@@ -26,9 +26,12 @@
 #ifndef CASADI_LINSOL_QR_HPP
 #define CASADI_LINSOL_QR_HPP
 
-/** \defgroup plugin_Linsol_qr
+/** \defgroup plugin_Linsol_qr Title
+    \par
+
   * Linear solver using sparse direct QR factorization
-*/
+
+    \identifier{22z} */
 
 /** \pluginsection{Linsol,qr} */
 

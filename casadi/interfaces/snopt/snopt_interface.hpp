@@ -34,9 +34,12 @@ extern "C" {
 #include "snopt_cwrap.h" // NOLINT(build/include)
 }
 
-/** \defgroup plugin_Nlpsol_snopt
+/** \defgroup plugin_Nlpsol_snopt Title
+    \par
+
   SNOPT interface
-*/
+
+    \identifier{22m} */
 
 /** \pluginsection{Nlpsol,snopt} */
 

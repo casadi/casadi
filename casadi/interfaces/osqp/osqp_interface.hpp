@@ -34,9 +34,12 @@ extern "C" {
 #include "osqp.h" // NOLINT(build/include)
 }
 
-/** \defgroup plugin_Conic_osqp
+/** \defgroup plugin_Conic_osqp Title
+    \par
+
     Interface to the OSQP Solver for quadratic programming
-*/
+
+    \identifier{220} */
 
 /** \pluginsection{Conic,osqp} */
 

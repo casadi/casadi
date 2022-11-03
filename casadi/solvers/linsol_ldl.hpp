@@ -26,9 +26,12 @@
 #ifndef CASADI_LINSOL_LDL_HPP
 #define CASADI_LINSOL_LDL_HPP
 
-/** \defgroup plugin_Linsol_ldl
+/** \defgroup plugin_Linsol_ldl Title
+    \par
+
   * Linear solver using sparse direct LDL factorization
-*/
+
+    \identifier{233} */
 
 /** \pluginsection{Linsol,ldl} */
 

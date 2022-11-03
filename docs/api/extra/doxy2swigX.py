@@ -31,8 +31,14 @@ import re
 
 import lxml.etree as ET
 import pydot
+import os
+cwd = os.getcwd()
+
+import pathlib
+stem = str(pathlib.Path(cwd).parent.parent.parent)
 
 expression_tools = set()
+
 
 for r in open("../../../swig/casadi.i","r"):
   if "casadi_" in r:
@@ -41,13 +47,13 @@ for r in open("../../../swig/casadi.i","r"):
       expression_tools.add(m.group(1))
 
 aliases = {}
-for line in file('../Doxyfile.in','r'):
+for line in open('../Doxyfile.in','r'):
   if line.startswith('ALIASES'):
     m = re.search('\+=\s*(\w+)\s*=\s*"(.*?)"',line) 
     if m:
       aliases[m.group(1)]=m.group(2)
 
-print aliases
+print(aliases)
 
 
 def astext(node,whitespace=False,escape=True,strictspacing=False):
@@ -91,7 +97,7 @@ class Doxy2SWIG_X(Doxy2SWIG):
         for e3 in e2.getElementsByTagName("node"):
           for e4 in e3.getElementsByTagName("label"):
             if "Node" in e4.firstChild.data:
-              print "skipped"
+              print("skipped")
               try:
                 self.xmldoc.removeChild(e)
               except:
@@ -165,7 +171,7 @@ class Doxy2SWIG_X(Doxy2SWIG):
                 else:
                   _tmp = i.strip()
               else:
-                _tmp = textwrap.fill(i.strip(), 80-4, break_long_words=False)
+                _tmp = textwrap.fill(i.strip(), 80-4, break_long_words=False,drop_whitespace=False,replace_whitespace=False)
               _tmp = self.lead_spc.sub(r'\1"\2', _tmp)
               ret.extend([_tmp, '\n\n'])
       return ret
@@ -174,12 +180,12 @@ class Doxy2SWIG_X(Doxy2SWIG):
         o = my_open_write(fname)
         if self.multi:
             for p in self.pieces:
-              pp = p.encode("ascii","ignore")
+              pp = p#.encode("ascii","ignore")
               pp = re.sub("[A-Z_]*_EXPORT ","",pp)
               o.write(pp)
         else:
             for p in self.clean_pieces(self.pieces):
-              pp = p.encode("ascii","ignore")
+              pp = p#.encode("ascii","ignore")
               pp = re.sub("[A-Z_]*_EXPORT ","",pp)
               o.write(pp)
         o.close()
@@ -197,14 +203,14 @@ class Doxy2SWIG_X(Doxy2SWIG):
           if "SparsityInterface" in refid: filtered = False
           if filtered: continue
 
-          print c.attributes['refid'].value, c.attributes['kind'].value
+          print(c.attributes['refid'].value, c.attributes['kind'].value)
 
           fname = refid + '.xml'
           if not os.path.exists(fname):
               fname = os.path.join(self.my_dir,  fname)
           if fname.endswith("cpp.xml"): continue
           if not self.quiet:
-              print "parsing file: %s"%fname
+              print("parsing file: %s"%fname)
           p = Doxy2SWIG_X(fname, self.include_function_definition, self.quiet,internal=self.internal,deprecated=self.deprecated,merge=self.merge,groupdoc=self.groupdoc)
           p.generate()
           self.pieces.extend(self.clean_pieces(p.pieces))
@@ -226,7 +232,7 @@ class Doxy2SWIG_X(Doxy2SWIG):
     pass
     
   def do_programlisting(self,node):
-    if hasattr(node.previousSibling,'tagName') and node.previousSibling.tagName=="htmlonly" and "doctest" in node.previousSibling.firstChild.data:
+    if True or hasattr(node.previousSibling,'tagName') and node.previousSibling.tagName=="htmlonly" and "doctest" in node.previousSibling.firstChild.data:
       self.add_text("\n\n::\n\n")
       for codeline in node.getElementsByTagName("codeline"):
         self.add_text("  >>> " + astext(codeline,strictspacing=True).replace("\n","%%newline%%")+"\n")
@@ -247,16 +253,15 @@ class Doxy2SWIG_X(Doxy2SWIG):
     self.add_text(text.replace("\n","%%newline%%").replace('\\', r'\\\\').replace('"', r'\"')+"\n\n")
     
   def do_table(self, node):
-     
     caption = node.getElementsByTagName("caption")
     if len(caption)==1:
-      self.add_text(">" + astext(caption[0]).encode("ascii","ignore")+"\n\n")
+      self.add_text(">" + astext(caption[0]).encode("ascii","replace").decode("ascii")+"\n\n")
     
     rows = []
     for (i,row) in enumerate(node.getElementsByTagName("row")):
       rows.append([])
       for (j,entry) in enumerate(row.getElementsByTagName("entry")):
-        rows[i].append(astext(entry,escape=False).encode("ascii","ignore").replace("&gt;",">").replace("&lt;","<"))
+        rows[i].append(astext(entry,escape=False).encode("ascii","replace").decode("ascii").replace("&gt;",">").replace("&lt;","<"))
       
     table = texttable.Texttable(max_width=80-4)
     table.add_rows(rows)
@@ -286,13 +291,13 @@ class Doxy2SWIG_X(Doxy2SWIG):
 
       if kind in ('class', 'struct'):
           prot = node.attributes['prot'].value
-          if prot <> 'public':
+          if prot != 'public':
               return
           names = ('compoundname', 'briefdescription',
                    'detaileddescription', 'includes')
           first = self.get_specific_nodes(node, names)
           for n in names:
-              if first.has_key(n):
+              if n in first:
                   self.parse(first[n])
           self.end_docstring()
           for n in node.childNodes:
@@ -308,7 +313,7 @@ class Doxy2SWIG_X(Doxy2SWIG):
                      'detaileddescription', 'includes')
             first = self.get_specific_nodes(node, names)
             for n in names:
-                if first.has_key(n):
+                if n in first:
                     self.parse(first[n])
             self.end_docstring()
 
@@ -324,14 +329,24 @@ class Doxy2SWIG_X(Doxy2SWIG):
       tmp = node.parentNode.parentNode.parentNode
       compdef = tmp.getElementsByTagName('compounddef')[0]
       cdef_kind = compdef.attributes['kind'].value
-      location = node.getElementsByTagName('location')[0].attributes['file'].value
+      location = node.getElementsByTagName('location')[0]
+      if "declfile" in location.attributes:
+        location = location.attributes['declfile'].value
+      else:
+        location = location.attributes['file'].value
+      if "bodyfile" in node.getElementsByTagName('location')[0].attributes:
+          bodylocation = node.getElementsByTagName('location')[0].attributes['bodyfile'].value
+          bodystart = int(node.getElementsByTagName('location')[0].attributes['bodystart'].value)
+          bodyend = int(node.getElementsByTagName('location')[0].attributes['bodyend'].value)
+      line = int(node.getElementsByTagName('location')[0].attributes['line'].value)
       if prot == 'public' and not location.endswith('cpp'):
           first = self.get_specific_nodes(node, ('definition', 'name','argsstring'))
+
           name = first['name'].firstChild.data
           if name[:8] == 'operator': # Don't handle operators yet.
               return
 
-          if not first.has_key('definition') or \
+          if not ('definition' in first) or \
                  kind in ['variable', 'typedef']:
               return
 
@@ -357,25 +372,29 @@ class Doxy2SWIG_X(Doxy2SWIG):
           definition = first['definition'].firstChild.data
           #definition of friends is missing parent class
           if not re.search("::~?\w+(<[ \w]+>)?$",definition):
-            print "repair", definition
+            print("repair", definition)
             definition = " ".join(definition.split(" ")[:-1]+[target])
           try:
             defn = definition + first['argsstring'].firstChild.data
           except:
             return
+            
+          meta = {"decl": {"file":location, "line": line}}
+          if "bodyfile" in node.getElementsByTagName('location')[0].attributes:
+            meta["impl"] = {"file": bodylocation, "lines": (bodystart,bodyend)}
               
-          self.start_docstring(target,defn)
+          self.start_docstring(target,defn,meta=meta)
           for n in node.childNodes:
               if n not in first.values():
                   self.parse(n)
           self.end_docstring()
 
-  def start_docstring(self,target,origin="huma kavula"):
-    self.active_docstring = (target,origin)
+  def start_docstring(self,target,origin="huma kavula",meta=None):
+    self.active_docstring = (target,origin,meta)
     if target in self.docstringmap:
-      self.docstringmap[target].append((origin,[]))
+      self.docstringmap[target].append((origin,[],meta))
     else:
-      self.docstringmap[target]= [(origin,[])]
+      self.docstringmap[target]= [(origin,[],meta)]
     
   def end_docstring(self):
     self.active_docstring = None
@@ -386,7 +405,7 @@ class Doxy2SWIG_X(Doxy2SWIG):
       self.add_text_original(value)
     else:
       #print self.active_docstring, self.docstringmap[self.active_docstring[0]], value
-      if type(value) in (types.ListType, types.TupleType):
+      if type(value) in (list, tuple):
           self.docstringmap[self.active_docstring[0]][-1][1].extend(value)
       else:
           self.docstringmap[self.active_docstring[0]][-1][1].append(value)
@@ -400,7 +419,7 @@ class Doxy2SWIG_X(Doxy2SWIG):
       except Exception as e:
         publicapi = None
       Doxy2SWIG.generate(self)
-      for k, v in self.docstringmap.iteritems():
+      for k, v in self.docstringmap.items():
         if k.startswith("plugin_"):
           groupdoc[k] = v[0][1]
           break
@@ -408,9 +427,9 @@ class Doxy2SWIG_X(Doxy2SWIG):
         grouped_list = []
         grouped_dict = {}
         
-        def fix_signature(a): return re.sub(" *?= *?delete *?$","", a.replace("override",""))
+        def fix_signature(a): return re.sub(" *?= *?(delete|default) *?$","", a.replace("override",""))
         
-        for (origin,pieces) in v:
+        for (origin,pieces,meta) in v:
           origin_nostatic = origin.replace("static ","")
           m = list(re.finditer("\[DEPRECATED(:(.*?))?\]","".join(pieces)))
           deprecated = ("" if m[-1].group(2) is None else m[-1].group(2)) if len(m)>0 else None
@@ -443,6 +462,11 @@ class Doxy2SWIG_X(Doxy2SWIG):
           else:
             swigname = ""
             
+          if meta is not None:
+              if len("".join(pieces).strip())>0:
+                  pieces = pieces+["Doc source: https://github.com/casadi/casadi/blob/develop%s#L%d\n" % (meta["decl"]["file"].replace(stem,""),meta["decl"]["line"])]
+                  if "impl" in meta:
+                      pieces = pieces+["Implementation: https://github.com/casadi/casadi/blob/develop%s#L%d-L%d\n" % (meta["impl"]["file"].replace(stem,""),meta["impl"]["lines"][0],meta["impl"]["lines"][1])]
             
           #"INTERNAL": "mark_internal(\"$decl\");"
           #"DEPRECATED": "deprecated(\"%s\");"
@@ -466,7 +490,7 @@ class Doxy2SWIG_X(Doxy2SWIG):
           total = u"".join(pieces)
           totalnowrap = total.replace("\n"," ")
           if (aliases["noswig"] in totalnowrap) or (aliases["nopython"] in totalnowrap):
-             print "skipping", origin
+             print("skipping", origin)
              continue
           if total in grouped_dict:
              grouped_dict[total][0].append(origin)
@@ -476,7 +500,6 @@ class Doxy2SWIG_X(Doxy2SWIG):
           if not self.merge:
             target = fix_signature(swigname if len(swigname)>0 else k)
             self.doc_target(target, pieces)
-            
         if self.merge:
           target = fix_signature(k)
           
@@ -509,9 +532,10 @@ class Doxy2SWIG_X(Doxy2SWIG):
     m = re.search(r"\b(\w+)\(",target)
     if m:
       if m.group(1) in expression_tools:
-        
         content = [c.replace("[INTERNAL]","") for c in content]
-        content = [re.sub("Functions called by friend functions defined (here|for \w+)\.?","",c) for c in content]
+        if "Functions called by friend functions defined" in " ".join(content):
+            content = []
+        content = [re.sub("Functions called by friend functions defined (here|for +\w+)\.?","",c) for c in content]
         self.doc_target("casadi::casadi_" + m.group(1), content,correction=False)
         target = target.split("(")[0]
         target = "::".join(target.split("::")[:-1])
@@ -551,15 +575,15 @@ if __name__ == '__main__':
     deprecated = dict()
     groupdoc = dict()
     convert(args[0], args[1], False, options.quiet,internal=internal,deprecated=deprecated,merge=options.merge,groupdoc=groupdoc)
-    file(args[2],'w').write("\n".join(sorted(filter(lambda x: len(x)>0, internal.values()))))
-    file(args[3],'w').write("\n".join(sorted(filter(lambda x: len(x)>0, deprecated.values()))))
+    open(args[2],'w').write("\n".join(sorted(filter(lambda x: len(x)>0, internal.values()))))
+    open(args[3],'w').write("\n".join(sorted(filter(lambda x: len(x)>0, deprecated.values()))))
     import pickle
-    filemap = pickle.load(file('filemap.pkl','r'))
+    filemap = pickle.load(open('filemap.pkl','rb'))
     
-    for k,v in groupdoc.iteritems():
+    for k,v in groupdoc.items():
       fn,n = filemap[k]
-      f = file(fn.replace(".hpp","_meta.cpp"),"w")
-      f.write(file('../../../misc/license_header.txt','r').read())
+      f = open(fn.replace(".hpp","_meta.cpp"),"w")
+      f.write(open('../../../misc/license_header.txt','r').read())
       f.write("""
       #include "%s"
       #include <string>

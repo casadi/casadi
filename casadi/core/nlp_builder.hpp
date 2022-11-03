@@ -31,9 +31,11 @@
 namespace casadi {
 
   /** \brief A symbolic NLP representation
+
   \date 2012-2015
   \author Joel Andersson
-  */
+
+      \identifier{1e2} */
   class CASADI_EXPORT NlpBuilder
     : public SWIG_IF_ELSE(PrintableCommon, Printable<NlpBuilder>) {
   public:

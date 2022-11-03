@@ -29,9 +29,12 @@
 #include "casadi/core/nlpsol_impl.hpp"
 #include <casadi/solvers/casadi_nlpsol_qrsqp_export.h>
 
-/** \defgroup plugin_Nlpsol_qrsqp
+/** \defgroup plugin_Nlpsol_qrsqp Title
+    \par
+
  A textbook SQPMethod
-*/
+
+    \identifier{22u} */
 
 /** \pluginsection{Nlpsol,qrsqp} */
 

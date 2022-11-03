@@ -34,7 +34,9 @@
 #include "generic_expression.hpp"
 #include "serializing_stream.hpp"
 
-/** \brief  C/C++ */
+/** \brief  C/C++
+
+    \identifier{10g} */
 #include <cmath>
 #include <iostream>
 #include <limits>
@@ -44,7 +46,9 @@
 
 namespace casadi {
 
-  /** \brief  forward declaration of Node and Matrix */
+  /** \brief  forward declaration of Node and Matrix
+
+      \identifier{10h} */
   class SXNode; // include will follow in the end
 
   /** SXElem is exposed only as an empty struct to SWIG */
@@ -53,9 +57,11 @@ namespace casadi {
 #else // SWIG
 
   /** \brief The basic scalar symbolic class of CasADi
+
       \author Joel Andersson
       \date 2010-2014
-  */
+
+      \identifier{10i} */
   class CASADI_EXPORT SXElem : public GenericExpression<SXElem>,
                                public Printable<SXElem> {
     friend class SXNode;
@@ -65,23 +71,29 @@ namespace casadi {
 
     /// \cond CLUTTER
     /** \brief Default constructor (not-a-number)
+
         Object is initialized as not-a-number.
-    */
+
+        \identifier{10j} */
     SXElem();
     /// \endcond
 
     /** \brief Numerical constant constructor
+
         \param val Numerical value
-    */
+
+        \identifier{10k} */
     SXElem(double val);
 
     /** \brief Create a symbolic primitive
+
          \param name Name of the symbolic primitive
 
         This is the name that will be used by the "operator<<" and "str" methods.
         The name is not used as identifier; you may construct distinct
         SXElem objects with non-unique names.
-    */
+
+        \identifier{10l} */
     static SXElem sym(const std::string& name);
 
     /// \cond INTERNAL
@@ -89,7 +101,9 @@ namespace casadi {
     SXElem(SXNode* node, bool dummy);
     /// \endcond
 
-    /** \brief Copy constructor */
+    /** \brief Copy constructor
+
+        \identifier{10m} */
     SXElem(const SXElem& scalar); // copy constructor
 
     /// Destructor
@@ -115,33 +129,44 @@ namespace casadi {
     void disp(std::ostream& stream, bool more=false) const;
 
     /// \cond INTERNAL
-    /** \brief  Get a pointer to the node */
+    /** \brief  Get a pointer to the node
+
+        \identifier{10n} */
     SXNode* get() const; // note: constant pointer, not pointer to constant object!
                          // (to allow access to the counter)
 
-    /** \brief  Access functions of the node */
+    /** \brief  Access functions of the node
+
+        \identifier{10o} */
     const SXNode* operator->() const;
     SXNode* operator->();
     /// \endcond
 
-    /** \brief  Perform operations by ID */
+    /** \brief  Perform operations by ID
+
+        \identifier{10p} */
     static SXElem binary(casadi_int op, const SXElem& x, const SXElem& y);
     static SXElem unary(casadi_int op, const SXElem& x);
 
     /** \brief Check the truth value of this node
+
      * Introduced to catch bool(x) situations in python
-     */
+
+        \identifier{10q} */
     bool __nonzero__() const;
 
     /** \brief check if this SXElem is a leaf of the SX graph
      *
      * An SXElem qualifies as leaf when it has no dependencies.
-     */
+
+        \identifier{10r} */
     bool is_leaf() const;
     bool is_constant() const;
     bool is_integer() const;
     bool is_symbolic() const;
-    /** \brief Check whether a binary SXElem is commutative*/
+    /** \brief Check whether a binary SXElem is commutative
+
+        \identifier{10s} */
     bool is_commutative() const;
     bool is_zero() const;
     bool is_almost_zero(double tol) const;
@@ -157,7 +182,9 @@ namespace casadi {
     /// Checks if expression does not contain NaN or Inf
     bool is_regular() const;
 
-    /** \brief Check if a value is always nonnegative (false negatives are allowed) */
+    /** \brief Check if a value is always nonnegative (false negatives are allowed)
+
+        \identifier{10t} */
     bool is_nonnegative() const;
     SXElem dep(casadi_int ch=0) const;
 
@@ -167,24 +194,36 @@ namespace casadi {
     /// Type conversion to casadi_int
     explicit operator casadi_int() const;
 
-    /** \brief Check if the node is the sum of two equal expressions */
+    /** \brief Check if the node is the sum of two equal expressions
+
+        \identifier{10u} */
     bool is_doubled() const;
 
-    /** \brief Get the number of dependencies of a binary SXElem */
+    /** \brief Get the number of dependencies of a binary SXElem
+
+        \identifier{10v} */
     casadi_int n_dep() const;
 
     /** \brief Returns a number that is unique for a given SXNode.
+
      * If the SXElem does not point to any node, 0 is returned.
-     */
+
+        \identifier{10w} */
     casadi_int __hash__() const;
 
-    /** \brief  Negation */
+    /** \brief  Negation
+
+        \identifier{10x} */
     SXElem operator-() const;
 
-    /** \brief Element-wise inverse */
+    /** \brief Element-wise inverse
+
+        \identifier{10y} */
     SXElem inv() const;
 
-    /** \brief Check equality up to a given depth */
+    /** \brief Check equality up to a given depth
+
+        \identifier{10z} */
     static bool is_equal(const SXElem& x, const SXElem& y, casadi_int depth=0);
 
     /// \cond INTERNAL
@@ -201,23 +240,35 @@ namespace casadi {
     void mark() const;
 
     /** \brief Assign to another expression, if a duplicate.
-     * Check for equality up to a given depth */
+
+     * Check for equality up to a given depth
+
+        \identifier{110} */
     void assignIfDuplicate(const SXElem& scalar, casadi_int depth=1);
 
     /** \brief Assign the node to something, without invoking the deletion of the node,
-     * if the count reaches 0 */
+
+     * if the count reaches 0
+
+        \identifier{111} */
     SXNode* assignNoDelete(const SXElem& scalar);
     /// \endcond
 
-    /** \brief SXElem nodes are not allowed to be null */
+    /** \brief SXElem nodes are not allowed to be null
+
+        \identifier{112} */
     inline bool is_null() {return false;}
 
-    /** \brief Ternary if_else: x ? y : z */
+    /** \brief Ternary if_else: x ? y : z
+
+        \identifier{113} */
     friend inline SXElem if_else(const SXElem& x, const SXElem& y, const SXElem& z) {
       return if_else_zero(x, y) + if_else_zero(!x, z);
     }
 
-    /** \brief Serialize an object */
+    /** \brief Serialize an object
+
+        \identifier{114} */
     void serialize(SerializingStream& s) const;
 
     static SXElem deserialize(DeserializingStream& s);

@@ -177,18 +177,18 @@ namespace casadi {
      * This class is intended for advanced users that want to circumvent the restrictions
      * of standard pickling/matlab save load, ie no raw SX/MX symbols allowed.
      * 
-     * \example
-     * x = SX.sym('x');
-     * s = StringSerializer();
-     * s.pack(x);
-     * s.pack(sin(x));
-     * 
-     * data = s.encode();
-     * 
-     * s = StringDeserializer(data);
-     * a = s.unpack();
-     * b = s.unpack();
-     * \endexample
+     * \verbatim
+     x = SX.sym('x');
+     s = StringSerializer();
+     s.pack(x);
+     s.pack(sin(x));
+      
+     data = s.encode();
+     
+     s = StringDeserializer(data);
+     a = s.unpack();
+     b = s.unpack();
+     \endverbatim
      * 
      * Note:
      *  Saving SX/MX objects individually has a substantial overhead
@@ -197,16 +197,17 @@ namespace casadi {
      *  the overhead.
      * 
      * 
-     * \seealso Function::save, Function::serialize, StringDeserializer, FileSerializer
-     * 
-     */
+     * \see Function::save, Function::serialize, StringDeserializer, FileSerializer
+     *
+        \identifier{7o} */
     StringSerializer(const Dict& opts = Dict());
     ~StringSerializer();
 
     /** \brief Returns a string that holds the serialized objects
      * 
      * As a side effect, this method clears the internal buffer
-    */
+
+        \identifier{7p} */
     std::string encode();
   };
 
@@ -214,8 +215,9 @@ namespace casadi {
   public:
     /** \brief Advanced serialization of CasADi objects
      * 
-     * \seealso StringSerializer, FileDeserializer
-     */
+     * \see StringSerializer, FileDeserializer
+
+        \identifier{7q} */
     FileSerializer(const std::string& fname, const Dict& opts = Dict());
     ~FileSerializer();
   };
@@ -225,14 +227,16 @@ namespace casadi {
 
     /** \brief Advanced deserialization of CasADi objects
      * 
-     * \seealso StringDeserializer
-     */
+     * \see StringDeserializer
+
+        \identifier{7r} */
     StringDeserializer(const std::string& string);
     ~StringDeserializer();
 
 
     /** \brief Sets the string to deserialize objects from
-    */
+
+        \identifier{7s} */
     void decode(const std::string& string);
   };
 
@@ -240,8 +244,9 @@ namespace casadi {
   public:
      /** \brief Advanced deserialization of CasADi objects
      * 
-     * \seealso FileSerializer
-     */
+     * \see FileSerializer
+
+         \identifier{7t} */
     FileDeserializer(const std::string& fname);
     ~FileDeserializer();
   };

@@ -29,12 +29,13 @@
 #include "casadi/core/linsol_internal.hpp"
 #include <casadi/solvers/casadi_linsol_lsqr_export.h>
 
-/** \defgroup plugin_Linsol_symbolicqr
+/** \defgroup plugin_Linsol_symbolicqr Title
+    \par
 
     Linear solver for sparse least-squares problems
     Inspired from https://github.com/scipy/scipy/blob/v0.14.0/scipy/sparse/linalg/isolve/lsqr.py#L96
 
-*/
+    \identifier{230} */
 
 /** \pluginsection{Linsol,symbolicqr} */
 

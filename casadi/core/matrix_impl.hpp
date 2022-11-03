@@ -1807,6 +1807,16 @@ namespace casadi {
   }
 
   template<typename Scalar>
+  Matrix<Scalar> Matrix<Scalar>::sparsity_cast(const Matrix<Scalar>& x, const Sparsity& sp) {
+    // quick return if already the right shape
+    if (sp==x.sparsity()) return x;
+
+    casadi_assert_dev(sp.nnz()==x.nnz());
+
+    return Matrix<Scalar>(sp, x.nonzeros(), false);
+  }
+
+  template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::trace(const Matrix<Scalar>& x) {
     casadi_assert(x.is_square(), "trace: must be square");
     Scalar res=0;
@@ -2316,7 +2326,9 @@ namespace casadi {
     return ret;
   }
 
-  /** \brief   Construct a matrix with given block on the diagonal */
+  /** \brief   Construct a matrix with given block on the diagonal
+
+      \identifier{1nb} */
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::diagcat(const std::vector< Matrix<Scalar> > &A) {
     std::vector<Scalar> data;
@@ -2561,6 +2573,13 @@ namespace casadi {
       casadi_int order, bool tr) {
     casadi_error("'which_depends' not defined for " + type_name());
     return std::vector<bool>();
+  }
+
+  template<typename Scalar>
+  Sparsity
+  Matrix<Scalar>::jacobian_sparsity(const Matrix<Scalar> &f, const Matrix<Scalar> &x) {
+    casadi_error("'jacobian_sparsity' not defined for " + type_name());
+    return Sparsity();
   }
 
   template<typename Scalar>

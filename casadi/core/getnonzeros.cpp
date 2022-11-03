@@ -61,11 +61,9 @@ namespace casadi {
   }
 
   void GetNonzerosVector::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
-    for (casadi_int i=0;i<this->n_dep();++i) {
-      if (this->dep(i).sparsity()!=arg[i].sparsity()) {
-        GetNonzeros::eval_mx(arg, res);
-        return;
-      }
+    if (!matches_sparsity(arg)) {
+      GetNonzeros::eval_mx(arg, res);
+      return;
     }
     res[0] = arg[0]->get_nzref(sparsity(), nz_);
   }
@@ -496,7 +494,12 @@ namespace casadi {
     g << "for (cii=" << ind << ", rr=" << g.work(res[0], nnz())
       << ", ss=" << g.work(arg[0], dep(0).nnz())
       << "; cii!=" << ind << "+" << nz_.size()
-      << "; ++cii) *rr++ = *cii>=0 ? ss[*cii] : 0;\n";
+      << "; ++cii) *rr++ = ";
+    if (has_negative(nz_)) {
+      g << "*cii>=0 ? ss[*cii] : 0;\n";
+    } else {
+      g << "ss[*cii];\n";
+    }
   }
 
   MX GetNonzeros::get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz) const {

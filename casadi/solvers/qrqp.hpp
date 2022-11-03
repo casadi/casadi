@@ -29,9 +29,13 @@
 #include "casadi/core/conic_impl.hpp"
 #include <casadi/solvers/casadi_conic_qrqp_export.h>
 
-/** \defgroup plugin_Conic_qrqp
- Solve QPs using an active-set method
-*/
+/** \defgroup plugin_Conic_qrqp Title
+    \par
+ * 
+ * 
+ * Solve QPs using an active-set method
+ *
+ \identifier{22y} */
 
 /** \pluginsection{Conic,qrqp} */
 

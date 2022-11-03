@@ -32,12 +32,15 @@
 #include <mumps/mumps_mpi.h>
 #include <mumps/dmumps_c.h>
 
-/** \defgroup plugin_Linsol_mumps
+/** \defgroup plugin_Linsol_mumps Title
+    \par
+
  * Interface to the sparse direct linear solver MUMPS
  * Works for symmetric indefinite systems
  * \author Joel Andersson
  * \date 2019
- */
+
+    \identifier{22t} */
 
 /** \pluginsection{Linsol,mumps} */
 /// \cond INTERNAL

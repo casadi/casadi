@@ -31,7 +31,9 @@
 /// \cond INTERNAL
 
 namespace casadi {
-  /** \brief  An atomic operation for the SXElem virtual machine */
+  /** \brief  An atomic operation for the SXElem virtual machine
+
+      \identifier{ua} */
   struct ScalarAtomic {
     int op;     /// Operator index
     int i0;
@@ -42,27 +44,37 @@ namespace casadi {
   };
 
 /** \brief  Internal node class for SXFunction
+
     Do not use any internal class directly - always use the public Function
     \author Joel Andersson
     \date 2010-2015
-*/
+
+    \identifier{ub} */
 class CASADI_EXPORT SXFunction :
         public XFunction<SXFunction, Matrix<SXElem>, SXNode>{
   public:
-    /** \brief Constructor */
+    /** \brief Constructor
+
+        \identifier{uc} */
     SXFunction(const std::string& name,
                const std::vector<Matrix<SXElem> >& inputv,
                const std::vector<Matrix<SXElem> >& outputv,
                const std::vector<std::string>& name_in,
                const std::vector<std::string>& name_out);
 
-  /** \brief  Destructor */
+  /** \brief  Destructor
+
+      \identifier{ud} */
   ~SXFunction() override;
 
-  /** \brief  Evaluate numerically, work vectors given */
+  /** \brief  Evaluate numerically, work vectors given
+
+      \identifier{ue} */
   int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
 
-  /** \brief  evaluate symbolically while also propagating directional derivatives */
+  /** \brief  evaluate symbolically while also propagating directional derivatives
+
+      \identifier{uf} */
   int eval_sx(const SXElem** arg, SXElem** res,
               casadi_int* iw, SXElem* w, void* mem) const override;
 
@@ -71,28 +83,42 @@ class CASADI_EXPORT SXFunction :
     return true;
   }
 
-  /** \brief Calculate forward mode directional derivatives */
+  /** \brief Calculate forward mode directional derivatives
+
+      \identifier{ug} */
   void ad_forward(const std::vector<std::vector<SX> >& fseed,
                             std::vector<std::vector<SX> >& fsens) const;
 
-  /** \brief Calculate reverse mode directional derivatives */
+  /** \brief Calculate reverse mode directional derivatives
+
+      \identifier{uh} */
   void ad_reverse(const std::vector<std::vector<SX> >& aseed,
                             std::vector<std::vector<SX> >& asens) const;
 
-  /** \brief  Check if smooth */
+  /** \brief  Check if smooth
+
+      \identifier{ui} */
   bool is_smooth() const;
 
-  /** \brief  Print the algorithm */
+  /** \brief  Print the algorithm
+
+      \identifier{uj} */
   void disp_more(std::ostream& stream) const override;
 
-  /** \brief Get type name */
+  /** \brief Get type name
+
+      \identifier{uk} */
   std::string class_name() const override {return "SXFunction";}
 
-  /** \brief Check if the function is of a particular type */
+  /** \brief Check if the function is of a particular type
+
+      \identifier{ul} */
   bool is_a(const std::string& type, bool recursive) const override;
 
   ///@{
-  /** \brief Get function input(s) and output(s)  */
+  /** \brief Get function input(s) and output(s)
+
+      \identifier{um} */
   const SX sx_in(casadi_int ind) const override;
   const std::vector<SX> sx_in() const override;
   ///@}
@@ -104,26 +130,38 @@ class CASADI_EXPORT SXFunction :
     return ret;
   }
 
-  /** \brief Does the function have free variables */
+  /** \brief Does the function have free variables
+
+      \identifier{un} */
   bool has_free() const override { return !free_vars_.empty();}
 
-  /** \brief Print free variables */
+  /** \brief Print free variables
+
+      \identifier{uo} */
   std::vector<std::string> get_free() const override {
     std::vector<std::string> ret;
     for (auto&& e : free_vars_) ret.push_back(e.name());
     return ret;
   }
 
-  /** \brief Hessian (forward over adjoint) via source code transformation */
+  /** \brief Hessian (forward over adjoint) via source code transformation
+
+      \identifier{up} */
   SX hess(casadi_int iind=0, casadi_int oind=0);
 
-  /** \brief Get the number of atomic operations */
+  /** \brief Get the number of atomic operations
+
+      \identifier{uq} */
   casadi_int n_instructions() const override { return algorithm_.size();}
 
-  /** \brief Get an atomic operation operator index */
+  /** \brief Get an atomic operation operator index
+
+      \identifier{ur} */
   casadi_int instruction_id(casadi_int k) const override { return algorithm_.at(k).op;}
 
-  /** \brief Get the (integer) input arguments of an atomic operation */
+  /** \brief Get the (integer) input arguments of an atomic operation
+
+      \identifier{us} */
   std::vector<casadi_int> instruction_input(casadi_int k) const override {
     auto e = algorithm_.at(k);
     if (casadi_math<double>::ndeps(e.op)==2 || e.op==OP_INPUT) {
@@ -135,12 +173,16 @@ class CASADI_EXPORT SXFunction :
     }
   }
 
-  /** \brief Get the floating point output argument of an atomic operation */
+  /** \brief Get the floating point output argument of an atomic operation
+
+      \identifier{ut} */
   double instruction_constant(casadi_int k) const override {
     return algorithm_.at(k).d;
   }
 
-  /** \brief Get the (integer) output argument of an atomic operation */
+  /** \brief Get the (integer) output argument of an atomic operation
+
+      \identifier{uu} */
   std::vector<casadi_int> instruction_output(casadi_int k) const override {
     auto e = algorithm_.at(k);
     if (e.op==OP_OUTPUT) {
@@ -150,21 +192,31 @@ class CASADI_EXPORT SXFunction :
     }
   }
 
-  /** \brief Number of nodes in the algorithm */
+  /** \brief Number of nodes in the algorithm
+
+      \identifier{uv} */
   casadi_int n_nodes() const override { return algorithm_.size() - nnz_out();}
 
-  /** \brief  DATA MEMBERS */
+  /** \brief  DATA MEMBERS
 
-  /** \brief  An element of the algorithm, namely a binary operation */
+      \identifier{uw} */
+
+  /** \brief  An element of the algorithm, namely a binary operation
+
+      \identifier{ux} */
   typedef ScalarAtomic AlgEl;
 
-  /** \brief  An element of the tape */
+  /** \brief  An element of the tape
+
+      \identifier{uy} */
   template<typename T>
   struct TapeEl {
     T d[2];
   };
 
-  /** \brief  all binary nodes of the tree in the order of execution */
+  /** \brief  all binary nodes of the tree in the order of execution
+
+      \identifier{uz} */
   std::vector<AlgEl> algorithm_;
 
   // Work vector size
@@ -182,14 +234,20 @@ class CASADI_EXPORT SXFunction :
   /// Default input values
   std::vector<double> default_in_;
 
-    /** \brief Serialize an object without type information */
+    /** \brief Serialize an object without type information
+
+        \identifier{v0} */
   void serialize_body(SerializingStream &s) const override;
 
-    /** \brief Deserialize without type information */
+    /** \brief Deserialize without type information
+
+        \identifier{v1} */
   static ProtoFunction* deserialize(DeserializingStream& s);
 
   ///@{
-  /** \brief Options */
+  /** \brief Options
+
+      \identifier{v2} */
   static const Options options_;
   const Options& get_options() const override { return options_;}
   ///@}
@@ -197,29 +255,45 @@ class CASADI_EXPORT SXFunction :
   /// Reconstruct options dict
   Dict generate_options(bool is_temp) const override;
 
-  /** \brief  Initialize */
+  /** \brief  Initialize
+
+      \identifier{v3} */
   void init(const Dict& opts) override;
 
-  /** \brief Generate code for the declarations of the C function */
+  /** \brief Generate code for the declarations of the C function
+
+      \identifier{v4} */
   void codegen_declarations(CodeGenerator& g) const override;
 
-  /** \brief Generate code for the body of the C function */
+  /** \brief Generate code for the body of the C function
+
+      \identifier{v5} */
   void codegen_body(CodeGenerator& g) const override;
 
-  /** \brief  Propagate sparsity forward */
+  /** \brief  Propagate sparsity forward
+
+      \identifier{v6} */
   int sp_forward(const bvec_t** arg, bvec_t** res,
                   casadi_int* iw, bvec_t* w, void* mem) const override;
 
-  /** \brief  Propagate sparsity backwards */
+  /** \brief  Propagate sparsity backwards
+
+      \identifier{v7} */
   int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, void* mem) const override;
 
-  /** *\brief get SX expression associated with instructions */
+  /** *\brief get SX expression associated with instructions
+
+       \identifier{v8} */
   SX instructions_sx() const override;
 
-  /** \brief Get default input value */
+  /** \brief Get default input value
+
+      \identifier{v9} */
   double get_default_in(casadi_int ind) const override { return default_in_.at(ind);}
 
-  /** \brief Export function in a specific language */
+  /** \brief Export function in a specific language
+
+      \identifier{va} */
   void export_code_body(const std::string& lang,
     std::ostream &stream, const Dict& options) const override;
 
@@ -233,7 +307,9 @@ class CASADI_EXPORT SXFunction :
   bool live_variables_;
 
 protected:
-  /** \brief Deserializing constructor */
+  /** \brief Deserializing constructor
+
+      \identifier{vb} */
   explicit SXFunction(DeserializingStream& s);
 };
 

@@ -29,9 +29,12 @@
 #include "casadi/core/rootfinder_impl.hpp"
 #include <casadi/solvers/casadi_rootfinder_fast_newton_export.h>
 
-/** \defgroup plugin_Rootfinder_fast_newton
+/** \defgroup plugin_Rootfinder_fast_newton Title
+    \par
+
      Implements simple newton iterations to solve an implicit function.
-*/
+
+    \identifier{237} */
 
 /** \pluginsection{Rootfinder,fast_newton} */
 

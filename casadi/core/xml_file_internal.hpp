@@ -42,7 +42,9 @@ namespace casadi {
     // Destructor
     ~XmlFileInternal() override;
 
-    /** \brief  Print a description */
+    /** \brief  Print a description
+
+        \identifier{ed} */
     void disp(std::ostream& stream, bool more=false) const override;
 
     // Parse an XML file

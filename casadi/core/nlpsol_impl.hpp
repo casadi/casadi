@@ -34,7 +34,9 @@
 /// \cond INTERNAL
 namespace casadi {
 
-  /** \brief Integrator memory */
+  /** \brief Integrator memory
+
+      \identifier{1ni} */
   struct CASADI_EXPORT NlpsolMemory : public OracleMemory {
     // Problem data structure
     casadi_nlpsol_data<double> d_nlp;
@@ -51,7 +53,8 @@ namespace casadi {
       @copydoc Nlpsol_doc
       \author Joel Andersson
       \date 2010-2013
-  */
+
+      \identifier{1nj} */
   class CASADI_EXPORT
   Nlpsol : public OracleFunction, public PluginInterface<Nlpsol> {
   public:
@@ -74,15 +77,14 @@ namespace casadi {
     /// Execute the callback function only after this amount of iterations
     casadi_int callback_step_;
 
-    /// Throw an exception on failure?
-    bool error_on_fail_;
-
     /// Linear solver and options
     std::string sens_linsol_;
     Dict sens_linsol_options_;
 
     ///@{
-    /** \brief Options */
+    /** \brief Options
+
+        \identifier{1nk} */
     bool eval_errors_fatal_;
     bool warn_initial_bounds_;
     bool iteration_callback_ignore_errors_;
@@ -100,15 +102,23 @@ namespace casadi {
     /// Cache for KKT function
     mutable WeakRef kkt_;
 
-    /** \brief Serialize an object without type information */
+    /** \brief Serialize an object without type information
+
+        \identifier{1nl} */
     void serialize_body(SerializingStream &s) const override;
-    /** \brief Serialize type information */
+    /** \brief Serialize type information
+
+        \identifier{1nm} */
     void serialize_type(SerializingStream &s) const override;
 
-    /** \brief Deserialize into MX */
+    /** \brief Deserialize into MX
+
+        \identifier{1nn} */
     static ProtoFunction* deserialize(DeserializingStream& s);
 
-    /** \brief String used to identify the immediate FunctionInternal subclass */
+    /** \brief String used to identify the immediate FunctionInternal subclass
+
+        \identifier{1no} */
     std::string serialize_base_function() const override { return "Nlpsol"; }
 
     /// Constructor
@@ -118,54 +128,76 @@ namespace casadi {
     ~Nlpsol() override = 0;
 
     ///@{
-    /** \brief Number of function inputs and outputs */
+    /** \brief Number of function inputs and outputs
+
+        \identifier{1np} */
     size_t get_n_in() override { return NLPSOL_NUM_IN;}
     size_t get_n_out() override { return NLPSOL_NUM_OUT;}
     ///@}
 
     /// @{
-    /** \brief Sparsities of function inputs and outputs */
+    /** \brief Sparsities of function inputs and outputs
+
+        \identifier{1nq} */
     Sparsity get_sparsity_in(casadi_int i) override;
     Sparsity get_sparsity_out(casadi_int i) override;
     /// @}
 
     ///@{
-    /** \brief Names of function input and outputs */
+    /** \brief Names of function input and outputs
+
+        \identifier{1nr} */
     std::string get_name_in(casadi_int i) override { return nlpsol_in(i);}
     std::string get_name_out(casadi_int i) override { return nlpsol_out(i);}
     /// @}
 
     ///@{
-    /** \brief Options */
+    /** \brief Options
+
+        \identifier{1ns} */
     static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
 
-    /** \brief  Print description */
+    /** \brief  Print description
+
+        \identifier{1nt} */
     void disp_more(std::ostream& stream) const override;
 
     /// Initialize
     void init(const Dict& opts) override;
 
-    /** \brief Create memory block */
+    /** \brief Create memory block
+
+        \identifier{1nu} */
     void* alloc_mem() const override { return new NlpsolMemory();}
 
-    /** \brief Initalize memory block */
+    /** \brief Initalize memory block
+
+        \identifier{1nv} */
     int init_mem(void* mem) const override;
 
-    /** \brief Free memory block */
+    /** \brief Free memory block
+
+        \identifier{1nw} */
     void free_mem(void *mem) const override { delete static_cast<NlpsolMemory*>(mem);}
 
-    /** \brief Check if the inputs correspond to a well-posed problem */
+    /** \brief Check if the inputs correspond to a well-posed problem
+
+        \identifier{1nx} */
     virtual void check_inputs(void* mem) const;
 
-    /** \brief Get default input value */
+    /** \brief Get default input value
+
+        \identifier{1ny} */
     double get_default_in(casadi_int ind) const override { return nlpsol_default_in(ind);}
 
     /// Can discrete variables be treated
     virtual bool integer_support() const { return false;}
 
-    /** \brief Set the (persistent) work vectors */
+    /** \brief Set the (persistent) work vectors
+
+        \identifier{1nz} */
     void set_work(void* mem, const double**& arg, double**& res,
                           casadi_int*& iw, double*& w) const override;
 
@@ -175,17 +207,23 @@ namespace casadi {
     // Solve the NLP
     virtual int solve(void* mem) const = 0;
 
-    /** \brief Generate code for the function body */
+    /** \brief Generate code for the function body
+
+        \identifier{1o0} */
     void nlpsol_codegen_body(CodeGenerator& g) const;
 
-    /** \brief Do the derivative functions need nondifferentiated outputs? */
+    /** \brief Do the derivative functions need nondifferentiated outputs?
+
+        \identifier{1o1} */
     bool uses_output() const override {return true;}
 
     /// Get all statistics
     Dict get_stats(void* mem) const override;
 
     ///@{
-    /** \brief Generate a function that calculates forward mode derivatives */
+    /** \brief Generate a function that calculates forward mode derivatives
+
+        \identifier{1o2} */
     bool has_forward(casadi_int nfwd) const override { return true;}
     Function get_forward(casadi_int nfwd, const std::string& name,
                          const std::vector<std::string>& inames,
@@ -194,7 +232,9 @@ namespace casadi {
     ///@}
 
     ///@{
-    /** \brief Generate a function that calculates reverse mode derivatives */
+    /** \brief Generate a function that calculates reverse mode derivatives
+
+        \identifier{1o3} */
     bool has_reverse(casadi_int nadj) const override { return true;}
     Function get_reverse(casadi_int nadj, const std::string& name,
                          const std::vector<std::string>& inames,
@@ -227,10 +267,14 @@ namespace casadi {
     /// Short name
     static std::string shortname() { return "nlpsol";}
 
-    /** \brief Get type name */
+    /** \brief Get type name
+
+        \identifier{1o4} */
     std::string class_name() const override {return "Nlpsol";}
 
-    /** \brief Check if the function is of a particular type */
+    /** \brief Check if the function is of a particular type
+
+        \identifier{1o5} */
     bool is_a(const std::string& type, bool recursive) const override;
 
     // Get reduced Hessian
@@ -252,7 +296,9 @@ namespace casadi {
                                     const Dict& opts);
 
   protected:
-    /** \brief Deserializing constructor */
+    /** \brief Deserializing constructor
+
+        \identifier{1o6} */
     explicit Nlpsol(DeserializingStream& s);
   private:
     void set_nlpsol_prob();

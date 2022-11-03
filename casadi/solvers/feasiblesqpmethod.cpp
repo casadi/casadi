@@ -2,9 +2,10 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl, Kobe Bergmans
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
  *                            K.U. Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
+ *    Copyright (C) 2022-2023 David Kiessling
  *
  *    CasADi is free software; you can redistribute it and/or
  *    modify it under the terms of the GNU Lesser General Public
@@ -515,8 +516,8 @@ void Feasiblesqpmethod::tr_update(void* mem, double& tr_rad, double tr_ratio) co
   auto d = &m->d;
   
   if (tr_ratio < tr_eta1_){
-    tr_rad = tr_alpha1_ * casadi_tr_norm_inf(nx_, d->dx, d->tr_scale_vector);
-  } else if (tr_ratio > tr_eta2_ && abs(casadi_tr_norm_inf(nx_, d->dx, d->tr_scale_vector) - tr_rad) < optim_tol_){
+    tr_rad = tr_alpha1_ * casadi_masked_norm_inf(nx_, d->dx, d->tr_mask);
+  } else if (tr_ratio > tr_eta2_ && abs(casadi_masked_norm_inf(nx_, d->dx, d->tr_mask) - tr_rad) < optim_tol_){
     tr_rad = fmin(tr_alpha2_*tr_rad, tr_rad_max_);
   }
   // else: keep trust-region as it is....
@@ -560,7 +561,7 @@ int Feasiblesqpmethod::feasibility_iterations(void* mem, double tr_rad) const{
   casadi_axpy(nx_+ng_, -1.0, d_nlp->lam, d->z_tmp);
 
   // this is in solve in fslp.py
-  double step_inf_norm = casadi_tr_norm_inf(nx_, d->dx, d->tr_scale_vector);
+  double step_inf_norm = casadi_masked_norm_inf(nx_, d->dx, d->tr_mask);
   double prev_step_inf_norm = step_inf_norm;
 
   // bool kappa_acceptance = false;
@@ -645,7 +646,7 @@ int Feasiblesqpmethod::feasibility_iterations(void* mem, double tr_rad) const{
     //                       self.lbx - self.x_tmp)
 
     casadi_copy(d_nlp->lbz, nx_, d->lbdz_feas);
-    casadi_clip_min(d->lbdz_feas, d->tr_scale_vector, nx_, -tr_rad);
+    casadi_clip_min(d->lbdz_feas, nx_, -tr_rad, d->tr_mask);
     DM(std::vector<double>(d->lbdz_feas,d->lbdz_feas+nx_)).to_file("lbx_feas_part1_part1.mtx");
     // casadi_fill(d->lbdz_feas, nx_, -tr_rad);
     casadi_axpy(nx_, -1., d->z_feas, d->lbdz_feas);
@@ -658,7 +659,7 @@ int Feasiblesqpmethod::feasibility_iterations(void* mem, double tr_rad) const{
     DM(std::vector<double>(d->z_tmp,d->z_tmp+nx_)).to_file("lbx_feas_part2.mtx");
 
     // comparison of both vectors
-    casadi_elem_vfmax(nx_, d->z_tmp, d->lbdz_feas);
+    casadi_vector_fmax(nx_, d->z_tmp, d->lbdz_feas, d->lbdz_feas);
     DM(std::vector<double>(d->lbdz_feas,d->lbdz_feas+nx_)).to_file("lbx_feas_end.mtx");
 
 
@@ -669,7 +670,7 @@ int Feasiblesqpmethod::feasibility_iterations(void* mem, double tr_rad) const{
 
 
     casadi_copy(d_nlp->ubz, nx_, d->ubdz_feas);
-    casadi_clip_max(d->ubdz_feas, d->tr_scale_vector, nx_, tr_rad);
+    casadi_clip_max(d->ubdz_feas, nx_, tr_rad, d->tr_mask);
     DM(std::vector<double>(d->ubdz_feas,d->ubdz_feas+nx_)).to_file("ubx_feas_part1_part1.mtx");
     // casadi_fill(d->ubdz_feas, nx_, tr_rad);
     casadi_axpy(nx_, -1., d->z_feas, d->ubdz_feas);
@@ -682,7 +683,7 @@ int Feasiblesqpmethod::feasibility_iterations(void* mem, double tr_rad) const{
     casadi_axpy(nx_, -1., d->z_feas, d->z_tmp);
     DM(std::vector<double>(d->z_tmp,d->z_tmp+nx_)).to_file("ubx_feas_part2.mtx");
     // comparison of both vectors
-    casadi_elem_vfmin(nx_, d->z_tmp, d->ubdz_feas);
+    casadi_vector_fmin(nx_, d->z_tmp, d->ubdz_feas, d->ubdz_feas);
     DM(std::vector<double>(d->ubdz_feas,d->ubdz_feas+nx_)).to_file("ubx_feas_end.mtx");
 
 
@@ -723,7 +724,7 @@ int Feasiblesqpmethod::feasibility_iterations(void* mem, double tr_rad) const{
     // here!!
     // casadi_copy(d->dlam_feas, nx_+ng_, d->z_tmp);
     // casadi_axpy(nx_+ng_, -1.0, d->dlam, d->z_tmp);
-    step_inf_norm = casadi_tr_norm_inf(nx_, d->dx_feas, d->tr_scale_vector);
+    step_inf_norm = casadi_masked_norm_inf(nx_, d->dx_feas, d->tr_mask);
 
     //       self.x_tmp = self.x_tmp + p_tmp
     //       self.g_tmp = self.__eval_g(self.x_tmp)  # x_tmp = x_{tmp-1} + p_tmp
@@ -840,9 +841,11 @@ int Feasiblesqpmethod::solve(void* mem) const {
     double tr_rad = tr_rad0_;
     double tr_rad_prev = tr_rad0_;
 
-    // transfer the scale vector to the problem.... thats not a nice way???
-    for (int i=0; i<nx_; ++i){
-      d->tr_scale_vector[i] = tr_scale_vector_[i];
+    // transfer the scale vector to the problem
+    casadi_copy(get_ptr(tr_scale_vector_), nx_, d->tr_scale_vector);
+
+    for (casadi_int i=0;i<nx_;++i) {
+      d->tr_mask[i] = d->tr_scale_vector[i]!=0;
     }
 
     // // Default stepsize
@@ -1076,14 +1079,14 @@ int Feasiblesqpmethod::solve(void* mem) const {
       // Define lower bounds
       casadi_copy(d_nlp->lbz, nx_+ng_, d->lbdz);
       casadi_axpy(nx_+ng_, -1., d_nlp->z, d->lbdz);
-      casadi_clip_min(d->lbdz, d->tr_scale_vector, nx_, -tr_rad);
+      casadi_clip_min(d->lbdz, nx_, -tr_rad, d->tr_mask);
       // uout() << "lbdz: " << std::vector<double>(d->lbdz, d->lbdz+nx_) << std::endl;
       
 
       // Define upper bounds
       casadi_copy(d_nlp->ubz, nx_+ng_, d->ubdz);
       casadi_axpy(nx_+ng_, -1., d_nlp->z, d->ubdz);
-      casadi_clip_max(d->ubdz, d->tr_scale_vector, nx_, tr_rad);
+      casadi_clip_max(d->ubdz, nx_, tr_rad, d->tr_mask);
       // uout() << "ubdz: " << std::vector<double>(d->ubdz, d->ubdz+nx_) << std::endl;
 
       // Initial guess
@@ -1129,9 +1132,9 @@ int Feasiblesqpmethod::solve(void* mem) const {
       // Check if step was accepted or not
       if (ret < 0){
         uout() << "Rejected inner iterates" << std::endl;
-        uout() << casadi_tr_norm_inf(nx_, d->dx, d->tr_scale_vector) << std::endl;
+        uout() << casadi_masked_norm_inf(nx_, d->dx, d->tr_mask) << std::endl;
 
-        tr_rad = 0.5 * casadi_tr_norm_inf(nx_, d->dx, d->tr_scale_vector);
+        tr_rad = 0.5 * casadi_masked_norm_inf(nx_, d->dx, d->tr_mask);
       } else{
         // Evaluate f
         m->arg[0] = d->z_feas;

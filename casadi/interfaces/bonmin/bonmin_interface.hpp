@@ -40,7 +40,8 @@
 #include "casadi/core/timing.hpp"
 
 
-/** \defgroup plugin_Nlpsol_bonmin
+/** \defgroup plugin_Nlpsol_bonmin Title
+    \par
  *
  * When in warmstart mode, output NLPSOL_LAM_X may be used as input
  *
@@ -62,7 +63,8 @@
  * Change the 'fixed_variable_treatment' to 'make_constraint' or 'relax_bounds' to obtain
  * correct results.
  *
- */
+
+    \identifier{223} */
 
 /** \pluginsection{Nlpsol,bonmin} **/
 

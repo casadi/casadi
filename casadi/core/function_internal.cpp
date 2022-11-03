@@ -60,6 +60,7 @@ namespace casadi {
     print_time_ = false;
     record_time_ = false;
     regularity_check_ = false;
+    error_on_fail_ = true;
   }
 
   FunctionInternal::FunctionInternal(const std::string& name) : ProtoFunction(name) {
@@ -169,7 +170,10 @@ namespace casadi {
         "record information about execution time, for retrieval with stats()."}},
       {"regularity_check",
        {OT_BOOL,
-        "Throw exceptions when NaN or Inf appears during evaluation"}}
+        "Throw exceptions when NaN or Inf appears during evaluation"}},
+      {"error_on_fail",
+       {OT_BOOL,
+        "Throw exceptions when function evaluation fails (default true)."}}
       }
   };
 
@@ -345,6 +349,8 @@ namespace casadi {
         record_time_ = op.second;
       } else if (op.first=="regularity_check") {
         regularity_check_ = op.second;
+      } else if (op.first=="error_on_fail") {
+        error_on_fail_ = op.second;
       }
     }
   }
@@ -355,6 +361,7 @@ namespace casadi {
     opts["print_time"] = print_time_;
     opts["record_time"] = record_time_;
     opts["regularity_check"] = regularity_check_;
+    opts["error_on_fail"] = error_on_fail_;
     return opts;
   }
 
@@ -3671,6 +3678,7 @@ namespace casadi {
     s.pack("ProtoFunction::print_time", print_time_);
     s.pack("ProtoFunction::record_time", record_time_);
     s.pack("ProtoFunction::regularity_check", regularity_check_);
+    s.pack("ProtoFunction::error_on_fail", error_on_fail_);
   }
 
   ProtoFunction::ProtoFunction(DeserializingStream& s) {
@@ -3680,6 +3688,7 @@ namespace casadi {
     s.unpack("ProtoFunction::print_time", print_time_);
     s.unpack("ProtoFunction::record_time", record_time_);
     if (version >= 2) s.unpack("ProtoFunction::regularity_check", regularity_check_);
+    if (version >= 2) s.unpack("ProtoFunction::error_on_fail", error_on_fail_);
   }
 
   void FunctionInternal::serialize_type(SerializingStream &s) const {

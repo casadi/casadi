@@ -33,10 +33,12 @@
 #include "CbcEventHandler.hpp"
 #include <string>
 
-/** \defgroup plugin_Conic_cbc
+/** \defgroup plugin_Conic_cbc Title
+    \par
 
       Interface to Cbc solver for sparse Quadratic Programs
-*/
+
+    \identifier{221} */
 
 /** \pluginsection{Conic,cbc} */
 

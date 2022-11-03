@@ -30,7 +30,8 @@
 #include "casadi/core/nlpsol_impl.hpp"
 #include "casadi/core/timing.hpp"
 
-/** \defgroup plugin_Nlpsol_ipopt
+/** \defgroup plugin_Nlpsol_ipopt Title
+    \par
  *
  * When in warmstart mode, output NLPSOL_LAM_X may be used as input
  *
@@ -52,7 +53,8 @@
  * Change the 'fixed_variable_treatment' to 'make_constraint' or 'relax_bounds' to obtain
  * correct results.
  *
- */
+
+    \identifier{21y} */
 
 /** \pluginsection{Nlpsol,ipopt} **/
 

@@ -28,6 +28,14 @@
 #include <ctime>
 #include <cstdio>
 #include <cstdlib>
+#include <algorithm>
+#ifdef CASADI_WITH_THREAD
+#ifdef CASADI_WITH_THREAD_MINGW
+#include <mingw.thread.h>
+#else // CASADI_WITH_THREAD_MINGW
+#include <thread>
+#endif // CASADI_WITH_THREAD_MINGW
+#endif //CASADI_WITH_THREAD
 
 using namespace std;
 namespace casadi {
@@ -130,12 +138,32 @@ namespace casadi {
                                   {{"gamma", {"f", "g"}}});
     hesslag_sp_ = hess_l_fcn.sparsity_out(0);
 
-    // Obtain maximum number of threads needed
+    unsigned int hc = 0;
+    #ifdef CASADI_WITH_THREAD
+    //may return 0 when not able to detect. If it's the case, then return 8.
+    hc = std::thread::hardware_concurrency();
+    #endif
+    int processor_count = hc ? hc : 8;
+    //Obtain maximum number of threads needed
+    int ms_numthreads = 1;
+    int findiff_numthreads = 1;
+    int numthreads = 1;
+    int mip_numthreads = 1;
     for (auto&& op : opts_) {
       if (op.first=="ms_numthreads") {
-        max_num_threads_ = op.second;
+        ms_numthreads = op.second;
+      }
+      if (op.first=="findiff_numthreads") {
+        findiff_numthreads = op.second;
+      }
+      if (op.first=="numthreads") {
+        numthreads = op.second;
+      }
+      if (op.first=="mip_numthreads") {
+        mip_numthreads = op.second;
       }
     }
+    max_num_threads_ = std::max({processor_count, ms_numthreads, findiff_numthreads, numthreads, mip_numthreads});
 
     // Allocate persistent memory
     alloc_w(nx_, true); // wlbx_
@@ -342,8 +370,6 @@ namespace casadi {
       m->res[1] = d_nlp->z + nx_;
       calc_function(m, "nlp_fg");
     }
-
-    join_results(m);
 
     // Free memory (move to destructor!)
     status = KN_free(&m->kc);

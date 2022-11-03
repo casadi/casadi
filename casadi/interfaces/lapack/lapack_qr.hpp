@@ -44,11 +44,13 @@ extern "C" {
                          double *alpha, double *a, int *lda, double *b, int *ldb);
 }
 
-/** \defgroup plugin_Linsol_lapackqr
+/** \defgroup plugin_Linsol_lapackqr Title
+    \par
 *
 * This class solves the linear system <tt>A.x=b</tt> by making an QR factorization of A: \n
 * <tt>A = Q.R</tt>, with Q orthogonal and R upper triangular
-*/
+
+    \identifier{22g} */
 
 /** \pluginsection{Linsol,lapackqr} */
 

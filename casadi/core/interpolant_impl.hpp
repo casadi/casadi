@@ -50,32 +50,44 @@ namespace casadi {
     /// Destructor
     ~Interpolant() override;
 
-    /** \brief Get type name */
+    /** \brief Get type name
+
+        \identifier{16e} */
     std::string class_name() const override {return "Interpolant";}
 
     ///@{
-    /** \brief Number of function inputs and outputs */
+    /** \brief Number of function inputs and outputs
+
+        \identifier{16f} */
     size_t get_n_in() override { return 1+has_parametric_values()+has_parametric_grid();}
     size_t get_n_out() override { return 1;}
     ///@}
 
-    /** \brief Which inputs are differentiable? */
+    /** \brief Which inputs are differentiable?
+
+        \identifier{16g} */
     bool get_diff_in(casadi_int i) override { return i==0; }
 
     /// @{
-    /** \brief Sparsities of function inputs and outputs */
+    /** \brief Sparsities of function inputs and outputs
+
+        \identifier{16h} */
     Sparsity get_sparsity_in(casadi_int i) override;
     Sparsity get_sparsity_out(casadi_int i) override;
     /// @}
 
     ///@{
-    /** \brief Names of function input and outputs */
+    /** \brief Names of function input and outputs
+
+        \identifier{16i} */
     std::string get_name_in(casadi_int i) override;
     std::string get_name_out(casadi_int i) override;
     /// @}
 
     ///@{
-    /** \brief Options */
+    /** \brief Options
+
+        \identifier{16j} */
     static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
@@ -104,7 +116,9 @@ namespace casadi {
                                     const std::vector<double>& values,
                                     casadi_int m);
 
-    /** \brief  Comstruct a new Interpolant */
+    /** \brief  Comstruct a new Interpolant
+
+        \identifier{16k} */
     static Function construct(const std::string& solver, const std::string& name,
                       const std::vector<double>& grid,
                       const std::vector<casadi_int>& offset,
@@ -149,26 +163,40 @@ namespace casadi {
     // Lookup modes
     std::vector<std::string> lookup_modes_;
 
-    /** \brief Serialize an object without type information */
+    /** \brief Serialize an object without type information
+
+        \identifier{16l} */
     void serialize_body(SerializingStream &s) const override;
-    /** \brief Serialize type information */
+    /** \brief Serialize type information
+
+        \identifier{16m} */
     void serialize_type(SerializingStream &s) const override;
 
-    /** \brief String used to identify the immediate FunctionInternal subclass */
+    /** \brief String used to identify the immediate FunctionInternal subclass
+
+        \identifier{16n} */
     std::string serialize_base_function() const override { return "Interpolant"; }
-    /** \brief Deserialize with type disambiguation */
+    /** \brief Deserialize with type disambiguation
+
+        \identifier{16o} */
     static ProtoFunction* deserialize(DeserializingStream& s);
 
-    /** \brief Is parametric? */
+    /** \brief Is parametric?
+
+        \identifier{16p} */
     bool has_parametric_values() const { return values_.empty(); }
 
-    /** \brief Is parametric? */
+    /** \brief Is parametric?
+
+        \identifier{16q} */
     bool has_parametric_grid() const { return grid_.empty(); }
 
     casadi_int arg_values() const;
     casadi_int arg_grid() const;
 
-    /** \brief Size of the flattened coefficients vector */
+    /** \brief Size of the flattened coefficients vector
+
+        \identifier{16r} */
     casadi_int coeff_size() const;
     static casadi_int coeff_size(const std::vector<casadi_int>& offset, casadi_int m);
 
@@ -177,7 +205,9 @@ namespace casadi {
     bool arg_values(casadi_int i) const;
     bool arg_grid(casadi_int i) const;
 
-    /** \brief Deserializing constructor */
+    /** \brief Deserializing constructor
+
+        \identifier{16s} */
     explicit Interpolant(DeserializingStream& s);
 
 

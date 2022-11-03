@@ -628,11 +628,15 @@ struct CASADI_EXPORT Fmu {
   // Retrieve auxilliary variables from FMU
   int get_aux(fmi2Component c, Value* v) const;
 
-  /** \brief Get stats */
+  /** \brief Get stats
+
+      \identifier{ye} */
   void get_stats(FmuMemory* m, Dict* stats,
     const std::vector<std::string>& name_in, const InputStruct* in) const;
 
-  /** \brief Initalize memory block */
+  /** \brief Initalize memory block
+
+      \identifier{yf} */
   int init_mem(FmuMemory* m) const;
 
   // Set value
@@ -689,7 +693,9 @@ struct CASADI_EXPORT Fmu {
   }
 
   /// @{
-  /** \brief Retreive nominal values */
+  /** \brief Retreive nominal values
+
+      \identifier{yg} */
   std::vector<double> get_nominal_in(casadi_int i) const;
   std::vector<double> get_nominal_out(casadi_int i) const;
   /// @}
@@ -792,19 +798,27 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   // Stats from initialization
   Dict init_stats_;
 
-  /** \brief Constructor */
+  /** \brief Constructor
+
+      \identifier{yh} */
   FmuFunction(const std::string& name, Fmu* fmu,
       const std::vector<std::string>& name_in,
       const std::vector<std::string>& name_out);
 
-  /** \brief Destructor */
+  /** \brief Destructor
+
+      \identifier{yi} */
   ~FmuFunction() override;
 
-  /** \brief Get type name */
+  /** \brief Get type name
+
+      \identifier{yj} */
   std::string class_name() const override { return "FmuFunction";}
 
   ///@{
-  /** \brief Options */
+  /** \brief Options
+
+      \identifier{yk} */
   static const Options options_;
   const Options& get_options() const override { return options_;}
   ///@}
@@ -835,19 +849,25 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   casadi_int max_jac_tasks_, max_hess_tasks_, max_n_tasks_;
 
   ///@{
-  /** \brief Number of function inputs and outputs */
+  /** \brief Number of function inputs and outputs
+
+      \identifier{yl} */
   size_t get_n_in() override { return in_.size();}
   size_t get_n_out() override {return out_.size();}
   ///@}
 
   /// @{
-  /** \brief Retreive sparsities */
+  /** \brief Retreive sparsities
+
+      \identifier{ym} */
   Sparsity get_sparsity_in(casadi_int i) override;
   Sparsity get_sparsity_out(casadi_int i) override;
   /// @}
 
   /// @{
-  /** \brief Retreive nominal values */
+  /** \brief Retreive nominal values
+
+      \identifier{yn} */
   std::vector<double> get_nominal_in(casadi_int i) const override;
   std::vector<double> get_nominal_out(casadi_int i) const override;
   /// @}
@@ -873,7 +893,9 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   void make_symmetric(double *hess_nz, casadi_int* iw) const;
 
   ///@{
-  /** \brief Return sparsity of Jacobian of an output respect to an input */
+  /** \brief Return sparsity of Jacobian of an output respect to an input
+
+      \identifier{yo} */
   bool has_jac_sparsity(casadi_int oind, casadi_int iind) const override;
   Sparsity get_jac_sparsity(casadi_int oind, casadi_int iind, bool symmetric) const override;
   ///@}
@@ -885,7 +907,9 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   bool all_vectors() const;
 
   ///@{
-  /** \brief Full Jacobian */
+  /** \brief Full Jacobian
+
+      \identifier{yp} */
   bool has_jacobian() const override;
   Function get_jacobian(const std::string& name,
     const std::vector<std::string>& inames,
@@ -894,7 +918,9 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   ///@}
 
   ///@{
-  /** \brief Reverse mode AD */
+  /** \brief Reverse mode AD
+
+      \identifier{yq} */
   bool has_reverse(casadi_int nadj) const override;
   Function get_reverse(casadi_int nadj, const std::string& name,
     const std::vector<std::string>& inames,
@@ -902,13 +928,19 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
     const Dict& opts) const override;
   ///@}
 
-  /** \brief Create memory block */
+  /** \brief Create memory block
+
+      \identifier{yr} */
   void* alloc_mem() const override;
 
-  /** \brief Initalize memory block */
+  /** \brief Initalize memory block
+
+      \identifier{ys} */
   int init_mem(void* mem) const override;
 
-  /** \brief Free memory block */
+  /** \brief Free memory block
+
+      \identifier{yt} */
   void free_mem(void *mem) const override;
 
   /// Get all statistics

@@ -30,9 +30,11 @@
 
 namespace casadi {
   /** \brief An input or output instruction
+
       \author Joel Andersson
       \date 2017
-  */
+
+      \identifier{1p6} */
   class CASADI_EXPORT IOInstruction : public MXNode {
   protected:
     // Input/output index
@@ -64,15 +66,21 @@ namespace casadi {
     /** Obtain information about node */
     Dict info() const override;
 
-    /** \brief Serialize an object without type information */
+    /** \brief Serialize an object without type information
+
+        \identifier{1p7} */
     void serialize_body(SerializingStream& s) const override;
 
   protected:
-    /** \brief Deserializing constructor */
+    /** \brief Deserializing constructor
+
+        \identifier{1p8} */
     explicit IOInstruction(DeserializingStream&s);
   };
 
-  /** \brief Input instruction  */
+  /** \brief Input instruction
+
+      \identifier{1p9} */
   class CASADI_EXPORT Input : public IOInstruction {
   public:
     // Constructor (called from derived classes)
@@ -81,26 +89,38 @@ namespace casadi {
     /// Destructor
     ~Input() override {}
 
-    /** \brief Get the operation */
+    /** \brief Get the operation
+
+        \identifier{1pa} */
     casadi_int op() const override { return OP_INPUT;}
 
-    /** \brief  Print expression */
+    /** \brief  Print expression
+
+        \identifier{1pb} */
     std::string disp(const std::vector<std::string>& arg) const override;
 
-    /** \brief Generate code for the operation */
+    /** \brief Generate code for the operation
+
+        \identifier{1pc} */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
                   const std::vector<casadi_int>& res) const override;
 
-    /** \brief Deserialize without type information */
+    /** \brief Deserialize without type information
+
+        \identifier{1pd} */
     static MXNode* deserialize(DeserializingStream& s) { return new Input(s); }
 
   protected:
-    /** \brief Deserializing constructor */
+    /** \brief Deserializing constructor
+
+        \identifier{1pe} */
     explicit Input(DeserializingStream&s) : IOInstruction(s) {}
   };
 
-  /** \brief Input instruction  */
+  /** \brief Input instruction
+
+      \identifier{1pf} */
   class CASADI_EXPORT Output : public IOInstruction {
   public:
     // Constructor (called from derived classes)
@@ -109,24 +129,36 @@ namespace casadi {
     /// Destructor
     ~Output() override {}
 
-    /** \brief  Number of outputs */
+    /** \brief  Number of outputs
+
+        \identifier{1pg} */
     casadi_int nout() const override { return 0;}
 
-    /** \brief Get the operation */
+    /** \brief Get the operation
+
+        \identifier{1ph} */
     casadi_int op() const override { return OP_OUTPUT;}
 
-    /** \brief  Print expression */
+    /** \brief  Print expression
+
+        \identifier{1pi} */
     std::string disp(const std::vector<std::string>& arg) const override;
 
-    /** \brief Generate code for the operation */
+    /** \brief Generate code for the operation
+
+        \identifier{1pj} */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
                   const std::vector<casadi_int>& res) const override;
 
-    /** \brief Deserialize without type information */
+    /** \brief Deserialize without type information
+
+        \identifier{1pk} */
     static MXNode* deserialize(DeserializingStream& s) { return new Output(s); }
   protected:
-    /** \brief Deserializing constructor */
+    /** \brief Deserializing constructor
+
+        \identifier{1pl} */
     explicit Output(DeserializingStream&s) : IOInstruction(s) {}
   };
 

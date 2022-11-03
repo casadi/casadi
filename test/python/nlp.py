@@ -1803,7 +1803,83 @@ class NLPtests(casadiTestCase):
     f = Function('f',[p],[res["x"]])
     f_ref = Function('f_ref',[p],[arcsin(p)])
     self.checkfunction(f,f_ref,inputs=[vertcat(0.1,0.2,0.3)])
+    
+  def test_hock_schittkowski(self):
+    import importlib
+    file_names = []
+    for i in range(1, 120):
+        if i < 10:
+            file_names.append("hs00" + str(i))
+        elif i < 100:
+            file_names.append("hs0" + str(i))
+        else:
+            file_names.append("hs" + str(i))
 
+
+
+
+    solvers = []
+    if has_conic("qpoases"): solvers.append("qpoases")
+    if has_conic("qrqp"): solvers.append("qrqp")
+    elastic_modes = [False, True]
+    so_modes = [False, True]
+    convex = "regularize"
+    max_iter = 200
+    
+    import pandas as pd
+    
+    results = pd.DataFrame(columns=["problem","solver","elastic_mode","so_mode","outcome"])
+    
+    reference = pd.read_csv('hock_schittkowski/results.csv')
+    
+
+
+    for solver in solvers:
+        for elastic_mode in elastic_modes:
+            for so_mode in so_modes:
+                outcomes_encountered = set()
+                for file_name in file_names:
+                    mode = (solver,elastic_mode,so_mode)
+                    
+                    if file_name == 'hs087':
+                        continue
+                    if file_name == 'hs082' or file_name == 'hs094' or file_name == 'hs115'\
+                            or file_name == 'hs087':
+                        continue
+
+                    prob = importlib.import_module("hock_schittkowski."+file_name)
+                    hock_schittkowsky_func = getattr(prob, file_name)
+                    (x_opt,
+                        f_opt, x, f, g, lbg, ubg, lbx, ubx, x0) = hock_schittkowsky_func()
+                    # SOLVE NLP WITH CASADI-SQP
+                    nlp = {'x': x, 'f': f, 'g': g}
+                    e_o_f = False
+                    with capture_stdout():
+                        sqp_solver = nlpsol('sqp_solver', 'sqpmethod', nlp, {"init_feasible":True, "elastic_mode": elastic_mode, 'qpsol': solver, "second_order_corrections": so_mode, 'convexify_strategy': convex, 'max_iter': max_iter, 'gamma_max': 10e40, 'qpsol_options.error_on_fail': e_o_f})
+                    try:
+                        with capture_stdout():
+                            sol_sqp = sqp_solver(x0=x0, lbx=lbx, ubx=ubx, lbg=lbg, ubg=ubg)
+                            
+                        outcome = sqp_solver.stats()["return_status"]
+
+                    except Exception as ex:
+                        outcome = "exception"
+                    if outcome !="exception":
+                        if outcome not in outcomes_encountered:
+                            if outcome not in ["Search_Direction_Becomes_Too_Small","Non_Regular_Sensitivities"]: # Bugs
+                                print("outcome:", outcome)
+                                outcomes_encountered.add(outcome)
+                                with capture_stdout():
+                                    if solver=="qrqp": self.check_codegen(sqp_solver,dict(x0=x0, lbx=lbx, ubx=ubx, lbg=lbg, ubg=ubg),std="c99",extra_options=["-Wno-maybe-uninitialized"])
+                                
+                    results = results.append({"problem":file_name,"solver":solver,"elastic_mode":elastic_mode,"so_mode": so_mode,"outcome": outcome},ignore_index=True)
+                    
+                    reference_outcome = list(reference[(reference['problem']==file_name) & (reference['solver']==solver) & (reference['elastic_mode']==elastic_mode) & (reference['so_mode']==so_mode)]["outcome"])[0]
+                    self.assertEqual(outcome,reference_outcome)
+
+
+    #results.to_csv('hock_schittkowski/results.csv',index=False)
+            
 if __name__ == '__main__':
     unittest.main()
     print(solvers)

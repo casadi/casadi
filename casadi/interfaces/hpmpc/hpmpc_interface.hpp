@@ -30,7 +30,9 @@
 #include "casadi/core/linsol.hpp"
 #include <casadi/interfaces/hpmpc/casadi_conic_hpmpc_export.h>
 
-/** \defgroup plugin_Conic_hpmpc
+/** \defgroup plugin_Conic_hpmpc Title
+    \par
+
 Interface to HMPC Solver
 
 
@@ -53,8 +55,7 @@ In order to use this interface, you must:
    where I must be a diagonal sparse matrix
  - Either supply all of N, nx, ng, nu options or rely on automatic detection
 
-
-*/
+    \identifier{22p} */
 
 #ifndef HPMPC_DLOPEN
 #include <target.h>

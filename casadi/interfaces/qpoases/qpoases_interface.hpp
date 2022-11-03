@@ -31,10 +31,12 @@
 #include <casadi/interfaces/qpoases/casadi_conic_qpoases_export.h>
 #include <qpOASES.hpp>
 
-/** \defgroup plugin_Conic_qpoases
+/** \defgroup plugin_Conic_qpoases Title
+    \par
+
 Interface to QPOases Solver for quadratic programming
 
-*/
+    \identifier{22o} */
 
 /** \pluginsection{Conic,qpoases} */
 

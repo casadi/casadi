@@ -412,6 +412,39 @@ class MXtests(casadiTestCase):
     for i in range(len(L)):
       self.assertAlmostEqual(L[i], zt[0,i],10)
 
+  def test_sparsity_cast(self):
+    sp_source = sparsify(DM([[1, 0, 1],[0, 0, 1],[1, 0,0]])).sparsity()
+    x   = MX.sym("x",sp_source)
+    xsx = SX.sym("x",sp_source)
+
+
+
+    sp = sparsify(DM([[1, 0, 1],[1, 0,1]])).sparsity()
+
+    with self.assertInException("mismatch"):
+      reshape(x,sp)
+
+    with self.assertInException("Mismatching"):
+      sparsity_cast(x,horzcat(sp,sp))
+
+    y = sparsity_cast(x,sp)
+    ysx = sparsity_cast(xsx,sp)
+
+    fsx = Function("fsx",[xsx],[ysx])
+    f = Function("f",[x],[y])
+
+    inp = DM([[1, 0, 2],[0, 0, 3],[4, 0, 0]])
+    self.checkfunction(f,fsx,inputs=[inp])
+    y = fsx(inp)
+    self.checkarray(y,DM([[1, 0, 2],[4, 0, 3]]))
+    
+    x = MX.sym("x",2)
+    sp = sparsify(blockcat([[1,0],[0,1]])).sparsity()
+    y = sparsity_cast(MX.sym("y",2),sp)
+
+    vec(y)
+
+
   def test_MXcompose(self):
     self.message("compositions of vec, trans, reshape with vertcat")
     checkMXoperations(self,lambda x: x,lambda x: x,'vertcat')
@@ -2996,6 +3029,26 @@ class MXtests(casadiTestCase):
       res = atan2(MX.sym("c",nc,4),MX.sym("t",nc,2))
       self.assertEqual(res.shape[0],nc)
       self.assertEqual(res.shape[1],4)
+
+  def test_horzcat_sparsity(self):
+    x = MX.sym("x",2,2)
+
+    for y in [MX.sym("y",Sparsity(2,2)), MX.sym("y",Sparsity.lower(2))]:
+
+      z = sin(horzcat(x,sin(y),x))
+      z_alt = sin(sparsity_cast(vertcat(vec(x),vec(sin(y)),vec(x)),z.sparsity()))
+
+      f = Function('f',[x,y],[z])
+      f_alt = Function('f_alt',[x,y],[z])
+
+      for F in [f,f_alt]:
+        self.assertEqual(F.call([x,y],True,False)[0].nnz(), z.nnz())
+        self.assertEqual(F.call([x,y],False,True)[0].nnz(), z.nnz())
+        self.assertEqual(F.call([x,x**2],True,False)[0].nnz(), z.nnz())
+        self.assertEqual(F.call([x,x**2],False,True)[0].nnz(), z.nnz())
+
+    self.checkfunction(f,f.expand(),inputs=[DM([[1,2],[3,4]]),DM([[5,6],[7,8]])])
+    self.checkfunction(f,f_alt,inputs=[DM([[1,2],[3,4]]),DM([[5,6],[7,8]])])
 
 if __name__ == '__main__':
     unittest.main()

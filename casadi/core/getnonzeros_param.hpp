@@ -34,9 +34,11 @@
 
 namespace casadi {
   /** \brief Get nonzeros of a matrix, parametrically
+
       \author Joris Gillis
       \date 2019
-  */
+
+      \identifier{7v} */
   class CASADI_EXPORT GetNonzerosParam : public MXNode {
   public:
 
@@ -55,20 +57,30 @@ namespace casadi {
     /// Destructor
     ~GetNonzerosParam() override {}
 
-    /** \brief  Propagate sparsity forward */
+    /** \brief  Propagate sparsity forward
+
+        \identifier{7w} */
     int sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
-    /** \brief  Propagate sparsity backwards */
+    /** \brief  Propagate sparsity backwards
+
+        \identifier{7x} */
     int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
-    /** \brief Get the operation */
+    /** \brief Get the operation
+
+        \identifier{7y} */
     casadi_int op() const override { return OP_GETNONZEROS_PARAM;}
 
-    /** \brief Deserialize without type information */
+    /** \brief Deserialize without type information
+
+        \identifier{7z} */
     static MXNode* deserialize(DeserializingStream& s);
 
   protected:
-    /** \brief Deserializing constructor */
+    /** \brief Deserializing constructor
+
+        \identifier{80} */
     explicit GetNonzerosParam(DeserializingStream& s) : MXNode(s) {}
   };
 
@@ -82,34 +94,50 @@ namespace casadi {
     /// Destructor
     ~GetNonzerosParamVector() override {}
 
-    /** \brief Calculate forward mode directional derivatives */
+    /** \brief Calculate forward mode directional derivatives
+
+        \identifier{81} */
     void ad_forward(const std::vector<std::vector<MX> >& fseed,
                          std::vector<std::vector<MX> >& fsens) const override;
 
-    /** \brief Calculate reverse mode directional derivatives */
+    /** \brief Calculate reverse mode directional derivatives
+
+        \identifier{82} */
     void ad_reverse(const std::vector<std::vector<MX> >& aseed,
                          std::vector<std::vector<MX> >& asens) const override;
 
     /// Evaluate the function numerically
     int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
 
-    /** \brief  Evaluate symbolically (MX) */
+    /** \brief  Evaluate symbolically (MX)
+
+        \identifier{83} */
     void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
 
-    /** \brief  Print expression */
+    /** \brief  Print expression
+
+        \identifier{84} */
     std::string disp(const std::vector<std::string>& arg) const override;
 
-    /** \brief Generate code for the operation */
+    /** \brief Generate code for the operation
+
+        \identifier{85} */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
                   const std::vector<casadi_int>& res) const override;
 
-    /** \brief Serialize an object without type information */
+    /** \brief Serialize an object without type information
+
+        \identifier{86} */
     void serialize_body(SerializingStream& s) const override;
-    /** \brief Serialize type information */
+    /** \brief Serialize type information
+
+        \identifier{87} */
     void serialize_type(SerializingStream& s) const override;
 
-    /** \brief Deserializing constructor */
+    /** \brief Deserializing constructor
+
+        \identifier{88} */
     explicit GetNonzerosParamVector(DeserializingStream& s);
   };
 
@@ -128,21 +156,31 @@ namespace casadi {
     /// Evaluate the function numerically
     int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
 
-    /** \brief  Evaluate symbolically (MX) */
+    /** \brief  Evaluate symbolically (MX)
+
+        \identifier{89} */
     void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
 
-    /** \brief Calculate forward mode directional derivatives */
+    /** \brief Calculate forward mode directional derivatives
+
+        \identifier{8a} */
     void ad_forward(const std::vector<std::vector<MX> >& fseed,
                          std::vector<std::vector<MX> >& fsens) const override;
 
-    /** \brief Calculate reverse mode directional derivatives */
+    /** \brief Calculate reverse mode directional derivatives
+
+        \identifier{8b} */
     void ad_reverse(const std::vector<std::vector<MX> >& aseed,
                          std::vector<std::vector<MX> >& asens) const override;
 
-    /** \brief  Print expression */
+    /** \brief  Print expression
+
+        \identifier{8c} */
     std::string disp(const std::vector<std::string>& arg) const override;
 
-    /** \brief Generate code for the operation */
+    /** \brief Generate code for the operation
+
+        \identifier{8d} */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
                   const std::vector<casadi_int>& res) const override;
@@ -153,12 +191,18 @@ namespace casadi {
     // Data members
     Slice inner_;
 
-    /** \brief Serialize an object without type information */
+    /** \brief Serialize an object without type information
+
+        \identifier{8e} */
     void serialize_body(SerializingStream& s) const override;
-    /** \brief Serialize type information */
+    /** \brief Serialize type information
+
+        \identifier{8f} */
     void serialize_type(SerializingStream& s) const override;
 
-    /** \brief Deserializing constructor */
+    /** \brief Deserializing constructor
+
+        \identifier{8g} */
     explicit GetNonzerosSliceParam(DeserializingStream& s);
   };
 
@@ -174,27 +218,39 @@ namespace casadi {
     /// Destructor
     ~GetNonzerosParamSlice() override {}
 
-    /** \brief Get required length of iw field */
+    /** \brief Get required length of iw field
+
+        \identifier{8h} */
     size_t sz_iw() const override;
 
     /// Evaluate the function numerically
     int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
 
-    /** \brief  Evaluate symbolically (MX) */
+    /** \brief  Evaluate symbolically (MX)
+
+        \identifier{8i} */
     void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
 
-    /** \brief Calculate forward mode directional derivatives */
+    /** \brief Calculate forward mode directional derivatives
+
+        \identifier{8j} */
     void ad_forward(const std::vector<std::vector<MX> >& fseed,
                          std::vector<std::vector<MX> >& fsens) const override;
 
-    /** \brief Calculate reverse mode directional derivatives */
+    /** \brief Calculate reverse mode directional derivatives
+
+        \identifier{8k} */
     void ad_reverse(const std::vector<std::vector<MX> >& aseed,
                          std::vector<std::vector<MX> >& asens) const override;
 
-    /** \brief  Print expression */
+    /** \brief  Print expression
+
+        \identifier{8l} */
     std::string disp(const std::vector<std::string>& arg) const override;
 
-    /** \brief Generate code for the operation */
+    /** \brief Generate code for the operation
+
+        \identifier{8m} */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
                   const std::vector<casadi_int>& res) const override;
@@ -205,12 +261,18 @@ namespace casadi {
     // Data members
     Slice outer_;
 
-    /** \brief Serialize an object without type information */
+    /** \brief Serialize an object without type information
+
+        \identifier{8n} */
     void serialize_body(SerializingStream& s) const override;
-    /** \brief Serialize type information */
+    /** \brief Serialize type information
+
+        \identifier{8o} */
     void serialize_type(SerializingStream& s) const override;
 
-    /** \brief Deserializing constructor */
+    /** \brief Deserializing constructor
+
+        \identifier{8p} */
     explicit GetNonzerosParamSlice(DeserializingStream& s);
   };
 
@@ -227,27 +289,39 @@ namespace casadi {
     /// Destructor
     ~GetNonzerosParamParam() override {}
 
-    /** \brief Get required length of iw field */
+    /** \brief Get required length of iw field
+
+        \identifier{8q} */
     size_t sz_iw() const override;
 
     /// Evaluate the function numerically
     int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
 
-    /** \brief  Evaluate symbolically (MX) */
+    /** \brief  Evaluate symbolically (MX)
+
+        \identifier{8r} */
     void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
 
-    /** \brief Calculate forward mode directional derivatives */
+    /** \brief Calculate forward mode directional derivatives
+
+        \identifier{8s} */
     void ad_forward(const std::vector<std::vector<MX> >& fseed,
                          std::vector<std::vector<MX> >& fsens) const override;
 
-    /** \brief Calculate reverse mode directional derivatives */
+    /** \brief Calculate reverse mode directional derivatives
+
+        \identifier{8t} */
     void ad_reverse(const std::vector<std::vector<MX> >& aseed,
                          std::vector<std::vector<MX> >& asens) const override;
 
-    /** \brief  Print expression */
+    /** \brief  Print expression
+
+        \identifier{8u} */
     std::string disp(const std::vector<std::string>& arg) const override;
 
-    /** \brief Generate code for the operation */
+    /** \brief Generate code for the operation
+
+        \identifier{8v} */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
                   const std::vector<casadi_int>& res) const override;
@@ -256,10 +330,14 @@ namespace casadi {
     Dict info() const override { return {}; }
 
 
-    /** \brief Serialize type information */
+    /** \brief Serialize type information
+
+        \identifier{8w} */
     void serialize_type(SerializingStream& s) const override;
 
-    /** \brief Deserializing constructor */
+    /** \brief Deserializing constructor
+
+        \identifier{8x} */
     explicit GetNonzerosParamParam(DeserializingStream& s);
   };
 

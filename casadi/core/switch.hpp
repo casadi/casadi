@@ -39,40 +39,58 @@ namespace casadi {
   class CASADI_EXPORT Switch : public FunctionInternal {
   public:
 
-    /** \brief Constructor (generic switch) */
+    /** \brief Constructor (generic switch)
+
+        \identifier{1ko} */
     Switch(const std::string& name,
                    const std::vector<Function>& f, const Function& f_def);
 
-    /** \brief  Destructor */
+    /** \brief  Destructor
+
+        \identifier{1kp} */
     ~Switch() override;
 
-    /** \brief Get type name */
+    /** \brief Get type name
+
+        \identifier{1kq} */
     std::string class_name() const override {return "Switch";}
 
     ///@{
-    /** \brief Number of function inputs and outputs */
+    /** \brief Number of function inputs and outputs
+
+        \identifier{1kr} */
     size_t get_n_in() override;
     size_t get_n_out() override;
     ///@}
 
     /// @{
-    /** \brief Sparsities of function inputs and outputs */
+    /** \brief Sparsities of function inputs and outputs
+
+        \identifier{1ks} */
     Sparsity get_sparsity_in(casadi_int i) override;
     Sparsity get_sparsity_out(casadi_int i) override;
     /// @}
 
-    /** \brief  Initialize */
+    /** \brief  Initialize
+
+        \identifier{1kt} */
     void init(const Dict& opts) override;
 
-    /** \brief  Evaluate numerically, work vectors given */
+    /** \brief  Evaluate numerically, work vectors given
+
+        \identifier{1ku} */
     int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
 
-    /** \brief  evaluate symbolically while also propagating directional derivatives */
+    /** \brief  evaluate symbolically while also propagating directional derivatives
+
+        \identifier{1kv} */
     int eval_sx(const SXElem** arg, SXElem** res,
                 casadi_int* iw, SXElem* w, void* mem) const override;
 
     ///@{
-    /** \brief Generate a function that calculates \a nfwd forward derivatives */
+    /** \brief Generate a function that calculates \a nfwd forward derivatives
+
+        \identifier{1kw} */
     bool has_forward(casadi_int nfwd) const override { return true;}
     Function get_forward(casadi_int nfwd, const std::string& name,
                          const std::vector<std::string>& inames,
@@ -81,7 +99,9 @@ namespace casadi {
     ///@}
 
     ///@{
-    /** \brief Generate a function that calculates \a nadj adjoint derivatives */
+    /** \brief Generate a function that calculates \a nadj adjoint derivatives
+
+        \identifier{1kx} */
     bool has_reverse(casadi_int nadj) const override { return true;}
     Function get_reverse(casadi_int nadj, const std::string& name,
                          const std::vector<std::string>& inames,
@@ -89,16 +109,24 @@ namespace casadi {
                          const Dict& opts) const override;
     ///@}
 
-    /** \brief  Print description */
+    /** \brief  Print description
+
+        \identifier{1ky} */
     void disp_more(std::ostream& stream) const override;
 
-    /** \brief Generate code for the declarations of the C function */
+    /** \brief Generate code for the declarations of the C function
+
+        \identifier{1kz} */
     void codegen_declarations(CodeGenerator& g) const override;
 
-    /** \brief Is codegen supported? */
+    /** \brief Is codegen supported?
+
+        \identifier{1l0} */
     bool has_codegen() const override { return true;}
 
-    /** \brief Generate code for the body of the C function */
+    /** \brief Generate code for the body of the C function
+
+        \identifier{1l1} */
     void codegen_body(CodeGenerator& g) const override;
 
     // Function to be evaluated for each case
@@ -110,10 +138,14 @@ namespace casadi {
     // Sparsity projection needed?
     bool project_in_, project_out_;
 
-    /** \brief Serialize an object without type information */
+    /** \brief Serialize an object without type information
+
+        \identifier{1l2} */
     void serialize_body(SerializingStream &s) const override;
 
-    /** \brief Deserialize without type information */
+    /** \brief Deserialize without type information
+
+        \identifier{1l3} */
     static ProtoFunction* deserialize(DeserializingStream& s) { return new Switch(s); }
 
     /** Obtain information about node */
@@ -123,7 +155,9 @@ namespace casadi {
     void find(std::map<FunctionInternal*, Function>& all_fun, casadi_int max_depth) const override;
 
   protected:
-    /** \brief Deserializing constructor */
+    /** \brief Deserializing constructor
+
+        \identifier{1l4} */
     explicit Switch(DeserializingStream& s);
   };
 

@@ -31,8 +31,10 @@
 namespace casadi {
 
   /** \brief Empty Base
+
       This class is extended in SWIG.
-   */
+
+      \identifier{ol} */
   struct CASADI_EXPORT GenericExpressionCommon {};
 
 #ifndef SWIG
@@ -43,7 +45,8 @@ namespace casadi {
 
   \author Joel Andersson
   \date 2012
-*/
+
+      \identifier{om} */
 template<typename ExType>
 class GenericExpression : public GenericExpressionCommon {
   protected:
@@ -53,12 +56,14 @@ class GenericExpression : public GenericExpressionCommon {
   public:
 
 /**
-\ingroup expression_tools
+\addtogroup expression_tools
 @{
 */
 
   ///@{
-  /** \brief Addition: (x,y) -> x + y */
+  /** \brief Addition: (x,y) -> x + y
+
+      \identifier{on} */
   static ExType plus(const ExType &x, const ExType &y) {
     return ExType::binary(OP_ADD, x, y);
   }
@@ -72,7 +77,9 @@ class GenericExpression : public GenericExpressionCommon {
   ///@}
 
   ///@{
-  /** \brief Subtraction: (x,y) -> x - y */
+  /** \brief Subtraction: (x,y) -> x - y
+
+      \identifier{oo} */
   static ExType minus(const ExType &x, const ExType &y) {
     return ExType::binary(OP_SUB, x, y);
   }
@@ -86,7 +93,9 @@ class GenericExpression : public GenericExpressionCommon {
   ///@}
 
   ///@{
-  /** \brief Elementwise multiplication: (x,y) -> x .* y */
+  /** \brief Elementwise multiplication: (x,y) -> x .* y
+
+      \identifier{op} */
   static ExType times(const ExType &x, const ExType &y) {
     return ExType::binary(OP_MUL, x, y);
   }
@@ -100,7 +109,9 @@ class GenericExpression : public GenericExpressionCommon {
   ///@}
 
   ///@{
-  /** \brief Elementwise division: (x,y) -> x ./ y */
+  /** \brief Elementwise division: (x,y) -> x ./ y
+
+      \identifier{oq} */
   static ExType rdivide(const ExType &x, const ExType &y) {
     return ExType::binary(OP_DIV, x, y);
   }
@@ -114,7 +125,9 @@ class GenericExpression : public GenericExpressionCommon {
   ///@}
 
   ///@{
-  /** \brief Logical less than: (x,y) -> x < y */
+  /** \brief Logical less than: (x,y) -> x < y
+
+      \identifier{or} */
   static ExType lt(const ExType &x, const ExType &y) {
     return ExType::binary(OP_LT, x, y);
   }
@@ -127,7 +140,9 @@ class GenericExpression : public GenericExpressionCommon {
   ///@}
 
   ///@{
-  /** \brief Logical less or equal to: (x,y) -> x <= y */
+  /** \brief Logical less or equal to: (x,y) -> x <= y
+
+      \identifier{os} */
   static ExType le(const ExType &x, const ExType &y) {
     return ExType::binary(OP_LE, x, y);
   }
@@ -140,7 +155,9 @@ class GenericExpression : public GenericExpressionCommon {
   ///@}
 
   ///@{
-  /** \brief Logical greater than: (x,y) -> x > y */
+  /** \brief Logical greater than: (x,y) -> x > y
+
+      \identifier{ot} */
   static ExType gt(const ExType &x, const ExType &y) {
     return ExType::lt(y, x);
   }
@@ -153,7 +170,9 @@ class GenericExpression : public GenericExpressionCommon {
   ///@}
 
   ///@{
-  /** \brief Logical greater or equal to: (x,y) -> x <= y */
+  /** \brief Logical greater or equal to: (x,y) -> x <= y
+
+      \identifier{ou} */
   static ExType ge(const ExType &x, const ExType &y) {
     return ExType::le(y, x);
   }
@@ -166,7 +185,9 @@ class GenericExpression : public GenericExpressionCommon {
   ///@}
 
   ///@{
-  /** \brief Logical equal to: (x,y) -> x == y */
+  /** \brief Logical equal to: (x,y) -> x == y
+
+      \identifier{ov} */
   static ExType eq(const ExType &x, const ExType &y) {
     return ExType::binary(OP_EQ, x, y);
   }
@@ -179,7 +200,9 @@ class GenericExpression : public GenericExpressionCommon {
   ///@}
 
   ///@{
-  /** \brief Logical not equal to: (x,y) -> x != y */
+  /** \brief Logical not equal to: (x,y) -> x != y
+
+      \identifier{ow} */
   static ExType ne(const ExType &x, const ExType &y) {
     return ExType::binary(OP_NE, x, y);
   }
@@ -193,9 +216,11 @@ class GenericExpression : public GenericExpressionCommon {
 
   ///@{
   /** \brief Logical `and`
+
    * Returns (an expression evaluating to) 1 if both
    * expressions are nonzero and 0 otherwise
-   */
+
+      \identifier{ox} */
    static ExType logic_and(const ExType &x, const ExType &y) {
      return ExType::binary(OP_AND, x, y);
    }
@@ -209,9 +234,11 @@ class GenericExpression : public GenericExpressionCommon {
 
   ///@{
   /** \brief  Logical `or`
+
    * returns (an expression evaluating to) 1 if at
    * least one expression is nonzero and 0 otherwise
-   */
+
+      \identifier{oy} */
    static ExType logic_or(const ExType &x, const ExType &y) {
      return ExType::binary(OP_OR, x, y);
    }
@@ -225,9 +252,11 @@ class GenericExpression : public GenericExpressionCommon {
 
    ///@{
    /** \brief  Logical `not` x -> !x
+
     * Returns (an expression evaluating to) 1 if
     * expression is zero and 0 otherwise
-    */
+
+       \identifier{oz} */
     static ExType logic_not(const ExType& x) {
       return ExType::unary(OP_NOT, x);
     }
@@ -240,7 +269,9 @@ class GenericExpression : public GenericExpressionCommon {
     ///@}
 
     ///@{
-    /** \brief Absolute value: x -> abs(x) */
+    /** \brief Absolute value: x -> abs(x)
+
+        \identifier{p0} */
     static ExType abs(const ExType& x) {
       return ExType::unary(OP_FABS, x);
     }
@@ -253,7 +284,9 @@ class GenericExpression : public GenericExpressionCommon {
     ///@}
 
     ///@{
-    /** \brief Square root: x -> sqrt(x) */
+    /** \brief Square root: x -> sqrt(x)
+
+        \identifier{p1} */
     static ExType sqrt(const ExType& x) {
       return ExType::unary(OP_SQRT, x);
     }
@@ -263,7 +296,9 @@ class GenericExpression : public GenericExpressionCommon {
     ///@}
 
     ///@{
-    /** \brief Square: x -> x^2 */
+    /** \brief Square: x -> x^2
+
+        \identifier{p2} */
     static ExType sq(const ExType& x) {
       return ExType::unary(OP_SQ, x);
     }
@@ -273,7 +308,9 @@ class GenericExpression : public GenericExpressionCommon {
     ///@}
 
     ///@{
-    /** \brief Sine: x -> sin(x) */
+    /** \brief Sine: x -> sin(x)
+
+        \identifier{p3} */
     static ExType sin(const ExType& x) {
       return ExType::unary(OP_SIN, x);
     }
@@ -283,7 +320,9 @@ class GenericExpression : public GenericExpressionCommon {
     ///@}
 
     ///@{
-    /** \brief Cosine: x -> cos(x) */
+    /** \brief Cosine: x -> cos(x)
+
+        \identifier{p4} */
     static ExType cos(const ExType& x) {
       return ExType::unary(OP_COS, x);
     }
@@ -293,7 +332,9 @@ class GenericExpression : public GenericExpressionCommon {
     ///@}
 
     ///@{
-    /** \brief Tangent: x -> tan(x) */
+    /** \brief Tangent: x -> tan(x)
+
+        \identifier{p5} */
     static ExType tan(const ExType& x) {
       return ExType::unary(OP_TAN, x);
     }
@@ -303,7 +344,9 @@ class GenericExpression : public GenericExpressionCommon {
     ///@}
 
     ///@{
-    /** \brief Arc tangent: x -> atan(x) */
+    /** \brief Arc tangent: x -> atan(x)
+
+        \identifier{p6} */
     static ExType atan(const ExType& x) {
       return ExType::unary(OP_ATAN, x);
     }
@@ -313,7 +356,9 @@ class GenericExpression : public GenericExpressionCommon {
     ///@}
 
     ///@{
-    /** \brief Arc sine: x -> asin(x) */
+    /** \brief Arc sine: x -> asin(x)
+
+        \identifier{p7} */
     static ExType asin(const ExType& x) {
       return ExType::unary(OP_ASIN, x);
     }
@@ -323,7 +368,9 @@ class GenericExpression : public GenericExpressionCommon {
     ///@}
 
     ///@{
-    /** \brief Arc cosine: x -> acos(x) */
+    /** \brief Arc cosine: x -> acos(x)
+
+        \identifier{p8} */
     static ExType acos(const ExType& x) {
       return ExType::unary(OP_ACOS, x);
     }
@@ -333,7 +380,9 @@ class GenericExpression : public GenericExpressionCommon {
     ///@}
 
     ///@{
-    /** \brief Hyperbolic tangent: x -> tanh(x) */
+    /** \brief Hyperbolic tangent: x -> tanh(x)
+
+        \identifier{p9} */
     static ExType tanh(const ExType& x) {
       return ExType::unary(OP_TANH, x);
     }
@@ -343,7 +392,9 @@ class GenericExpression : public GenericExpressionCommon {
     ///@}
 
     ///@{
-    /** \brief Hyperbolic sin: x -> sinh(x) */
+    /** \brief Hyperbolic sin: x -> sinh(x)
+
+        \identifier{pa} */
     static ExType sinh(const ExType& x) {
       return ExType::unary(OP_SINH, x);
     }
@@ -353,7 +404,9 @@ class GenericExpression : public GenericExpressionCommon {
     ///@}
 
     ///@{
-    /** \brief Hyperbolic cosine: x -> cosh(x) */
+    /** \brief Hyperbolic cosine: x -> cosh(x)
+
+        \identifier{pb} */
     static ExType cosh(const ExType& x) {
       return ExType::unary(OP_COSH, x);
     }
@@ -363,7 +416,9 @@ class GenericExpression : public GenericExpressionCommon {
     ///@}
 
     ///@{
-    /** \brief Inverse hyperbolic tangent: x -> atanh(x) */
+    /** \brief Inverse hyperbolic tangent: x -> atanh(x)
+
+        \identifier{pc} */
     static ExType atanh(const ExType& x) {
       return ExType::unary(OP_ATANH, x);
     }
@@ -373,7 +428,9 @@ class GenericExpression : public GenericExpressionCommon {
     ///@}
 
     ///@{
-    /** \brief Inverse hyperbolic sin: x -> asinh(x) */
+    /** \brief Inverse hyperbolic sin: x -> asinh(x)
+
+        \identifier{pd} */
     static ExType asinh(const ExType& x) {
       return ExType::unary(OP_ASINH, x);
     }
@@ -383,7 +440,9 @@ class GenericExpression : public GenericExpressionCommon {
     ///@}
 
     ///@{
-    /** \brief Inverse hyperbolic cosine: x -> acosh(x) */
+    /** \brief Inverse hyperbolic cosine: x -> acosh(x)
+
+        \identifier{pe} */
     static ExType acosh(const ExType& x) {
       return ExType::unary(OP_ACOSH, x);
     }
@@ -393,7 +452,9 @@ class GenericExpression : public GenericExpressionCommon {
     ///@}
 
     ///@{
-    /** \brief Elementwise exponential: x -> exp(x) */
+    /** \brief Elementwise exponential: x -> exp(x)
+
+        \identifier{pf} */
     static ExType exp(const ExType& x) {
       return ExType::unary(OP_EXP, x);
     }
@@ -403,7 +464,9 @@ class GenericExpression : public GenericExpressionCommon {
     ///@}
 
     ///@{
-    /** \brief Natural logarithm: x -> log(x) */
+    /** \brief Natural logarithm: x -> log(x)
+
+        \identifier{pg} */
     static ExType log(const ExType& x) {
       return ExType::unary(OP_LOG, x);
     }
@@ -413,7 +476,9 @@ class GenericExpression : public GenericExpressionCommon {
     ///@}
 
     ///@{
-    /** \brief Base-10 logarithm: x -> log10(x) */
+    /** \brief Base-10 logarithm: x -> log10(x)
+
+        \identifier{ph} */
     static ExType log10(const ExType& x) {
       return log(x)*(1/std::log(10.));
     }
@@ -423,7 +488,9 @@ class GenericExpression : public GenericExpressionCommon {
     ///@}
 
     ///@{
-    /** \brief Precision variant for natural logarithm: x -> log(x+1) */
+    /** \brief Precision variant for natural logarithm: x -> log(x+1)
+
+        \identifier{pi} */
     static ExType log1p(const ExType& x) {
       return ExType::unary(OP_LOG1P, x);
     }
@@ -433,7 +500,9 @@ class GenericExpression : public GenericExpressionCommon {
     ///@}
 
     ///@{
-    /** \brief Precision variant for elementwise exponential: x -> exp(x)-1 */
+    /** \brief Precision variant for elementwise exponential: x -> exp(x)-1
+
+        \identifier{pj} */
     static ExType expm1(const ExType& x) {
       return ExType::unary(OP_EXPM1, x);
     }
@@ -443,7 +512,9 @@ class GenericExpression : public GenericExpressionCommon {
     ///@}
 
     ///@{
-    /** \brief Round down to nearest integer: x -> floor(x) */
+    /** \brief Round down to nearest integer: x -> floor(x)
+
+        \identifier{pk} */
     static ExType floor(const ExType& x) {
       return ExType::unary(OP_FLOOR, x);
     }
@@ -453,7 +524,9 @@ class GenericExpression : public GenericExpressionCommon {
     ///@}
 
     ///@{
-    /** \brief Round up to nearest integer: x -> ceil(x) */
+    /** \brief Round up to nearest integer: x -> ceil(x)
+
+        \identifier{pl} */
     static ExType ceil(const ExType& x) {
       return ExType::unary(OP_CEIL, x);
     }
@@ -463,7 +536,9 @@ class GenericExpression : public GenericExpressionCommon {
     ///@}
 
     ///@{
-    /** \brief Error function: x -> erf(x) */
+    /** \brief Error function: x -> erf(x)
+
+        \identifier{pm} */
     static ExType erf(const ExType& x) {
       return ExType::unary(OP_ERF, x);
     }
@@ -473,7 +548,9 @@ class GenericExpression : public GenericExpressionCommon {
     ///@}
 
     ///@{
-    /** \brief Inverse error function: x -> erfinv(x) */
+    /** \brief Inverse error function: x -> erfinv(x)
+
+        \identifier{pn} */
     static ExType erfinv(const ExType& x) {
       return ExType::unary(OP_ERFINV, x);
     }
@@ -484,11 +561,13 @@ class GenericExpression : public GenericExpressionCommon {
 
     ///@{
     /** \brief Sign function:
+
         sign(x)   := -1 for x<0
         sign(x)   :=  1 for x>0,
         sign(0)   :=  0
         sign(NaN) :=  NaN
-    */
+
+        \identifier{po} */
     static ExType sign(const ExType& x) {
       return ExType::unary(OP_SIGN, x);
     }
@@ -498,7 +577,9 @@ class GenericExpression : public GenericExpressionCommon {
     ///@}
 
     ///@{
-    /** \brief Elementwise power: (x,y) -> x.^y */
+    /** \brief Elementwise power: (x,y) -> x.^y
+
+        \identifier{pp} */
     static ExType pow(const ExType& x, const ExType& y) {
       return ExType::binary(OP_POW, x, y);
     }
@@ -508,7 +589,9 @@ class GenericExpression : public GenericExpressionCommon {
     ///@}
 
     ///@{
-    /** \brief Remainder after division: (x,y) -> mod(x,y) */
+    /** \brief Remainder after division: (x,y) -> mod(x,y)
+
+        \identifier{pq} */
     static ExType mod(const ExType& x, const ExType& y) {
       return ExType::binary(OP_FMOD, x, y);
     }
@@ -521,7 +604,9 @@ class GenericExpression : public GenericExpressionCommon {
     ///@}
 
     ///@{
-    /** \brief Two argument arc tangent: (x,y) -> atan2(x,y) */
+    /** \brief Two argument arc tangent: (x,y) -> atan2(x,y)
+
+        \identifier{pr} */
     static ExType atan2(const ExType& x, const ExType& y) {
       return ExType::binary(OP_ATAN2, x, y);
     }
@@ -531,7 +616,9 @@ class GenericExpression : public GenericExpressionCommon {
     ///@}
 
     ///@{
-    /** \brief Conditional assignment: (x,y) -> x ? y : 0 */
+    /** \brief Conditional assignment: (x,y) -> x ? y : 0
+
+        \identifier{ps} */
     static ExType if_else_zero(const ExType& x, const ExType& y) {
       return ExType::binary(OP_IF_ELSE_ZERO, x, y);
     }
@@ -541,7 +628,9 @@ class GenericExpression : public GenericExpressionCommon {
     ///@}
 
     ///@{
-    /** \brief Smallest of two values: (x,y) -> min(x,y) */
+    /** \brief Smallest of two values: (x,y) -> min(x,y)
+
+        \identifier{pt} */
     static ExType fmin(const ExType& x, const ExType& y) {
       return ExType::binary(OP_FMIN, x, y);
     }
@@ -551,7 +640,9 @@ class GenericExpression : public GenericExpressionCommon {
     ///@}
 
     ///@{
-    /** \brief Largest of two values: (x,y) -> max(x,y) */
+    /** \brief Largest of two values: (x,y) -> max(x,y)
+
+        \identifier{pu} */
     static ExType fmax(const ExType& x, const ExType& y) {
       return ExType::binary(OP_FMAX, x, y);
     }
@@ -562,13 +653,15 @@ class GenericExpression : public GenericExpressionCommon {
 
     ///@{
     /** \brief Check if two nodes are equivalent up to a given depth.
+
      * Depth=0 checks if the expressions are identical, i.e. points to the same node.
      *
      * a = x*x
      * b = x*x
      *
      *  is_equal(a,b,0)  will return false, but a.is_equal(a,b,1) will return true
-     */
+
+        \identifier{pv} */
      friend inline bool is_equal(const ExType& x, const ExType& y, casadi_int depth=0) {
        return ExType::is_equal(x, y, depth);
      }
@@ -605,7 +698,9 @@ class GenericExpression : public GenericExpressionCommon {
      ///@}
 
     ///@{
-    /** \brief Precision variant for 2 norm: (x,y) -> sqrt(x^2+y^2) */
+    /** \brief Precision variant for 2 norm: (x,y) -> sqrt(x^2+y^2)
+
+        \identifier{pw} */
     static ExType hypot(const ExType& x, const ExType& y) {
       return ExType::binary(OP_HYPOT, x, y);
     }

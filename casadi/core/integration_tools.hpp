@@ -32,9 +32,11 @@ namespace casadi {
 
   ///@{
   /** \brief Obtain collocation points of specific order and scheme
+
   \param order Which order (1 to 9 supported)
   \param scheme  'radau' or 'legendre'
-  **/
+  *
+  \identifier{1so} */
   CASADI_EXPORT
     std::vector<double> collocation_points(casadi_int order, const std::string& scheme="radau");
 #ifndef SWIG
@@ -47,12 +49,12 @@ namespace casadi {
   /** \brief Obtain collocation interpolating matrices
   
   A collocation method poses a polynomial Pi that interpolates exactly through
-  an initial state (0,X_0) and helper states at collocation points (tau_j,X@collPoint(j)).
+  an initial state (0,X_0) and helper states at collocation points (tau_j,X:collPoint(j)).
 
-  This function computes the linear mapping between dPi/dt and coefficients Z=[X_0 X@collPoints].
+  This function computes the linear mapping between dPi/dt and coefficients Z=[X_0 X:collPoints].
 
   \param tau  location of collocation points, as obtained from collocation_points
-  \param[out] output_C interpolating coefficients to obtain derivatives.
+  \param[out] C interpolating coefficients to obtain derivatives.
       Length: order+1, order+1
 
     \verbatim
@@ -61,14 +63,14 @@ namespace casadi {
 
     with h the length of the integration interval.
 
-  \param[out] output_D interpolating coefficients to obtain end state.
+  \param[out] D interpolating coefficients to obtain end state.
       Length: order+1
 
     \verbatim
       Pi @X_f = Sum_i D[i]*Z_i
     \endverbatim
 
-  */
+  \identifier{1sp} */
   CASADI_EXPORT void
   collocation_interpolators(const std::vector<double> & tau,
                             std::vector< std::vector<double> > &SWIG_OUTPUT(C),
@@ -110,7 +112,7 @@ namespace casadi {
       q = quad*B*h
     \endverbatim
 
-  */
+  \identifier{1sq} */
   CASADI_EXPORT void
   collocation_coeff(const std::vector<double> & tau,
                             DM &SWIG_OUTPUT(C),
@@ -121,6 +123,7 @@ namespace casadi {
   enum CollocationPoints {LEGENDRE, RADAU};
 
   /** \brief Construct an explicit Runge-Kutta integrator
+
    * The constructed function has three inputs,
    * corresponding to initial state (x0), parameter (p) and integration time (h)
    * and one output, corresponding to final state (xf).
@@ -128,10 +131,12 @@ namespace casadi {
    * \param f     ODE function with two inputs (x and p) and one output (xdot)
    * \param N     Number of integrator steps
    * \param order Order of interpolating polynomials
-   */
+
+  \identifier{1sr} */
   CASADI_EXPORT Function simpleRK(Function f, casadi_int N=10, casadi_int order=4);
 
   /** \brief Construct an implicit Runge-Kutta integrator using a collocation scheme
+
    * The constructed function has three inputs,
    * corresponding to initial state (x0), parameter (p) and integration time (h)
    * and one output, corresponding to final state (xf).
@@ -142,7 +147,8 @@ namespace casadi {
    * \param scheme Collocation scheme, as excepted by collocationPoints function.
    * \param solver Solver plugin
    * \param solver_options Options to be passed to the solver plugin
-  */
+
+  \identifier{1ss} */
   CASADI_EXPORT
   Function simpleIRK(Function f, casadi_int N=10, casadi_int order=4,
                       const std::string& scheme="radau",
@@ -150,23 +156,14 @@ namespace casadi {
                       const Dict& solver_options = Dict());
 
   /** \brief Simplified wrapper for the Integrator class
-   * Constructs an integrator using the same syntax as simpleRK and simpleIRK.
-   * The constructed function has three inputs,
-   * corresponding to initial state (x0), parameter (p) and integration time (h)
-   * and one output, corresponding to final state (xf).
-   *
-   * \param f      ODE function with two inputs (x and p) and one output (xdot)
-   * \param N      Number of integrator steps
-   * \param order  Order of interpolating polynomials
-   * \param scheme Collocation scheme, as excepted by collocationPoints function.
-  */
+
+  \identifier{1st} */
   CASADI_EXPORT
   Function simpleIntegrator(Function f, const std::string& integrator="cvodes",
                               const Dict& integrator_options = Dict());
 
  
-  /**
-   * @brief 
+  /** \brief Reduce index
    * 
    * 
    * Index reduction leads to a new set of variables and equations.
@@ -209,6 +206,7 @@ namespace casadi {
    *      Corresponds to -gamma of equation (1.5) in
    *      Ascher, Uri M., Hongsheng Chin, and Sebastian Reich. "Stabilization of DAEs and invariant manifolds." Numerische Mathematik 67.2 (1994): 131-149.
    * 
+   * \param stats Statistics
    * 
    * \return Expression dictionary describing the reduced DAE
    *   
@@ -217,8 +215,9 @@ namespace casadi {
    *      - x:   symbol for explicit differential states
    *      - ode: expression for right-hand-side of explicit differential states
    *      - I:   expression for invariants
-   * 
-   */
+   *
+
+      \identifier{23h} */
   /// @{
   CASADI_EXPORT
   MXDict dae_reduce_index(const MXDict& dae, Dict& SWIG_OUTPUT(stats), const Dict& opts={});
@@ -240,7 +239,8 @@ namespace casadi {
   * \return Semi explicit DAE dictionary, suitable to pass to a CasADi integrator
   * 
   * \sa dae_reduce_index
-  */
+
+  \identifier{1su} */
   /// @{
   CASADI_EXPORT
   MXDict dae_map_semi_expl(const MXDict& dae, const MXDict& dae_red,
@@ -274,7 +274,8 @@ namespace casadi {
   *                         typically used as input for integrators
   * 
   * \sa dae_reduce_index
-  */
+
+  \identifier{1sv} */
   /// @{
   CASADI_EXPORT
   Function dae_init_gen(const MXDict& dae, const MXDict& dae_red,

@@ -2754,6 +2754,7 @@ class Functiontests(casadiTestCase):
 
   @requires_conic('osqp')
   def test_memful_external(self):
+    if not args.run_slow: return
     c = conic("conic","osqp",{"a":Sparsity.dense(1,2),"h":Sparsity.dense(2,2)},{"print_problem":True,"osqp.verbose":False})
     inputs = {"h": DM([[1,0.2],[0.2,1]]),"g":vertcat(1,2),"a":horzcat(1,1),"lba":-1,"uba":1}
     inputs = c.convert_in(inputs)
@@ -2761,6 +2762,23 @@ class Functiontests(casadiTestCase):
     F = F.wrap()
     print("memful_external")
     self.check_codegen(F,inputs=inputs,main=True,extralibs=[lib])
+    
+  def test_cse(self):
+    for X in [SX,MX]:
+        x = X.sym("x",2)
+        y = X.sym("y",2)
+        p = X.sym("p",2)
+        z=p*cos(x+5*y)
+        z2=p*cos(x+5*y)
+        w = z-z2
+        self.assertFalse(w.is_zero())
+        res = cse(w)
+        self.assertTrue(res.is_zero())
+        f1 = Function('f',[x,y],[w],{"cse":False})
+        f2 = Function('f',[x,y],[w],{"cse":True})
+        self.assertTrue(f1.n_instructions()>3)
+        self.assertTrue(f2.n_instructions()<=3)
+
     
 if __name__ == '__main__':
     unittest.main()

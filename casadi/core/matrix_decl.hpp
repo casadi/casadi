@@ -42,13 +42,17 @@
 namespace casadi {
 
   /** \brief Empty Base
+
       This class is extended in SWIG.
-  */
+
+      \identifier{18c} */
   struct CASADI_EXPORT MatrixCommon {};
 
 /// \cond CLUTTER
   ///@{
-  /** \brief Get typename */
+  /** \brief Get typename
+
+      \identifier{18d} */
   template <typename Scalar> inline std::string matrixName()
   { return std::string("Matrix<") + typeid(Scalar).name() + std::string(">");}
   template<> inline std::string matrixName<double>() { return "DM"; }
@@ -78,7 +82,8 @@ namespace casadi {
 
       \author Joel Andersson
       \date 2010-2014
-  */
+
+      \identifier{18e} */
   template<typename Scalar>
   class CASADI_EXPORT Matrix :
     public MatrixCommon,
@@ -87,7 +92,9 @@ namespace casadi {
     public SWIG_IF_ELSE(PrintableCommon, Printable<Matrix<Scalar> >) {
   public:
 
-    /** \brief  constructors */
+    /** \brief  constructors
+
+        \identifier{18f} */
     /// empty 0-by-0 matrix constructor
     Matrix();
 
@@ -99,26 +106,38 @@ namespace casadi {
     Matrix<Scalar>& operator=(const Matrix<Scalar>& m);
 #endif // SWIG
 
-    /** \brief Create a sparse matrix with all structural zeros */
+    /** \brief Create a sparse matrix with all structural zeros
+
+        \identifier{18g} */
     Matrix(casadi_int nrow, casadi_int ncol);
 
 #ifndef SWIG
-    /** \brief Create a sparse matrix with all structural zeros */
+    /** \brief Create a sparse matrix with all structural zeros
+
+        \identifier{18h} */
     explicit Matrix(const std::pair<casadi_int, casadi_int>& rc);
 
-    /** \brief  Access functions of the node */
+    /** \brief  Access functions of the node
+
+        \identifier{18i} */
     std::vector<Scalar>* operator->() { return &nonzeros_;}
 
-    /** \brief  Const access functions of the node */
+    /** \brief  Const access functions of the node
+
+        \identifier{18j} */
     const std::vector<Scalar>* operator->() const { return &nonzeros_;}
 #endif // SWIG
 
     /** \brief Create a sparse matrix from a sparsity pattern.
+
         Same as Matrix::ones(sparsity)
-     */
+
+        \identifier{18k} */
     explicit Matrix(const Sparsity& sp);
 
-    /** \brief Construct matrix with a given sparsity and nonzeros */
+    /** \brief Construct matrix with a given sparsity and nonzeros
+
+        \identifier{18l} */
     Matrix(const Sparsity& sp, const Matrix<Scalar>& d);
 
     /// This constructor enables implicit type conversion from a numeric type
@@ -128,7 +147,9 @@ namespace casadi {
     /// Dense matrix constructor with data given as vector of vectors
     explicit Matrix(const std::vector< std::vector<double> >& m);
 
-    /** \brief  Create an expression from a vector  */
+    /** \brief  Create an expression from a vector
+
+        \identifier{18m} */
     template<typename A>
     Matrix(const std::vector<A>& x) : sparsity_(Sparsity::dense(x.size(), 1)),
       nonzeros_(std::vector<Scalar>(x.size())) {
@@ -138,8 +159,10 @@ namespace casadi {
 #endif
 
     /** \brief Create a matrix from another matrix with a different entry type
+
      *  Assumes that the scalar conversion is valid.
-     */
+
+        \identifier{18n} */
     template<typename A>
     Matrix(const Matrix<A>& x) : sparsity_(x.sparsity()), nonzeros_(std::vector<Scalar>(x.nnz())) {
       auto x_it = x->begin();
@@ -250,7 +273,9 @@ namespace casadi {
 
     /// \cond INTERNAL
     ///@{
-    /** \brief  Create nodes by their ID */
+    /** \brief  Create nodes by their ID
+
+        \identifier{18o} */
     static Matrix<Scalar> binary(casadi_int op, const Matrix<Scalar> &x, const Matrix<Scalar> &y);
     static Matrix<Scalar> unary(casadi_int op, const Matrix<Scalar> &x);
     static Matrix<Scalar> scalar_matrix(casadi_int op,
@@ -276,6 +301,7 @@ namespace casadi {
     static Matrix<Scalar> simplify(const Matrix<Scalar> &x);
     static Matrix<Scalar> jacobian(const Matrix<Scalar> &f, const Matrix<Scalar> &x,
                                    const Dict& opts = Dict());
+    static Sparsity jacobian_sparsity(const Matrix<Scalar> &f, const Matrix<Scalar> &x);
     static Matrix<Scalar> hessian(const Matrix<Scalar> &f, const Matrix<Scalar> &x,
       const Dict& opts = Dict());
     static Matrix<Scalar> hessian(const Matrix<Scalar> &f, const Matrix<Scalar> &x,
@@ -385,6 +411,7 @@ namespace casadi {
                 const std::vector<casadi_int>& offset2);
     static Matrix<Scalar> reshape(const Matrix<Scalar> &x, casadi_int nrow, casadi_int ncol);
     static Matrix<Scalar> reshape(const Matrix<Scalar> &x, const Sparsity& sp);
+    static Matrix<Scalar> sparsity_cast(const Matrix<Scalar> &x, const Sparsity& sp);
     static Matrix<Scalar> kron(const Matrix<Scalar> &x, const Matrix<Scalar>& y);
     static Matrix<Scalar> mtimes(const Matrix<Scalar> &x, const Matrix<Scalar> &y);
     static Matrix<Scalar> mac(const Matrix<Scalar> &x,
@@ -468,47 +495,56 @@ namespace casadi {
 
 #if !defined(SWIG) || defined(DOXYGEN)
 /**
-\ingroup expression_tools
+\addtogroup expression_tools
 @{
 */
     /** \brief Matrix adjoint
-    */
+
+        \identifier{18p} */
     friend inline Matrix<Scalar> adj(const Matrix<Scalar>& A) {
       return Matrix<Scalar>::adj(A);
     }
 
     /** \brief Get the (i,j) minor matrix
-     */
+
+        \identifier{18q} */
     friend inline Matrix<Scalar> minor(const Matrix<Scalar> &x, casadi_int i, casadi_int j) {
       return Matrix<Scalar>::minor(x, i, j);
     }
 
     /** \brief Get the (i,j) cofactor matrix
-    */
+
+        \identifier{18r} */
     friend inline Matrix<Scalar> cofactor(const Matrix<Scalar> &x, casadi_int i, casadi_int j) {
       return Matrix<Scalar>::cofactor(x, i, j);
     }
 
     /** \brief  QR factorization using the modified Gram-Schmidt algorithm
+
      * More stable than the classical Gram-Schmidt, but may break down if the rows of A
      * are nearly linearly dependent
      * See J. Demmel: Applied Numerical Linear Algebra (algorithm 3.1.).
      * Note that in SWIG, Q and R are returned by value.
-     */
+
+        \identifier{18s} */
     friend inline void qr(const Matrix<Scalar>& A, Matrix<Scalar>& Q, Matrix<Scalar>& R) {
       return Matrix<Scalar>::qr(A, Q, R);
     }
 
     /** \brief Sparse direct QR factorization
+
      * See T. Davis: Direct Methods for Sparse Linear Systems
-     */
+
+        \identifier{18t} */
     friend inline void qr_sparse(const Matrix<Scalar>& A, Matrix<Scalar>& V, Matrix<Scalar>& R,
                                  Matrix<Scalar>& beta, std::vector<casadi_int>& prinv,
                                  std::vector<casadi_int>& pc, bool amd=true) {
       return Matrix<Scalar>::qr_sparse(A, V, R, beta, prinv, pc, amd);
     }
 
-    /** \brief Solve using a sparse QR factorization */
+    /** \brief Solve using a sparse QR factorization
+
+        \identifier{18u} */
     friend inline Matrix<Scalar>
     qr_solve(const Matrix<Scalar>& b, const Matrix<Scalar>& v,
              const Matrix<Scalar>& r, const Matrix<Scalar>& beta,
@@ -518,24 +554,30 @@ namespace casadi {
     }
 
     /** \brief Obtain a Cholesky factorisation of a matrix
+
      * Performs and LDL transformation [L,D] = ldl(A) and
      * returns diag(sqrt(D))*L'
-     */
+
+        \identifier{18v} */
     friend inline Matrix<Scalar> chol(const Matrix<Scalar>& A) {
       return Matrix<Scalar>::chol(A);
     }
 
     /** \brief Sparse LDL^T factorization
+
      * Returns D and the strictly upper triangular entries of L^T
      * I.e. ones on the diagonal are ignored.
      * Only guarenteed to work for positive definite matrices.
-     */
+
+        \identifier{18w} */
     friend inline void ldl(const Matrix<Scalar>& A, Matrix<Scalar>& D, Matrix<Scalar>& LT,
                            std::vector<casadi_int>& p, bool amd=true) {
       return Matrix<Scalar>::ldl(A, D, LT, p, amd);
     }
 
-    /** \brief Solve using a sparse LDL^T factorization */
+    /** \brief Solve using a sparse LDL^T factorization
+
+        \identifier{18x} */
     friend inline Matrix<Scalar>
     ldl_solve(const Matrix<Scalar>& b, const Matrix<Scalar>& D, const Matrix<Scalar>& LT,
               const std::vector<casadi_int>& p) {
@@ -543,46 +585,53 @@ namespace casadi {
     }
 
     /** \brief Returns true only if any element in the matrix is true
-     */
+
+        \identifier{18y} */
     friend inline Matrix<Scalar> any(const Matrix<Scalar> &x) {
       return Matrix<Scalar>::any(x);
     }
 
     /** \brief Returns true only if every element in the matrix is true
-     */
+
+        \identifier{18z} */
     friend inline Matrix<Scalar> all(const Matrix<Scalar> &x) {
       return Matrix<Scalar>::all(x);
     }
 
     /** \brief Inf-norm of a Matrix-Matrix product
-    */
+
+        \identifier{190} */
     friend inline Matrix<Scalar>
       norm_inf_mul(const Matrix<Scalar> &x, const Matrix<Scalar> &y) {
       return Matrix<Scalar>::norm_inf_mul(x, y);
     }
 
     /** \brief  Make a matrix sparse by removing numerical zeros
-    */
+
+        \identifier{191} */
     friend inline Matrix<Scalar>
       sparsify(const Matrix<Scalar>& A, double tol=0) {
       return Matrix<Scalar>::sparsify(A, tol);
     }
 
     /** \brief  Expand the expression as a weighted sum (with constant weights)
-     */
+
+        \identifier{192} */
     friend inline void expand(const Matrix<Scalar>& ex, Matrix<Scalar> &weights,
                               Matrix<Scalar>& terms) {
       Matrix<Scalar>::expand(ex, weights, terms);
     }
 
     /** \brief Create a piecewise constant function
+
         Create a piecewise constant function with n=val.size() intervals
 
         Inputs:
         \param t a scalar variable (e.g. time)
         \param tval vector with the discrete values of t at the interval transitions (length n-1)
         \param val vector with the value of the function for each interval (length n)
-    */
+
+        \identifier{193} */
     friend inline Matrix<Scalar> pw_const(const Matrix<Scalar> &t,
                                             const Matrix<Scalar> &tval,
                                             const Matrix<Scalar> &val) {
@@ -590,13 +639,15 @@ namespace casadi {
     }
 
     /** Create a piecewise linear function
+
         Create a piecewise linear function:
 
         Inputs:
         \brief t a scalar variable (e.g. time)
         \brief tval vector with the the discrete values of t (monotonically increasing)
         \brief val vector with the corresponding function values (same length as tval)
-    */
+
+                                                                                                                \identifier{194} */
     friend inline Matrix<Scalar>
       pw_lin(const Matrix<Scalar> &t, const Matrix<Scalar> &tval,
              const Matrix<Scalar> &val) {
@@ -612,13 +663,13 @@ namespace casadi {
      * H(x) = 1 & x>0 \\
      * \end {cases}
      * \f]
-     */
+
+         \identifier{195} */
     friend inline Matrix<Scalar> heaviside(const Matrix<Scalar> &x) {
       return Matrix<Scalar>::heaviside(x);
     }
 
-    /**
-     * \brief rectangle function
+    /** \brief rectangle function
      *
      * \f[
      * \begin {cases}
@@ -629,13 +680,13 @@ namespace casadi {
      * \f]
      *
      * Also called: gate function, block function, band function, pulse function, window function
-     */
+
+        \identifier{23n} */
     friend inline Matrix<Scalar> rectangle(const Matrix<Scalar> &x) {
       return Matrix<Scalar>::rectangle(x);
     }
 
-    /**
-     * \brief triangle function
+    /** \brief triangle function
      *
      * \f[
      * \begin {cases}
@@ -644,13 +695,13 @@ namespace casadi {
      * \end {cases}
      * \f]
      *
-     */
+
+        \identifier{23o} */
     friend inline Matrix<Scalar> triangle(const Matrix<Scalar> &x) {
       return Matrix<Scalar>::triangle(x);
     }
 
-    /**
-     * \brief ramp function
+    /** \brief ramp function
      *
      *
      * \f[
@@ -661,13 +712,16 @@ namespace casadi {
      * \f]
      *
      * Also called: slope function
-     */
+
+        \identifier{23p} */
     friend inline Matrix<Scalar> ramp(const Matrix<Scalar> &x) {
       return Matrix<Scalar>::ramp(x);
     }
 
     ///@{
-    /** \brief  Integrate f from a to b using Gaussian quadrature with n points */
+    /** \brief  Integrate f from a to b using Gaussian quadrature with n points
+
+        \identifier{196} */
     friend inline Matrix<Scalar>
       gauss_quadrature(const Matrix<Scalar> &f, const Matrix<Scalar> &x,
                        const Matrix<Scalar> &a, const Matrix<Scalar> &b,
@@ -683,8 +737,7 @@ namespace casadi {
     ///@}
 
     ///@{
-    /**
-     * \brief univariate Taylor series expansion
+    /** \brief univariate Taylor series expansion
      *
      * Calculate the Taylor expansion of expression 'ex' up to order 'order' with
      * respect to variable 'x' around the point 'a'
@@ -696,7 +749,8 @@ namespace casadi {
      * taylor(sin(x), x)
      * \endcode
      * \verbatim >>   x \endverbatim
-     */
+
+        \identifier{23q} */
     friend inline Matrix<Scalar> taylor(const Matrix<Scalar>& ex, const Matrix<Scalar>& x,
                                           const Matrix<Scalar>& a, casadi_int order=1) {
       return Matrix<Scalar>::taylor(ex, x, a, order);
@@ -706,20 +760,19 @@ namespace casadi {
     }
     ///@}
 
-    /**
-     * \brief multivariate Taylor series expansion
+    /** \brief multivariate Taylor series expansion
      *
      * Do Taylor expansions until the aggregated order of a term is equal to 'order'.
      * The aggregated order of \f$x^n y^m\f$ equals \f$n+m\f$.
      *
-     */
+
+        \identifier{23r} */
     friend inline Matrix<Scalar> mtaylor(const Matrix<Scalar>& ex, const Matrix<Scalar>& x,
                                            const Matrix<Scalar>& a, casadi_int order=1) {
       return Matrix<Scalar>::mtaylor(ex, x, a, order);
     }
 
-    /**
-     * \brief multivariate Taylor series expansion
+    /** \brief multivariate Taylor series expansion
      *
      * Do Taylor expansions until the aggregated order of a term is equal to 'order'.
      * The aggregated order of \f$x^n y^m\f$ equals \f$n+m\f$.
@@ -743,7 +796,8 @@ namespace casadi {
      * \endcode
      * \f$  (-3 x^2 y-x^3)/6+y+x \f$
      *
-     */
+
+        \identifier{23s} */
     friend inline Matrix<Scalar> mtaylor(const Matrix<Scalar>& ex, const Matrix<Scalar>& x,
                                            const Matrix<Scalar>& a, casadi_int order,
                                            const std::vector<casadi_int>& order_contributions) {
@@ -754,7 +808,8 @@ namespace casadi {
      *
      * \param ex Scalar expression that represents a polynomial
      * \param x  Scalar symbol that the polynomial is build up with
-     */
+
+        \identifier{197} */
     friend inline Matrix<Scalar> poly_coeff(const Matrix<Scalar>& f,
                                               const Matrix<Scalar>& x) {
       return Matrix<Scalar>::poly_coeff(f, x);
@@ -765,14 +820,16 @@ namespace casadi {
      *  This will only work for polynomials up to order 3
      *  It is assumed that the roots are real.
      *
-     */
+        \identifier{198} */
     friend inline Matrix<Scalar> poly_roots(const Matrix<Scalar>& p) {
       return Matrix<Scalar>::poly_roots(p);
     }
 
     /** \brief Attempts to find the eigenvalues of a symbolic matrix
+
      *  This will only work for up to 3x3 matrices
-     */
+
+        \identifier{199} */
     friend inline Matrix<Scalar> eig_symbolic(const Matrix<Scalar>& m) {
       return Matrix<Scalar>::eig_symbolic(m);
     }
@@ -781,23 +838,32 @@ namespace casadi {
     /** \brief Evaluates the expression numerically
     *
     * An error is raised when the expression contains symbols
-    */
+
+        \identifier{19a} */
     inline friend Matrix<double> evalf(const Matrix<Scalar>& expr) {
       return Matrix<Scalar>::evalf(expr);
     }
 /** @} */
 #endif
 
-    /** \brief Set or reset the depth to which equalities are being checked for simplifications */
+    /** \brief Set or reset the depth to which equalities are being checked for simplifications
+
+        \identifier{19b} */
     static void set_max_depth(casadi_int eq_depth=1);
 
-    /** \brief Get the depth to which equalities are being checked for simplifications */
+    /** \brief Get the depth to which equalities are being checked for simplifications
+
+        \identifier{19c} */
     static casadi_int get_max_depth();
 
-    /** \brief Get function input */
+    /** \brief Get function input
+
+        \identifier{19d} */
     static std::vector<Matrix<Scalar> > get_input(const Function& f);
 
-    /** \brief Get free */
+    /** \brief Get free
+
+        \identifier{19e} */
     static std::vector<Matrix<Scalar> > get_free(const Function& f);
 
     /// Get name of the class
@@ -856,21 +922,33 @@ namespace casadi {
     void reserve(casadi_int nnz, casadi_int ncol);
 
     /** \brief Erase a submatrix (leaving structural zeros in its place)
-        Erase rows and/or columns of a matrix */
+
+        Erase rows and/or columns of a matrix
+
+        \identifier{19f} */
     void erase(const std::vector<casadi_int>& rr, const std::vector<casadi_int>& cc,
                bool ind1=false);
 
     /** \brief Erase a submatrix (leaving structural zeros in its place)
-        Erase elements of a matrix */
+
+        Erase elements of a matrix
+
+        \identifier{19g} */
     void erase(const std::vector<casadi_int>& rr, bool ind1=false);
 
     /** \brief Remove columns and rows
-        Remove/delete rows and/or columns of a matrix */
+
+        Remove/delete rows and/or columns of a matrix
+
+        \identifier{19h} */
     void remove(const std::vector<casadi_int>& rr, const std::vector<casadi_int>& cc);
 
     /** \brief Enlarge matrix
+
         Make the matrix larger by inserting empty rows and columns,
-        keeping the existing non-zeros */
+        keeping the existing non-zeros
+
+        \identifier{19i} */
     void enlarge(casadi_int nrow, casadi_int ncol,
                   const std::vector<casadi_int>& rr, const std::vector<casadi_int>& cc,
                   bool ind1=false);
@@ -895,12 +973,16 @@ namespace casadi {
 
 #endif // SWIG
 
-    /** \brief Get an owning reference to the sparsity pattern */
+    /** \brief Get an owning reference to the sparsity pattern
+
+        \identifier{19j} */
     Sparsity get_sparsity() const { return sparsity();}
 
-    /* \brief Construct a sparse matrix from triplet form
+    /** \brief Construct a sparse matrix from triplet form
+
      * Default matrix size is max(col) x max(row)
-     */
+
+        \identifier{23t} */
     ///@{
     static Matrix<Scalar> triplet(const std::vector<casadi_int>& row,
                                   const std::vector<casadi_int>& col,
@@ -915,87 +997,120 @@ namespace casadi {
     ///@}
 
     ///@{
-    /** \brief  create a matrix with all inf */
+    /** \brief  create a matrix with all inf
+
+        \identifier{19k} */
     static Matrix<Scalar> inf(const Sparsity& sp);
     static Matrix<Scalar> inf(casadi_int nrow=1, casadi_int ncol=1);
     static Matrix<Scalar> inf(const std::pair<casadi_int, casadi_int>& rc);
     ///@}
 
     ///@{
-    /** \brief  create a matrix with all nan */
+    /** \brief  create a matrix with all nan
+
+        \identifier{19l} */
     static Matrix<Scalar> nan(const Sparsity& sp);
     static Matrix<Scalar> nan(casadi_int nrow=1, casadi_int ncol=1);
     static Matrix<Scalar> nan(const std::pair<casadi_int, casadi_int>& rc);
     ///@}
 
-    /** \brief  create an n-by-n identity matrix */
+    /** \brief  create an n-by-n identity matrix
+
+        \identifier{19m} */
     static Matrix<Scalar> eye(casadi_int n);
 
     /** \brief Returns a number that is unique for a given symbolic scalar
      *
      * Only defined if symbolic scalar.
-     */
+
+        \identifier{19n} */
     casadi_int element_hash() const;
 
     /// Checks if expression does not contain NaN or Inf
     bool is_regular() const;
 
-    /** \brief Check if smooth */
+    /** \brief Check if smooth
+
+        \identifier{19o} */
     bool is_smooth() const;
 
     /** \brief Check if SX is a leaf of the SX graph
 
         Only defined if symbolic scalar.
-    */
+
+        \identifier{19p} */
     bool is_leaf() const;
 
     /** \brief Check whether a binary SX is commutative
 
         Only defined if symbolic scalar.
-    */
+
+        \identifier{19q} */
     bool is_commutative() const;
 
     /** \brief Check if symbolic (Dense)
+
         Sparse matrices invariable return false
-    */
+
+        \identifier{19r} */
     bool is_symbolic() const;
 
     /** \brief Check if matrix can be used to define function inputs.
+
         Sparse matrices can return true if all non-zero elements are symbolic
-    */
+
+        \identifier{19s} */
     bool is_valid_input() const;
 
     /// \cond INTERNAL
     /** \brief Detect duplicate symbolic expressions
+
         If there are symbolic primitives appearing more than once, the function will return
         true and the names of the duplicate expressions will be passed to casadi_warning.
         Note: Will mark the node using SXElem::set_temp.
         Make sure to call reset_input() after usage.
-    */
+
+        \identifier{19t} */
     bool has_duplicates() const;
 
-    /** \brief Reset the marker for an input expression */
+    /** \brief Reset the marker for an input expression
+
+        \identifier{19u} */
     void reset_input() const;
   /// \endcond
 
-    /** \brief Check if the matrix is constant (note that false negative answers are possible)*/
+    /** \brief Check if the matrix is constant (note that false negative answers are possible)
+
+        \identifier{19v} */
     bool is_constant() const;
 
     /** \brief Check if the matrix is integer-valued
-     * (note that false negative answers are possible)*/
+
+     * (note that false negative answers are possible)
+
+        \identifier{19w} */
     bool is_integer() const;
 
-    /** \brief  check if the matrix is 0 (note that false negative answers are possible)*/
+    /** \brief  check if the matrix is 0 (note that false negative answers are possible)
+
+        \identifier{19x} */
     bool is_zero() const;
 
-    /** \brief  check if the matrix is 1 (note that false negative answers are possible)*/
+    /** \brief  check if the matrix is 1 (note that false negative answers are possible)
+
+        \identifier{19y} */
     bool is_one() const;
 
-    /** \brief  check if the matrix is -1 (note that false negative answers are possible)*/
+    /** \brief  check if the matrix is -1 (note that false negative answers are possible)
+
+        \identifier{19z} */
     bool is_minus_one() const;
 
     /** \brief  check if the matrix is an identity matrix (note that false negative answers
-     * are possible)*/
+
+     * are possible)
+
+        \identifier{1a0} */
     bool is_eye() const;
 
     /// Get operation type
@@ -1004,45 +1119,65 @@ namespace casadi {
     /// Is it a certain operation
     bool is_op(casadi_int op) const;
 
-    /** \brief  Check if the matrix has any zero entries which are not structural zeros */
+    /** \brief  Check if the matrix has any zero entries which are not structural zeros
+
+        \identifier{1a1} */
     bool has_zeros() const;
 
-    /** \brief Get all nonzeros */
+    /** \brief Get all nonzeros
+
+        \identifier{1a2} */
     std::vector<Scalar> get_nonzeros() const { return nonzeros_;}
 
-    /** \brief Get all elements */
+    /** \brief Get all elements
+
+        \identifier{1a3} */
     std::vector<Scalar> get_elements() const { return static_cast< std::vector<Scalar> >(*this);}
 
 #ifndef SWIG
-    /** \brief Get all nonzeros */
+    /** \brief Get all nonzeros
+
+        \identifier{1a4} */
     template<typename A>
     std::vector<A> get_nonzeros() const;
 #endif // SWIG
 
-    /** \brief Type conversion to double */
+    /** \brief Type conversion to double
+
+        \identifier{1a5} */
     explicit operator double() const;
 
-    /** \brief Type conversion to casadi_int */
+    /** \brief Type conversion to casadi_int
+
+        \identifier{1a6} */
     explicit operator casadi_int() const;
 
 #ifndef SWIG
-    /** \brief Type conversion to a vector */
+    /** \brief Type conversion to a vector
+
+        \identifier{1a7} */
     template<typename A>
     explicit operator std::vector<A>() const;
 #endif // SWIG
 
-    /** \brief Get name (only if symbolic scalar) */
+    /** \brief Get name (only if symbolic scalar)
+
+        \identifier{1a8} */
     std::string name() const;
 
     /** \brief Get expressions of the children of the expression
+
         Only defined if symbolic scalar.
         Wraps SXElem SXElem::dep(casadi_int ch=0) const.
-     */
+
+        \identifier{1a9} */
     Matrix<Scalar> dep(casadi_int ch=0) const;
 
     /** \brief Get the number of dependencies of a binary SXElem
+
         Only defined if symbolic scalar.
-    */
+
+        \identifier{1aa} */
     casadi_int n_dep() const;
 
     // @{
@@ -1056,7 +1191,9 @@ namespace casadi {
     static void rng(casadi_int seed);
 
     ///@{
-    /** \brief Create a matrix with uniformly distributed random numbers */
+    /** \brief Create a matrix with uniformly distributed random numbers
+
+        \identifier{1ab} */
     static Matrix<Scalar> rand(casadi_int nrow=1, // NOLINT(runtime/threadsafe_fn)
                                casadi_int ncol=1) {
       return rand(Sparsity::dense(nrow, ncol)); // NOLINT(runtime/threadsafe_fn)
@@ -1080,27 +1217,38 @@ namespace casadi {
      *               might be needed for matlab sparse construct,
      *               which doesn't allow numerical zero
      * \endverbatim
-     */
+
+        \identifier{1ac} */
     void export_code(const std::string& lang,
         std::ostream &stream=casadi::uout(), const Dict& options=Dict()) const;
 
     /** Obtain information about sparsity */
     Dict info() const;
     #ifndef SWIG
-        /** \brief Serialize an object */
+        /** \brief Serialize an object
+
+            \identifier{1ad} */
         void serialize(std::ostream &stream) const;
     #endif
 
-    /** \brief Serialize */
+    /** \brief Serialize
+
+        \identifier{1ae} */
     std::string serialize() const;
 
-    /** \brief Build Sparsity from serialization */
+    /** \brief Build Sparsity from serialization
+
+        \identifier{1af} */
     static Matrix<Scalar> deserialize(std::istream& stream);
 
-    /** \brief Build Sparsity from serialization */
+    /** \brief Build Sparsity from serialization
+
+        \identifier{1ag} */
     static Matrix<Scalar> deserialize(const std::string& s);
 
-    /** \brief Serialize an object */
+    /** \brief Serialize an object
+
+        \identifier{1ah} */
     void serialize(SerializingStream& s) const;
 
     static Matrix<Scalar> deserialize(DeserializingStream& s);

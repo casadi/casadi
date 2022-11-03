@@ -181,21 +181,22 @@ TAB_SIZE               = 4
 # will result in a user-defined paragraph with heading "Side Effects:". 
 # You can put \n's in the value part of an alias to insert newlines.
 
-ALIASES                += pythonexample{1}="View <a href='\1.pdf'>output (PDF)</a> | <a href='\1.py'>source (python)</a>\n\example \1.py"
+ALIASES                += pythonexample{1}="View <a href='\1.pdf'>output (PDF)</a> | <a href='\1.py'>source (python)</a>^^\example \1.py"
 ALIASES                += nocpp="(not available in cpp)"
 ALIASES                += noswig="(not available in python/octave)"
 ALIASES                += nopython="(not available in python)"
 ALIASES                += nooctave="(not available in octave)"
-ALIASES                += pluginsection{2}="\addtogroup pluginlist_\1 \n - \htmlonly <a href='#plugin_\1_\2'>\2</a> \endhtmlonly \xmlonly \2 \endxmlonly \n \addtogroup plugins_\1 \n ----- \n #### \2 <a name='plugin_\1_\2'></a>  \n @copydoc plugin_\1_\2 \n - - - - - \n"
-ALIASES                += pluginssection{1}="### List of plugins \n @copydoc pluginlist_\1 \n \n Note: some of the plugins in this list might not be available on your system. \n Also, there might be extra plugins available to you that are not listed here. You can obtain their documentation with `\1.doc(\"myextraplugin\")` \n @copydoc plugins_\1"
-ALIASES                += pluginargument{1}="\n \parblock \n Name of a solver. It might be one of: \n \n @copydoc pluginlist_\1 \n \n Note: some of the plugins in this list might not be available on your system. \n Also, there might be extra plugins available to you that are not listed here. You can obtain their documentation with `\1.doc(\"myextraplugin\")` \n \endparblock"
+ALIASES                += pluginsection{2}="\addtogroup pluginlist_\1 ^^ - \htmlonly <a href='#plugin_\1_\2'>\2</a> \endhtmlonly \xmlonly \2 \endxmlonly ^^ \addtogroup plugins_\1 ^^ <hr> ^^<h4> \2 <a name='plugin_\1_\2'></a> </h4>^^ @copydoc plugin_\1_\2 ^^ "
+ALIASES                += pluginssection{1}="### List of plugins ^^ @copydoc pluginlist_\1 ^^ ^^ Note: some of the plugins in this list might not be available on your system. ^^ Also, there might be extra plugins available to you that are not listed here. You can obtain their documentation with `\1.doc(\"myextraplugin\")` ^^ @copydoc plugins_\1"
+ALIASES                += pluginargument{1}="^^ \parblock ^^ Name of a solver. It might be one of: ^^ ^^ @copydoc pluginlist_\1 ^^ ^^ Note: some of the plugins in this list might not be available on your system. ^^ Also, there might be extra plugins available to you that are not listed here. You can obtain their documentation with `\1.doc(\"myextraplugin\")` ^^ \endparblock"
 ALIASES                += pluginbrief{2}="'\2' plugin for \1"
-ALIASES                += generalsection{1}="### General information \n @copydoc general_\1 \n @copydoc scheme_\1Input \n @copydoc scheme_\1Output \n"
-ALIASES                += structargument{1}="\n \parblock \n Problem structure. @copydoc scheme_\1Struct \n \endparblock"
+ALIASES                += generalsection{1}="### General information ^^ @copydoc general_\1 ^^ @copydoc scheme_\1Input ^^ @copydoc scheme_\1Output ^^"
+ALIASES                += structargument{1}="^^ \parblock ^^ Problem structure. @copydoc scheme_\1Struct ^^ \endparblock"
 
 ALIASES                += doctest="\htmlonly <div class='doctest'> <div class='doctestcode'> \endhtmlonly \code{.py}"
 ALIASES                += doctestout="\endcode \htmlonly </div> \endhtmlonly \htmlonly <div class='doctestout'> \endhtmlonly \verbatim"
 ALIASES                += enddoctest="\endverbatim \htmlonly </div> </div> \endhtmlonly"
+ALIASES                += identifier{1}="Extra doc: https://github.com/casadi/casadi/wiki/L_\1"
 
 # Set the OPTIMIZE_OUTPUT_FOR_C tag to YES if your project consists of C 
 # sources only. Doxygen will then generate output that is more tailored for C. 
@@ -1382,7 +1383,10 @@ INCLUDE_FILE_PATTERNS  =
 # instead of the = operator.
 
 PREDEFINED             = DOXYGENPROC = \
-                         "SWIG_OUTPUT(myarg) = output_ ## myarg"
+                         "SWIG_OUTPUT(myarg) = myarg"
+PREDEFINED+=             "SWIG_CONSTREF(myarg) = myarg"
+PREDEFINED+=             "SWIG_INOUT(myarg) = myarg"
+PREDEFINED+=             "CASADI_PREFIX(myarg) = casadi_ ## myarg"
 PREDEFINED+=             SWIG
 PREDEFINED+=             DOXYGEN
 PREDEFINED+=             WITH_DEPRECATED_FEATURES

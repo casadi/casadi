@@ -755,6 +755,11 @@ namespace casadi {
   }
 
   template<>
+  Sparsity CASADI_EXPORT SX::jacobian_sparsity(const SX &f, const SX &x) {
+    return _jacobian_sparsity(f, x);
+  }
+
+  template<>
   SX CASADI_EXPORT SX::taylor(const SX& f, const SX& x,
                 const SX& a, casadi_int order) {
     casadi_assert_dev(x.is_scalar() && a.is_scalar());
@@ -817,7 +822,7 @@ namespace casadi {
 
   template<>
   casadi_int CASADI_EXPORT SX::n_nodes(const SX& x) {
-    Function f("tmp_n_nodes", {SX()}, {x}, Dict{{"max_io", 0}});
+    Function f("tmp_n_nodes", {SX()}, {x}, Dict{{"max_io", 0}, {"cse", false}});
     return f.n_nodes();
   }
 

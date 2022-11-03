@@ -36,14 +36,14 @@ namespace casadi {
 
   /// \cond INTERNAL
 
-  /**
-   * \brief Takes care of user interrupts (Ctrl+C)
+  /** \brief Takes care of user interrupts (Ctrl+C)
    *
    * This is an internal class.
    *
    *  \author Joris Gillis
    *  \date 2015
-   */
+
+      \identifier{23l} */
   class CASADI_EXPORT InterruptHandler {
   private:
     /// No implementation - no instances are allowed of this class

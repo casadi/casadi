@@ -2963,6 +2963,9 @@ namespace casadi{
  DECL M casadi_reshape(const M& a, const Sparsity& sp) {
  return reshape(a, sp);
  }
+ DECL M casadi_sparsity_cast(const M& a, const Sparsity& sp) {
+ return sparsity_cast(a, sp);
+ }
  DECL casadi_int casadi_sprank(const M& A) {
  return sprank(A);
  }
@@ -3207,6 +3210,10 @@ DECL M casadi_linearize(const M& f, const M& x, const M& x0) {
 DECL std::vector<bool> casadi_which_depends(const M& expr, const M& var,
                                             casadi_int order=1, bool tr=false) {
   return which_depends(expr, var, order, tr);
+}
+
+DECL Sparsity casadi_jacobian_sparsity(const M& f, const M& x) {
+  return jacobian_sparsity(f, x);
 }
 
 DECL bool casadi_is_linear(const M& expr, const M& var) {

@@ -29,8 +29,10 @@
 #include "casadi/core/interpolant_impl.hpp"
 #include <casadi/solvers/casadi_interpolant_linear_export.h>
 
-/** \defgroup plugin_Interpolant_linear
-*/
+/** \defgroup plugin_Interpolant_linear Title
+    \par
+
+    \identifier{23b} */
 
 /** \pluginsection{Interpolant,linear} */
 

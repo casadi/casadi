@@ -2,7 +2,7 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl, Kobe Bergmans
  *                            K.U. Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
@@ -151,13 +151,16 @@ namespace casadi {
     if (Conic::init_mem(mem)) return 1;
     auto m = static_cast<OsqpMemory*>(mem);
 
+    // convert H in a upper triangular matrix. This is required by osqp v0.6.0
+    Sparsity H_triu = Sparsity::triu(H_);
+
     Sparsity Asp = vertcat(Sparsity::diag(nx_), A_);
     std::vector<double> dummy(max(nx_+na_, max(Asp.nnz(), H_.nnz())));
 
     std::vector<c_int> A_row = vector_static_cast<c_int>(Asp.get_row());
     std::vector<c_int> A_colind = vector_static_cast<c_int>(Asp.get_colind());
-    std::vector<c_int> H_row = vector_static_cast<c_int>(H_.get_row());
-    std::vector<c_int> H_colind = vector_static_cast<c_int>(H_.get_colind());
+    std::vector<c_int> H_row = vector_static_cast<c_int>(H_triu.get_row());
+    std::vector<c_int> H_colind = vector_static_cast<c_int>(H_triu.get_colind());
 
     csc A;
     A.m = nx_ + na_;
@@ -171,8 +174,8 @@ namespace casadi {
     csc H;
     H.m = nx_;
     H.n = nx_;
-    H.nz = H_.nnz();
-    H.nzmax = H_.nnz();
+    H.nz = H_triu.nnz_upper();
+    H.nzmax = H_triu.nnz_upper();
     H.x = get_ptr(dummy);
     H.i = get_ptr(H_row);
     H.p = get_ptr(H_colind);
@@ -189,7 +192,7 @@ namespace casadi {
     data.u = get_ptr(dummy);
 
     // Setup workspace
-    m->work = osqp_setup(&data, &settings_);
+    if(osqp_setup(&m->work, &data, &settings_)) return 1;
 
     m->fstats["preprocessing"]  = FStats();
     m->fstats["solver"]         = FStats();
@@ -276,7 +279,18 @@ namespace casadi {
     if (res[CONIC_COST]) *res[CONIC_COST] = m->work->info->obj_val;
 
     m->success = m->work->info->status_val == OSQP_SOLVED;
-    if (m->success) m->unified_return_status = SOLVER_RET_SUCCESS;
+    if (m->success) {
+      m->unified_return_status = SOLVER_RET_SUCCESS;
+    } else if (m->work->info->status_val == OSQP_PRIMAL_INFEASIBLE || 
+        m->work->info->status_val == OSQP_MAX_ITER_REACHED ||
+        m->work->info->status_val == OSQP_DUAL_INFEASIBLE ||
+        m->work->info->status_val == OSQP_NON_CVX ||
+        m->work->info->status_val == OSQP_PRIMAL_INFEASIBLE_INACCURATE ||
+        m->work->info->status_val == OSQP_DUAL_INFEASIBLE_INACCURATE) {
+          m->unified_return_status = SOLVER_RET_INFEASIBLE;
+    } else {
+      m->unified_return_status = SOLVER_RET_UNKNOWN;
+    }
 
     return 0;
   }
@@ -295,8 +309,12 @@ namespace casadi {
 
     g.constant_copy("A_row", Asp.get_row(), "c_int");
     g.constant_copy("A_colind", Asp.get_colind(), "c_int");
-    g.constant_copy("H_row", H_.get_row(), "c_int");
-    g.constant_copy("H_colind", H_.get_colind(), "c_int");
+
+    // convert H in a upper triangular matrix. This is required by osqp v0.6.0
+    Sparsity H_triu = Sparsity::triu(H_);
+
+    g.constant_copy("H_row", H_triu.get_row(), "c_int");
+    g.constant_copy("H_colind", H_triu.get_colind(), "c_int");
 
     g.local("A", "csc");
     g << "A.m = " << nx_ + na_ << ";\n";
@@ -310,8 +328,8 @@ namespace casadi {
     g.local("H", "csc");
     g << "H.m = " << nx_ << ";\n";
     g << "H.n = " << nx_ << ";\n";
-    g << "H.nz = " << H_.nnz() << ";\n";
-    g << "H.nzmax = " << H_.nnz() << ";\n";
+    g << "H.nz = " << H_.nnz_upper() << ";\n";
+    g << "H.nzmax = " << H_.nnz_upper() << ";\n";
     g << "H.x = dummy;\n";
     g << "H.i = H_row;\n";
     g << "H.p = H_colind;\n";
@@ -349,8 +367,7 @@ namespace casadi {
     g << "settings.warm_start = " << settings_.warm_start << ";\n";
     //g << "settings.time_limit = " << settings_.time_limit << ";\n";
 
-    g << codegen_mem(g) + " = osqp_setup(&data, &settings);\n";
-    g << "return 0;\n";
+    g << "return osqp_setup(&" + codegen_mem(g) + ", &data, &settings)!=0;\n";
   }
 
   void OsqpInterface::codegen_body(CodeGenerator& g) const {
@@ -405,7 +422,24 @@ namespace casadi {
     g.copy_check("work->solution->y", nx_, g.res(CONIC_LAM_X), false, true);
     g.copy_check("work->solution->y+" + str(nx_), na_, g.res(CONIC_LAM_A), false, true);
 
-    g << "if (work->info->status_val != OSQP_SOLVED) return 1;\n";
+    g << "if (work->info->status_val != OSQP_SOLVED) {\n";
+    if (error_on_fail_) {
+      g << "return -1000;\n";
+    } else {
+      g << "if (work->info->status_val == OSQP_PRIMAL_INFEASIBLE || ";
+      g << "work->info->status_val == OSQP_MAX_ITER_REACHED || ";
+      g << "work->info->status_val == OSQP_DUAL_INFEASIBLE || ";
+      g << "work->info->status_val == OSQP_PRIMAL_INFEASIBLE_INACCURATE || ";
+      g << "work->info->status_val == OSQP_DUAL_INFEASIBLE_INACCURATE || ";
+      g << "work->info->status_val == OSQP_NON_CVX) {\n";
+      g << "return " << SOLVER_RET_INFEASIBLE << ";\n";
+      g << "} else {\n";
+      g << "return " << SOLVER_RET_UNKNOWN << ";\n";
+      g << "}\n";
+    }
+    g << "}\n";
+
+    g << "return 0;\n";
   }
 
   Dict OsqpInterface::get_stats(void* mem) const {

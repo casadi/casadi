@@ -63,7 +63,9 @@ namespace casadi {
     /// Print a description of the object
     virtual void disp(std::ostream& stream, bool more) const = 0;
 
-    /** \brief Get a weak reference to the object */
+    /** \brief Get a weak reference to the object
+
+        \identifier{1ai} */
     WeakRef* weak();
 
   protected:

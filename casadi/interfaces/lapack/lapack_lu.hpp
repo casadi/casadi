@@ -48,12 +48,14 @@ extern "C" {
 
 namespace casadi {
 
-/** \defgroup plugin_Linsol_lapacklu
+/** \defgroup plugin_Linsol_lapacklu Title
+    \par
 *
    * This class solves the linear system <tt>A.x=b</tt> by making an LU factorization of A: \n
    * <tt>A = L.U</tt>, with L lower and U upper triangular
    *
-*/
+
+    \identifier{22h} */
 
 /** \pluginsection{Linsol,lapacklu} */
 /// \cond INTERNAL

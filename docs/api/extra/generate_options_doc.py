@@ -97,7 +97,6 @@ for c in classes:
   if not(temp is None):
     meta['file']=temp.attrib["file"]
     
-print metadata["casadi::Integrator"]
 
 for v in metadata.values(): # Remove templating if not in index.xml
   for i,vv in enumerate(v['parents']):
@@ -217,7 +216,7 @@ for name,meta in metadata.items():
   meta['monitors']={}
   meta['optionproviders'] = []
   try:
-    f =file(source,"r")
+    f =open(source,"r")
   except:
     continue
   lines = f.readlines()
@@ -300,13 +299,13 @@ def monitorsashtml(monitor,used=True):
 
 
 def update_no_overwrite(orig,new):
-  for (k,v) in new.iteritems():
+  for (k,v) in new.items():
     if not(k in orig):
       orig[k] = v
         
 def update_overwrite(orig,new):
   import copy
-  for (k,v) in new.iteritems():
+  for (k,v) in new.items():
     if not(k in orig):
       orig[k] = copy.copy(v)
     else:
@@ -316,10 +315,10 @@ def update_overwrite(orig,new):
       else:
         orig[k] = copy.copy(v)
         
-f = file(out+'b0_options.hpp','w')
+f = open(out+'b0_options.hpp','w')
 
 #raise Exception("")
-fdiagram = file(out+'e0_diagram.hpp','w')
+fdiagram = open(out+'e0_diagram.hpp','w')
 
 filemap = {}
 for name,meta in sorted(metadata.items()):
@@ -329,7 +328,8 @@ for name,meta in sorted(metadata.items()):
       filemap["plugin_%s_%s" % ( m.group(2),m.group(1))] = (meta["file"],name)
 
 import pickle
-pickle.dump(filemap,file(out+"filemap.pkl","w"))
+pickle.dump(filemap,open(out+"filemap.pkl","wb"))
+
 
 # Print out doxygen information - options
 for name,meta in sorted(metadata.items()):
@@ -349,7 +349,7 @@ for name,meta in sorted(metadata.items()):
   myoptionskeys = alloptions.keys()
   if len(myoptionskeys)==0:
     continue
-  myoptionskeys.sort()
+  myoptionskeys = sorted(myoptionskeys)
   
   for t in [name]:
     f.write("/// \cond INTERNAL\n")
@@ -373,7 +373,7 @@ for name,meta in sorted(metadata.items()):
   if "casadi::PluginInterface" in meta["hierarchy"]:
     m = re.search("'(\w+)' plugin for (\w+)",meta["brief"])
     if not m:
-      print "This plugin is undocumented. add \\pluginbrief{class,name} to it: " + meta["file"]
+      print("This plugin is undocumented. add \\pluginbrief{class,name} to it: " + meta["file"])
       #print meta["file"]
     else:
       f.write("/** \\addtogroup plugin_%s_%s\n\\n\n\\par\n" % (m.group(2),m.group(1)))
@@ -391,7 +391,7 @@ for name,meta in sorted(metadata.items()):
       f.write( "*/\n")
     
     t = name
-    print "test", name, myoptionskeys
+    print("test", name, myoptionskeys)
     f.write("/** \\addtogroup general_%s\n\\n\n\\par\n" % t.replace("casadi::","") )
     f.write("<a name='options'></a><table>\n")
     f.write("<caption>List of available options</caption>\n")
@@ -546,7 +546,7 @@ f.close()
 """
 
 
-f = file(out+'a0_schemes.hpp','w')
+f = open(out+'a0_schemes.hpp','w')
 
 def enumsashtml(n,title):
   s=""

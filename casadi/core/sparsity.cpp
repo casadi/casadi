@@ -253,6 +253,11 @@ namespace casadi {
     return sp;
   }
 
+  Sparsity Sparsity::sparsity_cast(const Sparsity& x, const Sparsity& sp) {
+    casadi_assert_dev(x.nnz()==sp.nnz());
+    return sp;
+  }
+
   Sparsity Sparsity::reshape(const Sparsity& x, casadi_int nrow, casadi_int ncol) {
     return x->_reshape(nrow, ncol);
   }
@@ -288,6 +293,26 @@ namespace casadi {
 
   bool Sparsity::is_square() const {
     return (*this)->is_square();
+  }
+
+  bool Sparsity::is_permutation() const {
+    return (*this)->is_permutation();
+  }
+
+  bool Sparsity::is_selection(bool allow_empty) const {
+    return (*this)->is_selection(allow_empty);
+  }
+
+  bool Sparsity::is_orthonormal(bool allow_empty) const {
+    return (*this)->is_orthonormal(allow_empty);
+  }
+
+  bool Sparsity::is_orthonormal_rows(bool allow_empty) const {
+    return (*this)->is_orthonormal_rows(allow_empty);
+  }
+
+  bool Sparsity::is_orthonormal_columns(bool allow_empty) const {
+    return (*this)->is_orthonormal_columns(allow_empty);
   }
 
   bool Sparsity::is_symmetric() const {
@@ -1317,6 +1342,25 @@ namespace casadi {
     }
   }
 
+  Sparsity Sparsity::permutation(const std::vector<casadi_int>& p, bool invert) {
+    casadi_assert(casadi::is_permutation(p), "Sparsity::permutation supplied list is not a permutation.");
+    std::vector<casadi_int> colind = range(p.size()+1);
+    if (invert) {
+      return Sparsity(p.size(), p.size(), colind, p);
+    } else {
+      return Sparsity(p.size(), p.size(), colind, invert_permutation(p));
+    }
+  }
+
+  const std::vector<casadi_int> Sparsity::permutation(bool invert) const {
+    casadi_assert(is_permutation(), "Sparsity::permutation called on non-permutation matrix.");
+    if (invert) {
+      return get_row();
+    } else {
+      return invert_permutation(get_row());
+    }
+  }
+
   casadi_int Sparsity::bw_upper() const {
     return (*this)->bw_upper();
   }
@@ -1775,6 +1819,43 @@ namespace casadi {
         w[z_row[kk]] = 0;
       }
     }
+  }
+
+  Sparsity Sparsity::sparsity_cast_mod(const Sparsity& X, const Sparsity& Y) const {
+    const Sparsity& x = *this;
+    if (X==x) return Y;
+    if (X==Y) return x;
+    std::vector<unsigned char> mapping;
+    X.unite(x, mapping);
+
+
+    const casadi_int* Y_colind = Y.colind();
+    const casadi_int* Y_row = Y.row();
+    std::vector<casadi_int> y_colind(Y.size2()+1, 0);
+    std::vector<casadi_int> y_row;
+    y_row.reserve(Y.nnz());
+    casadi_assert_dev(Y.nnz()==mapping.size());
+
+    casadi_int i = 0;
+    // Loop over columns of Y
+    for (casadi_int cc=0; cc<Y.size2(); ++cc) {
+      y_colind[cc+1] = y_colind[cc];
+      // Loop over nonzeros of Y in column cc
+      for (casadi_int kk=Y_colind[cc]; kk<Y_colind[cc+1]; ++kk) {
+        // Get corresponding map entry
+        casadi_int e = mapping[i++];
+        if (e==3) {
+          // Preserve element
+          y_colind[cc+1]++;
+          y_row.push_back(Y_row[kk]);
+        } else {
+          casadi_assert_dev(e==1);
+        }
+      }
+    }
+
+    Sparsity ret(Y.size1(), Y.size2(), y_colind, y_row, true);
+    return ret;
   }
 
   Dict Sparsity::info() const {

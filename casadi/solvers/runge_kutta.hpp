@@ -29,12 +29,15 @@
 #include "casadi/core/integrator_impl.hpp"
 #include <casadi/solvers/casadi_integrator_rk_export.h>
 
-/** \defgroup plugin_Integrator_rk
+/** \defgroup plugin_Integrator_rk Title
+    \par
+
       Fixed-step explicit Runge-Kutta integrator for ODEs
       Currently implements RK4.
 
       The method is still under development
-*/
+
+    \identifier{23a} */
 /** \pluginsection{Integrator,rk} */
 
 /// \cond INTERNAL

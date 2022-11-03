@@ -307,8 +307,7 @@ namespace casadi {
       Sparsity Hsp_ela = Sparsity(Hsp_);
       Sparsity Asp_ela = Sparsity(Asp_);
 
-      std::vector<casadi_int> n_v(nx_);
-      std::iota(std::begin(n_v), std::end(n_v), 0);
+      std::vector<casadi_int> n_v = range(nx_);
       Hsp_ela.enlarge(2*ng_ + nx_, 2*ng_ + nx_, n_v, n_v);
 
       Sparsity dsp = Sparsity::diag(ng_,ng_);
@@ -487,6 +486,7 @@ int Sqpmethod::solve(void* mem) const {
           print("MESSAGE(sqpmethod): Convergence achieved after %d iterations\n", m->iter_count);
         m->return_status = "Solve_Succeeded";
         m->success = true;
+        m->unified_return_status = SOLVER_RET_SUCCESS;
         break;
       }
 
@@ -540,12 +540,12 @@ int Sqpmethod::solve(void* mem) const {
       casadi_clear(d->dx, nx_);
 
       // Make initial guess feasable
-      if (init_feasible_) {
+      /*if (init_feasible_) {
         for (casadi_int i = 0; i < nx_; ++i) {
           if (d->lbdz[i] > 0) d->dx[i] = d->lbdz[i];
           else if (d->ubdz[i] < 0) d->dx[i] = d->ubdz[i];
         }
-      }
+      }*/
 
       // Increase counter
       m->iter_count++;
@@ -597,6 +597,7 @@ int Sqpmethod::solve(void* mem) const {
       
       // Pre calculations for second order corrections
       double l1_infeas_cand, l1_cand, fk_cand;
+      l1_infeas_cand = 0;
       if (so_corr_) {
         // Take candidate step
         casadi_copy(d_nlp->z, nx_, d->z_cand);
@@ -855,6 +856,8 @@ int Sqpmethod::solve(void* mem) const {
     m->res[CONIC_X] = x_opt;
     m->res[CONIC_LAM_X] = dlam;
     m->res[CONIC_LAM_A] = dlam + nx_;
+    double cost;
+    m->res[CONIC_COST] = &cost;
 
     // Solve the QP
     qpsol_(m->arg, m->res, m->iw, m->w, 0);
@@ -893,7 +896,12 @@ int Sqpmethod::solve(void* mem) const {
     m->res[CONIC_X] = x_opt;
     m->res[CONIC_LAM_X] = dlam;
     m->res[CONIC_LAM_A] = dlam + nx_ + 2*ng_;
+<<<<<<< HEAD
     m->res[CONIC_COST] = nullptr;
+=======
+    double cost;
+    m->res[CONIC_COST] = &cost;
+>>>>>>> c5904ece6613976d9ac22972949b229c90e13a2b
 
     // Solve the QP
     qpsol_ela_(m->arg, m->res, m->iw, m->w, 0);
@@ -1185,6 +1193,7 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     }
     if (so_corr_) {
       g.local("l1_infeas_cand", "casadi_real");
+      g.init_local("l1_infeas_cand", "0");
       g.local("l1_cand", "casadi_real");
       g.local("fk_cand", "casadi_real");
       g.comment("Take candidate step");

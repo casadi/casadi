@@ -31,13 +31,15 @@
 #include "Highs.h"
 #include <string>
 
-/** \defgroup plugin_Conic_highs
+/** \defgroup plugin_Conic_highs Title
+    \par
 
       Interface to HiGHS solver for sparse Quadratic Programs,
       see highs.dev for more information and
       https://www.maths.ed.ac.uk/hall/HiGHS/HighsOptions.html
       for a list of options.
-*/
+
+    \identifier{22f} */
 
 /** \pluginsection{Conic,highs} */
 

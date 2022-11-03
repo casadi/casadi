@@ -34,9 +34,11 @@
 
 namespace casadi {
   /** \brief BSpline Node
+
       \author Joris Gillis
       \date 2017-2019
-  */
+
+      \identifier{1yd} */
   class CASADI_EXPORT BSplineCommon : public MXNode {
   public:
 
@@ -72,44 +74,65 @@ namespace casadi {
      * 
      * Derivatives are computed by transforming the coefficient matrix
      * This is efficient
-     */
+
+        \identifier{1ye} */
     mutable MX jac_cache_;
 
     virtual MX jac_cached() const = 0;
 
-    /** \brief Get required length of iw field */
+    /** \brief Get required length of iw field
+
+        \identifier{1yf} */
     static size_t n_iw(const std::vector<casadi_int> &degree);
 
-    /** \brief Get required length of w field */
+    /** \brief Get required length of w field
+
+        \identifier{1yg} */
     static size_t n_w(const std::vector<casadi_int> &degree);
 
-    /** \brief Get required length of iw field */
+    /** \brief Get required length of iw field
+
+        \identifier{1yh} */
     size_t sz_iw() const override;
 
-    /** \brief Get required length of w field */
+    /** \brief Get required length of w field
+
+        \identifier{1yi} */
     size_t sz_w() const override;
 
-    /** \brief Get the operation */
+    /** \brief Get the operation
+
+        \identifier{1yj} */
     casadi_int op() const override { return OP_BSPLINE;}
 
-    /** \brief Calculate forward mode directional derivatives */
+    /** \brief Calculate forward mode directional derivatives
+
+        \identifier{1yk} */
     void ad_forward(const std::vector<std::vector<MX> >& fseed,
                          std::vector<std::vector<MX> >& fsens) const override;
 
-    /** \brief Calculate reverse mode directional derivatives */
+    /** \brief Calculate reverse mode directional derivatives
+
+        \identifier{1yl} */
     void ad_reverse(const std::vector<std::vector<MX> >& aseed,
                          std::vector<std::vector<MX> >& asens) const override;
 
-    /** \brief Generate code for the operation */
+    /** \brief Generate code for the operation
+
+        \identifier{1ym} */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
                   const std::vector<casadi_int>& res) const override;
 
-    /** \brief Generate code for the operation */
+    /** \brief Generate code for the operation
+
+        \identifier{1yn} */
     virtual std::string generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg) const = 0;
 
-    /** \brief Deserialize without type information */
+    /** \brief Deserialize without type information
+
+        \identifier{1yo} */
     static MXNode* deserialize(DeserializingStream& s);
 
     template<class M>
@@ -118,12 +141,16 @@ namespace casadi {
     template<class T>
     MX jac(const MX& x, const T& coeffs) const;
 
-    /** \brief Serialize an object without type information */
+    /** \brief Serialize an object without type information
+
+        \identifier{1yp} */
     void serialize_body(SerializingStream& s) const override;
 
   protected:
 
-    /** \brief Deserializing constructor */
+    /** \brief Deserializing constructor
+
+        \identifier{1yq} */
     explicit BSplineCommon(DeserializingStream& s);
 
   };
@@ -159,14 +186,20 @@ namespace casadi {
     /// Evaluate the function numerically
     int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
 
-    /** \brief  Evaluate symbolically (MX) */
+    /** \brief  Evaluate symbolically (MX)
+
+        \identifier{1yr} */
     void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
 
-    /** \brief Generate code for the operation */
+    /** \brief Generate code for the operation
+
+        \identifier{1ys} */
     std::string generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg) const override;
 
-    /** \brief  Print expression */
+    /** \brief  Print expression
+
+        \identifier{1yt} */
     std::string disp(const std::vector<std::string>& arg) const override;
 
     // Numeric coefficients
@@ -188,12 +221,18 @@ namespace casadi {
           const std::vector< std::vector<double> >& knots,
           const std::vector<casadi_int>& degree,
           const Dict& opts);
-    /** \brief Serialize an object without type information */
+    /** \brief Serialize an object without type information
+
+        \identifier{1yu} */
     void serialize_body(SerializingStream& s) const override;
-    /** \brief Serialize type information */
+    /** \brief Serialize type information
+
+        \identifier{1yv} */
     void serialize_type(SerializingStream& s) const override;
 
-    /** \brief Deserializing constructor */
+    /** \brief Deserializing constructor
+
+        \identifier{1yw} */
     explicit BSpline(DeserializingStream& s);
   };
 
@@ -220,22 +259,32 @@ namespace casadi {
     /// Evaluate the function numerically
     int eval(const double** arg, double** res, casadi_int* iw, double* w) const override;
 
-    /** \brief  Evaluate symbolically (MX) */
+    /** \brief  Evaluate symbolically (MX)
+
+        \identifier{1yx} */
     void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
 
     MX jac_cached() const override;
 
-    /** \brief Generate code for the operation */
+    /** \brief Generate code for the operation
+
+        \identifier{1yy} */
     std::string generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg) const override;
 
-    /** \brief  Print expression */
+    /** \brief  Print expression
+
+        \identifier{1yz} */
     std::string disp(const std::vector<std::string>& arg) const override;
 
-    /** \brief Serialize type information */
+    /** \brief Serialize type information
+
+        \identifier{1z0} */
     void serialize_type(SerializingStream& s) const override;
 
-    /** \brief Deserializing constructor */
+    /** \brief Deserializing constructor
+
+        \identifier{1z1} */
     explicit BSplineParametric(DeserializingStream& s) : BSplineCommon(s) {}
   };
 

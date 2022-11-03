@@ -29,11 +29,13 @@
 #include "casadi/core/linsol_internal.hpp"
 #include <casadi/solvers/casadi_linsol_symbolicqr_export.h>
 
-/** \defgroup plugin_Linsol_symbolicqr
+/** \defgroup plugin_Linsol_symbolicqr Title
+    \par
 
        Linsol based on QR factorization with sparsity pattern based reordering
       _without_ partial pivoting
-*/
+
+    \identifier{231} */
 
 /** \pluginsection{Linsol,symbolicqr} */
 

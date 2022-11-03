@@ -50,7 +50,8 @@ private:
 
       \date 2017
       \author Joris Gillis, Erik Lambrechts
-*/
+
+    \identifier{172} */
 class CASADI_EXPORT OptiNode :
     public SharedObjectInternal {
   friend class InternalOptiCallback;
@@ -91,7 +92,8 @@ public:
   /** \brief Set value of parameter
   *
   * Each parameter must be given a value before 'solve' can be called
-  */
+
+      \identifier{173} */
   void set_value(const MX& x, const DM& v);
   void set_value(const std::vector<MX>& assignments);
   /// @}
@@ -254,7 +256,9 @@ public:
   void assert_empty() const;
 
 
-  /** \brief Create a CasADi Function from the Opti solver */
+  /** \brief Create a CasADi Function from the Opti solver
+
+      \identifier{174} */
   Function to_function(const std::string& name,
       const std::vector<MX>& args, const std::vector<MX>& res,
       const std::vector<std::string>& name_in,
@@ -303,7 +307,8 @@ private:
   * a<=b<=c [a,b,c]
   *
   * When flipped is set, [a,b,c] corresponds to c>=b>=a
-  */
+
+      \identifier{175} */
   static std::vector<MX> ineq_unchain(const MX& a, bool& SWIG_OUTPUT(flipped));
 
   /// Get meta-dat by const-ref

@@ -36,7 +36,8 @@ struct casadi_feasiblesqpmethod_data {
   T1 *gf_feas;
   T1 *lbdz_feas, *ubdz_feas;
   T1* z_tmp;
-  T1 *tr_scale_vector; 
+  T1 *tr_scale_vector;
+  casadi_int *tr_mask;
   // Hessian approximation
   T1 *Bk;
   // Jacobian
@@ -89,6 +90,7 @@ void casadi_feasiblesqpmethod_work(const casadi_feasiblesqpmethod_prob<T1>* p,
   *sz_w += nx + ng; // upper bounds feasible QP
   *sz_w += nx+ng; // x tmp feasible QP
   *sz_w += nx; // tr_scale_vector
+  *sz_iw += nx; // tr_mask
   // Hessian approximation
   *sz_w += nnz_h; // Bk
   // Jacobian
@@ -118,7 +120,7 @@ void casadi_feasiblesqpmethod_work(const casadi_feasiblesqpmethod_prob<T1>* p,
 template<typename T1>
 void casadi_feasiblesqpmethod_init(casadi_feasiblesqpmethod_data<T1>* d, casadi_int** iw, T1** w) {
   // Local variables
-  casadi_int nnz_h, nnz_a, nx, ng;
+  casadi_int nnz_h, nnz_a, nx, ng, i;
   const casadi_feasiblesqpmethod_prob<T1>* p = d->prob;
   // Get matrix number of nonzeros
   nnz_h = p->sp_h[2+p->sp_h[1]];
@@ -163,7 +165,8 @@ void casadi_feasiblesqpmethod_init(casadi_feasiblesqpmethod_data<T1>* d, casadi_
   d->z_tmp = *w; *w += nx+ng;
   // trust-region scale vector
   d->tr_scale_vector = *w; *w += nx;
+  d->tr_mask = *iw; *iw += nx;
   // Jacobian
   d->Jk = *w; *w += nnz_a;
-  // }
+  
 }

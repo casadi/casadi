@@ -32,26 +32,36 @@
 
 namespace casadi {
   /** \brief An MX atomic for an Einstein product,
+
       \author Joris Gillis
       \date 2016
-  */
+
+      \identifier{2z} */
   class CASADI_EXPORT Einstein : public MXNode {
   public:
 
-    /** \brief  Constructor */
+    /** \brief  Constructor
+
+        \identifier{30} */
     Einstein(const MX& C, const MX& A, const MX& B,
       const std::vector<casadi_int>& dim_c, const std::vector<casadi_int>& dim_a,
       const std::vector<casadi_int>& dim_b,
       const std::vector<casadi_int>& c, const std::vector<casadi_int>& a,
       const std::vector<casadi_int>& b);
 
-    /** \brief  Destructor */
+    /** \brief  Destructor
+
+        \identifier{31} */
     ~Einstein() override {}
 
-    /** \brief  Print expression */
+    /** \brief  Print expression
+
+        \identifier{32} */
     std::string disp(const std::vector<std::string>& arg) const override;
 
-    /** \brief Generate code for the operation */
+    /** \brief Generate code for the operation
+
+        \identifier{33} */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
                   const std::vector<casadi_int>& res) const override;
@@ -66,35 +76,51 @@ namespace casadi {
     /// Evaluate the function symbolically (SX)
     int eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const override;
 
-    /** \brief  Evaluate symbolically (MX) */
+    /** \brief  Evaluate symbolically (MX)
+
+        \identifier{34} */
     void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
 
-    /** \brief Calculate forward mode directional derivatives */
+    /** \brief Calculate forward mode directional derivatives
+
+        \identifier{35} */
     void ad_forward(const std::vector<std::vector<MX> >& fseed,
                          std::vector<std::vector<MX> >& fsens) const override;
 
-    /** \brief Calculate reverse mode directional derivatives */
+    /** \brief Calculate reverse mode directional derivatives
+
+        \identifier{36} */
     void ad_reverse(const std::vector<std::vector<MX> >& aseed,
                          std::vector<std::vector<MX> >& asens) const override;
 
-    /** \brief  Propagate sparsity forward */
+    /** \brief  Propagate sparsity forward
+
+        \identifier{37} */
     int sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
-    /** \brief  Propagate sparsity backwards */
+    /** \brief  Propagate sparsity backwards
+
+        \identifier{38} */
     int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
-    /** \brief Get the operation */
+    /** \brief Get the operation
+
+        \identifier{39} */
     casadi_int op() const override { return OP_EINSTEIN;}
 
     /// Can the operation be performed inplace (i.e. overwrite the result)
     casadi_int n_inplace() const override { return 1;}
 
-    /** \brief Check if two nodes are equivalent up to a given depth */
+    /** \brief Check if two nodes are equivalent up to a given depth
+
+        \identifier{3a} */
     bool is_equal(const MXNode* node, casadi_int depth) const override {
       return sameOpAndDeps(node, depth) && dynamic_cast<const Einstein*>(node)!=nullptr;
     }
 
-    /** \brief Get required length of w field */
+    /** \brief Get required length of w field
+
+        \identifier{3b} */
     size_t sz_w() const override { return sparsity().size1();}
 
     /** Obtain information about node */

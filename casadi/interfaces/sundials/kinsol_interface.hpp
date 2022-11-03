@@ -41,9 +41,12 @@
 #include <kinsol/kinsol_spils_impl.h> /* Needed for the provided linear solver */
 #include <ctime>
 
-/** \defgroup plugin_Rootfinder_kinsol
+/** \defgroup plugin_Rootfinder_kinsol Title
+    \par
+
  KINSOL interface from the Sundials suite
-*/
+
+    \identifier{226} */
 /** \pluginsection{Rootfinder,kinsol} */
 
 /// \cond INTERNAL

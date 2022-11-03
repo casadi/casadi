@@ -32,11 +32,13 @@
 namespace casadi {
 
 /** \brief Represents a scalar symbolic expression
+
   \author Joel Andersson
   \date 2010
   A regular user is not supposed to work with this Node class.
   This user can call SX(name) instead.
-*/
+
+    \identifier{129} */
 class SymbolicSX : public SXNode {
 public:
   explicit SymbolicSX(const std::string &name) : name_(name) {}
@@ -46,18 +48,24 @@ public:
 
   const std::string& name() const override { return name_; }
 
-  /** \brief  Get the operation */
+  /** \brief  Get the operation
+
+      \identifier{12a} */
   casadi_int op() const override { return OP_PARAMETER;}
 
   bool is_op(casadi_int op) const override { return op==OP_PARAMETER; }
 
-  /** \brief  Name */
+  /** \brief  Name
+
+      \identifier{12b} */
   std::string name_;
 
   // Class name
   std::string class_name() const override {return "SymbolicSX";}
 
-  /** \brief  Print expression */
+  /** \brief  Print expression
+
+      \identifier{12c} */
   std::string print(const std::string& arg1, const std::string& arg2) const override {
     return name_;
   }

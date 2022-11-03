@@ -29,8 +29,10 @@
 #include "casadi/core/interpolant_impl.hpp"
 #include <casadi/solvers/casadi_interpolant_bspline_export.h>
 
-/** \defgroup plugin_Interpolant_bspline
-*/
+/** \defgroup plugin_Interpolant_bspline Title
+    \par
+
+    \identifier{239} */
 
 /** \pluginsection{Interpolant,bspline} */
 

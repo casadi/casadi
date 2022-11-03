@@ -1204,11 +1204,25 @@ namespace casadi {
   }
 
   MX MX::reshape(const MX& x, const Sparsity& sp) {
+    casadi_assert(sp.is_reshape(x.sparsity()), "Reshape mismatch");
+
     // Quick return if trivial
     if (sp==x.sparsity()) return x;
 
     // Call internal method
     return x->get_reshape(sp);
+  }
+
+  MX MX::sparsity_cast(const MX& x, const Sparsity& sp) {
+    casadi_assert(x.nnz()==sp.nnz(),
+      "Mismatching nonzero count: " + str(x.nnz()) + " versus " +
+      str(sp.nnz()) + ".");
+
+    // Quick return if trivial
+    if (sp==x.sparsity()) return x;
+
+    // Call internal method
+    return x->get_sparsity_cast(sp);
   }
 
   MX MX::if_else(const MX &cond, const MX &x_true, const MX &x_false, bool short_circuit) {
@@ -1314,7 +1328,7 @@ namespace casadi {
   }
 
   casadi_int MX::n_nodes(const MX& x) {
-    Function f("tmp_n_nodes", vector<MX>{}, {x}, Dict{{"max_io", 0}});
+    Function f("tmp_n_nodes", vector<MX>{}, {x}, Dict{{"max_io", 0}, {"cse", false}});
     return f.n_nodes();
   }
 
@@ -1775,6 +1789,10 @@ namespace casadi {
     return _which_depends(expr, var, order, tr);
   }
 
+  Sparsity MX::jacobian_sparsity(const MX &f, const MX &x) {
+    return _jacobian_sparsity(f, x);
+  }
+
   MX MX::det(const MX& x) {
     return x->get_det();
   }
@@ -1867,6 +1885,11 @@ namespace casadi {
     } else if (a.is_tril()) {
       // A is lower triangular
       return a->get_solve_tril(b, false);
+    } else if (a.sparsity().is_orthonormal()) {
+      // A is orthonormal -> inv(A)==A.T
+      MX nz = sparsity_cast(a, Sparsity::dense(a.nnz()));
+      const Sparsity& Q = a.sparsity();
+      return mtimes(MX(Q, 1/nz).T(), b);
     } else {
       // Fall-back to QR factorization
       return solve(a, b, "qr");
@@ -1874,6 +1897,7 @@ namespace casadi {
   }
 
   MX MX::solve(const MX& a, const MX& b, const std::string& lsolver, const Dict& dict) {
+    if (a.sparsity().is_orthonormal()) return solve(a, b);
     Linsol mysolver("tmp_solve", lsolver, a.sparsity(), dict);
     return mysolver.solve(a, b, false);
   }

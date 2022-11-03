@@ -30,9 +30,12 @@
 #include <casadi/solvers/casadi_conic_ipqp_export.h>
 #include "casadi/core/linsol.hpp"
 
-/** \defgroup plugin_Conic_ipqp
+/** \defgroup plugin_Conic_ipqp Title
+    \par
+
  Solves QPs using a Mehrotra predictor-corrector interior point method
-*/
+
+    \identifier{23c} */
 
 /** \pluginsection{Conic,ipqp} */
 
