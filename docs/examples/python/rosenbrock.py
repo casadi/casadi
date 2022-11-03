@@ -43,12 +43,11 @@ g = z + (1-x)**2 - y
 nlp = {'x':vertcat(x,y,z), 'f':f, 'g':g}
 
 # Create an NLP solver
-solver = nlpsol("solver", "ipopt", nlp)
+opts_sqpmethod = { 'qpsol': 'qpoases', 'qpsol_options': {  'nWSR':1000000,'sparse':True,'hessian_type': 'semidef', 'printLevel': 'none',}}
+solver = nlpsol("S", "feasiblesqpmethod", nlp, opts_sqpmethod)
 
 # Solve the Rosenbrock problem
-res = solver(x0  = [2.5,3.0,0.75],
-             ubg = 0,
-             lbg = 0)
+res = solver(x0  = [2.5,3.0,0.75],ubg = 0,lbg = 0)
 
 # Print solution
 print()
