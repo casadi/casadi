@@ -1,7 +1,7 @@
 #pragma once
 
-#include <alpaqa/inner/panoc.hpp>
 #include <alpaqa/inner/directions/panoc/structured-lbfgs.hpp>
+#include <alpaqa/inner/panoc.hpp>
 #include <alpaqa/outer/alm.hpp>
 
 namespace alpaqa {

@@ -1,3 +1,4 @@
+#include <alpaqa/inner/directions/panoc/src/structured-lbfgs.tpp>
 #include <alpaqa/inner/src/panoc.tpp>
 #include <alpaqa/outer/src/alm.tpp>
 #include <alpaqa/structured-panoc-alm.hpp>
