@@ -896,12 +896,8 @@ int Sqpmethod::solve(void* mem) const {
     m->res[CONIC_X] = x_opt;
     m->res[CONIC_LAM_X] = dlam;
     m->res[CONIC_LAM_A] = dlam + nx_ + 2*ng_;
-<<<<<<< HEAD
-    m->res[CONIC_COST] = nullptr;
-=======
     double cost;
     m->res[CONIC_COST] = &cost;
->>>>>>> c5904ece6613976d9ac22972949b229c90e13a2b
 
     // Solve the QP
     qpsol_ela_(m->arg, m->res, m->iw, m->w, 0);
