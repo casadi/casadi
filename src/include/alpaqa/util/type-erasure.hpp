@@ -72,12 +72,13 @@ struct BasicVTable {
     BasicVTable() = default;
 
     template <class T>
-    BasicVTable(VTableTypeTag<T>) {
+    BasicVTable(VTableTypeTag<T>) noexcept {
         size = sizeof(T);
         copy = [](const void *self, void *storage) {
             new (storage) T(*std::launder(reinterpret_cast<const T *>(self)));
         };
-        move = [](void *self, void *storage) {
+        // TODO: require that move constructor is noexcept?
+        move = [](void *self, void *storage) noexcept {
             new (storage)
                 T(std::move(*std::launder(reinterpret_cast<T *>(self))));
         };
@@ -224,7 +225,7 @@ class TypeErased {
     /// Construct a type-erased wrapper of type Ret for an object of type T,
     /// initialized in-place with the given arguments.
     template <class Ret, class T, class... Args>
-    requires std::is_base_of_v<TypeErased, Ret>
+        requires std::is_base_of_v<TypeErased, Ret>
     static Ret make(Args &&...args) {
         Ret r{};
         r.template construct_inplace<T>(std::forward<Args>(args)...);
@@ -233,7 +234,7 @@ class TypeErased {
     /// Construct a type-erased wrapper of type Ret for an object of type T,
     /// initialized in-place with the given arguments.
     template <class Ret, class T, class... Args>
-    requires std::is_base_of_v<TypeErased, Ret>
+        requires std::is_base_of_v<TypeErased, Ret>
     static Ret make(std::allocator_arg_t, allocator_type alloc,
                     Args &&...args) {
         Ret r{std::move(alloc)};
@@ -276,15 +277,20 @@ class TypeErased {
     }
     void ensure_storage() { ensure_storage(vtable.size); }
 
+    /// Deallocate the memory without invoking the destructor.
+    void deallocate() {
+        if (vtable.size > small_buffer_size)
+            allocator.deallocate(reinterpret_cast<std::byte *>(self),
+                                 vtable.size);
+        self = nullptr;
+    }
+
     /// Destroy the type-erased object (if not empty), and deallocate the memory
     /// if necessary.
     void cleanup() {
         if (self) {
             vtable.destroy(self);
-            if (vtable.size > small_buffer_size)
-                allocator.deallocate(reinterpret_cast<std::byte *>(self),
-                                     vtable.size);
-            self = nullptr;
+            deallocate();
         }
     }
 
@@ -296,7 +302,13 @@ class TypeErased {
             allocator = other.allocator;
         vtable = other.vtable;
         ensure_storage();
-        vtable.copy(other.self, self);
+        try {
+            vtable.copy(other.self, self);
+        } catch (...) {
+            // If copy constructor throws, destructor should not be called
+            deallocate();
+            throw;
+        }
     }
 
     template <bool MoveAllocator>
@@ -316,6 +328,7 @@ class TypeErased {
             // so do an explicit move
             else {
                 self = allocator.allocate(vtable.size);
+                // TODO: exception safety
                 vtable.move(other.self, self);
                 other.cleanup();
             }
@@ -323,6 +336,7 @@ class TypeErased {
         // Otherwise, use the small buffer and do an explicit move
         else if (other.self) {
             self = small_buffer.data();
+            // TODO: exception safety
             vtable.move(other.self, self);
             other.cleanup();
         }
@@ -332,9 +346,25 @@ class TypeErased {
     /// Ensure storage and construct the type-erased object of type T in-place.
     template <class T, class... Args>
     void construct_inplace(Args &&...args) {
+        // Allocate memory
         ensure_storage(sizeof(T));
-        T *t   = new (self) T{std::forward<Args>(args)...};
-        vtable = VTable{VTableTypeTag<T>{t}};
+        // Construct the stored object
+        T *t;
+        try {
+            t = new (self) T{std::forward<Args>(args)...};
+        } catch (...) {
+            deallocate();
+            throw;
+        }
+        // Save the vtable pointers etc.
+        try {
+            vtable = VTable{VTableTypeTag<T>{t}};
+        } catch (...) {
+            t->~T();
+            deallocate();
+            throw;
+        }
+        // TODO: can we clean this up using RAII?
     }
 
     /// Call the vtable function @p f with the given arguments @p args,
