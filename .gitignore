@@ -11,6 +11,7 @@ dist
 wheelhouse
 python-cross-staging
 *.py-build-cmake.config.toml
+python/alpaqa/_alpaqa*
 
 # Compiled or generated files
 *.mod
