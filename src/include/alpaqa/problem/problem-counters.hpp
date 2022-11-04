@@ -116,8 +116,10 @@ struct Timed {
     Timed &operator=(Timed &&)      = delete;
     T &time;
 };
+#ifndef DOXYGEN
 template <class T>
 Timed(T &) -> Timed<T>;
+#endif
 } // namespace detail
 
 } // namespace alpaqa

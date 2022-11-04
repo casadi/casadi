@@ -601,6 +601,7 @@ class TypeErasedProblem : public util::TypeErased<ProblemVTable<Conf>, Allocator
     /// @}
 };
 
+#ifndef DOXYGEN
 template <class Tref>
 explicit TypeErasedProblem(Tref &&d)
     -> TypeErasedProblem<typename std::remove_cvref_t<Tref>::config_t>;
@@ -608,6 +609,7 @@ explicit TypeErasedProblem(Tref &&d)
 template <class Tref, class Allocator>
 explicit TypeErasedProblem(Tref &&d, Allocator alloc)
     -> TypeErasedProblem<typename std::remove_cvref_t<Tref>::config_t, Allocator>;
+#endif
 
 template <Config Conf, class Allocator>
 auto TypeErasedProblem<Conf, Allocator>::get_n() const -> length_t {
