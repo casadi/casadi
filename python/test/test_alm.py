@@ -107,6 +107,31 @@ def test_alm_inherit():
     assert stats['status'] == pa.SolverStatus.Converged
 
 
+def test_alm_structured_inherit():
+
+    p = pickle.loads(get_pickled_problem())
+    solver = pa.StructuredPANOCLBFGSSolver(
+        pa.StructuredPANOCLBFGSParams(max_iter=200, print_interval=1),
+        pa.LBFGS.Params(memory=5),
+    )
+    almparams = pa.ALMParams(max_iter=20, print_interval=1, ε=1e-12, δ=1e-12)
+    almsolver = pa.ALMSolver(almparams, solver)
+    pc, counters = pa.problem_with_counters(p)
+    x0 = np.array([3, 3])
+    y0 = np.array([0, 0])
+    x, y, stats = almsolver(pa.TEProblem(p), x=x0, y=y0)
+    x, y, stats = almsolver(pc, x=x0, y=y0)
+
+    print()
+    print(counters)
+    print(stats["status"])
+    print("x", x)
+    print("y", y)
+    pprint(stats)
+    assert stats['status'] == pa.SolverStatus.Converged
+
+
 if __name__ == '__main__':
     test_alm()
     test_alm_inherit()
+    test_alm_structured_inherit()

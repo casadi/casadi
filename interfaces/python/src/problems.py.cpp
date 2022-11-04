@@ -14,13 +14,6 @@ using namespace py::literals;
 #include <alpaqa/interop/casadi/CasADiLoader.hpp>
 #endif
 
-template <class... Ts>
-struct overloaded : Ts... {
-    using Ts::operator()...;
-};
-template <class... Ts>
-overloaded(Ts...) -> overloaded<Ts...>;
-
 template <class FuncProb, auto py_f, auto f, class Ret, class... Args>
 void functional_setter_ret(FuncProb &p, std::optional<py::object> o) {
     if (o) {
