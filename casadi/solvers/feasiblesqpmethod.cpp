@@ -69,7 +69,10 @@ namespace casadi {
 
   const Options Feasiblesqpmethod::options_
   = {{&Nlpsol::options_},
-     {{"qpsol",
+     {{"solve_type",
+       {OT_STRING,
+        "The solver type: Either SQP or SLP. Defaults to SQP"}},
+      {"qpsol",
        {OT_STRING,
         "The QP solver to be used by the SQP method [qpoases]"}},
       {"qpsol_options",
@@ -206,15 +209,12 @@ namespace casadi {
     // Default options
     min_iter_ = 0;
     max_iter_ = 50;
-    // max_iter_ls_ = 3;
-    // c1_ = 1e-4;
-    // beta_ = 0.8;
-    // merit_memsize_ = 4;
     lbfgs_memory_ = 10;
     tol_pr_ = 1e-6;
     tol_du_ = 1e-6;
     string hessian_approximation = "exact";
     // min_step_size_ = 1e-10;
+    std::string solve_type = "SQP";
     std::string qpsol_plugin = "qpoases";
     Dict qpsol_options;
     print_header_ = true;
@@ -278,8 +278,10 @@ namespace casadi {
       } 
       //   else if (op.first=="min_step_size") {
       //   min_step_size_ = op.second;
-      // } 
-      else if (op.first=="qpsol") {
+      // }
+      else if (op.first=="solve_type") {
+        solve_type = op.second.to_string();
+      } else if (op.first=="qpsol") {
         qpsol_plugin = op.second.to_string();
       } else if (op.first=="qpsol_options") {
         qpsol_options = op.second;
@@ -366,6 +368,8 @@ namespace casadi {
 
     // Use exact Hessian?
     exact_hessian_ = hessian_approximation =="exact";
+    cout << "print solve type" << solve_type << std::endl;
+    use_sqp_ = solve_type=="SQP";
 
     convexify_ = false;
 
@@ -397,39 +401,56 @@ namespace casadi {
                      {"f", "grad:f:x", "g", "jac:g:x"});
     }
     Asp_ = get_function("nlp_jac_fg").sparsity_out(3);*/
-
-    if (exact_hessian_) {
-      if (!has_function("nlp_hess_l")) {
-        create_function("nlp_hess_l", {"x", "p", "lam:f", "lam:g"},
-                      {"hess:gamma:x:x"}, {{"gamma", {"f", "g"}}});
+    if (use_sqp_){
+      if (exact_hessian_) {
+        if (!has_function("nlp_hess_l")) {
+          create_function("nlp_hess_l", {"x", "p", "lam:f", "lam:g"},
+                        {"hess:gamma:x:x"}, {{"gamma", {"f", "g"}}});
+        }
+        Hsp_ = get_function("nlp_hess_l").sparsity_out(0);
+        cout << "Sparsity pattern: " << Hsp_ << std::endl;
+        casadi_assert(Hsp_.is_symmetric(), "Hessian must be symmetric");
+        if (convexify_strategy!="none") {
+          convexify_ = true;
+          Dict opts;
+          opts["strategy"] = convexify_strategy;
+          opts["margin"] = convexify_margin;
+          opts["max_iter_eig"] = max_iter_eig;
+          opts["verbose"] = verbose_;
+          Hsp_ = Convexify::setup(convexify_data_, Hsp_, opts);
+        }
+      } else {
+        Hsp_ = Sparsity::dense(nx_, nx_);
       }
-      Hsp_ = get_function("nlp_hess_l").sparsity_out(0);
-      casadi_assert(Hsp_.is_symmetric(), "Hessian must be symmetric");
-      if (convexify_strategy!="none") {
-        convexify_ = true;
-        Dict opts;
-        opts["strategy"] = convexify_strategy;
-        opts["margin"] = convexify_margin;
-        opts["max_iter_eig"] = max_iter_eig;
-        opts["verbose"] = verbose_;
-        Hsp_ = Convexify::setup(convexify_data_, Hsp_, opts);
-      }
-    } else {
-      Hsp_ = Sparsity::dense(nx_, nx_);
     }
+    
 
     casadi_assert(!qpsol_plugin.empty(), "'qpsol' option has not been set");
-    // qpsol_options["dump_in"] = true;
-    // qpsol_options["dump_out"] = true;
-    // qpsol_options["dump"] = true;
+    qpsol_options["dump_in"] = true;
+    qpsol_options["dump_out"] = true;
+    qpsol_options["dump"] = true;
     // qpsol_options["print_out"] = true;
     // qpsol_options["error_on_fail"] = false;
     
-    Hsp_.to_file("h.mtx");
-    Asp_.to_file("a.mtx");
-    uout() << qpsol_options << std::endl;
-    qpsol_ = conic("qpsol", qpsol_plugin, {{"h", Hsp_}, {"a", Asp_}},
+    // Hsp_.to_file("h.mtx");
+    // Asp_.to_file("a.mtx");
+    // uout() << qpsol_options << std::endl;
+    if (use_sqp_){
+      qpsol_ = conic("qpsol", qpsol_plugin, {{"h", Hsp_}, {"a", Asp_}},
                    qpsol_options);
+      cout << qpsol_ <<std::endl;
+    } else {
+      Hsp_ = Sparsity(nx_, nx_);
+      cout << "Sparsity pattern: " << Hsp_ << std::endl;
+      cout << "Sparsity pattern: " << Asp_ << std::endl;
+      // cout << "Nonzeros: " << Hsp_.nnz() << std::endl;
+      // qpsol_ = conic("qpsol", qpsol_plugin, {{"h", Hsp_}, {"a", Asp_}},
+      //              qpsol_options);
+      qpsol_ = conic("qpsol", qpsol_plugin, {{"a", Asp_}},
+                   qpsol_options);
+      cout << qpsol_ <<std::endl;
+    }
+    
     alloc(qpsol_);
 
     // BFGS?
@@ -467,7 +488,9 @@ namespace casadi {
   }
 
   void Feasiblesqpmethod::set_feasiblesqpmethod_prob() {
+    
     p_.sp_h = Hsp_;
+    
     p_.sp_a = Asp_;
     // p_.merit_memsize = merit_memsize_;
     // p_.max_iter_ls = max_iter_ls_;
@@ -494,16 +517,18 @@ namespace casadi {
     if (convexify_) m->add_stat("convexify");
     m->add_stat("BFGS");
     m->add_stat("QP");
-    m->add_stat("linesearch");
+    // m->add_stat("linesearch");
     return 0;
   }
 
 double Feasiblesqpmethod::eval_m_k(void* mem) const {
   auto m = static_cast<FeasiblesqpmethodMemory*>(mem);
-  // auto d_nlp = &m->d_nlp;
   auto d = &m->d;
-
-  return 0.5*casadi_bilin(d->Bk, Hsp_, d->dx, d->dx) + casadi_dot(nx_, d->gf, d->dx);
+  if (use_sqp_){
+    return 0.5*casadi_bilin(d->Bk, Hsp_, d->dx, d->dx) + casadi_dot(nx_, d->gf, d->dx);
+  } else {
+    return casadi_dot(nx_, d->gf, d->dx);
+  }
 }
 
 double Feasiblesqpmethod::eval_tr_ratio(double val_f, double val_f_corr, double val_m_k) const{
@@ -647,20 +672,20 @@ int Feasiblesqpmethod::feasibility_iterations(void* mem, double tr_rad) const{
 
     casadi_copy(d_nlp->lbz, nx_, d->lbdz_feas);
     casadi_clip_min(d->lbdz_feas, nx_, -tr_rad, d->tr_mask);
-    DM(std::vector<double>(d->lbdz_feas,d->lbdz_feas+nx_)).to_file("lbx_feas_part1_part1.mtx");
+    // DM(std::vector<double>(d->lbdz_feas,d->lbdz_feas+nx_)).to_file("lbx_feas_part1_part1.mtx");
     // casadi_fill(d->lbdz_feas, nx_, -tr_rad);
     casadi_axpy(nx_, -1., d->z_feas, d->lbdz_feas);
     casadi_axpy(nx_, 1., d_nlp->z, d->lbdz_feas);
-    DM(std::vector<double>(d->lbdz_feas,d->lbdz_feas+nx_)).to_file("lbx_feas_part1.mtx");
+    // DM(std::vector<double>(d->lbdz_feas,d->lbdz_feas+nx_)).to_file("lbx_feas_part1.mtx");
 
 
     casadi_copy(d_nlp->lbz, nx_, d->z_tmp);
     casadi_axpy(nx_, -1., d->z_feas, d->z_tmp);
-    DM(std::vector<double>(d->z_tmp,d->z_tmp+nx_)).to_file("lbx_feas_part2.mtx");
+    // DM(std::vector<double>(d->z_tmp,d->z_tmp+nx_)).to_file("lbx_feas_part2.mtx");
 
     // comparison of both vectors
     casadi_vector_fmax(nx_, d->z_tmp, d->lbdz_feas, d->lbdz_feas);
-    DM(std::vector<double>(d->lbdz_feas,d->lbdz_feas+nx_)).to_file("lbx_feas_end.mtx");
+    // DM(std::vector<double>(d->lbdz_feas,d->lbdz_feas+nx_)).to_file("lbx_feas_end.mtx");
 
 
     // upper bounds of variables
@@ -671,20 +696,20 @@ int Feasiblesqpmethod::feasibility_iterations(void* mem, double tr_rad) const{
 
     casadi_copy(d_nlp->ubz, nx_, d->ubdz_feas);
     casadi_clip_max(d->ubdz_feas, nx_, tr_rad, d->tr_mask);
-    DM(std::vector<double>(d->ubdz_feas,d->ubdz_feas+nx_)).to_file("ubx_feas_part1_part1.mtx");
+    // DM(std::vector<double>(d->ubdz_feas,d->ubdz_feas+nx_)).to_file("ubx_feas_part1_part1.mtx");
     // casadi_fill(d->ubdz_feas, nx_, tr_rad);
     casadi_axpy(nx_, -1., d->z_feas, d->ubdz_feas);
-    DM(std::vector<double>(d->z_feas,d->z_feas+nx_)).to_file("ubx_feas_part1_zfeas.mtx");
+    // DM(std::vector<double>(d->z_feas,d->z_feas+nx_)).to_file("ubx_feas_part1_zfeas.mtx");
     casadi_axpy(nx_, 1., d_nlp->z, d->ubdz_feas);
 
-    DM(std::vector<double>(d->ubdz_feas,d->ubdz_feas+nx_)).to_file("ubx_feas_part1.mtx");
+    // DM(std::vector<double>(d->ubdz_feas,d->ubdz_feas+nx_)).to_file("ubx_feas_part1.mtx");
 
     casadi_copy(d_nlp->ubz, nx_, d->z_tmp);
     casadi_axpy(nx_, -1., d->z_feas, d->z_tmp);
-    DM(std::vector<double>(d->z_tmp,d->z_tmp+nx_)).to_file("ubx_feas_part2.mtx");
+    // DM(std::vector<double>(d->z_tmp,d->z_tmp+nx_)).to_file("ubx_feas_part2.mtx");
     // comparison of both vectors
     casadi_vector_fmin(nx_, d->z_tmp, d->ubdz_feas, d->ubdz_feas);
-    DM(std::vector<double>(d->ubdz_feas,d->ubdz_feas+nx_)).to_file("ubx_feas_end.mtx");
+    // DM(std::vector<double>(d->ubdz_feas,d->ubdz_feas+nx_)).to_file("ubx_feas_end.mtx");
 
 
     // std::string suffix = str(j);
@@ -698,16 +723,19 @@ int Feasiblesqpmethod::feasibility_iterations(void* mem, double tr_rad) const{
     // casadi_copy(d->dx, nx_, d->x_tmp);
 
     //prepare step_inf_norm
-    DM(std::vector<double>(d->gf_feas,d->gf_feas+nx_)).to_file("gf_feas.mtx");
-    DM(std::vector<double>(d->lbdz_feas, d->lbdz_feas+nx_)).to_file("lb_var_correction.mtx");
-    DM(std::vector<double>(d->ubdz_feas, d->ubdz_feas+nx_)).to_file("ub_var_correction.mtx");
-    DM(std::vector<double>(d->lbdz_feas+nx_, d->lbdz_feas+nx_+ng_)).to_file("lba_correction.mtx");
-    DM(std::vector<double>(d->ubdz_feas+nx_, d->ubdz_feas+nx_+ng_)).to_file("uba_correction.mtx");
+    // DM(std::vector<double>(d->gf_feas,d->gf_feas+nx_)).to_file("gf_feas.mtx");
+    // DM(std::vector<double>(d->lbdz_feas, d->lbdz_feas+nx_)).to_file("lb_var_correction.mtx");
+    // DM(std::vector<double>(d->ubdz_feas, d->ubdz_feas+nx_)).to_file("ub_var_correction.mtx");
+    // DM(std::vector<double>(d->lbdz_feas+nx_, d->lbdz_feas+nx_+ng_)).to_file("lba_correction.mtx");
+    // DM(std::vector<double>(d->ubdz_feas+nx_, d->ubdz_feas+nx_+ng_)).to_file("uba_correction.mtx");
+    if (use_sqp_){
+      int ret = solve_QP(m, d->Bk, d->gf_feas, d->lbdz_feas, d->ubdz_feas, d->Jk, d->dx_feas, d->dlam_feas, 0);
+    } else {
+      int ret = solve_LP(m, d->gf_feas, d->lbdz_feas, d->ubdz_feas, d->Jk, d->dx_feas, d->dlam_feas, 0);
+    }
+     // put definition of ret out of loop
 
-    int ret = solve_QP(m, d->Bk, d->gf_feas, d->lbdz_feas, d->ubdz_feas, d->Jk,
-    d->dx_feas, d->dlam_feas, 0); // put definition of ret out of loop
-
-    DM(std::vector<double>(d->dx_feas,d->dx_feas+nx_)).to_file("dx_feas.mtx");
+    // DM(std::vector<double>(d->dx_feas,d->dx_feas+nx_)).to_file("dx_feas.mtx");
     // uout() << "Feas QP step: " << std::vector<double>(d->dx_feas, d->dx_feas+nx_) << std::endl;
     //MISSING: Depending on the result terminate program
 
@@ -748,8 +776,8 @@ int Feasiblesqpmethod::feasibility_iterations(void* mem, double tr_rad) const{
     kappa = step_inf_norm/prev_step_inf_norm;
     //MISSING: as_exac:
 
-    DM(std::vector<double>(d_nlp->z, d_nlp->z+nx_)).to_file("z.mtx");
-    DM(std::vector<double>(d->z_feas,d->z_feas+nx_)).to_file("z_feas.mtx");
+    // DM(std::vector<double>(d_nlp->z, d_nlp->z+nx_)).to_file("z.mtx");
+    // DM(std::vector<double>(d->z_feas,d->z_feas+nx_)).to_file("z_feas.mtx");
     // DM(std::vector<double>(d->dx_feas,d->dx_feas+nx_)).to_file("dx_feas"+suffix+".mtx");
     // DM(std::vector<double>(d->dx,d->dx+nx_)).to_file("dx.mtx");
 
@@ -822,8 +850,7 @@ int Feasiblesqpmethod::solve(void* mem) const {
     auto d_nlp = &m->d_nlp;
     auto d = &m->d;
 
-
-    DM(std::vector<double>(d_nlp->z, d_nlp->z+nx_)).to_file("x0.mtx");
+    // DM(std::vector<double>(d_nlp->z, d_nlp->z+nx_)).to_file("x0.mtx");
     // Number of SQP iterations
     m->iter_count = 0;
 
@@ -926,41 +953,44 @@ int Feasiblesqpmethod::solve(void* mem) const {
         // uout() << "nlp_f: " << d_nlp->f << std::endl;
         // uout() << "nlp_g: " << *(d_nlp->z + nx_) << std::endl;
 
-        if (exact_hessian_) {
-          // Update/reset exact Hessian
-          m->arg[0] = d_nlp->z;
-          m->arg[1] = d_nlp->p;
-          m->arg[2] = &one;
-          m->arg[3] = d_nlp->lam + nx_;
-          m->res[0] = d->Bk;
-          if (calc_function(m, "nlp_hess_l")) return 1;
-          if (convexify_) {
-            ScopedTiming tic(m->fstats.at("convexify"));
-            if (convexify_eval(&convexify_data_.config, d->Bk, d->Bk, m->iw, m->w)) return 1;
+        if (use_sqp_){
+          if (exact_hessian_) {
+            // Update/reset exact Hessian
+            m->arg[0] = d_nlp->z;
+            m->arg[1] = d_nlp->p;
+            m->arg[2] = &one;
+            m->arg[3] = d_nlp->lam + nx_;
+            m->res[0] = d->Bk;
+            if (calc_function(m, "nlp_hess_l")) return 1;
+            if (convexify_) {
+              ScopedTiming tic(m->fstats.at("convexify"));
+              if (convexify_eval(&convexify_data_.config, d->Bk, d->Bk, m->iw, m->w)) return 1;
+            }
+          } else if (m->iter_count==0) {
+            ScopedTiming tic(m->fstats.at("BFGS"));
+            // Initialize BFGS
+            casadi_fill(d->Bk, Hsp_.nnz(), 1.);
+            casadi_bfgs_reset(Hsp_, d->Bk);
+          } else {
+            ScopedTiming tic(m->fstats.at("BFGS"));
+            // Update BFGS
+            if (m->iter_count % lbfgs_memory_ == 0) casadi_bfgs_reset(Hsp_, d->Bk);
+            // Update the Hessian approximation
+            casadi_bfgs(Hsp_, d->Bk, d->dx, d->gLag, d->gLag_old, m->w);
           }
-        } else if (m->iter_count==0) {
-          ScopedTiming tic(m->fstats.at("BFGS"));
-          // Initialize BFGS
-          casadi_fill(d->Bk, Hsp_.nnz(), 1.);
-          casadi_bfgs_reset(Hsp_, d->Bk);
-        } else {
-          ScopedTiming tic(m->fstats.at("BFGS"));
-          // Update BFGS
-          if (m->iter_count % lbfgs_memory_ == 0) casadi_bfgs_reset(Hsp_, d->Bk);
-          // Update the Hessian approximation
-          casadi_bfgs(Hsp_, d->Bk, d->dx, d->gLag, d->gLag_old, m->w);
-        }
 
-        // test if initialization is feasible
-        if (casadi_max_viol(nx_ + ng_, d_nlp->z, d_nlp->lbz, d_nlp->ubz) > feas_tol_){
-          if (print_status_) print("MESSAGE(feasiblesqpmethod): No feasible initialization given! "
-              "Find feasible initialization.\n");
-          m->return_status = "No_Feasible_Initialization";
-          break;
+          // test if initialization is feasible
+          if (casadi_max_viol(nx_ + ng_, d_nlp->z, d_nlp->lbz, d_nlp->ubz) > feas_tol_){
+            if (print_status_) print("MESSAGE(feasiblesqpmethod): No feasible initialization given! "
+                "Find feasible initialization.\n");
+            m->return_status = "No_Feasible_Initialization";
+            break;
+          }
         }
+        
 
-        DM(std::vector<double>(d_nlp->z+nx_, d_nlp->z+nx_+ng_)).to_file("g0.mtx");
-        DM(std::vector<double>(d->gf, d->gf+nx_)).to_file("gf0.mtx");
+        // DM(std::vector<double>(d_nlp->z+nx_, d_nlp->z+nx_+ng_)).to_file("g0.mtx");
+        // DM(std::vector<double>(d->gf, d->gf+nx_)).to_file("gf0.mtx");
 
       } else if (step_accepted == 0){
         // Evaluate grad_f
@@ -990,29 +1020,31 @@ int Feasiblesqpmethod::solve(void* mem) const {
         // uout() << "nlp_f: " << d_nlp->f << std::endl;
         // uout() << "nlp_g: " << *(d_nlp->z + nx_) << std::endl;
 
-        if (exact_hessian_) {
-          // Update/reset exact Hessian
-          m->arg[0] = d_nlp->z;
-          m->arg[1] = d_nlp->p;
-          m->arg[2] = &one;
-          m->arg[3] = d_nlp->lam + nx_;
-          m->res[0] = d->Bk;
-          if (calc_function(m, "nlp_hess_l")) return 1;
-          if (convexify_) {
-            ScopedTiming tic(m->fstats.at("convexify"));
-            if (convexify_eval(&convexify_data_.config, d->Bk, d->Bk, m->iw, m->w)) return 1;
+        if (use_sqp_){
+          if (exact_hessian_) {
+            // Update/reset exact Hessian
+            m->arg[0] = d_nlp->z;
+            m->arg[1] = d_nlp->p;
+            m->arg[2] = &one;
+            m->arg[3] = d_nlp->lam + nx_;
+            m->res[0] = d->Bk;
+            if (calc_function(m, "nlp_hess_l")) return 1;
+            if (convexify_) {
+              ScopedTiming tic(m->fstats.at("convexify"));
+              if (convexify_eval(&convexify_data_.config, d->Bk, d->Bk, m->iw, m->w)) return 1;
+            }
+          } else if (m->iter_count==0) {
+            ScopedTiming tic(m->fstats.at("BFGS"));
+            // Initialize BFGS
+            casadi_fill(d->Bk, Hsp_.nnz(), 1.);
+            casadi_bfgs_reset(Hsp_, d->Bk);
+          } else {
+            ScopedTiming tic(m->fstats.at("BFGS"));
+            // Update BFGS
+            if (m->iter_count % lbfgs_memory_ == 0) casadi_bfgs_reset(Hsp_, d->Bk);
+            // Update the Hessian approximation
+            casadi_bfgs(Hsp_, d->Bk, d->dx, d->gLag, d->gLag_old, m->w);
           }
-        } else if (m->iter_count==0) {
-          ScopedTiming tic(m->fstats.at("BFGS"));
-          // Initialize BFGS
-          casadi_fill(d->Bk, Hsp_.nnz(), 1.);
-          casadi_bfgs_reset(Hsp_, d->Bk);
-        } else {
-          ScopedTiming tic(m->fstats.at("BFGS"));
-          // Update BFGS
-          if (m->iter_count % lbfgs_memory_ == 0) casadi_bfgs_reset(Hsp_, d->Bk);
-          // Update the Hessian approximation
-          casadi_bfgs(Hsp_, d->Bk, d->dx, d->gLag, d->gLag_old, m->w);
         }
       }
       
@@ -1021,7 +1053,6 @@ int Feasiblesqpmethod::solve(void* mem) const {
       casadi_mv(d->Jk, Asp_, d_nlp->lam+nx_, d->gLag, true);
       casadi_axpy(nx_, 1., d_nlp->lam, d->gLag);
 
-      // raise(SIGTRAP);
       // Primal infeasability
       double pr_inf = casadi_max_viol(nx_+ng_, d_nlp->z, d_nlp->lbz, d_nlp->ubz);
       // uout() << "pr_inf: " << pr_inf << std::endl;
@@ -1101,12 +1132,18 @@ int Feasiblesqpmethod::solve(void* mem) const {
       DM(std::vector<double>(d->ubdz, d->ubdz+nx_)).to_file("ub_var.mtx");
       DM(std::vector<double>(d->lbdz+nx_, d->lbdz+nx_+ng_)).to_file("lba.mtx");
       DM(std::vector<double>(d->ubdz+nx_, d->ubdz+nx_+ng_)).to_file("uba.mtx");
-      DM(std::vector<double>(d->Bk, d->Bk+Hsp_.nnz())).to_file("Bk.mtx");
+      // DM(std::vector<double>(d->Bk, d->Bk+Hsp_.nnz())).to_file("Bk.mtx");
       DM(std::vector<double>(d->Jk, d->Jk+Asp_.nnz())).to_file("Jk.mtx");
 
+      int ret = 0;
       // Solve the QP
-      int ret = solve_QP(m, d->Bk, d->gf, d->lbdz, d->ubdz, d->Jk,
-               d->dx, d->dlam, 0);
+      if (use_sqp_){
+        ret = solve_QP(m, d->Bk, d->gf, d->lbdz, d->ubdz, d->Jk,
+                 d->dx, d->dlam, 0);
+      } else {
+        ret = solve_LP(m, d->gf, d->lbdz, d->ubdz, d->Jk,
+                 d->dx, d->dlam, 0);
+      }
 
       DM(std::vector<double>(d->dx,d->dx+nx_)).to_file("dx.mtx");
       // Eval quadratic model and check for convergence
@@ -1121,9 +1158,11 @@ int Feasiblesqpmethod::solve(void* mem) const {
         
       // uout() << "QP step: " << std::vector<double>(d->dx, d->dx+nx_) << std::endl;
       // Detecting indefiniteness
-      double gain = casadi_bilin(d->Bk, Hsp_, d->dx, d->dx);
-      if (gain < 0) {
-        if (print_status_) print("WARNING(feasiblesqpmethod): Indefinite Hessian detected\n");
+      if (use_sqp_) {
+        double gain = casadi_bilin(d->Bk, Hsp_, d->dx, d->dx);
+        if (gain < 0) {
+          if (print_status_) print("WARNING(feasiblesqpmethod): Indefinite Hessian detected\n");
+        }
       }
 
       // Do the feasibility iterations here
@@ -1132,7 +1171,7 @@ int Feasiblesqpmethod::solve(void* mem) const {
       // Check if step was accepted or not
       if (ret < 0){
         uout() << "Rejected inner iterates" << std::endl;
-        uout() << casadi_masked_norm_inf(nx_, d->dx, d->tr_mask) << std::endl;
+        // uout() << casadi_masked_norm_inf(nx_, d->dx, d->tr_mask) << std::endl;
 
         tr_rad = 0.5 * casadi_masked_norm_inf(nx_, d->dx, d->tr_mask);
       } else{
@@ -1196,6 +1235,41 @@ int Feasiblesqpmethod::solve(void* mem) const {
     print("\n");
   }
 
+  int Feasiblesqpmethod::solve_LP(FeasiblesqpmethodMemory* m, const double* g,
+                           const double* lbdz, const double* ubdz, const double* A,
+                           double* x_opt, double* dlam, int mode) const {
+    ScopedTiming tic(m->fstats.at("QP"));
+    // Inputs
+    fill_n(m->arg, qpsol_.n_in(), nullptr);
+    m->arg[CONIC_H] = nullptr;
+    m->arg[CONIC_G] = g;
+    m->arg[CONIC_X0] = x_opt;
+    m->arg[CONIC_LAM_X0] = dlam;
+    m->arg[CONIC_LAM_A0] = dlam + nx_;
+    m->arg[CONIC_LBX] = lbdz;
+    m->arg[CONIC_UBX] = ubdz;
+    m->arg[CONIC_A] = A;
+    m->arg[CONIC_LBA] = lbdz+nx_;
+    m->arg[CONIC_UBA] = ubdz+nx_;
+
+    // Outputs
+    fill_n(m->res, qpsol_.n_out(), nullptr);
+    m->res[CONIC_X] = x_opt;
+    m->res[CONIC_LAM_X] = dlam;
+    m->res[CONIC_LAM_A] = dlam + nx_;
+    // double obj;
+    // m->res[CONIC_COST] = &obj;
+    m->res[CONIC_COST] = nullptr;
+
+
+    // Solve the QP
+    qpsol_(m->arg, m->res, m->iw, m->w, 0);
+    auto m_qpsol = static_cast<ConicMemory*>(qpsol_->memory(0));
+
+    if (verbose_) print("QP solved\n");
+    return 0;
+  }
+
   int Feasiblesqpmethod::solve_QP(FeasiblesqpmethodMemory* m, const double* H, const double* g,
                            const double* lbdz, const double* ubdz, const double* A,
                            double* x_opt, double* dlam, int mode) const {
@@ -1227,146 +1301,9 @@ int Feasiblesqpmethod::solve(void* mem) const {
     qpsol_(m->arg, m->res, m->iw, m->w, 0);
     auto m_qpsol = static_cast<ConicMemory*>(qpsol_->memory(0));
 
-    // Check if the QP was infeasible for elastic mode
-    // if (!m_qpsol->success) {
-    //   if ((elastic_mode_ && m_qpsol->unified_return_status == SOLVER_RET_INFEASIBLE) || (mode == 1)) {
-    //     return SOLVER_RET_INFEASIBLE;
-    //   }
-    // } 
-
     if (verbose_) print("QP solved\n");
     return 0;
   }
-
-  // int Feasiblesqpmethod::solve_ela_QP(FeasiblesqpmethodMemory* m, const double* H, const double* g,
-  //                          const double* lbdz, const double* ubdz, const double* A,
-  //                          double* x_opt, double* dlam) const {
-  //   ScopedTiming tic(m->fstats.at("QP"));
-  //   // Inputs
-  //   fill_n(m->arg, qpsol_ela_.n_in(), nullptr);
-  //   m->arg[CONIC_H] = H;
-  //   m->arg[CONIC_G] = g;
-  //   m->arg[CONIC_X0] = x_opt;
-  //   m->arg[CONIC_LAM_X0] = dlam;
-  //   m->arg[CONIC_LAM_A0] = dlam + nx_ + 2*ng_;
-  //   m->arg[CONIC_LBX] = lbdz;
-  //   m->arg[CONIC_UBX] = ubdz;
-  //   m->arg[CONIC_A] = A;
-  //   m->arg[CONIC_LBA] = lbdz + nx_ + 2*ng_;
-  //   m->arg[CONIC_UBA] = ubdz + nx_ + 2*ng_;
-
-  //   // Outputs
-  //   fill_n(m->res, qpsol_ela_.n_out(), nullptr);
-  //   m->res[CONIC_X] = x_opt;
-  //   m->res[CONIC_LAM_X] = dlam;
-  //   m->res[CONIC_LAM_A] = dlam + nx_ + 2*ng_;
-
-  //   // Solve the QP
-  //   qpsol_ela_(m->arg, m->res, m->iw, m->w, 0);
-  //   auto m_qpsol_ela = static_cast<ConicMemory*>(qpsol_ela_->memory(0));
-
-  //   // Check if the QP was infeasible
-  //   if (!m_qpsol_ela->success) {
-  //     if (m_qpsol_ela->unified_return_status == SOLVER_RET_INFEASIBLE) {
-  //       return SOLVER_RET_INFEASIBLE;
-  //     }
-  //   } 
-
-  //   if (verbose_) print("Elastic QP solved\n");
-
-  //   return 0;
-  // }
-
-  // int Feasiblesqpmethod::solve_elastic_mode(FeasiblesqpmethodMemory* m, casadi_int* ela_it, double gamma_1,
-  //                                   casadi_int ls_iter, bool ls_success, bool so_succes, double pr_inf, 
-  //                                   double du_inf, double dx_norminf, std::string* info, int mode) const {
-  //   auto d_nlp = &m->d_nlp;
-  //   auto d = &m->d;
-
-  //   if (mode != 0 && mode != 1) casadi_error("Wrong mode provided to solve_elastic_mode.");
-    
-  //   double gamma = 0.;
-
-  //   if (mode == 0) (*ela_it)++;
-
-  //   // Temp datastructs for data copy
-  //   double *temp_1, *temp_2;
-
-  //   // Make larger jacobian (has 2 extra diagonal matrices with -1 and 1 respectively)
-  //   temp_1 = d->Jk + Asp_.nnz();
-  //   casadi_fill(temp_1, ng_, -1.);
-  //   temp_1 += ng_;
-  //   casadi_fill(temp_1, ng_, 1.);
-
-  //   // Initialize bounds
-  //   temp_1 = d->lbdz + nx_;
-  //   temp_2 = d->lbdz + nx_+2*ng_;
-  //   casadi_copy(temp_1, ng_, temp_2);
-  //   casadi_clear(temp_1, 2*ng_);
-
-  //   temp_1 = d->ubdz + nx_;
-  //   temp_2 = d->ubdz + nx_+2*ng_;
-  //   casadi_copy(temp_1, ng_, temp_2);
-  //   casadi_fill(temp_1, 2*ng_, inf);
-
-  //   if (*ela_it > 1) {
-  //     gamma = pow(10, *ela_it * (*ela_it - 1) / 2) * gamma_1;
-  //   } else {
-  //     gamma = gamma_1;
-  //   }
-
-  //   if (gamma > gamma_max_) {
-  //     casadi_error("Error in elastic mode of QP solver."
-  //                  "Gamma became larger than gamma_max.");
-  //   }
-
-  //   if (mode == 0 && print_iteration_) {
-  //     ls_iter = 0;
-  //     ls_success = true;
-  //     print_iteration(m->iter_count, d_nlp->f, pr_inf, du_inf, dx_norminf,
-  //                     m->reg, ls_iter, ls_success, so_succes, *info);
-  //   }
-
-  //   // Make larger gradient (has gamma for slack variables)
-  //   temp_1 = d->gf + nx_;
-  //   casadi_fill(temp_1, 2 * ng_, gamma);
-
-  //   // Initial guess
-  //   casadi_clear(d->dlam, nx_ + 3 * ng_);
-  //   casadi_copy(d_nlp->lam, nx_, d->dlam);
-  //   casadi_copy(d_nlp->lam + nx_, ng_, d->dlam + nx_ + 2 * ng_);
-  //   casadi_clear(d->dx, nx_ + 2 * ng_);
-
-  //   // Make initial guess feasible on x values
-  //   if (init_feasible_) {
-  //     for (casadi_int i = 0; i < nx_; ++i) {
-  //       if (d->lbdz[i] > 0) d->dx[i] = d->lbdz[i];
-  //       else if (d->ubdz[i] < 0) d->dx[i] = d->ubdz[i];
-  //     }
-
-  //     // Make initial guess feasible on constraints by altering slack variables
-  //     casadi_mv(d->Jk, Asp_, d->dx, d->temp_mem, false);
-  //     for (casadi_int i = 0; i < ng_; ++i) {
-  //       if (d->ubdz[nx_+2*ng_+i]-d->temp_mem[i] < 0) {
-  //         d->dx[nx_+i] = -d->ubdz[nx_+2*ng_+i]+d->temp_mem[i];
-  //       }
-
-  //       if (d->lbdz[nx_+2*ng_+i]-d->temp_mem[i] > 0) {
-  //         d->dx[nx_+ng_+i] = d->lbdz[nx_+2*ng_+i]-d->temp_mem[i];
-  //       }
-  //     }
-  //   }
-
-  //   // Solve the QP
-  //   int ret = solve_ela_QP(m, d->Bk, d->gf, d->lbdz, d->ubdz, d->Jk, d->dx, d->dlam);
-
-  //   if (mode == 0) *info = "Elastic mode QP (gamma = " + str(gamma) + ")";
-
-  //   // Copy constraint dlam to the right place
-  //   casadi_copy(d->dlam+nx_+2*ng_, ng_, d->dlam+nx_);
-
-  //   return ret;
-  // }
 
 void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
     // if (max_iter_ls_) g.add_dependency(get_function("nlp_fg"));
@@ -1983,24 +1920,11 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
     s.pack("Feasiblesqpmethod::lbfgs_memory", lbfgs_memory_);
     s.pack("Feasiblesqpmethod::tol_pr_", tol_pr_);
     s.pack("Feasiblesqpmethod::tol_du_", tol_du_);
-    // s.pack("Feasiblesqpmethod::min_step_size_", min_step_size_);
-    // s.pack("Feasiblesqpmethod::c1", c1_);
-    // s.pack("Feasiblesqpmethod::beta", beta_);
-    // s.pack("Feasiblesqpmethod::max_iter_ls_", max_iter_ls_);
-    // s.pack("Feasiblesqpmethod::merit_memsize_", merit_memsize_);
-    // s.pack("Feasiblesqpmethod::beta", beta_);
     s.pack("Feasiblesqpmethod::print_header", print_header_);
     s.pack("Feasiblesqpmethod::print_iteration", print_iteration_);
     s.pack("Feasiblesqpmethod::print_status", print_status_);
 
-    // s.pack("Feasiblesqpmethod::elastic_mode", elastic_mode_);
-    // s.pack("Feasiblesqpmethod::gamma_0", gamma_0_);
-    // s.pack("Feasiblesqpmethod::gamma_max", gamma_max_);
-    // s.pack("Feasiblesqpmethod::gamma_1_min", gamma_1_min_);
-
     s.pack("Feasiblesqpmethod::init_feasible", init_feasible_);
-    // s.pack("Feasiblesqpmethod::so_corr", so_corr_);
-
     s.pack("Feasiblesqpmethod::Hsp", Hsp_);
     s.pack("Feasiblesqpmethod::Asp", Asp_);
     s.pack("Feasiblesqpmethod::convexify", convexify_);
