@@ -91,14 +91,14 @@ jobs:
         cmake --build build-examples -j --config Release
     - name: Run examples (Release)
       run: |
-        ./build-examples/C++/LambdaProblem/Release/lambda-problem-example
+        ./build-examples/C++/CustomCppProblem/Release/custom-cpp-problem-example
         ./build-examples/C++/FortranProblem/Release/fortran-problem-example
     - name: Build examples (Debug)
       run: |
         cmake --build build-examples -j --config Debug
     - name: Run examples (Debug)
       run: |
-        ./build-examples/C++/LambdaProblem/Debug/lambda-problem-example
+        ./build-examples/C++/CustomCppProblem/Debug/custom-cpp-problem-example
         ./build-examples/C++/FortranProblem/Debug/fortran-problem-example
     - name: Build tests (Release)
       run: |
@@ -123,7 +123,7 @@ jobs:
       with:
         name: alpaqa-linux${{ matrix.suffix }}-test-examples-release
         path: |
-          build-examples/C++/LambdaProblem/Release/lambda-problem-example
+          build-examples/C++/CustomCppProblem/Release/custom-cpp-problem-example
           build-examples/C++/FortranProblem/Release/fortran-problem-example
           build-tests/Release/tests
     - name: Upload (Debug)
@@ -131,7 +131,7 @@ jobs:
       with:
         name: alpaqa-linux${{ matrix.suffix }}-test-examples-debug
         path: |
-          build-examples/C++/LambdaProblem/Debug/lambda-problem-example
+          build-examples/C++/CustomCppProblem/Debug/custom-cpp-problem-example
           build-examples/C++/FortranProblem/Debug/fortran-problem-example
           build-tests/Debug/tests
 
