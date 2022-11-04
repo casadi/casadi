@@ -85,6 +85,10 @@ namespace casadi {
     /** \brief Free memory block */
     void free_mem(void *mem) const override { delete static_cast<QrqpMemory*>(mem);}
 
+    /** \brief Set the (persistent) work vectors */
+    void set_work(void* mem, const double**& arg, double**& res,
+                          casadi_int*& iw, double*& w) const override;
+
     ///@{
     /** \brief Options */
     static const Options options_;

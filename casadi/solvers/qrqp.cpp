@@ -147,6 +147,20 @@ namespace casadi {
     }
   }
 
+  void Qrqp::set_work(void* mem, const double**& arg, double**& res,
+                                casadi_int*& iw, double*& w) const {
+    auto m = static_cast<QrqpMemory*>(mem);
+
+    // Set work in base classes
+    Conic::set_work(mem, arg, res, iw, w);
+
+    // Setup data structure
+    m->d.prob = &p_;
+    m->d.qp = &m->d_qp;
+
+    casadi_qrqp_init(&m->d, &iw, &w);
+  }
+
   void Qrqp::set_qrqp_prob() {
     p_.qp = &p_qp_;
     p_.sp_at = AT_;
@@ -173,23 +187,7 @@ namespace casadi {
     // Setup data structure
     casadi_qrqp_data<double>& d = m->d;
     casadi_qp_data<double>& d_qp = m->d_qp;
-    d.prob = &p_;
-    d.qp = &d_qp;
-    d_qp.h = arg[CONIC_H];
-    d_qp.g = arg[CONIC_G];
-    d_qp.a = arg[CONIC_A];
-    d_qp.lbx = arg[CONIC_LBX];
-    d_qp.ubx = arg[CONIC_UBX];
-    d_qp.uba = arg[CONIC_UBA];
-    d_qp.lba = arg[CONIC_LBA];
-    d_qp.x0 = arg[CONIC_X0];
-    d_qp.lam_x0 = arg[CONIC_LAM_X0];
-    d_qp.lam_a0 = arg[CONIC_LAM_A0];
-    d_qp.x = res[CONIC_X];
-    d_qp.lam_x = res[CONIC_LAM_X];
-    d_qp.lam_a = res[CONIC_LAM_A];
-    d_qp.f = res[CONIC_COST];
-    casadi_qrqp_init(&d, &iw, &w);
+
     // Pass bounds on z
     casadi_copy(d_qp.lbx, nx_, d.lbz);
     casadi_copy(d_qp.lba, na_, d.lbz+nx_);

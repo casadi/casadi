@@ -442,13 +442,6 @@ namespace casadi {
   int Conic::init_mem(void* mem) const {
     if (ProtoFunction::init_mem(mem)) return 1;
 
-    auto m = static_cast<ConicMemory*>(mem);
-
-    // Problem has not been solved at this point
-    m->success = false;
-    m->unified_return_status = SOLVER_RET_UNKNOWN;
-    m->iter_count = -1;
-
     return 0;
   }
 
@@ -457,6 +450,22 @@ namespace casadi {
                           casadi_int*& iw, double*& w) const {
 
     auto m = static_cast<ConicMemory*>(mem);
+
+    casadi_qp_data<double>& d_qp = m->d_qp;
+    d_qp.h = arg[CONIC_H];
+    d_qp.g = arg[CONIC_G];
+    d_qp.a = arg[CONIC_A];
+    d_qp.lbx = arg[CONIC_LBX];
+    d_qp.ubx = arg[CONIC_UBX];
+    d_qp.uba = arg[CONIC_UBA];
+    d_qp.lba = arg[CONIC_LBA];
+    d_qp.x0 = arg[CONIC_X0];
+    d_qp.lam_x0 = arg[CONIC_LAM_X0];
+    d_qp.lam_a0 = arg[CONIC_LAM_A0];
+    d_qp.x = res[CONIC_X];
+    d_qp.lam_x = res[CONIC_LAM_X];
+    d_qp.lam_a = res[CONIC_LAM_A];
+    d_qp.f = res[CONIC_COST];
 
     // Problem has not been solved at this point
     m->success = false;
@@ -526,21 +535,9 @@ namespace casadi {
     if (inputs_check_) {
       check_inputs(arg[CONIC_LBX], arg[CONIC_UBX], arg[CONIC_LBA], arg[CONIC_UBA]);
     }
-    casadi_qp_data<double>& d_qp = m->d_qp;
-    d_qp.h = arg[CONIC_H];
-    d_qp.g = arg[CONIC_G];
-    d_qp.a = arg[CONIC_A];
-    d_qp.lbx = arg[CONIC_LBX];
-    d_qp.ubx = arg[CONIC_UBX];
-    d_qp.uba = arg[CONIC_UBA];
-    d_qp.lba = arg[CONIC_LBA];
-    d_qp.x0 = arg[CONIC_X0];
-    d_qp.lam_x0 = arg[CONIC_LAM_X0];
-    d_qp.lam_a0 = arg[CONIC_LAM_A0];
-    d_qp.x = res[CONIC_X];
-    d_qp.lam_x = res[CONIC_LAM_X];
-    d_qp.lam_a = res[CONIC_LAM_A];
-    d_qp.f = res[CONIC_COST];
+
+    setup(mem, arg, res, iw, w);
+
     int ret = solve(arg, res, iw, w, mem);
 
     if (error_on_fail_ && !m->success)
