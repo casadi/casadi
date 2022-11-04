@@ -80,8 +80,6 @@ class CasADiProblem : public BoxConstrProblem<Conf> {
     /// @see @ref TypeErasedProblem::provides_eval_hess_L
     bool provides_eval_hess_L() const;
 
-    using BoxConstrProblem<config_t>::check;
-
   private:
     using Functions = casadi_loader::CasADiFunctionsWithParam<Conf>;
     std::unique_ptr<Functions> impl;
