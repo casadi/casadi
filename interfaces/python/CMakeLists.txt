@@ -1,4 +1,6 @@
 set(PY_FULL_VERSION ${PROJECT_VERSION}${PY_VERSION_SUFFIX})
+set(PY_BUILD_CMAKE_MODULE_NAME "alpaqa" CACHE STRING "Python module name")
+set(PY_BUILD_CMAKE_PACKAGE_NAME "alpaqa" CACHE STRING "Python package name")
 
 # Make sure that the Python and CMake versions match
 if (DEFINED PY_BUILD_CMAKE_PACKAGE_VERSION)
