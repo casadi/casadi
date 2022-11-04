@@ -504,6 +504,7 @@ namespace casadi {
       AUX_FINITE_DIFF,
       AUX_QR,
       AUX_QP,
+      AUX_QRQP,
       AUX_NLP,
       AUX_SQPMETHOD,
       AUX_FEASIBLESQPMETHOD,

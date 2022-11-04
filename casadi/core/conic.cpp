@@ -429,6 +429,13 @@ namespace casadi {
     casadi_assert(np_==0 || psd_support(),
       "Selected solver does not support psd constraints.");
 
+    set_qp_prob();
+
+    // Allocate memory
+    casadi_int sz_w, sz_iw;
+    casadi_qp_work(&p_qp_, &sz_iw, &sz_w);
+    alloc_iw(sz_iw, true);
+    alloc_w(sz_w, true);
   }
 
   /** \brief Initalize memory block */
@@ -519,6 +526,21 @@ namespace casadi {
     if (inputs_check_) {
       check_inputs(arg[CONIC_LBX], arg[CONIC_UBX], arg[CONIC_LBA], arg[CONIC_UBA]);
     }
+    casadi_qp_data<double>& d_qp = m->d_qp;
+    d_qp.h = arg[CONIC_H];
+    d_qp.g = arg[CONIC_G];
+    d_qp.a = arg[CONIC_A];
+    d_qp.lbx = arg[CONIC_LBX];
+    d_qp.ubx = arg[CONIC_UBX];
+    d_qp.uba = arg[CONIC_UBA];
+    d_qp.lba = arg[CONIC_LBA];
+    d_qp.x0 = arg[CONIC_X0];
+    d_qp.lam_x0 = arg[CONIC_LAM_X0];
+    d_qp.lam_a0 = arg[CONIC_LAM_A0];
+    d_qp.x = res[CONIC_X];
+    d_qp.lam_x = res[CONIC_LAM_X];
+    d_qp.lam_a = res[CONIC_LAM_A];
+    d_qp.f = res[CONIC_COST];
     int ret = solve(arg, res, iw, w, mem);
 
     if (error_on_fail_ && !m->success)
@@ -734,11 +756,42 @@ namespace casadi {
     }
     s.unpack("Conic::H", H_);
     s.unpack("Conic::A", A_);
+    set_qp_prob();
     s.unpack("Conic::Q", Q_);
     s.unpack("Conic::P", P_);
     s.unpack("Conic::nx", nx_);
     s.unpack("Conic::na", na_);
     s.unpack("Conic::np", np_);
+  }
+
+  void Conic::set_qp_prob() {
+    p_qp_.sp_a = A_;
+    p_qp_.sp_h = H_;
+    casadi_qp_setup(&p_qp_);
+  }
+
+  void Conic::qp_codegen_body(CodeGenerator& g) const {
+    g.add_auxiliary(CodeGenerator::AUX_QP);
+    g.local("d_qp", "struct casadi_qp_data");
+    g.local("p_qp", "struct casadi_qp_prob");
+
+    g << "d_qp.prob = &p_qp;\n";
+    g << "p_qp.sp_a = " << g.sparsity(A_) << ";\n";
+    g << "p_qp.sp_h = " << g.sparsity(H_) << ";\n";
+    g << "casadi_qp_setup(&p_qp);\n";
+    g << "casadi_qp_init(&d_qp, &iw, &w);\n";
+
+
+    g << "d_qp.h = arg[" << CONIC_H << "];\n";
+    g << "d_qp.g = arg[" << CONIC_G << "];\n";
+    g << "d_qp.a = arg[" << CONIC_A << "];\n";
+    g << "d_qp.lbx = arg[" << CONIC_LBX << "];\n";
+    g << "d_qp.ubx = arg[" << CONIC_UBX << "];\n";
+    g << "d_qp.lba = arg[" << CONIC_LBA << "];\n";
+    g << "d_qp.uba = arg[" << CONIC_UBA << "];\n";
+    g << "d_qp.x0 = arg[" << CONIC_X0 << "];\n";
+    g << "d_qp.lam_x0 = arg[" << CONIC_LAM_X0 << "];\n";
+    g << "d_qp.lam_a0 = arg[" << CONIC_LAM_A0 << "];\n";
   }
 
 } // namespace casadi

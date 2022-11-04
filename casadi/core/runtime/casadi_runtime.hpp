@@ -289,6 +289,7 @@ namespace casadi {
   #include "casadi_ldl.hpp"
   #include "casadi_qr.hpp"
   #include "casadi_qp.hpp"
+  #include "casadi_qrqp.hpp"
   #include "casadi_kkt.hpp"
   #include "casadi_ipqp.hpp"
   #include "casadi_nlp.hpp"

@@ -1040,6 +1040,10 @@ namespace casadi {
       this->auxiliaries << sanitize_source(casadi_lsqr_str, inst);
       break;
     case AUX_QP:
+      this->auxiliaries << sanitize_source(casadi_qp_str, inst);
+      break;
+    case AUX_QRQP:
+      add_auxiliary(AUX_QP);
       add_auxiliary(AUX_COPY);
       add_auxiliary(AUX_QR);
       add_auxiliary(AUX_MAX);
@@ -1056,7 +1060,7 @@ namespace casadi {
       add_include("stdio.h");
       add_include("math.h");
 
-      this->auxiliaries << sanitize_source(casadi_qp_str, inst);
+      this->auxiliaries << sanitize_source(casadi_qrqp_str, inst);
       break;
     case AUX_NLP:
       this->auxiliaries << sanitize_source(casadi_nlp_str, inst);

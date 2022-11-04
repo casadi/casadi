@@ -54,6 +54,7 @@ set(RUNTIME_SRC
   casadi_ldl.hpp
   casadi_qr.hpp
   casadi_qp.hpp
+  casadi_qrqp.hpp
   casadi_kkt.hpp
   casadi_ipqp.hpp
   casadi_nlp.hpp
