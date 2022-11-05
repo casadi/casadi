@@ -4,9 +4,9 @@ readme = "python/README.rst"
 requires-python = ">=3.7"
 license = { "file" = "LICENSE" }
 authors = [{ "name" = "Pieter P", "email" = "pieter.p.dev@outlook.com" }]
-keywords = ["addition", "subtraction", "pybind11"]
+keywords = ["optimization", "panoc", "alm", "mpc"]
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
     "Programming Language :: Python :: 3",
@@ -39,7 +39,7 @@ docs = [
 alpaqa = "alpaqa.__main__:main"
 
 [build-system]
-requires = ["py-build-cmake~=0.0.10", "pybind11", "pybind11-stubgen"]
+requires = ["py-build-cmake~=0.0.15", "pybind11", "pybind11-stubgen"]
 build-backend = "py_build_cmake.build"
 
 [tool.py-build-cmake.module]
@@ -65,6 +65,7 @@ install_components = ["python_modules"]
 "ALPAQA_WITH_QUAD_PRECISION:BOOL" = "Off"
 "ALPAQA_WITH_UBSAN_DEBUG:BOOL" = "Off"
 "ALPAQA_WITH_ASAN_DEBUG:BOOL" = "Off"
+"ALPAQA_INCLUDE_DEBUG_INFO:BOOL" = "Off"
 
 [tool.py-build-cmake.linux.cmake]
 config = ["Debug", "Release"]
