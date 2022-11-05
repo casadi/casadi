@@ -582,6 +582,7 @@ int Feasiblesqpmethod::feasibility_iterations(void* mem, double tr_rad) const{
 //   lam_p_x_tmp = self.lam_p_x_k
   casadi_copy(d->dlam, nx_ + ng_, d->dlam_feas);
 
+  // Why do we do this at the moment??
   casadi_copy(d->dlam, nx_+ng_, d->z_tmp);
   casadi_axpy(nx_+ng_, -1.0, d_nlp->lam, d->z_tmp);
 
@@ -723,11 +724,15 @@ int Feasiblesqpmethod::feasibility_iterations(void* mem, double tr_rad) const{
     // casadi_copy(d->dx, nx_, d->x_tmp);
 
     //prepare step_inf_norm
+    // DM(std::vector<double>(d->dx_feas,d->dx_feas+nx_)).to_file("dx_input.mtx");
     // DM(std::vector<double>(d->gf_feas,d->gf_feas+nx_)).to_file("gf_feas.mtx");
     // DM(std::vector<double>(d->lbdz_feas, d->lbdz_feas+nx_)).to_file("lb_var_correction.mtx");
     // DM(std::vector<double>(d->ubdz_feas, d->ubdz_feas+nx_)).to_file("ub_var_correction.mtx");
     // DM(std::vector<double>(d->lbdz_feas+nx_, d->lbdz_feas+nx_+ng_)).to_file("lba_correction.mtx");
     // DM(std::vector<double>(d->ubdz_feas+nx_, d->ubdz_feas+nx_+ng_)).to_file("uba_correction.mtx");
+    // DM(std::vector<double>(d->dlam_feas, d->dlam_feas+nx_)).to_file("lam_x.mtx");
+    // DM(std::vector<double>(d->dlam_feas+nx_, d->dlam_feas+nx_+ng_)).to_file("lam_g.mtx");
+
     if (use_sqp_){
       int ret = solve_QP(m, d->Bk, d->gf_feas, d->lbdz_feas, d->ubdz_feas, d->Jk, d->dx_feas, d->dlam_feas, 0);
     } else {
@@ -1134,6 +1139,9 @@ int Feasiblesqpmethod::solve(void* mem) const {
       DM(std::vector<double>(d->ubdz+nx_, d->ubdz+nx_+ng_)).to_file("uba.mtx");
       // DM(std::vector<double>(d->Bk, d->Bk+Hsp_.nnz())).to_file("Bk.mtx");
       DM(std::vector<double>(d->Jk, d->Jk+Asp_.nnz())).to_file("Jk.mtx");
+      DM(std::vector<double>(d->dlam, d->dlam+nx_)).to_file("lam_x.mtx");
+      DM(std::vector<double>(d->dx, d->dx+nx_)).to_file("dx_input.mtx");
+      DM(std::vector<double>(d->dlam+nx_, d->dlam+nx_+ng_)).to_file("lam_g.mtx");
 
       int ret = 0;
       // Solve the QP
@@ -1257,9 +1265,9 @@ int Feasiblesqpmethod::solve(void* mem) const {
     m->res[CONIC_X] = x_opt;
     m->res[CONIC_LAM_X] = dlam;
     m->res[CONIC_LAM_A] = dlam + nx_;
-    // double obj;
-    // m->res[CONIC_COST] = &obj;
-    m->res[CONIC_COST] = nullptr;
+    double obj;
+    m->res[CONIC_COST] = &obj;
+    // m->res[CONIC_COST] = nullptr;
 
 
     // Solve the QP
@@ -1292,9 +1300,9 @@ int Feasiblesqpmethod::solve(void* mem) const {
     m->res[CONIC_X] = x_opt;
     m->res[CONIC_LAM_X] = dlam;
     m->res[CONIC_LAM_A] = dlam + nx_;
-    // double obj;
-    // m->res[CONIC_COST] = &obj;
-    m->res[CONIC_COST] = nullptr;
+    double obj;
+    m->res[CONIC_COST] = &obj;
+    // m->res[CONIC_COST] = nullptr;
 
 
     // Solve the QP
