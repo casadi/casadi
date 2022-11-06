@@ -781,10 +781,10 @@ int Feasiblesqpmethod::feasibility_iterations(void* mem, double tr_rad) const{
     kappa = step_inf_norm/prev_step_inf_norm;
     //MISSING: as_exac:
 
-    // DM(std::vector<double>(d_nlp->z, d_nlp->z+nx_)).to_file("z.mtx");
-    // DM(std::vector<double>(d->z_feas,d->z_feas+nx_)).to_file("z_feas.mtx");
+    DM(std::vector<double>(d_nlp->z, d_nlp->z+nx_)).to_file("x_k.mtx");
+    DM(std::vector<double>(d->z_feas,d->z_feas+nx_)).to_file("x_tmp.mtx");
     // DM(std::vector<double>(d->dx_feas,d->dx_feas+nx_)).to_file("dx_feas"+suffix+".mtx");
-    // DM(std::vector<double>(d->dx,d->dx+nx_)).to_file("dx.mtx");
+    DM(std::vector<double>(d->dx,d->dx+nx_)).to_file("p_k.mtx");
 
 
     casadi_copy(d->dx, nx_, d->z_tmp);
