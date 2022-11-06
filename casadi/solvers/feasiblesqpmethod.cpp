@@ -1127,7 +1127,7 @@ int Feasiblesqpmethod::solve(void* mem) const {
 
       // Initial guess
       casadi_copy(d_nlp->lam, nx_+ng_, d->dlam);
-      casadi_clear(d->dx, nx_);
+      //casadi_clear(d->dx, nx_);
 
       // Increase counter
       m->iter_count++;
@@ -1153,7 +1153,7 @@ int Feasiblesqpmethod::solve(void* mem) const {
                  d->dx, d->dlam, 0);
       }
 
-      DM(std::vector<double>(d->dx,d->dx+nx_)).to_file("dx.mtx");
+      DM(std::vector<double>(d->dx,d->dx+nx_)).to_file("dx_out.mtx");
       // Eval quadratic model and check for convergence
       m_k = eval_m_k(mem);
       if (fabs(m_k) < optim_tol_) {
