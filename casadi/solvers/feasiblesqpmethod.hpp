@@ -112,6 +112,10 @@ namespace casadi {
     // function to get feasible iterate
     int feasibility_iterations(void* mem, double tr_rad) const;
 
+    void anderson_acc_step_update(void* mem) const;
+
+    void anderson_acc_memory_update(void* mem, double* vec) const;
+
     // Solve the NLP
     int solve(void* mem) const override;
 
@@ -130,6 +134,9 @@ namespace casadi {
     /// Exact Hessian?
     bool use_sqp_;
 
+    /// Use Anderson Acceleration
+    bool use_anderson_;
+
     /// Maximum block size of Hessian
     casadi_int block_size_ = 0;
 
@@ -138,6 +145,9 @@ namespace casadi {
 
     /// Memory size of L-BFGS method
     casadi_int lbfgs_memory_;
+
+    // Memory size of Anderson acceleration
+    casadi_int sz_anderson_memory_;
 
     /// Tolerance of primal and dual infeasibility
     double tol_pr_, tol_du_;

@@ -199,6 +199,13 @@ namespace casadi {
       {"max_inner_iter",
        {OT_DOUBLE,
         "Maximum number of inner iterations."}},
+      // From here Anderson Acceleration
+      {"use_anderson",
+       {OT_BOOL,
+        "Use Anderson Acceleration. (default false)"}},
+      {"anderson_memory_size",
+       {OT_INT,
+        "Anderson memory. If Anderson is used default is 1, else default is 0."}},
      }
   };
 
@@ -242,6 +249,8 @@ namespace casadi {
     contraction_acceptance_value_ = 0.5;
     watchdog_ = 5;
     max_inner_iter_ = 50;
+    use_anderson_ = false;
+    sz_anderson_memory_ = 0;
 
 
     std::string convexify_strategy = "none";
@@ -254,20 +263,13 @@ namespace casadi {
         max_iter_ = op.second;
       } else if (op.first=="min_iter") {
         min_iter_ = op.second;
-      } 
-      // else if (op.first=="max_iter_ls") {
-      //   max_iter_ls_ = op.second;
-      // } 
-      // else if (op.first=="c1") {
-      //   c1_ = op.second;
-      // } 
-      // else if (op.first=="beta") {
-      //   beta_ = op.second;
-      // } 
-      // else if (op.first=="merit_memory") {
-      //   merit_memsize_ = op.second;
-      // } 
-      else if (op.first=="lbfgs_memory") {
+
+      } else if (op.first=="use_anderson") {
+        use_anderson_ = op.second;
+      } else if (op.first=="anderson_memory") {
+        sz_anderson_memory_ = op.second;
+
+      } else if (op.first=="lbfgs_memory") {
         lbfgs_memory_ = op.second;
       } else if (op.first=="tol_pr") {
         tol_pr_ = op.second;
@@ -423,7 +425,6 @@ namespace casadi {
         Hsp_ = Sparsity::dense(nx_, nx_);
       }
     }
-    
 
     casadi_assert(!qpsol_plugin.empty(), "'qpsol' option has not been set");
     qpsol_options["dump_in"] = true;
@@ -478,7 +479,7 @@ namespace casadi {
     set_feasiblesqpmethod_prob();
     // Allocate memory
     casadi_int sz_w, sz_iw;
-    casadi_feasiblesqpmethod_work(&p_, &sz_iw, &sz_w);
+    casadi_feasiblesqpmethod_work(&p_, &sz_iw, &sz_w, sz_anderson_memory_);
     alloc_iw(sz_iw, true);
     alloc_w(sz_w, true);
     if (convexify_) {
@@ -505,7 +506,7 @@ namespace casadi {
     Nlpsol::set_work(mem, arg, res, iw, w);
 
     m->d.prob = &p_;
-    casadi_feasiblesqpmethod_init(&m->d, &iw, &w);
+    casadi_feasiblesqpmethod_init(&m->d, &iw, &w, sz_anderson_memory_);
 
     m->iter_count = -1;
   }
@@ -517,7 +518,6 @@ namespace casadi {
     if (convexify_) m->add_stat("convexify");
     m->add_stat("BFGS");
     m->add_stat("QP");
-    // m->add_stat("linesearch");
     return 0;
   }
 
@@ -567,10 +567,33 @@ int Feasiblesqpmethod::step_update(void* mem, double tr_ratio) const {
   }
 }
 
+
+/*
+Do the Anderson step update here
+*/
+void Feasiblesqpmethod::anderson_acc_step_update(void* mem) const {
+
+}
+
+/* 
+Store a new vector in the Anderson memory
+*/
+void Feasiblesqpmethod::anderson_acc_memory_update(void* mem, double* vec) const {
+  auto m = static_cast<FeasiblesqpmethodMemory*>(mem);
+  auto d = &m->d;
+  
+  if (sz_anderson_memory_ == 1){
+    casadi_copy(vec, nx_, d->anderson_memory);
+  } else {
+    print("This is not implemented yet!!!");
+  }
+}
+
 /*
 Calculates the feasibility_iterations. If iterations are accepted return 0.
 If iterations are aborted return -1.
 */
+
 int Feasiblesqpmethod::feasibility_iterations(void* mem, double tr_rad) const{
   auto m = static_cast<FeasiblesqpmethodMemory*>(mem);
   auto d_nlp = &m->d_nlp;
@@ -578,6 +601,7 @@ int Feasiblesqpmethod::feasibility_iterations(void* mem, double tr_rad) const{
 
   // p_tmp = p
   casadi_copy(d->dx, nx_, d->dx_feas);
+
 //   lam_p_g_tmp = self.lam_p_g_k
 //   lam_p_x_tmp = self.lam_p_x_k
   casadi_copy(d->dlam, nx_ + ng_, d->dlam_feas);
@@ -1249,7 +1273,8 @@ int Feasiblesqpmethod::solve(void* mem) const {
     ScopedTiming tic(m->fstats.at("QP"));
     // Inputs
     fill_n(m->arg, qpsol_.n_in(), nullptr);
-    m->arg[CONIC_H] = nullptr;
+    // double lol;
+    // m->arg[CONIC_H] = &lol;
     m->arg[CONIC_G] = g;
     m->arg[CONIC_X0] = x_opt;
     m->arg[CONIC_LAM_X0] = dlam;
