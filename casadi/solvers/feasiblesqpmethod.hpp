@@ -114,7 +114,7 @@ namespace casadi {
 
     void anderson_acc_step_update(void* mem) const;
 
-    void anderson_acc_memory_update(void* mem, double* vec) const;
+    void anderson_acc_init_memory(void* mem, double* step, double* x) const;
 
     // Solve the NLP
     int solve(void* mem) const override;

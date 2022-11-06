@@ -203,7 +203,7 @@ namespace casadi {
       {"use_anderson",
        {OT_BOOL,
         "Use Anderson Acceleration. (default false)"}},
-      {"anderson_memory_size",
+      {"anderson_memory",
        {OT_INT,
         "Anderson memory. If Anderson is used default is 1, else default is 0."}},
      }
@@ -569,21 +569,48 @@ int Feasiblesqpmethod::step_update(void* mem, double tr_ratio) const {
 
 
 /*
-Do the Anderson step update here
+Do the Anderson step update here and also update the memory here
 */
 void Feasiblesqpmethod::anderson_acc_step_update(void* mem) const {
+  auto m = static_cast<FeasiblesqpmethodMemory*>(mem);
+  auto d = &m->d;
 
+  if (sz_anderson_memory_ == 1){
+    // Calculte gamma
+    casadi_copy(d->dx_feas, nx_, d->z_tmp);
+    casadi_axpy(nx_, -1.0, d->anderson_memory_step, d->z_tmp);
+    double gamma = casadi_dot(nx_, d->dx_feas, d->z_tmp) / casadi_dot(nx_, d->z_tmp, d->z_tmp);
+
+    // Prepare the step update
+    casadi_copy(d->z_feas, nx_, d->z_tmp);
+    casadi_axpy(nx_, -1.0, d->anderson_memory_x, d->z_tmp);
+    casadi_axpy(nx_, 1.0, d->dx_feas, d->z_tmp);
+    casadi_axpy(nx_, -1.0, d->anderson_memory_step, d->z_tmp);
+
+    // Update the Anderson memory
+    casadi_copy(d->dx_feas, nx_, d->anderson_memory_step);
+    casadi_copy(d->z_feas, nx_, d->anderson_memory_x);
+
+    // Do the step update
+    double beta = 1.0;
+    casadi_axpy(nx_, beta, d->dx_feas, d->z_feas);
+    casadi_axpy(nx_, -gamma, d->z_tmp, d->z_feas);
+
+  } else {
+    print("This is not implemented yet!!!");
+  }
 }
 
 /* 
-Store a new vector in the Anderson memory
+Initialize the memory of the Anderson acceleration
 */
-void Feasiblesqpmethod::anderson_acc_memory_update(void* mem, double* vec) const {
+void Feasiblesqpmethod::anderson_acc_init_memory(void* mem, double* step, double* x) const {
   auto m = static_cast<FeasiblesqpmethodMemory*>(mem);
   auto d = &m->d;
   
   if (sz_anderson_memory_ == 1){
-    casadi_copy(vec, nx_, d->anderson_memory);
+    casadi_copy(step, nx_, d->anderson_memory_step);
+    casadi_copy(x, nx_, d->anderson_memory_x);
   } else {
     print("This is not implemented yet!!!");
   }
@@ -619,6 +646,10 @@ int Feasiblesqpmethod::feasibility_iterations(void* mem, double tr_rad) const{
   // self.x_tmp = self.x_k + p_tmp
   casadi_copy(d_nlp->z, nx_+ng_, d->z_feas);
   casadi_axpy(nx_, 1., d->dx_feas, d->z_feas);
+
+  if (use_anderson_){
+    anderson_acc_init_memory(mem, d->dx_feas, d->z_feas);
+  }
 
   // Evaluate g
   //   self.g_tmp = self.__eval_g(self.x_tmp)
@@ -786,7 +817,11 @@ int Feasiblesqpmethod::feasibility_iterations(void* mem, double tr_rad) const{
     //       self.x_tmp = self.x_tmp + p_tmp
     //       self.g_tmp = self.__eval_g(self.x_tmp)  # x_tmp = x_{tmp-1} + p_tmp
     
-    casadi_axpy(nx_, 1., d->dx_feas, d->z_feas);
+    if (use_anderson_){
+      anderson_acc_step_update(mem);
+    } else {
+      casadi_axpy(nx_, 1., d->dx_feas, d->z_feas);
+    }
 
     // Evaluate g
     m->arg[0] = d->z_feas;
