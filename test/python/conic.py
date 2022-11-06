@@ -1001,6 +1001,9 @@ class ConicTests(casadiTestCase):
     sol_ref = solver_ref(x0=w0, lbx=lbw, ubx=ubw, lbg=lbg, ubg=ubg)
     sol = solver(x0=w0, lbx=lbw, ubx=ubw, lbg=lbg, ubg=ubg)
 
+    self.check_codegen(solver,dict(x0=w0, lbx=lbw, ubx=ubw, lbg=lbg, ubg=ubg),std="c99",extralibs=["hpipm","blasfeo","m"])
+    
+
     self.checkarray(sol_ref["x"], sol["x"])
     self.checkarray(sol_ref["lam_g"], sol["lam_g"],digits=8)
     self.checkarray(sol_ref["lam_x"], sol["lam_x"],digits=8)
@@ -1009,6 +1012,7 @@ class ConicTests(casadiTestCase):
     solver = nlpsol('solver', 'sqpmethod', prob,{"qpsol": "hpipm", "qpsol_options": options})
     sol = solver(x0=w0, lbx=lbw, ubx=ubw, lbg=lbg, ubg=ubg)
 
+    
     self.checkarray(sol_ref["x"], sol["x"])
     self.checkarray(sol_ref["lam_g"], sol["lam_g"],digits=8)
     self.checkarray(sol_ref["lam_x"], sol["lam_x"],digits=8)
@@ -1141,6 +1145,8 @@ class ConicTests(casadiTestCase):
     self.checkarray(sol_ref["lam_a"], sol["lam_a"],digits=8)
     self.checkarray(sol_ref["lam_x"], sol["lam_x"],digits=8)
 
+    self.check_codegen(solver,dict(a=A,h=H,lba=lbg,uba=ubg,g=g,lbx=lbx,ubx=ubx),std="c99",extralibs=["hpipm","blasfeo","m"])
+    
     solver = conic('solver', 'hpipm', {"a": A.sparsity(), "h": H.sparsity()},options)
     sol = solver(a=A,h=H,lba=lbg,uba=ubg,g=g,lbx=lbx,ubx=ubx,x0=sol["x"],lam_a0=sol["lam_a"],lam_x0=sol["lam_x"])
 
@@ -1148,7 +1154,16 @@ class ConicTests(casadiTestCase):
     self.checkarray(sol_ref["lam_a"], sol["lam_a"],digits=8)
     self.checkarray(sol_ref["lam_x"], sol["lam_x"],digits=8)
 
+    # Solve again
+    sol2 = solver(a=A,h=H,lba=lbg,uba=ubg,g=g,lbx=lbx,ubx=ubx,x0=sol["x"],lam_a0=sol["lam_a"],lam_x0=sol["lam_x"])
 
+    self.checkarray(sol["x"], sol2["x"])
+    
+    
+    # extralibs=extralibs,extra_options=aux_options["codegen"]   
+    print("codegen starts here")   
+    self.check_codegen(solver,dict(a=A,h=H,lba=lbg,uba=ubg,g=g,lbx=lbx,ubx=ubx,x0=sol["x"],lam_a0=sol["lam_a"],lam_x0=sol["lam_x"]),std="c99",extralibs=["hpipm","blasfeo","m"])
+        
   @requires_nlpsol("ipopt")
   def test_SOCP(self):
 
@@ -1243,6 +1258,8 @@ class ConicTests(casadiTestCase):
       res = solver(lbx=vertcat(-inf,-inf,-inf,-inf,1))
 
       self.checkarray(res["x"][:-1],x0,conic,digits=4)
+      
+      self.checkcodegen
 
   def test_no_success(self):
 

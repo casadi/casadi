@@ -831,6 +831,10 @@ if(WITH_BLASFEO)
       INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include"
       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/libblasfeo${CMAKE_STATIC_LIBRARY_SUFFIX}"
     )
+    file(GLOB BLASFEO_HEADERS "${CMAKE_BINARY_DIR}/external_projects/include/blasfeo*")
+    install(FILES
+      ${BLASFEO_HEADERS}
+      DESTINATION "${INCLUDE_PREFIX}")
   else()
     #add_library(lapack INTERFACE)
     #target_link_libraries(lapack INTERFACE ${LAPACK_LIBRARIES})
@@ -855,6 +859,10 @@ if(WITH_HPIPM)
     set_target_properties(hpipm PROPERTIES
        IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/libhpipm${CMAKE_STATIC_LIBRARY_SUFFIX}"
     )
+    file(GLOB HPIPM_HEADERS "${CMAKE_BINARY_DIR}/external_projects/include/hpipm*")
+    install(FILES
+      ${HPIPM_HEADERS}
+      DESTINATION "${INCLUDE_PREFIX}")
   else()
     #add_library(lapack INTERFACE)
     #target_link_libraries(lapack INTERFACE ${LAPACK_LIBRARIES})

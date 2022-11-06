@@ -108,6 +108,11 @@ namespace casadi {
         \identifier{rz} */
     std::string constant(const std::vector<casadi_int>& v);
 
+    /** \brief Represent an array constant; adding it when new */
+    std::string constant(const std::vector<int>& v) {
+        return constant(vector_static_cast<casadi_int>(v));
+    }
+
     /** \brief Represent an array constant; adding it when new
 
         \identifier{s0} */

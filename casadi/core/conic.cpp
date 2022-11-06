@@ -789,6 +789,11 @@ namespace casadi {
     g << "d_qp.x0 = arg[" << CONIC_X0 << "];\n";
     g << "d_qp.lam_x0 = arg[" << CONIC_LAM_X0 << "];\n";
     g << "d_qp.lam_a0 = arg[" << CONIC_LAM_A0 << "];\n";
+
+    g << "d_qp.f = res[" << CONIC_COST << "];\n";
+    g << "d_qp.x = res[" << CONIC_X << "];\n";
+    g << "d_qp.lam_x = res[" << CONIC_LAM_X << "];\n";
+    g << "d_qp.lam_a = res[" << CONIC_LAM_A << "];\n";
   }
 
 } // namespace casadi

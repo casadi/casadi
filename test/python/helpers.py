@@ -654,7 +654,7 @@ class casadiTestCase(unittest.TestCase):
         with open(F.name()+"_out.txt","w") as stdout:
           with open(F.name()+"_in.txt","r") as stdin:
             commands = exename+" "+F.name()
-            print(commands)
+            print(commands+" < " + F.name()+"_in.txt")
             p = subprocess.Popen(commands,shell=True,stdin=stdin,stdout=stdout)
             out = p.communicate()
         assert p.returncode==0

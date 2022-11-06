@@ -26,6 +26,8 @@
 #include <numeric>
 #include <cstring>
 
+#include "hpipm_runtime_str.h"
+
 using namespace std;
 namespace casadi {
 
@@ -242,7 +244,6 @@ namespace casadi {
       }
       nxs_.push_back(pivot-start_pivot+1);
 
-      uout() << nx << nu << ng << std::endl;
       // Correction for k==0
       nxs_[0] = A_skyline[0];
       nus_[0] = 0;
@@ -469,6 +470,147 @@ namespace casadi {
 
   }
 
+  std::vector<casadi_int> hpipm_blocks_pack(const std::vector<casadi_hpipm_block>& blocks) {
+    size_t N = blocks.size();
+    std::vector<casadi_int> ret(4*N);
+    casadi_int* r = get_ptr(ret);
+    for (casadi_int i=0;i<N;++i) {
+      *r++ = blocks[i].offset_r;
+      *r++ = blocks[i].offset_c;
+      *r++ = blocks[i].rows;
+      *r++ = blocks[i].cols;
+    }
+    return ret;
+  }
+
+
+  void codegen_unpack_block(CodeGenerator& g, const std::string& name, const std::vector<casadi_hpipm_block>& blocks) {
+      std::string n = "block_" + name + "[" + str(blocks.size()) + "]";
+      g.local(n, "static struct casadi_hpipm_block");
+      g << "p." << name << " = block_" + name + ";\n";
+      g << "casadi_hpipm_unpack_blocks(" << blocks.size()
+      << ", p." << name
+      << ", " << g.constant(hpipm_blocks_pack(blocks)) << ");\n";
+  }
+
+  void codegen_local(CodeGenerator& g, const std::string& name, const std::vector<int>& v) {
+    std::string n = name + "[]";
+    g.local(n, "static const int");
+    std::stringstream init;
+    init << "{";
+    for (casadi_int i=0;i<v.size();++i) {
+      init << v[i];
+      if (i<v.size()-1) init << ", ";
+    }
+    init << "}";
+    g.init_local(n, init.str());
+  }
+
+  void HpipmInterface::set_hpipm_prob(CodeGenerator& g) const {
+    g << "p.qp = &p_qp;\n";
+    codegen_local(g, "nx", nxs_);
+    codegen_local(g, "nu", nus_);
+    codegen_local(g, "ng", ngs_);
+    codegen_local(g, "zeros", zeros_);
+    g << "p.nx = nx;\n";
+    g << "p.nu = nu;\n";
+    g << "p.ng = ng;\n";
+
+    g << "p.nbx = nx;\n";
+    g << "p.nbu = nu;\n";
+    g << "p.ns = zeros;\n";
+    g << "p.nsbx = zeros;\n";
+    g << "p.nsbu = zeros;\n";
+    g << "p.nsg = zeros;\n";
+
+    g << "p.sp_x = " << g.sparsity(sparsity_in(CONIC_X0)) << ";\n";
+    g << "p.sp_ba = " << g.sparsity(sparsity_in(CONIC_LBA)) << ";\n";
+
+    g << "p.Asp = " << g.sparsity(Asp_) << ";\n";
+    g << "p.Bsp = " << g.sparsity(Bsp_) << ";\n";
+    g << "p.Csp = " << g.sparsity(Csp_) << ";\n";
+    g << "p.Dsp = " << g.sparsity(Dsp_) << ";\n";
+
+    g << "p.Rsp = " << g.sparsity(Rsp_) << ";\n";
+    g << "p.Isp = " << g.sparsity(Isp_) << ";\n";
+    g << "p.Ssp = " << g.sparsity(Ssp_) << ";\n";
+    g << "p.Qsp = " << g.sparsity(Qsp_) << ";\n";
+
+    g << "p.bsp = " << g.sparsity(bsp_) << ";\n";
+    g << "p.xsp = " << g.sparsity(xsp_) << ";\n";
+    g << "p.usp = " << g.sparsity(usp_) << ";\n";
+
+    g << "p.pisp = " << g.sparsity(pisp_) << ";\n";
+
+    g << "p.theirs_xsp = " << g.sparsity(theirs_xsp_) << ";\n";
+    g << "p.theirs_usp = " << g.sparsity(theirs_usp_) << ";\n";
+    g << "p.theirs_Xsp = " << g.sparsity(theirs_Xsp_) << ";\n";
+    g << "p.theirs_Usp = " << g.sparsity(theirs_Usp_) << ";\n";
+
+    g << "p.lamg_gapsp = " << g.sparsity(lamg_gapsp_) << ";\n";
+    g << "p.lugsp = " << g.sparsity(lugsp_) << ";\n";
+
+    g << "p.N = " << N_ << ";\n";
+
+    g << "p.hpipm_options.mu0 = " << hpipm_options_.mu0 << ";\n";
+    g << "p.hpipm_options.alpha_min = " << hpipm_options_.alpha_min << ";\n";
+    g << "p.hpipm_options.res_g_max = " << hpipm_options_.res_g_max << ";\n";
+    g << "p.hpipm_options.res_b_max = " << hpipm_options_.res_b_max << ";\n";
+    g << "p.hpipm_options.res_d_max = " << hpipm_options_.res_d_max << ";\n";
+    g << "p.hpipm_options.res_m_max = " << hpipm_options_.res_m_max << ";\n";
+    g << "p.hpipm_options.reg_prim = " << hpipm_options_.reg_prim << ";\n";
+    g << "p.hpipm_options.lam_min = " << hpipm_options_.lam_min << ";\n";
+    g << "p.hpipm_options.t_min = " << hpipm_options_.t_min << ";\n";
+    g << "p.hpipm_options.tau_min = " << hpipm_options_.tau_min << ";\n";
+    g << "p.hpipm_options.iter_max = " << hpipm_options_.iter_max << ";\n";
+    g << "p.hpipm_options.stat_max = " << hpipm_options_.stat_max << ";\n";
+    g << "p.hpipm_options.pred_corr = " << hpipm_options_.pred_corr << ";\n";
+    g << "p.hpipm_options.cond_pred_corr = " << hpipm_options_.cond_pred_corr << ";\n";
+    g << "p.hpipm_options.itref_pred_max = " << hpipm_options_.itref_pred_max << ";\n";
+    g << "p.hpipm_options.itref_corr_max = " << hpipm_options_.itref_corr_max << ";\n";
+    g << "p.hpipm_options.warm_start = " << hpipm_options_.warm_start << ";\n";
+    g << "p.hpipm_options.square_root_alg = " << hpipm_options_.square_root_alg << ";\n";
+    g << "p.hpipm_options.lq_fact = " << hpipm_options_.lq_fact << ";\n";
+    g << "p.hpipm_options.abs_form = " << hpipm_options_.abs_form << ";\n";
+    g << "p.hpipm_options.comp_dual_sol_eq = " << hpipm_options_.comp_dual_sol_eq << ";\n";
+    g << "p.hpipm_options.comp_res_exit = " << hpipm_options_.comp_res_exit << ";\n";
+    g << "p.hpipm_options.comp_res_pred = " << hpipm_options_.comp_res_pred << ";\n";
+    g << "p.hpipm_options.split_step = " << hpipm_options_.split_step << ";\n";
+    g << "p.hpipm_options.var_init_scheme = " << hpipm_options_.var_init_scheme << ";\n";
+    g << "p.hpipm_options.t_lam_min = " << hpipm_options_.t_lam_min << ";\n";
+    g << "p.hpipm_options.mode = " << hpipm_options_.mode << ";\n";
+    g << "p.hpipm_options.memsize = " << hpipm_options_.memsize << ";\n";
+
+
+    g << "p.inf = " << inf_ << ";\n";
+
+    codegen_unpack_block(g, "A", A_blocks);
+    codegen_unpack_block(g, "B", B_blocks);
+    codegen_unpack_block(g, "C", C_blocks);
+    codegen_unpack_block(g, "D", D_blocks);
+
+    codegen_unpack_block(g, "R", R_blocks);
+    codegen_unpack_block(g, "I", I_blocks);
+    codegen_unpack_block(g, "S", S_blocks);
+    codegen_unpack_block(g, "Q", Q_blocks);  
+  
+    codegen_unpack_block(g, "b", b_blocks);
+    codegen_unpack_block(g, "lug", lug_blocks);
+    codegen_unpack_block(g, "u", u_blocks);
+    codegen_unpack_block(g, "x", x_blocks);   
+
+
+    codegen_unpack_block(g, "lam_ul", lam_ul_blocks);
+    codegen_unpack_block(g, "lam_xl", lam_xl_blocks);
+    codegen_unpack_block(g, "lam_uu", lam_uu_blocks);
+    codegen_unpack_block(g, "lam_xu", lam_xu_blocks);
+    codegen_unpack_block(g, "lam_cl", lam_cl_blocks);
+    codegen_unpack_block(g, "lam_cu", lam_cu_blocks);
+
+    g << "casadi_hpipm_setup(&p);\n";
+
+  }
+
   void HpipmInterface::set_hpipm_prob() {
     p_.qp = &p_qp_;
     p_.nx  = get_ptr(nxs_);
@@ -585,6 +727,10 @@ namespace casadi {
 
     m->success = m->d.return_status==0;
 
+    uout() << "HPIPM finished after " << m->d.iter_count << " iterations." << std::endl;
+    uout() << "return status: " << m->d.return_status << std::endl;
+    uout() << "HPIPM residuals: " << m->d.res_stat << ", " << m->d.res_eq << ", " << m->d.res_ineq << ", " << m->d.res_comp << std::endl;
+
     return 0;
   }
 
@@ -634,6 +780,53 @@ namespace casadi {
     }
   }
 
+
+  void HpipmInterface::codegen_body(CodeGenerator& g) const {
+    qp_codegen_body(g);
+    g.add_auxiliary(CodeGenerator::AUX_PROJECT);
+    g.add_auxiliary(CodeGenerator::AUX_SCAL);
+    g.add_auxiliary(CodeGenerator::AUX_SPARSIFY);
+    g.add_auxiliary(CodeGenerator::AUX_MAX);
+    g.add_auxiliary(CodeGenerator::AUX_SPARSITY);
+    g.add_auxiliary(CodeGenerator::AUX_SUM);
+    g.add_auxiliary(CodeGenerator::AUX_FILL);
+    g.add_auxiliary(CodeGenerator::AUX_CLIP_MIN);
+    g.add_auxiliary(CodeGenerator::AUX_CLIP_MAX);
+    g.add_auxiliary(CodeGenerator::AUX_DOT);
+    g.add_auxiliary(CodeGenerator::AUX_BILIN);
+    g.add_include("blasfeo_d_aux_ext_dep.h");
+    g.add_include("hpipm_d_ocp_qp_ipm.h");
+    g.add_include("hpipm_d_ocp_qp_dim.h");
+    g.add_include("hpipm_d_ocp_qp.h");
+    g.add_include("hpipm_d_ocp_qp_sol.h");
+    g.add_include("hpipm_d_ocp_qp_utils.h");
+    g.add_include("stdlib.h");
+    g.add_include("string.h");
+
+    g.auxiliaries << g.sanitize_source(hpipm_runtime_str, {"casadi_real"});
+
+
+    g.local("d", "struct casadi_hpipm_data");
+    g.local("p", "struct casadi_hpipm_prob");
+
+    set_hpipm_prob(g);
+
+    // Setup data structure (corresponds to set_work)
+    g << "d.prob = &p;\n";
+    g << "d.qp = &d_qp;\n";
+    g << "casadi_hpipm_init(&d, &arg, &res, &iw, &w);\n";
+
+    g << "casadi_hpipm_solve(&d, arg, res, iw, w);\n";
+
+    g << "if (d.return_status!=0) {\n";
+    if (error_on_fail_) {
+      g << "return -1000;\n";
+    } else {
+      g << "return -1;\n";
+    }
+    g << "}\n";
+    g << "return 0;\n";
+  }
 
   HpipmInterface::HpipmInterface(DeserializingStream& s) : Conic(s) {
     s.version("HpipmInterface", 1);
