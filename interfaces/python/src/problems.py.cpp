@@ -306,6 +306,17 @@ void register_problems(py::module_ &m) {
             },
             "x"_a, "y"_a, "Σ"_a);
 
+    using TEControlProblem = alpaqa::TypeErasedControlProblem<config_t>;
+    py::class_<TEControlProblem> te_control_problem(
+        m, "TEControlProblem", "C++ documentation: :cpp:class:`alpaqa::TypeErasedControlProblem`");
+    te_control_problem //
+        .def(py::init<const TEControlProblem &>())
+        .def("__copy__", [](const TEControlProblem &self) { return TEControlProblem{self}; })
+        .def(
+            "__deepcopy__",
+            [](const TEControlProblem &self, py::dict) { return TEControlProblem{self}; },
+            "memo"_a);
+
     if constexpr (std::is_same_v<typename Conf::real_t, double>) {
 #if ALPAQA_HAVE_CASADI
         using CasADiProblem      = alpaqa::CasADiProblem<config_t>;
@@ -412,14 +423,76 @@ void register_problems(py::module_ &m) {
                 "Parameter vector :math:`p` of the problem");
 #endif
         ;
-
-#ifdef ALPAQA_HAVE_CASADI
+#if ALPAQA_HAVE_CASADI
         te_problem.def(py::init<const CasADiProblem &>());
         py::implicitly_convertible<CasADiProblem, TEProblem>();
 #endif
 
         m.def("load_casadi_problem", load_CasADi_problem, "so_name"_a, "n"_a = 0, "m"_a = 0,
               "p"_a = 0, "second_order"_a = false, "Load a compiled CasADi problem.\n\n");
+
+#if ALPAQA_HAVE_CASADI
+        using CasADiControlProblem       = alpaqa::CasADiControlProblem<config_t>;
+        auto load_CasADi_control_problem = [](const char *so_name, unsigned N, unsigned nx,
+                                              unsigned nu, unsigned p) {
+            return std::make_unique<CasADiControlProblem>(so_name, N, nx, nu, p);
+        };
+#else
+        class CasADiControlProblem {};
+        auto load_CasADi_control_problem = [](const char *so_name, unsigned N, unsigned nx,
+                                              unsigned nu,
+                                              unsigned p) -> std::unique_ptr<CasADiControlProblem> {
+            throw std::runtime_error("This version of alpaqa was compiled without CasADi support");
+        };
+#endif
+
+        py::class_<CasADiControlProblem>(
+            m, "CasADiControlProblem",
+            "C++ documentation: :cpp:class:`alpaqa::CasADiControlProblem`\n\n"
+            "See :py:class:`alpaqa._alpaqa.float64.TEControlProblem` for the full documentation.")
+            .def("__copy__",
+                 [](const CasADiControlProblem &self) { return CasADiControlProblem{self}; })
+            .def(
+                "__deepcopy__",
+                [](const CasADiControlProblem &self, py::dict) {
+                    return CasADiControlProblem{self};
+                },
+                "memo"_a)
+#if ALPAQA_HAVE_CASADI
+            .def_readonly("N", &CasADiControlProblem::N)
+            .def_readonly("nx", &CasADiControlProblem::nx)
+            .def_readonly("nu", &CasADiControlProblem::nu)
+            .def_readwrite("U", &CasADiControlProblem::U)
+            .def_property(
+                "x_init", [](CasADiControlProblem &p) -> rvec { return p.x_init; },
+                [](CasADiControlProblem &p, crvec x_init) {
+                    if (x_init.size() != p.x_init.size())
+                        throw std::invalid_argument("Invalid x_init dimension: got " +
+                                                    std::to_string(x_init.size()) + ", should be " +
+                                                    std::to_string(p.x_init.size()) + ".");
+                    p.x_init = x_init;
+                },
+                "Initial state vector :math:`x^0` of the problem")
+            .def_property(
+                "param", [](CasADiControlProblem &p) -> rvec { return p.param; },
+                [](CasADiControlProblem &p, crvec param) {
+                    if (param.size() != p.param.size())
+                        throw std::invalid_argument("Invalid parameter dimension: got " +
+                                                    std::to_string(param.size()) + ", should be " +
+                                                    std::to_string(p.param.size()) + ".");
+                    p.param = param;
+                },
+                "Parameter vector :math:`p` of the problem");
+#endif
+        ;
+#if ALPAQA_HAVE_CASADI
+        te_control_problem.def(py::init<const CasADiControlProblem &>());
+        py::implicitly_convertible<CasADiControlProblem, TEControlProblem>();
+#endif
+
+        m.def("load_casadi_control_problem", load_CasADi_control_problem, "so_name"_a, "N"_a,
+              "nx"_a = 0, "nu"_a = 0, "p"_a = 0,
+              "Load a compiled CasADi optimal control problem.\n\n");
 
         static constexpr auto te_pwc = []<class P>(P &&p) {
             using PwC = alpaqa::ProblemWithCounters<std::remove_cvref_t<P>>;

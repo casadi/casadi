@@ -19,6 +19,7 @@ using namespace std::chrono_literals;
 
 #include <alpaqa/accelerators/lbfgs.hpp>
 #include <alpaqa/inner/directions/panoc/lbfgs.hpp>
+#include <alpaqa/inner/panoc-ocp.hpp>
 #include <alpaqa/inner/panoc.hpp>
 #include <alpaqa/inner/src/panoc.tpp>
 #include <alpaqa/util/check-dim.hpp>
@@ -375,6 +376,97 @@ void register_panoc(py::module_ &m) {
              "         * Statistics\n\n")
         .def("__str__", &PANOCSolver::get_name)
         .def("set_progress_callback", &PANOCSolver::set_progress_callback, "callback"_a,
+             "Specify a callable that is invoked with some intermediate results on each iteration "
+             "of the algorithm.");
+
+    using PANOCOCPProgressInfo = alpaqa::PANOCOCPProgressInfo<config_t>;
+    py::class_<PANOCOCPProgressInfo>(m, "PANOCOCPProgressInfo",
+                                     "Data passed to the PANOC progress callback.\n\n"
+                                     "C++ documentation: :cpp:class:`alpaqa::PANOCOCPProgressInfo`")
+        // clang-format off
+        .def_readonly("k", &PANOCOCPProgressInfo::k, "Iteration")
+        .def_readonly("xu", &PANOCOCPProgressInfo::xu, "States :math:`x` and inputs :math:`u`")
+        .def_readonly("p", &PANOCOCPProgressInfo::p, "Projected gradient step :math:`p`")
+        .def_readonly("norm_sq_p", &PANOCOCPProgressInfo::norm_sq_p, ":math:`\\left\\|p\\right\\|^2`")
+        .def_readonly("x̂u", &PANOCOCPProgressInfo::x̂u, "Variables after projected gradient step :math:`\\hat u`")
+        .def_readonly("φγ", &PANOCOCPProgressInfo::φγ, "Forward-backward envelope :math:`\\varphi_\\gamma(u)`")
+        .def_readonly("ψ", &PANOCOCPProgressInfo::ψ, "Objective value :math:`\\psi(u)`")
+        .def_readonly("grad_ψ", &PANOCOCPProgressInfo::grad_ψ, "Gradient of objective :math:`\\nabla\\psi(u)`")
+        .def_readonly("ψ_hat", &PANOCOCPProgressInfo::ψ_hat, "Objective at x̂ :math:`\\psi(\\hat u)`")
+        .def_readonly("q", &PANOCOCPProgressInfo::q, "Gauss-Newton step :math:`q`")
+        .def_readonly("L", &PANOCOCPProgressInfo::L, "Estimate of Lipschitz constant of objective :math:`L`")
+        .def_readonly("γ", &PANOCOCPProgressInfo::γ, "Step size :math:`\\gamma`")
+        .def_readonly("τ", &PANOCOCPProgressInfo::τ, "Line search parameter :math:`\\tau`")
+        .def_readonly("ε", &PANOCOCPProgressInfo::ε, "Tolerance reached :math:`\\varepsilon_k`")
+        .def_property_readonly("problem", [](const PANOCOCPProgressInfo &p) -> auto & { return p.problem; }, "Problem being solved")
+        .def_property_readonly("params", [](const PANOCOCPProgressInfo &p) -> auto & { return p.params; }, "Solver parameters")
+        // clang-format on
+        .def_property_readonly(
+            "fpr", [](const PANOCOCPProgressInfo &p) { return std::sqrt(p.norm_sq_p) / p.γ; },
+            "Fixed-point residual :math:`\\left\\|p\\right\\| / \\gamma`");
+
+    using PANOCOCPSolver                      = alpaqa::PANOCOCPSolver<config_t>;
+    using ControlProblem                      = typename PANOCOCPSolver::Problem;
+    auto panoc_ocp_independent_solve_unconstr = [](PANOCOCPSolver &solver,
+                                                   const ControlProblem &problem, real_t ε,
+                                                   std::optional<vec> u, bool async) {
+        auto N  = problem.get_N();
+        auto nu = problem.get_nu();
+        if (u)
+            check_dim("u", *u, nu * N);
+        else
+            u = vec::Zero(nu * N);
+        auto invoke_solver = [&] { return solver(problem, ε, *u); };
+        if (!async) {
+            auto stats = invoke_solver();
+            return std::make_tuple(std::move(*u), alpaqa::conv::stats_to_dict(stats));
+        } else {
+            auto stats = std::async(std::launch::async, invoke_solver);
+            {
+                py::gil_scoped_release gil{};
+                while (stats.wait_for(50ms) != std::future_status::ready) {
+                    py::gil_scoped_acquire gil{};
+                    // Check if Python received a signal (e.g. Ctrl+C)
+                    if (PyErr_CheckSignals() != 0) {
+                        // Nicely ask the solver to stop
+                        solver.stop();
+                        // It should return a result soon
+                        if (py::gil_scoped_release gil{};
+                            stats.wait_for(15s) != std::future_status::ready) {
+                            // If it doesn't, we terminate the entire program,
+                            // because the solver uses variables local to this
+                            // function, so we cannot safely return without
+                            // waiting for the solver to finish.
+                            std::terminate();
+                        }
+                        if (PyErr_Occurred())
+                            throw py::error_already_set();
+                        break;
+                    }
+                }
+            }
+            return std::make_tuple(std::move(*u), alpaqa::conv::stats_to_dict(stats.get()));
+        }
+    };
+
+    py::class_<PANOCOCPSolver>(m, "PANOCOCPSolver",
+                               "C++ documentation: :cpp:class:`alpaqa::PANOCOCPSolver`")
+        .def(py::init([](params_or_dict<PANOCParams> params) {
+                 return PANOCOCPSolver{var_kwargs_to_struct(params)};
+             }),
+             "panoc_params"_a, "Create a PANOC solver.")
+        .def("__call__", panoc_ocp_independent_solve_unconstr,
+             py::call_guard<py::scoped_ostream_redirect, py::scoped_estream_redirect>(),
+             "problem"_a, "ε"_a, "u"_a = py::none(), "async_"_a = false, //
+             "Solve.\n\n"
+             ":param problem: Problem to solve\n"
+             ":param ε: Desired tolerance\n"
+             ":param u: Initial guess\n"
+             ":param async_: Release the GIL and run the solver on a separate thread\n"
+             ":return: * Solution :math:`u`\n"
+             "         * Statistics\n\n")
+        .def("__str__", &PANOCOCPSolver::get_name)
+        .def("set_progress_callback", &PANOCOCPSolver::set_progress_callback, "callback"_a,
              "Specify a callable that is invoked with some intermediate results on each iteration "
              "of the algorithm.");
 }

@@ -1,6 +1,7 @@
 #include <alpaqa/accelerators/lbfgs.hpp>
 #include <alpaqa/inner/internal/panoc-stop-crit.hpp>
 #include <alpaqa/inner/internal/solverstatus.hpp>
+#include <alpaqa/problem/structure.hpp>
 #include <pybind11/pybind11.h>
 
 namespace py = pybind11;
@@ -11,6 +12,14 @@ void register_enums(py::module_ &m) {
                                      "C++ documentation: :cpp:enum:`alpaqa::LBFGSStepSize`")
         .value("BasedOnExternalStepSize", alpaqa::LBFGSStepSize::BasedOnExternalStepSize)
         .value("BasedOnCurvature", alpaqa::LBFGSStepSize::BasedOnCurvature)
+        .export_values();
+
+    py::enum_<alpaqa::CostStructure>(m, "CostStructure",
+                                     "C++ documentation: :cpp:enum:`alpaqa::CostStructure`")
+        .value("General", alpaqa::CostStructure::General)
+        .value("Separable", alpaqa::CostStructure::Separable)
+        .value("Quadratic", alpaqa::CostStructure::Quadratic)
+        .value("SeparableQuadratic", alpaqa::CostStructure::SeparableQuadratic)
         .export_values();
 
     using SolverStatus = alpaqa::SolverStatus;
