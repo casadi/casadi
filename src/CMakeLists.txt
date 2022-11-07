@@ -8,6 +8,7 @@ add_library(alpaqa
     "src/problem/problem-counters.cpp"
     "src/outer/alm.cpp"
     "src/inner/panoc.cpp"
+    "src/inner/panoc-ocp.cpp"
     "src/inner/structured-panoc.cpp"
     "src/panoc-alm.cpp"
     "src/structured-panoc-alm.cpp"

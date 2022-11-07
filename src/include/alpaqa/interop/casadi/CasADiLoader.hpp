@@ -2,6 +2,7 @@
 
 #include <alpaqa/casadi-loader-export.hpp>
 #include <alpaqa/config/config.hpp>
+#include <alpaqa/problem/dynamics.hpp>
 #include <alpaqa/problem/type-erased-problem.hpp>
 
 #include <memory>
@@ -9,6 +10,33 @@
 #include <type_traits>
 
 namespace alpaqa {
+
+namespace detail {
+
+template <class T>
+struct copyable_unique_ptr {
+    copyable_unique_ptr(std::unique_ptr<T> ptr) : ptr{std::move(ptr)} {}
+    copyable_unique_ptr() = default;
+    copyable_unique_ptr(const copyable_unique_ptr &o)
+        : ptr{o.ptr ? std::make_unique<T>(*o.ptr) : nullptr} {}
+    copyable_unique_ptr &operator=(const copyable_unique_ptr &o) {
+        this->ptr = o.ptr ? std::make_unique<T>(*o.ptr) : nullptr;
+        return *this;
+    }
+    copyable_unique_ptr(copyable_unique_ptr &&)            = default;
+    copyable_unique_ptr &operator=(copyable_unique_ptr &&) = default;
+
+    operator std::unique_ptr<T> &() & { return ptr; }
+    operator const std::unique_ptr<T> &() const & { return ptr; }
+    operator std::unique_ptr<T> &&() && { return std::move(ptr); }
+
+    std::unique_ptr<T> &operator->() { return ptr; }
+    const std::unique_ptr<T> &operator->() const { return ptr; }
+
+    std::unique_ptr<T> ptr;
+};
+
+} // namespace detail
 
 namespace casadi_loader {
 template <Config>
@@ -87,5 +115,57 @@ class CasADiProblem : public BoxConstrProblem<Conf> {
 
 CASADI_LOADER_EXPORT_EXTERN_TEMPLATE(class, CasADiProblem, EigenConfigd);
 CASADI_LOADER_EXPORT_EXTERN_TEMPLATE(class, CasADiProblem, DefaultConfig);
+
+namespace casadi_loader {
+template <Config>
+struct CasADiControlFunctionsWithParam;
+} // namespace casadi_loader
+
+template <Config Conf>
+class CasADiControlProblem {
+  public:
+    USING_ALPAQA_CONFIG(Conf);
+    using Box = alpaqa::Box<config_t>;
+    length_t N, nx, nu;
+    vec x_init;
+    vec param;
+    Box U;
+    CostStructure cost_structure = CostStructure::General;
+
+    CasADiControlProblem(const std::string &filename, length_t N,
+                         length_t nx = 0, length_t nu = 0, length_t p = 0);
+    ~CasADiControlProblem();
+
+    CasADiControlProblem(const CasADiControlProblem &);
+    CasADiControlProblem &operator=(const CasADiControlProblem &);
+    CasADiControlProblem(CasADiControlProblem &&);
+    CasADiControlProblem &operator=(CasADiControlProblem &&);
+
+    void get_U(Box &U) const { U = this->U; }
+    void get_x_init(rvec x_init) const { x_init = this->x_init; }
+    void eval_f(index_t timestep, crvec x, crvec u, rvec fxu) const;
+    void eval_jac_f(index_t timestep, crvec x, crvec u, rmat J_fxu) const;
+    real_t eval_l(index_t timestep, crvec h) const;
+    real_t eval_l_N(crvec h) const;
+    void eval_grad_l(index_t timestep, crvec h, rvec grad_lh) const;
+    void eval_grad_l_N(crvec h, rvec grad_lh) const;
+    void eval_hess_l(index_t timestep, crvec h, rmat hess_lh) const;
+    void eval_hess_l_N(crvec h, rmat hess_lh) const;
+    CostStructure get_l_structure() const { return cost_structure; }
+    void check() const {} // TODO
+
+    length_t get_N() const { return N; }
+    length_t get_nx() const { return nx; }
+    length_t get_nu() const { return nu; }
+    length_t get_nh() const { return nx + nu; }
+
+  private:
+    using Functions = casadi_loader::CasADiControlFunctionsWithParam<Conf>;
+    detail::copyable_unique_ptr<Functions> impl;
+};
+
+CASADI_LOADER_EXPORT_EXTERN_TEMPLATE(class, CasADiControlProblem, EigenConfigd);
+CASADI_LOADER_EXPORT_EXTERN_TEMPLATE(class, CasADiControlProblem,
+                                     DefaultConfig);
 
 } // namespace alpaqa

@@ -321,7 +321,7 @@ class TypeErasedProblem : public util::TypeErased<ProblemVTable<Conf>, Allocator
         return TypeErased::template make<TypeErasedProblem, T>(std::forward<Args>(args)...);
     }
 
-    /// @name Basic functions
+    /// @name Problem dimensions
     /// @{
 
     /// Number of decision variables.
