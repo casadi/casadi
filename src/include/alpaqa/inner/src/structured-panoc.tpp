@@ -19,7 +19,7 @@
 namespace alpaqa {
 
 using std::chrono::duration_cast;
-using std::chrono::microseconds;
+using std::chrono::nanoseconds;
 
 template <Config Conf>
 void StructuredPANOCLBFGSSolver<Conf>::compute_quasi_newton_step(
@@ -382,7 +382,7 @@ auto StructuredPANOCLBFGSSolver<Conf>::operator()(
             }
             s.iterations   = k;
             s.ε            = εₖ;
-            s.elapsed_time = duration_cast<microseconds>(time_elapsed);
+            s.elapsed_time = duration_cast<nanoseconds>(time_elapsed);
             s.status       = stop_status;
             s.final_γ      = γₖ;
             return s;

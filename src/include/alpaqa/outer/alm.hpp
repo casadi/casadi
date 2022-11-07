@@ -110,7 +110,7 @@ class ALMSolver {
         /// the inner solver was invoked).
         unsigned outer_iterations = 0;
         /// Total elapsed time.
-        std::chrono::microseconds elapsed_time;
+        std::chrono::nanoseconds elapsed_time;
         /// The number of times that the initial penalty factor was reduced by
         /// @ref ALMParams::Σ_0_lower and that the initial tolerance was
         /// increased by @ref ALMParams::ε_0_increase because the inner solver

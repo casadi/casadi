@@ -70,7 +70,7 @@ struct StructuredPANOCLBFGSStats {
 
     SolverStatus status = SolverStatus::Busy;
     real_t ε            = inf<config_t>;
-    std::chrono::microseconds elapsed_time;
+    std::chrono::nanoseconds elapsed_time;
     unsigned iterations          = 0;
     unsigned linesearch_failures = 0;
     unsigned lbfgs_failures      = 0;
@@ -171,7 +171,7 @@ struct InnerStatsAccumulator<StructuredPANOCLBFGSStats<Conf>> {
     USING_ALPAQA_CONFIG(Conf);
 
     /// Total elapsed time in the inner solver.
-    std::chrono::microseconds elapsed_time;
+    std::chrono::nanoseconds elapsed_time;
     /// Total number of inner PANOC iterations.
     unsigned iterations = 0;
     /// Total number of PANOC line search failures.

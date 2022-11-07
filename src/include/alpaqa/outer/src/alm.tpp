@@ -19,7 +19,7 @@ template <class InnerSolverT>
 typename ALMSolver<InnerSolverT>::Stats
 ALMSolver<InnerSolverT>::operator()(const Problem &p, rvec y, rvec x) {
     using std::chrono::duration_cast;
-    using std::chrono::microseconds;
+    using std::chrono::nanoseconds;
     auto start_time = std::chrono::steady_clock::now();
 
     // Check the problem dimensions etc.
@@ -42,7 +42,7 @@ ALMSolver<InnerSolverT>::operator()(const Problem &p, rvec y, rvec x) {
         s.δ                = 0;
         s.norm_penalty     = 0;
         s.outer_iterations = 1;
-        s.elapsed_time     = duration_cast<microseconds>(time_elapsed);
+        s.elapsed_time     = duration_cast<nanoseconds>(time_elapsed);
         s.status           = ps.status;
         return s;
     }
@@ -136,7 +136,7 @@ ALMSolver<InnerSolverT>::operator()(const Problem &p, rvec y, rvec x) {
             s.δ                = vec_util::norm_inf(error_2);
             s.norm_penalty     = Σ.norm();
             s.outer_iterations = i + 1;
-            s.elapsed_time     = duration_cast<microseconds>(time_elapsed);
+            s.elapsed_time     = duration_cast<nanoseconds>(time_elapsed);
             s.status           = ps.status;
             return s;
         }
@@ -192,7 +192,7 @@ ALMSolver<InnerSolverT>::operator()(const Problem &p, rvec y, rvec x) {
                 s.δ                = norm_e_1;
                 s.norm_penalty     = Σ.norm();
                 s.outer_iterations = i + 1;
-                s.elapsed_time     = duration_cast<microseconds>(time_elapsed);
+                s.elapsed_time     = duration_cast<nanoseconds>(time_elapsed);
                 s.status           = alm_converged ? SolverStatus::Converged
                                      : out_of_time ? SolverStatus::MaxTime
                                      : out_of_iter ? SolverStatus::MaxIter

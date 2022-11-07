@@ -17,7 +17,7 @@
 namespace alpaqa {
 
 using std::chrono::duration_cast;
-using std::chrono::microseconds;
+using std::chrono::nanoseconds;
 
 template <class DirectionProviderT>
 std::string PANOCSolver<DirectionProviderT>::get_name() const {
@@ -214,7 +214,7 @@ auto PANOCSolver<DirectionProviderT>::operator()(
             }
             s.iterations   = k;
             s.ε            = εₖ;
-            s.elapsed_time = duration_cast<microseconds>(time_elapsed);
+            s.elapsed_time = duration_cast<nanoseconds>(time_elapsed);
             s.status       = stop_status;
             s.final_γ      = γₖ;
             return s;
