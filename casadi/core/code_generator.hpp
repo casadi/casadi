@@ -526,6 +526,7 @@ namespace casadi {
       AUX_VFMAX,
       AUX_MAX_VIOL,
       AUX_SUM_VIOL,
+      AUX_SUM,
       AUX_REGULARIZE,
       AUX_INF,
       AUX_NAN,
@@ -542,7 +543,8 @@ namespace casadi {
       AUX_MMAX,
       AUX_LOGSUMEXP,
       AUX_CLIP_MIN,
-      AUX_CLIP_MAX
+      AUX_CLIP_MAX,
+      AUX_SPARSITY
     };
 
     /** \brief Add a built-in auxiliary function

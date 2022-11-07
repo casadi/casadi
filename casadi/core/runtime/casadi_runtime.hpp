@@ -303,6 +303,8 @@ namespace casadi {
   #include "casadi_cache.hpp"
   #include "casadi_convexify.hpp"
   #include "casadi_logsumexp.hpp"
+  #include "casadi_sum.hpp"
+  #include "casadi_sparsity.hpp"
 
 } // namespace casadi
 

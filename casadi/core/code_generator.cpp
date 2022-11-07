@@ -1097,6 +1097,9 @@ namespace casadi {
     case AUX_SUM_VIOL:
       this->auxiliaries << sanitize_source(casadi_sum_viol_str, inst);
       break;
+    case AUX_SUM:
+      this->auxiliaries << sanitize_source(casadi_sum_str, inst);
+      break;
     case AUX_VFMIN:
       this->auxiliaries << sanitize_source(casadi_vfmin_str, inst);
       break;
@@ -1141,6 +1144,9 @@ namespace casadi {
       add_auxiliary(AUX_LOG1P);
       add_auxiliary(AUX_FMAX);
       this->auxiliaries << sanitize_source(casadi_logsumexp_str, inst);
+      break;
+    case AUX_SPARSITY:
+      this->auxiliaries << sanitize_source(casadi_sparsity_str, inst);
       break;
     case AUX_TO_DOUBLE:
       this->auxiliaries << "#define casadi_to_double(x) "

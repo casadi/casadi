@@ -48,6 +48,7 @@ set(RUNTIME_SRC
   casadi_scal.hpp
   casadi_sparsify.hpp
   casadi_sum_viol.hpp
+  casadi_sum.hpp
   casadi_swap.hpp
   casadi_trans.hpp
   casadi_finite_diff.hpp
@@ -67,6 +68,7 @@ set(RUNTIME_SRC
   casadi_cache.hpp
   casadi_convexify.hpp
   casadi_logsumexp.hpp
+  casadi_sparsity.hpp
 )
 set(CASADI_RUNTIME_SRC "${RUNTIME_SRC}" PARENT_SCOPE)
 
