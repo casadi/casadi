@@ -449,6 +449,7 @@ namespace casadi {
       //              qpsol_options);
       qpsol_ = conic("qpsol", qpsol_plugin, {{"a", Asp_}},
                    qpsol_options);
+      // qpsol_ = Function::load("/home/david/testproblems_feasible_casadi/qpsol.casadi");
       cout << qpsol_ <<std::endl;
     }
     
@@ -580,6 +581,8 @@ void Feasiblesqpmethod::anderson_acc_step_update(void* mem) const {
     casadi_copy(d->dx_feas, nx_, d->z_tmp);
     casadi_axpy(nx_, -1.0, d->anderson_memory_step, d->z_tmp);
     double gamma = casadi_dot(nx_, d->dx_feas, d->z_tmp) / casadi_dot(nx_, d->z_tmp, d->z_tmp);
+    DM(gamma).to_file("gamma.mtx");
+
 
     // Prepare the step update
     casadi_copy(d->z_feas, nx_, d->z_tmp);
@@ -595,6 +598,7 @@ void Feasiblesqpmethod::anderson_acc_step_update(void* mem) const {
     double beta = 1.0;
     casadi_axpy(nx_, beta, d->dx_feas, d->z_feas);
     casadi_axpy(nx_, -gamma, d->z_tmp, d->z_feas);
+    DM(std::vector<double>(d->z_feas,d->z_feas+nx_)).to_file("dx_anderson2.mtx");
 
   } else {
     print("This is not implemented yet!!!");
@@ -648,9 +652,11 @@ int Feasiblesqpmethod::feasibility_iterations(void* mem, double tr_rad) const{
   casadi_axpy(nx_, 1., d->dx_feas, d->z_feas);
 
   if (use_anderson_){
-    anderson_acc_init_memory(mem, d->dx_feas, d->z_feas);
+    // anderson_acc_init_memory(mem, d->dx_feas, d->z_feas);
+    anderson_acc_init_memory(mem, d->dx_feas, d_nlp->z);
   }
 
+  DM(std::vector<double>(d->z_feas,d->z_feas+nx_)).to_file("dx_anderson1.mtx");
   // Evaluate g
   //   self.g_tmp = self.__eval_g(self.x_tmp)
   m->arg[0] = d->z_feas;
@@ -710,7 +716,10 @@ int Feasiblesqpmethod::feasibility_iterations(void* mem, double tr_rad) const{
     casadi_copy(d->z_feas, nx_, d->z_tmp);
     casadi_axpy(nx_, -1., d_nlp->z, d->z_tmp);
     casadi_copy(d->gf, nx_, d->gf_feas);
-    casadi_mv(d->Bk, Hsp_, d->z_tmp, d->gf_feas, true);
+    // In case of SQP we need to multiply with 
+    if (use_sqp_){
+      casadi_mv(d->Bk, Hsp_, d->z_tmp, d->gf_feas, true);
+    }
 
     // create bounds of correction QP -----------------------------
     // upper bounds of constraints
@@ -1309,7 +1318,7 @@ int Feasiblesqpmethod::solve(void* mem) const {
     // Inputs
     fill_n(m->arg, qpsol_.n_in(), nullptr);
     // double lol;
-    // m->arg[CONIC_H] = &lol;
+    m->arg[CONIC_H] = nullptr;
     m->arg[CONIC_G] = g;
     m->arg[CONIC_X0] = x_opt;
     m->arg[CONIC_LAM_X0] = dlam;
