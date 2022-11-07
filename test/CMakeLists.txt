@@ -13,6 +13,7 @@ add_executable(tests
     "accelerators/test-lbfgs.cpp"
     "inner/test-panoc.cpp"
     "util/test-type-erasure.cpp"
+    "util/test-index-set.cpp"
     "outer/test-alm.cpp"
     "problem/test-type-erased-problem.cpp"
 )
