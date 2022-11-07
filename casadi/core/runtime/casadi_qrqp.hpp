@@ -55,7 +55,7 @@ struct casadi_qrqp_data {
   // Problem structure
   const casadi_qrqp_prob<T1>* prob;
   // Problem structure
-  const casadi_qp_data<T1>* qp;
+  casadi_qp_data<T1>* qp;
   // Cost
   T1 f;
   // Solver status
