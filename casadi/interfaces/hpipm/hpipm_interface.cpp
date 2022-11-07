@@ -176,9 +176,11 @@ namespace casadi {
       "You must either set all of N, nx, nu, ng; "
       "or set none at all (automatic detection).");
 
-    const std::vector<casadi_int>& nx = nxs_;
-    const std::vector<casadi_int>& ng = ngs_;
-    const std::vector<casadi_int>& nu = nus_;
+    const std::vector<int>& nx = nxs_;
+    const std::vector<int>& ng = ngs_;
+    const std::vector<int>& nu = nus_;
+
+    Sparsity lamg_csp_, lam_ulsp_, lam_uusp_, lam_xlsp_, lam_xusp_, lam_clsp_;
 
     if (detect_structure) {
       /* General strategy: look for the xk+1 diagonal part in A
@@ -261,7 +263,7 @@ namespace casadi {
       nus_.push_back(0);
     }
 
-    uout() << nx << nu << ng << std::endl;
+    uout() << "nx,nu,ng" << nx << nu << ng << std::endl;
 
     casadi_assert_dev(nx.size()==N_+1);
     casadi_assert_dev(nu.size()==N_+1);
@@ -387,7 +389,7 @@ namespace casadi {
     casadi_assert_dev(total.nnz() == usp_.nnz() + xsp_.nnz());
     casadi_assert_dev(total.nnz() == nx_);
 
-    std::vector< Block > theirs_u_blocks, theirs_x_blocks;
+    std::vector< casadi_hpipm_block > theirs_u_blocks, theirs_x_blocks;
     offset = 0;
 
     for (casadi_int k=0;k<N_;++k) {
@@ -403,7 +405,7 @@ namespace casadi {
     casadi_assert_dev(total.nnz() == nx_);
 
     offset = 0;
-    std::vector< Block > lamg_gap_blocks;
+    std::vector< casadi_hpipm_block > lamg_gap_blocks;
     for (casadi_int k=0;k<N_;++k) {
       lamg_gap_blocks.push_back({offset,       0, nx[k+1], 1});offset+= nx[k+1] + ng[k];
     }
@@ -442,145 +444,109 @@ namespace casadi {
     theirs_Xsp_ = Sparsity::dense(std::accumulate(nx.begin(), nx.end(), 0), 1);  // NOLINT
     theirs_Usp_ = Sparsity::dense(std::accumulate(nu.begin(), nu.end(), 0), 1);  // NOLINT
 
+    nus_.push_back(0);
+    zeros_.resize(N_+1, 0);
+
+    uout() << "nus" << nus_ << std::endl;
+
+    set_hpipm_prob();
+
+    // Allocate memory
+    casadi_int sz_arg, sz_res, sz_w, sz_iw;
+    casadi_hpipm_work(&p_, &sz_arg, &sz_res, &sz_iw, &sz_w);
+
+    uout() << sz_arg << std::endl;
+    uout() << sz_res << std::endl;
+    uout() << sz_iw << std::endl;
+    uout() << sz_w << std::endl;
+
+    alloc_arg(sz_arg, true);
+    alloc_res(sz_res, true);
+    alloc_iw(sz_iw, true);
+    alloc_w(sz_w, true);
+
+
+
   }
 
+  void HpipmInterface::set_hpipm_prob() {
+    p_.qp = &p_qp_;
+    p_.nx  = get_ptr(nxs_);
+    p_.nu  = get_ptr(nus_);
+    uout() << "nu" << nus_.size() << ":" << N_ << std::endl;
+    p_.ng  = get_ptr(ngs_);
+
+    p_.nbx = get_ptr(nxs_);
+    p_.nbu = get_ptr(nus_);
+    p_.ns  = get_ptr(zeros_);
+    p_.nsbx = get_ptr(zeros_);
+    p_.nsbu = get_ptr(zeros_);
+    p_.nsg = get_ptr(zeros_);
+
+    p_.sp_x = sparsity_in(CONIC_X0);
+    p_.sp_ba = sparsity_in(CONIC_LBA);
+
+    p_.Asp = Asp_;
+    p_.Bsp = Bsp_;
+    p_.Csp = Csp_;
+    p_.Dsp = Dsp_;
+
+    p_.Rsp = Rsp_;
+    p_.Isp = Isp_;
+    p_.Ssp = Ssp_;
+    p_.Qsp = Qsp_;
+
+    p_.bsp = bsp_;
+
+    p_.xsp = xsp_;
+    p_.usp = usp_;
+
+    p_.pisp = pisp_;
+
+    p_.theirs_xsp = theirs_xsp_;
+    p_.theirs_usp = theirs_usp_;
+    p_.theirs_Xsp = theirs_Xsp_;
+    p_.theirs_Usp = theirs_Usp_;
+
+    p_.lamg_gapsp = lamg_gapsp_;
+    p_.lugsp = lugsp_;
+
+    p_.N = N_;
+    p_.hpipm_options = hpipm_options_;
+
+    p_.inf = inf_;
+
+    p_.A = get_ptr(A_blocks);
+    p_.B = get_ptr(B_blocks);
+    p_.C = get_ptr(C_blocks);
+    p_.D = get_ptr(D_blocks);
+
+    p_.R = get_ptr(R_blocks);
+    p_.I = get_ptr(I_blocks);
+    p_.S = get_ptr(S_blocks);
+    p_.Q = get_ptr(Q_blocks);
+
+    p_.b = get_ptr(b_blocks);
+    p_.lug = get_ptr(lug_blocks);
+    p_.u = get_ptr(u_blocks);
+    p_.x = get_ptr(x_blocks);
+
+    p_.lam_ul = get_ptr(lam_ul_blocks);
+    p_.lam_xl = get_ptr(lam_xl_blocks);
+    p_.lam_uu = get_ptr(lam_uu_blocks);
+    p_.lam_xu = get_ptr(lam_xu_blocks);
+    p_.lam_cl = get_ptr(lam_cl_blocks);
+    p_.lam_cu = get_ptr(lam_cu_blocks);
+
+    uout() << "p"<< p_.nu[0] << nus_[0] << std::endl;
+    casadi_hpipm_setup(&p_);
+
+    uout() << "p"<< p_.nu[0] << std::endl;
+  }
 
   int HpipmInterface::init_mem(void* mem) const {
     if (Conic::init_mem(mem)) return 1;
     auto m = static_cast<HpipmMemory*>(mem);
-
-    init_vector(m->nx, nxs_);
-    init_vector(m->nu, nus_); m->nu.push_back(0);
-    init_vector(m->ng, ngs_);
-    m->ns.resize(N_+1, 0);
-    m->nsbx.resize(N_+1, 0);
-    m->nsbu.resize(N_+1, 0);
-    m->nsg.resize(N_+1, 0);
-
-    const std::vector<int>& nx = m->nx;
-    const std::vector<int>& nu = m->nu;
-    const std::vector<int>& ng = m->ng;
-    const std::vector<int>& nbx = m->nbx;
-    const std::vector<int>& nbu = m->nbu;
-    
-    casadi_int offset = 0;
-
-    m->nbx.resize(N_+1);
-    for (casadi_int k=0;k<N_+1;++k) m->nbx[k] = nx[k];
-
-    m->nbu.resize(N_+1);
-    for (casadi_int k=0;k<N_+1;++k) m->nbu[k] = nu[k];
-
-    uout() <<  "nbx;nbu" << m->nbx <<  m->nbu << std::endl;
-    uout() <<  "nx;nu" << m->nx <<  m->nu << std::endl;
-
-    m->A.resize(Asp_.nnz());
-    m->B.resize(Bsp_.nnz());
-    m->C.resize(Csp_.nnz());
-    m->D.resize(Dsp_.nnz());
-    m->R.resize(Rsp_.nnz());
-    m->I.resize(Isp_.nnz());
-    m->S.resize(Ssp_.nnz());
-    m->Q.resize(Qsp_.nnz());
-    m->b.resize(bsp_.nnz());
-    m->b2.resize(bsp_.nnz());
-    m->x.resize(xsp_.nnz());m->q.resize(xsp_.nnz());
-    m->u.resize(usp_.nnz());m->r.resize(usp_.nnz());
-    m->lg.resize(lugsp_.nnz());
-    m->ug.resize(lugsp_.nnz());
-
-    m->pi.resize(pisp_.nnz());
-
-    casadi_int nx_total = 0;
-    for (casadi_int k=0;k<N_+1;++k) nx_total+=nx[k];
-    m->iidxbx.resize(nx_total); // TODO; make range?
-    m->lbx.resize(nx_total);
-    m->ubx.resize(nx_total);
-
-    casadi_int nu_total = 0;
-    for (casadi_int k=0;k<N_+1;++k) nu_total+=nu[k];
-    m->iidxbu.resize(nu_total); // TODO; make range?
-
-    m->lbu.resize(nu_total);
-    m->ubu.resize(nu_total);
-
-    offset = 0;
-    for (casadi_int k=0;k<N_+1;++k) offset+=ng[k]+nx[k];
-    m->lam.resize(2*offset);
-
-    // Allocate double* work vectors
-    blockptr(m->hA, m->A, A_blocks);
-    blockptr(m->hB, m->B, B_blocks);
-    blockptr(m->hC, m->C, C_blocks);
-    blockptr(m->hD, m->D, D_blocks);
-    blockptr(m->hI, m->I, I_blocks, true);
-    blockptr(m->hR, m->R, R_blocks);
-    blockptr(m->hQ, m->Q, Q_blocks);
-    blockptr(m->hS, m->S, S_blocks);
-    blockptr(m->hu_guess, m->u, u_blocks);
-    blockptr(m->hx_guess, m->x, x_blocks);
-    blockptr(m->hr, m->r, u_blocks);
-    blockptr(m->hq, m->q, x_blocks);
-    blockptr(m->hlg, m->lg, lug_blocks);
-    blockptr(m->hug, m->ug, lug_blocks);
-    blockptr(m->hb, m->b, b_blocks);
-
-    m->pis.resize(N_);
-    offset = 0;
-    for (casadi_int k=0;k<N_;++k) {
-      m->pis[k] = get_ptr(m->pi)+offset;
-      offset+=nx[k+1];
-    }
-
-    m->hlbx.resize(N_+1);
-    m->hubx.resize(N_+1);
-    offset = 0;
-    for (casadi_int k=0;k<N_+1;++k) {
-      m->hlbx[k] = get_ptr(m->lbx)+offset;
-      m->hubx[k] = get_ptr(m->ubx)+offset;
-      offset+=nx[k];
-    }
-    m->hlbu.resize(N_+1);
-    m->hubu.resize(N_+1);
-    offset = 0;
-    for (casadi_int k=0;k<N_+1;++k) {
-      m->hlbu[k] = get_ptr(m->lbu)+offset;
-      m->hubu[k] = get_ptr(m->ubu)+offset;
-      offset+=nu[k];
-    }
-
-    m->lams.resize(N_+1);
-    offset = 0;
-    for (casadi_int k=0;k<N_+1;++k) {
-      m->lams[k] = get_ptr(m->lam)+offset;
-      offset+=2*(ng[k]+nx[k]);
-    }
-
-    m->hidxbx.resize(N_+1);
-    m->hidxbu.resize(N_+1);
-    offset = 0;
-    for (casadi_int k=0;k<N_+1;++k) {
-      m->hidxbx[k] = get_ptr(m->iidxbx)+offset;
-      for (casadi_int i=0;i<nbx[k];++i) m->hidxbx[k][i] = i;
-      offset+=nbx[k];
-    }
-    offset = 0;
-    for (casadi_int k=0;k<N_+1;++k) {
-      m->hidxbu[k] = get_ptr(m->iidxbu)+offset;
-      for (casadi_int i=0;i<nbx[k];++i) m->hidxbu[k][i] = i;
-      offset+=nbu[k];
-    }
-
-    m->pv.resize(2*(nx_+na_));
-
-    // We don't interface the slack-variable feature
-    m->hZl.resize(N_+1, nullptr);
-    m->hZu.resize(N_+1, nullptr);
-    m->hzl.resize(N_+1, nullptr);
-    m->hzu.resize(N_+1, nullptr);
-    m->hlls.resize(N_+1, nullptr);
-    m->hlus.resize(N_+1, nullptr);
-    m->hidxs.resize(N_+1, 0);
 
     m->fstats["preprocessing"]  = FStats();
     m->fstats["solver"]         = FStats();
@@ -588,26 +554,25 @@ namespace casadi {
     return 0;
   }
 
-  void HpipmInterface::mproject(double factor, const double* x, const casadi_int* sp_x,
-                                double* y, const casadi_int* sp_y, double* w) {
-    casadi_int ncol_y = sp_y[1];
-    const casadi_int *colind_y = sp_y+2;
-    casadi_project(x, sp_x, y, sp_y, w);
-    casadi_scal(colind_y[ncol_y], factor, y);
-  }
+  /** \brief Set the (persistent) work vectors */
+  void HpipmInterface::set_work(void* mem, const double**& arg, double**& res,
+                          casadi_int*& iw, double*& w) const {
 
-  void HpipmInterface::dense_transfer(double factor, const double* x,
-                                      const casadi_int* sp_x, double* y,
-                                      const casadi_int* sp_y, double* w) {
-    CASADI_PREFIX(sparsify)(x, w, sp_x, false);
-    casadi_int nrow_y = sp_y[0];
-    casadi_int ncol_y = sp_y[1];
-    const casadi_int *colind_y = sp_y+2, *row_y = sp_y + 2 + ncol_y+1;
-    /* Loop over columns of y */
-    casadi_int i, el;
-    for (i=0; i<ncol_y; ++i) {
-      for (el=colind_y[i]; el<colind_y[i+1]; ++el) y[nrow_y*i + row_y[el]] += factor*(*w++);
-    }
+    auto m = static_cast<HpipmMemory*>(mem);
+
+    uout() << "set_work" << std::endl;
+
+    uout() << "p"<< p_.nu[0] << nus_[0] << std::endl;
+    Conic::set_work(mem, arg, res, iw, w);
+
+    m->d.prob = &p_;
+    m->d.qp = &m->d_qp;
+    uout() << "p_" << &p_ << p_.nu[0] << std::endl;
+    casadi_hpipm_init(&m->d, &arg, &res, &iw, &w);
+
+    m->iter_count = 0;
+
+    uout() << "pset_work"<< p_.nu[0] << std::endl;
   }
 
   int HpipmInterface::
@@ -616,306 +581,9 @@ namespace casadi {
     // Statistics
     m->fstats.at("preprocessing").tic();
 
-    int dim_size = d_ocp_qp_dim_memsize(N_);
+    casadi_hpipm_solve(&m->d, arg, res, iw, w);
 
-	  void *dim_mem = malloc(dim_size);
-
-	  struct d_ocp_qp_dim dim;
-	  d_ocp_qp_dim_create(N_, &dim, dim_mem);
-
-    d_ocp_qp_dim_set_all(
-      get_ptr(m->nx), get_ptr(m->nu), get_ptr(m->nbx), get_ptr(m->nbu),
-      get_ptr(m->ng), get_ptr(m->nsbx), get_ptr(m->nsbu), get_ptr(m->nsg), &dim);
-
-    int qp_size = d_ocp_qp_memsize(&dim);
-    void *qp_mem = malloc(qp_size);
-
-    struct d_ocp_qp qp;
-    d_ocp_qp_create(&dim, &qp, qp_mem);
-
-
-    double* pv =  get_ptr(m->pv);
-
-    // Dissect A matrix
-    casadi_project(arg[CONIC_A], A_, get_ptr(m->A), Asp_, pv);
-    casadi_project(arg[CONIC_A], A_, get_ptr(m->B), Bsp_, pv);
-    casadi_project(arg[CONIC_A], A_, get_ptr(m->C), Csp_, pv);
-    casadi_project(arg[CONIC_A], A_, get_ptr(m->D), Dsp_, pv);
-    casadi_project(arg[CONIC_A], A_, get_ptr(m->I), Isp_, pv);
-
-    // Dissect H matrix; definition of HPIPM lacks a factor 2
-    mproject(0.5, arg[CONIC_H], H_, get_ptr(m->R), Rsp_, pv);
-    mproject(0.5, arg[CONIC_H], H_, get_ptr(m->S), Ssp_, pv);
-    mproject(0.5, arg[CONIC_H], H_, get_ptr(m->Q), Qsp_, pv);
-
-    // Dissect LBA/UBA
-    mproject(-1.0, arg[CONIC_LBA], sparsity_in_.at(CONIC_LBA), get_ptr(m->b), bsp_, pv);
-    mproject(-1.0, arg[CONIC_UBA], sparsity_in_.at(CONIC_UBA), get_ptr(m->b2), bsp_, pv);
-    casadi_assert_dev(std::equal(m->b.begin(), m->b.end(), m->b2.begin()));
-    casadi_project(arg[CONIC_LBA], sparsity_in_.at(CONIC_LBA), get_ptr(m->lg), lugsp_, pv);
-    casadi_project(arg[CONIC_UBA], sparsity_in_.at(CONIC_UBA), get_ptr(m->ug), lugsp_, pv);
-
-    // Dissect LBX/UBX input
-    std::fill(m->lbu.begin(), m->lbu.end(), 0);
-    std::fill(m->ubu.begin(), m->ubu.end(), 0);
-    std::fill(m->lbx.begin(), m->lbx.end(), 0);
-    std::fill(m->ubx.begin(), m->ubx.end(), 0);
-
-    dense_transfer(1.0, arg[CONIC_LBX], xsp_, get_ptr(m->lbx), theirs_Xsp_, pv);
-    dense_transfer(1.0, arg[CONIC_UBX], xsp_, get_ptr(m->ubx), theirs_Xsp_, pv);
-    dense_transfer(1.0, arg[CONIC_LBX], usp_, get_ptr(m->lbu), theirs_Usp_, pv);
-    dense_transfer(1.0, arg[CONIC_UBX], usp_, get_ptr(m->ubu), theirs_Usp_, pv);
-
-    // Dissect G
-    mproject(0.5, arg[CONIC_G], sparsity_in_.at(CONIC_G), get_ptr(m->r), usp_, pv);
-    mproject(0.5, arg[CONIC_G], sparsity_in_.at(CONIC_G), get_ptr(m->q), xsp_, pv);
-
-    // Dissect X0
-    casadi_project(arg[CONIC_X0], sparsity_in_.at(CONIC_X0), get_ptr(m->u), usp_, pv);
-    casadi_project(arg[CONIC_X0], sparsity_in_.at(CONIC_X0), get_ptr(m->x), xsp_, pv);
-
-    m->iter_count = -1;
-
-    // Deal with non-unity I block
-    for (casadi_int k=0;k<N_;++k) {
-      casadi_int n_row = m->nx[k+1];
-      for (casadi_int i=0;i<n_row;++i) {
-        double f = -1/m->hI[k][i];
-        m->hb[k][i]*=f;
-        for (casadi_int j=0;j<m->nx[k];++j) m->hA[k][i+j*n_row]*=f;
-        for (casadi_int j=0;j<m->nu[k];++j) m->hB[k][i+j*n_row]*=f;
-      }
-    }
-
-    // replace infinities
-    for (casadi_int i=0;i<m->lbx.size();++i) {
-      if (m->lbx[i]==-std::numeric_limits<double>::infinity()) m->lbx[i] = -inf_;
-    }
-    for (casadi_int i=0;i<m->lbu.size();++i) {
-      if (m->lbu[i]==-std::numeric_limits<double>::infinity()) m->lbu[i] = -inf_;
-    }
-    for (casadi_int i=0;i<m->ubx.size();++i) {
-      if (m->ubx[i]==std::numeric_limits<double>::infinity()) m->ubx[i] = inf_;
-    }
-    for (casadi_int i=0;i<m->ubu.size();++i) {
-      if (m->ubu[i]==std::numeric_limits<double>::infinity()) m->ubu[i] = inf_;
-    }
-    for (casadi_int i=0;i<m->lg.size();++i) {
-      if (m->lg[i]==-std::numeric_limits<double>::infinity()) m->lg[i] = -inf_;
-    }
-    for (casadi_int i=0;i<m->ug.size();++i) {
-      if (m->ug[i]==std::numeric_limits<double>::infinity()) m->ug[i] = inf_;
-    }
-
-    m->fstats.at("preprocessing").toc();
-
-
-
-    std::fill(m->pi.begin(), m->pi.end(), 0);
-    std::fill(m->lam.begin(), m->lam.end(), 0);
-
-/*
-    if (arg[CONIC_LAM_A0]) {
-      dense_transfer(0.5, arg[CONIC_LAM_A0], lamg_gapsp_, get_ptr(m->pi), pisp_, pv);
-      // Deal with non-unity I block
-      for (casadi_int k=0;k<N_;++k) {
-        casadi_int n_row = m->nx[k+1];
-        for (casadi_int i=0;i<n_row;++i) {
-          double f = -m->hI[k][i];
-          m->pis[k][i]*=f;
-        }
-      }
-
-      dense_transfer(0.5, arg[CONIC_LAM_A0], lamg_csp_, get_ptr(m->lam), lam_cusp_, pv);
-    }
-
-    if (arg[CONIC_LAM_X0]) {
-      dense_transfer(0.5, arg[CONIC_LAM_X0], usp_, get_ptr(m->lam), lam_uusp_, pv);
-      dense_transfer(0.5, arg[CONIC_LAM_X0], xsp_, get_ptr(m->lam), lam_xusp_, pv);
-    }*/
-
-    /*
-    uout() << m->hA << std::endl;
-    uout() << m->hB << std::endl;
-    uout() << m->hb << std::endl;
-    uout() << m->hQ << std::endl;
-    uout() << m->hR << std::endl;
-    uout() << m->hS << std::endl;
-    uout() << m->hq << std::endl;
-    uout() << m->hr << std::endl;
-    uout() << m->hlb << std::endl;
-    uout() << m->hub << std::endl;
-    uout() << m->hC << std::endl;
-    uout() << m->hD << std::endl;
-    uout() << m->hlg << std::endl;
-    uout() << m->hug << std::endl;
-    uout() << m->hZl << std::endl;
-    uout() << m->hZu << std::endl;
-    uout() << m->hzl << std::endl;
-    uout() << m->hzu << std::endl;
-    uout() << m->hlls << std::endl;
-    uout() << m->hlus << std::endl;
-
-    uout() << m->A << std::endl;
-    uout() <<  m->B << std::endl;
-    uout() <<  m->b << std::endl;
-    uout() <<  m->b2 << std::endl;
-    uout() <<  m->Q << std::endl;
-    uout() <<  m->S << std::endl;
-    uout() <<  m->R << std::endl;
-    uout() << m->q << std::endl;
-    uout() <<  m->r << std::endl;
-    uout() <<  m->lb  << std::endl;
-    uout() << m->ub << std::endl;
-    uout() <<  m->C << std::endl;
-    uout() <<  m->D << std::endl;
-    uout() << m->lg << std::endl;
-    uout() << m->ug << std::endl;
-    */
-
-    // https://github.com/giaf/hpipm/commit/590f3b21521ff5784c9497869883df695bc0f441
-    std::vector<double*> hI;
-
-    d_ocp_qp_set_all(get_ptr(m->hA), get_ptr(m->hB), get_ptr(m->hb),
-      get_ptr(m->hQ), get_ptr(m->hS), get_ptr(m->hR),
-      get_ptr(m->hq), get_ptr(m->hr),
-      get_ptr(m->hidxbx), get_ptr(m->hlbx), get_ptr(m->hubx),
-      get_ptr(m->hidxbu), get_ptr(m->hlbu), get_ptr(m->hubu),
-      get_ptr(m->hC), get_ptr(m->hD),
-      get_ptr(m->hlg), get_ptr(m->hug),
-      get_ptr(m->hZl), get_ptr(m->hZu), get_ptr(m->hzl),
-      get_ptr(m->hzu), get_ptr(m->hidxs),
-      get_ptr(m->hlls), get_ptr(m->hlus), &qp);
-
-    int qp_sol_size = d_ocp_qp_sol_memsize(&dim);
-    void *qp_sol_mem = malloc(qp_sol_size);
-
-    struct d_ocp_qp_sol qp_sol;
-    d_ocp_qp_sol_create(&dim, &qp_sol, qp_sol_mem);
-
-    int ipm_arg_size = d_ocp_qp_ipm_arg_memsize(&dim);
-    void *ipm_arg_mem = malloc(ipm_arg_size);
-    struct d_ocp_qp_ipm_arg myarg;
-    d_ocp_qp_ipm_arg_create(&dim, &myarg, ipm_arg_mem);
-
-    memcpy(&myarg, &hpipm_options_, sizeof(d_ocp_qp_ipm_arg));
-
-    int ipm_size = d_ocp_qp_ipm_ws_memsize(&dim, &myarg);
-    void *ipm_mem = malloc(ipm_size);
-
-    struct d_ocp_qp_ipm_ws workspace;
-    d_ocp_qp_ipm_ws_create(&dim, &myarg, &workspace, ipm_mem);
-
-		// solution guess
-		for (casadi_int i=0; i<N_+1; i++)	d_ocp_qp_sol_set_u(i, m->hu_guess[i], &qp_sol);
-		for (casadi_int i=0; i<N_+1; i++)	d_ocp_qp_sol_set_x(i, m->hx_guess[i], &qp_sol);
-
-    m->fstats.at("solver").tic();
-		// call solver
-	  d_ocp_qp_ipm_solve(&qp, &qp_sol, &myarg, &workspace);
-    d_ocp_qp_ipm_get_status(&workspace, &m->return_status);
-    m->fstats.at("solver").toc();
-    m->fstats.at("postprocessing").tic();
-
-    d_ocp_qp_ipm_get_iter(&workspace, &m->iter_count);
-    d_ocp_qp_ipm_get_max_res_stat(&workspace, &m->res_stat);
-	  d_ocp_qp_ipm_get_max_res_eq(&workspace, &m->res_eq);
-	  d_ocp_qp_ipm_get_max_res_ineq(&workspace, &m->res_ineq);
-	  d_ocp_qp_ipm_get_max_res_comp(&workspace, &m->res_comp);
-
-
-	  double *stat;
-    d_ocp_qp_ipm_get_stat(&workspace, &stat);
-printf("\nalpha_aff\tmu_aff\t\tsigma\t\talpha\t\tmu\n");
-    d_print_exp_tran_mat(5, m->iter_count, stat, 5);
-
-    printf("\nHPIPM returned with flag %i.\n", m->return_status);
-    if(m->return_status == 0)
-		{
-        printf("\n -> QP solved!\n");
-		}
-	else if(m->return_status==1)
-		{
-        printf("\n -> Solver failed! Maximum number of iterations reached\n");
-		}
-	else if(m->return_status==2)
-		{
-        printf("\n -> Solver failed! Minimum step lenght reached\n");
-		}
-	else if(m->return_status==2)
-		{
-        printf("\n -> Solver failed! NaN in computations\n");
-		}
-	else
-		{
-        printf("\n -> Solver failed! Unknown return flag\n");
-		}
-	printf("\n\n");
-
-
-	for(casadi_int i=0; i<N_+1; ++i) d_ocp_qp_sol_get_u(i, &qp_sol, m->hu_guess[i]);
-	for(casadi_int i=0; i<N_+1; ++i) d_ocp_qp_sol_get_x(i, &qp_sol, m->hx_guess[i]);
-	for(casadi_int i=0; i<N_; ++i) d_ocp_qp_sol_get_pi(i, &qp_sol, m->pis[i]);
-
-  if (res[CONIC_LAM_X]) {
-    casadi_int offset = 0;
-    for(casadi_int i=0; i<N_+1; ++i) {
-      std::vector<double> lam_lb(m->nbx[i]+m->nbu[i], nan), lam_ub(m->nbx[i]+m->nbu[i], nan);
-      d_ocp_qp_sol_get_lam_lb(i, &qp_sol, get_ptr(lam_lb));
-      d_ocp_qp_sol_get_lam_ub(i, &qp_sol, get_ptr(lam_ub));
-      for (casadi_int k=0;k<m->nbx[i];++k) {
-        res[CONIC_LAM_X][offset+k] = (lam_ub[k+m->nbu[i]]-lam_lb[k+m->nbu[i]])*2;
-      }
-      offset += m->nbx[i];
-      for (casadi_int k=0;k<m->nbu[i];++k) {
-        res[CONIC_LAM_X][offset+k] = (lam_ub[k]-lam_lb[k])*2;
-      }
-      offset += m->nbu[i];
-    }
-  }
-  if (res[CONIC_LAM_A]) {
-    casadi_int offset = 0;
-    for(casadi_int i=0; i<N_+1; ++i) {
-      std::vector<double> lam_lg(m->ng[i]), lam_ug(m->ng[i]);
-      d_ocp_qp_sol_get_lam_lg(i, &qp_sol, get_ptr(lam_lg));
-      d_ocp_qp_sol_get_lam_ug(i, &qp_sol, get_ptr(lam_ug));
-      for (casadi_int k=0;k<m->ng[i];++k) {
-        res[CONIC_LAM_A][offset+(i<N_ ? m->nx[i+1]: 0)+k] = (lam_ug[k]-lam_lg[k])*2;
-      }
-      offset += m->ng[i]+(i<N_ ? m->nx[i+1]: 0);
-    }
-  }
-
-
-
-      uout() << "HPIPM finished after " << m->iter_count << " iterations." << std::endl;
-      uout() << "return status: " << m->return_status << std::endl;
-      uout() << "HPIPM residuals: " << m->res_stat << ", " << m->res_eq << ", " << m->res_ineq << ", " << m->res_comp << std::endl;
-
-    m->success = m->return_status==0;
-
-    dense_transfer(1.0, get_ptr(m->x), theirs_Xsp_, res[CONIC_X], xsp_, pv);
-    dense_transfer(1.0, get_ptr(m->u), theirs_Usp_, res[CONIC_X], usp_, pv);
-
-
-    // Deal with non-unity I block
-    for (casadi_int k=0;k<N_;++k) {
-      casadi_int n_row = m->nx[k+1];
-      for (casadi_int i=0;i<n_row;++i) {
-        double f = -1/m->hI[k][i];
-        m->pis[k][i]*=f;
-      }
-    }
-
-    dense_transfer(2.0, get_ptr(m->pi), pisp_, res[CONIC_LAM_A], lamg_gapsp_, pv);
-
-    // Construct f
-    double f = casadi_dot(nx_, arg[CONIC_G], res[CONIC_X]);
-    f += 0.5*casadi_bilin(arg[CONIC_H], H_, res[CONIC_X], res[CONIC_X]);
-
-    if (res[CONIC_COST]) res[CONIC_COST][0] = f;
-
-    m->fstats.at("postprocessing").toc();
+    m->success = m->d.return_status==0;
 
     return 0;
   }
@@ -923,8 +591,9 @@ printf("\nalpha_aff\tmu_aff\t\tsigma\t\talpha\t\tmu\n");
   Dict HpipmInterface::get_stats(void* mem) const {
     Dict stats = Conic::get_stats(mem);
     auto m = static_cast<HpipmMemory*>(mem);
-    stats["return_status"] = m->return_status;
-    stats["iter_count"] = m->iter_count;
+
+    stats["return_status"] = m->d.return_status;
+    stats["iter_count"] = m->d.iter_count;
     return stats;
   }
 
@@ -932,11 +601,10 @@ printf("\nalpha_aff\tmu_aff\t\tsigma\t\talpha\t\tmu\n");
   }
 
   HpipmMemory::~HpipmMemory() {
-
   }
 
   Sparsity HpipmInterface::blocksparsity(casadi_int rows, casadi_int cols,
-      const std::vector<Block>& blocks, bool eye) {
+      const std::vector<casadi_hpipm_block>& blocks, bool eye) {
     DM r(rows, cols);
     for (auto && b : blocks) {
       if (eye) {
@@ -951,7 +619,7 @@ printf("\nalpha_aff\tmu_aff\t\tsigma\t\talpha\t\tmu\n");
     return r.sparsity();
   }
   void HpipmInterface::blockptr(std::vector<double *>& vs, std::vector<double>& v,
-      const std::vector<Block>& blocks, bool eye) {
+      const std::vector<casadi_hpipm_block>& blocks, bool eye) {
     casadi_int N = blocks.size();
     vs.resize(N);
     casadi_int offset=0;
@@ -976,4 +644,5 @@ printf("\nalpha_aff\tmu_aff\t\tsigma\t\talpha\t\tmu\n");
 
     s.version("HpipmInterface", 1);
   }
+
 } // namespace casadi
