@@ -444,8 +444,8 @@ function ``S``:
 Quadratic programming
 ---------------------
 
-|casadi| provides interfaces to solve quadratic programs (QPs). Supported solvers are the open-source solvers qpOASES (distributed with |casadi|) and
-OOQP as well as the commercial solvers CPLEX and GUROBI.
+|casadi| provides interfaces to solve quadratic programs (QPs). Supported solvers are the open-source solvers qpOASES (distributed with |casadi|), OOQP, OSQP and PROXQP 
+as well as the commercial solvers CPLEX and GUROBI.
 
 There are two different ways to solve QPs in |casadi|, using a high-level interface and a low-level interface. They are described in the following.
 
