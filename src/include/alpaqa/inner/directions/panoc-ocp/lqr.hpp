@@ -213,21 +213,35 @@ struct StatefulLQRFactor {
             PA.noalias() = P * Ai;
             S̅.noalias()  = BiJ.transpose() * PA;
             // y ← Pc + s
-            c = Bi(Eigen::all, Ki) * ui(Ki);
-            y = P * c + s;
+            c.noalias() = Bi(Eigen::all, Ki) * ui(Ki);
+            y.noalias() = P * c;
+            y += s;
             // K ← -R̅⁻¹S̅
+#ifdef EIGEN_RUNTIME_NO_MALLOC
+            bool prev = Eigen::internal::is_malloc_allowed();
+            Eigen::internal::set_is_malloc_allowed(true); // TODO
+#endif
             Eigen::PartialPivLU<rmat> R̅LU{R̅};
-            gain_Ki.noalias() = -R̅LU.solve(S̅);
+#ifdef EIGEN_RUNTIME_NO_MALLOC
+            Eigen::internal::set_is_malloc_allowed(prev);
+#endif
+            gain_Ki.noalias() = R̅LU.solve(S̅);
+            gain_Ki           = -gain_Ki;
             // e ← -R̅⁻¹(Bᵀy + r)
-            ti = BiJ.transpose() * y + r(i)(Ji);
+            ti.noalias() = BiJ.transpose() * y;
+            ti += r(i)(Ji);
             if (Ri.cols() > 1 && Ri.rows() > 1)
-                ti += Ri(Ji, Ki) * ui(Ki);
-            ei = -R̅LU.solve(ti);
+                ti.noalias() += Ri(Ji, Ki) * ui(Ki);
+            ei.noalias() = R̅LU.solve(ti);
+            ei           = -ei;
             if (i > 0) {
                 // P ← Q + Aᵀ P A + S̅ᵀ K
-                P.noalias() = Ai.transpose() * PA + S̅.transpose() * gain_Ki;
+                P.noalias() = Ai.transpose() * PA;
+                P.noalias() += S̅.transpose() * gain_Ki;
                 // s ← S̅ᵀ e + Aᵀ y + q
-                s = S̅.transpose() * ei + Ai.transpose() * y + q(i);
+                s.noalias() = S̅.transpose() * ei;
+                s.noalias() += Ai.transpose() * y;
+                s += q(i);
                 add_possibly_diagonal(P, Qi);
             }
         }
@@ -243,8 +257,10 @@ struct StatefulLQRFactor {
             auto &&Δui     = Δxu_eq.segment(i * (nx + nu) + nx, nu);
             auto &&Δxi     = Δxu_eq.segment(i * (nx + nu), nx);
             auto &&Δx_next = Δxu_eq.segment((i + 1) * (nx + nu), nx);
-            Δui(Ji)        = Ki * Δxi + ei;
-            Δx_next        = A(i) * Δxi + B(i) * Δui;
+            ei.noalias() += Ki * Δxi;
+            Δui(Ji).noalias() = ei;
+            Δx_next.noalias() = A(i) * Δxi;
+            Δx_next.noalias() += B(i) * Δui;
         }
     }
 

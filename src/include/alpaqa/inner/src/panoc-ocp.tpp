@@ -311,7 +311,8 @@ auto PANOCOCPSolver<Conf>::operator()(
             check_all_stop_conditions(time_elapsed, k, εₖ, no_progress);
         if (stop_status != SolverStatus::Busy) {
             // TODO: loop
-            u              = x̂uₖ;
+            for (index_t t = 0; t < N; ++t)
+                u.segment(t * nu, nu) = eval.uk(x̂uₖ, t);
             s.iterations   = k;
             s.ε            = εₖ;
             s.elapsed_time = duration_cast<nanoseconds>(time_elapsed);
@@ -424,9 +425,6 @@ auto PANOCOCPSolver<Conf>::operator()(
             φₙₑₓₜ = ψₙₑₓₜ + 1 / (2 * γₙₑₓₜ) * pₙₑₓₜᵀpₙₑₓₜ + grad_ψₙₑₓₜᵀpₙₑₓₜ;
             // Compute line search condition
             ls_cond = φₙₑₓₜ - (φₖ - σₖγₖpₖᵀpₖ);
-            if (params.alternative_linesearch_cond)
-                throw std::invalid_argument(
-                    "alternative_linesearch_cond not supported");
 
             τ /= 2;
         } while (ls_cond > margin && τ >= params.τ_min);

@@ -140,14 +140,29 @@ struct DynamicsEvaluator {
         problem.eval_grad_l_N(xk(xu, N), p);
         qk(N) = p;
         for (index_t t = N; t-- > 0;) {
-            auto &&gk = g.segment(t * nu, nu);
+            auto &&gt = g.segment(t * nu, nu);
+            auto &&qt = qk(t);
             problem.eval_jac_f(t, xk(xu, t), uk(xu, t), ABk(t));
-            // TODO: gradient could be combined with forward evaluation
-            problem.eval_grad_l(t, xuk(xu, t), qrk(t));
-            gk = rk(t) + Bk(t).transpose() * p;
-            if (t > 0)
-                p = qk(t) + Ak(t).transpose() * p;
-            // TODO: qk(t) is not really used here if t == 0
+            if (false) {
+                // TODO: gradient could be combined with forward evaluation
+                problem.eval_grad_l(t, xuk(xu, t), qrk(t));
+                // TODO: avoid allocations
+                gt = rk(t) + Bk(t).transpose() * p;
+                if (t > 0)
+                    p = qt + Ak(t).transpose() * p;
+                // TODO: qt is not really used here if t == 0
+            } else {
+                gt.noalias() = Bk(t).transpose() * p;
+                if (t > 0) {
+                    qt.noalias() = Ak(t).transpose() * p;
+                    p            = qt;
+                }
+                // TODO: gradient could be combined with forward evaluation
+                problem.eval_grad_l(t, xuk(xu, t), qrk(t));
+                if (t > 0)
+                    p += qt;
+                gt += rk(t);
+            }
         }
     }
 
