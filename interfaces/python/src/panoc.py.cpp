@@ -51,6 +51,27 @@ struct kwargs_to_struct_table<alpaqa::PANOCParams<Conf>> {
 };
 
 template <alpaqa::Config Conf>
+struct kwargs_to_struct_table<alpaqa::PANOCOCPParams<Conf>> {
+    inline static const kwargs_to_struct_table_t<alpaqa::PANOCOCPParams<Conf>> table{
+        // clang-format off
+        {"Lipschitz", &alpaqa::PANOCOCPParams<Conf>::Lipschitz},
+        {"max_iter", &alpaqa::PANOCOCPParams<Conf>::max_iter},
+        {"max_time", &alpaqa::PANOCOCPParams<Conf>::max_time},
+        {"τ_min", &alpaqa::PANOCOCPParams<Conf>::τ_min},
+        {"L_min", &alpaqa::PANOCOCPParams<Conf>::L_min},
+        {"L_max", &alpaqa::PANOCOCPParams<Conf>::L_max},
+        {"stop_crit", &alpaqa::PANOCOCPParams<Conf>::stop_crit},
+        {"max_no_progress", &alpaqa::PANOCOCPParams<Conf>::max_no_progress},
+        {"gn_interval", &alpaqa::PANOCOCPParams<Conf>::gn_interval},
+        {"print_interval", &alpaqa::PANOCOCPParams<Conf>::print_interval},
+        {"print_precision", &alpaqa::PANOCOCPParams<Conf>::print_precision},
+        {"quadratic_upperbound_tolerance_factor", &alpaqa::PANOCOCPParams<Conf>::quadratic_upperbound_tolerance_factor},
+        {"update_lipschitz_in_linesearch", &alpaqa::PANOCOCPParams<Conf>::update_lipschitz_in_linesearch},
+        // clang-format on
+    };
+};
+
+template <alpaqa::Config Conf>
 struct kwargs_to_struct_table<alpaqa::LipschitzEstimateParams<Conf>> {
     inline static const kwargs_to_struct_table_t<alpaqa::LipschitzEstimateParams<Conf>> table{
         {"L_0", &alpaqa::LipschitzEstimateParams<Conf>::L_0},
@@ -379,6 +400,29 @@ void register_panoc(py::module_ &m) {
              "Specify a callable that is invoked with some intermediate results on each iteration "
              "of the algorithm.");
 
+    using PANOCOCPParams = alpaqa::PANOCOCPParams<config_t>;
+    py::class_<PANOCOCPParams>(m, "PANOCOCPParams",
+                               "C++ documentation: :cpp:class:`alpaqa::PANOCOCPParams`")
+        .def(py::init())
+        .def(py::init(&kwargs_to_struct<PANOCOCPParams>))
+        .def("to_dict", &struct_to_dict<PANOCOCPParams>)
+        // clang-format off
+        .def_readwrite("Lipschitz", &PANOCOCPParams::Lipschitz)
+        .def_readwrite("max_iter", &PANOCOCPParams::max_iter)
+        .def_readwrite("max_time", &PANOCOCPParams::max_time)
+        .def_readwrite("τ_min", &PANOCOCPParams::τ_min)
+        .def_readwrite("L_min", &PANOCOCPParams::L_min)
+        .def_readwrite("L_max", &PANOCOCPParams::L_max)
+        .def_readwrite("stop_crit", &PANOCOCPParams::stop_crit)
+        .def_readwrite("max_no_progress", &PANOCOCPParams::max_no_progress)
+        .def_readwrite("gn_interval", &PANOCOCPParams::gn_interval)
+        .def_readwrite("print_interval", &PANOCOCPParams::print_interval)
+        .def_readwrite("print_precision", &PANOCOCPParams::print_precision)
+        .def_readwrite("quadratic_upperbound_tolerance_factor", &PANOCOCPParams::quadratic_upperbound_tolerance_factor)
+        .def_readwrite("update_lipschitz_in_linesearch", &PANOCOCPParams::update_lipschitz_in_linesearch)
+        // clang-format on
+        ;
+
     using PANOCOCPProgressInfo = alpaqa::PANOCOCPProgressInfo<config_t>;
     py::class_<PANOCOCPProgressInfo>(m, "PANOCOCPProgressInfo",
                                      "Data passed to the PANOC progress callback.\n\n"
@@ -451,7 +495,7 @@ void register_panoc(py::module_ &m) {
 
     py::class_<PANOCOCPSolver>(m, "PANOCOCPSolver",
                                "C++ documentation: :cpp:class:`alpaqa::PANOCOCPSolver`")
-        .def(py::init([](params_or_dict<PANOCParams> params) {
+        .def(py::init([](params_or_dict<PANOCOCPParams> params) {
                  return PANOCOCPSolver{var_kwargs_to_struct(params)};
              }),
              "panoc_params"_a, "Create a PANOC solver.")

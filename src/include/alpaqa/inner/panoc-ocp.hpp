@@ -9,6 +9,42 @@
 
 namespace alpaqa {
 
+/// Tuning parameters for the PANOC algorithm.
+template <Config Conf = DefaultConfig>
+struct PANOCOCPParams {
+    USING_ALPAQA_CONFIG(Conf);
+
+    /// Parameters related to the Lipschitz constant estimate and step size.
+    LipschitzEstimateParams<config_t> Lipschitz;
+    /// Maximum number of inner PANOC iterations.
+    unsigned max_iter = 100;
+    /// Maximum duration.
+    std::chrono::microseconds max_time = std::chrono::minutes(5);
+    /// Minimum weight factor between Newton step and projected gradient step.
+    real_t τ_min = 1. / 256;
+    /// Minimum Lipschitz constant estimate.
+    real_t L_min = 1e-5;
+    /// Maximum Lipschitz constant estimate.
+    real_t L_max = 1e20;
+    /// What stopping criterion to use.
+    PANOCStopCrit stop_crit = PANOCStopCrit::ApproxKKT;
+    /// Maximum number of iterations without any progress before giving up.
+    unsigned max_no_progress = 10;
+    /// How often to use a Gauss-Newton step.
+    unsigned gn_interval = 1;
+
+    /// When to print progress. If set to zero, nothing will be printed.
+    /// If set to N != 0, progress is printed every N iterations.
+    unsigned print_interval = 0;
+    /// The precision of the floating point values printed by the solver.
+    int print_precision = std::numeric_limits<real_t>::max_digits10 / 2;
+
+    real_t quadratic_upperbound_tolerance_factor =
+        10 * std::numeric_limits<real_t>::epsilon();
+
+    bool update_lipschitz_in_linesearch = true;
+};
+
 template <Config Conf = DefaultConfig>
 struct PANOCOCPProgressInfo {
     USING_ALPAQA_CONFIG(Conf);
@@ -28,7 +64,7 @@ struct PANOCOCPProgressInfo {
     real_t τ;
     real_t ε;
     const TypeErasedControlProblem<config_t> &problem;
-    const PANOCParams<config_t> &params;
+    const PANOCOCPParams<config_t> &params;
 };
 
 template <Config Conf>
@@ -37,7 +73,7 @@ class PANOCOCPSolver {
     USING_ALPAQA_CONFIG(Conf);
 
     using Problem      = alpaqa::TypeErasedControlProblem<config_t>;
-    using Params       = PANOCParams<config_t>;
+    using Params       = PANOCOCPParams<config_t>;
     using Stats        = PANOCStats<config_t>;
     using ProgressInfo = PANOCOCPProgressInfo<config_t>;
 

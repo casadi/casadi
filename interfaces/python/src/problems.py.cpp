@@ -463,6 +463,7 @@ void register_problems(py::module_ &m) {
             .def_readonly("nx", &CasADiControlProblem::nx)
             .def_readonly("nu", &CasADiControlProblem::nu)
             .def_readwrite("U", &CasADiControlProblem::U)
+            .def_readwrite("cost_structure", &CasADiControlProblem::cost_structure)
             .def_property(
                 "x_init", [](CasADiControlProblem &p) -> rvec { return p.x_init; },
                 [](CasADiControlProblem &p, crvec x_init) {
