@@ -32,6 +32,8 @@ struct PANOCOCPParams {
     unsigned max_no_progress = 10;
     /// How often to use a Gauss-Newton step.
     unsigned gn_interval = 1;
+    bool gn_sticky = true;
+    bool reset_lbfgs_on_gn_step = false;
 
     /// When to print progress. If set to zero, nothing will be printed.
     /// If set to N != 0, progress is printed every N iterations.
@@ -59,6 +61,9 @@ struct PANOCOCPProgressInfo {
     crvec grad_ψ;
     real_t ψ_hat;
     crvec q;
+    bool gn;
+    length_t nJ;
+    real_t lqr_min_rcond;
     real_t L;
     real_t γ;
     real_t τ;

@@ -1,3 +1,4 @@
+#include <alpaqa/accelerators/lbfgs.hpp>
 #include <alpaqa/inner/directions/panoc-ocp/dynamics-eval.hpp>
 #include <alpaqa/inner/directions/panoc-ocp/lqr.hpp>
 #include <alpaqa/inner/panoc-ocp.hpp>
@@ -33,16 +34,21 @@ auto PANOCOCPSolver<Conf>::operator()(
     const auto n   = nu * N;
     const auto Nxu = n + nx * (N + 1);
 
+    bool enable_lbfgs = params.gn_interval > 1;
+
     // Allocate storage --------------------------------------------------------
 
     // TODO: the L-BFGS objects and vectors allocate on each iteration of ALM,
     //       and there are more vectors than strictly necessary.
 
-    vec xuₖ(Nxu),    // x and u at the beginning of the iteration
-        x̂uₖ(Nxu),    // x and u after a projected gradient step
-        xuₙₑₓₜ(Nxu), // xuₖ for next iteration
-        x̂uₙₑₓₜ(Nxu), // x̂uₖ for next iteration
-        pₖ(n),       // Projected gradient step pₖ = x̂ₖ - xₖ
+    vec xuₖ(Nxu),                 // x and u at the beginning of the iteration
+        x̂uₖ(Nxu),                 // x and u after a projected gradient step
+        xuₙₑₓₜ(Nxu),              // xuₖ for next iteration
+        x̂uₙₑₓₜ(Nxu),              // x̂uₖ for next iteration
+        uₖ(enable_lbfgs ? n : 0), // For L-BFGS update
+        uₙₑₓₜ(enable_lbfgs ? n : 0), // For L-BFGS update
+        quₖ(enable_lbfgs ? n : 0),   // For L-BFGS update
+        pₖ(n), // Projected gradient step pₖ = x̂ₖ - xₖ
         pₙₑₓₜ(n), // Projected gradient step pₙₑₓₜ = x̂ₙₑₓₜ - xₙₑₓₜ
         qxuₖ(Nxu),       // Newton step, including states
         grad_ψₖ(n),      // ∇ψ(xₖ)
@@ -51,12 +57,13 @@ auto PANOCOCPSolver<Conf>::operator()(
         work_w(nx + nu); //
     Box<config_t> U{vec::Constant(nu, NaN<config_t>),
                     vec::Constant(n, NaN<config_t>)};
-    mat work_AB(nx, nx + nu);
 
     DynamicsEvaluator<config_t> eval{problem};
     detail::IndexSet<config_t> J{N, nu};
     using LQRFactor = alpaqa::StatefulLQRFactor<config_t>;
     LQRFactor lqr{{.N = N, .nx = nx, .nu = nu}};
+    LBFGSParams<config_t> lbfgs_param{.memory = N}; // TODO: make configurable
+    LBFGS<config_t> lbfgs{lbfgs_param, enable_lbfgs ? n : 0};
 
     // Keep track of how many successive iterations didn't update the iterate
     unsigned no_progress = 0;
@@ -172,12 +179,23 @@ auto PANOCOCPSolver<Conf>::operator()(
                                      : SolverStatus::Busy;
         };
 
-    // Note: updates the stats in xuₖ, the jacobians in eval, and
+    auto assign_interleave_xu = [N, nu, nx](crvec u, rvec xu) {
+        for (index_t t = 0; t < N; ++t)
+            xu.segment(t * (nx + nu) + nx, nu) = u.segment(t * nu, nu);
+    };
+    auto assign_extract_u = [N, nu, nx](crvec xu, rvec u) {
+        for (index_t t = 0; t < N; ++t)
+            u.segment(t * nu, nu) = xu.segment(t * (nx + nu) + nx, nu);
+    };
+
+    // Note: updates the stats in xuₖ, the Jacobians in eval, and
     // overwrites grad_ψₙₑₓₜ
     auto initial_lipschitz_estimate =
-        [&eval, &grad_ψₙₑₓₜ, &work_p, &work_w, &work_AB, N, nu](
+        [&eval, &grad_ψₙₑₓₜ, &work_p, &work_w, N, nu](
             /// [inout]    Current iterate @f$ x^k @f$
             rvec xuₖ,
+            /// Whether to compute the Jacobians of the dynamics in xuₖ
+            bool do_gn_step,
             /// [in]    Finite difference step size relative to xₖ
             real_t ε,
             /// [in]    Minimum absolute finite difference step size
@@ -194,7 +212,8 @@ auto PANOCOCPSolver<Conf>::operator()(
             rvec work_xuₖ) {
             // Calculate ψ(x₀), ∇ψ(x₀)
             ψ = eval.forward(xuₖ);
-            eval.backward_with_jac(xuₖ, grad_ψ, work_p);
+            do_gn_step ? eval.backward_with_jac(xuₖ, grad_ψ, work_p)
+                       : eval.backward(xuₖ, grad_ψ, work_p, work_w);
             // Select a small step h for finite differences
             auto h = (-grad_ψ * ε).cwiseAbs().cwiseMax(δ); // TODO: remove abs
             real_t norm_h = h.norm();
@@ -202,7 +221,7 @@ auto PANOCOCPSolver<Conf>::operator()(
                 eval.uk(work_xuₖ, t) = eval.uk(xuₖ, t) + h.segment(t * nu, nu);
             eval.forward_simulate(work_xuₖ); // needed for backwards sweep
             // Calculate ∇ψ(x₀ + h)
-            eval.backward(work_xuₖ, grad_ψₙₑₓₜ, work_p, work_w, work_AB);
+            eval.backward(work_xuₖ, grad_ψₙₑₓₜ, work_p, work_w);
 
             // Estimate Lipschitz constant using finite differences
             real_t L = (grad_ψₙₑₓₜ - grad_ψ).norm() / norm_h;
@@ -216,47 +235,60 @@ auto PANOCOCPSolver<Conf>::operator()(
     auto print_real3 = [&](real_t x) {
         return float_to_str_vw(print_buf, x, 3);
     };
-    auto print_progress = [&](unsigned k, real_t ψₖ, crvec grad_ψₖ,
+    auto print_progress = [&](unsigned k, real_t φₖ, real_t ψₖ, crvec grad_ψₖ,
                               real_t pₖᵀpₖ, crvec qₖ, real_t γₖ, real_t τₖ,
-                              real_t εₖ) {
+                              real_t εₖ, bool did_gn, length_t nJ,
+                              real_t min_rcond) {
         std::cout << "[PANOC] " << std::setw(6) << k
-                  << ": ψ = " << print_real(ψₖ)
+                  << ": φγ = " << print_real(φₖ) << ", ψ = " << print_real(ψₖ)
                   << ", ‖∇ψ‖ = " << print_real(grad_ψₖ.norm())
                   << ", ‖p‖ = " << print_real(std::sqrt(pₖᵀpₖ))
-                  << ", ‖q‖ = " << print_real(qₖ.norm())
-                  << ", γ = " << print_real(γₖ) << ", τ = " << print_real3(τₖ)
-                  << ", εₖ = " << print_real(εₖ)
-                  << std::endl; // Flush for Python buffering
+                  << ", γ = " << print_real(γₖ) << ", εₖ = " << print_real(εₖ);
+        if (k > 0)
+            std::cout << ", τ = " << print_real3(τₖ)
+                      << ", ‖q‖ = " << print_real(qₖ.norm())
+                      << ", #J =" << std::setw(5) << nJ
+                      << ", rcond = " << print_real3(min_rcond) << ", "
+                      << (did_gn ? "GN" : "L-BFGS");
+        std::cout << std::endl; // Flush for Python buffering
     };
 
     // Initialize inputs and initial state (do not simulate states yet) --------
 
+    assign_interleave_xu(u, xuₖ);
     problem.get_x_init(xuₖ.topRows(nx));
-    for (index_t t = 0; t < N; ++t)
-        eval.uk(xuₖ, t) = u.segment(t * nu, nu);
     x̂uₖ.topRows(nx)    = xuₖ.topRows(nx);
     xuₙₑₓₜ.topRows(nx) = xuₖ.topRows(nx);
     x̂uₙₑₓₜ.topRows(nx) = xuₖ.topRows(nx);
     qxuₖ.topRows(nx).setZero();
+    if (enable_lbfgs)
+        uₖ = u;
 
     problem.get_U(U);
+
+    bool do_gn_step     = true;
+    bool have_jacobians = false; // TODO: just as a sanity check
+    bool did_gn         = false;
 
     // Estimate Lipschitz constant ---------------------------------------------
 
     real_t ψₖ, Lₖ;
     // Finite difference approximation of ∇²ψ in starting point
     if (params.Lipschitz.L_0 <= 0) {
-        Lₖ = initial_lipschitz_estimate(xuₖ, params.Lipschitz.ε,
+        Lₖ = initial_lipschitz_estimate(xuₖ, do_gn_step, params.Lipschitz.ε,
                                         params.Lipschitz.δ, params.L_min,
                                         params.L_max,
                                         /* in ⟹ out */ ψₖ, grad_ψₖ, xuₙₑₓₜ);
+        have_jacobians = do_gn_step;
     }
     // Initial Lipschitz constant provided by the user
     else {
         Lₖ = params.Lipschitz.L_0;
         // Calculate ψ(x₀), ∇ψ(x₀)
         ψₖ = eval.forward(xuₖ);
-        eval.backward_with_jac(grad_ψₖ, work_p, work_w);
+        do_gn_step ? eval.backward_with_jac(xuₖ, grad_ψₖ, work_p)
+                   : eval.backward(xuₖ, grad_ψₖ, work_p, work_w);
+        have_jacobians = do_gn_step;
     }
     if (not std::isfinite(Lₖ)) {
         s.status = SolverStatus::NotFinite;
@@ -299,11 +331,13 @@ auto PANOCOCPSolver<Conf>::operator()(
 
         // Print progress
         if (params.print_interval != 0 && k % params.print_interval == 0)
-            print_progress(k, ψₖ, grad_ψₖ, pₖᵀpₖ, qxuₖ, γₖ, τ, εₖ);
+            print_progress(k, φₖ, ψₖ, grad_ψₖ, pₖᵀpₖ, qxuₖ, γₖ, τ, εₖ, did_gn,
+                           J.sizes().sum(), lqr.min_rcond);
         if (progress_cb) {
             ScopedMallocAllower ma;
-            progress_cb({k, xuₖ, pₖ, pₖᵀpₖ, x̂uₖ, φₖ, ψₖ, grad_ψₖ, ψx̂ₖ, qxuₖ, Lₖ,
-                         γₖ, τ, εₖ, problem, params});
+            progress_cb({k, xuₖ, pₖ, pₖᵀpₖ, x̂uₖ, φₖ, ψₖ, grad_ψₖ, ψx̂ₖ, qxuₖ,
+                         did_gn, J.sizes().sum(), lqr.min_rcond, Lₖ, γₖ, τ, εₖ,
+                         problem, params});
         }
 
         auto time_elapsed = std::chrono::steady_clock::now() - start_time;
@@ -311,8 +345,7 @@ auto PANOCOCPSolver<Conf>::operator()(
             check_all_stop_conditions(time_elapsed, k, εₖ, no_progress);
         if (stop_status != SolverStatus::Busy) {
             // TODO: loop
-            for (index_t t = 0; t < N; ++t)
-                u.segment(t * nu, nu) = eval.uk(x̂uₖ, t);
+            assign_extract_u(x̂uₖ, u);
             s.iterations   = k;
             s.ε            = εₖ;
             s.elapsed_time = duration_cast<nanoseconds>(time_elapsed);
@@ -320,46 +353,6 @@ auto PANOCOCPSolver<Conf>::operator()(
             s.final_γ      = γₖ;
             return s;
         }
-
-        // Calculate Gauss-Newton step -----------------------------------------
-
-        // Forward simulation has been carried out on xuₖ and the Jacobians are
-        // stored in 'eval'
-
-        // Make sure that Q and R are stored as well
-        eval.hessians(xuₖ);
-
-        auto is_constr_active = [&](index_t t, index_t i) {
-            real_t ui = eval.uk(xuₖ, t)(i);
-            // Gradient descent step.
-            real_t gs = ui - γₖ * grad_ψₖ(t * nu + i);
-            // Check whether the box constraints are active for this index.
-            bool active_lb = gs <= U.lowerbound(i);
-            bool active_ub = gs >= U.upperbound(i);
-            if (active_ub) {
-                eval.uk(qxuₖ, t)(i) = U.upperbound(i) - ui;
-                return false;
-            } else if (active_lb) {
-                eval.uk(qxuₖ, t)(i) = U.lowerbound(i) - ui;
-                return false;
-            } else { // Store inactive indices
-                return true;
-            }
-        };
-        J.update(is_constr_active);
-
-        auto Ak    = [&](index_t i) -> crmat { return eval.Ak(i); };
-        auto Bk    = [&](index_t i) -> crmat { return eval.Bk(i); };
-        auto Qk    = [&](index_t k) -> crmat { return eval.Qk(k); };
-        auto Rk    = [&](index_t k) -> crmat { return eval.Rk(k); };
-        auto qk    = [&](index_t k) -> crvec { return eval.qk(k); };
-        auto rk    = [&](index_t k) -> crvec { return eval.rk(k); };
-        auto uk_eq = [&](index_t k) -> crvec { return eval.uk(qxuₖ, k); };
-        auto Jk    = [&](index_t k) -> crindexvec { return J.indices(k); };
-        auto Kk = [&](index_t k) -> crindexvec { return J.compl_indices(k); };
-
-        lqr.factor_masked(Ak, Bk, Qk, Rk, qk, rk, uk_eq, Jk, Kk);
-        lqr.solve_masked(Ak, Bk, Jk, qxuₖ);
 
         // Line search initialization ------------------------------------------
         τ                = 1;
@@ -371,14 +364,114 @@ auto PANOCOCPSolver<Conf>::operator()(
         real_t margin =
             (1 + std::abs(φₖ)) * params.quadratic_upperbound_tolerance_factor;
 
+        // Calculate Gauss-Newton step -----------------------------------------
+
+        did_gn = do_gn_step;
+        if (do_gn_step) {
+            // Forward simulation has been carried out on xuₖ and the Jacobians
+            // are stored in 'eval'
+            if (!have_jacobians)
+                throw std::logic_error("have_jacobians");
+
+            // Make sure that Q and R are stored as well
+            eval.hessians(xuₖ);
+
+            auto is_constr_inactive = [&](index_t t, index_t i) {
+                real_t ui = eval.uk(xuₖ, t)(i);
+                // Gradient descent step.
+                real_t gs = ui - γₖ * grad_ψₖ(t * nu + i);
+                // Check whether the box constraints are active for this index.
+                bool active_lb = gs <= U.lowerbound(i);
+                bool active_ub = gs >= U.upperbound(i);
+                if (active_ub) {
+                    eval.uk(qxuₖ, t)(i) = U.upperbound(i) - ui;
+                    return false;
+                } else if (active_lb) {
+                    eval.uk(qxuₖ, t)(i) = U.lowerbound(i) - ui;
+                    return false;
+                } else { // Store inactive indices
+                    return true;
+                }
+            };
+            J.update(is_constr_inactive);
+
+            auto Ak    = [&](index_t i) -> crmat { return eval.Ak(i); };
+            auto Bk    = [&](index_t i) -> crmat { return eval.Bk(i); };
+            auto Qk    = [&](index_t k) -> crmat { return eval.Qk(k); };
+            auto Rk    = [&](index_t k) -> crmat { return eval.Rk(k); };
+            auto qk    = [&](index_t k) -> crvec { return eval.qk(k); };
+            auto rk    = [&](index_t k) -> crvec { return eval.rk(k); };
+            auto uk_eq = [&](index_t k) -> crvec { return eval.uk(qxuₖ, k); };
+            auto Jk    = [&](index_t k) -> crindexvec { return J.indices(k); };
+            auto Kk    = [&](index_t k) -> crindexvec {
+                return J.compl_indices(k);
+            };
+
+            lqr.factor_masked(Ak, Bk, Qk, Rk, qk, rk, uk_eq, Jk, Kk);
+            lqr.solve_masked(Ak, Bk, Jk, qxuₖ);
+        } else {
+            if (!enable_lbfgs)
+                throw std::logic_error("enable_lbfgs");
+
+            // Find inactive indices J
+            auto is_constr_inactive = [&](index_t t, index_t i) {
+                real_t ui     = eval.uk(xuₖ, t)(i);
+                real_t grad_i = grad_ψₖ(t * nu + i);
+                // Gradient descent step.
+                real_t gs = ui - γₖ * grad_i;
+                // Check whether the box constraints are active for this index.
+                bool active_lb = gs <= U.lowerbound(i);
+                bool active_ub = gs >= U.upperbound(i);
+                if (active_ub) {
+                    quₖ(t * nu + i) = pₖ(t * nu + i);
+                    return false;
+                } else if (active_lb) {
+                    quₖ(t * nu + i) = pₖ(t * nu + i);
+                    return false;
+                } else { // Store inactive indices
+                    quₖ(t * nu + i) = -grad_i;
+                    return true;
+                }
+            };
+
+            auto J_idx = J.indices();
+            J_idx.setConstant(0x5A5A'5A5A);
+            index_t nJ = 0;
+            for (index_t t = 0; t < N; ++t)
+                for (index_t i = 0; i < nu; ++i)
+                    if (is_constr_inactive(t, i))
+                        J_idx(nJ++) = t * nu + i;
+
+            auto J_lbfgs = J_idx.topRows(nJ);
+
+            // If all indices are inactive, we can use standard L-BFGS,
+            // if there are active indices, we need the specialized version
+            // that only applies L-BFGS to the inactive indices
+            bool success = lbfgs.apply_masked(quₖ, γₖ, J_lbfgs);
+            // If L-BFGS application failed, qₖ(J) still contains
+            // -∇ψ(x)(J) - HqK(J) or -∇ψ(x)(J), which is not a valid step.
+            if (not success) {
+                τ = 0;
+            } else {
+                // for (index_t t = N; t-- > 0;)
+                //     for (index_t i = nu; i-- > 0;)
+                //         qxuₖ(t * (nx + nu) + nx + i) = qxuₖ(t * (0 + nu) + nx + i);
+                assign_interleave_xu(quₖ, qxuₖ);
+            }
+        }
+
         // Make sure quasi-Newton step is valid
-        if (k == 0) {
-            τ = 0; // Always use prox step on first iteration
-        } else if (not qxuₖ.allFinite()) {
+        if (not qxuₖ.allFinite()) {
             τ = 0;
             ++s.lbfgs_failures;
             // Is there anything we can do?
+            if (not did_gn)
+                lbfgs.reset();
         }
+
+        bool do_next_gn =
+            params.gn_interval == 0 || ((k + 1) % params.gn_interval) == 0;
+        do_gn_step = do_next_gn || (do_gn_step && params.gn_sticky);
 
         // Line search loop ----------------------------------------------------
         do {
@@ -389,11 +482,14 @@ auto PANOCOCPSolver<Conf>::operator()(
             if (τ / 2 < params.τ_min) { // line search failed
                 xuₙₑₓₜ.swap(x̂uₖ);       // → safe prox step
                 ψₙₑₓₜ = ψx̂ₖ;
-                eval.backward_with_jac(xuₙₑₓₜ, grad_ψₙₑₓₜ, work_p);
+                do_gn_step ? eval.backward_with_jac(xuₙₑₓₜ, grad_ψₙₑₓₜ, work_p)
+                           : eval.backward(xuₙₑₓₜ, grad_ψₙₑₓₜ, work_p, work_w);
+                have_jacobians = do_gn_step;
             } else {          // line search didn't fail (yet)
                 if (τ == 1) { // → faster quasi-Newton step
                     xuₙₑₓₜ = xuₖ + qxuₖ;
                 } else {
+                    do_gn_step = do_next_gn;
                     for (index_t t = 0; t < N; ++t)
                         eval.uk(xuₙₑₓₜ, t) = eval.uk(xuₖ, t) +
                                              (1 - τ) * pₖ.segment(t * nu, nu) +
@@ -401,7 +497,9 @@ auto PANOCOCPSolver<Conf>::operator()(
                 }
                 // Calculate ψ(xₙₑₓₜ), ∇ψ(xₙₑₓₜ)
                 ψₙₑₓₜ = eval.forward(xuₙₑₓₜ);
-                eval.backward_with_jac(xuₙₑₓₜ, grad_ψₙₑₓₜ, work_p);
+                do_gn_step ? eval.backward_with_jac(xuₙₑₓₜ, grad_ψₙₑₓₜ, work_p)
+                           : eval.backward(xuₙₑₓₜ, grad_ψₙₑₓₜ, work_p, work_w);
+                have_jacobians = do_gn_step;
             }
 
             // Calculate x̂ₙₑₓₜ, pₙₑₓₜ (projected gradient step in xₙₑₓₜ)
@@ -430,22 +528,33 @@ auto PANOCOCPSolver<Conf>::operator()(
         } while (ls_cond > margin && τ >= params.τ_min);
 
         // If τ < τ_min the line search failed and we accepted the prox step
-        if (τ < params.τ_min && k != 0) {
+        if (τ < params.τ_min) {
             ++s.linesearch_failures;
             τ = 0;
         }
         τ *= 2; // restore to the value that was actually accepted
-        if (k != 0) {
-            s.count_τ += 1;
-            s.sum_τ += τ;
-            s.τ_1_accepted += τ == 1;
-        }
+        s.count_τ += 1;
+        s.sum_τ += τ;
+        s.τ_1_accepted += τ == 1;
 
         // Update L-BFGS -------------------------------------------------------
 
         // Check if we made any progress
         if (no_progress > 0 || k % params.max_no_progress == 0)
             no_progress = xuₖ == xuₙₑₓₜ ? no_progress + 1 : 0;
+
+        // Update L-BFGS
+        if (enable_lbfgs) {
+            const bool force = true;
+            assign_extract_u(xuₙₑₓₜ, uₙₑₓₜ);
+            if (did_gn && params.reset_lbfgs_on_gn_step) {
+                lbfgs.reset();
+            } else {
+                s.lbfgs_rejected +=
+                    not lbfgs.update(uₖ, uₙₑₓₜ, grad_ψₖ, grad_ψₙₑₓₜ,
+                                     LBFGS<config_t>::Sign::Positive, force);
+            }
+        }
 
         // Advance step --------------------------------------------------------
         Lₖ = Lₙₑₓₜ;
@@ -461,6 +570,8 @@ auto PANOCOCPSolver<Conf>::operator()(
         grad_ψₖ.swap(grad_ψₙₑₓₜ);
         grad_ψₖᵀpₖ = grad_ψₙₑₓₜᵀpₙₑₓₜ;
         pₖᵀpₖ      = pₙₑₓₜᵀpₙₑₓₜ;
+        if (enable_lbfgs)
+            uₖ.swap(uₙₑₓₜ);
     }
     throw std::logic_error("[PANOC] loop error");
 }

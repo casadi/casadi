@@ -63,6 +63,8 @@ struct kwargs_to_struct_table<alpaqa::PANOCOCPParams<Conf>> {
         {"stop_crit", &alpaqa::PANOCOCPParams<Conf>::stop_crit},
         {"max_no_progress", &alpaqa::PANOCOCPParams<Conf>::max_no_progress},
         {"gn_interval", &alpaqa::PANOCOCPParams<Conf>::gn_interval},
+        {"gn_sticky", &alpaqa::PANOCOCPParams<Conf>::gn_sticky},
+        {"reset_lbfgs_on_gn_step", &alpaqa::PANOCOCPParams<Conf>::reset_lbfgs_on_gn_step},
         {"print_interval", &alpaqa::PANOCOCPParams<Conf>::print_interval},
         {"print_precision", &alpaqa::PANOCOCPParams<Conf>::print_precision},
         {"quadratic_upperbound_tolerance_factor", &alpaqa::PANOCOCPParams<Conf>::quadratic_upperbound_tolerance_factor},
@@ -416,6 +418,8 @@ void register_panoc(py::module_ &m) {
         .def_readwrite("stop_crit", &PANOCOCPParams::stop_crit)
         .def_readwrite("max_no_progress", &PANOCOCPParams::max_no_progress)
         .def_readwrite("gn_interval", &PANOCOCPParams::gn_interval)
+        .def_readwrite("gn_sticky", &PANOCOCPParams::gn_sticky)
+        .def_readwrite("reset_lbfgs_on_gn_step", &PANOCOCPParams::reset_lbfgs_on_gn_step)
         .def_readwrite("print_interval", &PANOCOCPParams::print_interval)
         .def_readwrite("print_precision", &PANOCOCPParams::print_precision)
         .def_readwrite("quadratic_upperbound_tolerance_factor", &PANOCOCPParams::quadratic_upperbound_tolerance_factor)
@@ -437,7 +441,10 @@ void register_panoc(py::module_ &m) {
         .def_readonly("ψ", &PANOCOCPProgressInfo::ψ, "Objective value :math:`\\psi(u)`")
         .def_readonly("grad_ψ", &PANOCOCPProgressInfo::grad_ψ, "Gradient of objective :math:`\\nabla\\psi(u)`")
         .def_readonly("ψ_hat", &PANOCOCPProgressInfo::ψ_hat, "Objective at x̂ :math:`\\psi(\\hat u)`")
-        .def_readonly("q", &PANOCOCPProgressInfo::q, "Gauss-Newton step :math:`q`")
+        .def_readonly("q", &PANOCOCPProgressInfo::q, "Previous accelerated step :math:`q`")
+        .def_readonly("gn", &PANOCOCPProgressInfo::gn, "Was :math:`q` a Gauss-Newton or L-BFGS step?")
+        .def_readonly("nJ", &PANOCOCPProgressInfo::nJ, "Number of inactive constraints :math:`\\#\\mathcal J`")
+        .def_readonly("lqr_min_rcond", &PANOCOCPProgressInfo::lqr_min_rcond, "Minimum reciprocal condition number encountered in LQR factorization")
         .def_readonly("L", &PANOCOCPProgressInfo::L, "Estimate of Lipschitz constant of objective :math:`L`")
         .def_readonly("γ", &PANOCOCPProgressInfo::γ, "Step size :math:`\\gamma`")
         .def_readonly("τ", &PANOCOCPProgressInfo::τ, "Line search parameter :math:`\\tau`")

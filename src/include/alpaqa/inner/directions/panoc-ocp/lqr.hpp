@@ -1,6 +1,7 @@
 #pragma once
 
 #include <alpaqa/config/config.hpp>
+#include <Eigen/Cholesky>
 #include <Eigen/LU>
 
 namespace alpaqa {
@@ -171,6 +172,7 @@ struct StatefulLQRFactor {
     vec BiJ_sto{dim.nx * dim.nu};
     vec PBiJ_sto{dim.nx * dim.nu};
     mat PA{dim.nx, dim.nx};
+    real_t min_rcond = 1;
 
     void factor_masked(auto &&A, ///< System matrix A
                        auto &&B, ///< Input matrix B
@@ -185,6 +187,7 @@ struct StatefulLQRFactor {
         using mmat       = Eigen::Map<mat>;
         auto [N, nx, nu] = dim;
 
+        min_rcond = 1;
         assign_possibly_diagonal(P, Q(N));
         s = q(N);
         for (index_t i = N; i-- > 0;) {
@@ -221,10 +224,11 @@ struct StatefulLQRFactor {
             bool prev = Eigen::internal::is_malloc_allowed();
             Eigen::internal::set_is_malloc_allowed(true); // TODO
 #endif
-            Eigen::PartialPivLU<rmat> R̅LU{R̅};
+            Eigen::LDLT<rmat> R̅LU{R̅};
 #ifdef EIGEN_RUNTIME_NO_MALLOC
             Eigen::internal::set_is_malloc_allowed(prev);
 #endif
+            min_rcond         = std::min(R̅LU.rcond(), min_rcond);
             gain_Ki.noalias() = R̅LU.solve(S̅);
             gain_Ki           = -gain_Ki;
             // e ← -R̅⁻¹(Bᵀy + r)

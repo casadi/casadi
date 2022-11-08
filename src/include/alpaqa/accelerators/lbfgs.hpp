@@ -49,7 +49,7 @@ struct LBFGSParams {
     /// Parameters in the cautious BFGS update condition
     /// @f[ \frac{y^\top s}{s^\top s} \ge \epsilon \| g \|^\alpha @f]
     /// @see https://epubs.siam.org/doi/10.1137/S1052623499354242
-    CBFGSParams<config_t> cbfgs;
+    CBFGSParams<config_t> cbfgs = {};
     /// If set to true, the inverse Hessian estimate should remain definite,
     /// i.e. a check is performed that rejects the update if
     /// @f$ y^\top s \le \text{min_div_fac} \cdot s^\top s @f$.

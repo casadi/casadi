@@ -188,7 +188,7 @@ struct DynamicsEvaluator {
         }
     }
 #else
-    void backward(crvec xu, rvec g, rvec p, rvec w, rmat) {
+    void backward(crvec xu, rvec g, rvec p, rvec w) {
         assert(xu.size() == (nx + nu) * N + nx);
         problem.eval_grad_l_N(xk(xu, N), p);
         for (index_t t = N; t-- > 0;) {
