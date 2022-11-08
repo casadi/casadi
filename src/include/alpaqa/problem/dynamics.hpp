@@ -44,6 +44,8 @@ struct ControlProblemVTable : util::BasicVTable {
         eval_f;
     required_const_function_t<void(index_t timestep, crvec x, crvec u, rmat J_fxu)>
         eval_jac_f;
+    required_const_function_t<void(index_t timestep, crvec x, crvec u, crvec v, rvec grad_fxu_p)>
+        eval_grad_f_prod;
     required_const_function_t<real_t(index_t timestep, crvec h)>
         eval_l;
     required_const_function_t<real_t(crvec h)>
@@ -66,22 +68,23 @@ struct ControlProblemVTable : util::BasicVTable {
 
     template <class P>
     ControlProblemVTable(util::VTableTypeTag<P> t) : util::BasicVTable{t} {
-        get_U           = util::type_erased_wrapped<&P::get_U>();
-        get_x_init      = util::type_erased_wrapped<&P::get_x_init>();
-        eval_f          = util::type_erased_wrapped<&P::eval_f>();
-        eval_jac_f      = util::type_erased_wrapped<&P::eval_jac_f>();
-        eval_l          = util::type_erased_wrapped<&P::eval_l>();
-        eval_l_N        = util::type_erased_wrapped<&P::eval_l_N>();
-        eval_grad_l     = util::type_erased_wrapped<&P::eval_grad_l>();
-        eval_grad_l_N   = util::type_erased_wrapped<&P::eval_grad_l_N>();
-        eval_hess_l     = util::type_erased_wrapped<&P::eval_hess_l>();
-        eval_hess_l_N   = util::type_erased_wrapped<&P::eval_hess_l_N>();
-        get_l_structure = util::type_erased_wrapped<&P::get_l_structure>();
-        check           = util::type_erased_wrapped<&P::check>();
-        N               = t.t->get_N();
-        nu              = t.t->get_nu();
-        nx              = t.t->get_nx();
-        nh              = t.t->get_nh();
+        get_U            = util::type_erased_wrapped<&P::get_U>();
+        get_x_init       = util::type_erased_wrapped<&P::get_x_init>();
+        eval_f           = util::type_erased_wrapped<&P::eval_f>();
+        eval_jac_f       = util::type_erased_wrapped<&P::eval_jac_f>();
+        eval_grad_f_prod = util::type_erased_wrapped<&P::eval_grad_f_prod>();
+        eval_l           = util::type_erased_wrapped<&P::eval_l>();
+        eval_l_N         = util::type_erased_wrapped<&P::eval_l_N>();
+        eval_grad_l      = util::type_erased_wrapped<&P::eval_grad_l>();
+        eval_grad_l_N    = util::type_erased_wrapped<&P::eval_grad_l_N>();
+        eval_hess_l      = util::type_erased_wrapped<&P::eval_hess_l>();
+        eval_hess_l_N    = util::type_erased_wrapped<&P::eval_hess_l_N>();
+        get_l_structure  = util::type_erased_wrapped<&P::get_l_structure>();
+        check            = util::type_erased_wrapped<&P::check>();
+        N                = t.t->get_N();
+        nu               = t.t->get_nu();
+        nx               = t.t->get_nx();
+        nh               = t.t->get_nh();
     }
     ControlProblemVTable() = default;
 };
@@ -125,6 +128,7 @@ class TypeErasedControlProblem : public util::TypeErased<ControlProblemVTable<Co
     void get_x_init(rvec x_init) const;
     void eval_f(index_t timestep, crvec x, crvec u, rvec fxu) const;
     void eval_jac_f(index_t timestep, crvec x, crvec u, rmat J_fxu) const;
+    void eval_grad_f_prod(index_t timestep, crvec x, crvec u, crvec v, rvec grad_fxu_p) const;
     real_t eval_l(index_t timestep, crvec h) const;
     real_t eval_l_N(crvec h) const;
     void eval_grad_l(index_t timestep, crvec h, rvec grad_lh) const;
@@ -152,6 +156,11 @@ template <Config Conf, class Allocator>
 void TypeErasedControlProblem<Conf, Allocator>::eval_jac_f(index_t timestep, crvec x, crvec u,
                                                            rmat J_fxu) const {
     return call(vtable.eval_jac_f, timestep, x, u, J_fxu);
+}
+template <Config Conf, class Allocator>
+void TypeErasedControlProblem<Conf, Allocator>::eval_grad_f_prod(index_t timestep, crvec x, crvec u,
+                                                                 crvec v, rvec grad_fxu_p) const {
+    return call(vtable.eval_grad_f_prod, timestep, x, u, v, grad_fxu_p);
 }
 template <Config Conf, class Allocator>
 auto TypeErasedControlProblem<Conf, Allocator>::eval_l(index_t timestep, crvec h) const -> real_t {

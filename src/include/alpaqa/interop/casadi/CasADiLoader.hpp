@@ -145,6 +145,8 @@ class CasADiControlProblem {
     void get_x_init(rvec x_init) const { x_init = this->x_init; }
     void eval_f(index_t timestep, crvec x, crvec u, rvec fxu) const;
     void eval_jac_f(index_t timestep, crvec x, crvec u, rmat J_fxu) const;
+    void eval_grad_f_prod(index_t timestep, crvec x, crvec u, crvec v,
+                          rvec grad_fxu_p) const;
     real_t eval_l(index_t timestep, crvec h) const;
     real_t eval_l_N(crvec h) const;
     void eval_grad_l(index_t timestep, crvec h, rvec grad_lh) const;

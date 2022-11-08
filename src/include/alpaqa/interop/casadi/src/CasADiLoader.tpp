@@ -65,6 +65,7 @@ struct CasADiControlFunctionsWithParam {
     static constexpr bool WithParam = true;
     CasADiFunctionEvaluator<Conf, 2 + WithParam, 1> f;
     CasADiFunctionEvaluator<Conf, 2 + WithParam, 1> jac_f;
+    CasADiFunctionEvaluator<Conf, 3 + WithParam, 1> grad_f_prod;
     CasADiFunctionEvaluator<Conf, 1 + WithParam, 1> l;
     CasADiFunctionEvaluator<Conf, 1 + WithParam, 1> l_N;
     CasADiFunctionEvaluator<Conf, 1 + WithParam, 1> grad_l;
@@ -395,6 +396,8 @@ CasADiControlProblem<Conf>::CasADiControlProblem(const std::string &so_name,
             .f     = std::move(f),
             .jac_f = wrapped_load<CasADiFunctionEvaluator<Conf, 3, 1>>(
                 so_name, "jac_f", dims(nx, nu, p), dims(dim(nx, nx + nu))),
+            .grad_f_prod = wrapped_load<CasADiFunctionEvaluator<Conf, 4, 1>>(
+                so_name, "grad_f_prod", dims(nx, nu, p, nx), dims(nx + nu)),
             .l = wrapped_load<CasADiFunctionEvaluator<Conf, 2, 1>>(
                 so_name, "l", dims(nx + nu, p), dims(1)),
             .l_N = wrapped_load<CasADiFunctionEvaluator<Conf, 2, 1>>(
@@ -437,6 +440,13 @@ template <Config Conf>
 void CasADiControlProblem<Conf>::eval_jac_f(index_t, crvec x, crvec u,
                                             rmat J_fxu) const {
     impl->jac_f({x.data(), u.data(), param.data()}, {J_fxu.data()});
+}
+template <Config Conf>
+void CasADiControlProblem<Conf>::eval_grad_f_prod(index_t, crvec x, crvec u,
+                                                  crvec v,
+                                                  rvec grad_fxu_p) const {
+    impl->grad_f_prod({x.data(), u.data(), param.data(), v.data()},
+                      {grad_fxu_p.data()});
 }
 template <Config Conf>
 auto CasADiControlProblem<Conf>::eval_l(index_t, crvec h) const -> real_t {

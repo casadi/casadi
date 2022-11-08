@@ -171,6 +171,7 @@ struct DynamicsEvaluator {
     /// @param p Work vector of dimension @f$ n_x @f$
     /// @param w Work vector of dimension @f$ n_x + n_u @f$
     /// @param AB Work matrix of dimensions @f$ n_x \times (n_x + n_u) @f$
+#if 0
     void backward(crvec xu, rvec g, rvec p, rvec w, rmat AB) {
         assert(xu.size() == (nx + nu) * N + nx);
         problem.eval_grad_l_N(xk(xu, N), p);
@@ -186,6 +187,21 @@ struct DynamicsEvaluator {
             // TODO: t.topRows(nx) is not really used here if k == 0
         }
     }
+#else
+    void backward(crvec xu, rvec g, rvec p, rvec w, rmat) {
+        assert(xu.size() == (nx + nu) * N + nx);
+        problem.eval_grad_l_N(xk(xu, N), p);
+        for (index_t t = N; t-- > 0;) {
+            auto &&gt = g.segment(t * nu, nu);
+            problem.eval_grad_f_prod(t, xk(xu, t), uk(xu, t), p, w);
+            gt = w.bottomRows(nu);
+            p  = w.topRows(nx);
+            problem.eval_grad_l(t, xuk(xu, t), w);
+            gt += w.bottomRows(nu);
+            p += w.topRows(nx);
+        }
+    }
+#endif
 
     void hessians(crvec xu) {
         assert(xu.size() == (nx + nu) * N + nx);

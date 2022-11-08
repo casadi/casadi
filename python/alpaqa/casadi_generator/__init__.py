@@ -194,6 +194,8 @@ def generate_casadi_control_problem(
           else (l_N.name_in(0), "p")
     lNx = xp[0]
 
+    v = cs.SX.sym("v", nx)
+
     cgname = f"{name}.c"
     cg = cs.CodeGenerator(cgname)
     cg.add(cs.Function(
@@ -209,6 +211,13 @@ def generate_casadi_control_problem(
         [cs.densify(cs.jacobian(f(*xup), cs.vertcat(x, u)))],
         [*xup_names],
         ["jac_f"],
+    ))
+    cg.add(cs.Function(
+        "grad_f_prod",
+        [*xup_def, v],
+        [cs.jtimes(f(*xup), cs.vertcat(x, u), v, True)],
+        [*xup_names, "v"],
+        ["grad_f_prod"],
     ))
     cg.add(cs.Function(
         "l",
