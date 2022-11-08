@@ -299,6 +299,7 @@ namespace casadi {
   #include "casadi_newton.hpp"
   #include "casadi_bound_consistency.hpp"
   #include "casadi_lsqr.hpp"
+  #include "casadi_dense_lsqr.hpp"
   #include "casadi_cache.hpp"
   #include "casadi_convexify.hpp"
   #include "casadi_logsumexp.hpp"

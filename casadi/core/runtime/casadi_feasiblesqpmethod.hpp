@@ -44,7 +44,7 @@ struct casadi_feasiblesqpmethod_data {
   T1* Jk;
   // Anderson vectors
   T1* anderson_memory_step;
-  T1* anderson_memory_x;
+  T1* anderson_memory_iterate;
 
   // Function value of feasibility iterate
   T1 f_feas;
@@ -180,6 +180,6 @@ void casadi_feasiblesqpmethod_init(casadi_feasiblesqpmethod_data<T1>* d, casadi_
   d->Jk = *w; *w += nnz_a;
   // Anderson vector
   d->anderson_memory_step = *w; *w += sz_anderson_memory*nx;
-  d->anderson_memory_x = *w; *w += sz_anderson_memory*nx;
+  d->anderson_memory_iterate = *w; *w += sz_anderson_memory*nx;
   
 }

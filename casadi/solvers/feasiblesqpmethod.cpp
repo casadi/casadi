@@ -586,13 +586,14 @@ void Feasiblesqpmethod::anderson_acc_step_update(void* mem) const {
 
     // Prepare the step update
     casadi_copy(d->z_feas, nx_, d->z_tmp);
-    casadi_axpy(nx_, -1.0, d->anderson_memory_x, d->z_tmp);
+    casadi_axpy(nx_, -1.0, d->anderson_memory_iterate, d->z_tmp);
     casadi_axpy(nx_, 1.0, d->dx_feas, d->z_tmp);
     casadi_axpy(nx_, -1.0, d->anderson_memory_step, d->z_tmp);
 
     // Update the Anderson memory
-    casadi_copy(d->dx_feas, nx_, d->anderson_memory_step);
-    casadi_copy(d->z_feas, nx_, d->anderson_memory_x);
+    anderson_acc_update_memory(mem, d->dx_feas, d->z_feas);
+    // casadi_copy(d->dx_feas, nx_, d->anderson_memory_step);
+    // casadi_copy(d->z_feas, nx_, d->anderson_memory_iterate);
 
     // Do the step update
     double beta = 1.0;
@@ -608,17 +609,45 @@ void Feasiblesqpmethod::anderson_acc_step_update(void* mem) const {
 /* 
 Initialize the memory of the Anderson acceleration
 */
-void Feasiblesqpmethod::anderson_acc_init_memory(void* mem, double* step, double* x) const {
+void Feasiblesqpmethod::anderson_acc_init_memory(void* mem, double* step, double* iterate) const {
+  auto m = static_cast<FeasiblesqpmethodMemory*>(mem);
+  auto d = &m->d;
+  
+  casadi_clear(d->anderson_memory_step, sz_anderson_memory_*nx_);
+  casadi_clear(d->anderson_memory_iterate, sz_anderson_memory_*nx_);
+  
+  // if (sz_anderson_memory_ == 1){
+  //   casadi_copy(step, nx_, d->anderson_memory_step);
+  //   casadi_copy(x, nx_, d->anderson_memory_iterate);
+  // } else {
+  //   print("This is not implemented yet!!!");
+  // }
+
+  casadi_copy(step, nx_, d->anderson_memory_step);
+  casadi_copy(iterate, nx_, d->anderson_memory_iterate);
+
+}
+
+/* 
+Update the memory of the Anderson acceleration
+*/
+void Feasiblesqpmethod::anderson_acc_update_memory(void* mem, double* step, double* iterate) const {
   auto m = static_cast<FeasiblesqpmethodMemory*>(mem);
   auto d = &m->d;
   
   if (sz_anderson_memory_ == 1){
     casadi_copy(step, nx_, d->anderson_memory_step);
-    casadi_copy(x, nx_, d->anderson_memory_x);
+    casadi_copy(iterate, nx_, d->anderson_memory_iterate);
   } else {
-    print("This is not implemented yet!!!");
+    // Shift old values further
+    casadi_copy(d->anderson_memory_step, (sz_anderson_memory_-1)*nx_, d->anderson_memory_step + nx_);
+    casadi_copy(d->anderson_memory_iterate, (sz_anderson_memory_-1)*nx_, d->anderson_memory_iterate + nx_);
+    // Insert new values
+    casadi_copy(step, nx_, d->anderson_memory_step);
+    casadi_copy(iterate, nx_, d->anderson_memory_iterate);
   }
 }
+
 
 /*
 Calculates the feasibility_iterations. If iterations are accepted return 0.
