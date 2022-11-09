@@ -407,7 +407,8 @@ auto PANOCOCPSolver<Conf>::operator()(
                 return J.compl_indices(k);
             };
 
-            lqr.factor_masked(Ak, Bk, Qk, Rk, qk, rk, uk_eq, Jk, Kk);
+            lqr.factor_masked(Ak, Bk, Qk, Rk, qk, rk, uk_eq, Jk, Kk,
+                              params.lqr_factor_cholesky);
             lqr.solve_masked(Ak, Bk, Jk, qxuₖ);
         } else {
             if (!enable_lbfgs)

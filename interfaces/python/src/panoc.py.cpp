@@ -65,6 +65,7 @@ struct kwargs_to_struct_table<alpaqa::PANOCOCPParams<Conf>> {
         {"gn_interval", &alpaqa::PANOCOCPParams<Conf>::gn_interval},
         {"gn_sticky", &alpaqa::PANOCOCPParams<Conf>::gn_sticky},
         {"reset_lbfgs_on_gn_step", &alpaqa::PANOCOCPParams<Conf>::reset_lbfgs_on_gn_step},
+        {"lqr_factor_cholesky", &alpaqa::PANOCOCPParams<Conf>::lqr_factor_cholesky},
         {"print_interval", &alpaqa::PANOCOCPParams<Conf>::print_interval},
         {"print_precision", &alpaqa::PANOCOCPParams<Conf>::print_precision},
         {"quadratic_upperbound_tolerance_factor", &alpaqa::PANOCOCPParams<Conf>::quadratic_upperbound_tolerance_factor},
@@ -420,6 +421,7 @@ void register_panoc(py::module_ &m) {
         .def_readwrite("gn_interval", &PANOCOCPParams::gn_interval)
         .def_readwrite("gn_sticky", &PANOCOCPParams::gn_sticky)
         .def_readwrite("reset_lbfgs_on_gn_step", &PANOCOCPParams::reset_lbfgs_on_gn_step)
+        .def_readwrite("lqr_factor_cholesky", &PANOCOCPParams::lqr_factor_cholesky)
         .def_readwrite("print_interval", &PANOCOCPParams::print_interval)
         .def_readwrite("print_precision", &PANOCOCPParams::print_precision)
         .def_readwrite("quadratic_upperbound_tolerance_factor", &PANOCOCPParams::quadratic_upperbound_tolerance_factor)

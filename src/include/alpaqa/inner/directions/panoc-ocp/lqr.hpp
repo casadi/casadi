@@ -174,15 +174,16 @@ struct StatefulLQRFactor {
     mat PA{dim.nx, dim.nx};
     real_t min_rcond = 1;
 
-    void factor_masked(auto &&A, ///< System matrix A
-                       auto &&B, ///< Input matrix B
-                       auto &&Q, ///< State cost matrix Q
-                       auto &&R, ///< Input cost matrix R
-                       auto &&q, ///< Linear state factor q
-                       auto &&r, ///< Linear input factor r
-                       auto &&u, ///< Fixed inputs u
-                       auto &&J, ///< Index set of inactive constraints
-                       auto &&K  ///< Index set of active constraints
+    void factor_masked(auto &&A,         ///< System matrix A
+                       auto &&B,         ///< Input matrix B
+                       auto &&Q,         ///< State cost matrix Q
+                       auto &&R,         ///< Input cost matrix R
+                       auto &&q,         ///< Linear state factor q
+                       auto &&r,         ///< Linear input factor r
+                       auto &&u,         ///< Fixed inputs u
+                       auto &&J,         ///< Index set of inactive constraints
+                       auto &&K,         ///< Index set of active constraints
+                       bool use_cholesky ///< Use Cholesky instead of LU solver
     ) {
         using mmat       = Eigen::Map<mat>;
         auto [N, nx, nu] = dim;
@@ -219,25 +220,42 @@ struct StatefulLQRFactor {
             c.noalias() = Bi(Eigen::all, Ki) * ui(Ki);
             y.noalias() = P * c;
             y += s;
-            // K ← -R̅⁻¹S̅
-#ifdef EIGEN_RUNTIME_NO_MALLOC
-            bool prev = Eigen::internal::is_malloc_allowed();
-            Eigen::internal::set_is_malloc_allowed(true); // TODO
-#endif
-            Eigen::LDLT<rmat> R̅LU{R̅};
-#ifdef EIGEN_RUNTIME_NO_MALLOC
-            Eigen::internal::set_is_malloc_allowed(prev);
-#endif
-            min_rcond         = std::min(R̅LU.rcond(), min_rcond);
-            gain_Ki.noalias() = R̅LU.solve(S̅);
-            gain_Ki           = -gain_Ki;
-            // e ← -R̅⁻¹(Bᵀy + r)
+            // t ← Bᵀy + r
             ti.noalias() = BiJ.transpose() * y;
             ti += r(i)(Ji);
+            if (use_cholesky) {
+#ifdef EIGEN_RUNTIME_NO_MALLOC
+                bool prev = Eigen::internal::is_malloc_allowed();
+                Eigen::internal::set_is_malloc_allowed(true); // TODO
+#endif
+                Eigen::LDLT<rmat> R̅LU{R̅};
+                min_rcond = std::min(R̅LU.rcond(), min_rcond);
+#ifdef EIGEN_RUNTIME_NO_MALLOC
+                Eigen::internal::set_is_malloc_allowed(prev);
+#endif
+                // K ← -R̅⁻¹S̅
+                gain_Ki.noalias() = R̅LU.solve(S̅);
+                // e ← -R̅⁻¹(Bᵀy + r)
+                ei.noalias() = R̅LU.solve(ti);
+            } else {
+#ifdef EIGEN_RUNTIME_NO_MALLOC
+                bool prev = Eigen::internal::is_malloc_allowed();
+                Eigen::internal::set_is_malloc_allowed(true); // TODO
+#endif
+                Eigen::PartialPivLU<rmat> R̅LU{R̅};
+                min_rcond = std::min(R̅LU.rcond(), min_rcond);
+#ifdef EIGEN_RUNTIME_NO_MALLOC
+                Eigen::internal::set_is_malloc_allowed(prev);
+#endif
+                // K ← -R̅⁻¹S̅
+                gain_Ki.noalias() = R̅LU.solve(S̅);
+                // e ← -R̅⁻¹(Bᵀy + r)
+                ei.noalias() = R̅LU.solve(ti);
+            }
+            gain_Ki      = -gain_Ki;
             if (Ri.cols() > 1 && Ri.rows() > 1)
                 ti.noalias() += Ri(Ji, Ki) * ui(Ki);
-            ei.noalias() = R̅LU.solve(ti);
-            ei           = -ei;
+            ei = -ei;
             if (i > 0) {
                 // P ← Q + Aᵀ P A + S̅ᵀ K
                 P.noalias() = Ai.transpose() * PA;
