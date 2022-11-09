@@ -1,0 +1,33 @@
+---
+WarningsAsErrors: ''
+HeaderFilterRegex: '(interfaces/python/src)|(src/include/alpaqa)'
+FormatStyle: file
+
+Checks: |
+    -*,
+    clang-analyzer-*,
+    clang-diagnostic-*,
+    bugprone-*,
+    modernize-*,
+    performance-*,
+    portability-*,
+    readability-*,
+    -modernize-raw-string-literal,
+    -modernize-use-bool-literals,
+    -modernize-use-trailing-return-type,
+    -readability-braces-around-statements,
+    -readability-else-after-return,
+    -readability-identifier-length,
+    -readability-isolate-declaration,
+    -readability-magic-numbers,
+    -readability-named-parameter,
+    -readability-redundant-access-specifiers,
+    -readability-static-accessed-through-instance,
+    -readability-uppercase-literal-suffix,
+    -bugprone-easily-swappable-parameters,
+
+CheckOptions:
+    - key: readability-implicit-bool-conversion.AllowIntegerConditions
+      value: true
+    - key: readability-implicit-bool-conversion.AllowPointerConditions
+      value: true

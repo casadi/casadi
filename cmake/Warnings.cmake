@@ -30,6 +30,11 @@ function(add_warnings_target tgt_name warnings_as_errors)
         -Wno-error=unused-but-set-variable
         -Winconsistent-missing-override
         -Wno-gnu-zero-variadic-macro-arguments
+        -Wunreachable-code
+        -Wunreachable-code-break
+        -Wunreachable-code-fallthrough
+        -Wunreachable-code-return
+        -Wunreachable-code-aggressive
     )
     # MSVC (Microsoft)
     set(MSVC_WARNINGS
