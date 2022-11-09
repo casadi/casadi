@@ -317,7 +317,7 @@ auto PANOCOCPSolver<Conf>::operator()(
     for (unsigned k = 0; k <= params.max_iter; ++k) {
 
         // Quadratic upper bound -----------------------------------------------
-        if (k == 0 || params.update_lipschitz_in_linesearch == false) {
+        if (k == 0 || not params.update_lipschitz_in_linesearch) {
             // Decrease step size until quadratic upper bound is satisfied
             real_t old_γₖ = descent_lemma(xuₖ, ψₖ, grad_ψₖ, x̂uₖ, pₖ, ψx̂ₖ, pₖᵀpₖ,
                                           grad_ψₖᵀpₖ, Lₖ, γₖ);
@@ -423,10 +423,7 @@ auto PANOCOCPSolver<Conf>::operator()(
                 // Check whether the box constraints are active for this index.
                 bool active_lb = gs <= U.lowerbound(i);
                 bool active_ub = gs >= U.upperbound(i);
-                if (active_ub) {
-                    quₖ(t * nu + i) = pₖ(t * nu + i);
-                    return false;
-                } else if (active_lb) {
+                if (active_ub || active_lb) {
                     quₖ(t * nu + i) = pₖ(t * nu + i);
                     return false;
                 } else { // Store inactive indices
@@ -436,7 +433,6 @@ auto PANOCOCPSolver<Conf>::operator()(
             };
 
             auto J_idx = J.indices();
-            J_idx.setConstant(0x5A5A'5A5A);
             index_t nJ = 0;
             for (index_t t = 0; t < N; ++t)
                 for (index_t i = 0; i < nu; ++i)
@@ -512,7 +508,7 @@ auto PANOCOCPSolver<Conf>::operator()(
             grad_ψₙₑₓₜᵀpₙₑₓₜ = grad_ψₙₑₓₜ.dot(pₙₑₓₜ);
             pₙₑₓₜᵀpₙₑₓₜ      = pₙₑₓₜ.squaredNorm();
 
-            if (params.update_lipschitz_in_linesearch == true) {
+            if (params.update_lipschitz_in_linesearch) {
                 // Decrease step size until quadratic upper bound is satisfied
                 (void)descent_lemma(xuₙₑₓₜ, ψₙₑₓₜ, grad_ψₙₑₓₜ,
                                     /* in ⟹ out */ x̂uₙₑₓₜ, pₙₑₓₜ,
