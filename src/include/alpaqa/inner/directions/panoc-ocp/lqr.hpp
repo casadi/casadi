@@ -210,15 +210,15 @@ struct StatefulLQRFactor {
             auto &&ei      = e.col(i).topRows(nJ);
             // R̅ ← R + Bᵀ P B
             BiJ.noalias()  = Bi(Eigen::all, Ji);
-            PBiJ.noalias() = P * BiJ;
+            PBiJ.noalias() = P.template selfadjointView<Eigen::Lower>() * BiJ;
             R̅.noalias()    = BiJ.transpose() * PBiJ;
             add_possibly_diagonal_masked(R̅, Ri, Ji);
             // S̅ ← S + Bᵀ P A
-            PA.noalias() = P * Ai;
+            PA.noalias() = P.template selfadjointView<Eigen::Lower>() * Ai;
             S̅.noalias()  = BiJ.transpose() * PA;
             // y ← Pc + s
             c.noalias() = Bi(Eigen::all, Ki) * ui(Ki);
-            y.noalias() = P * c;
+            y.noalias() = P.template selfadjointView<Eigen::Lower>() * c;
             y += s;
             // t ← Bᵀy + r
             ti.noalias() = BiJ.transpose() * y;
