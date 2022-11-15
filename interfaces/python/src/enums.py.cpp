@@ -17,9 +17,9 @@ void register_enums(py::module_ &m) {
     py::enum_<alpaqa::CostStructure>(m, "CostStructure",
                                      "C++ documentation: :cpp:enum:`alpaqa::CostStructure`")
         .value("General", alpaqa::CostStructure::General)
-        .value("Separable", alpaqa::CostStructure::Separable)
+        .value("Separable", alpaqa::CostStructure::DiagonalHessian)
         .value("Quadratic", alpaqa::CostStructure::Quadratic)
-        .value("SeparableQuadratic", alpaqa::CostStructure::SeparableQuadratic)
+        .value("SeparableQuadratic", alpaqa::CostStructure::DiagonalQuadratic)
         .export_values();
 
     using SolverStatus = alpaqa::SolverStatus;

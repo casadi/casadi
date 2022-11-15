@@ -145,8 +145,8 @@ def generate_casadi_control_problem(
 
     :return:   * Code generator that generates the functions and derivatives
                  used by the solvers.
-               * Dimensions of the decision variables (primal dimension).
-               * Number of nonlinear constraints (dual dimension).
+               * Number of states.
+               * Number of inputs.
                * Number of parameters.
     """
 
@@ -260,5 +260,64 @@ def generate_casadi_control_problem(
         [cs.densify(cs.hessian(l_N(*xp), lNx)[0])],
         [*xp_names],
         ["hess_l_N"],
+    ))
+    return cg, nx, nu, p
+
+
+def generate_casadi_quadratic_control_problem(
+    f: cs.Function,
+    name: str = "alpaqa_quadratic_control_problem",
+) -> Tuple[cs.CodeGenerator, int, int, int]:
+    """Convert the dynamics into a CasADi code generator.
+
+    :param f:            Dynamics.
+    :param name: Optional string description of the problem (used for filename).
+
+    :return:   * Code generator that generates the functions and derivatives
+                 used by the solvers.
+               * Number of states.
+               * Number of inputs.
+               * Number of parameters.
+    """
+
+    assert f.n_in() in [2, 3]
+    assert f.n_out() == 1
+    nx = f.size1_in(0)
+    nu = f.size1_in(1)
+    p = f.size1_in(2) if f.n_in() == 3 else 0
+    assert f.size1_out(0) == nx
+    xup = (f.sx_in(0), f.sx_in(1), f.sx_in(2)) if f.n_in() == 3 \
+        else (f.sx_in(0), f.sx_in(1))
+    xup_def = (f.sx_in(0), f.sx_in(1), f.sx_in(2)) if f.n_in() == 3 \
+        else (f.sx_in(0), f.sx_in(1), cs.SX.sym("p", 0))
+    xup_names = (f.name_in(0), f.name_in(1), f.name_in(2)) if f.n_in() == 3 \
+          else (f.name_in(0), f.name_in(1), "p")
+    x = xup[0]
+    u = xup[1]
+
+    v = cs.SX.sym("v", nx)
+
+    cgname = f"{name}.c"
+    cg = cs.CodeGenerator(cgname)
+    cg.add(cs.Function(
+        "f",
+        [*xup_def],
+        [f(*xup)],
+        [*xup_names],
+        ["f"],
+    ))
+    cg.add(cs.Function(
+        "jac_f",
+        [*xup_def],
+        [cs.densify(cs.jacobian(f(*xup), cs.vertcat(x, u)))],
+        [*xup_names],
+        ["jac_f"],
+    ))
+    cg.add(cs.Function(
+        "grad_f_prod",
+        [*xup_def, v],
+        [cs.jtimes(f(*xup), cs.vertcat(x, u), v, True)],
+        [*xup_names, "v"],
+        ["grad_f_prod"],
     ))
     return cg, nx, nu, p

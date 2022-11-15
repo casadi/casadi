@@ -47,9 +47,13 @@ target_include_directories(alpaqa PUBLIC
 if (ALPAQA_WITH_CASADI)
     find_package(casadi REQUIRED)
     add_library(casadi-loader 
-        "interop/casadi/CasADiLoader.cpp"
+        "interop/casadi/CasADiProblem.cpp"
+        "interop/casadi/CasADiControlProblem.cpp"
+        "interop/casadi/CasADiQuadraticControlProblem.cpp"
         "include/alpaqa/interop/casadi/CasADiFunctionWrapper.hpp"
-        "include/alpaqa/interop/casadi/CasADiLoader.hpp")
+        "include/alpaqa/interop/casadi/CasADiProblem.hpp"
+        "include/alpaqa/interop/casadi/CasADiControlProblem.hpp"
+        "include/alpaqa/interop/casadi/CasADiQuadraticControlProblem.hpp")
     find_package(Threads REQUIRED)
     target_link_libraries(casadi-loader 
         PUBLIC

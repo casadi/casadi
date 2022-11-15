@@ -4,9 +4,9 @@ namespace alpaqa {
 
 enum class CostStructure {
     General = 1,
-    Separable,
+    DiagonalHessian,
     Quadratic,
-    SeparableQuadratic,
+    DiagonalQuadratic,
 };
 
 } // namespace alpaqa

@@ -22,7 +22,7 @@ struct DynamicsEvaluator {
                 QRS.resize(nx + nu, (nx + nu) * N);
                 Q_N.resize(nx, nx);
                 break;
-            case CostStructure::Separable:
+            case CostStructure::DiagonalHessian:
                 QRS.resize(nx + nu, N);
                 Q_N.resize(nx, 1);
                 break;
@@ -30,7 +30,7 @@ struct DynamicsEvaluator {
                 QRS.resize(nx + nu, nx + nu);
                 Q_N.resize(nx, nx);
                 break;
-            case CostStructure::SeparableQuadratic:
+            case CostStructure::DiagonalQuadratic:
                 QRS.resize(nx + nu, 1);
                 Q_N.resize(nx, 1);
                 break;
@@ -82,10 +82,10 @@ struct DynamicsEvaluator {
         switch (structure) {
             case CostStructure::General:
                 return QRS.middleCols((nx + nu) * k, nx).topRows(nx);
-            case CostStructure::Separable:
+            case CostStructure::DiagonalHessian:
                 return QRS.middleCols(k, 1).topRows(nx);
             case CostStructure::Quadratic: return QRS.leftCols(nx).topRows(nx);
-            case CostStructure::SeparableQuadratic:
+            case CostStructure::DiagonalQuadratic:
                 return QRS.leftCols(1).topRows(nx);
             default: throw std::logic_error("CostStructure");
         }
@@ -95,11 +95,11 @@ struct DynamicsEvaluator {
         switch (structure) {
             case CostStructure::General:
                 return QRS.middleCols((nx + nu) * k + nx, nu).bottomRows(nu);
-            case CostStructure::Separable:
+            case CostStructure::DiagonalHessian:
                 return QRS.middleCols(k, 1).bottomRows(nu);
             case CostStructure::Quadratic:
                 return QRS.rightCols(nu).bottomRows(nu);
-            case CostStructure::SeparableQuadratic:
+            case CostStructure::DiagonalQuadratic:
                 return QRS.rightCols(1).bottomRows(nu);
             default: throw std::logic_error("CostStructure");
         }
@@ -212,14 +212,14 @@ struct DynamicsEvaluator {
                     problem.eval_hess_l(t, xuk(xu, t), QRS_t);
                 }
                 break;
-            case CostStructure::Separable:
+            case CostStructure::DiagonalHessian:
                 for (index_t t = 0; t < N; ++t) {
                     auto &&QRS_t = QRS.middleCols(t, 1);
                     problem.eval_hess_l(t, xuk(xu, t), QRS_t);
                 }
                 break;
             case CostStructure::Quadratic: [[fallthrough]];
-            case CostStructure::SeparableQuadratic:
+            case CostStructure::DiagonalQuadratic:
                 problem.eval_hess_l(0, xuk(xu, 0), QRS);
                 break;
             default: throw std::logic_error("CostStructure");

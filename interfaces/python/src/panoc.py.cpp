@@ -169,19 +169,19 @@ void register_panoc(py::module_ &m) {
 
     auto safe_lbfgs_update = [](LBFGS &self, crvec xk, crvec xkp1, crvec pk, crvec pkp1,
                                 LBFGSSign sign, bool forced) {
-        check_dim("xk", xk, self.n());
-        check_dim("xkp1", xkp1, self.n());
-        check_dim("pk", pk, self.n());
-        check_dim("pkp1", pkp1, self.n());
+        alpaqa::util::check_dim<config_t>("xk", xk, self.n());
+        alpaqa::util::check_dim<config_t>("xkp1", xkp1, self.n());
+        alpaqa::util::check_dim<config_t>("pk", pk, self.n());
+        alpaqa::util::check_dim<config_t>("pkp1", pkp1, self.n());
         return self.update(xk, xkp1, pk, pkp1, sign, forced);
     };
     auto safe_lbfgs_update_sy = [](LBFGS &self, crvec sk, crvec yk, real_t pkp1Tpkp1, bool forced) {
-        check_dim("sk", sk, self.n());
-        check_dim("yk", yk, self.n());
+        alpaqa::util::check_dim<config_t>("sk", sk, self.n());
+        alpaqa::util::check_dim<config_t>("yk", yk, self.n());
         return self.update_sy(sk, yk, pkp1Tpkp1, forced);
     };
     auto safe_lbfgs_apply = [](LBFGS &self, rvec q, real_t γ) {
-        check_dim("q", q, self.n());
+        alpaqa::util::check_dim<config_t>("q", q, self.n());
         return self.apply(q, γ);
     };
 
@@ -295,13 +295,13 @@ void register_panoc(py::module_ &m) {
         bool always_overwrite_results = true;
         auto n                        = problem.get_n();
         auto m                        = problem.get_m();
-        check_dim("Σ", Σ, m);
+        alpaqa::util::check_dim<config_t>("Σ", Σ, m);
         if (x)
-            check_dim("x", *x, n);
+            alpaqa::util::check_dim<config_t>("x", *x, n);
         else
             x = vec::Zero(n);
         if (y)
-            check_dim("y", *y, m);
+            alpaqa::util::check_dim<config_t>("y", *y, m);
         else
             y = vec::Zero(m);
         vec err_z  = vec::Zero(m);
@@ -315,7 +315,7 @@ void register_panoc(py::module_ &m) {
         auto n                        = problem.get_n();
         auto m                        = problem.get_m();
         if (x)
-            check_dim("x", *x, n);
+            alpaqa::util::check_dim<config_t>("x", *x, n);
         else
             x = vec::Zero(n);
         vec Σ(0), y(0), err_z(0);
@@ -466,7 +466,7 @@ void register_panoc(py::module_ &m) {
         auto N  = problem.get_N();
         auto nu = problem.get_nu();
         if (u)
-            check_dim("u", *u, nu * N);
+            alpaqa::util::check_dim<config_t>("u", *u, nu * N);
         else
             u = vec::Zero(nu * N);
         auto invoke_solver = [&] { return solver(problem, ε, *u); };

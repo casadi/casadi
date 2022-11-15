@@ -112,11 +112,13 @@ void register_alm(py::module_ &m) {
         if (!x)
             x = vec::Zero(p.get_n());
         else
-            check_dim_msg(*x, p.get_n(), "Length of x does not match problem size problem.n");
+            alpaqa::util::check_dim_msg<config_t>(
+                *x, p.get_n(), "Length of x does not match problem size problem.n");
         if (!y)
             y = vec::Zero(p.get_m());
         else
-            check_dim_msg(*y, p.get_m(), "Length of y does not match problem size problem.m");
+            alpaqa::util::check_dim_msg<config_t>(
+                *y, p.get_m(), "Length of y does not match problem size problem.m");
         auto penalty_alm_split = solver.get_params().penalty_alm_split;
         if (penalty_alm_split < 0 || penalty_alm_split > p.get_m())
             throw std::invalid_argument("invalid penalty_alm_split");

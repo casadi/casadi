@@ -774,7 +774,8 @@ struct ProblemWithCounters {
     Problem problem;
 
     ProblemWithCounters(const Problem &problem) : problem(problem) {}
-    ProblemWithCounters(Problem &&problem) requires(!std::is_lvalue_reference_v<Problem>)
+    ProblemWithCounters(Problem &&problem)
+        requires(!std::is_lvalue_reference_v<Problem>)
         : problem(std::forward<Problem>(problem)) {}
 
   private:
@@ -817,10 +818,10 @@ class BoxConstrProblem {
     BoxConstrProblem(Box C, Box D)
         : n{C.lowerbound.size()}, m{D.lowerbound.size()}, C{std::move(C)}, D{std::move(D)} {}
 
-    BoxConstrProblem(const BoxConstrProblem &)            = default;
-    BoxConstrProblem &operator=(const BoxConstrProblem &) = default;
-    BoxConstrProblem(BoxConstrProblem &&)                 = default;
-    BoxConstrProblem &operator=(BoxConstrProblem &&)      = default;
+    BoxConstrProblem(const BoxConstrProblem &)                = default;
+    BoxConstrProblem &operator=(const BoxConstrProblem &)     = default;
+    BoxConstrProblem(BoxConstrProblem &&) noexcept            = default;
+    BoxConstrProblem &operator=(BoxConstrProblem &&) noexcept = default;
 
     /// Constraints of the decision variables, @f$ x \in C @f$
     Box C{vec::Constant(this->n, +inf<Conf>), vec::Constant(this->n, -inf<Conf>)};
@@ -880,14 +881,18 @@ class BoxConstrProblem {
 
     /// @see @ref TypeErasedProblem::check
     void check() const {
-        check_dim_msg(C.lowerbound, n,
-                      "Length of problem.C.lowerbound does not match problem size problem.n");
-        check_dim_msg(C.upperbound, n,
-                      "Length of problem.C.upperbound does not match problem size problem.n");
-        check_dim_msg(D.lowerbound, m,
-                      "Length of problem.D.lowerbound does not match problem size problem.m");
-        check_dim_msg(D.upperbound, m,
-                      "Length of problem.D.upperbound does not match problem size problem.m");
+        util::check_dim_msg<config_t>(
+            C.lowerbound, n,
+            "Length of problem.C.lowerbound does not match problem size problem.n");
+        util::check_dim_msg<config_t>(
+            C.upperbound, n,
+            "Length of problem.C.upperbound does not match problem size problem.n");
+        util::check_dim_msg<config_t>(
+            D.lowerbound, m,
+            "Length of problem.D.lowerbound does not match problem size problem.m");
+        util::check_dim_msg<config_t>(
+            D.upperbound, m,
+            "Length of problem.D.upperbound does not match problem size problem.m");
     }
 };
 
@@ -925,10 +930,10 @@ class FunctionalProblem : public BoxConstrProblem<Conf> {
     /// @see @ref TypeErasedProblem::provides_eval_hess_L
     bool provides_eval_hess_L() const { return bool{hess_L}; }
 
-    FunctionalProblem(const FunctionalProblem &)            = default;
-    FunctionalProblem &operator=(const FunctionalProblem &) = default;
-    FunctionalProblem(FunctionalProblem &&)                 = default;
-    FunctionalProblem &operator=(FunctionalProblem &&)      = default;
+    FunctionalProblem(const FunctionalProblem &)                = default;
+    FunctionalProblem &operator=(const FunctionalProblem &)     = default;
+    FunctionalProblem(FunctionalProblem &&) noexcept            = default;
+    FunctionalProblem &operator=(FunctionalProblem &&) noexcept = default;
 };
 
 } // namespace alpaqa

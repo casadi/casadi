@@ -3,7 +3,7 @@
 #include <alpaqa/outer/alm.hpp>
 #include <alpaqa/problem/type-erased-problem.hpp>
 
-#include <alpaqa/interop/casadi/CasADiLoader.hpp>
+#include <alpaqa/interop/casadi/CasADiProblem.hpp>
 
 #include <filesystem>
 #include <iostream>
