@@ -34,7 +34,7 @@ auto PANOCOCPSolver<Conf>::operator()(
     const auto n   = nu * N;
     const auto Nxu = n + nx * (N + 1);
 
-    bool enable_lbfgs = params.gn_interval > 1;
+    bool enable_lbfgs = params.gn_interval != 1;
 
     // Allocate storage --------------------------------------------------------
 
@@ -266,7 +266,7 @@ auto PANOCOCPSolver<Conf>::operator()(
 
     problem.get_U(U);
 
-    bool do_gn_step     = true;
+    bool do_gn_step     = params.gn_interval > 0;
     bool have_jacobians = false; // TODO: just as a sanity check
     bool did_gn         = false;
 
@@ -485,7 +485,7 @@ auto PANOCOCPSolver<Conf>::operator()(
         }
 
         bool do_next_gn =
-            params.gn_interval == 0 || ((k + 1) % params.gn_interval) == 0;
+            params.gn_interval > 0 && ((k + 1) % params.gn_interval) == 0;
         do_gn_step = do_next_gn || (do_gn_step && params.gn_sticky);
 
         // Line search loop ----------------------------------------------------

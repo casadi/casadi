@@ -30,7 +30,7 @@ struct PANOCOCPParams {
     PANOCStopCrit stop_crit = PANOCStopCrit::ApproxKKT;
     /// Maximum number of iterations without any progress before giving up.
     unsigned max_no_progress = 10;
-    /// How often to use a Gauss-Newton step.
+    /// How often to use a Gauss-Newton step. Zero to disable GN entirely.
     unsigned gn_interval        = 1;
     bool gn_sticky              = true;
     bool reset_lbfgs_on_gn_step = false;
