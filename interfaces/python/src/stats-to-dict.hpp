@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <alpaqa/inner/panoc-ocp.hpp>
 #include <alpaqa/inner/panoc.hpp>
 #include <alpaqa/inner/structured-panoc.hpp>
 
@@ -37,6 +38,34 @@ py::dict stats_to_dict(const PANOCStats<Conf> &s) {
         "count_τ"_a             = s.count_τ,
         "sum_τ"_a               = s.sum_τ,
         "final_γ"_a             = s.final_γ,
+    };
+}
+
+template <Config Conf>
+py::dict stats_to_dict(const PANOCOCPStats<Conf> &s) {
+    using namespace py::literals;
+    return py::dict{
+        "status"_a                  = s.status,
+        "ε"_a                       = s.ε,
+        "elapsed_time"_a            = s.elapsed_time,
+        "time_forward"_a            = s.time_forward,
+        "time_backward"_a           = s.time_backward,
+        "time_backward_jacobians"_a = s.time_backward_jacobians,
+        "time_hessians"_a           = s.time_hessians,
+        "time_indices"_a            = s.time_indices,
+        "time_lqr_factor"_a         = s.time_lqr_factor,
+        "time_lqr_solve"_a          = s.time_lqr_solve,
+        "time_lbfgs_indices"_a      = s.time_lbfgs_indices,
+        "time_lbfgs_apply"_a        = s.time_lbfgs_apply,
+        "time_lbfgs_update"_a       = s.time_lbfgs_update,
+        "iterations"_a              = s.iterations,
+        "linesearch_failures"_a     = s.linesearch_failures,
+        "lbfgs_failures"_a          = s.lbfgs_failures,
+        "lbfgs_rejected"_a          = s.lbfgs_rejected,
+        "τ_1_accepted"_a            = s.τ_1_accepted,
+        "count_τ"_a                 = s.count_τ,
+        "sum_τ"_a                   = s.sum_τ,
+        "final_γ"_a                 = s.final_γ,
     };
 }
 

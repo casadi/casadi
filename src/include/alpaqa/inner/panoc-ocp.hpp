@@ -73,6 +73,33 @@ struct PANOCOCPProgressInfo {
     const PANOCOCPParams<config_t> &params;
 };
 
+template <Config Conf = DefaultConfig>
+struct PANOCOCPStats {
+    USING_ALPAQA_CONFIG(Conf);
+
+    SolverStatus status = SolverStatus::Busy;
+    real_t ε            = inf<config_t>;
+    std::chrono::nanoseconds elapsed_time{};
+    std::chrono::nanoseconds time_forward{};
+    std::chrono::nanoseconds time_backward{};
+    std::chrono::nanoseconds time_backward_jacobians{};
+    std::chrono::nanoseconds time_hessians{};
+    std::chrono::nanoseconds time_indices{};
+    std::chrono::nanoseconds time_lqr_factor{};
+    std::chrono::nanoseconds time_lqr_solve{};
+    std::chrono::nanoseconds time_lbfgs_indices{};
+    std::chrono::nanoseconds time_lbfgs_apply{};
+    std::chrono::nanoseconds time_lbfgs_update{};
+    unsigned iterations          = 0;
+    unsigned linesearch_failures = 0;
+    unsigned lbfgs_failures      = 0;
+    unsigned lbfgs_rejected      = 0;
+    unsigned τ_1_accepted        = 0;
+    unsigned count_τ             = 0;
+    real_t sum_τ                 = 0;
+    real_t final_γ               = 0;
+};
+
 template <Config Conf>
 class PANOCOCPSolver {
   public:
@@ -80,7 +107,7 @@ class PANOCOCPSolver {
 
     using Problem      = alpaqa::TypeErasedControlProblem<config_t>;
     using Params       = PANOCOCPParams<config_t>;
-    using Stats        = PANOCStats<config_t>;
+    using Stats        = PANOCOCPStats<config_t>;
     using ProgressInfo = PANOCOCPProgressInfo<config_t>;
 
     PANOCOCPSolver(const Params &params) : params(params) {}

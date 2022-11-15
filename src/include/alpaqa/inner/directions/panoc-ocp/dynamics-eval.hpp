@@ -2,6 +2,9 @@
 
 #include <alpaqa/config/config.hpp>
 #include <alpaqa/problem/dynamics.hpp>
+#include <alpaqa/problem/problem-counters.hpp>
+
+#include <chrono>
 
 namespace alpaqa {
 
@@ -75,6 +78,13 @@ struct DynamicsEvaluator {
     rmat Bk(index_t k) { return AB.middleCols(k * (nx + nu) + nx, nu); }
     crmat Bk(index_t k) const { return AB.middleCols(k * (nx + nu) + nx, nu); }
 
+    struct {
+        std::chrono::nanoseconds forward{};
+        std::chrono::nanoseconds backward{};
+        std::chrono::nanoseconds backward_jacobians{};
+        std::chrono::nanoseconds hessians{};
+    } mutable time;
+
     rmat Qk(index_t k) {
         assert(k <= N);
         if (k == N)
@@ -109,6 +119,7 @@ struct DynamicsEvaluator {
     /// @post `xk(k)` for `1 <= k <= N` updated
     /// @return @f$ V(u) = \sum_{k=0}^{N-1} \ell(x_k, u_k) + V_f(x_N) @f$
     real_t forward(rvec xu) const {
+        detail::Timed t{time.forward};
         assert(xu.size() == (nx + nu) * N + nx);
         real_t V = 0;
         for (index_t k = 0; k < N; ++k) {
@@ -123,6 +134,7 @@ struct DynamicsEvaluator {
     /// @post `xk(k)` for `1 <= k <= N` updated
     /// @return @f$ V(u) = \sum_{k=0}^{N-1} \ell(x_k, u_k) + V_f(x_N) @f$
     void forward_simulate(rvec xu) const {
+        detail::Timed t{time.forward};
         assert(xu.size() == (nx + nu) * N + nx);
         for (index_t k = 0; k < N; ++k)
             problem.eval_f(k, xk(xu, k), uk(xu, k), xk(xu, k + 1));
@@ -136,6 +148,7 @@ struct DynamicsEvaluator {
     /// @param[out] g @f$ \nabla V_N(u) @f$
     /// @param p Work vector of dimension @f$ n_x @f$
     void backward_with_jac(crvec xu, rvec g, rvec p) {
+        detail::Timed t{time.backward_jacobians};
         assert(xu.size() == (nx + nu) * N + nx);
         problem.eval_grad_l_N(xk(xu, N), p);
         qk(N) = p;
@@ -189,6 +202,7 @@ struct DynamicsEvaluator {
     }
 #else
     void backward(crvec xu, rvec g, rvec p, rvec w) {
+        detail::Timed t{time.backward};
         assert(xu.size() == (nx + nu) * N + nx);
         problem.eval_grad_l_N(xk(xu, N), p);
         for (index_t t = N; t-- > 0;) {
@@ -204,6 +218,7 @@ struct DynamicsEvaluator {
 #endif
 
     void hessians(crvec xu) {
+        detail::Timed t{time.hessians};
         assert(xu.size() == (nx + nu) * N + nx);
         switch (structure) {
             case CostStructure::General:

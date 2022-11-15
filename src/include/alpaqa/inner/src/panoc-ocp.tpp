@@ -346,11 +346,15 @@ auto PANOCOCPSolver<Conf>::operator()(
         if (stop_status != SolverStatus::Busy) {
             // TODO: loop
             assign_extract_u(x̂uₖ, u);
-            s.iterations   = k;
-            s.ε            = εₖ;
-            s.elapsed_time = duration_cast<nanoseconds>(time_elapsed);
-            s.status       = stop_status;
-            s.final_γ      = γₖ;
+            s.iterations    = k;
+            s.ε             = εₖ;
+            s.elapsed_time  = duration_cast<nanoseconds>(time_elapsed);
+            s.time_forward  = eval.time.forward;
+            s.time_backward = eval.time.backward;
+            s.time_backward_jacobians = eval.time.backward_jacobians;
+            s.time_hessians           = eval.time.hessians;
+            s.status                  = stop_status;
+            s.final_γ                 = γₖ;
             return s;
         }
 
@@ -393,7 +397,10 @@ auto PANOCOCPSolver<Conf>::operator()(
                     return true;
                 }
             };
-            J.update(is_constr_inactive);
+            {
+                detail::Timed t{s.time_indices};
+                J.update(is_constr_inactive);
+            }
 
             auto Ak    = [&](index_t i) -> crmat { return eval.Ak(i); };
             auto Bk    = [&](index_t i) -> crmat { return eval.Bk(i); };
@@ -407,9 +414,15 @@ auto PANOCOCPSolver<Conf>::operator()(
                 return J.compl_indices(k);
             };
 
-            lqr.factor_masked(Ak, Bk, Qk, Rk, qk, rk, uk_eq, Jk, Kk,
-                              params.lqr_factor_cholesky);
-            lqr.solve_masked(Ak, Bk, Jk, qxuₖ);
+            {
+                detail::Timed t{s.time_lqr_factor};
+                lqr.factor_masked(Ak, Bk, Qk, Rk, qk, rk, uk_eq, Jk, Kk,
+                                  params.lqr_factor_cholesky);
+            }
+            {
+                detail::Timed t{s.time_lqr_solve};
+                lqr.solve_masked(Ak, Bk, Jk, qxuₖ);
+            }
         } else {
             if (!enable_lbfgs)
                 throw std::logic_error("enable_lbfgs");
@@ -434,17 +447,22 @@ auto PANOCOCPSolver<Conf>::operator()(
 
             auto J_idx = J.indices();
             index_t nJ = 0;
-            for (index_t t = 0; t < N; ++t)
-                for (index_t i = 0; i < nu; ++i)
-                    if (is_constr_inactive(t, i))
-                        J_idx(nJ++) = t * nu + i;
-
+            {
+                detail::Timed t{s.time_lbfgs_indices};
+                for (index_t t = 0; t < N; ++t)
+                    for (index_t i = 0; i < nu; ++i)
+                        if (is_constr_inactive(t, i))
+                            J_idx(nJ++) = t * nu + i;
+            }
             auto J_lbfgs = J_idx.topRows(nJ);
 
             // If all indices are inactive, we can use standard L-BFGS,
             // if there are active indices, we need the specialized version
             // that only applies L-BFGS to the inactive indices
-            bool success = lbfgs.apply_masked(quₖ, γₖ, J_lbfgs);
+            bool success = [&] {
+                detail::Timed t{s.time_lbfgs_apply};
+                return lbfgs.apply_masked(quₖ, γₖ, J_lbfgs);
+            }();
             // If L-BFGS application failed, qₖ(J) still contains
             // -∇ψ(x)(J) - HqK(J) or -∇ψ(x)(J), which is not a valid step.
             if (not success) {
@@ -547,6 +565,7 @@ auto PANOCOCPSolver<Conf>::operator()(
             if (did_gn && params.reset_lbfgs_on_gn_step) {
                 lbfgs.reset();
             } else {
+                detail::Timed t{s.time_lbfgs_update};
                 s.lbfgs_rejected +=
                     not lbfgs.update(uₖ, uₙₑₓₜ, grad_ψₖ, grad_ψₙₑₓₜ,
                                      LBFGS<config_t>::Sign::Positive, force);
