@@ -104,12 +104,16 @@ auto PANOCOCPSolver<Conf>::operator()(
             params.quadratic_upperbound_tolerance_factor;
         real_t old_γₖ = γₖ;
         real_t margin = (1 + std::abs(ψₖ)) * rounding_tolerance;
+        unsigned num_inc = 0;
         while (ψx̂ₖ - ψₖ > grad_ψₖᵀpₖ + real_t(0.5) * Lₖ * pₖᵀpₖ + margin) {
+            if (num_inc > params.L_max_inc)
+                break;
             if (not(Lₖ * 2 <= params.L_max))
                 break;
 
             Lₖ *= 2;
             γₖ /= 2;
+            ++num_inc;
 
             // Calculate ûₖ and pₖ (with new step size)
             std::tie(pₖᵀpₖ, grad_ψₖᵀpₖ) = eval_prox(γₖ, xuₖ, grad_ψₖ, x̂uₖ, pₖ);

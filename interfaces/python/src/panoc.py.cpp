@@ -60,6 +60,7 @@ struct kwargs_to_struct_table<alpaqa::PANOCOCPParams<Conf>> {
         {"τ_min", &alpaqa::PANOCOCPParams<Conf>::τ_min},
         {"L_min", &alpaqa::PANOCOCPParams<Conf>::L_min},
         {"L_max", &alpaqa::PANOCOCPParams<Conf>::L_max},
+        {"L_max_inc", &alpaqa::PANOCOCPParams<Conf>::L_max_inc},
         {"stop_crit", &alpaqa::PANOCOCPParams<Conf>::stop_crit},
         {"max_no_progress", &alpaqa::PANOCOCPParams<Conf>::max_no_progress},
         {"gn_interval", &alpaqa::PANOCOCPParams<Conf>::gn_interval},
@@ -416,6 +417,7 @@ void register_panoc(py::module_ &m) {
         .def_readwrite("τ_min", &PANOCOCPParams::τ_min)
         .def_readwrite("L_min", &PANOCOCPParams::L_min)
         .def_readwrite("L_max", &PANOCOCPParams::L_max)
+        .def_readwrite("L_max_inc", &PANOCOCPParams::L_max_inc)
         .def_readwrite("stop_crit", &PANOCOCPParams::stop_crit)
         .def_readwrite("max_no_progress", &PANOCOCPParams::max_no_progress)
         .def_readwrite("gn_interval", &PANOCOCPParams::gn_interval)

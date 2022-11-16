@@ -26,6 +26,9 @@ struct PANOCOCPParams {
     real_t L_min = 1e-5;
     /// Maximum Lipschitz constant estimate.
     real_t L_max = 1e20;
+    /// Maximum number of times to double the Lipschitz constant estimate per
+    /// iteration.
+    unsigned L_max_inc = 6;
     /// What stopping criterion to use.
     PANOCStopCrit stop_crit = PANOCStopCrit::ApproxKKT;
     /// Maximum number of iterations without any progress before giving up.
