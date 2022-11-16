@@ -10,6 +10,88 @@
 
 namespace alpaqa {
 
+namespace detail {
+
+template <Config Conf>
+void assign_interleave_xu(OCPDim<Conf> dim, crvec<Conf> u, rvec<Conf> xu) {
+    for (index_t<Conf> t = 0; t < dim.N; ++t)
+        xu.segment(t * (dim.nx + dim.nu) + dim.nx, dim.nu) =
+            u.segment(t * dim.nu, dim.nu);
+}
+template <Config Conf>
+void assign_interleave_xu(OCPDim<Conf> dim, crvec<Conf> x, crvec<Conf> u,
+                          rvec<Conf> xu) {
+    for (index_t<Conf> t = 0; t < dim.N; ++t) {
+        xu.segment(t * (dim.nx + dim.nu), dim.nx) =
+            x.segment(t * dim.nx, dim.nx);
+        xu.segment(t * (dim.nx + dim.nu) + dim.nx, dim.nu) =
+            u.segment(t * dim.nu, dim.nu);
+    }
+    xu.segment(dim.N * (dim.nx + dim.nu), dim.nx) =
+        x.segment(dim.N * dim.nx, dim.nx);
+}
+template <Config Conf>
+void assign_extract_u(OCPDim<Conf> dim, crvec<Conf> xu, rvec<Conf> u) {
+    for (index_t<Conf> t = 0; t < dim.N; ++t)
+        u.segment(t * dim.nu, dim.nu) =
+            xu.segment(t * (dim.nx + dim.nu) + dim.nx, dim.nu);
+}
+template <Config Conf>
+void assign_extract_x(OCPDim<Conf> dim, crvec<Conf> xu, rvec<Conf> x) {
+    for (index_t<Conf> t = 0; t < dim.N + 1; ++t)
+        x.segment(t * dim.nx, dim.nx) =
+            xu.segment(t * (dim.nx + dim.nu), dim.nx);
+}
+
+template <Config Conf>
+vec<Conf> extract_u(const TypeErasedControlProblem<Conf> &problem,
+                    crvec<Conf> xu) {
+    auto dim = problem.get_dimensions();
+    vec<Conf> u(dim.N * dim.nu);
+    assign_extract_u(dim, xu, u);
+    return u;
+}
+template <Config Conf>
+vec<Conf> extract_x(const TypeErasedControlProblem<Conf> &problem,
+                    crvec<Conf> xu) {
+    auto dim = problem.get_dimensions();
+    vec<Conf> x((dim.N + 1) * (dim.nx + dim.nu));
+    assign_extract_x(dim, xu, x);
+    return x;
+}
+
+} // namespace detail
+
+template <Config Conf>
+auto PANOCOCPProgressInfo<Conf>::u() const -> vec {
+    return detail::extract_u(problem, xu);
+}
+
+template <Config Conf>
+auto PANOCOCPProgressInfo<Conf>::x() const -> vec {
+    return detail::extract_x(problem, xu);
+}
+
+template <Config Conf>
+auto PANOCOCPProgressInfo<Conf>::û() const -> vec {
+    return detail::extract_u(problem, x̂u);
+}
+
+template <Config Conf>
+auto PANOCOCPProgressInfo<Conf>::x̂() const -> vec {
+    return detail::extract_x(problem, x̂u);
+}
+
+template <Config Conf>
+auto PANOCOCPProgressInfo<Conf>::qu() const -> vec {
+    return detail::extract_u(problem, q);
+}
+
+template <Config Conf>
+auto PANOCOCPProgressInfo<Conf>::qx() const -> vec {
+    return detail::extract_x(problem, q);
+}
+
 template <Config Conf>
 std::string PANOCOCPSolver<Conf>::get_name() const {
     return "PANOCOCPSolver<" + std::string(config_t::get_name()) + '>';
@@ -102,8 +184,8 @@ auto PANOCOCPSolver<Conf>::operator()(
                              real_t &grad_ψₖᵀpₖ, real_t &Lₖ, real_t &γₖ) {
         const auto rounding_tolerance =
             params.quadratic_upperbound_tolerance_factor;
-        real_t old_γₖ = γₖ;
-        real_t margin = (1 + std::abs(ψₖ)) * rounding_tolerance;
+        real_t old_γₖ    = γₖ;
+        real_t margin    = (1 + std::abs(ψₖ)) * rounding_tolerance;
         unsigned num_inc = 0;
         while (ψx̂ₖ - ψₖ > grad_ψₖᵀpₖ + real_t(0.5) * Lₖ * pₖᵀpₖ + margin) {
             if (num_inc > params.L_max_inc)
@@ -115,7 +197,7 @@ auto PANOCOCPSolver<Conf>::operator()(
             γₖ /= 2;
             ++num_inc;
 
-            // Calculate ûₖ and pₖ (with new step size)
+            // Calculate ûₖ and pₖ (with new step size)
             std::tie(pₖᵀpₖ, grad_ψₖᵀpₖ) = eval_prox(γₖ, xuₖ, grad_ψₖ, x̂uₖ, pₖ);
 
             // Calculate ψ(x̂ₖ)
@@ -183,13 +265,12 @@ auto PANOCOCPSolver<Conf>::operator()(
                                      : SolverStatus::Busy;
         };
 
-    auto assign_interleave_xu = [N, nu, nx](crvec u, rvec xu) {
-        for (index_t t = 0; t < N; ++t)
-            xu.segment(t * (nx + nu) + nx, nu) = u.segment(t * nu, nu);
+    auto assign_interleave_xu = [dim{problem.get_dimensions()}](crvec u,
+                                                                rvec xu) {
+        detail::assign_interleave_xu(dim, u, xu);
     };
-    auto assign_extract_u = [N, nu, nx](crvec xu, rvec u) {
-        for (index_t t = 0; t < N; ++t)
-            u.segment(t * nu, nu) = xu.segment(t * (nx + nu) + nx, nu);
+    auto assign_extract_u = [dim{problem.get_dimensions()}](crvec xu, rvec u) {
+        detail::assign_extract_u(dim, xu, u);
     };
 
     // Note: updates the stats in xuₖ, the Jacobians in eval, and
@@ -264,7 +345,7 @@ auto PANOCOCPSolver<Conf>::operator()(
     x̂uₖ.topRows(nx)    = xuₖ.topRows(nx);
     xuₙₑₓₜ.topRows(nx) = xuₖ.topRows(nx);
     x̂uₙₑₓₜ.topRows(nx) = xuₖ.topRows(nx);
-    qxuₖ.topRows(nx).setZero();
+    qxuₖ.setZero();
     if (enable_lbfgs)
         uₖ = u;
 
@@ -364,13 +445,11 @@ auto PANOCOCPSolver<Conf>::operator()(
 
         // Line search initialization ------------------------------------------
         τ                = 1;
-        real_t σₖγₖpₖᵀpₖ = (1 - γₖ * Lₖ) * pₖᵀpₖ / (2 * γₖ);
+        real_t σₖγₖpₖᵀpₖ = params.β * (1 - γₖ * Lₖ) * pₖᵀpₖ / (2 * γₖ);
         real_t φₙₑₓₜ, ψₙₑₓₜ, ψx̂ₙₑₓₜ, grad_ψₙₑₓₜᵀpₙₑₓₜ, pₙₑₓₜᵀpₙₑₓₜ;
         real_t Lₙₑₓₜ, γₙₑₓₜ;
         real_t ls_cond;
-        // TODO: make separate parameter
-        real_t margin =
-            (1 + std::abs(φₖ)) * params.quadratic_upperbound_tolerance_factor;
+        real_t margin = (1 + std::abs(φₖ)) * params.linesearch_tolerance_factor;
 
         // Calculate Gauss-Newton step -----------------------------------------
 

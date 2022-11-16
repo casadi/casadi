@@ -45,6 +45,8 @@ struct PANOCParams {
 
     real_t quadratic_upperbound_tolerance_factor =
         10 * std::numeric_limits<real_t>::epsilon();
+    real_t linesearch_tolerance_factor =
+        10 * std::numeric_limits<real_t>::epsilon();
 
     bool update_lipschitz_in_linesearch = true;
     bool alternative_linesearch_cond    = false;

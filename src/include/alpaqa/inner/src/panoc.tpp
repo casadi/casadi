@@ -199,7 +199,7 @@ auto PANOCSolver<DirectionProviderT>::operator()(
 
         auto time_elapsed = std::chrono::steady_clock::now() - start_time;
         auto stop_status  = Helpers::check_all_stop_conditions(
-             params, time_elapsed, k, stop_signal, ε, εₖ, no_progress);
+            params, time_elapsed, k, stop_signal, ε, εₖ, no_progress);
         if (stop_status != SolverStatus::Busy) {
             // TODO: We could cache g(x) and ẑ, but would that faster?
             //       It saves 1 evaluation of g per ALM iteration, but requires
@@ -231,9 +231,7 @@ auto PANOCSolver<DirectionProviderT>::operator()(
         real_t φₙₑₓₜ, ψₙₑₓₜ, ψx̂ₙₑₓₜ, grad_ψₙₑₓₜᵀpₙₑₓₜ, pₙₑₓₜᵀpₙₑₓₜ;
         real_t Lₙₑₓₜ, γₙₑₓₜ;
         real_t ls_cond;
-        // TODO: make separate parameter
-        real_t margin =
-            (1 + std::abs(φₖ)) * params.quadratic_upperbound_tolerance_factor;
+        real_t margin = (1 + std::abs(φₖ)) * params.linesearch_tolerance_factor;
 
         // Make sure quasi-Newton step is valid
         if (k == 0) {
@@ -310,8 +308,8 @@ auto PANOCSolver<DirectionProviderT>::operator()(
         if (γₖ != γₙₑₓₜ) // Flush L-BFGS if γ changed
             direction_provider.changed_γ(γₙₑₓₜ, γₖ);
 
-        s.lbfgs_rejected += not direction_provider.update(γₖ, γₙₑₓₜ, xₖ, xₙₑₓₜ, pₖ, pₙₑₓₜ,
-                                                          grad_ψₖ, grad_ψₙₑₓₜ);
+        s.lbfgs_rejected += not direction_provider.update(
+            γₖ, γₙₑₓₜ, xₖ, xₙₑₓₜ, pₖ, pₙₑₓₜ, grad_ψₖ, grad_ψₙₑₓₜ);
 
         // Check if we made any progress
         if (no_progress > 0 || k % params.max_no_progress == 0)

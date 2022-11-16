@@ -119,6 +119,8 @@ inline const kwargs_to_struct_table_t<alpaqa::PGAParams>
         {"print_interval", &alpaqa::PGAParams::print_interval},
         {"quadratic_upperbound_tolerance_factor",
          &alpaqa::PGAParams::quadratic_upperbound_tolerance_factor},
+        {"linesearch_tolerance_factor",
+         &alpaqa::PGAParams::linesearch_tolerance_factor},
     };
 
 #include <alpaqa/inner/guarded-aa-pga.hpp>
@@ -136,6 +138,8 @@ inline const kwargs_to_struct_table_t<alpaqa::GAAPGAParams>
         {"print_interval", &alpaqa::GAAPGAParams::print_interval},
         {"quadratic_upperbound_tolerance_factor",
          &alpaqa::GAAPGAParams::quadratic_upperbound_tolerance_factor},
+        {"linesearch_tolerance_factor",
+         &alpaqa::GAAPGAParams::linesearch_tolerance_factor},
         {"max_no_progress", &alpaqa::GAAPGAParams::max_no_progress},
         {"full_flush_on_γ_change",
          &alpaqa::GAAPGAParams::full_flush_on_γ_change},
@@ -165,6 +169,9 @@ inline const kwargs_to_struct_table_t<alpaqa::StructuredPANOCLBFGSParams>
         {"quadratic_upperbound_tolerance_factor",
          &alpaqa::StructuredPANOCLBFGSParams::
              quadratic_upperbound_tolerance_factor},
+        {"linesearch_tolerance_factor",
+         &alpaqa::StructuredPANOCLBFGSParams::
+             linesearch_tolerance_factor},
         {"update_lipschitz_in_linesearch",
          &alpaqa::StructuredPANOCLBFGSParams::update_lipschitz_in_linesearch},
         {"alternative_linesearch_cond",

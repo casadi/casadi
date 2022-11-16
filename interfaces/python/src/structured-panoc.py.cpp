@@ -37,6 +37,7 @@ struct kwargs_to_struct_table<alpaqa::StructuredPANOCLBFGSParams<Conf>> {
         {"print_interval", &alpaqa::StructuredPANOCLBFGSParams<Conf>::print_interval},
         {"print_precision", &alpaqa::StructuredPANOCLBFGSParams<Conf>::print_precision},
         {"quadratic_upperbound_tolerance_factor", &alpaqa::StructuredPANOCLBFGSParams<Conf>::quadratic_upperbound_tolerance_factor},
+        {"linesearch_tolerance_factor", &alpaqa::StructuredPANOCLBFGSParams<Conf>::linesearch_tolerance_factor},
         {"update_lipschitz_in_linesearch", &alpaqa::StructuredPANOCLBFGSParams<Conf>::update_lipschitz_in_linesearch},
         {"alternative_linesearch_cond", &alpaqa::StructuredPANOCLBFGSParams<Conf>::alternative_linesearch_cond},
         {"hessian_vec", &alpaqa::StructuredPANOCLBFGSParams<Conf>::hessian_vec},
@@ -75,6 +76,7 @@ void register_structured_panoc(py::module_ &m) {
         .def_readwrite("print_interval", &StructuredPANOCLBFGSParams::print_interval)
         .def_readwrite("print_precision", &StructuredPANOCLBFGSParams::print_precision)
         .def_readwrite("quadratic_upperbound_tolerance_factor", &StructuredPANOCLBFGSParams::quadratic_upperbound_tolerance_factor)
+        .def_readwrite("linesearch_tolerance_factor", &StructuredPANOCLBFGSParams::linesearch_tolerance_factor)
         .def_readwrite("update_lipschitz_in_linesearch", &StructuredPANOCLBFGSParams::update_lipschitz_in_linesearch)
         .def_readwrite("alternative_linesearch_cond", &StructuredPANOCLBFGSParams::alternative_linesearch_cond)
         .def_readwrite("hessian_vec", &StructuredPANOCLBFGSParams::hessian_vec)

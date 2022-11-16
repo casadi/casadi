@@ -15,6 +15,8 @@ struct LipschitzEstimateParams {
     /// Minimum step size for initial finite difference Lipschitz estimate.
     real_t δ = 1e-12;
     /// Factor that relates step size γ and Lipschitz constant.
+    /// Parameter α in Algorithm 2 of @cite de_marchi_proximal_2022.
+    /// @f$ 0 < \alpha < 1 @f$
     real_t Lγ_factor = 0.95;
 
     void verify() const {

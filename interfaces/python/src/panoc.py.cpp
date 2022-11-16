@@ -44,6 +44,7 @@ struct kwargs_to_struct_table<alpaqa::PANOCParams<Conf>> {
         {"print_interval", &alpaqa::PANOCParams<Conf>::print_interval},
         {"print_precision", &alpaqa::PANOCParams<Conf>::print_precision},
         {"quadratic_upperbound_tolerance_factor", &alpaqa::PANOCParams<Conf>::quadratic_upperbound_tolerance_factor},
+        {"linesearch_tolerance_factor", &alpaqa::PANOCParams<Conf>::linesearch_tolerance_factor},
         {"update_lipschitz_in_linesearch", &alpaqa::PANOCParams<Conf>::update_lipschitz_in_linesearch},
         {"alternative_linesearch_cond", &alpaqa::PANOCParams<Conf>::alternative_linesearch_cond},
         // clang-format on
@@ -58,6 +59,7 @@ struct kwargs_to_struct_table<alpaqa::PANOCOCPParams<Conf>> {
         {"max_iter", &alpaqa::PANOCOCPParams<Conf>::max_iter},
         {"max_time", &alpaqa::PANOCOCPParams<Conf>::max_time},
         {"τ_min", &alpaqa::PANOCOCPParams<Conf>::τ_min},
+        {"β", &alpaqa::PANOCOCPParams<Conf>::β},
         {"L_min", &alpaqa::PANOCOCPParams<Conf>::L_min},
         {"L_max", &alpaqa::PANOCOCPParams<Conf>::L_max},
         {"L_max_inc", &alpaqa::PANOCOCPParams<Conf>::L_max_inc},
@@ -70,6 +72,7 @@ struct kwargs_to_struct_table<alpaqa::PANOCOCPParams<Conf>> {
         {"print_interval", &alpaqa::PANOCOCPParams<Conf>::print_interval},
         {"print_precision", &alpaqa::PANOCOCPParams<Conf>::print_precision},
         {"quadratic_upperbound_tolerance_factor", &alpaqa::PANOCOCPParams<Conf>::quadratic_upperbound_tolerance_factor},
+        {"linesearch_tolerance_factor", &alpaqa::PANOCOCPParams<Conf>::linesearch_tolerance_factor},
         {"update_lipschitz_in_linesearch", &alpaqa::PANOCOCPParams<Conf>::update_lipschitz_in_linesearch},
         // clang-format on
     };
@@ -255,6 +258,7 @@ void register_panoc(py::module_ &m) {
         .def_readwrite("print_interval", &PANOCParams::print_interval)
         .def_readwrite("print_precision", &PANOCParams::print_precision)
         .def_readwrite("quadratic_upperbound_tolerance_factor", &PANOCParams::quadratic_upperbound_tolerance_factor)
+        .def_readwrite("linesearch_tolerance_factor", &PANOCParams::linesearch_tolerance_factor)
         .def_readwrite("update_lipschitz_in_linesearch", &PANOCParams::update_lipschitz_in_linesearch)
         .def_readwrite("alternative_linesearch_cond", &PANOCParams::alternative_linesearch_cond)
         // clang-format on
@@ -415,6 +419,7 @@ void register_panoc(py::module_ &m) {
         .def_readwrite("max_iter", &PANOCOCPParams::max_iter)
         .def_readwrite("max_time", &PANOCOCPParams::max_time)
         .def_readwrite("τ_min", &PANOCOCPParams::τ_min)
+        .def_readwrite("β", &PANOCOCPParams::β)
         .def_readwrite("L_min", &PANOCOCPParams::L_min)
         .def_readwrite("L_max", &PANOCOCPParams::L_max)
         .def_readwrite("L_max_inc", &PANOCOCPParams::L_max_inc)
@@ -427,6 +432,7 @@ void register_panoc(py::module_ &m) {
         .def_readwrite("print_interval", &PANOCOCPParams::print_interval)
         .def_readwrite("print_precision", &PANOCOCPParams::print_precision)
         .def_readwrite("quadratic_upperbound_tolerance_factor", &PANOCOCPParams::quadratic_upperbound_tolerance_factor)
+        .def_readwrite("linesearch_tolerance_factor", &PANOCOCPParams::linesearch_tolerance_factor)
         .def_readwrite("update_lipschitz_in_linesearch", &PANOCOCPParams::update_lipschitz_in_linesearch)
         // clang-format on
         ;
@@ -455,6 +461,12 @@ void register_panoc(py::module_ &m) {
         .def_readonly("ε", &PANOCOCPProgressInfo::ε, "Tolerance reached :math:`\\varepsilon_k`")
         .def_property_readonly("problem", [](const PANOCOCPProgressInfo &p) -> auto & { return p.problem; }, "Problem being solved")
         .def_property_readonly("params", [](const PANOCOCPProgressInfo &p) -> auto & { return p.params; }, "Solver parameters")
+        .def_property_readonly("u", &PANOCOCPProgressInfo::u, "Inputs")
+        .def_property_readonly("û", &PANOCOCPProgressInfo::û, "Inputs after projected gradient step")
+        .def_property_readonly("x", &PANOCOCPProgressInfo::x, "States")
+        .def_property_readonly("x̂", &PANOCOCPProgressInfo::x̂, "States after projected gradient step")
+        .def_property_readonly("qu", &PANOCOCPProgressInfo::qu, "Accelerated step on inputs")
+        .def_property_readonly("qx", &PANOCOCPProgressInfo::qx, "Accelerated step on states")
         // clang-format on
         .def_property_readonly(
             "fpr", [](const PANOCOCPProgressInfo &p) { return std::sqrt(p.norm_sq_p) / p.γ; },

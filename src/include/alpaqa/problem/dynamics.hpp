@@ -31,6 +31,12 @@ struct ControlProblem {
 };
 
 template <Config Conf>
+struct OCPDim {
+    USING_ALPAQA_CONFIG(Conf);
+    length_t N, nx, nu, nh;
+};
+
+template <Config Conf>
 struct ControlProblemVTable : util::BasicVTable {
     USING_ALPAQA_CONFIG(Conf);
     using Box = alpaqa::Box<config_t>;
@@ -96,6 +102,7 @@ class TypeErasedControlProblem : public util::TypeErased<ControlProblemVTable<Co
     using VTable         = ControlProblemVTable<config_t>;
     using allocator_type = Allocator;
     using Box            = typename VTable::Box;
+    using Dim            = OCPDim<config_t>;
     using TypeErased     = util::TypeErased<VTable, allocator_type>;
     using TypeErased::TypeErased;
 
@@ -120,7 +127,11 @@ class TypeErasedControlProblem : public util::TypeErased<ControlProblemVTable<Co
     /// Number of states.
     length_t get_nx() const { return vtable.nx; }
     /// Number of outputs.
-    length_t get_ny() const { return vtable.ny; }
+    length_t get_nh() const { return vtable.nh; }
+    /// All dimensions
+    Dim get_dimensions() const {
+        return {.N = vtable.N, .nx = vtable.nx, .nu = vtable.nu, .nh = vtable.nh};
+    }
 
     /// @}
 

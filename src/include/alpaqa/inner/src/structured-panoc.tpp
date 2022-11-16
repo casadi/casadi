@@ -367,7 +367,7 @@ auto StructuredPANOCLBFGSSolver<Conf>::operator()(
 
         auto time_elapsed = std::chrono::steady_clock::now() - start_time;
         auto stop_status  = Helpers::check_all_stop_conditions(
-             params, time_elapsed, k, stop_signal, ε, εₖ, no_progress);
+            params, time_elapsed, k, stop_signal, ε, εₖ, no_progress);
         if (stop_status != SolverStatus::Busy) {
             // TODO: We could cache g(x) and ẑ, but would that faster?
             //       It saves 1 evaluation of g per ALM iteration, but requires
@@ -404,9 +404,8 @@ auto StructuredPANOCLBFGSSolver<Conf>::operator()(
         real_t ls_cond;
         real_t w = params.nonmonotone_linesearch;
         nmΦₖ     = k == 0 ? φₖ : w * nmΦₖ + (1 - w) * φₖ;
-        // TODO: make separate parameter
         real_t margin =
-            (1 + std::abs(nmΦₖ)) * params.quadratic_upperbound_tolerance_factor;
+            (1 + std::abs(nmΦₖ)) * params.linesearch_tolerance_factor;
 
         // Make sure quasi-Newton step is valid
         if (k == 0) {
