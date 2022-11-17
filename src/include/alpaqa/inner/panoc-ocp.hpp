@@ -50,11 +50,11 @@ struct PANOCOCPParams {
     int print_precision = std::numeric_limits<real_t>::max_digits10 / 2;
 
     real_t quadratic_upperbound_tolerance_factor =
-        10 * std::numeric_limits<real_t>::epsilon();
+        1e2 * std::numeric_limits<real_t>::epsilon();
     real_t linesearch_tolerance_factor =
-        10 * std::numeric_limits<real_t>::epsilon();
+        1e2 * std::numeric_limits<real_t>::epsilon();
 
-    bool update_lipschitz_in_linesearch = true;
+    bool disable_acceleration = false;
 };
 
 template <Config Conf = DefaultConfig>
