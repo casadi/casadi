@@ -850,14 +850,14 @@ if(WITH_HPIPM)
       PREFIX "${CMAKE_BINARY_DIR}/external_projects"
       UPDATE_COMMAND ""
       CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
-      CMAKE_ARGS -DCMAKE_C_FLAGS=-g -DBLASFEO_PATH=${BLASFEO_PATH} -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
+      CMAKE_ARGS -DHPIPM_TESTING=OFF -DBUILD_SHARED_LIBS=ON -DBLASFEO_PATH=${BLASFEO_PATH} -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
     set(LAPACK_LIBRARIES "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}openblas${CMAKE_SHARED_LIBRARY_SUFFIX}")
     set(LAPACK_DEPENDS_TARGET openblas-external)
 
     add_library(hpipm SHARED IMPORTED)
     target_link_libraries(hpipm INTERFACE blasfeo)
     set_target_properties(hpipm PROPERTIES
-       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/libhpipm${CMAKE_STATIC_LIBRARY_SUFFIX}"
+       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/libhpipm${CMAKE_SHARED_LIBRARY_SUFFIX}"
     )
     file(GLOB HPIPM_HEADERS "${CMAKE_BINARY_DIR}/external_projects/include/hpipm*")
     install(FILES
