@@ -519,7 +519,7 @@ jobs:
 
   test-python:
     runs-on: ${{matrix.image}}
-    needs: [python-dockcross,python-osx]
+    needs: [python-dockcross]
     strategy:
      fail-fast: false
      matrix:
