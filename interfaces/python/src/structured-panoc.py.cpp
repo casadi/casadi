@@ -58,7 +58,7 @@ void register_structured_panoc(py::module_ &m) {
         m, "StructuredPANOCLBFGSParams",
         "C++ documentation: :cpp:class:`alpaqa::StructuredPANOCLBFGSParams`")
         .def(py::init())
-        .def(py::init(&dict_to_struct<StructuredPANOCLBFGSParams>))
+        .def(py::init(&kwargs_to_struct<StructuredPANOCLBFGSParams>))
         .def("to_dict", &struct_to_dict<StructuredPANOCLBFGSParams>)
         // clang-format off
         .def_readwrite("Lipschitz", &StructuredPANOCLBFGSParams::Lipschitz)
@@ -125,8 +125,8 @@ void register_structured_panoc(py::module_ &m) {
         "C++ documentation: :cpp:class:`alpaqa::StructuredPANOCLBFGSSolver`")
         .def(py::init([](params_or_dict<StructuredPANOCLBFGSParams> params,
                          params_or_dict<LBFGSParams> lbfgs_params) {
-                 return StructuredPANOCLBFGSSolver{var_dict_to_struct(params),
-                                                   var_dict_to_struct(lbfgs_params)};
+                 return StructuredPANOCLBFGSSolver{var_kwargs_to_struct(params),
+                                                   var_kwargs_to_struct(lbfgs_params)};
              }),
              "panoc_params"_a = py::dict{}, "lbfgs_params"_a = py::dict{},
              "Create a PANOC solver using L-BFGS directions.")

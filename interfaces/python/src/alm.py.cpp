@@ -79,7 +79,7 @@ void register_alm(py::module_ &m) {
     using ALMParams = typename ALMSolver::Params;
     py::class_<ALMParams>(m, "ALMParams", "C++ documentation: :cpp:class:`alpaqa::ALMParams`")
         .def(py::init())
-        .def(py::init(&dict_to_struct<ALMParams>))
+        .def(py::init(&kwargs_to_struct<ALMParams>))
         .def("to_dict", &struct_to_dict<ALMParams>)
         .def_readwrite("ε", &ALMParams::ε)
         .def_readwrite("δ", &ALMParams::δ)
@@ -178,13 +178,13 @@ void register_alm(py::module_ &m) {
              "inner_solver"_a, "Build an ALM solver using Structured PANOC as inner solver.")
         // Params and solver
         .def(py::init([](params_or_dict<ALMParams> params, const PANOCSolver &inner) {
-                 return std::make_unique<ALMSolver>(var_dict_to_struct(params),
+                 return std::make_unique<ALMSolver>(var_kwargs_to_struct(params),
                                                     InnerSolver{inner});
              }),
              "alm_params"_a, "inner_solver"_a, "Build an ALM solver using PANOC as inner solver.")
         .def(
             py::init([](params_or_dict<ALMParams> params, const StructuredPANOCLBFGSSolver &inner) {
-                return std::make_unique<ALMSolver>(var_dict_to_struct(params),
+                return std::make_unique<ALMSolver>(var_kwargs_to_struct(params),
                                                    InnerSolver{inner});
             }),
             "alm_params"_a, "inner_solver"_a,

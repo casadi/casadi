@@ -119,8 +119,9 @@ template <class Params>
 using params_or_dict = std::variant<Params, py::dict>;
 
 template <class T>
-T var_dict_to_struct(const params_or_dict<T> &p) {
-    return std::holds_alternative<T>(p) ? std::get<T>(p) : dict_to_struct<T>(std::get<py::dict>(p));
+T var_kwargs_to_struct(const params_or_dict<T> &p) {
+    return std::holds_alternative<T>(p) ? std::get<T>(p)
+                                        : kwargs_to_struct<T>(std::get<py::dict>(p));
 }
 
 #if 0
