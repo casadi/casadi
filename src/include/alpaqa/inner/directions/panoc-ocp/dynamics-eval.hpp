@@ -217,13 +217,6 @@ struct DynamicsEvaluator {
     }
 #endif
 
-    void jacobians(crvec xu) {
-        detail::Timed t{time.backward_jacobians};
-        assert(xu.size() == (nx + nu) * N + nx);
-        for (index_t t = N; t-- > 0;)
-            problem.eval_jac_f(t, xk(xu, t), uk(xu, t), ABk(t));
-    }
-
     void hessians(crvec xu) {
         detail::Timed t{time.hessians};
         assert(xu.size() == (nx + nu) * N + nx);

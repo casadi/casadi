@@ -55,9 +55,6 @@ struct PANOCOCPParams {
         1e2 * std::numeric_limits<real_t>::epsilon();
 
     bool disable_acceleration = false;
-    /// If true, always perform Gauss-Newton steps, but only update the
-    /// factorization every @ref gn_interval iterations.
-    bool reuse_factorization = false;
 };
 
 template <Config Conf = DefaultConfig>
