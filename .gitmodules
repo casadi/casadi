@@ -1,9 +1,3 @@
-[submodule "external_packages/hpmpc/src"]
-	path = external_packages/hpmpc/src
-	url = https://github.com/jgillis/hpmpc.git
-[submodule "external_packages/blasfeo/src"]
-	path = external_packages/blasfeo/src
-	url = https://github.com/jgillis/blasfeo.git
 [submodule "external_packages/snopt-interface/snopt-interface"]
 	path = external_packages/snopt-interface/snopt-interface
 	url = https://github.com/snopt/snopt-interface.git
