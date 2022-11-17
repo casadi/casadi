@@ -137,6 +137,16 @@ auto PANOCOCPSolver<Conf>::operator()(
     LBFGSParams<config_t> lbfgs_param{.memory = N}; // TODO: make configurable
     LBFGS<config_t> lbfgs{lbfgs_param, enable_lbfgs ? n : 0};
 
+    auto Ak    = [&](index_t i) -> crmat { return eval.Ak(i); };
+    auto Bk    = [&](index_t i) -> crmat { return eval.Bk(i); };
+    auto Qk    = [&](index_t k) -> crmat { return eval.Qk(k); };
+    auto Rk    = [&](index_t k) -> crmat { return eval.Rk(k); };
+    auto qk    = [&](index_t k) -> crvec { return eval.qk(k); };
+    auto rk    = [&](index_t k) -> crvec { return eval.rk(k); };
+    auto uk_eq = [&](index_t k) -> crvec { return eval.uk(qxuₖ, k); };
+    auto Jk    = [&](index_t k) -> crindexvec { return J.indices(k); };
+    auto Kk    = [&](index_t k) -> crindexvec { return J.compl_indices(k); };
+
     // Iterates ----------------------------------------------------------------
 
     struct Iterate {
@@ -508,22 +518,36 @@ auto PANOCOCPSolver<Conf>::operator()(
                 J.update(is_constr_inactive);
             }
 
-            auto Ak    = [&](index_t i) -> crmat { return eval.Ak(i); };
-            auto Bk    = [&](index_t i) -> crmat { return eval.Bk(i); };
-            auto Qk    = [&](index_t k) -> crmat { return eval.Qk(k); };
-            auto Rk    = [&](index_t k) -> crmat { return eval.Rk(k); };
-            auto qk    = [&](index_t k) -> crvec { return eval.qk(k); };
-            auto rk    = [&](index_t k) -> crvec { return eval.rk(k); };
-            auto uk_eq = [&](index_t k) -> crvec { return eval.uk(qxuₖ, k); };
-            auto Jk    = [&](index_t k) -> crindexvec { return J.indices(k); };
-            auto Kk    = [&](index_t k) -> crindexvec {
-                return J.compl_indices(k);
-            };
-
             { // LQR factor
                 detail::Timed t{s.time_lqr_factor};
                 lqr.factor_masked(Ak, Bk, Qk, Rk, qk, rk, uk_eq, Jk, Kk,
                                   params.lqr_factor_cholesky);
+            }
+            { // LQR solve
+                detail::Timed t{s.time_lqr_solve};
+                lqr.solve_masked(Ak, Bk, Jk, qxuₖ);
+            }
+        } else if (params.gn_interval > 0 && params.reuse_factorization) {
+            auto update_Δu_eq = [&](index_t t, index_t i) {
+                real_t ui = eval.uk(curr->xu, t)(i);
+                // Gradient descent step.
+                real_t γg = curr->γ * curr->grad_ψ(t * nu + i);
+                // Check whether the box constraints are active for this index.
+                bool active_lb = ui - γg <= U.lowerbound(i);
+                bool active_ub = ui - γg >= U.upperbound(i);
+                if (active_ub) {
+                    eval.uk(qxuₖ, t)(i) = U.upperbound(i) - ui;
+                } else if (active_lb) {
+                    eval.uk(qxuₖ, t)(i) = U.lowerbound(i) - ui;
+                } else {
+                    eval.uk(qxuₖ, t)(i) = -γg; // Is this the best we can do?
+                }
+            };
+            {
+                detail::Timed t{s.time_indices};
+                for (index_t t = 0; t < N; ++t)
+                    for (index_t i = 0; i < nu; ++i)
+                        update_Δu_eq(t, i);
             }
             { // LQR solve
                 detail::Timed t{s.time_lqr_solve};
@@ -608,8 +632,9 @@ auto PANOCOCPSolver<Conf>::operator()(
                 next->xu = curr->xû;
                 next->ψu = curr->ψû;
                 // Calculate ∇ψ(xₖ₊₁)
-                curr->have_jacobians = false;
-                eval_backward(*next, do_gn_step);
+                bool overwrite_jacs = params.reuse_factorization || do_gn_step;
+                curr->have_jacobians = !overwrite_jacs;
+                eval_backward(*next, overwrite_jacs);
             } else {
                 if (τ == 1) {
                     next->xu = curr->xu + qxuₖ;
@@ -623,8 +648,9 @@ auto PANOCOCPSolver<Conf>::operator()(
                 }
                 // Calculate ψ(xₖ₊₁), ∇ψ(xₖ₊₁)
                 eval_forward(*next); // Not necessary for DDP
-                curr->have_jacobians = false;
-                eval_backward(*next, do_gn_step);
+                bool overwrite_jacs = params.reuse_factorization || do_gn_step;
+                curr->have_jacobians = !overwrite_jacs;
+                eval_backward(*next, overwrite_jacs);
             }
 
             // Calculate x̂ₖ₊₁, ψ(x̂ₖ₊₁)

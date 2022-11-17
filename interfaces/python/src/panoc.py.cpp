@@ -74,6 +74,7 @@ struct dict_to_struct_table<alpaqa::PANOCOCPParams<Conf>> {
         {"quadratic_upperbound_tolerance_factor", &alpaqa::PANOCOCPParams<Conf>::quadratic_upperbound_tolerance_factor},
         {"linesearch_tolerance_factor", &alpaqa::PANOCOCPParams<Conf>::linesearch_tolerance_factor},
         {"disable_acceleration", &alpaqa::PANOCOCPParams<Conf>::disable_acceleration},
+        {"reuse_factorization", &alpaqa::PANOCOCPParams<Conf>::reuse_factorization},
         // clang-format on
     };
 };
@@ -434,6 +435,7 @@ void register_panoc(py::module_ &m) {
         .def_readwrite("quadratic_upperbound_tolerance_factor", &PANOCOCPParams::quadratic_upperbound_tolerance_factor)
         .def_readwrite("linesearch_tolerance_factor", &PANOCOCPParams::linesearch_tolerance_factor)
         .def_readwrite("disable_acceleration", &PANOCOCPParams::disable_acceleration)
+        .def_readwrite("reuse_factorization", &PANOCOCPParams::reuse_factorization)
         // clang-format on
         ;
 
