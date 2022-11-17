@@ -137,6 +137,17 @@ auto PANOCOCPSolver<Conf>::operator()(
     LBFGSParams<config_t> lbfgs_param{.memory = N}; // TODO: make configurable
     LBFGS<config_t> lbfgs{lbfgs_param, enable_lbfgs ? n : 0};
 
+    // Functions for accessing the LQR matrices and index sets
+    auto Ak    = [&](index_t i) -> crmat { return eval.Ak(i); };
+    auto Bk    = [&](index_t i) -> crmat { return eval.Bk(i); };
+    auto Qk    = [&](index_t k) -> crmat { return eval.Qk(k); };
+    auto Rk    = [&](index_t k) -> crmat { return eval.Rk(k); };
+    auto qk    = [&](index_t k) -> crvec { return eval.qk(k); };
+    auto rk    = [&](index_t k) -> crvec { return eval.rk(k); };
+    auto uk_eq = [&](index_t k) -> crvec { return eval.uk(qxuₖ, k); };
+    auto Jk    = [&](index_t k) -> crindexvec { return J.indices(k); };
+    auto Kk    = [&](index_t k) -> crindexvec { return J.compl_indices(k); };
+
     // Iterates ----------------------------------------------------------------
 
     struct Iterate {
@@ -383,6 +394,9 @@ auto PANOCOCPSolver<Conf>::operator()(
     bool do_gn_step = params.gn_interval > 0 and !params.disable_acceleration;
     bool did_gn     = false;
 
+    // Make sure that we don't allocate any memory in the inner loop
+    ScopedMallocBlocker mb;
+
     // Estimate Lipschitz constant ---------------------------------------------
 
     // Finite difference approximation of ∇²ψ in starting point
@@ -405,9 +419,6 @@ auto PANOCOCPSolver<Conf>::operator()(
     curr->γ = params.Lipschitz.Lγ_factor / curr->L;
     eval_prox(*curr);
     eval_forward_hat(*curr);
-
-    // Make sure that we don't allocate any memory in the inner loop
-    ScopedMallocBlocker mb;
 
     unsigned k  = 0;
     real_t τ    = NaN<config_t>;
@@ -453,6 +464,8 @@ auto PANOCOCPSolver<Conf>::operator()(
                          .problem       = problem,
                          .params        = params});
         }
+
+        // Return solution -----------------------------------------------------
 
         auto time_elapsed = std::chrono::steady_clock::now() - start_time;
         auto stop_status =
@@ -507,18 +520,6 @@ auto PANOCOCPSolver<Conf>::operator()(
                 detail::Timed t{s.time_indices};
                 J.update(is_constr_inactive);
             }
-
-            auto Ak    = [&](index_t i) -> crmat { return eval.Ak(i); };
-            auto Bk    = [&](index_t i) -> crmat { return eval.Bk(i); };
-            auto Qk    = [&](index_t k) -> crmat { return eval.Qk(k); };
-            auto Rk    = [&](index_t k) -> crmat { return eval.Rk(k); };
-            auto qk    = [&](index_t k) -> crvec { return eval.qk(k); };
-            auto rk    = [&](index_t k) -> crvec { return eval.rk(k); };
-            auto uk_eq = [&](index_t k) -> crvec { return eval.uk(qxuₖ, k); };
-            auto Jk    = [&](index_t k) -> crindexvec { return J.indices(k); };
-            auto Kk    = [&](index_t k) -> crindexvec {
-                return J.compl_indices(k);
-            };
 
             { // LQR factor
                 detail::Timed t{s.time_lqr_factor};
@@ -657,13 +658,12 @@ auto PANOCOCPSolver<Conf>::operator()(
         s.count_τ += 1;
         s.sum_τ += τ;
 
-        // Update L-BFGS -------------------------------------------------------
-
         // Check if we made any progress
         if (no_progress > 0 || k % params.max_no_progress == 0)
             no_progress = curr->xu == next->xu ? no_progress + 1 : 0;
 
-        // Update L-BFGS
+        // Update L-BFGS -------------------------------------------------------
+
         if (enable_lbfgs) {
             const bool force = true;
             assign_extract_u(next->xu, next->u);
