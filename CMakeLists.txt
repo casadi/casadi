@@ -951,7 +951,7 @@ if(WITH_CLP)
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/coin")
     add_library(clp-raw SHARED IMPORTED)
     set_target_properties(clp-raw PROPERTIES
-      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIXBLASFEO_PATH}Clp${CMAKE_SHARED_LIBRARY_SUFFIX}"
+      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}Clp${CMAKE_SHARED_LIBRARY_SUFFIX}"
       IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}Clp${CMAKE_IMPORT_LIBRARY_SUFFIX}"
       INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include/coin"
     )
