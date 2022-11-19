@@ -787,6 +787,11 @@ foreach(PKG BONMIN IPOPT CBC CLP MUMPS HPIPM BLASFEO LAPACK)
   endif()
 endforeach()
 
+set(SHARED_LIBRARY_RELDIR lib)
+if (WIN32)
+    set(SHARED_LIBRARY_RELDIR bin)
+endif()
+
 if(WITH_LAPACK)
   if (WITH_BUILD_LAPACK)
     ExternalProject_Add(openblas-external
@@ -799,20 +804,12 @@ if(WITH_LAPACK)
 
     message("CMAKE_IMPORT_LIBRARY_SUFFIX : ${CMAKE_IMPORT_LIBRARY_SUFFIX}")
     set(LAPACK_LIBRARIES "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}openblas${CMAKE_SHARED_LIBRARY_SUFFIX}")    
-    if (WIN32)
-        set(LAPACK_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/bin/${CMAKE_SHARED_LIBRARY_PREFIX}openblas${CMAKE_SHARED_LIBRARY_SUFFIX}.a")
-        if (NOT EXISTS ${LAPACK_IMPLIB})
-            set(LAPACK_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/bin/${CMAKE_IMPORT_LIBRARY_PREFIX}openblas${CMAKE_IMPORT_LIBRARY_SUFFIX}")
-        endif()
-    else()
-        set(LAPACK_IMPLIB "${LAPACK_LIBRARIES}")
-    endif()
     set(LAPACK_DEPENDS_TARGET openblas-external)
 
     add_library(lapack SHARED IMPORTED)
     set_target_properties(lapack PROPERTIES
-      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}openblas${CMAKE_SHARED_LIBRARY_SUFFIX}"
-      IMPORTED_IMPLIB "${LAPACK_IMPLIB}"
+      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}openblas${CMAKE_SHARED_LIBRARY_SUFFIX}"
+      IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}openblas${CMAKE_IMPORT_LIBRARY_SUFFIX}"
     )
   else()
     add_library(lapack INTERFACE)
@@ -825,28 +822,29 @@ if(LAPACK_FOUND)
 endif()
 
 
-set(SHARED_LIBRARY_RELDIR lib)
-if (WIN32)
-    set(SHARED_LIBRARY_RELDIR bin)
-endif()
+
 
 
 if(WITH_BLASFEO)
   if (WITH_BUILD_BLASFEO)
+    set(C_FLAGS "")
+    if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
+        set(C_FLAGS "-DCMAKE_CFLAGS=-std=c99")
+    endif()
     ExternalProject_Add(blasfeo-external
       GIT_REPOSITORY https://github.com/giaf/blasfeo.git
       GIT_TAG ${BUILD_BLASFEO_VERSION}
       PREFIX "${CMAKE_BINARY_DIR}/external_projects"
       UPDATE_COMMAND ""
       CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
-      CMAKE_ARGS -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
+      CMAKE_ARGS ${C_FLAGS} -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
     set(BLASFEO_PATH "${CMAKE_BINARY_DIR}/external_projects")
     set(BLASFEO_DEPENDS_TARGET blasfeo-external)
 
     add_library(blasfeo SHARED IMPORTED)
     set_target_properties(blasfeo PROPERTIES
       INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include"
-      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}blasfeo${CMAKE_SHARED_LIBRARY_SUFFIX}"
+      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}blasfeo${CMAKE_SHARED_LIBRARY_SUFFIX}"
       IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}blasfeo${CMAKE_IMPORT_LIBRARY_SUFFIX}"
     )
     file(GLOB BLASFEO_HEADERS "${CMAKE_BINARY_DIR}/external_projects/include/blasfeo*")
@@ -870,8 +868,6 @@ if(WITH_HPIPM)
       UPDATE_COMMAND ""
       CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
       CMAKE_ARGS -DHPIPM_TESTING=OFF -DBUILD_SHARED_LIBS=ON -DBLASFEO_PATH=${BLASFEO_PATH} -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
-    set(LAPACK_LIBRARIES "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}openblas${CMAKE_SHARED_LIBRARY_SUFFIX}")
-    set(LAPACK_DEPENDS_TARGET openblas-external)
     add_library(hpipm SHARED IMPORTED)
     target_link_libraries(hpipm INTERFACE blasfeo)
     set_target_properties(hpipm PROPERTIES
