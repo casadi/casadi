@@ -829,7 +829,7 @@ if(WITH_BLASFEO)
   if (WITH_BUILD_BLASFEO)
     set(C_FLAGS "")
     if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
-        set(C_FLAGS "-DCMAKE_CFLAGS=-std=c99")
+        set(C_FLAGS "-DCMAKE_C_FLAGS=-std=c99")
     endif()
     ExternalProject_Add(blasfeo-external
       GIT_REPOSITORY https://github.com/giaf/blasfeo.git
