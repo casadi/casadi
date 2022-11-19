@@ -4,7 +4,8 @@ on: push
 
 env:
   cache-suffix: v13
-  build_flags: "-DWITH_COMMON=OFF -DWITH_BUILD_REQUIRED=ON -DWITH_BUILD_BONMIN=ON -DWITH_BONMIN=ON -DWITH_IPOPT=ON -DWITH_BUILD_LAPACK=ON -DWITH_LAPACK=ON -DWITH_MUMPS=ON -DWITH_CLP=ON -DWITH_CBC=ON -DWITH_THREAD=ON -DWITH_QPOASES=ON -DWITH_HPIPM=ON -DWITH_BLASFEO=ON -DWITH_BUILD_HPIPM=ON -DWITH_BUILD_BLASFEO=ON"
+  build_flags: "-DWITH_COMMON=OFF -DWITH_BUILD_REQUIRED=ON -DWITH_BUILD_BONMIN=ON -DWITH_BONMIN=ON -DWITH_IPOPT=ON -DWITH_BUILD_LAPACK=ON -DWITH_LAPACK=ON -DWITH_MUMPS=ON -DWITH_CLP=ON -DWITH_CBC=ON -DWITH_THREAD=ON -DWITH_QPOASES=ON"
+  build_flags_64_bit_only: "-DWITH_HPIPM=ON -DWITH_BLASFEO=ON -DWITH_BUILD_HPIPM=ON -DWITH_BUILD_BLASFEO=ON"
 
 
 
@@ -90,7 +91,7 @@ jobs:
       - name: Build
         run: |
           rm -f build/CMakeCache.txt
-          CC=${{ env.CC }} FC=${{ env.FC }} CXX=${{ env.CXX }} cmake -DCMAKE_OSX_SYSROOT=${{env.CONDA_BUILD_SYSROOT}} -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} -H.
+          CC=${{ env.CC }} FC=${{ env.FC }} CXX=${{ env.CXX }} cmake -DCMAKE_OSX_SYSROOT=${{env.CONDA_BUILD_SYSROOT}} -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} ${{env.build_flags_64_bit_only}} -H.
           CC=${{ env.CC }} FC=${{ env.FC }} CXX=${{ env.CXX }} cmake --build build -v
       - run: zip -rq ${{github.job}}-${{matrix.image}}.zip build
       - uses: actions/upload-artifact@v2.2.4
@@ -126,7 +127,7 @@ jobs:
       - name: Build
         run: |
           rm -f build/CMakeCache.txt
-          ./dockcross cmake -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} -H.
+          ./dockcross cmake -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} ${{ contains(matrix.target,'64') && env.build_flags_64_bit_only || ''}} -H.
 
           # In MXE land, (cross).pkg-config does not listen to PKG_CONFIG_PATH straight see https://mxe.cc/#tutorial-4
           # Needed to make CoinUtils work
