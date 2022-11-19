@@ -733,6 +733,11 @@ if(WITH_HSL)
 endif()
 add_feature_info(hsl-interface WITH_HSL "Interface to HSL.")
 
+# HIGHS: A MILP / QP solver
+option(WITH_HIGHS "Compile the HiGHS interface" OFF)
+set(BUILD_HIGHS_GIT_REPO "https://github.com/ERGO-Code/HiGHS")
+set(BUILD_HIGHS_VERSION "46f6ceb269ed44934c79fc9e488487fcb6313b6a") # v1.3.0 suffers from https://github.com/ERGO-Code/HiGHS/issues/928
+option(WITH_BUILD_HIGHS "Build HiGHS (BUILD_HIGHS_VERSION=${BUILD_HIGHS_VERSION}) from downloaded source (BUILD_HIGHS_GIT_REPO=${BUILD_HIGHS_GIT_REPO})." OFF)
 
 function(libraries2flags libraries out)
 # libtool cannot handle absoulte paths (i.e. it omits the library from the list of dependencies)
@@ -756,7 +761,7 @@ function(libraries2flags libraries out)
 endfunction()
 
 # Packages must be sorted from high to low in the dependency graph
-foreach(PKG BONMIN IPOPT CBC CLP MUMPS HPIPM BLASFEO LAPACK)
+foreach(PKG HIGHS BONMIN IPOPT CBC CLP MUMPS HPIPM BLASFEO LAPACK)
   string(TOLOWER ${PKG} PKG_LOWER)
   if(WITH_${PKG})
     if(NOT WITH_BUILD_${PKG})
@@ -788,12 +793,18 @@ foreach(PKG BONMIN IPOPT CBC CLP MUMPS HPIPM BLASFEO LAPACK)
 endforeach()
 
 set(SHARED_LIBRARY_RELDIR lib)
+set(SHARED_LIBRARY64_RELDIR lib64)
 if (WIN32)
     set(SHARED_LIBRARY_RELDIR bin)
+else()
+    if (CMAKE_SIZEOF_VOID_P EQUAL 4)
+        set(SHARED_LIBRARY64_RELDIR lib)
+    endif()
 endif()
 
 if(WITH_LAPACK)
   if (WITH_BUILD_LAPACK)
+    # Requires gcc>=5.0
     ExternalProject_Add(openblas-external
       GIT_REPOSITORY https://github.com/jgillis/OpenBLAS.git
       GIT_TAG ee15f53c9ef7148b05e1b2ff80003df1685f0f10
@@ -1076,6 +1087,29 @@ if(WITH_BONMIN)
 endif()
 add_feature_info(bonmin-interface WITH_BONMIN "Interface to the MINLP framework Bonmin.")
 
+if(WITH_HIGHS)
+  if(WITH_BUILD_HIGHS)
+    ExternalProject_Add(highs-external
+        GIT_REPOSITORY ${BUILD_HIGHS_GIT_REPO}
+        GIT_TAG ${BUILD_HIGHS_VERSION}
+        PREFIX "${CMAKE_BINARY_DIR}/external_projects"
+        UPDATE_COMMAND ""
+        CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
+        CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/highs")
+    add_library(highs SHARED IMPORTED)
+    set_target_properties(highs PROPERTIES
+       INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include/highs"
+       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY64_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}highs${CMAKE_SHARED_LIBRARY_SUFFIX}"
+       IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}highs${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+    )
+    install(DIRECTORY
+      "${CMAKE_BINARY_DIR}/external_projects/include/highs"
+      DESTINATION "${INCLUDE_PREFIX}")
+  endif()
+endif()
+add_feature_info(highs-interface WITH_HIGHS "Interface to the MILP / QP solver HiGHS.")
+
 
 # SNOPT: An SQP method
 option(WITH_SNOPT "Compile the SNOPT interface if SNOPT libraries can be found" OFF)
@@ -1093,13 +1127,6 @@ if(WITH_SNOPT)
   endif()
 endif()
 add_feature_info(snopt-interface WITH_SNOPT "Interface to the NLP solver SNOPT.")
-
-# HIGHS: A MILP / QP solver
-option(WITH_HIGHS "Compile the HIGHS interface" OFF)
-if(WITH_HIGHS)
-  find_package(HIGHS REQUIRED)
-endif()
-add_feature_info(highs-interface WITH_HIGHS "Interface to the MILP / QP solver HIGHS.")
 
 # OOQP: A sparse interior point QP solver
 option(WITH_OOQP "Enable OOQP interface" OFF)

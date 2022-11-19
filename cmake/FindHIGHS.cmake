@@ -5,20 +5,16 @@ pkg_search_module(HIGHS highs)
 include(canonicalize_paths)
 canonicalize_paths(HIGHS_LIBRARY_DIRS)
 
-# add osx frameworks to CBC_LIBRARIES
-#if(CBC_LIBRARIES)
-#  if(APPLE)
-#    # turn "-framework;foo;-framework;bar;other" into "-framework foo;-framework bar;other"
-#    string(REPLACE "-framework;" "-framework " CBC_LDFLAGS_OTHER "${CBC_LDFLAGS_OTHER}")
-#    # take "-framework foo;-framework bar;other" and add only frameworks to CBC_LIBRARIES
-#    foreach(arg ${CBC_LDFLAGS_OTHER})
-#      if("${arg}" MATCHES "-framework .+")
-#        set(CBC_LIBRARIES "${CBC_LIBRARIES};${arg}")
-#      endif("${arg}" MATCHES "-framework .+")
-#    endforeach(arg ${CBC_LDFLAGS_OTHER})
-#  endif(APPLE)
-#endif(CBC_LIBRARIES)
-
 # Set standard flags
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(HIGHS DEFAULT_MSG HIGHS_LIBRARIES HIGHS_INCLUDE_DIRS)
+
+if(HIGHS_FOUND)
+  add_library(highs INTERFACE)
+
+  foreach(LIB ${HIGHS_LIBRARIES})
+    find_library(LIB_FULL_${LIB} NAMES ${LIB} PATHS ${HIGHS_LIBRARY_DIRS})
+    target_link_libraries(highs INTERFACE ${LIB_FULL_${LIB}})
+  endforeach()
+  target_include_directories(highs INTERFACE ${HIGHS_INCLUDE_DIRS})
+endif()
