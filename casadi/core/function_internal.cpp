@@ -752,7 +752,7 @@ namespace casadi {
     #else
     const std::string filesep("/");
     #endif
-    shared_from_this<Function>().save(dump_dir_+ filesep + name_ + ".casadi", {{"debug", true}});
+    shared_from_this<Function>().save(dump_dir_+ filesep + name_ + ".casadi");
   }
 
   casadi_int FunctionInternal::get_dump_id() const {
