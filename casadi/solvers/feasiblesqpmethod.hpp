@@ -112,6 +112,12 @@ namespace casadi {
     // function to get feasible iterate
     int feasibility_iterations(void* mem, double tr_rad) const;
 
+    void anderson_acc_step_update(void* mem) const;
+
+    void anderson_acc_init_memory(void* mem, double* step, double* iterate) const;
+    
+    void anderson_acc_update_memory(void* mem, double* step, double* iterate) const;
+
     // Solve the NLP
     int solve(void* mem) const override;
 
@@ -127,6 +133,12 @@ namespace casadi {
     /// Exact Hessian?
     bool exact_hessian_;
 
+    /// Exact Hessian?
+    bool use_sqp_;
+
+    /// Use Anderson Acceleration
+    bool use_anderson_;
+
     /// Maximum block size of Hessian
     casadi_int block_size_ = 0;
 
@@ -135,6 +147,9 @@ namespace casadi {
 
     /// Memory size of L-BFGS method
     casadi_int lbfgs_memory_;
+
+    // Memory size of Anderson acceleration
+    casadi_int sz_anderson_memory_;
 
     /// Tolerance of primal and dual infeasibility
     double tol_pr_, tol_du_;
@@ -210,16 +225,12 @@ namespace casadi {
                           const double* A,
                           double* x_opt, double* dlam, int mode) const;
 
-    // Solve the QP subproblem for elastic mode
-    // virtual int solve_ela_QP(FeasiblesqpmethodMemory* m, const double* H, const double* g,
-    //                       const double* lbdz, const double* ubdz,
-    //                       const double* A,
-    //                       double* x_opt, double* dlam) const;
-
-    // Execute elastic mode: mode 0 = normal, mode 1 = SOC
-    // virtual int solve_elastic_mode(FeasiblesqpmethodMemory* m, casadi_int* ela_it, double gamma_1,
-    //                                 casadi_int ls_iter, bool ls_success, bool so_succes, double pr_inf, 
-    //                                 double du_inf, double dx_norminf, std::string* info, int mode) const;
+    // Solve the LP
+    virtual int solve_LP(FeasiblesqpmethodMemory* m, const double* g,
+                          const double* lbdz, const double* ubdz,
+                          const double* A,
+                          double* x_opt, double* dlam, int mode) const;
+    
 
 
     // Solve the QP subproblem

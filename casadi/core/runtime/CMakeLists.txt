@@ -67,6 +67,7 @@ set(RUNTIME_SRC
   casadi_newton.hpp
   casadi_bound_consistency.hpp
   casadi_lsqr.hpp
+  casadi_dense_lsqr.hpp
   casadi_cache.hpp
   casadi_convexify.hpp
   casadi_logsumexp.hpp
