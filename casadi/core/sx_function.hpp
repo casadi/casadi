@@ -156,6 +156,12 @@ class CASADI_EXPORT SXFunction :
       \identifier{uq} */
   casadi_int n_instructions() const override { return algorithm_.size();}
 
+  /** \brief  Construct a complete Jacobian by alternative means */
+  std::vector<SX> jac_alt(const Dict& opts) const override;
+
+  /** \brief  Construct a complete Jacobian by vertex elimination */
+  SX jac_ve(const Dict& opts) const;
+
   /** \brief Get an atomic operation operator index
 
       \identifier{ur} */

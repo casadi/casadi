@@ -94,6 +94,11 @@ namespace casadi {
         \identifier{xs} */
     std::vector<MatType> jac(const Dict& opts) const;
 
+    /** \brief  Construct a complete Jacobian by alternative means */
+    virtual std::vector<MatType> jac_alt(const Dict& opts) const {
+      casadi_error("Not implemented");
+    }
+
     /** \brief Check if the function is of a particular type
 
         \identifier{xt} */
@@ -426,6 +431,10 @@ namespace casadi {
       casadi_assert(n_in_ == 1, "Not implemented");
       casadi_assert(n_out_ == 1, "Not implemented");
 
+      if (is_a("SXFunction", false)) {
+        return jac_alt(opts);
+      }
+
       // Create return object
       ret.at(0) = MatType::zeros(jac_sparsity(0, 0, false, symmetric).T());
       if (verbose_) casadi_message("Allocated return value");
@@ -439,6 +448,15 @@ namespace casadi {
       // Get a bidirectional partition
       Sparsity D1, D2;
       get_partition(iind, oind, D1, D2, true, symmetric, allow_forward, allow_reverse);
+      //uout() << "jac " << name_ << ":" << "symmetric:" << symmetric << " - compact:" << compact  << std::endl;
+      Sparsity sp = jac_sparsity(oind, iind, compact, symmetric);
+      size_t h = sp.hash();
+      //shared_from_this<Function>().save("fun" + str(h)+".casadi");
+      //sp.to_file("sp" + str(h)+".mtx");
+
+      //uout() << "sp " << sp << " - " << h << std::endl;
+      //uout() << "D1" << D1 << "D2" << D2 << std::endl;
+
       if (verbose_) casadi_message("Graph coloring completed");
 
       // Get the number of forward and adjoint sweeps
