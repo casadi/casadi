@@ -1129,6 +1129,63 @@ namespace casadi {
     return order;
   }
 
+  template <class Ita, class Itb>
+  bool is_disjoint(Ita a_begin, Ita a_end, Itb b_begin, Ita b_end) {
+    Ita ita = a_begin;
+    Itb itb = b_begin;
+
+
+    // Depending on contents, ita or itb may be already advanced
+
+    while (ita != a_end && itb != b_end) {
+      if (*ita == *itb) return false;
+      if (*ita < *itb) {
+        ita++;
+      } else {
+        itb++;
+      }
+    }
+    return true;
+  }
+
+  void partial_product(const std::vector<  std::vector< std::pair<casadi_int, SXElem*> > > & row_view,
+                  const std::vector<  std::vector< std::pair<casadi_int, SXElem*> > > & col_view,
+                  casadi_int i, casadi_int j, casadi_int r) {
+
+    auto itrow = row_view[i].begin();
+    auto itcol = col_view[j].begin();
+
+    auto endrow = row_view[i].end();
+    auto endcol = col_view[j].end();
+
+    // Depending on contents, ita or itb may be already advanced
+
+    SXElem prod = 0;
+    bool hit = false;
+    while (itrow != endrow && itcol != endcol && itrow->first < r && itcol->first < r) {
+      if (itrow->first == itcol->first) {
+        prod += (*itrow->second) * (*itcol->second);
+        hit = true;
+      }
+      if (itrow->first  < itcol->first ) {
+        itrow++;
+      } else {
+        itcol++;
+      }
+    }
+
+    if (!hit) return;
+
+    // Find location (i, j)
+    itrow = std::lower_bound(itrow, endrow, j, [](const std::pair<casadi_int, const SXElem*>& v, casadi_int val)
+          {
+              return v.first < val;
+          });
+
+    *(itrow->second) += prod;
+  }
+
+
   SX SXFunction::jac_ve(const Dict& opts) const {
     const SX& x = in_[0];
     const SX& y = out_[0];
@@ -1228,12 +1285,94 @@ namespace casadi {
 
     SX C_star = SX::blockcat({{mtimes(mtimes(P, L), P.T())-SX::eye(p), mtimes(P, B)}, {mtimes(T, P.T()), R}});
 
-    // Pre-compute sparsity pattern
+    const casadi_int* colind = C_star.sparsity().colind();
+    const casadi_int* row = C_star.sparsity().row();
+
+    // Alternative view on sparsity pattern (with perfect redundancy)
+    std::vector< std::set<casadi_int> > row_view(C_star.size1()); // List of column indices per row
+    std::vector< std::set<casadi_int> > col_view(C_star.size2()); // List of row indices per column
+    // Loop over columns
+    for (casadi_int c = 0; c < C_star.size2(); ++c) {
+      // Loop over nonzeros for the column
+      for (casadi_int k = colind[c]; k < colind[c + 1]; ++k) {
+        casadi_int r = row[k];
+        row_view[r].insert(c);
+        col_view[c].insert(r);
+      }
+    }
+
+    // Traverse all (i,j) in Crout order
+    for (casadi_int k=1;k<p+std::min(n, m);++k) {
+      casadi_int i=k;
+      for (casadi_int j=i;j<p+n;++j) {
+        casadi_int r = std::min(std::min(i, j), p);
+        bool empty = is_disjoint(row_view[i].begin(), row_view[i].lower_bound(r),
+                               col_view[j].begin(), col_view[j].lower_bound(r));
+        if (!empty) {
+          row_view[i].insert(j);
+          col_view[j].insert(i);
+        }
+      }
+      casadi_int j=k;
+      for (casadi_int i=j+1;i<p+m;++i) {
+        casadi_int r = std::min(std::min(i, j), p);
+        bool empty = is_disjoint(row_view[i].begin(), row_view[i].lower_bound(r),
+                               col_view[j].begin(), col_view[j].lower_bound(r));
+        if (!empty) {
+          row_view[i].insert(j);
+          col_view[j].insert(i);
+        }
+      }
+    }
+
     c_row.clear();
     c_col.clear();
-    c_data.clear();
+    for (casadi_int j=0;j<col_view.size();++j) {
+      for (casadi_int i : col_view[j]) {
+        c_row.push_back(i);
+        c_col.push_back(j);
+      }
+    }
+
+    Sparsity sp = Sparsity::triplet(m+p, n+p, c_row, c_col);
+
+    C_star = project(C_star, sp);
 
 
+    {
+
+      colind = C_star.sparsity().colind();
+      row = C_star.sparsity().row();
+      std::vector<SXElem> & c_data = C_star.nonzeros();
+      std::vector< std::vector< std::pair<casadi_int, SXElem*> > > row_view(C_star.size1()); // List of column indices per row
+      std::vector< std::vector< std::pair<casadi_int, SXElem*> > > col_view(C_star.size2()); // List of row indices per column
+      // Loop over columns
+      for (casadi_int c = 0; c < C_star.size2(); ++c) {
+        // Loop over nonzeros for the column
+        for (casadi_int k = colind[c]; k < colind[c + 1]; ++k) {
+          casadi_int r = row[k];
+          row_view[r].push_back(std::make_pair(c, &c_data[k]));
+          col_view[c].push_back(std::make_pair(r, &c_data[k]));
+        }
+      }
+
+      // Traverse all (i,j) in Crout order
+      for (casadi_int k=1;k<p+std::min(n, m);++k) {
+        casadi_int i=k;
+        for (casadi_int j=i;j<p+n;++j) {
+          casadi_int r = std::min(std::min(i, j), p);
+          partial_product(row_view, col_view, i, j, r);
+        }
+        casadi_int j=k;
+        for (casadi_int i=j+1;i<p+m;++i) {
+          casadi_int r = std::min(std::min(i, j), p);
+          partial_product(row_view, col_view, i, j, r);
+        }
+      }
+
+    }
+
+/**
     // Traverse all (i,j) in Crout order
     for (casadi_int k=1;k<p+std::min(n, m);++k) {
       casadi_int i=k;
@@ -1253,9 +1392,11 @@ namespace casadi {
         }
       }
     }
+*/
+    casadi_assert_dev(sp==C_star.sparsity());
 
     SX J = sparsify(C_star(Slice(p, m+p), Slice(p, n+p)));
-    return J;
+    return cse(J);
   }
 
   std::vector<SX> SXFunction::jac_alt(const Dict& opts) const {
