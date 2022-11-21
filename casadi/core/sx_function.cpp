@@ -1239,12 +1239,18 @@ namespace casadi {
       casadi_int i=k;
       for (casadi_int j=i;j<p+n;++j) {
         Slice sk(0, std::min(std::min(i, j), p));
-        C_star(i, j) += dot(vec(C_star(i, sk)), C_star(sk, j));
+        SX prod = mtimes(C_star(i, sk), C_star(sk, j));
+        if (prod.nnz()>0) {
+          C_star(i, j) += prod;
+        }
       }
       casadi_int j=k;
       for (casadi_int i=j+1;i<p+m;++i) {
         Slice sk(0, std::min(std::min(i, j), p));
-        C_star(i, j) += dot(vec(C_star(i, sk)), C_star(sk, j));
+        SX prod = mtimes(C_star(i, sk), C_star(sk, j));
+        if (prod.nnz()>0) {
+          C_star(i, j) += prod;
+        }
       }
     }
 
