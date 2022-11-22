@@ -313,7 +313,7 @@ jobs:
     env:
       CMAKE_C_COMPILER_LAUNCHER: ccache
       CMAKE_CXX_COMPILER_LAUNCHER: ccache
-      CCACHE_DIR: ${{ runner.temp }}/.ccache
+      CCACHE_DIR: /tmp/.ccache
     steps:
       - uses: actions/checkout@v3
         with:
