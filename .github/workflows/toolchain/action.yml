@@ -1,0 +1,80 @@
+name: Toolchains
+description: Install toolchains
+inputs:
+  host:
+    required: true
+    type: string
+  python-version:
+    required: true
+    type: string
+  pypy:
+    required: true
+    type: string
+  tools-version:
+    required: false
+    default: '0.0.7'
+    type: string
+  tools-url:
+    required: false
+    default: 'https://github.com/tttapa/cross-python/releases/download'
+    type: string
+  cmake-version:
+    required: false
+    default: '3.25.0'
+    type: string
+
+runs:
+  using: composite
+  steps:
+    # Apt install tools
+    - name: Install tools
+      shell: bash
+      run: |
+        apt -y update
+        apt -y install --no-install-recommends \
+          wget bzip2 xz-utils ccache ninja-build ca-certificates
+    # Cache
+    - name: Cache tools
+      id: cache-tools
+      uses: actions/cache@v3
+      with:
+        path: /opt
+        key: ${{ runner.os }}-${{ inputs.pypy }}${{ inputs.python-version }}-tools-${{ inputs.tools-version }}
+      # CMake
+    - name: Install CMake
+      if: ${{ steps.cache-tools.outputs.cache-hit != 'true' }}
+      shell: bash
+      run: |
+        version=${{ inputs.cmake-version }}; cd /tmp; mkdir -p /opt/cmake
+        wget https://github.com/Kitware/CMake/releases/download/v$version/cmake-$version-Linux-x86_64.sh
+        bash cmake-$version-*.sh --skip-license --prefix="/opt/cmake"
+    - name: Add CMake to PATH
+      shell: bash
+      run: echo "/opt/cmake/bin" >> $GITHUB_PATH
+    # Python
+    - name: Install Python
+      if: ${{ steps.cache-tools.outputs.cache-hit != 'true' && !inputs.pypy }}
+      shell: bash
+      run: wget "${{ inputs.tools-url }}/${{ inputs.tools-version }}/build-python-${{ inputs.python-version }}.tar.xz" -O- | tar xJ -C /opt
+    - name: Add Python to PATH
+      if: ${{ !inputs.pypy }}
+      shell: bash
+      run: echo "/opt/build-python-${{ inputs.python-version }}/usr/local/bin" >> $GITHUB_PATH
+    # PyPy
+    - name: Install PyPy
+      if: ${{ inputs.pypy }}
+      shell: bash
+      run: wget "https://downloads.python.org/pypy/pypy${{ inputs.python-version }}-v7.3.9-linux64.tar.bz2" -O- | tar xj -C /opt
+    - name: Add PyPy to PATH
+      if: ${{ inputs.pypy }}
+      shell: bash
+      run: echo "/opt/pypy${{ inputs.python-version }}-v7.3.9-linux64/bin" >> $GITHUB_PATH
+    # Pip
+    - name: Install Pip
+      shell: bash
+      run: python${{ inputs.python-version }} -m ensurepip
+    # Toolchains
+    - name: Download toolchains
+      if: steps.cache-tools.outputs.cache-hit != 'true'
+      shell: bash
+      run: wget "${{ inputs.tools-url }}/${{ inputs.tools-version }}/full-${{ inputs.host }}.tar.xz" -O- | tar xJ -C /opt

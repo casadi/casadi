@@ -17,94 +17,36 @@ env:
   TWINE_REPOSITORY: pypi
 
 jobs:
-  build-linux:
+  generate-stubs:
     runs-on: ubuntu-latest
-    container: 
+    container:
       image: ubuntu:jammy
-    strategy:
-      matrix:
-        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11']
-        pypy: ['']
-        include:
-          - python-version: '3.8'
-            pypy: 'pypy'
-          - python-version: '3.9'
-            pypy: 'pypy'
     env:
-      CMAKE_C_COMPILER_LAUNCHER: ccache
-      CMAKE_CXX_COMPILER_LAUNCHER: ccache
-      CCACHE_DIR: /root/.ccache
-      CROSS_TOOLS_VERSION: '0.0.7'
-      CROSS_TOOLS_URL: 'https://github.com/tttapa/cross-python/releases/download'
-      HOST_TRIPLES: 'x86_64-centos7-linux-gnu armv7-neon-linux-gnueabihf armv6-rpi-linux-gnueabihf aarch64-rpi3-linux-gnu'
-      PYPY_HOST_TRIPLES: 'x86_64-centos7-linux-gnu aarch64-rpi3-linux-gnu'
+      HOST: 'x86_64-centos7-linux-gnu'
+      PYTHON_VERSION: '3.10'
     steps:
-      # Apt install tools
-      - name: Install tools
-        run: |
-          apt -y update
-          apt -y install --no-install-recommends \
-            git wget bzip2 xz-utils ccache ninja-build ca-certificates
-          mkdir -p $CCACHE_DIR
       # Git clone
+      - name: Install git
+        run: apt -y update && apt -y install --no-install-recommends git ca-certificates
       - uses: actions/checkout@v3
         with:
           submodules: recursive
-      # Cache
-      - name: Cache ccache
-        uses: actions/cache@v3
+      # Tools
+      - name: Install tools
+        uses: ./.github/workflows/toolchain
         with:
-          path: ${{ env.CCACHE_DIR }}
-          key: ${{ runner.os }}-${{ matrix.pypy }}${{ matrix.python-version }}-ccache-${{ github.run_id }}
-          restore-keys: ${{ runner.os }}-${{ matrix.pypy }}${{ matrix.python-version }}-ccache
-      - name: Cache tools
-        id: cache-tools
-        uses: actions/cache@v3
-        with:
-          path: /opt
-          key: ${{ runner.os }}-${{ matrix.pypy }}${{ matrix.python-version }}-tools-${{ env.CROSS_TOOLS_VERSION }}
-        # CMake
-      - name: Install CMake
-        if: ${{ steps.cache-tools.outputs.cache-hit != 'true' }}
-        run: |
-          version=3.25.0; cd /tmp; mkdir -p /opt/cmake
-          wget https://github.com/Kitware/CMake/releases/download/v$version/cmake-$version-Linux-x86_64.sh
-          bash cmake-$version-*.sh --skip-license --prefix="/opt/cmake"
-      - name: Add CMake to PATH
-        run: echo "/opt/cmake/bin" >> $GITHUB_PATH
-      # Python
-      - name: Install Python
-        if: ${{ steps.cache-tools.outputs.cache-hit != 'true' && !matrix.pypy }}
-        run: wget "${CROSS_TOOLS_URL}/${CROSS_TOOLS_VERSION}/build-python-${{ matrix.python-version }}.tar.xz" -O- | tar xJ -C /opt
-      - name: Add Python to PATH
-        if: ${{ !matrix.pypy }}
-        run: echo "/opt/build-python-${{ matrix.python-version }}/usr/local/bin" >> $GITHUB_PATH
-      # PyPy
-      - name: Install PyPy
-        if: ${{ matrix.pypy }}
-        run: wget "https://downloads.python.org/pypy/pypy${{ matrix.python-version }}-v7.3.9-linux64.tar.bz2" -O- | tar xj -C /opt
-      - name: Add PyPy to PATH
-        if: ${{ matrix.pypy }}
-        run: echo "/opt/pypy${{ matrix.python-version }}-v7.3.9-linux64/bin" >> $GITHUB_PATH
+          host: ${{ env.HOST }}
+          python-version: ${{ env.PYTHON_VERSION }}
+          pypy: ''
       # Pip install dependencies
       - name: Install Python dependencies
-        run: |
-          python${{ matrix.python-version }} -m ensurepip
-          python${{ matrix.python-version }} -m pip install -U pip build pybind11-stubgen py-build-cmake~=0.0.16a2
-      # Toolchains
-      - name: Download toolchains
-        if: steps.cache-tools.outputs.cache-hit != 'true'
-        run: |
-          if [ "${{ matrix.pypy }}" ]; then triples="${PYPY_HOST_TRIPLES}"; else triples="${HOST_TRIPLES}"; fi
-          for host in $triples; do
-              wget "${CROSS_TOOLS_URL}/${CROSS_TOOLS_VERSION}/full-$host.tar.xz" -O- | tar xJ -C /opt
-          done
+        run: python${{ env.PYTHON_VERSION }} -m pip install -U pip build pybind11-stubgen py-build-cmake~=0.1.0
       # Build
       - name: Native build
         run: |
-          host="x86_64-centos7-linux-gnu"
+          host="${{ env.HOST }}"
           staging="/opt/$host"
-          pbc_cli="python${{ matrix.python-version }} -m py_build_cmake.cli"
+          pbc_cli="python${{ env.PYTHON_VERSION }} -m py_build_cmake.cli"
           $pbc_cli -B native-build configure -- \
               -D CMAKE_C_COMPILER="$staging/x-tools/$host/bin/$host-gcc" \
               -D CMAKE_CXX_COMPILER="$staging/x-tools/$host/bin/$host-g++" \
@@ -112,24 +54,89 @@ jobs:
               -D USE_GLOBAL_PYBIND11=On \
               -D CMAKE_FIND_ROOT_PATH="$staging/pybind11;$staging/eigen;$staging/casadi"
           $pbc_cli -B native-build build -- -t ${{ env.C_EXTENSIONS }}
-          $pbc_cli -B native-build install --component python_stubs -- --prefix "$PWD/python"
+          $pbc_cli -B native-build install --component python_stubs -- --prefix "$PWD/staging/python"
+          tar cf stubs.tar -C "$PWD/staging" python
+      # Upload
+      - name: Upload stubs
+        uses: actions/upload-artifact@v3
+        with:
+          name: stubs
+          path: stubs.tar
+
+  build-linux:
+    needs: [generate-stubs]
+    runs-on: ubuntu-latest
+    container: 
+      image: ubuntu:jammy
+    strategy:
+      matrix:
+        host: [x86_64-centos7-linux-gnu, armv7-neon-linux-gnueabihf, armv6-rpi-linux-gnueabihf, aarch64-rpi3-linux-gnu]
+        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11']
+        pypy: ['', pypy]
+        exclude:
+          - pypy: pypy
+            python-version: '3.7'
+          - pypy: pypy
+            python-version: '3.10'
+          - pypy: pypy
+            python-version: '3.11'
+          - pypy: pypy
+            host: armv7-neon-linux-gnueabihf
+          - pypy: pypy
+            host: armv6-rpi-linux-gnueabihf
+    env:
+      CMAKE_C_COMPILER_LAUNCHER: ccache
+      CMAKE_CXX_COMPILER_LAUNCHER: ccache
+      CCACHE_DIR: /root/.ccache
+    steps:
+      # Git clone
+      - name: Install git
+        run: apt -y update && apt -y install --no-install-recommends git ca-certificates
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      # Tools
+      - name: Install tools
+        uses: ./.github/workflows/toolchain
+        with:
+          host: ${{ matrix.host }}
+          python-version: ${{ matrix.python-version }}
+          pypy: ${{ matrix.pypy }}
+      # Ccache
+      - name: Prepare ccache directory
+        run: mkdir -p "${{ env.CCACHE_DIR }}"
+      - name: Cache ccache
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.CCACHE_DIR }}
+          key: ${{ runner.os }}-${{ matrix.pypy }}${{ matrix.python-version }}-ccache-${{ github.run_id }}
+          restore-keys: ${{ runner.os }}-${{ matrix.pypy }}${{ matrix.python-version }}-ccache
+      # Pip install dependencies
+      - name: Install Python dependencies
+        run: python${{ matrix.python-version }} -m pip install -U pip build pybind11-stubgen py-build-cmake~=0.0.16a2
+      # Download stubs
+      - name: Download stubs
+        uses: actions/download-artifact@v3
+        with:
+          name: stubs
+      - name: Extract stubs
+        run: tar xf stubs.tar
+      # Build
       - name: Build wheels
         run: |
-          if [ "${{ matrix.pypy }}" ]; then triples="${PYPY_HOST_TRIPLES}"; else triples="${HOST_TRIPLES}"; fi
-          for host in $triples; do
-            staging="/opt/$host"
-          	cat > ninja-debug-release.cross.toml <<- EOF
-          	[cmake]
-          	config = ["Debug", "Release"]
-          	generator = "Ninja Multi-Config"
-          	[cmake.options]
-          	CMAKE_FIND_ROOT_PATH = "$staging/pybind11;$staging/eigen;$staging/casadi"
-          	USE_GLOBAL_PYBIND11 = "On"
-          	EOF
-            python${{ matrix.python-version }} -m build -w . \
+          host="${{ matrix.host }}"
+          staging="/opt/$host"
+          cat > ninja-debug-release.cross.toml <<- EOF
+          [cmake]
+          config = ["Debug", "Release"]
+          generator = "Ninja Multi-Config"
+          [cmake.options]
+          CMAKE_FIND_ROOT_PATH = "$staging/pybind11;$staging/eigen;$staging/casadi"
+          USE_GLOBAL_PYBIND11 = "On"
+          EOF
+          python${{ matrix.python-version }} -m build -w . \
               -C--cross="$PWD/ninja-debug-release.cross.toml" \
               -C--cross="$staging/cmake/$host.py-build-cmake.cross.toml"
-          done
         env:
           CFLAGS: '-static-libgcc'
           CXXFLAGS: '-static-libgcc -static-libstdc++'
@@ -142,71 +149,33 @@ jobs:
 
   build-linux-src:
     runs-on: ubuntu-latest
-    container: 
+    container:
       image: ubuntu:jammy
-    strategy:
-      matrix:
-        python-version: ['3.11']
     env:
-      CMAKE_C_COMPILER_LAUNCHER: ccache
-      CMAKE_CXX_COMPILER_LAUNCHER: ccache
-      CCACHE_DIR: /root/.ccache
-      CROSS_TOOLS_VERSION: '0.0.7'
-      CROSS_TOOLS_URL: 'https://github.com/tttapa/cross-python/releases/download'
-      HOST_TRIPLE: 'x86_64-centos7-linux-gnu'
+      HOST: 'x86_64-centos7-linux-gnu'
+      PYTHON_VERSION: '3.10'
     steps:
-      # Apt install tools
-      - name: Install tools
-        run: |
-          apt -y update
-          apt -y install --no-install-recommends \
-            git wget bzip2 xz-utils ccache ninja-build ca-certificates
-          mkdir -p $CCACHE_DIR
       # Git clone
+      - name: Install git
+        run: apt -y update && apt -y install --no-install-recommends git ca-certificates
       - uses: actions/checkout@v3
         with:
           submodules: recursive
-      # Cache
-      - name: Cache ccache
-        uses: actions/cache@v3
+      # Tools
+      - name: Install tools
+        uses: ./.github/workflows/toolchain
         with:
-          path: ${{ env.CCACHE_DIR }}
-          key: ${{ runner.os }}-${{ matrix.python-version }}-ccache-src-${{ github.run_id }}
-          restore-keys: ${{ runner.os }}-${{ matrix.python-version }}-ccache-src
-      - name: Cache tools
-        id: cache-tools
-        uses: actions/cache@v3
-        with:
-          path: /opt
-          key: ${{ runner.os }}-${{ matrix.python-version }}-tools-src-${{ env.CROSS_TOOLS_VERSION }}
-        # CMake
-      - name: Install CMake
-        if: ${{ steps.cache-tools.outputs.cache-hit != 'true' }}
-        run: |
-          version=3.25.0; cd /tmp; mkdir -p /opt/cmake
-          wget https://github.com/Kitware/CMake/releases/download/v$version/cmake-$version-Linux-x86_64.sh
-          bash cmake-$version-*.sh --skip-license --prefix="/opt/cmake"
-      - name: Add CMake to PATH
-        run: echo "/opt/cmake/bin" >> $GITHUB_PATH
-      # Python
-      - name: Install Python
-        if: ${{ steps.cache-tools.outputs.cache-hit != 'true' }}
-        run: wget "${CROSS_TOOLS_URL}/${CROSS_TOOLS_VERSION}/build-python-${{ matrix.python-version }}.tar.xz" -O- | tar xJ -C /opt
-      - name: Add Python to PATH
-        run: echo "/opt/build-python-${{ matrix.python-version }}/usr/local/bin" >> $GITHUB_PATH
+          host: ${{ env.HOST }}
+          python-version: ${{ env.PYTHON_VERSION }}
+          pypy: ''
       # Pip install dependencies
       - name: Install Python dependencies
-        run: |
-          python${{ matrix.python-version }} -m ensurepip
-          python${{ matrix.python-version }} -m pip install -U pip build
-      # Toolchain
-      - name: Download toolchain
-        if: steps.cache-tools.outputs.cache-hit != 'true'
-        run: wget "${CROSS_TOOLS_URL}/${CROSS_TOOLS_VERSION}/full-${HOST_TRIPLE}.tar.xz" -O- | tar xJ -C /opt
+        run: python${{ env.PYTHON_VERSION }} -m pip install -U pip build
       # Build
       - name: Build wheels
         run: |
-          staging="/opt/${HOST_TRIPLE}"
+          host="${{ env.HOST }}"
+          staging="/opt/$host"
           cat > ninja-debug.cross.toml <<- EOF
           [cmake]
           config = ["Debug"]
@@ -215,9 +184,9 @@ jobs:
           CMAKE_FIND_ROOT_PATH = "$staging/pybind11;$staging/eigen;$staging/casadi"
           USE_GLOBAL_PYBIND11 = "On"
           EOF
-          python${{ matrix.python-version }} -m build . \
-            -C--cross="$PWD/ninja-debug.cross.toml" \
-            -C--cross="$staging/cmake/${HOST_TRIPLE}.py-build-cmake.cross.toml"
+          python${{ env.PYTHON_VERSION }} -m build . \
+              -C--cross="$PWD/ninja-debug.cross.toml" \
+              -C--cross="$staging/cmake/$host.py-build-cmake.cross.toml"
         env:
           CFLAGS: '-static-libgcc'
           CXXFLAGS: '-static-libgcc -static-libstdc++'
