@@ -126,7 +126,7 @@ jobs:
           	CMAKE_FIND_ROOT_PATH = "$staging/pybind11;$staging/eigen;$staging/casadi"
           	USE_GLOBAL_PYBIND11 = "On"
           	EOF
-            python${{ matrix.python-version }} -m build . \
+            python${{ matrix.python-version }} -m build -w . \
               -C--cross="$PWD/ninja-debug-release.cross.toml" \
               -C--cross="$staging/cmake/$host.py-build-cmake.cross.toml"
           done
@@ -204,7 +204,7 @@ jobs:
         run: |
           ./py-venv/Scripts/Activate.ps1
           $Env:CMAKE_PREFIX_PATH = $Env:VIRTUAL_ENV + ";" + $Env:CMAKE_PREFIX_PATH
-          python -m build .
+          python -m build -w .
         env:
           CXXFLAGS: "/bigobj"
           CFLAGS: "/bigobj"
@@ -275,7 +275,7 @@ jobs:
           CMAKE_PREFIX_PATH="$VIRTUAL_ENV:$CMAKE_PREFIX_PATH" \
           _PYTHON_HOST_PLATFORM='macosx-10.9-universal2' \
           ARCHFLAGS='-arch arm64 -arch x86_64' \
-              python -m build .
+              python -m build -w .
       - name: Upload
         uses: actions/upload-artifact@v3
         with:
