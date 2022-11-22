@@ -437,12 +437,12 @@ jobs:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.PyPI }}
       - uses: actions/download-artifact@v3
-        if: ${{ matrix.python-version == '3.11' }}
+        if: ${{ matrix.python-version == '3.11' && !matrix.pypy }}
         with:
           name: src-dist
           path: dist
       - name: Upload source to PyPI
-        if: ${{ matrix.python-version == '3.11' }}
+        if: ${{ matrix.python-version == '3.11' && !matrix.pypy }}
         run: python -m twine upload -r ${{ env.TWINE_REPOSITORY }} dist/*.tar.gz
         env:
           TWINE_USERNAME: __token__
