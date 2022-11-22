@@ -16,14 +16,8 @@ function(pybind11_stubgen_install target destination)
 
     install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/$<TARGET_FILE_BASE_NAME:${target}>-stubs/
         EXCLUDE_FROM_ALL
-        COMPONENT python_modules
+        COMPONENT python_stubs
         DESTINATION ${destination}/$<TARGET_FILE_BASE_NAME:${target}>
         FILES_MATCHING REGEX "\.pyi$")
 
-    install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/$<TARGET_FILE_BASE_NAME:${target}>-stubs/
-        EXCLUDE_FROM_ALL
-        COMPONENT python_stubs_in_tree
-        DESTINATION ${PROJECT_SOURCE_DIR}/python/${destination}/$<TARGET_FILE_BASE_NAME:${target}>
-        FILES_MATCHING REGEX "\.pyi$")
-    
 endfunction()

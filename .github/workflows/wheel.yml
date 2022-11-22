@@ -9,42 +9,141 @@ on:
   release:
     types: ['released', 'prereleased']
 
+env:
+  PACKAGE_VERSION: '1.0.0a5'
+  PACKAGE_NAME: alpaqa
+  MODULE_NAME: alpaqa
+  C_EXTENSIONS: _alpaqa
+  TWINE_REPOSITORY: pypi
+
 jobs:
   build-linux:
     runs-on: ubuntu-latest
     container: 
-      image: ghcr.io/tttapa/alpaqa-python-build:py${{ matrix.python-version }}
-      options: --user root
+      image: ubuntu:jammy
     strategy:
       matrix:
-        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11', 'pypy3.8', 'pypy3.9']
+        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11']
+        pypy: ['']
+        include:
+          - python-version: '3.8'
+            pypy: 'pypy'
+          - python-version: '3.9'
+            pypy: 'pypy'
+    env:
+      CMAKE_C_COMPILER_LAUNCHER: ccache
+      CMAKE_CXX_COMPILER_LAUNCHER: ccache
+      CCACHE_DIR: /root/.ccache
+      CROSS_TOOLS_VERSION: '0.0.7'
+      CROSS_TOOLS_URL: 'https://github.com/tttapa/cross-python/releases/download'
+      HOST_TRIPLES: 'x86_64-centos7-linux-gnu armv7-neon-linux-gnueabihf armv6-rpi-linux-gnueabihf aarch64-rpi3-linux-gnu'
+      PYPY_HOST_TRIPLES: 'x86_64-centos7-linux-gnu aarch64-rpi3-linux-gnu'
     steps:
-    - run: lscpu
-    - uses: actions/checkout@v2
-      with:
-        submodules: recursive
-    - name: Install Python build tools
-      run: |
-        python3 -m ensurepip
-        python3 -m pip install build auditwheel patchelf
-    - name: Build
-      run: |
-        python3 -m build .
-        auditwheel repair --plat manylinux_2_17_$(uname -m) dist/*$(uname -m).whl
-      env:
-        CXXFLAGS: "-march=skylake -static-libstdc++ -static-libgcc"
-        LDFLAGS: "-static-libstdc++ -static-libgcc"
-        CFLAGS: "-march=skylake -static-libgcc"
-    - name: Upload Wheel
-      uses: actions/upload-artifact@v2
-      with:
-        name: alpaqa-whl-${{ matrix.python-version }}-amd64
-        path: wheelhouse/alpaqa-*.whl
-    - name: Upload source
-      uses: actions/upload-artifact@v2
-      with:
-        name: alpaqa-src-${{ matrix.python-version }}
-        path: dist/alpaqa-*.tar.gz
+      # Apt install tools
+      - name: Install tools
+        run: |
+          apt -y update
+          apt -y install --no-install-recommends \
+            git wget bzip2 xz-utils ccache ninja-build ca-certificates
+          mkdir -p $CCACHE_DIR
+      # Git clone
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      # Cache
+      - name: Cache ccache
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.CCACHE_DIR }}
+          key: ${{ runner.os }}-${{ matrix.pypy }}${{ matrix.python-version }}-ccache-${{ github.run_id }}
+          restore-keys: ${{ runner.os }}-${{ matrix.pypy }}${{ matrix.python-version }}-ccache
+      - name: Cache tools
+        id: cache-tools
+        uses: actions/cache@v3
+        with:
+          path: /opt
+          key: ${{ runner.os }}-${{ matrix.pypy }}${{ matrix.python-version }}-tools-${{ env.CROSS_TOOLS_VERSION }}
+        # CMake
+      - name: Install CMake
+        if: ${{ steps.cache-tools.outputs.cache-hit != 'true' }}
+        run: |
+          version=3.25.0; cd /tmp; mkdir -p /opt/cmake
+          wget https://github.com/Kitware/CMake/releases/download/v$version/cmake-$version-Linux-x86_64.sh
+          bash cmake-$version-*.sh --skip-license --prefix="/opt/cmake"
+      - name: Add CMake to PATH
+        run: echo "/opt/cmake/bin" >> $GITHUB_PATH
+      # Python
+      - name: Install Python
+        if: ${{ steps.cache-tools.outputs.cache-hit != 'true' && !matrix.pypy }}
+        run: wget "${CROSS_TOOLS_URL}/${CROSS_TOOLS_VERSION}/build-python-${{ matrix.python-version }}.tar.xz" -O- | tar xJ -C /opt
+      - name: Add Python to PATH
+        if: ${{ !matrix.pypy }}
+        run: echo "/opt/build-python-${{ matrix.python-version }}/usr/local/bin" >> $GITHUB_PATH
+      # PyPy
+      - name: Install PyPy
+        if: ${{ matrix.pypy }}
+        run: wget "https://downloads.python.org/pypy/pypy${{ matrix.python-version }}-v7.3.9-linux64.tar.bz2" -O- | tar xj -C /opt
+      - name: Add PyPy to PATH
+        if: ${{ matrix.pypy }}
+        run: echo "/opt/pypy${{ matrix.python-version }}-v7.3.9-linux64/bin" >> $GITHUB_PATH
+      # Pip install dependencies
+      - name: Install Python dependencies
+        run: |
+          python${{ matrix.python-version }} -m ensurepip
+          python${{ matrix.python-version }} -m pip install -U pip build pybind11-stubgen py-build-cmake~=0.0.16a2
+      # Toolchains
+      - name: Download toolchains
+        if: steps.cache-tools.outputs.cache-hit != 'true'
+        run: |
+          if [ "${{ matrix.pypy }}" ]; then triples="${PYPY_HOST_TRIPLES}"; else triples="${HOST_TRIPLES}"; fi
+          for host in $triples; do
+              wget "${CROSS_TOOLS_URL}/${CROSS_TOOLS_VERSION}/full-$host.tar.xz" -O- | tar xJ -C /opt
+          done
+      # Build
+      - name: Native build
+        run: |
+          host="x86_64-centos7-linux-gnu"
+          staging="/opt/$host"
+          pbc_cli="python${{ matrix.python-version }} -m py_build_cmake.cli"
+          $pbc_cli -B native-build configure -- \
+              -D CMAKE_C_COMPILER="$staging/x-tools/$host/bin/$host-gcc" \
+              -D CMAKE_CXX_COMPILER="$staging/x-tools/$host/bin/$host-g++" \
+              -D CMAKE_Fortran_COMPILER="$staging/x-tools/$host/bin/$host-gfortran" \
+              -D USE_GLOBAL_PYBIND11=On \
+              -D CMAKE_FIND_ROOT_PATH="$staging/pybind11;$staging/eigen;$staging/casadi"
+          $pbc_cli -B native-build build -- -t ${{ env.C_EXTENSIONS }}
+          $pbc_cli -B native-build install --component python_stubs -- --prefix "$PWD/python"
+      - name: Build wheels
+        run: |
+          if [ "${{ matrix.pypy }}" ]; then triples="${PYPY_HOST_TRIPLES}"; else triples="${HOST_TRIPLES}"; fi
+          for host in $triples; do
+            staging="/opt/$host"
+          	cat > ninja-debug-release.cross.toml <<- EOF
+          	[cmake]
+          	config = ["Debug", "Release"]
+          	generator = "Ninja Multi-Config"
+          	[cmake.options]
+          	CMAKE_FIND_ROOT_PATH = "$staging/pybind11;$staging/eigen;$staging/casadi"
+          	USE_GLOBAL_PYBIND11 = "On"
+          	EOF
+            python${{ matrix.python-version }} -m build . \
+              -C--cross="$PWD/ninja-debug-release.cross.toml" \
+              -C--cross="$staging/cmake/$host.py-build-cmake.cross.toml"
+          done
+        env:
+          CFLAGS: '-static-libgcc'
+          CXXFLAGS: '-static-libgcc -static-libstdc++'
+      # Upload
+      - name: Upload Wheels
+        uses: actions/upload-artifact@v3
+        with:
+          name: whl-${{ matrix.pypy }}${{ matrix.python-version }}-linux
+          path: dist/*.whl
+      - name: Upload source
+        uses: actions/upload-artifact@v3
+        with:
+          name: src-${{ matrix.pypy }}${{ matrix.python-version }}
+          path: dist/*.tar.gz
 
   test-linux:
     needs: [build-linux]
@@ -52,280 +151,216 @@ jobs:
     container: python:${{ matrix.python-version }}-bullseye
     strategy:
       matrix:
-        python-version: ['3.7', '3.8', '3.9', '3.10']
+        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11']
     steps:
-    - uses: actions/checkout@v2
-      with:
-        submodules: recursive
-    - uses: actions/download-artifact@v2
-      with:
-        name: alpaqa-whl-${{ matrix.python-version }}-amd64
-        path: dist
-    - name: Test
-      run: |
-          python3 -m pip install -U pip pytest cmake ninja
-          python3 -m pip install dist/alpaqa-*.whl
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - uses: actions/download-artifact@v3
+        with:
+          name: whl-${{ matrix.python-version }}-linux
+          path: dist
+      - name: Test
+        run: |
+          python3 -m pip install -U pip pytest
+          python3 -m pip install --find-links=dist ${PACKAGE_NAME}==${PACKAGE_VERSION}
           pytest -rP
+
 
   build-windows:
     runs-on: windows-2022
     strategy:
       matrix:
-        include:
-          - python-version: '3.7'
-            full-python-version: '3.7'
-          - python-version: '3.8'
-            full-python-version: '3.8'
-          - python-version: '3.9'
-            full-python-version: '3.9'
-          - python-version: '3.10'
-            full-python-version: '3.10'
-          - python-version: '3.11'
-            full-python-version: '3.11-dev'
+        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11']
     steps:
-    - uses: actions/checkout@v2
-      with:
-        submodules: recursive
-    - uses: actions/setup-python@v2
-      name: Install Python
-      id: python
-      with: 
-        python-version: ${{ matrix.full-python-version }}
-    - name: Cache Virtual Environment
-      id: cache-venv
-      uses: actions/cache@v2
-      with:
-        path: py-venv
-        key: ${{ runner.os }}-${{ steps.python.outputs.python-version }}-${{ hashFiles('scripts/install-eigen.ps1', 'scripts/install-casadi-static.ps1') }}
-    - name: Install Python Dependencies 
-      if: steps.cache-venv.outputs.cache-hit != 'true'
-      shell: powershell
-      run: |
-        python -m venv py-venv
-        ./py-venv/Scripts/Activate.ps1
-        ./scripts/install-eigen.ps1
-        ./scripts/install-casadi-static.ps1
-        python -m pip install build
-      env:
-        CXXFLAGS: "/bigobj"
-        CFLAGS: "/bigobj"
-    - name: Build
-      shell: powershell
-      run: |
-        ./py-venv/Scripts/Activate.ps1
-        $env:CMAKE_PREFIX_PATH = $env:VIRTUAL_ENV + ";" + $env:CMAKE_PREFIX_PATH
-        python -m build . --wheel
-      env:
-        PYTHONUTF8: 1
-    - name: Upload
-      uses: actions/upload-artifact@v2
-      with:
-        name: alpaqa-whl-${{ matrix.python-version }}-win
-        path: dist/alpaqa-*.whl
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - uses: actions/setup-python@v4
+        name: Install Python
+        id: python
+        with: 
+          python-version: ${{ matrix.python-version }}
+      - name: Cache Virtual Environment
+        id: cache-venv
+        uses: actions/cache@v3
+        with:
+          path: py-venv
+          key: ${{ runner.os }}-${{ steps.python.outputs.python-version }}-${{ hashFiles('scripts/install-eigen.ps1', 'scripts/install-casadi-static.ps1') }}
+      - name: Install Python dependencies
+        if: steps.cache-venv.outputs.cache-hit != 'true'
+        shell: powershell
+        run: |
+          python -m venv py-venv
+          ./py-venv/Scripts/Activate.ps1
+          python -m pip install -U pip build cmake ninja
+          ./scripts/install-eigen.ps1
+          ./scripts/install-casadi-static.ps1
+        env:
+          CXXFLAGS: "/bigobj"
+          CFLAGS: "/bigobj"
+      - name: Build
+        shell: powershell
+        run: |
+          ./py-venv/Scripts/Activate.ps1
+          $Env:CMAKE_PREFIX_PATH = $Env:VIRTUAL_ENV + ";" + $Env:CMAKE_PREFIX_PATH
+          python -m build .
+        env:
+          CXXFLAGS: "/bigobj"
+          CFLAGS: "/bigobj"
+          PYTHONUTF8: 1
+      - name: Upload
+        uses: actions/upload-artifact@v3
+        with:
+          name: whl-${{ matrix.python-version }}-windows
+          path: dist/*.whl
 
   test-windows:
     needs: [build-windows]
     runs-on: windows-2022
     strategy:
       matrix:
-        include:
-          - python-version: '3.7'
-            full-python-version: '3.7'
-          - python-version: '3.8'
-            full-python-version: '3.8'
-          - python-version: '3.9'
-            full-python-version: '3.9'
-          - python-version: '3.10'
-            full-python-version: '3.10'
+        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11']
     steps:
-    - uses: actions/checkout@v2
-      with:
-        submodules: recursive
-    - uses: actions/setup-python@v2
-      name: Install Python
-      with: 
-        python-version: ${{ matrix.full-python-version }}
-    - uses: actions/download-artifact@v2
-      with:
-        name: alpaqa-whl-${{ matrix.python-version }}-win
-        path: dist
-    - name: Test
-      shell: powershell
-      run: |
-        python -m pip install -U pip pytest cmake ninja
-        $whl = Resolve-Path dist/alpaqa-*.whl
-        python -m pip install $whl
-        pytest -rP
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - uses: actions/setup-python@v4
+        name: Install Python
+        with:
+          python-version: ${{ matrix.python-version }}
+      - uses: actions/download-artifact@v3
+        with:
+          name: whl-${{ matrix.python-version }}-windows
+          path: dist
+      - name: Test
+        shell: powershell
+        run: |
+          python3 -m pip install -U pip pytest
+          python3 -m pip install --find-links=dist $Env:PACKAGE_NAME==$Env:PACKAGE_VERSION
+          pytest -rP
+
 
   build-macos:
     runs-on: macos-latest
     strategy:
       matrix:
-        include:
-          - python-version: '3.7'
-            full-python-version: '3.7'
-          - python-version: '3.8'
-            full-python-version: '3.8'
-          - python-version: '3.9'
-            full-python-version: '3.9'
-          - python-version: '3.10'
-            full-python-version: '3.10'
-          - python-version: '3.11'
-            full-python-version: '3.11-dev'
+        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11']
     steps:
-    - run: sysctl -a | grep machdep.cpu.brand_string
-    - uses: actions/checkout@v2
-      with:
-        submodules: recursive
-    - uses: actions/setup-python@v2
-      id: python
-      name: Install Python
-      with: 
-        python-version: ${{ matrix.full-python-version }}
-    - name: Cache Virtual Environment
-      id: cache-venv
-      uses: actions/cache@v2
-      with:
-        path: py-venv
-        key: ${{ runner.os }}-${{ steps.python.outputs.python-version }}-${{ hashFiles('scripts/install-eigen.sh', 'scripts/install-casadi-static.sh') }}-skylake
-    - name: Install Python Dependencies 
-      if: steps.cache-venv.outputs.cache-hit != 'true'
-      run: |
-        python -m venv py-venv
-        source ./py-venv/bin/activate
-        python -m pip install build ninja
-        ./scripts/install-eigen.sh
-        ./scripts/install-casadi-static.sh
-    - name: Build
-      run: |
-        source ./py-venv/bin/activate
-        CMAKE_PREFIX_PATH="$VIRTUAL_ENV:$CMAKE_PREFIX_PATH" \
-        _PYTHON_HOST_PLATFORM='macosx-10.9-universal2' \
-        ARCHFLAGS='-arch arm64 -arch x86_64' \
-            python -m build . --wheel
-    - name: Upload
-      uses: actions/upload-artifact@v2
-      with:
-        name: alpaqa-whl-${{ matrix.python-version }}-mac
-        path: dist/alpaqa-*.whl
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - uses: actions/setup-python@v4
+        id: python
+        name: Install Python
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Cache Virtual Environment
+        id: cache-venv
+        uses: actions/cache@v3
+        with:
+          path: py-venv
+          key: ${{ runner.os }}-${{ steps.python.outputs.python-version }}-${{ hashFiles('scripts/install-eigen.sh', 'scripts/install-casadi-static.sh') }}
+      - name: Install Python dependencies 
+        if: steps.cache-venv.outputs.cache-hit != 'true'
+        run: |
+          python -m venv py-venv
+          source ./py-venv/bin/activate
+          python -m pip install -U pip build cmake ninja
+          ./scripts/install-eigen.sh
+          ./scripts/install-casadi-static.sh
+      - name: Build
+        run: |
+          source ./py-venv/bin/activate
+          CMAKE_PREFIX_PATH="$VIRTUAL_ENV:$CMAKE_PREFIX_PATH" \
+          _PYTHON_HOST_PLATFORM='macosx-10.9-universal2' \
+          ARCHFLAGS='-arch arm64 -arch x86_64' \
+              python -m build .
+      - name: Upload
+        uses: actions/upload-artifact@v3
+        with:
+          name: whl-${{ matrix.python-version }}-macos
+          path: dist/*.whl
 
   test-macos:
     needs: [build-macos]
     runs-on: macos-latest
     strategy:
       matrix:
-        include:
-          - python-version: '3.7'
-            full-python-version: '3.7'
-          - python-version: '3.8'
-            full-python-version: '3.8'
-          - python-version: '3.9'
-            full-python-version: '3.9'
-          - python-version: '3.10'
-            full-python-version: '3.10'
+        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11']
     steps:
-    - uses: actions/checkout@v1
-    - uses: actions/setup-python@v2
-      name: Install Python
-      with: 
-        python-version: ${{ matrix.full-python-version }}
-    - uses: actions/download-artifact@v2
-      with:
-        name: alpaqa-whl-${{ matrix.python-version }}-mac
-        path: dist
-    - name: Test
-      run: |
-        python -m pip install -U pip pytest cmake ninja
-        python -m pip install dist/alpaqa-*.whl
-        pytest -rP
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - uses: actions/setup-python@v4
+        name: Install Python
+        with: 
+          python-version: ${{ matrix.python-version }}
+      - uses: actions/download-artifact@v3
+        with:
+          name: whl-${{ matrix.python-version }}-macos
+          path: dist
+      - name: Test
+        run: |
+          python3 -m pip install -U pip pytest
+          python3 -m pip install --find-links=dist ${PACKAGE_NAME}==${PACKAGE_VERSION}
+          pytest -rP
+
 
   release:
     if: ${{ github.event.action == 'released' || github.event.action == 'prereleased' }}
     needs: [test-linux, test-windows, test-macos]
     runs-on: ubuntu-latest
-    container: python:${{ matrix.full-python-version }}-bullseye
+    container: ${{ matrix.container }}:${{ matrix.python-version }}-bullseye
     strategy:
       matrix:
-        include:
-          - python-version: '3.7'
-            full-python-version: '3.7'
-          - python-version: '3.8'
-            full-python-version: '3.8'
-          - python-version: '3.9'
-            full-python-version: '3.9'
-          - python-version: '3.10'
-            full-python-version: '3.10'
-          - python-version: '3.11'
-            full-python-version: '3.11-rc'
-    steps:
-    - uses: actions/checkout@v1
-    - uses: actions/download-artifact@v2
-      with:
-        name: alpaqa-whl-${{ matrix.python-version }}-amd64
-        path: dist
-    - uses: actions/download-artifact@v2
-      with:
-        name: alpaqa-whl-${{ matrix.python-version }}-win
-        path: dist
-    - uses: actions/download-artifact@v2
-      with:
-        name: alpaqa-whl-${{ matrix.python-version }}-mac
-        path: dist
-    - name: Update pip
-      run: python -m pip install -U pip
-    - name: Install alpaqa
-      run: python -m pip install --no-deps --no-index --find-links=dist alpaqa
-    - name: Check alpaqa version
-      run: |
-        [ "${{ github.event.release.tag_name }}" == "$(python -c 'import alpaqa as a; print(a.__version__)')" ]
-      shell: bash
-    - name: Install Twine
-      run: python -m pip install twine
-    - name: Upload Wheel to PyPI
-      run: python -m twine upload dist/alpaqa-*.whl
-      env:
-        TWINE_USERNAME: __token__
-        TWINE_PASSWORD: ${{ secrets.PyPI }}
-    - uses: actions/download-artifact@v2
-      if: ${{ matrix.python-version == '3.10' }}
-      with:
-        name: alpaqa-src-${{ matrix.python-version }}
-        path: dist
-    - name: Upload source to PyPI
-      if: ${{ matrix.python-version == '3.10' }}
-      run: python -m twine upload dist/alpaqa-*.tar.gz
-      env:
-        TWINE_USERNAME: __token__
-        TWINE_PASSWORD: ${{ secrets.PyPI }}
-
-  release-pypy:
-    if: ${{ github.event.action == 'released' || github.event.action == 'prereleased' }}
-    needs: [test-linux, test-windows, test-macos]
-    runs-on: ubuntu-latest
-    container: pypy:${{ matrix.python-version }}-bullseye
-    strategy:
-      matrix:
+        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11']
+        pypy: ['']
+        container: ['python']
         include:
           - python-version: '3.8'
+            pypy: 'pypy'
+            container: 'pypy'
           - python-version: '3.9'
+            pypy: 'pypy'
+            container: 'pypy'
     steps:
-    - uses: actions/checkout@v1
-    - uses: actions/download-artifact@v2
-      with:
-        name: alpaqa-whl-pypy${{ matrix.python-version }}-amd64
-        path: dist
-    - name: Update pip
-      run: python -m pip install -U pip
-    - name: Install alpaqa
-      run: python -m pip install --no-deps --no-index --find-links=dist alpaqa
-    - name: Check alpaqa version
-      run: |
-        [ "${{ github.event.release.tag_name }}" == "$(python -c 'import alpaqa as a; print(a.__version__)')" ]
-      shell: bash
-    - name: Install Twine
-      run: python -m pip install twine
-    - name: Upload Wheel to PyPI
-      run: python -m twine upload dist/alpaqa-*.whl
-      env:
-        TWINE_USERNAME: __token__
-        TWINE_PASSWORD: ${{ secrets.PyPI }}
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: whl-${{ matrix.pypy }}${{ matrix.python-version }}-linux
+          path: dist
+      - uses: actions/download-artifact@v3
+        if: ${{ !matrix.pypy }}
+        with:
+          name: whl-${{ matrix.python-version }}-windows
+          path: dist
+      - uses: actions/download-artifact@v3
+        if: ${{ !matrix.pypy }}
+        with:
+          name: whl-${{ matrix.python-version }}-macos
+          path: dist
+      - name: Install Twine
+        run: python -m pip install -U pip twine
+      - name: Install package
+        run: python -m pip install --no-deps --no-index --find-links=dist ${PACKAGE_NAME}==${PACKAGE_VERSION}
+      - name: Check package version
+        run: |
+          [ "${{ github.event.release.tag_name }}" == "$(python -c 'import ${{ env.MODULE_NAME }} as m; print(m.__version__)')" ]
+        shell: bash
+      - name: Upload Wheels to PyPI
+        run: python -m twine upload -r ${{ env.TWINE_REPOSITORY }} dist/*.whl
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PyPI }}
+      - uses: actions/download-artifact@v3
+        if: ${{ matrix.python-version == '3.11' }}
+        with:
+          name: src-${{ matrix.python-version }}
+          path: dist
+      - name: Upload source to PyPI
+        if: ${{ matrix.python-version == '3.11' }}
+        run: python -m twine upload -r ${{ env.TWINE_REPOSITORY }} dist/*.tar.gz
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PyPI }}

@@ -39,7 +39,7 @@ docs = [
 alpaqa = "alpaqa.__main__:main"
 
 [build-system]
-requires = ["py-build-cmake~=0.0.15", "pybind11", "pybind11-stubgen"]
+requires = ["py-build-cmake~=0.0.16a2", "pybind11", "pybind11-stubgen"]
 build-backend = "py_build_cmake.build"
 
 [tool.py-build-cmake.module]
@@ -56,7 +56,7 @@ source_path = "."
 config = []
 args = ["-Wdev"]
 build_args = ["-j"]
-install_components = ["python_modules"]
+install_components = ["python_modules", "python_stubs"]
 [tool.py-build-cmake.cmake.options]
 "ALPAQA_WITH_PYTHON:BOOL" = "On"
 "ALPAQA_WITH_PY_STUBS:BOOL" = "On"
