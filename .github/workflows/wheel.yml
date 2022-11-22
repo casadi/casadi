@@ -70,9 +70,9 @@ jobs:
       image: ubuntu:jammy
     strategy:
       matrix:
-        host: [x86_64-centos7-linux-gnu, armv7-neon-linux-gnueabihf, armv6-rpi-linux-gnueabihf, aarch64-rpi3-linux-gnu]
-        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11']
         pypy: ['', pypy]
+        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11']
+        host: [x86_64-centos7-linux-gnu, armv7-neon-linux-gnueabihf, armv6-rpi-linux-gnueabihf, aarch64-rpi3-linux-gnu]
         exclude:
           - pypy: pypy
             python-version: '3.7'
