@@ -24,6 +24,9 @@ jobs:
     env:
       HOST: 'x86_64-centos7-linux-gnu'
       PYTHON_VERSION: '3.10'
+      CMAKE_C_COMPILER_LAUNCHER: ccache
+      CMAKE_CXX_COMPILER_LAUNCHER: ccache
+      CCACHE_DIR: /root/.ccache
     steps:
       # Git clone
       - name: Install git
@@ -38,6 +41,15 @@ jobs:
           host: ${{ env.HOST }}
           python-version: ${{ env.PYTHON_VERSION }}
           pypy: ''
+      # Ccache
+      - name: Prepare ccache directory
+        run: mkdir -p "${{ env.CCACHE_DIR }}"
+      - name: Cache ccache
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.CCACHE_DIR }}
+          key: ${{ runner.os }}-${{ env.PYTHON_VERSION }}-${{ env.HOST }}-ccache-${{ github.run_id }}
+          restore-keys: ${{ runner.os }}-${{ env.PYTHON_VERSION }}-${{ env.HOST }}-ccache
       # Pip install dependencies
       - name: Install Python dependencies
         run: python${{ env.PYTHON_VERSION }} -m pip install -U pip build pybind11-stubgen py-build-cmake~=0.1.0
