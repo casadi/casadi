@@ -10,7 +10,7 @@ on:
     types: ['released', 'prereleased']
 
 env:
-  PACKAGE_VERSION: '1.0.0a5'
+  PACKAGE_VERSION: '1.0.0a6'
   PACKAGE_NAME: alpaqa
   MODULE_NAME: alpaqa
   C_EXTENSIONS: _alpaqa
