@@ -310,6 +310,10 @@ jobs:
     strategy:
       matrix:
         python-version: ['3.7', '3.8', '3.9', '3.10', '3.11']
+    env:
+      CMAKE_C_COMPILER_LAUNCHER: ccache
+      CMAKE_CXX_COMPILER_LAUNCHER: ccache
+      CCACHE_DIR: ${{ runner.temp }}/.ccache
     steps:
       - uses: actions/checkout@v3
         with:
@@ -319,6 +323,16 @@ jobs:
         name: Install Python
         with:
           python-version: ${{ matrix.python-version }}
+      - name: Install ccache
+        run: brew install ccache && ccache --version
+      - name: Prepare ccache directory
+        run: mkdir -p "${{ env.CCACHE_DIR }}"
+      - name: Cache ccache
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.CCACHE_DIR }}
+          key: ${{ runner.os }}-${{ matrix.python-version }}-ccache-${{ github.run_id }}
+          restore-keys: ${{ runner.os }}-${{ matrix.python-version }}-ccache
       - name: Cache Virtual Environment
         id: cache-venv
         uses: actions/cache@v3
