@@ -139,10 +139,93 @@ jobs:
         with:
           name: whl-${{ matrix.pypy }}${{ matrix.python-version }}-linux
           path: dist/*.whl
+
+  build-linux-src:
+    runs-on: ubuntu-latest
+    container: 
+      image: ubuntu:jammy
+    strategy:
+      matrix:
+        python-version: ['3.11']
+    env:
+      CMAKE_C_COMPILER_LAUNCHER: ccache
+      CMAKE_CXX_COMPILER_LAUNCHER: ccache
+      CCACHE_DIR: /root/.ccache
+      CROSS_TOOLS_VERSION: '0.0.7'
+      CROSS_TOOLS_URL: 'https://github.com/tttapa/cross-python/releases/download'
+      HOST_TRIPLE: 'x86_64-centos7-linux-gnu'
+    steps:
+      # Apt install tools
+      - name: Install tools
+        run: |
+          apt -y update
+          apt -y install --no-install-recommends \
+            git wget bzip2 xz-utils ccache ninja-build ca-certificates
+          mkdir -p $CCACHE_DIR
+      # Git clone
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      # Cache
+      - name: Cache ccache
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.CCACHE_DIR }}
+          key: ${{ runner.os }}-${{ matrix.python-version }}-ccache-src-${{ github.run_id }}
+          restore-keys: ${{ runner.os }}-${{ matrix.python-version }}-ccache-src
+      - name: Cache tools
+        id: cache-tools
+        uses: actions/cache@v3
+        with:
+          path: /opt
+          key: ${{ runner.os }}-${{ matrix.python-version }}-tools-${{ env.CROSS_TOOLS_VERSION }}
+        # CMake
+      - name: Install CMake
+        if: ${{ steps.cache-tools.outputs.cache-hit != 'true' }}
+        run: |
+          version=3.25.0; cd /tmp; mkdir -p /opt/cmake
+          wget https://github.com/Kitware/CMake/releases/download/v$version/cmake-$version-Linux-x86_64.sh
+          bash cmake-$version-*.sh --skip-license --prefix="/opt/cmake"
+      - name: Add CMake to PATH
+        run: echo "/opt/cmake/bin" >> $GITHUB_PATH
+      # Python
+      - name: Install Python
+        if: ${{ steps.cache-tools.outputs.cache-hit != 'true' }}
+        run: wget "${CROSS_TOOLS_URL}/${CROSS_TOOLS_VERSION}/build-python-${{ matrix.python-version }}.tar.xz" -O- | tar xJ -C /opt
+      - name: Add Python to PATH
+        run: echo "/opt/build-python-${{ matrix.python-version }}/usr/local/bin" >> $GITHUB_PATH
+      # Pip install dependencies
+      - name: Install Python dependencies
+        run: |
+          python${{ matrix.python-version }} -m ensurepip
+          python${{ matrix.python-version }} -m pip install -U pip build
+      # Toolchain
+      - name: Download toolchain
+        if: steps.cache-tools.outputs.cache-hit != 'true'
+        run: wget "${CROSS_TOOLS_URL}/${CROSS_TOOLS_VERSION}/full-${HOST_TRIPLE}.tar.xz" -O- | tar xJ -C /opt
+      # Build
+      - name: Build wheels
+        run: |
+          staging="/opt/${HOST_TRIPLE}"
+          cat > ninja-debug.cross.toml <<- EOF
+          [cmake]
+          config = ["Debug"]
+          generator = "Ninja Multi-Config"
+          [cmake.options]
+          CMAKE_FIND_ROOT_PATH = "$staging/pybind11;$staging/eigen;$staging/casadi"
+          USE_GLOBAL_PYBIND11 = "On"
+          EOF
+          python${{ matrix.python-version }} -m build . \
+            -C--cross="$PWD/ninja-debug.cross.toml" \
+            -C--cross="$staging/cmake/${HOST_TRIPLE}.py-build-cmake.cross.toml"
+        env:
+          CFLAGS: '-static-libgcc'
+          CXXFLAGS: '-static-libgcc -static-libstdc++'
+      # Upload
       - name: Upload source
         uses: actions/upload-artifact@v3
         with:
-          name: src-${{ matrix.pypy }}${{ matrix.python-version }}
+          name: src-dist
           path: dist/*.tar.gz
 
   test-linux:
@@ -309,7 +392,7 @@ jobs:
 
   release:
     if: ${{ github.event.action == 'released' || github.event.action == 'prereleased' }}
-    needs: [test-linux, test-windows, test-macos]
+    needs: [test-linux, build-linux-src, test-windows, test-macos]
     runs-on: ubuntu-latest
     container: ${{ matrix.container }}:${{ matrix.python-version }}-bullseye
     strategy:
@@ -356,7 +439,7 @@ jobs:
       - uses: actions/download-artifact@v3
         if: ${{ matrix.python-version == '3.11' }}
         with:
-          name: src-${{ matrix.python-version }}
+          name: src-dist
           path: dist
       - name: Upload source to PyPI
         if: ${{ matrix.python-version == '3.11' }}
