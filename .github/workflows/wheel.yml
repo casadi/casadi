@@ -178,7 +178,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: /opt
-          key: ${{ runner.os }}-${{ matrix.python-version }}-tools-${{ env.CROSS_TOOLS_VERSION }}
+          key: ${{ runner.os }}-${{ matrix.python-version }}-tools-src-${{ env.CROSS_TOOLS_VERSION }}
         # CMake
       - name: Install CMake
         if: ${{ steps.cache-tools.outputs.cache-hit != 'true' }}
