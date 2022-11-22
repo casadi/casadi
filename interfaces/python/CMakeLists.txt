@@ -45,7 +45,7 @@ endif()
 install(TARGETS _alpaqa
         EXCLUDE_FROM_ALL
         COMPONENT python_modules
-        DESTINATION ./${PY_BUILD_CMAKE_MODULE_NAME})
+        DESTINATION ${PY_BUILD_CMAKE_MODULE_NAME})
 
 # Strip and install debug information
 option(ALPAQA_INCLUDE_DEBUG_INFO "Include files with debugging symbols" On)
@@ -61,7 +61,7 @@ if (CMAKE_STRIP AND CMAKE_OBJCOPY)
             EXCLUDE_FROM_ALL
             CONFIGURATIONS Debug RelWithDebInfo
             COMPONENT python_modules
-            DESTINATION ./${PY_BUILD_CMAKE_MODULE_NAME})
+            DESTINATION ${PY_BUILD_CMAKE_MODULE_NAME})
     endif()
 endif()
 
@@ -71,5 +71,5 @@ option(ALPAQA_WITH_PY_STUBS
 if (ALPAQA_WITH_PY_STUBS AND NOT CMAKE_CROSSCOMPILING)
     include(cmake/Pybind11Stubgen.cmake)
     pybind11_stubgen(_alpaqa)
-    pybind11_stubgen_install(_alpaqa ./${PY_BUILD_CMAKE_MODULE_NAME})
+    pybind11_stubgen_install(_alpaqa ${PY_BUILD_CMAKE_MODULE_NAME})
 endif()
