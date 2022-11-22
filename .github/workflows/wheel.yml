@@ -109,8 +109,8 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ${{ env.CCACHE_DIR }}
-          key: ${{ runner.os }}-${{ matrix.pypy }}${{ matrix.python-version }}-ccache-${{ github.run_id }}
-          restore-keys: ${{ runner.os }}-${{ matrix.pypy }}${{ matrix.python-version }}-ccache
+          key: ${{ runner.os }}-${{ matrix.pypy }}${{ matrix.python-version }}-${{ matrix.host }}-ccache-${{ github.run_id }}
+          restore-keys: ${{ runner.os }}-${{ matrix.pypy }}${{ matrix.python-version }}-${{ matrix.host }}-ccache
       # Pip install dependencies
       - name: Install Python dependencies
         run: python${{ matrix.python-version }} -m pip install -U pip build pybind11-stubgen py-build-cmake~=0.0.16a2

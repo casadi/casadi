@@ -39,7 +39,7 @@ runs:
       uses: actions/cache@v3
       with:
         path: /opt
-        key: ${{ runner.os }}-${{ inputs.pypy }}${{ inputs.python-version }}-tools-${{ inputs.tools-version }}
+        key: ${{ runner.os }}-${{ inputs.pypy }}${{ inputs.python-version }}-${{ inputs.host }}-tools-${{ inputs.tools-version }}-${{ inputs.cmake-version }}
       # CMake
     - name: Install CMake
       if: ${{ steps.cache-tools.outputs.cache-hit != 'true' }}
