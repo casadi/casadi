@@ -294,7 +294,7 @@ jobs:
 
 
   build-macos:
-    runs-on: macos-latest
+    runs-on: macos-12
     strategy:
       matrix:
         python-version: ['3.7', '3.8', '3.9', '3.10', '3.11']
@@ -336,7 +336,7 @@ jobs:
 
   test-macos:
     needs: [build-macos]
-    runs-on: macos-latest
+    runs-on: macos-12
     strategy:
       matrix:
         python-version: ['3.7', '3.8', '3.9', '3.10']
