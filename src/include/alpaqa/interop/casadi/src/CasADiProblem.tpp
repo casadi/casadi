@@ -99,10 +99,8 @@ CasADiProblem<Conf>::CasADiProblem(const std::string &so_name, length_t n,
     this->n     = n;
     this->m     = m;
     this->param = vec::Constant(p, alpaqa::NaN<Conf>);
-    this->C     = {vec::Constant(n, +alpaqa::inf<Conf>),
-                   vec::Constant(n, -alpaqa::inf<Conf>)};
-    this->D     = {vec::Constant(m, +alpaqa::inf<Conf>),
-                   vec::Constant(m, -alpaqa::inf<Conf>)};
+    this->C     = Box<config_t>{n};
+    this->D     = Box<config_t>{m};
 
     impl = std::make_unique<CasADiFunctionsWithParam<Conf>>(
         CasADiFunctionsWithParam<Conf>{

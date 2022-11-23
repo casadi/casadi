@@ -8,10 +8,10 @@ TEST(ALM, singleshooting1D) {
     USING_ALPAQA_CONFIG(alpaqa::EigenConfigd);
     using namespace alpaqa;
 
-    Box<config_t> C{vec(1), vec(1)};
+    Box<config_t> C{1};
     C.lowerbound << -1;
     C.upperbound << 1;
-    Box<config_t> D{vec(0), vec(0)};
+    Box<config_t> D{0};
 
     using Diag = Eigen::DiagonalMatrix<real_t, Eigen::Dynamic, Eigen::Dynamic>;
 
@@ -84,10 +84,10 @@ TEST(ALM, multipleshooting1D) {
     USING_ALPAQA_CONFIG(alpaqa::EigenConfigd);
     using namespace alpaqa;
 
-    Box<config_t> C{vec(2), vec(2)};
+    Box<config_t> C{2};
     C.lowerbound << -1, -inf<config_t>;
     C.upperbound << 1, inf<config_t>;
-    Box<config_t> D{vec(1), vec(1)};
+    Box<config_t> D{1};
     D.lowerbound << 0;
     D.upperbound << 0;
 
@@ -187,12 +187,12 @@ TEST(ALM, multipleshooting8D) {
     length_t n = nu + nx;
     length_t m = nx;
 
-    Box<config_t> C{vec(n), vec(n)};
+    Box<config_t> C{n};
     C.lowerbound.topRows(nu).fill(-1);
     C.lowerbound.bottomRows(nx).fill(-inf<config_t>);
     C.upperbound.topRows(nu).fill(1);
     C.upperbound.bottomRows(nx).fill(inf<config_t>);
-    Box<config_t> D{vec(m), vec(m)};
+    Box<config_t> D{m};
     D.lowerbound.fill(0);
     D.upperbound.fill(0);
 
@@ -313,12 +313,12 @@ TEST(ALM, multipleshooting8Dstructured) {
     length_t n = nu + nx;
     length_t m = nx;
 
-    Box<config_t> C{vec(n), vec(n)};
+    Box<config_t> C{n};
     C.lowerbound.topRows(nu).fill(-1);
     C.lowerbound.bottomRows(nx).fill(-inf<config_t>);
     C.upperbound.topRows(nu).fill(1);
     C.upperbound.bottomRows(nx).fill(inf<config_t>);
-    Box<config_t> D{vec(m), vec(m)};
+    Box<config_t> D{m};
     D.lowerbound.fill(0);
     D.upperbound.fill(0);
 

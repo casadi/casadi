@@ -89,12 +89,9 @@ CasADiQuadraticControlProblem<Conf>::CasADiQuadraticControlProblem(
     this->nu     = nu;
     this->x_init = vec::Constant(nx, alpaqa::NaN<Conf>);
     this->param  = vec::Constant(p, alpaqa::NaN<Conf>);
-    this->U      = {vec::Constant(nu, +alpaqa::inf<Conf>),
-                    vec::Constant(nu, -alpaqa::inf<Conf>)};
-    this->D      = {vec::Constant(nx, +alpaqa::inf<Conf>),
-                    vec::Constant(nx, -alpaqa::inf<Conf>)};
-    this->D_N    = {vec::Constant(nx, +alpaqa::inf<Conf>),
-                    vec::Constant(nx, -alpaqa::inf<Conf>)};
+    this->U      = Box{nu};
+    this->D      = Box{nx};
+    this->D_N    = Box{nx};
     this->Q      = vec::Constant(nx, alpaqa::NaN<Conf>);
     this->R      = vec::Constant(nu, alpaqa::NaN<Conf>);
     this->Q_N    = vec::Constant(nx, alpaqa::NaN<Conf>);

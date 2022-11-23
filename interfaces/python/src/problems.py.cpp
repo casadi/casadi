@@ -60,26 +60,20 @@ void register_problems(py::module_ &m) {
             [](py::tuple t) { // __setstate__
                 if (t.size() != 2)
                     throw std::runtime_error("Invalid state!");
-                return Box{
-                    py::cast<decltype(Box::upperbound)>(t[0]),
-                    py::cast<decltype(Box::lowerbound)>(t[1]),
-                };
+                return Box::from_lower_upper(py::cast<decltype(Box::lowerbound)>(t[1]),
+                                             py::cast<decltype(Box::upperbound)>(t[0]));
             }))
-        .def(py::init([](length_t n) {
-                 return Box{vec::Constant(n, +alpaqa::inf<config_t>),
-                            vec::Constant(n, -alpaqa::inf<config_t>)};
-             }),
-             "n"_a,
+        .def(py::init<length_t>(), "n"_a,
              "Create an :math:`n`-dimensional box at with bounds at "
              ":math:`\\pm\\infty` (no constraints).")
-        .def(py::init([](vec ub, vec lb) {
-                 if (ub.size() != lb.size())
+        .def(py::init([](vec lower, vec upper) {
+                 if (lower.size() != upper.size())
                      throw std::invalid_argument("Upper and lower bound dimensions do not match");
-                 return Box{std::move(ub), std::move(lb)};
+                 return Box::from_lower_upper(std::move(lower), std::move(upper));
              }),
-             "ub"_a, "lb"_a, "Create a box with the given bounds.")
-        .def_readwrite("upperbound", &Box::upperbound)
-        .def_readwrite("lowerbound", &Box::lowerbound);
+             py::kw_only(), "lower"_a, "upper"_a, "Create a box with the given bounds.")
+        .def_readwrite("lowerbound", &Box::lowerbound)
+        .def_readwrite("upperbound", &Box::upperbound);
 
     using BoxConstrProblem = alpaqa::BoxConstrProblem<config_t>;
     py::class_<BoxConstrProblem>(m, "BoxConstrProblem",

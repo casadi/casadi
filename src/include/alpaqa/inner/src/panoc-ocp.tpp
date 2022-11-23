@@ -127,8 +127,7 @@ auto PANOCOCPSolver<Conf>::operator()(
         qxuₖ(Nxu),                 // Newton step, including states
         work_p(nx),                //
         work_w(nx + nu);           //
-    Box<config_t> U{vec::Constant(nu, NaN<config_t>),
-                    vec::Constant(n, NaN<config_t>)};
+    Box<config_t> U = Box<config_t>::NaN(nu);
 
     DynamicsEvaluator<config_t> eval{problem};
     detail::IndexSet<config_t> J{N, nu};

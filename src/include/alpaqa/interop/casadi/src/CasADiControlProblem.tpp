@@ -94,8 +94,7 @@ CasADiControlProblem<Conf>::CasADiControlProblem(const std::string &so_name,
     this->nu     = nu;
     this->x_init = vec::Constant(nx, alpaqa::NaN<Conf>);
     this->param  = vec::Constant(p, alpaqa::NaN<Conf>);
-    this->U      = {vec::Constant(nu, +alpaqa::inf<Conf>),
-                    vec::Constant(nu, -alpaqa::inf<Conf>)};
+    this->U      = Box{nu};
 
     impl = std::make_unique<CasADiControlFunctionsWithParam<Conf>>(
         CasADiControlFunctionsWithParam<Conf>{

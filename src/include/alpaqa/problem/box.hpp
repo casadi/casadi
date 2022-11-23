@@ -9,8 +9,22 @@ template <Config Conf = DefaultConfig>
 struct Box {
     USING_ALPAQA_CONFIG(Conf);
 
-    vec upperbound;
+    Box() : Box{0} {}
+    Box(length_t n)
+        : lowerbound{vec::Constant(n, -inf<config_t>)}, upperbound{
+                                                            vec::Constant(n, +inf<config_t>)} {}
+
+    static Box NaN(length_t n) {
+        return Box{vec::Constant(n, alpaqa::NaN<config_t>),
+                   vec::Constant(n, alpaqa::NaN<config_t>)};
+    }
+    static Box from_lower_upper(vec lower, vec upper) { return Box{lower, upper}; }
+
     vec lowerbound;
+    vec upperbound;
+
+  private:
+    Box(vec lower, vec upper) : lowerbound{std::move(lower)}, upperbound{std::move(upper)} {}
 };
 
 /// Project a vector onto a box.
@@ -29,7 +43,7 @@ inline auto project(const auto &v,       ///< [in] The vector to project
 /// @f[ v - \Pi_C(v) @f]
 /// @warning    Beware catastrophic cancellation!
 template <Config Conf>
-inline auto
+inline auto                                //
 projecting_difference(const auto &v,       ///< [in] The vector to project
                       const Box<Conf> &box ///< [in] The box to project onto
 ) {
@@ -55,7 +69,7 @@ inline auto dist_squared(const auto &v,       ///< [in] The vector to project
 template <Config Conf>
 inline auto dist_squared(const auto &v,        ///< [in] The vector to project
                          const Box<Conf> &box, ///< [in] The box to project onto
-                         const auto &Σ ///< [in] Diagonal matrix defining norm
+                         const auto &Σ         ///< [in] Diagonal matrix defining norm
 ) {
     // TODO: Does this allocate?
     //       Does it have dangling references to temporaries?

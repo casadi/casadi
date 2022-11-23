@@ -824,9 +824,9 @@ class BoxConstrProblem {
     BoxConstrProblem &operator=(BoxConstrProblem &&) noexcept = default;
 
     /// Constraints of the decision variables, @f$ x \in C @f$
-    Box C{vec::Constant(this->n, +inf<Conf>), vec::Constant(this->n, -inf<Conf>)};
+    Box C{this->n};
     /// Other constraints, @f$ g(x) \in D @f$
-    Box D{vec::Constant(this->m, +inf<Conf>), vec::Constant(this->m, -inf<Conf>)};
+    Box D{this->m};
 
     /// Number of decision variables, @ref n
     length_t get_n() const { return n; }
