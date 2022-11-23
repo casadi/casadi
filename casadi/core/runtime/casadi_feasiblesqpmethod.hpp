@@ -45,6 +45,7 @@ struct casadi_feasiblesqpmethod_data {
   // Anderson vectors
   T1* anderson_memory_step;
   T1* anderson_memory_iterate;
+  T1* gamma;
 
   // Function value of feasibility iterate
   T1 f_feas;
@@ -106,6 +107,8 @@ void casadi_feasiblesqpmethod_work(const casadi_feasiblesqpmethod_prob<T1>* p,
     *sz_w += sz_anderson_memory*nx;
     // for x
     *sz_w += sz_anderson_memory*nx;
+    // for gamma
+    *sz_w += sz_anderson_memory;
   }
 
   // if (elastic_mode) {
@@ -172,7 +175,7 @@ void casadi_feasiblesqpmethod_init(casadi_feasiblesqpmethod_data<T1>* d, casadi_
   d->lbdz_feas = *w; *w += nx + ng;
   d->ubdz_feas = *w; *w += nx + ng;
   // x tmp for QPs
-  d->z_tmp = *w; *w += nx+ng;
+  d->z_tmp = *w; *w += sz_anderson_memory*nx+ng;
   // trust-region scale vector
   d->tr_scale_vector = *w; *w += nx;
   d->tr_mask = *iw; *iw += nx;
@@ -181,5 +184,6 @@ void casadi_feasiblesqpmethod_init(casadi_feasiblesqpmethod_data<T1>* d, casadi_
   // Anderson vector
   d->anderson_memory_step = *w; *w += sz_anderson_memory*nx;
   d->anderson_memory_iterate = *w; *w += sz_anderson_memory*nx;
+  d->gamma = *w; *w += sz_anderson_memory;
   
 }

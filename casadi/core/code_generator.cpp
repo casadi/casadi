@@ -1576,6 +1576,24 @@ namespace casadi {
     return "casadi_axpy(" + str(n) + ", " + a + ", " + x + ", " + y + ");";
   }
 
+  string CodeGenerator::clip_min(const string& x, casadi_int n,
+                                  const string& min, const string& mask) {
+    add_auxiliary(AUX_CLIP_MIN);
+    return "casadi_clip_min(" + x + ", " + str(n) + ", " + min + ", " + mask + ");";
+  }
+
+  string CodeGenerator::clip_max(const string& x, casadi_int n,
+                                  const string& min, const string& mask) {
+    add_auxiliary(AUX_CLIP_MAX);
+    return "casadi_clip_max(" + x + ", " + str(n) + ", " + min + ", " + mask + ");";
+  }
+
+  string CodeGenerator::masked_norm_inf(casadi_int n, const string& x, 
+                                  const string& mask) {
+    add_auxiliary(AUX_MASKED_NORM_INF);
+    return "casadi_clip_max(" + str(n) + ", " + x + ", " + mask + ");";
+  }
+
   string CodeGenerator::scal(casadi_int n, const string& alpha, const string& x) {
     add_auxiliary(AUX_SCAL);
     return "casadi_scal(" + str(n) + ", " + alpha + ", " + x + ");";

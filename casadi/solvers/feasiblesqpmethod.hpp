@@ -112,7 +112,7 @@ namespace casadi {
     // function to get feasible iterate
     int feasibility_iterations(void* mem, double tr_rad) const;
 
-    void anderson_acc_step_update(void* mem) const;
+    void anderson_acc_step_update(void* mem, casadi_int iter_index) const;
 
     void anderson_acc_init_memory(void* mem, double* step, double* iterate) const;
     
