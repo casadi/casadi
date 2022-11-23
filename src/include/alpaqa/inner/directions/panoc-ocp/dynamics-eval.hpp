@@ -130,9 +130,10 @@ struct DynamicsEvaluator {
         return V;
     }
 
+    /// Simulate the system and update the states @f$ x @f$ based on the initial
+    /// state @f$ x_\mathrm{init} @f$ and the inputs @f$ u @f$.
     /// @pre `xk(0)` and `uk(k)` for `0 <= k < N` initialized
     /// @post `xk(k)` for `1 <= k <= N` updated
-    /// @return @f$ V(u) = \sum_{k=0}^{N-1} \ell(x_k, u_k) + V_f(x_N) @f$
     void forward_simulate(rvec xu) const {
         detail::Timed t{time.forward};
         assert(xu.size() == (nx + nu) * N + nx);
@@ -140,11 +141,14 @@ struct DynamicsEvaluator {
             problem.eval_f(k, xk(xu, k), uk(xu, k), xk(xu, k + 1));
     }
 
+    /// Compute the gradient of the cost @f$ \nabla\psi @f$, evaluating the full
+    /// Jacobians of the dynamics @f$ A_k @f$ and @f$ B_k @f$.
     /// @pre @ref forward() has been called
     /// @post `Ak(k)` for `0 <= k < N` updated
     /// @post `Bk(k)` for `0 <= k < N` updated
     /// @post `qk(k)` for `0 <= k <= N` updated
     /// @post `rk(k)` for `0 <= k < N` updated
+    /// @param[in]  xu Interleaved states @f$ x @f$ and inputs @f$ u @f$.
     /// @param[out] g @f$ \nabla V_N(u) @f$
     /// @param p Work vector of dimension @f$ n_x @f$
     void backward_with_jac(crvec xu, rvec g, rvec p) {
@@ -179,28 +183,12 @@ struct DynamicsEvaluator {
         }
     }
 
+    /// Compute the gradient of the cost @f$ \nabla\psi @f$.
     /// @pre @ref forward() has been called
+    /// @param[in]  xu Interleaved states @f$ x @f$ and inputs @f$ u @f$.
     /// @param[out] g @f$ \nabla V_N(u) @f$
     /// @param p Work vector of dimension @f$ n_x @f$
     /// @param w Work vector of dimension @f$ n_x + n_u @f$
-    /// @param AB Work matrix of dimensions @f$ n_x \times (n_x + n_u) @f$
-#if 0
-    void backward(crvec xu, rvec g, rvec p, rvec w, rmat AB) {
-        assert(xu.size() == (nx + nu) * N + nx);
-        problem.eval_grad_l_N(xk(xu, N), p);
-        for (index_t t = N; t-- > 0;) {
-            auto &&gt = g.segment(t * nu, nu);
-            auto &&At = AB.leftCols(nx);
-            auto &&Bt = AB.rightCols(nu);
-            problem.eval_jac_f(t, xk(xu, t), uk(xu, t), AB);
-            problem.eval_grad_l(t, xuk(xu, t), w);
-            gt = w.bottomRows(nu) + Bt.transpose() * p;
-            if (t > 0)
-                p = w.topRows(nx) + At.transpose() * p;
-            // TODO: t.topRows(nx) is not really used here if k == 0
-        }
-    }
-#else
     void backward(crvec xu, rvec g, rvec p, rvec w) {
         detail::Timed t{time.backward};
         assert(xu.size() == (nx + nu) * N + nx);
@@ -215,8 +203,9 @@ struct DynamicsEvaluator {
             p += w.topRows(nx);
         }
     }
-#endif
 
+    /// Evaluate the Hessian matrices of the cost @f$ \ell @f$.
+    /// @param[in]  xu Interleaved states @f$ x @f$ and inputs @f$ u @f$.
     void hessians(crvec xu) {
         detail::Timed t{time.hessians};
         assert(xu.size() == (nx + nu) * N + nx);

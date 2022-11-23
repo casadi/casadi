@@ -1,5 +1,5 @@
 /**
- * @example{lineno} C++/LambdaProblem/main.cpp
+ * @example{lineno} C++/CustomCppProblem/main.cpp
  *
  * This example shows how to define optimization problems using ordinary C++
  * functions.

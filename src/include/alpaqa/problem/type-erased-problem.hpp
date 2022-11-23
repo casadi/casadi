@@ -536,7 +536,7 @@ class TypeErasedProblem : public util::TypeErased<ProblemVTable<Conf>, Allocator
     /// etc. Throws an exception if this is not the case.
     void check() const;
 
-    /// }
+    /// @}
 
     /// @name Querying specialized implementations
     /// @{
@@ -896,7 +896,7 @@ class BoxConstrProblem {
     }
 };
 
-/// @ref Problem class that allows specifying the basic functions as C++
+/// Problem class that allows specifying the basic functions as C++
 /// `std::function`s.
 /// @ingroup grp_Problems
 template <Config Conf = DefaultConfig>

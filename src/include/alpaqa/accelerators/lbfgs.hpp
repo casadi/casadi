@@ -145,9 +145,9 @@ class LBFGS {
     /// Apply the inverse Hessian approximation to the given vector q, applying
     /// only the columns and rows of the Hessian in the index set J.
     bool apply_masked(rvec q, real_t γ, crindexvec J) const;
-    /// @copydoc apply_masked(rvec, real_t, crindexvec)
+    /// @copydoc apply_masked(rvec, real_t, crindexvec) const
     bool apply_masked(rvec q, real_t γ, const std::vector<index_t> &J) const;
-    /// @see @ref apply_masked
+    /// @copydoc apply_masked(rvec, real_t, crindexvec) const
     bool apply_masked_impl(rvec q, real_t γ, const auto &J) const;
 
     /// Throw away the approximation and all previous vectors s and y.

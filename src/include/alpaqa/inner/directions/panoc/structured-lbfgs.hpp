@@ -29,7 +29,7 @@ struct StructuredLBFGS {
                     const ExtraParams &extraparams = {})
         : lbfgs(params), extraparams(extraparams) {}
 
-    /// @see @ref PANOCDirection::initializer
+    /// @see @ref PANOCDirection::initialize
     void initialize(const Problem &problem, crvec y, crvec Σ, real_t γ_0,
                     crvec x_0, crvec x̂_0, crvec p_0, crvec grad_ψx_0);
 
