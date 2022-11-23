@@ -166,3 +166,77 @@ TEST(TypeErasure, TypeErased) {
     EXPECT_NE(buf_str.find("vec 0"sv), buf_str.npos);
     EXPECT_NE(buf_str.find("vec 1"sv), buf_str.npos);
 }
+
+TEST(TypeErasure, copyFromEmpty) {
+    struct test_exception {};
+    auto a = CustomTypeErased<>();
+    auto b = CustomTypeErased<>::make<Noisy>();
+    b      = a;
+}
+
+TEST(TypeErasure, copyToEmpty) {
+    struct test_exception {};
+    auto a = CustomTypeErased<>();
+    auto b = CustomTypeErased<>::make<Noisy>();
+    a      = b;
+}
+
+TEST(TypeErasure, copyEmptyToEmpty) {
+    struct test_exception {};
+    auto a = CustomTypeErased<>();
+    auto b = CustomTypeErased<>();
+    a      = b;
+}
+
+TEST(TypeErasure, copyConstructFromEmpty) {
+    struct test_exception {};
+    auto a = CustomTypeErased<>();
+    auto b{a};
+}
+
+TEST(TypeErasure, moveFromEmpty) {
+    struct test_exception {};
+    auto a = CustomTypeErased<>();
+    auto b = CustomTypeErased<>::make<Noisy>();
+    b      = std::move(a);
+}
+
+TEST(TypeErasure, moveToEmpty) {
+    struct test_exception {};
+    auto a = CustomTypeErased<>();
+    auto b = CustomTypeErased<>::make<Noisy>();
+    a      = std::move(b);
+}
+
+TEST(TypeErasure, moveEmptyToEmpty) {
+    struct test_exception {};
+    auto a = CustomTypeErased<>();
+    auto b = CustomTypeErased<>();
+    a      = std::move(b);
+}
+
+TEST(TypeErasure, moveConstructFromEmpty) {
+    struct test_exception {};
+    auto a = CustomTypeErased<>();
+    auto b{std::move(a)};
+}
+
+TEST(TypeErasure, throwingCopyCtor) {
+    struct test_exception {};
+    struct Throwing : Noisy {
+        using Noisy::Noisy;
+        Throwing(const Throwing &o) : Noisy{o} { throw test_exception(); }
+    };
+    auto a = CustomTypeErased<>::make<Throwing>();
+    EXPECT_THROW({ auto b{a}; }, test_exception);
+    auto c = CustomTypeErased<>();
+    EXPECT_THROW({ c = a; }, test_exception);
+}
+
+TEST(TypeErasure, throwingCtor) {
+    struct test_exception {};
+    struct Throwing : Noisy {
+        Throwing() { throw test_exception(); }
+    };
+    EXPECT_THROW(CustomTypeErased<>::make<Throwing>(), test_exception);
+}

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <alpaqa/util/noop-delete.hpp>
 #include <alpaqa/util/type-traits.hpp>
 
 #include <algorithm>
@@ -27,45 +28,56 @@ struct VTableTypeTag {
 struct BasicVTable {
 
     template <class>
-    struct required_function;
+    struct required_function; // undefined
     template <class R, class... Args>
     struct required_function<R(Args...)> {
         using type = R (*)(void *self, Args...);
     };
     template <class>
-    struct required_const_function;
+    struct required_const_function; // undefined
     template <class R, class... Args>
     struct required_const_function<R(Args...)> {
         using type = R (*)(const void *self, Args...);
     };
-    template <class F>
-    using required_function_t = typename required_function<F>::type;
-    template <class F>
-    using required_const_function_t = typename required_const_function<F>::type;
-
     template <class, class VTable = BasicVTable>
-    struct optional_function;
+    struct optional_function; // undefined
     template <class R, class... Args, class VTable>
     struct optional_function<R(Args...), VTable> {
         using type = R (*)(void *self, Args..., const VTable &);
     };
     template <class, class VTable = BasicVTable>
-    struct optional_const_function;
+    struct optional_const_function; // undefined
     template <class R, class... Args, class VTable>
     struct optional_const_function<R(Args...), VTable> {
         using type = R (*)(const void *self, Args..., const VTable &);
     };
+    /// A required function includes a void pointer to self, in addition to the
+    /// arguments of @p F.
+    template <class F>
+    using required_function_t = typename required_function<F>::type;
+    /// @copydoc required_function_t
+    /// For const-qualified member functions.
+    template <class F>
+    using required_const_function_t = typename required_const_function<F>::type;
+    /// An optional function includes a void pointer to self, the arguments of
+    /// @p F, and an additional reference to the VTable, so that it can be
+    /// implemented in terms of other functions.
     template <class F, class VTable = BasicVTable>
     using optional_function_t = typename optional_function<F, VTable>::type;
+    /// @copydoc optional_function_t
+    /// For const-qualified member functions.
     template <class F, class VTable = BasicVTable>
     using optional_const_function_t =
         typename optional_const_function<F, VTable>::type;
 
-    size_t size = static_cast<size_t>(0xDEADBEEFDEADBEEF);
+    /// Copy-construct a new instance into storage.
     required_const_function_t<void(void *storage)> copy = nullptr;
-    required_function_t<void(void *storage)> move       = nullptr;
-    required_function_t<void()> destroy                 = nullptr;
+    /// Move-construct a new instance into storage.
+    required_function_t<void(void *storage)> move = nullptr;
+    /// Destruct the given instance.
+    required_function_t<void()> destroy = nullptr;
 #ifndef NDEBUG
+    /// The original type of the stored object (available in debug mode only).
     const std::type_info *type = &typeid(void);
 #endif
 
@@ -73,7 +85,6 @@ struct BasicVTable {
 
     template <class T>
     BasicVTable(VTableTypeTag<T>) noexcept {
-        size = sizeof(T);
         copy = [](const void *self, void *storage) {
             new (storage) T(*std::launder(reinterpret_cast<const T *>(self)));
         };
@@ -101,25 +112,30 @@ struct Launderer {
                            std::forward<Args>(args)...);
     }
     template <auto M, class T, class R, class... Args>
-    static constexpr auto invoke_ovl(R (T::*)(Args...) const) {
+    static constexpr auto invoker_ovl(R (T::*)(Args...) const) {
         return do_invoke<M, const void, const T, R, Args...>;
     }
     template <auto M, class T, class R, class... Args>
-    static constexpr auto invoke_ovl(R (T::*)(Args...)) {
+    static constexpr auto invoker_ovl(R (T::*)(Args...)) {
         return do_invoke<M, void, T, R, Args...>;
     }
 
   public:
-    template <auto M>
-    static constexpr auto invoke() {
-        return invoke_ovl<M>(M);
+    /// Returns a function that accepts a void pointer, casts it to the class
+    /// type of the member function @p Method, launders it, and then invokes
+    /// @p Method with it, passing on the arguments to @p Method. The function
+    /// can also accept additional arguments at the end, of type @p ExtraArgs.
+    template <auto Method>
+    static constexpr auto invoker() {
+        return invoker_ovl<Method>(Method);
     }
 };
 } // namespace detail
 
+/// @copydoc detail::Launderer::invoker
 template <auto Method, class... ExtraArgs>
 constexpr auto type_erased_wrapped() {
-    return detail::Launderer<ExtraArgs...>::template invoke<Method>();
+    return detail::Launderer<ExtraArgs...>::template invoker<Method>();
 }
 
 template <class VTable, class Allocator>
@@ -161,7 +177,12 @@ class TypeErased {
     [[no_unique_address]] allocator_type allocator;
 
   protected:
+    static constexpr size_t invalid_size =
+        static_cast<size_t>(0xDEADBEEFDEADBEEF);
+    /// Pointer to the stored object.
     void *self = nullptr;
+    /// Size required to store the object.
+    size_t size = invalid_size;
     VTable vtable;
 
   public:
@@ -214,12 +235,12 @@ class TypeErased {
     /// Main constructor that type-erases the given argument. Requirement
     /// prevents this constructor from taking precedence over the copy and move
     /// constructors.
-    template <class Tref>
-    explicit TypeErased(Tref &&d, allocator_type alloc = {}) //
-        requires(!std::is_base_of_v<TypeErased, std::remove_cvref_t<Tref>>)
+    template <class T>
+    explicit TypeErased(T &&d, allocator_type alloc = {})
+        requires(!std::is_base_of_v<TypeErased, std::remove_cvref_t<T>>)
         : allocator{std::move(alloc)} {
-        using T = std::remove_cvref_t<Tref>;
-        construct_inplace<T>(std::forward<Tref>(d));
+        using T_real = std::remove_cvref_t<T>;
+        construct_inplace<T_real>(std::forward<T>(d));
     }
 
     /// Construct a type-erased wrapper of type Ret for an object of type T,
@@ -244,7 +265,7 @@ class TypeErased {
 
     /// Check if this wrapper wraps an object. False for default-constructed
     /// objects.
-    explicit operator bool() const { return self; }
+    explicit operator bool() const { return self != nullptr; }
 
     /// Get a copy of the allocator.
     allocator_type get_allocator() const { return allocator; }
@@ -268,20 +289,36 @@ class TypeErased {
     }
 
   private:
+    /// Deallocates the storage when destroyed.
+    struct Deallocator {
+        TypeErased *instance;
+        Deallocator(TypeErased *instance) noexcept : instance{instance} {}
+        Deallocator(const Deallocator &)            = delete;
+        Deallocator &operator=(const Deallocator &) = delete;
+        Deallocator(Deallocator &&o) noexcept
+            : instance{std::exchange(o.instance, nullptr)} {}
+        Deallocator &operator=(Deallocator &&) noexcept = delete;
+        void release() noexcept { instance = nullptr; }
+        ~Deallocator() { instance ? instance->deallocate() : void(); }
+    };
+
     /// Ensure that storage is available, either by using the small buffer if
     /// it is large enough, or by calling the allocator.
-    void ensure_storage(size_t size) {
+    /// Returns a RAII wrapper that deallocates the storage unless released.
+    Deallocator allocate(size_t size) {
         assert(!self);
-        self = size <= small_buffer_size ? small_buffer.data()
-                                         : allocator.allocate(size);
+        assert(size != invalid_size);
+        self       = size <= small_buffer_size ? small_buffer.data()
+                                               : allocator.allocate(size);
+        this->size = size;
+        return {this};
     }
-    void ensure_storage() { ensure_storage(vtable.size); }
 
     /// Deallocate the memory without invoking the destructor.
     void deallocate() {
-        if (vtable.size > small_buffer_size)
-            allocator.deallocate(reinterpret_cast<std::byte *>(self),
-                                 vtable.size);
+        assert(size != invalid_size);
+        if (size > small_buffer_size)
+            allocator.deallocate(reinterpret_cast<std::byte *>(self), size);
         self = nullptr;
     }
 
@@ -300,15 +337,15 @@ class TypeErased {
             allocator_traits::propagate_on_container_copy_assignment::value;
         if constexpr (CopyAllocator && prop_alloc)
             allocator = other.allocator;
-        vtable = other.vtable;
-        ensure_storage();
-        try {
-            vtable.copy(other.self, self);
-        } catch (...) {
-            // If copy constructor throws, destructor should not be called
-            deallocate();
-            throw;
-        }
+        if (!other)
+            return;
+        vtable             = other.vtable;
+        auto storage_guard = allocate(other.size);
+        // If copy constructor throws, storage should be released, otherwise
+        // the TypeErased destructor attempts to call the contained object's
+        // destructor, which is undefined behavior if construction failed.
+        vtable.copy(other.self, self);
+        storage_guard.release();
     }
 
     template <bool MoveAllocator>
@@ -317,9 +354,12 @@ class TypeErased {
             allocator_traits::propagate_on_container_move_assignment::value;
         if constexpr (MoveAllocator && prop_alloc)
             allocator = std::move(other.allocator);
+        if (!other)
+            return;
+        size   = other.size;
         vtable = other.vtable;
         // If dynamically allocated, simply steal storage
-        if (vtable.size > small_buffer_size) {
+        if (size > small_buffer_size) {
             // If we can steal the storage because of equal allocators, do so
             if (allocator == other.allocator) {
                 self = std::exchange(other.self, nullptr);
@@ -327,8 +367,7 @@ class TypeErased {
             // If the allocators are not the same, we cannot steal the storage,
             // so do an explicit move
             else {
-                self = allocator.allocate(vtable.size);
-                // TODO: exception safety
+                self = allocator.allocate(size);
                 vtable.move(other.self, self);
                 other.cleanup();
             }
@@ -336,7 +375,6 @@ class TypeErased {
         // Otherwise, use the small buffer and do an explicit move
         else if (other.self) {
             self = small_buffer.data();
-            // TODO: exception safety
             vtable.move(other.self, self);
             other.cleanup();
         }
@@ -347,24 +385,13 @@ class TypeErased {
     template <class T, class... Args>
     void construct_inplace(Args &&...args) {
         // Allocate memory
-        ensure_storage(sizeof(T));
+        auto storage_guard = allocate(sizeof(T));
         // Construct the stored object
-        T *t;
-        try {
-            t = new (self) T{std::forward<Args>(args)...};
-        } catch (...) {
-            deallocate();
-            throw;
-        }
-        // Save the vtable pointers etc.
-        try {
-            vtable = VTable{VTableTypeTag<T>{t}};
-        } catch (...) {
-            t->~T();
-            deallocate();
-            throw;
-        }
-        // TODO: can we clean this up using RAII?
+        using destroyer = std::unique_ptr<T, noop_delete<T>>;
+        destroyer object_guard{new (self) T{std::forward<Args>(args)...}};
+        vtable = VTable{VTableTypeTag<T>{object_guard.get()}};
+        object_guard.release();
+        storage_guard.release();
     }
 
     /// Call the vtable function @p f with the given arguments @p args,

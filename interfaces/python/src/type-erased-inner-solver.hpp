@@ -24,9 +24,9 @@ struct InnerSolverVTable : util::BasicVTable {
     InnerSolverVTable(util::VTableTypeTag<T> t) : util::BasicVTable{t} {
         stop     = util::type_erased_wrapped<&T::stop>();
         get_name = util::type_erased_wrapped<&T::get_name>();
-        call     = [](void *self, const Problem &p, auto... valargs) {
+        call     = []<class... Args>(void *self, const Problem &p, Args... args) {
             constexpr auto call = util::type_erased_wrapped<&T::operator()>();
-            return Stats{call(self, p, valargs...)};
+            return Stats{call(self, p, std::forward<Args>(args)...)};
         };
     }
     InnerSolverVTable() = default;
