@@ -238,6 +238,16 @@ namespace casadi {
               const std::string& lbdz, const std::string& ubdz,
               const std::string& A, const std::string& x_opt, const std::string& dlam, int mode) const;
 
+    void codegen_tr_update(CodeGenerator& cg, const std::string& tr_rad, const std::string& tr_ratio) const;
+    
+    void codegen_eval_m_k(CodeGenerator& cg) const;
+
+    void codegen_eval_tr_ratio(CodeGenerator& cg, const std::string& val_f, const std::string& val_f_corr, const std::string& val_m_k) const;
+
+    void codegen_step_update(CodeGenerator& cg, const std::string& tr_ratio) const;
+
+    void codegen_feasibility_iterations(CodeGenerator& cg, const std::string& tr_rad) const;
+
     // Solve the QP subproblem
     // void codegen_qp_ela_solve(CodeGenerator& cg, const std::string& H, const std::string& g,
     //           const std::string& lbdz, const std::string& ubdz,

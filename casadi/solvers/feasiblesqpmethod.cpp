@@ -1857,7 +1857,7 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
       // Do the feasibility iterations here
       // ret = feasibility_iterations(mem, tr_rad);
       g.comment("Check if step was accepted or not");
-      codegen_feasibility_iterations() << ";\n";
+      codegen_feasibility_iterations(g, "tr_rad");
 
       // Check if step was accepted or not
       // if (ret < 0){
@@ -1892,33 +1892,37 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
       g.comment("Evaluate f");
       g << "m_arg[0] = d.z_feas;\n";
       g << "m_arg[1] = m_p;\n";
-      // g << "m_arg[2] = &one;\n";
       g << "m_res[0] = &m_f_feas;\n";
 
-      g << "tr_ratio = " << codegen_eval_tr_ratio() << ";\n";
-      codegen_tr_update();
+      codegen_eval_tr_ratio(g, "m_f", "m_f_feas", "m_k");
+      codegen_tr_update(g, "tr_rad", "tr_ratio");
 
       g << "if (tr_rad < "<< feas_tol_ << "){\n";
       g << "if (" << print_status_ << "){\n";
       g << "printf(\"MESSAGE: Trust-Region radius smaller than feasibilty!!\");\n";
       g << "break;}";
 
-      g << "step_accepted =" << codegen_step_update() << ";\n";
+      codegen_step_update(g, "tr_ratio");
       g.comment("Close the step acceptance loop");
       g << "}\n";
 
+      // if (!exact_hessian_) {
+      //   // Evaluate the gradient of the Lagrangian with the old x but new lam (for BFGS)
+      //   casadi_copy(d->gf, nx_, d->gLag_old);
+      //   casadi_mv(d->Jk, Asp_, d_nlp->lam+nx_, d->gLag_old, true);
+      //   casadi_axpy(nx_, 1., d_nlp->lam, d->gLag_old);
+      // }
+    // }
+  //   g << "}\n";
 
+  //   return 0;
+  // }
+  //Close next loop
+    g << "}\n";
 
-      if (!exact_hessian_) {
-        // Evaluate the gradient of the Lagrangian with the old x but new lam (for BFGS)
-        casadi_copy(d->gf, nx_, d->gLag_old);
-        casadi_mv(d->Jk, Asp_, d_nlp->lam+nx_, d->gLag_old, true);
-        casadi_axpy(nx_, 1., d_nlp->lam, d->gLag_old);
-      }
-    }
-
-    return 0;
-  }
+    g << "return 0;\n";
+    // Close the loop optimization problem
+    g << "}\n";
 
 
     g << "if (!" << exact_hessian_ << "){\n";
@@ -1927,12 +1931,7 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
     g << g.axpy(nx_, "1.", "d_nlp.lam", "d.gLag_old") << ";\n";
     g << "}\n";
 
-    //Close next loop
-    g << "}\n";
-
-    g << "return 0;\n";
-    // Close the loop optimization problem
-    g << "}\n";
+    
     if (calc_f_ || calc_g_ || calc_lam_x_ || calc_lam_p_) {
       g << "m_arg[0] = d_nlp.z;\n";
       g << "m_arg[1] = m_p;\n";
@@ -1982,7 +1981,7 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
     cg << "if (ret == -1000) return -1000;\n"; // equivalent to raise Exception
   }
 
-  void Feasiblesqpmethod::codegen_tr_update(CodeGenerator& cg, const std::string& tr_rad, const std::string& tr_ratio){
+  void Feasiblesqpmethod::codegen_tr_update(CodeGenerator& cg, const std::string& tr_rad, const std::string& tr_ratio) const{
     //   if (tr_ratio < tr_eta1_){
     //   tr_rad = tr_alpha1_ * casadi_masked_norm_inf(nx_, d->dx, d->tr_mask);
     // } else if (tr_ratio > tr_eta2_ && abs(casadi_masked_norm_inf(nx_, d->dx, d->tr_mask) - tr_rad) < optim_tol_){
@@ -2009,12 +2008,41 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
   cg << "m_k = 0.5*" << cg.bilin("d.Bk", Hsp_, "d.dx", "d.dx") << "+" << cg.dot(nx_, "d.gf", "d.dx") << ";\n";
 }
 
-  void Feasiblesqpmethod::codegen_eval_tr_ratio(CodeGenerator& cg, const std::string& val_f, const std::string& val_f_corr, const std::string& val_m_k){
+  void Feasiblesqpmethod::codegen_eval_tr_ratio(CodeGenerator& cg, const std::string& val_f, const std::string& val_f_corr, const std::string& val_m_k) const{
     // return (val_f - val_f_corr) / (-val_m_k);
     cg << "tr_ratio = " + val_f + "-" + val_f_corr + ") / (-" + val_m_k + ");\n";
   }
 
-  void Feasiblesqpmethod::codegen_feasibility_iterations(CodeGenerator& cg, const std::string& tr_rad){
+  void Feasiblesqpmethod::codegen_step_update(CodeGenerator& cg, const std::string& tr_ratio) const {
+  // auto m = static_cast<FeasiblesqpmethodMemory*>(mem);
+  // auto d_nlp = &m->d_nlp;
+  // auto d = &m->d;
+  
+  // if (tr_ratio > tr_acceptance_){
+  //   // This is not properly implemented yet: d_nlp->z_old = d_mlp->z;
+  //   casadi_copy(d->z_feas, nx_ + ng_, d_nlp->z);
+  //   d_nlp->f = d->f_feas;
+  //   casadi_copy(d->dlam_feas, nx_ + ng_, d_nlp->lam);
+
+  //   uout() << "ACCEPTED" << std::endl;
+  //   return 0;
+  // } else {
+  //   uout() << "REJECTED" << std::endl;
+  //   return -1;
+  // }
+  cg << "if(" + tr_ratio + ">" << tr_acceptance_ << "){\n";
+  cg << cg.copy("d.z_feas", nx_ + ng_, "d_nlp.z") << ";\n";
+  cg << "m_f = m_f_feas;\n";
+  cg << cg.copy("d.dlam_feas", nx_ + ng_, "d_nlp.lam") << ";\n";
+  cg << "printf(\"ACCEPTED\");\n";
+  cg << "ret = 0;\n";
+  cg << "} else {\n";
+  cg << "printf(\"ACCEPTED\");\n";
+  cg << "ret = -1;\n";
+  cg << "}\n";
+}
+
+  void Feasiblesqpmethod::codegen_feasibility_iterations(CodeGenerator& cg, const std::string& tr_rad) const{
   cg.local("ret", "casadi_int");
   cg.init_local("ret", "0");
 
@@ -2049,9 +2077,9 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
   //   // anderson_acc_init_memory(mem, d->dx_feas, d->z_feas);
   //   anderson_acc_init_memory(mem, d->dx_feas, d_nlp->z);
   // }
-  cg << "if (" << use_anderson_ << "){\n";
-  cg << cg.codegen_anderson_acc_init_memory(cg, "d.dx_feas", "d_nlp.z");
-  cg << "}\n";
+  // cg << "if (" << use_anderson_ << "){\n";
+  // cg << cg.codegen_anderson_acc_init_memory(cg, "d.dx_feas", "d_nlp.z");
+  // cg << "}\n";
 
   // Evaluate g
   //   self.g_tmp = self.__eval_g(self.x_tmp)
