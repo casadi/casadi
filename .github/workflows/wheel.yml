@@ -149,6 +149,10 @@ jobs:
           python${{ matrix.python-version }} -m build -w . \
               -C--cross="$PWD/ninja-debug-release.cross.toml" \
               -C--cross="$staging/cmake/$host.py-build-cmake.cross.toml"
+          python${{ matrix.python-version }} -m build -w python/alpaqa-debug \
+              -C--cross="$PWD/ninja-debug-release.cross.toml" \
+              -C--cross="$staging/cmake/$host.py-build-cmake.cross.toml" \
+              -o dist-debug
         env:
           CFLAGS: '-static-libgcc'
           CXXFLAGS: '-static-libgcc -static-libstdc++'
@@ -158,6 +162,11 @@ jobs:
         with:
           name: whl-${{ matrix.pypy }}${{ matrix.python-version }}-linux
           path: dist/*.whl
+      - name: Upload debug Wheels
+        uses: actions/upload-artifact@v3
+        with:
+          name: whl-${{ matrix.pypy }}${{ matrix.python-version }}-debug-linux
+          path: dist-debug/*.whl
 
   build-linux-src:
     runs-on: ubuntu-latest
@@ -407,6 +416,10 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: whl-${{ matrix.pypy }}${{ matrix.python-version }}-linux
+          path: dist
+      - uses: actions/download-artifact@v3
+        with:
+          name: whl-${{ matrix.pypy }}${{ matrix.python-version }}-debug-linux
           path: dist
       - uses: actions/download-artifact@v3
         if: ${{ !matrix.pypy }}
