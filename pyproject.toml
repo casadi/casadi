@@ -29,6 +29,9 @@ docs = [
     "breathe",
     "furo",
 ]
+debug = [
+    "alpaqa-debug==1.0.0a7"
+]
 
 [project.urls]
 "Documentation" = "https://kul-optec.github.io/alpaqa"
@@ -39,7 +42,7 @@ docs = [
 alpaqa = "alpaqa.__main__:main"
 
 [build-system]
-requires = ["py-build-cmake~=0.0.16a2", "pybind11", "pybind11-stubgen"]
+requires = ["py-build-cmake~=0.1.1", "pybind11", "pybind11-stubgen"]
 build-backend = "py_build_cmake.build"
 
 [tool.py-build-cmake.module]
@@ -65,7 +68,6 @@ install_components = ["python_modules", "python_stubs"]
 "ALPAQA_WITH_QUAD_PRECISION:BOOL" = "Off"
 "ALPAQA_WITH_UBSAN_DEBUG:BOOL" = "Off"
 "ALPAQA_WITH_ASAN_DEBUG:BOOL" = "Off"
-"ALPAQA_INCLUDE_DEBUG_INFO:BOOL" = "Off"
 
 [tool.py-build-cmake.linux.cmake]
 config = ["Debug", "Release"]

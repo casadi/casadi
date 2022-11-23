@@ -48,7 +48,6 @@ install(TARGETS _alpaqa
         DESTINATION ${PY_BUILD_CMAKE_MODULE_NAME})
 
 # Strip and install debug information
-option(ALPAQA_INCLUDE_DEBUG_INFO "Include files with debugging symbols" On)
 set(DEBUG_FILE "$<TARGET_FILE_NAME:_alpaqa>.debug")
 if (CMAKE_STRIP AND CMAKE_OBJCOPY)
     add_custom_command(TARGET _alpaqa POST_BUILD
@@ -56,13 +55,11 @@ if (CMAKE_STRIP AND CMAKE_OBJCOPY)
         COMMAND "${CMAKE_STRIP}" "--strip-debug" "$<TARGET_FILE:_alpaqa>"
         COMMAND "${CMAKE_OBJCOPY}" "--add-gnu-debuglink=${DEBUG_FILE}" "$<TARGET_FILE:_alpaqa>"
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
-    if (ALPAQA_INCLUDE_DEBUG_INFO)
-        install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${DEBUG_FILE}"
-            EXCLUDE_FROM_ALL
-            CONFIGURATIONS Debug RelWithDebInfo
-            COMPONENT python_modules
-            DESTINATION ${PY_BUILD_CMAKE_MODULE_NAME})
-    endif()
+    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${DEBUG_FILE}"
+        EXCLUDE_FROM_ALL
+        CONFIGURATIONS Debug RelWithDebInfo
+        COMPONENT python_modules_debug
+        DESTINATION ${PY_BUILD_CMAKE_MODULE_NAME})
 endif()
 
 # Generate stubs for the Python module
