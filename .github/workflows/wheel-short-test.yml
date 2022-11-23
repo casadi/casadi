@@ -1,0 +1,94 @@
+name: Python Wheels tests
+
+on:
+  push:
+    tags-ignore:
+      - '**'
+    branches:
+      - '**'
+
+env:
+  PACKAGE_VERSION: '1.0.0a7'
+  PACKAGE_NAME: alpaqa
+  PYTHON_VERSION: '3.10'
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    container: ubuntu:jammy
+    env:
+      HOST: 'x86_64-centos7-linux-gnu'
+      CMAKE_C_COMPILER_LAUNCHER: ccache
+      CMAKE_CXX_COMPILER_LAUNCHER: ccache
+      CCACHE_DIR: /root/.ccache
+    steps:
+      # Git clone
+      - name: Install git
+        run: apt -y update && apt -y install --no-install-recommends git ca-certificates
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      # Tools
+      - name: Install tools
+        uses: ./.github/workflows/toolchain
+        with:
+          host: ${{ env.HOST }}
+          python-version: ${{ env.PYTHON_VERSION }}
+          pypy: ''
+      # Ccache
+      - name: Prepare ccache directory
+        run: mkdir -p "${{ env.CCACHE_DIR }}"
+      - name: Cache ccache
+        uses: actions/cache@v3
+        with:
+          path: ${{ env.CCACHE_DIR }}
+          key: ${{ runner.os }}-${{ env.PYTHON_VERSION }}-${{ env.HOST }}-ccache-${{ github.run_id }}
+          restore-keys: ${{ runner.os }}-${{ env.PYTHON_VERSION }}-${{ env.HOST }}-ccache
+      # Pip install dependencies
+      - name: Install Python dependencies
+        run: python${{ env.PYTHON_VERSION }} -m pip install -U pip build
+      # Build
+      - name: Build wheel
+        run: |
+          host="${{ env.HOST }}"
+          staging="/opt/$host"
+          cat > ninja-debug.cross.toml <<- EOF
+          [cmake]
+          config = ["Debug"]
+          generator = "Ninja Multi-Config"
+          [cmake.options]
+          CMAKE_FIND_ROOT_PATH = "$staging/pybind11;$staging/eigen;$staging/casadi"
+          USE_GLOBAL_PYBIND11 = "On"
+          EOF
+          python${{ env.PYTHON_VERSION }} -m build -w . \
+              -C--cross="$PWD/ninja-debug.cross.toml" \
+              -C--cross="$staging/cmake/$host.py-build-cmake.cross.toml"
+        env:
+          CFLAGS: '-static-libgcc'
+          CXXFLAGS: '-static-libgcc -static-libstdc++'
+      # Upload
+      - name: Upload Wheels
+        uses: actions/upload-artifact@v3
+        with:
+          name: whl-${{ env.PYTHON_VERSION }}-linux-test
+          path: dist/*.whl
+
+  test-linux:
+    needs: [build-linux]
+    runs-on: ubuntu-latest
+    container: python:3.10-bullseye
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - uses: actions/download-artifact@v3
+        with:
+          name: whl-${{ env.PYTHON_VERSION }}-linux-test
+          path: dist
+      - name: Test
+        run: |
+          python3 -m pip install -U pip pytest cmake ninja
+          python3 -m pip install --find-links=dist ${PACKAGE_NAME}==${PACKAGE_VERSION}
+          pytest -rP
+        env:
+          ALPAQA_PYTHON_DEBUG: "1"

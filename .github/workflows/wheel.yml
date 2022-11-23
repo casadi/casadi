@@ -1,11 +1,7 @@
 name: Python Wheels
 
 on:
-  push:
-    tags-ignore:
-      - '**'
-    branches:
-      - '**'
+  workflow_dispatch:
   release:
     types: ['released', 'prereleased']
 
