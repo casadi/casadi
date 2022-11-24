@@ -257,7 +257,7 @@ namespace casadi {
      * to the min
      
      */
-    std::string CodeGenerator::clip_min(const std::string& x, casadi_int n,
+    std::string clip_min(const std::string& x, casadi_int n,
                                   const std::string& min, const std::string& mask);
 
     /**
@@ -265,28 +265,28 @@ namespace casadi {
      * to the max
      
      */
-    std::string CodeGenerator::clip_max(const std::string& x, casadi_int n,
+    std::string clip_max(const std::string& x, casadi_int n,
                                     const std::string& min, const std::string& mask);
 
     /**
      * @brief Codegen vector_fmax: Takes vectorwise max of a vector and writes
      * the result to second vector
      */
-    std::string CodeGenerator::vector_fmax(casadi_int n, const std::string& x, 
+    std::string vector_fmax(casadi_int n, const std::string& x, 
                                     const std::string& y, const std::string& z);
 
     /**
      * @brief Codegen vector_fmin: Takes vectorwise min of a vector and writes
      * the result to second vector
      */
-    std::string CodeGenerator::vector_fmin(casadi_int n, const std::string& x, 
+    std::string vector_fmin(casadi_int n, const std::string& x, 
                                     const std::string& y, const std::string& z);
 
     /**
      * @brief codegen masked_norm_inf: The mask tells what entry is used in the
      * inf-norm.
      */
-    std::string CodeGenerator::masked_norm_inf(casadi_int n, const std::string& x, 
+    std::string masked_norm_inf(casadi_int n, const std::string& x, 
                                     const std::string& mask);
 
 
@@ -453,7 +453,7 @@ namespace casadi {
     /** 
      * \brief norm_2
     */
-    std::string CodeGenerator::norm_2(casadi_int n, const std::string& x);
+    std::string norm_2(casadi_int n, const std::string& x);
 
     /** \brief max_viol
 
