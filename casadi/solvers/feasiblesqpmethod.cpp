@@ -1601,40 +1601,44 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
         std::string nlp_jac_g = g(get_function("nlp_jac_g"), "m_arg", "m_res", "m_iw", "m_w");
         g << "if (" + nlp_jac_g + ") return 1;\n";
 
-        if (use_sqp_){
-          if (exact_hessian_) {
-            // Update/reset exact Hessian
-            m->arg[0] = d_nlp->z;
-            m->arg[1] = d_nlp->p;
-            m->arg[2] = &one;
-            m->arg[3] = d_nlp->lam + nx_;
-            m->res[0] = d->Bk;
-            if (calc_function(m, "nlp_hess_l")) return 1;
-            if (convexify_) {
-              ScopedTiming tic(m->fstats.at("convexify"));
-              if (convexify_eval(&convexify_data_.config, d->Bk, d->Bk, m->iw, m->w)) return 1;
-            }
-          } else if (m->iter_count==0) {
-            ScopedTiming tic(m->fstats.at("BFGS"));
-            // Initialize BFGS
-            casadi_fill(d->Bk, Hsp_.nnz(), 1.);
-            casadi_bfgs_reset(Hsp_, d->Bk);
-          } else {
-            ScopedTiming tic(m->fstats.at("BFGS"));
-            // Update BFGS
-            if (m->iter_count % lbfgs_memory_ == 0) casadi_bfgs_reset(Hsp_, d->Bk);
-            // Update the Hessian approximation
-            casadi_bfgs(Hsp_, d->Bk, d->dx, d->gLag, d->gLag_old, m->w);
-          }
+        // if (use_sqp_){
+        //   if (exact_hessian_) {
+        //     // Update/reset exact Hessian
+        //     m->arg[0] = d_nlp->z;
+        //     m->arg[1] = d_nlp->p;
+        //     m->arg[2] = &one;
+        //     m->arg[3] = d_nlp->lam + nx_;
+        //     m->res[0] = d->Bk;
+        //     if (calc_function(m, "nlp_hess_l")) return 1;
+        //     if (convexify_) {
+        //       ScopedTiming tic(m->fstats.at("convexify"));
+        //       if (convexify_eval(&convexify_data_.config, d->Bk, d->Bk, m->iw, m->w)) return 1;
+        //     }
+        //   } else if (m->iter_count==0) {
+        //     ScopedTiming tic(m->fstats.at("BFGS"));
+        //     // Initialize BFGS
+        //     casadi_fill(d->Bk, Hsp_.nnz(), 1.);
+        //     casadi_bfgs_reset(Hsp_, d->Bk);
+        //   } else {
+        //     ScopedTiming tic(m->fstats.at("BFGS"));
+        //     // Update BFGS
+        //     if (m->iter_count % lbfgs_memory_ == 0) casadi_bfgs_reset(Hsp_, d->Bk);
+        //     // Update the Hessian approximation
+        //     casadi_bfgs(Hsp_, d->Bk, d->dx, d->gLag, d->gLag_old, m->w);
+        //   }
 
-          // test if initialization is feasible
-          if (casadi_max_viol(nx_ + ng_, d_nlp->z, d_nlp->lbz, d_nlp->ubz) > feas_tol_){
-            if (print_status_) print("MESSAGE(feasiblesqpmethod): No feasible initialization given! "
-                "Find feasible initialization.\n");
-            m->return_status = "No_Feasible_Initialization";
-            break;
-          }
-        }
+        // }
+        // test if initialization is feasible
+        // if (casadi_max_viol(nx_ + ng_, d_nlp->z, d_nlp->lbz, d_nlp->ubz) > feas_tol_){
+        //   if (print_status_) print("MESSAGE(feasiblesqpmethod): No feasible initialization given! "
+        //       "Find feasible initialization.\n");
+        //   m->return_status = "No_Feasible_Initialization";
+        //   break;
+        // }
+        g << "if (casadi_max_viol(" + str(nx_+ ng_) +", d_nlp->z, d_nlp->lbz, d_nlp->ubz) > feas_tol_){\n";
+        g << "printf(\"MESSAGE(feasiblesqpmethod): No feasible initialization given! Find feasible initialization.\")\n";
+        g << "break;\n";
+        g << "}\n";
         
       // } else if (step_accepted == 0){
       g << "} else if (step_accepted == 0){\n";
@@ -1741,13 +1745,13 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
       g << "dx_norminf = " << g.norm_inf(nx_, "d.dx") << ";\n";
 
       // Printing information about the actual iterate
-      if (print_iteration_) {
-        // if (m->iter_count % 10 == 0) print_iteration();
-        print_iteration();
-        print_iteration(m->iter_count, d_nlp->f, m_k, tr_ratio,
-                        pr_inf, du_inf, dx_norminf, m->reg, tr_rad_prev, info);
-        info = "";
-      }
+      // if (print_iteration_) {
+      //   // if (m->iter_count % 10 == 0) print_iteration();
+      //   print_iteration();
+      //   print_iteration(m->iter_count, d_nlp->f, m_k, tr_ratio,
+      //                   pr_inf, du_inf, dx_norminf, m->reg, tr_rad_prev, info);
+      //   info = "";
+      // }
 
       // tr_rad_prev = tr_rad;
       g << "tr_rad_prev = tr_rad;\n";
@@ -1831,7 +1835,7 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
       // m_k = eval_m_k(mem);
 
       g.comment("Eval quadratic model and check for convergence");
-      codegen_eval_m_k();
+      codegen_eval_m_k(g);
 
       // if (fabs(m_k) < optim_tol_) {
       //   if (print_status_)
@@ -1887,7 +1891,7 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
 
       g << "if (ret < 0) {\n";
       g << "printf(\"Rejected inner iterates\");\n";
-      g << "tr_rad = 0.5" << g.masked_norm_inf() << ";\n";
+      g << "tr_rad = 0.5" << g.masked_norm_inf(nx_, "d.dx", "d.tr_mask") << ";\n";
       g << "} else {\n";
       g.comment("Evaluate f");
       g << "m_arg[0] = d.z_feas;\n";
@@ -1991,9 +1995,9 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
     
     cg << "if (tr_ratio < " << tr_eta1_ << "){\n";
     cg << "tr_rad = " << tr_alpha1_ <<"*" << cg.masked_norm_inf(nx_, "d.dx", "d.tr_mask") << ";\n";
-    cg << "} else if (tr_ratio > " << tr_eta2_ << "&& abs(" << cg.masked_norm_inf(nx_, "d.dx", "d.tr_mask") << " - tr_rad) < " << optim_tol_ " ){\n";
-    cg << "tr_rad = " cg.fmin(str(tr_alpha2_)+"*tr_rad", str(tr_rad_max_)) ";";
-    cg << "}";
+    cg << "} else if (tr_ratio > " << tr_eta2_ << "&& abs(" << cg.masked_norm_inf(nx_, "d.dx", "d.tr_mask") << " - tr_rad) < " << optim_tol_ << " ){\n";
+    cg << "tr_rad = " << cg.fmin(str(tr_alpha2_)+"*tr_rad", str(tr_rad_max_)) << ";\n";
+    cg << "}\n";
     cg.comment("else: keep trust-region as it is....");
   }
 
@@ -2179,7 +2183,7 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
     // }
     cg.comment("Just SQP implemented so far!");
     // cg << "if (" << use_sqp_ << "){\n";
-    cg << cg.mv("d.Bk", Hsp_, "d.z_tmp", "d.gf_feas") << ";\n";
+    cg << cg.mv("d.Bk", Hsp_, "d.z_tmp", "d.gf_feas", true) << ";\n";
     // cg << "}\n";
 
     // create bounds of correction QP -----------------------------

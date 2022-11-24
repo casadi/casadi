@@ -960,6 +960,18 @@ namespace casadi {
       add_auxiliary(AUX_FMAX);
       this->auxiliaries << sanitize_source(casadi_norm_inf_str, inst);
       break;
+    case AUX_VECTOR_FMAX:
+      add_auxiliary(AUX_FMAX);
+      this->auxiliaries << sanitize_source(casadi_vector_fmax_str, inst);
+      break;
+    case AUX_VECTOR_FMIN:
+      add_auxiliary(AUX_FMIN);
+      this->auxiliaries << sanitize_source(casadi_vector_fmin_str, inst);
+      break;
+    case AUX_MASKED_NORM_INF:
+      add_auxiliary(AUX_FMAX);
+      this->auxiliaries << sanitize_source(casadi_masked_norm_inf_str, inst);
+      break;
     case AUX_CLEAR:
       this->auxiliaries << sanitize_source(casadi_clear_str, inst);
       break;
@@ -1588,6 +1600,18 @@ namespace casadi {
     return "casadi_clip_max(" + x + ", " + str(n) + ", " + min + ", " + mask + ");";
   }
 
+  string CodeGenerator::vector_fmax(casadi_int n, const string& x,
+                                  const string& y, const string& z) {
+    add_auxiliary(AUX_VECTOR_FMAX);
+    return "casadi_vector_fmax(" + x + ", " + str(n) + ", " + y + ", " + y + ");";
+  }
+
+  string CodeGenerator::vector_fmin(casadi_int n, const string& x,
+                                  const string& y, const string& z) {
+    add_auxiliary(AUX_VECTOR_FMIN);
+    return "casadi_vector_fmin(" + x + ", " + str(n) + ", " + y + ", " + y + ");";
+  }
+
   string CodeGenerator::masked_norm_inf(casadi_int n, const string& x, 
                                   const string& mask) {
     add_auxiliary(AUX_MASKED_NORM_INF);
@@ -1982,6 +2006,12 @@ namespace casadi {
   norm_inf(casadi_int n, const std::string& x) {
     add_auxiliary(CodeGenerator::AUX_NORM_INF);
     return "casadi_norm_inf(" + str(n) + ", " + x + ")";
+  }
+
+  std::string CodeGenerator::
+  norm_2(casadi_int n, const std::string& x) {
+    add_auxiliary(CodeGenerator::AUX_NORM_2);
+    return "casadi_norm_2(" + str(n) + ", " + x + ")";
   }
 
   std::string CodeGenerator::

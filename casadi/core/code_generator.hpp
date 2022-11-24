@@ -252,7 +252,45 @@ namespace casadi {
     std::string axpy(casadi_int n, const std::string& a,
                      const std::string& x, const std::string& y);
 
-    /** \brief Codegen axpy: x *= alpha
+    /**
+     * @brief Codegen clip_min: Clips the smaller entries in a vector than min
+     * to the min
+     
+     */
+    string CodeGenerator::clip_min(const string& x, casadi_int n,
+                                  const string& min, const string& mask);
+
+    /**
+     * @brief Codegen clip_max: Clips the larger entries in a vector than max
+     * to the max
+     
+     */
+    string CodeGenerator::clip_max(const string& x, casadi_int n,
+                                    const string& min, const string& mask);
+
+    /**
+     * @brief Codegen vector_fmax: Takes vectorwise max of a vector and writes
+     * the result to second vector
+     */
+    string CodeGenerator::vector_fmax(casadi_int n, const string& x, 
+                                    const string& y, const string& y);
+
+    /**
+     * @brief Codegen vector_fmin: Takes vectorwise min of a vector and writes
+     * the result to second vector
+     */
+    string CodeGenerator::vector_fmin(casadi_int n, const string& x, 
+                                    const string& y, const string& y);
+
+    /**
+     * @brief codegen masked_norm_inf: The mask tells what entry is used in the
+     * inf-norm.
+     */
+    string CodeGenerator::masked_norm_inf(casadi_int n, const string& x, 
+                                    const string& mask);
+
+
+    /** \brief What does scal do??
 
         \identifier{sq} */
     std::string scal(casadi_int n, const std::string& alpha, const std::string& x);
@@ -412,6 +450,11 @@ namespace casadi {
         \identifier{te} */
     std::string norm_inf(casadi_int n, const std::string& x);
 
+    /** 
+     * \brief norm_2
+    */
+    std::string CodeGenerator::norm_2(casadi_int n, const std::string& x);
+
     /** \brief max_viol
 
         \identifier{tf} */
@@ -477,7 +520,12 @@ namespace casadi {
       AUX_RANK1,
       AUX_NORM_1,
       AUX_NORM_2,
+      AUX_CLIP_MAX,
+      AUX_CLIP_MIN,
+      AUX_VECTOR_FMAX,
+      AUX_VECTOR_FMIN,
       AUX_NORM_INF,
+      AUX_MASKED_NORM_INF,
       AUX_IAMAX,
       AUX_CLEAR,
       AUX_FILL,
