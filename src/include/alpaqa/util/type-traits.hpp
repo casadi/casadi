@@ -1,5 +1,7 @@
 #pragma once
 
+#include <concepts>
+#include <memory>
 #include <type_traits>
 
 namespace alpaqa::util {
@@ -34,5 +36,23 @@ struct last_type<Only> {
 };
 template <class... Pack>
 using last_type_t = typename last_type<Pack...>::type;
+
+template <class... Pack>
+struct first_type_or_void;
+template <class First, class... Pack>
+struct first_type_or_void<First, Pack...> {
+    using type = First;
+};
+template <>
+struct first_type_or_void<> {
+    using type = void;
+};
+template <class... Pack>
+using first_type_or_void_t = typename first_type_or_void<Pack...>::type;
+
+template <class... Pack>
+concept no_leading_allocator = !
+std::is_same_v<std::remove_cvref_t<first_type_or_void_t<Pack...>>,
+               std::allocator_arg_t>;
 
 } // namespace alpaqa::util
