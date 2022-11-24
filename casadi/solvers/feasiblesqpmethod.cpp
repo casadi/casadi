@@ -1653,7 +1653,7 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
         g << "m_arg[0] = d_nlp.z;\n";
         g << "m_arg[1] = m_p;\n";
         g << "m_res[0] = d.gf;\n";
-        std::string nlp_grad_f = g(get_function("nlp_grad_f"), "m_arg", "m_res", "m_iw", "m_w");
+        nlp_grad_f = g(get_function("nlp_grad_f"), "m_arg", "m_res", "m_iw", "m_w");
         g << "if (" + nlp_grad_f + ") return 1;\n";
         
         // Evaluate jac_g
@@ -1676,7 +1676,7 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
         g << "m_arg[0] = d_nlp.z;\n";
         g << "m_arg[1] = m_p;\n";
         g << "m_res[0] = d.Jk;\n";
-        std::string nlp_jac_g = g(get_function("nlp_jac_g"), "m_arg", "m_res", "m_iw", "m_w");
+        nlp_jac_g = g(get_function("nlp_jac_g"), "m_arg", "m_res", "m_iw", "m_w");
         g << "if (" + nlp_jac_g + ") return 1;\n";
 
         // if (use_sqp_){
@@ -2270,7 +2270,7 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
     cg << "m_arg[0] = d_nlp.z;\n";
     cg << "m_arg[1] = m_p;\n";
     cg << "m_res[0] = d_nlp.z+" + str(nx_) + ";\n";
-    std::string nlp_g = cg(get_function("nlp_g"), "m_arg", "m_res", "m_iw", "m_w");
+    nlp_g = cg(get_function("nlp_g"), "m_arg", "m_res", "m_iw", "m_w");
     cg << "if (" + nlp_g + ") return 1;\n";
 
     // prev_infeas = casadi_max_viol(nx_+ng_, d->z_feas, d_nlp->lbz, d_nlp->ubz);
