@@ -257,37 +257,37 @@ namespace casadi {
      * to the min
      
      */
-    std::string CodeGenerator::clip_min(const string& x, casadi_int n,
-                                  const string& min, const string& mask);
+    std::string CodeGenerator::clip_min(const std::string& x, casadi_int n,
+                                  const std::string& min, const std::string& mask);
 
     /**
      * @brief Codegen clip_max: Clips the larger entries in a vector than max
      * to the max
      
      */
-    std::string CodeGenerator::clip_max(const string& x, casadi_int n,
-                                    const string& min, const string& mask);
+    std::string CodeGenerator::clip_max(const std::string& x, casadi_int n,
+                                    const std::string& min, const std::string& mask);
 
     /**
      * @brief Codegen vector_fmax: Takes vectorwise max of a vector and writes
      * the result to second vector
      */
-    std::string CodeGenerator::vector_fmax(casadi_int n, const string& x, 
-                                    const string& y, const string& z);
+    std::string CodeGenerator::vector_fmax(casadi_int n, const std::string& x, 
+                                    const std::string& y, const std::string& z);
 
     /**
      * @brief Codegen vector_fmin: Takes vectorwise min of a vector and writes
      * the result to second vector
      */
-    std::string CodeGenerator::vector_fmin(casadi_int n, const string& x, 
-                                    const string& y, const string& z);
+    std::string CodeGenerator::vector_fmin(casadi_int n, const std::string& x, 
+                                    const std::string& y, const std::string& z);
 
     /**
      * @brief codegen masked_norm_inf: The mask tells what entry is used in the
      * inf-norm.
      */
-    std::string CodeGenerator::masked_norm_inf(casadi_int n, const string& x, 
-                                    const string& mask);
+    std::string CodeGenerator::masked_norm_inf(casadi_int n, const std::string& x, 
+                                    const std::string& mask);
 
 
     /** \brief What does scal do??
