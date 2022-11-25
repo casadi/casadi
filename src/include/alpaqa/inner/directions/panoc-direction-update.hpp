@@ -36,6 +36,10 @@ struct PANOCDirection {
     void initialize(const Problem &problem, crvec y, crvec Σ, real_t γ_0,
                     crvec x_0, crvec x̂_0, crvec p_0, crvec grad_ψx_0) = delete;
 
+    /// Return whether a direction is available on the very first iteration,
+    /// before the first call to @ref update.
+    bool has_initial_direction() const = delete;
+
     /// Update the direction provider when accepting the next iterate.
     ///
     /// @param[in]  γₖ

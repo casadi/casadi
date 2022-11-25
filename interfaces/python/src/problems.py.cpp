@@ -122,8 +122,8 @@ void register_problems(py::module_ &m) {
             [](const BoxConstrProblem &prob, real_t γ, crvec x, crvec grad_ψ) {
                 vec x̂(prob.get_n());
                 vec p(prob.get_n());
-                prob.eval_prox_grad_step(γ, x, grad_ψ, x̂, p);
-                return std::make_tuple(std::move(x̂), std::move(p));
+                real_t hx̂ = prob.eval_prox_grad_step(γ, x, grad_ψ, x̂, p);
+                return std::make_tuple(std::move(x̂), std::move(p), hx̂);
             },
             "γ"_a, "x"_a, "grad_ψ"_a)
         .def("get_box_C", &BoxConstrProblem::get_box_C)
@@ -138,7 +138,7 @@ void register_problems(py::module_ &m) {
         // clang-format off
         void eval_proj_diff_g(crvec z, rvec p) const { o.attr("eval_proj_diff_g")(z, p); }
         void eval_proj_multipliers(rvec y, real_t M, index_t penalty_alm_split) const { o.attr("eval_proj_multipliers")(y, M, penalty_alm_split); }
-        void eval_prox_grad_step(real_t γ, crvec x, crvec grad_ψ, rvec x̂, rvec p) const { o.attr("eval_prox_grad_step")(γ, x, grad_ψ, x̂, p); }
+        real_t eval_prox_grad_step(real_t γ, crvec x, crvec grad_ψ, rvec x̂, rvec p) const { return py::cast<real_t>(o.attr("eval_prox_grad_step")(γ, x, grad_ψ, x̂, p)); }
         real_t eval_f(crvec x) const { return py::cast<real_t>(o.attr("eval_f")(x)); }
         void eval_grad_f(crvec x, rvec grad_fx) const { o.attr("eval_grad_f")(x, grad_fx); }
         void eval_g(crvec x, rvec gx) const { o.attr("eval_g")(x, gx); }
@@ -243,8 +243,8 @@ void register_problems(py::module_ &m) {
             [](const TEProblem &prob, real_t γ, crvec x, crvec grad_ψ) {
                 vec x̂(prob.get_n());
                 vec p(prob.get_n());
-                prob.eval_prox_grad_step(γ, x, grad_ψ, x̂, p);
-                return std::make_tuple(std::move(x̂), std::move(p));
+                real_t hx̂ = prob.eval_prox_grad_step(γ, x, grad_ψ, x̂, p);
+                return std::make_tuple(std::move(x̂), std::move(p), hx̂);
             },
             "γ"_a, "x"_a, "grad_ψ"_a)
         .def(

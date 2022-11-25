@@ -21,6 +21,8 @@ struct PANOCDirectionVTable : util::BasicVTable {
         initialize = nullptr;
     required_function_t<bool(real_t γₖ, real_t γₙₑₓₜ, crvec xₖ, crvec xₙₑₓₜ, crvec pₖ, crvec pₙₑₓₜ, crvec grad_ψxₖ, crvec grad_ψxₙₑₓₜ)>
         update = nullptr;
+    required_const_function_t<bool()>
+        has_initial_direction = nullptr;
     required_const_function_t<bool(real_t γₖ, crvec xₖ, crvec x̂ₖ, crvec pₖ, crvec grad_ψxₖ, rvec qₖ)>
         apply = nullptr;
     required_function_t<void(real_t γₖ, real_t old_γₖ)>
@@ -33,12 +35,13 @@ struct PANOCDirectionVTable : util::BasicVTable {
 
     template <class T>
     PANOCDirectionVTable(util::VTableTypeTag<T> t) : util::BasicVTable{t} {
-        initialize = util::type_erased_wrapped<&T::initialize>();
-        update     = util::type_erased_wrapped<&T::update>();
-        apply      = util::type_erased_wrapped<&T::apply>();
-        changed_γ  = util::type_erased_wrapped<&T::changed_γ>();
-        reset      = util::type_erased_wrapped<&T::reset>();
-        get_name   = util::type_erased_wrapped<&T::get_name>();
+        initialize            = util::type_erased_wrapped<&T::initialize>();
+        update                = util::type_erased_wrapped<&T::update>();
+        has_initial_direction = util::type_erased_wrapped<&T::has_initial_direction>();
+        apply                 = util::type_erased_wrapped<&T::apply>();
+        changed_γ             = util::type_erased_wrapped<&T::changed_γ>();
+        reset                 = util::type_erased_wrapped<&T::reset>();
+        get_name              = util::type_erased_wrapped<&T::get_name>();
     }
     PANOCDirectionVTable() = default;
 };
@@ -75,6 +78,10 @@ class TypeErasedPANOCDirection
     template <class... Args>
     decltype(auto) update(Args &&...args) {
         return call(vtable.update, std::forward<Args>(args)...);
+    }
+    template <class... Args>
+    decltype(auto) has_initial_direction(Args &&...args) const {
+        return call(vtable.has_initial_direction, std::forward<Args>(args)...);
     }
     template <class... Args>
     decltype(auto) apply(Args &&...args) const {

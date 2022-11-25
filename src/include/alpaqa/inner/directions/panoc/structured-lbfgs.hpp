@@ -33,6 +33,9 @@ struct StructuredLBFGS {
     void initialize(const Problem &problem, crvec y, crvec Σ, real_t γ_0,
                     crvec x_0, crvec x̂_0, crvec p_0, crvec grad_ψx_0);
 
+    /// @see @ref PANOCDirection::has_initial_direction
+    bool has_initial_direction() const { return false; }
+
     /// @see @ref PANOCDirection::update
     bool update([[maybe_unused]] real_t γₖ, [[maybe_unused]] real_t γₙₑₓₜ,
                 crvec xₖ, crvec xₙₑₓₜ, [[maybe_unused]] crvec pₖ,

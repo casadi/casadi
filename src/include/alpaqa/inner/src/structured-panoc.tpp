@@ -197,7 +197,7 @@ auto StructuredPANOCLBFGSSolver<Conf>::operator()(
         problem.eval_grad_ψ_from_ŷ(x, ŷ, grad_ψ, work_n);
     };
     auto calc_x̂ = [&problem](real_t γ, crvec x, crvec grad_ψ, rvec x̂, rvec p) {
-        problem.eval_prox_grad_step(γ, x, grad_ψ, x̂, p);
+        return problem.eval_prox_grad_step(γ, x, grad_ψ, x̂, p);
     };
     auto proj_grad_step = [&problem, &work_n, &work_n2](real_t γ, crvec x,
                                                         crvec grad_ψ) -> rvec {

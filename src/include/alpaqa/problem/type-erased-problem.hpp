@@ -45,7 +45,7 @@ struct ProblemVTable : util::BasicVTable {
         eval_proj_diff_g;
     required_const_function_t<void(rvec y, real_t M, index_t penalty_alm_split)>
         eval_proj_multipliers;
-    required_const_function_t<void(real_t γ, crvec x, crvec grad_ψ, rvec x̂, rvec p)>
+    required_const_function_t<real_t(real_t γ, crvec x, crvec grad_ψ, rvec x̂, rvec p)>
         eval_prox_grad_step;
     required_const_function_t<real_t(crvec x)>
         eval_f;
@@ -364,9 +364,11 @@ class TypeErasedProblem : public util::TypeErased<ProblemVTable<Conf>, Allocator
     /// @param  [out] p
     ///         The proximal gradient step,
     ///         @f$ p = \hat x - x \in \R^n @f$
+    /// @return The nonsmooth function evaluated at x̂,
+    ///         @f$ h(\hat x) @f$.
     /// @note   The vector @f$ p @f$ is often used in stopping criteria, so its
     ///         numerical accuracy is more important than that of @f$ \hat x @f$.
-    void eval_prox_grad_step(real_t γ, crvec x, crvec grad_ψ, rvec x̂, rvec p) const;
+    real_t eval_prox_grad_step(real_t γ, crvec x, crvec grad_ψ, rvec x̂, rvec p) const;
 
     /// Function that evaluates the cost, @f$ f(x) @f$
     /// @param  [in] x
@@ -630,8 +632,8 @@ void TypeErasedProblem<Conf, Allocator>::eval_proj_multipliers(rvec y, real_t M,
     return call(vtable.eval_proj_multipliers, y, M, penalty_alm_split);
 }
 template <Config Conf, class Allocator>
-void TypeErasedProblem<Conf, Allocator>::eval_prox_grad_step(real_t γ, crvec x, crvec grad_ψ,
-                                                             rvec x̂, rvec p) const {
+auto TypeErasedProblem<Conf, Allocator>::eval_prox_grad_step(real_t γ, crvec x, crvec grad_ψ,
+                                                             rvec x̂, rvec p) const -> real_t {
     return call(vtable.eval_prox_grad_step, γ, x, grad_ψ, x̂, p);
 }
 template <Config Conf, class Allocator>
@@ -730,7 +732,7 @@ struct ProblemWithCounters {
     // clang-format off
     void eval_proj_diff_g(crvec z, rvec p) const { ++evaluations->proj_diff_g; return timed(evaluations->time.proj_diff_g, std::bind(&std::remove_cvref_t<Problem>::eval_proj_diff_g, &problem, z, p)); }
     void eval_proj_multipliers(rvec y, real_t M, index_t penalty_alm_split) const { ++evaluations->proj_multipliers; return timed(evaluations->time.proj_multipliers, std::bind(&std::remove_cvref_t<Problem>::eval_proj_multipliers, &problem, y, M, penalty_alm_split)); }
-    void eval_prox_grad_step(real_t γ, crvec x, crvec grad_ψ, rvec x̂, rvec p) const { ++evaluations->prox_grad_step; return timed(evaluations->time.prox_grad_step, std::bind(&std::remove_cvref_t<Problem>::eval_prox_grad_step, &problem, γ, x, grad_ψ, x̂, p)); }
+    real_t eval_prox_grad_step(real_t γ, crvec x, crvec grad_ψ, rvec x̂, rvec p) const { ++evaluations->prox_grad_step; return timed(evaluations->time.prox_grad_step, std::bind(&std::remove_cvref_t<Problem>::eval_prox_grad_step, &problem, γ, x, grad_ψ, x̂, p)); }
     real_t eval_f(crvec x) const { ++evaluations->f; return timed(evaluations->time.f, std::bind(&std::remove_cvref_t<Problem>::eval_f, &problem, x)); }
     void eval_grad_f(crvec x, rvec grad_fx) const { ++evaluations->grad_f; return timed(evaluations->time.grad_f, std::bind(&std::remove_cvref_t<Problem>::eval_grad_f, &problem, x, grad_fx)); }
     void eval_g(crvec x, rvec gx) const { ++evaluations->g; return timed(evaluations->time.g, std::bind(&std::remove_cvref_t<Problem>::eval_g, &problem, x, gx)); }
@@ -835,18 +837,19 @@ class BoxConstrProblem {
 
     /// @f$ \hat x = \Pi_C(x - \gamma\nabla\psi(x)) @f$
     /// @f$ p = \hat x - x @f$
-    static void eval_proj_grad_step_box(const Box &C, real_t γ, crvec x, crvec grad_ψ, rvec x̂,
-                                        rvec p) {
+    static real_t eval_proj_grad_step_box(const Box &C, real_t γ, crvec x, crvec grad_ψ, rvec x̂,
+                                          rvec p) {
         using binary_real_f = real_t (*)(real_t, real_t);
         p                   = (-γ * grad_ψ)
                 .binaryExpr(C.lowerbound - x, binary_real_f(std::fmax))
                 .binaryExpr(C.upperbound - x, binary_real_f(std::fmin));
         x̂ = x + p;
+        return real_t{0};
     }
 
     /// @see @ref TypeErasedProblem::eval_prox_grad_step
-    void eval_prox_grad_step(real_t γ, crvec x, crvec grad_ψ, rvec x̂, rvec p) const {
-        eval_proj_grad_step_box(C, γ, x, grad_ψ, x̂, p);
+    real_t eval_prox_grad_step(real_t γ, crvec x, crvec grad_ψ, rvec x̂, rvec p) const {
+        return eval_proj_grad_step_box(C, γ, x, grad_ψ, x̂, p);
     }
 
     /// @see @ref TypeErasedProblem::eval_proj_diff_g

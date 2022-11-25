@@ -333,14 +333,16 @@ auto PANOCOCPSolver<Conf>::operator()(
             eval_forward(*it);
             eval_backward(*it, do_gn_step);
             // Select a small step h for finite differences
-            // TODO: remove abs
-            auto h        = (it->grad_ψ * -ε).cwiseAbs().cwiseMax(δ);
+            auto h = (it->grad_ψ * ε)
+                         .cwiseAbs()
+                         .cwiseMax(δ)
+                         .cwiseProduct(it->grad_ψ.cwiseSign());
             real_t norm_h = h.norm();
-            // work_xu = xu + h
+            // work_xu = xu - h
             for (index_t t = 0; t < N; ++t)
                 eval.uk(work_xu, t) =
-                    eval.uk(it->xu, t) + h.segment(t * nu, nu);
-            // Calculate ψ(x₀ + h)
+                    eval.uk(it->xu, t) - h.segment(t * nu, nu);
+            // Calculate ψ(x₀ - h)
             eval.forward_simulate(work_xu); // needed for backwards sweep
             // Calculate ∇ψ(x₀ + h)
             eval.backward(work_xu, work_grad_ψ, work_p, work_w);
@@ -597,34 +599,39 @@ auto PANOCOCPSolver<Conf>::operator()(
 
         // Line search ---------------------------------------------------------
 
-        next->γ = curr->γ;
-        next->L = curr->L;
-        τ       = τ_init;
+        next->γ       = curr->γ;
+        next->L       = curr->L;
+        τ             = τ_init;
+        real_t τ_prev = -1;
 
         while (!stop_signal.stop_requested()) {
 
-            // xₖ₊₁ = xₖ + (1-τ) pₖ + τ qₖ
-            if (τ == 0) {
-                next->xu = curr->xû;
-                next->ψu = curr->ψû;
-                // Calculate ∇ψ(xₖ₊₁)
-                curr->have_jacobians = false;
-                eval_backward(*next, do_gn_step);
-            } else {
-                if (τ == 1) {
-                    next->xu = curr->xu + qxuₖ;
+            // Recompute step only if τ changed
+            if (τ != τ_prev) {
+                // xₖ₊₁ = xₖ + (1-τ) pₖ + τ qₖ
+                if (τ == 0) {
+                    next->xu = curr->xû;
+                    next->ψu = curr->ψû;
+                    // Calculate ∇ψ(xₖ₊₁)
+                    curr->have_jacobians = false;
+                    eval_backward(*next, do_gn_step);
                 } else {
-                    do_gn_step = do_next_gn;
-                    for (index_t t = 0; t < N; ++t)
-                        eval.uk(next->xu, t) =
-                            eval.uk(curr->xu, t) +
-                            (1 - τ) * curr->p.segment(t * nu, nu) +
-                            τ * eval.uk(qxuₖ, t);
+                    if (τ == 1) {
+                        next->xu = curr->xu + qxuₖ;
+                    } else {
+                        do_gn_step = do_next_gn;
+                        for (index_t t = 0; t < N; ++t)
+                            eval.uk(next->xu, t) =
+                                eval.uk(curr->xu, t) +
+                                (1 - τ) * curr->p.segment(t * nu, nu) +
+                                τ * eval.uk(qxuₖ, t);
+                    }
+                    // Calculate ψ(xₖ₊₁), ∇ψ(xₖ₊₁)
+                    eval_forward(*next); // Not necessary for DDP
+                    curr->have_jacobians = false;
+                    eval_backward(*next, do_gn_step);
                 }
-                // Calculate ψ(xₖ₊₁), ∇ψ(xₖ₊₁)
-                eval_forward(*next); // Not necessary for DDP
-                curr->have_jacobians = false;
-                eval_backward(*next, do_gn_step);
+                τ_prev = τ;
             }
 
             // Calculate x̂ₖ₊₁, ψ(x̂ₖ₊₁)

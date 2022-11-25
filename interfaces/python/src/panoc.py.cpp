@@ -45,8 +45,6 @@ struct dict_to_struct_table<alpaqa::PANOCParams<Conf>> {
         {"print_precision", &alpaqa::PANOCParams<Conf>::print_precision},
         {"quadratic_upperbound_tolerance_factor", &alpaqa::PANOCParams<Conf>::quadratic_upperbound_tolerance_factor},
         {"linesearch_tolerance_factor", &alpaqa::PANOCParams<Conf>::linesearch_tolerance_factor},
-        {"update_lipschitz_in_linesearch", &alpaqa::PANOCParams<Conf>::update_lipschitz_in_linesearch},
-        {"alternative_linesearch_cond", &alpaqa::PANOCParams<Conf>::alternative_linesearch_cond},
         // clang-format on
     };
 };
@@ -117,6 +115,10 @@ void register_panoc(py::module_ &m) {
                     alpaqa::ScopedMallocAllower ma;
                     return py::cast<bool>(
                         o.attr("update")(γₖ, γₙₑₓₜ, xₖ, xₙₑₓₜ, pₖ, pₙₑₓₜ, grad_ψxₖ, grad_ψxₙₑₓₜ));
+                }
+                bool has_initial_direction() const {
+                    alpaqa::ScopedMallocAllower ma;
+                    return py::cast<bool>(o.attr("has_initial_direction")());
                 }
                 bool apply(real_t γₖ, crvec xₖ, crvec x̂ₖ, crvec pₖ, crvec grad_ψxₖ, rvec qₖ) const {
                     alpaqa::ScopedMallocAllower ma;
@@ -259,8 +261,6 @@ void register_panoc(py::module_ &m) {
         .def_readwrite("print_precision", &PANOCParams::print_precision)
         .def_readwrite("quadratic_upperbound_tolerance_factor", &PANOCParams::quadratic_upperbound_tolerance_factor)
         .def_readwrite("linesearch_tolerance_factor", &PANOCParams::linesearch_tolerance_factor)
-        .def_readwrite("update_lipschitz_in_linesearch", &PANOCParams::update_lipschitz_in_linesearch)
-        .def_readwrite("alternative_linesearch_cond", &PANOCParams::alternative_linesearch_cond)
         // clang-format on
         ;
 

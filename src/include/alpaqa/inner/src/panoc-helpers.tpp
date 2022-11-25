@@ -333,12 +333,12 @@ struct PANOCHelpers {
         /// [in]    Problem description
         const Problem &problem,
         /// [in]    Current iterate @f$ x^k @f$
-        crvec xₖ,
+        crvec x,
         /// [in]    Lagrange multipliers @f$ y @f$
         crvec y,
         /// [in]    Penalty weights @f$ \Sigma @f$
         crvec Σ,
-        /// [in]    Finite difference step size relative to xₖ
+        /// [in]    Finite difference step size relative to x
         real_t ε,
         /// [in]    Minimum absolute finite difference step size
         real_t δ,
@@ -351,26 +351,30 @@ struct PANOCHelpers {
         /// [out]   Gradient @f$ \nabla \psi(x^k) @f$
         rvec grad_ψ,
         ///         Dimension n
-        rvec work_n1,
+        rvec work_x,
         ///         Dimension n
-        rvec work_n2,
+        rvec work_grad_ψ,
         ///         Dimension n
-        rvec work_n3,
+        rvec work_n,
         ///         Dimension m
         rvec work_m) {
 
-        auto h        = (xₖ * ε).cwiseAbs().cwiseMax(δ);
-        work_n1       = xₖ + h;
-        real_t norm_h = h.norm();
-        // Calculate ∇ψ(x₀ + h)
-        problem.eval_grad_ψ(work_n1, y, Σ, /* in ⟹ out */ work_n2, work_n3,
-                            work_m);
         // Calculate ψ(x₀), ∇ψ(x₀)
-        ψ = problem.eval_ψ_grad_ψ(xₖ, y, Σ, /* in ⟹ out */ grad_ψ, work_n1,
+        ψ = problem.eval_ψ_grad_ψ(x, y, Σ, /* in ⟹ out */ grad_ψ, work_n,
                                   work_m);
+        // Select a small step h for finite differences
+        auto h = (grad_ψ * ε)
+                     .cwiseAbs()
+                     .cwiseMax(δ)
+                     .cwiseProduct(grad_ψ.cwiseSign());
+        work_x        = x - h;
+        real_t norm_h = h.norm();
+        // Calculate ∇ψ(x₀ - h)
+        problem.eval_grad_ψ(work_x, y, Σ, /* in ⟹ out */ work_grad_ψ, work_n,
+                            work_m);
 
         // Estimate Lipschitz constant using finite differences
-        real_t L = (work_n2 - grad_ψ).norm() / norm_h;
+        real_t L = (work_grad_ψ - grad_ψ).norm() / norm_h;
         return std::clamp(L, L_min, L_max);
     }
 
