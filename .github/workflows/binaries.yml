@@ -201,7 +201,7 @@ jobs:
             core.setOutput('pydot2', major+"."+minor)
             core.setOutput('WITH_PYTHON3', major==="3" ? "ON" : "OFF")
       - name: Setup Python
-        uses: actions/setup-python@v2.3.1
+        uses: actions/setup-python@v4.3.0
         with:
           python-version: ${{steps.get-id.outputs.pydot2}}
       - uses: actions/download-artifact@v2
