@@ -598,7 +598,7 @@ option(WITH_BUILD_BLASFEO "Build BLASFEO (BUILD_BLASFEO_VERSION=${BUILD_BLASFEO_
 option(WITH_HPIPM "Compile the interface to HPIPM" OFF)
 set(BUILD_HPIPM_VERSION "0e0c9f4e0d4081dceafa9b37c396db50bce0e81a")
 set(BUILD_HPIPM_GIT_REPO "https://github.com/jgillis/hpipm.git")
-option(WITH_BUILD_HPIPM "Build HPIPM (BUILD_HPIPM_VERSION=${BUILD_HPIPM_VERSION}) from downloaded source." OFF)
+option(WITH_BUILD_HPIPM "Build HPIPM (BUILD_HPIPM_VERSION=${BUILD_HPIPM_VERSION}) from downloaded source (BUILD_HPIPM_GIT_REPO=${BUILD_HPIPM_GIT_REPO})." OFF)
 set(BUILD_HPIPM_DEPENDENCIES BLASFEO)
 
 # SuperSCS: An conic solver
@@ -609,9 +609,21 @@ add_feature_info(superscs-interface WITH_SUPERSCS "Interface to Conic solver Sup
 option(WITH_OSQP "Compile the interface to OSQP (the source code for OSQP is included)" OFF)
 add_feature_info(osqp-interface WITH_OSQP "Interface to QP solver OSQP.")
 
+set(BUILD_EIGEN3_VERSION "3.4.0")
+set(BUILD_EIGEN3_GIT_REPO "https://gitlab.com/libeigen/eigen.git")
+option(WITH_BUILD_EIGEN3 "Build Eigen (BUILD_EIGEN3_VERSION=${BUILD_EIGEN3_VERSION}) from downloaded source (BUILD_EIGEN3_GIT_REPO=${BUILD_EIGEN3_GIT_REPO})." OFF)
+
+set(BUILD_SIMDE_VERSION "v0.7.2")
+set(BUILD_SIMDE_GIT_REPO "https://github.com/simd-everywhere/simde.git")
+option(WITH_BUILD_SIMDE "Build Eigen (BUILD_SIMDE_VERSION=${BUILD_SIMDE_VERSION}) from downloaded source (BUILD_SIMDE_GIT_REPO=${BUILD_SIMDE_GIT_REPO})." OFF)
+
+
 # PROXQP: A QP solver based on proximal methods
-option(WITH_PROXQP "Compile the interface to PROXQP (the source code for PROXQP is included)" OFF)
-add_feature_info(proxqp-interface WITH_PROXQP "Interface to QP solver PROXQP.")
+option(WITH_PROXQP "Compile the interface to PROXQP" OFF)
+set(BUILD_PROXQP_VERSION "46086651000de8cab7341c4dfdaca56ef4594e5b")
+set(BUILD_PROXQP_GIT_REPO "https://github.com/jgillis/proxsuite.git")
+option(WITH_BUILD_PROXQP "Build PROXQP (BUILD_PROXQP_VERSION=${BUILD_PROXQP_VERSION}) from downloaded source (BUILD_PROXQP_GIT_REPO=${BUILD_PROXQP_GIT_REPO})." OFF)
+set(BUILD_PROXQP_DEPENDENCIES EIGEN3 SIMDE)
 
 # TinyXML: An XML reader, needed e.g. by the Modelica interface
 option(WITH_BUILD_TINYXML "Compile the included TinyXML source code" ON)
@@ -775,7 +787,7 @@ function(libraries2flags libraries out)
 endfunction()
 
 # Packages must be sorted from high to low in the dependency graph
-foreach(PKG HIGHS BONMIN IPOPT CBC CLP MUMPS SPRAL METIS HPIPM BLASFEO LAPACK)
+foreach(PKG HIGHS PROXQP BONMIN IPOPT CBC CLP MUMPS SPRAL METIS HPIPM BLASFEO LAPACK EIGEN3 SIMDE)
   string(TOLOWER ${PKG} PKG_LOWER)
   if(WITH_${PKG})
     if(NOT WITH_BUILD_${PKG})
@@ -1219,6 +1231,58 @@ if(WITH_HIGHS)
 endif()
 add_feature_info(highs-interface WITH_HIGHS "Interface to the MILP / QP solver HiGHS.")
 
+if(WITH_BUILD_EIGEN3)
+  ExternalProject_Add(eigen3-external
+      GIT_REPOSITORY ${BUILD_EIGEN3_GIT_REPO}
+      GIT_TAG ${BUILD_EIGEN3_VERSION}
+      PREFIX "${CMAKE_BINARY_DIR}/external_projects"
+      UPDATE_COMMAND ""
+      CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
+      CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
+  add_library(eigen3 INTERFACE)
+  target_include_directories(eigen3 INTERFACE "${CMAKE_BINARY_DIR}/external_projects/include/eigen3")
+  install(DIRECTORY
+    "${CMAKE_BINARY_DIR}/external_projects/include/eigen3"
+    DESTINATION "${INCLUDE_PREFIX}")
+endif()
+
+if(WITH_BUILD_SIMDE)
+  ExternalProject_Add(simde-external
+      GIT_REPOSITORY ${BUILD_SIMDE_GIT_REPO}
+      GIT_TAG ${BUILD_SIMDE_VERSION}
+      PREFIX "${CMAKE_BINARY_DIR}/external_projects"
+      CONFIGURE_COMMAND ""
+      BUILD_COMMAND ""
+      INSTALL_COMMAND ${EXTERNAL_CMAKE_COMMAND} -E copy_directory
+                    <SOURCE_DIR>/simde <INSTALL_DIR>/include/simde)
+  add_library(Simde INTERFACE)
+  target_include_directories(Simde INTERFACE "${CMAKE_BINARY_DIR}/external_projects/include/simde")
+  install(DIRECTORY
+    "${CMAKE_BINARY_DIR}/external_projects/include/simde"
+    DESTINATION "${INCLUDE_PREFIX}")
+endif()
+
+if(WITH_PROXQP)
+  if(WITH_BUILD_PROXQP)
+    ExternalProject_Add(proxqp-external
+        DEPENDS simde-external eigen3-external
+        GIT_REPOSITORY ${BUILD_PROXQP_GIT_REPO}
+        GIT_TAG ${BUILD_PROXQP_VERSION}
+        PREFIX "${CMAKE_BINARY_DIR}/external_projects"
+        BUILD_ALWAYS 1
+        UPDATE_COMMAND ""
+        CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
+        CMAKE_ARGS --debug-find -DCMAKE_FIND_ROOT_PATH_MODE_PACKAGE=BOTH -DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=BOTH -DSimde_DIR=${CMAKE_BINARY_DIR}/external_projects/share/eigen3/cmake -DEigen3_DIR=${CMAKE_BINARY_DIR}/external_projects/share/eigen3/cmake -DCMAKE_PREFIX_PATH=${CMAKE_BINARY_DIR}/external_projects/include/ -DCMAKE_INCLUDE_PATH=${CMAKE_BINARY_DIR}/external_projects/include/ -DBUILD_TESTING=OFF -DBUILD_PYTHON_INTERFACE=OFF -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
+        # --debug-find
+    add_library(proxqp INTERFACE)
+    target_include_directories(proxqp INTERFACE "${CMAKE_BINARY_DIR}/external_projects/include")
+    target_link_libraries(proxqp INTERFACE eigen3)
+    install(DIRECTORY
+      "${CMAKE_BINARY_DIR}/external_projects/include/proxsuite"
+      DESTINATION "${INCLUDE_PREFIX}")
+  endif()
+endif()
+add_feature_info(proxqp-interface WITH_PROXQP "Interface to QP solver PROXQP.")
 
 # SNOPT: An SQP method
 option(WITH_SNOPT "Compile the SNOPT interface if SNOPT libraries can be found" OFF)
