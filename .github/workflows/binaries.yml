@@ -155,12 +155,12 @@ jobs:
           config: |
             matrix:
               arch: [manylinux1-x64,manylinux1-x86]
-              py2: ["27","35","36","37","38","39","310","311"]
+              py2: ["27","35","36","37","38","39"]
             operations:
               - type: append
                 matrix:
                   arch: [manylinux2014-x64,manylinux2014-x86]
-                  py2: ["310"]
+                  py2: ["310","311"]
               - type: append
                 matrix:
                   arch: [windows-shared-x64-posix]
