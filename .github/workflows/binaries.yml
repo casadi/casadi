@@ -563,7 +563,7 @@ jobs:
             const minor = py2.substr(1);
             core.setOutput('pydot2', major+"."+minor)
       - name: Setup Python
-        uses: actions/setup-python@v2.3.1
+        uses: actions/setup-python@v4.3.0
         with:
           python-version: ${{steps.get-id.outputs.pydot2}}
       - env:
