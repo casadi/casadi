@@ -81,7 +81,7 @@ import alpaqa as pa
 from datetime import timedelta
 
 # Configure an alpaqa solver:
-Solver = pa.StructuredPANOCLBFGSSolver
+Solver = pa.PANOCSolver
 inner_solver = Solver(
     panoc_params={
         'max_time': timedelta(seconds=Ts),

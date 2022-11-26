@@ -25,95 +25,9 @@ using namespace std::chrono_literals;
 #include <alpaqa/inner/src/panoc.tpp>
 #include <alpaqa/util/check-dim.hpp>
 
-#include "kwargs-to-struct.hpp"
-#include "lbfgs-params.hpp"
+#include "params/params.hpp"
 #include "stats-to-dict.hpp"
 #include "type-erased-panoc-direction.hpp"
-
-template <alpaqa::Config Conf>
-struct dict_to_struct_table<alpaqa::PANOCParams<Conf>> {
-    inline static const dict_to_struct_table_t<alpaqa::PANOCParams<Conf>> table{
-        // clang-format off
-        {"Lipschitz", &alpaqa::PANOCParams<Conf>::Lipschitz},
-        {"max_iter", &alpaqa::PANOCParams<Conf>::max_iter},
-        {"max_time", &alpaqa::PANOCParams<Conf>::max_time},
-        {"τ_min", &alpaqa::PANOCParams<Conf>::τ_min},
-        {"L_min", &alpaqa::PANOCParams<Conf>::L_min},
-        {"L_max", &alpaqa::PANOCParams<Conf>::L_max},
-        {"stop_crit", &alpaqa::PANOCParams<Conf>::stop_crit},
-        {"max_no_progress", &alpaqa::PANOCParams<Conf>::max_no_progress},
-        {"print_interval", &alpaqa::PANOCParams<Conf>::print_interval},
-        {"print_precision", &alpaqa::PANOCParams<Conf>::print_precision},
-        {"quadratic_upperbound_tolerance_factor", &alpaqa::PANOCParams<Conf>::quadratic_upperbound_tolerance_factor},
-        {"linesearch_tolerance_factor", &alpaqa::PANOCParams<Conf>::linesearch_tolerance_factor},
-        // clang-format on
-    };
-};
-
-template <alpaqa::Config Conf>
-struct dict_to_struct_table<alpaqa::PANOCOCPParams<Conf>> {
-    inline static const dict_to_struct_table_t<alpaqa::PANOCOCPParams<Conf>> table{
-        // clang-format off
-        {"Lipschitz", &alpaqa::PANOCOCPParams<Conf>::Lipschitz},
-        {"max_iter", &alpaqa::PANOCOCPParams<Conf>::max_iter},
-        {"max_time", &alpaqa::PANOCOCPParams<Conf>::max_time},
-        {"τ_min", &alpaqa::PANOCOCPParams<Conf>::τ_min},
-        {"β", &alpaqa::PANOCOCPParams<Conf>::β},
-        {"L_min", &alpaqa::PANOCOCPParams<Conf>::L_min},
-        {"L_max", &alpaqa::PANOCOCPParams<Conf>::L_max},
-        {"L_max_inc", &alpaqa::PANOCOCPParams<Conf>::L_max_inc},
-        {"stop_crit", &alpaqa::PANOCOCPParams<Conf>::stop_crit},
-        {"max_no_progress", &alpaqa::PANOCOCPParams<Conf>::max_no_progress},
-        {"gn_interval", &alpaqa::PANOCOCPParams<Conf>::gn_interval},
-        {"gn_sticky", &alpaqa::PANOCOCPParams<Conf>::gn_sticky},
-        {"reset_lbfgs_on_gn_step", &alpaqa::PANOCOCPParams<Conf>::reset_lbfgs_on_gn_step},
-        {"lqr_factor_cholesky", &alpaqa::PANOCOCPParams<Conf>::lqr_factor_cholesky},
-        {"print_interval", &alpaqa::PANOCOCPParams<Conf>::print_interval},
-        {"print_precision", &alpaqa::PANOCOCPParams<Conf>::print_precision},
-        {"quadratic_upperbound_tolerance_factor", &alpaqa::PANOCOCPParams<Conf>::quadratic_upperbound_tolerance_factor},
-        {"linesearch_tolerance_factor", &alpaqa::PANOCOCPParams<Conf>::linesearch_tolerance_factor},
-        {"disable_acceleration", &alpaqa::PANOCOCPParams<Conf>::disable_acceleration},
-        // clang-format on
-    };
-};
-
-template <alpaqa::Config Conf>
-struct dict_to_struct_table<alpaqa::StructuredLBFGSDirectionParams<Conf>> {
-    inline static const dict_to_struct_table_t<alpaqa::StructuredLBFGSDirectionParams<Conf>> table{
-        // clang-format off
-        {"hessian_vec", &alpaqa::StructuredLBFGSDirectionParams<Conf>::hessian_vec},
-        {"hessian_vec_finite_differences", &alpaqa::StructuredLBFGSDirectionParams<Conf>::hessian_vec_finite_differences},
-        {"full_augmented_hessian", &alpaqa::StructuredLBFGSDirectionParams<Conf>::full_augmented_hessian},
-        // clang-format on
-    };
-};
-
-template <alpaqa::Config Conf>
-struct dict_to_struct_table<alpaqa::LBFGSDirectionParams<Conf>> {
-    inline static const dict_to_struct_table_t<alpaqa::LBFGSDirectionParams<Conf>> table{
-        // clang-format off
-        {"rescale_when_γ_changes", &alpaqa::LBFGSDirectionParams<Conf>::rescale_when_γ_changes},
-        // clang-format on
-    };
-};
-
-template <alpaqa::Config Conf>
-struct dict_to_struct_table<alpaqa::LipschitzEstimateParams<Conf>> {
-    inline static const dict_to_struct_table_t<alpaqa::LipschitzEstimateParams<Conf>> table{
-        {"L_0", &alpaqa::LipschitzEstimateParams<Conf>::L_0},
-        {"δ", &alpaqa::LipschitzEstimateParams<Conf>::δ},
-        {"ε", &alpaqa::LipschitzEstimateParams<Conf>::ε},
-        {"Lγ_factor", &alpaqa::LipschitzEstimateParams<Conf>::Lγ_factor},
-    };
-};
-
-template <alpaqa::Config Conf>
-struct dict_to_struct_table<alpaqa::CBFGSParams<Conf>> {
-    inline static const dict_to_struct_table_t<alpaqa::CBFGSParams<Conf>> table{
-        {"α", &alpaqa::CBFGSParams<Conf>::α},
-        {"ϵ", &alpaqa::CBFGSParams<Conf>::ϵ},
-    };
-};
 
 template <alpaqa::Config Conf>
 void register_panoc(py::module_ &m) {
@@ -387,19 +301,17 @@ void register_panoc(py::module_ &m) {
     };
 
     py::class_<PANOCSolver>(m, "PANOCSolver", "C++ documentation: :cpp:class:`alpaqa::PANOCSolver`")
-        // .def(py::init([](params_or_dict<PANOCParams> params, const LBFGS &lbfgs) {
-        //          return PANOCSolver{var_kwargs_to_struct(params),
-        //                             alpaqa::erase_direction<LBFGS>(lbfgs)};
-        //      }),
-        //      "panoc_params"_a, "lbfgs"_a, "Create a PANOC solver using L-BFGS directions.")
-        .def(py::init(
-                 [](params_or_dict<PANOCParams> params, params_or_dict<LBFGSParams> lbfgs_params) {
-                     return PANOCSolver{var_kwargs_to_struct(params),
-                                        alpaqa::erase_direction_with_params_dict<LBFGS>(
-                                            LBFGS{var_kwargs_to_struct(lbfgs_params)})};
-                 }),
+        .def(py::init([](params_or_dict<PANOCParams> params,
+                         params_or_dict<LBFGSParams> lbfgs_params,
+                         params_or_dict<StrucLBFGSParams> direction_params) {
+                 return PANOCSolver{var_kwargs_to_struct(params),
+                                    alpaqa::erase_direction_with_params_dict<StructuredLBFGS>(
+                                        var_kwargs_to_struct(lbfgs_params),
+                                        var_kwargs_to_struct(direction_params))};
+             }),
              "panoc_params"_a = py::dict{}, "lbfgs_params"_a = py::dict{},
-             "Create a PANOC solver using L-BFGS directions.")
+             "direction_params"_a = py::dict{},
+             "Create a PANOC solver using structured L-BFGS directions.")
         .def(py::init(
                  [](params_or_dict<PANOCParams> params, const TypeErasedPANOCDirection &direction) {
                      return PANOCSolver{var_kwargs_to_struct(params),

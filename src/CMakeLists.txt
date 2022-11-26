@@ -9,7 +9,6 @@ add_library(alpaqa
     "src/outer/alm.cpp"
     "src/inner/panoc.cpp"
     "src/inner/panoc-ocp.cpp"
-    "src/inner/structured-panoc.cpp"
     "src/panoc-alm.cpp"
     "src/structured-panoc-alm.cpp"
     "src/inner/internal/solverstatus.cpp"

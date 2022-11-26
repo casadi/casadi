@@ -102,7 +102,7 @@ solver = pa.ALMSolver(
         'max_time': timedelta(seconds=0.2),
         'max_total_num_retries': 0,
     },
-    inner_solver=pa.StructuredPANOCLBFGSSolver(
+    inner_solver=pa.PANOCSolver(
         panoc_params={
             'stop_crit': pa.ProjGradNorm2,
             'max_time': timedelta(seconds=0.02),

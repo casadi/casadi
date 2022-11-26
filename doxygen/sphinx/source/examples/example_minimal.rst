@@ -64,7 +64,7 @@ Next, we give the parameter :math:`p` some value::
 Finally, we construct the solver for our problem. We start with an inner solver that then gets passed to an outer ALM solver:: 
 
     # Construct a PANOC instance to serve as the inner solver
-    innersolver = pa.StructuredPANOCLBFGSSolver() # (with default parameters)
+    innersolver = pa.PANOCSolver() # (with default parameters)
 
     # Make an ALM solver with default parameters, using the PANOC solver
     solver = pa.ALMSolver(pa.ALMParams(), innersolver)

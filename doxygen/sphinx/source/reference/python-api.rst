@@ -6,21 +6,23 @@ Inner PANOC solver
 
 .. autoclass:: alpaqa._alpaqa.float64.PANOCSolver
     :noindex:
+
 .. autoclass:: alpaqa._alpaqa.float64.PANOCParams
     :noindex:
 
 PANOC accelerators
 ^^^^^^^^^^^^^^^^^^
 
+.. autoclass:: alpaqa._alpaqa.float64.LBFGS
+    :noindex:
+
 .. autoclass:: alpaqa._alpaqa.float64.LBFGS.Params
     :noindex:
 
-Inner Structured PANOC solver
------------------------------
-
-.. autoclass:: alpaqa._alpaqa.float64.StructuredPANOCLBFGSSolver
+.. autoclass:: alpaqa._alpaqa.float64.StructuredLBFGS
     :noindex:
-.. autoclass:: alpaqa._alpaqa.float64.StructuredPANOCLBFGSParams
+
+.. autoclass:: alpaqa._alpaqa.float64.StructuredLBFGS.DirectionParams
     :noindex:
 
 Outer ALM solver
@@ -28,26 +30,20 @@ Outer ALM solver
 
 .. autoclass:: alpaqa._alpaqa.float64.ALMSolver
     :noindex:
+
 .. autoclass:: alpaqa._alpaqa.float64.ALMParams
     :noindex:
 
 Problem formulation
 -------------------
 
-.. autoclass:: alpaqa._alpaqa.float64.Problem
+.. autoclass:: alpaqa._alpaqa.float64.BoxConstrProblem
     :noindex:
     :inherited-members:
-    :show-inheritance:
 
-.. autoclass:: alpaqa._alpaqa.float64.FunctionalProblem
+.. autoclass:: alpaqa._alpaqa.float64.TEProblem
     :noindex:
     :inherited-members:
-    :show-inheritance:
-
-.. autoclass:: alpaqa._alpaqa.float64.CountedProblem
-    :noindex:
-    :inherited-members:
-    :show-inheritance:
 
 CasADi Interface
 ----------------

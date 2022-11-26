@@ -12,8 +12,10 @@
 #include <typeinfo>
 #include <variant>
 
+#include <pybind11/chrono.h>
 #include <pybind11/detail/typeid.h>
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 namespace py = pybind11;
 
 template <class T>
@@ -165,43 +167,4 @@ inline const dict_to_struct_table_t<alpaqa::GAAPGAParams>
          &alpaqa::GAAPGAParams::full_flush_on_γ_change},
     };
 
-#include <alpaqa/inner/decl/structured-panoc-lbfgs.hpp>
-
-template <>
-inline const dict_to_struct_table_t<alpaqa::StructuredPANOCLBFGSParams>
-    dict_to_struct_table<alpaqa::StructuredPANOCLBFGSParams>{
-        {"Lipschitz", &alpaqa::StructuredPANOCLBFGSParams::Lipschitz},
-        {"max_iter", &alpaqa::StructuredPANOCLBFGSParams::max_iter},
-        {"max_time", &alpaqa::StructuredPANOCLBFGSParams::max_time},
-        {"τ_min", &alpaqa::StructuredPANOCLBFGSParams::τ_min},
-        {"L_min", &alpaqa::StructuredPANOCLBFGSParams::L_min},
-        {"L_max", &alpaqa::StructuredPANOCLBFGSParams::L_max},
-        {"nonmonotone_linesearch",
-         &alpaqa::StructuredPANOCLBFGSParams::nonmonotone_linesearch},
-        {"fpr_shortcut_accept_factor",
-         &alpaqa::StructuredPANOCLBFGSParams::fpr_shortcut_accept_factor},
-        {"fpr_shortcut_history",
-         &alpaqa::StructuredPANOCLBFGSParams::fpr_shortcut_history},
-        {"stop_crit", &alpaqa::StructuredPANOCLBFGSParams::stop_crit},
-        {"max_no_progress",
-         &alpaqa::StructuredPANOCLBFGSParams::max_no_progress},
-        {"print_interval", &alpaqa::StructuredPANOCLBFGSParams::print_interval},
-        {"quadratic_upperbound_tolerance_factor",
-         &alpaqa::StructuredPANOCLBFGSParams::
-             quadratic_upperbound_tolerance_factor},
-        {"linesearch_tolerance_factor",
-         &alpaqa::StructuredPANOCLBFGSParams::
-             linesearch_tolerance_factor},
-        {"update_lipschitz_in_linesearch",
-         &alpaqa::StructuredPANOCLBFGSParams::update_lipschitz_in_linesearch},
-        {"alternative_linesearch_cond",
-         &alpaqa::StructuredPANOCLBFGSParams::alternative_linesearch_cond},
-        {"hessian_vec", &alpaqa::StructuredPANOCLBFGSParams::hessian_vec},
-        {"hessian_vec_finite_differences",
-         &alpaqa::StructuredPANOCLBFGSParams::hessian_vec_finite_differences},
-        {"full_augmented_hessian",
-         &alpaqa::StructuredPANOCLBFGSParams::full_augmented_hessian},
-        {"hessian_step_size_heuristic",
-         &alpaqa::StructuredPANOCLBFGSParams::hessian_step_size_heuristic},
-    };
 #endif

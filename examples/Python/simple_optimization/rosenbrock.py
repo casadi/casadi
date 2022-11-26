@@ -37,8 +37,8 @@ prob.D.upperbound = [0, 0]              # g2 <= 0
 prob.param = [10.]
 
 # %% Build an inner Structured PANOC solver with custom parameters
-innersolver = pa.StructuredPANOCLBFGSSolver(
-    pa.StructuredPANOCLBFGSParams(
+innersolver = pa.PANOCSolver(
+    pa.PANOCParams(
         max_iter=1000,
         stop_crit=pa.PANOCStopCrit.ApproxKKT,
     ),
@@ -50,7 +50,7 @@ innersolver = pa.StructuredPANOCLBFGSSolver(
 # You can attach a callback that is called on each iteration, and keeps track of
 # the iterates so they can be plotted later
 iterates = []
-def callback(it: pa.StructuredPANOCLBFGSProgressInfo):
+def callback(it: pa.PANOCProgressInfo):
     if it.k == 0:
         iterates.append([])
     iterates[-1].append(np.copy(it.x))
@@ -81,6 +81,7 @@ y0 = np.zeros((prob.m,))  # Lagrange multipliers for g(x)
 x_sol, y_sol, stats = solver(prob, x0, y0)
 
 # Print the results
+print(solver)
 print(stats["status"])
 print(f"Solution:      {x_sol}")
 print(f"Multipliers:   {y_sol}")

@@ -33,8 +33,7 @@ struct InnerSolverVTable : util::BasicVTable {
 };
 
 template <Config Conf = DefaultConfig, class Allocator = std::allocator<std::byte>>
-class TypeErasedInnerSolver : util::TypeErased<InnerSolverVTable<Conf>, Allocator> {
-  public:
+class TypeErasedInnerSolver : public util::TypeErased<InnerSolverVTable<Conf>, Allocator> {
     USING_ALPAQA_CONFIG(Conf);
     using VTable         = InnerSolverVTable<Conf>;
     using allocator_type = Allocator;
@@ -42,7 +41,8 @@ class TypeErasedInnerSolver : util::TypeErased<InnerSolverVTable<Conf>, Allocato
     using Stats          = typename VTable::Stats;
     using TypeErased::TypeErased;
 
-  private:
+  protected:
+    using TypeErased::call;
     using TypeErased::self;
     using TypeErased::vtable;
 
@@ -54,15 +54,15 @@ class TypeErasedInnerSolver : util::TypeErased<InnerSolverVTable<Conf>, Allocato
 
     template <class... Args>
     decltype(auto) operator()(Args &&...args) {
-        return vtable.call(self, std::forward<Args>(args)...);
+        return call(vtable.call, std::forward<Args>(args)...);
     }
     template <class... Args>
     decltype(auto) stop(Args &&...args) {
-        return vtable.stop(self, std::forward<Args>(args)...);
+        return call(vtable.stop, std::forward<Args>(args)...);
     }
     template <class... Args>
     decltype(auto) get_name(Args &&...args) const {
-        return vtable.get_name(self, std::forward<Args>(args)...);
+        return call(vtable.get_name, std::forward<Args>(args)...);
     }
 };
 
