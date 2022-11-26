@@ -71,7 +71,7 @@ auto PANOCSolver<DirectionProviderT>::operator()(
     Iterate *next = &iterates[1];
 
     bool need_grad_ψx̂ = Helpers::stop_crit_requires_grad_ψx̂(params.stop_crit);
-    vec grad_ψx̂(need_grad_ψx̂ ? n : 0);
+    vec grad_ψx̂(n);
     vec work_n(n), work_m(m);
     vec q(n); // (quasi-)Newton step Hₖ pₖ
 
