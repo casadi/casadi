@@ -156,8 +156,8 @@ void register_problems(py::module_ &m) {
         void eval_grad_ψ(crvec x, crvec y, crvec Σ, rvec grad_ψ, rvec work_n, rvec work_m) const { o.attr("eval_grad_ψ")(x, y, Σ, grad_ψ, work_n, work_m); }
         real_t eval_ψ_grad_ψ(crvec x, crvec y, crvec Σ, rvec grad_ψ, rvec work_n, rvec work_m) const { return py::cast<real_t>(o.attr("eval_ψ_grad_ψ")(x, y, Σ, grad_ψ, work_n, work_m)); }
         void check() const { if (auto ch = py::getattr(o, "check", py::none()); !ch.is_none()) ch(); }
-        const Box &get_box_C() const { C = o.attr("get_box_C")(); return py::cast<const Box &>(C); }
-        const Box &get_box_D() const { D = o.attr("get_box_D")(); return py::cast<const Box &>(D); }
+        const Box &get_box_C() const { alpaqa::ScopedMallocAllower ma; C = py::cast<Box>(o.attr("get_box_C")()); return C; }
+        const Box &get_box_D() const { alpaqa::ScopedMallocAllower ma; D = py::cast<Box>(o.attr("get_box_D")()); return D; }
 
         bool provides_eval_grad_gi() const { return py::hasattr(o, "eval_grad_gi"); }
         bool provides_eval_hess_L_prod() const { return py::hasattr(o, "eval_hess_L_prod"); }
@@ -179,8 +179,8 @@ void register_problems(py::module_ &m) {
         length_t get_m() const { return py::cast<length_t>(o.attr("m")); }
 
         // To keep the references to the boxes alive
-        mutable py::object C;
-        mutable py::object D;
+        mutable Box C;
+        mutable Box D;
     };
 
     using TEProblem = alpaqa::TypeErasedProblem<config_t>;
