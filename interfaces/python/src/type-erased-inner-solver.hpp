@@ -34,6 +34,7 @@ struct InnerSolverVTable : util::BasicVTable {
 
 template <Config Conf = DefaultConfig, class Allocator = std::allocator<std::byte>>
 class TypeErasedInnerSolver : public util::TypeErased<InnerSolverVTable<Conf>, Allocator> {
+  public:
     USING_ALPAQA_CONFIG(Conf);
     using VTable         = InnerSolverVTable<Conf>;
     using allocator_type = Allocator;
