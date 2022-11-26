@@ -91,16 +91,21 @@ struct EigenConfig {
     using crindexvec = Eigen::Ref<const indexvec>;
 };
 
+/// Single-precision `float` configuration.
 struct EigenConfigf : EigenConfig<float> {
     static constexpr const char *get_name() { return "EigenConfigf"; }
 };
+/// Double-precision `double` configuration.
 struct EigenConfigd : EigenConfig<double> {
     static constexpr const char *get_name() { return "EigenConfigd"; }
 };
+/// `long double` configuration. (Quad precision on ARM64, 80-bit x87 floats
+/// on Intel/AMD x86)
 struct EigenConfigl : EigenConfig<long double> {
     static constexpr const char *get_name() { return "EigenConfigl"; }
 };
 #ifdef ALPAQA_WITH_QUAD_PRECISION
+/// Quad-precision `__float128` configuration.
 struct EigenConfigq : EigenConfig<__float128> {
     static constexpr const char *get_name() { return "EigenConfigq"; }
 };
@@ -122,25 +127,25 @@ namespace vec_util {
 /// Get the Σ norm squared of a given vector, with Σ a diagonal matrix.
 /// @returns @f$ \langle v, \Sigma v \rangle @f$
 template <class Derived>
+    requires(Derived::ColsAtCompileTime == 1)
 auto norm_squared_weighted(const Eigen::MatrixBase<Derived> &v,
-                           const Eigen::MatrixBase<Derived> &Σ) //
-    requires(Derived::ColsAtCompileTime == 1) {
+                           const Eigen::MatrixBase<Derived> &Σ) {
     return v.dot(Σ.asDiagonal() * v);
 }
 
 /// Get the maximum or infinity-norm of the given vector.
 /// @returns @f$ \left\|v\right\|_\infty @f$
 template <class Derived>
-auto norm_inf(const Eigen::MatrixBase<Derived> &v) //
-    requires(Derived::ColsAtCompileTime == 1) {
+    requires(Derived::ColsAtCompileTime == 1)
+auto norm_inf(const Eigen::MatrixBase<Derived> &v) {
     return v.template lpNorm<Eigen::Infinity>();
 }
 
 /// Get the 1-norm of the given vector.
 /// @returns @f$ \left\|v\right\|_1 @f$
 template <class Derived>
-auto norm_1(const Eigen::MatrixBase<Derived> &v) //
-    requires(Derived::ColsAtCompileTime == 1) {
+    requires(Derived::ColsAtCompileTime == 1)
+auto norm_1(const Eigen::MatrixBase<Derived> &v) {
     return v.template lpNorm<1>();
 }
 
