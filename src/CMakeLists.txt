@@ -13,6 +13,8 @@ add_library(alpaqa
     "src/panoc-alm.cpp"
     "src/structured-panoc-alm.cpp"
     "src/inner/internal/solverstatus.cpp"
+    "src/inner/directions/panoc/structured-lbfgs.cpp"
+    "src/inner/internal/panoc-helpers.cpp"
     "include/alpaqa/util/type-erasure.hpp"
 )
 target_compile_features(alpaqa PUBLIC cxx_std_20)

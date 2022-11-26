@@ -19,6 +19,7 @@ using namespace std::chrono_literals;
 
 #include <alpaqa/accelerators/lbfgs.hpp>
 #include <alpaqa/inner/directions/panoc/lbfgs.hpp>
+#include <alpaqa/inner/directions/panoc/structured-lbfgs.hpp>
 #include <alpaqa/inner/panoc-ocp.hpp>
 #include <alpaqa/inner/panoc.hpp>
 #include <alpaqa/inner/src/panoc.tpp>
@@ -77,6 +78,26 @@ struct dict_to_struct_table<alpaqa::PANOCOCPParams<Conf>> {
 };
 
 template <alpaqa::Config Conf>
+struct dict_to_struct_table<alpaqa::StructuredLBFGSDirectionParams<Conf>> {
+    inline static const dict_to_struct_table_t<alpaqa::StructuredLBFGSDirectionParams<Conf>> table{
+        // clang-format off
+        {"hessian_vec", &alpaqa::StructuredLBFGSDirectionParams<Conf>::hessian_vec},
+        {"hessian_vec_finite_differences", &alpaqa::StructuredLBFGSDirectionParams<Conf>::hessian_vec_finite_differences},
+        {"full_augmented_hessian", &alpaqa::StructuredLBFGSDirectionParams<Conf>::full_augmented_hessian},
+        // clang-format on
+    };
+};
+
+template <alpaqa::Config Conf>
+struct dict_to_struct_table<alpaqa::LBFGSDirectionParams<Conf>> {
+    inline static const dict_to_struct_table_t<alpaqa::LBFGSDirectionParams<Conf>> table{
+        // clang-format off
+        {"rescale_when_γ_changes", &alpaqa::LBFGSDirectionParams<Conf>::rescale_when_γ_changes},
+        // clang-format on
+    };
+};
+
+template <alpaqa::Config Conf>
 struct dict_to_struct_table<alpaqa::LipschitzEstimateParams<Conf>> {
     inline static const dict_to_struct_table_t<alpaqa::LipschitzEstimateParams<Conf>> table{
         {"L_0", &alpaqa::LipschitzEstimateParams<Conf>::L_0},
@@ -101,43 +122,9 @@ void register_panoc(py::module_ &m) {
     // ----------------------------------------------------------------------------------------- //
     using Box                      = alpaqa::Box<config_t>;
     using TypeErasedPANOCDirection = alpaqa::TypeErasedPANOCDirection<Conf>;
-    py::class_<TypeErasedPANOCDirection>(m, "PANOCDirection")
-        .def(py::init([](py::object o) {
-            struct {
-                using Problem = alpaqa::TypeErasedProblem<Conf>;
-                void initialize(const Problem &problem, crvec y, crvec Σ, real_t γ_0, crvec x_0,
-                                crvec x̂_0, crvec p_0, crvec grad_ψx_0) {
-                    alpaqa::ScopedMallocAllower ma;
-                    o.attr("initialize")(problem, y, Σ, γ_0, x_0, x̂_0, p_0, grad_ψx_0);
-                }
-                bool update(real_t γₖ, real_t γₙₑₓₜ, crvec xₖ, crvec xₙₑₓₜ, crvec pₖ, crvec pₙₑₓₜ,
-                            crvec grad_ψxₖ, crvec grad_ψxₙₑₓₜ) {
-                    alpaqa::ScopedMallocAllower ma;
-                    return py::cast<bool>(
-                        o.attr("update")(γₖ, γₙₑₓₜ, xₖ, xₙₑₓₜ, pₖ, pₙₑₓₜ, grad_ψxₖ, grad_ψxₙₑₓₜ));
-                }
-                bool has_initial_direction() const {
-                    alpaqa::ScopedMallocAllower ma;
-                    return py::cast<bool>(o.attr("has_initial_direction")());
-                }
-                bool apply(real_t γₖ, crvec xₖ, crvec x̂ₖ, crvec pₖ, crvec grad_ψxₖ, rvec qₖ) const {
-                    alpaqa::ScopedMallocAllower ma;
-                    return py::cast<bool>(o.attr("apply")(γₖ, xₖ, x̂ₖ, pₖ, grad_ψxₖ, qₖ));
-                }
-                void changed_γ(real_t γₖ, real_t old_γₖ) {
-                    alpaqa::ScopedMallocAllower ma;
-                    o.attr("changed_γ")(γₖ, old_γₖ);
-                }
-                void reset() {
-                    alpaqa::ScopedMallocAllower ma;
-                    o.attr("reset")();
-                }
-                std::string get_name() const { return py::cast<std::string>(py::str(o)); }
-
-                py::object o;
-            } s{std::move(o)};
-            return TypeErasedPANOCDirection{std::move(s)};
-        }))
+    py::class_<TypeErasedPANOCDirection> te_direction(m, "PANOCDirection");
+    te_direction //
+        .def_property_readonly("params", &TypeErasedPANOCDirection::template get_params<>)
         .def("__str__", &TypeErasedPANOCDirection::template get_name<>);
 
     // ----------------------------------------------------------------------------------------- //
@@ -230,6 +217,45 @@ void register_panoc(py::module_ &m) {
         .def_property_readonly("params", &LBFGS::get_params)
         .def("__str__", &LBFGS::get_name);
 
+    te_direction.def(py::init(&alpaqa::erase_direction_with_params_dict<LBFGS, const LBFGS &>));
+    py::implicitly_convertible<LBFGS, TypeErasedPANOCDirection>();
+
+    // ----------------------------------------------------------------------------------------- //
+    using StructuredLBFGS = alpaqa::StructuredLBFGS<config_t>;
+    py::class_<StructuredLBFGS> struc_lbfgs(
+        m, "StructuredLBFGS", "C++ documentation: :cpp:class:`alpaqa::StructuredLBFGS`");
+    using StrucLBFGSParams = alpaqa::StructuredLBFGSDirectionParams<config_t>;
+    py::class_<StrucLBFGSParams> struc_lbfgs_params(
+        struc_lbfgs, "DirectionParams",
+        "C++ documentation: :cpp:class:`alpaqa::StructuredLBFGS::DirectionParams`");
+    struc_lbfgs_params //
+        .def(py::init())
+        .def(py::init(&kwargs_to_struct<StrucLBFGSParams>))
+        .def("to_dict", &struct_to_dict<StrucLBFGSParams>)
+        .def_readwrite("hessian_vec", &StrucLBFGSParams::hessian_vec)
+        .def_readwrite("hessian_vec_finite_differences",
+                       &StrucLBFGSParams::hessian_vec_finite_differences)
+        .def_readwrite("full_augmented_hessian", &StrucLBFGSParams::full_augmented_hessian);
+    struc_lbfgs //
+        .def(py::init([](params_or_dict<LBFGSParams> lbfgs_params) {
+                 return StructuredLBFGS{var_kwargs_to_struct(lbfgs_params)};
+             }),
+             "lbfgs_params"_a)
+        .def(py::init([](params_or_dict<LBFGSParams> lbfgs_params,
+                         params_or_dict<StrucLBFGSParams> direction_params) {
+                 return StructuredLBFGS{var_kwargs_to_struct(lbfgs_params),
+                                        var_kwargs_to_struct(direction_params)};
+             }),
+             "lbfgs_params"_a, "direction_params"_a)
+        .def_property_readonly("params",
+                               py::cpp_function(&StructuredLBFGS::get_params,
+                                                py::return_value_policy::reference_internal))
+        .def("__str__", &StructuredLBFGS::get_name);
+
+    te_direction.def(py::init(
+        &alpaqa::erase_direction_with_params_dict<StructuredLBFGS, const StructuredLBFGS &>));
+    py::implicitly_convertible<StructuredLBFGS, TypeErasedPANOCDirection>();
+
     // ----------------------------------------------------------------------------------------- //
     using LipschitzEstimateParams = alpaqa::LipschitzEstimateParams<config_t>;
     py::class_<LipschitzEstimateParams>(
@@ -280,9 +306,10 @@ void register_panoc(py::module_ &m) {
         .def_readonly("grad_ψ", &PANOCProgressInfo::grad_ψ, "Gradient of objective :math:`\\nabla\\psi(x)`")
         .def_readonly("ψ_hat", &PANOCProgressInfo::ψ_hat, "Objective at x̂ :math:`\\psi(\\hat x)`")
         .def_readonly("grad_ψ_hat", &PANOCProgressInfo::grad_ψ_hat, "Gradient of objective at x̂ :math:`\\nabla\\psi(\\hat x)`")
+        .def_readonly("q", &PANOCProgressInfo::q, "Previous quasi-Newton step :math:`\\nabla\\psi(\\hat x)`")
         .def_readonly("L", &PANOCProgressInfo::L, "Estimate of Lipschitz constant of objective :math:`L`")
         .def_readonly("γ", &PANOCProgressInfo::γ, "Step size :math:`\\gamma`")
-        .def_readonly("τ", &PANOCProgressInfo::τ, "Line search parameter :math:`\\tau`")
+        .def_readonly("τ", &PANOCProgressInfo::τ, "Previous line search parameter :math:`\\tau`")
         .def_readonly("ε", &PANOCProgressInfo::ε, "Tolerance reached :math:`\\varepsilon_k`")
         .def_readonly("Σ", &PANOCProgressInfo::Σ, "Penalty factor :math:`\\Sigma`")
         .def_readonly("y", &PANOCProgressInfo::y, "Lagrange multipliers :math:`y`")
@@ -333,15 +360,15 @@ void register_panoc(py::module_ &m) {
         } else {
             auto stats = std::async(std::launch::async, invoke_solver);
             {
-                py::gil_scoped_release gil{};
+                py::gil_scoped_release gil;
                 while (stats.wait_for(50ms) != std::future_status::ready) {
-                    py::gil_scoped_acquire gil{};
+                    py::gil_scoped_acquire gil;
                     // Check if Python received a signal (e.g. Ctrl+C)
                     if (PyErr_CheckSignals() != 0) {
                         // Nicely ask the solver to stop
                         solver.stop();
                         // It should return a result soon
-                        if (py::gil_scoped_release gil{};
+                        if (py::gil_scoped_release gil;
                             stats.wait_for(15s) != std::future_status::ready) {
                             // If it doesn't, we terminate the entire program,
                             // because the solver uses variables local to this
@@ -360,16 +387,16 @@ void register_panoc(py::module_ &m) {
     };
 
     py::class_<PANOCSolver>(m, "PANOCSolver", "C++ documentation: :cpp:class:`alpaqa::PANOCSolver`")
-        .def(py::init([](params_or_dict<PANOCParams> params, const LBFGS &lbfgs) {
-                 return PANOCSolver{var_kwargs_to_struct(params),
-                                    alpaqa::erase_direction<LBFGS>(lbfgs)};
-             }),
-             "panoc_params"_a, "LBFGS"_a, "Create a PANOC solver using L-BFGS directions.")
+        // .def(py::init([](params_or_dict<PANOCParams> params, const LBFGS &lbfgs) {
+        //          return PANOCSolver{var_kwargs_to_struct(params),
+        //                             alpaqa::erase_direction<LBFGS>(lbfgs)};
+        //      }),
+        //      "panoc_params"_a, "lbfgs"_a, "Create a PANOC solver using L-BFGS directions.")
         .def(py::init(
                  [](params_or_dict<PANOCParams> params, params_or_dict<LBFGSParams> lbfgs_params) {
-                     return PANOCSolver{
-                         var_kwargs_to_struct(params),
-                         alpaqa::erase_direction<LBFGS>(LBFGS{var_kwargs_to_struct(lbfgs_params)})};
+                     return PANOCSolver{var_kwargs_to_struct(params),
+                                        alpaqa::erase_direction_with_params_dict<LBFGS>(
+                                            LBFGS{var_kwargs_to_struct(lbfgs_params)})};
                  }),
              "panoc_params"_a = py::dict{}, "lbfgs_params"_a = py::dict{},
              "Create a PANOC solver using L-BFGS directions.")
@@ -406,7 +433,13 @@ void register_panoc(py::module_ &m) {
         .def("__str__", &PANOCSolver::get_name)
         .def("set_progress_callback", &PANOCSolver::set_progress_callback, "callback"_a,
              "Specify a callable that is invoked with some intermediate results on each iteration "
-             "of the algorithm.");
+             "of the algorithm.")
+        .def_property_readonly("direction_provider",
+                               py::cpp_function(
+                                   [](const PANOCSolver &s) -> const TypeErasedPANOCDirection & {
+                                       return s.direction_provider;
+                                   },
+                                   py::return_value_policy::reference_internal));
 
     using PANOCOCPParams = alpaqa::PANOCOCPParams<config_t>;
     py::class_<PANOCOCPParams>(m, "PANOCOCPParams",
@@ -536,6 +569,58 @@ void register_panoc(py::module_ &m) {
         .def("set_progress_callback", &PANOCOCPSolver::set_progress_callback, "callback"_a,
              "Specify a callable that is invoked with some intermediate results on each iteration "
              "of the algorithm.");
+
+    // Catch-all, must be last
+    te_direction //
+        .def(py::init([](py::object o) {
+            struct {
+                using Problem = alpaqa::TypeErasedProblem<Conf>;
+                void initialize(const Problem &problem, crvec y, crvec Σ, real_t γ_0, crvec x_0,
+                                crvec x̂_0, crvec p_0, crvec grad_ψx_0) {
+                    alpaqa::ScopedMallocAllower ma;
+                    py::gil_scoped_acquire gil;
+                    o.attr("initialize")(problem, y, Σ, γ_0, x_0, x̂_0, p_0, grad_ψx_0);
+                }
+                bool update(real_t γₖ, real_t γₙₑₓₜ, crvec xₖ, crvec xₙₑₓₜ, crvec pₖ, crvec pₙₑₓₜ,
+                            crvec grad_ψxₖ, crvec grad_ψxₙₑₓₜ) {
+                    alpaqa::ScopedMallocAllower ma;
+                    py::gil_scoped_acquire gil;
+                    return py::cast<bool>(
+                        o.attr("update")(γₖ, γₙₑₓₜ, xₖ, xₙₑₓₜ, pₖ, pₙₑₓₜ, grad_ψxₖ, grad_ψxₙₑₓₜ));
+                }
+                bool has_initial_direction() const {
+                    alpaqa::ScopedMallocAllower ma;
+                    py::gil_scoped_acquire gil;
+                    return py::cast<bool>(o.attr("has_initial_direction")());
+                }
+                bool apply(real_t γₖ, crvec xₖ, crvec x̂ₖ, crvec pₖ, crvec grad_ψxₖ, rvec qₖ) const {
+                    alpaqa::ScopedMallocAllower ma;
+                    py::gil_scoped_acquire gil;
+                    return py::cast<bool>(o.attr("apply")(γₖ, xₖ, x̂ₖ, pₖ, grad_ψxₖ, qₖ));
+                }
+                void changed_γ(real_t γₖ, real_t old_γₖ) {
+                    alpaqa::ScopedMallocAllower ma;
+                    py::gil_scoped_acquire gil;
+                    o.attr("changed_γ")(γₖ, old_γₖ);
+                }
+                void reset() {
+                    alpaqa::ScopedMallocAllower ma;
+                    py::gil_scoped_acquire gil;
+                    o.attr("reset")();
+                }
+                std::string get_name() const {
+                    py::gil_scoped_acquire gil;
+                    return py::cast<std::string>(py::str(o));
+                }
+                py::object get_params() const {
+                    py::gil_scoped_acquire gil;
+                    return py::getattr(o, "params");
+                }
+
+                py::object o;
+            } s{std::move(o)};
+            return TypeErasedPANOCDirection{std::move(s)};
+        }));
 }
 
 template void register_panoc<alpaqa::EigenConfigd>(py::module_ &);

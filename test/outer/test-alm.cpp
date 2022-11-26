@@ -383,7 +383,7 @@ TEST(ALM, multipleshooting8Dstructured) {
     panocparam.Lipschitz.δ = 1e-12;
     panocparam.max_iter    = 200;
 
-    Accelerator::Params lbfgsparam;
+    alpaqa::LBFGS<config_t>::Params lbfgsparam;
     lbfgsparam.memory = 10;
 
     ALMSolver solver{almparam, {panocparam, lbfgsparam}};

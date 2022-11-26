@@ -25,11 +25,11 @@ void StructuredLBFGS<Conf>::initialize(const Problem &problem, crvec y, crvec Σ
     lbfgs.resize(n);
     J.reserve(static_cast<size_t>(n));
     HqK.resize(n);
-    if (extraparams.hessian_vec_finite_differences) {
+    if (direction_params.hessian_vec_finite_differences) {
         work_n.resize(n);
         work_n2.resize(n);
         work_m.resize(m);
-    } else if (extraparams.full_augmented_hessian) {
+    } else if (direction_params.full_augmented_hessian) {
         work_n.resize(n);
         work_m.resize(m);
     }
@@ -55,21 +55,21 @@ bool StructuredLBFGS<Conf>::apply(real_t γₖ, crvec xₖ,
             qₖ(i) = pₖ(i);                  //
         } else {                            // i ∊ J
             J.push_back(i);
-            qₖ(i) = extraparams.hessian_vec ? 0 : -grad_ψxₖ(i);
+            qₖ(i) = direction_params.hessian_vec ? 0 : -grad_ψxₖ(i);
         }
     }
 
     if (not J.empty()) {      // There are inactive indices J
         if (J.size() == un) { // There are no active indices K
             qₖ = -grad_ψxₖ;
-        } else if (extraparams.hessian_vec) { // There are active indices K
-            if (extraparams.hessian_vec_finite_differences) {
+        } else if (direction_params.hessian_vec) { // There are active indices K
+            if (direction_params.hessian_vec_finite_differences) {
                 Helpers::calc_augmented_lagrangian_hessian_prod_fd(
                     *problem, xₖ, *y, *Σ, grad_ψxₖ, qₖ, HqK, work_n, work_n2,
                     work_m);
             } else {
                 problem->eval_hess_L_prod(xₖ, *y, qₖ, HqK);
-                if (extraparams.full_augmented_hessian) {
+                if (direction_params.full_augmented_hessian) {
                     auto &g = work_m;
                     problem->eval_g(xₖ, g);
                     for (index_t i = 0; i < m; ++i) {

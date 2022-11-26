@@ -1,6 +1,7 @@
 #pragma once
 
 #include <alpaqa/config/config.hpp>
+#include <alpaqa/export.hpp>
 #include <alpaqa/inner/internal/panoc-stop-crit.hpp>
 #include <alpaqa/inner/internal/solverstatus.hpp>
 #include <alpaqa/problem/type-erased-problem.hpp>
@@ -422,5 +423,13 @@ struct PANOCHelpers {
         return std::clamp(L, L_min, L_max);
     }
 };
+
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, PANOCHelpers, DefaultConfig);
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, PANOCHelpers, EigenConfigf);
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, PANOCHelpers, EigenConfigd);
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, PANOCHelpers, EigenConfigl);
+#ifdef ALPAQA_WITH_QUAD_PRECISION
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, PANOCHelpers, EigenConfigq);
+#endif
 
 } // namespace alpaqa::detail

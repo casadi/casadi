@@ -9,6 +9,14 @@
 
 namespace alpaqa {
 
+/// Parameters for the @ref StructuredLBFGS class.
+template <Config Conf>
+struct StructuredLBFGSDirectionParams {
+    bool hessian_vec                    = true;
+    bool hessian_vec_finite_differences = true;
+    bool full_augmented_hessian         = true;
+};
+
 /// @ingroup grp_DirectionProviders
 template <Config Conf = DefaultConfig>
 struct StructuredLBFGS {
@@ -16,18 +24,11 @@ struct StructuredLBFGS {
     using Problem = TypeErasedProblem<config_t>;
     using LBFGS   = alpaqa::LBFGS<config_t>;
 
-    struct ExtraParams {
-        bool hessian_vec                    = true;
-        bool hessian_vec_finite_differences = true;
-        bool full_augmented_hessian         = true;
-    };
-    struct Params : LBFGS::Params, ExtraParams {};
+    using DirectionParams = StructuredLBFGSDirectionParams<config_t>;
 
-    StructuredLBFGS(const Params &params)
-        : lbfgs(params), extraparams(params) {}
     StructuredLBFGS(const typename LBFGS::Params &params,
-                    const ExtraParams &extraparams = {})
-        : lbfgs(params), extraparams(extraparams) {}
+                    const DirectionParams &directionparams = {})
+        : lbfgs(params), direction_params(directionparams) {}
 
     /// @see @ref PANOCDirection::initialize
     void initialize(const Problem &problem, crvec y, crvec Σ, real_t γ_0,
@@ -63,7 +64,9 @@ struct StructuredLBFGS {
         return "StructuredLBFGS<" + std::string(config_t::get_name()) + '>';
     }
 
-    ExtraParams get_params() const { return lbfgs.get_params(); }
+    auto get_params() const {
+        return std::tie(lbfgs.get_params(), direction_params);
+    }
 
   private:
     using indexstdvec = std::vector<index_t>;
@@ -85,12 +88,23 @@ struct StructuredLBFGS {
     mutable vec work_n2;
     mutable vec work_m;
 
-    ExtraParams extraparams;
+    DirectionParams direction_params;
 };
 
 template <Config Conf>
 struct PANOCDirection<StructuredLBFGS<Conf>> : StructuredLBFGS<Conf> {
     using StructuredLBFGS<Conf>::StructuredLBFGS;
+    PANOCDirection(const StructuredLBFGS<Conf> &s) : StructuredLBFGS<Conf>{s} {}
+    PANOCDirection(StructuredLBFGS<Conf> &&s)
+        : StructuredLBFGS<Conf>{std::move(s)} {}
 };
+
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, StructuredLBFGS, DefaultConfig);
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, StructuredLBFGS, EigenConfigf);
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, StructuredLBFGS, EigenConfigd);
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, StructuredLBFGS, EigenConfigl);
+#ifdef ALPAQA_WITH_QUAD_PRECISION
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, StructuredLBFGS, EigenConfigq);
+#endif
 
 } // namespace alpaqa

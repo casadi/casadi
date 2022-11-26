@@ -5,9 +5,14 @@
 #include <alpaqa/inner/directions/panoc/lbfgs.hpp>
 #include <alpaqa/util/type-erasure.hpp>
 
+#include "kwargs-to-struct.hpp"
+
 #include <new>
 #include <string>
 #include <utility>
+
+#include <pybind11/pytypes.h>
+namespace py = pybind11;
 
 namespace alpaqa {
 
@@ -29,6 +34,8 @@ struct PANOCDirectionVTable : util::BasicVTable {
         changed_γ = nullptr;
     required_function_t<void()>
         reset = nullptr;
+    required_const_function_t<py::object()>
+        get_params = nullptr;
     required_const_function_t<std::string()>
         get_name = nullptr;
     // clang-format on
@@ -41,6 +48,7 @@ struct PANOCDirectionVTable : util::BasicVTable {
         apply                 = util::type_erased_wrapped<&T::apply>();
         changed_γ             = util::type_erased_wrapped<&T::changed_γ>();
         reset                 = util::type_erased_wrapped<&T::reset>();
+        get_params            = util::type_erased_wrapped<&T::get_params>();
         get_name              = util::type_erased_wrapped<&T::get_name>();
     }
     PANOCDirectionVTable() = default;
@@ -96,6 +104,10 @@ class TypeErasedPANOCDirection
         return call(vtable.reset, std::forward<Args>(args)...);
     }
     template <class... Args>
+    decltype(auto) get_params(Args &&...args) const {
+        return call(vtable.get_params, std::forward<Args>(args)...);
+    }
+    template <class... Args>
     decltype(auto) get_name(Args &&...args) const {
         return call(vtable.get_name, std::forward<Args>(args)...);
     }
@@ -111,7 +123,35 @@ struct PANOCDirection<TypeErasedPANOCDirection<Conf>> : TypeErasedPANOCDirection
 
 template <class T, class... Args>
 auto erase_direction(Args &&...args) {
-    return TypeErasedPANOCDirection<typename T::config_t>::template make<PANOCDirection<T>>(
+    using D = PANOCDirection<T>;
+    return TypeErasedPANOCDirection<typename D::config_t>::template make<D>(
+        std::forward<Args>(args)...);
+}
+
+namespace detail {
+template <class P>
+py::object to_dict_tup(const P &params) {
+    return struct_to_dict(params);
+}
+template <class... Ps>
+py::object to_dict_tup(const std::tuple<Ps...> tup) {
+    return py::cast([&]<size_t... Is>(std::index_sequence<Is...>) {
+        return std::make_tuple(to_dict_tup(std::get<Is>(tup))...);
+    }(std::make_index_sequence<sizeof...(Ps)>()));
+}
+inline py::object to_dict_tup(py::object o) { return std::move(o); }
+} // namespace detail
+
+template <class T, class... Args>
+auto erase_direction_with_params_dict(Args &&...args) {
+    using D = PANOCDirection<T>;
+    struct S : D {
+        using D::D;
+        S(const D &d) : D{d} {}
+        S(D &&d) : D{std::move(d)} {}
+        py::object get_params() const { return detail::to_dict_tup(D::get_params()); }
+    };
+    return TypeErasedPANOCDirection<typename T::config_t>::template make<S>(
         std::forward<Args>(args)...);
 }
 

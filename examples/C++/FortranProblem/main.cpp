@@ -61,7 +61,7 @@ int main() {
     panocparam.max_iter       = 500;
     panocparam.print_interval = 10;
     // Settings for the L-BFGS algorithm used by PANOC
-    Accelerator::Params lbfgsparam;
+    alpaqa::LBFGS<config_t>::Params lbfgsparam;
     lbfgsparam.memory = 2;
 
     // Create an ALM solver using PANOC as inner solver
