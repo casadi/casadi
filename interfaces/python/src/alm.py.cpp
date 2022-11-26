@@ -69,7 +69,7 @@ void register_alm(py::module_ &m) {
     using PANOCSolver              = alpaqa::PANOCSolver<TypeErasedPANOCDirection>;
     using TypeErasedProblem        = alpaqa::TypeErasedProblem<config_t>;
     using InnerSolver              = alpaqa::TypeErasedInnerSolver<config_t>;
-    using DefaultInnerSolver       = alpaqa::PANOCSolver<alpaqa::StructuredLBFGS<config_t>>;
+    using DefaultInnerSolver = alpaqa::PANOCSolver<alpaqa::StructuredLBFGSDirection<config_t>>;
     py::class_<InnerSolver>(m, "InnerSolver")
         .def(py::init<PANOCSolver>())
         .def("__call__",
@@ -201,12 +201,12 @@ void register_alm(py::module_ &m) {
             py::cpp_function([](ALMSolver &self) -> InnerSolver & { return self.inner_solver; },
                              ret_ref_internal))
         .def("__call__", safe_alm_call, "problem"_a, "x"_a = std::nullopt, "y"_a = std::nullopt,
-             "async_"_a = false,
+             "asynchronous"_a = true,
              "Solve.\n\n"
              ":param problem: Problem to solve.\n"
              ":param x: Initial guess for decision variables :math:`x`\n\n"
              ":param y: Initial guess for Lagrange multipliers :math:`y`\n"
-             ":param async_: Release the GIL and run the solver on a separate thread\n"
+             ":param asynchronous: Release the GIL and run the solver on a separate thread\n"
              ":return: * Solution :math:`x`\n"
              "         * Lagrange multipliers :math:`y` at the solution\n"
              "         * Statistics\n\n")

@@ -44,7 +44,7 @@ int main() {
     problem.D.upperbound = b;
 
     // Define the solvers to use
-    using Accelerator = alpaqa::StructuredLBFGS<config_t>;
+    using Accelerator = alpaqa::StructuredLBFGSDirection<config_t>;
     using InnerSolver = alpaqa::PANOCSolver<Accelerator>;
     using OuterSolver = alpaqa::ALMSolver<InnerSolver>;
 
@@ -61,7 +61,7 @@ int main() {
     panocparam.max_iter       = 500;
     panocparam.print_interval = 10;
     // Settings for the L-BFGS algorithm used by PANOC
-    alpaqa::LBFGS<config_t>::Params lbfgsparam;
+    Accelerator::LBFGSParams lbfgsparam;
     lbfgsparam.memory = 2;
 
     // Create an ALM solver using PANOC as inner solver

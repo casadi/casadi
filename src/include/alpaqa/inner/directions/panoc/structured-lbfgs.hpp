@@ -19,15 +19,16 @@ struct StructuredLBFGSDirectionParams {
 
 /// @ingroup grp_DirectionProviders
 template <Config Conf = DefaultConfig>
-struct StructuredLBFGS {
+struct StructuredLBFGSDirection {
     USING_ALPAQA_CONFIG(Conf);
-    using Problem = TypeErasedProblem<config_t>;
-    using LBFGS   = alpaqa::LBFGS<config_t>;
+    using Problem     = TypeErasedProblem<config_t>;
+    using LBFGS       = alpaqa::LBFGS<config_t>;
+    using LBFGSParams = typename LBFGS::Params;
 
     using DirectionParams = StructuredLBFGSDirectionParams<config_t>;
 
-    StructuredLBFGS(const typename LBFGS::Params &params    = {},
-                    const DirectionParams &direction_params = {})
+    StructuredLBFGSDirection(const typename LBFGS::Params &params    = {},
+                             const DirectionParams &direction_params = {})
         : lbfgs(params), direction_params(direction_params) {}
 
     /// @see @ref PANOCDirection::initialize
@@ -61,7 +62,8 @@ struct StructuredLBFGS {
 
     /// @see @ref PANOCDirection::get_name
     std::string get_name() const {
-        return "StructuredLBFGS<" + std::string(config_t::get_name()) + '>';
+        return "StructuredLBFGSDirection<" + std::string(config_t::get_name()) +
+               '>';
     }
 
     auto get_params() const {
@@ -91,20 +93,12 @@ struct StructuredLBFGS {
     DirectionParams direction_params;
 };
 
-template <Config Conf>
-struct PANOCDirection<StructuredLBFGS<Conf>> : StructuredLBFGS<Conf> {
-    using StructuredLBFGS<Conf>::StructuredLBFGS;
-    PANOCDirection(const StructuredLBFGS<Conf> &s) : StructuredLBFGS<Conf>{s} {}
-    PANOCDirection(StructuredLBFGS<Conf> &&s)
-        : StructuredLBFGS<Conf>{std::move(s)} {}
-};
-
-ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, StructuredLBFGS, DefaultConfig);
-ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, StructuredLBFGS, EigenConfigf);
-ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, StructuredLBFGS, EigenConfigd);
-ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, StructuredLBFGS, EigenConfigl);
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, StructuredLBFGSDirection, DefaultConfig);
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, StructuredLBFGSDirection, EigenConfigf);
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, StructuredLBFGSDirection, EigenConfigd);
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, StructuredLBFGSDirection, EigenConfigl);
 #ifdef ALPAQA_WITH_QUAD_PRECISION
-ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, StructuredLBFGS, EigenConfigq);
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, StructuredLBFGSDirection, EigenConfigq);
 #endif
 
 } // namespace alpaqa

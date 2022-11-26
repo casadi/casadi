@@ -21,7 +21,7 @@ using std::chrono::nanoseconds;
 
 template <class DirectionProviderT>
 std::string PANOCSolver<DirectionProviderT>::get_name() const {
-    return "PANOCSolver<" + direction_provider.get_name() + ">";
+    return "PANOCSolver<" + direction.get_name() + ">";
 }
 
 template <class DirectionProviderT>
@@ -255,20 +255,20 @@ auto PANOCSolver<DirectionProviderT>::operator()(
         real_t τ_init = NaN<config_t>;
         if (k == 0) { // Initialize L-BFGS
             ScopedMallocAllower ma;
-            direction_provider.initialize(problem, y, Σ, curr->γ, curr->x,
+            direction.initialize(problem, y, Σ, curr->γ, curr->x,
                                           curr->x̂, curr->p, curr->grad_ψ);
             τ_init = 0;
         }
-        if (k > 0 || direction_provider.has_initial_direction()) {
+        if (k > 0 || direction.has_initial_direction()) {
             τ_init = 1;
-            direction_provider.apply(curr->γ, curr->x, curr->x̂, curr->p,
+            direction.apply(curr->γ, curr->x, curr->x̂, curr->p,
                                      curr->grad_ψ, q);
         }
         // Make sure quasi-Newton step is valid
         if (not q.allFinite()) {
             if (τ_init == 1) { // If we computed a quasi-Newton step
                 ++s.lbfgs_failures;
-                direction_provider.reset(); // Is there anything else we can do?
+                direction.reset(); // Is there anything else we can do?
             }
             τ_init = 0;
         }
@@ -340,9 +340,9 @@ auto PANOCSolver<DirectionProviderT>::operator()(
         // Update L-BFGS -------------------------------------------------------
 
         if (curr->γ != next->γ) // Flush L-BFGS if γ changed
-            direction_provider.changed_γ(next->γ, curr->γ);
+            direction.changed_γ(next->γ, curr->γ);
 
-        s.lbfgs_rejected += not direction_provider.update(
+        s.lbfgs_rejected += not direction.update(
             curr->γ, next->γ, curr->x, next->x, curr->p, next->p, curr->grad_ψ,
             next->grad_ψ);
 

@@ -6,7 +6,7 @@
 
 namespace alpaqa {
 
-/// Parameters for the @ref PANOCDirection<LBFGS<Conf>> class.
+/// Parameters for the @ref LBFGSDirection class.
 template <Config Conf>
 struct LBFGSDirectionParams {
     bool rescale_when_γ_changes = false;
@@ -14,26 +14,27 @@ struct LBFGSDirectionParams {
 
 /// @ingroup grp_DirectionProviders
 template <Config Conf>
-struct PANOCDirection<LBFGS<Conf>> {
+struct LBFGSDirection {
     USING_ALPAQA_CONFIG(Conf);
 
-    using Problem = TypeErasedProblem<config_t>;
-    using LBFGS   = alpaqa::LBFGS<config_t>;
+    using Problem     = TypeErasedProblem<config_t>;
+    using LBFGS       = alpaqa::LBFGS<config_t>;
+    using LBFGSParams = typename LBFGS::Params;
 
     LBFGS lbfgs;
 
     using DirectionParams = LBFGSDirectionParams<config_t>;
     struct Params : LBFGS::Params, DirectionParams {};
 
-    PANOCDirection(const Params &params)
+    LBFGSDirection(const Params &params)
         : lbfgs(params), direction_params(params) {}
-    PANOCDirection(const typename LBFGS::Params &params,
+    LBFGSDirection(const typename LBFGS::Params &params,
                    const DirectionParams &directionparams = {})
         : lbfgs(params), direction_params(directionparams) {}
-    PANOCDirection(const LBFGS &lbfgs,
+    LBFGSDirection(const LBFGS &lbfgs,
                    const DirectionParams &directionparams = {})
         : lbfgs(lbfgs), direction_params(directionparams) {}
-    PANOCDirection(LBFGS &&lbfgs, const DirectionParams &directionparams = {})
+    LBFGSDirection(LBFGS &&lbfgs, const DirectionParams &directionparams = {})
         : lbfgs(std::move(lbfgs)), direction_params(directionparams) {}
 
     /// @see @ref PANOCDirection::initialize
@@ -76,8 +77,9 @@ struct PANOCDirection<LBFGS<Conf>> {
     void reset() { lbfgs.reset(); }
 
     /// @see @ref PANOCDirection::get_name
-    std::string get_name() const { return lbfgs.get_name(); }
-
+    std::string get_name() const {
+        return "LBFGSDirection<" + std::string(config_t::get_name()) + '>';
+    }
     auto get_params() const {
         return std::tie(lbfgs.get_params(), direction_params);
     }

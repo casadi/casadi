@@ -8,9 +8,9 @@ def test_alm():
     import alpaqa.casadi_loader as cl
 
     pp = pa.PANOCParams()
-    lbfgs = pa.LBFGS({})
+    lbfgs = pa.LBFGSDirection()
     panoc = pa.PANOCSolver(pp, lbfgs)
-    pprint(panoc.direction_provider.params)
+    pprint(panoc.direction.params)
     solver = pa.ALMSolver(pa.ALMParams(), panoc)
     print(f"Solver: {solver} "
           f"({solver.__class__.__module__}.{solver.__class__.__qualname__})")
@@ -38,7 +38,7 @@ def test_alm():
     p.D.upperbound = [+np.inf, +np.inf]
     solver = pa.PANOCSolver(
         pa.PANOCParams(max_iter=200, print_interval=1),
-        pa.LBFGS(pa.LBFGS.Params(memory=5)),
+        pa.LBFGSDirection(pa.LBFGS.Params(memory=5)),
     )
     almparams = pa.ALMParams(max_iter=20, print_interval=1, ε=1e-12, δ=1e-12)
     almsolver = pa.ALMSolver(almparams, solver)
@@ -89,7 +89,7 @@ def test_alm_inherit():
     p = pickle.loads(get_pickled_problem())
     solver = pa.PANOCSolver(
         pa.PANOCParams(max_iter=200, print_interval=1),
-        pa.LBFGS(pa.LBFGS.Params(memory=5)),
+        pa.LBFGSDirection(pa.LBFGS.Params(memory=5)),
     )
     almparams = pa.ALMParams(max_iter=20, print_interval=1, ε=1e-12, δ=1e-12)
     almsolver = pa.ALMSolver(almparams, solver)
@@ -113,9 +113,9 @@ def test_alm_structured_inherit():
     p = pickle.loads(get_pickled_problem())
     solver = pa.PANOCSolver(
         pa.PANOCParams(max_iter=200, print_interval=1),
-        pa.StructuredLBFGS(pa.LBFGS.Params(memory=5)),
+        pa.StructuredLBFGSDirection(pa.LBFGS.Params(memory=5)),
     )
-    pprint(solver.direction_provider.params)
+    pprint(solver.direction.params)
     almparams = pa.ALMParams(max_iter=20, print_interval=1, ε=1e-12, δ=1e-12)
     almsolver = pa.ALMSolver(almparams, solver)
     pc, counters = pa.problem_with_counters(p)

@@ -44,8 +44,8 @@ TEST(ALM, singleshooting1D) {
     op.g           = g;
     op.grad_g_prod = grad_g;
 
-    using LBFGS       = alpaqa::LBFGS<config_t>;
-    using PANOCSolver = alpaqa::PANOCSolver<LBFGS>;
+    using Accelerator = alpaqa::LBFGSDirection<config_t>;
+    using PANOCSolver = alpaqa::PANOCSolver<Accelerator>;
     using ALMSolver   = alpaqa::ALMSolver<PANOCSolver>;
 
     ALMSolver::Params almparam;
@@ -65,7 +65,7 @@ TEST(ALM, singleshooting1D) {
     panocparam.Lipschitz.δ = 1e-12;
     panocparam.max_iter    = 100;
 
-    LBFGS::Params lbfgsparam;
+    Accelerator::LBFGSParams lbfgsparam;
     lbfgsparam.memory = 10;
 
     ALMSolver solver{almparam, {panocparam, lbfgsparam}};
@@ -132,8 +132,8 @@ TEST(ALM, multipleshooting1D) {
     op.g           = g;
     op.grad_g_prod = grad_g;
 
-    using LBFGS       = alpaqa::LBFGS<config_t>;
-    using PANOCSolver = alpaqa::PANOCSolver<LBFGS>;
+    using Accelerator = alpaqa::LBFGSDirection<config_t>;
+    using PANOCSolver = alpaqa::PANOCSolver<Accelerator>;
     using ALMSolver   = alpaqa::ALMSolver<PANOCSolver>;
 
     ALMSolver::Params almparam;
@@ -153,7 +153,7 @@ TEST(ALM, multipleshooting1D) {
     panocparam.Lipschitz.δ = 1e-12;
     panocparam.max_iter    = 100;
 
-    LBFGS::Params lbfgsparam;
+    Accelerator::LBFGSParams lbfgsparam;
     lbfgsparam.memory = 10;
 
     ALMSolver solver{almparam, {panocparam, lbfgsparam}};
@@ -236,8 +236,8 @@ TEST(ALM, multipleshooting8D) {
     op.g           = g;
     op.grad_g_prod = grad_g;
 
-    using LBFGS       = alpaqa::LBFGS<config_t>;
-    using PANOCSolver = alpaqa::PANOCSolver<LBFGS>;
+    using Accelerator = alpaqa::LBFGSDirection<config_t>;
+    using PANOCSolver = alpaqa::PANOCSolver<Accelerator>;
     using ALMSolver   = alpaqa::ALMSolver<PANOCSolver>;
 
     ALMSolver::Params almparam;
@@ -257,7 +257,7 @@ TEST(ALM, multipleshooting8D) {
     panocparam.Lipschitz.δ = 1e-12;
     panocparam.max_iter    = 200;
 
-    LBFGS::Params lbfgsparam;
+    Accelerator::LBFGSParams lbfgsparam;
     lbfgsparam.memory = 10;
 
     ALMSolver solver{almparam, {panocparam, lbfgsparam}};
@@ -362,7 +362,7 @@ TEST(ALM, multipleshooting8Dstructured) {
     p.g           = g;
     p.grad_g_prod = grad_g;
 
-    using Accelerator = alpaqa::StructuredLBFGS<config_t>;
+    using Accelerator = alpaqa::StructuredLBFGSDirection<config_t>;
     using InnerSolver = alpaqa::PANOCSolver<Accelerator>;
     using ALMSolver   = alpaqa::ALMSolver<InnerSolver>;
 
@@ -383,7 +383,7 @@ TEST(ALM, multipleshooting8Dstructured) {
     panocparam.Lipschitz.δ = 1e-12;
     panocparam.max_iter    = 200;
 
-    alpaqa::LBFGS<config_t>::Params lbfgsparam;
+    Accelerator::LBFGSParams lbfgsparam;
     lbfgsparam.memory = 10;
 
     ALMSolver solver{almparam, {panocparam, lbfgsparam}};

@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
     problem.D.lowerbound = vec::Constant(1, 0.);
 
     // Define the solvers to use
-    using Accelerator = alpaqa::LBFGS<config_t>;
+    using Accelerator = alpaqa::LBFGSDirection<config_t>;
     using InnerSolver = alpaqa::PANOCSolver<Accelerator>;
     using OuterSolver = alpaqa::ALMSolver<InnerSolver>;
 
@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
     panocparam.max_iter       = 500;
     panocparam.print_interval = 10;
     // Settings for the L-BFGS algorithm used by PANOC
-    Accelerator::Params lbfgsparam;
+    Accelerator::LBFGSParams lbfgsparam;
     lbfgsparam.memory = 10;
 
     // Create an ALM solver using PANOC as inner solver

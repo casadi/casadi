@@ -44,133 +44,69 @@ void register_panoc(py::module_ &m) {
         .def("__str__", &TypeErasedPANOCDirection::template get_name<>);
 
     // ----------------------------------------------------------------------------------------- //
-    using LBFGS = alpaqa::LBFGS<config_t>;
-    py::class_<LBFGS> lbfgs(m, "LBFGS", "C++ documentation :cpp:class:`alpaqa::LBFGS`");
-    using LBFGSParams = typename LBFGS::Params;
-    py::class_<LBFGSParams> lbfgsparams(lbfgs, "Params",
-                                        "C++ documentation :cpp:class:`alpaqa::LBFGSParams`");
-    using CBFGS = alpaqa::CBFGSParams<config_t>;
-    py::class_<CBFGS> cbfgs(lbfgsparams, "CBFGS",
-                            "C++ documentation :cpp:class:`alpaqa::CBFGSParams`");
-    using LBFGSSign = typename LBFGS::Sign;
-    py::enum_<LBFGSSign> lbfgssign(lbfgs, "Sign",
-                                   "C++ documentation :cpp:enum:`alpaqa::LBFGS::Sign`");
-    cbfgs //
-        .def(py::init())
-        .def(py::init(&kwargs_to_struct<CBFGS>))
-        .def("to_dict", &struct_to_dict<CBFGS>)
-        .def_readwrite("α", &CBFGS::α)
-        .def_readwrite("ϵ", &CBFGS::ϵ);
-    lbfgsparams //
-        .def(py::init())
-        .def(py::init(&kwargs_to_struct<LBFGSParams>))
-        .def("to_dict", &struct_to_dict<LBFGSParams>)
-        .def_readwrite("memory", &LBFGSParams::memory)
-        .def_readwrite("min_div_fac", &LBFGSParams::min_div_fac)
-        .def_readwrite("min_abs_s", &LBFGSParams::min_abs_s)
-        .def_readwrite("cbfgs", &LBFGSParams::cbfgs)
-        .def_readwrite("force_pos_def", &LBFGSParams::force_pos_def)
-        .def_readwrite("stepsize", &LBFGSParams::stepsize);
-    lbfgssign //
-        .value("Positive", LBFGSSign::Positive)
-        .value("Negative", LBFGSSign::Negative)
-        .export_values();
+    using LBFGSDir       = alpaqa::LBFGSDirection<config_t>;
+    using LBFGSParams    = alpaqa::LBFGSParams<config_t>;
+    using LBFGSDirParams = alpaqa::LBFGSDirectionParams<config_t>;
 
-    auto safe_lbfgs_update = [](LBFGS &self, crvec xk, crvec xkp1, crvec pk, crvec pkp1,
-                                LBFGSSign sign, bool forced) {
-        alpaqa::util::check_dim<config_t>("xk", xk, self.n());
-        alpaqa::util::check_dim<config_t>("xkp1", xkp1, self.n());
-        alpaqa::util::check_dim<config_t>("pk", pk, self.n());
-        alpaqa::util::check_dim<config_t>("pkp1", pkp1, self.n());
-        return self.update(xk, xkp1, pk, pkp1, sign, forced);
-    };
-    auto safe_lbfgs_update_sy = [](LBFGS &self, crvec sk, crvec yk, real_t pkp1Tpkp1, bool forced) {
-        alpaqa::util::check_dim<config_t>("sk", sk, self.n());
-        alpaqa::util::check_dim<config_t>("yk", yk, self.n());
-        return self.update_sy(sk, yk, pkp1Tpkp1, forced);
-    };
-    auto safe_lbfgs_apply = [](LBFGS &self, rvec q, real_t γ) {
-        alpaqa::util::check_dim<config_t>("q", q, self.n());
-        return self.apply(q, γ);
-    };
-
+    py::class_<LBFGSDir> lbfgs(m, "LBFGSDirection",
+                               "C++ documentation: :cpp:class:`alpaqa::LBFGSDirection`");
+    py::class_<LBFGSDirParams> lbfgs_params(
+        lbfgs, "DirectionParams",
+        "C++ documentation: :cpp:class:`alpaqa::LBFGSDirection::DirectionParams`");
+    lbfgs_params //
+        .def(py::init())
+        .def(py::init(&kwargs_to_struct<LBFGSDirParams>))
+        .def("to_dict", &struct_to_dict<LBFGSDirParams>)
+        .def_readwrite("rescale_when_γ_changes", &LBFGSDirParams::rescale_when_γ_changes);
     lbfgs //
-        .def(py::init([](params_or_dict<LBFGSParams> params) {
-                 return LBFGS{var_kwargs_to_struct(params)};
+        .def(py::init([](params_or_dict<LBFGSParams> lbfgs_params,
+                         params_or_dict<LBFGSDirParams> direction_params) {
+                 return LBFGSDir{var_kwargs_to_struct(lbfgs_params),
+                                 var_kwargs_to_struct(direction_params)};
              }),
-             "params"_a)
-        .def(py::init([](params_or_dict<LBFGSParams> params, length_t n) {
-                 return LBFGS{var_kwargs_to_struct(params), n};
-             }),
-             "params"_a, "n"_a)
-        .def_static("update_valid", LBFGS::update_valid, "params"_a, "yᵀs"_a, "sᵀs"_a, "pᵀp"_a)
-        .def("update", safe_lbfgs_update, "xk"_a, "xkp1"_a, "pk"_a, "pkp1"_a,
-             "sign"_a = LBFGS::Sign::Positive, "forced"_a = false)
-        .def("update_sy", safe_lbfgs_update_sy, "sk"_a, "yk"_a, "pkp1Tpkp1"_a, "forced"_a = false)
-        .def("apply", safe_lbfgs_apply, "q"_a, "γ"_a)
-        .def("apply_masked",
-             py::overload_cast<rvec, real_t, const std::vector<index_t> &>(&LBFGS::apply_masked,
-                                                                           py::const_),
-             // [](LBFGS &self, rvec q, real_t γ, const std::vector<index_t> &J) {
-             //     return self.apply_masked(q, γ, J);
-             // },
-             "q"_a, "γ"_a, "J"_a)
-        .def("reset", &LBFGS::reset)
-        .def("current_history", &LBFGS::current_history)
-        .def("resize", &LBFGS::resize, "n"_a)
-        .def("scale_y", &LBFGS::scale_y, "factor"_a)
-        .def_property_readonly("n", &LBFGS::n)
-        .def(
-            "s", [](LBFGS &self, index_t i) -> rvec { return self.s(i); }, ret_ref_internal, "i"_a)
-        .def(
-            "y", [](LBFGS &self, index_t i) -> rvec { return self.y(i); }, ret_ref_internal, "i"_a)
-        .def(
-            "ρ", [](LBFGS &self, index_t i) -> real_t & { return self.ρ(i); }, ret_ref_internal,
-            "i"_a)
-        .def(
-            "α", [](LBFGS &self, index_t i) -> real_t & { return self.α(i); }, ret_ref_internal,
-            "i"_a)
-        .def_property_readonly("params", &LBFGS::get_params)
-        .def("__str__", &LBFGS::get_name);
+             "lbfgs_params"_a = py::dict{}, "direction_params"_a = py::dict{})
+        .def_property_readonly(
+            "params",
+            py::cpp_function(&LBFGSDir::get_params, py::return_value_policy::reference_internal))
+        .def("__str__", &LBFGSDir::get_name);
 
-    te_direction.def(py::init(&alpaqa::erase_direction_with_params_dict<LBFGS, const LBFGS &>));
-    py::implicitly_convertible<LBFGS, TypeErasedPANOCDirection>();
+    te_direction.def(
+        py::init(&alpaqa::erase_direction_with_params_dict<LBFGSDir, const LBFGSDir &>));
+    py::implicitly_convertible<LBFGSDir, TypeErasedPANOCDirection>();
 
     // ----------------------------------------------------------------------------------------- //
-    using StructuredLBFGS = alpaqa::StructuredLBFGS<config_t>;
-    py::class_<StructuredLBFGS> struc_lbfgs(
-        m, "StructuredLBFGS", "C++ documentation: :cpp:class:`alpaqa::StructuredLBFGS`");
-    using StrucLBFGSParams = alpaqa::StructuredLBFGSDirectionParams<config_t>;
-    py::class_<StrucLBFGSParams> struc_lbfgs_params(
+    using StructuredLBFGSDir  = alpaqa::StructuredLBFGSDirection<config_t>;
+    using StrucLBFGSDirParams = alpaqa::StructuredLBFGSDirectionParams<config_t>;
+
+    py::class_<StructuredLBFGSDir> struc_lbfgs(
+        m, "StructuredLBFGSDirection",
+        "C++ documentation: :cpp:class:`alpaqa::StructuredLBFGSDirection`");
+    py::class_<StrucLBFGSDirParams> struc_lbfgs_params(
         struc_lbfgs, "DirectionParams",
-        "C++ documentation: :cpp:class:`alpaqa::StructuredLBFGS::DirectionParams`");
+        "C++ documentation: :cpp:class:`alpaqa::StructuredLBFGSDirection::DirectionParams`");
     struc_lbfgs_params //
         .def(py::init())
-        .def(py::init(&kwargs_to_struct<StrucLBFGSParams>))
-        .def("to_dict", &struct_to_dict<StrucLBFGSParams>)
-        .def_readwrite("hessian_vec", &StrucLBFGSParams::hessian_vec)
+        .def(py::init(&kwargs_to_struct<StrucLBFGSDirParams>))
+        .def("to_dict", &struct_to_dict<StrucLBFGSDirParams>)
+        .def_readwrite("hessian_vec", &StrucLBFGSDirParams::hessian_vec)
         .def_readwrite("hessian_vec_finite_differences",
-                       &StrucLBFGSParams::hessian_vec_finite_differences)
-        .def_readwrite("full_augmented_hessian", &StrucLBFGSParams::full_augmented_hessian);
+                       &StrucLBFGSDirParams::hessian_vec_finite_differences)
+        .def_readwrite("full_augmented_hessian", &StrucLBFGSDirParams::full_augmented_hessian);
     struc_lbfgs //
-        .def(py::init([](params_or_dict<LBFGSParams> lbfgs_params) {
-                 return StructuredLBFGS{var_kwargs_to_struct(lbfgs_params)};
-             }),
-             "lbfgs_params"_a)
         .def(py::init([](params_or_dict<LBFGSParams> lbfgs_params,
-                         params_or_dict<StrucLBFGSParams> direction_params) {
-                 return StructuredLBFGS{var_kwargs_to_struct(lbfgs_params),
-                                        var_kwargs_to_struct(direction_params)};
+                         params_or_dict<StrucLBFGSDirParams> direction_params) {
+                 return StructuredLBFGSDir{var_kwargs_to_struct(lbfgs_params),
+                                           var_kwargs_to_struct(direction_params)};
              }),
-             "lbfgs_params"_a, "direction_params"_a)
+             "lbfgs_params"_a = py::dict{}, "direction_params"_a = py::dict{})
         .def_property_readonly("params",
-                               py::cpp_function(&StructuredLBFGS::get_params,
+                               py::cpp_function(&StructuredLBFGSDir::get_params,
                                                 py::return_value_policy::reference_internal))
-        .def("__str__", &StructuredLBFGS::get_name);
+        .def("__str__", &StructuredLBFGSDir::get_name);
 
     te_direction.def(py::init(
-        &alpaqa::erase_direction_with_params_dict<StructuredLBFGS, const StructuredLBFGS &>));
-    py::implicitly_convertible<StructuredLBFGS, TypeErasedPANOCDirection>();
+        &alpaqa::erase_direction_with_params_dict<StructuredLBFGSDir, const StructuredLBFGSDir &>));
+    py::implicitly_convertible<StructuredLBFGSDir, TypeErasedPANOCDirection>();
 
     // ----------------------------------------------------------------------------------------- //
     using LipschitzEstimateParams = alpaqa::LipschitzEstimateParams<config_t>;
@@ -315,9 +251,9 @@ void register_panoc(py::module_ &m) {
         // Constructors
         .def(py::init([](params_or_dict<PANOCParams> params,
                          params_or_dict<LBFGSParams> lbfgs_params,
-                         params_or_dict<StrucLBFGSParams> direction_params) {
+                         params_or_dict<StrucLBFGSDirParams> direction_params) {
                  return PANOCSolver{var_kwargs_to_struct(params),
-                                    alpaqa::erase_direction_with_params_dict<StructuredLBFGS>(
+                                    alpaqa::erase_direction_with_params_dict<StructuredLBFGSDir>(
                                         var_kwargs_to_struct(lbfgs_params),
                                         var_kwargs_to_struct(direction_params))};
              }),
@@ -349,22 +285,22 @@ void register_panoc(py::module_ &m) {
              "         * Slack variable error :math:`g(x) - z`\n"
              "         * Statistics\n\n")
         .def("__call__", panoc_independent_solve_unconstr, "problem"_a, "ε"_a, "x"_a = py::none(),
-             "async_"_a = false, //
+             "asynchronous"_a = true, //
              "Solve.\n\n"
              ":param problem: Problem to solve\n"
              ":param ε: Desired tolerance\n"
              ":param x: Initial guess\n"
-             ":param async_: Release the GIL and run the solver on a separate thread\n"
+             ":param asynchronous: Release the GIL and run the solver on a separate thread\n"
              ":return: * Solution :math:`x`\n"
              "         * Statistics\n\n")
         .def("__str__", &PANOCSolver::get_name)
         .def("set_progress_callback", &PANOCSolver::set_progress_callback, "callback"_a,
              "Specify a callable that is invoked with some intermediate results on each iteration "
              "of the algorithm.")
-        .def_property_readonly("direction_provider",
+        .def_property_readonly("direction",
                                py::cpp_function(
                                    [](const PANOCSolver &s) -> const TypeErasedPANOCDirection & {
-                                       return s.direction_provider;
+                                       return s.direction;
                                    },
                                    py::return_value_policy::reference_internal));
 
@@ -496,12 +432,12 @@ void register_panoc(py::module_ &m) {
             [](const PANOCOCPSolver &self, py::dict) { return PANOCOCPSolver{self}; }, "memo"_a)
         // Call
         .def("__call__", panoc_ocp_independent_solve_unconstr, "problem"_a, "ε"_a,
-             "u"_a = py::none(), "async_"_a = false, //
+             "u"_a = py::none(), "asynchronous"_a = true, //
              "Solve.\n\n"
              ":param problem: Problem to solve\n"
              ":param ε: Desired tolerance\n"
              ":param u: Initial guess\n"
-             ":param async_: Release the GIL and run the solver on a separate thread\n"
+             ":param asynchronous: Release the GIL and run the solver on a separate thread\n"
              ":return: * Solution :math:`u`\n"
              "         * Statistics\n\n")
         .def("__str__", &PANOCOCPSolver::get_name)

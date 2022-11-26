@@ -6,12 +6,10 @@
 namespace alpaqa {
 
 template <Config Conf>
-void StructuredLBFGS<Conf>::initialize(const Problem &problem, crvec y, crvec Σ,
-                                       [[maybe_unused]] real_t γ_0,
-                                       [[maybe_unused]] crvec x_0,
-                                       [[maybe_unused]] crvec x̂_0,
-                                       [[maybe_unused]] crvec p_0,
-                                       [[maybe_unused]] crvec grad_ψx_0) {
+void StructuredLBFGSDirection<Conf>::initialize(
+    const Problem &problem, crvec y, crvec Σ, [[maybe_unused]] real_t γ_0,
+    [[maybe_unused]] crvec x_0, [[maybe_unused]] crvec x̂_0,
+    [[maybe_unused]] crvec p_0, [[maybe_unused]] crvec grad_ψx_0) {
     if (!(problem.provides_get_box_C() && problem.provides_get_box_D()))
         throw std::invalid_argument(
             "Structured PANOC only supports box-constrained problems");
@@ -36,9 +34,9 @@ void StructuredLBFGS<Conf>::initialize(const Problem &problem, crvec y, crvec Σ
 }
 
 template <Config Conf>
-bool StructuredLBFGS<Conf>::apply(real_t γₖ, crvec xₖ,
-                                  [[maybe_unused]] crvec x̂ₖ, crvec pₖ,
-                                  crvec grad_ψxₖ, rvec qₖ) const {
+bool StructuredLBFGSDirection<Conf>::apply(real_t γₖ, crvec xₖ,
+                                           [[maybe_unused]] crvec x̂ₖ, crvec pₖ,
+                                           crvec grad_ψxₖ, rvec qₖ) const {
     const auto n  = problem->get_n();
     const auto m  = problem->get_m();
     const auto un = static_cast<std::make_unsigned_t<decltype(n)>>(n);

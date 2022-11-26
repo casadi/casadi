@@ -4,20 +4,22 @@
 
 namespace alpaqa {
 
-ALPAQA_EXPORT_TEMPLATE(class, PANOCSolver, LBFGS<DefaultConfig>);
-ALPAQA_EXPORT_TEMPLATE(class, PANOCSolver, LBFGS<EigenConfigf>);
-ALPAQA_EXPORT_TEMPLATE(class, PANOCSolver, LBFGS<EigenConfigd>);
-ALPAQA_EXPORT_TEMPLATE(class, PANOCSolver, LBFGS<EigenConfigl>);
+// clang-format off
+ALPAQA_EXPORT_TEMPLATE(class, PANOCSolver, LBFGSDirection<DefaultConfig>);
+ALPAQA_EXPORT_TEMPLATE(class, PANOCSolver, LBFGSDirection<EigenConfigf>);
+ALPAQA_EXPORT_TEMPLATE(class, PANOCSolver, LBFGSDirection<EigenConfigd>);
+ALPAQA_EXPORT_TEMPLATE(class, PANOCSolver, LBFGSDirection<EigenConfigl>);
 #ifdef ALPAQA_WITH_QUAD_PRECISION
-ALPAQA_EXPORT_TEMPLATE(class, PANOCSolver, LBFGS<EigenConfigq>);
+ALPAQA_EXPORT_TEMPLATE(class, PANOCSolver, LBFGSDirection<EigenConfigq>);
 #endif
 
-ALPAQA_EXPORT_TEMPLATE(class, ALMSolver, PANOCSolver<LBFGS<DefaultConfig>>);
-ALPAQA_EXPORT_TEMPLATE(class, ALMSolver, PANOCSolver<LBFGS<EigenConfigf>>);
-ALPAQA_EXPORT_TEMPLATE(class, ALMSolver, PANOCSolver<LBFGS<EigenConfigd>>);
-ALPAQA_EXPORT_TEMPLATE(class, ALMSolver, PANOCSolver<LBFGS<EigenConfigl>>);
+ALPAQA_EXPORT_TEMPLATE(class, ALMSolver, PANOCSolver<LBFGSDirection<DefaultConfig>>);
+ALPAQA_EXPORT_TEMPLATE(class, ALMSolver, PANOCSolver<LBFGSDirection<EigenConfigf>>);
+ALPAQA_EXPORT_TEMPLATE(class, ALMSolver, PANOCSolver<LBFGSDirection<EigenConfigd>>);
+ALPAQA_EXPORT_TEMPLATE(class, ALMSolver, PANOCSolver<LBFGSDirection<EigenConfigl>>);
 #ifdef ALPAQA_WITH_QUAD_PRECISION
-ALPAQA_EXPORT_TEMPLATE(class, ALMSolver, PANOCSolver<LBFGS<EigenConfigq>>);
+ALPAQA_EXPORT_TEMPLATE(class, ALMSolver, PANOCSolver<LBFGSDirection<EigenConfigq>>);
 #endif
+// clang-format on
 
 } // namespace alpaqa

@@ -13,16 +13,13 @@ Inner PANOC solver
 PANOC accelerators
 ^^^^^^^^^^^^^^^^^^
 
-.. autoclass:: alpaqa._alpaqa.float64.LBFGS
+.. autoclass:: alpaqa._alpaqa.float64.LBFGSDirection
+    :noindex:
+
+.. autoclass:: alpaqa._alpaqa.float64.StructuredLBFGSDirection
     :noindex:
 
 .. autoclass:: alpaqa._alpaqa.float64.LBFGS.Params
-    :noindex:
-
-.. autoclass:: alpaqa._alpaqa.float64.StructuredLBFGS
-    :noindex:
-
-.. autoclass:: alpaqa._alpaqa.float64.StructuredLBFGS.DirectionParams
     :noindex:
 
 Outer ALM solver

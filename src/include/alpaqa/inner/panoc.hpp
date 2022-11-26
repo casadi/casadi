@@ -98,25 +98,24 @@ struct PANOCProgressInfo {
 
 /// PANOC solver for ALM.
 /// @ingroup    grp_InnerSolvers
-template <class DirectionProviderT>
+template <class DirectionT>
 class PANOCSolver {
   public:
-    USING_ALPAQA_CONFIG_TEMPLATE(DirectionProviderT::config_t);
+    USING_ALPAQA_CONFIG_TEMPLATE(DirectionT::config_t);
 
-    using Problem           = TypeErasedProblem<config_t>;
-    using Params            = PANOCParams<config_t>;
-    using DirectionProvider = DirectionProviderT;
-    using Direction         = PANOCDirection<DirectionProvider>;
-    using Stats             = PANOCStats<config_t>;
-    using ProgressInfo      = PANOCProgressInfo<config_t>;
+    using Problem      = TypeErasedProblem<config_t>;
+    using Params       = PANOCParams<config_t>;
+    using Direction    = DirectionT;
+    using Stats        = PANOCStats<config_t>;
+    using ProgressInfo = PANOCProgressInfo<config_t>;
 
     PANOCSolver(const Params &params)
         requires std::is_default_constructible_v<Direction>
         : params(params) {}
-    PANOCSolver(const Params &params, Direction &&direction_provider)
-        : params(params), direction_provider(std::move(direction_provider)) {}
-    PANOCSolver(const Params &params, const Direction &direction_provider)
-        : params(params), direction_provider(direction_provider) {}
+    PANOCSolver(const Params &params, Direction &&direction)
+        : params(params), direction(std::move(direction)) {}
+    PANOCSolver(const Params &params, const Direction &direction)
+        : params(params), direction(direction) {}
 
     Stats operator()(const Problem &problem,        // in
                      crvec Σ,                       // in
@@ -148,7 +147,7 @@ class PANOCSolver {
     using Helpers = detail::PANOCHelpers<config_t>;
 
   public:
-    Direction direction_provider;
+    Direction direction;
     std::ostream *os = &std::cout;
 };
 

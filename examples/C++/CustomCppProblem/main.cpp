@@ -50,7 +50,7 @@ int main() {
     auto counted_problem = alpaqa::problem_with_counters_ref(problem);
 
     // Define the solvers to use
-    using Accelerator = alpaqa::LBFGS<config_t>;
+    using Accelerator = alpaqa::LBFGSDirection<config_t>;
     using InnerSolver = alpaqa::PANOCSolver<Accelerator>;
     using OuterSolver = alpaqa::ALMSolver<InnerSolver>;
 
@@ -67,7 +67,7 @@ int main() {
     panocparam.max_iter       = 500;
     panocparam.print_interval = 1;
     // Settings for the L-BFGS algorithm used by PANOC
-    Accelerator::Params lbfgsparam;
+    Accelerator::LBFGSParams lbfgsparam;
     lbfgsparam.memory = 2;
 
     // Create an ALM solver using PANOC as inner solver

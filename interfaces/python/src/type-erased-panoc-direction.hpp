@@ -55,7 +55,7 @@ struct PANOCDirectionVTable : util::BasicVTable {
 };
 
 template <Config Conf>
-constexpr size_t te_pd_buff_size = util::required_te_buffer_size_for<PANOCDirection<LBFGS<Conf>>>();
+constexpr size_t te_pd_buff_size = util::required_te_buffer_size_for<LBFGSDirection<Conf>>();
 
 template <Config Conf = DefaultConfig, class Allocator = std::allocator<std::byte>>
 class TypeErasedPANOCDirection
@@ -113,18 +113,11 @@ class TypeErasedPANOCDirection
     }
 };
 
-template <Config Conf>
-struct PANOCDirection<TypeErasedPANOCDirection<Conf>> : TypeErasedPANOCDirection<Conf> {
-    PANOCDirection(const TypeErasedPANOCDirection<Conf> &other)
-        : TypeErasedPANOCDirection<Conf>(other) {}
-    PANOCDirection(TypeErasedPANOCDirection<Conf> &&other)
-        : TypeErasedPANOCDirection<Conf>(std::move(other)) {}
-};
+
 
 template <class T, class... Args>
 auto erase_direction(Args &&...args) {
-    using D = PANOCDirection<T>;
-    return TypeErasedPANOCDirection<typename D::config_t>::template make<D>(
+    return TypeErasedPANOCDirection<typename T::config_t>::template make<T>(
         std::forward<Args>(args)...);
 }
 
@@ -144,12 +137,11 @@ inline py::object to_dict_tup(py::object o) { return std::move(o); }
 
 template <class T, class... Args>
 auto erase_direction_with_params_dict(Args &&...args) {
-    using D = PANOCDirection<T>;
-    struct S : D {
-        using D::D;
-        S(const D &d) : D{d} {}
-        S(D &&d) : D{std::move(d)} {}
-        py::object get_params() const { return detail::to_dict_tup(D::get_params()); }
+    struct S : T {
+        using T::T;
+        S(const T &d) : T{d} {}
+        S(T &&d) : T{std::move(d)} {}
+        py::object get_params() const { return detail::to_dict_tup(T::get_params()); }
     };
     return TypeErasedPANOCDirection<typename T::config_t>::template make<S>(
         std::forward<Args>(args)...);
