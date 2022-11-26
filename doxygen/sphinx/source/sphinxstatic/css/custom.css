@@ -34,9 +34,10 @@ body[data-theme="dark"] .sig.py .sig-param > span.n:first-child {
 body[data-theme="dark"] .sig.cpp > span.sig-param {
     color: #ccc;
 }
-.cpp.struct, .cpp.class, .breathe-sectiondef.docutils.container {
-    padding: 1em;
-    border: 1px solid #eee;
+.cpp.struct, .cpp.class, .py.class, .breathe-sectiondef.docutils.container {
+    padding: 0.6em;
+    border: 1px solid #e7e7e7;
     border-radius: 0.5em;
     margin-bottom: 0.5em;
+    margin-top: 0.5em;
 }
