@@ -22,8 +22,13 @@ pybind11_add_module(_alpaqa MODULE
     "src/enums.py.cpp"
     "src/panoc.py.cpp"
     "src/problems.py.cpp"
-    "src/structured-panoc.py.cpp"
+    "src/params/lbfgs-direction-params.cpp"
+    "src/params/lbfgs-params.cpp"
+    "src/params/panoc-ocp-params.cpp"
+    "src/params/panoc-params.cpp"
+    "src/params/structured-lbfgs-direction-params.cpp"
 )
+target_include_directories(_alpaqa PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 target_link_libraries(_alpaqa PRIVATE pybind11::pybind11 alpaqa::alpaqa)
 target_compile_definitions(_alpaqa PRIVATE
     MODULE_NAME=$<TARGET_FILE_BASE_NAME:_alpaqa>
