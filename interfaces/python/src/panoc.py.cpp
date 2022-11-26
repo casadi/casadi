@@ -27,6 +27,8 @@ using namespace std::chrono_literals;
 
 #include "params/params.hpp"
 #include "stats-to-dict.hpp"
+#include "stream-replacer.hpp"
+#include "thread-checker.hpp"
 #include "type-erased-panoc-direction.hpp"
 
 template <alpaqa::Config Conf>
@@ -269,9 +271,18 @@ void register_panoc(py::module_ &m) {
             return solver(problem, Σ, ε, always_overwrite_results, *x, y, err_z);
         };
         if (!async) {
+            // Replace the output stream
+            StreamReplacer stream{&solver};
+            // Invoke the solver synchronously
             auto stats = invoke_solver();
             return std::make_tuple(std::move(*x), alpaqa::conv::stats_to_dict(stats));
         } else {
+            // Check that the user doesn't use the same solver/problem in multiple threads
+            ThreadChecker solver_checker{&solver};
+            ThreadChecker problem_checker{&problem};
+            // Replace the output stream
+            StreamReplacer stream{&solver};
+            // Invoke the solver asynchronously
             auto stats = std::async(std::launch::async, invoke_solver);
             {
                 py::gil_scoped_release gil;
@@ -301,6 +312,7 @@ void register_panoc(py::module_ &m) {
     };
 
     py::class_<PANOCSolver>(m, "PANOCSolver", "C++ documentation: :cpp:class:`alpaqa::PANOCSolver`")
+        // Constructors
         .def(py::init([](params_or_dict<PANOCParams> params,
                          params_or_dict<LBFGSParams> lbfgs_params,
                          params_or_dict<StrucLBFGSParams> direction_params) {
@@ -318,9 +330,13 @@ void register_panoc(py::module_ &m) {
                                         typename PANOCSolver::Direction{direction}};
                  }),
              "panoc_params"_a, "direction"_a, "Create a PANOC solver using a custom direction.")
-        .def("__call__", panoc_independent_solve,
-             py::call_guard<py::scoped_ostream_redirect, py::scoped_estream_redirect>(),
-             "problem"_a, "Σ"_a, "ε"_a, "x"_a = py::none(),
+        // Copy
+        .def("__copy__", [](const PANOCSolver &self) { return PANOCSolver{self}; })
+        .def(
+            "__deepcopy__", [](const PANOCSolver &self, py::dict) { return PANOCSolver{self}; },
+            "memo"_a)
+        // Call
+        .def("__call__", panoc_independent_solve, "problem"_a, "Σ"_a, "ε"_a, "x"_a = py::none(),
              "y"_a = py::none(), //
              "Solve.\n\n"
              ":param problem: Problem to solve\n"
@@ -332,9 +348,8 @@ void register_panoc(py::module_ &m) {
              "         * Updated Lagrange multipliers :math:`y`\n"
              "         * Slack variable error :math:`g(x) - z`\n"
              "         * Statistics\n\n")
-        .def("__call__", panoc_independent_solve_unconstr,
-             py::call_guard<py::scoped_ostream_redirect, py::scoped_estream_redirect>(),
-             "problem"_a, "ε"_a, "x"_a = py::none(), "async_"_a = false, //
+        .def("__call__", panoc_independent_solve_unconstr, "problem"_a, "ε"_a, "x"_a = py::none(),
+             "async_"_a = false, //
              "Solve.\n\n"
              ":param problem: Problem to solve\n"
              ":param ε: Desired tolerance\n"
@@ -433,6 +448,12 @@ void register_panoc(py::module_ &m) {
             auto stats = invoke_solver();
             return std::make_tuple(std::move(*u), alpaqa::conv::stats_to_dict(stats));
         } else {
+            // Check that the user doesn't use the same solver/problem in multiple threads
+            ThreadChecker solver_checker{&solver};
+            ThreadChecker problem_checker{&problem};
+            // Replace the output stream
+            StreamReplacer stream{&solver};
+            // Invoke the solver asynchronously
             auto stats = std::async(std::launch::async, invoke_solver);
             {
                 py::gil_scoped_release gil{};
@@ -463,13 +484,19 @@ void register_panoc(py::module_ &m) {
 
     py::class_<PANOCOCPSolver>(m, "PANOCOCPSolver",
                                "C++ documentation: :cpp:class:`alpaqa::PANOCOCPSolver`")
+        // Constructor
         .def(py::init([](params_or_dict<PANOCOCPParams> params) {
                  return PANOCOCPSolver{var_kwargs_to_struct(params)};
              }),
              "panoc_params"_a, "Create a PANOC solver.")
-        .def("__call__", panoc_ocp_independent_solve_unconstr,
-             py::call_guard<py::scoped_ostream_redirect, py::scoped_estream_redirect>(),
-             "problem"_a, "ε"_a, "u"_a = py::none(), "async_"_a = false, //
+        // Copy
+        .def("__copy__", [](const PANOCOCPSolver &self) { return PANOCOCPSolver{self}; })
+        .def(
+            "__deepcopy__",
+            [](const PANOCOCPSolver &self, py::dict) { return PANOCOCPSolver{self}; }, "memo"_a)
+        // Call
+        .def("__call__", panoc_ocp_independent_solve_unconstr, "problem"_a, "ε"_a,
+             "u"_a = py::none(), "async_"_a = false, //
              "Solve.\n\n"
              ":param problem: Problem to solve\n"
              ":param ε: Desired tolerance\n"

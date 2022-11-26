@@ -136,47 +136,47 @@ void register_problems(py::module_ &m) {
         PyProblem(py::object o) : o{std::move(o)} {}
 
         // clang-format off
-        void eval_proj_diff_g(crvec z, rvec p) const { o.attr("eval_proj_diff_g")(z, p); }
-        void eval_proj_multipliers(rvec y, real_t M, index_t penalty_alm_split) const { o.attr("eval_proj_multipliers")(y, M, penalty_alm_split); }
-        real_t eval_prox_grad_step(real_t γ, crvec x, crvec grad_ψ, rvec x̂, rvec p) const { return py::cast<real_t>(o.attr("eval_prox_grad_step")(γ, x, grad_ψ, x̂, p)); }
-        real_t eval_f(crvec x) const { return py::cast<real_t>(o.attr("eval_f")(x)); }
-        void eval_grad_f(crvec x, rvec grad_fx) const { o.attr("eval_grad_f")(x, grad_fx); }
-        void eval_g(crvec x, rvec gx) const { o.attr("eval_g")(x, gx); }
-        void eval_grad_g_prod(crvec x, crvec y, rvec grad_gxy) const { o.attr("eval_grad_g_prod")(x, y, grad_gxy); }
-        void eval_grad_gi(crvec x, index_t i, rvec grad_gi) const { o.attr("eval_grad_gi")(x, i, grad_gi); }
-        void eval_hess_L_prod(crvec x, crvec y, crvec v, rvec Hv) const { o.attr("eval_hess_L_prod")(x, y, v, Hv); }
-        void eval_hess_L(crvec x, crvec y, rmat H) const { o.attr("eval_hess_L")(x, y, H); }
-        real_t eval_f_grad_f(crvec x, rvec grad_fx) const { return py::cast<real_t>(o.attr("eval_f_grad_f")(x, grad_fx)); }
-        real_t eval_f_g(crvec x, rvec g) const { return py::cast<real_t>(o.attr("eval_f_g")(x, g)); }
-        real_t eval_f_grad_f_g(crvec x, rvec grad_fx, rvec g) const { return py::cast<real_t>(o.attr("eval_f_grad_f_g")(x, grad_fx, g)); }
-        void eval_grad_f_grad_g_prod(crvec x, crvec y, rvec grad_f, rvec grad_gxy) const { o.attr("eval_grad_f_grad_g_prod")(x, y, grad_f, grad_gxy); }
-        void eval_grad_L(crvec x, crvec y, rvec grad_L, rvec work_n) const { o.attr("eval_grad_L")(x, y, grad_L, work_n); }
-        real_t eval_ψ(crvec x, crvec y, crvec Σ, rvec ŷ) const { return py::cast<real_t>(o.attr("eval_ψ")(x, y, Σ, ŷ)); }
-        void eval_grad_ψ_from_ŷ(crvec x, crvec ŷ, rvec grad_ψ, rvec work_n) const { o.attr("eval_grad_ψ_from_ŷ")(x, ŷ, grad_ψ, work_n); }
-        void eval_grad_ψ(crvec x, crvec y, crvec Σ, rvec grad_ψ, rvec work_n, rvec work_m) const { o.attr("eval_grad_ψ")(x, y, Σ, grad_ψ, work_n, work_m); }
-        real_t eval_ψ_grad_ψ(crvec x, crvec y, crvec Σ, rvec grad_ψ, rvec work_n, rvec work_m) const { return py::cast<real_t>(o.attr("eval_ψ_grad_ψ")(x, y, Σ, grad_ψ, work_n, work_m)); }
-        void check() const { if (auto ch = py::getattr(o, "check", py::none()); !ch.is_none()) ch(); }
-        const Box &get_box_C() const { alpaqa::ScopedMallocAllower ma; C = py::cast<Box>(o.attr("get_box_C")()); return C; }
-        const Box &get_box_D() const { alpaqa::ScopedMallocAllower ma; D = py::cast<Box>(o.attr("get_box_D")()); return D; }
+        void eval_proj_diff_g(crvec z, rvec p) const { py::gil_scoped_acquire gil; o.attr("eval_proj_diff_g")(z, p); }
+        void eval_proj_multipliers(rvec y, real_t M, index_t penalty_alm_split) const { py::gil_scoped_acquire gil; o.attr("eval_proj_multipliers")(y, M, penalty_alm_split); }
+        real_t eval_prox_grad_step(real_t γ, crvec x, crvec grad_ψ, rvec x̂, rvec p) const { py::gil_scoped_acquire gil; return py::cast<real_t>(o.attr("eval_prox_grad_step")(γ, x, grad_ψ, x̂, p)); }
+        real_t eval_f(crvec x) const { py::gil_scoped_acquire gil; return py::cast<real_t>(o.attr("eval_f")(x)); }
+        void eval_grad_f(crvec x, rvec grad_fx) const { py::gil_scoped_acquire gil; o.attr("eval_grad_f")(x, grad_fx); }
+        void eval_g(crvec x, rvec gx) const { py::gil_scoped_acquire gil; o.attr("eval_g")(x, gx); }
+        void eval_grad_g_prod(crvec x, crvec y, rvec grad_gxy) const { py::gil_scoped_acquire gil; o.attr("eval_grad_g_prod")(x, y, grad_gxy); }
+        void eval_grad_gi(crvec x, index_t i, rvec grad_gi) const { py::gil_scoped_acquire gil; o.attr("eval_grad_gi")(x, i, grad_gi); }
+        void eval_hess_L_prod(crvec x, crvec y, crvec v, rvec Hv) const { py::gil_scoped_acquire gil; o.attr("eval_hess_L_prod")(x, y, v, Hv); }
+        void eval_hess_L(crvec x, crvec y, rmat H) const { py::gil_scoped_acquire gil; o.attr("eval_hess_L")(x, y, H); }
+        real_t eval_f_grad_f(crvec x, rvec grad_fx) const { py::gil_scoped_acquire gil; return py::cast<real_t>(o.attr("eval_f_grad_f")(x, grad_fx)); }
+        real_t eval_f_g(crvec x, rvec g) const { py::gil_scoped_acquire gil; return py::cast<real_t>(o.attr("eval_f_g")(x, g)); }
+        real_t eval_f_grad_f_g(crvec x, rvec grad_fx, rvec g) const { py::gil_scoped_acquire gil; return py::cast<real_t>(o.attr("eval_f_grad_f_g")(x, grad_fx, g)); }
+        void eval_grad_f_grad_g_prod(crvec x, crvec y, rvec grad_f, rvec grad_gxy) const { py::gil_scoped_acquire gil; o.attr("eval_grad_f_grad_g_prod")(x, y, grad_f, grad_gxy); }
+        void eval_grad_L(crvec x, crvec y, rvec grad_L, rvec work_n) const { py::gil_scoped_acquire gil; o.attr("eval_grad_L")(x, y, grad_L, work_n); }
+        real_t eval_ψ(crvec x, crvec y, crvec Σ, rvec ŷ) const { py::gil_scoped_acquire gil; return py::cast<real_t>(o.attr("eval_ψ")(x, y, Σ, ŷ)); }
+        void eval_grad_ψ_from_ŷ(crvec x, crvec ŷ, rvec grad_ψ, rvec work_n) const { py::gil_scoped_acquire gil; o.attr("eval_grad_ψ_from_ŷ")(x, ŷ, grad_ψ, work_n); }
+        void eval_grad_ψ(crvec x, crvec y, crvec Σ, rvec grad_ψ, rvec work_n, rvec work_m) const { py::gil_scoped_acquire gil; o.attr("eval_grad_ψ")(x, y, Σ, grad_ψ, work_n, work_m); }
+        real_t eval_ψ_grad_ψ(crvec x, crvec y, crvec Σ, rvec grad_ψ, rvec work_n, rvec work_m) const { py::gil_scoped_acquire gil; return py::cast<real_t>(o.attr("eval_ψ_grad_ψ")(x, y, Σ, grad_ψ, work_n, work_m)); }
+        void check() const { py::gil_scoped_acquire gil; if (auto ch = py::getattr(o, "check", py::none()); !ch.is_none()) ch(); }
+        const Box &get_box_C() const { py::gil_scoped_acquire gil; alpaqa::ScopedMallocAllower ma; C = py::cast<Box>(o.attr("get_box_C")()); return C; }
+        const Box &get_box_D() const { py::gil_scoped_acquire gil; alpaqa::ScopedMallocAllower ma; D = py::cast<Box>(o.attr("get_box_D")()); return D; }
 
-        bool provides_eval_grad_gi() const { return py::hasattr(o, "eval_grad_gi"); }
-        bool provides_eval_hess_L_prod() const { return py::hasattr(o, "eval_hess_L_prod"); }
-        bool provides_eval_hess_L() const { return py::hasattr(o, "eval_hess_L"); }
-        bool provides_eval_f_grad_f() const { return py::hasattr(o, "eval_f_grad_f"); }
-        bool provides_eval_f_g() const { return py::hasattr(o, "eval_f_g"); }
-        bool provides_eval_f_grad_f_g() const { return py::hasattr(o, "eval_f_grad_f_g"); }
-        bool provides_eval_grad_f_grad_g_prod() const { return py::hasattr(o, "eval_grad_f_grad_g_prod"); }
-        bool provides_eval_grad_L() const { return py::hasattr(o, "eval_grad_L"); }
-        bool provides_eval_ψ() const { return py::hasattr(o, "eval_ψ"); }
-        bool provides_eval_grad_ψ_from_ŷ() const { return py::hasattr(o, "eval_grad_ψ_from_ŷ"); }
-        bool provides_eval_grad_ψ() const { return py::hasattr(o, "eval_grad_ψ"); }
-        bool provides_eval_ψ_grad_ψ() const { return py::hasattr(o, "eval_ψ_grad_ψ"); }
-        bool provides_get_box_C() const { return py::hasattr(o, "get_box_C"); }
-        bool provides_get_box_D() const { return py::hasattr(o, "get_box_D"); }
+        bool provides_eval_grad_gi() const { py::gil_scoped_acquire gil; return py::hasattr(o, "eval_grad_gi"); }
+        bool provides_eval_hess_L_prod() const { py::gil_scoped_acquire gil; return py::hasattr(o, "eval_hess_L_prod"); }
+        bool provides_eval_hess_L() const { py::gil_scoped_acquire gil; return py::hasattr(o, "eval_hess_L"); }
+        bool provides_eval_f_grad_f() const { py::gil_scoped_acquire gil; return py::hasattr(o, "eval_f_grad_f"); }
+        bool provides_eval_f_g() const { py::gil_scoped_acquire gil; return py::hasattr(o, "eval_f_g"); }
+        bool provides_eval_f_grad_f_g() const { py::gil_scoped_acquire gil; return py::hasattr(o, "eval_f_grad_f_g"); }
+        bool provides_eval_grad_f_grad_g_prod() const { py::gil_scoped_acquire gil; return py::hasattr(o, "eval_grad_f_grad_g_prod"); }
+        bool provides_eval_grad_L() const { py::gil_scoped_acquire gil; return py::hasattr(o, "eval_grad_L"); }
+        bool provides_eval_ψ() const { py::gil_scoped_acquire gil; return py::hasattr(o, "eval_ψ"); }
+        bool provides_eval_grad_ψ_from_ŷ() const { py::gil_scoped_acquire gil; return py::hasattr(o, "eval_grad_ψ_from_ŷ"); }
+        bool provides_eval_grad_ψ() const { py::gil_scoped_acquire gil; return py::hasattr(o, "eval_grad_ψ"); }
+        bool provides_eval_ψ_grad_ψ() const { py::gil_scoped_acquire gil; return py::hasattr(o, "eval_ψ_grad_ψ"); }
+        bool provides_get_box_C() const { py::gil_scoped_acquire gil; return py::hasattr(o, "get_box_C"); }
+        bool provides_get_box_D() const { py::gil_scoped_acquire gil; return py::hasattr(o, "get_box_D"); }
         // clang-format on
 
-        length_t get_n() const { return py::cast<length_t>(o.attr("n")); }
-        length_t get_m() const { return py::cast<length_t>(o.attr("m")); }
+        length_t get_n() const { py::gil_scoped_acquire gil; return py::cast<length_t>(o.attr("n")); }
+        length_t get_m() const { py::gil_scoped_acquire gil; return py::cast<length_t>(o.attr("m")); }
 
         // To keep the references to the boxes alive
         mutable Box C;

@@ -365,18 +365,18 @@ auto PANOCOCPSolver<Conf>::operator()(
                               real_t pₖᵀpₖ, crvec qₖ, real_t γₖ, real_t τₖ,
                               real_t εₖ, bool did_gn, length_t nJ,
                               real_t min_rcond) {
-        std::cout << "[PANOC] " << std::setw(6) << k
-                  << ": φγ = " << print_real(φₖ) << ", ψ = " << print_real(ψₖ)
-                  << ", ‖∇ψ‖ = " << print_real(grad_ψₖ.norm())
-                  << ", ‖p‖ = " << print_real(std::sqrt(pₖᵀpₖ))
-                  << ", γ = " << print_real(γₖ) << ", εₖ = " << print_real(εₖ);
+        *os << "[PANOC] " << std::setw(6) << k << ": φγ = " << print_real(φₖ)
+            << ", ψ = " << print_real(ψₖ)
+            << ", ‖∇ψ‖ = " << print_real(grad_ψₖ.norm())
+            << ", ‖p‖ = " << print_real(std::sqrt(pₖᵀpₖ))
+            << ", γ = " << print_real(γₖ) << ", εₖ = " << print_real(εₖ);
         if (k > 0)
-            std::cout << ", τ = " << print_real3(τₖ)
-                      << ", ‖q‖ = " << print_real(qₖ.norm())
-                      << ", #J =" << std::setw(5) << nJ
-                      << ", rcond = " << print_real3(min_rcond) << ", "
-                      << (did_gn ? "GN" : "L-BFGS");
-        std::cout << std::endl; // Flush for Python buffering
+            *os << ", τ = " << print_real3(τₖ)
+                << ", ‖q‖ = " << print_real(qₖ.norm())
+                << ", #J =" << std::setw(5) << nJ
+                << ", rcond = " << print_real3(min_rcond) << ", "
+                << (did_gn ? "GN" : "L-BFGS");
+        *os << std::endl; // Flush for Python buffering
     };
 
     // Initialize inputs and initial state (do not simulate states yet) --------

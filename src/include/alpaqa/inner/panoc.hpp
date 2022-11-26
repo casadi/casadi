@@ -10,6 +10,7 @@
 #include <alpaqa/util/atomic-stop-signal.hpp>
 
 #include <chrono>
+#include <iostream>
 #include <limits>
 #include <string>
 #include <type_traits>
@@ -148,6 +149,7 @@ class PANOCSolver {
 
   public:
     Direction direction_provider;
+    std::ostream *os = &std::cout;
 };
 
 template <class InnerSolverStats>

@@ -22,10 +22,17 @@ struct InnerStatsAccumulator;
 template <Config Conf>
 struct TypeErasedInnerSolverStats;
 
+namespace detail {
+py::dict make_dict_threadsafe() {
+    py::gil_scoped_acquire gil;
+    return {};
+}
+} // namespace detail
+
 template <Config Conf>
 struct InnerStatsAccumulator<TypeErasedInnerSolverStats<Conf>> {
     std::any accumulator;
-    py::dict as_dict;
+    py::dict as_dict = detail::make_dict_threadsafe();
 };
 
 template <Config Conf, class Stats>

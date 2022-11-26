@@ -123,15 +123,15 @@ auto PANOCSolver<DirectionProviderT>::operator()(
     auto print_progress = [&](unsigned k, real_t φγ, real_t ψ, crvec grad_ψ,
                               real_t pᵀp, crvec q, real_t γ, real_t τ,
                               real_t ε) {
-        std::cout << "[PANOC] " << std::setw(6) << k
-                  << ": φγ = " << print_real(φγ) << ", ψ = " << print_real(ψ)
-                  << ", ‖∇ψ‖ = " << print_real(grad_ψ.norm())
-                  << ", ‖p‖ = " << print_real(std::sqrt(pᵀp))
-                  << ", γ = " << print_real(γ) << ", ε = " << print_real(ε);
+        *os << "[PANOC] " << std::setw(6) << k << ": φγ = " << print_real(φγ)
+            << ", ψ = " << print_real(ψ)
+            << ", ‖∇ψ‖ = " << print_real(grad_ψ.norm())
+            << ", ‖p‖ = " << print_real(std::sqrt(pᵀp))
+            << ", γ = " << print_real(γ) << ", ε = " << print_real(ε);
         if (k > 0)
-            std::cout << ", τ = " << print_real3(τ)
-                      << ", ‖q‖ = " << print_real(q.norm());
-        std::cout << std::endl; // Flush for Python buffering
+            *os << ", τ = " << print_real3(τ)
+                << ", ‖q‖ = " << print_real(q.norm());
+        *os << std::endl; // Flush for Python buffering
     };
 
     // Initialization ----------------------------------------------------------

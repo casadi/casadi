@@ -25,6 +25,8 @@ using namespace std::chrono_literals;
 #include <alpaqa/util/check-dim.hpp>
 
 #include "kwargs-to-struct.hpp"
+#include "stream-replacer.hpp"
+#include "thread-checker.hpp"
 #include "type-erased-inner-solver.hpp"
 #include "type-erased-panoc-direction.hpp"
 
@@ -125,10 +127,19 @@ void register_alm(py::module_ &m) {
 
         auto invoke_solver = [&] { return solver(p, *y, *x); };
         if (!async) {
+            // Replace the output stream
+            StreamReplacer stream{&solver};
+            // Invoke the solver synchronously
             auto stats = invoke_solver();
             return std::make_tuple(std::move(*x), std::move(*y),
                                    alpaqa::conv::stats_to_dict<InnerSolver>(stats));
         } else {
+            // Check that the user doesn't use the same solver/problem in multiple threads
+            ThreadChecker solver_checker{&solver};
+            ThreadChecker problem_checker{&p};
+            // Replace the output stream
+            StreamReplacer stream{&solver};
+            // Invoke the solver asynchronously
             auto stats = std::async(std::launch::async, invoke_solver);
             {
                 py::gil_scoped_release gil{};
@@ -179,6 +190,11 @@ void register_alm(py::module_ &m) {
                                                     InnerSolver{inner});
              }),
              "alm_params"_a, "inner_solver"_a, "Build an ALM solver using PANOC as inner solver.")
+        // Copy
+        .def("__copy__", [](const ALMSolver &self) { return ALMSolver{self}; })
+        .def(
+            "__deepcopy__", [](const ALMSolver &self, py::dict) { return ALMSolver{self}; },
+            "memo"_a)
         // Other functions and properties
         .def_property_readonly(
             "inner_solver",
@@ -186,7 +202,6 @@ void register_alm(py::module_ &m) {
                              ret_ref_internal))
         .def("__call__", safe_alm_call, "problem"_a, "x"_a = std::nullopt, "y"_a = std::nullopt,
              "async_"_a = false,
-             py::call_guard<py::scoped_ostream_redirect, py::scoped_estream_redirect>(),
              "Solve.\n\n"
              ":param problem: Problem to solve.\n"
              ":param x: Initial guess for decision variables :math:`x`\n\n"

@@ -119,15 +119,14 @@ ALMSolver<InnerSolverT>::operator()(const Problem &p, rvec y, rvec x) {
             real_t δ       = backtrack ? NaN : vec_util::norm_inf(error_2);
             auto color     = inner_converged ? "\x1b[0;32m" : "\x1b[0;31m";
             auto color_end = "\x1b[0m";
-            std::cout << "[\x1b[0;34mALM\x1b[0m]   " << std::setw(5) << i
-                      << ": ‖Σ‖ = " << print_real(Σ.norm())
-                      << ", ‖y‖ = " << print_real(y.norm())
-                      << ", δ = " << print_real(δ)
-                      << ", ε = " << print_real(ps.ε)
-                      << ", Δ = " << print_real(Δ) << ", status = " << color
-                      << std::setw(13) << ps.status << color_end
-                      << ", iter = " << std::setw(13) << ps.iterations
-                      << std::endl; // Flush for Python buffering
+            *os << "[\x1b[0;34mALM\x1b[0m]   " << std::setw(5) << i
+                << ": ‖Σ‖ = " << print_real(Σ.norm())
+                << ", ‖y‖ = " << print_real(y.norm())
+                << ", δ = " << print_real(δ) << ", ε = " << print_real(ps.ε)
+                << ", Δ = " << print_real(Δ) << ", status = " << color
+                << std::setw(13) << ps.status << color_end
+                << ", iter = " << std::setw(13) << ps.iterations
+                << std::endl; // Flush for Python buffering
         }
 
         // TODO: check penalty size?

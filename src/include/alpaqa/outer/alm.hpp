@@ -7,6 +7,7 @@
 #include <alpaqa/problem/type-erased-problem.hpp>
 
 #include <chrono>
+#include <iostream>
 #include <string>
 
 namespace alpaqa {
@@ -180,6 +181,7 @@ class ALMSolver {
 
   public:
     InnerSolver inner_solver;
+    std::ostream *os = &std::cout;
 };
 
 ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, ALMParams, DefaultConfig);

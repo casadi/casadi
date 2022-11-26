@@ -4,6 +4,7 @@
 #include "alpaqa/problem/dynamics.hpp"
 
 #include <chrono>
+#include <iostream>
 #include <limits>
 #include <string>
 
@@ -152,6 +153,9 @@ class PANOCOCPSolver {
     AtomicStopSignal stop_signal;
     std::function<void(const ProgressInfo &)> progress_cb;
     using Helpers = detail::PANOCHelpers<config_t>;
+
+  public:
+    std::ostream *os = &std::cout;
 };
 
 ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, PANOCOCPProgressInfo, DefaultConfig);
