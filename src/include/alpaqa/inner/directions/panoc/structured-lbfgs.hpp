@@ -26,9 +26,9 @@ struct StructuredLBFGS {
 
     using DirectionParams = StructuredLBFGSDirectionParams<config_t>;
 
-    StructuredLBFGS(const typename LBFGS::Params &params,
-                    const DirectionParams &directionparams = {})
-        : lbfgs(params), direction_params(directionparams) {}
+    StructuredLBFGS(const typename LBFGS::Params &params    = {},
+                    const DirectionParams &direction_params = {})
+        : lbfgs(params), direction_params(direction_params) {}
 
     /// @see @ref PANOCDirection::initialize
     void initialize(const Problem &problem, crvec y, crvec Σ, real_t γ_0,

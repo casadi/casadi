@@ -12,6 +12,7 @@
 #include <chrono>
 #include <limits>
 #include <string>
+#include <type_traits>
 
 namespace alpaqa {
 
@@ -108,6 +109,9 @@ class PANOCSolver {
     using Stats             = PANOCStats<config_t>;
     using ProgressInfo      = PANOCProgressInfo<config_t>;
 
+    PANOCSolver(const Params &params)
+        requires std::is_default_constructible_v<Direction>
+        : params(params) {}
     PANOCSolver(const Params &params, Direction &&direction_provider)
         : params(params), direction_provider(std::move(direction_provider)) {}
     PANOCSolver(const Params &params, const Direction &direction_provider)
