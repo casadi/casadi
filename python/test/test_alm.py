@@ -96,7 +96,7 @@ def test_alm_inherit():
     pc, counters = pa.problem_with_counters(p)
     x0 = np.array([3, 3])
     y0 = np.array([0, 0])
-    x, y, stats = almsolver(pa.TEProblem(p), x=x0, y=y0)
+    x, y, stats = almsolver(pa.Problem(p), x=x0, y=y0)
     x, y, stats = almsolver(pc, x=x0, y=y0)
 
     print()
@@ -121,7 +121,7 @@ def test_alm_structured_inherit():
     pc, counters = pa.problem_with_counters(p)
     x0 = np.array([3, 3])
     y0 = np.array([0, 0])
-    x, y, stats = almsolver(pa.TEProblem(p), x=x0, y=y0)
+    x, y, stats = almsolver(pa.Problem(p), x=x0, y=y0)
     x, y, stats = almsolver(pc, x=x0, y=y0)
 
     print()

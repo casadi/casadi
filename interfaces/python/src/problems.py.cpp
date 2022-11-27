@@ -173,10 +173,10 @@ void register_problems(py::module_ &m) {
         bool provides_eval_ψ_grad_ψ() const { py::gil_scoped_acquire gil; return py::hasattr(o, "eval_ψ_grad_ψ"); }
         bool provides_get_box_C() const { py::gil_scoped_acquire gil; return py::hasattr(o, "get_box_C"); }
         bool provides_get_box_D() const { py::gil_scoped_acquire gil; return py::hasattr(o, "get_box_D"); }
-        // clang-format on
 
         length_t get_n() const { py::gil_scoped_acquire gil; return py::cast<length_t>(o.attr("n")); }
         length_t get_m() const { py::gil_scoped_acquire gil; return py::cast<length_t>(o.attr("m")); }
+        // clang-format on
 
         // To keep the references to the boxes alive
         mutable Box C;
@@ -184,7 +184,7 @@ void register_problems(py::module_ &m) {
     };
 
     using TEProblem = alpaqa::TypeErasedProblem<config_t>;
-    py::class_<TEProblem> te_problem(m, "TEProblem",
+    py::class_<TEProblem> te_problem(m, "Problem",
                                      "C++ documentation: :cpp:class:`alpaqa::TypeErasedProblem`");
     te_problem //
         .def(py::init<const TEProblem &>())
@@ -333,7 +333,7 @@ void register_problems(py::module_ &m) {
         py::class_<CasADiProblem, BoxConstrProblem>(
             m, "CasADiProblem",
             "C++ documentation: :cpp:class:`alpaqa::CasADiProblem`\n\n"
-            "See :py:class:`alpaqa._alpaqa.float64.TEProblem` for the full documentation.")
+            "See :py:class:`alpaqa._alpaqa.float64.Problem` for the full documentation.")
             .def("__copy__", [](const CasADiProblem &self) { return CasADiProblem{self}; })
             .def(
                 "__deepcopy__",

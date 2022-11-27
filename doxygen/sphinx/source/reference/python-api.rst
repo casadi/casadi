@@ -38,7 +38,7 @@ Problem formulation
     :noindex:
     :inherited-members:
 
-.. autoclass:: alpaqa._alpaqa.float64.TEProblem
+.. autoclass:: alpaqa._alpaqa.float64.Problem
     :noindex:
     :inherited-members:
 
