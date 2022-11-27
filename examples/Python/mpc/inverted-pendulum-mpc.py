@@ -1,14 +1,14 @@
 # %% Model
 
 import casadi as cs
+import numpy as np
 
 # State vector
-x = cs.SX.sym("x")  # Cart position                      [m]
-v = cs.SX.sym("v")  # Cart velocity                      [m/s]
 θ = cs.SX.sym("θ")  # Pendulum angle                     [rad]
 ω = cs.SX.sym("ω")  # Pendulum angular velocity          [rad/s]
-i = cs.SX.sym("i")  # Integral of cart position          [m s]
-state = cs.vertcat(x, v, θ, ω, i)  # Full state vector
+x = cs.SX.sym("x")  # Cart position                      [m]
+v = cs.SX.sym("v")  # Cart velocity                      [m/s]
+state = cs.vertcat(θ, ω, x, v)  # Full state vector
 nx = state.shape[0]  # Number of states
 
 # Input
@@ -30,7 +30,7 @@ N_sim = 240  #      Simulation length                    [time steps]
 a_pend = (l_pend * cs.sin(θ) * ω**2 - g_gravity * cs.cos(θ) * cs.sin(θ))
 a = (F - b_cart * v + m_pend * a_pend) / (m_cart + m_pend)
 α = (g_gravity * cs.sin(θ) - a * cs.cos(θ)) / l_pend
-f_c = cs.Function("f_c", [state, F], [cs.vertcat(v, a, ω, α, x)])
+f_c = cs.Function("f_c", [state, F], [cs.vertcat(ω, α, v, a)])
 
 # 4th order Runge-Kutta integrator
 k1 = f_c(state, F)
@@ -54,8 +54,9 @@ Q = cs.SX.sym("Q", nx)  # Stage state cost
 Qf = cs.SX.sym("Qf", nx)  # Terminal state cost
 R = cs.SX.sym("R", nu)  # Stage input cost
 s, u = cs.SX.sym("s", nx), cs.SX.sym("u", nu)
-stage_cost_x = cs.Function("lx", [s], [cs.dot(s, cs.diag(Q) @ s)])
-terminal_cost_x = cs.Function("lf", [s], [cs.dot(s, cs.diag(Qf) @ s)])
+sin_s = cs.vertcat(cs.sin(s[0] / 2), s[1:])  # Penalize sin(θ/2), not θ
+stage_cost_x = cs.Function("lx", [s], [cs.dot(sin_s, cs.diag(Q) @ sin_s)])
+terminal_cost_x = cs.Function("lf", [s], [cs.dot(sin_s, cs.diag(Qf) @ sin_s)])
 stage_cost_u = cs.Function("lu", [u], [cs.dot(u, cs.diag(R) @ u)])
 
 mpc_param = cs.vertcat(mpc_x0, Q, Qf, R)
@@ -67,7 +68,6 @@ mpc_cost_fun = cs.Function('f_mpc', [cs.vec(mpc_u), mpc_param],
 
 # Compile into an alpaqa problem
 from alpaqa import casadi_loader as cl
-import numpy as np
 
 # Generate C code for the cost function, compile it, and load it as an
 # alpaqa problem description:
@@ -85,8 +85,9 @@ inner_solver = Solver(
     panoc_params={
         'max_time': timedelta(seconds=Ts),
         'max_iter': 200,
+        'stop_crit': pa.PANOCStopCrit.ProjGradUnitNorm2,
     },
-    lbfgs_params={'memory': 10},
+    lbfgs_params={'memory': N_horiz // 5},
 )
 solver = pa.ALMSolver(
     alm_params={
@@ -122,9 +123,8 @@ class MPCController:
         # (warm start using the shifted previous solution)
         self.u, _, stats = solver(self.problem, self.u)
         # Print some solver statistics
-        print(stats['status'], stats['outer_iterations'],
-              stats['inner']['iterations'], stats['elapsed_time'],
-              stats['inner_convergence_failures'])
+        print(f"{stats['status']!s:24} {stats['inner']['iterations']:3} "
+              f"{stats['elapsed_time']} {stats['inner_convergence_failures']}")
         self.tot_it += stats['inner']['iterations']
         self.failures += stats['status'] != pa.SolverStatus.Converged
         self.tot_time += stats['elapsed_time']
@@ -132,30 +132,27 @@ class MPCController:
         # Return the optimal control signal for the first time step
         return self.u[:nu]
 
-
 # %% Simulate the system using the MPC controller
 
-state_0 = np.array([0, 0, -np.pi / 3, 0, 0])  # Initial state of the system
+state_0 = np.array([-np.pi / 3, 0, 0, 0])  # Initial state of the system
 
 # Parameters
-Q = [1, 1e-2, 1e-1, 1e-2, 1e-2]
-Qf = [10, 1e-2, 1e-1, 1e-2, 1e-2]
+Q = [10, 1e-2, 1, 1e-2]
+Qf = np.array([10, 1e-1, 1000, 1e-1])
 R = [1e-1]
 problem.param = np.concatenate((state_0, Q, Qf, R))
 
 # Simulation
-state_n = state_0
-mpc_states = np.empty((nx, N_sim))
+mpc_states = np.empty((nx, N_sim + 1))
 mpc_inputs = np.empty((nu, N_sim))
+mpc_states[:, 0] = state_0
 controller = MPCController(problem)
 for n in range(N_sim):
     # Solve the optimal control problem:
-    input_n = controller(state_n)
+    mpc_inputs[:, n] = controller(mpc_states[:, n])
     # Apply the first optimal control input to the system and simulate for
     # one time step, then update the state:
-    state_n = f_d(state_n, input_n).T
-    mpc_states[:, n] = state_n
-    mpc_inputs[:, n] = input_n
+    mpc_states[:, n + 1] = f_d(mpc_states[:, n], mpc_inputs[:, n]).T
 
 print(f"{controller.tot_it} iterations, {controller.failures} failures")
 print(f"time: {controller.tot_time} (total), {controller.max_time} (max), "
@@ -172,8 +169,8 @@ mpl.rcParams['animation.frame_format'] = 'svg'
 # Plot the cart and pendulum
 fig, ax = plt.subplots()
 h = 0.04
-x = [state_0[0], state_0[0] + l_pend * np.sin(state_0[2])]
-y = [h, h + l_pend * np.cos(state_0[2])]
+x = [state_0[2], state_0[2] + l_pend * np.sin(state_0[0])]
+y = [h, h + l_pend * np.cos(state_0[0])]
 target_pend, = ax.plot(x, y, '--', label='Initial state')
 pend, = ax.plot(x, y, '-o', label='MPC')
 cart = plt.Rectangle((-2 * h, 0), 4 * h, h, color='tab:orange')
@@ -189,11 +186,11 @@ class Animation:
 
     def __call__(self, n):
         state_n = mpc_states[:, n]
-        x = [state_n[0], state_n[0] + l_pend * np.sin(state_n[2])]
-        y = [h, h + l_pend * np.cos(state_n[2])]
+        x = [state_n[2], state_n[2] + l_pend * np.sin(state_n[0])]
+        y = [h, h + l_pend * np.cos(state_n[0])]
         pend.set_xdata(x)
         pend.set_ydata(y)
-        cart.set_x(state_n[0] - 2 * h)
+        cart.set_x(state_n[2] - 2 * h)
         return [pend, cart]
 
 
@@ -205,16 +202,17 @@ ani = animation.FuncAnimation(fig,
                               frames=N_sim)
 
 fig, axs = plt.subplots(5, sharex=True, figsize=(6, 9))
-ts = np.arange(N_sim) * Ts
+ts = np.arange(N_sim + 1) * Ts
 labels = [
-    "Position $x$ [m]", "Velocity $v$ [m/s]", "Angle $\\theta$ [rad]",
-    "Angular velocity $\\omega$ [rad/s]"
+    "Angle $\\theta$ [rad]",
+    "Angular velocity $\\omega$ [rad/s]",
+    "Position $x$ [m]", "Velocity $v$ [m/s]", 
 ]
 for i, (ax, lbl) in enumerate(zip(axs[:-1], labels)):
     ax.plot(ts, mpc_states[i, :])
     ax.set_title(lbl)
 ax = axs[-1]
-ax.plot(ts, mpc_inputs.T)
+ax.plot(ts[:N_sim], mpc_inputs.T)
 ax.set_title("Control input $F$ [N]")
 ax.set_xlabel("Simulation time $t$ [s]")
 plt.tight_layout()

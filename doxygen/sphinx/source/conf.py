@@ -248,5 +248,6 @@ mathjax3_config = {
         },
         'packages': ['base','configmacros','newcommand','ams'],
         'tags': 'ams',
-    }
+    },
+    'loader': {'load': ['[tex]/newcommand']},
 }
