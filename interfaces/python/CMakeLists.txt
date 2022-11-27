@@ -22,6 +22,8 @@ pybind11_add_module(_alpaqa MODULE
     "src/enums.py.cpp"
     "src/lbfgs.py.cpp"
     "src/panoc.py.cpp"
+    "src/panoc-directions.py.cpp"
+    "src/panoc-ocp.py.cpp"
     "src/problems.py.cpp"
     "src/params/lbfgs-direction-params.cpp"
     "src/params/lbfgs-params.cpp"
