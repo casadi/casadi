@@ -30,5 +30,5 @@ template struct dict_to_struct_table<alpaqa::PANOCOCPParams<alpaqa::EigenConfigf
 template struct dict_to_struct_table<alpaqa::PANOCOCPParams<alpaqa::EigenConfigd>>;
 template struct dict_to_struct_table<alpaqa::PANOCOCPParams<alpaqa::EigenConfigl>>;
 #ifdef ALPAQA_WITH_QUAD_PRECISION
-template struct dict_to_struct_table<alpaqa::PANOCOCPParams<alpaqa::EigenConfigf>>;
+template struct dict_to_struct_table<alpaqa::PANOCOCPParams<alpaqa::EigenConfigq>>;
 #endif

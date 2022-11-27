@@ -13,6 +13,6 @@ extern template struct dict_to_struct_table<alpaqa::StructuredLBFGSDirectionPara
 extern template struct dict_to_struct_table<alpaqa::StructuredLBFGSDirectionParams<alpaqa::EigenConfigd>>;
 extern template struct dict_to_struct_table<alpaqa::StructuredLBFGSDirectionParams<alpaqa::EigenConfigl>>;
 #ifdef ALPAQA_WITH_QUAD_PRECISION
-extern template struct dict_to_struct_table<alpaqa::StructuredLBFGSDirectionParams<alpaqa::EigenConfigf>>;
+extern template struct dict_to_struct_table<alpaqa::StructuredLBFGSDirectionParams<alpaqa::EigenConfigq>>;
 #endif
 // clang-format on

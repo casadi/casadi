@@ -17,12 +17,12 @@ extern template struct dict_to_struct_table<alpaqa::LBFGSParams<alpaqa::EigenCon
 extern template struct dict_to_struct_table<alpaqa::LBFGSParams<alpaqa::EigenConfigd>>;
 extern template struct dict_to_struct_table<alpaqa::LBFGSParams<alpaqa::EigenConfigl>>;
 #ifdef ALPAQA_WITH_QUAD_PRECISION
-extern template struct dict_to_struct_table<alpaqa::LBFGSParams<alpaqa::EigenConfigf>>;
+extern template struct dict_to_struct_table<alpaqa::LBFGSParams<alpaqa::EigenConfigq>>;
 #endif
 
 extern template struct dict_to_struct_table<alpaqa::CBFGSParams<alpaqa::EigenConfigf>>;
 extern template struct dict_to_struct_table<alpaqa::CBFGSParams<alpaqa::EigenConfigd>>;
 extern template struct dict_to_struct_table<alpaqa::CBFGSParams<alpaqa::EigenConfigl>>;
 #ifdef ALPAQA_WITH_QUAD_PRECISION
-extern template struct dict_to_struct_table<alpaqa::CBFGSParams<alpaqa::EigenConfigf>>;
+extern template struct dict_to_struct_table<alpaqa::CBFGSParams<alpaqa::EigenConfigq>>;
 #endif

@@ -12,5 +12,5 @@ extern template struct dict_to_struct_table<alpaqa::LBFGSDirectionParams<alpaqa:
 extern template struct dict_to_struct_table<alpaqa::LBFGSDirectionParams<alpaqa::EigenConfigd>>;
 extern template struct dict_to_struct_table<alpaqa::LBFGSDirectionParams<alpaqa::EigenConfigl>>;
 #ifdef ALPAQA_WITH_QUAD_PRECISION
-extern template struct dict_to_struct_table<alpaqa::LBFGSDirectionParams<alpaqa::EigenConfigf>>;
+extern template struct dict_to_struct_table<alpaqa::LBFGSDirectionParams<alpaqa::EigenConfigq>>;
 #endif

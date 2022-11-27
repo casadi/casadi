@@ -17,12 +17,12 @@ extern template struct dict_to_struct_table<alpaqa::PANOCParams<alpaqa::EigenCon
 extern template struct dict_to_struct_table<alpaqa::PANOCParams<alpaqa::EigenConfigd>>;
 extern template struct dict_to_struct_table<alpaqa::PANOCParams<alpaqa::EigenConfigl>>;
 #ifdef ALPAQA_WITH_QUAD_PRECISION
-extern template struct dict_to_struct_table<alpaqa::PANOCParams<alpaqa::EigenConfigf>>;
+extern template struct dict_to_struct_table<alpaqa::PANOCParams<alpaqa::EigenConfigq>>;
 #endif
 
 extern template struct dict_to_struct_table<alpaqa::LipschitzEstimateParams<alpaqa::EigenConfigf>>;
 extern template struct dict_to_struct_table<alpaqa::LipschitzEstimateParams<alpaqa::EigenConfigd>>;
 extern template struct dict_to_struct_table<alpaqa::LipschitzEstimateParams<alpaqa::EigenConfigl>>;
 #ifdef ALPAQA_WITH_QUAD_PRECISION
-extern template struct dict_to_struct_table<alpaqa::LipschitzEstimateParams<alpaqa::EigenConfigf>>;
+extern template struct dict_to_struct_table<alpaqa::LipschitzEstimateParams<alpaqa::EigenConfigq>>;
 #endif

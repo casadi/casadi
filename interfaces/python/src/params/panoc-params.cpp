@@ -32,12 +32,12 @@ template struct dict_to_struct_table<alpaqa::PANOCParams<alpaqa::EigenConfigf>>;
 template struct dict_to_struct_table<alpaqa::PANOCParams<alpaqa::EigenConfigd>>;
 template struct dict_to_struct_table<alpaqa::PANOCParams<alpaqa::EigenConfigl>>;
 #ifdef ALPAQA_WITH_QUAD_PRECISION
-template struct dict_to_struct_table<alpaqa::PANOCParams<alpaqa::EigenConfigf>>;
+template struct dict_to_struct_table<alpaqa::PANOCParams<alpaqa::EigenConfigq>>;
 #endif
 
 template struct dict_to_struct_table<alpaqa::LipschitzEstimateParams<alpaqa::EigenConfigf>>;
 template struct dict_to_struct_table<alpaqa::LipschitzEstimateParams<alpaqa::EigenConfigd>>;
 template struct dict_to_struct_table<alpaqa::LipschitzEstimateParams<alpaqa::EigenConfigl>>;
 #ifdef ALPAQA_WITH_QUAD_PRECISION
-template struct dict_to_struct_table<alpaqa::LipschitzEstimateParams<alpaqa::EigenConfigf>>;
+template struct dict_to_struct_table<alpaqa::LipschitzEstimateParams<alpaqa::EigenConfigq>>;
 #endif

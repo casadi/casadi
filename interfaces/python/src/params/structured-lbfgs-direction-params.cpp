@@ -15,6 +15,6 @@ template struct dict_to_struct_table<alpaqa::StructuredLBFGSDirectionParams<alpa
 template struct dict_to_struct_table<alpaqa::StructuredLBFGSDirectionParams<alpaqa::EigenConfigd>>;
 template struct dict_to_struct_table<alpaqa::StructuredLBFGSDirectionParams<alpaqa::EigenConfigl>>;
 #ifdef ALPAQA_WITH_QUAD_PRECISION
-template struct dict_to_struct_table<alpaqa::StructuredLBFGSDirectionParams<alpaqa::EigenConfigf>>;
+template struct dict_to_struct_table<alpaqa::StructuredLBFGSDirectionParams<alpaqa::EigenConfigq>>;
 #endif
 // clang-format on

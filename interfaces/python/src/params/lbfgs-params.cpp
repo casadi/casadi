@@ -22,12 +22,12 @@ template struct dict_to_struct_table<alpaqa::LBFGSParams<alpaqa::EigenConfigf>>;
 template struct dict_to_struct_table<alpaqa::LBFGSParams<alpaqa::EigenConfigd>>;
 template struct dict_to_struct_table<alpaqa::LBFGSParams<alpaqa::EigenConfigl>>;
 #ifdef ALPAQA_WITH_QUAD_PRECISION
-template struct dict_to_struct_table<alpaqa::LBFGSParams<alpaqa::EigenConfigf>>;
+template struct dict_to_struct_table<alpaqa::LBFGSParams<alpaqa::EigenConfigq>>;
 #endif
 
 template struct dict_to_struct_table<alpaqa::CBFGSParams<alpaqa::EigenConfigf>>;
 template struct dict_to_struct_table<alpaqa::CBFGSParams<alpaqa::EigenConfigd>>;
 template struct dict_to_struct_table<alpaqa::CBFGSParams<alpaqa::EigenConfigl>>;
 #ifdef ALPAQA_WITH_QUAD_PRECISION
-template struct dict_to_struct_table<alpaqa::CBFGSParams<alpaqa::EigenConfigf>>;
+template struct dict_to_struct_table<alpaqa::CBFGSParams<alpaqa::EigenConfigq>>;
 #endif
