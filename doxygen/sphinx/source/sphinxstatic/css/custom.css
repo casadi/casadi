@@ -1,42 +1,61 @@
+body {
+    --color-custom-sig-param: #333;
+    --color-custom-border: #e7e7e7;
+}
+
+@media not print {
+    body[data-theme="dark"] {
+        --color-custom-sig-param: #ccc;
+        --color-custom-border: #333;
+    }
+
+    @media (prefers-color-scheme: dark) {
+        body:not([data-theme="light"]) {
+            --color-custom-sig-param: #ccc;
+            --color-custom-border: #333;
+        }
+    }
+}
+
 span.linenos {
     padding-right: 1.6em;
 }
 
-.sig.py .sig-param > span,
-.sig-return-typehint > span,
-.sig-return-typehint > a > span {
+.sig.py .sig-param>span,
+.sig-return-typehint>span,
+.sig-return-typehint>a>span {
     font-weight: 200;
 }
 
-.sig.py .sig-param > span.n:first-child {
+.sig.py .sig-param>span.n:first-child {
     font-weight: 700;
-    color: #333;
-}
-body[data-theme="dark"] .sig.py .sig-param > span.n:first-child {
-    color: #ccc;
+    color: var(--color-custom-sig-param);
 }
 
-.sig.py .sig-param > span.default_value {
+.sig.py .sig-param>span.default_value {
     font-weight: 700;
 }
 
-.sig.cpp > span,
-.sig.cpp > a > span {
+.sig.cpp>span,
+.sig.cpp>a>span {
     font-weight: 200;
 }
-.sig.cpp > span.sig-name,
-.sig.cpp > span.sig-param {
+
+.sig.cpp>span.sig-name,
+.sig.cpp>span.sig-param {
     font-weight: 700;
 }
-.sig.cpp > span.sig-param {
-    color: #333;
+
+.sig.cpp>span.sig-param {
+    color: var(--color-custom-sig-param);
 }
-body[data-theme="dark"] .sig.cpp > span.sig-param {
-    color: #ccc;
-}
-.cpp.struct, .cpp.class, .py.class, .breathe-sectiondef.docutils.container {
+
+.cpp.struct,
+.cpp.class,
+.py.class,
+.breathe-sectiondef.docutils.container {
     padding: 0.6em;
-    border: 1px solid #e7e7e7;
+    border: 1px solid var(--color-custom-border);
     border-radius: 0.5em;
     margin-bottom: 0.5em;
     margin-top: 0.5em;
