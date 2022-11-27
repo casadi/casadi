@@ -52,16 +52,15 @@ class HangingChain:
 
         # Discretize dynamics y[k+1] = f_d(y[k], u[k]; p)
 
-        opt = {"tf": Ts, "simplify": True, "number_of_finite_elements": 4}
-        intg = cs.integrator("intg", "rk", {
-            "x": y,
-            "p": vc(u, p),
-            "ode": f_expr
-        }, opt)
+        # 4th order Runge-Kutta integrator
+        k1 = self.f(y, u, p)
+        k2 = self.f(y + Ts * k1 / 2, u, p)
+        k3 = self.f(y + Ts * k2 / 2, u, p)
+        k4 = self.f(y + Ts * k3, u, p)
 
-        f_d_expr = intg(x0=y, p=vc(u, p))["xf"]
-        self.f_d = cs.Function("f_d", [y, u, p], [f_d_expr], ["y", "u", "p"],
-                               ["y+"])
+        # Discrete-time dynamics
+        f_d_expr = y + (Ts / 6) * (k1 + 2 * k2 + 2 * k3 + k4)
+        self.f_d = cs.Function("f", [y, u, p], [f_d_expr])
 
         return self.f_d
 

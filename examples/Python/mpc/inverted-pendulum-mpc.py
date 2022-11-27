@@ -32,16 +32,15 @@ a = (F - b_cart * v + m_pend * a_pend) / (m_cart + m_pend)
 α = (g_gravity * cs.sin(θ) - a * cs.cos(θ)) / l_pend
 f_c = cs.Function("f_c", [state, F], [cs.vertcat(v, a, ω, α, x)])
 
-# Runge-Kutta integrator
-opt = {"tf": Ts, "simplify": True, "number_of_finite_elements": 2}
-intg = cs.integrator("intg", "rk", {
-    "x": state,
-    "p": F,
-    "ode": f_c(state, F)
-}, opt)
+# 4th order Runge-Kutta integrator
+k1 = f_c(state, F)
+k2 = f_c(state + Ts * k1 / 2, F)
+k3 = f_c(state + Ts * k2 / 2, F)
+k4 = f_c(state + Ts * k3, F)
 
 # Discrete-time dynamics
-f_d = cs.Function("f_d", [state, F], [intg(x0=state, p=F)["xf"]])
+f_d_expr = state + (Ts / 6) * (k1 + 2 * k2 + 2 * k3 + k4)
+f_d = cs.Function("f", [state, F], [f_d_expr])
 
 # %% Model predictive control
 
