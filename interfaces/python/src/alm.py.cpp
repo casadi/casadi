@@ -80,7 +80,6 @@ void register_alm(py::module_ &m) {
     using ALMSolver = alpaqa::ALMSolver<InnerSolver>;
     using ALMParams = typename ALMSolver::Params;
     py::class_<ALMParams>(m, "ALMParams", "C++ documentation: :cpp:class:`alpaqa::ALMParams`")
-        .def(py::init())
         .def(py::init(&kwargs_to_struct<ALMParams>))
         .def("to_dict", &struct_to_dict<ALMParams>)
         .def_readwrite("ε", &ALMParams::ε)

@@ -29,13 +29,11 @@ void register_lbfgs(py::module_ &m) {
     py::enum_<LBFGSSign> lbfgssign(lbfgs, "Sign",
                                    "C++ documentation :cpp:enum:`alpaqa::LBFGS::Sign`");
     cbfgs //
-        .def(py::init())
         .def(py::init(&kwargs_to_struct<CBFGS>))
         .def("to_dict", &struct_to_dict<CBFGS>)
         .def_readwrite("α", &CBFGS::α)
         .def_readwrite("ϵ", &CBFGS::ϵ);
     lbfgsparams //
-        .def(py::init())
         .def(py::init(&kwargs_to_struct<LBFGSParams>))
         .def("to_dict", &struct_to_dict<LBFGSParams>)
         .def_readwrite("memory", &LBFGSParams::memory)
