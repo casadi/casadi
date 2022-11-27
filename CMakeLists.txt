@@ -19,6 +19,8 @@ option(ALPAQA_WITH_CASADI
     "Build the CasADi loader" On)
 set(ALPAQA_DOXYFILE "Doxyfile" CACHE STRING
     "The Doxyfile to use for the docs target")
+option(ALPAQA_ENABLE_PCH
+    "Enable precompiled headers" On)
 
 # Compiler warnings
 include(cmake/Warnings.cmake)

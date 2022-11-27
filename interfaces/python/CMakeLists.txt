@@ -48,6 +48,15 @@ if (TARGET alpaqa::casadi-loader)
     target_compile_definitions(_alpaqa PRIVATE ALPAQA_HAVE_CASADI)
     target_link_libraries(_alpaqa PRIVATE alpaqa::casadi-loader)
 endif()
+if (ALPAQA_ENABLE_PCH)
+    target_precompile_headers(_alpaqa PRIVATE
+        <pybind11/chrono.h>
+        <pybind11/eigen.h>
+        <pybind11/functional.h>
+        <pybind11/gil.h>
+        <pybind11/iostream.h>
+        <pybind11/stl.h>)
+endif()
 
 # Install the Python module
 install(TARGETS _alpaqa
