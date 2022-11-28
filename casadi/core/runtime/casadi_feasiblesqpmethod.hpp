@@ -2,7 +2,7 @@
 
 // C-REPLACE "casadi_nlpsol_prob<T1>" "struct casadi_nlpsol_prob"
 
-// SYMBOL "sqpmethod_prob"
+// SYMBOL "feasiblesqpmethod_prob"
 template<typename T1>
 struct casadi_feasiblesqpmethod_prob {
   const casadi_nlpsol_prob<T1>* nlp;
@@ -11,10 +11,10 @@ struct casadi_feasiblesqpmethod_prob {
   // casadi_int merit_memsize;
   // casadi_int max_iter_ls;
 };
-// C-REPLACE "casadi_sqpmethod_prob<T1>" "struct casadi_sqpmethod_prob"
+// C-REPLACE "casadi_feasiblesqpmethod_prob<T1>" "struct casadi_feasiblesqpmethod_prob"
 
 
-// SYMBOL "sqpmethod_data"
+// SYMBOL "feasiblesqpmethod_data"
 template<typename T1>
 struct casadi_feasiblesqpmethod_data {
   // Problem structure
@@ -59,7 +59,7 @@ struct casadi_feasiblesqpmethod_data {
 // C-REPLACE "casadi_feasiblesqpmethod_data<T1>" "struct casadi_feasiblesqpmethod_data"
 
 
-// SYMBOL "sqpmethod_work"
+// SYMBOL "feasiblesqpmethod_work"
 template<typename T1>
 void casadi_feasiblesqpmethod_work(const casadi_feasiblesqpmethod_prob<T1>* p,
     casadi_int* sz_iw, casadi_int* sz_w, int sz_anderson_memory) {
@@ -129,7 +129,7 @@ void casadi_feasiblesqpmethod_work(const casadi_feasiblesqpmethod_prob<T1>* p,
   // if (so_corr) *sz_w += nx+nx+ng; // Temp memory for failing soc
 }
 
-// SYMBOL "sqpmethod_init"
+// SYMBOL "feasiblesqpmethod_init"
 template<typename T1>
 void casadi_feasiblesqpmethod_init(casadi_feasiblesqpmethod_data<T1>* d, casadi_int** iw, T1** w, int sz_anderson_memory) {
   // Local variables
