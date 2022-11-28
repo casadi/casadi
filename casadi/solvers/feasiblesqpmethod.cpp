@@ -1459,10 +1459,8 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
     g << "d.prob = &p;\n";
     g << "p.sp_h = " << g.sparsity(Hsp_) << ";\n";
     g << "p.sp_a = " << g.sparsity(Asp_) << ";\n";
-    // g << "p.merit_memsize = " << merit_memsize_ << ";\n";
-    // g << "p.max_iter_ls = " << max_iter_ls_ << ";\n";
     g << "p.nlp = &p_nlp;\n";
-    // g << "casadi_feasiblesqpmethod_init(&d, &iw, &w, " << elastic_mode_ << ", " << so_corr_ << ");\n";
+    g << "casadi_feasiblesqpmethod_init(&d, &iw, &w, " << sz_anderson_memory_ << ");\n";
 
     g.local("m_w", "casadi_real", "*");
     g << "m_w = w;\n";
@@ -1473,7 +1471,8 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
     g.local("m_res", "casadi_real", "**");
     g.init_local("m_res", "res+" + str(NLPSOL_NUM_OUT));
     
-    g.local("ret", "int");
+    // g.local("ret", "int");
+    g.local("ret", "casadi_int");
 
     // Number of SQP iterations
     // m->iter_count = 0;
@@ -1504,7 +1503,8 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
     // transfer the scale vector to the problem
     // casadi_copy(get_ptr(tr_scale_vector_), nx_, d->tr_scale_vector);
     //transfer the scale vector to the problem
-    g << g.copy("getptr(tr_scale_vector_)", nx_, "d.tr_scale_vector") << "\n";
+    g << g.copy(g.constant(tr_scale_vector_), nx_, "d.tr_scale_vector") << "\n";
+    // g << g.copy("casadi_tr_scale_vector_", nx_, "d.tr_scale_vector") << "\n";
 
     // for (casadi_int i=0;i<nx_;++i) {
     //   d->tr_mask[i] = d->tr_scale_vector[i]!=0;
@@ -1635,8 +1635,8 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
         //   m->return_status = "No_Feasible_Initialization";
         //   break;
         // }
-        g << "if (casadi_max_viol(" + str(nx_+ ng_) +", d_nlp->z, d_nlp->lbz, d_nlp->ubz) > feas_tol_){\n";
-        g << "printf(\"MESSAGE(feasiblesqpmethod): No feasible initialization given! Find feasible initialization.\")\n";
+        g << "if (" << g.max_viol(nx_+ ng_, "d_nlp.z", "d_nlp.lbz", "d_nlp.ubz") << "> " << feas_tol_ << "){\n";
+        g << "printf(\"MESSAGE(feasiblesqpmethod): No feasible initialization given! Find feasible initialization.\\n\");\n";
         g << "break;\n";
         g << "}\n";
         
@@ -1780,9 +1780,10 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
       //   break;
       // }
       g << "if (iter_count >= " << max_iter_ << ") {\n";
-      g << "if (" << print_status_ << "){\n";
-      g << "printf(\"MESSAGE(feasiblesqpmethod): Maximum number of iterations reached.\n\")";
-      g << "break;\n";
+        g << "if (" << print_status_ << "){\n";
+          g << "printf(\"MESSAGE(feasiblesqpmethod): Maximum number of iterations reached.\\n\");\n";
+          g << "break;\n";
+        g << "}\n";
       g << "}\n";
 
       // Formulate the QP
@@ -1792,9 +1793,9 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
       // casadi_clip_min(d->lbdz, nx_, -tr_rad, d->tr_mask);
       g.comment("Formulate the QP");
       g.comment("Define the lower bounds");
-      g << g.copy("d_nlp.lbz", nx_+ng_, "d.lbdz") << ";\n";
-      g << g.axpy(nx_+ng_, "-1.0", "d_nlp.z", "d.lbdz") << ";\n";
-      g << g.clip_min("d.lbdz", nx_, "-tr_rad", "d.tr_mask") << ";\n";
+      g << g.copy("d_nlp.lbz", nx_+ng_, "d.lbdz") << "\n";
+      g << g.axpy(nx_+ng_, "-1.0", "d_nlp.z", "d.lbdz") << "\n";
+      g << g.clip_min("d.lbdz", nx_, "-tr_rad", "d.tr_mask") << "\n";
       
 
       // Define upper bounds
@@ -1802,14 +1803,14 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
       // casadi_axpy(nx_+ng_, -1., d_nlp->z, d->ubdz);
       // casadi_clip_max(d->ubdz, nx_, tr_rad, d->tr_mask);
       g.comment("Define the upper bounds");
-      g << g.copy("d_nlp.ubz", nx_+ng_, "d.ubdz") << ";\n";
-      g << g.axpy(nx_+ng_, "-1.0", "d_nlp.z", "d.ubdz") << ";\n";
-      g << g.clip_max("d.ubdz", nx_, "tr_rad", "d.tr_mask") << ";\n";
+      g << g.copy("d_nlp.ubz", nx_+ng_, "d.ubdz") << "\n";
+      g << g.axpy(nx_+ng_, "-1.0", "d_nlp.z", "d.ubdz") << "\n";
+      g << g.clip_max("d.ubdz", nx_, "tr_rad", "d.tr_mask") << "\n";
 
       // // Initial guess
       // casadi_copy(d_nlp->lam, nx_+ng_, d->dlam);
       g.comment("Initial guess");
-      g << g.copy("d_nlp.lam", nx_+ng_, "d.dlam") << ";\n";     
+      g << g.copy("d_nlp.lam", nx_+ng_, "d.dlam") << "\n";     
 
       // Increase counter
       // m->iter_count++;
@@ -1817,8 +1818,9 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
       g << "++iter_count;\n";
 
       // int ret = 0;
-      g.comment("Increase counter");
-      g << "++iter_count;\n";
+      g << "g = 0;\n";
+      // g.comment("Increase counter");
+      // g << "++iter_count;\n";
 
       // Solve the QP
       // if (use_sqp_){
@@ -1890,23 +1892,25 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
       // }
 
       g << "if (ret < 0) {\n";
-      g << "printf(\"Rejected inner iterates\");\n";
-      g << "tr_rad = 0.5" << g.masked_norm_inf(nx_, "d.dx", "d.tr_mask") << ";\n";
+        g << "printf(\"Rejected inner iterates\");\n";
+        g << "tr_rad = 0.5*" << g.masked_norm_inf(nx_, "d.dx", "d.tr_mask") << ";\n";
       g << "} else {\n";
-      g.comment("Evaluate f");
-      g << "m_arg[0] = d.z_feas;\n";
-      g << "m_arg[1] = m_p;\n";
-      g << "m_res[0] = &m_f_feas;\n";
+        g.comment("Evaluate f");
+        g << "m_arg[0] = d.z_feas;\n";
+        g << "m_arg[1] = m_p;\n";
+        g << "m_res[0] = &m_f_feas;\n";
 
-      codegen_eval_tr_ratio(g, "m_f", "m_f_feas", "m_k");
-      codegen_tr_update(g, "tr_rad", "tr_ratio");
+        codegen_eval_tr_ratio(g, "m_f", "m_f_feas", "m_k");
+        codegen_tr_update(g, "tr_rad", "tr_ratio");
 
-      g << "if (tr_rad < "<< feas_tol_ << "){\n";
-      g << "if (" << print_status_ << "){\n";
-      g << "printf(\"MESSAGE: Trust-Region radius smaller than feasibilty!!\");\n";
-      g << "break;}";
+        g << "if (tr_rad < "<< feas_tol_ << "){\n";
+          g << "if (" << print_status_ << "){\n";
+            g << "printf(\"MESSAGE: Trust-Region radius smaller than feasibilty!!\");\n";
+          g << "}\n";
+          g << "break;";
+        g << "}\n";
 
-      codegen_step_update(g, "tr_ratio");
+        codegen_step_update(g, "tr_ratio");
       g.comment("Close the step acceptance loop");
       g << "}\n";
 
@@ -1918,22 +1922,22 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
       // }
     // }
   //   g << "}\n";
+      // g << "if (!" << exact_hessian_ << "){\n";
+      // g << g.copy("d.gf", nx_, "d.gLag_old") << "\n";
+      // g << g.mv("d.Jk", Asp_, "d_nlp.lam+" + str(nx_), "d.gLag_old", true) << ";\n";
+      // g << g.axpy(nx_, "1.", "d_nlp.lam", "d.gLag_old") << "\n";
+      // g << "}\n";
 
   //   return 0;
   // }
   //Close next loop
-    g << "}\n";
+      // g << "}\n";
 
-    g << "return 0;\n";
+      g << "return 0;\n";
     // Close the loop optimization problem
     g << "}\n";
 
 
-    g << "if (!" << exact_hessian_ << "){\n";
-    g << g.copy("d.gf", nx_, "d.gLag_old") << ";\n";
-    g << g.mv("d.Jk", Asp_, "d_nlp.lam+" + str(nx_), "d.gLag_old", true) << ";\n";
-    g << g.axpy(nx_, "1.", "d_nlp.lam", "d.gLag_old") << ";\n";
-    g << "}\n";
 
     
     if (calc_f_ || calc_g_ || calc_lam_x_ || calc_lam_p_) {
@@ -1995,7 +1999,7 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
     
     cg << "if (tr_ratio < " << tr_eta1_ << "){\n";
     cg << "tr_rad = " << tr_alpha1_ <<"*" << cg.masked_norm_inf(nx_, "d.dx", "d.tr_mask") << ";\n";
-    cg << "} else if (tr_ratio > " << tr_eta2_ << "&& abs(" << cg.masked_norm_inf(nx_, "d.dx", "d.tr_mask") << " - tr_rad) < " << optim_tol_ << " ){\n";
+    cg << "} else if (tr_ratio > " << tr_eta2_ << " && fabs(" << cg.masked_norm_inf(nx_, "d.dx", "d.tr_mask") << " - tr_rad) < " << optim_tol_ << " ){\n";
     cg << "tr_rad = " << cg.fmin(str(tr_alpha2_)+"*tr_rad", str(tr_rad_max_)) << ";\n";
     cg << "}\n";
     cg.comment("else: keep trust-region as it is....");
@@ -2014,7 +2018,7 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
 
   void Feasiblesqpmethod::codegen_eval_tr_ratio(CodeGenerator& cg, const std::string& val_f, const std::string& val_f_corr, const std::string& val_m_k) const{
     // return (val_f - val_f_corr) / (-val_m_k);
-    cg << "tr_ratio = " + val_f + "-" + val_f_corr + ") / (-" + val_m_k + ");\n";
+    cg << "tr_ratio = (" + val_f + "-" + val_f_corr + ") / (-" + val_m_k + ");\n";
   }
 
   void Feasiblesqpmethod::codegen_step_update(CodeGenerator& cg, const std::string& tr_ratio) const {
@@ -2035,32 +2039,32 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
   //   return -1;
   // }
   cg << "if(" + tr_ratio + ">" << tr_acceptance_ << "){\n";
-  cg << cg.copy("d.z_feas", nx_ + ng_, "d_nlp.z") << ";\n";
-  cg << "m_f = m_f_feas;\n";
-  cg << cg.copy("d.dlam_feas", nx_ + ng_, "d_nlp.lam") << ";\n";
-  cg << "printf(\"ACCEPTED\");\n";
-  cg << "ret = 0;\n";
+    cg << cg.copy("d.z_feas", nx_ + ng_, "d_nlp.z") << "\n";
+    cg << "m_f = m_f_feas;\n";
+    cg << cg.copy("d.dlam_feas", nx_ + ng_, "d_nlp.lam") << "\n";
+    cg << "printf(\"ACCEPTED\");\n";
+    cg << "ret = 0;\n";
   cg << "} else {\n";
-  cg << "printf(\"ACCEPTED\");\n";
-  cg << "ret = -1;\n";
+    cg << "printf(\"REJECTED\");\n";
+    cg << "ret = -1;\n";
   cg << "}\n";
 }
 
   void Feasiblesqpmethod::codegen_feasibility_iterations(CodeGenerator& cg, const std::string& tr_rad) const{
-  cg.local("ret", "casadi_int");
+  // cg.local("ret", "casadi_int");
   cg.init_local("ret", "0");
 
   // casadi_copy(d->dx, nx_, d->dx_feas);
-  cg << cg.copy("d.dx", nx_, "d.dx_feas") << ";\n";
+  cg << cg.copy("d.dx", nx_, "d.dx_feas") << "\n";
 
   // casadi_copy(d->dlam, nx_ + ng_, d->dlam_feas);
-  cg << cg.copy("d.dlam", nx_, "d.dlam_feas") << ";\n";
+  cg << cg.copy("d.dlam", nx_, "d.dlam_feas") << "\n";
 
   // Why do we do this at the moment??
   // casadi_copy(d->dlam, nx_+ng_, d->z_tmp);
   // casadi_axpy(nx_+ng_, -1.0, d_nlp->lam, d->z_tmp);
-  cg << cg.copy("d.dlam", nx_+ng_, "d.z_tmp") << ";\n";
-  cg << cg.axpy(nx_+ng_, "-1.0", "d_nlp.lam", "d.z_tmp") << ";\n";
+  cg << cg.copy("d.dlam", nx_+ng_, "d.z_tmp") << "\n";
+  cg << cg.axpy(nx_+ng_, "-1.0", "d_nlp.lam", "d.z_tmp") << "\n";
 
   // this is in solve in fslp.py
   // double step_inf_norm = casadi_masked_norm_inf(nx_, d->dx, d->tr_mask);
@@ -2068,13 +2072,14 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
   cg.local("step_inf_norm", "casadi_real");
   cg << "step_inf_norm = " << cg.masked_norm_inf(nx_, "d.dx", "d.tr_mask") << ";\n";
   cg.local("prev_step_inf_norm", "casadi_real");
-  cg.init_local("prev_step_inf_norm", "step_inf_norm");
+  cg << "prev_step_inf_norm = step_inf_norm\n;";
+  // cg.init_local("prev_step_inf_norm", "step_inf_norm");
 
   // self.x_tmp = self.x_k + p_tmp
   // casadi_copy(d_nlp->z, nx_+ng_, d->z_feas);
   // casadi_axpy(nx_, 1., d->dx_feas, d->z_feas);
-  cg << cg.copy("d_nlp.z", nx_+ng_, "d.z_feas") << ";\n";
-  cg << cg.axpy(nx_, "-1.0", "d.dx_feas", "d.z_feas") << ";\n";
+  cg << cg.copy("d_nlp.z", nx_+ng_, "d.z_feas") << "\n";
+  cg << cg.axpy(nx_, "-1.0", "d.dx_feas", "d.z_feas") << "\n";
 
 
   // if (use_anderson_){
@@ -2110,7 +2115,7 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
   cg.local("prev_infeas", "casadi_real");
   cg << "prev_infeas =" << cg.max_viol(nx_+ng_, "d.z_feas", "d_nlp.lbz", "d_nlp.ubz") << ";\n";
   cg.local("curr_infeas", "casadi_real");
-  cg.init_local("curr_infeas", "prev_infeas");
+  cg << "curr_infeas = prev_infeas;\n";
 
 
   // Calculate asymptotic exactness of current step
@@ -2118,11 +2123,11 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
   // casadi_axpy(nx_, -1., d->z_feas, d->z_tmp);
   // casadi_axpy(nx_, 1., d_nlp->z, d->z_tmp);
   // double as_exac = casadi_norm_2(nx_, d->z_tmp) / casadi_norm_2(nx_, d->dx);
-  cg << cg.copy("d.dx", nx_, "d.z_tmp") << ";\n";
-  cg << cg.axpy(nx_, "-1.0", "d.z_feas", "d.z_tmp") << ";\n";
-  cg << cg.axpy(nx_, "1.0", "d_nlp.z", "d.z_tmp") << ";\n";
+  cg << cg.copy("d.dx", nx_, "d.z_tmp") << "\n";
+  cg << cg.axpy(nx_, "-1.0", "d.z_feas", "d.z_tmp") << "\n";
+  cg << cg.axpy(nx_, "1.0", "d_nlp.z", "d.z_tmp") << "\n";
   cg.local("as_exac", "casadi_real");
-  cg << "as_exac" << cg.norm_2(nx_, "d.z_tmp") << "/" << cg.norm_2(nx_, "d.dx") << ";\n";
+  cg << "as_exac =" << cg.norm_2(nx_, "d.z_tmp") << "/" << cg.norm_2(nx_, "d.dx") << ";\n";
 
   // double kappa_watchdog = 0.0;
   // double kappa = 0.0;
@@ -2137,7 +2142,8 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
 
   // double watchdog_prev_inf_norm = prev_step_inf_norm; // until here everything is correct!
   cg.local("watchdog_prev_inf_norm", "casadi_real");
-  cg.init_local("watchdog_prev_inf_norm", "prev_step_inf_norm");
+  // cg.init_local("watchdog_prev_inf_norm", "prev_step_inf_norm");
+  cg << "watchdog_prev_inf_norm = prev_step_inf_norm;\n";
 
   // for (int j=0; j<max_inner_iter_; ++j){
   //   if (curr_infeas < feas_tol_){
@@ -2154,29 +2160,30 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
   //   }
   cg << "for (int j=0;j<" << max_inner_iter_ << "; ++j){\n";
     cg << "if (curr_infeas < " << feas_tol_ << "){\n";
-    cg << "inner_iter = j;\n";
-    cg << "if (as_exac < 0.5){\n";
-    cg << "ret = 0; \n";
-    cg << "break; \n";
-    cg << "} else {\n";
-    cg << "ret = -1;\n";
-    cg << "break; \n";
-    cg << "}\n";
+      cg << "inner_iter = j;\n";
+      cg << "if (as_exac < 0.5){\n";
+        cg << "ret = 0; \n";
+        cg << "break; \n";
+      cg << "} else {\n";
+        cg << "ret = -1;\n";
+        cg << "break; \n";
+      cg << "}\n";
     cg << "} else if (j>0 && (curr_infeas > 1.0 || as_exac > 1.0)){\n";
-    cg << "ret = -1;\n";
-    cg << "break; \n";
+      cg << "ret = -1;\n";
+      cg << "break; \n";
     cg << "}\n";
+    
 
     // inner_iter = j+1;
-    cg << "inner_iter = j+1;\n";
+    cg << "inner_iter =j+1;\n";
 
     // create corrected gradient here -----------------------------
     // casadi_copy(d->z_feas, nx_, d->z_tmp);
     // casadi_axpy(nx_, -1., d_nlp->z, d->z_tmp);
     // casadi_copy(d->gf, nx_, d->gf_feas);
-    cg << cg.copy("d.z_feas", nx_, "d.z_tmp") << ";\n";
-    cg << cg.axpy(nx_, "-1.0", "d_nlp.z", "d.z_tmp") << ";\n";
-    cg << cg.copy("d.gf", nx_, "d.gf_feas") << ";\n";
+    cg << cg.copy("d.z_feas", nx_, "d.z_tmp") << "\n";
+    cg << cg.axpy(nx_, "-1.0", "d_nlp.z", "d.z_tmp") << "\n";
+    cg << cg.copy("d.gf", nx_, "d.gf_feas") << "\n";
     // In case of SQP we need to multiply with 
     // if (use_sqp_){
     //   casadi_mv(d->Bk, Hsp_, d->z_tmp, d->gf_feas, true);
@@ -2190,32 +2197,32 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
     // upper bounds of constraints
     // casadi_copy(d_nlp->ubz + nx_, ng_, d->ubdz_feas + nx_);
     // casadi_axpy(ng_, -1., d->z_feas + nx_, d->ubdz_feas + nx_);
-    cg << cg.copy("d_nlp.ubz+"+str(nx_), ng_, "d.ubdz_feas+"+str(nx_)) << ";\n";
-    cg << cg.axpy(ng_, "-1.0", "d.z_feas+"+str(nx_), "d.ubdz_feas+"+str(nx_)) << ";\n";
+    cg << cg.copy("d_nlp.ubz+"+str(nx_), ng_, "d.ubdz_feas+"+str(nx_)) << "\n";
+    cg << cg.axpy(ng_, "-1.0", "d.z_feas+"+str(nx_), "d.ubdz_feas+"+str(nx_)) << "\n";
 
     // lower bounds of constraints
     // casadi_copy(d_nlp->lbz + nx_, ng_, d->lbdz_feas + nx_);
     // casadi_axpy(ng_, -1., d->z_feas + nx_, d->lbdz_feas + nx_);
-    cg << cg.copy("d_nlp.lbz+"+str(nx_), ng_, "d.lbdz_feas+"+str(nx_)) << ";\n";
-    cg << cg.axpy(ng_, "-1.0", "d.z_feas+"+str(nx_), "d.lbdz_feas+"+str(nx_)) << ";\n";
+    cg << cg.copy("d_nlp.lbz+"+str(nx_), ng_, "d.lbdz_feas+"+str(nx_)) << "\n";
+    cg << cg.axpy(ng_, "-1.0", "d.z_feas+"+str(nx_), "d.lbdz_feas+"+str(nx_)) << "\n";
 
 
     // casadi_copy(d_nlp->lbz, nx_, d->lbdz_feas);
     // casadi_clip_min(d->lbdz_feas, nx_, -tr_rad, d->tr_mask);
-    cg << cg.copy("d_nlp.lbz", nx_, "d.lbdz_feas") << ";\n";
+    cg << cg.copy("d_nlp.lbz", nx_, "d.lbdz_feas") << "\n";
     cg << cg.clip_min("d.lbdz_feas", nx_, "-tr_rad", "d.tr_mask") << ";\n";
 
 
     // casadi_axpy(nx_, -1., d->z_feas, d->lbdz_feas);
     // casadi_axpy(nx_, 1., d_nlp->z, d->lbdz_feas);
-    cg << cg.axpy(nx_, "-1.0", "d.z_feas", "d.lbdz_feas") << ";\n";
-    cg << cg.axpy(nx_, "1.0", "d_nlp.z", "d.lbdz_feas") << ";\n";
+    cg << cg.axpy(nx_, "-1.0", "d.z_feas", "d.lbdz_feas") << "\n";
+    cg << cg.axpy(nx_, "1.0", "d_nlp.z", "d.lbdz_feas") << "\n";
 
 
     // casadi_copy(d_nlp->lbz, nx_, d->z_tmp);
     // casadi_axpy(nx_, -1., d->z_feas, d->z_tmp);
-    cg << cg.copy("d_nlp.lbz", nx_, "d.z_tmp") << ";\n";
-    cg << cg.axpy(nx_, "-1.0", "d.z_feas", "d.z_tmp") << ";\n";
+    cg << cg.copy("d_nlp.lbz", nx_, "d.z_tmp") << "\n";
+    cg << cg.axpy(nx_, "-1.0", "d.z_feas", "d.z_tmp") << "\n";
 
     // comparison of both vectors
     // casadi_vector_fmax(nx_, d->z_tmp, d->lbdz_feas, d->lbdz_feas);
@@ -2223,20 +2230,20 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
 
     // casadi_copy(d_nlp->ubz, nx_, d->ubdz_feas);
     // casadi_clip_max(d->ubdz_feas, nx_, tr_rad, d->tr_mask);
-    cg << cg.copy("d_nlp.ubz", nx_, "d.ubdz_feas") << ";\n";
+    cg << cg.copy("d_nlp.ubz", nx_, "d.ubdz_feas") << "\n";
     cg << cg.clip_max("d.ubdz_feas", nx_, "tr_rad", "d.tr_mask") << ";\n";
 
     // casadi_axpy(nx_, -1., d->z_feas, d->ubdz_feas);
     // casadi_axpy(nx_, 1., d_nlp->z, d->ubdz_feas);
-    cg << cg.axpy(nx_, "-1.0", "d.z_feas", "d.ubdz_feas") << ";\n";
-    cg << cg.axpy(nx_, "1.0", "d_nlp.z", "d.ubdz_feas") << ";\n";
+    cg << cg.axpy(nx_, "-1.0", "d.z_feas", "d.ubdz_feas") << "\n";
+    cg << cg.axpy(nx_, "1.0", "d_nlp.z", "d.ubdz_feas") << "\n";
 
 
     // casadi_copy(d_nlp->ubz, nx_, d->z_tmp);
     // casadi_axpy(nx_, -1., d->z_feas, d->z_tmp);
     // casadi_vector_fmin(nx_, d->z_tmp, d->ubdz_feas, d->ubdz_feas);
-    cg << cg.copy("d_nlp.ubz", nx_, "d.z_tmp") << ";\n";
-    cg << cg.axpy(nx_, "-1.0", "d.z_feas", "d.z_tmp") << ";\n";
+    cg << cg.copy("d_nlp.ubz", nx_, "d.z_tmp") << "\n";
+    cg << cg.axpy(nx_, "-1.0", "d.z_feas", "d.z_tmp") << "\n";
     cg << cg.vector_fmin(nx_, "d.z_tmp", "d.ubdz_feas", "d.ubdz_feas");
 
     // if (use_sqp_){
@@ -2249,7 +2256,7 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
 
 
     // step_inf_norm = casadi_masked_norm_inf(nx_, d->dx_feas, d->tr_mask);
-    cg << "step_inf_norm = " << cg.masked_norm_inf(nx_, "d.dx_feas", "d.tr_mask0") << ";\n";
+    cg << "step_inf_norm = " << cg.masked_norm_inf(nx_, "d.dx_feas", "d.tr_mask") << ";\n";
     
     // if (use_anderson_){
     //   anderson_acc_step_update(mem, j);
@@ -2257,7 +2264,7 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
     //   casadi_axpy(nx_, 1., d->dx_feas, d->z_feas);
     // }
     cg.comment("No Anderson Acceleration implemented yet.");
-    cg << cg.axpy(nx_, "1.0", "d.dx_feas", "d.z_feas") << ";\n";
+    cg << cg.axpy(nx_, "1.0", "d.dx_feas", "d.z_feas") << "\n";
 
     // Evaluate g
     // m->arg[0] = d->z_feas;
@@ -2284,16 +2291,17 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
     // casadi_axpy(nx_, -1., d->z_feas, d->z_tmp);
     // casadi_axpy(nx_, 1., d_nlp->z, d->z_tmp);
     // as_exac = casadi_norm_2(nx_, d->z_tmp) / casadi_norm_2(nx_, d->dx);
-    cg << cg.copy("d.dx", nx_, "d.z_tmp") << ";\n";
-    cg << cg.axpy(nx_, "-1.0", "d.z_feas", "d.z_tmp") << ";\n";
-    cg << cg.axpy(nx_, "1.0", "d_nlp.z", "d.z_tmp") << ";\n";
+    cg << cg.copy("d.dx", nx_, "d.z_tmp") << "\n";
+    cg << cg.axpy(nx_, "-1.0", "d.z_feas", "d.z_tmp") << "\n";
+    cg << cg.axpy(nx_, "1.0", "d_nlp.z", "d.z_tmp") << "\n";
     cg.local("as_exac", "casadi_real");
-    cg << "as_exac" << cg.norm_2(nx_, "d.z_tmp") << "/" << cg.norm_2(nx_, "d.dx") << ";\n";
+    cg << "as_exac =" << cg.norm_2(nx_, "d.z_tmp") << "/" << cg.norm_2(nx_, "d.dx") << ";\n";
     
     
     // print("%6s %9.10f %14s %9.10f %20s %9.10f\n", "Kappa:", kappa, 
     // "Infeasibility:", curr_infeas, "AsymptoticExactness:", as_exac);
-    cg << "printf(\"Kappa: %9.20f, Infeasibility: %9.10f, AsymptoticExctness: %9.10f\n\", kappa, curr_infeas, as_exac);\n";
+    // cg << "printf(\"Kappa: %9.10f, Infeasibility: %9.10f, AsymptoticExctness: %9.10f\n\", kappa, curr_infeas, as_exac);\n";
+    cg << "printf(\"Kappa: %9.10f, Infeasibility: %9.10f, AsymptoticExctness: %9.10f\\n\", kappa, curr_infeas, as_exac);\n";
 
     // acc_as_exac += as_exac;
     cg << "acc_as_exac += as_exac;\n";
@@ -2314,19 +2322,20 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
     // //           accumulated_as_ex = 0
     //   acc_as_exac = 0.0;
     // }
-    cg << "if (inner_iter % watchdog_ == 0){\n";
-    cg << "kappa_watchdog = step_inf_norm / watchdog_prev_inf_norm;\n";
-    cg << "watchdog_prev_inf_norm = step_inf_norm;\n";
-    cg << "printf(\"Kappa watchdog: %9.10f\n\", kappa_watchdog);\n";
-    cg << "if (curr_infeas < feas_tol_ && as_exac < 0.5){\n";
-    cg << "ret = 0;\n";
-    cg << "break; \n";
-    cg << "}\n";
-    cg << "if (kappa_watchdog > contraction_acceptance_value_ || acc_as_exac/watchdog_ > 0.5){\n";
-    cg << "ret = -1;";
-    cg << "break;";
-    cg << "}\n";
+    cg << "if (inner_iter % " << watchdog_ << "== 0){\n";
+      cg << "kappa_watchdog = step_inf_norm / watchdog_prev_inf_norm;\n";
+      cg << "watchdog_prev_inf_norm = step_inf_norm;\n";
+      cg << "printf(\"Kappa watchdog: %9.10f\\n\", kappa_watchdog);\n";
+      cg << "if (curr_infeas < "<< feas_tol_ << "&& as_exac < 0.5){\n";
+        cg << "ret = 0;\n";
+        cg << "break; \n";
+      cg << "}\n";
+      cg << "if (kappa_watchdog > " << contraction_acceptance_value_ << " || acc_as_exac/" << watchdog_ << "> 0.5){\n";
+        cg << "ret = -1;";
+        cg << "break;";
+      cg << "}\n";
 
+    cg << "}\n"; //Added
 
     // prev_step_inf_norm = step_inf_norm;
     cg << "prev_step_inf_norm = step_inf_norm;\n";
@@ -2336,7 +2345,7 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
   // kappa_acceptance = false;
 //   return -1;
 // }
-  cg << "if (j >=" << max_inner_iter_ << "){\n";
+  cg << "if (inner_iter >=" << max_inner_iter_ << "){\n";
   cg << "ret = -1;\n";
   cg << "}\n";
 
