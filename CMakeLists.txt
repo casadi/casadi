@@ -1087,6 +1087,28 @@ if(WITH_BONMIN)
 endif()
 add_feature_info(bonmin-interface WITH_BONMIN "Interface to the MINLP framework Bonmin.")
 
+
+macro(INSTALL_IMPORTED TARGET)
+    get_target_property(MY_IMPORTED_LOCATION ${TARGET} IMPORTED_LOCATION)
+    if(MY_IMPORTED_LOCATION)
+        if(WIN32)
+            install(FILES "${MY_IMPORTED_LOCATION}" DESTINATION ${BIN_PREFIX})
+            get_target_property(MY_IMPORTED_IMPLIB ${TARGET} IMPORTED_IMPLIB)
+            if(MY_IMPORTED_IMPLIB)
+                install(FILES "${MY_IMPORTED_IMPLIB}" DESTINATION ${LIB_PREFIX})
+            endif()
+        else()
+            install(FILES "${MY_IMPORTED_LOCATION}" DESTINATION ${LIB_PREFIX})
+        endif()
+    endif()
+    get_target_property(MY_INTERFACE_INCLUDE_DIRECTORIES ${TARGET} INTERFACE_INCLUDE_DIRECTORIES)
+    if(MY_INTERFACE_INCLUDE_DIRECTORIES)
+    install(DIRECTORY
+      "${MY_INTERFACE_INCLUDE_DIRECTORIES}"
+      DESTINATION "${INCLUDE_PREFIX}")
+    endif()
+endmacro()
+
 if(WITH_HIGHS)
   if(WITH_BUILD_HIGHS)
     ExternalProject_Add(highs-external
@@ -1102,10 +1124,9 @@ if(WITH_HIGHS)
        INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include/highs"
        IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY64_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}highs${CMAKE_SHARED_LIBRARY_SUFFIX}"
        IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}highs${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+       IMPORTED_NO_SONAME ON
     )
-    install(DIRECTORY
-      "${CMAKE_BINARY_DIR}/external_projects/include/highs"
-      DESTINATION "${INCLUDE_PREFIX}")
+    INSTALL_IMPORTED(highs)
   endif()
 endif()
 add_feature_info(highs-interface WITH_HIGHS "Interface to the MILP / QP solver HiGHS.")
