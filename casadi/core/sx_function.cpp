@@ -425,6 +425,12 @@ namespace casadi {
     // All nodes
     vector<SXNode*> nodes;
 
+    // Output nodes (output index, nonzero index)
+    vector< std::pair<int, int> > outputs;
+
+    // Associates node k with outputs output_indicator[k]
+    std::map< SXNode*, std::vector<int> > output_indicator;
+
     // Add the list of nodes
     casadi_int ind=0;
     for (auto it = out_.begin(); it != out_.end(); ++it, ++ind) {
@@ -434,17 +440,37 @@ namespace casadi {
         s.push(itc->get());
         sort_depth_first(s, nodes);
 
-        // A null pointer means an output instruction
-        nodes.push_back(static_cast<SXNode*>(nullptr));
+        // Indicate last added node to have an output association
+        output_indicator[itc->get()].push_back(outputs.size());
+
+        // Register output
+        outputs.push_back(std::make_pair(ind, nz));
       }
     }
 
+    vector<int> order;
+    if (name_=="jac_master") {
+      std::ifstream ifs("/home/yacoda/GE/experiments/live_var/jac_master_order_L1_50G.txt");
+      std::string line;
+      while (std::getline(ifs, line))
+      {
+          order.push_back(stoi(line));
+      }
+      casadi_assert(nodes.size()==order.size(), "mismatch: " + str(nodes.size()) + " versus " + str(order.size()));
+      vector<SXNode*> nodes_orig = nodes;
+      for (int i=0;i<nodes_orig.size();++i) {
+        nodes[order[i]] = nodes_orig[i]; 
+      }
+      uout() << "reordered" << std::endl;
+    }
+
+    uout() << "nodes is size " << nodes.size() << std::endl; 
+
     casadi_assert(nodes.size() <= std::numeric_limits<int>::max(), "Integer overflow");
+
     // Set the temporary variables to be the corresponding place in the sorted graph
     for (casadi_int i=0; i<nodes.size(); ++i) {
-      if (nodes[i]) {
-        nodes[i]->temp = static_cast<int>(i);
-      }
+      nodes[i]->temp = static_cast<int>(i);
     }
 
     // Sort the nodes by type
@@ -452,25 +478,14 @@ namespace casadi {
     operations_.clear();
     for (vector<SXNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it) {
       SXNode* t = *it;
-      if (t) {
-        if (t->is_constant())
-          constants_.push_back(SXElem::create(t));
-        else if (!t->is_symbolic())
-          operations_.push_back(SXElem::create(t));
-      }
+      if (t->is_constant())
+        constants_.push_back(SXElem::create(t));
+      else if (!t->is_symbolic())
+        operations_.push_back(SXElem::create(t));
     }
 
     // Input instructions
     vector<pair<int, SXNode*> > symb_loc;
-
-    // Current output and nonzero, start with the first one
-    int curr_oind, curr_nz=0;
-    casadi_assert(out_.size() <= std::numeric_limits<int>::max(), "Integer overflow");
-    for (curr_oind=0; curr_oind<out_.size(); ++curr_oind) {
-      if (out_[curr_oind].nnz()!=0) {
-        break;
-      }
-    }
 
     // Count the number of times each node is used
     vector<casadi_int> refcount(nodes.size(), 0);
@@ -479,7 +494,7 @@ namespace casadi {
 
     // Get the sequence of instructions for the virtual machine
     algorithm_.resize(0);
-    algorithm_.reserve(nodes.size());
+    algorithm_.reserve(nodes.size()+outputs.size());
     for (vector<SXNode*>::iterator it=nodes.begin(); it!=nodes.end(); ++it) {
       // Current node
       SXNode* n = *it;
@@ -488,7 +503,7 @@ namespace casadi {
       AlgEl ae;
 
       // Get operation
-      ae.op = n==nullptr ? static_cast<int>(OP_OUTPUT) : static_cast<int>(n->op());
+      ae.op = static_cast<int>(n->op());
 
       // Get instruction
       switch (ae.op) {
@@ -500,25 +515,6 @@ namespace casadi {
         symb_loc.push_back(make_pair(algorithm_.size(), n));
         ae.i0 = n->temp;
         ae.d = 0; // value not used, but set here to avoid uninitialized data in serialization
-        break;
-      case OP_OUTPUT: // output instruction
-        ae.i0 = curr_oind;
-        ae.i1 = out_[curr_oind]->at(curr_nz)->temp;
-        ae.i2 = curr_nz*stride_out_[ae.i0];
-
-        // Go to the next nonzero
-        casadi_assert(curr_nz < std::numeric_limits<int>::max(), "Integer overflow");
-        curr_nz++;
-        if (curr_nz>=out_[curr_oind].nnz()) {
-          curr_nz=0;
-          casadi_assert(curr_oind < std::numeric_limits<int>::max(), "Integer overflow");
-          curr_oind++;
-          for (; curr_oind<out_.size(); ++curr_oind) {
-            if (out_[curr_oind].nnz()!=0) {
-              break;
-            }
-          }
-        }
         break;
       case OP_FUNREF:
         {
@@ -551,13 +547,31 @@ namespace casadi {
       // Add to algorithm
       algorithm_.push_back(ae);
 
+      // Handle output association // complexity needs fixing
+      if (output_indicator.find(n)!=output_indicator.end()) {
+        for (int i : output_indicator[n]) {
+          const auto& out = outputs[i];
+          AlgEl ae;
+          ae.op = static_cast<int>(OP_OUTPUT);
+          ae.i0 = out.first;
+          ae.i1 = n->temp;
+          ae.i2 = out.second*stride_out_[ae.i0];
+
+          // Increase count of dependency
+          refcount.at(ae.i1)++;
+
+          // Add to algorithm
+          algorithm_.push_back(ae);
+        }
+      }
+
     }
 
     nodes_.resize(nodes.size());
     std::copy(nodes.begin(), nodes.end(), nodes_.begin());
 
     // Place in the work vector for each of the nodes in the tree (overwrites the reference counter)
-    vector<int> place(nodes.size());
+    vector<int> place(algorithm_.size());
 
     // Stack with unused elements in the work vector
     stack<int> unused;
@@ -612,7 +626,7 @@ namespace casadi {
     if (verbose_) {
       if (live_variables_) {
         casadi_message("Using live variables: work array is " + str(worksize_)
-         + " instead of " + str(nodes.size()));
+         + " instead of " + str(algorithm_.size()));
       } else {
         casadi_message("Live variables disabled.");
       }
@@ -626,9 +640,7 @@ namespace casadi {
 
     // Reset the temporary variables
     for (casadi_int i=0; i<nodes.size(); ++i) {
-      if (nodes[i]) {
-        nodes[i]->temp = 0;
-      }
+      nodes[i]->temp = 0;
     }
 
     // Now mark each input's place in the algorithm
