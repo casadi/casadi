@@ -318,7 +318,7 @@ namespace casadi {
         }
       }
       g  << ";\n";
-      node_ptr++;
+      if (a.op!=OP_OUTPUT) node_ptr++;
     }
     if (outro) {
       for (casadi_int i=0;i<rets.size();++i) {
