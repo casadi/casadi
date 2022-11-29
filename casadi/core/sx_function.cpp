@@ -1233,7 +1233,7 @@ namespace casadi {
           c_data.emplace_back();
           SXElem* d = get_ptr(c_data)+c_data.size()-2;
           in_deps[a.i0] = in_deps[a.i1];
-          if (ndeps>1) {
+          if (ndeps>1 && a.i1!=a.i2) {
             c_row.push_back(a.i0);
             c_col.push_back(n+a.i2);
             in_deps[a.i0].insert(in_deps[a.i2].begin(), in_deps[a.i2].end());
@@ -1247,7 +1247,12 @@ namespace casadi {
               FunRef::der(f->dep(0), f->dep(1), f, d);
               break;
           }
-          if (ndeps==1) c_data.pop_back();
+          if (ndeps>1 && a.i1==a.i2) {
+            d[0] += d[1];
+            c_data.pop_back();
+          } else if (ndeps==1) {
+            c_data.pop_back();
+          }
         }
       }
     }
