@@ -424,9 +424,9 @@ namespace casadi {
     }
 
     casadi_assert(!qpsol_plugin.empty(), "'qpsol' option has not been set");
-    qpsol_options["dump_in"] = true;
-    qpsol_options["dump_out"] = true;
-    qpsol_options["dump"] = true;
+    // qpsol_options["dump_in"] = true;
+    // qpsol_options["dump_out"] = true;
+    // qpsol_options["dump"] = true;
     // qpsol_options["print_out"] = true;
     // qpsol_options["error_on_fail"] = false;
     
@@ -436,7 +436,7 @@ namespace casadi {
     if (use_sqp_){
       qpsol_ = conic("qpsol", qpsol_plugin, {{"h", Hsp_}, {"a", Asp_}},
                    qpsol_options);
-      cout << qpsol_ <<std::endl;
+      // cout << qpsol_ <<std::endl;
     } else {
       Hsp_ = Sparsity(nx_, nx_);
       cout << "Sparsity pattern: " << Hsp_ << std::endl;
@@ -447,7 +447,7 @@ namespace casadi {
       qpsol_ = conic("qpsol", qpsol_plugin, {{"a", Asp_}},
                    qpsol_options);
       // qpsol_ = Function::load("/home/david/testproblems_feasible_casadi/qpsol.casadi");
-      cout << qpsol_ <<std::endl;
+      // cout << qpsol_ <<std::endl;
     }
     
     alloc(qpsol_);
@@ -596,7 +596,7 @@ void Feasiblesqpmethod::anderson_acc_step_update(void* mem, casadi_int iter_inde
     double beta = 1.0;
     casadi_axpy(nx_, beta, d->dx_feas, d->z_feas);
     casadi_axpy(nx_, -*d->gamma, d->z_tmp, d->z_feas);
-    DM(std::vector<double>(d->z_feas,d->z_feas+nx_)).to_file("dx_anderson2.mtx");
+    // DM(std::vector<double>(d->z_feas,d->z_feas+nx_)).to_file("dx_anderson2.mtx");
 
   } else {
     print("This is not implemented yet!!!");
@@ -704,7 +704,7 @@ int Feasiblesqpmethod::feasibility_iterations(void* mem, double tr_rad) const{
     anderson_acc_init_memory(mem, d->dx_feas, d_nlp->z);
   }
 
-  DM(std::vector<double>(d->z_feas,d->z_feas+nx_)).to_file("dx_anderson1.mtx");
+  // DM(std::vector<double>(d->z_feas,d->z_feas+nx_)).to_file("dx_anderson1.mtx");
   // Evaluate g
   //   self.g_tmp = self.__eval_g(self.x_tmp)
   m->arg[0] = d->z_feas;
@@ -898,10 +898,10 @@ int Feasiblesqpmethod::feasibility_iterations(void* mem, double tr_rad) const{
     kappa = step_inf_norm/prev_step_inf_norm;
     //MISSING: as_exac:
 
-    DM(std::vector<double>(d_nlp->z, d_nlp->z+nx_)).to_file("x_k.mtx");
-    DM(std::vector<double>(d->z_feas,d->z_feas+nx_)).to_file("x_tmp.mtx");
+    // DM(std::vector<double>(d_nlp->z, d_nlp->z+nx_)).to_file("x_k.mtx");
+    // DM(std::vector<double>(d->z_feas,d->z_feas+nx_)).to_file("x_tmp.mtx");
     // DM(std::vector<double>(d->dx_feas,d->dx_feas+nx_)).to_file("dx_feas"+suffix+".mtx");
-    DM(std::vector<double>(d->dx,d->dx+nx_)).to_file("p_k.mtx");
+    // DM(std::vector<double>(d->dx,d->dx+nx_)).to_file("p_k.mtx");
 
 
     casadi_copy(d->dx, nx_, d->z_tmp);
@@ -1236,16 +1236,16 @@ int Feasiblesqpmethod::solve(void* mem) const {
       // Increase counter
       m->iter_count++;
 
-      DM(std::vector<double>(d->gf,d->gf+nx_)).to_file("gf.mtx");
-      DM(std::vector<double>(d->lbdz, d->lbdz+nx_)).to_file("lb_var.mtx");
-      DM(std::vector<double>(d->ubdz, d->ubdz+nx_)).to_file("ub_var.mtx");
-      DM(std::vector<double>(d->lbdz+nx_, d->lbdz+nx_+ng_)).to_file("lba.mtx");
-      DM(std::vector<double>(d->ubdz+nx_, d->ubdz+nx_+ng_)).to_file("uba.mtx");
-      // DM(std::vector<double>(d->Bk, d->Bk+Hsp_.nnz())).to_file("Bk.mtx");
-      DM(std::vector<double>(d->Jk, d->Jk+Asp_.nnz())).to_file("Jk.mtx");
-      DM(std::vector<double>(d->dlam, d->dlam+nx_)).to_file("lam_x.mtx");
-      DM(std::vector<double>(d->dx, d->dx+nx_)).to_file("dx_input.mtx");
-      DM(std::vector<double>(d->dlam+nx_, d->dlam+nx_+ng_)).to_file("lam_g.mtx");
+      // DM(std::vector<double>(d->gf,d->gf+nx_)).to_file("gf.mtx");
+      // DM(std::vector<double>(d->lbdz, d->lbdz+nx_)).to_file("lb_var.mtx");
+      // DM(std::vector<double>(d->ubdz, d->ubdz+nx_)).to_file("ub_var.mtx");
+      // DM(std::vector<double>(d->lbdz+nx_, d->lbdz+nx_+ng_)).to_file("lba.mtx");
+      // DM(std::vector<double>(d->ubdz+nx_, d->ubdz+nx_+ng_)).to_file("uba.mtx");
+      // // DM(std::vector<double>(d->Bk, d->Bk+Hsp_.nnz())).to_file("Bk.mtx");
+      // DM(std::vector<double>(d->Jk, d->Jk+Asp_.nnz())).to_file("Jk.mtx");
+      // DM(std::vector<double>(d->dlam, d->dlam+nx_)).to_file("lam_x.mtx");
+      // DM(std::vector<double>(d->dx, d->dx+nx_)).to_file("dx_input.mtx");
+      // DM(std::vector<double>(d->dlam+nx_, d->dlam+nx_+ng_)).to_file("lam_g.mtx");
 
       int ret = 0;
       // Solve the QP
@@ -1257,7 +1257,7 @@ int Feasiblesqpmethod::solve(void* mem) const {
                  d->dx, d->dlam, 0);
       }
 
-      DM(std::vector<double>(d->dx,d->dx+nx_)).to_file("dx_out.mtx");
+      // DM(std::vector<double>(d->dx,d->dx+nx_)).to_file("dx_out.mtx");
       // Eval quadratic model and check for convergence
       m_k = eval_m_k(mem);
       if (fabs(m_k) < optim_tol_) {
@@ -1547,7 +1547,8 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
         g << "m_arg[1] = m_p;\n";
         g << "m_res[0] = &m_f;\n";
         std::string nlp_f = g(get_function("nlp_f"), "m_arg", "m_res", "m_iw", "m_w");
-        g << "if (" + nlp_f + ") return 1;\n";
+        // g << "if (" + nlp_f + ") return 1;\n";
+        g << "if (" + nlp_f + ") return 10;\n";
         
         // Evaluate g
         // m->arg[0] = d_nlp->z;
@@ -1561,7 +1562,8 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
         g << "m_arg[1] = m_p;\n";
         g << "m_res[0] = d_nlp.z+" + str(nx_) + ";\n";
         std::string nlp_g = g(get_function("nlp_g"), "m_arg", "m_res", "m_iw", "m_w");
-        g << "if (" + nlp_g + ") return 1;\n";
+        // g << "if (" + nlp_g + ") return 1;\n";
+        g << "if (" + nlp_g + ") return 20;\n";
         
         // Evaluate grad_f
         // m->arg[0] = d_nlp->z;
@@ -1575,7 +1577,8 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
         g << "m_arg[1] = m_p;\n";
         g << "m_res[0] = d.gf;\n";
         std::string nlp_grad_f = g(get_function("nlp_grad_f"), "m_arg", "m_res", "m_iw", "m_w");
-        g << "if (" + nlp_grad_f + ") return 1;\n";
+        // g << "if (" + nlp_grad_f + ") return 1;\n";
+        g << "if (" + nlp_grad_f + ") return 30;\n";
         
         // Evaluate jac_g
         // m->arg[0] = d_nlp->z;
@@ -1599,7 +1602,8 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
         g << "m_arg[1] = m_p;\n";
         g << "m_res[0] = d.Jk;\n";
         std::string nlp_jac_g = g(get_function("nlp_jac_g"), "m_arg", "m_res", "m_iw", "m_w");
-        g << "if (" + nlp_jac_g + ") return 1;\n";
+        // g << "if (" + nlp_jac_g + ") return 1;\n";
+        g << "if (" + nlp_jac_g + ") return 40;\n";
 
         // if (use_sqp_){
         //   if (exact_hessian_) {
@@ -1626,6 +1630,15 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
         //     // Update the Hessian approximation
         //     casadi_bfgs(Hsp_, d->Bk, d->dx, d->gLag, d->gLag_old, m->w);
         //   }
+        g.comment("Just exact Hessian implemented, GN would be possible!");
+        g << "m_arg[0] = d_nlp.z;\n";
+        g << "m_arg[1] = m_p;\n";
+        g << "m_arg[2] = &one;\n";
+        g << "m_arg[3] = d_nlp.lam+" + str(nx_) + ";\n";
+        g << "m_res[0] = d.Bk;\n";
+        std::string nlp_hess_l = g(get_function("nlp_hess_l"), "m_arg", "m_res", "m_iw", "m_w");
+        // g << "if (" + nlp_hess_l + ") return 1;\n";
+        g << "if (" + nlp_hess_l + ") return 70;\n";
 
         // }
         // test if initialization is feasible
@@ -1654,7 +1667,8 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
         g << "m_arg[1] = m_p;\n";
         g << "m_res[0] = d.gf;\n";
         nlp_grad_f = g(get_function("nlp_grad_f"), "m_arg", "m_res", "m_iw", "m_w");
-        g << "if (" + nlp_grad_f + ") return 1;\n";
+        // g << "if (" + nlp_grad_f + ") return 1;\n";
+        g << "if (" + nlp_grad_f + ") return 50;\n";
         
         // Evaluate jac_g
         // m->arg[0] = d_nlp->z;
@@ -1677,7 +1691,8 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
         g << "m_arg[1] = m_p;\n";
         g << "m_res[0] = d.Jk;\n";
         nlp_jac_g = g(get_function("nlp_jac_g"), "m_arg", "m_res", "m_iw", "m_w");
-        g << "if (" + nlp_jac_g + ") return 1;\n";
+        // g << "if (" + nlp_jac_g + ") return 1;\n";
+        g << "if (" + nlp_jac_g + ") return 60;\n";
 
         // if (use_sqp_){
         //   if (exact_hessian_) {
@@ -1711,8 +1726,9 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
         g << "m_arg[2] = &one;\n";
         g << "m_arg[3] = d_nlp.lam+" + str(nx_) + ";\n";
         g << "m_res[0] = d.Bk;\n";
-        std::string nlp_hess_l = g(get_function("nlp_hess_l"), "m_arg", "m_res", "m_iw", "m_w");
-        g << "if (" + nlp_hess_l + ") return 1;\n";
+        nlp_hess_l = g(get_function("nlp_hess_l"), "m_arg", "m_res", "m_iw", "m_w");
+        // g << "if (" + nlp_hess_l + ") return 1;\n";
+        g << "if (" + nlp_hess_l + ") return 70;\n";
       
       // }
       g << "}\n";
@@ -1752,6 +1768,10 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
       //                   pr_inf, du_inf, dx_norminf, m->reg, tr_rad_prev, info);
       //   info = "";
       // }
+      g << "if (" << print_iteration_ << ") {\n";
+        g << "printf(\"%4s %9s %14s %9s %9s %9s %9s %5s\\n\", \"iter\", \"m_k\", \"objective\", \"tr_ratio\", \"inf_pr\",\"inf_du\", \"||d||\", \"tr_rad\");\n";
+        g << "printf(\"%4lld %9.2e %14.6e %9.2e %9.2e %9.2e %9.2e %5.2e\\n\", iter_count, m_k, m_f, tr_ratio, pr_inf, du_inf, dx_norminf, tr_rad_prev);";
+      g << "}\n";
 
       // tr_rad_prev = tr_rad;
       g << "tr_rad_prev = tr_rad;\n";
@@ -1818,9 +1838,7 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
       g << "++iter_count;\n";
 
       // int ret = 0;
-      g << "g = 0;\n";
-      // g.comment("Increase counter");
-      // g << "++iter_count;\n";
+      // g << "ret = 0;\n";
 
       // Solve the QP
       // if (use_sqp_){
@@ -1847,8 +1865,11 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
       //   break;
       // } 
       g.comment("Checking convergence criteria");
-      g << "if (fabs(m_k) >= " << optim_tol_ << ") break;\n";
-        
+      g << "if (fabs(m_k) < " << optim_tol_ << "){\n";
+      g << "printf(\"MESSAGE(feasiblesqpmethod): Optimal Point Found? Quadratic model is zero. After %lld iterations.\\n\", iter_count-1);\n";
+      g << "break;\n";
+      g << "}\n";
+      
       // uout() << "QP step: " << std::vector<double>(d->dx, d->dx+nx_) << std::endl;
       // Detecting indefiniteness
       // if (use_sqp_) {
@@ -1862,7 +1883,7 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
 
       // Do the feasibility iterations here
       // ret = feasibility_iterations(mem, tr_rad);
-      g.comment("Check if step was accepted or not");
+      g.comment("Do the feasibility iterations here");
       codegen_feasibility_iterations(g, "tr_rad");
 
       // Check if step was accepted or not
@@ -1892,20 +1913,22 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
       // }
 
       g << "if (ret < 0) {\n";
-        g << "printf(\"Rejected inner iterates\");\n";
+        g << "printf(\"Rejected inner iterates\\n\");\n";
         g << "tr_rad = 0.5*" << g.masked_norm_inf(nx_, "d.dx", "d.tr_mask") << ";\n";
       g << "} else {\n";
         g.comment("Evaluate f");
         g << "m_arg[0] = d.z_feas;\n";
         g << "m_arg[1] = m_p;\n";
         g << "m_res[0] = &m_f_feas;\n";
+        nlp_f = g(get_function("nlp_f"), "m_arg", "m_res", "m_iw", "m_w");
+        g << "if (" + nlp_f + ") return 1;\n";
 
         codegen_eval_tr_ratio(g, "m_f", "m_f_feas", "m_k");
         codegen_tr_update(g, "tr_rad", "tr_ratio");
 
         g << "if (tr_rad < "<< feas_tol_ << "){\n";
           g << "if (" << print_status_ << "){\n";
-            g << "printf(\"MESSAGE: Trust-Region radius smaller than feasibilty!!\");\n";
+            g << "printf(\"MESSAGE: Trust-Region radius smaller than feasibilty!!\\n\");\n";
           g << "}\n";
           g << "break;";
         g << "}\n";
@@ -1933,27 +1956,26 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
   //Close next loop
       // g << "}\n";
 
-      g << "return 0;\n";
+      // g << "return 0;\n"; // Do we need this??
     // Close the loop optimization problem
+    g.comment("Close the loop optimization problem");
     g << "}\n";
 
+    // if (calc_f_ || calc_g_ || calc_lam_x_ || calc_lam_p_) {
+    //   g << "m_arg[0] = d_nlp.z;\n";
+    //   g << "m_arg[1] = m_p;\n";
+    //   g << "m_arg[2] = &one;\n";
+    //   g << "m_arg[3] = d_nlp.lam+" + str(nx_) + ";\n";
+    //   g << "m_res[0] = " << (calc_f_ ? "&malc_f_ || calc_g_ || calc_lam_x_ || calc_lam_p__f" : "0") << ";\n";
+    //   g << "m_res[1] = " << (calc_g_ ? "d_nlp.z+" + str(nx_) : "0") << ";\n";
+    //   g << "m_res[2] = " << (calc_lam_x_ ? "d_nlp.lam+" + str(nx_) : "0") << ";\n";
+    //   g << "m_res[3] = " << (calc_lam_p_ ? "d_nlp.lam_p" : "0") << ";\n";
+    //   std::string nlp_grad = g(get_function("nlp_grad"), "m_arg", "m_res", "m_iw", "m_w");
+    //   g << "if (" + nlp_grad + ") return 1;\n";
+    //   if (calc_lam_x_) g << g.scal(nx_, "-1.0", "d_nlp.lam") << "\n";
+    //   if (calc_lam_p_) g << g.scal(np_, "-1.0", "d_nlp.lam_p") << "\n";
+    // }
 
-
-    
-    if (calc_f_ || calc_g_ || calc_lam_x_ || calc_lam_p_) {
-      g << "m_arg[0] = d_nlp.z;\n";
-      g << "m_arg[1] = m_p;\n";
-      g << "m_arg[2] = &one;\n";
-      g << "m_arg[3] = d_nlp.lam+" + str(nx_) + ";\n";
-      g << "m_res[0] = " << (calc_f_ ? "&malc_f_ || calc_g_ || calc_lam_x_ || calc_lam_p__f" : "0") << ";\n";
-      g << "m_res[1] = " << (calc_g_ ? "d_nlp.z+" + str(nx_) : "0") << ";\n";
-      g << "m_res[2] = " << (calc_lam_x_ ? "d_nlp.lam+" + str(nx_) : "0") << ";\n";
-      g << "m_res[3] = " << (calc_lam_p_ ? "d_nlp.lam_p" : "0") << ";\n";
-      std::string nlp_grad = g(get_function("nlp_grad"), "m_arg", "m_res", "m_iw", "m_w");
-      g << "if (" + nlp_grad + ") return 1;\n";
-      if (calc_lam_x_) g << g.scal(nx_, "-1.0", "d_nlp.lam") << "\n";
-      if (calc_lam_p_) g << g.scal(np_, "-1.0", "d_nlp.lam_p") << "\n";
-    }
     if (bound_consistency_) {
       g << g.bound_consistency(nx_+ng_, "d_nlp.z", "d_nlp.lam", "d_nlp.lbz", "d_nlp.ubz") << ";\n";
     }
@@ -1986,6 +2008,7 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
     cg << "m_res[" << CONIC_LAM_A << "] = " << dlam << "+" << nx_ << ";\n";
     std::string flag = cg(qpsol_, "m_arg", "m_res", "m_iw", "m_w");
     cg << "ret = " << flag << ";\n";
+    // cg << "if (ret == 0) printf(\"QP successfully solved\\n\");\n"; // equivalent to raise Exception
     cg << "if (ret == -1000) return -1000;\n"; // equivalent to raise Exception
   }
 
@@ -2019,7 +2042,7 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
   void Feasiblesqpmethod::codegen_eval_tr_ratio(CodeGenerator& cg, const std::string& val_f, const std::string& val_f_corr, const std::string& val_m_k) const{
     // return (val_f - val_f_corr) / (-val_m_k);
     cg << "tr_ratio = (" + val_f + "-" + val_f_corr + ") / (-" + val_m_k + ");\n";
-  }
+  } 
 
   void Feasiblesqpmethod::codegen_step_update(CodeGenerator& cg, const std::string& tr_ratio) const {
   // auto m = static_cast<FeasiblesqpmethodMemory*>(mem);
@@ -2042,10 +2065,10 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
     cg << cg.copy("d.z_feas", nx_ + ng_, "d_nlp.z") << "\n";
     cg << "m_f = m_f_feas;\n";
     cg << cg.copy("d.dlam_feas", nx_ + ng_, "d_nlp.lam") << "\n";
-    cg << "printf(\"ACCEPTED\");\n";
+    cg << "printf(\"ACCEPTED\\n\");\n";
     cg << "ret = 0;\n";
   cg << "} else {\n";
-    cg << "printf(\"REJECTED\");\n";
+    cg << "printf(\"REJECTED\\n\");\n";
     cg << "ret = -1;\n";
   cg << "}\n";
 }
@@ -2072,14 +2095,14 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
   cg.local("step_inf_norm", "casadi_real");
   cg << "step_inf_norm = " << cg.masked_norm_inf(nx_, "d.dx", "d.tr_mask") << ";\n";
   cg.local("prev_step_inf_norm", "casadi_real");
-  cg << "prev_step_inf_norm = step_inf_norm\n;";
+  cg << "prev_step_inf_norm = step_inf_norm;\n";
   // cg.init_local("prev_step_inf_norm", "step_inf_norm");
 
   // self.x_tmp = self.x_k + p_tmp
   // casadi_copy(d_nlp->z, nx_+ng_, d->z_feas);
   // casadi_axpy(nx_, 1., d->dx_feas, d->z_feas);
   cg << cg.copy("d_nlp.z", nx_+ng_, "d.z_feas") << "\n";
-  cg << cg.axpy(nx_, "-1.0", "d.dx_feas", "d.z_feas") << "\n";
+  cg << cg.axpy(nx_, "1.0", "d.dx_feas", "d.z_feas") << "\n";
 
 
   // if (use_anderson_){
@@ -2099,11 +2122,12 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
   //   uout() << "What does it mean that calc_function fails here??" << std::endl;
   // }
   cg.comment("Evaluate g");
-  cg << "m_arg[0] = d_nlp.z;\n";
+  cg << "m_arg[0] = d.z_feas;\n";
   cg << "m_arg[1] = m_p;\n";
-  cg << "m_res[0] = d_nlp.z+" + str(nx_) + ";\n";
+  cg << "m_res[0] = d.z_feas+" + str(nx_) + ";\n";
   std::string nlp_g = cg(get_function("nlp_g"), "m_arg", "m_res", "m_iw", "m_w");
-  cg << "if (" + nlp_g + ") return 1;\n";
+  // cg << "if (" + nlp_g + ") return 1;\n";
+  cg << "if (" + nlp_g + ") return 100;\n";
 
 
   // int inner_iter = 0;
@@ -2137,8 +2161,7 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
   cg.local("kappa", "casadi_real");
   cg.init_local("kappa", "0.0");
   cg.local("acc_as_exac", "casadi_real");
-  cg.init_local("acc_as_exac", "0.0");
-  
+  cg << "acc_as_exac = 0.0;\n";  
 
   // double watchdog_prev_inf_norm = prev_step_inf_norm; // until here everything is correct!
   cg.local("watchdog_prev_inf_norm", "casadi_real");
@@ -2190,7 +2213,7 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
     // }
     cg.comment("Just SQP implemented so far!");
     // cg << "if (" << use_sqp_ << "){\n";
-    cg << cg.mv("d.Bk", Hsp_, "d.z_tmp", "d.gf_feas", true) << ";\n";
+    cg << cg.mv("d.Bk", Hsp_, "d.z_tmp", "d.gf_feas", true) << "\n";
     // cg << "}\n";
 
     // create bounds of correction QP -----------------------------
@@ -2210,7 +2233,7 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
     // casadi_copy(d_nlp->lbz, nx_, d->lbdz_feas);
     // casadi_clip_min(d->lbdz_feas, nx_, -tr_rad, d->tr_mask);
     cg << cg.copy("d_nlp.lbz", nx_, "d.lbdz_feas") << "\n";
-    cg << cg.clip_min("d.lbdz_feas", nx_, "-tr_rad", "d.tr_mask") << ";\n";
+    cg << cg.clip_min("d.lbdz_feas", nx_, "-tr_rad", "d.tr_mask") << "\n";
 
 
     // casadi_axpy(nx_, -1., d->z_feas, d->lbdz_feas);
@@ -2274,11 +2297,12 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
     //   uout() << "What does it mean that calc_function fails here??" << std::endl;
     // }
     cg.comment("Evaluate g");
-    cg << "m_arg[0] = d_nlp.z;\n";
+    cg << "m_arg[0] = d.z_feas;\n";
     cg << "m_arg[1] = m_p;\n";
-    cg << "m_res[0] = d_nlp.z+" + str(nx_) + ";\n";
+    cg << "m_res[0] = d.z_feas+" + str(nx_) + ";\n";
     nlp_g = cg(get_function("nlp_g"), "m_arg", "m_res", "m_iw", "m_w");
-    cg << "if (" + nlp_g + ") return 1;\n";
+    // cg << "if (" + nlp_g + ") return 1;\n";
+    cg << "if (" + nlp_g + ") return 100;\n";
 
     // prev_infeas = casadi_max_viol(nx_+ng_, d->z_feas, d_nlp->lbz, d_nlp->ubz);
     // curr_infeas = prev_infeas;
@@ -2331,10 +2355,11 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
         cg << "break; \n";
       cg << "}\n";
       cg << "if (kappa_watchdog > " << contraction_acceptance_value_ << " || acc_as_exac/" << watchdog_ << "> 0.5){\n";
-        cg << "ret = -1;";
-        cg << "break;";
+        cg << "ret = -1;\n";
+        cg << "break;\n";
       cg << "}\n";
 
+      cg << "acc_as_exac = 0.0;\n";
     cg << "}\n"; //Added
 
     // prev_step_inf_norm = step_inf_norm;
