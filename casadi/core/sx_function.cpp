@@ -36,6 +36,7 @@
 #include "serializing_stream.hpp"
 #include "fun_ref.hpp"
 #include "call_sx.hpp"
+#include <random>
 
 namespace casadi {
 
@@ -372,6 +373,255 @@ namespace casadi {
     return opts;
   }
 
+  typedef int Order;
+  typedef int NodeIndex;
+
+  struct Entry {
+      NodeIndex next;
+      Order p;
+      NodeIndex prev;
+  };
+
+
+  class SimulatedAnnealingInstrOrder {
+    public:
+      int N, nc;
+      std::vector<NodeIndex> i_left, i_right;
+      std::vector< std::vector<NodeIndex> > incoming, outgoing;
+
+      SimulatedAnnealingInstrOrder(std::vector<SXNode*>& nodes) {
+        // Set the temporary variables to be the corresponding place in the sorted graph
+        for (casadi_int i=0; i<nodes.size(); ++i) {
+          nodes[i]->temp = static_cast<int>(i);
+        }
+
+        // Accumlate edges i_right->i_left
+        N = nodes.size();
+        for (auto n : nodes) {
+          switch (n->op()) {
+            case OP_CONST:
+            case OP_FUNREF:
+            case OP_INPUT:
+            case OP_OUTPUT:
+            case OP_PARAMETER:
+              break;
+            case OP_CALL:
+              i_left.push_back(n->temp);
+              i_right.push_back(n->dep(0)->temp);
+              i_left.push_back(n->temp);
+              i_right.push_back(n->dep(1)->temp);
+              break;
+            default:
+              i_left.push_back(n->temp);
+              i_right.push_back(n->dep(0)->temp);
+              if (n->n_dep()==2 && n->dep(0)->temp!=n->dep(1)->temp) {
+                i_left.push_back(n->temp);
+                i_right.push_back(n->dep(1)->temp);
+              }
+          }
+        }
+        nc = i_left.size();
+
+        // Build up index
+        incoming.resize(N);
+        outgoing.resize(N);
+        for (int i=0;i<nc;++i) {
+          incoming[i_left[i]].push_back(i_right[i]);
+          outgoing[i_right[i]].push_back(i_left[i]);
+        }
+      }
+
+
+      int max_outgoing(const std::vector<Entry>& x, int i) {
+          int m = 0;
+          for (int k : outgoing[i]) {
+              m = std::max(m, x[k].p-x[i].p-1);
+          }
+          return m;
+      }
+
+
+      int compute_score(const std::vector<Entry>& x) {
+          int sum = 0;
+      #ifdef WITH_INF
+          for (int i=0;i<x.size();++i) {
+              sum += max_outgoing(x, i);
+          }
+      #else
+          for (int i=0;i<nc;++i) {
+              int d = x[i_left[i]].p-x[i_right[i]].p-1;
+              sum += d;
+          }
+      #endif
+          return sum;
+      }
+
+      void validate(const std::vector<Entry>& x) {
+          for (int i=0;i<nc;++i) {
+              int d = x[i_left[i]].p-x[i_right[i]].p-1;
+              casadi_assert_dev(d>=0);
+          }
+      }
+
+
+      bool accept_neighbour(int r, std::vector<Entry>& x) {
+          // Considered code location
+          Entry& instr_current = x[r];
+
+          if (instr_current.p==0) return false;
+
+          NodeIndex r_prev = instr_current.prev;
+          for (auto e : incoming[r]) {
+              if (e==r_prev) return false;
+          }
+          Entry& instr_prev = x[r_prev];
+          std::swap(instr_current.p, instr_prev.p);
+
+          if (instr_prev.prev>-1) x[instr_prev.prev].next = r;
+          if (instr_current.next>-1) x[instr_current.next].prev = r_prev;
+
+          NodeIndex instr_currrent_next = instr_current.next;
+
+          instr_current.prev = instr_prev.prev;
+          instr_current.next = r_prev;
+          instr_prev.prev = r;
+          instr_prev.next = instr_currrent_next;
+
+          return true;
+      }
+
+      bool probe_neighbour(int r, const std::vector<Entry>& x, int &score) {
+          // Considered code location
+          const Entry& instr_current = x[r];
+
+          if (instr_current.p==0) return false;
+
+          NodeIndex r_prev = instr_current.prev;
+          for (auto e : incoming[r]) {
+              if (e==r_prev) return false;
+          }
+          const Entry& instr_prev = x[r_prev];
+
+      #ifdef WITH_INF
+          // L1(Linf)
+          std::vector<Entry>& x_const = const_cast< std::vector<Entry>& >(x);
+          // Substract normal cost
+          for (int e : incoming[r]) {
+              score -= max_outgoing(x, e);
+          }
+          for (int e : incoming[r_prev]) {
+              score -= max_outgoing(x, e);
+          }
+          std::swap(x_const[r].p, x_const[r_prev].p);
+          for (int e : incoming[r]) {
+              score += max_outgoing(x, e);
+          }
+          for (int e : incoming[r_prev]) {
+              score += max_outgoing(x, e);
+          }
+          std::swap(x_const[r].p, x_const[r_prev].p);
+          score += outgoing[r].size()>0;
+          score -= outgoing[r_prev].size()>0;
+      #else
+          // L1
+          score -= incoming[r].size();
+          score += outgoing[r].size();
+          score += incoming[r_prev].size();
+          score -= outgoing[r_prev].size();
+      #endif
+
+          return true;
+      }
+    
+      std::vector<casadi_int> sort() {
+        #ifdef WITH_INF
+            double fac = 1;
+        #else
+            double fac = 1-1e-13;
+        #endif
+
+        #ifdef WITH_INF
+            double T = 4;
+        #else
+            double T = 5;
+        #endif
+
+        std::vector<Entry> order(N);
+        // Staring order (supplied sequence)
+        for (int i=0;i<N;++i) {
+            order[i].p = i;
+            order[i].prev = i-1;
+            order[i].next = i==N-1? -1 : i+1;
+        }
+
+        int score = compute_score(order);
+
+        std::random_device rd;  //Will be used to obtain a seed for the random number engine
+        std::mt19937 gen(1); //Standard mersenne_twister_engine seeded with rd()
+        casadi_assert(N>1, "Got N = " + str(N));
+        std::uniform_int_distribution<> distrib(0, N-1);
+        std::uniform_real_distribution<> distrib_real(0, 1);
+
+        validate(order);
+
+        int lowest_score = std::numeric_limits<int>::max();
+
+        long long int G = 1000000000;
+
+        #ifdef WITH_INF
+        long long int Nmax = 10*G;
+        #else
+        //long long int Nmax = 50*G;
+        long long int Nmax = 1000;
+        #endif
+
+        for (long long int k=0;k<1.1*Nmax;++k) {
+            //double rem = 1-(k+1)/kmax;
+            int r = distrib(gen);
+            int canidate_score = score;
+            // Compute neighbour score
+            if (!probe_neighbour(r, order, canidate_score)) continue;
+            if (canidate_score < score || exp(-(canidate_score-score)/T) >= distrib_real(gen)) {
+                // Accept the neighbour
+                accept_neighbour(r, order);
+                score = canidate_score;
+                // Print best achievement so far
+                if (score<lowest_score) {
+                    lowest_score = score;
+                    #ifdef COMPACT
+                    std::cout << console_at_line(ii) + std::to_string(ii)+ ". " +  std::to_string(lowest_score) + "|" + std::to_string(k) + "|"  << std::flush;
+                    #else
+                    //std::cout << ". " +  std::to_string(lowest_score) + "|" + std::to_string(k) + "|"  << std::endl;
+                    #endif
+                    if (k>=Nmax) {
+                        break;
+                    }
+                }
+            }
+            T *= fac;
+        }
+
+        validate(order);
+        casadi_assert_dev(compute_score(order)==score);
+        
+        std::vector<casadi_int> ret;
+        ret.reserve(order.size());
+        for (const auto& k : order) {
+          ret.push_back(k.p);
+        }
+
+        return ret;
+
+      }
+  };
+
+  std::vector<casadi_int> order_nodes(std::vector<SXNode*>& nodes) {
+    if (nodes.empty()) return {};
+    if (nodes.size()==1) return {0};
+    SimulatedAnnealingInstrOrder sa(nodes);
+    return sa.sort();
+  }
+
   void SXFunction::init(const Dict& opts) {
     // Call the init function of the base class
     XFunction<SXFunction, SX, SXNode>::init(opts);
@@ -448,7 +698,11 @@ namespace casadi {
       }
     }
 
-    vector<int> order;
+    casadi_assert(nodes.size() <= std::numeric_limits<int>::max(), "Integer overflow");
+
+    uout() << "nodes size " << nodes.size() << std::endl;
+
+    vector<casadi_int> order;
     if (name_=="jac_master") {
       std::ifstream ifs("/home/yacoda/GE/experiments/live_var/jac_master_order_L1_50G.txt");
       std::string line;
@@ -456,17 +710,17 @@ namespace casadi {
       {
           order.push_back(stoi(line));
       }
-      casadi_assert(nodes.size()==order.size(), "mismatch: " + str(nodes.size()) + " versus " + str(order.size()));
-      vector<SXNode*> nodes_orig = nodes;
-      for (int i=0;i<nodes_orig.size();++i) {
-        nodes[order[i]] = nodes_orig[i]; 
-      }
-      uout() << "reordered" << std::endl;
+    } else {
+      order = order_nodes(nodes);
     }
+    casadi_assert_dev(order.size()==nodes.size());
+    casadi_assert_dev(is_permutation(order));
 
-    uout() << "nodes is size " << nodes.size() << std::endl; 
-
-    casadi_assert(nodes.size() <= std::numeric_limits<int>::max(), "Integer overflow");
+    // Reorder nodes
+    vector<SXNode*> nodes_orig = nodes;
+    for (int i=0;i<nodes_orig.size();++i) {
+      nodes[order[i]] = nodes_orig[i]; 
+    }
 
     // Set the temporary variables to be the corresponding place in the sorted graph
     for (casadi_int i=0; i<nodes.size(); ++i) {

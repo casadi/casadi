@@ -171,6 +171,7 @@ namespace casadi {
   }
 
   bool is_permutation(const std::vector<casadi_int> &order) {
+    if (order.empty()) return true;
     std::set<casadi_int> order_set(order.begin(), order.end());
     return (order_set.size()==order.size()) &&
            (*order_set.begin()==0) &&
