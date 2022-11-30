@@ -45,4 +45,6 @@ namespace casadi {
 
   casadi_int GlobalOptions::byte_width_real = 8;
 
+  std::string GlobalOptions::sx_reordering = "none";
+
 } // namespace casadi

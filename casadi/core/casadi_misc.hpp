@@ -128,6 +128,9 @@ private:
   template<typename T, typename S>
   std::vector<T> vector_static_cast(const std::vector<S>& rhs);
 
+  template<typename T, typename S>
+  bool all_equal(const std::vector<T>& v, const S& e);
+
   CASADI_EXPORT std::string str_bvec(bvec_t v);
 
   /**  \brief Slicing vector
@@ -505,6 +508,14 @@ namespace casadi {
     ret.reserve(rhs.size());
     for (auto e : rhs) ret.push_back(static_cast<T>(e));
     return ret;
+  }
+
+  template<typename T, typename S>
+  bool all_equal(const std::vector<T>& v, const S& e) {
+    for (const auto& k : v) {
+      if (k!=e) return false;
+    }
+    return true;
   }
 
   template<typename T>

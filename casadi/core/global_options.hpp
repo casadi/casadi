@@ -75,6 +75,9 @@ namespace casadi {
       static casadi_int vector_width_real;
 
       static casadi_int byte_width_real;
+
+      static std::string sx_reordering;
+
 #endif //SWIG
       // Setter and getter for simplification_on_the_fly
       static void setSimplificationOnTheFly(bool flag) { simplification_on_the_fly = flag; }
@@ -103,6 +106,9 @@ namespace casadi {
 
       static void setByteWidthReal(casadi_int w) { byte_width_real = w; }
       static casadi_int getByteWidthReal() { return byte_width_real; }
+
+      static void setSXReordering(const std::string& mode) { sx_reordering = mode; }
+      static std::string getSXReordering() { return sx_reordering; }
 
   };
 
