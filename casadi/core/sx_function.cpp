@@ -732,7 +732,7 @@ namespace casadi {
       } else if (GlobalOptions::getSXReordering()=="L1") {
         order = order_nodes(nodes, 3*nodes.size()*nodes.size(), false);
       } else if (GlobalOptions::getSXReordering()=="none") {
-        order = order_nodes(nodes, 3*nodes.size()*nodes.size(), true);
+        // nothing to do
       } else {
         casadi_error("Unrecognised setting " + GlobalOptions::getSXReordering());
       }
