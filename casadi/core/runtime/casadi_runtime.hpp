@@ -289,6 +289,7 @@ namespace casadi {
   #include "casadi_ldl.hpp"
   #include "casadi_qr.hpp"
   #include "casadi_qp.hpp"
+  #include "casadi_qrqp.hpp"
   #include "casadi_kkt.hpp"
   #include "casadi_ipqp.hpp"
   #include "casadi_nlp.hpp"
@@ -303,6 +304,8 @@ namespace casadi {
   #include "casadi_cache.hpp"
   #include "casadi_convexify.hpp"
   #include "casadi_logsumexp.hpp"
+  #include "casadi_sum.hpp"
+  #include "casadi_sparsity.hpp"
 
 } // namespace casadi
 

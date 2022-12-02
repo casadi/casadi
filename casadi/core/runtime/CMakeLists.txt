@@ -28,6 +28,8 @@ set(RUNTIME_SRC
   casadi_mmin.hpp
   casadi_mmax.hpp
   casadi_mtimes.hpp
+  casadi_vector_fmin.hpp
+  casadi_vector_fmax.hpp
   casadi_vfmin.hpp
   casadi_vfmax.hpp
   casadi_vector_fmin.hpp
@@ -50,12 +52,14 @@ set(RUNTIME_SRC
   casadi_scal.hpp
   casadi_sparsify.hpp
   casadi_sum_viol.hpp
+  casadi_sum.hpp
   casadi_swap.hpp
   casadi_trans.hpp
   casadi_finite_diff.hpp
   casadi_ldl.hpp
   casadi_qr.hpp
   casadi_qp.hpp
+  casadi_qrqp.hpp
   casadi_kkt.hpp
   casadi_ipqp.hpp
   casadi_nlp.hpp
@@ -69,6 +73,7 @@ set(RUNTIME_SRC
   casadi_cache.hpp
   casadi_convexify.hpp
   casadi_logsumexp.hpp
+  casadi_sparsity.hpp
 )
 set(CASADI_RUNTIME_SRC "${RUNTIME_SRC}" PARENT_SCOPE)
 

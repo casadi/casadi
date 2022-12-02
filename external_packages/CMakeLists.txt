@@ -22,14 +22,6 @@ if(WITH_BUILD_DSDP AND DSDP_FOUND)
   add_subdirectory(DSDP)
 endif()
 
-if(WITH_HPMPC AND WITH_BUILD_HPMPC)
-  add_subdirectory(hpmpc)
-endif()
-
-if(WITH_BLASFEO AND WITH_BUILD_BLASFEO)
-  add_subdirectory(blasfeo)
-endif()
-
 if(WITH_SUPERSCS)
   add_subdirectory(superscs)
 endif()

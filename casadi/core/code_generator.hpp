@@ -108,6 +108,11 @@ namespace casadi {
         \identifier{rz} */
     std::string constant(const std::vector<casadi_int>& v);
 
+    /** \brief Represent an array constant; adding it when new */
+    std::string constant(const std::vector<int>& v) {
+        return constant(vector_static_cast<casadi_int>(v));
+    }
+
     /** \brief Represent an array constant; adding it when new
 
         \identifier{s0} */
@@ -552,6 +557,7 @@ namespace casadi {
       AUX_FINITE_DIFF,
       AUX_QR,
       AUX_QP,
+      AUX_QRQP,
       AUX_NLP,
       AUX_SQPMETHOD,
       AUX_FEASIBLESQPMETHOD,
@@ -573,6 +579,7 @@ namespace casadi {
       AUX_VFMAX,
       AUX_MAX_VIOL,
       AUX_SUM_VIOL,
+      AUX_SUM,
       AUX_REGULARIZE,
       AUX_INF,
       AUX_NAN,
@@ -587,7 +594,10 @@ namespace casadi {
       AUX_HYPOT,
       AUX_MMIN,
       AUX_MMAX,
-      AUX_LOGSUMEXP
+      AUX_LOGSUMEXP,
+      AUX_CLIP_MIN,
+      AUX_CLIP_MAX,
+      AUX_SPARSITY
     };
 
     /** \brief Add a built-in auxiliary function

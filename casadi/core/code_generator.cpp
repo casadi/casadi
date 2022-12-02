@@ -1059,7 +1059,17 @@ namespace casadi {
       add_auxiliary(AUX_SIGN);
       this->auxiliaries << sanitize_source(casadi_lsqr_str, inst);
       break;
+    case AUX_CLIP_MIN:
+      this->auxiliaries << sanitize_source(casadi_clip_min_str, inst);
+      break;
+    case AUX_CLIP_MAX:
+      this->auxiliaries << sanitize_source(casadi_clip_max_str, inst);
+      break;
     case AUX_QP:
+      this->auxiliaries << sanitize_source(casadi_qp_str, inst);
+      break;
+    case AUX_QRQP:
+      add_auxiliary(AUX_QP);
       add_auxiliary(AUX_COPY);
       add_auxiliary(AUX_QR);
       add_auxiliary(AUX_MAX);
@@ -1076,7 +1086,7 @@ namespace casadi {
       add_include("stdio.h");
       add_include("math.h");
 
-      this->auxiliaries << sanitize_source(casadi_qp_str, inst);
+      this->auxiliaries << sanitize_source(casadi_qrqp_str, inst);
       break;
     case AUX_NLP:
       this->auxiliaries << sanitize_source(casadi_nlp_str, inst);
@@ -1106,6 +1116,9 @@ namespace casadi {
       break;
     case AUX_SUM_VIOL:
       this->auxiliaries << sanitize_source(casadi_sum_viol_str, inst);
+      break;
+    case AUX_SUM:
+      this->auxiliaries << sanitize_source(casadi_sum_str, inst);
       break;
     case AUX_VFMIN:
       this->auxiliaries << sanitize_source(casadi_vfmin_str, inst);
@@ -1151,6 +1164,9 @@ namespace casadi {
       add_auxiliary(AUX_LOG1P);
       add_auxiliary(AUX_FMAX);
       this->auxiliaries << sanitize_source(casadi_logsumexp_str, inst);
+      break;
+    case AUX_SPARSITY:
+      this->auxiliaries << sanitize_source(casadi_sparsity_str, inst);
       break;
     case AUX_TO_DOUBLE:
       this->auxiliaries << "#define casadi_to_double(x) "

@@ -42,6 +42,8 @@
 /// \cond INTERNAL
 namespace casadi {
   struct CASADI_CONIC_QRQP_EXPORT QrqpMemory : public ConicMemory {
+    // Problem data structure
+    casadi_qrqp_data<double> d;
     const char* return_status;
   };
 
@@ -83,6 +85,10 @@ namespace casadi {
     /** \brief Free memory block */
     void free_mem(void *mem) const override { delete static_cast<QrqpMemory*>(mem);}
 
+    /** \brief Set the (persistent) work vectors */
+    void set_work(void* mem, const double**& arg, double**& res,
+                          casadi_int*& iw, double*& w) const override;
+
     ///@{
     /** \brief Options */
     static const Options options_;
@@ -105,7 +111,7 @@ namespace casadi {
     /// A documentation string
     static const std::string meta_doc;
     // Memory structure
-    casadi_qp_prob<double> p_;
+    casadi_qrqp_prob<double> p_;
     // KKT system and its QR factorization
     Sparsity AT_, kkt_, sp_v_, sp_r_;
     // KKT system permutation
@@ -125,7 +131,7 @@ namespace casadi {
     explicit Qrqp(DeserializingStream& s);
 
   private:
-    void set_qp_prob();
+    void set_qrqp_prob();
   };
 
 } // namespace casadi

@@ -591,45 +591,15 @@ add_feature_info(csparse-interface WITH_CSPARSE "Interface to the sparse direct 
 
 # BLASFEO
 option(WITH_BLASFEO "Compile the interface to BLASFEO" OFF)
-option(WITH_BUILD_BLASFEO "Compile the the included source code for BLASFEO" ON)
-if(WITH_BLASFEO)
-  if(WITH_BUILD_BLASFEO)
-    if(EXISTS ${PROJECT_SOURCE_DIR}/external_packages/blasfeo/src/include)
-      set(BLASFEO_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/external_packages/blasfeo/src/include)
-      set(BLASFEO_LIBRARIES)
-    else()
-      message(FATAL_ERROR "Blasfeo directory not found. If you want blasfeo, do git submodule init; git submodule update.")
-    endif()
-  else()
-    # try to find system blasfeo
-    find_package(BLASFEO REQUIRED)
-    set(BLASFEO_DLOPEN OFF)
-  endif()
-endif()
-add_feature_info(blasfeo-interface WITH_BLASFEO "Interface to blasfeo.")
+set(BUILD_BLASFEO_VERSION "edf92b396adddd9e548b9786f87ad290a0971329")
+option(WITH_BUILD_BLASFEO "Build BLASFEO (BUILD_BLASFEO_VERSION=${BUILD_BLASFEO_VERSION}) from downloaded source." OFF)
 
-# HPMPC
-option(WITH_HPMPC "Compile the interface to HPMPC" OFF)
-option(WITH_BUILD_HPMPC "Compile the the included source code for HPMPC" ON)
-if(WITH_HPMPC)
-  if(NOT WITH_BLASFEO)
-    message(FATAL_ERROR "WITH_HPMPC requires WITH_BLASFEO")
-  endif()
-  if(WITH_BUILD_HPMPC)
-    if(EXISTS ${PROJECT_SOURCE_DIR}/external_packages/hpmpc/src/include)
-      set(HPMPC_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/external_packages/hpmpc/src/include)
-      set(HPMPC_LIBRARIES)
-      set(HPMPC_DLOPEN ON)
-    else()
-      message(FATAL_ERROR "Hpmpc directory not found. If you want hpmpc, do git submodule init; git submodule update.")
-    endif()
-  else()
-    # try to find system hpmpc
-    find_package(HPMPC REQUIRED)
-    set(HPMPC_DLOPEN OFF)
-  endif()
-endif()
-add_feature_info(hpmpc-interface WITH_HPMPC "Interface to hpmpc.")
+# HPIPM
+option(WITH_HPIPM "Compile the interface to HPIPM" OFF)
+set(BUILD_HPIPM_VERSION "0e0c9f4e0d4081dceafa9b37c396db50bce0e81a")
+set(BUILD_HPIPM_GIT_REPO "https://github.com/jgillis/hpipm.git")
+option(WITH_BUILD_HPIPM "Build HPIPM (BUILD_HPIPM_VERSION=${BUILD_HPIPM_VERSION}) from downloaded source." OFF)
+set(BUILD_HPIPM_DEPENDENCIES BLASFEO)
 
 # SuperSCS: An conic solver
 option(WITH_SUPERSCS "Compile the interface to SuperSCS (the source code for SuperSCS is included)" ${WITH_SUPERSCS_DEF})
@@ -763,6 +733,11 @@ if(WITH_HSL)
 endif()
 add_feature_info(hsl-interface WITH_HSL "Interface to HSL.")
 
+# HIGHS: A MILP / QP solver
+option(WITH_HIGHS "Compile the HiGHS interface" OFF)
+set(BUILD_HIGHS_GIT_REPO "https://github.com/ERGO-Code/HiGHS")
+set(BUILD_HIGHS_VERSION "46f6ceb269ed44934c79fc9e488487fcb6313b6a") # v1.3.0 suffers from https://github.com/ERGO-Code/HiGHS/issues/928
+option(WITH_BUILD_HIGHS "Build HiGHS (BUILD_HIGHS_VERSION=${BUILD_HIGHS_VERSION}) from downloaded source (BUILD_HIGHS_GIT_REPO=${BUILD_HIGHS_GIT_REPO})." OFF)
 
 function(libraries2flags libraries out)
 # libtool cannot handle absoulte paths (i.e. it omits the library from the list of dependencies)
@@ -786,7 +761,7 @@ function(libraries2flags libraries out)
 endfunction()
 
 # Packages must be sorted from high to low in the dependency graph
-foreach(PKG BONMIN IPOPT CBC CLP MUMPS LAPACK)
+foreach(PKG HIGHS BONMIN IPOPT CBC CLP MUMPS HPIPM BLASFEO LAPACK)
   string(TOLOWER ${PKG} PKG_LOWER)
   if(WITH_${PKG})
     if(NOT WITH_BUILD_${PKG})
@@ -817,8 +792,19 @@ foreach(PKG BONMIN IPOPT CBC CLP MUMPS LAPACK)
   endif()
 endforeach()
 
+set(SHARED_LIBRARY_RELDIR lib)
+set(SHARED_LIBRARY64_RELDIR lib64)
+if (WIN32)
+    set(SHARED_LIBRARY_RELDIR bin)
+else()
+    if (CMAKE_SIZEOF_VOID_P EQUAL 4)
+        set(SHARED_LIBRARY64_RELDIR lib)
+    endif()
+endif()
+
 if(WITH_LAPACK)
   if (WITH_BUILD_LAPACK)
+    # Requires gcc>=5.0
     ExternalProject_Add(openblas-external
       GIT_REPOSITORY https://github.com/jgillis/OpenBLAS.git
       GIT_TAG ee15f53c9ef7148b05e1b2ff80003df1685f0f10
@@ -826,13 +812,13 @@ if(WITH_LAPACK)
       UPDATE_COMMAND ""
       CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
       CMAKE_ARGS -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_LIBDIR=lib -DTARGET=CORE2 -DUSE_THREAD=ON -DNUM_THREADS=16 -DBUILD_SINGLE=ON -DBUILD_DOUBLE=ON -DBUILD_COMPLEX=ON -DBUILD_COMPLEX16=ON -DDYNAMIC_ARCH=OFF -DUSE_OPENMP=OFF -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
-    set(LAPACK_LIBRARIES "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}openblas${CMAKE_SHARED_LIBRARY_SUFFIX}")
+    set(LAPACK_LIBRARIES "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}openblas${CMAKE_SHARED_LIBRARY_SUFFIX}")    
     set(LAPACK_DEPENDS_TARGET openblas-external)
 
     add_library(lapack SHARED IMPORTED)
     set_target_properties(lapack PROPERTIES
-      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}openblas${CMAKE_SHARED_LIBRARY_SUFFIX}"
-      IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}openblas${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}openblas${CMAKE_SHARED_LIBRARY_SUFFIX}"
+      IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}openblas${CMAKE_IMPORT_LIBRARY_SUFFIX}"
     )
   else()
     add_library(lapack INTERFACE)
@@ -841,8 +827,73 @@ if(WITH_LAPACK)
 endif()
 if(LAPACK_FOUND)
   libraries2flags("${LAPACK_LIBRARIES}" LAPACK_LFLAGS)
-  message("LAPACK_LFLAGS: ${LAPACK_LFLAGS}")
+  message("LAPACK_LFLAGS: ${LAPBLASFEO_PATHACK_LFLAGS}")
 endif()
+
+
+
+
+
+if(WITH_BLASFEO)
+  if (WITH_BUILD_BLASFEO)
+    set(C_FLAGS "")
+    if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
+        set(C_FLAGS "-DCMAKE_C_FLAGS=-std=c99")
+    endif()
+    ExternalProject_Add(blasfeo-external
+      GIT_REPOSITORY https://github.com/giaf/blasfeo.git
+      GIT_TAG ${BUILD_BLASFEO_VERSION}
+      PREFIX "${CMAKE_BINARY_DIR}/external_projects"
+      UPDATE_COMMAND ""
+      CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
+      CMAKE_ARGS ${C_FLAGS} -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
+    set(BLASFEO_PATH "${CMAKE_BINARY_DIR}/external_projects")
+    set(BLASFEO_DEPENDS_TARGET blasfeo-external)
+
+    add_library(blasfeo SHARED IMPORTED)
+    set_target_properties(blasfeo PROPERTIES
+      INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include"
+      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}blasfeo${CMAKE_SHARED_LIBRARY_SUFFIX}"
+      IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}blasfeo${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+    )
+    file(GLOB BLASFEO_HEADERS "${CMAKE_BINARY_DIR}/external_projects/include/blasfeo*")
+    install(FILES
+      ${BLASFEO_HEADERS}
+      DESTINATION "${INCLUDE_PREFIX}")
+  else()
+    #add_library(lapack INTERFACE)
+    #target_link_libraries(lapack INTERFACE ${LAPACK_LIBRARIES})
+  endif()
+endif()
+
+message("CMAKE_C_COMPILER_ID: ${CMAKE_C_COMPILER_ID}")
+if(WITH_HPIPM)
+  if (WITH_BUILD_HPIPM)
+    ExternalProject_Add(hpipm-external
+      DEPENDS ${BLASFEO_DEPENDS_TARGET}
+      GIT_REPOSITORY ${BUILD_HPIPM_GIT_REPO}
+      GIT_TAG ${BUILD_HPIPM_VERSION}
+      PREFIX "${CMAKE_BINARY_DIR}/external_projects"
+      UPDATE_COMMAND ""
+      CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
+      CMAKE_ARGS -DHPIPM_TESTING=OFF -DBUILD_SHARED_LIBS=ON -DBLASFEO_PATH=${BLASFEO_PATH} -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
+    add_library(hpipm SHARED IMPORTED)
+    target_link_libraries(hpipm INTERFACE blasfeo)
+    set_target_properties(hpipm PROPERTIES
+       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}hpipm${CMAKE_SHARED_LIBRARY_SUFFIX}"
+       IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}hpipm${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+    )
+    file(GLOB HPIPM_HEADERS "${CMAKE_BINARY_DIR}/external_projects/include/hpipm*")
+    install(FILES
+      ${HPIPM_HEADERS}
+      DESTINATION "${INCLUDE_PREFIX}")
+  else()
+    #add_library(lapack INTERFACE)
+    #target_link_libraries(lapack INTERFACE ${LAPACK_LIBRARIES})
+  endif()
+endif()
+
+message(STATUS "CMAKE_SYSTEM_NAME: ${CMAKE_SYSTEM_NAME} ${WIN32}")
 
 add_feature_info(lapack-interface WITH_LAPACK "Interface to LAPACK.")
 
@@ -1036,6 +1087,29 @@ if(WITH_BONMIN)
 endif()
 add_feature_info(bonmin-interface WITH_BONMIN "Interface to the MINLP framework Bonmin.")
 
+if(WITH_HIGHS)
+  if(WITH_BUILD_HIGHS)
+    ExternalProject_Add(highs-external
+        GIT_REPOSITORY ${BUILD_HIGHS_GIT_REPO}
+        GIT_TAG ${BUILD_HIGHS_VERSION}
+        PREFIX "${CMAKE_BINARY_DIR}/external_projects"
+        UPDATE_COMMAND ""
+        CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
+        CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/highs")
+    add_library(highs SHARED IMPORTED)
+    set_target_properties(highs PROPERTIES
+       INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include/highs"
+       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY64_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}highs${CMAKE_SHARED_LIBRARY_SUFFIX}"
+       IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}highs${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+    )
+    install(DIRECTORY
+      "${CMAKE_BINARY_DIR}/external_projects/include/highs"
+      DESTINATION "${INCLUDE_PREFIX}")
+  endif()
+endif()
+add_feature_info(highs-interface WITH_HIGHS "Interface to the MILP / QP solver HiGHS.")
+
 
 # SNOPT: An SQP method
 option(WITH_SNOPT "Compile the SNOPT interface if SNOPT libraries can be found" OFF)
@@ -1053,13 +1127,6 @@ if(WITH_SNOPT)
   endif()
 endif()
 add_feature_info(snopt-interface WITH_SNOPT "Interface to the NLP solver SNOPT.")
-
-# HIGHS: A MILP / QP solver
-option(WITH_HIGHS "Compile the HIGHS interface" OFF)
-if(WITH_HIGHS)
-  find_package(HIGHS REQUIRED)
-endif()
-add_feature_info(highs-interface WITH_HIGHS "Interface to the MILP / QP solver HIGHS.")
 
 # OOQP: A sparse interior point QP solver
 option(WITH_OOQP "Enable OOQP interface" OFF)

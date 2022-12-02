@@ -100,7 +100,6 @@ namespace casadi {
     void unpack(std::string& e);
     void unpack(double& e);
     void unpack(char& e);
-    void unpack_data(char& e);
     template <class T>
     void unpack(std::vector<T>& e) {
       assert_decoration('V');
@@ -135,14 +134,9 @@ namespace casadi {
     template <class T>
     void unpack(const std::string& descr, T& e) {
       if (debug_) {
-        char dummy;
-        unpack(dummy); // newline
-        unpack(dummy); // <
         std::string d;
         unpack(d);
         casadi_assert(d==descr, "Mismatch: '" + descr + "' expected, got '" + d + "'.");
-        unpack(dummy); // newline
-        unpack(dummy); // >
       }
       unpack(e);
     }
@@ -239,7 +233,6 @@ namespace casadi {
     void pack(double e);
     void pack(const std::string& e);
     void pack(char e);
-    void pack_data(char e);
     template <class T>
     void pack(const std::vector<T>& e) {
       decorate('V');
@@ -263,24 +256,12 @@ namespace casadi {
     }
     template <class T>
     void pack(const std::string& descr, const T& e) {
-      if (debug_) {
-        pack('\n');
-        pack('<');
-        pack(descr);
-        pack('>');
-        pack('\n');
-      }
+      if (debug_) pack(descr);
       pack(e);
     }
     template <class T>
     void pack(const std::string& descr, T& e) {
-      if (debug_) {
-        pack('\n');
-        pack('<');
-        pack(descr);
-        pack('>');
-        pack('\n');
-      }
+      if (debug_) pack(descr);
       pack(e);
     }
     //@}

@@ -35,6 +35,9 @@
 namespace casadi {
 
   struct CASADI_EXPORT ConicMemory : public FunctionMemory {
+    // Problem data structure
+    casadi_qp_data<double> d_qp;
+
     // Success?
     bool success;
 
@@ -48,6 +51,8 @@ namespace casadi {
   /// Internal class
   class CASADI_EXPORT Conic : public FunctionInternal, public PluginInterface<Conic> {
   public:
+    // Memory structure
+    casadi_qp_prob<double> p_qp_;
 
     // Constructor
     Conic(const std::string& name, const std::map<std::string, Sparsity> &st);
@@ -149,6 +154,10 @@ namespace casadi {
 
     /// Get all statistics
     Dict get_stats(void* mem) const override;
+
+    /** \brief Generate code for the function body */
+    void qp_codegen_body(CodeGenerator& g) const;
+
   protected:
     /// Options
     std::vector<bool> discrete_;
@@ -216,6 +225,8 @@ namespace casadi {
 
         \identifier{1ji} */
     explicit Conic(DeserializingStream& s);
+  private:
+    void set_qp_prob();
   };
 
 

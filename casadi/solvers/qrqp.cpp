@@ -98,7 +98,7 @@ namespace casadi {
     kkt_.qr_sparse(sp_v_, sp_r_, prinv_, pc_);
 
     // Setup memory structure
-    set_qp_prob();
+    set_qrqp_prob();
 
     // Default options
     print_iter_ = true;
@@ -129,7 +129,7 @@ namespace casadi {
 
     // Allocate memory
     casadi_int sz_w, sz_iw;
-    casadi_qp_work(&p_, &sz_iw, &sz_w);
+    casadi_qrqp_work(&p_, &sz_iw, &sz_w);
     alloc_iw(sz_iw, true);
     alloc_w(sz_w, true);
 
@@ -147,16 +147,29 @@ namespace casadi {
     }
   }
 
-  void Qrqp::set_qp_prob() {
-    p_.sp_a = A_;
-    p_.sp_h = H_;
+  void Qrqp::set_work(void* mem, const double**& arg, double**& res,
+                                casadi_int*& iw, double*& w) const {
+    auto m = static_cast<QrqpMemory*>(mem);
+
+    // Set work in base classes
+    Conic::set_work(mem, arg, res, iw, w);
+
+    // Setup data structure
+    m->d.prob = &p_;
+    m->d.qp = &m->d_qp;
+
+    casadi_qrqp_init(&m->d, &iw, &w);
+  }
+
+  void Qrqp::set_qrqp_prob() {
+    p_.qp = &p_qp_;
     p_.sp_at = AT_;
     p_.sp_kkt = kkt_;
     p_.sp_v = sp_v_;
     p_.sp_r = sp_r_;
     p_.prinv = get_ptr(prinv_);
     p_.pc = get_ptr(pc_);
-    casadi_qp_setup(&p_);
+    casadi_qrqp_setup(&p_);
   }
 
   int Qrqp::init_mem(void* mem) const {
@@ -172,45 +185,43 @@ namespace casadi {
     // Message buffer
     char buf[121];
     // Setup data structure
-    casadi_qp_data<double> d;
-    d.prob = &p_;
-    d.nz_h = arg[CONIC_H];
-    d.g = arg[CONIC_G];
-    d.nz_a = arg[CONIC_A];
-    casadi_qp_init(&d, &iw, &w);
+    casadi_qrqp_data<double>& d = m->d;
+    casadi_qp_data<double>& d_qp = m->d_qp;
+
     // Pass bounds on z
-    casadi_copy(arg[CONIC_LBX], nx_, d.lbz);
-    casadi_copy(arg[CONIC_LBA], na_, d.lbz+nx_);
-    casadi_copy(arg[CONIC_UBX], nx_, d.ubz);
-    casadi_copy(arg[CONIC_UBA], na_, d.ubz+nx_);
+    casadi_copy(d_qp.lbx, nx_, d.lbz);
+    casadi_copy(d_qp.lba, na_, d.lbz+nx_);
+    casadi_copy(d_qp.ubx, nx_, d.ubz);
+    casadi_copy(d_qp.uba, na_, d.ubz+nx_);
     // Pass initial guess
-    casadi_copy(arg[CONIC_X0], nx_, d.z);
+    casadi_copy(d_qp.x0, nx_, d.z);
     casadi_fill(d.z+nx_, na_, nan);
-    casadi_copy(arg[CONIC_LAM_X0], nx_, d.lam);
-    casadi_copy(arg[CONIC_LAM_A0], na_, d.lam+nx_);
+    casadi_copy(d_qp.lam_x0, nx_, d.lam);
+    casadi_copy(d_qp.lam_a0, na_, d.lam+nx_);
+
     // Reset solver
-    if (casadi_qp_reset(&d)) return 1;
+    if (casadi_qrqp_reset(&d)) return 1;
     while (true) {
       // Prepare QP
-      int flag = casadi_qp_prepare(&d);
+      int flag = casadi_qrqp_prepare(&d);
       // Print iteration progress
       if (print_iter_) {
         if (d.iter % 10 == 0) {
           // Print header
-          if (casadi_qp_print_header(&d, buf, sizeof(buf))) break;
+          if (casadi_qrqp_print_header(&d, buf, sizeof(buf))) break;
           uout() << buf << "\n";
         }
         // Print iteration
-        if (casadi_qp_print_iteration(&d, buf, sizeof(buf))) break;
+        if (casadi_qrqp_print_iteration(&d, buf, sizeof(buf))) break;
         uout() << buf << "\n";
       }
       // Make an iteration
-      flag = flag || casadi_qp_iterate(&d);
+      flag = flag || casadi_qrqp_iterate(&d);
       // Print debug info
       if (print_lincomb_) {
         for (casadi_int k=0;k<d.sing;++k) {
           uout() << "lincomb: ";
-          casadi_qp_print_colcomb(&d, buf, sizeof(buf), k);
+          casadi_qrqp_print_colcomb(&d, buf, sizeof(buf), k);
           uout() << buf << "\n";
         }
       }
@@ -237,10 +248,10 @@ namespace casadi {
         break;
     }
     // Get solution
-    casadi_copy(&d.f, 1, res[CONIC_COST]);
-    casadi_copy(d.z, nx_, res[CONIC_X]);
-    casadi_copy(d.lam, nx_, res[CONIC_LAM_X]);
-    casadi_copy(d.lam+nx_, na_, res[CONIC_LAM_A]);
+    casadi_copy(&d.f, 1, d_qp.f);
+    casadi_copy(d.z, nx_, d_qp.x);
+    casadi_copy(d.lam, nx_, d_qp.lam_x);
+    casadi_copy(d.lam+nx_, na_, d_qp.lam_a);
     // Return
     if (verbose_) casadi_warning(m->return_status);
     m->success = d.status == QP_SUCCESS;
@@ -248,24 +259,24 @@ namespace casadi {
   }
 
   void Qrqp::codegen_body(CodeGenerator& g) const {
-    g.add_auxiliary(CodeGenerator::AUX_QP);
+    qp_codegen_body(g);
+    g.add_auxiliary(CodeGenerator::AUX_QRQP);
     if (print_iter_) g.add_auxiliary(CodeGenerator::AUX_PRINTF);
-    g.local("d", "struct casadi_qp_data");
-    g.local("p", "struct casadi_qp_prob");
+    g.local("d", "struct casadi_qrqp_data");
+    g.local("p", "struct casadi_qrqp_prob");
     g.local("flag", "int");
     if (print_iter_ || print_lincomb_) g.local("buf[121]", "char");
     if (print_lincomb_) g.local("k", "casadi_int");
 
     // Setup memory structure
-    g << "p.sp_a = " << g.sparsity(A_) << ";\n";
-    g << "p.sp_h = " << g.sparsity(H_) << ";\n";
+    g << "p.qp = &p_qp;\n";
     g << "p.sp_at = " << g.sparsity(AT_) << ";\n";
     g << "p.sp_kkt = " << g.sparsity(kkt_) << ";\n";
     g << "p.sp_v = " << g.sparsity(sp_v_) << ";\n";
     g << "p.sp_r = " << g.sparsity(sp_r_) << ";\n";
     g << "p.prinv = " << g.constant(prinv_) << ";\n";
     g << "p.pc =  " << g.constant(pc_) << ";\n";
-    g << "casadi_qp_setup(&p);\n";
+    g << "casadi_qrqp_setup(&p);\n";
 
     // Copy options
     g << "p.max_iter = " << p_.max_iter << ";\n";
@@ -275,10 +286,8 @@ namespace casadi {
 
     // Setup data structure
     g << "d.prob = &p;\n";
-    g << "d.nz_h = arg[" << CONIC_H << "];\n";
-    g << "d.g = arg[" << CONIC_G << "];\n";
-    g << "d.nz_a = arg[" << CONIC_A << "];\n";
-    g << "casadi_qp_init(&d, &iw, &w);\n";
+    g << "d.qp = &d_qp;\n";
+    g << "casadi_qrqp_init(&d, &iw, &w);\n";
 
     g.comment("Pass bounds on z");
     g.copy_default(g.arg(CONIC_LBX), nx_, "d.lbz", "-casadi_inf", false);
@@ -293,23 +302,23 @@ namespace casadi {
     g.copy_default(g.arg(CONIC_LAM_A0), na_, "d.lam+" + str(nx_), "0", false);
 
     g.comment("Solve QP");
-    g << "if (casadi_qp_reset(&d)) return 1;\n";
+    g << "if (casadi_qrqp_reset(&d)) return 1;\n";
     g << "while (1) {\n";
-    g << "flag = casadi_qp_prepare(&d);\n";
+    g << "flag = casadi_qrqp_prepare(&d);\n";
     if (print_iter_) {
       // Print header
       g << "if (d.iter % 10 == 0) {\n";
-      g << "if (casadi_qp_print_header(&d, buf, sizeof(buf))) break;\n";
+      g << "if (casadi_qrqp_print_header(&d, buf, sizeof(buf))) break;\n";
       g << g.printf("%s\\n", "buf") << "\n";
       g << "}\n";
       // Print iteration
-      g << "if (casadi_qp_print_iteration(&d, buf, sizeof(buf))) break;\n";
+      g << "if (casadi_qrqp_print_iteration(&d, buf, sizeof(buf))) break;\n";
       g << g.printf("%s\\n", "buf") << "\n";
     }
-    g << "if (flag || casadi_qp_iterate(&d)) break;\n";
+    g << "if (flag || casadi_qrqp_iterate(&d)) break;\n";
     if (print_lincomb_) {
       g << "for (k=0;k<d.sing;++k) {\n";
-      g << "casadi_qp_print_colcomb(&d, buf, sizeof(buf), k);\n";
+      g << "casadi_qrqp_print_colcomb(&d, buf, sizeof(buf), k);\n";
       g << g.printf("lincomb: %s\\n", "buf") << "\n";
       g << "}\n";
     }
@@ -353,7 +362,7 @@ namespace casadi {
     s.unpack("Qrqp::print_header", print_header_);
     s.unpack("Qrqp::print_info", print_info_);
     s.unpack("Qrqp::print_lincomb_", print_lincomb_);
-    set_qp_prob();
+    set_qrqp_prob();
     s.unpack("Qrqp::max_iter", p_.max_iter);
     s.unpack("Qrqp::min_lam", p_.min_lam);
     s.unpack("Qrqp::constr_viol_tol", p_.constr_viol_tol);

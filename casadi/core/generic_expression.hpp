@@ -604,6 +604,16 @@ class GenericExpression : public GenericExpressionCommon {
     ///@}
 
     ///@{
+    /** \brief Remainder after division: (x,y) -> remainder(x,y) */
+    static ExType remainder(const ExType& x, const ExType& y) {
+      return ExType::binary(OP_REMAINDER, x, y);
+    }
+    friend inline ExType remainder(const ExType& x, const ExType& y) {
+      return ExType::remainder(x, y);
+    }
+    ///@}
+
+    ///@{
     /** \brief Two argument arc tangent: (x,y) -> atan2(x,y)
 
         \identifier{pr} */
