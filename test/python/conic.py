@@ -1258,8 +1258,6 @@ class ConicTests(casadiTestCase):
       res = solver(lbx=vertcat(-inf,-inf,-inf,-inf,1))
 
       self.checkarray(res["x"][:-1],x0,conic,digits=4)
-      
-      self.checkcodegen
 
   def test_no_success(self):
 
