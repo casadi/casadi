@@ -93,16 +93,15 @@ struct casadi_qrqp_data {
 
 // SYMBOL "qrqp_work"
 template<typename T1>
-void casadi_qrqp_work(const casadi_qrqp_prob<T1>* p, casadi_int* sz_iw, casadi_int* sz_w) {
+void casadi_qrqp_work(const casadi_qrqp_prob<T1>* p, casadi_int* sz_arg, casadi_int* sz_res, casadi_int* sz_iw, casadi_int* sz_w) {
   // Local variables
   casadi_int nnz_a, nnz_kkt, nnz_v, nnz_r;
+  casadi_qp_work(p->qp, sz_arg, sz_res, sz_iw, sz_w);
   // Get matrix number of nonzeros
   nnz_a = p->qp->sp_a[2+p->qp->sp_a[1]];
   nnz_kkt = p->sp_kkt[2+p->sp_kkt[1]];
   nnz_v = p->sp_v[2+p->sp_v[1]];
   nnz_r = p->sp_r[2+p->sp_r[1]];
-  // Reset sz_w, sz_iw
-  *sz_w = *sz_iw = 0;
   // Temporary work vectors
   *sz_w = casadi_max(*sz_w, p->qp->nz); // casadi_project, tau memory
   *sz_iw = casadi_max(*sz_iw, p->qp->nz); // casadi_trans, tau type, allzero

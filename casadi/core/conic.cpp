@@ -430,12 +430,6 @@ namespace casadi {
       "Selected solver does not support psd constraints.");
 
     set_qp_prob();
-
-    // Allocate memory
-    casadi_int sz_w, sz_iw;
-    casadi_qp_work(&p_qp_, &sz_iw, &sz_w);
-    alloc_iw(sz_iw, true);
-    alloc_w(sz_w, true);
   }
 
   /** \brief Initalize memory block */

@@ -56,7 +56,9 @@ void casadi_qp_init(casadi_qp_data<T1>* d, casadi_int** iw, T1** w) {
 
 // SYMBOL "qp_work"
 template<typename T1>
-void casadi_qp_work(const casadi_qp_prob<T1>* p, casadi_int* sz_iw, casadi_int* sz_w) {
+void casadi_qp_work(const casadi_qp_prob<T1>* p, casadi_int* sz_arg, casadi_int* sz_res, casadi_int* sz_iw, casadi_int* sz_w) {
+  // Reset sz_arg, sz_res
+  *sz_arg = *sz_res = 0;
   // Reset sz_w, sz_iw
   *sz_w = *sz_iw = 0;
 }
