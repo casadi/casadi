@@ -13,6 +13,7 @@ struct casadi_qp_prob {
   const casadi_int *sp_a, *sp_h;
   // Dimensions
   casadi_int nx, na, nz;
+  casadi_int nnz_a, nnz_h;
 };
 // C-REPLACE "casadi_qp_prob<T1>" "struct casadi_qp_prob"
 
@@ -22,6 +23,8 @@ void casadi_qp_setup(casadi_qp_prob<T1>* p) {
   p->na = p->sp_a[0];
   p->nx = p->sp_a[1];
   p->nz = p->na+p->nx;
+  p->nnz_a = p->sp_a[2+p->sp_a[1]];
+  p->nnz_h = p->sp_h[2+p->sp_h[1]];
 }
 
 // C-REPLACE "UnifiedReturnStatus" "int"
