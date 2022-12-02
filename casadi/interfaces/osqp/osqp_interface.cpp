@@ -278,18 +278,18 @@ namespace casadi {
     casadi_copy(m->work->solution->y+nx_, na_, res[CONIC_LAM_A]);
     if (res[CONIC_COST]) *res[CONIC_COST] = m->work->info->obj_val;
 
-    m->success = m->work->info->status_val == OSQP_SOLVED;
-    if (m->success) {
-      m->unified_return_status = SOLVER_RET_SUCCESS;
+    m->d_qp.success = m->work->info->status_val == OSQP_SOLVED;
+    if (m->d_qp.success) {
+      m->d_qp.unified_return_status = SOLVER_RET_SUCCESS;
     } else if (m->work->info->status_val == OSQP_PRIMAL_INFEASIBLE || 
         m->work->info->status_val == OSQP_MAX_ITER_REACHED ||
         m->work->info->status_val == OSQP_DUAL_INFEASIBLE ||
         m->work->info->status_val == OSQP_NON_CVX ||
         m->work->info->status_val == OSQP_PRIMAL_INFEASIBLE_INACCURATE ||
         m->work->info->status_val == OSQP_DUAL_INFEASIBLE_INACCURATE) {
-          m->unified_return_status = SOLVER_RET_INFEASIBLE;
+          m->d_qp.unified_return_status = SOLVER_RET_INFEASIBLE;
     } else {
-      m->unified_return_status = SOLVER_RET_UNKNOWN;
+      m->d_qp.unified_return_status = SOLVER_RET_UNKNOWN;
     }
 
     return 0;

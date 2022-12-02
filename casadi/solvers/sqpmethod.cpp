@@ -864,8 +864,8 @@ int Sqpmethod::solve(void* mem) const {
     auto m_qpsol = static_cast<ConicMemory*>(qpsol_->memory(0));
 
     // Check if the QP was infeasible for elastic mode
-    if (!m_qpsol->success) {
-      if ((elastic_mode_ && m_qpsol->unified_return_status == SOLVER_RET_INFEASIBLE) || (mode == 1)) {
+    if (!m_qpsol->d_qp.success) {
+      if ((elastic_mode_ && m_qpsol->d_qp.unified_return_status == SOLVER_RET_INFEASIBLE) || (mode == 1)) {
         return SOLVER_RET_INFEASIBLE;
       }
     } 
@@ -904,8 +904,8 @@ int Sqpmethod::solve(void* mem) const {
     auto m_qpsol_ela = static_cast<ConicMemory*>(qpsol_ela_->memory(0));
 
     // Check if the QP was infeasible
-    if (!m_qpsol_ela->success) {
-      if (m_qpsol_ela->unified_return_status == SOLVER_RET_INFEASIBLE) {
+    if (!m_qpsol_ela->d_qp.success) {
+      if (m_qpsol_ela->d_qp.unified_return_status == SOLVER_RET_INFEASIBLE) {
         return SOLVER_RET_INFEASIBLE;
       }
     } 

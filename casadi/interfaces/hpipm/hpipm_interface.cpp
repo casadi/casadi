@@ -725,7 +725,7 @@ namespace casadi {
 
     casadi_hpipm_solve(&m->d, arg, res, iw, w);
 
-    m->success = m->d.return_status==0;
+    m->d_qp.success = m->d.return_status==0;
 
     uout() << "HPIPM finished after " << m->d.iter_count << " iterations." << std::endl;
     uout() << "return status: " << m->d.return_status << std::endl;

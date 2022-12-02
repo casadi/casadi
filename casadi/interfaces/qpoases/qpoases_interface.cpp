@@ -450,19 +450,19 @@ namespace casadi {
     m->fstats.at("postprocessing").tic();
 
     m->return_status = flag;
-    m->success = flag==qpOASES::SUCCESSFUL_RETURN;
-    if (m->success) m->unified_return_status = SOLVER_RET_SUCCESS;
+    m->d_qp.success = flag==qpOASES::SUCCESSFUL_RETURN;
+    if (m->d_qp.success) m->d_qp.unified_return_status = SOLVER_RET_SUCCESS;
     if (flag==qpOASES::RET_MAX_NWSR_REACHED) {
-      m->unified_return_status = SOLVER_RET_LIMITED;
+      m->d_qp.unified_return_status = SOLVER_RET_LIMITED;
     }
     
     if (flag==qpOASES::RET_INIT_FAILED_INFEASIBILITY || flag==qpOASES::RET_QP_INFEASIBLE ||
         flag==qpOASES::RET_HOTSTART_STOPPED_INFEASIBILITY || flag==qpOASES::RET_ADDCONSTRAINT_FAILED_INFEASIBILITY ||
         flag==qpOASES::RET_ADDBOUND_FAILED_INFEASIBILITY || flag==qpOASES::RET_ENSURELI_FAILED_NOINDEX || flag==qpOASES::RET_ENSURELI_FAILED_CYCLING) {
-      m->unified_return_status = SOLVER_RET_INFEASIBLE;
+      m->d_qp.unified_return_status = SOLVER_RET_INFEASIBLE;
     }
 
-    m->iter_count = nWSR;
+    m->d_qp.iter_count = nWSR;
 
     if (verbose_) casadi_message("qpOASES return status: " + getErrorMessage(m->return_status));
 
@@ -483,7 +483,7 @@ namespace casadi {
 
     m->fstats.at("postprocessing").toc();
 
-    return m->unified_return_status;
+    return m->d_qp.unified_return_status;
   }
 
   std::string QpoasesInterface::getErrorMessage(casadi_int flag) {

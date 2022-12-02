@@ -45,7 +45,7 @@ namespace casadi {
     // Success?
     bool success;
     // Return status
-    FunctionInternal::UnifiedReturnStatus unified_return_status;
+    UnifiedReturnStatus unified_return_status;
   };
 
   /** \brief NLP solver storage class

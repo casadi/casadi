@@ -1343,15 +1343,6 @@ namespace casadi {
     std::vector<std::vector<MatType> >
     symbolicAdjSeed(casadi_int nadj, const std::vector<MatType>& v) const;
 
-    /** Unified return status for solvers */
-    enum UnifiedReturnStatus {
-        SOLVER_RET_SUCCESS,
-        SOLVER_RET_UNKNOWN,
-        SOLVER_RET_LIMITED, // Out of time
-        SOLVER_RET_NAN,
-        SOLVER_RET_INFEASIBLE
-    };
-
     static std::string string_from_UnifiedReturnStatus(UnifiedReturnStatus status);
 
     /** \brief Deserializing constructor

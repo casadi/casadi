@@ -24,11 +24,20 @@ void casadi_qp_setup(casadi_qp_prob<T1>* p) {
   p->nz = p->na+p->nx;
 }
 
+// C-REPLACE "UnifiedReturnStatus" "int"
+// C-REPLACE "bool" "int"
+
 // SYMBOL "qp_data"
 template<typename T1>
 struct casadi_qp_data {
   // Problem structure
   const casadi_qp_prob<T1>* prob;
+
+  UnifiedReturnStatus unified_return_status;
+  bool success;
+
+  // Number of iterations performed
+  casadi_int iter_count;
 
   // QP data, pointers to arg (no allocations needed)
   const T1 *a, *h, *g, *lbx, *ubx, *lba, *uba, *x0, *lam_x0, *lam_a0;

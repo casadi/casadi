@@ -468,9 +468,9 @@ namespace casadi {
     d_qp.f = res[CONIC_COST];
 
     // Problem has not been solved at this point
-    m->success = false;
-    m->unified_return_status = SOLVER_RET_UNKNOWN;
-    m->iter_count = -1;
+    d_qp.success = false;
+    d_qp.unified_return_status = SOLVER_RET_UNKNOWN;
+    d_qp.iter_count = -1;
   }
 
   Conic::~Conic() {
@@ -540,7 +540,7 @@ namespace casadi {
 
     int ret = solve(arg, res, iw, w, mem);
 
-    if (error_on_fail_ && !m->success)
+    if (error_on_fail_ && !m->d_qp.success)
       casadi_error("conic process failed. "
                    "Set 'error_on_fail' option to false to ignore this error.");
     return ret;
@@ -697,9 +697,9 @@ namespace casadi {
     Dict stats = FunctionInternal::get_stats(mem);
     auto m = static_cast<ConicMemory*>(mem);
 
-    stats["success"] = m->success;
-    stats["unified_return_status"] = string_from_UnifiedReturnStatus(m->unified_return_status);
-    stats["iter_count"] = m->iter_count;
+    stats["success"] = m->d_qp.success;
+    stats["unified_return_status"] = string_from_UnifiedReturnStatus(m->d_qp.unified_return_status);
+    stats["iter_count"] = m->d_qp.iter_count;
     return stats;
   }
 

@@ -38,14 +38,6 @@ namespace casadi {
     // Problem data structure
     casadi_qp_data<double> d_qp;
 
-    // Success?
-    bool success;
-
-    // Return status
-    FunctionInternal::UnifiedReturnStatus unified_return_status;
-
-    // Number of iterations performed
-    casadi_int iter_count;
   };
 
   /// Internal class

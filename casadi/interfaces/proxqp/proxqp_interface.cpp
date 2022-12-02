@@ -382,20 +382,20 @@ namespace casadi {
       *res[CONIC_COST] = m->objValue;
     }
 
-    m->success = m->status == QPSolverOutput::PROXQP_SOLVED;
-    if (m->success)
+    m->d_qp.success = m->status == QPSolverOutput::PROXQP_SOLVED;
+    if (m->d_qp.success)
     {
-      m->unified_return_status = SOLVER_RET_SUCCESS;
+      m->d_qp.unified_return_status = SOLVER_RET_SUCCESS;
     }
     else
     {
       if (m->status == QPSolverOutput::PROXQP_MAX_ITER_REACHED)
       {
-        m->unified_return_status = SOLVER_RET_LIMITED;
+        m->d_qp.unified_return_status = SOLVER_RET_LIMITED;
       }
       else  // primal or dual infeasibility
       {
-        m->unified_return_status = SOLVER_RET_UNKNOWN;
+        m->d_qp.unified_return_status = SOLVER_RET_UNKNOWN;
       }
     }
     m->fstats.at("postprocessing").toc();

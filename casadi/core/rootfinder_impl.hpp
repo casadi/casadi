@@ -47,7 +47,7 @@ namespace casadi {
     bool success;
 
     // Return status
-    FunctionInternal::UnifiedReturnStatus unified_return_status;
+    UnifiedReturnStatus unified_return_status;
   };
 
   /// Internal class

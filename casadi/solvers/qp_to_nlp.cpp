@@ -202,8 +202,8 @@ namespace casadi {
     int ret = solver_(arg1, res1, iw, w, m->nlp_mem);
     auto nlp_m = static_cast<NlpsolMemory*>(solver_.memory(m->nlp_mem));
 
-    m->success = nlp_m->success;
-    m->unified_return_status = nlp_m->unified_return_status;
+    m->d_qp.success = nlp_m->success;
+    m->d_qp.unified_return_status = nlp_m->unified_return_status;
     return ret;
   }
 

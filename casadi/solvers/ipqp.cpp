@@ -220,7 +220,7 @@ namespace casadi {
     // Read return status
     m->return_status = casadi_ipqp_return_status(d.status);
     if (d.status == IPQP_MAX_ITER)
-      m->unified_return_status = SOLVER_RET_LIMITED;
+      m->d_qp.unified_return_status = SOLVER_RET_LIMITED;
     // Get solution
     casadi_ipqp_solution(&d, res[CONIC_X], res[CONIC_LAM_X], res[CONIC_LAM_A]);
     if (res[CONIC_COST]) {
@@ -229,7 +229,7 @@ namespace casadi {
     }
     // Return
     if (verbose_) casadi_warning(m->return_status);
-    m->success = d.status == IPQP_SUCCESS;
+    m->d_qp.success = d.status == IPQP_SUCCESS;
     return 0;
   }
 
