@@ -187,14 +187,14 @@ namespace casadi {
       integrality_ptr);
     
     // check that passing model is successful
-    casadi_assert(status == HighsStatus::kOk, "invalid data to build HiGHS model");
+    casadi_assert(status == HighsStatus::kOk || status==HighsStatus::kWarning, "invalid data to build HiGHS model" + str((int )status));
 
     m->fstats.at("preprocessing").toc();
     m->fstats.at("solver").tic();
 
     // solve incumbent model
     status = highs.run();
-    casadi_assert(status == HighsStatus::kOk, "running HiGHS failed");
+    casadi_assert(status == HighsStatus::kOk || status==HighsStatus::kWarning, "running HiGHS failed");
     
     m->fstats.at("solver").toc();
     m->fstats.at("postprocessing").tic();
