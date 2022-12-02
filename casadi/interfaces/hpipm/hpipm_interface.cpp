@@ -680,19 +680,16 @@ namespace casadi {
     p_.lam_cl = get_ptr(lam_cl_blocks);
     p_.lam_cu = get_ptr(lam_cu_blocks);
 
-    uout() << "p"<< p_.nu[0] << nus_[0] << std::endl;
     casadi_hpipm_setup(&p_);
-
-    uout() << "p"<< p_.nu[0] << std::endl;
   }
 
   int HpipmInterface::init_mem(void* mem) const {
     if (Conic::init_mem(mem)) return 1;
     auto m = static_cast<HpipmMemory*>(mem);
 
-    m->fstats["preprocessing"]  = FStats();
-    m->fstats["solver"]         = FStats();
-    m->fstats["postprocessing"] = FStats();
+    m->add_stat("preprocessing");
+    m->add_stat("solver");
+    m->add_stat("postprocessing");
     return 0;
   }
 
@@ -702,28 +699,23 @@ namespace casadi {
 
     auto m = static_cast<HpipmMemory*>(mem);
 
-    uout() << "set_work" << std::endl;
-
-    uout() << "p"<< p_.nu[0] << nus_[0] << std::endl;
     Conic::set_work(mem, arg, res, iw, w);
 
     m->d.prob = &p_;
     m->d.qp = &m->d_qp;
-    uout() << "p_" << &p_ << p_.nu[0] << std::endl;
     casadi_hpipm_init(&m->d, &arg, &res, &iw, &w);
-
-    m->iter_count = 0;
-
-    uout() << "pset_work"<< p_.nu[0] << std::endl;
   }
 
   int HpipmInterface::
   solve(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
     auto m = static_cast<HpipmMemory*>(mem);
+
     // Statistics
-    m->fstats.at("preprocessing").tic();
+    m->fstats.at("solver").tic();
 
     casadi_hpipm_solve(&m->d, arg, res, iw, w);
+
+    m->fstats.at("solver").toc();
 
     m->d_qp.success = m->d.return_status==0;
 

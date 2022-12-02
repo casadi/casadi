@@ -133,7 +133,7 @@ namespace casadi {
     void set_hpipm_prob();
     void set_hpipm_prob(CodeGenerator& g) const;
 
-   /** \brief Generate code for the function body */
+    /** \brief Generate code for the function body */
     void codegen_body(CodeGenerator& g) const override;
 
     /** \brief  Initialize */
