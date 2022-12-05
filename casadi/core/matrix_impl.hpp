@@ -2266,8 +2266,24 @@ namespace casadi {
   Matrix<Scalar> Matrix<Scalar>::
   solve(const Matrix<Scalar>& a, const Matrix<Scalar>& b,
            const std::string& lsolver, const Dict& dict) {
-    casadi_error("'solve' with plugin not defined for " + type_name());
-    return Matrix<Scalar>();
+    casadi_assert(a.size1() == b.size1(), "solve Ax=b: dimension mismatch: b has "
+                          + str(b.size1()) + " rows while A has " + str(a.size1()) + ".");
+    casadi_assert(a.size1() == a.size2(), "solve: A not square but " + str(a.dim()));
+
+    if (lsolver == "qr") {
+      Matrix<Scalar> V, R, beta;
+      std::vector<casadi_int> prinv, pc;
+      qr_sparse(a, V, R, beta, prinv, pc, false);
+      return qr_solve(b, V, R, beta, prinv, pc, false);
+    } else if (lsolver == "ldl") {
+      Matrix<Scalar> D, LT;
+      std::vector<casadi_int> p;
+      ldl(a, D, LT, p, false);
+      return ldl_solve(b, D, LT, p);
+    } else {
+      casadi_error("'solve' with " + lsolver + " not defined for " + type_name());
+      return Matrix<Scalar>();
+    }
   }
 
   template<typename Scalar>
