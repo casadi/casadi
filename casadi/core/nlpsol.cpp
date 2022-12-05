@@ -409,8 +409,10 @@ namespace casadi {
     set_nlpsol_prob();
 
     // Allocate memory
-    casadi_int sz_w, sz_iw;
-    casadi_nlpsol_work(&p_nlp_, &sz_iw, &sz_w);
+    casadi_int sz_arg, sz_res, sz_w, sz_iw;
+    casadi_nlpsol_work(&p_nlp_, &sz_arg, &sz_res, &sz_iw, &sz_w);
+    alloc_arg(sz_arg, true);
+    alloc_res(sz_res, true);
     alloc_iw(sz_iw, true);
     alloc_w(sz_w, true);
 
