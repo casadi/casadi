@@ -1059,12 +1059,6 @@ namespace casadi {
       add_auxiliary(AUX_SIGN);
       this->auxiliaries << sanitize_source(casadi_lsqr_str, inst);
       break;
-    case AUX_CLIP_MIN:
-      this->auxiliaries << sanitize_source(casadi_clip_min_str, inst);
-      break;
-    case AUX_CLIP_MAX:
-      this->auxiliaries << sanitize_source(casadi_clip_max_str, inst);
-      break;
     case AUX_QP:
       this->auxiliaries << sanitize_source(casadi_qp_str, inst);
       break;
