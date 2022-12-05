@@ -595,8 +595,6 @@ namespace casadi {
       AUX_MMIN,
       AUX_MMAX,
       AUX_LOGSUMEXP,
-      AUX_CLIP_MIN,
-      AUX_CLIP_MAX,
       AUX_SPARSITY
     };
 
