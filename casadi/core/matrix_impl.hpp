@@ -2103,16 +2103,6 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  Matrix<Scalar> Matrix<Scalar>::
-  ldl_solve(const Matrix<Scalar>& A, const Matrix<Scalar>& b) {
-    // Perform an LDL transformation
-    Matrix<Scalar> D, LT;
-    std::vector<casadi_int> p;
-    ldl(A, D, LT, p, false);
-    return ldl_solve(b, D, LT, p);
-  }
-
-  template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::nullspace(const Matrix<Scalar>& A) {
     Matrix<Scalar> X = A;
     casadi_int n = X.size1();
