@@ -724,7 +724,7 @@ namespace casadi {
 
 
     // Get optimal cost
-    d_nlp->f = m->obj;
+    d_nlp->objective = m->obj;
     // Get constraints at solution
     casadi_copy(m->gk, ng_, d_nlp->z + nx_);
     // Get dual solution (simple bounds)

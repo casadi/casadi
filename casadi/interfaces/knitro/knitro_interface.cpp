@@ -360,7 +360,7 @@ namespace casadi {
     casadi_copy(get_ptr(lambda), ng_, d_nlp->lam + nx_);
     casadi_copy(get_ptr(lambda)+ng_, nx_, d_nlp->lam);
 
-    d_nlp->f = objSol;
+    d_nlp->objective = objSol;
     
     // Calculate constraints
     if (ng_>0) {

@@ -555,48 +555,26 @@ namespace casadi {
 
     auto d_nlp = &m->d_nlp;
 
-    // Bounds, given parameter values
-    d_nlp->p = arg[NLPSOL_P];
-    const double *lbx = arg[NLPSOL_LBX];
-    const double *ubx = arg[NLPSOL_UBX];
-    const double *lbg = arg[NLPSOL_LBG];
-    const double *ubg = arg[NLPSOL_UBG];
-
-    // Get input pointers
-    const double *x0 = arg[NLPSOL_X0];
-    const double *lam_x0 = arg[NLPSOL_LAM_X0];
-    const double *lam_g0 = arg[NLPSOL_LAM_G0];
-    arg += NLPSOL_NUM_IN;
-
-    // Get output pointers
-    double *x = res[NLPSOL_X];
-    double *f = res[NLPSOL_F];
-    double *g = res[NLPSOL_G];
-    double *lam_x = res[NLPSOL_LAM_X];
-    double *lam_g = res[NLPSOL_LAM_G];
-    double *lam_p = res[NLPSOL_LAM_P];
-    res += NLPSOL_NUM_OUT;
-
     // Reset the solver, prepare for solution
     setup(m, arg, res, iw, w);
 
     // Set initial guess
-    casadi_copy(x0, nx_, d_nlp->z);
-    casadi_copy(lam_x0, nx_, d_nlp->lam);
-    casadi_copy(lam_g0, ng_, d_nlp->lam + nx_);
+    casadi_copy(d_nlp->x0, nx_, d_nlp->z);
+    casadi_copy(d_nlp->lam_x0, nx_, d_nlp->lam);
+    casadi_copy(d_nlp->lam_g0, ng_, d_nlp->lam + nx_);
 
     // Set multipliers to nan
     casadi_fill(d_nlp->lam_p, np_, nan);
 
     // Reset f, g
-    d_nlp->f = nan;
+    d_nlp->objective = nan;
     casadi_fill(d_nlp->z + nx_, ng_, nan);
 
     // Get bounds
-    casadi_copy(lbx, nx_, d_nlp->lbz);
-    casadi_copy(lbg, ng_, d_nlp->lbz + nx_);
-    casadi_copy(ubx, nx_, d_nlp->ubz);
-    casadi_copy(ubg, ng_, d_nlp->ubz + nx_);
+    casadi_copy(d_nlp->lbx, nx_, d_nlp->lbz);
+    casadi_copy(d_nlp->lbg, ng_, d_nlp->lbz + nx_);
+    casadi_copy(d_nlp->ubx, nx_, d_nlp->ubz);
+    casadi_copy(d_nlp->ubg, ng_, d_nlp->ubz + nx_);
 
     // Check the provided inputs
     check_inputs(m);
@@ -614,7 +592,7 @@ namespace casadi {
       m->arg[1] = d_nlp->p;
       m->arg[2] = &lam_f;
       m->arg[3] = d_nlp->lam + nx_;
-      m->res[0] = calc_f_ ? &d_nlp->f : nullptr;
+      m->res[0] = calc_f_ ? &d_nlp->objective : nullptr;
       m->res[1] = calc_g_ ? d_nlp->z + nx_ : nullptr;
       m->res[2] = calc_lam_x_ ? d_nlp->lam : nullptr;
       m->res[3] = calc_lam_p_ ? d_nlp->lam_p : nullptr;
@@ -631,12 +609,12 @@ namespace casadi {
     }
 
     // Get optimal solution
-    casadi_copy(d_nlp->z, nx_, x);
-    casadi_copy(d_nlp->z + nx_, ng_, g);
-    casadi_copy(d_nlp->lam, nx_, lam_x);
-    casadi_copy(d_nlp->lam + nx_, ng_, lam_g);
-    casadi_copy(d_nlp->lam_p, np_, lam_p);
-    casadi_copy(&d_nlp->f, 1, f);
+    casadi_copy(d_nlp->z, nx_, d_nlp->x);
+    casadi_copy(d_nlp->z + nx_, ng_, d_nlp->g);
+    casadi_copy(d_nlp->lam, nx_, d_nlp->lam_x);
+    casadi_copy(d_nlp->lam + nx_, ng_, d_nlp->lam_g);
+    casadi_copy(d_nlp->lam_p, np_, d_nlp->lam_p);
+    casadi_copy(&d_nlp->objective, 1, d_nlp->f);
 
     if (error_on_fail_ && !m->success)
       casadi_error("nlpsol process failed. "
@@ -653,6 +631,25 @@ namespace casadi {
     m->unified_return_status = SOLVER_RET_UNKNOWN;
 
     m->d_nlp.prob = &p_nlp_;
+    casadi_nlpsol_data<double>& d_nlp = m->d_nlp;
+    d_nlp.p = arg[NLPSOL_P];
+    d_nlp.lbx = arg[NLPSOL_LBX];
+    d_nlp.ubx = arg[NLPSOL_UBX];
+    d_nlp.lbg = arg[NLPSOL_LBG];
+    d_nlp.ubg = arg[NLPSOL_UBG];
+    d_nlp.x0 = arg[NLPSOL_X0];
+    d_nlp.lam_x0 = arg[NLPSOL_LAM_X0];
+    d_nlp.lam_g0 = arg[NLPSOL_LAM_G0];
+
+    d_nlp.x = res[NLPSOL_X];
+    d_nlp.f = res[NLPSOL_F];
+    d_nlp.g = res[NLPSOL_G];
+    d_nlp.lam_x = res[NLPSOL_LAM_X];
+    d_nlp.lam_g = res[NLPSOL_LAM_G];
+    d_nlp.lam_p = res[NLPSOL_LAM_P];
+
+    arg += NLPSOL_NUM_IN;
+    res += NLPSOL_NUM_OUT;
 
     casadi_nlpsol_init(&m->d_nlp, &iw, &w);
   }
@@ -941,7 +938,7 @@ namespace casadi {
     auto d_nlp = &m->d_nlp;
 
     m->arg[NLPSOL_X] = d_nlp->z;
-    m->arg[NLPSOL_F] = &d_nlp->f;
+    m->arg[NLPSOL_F] = &d_nlp->objective;
     m->arg[NLPSOL_G] = d_nlp->z + nx_;
     m->arg[NLPSOL_LAM_G] = d_nlp->lam + nx_;
     m->arg[NLPSOL_LAM_X] = d_nlp->lam;
@@ -990,6 +987,23 @@ namespace casadi {
     g << "p_nlp.ng = " << ng_ << ";\n";
     g << "p_nlp.np = " << np_ << ";\n";
     g << "casadi_nlpsol_init(&d_nlp, &iw, &w);\n";
+
+    g << "d_nlp.p = arg[" << NLPSOL_P << "];\n";
+    g << "d_nlp.lbx = arg[" << NLPSOL_LBX << "];\n";
+    g << "d_nlp.ubx = arg[" << NLPSOL_UBX << "];\n";
+    g << "d_nlp.lbg = arg[" << NLPSOL_LBG << "];\n";
+    g << "d_nlp.ubg = arg[" << NLPSOL_UBG << "];\n";
+    g << "d_nlp.x0 = arg[" << NLPSOL_X0 << "];\n";
+    g << "d_nlp.lam_x0 = arg[" << NLPSOL_LAM_X0 << "];\n";
+    g << "d_nlp.lam_g0 = arg[" << NLPSOL_LAM_G0 << "];\n";
+
+    g << "d_nlp.x = res[" << NLPSOL_X << "];\n";
+    g << "d_nlp.f = res[" << NLPSOL_F << "];\n";
+    g << "d_nlp.g = res[" << NLPSOL_G << "];\n";
+    g << "d_nlp.lam_x = res[" << NLPSOL_LAM_X << "];\n";
+    g << "d_nlp.lam_g = res[" << NLPSOL_LAM_G << "];\n";
+    g << "d_nlp.lam_p = res[" << NLPSOL_LAM_P << "];\n";
+
   }
 
   void Nlpsol::serialize_body(SerializingStream &s) const {

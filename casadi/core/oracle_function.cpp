@@ -391,6 +391,7 @@ namespace casadi {
 
   void OracleFunction::set_temp(void* mem, const double** arg, double** res,
                             casadi_int* iw, double* w) const {
+
     auto m = static_cast<OracleMemory*>(mem);
     m->arg = arg;
     m->res = res;

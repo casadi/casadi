@@ -568,7 +568,7 @@ namespace casadi {
       casadi_copy(x, nx_, d_nlp->z);
 
       // Get optimal cost
-      d_nlp->f = obj_value;
+      d_nlp->objective = obj_value;
 
       // Dual solution not calculated
       casadi_fill(d_nlp->lam, nx_ + ng_, nan);

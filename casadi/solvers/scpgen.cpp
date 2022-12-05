@@ -826,7 +826,7 @@ namespace casadi {
       if (m->iter_count % 10 == 0) printIteration(m, uout());
 
       // Printing information about the actual iterate
-      printIteration(m, uout(), m->iter_count, d_nlp->f, pr_inf, du_inf, m->reg,
+      printIteration(m, uout(), m->iter_count, d_nlp->objective, pr_inf, du_inf, m->reg,
                      ls_iter, ls_success);
 
       // Checking convergence criteria
@@ -845,7 +845,7 @@ namespace casadi {
       }
 
       // Check if not-a-number
-      if (d_nlp->f!=d_nlp->f || m->pr_step != m->pr_step || pr_inf != pr_inf) {
+      if (d_nlp->objective!=d_nlp->objective || m->pr_step != m->pr_step || pr_inf != pr_inf) {
         uout() << "casadi::SCPgen: Aborted, nan detected" << endl;
         break;
       }
@@ -872,7 +872,7 @@ namespace casadi {
     m->t_mainloop = (time2-time1)/CLOCKS_PER_SEC;
 
     // Store optimal value
-    uout() << "optimal cost = " << d_nlp->f << endl;
+    uout() << "optimal cost = " << d_nlp->objective << endl;
 
     // Write timers
     if (print_time_) {
@@ -1029,7 +1029,7 @@ namespace casadi {
 
     // Outputs
     fill_n(m->res, res_fcn_.n_out(), nullptr);
-    m->res[res_f_] = &d_nlp->f; // Objective
+    m->res[res_f_] = &d_nlp->objective; // Objective
     m->res[res_gl_] = gauss_newton_ ? m->b_gn : m->gfk; // Objective gradient
     m->res[res_g_] = d_nlp->z + nx_; // Constraints
     for (size_t i=0; i<v_.size(); ++i) {
@@ -1179,7 +1179,7 @@ namespace casadi {
     // Right-hand side of Armijo condition
     double F_sens = casadi_dot(nx_, m->dxk, m->gfk);
     double L1dir = F_sens - m->sigma * l1_infeas;
-    double L1merit = d_nlp->f + m->sigma * l1_infeas;
+    double L1merit = d_nlp->objective + m->sigma * l1_infeas;
 
     // Storing the actual merit function value in a list
     m->merit_mem[m->merit_ind] = L1merit;
@@ -1224,7 +1224,7 @@ namespace casadi {
 
       // Calculating merit-function in candidate
       l1_infeas = primalInfeasibility(m);
-      L1merit_cand = d_nlp->f + m->sigma * l1_infeas;
+      L1merit_cand = d_nlp->objective + m->sigma * l1_infeas;
       if (L1merit_cand <= meritmax + t * c1_ * L1dir) {
 
         // Accepting candidate

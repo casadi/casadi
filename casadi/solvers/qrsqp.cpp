@@ -314,7 +314,7 @@ namespace casadi {
       // Evaluate f, g and first order derivative information
       m->arg[0] = d_nlp->z;
       m->arg[1] = d_nlp->p;
-      m->res[0] = &d_nlp->f;
+      m->res[0] = &d_nlp->objective;
       m->res[1] = m->gf;
       m->res[2] = d_nlp->z + nx_;
       m->res[3] = m->Jk;
@@ -337,7 +337,7 @@ namespace casadi {
       // Printing information about the actual iterate
       if (print_iteration_) {
         if (m->iter_count % 10 == 0) print_iteration();
-        print_iteration(m->iter_count, d_nlp->f, pr_inf, du_inf, dx_norminf,
+        print_iteration(m->iter_count, d_nlp->objective, pr_inf, du_inf, dx_norminf,
                         m->reg, ls_iter, ls_success);
       }
 
@@ -428,7 +428,7 @@ namespace casadi {
       // Right-hand side of Armijo condition
       double F_sens = casadi_dot(nx_, m->dz, m->gf);
       double L1dir = F_sens - m->sigma * l1_infeas;
-      double L1merit = d_nlp->f + m->sigma * l1_infeas;
+      double L1merit = d_nlp->objective + m->sigma * l1_infeas;
 
       // Storing the actual merit function value in a list
       m->merit_mem[m->merit_ind] = L1merit;
