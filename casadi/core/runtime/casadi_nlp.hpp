@@ -44,7 +44,7 @@ void casadi_nlpsol_work(const casadi_nlpsol_prob<T1>* p, casadi_int* sz_arg, cas
 
 // SYMBOL "nlpsol_init"
 template<typename T1>
-void casadi_nlpsol_init(casadi_nlpsol_data<T1>* d, casadi_int** iw, T1** w) {
+void casadi_nlpsol_init(casadi_nlpsol_data<T1>* d, const T1*** arg, T1*** res, casadi_int** iw, T1** w) {
   // Local variables
   casadi_int nx, ng;
   const casadi_nlpsol_prob<T1>* p = d->prob;

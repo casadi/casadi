@@ -653,7 +653,7 @@ namespace casadi {
     arg += NLPSOL_NUM_IN;
     res += NLPSOL_NUM_OUT;
 
-    casadi_nlpsol_init(&m->d_nlp, &iw, &w);
+    casadi_nlpsol_init(&m->d_nlp, &arg, &res, &iw, &w);
   }
 
   std::vector<std::string> nlpsol_options(const std::string& name) {
@@ -988,7 +988,7 @@ namespace casadi {
     g << "p_nlp.nx = " << nx_ << ";\n";
     g << "p_nlp.ng = " << ng_ << ";\n";
     g << "p_nlp.np = " << np_ << ";\n";
-    g << "casadi_nlpsol_init(&d_nlp, &iw, &w);\n";
+    g << "casadi_nlpsol_init(&d_nlp, &arg, &res, &iw, &w);\n";
 
     g << "d_nlp.p = arg[" << NLPSOL_P << "];\n";
     g << "d_nlp.lbx = arg[" << NLPSOL_LBX << "];\n";
