@@ -1819,9 +1819,17 @@ class NLPtests(casadiTestCase):
         a.update(b)
         return a
         
+
+    nlp = {"x":x,"p":p,"g":g,"f":sumsqr(x-p)}
+    
     print_level = 0
     
-    nlp = {"x":x,"p":p,"g":g,"f":sumsqr(x-p)}
+    with self.assertOutput(["Total number of inequality constraints...............:        2"],[]):
+        nlpsol("solver","ipopt",nlp,{"detect_simple_bounds": True})(x0=0,lbg=lbg,ubg=ubg)
+    with self.assertOutput(["Total number of inequality constraints...............:       10"],[]):
+        nlpsol("solver","ipopt",nlp,{"detect_simple_bounds": False})(x0=0,lbg=lbg,ubg=ubg)
+    
+    
     options = {"detect_simple_bounds": True,"ipopt.print_level":print_level,"print_time":False,"ipopt.tol":1e-12,"ipopt.fixed_variable_treatment":"relax_bounds","ipopt.bound_relax_factor":1e-12}
     solver = nlpsol("solver","ipopt",nlp,options)
     options_nominal = {"detect_simple_bounds": False,"ipopt.print_level":print_level,"print_time":False,"ipopt.tol":1e-12,"ipopt.bound_relax_factor":1e-12}
