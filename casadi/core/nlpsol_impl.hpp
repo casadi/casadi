@@ -81,6 +81,11 @@ namespace casadi {
     std::string sens_linsol_;
     Dict sens_linsol_options_;
 
+    std::vector<char> detect_simple_bounds_is_simple_;
+    Function detect_simple_bounds_parts_;
+    std::vector<casadi_int> detect_simple_bounds_target_x_;
+    std::vector<casadi_int> detect_simple_bounds_target_g_;
+
     ///@{
     /** \brief Options
 
