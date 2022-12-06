@@ -641,7 +641,7 @@ namespace casadi {
             if (error_on_fail_) {
               casadi_error("CPXXsolution failed");
             } else {
-              m->success = false;
+              m->d_qp.success = false;
             }
           }
       }
@@ -657,10 +657,10 @@ namespace casadi {
     casadi_scal(nx_, -1., lam_x);
 
     m->return_status = CPXXgetstat(m->env, m->lp);
-    m->success  = m->return_status==CPX_STAT_OPTIMAL;
-    m->success |= m->return_status==CPX_STAT_FIRSTORDER;
-    m->success |= m->return_status==CPXMIP_OPTIMAL;
-    m->success |= m->return_status==CPXMIP_OPTIMAL_TOL;
+    m->d_qp.success  = m->return_status==CPX_STAT_OPTIMAL;
+    m->d_qp.success |= m->return_status==CPX_STAT_FIRSTORDER;
+    m->d_qp.success |= m->return_status==CPXMIP_OPTIMAL;
+    m->d_qp.success |= m->return_status==CPXMIP_OPTIMAL_TOL;
 
     if (verbose_) {
       char status_string[CPXMESSAGEBUFSIZE];

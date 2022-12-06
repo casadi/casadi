@@ -461,10 +461,10 @@ namespace casadi {
         " (" << optimstatus <<")" << std::endl;
 
       m->return_status = optimstatus;
-      m->success = optimstatus==GRB_OPTIMAL;
+      m->d_qp.success = optimstatus==GRB_OPTIMAL;
       if (optimstatus==GRB_ITERATION_LIMIT || optimstatus==GRB_TIME_LIMIT
           || optimstatus==GRB_NODE_LIMIT || optimstatus==GRB_SOLUTION_LIMIT)
-        m->unified_return_status = SOLVER_RET_LIMITED;
+        m->d_qp.unified_return_status = SOLVER_RET_LIMITED;
 
       // Get the objective value, if requested
       if (cost) {

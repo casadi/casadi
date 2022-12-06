@@ -410,8 +410,8 @@ namespace casadi {
     }
 
     m->return_status = ierr;
-    m->success = ierr==SUCCESSFUL_TERMINATION;
-    if (ierr==MAX_ITS_EXCEEDED) m->unified_return_status = SOLVER_RET_LIMITED;
+    m->d_qp.success = ierr==SUCCESSFUL_TERMINATION;
+    if (ierr==MAX_ITS_EXCEEDED) m->d_qp.unified_return_status = SOLVER_RET_LIMITED;
     if (ierr>0) {
       casadi_warning("Unable to solve problem: " + str(errFlag(ierr)));
     } else if (ierr<0) {

@@ -689,7 +689,7 @@ namespace casadi {
       uout() << "return status: " << m->return_status << std::endl;
       uout() << "residuals: " << m->res << std::endl;
     }
-    m->success = m->return_status==0;
+    m->d_qp.success = m->return_status==0;
 
     std::fill(res[CONIC_X], res[CONIC_X]+nx_, 0);
     dense_transfer(1.0, get_ptr(m->x), theirs_Xsp_, res[CONIC_X], xsp_, pv);
