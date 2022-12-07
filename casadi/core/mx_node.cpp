@@ -405,12 +405,55 @@ namespace casadi {
     casadi_error("'get_DM' not defined for class " + class_name());
   }
 
+  bool simplify_transpose_cat(const MX& x, MX& inner) {
+    /*
+
+    X = SX.sym("x",n,3*m)
+    x,y,z = horzsplit(X,[0,m,2*m,3*m])
+
+
+    W = horzcat(x.T,y.T,z.T).T
+
+    */
+    casadi_int m = x.size1();
+    if (x.op()!=OP_HORZCAT) return false;
+    casadi_int r = x.n_dep();
+    casadi_int n = x.numel()/m/r;
+    for (casadi_int i=0;i<x.n_dep();++i) {
+      MX e = x.dep(i);
+      if (e.op()!=OP_TRANSPOSE) return false;
+      e = e.dep();
+      if (e.size1()!=n || e.size2()!=m) return false;
+      if (!e.is_output()) return false;
+      if (e.which_output()!=i) return false;
+      e = e.dep();
+      if (!e.op()==OP_HORZSPLIT) return false;
+      std::vector<casadi_int> offset = get_from_dict(e.info(), "offset", std::vector<casadi_int>{});
+      if (offset!=range(0,n*m*(r+1), m*n)) return false;
+      if (inner.is_empty()) {
+        inner = e.dep();
+      } else {
+        if (inner.get()!=e.dep().get()) return false;
+      }
+    }
+    Layout before({n, m, r});
+    Layout after({n, r, m});
+
+    inner = sparsity_cast(permute_layout(inner, Relayout(before,{0,2,1},after)),Sparsity::dense(n*r, m));
+    return true;
+  }
+
+
   MX MXNode::get_transpose() const {
     if (sparsity().is_scalar()) {
       return shared_from_this<MX>();
     } else if (sparsity().is_vector()) {
       return get_reshape(sparsity().T());
     } else if (sparsity().is_dense()) {
+      if (GlobalOptions::simplification_on_the_fly) {
+        MX inner;
+        if (simplify_transpose_cat(shared_from_this<MX>(), inner)) return inner;
+      }
       return MX::create(new DenseTranspose(shared_from_this<MX>()));
     } else {
       return MX::create(new Transpose(shared_from_this<MX>()));

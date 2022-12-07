@@ -189,7 +189,9 @@ namespace casadi {
       s << "  " << e.first;
       casadi_int count = 0;
       for (auto it=e.second.begin(); it!=e.second.end(); ++it) {
-        s << (it==e.second.begin() ? " " : ", ") << it->second << it->first;
+        s << (it==e.second.begin() ? " " : ", ") << it->second;
+        if (!it->second.empty()) s << "";
+        s << it->first;
         // Insert definition, if any
         auto k=local_default_.find(it->first);
         if (k!=local_default_.end()) s << "=" << k->second;

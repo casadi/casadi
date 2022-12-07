@@ -1644,7 +1644,7 @@ namespace casadi {
       if (!g.codegen_scalars && n==1) {
         g << "w" << i;
       } else {
-        g << "*w" << i << "=w+" << workloc_[i];
+        g << "*" << "" << "w" << i << "=w+" << workloc_[i];
       }
       if ((i+1) % 200==0) g << "\\\n";
     }

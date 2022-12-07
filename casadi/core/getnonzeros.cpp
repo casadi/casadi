@@ -554,12 +554,15 @@ namespace casadi {
   void GetNonzerosSlice::generate(CodeGenerator& g,
                                   const std::vector<casadi_int>& arg,
                                   const std::vector<casadi_int>& res, bool prefer_inline) const {
-    g.local("rr", "casadi_real", "*");
-    g.local("ss", "const casadi_real", "*");
+    //g.local("rr", "casadi_real", "*");
+    //g.local("ss", "const casadi_real", "*");
     // Simplify for scalar case
-    g << "for (rr=" << g.work(res[0], nnz()) << ", ss=" << g.work(arg[0], dep(0).nnz())
-      << "+" << s_.start << "; ss!=" << g.work(arg[0], dep(0).nnz()) << "+" << s_.stop
-      << "; ss+=" << s_.step << ") *rr++ = *ss;\n";
+    g << "#pragma omp simd\n";
+    g << "for (i=0;i<" << s_.size() << ";++i) "
+      << "(" << g.work(res[0], nnz()) << ")[i] = (" << g.work(arg[0], dep(0).nnz()) << ")[i*" << s_.step << "+" << s_.start << "];\n";
+    //g << "for (rr=" << g.work(res[0], nnz()) << ", ss=" << g.work(arg[0], dep(0).nnz())
+    //  << "+" << s_.start << "; ss!=" << g.work(arg[0], dep(0).nnz()) << "+" << s_.stop
+    //  << "; ss+=" << s_.step << ") *rr++ = *ss;\n";
   }
 
   void GetNonzerosSlice2::generate(CodeGenerator& g,
@@ -573,6 +576,11 @@ namespace casadi {
       << outer_.stop << "; ss+=" << outer_.step << ") "
       << "for (tt=ss+" << inner_.start << "; tt!=ss+" << inner_.stop
       << "; tt+=" << inner_.step << ") *rr++ = *tt;\n";
+/*
+    g << "#pragma omp simd\n";
+    g << "for (i=0;i<" << outer_.size() << ";++i) "
+      << "for (j=0;j<" << inner_.size() << ";++j) "
+      << "(" << g.work(res[0], nnz()) << ")[i*" << inner_.size() << "+j] = (" << g.work(arg[0], dep(0).nnz()) << ")[(i*" << outer_.step << "+" << outer_.start <<  << ")*" << << "+j*" << inner_.step << "+" << inner_.start << "];\n";*/
   }
 
   bool GetNonzerosVector::is_equal(const MXNode* node, casadi_int depth) const {

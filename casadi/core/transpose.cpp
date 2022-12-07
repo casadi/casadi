@@ -220,14 +220,28 @@ namespace casadi {
   void DenseTranspose::generate(CodeGenerator& g,
                                 const std::vector<casadi_int>& arg,
                                 const std::vector<casadi_int>& res, bool prefer_inline) const {
-    g.local("cs", "const casadi_real", "*");
+    /*g.local("cs", "const casadi_real", "*");
     g.local("rr", "casadi_real", "*");
     g.local("i", "casadi_int");
     g.local("j", "casadi_int");
     g << "for (i=0, rr=" << g.work(res[0], nnz()) << ", "
       << "cs=" << g.work(arg[0], nnz()) << "; i<" << dep().size2() << "; ++i) "
       << "for (j=0; j<" << dep().size1() << "; ++j) "
-      << "rr[i+j*" << dep().size2() << "] = *cs++;\n";
+      << "rr[i+j*" << dep().size2() << "] = *cs++;\n";*/
+
+          g.local("i", "casadi_int");
+    g.local("j", "casadi_int");
+    if (dep().size2()>dep().size1()) {
+      g << "for (j=0; j<" << dep().size1() << "; ++j) {\n";
+      g << "#pragma omp simd\n";
+      g << "for (i=0; i<" << dep().size2() << "; ++i) ";
+    } else {
+      g << "for (i=0; i<" << dep().size2() << "; ++i) {\n";
+      g << "#pragma omp simd\n";
+      g << "for (j=0; j<" << dep().size1() << "; ++j) ";
+    }
+    g << "(" << g.work(res[0], nnz()) << ")[i+j*" << dep().size2() << "] = (" << g.work(arg[0], nnz()) << ")[j+i*" << dep().size1() << "];\n";
+    g << "}\n";
   }
 
 } // namespace casadi
