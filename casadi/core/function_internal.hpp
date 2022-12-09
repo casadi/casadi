@@ -737,7 +737,7 @@ namespace casadi {
          \identifier{lh} */
     virtual SX instructions_sx() const;
 
-    virtual Function pull_out(casadi_int i, Function& outer) const;
+    virtual Function pull_out(const std::vector<casadi_int>& in, Function& outer) const;
 
     /** \brief Wrap in an Function instance consisting of only one MX call
 

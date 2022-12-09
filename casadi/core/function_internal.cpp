@@ -3301,7 +3301,7 @@ namespace casadi {
     casadi_error("'instructions_sx' not defined for " + class_name());
   }
 
-  Function FunctionInternal::pull_out(casadi_int i, Function& outer) const {
+  Function FunctionInternal::pull_out(const std::vector<casadi_int>& in, Function& outer) const {
     casadi_error("'pull_out' not defined for " + class_name());
   }
 

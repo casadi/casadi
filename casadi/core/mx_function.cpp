@@ -998,7 +998,7 @@ namespace casadi {
 
 
 
-  Function MXFunction::pull_out(casadi_int i, Function& outer) const {
+  Function MXFunction::pull_out(const std::vector<casadi_int>& in, Function& outer) const {
     casadi_assert(!has_free(), "Not supported for Functions with free parameters");
     // Symbolic work, non-differentiated
     vector<MX> swork_vec(workloc_.size()+n_ce_+1);
@@ -1020,20 +1020,23 @@ namespace casadi {
 
     vector<MX> arg1, res1;
 
+    std::set<casadi_int> ins(in.begin(), in.end());
+
     // If 
     std::vector<bool> tainted(workloc_.size(), false);
 
     // List of endpoints
     std::vector<MX> endpoints;
 
-    std::vector<MX> endpoint_symbols;
+    std::map<MXNode*, MX> endpoint_symbols;
 
     // Loop over computational nodes in forward order
     casadi_int alg_counter = 0;
     for (auto it=algorithm_.begin(); it!=algorithm_.end(); ++it, ++alg_counter) {
       if (it->op == OP_INPUT) {
         swork[it->res.front()] = arg_split.at(it->data->ind()).at(it->data->segment());
-        tainted[it->res.front()] = it->data->ind()!=i;
+        tainted[it->res.front()] = !ins.count(it->data->ind());
+        uout() << "tainted" << it->data->ind() << ":" << !ins.count(it->data->ind()) << std::endl;
       } else if (it->op==OP_OUTPUT) {
         // Collect the results
         res_split.at(it->data->ind()).at(it->data->segment()) = swork[it->arg.front()];
@@ -1043,22 +1046,14 @@ namespace casadi {
       } else {
         bool any_tainted = false;
 
+        if (it->op==OP_COS) {
+          uout() << "it->arg" << it->arg << std::endl;
+        }
+
         for (casadi_int i=0; i<it->arg.size(); ++i) {
           casadi_int el = it->arg[i]; // index of the argument
           if (el!=-1) {
             any_tainted = any_tainted || tainted[el];
-          }
-        }
-
-        if (any_tainted) {
-          for (casadi_int i=0; i<it->arg.size(); ++i) {
-            casadi_int el = it->arg[i]; // index of the argument
-            if (el!=-1 && !tainted[el]) {
-              endpoints.push_back(swork[el]);
-              swork[el] = MX::sym(name_in_[i]+"_"+str(endpoints.size()), swork[el].sparsity());
-              tainted[el] = true;
-              endpoint_symbols.push_back(swork[el]);
-            }
           }
         }
 
@@ -1067,6 +1062,23 @@ namespace casadi {
         for (casadi_int i=0; i<arg1.size(); ++i) {
           casadi_int el = it->arg[i]; // index of the argument
           arg1[i] = el==-1 ? MX(it->data->dep(i).size()) : swork[el];
+        }
+
+        if (any_tainted) {
+          for (casadi_int i=0; i<it->arg.size(); ++i) {
+            casadi_int el = it->arg[i]; // index of the argument
+            if (el!=-1 && !tainted[el]) {
+              auto it = endpoint_symbols.find(swork[el].get());
+              if (it==endpoint_symbols.end()) {
+                endpoints.push_back(swork[el]);
+                arg1[i] = MX::sym("endpoint_"+str(endpoints.size()), swork[el].sparsity());
+                tainted[el] = false;
+                endpoint_symbols[swork[el].get()] = arg1[i];
+              } else {
+                arg1[i] = it->second;
+              }
+            }
+          }
         }
 
         // Perform the operation
@@ -1092,14 +1104,20 @@ namespace casadi {
     uout() << res << std::endl;
 
     // pass is-diff in
+    outer = Function("outer_" + name_, vector_slice(in_, in), {veccat(endpoints)}, vector_slice(name_in_, in), {name_+"_endpoint"});
 
-    outer = Function("inner_" + name_, {in_[i]}, {veccat(endpoints)}, {name_in_[i]}, {name_in_[i]+"_endpoint"});
+    std::vector<casadi_int> in_invert = complement(in, in_.size());
 
-    std::vector<MX> in = in_;
-    in[i] = veccat(endpoint_symbols);
-    std::vector<std::string> name_in = name_in_;
-    name_in[i] += "_endpoint";
-    return Function("outer_" + name_, in, res, name_in, name_out_);
+    std::vector<MX> in_syms = vector_slice(in_, in_invert);
+    std::vector<MX> endpoint_symbols_vec;
+    for (auto e : endpoints) {
+      endpoint_symbols_vec.push_back(endpoint_symbols[e.get()]);
+    }
+
+    in_syms.push_back(veccat(endpoint_symbols_vec));
+    std::vector<std::string> name_in = vector_slice(name_in_, in_invert);
+    name_in.push_back(name_+"_endpoint");
+    return Function("inner_" + name_, in_syms, res, name_in, name_out_);
   }
 
   void MXFunction::eval_mx(const MXVector& arg, MXVector& res,

@@ -311,7 +311,7 @@ namespace casadi {
         \identifier{2s} */
     casadi_int instruction_id(casadi_int k) const override { return algorithm_.at(k).op;}
 
-    Function pull_out(casadi_int i, Function& outer) const override;
+    Function pull_out(const std::vector<casadi_int>& in, Function& outer) const override;
 
     /** \brief Get default input value
 

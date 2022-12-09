@@ -208,7 +208,7 @@ namespace casadi {
                     const Dict& opts=Dict()) const;
     ///@}
 
-    Function pull_out(casadi_int i, Function& SWIG_OUTPUT(outer)) const;
+    Function pull_out(const std::vector<casadi_int>& in, Function& SWIG_OUTPUT(outer)) const;
 
     /// \cond INTERNAL
 #ifndef SWIG

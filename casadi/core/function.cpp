@@ -283,9 +283,9 @@ namespace casadi {
     return expand(name(), opts);
   }
 
-  Function Function::pull_out(casadi_int i, Function& outer) const {
+  Function Function::pull_out(const std::vector<casadi_int>& in, Function& outer) const {
     try {
-      return (*this)->pull_out(i, outer);
+      return (*this)->pull_out(in, outer);
     } catch (exception& e) {
       THROW_ERROR("pull_out", e.what());
     }
