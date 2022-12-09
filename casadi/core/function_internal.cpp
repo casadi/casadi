@@ -3301,6 +3301,10 @@ namespace casadi {
     casadi_error("'instructions_sx' not defined for " + class_name());
   }
 
+  Function FunctionInternal::pull_out(casadi_int i, Function& outer) const {
+    casadi_error("'pull_out' not defined for " + class_name());
+  }
+
   casadi_int FunctionInternal::n_nodes() const {
     casadi_error("'n_nodes' not defined for " + class_name());
   }

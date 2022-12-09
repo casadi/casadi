@@ -208,6 +208,8 @@ namespace casadi {
                     const Dict& opts=Dict()) const;
     ///@}
 
+    Function pull_out(casadi_int i, Function& SWIG_OUTPUT(outer)) const;
+
     /// \cond INTERNAL
 #ifndef SWIG
     /** \brief  Create from node

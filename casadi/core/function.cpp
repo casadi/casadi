@@ -283,6 +283,14 @@ namespace casadi {
     return expand(name(), opts);
   }
 
+  Function Function::pull_out(casadi_int i, Function& outer) const {
+    try {
+      return (*this)->pull_out(i, outer);
+    } catch (exception& e) {
+      THROW_ERROR("pull_out", e.what());
+    }
+  }
+
   Function Function::expand(const string& name, const Dict& opts) const {
     casadi_assert(!has_free(),
       "Function with free symbols cannot be expanded. "

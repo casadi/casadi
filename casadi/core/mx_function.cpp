@@ -996,6 +996,87 @@ namespace casadi {
     }
   }
 
+
+
+  Function MXFunction::pull_out(casadi_int i, Function& outer) const {
+    casadi_assert(!has_free(), "Not supported for Functions with free parameters");
+    // Symbolic work, non-differentiated
+    vector<MX> swork_vec(workloc_.size()+n_ce_+1);
+    MX* swork = get_ptr(swork_vec)+n_ce_+1;
+    if (verbose_) casadi_message("Allocated work vector");
+
+    // Split up inputs analogous to symbolic primitives
+    vector<vector<MX> > arg_split(in_.size());
+    for (casadi_int i=0; i<in_.size(); ++i) arg_split[i] = in_[i].split_primitives(in_[i]);
+
+    uout() << "in" << in_ << std::endl;
+    uout() << "arg_split" << arg_split << std::endl;
+
+    vector< MX > res(out_.size());
+
+    // Allocate storage for split outputs
+    vector<vector<MX> > res_split(out_.size());
+    for (casadi_int i=0; i<out_.size(); ++i) res_split[i].resize(out_[i].n_primitives());
+
+    vector<MX> arg1, res1;
+
+    std::vector<bool> tainted(workloc_.size(), false);
+
+    // Loop over computational nodes in forward order
+    casadi_int alg_counter = 0;
+    for (auto it=algorithm_.begin(); it!=algorithm_.end(); ++it, ++alg_counter) {
+      if (it->op == OP_INPUT) {
+        swork[it->res.front()] = arg_split.at(it->data->ind()).at(it->data->segment());
+        tainted[it->res.front()] = it->data->ind()!=i;
+      } else if (it->op==OP_OUTPUT) {
+        // Collect the results
+        res_split.at(it->data->ind()).at(it->data->segment()) = swork[it->arg.front()];
+      } else if (it->op==OP_PARAMETER) {
+        // Fetch parameter
+        swork[it->res.front()] = it->data;
+      } else {
+        bool any_tainted = false;
+        bool all_tainted = true;
+
+        // Arguments of the operation
+        arg1.resize(it->arg.size());
+        for (casadi_int i=0; i<arg1.size(); ++i) {
+          casadi_int el = it->arg[i]; // index of the argument
+          arg1[i] = el==-1 ? MX(it->data->dep(i).size()) : swork[el];
+          if (el!=-1) {
+            any_tainted = any_tainted || tainted[el];
+            all_tainted = all_tainted && tainted[el];
+          }
+        }
+
+        // Perform the operation
+        res1.resize(it->res.size());
+        it->data->eval_mx(arg1, res1);
+
+
+        if (any_tainted && !all_tainted) {
+          uout() << "hit" << res1 << arg1 << std::endl;
+        }
+
+        // Get the result
+        for (casadi_int i=0; i<res1.size(); ++i) {
+          casadi_int el = it->res[i]; // index of the output
+          if (el!=-1) {
+            swork[el] = res1[i];
+            tainted[el] = any_tainted;
+          }
+        }
+      }
+    }
+
+    // Join split outputs
+    for (casadi_int i=0; i<res.size(); ++i) res[i] = out_[i].join_primitives(res_split[i]);
+
+    uout() << res << std::endl;
+
+    return Function();
+  }
+
   void MXFunction::eval_mx(const MXVector& arg, MXVector& res,
                            bool always_inline, bool never_inline) const {
     always_inline = always_inline || always_inline_;
