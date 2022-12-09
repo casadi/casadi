@@ -431,7 +431,7 @@ namespace casadi {
       casadi_assert(n_in_ == 1, "Not implemented");
       casadi_assert(n_out_ == 1, "Not implemented");
 
-      if (is_a("SXFunction", false)) {// && !GlobalOptions::getHierarchicalSparsity()) {
+      if (is_a("SXFunction", false) && GlobalOptions::getFeatureVE()) {// && !GlobalOptions::getHierarchicalSparsity()) {
         return jac_alt(opts);
       }
 

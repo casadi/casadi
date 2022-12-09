@@ -554,15 +554,19 @@ namespace casadi {
   void GetNonzerosSlice::generate(CodeGenerator& g,
                                   const std::vector<casadi_int>& arg,
                                   const std::vector<casadi_int>& res, bool prefer_inline) const {
-    //g.local("rr", "casadi_real", "*");
-    //g.local("ss", "const casadi_real", "*");
-    // Simplify for scalar case
-    g << "#pragma omp simd\n";
-    g << "for (i=0;i<" << s_.size() << ";++i) "
-      << "(" << g.work(res[0], nnz()) << ")[i] = (" << g.work(arg[0], dep(0).nnz()) << ")[i*" << s_.step << "+" << s_.start << "];\n";
-    //g << "for (rr=" << g.work(res[0], nnz()) << ", ss=" << g.work(arg[0], dep(0).nnz())
-    //  << "+" << s_.start << "; ss!=" << g.work(arg[0], dep(0).nnz()) << "+" << s_.stop
-    //  << "; ss+=" << s_.step << ") *rr++ = *ss;\n";
+    if (GlobalOptions::getFeatureLoops()) {
+      g << "#pragma omp simd\n";
+      g << "for (i=0;i<" << s_.size() << ";++i) "
+        << "(" << g.work(res[0], nnz()) << ")[i] = (" << g.work(arg[0], dep(0).nnz()) << ")[i*" << s_.step << "+" << s_.start << "];\n";
+    } else {
+      g.local("rr", "casadi_real", "*");
+      g.local("ss", "const casadi_real", "*");
+      // Simplify for scalar case
+      g << "for (rr=" << g.work(res[0], nnz()) << ", ss=" << g.work(arg[0], dep(0).nnz())
+        << "+" << s_.start << "; ss!=" << g.work(arg[0], dep(0).nnz()) << "+" << s_.stop
+        << "; ss+=" << s_.step << ") *rr++ = *ss;\n";
+    }
+
   }
 
   void GetNonzerosSlice2::generate(CodeGenerator& g,

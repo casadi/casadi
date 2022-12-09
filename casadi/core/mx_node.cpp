@@ -450,7 +450,7 @@ namespace casadi {
     } else if (sparsity().is_vector()) {
       return get_reshape(sparsity().T());
     } else if (sparsity().is_dense()) {
-      if (GlobalOptions::simplification_on_the_fly) {
+      if (GlobalOptions::simplification_on_the_fly && GlobalOptions::getFeatureContractCat()) {
         MX inner;
         if (simplify_transpose_cat(shared_from_this<MX>(), inner)) return inner;
       }
