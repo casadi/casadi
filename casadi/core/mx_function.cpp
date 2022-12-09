@@ -1020,7 +1020,13 @@ namespace casadi {
 
     vector<MX> arg1, res1;
 
+    // If 
     std::vector<bool> tainted(workloc_.size(), false);
+
+    // List of endpoints
+    std::vector<MX> endpoints;
+
+    std::vector<MX> endpoint_symbols;
 
     // Loop over computational nodes in forward order
     casadi_int alg_counter = 0;
@@ -1036,27 +1042,36 @@ namespace casadi {
         swork[it->res.front()] = it->data;
       } else {
         bool any_tainted = false;
-        bool all_tainted = true;
+
+        for (casadi_int i=0; i<it->arg.size(); ++i) {
+          casadi_int el = it->arg[i]; // index of the argument
+          if (el!=-1) {
+            any_tainted = any_tainted || tainted[el];
+          }
+        }
+
+        if (any_tainted) {
+          for (casadi_int i=0; i<it->arg.size(); ++i) {
+            casadi_int el = it->arg[i]; // index of the argument
+            if (el!=-1 && !tainted[el]) {
+              endpoints.push_back(swork[el]);
+              swork[el] = MX::sym(name_in_[i]+"_"+str(endpoints.size()), swork[el].sparsity());
+              tainted[el] = true;
+              endpoint_symbols.push_back(swork[el]);
+            }
+          }
+        }
 
         // Arguments of the operation
         arg1.resize(it->arg.size());
         for (casadi_int i=0; i<arg1.size(); ++i) {
           casadi_int el = it->arg[i]; // index of the argument
           arg1[i] = el==-1 ? MX(it->data->dep(i).size()) : swork[el];
-          if (el!=-1) {
-            any_tainted = any_tainted || tainted[el];
-            all_tainted = all_tainted && tainted[el];
-          }
         }
 
         // Perform the operation
         res1.resize(it->res.size());
         it->data->eval_mx(arg1, res1);
-
-
-        if (any_tainted && !all_tainted) {
-          uout() << "hit" << res1 << arg1 << std::endl;
-        }
 
         // Get the result
         for (casadi_int i=0; i<res1.size(); ++i) {
@@ -1072,9 +1087,19 @@ namespace casadi {
     // Join split outputs
     for (casadi_int i=0; i<res.size(); ++i) res[i] = out_[i].join_primitives(res_split[i]);
 
+    uout() << endpoints << std::endl;
+    uout() << endpoint_symbols << std::endl;
     uout() << res << std::endl;
 
-    return Function();
+    // pass is-diff in
+
+    outer = Function("inner_" + name_, {in_[i]}, {veccat(endpoints)}, {name_in_[i]}, {name_in_[i]+"_endpoint"});
+
+    std::vector<MX> in = in_;
+    in[i] = veccat(endpoint_symbols);
+    std::vector<std::string> name_in = name_in_;
+    name_in[i] += "_endpoint";
+    return Function("outer_" + name_, in, res, name_in, name_out_);
   }
 
   void MXFunction::eval_mx(const MXVector& arg, MXVector& res,
