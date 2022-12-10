@@ -1050,7 +1050,6 @@ namespace casadi {
       if (it->op == OP_INPUT) {
         swork[it->res.front()] = arg_split.at(it->data->ind()).at(it->data->segment());
         tainted[it->res.front()] = !ins.count(it->data->ind());
-        uout() << "tainted" << it->data->ind() << ":" << !ins.count(it->data->ind()) << std::endl;
       } else if (it->op==OP_OUTPUT) {
         // Collect the results
         res_split.at(it->data->ind()).at(it->data->segment()) = swork[it->arg.front()];

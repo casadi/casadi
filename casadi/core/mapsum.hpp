@@ -242,6 +242,7 @@ namespace casadi {
     bool vectorize_f() const;
     static bool vectorize_f(const Function& f, casadi_int n);
 
+    Function pull_out(const std::vector<casadi_int>& in, Function& outer) const override;
 
   protected:
     /** \brief Deserializing constructor

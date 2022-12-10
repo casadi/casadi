@@ -743,4 +743,14 @@ namespace casadi {
     return local_eval_gen(arg, res, iw, w, m);
   }
 
+  Function MapSum::pull_out(const std::vector<casadi_int>& in, Function& outer) const {
+    Function f_core = f_.pull_out(in, outer);
+
+    casadi_assert_dev(all(vector_slice(reduce_in_, in)));
+    std::vector<bool> reduce_in = vector_slice(reduce_in_, in, true);
+    reduce_in.push_back(true);
+
+    return f_core.map(n_, reduce_in, reduce_out_);
+  }
+
 } // namespace casadi
