@@ -162,6 +162,8 @@ class CASADI_EXPORT SXFunction :
   /** \brief  Construct a complete Jacobian by vertex elimination */
   SX jac_ve(const Dict& opts) const;
 
+  Function pull_out(const std::vector<casadi_int>& in, Function& outer) const override;
+
   /** \brief Get an atomic operation operator index
 
       \identifier{ur} */

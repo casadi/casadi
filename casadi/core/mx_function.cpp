@@ -996,10 +996,23 @@ namespace casadi {
     }
   }
 
-
+  MX register_endpoint(const MX& expr, std::vector<MX>& endpoints, std::map<MXNode*, MX>& endpoint_symbols) {
+    auto it = endpoint_symbols.find(expr.get());
+    if (it==endpoint_symbols.end()) {
+      endpoints.push_back(expr);
+      MX symbol = MX::sym("endpoint_"+str(endpoints.size()), expr.sparsity());
+      endpoint_symbols[expr.get()] = symbol;
+      return symbol;
+    } else {
+      return it->second;
+    }
+  }
 
   Function MXFunction::pull_out(const std::vector<casadi_int>& in, Function& periphery) const {
-    if (in.empty()) return Function();
+    if (in.empty()) {
+      periphery = Function(name_+"_periphery", std::vector<MX>{}, std::vector<MX>{});
+      return shared_from_this<Function>();
+    }
     casadi_assert(!has_free(), "Not supported for Functions with free parameters");
     // Symbolic work, non-differentiated
     vector<MX> swork_vec(workloc_.size()+n_ce_+1);
@@ -1060,35 +1073,6 @@ namespace casadi {
           casadi_int el = it->arg[i]; // index of the argument
           arg1[i] = el==-1 ? MX(it->data->dep(i).size()) : swork[el];
         }
-/*
-        MX register_endpoint(const MX& expr, ) {
-          auto it = endpoint_symbols.find(expr.get());
-          if (it==endpoint_symbols.end()) {
-            endpoints.push_back(expr);
-            MX symbol = MX::sym("endpoint_"+str(endpoints.size()), expr.sparsity());
-            endpoint_symbols[expr.get()] = symbol;
-            return symbol;
-          } else {
-            return it->second;
-          }
-        }
-*/
-        if (any_tainted) {
-          for (casadi_int i=0; i<it->arg.size(); ++i) {
-            casadi_int el = it->arg[i]; // index of the argument
-            if (el!=-1 && !tainted[el]) {
-              auto it = endpoint_symbols.find(swork[el].get());
-              if (it==endpoint_symbols.end()) {
-                endpoints.push_back(swork[el]);
-                arg1[i] = MX::sym("endpoint_"+str(endpoints.size()), swork[el].sparsity());
-                tainted[el] = false;
-                endpoint_symbols[swork[el].get()] = arg1[i];
-              } else {
-                arg1[i] = it->second;
-              }
-            }
-          }
-        }
 
         // Perform the operation
         res1.resize(it->res.size());
@@ -1112,11 +1096,26 @@ namespace casadi {
 
           Function f_periphery;
           Function f_core = f.pull_out(in, f_periphery);
-          MX res = f_periphery(args_periphery)[0];
+          std::vector<MX> resv; 
+          f_periphery.call(args_periphery,resv,true,false);
+          MX res = resv[0];
+          uout() << "f_periphery" << res << endpoints << std::endl;
+          res = register_endpoint(res, endpoints, endpoint_symbols);
+          uout() << "f_periphery endpoints" << endpoints << std::endl;
           args_core.push_back(res);
           res1 = f_core(args_core);
           uout() << it->data.which_function() << f_periphery << f_core << std::endl;
         } else {
+
+          if (any_tainted) {
+            for (casadi_int i=0; i<it->arg.size(); ++i) {
+              casadi_int el = it->arg[i]; // index of the argument
+              if (el!=-1 && !tainted[el]) {
+                arg1[i] = register_endpoint(swork[el], endpoints, endpoint_symbols);
+              }
+            }
+          }
+
           it->data->eval_mx(arg1, res1);
         }
 

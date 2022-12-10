@@ -980,6 +980,153 @@ namespace casadi {
     shared_from_this<Function>().save("myfun" + name_ + "stride" + str(sum(stride_in_)) + ".casadi");
   }
 
+
+  SXElem register_endpoint(const SXElem& expr, std::vector<SXElem>& endpoints, std::map<SXNode*, SXElem>& endpoint_symbols) {
+    auto it = endpoint_symbols.find(expr.get());
+    if (it==endpoint_symbols.end()) {
+      endpoints.push_back(expr);
+      SXElem symbol = SXElem::sym("endpoint_"+str(endpoints.size()));
+      endpoint_symbols[expr.get()] = symbol;
+      return symbol;
+    } else {
+      return it->second;
+    }
+  }
+
+  Function SXFunction::pull_out(const std::vector<casadi_int>& in, Function& periphery) const {
+    if (in.empty()) {
+      periphery = Function(name_+"_periphery", std::vector<SX>{}, std::vector<SX>{});
+      return shared_from_this<Function>();
+    }
+    casadi_assert(!has_free(), "Not supported for Functions with free parameters");
+
+    // Iterator to the binary operations
+    vector<SXElem>::const_iterator b_it=operations_.begin();
+
+    // Iterator to stack of constants
+    vector<SXElem>::const_iterator c_it = constants_.begin();
+
+    // Iterator to free variables
+    vector<SXElem>::const_iterator p_it = free_vars_.begin();
+
+    vector<SXElem> w(worksize_);
+
+    std::set<casadi_int> ins(in.begin(), in.end());
+
+    std::vector<bool> tainted(worksize_, false);
+
+    // List of endpoints
+    std::vector<SXElem> endpoints;
+
+    std::map<SXNode*, SXElem> endpoint_symbols;
+
+    // Tape
+    vector<TapeEl<SXElem> > s_pdwork(operations_.size());
+    vector<TapeEl<SXElem> >::iterator it1 = s_pdwork.begin();
+
+    std::vector< std::vector<SXElem> > arg(n_in_);
+    for (casadi_int i=0;i<n_in_;++i) {
+      arg[i] = in_[i].nonzeros();
+    }
+    std::vector< std::vector<SXElem> > res(n_out_);
+    for (casadi_int i=0;i<n_out_;++i) {
+      res[i].resize(sparsity_out(i).nnz());
+    }
+
+    for (auto&& a : algorithm_) {
+      switch (a.op) {
+      case OP_INPUT:
+        w[a.i0] = arg[a.i1][a.i2];
+        tainted[a.i0] = !ins.count(a.i1);
+        break;
+      case OP_OUTPUT:
+        res[a.i0][a.i2] = w[a.i1];
+        break;
+      case OP_CONST:
+        w[a.i0] = *c_it++;
+        break;
+      case OP_PARAMETER:
+        w[a.i0] = *p_it++; break;
+      case OP_FUNREF:
+        w[a.i0] = SXElem::create(new FunRef(functions_[a.i2], w[a.i1])); break;
+      case OP_CALL:
+        w[a.i0] = SXElem::create(new CallSX(w[a.i1], w[a.i2])); break;
+      default:
+        {
+          SXElem in1 = w[a.i1];
+          SXElem in2;
+
+          bool binary = casadi_math<SXElem>::is_binary(a.op); 
+          if (binary) in2 = w[a.i2];
+
+          bool any_tainted = tainted[a.i1];
+          bool all_tainted = tainted[a.i1];
+          if (binary) {
+            any_tainted = any_tainted || tainted[a.i2];
+            all_tainted = all_tainted && tainted[a.i2];
+          }
+          if (any_tainted) {
+            if (!tainted[a.i1]) {
+              in1 = register_endpoint(w[a.i1], endpoints, endpoint_symbols);
+            }
+            if (binary && !tainted[a.i2]) {
+              in2 = register_endpoint(w[a.i2], endpoints, endpoint_symbols);
+            }
+          }
+
+          // Evaluate the function to a temporary value
+          // (as it might overwrite the children in the work vector)
+          SXElem f;
+          switch (a.op) {
+            CASADI_MATH_FUN_BUILTIN(in1, in2, f)
+          }
+
+
+          // If this new expression is identical to the expression used
+          // to define the algorithm, then reuse
+          const casadi_int depth = 2; // NOTE: a higher depth could possibly give more savings
+          f.assignIfDuplicate(*b_it++, depth);
+
+          // Finally save the function value
+          w[a.i0] = f;
+          tainted[a.i0] = any_tainted;
+
+        }
+      }
+    }
+
+    // pass is-diff in
+    periphery = Function("periphery_" + name_, vector_slice(in_, in), {SX(endpoints)}, vector_slice(name_in_, in), {name_+"_endpoint"});
+    uout() << "periphery" << std::endl;    
+    uout() << "in" << vector_slice(in_, in) << std::endl;
+    uout() << "res" << SX(endpoints) << std::endl;
+
+    casadi_assert_dev(!periphery.has_free());
+    std::vector<casadi_int> in_invert = complement(in, in_.size());
+
+    std::vector<SX> in_syms = vector_slice(in_, in_invert);
+    std::vector<SXElem> endpoint_symbols_vec;
+    for (auto e : endpoints) {
+      endpoint_symbols_vec.push_back(endpoint_symbols[e.get()]);
+    }
+
+    in_syms.push_back(SX(endpoint_symbols_vec));
+    std::vector<std::string> name_in = vector_slice(name_in_, in_invert);
+    name_in.push_back(name_+"_endpoint");
+    std::vector<SX> resSX(n_out_);
+    for (casadi_int i=0;i<n_out_;++i) {
+      resSX[i] = SX(sparsity_out(i), res[i]);
+    }
+
+    uout() << "core" << std::endl;
+    uout() << "in" << in_syms << std::endl;
+    uout() << "res" << resSX << std::endl;
+    Function ret = Function("core_" + name_, in_syms, resSX, name_in, name_out_);
+    casadi_assert(!ret.has_free(), name_);
+    return ret;
+  }
+
+
   void SXFunction::codegen_incref(CodeGenerator& g, const Instance& inst) const {
     for (auto&& f : functions_) {
       if (f->has_refcount_) {
