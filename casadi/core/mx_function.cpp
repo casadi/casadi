@@ -998,7 +998,8 @@ namespace casadi {
 
 
 
-  Function MXFunction::pull_out(const std::vector<casadi_int>& in, Function& outer) const {
+  Function MXFunction::pull_out(const std::vector<casadi_int>& in, Function& periphery) const {
+    if (in.empty()) return Function();
     casadi_assert(!has_free(), "Not supported for Functions with free parameters");
     // Symbolic work, non-differentiated
     vector<MX> swork_vec(workloc_.size()+n_ce_+1);
@@ -1046,10 +1047,6 @@ namespace casadi {
       } else {
         bool any_tainted = false;
 
-        if (it->op==OP_COS) {
-          uout() << "it->arg" << it->arg << std::endl;
-        }
-
         for (casadi_int i=0; i<it->arg.size(); ++i) {
           casadi_int el = it->arg[i]; // index of the argument
           if (el!=-1) {
@@ -1063,7 +1060,19 @@ namespace casadi {
           casadi_int el = it->arg[i]; // index of the argument
           arg1[i] = el==-1 ? MX(it->data->dep(i).size()) : swork[el];
         }
-
+/*
+        MX register_endpoint(const MX& expr, ) {
+          auto it = endpoint_symbols.find(expr.get());
+          if (it==endpoint_symbols.end()) {
+            endpoints.push_back(expr);
+            MX symbol = MX::sym("endpoint_"+str(endpoints.size()), expr.sparsity());
+            endpoint_symbols[expr.get()] = symbol;
+            return symbol;
+          } else {
+            return it->second;
+          }
+        }
+*/
         if (any_tainted) {
           for (casadi_int i=0; i<it->arg.size(); ++i) {
             casadi_int el = it->arg[i]; // index of the argument
@@ -1083,7 +1092,33 @@ namespace casadi {
 
         // Perform the operation
         res1.resize(it->res.size());
-        it->data->eval_mx(arg1, res1);
+
+        if (it->op==OP_CALL) {
+          Function f = it->data.which_function();
+          std::vector<casadi_int> in;
+          std::vector<MX> args_periphery;
+          std::vector<MX> args_core;
+          if (any_tainted) {
+            for (casadi_int i=0; i<it->arg.size(); ++i) {
+              casadi_int el = it->arg[i]; // index of the argument
+              if (el!=-1 && !tainted[el]) {
+                in.push_back(i);
+                args_periphery.push_back(swork[el]);
+              } else {
+                args_core.push_back(swork[el]);
+              }
+            }
+          }
+
+          Function f_periphery;
+          Function f_core = f.pull_out(in, f_periphery);
+          MX res = f_periphery(args_periphery)[0];
+          args_core.push_back(res);
+          res1 = f_core(args_core);
+          uout() << it->data.which_function() << f_periphery << f_core << std::endl;
+        } else {
+          it->data->eval_mx(arg1, res1);
+        }
 
         // Get the result
         for (casadi_int i=0; i<res1.size(); ++i) {
@@ -1099,13 +1134,13 @@ namespace casadi {
     // Join split outputs
     for (casadi_int i=0; i<res.size(); ++i) res[i] = out_[i].join_primitives(res_split[i]);
 
-    uout() << endpoints << std::endl;
-    uout() << endpoint_symbols << std::endl;
-    uout() << res << std::endl;
-
     // pass is-diff in
-    outer = Function("outer_" + name_, vector_slice(in_, in), {veccat(endpoints)}, vector_slice(name_in_, in), {name_+"_endpoint"});
+    periphery = Function("periphery_" + name_, vector_slice(in_, in), {veccat(endpoints)}, vector_slice(name_in_, in), {name_+"_endpoint"});
+    uout() << "periphery" << std::endl;    
+    uout() << "in" << vector_slice(in_, in) << std::endl;
+    uout() << "res" << veccat(endpoints) << std::endl;
 
+    casadi_assert_dev(!periphery.has_free());
     std::vector<casadi_int> in_invert = complement(in, in_.size());
 
     std::vector<MX> in_syms = vector_slice(in_, in_invert);
@@ -1117,7 +1152,12 @@ namespace casadi {
     in_syms.push_back(veccat(endpoint_symbols_vec));
     std::vector<std::string> name_in = vector_slice(name_in_, in_invert);
     name_in.push_back(name_+"_endpoint");
-    return Function("inner_" + name_, in_syms, res, name_in, name_out_);
+    uout() << "core" << std::endl;    
+    uout() << "in" << in_syms << std::endl;
+    uout() << "res" << res << std::endl;
+    Function ret = Function("core_" + name_, in_syms, res, name_in, name_out_);
+    casadi_assert(!ret.has_free(), name_);
+    return ret;
   }
 
   void MXFunction::eval_mx(const MXVector& arg, MXVector& res,
