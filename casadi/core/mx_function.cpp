@@ -1037,11 +1037,11 @@ namespace casadi {
     std::set<casadi_int> ins(in.begin(), in.end());
 
     // If 
-    std::vector<bool> tainted(workloc_.size(), false);
+    std::vector<char> tainted_vec(workloc_.size()+n_ce_+1, false);
+    char* tainted = get_ptr(tainted_vec)+n_ce_+1;
 
     // List of endpoints
     std::vector<MX> endpoints;
-
     std::map<MXNode*, MX> endpoint_symbols;
 
     // Loop over computational nodes in forward order
@@ -1051,8 +1051,10 @@ namespace casadi {
         swork[it->res.front()] = arg_split.at(it->data->ind()).at(it->data->segment());
         tainted[it->res.front()] = !ins.count(it->data->ind());
       } else if (it->op==OP_OUTPUT) {
+        MX arg = swork[it->arg.front()];
+        if (!tainted[it->arg.front()]) arg = register_endpoint(arg, endpoints, endpoint_symbols);
         // Collect the results
-        res_split.at(it->data->ind()).at(it->data->segment()) = swork[it->arg.front()];
+        res_split.at(it->data->ind()).at(it->data->segment()) = arg;
       } else if (it->op==OP_PARAMETER) {
         // Fetch parameter
         swork[it->res.front()] = it->data;
@@ -1134,7 +1136,7 @@ namespace casadi {
 
     // pass is-diff in
     periphery = Function("periphery_" + name_, vector_slice(in_, in), {veccat(endpoints)}, vector_slice(name_in_, in), {name_+"_endpoint"});
-    uout() << "periphery" << std::endl;    
+    uout() << "periphery for " << name_ << std::endl;    
     uout() << "in" << vector_slice(in_, in) << std::endl;
     uout() << "res" << veccat(endpoints) << std::endl;
 
@@ -1150,7 +1152,7 @@ namespace casadi {
     in_syms.push_back(veccat(endpoint_symbols_vec));
     std::vector<std::string> name_in = vector_slice(name_in_, in_invert);
     name_in.push_back(name_+"_endpoint");
-    uout() << "core" << std::endl;    
+    uout() << "core for " << name_ << std::endl;    
     uout() << "in" << in_syms << std::endl;
     uout() << "res" << res << std::endl;
     Function ret = Function("core_" + name_, in_syms, res, name_in, name_out_);

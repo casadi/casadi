@@ -744,11 +744,13 @@ namespace casadi {
   }
 
   Function MapSum::pull_out(const std::vector<casadi_int>& in, Function& outer) const {
+    uout() << "pull_out" << name_ << ":" << in << n_in_ << reduce_in_ << vector_slice(reduce_in_, in) << std::endl;
+    //casadi_assert_dev(all(vector_slice(reduce_in_, in)));
     Function f_core = f_.pull_out(in, outer);
 
-    casadi_assert_dev(all(vector_slice(reduce_in_, in)));
+
     std::vector<bool> reduce_in = vector_slice(reduce_in_, in, true);
-    reduce_in.push_back(true);
+    reduce_in.push_back(false);
 
     return f_core.map(n_, reduce_in, reduce_out_);
   }

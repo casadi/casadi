@@ -994,6 +994,8 @@ namespace casadi {
   }
 
   Function SXFunction::pull_out(const std::vector<casadi_int>& in, Function& periphery) const {
+
+    uout() << "pull_out" << name_ << ":" << in << n_in_ << std::endl;
     if (in.empty()) {
       periphery = Function(name_+"_periphery", std::vector<SX>{}, std::vector<SX>{});
       return shared_from_this<Function>();
@@ -1032,25 +1034,41 @@ namespace casadi {
     for (casadi_int i=0;i<n_out_;++i) {
       res[i].resize(sparsity_out(i).nnz());
     }
-
     for (auto&& a : algorithm_) {
       switch (a.op) {
       case OP_INPUT:
-        w[a.i0] = arg[a.i1][a.i2];
+        uout() << "in" << a.i1 << a.i2 << std::endl;
+        w[a.i0] = arg[a.i1][a.i2/std::abs(stride_in_[a.i1])];
         tainted[a.i0] = !ins.count(a.i1);
         break;
       case OP_OUTPUT:
-        res[a.i0][a.i2] = w[a.i1];
+        {
+          SXElem in1 = w[a.i1];
+          if (!tainted[a.i1]) {
+            in1 = register_endpoint(w[a.i1], endpoints, endpoint_symbols);
+          }
+          res[a.i0][a.i2] = in1;
+        }
         break;
       case OP_CONST:
         w[a.i0] = *c_it++;
+        tainted[a.i0] = false;
         break;
       case OP_PARAMETER:
-        w[a.i0] = *p_it++; break;
+        casadi_error("Cannot occur");
       case OP_FUNREF:
         w[a.i0] = SXElem::create(new FunRef(functions_[a.i2], w[a.i1])); break;
+        tainted[a.i0] = false;
       case OP_CALL:
-        w[a.i0] = SXElem::create(new CallSX(w[a.i1], w[a.i2])); break;
+        {
+          SXElem in2 = w[a.i2];
+          if (!tainted[a.i2]) {
+            in2 = register_endpoint(w[a.i2], endpoints, endpoint_symbols);
+          }
+          w[a.i0] = SXElem::create(new CallSX(w[a.i1], in2));
+          tainted[a.i0] = true;
+        }
+        break;
       default:
         {
           SXElem in1 = w[a.i1];
@@ -1121,7 +1139,13 @@ namespace casadi {
     uout() << "core" << std::endl;
     uout() << "in" << in_syms << std::endl;
     uout() << "res" << resSX << std::endl;
-    Function ret = Function("core_" + name_, in_syms, resSX, name_in, name_out_);
+    std::vector<casadi_int> stride_in = vector_slice(stride_in_, in);
+    stride_in.push_back(1);
+    Dict opts;
+    opts["stride_in"] = stride_in;
+    opts["stride_out"] = stride_out_;
+    Function ret = Function("core_" + name_, in_syms, resSX, name_in, name_out_, opts);
+    uout() << ret.get_free() << std::endl;
     casadi_assert(!ret.has_free(), name_);
     return ret;
   }
