@@ -996,6 +996,7 @@ if(WITH_IPOPT)
 	--enable-pkg-config
 	)
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/coin-or")
+    set(WITH_IPOPT_CALLBACK ON)
 
     add_library(ipopt SHARED IMPORTED)
     set_target_properties(ipopt PROPERTIES
