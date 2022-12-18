@@ -47,7 +47,7 @@ namespace casadi {
     }
 
   double FunRef::pack(int id, double index) {
-    casadi_assert((char) index == (casadi_int) index, "Funref index overflow");
+    casadi_assert((char) index == (casadi_int) index, "Funref index overflow: " + str(index));
     casadi_assert((char) id == id, "Funref id overflow");
     double ret = 0;
     char * result_parts = reinterpret_cast<char*>(&ret);
