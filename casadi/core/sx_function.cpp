@@ -901,7 +901,7 @@ namespace casadi {
 
     worksize_ = worksize;
 
-    if (true) {
+    if (verbose_) {
       if (live_variables_) {
         casadi_message("Using live variables: work array is " + str(worksize_)
          + " instead of " + str(algorithm_.size()));
