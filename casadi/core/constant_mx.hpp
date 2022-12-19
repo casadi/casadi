@@ -374,9 +374,6 @@ namespace casadi {
     /// Destructor
     ~ConstantPool() override {}
 
-    /** \brief Is reference counting needed in codegen? */
-    bool has_refcount() const { return true;}
-
     /** \brief  Print expression
 
         \identifier{zn} */

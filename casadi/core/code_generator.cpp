@@ -697,9 +697,6 @@ namespace casadi {
       shorthand("pd" + str(index));
       pool_double_[name] = index;
     } else {
-      uout() << "compare" << std::endl;
-      uout() << def << std::endl;
-      uout() << pool_double_defaults_[it->second] << std::endl;
       casadi_assert_dev(def==pool_double_defaults_[it->second]);
     }
   }
