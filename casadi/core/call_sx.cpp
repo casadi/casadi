@@ -123,8 +123,10 @@ namespace casadi {
 
       g.flush(s);
 
-      g.add_extra_declarations(f, s.str());
-      g.add_extra_definitions(f, s.str());
+      g.casadi_headers << s.str();
+
+      //g.add_extra_declarations(f, s.str());
+      //g.add_extra_definitions(f, s.str());
     }
   }
 

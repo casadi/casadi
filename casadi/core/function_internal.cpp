@@ -2248,21 +2248,28 @@ namespace casadi {
 
     if (vectorize) {
       if (is_a("SXFunction", false)) {
+        // A gcc bug (pre 11.1) causes avx512 emitted code not to be picked up, unless static is used.
+        // In a g.split setting, we must then declare static, but still make the symbols exported
         sig = signature(fname, true);
         std::string sig_intr = signature(fname, true, GlobalOptions::vector_width_real);
         std::string omp = "#pragma omp declare simd uniform(arg, res, iw, w, mem) linear(i:1) simdlen(" + str(GlobalOptions::vector_width_real) + ") notinbranch\n";
-        decl = "#undef casadi_" + codegen_name(g, false) + "\n";
+        decl = "";
+        if (g.split) decl += "#undef casadi_" + codegen_name(g, false) + "\n";
         decl += omp;
-        decl += "static __attribute__((noinline)) __attribute__((used)) " + sig + ";\n";
-        decl += "extern " + signature(resolved_name, true, GlobalOptions::vector_width_real) + ";\n";
-        decl += "extern " + signature(resolved_name, true, 1) + ";\n";
-        decl += "static __attribute__((noinline)) __attribute__((used)) " + signature(fname, true, GlobalOptions::vector_width_real) + "{\n";
-        decl += codegen_self_call(resolved_name, true, GlobalOptions::vector_width_real) + ";\n";
-        decl += "}\n";
-        decl += "static __attribute__((noinline)) __attribute__((used)) " + signature(fname+"_alias", true, 1) + " asm(\"" + fname + "\");\n";
-        decl += "static " + signature(fname+"_alias", true, 1) + "{\n";
-        decl += codegen_self_call(resolved_name, true, 1) + ";\n";
-        decl += "}\n";
+        if (g.split) {
+          decl += "static __attribute__((noinline)) __attribute__((used)) " + sig + ";\n";
+          decl += "extern " + signature(resolved_name, true, GlobalOptions::vector_width_real) + ";\n";
+          decl += "extern " + signature(resolved_name, true, 1) + ";\n";
+          decl += "static __attribute__((noinline)) __attribute__((used)) " + signature(fname, true, GlobalOptions::vector_width_real) + "{\n";
+          decl += codegen_self_call(resolved_name, true, GlobalOptions::vector_width_real) + ";\n";
+          decl += "}\n";
+          decl += "static __attribute__((noinline)) __attribute__((used)) " + signature(fname+"_alias", true, 1) + " asm(\"" + fname + "\");\n";
+          decl += "static " + signature(fname+"_alias", true, 1) + "{\n";
+          decl += codegen_self_call(resolved_name, true, 1) + ";\n";
+          decl += "}\n";
+        } else {
+          decl += "static __attribute__((noinline)) " + sig + ";\n";
+        }
         g << omp;
         if (!prefer_inline) g << "__attribute__((noinline)) ";
         g << g.vector_width_attribute() << " " << sig << " {\n";
@@ -2298,9 +2305,12 @@ namespace casadi {
     g.flush(s);
     g.body_parts[codegen_name(g, false)] = s.str();
 
-    
-    g.casadi_headers << "#ifndef DEF_" << codegen_name(g, false) << "\n"
-                     << decl << "#endif\n";
+    if (g.split) g.casadi_headers << "#ifndef DEF_" << codegen_name(g, false) << "\n";
+
+    g.casadi_headers << decl;
+
+    if (g.split) g.casadi_headers << "#endif\n";
+  
 
   }
 

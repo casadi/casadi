@@ -52,6 +52,9 @@ namespace casadi {
 #ifndef SWIG
     /// Generate the code to a stream
     void dump(std::ostream& s, const std::string& body);
+
+    /// Generate the code to a stream
+    void dump_preamble(std::ostream& s, bool common=false);
 #endif // SWIG
 
     /// Generate a file, return code as string
@@ -808,6 +811,12 @@ namespace casadi {
     // Prefix
     std::string prefix;
 
+    // Split codegen?
+    bool split;
+
+    // Blasfeo?
+    bool blasfeo;
+
     // Stringstreams holding the different parts of the file being generated
     std::stringstream includes;
     std::stringstream auxiliaries;
@@ -816,7 +825,6 @@ namespace casadi {
     std::stringstream buffer;
 
     std::map<std::string, std::string> body_parts;
-    std::map<std::string, std::string> dependee_parts;
     std::stringstream casadi_headers;
 
     // Are we at a new line?

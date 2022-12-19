@@ -53,6 +53,8 @@ namespace casadi {
     this->real_min = "";
     bool prefix_set = false;
     this->prefix = "";
+    this->split = true;
+    this->blasfeo = true;
     avoid_stack_ = false;
     indent_ = 2;
     sz_zeros_ = -1;
@@ -102,6 +104,10 @@ namespace casadi {
       } else if (e.first=="vector_width") {
         vector_width_ = e.second.to_int();
         casadi_assert(is_pow2(vector_width_), "vector width must be power of 2");
+      } else if (e.first=="split") {
+        split = e.second;
+      } else if (e.first=="blasfeo") {
+        blasfeo = e.second;
       } else {
         casadi_error("Unrecognized option: " + str(e.first));
       }
@@ -169,6 +175,8 @@ namespace casadi {
     if (!prefix_set) {
       this->prefix = this->name;
     }
+
+    this->header << "int set_pool_double(const char* name, const casadi_real* v);\n";
 
   }
 
@@ -453,82 +461,72 @@ namespace casadi {
     casadi_assert(prefix.find(this->name + this->suffix)==string::npos,
        "The signature of CodeGenerator::generate has changed. "
        "Instead of providing the filename, only provide the prefix.");
-    std::vector<std::string> part_names;
-    {
-      // Create c file
-      ofstream s;
-      string fullname = prefix + this->name + "_common" + this->suffix;
-      file_open(s, fullname);
 
-   // Prefix internal symbols to avoid symbol collisions
-    s << "/* How to prefix internal symbols */\n"
-      << "#ifdef CODEGEN_PREFIX\n"
-      << "  #define NAMESPACE_CONCAT(NS, ID) _NAMESPACE_CONCAT(NS, ID)\n"
-      << "  #define _NAMESPACE_CONCAT(NS, ID) NS ## ID\n"
-      << "  #define CASADI_PREFIX(ID) NAMESPACE_CONCAT(CODEGEN_PREFIX, ID)\n"
-      << "#else\n"
-      << "  #define CASADI_PREFIX(ID) " << this->name << "_ ## ID\n"
-      << "#endif\n\n";
+    // Create c file
+    ofstream s;
 
-    s << this->includes.str();
-    s << endl;
+    string fullname = prefix + this->name + (split? "_common" : "") + this->suffix;
 
-      s << "#define DEF_common\n";
+    std::vector<std::string> part_names = {fullname};
+    file_open(s, fullname);
 
+    if (split) s << "#define DEF_common\n";
+    dump_preamble(s, split);
 
-      // Define the casadi_real type (typically double)
-      generate_casadi_real(s);
+    for (const auto& e : body_parts) {
+      if (split) {
+        ofstream ss;
+        // Create c file
+        string fullname = prefix + this->name + "_" + e.first + this->suffix;
+        file_open(ss, fullname);
+        part_names.push_back(fullname);
 
-      // Define the casadi_int type
-      generate_casadi_int(s);
-
-      // Macros
-      if (!added_shorthands_.empty()) {
-        s << "/* Add prefix to internal symbols */\n";
-        for (auto&& i : added_shorthands_) {
-          s << "#define " << "casadi_" << i <<  " CASADI_PREFIX(" << i <<  ")\n";
+        ss << "#define DEF_" + e.first << "\n";
+        for (const std::string& d : dependees_[e.first]) {
+          ss <<  "#define DEF_" + d << "\n";
         }
-        s << endl;
-      }
+        dump_preamble(ss, false);
 
-      part_names.push_back(fullname);
-
-      // Print file scope double pool
-      if (!pool_double_.empty()) {
-        casadi_int i=0;
-        for (const auto& v : pool_double_defaults_) {
-          s << "casadi_real casadi_pd" + str(i) + "[" + str(v.size()) + "] = " + initializer(v) + ";\n";
-          i++;
+        for (const std::string& d : dependees_[e.first]) {
+          ss << body_parts[d];
         }
-        s << endl;
+        
+        ss << e.second << endl;
+
+        // Finalize file
+        file_close(ss);
+      } else {
+        s << e.second << endl;
       }
-
-      // Dump code to file
-      dump(s, body.str());
-
-      // Mex entry point
-      if (this->mex) generate_mex(s);
-
-      // Main entry point
-      if (this->main) generate_main(s);
-
-      if (!pool_double_defaults_.empty()) {
-        s << "CASADI_SYMBOL_EXPORT void set_pool_double(const char* name, const casadi_real* v) {\n";
-        for (const auto& e : pool_double_) {
-          casadi_int i = e.second;
-          s << "  if (strcmp(name, \"" + e.first + "\")==0) casadi_copy(v, " + str(pool_double_defaults_[i].size()) + ", casadi_pd" + str(i) + ");\n";
-        }
-        s << "}\n";
-      }
-
-      // Finalize file
-      file_close(s);
-
     }
+
+    // Dump code to file
+    dump(s, body.str());
+
+    if (!pool_double_defaults_.empty()) {
+      s << "CASADI_SYMBOL_EXPORT int set_pool_double(const char* name, const casadi_real* v) {\n";
+      for (const auto& e : pool_double_) {
+        casadi_int i = e.second;
+        s << "  if (strcmp(name, \"" + e.first + "\")==0) {\n"
+          << "casadi_copy(v, " + str(pool_double_defaults_[i].size()) + ", casadi_pd" + str(i) + ");\n"
+          << "return 0;\n"
+          << "}\n";
+      }
+      s << "return 1;\n";
+      s << "}\n";
+    }
+
+    // Mex entry point
+    if (this->mex) generate_mex(s);
+
+    // Main entry point
+    if (this->main) generate_main(s);
+
+    // Finalize file
+    file_close(s);
 
     // Generate header
     if (this->with_header) {
-      std::ofstream s;
       // Create a header file
       file_open(s, prefix + this->name + ".h");
 
@@ -548,50 +546,6 @@ namespace casadi {
       file_close(s);
     }
 
-    // Add in dependencees into parts
-    /*for (casadi_int i=added_functions_.size()-1;i>=0;--i) {
-      std::string key = "f"+str(i);
-      auto it = dependees_.find(key);
-      if (it!=dependees_.end()) {
-        std::stringstream preamble;
-        for (const std::string& d : it->second) {
-          preamble << body_parts[d];
-        }
-        body_parts[key] = preamble.str() + body_parts[key];
-      }
-    }*/
-    
-    for (const auto& e : body_parts) {
-      // Create c file
-      ofstream s;
-      string fullname = prefix + this->name + "_" + e.first + this->suffix;
-      file_open(s, fullname);
-      s << "#define DEF_" + e.first << "\n";
-      for (const std::string& d : dependees_[e.first]) {
-        s <<  "#define DEF_" + d << "\n";
-      }
- 
-
-      stringstream tmp;
-      tmp << "#pragma omp declare simd simdlen(4)\n";
-      tmp << "#pragma omp declare simd simdlen(8)\n";      
-      tmp << "static __attribute__((noinline)) casadi_int casadi_real2int(casadi_real a) {\n"
-        << "  return a;\n"
-        << "}\n";
-      for (const std::string& d : dependees_[e.first]) {
-        tmp << body_parts[d];
-      }
-      tmp << e.second;
-
-      // Dump code to file
-      dump(s, tmp.str());
-
-      // Finalize file
-      file_close(s);
-
-      part_names.push_back(fullname);
-
-    }
     return join(part_names,";");
   }
 
@@ -731,8 +685,8 @@ namespace casadi {
     return "casadi_ri" + str(it->second);
   }
 
-  void CodeGenerator::dump(std::ostream& s, const std::string& body) {
-    // Consistency check
+  void CodeGenerator::dump_preamble(std::ostream& s, bool common) {
+  // Consistency check
     casadi_assert_dev(current_indent_ == 0);
 
     // Prefix internal symbols to avoid symbol collisions
@@ -818,11 +772,16 @@ namespace casadi {
     if (!file_scope_double_.empty()) {
       casadi_int i=0;
       for (auto size : file_scope_double_size_) {
-        s << "#ifdef DEF_common\n";
+        if (split && !common) {
+          s << "extern casadi_real casadi_rd" + str(i) + "[" + str(size) + "];\n";
+        } else {
+          s << "casadi_real casadi_rd" + str(i) + "[" + str(size) + "];\n";
+        }
+        /*s << "#ifdef DEF_common\n";
         s << "casadi_real casadi_rd" + str(i) + "[" + str(size) + "];\n";
         s << "#else\n";
         s << "extern casadi_real casadi_rd" + str(i) + "[" + str(size) + "];\n";
-        s << "#endif\n";
+        s << "#endif\n";*/
         i++;
       }
       s << endl;
@@ -841,7 +800,11 @@ namespace casadi {
     if (!pool_double_.empty()) {
       casadi_int i=0;
       for (const auto& v : pool_double_defaults_) {
-        s << "extern casadi_real casadi_pd" + str(i) + "[" + str(v.size()) + "];\n";
+        if (split && !common) {
+          s << "extern casadi_real casadi_pd" + str(i) + "[" + str(v.size()) + "];\n";
+        } else {
+          s << "casadi_real casadi_pd" + str(i) + "[" + str(v.size()) + "] = " + initializer(v) + ";\n";
+        }
         i++;
       }
       s << endl;
@@ -857,6 +820,19 @@ namespace casadi {
     }
 
     s << casadi_headers.str();
+
+    s << "#pragma omp declare simd simdlen(4)\n";
+    s << "#pragma omp declare simd simdlen(8)\n";      
+    s << "static __attribute__((noinline)) casadi_int casadi_real2int(casadi_real a) {\n"
+      << "  return a;\n"
+      << "}\n";
+
+    // End with new line
+    s << endl;
+  }
+
+
+  void CodeGenerator::dump(std::ostream& s, const std::string& body) {
 
     // Codegen body
     s << body;
@@ -1159,6 +1135,7 @@ namespace casadi {
     switch (f) {
     case AUX_COPY:
       this->auxiliaries << sanitize_source(casadi_copy_str, inst);
+      add_include("string.h");
       break;
     case AUX_SWAP:
       this->auxiliaries << sanitize_source(casadi_swap_str, inst);
