@@ -124,6 +124,11 @@ namespace casadi {
         \identifier{q5} */
     MX(const Sparsity& sp, const std::string& fname);
 
+    /** \brief Construct matrix with a given sparsity and nonzeros, configurable in codegen
+
+        \identifier{q5} */
+    MX(const Matrix<double>& val, const std::string& name);
+
     /** \brief  Create scalar constant (also implicit type conversion)
 
         \identifier{q6} */

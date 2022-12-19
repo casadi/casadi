@@ -493,6 +493,16 @@ namespace casadi {
 
       part_names.push_back(fullname);
 
+      // Print file scope double pool
+      if (!pool_double_.empty()) {
+        casadi_int i=0;
+        for (const auto& v : pool_double_defaults_) {
+          s << "casadi_real casadi_pd" + str(i) + "[" + str(v.size()) + "] = " + initializer(v) + ";\n";
+          i++;
+        }
+        s << endl;
+      }
+
       // Dump code to file
       dump(s, body.str());
 
@@ -501,6 +511,15 @@ namespace casadi {
 
       // Main entry point
       if (this->main) generate_main(s);
+
+      if (!pool_double_defaults_.empty()) {
+        s << "CASADI_SYMBOL_EXPORT void set_pool_double(const char* name, const casadi_real* v) {\n";
+        for (const auto& e : pool_double_) {
+          casadi_int i = e.second;
+          s << "  if (strcmp(name, \"" + e.first + "\")==0) casadi_copy(v, " + str(pool_double_defaults_[i].size()) + ", casadi_pd" + str(i) + ");\n";
+        }
+        s << "}\n";
+      }
 
       // Finalize file
       file_close(s);
@@ -563,8 +582,6 @@ namespace casadi {
         tmp << body_parts[d];
       }
       tmp << e.second;
-
-  
 
       // Dump code to file
       dump(s, tmp.str());
@@ -672,10 +689,31 @@ namespace casadi {
 
   }
 
+  void CodeGenerator::define_pool_double(const std::string& name, const std::vector<double>& def) {
+    auto it = pool_double_.find(name);
+    if (it==pool_double_.end()) {
+      casadi_int index = pool_double_defaults_.size();
+      pool_double_defaults_.push_back(def);
+      shorthand("pd" + str(index));
+      pool_double_[name] = index;
+    } else {
+      uout() << "compare" << std::endl;
+      uout() << def << std::endl;
+      uout() << pool_double_defaults_[it->second] << std::endl;
+      casadi_assert_dev(def==pool_double_defaults_[it->second]);
+    }
+  }
+  
   std::string CodeGenerator::rom_double(const void* id) const {
     auto it = file_scope_double_.find(id);
     casadi_assert(it!=file_scope_double_.end(), "Not defined.");
     return "casadi_rd" + str(it->second);
+  }
+
+  std::string CodeGenerator::pool_double(const std::string& name) const {
+    auto it = pool_double_.find(name);
+    casadi_assert(it!=pool_double_.end(), "Not defined.");
+    return "casadi_pd" + str(it->second);
   }
 
   void CodeGenerator::define_rom_integer(const void* id, casadi_int size) {
@@ -798,6 +836,16 @@ namespace casadi {
       casadi_int i=0;
       for (auto size : file_scope_integer_size_) {
         s << "static casadi_real casadi_ri" + str(i++) + "[" + str(size) + "];\n";
+      }
+      s << endl;
+    }
+
+    // Print file scope double pool
+    if (!pool_double_.empty()) {
+      casadi_int i=0;
+      for (const auto& v : pool_double_defaults_) {
+        s << "extern casadi_real casadi_pd" + str(i) + "[" + str(v.size()) + "];\n";
+        i++;
       }
       s << endl;
     }

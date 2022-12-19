@@ -133,10 +133,18 @@ namespace casadi {
         \identifier{s2} */
     void define_rom_double(const void* id, casadi_int size);
 
+    /** \brief Allocate file scope double writeable memory */
+    void define_pool_double(const std::string& name, const std::vector<double>& def);
+
     /** \brief Access file scope double read-only memory
 
         \identifier{s3} */
     std::string rom_double(const void* id) const;
+
+    /** \brief Access file scope double writeable memory
+
+        \identifier{s3} */
+    std::string pool_double(const std::string& name) const;
 
     /** \brief Allocate file scope integer read-only memory
 
@@ -837,8 +845,11 @@ namespace casadi {
     std::map<const void *, casadi_int> file_scope_integer_;
     std::vector<casadi_int> file_scope_double_size_;
     std::vector<casadi_int> file_scope_integer_size_;
+    std::vector< std::vector<double> > pool_double_defaults_;
 
     std::map<std::string, std::set<std::string> > dependees_; 
+
+    std::map<std::string, casadi_int> pool_double_;
 
     // Added functions
     struct FunctionMeta {

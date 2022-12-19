@@ -182,6 +182,10 @@ namespace casadi {
     }
   }
 
+  ConstantMX* ConstantMX::create(const DM& x, const std::string& name) {
+    return new ConstantPool(x, name);
+  }
+
   bool ConstantDM::is_zero() const {
     return x_.is_zero();
   }
@@ -302,6 +306,7 @@ namespace casadi {
     switch (t) {
       case 'a':    return new ConstantDM(s);
       case 'f':    return new ConstantFile(s);
+      case 'p':    return new ConstantPool(s);
       case 'z':    return ZeroByZero::getInstance();
       case 'D':
         return new Constant<RuntimeConst<double> >(s, RuntimeConst<double>::deserialize(s));
@@ -324,15 +329,31 @@ namespace casadi {
     s.pack("ConstantFile::type", 'f');
   }
 
+  void ConstantPool::serialize_type(SerializingStream& s) const {
+    MXNode::serialize_type(s);
+    s.pack("ConstantPool::type", 'p');
+  }
+
   void ConstantFile::serialize_body(SerializingStream& s) const {
     MXNode::serialize_body(s);
     s.pack("ConstantFile::fname", fname_);
     s.pack("ConstantFile::x", x_);
   }
 
+  void ConstantPool::serialize_body(SerializingStream& s) const {
+    MXNode::serialize_body(s);
+    s.pack("ConstantPool::name", name_);
+    s.pack("ConstantPool::x", x_);
+  }
+
   ConstantFile::ConstantFile(DeserializingStream& s) : ConstantMX(s) {
     s.unpack("ConstantFile::fname", fname_);
     s.unpack("ConstantFile::x", x_);
+  }
+
+  ConstantPool::ConstantPool(DeserializingStream& s) : ConstantMX(s) {
+    s.unpack("ConstantPool::name", name_);
+    s.unpack("ConstantPool::x", x_);
   }
 
   ConstantFile::ConstantFile(const Sparsity& sp, const std::string& fname) :
@@ -344,8 +365,16 @@ namespace casadi {
                              "Expected " + str(sp.nnz()) + " doubles.");
   }
 
+  ConstantPool::ConstantPool(const DM& x, const std::string& name) :
+      ConstantMX(x.sparsity()), name_(name), x_(x.nonzeros()) {
+  }
+
   std::string ConstantFile::disp(const std::vector<std::string>& arg) const {
     return "from_file('"  + fname_ + "'): " + DM(sparsity(), x_, false).get_str();
+  }
+
+  std::string ConstantPool::disp(const std::vector<std::string>& arg) const {
+    return "constant_pool('"  + name_ + "'): " + DM(sparsity(), x_, false).get_str();
   }
 
   double ConstantFile::to_double() const {
@@ -355,6 +384,15 @@ namespace casadi {
   Matrix<double> ConstantFile::get_DM() const {
     casadi_error("Not defined for ConstantFile");
   }
+
+  double ConstantPool::to_double() const {
+    casadi_error("Not defined for ConstantPool");
+  }
+
+  Matrix<double> ConstantPool::get_DM() const {
+    casadi_error("Not defined for ConstantPool");
+  }
+
 
   void ConstantFile::codegen_incref(CodeGenerator& g, std::set<const void*>& added) const {
     auto i = g.incref_added_.insert(this);
@@ -382,6 +420,20 @@ namespace casadi {
       g << g.work(res[0], nnz()) << " = " << g.rom_double(this) << ";\n";
     } else {
       g << g.copy(g.rom_double(this), nnz(), g.work(res[0], nnz())) << '\n';
+    }
+  }
+
+  void ConstantPool::add_dependency(CodeGenerator& g, const Instance& inst, const Function& owner) const {
+    g.define_pool_double(name_, x_);
+  }
+
+  void ConstantPool::generate(CodeGenerator& g,
+                            const std::vector<casadi_int>& arg,
+                            const std::vector<casadi_int>& res, bool prefer_inline) const {
+    if (res[0]<=-2) {
+      g << g.work(res[0], nnz()) << " = " << g.pool_double(name_) << ";\n";
+    } else {
+      g << g.copy(g.pool_double(name_), nnz(), g.work(res[0], nnz())) << '\n';
     }
   }
 
