@@ -134,7 +134,7 @@ namespace casadi {
     casadi_int nrow_x = dep(1).size1(), nrow_y = dep(2).size1(), ncol_y = dep(2).size2();
     casadi_int flops = ncol_y*nrow_x*nrow_y;
 
-    if (true) {//flops>100) {
+    if (g.blasfeo) {//flops>100) {
       /*g << "cblas_dgemm(CblasColMajor,CblasNoTrans,CblasNoTrans," << nrow_x << "," << ncol_y << "," << nrow_y << ",1.0,";
       g << g.work(arg[1], dep(1).nnz()) << "," << nrow_x << ",";
       g << g.work(arg[2], dep(2).nnz()) << "," << nrow_y << ",";
