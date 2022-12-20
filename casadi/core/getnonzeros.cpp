@@ -496,19 +496,33 @@ namespace casadi {
     // Codegen the indices
     string ind = g.constant(nz_);
 
-    // Codegen the assignments
-    g.local("cii", "const casadi_int", "*");
-    g.local("rr", "casadi_real", "*");
-    g.local("ss", "const casadi_real", "*");
-    g << "for (cii=" << ind << ", rr=" << g.work(res[0], nnz())
-      << ", ss=" << g.work(arg[0], dep(0).nnz())
-      << "; cii!=" << ind << "+" << nz_.size()
-      << "; ++cii) *rr++ = ";
-    if (has_negative(nz_)) {
-      g << "*cii>=0 ? ss[*cii] : 0;\n";
+    if (GlobalOptions::getFeatureLoops()) {
+      g.local("i", "casadi_int");
+      std::string ss = g.work(arg[0], dep(0).nnz());
+      g << "#pragma omp simd\n";
+      g << "for (i=0;i<" << nz_.size() << ";++i) "
+        << "(" << g.work(res[0], nnz()) << ")[i] = ";
+      if (has_negative(nz_)) {
+        g << "ind[i] ? (" << ss << ")[" << ind << "[i]] : 0;\n";
+      } else {
+        g << "(" << ss << ")[" << ind << "[i]];\n";
+      }
     } else {
-      g << "ss[*cii];\n";
+      // Codegen the assignments
+      g.local("cii", "const casadi_int", "*");
+      g.local("rr", "casadi_real", "*");
+      g.local("ss", "const casadi_real", "*");
+      g << "for (cii=" << ind << ", rr=" << g.work(res[0], nnz())
+        << ", ss=" << g.work(arg[0], dep(0).nnz())
+        << "; cii!=" << ind << "+" << nz_.size()
+        << "; ++cii) *rr++ = ";
+      if (has_negative(nz_)) {
+        g << "*cii>=0 ? ss[*cii] : 0;\n";
+      } else {
+        g << "ss[*cii];\n";
+      }
     }
+
   }
 
   MX GetNonzeros::get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz) const {

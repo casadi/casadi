@@ -201,6 +201,9 @@ namespace casadi {
   }
 
   bool CASADI_EXPORT is_slice2(const std::vector<casadi_int>& v) {
+    // Does not pick up x = MX.sym("x",13,17)
+    // y = x[:10,3:12]
+
     // Always true if 1D slice
     if (is_slice(v)) return true;
 

@@ -53,7 +53,7 @@ namespace casadi {
     this->real_min = "";
     bool prefix_set = false;
     this->prefix = "";
-    this->split = true;
+    this->split = false;
     this->blasfeo = true;
     avoid_stack_ = false;
     indent_ = 2;

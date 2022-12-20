@@ -1743,9 +1743,9 @@ namespace casadi {
     g << "w = (casadi_real*) __builtin_assume_aligned (w, " << align_bytes << ");\n";
     g.add_include("stdint.h");
     if (!inst.arg_null.empty() || !inst.res_null.empty()) {
-      g << "#if defined(_OPENMP)\n";
-      g << g.debug_assert("(uintptr_t) w% " + str(align_bytes) + " ==0") + "\n";
-      g << "#endif\n";
+      //g << "#if defined(_OPENMP)\n";
+      //g << g.debug_assert("(uintptr_t) w% " + str(align_bytes) + " ==0") + "\n";
+      //g << "#endif\n";
     }
     g.local("i","casadi_int");
 
@@ -1755,9 +1755,9 @@ namespace casadi {
       g.local("args"+str(i),"const casadi_real", "*");
       if (nnz_in(i)>1 && align) {
         g << "args" << i << " = __builtin_assume_aligned (arg[" << i << "], " << align_bytes << ");\n";
-        g << "#if defined(_OPENMP)\n";
-        g << g.debug_assert("(uintptr_t) args" + str(i) + "% " + str(align_bytes) + " ==0") + "\n";
-        g << "#endif\n";
+        //g << "#if defined(_OPENMP)\n";
+        //g << g.debug_assert("(uintptr_t) args" + str(i) + "% " + str(align_bytes) + " ==0") + "\n";
+        //g << "#endif\n";
       } else {
         g << "args" << i << " = arg[" << i << "];\n";
       }
@@ -1766,9 +1766,9 @@ namespace casadi {
       g.local("ress"+str(i),"casadi_real", "*");
       if (nnz_out(i)>1 && align) {
         g << "ress" << i << " = __builtin_assume_aligned (res[" << i << "], " << align_bytes << ");\n";
-        g << "#if defined(_OPENMP)\n";
-        g << g.debug_assert("(uintptr_t) ress" + str(i) + "% " + str(align_bytes) + " ==0") + "\n";
-        g << "#endif\n";
+        //g << "#if defined(_OPENMP)\n";
+        //g << g.debug_assert("(uintptr_t) ress" + str(i) + "% " + str(align_bytes) + " ==0") + "\n";
+        //g << "#endif\n";
       } else {
         g << "ress" << i << " = res[" << i << "];\n";
       }
@@ -1856,10 +1856,10 @@ namespace casadi {
           size_t a = e.data->align_in(i);
           if (g.casadi_real_type=="float") a = a/2;
           if (a>1 && e.data.dep(i).nnz()>1) {
-            g << "#if defined(_OPENMP)\n";
-            std::string rem = "(uintptr_t) " + g.work(j, e.data.dep(i).nnz())+"%"+str(a);
-            g << g.debug_assert(rem + "==0") + "\n";
-            g << "#endif\n";
+            //g << "#if defined(_OPENMP)\n";
+            //std::string rem = "(uintptr_t) " + g.work(j, e.data.dep(i).nnz())+"%"+str(a);
+            //g << g.debug_assert(rem + "==0") + "\n";
+            //g << "#endif\n";
           }
         }
       }
@@ -1871,9 +1871,9 @@ namespace casadi {
           if (g.casadi_real_type=="float") a = a/2;
           if (a>1 && e.data->sparsity(i).nnz()>1) {
             std::string rem = "(uintptr_t) " + g.work(j, e.data->sparsity(i).nnz())+"%"+str(a);
-            g << "#if defined(_OPENMP)\n";
-            g << g.debug_assert(rem +"==0") + "\n";
-            g << "#endif\n";
+            //g << "#if defined(_OPENMP)\n";
+            //g << g.debug_assert(rem +"==0") + "\n";
+            //g << "#endif\n";
           }
         }
       }
