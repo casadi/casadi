@@ -900,13 +900,13 @@ namespace casadi {
   void SetNonzerosSlice<Add>::
   generate(CodeGenerator& g,
            const std::vector<casadi_int>& arg, const std::vector<casadi_int>& res, bool prefer_inline) const {
+    std::string rr = g.work(res[0], this->nnz());
+    std::string ss = g.work(arg[1], this->dep(1).nnz());
     // Copy first argument if not inplace
     if (arg[0]!=res[0]) {
       g << g.copy(g.work(arg[0], this->dep(0).nnz()), this->nnz(),
-                          g.work(res[0], this->nnz())) << '\n';
+                          rr) << '\n';
     }
-    std::string rr = g.work(res[0], this->nnz());
-    std::string ss = g.work(arg[1], this->dep(1).nnz());
     if (GlobalOptions::getFeatureLoops()) {
       g.local("i", "casadi_int");
       g << "#pragma omp simd\n";
@@ -928,23 +928,36 @@ namespace casadi {
   void SetNonzerosSlice2<Add>::
   generate(CodeGenerator& g,
            const std::vector<casadi_int>& arg, const std::vector<casadi_int>& res, bool prefer_inline) const {
+    std::string rr = g.work(res[0], this->nnz());
+    std::string ss = g.work(arg[1], this->dep(1).nnz());
     // Copy first argument if not inplace
     if (arg[0]!=res[0]) {
       g << g.copy(g.work(arg[0], this->dep(0).nnz()), this->nnz(),
-                          g.work(res[0], this->nnz())) << '\n';
+                          rr) << '\n';
     }
 
-    // Perform the operation inplace
-    g.local("rr", "casadi_real", "*");
-    g.local("ss", "const casadi_real", "*");
-    g.local("uu", "casadi_real", "*");
-    g << "for (rr=" << g.work(res[0], this->nnz()) << "+" << outer_.start
-      << ", ss=" << g.work(arg[1], this->dep(1).nnz()) << "; rr!="
-      << g.work(res[0], this->nnz()) << "+" << outer_.stop
-      << "; rr+=" << outer_.step << ")"
-      << " for (uu=rr+" << inner_.start << "; uu!=rr+" << inner_.stop
-      << "; uu+=" << inner_.step << ")"
+    if (GlobalOptions::getFeatureLoops()) {
+      g.local("i", "casadi_int");
+      g.local("j", "casadi_int");
+      g << "for (i=0;i<" << outer_.size() << ";++i) {\n"
+        << "#pragma omp simd\n"
+        << "for (j=0;j<" << inner_.size() << ";++j) "
+        << "(" << rr << ")[(i*" << outer_.step << "+" << outer_.start << ")+j*" << inner_.step << "+" << inner_.start << "] "
+        << (Add?"+=":"=") << " (" << ss << ")[i*" << inner_.size() << "+j];\n";
+      g << "}\n";
+    } else {
+      // Perform the operation inplace
+      g.local("rr", "casadi_real", "*");
+      g.local("ss", "const casadi_real", "*");
+      g.local("uu", "casadi_real", "*");
+      g << "for (rr=" << rr << "+" << outer_.start
+        << ", ss=" << ss << "; rr!="
+        << rr << "+" << outer_.stop
+        << "; rr+=" << outer_.step << ")"
+        << " for (uu=rr+" << inner_.start << "; uu!=rr+" << inner_.stop
+        << "; uu+=" << inner_.step << ")"
       << " *uu " << (Add?"+=":"=") << " *ss++;\n";
+    }
   }
 
   template<bool Add>
