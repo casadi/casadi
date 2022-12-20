@@ -1,7 +1,7 @@
 // NOLINT(legal/copyright)
 // SYMBOL "mtimes"
 template<typename T1>
-void casadi_mtimes(const T1* x, const casadi_int* sp_x, const T1* y, const casadi_int* sp_y, T1* z, const casadi_int* sp_z, T1* w, casadi_int tr) { // NOLINT(whitespace/line_length)
+void casadi_mtimes(const T1* x, const casadi_int* sp_x, const T1* y, const casadi_int* sp_y, T1* __restrict__ z, const casadi_int* sp_z, T1* __restrict__ w, casadi_int tr) { // NOLINT(whitespace/line_length)
   casadi_int ncol_x, ncol_y, ncol_z, cc;
   const casadi_int *colind_x, *row_x, *colind_y, *row_y, *colind_z, *row_z;
 

@@ -1,7 +1,7 @@
 // NOLINT(legal/copyright)
 // SYMBOL "project"
 template<typename T1>
-void casadi_project(const T1* x, const casadi_int* sp_x, T1* y, const casadi_int* sp_y, T1* w) {
+void casadi_project(const T1* x, const casadi_int* sp_x, T1* __restrict__ y, const casadi_int* sp_y, T1* __restrict__ w) {
   // x and y should be distinct
   casadi_int ncol_x, ncol_y, i, el;
   const casadi_int *colind_x, *row_x, *colind_y, *row_y;
