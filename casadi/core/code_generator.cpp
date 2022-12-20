@@ -746,10 +746,12 @@ namespace casadi {
     // Codegen auxiliary functions
     s << this->auxiliaries.str();
 
+    int align_bytes = casadi_real_type=="float" ? GlobalOptions::vector_width_real*sizeof(float) : GlobalOptions::vector_width_real*sizeof(double);
+
     // Print integer constants
     if (!integer_constants_.empty()) {
       for (casadi_int i=0; i<integer_constants_.size(); ++i) {
-        print_vector(s, "casadi_s" + str(i), integer_constants_[i], 1, false);
+        print_vector(s, "casadi_s" + str(i), integer_constants_[i], align_bytes, false);
       }
       s << endl;
     }
@@ -757,25 +759,23 @@ namespace casadi {
     // Print double constants
     if (!double_constants_.empty()) {
       for (casadi_int i=0; i<double_constants_.size(); ++i) {
-        print_vector(s, "casadi_c" + str(i), double_constants_[i], 1, false);
+        print_vector(s, "casadi_c" + str(i), double_constants_[i], align_bytes, false);
       }
       s << endl;
     }
 
     if (sz_zeros_>=0) {
-      int align_bytes = casadi_real_type=="float" ? GlobalOptions::vector_width_real*sizeof(float) : GlobalOptions::vector_width_real*sizeof(double);
       print_vector(s, "casadi_zeros", std::vector<double>(sz_zeros_), align_bytes);
       s << endl;
     }
-
     // Print file scope double work
     if (!file_scope_double_.empty()) {
       casadi_int i=0;
       for (auto size : file_scope_double_size_) {
         if (split && !common) {
-          s << "extern casadi_real casadi_rd" + str(i) + "[" + str(size) + "];\n";
+          s << "extern casadi_real casadi_rd" + str(i) + "[" + str(size) + "] __attribute__((aligned (" << align_bytes << ")));\n";
         } else {
-          s << "casadi_real casadi_rd" + str(i) + "[" + str(size) + "];\n";
+          s << "casadi_real casadi_rd" + str(i) + "[" + str(size) + "] __attribute__((aligned (" << align_bytes << ")));\n";
         }
         /*s << "#ifdef DEF_common\n";
         s << "casadi_real casadi_rd" + str(i) + "[" + str(size) + "];\n";
