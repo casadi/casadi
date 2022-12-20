@@ -868,17 +868,32 @@ namespace casadi {
     // Condegen the indices
     std::string ind = g.constant(this->nz_);
 
-    // Perform the operation inplace
-    g.local("cii", "const casadi_int", "*");
-    g.local("rr", "casadi_real", "*");
-    g.local("ss", "const casadi_real", "*");
-    g << "for (cii=" << ind << ", rr=" << g.work(res[0], this->nnz()) << ", "
-      << "ss=" << g.work(arg[1], this->dep(1).nnz()) << "; cii!=" << ind
-      << "+" << this->nz_.size() << "; ++cii, ++ss) ";
-    if (has_negative(this->nz_)) {
-      g << "if (*cii>=0) ";
+
+    if (GlobalOptions::getFeatureLoops()) {
+      g.local("i", "casadi_int");
+      std::string rr = g.work(res[0], this->nnz());
+      std::string ss = g.work(arg[1], this->dep(1).nnz());
+      g << "#pragma omp simd\n";
+      g << "for (i=0;i<" << nz_.size() << ";++i) ";
+      if (has_negative(nz_)) {
+        g << "if (ind[i]>=0) ";
+      }
+      g << "(" << rr << ")[" << ind <<"[i]] "
+        << (Add?"+=":"=") << " "
+        << ss << "[i];\n";
+    } else {
+      // Perform the operation inplace
+      g.local("cii", "const casadi_int", "*");
+      g.local("rr", "casadi_real", "*");
+      g.local("ss", "const casadi_real", "*");
+      g << "for (cii=" << ind << ", rr=" << g.work(res[0], this->nnz()) << ", "
+        << "ss=" << g.work(arg[1], this->dep(1).nnz()) << "; cii!=" << ind
+        << "+" << this->nz_.size() << "; ++cii, ++ss) ";
+      if (has_negative(this->nz_)) {
+        g << "if (*cii>=0) ";
+      }
+      g << "rr[*cii] " << (Add?"+=":"=") << " *ss;\n";
     }
-    g << "rr[*cii] " << (Add?"+=":"=") << " *ss;\n";
   }
 
   template<bool Add>
