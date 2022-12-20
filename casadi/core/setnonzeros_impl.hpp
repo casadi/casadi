@@ -905,15 +905,23 @@ namespace casadi {
       g << g.copy(g.work(arg[0], this->dep(0).nnz()), this->nnz(),
                           g.work(res[0], this->nnz())) << '\n';
     }
-
-    // Perform the operation inplace
-    g.local("rr", "casadi_real", "*");
-    g.local("ss", "const casadi_real", "*");
-    g << "for (rr=" << g.work(res[0], this->nnz()) << "+" << s_.start << ", ss="
-      << g.work(arg[1], this->dep(1).nnz()) << "; rr!="
-      << g.work(res[0], this->nnz()) << "+" << s_.stop
-      << "; rr+=" << s_.step << ")"
-      << " *rr " << (Add?"+=":"=") << " *ss++;\n";
+    std::string rr = g.work(res[0], this->nnz());
+    std::string ss = g.work(arg[1], this->dep(1).nnz());
+    if (GlobalOptions::getFeatureLoops()) {
+      g.local("i", "casadi_int");
+      g << "#pragma omp simd\n";
+      g << "for (i=0;i<" << s_.size() << ";++i) "
+        << "(" << rr << ")[i*" << s_.step << "+" << s_.start << "] " << (Add?"+=":"=") << " (" << ss << ")[i];\n";
+    } else {
+      // Perform the operation inplace
+      g.local("rr", "casadi_real", "*");
+      g.local("ss", "const casadi_real", "*");
+      g << "for (rr=" << rr << "+" << s_.start << ", ss="
+        << ss << "; rr!="
+        << rr << "+" << s_.stop
+        << "; rr+=" << s_.step << ")"
+        << " *rr " << (Add?"+=":"=") << " *ss++;\n";
+    }
   }
 
   template<bool Add>
