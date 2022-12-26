@@ -230,9 +230,19 @@ namespace casadi {
     set(m, ind1, rr.all(size1(), ind1), cc.all(size2(), ind1));
   }
 
+  void MX::add(const MX& m, bool ind1, const Slice& rr, const Slice& cc) {
+    // Fall back on (IM, IM)
+    add(m, ind1, rr.all(size1(), ind1), cc.all(size2(), ind1));
+  }
+
   void MX::set(const MX& m, bool ind1, const Slice& rr, const Matrix<casadi_int>& cc) {
     // Fall back on (IM, IM)
     set(m, ind1, rr.all(size1(), ind1), cc);
+  }
+
+  void MX::add(const MX& m, bool ind1, const Slice& rr, const Matrix<casadi_int>& cc) {
+    // Fall back on (IM, IM)
+    add(m, ind1, rr.all(size1(), ind1), cc);
   }
 
   void MX::set(const MX& m, bool ind1, const Matrix<casadi_int>& rr, const Slice& cc) {
@@ -240,15 +250,28 @@ namespace casadi {
     set(m, ind1, rr, cc.all(size2(), ind1));
   }
 
+  void MX::add(const MX& m, bool ind1, const Matrix<casadi_int>& rr, const Slice& cc) {
+    // Fall back on (IM, IM)
+    add(m, ind1, rr, cc.all(size2(), ind1));
+  }
+
   void MX::set(const MX& m, bool ind1, const Matrix<casadi_int>& rr, const Matrix<casadi_int>& cc) {
+    set_add(m, ind1, rr, cc, false);
+  }
+
+  void MX::add(const MX& m, bool ind1, const Matrix<casadi_int>& rr, const Matrix<casadi_int>& cc) {
+    set_add(m, ind1, rr, cc, true);
+  }
+
+  void MX::set_add(const MX& m, bool ind1, const Matrix<casadi_int>& rr, const Matrix<casadi_int>& cc, bool add) {
     // Row vector rr (e.g. in MATLAB) is transposed to column vector
     if (rr.size1()==1 && rr.size2()>1) {
-      return set(m, ind1, rr.T(), cc);
+      return set_add(m, ind1, rr.T(), cc, add);
     }
 
     // Row vector cc (e.g. in MATLAB) is transposed to column vector
     if (cc.size1()==1 && cc.size2()>1) {
-      return set(m, ind1, rr, cc.T());
+      return set_add(m, ind1, rr, cc.T(), add);
     }
 
     // Make sure rr and cc are dense vectors
@@ -261,11 +284,11 @@ namespace casadi {
     if (rr.size1() != m.size1() || cc.size1() != m.size2()) {
       if (m.is_scalar()) {
         // m scalar means "set all"
-        return set(repmat(m, rr.size1(), cc.size1()), ind1, rr, cc);
+        return set_add(repmat(m, rr.size1(), cc.size1()), ind1, rr, cc, add);
       } else if (rr.size1() == m.size2() && cc.size1() == m.size1()
                  && std::min(m.size1(), m.size2()) == 1) {
         // m is transposed if necessary
-        return set(m.T(), ind1, rr, cc);
+        return set_add(m.T(), ind1, rr, cc, add);
       } else {
         // Error otherwise
         casadi_error("Dimension mismatch. lhs is " + str(rr.size1()) + "-by-"
@@ -281,7 +304,7 @@ namespace casadi {
     casadi_assert_in_range(cc.nonzeros(), -sz2+ind1, sz2+ind1);
 
     // If we are assigning with something sparse, first remove existing entries
-    if (!m.is_dense()) {
+    if (!m.is_dense() && !add) {
       erase(rr.nonzeros(), cc.nonzeros(), ind1);
     }
 
@@ -297,7 +320,7 @@ namespace casadi {
         el->at(k) = this_i + this_j*sz1;
       }
     }
-    return set(m, false, el);
+    return set_add(m, false, el, add);
   }
 
   void MX::set(const MX& m, bool ind1, const Slice& rr) {
@@ -305,7 +328,20 @@ namespace casadi {
     set(m, ind1, rr.all(size1(), ind1));
   }
 
+  void MX::add(const MX& m, bool ind1, const Slice& rr) {
+    // Fall back on IM
+    add(m, ind1, rr.all(size1(), ind1));
+  }
+
   void MX::set(const MX& m, bool ind1, const Matrix<casadi_int>& rr) {
+    set_add(m, ind1, rr, false);
+  }
+
+  void MX::add(const MX& m, bool ind1, const Matrix<casadi_int>& rr) {
+    set_add(m, ind1, rr, true);
+  }
+
+  void MX::set_add(const MX& m, bool ind1, const Matrix<casadi_int>& rr, bool add) {
     // Assert dimensions of assigning matrix
     if (rr.sparsity() != m.sparsity()) {
       if (rr.size() == m.size()) {
@@ -316,18 +352,18 @@ namespace casadi {
         Sparsity sp = rr.sparsity() * m.sparsity();
 
         // Project both matrices to this sparsity
-        return set(project(m, sp), ind1, Matrix<casadi_int>::project(rr, sp));
+        return set_add(project(m, sp), ind1, Matrix<casadi_int>::project(rr, sp), add);
       } else if (m.is_scalar()) {
         // m scalar means "set all"
         if (m.is_dense()) {
-          return set(MX(rr.sparsity(), m), ind1, rr);
+          return set_add(MX(rr.sparsity(), m), ind1, rr, add);
         } else {
-          return set(MX(rr.size()), ind1, rr);
+          return set_add(MX(rr.size()), ind1, rr, add);
         }
       } else if (rr.size1() == m.size2() && rr.size2() == m.size1()
                  && std::min(m.size1(), m.size2()) == 1) {
         // m is transposed if necessary
-        return set(m.T(), ind1, rr);
+        return set_add(m.T(), ind1, rr, add);
       } else {
         // Error otherwise
         casadi_error("Dimension mismatch. lhs is " + str(rr.size())
@@ -346,7 +382,7 @@ namespace casadi {
 
     // Dense mode
     if (is_dense() && m.is_dense()) {
-      return set_nz(m, ind1, rr);
+      return set_add_nz(m, ind1, rr, add);
     }
 
     // Construct new sparsity pattern
@@ -370,7 +406,11 @@ namespace casadi {
     sparsity().get_nz(nz);
 
     // Create a nonzero assignment node
-    *this = m->get_nzassign(*this, nz);
+    if (add) {
+      *this = m->get_nzadd(*this, nz);    
+    } else {
+      *this = m->get_nzassign(*this, nz);
+    }
   }
 
   void MX::set(const MX& m, bool ind1, const Sparsity& sp) {
@@ -449,7 +489,20 @@ namespace casadi {
     set_nz(m, ind1, kk.all(nnz(), ind1));
   }
 
+  void MX::add_nz(const MX& m, bool ind1, const Slice& kk) {
+    // Fallback on IM
+    add_nz(m, ind1, kk.all(nnz(), ind1));
+  }
+
   void MX::set_nz(const MX& m, bool ind1, const Matrix<casadi_int>& kk) {
+    set_add_nz(m, ind1, kk, false);
+  }
+
+  void MX::add_nz(const MX& m, bool ind1, const Matrix<casadi_int>& kk) {
+    set_add_nz(m, ind1, kk, true);
+  }
+
+  void MX::set_add_nz(const MX& m, bool ind1, const Matrix<casadi_int>& kk, bool add) {
     casadi_assert(kk.nnz()==m.nnz() || m.nnz()==1,
       "MX::set_nz: length of non-zero indices (" + str(kk.nnz()) + ") " +
       "must match size of rhs (" + str(m.nnz()) + ").");
@@ -459,14 +512,14 @@ namespace casadi {
       if (m.is_scalar()) {
         // m scalar means "set all"
         if (!m.is_dense()) return; // Nothing to set
-        return set_nz(MX(kk.sparsity(), m), ind1, kk);
+        return set_add_nz(MX(kk.sparsity(), m), ind1, kk, add);
       } else if (kk.size() == m.size()) {
         // Project sparsity if needed
-        return set_nz(project(m, kk.sparsity()), ind1, kk);
+        return set_add_nz(project(m, kk.sparsity()), ind1, kk, add);
       } else if (kk.size1() == m.size2() && kk.size2() == m.size1()
                  && std::min(m.size1(), m.size2()) == 1) {
         // m is transposed if necessary
-        return set_nz(m.T(), ind1, kk);
+        return set_add_nz(m.T(), ind1, kk, add);
       } else {
         // Error otherwise
         casadi_error("Dimension mismatch. lhs is " + str(kk.size())
@@ -477,7 +530,7 @@ namespace casadi {
     // Call recursively if points both objects point to the same node
     if (this==&m) {
       MX m_copy = m;
-      return set_nz(m_copy, ind1, kk);
+      return set_add_nz(m_copy, ind1, kk, add);
     }
 
     // Check bounds
@@ -498,15 +551,24 @@ namespace casadi {
         if (ind1) i--;
         if (i<0) i += sz;
       }
-      return set_nz(m, false, kk_mod); // Call recursively
+      return set_add_nz(m, false, kk_mod, add); // Call recursively
     }
 
     // Create a nonzero assignment node
-    *this = m->get_nzassign(*this, kk.nonzeros());
+    if (add) {
+      *this = m->get_nzadd(*this, kk.nonzeros());
+    } else {
+      *this = m->get_nzassign(*this, kk.nonzeros());
+    }
+
   }
 
   void MX::set_nz(const MX& m, bool ind1, const MX& kk) {
     *this = m->get_nzassign(*this, ind1 ? kk-1 : kk);
+  }
+
+  void MX::add_nz(const MX& m, bool ind1, const MX& kk) {
+    *this = m->get_nzadd(*this, ind1 ? kk-1 : kk);
   }
 
   MX MX::binary(casadi_int op, const MX &x, const MX &y) {
@@ -674,7 +736,7 @@ namespace casadi {
     return axis==0 ? ret.T() : ret;
   }
 
-  MX MX::mac(const MX& x, const MX& y, const MX& z) {
+  MX MX::mac(const MX& x, const MX& y, const MX& z, const Dict& opts) {
     if (x.is_scalar() || y.is_scalar()) {
       // Use element-wise multiplication if at least one factor scalar
       return z + x*y;
@@ -693,7 +755,7 @@ namespace casadi {
     } else if (x.is_zero() || y.is_zero()) {
       return z;
     } else {
-      return x->get_mac(y, z);
+      return x->get_mac(y, z, opts);
     }
   }
 

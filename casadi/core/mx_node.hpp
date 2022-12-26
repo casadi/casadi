@@ -470,7 +470,7 @@ namespace casadi {
     /** \brief Matrix multiplication and addition
 
         \identifier{1ru} */
-    virtual MX get_mac(const MX& y, const MX& z) const;
+    virtual MX get_mac(const MX& y, const MX& z, const Dict& opts = Dict()) const;
 
     /** \brief Einstein product and addition
 

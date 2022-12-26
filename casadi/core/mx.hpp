@@ -436,6 +436,10 @@ namespace casadi {
 #ifndef SWIG
     /// Get a const pointer to the node
     MXNode* get() const;
+
+    void set_add(const MX& m, bool ind1, const Matrix<casadi_int>& rr, bool add);
+    void set_add(const MX& m, bool ind1, const Matrix<casadi_int>& rr, const Matrix<casadi_int>& cc, bool add);
+    void set_add_nz(const MX& m, bool ind1, const Matrix<casadi_int>& kk, bool add);
 #endif // SWIG
 
     ///@{
@@ -479,11 +483,25 @@ namespace casadi {
     ///@}
 
     ///@{
+    /// Add a submatrix, single argument
+    void add(const MX& m, bool ind1, const Slice& rr);
+    void add(const MX& m, bool ind1, const Matrix<casadi_int>& rr);
+    ///@}
+
+    ///@{
     /// Set a submatrix, two arguments
     void set(const MX& m, bool ind1, const Slice& rr, const Slice& cc);
     void set(const MX& m, bool ind1, const Slice& rr, const Matrix<casadi_int>& cc);
     void set(const MX& m, bool ind1, const Matrix<casadi_int>& rr, const Slice& cc);
     void set(const MX& m, bool ind1, const Matrix<casadi_int>& rr, const Matrix<casadi_int>& cc);
+    ///@}
+
+    ///@{
+    /// Add a submatrix, two arguments
+    void add(const MX& m, bool ind1, const Slice& rr, const Slice& cc);
+    void add(const MX& m, bool ind1, const Slice& rr, const Matrix<casadi_int>& cc);
+    void add(const MX& m, bool ind1, const Matrix<casadi_int>& rr, const Slice& cc);
+    void add(const MX& m, bool ind1, const Matrix<casadi_int>& rr, const Matrix<casadi_int>& cc);
     ///@}
 
     ///@{
@@ -505,6 +523,14 @@ namespace casadi {
     void set_nz(const MX& m, bool ind1, const Matrix<casadi_int>& kk);
     void set_nz(const MX& m, bool ind1, const MX& kk);
     void set_nz(const MX& m, bool ind1, casadi_int kk) { set_nz(m, ind1, Matrix<casadi_int>(kk)); }
+    ///@}
+
+    ///@{
+    /// Add a set of nonzeros
+    void add_nz(const MX& m, bool ind1, const Slice& kk);
+    void add_nz(const MX& m, bool ind1, const Matrix<casadi_int>& kk);
+    void add_nz(const MX& m, bool ind1, const MX& kk);
+    void add_nz(const MX& m, bool ind1, casadi_int kk) { add_nz(m, ind1, Matrix<casadi_int>(kk)); }
     ///@}
 
     ///@{
@@ -555,7 +581,7 @@ namespace casadi {
     static std::vector<MX> vertsplit(const MX& x, const std::vector<casadi_int>& offset);
     static MX blockcat(const std::vector< std::vector<MX > > &v);
     static MX mtimes(const MX& x, const MX& y);
-    static MX mac(const MX& x, const MX& y, const MX& z);
+    static MX mac(const MX& x, const MX& y, const MX& z, const Dict& opts = Dict());
     static MX reshape(const MX& x, casadi_int nrow, casadi_int ncol);
     static MX reshape(const MX& x, const Sparsity& sp);
     static MX sparsity_cast(const MX& x, const Sparsity& sp);

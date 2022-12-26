@@ -525,7 +525,7 @@ namespace casadi {
   }
 
 
-  MX MXNode::get_mac(const MX& y, const MX& z) const {
+  MX MXNode::get_mac(const MX& y, const MX& z, const Dict& opts) const {
     if (sparsity().is_orthonormal() && y.is_column() && y.is_dense() && y.sparsity()==z.sparsity() && z.is_zero()) {
       std::vector<casadi_int> perm = sparsity().permutation();
       MX nz = sparsity_cast(shared_from_this<MX>(), Sparsity::dense(nnz()));
@@ -544,7 +544,7 @@ namespace casadi {
     if (x.is_row() && y.is_column()) return z+dot(x,y.T());
 
     if (x.is_dense() && y.is_dense() && z.is_dense()) {
-      return MX::create(new DenseMultiplication(z, x, y));
+      return MX::create(new DenseMultiplication(z, x, y, opts));
     } else {
       return MX::create(new Multiplication(z, x, y));
     }
