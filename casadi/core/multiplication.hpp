@@ -44,7 +44,7 @@ namespace casadi {
     /** \brief  Constructor
 
         \identifier{11i} */
-    Multiplication(const MX& z, const MX& x, const MX& y);
+    Multiplication(const MX& z, const MX& x, const MX& y, const Dict& opts=Dict());
 
     /** \brief  Destructor
 
@@ -151,8 +151,8 @@ namespace casadi {
     /** \brief  Constructor
 
         \identifier{11y} */
-    DenseMultiplication(const MX& z, const MX& x, const MX& y)
-        : Multiplication(z, x, y) {}
+    DenseMultiplication(const MX& z, const MX& x, const MX& y, const Dict& opts=Dict())
+        : Multiplication(z, x, y, opts) {}
 
     /** \brief  Destructor
 

@@ -35,7 +35,7 @@ using namespace std;
 
 namespace casadi {
 
-  Multiplication::Multiplication(const MX& z, const MX& x, const MX& y) {
+  Multiplication::Multiplication(const MX& z, const MX& x, const MX& y, const Dict& opts) {
     casadi_assert(x.size2() == y.size1() && x.size1() == z.size1()
       && y.size2() == z.size2(),
       "Multiplication::Multiplication: dimension mismatch. Attempting to multiply "
