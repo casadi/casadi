@@ -96,9 +96,15 @@ namespace casadi {
   void Dot::generate(CodeGenerator& g,
                       const std::vector<casadi_int>& arg,
                       const std::vector<casadi_int>& res, bool prefer_inline) const {
-    g << g.workel(res[0]) << " = "
+
+    g.local("r","casadi_real");
+    g << "r=0.0;\n";
+    g << "#pragma omp simd reduction(+:r)\n";
+    g << "for (i=0;i<" << dep().nnz() << ";++i) r += (" << g.work(arg[0], dep(0).nnz()) << ")[i]*(" << g.work(arg[1], dep(1).nnz()) << ")[i];\n";
+    g << g.workel(res[0]) << " = r;\n";          
+    /*g << g.workel(res[0]) << " = "
       << g.dot(dep().nnz(), g.work(arg[0], dep(0).nnz()), g.work(arg[1], dep(1).nnz()))
-      << ";\n";
+      << ";\n";*/
   }
 
 } // namespace casadi
