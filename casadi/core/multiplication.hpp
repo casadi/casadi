@@ -106,7 +106,7 @@ namespace casadi {
     casadi_int op() const override { return OP_MTIMES;}
 
     /// Can the operation be performed inplace (i.e. overwrite the result)
-    casadi_int n_inplace() const override { return 1;}
+    casadi_int n_inplace() const override { return n_dep()==3;}
 
     /** \brief Check if two nodes are equivalent up to a given depth
 
