@@ -27,6 +27,7 @@
 #define CASADI_SPARSITY_INTERFACE_HPP
 
 #include "casadi_misc.hpp"
+#include "generic_type.hpp"
 
 namespace casadi {
   /** \brief Empty Base
@@ -318,8 +319,8 @@ namespace casadi {
 
         \identifier{3x} */
     inline friend MatType
-      mac(const MatType &x, const MatType &y, const MatType &z) {
-      return MatType::mac(x, y, z);
+      mac(const MatType &x, const MatType &y, const MatType &z, const Dict& opts=Dict()) {
+      return MatType::mac(x, y, z, opts);
     }
 
     /** \brief Transpose

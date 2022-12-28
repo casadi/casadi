@@ -118,7 +118,7 @@ namespace casadi {
     /** \brief Get required length of w field
 
         \identifier{11t} */
-    size_t sz_w() const override { return sparsity().size1();}
+    size_t sz_w() const override { return trans_x_ ? sparsity().size2() : sparsity().size1();}
 
     /** \brief Serialize specific part of node
 
@@ -130,11 +130,17 @@ namespace casadi {
         \identifier{11v} */
     static MXNode* deserialize(DeserializingStream& s);
 
+    /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream& s) const override;
+
   protected:
     /** \brief Deserializing constructor
 
         \identifier{11w} */
-    explicit Multiplication(DeserializingStream& s) : MXNode(s) {}
+    explicit Multiplication(DeserializingStream& s);
+
+    bool trans_x_;
+    bool trans_y_;
   };
 
 
@@ -151,8 +157,8 @@ namespace casadi {
     /** \brief  Constructor
 
         \identifier{11y} */
-    DenseMultiplication(const MX& z, const MX& x, const MX& y, const Dict& opts=Dict())
-        : Multiplication(z, x, y, opts) {}
+    DenseMultiplication(const MX& z, const MX& x, const MX& y, const Dict& opts=Dict()) :
+        Multiplication(z, x, y, opts) {}
 
     /** \brief  Destructor
 

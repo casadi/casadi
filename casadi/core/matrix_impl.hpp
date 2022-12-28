@@ -1115,7 +1115,8 @@ namespace casadi {
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::mac(const Matrix<Scalar> &x,
                                          const Matrix<Scalar> &y,
-                                         const Matrix<Scalar> &z) {
+                                         const Matrix<Scalar> &z,
+                                         const Dict& opts) {
     if (x.is_scalar() || y.is_scalar()) {
       // Use element-wise multiplication if at least one factor scalar
       return z + x*y;

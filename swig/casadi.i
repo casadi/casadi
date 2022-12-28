@@ -2981,8 +2981,8 @@ namespace casadi{
  DECL M casadi_mtimes(const std::vector< M > &args) {
  return mtimes(args);
  }
- DECL M casadi_mac(const M& X, const M& Y, const M& Z) {
- return mac(X, Y, Z);
+ DECL M casadi_mac(const M& X, const M& Y, const M& Z, const Dict& opts=Dict()) {
+ return mac(X, Y, Z, opts);
  }
  DECL M casadi_transpose(const M& X) {
  return X.T();

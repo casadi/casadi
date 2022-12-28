@@ -201,6 +201,7 @@ namespace casadi {
   }
 
   bool CASADI_EXPORT is_slice2(const std::vector<casadi_int>& v) {
+    // (start_inner+step_inner*i) + (start_outer+step_outer*j)
     // Does not pick up x = MX.sym("x",13,17)
     // y = x[:10,3:12]
 
