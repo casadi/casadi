@@ -217,8 +217,6 @@ namespace casadi {
 
   string CodeGenerator::add_dependency(const Function& f, const Instance& inst, const Function& owner) {
 
-    uout() << "Add dependency" << f.name() << " by " << owner.name() << "stored" << added_functions_.size() << std::endl;
-
     /*std::string prefix = "_";
     for (bool b : arg_null) prefix+= b ? 'n' : 'r';
     prefix += "_";
@@ -233,14 +231,12 @@ namespace casadi {
           dep.insert(e);
         }
       }
-      uout() << "Add dependency return " << e.codegen_name << std::endl;
       return e.codegen_name;
     }
 
     // Give it a name
     string fname = shorthand("f" + str(added_functions_.size()));
 
-    uout() << "Add dependency fname " << fname << std::endl;
 
     // Add to list of functions
     added_functions_.push_back({f, fname, inst});
