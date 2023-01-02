@@ -114,9 +114,9 @@ struct casadi_qp_data {
   // Smallest diagonal value for the QR factorization
   T1 mina;
   casadi_int imina;
-  // Primal and dual error, corresponding index
-  T1 pr, du, epr, edu;
-  casadi_int ipr, idu;
+  // Primal, dual complementary slackness error, corresponding index
+  T1 pr, du, epr, edu, co;
+  casadi_int ipr, idu, ico;
   // Pending active-set change
   casadi_int index, sign;
   // Feasibility restoration active-set change
@@ -235,6 +235,28 @@ void casadi_qp_du(casadi_qp_data<T1>* d) {
     } else if (d->infeas[i] < -d->du) {
       d->du = -d->infeas[i];
       d->idu = i;
+    }
+  }
+}
+
+// SYMBOL "qp_co"
+template<typename T1>
+void casadi_qp_co(casadi_qp_data<T1>* d) {
+  // Calculate largest complementary constraint violation
+  casadi_int i;
+  T1 abs_co;
+  const casadi_qp_prob<T1>* p = d->prob;
+  abs_co = d->co = 0;
+  d->ico = -1;
+  for (i=0; i < p->nz; ++i) {
+    if (d->lam[i] > 0 && d->z[i] + abs_co < d->ubz[i]) {
+      abs_co = d->ubz[i] - d->z[i];
+      d->co = abs_co;
+      d->ico = i;
+    } else if (d->lam[i] < 0 && d->z[i] - abs_co > d->lbz[i]) {
+      abs_co = d->z[i] - d->lbz[i];
+      d->co = -abs_co;
+      d->ico = i;
     }
   }
 }
@@ -974,9 +996,10 @@ void casadi_qp_calc_dependent(casadi_qp_data<T1>* d) {
     // Update dual infeasibility
     d->infeas[i] += d->lam[i];
   }
-  // Calculate primal and dual error
+  // Calculate optimality condition error
   casadi_qp_pr(d);
   casadi_qp_du(d);
+  casadi_qp_co(d);
   // Acceptable primal and dual error
   d->epr = fmax(d->pr, (0.5 * p->constr_viol_tol / p->dual_inf_tol) * d->du);
   d->edu = fmax(d->du, (0.5 * p->dual_inf_tol / p->constr_viol_tol) * d->pr);
@@ -1112,8 +1135,8 @@ template<typename T1>
 int casadi_qp_print_header(casadi_qp_data<T1>* d, char* buf, size_t buf_sz) {
   int flag;
   // Print to string
-  flag = snprintf(buf, buf_sz, "%5s %5s %9s %9s %5s %9s %5s %9s %5s %9s  %4s",
-          "Iter", "Sing", "fk", "|pr|", "con", "|du|", "var",
+  flag = snprintf(buf, buf_sz, "%5s %5s %9s %9s %5s %9s %5s %9s %5s %9s %5s %9s  %4s",
+          "Iter", "Sing", "fk", "|pr|", "con", "|du|", "var", "|co|", "var",
           "min_R", "con", "last_tau", "Note");
   // Check if error
   if (flag < 0) {
@@ -1181,9 +1204,11 @@ int casadi_qp_print_iteration(casadi_qp_data<T1>* d, char* buf, int buf_sz) {
   int flag;
   // Print iteration data without note to string
   flag = snprintf(buf, buf_sz,
-    "%5d %5d %9.2g %9.2g %5d %9.2g %5d %9.2g %5d %9.2g  ",
-    static_cast<int>(d->iter), static_cast<int>(d->sing), d->f, d->pr,
-    static_cast<int>(d->ipr), d->du, static_cast<int>(d->idu),
+    "%5d %5d %9.2g %9.2g %5d %9.2g %5d %9.2g %5d %9.2g %5d %9.2g  ",
+    static_cast<int>(d->iter), static_cast<int>(d->sing), d->f,
+    d->pr, static_cast<int>(d->ipr),
+    d->du, static_cast<int>(d->idu),
+    d->co, static_cast<int>(d->ico),
     d->mina, static_cast<int>(d->imina), d->tau);
   // Check if error
   if (flag < 0) {
