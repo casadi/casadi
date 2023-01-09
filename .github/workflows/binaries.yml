@@ -114,9 +114,9 @@ jobs:
       - uses: chetan/git-restore-mtime-action@v1
       - name: Setup dockcross
         run: |
-          docker pull dockcross/${{ matrix.target }}:latest
-          docker image inspect dockcross/${{ matrix.target }}:latest
-          docker run --rm dockcross/${{ matrix.target }}:latest > dockcross
+          docker pull ghcr.io/jgillis/${{ matrix.target }}:production
+          docker image inspect ghcr.io/jgillis/${{ matrix.target }}:production
+          docker run --rm ghcr.io/jgillis/${{ matrix.target }}:production > dockcross
           chmod +x dockcross
           pwd
           ls -al dockcross
@@ -275,8 +275,8 @@ jobs:
       - run: unzip core-dockcross-${{ matrix.arch }}.zip
       - name: Setup dockcross
         run: |
-          docker pull dockcross/${{ matrix.arch }}:latest
-          docker run --rm dockcross/${{ matrix.arch }}:latest > dockcross
+          docker pull ghcr.io/jgillis/${{ matrix.arch }}:production
+          docker run --rm ghcr.io/jgillis/${{ matrix.arch }}:production > dockcross
           chmod +x dockcross
       - uses: meco-group/mockups@v18
         with:
@@ -358,8 +358,8 @@ jobs:
       - run: unzip core-dockcross-${{ matrix.arch }}.zip
       - name: Setup dockcross
         run: |
-          docker pull dockcross/${{ matrix.arch }}:latest
-          docker run --rm dockcross/${{ matrix.arch }}:latest > dockcross
+          docker pull ghcr.io/jgillis/${{ matrix.arch }}:production
+          docker run --rm ghcr.io/jgillis/${{ matrix.arch }}:production > dockcross
           chmod +x dockcross
       - run: echo ${{env.GITHUB_WORKSPACE}}
       - run: cat $GITHUB_ENV
