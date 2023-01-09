@@ -478,6 +478,44 @@ class NLPtests(casadiTestCase):
       if "codegen" in features:
         self.check_codegen(solver,solver_in,std="c99")
 
+  @requires_nlpsol("ipopt")
+  def test_ipopt_solver(self):
+
+    solvers = ["mumps"]
+    if 'spral' in CasadiMeta.feature_list():
+        solvers.append("spral")
+    if has_linsol("ma27"):
+        solvers.append("ma27")
+
+    x=SX.sym("x")
+    y=SX.sym("y")
+
+    obj = (1-x)**2+100*(y-x**2)**2
+    nlp={'x':vertcat(*[x,y]), 'f':obj, 'g':x**2+y**2}
+
+    c_r = 4.56748075136258e-02;
+    x_r = [7.86415156987791e-01,6.17698316967954e-01]
+
+    DM.set_precision(16)
+    for solver in solvers:
+      print("ipopt.linear_solver", solver)
+      solver = nlpsol("mysolver", "ipopt", nlp, {"ipopt.linear_solver": solver})
+      solver_in = {}
+      solver_in["x0"]=[0.5,0.5]
+      solver_in["lbx"]=[-10]*2
+      solver_in["ubx"]=[10]*2
+      solver_in["lbg"]=[0]
+      solver_in["ubg"]=[1]
+      solver_out = solver(**solver_in)
+      solver_out = solver_out
+      digits = 7
+      self.assertAlmostEqual(solver_out["f"][0],c_r,digits,str(solver))
+      self.assertAlmostEqual(solver_out["x"][0],x_r[0],digits,str(solver))
+      self.assertAlmostEqual(solver_out["x"][1],x_r[1],digits,str(solver))
+      print(solver.stats())
+
+    DM.set_precision(8)
+    
   def test_warmstart(self):
 
     x=SX.sym("x")
@@ -486,6 +524,7 @@ class NLPtests(casadiTestCase):
     obj = (1-x)**2+100*(y-x**2)**2
     nlp={'x':vertcat(*[x,y]), 'f':obj, 'g':x**2+y**2}
 
+    
     c_r = 4.56748075136258e-02;
     x_r = [7.86415156987791e-01,6.17698316967954e-01]
 

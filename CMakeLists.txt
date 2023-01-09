@@ -726,6 +726,12 @@ set(BUILD_METIS_TP_VERSION "2.0.0")
 option(WITH_BUILD_MUMPS "Build MUMPS (BUILD_MUMPS_TP_VERSION=${BUILD_MUMPS_TP_VERSION}) from downloaded source." OFF)
 set(BUILD_MUMPS_DEPENDENCIES LAPACK)
 
+# SPRAL
+option(WITH_SPRAL "Enable SPRAL interface" OFF)
+set(BUILD_SPRAL_VERSION "d385d2c9e858366d257cafaaf05760ffa6543e26")
+option(WITH_BUILD_SPRAL "Build SPRAL (BUILD_SPRAL_VERSION=${BUILD_SPRAL_VERSION}) from downloaded source." OFF)
+set(BUILD_SPRAL_DEPENDENCIES LAPACK)
+
 # HSL: Sparse direct linear solvers
 option(WITH_HSL "Enable HSL interface" OFF)
 if(WITH_HSL)
@@ -761,7 +767,7 @@ function(libraries2flags libraries out)
 endfunction()
 
 # Packages must be sorted from high to low in the dependency graph
-foreach(PKG HIGHS BONMIN IPOPT CBC CLP MUMPS HPIPM BLASFEO LAPACK)
+foreach(PKG HIGHS BONMIN IPOPT CBC CLP MUMPS SPRAL METIS HPIPM BLASFEO LAPACK)
   string(TOLOWER ${PKG} PKG_LOWER)
   if(WITH_${PKG})
     if(NOT WITH_BUILD_${PKG})
@@ -897,10 +903,15 @@ message(STATUS "CMAKE_SYSTEM_NAME: ${CMAKE_SYSTEM_NAME} ${WIN32}")
 
 add_feature_info(lapack-interface WITH_LAPACK "Interface to LAPACK.")
 
-if(WITH_MUMPS)
-  if(WITH_BUILD_MUMPS)
-    add_feature_info(metis-sourcebuild ON "Build METIS (BUILD_METIS_TP_VERSION=${BUILD_METIS_TP_VERSION}) from downloaded source.")
-    ExternalProject_Add(metis-external
+if (WITH_MUMPS OR WITH_SPRAL)
+  set(WITH_COINMETIS ON)
+  set(WITH_BUILD_COINMETIS ON)
+endif()
+
+if(WITH_COINMETIS)
+  if(WITH_BUILD_COINMETIS)
+    add_feature_info(coinmetis-sourcebuild ON "Build METIS (BUILD_METIS_TP_VERSION=${BUILD_METIS_TP_VERSION}) from downloaded source.")
+    ExternalProject_Add(coinmetis-external
         GIT_REPOSITORY https://github.com/coin-or-tools/ThirdParty-Metis.git
         GIT_TAG releases/${BUILD_METIS_TP_VERSION}
         DEPENDS ${LAPACK_DEPENDS_TARGET}
@@ -911,18 +922,27 @@ if(WITH_MUMPS)
           # GKFree is not defined (variadic definition in utils.c); fails on MacOS target
           "CFLAGS=-Wno-implicit-function-declaration"
         PATCH_COMMAND COMMAND cd <SOURCE_DIR> && ./get.Metis)
-    set(EXTERNAL_METIS_LIBS coinmetis)
+    add_library(coinmetis INTERFACE IMPORTED)
+    set_target_properties(coinmetis PROPERTIES
+      INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include/coin-or/metis"
+      IMPORTED_LIBNAME "coinmetis"
+    )
 
-    set(DEPENDENT_LIBRARIES ${DEPENDENT_LIBRARIES} ${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}${EXTERNAL_METIS_LIBS}${CMAKE_SHARED_LIBRARY_SUFFIX})
+  endif()
+endif()
 
+if(WITH_MUMPS)
+  if(WITH_BUILD_MUMPS)
+    get_target_property(METIS_INCLUDE_DIR coinmetis INTERFACE_INCLUDE_DIRECTORIES)
+    get_target_property(METIS_LIB coinmetis IMPORTED_LIBNAME)
     ExternalProject_Add(mumps-external
-        DEPENDS metis-external
+        DEPENDS coinmetis-external
         GIT_REPOSITORY https://github.com/coin-or-tools/ThirdParty-Mumps.git
         GIT_TAG releases/${BUILD_MUMPS_TP_VERSION}
-        DEPENDS ${LAPACK_DEPENDS_TARGET} metis-external
+        DEPENDS ${LAPACK_DEPENDS_TARGET} coinmetis-external
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
-        CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS}  --prefix=<INSTALL_DIR> "--with-metis-cflags=-I${CMAKE_BINARY_DIR}/external_projects/include/coin-or/metis" "--with-metis-lflags=-L${CMAKE_BINARY_DIR}/external_projects/lib -l${EXTERNAL_METIS_LIBS} -lm" "--with-lapack-lflags=${LAPACK_LFLAGS}" ${CROSS_FLAGS_FORTRAN}
+        CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS}  --prefix=<INSTALL_DIR> "--with-metis-cflags=-I${METIS_INCLUDE_DIR}" "--with-metis-lflags=-L${CMAKE_BINARY_DIR}/external_projects/lib -l${METIS_LIB} -lm" "--with-lapack-lflags=${LAPACK_LFLAGS}" ${CROSS_FLAGS_FORTRAN}
         PATCH_COMMAND COMMAND cd <SOURCE_DIR> && ./get.Mumps)
 
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/coin-or")
@@ -935,6 +955,30 @@ if(WITH_MUMPS)
   endif()
 endif()
 add_feature_info(mumps-interface WITH_MUMPS "Interface to MUMPS.")
+
+set(SPRAL_DEPENDS_TARGET )
+set(SPRAL_FLAGS )
+
+message("WITH_SPRAL ${WITH_SPRAL} WITH_BUILD_SPRAL ${WITH_BUILD_SPRAL}")
+if(WITH_SPRAL)
+  if(WITH_BUILD_SPRAL)
+    get_target_property(METIS_INCLUDE_DIR coinmetis INTERFACE_INCLUDE_DIRECTORIES)
+    get_target_property(METIS_LIB coinmetis IMPORTED_LIBNAME)
+    ExternalProject_Add(spral-external
+        DEPENDS coinmetis-external
+        GIT_REPOSITORY https://github.com/ralna/spral.git
+        GIT_TAG ${BUILD_SPRAL_VERSION}
+        DEPENDS ${LAPACK_DEPENDS_TARGET}
+        PREFIX "${CMAKE_BINARY_DIR}/external_projects"
+        UPDATE_COMMAND ""
+        CONFIGURE_COMMAND autoreconf -ivf -I /usr/share/aclocal <SOURCE_DIR> COMMAND CFLAGS=-fPIC CXXFLAGS=-fPIC FFLAGS=-fPIC FCFLAGS=-fPIC <SOURCE_DIR>/configure ${CROSS_FLAGS} --disable-gpu --prefix=<INSTALL_DIR> --disable-openmp "--with-metis-inc-dir=${METIS_INCLUDE_DIR}" "--with-metis=-L${CMAKE_BINARY_DIR}/external_projects/lib -l${METIS_LIB} -lm" "--with-lapack=${LAPACK_LFLAGS}" "--with-blas=${LAPACK_LFLAGS}" ${CROSS_FLAGS_FORTRAN})
+    set(SPRAL_DEPENDS_TARGET spral-external)
+    set(SPRAL_FLAGS "--with-spral-cflags=-I${CMAKE_BINARY_DIR}/external_projects/include"
+        "--with-spral-lflags=-L${CMAKE_BINARY_DIR}/external_projects/lib -lspral -lgfortran -lm -lcoinmetis ${LAPACK_LFLAGS}")
+    install(FILES ${CMAKE_BINARY_DIR}/external_projects/src/spral-external/LICENCE DESTINATION ${INCLUDE_PREFIX}/licenses RENAME spral.txt)
+  endif()
+endif()
+add_feature_info(spral-interface WITH_SPRAL "Interface to SPRAL.")
 
 if(WITH_CLP)
   if(WITH_BUILD_CLP)
@@ -1041,11 +1085,13 @@ add_feature_info(cbc-interface WITH_CBC "Interface to the LP solver CBC.")
 if(WITH_IPOPT)
   if(WITH_BUILD_IPOPT)
     ExternalProject_Add(ipopt-external
-        DEPENDS ${LAPACK_DEPENDS_TARGET} mumps-external
+        DEPENDS ${LAPACK_DEPENDS_TARGET} mumps-external ${SPRAL_DEPENDS_TARGET} 
         URL https://www.coin-or.org/download/source/Ipopt/Ipopt-${BUILD_IPOPT_VERSION}.zip
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
-        CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR> "--with-mumps-cflags=-I${CMAKE_BINARY_DIR}/external_projects/include/coin-or/mumps" "--with-mumps-lflags=-L${CMAKE_BINARY_DIR}/external_projects/lib ${WHOLE_ARCHIVE_ON}-lcoinmumps ${WHOLE_ARCHIVE_OFF}" "--with-lapack-lflags= ${LAPACK_LFLAGS}" ${CROSS_FLAGS_FORTRAN}
+        CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR> "--with-mumps-cflags=-I${CMAKE_BINARY_DIR}/external_projects/include/coin-or/mumps" "--with-mumps-lflags=-L${CMAKE_BINARY_DIR}/external_projects/lib ${WHOLE_ARCHIVE_ON}-lcoinmumps ${WHOLE_ARCHIVE_OFF}"
+        ${SPRAL_FLAGS}
+        "--with-lapack-lflags= ${LAPACK_LFLAGS}" ${CROSS_FLAGS_FORTRAN}
 	# For unknown reasons, Coin-or/configure disables pkg-config by default for clang compilers 
 	--enable-pkg-config
 	)
@@ -1065,7 +1111,7 @@ add_feature_info(ipopt-interface WITH_IPOPT "Interface to the NLP solver Ipopt."
 if(WITH_BONMIN)
   if(WITH_BUILD_BONMIN)
     ExternalProject_Add(bonmin-external
-        DEPENDS mumps-external metis-external coinutils-external osi-external clp-external cgl-external cbc-external ipopt-external
+        DEPENDS mumps-external coinmetis-external coinutils-external osi-external clp-external cgl-external cbc-external ipopt-external
         GIT_REPOSITORY https://github.com/coin-or/Bonmin.git
         GIT_TAG releases/${BUILD_BONMIN_VERSION}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
