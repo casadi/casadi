@@ -1337,7 +1337,7 @@ class Integrationtests(casadiTestCase):
       yield (dae,1,init_strength,init,1e-8)
 
 
-      # S. Mattsson and G. Söderlind, Index reduction in differential-algebraic equations using dummy derivatives
+      # S. Mattsson and G. Soederlind, Index reduction in differential-algebraic equations using dummy derivatives
 
       x1 = SX.sym("x1")
       x2 = SX.sym("x2")
