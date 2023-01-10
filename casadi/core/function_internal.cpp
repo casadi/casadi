@@ -552,7 +552,8 @@ namespace casadi {
       is_diff_in_.resize(n_in_);
       for (casadi_int i = 0; i < n_in_; ++i) is_diff_in_[i] = get_diff_in(i);
     } else {
-      casadi_assert_dev(n_in_ == is_diff_in_.size());
+      casadi_assert(n_in_ == is_diff_in_.size(), "Function " + name_ + " has " + str(n_in_)
+        + " inputs, but is_diff_in has length " + str(is_diff_in_.size()) + ".");
     }
 
     // Query which outputs are differentiable if not already provided
@@ -560,7 +561,8 @@ namespace casadi {
       is_diff_out_.resize(n_out_);
       for (casadi_int i = 0; i < n_out_; ++i) is_diff_out_[i] = get_diff_out(i);
     } else {
-      casadi_assert_dev(n_out_ == is_diff_out_.size());
+      casadi_assert(n_out_ == is_diff_out_.size(), "Function " + name_ + " has " + str(n_out_)
+        + " outputs, but is_diff_out has length " + str(is_diff_out_.size()) + ".");
     }
 
     // Query input sparsities if not already provided
@@ -568,7 +570,8 @@ namespace casadi {
       sparsity_in_.resize(n_in_);
       for (casadi_int i=0; i<n_in_; ++i) sparsity_in_[i] = get_sparsity_in(i);
     } else {
-      casadi_assert_dev(sparsity_in_.size() == n_in_);
+      casadi_assert(sparsity_in_.size() == n_in_, "Function " + name_ + " has " + str(n_in_)
+        + " inputs, but sparsity_in has length " + str(sparsity_in_.size()) + ".");
     }
 
     // Query output sparsities if not already provided
@@ -576,7 +579,8 @@ namespace casadi {
       sparsity_out_.resize(n_out_);
       for (casadi_int i=0; i<n_out_; ++i) sparsity_out_[i] = get_sparsity_out(i);
     } else {
-      casadi_assert_dev(sparsity_out_.size() == n_out_);
+      casadi_assert(sparsity_out_.size() == n_out_, "Function " + name_ + " has " + str(n_out_)
+        + " outputs, but sparsity_out has length " + str(sparsity_out_.size()) + ".");
     }
 
     // Query input names if not already provided
@@ -584,7 +588,8 @@ namespace casadi {
       name_in_.resize(n_in_);
       for (casadi_int i=0; i<n_in_; ++i) name_in_[i] = get_name_in(i);
     } else {
-      casadi_assert_dev(name_in_.size()==n_in_);
+      casadi_assert(name_in_.size()==n_in_, "Function " + name_ + " has " + str(n_in_)
+        + " inputs, but name_in has length " + str(name_in_.size()) + ".");
     }
 
     // Query output names if not already provided
@@ -592,7 +597,8 @@ namespace casadi {
       name_out_.resize(n_out_);
       for (casadi_int i=0; i<n_out_; ++i) name_out_[i] = get_name_out(i);
     } else {
-      casadi_assert_dev(name_out_.size()==n_out_);
+      casadi_assert(name_out_.size()==n_out_, "Function " + name_ + " has " + str(n_out_)
+        + " outputs, but name_out has length " + str(name_out_.size()) + ".");
     }
 
     // Allocate memory for function inputs and outputs
