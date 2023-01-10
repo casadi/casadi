@@ -117,7 +117,7 @@ namespace casadi {
     ///@}
 
     /// Reconstruct options dict
-    virtual Dict generate_options(bool is_temp=false) const;
+    virtual Dict generate_options(const std::string& target) const;
 
     /** \brief Print list of options
 
@@ -300,7 +300,7 @@ namespace casadi {
     ///@}
 
     /// Reconstruct options dict
-    Dict generate_options(bool is_temp=false) const override;
+    Dict generate_options(const std::string& target) const override;
 
     /** \brief Change option after object creation for debugging
 

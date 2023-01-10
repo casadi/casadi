@@ -138,7 +138,7 @@ namespace casadi {
     Dict get_stats(void* mem) const override;
 
     /// Reconstruct options dict
-    Dict generate_options(bool is_temp) const override;
+    Dict generate_options(const std::string& target="clone") const override;
 
     /** \brief  Initialize
 

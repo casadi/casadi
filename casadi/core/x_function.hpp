@@ -870,7 +870,7 @@ namespace casadi {
                  const std::vector<std::string>& onames,
                  const Dict& opts) const {
     try {
-      Dict tmp_options = generate_options(true);
+      Dict tmp_options = generate_options("tmp");
       // Temporary single-input, single-output function FIXME(@jaeandersson)
       Function tmp("flattened_" + name, {veccat(in_)}, {veccat(out_)}, tmp_options);
 
@@ -1088,7 +1088,7 @@ namespace casadi {
           const Dict& opts) const {
     using namespace std;
 
-    Dict g_ops = generate_options();
+    Dict g_ops = generate_options("clone");
     Dict f_options;
     f_options["helper_options"] = g_ops;
     f_options["final_options"] = g_ops;

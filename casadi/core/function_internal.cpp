@@ -355,7 +355,7 @@ namespace casadi {
     }
   }
 
-  Dict ProtoFunction::generate_options(bool is_temp) const {
+  Dict ProtoFunction::generate_options(const std::string& target) const {
     Dict opts;
     opts["verbose"] = verbose_;
     opts["print_time"] = print_time_;
@@ -365,12 +365,12 @@ namespace casadi {
     return opts;
   }
 
-  Dict FunctionInternal::generate_options(bool is_temp) const {
-    Dict opts = ProtoFunction::generate_options(is_temp);
+  Dict FunctionInternal::generate_options(const std::string& target) const {
+    Dict opts = ProtoFunction::generate_options(target);
     opts["jac_penalty"] = jac_penalty_;
     opts["user_data"] = user_data_;
     opts["inputs_check"] = inputs_check_;
-    if (!is_temp) opts["jit"] = jit_;
+    if (target!="tmp") opts["jit"] = jit_;
     opts["jit_cleanup"] = jit_cleanup_;
     opts["jit_serialize"] = jit_serialize_;
     opts["compiler"] = compiler_plugin_;
@@ -382,6 +382,15 @@ namespace casadi {
     opts["always_inline"] = always_inline_;
     opts["never_inline"] = never_inline_;
     opts["max_num_dir"] = max_num_dir_;
+    if (target=="clone" || target=="tmp") {
+      opts["enable_forward"] = enable_forward_op_;
+      opts["enable_reverse"] = enable_reverse_op_;
+      opts["enable_jacobian"] = enable_jacobian_op_;
+      opts["enable_fd"] = enable_fd_op_;
+      opts["reverse_options"] = reverse_options_;
+      opts["forward_options"] = forward_options_;
+      opts["derivative_of"] = derivative_of_;
+    }
     opts["fd_options"] = fd_options_;
     opts["fd_method"] = fd_method_;
     opts["print_in"] = print_in_;
@@ -1977,7 +1986,7 @@ namespace casadi {
       std::vector<std::string> onames;
       for (i=0; i<n_out_; ++i) onames.push_back("fwd_" + name_out_[i]);
       // Options
-      Dict opts = combine(forward_options_, generate_options());
+      Dict opts = combine(forward_options_, generate_options("forward"));
       if (!enable_forward_) opts = fd_options_;
       opts["derivative_of"] = self();
       // Generate derivative function
@@ -2035,7 +2044,7 @@ namespace casadi {
       std::vector<std::string> onames;
       for (casadi_int i=0; i<n_in_; ++i) onames.push_back("adj_" + name_in_[i]);
       // Options
-      Dict opts = combine(reverse_options_, generate_options());
+      Dict opts = combine(reverse_options_, generate_options("reverse"));
       opts["derivative_of"] = self();
       // Generate derivative function
       casadi_assert_dev(enable_reverse_);
