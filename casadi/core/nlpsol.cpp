@@ -597,9 +597,9 @@ namespace casadi {
 
     // Detect ill-posed problems (simple bounds)
     for (casadi_int i=0; i<nx_; ++i) {
-      double lb = d_nlp->lbx[i];
-      double ub = d_nlp->ubx[i];
-      double x0 = d_nlp->x0[i];
+      double lb = d_nlp->lbx ? d_nlp->lbx[i] : get_default_in(NLPSOL_LBX);
+      double ub = d_nlp->ubx ? d_nlp->ubx[i] : get_default_in(NLPSOL_UBX);
+      double x0 = d_nlp->x0 ? d_nlp->x0[i] : get_default_in(NLPSOL_X0);
       casadi_assert(lb <= ub && lb!=inf && ub!=-inf,
           "Ill-posed problem detected: "
           "LBX[" + str(i) + "] <= UBX[" + str(i) + "] was violated. "
@@ -614,8 +614,8 @@ namespace casadi {
 
     // Detect ill-posed problems (nonlinear bounds)
     for (casadi_int i=0; i<nnz_out(NLPSOL_G); ++i) {
-      double lb = d_nlp->lbg[i];
-      double ub = d_nlp->ubg[i];
+      double lb = d_nlp->lbg ? d_nlp->lbg[i] : get_default_in(NLPSOL_LBG);
+      double ub = d_nlp->ubg ? d_nlp->ubg[i] : get_default_in(NLPSOL_UBG);
       casadi_assert(lb <= ub && lb!=inf && ub!=-inf,
         "Ill-posed problem detected: "
         "LBG[" + str(i) + "] <= UBG[" + str(i) + "] was violated. "
