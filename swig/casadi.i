@@ -3599,6 +3599,12 @@ DECL M casadi_convexify(const M& H,
         const Dict& opts = Dict()) {
   return convexify(H, opts);
 }
+DECL M casadi_stop_diff(const M& expr, casadi_int order) {
+  return stop_diff(expr, order);
+}
+DECL M casadi_stop_diff(const M& expr, const M& var, casadi_int order) {
+  return stop_diff(expr, var, order);
+}
 
 #endif
 %enddef

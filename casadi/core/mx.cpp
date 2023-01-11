@@ -2085,6 +2085,68 @@ namespace casadi {
     return res;
   }
 
+  MX MX::stop_diff(const MX& expr, casadi_int order) {
+    std::vector<MX> s = symvar(expr);
+    MX x = veccat(s);
+    Dict options;
+    options["never_inline"] = true;
+    if (order==1) {
+      options["is_diff_in"] = std::vector<bool>{false};
+      options["is_diff_out"] = std::vector<bool>{true};
+    } else if (order==2) {
+      options["forward_options"] = Dict{{"is_diff_in", std::vector<bool>{false, true, true} }, {"is_diff_out", std::vector<bool>{true}}};
+      options["reverse_options"] = Dict{{"is_diff_in", std::vector<bool>{false, true, true} }, {"is_diff_out", std::vector<bool>{true}}};
+      options["jacobian_options"] = Dict{{"is_diff_in", std::vector<bool>{false, true} }, {"is_diff_out", std::vector<bool>{false}}};
+    } else {
+      casadi_error("stop_diff: order must be 1 or 2, got " + str(order) + ".");
+    }
+    
+    Function FS("FS", {x}, {expr}, {"x"}, {"z"}, options);
+    return FS(std::vector<MX>{x})[0];
+  }
+
+  MX MX::stop_diff(const MX& expr, const MX& var, casadi_int order) {
+    casadi_warning("stop_diff(expr, var, order) is not well tested.");
+    std::vector<MX> xv = symvar(var);
+    std::vector<MX> s = symvar(expr);
+    std::vector<MX> yv = difference(s, xv);
+    
+    MX x = veccat(xv);
+    MX y = veccat(yv);
+
+    Dict options;
+    options["never_inline"] = true;
+    if (order==1) {
+      options["is_diff_in"] = std::vector<bool>{false, true};
+      options["is_diff_out"] = std::vector<bool>{true};
+    } else if (order==2) {
+      options["forward_options"] = Dict{{"is_diff_in", std::vector<bool>{false, true, false, true, true} }, {"is_diff_out", std::vector<bool>{true}}};
+      options["reverse_options"] = Dict{{"is_diff_in", std::vector<bool>{false, true, false, true} }, {"is_diff_out", std::vector<bool>{false, true}}};
+      options["jacobian_options"] = Dict{{"is_diff_in", std::vector<bool>{false, true, true} }, {"is_diff_out", std::vector<bool>{true}}};
+    } else {
+      casadi_error("stop_diff: order must be 1 or 2, got " + str(order) + ".");
+    }
+    
+    Function FS("FS", {x, y}, {expr}, {"x", "y"}, {"z"}, options);
+    return FS(std::vector<MX>{x, y})[0];
+  }
+
+  std::vector<MX> difference(const std::vector<MX>& a, const std::vector<MX>& b) {
+    // Create a set of MXNodes from b
+    std::set<MXNode*> bs;
+    for (const auto& e : b) {
+      if (!e.is_null()) bs.insert(e.get());
+    }
+    std::vector<MX> ret;
+    for (auto&& e : a) {
+      // If the element is not in the set, add it to the return vector
+      if (bs.find(e.get())==bs.end()) {
+        ret.push_back(e);
+      }
+    }
+    return ret;
+  }
+
   MX interpn_G(casadi_int i, // Dimension to interpolate along
                 const MX& v, // Coefficients
                 const std::vector<MX>& xis, // Normalised coordinates
