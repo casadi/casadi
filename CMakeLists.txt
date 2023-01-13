@@ -1099,6 +1099,10 @@ add_feature_info(cbc-interface WITH_CBC "Interface to the LP solver CBC.")
 
 if(WITH_IPOPT)
   if(WITH_BUILD_IPOPT)
+    set(MINGW_FLAG "")
+    if(MINGW)
+        set(MINGW_FLAG "--build mingw64")
+    endif()
     ExternalProject_Add(ipopt-external
         DEPENDS ${LAPACK_DEPENDS_TARGET} mumps-external ${SPRAL_DEPENDS_TARGET} 
         URL https://www.coin-or.org/download/source/Ipopt/Ipopt-${BUILD_IPOPT_VERSION}.zip
@@ -1109,6 +1113,9 @@ if(WITH_IPOPT)
         "--with-lapack-lflags= ${LAPACK_LFLAGS}" ${CROSS_FLAGS_FORTRAN}
 	# For unknown reasons, Coin-or/configure disables pkg-config by default for clang compilers 
 	--enable-pkg-config
+	# issue #2988
+	--enable-dependency-linking
+	${MINGW_FLAG}
 	)
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/coin-or")
     set(WITH_IPOPT_CALLBACK ON)
