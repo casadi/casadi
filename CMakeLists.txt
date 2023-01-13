@@ -1101,7 +1101,7 @@ if(WITH_IPOPT)
   if(WITH_BUILD_IPOPT)
     set(MINGW_FLAG "")
     if(MINGW)
-        set(MINGW_FLAG "--build mingw64")
+        set(MINGW_FLAG --build mingw64)
     endif()
     ExternalProject_Add(ipopt-external
         DEPENDS ${LAPACK_DEPENDS_TARGET} mumps-external ${SPRAL_DEPENDS_TARGET} 
