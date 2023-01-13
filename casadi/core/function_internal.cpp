@@ -988,9 +988,12 @@ namespace casadi {
     // Options
     Dict my_opts = opts;
     my_opts["derivative_of"] = derivative_of_;
-    my_opts["ad_weight"] = ad_weight();
-    my_opts["ad_weight_sp"] = sp_weight();
-    my_opts["max_num_dir"] = max_num_dir_;
+    if (my_opts.find("ad_weight")==my_opts.end())
+      my_opts["ad_weight"] = ad_weight();
+    if (my_opts.find("ad_weight_sp")==my_opts.end())
+      my_opts["ad_weight_sp"] = sp_weight();
+    if (my_opts.find("max_num_dir")==my_opts.end())
+      my_opts["max_num_dir"] = max_num_dir_;
     // Wrap the function
     vector<MX> arg = mx_in();
     vector<MX> res = self()(arg);
