@@ -364,7 +364,7 @@ namespace casadi {
           for (size_t i = 0; i < x.size(); ++i) x[i] = in_.at(all_x[i]);
           for (size_t i = 0; i < f.size(); ++i) f[i] = out_.at(all_f[i]);
           // Calculate Jacobian of all outputs with respect to all inputs
-          MatType J = MatType::jacobian(vertcat(f), vertcat(x), opts);
+          MatType J = MatType::jacobian(veccat(f), veccat(x), opts);
           // Split Jacobian into blocks
           std::vector<std::vector<MatType>> J_all = blocksplit(J, offset(f), offset(x));
           // Save blocks
