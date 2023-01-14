@@ -1,0 +1,47 @@
+diff -crB src/Algorithm/LinearSolvers/IpTSymLinearSolver.cpp src/Algorithm/LinearSolvers/IpTSymLinearSolver.cpp
+*** src/Algorithm/LinearSolvers/IpTSymLinearSolver.cpp	2021-09-20 10:45:09.000000000 +0200
+--- src/Algorithm/LinearSolvers/IpTSymLinearSolver.cpp	2023-01-14 14:42:24.541629247 +0100
+***************
+*** 331,338 ****
+  
+        delete[] airn_;
+        delete[] ajcn_;
+!       airn_ = new Index[nonzeros_triplet_];
+!       ajcn_ = new Index[nonzeros_triplet_];
+  
+        TripletHelper::FillRowCol(nonzeros_triplet_, sym_A, airn_, ajcn_);
+  
+--- 331,338 ----
+  
+        delete[] airn_;
+        delete[] ajcn_;
+!       airn_ = new Index[nonzeros_triplet_+1];
+!       ajcn_ = new Index[nonzeros_triplet_+1];
+  
+        TripletHelper::FillRowCol(nonzeros_triplet_, sym_A, airn_, ajcn_);
+  
+diff -crB src/Common/IpLibraryLoader.cpp src/Common/IpLibraryLoader.cpp
+*** src/Common/IpLibraryLoader.cpp	2021-09-20 10:45:09.000000000 +0200
+--- src/Common/IpLibraryLoader.cpp	2023-01-14 14:30:13.126657162 +0100
+***************
+*** 61,67 ****
+  
+  #elif defined(HAVE_DLFCN_H)
+     // ToDo switch to RTLD_LAZY for performance?
+!    libhandle = dlopen(libname.c_str(), RTLD_NOW);
+     if( libhandle == NULL )
+     {
+        THROW_EXCEPTION(DYNAMIC_LIBRARY_FAILURE, dlerror());
+--- 61,72 ----
+  
+  #elif defined(HAVE_DLFCN_H)
+     // ToDo switch to RTLD_LAZY for performance?
+!    #ifdef __APPLE__
+!       libhandle = dlopen(libname.c_str(), RTLD_NOW);
+!    #else
+!       libhandle = dlopen(libname.c_str(), RTLD_NOW | RTLD_DEEPBIND);
+!    #endif
+! 
+     if( libhandle == NULL )
+     {
+        THROW_EXCEPTION(DYNAMIC_LIBRARY_FAILURE, dlerror());

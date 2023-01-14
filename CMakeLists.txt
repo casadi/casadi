@@ -1102,6 +1102,12 @@ if(MINGW)
     set(MINGW_FLAG --build mingw32)
 endif()
 
+set(COIN_FLAGS "")
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+set(COIN_FLAGS "--enable-debug")
+endif()
+
+
 if(WITH_IPOPT)
   if(WITH_BUILD_IPOPT)
     ExternalProject_Add(ipopt-external
@@ -1109,14 +1115,17 @@ if(WITH_IPOPT)
         URL https://www.coin-or.org/download/source/Ipopt/Ipopt-${BUILD_IPOPT_VERSION}.zip
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
+        PATCH_COMMAND patch -p0 < ${CMAKE_CURRENT_SOURCE_DIR}/casadi/interfaces/ipopt/ipopt3_14.patch
         CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR> "--with-mumps-cflags=-I${CMAKE_BINARY_DIR}/external_projects/include/coin-or/mumps" "--with-mumps-lflags=-L${CMAKE_BINARY_DIR}/external_projects/lib ${WHOLE_ARCHIVE_ON}-lcoinmumps ${WHOLE_ARCHIVE_OFF}"
         ${SPRAL_FLAGS}
         "--with-lapack-lflags= ${LAPACK_LFLAGS}" ${CROSS_FLAGS_FORTRAN}
+        
 	# For unknown reasons, Coin-or/configure disables pkg-config by default for clang compilers 
 	--enable-pkg-config
 	# issue #2988
 	--enable-dependency-linking
 	${MINGW_FLAG}
+	${COIN_FLAGS}
 	)
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/coin-or")
     set(WITH_IPOPT_CALLBACK ON)
