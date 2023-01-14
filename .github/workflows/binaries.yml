@@ -569,12 +569,17 @@ jobs:
         uses: actions/setup-python@v4.3.0
         with:
           python-version: ${{steps.get-id.outputs.pydot2}}
+      - run: |
+          pip install numpy scipy
       - env:
           PYTHONPATH: ${{ github.workspace }}/install
         run: |
           cd test/python
-          pip install numpy scipy
           python -c "from casadi.tools import *;loadAllCompiledPlugins()"
+      - env:
+          PYTHONPATH: ${{ github.workspace }}/install
+        run: |
+          cd test/python
           python alltests.py
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v3.x
