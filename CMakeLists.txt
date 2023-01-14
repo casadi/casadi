@@ -1097,10 +1097,6 @@ if(WITH_CBC)
 endif()
 add_feature_info(cbc-interface WITH_CBC "Interface to the LP solver CBC.")
 
-set(MINGW_FLAG "")
-if(MINGW)
-    set(MINGW_FLAG --build mingw32)
-endif()
 
 set(COIN_FLAGS "")
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -1122,9 +1118,7 @@ if(WITH_IPOPT)
         
 	# For unknown reasons, Coin-or/configure disables pkg-config by default for clang compilers 
 	--enable-pkg-config
-	# issue #2988
 	--enable-dependency-linking
-	${MINGW_FLAG}
 	${COIN_FLAGS}
 	)
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/coin-or")
