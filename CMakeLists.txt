@@ -1099,7 +1099,7 @@ add_feature_info(cbc-interface WITH_CBC "Interface to the LP solver CBC.")
 
 set(MINGW_FLAG "")
 if(MINGW)
-    set(MINGW_FLAG --build mingw32)
+    set(MINGW_FLAG --host x86_64-w64-mingw32 --build mingw32)
 endif()
 
 set(COIN_FLAGS "")
