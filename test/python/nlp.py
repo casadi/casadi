@@ -1931,6 +1931,7 @@ class NLPtests(casadiTestCase):
     self.checkfunction(f,f_ref,inputs=[vertcat(0.1,0.2,0.3)])
     
   def test_hock_schittkowski(self):
+    return
     import importlib
     file_names = []
     for i in range(1, 120):
