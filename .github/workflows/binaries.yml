@@ -570,7 +570,7 @@ jobs:
         with:
           python-version: ${{steps.get-id.outputs.pydot2}}
       - run: |
-          pip install numpy scipy
+          pip install numpy scipy pandas
       - env:
           PYTHONPATH: ${{ github.workspace }}/install
         run: |
