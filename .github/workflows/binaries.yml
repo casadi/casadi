@@ -528,7 +528,7 @@ jobs:
      fail-fast: false
      matrix:
        py2: ["27","35","36","37","38","39","310","311"]
-       image: ["windows-latest","ubuntu-latest","macos-latest"]
+       image: ["windows-latest","ubuntu-20.04","macos-latest"]
        bit: [64]
        exclude:
         # No Windows 32bit builds currently
@@ -542,7 +542,7 @@ jobs:
           map: |
            {
               "windows-latest": {"os": "windows"},
-              "ubuntu-latest": {"os": "linux"},
+              "ubuntu-20.04": {"os": "linux"},
               "macos-latest": {"os": "osx"}
            }
           export_to: env
