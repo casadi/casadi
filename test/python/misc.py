@@ -486,12 +486,13 @@ class Misctests(casadiTestCase):
         with self.assertOutput(included, excluded):
           solver.solve(A,vertcat(1,2,3))
 
+  @memory_heavy()
   def test_record_time(self):
 
 
     x = MX.sym("x")
     f = x**2
-    for i in range(1000):
+    for i in range(10000):
       f =sin(f)*f
     f=f+x**2
 
