@@ -148,7 +148,7 @@ jobs:
           retention-days: 5
           
   matrix-arch-py2:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - id: build-matrix
         uses: jgillis/setup-build-matrix@v1.2.0
@@ -467,11 +467,11 @@ jobs:
      fail-fast: false
      matrix:
        matlab: ["2018b"]
-       image: ["windows-latest","ubuntu-latest"]
+       image: ["windows-2022","ubuntu-20.04"]
        bit: [64]
        exclude:
         # No Windows 32bit builds currently
-        - image: "windows-latest"
+        - image: "windows-2022"
           bit: 32
     steps:
       - uses: actions/checkout@v2.4.0
@@ -480,9 +480,9 @@ jobs:
           key: "${{matrix.image}}"
           map: |
            {
-              "windows-latest": {"os": "windows"},
-              "ubuntu-latest": {"os": "linux"},
-              "macos-latest": {"os": "osx"}
+              "windows-2022": {"os": "windows"},
+              "ubuntu-20.04": {"os": "linux"},
+              "macos-11": {"os": "osx"}
            }
           export_to: env
       - uses: actions/download-artifact@v2
@@ -528,11 +528,11 @@ jobs:
      fail-fast: false
      matrix:
        py2: ["27","35","36","37","38","39","310","311"]
-       image: ["windows-latest","ubuntu-20.04","macos-latest"]
+       image: ["windows-2022","ubuntu-20.04","macos-11"]
        bit: [64]
        exclude:
         # No Windows 32bit builds currently
-        - image: "windows-latest"
+        - image: "windows-2022"
           bit: 32
     steps:
       - uses: actions/checkout@v2.4.0
@@ -541,9 +541,9 @@ jobs:
           key: "${{matrix.image}}"
           map: |
            {
-              "windows-latest": {"os": "windows"},
+              "windows-2022": {"os": "windows"},
               "ubuntu-20.04": {"os": "linux"},
-              "macos-latest": {"os": "osx"}
+              "macos-11": {"os": "osx"}
            }
           export_to: env
       - uses: actions/download-artifact@v2
