@@ -82,5 +82,29 @@ else()
     message(STATUS "Compiling WITHOUT CasADi support")
 endif()
 
+if (CMAKE_DL_LIBS)
+    add_library(dl-headers INTERFACE)
+    # TODO: move to independent folder
+    target_include_directories(dl-headers INTERFACE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>)
+    add_library(alpaqa::dl-headers ALIAS dl-headers)
+    list(APPEND ALPAQA_INSTALL_TARGETS dl-headers)
+    add_library(dl-loader
+        "interop/dl/dl-problem.cpp"
+    )
+    target_link_libraries(dl-loader
+        PUBLIC
+            alpaqa::alpaqa
+            alpaqa::dl-headers
+        PRIVATE
+            dl)
+    add_library(alpaqa::dl-loader ALIAS dl-loader)
+    list(APPEND ALPAQA_INSTALL_TARGETS dl-loader)
+    message(STATUS "Compiling WITH dl support")
+else()
+    message(STATUS "Compiling WITHOUT dl support")
+endif()
+
 # Installation
 include(cmake/Install.cmake)
