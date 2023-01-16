@@ -8,13 +8,10 @@
 namespace py = pybind11;
 using namespace py::literals;
 
-#include <alpaqa/problem/dynamics.hpp>
 #include <alpaqa/problem/problem-counters.hpp>
 #include <alpaqa/problem/type-erased-problem.hpp>
 #if ALPAQA_HAVE_CASADI
-#include <alpaqa/interop/casadi/CasADiControlProblem.hpp>
 #include <alpaqa/interop/casadi/CasADiProblem.hpp>
-#include <alpaqa/interop/casadi/CasADiQuadraticControlProblem.hpp>
 #endif
 
 template <class FuncProb, auto py_f, auto f, class Ret, class... Args>
@@ -304,16 +301,13 @@ void register_problems(py::module_ &m) {
             },
             "x"_a, "y"_a, "Σ"_a);
 
-    using TEControlProblem = alpaqa::TypeErasedControlProblem<config_t>;
-    py::class_<TEControlProblem> te_control_problem(
-        m, "TEControlProblem", "C++ documentation: :cpp:class:`alpaqa::TypeErasedControlProblem`");
-    te_control_problem //
-        .def(py::init<const TEControlProblem &>())
-        .def("__copy__", [](const TEControlProblem &self) { return TEControlProblem{self}; })
-        .def(
-            "__deepcopy__",
-            [](const TEControlProblem &self, py::dict) { return TEControlProblem{self}; },
-            "memo"_a);
+    // ProblemWithCounters
+    static constexpr auto te_pwc = []<class P>(P &&p) {
+        using PwC = alpaqa::ProblemWithCounters<std::remove_cvref_t<P>>;
+        auto te_p = TEProblem::template make<PwC>(std::forward<P>(p));
+        auto eval = te_p.template as<PwC>().evaluations;
+        return std::make_tuple(std::move(te_p), std::move(eval));
+    };
 
     if constexpr (std::is_same_v<typename Conf::real_t, double>) {
 #if ALPAQA_HAVE_CASADI
@@ -429,196 +423,17 @@ void register_problems(py::module_ &m) {
         m.def("load_casadi_problem", load_CasADi_problem, "so_name"_a, "n"_a = 0, "m"_a = 0,
               "p"_a = 0, "second_order"_a = false, "Load a compiled CasADi problem.\n\n");
 
-#if ALPAQA_HAVE_CASADI
-        using CasADiControlProblem       = alpaqa::CasADiControlProblem<config_t>;
-        auto load_CasADi_control_problem = [](const char *so_name, unsigned N, unsigned nx,
-                                              unsigned nu, unsigned p) {
-            return std::make_unique<CasADiControlProblem>(so_name, N, nx, nu, p);
-        };
-#else
-        class CasADiControlProblem {};
-        auto load_CasADi_control_problem = [](const char *so_name, unsigned N, unsigned nx,
-                                              unsigned nu,
-                                              unsigned p) -> std::unique_ptr<CasADiControlProblem> {
-            throw std::runtime_error("This version of alpaqa was compiled without CasADi support");
-        };
-#endif
-
-        py::class_<CasADiControlProblem>(
-            m, "CasADiControlProblem",
-            "C++ documentation: :cpp:class:`alpaqa::CasADiControlProblem`\n\n"
-            "See :py:class:`alpaqa._alpaqa.float64.TEControlProblem` for the full documentation.")
-            .def("__copy__",
-                 [](const CasADiControlProblem &self) { return CasADiControlProblem{self}; })
-            .def(
-                "__deepcopy__",
-                [](const CasADiControlProblem &self, py::dict) {
-                    return CasADiControlProblem{self};
-                },
-                "memo"_a)
-#if ALPAQA_HAVE_CASADI
-            .def_readonly("N", &CasADiControlProblem::N)
-            .def_readonly("nx", &CasADiControlProblem::nx)
-            .def_readonly("nu", &CasADiControlProblem::nu)
-            .def_readwrite("U", &CasADiControlProblem::U)
-            .def_readwrite("cost_structure", &CasADiControlProblem::cost_structure)
-            .def_property(
-                "x_init", [](CasADiControlProblem &p) -> rvec { return p.x_init; },
-                [](CasADiControlProblem &p, crvec x_init) {
-                    if (x_init.size() != p.x_init.size())
-                        throw std::invalid_argument("Invalid x_init dimension: got " +
-                                                    std::to_string(x_init.size()) + ", should be " +
-                                                    std::to_string(p.x_init.size()) + ".");
-                    p.x_init = x_init;
-                },
-                "Initial state vector :math:`x^0` of the problem")
-            .def_property(
-                "param", [](CasADiControlProblem &p) -> rvec { return p.param; },
-                [](CasADiControlProblem &p, crvec param) {
-                    if (param.size() != p.param.size())
-                        throw std::invalid_argument("Invalid parameter dimension: got " +
-                                                    std::to_string(param.size()) + ", should be " +
-                                                    std::to_string(p.param.size()) + ".");
-                    p.param = param;
-                },
-                "Parameter vector :math:`p` of the problem");
-#endif
-        ;
-#if ALPAQA_HAVE_CASADI
-        te_control_problem.def(py::init<const CasADiControlProblem &>());
-        py::implicitly_convertible<CasADiControlProblem, TEControlProblem>();
-#endif
-
-        m.def("load_casadi_control_problem", load_CasADi_control_problem, "so_name"_a, "N"_a,
-              "nx"_a = 0, "nu"_a = 0, "p"_a = 0,
-              "Load a compiled CasADi optimal control problem.\n\n");
-
-#if ALPAQA_HAVE_CASADI
-        using CasADiQuadraticControlProblem = alpaqa::CasADiQuadraticControlProblem<config_t>;
-        auto load_CasADi_quadratic_control_problem = [](const char *so_name, unsigned N,
-                                                        unsigned nx, unsigned nu, unsigned p) {
-            return std::make_unique<CasADiQuadraticControlProblem>(so_name, N, nx, nu, p);
-        };
-#else
-        class CasADiQuadraticControlProblem {};
-        auto load_CasADi_quadratic_control_problem =
-            [](const char *so_name, unsigned N, unsigned nx, unsigned nu,
-               unsigned p) -> std::unique_ptr<CasADiQuadraticControlProblem> {
-            throw std::runtime_error("This version of alpaqa was compiled without CasADi support");
-        };
-#endif
-
-        py::class_<CasADiQuadraticControlProblem>(
-            m, "CasADiQuadraticControlProblem",
-            "C++ documentation: :cpp:class:`alpaqa::CasADiQuadraticControlProblem`\n\n"
-            "See :py:class:`alpaqa._alpaqa.float64.TEControlProblem` for the full documentation.")
-            .def("__copy__",
-                 [](const CasADiQuadraticControlProblem &self) {
-                     return CasADiQuadraticControlProblem{self};
-                 })
-            .def(
-                "__deepcopy__",
-                [](const CasADiQuadraticControlProblem &self, py::dict) {
-                    return CasADiQuadraticControlProblem{self};
-                },
-                "memo"_a)
-#if ALPAQA_HAVE_CASADI
-            .def_readonly("N", &CasADiQuadraticControlProblem::N)
-            .def_readonly("nx", &CasADiQuadraticControlProblem::nx)
-            .def_readonly("nu", &CasADiQuadraticControlProblem::nu)
-            .def_readwrite("U", &CasADiQuadraticControlProblem::U)
-            .def_readwrite("D", &CasADiQuadraticControlProblem::D)
-            .def_readwrite("D_N", &CasADiQuadraticControlProblem::D_N)
-            .def_property(
-                "x_init", [](CasADiQuadraticControlProblem &p) -> rvec { return p.x_init; },
-                [](CasADiQuadraticControlProblem &p, crvec x_init) {
-                    check_dim<config_t>("x_init", x_init, p.x_init.size());
-                    p.x_init = x_init;
-                },
-                "Initial state vector :math:`x^0` of the problem")
-            .def_property(
-                "Q", [](CasADiQuadraticControlProblem &p) -> rvec { return p.Q; },
-                [](CasADiQuadraticControlProblem &p, crvec Q) {
-                    check_dim<config_t>("Q", Q, p.nx);
-                    p.Q = Q;
-                },
-                "Cost matrix :math:`Q` of the problem")
-            .def_property(
-                "R", [](CasADiQuadraticControlProblem &p) -> rvec { return p.R; },
-                [](CasADiQuadraticControlProblem &p, crvec R) {
-                    check_dim<config_t>("R", R, p.nu);
-                    p.R = R;
-                },
-                "Cost matrix :math:`R` of the problem")
-            .def_property(
-                "Q_N", [](CasADiQuadraticControlProblem &p) -> rvec { return p.Q_N; },
-                [](CasADiQuadraticControlProblem &p, crvec Q_N) {
-                    check_dim<config_t>("Q_N", Q_N, p.nx);
-                    p.Q_N = Q_N;
-                },
-                "Cost matrix :math:`Q_N` of the problem")
-            .def_property(
-                "x_ref", [](CasADiQuadraticControlProblem &p) -> rmat { return p.x_ref; },
-                [](CasADiQuadraticControlProblem &p, crmat x_ref) {
-                    check_dim<config_t>("x_ref", x_ref.col(0), p.nx);
-                    if (x_ref.cols() > 1)
-                        check_dim<config_t>("x_ref", x_ref, p.nx, p.N + 1);
-                    p.x_ref = x_ref;
-                },
-                "Reference state :math:`x_\\mathrm{ref}`")
-            .def_property(
-                "u_ref", [](CasADiQuadraticControlProblem &p) -> rmat { return p.u_ref; },
-                [](CasADiQuadraticControlProblem &p, crmat u_ref) {
-                    check_dim<config_t>("u_ref", u_ref.col(0), p.nu);
-                    if (u_ref.cols() > 1)
-                        check_dim<config_t>("u_ref", u_ref, p.nu, p.N);
-                    p.u_ref = u_ref;
-                },
-                "Reference input :math:`u_\\mathrm{ref}`")
-            .def_property(
-                "μ", [](CasADiQuadraticControlProblem &p) -> rmat { return p.μ; },
-                [](CasADiQuadraticControlProblem &p, crmat μ) {
-                    check_dim<config_t>("μ", μ, p.nx, p.N + 1);
-                    p.μ = μ;
-                },
-                "Penalty factor :math:`\\mu`")
-            .def_property(
-                "param", [](CasADiQuadraticControlProblem &p) -> rvec { return p.param; },
-                [](CasADiQuadraticControlProblem &p, crvec param) {
-                    if (param.size() != p.param.size())
-                        throw std::invalid_argument("Invalid parameter dimension: got " +
-                                                    std::to_string(param.size()) + ", should be " +
-                                                    std::to_string(p.param.size()) + ".");
-                    p.param = param;
-                },
-                "Parameter vector :math:`p` of the problem");
-#endif
-        ;
-#if ALPAQA_HAVE_CASADI
-        te_control_problem.def(py::init<const CasADiQuadraticControlProblem &>());
-        py::implicitly_convertible<CasADiQuadraticControlProblem, TEControlProblem>();
-#endif
-
-        m.def("load_casadi_quadratic_control_problem", load_CasADi_quadratic_control_problem,
-              "so_name"_a, "N"_a, "nx"_a = 0, "nu"_a = 0, "p"_a = 0,
-              "Load a compiled CasADi optimal control problem.\n\n");
-
-        static constexpr auto te_pwc = []<class P>(P &&p) {
-            using PwC = alpaqa::ProblemWithCounters<std::remove_cvref_t<P>>;
-            auto te_p = TEProblem::template make<PwC>(std::forward<P>(p));
-            auto eval = te_p.template as<PwC>().evaluations;
-            return std::make_tuple(std::move(te_p), std::move(eval));
-        };
         m.def(
             "problem_with_counters", [](const CasADiProblem &p) { return te_pwc(p); }, "problem"_a,
             "Wrap the problem to count all function evaluations.\n\n"
             ":param problem: The original problem to wrap. Copied.\n"
             ":return: * Wrapped problem.\n"
             "         * Counters for wrapped problem.\n\n");
-        m.def(
-            "problem_with_counters", [](py::object p) { return te_pwc(PyProblem{std::move(p)}); },
-            "problem"_a);
     }
+    m.def(
+        "problem_with_counters", [](py::object p) { return te_pwc(PyProblem{std::move(p)}); },
+        "problem"_a);
+
     // Must be last
     te_problem.def(py::init([](py::object o) { return TEProblem::template make<PyProblem>(o); }));
 }
