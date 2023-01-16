@@ -80,6 +80,7 @@ py::dict stats_to_dict(const InnerStatsAccumulator<PANOCStats<Conf>> &s) {
         "τ_1_accepted"_a        = s.τ_1_accepted,
         "count_τ"_a             = s.count_τ,
         "sum_τ"_a               = s.sum_τ,
+        "final_γ"_a             = s.final_γ,
     };
 }
 

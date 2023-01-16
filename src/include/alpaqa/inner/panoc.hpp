@@ -60,7 +60,7 @@ struct PANOCStats {
 
     SolverStatus status = SolverStatus::Busy;
     real_t ε            = inf<config_t>;
-    std::chrono::nanoseconds elapsed_time;
+    std::chrono::nanoseconds elapsed_time{};
     unsigned iterations          = 0;
     unsigned linesearch_failures = 0;
     unsigned lbfgs_failures      = 0;
@@ -159,7 +159,7 @@ struct InnerStatsAccumulator<PANOCStats<Conf>> {
     USING_ALPAQA_CONFIG(Conf);
 
     /// Total elapsed time in the inner solver.
-    std::chrono::nanoseconds elapsed_time;
+    std::chrono::nanoseconds elapsed_time{};
     /// Total number of inner PANOC iterations.
     unsigned iterations = 0;
     /// Total number of PANOC line search failures.
@@ -178,6 +178,8 @@ struct InnerStatsAccumulator<PANOCStats<Conf>> {
     /// The sum of the line search parameter @f$ \tau @f$ in all iterations
     /// (used for computing the average value of @f$ \tau @f$).
     real_t sum_τ = 0;
+    /// The final PANOC step size γ.
+    real_t final_γ = 0;
 };
 
 template <Config Conf>
@@ -192,6 +194,7 @@ operator+=(InnerStatsAccumulator<PANOCStats<Conf>> &acc,
     acc.τ_1_accepted += s.τ_1_accepted;
     acc.count_τ += s.count_τ;
     acc.sum_τ += s.sum_τ;
+    acc.final_γ = s.final_γ;
     return acc;
 }
 
