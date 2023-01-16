@@ -1,10 +1,13 @@
-add_library(problem-c SHARED problem.c)
+add_library(problem-c MODULE problem.c)
 set_target_properties(problem-c PROPERTIES PREFIX "" DEBUG_POSTFIX "")
 
 # DLL import/export
 include(GenerateExportHeader)
 generate_export_header(problem-c
     EXPORT_FILE_NAME problem-c-export.h)
+set_target_properties(problem-c PROPERTIES
+    C_VISIBILITY_PRESET "hidden"
+    VISIBILITY_INLINES_HIDDEN true)
 target_include_directories(problem-c PRIVATE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>)
 target_link_libraries(problem-c PRIVATE alpaqa::dl-headers alpaqa::warnings)
