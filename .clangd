@@ -1,0 +1,2 @@
+CompileFlags:
+  Add: [-D__clangd__, -std=c++20]

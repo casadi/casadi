@@ -5,10 +5,17 @@
 #include <ranges>
 #include <type_traits>
 
+#if defined(__clang_major__) && __clang_major__ <= 15 && !defined(__clangd__)
+#error "Better ranges support required"
+#endif
+
 namespace alpaqa::util {
 
 template <class It>
 struct iter_range_adapter {
+    // P2325R3: https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p2325r3.html
+    iter_range_adapter() = default;
+    iter_range_adapter(It it) : it{std::forward<It>(it)} {}
     It it;
 
     struct sentinel_t {};
@@ -20,6 +27,9 @@ struct iter_range_adapter {
 
         bool operator!=(sentinel_t) const { return static_cast<bool>(*this); }
         bool operator==(sentinel_t) const { return !static_cast<bool>(*this); }
+        // TODO: For Clang bug
+        friend bool operator!=(sentinel_t s, const iter_t &i) { return i != s; }
+        friend bool operator==(sentinel_t s, const iter_t &i) { return i == s; }
 
         iter_t &operator++() {
             this->std::remove_cvref_t<It>::operator++();
@@ -51,7 +61,7 @@ struct enumerate_t : std::ranges::view_interface<enumerate_t<Rng>> {
 
     // P2325R3: https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p2325r3.html
     enumerate_t() = default;
-    enumerate_t(Rng &&rng) : rng{std::forward<Rng>(rng)} {}
+    enumerate_t(Rng rng) : rng{std::forward<Rng>(rng)} {}
 
     using begin_t = decltype(std::ranges::begin(rng));
     using end_t   = decltype(std::ranges::end(rng));
@@ -69,8 +79,14 @@ struct enumerate_t : std::ranges::view_interface<enumerate_t<Rng>> {
         index_t index{};
         begin_t it;
 
+        using difference_type = std::ptrdiff_t;
+        using value_type      = std::tuple<index_t, decltype(*it)>;
+
         bool operator!=(sentinel_t s) const { return s.it != it; }
         bool operator==(sentinel_t s) const { return s.it == it; }
+        // TODO: For Clang bug
+        friend bool operator!=(sentinel_t s, const iter_t &i) { return i != s; }
+        friend bool operator==(sentinel_t s, const iter_t &i) { return i == s; }
 
         iter_t &operator++() {
             ++it;
@@ -83,17 +99,15 @@ struct enumerate_t : std::ranges::view_interface<enumerate_t<Rng>> {
             return tmp;
         }
 
-        auto operator*() const {
-            return std::tuple<index_t, decltype(*it)>{index, *it};
-        }
-        using difference_type = std::ptrdiff_t;
-        using value_type = decltype(std::declval<const iter_t>().operator*());
+        value_type operator*() const { return {index, *it}; }
     };
 
-    auto begin() const & -> std::input_or_output_iterator auto{
+    auto begin() const -> std::input_or_output_iterator auto{
         return iter_t{std::ranges::begin(rng)};
     }
-    auto end() const -> std::sentinel_for<iter_t> auto{
+    auto end() const
+    // -> std::sentinel_for<iter_t> auto
+    {
         return sentinel_t{std::ranges::end(rng)};
     }
 };
@@ -105,6 +119,7 @@ auto enumerate(Rng &&rng) {
 
 } // namespace alpaqa::util
 
+// Iterators remain valid even if the range is destroyed.
 // Assume that the user takes care of lifetime, similar to std::span.
 template <class It>
 inline constexpr bool ::std::ranges::enable_borrowed_range<

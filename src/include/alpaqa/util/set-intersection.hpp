@@ -49,10 +49,18 @@ struct set_intersection_iterable
         Comp comp;
         Proj1 proj1;
         Proj2 proj2;
+
+        using difference_type = std::ptrdiff_t; // TODO
+        using value_type = std::tuple<decltype(*first1), decltype(*first2)>;
+
         bool operator!=(sentinel_t) const {
             return first1 != last1 && first2 != last2;
         }
         bool operator==(sentinel_t s) const { return !(*this != s); }
+        // TODO: For Clang bug
+        friend bool operator!=(sentinel_t s, const iter_t &i) { return i != s; }
+        friend bool operator==(sentinel_t s, const iter_t &i) { return i == s; }
+
         iter_t &operator++() {
             ++first1, ++first2;
             advance();
@@ -63,10 +71,7 @@ struct set_intersection_iterable
             ++*this;
             return tmp;
         }
-        auto operator*() const {
-            return std::tuple<decltype(*first1), decltype(*first2)>{*first1,
-                                                                    *first2};
-        }
+        value_type operator*() const { return {*first1, *first2}; }
         void advance() {
             while (*this != sentinel_t{}) {
                 if (std::invoke(comp, std::invoke(proj1, *first1),
@@ -79,25 +84,26 @@ struct set_intersection_iterable
                     break;
             }
         }
-        using difference_type = std::ptrdiff_t; // TODO
-        using value_type = decltype(std::declval<const iter_t>().operator*());
     };
-    auto begin() const -> std::input_or_output_iterator auto{
-        auto it = iter(std::ranges::begin(range1), std::ranges::end(range1),
-                       std::ranges::begin(range2), std::ranges::end(range2));
-        it.advance();
-        return it;
-    }
-    auto end() const -> std::sentinel_for<
-        decltype(std::declval<set_intersection_iterable>().begin())> auto{
-        return sentinel_t{};
-    }
 
   private:
     template <class I1, class S1, class I2, class S2>
     iter_t<I1, S1, I2, S2> iter(I1 first1, S1 last1, I2 first2,
                                 S2 last2) const {
         return {first1, last1, first2, last2, comp, proj1, proj2};
+    }
+
+  public:
+    auto begin() const -> std::input_or_output_iterator auto{
+        auto it = iter(std::ranges::begin(range1), std::ranges::end(range1),
+                       std::ranges::begin(range2), std::ranges::end(range2));
+        it.advance();
+        return it;
+    }
+    auto end() const
+    // -> std::sentinel_for< decltype(std::declval<set_intersection_iterable>().begin())> auto
+    {
+        return sentinel_t{};
     }
 };
 
@@ -108,6 +114,13 @@ set_intersection_iterable<std::ranges::views::all_t<R1>,
                           std::ranges::views::all_t<R2>, Comp, Proj1, Proj2>
 iter_set_intersection(R1 &&r1, R2 &&r2, Comp comp = {}, Proj1 proj1 = {},
                       Proj2 proj2 = {}) {
+    static_assert(
+        requires(set_intersection_iterable<std::ranges::views::all_t<R1>,
+                                           std::ranges::views::all_t<R2>, Comp,
+                                           Proj1, Proj2>
+                     s) {
+            { s.end() } -> std::sentinel_for<decltype(s.begin())>;
+        });
     return {
         std::forward<R1>(r1), std::forward<R2>(r2), std::move(comp),
         std::move(proj1),     std::move(proj2),

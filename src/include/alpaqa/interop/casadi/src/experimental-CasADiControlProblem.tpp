@@ -164,7 +164,7 @@ CasADiControlProblem<Conf>::CasADiControlProblem(const std::string &so_name,
                 so_name, "grad_f_prod", dims(nx, nu, p, nx), dims(nx + nu)),
             .h   = std::move(h),
             .h_N = std::move(h_N),
-            .l = wrapped_load<CasADiFunctionEvaluator<Conf, 2, 1>>(
+            .l   = wrapped_load<CasADiFunctionEvaluator<Conf, 2, 1>>(
                 so_name, "l", dims(nh, p), dims(1)),
             .l_N = wrapped_load<CasADiFunctionEvaluator<Conf, 2, 1>>(
                 so_name, "l_N", dims(nh_N, p), dims(1)),
@@ -327,20 +327,19 @@ auto select_rows_in_col(const SpMat &sp_mat, MaskVec mask, auto column) {
     static constexpr auto proj_row = [](const row_iter_t &it) {
         return static_cast<typename MaskVec::value_type>(it.row());
     };
+    std::span mask_span{mask.data(), static_cast<size_t>(mask.size())};
     auto intersection = util::iter_set_intersection(
-        std::move(col_range),
-        std::span{mask.data(), static_cast<size_t>(mask.size())}, std::less{},
-        proj_row);
+        std::move(col_range), std::move(mask_span), std::less{}, proj_row);
     return std::views::transform(std::move(intersection),
                                  []<class T>(T &&tup) -> decltype(auto) {
                                      return std::get<0>(std::forward<T>(tup));
                                  });
 }
 template <class SpMat, class MaskVec>
-auto select_rows_in_col_iota(const SpMat &sp_mat, const MaskVec &mask,
-                             auto column) {
+auto select_rows_in_col_iota(const SpMat &sp_mat, MaskVec mask, auto column) {
     using row_iter_t = typename SpMat::InnerIterator;
     util::iter_range_adapter<row_iter_t> col_range{{sp_mat, column}};
+    std::span mask_span{mask.data(), static_cast<size_t>(mask.size())};
     static constexpr auto proj_row = [](const row_iter_t &it) {
         return static_cast<typename MaskVec::value_type>(it.row());
     };
@@ -348,8 +347,8 @@ auto select_rows_in_col_iota(const SpMat &sp_mat, const MaskVec &mask,
         return std::get<1>(tup);
     };
     return util::iter_set_intersection(std::move(col_range),
-                                       util::enumerate(mask), std::less{},
-                                       proj_row, proj_mask);
+                                       util::enumerate(std::move(mask_span)),
+                                       std::less{}, proj_row, proj_mask);
 }
 } // namespace detail
 
