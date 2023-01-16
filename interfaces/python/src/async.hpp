@@ -24,7 +24,7 @@ auto async_solve(bool async, Solver &solver, Invoker &invoke_solver, CheckedArgs
     } else {
         // Check that the user doesn't use the same solver/problem in multiple threads
         ThreadChecker solver_checker{&solver};
-        auto checkers = std::make_tuple(ThreadChecker{&checked_args}...);
+        std::tuple checkers{ThreadChecker{&checked_args}...};
         // Replace the output stream
         StreamReplacer stream{&solver};
         // Invoke the solver asynchronously

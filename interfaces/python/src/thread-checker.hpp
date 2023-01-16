@@ -28,6 +28,14 @@ class ThreadChecker {
         if (iterator)
             set.erase(*iterator);
     }
+    ThreadChecker(const ThreadChecker &)            = delete;
+    ThreadChecker &operator=(const ThreadChecker &) = delete;
+    ThreadChecker(ThreadChecker &&o) noexcept { std::swap(this->iterator, o.iterator); }
+    ThreadChecker &operator=(ThreadChecker &&o) noexcept {
+        this->iterator = std::move(o.iterator);
+        o.iterator.reset();
+        return *this;
+    }
 };
 
 template <class T>

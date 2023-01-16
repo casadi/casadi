@@ -10,7 +10,7 @@ namespace py = pybind11;
 using namespace py::literals;
 constexpr auto ret_ref_internal = py::return_value_policy::reference_internal;
 
-#include <alpaqa/inner/panoc-ocp.hpp>
+#include <alpaqa/inner/experimental-panoc-ocp.hpp>
 #include <alpaqa/util/check-dim.hpp>
 
 #include "async.hpp"
@@ -22,9 +22,9 @@ void register_panoc_ocp(py::module_ &m) {
     USING_ALPAQA_CONFIG(Conf);
 
     // ----------------------------------------------------------------------------------------- //
-    using PANOCOCPParams = alpaqa::PANOCOCPParams<config_t>;
-    py::class_<PANOCOCPParams>(m, "PANOCOCPParams",
-                               "C++ documentation: :cpp:class:`alpaqa::PANOCOCPParams`")
+    using PANOCOCPParams = alpaqa::experimental::PANOCOCPParams<config_t>;
+    py::class_<PANOCOCPParams>(
+        m, "PANOCOCPParams", "C++ documentation: :cpp:class:`alpaqa::experimental::PANOCOCPParams`")
         .def(py::init(&kwargs_to_struct<PANOCOCPParams>))
         .def("to_dict", &struct_to_dict<PANOCOCPParams>)
         // clang-format off
@@ -50,7 +50,7 @@ void register_panoc_ocp(py::module_ &m) {
         // clang-format on
         ;
 
-    using PANOCOCPProgressInfo = alpaqa::PANOCOCPProgressInfo<config_t>;
+    using PANOCOCPProgressInfo = alpaqa::experimental::PANOCOCPProgressInfo<config_t>;
     py::class_<PANOCOCPProgressInfo>(m, "PANOCOCPProgressInfo",
                                      "Data passed to the PANOC progress callback.\n\n"
                                      "C++ documentation: :cpp:class:`alpaqa::PANOCOCPProgressInfo`")
@@ -78,14 +78,12 @@ void register_panoc_ocp(py::module_ &m) {
         .def_property_readonly("û", &PANOCOCPProgressInfo::û, "Inputs after projected gradient step")
         .def_property_readonly("x", &PANOCOCPProgressInfo::x, "States")
         .def_property_readonly("x̂", &PANOCOCPProgressInfo::x̂, "States after projected gradient step")
-        .def_property_readonly("qu", &PANOCOCPProgressInfo::qu, "Accelerated step on inputs")
-        .def_property_readonly("qx", &PANOCOCPProgressInfo::qx, "Accelerated step on states")
         // clang-format on
         .def_property_readonly(
             "fpr", [](const PANOCOCPProgressInfo &p) { return std::sqrt(p.norm_sq_p) / p.γ; },
             "Fixed-point residual :math:`\\left\\|p\\right\\| / \\gamma`");
 
-    using PANOCOCPSolver                      = alpaqa::PANOCOCPSolver<config_t>;
+    using PANOCOCPSolver                      = alpaqa::experimental::PANOCOCPSolver<config_t>;
     using ControlProblem                      = typename PANOCOCPSolver::Problem;
     auto panoc_ocp_independent_solve_unconstr = [](PANOCOCPSolver &solver,
                                                    const ControlProblem &problem, real_t ε,

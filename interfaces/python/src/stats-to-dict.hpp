@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <alpaqa/inner/panoc-ocp.hpp>
+#include <alpaqa/inner/experimental-panoc-ocp.hpp>
 #include <alpaqa/inner/panoc.hpp>
 
 #include <pybind11/chrono.h>
@@ -41,7 +41,7 @@ py::dict stats_to_dict(const PANOCStats<Conf> &s) {
 }
 
 template <Config Conf>
-py::dict stats_to_dict(const PANOCOCPStats<Conf> &s) {
+py::dict stats_to_dict(const experimental::PANOCOCPStats<Conf> &s) {
     using namespace py::literals;
     return py::dict{
         "status"_a                  = s.status,
