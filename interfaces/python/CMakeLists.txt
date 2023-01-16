@@ -73,8 +73,8 @@ if (CMAKE_STRIP AND CMAKE_OBJCOPY)
         COMMAND "${CMAKE_STRIP}" "--only-keep-debug" "$<TARGET_FILE:_alpaqa>" "-o" "${DEBUG_FILE}"
         COMMAND "${CMAKE_STRIP}" "--strip-debug" "$<TARGET_FILE:_alpaqa>"
         COMMAND "${CMAKE_OBJCOPY}" "--add-gnu-debuglink=${DEBUG_FILE}" "$<TARGET_FILE:_alpaqa>"
-        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
-    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${DEBUG_FILE}"
+        WORKING_DIRECTORY $<TARGET_FILE_DIR:_alpaqa>)
+    install(FILES "$<TARGET_FILE_DIR:_alpaqa>/${DEBUG_FILE}"
         EXCLUDE_FROM_ALL
         CONFIGURATIONS Debug RelWithDebInfo
         COMPONENT python_modules_debug
