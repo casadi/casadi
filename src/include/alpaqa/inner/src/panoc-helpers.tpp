@@ -364,10 +364,9 @@ struct PANOCHelpers {
         ψ = problem.eval_ψ_grad_ψ(x, y, Σ, /* in ⟹ out */ grad_ψ, work_n,
                                   work_m);
         // Select a small step h for finite differences
-        auto h = (grad_ψ * ε)
-                     .cwiseAbs()
-                     .cwiseMax(δ)
-                     .cwiseProduct(grad_ψ.cwiseSign());
+        auto h        = grad_ψ.unaryExpr([&](real_t g) {
+            return g > 0 ? std::max(g * ε, δ) : std::min(g * ε, -δ);
+        });
         work_x        = x - h;
         real_t norm_h = h.norm();
         // Calculate ∇ψ(x₀ - h)
