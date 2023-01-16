@@ -4,6 +4,7 @@
 #include <iterator>
 #include <ranges>
 #include <type_traits>
+#include <utility>
 
 #if defined(__clang_major__) && __clang_major__ <= 15 && !defined(__clangd__)
 #error "Better ranges support required"
@@ -63,8 +64,8 @@ struct enumerate_t : std::ranges::view_interface<enumerate_t<Rng>> {
     enumerate_t() = default;
     enumerate_t(Rng rng) : rng{std::forward<Rng>(rng)} {}
 
-    using begin_t = decltype(std::ranges::begin(rng));
-    using end_t   = decltype(std::ranges::end(rng));
+    using begin_t = decltype(std::ranges::begin(std::as_const(rng)));
+    using end_t   = decltype(std::ranges::end(std::as_const(rng)));
 
     struct sentinel_t {
         end_t it;
