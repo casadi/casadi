@@ -1,8 +1,7 @@
 /**
  * @example{lineno} C++/CustomCppProblem/main.cpp
- *
  * This example shows how to define optimization problems using ordinary C++
- * functions.
+ * functions.  
  *
  * It solves a simple quadratic program of the form:
  * @f[ \begin{aligned}
@@ -13,9 +12,8 @@
 
 /**
  * @example{lineno} C++/FortranProblem/main.cpp
- *
  * This example shows how to define optimization problems using Fortran 
- * routines.
+ * routines.  
  *
  * It solves a simple quadratic program of the form:
  * @f[ \begin{aligned}
@@ -28,11 +26,26 @@
  * # Problem solution using alpaqa
  */
  
+/**
+ * @example{lineno} C++/DLProblem/main.cpp
+ * This example shows how to load optimization problems from an external library
+ * using `dlopen`.  
+ *
+ * It solves a simple quadratic program of the form:
+ * @f[ \begin{aligned}
+ * & \underset{x}{\text{minimize}} && \tfrac12 \tp x Q x \\ 
+ * & \text{subject to} && Ax \le b \\ 
+ * \end{aligned} @f]
+ *
+ * # Problem definition in C
+ * @include C++/DLProblem/problem.c
+ * # Problem solution using alpaqa
+ */
+
  /** 
  * @example{lineno} C++/CasADi/Rosenbrock/main.cpp
- *
  * This example shows how to generate a problem using CasADi and how to load
- * and solve it using alpaqa.
+ * and solve it using alpaqa.  
  *
  * # Problem generation using CasADi
  * @include CasADi/Rosenbrock/codegen-rosenbrock.py
@@ -41,14 +54,13 @@
 
 /**
  * @example Python/simple_optimization/getting-started.py
- *
  * This is a minimal example of an optimization problem that can be built and
- * solved using the `alpaqa` Python interface.
+ * solved using the `alpaqa` Python interface.  
  */
 
 /**
  * @example Python/simple_optimization/rosenbrock.py
  * This is a minimal example of an optimization problem that can be built and
  * solved using the `alpaqa` Python interface. It includes visualization of the
- * iterates.
+ * iterates.  
  */

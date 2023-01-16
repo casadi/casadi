@@ -6,26 +6,13 @@
 #include <alpaqa/util/alloc-check.hpp>
 #include <alpaqa/util/check-dim.hpp>
 #include <alpaqa/util/not-implemented.hpp>
+#include <alpaqa/util/required-method.hpp>
 #include <alpaqa/util/type-erasure.hpp>
 #include <chrono>
 #include <stdexcept>
 #include <type_traits>
 
 namespace alpaqa {
-
-#define ALPAQA_TE_REQUIRED_METHOD(vtable, type, member)                                            \
-    vtable.member = util::type_erased_wrapped<&type::member>()
-#define ALPAQA_TE_OPTIONAL_METHOD(vtable, type, member)                                            \
-    if constexpr (requires { &type::member; })                                                     \
-    vtable.member =                                                                                \
-        util::type_erased_wrapped<&type::member, const std::remove_cvref_t<decltype(vtable)> &>()
-#define ALPAQA_TE_DISABLED_METHOD(vtable, member, instance_p)                                      \
-    if constexpr (requires { (instance_p)->provides_##member(); })                                 \
-        if (!(instance_p)->provides_##member())                                                    \
-    vtable.member = nullptr
-#define ALPAQA_TE_DEFAULT_METHOD(vtable, member, default_)                                         \
-    if (vtable.member == nullptr)                                                                  \
-    vtable.member = default_
 
 template <Config Conf>
 struct ProblemVTable : util::BasicVTable {
@@ -58,39 +45,39 @@ struct ProblemVTable : util::BasicVTable {
 
     // Second order
     optional_const_function_t<void(crvec x, index_t i, rvec grad_gi)>
-        eval_grad_gi = nullptr;
+        eval_grad_gi = &default_eval_grad_gi;
     optional_const_function_t<void(crvec x, crvec y, crvec v, rvec Hv)>
-        eval_hess_L_prod = nullptr;
+        eval_hess_L_prod = &default_eval_hess_L_prod;
     optional_const_function_t<void(crvec x, crvec y, rmat H)>
-        eval_hess_L = nullptr;
+        eval_hess_L = &default_eval_hess_L;
 
     // Combined evaluations
     optional_const_function_t<real_t(crvec x, rvec grad_fx)>
-        eval_f_grad_f = nullptr;
+        eval_f_grad_f = &default_eval_f_grad_f;
     optional_const_function_t<real_t(crvec x, rvec g)>
-        eval_f_g = nullptr;
+        eval_f_g = &default_eval_f_g;
     optional_const_function_t<real_t(crvec x, rvec grad_fx, rvec g)>
-        eval_f_grad_f_g = nullptr;
+        eval_f_grad_f_g = &default_eval_f_grad_f_g;
     optional_const_function_t<void(crvec x, crvec y, rvec grad_f, rvec grad_gxy)>
-        eval_grad_f_grad_g_prod = nullptr;
+        eval_grad_f_grad_g_prod = &default_eval_grad_f_grad_g_prod;
 
     // Lagrangian and augmented lagrangian evaluations
     optional_const_function_t<void(crvec x, crvec y, rvec grad_L, rvec work_n)>
-        eval_grad_L = nullptr;
+        eval_grad_L = &default_eval_grad_L;
     optional_const_function_t<real_t(crvec x, crvec y, crvec Σ, rvec ŷ)>
-        eval_ψ = nullptr;
+        eval_ψ = &default_eval_ψ;
     optional_const_function_t<void(crvec x, crvec ŷ, rvec grad_ψ, rvec work_n)>
-        eval_grad_ψ_from_ŷ = nullptr;
+        eval_grad_ψ_from_ŷ = &default_eval_grad_ψ_from_ŷ;
     optional_const_function_t<void(crvec x, crvec y, crvec Σ, rvec grad_ψ, rvec work_n, rvec work_m)>
-        eval_grad_ψ = nullptr;
+        eval_grad_ψ = &default_eval_grad_ψ;
     optional_const_function_t<real_t(crvec x, crvec y, crvec Σ, rvec grad_ψ, rvec work_n, rvec work_m)>
-        eval_ψ_grad_ψ = nullptr;
+        eval_ψ_grad_ψ = &default_eval_ψ_grad_ψ;
 
     // Constraint sets
     optional_const_function_t<const Box &()>
-        get_box_C = nullptr;
+        get_box_C = &default_get_box_C;
     optional_const_function_t<const Box &()>
-        get_box_D = nullptr;
+        get_box_D = &default_get_box_D;
 
     // Check
     required_const_function_t<void()>
@@ -226,67 +213,25 @@ struct ProblemVTable : util::BasicVTable {
         ALPAQA_TE_REQUIRED_METHOD(vtable, P, eval_g);
         ALPAQA_TE_REQUIRED_METHOD(vtable, P, eval_grad_g_prod);
         // Second order
-        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_grad_gi);
-        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_hess_L_prod);
-        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_hess_L);
+        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_grad_gi, t.t);
+        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_hess_L_prod, t.t);
+        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_hess_L, t.t);
         // Combined evaluations
-        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_f_grad_f);
-        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_f_g);
-        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_f_grad_f_g);
-        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_grad_f_grad_g_prod);
+        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_f_grad_f, t.t);
+        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_f_g, t.t);
+        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_f_grad_f_g, t.t);
+        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_grad_f_grad_g_prod, t.t);
         // Lagrangian and augmented lagrangian evaluations
-        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_grad_L);
-        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_ψ);
-        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_grad_ψ_from_ŷ);
-        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_grad_ψ);
-        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_ψ_grad_ψ);
+        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_grad_L, t.t);
+        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_ψ, t.t);
+        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_grad_ψ_from_ŷ, t.t);
+        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_grad_ψ, t.t);
+        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_ψ_grad_ψ, t.t);
         // Constraint set
-        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, get_box_C);
-        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, get_box_D);
+        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, get_box_C, t.t);
+        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, get_box_D, t.t);
         // Check
         ALPAQA_TE_REQUIRED_METHOD(vtable, P, check);
-
-        // Disable optional methods
-
-        // Second order
-        ALPAQA_TE_DISABLED_METHOD(vtable, eval_grad_gi, t.t);
-        ALPAQA_TE_DISABLED_METHOD(vtable, eval_hess_L_prod, t.t);
-        ALPAQA_TE_DISABLED_METHOD(vtable, eval_hess_L, t.t);
-        // Combined evaluations
-        ALPAQA_TE_DISABLED_METHOD(vtable, eval_f_grad_f, t.t);
-        ALPAQA_TE_DISABLED_METHOD(vtable, eval_f_g, t.t);
-        ALPAQA_TE_DISABLED_METHOD(vtable, eval_f_grad_f_g, t.t);
-        ALPAQA_TE_DISABLED_METHOD(vtable, eval_grad_f_grad_g_prod, t.t);
-        // Lagrangian and augmented lagrangian evaluations
-        ALPAQA_TE_DISABLED_METHOD(vtable, eval_grad_L, t.t);
-        ALPAQA_TE_DISABLED_METHOD(vtable, eval_ψ, t.t);
-        ALPAQA_TE_DISABLED_METHOD(vtable, eval_grad_ψ_from_ŷ, t.t);
-        ALPAQA_TE_DISABLED_METHOD(vtable, eval_grad_ψ, t.t);
-        ALPAQA_TE_DISABLED_METHOD(vtable, eval_ψ_grad_ψ, t.t);
-        // Constraint sets
-        ALPAQA_TE_DISABLED_METHOD(vtable, P, get_box_C);
-        ALPAQA_TE_DISABLED_METHOD(vtable, P, get_box_D);
-
-        // Provide defaults
-
-        // Second order
-        ALPAQA_TE_DEFAULT_METHOD(vtable, eval_grad_gi, default_eval_grad_gi);
-        ALPAQA_TE_DEFAULT_METHOD(vtable, eval_hess_L_prod, default_eval_hess_L_prod);
-        ALPAQA_TE_DEFAULT_METHOD(vtable, eval_hess_L, default_eval_hess_L);
-        // Combined evaluations
-        ALPAQA_TE_DEFAULT_METHOD(vtable, eval_f_grad_f, default_eval_f_grad_f);
-        ALPAQA_TE_DEFAULT_METHOD(vtable, eval_f_g, default_eval_f_g);
-        ALPAQA_TE_DEFAULT_METHOD(vtable, eval_f_grad_f_g, default_eval_f_grad_f_g);
-        ALPAQA_TE_DEFAULT_METHOD(vtable, eval_grad_f_grad_g_prod, default_eval_grad_f_grad_g_prod);
-        // Lagrangian and augmented lagrangian evaluations
-        ALPAQA_TE_DEFAULT_METHOD(vtable, eval_grad_L, default_eval_grad_L);
-        ALPAQA_TE_DEFAULT_METHOD(vtable, eval_ψ, default_eval_ψ);
-        ALPAQA_TE_DEFAULT_METHOD(vtable, eval_grad_ψ_from_ŷ, default_eval_grad_ψ_from_ŷ);
-        ALPAQA_TE_DEFAULT_METHOD(vtable, eval_grad_ψ, default_eval_grad_ψ);
-        ALPAQA_TE_DEFAULT_METHOD(vtable, eval_ψ_grad_ψ, default_eval_ψ_grad_ψ);
-        // Constraint sets
-        ALPAQA_TE_DEFAULT_METHOD(vtable, get_box_C, default_get_box_C);
-        ALPAQA_TE_DEFAULT_METHOD(vtable, get_box_D, default_get_box_D);
 
         // Dimensions
         vtable.n = t.t->get_n();
@@ -294,11 +239,6 @@ struct ProblemVTable : util::BasicVTable {
     }
     ProblemVTable() = default;
 };
-
-#undef ALPAQA_TE_OPTIONAL_METHOD
-#undef ALPAQA_TE_REQUIRED_METHOD
-#undef ALPAQA_TE_DISABLED_METHOD
-#undef ALPAQA_TE_DEFAULT_METHOD
 
 template <Config Conf = DefaultConfig, class Allocator = std::allocator<std::byte>>
 class TypeErasedProblem : public util::TypeErased<ProblemVTable<Conf>, Allocator> {
@@ -753,24 +693,24 @@ struct ProblemWithCounters {
     const Box &get_box_D() const requires requires { &std::remove_cvref_t<Problem>::get_box_D; } { ++evaluations->f_g; return timed(evaluations->time.f_g, std::bind(&std::remove_cvref_t<Problem>::get_box_D, &problem)); }
     void check() const { problem.check(); }
 
-    template <class... Args> decltype(auto) provides_eval_grad_gi(Args... args) const requires requires { &std::remove_cvref_t<Problem>::provides_eval_grad_gi; } { return problem.provides_eval_grad_gi(std::forward<Args>(args)...); }
-    template <class... Args> decltype(auto) provides_eval_hess_L_prod(Args... args) const requires requires { &std::remove_cvref_t<Problem>::provides_eval_hess_L_prod; } { return problem.provides_eval_hess_L_prod(std::forward<Args>(args)...); }
-    template <class... Args> decltype(auto) provides_eval_hess_L(Args... args) const requires requires { &std::remove_cvref_t<Problem>::provides_eval_hess_L; } { return problem.provides_eval_hess_L(std::forward<Args>(args)...); }
-    template <class... Args> decltype(auto) provides_eval_f_grad_f(Args... args) const requires requires { &std::remove_cvref_t<Problem>::provides_eval_f_grad_f; } { return problem.provides_eval_f_grad_f(std::forward<Args>(args)...); }
-    template <class... Args> decltype(auto) provides_eval_f_g(Args... args) const requires requires { &std::remove_cvref_t<Problem>::provides_eval_f_g; } { return problem.provides_eval_f_g(std::forward<Args>(args)...); }
-    template <class... Args> decltype(auto) provides_eval_f_grad_f_g(Args... args) const requires requires { &std::remove_cvref_t<Problem>::provides_eval_f_grad_f_g; } { return problem.provides_eval_f_grad_f_g(std::forward<Args>(args)...); }
-    template <class... Args> decltype(auto) provides_eval_grad_f_grad_g_prod(Args... args) const requires requires { &std::remove_cvref_t<Problem>::provides_eval_grad_f_grad_g_prod; } { return problem.provides_eval_grad_f_grad_g_prod(std::forward<Args>(args)...); }
-    template <class... Args> decltype(auto) provides_eval_grad_L(Args... args) const requires requires { &std::remove_cvref_t<Problem>::provides_eval_grad_L; } { return problem.provides_eval_grad_L(std::forward<Args>(args)...); }
-    template <class... Args> decltype(auto) provides_eval_ψ(Args... args) const requires requires { &std::remove_cvref_t<Problem>::provides_eval_ψ; } { return problem.provides_eval_ψ(std::forward<Args>(args)...); }
-    template <class... Args> decltype(auto) provides_eval_grad_ψ_from_ŷ(Args... args) const requires requires { &std::remove_cvref_t<Problem>::provides_eval_grad_ψ_from_ŷ; } { return problem.provides_eval_grad_ψ_from_ŷ(std::forward<Args>(args)...); }
-    template <class... Args> decltype(auto) provides_eval_grad_ψ(Args... args) const requires requires { &std::remove_cvref_t<Problem>::provides_eval_grad_ψ; } { return problem.provides_eval_grad_ψ(std::forward<Args>(args)...); }
-    template <class... Args> decltype(auto) provides_eval_ψ_grad_ψ(Args... args) const requires requires { &std::remove_cvref_t<Problem>::provides_eval_ψ_grad_ψ; } { return problem.provides_eval_ψ_grad_ψ(std::forward<Args>(args)...); }
-    template <class... Args> decltype(auto) provides_get_box_C(Args... args) const requires requires { &std::remove_cvref_t<Problem>::provides_get_box_C; } { return problem.provides_get_box_C(std::forward<Args>(args)...); }
-    template <class... Args> decltype(auto) provides_get_box_D(Args... args) const requires requires { &std::remove_cvref_t<Problem>::provides_get_box_D; } { return problem.provides_get_box_D(std::forward<Args>(args)...); }
+    [[nodiscard]] bool provides_eval_grad_gi() const requires requires (Problem p) { { p.provides_eval_grad_gi() } -> std::convertible_to<bool>; } { return problem.provides_eval_grad_gi(); }
+    [[nodiscard]] bool provides_eval_hess_L_prod() const requires requires (Problem p) { { p.provides_eval_hess_L_prod() } -> std::convertible_to<bool>; } { return problem.provides_eval_hess_L_prod(); }
+    [[nodiscard]] bool provides_eval_hess_L() const requires requires (Problem p) { { p.provides_eval_hess_L() } -> std::convertible_to<bool>; } { return problem.provides_eval_hess_L(); }
+    [[nodiscard]] bool provides_eval_f_grad_f() const requires requires (Problem p) { { p.provides_eval_f_grad_f() } -> std::convertible_to<bool>; } { return problem.provides_eval_f_grad_f(); }
+    [[nodiscard]] bool provides_eval_f_g() const requires requires (Problem p) { { p.provides_eval_f_g() } -> std::convertible_to<bool>; } { return problem.provides_eval_f_g(); }
+    [[nodiscard]] bool provides_eval_f_grad_f_g() const requires requires (Problem p) { { p.provides_eval_f_grad_f_g() } -> std::convertible_to<bool>; } { return problem.provides_eval_f_grad_f_g(); }
+    [[nodiscard]] bool provides_eval_grad_f_grad_g_prod() const requires requires (Problem p) { { p.provides_eval_grad_f_grad_g_prod() } -> std::convertible_to<bool>; } { return problem.provides_eval_grad_f_grad_g_prod(); }
+    [[nodiscard]] bool provides_eval_grad_L() const requires requires (Problem p) { { p.provides_eval_grad_L() } -> std::convertible_to<bool>; } { return problem.provides_eval_grad_L(); }
+    [[nodiscard]] bool provides_eval_ψ() const requires requires (Problem p) { { p.provides_eval_ψ() } -> std::convertible_to<bool>; } { return problem.provides_eval_ψ(); }
+    [[nodiscard]] bool provides_eval_grad_ψ_from_ŷ() const requires requires (Problem p) { { p.provides_eval_grad_ψ_from_ŷ() } -> std::convertible_to<bool>; } { return problem.provides_eval_grad_ψ_from_ŷ(); }
+    [[nodiscard]] bool provides_eval_grad_ψ() const requires requires (Problem p) { { p.provides_eval_grad_ψ() } -> std::convertible_to<bool>; } { return problem.provides_eval_grad_ψ(); }
+    [[nodiscard]] bool provides_eval_ψ_grad_ψ() const requires requires (Problem p) { { p.provides_eval_ψ_grad_ψ() } -> std::convertible_to<bool>; } { return problem.provides_eval_ψ_grad_ψ(); }
+    [[nodiscard]] bool provides_get_box_C() const requires requires (Problem p) { { p.provides_get_box_C() } -> std::convertible_to<bool>; } { return problem.provides_get_box_C(); }
+    [[nodiscard]] bool provides_get_box_D() const requires requires (Problem p) { { p.provides_get_box_D() } -> std::convertible_to<bool>; } { return problem.provides_get_box_D(); }
     // clang-format on
 
-    length_t get_n() const { return problem.get_n(); }
-    length_t get_m() const { return problem.get_m(); }
+    [[nodiscard]] length_t get_n() const { return problem.get_n(); }
+    [[nodiscard]] length_t get_m() const { return problem.get_m(); }
 
     std::shared_ptr<EvalCounter> evaluations = std::make_shared<EvalCounter>();
     Problem problem;
@@ -844,7 +784,7 @@ class BoxConstrProblem {
                 .binaryExpr(C.lowerbound - x, binary_real_f(std::fmax))
                 .binaryExpr(C.upperbound - x, binary_real_f(std::fmin));
         x̂ = x + p;
-        return real_t{0};
+        return real_t(0);
     }
 
     /// @see @ref TypeErasedProblem::eval_prox_grad_step

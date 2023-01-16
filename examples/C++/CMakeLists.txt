@@ -11,3 +11,7 @@ find_package(casadi)
 if (TARGET casadi AND TARGET alpaqa::casadi-loader)
     add_subdirectory(CasADi)
 endif()
+
+if (TARGET alpaqa::dl-loader)
+    add_subdirectory(DLProblem)
+endif()

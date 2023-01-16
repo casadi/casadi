@@ -437,7 +437,7 @@ class TypeErased {
             return;
         vtable             = other.vtable;
         auto storage_guard = allocate(other.size);
-        // If copy constructor throws, storage should be deallocated and self 
+        // If copy constructor throws, storage should be deallocated and self
         // set to null, otherwise the TypeErased destructor will attempt to call
         // the contained object's destructor, which is undefined behavior if
         // construction failed.
@@ -498,6 +498,20 @@ class TypeErased {
         assert(f);
         assert(self);
         return f(self);
+    }
+    /// @copydoc call
+    template <class Ret>
+    decltype(auto) call(Ret (*f)(const void *, const VTable &)) const {
+        assert(f);
+        assert(self);
+        return f(self, vtable);
+    }
+    /// @copydoc call
+    template <class Ret>
+    decltype(auto) call(Ret (*f)(void *, const VTable &)) {
+        assert(f);
+        assert(self);
+        return f(self, vtable);
     }
 };
 
