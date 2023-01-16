@@ -4,17 +4,14 @@
 #include <alpaqa/interop/casadi/CasADiControlProblem.hpp>
 #include <alpaqa/interop/casadi/CasADiFunctionWrapper.hpp>
 #include <alpaqa/util/not-implemented.hpp>
+#include <alpaqa/util/sparse-ops.hpp>
 #include "CasADiLoader-util.hpp"
-#include "alpaqa/util/iter-adapter.hpp"
-#include "alpaqa/util/set-intersection.hpp"
 
 #include <Eigen/Sparse>
 #include <casadi/core/external.hpp>
 
 #include <memory>
 #include <optional>
-#include <ranges>
-#include <span>
 #include <stdexcept>
 #include <type_traits>
 
@@ -68,18 +65,6 @@ CasADiControlProblem<Conf>::CasADiControlProblem(const std::string &so_name,
             throw std::invalid_argument(
                 "Invalid number of output arguments: got "s +
                 std::to_string(ffun.n_in()) + ", should be 1.");
-        // if (ffun.size2_in(0) != 1)
-        //     throw std::invalid_argument(
-        //         "First input argument should be a column vector.");
-        // if (ffun.size2_in(1) != 1)
-        //     throw std::invalid_argument(
-        //         "Second input argument should be a column vector.");
-        // if (ffun.size2_in(2) != 1)
-        //     throw std::invalid_argument(
-        //         "Third input argument should be a column vector.");
-        // if (ffun.size2_out(0) != 1)
-        //     throw std::invalid_argument(
-        //         "First output argument should be a column vector.");
         nx = static_cast<length_t>(ffun.size1_in(0));
         nu = static_cast<length_t>(ffun.size1_in(1));
         p  = static_cast<length_t>(ffun.size1_in(2));
@@ -99,9 +84,6 @@ CasADiControlProblem<Conf>::CasADiControlProblem(const std::string &so_name,
             throw std::invalid_argument(
                 "Invalid number of output arguments: got "s +
                 std::to_string(hfun.n_in()) + ", should be 1.");
-        // if (hfun.n_out() == 1 && hfun.size2_out(0) != 1)
-        //     throw std::invalid_argument(
-        //         "First output argument should be a column vector.");
         nh = static_cast<length_t>(hfun.size1_out(0));
         CasADiFunctionEvaluator<Conf, 3, 1> h{std::move(hfun)};
         h.validate_dimensions({dim(nx, 1), dim(nu, 1), dim(p, 1)},
@@ -135,9 +117,6 @@ CasADiControlProblem<Conf>::CasADiControlProblem(const std::string &so_name,
             throw std::invalid_argument(
                 "Invalid number of output arguments: got "s +
                 std::to_string(cfun.n_in()) + ", should be 1.");
-        // if (cfun.n_out() == 1 && cfun.size2_out(0) != 1)
-        //     throw std::invalid_argument(
-        //         "First output argument should be a column vector.");
         nc = static_cast<length_t>(cfun.size1_out(0));
         CasADiFunctionEvaluator<Conf, 2, 1> c{std::move(cfun)};
         c.validate_dimensions({dim(nx, 1), dim(p, 1)}, {dim(nc, 1)});
@@ -319,67 +298,6 @@ void CasADiControlProblem<Conf>::eval_add_Q_N(crvec x, crvec h, rmat Q) const {
         };
 }
 
-namespace detail {
-/// Returns a range over the row indices in the given column of @p sp_mat that
-/// are also in @ref mask.
-/// Returns a range of full Eigen InnerIterators (row, column, value).
-template <class SpMat, class MaskVec>
-auto select_rows_in_col(const SpMat &sp_mat, const MaskVec &mask, auto column) {
-    // Make a range that iterates over all matrix elements in the given column:
-    using row_iter_t = typename SpMat::InnerIterator;
-    util::iter_range_adapter<row_iter_t> col_range{{sp_mat, column}};
-    // Projector that extracts the row index from an element of that range:
-    static constexpr auto proj_row = [](const row_iter_t &it) {
-        return static_cast<typename MaskVec::value_type>(it.row());
-    };
-    // Make a range over the indices of the rows selected by the mask:
-    std::span mask_span{mask.data(), static_cast<size_t>(mask.size())};
-    // Compute the intersection between the matrix elements and the mask:
-    auto intersection = util::iter_set_intersection(
-        std::move(col_range), std::move(mask_span), std::less{}, proj_row);
-    // Extract just the iterator to the matrix element (dropping the mask):
-    auto extract_eigen_iter = []<class T>(T &&tup) -> decltype(auto) {
-        return std::get<0>(std::forward<T>(tup));
-    };
-    return std::views::transform(std::move(intersection), extract_eigen_iter);
-}
-/// Like @ref select_rows_in_col, but returns a range of tuples containing the
-/// Eigen InnerIterator and a linear index into the mask.
-template <class SpMat, class MaskVec>
-auto select_rows_in_col_iota(const SpMat &sp_mat, const MaskVec &mask,
-                             auto column) {
-    // Make a range that iterates over all matrix elements in the given column:
-    using row_iter_t = typename SpMat::InnerIterator;
-    util::iter_range_adapter<row_iter_t> col_range{{sp_mat, column}};
-    // Projector that extracts the row index from an element of that range:
-    static constexpr auto proj_row = [](const row_iter_t &it) {
-        return static_cast<typename MaskVec::value_type>(it.row());
-    };
-    // Make a range over the indices of the rows selected by the mask:
-    std::span mask_span{mask.data(), static_cast<size_t>(mask.size())};
-    // Make a range of tuples of the index into the mask and the mask value:
-    auto iota_mask = util::enumerate(std::move(mask_span));
-    // Projector that extracts the mask value from such a tuple:
-    static constexpr auto proj_mask = [](const auto &tup) -> decltype(auto) {
-        return std::get<1>(tup);
-    };
-    // Compute the intersection between the matrix elements and the mask:
-    auto intersection =
-        util::iter_set_intersection(std::move(col_range), std::move(iota_mask),
-                                    std::less{}, proj_row, proj_mask);
-    // Extract the iterator to the matrix element and the index into the mask:
-    auto extract_eigen_iter_and_index = []<class T>(T && tup)
-        requires(std::is_rvalue_reference_v<T &&>)
-    {
-        auto &[eigen_iter, enum_tup] = tup;
-        auto &mask_index             = std::get<0>(enum_tup);
-        return std::tuple{std::move(eigen_iter), std::move(mask_index)};
-    };
-    return std::views::transform(std::move(intersection),
-                                 extract_eigen_iter_and_index);
-}
-} // namespace detail
-
 template <Config Conf>
 void CasADiControlProblem<Conf>::eval_add_R_masked(index_t, crvec xu, crvec h,
                                                    crindexvec mask, rmat R,
@@ -395,18 +313,14 @@ void CasADiControlProblem<Conf>::eval_add_R_masked(index_t, crvec xu, crvec h,
     impl->R({xu.data(), h.data(), param.data()}, {work.data()});
     using spmat   = Eigen::SparseMatrix<real_t, Eigen::ColMajor, casadi_int>;
     using cmspmat = Eigen::Map<const spmat>;
-    if (sparse.is_dense())
-        R += cmmat{work.data(), nu, nu}(mask, mask);
-    else {
+    if (sparse.is_dense()) {
+        cmmat R_full{work.data(), nu, nu};
+        R += R_full(mask, mask);
+    } else {
         cmspmat R_full{
             nu, nu, sparse.nnz(), sparse.colind(), sparse.row(), work.data(),
         };
-        using detail::select_rows_in_col_iota;
-        // Iterate over all columns in the mask
-        for (auto [ci, c] : util::enumerate(mask))
-            // Iterate over rows in intersection of mask and sparse column
-            for (auto [r, ri] : select_rows_in_col_iota(R_full, mask, c))
-                R(ri, ci) += r.value();
+        util::sparse_add_masked(R_full, R, mask);
     }
 }
 
@@ -425,18 +339,14 @@ void CasADiControlProblem<Conf>::eval_add_S_masked(index_t, crvec xu, crvec h,
     using spmat   = Eigen::SparseMatrix<real_t, Eigen::ColMajor, casadi_int>;
     using cmspmat = Eigen::Map<const spmat>;
     using Eigen::placeholders::all;
-    if (sparse.is_dense())
-        S += cmmat{work.data(), nu, nx}(mask, all);
-    else {
+    if (sparse.is_dense()) {
+        cmmat S_full{work.data(), nu, nx};
+        S += S_full(mask, all);
+    } else {
         cmspmat S_full{
             nu, nx, sparse.nnz(), sparse.colind(), sparse.row(), work.data(),
         };
-        using detail::select_rows_in_col_iota;
-        // Iterate over all columns
-        for (index_t c = 0; c < S_full.cols(); ++c)
-            // Iterate over rows in intersection of mask and sparse column
-            for (auto [r, ri] : select_rows_in_col_iota(S_full, mask, c))
-                S(ri, c) += r.value();
+        util::sparse_add_masked_rows(S_full, S, mask);
     }
 }
 
@@ -453,19 +363,14 @@ void CasADiControlProblem<Conf>::eval_add_R_prod_masked(index_t, crvec, crvec,
     using spmat   = Eigen::SparseMatrix<real_t, Eigen::ColMajor, casadi_int>;
     using cmspmat = Eigen::Map<const spmat>;
     if (sparse.is_dense()) {
-        auto R_JK = cmmat{work.data(), nu, nu}(mask_J, mask_K);
-        out.noalias() += R_JK * v(mask_K);
+        auto R = cmmat{work.data(), nu, nu};
+        out.noalias() += R(mask_J, mask_K) * v(mask_K);
     } else {
-        cmspmat R_full{
+        cmspmat R{
             nu, nu, sparse.nnz(), sparse.colind(), sparse.row(), work.data(),
         };
-        using detail::select_rows_in_col_iota;
-        // out += R_JK * v_K;
-        // Iterate over all columns in the mask K
-        for (index_t c : mask_K)
-            // Iterate over rows in intersection of mask J and sparse column
-            for (auto &&[r, i] : select_rows_in_col_iota(R_full, mask_J, c))
-                out(i) += r.value() * v(c);
+        // out += R_full(mask_J,mask_K) * v(mask_K);
+        util::sparse_matvec_add_masked_rows_cols(R, v, out, mask_J, mask_K);
     }
 }
 
@@ -482,18 +387,14 @@ void CasADiControlProblem<Conf>::eval_add_S_prod_masked(index_t, crvec, crvec,
     using cmspmat = Eigen::Map<const spmat>;
     using Eigen::placeholders::all;
     if (sparse.is_dense()) {
-        auto Sᵀ_K = cmmat{work.data(), nu, nu}.transpose()(all, mask_K);
-        out.noalias() += Sᵀ_K * v(mask_K);
+        auto Sᵀ = cmmat{work.data(), nu, nu}.transpose();
+        out.noalias() += Sᵀ(all, mask_K) * v(mask_K);
     } else {
-        cmspmat S_full{
+        cmspmat S{
             nu, nu, sparse.nnz(), sparse.colind(), sparse.row(), work.data(),
         };
-        // out += Sᵀ_K * v(mask_K);
-        // Iterate over all rows of Sᵀ
-        for (index_t c = 0; c < S_full.cols(); ++c)
-            // Iterate over columns in intersection of mask K and sparse row
-            for (auto r : detail::select_rows_in_col(S_full, mask_K, c))
-                out(c) += r.value() * v(r.row());
+        // out += S(mask_K,:)ᵀ * v(mask_K);
+        util::sparse_matvec_add_transpose_masked_rows(S, v, out, mask_K);
     }
 }
 

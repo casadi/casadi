@@ -15,6 +15,7 @@ add_executable(tests
     "util/test-type-erasure.cpp"
     "util/test-index-set.cpp"
     "util/test-set-intersection.cpp"
+    "util/test-sparse-ops.cpp"
     "outer/test-alm.cpp"
     "problem/test-type-erased-problem.cpp"
     "problem/test-variant-matrix.cpp"

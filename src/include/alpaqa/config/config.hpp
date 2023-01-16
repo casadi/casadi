@@ -168,3 +168,35 @@ auto norm_1(const Eigen::MatrixBase<Derived> &v) {
 } // namespace vec_util
 
 } // namespace alpaqa
+
+template <class Scalar, int Rows, int Cols, int Options, int MaxRows,
+          int MaxCols>
+inline constexpr bool std::ranges::enable_borrowed_range<              //
+    Eigen::Ref<                                                        //
+        Eigen::Matrix<Scalar, Rows, Cols, Options, MaxRows, MaxCols>>> //
+    = true;
+
+// TODO: This might be dangerous, because Ref<const> could be owning.
+//       Fix: create custom Ref class that doesn't keep a copy.
+template <class Scalar, int Rows, int Cols, int Options, int MaxRows,
+          int MaxCols>
+inline constexpr bool std::ranges::enable_borrowed_range<                    //
+    Eigen::Ref<                                                              //
+        const Eigen::Matrix<Scalar, Rows, Cols, Options, MaxRows, MaxCols>>> //
+    = true;
+
+template <class Scalar, int Rows, int Cols, int Options, int MaxRows,
+          int MaxCols, int MapOptions, class StrideType>
+inline constexpr bool std::ranges::enable_borrowed_range<             //
+    Eigen::Map<                                                       //
+        Eigen::Matrix<Scalar, Rows, Cols, Options, MaxRows, MaxCols>, //
+        MapOptions, StrideType>>                                      //
+    = true;
+
+template <class Scalar, int Rows, int Cols, int Options, int MaxRows,
+          int MaxCols, int MapOptions, class StrideType>
+inline constexpr bool std::ranges::enable_borrowed_range<                   //
+    Eigen::Map<                                                             //
+        const Eigen::Matrix<Scalar, Rows, Cols, Options, MaxRows, MaxCols>, //
+        MapOptions, StrideType>>                                            //
+    = true;
