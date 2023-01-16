@@ -23,15 +23,8 @@ dependencies = ["numpy", "casadi"]
 dynamic = ["version", "description"]
 
 [project.optional-dependencies]
-docs = [
-    "sphinx~=5.1",
-    "matplotlib",
-    "breathe",
-    "furo",
-]
-debug = [
-    "alpaqa-debug==1.0.0a7"
-]
+docs = ["sphinx~=5.1", "matplotlib", "breathe", "furo"]
+debug = ["alpaqa-debug==1.0.0a7"]
 
 [project.urls]
 "Documentation" = "https://kul-optec.github.io/alpaqa"
@@ -42,7 +35,7 @@ debug = [
 alpaqa = "alpaqa.__main__:main"
 
 [build-system]
-requires = ["py-build-cmake~=0.1.1", "pybind11", "pybind11-stubgen"]
+requires = ["py-build-cmake~=0.1.1", "pybind11>=2.10.1,!=2.10.2,!=2.10.3", "pybind11-stubgen"]
 build-backend = "py_build_cmake.build"
 
 [tool.py-build-cmake.module]
