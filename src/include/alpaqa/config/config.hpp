@@ -24,9 +24,13 @@ struct is_config<DefaultConfig> : std::true_type {};
 #define USING_ALPAQA_CONFIG_NO_TYPENAME(Conf)                                  \
     using real_t [[maybe_unused]]     = Conf::real_t;                          \
     using vec [[maybe_unused]]        = Conf::vec;                             \
+    using mvec [[maybe_unused]]       = Conf::mvec;                            \
+    using cmvec [[maybe_unused]]      = Conf::cmvec;                           \
     using rvec [[maybe_unused]]       = Conf::rvec;                            \
     using crvec [[maybe_unused]]      = Conf::crvec;                           \
     using mat [[maybe_unused]]        = Conf::mat;                             \
+    using mmat [[maybe_unused]]       = Conf::mmat;                            \
+    using cmmat [[maybe_unused]]      = Conf::cmmat;                           \
     using rmat [[maybe_unused]]       = Conf::rmat;                            \
     using crmat [[maybe_unused]]      = Conf::crmat;                           \
     using length_t [[maybe_unused]]   = Conf::length_t;                        \
@@ -46,9 +50,13 @@ struct is_config<DefaultConfig> : std::true_type {};
 // clang-format off
 template <Config Conf = DefaultConfig> using real_t = typename Conf::real_t;
 template <Config Conf = DefaultConfig> using vec = typename Conf::vec;
+template <Config Conf = DefaultConfig> using mvec = typename Conf::mvec;
+template <Config Conf = DefaultConfig> using cmvec = typename Conf::cmvec;
 template <Config Conf = DefaultConfig> using rvec = typename Conf::rvec;
 template <Config Conf = DefaultConfig> using crvec = typename Conf::crvec;
 template <Config Conf = DefaultConfig> using mat = typename Conf::mat;
+template <Config Conf = DefaultConfig> using mmat = typename Conf::mmat;
+template <Config Conf = DefaultConfig> using cmmat = typename Conf::cmmat;
 template <Config Conf = DefaultConfig> using rmat = typename Conf::rmat;
 template <Config Conf = DefaultConfig> using crmat = typename Conf::crmat;
 template <Config Conf = DefaultConfig> using length_t = typename Conf::length_t;
@@ -69,12 +77,20 @@ struct EigenConfig {
     using real_t = RealT;
     /// Dynamic vector type.
     using vec = Eigen::VectorX<real_t>;
+    /// Map of vector type.
+    using mvec = Eigen::Map<vec>;
+    /// Immutable map of vector type.
+    using cmvec = Eigen::Map<const vec>;
     /// Reference to mutable vector.
     using rvec = Eigen::Ref<vec>;
     /// Reference to immutable vector.
     using crvec = Eigen::Ref<const vec>;
     /// Dynamic matrix type.
     using mat = Eigen::MatrixX<real_t>;
+    /// Map of matrix type.
+    using mmat = Eigen::Map<mat>;
+    /// Immutable map of matrix type.
+    using cmmat = Eigen::Map<const mat>;
     /// Reference to mutable matrix.
     using rmat = Eigen::Ref<mat>;
     /// Reference to immutable matrix.
