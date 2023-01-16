@@ -16,6 +16,7 @@ add_executable(tests
     "util/test-index-set.cpp"
     "outer/test-alm.cpp"
     "problem/test-type-erased-problem.cpp"
+    "problem/test-variant-matrix.cpp"
 )
 target_include_directories(tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_compile_definitions(tests PRIVATE _CRT_SECURE_NO_WARNINGS)
