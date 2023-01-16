@@ -401,11 +401,12 @@ void CasADiControlProblem<Conf>::eval_add_R_masked(index_t, crvec xu, crvec h,
         cmspmat R_full{
             nu, nu, sparse.nnz(), sparse.colind(), sparse.row(), work.data(),
         };
+        using detail::select_rows_in_col_iota;
         // Iterate over all columns in the mask
-        for (index_t c : mask)
+        for (auto [ci, c] : util::enumerate(mask))
             // Iterate over rows in intersection of mask and sparse column
-            for (auto r : detail::select_rows_in_col(R_full, mask, c))
-                R(r.row(), c) += r.value();
+            for (auto [r, ri] : select_rows_in_col_iota(R_full, mask, c))
+                R(ri, ci) += r.value();
     }
 }
 
@@ -423,17 +424,19 @@ void CasADiControlProblem<Conf>::eval_add_S_masked(index_t, crvec xu, crvec h,
     impl->S({xu.data(), h.data(), param.data()}, {work.data()});
     using spmat   = Eigen::SparseMatrix<real_t, Eigen::ColMajor, casadi_int>;
     using cmspmat = Eigen::Map<const spmat>;
+    using Eigen::placeholders::all;
     if (sparse.is_dense())
-        S += cmmat{work.data(), nu, nx}(mask, Eigen::all);
+        S += cmmat{work.data(), nu, nx}(mask, all);
     else {
         cmspmat S_full{
             nu, nx, sparse.nnz(), sparse.colind(), sparse.row(), work.data(),
         };
+        using detail::select_rows_in_col_iota;
         // Iterate over all columns
         for (index_t c = 0; c < S_full.cols(); ++c)
             // Iterate over rows in intersection of mask and sparse column
-            for (auto r : detail::select_rows_in_col(S_full, mask, c))
-                S(r.row(), c) += r.value();
+            for (auto [r, ri] : select_rows_in_col_iota(S_full, mask, c))
+                S(ri, c) += r.value();
     }
 }
 
@@ -477,8 +480,9 @@ void CasADiControlProblem<Conf>::eval_add_S_prod_masked(index_t, crvec, crvec,
     assert(work.size() >= sparse.nnz());
     using spmat   = Eigen::SparseMatrix<real_t, Eigen::ColMajor, casadi_int>;
     using cmspmat = Eigen::Map<const spmat>;
+    using Eigen::placeholders::all;
     if (sparse.is_dense()) {
-        auto Sᵀ_K = cmmat{work.data(), nu, nu}.transpose()(Eigen::all, mask_K);
+        auto Sᵀ_K = cmmat{work.data(), nu, nu}.transpose()(all, mask_K);
         out.noalias() += Sᵀ_K * v(mask_K);
     } else {
         cmspmat S_full{
