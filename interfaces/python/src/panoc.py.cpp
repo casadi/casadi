@@ -51,6 +51,7 @@ void register_panoc(py::module_ &m) {
         .def_readwrite("max_iter", &PANOCParams::max_iter)
         .def_readwrite("max_time", &PANOCParams::max_time)
         .def_readwrite("τ_min", &PANOCParams::τ_min)
+        .def_readwrite("β", &PANOCParams::β)
         .def_readwrite("L_min", &PANOCParams::L_min)
         .def_readwrite("L_max", &PANOCParams::L_max)
         .def_readwrite("stop_crit", &PANOCParams::stop_crit)
