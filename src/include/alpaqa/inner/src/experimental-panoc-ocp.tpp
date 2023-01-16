@@ -814,6 +814,7 @@ auto PANOCOCPSolver<Conf>::operator()(
                            did_gn ? J.sizes().sum() : nJ, lqr.min_rcond);
         if (progress_cb) {
             ScopedMallocAllower ma;
+            alpaqa::detail::Timed t{s.time_progress_callback};
             progress_cb({.k             = k,
                          .xu            = curr->xu,
                          .p             = curr->p,

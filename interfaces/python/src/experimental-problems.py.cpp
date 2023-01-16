@@ -20,7 +20,7 @@ void register_experimental_problems(py::module_ &m) {
     using alpaqa::util::check_dim;
 
     using OCProblem = alpaqa::TypeErasedOCProblem<config_t>;
-    py::class_<OCProblem> te_problem(m, "ExperimentalControlProblem",
+    py::class_<OCProblem> te_problem(m, "ControlProblem",
                                      "C++ documentation: :cpp:class:`alpaqa::TypeErasedProblem`");
     te_problem //
         .def(py::init<const OCProblem &>())
@@ -30,6 +30,14 @@ void register_experimental_problems(py::module_ &m) {
             "memo"_a)
         // TODO
         ;
+
+    // ProblemWithCounters
+    static constexpr auto te_pwc = []<class P>(P &&p) {
+        using PwC = alpaqa::OCProblemWithCounters<std::remove_cvref_t<P>>;
+        auto te_p = OCProblem::template make<PwC>(std::forward<P>(p));
+        auto eval = te_p.template as<PwC>().evaluations;
+        return std::make_tuple(std::move(te_p), std::move(eval));
+    };
 
     if constexpr (std::is_same_v<typename Conf::real_t, double>) {
 #if ALPAQA_HAVE_CASADI
@@ -46,7 +54,7 @@ void register_experimental_problems(py::module_ &m) {
 #endif
 
         py::class_<CasADiControlProblem>(
-            m, "ExperimentalCasADiControlProblem",
+            m, "CasADiControlProblem",
             "C++ documentation: :cpp:class:`alpaqa::CasADiControlProblem`\n\n"
             "See :py:class:`alpaqa._alpaqa.float64.TEControlProblem` for the full documentation.")
             .def("__copy__",
@@ -92,6 +100,14 @@ void register_experimental_problems(py::module_ &m) {
 #endif
         m.def("load_experimental_casadi_control_problem", load_experimental_CasADi_control_problem,
               "so_name"_a, "N"_a, "Load a compiled CasADi optimal control problem.\n\n");
+
+        m.def(
+            "control_problem_with_counters",
+            [](const CasADiControlProblem &p) { return te_pwc(p); }, "problem"_a,
+            "Wrap the problem to count all function evaluations.\n\n"
+            ":param problem: The original problem to wrap. Copied.\n"
+            ":return: * Wrapped problem.\n"
+            "         * Counters for wrapped problem.\n\n");
     }
 }
 

@@ -57,6 +57,7 @@ py::dict stats_to_dict(const experimental::PANOCOCPStats<Conf> &s) {
         "time_lbfgs_indices"_a      = s.time_lbfgs_indices,
         "time_lbfgs_apply"_a        = s.time_lbfgs_apply,
         "time_lbfgs_update"_a       = s.time_lbfgs_update,
+        "time_progress_callback"_a  = s.time_progress_callback,
         "iterations"_a              = s.iterations,
         "linesearch_failures"_a     = s.linesearch_failures,
         "lbfgs_failures"_a          = s.lbfgs_failures,

@@ -1,3 +1,4 @@
+#include <alpaqa/problem/ocproblem-counters.hpp>
 #include <alpaqa/problem/problem-counters.hpp>
 #include <pybind11/chrono.h>
 #include <pybind11/pybind11.h>
@@ -125,6 +126,153 @@ void register_counters(py::module_ &m) {
         .def_readwrite("ψ_grad_ψ", &alpaqa::EvalCounter::ψ_grad_ψ)
         .def_readwrite("time", &alpaqa::EvalCounter::time)
         .def("__str__", [](const alpaqa::EvalCounter &c) {
+            std::ostringstream os;
+            os << c;
+            return os.str();
+        });
+
+    py::class_<alpaqa::OCPEvalCounter, std::shared_ptr<alpaqa::OCPEvalCounter>> ocpevalcounter(
+        m, "OCPEvalCounter",
+        "C++ documentation: "
+        ":cpp:class:`alpaqa::OCPEvalCounter`\n\n");
+    py::class_<alpaqa::OCPEvalCounter::OCPEvalTimer>(
+        ocpevalcounter, "OCPEvalTimer",
+        "C++ documentation: "
+        ":cpp:class:`alpaqa::OCPEvalCounter::OCPEvalTimer`\n\n")
+        .def(py::pickle(
+            [](const alpaqa::OCPEvalCounter::OCPEvalTimer &p) { // __getstate__
+                return py::make_tuple(p.f, p.jac_f, p.grad_f_prod, p.h, p.h_N, p.l, p.l_N, p.qr,
+                                      p.q_N, p.add_Q, p.add_Q_N, p.add_R_masked, p.add_S_masked,
+                                      p.add_R_prod_masked, p.add_S_prod_masked, p.constr,
+                                      p.constr_N, p.jac_constr, p.jac_constr_N, p.grad_constr_prod,
+                                      p.grad_constr_prod_N, p.add_gn_hess_constr,
+                                      p.add_gn_hess_constr_N);
+            },
+            [](py::tuple t) { // __setstate__
+                if (t.size() != 23)
+                    throw std::runtime_error("Invalid state!");
+                using T = alpaqa::OCPEvalCounter::OCPEvalTimer;
+                return T{
+                    py::cast<decltype(T::f)>(t[0]),
+                    py::cast<decltype(T::jac_f)>(t[1]),
+                    py::cast<decltype(T::grad_f_prod)>(t[2]),
+                    py::cast<decltype(T::h)>(t[3]),
+                    py::cast<decltype(T::h_N)>(t[4]),
+                    py::cast<decltype(T::l)>(t[5]),
+                    py::cast<decltype(T::l_N)>(t[6]),
+                    py::cast<decltype(T::qr)>(t[7]),
+                    py::cast<decltype(T::q_N)>(t[8]),
+                    py::cast<decltype(T::add_Q)>(t[9]),
+                    py::cast<decltype(T::add_Q_N)>(t[10]),
+                    py::cast<decltype(T::add_R_masked)>(t[11]),
+                    py::cast<decltype(T::add_S_masked)>(t[12]),
+                    py::cast<decltype(T::add_R_prod_masked)>(t[13]),
+                    py::cast<decltype(T::add_S_prod_masked)>(t[14]),
+                    py::cast<decltype(T::constr)>(t[15]),
+                    py::cast<decltype(T::constr_N)>(t[16]),
+                    py::cast<decltype(T::jac_constr)>(t[17]),
+                    py::cast<decltype(T::jac_constr_N)>(t[18]),
+                    py::cast<decltype(T::grad_constr_prod)>(t[19]),
+                    py::cast<decltype(T::grad_constr_prod_N)>(t[20]),
+                    py::cast<decltype(T::add_gn_hess_constr)>(t[21]),
+                    py::cast<decltype(T::add_gn_hess_constr_N)>(t[22]),
+                };
+            }))
+        // clang-format off
+        .def_readwrite("f", &alpaqa::OCPEvalCounter::OCPEvalTimer::f)
+        .def_readwrite("jac_f", &alpaqa::OCPEvalCounter::OCPEvalTimer::jac_f)
+        .def_readwrite("grad_f_prod", &alpaqa::OCPEvalCounter::OCPEvalTimer::grad_f_prod)
+        .def_readwrite("h", &alpaqa::OCPEvalCounter::OCPEvalTimer::h)
+        .def_readwrite("h_N", &alpaqa::OCPEvalCounter::OCPEvalTimer::h_N)
+        .def_readwrite("l", &alpaqa::OCPEvalCounter::OCPEvalTimer::l)
+        .def_readwrite("l_N", &alpaqa::OCPEvalCounter::OCPEvalTimer::l_N)
+        .def_readwrite("qr", &alpaqa::OCPEvalCounter::OCPEvalTimer::qr)
+        .def_readwrite("q_N", &alpaqa::OCPEvalCounter::OCPEvalTimer::q_N)
+        .def_readwrite("add_Q", &alpaqa::OCPEvalCounter::OCPEvalTimer::add_Q)
+        .def_readwrite("add_Q_N", &alpaqa::OCPEvalCounter::OCPEvalTimer::add_Q_N)
+        .def_readwrite("add_R_masked", &alpaqa::OCPEvalCounter::OCPEvalTimer::add_R_masked)
+        .def_readwrite("add_S_masked", &alpaqa::OCPEvalCounter::OCPEvalTimer::add_S_masked)
+        .def_readwrite("add_R_prod_masked", &alpaqa::OCPEvalCounter::OCPEvalTimer::add_R_prod_masked)
+        .def_readwrite("add_S_prod_masked", &alpaqa::OCPEvalCounter::OCPEvalTimer::add_S_prod_masked)
+        .def_readwrite("constr", &alpaqa::OCPEvalCounter::OCPEvalTimer::constr)
+        .def_readwrite("constr_N", &alpaqa::OCPEvalCounter::OCPEvalTimer::constr_N)
+        .def_readwrite("jac_constr", &alpaqa::OCPEvalCounter::OCPEvalTimer::jac_constr)
+        .def_readwrite("jac_constr_N", &alpaqa::OCPEvalCounter::OCPEvalTimer::jac_constr_N)
+        .def_readwrite("grad_constr_prod", &alpaqa::OCPEvalCounter::OCPEvalTimer::grad_constr_prod)
+        .def_readwrite("grad_constr_prod_N", &alpaqa::OCPEvalCounter::OCPEvalTimer::grad_constr_prod_N)
+        .def_readwrite("add_gn_hess_constr", &alpaqa::OCPEvalCounter::OCPEvalTimer::add_gn_hess_constr)
+        .def_readwrite("add_gn_hess_constr_N", &alpaqa::OCPEvalCounter::OCPEvalTimer::add_gn_hess_constr_N)
+        // clang-format on
+        ;
+
+    ocpevalcounter
+        .def(py::pickle(
+            [](const alpaqa::OCPEvalCounter &p) { // __getstate__
+                return py::make_tuple(p.f, p.jac_f, p.grad_f_prod, p.h, p.h_N, p.l, p.l_N, p.qr,
+                                      p.q_N, p.add_Q, p.add_Q_N, p.add_R_masked, p.add_S_masked,
+                                      p.add_R_prod_masked, p.add_S_prod_masked, p.constr,
+                                      p.constr_N, p.jac_constr, p.jac_constr_N, p.grad_constr_prod,
+                                      p.grad_constr_prod_N, p.add_gn_hess_constr,
+                                      p.add_gn_hess_constr_N, p.time);
+            },
+            [](py::tuple t) { // __setstate__
+                if (t.size() != 24)
+                    throw std::runtime_error("Invalid state!");
+                using T = alpaqa::OCPEvalCounter;
+                return T{
+                    py::cast<decltype(T::f)>(t[0]),
+                    py::cast<decltype(T::jac_f)>(t[1]),
+                    py::cast<decltype(T::grad_f_prod)>(t[2]),
+                    py::cast<decltype(T::h)>(t[3]),
+                    py::cast<decltype(T::h_N)>(t[4]),
+                    py::cast<decltype(T::l)>(t[5]),
+                    py::cast<decltype(T::l_N)>(t[6]),
+                    py::cast<decltype(T::qr)>(t[7]),
+                    py::cast<decltype(T::q_N)>(t[8]),
+                    py::cast<decltype(T::add_Q)>(t[9]),
+                    py::cast<decltype(T::add_Q_N)>(t[10]),
+                    py::cast<decltype(T::add_R_masked)>(t[11]),
+                    py::cast<decltype(T::add_S_masked)>(t[12]),
+                    py::cast<decltype(T::add_R_prod_masked)>(t[13]),
+                    py::cast<decltype(T::add_S_prod_masked)>(t[14]),
+                    py::cast<decltype(T::constr)>(t[15]),
+                    py::cast<decltype(T::constr_N)>(t[16]),
+                    py::cast<decltype(T::jac_constr)>(t[17]),
+                    py::cast<decltype(T::jac_constr_N)>(t[18]),
+                    py::cast<decltype(T::grad_constr_prod)>(t[19]),
+                    py::cast<decltype(T::grad_constr_prod_N)>(t[20]),
+                    py::cast<decltype(T::add_gn_hess_constr)>(t[21]),
+                    py::cast<decltype(T::add_gn_hess_constr_N)>(t[22]),
+                    py::cast<decltype(T::time)>(t[23]),
+                };
+            }))
+        // clang-format off
+        .def_readwrite("f", &alpaqa::OCPEvalCounter::f)
+        .def_readwrite("jac_f", &alpaqa::OCPEvalCounter::jac_f)
+        .def_readwrite("grad_f_prod", &alpaqa::OCPEvalCounter::grad_f_prod)
+        .def_readwrite("h", &alpaqa::OCPEvalCounter::h)
+        .def_readwrite("h_N", &alpaqa::OCPEvalCounter::h_N)
+        .def_readwrite("l", &alpaqa::OCPEvalCounter::l)
+        .def_readwrite("l_N", &alpaqa::OCPEvalCounter::l_N)
+        .def_readwrite("qr", &alpaqa::OCPEvalCounter::qr)
+        .def_readwrite("q_N", &alpaqa::OCPEvalCounter::q_N)
+        .def_readwrite("add_Q", &alpaqa::OCPEvalCounter::add_Q)
+        .def_readwrite("add_Q_N", &alpaqa::OCPEvalCounter::add_Q_N)
+        .def_readwrite("add_R_masked", &alpaqa::OCPEvalCounter::add_R_masked)
+        .def_readwrite("add_S_masked", &alpaqa::OCPEvalCounter::add_S_masked)
+        .def_readwrite("add_R_prod_masked", &alpaqa::OCPEvalCounter::add_R_prod_masked)
+        .def_readwrite("add_S_prod_masked", &alpaqa::OCPEvalCounter::add_S_prod_masked)
+        .def_readwrite("constr", &alpaqa::OCPEvalCounter::constr)
+        .def_readwrite("constr_N", &alpaqa::OCPEvalCounter::constr_N)
+        .def_readwrite("jac_constr", &alpaqa::OCPEvalCounter::jac_constr)
+        .def_readwrite("jac_constr_N", &alpaqa::OCPEvalCounter::jac_constr_N)
+        .def_readwrite("grad_constr_prod", &alpaqa::OCPEvalCounter::grad_constr_prod)
+        .def_readwrite("grad_constr_prod_N", &alpaqa::OCPEvalCounter::grad_constr_prod_N)
+        .def_readwrite("add_gn_hess_constr", &alpaqa::OCPEvalCounter::add_gn_hess_constr)
+        .def_readwrite("add_gn_hess_constr_N", &alpaqa::OCPEvalCounter::add_gn_hess_constr_N)
+        .def_readwrite("time", &alpaqa::OCPEvalCounter::time)
+        // clang-format on
+        .def("__str__", [](const alpaqa::OCPEvalCounter &c) {
             std::ostringstream os;
             os << c;
             return os.str();

@@ -106,6 +106,7 @@ struct PANOCOCPStats {
     std::chrono::nanoseconds time_lbfgs_indices{};
     std::chrono::nanoseconds time_lbfgs_apply{};
     std::chrono::nanoseconds time_lbfgs_update{};
+    std::chrono::nanoseconds time_progress_callback{};
     unsigned iterations          = 0;
     unsigned linesearch_failures = 0;
     unsigned lbfgs_failures      = 0;

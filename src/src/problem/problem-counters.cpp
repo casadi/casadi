@@ -14,7 +14,14 @@ std::ostream &operator<<(std::ostream &os, const CountResult &t) {
     auto sec = [](auto t) { return std::chrono::duration<double>(t).count(); };
     os << std::setw(8);
     if (t.count > 0) {
-        os << t.count << "  (" << sec(t.time) << " s)\r\n";
+        os << t.count << "  (";
+        auto old  = os.flags();
+        auto prec = os.precision(3);
+        os << std::scientific << std::setw(9) << 1e6 * sec(t.time) << " µs, "
+           << std::setw(9) << 1e6 * sec(t.time) / static_cast<double>(t.count)
+           << " µs/call)\r\n";
+        os.precision(prec);
+        os.flags(old);
     } else {
         os << '-' << "\r\n";
     }
