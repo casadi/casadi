@@ -322,17 +322,22 @@ void CasADiControlProblem<Conf>::eval_add_Q_N(crvec x, crvec h, rmat Q) const {
 namespace detail {
 /// Returns a range over the row indices in the given column of @p sp_mat that
 /// are also in @ref mask.
-/// Returns a full Eigen InnerIterator (row, column, value)
+/// Returns a range of full Eigen InnerIterators (row, column, value).
 template <class SpMat, class MaskVec>
-auto select_rows_in_col(const SpMat &sp_mat, MaskVec mask, auto column) {
+auto select_rows_in_col(const SpMat &sp_mat, const MaskVec &mask, auto column) {
+    // Make a range that iterates over all matrix elements in the given column:
     using row_iter_t = typename SpMat::InnerIterator;
     util::iter_range_adapter<row_iter_t> col_range{{sp_mat, column}};
+    // Projector that extracts the row index from an element of that range:
     static constexpr auto proj_row = [](const row_iter_t &it) {
         return static_cast<typename MaskVec::value_type>(it.row());
     };
+    // Make a range over the indices of the rows selected by the mask:
     std::span mask_span{mask.data(), static_cast<size_t>(mask.size())};
+    // Compute the intersection between the matrix elements and the mask:
     auto intersection = util::iter_set_intersection(
         std::move(col_range), std::move(mask_span), std::less{}, proj_row);
+    // Extract just the iterator to the matrix element (dropping the mask):
     auto extract_eigen_iter = []<class T>(T &&tup) -> decltype(auto) {
         return std::get<0>(std::forward<T>(tup));
     };
@@ -341,19 +346,28 @@ auto select_rows_in_col(const SpMat &sp_mat, MaskVec mask, auto column) {
 /// Like @ref select_rows_in_col, but returns a range of tuples containing the
 /// Eigen InnerIterator and a linear index into the mask.
 template <class SpMat, class MaskVec>
-auto select_rows_in_col_iota(const SpMat &sp_mat, MaskVec mask, auto column) {
+auto select_rows_in_col_iota(const SpMat &sp_mat, const MaskVec &mask,
+                             auto column) {
+    // Make a range that iterates over all matrix elements in the given column:
     using row_iter_t = typename SpMat::InnerIterator;
     util::iter_range_adapter<row_iter_t> col_range{{sp_mat, column}};
-    std::span mask_span{mask.data(), static_cast<size_t>(mask.size())};
+    // Projector that extracts the row index from an element of that range:
     static constexpr auto proj_row = [](const row_iter_t &it) {
         return static_cast<typename MaskVec::value_type>(it.row());
     };
+    // Make a range over the indices of the rows selected by the mask:
+    std::span mask_span{mask.data(), static_cast<size_t>(mask.size())};
+    // Make a range of tuples of the index into the mask and the mask value:
+    auto iota_mask = util::enumerate(std::move(mask_span));
+    // Projector that extracts the mask value from such a tuple:
     static constexpr auto proj_mask = [](const auto &tup) -> decltype(auto) {
         return std::get<1>(tup);
     };
-    auto intersection = util::iter_set_intersection(
-        std::move(col_range), util::enumerate(std::move(mask_span)),
-        std::less{}, proj_row, proj_mask);
+    // Compute the intersection between the matrix elements and the mask:
+    auto intersection =
+        util::iter_set_intersection(std::move(col_range), std::move(iota_mask),
+                                    std::less{}, proj_row, proj_mask);
+    // Extract the iterator to the matrix element and the index into the mask:
     auto extract_eigen_iter_and_index = []<class T>(T && tup)
         requires(std::is_rvalue_reference_v<T &&>)
     {
