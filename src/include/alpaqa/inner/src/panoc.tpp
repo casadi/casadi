@@ -255,14 +255,14 @@ auto PANOCSolver<DirectionProviderT>::operator()(
         real_t τ_init = NaN<config_t>;
         if (k == 0) { // Initialize L-BFGS
             ScopedMallocAllower ma;
-            direction.initialize(problem, y, Σ, curr->γ, curr->x,
-                                          curr->x̂, curr->p, curr->grad_ψ);
+            direction.initialize(problem, y, Σ, curr->γ, curr->x, curr->x̂,
+                                 curr->p, curr->grad_ψ);
             τ_init = 0;
         }
         if (k > 0 || direction.has_initial_direction()) {
             τ_init = 1;
-            direction.apply(curr->γ, curr->x, curr->x̂, curr->p,
-                                     curr->grad_ψ, q);
+            direction.apply(curr->γ, curr->x, curr->x̂, curr->p, curr->grad_ψ,
+                            q);
         }
         // Make sure quasi-Newton step is valid
         if (not q.allFinite()) {
@@ -304,6 +304,14 @@ auto PANOCSolver<DirectionProviderT>::operator()(
                 τ_prev = τ;
             }
 
+            // If the cost is not finite, abandon the direction entirely, don't
+            // even bother backtracking.
+            if (τ > 0 && !std::isfinite(next->ψx)) {
+                τ = 0;
+                direction.reset();
+                continue;
+            }
+
             // Calculate x̂ₖ₊₁, ψ(x̂ₖ₊₁)
             eval_prox_grad_step(*next);
             eval_ψx̂(*next);
@@ -342,9 +350,9 @@ auto PANOCSolver<DirectionProviderT>::operator()(
         if (curr->γ != next->γ) // Flush L-BFGS if γ changed
             direction.changed_γ(next->γ, curr->γ);
 
-        s.lbfgs_rejected += not direction.update(
-            curr->γ, next->γ, curr->x, next->x, curr->p, next->p, curr->grad_ψ,
-            next->grad_ψ);
+        s.lbfgs_rejected +=
+            not direction.update(curr->γ, next->γ, curr->x, next->x, curr->p,
+                                 next->p, curr->grad_ψ, next->grad_ψ);
 
         // Advance step --------------------------------------------------------
         std::swap(curr, next);
