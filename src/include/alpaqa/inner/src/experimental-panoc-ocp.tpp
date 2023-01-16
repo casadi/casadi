@@ -94,14 +94,17 @@ struct OCPVariables {
                          (t < N ? nc() : nc_N()));
     }
 
-    vec create_qr() const { return vec(N * nxu()); }
+    vec create_qr() const { return vec(N * nxu() + nx()); }
     auto qk(VectorRefLike<config_t> auto &&v, index_t t) const {
+        assert(t <= N);
         return const_or_mut_rvec<config_t>(v.segment(t * nxu(), nx()));
     }
     auto rk(VectorRefLike<config_t> auto &&v, index_t t) const {
+        assert(t < N);
         return const_or_mut_rvec<config_t>(v.segment(t * nxu() + nx(), nu()));
     }
     auto qrk(VectorRefLike<config_t> auto &&v, index_t t) const {
+        assert(t < N);
         return const_or_mut_rvec<config_t>(v.segment(t * nxu(), nxu()));
     }
 
@@ -173,8 +176,19 @@ struct OCPEvaluator {
         for (index_t t = 0; t < N(); ++t) {
             auto xk = vars.xk(storage, t);
             auto uk = vars.uk(storage, t);
+            auto hk = vars.hk(storage, t);
+            auto ck = vars.ck(storage, t);
+            problem->eval_h(t, xk, uk, hk);
+            if (vars.nc() > 0)
+                problem->eval_constr(t, xk, ck);
             problem->eval_f(t, xk, uk, vars.xk(storage, t + 1));
         }
+        auto xN = vars.xk(storage, N());
+        auto hN = vars.hk(storage, N());
+        auto cN = vars.ck(storage, N());
+        problem->eval_h_N(xN, hN);
+        if (vars.nc() > 0)
+            problem->eval_constr_N(xN, cN);
     }
 
     /// @pre x0 and u initialized
@@ -189,7 +203,8 @@ struct OCPEvaluator {
 
     /// @pre x, u, h and c initialized (i.e. forward was called)
     void backward(rvec storage, rvec g, rvec λ, rvec w, rvec v, const auto &qr,
-                  const Box &D, const Box &D_N, crvec μ, crvec y) const {
+                  const auto &q_N, const Box &D, const Box &D_N, crvec μ,
+                  crvec y) const {
         auto N    = this->N();
         auto nc   = vars.nc();
         auto nc_N = vars.nc_N();
@@ -197,7 +212,7 @@ struct OCPEvaluator {
         auto nx   = vars.nx();
         assert((nc <= 0 && nc_N <= 0) || w.size() == nx);
         assert((nc <= 0 && nc_N <= 0) || v.size() == nc);
-        auto qN = qr(N).topRows(nx);
+        auto qN = q_N();
         auto xN = vars.xk(storage, N);
         auto hN = vars.hk(storage, N);
         auto vN = v.topRows(nc_N);
@@ -379,6 +394,10 @@ auto PANOCOCPSolver<Conf>::operator()(
     auto Qk  = [&](rvec storage) {
         return [&, storage](index_t k) {
             return [&, k](rmat out) {
+#ifndef NDEBUG
+                check_finiteness(out.reshaped(), "Qk input");
+#endif
+                alpaqa::detail::Timed t{s.time_hessians};
                 auto hk  = vars.hk(storage, k);
                 auto xuk = vars.xuk(storage, k);
                 auto xk  = vars.xk(storage, k);
@@ -402,24 +421,41 @@ auto PANOCOCPSolver<Conf>::operator()(
                         problem.eval_add_gn_hess_constr_N(xk, work_cN, out);
                     }
                 }
+#ifndef NDEBUG
+                check_finiteness(out.reshaped(), "Qk output");
+#endif
             };
         };
     };
     auto Rk = [&](rvec storage) {
         return [&, storage](index_t k) {
             return [&, k](crindexvec mask, rmat out) {
+#ifndef NDEBUG
+                check_finiteness(out.reshaped(), "Rk input");
+#endif
+                alpaqa::detail::Timed t{s.time_hessians};
                 auto hk  = vars.hk(storage, k);
                 auto xuk = vars.xuk(storage, k);
                 problem.eval_add_R_masked(k, xuk, hk, mask, out, work_R);
+#ifndef NDEBUG
+                check_finiteness(out.reshaped(), "Rk output");
+#endif
             };
         };
     };
     auto Sk = [&](rvec storage) {
         return [&, storage](index_t k) {
             return [&, k](crindexvec mask, rmat out) {
+#ifndef NDEBUG
+                check_finiteness(out.reshaped(), "Sk input");
+#endif
+                alpaqa::detail::Timed t{s.time_hessians};
                 auto hk  = vars.hk(storage, k);
                 auto xuk = vars.xuk(storage, k);
                 problem.eval_add_S_masked(k, xuk, hk, mask, out, work_S);
+#ifndef NDEBUG
+                check_finiteness(out.reshaped(), "Sk output");
+#endif
             };
         };
     };
@@ -427,24 +463,49 @@ auto PANOCOCPSolver<Conf>::operator()(
         return [&, storage](index_t k) {
             return [&, k](crindexvec mask_J, crindexvec mask_K, crvec v,
                           rvec out) {
+#ifndef NDEBUG
+                {
+                    ScopedMallocAllower ma;
+                    vec vv = v(mask_K);
+                    check_finiteness(vv.reshaped(), "Rk_prod input v");
+                }
+                check_finiteness(out.reshaped(), "Rk_prod input");
+#endif
+                alpaqa::detail::Timed t{s.time_hessians};
                 auto hk  = vars.hk(storage, k);
                 auto xuk = vars.xuk(storage, k);
                 problem.eval_add_R_prod_masked(k, xuk, hk, mask_J, mask_K, v,
                                                out, work_R);
+#ifndef NDEBUG
+                check_finiteness(out.reshaped(), "Rk_prod output");
+#endif
             };
         };
     };
     auto Sk_prod = [&](rvec storage) {
         return [&, storage](index_t k) {
             return [&, k](crindexvec mask_K, crvec v, rvec out) {
+#ifndef NDEBUG
+                {
+                    ScopedMallocAllower ma;
+                    vec vv = v(mask_K);
+                    check_finiteness(vv.reshaped(), "Sk_prod input v");
+                }
+                check_finiteness(out.reshaped(), "Sk_prod input");
+#endif
+                alpaqa::detail::Timed t{s.time_hessians};
                 auto hk  = vars.hk(storage, k);
                 auto xuk = vars.xuk(storage, k);
                 problem.eval_add_S_prod_masked(k, xuk, hk, mask_K, v, out,
                                                work_S);
+#ifndef NDEBUG
+                check_finiteness(out.reshaped(), "Sk_prod output");
+#endif
             };
         };
     };
     auto mut_qrk = [&](index_t k) -> rvec { return vars.qrk(qr, k); };
+    auto mut_q_N = [&]() -> rvec { return vars.qk(qr, N); };
     auto qk      = [&](index_t k) -> crvec { return vars.qk(qr, k); };
     auto rk      = [&](index_t k) -> crvec { return vars.rk(qr, k); };
     auto uk_eq   = [&](index_t k) -> crvec { return q.segment(k * nu, nu); };
@@ -493,7 +554,7 @@ auto PANOCOCPSolver<Conf>::operator()(
 
     auto eval_prox_impl = [&](real_t γ, crvec xu, crvec grad_ψ, rvec x̂u,
                               rvec p) {
-        alpaqa::detail::Timed{s.time_prox};
+        alpaqa::detail::Timed t{s.time_prox};
         real_t pᵀp      = 0;
         real_t grad_ψᵀp = 0;
         for (index_t t = 0; t < N; ++t) {
@@ -586,22 +647,22 @@ auto PANOCOCPSolver<Conf>::operator()(
     /// @pre    @ref Iterate::xu
     /// @post   @ref Iterate::ψu
     auto eval_forward = [&](Iterate &i) {
-        alpaqa::detail::Timed{s.time_forward};
+        alpaqa::detail::Timed t{s.time_forward};
         i.ψu = eval.forward(i.xu, D, D_N, μ, y);
     };
     /// @pre    @ref Iterate::xû
     /// @post   @ref Iterate::ψû
     auto eval_forward_hat = [&](Iterate &i) {
-        alpaqa::detail::Timed{s.time_forward};
+        alpaqa::detail::Timed t{s.time_forward};
         i.ψû = eval.forward(i.xû, D, D_N, μ, y);
     };
 
     /// @pre    @ref Iterate::xu
     /// @post   @ref Iterate::grad_ψ, @ref Iterate::have_jacobians
     auto eval_backward = [&](Iterate &i) {
-        alpaqa::detail::Timed{s.time_backward};
-        eval.backward(i.xu, i.grad_ψ, work_λ, work_x, work_c, mut_qrk, D, D_N,
-                      μ, y);
+        alpaqa::detail::Timed t{s.time_backward};
+        eval.backward(i.xu, i.grad_ψ, work_λ, work_x, work_c, mut_qrk, mut_q_N,
+                      D, D_N, μ, y);
     };
 
     auto qub_violated = [this](const Iterate &i) {
@@ -648,14 +709,13 @@ auto PANOCOCPSolver<Conf>::operator()(
                     vars.uk(it->xu, t) - h.segment(t * nu, nu);
 
             { // Calculate ψ(x₀ - h)
-                alpaqa::detail::Timed{s.time_forward};
+                alpaqa::detail::Timed t{s.time_forward};
                 eval.forward_simulate(work_xu); // needed for backwards sweep
             }
             { // Calculate ∇ψ(x₀ + h)
-                alpaqa::detail::Timed{s.time_backward};
-
+                alpaqa::detail::Timed t{s.time_backward};
                 eval.backward(work_xu, work_grad_ψ, work_λ, work_x, work_c,
-                              mut_qrk, D, D_N, μ, y);
+                              mut_qrk, mut_q_N, D, D_N, μ, y);
             }
             // Estimate Lipschitz constant using finite differences
             it->L = (work_grad_ψ - it->grad_ψ).norm() / norm_h;
@@ -820,7 +880,7 @@ auto PANOCOCPSolver<Conf>::operator()(
                 J.update(is_constr_inactive);
             }
             { // evaluate the Jacobians
-                alpaqa::detail::Timed{s.time_backward_jacobians};
+                alpaqa::detail::Timed t{s.time_backward_jacobians};
                 for (index_t t = 0; t < N; ++t)
                     problem.eval_jac_f(t, vars.xk(curr->xu, t),
                                        vars.uk(curr->xu, t), vars.ABk(jacs, t));

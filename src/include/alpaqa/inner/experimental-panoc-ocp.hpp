@@ -86,8 +86,6 @@ struct PANOCOCPProgressInfo {
     [[nodiscard]] vec û() const;
     [[nodiscard]] vec x() const;
     [[nodiscard]] vec x̂() const;
-    [[nodiscard]] vec qu() const;
-    [[nodiscard]] vec qx() const;
 };
 
 template <Config Conf = DefaultConfig>

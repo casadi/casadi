@@ -251,8 +251,8 @@ void CasADiControlProblem<Conf>::eval_h(index_t, crvec x, crvec u,
 template <Config Conf>
 void CasADiControlProblem<Conf>::eval_h_N(crvec x, rvec h) const {
     assert(x.size() == nx);
-    assert(h.size() == nh);
-    impl->h({x.data(), param.data()}, {h.data()});
+    assert(h.size() == nh_N);
+    impl->h_N({x.data(), param.data()}, {h.data()});
 }
 template <Config Conf>
 auto CasADiControlProblem<Conf>::eval_l(index_t, crvec h) const -> real_t {
@@ -263,7 +263,7 @@ auto CasADiControlProblem<Conf>::eval_l(index_t, crvec h) const -> real_t {
 }
 template <Config Conf>
 auto CasADiControlProblem<Conf>::eval_l_N(crvec h) const -> real_t {
-    assert(h.size() == nh);
+    assert(h.size() == nh_N);
     real_t l;
     impl->l_N({h.data(), param.data()}, {&l});
     return l;
@@ -279,7 +279,7 @@ void CasADiControlProblem<Conf>::eval_qr(index_t, crvec xu, crvec h,
 template <Config Conf>
 void CasADiControlProblem<Conf>::eval_q_N(crvec x, crvec h, rvec q) const {
     assert(x.size() == nx);
-    assert(h.size() == nh);
+    assert(h.size() == nh_N);
     assert(q.size() == nx);
     impl->q_N({x.data(), h.data(), param.data()}, {q.data()});
 }
@@ -304,7 +304,7 @@ void CasADiControlProblem<Conf>::eval_add_Q(index_t, crvec xu, crvec h,
 template <Config Conf>
 void CasADiControlProblem<Conf>::eval_add_Q_N(crvec x, crvec h, rmat Q) const {
     assert(x.size() == nx);
-    assert(h.size() == nh);
+    assert(h.size() == nh_N);
     assert(Q.rows() == nx);
     assert(Q.cols() == nx);
     impl->Q_N({x.data(), h.data(), param.data()}, {work.data()});
@@ -373,8 +373,10 @@ void CasADiControlProblem<Conf>::eval_add_R_masked(index_t, crvec xu, crvec h,
     auto &&sparse = impl->R.fun.sparsity_out(0);
     assert(xu.size() == nx + nu);
     assert(h.size() == nh);
-    assert(R.rows() == nu);
-    assert(R.cols() == nu);
+    assert(R.rows() <= nu);
+    assert(R.cols() <= nu);
+    assert(R.rows() == mask.size());
+    assert(R.cols() == mask.size());
     assert(work.size() >= sparse.nnz());
     impl->R({xu.data(), h.data(), param.data()}, {work.data()});
     using spmat   = Eigen::SparseMatrix<real_t, Eigen::ColMajor, casadi_int>;
@@ -400,7 +402,8 @@ void CasADiControlProblem<Conf>::eval_add_S_masked(index_t, crvec xu, crvec h,
     auto &&sparse = impl->S.fun.sparsity_out(0);
     assert(xu.size() == nx + nu);
     assert(h.size() == nh);
-    assert(S.rows() == nu);
+    assert(S.rows() <= nu);
+    assert(S.rows() == mask.size());
     assert(S.cols() == nx);
     assert(work.size() >= sparse.nnz());
     impl->S({xu.data(), h.data(), param.data()}, {work.data()});
@@ -454,7 +457,7 @@ void CasADiControlProblem<Conf>::eval_add_S_prod_masked(index_t, crvec, crvec,
                                                         crindexvec mask_K,
                                                         crvec v, rvec out,
                                                         rvec work) const {
-    auto &&sparse = impl->R.fun.sparsity_out(0);
+    auto &&sparse = impl->S.fun.sparsity_out(0);
     assert(v.size() == nu);
     assert(out.size() == nx);
     assert(work.size() >= sparse.nnz());
