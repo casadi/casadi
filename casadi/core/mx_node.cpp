@@ -469,7 +469,7 @@ namespace casadi {
 
   MX MXNode::get_mac(const MX& y, const MX& z) const {
     if (sparsity().is_orthonormal() && y.is_column() && y.is_dense() && y.sparsity()==z.sparsity() && z.is_zero()) {
-      std::vector<casadi_int> perm = sparsity().permutation();
+      std::vector<casadi_int> perm = sparsity().permutation_vector();
       MX nz = sparsity_cast(shared_from_this<MX>(), Sparsity::dense(nnz()));
       return (nz*y)(perm);
     }

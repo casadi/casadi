@@ -1124,6 +1124,7 @@ class Matrixtests(casadiTestCase):
     numpy.random.seed(1)
     p = np.random.permutation(n)
     S = Sparsity.permutation(p)
+    self.checkarray(DM(p).T,S.permutation_vector())
     self.assertTrue(S.is_permutation())
     v = DM.rand(n)
     self.checkarray(mtimes(S,v), v[p])

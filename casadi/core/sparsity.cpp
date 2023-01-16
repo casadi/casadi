@@ -1352,7 +1352,7 @@ namespace casadi {
     }
   }
 
-  const std::vector<casadi_int> Sparsity::permutation(bool invert) const {
+  const std::vector<casadi_int> Sparsity::permutation_vector(bool invert) const {
     casadi_assert(is_permutation(), "Sparsity::permutation called on non-permutation matrix.");
     if (invert) {
       return get_row();
