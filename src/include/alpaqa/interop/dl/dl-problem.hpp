@@ -2,11 +2,14 @@
 
 #include <alpaqa/config/config.hpp>
 #include <alpaqa/interop/dl/dl-problem.h>
-#include "alpaqa/problem/type-erased-problem.hpp"
+#include <alpaqa/problem/type-erased-problem.hpp>
+#include <alpaqa/util/demangled-typename.hpp>
 
 #include <memory>
+#include <stdexcept>
 #include <string>
 #include <string_view>
+#include <type_traits>
 
 namespace alpaqa::dl {
 
@@ -33,6 +36,9 @@ class DLProblem : public BoxConstrProblem<EigenConfigd> {
         /// Pointer to custom user data to pass to the registration function.
         void *user_param = nullptr);
 
+    /// Unique type
+    struct instance_t;
+
   private:
     std::string so_filename;
     std::string symbol_prefix;
@@ -45,13 +51,15 @@ class DLProblem : public BoxConstrProblem<EigenConfigd> {
     std::shared_ptr<void> instance;
     /// Pointer to the struct of function pointers for evaluating the objective,
     /// constraints, their gradients, etc.
-    alpaqa_problem_functions_t *functions = nullptr;
+    problem_functions_t *functions = nullptr;
+    /// An associative array of additional functions exposed by the problem.
+    std::shared_ptr<function_dict_t> extra_functions;
 
     /// Open the shared library using `dlopen`
     [[nodiscard]] std::shared_ptr<void> load_lib() const;
     /// Load a function with signature @p F from the library using `dlsym`.
     template <class F>
-    F *load_func(std::string_view name);
+    [[nodiscard]] F *load_func(std::string_view name) const;
 
   public:
     // clang-format off
@@ -89,6 +97,57 @@ class DLProblem : public BoxConstrProblem<EigenConfigd> {
     [[nodiscard]] bool provides_eval_grad_ψ() const;
     [[nodiscard]] bool provides_eval_ψ_grad_ψ() const;
     // clang-format on
+
+    template <class Signature>
+        requires std::is_function_v<Signature>
+    const std::function<Signature> &extra_func(const std::string &name) const {
+        if (!extra_functions)
+            throw std::logic_error("DLProblem: no extra functions");
+        auto it = extra_functions->dict.find(name);
+        if (it == extra_functions->dict.end())
+            throw std::out_of_range("DLProblem: no extra function named \"" +
+                                    name + '"');
+        try {
+            return std::any_cast<const std::function<Signature> &>(it->second);
+        } catch (const std::bad_any_cast &e) {
+            throw std::logic_error(
+                "DLProblem: incorrect type for extra function \"" + name +
+                "\" (stored type: " + demangled_typename(it->second.type()) +
+                ')');
+        }
+    }
+
+    template <class Func>
+    struct FuncTag {};
+
+    template <class Ret, class... FArgs, class... Args>
+    decltype(auto)
+    call_extra_func_helper(FuncTag<Ret(const instance_t *, FArgs...)>,
+                           const std::string &name, Args &&...args) const {
+        return extra_func<Ret(const void *, FArgs...)>(name)(
+            instance.get(), std::forward<Args>(args)...);
+    }
+
+    template <class Ret, class... FArgs, class... Args>
+    decltype(auto) call_extra_func_helper(FuncTag<Ret(instance_t *, FArgs...)>,
+                                          const std::string &name,
+                                          Args &&...args) {
+        return extra_func<Ret(const void *, FArgs...)>(name)(
+            instance.get(), std::forward<Args>(args)...);
+    }
+
+    template <class Ret, class... FArgs, class... Args>
+    decltype(auto) call_extra_func_helper(FuncTag<Ret(FArgs...)>,
+                                          const std::string &name,
+                                          Args &&...args) {
+        return extra_func<Ret(FArgs...)>(name)(std::forward<Args>(args)...);
+    }
+
+    template <class Signature, class... Args>
+    decltype(auto) call_extra_func(const std::string &name, Args &&...args) {
+        return call_extra_func_helper(FuncTag<Signature>{}, name,
+                                      std::forward<Args>(args)...);
+    }
 };
 
 } // namespace alpaqa::dl

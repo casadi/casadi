@@ -6,6 +6,9 @@
 
 #include "matmul.h"
 
+typedef alpaqa_real_t real_t;
+typedef alpaqa_length_t length_t;
+
 struct ProblemData {
     real_t *Q;
     real_t *A;

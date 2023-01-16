@@ -16,7 +16,7 @@ std::shared_ptr<void> DLProblem::load_lib() const {
 }
 
 template <class F>
-F *DLProblem::load_func(std::string_view name) {
+F *DLProblem::load_func(std::string_view name) const {
     assert(handle);
     auto full_name = symbol_prefix + "_" + std::string(name);
     ::dlerror();
@@ -31,18 +31,20 @@ DLProblem::DLProblem(std::string so_filename, std::string symbol_prefix,
                      void *user_param)
     : BoxConstrProblem{0, 0}, so_filename(std::move(so_filename)),
       symbol_prefix(std::move(symbol_prefix)) {
-    handle = load_lib();
-    auto *register_func =
-        load_func<alpaqa_problem_register_t(void *)>("register");
-    auto r = register_func(user_param);
+    handle              = load_lib();
+    auto *register_func = load_func<problem_register_t(void *)>("register");
+    auto r              = register_func(user_param);
     // Avoid leaking if std::shared_ptr constructor throws
     std::unique_ptr<void, void (*)(void *)> unique_inst{r.instance, r.cleanup};
-    instance  = std::shared_ptr<void>{std::move(unique_inst)};
-    functions = r.functions;
-    this->n   = r.functions->n;
-    this->m   = r.functions->m;
-    this->C   = Box{this->n};
-    this->D   = Box{this->m};
+    std::unique_ptr<alpaqa_function_dict_t> unique_extra{r.extra_functions};
+    // Store data returned by plugin
+    instance        = std::shared_ptr<void>{std::move(unique_inst)};
+    functions       = r.functions;
+    this->n         = r.functions->n;
+    this->m         = r.functions->m;
+    this->C         = Box{this->n};
+    this->D         = Box{this->m};
+    extra_functions = std::shared_ptr<function_dict_t>{std::move(unique_extra)};
 }
 
 // clang-format off
