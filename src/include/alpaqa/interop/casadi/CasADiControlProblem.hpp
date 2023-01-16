@@ -1,6 +1,6 @@
 #pragma once
 
-#include <alpaqa/casadi-loader-export.hpp>
+#include <alpaqa/casadi-ocp-loader-export.hpp>
 #include <alpaqa/config/config.hpp>
 #include <alpaqa/problem/box.hpp>
 #include <alpaqa/util/copyable_unique_ptr.hpp>
@@ -82,8 +82,9 @@ class CasADiControlProblem {
     util::copyable_unique_ptr<Functions> impl;
 };
 
-CASADI_LOADER_EXPORT_EXTERN_TEMPLATE(class, CasADiControlProblem, EigenConfigd);
-CASADI_LOADER_EXPORT_EXTERN_TEMPLATE(class, CasADiControlProblem,
-                                     DefaultConfig);
+CASADI_OCP_LOADER_EXPORT_EXTERN_TEMPLATE(class, CasADiControlProblem,
+                                         EigenConfigd);
+CASADI_OCP_LOADER_EXPORT_EXTERN_TEMPLATE(class, CasADiControlProblem,
+                                         DefaultConfig);
 
 } // namespace alpaqa

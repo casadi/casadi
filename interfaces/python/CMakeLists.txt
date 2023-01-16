@@ -50,6 +50,10 @@ if (TARGET alpaqa::casadi-loader)
     target_compile_definitions(_alpaqa PRIVATE ALPAQA_HAVE_CASADI)
     target_link_libraries(_alpaqa PRIVATE alpaqa::casadi-loader)
 endif()
+if (TARGET alpaqa::casadi-ocp-loader)
+    target_compile_definitions(_alpaqa PRIVATE ALPAQA_HAVE_CASADI_OCP)
+    target_link_libraries(_alpaqa PRIVATE alpaqa::casadi-ocp-loader)
+endif()
 if (ALPAQA_ENABLE_PCH)
     target_precompile_headers(_alpaqa PRIVATE
         <pybind11/chrono.h>

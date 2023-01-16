@@ -17,10 +17,10 @@ install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/"
     DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
         COMPONENT dev
     FILES_MATCHING REGEX "/.*\.(h|[hti]pp)$")
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/alpaqa/export.h
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/export/alpaqa/export.h
     DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/alpaqa/"
         COMPONENT dev)
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/alpaqa/casadi-loader-export.h
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/export/alpaqa/casadi-loader-export.h
     DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/alpaqa/"
         COMPONENT dev)
 

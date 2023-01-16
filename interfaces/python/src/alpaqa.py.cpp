@@ -49,6 +49,11 @@ PYBIND11_MODULE(MODULE_NAME, m) {
 #else
     m.attr("with_casadi") = false;
 #endif
+#if ALPAQA_HAVE_CASADI_OCP
+    m.attr("with_casadi_ocp") = true;
+#else
+    m.attr("with_casadi_ocp") = false;
+#endif
 
     py::register_exception<alpaqa::not_implemented_error>(m, "not_implemented_error",
                                                           PyExc_NotImplementedError);

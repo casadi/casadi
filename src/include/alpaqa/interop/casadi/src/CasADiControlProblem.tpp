@@ -175,11 +175,11 @@ CasADiControlProblem<Conf>::CasADiControlProblem(const std::string &so_name,
 }
 
 template <Config Conf>
-CasADiControlProblem<Conf>::CasADiControlProblem(
-    const CasADiControlProblem &o) = default;
+CasADiControlProblem<Conf>::CasADiControlProblem(const CasADiControlProblem &) =
+    default;
 template <Config Conf>
 CasADiControlProblem<Conf> &
-CasADiControlProblem<Conf>::operator=(const CasADiControlProblem &o) = default;
+CasADiControlProblem<Conf>::operator=(const CasADiControlProblem &) = default;
 
 template <Config Conf>
 CasADiControlProblem<Conf>::CasADiControlProblem(

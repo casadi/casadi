@@ -317,7 +317,7 @@ void register_problems(py::module_ &m) {
             return std::make_unique<CasADiProblem>(so_name, n, m, p, second_order);
         };
 #else
-        class CasADiProblem : BoxConstrProblem {};
+        struct CasADiProblem : BoxConstrProblem {};
         auto load_CasADi_problem = [](const char *, unsigned, unsigned, unsigned,
                                       bool) -> std::unique_ptr<CasADiProblem> {
             throw std::runtime_error("This version of alpaqa was compiled without CasADi support");
@@ -423,12 +423,14 @@ void register_problems(py::module_ &m) {
         m.def("load_casadi_problem", load_CasADi_problem, "so_name"_a, "n"_a = 0, "m"_a = 0,
               "p"_a = 0, "second_order"_a = false, "Load a compiled CasADi problem.\n\n");
 
+#if ALPAQA_HAVE_CASADI
         m.def(
             "problem_with_counters", [](const CasADiProblem &p) { return te_pwc(p); }, "problem"_a,
             "Wrap the problem to count all function evaluations.\n\n"
             ":param problem: The original problem to wrap. Copied.\n"
             ":return: * Wrapped problem.\n"
             "         * Counters for wrapped problem.\n\n");
+#endif
     }
     m.def(
         "problem_with_counters", [](py::object p) { return te_pwc(PyProblem{std::move(p)}); },

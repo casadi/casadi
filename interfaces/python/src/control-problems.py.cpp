@@ -10,7 +10,7 @@ using namespace py::literals;
 
 #include <alpaqa/problem/ocproblem.hpp>
 #include <alpaqa/util/check-dim.hpp>
-#if ALPAQA_HAVE_CASADI
+#if ALPAQA_HAVE_CASADI_OCP
 #include <alpaqa/interop/casadi/CasADiControlProblem.hpp>
 #endif
 
@@ -40,13 +40,13 @@ void register_control_problems(py::module_ &m) {
     };
 
     if constexpr (std::is_same_v<typename Conf::real_t, double>) {
-#if ALPAQA_HAVE_CASADI
+#if ALPAQA_HAVE_CASADI_OCP
         using CasADiControlProblem       = alpaqa::CasADiControlProblem<config_t>;
         auto load_CasADi_control_problem = [](const char *so_name, unsigned N) {
             return std::make_unique<CasADiControlProblem>(so_name, N);
         };
 #else
-        class CasADiControlProblem {};
+        struct CasADiControlProblem {};
         auto load_CasADi_control_problem = [](const char *so_name,
                                               unsigned N) -> std::unique_ptr<CasADiControlProblem> {
             throw std::runtime_error("This version of alpaqa was compiled without CasADi support");
@@ -65,7 +65,7 @@ void register_control_problems(py::module_ &m) {
                     return CasADiControlProblem{self};
                 },
                 "memo"_a)
-#if ALPAQA_HAVE_CASADI
+#if ALPAQA_HAVE_CASADI_OCP
             .def_readonly("N", &CasADiControlProblem::N)
             .def_readonly("nx", &CasADiControlProblem::nx)
             .def_readonly("nu", &CasADiControlProblem::nu)
@@ -94,13 +94,17 @@ void register_control_problems(py::module_ &m) {
                                                     std::to_string(p.param.size()) + ".");
                     p.param = param;
                 },
-                "Parameter vector :math:`p` of the problem");
+                "Parameter vector :math:`p` of the problem")
+#endif
+            ;
+#if ALPAQA_HAVE_CASADI_OCP
         te_problem.def(py::init<const CasADiControlProblem &>());
         py::implicitly_convertible<CasADiControlProblem, ControlProblem>();
 #endif
         m.def("load_casadi_control_problem", load_CasADi_control_problem, "so_name"_a, "N"_a,
               "Load a compiled CasADi optimal control problem.\n\n");
 
+#if ALPAQA_HAVE_CASADI_OCP
         m.def(
             "control_problem_with_counters",
             [](const CasADiControlProblem &p) { return te_pwc(p); }, "problem"_a,
@@ -108,6 +112,7 @@ void register_control_problems(py::module_ &m) {
             ":param problem: The original problem to wrap. Copied.\n"
             ":return: * Wrapped problem.\n"
             "         * Counters for wrapped problem.\n\n");
+#endif
     }
 }
 
