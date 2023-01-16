@@ -117,6 +117,7 @@ class LBFGS {
         Negative, ///< @f$ p \sim -\nabla \psi(x) @f$
     };
 
+    LBFGS() = default;
     LBFGS(Params params) : params(params) {}
     LBFGS(Params params, length_t n) : params(params) { resize(n); }
 

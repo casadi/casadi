@@ -110,7 +110,7 @@ class PANOCSolver {
     using ProgressInfo = PANOCProgressInfo<config_t>;
 
     PANOCSolver(const Params &params)
-        requires std::is_default_constructible_v<Direction>
+        requires std::default_initializable<Direction>
         : params(params) {}
     PANOCSolver(const Params &params, Direction &&direction)
         : params(params), direction(std::move(direction)) {}

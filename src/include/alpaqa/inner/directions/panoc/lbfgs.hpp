@@ -26,6 +26,7 @@ struct LBFGSDirection {
     using DirectionParams = LBFGSDirectionParams<config_t>;
     struct Params : LBFGS::Params, DirectionParams {};
 
+    LBFGSDirection() = default;
     LBFGSDirection(const Params &params)
         : lbfgs(params), direction_params(params) {}
     LBFGSDirection(const typename LBFGS::Params &params,
