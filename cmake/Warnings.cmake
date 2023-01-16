@@ -20,7 +20,7 @@ function(add_warnings_target tgt_name warnings_as_errors)
     # GCC
     set(GCC_WARNINGS
         -Wno-error=unused-but-set-variable
-        -Wsuggest-override
+        $<$<COMPILE_LANGUAGE:CXX>:-Wsuggest-override>
         -Wno-error=attributes
     )
     # Clang, AppleClang
@@ -28,7 +28,7 @@ function(add_warnings_target tgt_name warnings_as_errors)
         -Wno-error=unknown-warning-option
         -Wno-newline-eof
         -Wno-error=unused-but-set-variable
-        -Winconsistent-missing-override
+        $<$<COMPILE_LANGUAGE:CXX>:-Winconsistent-missing-override>
         -Wno-gnu-zero-variadic-macro-arguments
         -Wunreachable-code
         -Wunreachable-code-break
