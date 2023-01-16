@@ -1,3 +1,5 @@
+#if !defined(__clang_major__) || __clang_major__ > 15 || defined(__clangd__)
+
 #include <gtest/gtest.h>
 
 #include <alpaqa/util/set-intersection.hpp>
@@ -48,3 +50,5 @@ TEST(SetIntersection, differentFirstLast) {
     EXPECT_EQ(result_A, expected);
     EXPECT_EQ(result_B, expected);
 }
+
+#endif

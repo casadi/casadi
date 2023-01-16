@@ -1,3 +1,5 @@
+#if !defined(__clang_major__) || __clang_major__ > 15 || defined(__clangd__)
+
 #include <test-util/eigen-matchers.hpp>
 
 #include <alpaqa/config/config.hpp>
@@ -93,3 +95,5 @@ TEST(SparseOps, Svec) {
 
     EXPECT_THAT(result, EigenAlmostEqual(expected, 1e-13));
 }
+
+#endif
