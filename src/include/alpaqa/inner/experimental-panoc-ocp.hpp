@@ -98,7 +98,7 @@ struct PANOCOCPStats {
     std::chrono::nanoseconds time_prox{};
     std::chrono::nanoseconds time_forward{};
     std::chrono::nanoseconds time_backward{};
-    std::chrono::nanoseconds time_backward_jacobians{};
+    std::chrono::nanoseconds time_jacobians{};
     std::chrono::nanoseconds time_hessians{};
     std::chrono::nanoseconds time_indices{};
     std::chrono::nanoseconds time_lqr_factor{};

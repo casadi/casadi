@@ -881,7 +881,7 @@ auto PANOCOCPSolver<Conf>::operator()(
                 J.update(is_constr_inactive);
             }
             { // evaluate the Jacobians
-                alpaqa::detail::Timed t{s.time_backward_jacobians};
+                alpaqa::detail::Timed t{s.time_jacobians};
                 for (index_t t = 0; t < N; ++t)
                     problem.eval_jac_f(t, vars.xk(curr->xu, t),
                                        vars.uk(curr->xu, t), vars.ABk(jacs, t));
