@@ -963,33 +963,39 @@ auto PANOCOCPSolver<Conf>::operator()(
         τ             = τ_init;
         real_t τ_prev = -1;
 
+        // xₖ₊₁ = xₖ + pₖ
+        auto take_safe_step = [&] {
+            next->xu = curr->xû;
+            next->ψu = curr->ψû;
+            // Calculate ∇ψ(xₖ₊₁)
+            eval_backward(*next);
+        };
+
+        // xₖ₊₁ = xₖ + (1-τ) pₖ + τ qₖ
+        auto take_accelerated_step = [&](real_t τ) {
+            if (τ == 1) {
+                for (index_t t = 0; t < N; ++t)
+                    vars.uk(next->xu, t) =
+                        vars.uk(curr->xu, t) + q.segment(t * nu, nu);
+            } else {
+                do_gn_step = do_next_gn;
+                for (index_t t = 0; t < N; ++t)
+                    vars.uk(next->xu, t) =
+                        vars.uk(curr->xu, t) +
+                        (1 - τ) * curr->p.segment(t * nu, nu) +
+                        τ * q.segment(t * nu, nu);
+            }
+            // Calculate ψ(xₖ₊₁), ∇ψ(xₖ₊₁)
+            eval_forward(*next); // Not necessary for DDP
+            eval_backward(*next);
+        };
+
+        // Backtracking line search loop
         while (!stop_signal.stop_requested()) {
 
             // Recompute step only if τ changed
             if (τ != τ_prev) {
-                // xₖ₊₁ = xₖ + (1-τ) pₖ + τ qₖ
-                if (τ == 0) {
-                    next->xu = curr->xû;
-                    next->ψu = curr->ψû;
-                    // Calculate ∇ψ(xₖ₊₁)
-                    eval_backward(*next);
-                } else {
-                    if (τ == 1) {
-                        for (index_t t = 0; t < N; ++t)
-                            vars.uk(next->xu, t) =
-                                vars.uk(curr->xu, t) + q.segment(t * nu, nu);
-                    } else {
-                        do_gn_step = do_next_gn;
-                        for (index_t t = 0; t < N; ++t)
-                            vars.uk(next->xu, t) =
-                                vars.uk(curr->xu, t) +
-                                (1 - τ) * curr->p.segment(t * nu, nu) +
-                                τ * q.segment(t * nu, nu);
-                    }
-                    // Calculate ψ(xₖ₊₁), ∇ψ(xₖ₊₁)
-                    eval_forward(*next); // Not necessary for DDP
-                    eval_backward(*next);
-                }
+                τ != 0 ? take_accelerated_step(τ) : take_safe_step();
                 τ_prev = τ;
             }
 

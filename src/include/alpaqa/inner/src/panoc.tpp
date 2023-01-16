@@ -280,27 +280,32 @@ auto PANOCSolver<DirectionProviderT>::operator()(
         τ             = τ_init;
         real_t τ_prev = -1;
 
+        // xₖ₊₁ = xₖ + pₖ
+        auto take_safe_step = [&] {
+            // Calculate ∇ψ(xₖ₊₁)
+            if (not have_grad_ψx̂)
+                eval_grad_ψx̂(*curr, grad_ψx̂);
+            have_grad_ψx̂ = true;
+            next->x      = curr->x̂; // → safe prox step
+            next->ψx     = curr->ψx̂;
+            next->grad_ψ.swap(grad_ψx̂);
+        };
+
+        // xₖ₊₁ = xₖ + (1-τ) pₖ + τ qₖ
+        auto take_accelerated_step = [&](real_t τ) {
+            if (τ == 1) // → faster quasi-Newton step
+                next->x = curr->x + q;
+            else
+                next->x = curr->x + (1 - τ) * curr->p + τ * q;
+            // Calculate ψ(xₖ₊₁), ∇ψ(xₖ₊₁)
+            eval_ψ_grad_ψ(*next);
+        };
+
         while (!stop_signal.stop_requested()) {
 
             // Recompute step only if τ changed
             if (τ != τ_prev) {
-                // xₖ₊₁ = xₖ + (1-τ) pₖ + τ qₖ
-                if (τ == 0) { // no line search or line search failed
-                    // Calculate ∇ψ(xₖ₊₁)
-                    if (not have_grad_ψx̂)
-                        eval_grad_ψx̂(*curr, grad_ψx̂);
-                    have_grad_ψx̂ = true;
-                    next->x      = curr->x̂; // → safe prox step
-                    next->ψx     = curr->ψx̂;
-                    next->grad_ψ.swap(grad_ψx̂);
-                } else {        // line search didn't fail (yet)
-                    if (τ == 1) // → faster quasi-Newton step
-                        next->x = curr->x + q;
-                    else
-                        next->x = curr->x + (1 - τ) * curr->p + τ * q;
-                    // Calculate ψ(xₖ₊₁), ∇ψ(xₖ₊₁)
-                    eval_ψ_grad_ψ(*next);
-                }
+                τ != 0 ? take_accelerated_step(τ) : take_safe_step();
                 τ_prev = τ;
             }
 
