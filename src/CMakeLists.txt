@@ -50,6 +50,7 @@ if (ALPAQA_WITH_CASADI)
     add_library(casadi-loader 
         "interop/casadi/CasADiProblem.cpp"
         "interop/casadi/CasADiControlProblem.cpp"
+        "interop/casadi/experimental-CasADiControlProblem.cpp"
         "interop/casadi/CasADiQuadraticControlProblem.cpp"
         "include/alpaqa/interop/casadi/CasADiFunctionWrapper.hpp"
         "include/alpaqa/interop/casadi/CasADiProblem.hpp"
@@ -72,7 +73,7 @@ if (ALPAQA_WITH_CASADI)
     list(APPEND ALPAQA_INSTALL_TARGETS casadi-loader)
     # DLL import/export
     generate_export_header(casadi-loader
-    EXPORT_FILE_NAME alpaqa/casadi-loader-export.h)
+        EXPORT_FILE_NAME alpaqa/casadi-loader-export.h)
     target_include_directories(casadi-loader PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>)
 

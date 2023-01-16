@@ -157,6 +157,8 @@ inline constexpr size_t required_te_buffer_size_for() {
 
 /// Class for polymorphism through type erasure. Saves the entire vtable, and
 /// uses small buffer optimization.
+///
+/// @todo   Decouple allocation/small buffer optimization.
 template <class VTable           = BasicVTable,
           class Allocator        = std::allocator<std::byte>,
           size_t SmallBufferSize = default_te_buffer_size<VTable, Allocator>()>

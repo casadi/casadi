@@ -12,6 +12,9 @@ template <alpaqa::Config Conf>
 void register_problems(py::module_ &m);
 
 template <alpaqa::Config Conf>
+void register_experimental_problems(py::module_ &m);
+
+template <alpaqa::Config Conf>
 void register_lbfgs(py::module_ &m);
 
 template <alpaqa::Config Conf>
@@ -29,6 +32,7 @@ void register_alm(py::module_ &m);
 template <alpaqa::Config Conf>
 void register_classes_for(py::module_ &m) {
     register_problems<Conf>(m);
+    register_experimental_problems<Conf>(m);
     register_lbfgs<Conf>(m);
     register_panoc_directions<Conf>(m);
     register_panoc<Conf>(m);

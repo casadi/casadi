@@ -206,7 +206,7 @@ def generate_casadi_control_problem(
         ["f"],
     ))
     cg.add(cs.Function(
-        "jac_f",
+        "jacobian_f",
         [*xup_def],
         [cs.densify(cs.jacobian(f(*xup), cs.vertcat(x, u)))],
         [*xup_names],
@@ -307,7 +307,7 @@ def generate_casadi_quadratic_control_problem(
         ["f"],
     ))
     cg.add(cs.Function(
-        "jac_f",
+        "jacobian_f",
         [*xup_def],
         [cs.densify(cs.jacobian(f(*xup), cs.vertcat(x, u)))],
         [*xup_names],
@@ -321,3 +321,298 @@ def generate_casadi_quadratic_control_problem(
         ["grad_f_prod"],
     ))
     return cg, nx, nu, p
+
+def _add_parameter(f: cs.Function, expected_inputs: int) -> Tuple[cs.Function, cs.SX, str]:
+    if f.n_in() == expected_inputs + 1:
+        # Okay, we already have a parameter argument
+        return f, f.sx_in(expected_inputs), f.name_in(expected_inputs)
+    elif f.n_in() == expected_inputs:
+        # We don't have a parameter argument
+        param = cs.SX.sym("p", 0)
+        return cs.Function(
+            f.name(),
+            [f.sx_in(i) for i in range(expected_inputs)] + [param],
+            [f.sx_out(i) for i in range(f.n_out())],
+            [f.name_in(i) for i in range(expected_inputs)] + ["p"],
+            [f.name_out(i) for i in range(f.n_out())],
+        ), param, "p"
+    else:
+        raise RuntimeError(f"Incorrect number of inputs for {f.name()} "
+                           f"(expected {expected_inputs} inputs with optional "
+                           f"additional parameter)")
+
+def generate_experimental_casadi_control_problem(
+    f: cs.Function,
+    l: cs.Function,
+    l_N: cs.Function,
+    h: cs.Function = None,
+    h_N: cs.Function = None,
+    c: cs.Function = None,
+    c_N: cs.Function = None,
+    name: str = "alpaqa_control_problem",
+) -> cs.CodeGenerator:
+    """Convert the dynamics and cost functions into a CasADi code generator.
+
+    :param f:            Dynamics.
+    :param name: Optional string description of the problem (used for filename).
+
+    :return:   * Code generator that generates the functions and derivatives
+                 used by the solvers.
+               * Number of states.
+               * Number of inputs.
+               * Number of parameters.
+    """
+
+    cgname = f"{name}.c"
+    cg = cs.CodeGenerator(cgname)
+
+    assert f.n_in() in [2, 3]
+    assert f.n_out() == 1
+    f, p_var, p_name = _add_parameter(f, 2) # x, u
+    assert f.size2_in(0) == 1
+    nx = f.size1_in(0)
+    assert f.size2_in(1) == 1
+    nu = f.size1_in(1)
+    assert f.size2_in(2) == 1
+    p = p_var.size1()
+    assert f.size1_out(0) == nx
+    assert f.size2_out(0) == 1
+    x_var = f.sx_in(0)
+    u_var = f.sx_in(1)
+    xu_var = cs.vertcat(x_var, u_var)
+
+    v_var = cs.SX.sym("v", nx)
+
+    # dynamics and their derivatives
+    cg.add(cs.Function(
+        "f",
+        [x_var, u_var, p_var],
+        [f(x_var, u_var, p_var)],
+        [f.name_in(i) for i in range(3)],
+        [f.name_out(0)],
+    ))
+    cg.add(cs.Function(
+        "jacobian_f",
+        [x_var, u_var, p_var],
+        [cs.densify(cs.jacobian(f(x_var, u_var, p_var), xu_var))],
+        [f.name_in(i) for i in range(3)],
+        ["jac_" + f.name_out(0)],
+    ))
+    cg.add(cs.Function(
+        "grad_f_prod",
+        [x_var, u_var, p_var, v_var],
+        [cs.jtimes(f(x_var, u_var, p_var), xu_var, v_var, True)],
+        [f.name_in(i) for i in range(3)] + ["v"],
+        ["grad_" + f.name_out(0) + "_prod"],
+    ))
+
+    # output mapping
+    if h is None:
+        h = cs.Function("h", [x_var, u_var, p_var], [xu_var])
+    else:
+        assert h.n_in() in [2, 3]
+        h, _, _ = _add_parameter(h, 2) # x, u
+    assert h.size1_in(0) == nx
+    assert h.size2_in(0) == 1
+    assert h.size1_in(1) == nu
+    assert h.size2_in(1) == 1
+    assert h.size1_in(2) == p
+    assert h.size2_in(2) == 1
+    nh = h.size1_out(0)
+    assert h.size2_out(0) == 1
+
+    cg.add(cs.Function(
+        "h",
+        [x_var, u_var, p_var],
+        [h(x_var, u_var, p_var)],
+        [h.name_in(i) for i in range(3)],
+        [h.name_out(0)],
+    ))
+
+    # terminal output mapping
+    if h_N is None:
+        h_N = cs.Function("h_N", [x_var, p_var], [x_var])
+    else:
+        assert h_N.n_in() in [1, 2]
+        h_N, _, _ = _add_parameter(h_N, 1) # x
+    assert h_N.size1_in(0) == nx
+    assert h_N.size2_in(0) == 1
+    assert h_N.size1_in(1) == p
+    assert h_N.size2_in(1) == 1
+    nh_N = h_N.size1_out(0)
+    assert h_N.size2_out(0) == 1
+
+    cg.add(cs.Function(
+        "h_N",
+        [x_var, p_var],
+        [h_N(x_var, p_var)],
+        [h_N.name_in(i) for i in range(2)],
+        [h_N.name_out(0)],
+    ))
+
+    # cost
+    assert l.n_in() in [1, 2] # h
+    l, _, _ = _add_parameter(l, 1)
+    assert l.size1_in(0) == nh
+    assert l.size2_in(0) == 1
+    assert l.size1_in(1) == p
+    assert l.size2_in(1) == 1
+    assert l.n_out() == 1
+    assert l.size1_out(0) == 1
+    assert l.size2_out(0) == 1
+
+    h_var = l.sx_in(0)
+
+    cg.add(cs.Function(
+        "l",
+        [h_var, p_var],
+        [l(h_var, p_var)],
+        [l.name_in(i) for i in range(2)],
+        [l.name_out(0)],
+    ))
+
+    cg.add(cs.Function(
+        "qr",
+        [xu_var, h_var, p_var],
+        [cs.jtimes(h(x_var, u_var, p_var), xu_var, cs.gradient(l(h_var, p_var), h_var), True)],
+        ["xu", "h", "p"], # TODO
+        ["qr"], # TODO
+    ))
+
+    # (JhᵀΛ)ᵀ = ΛJh
+    # JhᵀΛ = cs.jtimes(h(x_var, u_var, p_var), x_var, cs.hessian(l(h_var, p_var), h_var)[0], True)
+    # JhᵀΛJh = cs.jtimes(h(x_var, u_var, p_var), x_var, cs.transpose(JhTΛ), True)
+    Jhx = cs.jacobian(h(x_var, u_var, p_var), x_var)
+    Λ = cs.hessian(l(h_var, p_var), h_var)[0]
+    Q = Jhx.T @ Λ @ Jhx
+    cg.add(cs.Function(
+        "Q",
+        [xu_var, h_var, p_var],
+        [Q],
+        ["xu", "h", "p"], # TODO
+        ["Q"], # TODO
+    ))
+
+    # (JhᵀΛ)ᵀ = ΛJh
+    # JhᵀΛ = cs.jtimes(h(x_var, u_var, p_var), u_var, cs.hessian(l(h_var, p_var), h_var)[0], True)
+    # JhᵀΛJh = cs.jtimes(h(x_var, u_var, p_var), u_var, cs.transpose(JhTΛ), True)
+    Jhu = cs.jacobian(h(x_var, u_var, p_var), u_var)
+    R = Jhu.T @ Λ @ Jhu
+    cg.add(cs.Function(
+        "R",
+        [xu_var, h_var, p_var],
+        [R],
+        ["xu", "h", "p"], # TODO
+        ["R"], # TODO
+    ))
+
+    # (JhᵀΛ)ᵀ = ΛJh
+    # JhᵀΛ = cs.jtimes(h(x_var, u_var, p_var), x_var, cs.hessian(l(h_var, p_var), h_var)[0], True)
+    # JhᵀΛJh = cs.jtimes(h(x_var, u_var, p_var), u_var, cs.transpose(JhTΛ), True)
+    S = Jhu.T @ Λ @ Jhx
+    cg.add(cs.Function(
+        "S",
+        [xu_var, h_var, p_var],
+        [S],
+        ["xu", "h", "p"], # TODO
+        ["S"], # TODO
+    ))
+
+    # terminal cost
+    assert l_N.n_in() in [1, 2] # h
+    l_N, _, _ = _add_parameter(l_N, 1)
+    assert l_N.size1_in(0) == nh_N
+    assert l_N.size2_in(0) == 1
+    assert l_N.size1_in(1) == p
+    assert l_N.size2_in(1) == 1
+    assert l_N.n_out() == 1
+    assert l_N.size1_out(0) == 1
+    assert l_N.size2_out(0) == 1
+
+    hN_var = l_N.sx_in(0)
+
+    cg.add(cs.Function(
+        "l_N",
+        [hN_var, p_var],
+        [l_N(hN_var, p_var)],
+        [l_N.name_in(i) for i in range(2)],
+        [l_N.name_out(0)],
+    ))
+
+    cg.add(cs.Function(
+        "q_N",
+        [x_var, hN_var, p_var],
+        [cs.jtimes(h_N(x_var, p_var), x_var, cs.gradient(l_N(hN_var, p_var), hN_var), True)],
+        ["x", "h", "p"], # TODO
+        ["q_N"], # TODO
+    ))
+
+    # (JhᵀΛ)ᵀ = ΛJh
+    # JhᵀΛ = cs.jtimes(h_N(x_var, p_var), x_var, cs.hessian(l_N(hN_var, p_var), hN_var)[0], True)
+    # JhᵀΛJh = cs.jtimes(h_N(x_var, p_var), x_var, cs.transpose(JhTΛ), True)
+    JhN = cs.jacobian(h_N(x_var, p_var), x_var)
+    ΛN = cs.hessian(l_N(hN_var, p_var), hN_var)[0]
+    Q_N = JhN.T @ ΛN @ JhN
+    cg.add(cs.Function(
+        "Q_N",
+        [x_var, hN_var, p_var],
+        [Q_N],
+        ["x", "h", "p"], # TODO
+        ["Q_N"], # TODO
+    ))
+
+    # constraints
+    if c is None:
+        c = cs.Function("c", [x_var, p_var], [cs.vertcat()])
+    else:
+        assert c.n_in() in [1, 2]
+        c, _, _ = _add_parameter(c, 1)
+    assert c.size1_in(0) == nx
+    assert c.size2_in(0) == 1
+    assert c.size1_in(1) == p
+    assert c.size2_in(1) == 1
+    assert c.n_out() == 1
+    nc = c.size1_out(0)
+    assert c.size2_out(0) in [0, 1]
+
+    w_var = cs.SX.sym("w", nc)
+
+    cg.add(cs.Function(
+        "c",
+        [x_var, p_var],
+        [c(x_var, p_var)],
+        [c.name_in(i) for i in range(2)],
+        [c.name_out(0)],
+    ))
+
+    cg.add(cs.Function(
+        "grad_c_prod",
+        [x_var, p_var, w_var],
+        [cs.jtimes(c(x_var, p_var), x_var, w_var, True) if nc > 0 else cs.DM.zeros(nx)],
+        [c.name_in(i) for i in range(2)] + ["w"],
+        ["grad_" + c.name_out(0) + "_prod"],
+    ))
+
+    m_var = cs.SX.sym("m", nc)
+    # (JhᵀM)ᵀ = MJh
+    # JhᵀM = cs.jtimes(c(x_var, p_var), x_var, cs.diag(m_var), True)
+    # JhᵀMJh = cs.jtimes(c(x_var, p_var), x_var, cs.transpose(JhᵀM), True)
+    Jc = cs.jacobian(c(x_var, p_var), x_var)
+    JhᵀMJh = Jc.T @ cs.diag(m_var) @ Jc
+    cg.add(cs.Function(
+        "gn_hess_c",
+        [x_var, p_var, m_var],
+        [JhᵀMJh],
+        [c.name_in(i) for i in range(2)] + ["m"],
+        ["gn_hess_" + c.name_out(0)],
+    ))
+
+    # TODO
+    assert c_N is None, "Specific terminal constraints not yet supported"
+    # if c_N is None:
+    #     c_N = cs.Function("c_N", [x_var, p_var], [cs.vertcat()])
+    # else:
+    #     assert c_N.n_in() in [1, 2]
+    #     c_N, _, _ = _add_parameter(c_N, 1)
+
+    return cg

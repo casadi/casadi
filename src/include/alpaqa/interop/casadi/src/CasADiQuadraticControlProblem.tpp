@@ -103,7 +103,8 @@ CasADiQuadraticControlProblem<Conf>::CasADiQuadraticControlProblem(
         CasADiQuadraticControlFunctionsWithParam<Conf>{
             .f     = std::move(f),
             .jac_f = wrapped_load<CasADiFunctionEvaluator<Conf, 3, 1>>(
-                filename, "jac_f", dims(nx, nu, p), dims(dim(nx, nx + nu))),
+                filename, "jacobian_f", dims(nx, nu, p),
+                dims(dim(nx, nx + nu))),
             .grad_f_prod = wrapped_load<CasADiFunctionEvaluator<Conf, 4, 1>>(
                 filename, "grad_f_prod", dims(nx, nu, p, nx), dims(nx + nu)),
         });
@@ -155,7 +156,7 @@ auto CasADiQuadraticControlProblem<Conf>::eval_l(index_t t, crvec h) const
     real_t lu    = (u - u_ref_t).cwiseAbs2().cwiseProduct(R).sum();
     auto x_proj  = D.lowerbound.cwiseMax(x).cwiseMin(D.upperbound);
     real_t lz    = μ(t) * (x - x_proj).squaredNorm();
-    return real_t{0.5} * (lx + lu + lz);
+    return real_t(0.5) * (lx + lu + lz);
 }
 template <Config Conf>
 auto CasADiQuadraticControlProblem<Conf>::eval_l_N(crvec h) const -> real_t {
@@ -163,7 +164,7 @@ auto CasADiQuadraticControlProblem<Conf>::eval_l_N(crvec h) const -> real_t {
     real_t lx    = (h - x_ref_t).cwiseAbs2().cwiseProduct(Q_N).sum();
     auto h_proj  = D_N.lowerbound.cwiseMax(h).cwiseMin(D_N.upperbound);
     real_t lz    = μ(N) * (h - h_proj).squaredNorm();
-    return real_t{0.5} * (lx + lz);
+    return real_t(0.5) * (lx + lz);
 }
 template <Config Conf>
 void dist_sq_hess(crvec<Conf> z, const Box<Conf> &D, crvec<Conf> μ,

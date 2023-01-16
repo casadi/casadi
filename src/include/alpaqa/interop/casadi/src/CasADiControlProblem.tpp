@@ -100,7 +100,7 @@ CasADiControlProblem<Conf>::CasADiControlProblem(const std::string &so_name,
         CasADiControlFunctionsWithParam<Conf>{
             .f     = std::move(f),
             .jac_f = wrapped_load<CasADiFunctionEvaluator<Conf, 3, 1>>(
-                so_name, "jac_f", dims(nx, nu, p), dims(dim(nx, nx + nu))),
+                so_name, "jacobian_f", dims(nx, nu, p), dims(dim(nx, nx + nu))),
             .grad_f_prod = wrapped_load<CasADiFunctionEvaluator<Conf, 4, 1>>(
                 so_name, "grad_f_prod", dims(nx, nu, p, nx), dims(nx + nu)),
             .l = wrapped_load<CasADiFunctionEvaluator<Conf, 2, 1>>(
