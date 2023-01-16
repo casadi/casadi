@@ -12,7 +12,7 @@ pushd $env:Temp
 if (Test-Path eigen) {
     rm -r -fo eigen
 }
-git clone --single-branch --depth=1 --branch 3.4.0 `
+git clone --single-branch --depth=1 --branch master `
     "https://gitlab.com/libeigen/eigen"
 pushd eigen
 cmake -Bbuild -S. `
