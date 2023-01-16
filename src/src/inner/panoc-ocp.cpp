@@ -1,6 +1,6 @@
-#include <alpaqa/inner/src/experimental-panoc-ocp.tpp>
+#include <alpaqa/inner/src/panoc-ocp.tpp>
 
-namespace alpaqa::experimental {
+namespace alpaqa {
 
 ALPAQA_EXPORT_TEMPLATE(struct, PANOCOCPProgressInfo, DefaultConfig);
 ALPAQA_EXPORT_TEMPLATE(struct, PANOCOCPProgressInfo, EigenConfigf);
@@ -18,4 +18,4 @@ ALPAQA_EXPORT_TEMPLATE(class, PANOCOCPSolver, EigenConfigl);
 ALPAQA_EXPORT_TEMPLATE(class, PANOCOCPSolver, EigenConfigq);
 #endif
 
-} // namespace alpaqa::experimental
+} // namespace alpaqa

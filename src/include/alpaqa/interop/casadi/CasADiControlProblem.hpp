@@ -5,7 +5,7 @@
 #include <alpaqa/problem/box.hpp>
 #include <alpaqa/util/copyable_unique_ptr.hpp>
 
-namespace alpaqa::experimental {
+namespace alpaqa {
 
 namespace casadi_loader {
 template <Config>
@@ -86,4 +86,4 @@ CASADI_LOADER_EXPORT_EXTERN_TEMPLATE(class, CasADiControlProblem, EigenConfigd);
 CASADI_LOADER_EXPORT_EXTERN_TEMPLATE(class, CasADiControlProblem,
                                      DefaultConfig);
 
-} // namespace alpaqa::experimental
+} // namespace alpaqa

@@ -22,15 +22,15 @@ struct OCPDim {
 };
 
 template <Config Conf>
-struct OCProblemVTable : util::BasicVTable {
+struct ControlProblemVTable : util::BasicVTable {
     USING_ALPAQA_CONFIG(Conf);
     using Box = alpaqa::Box<config_t>;
 
     template <class F>
-    using optional_function_t = util::BasicVTable::optional_function_t<F, OCProblemVTable>;
+    using optional_function_t = util::BasicVTable::optional_function_t<F, ControlProblemVTable>;
     template <class F>
     using optional_const_function_t =
-        util::BasicVTable::optional_const_function_t<F, OCProblemVTable>;
+        util::BasicVTable::optional_const_function_t<F, ControlProblemVTable>;
 
     // clang-format off
     required_const_function_t<void(Box &U)>
@@ -98,7 +98,7 @@ struct OCProblemVTable : util::BasicVTable {
     length_t N, nu, nx, nh, nh_N, nc, nc_N;
 
     template <class P>
-    OCProblemVTable(util::VTableTypeTag<P> t) : util::BasicVTable{t} {
+    ControlProblemVTable(util::VTableTypeTag<P> t) : util::BasicVTable{t} {
         ALPAQA_TE_REQUIRED_METHOD(*this, P, get_U);
         ALPAQA_TE_OPTIONAL_METHOD(*this, P, get_D, t.t);
         ALPAQA_TE_OPTIONAL_METHOD(*this, P, get_D_N, t.t);
@@ -137,59 +137,61 @@ struct OCProblemVTable : util::BasicVTable {
         nc   = t.t->get_nc();
         nc_N = t.t->get_nc_N();
         if (nc > 0 && get_D == nullptr)
-            throw std::runtime_error("OCProblem: missing 'get_D'");
+            throw std::runtime_error("ControlProblem: missing 'get_D'");
         if (nc > 0 && eval_constr == nullptr)
-            throw std::runtime_error("OCProblem: missing 'eval_constr'");
+            throw std::runtime_error("ControlProblem: missing 'eval_constr'");
         if (nc > 0 && eval_jac_constr == nullptr)
-            throw std::runtime_error("OCProblem: missing 'eval_jac_constr'");
+            throw std::runtime_error("ControlProblem: missing 'eval_jac_constr'");
         if (nc > 0 && eval_grad_constr_prod == nullptr)
-            throw std::runtime_error("OCProblem: missing 'eval_grad_constr_prod'");
+            throw std::runtime_error("ControlProblem: missing 'eval_grad_constr_prod'");
         if (nc > 0 && eval_add_gn_hess_constr == nullptr)
-            throw std::runtime_error("OCProblem: missing 'eval_add_gn_hess_constr'");
+            throw std::runtime_error("ControlProblem: missing 'eval_add_gn_hess_constr'");
     }
-    OCProblemVTable() = default;
+    ControlProblemVTable() = default;
 
-    static void default_get_D_N(const void *self, Box &D, const OCProblemVTable &vtable) {
+    static void default_get_D_N(const void *self, Box &D, const ControlProblemVTable &vtable) {
         vtable.get_D(self, D, vtable);
     }
     static void default_eval_add_Q_N(const void *self, crvec x, crvec h, rmat Q,
-                                     const OCProblemVTable &vtable) {
+                                     const ControlProblemVTable &vtable) {
         vtable.eval_add_Q(self, vtable.N, x, h, Q);
     }
     static void default_eval_add_R_prod_masked(const void *, index_t, crvec, crvec, crindexvec,
                                                crindexvec, crvec, rvec, rvec,
-                                               const OCProblemVTable &) {}
+                                               const ControlProblemVTable &) {}
     static void default_eval_add_S_prod_masked(const void *, index_t, crvec, crvec, crindexvec,
-                                               crvec, rvec, rvec, const OCProblemVTable &) {}
-    [[nodiscard]] static length_t default_get_R_work_size(const void *, const OCProblemVTable &) {
+                                               crvec, rvec, rvec, const ControlProblemVTable &) {}
+    [[nodiscard]] static length_t default_get_R_work_size(const void *,
+                                                          const ControlProblemVTable &) {
         return 0;
     }
-    [[nodiscard]] static length_t default_get_S_work_size(const void *, const OCProblemVTable &) {
+    [[nodiscard]] static length_t default_get_S_work_size(const void *,
+                                                          const ControlProblemVTable &) {
         return 0;
     }
     static void default_eval_constr_N(const void *self, crvec x, rvec c,
-                                      const OCProblemVTable &vtable) {
+                                      const ControlProblemVTable &vtable) {
         vtable.eval_constr(self, vtable.N, x, c, vtable);
     }
     static void default_eval_jac_constr_N(const void *self, crvec x, rmat J_c,
-                                          const OCProblemVTable &vtable) {
+                                          const ControlProblemVTable &vtable) {
         vtable.eval_jac_constr(self, vtable.N, x, J_c, vtable);
     }
     static void default_eval_grad_constr_prod_N(const void *self, crvec x, crvec p, rvec grad_cx_p,
-                                                const OCProblemVTable &vtable) {
+                                                const ControlProblemVTable &vtable) {
         vtable.eval_grad_constr_prod(self, vtable.N, x, p, grad_cx_p, vtable);
     }
     static void default_eval_add_gn_hess_constr_N(const void *self, crvec x, crvec M, rmat out,
-                                                  const OCProblemVTable &vtable) {
+                                                  const ControlProblemVTable &vtable) {
         vtable.eval_add_gn_hess_constr(self, vtable.N, x, M, out, vtable);
     }
 };
 
 template <Config Conf = DefaultConfig, class Allocator = std::allocator<std::byte>>
-class TypeErasedOCProblem : public util::TypeErased<OCProblemVTable<Conf>, Allocator> {
+class TypeErasedControlProblem : public util::TypeErased<ControlProblemVTable<Conf>, Allocator> {
   public:
     USING_ALPAQA_CONFIG(Conf);
-    using VTable         = OCProblemVTable<config_t>;
+    using VTable         = ControlProblemVTable<config_t>;
     using allocator_type = Allocator;
     using Box            = typename VTable::Box;
     using Dim            = OCPDim<config_t>;
@@ -203,8 +205,8 @@ class TypeErasedOCProblem : public util::TypeErased<OCProblemVTable<Conf>, Alloc
 
   public:
     template <class T, class... Args>
-    static TypeErasedOCProblem make(Args &&...args) {
-        return TypeErased::template make<TypeErasedOCProblem, T>(std::forward<Args>(args)...);
+    static TypeErasedControlProblem make(Args &&...args) {
+        return TypeErased::template make<TypeErasedControlProblem, T>(std::forward<Args>(args)...);
     }
 
     /// @name Problem dimensions
@@ -275,36 +277,36 @@ class TypeErasedOCProblem : public util::TypeErased<OCProblemVTable<Conf>, Alloc
 
 // clang-format off
 #ifdef NDEBUG
-template <Config Conf, class Allocator> void TypeErasedOCProblem<Conf, Allocator>::get_U(Box &U) const { return call(vtable.get_U, U); }
-template <Config Conf, class Allocator> void TypeErasedOCProblem<Conf, Allocator>::get_D(Box &D) const { return call(vtable.get_D, D); }
-template <Config Conf, class Allocator> void TypeErasedOCProblem<Conf, Allocator>::get_D_N(Box &D) const { return call(vtable.get_D_N, D); }
-template <Config Conf, class Allocator> void TypeErasedOCProblem<Conf, Allocator>::get_x_init(rvec x_init) const { return call(vtable.get_x_init, x_init); }
-template <Config Conf, class Allocator> void TypeErasedOCProblem<Conf, Allocator>::eval_f(index_t timestep, crvec x, crvec u, rvec fxu) const { return call(vtable.eval_f, timestep, x, u, fxu); }
-template <Config Conf, class Allocator> void TypeErasedOCProblem<Conf, Allocator>::eval_jac_f(index_t timestep, crvec x, crvec u, rmat J_fxu) const { return call(vtable.eval_jac_f, timestep, x, u, J_fxu); }
-template <Config Conf, class Allocator> void TypeErasedOCProblem<Conf, Allocator>::eval_grad_f_prod(index_t timestep, crvec x, crvec u, crvec p, rvec grad_fxu_p) const { return call(vtable.eval_grad_f_prod, timestep, x, u, p, grad_fxu_p); }
-template <Config Conf, class Allocator> void TypeErasedOCProblem<Conf, Allocator>::eval_h(index_t timestep, crvec x, crvec u, rvec h) const { return call(vtable.eval_h, timestep, x, u, h); }
-template <Config Conf, class Allocator> void TypeErasedOCProblem<Conf, Allocator>::eval_h_N(crvec x, rvec h) const { return call(vtable.eval_h_N, x, h); }
-template <Config Conf, class Allocator> auto TypeErasedOCProblem<Conf, Allocator>::eval_l(index_t timestep, crvec h) const -> real_t { return call(vtable.eval_l, timestep, h); }
-template <Config Conf, class Allocator> auto TypeErasedOCProblem<Conf, Allocator>::eval_l_N(crvec h) const -> real_t { return call(vtable.eval_l_N, h); }
-template <Config Conf, class Allocator> void TypeErasedOCProblem<Conf, Allocator>::eval_qr(index_t timestep, crvec xu, crvec h, rvec qr) const { return call(vtable.eval_qr, timestep, xu, h, qr); }
-template <Config Conf, class Allocator> void TypeErasedOCProblem<Conf, Allocator>::eval_q_N(crvec x, crvec h, rvec q) const { return call(vtable.eval_q_N, x, h, q); }
-template <Config Conf, class Allocator> void TypeErasedOCProblem<Conf, Allocator>::eval_add_Q(index_t timestep, crvec xu, crvec h, rmat Q) const { return call(vtable.eval_add_Q, timestep, xu, h, Q); }
-template <Config Conf, class Allocator> void TypeErasedOCProblem<Conf, Allocator>::eval_add_Q_N(crvec x, crvec h, rmat Q) const { return call(vtable.eval_add_Q_N, x, h, Q); }
-template <Config Conf, class Allocator> void TypeErasedOCProblem<Conf, Allocator>::eval_add_R_masked(index_t timestep, crvec xu, crvec h, crindexvec mask, rmat R, rvec work) const { return call(vtable.eval_add_R_masked, timestep, xu, h, mask, R, work); }
-template <Config Conf, class Allocator> void TypeErasedOCProblem<Conf, Allocator>::eval_add_S_masked(index_t timestep, crvec xu, crvec h, crindexvec mask, rmat S, rvec work) const { return call(vtable.eval_add_S_masked, timestep, xu, h, mask, S, work); }
-template <Config Conf, class Allocator> void TypeErasedOCProblem<Conf, Allocator>::eval_add_R_prod_masked(index_t timestep, crvec xu, crvec h, crindexvec mask_J, crindexvec mask_K, crvec v, rvec out, rvec work) const { return call(vtable.eval_add_R_prod_masked, timestep, xu, h, mask_J, mask_K, v, out, work); }
-template <Config Conf, class Allocator> void TypeErasedOCProblem<Conf, Allocator>::eval_add_S_prod_masked(index_t timestep, crvec xu, crvec h, crindexvec mask_K, crvec v, rvec out, rvec work) const { return call(vtable.eval_add_S_prod_masked, timestep, xu, h, mask_K, v, out, work); }
-template <Config Conf, class Allocator> auto TypeErasedOCProblem<Conf, Allocator>::get_R_work_size() const -> length_t { return call(vtable.get_R_work_size); }
-template <Config Conf, class Allocator> auto TypeErasedOCProblem<Conf, Allocator>::get_S_work_size() const -> length_t { return call(vtable.get_S_work_size); }
-template <Config Conf, class Allocator> void TypeErasedOCProblem<Conf, Allocator>::eval_constr(index_t timestep, crvec x, rvec c) const { return call(vtable.eval_constr, timestep, x, c); }
-template <Config Conf, class Allocator> void TypeErasedOCProblem<Conf, Allocator>::eval_constr_N(crvec x, rvec c) const { return call(vtable.eval_constr_N, x, c); }
-template <Config Conf, class Allocator> void TypeErasedOCProblem<Conf, Allocator>::eval_jac_constr(index_t timestep, crvec x, rmat J_c) const { return call(vtable.eval_jac_constr, timestep, x, J_c); }
-template <Config Conf, class Allocator> void TypeErasedOCProblem<Conf, Allocator>::eval_jac_constr_N(crvec x, rmat J_c) const { return call(vtable.eval_jac_constr_N, x, J_c); }
-template <Config Conf, class Allocator> void TypeErasedOCProblem<Conf, Allocator>::eval_grad_constr_prod(index_t timestep, crvec x, crvec p, rvec grad_cx_p) const { return call(vtable.eval_grad_constr_prod, timestep, x, p, grad_cx_p); }
-template <Config Conf, class Allocator> void TypeErasedOCProblem<Conf, Allocator>::eval_grad_constr_prod_N(crvec x, crvec p, rvec grad_cx_p) const { return call(vtable.eval_grad_constr_prod_N, x, p, grad_cx_p); }
-template <Config Conf, class Allocator> void TypeErasedOCProblem<Conf, Allocator>::eval_add_gn_hess_constr(index_t timestep, crvec x, crvec M, rmat out) const { return call(vtable.eval_add_gn_hess_constr, timestep, x, M, out); }
-template <Config Conf, class Allocator> void TypeErasedOCProblem<Conf, Allocator>::eval_add_gn_hess_constr_N(crvec x, crvec M, rmat out) const { return call(vtable.eval_add_gn_hess_constr_N, x, M, out); }
-template <Config Conf, class Allocator> void TypeErasedOCProblem<Conf, Allocator>::check() const { return call(vtable.check); }
+template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::get_U(Box &U) const { return call(vtable.get_U, U); }
+template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::get_D(Box &D) const { return call(vtable.get_D, D); }
+template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::get_D_N(Box &D) const { return call(vtable.get_D_N, D); }
+template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::get_x_init(rvec x_init) const { return call(vtable.get_x_init, x_init); }
+template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::eval_f(index_t timestep, crvec x, crvec u, rvec fxu) const { return call(vtable.eval_f, timestep, x, u, fxu); }
+template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::eval_jac_f(index_t timestep, crvec x, crvec u, rmat J_fxu) const { return call(vtable.eval_jac_f, timestep, x, u, J_fxu); }
+template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::eval_grad_f_prod(index_t timestep, crvec x, crvec u, crvec p, rvec grad_fxu_p) const { return call(vtable.eval_grad_f_prod, timestep, x, u, p, grad_fxu_p); }
+template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::eval_h(index_t timestep, crvec x, crvec u, rvec h) const { return call(vtable.eval_h, timestep, x, u, h); }
+template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::eval_h_N(crvec x, rvec h) const { return call(vtable.eval_h_N, x, h); }
+template <Config Conf, class Allocator> auto TypeErasedControlProblem<Conf, Allocator>::eval_l(index_t timestep, crvec h) const -> real_t { return call(vtable.eval_l, timestep, h); }
+template <Config Conf, class Allocator> auto TypeErasedControlProblem<Conf, Allocator>::eval_l_N(crvec h) const -> real_t { return call(vtable.eval_l_N, h); }
+template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::eval_qr(index_t timestep, crvec xu, crvec h, rvec qr) const { return call(vtable.eval_qr, timestep, xu, h, qr); }
+template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::eval_q_N(crvec x, crvec h, rvec q) const { return call(vtable.eval_q_N, x, h, q); }
+template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::eval_add_Q(index_t timestep, crvec xu, crvec h, rmat Q) const { return call(vtable.eval_add_Q, timestep, xu, h, Q); }
+template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::eval_add_Q_N(crvec x, crvec h, rmat Q) const { return call(vtable.eval_add_Q_N, x, h, Q); }
+template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::eval_add_R_masked(index_t timestep, crvec xu, crvec h, crindexvec mask, rmat R, rvec work) const { return call(vtable.eval_add_R_masked, timestep, xu, h, mask, R, work); }
+template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::eval_add_S_masked(index_t timestep, crvec xu, crvec h, crindexvec mask, rmat S, rvec work) const { return call(vtable.eval_add_S_masked, timestep, xu, h, mask, S, work); }
+template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::eval_add_R_prod_masked(index_t timestep, crvec xu, crvec h, crindexvec mask_J, crindexvec mask_K, crvec v, rvec out, rvec work) const { return call(vtable.eval_add_R_prod_masked, timestep, xu, h, mask_J, mask_K, v, out, work); }
+template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::eval_add_S_prod_masked(index_t timestep, crvec xu, crvec h, crindexvec mask_K, crvec v, rvec out, rvec work) const { return call(vtable.eval_add_S_prod_masked, timestep, xu, h, mask_K, v, out, work); }
+template <Config Conf, class Allocator> auto TypeErasedControlProblem<Conf, Allocator>::get_R_work_size() const -> length_t { return call(vtable.get_R_work_size); }
+template <Config Conf, class Allocator> auto TypeErasedControlProblem<Conf, Allocator>::get_S_work_size() const -> length_t { return call(vtable.get_S_work_size); }
+template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::eval_constr(index_t timestep, crvec x, rvec c) const { return call(vtable.eval_constr, timestep, x, c); }
+template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::eval_constr_N(crvec x, rvec c) const { return call(vtable.eval_constr_N, x, c); }
+template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::eval_jac_constr(index_t timestep, crvec x, rmat J_c) const { return call(vtable.eval_jac_constr, timestep, x, J_c); }
+template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::eval_jac_constr_N(crvec x, rmat J_c) const { return call(vtable.eval_jac_constr_N, x, J_c); }
+template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::eval_grad_constr_prod(index_t timestep, crvec x, crvec p, rvec grad_cx_p) const { return call(vtable.eval_grad_constr_prod, timestep, x, p, grad_cx_p); }
+template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::eval_grad_constr_prod_N(crvec x, crvec p, rvec grad_cx_p) const { return call(vtable.eval_grad_constr_prod_N, x, p, grad_cx_p); }
+template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::eval_add_gn_hess_constr(index_t timestep, crvec x, crvec M, rmat out) const { return call(vtable.eval_add_gn_hess_constr, timestep, x, M, out); }
+template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::eval_add_gn_hess_constr_N(crvec x, crvec M, rmat out) const { return call(vtable.eval_add_gn_hess_constr_N, x, M, out); }
+template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::check() const { return call(vtable.check); }
 #else
 /// If the given vector @p v is not finite, break or throw an exception with the
 /// given message @p msg.
@@ -317,42 +319,42 @@ inline void check_finiteness(const auto &v, std::string_view msg) {
         throw std::runtime_error(std::string(msg));
     }
 }
-template <Config Conf, class Allocator> void TypeErasedOCProblem<Conf, Allocator>::get_U(Box &U) const { return call(vtable.get_U, U); }
-template <Config Conf, class Allocator> void TypeErasedOCProblem<Conf, Allocator>::get_D(Box &D) const { return call(vtable.get_D, D); }
-template <Config Conf, class Allocator> void TypeErasedOCProblem<Conf, Allocator>::get_x_init(rvec x_init) const { call(vtable.get_x_init, x_init); check_finiteness(x_init, "Infinite output of get_x_init"); }
-template <Config Conf, class Allocator> void TypeErasedOCProblem<Conf, Allocator>::eval_f(index_t timestep, crvec x, crvec u, rvec fxu) const { check_finiteness(x, "Infinite input x of f"); check_finiteness(u, "Infinite input u of f"); call(vtable.eval_f, timestep, x, u, fxu); check_finiteness(fxu, "Infinite output of f"); }
-template <Config Conf, class Allocator> void TypeErasedOCProblem<Conf, Allocator>::eval_jac_f(index_t timestep, crvec x, crvec u, rmat J_fxu) const { check_finiteness(x, "Infinite input x of jac_f"); check_finiteness(u, "Infinite input u of jac_f"); call(vtable.eval_jac_f, timestep, x, u, J_fxu); check_finiteness(J_fxu.reshaped(), "Infinite output of jac_f"); }
-template <Config Conf, class Allocator> void TypeErasedOCProblem<Conf, Allocator>::eval_grad_f_prod(index_t timestep, crvec x, crvec u, crvec p, rvec grad_fxu_p) const { check_finiteness(x, "Infinite input x of grad_f_prod"); check_finiteness(u, "Infinite input u of grad_f_prod"); check_finiteness(p, "Infinite input p of grad_prod_f"); call(vtable.eval_grad_f_prod, timestep, x, u, p, grad_fxu_p); check_finiteness(grad_fxu_p, "Infinite output of jac_f"); }
-template <Config Conf, class Allocator> void TypeErasedOCProblem<Conf, Allocator>::eval_h(index_t timestep, crvec x, crvec u, rvec h) const { check_finiteness(x, "Infinite input x of h"); check_finiteness(u, "Infinite input u of h"); call(vtable.eval_h, timestep, x, u, h); check_finiteness(h, "Infinite output of h"); }
-template <Config Conf, class Allocator> void TypeErasedOCProblem<Conf, Allocator>::eval_h_N(crvec x, rvec h) const { check_finiteness(x, "Infinite input x of h_N"); call(vtable.eval_h_N, x, h); check_finiteness(h, "Infinite output of h_N"); }
-template <Config Conf, class Allocator> auto TypeErasedOCProblem<Conf, Allocator>::eval_l(index_t timestep, crvec h) const -> real_t { check_finiteness(h, "Infinite input h of l"); auto l = call(vtable.eval_l, timestep, h); check_finiteness(std::array{l}, "Infinite output of l"); return l; }
-template <Config Conf, class Allocator> auto TypeErasedOCProblem<Conf, Allocator>::eval_l_N(crvec h) const -> real_t { check_finiteness(h, "Infinite input h of l_N"); auto l =  call(vtable.eval_l_N, h); check_finiteness(std::array{l}, "Infinite output of l_N"); return l; }
-template <Config Conf, class Allocator> void TypeErasedOCProblem<Conf, Allocator>::eval_qr(index_t timestep, crvec xu, crvec h, rvec qr) const { return call(vtable.eval_qr, timestep, xu, h, qr); }
-template <Config Conf, class Allocator> void TypeErasedOCProblem<Conf, Allocator>::eval_q_N(crvec x, crvec h, rvec q) const { check_finiteness(x, "Infinite input x of q_N"); check_finiteness(h, "Infinite input h of q_N"); call(vtable.eval_q_N, x, h, q); check_finiteness(q, "Infinite output of q_N"); }
-template <Config Conf, class Allocator> void TypeErasedOCProblem<Conf, Allocator>::eval_add_Q(index_t timestep, crvec xu, crvec h, rmat Q) const { return call(vtable.eval_add_Q, timestep, xu, h, Q); }
-template <Config Conf, class Allocator> void TypeErasedOCProblem<Conf, Allocator>::eval_add_Q_N(crvec x, crvec h, rmat Q) const { return call(vtable.eval_add_Q_N, x, h, Q); }
-template <Config Conf, class Allocator> void TypeErasedOCProblem<Conf, Allocator>::eval_add_R_masked(index_t timestep, crvec xu, crvec h, crindexvec mask, rmat R, rvec work) const { return call(vtable.eval_add_R_masked, timestep, xu, h, mask, R, work); }
-template <Config Conf, class Allocator> void TypeErasedOCProblem<Conf, Allocator>::eval_add_S_masked(index_t timestep, crvec xu, crvec h, crindexvec mask, rmat S, rvec work) const { return call(vtable.eval_add_S_masked, timestep, xu, h, mask, S, work); }
-template <Config Conf, class Allocator> void TypeErasedOCProblem<Conf, Allocator>::eval_add_R_prod_masked(index_t timestep, crvec xu, crvec h, crindexvec mask_J, crindexvec mask_K, crvec v, rvec out, rvec work) const { return call(vtable.eval_add_R_prod_masked, timestep, xu, h, mask_J, mask_K, v, out, work); }
-template <Config Conf, class Allocator> void TypeErasedOCProblem<Conf, Allocator>::eval_add_S_prod_masked(index_t timestep, crvec xu, crvec h, crindexvec mask_K, crvec v, rvec out, rvec work) const { return call(vtable.eval_add_S_prod_masked, timestep, xu, h, mask_K, v, out, work); }
-template <Config Conf, class Allocator> auto TypeErasedOCProblem<Conf, Allocator>::get_R_work_size() const -> length_t { return call(vtable.get_R_work_size); }
-template <Config Conf, class Allocator> auto TypeErasedOCProblem<Conf, Allocator>::get_S_work_size() const -> length_t { return call(vtable.get_S_work_size); }
-template <Config Conf, class Allocator> void TypeErasedOCProblem<Conf, Allocator>::eval_constr(index_t timestep, crvec x, rvec c) const { return call(vtable.eval_constr, timestep, x, c); }
-template <Config Conf, class Allocator> void TypeErasedOCProblem<Conf, Allocator>::eval_constr_N(crvec x, rvec c) const { return call(vtable.eval_constr_N, x, c); }
-template <Config Conf, class Allocator> void TypeErasedOCProblem<Conf, Allocator>::eval_jac_constr(index_t timestep, crvec x, rmat J_c) const { return call(vtable.eval_jac_constr, timestep, x, J_c); }
-template <Config Conf, class Allocator> void TypeErasedOCProblem<Conf, Allocator>::eval_jac_constr_N(crvec x, rmat J_c) const { return call(vtable.eval_jac_constr_N, x, J_c); }
-template <Config Conf, class Allocator> void TypeErasedOCProblem<Conf, Allocator>::eval_grad_constr_prod(index_t timestep, crvec x, crvec p, rvec grad_cx_p) const { return call(vtable.eval_grad_constr_prod, timestep, x, p, grad_cx_p); }
-template <Config Conf, class Allocator> void TypeErasedOCProblem<Conf, Allocator>::eval_grad_constr_prod_N(crvec x, crvec p, rvec grad_cx_p) const { return call(vtable.eval_grad_constr_prod_N, x, p, grad_cx_p); }
-template <Config Conf, class Allocator> void TypeErasedOCProblem<Conf, Allocator>::eval_add_gn_hess_constr(index_t timestep, crvec x, crvec M, rmat out) const { return call(vtable.eval_add_gn_hess_constr, timestep, x, M, out); }
-template <Config Conf, class Allocator> void TypeErasedOCProblem<Conf, Allocator>::eval_add_gn_hess_constr_N(crvec x, crvec M, rmat out) const { return call(vtable.eval_add_gn_hess_constr_N, x, M, out); }
-template <Config Conf, class Allocator> void TypeErasedOCProblem<Conf, Allocator>::check() const { return call(vtable.check); }
+template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::get_U(Box &U) const { return call(vtable.get_U, U); }
+template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::get_D(Box &D) const { return call(vtable.get_D, D); }
+template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::get_x_init(rvec x_init) const { call(vtable.get_x_init, x_init); check_finiteness(x_init, "Infinite output of get_x_init"); }
+template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::eval_f(index_t timestep, crvec x, crvec u, rvec fxu) const { check_finiteness(x, "Infinite input x of f"); check_finiteness(u, "Infinite input u of f"); call(vtable.eval_f, timestep, x, u, fxu); check_finiteness(fxu, "Infinite output of f"); }
+template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::eval_jac_f(index_t timestep, crvec x, crvec u, rmat J_fxu) const { check_finiteness(x, "Infinite input x of jac_f"); check_finiteness(u, "Infinite input u of jac_f"); call(vtable.eval_jac_f, timestep, x, u, J_fxu); check_finiteness(J_fxu.reshaped(), "Infinite output of jac_f"); }
+template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::eval_grad_f_prod(index_t timestep, crvec x, crvec u, crvec p, rvec grad_fxu_p) const { check_finiteness(x, "Infinite input x of grad_f_prod"); check_finiteness(u, "Infinite input u of grad_f_prod"); check_finiteness(p, "Infinite input p of grad_prod_f"); call(vtable.eval_grad_f_prod, timestep, x, u, p, grad_fxu_p); check_finiteness(grad_fxu_p, "Infinite output of jac_f"); }
+template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::eval_h(index_t timestep, crvec x, crvec u, rvec h) const { check_finiteness(x, "Infinite input x of h"); check_finiteness(u, "Infinite input u of h"); call(vtable.eval_h, timestep, x, u, h); check_finiteness(h, "Infinite output of h"); }
+template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::eval_h_N(crvec x, rvec h) const { check_finiteness(x, "Infinite input x of h_N"); call(vtable.eval_h_N, x, h); check_finiteness(h, "Infinite output of h_N"); }
+template <Config Conf, class Allocator> auto TypeErasedControlProblem<Conf, Allocator>::eval_l(index_t timestep, crvec h) const -> real_t { check_finiteness(h, "Infinite input h of l"); auto l = call(vtable.eval_l, timestep, h); check_finiteness(std::array{l}, "Infinite output of l"); return l; }
+template <Config Conf, class Allocator> auto TypeErasedControlProblem<Conf, Allocator>::eval_l_N(crvec h) const -> real_t { check_finiteness(h, "Infinite input h of l_N"); auto l =  call(vtable.eval_l_N, h); check_finiteness(std::array{l}, "Infinite output of l_N"); return l; }
+template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::eval_qr(index_t timestep, crvec xu, crvec h, rvec qr) const { return call(vtable.eval_qr, timestep, xu, h, qr); }
+template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::eval_q_N(crvec x, crvec h, rvec q) const { check_finiteness(x, "Infinite input x of q_N"); check_finiteness(h, "Infinite input h of q_N"); call(vtable.eval_q_N, x, h, q); check_finiteness(q, "Infinite output of q_N"); }
+template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::eval_add_Q(index_t timestep, crvec xu, crvec h, rmat Q) const { return call(vtable.eval_add_Q, timestep, xu, h, Q); }
+template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::eval_add_Q_N(crvec x, crvec h, rmat Q) const { return call(vtable.eval_add_Q_N, x, h, Q); }
+template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::eval_add_R_masked(index_t timestep, crvec xu, crvec h, crindexvec mask, rmat R, rvec work) const { return call(vtable.eval_add_R_masked, timestep, xu, h, mask, R, work); }
+template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::eval_add_S_masked(index_t timestep, crvec xu, crvec h, crindexvec mask, rmat S, rvec work) const { return call(vtable.eval_add_S_masked, timestep, xu, h, mask, S, work); }
+template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::eval_add_R_prod_masked(index_t timestep, crvec xu, crvec h, crindexvec mask_J, crindexvec mask_K, crvec v, rvec out, rvec work) const { return call(vtable.eval_add_R_prod_masked, timestep, xu, h, mask_J, mask_K, v, out, work); }
+template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::eval_add_S_prod_masked(index_t timestep, crvec xu, crvec h, crindexvec mask_K, crvec v, rvec out, rvec work) const { return call(vtable.eval_add_S_prod_masked, timestep, xu, h, mask_K, v, out, work); }
+template <Config Conf, class Allocator> auto TypeErasedControlProblem<Conf, Allocator>::get_R_work_size() const -> length_t { return call(vtable.get_R_work_size); }
+template <Config Conf, class Allocator> auto TypeErasedControlProblem<Conf, Allocator>::get_S_work_size() const -> length_t { return call(vtable.get_S_work_size); }
+template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::eval_constr(index_t timestep, crvec x, rvec c) const { return call(vtable.eval_constr, timestep, x, c); }
+template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::eval_constr_N(crvec x, rvec c) const { return call(vtable.eval_constr_N, x, c); }
+template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::eval_jac_constr(index_t timestep, crvec x, rmat J_c) const { return call(vtable.eval_jac_constr, timestep, x, J_c); }
+template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::eval_jac_constr_N(crvec x, rmat J_c) const { return call(vtable.eval_jac_constr_N, x, J_c); }
+template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::eval_grad_constr_prod(index_t timestep, crvec x, crvec p, rvec grad_cx_p) const { return call(vtable.eval_grad_constr_prod, timestep, x, p, grad_cx_p); }
+template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::eval_grad_constr_prod_N(crvec x, crvec p, rvec grad_cx_p) const { return call(vtable.eval_grad_constr_prod_N, x, p, grad_cx_p); }
+template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::eval_add_gn_hess_constr(index_t timestep, crvec x, crvec M, rmat out) const { return call(vtable.eval_add_gn_hess_constr, timestep, x, M, out); }
+template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::eval_add_gn_hess_constr_N(crvec x, crvec M, rmat out) const { return call(vtable.eval_add_gn_hess_constr_N, x, M, out); }
+template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::check() const { return call(vtable.check); }
 #endif
 // clang-format on
 
 template <class Problem>
-struct OCProblemWithCounters {
+struct ControlProblemWithCounters {
     USING_ALPAQA_CONFIG_TEMPLATE(std::remove_cvref_t<Problem>::config_t);
-    using Box = typename TypeErasedOCProblem<config_t>::Box;
+    using Box = typename TypeErasedControlProblem<config_t>::Box;
 
     [[nodiscard]] length_t get_N() const { return problem.get_N(); }
     [[nodiscard]] length_t get_nu() const { return problem.get_nu(); }
@@ -414,8 +416,8 @@ struct OCProblemWithCounters {
     std::shared_ptr<OCPEvalCounter> evaluations = std::make_shared<OCPEvalCounter>();
     Problem problem;
 
-    OCProblemWithCounters(const Problem &problem) : problem(problem) {}
-    OCProblemWithCounters(Problem &&problem)
+    ControlProblemWithCounters(const Problem &problem) : problem(problem) {}
+    ControlProblemWithCounters(Problem &&problem)
         requires(!std::is_lvalue_reference_v<Problem>)
         : problem(std::forward<Problem>(problem)) {}
 
@@ -430,14 +432,14 @@ struct OCProblemWithCounters {
 template <class Problem>
 [[nodiscard]] auto ocproblem_with_counters(Problem &&p) {
     using Prob        = std::remove_cvref_t<Problem>;
-    using ProbWithCnt = OCProblemWithCounters<Prob>;
+    using ProbWithCnt = ControlProblemWithCounters<Prob>;
     return ProbWithCnt{std::forward<Problem>(p)};
 }
 
 template <class Problem>
 [[nodiscard]] auto ocproblem_with_counters_ref(Problem &p) {
     using Prob        = std::remove_cvref_t<Problem>;
-    using ProbWithCnt = OCProblemWithCounters<const Prob &>;
+    using ProbWithCnt = ControlProblemWithCounters<const Prob &>;
     return ProbWithCnt{p};
 }
 

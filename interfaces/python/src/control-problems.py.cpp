@@ -11,44 +11,44 @@ using namespace py::literals;
 #include <alpaqa/problem/ocproblem.hpp>
 #include <alpaqa/util/check-dim.hpp>
 #if ALPAQA_HAVE_CASADI
-#include <alpaqa/interop/casadi/experimental-CasADiControlProblem.hpp>
+#include <alpaqa/interop/casadi/CasADiControlProblem.hpp>
 #endif
 
 template <alpaqa::Config Conf>
-void register_experimental_problems(py::module_ &m) {
+void register_control_problems(py::module_ &m) {
     USING_ALPAQA_CONFIG(Conf);
     using alpaqa::util::check_dim;
 
-    using OCProblem = alpaqa::TypeErasedOCProblem<config_t>;
-    py::class_<OCProblem> te_problem(m, "ControlProblem",
-                                     "C++ documentation: :cpp:class:`alpaqa::TypeErasedProblem`");
+    using ControlProblem = alpaqa::TypeErasedControlProblem<config_t>;
+    py::class_<ControlProblem> te_problem(
+        m, "ControlProblem", "C++ documentation: :cpp:class:`alpaqa::TypeErasedControlProblem`");
     te_problem //
-        .def(py::init<const OCProblem &>())
-        .def("__copy__", [](const OCProblem &self) { return OCProblem{self}; })
+        .def(py::init<const ControlProblem &>())
+        .def("__copy__", [](const ControlProblem &self) { return ControlProblem{self}; })
         .def(
-            "__deepcopy__", [](const OCProblem &self, py::dict) { return OCProblem{self}; },
-            "memo"_a)
+            "__deepcopy__",
+            [](const ControlProblem &self, py::dict) { return ControlProblem{self}; }, "memo"_a)
         // TODO
         ;
 
     // ProblemWithCounters
     static constexpr auto te_pwc = []<class P>(P &&p) {
-        using PwC = alpaqa::OCProblemWithCounters<std::remove_cvref_t<P>>;
-        auto te_p = OCProblem::template make<PwC>(std::forward<P>(p));
+        using PwC = alpaqa::ControlProblemWithCounters<std::remove_cvref_t<P>>;
+        auto te_p = ControlProblem::template make<PwC>(std::forward<P>(p));
         auto eval = te_p.template as<PwC>().evaluations;
         return std::make_tuple(std::move(te_p), std::move(eval));
     };
 
     if constexpr (std::is_same_v<typename Conf::real_t, double>) {
 #if ALPAQA_HAVE_CASADI
-        using CasADiControlProblem = alpaqa::experimental::CasADiControlProblem<config_t>;
-        auto load_experimental_CasADi_control_problem = [](const char *so_name, unsigned N) {
+        using CasADiControlProblem       = alpaqa::CasADiControlProblem<config_t>;
+        auto load_CasADi_control_problem = [](const char *so_name, unsigned N) {
             return std::make_unique<CasADiControlProblem>(so_name, N);
         };
 #else
         class CasADiControlProblem {};
-        auto load_experimental_CasADi_control_problem =
-            [](const char *so_name, unsigned N) -> std::unique_ptr<CasADiControlProblem> {
+        auto load_CasADi_control_problem = [](const char *so_name,
+                                              unsigned N) -> std::unique_ptr<CasADiControlProblem> {
             throw std::runtime_error("This version of alpaqa was compiled without CasADi support");
         };
 #endif
@@ -96,10 +96,10 @@ void register_experimental_problems(py::module_ &m) {
                 },
                 "Parameter vector :math:`p` of the problem");
         te_problem.def(py::init<const CasADiControlProblem &>());
-        py::implicitly_convertible<CasADiControlProblem, OCProblem>();
+        py::implicitly_convertible<CasADiControlProblem, ControlProblem>();
 #endif
-        m.def("load_experimental_casadi_control_problem", load_experimental_CasADi_control_problem,
-              "so_name"_a, "N"_a, "Load a compiled CasADi optimal control problem.\n\n");
+        m.def("load_casadi_control_problem", load_CasADi_control_problem, "so_name"_a, "N"_a,
+              "Load a compiled CasADi optimal control problem.\n\n");
 
         m.def(
             "control_problem_with_counters",
@@ -111,9 +111,9 @@ void register_experimental_problems(py::module_ &m) {
     }
 }
 
-template void register_experimental_problems<alpaqa::EigenConfigd>(py::module_ &);
-template void register_experimental_problems<alpaqa::EigenConfigf>(py::module_ &);
-template void register_experimental_problems<alpaqa::EigenConfigl>(py::module_ &);
+template void register_control_problems<alpaqa::EigenConfigd>(py::module_ &);
+template void register_control_problems<alpaqa::EigenConfigf>(py::module_ &);
+template void register_control_problems<alpaqa::EigenConfigl>(py::module_ &);
 #ifdef ALPAQA_WITH_QUAD_PRECISION
-template void register_experimental_problems<alpaqa::EigenConfigq>(py::module_ &);
+template void register_control_problems<alpaqa::EigenConfigq>(py::module_ &);
 #endif

@@ -8,7 +8,7 @@
 #include <limits>
 #include <string>
 
-namespace alpaqa::experimental {
+namespace alpaqa {
 
 /// Tuning parameters for the PANOC algorithm.
 template <Config Conf = DefaultConfig>
@@ -79,7 +79,7 @@ struct PANOCOCPProgressInfo {
     real_t γ;
     real_t τ;
     real_t ε;
-    const TypeErasedOCProblem<config_t> &problem;
+    const TypeErasedControlProblem<config_t> &problem;
     const PANOCOCPParams<config_t> &params;
 
     [[nodiscard]] vec u() const;
@@ -122,7 +122,7 @@ class PANOCOCPSolver {
   public:
     USING_ALPAQA_CONFIG(Conf);
 
-    using Problem      = alpaqa::TypeErasedOCProblem<config_t>;
+    using Problem      = alpaqa::TypeErasedControlProblem<config_t>;
     using Params       = PANOCOCPParams<config_t>;
     using Stats        = PANOCOCPStats<config_t>;
     using ProgressInfo = PANOCOCPProgressInfo<config_t>;
@@ -174,4 +174,4 @@ ALPAQA_EXPORT_EXTERN_TEMPLATE(class, PANOCOCPSolver, EigenConfigl);
 ALPAQA_EXPORT_EXTERN_TEMPLATE(class, PANOCOCPSolver, EigenConfigq);
 #endif
 
-} // namespace alpaqa::experimental
+} // namespace alpaqa

@@ -1,8 +1,8 @@
 #pragma once
 
 #include <alpaqa/config/config.hpp>
+#include <alpaqa/interop/casadi/CasADiControlProblem.hpp>
 #include <alpaqa/interop/casadi/CasADiFunctionWrapper.hpp>
-#include <alpaqa/interop/casadi/experimental-CasADiControlProblem.hpp>
 #include <alpaqa/util/not-implemented.hpp>
 #include "CasADiLoader-util.hpp"
 #include "alpaqa/util/iter-adapter.hpp"
@@ -18,7 +18,7 @@
 #include <stdexcept>
 #include <type_traits>
 
-namespace alpaqa::experimental {
+namespace alpaqa {
 
 namespace casadi_loader {
 
@@ -553,4 +553,4 @@ void CasADiControlProblem<Conf>::eval_add_gn_hess_constr(index_t, crvec x,
             nx, nx, sparse.nnz(), sparse.colind(), sparse.row(), work.data(),
         };
 }
-} // namespace alpaqa::experimental
+} // namespace alpaqa

@@ -9,7 +9,7 @@ add_library(alpaqa
     "src/problem/ocproblem-counters.cpp"
     "src/outer/alm.cpp"
     "src/inner/panoc.cpp"
-    "src/inner/experimental-panoc-ocp.cpp"
+    "src/inner/panoc-ocp.cpp"
     "src/panoc-alm.cpp"
     "src/structured-panoc-alm.cpp"
     "src/inner/internal/solverstatus.cpp"
@@ -50,10 +50,10 @@ if (ALPAQA_WITH_CASADI)
     find_package(casadi REQUIRED)
     add_library(casadi-loader 
         "interop/casadi/CasADiProblem.cpp"
-        "interop/casadi/experimental-CasADiControlProblem.cpp"
+        "interop/casadi/CasADiControlProblem.cpp"
         "include/alpaqa/interop/casadi/CasADiFunctionWrapper.hpp"
         "include/alpaqa/interop/casadi/CasADiProblem.hpp"
-        "include/alpaqa/interop/casadi/experimental-CasADiControlProblem.hpp")
+        "include/alpaqa/interop/casadi/CasADiControlProblem.hpp")
     find_package(Threads REQUIRED)
     target_link_libraries(casadi-loader 
         PUBLIC

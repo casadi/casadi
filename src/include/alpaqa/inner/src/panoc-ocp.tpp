@@ -1,7 +1,7 @@
 #include <alpaqa/accelerators/lbfgs.hpp>
 #include <alpaqa/config/config.hpp>
-#include <alpaqa/inner/directions/panoc-ocp/experimental-lqr.hpp>
-#include <alpaqa/inner/experimental-panoc-ocp.hpp>
+#include <alpaqa/inner/directions/panoc-ocp/lqr.hpp>
+#include <alpaqa/inner/panoc-ocp.hpp>
 #include <alpaqa/problem/box.hpp>
 #include <alpaqa/problem/ocproblem.hpp>
 #include <alpaqa/util/index-set.hpp>
@@ -13,7 +13,7 @@
 #include <stdexcept>
 #include <type_traits>
 
-namespace alpaqa::experimental {
+namespace alpaqa {
 
 template <class V, class Conf>
 concept VectorRefLike =
@@ -42,7 +42,7 @@ struct OCPVariables {
         std::partial_sum(sizes.begin(), sizes.end(), indices.begin());
         std::partial_sum(sizes_N.begin(), sizes_N.end(), indices_N.begin());
     }
-    OCPVariables(const TypeErasedOCProblem<config_t> &prob)
+    OCPVariables(const TypeErasedControlProblem<config_t> &prob)
         : OCPVariables{
               {prob.get_nx(), prob.get_nu(), prob.get_nh(), prob.get_nc()},
               {prob.get_nx(), prob.get_nh_N(), prob.get_nc_N()},
@@ -122,7 +122,7 @@ template <Config Conf>
 struct OCPEvaluator {
     USING_ALPAQA_CONFIG(Conf);
     using OCPVars = OCPVariables<config_t>;
-    using Problem = TypeErasedOCProblem<config_t>;
+    using Problem = TypeErasedControlProblem<config_t>;
     using Box     = alpaqa::Box<config_t>;
     const Problem *problem;
     OCPVars vars;
@@ -295,14 +295,16 @@ void assign_extract_x(const OCPVariables<Conf> &dim, crvec<Conf> storage,
 }
 
 template <Config Conf>
-vec<Conf> extract_u(const TypeErasedOCProblem<Conf> &problem, crvec<Conf> xu) {
+vec<Conf> extract_u(const TypeErasedControlProblem<Conf> &problem,
+                    crvec<Conf> xu) {
     OCPVariables<Conf> dim{problem};
     vec<Conf> u(dim.N * dim.nu());
     assign_extract_u(dim, xu, u);
     return u;
 }
 template <Config Conf>
-vec<Conf> extract_x(const TypeErasedOCProblem<Conf> &problem, crvec<Conf> xu) {
+vec<Conf> extract_x(const TypeErasedControlProblem<Conf> &problem,
+                    crvec<Conf> xu) {
     OCPVariables<Conf> dim{problem};
     vec<Conf> x((dim.N + 1) * dim.nx());
     assign_extract_x(dim, xu, x);
@@ -366,7 +368,7 @@ auto PANOCOCPSolver<Conf>::operator()(
     OCPEvaluator<config_t> eval{problem};
     auto &vars = eval.vars;
     alpaqa::detail::IndexSet<config_t> J{N, nu};
-    using LQRFactor = alpaqa::experimental::StatefulLQRFactor<config_t>;
+    using LQRFactor = alpaqa::StatefulLQRFactor<config_t>;
     LQRFactor lqr{{.N = N, .nx = nx, .nu = nu}};
     LBFGSParams<config_t> lbfgs_param{.memory = N}; // TODO: make configurable
     LBFGS<config_t> lbfgs{lbfgs_param, enable_lbfgs ? n : 0};
@@ -1055,4 +1057,4 @@ auto PANOCOCPSolver<Conf>::operator()(
     throw std::logic_error("[PANOC] loop error");
 }
 
-} // namespace alpaqa::experimental
+} // namespace alpaqa

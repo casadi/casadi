@@ -4,7 +4,7 @@
 #include <Eigen/Cholesky>
 #include <Eigen/LU>
 
-namespace alpaqa::experimental {
+namespace alpaqa {
 
 template <Config Conf>
 struct Dim {
@@ -37,7 +37,7 @@ template <Config Conf>
 struct StatefulLQRFactor {
     USING_ALPAQA_CONFIG(Conf);
 
-    using Dim = alpaqa::experimental::Dim<config_t>;
+    using Dim = alpaqa::Dim<config_t>;
 
     StatefulLQRFactor(Dim d) : dim{d} {}
     Dim dim;
@@ -68,7 +68,7 @@ struct StatefulLQRFactor {
                        auto &&K,         ///< Index set of active constraints
                        bool use_cholesky ///< Use Cholesky instead of LU solver
     ) {
-        using mmat       = Eigen::Map<mat>;
+        using mmat = Eigen::Map<mat>;
         using Eigen::placeholders::all;
         auto [N, nx, nu] = dim;
 
@@ -178,4 +178,4 @@ struct StatefulLQRFactor {
     }
 };
 
-} // namespace alpaqa::experimental
+} // namespace alpaqa
