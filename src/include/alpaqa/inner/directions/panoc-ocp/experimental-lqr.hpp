@@ -69,6 +69,7 @@ struct StatefulLQRFactor {
                        bool use_cholesky ///< Use Cholesky instead of LU solver
     ) {
         using mmat       = Eigen::Map<mat>;
+        using Eigen::placeholders::all;
         auto [N, nx, nu] = dim;
 
         min_rcond = 1;
@@ -92,7 +93,7 @@ struct StatefulLQRFactor {
             mmat gain_Ki{gain_K.col(i).data(), nJ, nx};
             auto &&ei = e.col(i).topRows(nJ);
             // R̅ ← R + Bᵀ P B
-            BiJ.noalias()  = Bi(Eigen::all, Ji);
+            BiJ.noalias()  = Bi(all, Ji);
             PBiJ.noalias() = P * BiJ;
             R̅.noalias()    = BiJ.transpose() * PBiJ;
             R(i)(Ji, R̅);
@@ -101,7 +102,7 @@ struct StatefulLQRFactor {
             S̅.noalias()  = BiJ.transpose() * PA;
             S(i)(Ji, S̅);
             // y ← Pc + s
-            c.noalias() = Bi(Eigen::all, Ki) * ui(Ki);
+            c.noalias() = Bi(all, Ki) * ui(Ki);
             y.noalias() = P * c;
             y += s;
             // t ← Bᵀy + r + R(J,K) u(K)
