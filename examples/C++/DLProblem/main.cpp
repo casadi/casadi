@@ -9,21 +9,6 @@ namespace fs = std::filesystem;
 // Double precision, same as in C
 USING_ALPAQA_CONFIG(alpaqa::EigenConfigd);
 
-vec finite_diff(std::function<real_t(crvec)> f, crvec x) {
-    const auto n = x.size();
-    vec grad(n);
-    vec h        = vec::Zero(n);
-    const auto ε = std::sqrt(std::numeric_limits<real_t>::epsilon());
-    const auto δ = std::numeric_limits<real_t>::min() / ε;
-    for (index_t i = 0; i < n; ++i) {
-        real_t hh        = std::abs(x(i)) > δ ? x(i) * ε : δ;
-        h(i)             = hh;
-        grad.coeffRef(i) = (f(x + h) - f(x)) / hh;
-        h(i)             = 0;
-    }
-    return grad;
-}
-
 int main(int argc, char *argv[]) {
     // Find the problem to load
     fs::path so_name = DLPROBLEM_DLL;
@@ -79,24 +64,6 @@ int main(int argc, char *argv[]) {
     x << 2, 2; // decision variables
     vec y(1);
     y << 1; // Lagrange multipliers
-
-    auto te_problem = alpaqa::TypeErasedProblem{problem};
-
-    // Verify gradient using finite differences
-    vec work_y(m);
-    vec work_n(n);
-    vec work_m(m);
-    vec Σ        = 1e6 * vec::Ones(m);
-    auto fd_grad = finite_diff(
-        [&](crvec x) { return te_problem.eval_ψ(x, y, Σ, work_y); }, x);
-    auto eval_grad = [&](crvec x) {
-        vec grad(n);
-        te_problem.eval_grad_ψ(x, y, Σ, grad, work_n, work_m);
-        return grad;
-    };
-    vec grad = eval_grad(x);
-    std::cout << "Finite difference gradient error: " << (fd_grad - grad).norm()
-              << std::endl;
 
     // Solve the problem
     auto stats = solver(counted_problem, y, x);
