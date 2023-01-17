@@ -84,7 +84,7 @@ genhtml \
     --output-directory="$html_dest" \
     --legend --title $(cd "$proj_dir" && git rev-parse HEAD) \
     --rc lcov_branch_coverage=$branches \
-    -s \
-    --demangle-cpp
+    -s --demangle-cpp \
+    --no-function-coverage # because of the many templates
 
 python3 "$proj_dir/scripts/coverage-badge.py"
