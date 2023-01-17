@@ -8,6 +8,66 @@
  * & \underset{x}{\text{minimize}} && \tfrac12 \tp x Q x \\ 
  * & \text{subject to} && Ax \le b \\ 
  * \end{aligned} @f]
+ *
+ * ## Problem specification
+ *
+ * The problem is defined by creating a class (`Problem`) that inherits from
+ * alpaqa's @ref alpaqa::BoxConstrProblem class. Then, the problem-specific
+ * functions for the cost function @f$ f(x) = \tfrac12 \tp xQx @f$
+ * (@ref alpaqa::TypeErasedProblem::eval_f) and its gradient
+ * @f$ \nabla f(x) = Qx @f$ (@ref alpaqa::TypeErasedProblem::eval_grad_f), as
+ * well as the constraint function @f$ g(x) = Ax @f$
+ * (@ref alpaqa::TypeErasedProblem::eval_g) and the function that
+ * evaluates the product of the gradient of the constraints and a given vector
+ * @f$ y @f$, @f$ \nabla g(x)\,y = \tp A y @f$
+ * (@ref alpaqa::TypeErasedProblem::eval_grad_g_prod).
+ *
+ * If you have more efficient ways to combine evaluations of these functions and
+ * gradients, you can specify them as well, see @ref alpaqa::TypeErasedProblem
+ * for the full list of supported functions.
+ *
+ * The @ref BoxConstrProblem class exposes the two constraint sets,
+ * @f$ x \in C @f$ and @f$ g(x) \in D @f$, and provides the projection functions
+ * (@ref alpaqa::TypeErasedProblem::eval_prox_grad_step, 
+ * @ref alpaqa::TypeErasedProblem::eval_proj_diff_g and
+ * @ref alpaqa::TypeErasedProblem::eval_proj_multipliers) for you.
+ * The @ref alpaqa::BoxConstrProblem constructor accepts the number of variables
+ * @f$ n = 2 @f$ and the number of constraints @f$ m = 1 @f$ as arguments.
+ *
+ * @note Alpaqa uses [structural typing](https://en.wikipedia.org/wiki/Structural_type_system)
+ *       for problem definitions. This means that you just have to provide the
+ *       supported functions with the correct names and arguments, and the
+ *       library will pick them up automatically, you don't have to inherit from
+ *       any interface or override any virtual functions.
+ *
+ * ## Solver selection
+ *
+ * The solver consists of three layers:
+ *
+ *   1. The outer augmented Lagrangian solver (@ref alpaqa::ALMSolver) that
+ *      handles the general constraints @f$ g(x) \in D @f$;
+ *   2. The inner PANOC solver (@ref alpaqa::PANOCSolver) that is used to solve
+ *      the ALM subproblems;
+ *   3. The L-BFGS accelerator (@ref alpaqa::LBFGSDirection) that provides fast
+ *      Newton-type directions to speed up PANOC.
+ *
+ * You can try out different inner solvers (@ref grp_InnerSolvers) and
+ * direction providers (@ref grp_DirectionProviders), you can even write your
+ * own.
+ *
+ * ## Solver configuration
+ *
+ * Each solver and accelerator class has a set of parameters, which are
+ * collected in a struct. Tuning these parameters can often significantly
+ * improve solver performance. You can also use them to limit the run time or
+ * the number of iterations, and to enable verbose output from the solvers.
+ *
+ * ## Solver invocation
+ *
+ * The solver is invoked by calling the solver object with an instance of the
+ * problem and an initial guess for the Lagrange multipliers and the decision
+ * variables. The solver will overwrite these guesses with the (approximate)
+ * solution, and returns a struct containing solver statistics.
  */
 
 /**
@@ -25,7 +85,7 @@
  * @include C++/FortranProblem/problem.f90
  * # Problem solution using alpaqa
  */
- 
+
 /**
  * @example{lineno} C++/DLProblem/main.cpp
  * This example shows how to load optimization problems from an external library
@@ -42,7 +102,7 @@
  * # Problem solution using alpaqa
  */
 
- /** 
+/** 
  * @example{lineno} C++/CasADi/Rosenbrock/main.cpp
  * This example shows how to generate a problem using CasADi and how to load
  * and solve it using alpaqa.  

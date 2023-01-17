@@ -240,6 +240,9 @@ struct ProblemVTable : util::BasicVTable {
     ProblemVTable() = default;
 };
 
+/// @addtogroup grp_Problems
+/// @{
+
 template <Config Conf = DefaultConfig, class Allocator = std::allocator<std::byte>>
 class TypeErasedProblem : public util::TypeErased<ProblemVTable<Conf>, Allocator> {
   public:
@@ -264,16 +267,55 @@ class TypeErasedProblem : public util::TypeErased<ProblemVTable<Conf>, Allocator
     /// @name Problem dimensions
     /// @{
 
+    /// **[Required]**
     /// Number of decision variables.
     length_t get_n() const;
+    /// **[Required]**
     /// Number of constraints.
     length_t get_m() const;
 
     /// @}
 
-    /// @name Basic functions
+    /// @name Required cost and constraint functions
     /// @{
 
+    /// **[Required]**
+    /// Function that evaluates the cost, @f$ f(x) @f$
+    /// @param  [in] x
+    ///         Decision variable @f$ x \in \R^n @f$
+    real_t eval_f(crvec x) const;
+    /// **[Required]**
+    /// Function that evaluates the gradient of the cost, @f$ \nabla f(x) @f$
+    /// @param  [in] x
+    ///         Decision variable @f$ x \in \R^n @f$
+    /// @param  [out] grad_fx
+    ///         Gradient of cost function @f$ \nabla f(x) \in \R^n @f$
+    void eval_grad_f(crvec x, rvec grad_fx) const;
+    /// **[Required]**
+    /// Function that evaluates the constraints, @f$ g(x) @f$
+    /// @param  [in] x
+    ///         Decision variable @f$ x \in \R^n @f$
+    /// @param  [out] gx
+    ///         Value of the constraints @f$ g(x) \in \R^m @f$
+    void eval_g(crvec x, rvec gx) const;
+    /// **[Required]**
+    /// Function that evaluates the gradient of the constraints times a vector,
+    /// @f$ \nabla g(x)\,y = \tp{\jac_g(x)}y @f$
+    /// @param  [in] x
+    ///         Decision variable @f$ x \in \R^n @f$
+    /// @param  [in] y
+    ///         Vector @f$ y \in \R^m @f$ to multiply the gradient by
+    /// @param  [out] grad_gxy
+    ///         Gradient of the constraints
+    ///         @f$ \nabla g(x)\,y \in \R^n @f$
+    void eval_grad_g_prod(crvec x, crvec y, rvec grad_gxy) const;
+
+    /// @}
+
+    /// @name Projections onto constraint sets and proximal mappings
+    /// @{
+
+    /// **[Required]**
     /// Function that evaluates the difference between the given point @f$ z @f$
     /// and its projection onto the constraint set @f$ D @f$.
     /// @param  [in] z
@@ -283,6 +325,7 @@ class TypeErasedProblem : public util::TypeErased<ProblemVTable<Conf>, Allocator
     ///         @f$ p = z - \Pi_D(z) \in \R^m @f$
     /// @note   @p z and @p p can refer to the same vector.
     void eval_proj_diff_g(crvec z, rvec p) const;
+    /// **[Required]**
     /// Function that projects the Lagrange multipliers for ALM.
     /// @param  [inout] y
     ///         Multipliers, @f$ y \leftarrow \Pi_Y(y) \in \R^m @f$
@@ -291,6 +334,7 @@ class TypeErasedProblem : public util::TypeErased<ProblemVTable<Conf>, Allocator
     /// @param  [in] penalty_alm_split
     ///         See @ref ALMParams::penalty_alm_split.
     void eval_proj_multipliers(rvec y, real_t M, index_t penalty_alm_split) const;
+    /// **[Required]**
     /// Function that evaluates a proximal gradient step.
     /// @param  [in] γ
     ///         Step size, @f$ \gamma \in \R_{>0} @f$
@@ -310,38 +354,26 @@ class TypeErasedProblem : public util::TypeErased<ProblemVTable<Conf>, Allocator
     ///         numerical accuracy is more important than that of @f$ \hat x @f$.
     real_t eval_prox_grad_step(real_t γ, crvec x, crvec grad_ψ, rvec x̂, rvec p) const;
 
-    /// Function that evaluates the cost, @f$ f(x) @f$
-    /// @param  [in] x
-    ///         Decision variable @f$ x \in \R^n @f$
-    real_t eval_f(crvec x) const;
-    /// Function that evaluates the gradient of the cost, @f$ \nabla f(x) @f$
-    /// @param  [in] x
-    ///         Decision variable @f$ x \in \R^n @f$
-    /// @param  [out] grad_fx
-    ///         Gradient of cost function @f$ \nabla f(x) \in \R^n @f$
-    void eval_grad_f(crvec x, rvec grad_fx) const;
-    /// Function that evaluates the constraints, @f$ g(x) @f$
-    /// @param  [in] x
-    ///         Decision variable @f$ x \in \R^n @f$
-    /// @param  [out] gx
-    ///         Value of the constraints @f$ g(x) \in \R^m @f$
-    void eval_g(crvec x, rvec gx) const;
-    /// Function that evaluates the gradient of the constraints times a vector,
-    /// @f$ \nabla g(x)\,y @f$
-    /// @param  [in] x
-    ///         Decision variable @f$ x \in \R^n @f$
-    /// @param  [in] y
-    ///         Vector @f$ y \in \R^m @f$ to multiply the gradient by
-    /// @param  [out] grad_gxy
-    ///         Gradient of the constraints
-    ///         @f$ \nabla g(x)\,y \in \R^n @f$
-    void eval_grad_g_prod(crvec x, crvec y, rvec grad_gxy) const;
+    /// @}
+
+    /// @name Constraint sets
+    /// @{
+
+    /// **[Optional]**
+    /// Get the rectangular constraint set of the decision variables,
+    /// @f$ x \in C @f$.
+    const Box &get_box_C() const;
+    /// **[Optional]**
+    /// Get the rectangular constraint set of the general constraint function,
+    /// @f$ g(x) \in D @f$.
+    const Box &get_box_D() const;
 
     /// @}
 
     /// @name Functions for second-order solvers
     /// @{
 
+    /// **[Optional]**
     /// Function that evaluates the gradient of one specific constraint,
     /// @f$ \nabla g_i(x) @f$
     /// @param  [in] x
@@ -354,6 +386,7 @@ class TypeErasedProblem : public util::TypeErased<ProblemVTable<Conf>, Allocator
     ///
     /// Required for second-order solvers only.
     void eval_grad_gi(crvec x, index_t i, rvec grad_gi) const;
+    /// **[Optional]**
     /// Function that evaluates the Hessian of the Lagrangian multiplied by a
     /// vector,
     /// @f$ \nabla_{xx}^2L(x, y)\,v @f$
@@ -369,6 +402,7 @@ class TypeErasedProblem : public util::TypeErased<ProblemVTable<Conf>, Allocator
     ///
     /// Required for second-order solvers only.
     void eval_hess_L_prod(crvec x, crvec y, crvec v, rvec Hv) const;
+    /// **[Optional]**
     /// Function that evaluates the Hessian of the Lagrangian,
     /// @f$ \nabla_{xx}^2L(x, y) @f$
     /// @param  [in] x
@@ -386,14 +420,19 @@ class TypeErasedProblem : public util::TypeErased<ProblemVTable<Conf>, Allocator
     /// @name Combined evaluations
     /// @{
 
+    /// **[Optional]**
     /// Evaluate both @f$ f(x) @f$ and its gradient, @f$ \nabla f(x) @f$.
     real_t eval_f_grad_f(crvec x, rvec grad_fx) const;
+    /// **[Optional]**
     /// Evaluate both @f$ f(x) @f$ and @f$ g(x) @f$.
     real_t eval_f_g(crvec x, rvec g) const;
+    /// **[Optional]**
     /// Evaluate @f$ f(x) @f$, its gradient @f$ \nabla f(x) @f$ and @f$ g(x) @f$.
     real_t eval_f_grad_f_g(crvec x, rvec grad_fx, rvec g) const;
+    /// **[Optional]**
     /// Evaluate both @f$ \nabla f(x) @f$ and @f$ \nabla g(x)\,y @f$.
     void eval_grad_f_grad_g_prod(crvec x, crvec y, rvec grad_f, rvec grad_gxy) const;
+    /// **[Optional]**
     /// Evaluate the gradient of the Lagrangian
     /// @f$ \nabla_x L(x, y) = \nabla f(x) + \nabla g(x)\,y @f$
     void eval_grad_L(crvec x, crvec y, rvec grad_L, rvec work_n) const;
@@ -403,6 +442,7 @@ class TypeErasedProblem : public util::TypeErased<ProblemVTable<Conf>, Allocator
     /// @name Augmented Lagrangian
     /// @{
 
+    /// **[Optional]**
     /// Calculate both ψ(x) and the vector ŷ that can later be used to compute
     /// ∇ψ.
     /// @f[ \psi(x) = f(x) + \tfrac{1}{2}
@@ -414,12 +454,14 @@ class TypeErasedProblem : public util::TypeErased<ProblemVTable<Conf>, Allocator
                   crvec Σ, ///< [in]  Penalty weights @f$ \Sigma @f$
                   rvec ŷ   ///< [out] @f$ \hat y @f$
     ) const;
+    /// **[Optional]**
     /// Calculate ∇ψ(x) using ŷ.
     void eval_grad_ψ_from_ŷ(crvec x,     ///< [in]  Decision variable @f$ x @f$
                             crvec ŷ,     ///< [in]  @f$ \hat y @f$
                             rvec grad_ψ, ///< [out] @f$ \nabla \psi(x) @f$
                             rvec work_n  ///<       Dimension @f$ n @f$
     ) const;
+    /// **[Optional]**
     /// Calculate the gradient ∇ψ(x).
     /// @f[ \nabla \psi(x) = \nabla f(x) + \nabla g(x)\,\hat y(x) @f]
     void eval_grad_ψ(crvec x,     ///< [in]  Decision variable @f$ x @f$
@@ -429,6 +471,7 @@ class TypeErasedProblem : public util::TypeErased<ProblemVTable<Conf>, Allocator
                      rvec work_n, ///<       Dimension @f$ n @f$
                      rvec work_m  ///<       Dimension @f$ m @f$
     ) const;
+    /// **[Optional]**
     /// Calculate both ψ(x) and its gradient ∇ψ(x).
     /// @f[ \psi(x) = f(x) + \tfrac{1}{2}
     /// \text{dist}_\Sigma^2\left(g(x) + \Sigma^{-1}y,\;D\right) @f]
@@ -443,37 +486,10 @@ class TypeErasedProblem : public util::TypeErased<ProblemVTable<Conf>, Allocator
 
     /// @}
 
-    /// @name Helpers
-    /// @{
-
-    /// Given g(x), compute the intermediate results ŷ and dᵀŷ that can later be
-    /// used to compute ψ(x) and ∇ψ(x).
-    /// @param[inout]   g_ŷ
-    ///                 Input @f$ g(x) @f$, outputs @f$ \hat y @f$
-    /// @param[in]      y
-    ///                 Lagrange multipliers @f$ y @f$
-    /// @param[in]      Σ
-    ///                 Penalty weights @f$ \Sigma @f$
-    /// @return The inner product @f$ d^\top \hat y @f$
-    real_t calc_ŷ_dᵀŷ(rvec g_ŷ, crvec y, crvec Σ) const;
-
-    /// @}
-
-    /// @name Constraint sets
-    /// @{
-
-    /// Get the rectangular constraint set of the decision variables,
-    /// @f$ x \in C @f$.
-    const Box &get_box_C() const;
-    /// Get the rectangular constraint set of the general constraint function,
-    /// @f$ g(x) \in D @f$.
-    const Box &get_box_D() const;
-
-    /// @}
-
     /// @name Checks
     /// @{
 
+    /// **[Required]**
     /// Check that the problem formulation is well-defined, the dimensions match,
     /// etc. Throws an exception if this is not the case.
     void check() const;
@@ -541,7 +557,25 @@ class TypeErasedProblem : public util::TypeErased<ProblemVTable<Conf>, Allocator
     bool provides_get_box_D() const { return vtable.get_box_D != vtable.default_get_box_D; }
 
     /// @}
+
+    /// @name Helpers
+    /// @{
+
+    /// Given g(x), compute the intermediate results ŷ and dᵀŷ that can later be
+    /// used to compute ψ(x) and ∇ψ(x).
+    /// @param[inout]   g_ŷ
+    ///                 Input @f$ g(x) @f$, outputs @f$ \hat y @f$
+    /// @param[in]      y
+    ///                 Lagrange multipliers @f$ y @f$
+    /// @param[in]      Σ
+    ///                 Penalty weights @f$ \Sigma @f$
+    /// @return The inner product @f$ d^\top \hat y @f$
+    real_t calc_ŷ_dᵀŷ(rvec g_ŷ, crvec y, crvec Σ) const;
+
+    /// @}
 };
+
+/// @}
 
 #ifndef DOXYGEN
 template <class Tref>
@@ -664,6 +698,17 @@ void TypeErasedProblem<Conf, Allocator>::check() const {
     return call(vtable.check);
 }
 
+/// @addtogroup grp_Problems
+/// @{
+
+/// Problem wrapper that keeps track of the number of evaluations and the run
+/// time of each function.
+/// You probably want to use @ref problem_with_counters or
+/// @ref problem_with_counters_ref instead of instantiating this class directly.
+/// @note   The evaluation counters are stored using a `std::shared_pointers`,
+///         which means that different copies of a @ref ProblemWithCounters
+///         instance all share the same counters. To opt out of this behavior,
+///         you can use the @ref decouple_evaluations function.
 template <class Problem>
 struct ProblemWithCounters {
     USING_ALPAQA_CONFIG_TEMPLATE(std::remove_cvref_t<Problem>::config_t);
@@ -720,6 +765,15 @@ struct ProblemWithCounters {
         requires(!std::is_lvalue_reference_v<Problem>)
         : problem(std::forward<Problem>(problem)) {}
 
+    /// Reset all evaluation counters and timers to zero. Affects all instances
+    /// that share the same evaluations. If you only want to reset the counters
+    /// of this instance, use @ref decouple_evaluations first.
+    void reset_evaluations() { evaluations.reset(); }
+    /// Give this instance its own evaluation counters and timers, decoupling
+    /// it from any other instances they might have previously been shared with.
+    /// The evaluation counters and timers are preserved (a copy is made).
+    void decouple_evaluations() { evaluations = std::make_shared<EvalCounter>(*evaluations); }
+
   private:
     template <class TimeT, class FunT>
     static decltype(auto) timed(TimeT &time, FunT &&f) {
@@ -728,15 +782,26 @@ struct ProblemWithCounters {
     }
 };
 
+/// Wraps the given problem into a @ref ProblemWithCounters and keeps track of
+/// how many times each function is called, and how long these calls took.
+/// The wrapper has its own copy of the given problem. Making copies of the
+/// wrapper also copies the underlying problem, but does not copy the evaluation
+/// counters, all copies share the same counters.
 template <class Problem>
-auto problem_with_counters(Problem &&p) {
+[[nodiscard]] auto problem_with_counters(Problem &&p) {
     using Prob        = std::remove_cvref_t<Problem>;
     using ProbWithCnt = ProblemWithCounters<Prob>;
     return ProbWithCnt{std::forward<Problem>(p)};
 }
 
+/// Wraps the given problem into a @ref ProblemWithCounters and keeps track of
+/// how many times each function is called, and how long these calls took.
+/// The wrapper keeps only a reference to the given problem, it is the
+/// responsibility of the caller to make sure that the wrapper does not outlive
+/// the original problem. Making copies of the wrapper does not copy the
+/// evaluation counters, all copies share the same counters.
 template <class Problem>
-auto problem_with_counters_ref(Problem &p) {
+[[nodiscard]] auto problem_with_counters_ref(Problem &p) {
     using Prob        = std::remove_cvref_t<Problem>;
     using ProbWithCnt = ProblemWithCounters<const Prob &>;
     return ProbWithCnt{p};
@@ -878,5 +943,7 @@ class FunctionalProblem : public BoxConstrProblem<Conf> {
     FunctionalProblem(FunctionalProblem &&) noexcept            = default;
     FunctionalProblem &operator=(FunctionalProblem &&) noexcept = default;
 };
+
+/// @}
 
 } // namespace alpaqa

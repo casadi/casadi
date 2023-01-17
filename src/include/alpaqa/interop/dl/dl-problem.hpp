@@ -13,7 +13,7 @@
 
 namespace alpaqa::dl {
 
-/// Class that loads a problem using dlopen.
+/// Class that loads a problem using `dlopen`.
 ///
 /// The shared library should export a C function with the name
 /// `<symbol_prefix>_register` that accepts a void pointer with user data, and
@@ -23,6 +23,9 @@ namespace alpaqa::dl {
 ///
 /// @note   Copies are shallow, they all share the same problem instance, take
 ///         that into account when using multiple threads.
+///
+/// @ingroup    grp_Problems
+/// @see @ref   TypeErasedProblem
 class DLProblem : public BoxConstrProblem<EigenConfigd> {
   public:
     USING_ALPAQA_CONFIG(EigenConfigd);
