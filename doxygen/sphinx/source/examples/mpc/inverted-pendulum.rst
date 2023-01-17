@@ -1,8 +1,8 @@
 Inverted Pendulum
 =================
 
-In this example, a mode predictive controller (MPC) is used to stabilize an
-inverted pendulum mounted on a moving cart.
+In this example, a mode predictive controller (MPC) is used to swing up and 
+stabilize an inverted pendulum mounted on a moving cart.
 
 .. raw:: html
    :file: ../../sphinxstatic/inverted-pendulum.html
@@ -47,7 +47,7 @@ to make it periodic with period :math:`2\pi`:
 
     \ell(x, v, \theta, \omega, F) = q_\theta \sin^2(\theta/2) + q_\omega\, \omega^2 + q_x\, x^2 + q_v\, v^2 + r_F\, F^2
 
-The force :math:`F` exerted on the cart is limited to :math:`\pm 2 \mathrm{N}`.
+The force :math:`F` exerted on the cart is limited to :math:`\pm 5 \mathrm{N}`.
 
 .. literalinclude:: ../../../../../examples/Python/mpc/inverted-pendulum-mpc.py
     :language: python

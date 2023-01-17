@@ -16,15 +16,15 @@ F = cs.SX.sym("F")  # External force applied to the cart [N]
 nu = F.shape[0]  # Number of inputs
 
 # Parameters
-F_max = 2  #        Maximum force applied to the cart    [N]
+F_max = 5  #        Maximum force applied to the cart    [N]
 m_cart = 0.8  #     Mass of the cart                     [kg]
 m_pend = 0.3  #     Mass of the pendulum                 [kg]
 b_cart = 0.1  #     Friction coefficient of the cart     [N/m/s]
 l_pend = 0.3  #     Length of the pendulum               [m]
 g_gravity = 9.81  # Gravitational acceleration           [m/s²]
 Ts = 0.025  #       Simulation sampling time             [s]
-N_horiz = 64  #     MPC horizon                          [time steps]
-N_sim = 240  #      Simulation length                    [time steps]
+N_horiz = 50  #     MPC horizon                          [time steps]
+N_sim = 300  #      Simulation length                    [time steps]
 
 # Continous-time dynamics
 a_pend = (l_pend * cs.sin(θ) * ω**2 - g_gravity * cs.cos(θ) * cs.sin(θ))
@@ -41,6 +41,7 @@ k4 = f_c(state + Ts * k3, F)
 # Discrete-time dynamics
 f_d_expr = state + (Ts / 6) * (k1 + 2 * k2 + 2 * k3 + k4)
 f_d = cs.Function("f", [state, F], [f_d_expr])
+
 
 # %% Model predictive control
 
@@ -87,19 +88,21 @@ inner_solver = Solver(
         'max_iter': 200,
         'stop_crit': pa.PANOCStopCrit.ProjGradUnitNorm2,
     },
-    lbfgs_params={'memory': N_horiz // 5},
+    direction=pa.StructuredLBFGSDirection(
+        lbfgs_params={'memory': N_horiz},
+        direction_params={'hessian_vec': False},
+    ),
 )
+alm_params={
+    'ε': 1e-4,'ε_0': 1e-4,
+}
 solver = pa.ALMSolver(
-    alm_params={
-        'ε': 1e-4,
-        'δ': 1e-4,
-        'max_iter': 1,
-    },
+    alm_params=alm_params,
     inner_solver=inner_solver,
 )
 
-# %% Controller class
 
+# %% Controller class
 
 # Wrap the solver in a class that solves the optimal control problem at each
 # time step, implementing warm starting:
@@ -111,7 +114,7 @@ class MPCController:
         self.tot_time = timedelta()
         self.max_time = timedelta()
         self.failures = 0
-        self.u = np.zeros((nu * N_horiz, ))
+        self.u = np.ones((nu * N_horiz, ))
 
     def __call__(self, state_n):
         state_n = np.array(state_n).ravel()
@@ -123,8 +126,9 @@ class MPCController:
         # (warm start using the shifted previous solution)
         self.u, _, stats = solver(self.problem, self.u)
         # Print some solver statistics
-        print(f"{stats['status']!s:24} {stats['inner']['iterations']:3} "
-              f"{stats['elapsed_time']} {stats['inner_convergence_failures']}")
+        print(f"{stats['status']!s:24} {stats['inner']['iterations']:4} "
+              f"{stats['elapsed_time']} {stats['inner_convergence_failures']} "
+              f"{stats['ε']:1.3e} {stats['inner']['final_γ']:1.3e}")
         self.tot_it += stats['inner']['iterations']
         self.failures += stats['status'] != pa.SolverStatus.Converged
         self.tot_time += stats['elapsed_time']
@@ -132,9 +136,10 @@ class MPCController:
         # Return the optimal control signal for the first time step
         return self.u[:nu]
 
+
 # %% Simulate the system using the MPC controller
 
-state_0 = np.array([-np.pi / 3, 0, 0, 0])  # Initial state of the system
+state_0 = np.array([-np.pi, 0, 0.2, 0])  # Initial state of the system
 
 # Parameters
 Q = [10, 1e-2, 1, 1e-2]
@@ -158,6 +163,7 @@ print(f"{controller.tot_it} iterations, {controller.failures} failures")
 print(f"time: {controller.tot_time} (total), {controller.max_time} (max), "
       f"{controller.tot_time / N_sim} (avg)")
 
+
 # %% Visualize the results
 
 import matplotlib.pyplot as plt
@@ -171,8 +177,12 @@ fig, ax = plt.subplots()
 h = 0.04
 x = [state_0[2], state_0[2] + l_pend * np.sin(state_0[0])]
 y = [h, h + l_pend * np.cos(state_0[0])]
-target_pend, = ax.plot(x, y, '--', label='Initial state')
-pend, = ax.plot(x, y, '-o', label='MPC')
+target_pend, = ax.plot(x, y, '--', color='tab:blue', linewidth=1, label='Initial state')
+state_N = [0, 0, 0, 0]
+x = [state_N[2], state_N[2] + l_pend * np.sin(state_N[0])]
+y = [h, h + l_pend * np.cos(state_N[0])]
+target_pend, = ax.plot(x, y, '--', color='tab:green', linewidth=1, label='Target state')
+pend, = ax.plot(x, y, '-o', color='tab:orange', alpha=0.9, label='MPC')
 cart = plt.Rectangle((-2 * h, 0), 4 * h, h, color='tab:orange')
 ax.add_patch(cart)
 plt.legend()
@@ -215,6 +225,7 @@ ax = axs[-1]
 ax.plot(ts[:N_sim], mpc_inputs.T)
 ax.set_title("Control input $F$ [N]")
 ax.set_xlabel("Simulation time $t$ [s]")
+ax.set_xlim(0, N_sim * Ts)
 plt.tight_layout()
 
 # Show the animation
