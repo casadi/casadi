@@ -321,3 +321,45 @@ The following graph visualizes the dependencies between the different values
 used in a PANOC iteration.
 
 @image html expression-dep.gv.svg
+
+## Structured PANOC
+
+See @cite pas2022alpaqa for details.
+
+## PANOC-OCP
+
+### Problem formulation
+
+Consider the following general formulation of a nonlinear optimal control
+problem with finite horizon @f$ N @f$.
+@f[
+\newcommand\U{U}
+\newcommand\D{D}
+\newcommand\nnu{{n_u}}
+\newcommand\nnx{{n_x}}
+\newcommand\nny{{n_y}}
+\newcommand\xinit{x_\text{init}}
+\newcommand\xref{x_\text{r}}
+\newcommand\uref{u_\text{r}}
+\begin{equation}\label{eq:OCP} \tag{OCP}\hspace{-0.8em}
+    \begin{aligned}
+        &\minimize_{u,x} && \sum_{k=0}^{N-1} \ell_k\big(h_k(x^k, u^k)\big) + \ell_N\big(h_N(x^N)\big)\hspace{-0.8em} \\
+        &\subjto && u^k \in \U \\
+        &&& C(x^k) \in \D \\
+        &&& x^0 = \xinit \\
+        &&& x^{k+1} = f(x^k, u^k) \quad\quad (0 \le k \lt N)
+    \end{aligned}
+\end{equation}
+@f]
+
+The function @f$ f : \R^\nnx \times \R^\nnu \to \R^\nnx @f$ models the 
+discrete-time, nonlinear dynamics of the system, which starts from an initial
+state @f$ \xinit @f$. 
+The functions @f$ h_k : \R^\nnx \times \R^\nnu \to \R^{n_h} @f$ for
+@f$ 0 \le k \lt N @f$ and @f$ h_N : \R^\nnx \to \R^{n_h^N} @f$ can be used to
+represent the (possibly time-varying) output mapping of the system,
+and the convex functions @f$ \ell_k : \R^{n_h} \to \R @f$ and
+@f$ \ell_N : \R^{n_h^N} \to \R @f$ define the stage costs and the terminal cost
+respectively.
+
+See @cite pas2022gaussnewton for more details.
