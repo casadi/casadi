@@ -1,1 +1,3 @@
-sphinx/source/sphinxstatic/hanging-chain.html linguist-generated
+doxygen/sphinx/source/sphinxstatic/hanging-chain.html linguist-generated
+doxygen/sphinx/source/sphinxstatic/inverted-pendulum.html linguist-generated
+test/outer/rosenbrock_functions_test.c linguist-generated

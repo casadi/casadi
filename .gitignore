@@ -8,10 +8,13 @@ py*-venv*
 
 # Python distribution and building
 dist
+dist-debug
 wheelhouse
 python-cross-staging
 *.py-build-cmake.config.toml
 python/alpaqa/_alpaqa*
+/install
+/staging
 
 # Compiled or generated files
 *.mod
@@ -20,3 +23,9 @@ python/alpaqa/_alpaqa*
 *.so
 a.out
 dynamics.c
+
+# Other files
+*.mp4
+*.nope
+/old
+callgrind.out.*

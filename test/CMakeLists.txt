@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.21)
-project(alpaqa-test CXX)
+project(alpaqa-test C CXX)
 enable_testing()
 include(GoogleTest)
 
@@ -25,6 +25,16 @@ target_compile_definitions(tests PRIVATE _CRT_SECURE_NO_WARNINGS)
 target_link_libraries(tests PRIVATE alpaqa::alpaqa 
                                     GTest::gtest_main 
                                     GTest::gmock)
+
+if (TARGET alpaqa::casadi-loader)
+    target_sources(tests PUBLIC "outer/test-casadi.cpp")
+    add_library(rosenbrock_functions_test MODULE
+        "outer/rosenbrock_functions_test.c")
+    target_compile_definitions(tests PRIVATE
+        ROSENBROCK_FUNC_DLL=\"$<TARGET_FILE:rosenbrock_functions_test>\")
+    add_dependencies(tests rosenbrock_functions_test)
+    target_link_libraries(tests PRIVATE alpaqa::casadi-loader)
+endif()
 
 gtest_discover_tests(tests DISCOVERY_TIMEOUT 60)
 add_executable(alpaqa::tests ALIAS tests)
