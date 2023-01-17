@@ -159,10 +159,10 @@ class ALMSolver {
     ALMSolver(Params params, const InnerSolver &inner_solver)
         : params(params), inner_solver(inner_solver) {}
 
-    Stats operator()(const Problem &problem, rvec y, rvec x);
+    Stats operator()(const Problem &problem, rvec x, rvec y);
     template <class P>
-    Stats operator()(const P &problem, rvec y, rvec x) {
-        return operator()(Problem::template make<P>(problem), y, x);
+    Stats operator()(const P &problem, rvec x, rvec y) {
+        return operator()(Problem::template make<P>(problem), x, y);
     }
 
     std::string get_name() const {

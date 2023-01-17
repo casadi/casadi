@@ -124,7 +124,7 @@ void register_alm(py::module_ &m) {
         if (penalty_alm_split < 0 || penalty_alm_split > p.get_m())
             throw std::invalid_argument("invalid penalty_alm_split");
 
-        auto invoke_solver = [&] { return solver(p, *y, *x); };
+        auto invoke_solver = [&] { return solver(p, *x, *y); };
         if (!async) {
             // Replace the output stream
             StreamReplacer stream{&solver};

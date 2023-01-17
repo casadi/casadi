@@ -83,7 +83,7 @@ int main() {
     y << 1; // Lagrange multipliers
 
     // Solve the problem
-    auto stats = solver(counted_problem, y, x);
+    auto stats = solver(counted_problem, x, y);
     // y and x have been overwritten by the solution
 
     // Print the results

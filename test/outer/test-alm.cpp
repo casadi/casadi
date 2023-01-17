@@ -73,7 +73,7 @@ TEST(ALM, singleshooting1D) {
     vec x(1);
     x << 1;
     vec y(0);
-    solver(op, y, x);
+    solver(op, x, y);
 
     EXPECT_NEAR(x(0), -0.454545, 1e-4);
     std::cout << "u = " << x.transpose() << std::endl;
@@ -164,7 +164,7 @@ TEST(ALM, multipleshooting1D) {
     y << 1;
 
     auto begin = std::chrono::high_resolution_clock::now();
-    auto stats = solver(op, y, x);
+    auto stats = solver(op, x, y);
     auto end   = std::chrono::high_resolution_clock::now();
 
     std::cout << "u = " << x.topRows(1).transpose() << std::endl;
@@ -268,7 +268,7 @@ TEST(ALM, multipleshooting8D) {
     y.fill(1);
 
     auto begin = std::chrono::high_resolution_clock::now();
-    auto stats = solver(op, y, x);
+    auto stats = solver(op, x, y);
     auto end   = std::chrono::high_resolution_clock::now();
 
     std::cout << "u = " << x.topRows(nu).transpose() << std::endl;
@@ -394,7 +394,7 @@ TEST(ALM, multipleshooting8Dstructured) {
     y.fill(1);
 
     auto begin = std::chrono::high_resolution_clock::now();
-    auto stats = solver(p, y, x);
+    auto stats = solver(p, x, y);
     auto end   = std::chrono::high_resolution_clock::now();
 
     std::cout << "u = " << x.topRows(nu).transpose() << std::endl;

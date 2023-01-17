@@ -69,7 +69,7 @@ int main(int argc, char *argv[]) {
     auto counted_problem = alpaqa::problem_with_counters_ref(problem);
 
     // Solve the problem
-    auto stats = solver(counted_problem, y, x);
+    auto stats = solver(counted_problem, x, y);
 
     // Print the results
     std::cout << '\n' << *counted_problem.evaluations << '\n';

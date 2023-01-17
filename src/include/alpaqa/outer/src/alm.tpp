@@ -17,7 +17,7 @@ namespace alpaqa {
 
 template <class InnerSolverT>
 typename ALMSolver<InnerSolverT>::Stats
-ALMSolver<InnerSolverT>::operator()(const Problem &p, rvec y, rvec x) {
+ALMSolver<InnerSolverT>::operator()(const Problem &p, rvec x, rvec y) {
     using std::chrono::duration_cast;
     using std::chrono::nanoseconds;
     auto start_time = std::chrono::steady_clock::now();
