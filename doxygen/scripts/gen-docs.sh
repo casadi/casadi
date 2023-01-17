@@ -44,7 +44,7 @@ function run_doxygen_coverage {
         -DALPAQA_WITH_QUAD_PRECISION=On \
         -DALPAQA_WITH_PYTHON=Off \
         -DALPAQA_WITH_EXAMPLES=Off \
-        -DALPAQA_WITH_CASADI=Off \
+        -DALPAQA_WITH_CASADI=On \
         -DALPAQA_DOXYFILE="$tmpdir/tmp-Doxyfile"
 
     # Generate the Doxygen C++ documentation
