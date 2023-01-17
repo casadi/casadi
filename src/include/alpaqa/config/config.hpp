@@ -169,6 +169,8 @@ auto norm_1(const Eigen::MatrixBase<Derived> &v) {
 
 } // namespace alpaqa
 
+// Make Eigen Ref and Map object available as std::ranges view.
+#ifndef DOXYGEN
 template <class Scalar, int Rows, int Cols, int Options, int MaxRows,
           int MaxCols>
 inline constexpr bool std::ranges::enable_borrowed_range<              //
@@ -200,3 +202,4 @@ inline constexpr bool std::ranges::enable_borrowed_range<                   //
         const Eigen::Matrix<Scalar, Rows, Cols, Options, MaxRows, MaxCols>, //
         MapOptions, StrideType>>                                            //
     = true;
+#endif

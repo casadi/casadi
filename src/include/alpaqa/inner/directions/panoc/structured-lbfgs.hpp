@@ -9,7 +9,7 @@
 
 namespace alpaqa {
 
-/// Parameters for the @ref StructuredLBFGS class.
+/// Parameters for the @ref StructuredLBFGSDirection class.
 template <Config Conf>
 struct StructuredLBFGSDirectionParams {
     bool hessian_vec                    = true;

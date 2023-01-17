@@ -516,21 +516,23 @@ auto PANOCOCPSolver<Conf>::operator()(
 
     // Iterates ----------------------------------------------------------------
 
+    // Represents an iterate in the algorithm, keeping track of some
+    // intermediate values and function evaluations.
     struct Iterate {
-        vec xu;     ///< Inputs u interleaved with states x
-        vec xû;     ///< Inputs u interleaved with states x after prox grad
-        vec grad_ψ; ///< Gradient of cost in u
-        vec p;      ///< Proximal gradient step in u
-        vec u;      ///< Inputs u (used for L-BFGS only)
-        real_t ψu       = NaN<config_t>; ///< Cost in u
-        real_t ψû       = NaN<config_t>; ///< Cost in û
-        real_t γ        = NaN<config_t>; ///< Step size γ
-        real_t L        = NaN<config_t>; ///< Lipschitz estimate L
-        real_t pᵀp      = NaN<config_t>; ///< Norm squared of p
-        real_t grad_ψᵀp = NaN<config_t>; ///< Dot product of gradient and p
+        vec xu;     //< Inputs u interleaved with states x
+        vec xû;     //< Inputs u interleaved with states x after prox grad
+        vec grad_ψ; //< Gradient of cost in u
+        vec p;      //< Proximal gradient step in u
+        vec u;      //< Inputs u (used for L-BFGS only)
+        real_t ψu       = NaN<config_t>; //< Cost in u
+        real_t ψû       = NaN<config_t>; //< Cost in û
+        real_t γ        = NaN<config_t>; //< Step size γ
+        real_t L        = NaN<config_t>; //< Lipschitz estimate L
+        real_t pᵀp      = NaN<config_t>; //< Norm squared of p
+        real_t grad_ψᵀp = NaN<config_t>; //< Dot product of gradient and p
 
-        /// @pre    @ref ψu, @ref pᵀp, @pre grad_ψᵀp
-        /// @return φγ
+        // @pre    @ref ψu, @ref pᵀp, @pre grad_ψᵀp
+        // @return φγ
         real_t fbe() const { return ψu + pᵀp / (2 * γ) + grad_ψᵀp; }
 
         Iterate(const OCPVariables<config_t> &vars, bool enable_lbfgs)
@@ -638,29 +640,29 @@ auto PANOCOCPSolver<Conf>::operator()(
         detail::assign_extract_u(vars, xu, u);
     };
 
-    /// @pre    @ref Iterate::γ, @ref Iterate::xu, @ref Iterate::grad_ψ
-    /// @post   @ref Iterate::xû, @ref Iterate::p, @ref Iterate::pᵀp,
-    ///         @ref Iterate::grad_ψᵀp
+    // @pre    @ref Iterate::γ, @ref Iterate::xu, @ref Iterate::grad_ψ
+    // @post   @ref Iterate::xû, @ref Iterate::p, @ref Iterate::pᵀp,
+    //         @ref Iterate::grad_ψᵀp
     auto eval_prox = [&](Iterate &i) {
         std::tie(i.pᵀp, i.grad_ψᵀp) =
             eval_prox_impl(i.γ, i.xu, i.grad_ψ, i.xû, i.p);
     };
 
-    /// @pre    @ref Iterate::xu
-    /// @post   @ref Iterate::ψu
+    // @pre    @ref Iterate::xu
+    // @post   @ref Iterate::ψu
     auto eval_forward = [&](Iterate &i) {
         alpaqa::detail::Timed t{s.time_forward};
         i.ψu = eval.forward(i.xu, D, D_N, μ, y);
     };
-    /// @pre    @ref Iterate::xû
-    /// @post   @ref Iterate::ψû
+    // @pre    @ref Iterate::xû
+    // @post   @ref Iterate::ψû
     auto eval_forward_hat = [&](Iterate &i) {
         alpaqa::detail::Timed t{s.time_forward};
         i.ψû = eval.forward(i.xû, D, D_N, μ, y);
     };
 
-    /// @pre    @ref Iterate::xu
-    /// @post   @ref Iterate::grad_ψ, @ref Iterate::have_jacobians
+    // @pre    @ref Iterate::xu
+    // @post   @ref Iterate::grad_ψ, q, q_N
     auto eval_backward = [&](Iterate &i) {
         alpaqa::detail::Timed t{s.time_backward};
         eval.backward(i.xu, i.grad_ψ, work_λ, work_x, work_c, mut_qrk, mut_q_N,

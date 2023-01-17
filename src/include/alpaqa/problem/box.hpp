@@ -18,7 +18,9 @@ struct Box {
         return Box{vec::Constant(n, alpaqa::NaN<config_t>),
                    vec::Constant(n, alpaqa::NaN<config_t>)};
     }
-    static Box from_lower_upper(vec lower, vec upper) { return Box{lower, upper}; }
+    static Box from_lower_upper(vec lower, vec upper) {
+        return Box{std::move(lower), std::move(upper)};
+    }
 
     vec lowerbound;
     vec upperbound;

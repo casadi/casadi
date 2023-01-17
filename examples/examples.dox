@@ -26,7 +26,7 @@
  * gradients, you can specify them as well, see @ref alpaqa::TypeErasedProblem
  * for the full list of supported functions.
  *
- * The @ref BoxConstrProblem class exposes the two constraint sets,
+ * The @ref alpaqa::BoxConstrProblem class exposes the two constraint sets,
  * @f$ x \in C @f$ and @f$ g(x) \in D @f$, and provides the projection functions
  * (@ref alpaqa::TypeErasedProblem::eval_prox_grad_step, 
  * @ref alpaqa::TypeErasedProblem::eval_proj_diff_g and

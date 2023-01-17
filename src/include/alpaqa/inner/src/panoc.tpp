@@ -47,22 +47,24 @@ auto PANOCSolver<DirectionProviderT>::operator()(
     const auto n = problem.get_n();
     const auto m = problem.get_m();
 
+    // Represents an iterate in the algorithm, keeping track of some
+    // intermediate values and function evaluations.
     struct Iterate {
-        vec x;      ///< Decision variables
-        vec x̂;      ///< Decision variables after proximal gradient step
-        vec grad_ψ; ///< Gradient of cost in x
-        vec p;      ///< Proximal gradient step in x
-        vec ŷx̂;     ///< Candidate Lagrange multipliers in x̂
-        real_t ψx       = NaN<config_t>; ///< Cost in x
-        real_t ψx̂       = NaN<config_t>; ///< Cost in x̂
-        real_t γ        = NaN<config_t>; ///< Step size γ
-        real_t L        = NaN<config_t>; ///< Lipschitz estimate L
-        real_t pᵀp      = NaN<config_t>; ///< Norm squared of p
-        real_t grad_ψᵀp = NaN<config_t>; ///< Dot product of gradient and p
-        real_t hx̂       = NaN<config_t>; ///< Non-smooth function value in x̂
+        vec x;      //< Decision variables
+        vec x̂;      //< Decision variables after proximal gradient step
+        vec grad_ψ; //< Gradient of cost in x
+        vec p;      //< Proximal gradient step in x
+        vec ŷx̂;     //< Candidate Lagrange multipliers in x̂
+        real_t ψx       = NaN<config_t>; //< Cost in x
+        real_t ψx̂       = NaN<config_t>; //< Cost in x̂
+        real_t γ        = NaN<config_t>; //< Step size γ
+        real_t L        = NaN<config_t>; //< Lipschitz estimate L
+        real_t pᵀp      = NaN<config_t>; //< Norm squared of p
+        real_t grad_ψᵀp = NaN<config_t>; //< Dot product of gradient and p
+        real_t hx̂       = NaN<config_t>; //< Non-smooth function value in x̂
 
-        /// @pre    @ref ψu, @ref pᵀp, @pre grad_ψᵀp
-        /// @return φγ
+        // @pre    @ref ψx, @ref hx̂ @ref pᵀp, @ref grad_ψᵀp
+        // @return φγ
         real_t fbe() const { return ψx + hx̂ + pᵀp / (2 * γ) + grad_ψᵀp; }
 
         Iterate(length_t n, length_t m) : x(n), x̂(n), grad_ψ(n), p(n), ŷx̂(m) {}

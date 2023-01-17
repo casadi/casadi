@@ -120,8 +120,11 @@ auto enumerate(Rng &&rng) {
 
 } // namespace alpaqa::util
 
+// Make iter_range_adapter available as an std::ranges view.
 // Iterators remain valid even if the range is destroyed.
 // Assume that the user takes care of lifetime, similar to std::span.
+#ifndef DOXYGEN
 template <class It>
 inline constexpr bool ::std::ranges::enable_borrowed_range<
     alpaqa::util::iter_range_adapter<It>> = true;
+#endif

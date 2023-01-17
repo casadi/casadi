@@ -15,7 +15,7 @@ namespace alpaqa::util {
 namespace detail {
 
 /// Returns a range over the row indices in the given column of @p sp_mat that
-/// are also in @ref mask.
+/// are also in @p mask.
 /// The range consists of the full Eigen InnerIterators (row, column, value).
 template <class SpMat, class MaskVec>
 auto select_rows_in_col(const SpMat &sp_mat, MaskVec mask, auto column) {
