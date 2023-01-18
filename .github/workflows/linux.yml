@@ -97,7 +97,10 @@ jobs:
     steps:
       # Git clone
       - name: Install git
-        run: apt -y update && apt -y install --no-install-recommends git ca-certificates g++ gfortran cmake ninja-build python3-pip libeigen3-dev libgtest-dev
+        run: >
+          apt -y update && apt -y install --no-install-recommends
+          git ca-certificates g++ gfortran cmake ninja-build python3-pip
+          libeigen3-dev libgtest-dev libgmock-dev
       - uses: actions/checkout@v3
         with:
           submodules: recursive
