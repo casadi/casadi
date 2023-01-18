@@ -137,10 +137,11 @@ def _add_parameter(f: cs.Function, expected_inputs: int) -> Tuple[cs.Function, c
     elif f.n_in() == expected_inputs:
         # We don't have a parameter argument
         param = cs.SX.sym("p", 0)
+        fx = f(*(f.sx_in(i) for i in range(expected_inputs)))
         return cs.Function(
             f.name(),
             [f.sx_in(i) for i in range(expected_inputs)] + [param],
-            [f.sx_out(i) for i in range(f.n_out())],
+            [fx] if f.n_out() == 1 else fx,
             [f.name_in(i) for i in range(expected_inputs)] + ["p"],
             [f.name_out(i) for i in range(f.n_out())],
         ), param, "p"
@@ -269,7 +270,7 @@ def generate_casadi_control_problem(
     assert l.size1_out(0) == 1
     assert l.size2_out(0) == 1
 
-    h_var = l.sx_in(0)
+    h_var = cs.SX.sym("h", *l.sx_in(0).shape)
 
     cg.add(cs.Function(
         "l",
@@ -337,7 +338,7 @@ def generate_casadi_control_problem(
     assert l_N.size1_out(0) == 1
     assert l_N.size2_out(0) == 1
 
-    hN_var = l_N.sx_in(0)
+    hN_var = cs.SX.sym("hN", *l_N.sx_in(0).shape)
 
     cg.add(cs.Function(
         "l_N",
