@@ -58,36 +58,34 @@ jobs:
             -G "Ninja Multi-Config" \
             -D BUILD_SHARED_LIBS=On \
             -D CMAKE_POSITION_INDEPENDENT_CODE=On \
-            -D CMAKE_SHARED_LINKER_FLAGS_RELEASE=-s \
             -D ALPAQA_WITH_EXAMPLES=Off \
             -D ALPAQA_WITH_TESTS=Off \
             -D ALPAQA_WARNINGS_AS_ERRORS=On \
             -D ALPAQA_WITH_QUAD_PRECISION=$quadmath \
             -D ALPAQA_WITH_CASADI=On \
             -D CMAKE_TOOLCHAIN_FILE="$staging/cmake/$host.toolchain.cmake" \
-            -D CMAKE_FIND_ROOT_PATH="$staging/eigen-master;$staging/casadi"
+            -D CMAKE_FIND_ROOT_PATH="$staging/eigen;$staging/casadi"
         env:
-          CFLAGS: '-static-libgcc'
-          CXXFLAGS: '-static-libgcc -static-libstdc++'
+          CXXFLAGS: '-static-libstdc++'
       # Build
-      - name: Build Release
+      - name: Build RelWithDebInfo
         run: |
-          cmake --build package --config Release -j
+          cmake --build package --config RelWithDebInfo -j
       - name: Build Debug
         run: |
           cmake --build package --config Debug -j
       # Package
       - name: Package
         run: |
-          cpack -G 'TGZ;DEB' -C "Release;Debug"
+          cpack -G 'TGZ;DEB' -C "RelWithDebInfo;Debug"
         working-directory: package
       - name: Upload
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: alpaqa-${{ matrix.host }}
           path: |
             package/alpaqa*.tar.gz
-            package/alpaqa*.deb
+            package/*alpaqa*.deb
 
   test:
     needs: [build]
@@ -99,45 +97,40 @@ jobs:
     steps:
       # Git clone
       - name: Install git
-        run: apt -y update && apt -y install --no-install-recommends git ca-certificates g++ gfortran cmake ninja-build python3-pip
+        run: apt -y update && apt -y install --no-install-recommends git ca-certificates g++ gfortran cmake ninja-build python3-pip libeigen3-dev libgtest-dev
       - uses: actions/checkout@v3
         with:
           submodules: recursive
       - name: Install CasADi, NumPy
         run: python3 -m pip install casadi numpy
       - name: Download
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: alpaqa-${{ matrix.host }}
           path: package
       - name: Install
-        run: |
-          tar xzf package/alpaqa*.tar.gz --strip-components 1 -C /usr/local
-          ldconfig
-      - name: Install dependencies
-        run: |
-          ./scripts/install-eigen.sh /usr/local
-          ./scripts/install-gtest.sh /usr/local
-      - name: Build examples (Release)
+        run: dpkg -i package/*alpaqa*.deb
+      - name: Build examples (RelWithDebInfo)
         run: |
           cmake -B build-examples -S examples \
             -G "Ninja Multi-Config"
-          cmake --build build-examples -j --config Release
-      - name: Build tests (Release)
+          cmake --build build-examples -j --config RelWithDebInfo
+      - name: Build tests (RelWithDebInfo)
         run: |
           cmake -B build-tests -S test \
             -G "Ninja Multi-Config"
-          cmake --build build-tests -j --config Release
-      - name: Upload (Release)
-        uses: actions/upload-artifact@v2
+          cmake --build build-tests -j --config RelWithDebInfo
+      - name: Upload (RelWithDebInfo)
+        uses: actions/upload-artifact@v3
         with:
           name: alpaqa-${{ matrix.host }}-test-examples-release
           path: |
-            build-examples/C++/CustomCppProblem/Release/custom-cpp-problem-example
-            build-examples/C++/FortranProblem/Release/fortran-problem-example
-            build-examples/C++/DLProblem/Release/dl-problem-example
-            build-examples/C++/DLProblem/Release/test-matmul
-            build-tests/Release/tests
+            build-examples/C++/CustomCppProblem/RelWithDebInfo/custom-cpp-problem-example
+            build-examples/C++/FortranProblem/RelWithDebInfo/fortran-problem-example
+            build-examples/C++/DLProblem/RelWithDebInfo/dl-problem-example
+            build-examples/C++/DLProblem/RelWithDebInfo/test-matmul
+            build-tests/RelWithDebInfo/tests
+            build-tests/RelWithDebInfo/librosenbrock_functions_test.so
       - name: Build examples (Debug)
         run: |
           cmake --build build-examples -j --config Debug
@@ -145,7 +138,7 @@ jobs:
         run: |
           cmake --build build-tests -j --config Debug
       - name: Upload (Debug)
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: alpaqa-${{ matrix.host }}-test-examples-debug
           path: |
@@ -154,25 +147,28 @@ jobs:
             build-examples/C++/DLProblem/Debug/dl-problem-example
             build-examples/C++/DLProblem/Debug/test-matmul
             build-tests/Debug/tests
-      - name: Run examples (Release)
+            build-tests/Debug/librosenbrock_functions_test.so
+      - name: Run examples (RelWithDebInfo)
         run: |
-          ./build-examples/C++/CustomCppProblem/Release/custom-cpp-problem-example
-          ./build-examples/C++/FortranProblem/Release/fortran-problem-example
-          ./build-examples/C++/DLProblem/Release/dl-problem-example
-          ./build-examples/C++/DLProblem/Release/test-matmul
+          ./build-examples/C++/CustomCppProblem/RelWithDebInfo/custom-cpp-problem-example
+          ./build-examples/C++/FortranProblem/RelWithDebInfo/fortran-problem-example
+          ./build-examples/C++/DLProblem/RelWithDebInfo/dl-problem-example
+          ./build-examples/C++/DLProblem/RelWithDebInfo/test-matmul
       - name: Run examples (Debug)
         run: |
           ./build-examples/C++/CustomCppProblem/Debug/custom-cpp-problem-example
           ./build-examples/C++/FortranProblem/Debug/fortran-problem-example
           ./build-examples/C++/DLProblem/Debug/dl-problem-example
           ./build-examples/C++/DLProblem/Debug/test-matmul
-      - name: Run tests (Release)
+      - name: Run tests (RelWithDebInfo)
         run: |
-          cmake --build build-tests -t test --config Release
+          ./build-tests/RelWithDebInfo/tests
+          cmake --build build-tests -t test --config RelWithDebInfo
         env:
           CTEST_OUTPUT_ON_FAILURE: 1
       - name: Run tests (Debug)
         run: |
+          ./build-tests/Debug/tests
           cmake --build build-tests -t test --config Debug
         env:
           CTEST_OUTPUT_ON_FAILURE: 1
@@ -186,7 +182,7 @@ jobs:
         host: [x86_64-centos7-linux-gnu, aarch64-rpi3-linux-gnu]
     steps:
     - name: Download
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v3
       with:
         name: alpaqa-${{ matrix.host }}
         path: package
@@ -195,4 +191,4 @@ jobs:
       with:
         files: |
           package/alpaqa*.tar.gz
-          package/alpaqa*.deb
+          package/*alpaqa*.deb
