@@ -1,4 +1,5 @@
 include(GNUInstallDirs)
+include(${PROJECT_SOURCE_DIR}/cmake/Debug.cmake)
 
 set(INSTALL_CMAKE_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/alpaqa")
 
@@ -27,7 +28,7 @@ install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/interop/dl/include/"
     FILES_MATCHING REGEX "/.*\.(h|[hti]pp)$")
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/interop/dl-api/include/"
     DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
-        COMPONENT dev
+        COMPONENT dl_dev
     FILES_MATCHING REGEX "/.*\.(h|[hti]pp)$")
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/export/alpaqa/export.h
     DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/alpaqa/"
@@ -37,16 +38,14 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/export/alpaqa/casadi-loader-export.h
         COMPONENT dev)
 
 # Install the debug files
-if (MSVC)
-    foreach(TGT IN LISTS ALPAQA_INSTALL_TARGETS)
-        get_target_property(TGT_TYPE ${TGT} TYPE)
-        if (${TGT_TYPE} STREQUAL "SHARED_LIBRARY")
-            install(FILES $<TARGET_PDB_FILE:${TGT}>
-                DESTINATION "${CMAKE_INSTALL_BINDIR}"
-                    COMPONENT debug  OPTIONAL)
-        endif()
-    endforeach()
-endif()
+foreach(TGT IN LISTS ALPAQA_INSTALL_TARGETS)
+    get_target_property(TGT_TYPE ${TGT} TYPE)
+    if (${TGT_TYPE} STREQUAL "SHARED_LIBRARY")
+        alpaqa_install_debug_syms(${TGT} debug
+                                  ${CMAKE_INSTALL_LIBDIR}
+                                  ${CMAKE_INSTALL_BINDIR})
+    endif()
+endforeach()
 
 # Install the export set for use with the install tree
 install(EXPORT alpaqaTargets 
