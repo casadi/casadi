@@ -10,28 +10,43 @@
 namespace alpaqa {
 
 template <Config Conf>
+struct EmptyMatrix {
+    USING_ALPAQA_CONFIG(Conf);
+    [[nodiscard]] length_t storage_size() const { return 0; }
+    [[nodiscard]] length_t rows() const { return 0; }
+    [[nodiscard]] length_t cols() const { return 0; }
+    static constexpr bool is_symmetric = true;
+};
+
+template <Config Conf>
 struct DenseMatrixStructure {
     USING_ALPAQA_CONFIG(Conf);
-    DenseMatrixStructure(length_t rows, length_t cols) : rows{rows}, cols{cols} {}
+    DenseMatrixStructure(length_t rows, length_t cols) : rows_{rows}, cols_{cols} {}
     [[nodiscard]] auto view(std::span<const real_t> storage) const {
-        assert(static_cast<length_t>(storage.size()) >= rows * cols);
-        return cmmat{storage.data(), rows, cols};
+        assert(static_cast<length_t>(storage.size()) >= storage_size());
+        return cmmat{storage.data(), rows_, cols_};
     }
-    length_t rows, cols;
+    [[nodiscard]] length_t storage_size() const { return rows_ * cols_; }
+    length_t rows_, cols_;
+    length_t rows() const { return rows_; }
+    length_t cols() const { return cols_; }
     static constexpr bool is_symmetric = false;
 };
 
 template <Config Conf>
 struct DiagonalMatrixStructure {
     USING_ALPAQA_CONFIG(Conf);
-    DiagonalMatrixStructure(length_t rows, [[maybe_unused]] length_t cols) : rows{rows} {
+    DiagonalMatrixStructure(length_t rows, [[maybe_unused]] length_t cols) : rows_{rows} {
         assert(rows == cols);
     }
     [[nodiscard]] auto view(std::span<const real_t> storage) const {
-        assert(static_cast<length_t>(storage.size()) >= rows);
-        return cmvec{storage.data(), rows}.asDiagonal();
+        assert(static_cast<length_t>(storage.size()) >= storage_size());
+        return cmvec{storage.data(), rows_}.asDiagonal();
     }
-    length_t rows;
+    [[nodiscard]] length_t storage_size() const { return rows_; }
+    length_t rows_;
+    length_t rows() const { return rows_; }
+    length_t cols() const { return rows_; }
     static constexpr bool is_symmetric = true;
 };
 
@@ -39,13 +54,17 @@ template <Config Conf, Eigen::UpLoType UpLo>
 struct SymmetricMatrixStructure {
     USING_ALPAQA_CONFIG(Conf);
     /// @todo   Wastes ~50% of storage, but can be optimized later.
-    SymmetricMatrixStructure(length_t rows, [[maybe_unused]] length_t cols) : rows{rows} {
+    SymmetricMatrixStructure(length_t rows, [[maybe_unused]] length_t cols) : rows_{rows} {
         assert(rows == cols);
     }
     [[nodiscard]] auto view(std::span<const real_t> storage) const {
-        return cmmat{storage.data(), rows, rows}.template selfadjointView<UpLo>();
+        assert(static_cast<length_t>(storage.size()) >= storage_size());
+        return cmmat{storage.data(), rows_, rows_}.template selfadjointView<UpLo>();
     }
-    length_t rows;
+    [[nodiscard]] length_t storage_size() const { return rows_ * rows_; }
+    length_t rows_;
+    length_t rows() const { return rows_; }
+    length_t cols() const { return rows_; }
     static constexpr bool is_symmetric = true;
 };
 
@@ -60,7 +79,7 @@ struct SparseMatrixStructure {
     /// through `shared_ptr`'s aliasing constructor.
     SparseMatrixStructure(std::shared_ptr<Sparsity> sparsity) : sparsity{std::move(sparsity)} {}
     [[nodiscard]] auto view(std::span<const real_t> storage) const {
-        assert(static_cast<length_t>(storage.size()) >= sparsity->nnz);
+        assert(static_cast<length_t>(storage.size()) >= storage_size());
         return Eigen::Map<const Eigen::SparseMatrix<real_t, Eigen::ColMajor, StorageIndex>>{
             sparsity->rows,
             sparsity->cols,
@@ -71,8 +90,16 @@ struct SparseMatrixStructure {
             sparsity->inner_non_zeros_ptr,
         };
     }
+    [[nodiscard]] length_t storage_size() const { return sparsity->nnz; }
     std::shared_ptr<Sparsity> sparsity;
+    length_t rows() const { return sparsity->rows; }
+    length_t cols() const { return sparsity->cols; }
     static constexpr bool is_symmetric = false;
+    // Deleted for performance reasons
+    SparseMatrixStructure(const SparseMatrixStructure &)                = delete;
+    SparseMatrixStructure &operator=(const SparseMatrixStructure &)     = delete;
+    SparseMatrixStructure(SparseMatrixStructure &&) noexcept            = default;
+    SparseMatrixStructure &operator=(SparseMatrixStructure &&) noexcept = default;
 };
 
 template <class Base>
@@ -84,6 +111,7 @@ struct VariantMatrix {
 
     // clang-format off
     using variant_t = std::variant<
+        EmptyMatrix<config_t>,
         DenseMatrixStructure<config_t>,
         DiagonalMatrixStructure<config_t>,
         SymmetricMatrixStructure<config_t, Eigen::Upper>,
@@ -94,6 +122,8 @@ struct VariantMatrix {
     // clang-format on
     variant_t value;
 
+    explicit operator bool() const { return value.index() == 0; }
+
     template <class Visitor>
     decltype(auto) visit(Visitor &&vis) {
         return std::visit(std::forward<Visitor>(vis), value);
@@ -101,6 +131,16 @@ struct VariantMatrix {
     template <class Visitor>
     decltype(auto) visit(Visitor &&vis) const {
         return std::visit(std::forward<Visitor>(vis), value);
+    }
+
+    length_t rows() const {
+        return visit([](auto &t) { return t.rows(); });
+    }
+    length_t cols() const {
+        return visit([](auto &t) { return t.cols(); });
+    }
+    length_t storage_size() const {
+        return visit([](auto &t) { return t.storage_size(); });
     }
 
     TransposedVariantMatrix<VariantMatrix &> transpose() & { return {*this}; }
@@ -142,6 +182,7 @@ struct VariantMatrixMultiplyAdd {
         else if constexpr (Side == Right && Transp == Yes)
             out.noalias() += op_b * op_a.view(storage).transpose();
     }
+    void operator()(const EmptyMatrix<config_t> &) {}
 
     std::span<const real_t> storage;
     crmat op_b;

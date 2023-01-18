@@ -20,13 +20,13 @@ TEST(VariantMatrix, Dense) {
     length_t m = 11, n = 17, p = 13;
     mat A = mat::Random(m, n);
     varmat A_struc{alpaqa::DenseMatrixStructure<config_t>{m, n}};
+    ASSERT_EQ(A.size(), A_struc.storage_size());
     {
         mat B = mat::Random(n, p);
         mat C = A * B;
         mat C_result{m, p};
         C_result.setZero();
         alpaqa::multiply_add(mat_to_span(A), A_struc, B, C_result);
-        EXPECT_DOUBLE_EQ(C(0, 0), C_result(0, 0));
         EXPECT_THAT(C, EigenAlmostEqual(C_result, 1e-14));
     }
     {
@@ -35,7 +35,6 @@ TEST(VariantMatrix, Dense) {
         mat C_result{n, p};
         C_result.setZero();
         alpaqa::multiply_add(mat_to_span(A), A_struc.transpose(), B, C_result);
-        EXPECT_DOUBLE_EQ(C(0, 0), C_result(0, 0));
         EXPECT_THAT(C, EigenAlmostEqual(C_result, 1e-14));
     }
     {
@@ -44,7 +43,6 @@ TEST(VariantMatrix, Dense) {
         mat C_result{p, n};
         C_result.setZero();
         alpaqa::multiply_add(mat_to_span(A), B, A_struc, C_result);
-        EXPECT_DOUBLE_EQ(C(0, 0), C_result(0, 0));
         EXPECT_THAT(C, EigenAlmostEqual(C_result, 1e-14));
     }
     {
@@ -53,7 +51,6 @@ TEST(VariantMatrix, Dense) {
         mat C_result{p, m};
         C_result.setZero();
         alpaqa::multiply_add(mat_to_span(A), B, A_struc.transpose(), C_result);
-        EXPECT_DOUBLE_EQ(C(0, 0), C_result(0, 0));
         EXPECT_THAT(C, EigenAlmostEqual(C_result, 1e-14));
     }
 }
@@ -65,13 +62,13 @@ TEST(VariantMatrix, Diagonal) {
     vec A_sto = vec::Random(m);
     mat A     = A_sto.asDiagonal();
     varmat A_struc{alpaqa::DiagonalMatrixStructure<config_t>{m, m}};
+    ASSERT_EQ(A_sto.size(), A_struc.storage_size());
     {
         mat B = mat::Random(m, p);
         mat C = A * B;
         mat C_result{m, p};
         C_result.setZero();
         alpaqa::multiply_add(mat_to_span(A_sto), A_struc, B, C_result);
-        EXPECT_DOUBLE_EQ(C(0, 0), C_result(0, 0));
         EXPECT_THAT(C, EigenAlmostEqual(C_result, 1e-14));
     }
     {
@@ -81,7 +78,6 @@ TEST(VariantMatrix, Diagonal) {
         C_result.setZero();
         alpaqa::multiply_add(mat_to_span(A_sto), A_struc.transpose(), B,
                              C_result);
-        EXPECT_DOUBLE_EQ(C(0, 0), C_result(0, 0));
         EXPECT_THAT(C, EigenAlmostEqual(C_result, 1e-14));
     }
     {
@@ -90,7 +86,6 @@ TEST(VariantMatrix, Diagonal) {
         mat C_result{p, m};
         C_result.setZero();
         alpaqa::multiply_add(mat_to_span(A_sto), B, A_struc, C_result);
-        EXPECT_DOUBLE_EQ(C(0, 0), C_result(0, 0));
         EXPECT_THAT(C, EigenAlmostEqual(C_result, 1e-14));
     }
     {
@@ -100,7 +95,6 @@ TEST(VariantMatrix, Diagonal) {
         C_result.setZero();
         alpaqa::multiply_add(mat_to_span(A_sto), B, A_struc.transpose(),
                              C_result);
-        EXPECT_DOUBLE_EQ(C(0, 0), C_result(0, 0));
         EXPECT_THAT(C, EigenAlmostEqual(C_result, 1e-14));
     }
 }
@@ -113,13 +107,13 @@ TEST(VariantMatrix, Symmetric) {
     mat A     = A_sto.selfadjointView<Eigen::Upper>();
     varmat A_struc{
         alpaqa::SymmetricMatrixStructure<config_t, Eigen::Upper>{m, m}};
+    ASSERT_EQ(A_sto.size(), A_struc.storage_size());
     {
         mat B = mat::Random(m, p);
         mat C = A * B;
         mat C_result{m, p};
         C_result.setZero();
         alpaqa::multiply_add(mat_to_span(A_sto), A_struc, B, C_result);
-        EXPECT_DOUBLE_EQ(C(0, 0), C_result(0, 0));
         EXPECT_THAT(C, EigenAlmostEqual(C_result, 1e-14));
     }
     {
@@ -129,7 +123,6 @@ TEST(VariantMatrix, Symmetric) {
         C_result.setZero();
         alpaqa::multiply_add(mat_to_span(A_sto), A_struc.transpose(), B,
                              C_result);
-        EXPECT_DOUBLE_EQ(C(0, 0), C_result(0, 0));
         EXPECT_THAT(C, EigenAlmostEqual(C_result, 1e-14));
     }
     {
@@ -138,7 +131,6 @@ TEST(VariantMatrix, Symmetric) {
         mat C_result{p, m};
         C_result.setZero();
         alpaqa::multiply_add(mat_to_span(A_sto), B, A_struc, C_result);
-        EXPECT_DOUBLE_EQ(C(0, 0), C_result(0, 0));
         EXPECT_THAT(C, EigenAlmostEqual(C_result, 1e-14));
     }
     {
@@ -148,7 +140,6 @@ TEST(VariantMatrix, Symmetric) {
         C_result.setZero();
         alpaqa::multiply_add(mat_to_span(A_sto), B, A_struc.transpose(),
                              C_result);
-        EXPECT_DOUBLE_EQ(C(0, 0), C_result(0, 0));
         EXPECT_THAT(C, EigenAlmostEqual(C_result, 1e-14));
     }
 }
@@ -170,13 +161,13 @@ TEST(VariantMatrix, Sparse) {
             .inner_non_zeros_ptr = A.innerNonZeroPtr(),
         })},
     };
+    ASSERT_EQ(A.nonZeros(), A_struc.storage_size());
     {
         mat B = mat::Random(n, p);
         mat C = A * B;
         mat C_result{m, p};
         C_result.setZero();
         alpaqa::multiply_add(mat_to_span(A), A_struc, B, C_result);
-        EXPECT_DOUBLE_EQ(C(0, 0), C_result(0, 0));
         EXPECT_THAT(C, EigenAlmostEqual(C_result, 1e-14));
     }
     {
@@ -185,7 +176,6 @@ TEST(VariantMatrix, Sparse) {
         mat C_result{n, p};
         C_result.setZero();
         alpaqa::multiply_add(mat_to_span(A), A_struc.transpose(), B, C_result);
-        EXPECT_DOUBLE_EQ(C(0, 0), C_result(0, 0));
         EXPECT_THAT(C, EigenAlmostEqual(C_result, 1e-14));
     }
     {
@@ -194,7 +184,6 @@ TEST(VariantMatrix, Sparse) {
         mat C_result{p, n};
         C_result.setZero();
         alpaqa::multiply_add(mat_to_span(A), B, A_struc, C_result);
-        EXPECT_DOUBLE_EQ(C(0, 0), C_result(0, 0));
         EXPECT_THAT(C, EigenAlmostEqual(C_result, 1e-14));
     }
     {
@@ -203,7 +192,6 @@ TEST(VariantMatrix, Sparse) {
         mat C_result{p, m};
         C_result.setZero();
         alpaqa::multiply_add(mat_to_span(A), B, A_struc.transpose(), C_result);
-        EXPECT_DOUBLE_EQ(C(0, 0), C_result(0, 0));
         EXPECT_THAT(C, EigenAlmostEqual(C_result, 1e-14));
     }
 }
