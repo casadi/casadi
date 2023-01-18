@@ -338,7 +338,7 @@ void CasADiControlProblem<Conf>::eval_add_S_masked(index_t, crvec xu, crvec h,
     impl->S({xu.data(), h.data(), param.data()}, {work.data()});
     using spmat   = Eigen::SparseMatrix<real_t, Eigen::ColMajor, casadi_int>;
     using cmspmat = Eigen::Map<const spmat>;
-    using Eigen::placeholders::all;
+    using Eigen::indexing::all;
     if (sparse.is_dense()) {
         cmmat S_full{work.data(), nu, nx};
         S += S_full(mask, all);
@@ -385,7 +385,7 @@ void CasADiControlProblem<Conf>::eval_add_S_prod_masked(index_t, crvec, crvec,
     assert(work.size() >= sparse.nnz());
     using spmat   = Eigen::SparseMatrix<real_t, Eigen::ColMajor, casadi_int>;
     using cmspmat = Eigen::Map<const spmat>;
-    using Eigen::placeholders::all;
+    using Eigen::indexing::all;
     if (sparse.is_dense()) {
         auto Sᵀ = cmmat{work.data(), nu, nu}.transpose();
         out.noalias() += Sᵀ(all, mask_K) * v(mask_K);

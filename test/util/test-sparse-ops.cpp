@@ -70,7 +70,7 @@ TEST(SparseOps, S) {
     mat O      = mat::Random(J.size(), m);
 
     auto S_dense = S.toDense();
-    mat expected = O + S_dense(J, Eigen::placeholders::all);
+    mat expected = O + S_dense(J, Eigen::indexing::all);
 
     mat result = O;
     alpaqa::util::sparse_add_masked_rows(S, rmat{result}, crindexvec{J});
@@ -87,7 +87,7 @@ TEST(SparseOps, Svec) {
     vec o      = vec::Random(m);
 
     auto S_dense = S.toDense();
-    vec expected = o + S_dense(J, Eigen::placeholders::all).transpose() * v(J);
+    vec expected = o + S_dense(J, Eigen::indexing::all).transpose() * v(J);
 
     vec result = o;
     alpaqa::util::sparse_matvec_add_transpose_masked_rows(

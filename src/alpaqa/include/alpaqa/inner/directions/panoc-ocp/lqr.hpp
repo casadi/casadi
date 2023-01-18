@@ -69,7 +69,7 @@ struct StatefulLQRFactor {
                        bool use_cholesky ///< Use Cholesky instead of LU solver
     ) {
         using mmat = Eigen::Map<mat>;
-        using Eigen::placeholders::all;
+        using Eigen::indexing::all;
         auto [N, nx, nu] = dim;
 
         min_rcond = 1;
