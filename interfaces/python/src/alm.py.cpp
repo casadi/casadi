@@ -19,9 +19,9 @@ using namespace std::chrono_literals;
 
 #include <alpaqa/inner/directions/panoc/structured-lbfgs.hpp>
 #include <alpaqa/inner/panoc.hpp>
-#include <alpaqa/inner/src/panoc.tpp>
+#include <alpaqa/implementation/inner/panoc.tpp>
 #include <alpaqa/outer/alm.hpp>
-#include <alpaqa/outer/src/alm.tpp>
+#include <alpaqa/implementation/outer/alm.tpp>
 #include <alpaqa/util/check-dim.hpp>
 
 #include "kwargs-to-struct.hpp"

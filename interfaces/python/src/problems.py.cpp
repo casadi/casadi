@@ -11,7 +11,7 @@ using namespace py::literals;
 #include <alpaqa/problem/problem-counters.hpp>
 #include <alpaqa/problem/type-erased-problem.hpp>
 #if ALPAQA_HAVE_CASADI
-#include <alpaqa/interop/casadi/CasADiProblem.hpp>
+#include <alpaqa/casadi/CasADiProblem.hpp>
 #endif
 
 template <class FuncProb, auto py_f, auto f, class Ret, class... Args>

@@ -1,4 +1,4 @@
-#include <alpaqa/interop/casadi/CasADiProblem.hpp>
+#include <alpaqa/casadi/CasADiProblem.hpp>
 #include <alpaqa/panoc-alm.hpp>
 #include <alpaqa/structured-panoc-alm.hpp>
 

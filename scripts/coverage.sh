@@ -50,8 +50,8 @@ lcov \
 lcov \
     --capture --initial \
     --directory "$build_dir" \
-    --include "$proj_dir"'/src/include/**' \
-    --include "$proj_dir"'/src/src/**' \
+    --include "$proj_dir"'/src/alpaqa/**' \
+    --include "$proj_dir"'/src/interop/**' \
     --output-file "$dest"/coverage_base.info \
     --gcov-tool "$gcov_bin" \
     --rc lcov_branch_coverage=$branches
@@ -63,8 +63,8 @@ ctest
 lcov \
     --capture \
     --directory "$build_dir" \
-    --include "$proj_dir"'/src/include/**' \
-    --include "$proj_dir"'/src/src/**' \
+    --include "$proj_dir"'/src/alpaqa/**' \
+    --include "$proj_dir"'/src/interop/**' \
     --output-file "$dest"/coverage_test.info \
     --gcov-tool "$gcov_bin" \
     --rc lcov_branch_coverage=$branches

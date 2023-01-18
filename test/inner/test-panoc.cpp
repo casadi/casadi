@@ -6,7 +6,7 @@
 #include <alpaqa/inner/panoc.hpp>
 
 #include <alpaqa/config/config.hpp>
-#include <alpaqa/inner/src/panoc-helpers.tpp>
+#include <alpaqa/implementation/inner/panoc-helpers.tpp>
 #include <alpaqa/problem/type-erased-problem.hpp>
 
 USING_ALPAQA_CONFIG(alpaqa::EigenConfigd);

@@ -1,4 +1,4 @@
-#include <alpaqa/interop/dl/dl-problem.h>
+#include <alpaqa/dl/dl-problem.h>
 #include <problem-c-export.h>
 
 #include <stdlib.h>

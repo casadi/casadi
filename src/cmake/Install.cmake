@@ -13,7 +13,19 @@ install(TARGETS ${ALPAQA_INSTALL_TARGETS} warnings
         COMPONENT lib)
 
 # Install the header files
-install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include/"
+install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/alpaqa/include/"
+    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+        COMPONENT dev
+    FILES_MATCHING REGEX "/.*\.(h|[hti]pp)$")
+install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/interop/casadi/include/"
+    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+        COMPONENT dev
+    FILES_MATCHING REGEX "/.*\.(h|[hti]pp)$")
+install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/interop/dl/include/"
+    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+        COMPONENT dev
+    FILES_MATCHING REGEX "/.*\.(h|[hti]pp)$")
+install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/interop/dl-api/include/"
     DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
         COMPONENT dev
     FILES_MATCHING REGEX "/.*\.(h|[hti]pp)$")

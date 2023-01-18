@@ -12,7 +12,7 @@ using namespace py::literals;
 #include <alpaqa/inner/directions/panoc/lbfgs.hpp>
 #include <alpaqa/inner/directions/panoc/structured-lbfgs.hpp>
 #include <alpaqa/inner/panoc.hpp>
-#include <alpaqa/inner/src/panoc.tpp>
+#include <alpaqa/implementation/inner/panoc.tpp>
 #include <alpaqa/util/check-dim.hpp>
 
 #include "async.hpp"

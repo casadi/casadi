@@ -1,6 +1,6 @@
 #pragma once
 
-#include <alpaqa/interop/dl/dl-problem.h>
+#include <alpaqa/dl/dl-problem.h>
 
 // A: m×n, B: n×p, C: m×p, column major
 inline static void matmul(alpaqa_length_t m, alpaqa_length_t n,

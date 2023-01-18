@@ -1,4 +1,4 @@
-#include <alpaqa/interop/dl/dl-problem.hpp>
+#include <alpaqa/dl/dl-problem.hpp>
 #include <alpaqa/structured-panoc-alm.hpp>
 
 #include <filesystem>

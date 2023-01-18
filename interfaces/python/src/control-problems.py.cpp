@@ -11,7 +11,7 @@ using namespace py::literals;
 #include <alpaqa/problem/ocproblem.hpp>
 #include <alpaqa/util/check-dim.hpp>
 #if ALPAQA_HAVE_CASADI_OCP
-#include <alpaqa/interop/casadi/CasADiControlProblem.hpp>
+#include <alpaqa/casadi/CasADiControlProblem.hpp>
 #endif
 
 template <alpaqa::Config Conf>

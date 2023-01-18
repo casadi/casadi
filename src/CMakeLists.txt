@@ -9,25 +9,24 @@ function(alpaqa_configure_visibility target)
 endfunction()
 
 add_library(alpaqa
-    "src/util/type-erasure.cpp"
-    "src/util/demangled-typename.cpp"
-    "src/util/print.cpp"
-    "src/accelerators/lbfgs.cpp"
-    "src/problem/problem-counters.cpp"
-    "src/problem/ocproblem-counters.cpp"
-    "src/outer/alm.cpp"
-    "src/inner/panoc.cpp"
-    "src/inner/panoc-ocp.cpp"
-    "src/panoc-alm.cpp"
-    "src/structured-panoc-alm.cpp"
-    "src/inner/internal/solverstatus.cpp"
-    "src/inner/directions/panoc/structured-lbfgs.cpp"
-    "src/inner/internal/panoc-helpers.cpp"
-    "include/alpaqa/util/type-erasure.hpp"
+    "alpaqa/src/util/type-erasure.cpp"
+    "alpaqa/src/util/demangled-typename.cpp"
+    "alpaqa/src/util/print.cpp"
+    "alpaqa/src/accelerators/lbfgs.cpp"
+    "alpaqa/src/problem/problem-counters.cpp"
+    "alpaqa/src/problem/ocproblem-counters.cpp"
+    "alpaqa/src/outer/alm.cpp"
+    "alpaqa/src/inner/panoc.cpp"
+    "alpaqa/src/inner/panoc-ocp.cpp"
+    "alpaqa/src/panoc-alm.cpp"
+    "alpaqa/src/structured-panoc-alm.cpp"
+    "alpaqa/src/inner/internal/solverstatus.cpp"
+    "alpaqa/src/inner/directions/panoc/structured-lbfgs.cpp"
+    "alpaqa/src/inner/internal/panoc-helpers.cpp"
 )
 target_compile_features(alpaqa PUBLIC cxx_std_20)
 target_include_directories(alpaqa PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/alpaqa/include>
     $<INSTALL_INTERFACE:include>)
 target_compile_definitions(alpaqa PUBLIC
     $<$<CONFIG:Debug>:EIGEN_INITIALIZE_MATRICES_BY_NAN>
@@ -54,7 +53,10 @@ if (ALPAQA_WITH_CASADI)
     find_package(casadi REQUIRED)
     find_package(Threads REQUIRED)
     # Normal NLPs
-    add_library(casadi-loader "interop/casadi/CasADiProblem.cpp")
+    add_library(casadi-loader "interop/casadi/src/CasADiProblem.cpp")
+    target_include_directories(alpaqa PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/interop/casadi/include>
+        $<INSTALL_INTERFACE:include>)
     set_property(TARGET casadi-loader
         PROPERTY OUTPUT_NAME alpaqa-casadi-loader)
     target_link_libraries(casadi-loader
@@ -86,7 +88,10 @@ cmake_dependent_option(ALPAQA_WITH_CASADI_OCP
 
 # Optimal control problems
 if (ALPAQA_WITH_CASADI_OCP)
-    add_library(casadi-ocp-loader "interop/casadi/CasADiControlProblem.cpp")
+    add_library(casadi-ocp-loader "interop/casadi/src/CasADiControlProblem.cpp")
+    target_include_directories(alpaqa PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/interop/casadi/include>
+        $<INSTALL_INTERFACE:include>)
     set_property(TARGET casadi-ocp-loader
         PROPERTY OUTPUT_NAME alpaqa-casadi-ocp-loader)
     target_link_libraries(casadi-ocp-loader
@@ -102,18 +107,20 @@ if (ALPAQA_WITH_CASADI_OCP)
 endif()
 
 if (CMAKE_DL_LIBS)
-    add_library(dl-headers INTERFACE)
-    # TODO: move to independent folder
-    target_include_directories(dl-headers INTERFACE
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    add_library(dl-api INTERFACE)
+    target_include_directories(dl-api INTERFACE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/interop/dl-api/include>
         $<INSTALL_INTERFACE:include>)
-    add_library(alpaqa::dl-headers ALIAS dl-headers)
-    list(APPEND ALPAQA_INSTALL_TARGETS dl-headers)
-    add_library(dl-loader "interop/dl/dl-problem.cpp")
+    add_library(alpaqa::dl-api ALIAS dl-api)
+    list(APPEND ALPAQA_INSTALL_TARGETS dl-api)
+    add_library(dl-loader "interop/dl/src/dl-problem.cpp")
+    target_include_directories(dl-loader PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/interop/dl/include>
+        $<INSTALL_INTERFACE:include>)
     set_property(TARGET dl-loader
         PROPERTY OUTPUT_NAME alpaqa-dl-loader)
     target_link_libraries(dl-loader
-        PUBLIC alpaqa::alpaqa alpaqa::dl-headers
+        PUBLIC alpaqa::alpaqa alpaqa::dl-api
         PRIVATE ${CMAKE_DL_LIBS} alpaqa::warnings)
     add_library(alpaqa::dl-loader ALIAS dl-loader)
     list(APPEND ALPAQA_INSTALL_TARGETS dl-loader)
