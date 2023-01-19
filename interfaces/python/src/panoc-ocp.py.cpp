@@ -25,6 +25,7 @@ void register_panoc_ocp(py::module_ &m) {
     using PANOCOCPParams = alpaqa::PANOCOCPParams<config_t>;
     py::class_<PANOCOCPParams>(m, "PANOCOCPParams",
                                "C++ documentation: :cpp:class:`alpaqa::PANOCOCPParams`")
+        .def(py::init(&dict_to_struct<PANOCOCPParams>))
         .def(py::init(&kwargs_to_struct<PANOCOCPParams>))
         .def("to_dict", &struct_to_dict<PANOCOCPParams>)
         // clang-format off
@@ -42,6 +43,7 @@ void register_panoc_ocp(py::module_ &m) {
         .def_readwrite("gn_sticky", &PANOCOCPParams::gn_sticky)
         .def_readwrite("reset_lbfgs_on_gn_step", &PANOCOCPParams::reset_lbfgs_on_gn_step)
         .def_readwrite("lqr_factor_cholesky", &PANOCOCPParams::lqr_factor_cholesky)
+        .def_readwrite("lbfgs_params", &PANOCOCPParams::lbfgs_params)
         .def_readwrite("print_interval", &PANOCOCPParams::print_interval)
         .def_readwrite("print_precision", &PANOCOCPParams::print_precision)
         .def_readwrite("quadratic_upperbound_tolerance_factor", &PANOCOCPParams::quadratic_upperbound_tolerance_factor)
@@ -83,21 +85,35 @@ void register_panoc_ocp(py::module_ &m) {
             "fpr", [](const PANOCOCPProgressInfo &p) { return std::sqrt(p.norm_sq_p) / p.γ; },
             "Fixed-point residual :math:`\\left\\|p\\right\\| / \\gamma`");
 
-    using PANOCOCPSolver                      = alpaqa::PANOCOCPSolver<config_t>;
-    using ControlProblem                      = typename PANOCOCPSolver::Problem;
-    auto panoc_ocp_independent_solve_unconstr = [](PANOCOCPSolver &solver,
-                                                   const ControlProblem &problem, real_t ε,
-                                                   std::optional<vec> u, bool async) {
-        auto N  = problem.get_N();
-        auto nu = problem.get_nu();
-        if (u)
-            alpaqa::util::check_dim<config_t>("u", *u, nu * N);
-        else
-            u = vec::Zero(nu * N);
-        auto invoke_solver = [&] { return solver(problem, ε, *u); };
-        auto &&stats       = async_solve(async, solver, invoke_solver, problem);
-        return std::make_tuple(std::move(*u), alpaqa::conv::stats_to_dict(stats));
-    };
+    using PANOCOCPSolver = alpaqa::PANOCOCPSolver<config_t>;
+    using ControlProblem = typename PANOCOCPSolver::Problem;
+    auto panoc_ocp_independent_solve_unconstr =
+        [](PANOCOCPSolver &solver, const ControlProblem &problem, real_t ε, std::optional<vec> u,
+           std::optional<vec> y, std::optional<vec> μ, bool async) {
+            auto N    = problem.get_N();
+            auto nu   = problem.get_nu();
+            auto nc   = problem.get_nc();
+            auto nc_N = problem.get_nc_N();
+            if (u)
+                alpaqa::util::check_dim<config_t>("u", *u, nu * N);
+            else
+                u = vec::Zero(nu * N);
+            if (y)
+                alpaqa::util::check_dim<config_t>("y", *y, nc * N + nc_N);
+            else if (nc * N + nc_N == 0)
+                y = vec{};
+            else
+                throw std::invalid_argument("Missing argument y");
+            if (μ)
+                alpaqa::util::check_dim<config_t>("μ", *μ, (nc == 0 && nc_N == 0) ? 0 : (N + 1));
+            else if (nc * N + nc_N == 0)
+                μ = vec{};
+            else
+                throw std::invalid_argument("Missing argument μ");
+            auto invoke_solver = [&] { return solver(problem, ε, *u, *y, *μ); };
+            auto &&stats       = async_solve(async, solver, invoke_solver, problem);
+            return std::make_tuple(std::move(*u), alpaqa::conv::stats_to_dict(stats));
+        };
 
     py::class_<PANOCOCPSolver>(m, "PANOCOCPSolver",
                                "C++ documentation: :cpp:class:`alpaqa::PANOCOCPSolver`")
@@ -113,11 +129,13 @@ void register_panoc_ocp(py::module_ &m) {
             [](const PANOCOCPSolver &self, py::dict) { return PANOCOCPSolver{self}; }, "memo"_a)
         // Call
         .def("__call__", panoc_ocp_independent_solve_unconstr, "problem"_a, "ε"_a,
-             "u"_a = py::none(), "asynchronous"_a = true, //
+             "u"_a = py::none(), "y"_a = py::none(), "μ"_a = py::none(), "asynchronous"_a = true,
              "Solve.\n\n"
              ":param problem: Problem to solve\n"
              ":param ε: Desired tolerance\n"
              ":param u: Initial guess\n"
+             ":param y: Lagrange multipliers\n"
+             ":param μ: Penalty factors\n"
              ":param asynchronous: Release the GIL and run the solver on a separate thread\n"
              ":return: * Solution :math:`u`\n"
              "         * Statistics\n\n")

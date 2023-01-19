@@ -24,6 +24,7 @@ pybind11_add_module(_alpaqa MODULE
     "src/panoc.py.cpp"
     "src/panoc-directions.py.cpp"
     "src/panoc-ocp.py.cpp"
+    "src/ocp.py.cpp"
     "src/problems.py.cpp"
     "src/control-problems.py.cpp"
     "src/params/lbfgs-direction-params.cpp"

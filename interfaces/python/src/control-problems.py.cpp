@@ -72,6 +72,7 @@ void register_control_problems(py::module_ &m) {
             .def_readonly("nh", &CasADiControlProblem::nh)
             .def_readonly("nh_N", &CasADiControlProblem::nh_N)
             .def_readonly("nc", &CasADiControlProblem::nc)
+            .def_readonly("nc_N", &CasADiControlProblem::nc_N)
             .def_readwrite("U", &CasADiControlProblem::U)
             .def_readwrite("D", &CasADiControlProblem::D)
             .def_readwrite("D_N", &CasADiControlProblem::D_N)

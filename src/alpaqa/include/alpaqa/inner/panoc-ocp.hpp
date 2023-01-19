@@ -1,5 +1,6 @@
 #pragma once
 
+#include <alpaqa/accelerators/lbfgs.hpp>
 #include <alpaqa/inner/panoc.hpp>
 #include <alpaqa/problem/ocproblem.hpp>
 
@@ -43,6 +44,9 @@ struct PANOCOCPParams {
     bool gn_sticky              = true;
     bool reset_lbfgs_on_gn_step = false;
     bool lqr_factor_cholesky    = true;
+
+    /// L-BFGS parameters (e.g. memory).
+    LBFGSParams<config_t> lbfgs_params;
 
     /// When to print progress. If set to zero, nothing will be printed.
     /// If set to N != 0, progress is printed every N iterations.
@@ -131,7 +135,9 @@ class PANOCOCPSolver {
 
     Stats operator()(const Problem &problem, // in
                      real_t ε,               // in
-                     rvec u);                // inout
+                     rvec u,                 // inout
+                     crvec y = vec{},        // in
+                     crvec μ = vec{});       // in
 
     /// Specify a callable that is invoked with some intermediate results on
     /// each iteration of the algorithm.

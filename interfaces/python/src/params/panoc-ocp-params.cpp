@@ -1,4 +1,5 @@
 #include "panoc-ocp-params.hpp"
+#include "lbfgs-params.hpp"
 
 template <alpaqa::Config Conf>
 const dict_to_struct_table_t<alpaqa::PANOCOCPParams<Conf>>
@@ -18,6 +19,7 @@ const dict_to_struct_table_t<alpaqa::PANOCOCPParams<Conf>>
         {"gn_sticky", &alpaqa::PANOCOCPParams<Conf>::gn_sticky},
         {"reset_lbfgs_on_gn_step", &alpaqa::PANOCOCPParams<Conf>::reset_lbfgs_on_gn_step},
         {"lqr_factor_cholesky", &alpaqa::PANOCOCPParams<Conf>::lqr_factor_cholesky},
+        {"lbfgs_params", &alpaqa::PANOCOCPParams<Conf>::lbfgs_params},
         {"print_interval", &alpaqa::PANOCOCPParams<Conf>::print_interval},
         {"print_precision", &alpaqa::PANOCOCPParams<Conf>::print_precision},
         {"quadratic_upperbound_tolerance_factor", &alpaqa::PANOCOCPParams<Conf>::quadratic_upperbound_tolerance_factor},

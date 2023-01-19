@@ -27,6 +27,9 @@ template <alpaqa::Config Conf>
 void register_panoc_ocp(py::module_ &m);
 
 template <alpaqa::Config Conf>
+void register_ocp(py::module_ &m);
+
+template <alpaqa::Config Conf>
 void register_alm(py::module_ &m);
 
 template <alpaqa::Config Conf>
@@ -37,6 +40,7 @@ void register_classes_for(py::module_ &m) {
     register_panoc_directions<Conf>(m);
     register_panoc<Conf>(m);
     register_panoc_ocp<Conf>(m);
+    register_ocp<Conf>(m);
     register_alm<Conf>(m);
 }
 
@@ -47,7 +51,7 @@ PYBIND11_MODULE(MODULE_NAME, m) {
 #if ALPAQA_HAVE_CASADI
     m.attr("with_casadi") = true;
 #else
-    m.attr("with_casadi") = false;
+    m.attr("with_casadi")     = false;
 #endif
 #if ALPAQA_HAVE_CASADI_OCP
     m.attr("with_casadi_ocp") = true;

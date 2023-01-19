@@ -1,8 +1,8 @@
 #pragma once
 
-#include <alpaqa/config/config.hpp>
 #include <alpaqa/casadi/CasADiControlProblem.hpp>
 #include <alpaqa/casadi/CasADiFunctionWrapper.hpp>
+#include <alpaqa/config/config.hpp>
 #include <alpaqa/util/not-implemented.hpp>
 #include <alpaqa/util/sparse-ops.hpp>
 #include "CasADiLoader-util.hpp"
@@ -117,7 +117,8 @@ CasADiControlProblem<Conf>::CasADiControlProblem(const std::string &so_name,
             throw std::invalid_argument(
                 "Invalid number of output arguments: got "s +
                 std::to_string(cfun.n_in()) + ", should be 1.");
-        nc = static_cast<length_t>(cfun.size1_out(0));
+        nc   = static_cast<length_t>(cfun.size1_out(0));
+        nc_N = nc; // TODO
         CasADiFunctionEvaluator<Conf, 2, 1> c{std::move(cfun)};
         c.validate_dimensions({dim(nx, 1), dim(p, 1)}, {dim(nc, 1)});
         return c;

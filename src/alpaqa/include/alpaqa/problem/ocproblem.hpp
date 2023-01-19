@@ -321,6 +321,7 @@ inline void check_finiteness(const auto &v, std::string_view msg) {
 }
 template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::get_U(Box &U) const { return call(vtable.get_U, U); }
 template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::get_D(Box &D) const { return call(vtable.get_D, D); }
+template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::get_D_N(Box &D_N) const { return call(vtable.get_D_N, D_N); }
 template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::get_x_init(rvec x_init) const { call(vtable.get_x_init, x_init); check_finiteness(x_init, "Infinite output of get_x_init"); }
 template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::eval_f(index_t timestep, crvec x, crvec u, rvec fxu) const { check_finiteness(x, "Infinite input x of f"); check_finiteness(u, "Infinite input u of f"); call(vtable.eval_f, timestep, x, u, fxu); check_finiteness(fxu, "Infinite output of f"); }
 template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::eval_jac_f(index_t timestep, crvec x, crvec u, rmat J_fxu) const { check_finiteness(x, "Infinite input x of jac_f"); check_finiteness(u, "Infinite input u of jac_f"); call(vtable.eval_jac_f, timestep, x, u, J_fxu); check_finiteness(J_fxu.reshaped(), "Infinite output of jac_f"); }

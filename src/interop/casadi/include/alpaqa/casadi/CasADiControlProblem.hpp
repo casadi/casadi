@@ -17,7 +17,7 @@ class CasADiControlProblem {
   public:
     USING_ALPAQA_CONFIG(Conf);
     using Box = alpaqa::Box<config_t>;
-    length_t N, nx, nu, nh, nh_N, nc;
+    length_t N, nx, nu, nh, nh_N, nc, nc_N;
     vec x_init;
     vec param;
     Box U, D, D_N;
@@ -75,7 +75,7 @@ class CasADiControlProblem {
     [[nodiscard]] length_t get_nh() const { return nh; }
     [[nodiscard]] length_t get_nh_N() const { return nh_N; }
     [[nodiscard]] length_t get_nc() const { return nc; }
-    [[nodiscard]] length_t get_nc_N() const { return nc; } // TODO
+    [[nodiscard]] length_t get_nc_N() const { return nc_N; }
 
   private:
     using Functions = casadi_loader::CasADiControlFunctionsWithParam<Conf>;
