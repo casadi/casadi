@@ -113,11 +113,11 @@ auto PANOCOCPSolver<Conf>::operator()(
                     problem.eval_add_Q(k, xuk, hk, out);
                 else
                     problem.eval_add_Q_N(xk, hk, out);
-                auto ck = vars.ck(storage, k);
-                auto yk = y.segment(k * nc, k < N ? nc : nc_N);
-                auto ζ  = ck + (real_t(1) / μ(k)) * yk;
                 if (k < N) {
                     if (nc > 0) {
+                        auto ck = vars.ck(storage, k);
+                        auto yk = y.segment(k * nc, k < N ? nc : nc_N);
+                        auto ζ  = ck + (real_t(1) / μ(k)) * yk;
                         for (index_t i = 0; i < nc; ++i)
                             work_ck(i) = μ(k) * (ζ(i) < D.lowerbound(i) ||
                                                  ζ(i) > D.upperbound(i));
@@ -125,6 +125,9 @@ auto PANOCOCPSolver<Conf>::operator()(
                     }
                 } else {
                     if (nc_N > 0) {
+                        auto ck = vars.ck(storage, k);
+                        auto yk = y.segment(k * nc, k < N ? nc : nc_N);
+                        auto ζ  = ck + (real_t(1) / μ(k)) * yk;
                         for (index_t i = 0; i < nc_N; ++i)
                             work_cN(i) = μ(k) * (ζ(i) < D_N.lowerbound(i) ||
                                                  ζ(i) > D_N.upperbound(i));
@@ -443,22 +446,49 @@ auto PANOCOCPSolver<Conf>::operator()(
     auto print_real3 = [&](real_t x) {
         return float_to_str_vw(print_buf, x, 3);
     };
-    auto print_progress = [&](unsigned k, real_t φₖ, real_t ψₖ, crvec grad_ψₖ,
-                              real_t pₖᵀpₖ, crvec qₖ, real_t γₖ, real_t τₖ,
-                              real_t εₖ, bool did_gn, length_t nJ,
-                              real_t min_rcond) {
-        *os << "[PANOC] " << std::setw(6) << k << ": φγ = " << print_real(φₖ)
-            << ", ψ = " << print_real(ψₖ)
-            << ", ‖∇ψ‖ = " << print_real(grad_ψₖ.norm())
-            << ", ‖p‖ = " << print_real(std::sqrt(pₖᵀpₖ))
-            << ", γ = " << print_real(γₖ) << ", εₖ = " << print_real(εₖ);
-        if (k > 0)
-            *os << ", τ = " << print_real3(τₖ)
-                << ", ‖q‖ = " << print_real(qₖ.norm())
-                << ", #J =" << std::setw(5) << nJ
-                << ", rcond = " << print_real3(min_rcond) << ", "
-                << (did_gn ? "GN" : "L-BFGS");
-        *os << std::endl; // Flush for Python buffering
+    [[maybe_unused]] auto print_progress =
+        [&](unsigned k, real_t φₖ, real_t ψₖ, crvec grad_ψₖ, real_t pₖᵀpₖ,
+            crvec qₖ, real_t γₖ, real_t τₖ, real_t εₖ, bool did_gn, length_t nJ,
+            real_t min_rcond) {
+            *os << "[PANOC] " << std::setw(6) << k
+                << ": φγ = " << print_real(φₖ) << ", ψ = " << print_real(ψₖ)
+                << ", ‖∇ψ‖ = " << print_real(grad_ψₖ.norm())
+                << ", ‖p‖ = " << print_real(std::sqrt(pₖᵀpₖ))
+                << ", γ = " << print_real(γₖ) << ", εₖ = " << print_real(εₖ);
+            if (k > 0)
+                *os << ", τ = " << print_real3(τₖ)
+                    << ", ‖q‖ = " << print_real(qₖ.norm())
+                    << ", #J =" << std::setw(5) << nJ
+                    << ", rcond = " << print_real3(min_rcond) << ", "
+                    << (did_gn ? "GN" : "L-BFGS");
+            *os << std::endl; // Flush for Python buffering
+        };
+
+    auto print_progress_1 = [&](unsigned k, real_t φₖ, real_t ψₖ, crvec grad_ψₖ,
+                                real_t pₖᵀpₖ, real_t γₖ, real_t εₖ) {
+        if (k == 0)
+            *os << "┌─[PANOC]\n";
+        else
+            *os << "├─ " << std::setw(6) << k << '\n';
+        *os << "│   φγ = " << print_real(φₖ)               //
+            << ",    ψ = " << print_real(ψₖ)               //
+            << ", ‖∇ψ‖ = " << print_real(grad_ψₖ.norm())   //
+            << ",  ‖p‖ = " << print_real(std::sqrt(pₖᵀpₖ)) //
+            << ",    γ = " << print_real(γₖ)               //
+            << ",    ε = " << print_real(εₖ) << '\n';
+    };
+    auto print_progress_2 = [&](crvec qₖ, real_t τₖ, bool did_gn, length_t nJ,
+                                real_t min_rcond) {
+        *os << "│  ‖q‖ = " << print_real(qₖ.norm())                       //
+            << ",   #J = " << std::setw(7 + params.print_precision) << nJ //
+            << ", cond = " << print_real3(real_t(1) / min_rcond)          //
+            << ",    τ = " << print_real3(τₖ)                             //
+            << ",    " << (did_gn ? "GN" : "L-BFGS")                      //
+            << std::endl; // Flush for Python buffering
+    };
+    auto print_progress_n = [&](SolverStatus status) {
+        *os << "└─ " << status << " ──"
+            << std::endl; // Flush for Python buffering
     };
 
     // Initialize inputs and initial state (do not simulate states yet) --------
@@ -521,11 +551,11 @@ auto PANOCOCPSolver<Conf>::operator()(
                                          curr->p, curr->pᵀp, next->xû, next->p);
 
         // Print progress ------------------------------------------------------
-
-        if (params.print_interval != 0 && k % params.print_interval == 0)
-            print_progress(k, curr->fbe(), curr->ψu, curr->grad_ψ, curr->pᵀp, q,
-                           curr->γ, τ, εₖ, did_gn,
-                           did_gn ? J.sizes().sum() : nJ, lqr.min_rcond);
+        bool do_print =
+            params.print_interval != 0 && k % params.print_interval == 0;
+        if (do_print)
+            print_progress_1(k, curr->fbe(), curr->ψu, curr->grad_ψ, curr->pᵀp,
+                             curr->γ, εₖ);
         if (progress_cb) {
             ScopedMallocAllower ma;
             alpaqa::detail::Timed t{s.time_progress_callback};
@@ -556,6 +586,12 @@ auto PANOCOCPSolver<Conf>::operator()(
         auto stop_status =
             check_all_stop_conditions(time_elapsed, k, εₖ, no_progress);
         if (stop_status != SolverStatus::Busy) {
+            bool do_final_print = params.print_interval != 0;
+            if (!do_print && do_final_print)
+                print_progress_1(k, curr->fbe(), curr->ψu, curr->grad_ψ,
+                                 curr->pᵀp, curr->γ, εₖ);
+            if (do_print || do_final_print)
+                print_progress_n(stop_status);
             assign_extract_u(curr->xû, u);
             s.iterations   = k;
             s.ε            = εₖ;
@@ -761,6 +797,11 @@ auto PANOCOCPSolver<Conf>::operator()(
                     LBFGS<config_t>::Sign::Positive, force);
             }
         }
+
+        // Print ---------------------------------------------------------------
+        if (do_print && k != 0)
+            print_progress_2(q, τ, did_gn, did_gn ? J.sizes().sum() : nJ,
+                             lqr.min_rcond);
 
         // Advance step --------------------------------------------------------
         std::swap(curr, next);
