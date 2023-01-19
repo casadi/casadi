@@ -1,4 +1,4 @@
-#include <params/panoc-params.hpp>
+#include "panoc-params.hpp"
 
 template <alpaqa::Config Conf>
 const dict_to_struct_table_t<alpaqa::PANOCParams<Conf>>

@@ -35,6 +35,7 @@ void register_panoc(py::module_ &m) {
     py::class_<LipschitzEstimateParams>(
         m, "LipschitzEstimateParams",
         "C++ documentation: :cpp:class:`alpaqa::LipschitzEstimateParams`")
+        .def(py::init(&dict_to_struct<LipschitzEstimateParams>))
         .def(py::init(&kwargs_to_struct<LipschitzEstimateParams>))
         .def("to_dict", &struct_to_dict<LipschitzEstimateParams>)
         .def_readwrite("L_0", &LipschitzEstimateParams::L_0)
@@ -44,6 +45,7 @@ void register_panoc(py::module_ &m) {
 
     using PANOCParams = alpaqa::PANOCParams<config_t>;
     py::class_<PANOCParams>(m, "PANOCParams", "C++ documentation: :cpp:class:`alpaqa::PANOCParams`")
+        .def(py::init(&dict_to_struct<PANOCParams>))
         .def(py::init(&kwargs_to_struct<PANOCParams>))
         .def("to_dict", &struct_to_dict<PANOCParams>)
         // clang-format off

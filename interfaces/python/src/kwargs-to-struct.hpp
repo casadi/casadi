@@ -84,7 +84,8 @@ void dict_to_struct_helper(T &t, const py::dict &kwargs) {
 template <class T>
     requires(!requires { dict_to_struct_table<T>::table; })
 void dict_to_struct_helper(T &, const py::dict &) {
-    throw std::runtime_error("Cannot convert dict to '" + demangled_typename(typeid(T)) + '\'');
+    throw std::runtime_error("No known conversion from Python dict to C++ type '" +
+                             demangled_typename(typeid(T)) + '\'');
 }
 
 template <class T>
