@@ -140,7 +140,7 @@ def generate_and_compile_casadi_control_problem(
     cachefile = join(cachedir, 'problems')
 
     key = base64.b64encode(pickle.dumps(
-        (f, name))).decode('ascii')
+        (f, l, l_N, h, h_N, c, c_N, name))).decode('ascii')
 
     os.makedirs(cachedir, exist_ok=True)
     with shelve.open(cachefile) as cache:
