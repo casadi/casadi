@@ -118,6 +118,8 @@ struct OCPEvaluator {
     using Box     = alpaqa::Box<config_t>;
     const Problem *problem;
     OCPVars vars;
+    mutable vec work_x{vars.nc() > 0 || vars.nc_N() ? vars.nx() : 0};
+    mutable vec work_λ{vars.nx()};
     mutable vec work_c{std::max(vars.nc(), vars.nc_N())};
     mutable vec work_R{problem->get_R_work_size()};
     mutable vec work_S{problem->get_S_work_size()};
@@ -199,15 +201,16 @@ struct OCPEvaluator {
     }
 
     /// @pre x, u, h and c initialized (i.e. forward was called)
-    void backward(rvec storage, rvec g, rvec λ, rvec w, const auto &qr,
-                  const auto &q_N, const Box &D, const Box &D_N, crvec μ,
-                  crvec y) const {
+    void backward(rvec storage, rvec g, const auto &qr, const auto &q_N,
+                  const Box &D, const Box &D_N, crvec μ, crvec y) const {
         auto N    = this->N();
         auto nc   = vars.nc();
         auto nc_N = vars.nc_N();
         auto nu   = vars.nu();
         auto nx   = vars.nx();
+        auto &w   = work_x;
         auto &v   = work_c;
+        auto &λ   = work_λ;
         assert((nc <= 0 && nc_N <= 0) || w.size() == nx);
         assert((nc <= 0 && nc_N <= 0) || v.size() == std::max(nc, nc_N));
         auto qN = q_N();
@@ -294,6 +297,7 @@ struct OCPEvaluator {
         check_finiteness(out.reshaped(), "Qk output");
     }
 
+    /// @post initialize work_R
     void Rk(rvec storage, index_t k, crindexvec mask, rmat out) {
         check_finiteness(out.reshaped(), "Rk input");
         auto hk  = vars.hk(storage, k);
@@ -302,6 +306,7 @@ struct OCPEvaluator {
         check_finiteness(out.reshaped(), "Rk output");
     }
 
+    /// @post initialize work_S
     void Sk(rvec storage, index_t k, crindexvec mask, rmat out) {
         check_finiteness(out.reshaped(), "Sk input");
         auto hk  = vars.hk(storage, k);
@@ -310,6 +315,7 @@ struct OCPEvaluator {
         check_finiteness(out.reshaped(), "Sk output");
     }
 
+    /// @pre initialized work_R
     void Rk_prod(rvec storage, index_t k, crindexvec mask_J, crindexvec mask_K,
                  crvec v, rvec out) const {
 
@@ -322,6 +328,7 @@ struct OCPEvaluator {
         check_finiteness(out.reshaped(), "Rk_prod output");
     }
 
+    /// @pre initialized work_S
     void Sk_prod(rvec storage, index_t k, crindexvec mask_K, crvec v,
                  rvec out) const {
         check_finiteness(v(mask_K), "Sk_prod input v");
