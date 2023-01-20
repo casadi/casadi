@@ -89,7 +89,6 @@ struct StatefulLQRFactor {
             mmat BiJ{BiJ_sto.data(), nx, nJ};
             mmat PBiJ{PBiJ_sto.data(), nx, nJ};
             auto &&ti = t.topRows(nJ);
-            // todo: make K contiguous
             mmat gain_Ki{gain_K.col(i).data(), nJ, nx};
             auto &&ei = e.col(i).topRows(nJ);
             // R̅ ← R + Bᵀ P B
@@ -101,7 +100,7 @@ struct StatefulLQRFactor {
             PA.noalias() = P * Ai;
             S̅.noalias()  = BiJ.transpose() * PA;
             S(i)(Ji, S̅);
-            // y ← Pc + s
+            // c = B(·,K) u(K), y ← P c + s
             c.noalias() = Bi(all, Ki) * ui(Ki);
             y.noalias() = P * c;
             y += s;

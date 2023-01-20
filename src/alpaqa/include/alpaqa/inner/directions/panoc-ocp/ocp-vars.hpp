@@ -66,6 +66,9 @@ struct OCPVariables {
     auto xk(VectorRefLike<config_t> auto &&v, index_t t) const {
         return const_or_mut_rvec<config_t>(v.segment(t * indices.back(), nx()));
     }
+    auto x(crvec v) const {
+        return [v, this](index_t t) { return xk(v, t); };
+    }
     auto xuk(VectorRefLike<config_t> auto &&v, index_t t) const {
         return const_or_mut_rvec<config_t>(
             v.segment(t * indices.back(), nxu()));
@@ -74,6 +77,9 @@ struct OCPVariables {
         assert(t < N);
         return const_or_mut_rvec<config_t>(
             v.segment(t * indices.back() + indices[0], nu()));
+    }
+    auto u(crvec v) const {
+        return [v, this](index_t t) { return uk(v, t); };
     }
     auto hk(VectorRefLike<config_t> auto &&v, index_t t) const {
         return const_or_mut_rvec<config_t>(v.segment(
@@ -91,22 +97,62 @@ struct OCPVariables {
         assert(t <= N);
         return const_or_mut_rvec<config_t>(v.segment(t * nxu(), nx()));
     }
+    auto q(crvec v) const {
+        return [v, this](index_t t) { return qk(v, t); };
+    }
+    auto qN_mut(vec &v) const {
+        return [&v, this]() { return qk(v, N); };
+    }
     auto rk(VectorRefLike<config_t> auto &&v, index_t t) const {
         assert(t < N);
         return const_or_mut_rvec<config_t>(v.segment(t * nxu() + nx(), nu()));
     }
+    auto r(crvec v) const {
+        return [v, this](index_t t) { return rk(v, t); };
+    }
     auto qrk(VectorRefLike<config_t> auto &&v, index_t t) const {
         assert(t < N);
         return const_or_mut_rvec<config_t>(v.segment(t * nxu(), nxu()));
+    }
+    auto qr(crvec v) const {
+        return [v, this](index_t t) { return qrk(v, t); };
+    }
+    auto qr_mut(vec &v) const {
+        return [&v, this](index_t t) { return qrk(v, t); };
     }
 
     mat create_AB() const { return mat(nx(), nxu() * N); }
     rmat ABk(rmat AB, index_t t) const {
         return AB.middleCols(t * nxu(), nxu());
     }
+    auto ABk(mat &AB, index_t t) const {
+        return AB.middleCols(t * nxu(), nxu());
+    }
+    crmat ABk(crmat AB, index_t t) const {
+        return AB.middleCols(t * nxu(), nxu());
+    }
+    auto AB(crmat AB) const {
+        return [AB, this](index_t t) { return ABk(AB, t); };
+    }
     rmat Ak(rmat AB, index_t t) const { return AB.middleCols(t * nxu(), nx()); }
+    crmat Ak(crmat AB, index_t t) const {
+        return AB.middleCols(t * nxu(), nx());
+    }
+    auto Ak(mat &AB, index_t t) const { return AB.middleCols(t * nxu(), nx()); }
+    auto A(crmat AB) const {
+        return [AB, this](index_t t) { return Ak(AB, t); };
+    }
     rmat Bk(rmat AB, index_t t) const {
         return AB.middleCols(t * nxu() + nx(), nu());
+    }
+    crmat Bk(crmat AB, index_t t) const {
+        return AB.middleCols(t * nxu() + nx(), nu());
+    }
+    auto Bk(mat &AB, index_t t) const {
+        return AB.middleCols(t * nxu() + nx(), nu());
+    }
+    auto B(crmat AB) const {
+        return [AB, this](index_t t) { return Bk(AB, t); };
     }
 };
 
@@ -263,7 +309,7 @@ struct OCPEvaluator {
         }
     }
 
-    void Qk(rvec storage, crvec y, crvec μ, const Box &D, const Box &D_N,
+    void Qk(crvec storage, crvec y, crvec μ, const Box &D, const Box &D_N,
             index_t k, rmat out) const {
         auto N       = this->N();
         auto nc      = vars.nc();
@@ -296,27 +342,49 @@ struct OCPEvaluator {
         }
         check_finiteness(out.reshaped(), "Qk output");
     }
+    auto Q(crvec storage, crvec y, crvec μ, const Box &D,
+           const Box &D_N) const {
+        return [=, this, &D, &D_N](index_t k) {
+            return [=, this, &D, &D_N](rmat out) {
+                return Qk(storage, y, μ, D, D_N, k, out);
+            };
+        };
+    }
 
     /// @post initialize work_R
-    void Rk(rvec storage, index_t k, crindexvec mask, rmat out) {
+    void Rk(crvec storage, index_t k, crindexvec mask, rmat out) {
         check_finiteness(out.reshaped(), "Rk input");
         auto hk  = vars.hk(storage, k);
         auto xuk = vars.xuk(storage, k);
         problem->eval_add_R_masked(k, xuk, hk, mask, out, work_R);
         check_finiteness(out.reshaped(), "Rk output");
     }
+    auto R(crvec storage) {
+        return [=, this](index_t k) {
+            return [=, this](crindexvec mask, rmat out) {
+                return Rk(storage, k, mask, out);
+            };
+        };
+    }
 
     /// @post initialize work_S
-    void Sk(rvec storage, index_t k, crindexvec mask, rmat out) {
+    void Sk(crvec storage, index_t k, crindexvec mask, rmat out) {
         check_finiteness(out.reshaped(), "Sk input");
         auto hk  = vars.hk(storage, k);
         auto xuk = vars.xuk(storage, k);
         problem->eval_add_S_masked(k, xuk, hk, mask, out, work_S);
         check_finiteness(out.reshaped(), "Sk output");
     }
+    auto S(crvec storage) {
+        return [=, this](index_t k) {
+            return [=, this](crindexvec mask, rmat out) {
+                return Sk(storage, k, mask, out);
+            };
+        };
+    }
 
     /// @pre initialized work_R
-    void Rk_prod(rvec storage, index_t k, crindexvec mask_J, crindexvec mask_K,
+    void Rk_prod(crvec storage, index_t k, crindexvec mask_J, crindexvec mask_K,
                  crvec v, rvec out) const {
 
         check_finiteness(v(mask_K), "Rk_prod input v");
@@ -327,9 +395,17 @@ struct OCPEvaluator {
                                         work_R);
         check_finiteness(out.reshaped(), "Rk_prod output");
     }
+    auto R_prod(crvec storage) const {
+        return [=, this](index_t k) {
+            return [=, this](crindexvec mask_J, crindexvec mask_K, crvec v,
+                             rvec out) {
+                return Rk_prod(storage, k, mask_J, mask_K, v, out);
+            };
+        };
+    }
 
     /// @pre initialized work_S
-    void Sk_prod(rvec storage, index_t k, crindexvec mask_K, crvec v,
+    void Sk_prod(crvec storage, index_t k, crindexvec mask_K, crvec v,
                  rvec out) const {
         check_finiteness(v(mask_K), "Sk_prod input v");
         check_finiteness(out.reshaped(), "Sk_prod input");
@@ -337,6 +413,13 @@ struct OCPEvaluator {
         auto xuk = vars.xuk(storage, k);
         problem->eval_add_S_prod_masked(k, xuk, hk, mask_K, v, out, work_S);
         check_finiteness(out.reshaped(), "Sk_prod output");
+    }
+    auto S_prod(crvec storage) const {
+        return [=, this](index_t k) {
+            return [=, this](crindexvec mask_K, crvec v, rvec out) {
+                return Sk_prod(storage, k, mask_K, v, out);
+            };
+        };
     }
 };
 
