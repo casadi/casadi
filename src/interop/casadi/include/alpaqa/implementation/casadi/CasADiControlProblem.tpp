@@ -388,11 +388,11 @@ void CasADiControlProblem<Conf>::eval_add_S_prod_masked(index_t, crvec, crvec,
     using cmspmat = Eigen::Map<const spmat>;
     using Eigen::indexing::all;
     if (sparse.is_dense()) {
-        auto Sᵀ = cmmat{work.data(), nu, nu}.transpose();
+        auto Sᵀ = cmmat{work.data(), nu, nx}.transpose();
         out.noalias() += Sᵀ(all, mask_K) * v(mask_K);
     } else {
         cmspmat S{
-            nu, nu, sparse.nnz(), sparse.colind(), sparse.row(), work.data(),
+            nu, nx, sparse.nnz(), sparse.colind(), sparse.row(), work.data(),
         };
         // out += S(mask_K,:)ᵀ * v(mask_K);
         util::sparse_matvec_add_transpose_masked_rows(S, v, out, mask_K);
