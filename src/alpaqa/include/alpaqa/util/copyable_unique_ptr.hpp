@@ -23,6 +23,8 @@ struct copyable_unique_ptr {
 
     std::unique_ptr<T> &operator->() { return ptr; }
     const std::unique_ptr<T> &operator->() const { return ptr; }
+    auto &operator*() { return *ptr; }
+    auto &operator*() const { return *ptr; }
 
     std::unique_ptr<T> ptr;
 };

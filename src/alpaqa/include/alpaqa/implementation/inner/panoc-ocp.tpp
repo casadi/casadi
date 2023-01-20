@@ -87,8 +87,7 @@ auto PANOCOCPSolver<Conf>::operator()(
     Box<config_t> D_N = Box<config_t>::NaN(nc_N);
 
     // Workspace storage
-    vec work_2x(nx * 2), work_λ(nx);
-    auto work_x = work_2x.topRows(nx);
+    vec work_2x(nx * 2);
 
     // ALM
     assert((nc == 0 && nc_N == 0) || μ.size() == N + 1);
@@ -296,8 +295,7 @@ auto PANOCOCPSolver<Conf>::operator()(
     // @post   @ref Iterate::grad_ψ, q, q_N
     auto eval_backward = [&](Iterate &i) {
         alpaqa::detail::Timed t{s.time_backward};
-        eval.backward(i.xu, i.grad_ψ, work_λ, work_x, mut_qrk, mut_q_N, D, D_N,
-                      μ, y);
+        eval.backward(i.xu, i.grad_ψ, mut_qrk, mut_q_N, D, D_N, μ, y);
     };
 
     auto qub_violated = [this](const Iterate &i) {
@@ -349,8 +347,8 @@ auto PANOCOCPSolver<Conf>::operator()(
             }
             { // Calculate ∇ψ(x₀ + h)
                 alpaqa::detail::Timed t{s.time_backward};
-                eval.backward(work_xu, work_grad_ψ, work_λ, work_x, mut_qrk,
-                              mut_q_N, D, D_N, μ, y);
+                eval.backward(work_xu, work_grad_ψ, mut_qrk, mut_q_N, D, D_N, μ,
+                              y);
             }
             // Estimate Lipschitz constant using finite differences
             it->L = (work_grad_ψ - it->grad_ψ).norm() / norm_h;
@@ -701,7 +699,7 @@ auto PANOCOCPSolver<Conf>::operator()(
         }
 
         // Print ---------------------------------------------------------------
-        if (do_print && k != 0)
+        if (do_print && (k != 0 || did_gn))
             print_progress_2(q, τ, did_gn, did_gn ? J.sizes().sum() : nJ,
                              lqr.min_rcond);
 
