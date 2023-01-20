@@ -366,24 +366,6 @@ auto PANOCOCPSolver<Conf>::operator()(
     auto print_real3 = [&](real_t x) {
         return float_to_str_vw(print_buf, x, 3);
     };
-    [[maybe_unused]] auto print_progress =
-        [&](unsigned k, real_t φₖ, real_t ψₖ, crvec grad_ψₖ, real_t pₖᵀpₖ,
-            crvec qₖ, real_t γₖ, real_t τₖ, real_t εₖ, bool did_gn, length_t nJ,
-            real_t min_rcond) {
-            *os << "[PANOC] " << std::setw(6) << k
-                << ": φγ = " << print_real(φₖ) << ", ψ = " << print_real(ψₖ)
-                << ", ‖∇ψ‖ = " << print_real(grad_ψₖ.norm())
-                << ", ‖p‖ = " << print_real(std::sqrt(pₖᵀpₖ))
-                << ", γ = " << print_real(γₖ) << ", εₖ = " << print_real(εₖ);
-            if (k > 0)
-                *os << ", τ = " << print_real3(τₖ)
-                    << ", ‖q‖ = " << print_real(qₖ.norm())
-                    << ", #J =" << std::setw(5) << nJ
-                    << ", rcond = " << print_real3(min_rcond) << ", "
-                    << (did_gn ? "GN" : "L-BFGS");
-            *os << std::endl; // Flush for Python buffering
-        };
-
     auto print_progress_1 = [&](unsigned k, real_t φₖ, real_t ψₖ, crvec grad_ψₖ,
                                 real_t pₖᵀpₖ, real_t γₖ, real_t εₖ) {
         if (k == 0)
