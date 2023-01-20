@@ -87,11 +87,8 @@ auto PANOCOCPSolver<Conf>::operator()(
     Box<config_t> D_N = Box<config_t>::NaN(nc_N);
 
     // Workspace storage
-    vec work_2x(nx * 2), work_λ(nx), work_c(std::max(nc, nc_N));
-    auto work_x  = work_2x.topRows(nx);
-    auto work_cN = work_c.topRows(nc_N);
-    auto work_ck = work_c.topRows(nc);
-    vec work_R(problem.get_R_work_size()), work_S(problem.get_S_work_size());
+    vec work_2x(nx * 2), work_λ(nx);
+    auto work_x = work_2x.topRows(nx);
 
     // ALM
     assert((nc == 0 && nc_N == 0) || μ.size() == N + 1);
@@ -102,73 +99,24 @@ auto PANOCOCPSolver<Conf>::operator()(
     auto Qk  = [&](rvec storage) {
         return [&, storage](index_t k) {
             return [&, k](rmat out) {
-#ifndef NDEBUG
-                check_finiteness(out.reshaped(), "Qk input");
-#endif
                 alpaqa::detail::Timed t{s.time_hessians};
-                auto hk  = vars.hk(storage, k);
-                auto xuk = vars.xuk(storage, k);
-                auto xk  = vars.xk(storage, k);
-                if (k < N)
-                    problem.eval_add_Q(k, xuk, hk, out);
-                else
-                    problem.eval_add_Q_N(xk, hk, out);
-                if (k < N) {
-                    if (nc > 0) {
-                        auto ck = vars.ck(storage, k);
-                        auto yk = y.segment(k * nc, k < N ? nc : nc_N);
-                        auto ζ  = ck + (real_t(1) / μ(k)) * yk;
-                        for (index_t i = 0; i < nc; ++i)
-                            work_ck(i) = μ(k) * (ζ(i) < D.lowerbound(i) ||
-                                                 ζ(i) > D.upperbound(i));
-                        problem.eval_add_gn_hess_constr(k, xk, work_ck, out);
-                    }
-                } else {
-                    if (nc_N > 0) {
-                        auto ck = vars.ck(storage, k);
-                        auto yk = y.segment(k * nc, k < N ? nc : nc_N);
-                        auto ζ  = ck + (real_t(1) / μ(k)) * yk;
-                        for (index_t i = 0; i < nc_N; ++i)
-                            work_cN(i) = μ(k) * (ζ(i) < D_N.lowerbound(i) ||
-                                                 ζ(i) > D_N.upperbound(i));
-                        problem.eval_add_gn_hess_constr_N(xk, work_cN, out);
-                    }
-                }
-#ifndef NDEBUG
-                check_finiteness(out.reshaped(), "Qk output");
-#endif
+                return eval.Qk(storage, y, μ, D, D_N, k, out);
             };
         };
     };
     auto Rk = [&](rvec storage) {
         return [&, storage](index_t k) {
             return [&, k](crindexvec mask, rmat out) {
-#ifndef NDEBUG
-                check_finiteness(out.reshaped(), "Rk input");
-#endif
                 alpaqa::detail::Timed t{s.time_hessians};
-                auto hk  = vars.hk(storage, k);
-                auto xuk = vars.xuk(storage, k);
-                problem.eval_add_R_masked(k, xuk, hk, mask, out, work_R);
-#ifndef NDEBUG
-                check_finiteness(out.reshaped(), "Rk output");
-#endif
+                return eval.Rk(storage, k, mask, out);
             };
         };
     };
     auto Sk = [&](rvec storage) {
         return [&, storage](index_t k) {
             return [&, k](crindexvec mask, rmat out) {
-#ifndef NDEBUG
-                check_finiteness(out.reshaped(), "Sk input");
-#endif
                 alpaqa::detail::Timed t{s.time_hessians};
-                auto hk  = vars.hk(storage, k);
-                auto xuk = vars.xuk(storage, k);
-                problem.eval_add_S_masked(k, xuk, hk, mask, out, work_S);
-#ifndef NDEBUG
-                check_finiteness(out.reshaped(), "Sk output");
-#endif
+                return eval.Sk(storage, k, mask, out);
             };
         };
     };
@@ -176,44 +124,16 @@ auto PANOCOCPSolver<Conf>::operator()(
         return [&, storage](index_t k) {
             return [&, k](crindexvec mask_J, crindexvec mask_K, crvec v,
                           rvec out) {
-#ifndef NDEBUG
-                {
-                    ScopedMallocAllower ma;
-                    vec vv = v(mask_K);
-                    check_finiteness(vv.reshaped(), "Rk_prod input v");
-                }
-                check_finiteness(out.reshaped(), "Rk_prod input");
-#endif
                 alpaqa::detail::Timed t{s.time_hessians};
-                auto hk  = vars.hk(storage, k);
-                auto xuk = vars.xuk(storage, k);
-                problem.eval_add_R_prod_masked(k, xuk, hk, mask_J, mask_K, v,
-                                               out, work_R);
-#ifndef NDEBUG
-                check_finiteness(out.reshaped(), "Rk_prod output");
-#endif
+                return eval.Rk_prod(storage, k, mask_J, mask_K, v, out);
             };
         };
     };
     auto Sk_prod = [&](rvec storage) {
         return [&, storage](index_t k) {
             return [&, k](crindexvec mask_K, crvec v, rvec out) {
-#ifndef NDEBUG
-                {
-                    ScopedMallocAllower ma;
-                    vec vv = v(mask_K);
-                    check_finiteness(vv.reshaped(), "Sk_prod input v");
-                }
-                check_finiteness(out.reshaped(), "Sk_prod input");
-#endif
                 alpaqa::detail::Timed t{s.time_hessians};
-                auto hk  = vars.hk(storage, k);
-                auto xuk = vars.xuk(storage, k);
-                problem.eval_add_S_prod_masked(k, xuk, hk, mask_K, v, out,
-                                               work_S);
-#ifndef NDEBUG
-                check_finiteness(out.reshaped(), "Sk_prod output");
-#endif
+                return eval.Sk_prod(storage, k, mask_K, v, out);
             };
         };
     };
@@ -376,8 +296,8 @@ auto PANOCOCPSolver<Conf>::operator()(
     // @post   @ref Iterate::grad_ψ, q, q_N
     auto eval_backward = [&](Iterate &i) {
         alpaqa::detail::Timed t{s.time_backward};
-        eval.backward(i.xu, i.grad_ψ, work_λ, work_x, work_c, mut_qrk, mut_q_N,
-                      D, D_N, μ, y);
+        eval.backward(i.xu, i.grad_ψ, work_λ, work_x, mut_qrk, mut_q_N, D, D_N,
+                      μ, y);
     };
 
     auto qub_violated = [this](const Iterate &i) {
@@ -429,8 +349,8 @@ auto PANOCOCPSolver<Conf>::operator()(
             }
             { // Calculate ∇ψ(x₀ + h)
                 alpaqa::detail::Timed t{s.time_backward};
-                eval.backward(work_xu, work_grad_ψ, work_λ, work_x, work_c,
-                              mut_qrk, mut_q_N, D, D_N, μ, y);
+                eval.backward(work_xu, work_grad_ψ, work_λ, work_x, mut_qrk,
+                              mut_q_N, D, D_N, μ, y);
             }
             // Estimate Lipschitz constant using finite differences
             it->L = (work_grad_ψ - it->grad_ψ).norm() / norm_h;

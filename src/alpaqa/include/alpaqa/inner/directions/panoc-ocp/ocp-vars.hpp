@@ -118,6 +118,10 @@ struct OCPEvaluator {
     using Box     = alpaqa::Box<config_t>;
     const Problem *problem;
     OCPVars vars;
+    mutable vec work_c{std::max(vars.nc(), vars.nc_N())};
+    mutable vec work_R{problem->get_R_work_size()};
+    mutable vec work_S{problem->get_S_work_size()};
+
     OCPEvaluator(const Problem &problem) : problem{&problem}, vars{problem} {}
 
     length_t N() const { return vars.N; }
@@ -195,7 +199,7 @@ struct OCPEvaluator {
     }
 
     /// @pre x, u, h and c initialized (i.e. forward was called)
-    void backward(rvec storage, rvec g, rvec λ, rvec w, rvec v, const auto &qr,
+    void backward(rvec storage, rvec g, rvec λ, rvec w, const auto &qr,
                   const auto &q_N, const Box &D, const Box &D_N, crvec μ,
                   crvec y) const {
         auto N    = this->N();
@@ -203,6 +207,7 @@ struct OCPEvaluator {
         auto nc_N = vars.nc_N();
         auto nu   = vars.nu();
         auto nx   = vars.nx();
+        auto &v   = work_c;
         assert((nc <= 0 && nc_N <= 0) || w.size() == nx);
         assert((nc <= 0 && nc_N <= 0) || v.size() == std::max(nc, nc_N));
         auto qN = q_N();
@@ -253,6 +258,78 @@ struct OCPEvaluator {
             λ += qk;
             gt += rk;
         }
+    }
+
+    void Qk(rvec storage, crvec y, crvec μ, const Box &D, const Box &D_N,
+            index_t k, rmat out) const {
+        auto N       = this->N();
+        auto nc      = vars.nc();
+        auto nc_N    = vars.nc_N();
+        auto work_cN = work_c.topRows(nc_N);
+        auto work_ck = work_c.topRows(nc);
+        check_finiteness(out.reshaped(), "Qk input");
+        auto hk  = vars.hk(storage, k);
+        auto xuk = vars.xuk(storage, k);
+        auto xk  = vars.xk(storage, k);
+        if (k < N)
+            problem->eval_add_Q(k, xuk, hk, out);
+        else
+            problem->eval_add_Q_N(xk, hk, out);
+        if (nc > 0 || nc_N > 0) {
+            auto ck = vars.ck(storage, k);
+            auto yk = y.segment(k * nc, k < N ? nc : nc_N);
+            auto ζ  = ck + (real_t(1) / μ(k)) * yk;
+            if (k < N) {
+                for (index_t i = 0; i < nc; ++i)
+                    work_ck(i) = μ(k) * (ζ(i) < D.lowerbound(i) ||
+                                         ζ(i) > D.upperbound(i));
+                problem->eval_add_gn_hess_constr(k, xk, work_ck, out);
+            } else {
+                for (index_t i = 0; i < nc_N; ++i)
+                    work_cN(i) = μ(k) * (ζ(i) < D_N.lowerbound(i) ||
+                                         ζ(i) > D_N.upperbound(i));
+                problem->eval_add_gn_hess_constr_N(xk, work_cN, out);
+            }
+        }
+        check_finiteness(out.reshaped(), "Qk output");
+    }
+
+    void Rk(rvec storage, index_t k, crindexvec mask, rmat out) {
+        check_finiteness(out.reshaped(), "Rk input");
+        auto hk  = vars.hk(storage, k);
+        auto xuk = vars.xuk(storage, k);
+        problem->eval_add_R_masked(k, xuk, hk, mask, out, work_R);
+        check_finiteness(out.reshaped(), "Rk output");
+    }
+
+    void Sk(rvec storage, index_t k, crindexvec mask, rmat out) {
+        check_finiteness(out.reshaped(), "Sk input");
+        auto hk  = vars.hk(storage, k);
+        auto xuk = vars.xuk(storage, k);
+        problem->eval_add_S_masked(k, xuk, hk, mask, out, work_S);
+        check_finiteness(out.reshaped(), "Sk output");
+    }
+
+    void Rk_prod(rvec storage, index_t k, crindexvec mask_J, crindexvec mask_K,
+                 crvec v, rvec out) const {
+
+        check_finiteness(v(mask_K), "Rk_prod input v");
+        check_finiteness(out.reshaped(), "Rk_prod input");
+        auto hk  = vars.hk(storage, k);
+        auto xuk = vars.xuk(storage, k);
+        problem->eval_add_R_prod_masked(k, xuk, hk, mask_J, mask_K, v, out,
+                                        work_R);
+        check_finiteness(out.reshaped(), "Rk_prod output");
+    }
+
+    void Sk_prod(rvec storage, index_t k, crindexvec mask_K, crvec v,
+                 rvec out) const {
+        check_finiteness(v(mask_K), "Sk_prod input v");
+        check_finiteness(out.reshaped(), "Sk_prod input");
+        auto hk  = vars.hk(storage, k);
+        auto xuk = vars.xuk(storage, k);
+        problem->eval_add_S_prod_masked(k, xuk, hk, mask_K, v, out, work_S);
+        check_finiteness(out.reshaped(), "Sk_prod output");
     }
 };
 

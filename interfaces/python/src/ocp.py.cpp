@@ -29,15 +29,14 @@ void register_ocp(py::module_ &m) {
               vec storage = eval.vars.create();
               alpaqa::detail::assign_interleave_xu(eval.vars, u, storage);
               problem.get_x_init(eval.vars.xk(storage, 0));
-              vec qr      = eval.vars.create_qr();
-              auto V      = eval.forward(storage, D, D_N, μ, y);
+              vec qr = eval.vars.create_qr();
+              auto V = eval.forward(storage, D, D_N, μ, y);
               vec grad(N * nu);
               vec λ(nx);
               vec w(nx);
-              vec v(std::max(nc, nc_N));
               auto mut_qrk = [&](index_t k) -> rvec { return eval.vars.qrk(qr, k); };
               auto mut_q_N = [&]() -> rvec { return eval.vars.qk(qr, N); };
-              eval.backward(storage, grad, λ, w, v, mut_qrk, mut_q_N, D, D_N, μ, y);
+              eval.backward(storage, grad, λ, w, mut_qrk, mut_q_N, D, D_N, μ, y);
               return std::tuple{V, std::move(grad)};
           });
 }

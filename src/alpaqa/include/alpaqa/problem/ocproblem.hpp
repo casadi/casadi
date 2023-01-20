@@ -7,6 +7,7 @@
 #include <alpaqa/util/required-method.hpp>
 #include <alpaqa/util/type-erasure.hpp>
 #include <array>
+#include <concepts>
 #include <stdexcept>
 
 #ifndef NDEBUG
@@ -277,6 +278,7 @@ class TypeErasedControlProblem : public util::TypeErased<ControlProblemVTable<Co
 
 // clang-format off
 #ifdef NDEBUG
+inline void check_finiteness(auto &&, auto &&) {}
 template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::get_U(Box &U) const { return call(vtable.get_U, U); }
 template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::get_D(Box &D) const { return call(vtable.get_D, D); }
 template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::get_D_N(Box &D) const { return call(vtable.get_D_N, D); }
@@ -313,8 +315,13 @@ template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allo
 inline void check_finiteness(const auto &v, std::string_view msg) {
     using std::begin;
     using std::end;
-    if (std::any_of(begin(v), end(v),
-                    [](double d) { return !std::isfinite(d); })) {
+    if (!v.allFinite()) {
+        std::cout << msg << std::endl;
+        throw std::runtime_error(std::string(msg));
+    }
+}
+inline void check_finiteness(const std::floating_point auto &v, std::string_view msg) {
+    if (!std::isfinite(v)) {
         std::cout << msg << std::endl;
         throw std::runtime_error(std::string(msg));
     }
@@ -328,8 +335,8 @@ template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allo
 template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::eval_grad_f_prod(index_t timestep, crvec x, crvec u, crvec p, rvec grad_fxu_p) const { check_finiteness(x, "Infinite input x of grad_f_prod"); check_finiteness(u, "Infinite input u of grad_f_prod"); check_finiteness(p, "Infinite input p of grad_f_prod"); call(vtable.eval_grad_f_prod, timestep, x, u, p, grad_fxu_p); check_finiteness(grad_fxu_p, "Infinite output of jac_f"); }
 template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::eval_h(index_t timestep, crvec x, crvec u, rvec h) const { check_finiteness(x, "Infinite input x of h"); check_finiteness(u, "Infinite input u of h"); call(vtable.eval_h, timestep, x, u, h); check_finiteness(h, "Infinite output of h"); }
 template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::eval_h_N(crvec x, rvec h) const { check_finiteness(x, "Infinite input x of h_N"); call(vtable.eval_h_N, x, h); check_finiteness(h, "Infinite output of h_N"); }
-template <Config Conf, class Allocator> auto TypeErasedControlProblem<Conf, Allocator>::eval_l(index_t timestep, crvec h) const -> real_t { check_finiteness(h, "Infinite input h of l"); auto l = call(vtable.eval_l, timestep, h); check_finiteness(std::array{l}, "Infinite output of l"); return l; }
-template <Config Conf, class Allocator> auto TypeErasedControlProblem<Conf, Allocator>::eval_l_N(crvec h) const -> real_t { check_finiteness(h, "Infinite input h of l_N"); auto l =  call(vtable.eval_l_N, h); check_finiteness(std::array{l}, "Infinite output of l_N"); return l; }
+template <Config Conf, class Allocator> auto TypeErasedControlProblem<Conf, Allocator>::eval_l(index_t timestep, crvec h) const -> real_t { check_finiteness(h, "Infinite input h of l"); auto l = call(vtable.eval_l, timestep, h); check_finiteness(l, "Infinite output of l"); return l; }
+template <Config Conf, class Allocator> auto TypeErasedControlProblem<Conf, Allocator>::eval_l_N(crvec h) const -> real_t { check_finiteness(h, "Infinite input h of l_N"); auto l =  call(vtable.eval_l_N, h); check_finiteness(l, "Infinite output of l_N"); return l; }
 template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::eval_qr(index_t timestep, crvec xu, crvec h, rvec qr) const { return call(vtable.eval_qr, timestep, xu, h, qr); }
 template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::eval_q_N(crvec x, crvec h, rvec q) const { check_finiteness(x, "Infinite input x of q_N"); check_finiteness(h, "Infinite input h of q_N"); call(vtable.eval_q_N, x, h, q); check_finiteness(q, "Infinite output of q_N"); }
 template <Config Conf, class Allocator> void TypeErasedControlProblem<Conf, Allocator>::eval_add_Q(index_t timestep, crvec xu, crvec h, rmat Q) const { return call(vtable.eval_add_Q, timestep, xu, h, Q); }
