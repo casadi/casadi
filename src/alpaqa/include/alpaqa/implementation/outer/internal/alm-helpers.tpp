@@ -78,4 +78,12 @@ struct ALMHelpers {
     }
 };
 
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, ALMHelpers, DefaultConfig);
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, ALMHelpers, EigenConfigf);
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, ALMHelpers, EigenConfigd);
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, ALMHelpers, EigenConfigl);
+#ifdef ALPAQA_WITH_QUAD_PRECISION
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, ALMHelpers, EigenConfigq);
+#endif
+
 } // namespace alpaqa::detail

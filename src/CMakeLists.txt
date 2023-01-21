@@ -16,6 +16,7 @@ add_library(alpaqa
     "alpaqa/src/problem/problem-counters.cpp"
     "alpaqa/src/problem/ocproblem-counters.cpp"
     "alpaqa/src/outer/alm.cpp"
+    "alpaqa/src/outer/internal/alm-helpers.cpp"
     "alpaqa/src/inner/panoc.cpp"
     "alpaqa/src/inner/panoc-ocp.cpp"
     "alpaqa/src/panoc-alm.cpp"
@@ -53,7 +54,9 @@ if (ALPAQA_WITH_CASADI)
     find_package(casadi REQUIRED)
     find_package(Threads REQUIRED)
     # Normal NLPs
-    add_library(casadi-loader "interop/casadi/src/CasADiProblem.cpp")
+    add_library(casadi-loader 
+        "interop/casadi/src/CasADiProblem.cpp"
+        "interop/casadi/include/alpaqa/casadi/CasADiFunctionWrapper.hpp")
     target_include_directories(alpaqa PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/interop/casadi/include>
         $<INSTALL_INTERFACE:include>)
