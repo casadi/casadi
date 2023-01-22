@@ -193,6 +193,7 @@ h2.memtitle, .memproto, .fieldtable th, .reflist dt {
     background-image: none;
 }
 h2.memtitle {
+    /* font-family: monospace; */
     border-radius: 0.4em 0.4em 0 0;
 }
 .memproto {
@@ -213,6 +214,14 @@ span.mlabel {
 .reflist dt {
     border-radius: 0.4em 0.4em 0 0;
 }
+.memdoc a.el,
+.memberdecls a.el {
+    font-size: 0.95em;
+    font-family: monospace;
+}
+.paramtype {
+    font-family: monospace;
+}
 
 /* A bit more space in lists on related pages */
 div.textblock li {
@@ -224,7 +233,8 @@ div.textblock li {
     color: var(--description-color);
 }
 .compoundTemplParams {
-    color: #3C4F74;
+    font-family: monospace;
+    color: var(--template-color);
     font-size: inherit;
 }
 /* Code snippets */
@@ -232,7 +242,7 @@ code {
     background-color: var(--code-background-color);
     border-radius: 6px;
     padding: .1em .3em;
-    font-size: 0.8em;
+    font-size: 0.9em;
 }
 div.fragment {
     padding: 0.6em;
@@ -262,6 +272,7 @@ html {
     --concept-color: #0070C1;
     --variable-color: #001080;
     --code-hover-brightness: 120%;
+    --template-color: #3C4F74;
 }
 span.preprocessor {
     color: var(--preprocessor-color);
@@ -455,6 +466,7 @@ blockquote.doxtable > p:last-child {
         --nav-hover-color: #c0d0f0;
         --box-shadow-color: #333;
         --header-background-color: var(--nav-background-color);
+        --template-color: #9AA9C8;
 
         --fragment-foreground-color: #D4D4D4;
         --preprocessor-color: #CE9178;
