@@ -12,9 +12,33 @@ namespace alpaqa {
 /// Parameters for the @ref StructuredLBFGSDirection class.
 template <Config Conf>
 struct StructuredLBFGSDirectionParams {
-    bool hessian_vec                    = true;
+    /// Set this option to true to include the Hessian-vector product
+    /// @f$ \nabla^2_{x_\mathcal{J}x_\mathcal{K}}\psi(x) q_\mathcal{K} @f$ from
+    /// equation 12b in @cite pas2022alpaqa, false to leave out that term.
+    bool hessian_vec = true;
+    /// If @ref hessian_vec is true, set this option to true to approximate that
+    /// term using finite differences instead of using AD.
     bool hessian_vec_finite_differences = true;
-    bool full_augmented_hessian         = true;
+    /// If both @ref hessian_vec and @ref hessian_vec_finite_differences are
+    /// true, set this option to true to compute the exact Hessian of the
+    /// augmented Lagrangian, false to approximate it using the Hessian of the
+    /// Lagrangian.
+    bool full_augmented_hessian = true;
+    enum FailurePolicy {
+        /// If L-BFGS fails, propagate the failure and tell PANOC that no
+        /// accelerated step is available, causing it to accept the projected
+        /// gradient step instead.
+        FallbackToProjectedGradient,
+        /// If L-BFGS fails, return @f$ q_\mathcal{J} =
+        /// -\gamma\nabla_{x_\mathcal{J}}\psi(x^k)
+        /// -\gamma\nabla^2_{x_\mathcal{J}x_\mathcal{K}}\psi(x)
+        /// q_\mathcal{K} @f$ as the accelerated step (effectively approximating
+        /// @f$ \nabla_{x_\mathcal{J}x_\mathcal{J}} \approx \gamma I @f$).
+        UseScaledLBFGSInput,
+    }
+    /// What to do when L-BFGS failed (e.g. if there were no pairs (s, y) with
+    /// positive curvature).
+    failure_policy = FallbackToProjectedGradient;
 };
 
 /// @ingroup grp_DirectionProviders
@@ -90,6 +114,10 @@ struct StructuredLBFGSDirection {
     mutable vec work_n2;
     mutable vec work_m;
 
+    void approximate_hessian_vec_term(crvec xₖ, crvec grad_ψxₖ, rvec qₖ,
+                                      const Box<config_t> &D) const;
+
+  public:
     DirectionParams direction_params;
 };
 
