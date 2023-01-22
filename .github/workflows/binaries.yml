@@ -705,20 +705,41 @@ jobs:
           activate-environment: py${{steps.get-id.outputs.pydot2}}
           auto-update-conda: true
       - run: |
-          conda activate py${{steps.get-id.outputs.pydot2}}
           pip install numpy scipy pandas
+        shell: bash -el {0}
+        if: "!contains(matrix.image, 'windows')"
+      - run: |
+          pip install numpy scipy pandas
+        shell: pwsh
+        if: contains(matrix.image, 'windows')
       - env:
           PYTHONPATH: ${{ github.workspace }}/install
         run: |
-          conda activate py${{steps.get-id.outputs.pydot2}}
           cd test/python
           python -c "from casadi.tools import *;loadAllCompiledPlugins()"
+        shell: bash -el {0}
+        if: "!contains(matrix.image, 'windows')"
       - env:
           PYTHONPATH: ${{ github.workspace }}/install
         run: |
-          conda activate py${{steps.get-id.outputs.pydot2}}
+          cd test/python
+          python -c "from casadi.tools import *;loadAllCompiledPlugins()"
+        shell: pwsh
+        if: contains(matrix.image, 'windows')
+      - env:
+          PYTHONPATH: ${{ github.workspace }}/install
+        run: |
           cd test/python
           python alltests.py
+        shell: bash -el {0}
+        if: "!contains(matrix.image, 'windows')"
+      - env:
+          PYTHONPATH: ${{ github.workspace }}/install
+        run: |
+          cd test/python
+          python alltests.py
+        shell: pwsh
+        if: contains(matrix.image, 'windows')
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.4.0
       - run: cp casadi-${{env.os}}${{matrix.bit}}-py${{matrix.py2}}.zip casadi-${{ env.GITHUB_REF_SLUG }}.${{ env.GITHUB_SHA_SHORT }}-${{env.os}}${{matrix.bit}}-py${{matrix.py2}}-tested.zip
