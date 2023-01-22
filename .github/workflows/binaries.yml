@@ -597,10 +597,10 @@ jobs:
           key: "${{matrix.image}}"
           map: |
            {
-              "windows-2022": {"os": "windows", "shell": "pwsh"},
-              "ubuntu-20.04": {"os": "linux", "shell": "bash -el {0}"},
-              "macos-11": {"os": "osx", "shell": "bash -el {0}"},
-              "macos-m1": {"os": "osx_arm", "shell": "bash -el {0}"}
+              "windows-2022": {"os": "windows"},
+              "ubuntu-20.04": {"os": "linux"},
+              "macos-11": {"os": "osx"},
+              "macos-m1": {"os": "osx_arm"}
            }
           export_to: env
       - uses: actions/download-artifact@v3.0.2
@@ -629,19 +629,19 @@ jobs:
           auto-update-conda: true
       - run: |
           pip install numpy scipy pandas
-        shell: ${{env.shell}}
+        shell: ${{ contains(matrix.image,'windows') && 'pwsh' || 'bash -el {0}'}}
       - env:
           PYTHONPATH: ${{ github.workspace }}/install
         run: |
           cd test/python
           python -c "from casadi.tools import *;loadAllCompiledPlugins()"
-        shell: ${{env.shell}}
+        shell: ${{ contains(matrix.image,'windows') && 'pwsh' || 'bash -el {0}'}}
       - env:
           PYTHONPATH: ${{ github.workspace }}/install
         run: |
           cd test/python
           python alltests.py
-        shell: ${{env.shell}}
+        shell: ${{ contains(matrix.image,'windows') && 'pwsh' || 'bash -el {0}'}}
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.4.0
       - run: cp casadi-${{env.os}}${{matrix.bit}}-py${{matrix.py2}}.zip casadi-${{ env.GITHUB_REF_SLUG }}.${{ env.GITHUB_SHA_SHORT }}-${{env.os}}${{matrix.bit}}-py${{matrix.py2}}-tested.zip
