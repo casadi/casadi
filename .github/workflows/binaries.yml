@@ -333,7 +333,7 @@ jobs:
           name: core-osx-${{ matrix.image }}
       - run: ls
       - run: unzip core-osx-${{ matrix.image }}.zip
-      - uses: casadi/mockups@v20
+      - uses: casadi/mockups@master
         with:
           tag: ${{ matrix.image }}
       - run: |
