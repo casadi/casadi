@@ -629,19 +629,16 @@ jobs:
           auto-update-conda: true
       - run: |
           pip install numpy scipy pandas
-        shell: ${{ contains(matrix.image,'windows') && 'pwsh' || 'bash -el {0}'}}
       - env:
           PYTHONPATH: ${{ github.workspace }}/install
         run: |
           cd test/python
           python -c "from casadi.tools import *;loadAllCompiledPlugins()"
-        shell: ${{ contains(matrix.image,'windows') && 'pwsh' || 'bash -el {0}'}}
       - env:
           PYTHONPATH: ${{ github.workspace }}/install
         run: |
           cd test/python
           python alltests.py
-        shell: ${{ contains(matrix.image,'windows') && 'pwsh' || 'bash -el {0}'}}
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.4.0
       - run: cp casadi-${{env.os}}${{matrix.bit}}-py${{matrix.py2}}.zip casadi-${{ env.GITHUB_REF_SLUG }}.${{ env.GITHUB_SHA_SHORT }}-${{env.os}}${{matrix.bit}}-py${{matrix.py2}}-tested.zip
