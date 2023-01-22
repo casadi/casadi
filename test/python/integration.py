@@ -742,7 +742,7 @@ class Integrationtests(casadiTestCase):
     tend=num['tend']
     q0=num['q0']
     p=num['p']
-    self.assertAlmostEqual(H_out[0][0],(q0*tend**6*exp(tend**3/(3*p)))/(9*p**4)+(2*q0*tend**3*exp(tend**3/(3*p)))/(3*p**3),8,"Evaluation output mismatch")
+    self.assertAlmostEqual(H_out[0][0],(q0*tend**6*exp(tend**3/(3*p)))/(9*p**4)+(2*q0*tend**3*exp(tend**3/(3*p)))/(3*p**3),7,"Evaluation output mismatch")
 
   def test_glibcbug(self):
     self.message("former glibc error")

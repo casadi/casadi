@@ -1,5 +1,5 @@
 import os
-from wheel.util import urlsafe_b64encode, native
+import base64
 from wheel.archive import archive_wheelfile
 import hashlib
 import csv
@@ -42,8 +42,11 @@ if os_name=="linux":
     arch = "manylinux2014_x86_64"
   tag = "cp%s-none-%s" % (pyversion,arch.replace("-","_"))
 elif os_name=="osx":
-  tag = ["cp%s-none-macosx_10_13_x86_64" % (pyversion),
+  if arch=="osx":
+    tag = ["cp%s-none-macosx_10_13_x86_64" % (pyversion),
          "cp%s-none-macosx_10_13_intel" % (pyversion)]
+  elif arch=="osx-m1":
+    tag = "cp%s-none-macosx_11_0_arm64" % (pyversion)
 elif os_name=="windows":
   if bitness=="64":
     tag = "cp%s-none-win_amd64" % pyversion
@@ -78,7 +81,7 @@ def write_record(bdist_dir, distinfo_dir):
                   with open(path, 'rb') as f:
                       data = f.read()
                   digest = hashlib.sha256(data).digest()
-                  hash = 'sha256=' + native(urlsafe_b64encode(digest))
+                  hash = 'sha256=' + base64.urlsafe_b64encode(digest).decode("ascii").strip("=")
                   size = len(data)
               record_path = os.path.relpath(
                   path, bdist_dir).replace(os.path.sep, '/')

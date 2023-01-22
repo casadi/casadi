@@ -745,6 +745,9 @@ set(BUILD_HIGHS_GIT_REPO "https://github.com/ERGO-Code/HiGHS")
 set(BUILD_HIGHS_VERSION "46f6ceb269ed44934c79fc9e488487fcb6313b6a") # v1.3.0 suffers from https://github.com/ERGO-Code/HiGHS/issues/928
 option(WITH_BUILD_HIGHS "Build HiGHS (BUILD_HIGHS_VERSION=${BUILD_HIGHS_VERSION}) from downloaded source (BUILD_HIGHS_GIT_REPO=${BUILD_HIGHS_GIT_REPO})." OFF)
 
+
+option(ALLOW_DOCKER "System has docker installed" OFF)
+
 function(libraries2flags libraries out)
 # libtool cannot handle absoulte paths (i.e. it omits the library from the list of dependencies)
   set(local "")
@@ -753,13 +756,18 @@ function(libraries2flags libraries out)
       # Pass -l, -L as-is
       set(local "${local} ${LIB}")
     else()
-      get_filename_component(LIB_DIR "${LIB}" DIRECTORY)
-      get_filename_component(LIB_NAME "${LIB}" NAME)
-      string(REGEX REPLACE "${CMAKE_SHARED_LIBRARY_PREFIX}([A-Za-z0-9_]+)${CMAKE_SHARED_LIBRARY_SUFFIX}" "\\1" LIB_NAME_MOD ${LIB_NAME})
-      if(LIB_NAME STREQUAL LIB_NAME_MOD)
-        set(local "${local} ${LIB}")
+      if (LIB MATCHES "System/Library/Frameworks/Accelerate.framework")
+        #set(${out} "-framework Accelerate" PARENT_SCOPE)
+        set(local "${local} -framework Accelerate")
       else()
-        set(local "${local} -L${LIB_DIR} -l${LIB_NAME_MOD}")
+          get_filename_component(LIB_DIR "${LIB}" DIRECTORY)
+          get_filename_component(LIB_NAME "${LIB}" NAME)
+          string(REGEX REPLACE "${CMAKE_SHARED_LIBRARY_PREFIX}([A-Za-z0-9_]+)${CMAKE_SHARED_LIBRARY_SUFFIX}" "\\1" LIB_NAME_MOD ${LIB_NAME})
+          if(LIB_NAME STREQUAL LIB_NAME_MOD)
+            set(local "${local} ${LIB}")
+          else()
+            set(local "${local} -L${LIB_DIR} -l${LIB_NAME_MOD}")
+          endif()
       endif()
     endif()
     set(${out} "${local}" PARENT_SCOPE)
@@ -911,16 +919,23 @@ if (WITH_MUMPS OR WITH_SPRAL)
   set(WITH_BUILD_COINMETIS ON)
 endif()
 
+
+
 if(WITH_COINMETIS)
   if(WITH_BUILD_COINMETIS)
     add_feature_info(coinmetis-sourcebuild ON "Build METIS (BUILD_METIS_TP_VERSION=${BUILD_METIS_TP_VERSION}) from downloaded source.")
+    if(ALLOW_DOCKER)
+       set(COIN_RECONFIG_CMD docker run --rm -v <SOURCE_DIR>:/work ghcr.io/casadi/coinbuild:latest /bin/bash ./run_autotools /work COMMAND)
+    else()
+       set(COIN_RECONFIG_CMD)
+    endif()
     ExternalProject_Add(coinmetis-external
         GIT_REPOSITORY https://github.com/coin-or-tools/ThirdParty-Metis.git
         GIT_TAG releases/${BUILD_METIS_TP_VERSION}
         DEPENDS ${LAPACK_DEPENDS_TARGET}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
-        CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR>
+        CONFIGURE_COMMAND ${COIN_RECONFIG_CMD} <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR>
 
           # GKFree is not defined (variadic definition in utils.c); fails on MacOS target
           "CFLAGS=-Wno-implicit-function-declaration"
@@ -966,6 +981,16 @@ set(SPRAL_FLAGS )
 
 message("WITH_SPRAL ${WITH_SPRAL} WITH_BUILD_SPRAL ${WITH_BUILD_SPRAL}")
 if(WITH_SPRAL)
+
+  # configure performed to resolve
+  #      PKG_PROG_PKG_CONFIG: command not found"
+  #      syntax error near unexpected token `HWLOC,'
+  #      `PKG_CHECK_MODULES(HWLOC, hwloc,'
+  if(ALLOW_DOCKER)
+    set(SPRAL_RECONFIG_CMD docker run --rm -v <SOURCE_DIR>:/work ghcr.io/casadi/coinbuild:latest autoreconf -ivf -I /usr/share/aclocal /work COMMAND)
+  else()
+    set(SPRAL_RECONFIG_CMD autoreconf -ivf -I /usr/share/aclocal <SOURCE_DIR> COMMAND)
+  endif()
   if(WITH_BUILD_SPRAL)
     get_target_property(METIS_INCLUDE_DIR coinmetis INTERFACE_INCLUDE_DIRECTORIES)
     get_target_property(METIS_LIB coinmetis IMPORTED_LIBNAME)
@@ -976,7 +1001,7 @@ if(WITH_SPRAL)
         DEPENDS ${LAPACK_DEPENDS_TARGET}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
-        CONFIGURE_COMMAND autoreconf -ivf -I /usr/share/aclocal <SOURCE_DIR> COMMAND CFLAGS=-fPIC CXXFLAGS=-fPIC FFLAGS=-fPIC FCFLAGS=-fPIC <SOURCE_DIR>/configure ${CROSS_FLAGS} --disable-gpu --prefix=<INSTALL_DIR> --disable-openmp "--with-metis-inc-dir=${METIS_INCLUDE_DIR}" "--with-metis=-L${CMAKE_BINARY_DIR}/external_projects/lib -l${METIS_LIB} -lm" "--with-lapack=${LAPACK_LFLAGS}" "--with-blas=${LAPACK_LFLAGS}" ${CROSS_FLAGS_FORTRAN})
+        CONFIGURE_COMMAND ${SPRAL_RECONFIG_CMD} CFLAGS=-fPIC CXXFLAGS=-fPIC FFLAGS=-fPIC FCFLAGS=-fPIC <SOURCE_DIR>/configure ${CROSS_FLAGS} --disable-gpu --prefix=<INSTALL_DIR> --disable-openmp "--with-metis-inc-dir=${METIS_INCLUDE_DIR}" "--with-metis=-L${CMAKE_BINARY_DIR}/external_projects/lib -l${METIS_LIB} -lm" "--with-lapack=${LAPACK_LFLAGS}" "--with-blas=${LAPACK_LFLAGS}" ${CROSS_FLAGS_FORTRAN})
     set(SPRAL_DEPENDS_TARGET spral-external)
     set(SPRAL_FLAGS "--with-spral-cflags=-I${CMAKE_BINARY_DIR}/external_projects/include"
         "--with-spral-lflags=-L${CMAKE_BINARY_DIR}/external_projects/lib -lspral -lgfortran -lm -lcoinmetis ${LAPACK_LFLAGS}")
@@ -1021,6 +1046,11 @@ if(WITH_CLP)
       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}Osi${CMAKE_SHARED_LIBRARY_SUFFIX}"
       IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}Osi${CMAKE_IMPORT_LIBRARY_SUFFIX}"
     )
+    set(APPLE_FLAGS "")
+    if(APPLE)
+        # Delocate step wants to grow zlib install name
+        set(APPLE_FLAGS "ADD_CXXFLAGS=-Wl,-headerpad_max_install_names")
+    endif()
     ExternalProject_Add(clp-external
         DEPENDS osi-external mumps-external coinutils-external ${LAPACK_DEPENDS_TARGET}
         GIT_REPOSITORY https://github.com/coin-or/Clp.git
@@ -1030,6 +1060,7 @@ if(WITH_CLP)
         CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} "--with-lapack-lflags=${LAPACK_LFLAGS}" --prefix=<INSTALL_DIR>  ${CROSS_FLAGS_FORTRAN}
 	# For unknown reasons, Coin-or/configure disables pkg-config by default for clang compilers 
 	--enable-pkg-config
+	${APPLE_FLAGS}
 	)
 
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/coin")
@@ -1114,7 +1145,7 @@ if(WITH_IPOPT)
         CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR> "--with-mumps-cflags=-I${CMAKE_BINARY_DIR}/external_projects/include/coin-or/mumps" "--with-mumps-lflags=-L${CMAKE_BINARY_DIR}/external_projects/lib ${WHOLE_ARCHIVE_ON}-lcoinmumps ${WHOLE_ARCHIVE_OFF}"
         ${SPRAL_FLAGS}
         "--with-lapack-lflags= ${LAPACK_LFLAGS}" ${CROSS_FLAGS_FORTRAN}
-        
+	--disable-java
 	# For unknown reasons, Coin-or/configure disables pkg-config by default for clang compilers 
 	--enable-pkg-config
 	--enable-dependency-linking
