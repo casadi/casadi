@@ -579,7 +579,7 @@ jobs:
 
   test-python:
     runs-on: ${{matrix.image == 'macos-m1' && 'self-hosted' || matrix.image }}
-    needs: [python-osx]
+    needs: [python-osx,python-dockcross]
     strategy:
      fail-fast: false
      matrix:
@@ -628,15 +628,18 @@ jobs:
           activate-environment: py${{steps.get-id.outputs.pydot2}}
           auto-update-conda: true
       - run: |
+          conda activate py${{steps.get-id.outputs.pydot2}}
           pip install numpy scipy pandas
       - env:
           PYTHONPATH: ${{ github.workspace }}/install
         run: |
+          conda activate py${{steps.get-id.outputs.pydot2}}
           cd test/python
           python -c "from casadi.tools import *;loadAllCompiledPlugins()"
       - env:
           PYTHONPATH: ${{ github.workspace }}/install
         run: |
+          conda activate py${{steps.get-id.outputs.pydot2}}
           cd test/python
           python alltests.py
       - name: Inject slug/short variables
