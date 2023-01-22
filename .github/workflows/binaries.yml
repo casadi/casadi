@@ -309,7 +309,84 @@ jobs:
           overwrite: true
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
           file: ${{ steps.wheel.outputs.wheel }}
-          
+
+  matlab-osx:
+    needs: [core-osx,swig]
+    runs-on: ${{matrix.image == 'macos-m1' && 'self-hosted' || matrix.image }}
+    strategy:
+      fail-fast: false
+      matrix:
+        matlab: ["2018b"]
+        image: [macos-11,macos-m1]
+    steps:
+      - uses: casadi/action-setup-compiler@master
+        with:
+          cache-suffix: ''
+          target: ${{matrix.image == 'macos-m1' && 'arm64' || 'x86_64'}}
+      - uses: actions/download-artifact@v3.0.2
+        with:
+          name: casadi_source_wrapper
+      - name: Unpack source
+        run: unzip casadi_source.zip
+      - uses: actions/download-artifact@v3.0.2
+        with:
+          name: core-osx-${{ matrix.image }}
+      - run: ls
+      - run: unzip core-osx-${{ matrix.image }}.zip
+      - uses: casadi/mockups@v20
+        with:
+          tag: ${{ matrix.image }}
+      - run: |
+          ls mockups/cmake
+      - name: Build
+        run: |
+          CC=${{ env.CC }} FC=${{ env.FC }} CXX=${{ env.CXX }} cmake -DCMAKE_OSX_SYSROOT=${{env.CONDA_BUILD_SYSROOT}} -Bbuild -DWITH_MATLAB=ON -USWIG_IMPORT -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/install -DSKIP_CONFIG_H_GENERATION=ON -DCMAKE_PREFIX_PATH=${{ github.workspace }}/mockups/cmake
+          cmake --build build --target install -v
+      - uses: kanga333/variable-mapper@v0.3.0
+        with:
+          key: "${{matrix.image}}"
+          map: |
+           {
+              "macos-11": {"os": "osx", "bitness": "64"},
+              "macos-m1": {"os": "osx_arm", "bitness": "64"}
+           }
+          export_to: env
+      - uses: jgillis/universal_grafter@master
+        with:
+          source_path: install/casadi
+          destination_path: install/casadi
+          search_paths: ${{env.COMPILER_LIB_SEARCH_PATH}}
+      - name: Easy Zip Files
+        uses: vimtor/action-zip@v1.1
+        with:
+          files: install/
+          recursive: false
+          dest: casadi-${{env.os}}${{env.bitness}}-matlab${{matrix.matlab}}.zip
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v4.4.0
+      - run: cp casadi-${{env.os}}${{env.bitness}}-matlab${{matrix.matlab}}.zip casadi-${{ env.GITHUB_REF_SLUG }}.${{ env.GITHUB_SHA_SHORT }}-${{env.os}}${{env.bitness}}-matlab${{matrix.matlab}}-untested.zip
+      - name: Delete old release assets
+        uses: mknejp/delete-release-assets@v1
+        with:
+          token: ${{ secrets.CASADIBOT_TOKEN}}
+          tag: nightly-${{ env.GITHUB_REF_SLUG }}
+          assets: casadi-*-${{env.os}}${{env.bitness}}-matlab${{matrix.matlab}}-untested.zip
+          fail-if-no-release: false
+          fail-if-no-assets: false
+      - name: Upload files to a GitHub release
+        uses: svenstaro/upload-release-action@2.4.0
+        with:
+          repo_token: ${{ secrets.CASADIBOT_TOKEN}}
+          overwrite: true
+          tag: nightly-${{ env.GITHUB_REF_SLUG }}
+          file: casadi-${{ env.GITHUB_REF_SLUG }}.${{ env.GITHUB_SHA_SHORT }}-${{env.os}}${{env.bitness}}-matlab${{matrix.matlab}}-untested.zip
+
+      - uses: actions/upload-artifact@v3.1.2
+        with:
+          name: casadi-${{env.os}}${{env.bitness}}-matlab${{matrix.matlab}}
+          path: casadi-${{env.os}}${{env.bitness}}-matlab${{matrix.matlab}}.zip
+          retention-days: 5
+                  
   matlab-dockcross:
     needs: [core-dockcross,swig]
     runs-on: ubuntu-20.04
@@ -518,12 +595,12 @@ jobs:
 
   test-matlab:
     runs-on: ${{matrix.image}}
-    needs: [matlab-dockcross]
+    needs: [matlab-dockcross,matlab-osx]
     strategy:
      fail-fast: false
      matrix:
        matlab: ["2018b"]
-       image: ["windows-2022","ubuntu-20.04"]
+       image: ["windows-2022","ubuntu-20.04","macos-11"]
        bit: [64]
        exclude:
         # No Windows 32bit builds currently
