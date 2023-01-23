@@ -62,6 +62,7 @@ jobs:
         overwrite: true
         tag: nightly-${{ env.GITHUB_REF_SLUG }}
         file: casadi-${{ env.GITHUB_REF_SLUG }}.${{ env.GITHUB_SHA_SHORT }}-source.zip
+        prerelease: true
 
     - uses: actions/upload-artifact@v3.1.2
       with:
@@ -273,6 +274,7 @@ jobs:
           overwrite: true
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
           file: casadi-${{ env.GITHUB_REF_SLUG }}.${{ env.GITHUB_SHA_SHORT }}-${{matrix.image == 'macos-m1' && 'osx_arm64' || 'osx64'}}-py${{matrix.py2}}-untested.zip
+          prerelease: true
 
       - uses: jgillis/import-codesign-certs@master
         with: 
@@ -309,6 +311,7 @@ jobs:
           overwrite: true
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
           file: ${{ steps.wheel.outputs.wheel }}
+          prerelease: true
 
   matlab-osx:
     needs: [core-osx,swig]
@@ -388,6 +391,7 @@ jobs:
           overwrite: true
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
           file: casadi-${{ env.GITHUB_REF_SLUG }}.${{ env.GITHUB_SHA_SHORT }}-${{env.os}}${{env.bitness}}-matlab${{matrix.matlab}}-untested.zip
+          prerelease: true
 
       - uses: actions/upload-artifact@v3.1.2
         with:
@@ -472,6 +476,7 @@ jobs:
           overwrite: true
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
           file: casadi-${{ env.GITHUB_REF_SLUG }}.${{ env.GITHUB_SHA_SHORT }}-${{env.os}}${{env.bitness}}-matlab${{matrix.matlab}}-untested.zip
+          prerelease: true
 
       - uses: actions/upload-artifact@v3.1.2
         with:
@@ -563,6 +568,7 @@ jobs:
           overwrite: true
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
           file: casadi-${{ env.GITHUB_REF_SLUG }}.${{ env.GITHUB_SHA_SHORT }}-${{env.os}}${{env.bitness}}-py${{matrix.py2}}-untested.zip
+          prerelease: true
 
       - uses: actions/upload-artifact@v3.1.2
         with:
@@ -598,6 +604,7 @@ jobs:
           overwrite: true
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
           file: ${{ steps.wheel.outputs.wheel }}
+          prerelease: true
 
 
 
@@ -661,6 +668,7 @@ jobs:
           overwrite: true
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
           file: casadi-${{ env.GITHUB_REF_SLUG }}.${{ env.GITHUB_SHA_SHORT }}-${{env.os}}${{matrix.bit}}-matlab${{matrix.matlab}}-tested.zip
+          prerelease: true
 
   test-python:
     runs-on: ${{matrix.image == 'macos-m1' && 'self-hosted' || matrix.image }}
@@ -774,5 +782,5 @@ jobs:
           overwrite: true
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
           file: casadi-${{ env.GITHUB_REF_SLUG }}.${{ env.GITHUB_SHA_SHORT }}-${{env.os}}${{matrix.bit}}-py${{matrix.py2}}-tested.zip
-
+          prerelease: true
 
