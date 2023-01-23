@@ -355,7 +355,7 @@ jobs:
         with:
           source_path: install/casadi
           destination_path: install/casadi
-          search_paths: "${{env.COMPILER_LIB_SEARCH_PATH}}:${{ github.workspace }}/matlab/lib"
+          search_paths: "${{env.COMPILER_LIB_SEARCH_PATH}}:${{ github.workspace }}/mockups/matlab/lib"
           
       - uses: jgillis/import-codesign-certs@master
         with: 
