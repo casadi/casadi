@@ -746,14 +746,14 @@ jobs:
           PYTHONPATH: ${{ github.workspace }}/install
         run: |
           cd test/python
-          python alltests.py
+          python alltests.py ${{matrix.image == '38' && '--run_slow' || '' }}
         shell: bash -el {0}
         if: "!contains(matrix.image, 'windows')"
       - env:
           PYTHONPATH: ${{ github.workspace }}/install
         run: |
           cd test/python
-          python alltests.py
+          python alltests.py ${{matrix.image == '38' && '--run_slow' || '' }}
         shell: pwsh
         if: contains(matrix.image, 'windows')
       - name: Inject slug/short variables
