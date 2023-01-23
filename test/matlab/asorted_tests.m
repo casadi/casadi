@@ -397,7 +397,9 @@ if ~is_octave
   assert(data.x.isnull)
 end
 
-if isunix
+if ismac
+  compile_flags = 'CFLAGS=$CFLAGS -pedantic -std=c99 -fPIC -Wall -Werror -Wextra -Wno-unknown-pragmas -Wno-long-long -Wno-unused-parameter'
+elseif isunix
   compile_flags = 'CFLAGS=$CFLAGS -pedantic -std=c89 -fPIC -Wall -Werror -Wextra -Wno-unknown-pragmas -Wno-long-long -Wno-unused-parameter'
 else
   compile_flags = '';
