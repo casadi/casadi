@@ -45,16 +45,19 @@ template <Config Conf>
 auto PANOCOCPSolver<Conf>::operator()(
     /// [in]    Problem description
     const Problem &problem,
-    /// [in]    Tolerance @f$ \varepsilon @f$
-    const real_t ε,
+    /// [in]    Solve options
+    const SolveOptions &opts,
     /// [inout] Decision variable @f$ u @f$
     rvec u,
-    /// [in]    Lagrange multipliers @f$ y @f$
-    crvec y,
+    /// [inout] Lagrange multipliers @f$ y @f$
+    rvec y,
     /// [in]    Penalty factors @f$ \mu @f$
-    crvec μ) -> Stats {
+    crvec μ,
+    /// [out]   Slack variable error @f$ c(x) - \Pi_D(c(x) + \mu^{-1} y) @f$
+    rvec err_z) -> Stats {
 
     using std::chrono::nanoseconds;
+    auto os         = opts.os ? opts.os : this->os;
     auto start_time = std::chrono::steady_clock::now();
     Stats s;
 
@@ -239,7 +242,7 @@ auto PANOCOCPSolver<Conf>::operator()(
     };
 
     auto check_all_stop_conditions =
-        [this, ε](
+        [this, &opts](
             /// [in]    Time elapsed since the start of the algorithm
             auto time_elapsed,
             /// [in]    The current iteration number
@@ -248,11 +251,15 @@ auto PANOCOCPSolver<Conf>::operator()(
             real_t εₖ,
             /// [in]    The number of successive iterations no progress was made
             unsigned no_progress) {
-            bool out_of_time     = time_elapsed > params.max_time;
+            auto max_time = params.max_time;
+            if (opts.max_time)
+                max_time = std::min(max_time, *opts.max_time);
+            auto tolerance = opts.tolerance > 0 ? opts.tolerance : real_t(1e-8);
+            bool out_of_time     = time_elapsed > max_time;
             bool out_of_iter     = iteration == params.max_iter;
             bool interrupted     = stop_signal.stop_requested();
             bool not_finite      = not std::isfinite(εₖ);
-            bool conv            = εₖ <= ε;
+            bool conv            = εₖ <= tolerance;
             bool max_no_progress = no_progress > params.max_no_progress;
             return conv              ? SolverStatus::Converged
                    : out_of_time     ? SolverStatus::MaxTime
@@ -492,7 +499,30 @@ auto PANOCOCPSolver<Conf>::operator()(
                                  curr->pᵀp, curr->γ, εₖ);
             if (do_print || do_final_print)
                 print_progress_n(stop_status);
-            assign_extract_u(curr->xû, u);
+            if (stop_status == SolverStatus::Converged ||
+                stop_status == SolverStatus::Interrupted ||
+                opts.always_overwrite_results) {
+                // Update multipliers and constraint error
+                if (nc > 0 || nc_N > 0) {
+                    for (index_t t = 0; t < N; ++t) {
+                        auto ct = vars.ck(curr->xû, t);
+                        auto yt = y.segment(nc * t, nc);
+                        auto ζ  = ct + (real_t(1) / μ(t)) * yt;
+                        auto et = err_z.segment(nc * t, nc);
+                        et      = projecting_difference(ζ, D);
+                        et -= (real_t(1) / μ(t)) * yt;
+                        yt += μ(t) * et;
+                    }
+                    auto ct = vars.ck(curr->xû, N);
+                    auto yt = y.segment(nc * N, nc_N);
+                    auto ζ  = ct + (real_t(1) / μ(N)) * yt;
+                    auto et = err_z.segment(nc * N, nc_N);
+                    et      = projecting_difference(ζ, D_N);
+                    et -= (real_t(1) / μ(N)) * yt;
+                    yt += μ(N) * et;
+                }
+                assign_extract_u(curr->xû, u);
+            }
             s.iterations   = k;
             s.ε            = εₖ;
             s.elapsed_time = duration_cast<nanoseconds>(time_elapsed);

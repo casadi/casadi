@@ -172,8 +172,7 @@ TEST(ALM, multipleshooting1D) {
     std::cout << "Inner: " << stats.inner.iterations
               << ", Outer: " << stats.outer_iterations << std::endl;
 
-    auto duration =
-        std::chrono::duration_cast<std::chrono::microseconds>(end - begin);
+    auto duration = duration_cast<std::chrono::nanoseconds>(end - begin);
     std::cout << duration.count() << "µs" << std::endl;
 
     EXPECT_NEAR(x(0), -0.454545, 1e-4);
@@ -281,8 +280,7 @@ TEST(ALM, multipleshooting8D) {
     std::cout << "Inner: " << stats.inner.iterations
               << ", Outer: " << stats.outer_iterations << std::endl;
 
-    auto duration =
-        std::chrono::duration_cast<std::chrono::microseconds>(end - begin);
+    auto duration = duration_cast<std::chrono::nanoseconds>(end - begin);
     std::cout << duration.count() << "µs" << std::endl;
 
     auto u  = x.topRows(nu);
@@ -407,8 +405,7 @@ TEST(ALM, multipleshooting8Dstructured) {
     std::cout << "Inner: " << stats.inner.iterations
               << ", Outer: " << stats.outer_iterations << std::endl;
 
-    auto duration =
-        std::chrono::duration_cast<std::chrono::microseconds>(end - begin);
+    auto duration = duration_cast<std::chrono::nanoseconds>(end - begin);
     std::cout << duration.count() << "µs" << std::endl;
 
     auto u  = x.topRows(nu);

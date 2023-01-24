@@ -1,8 +1,6 @@
 #pragma once
 
-#include <alpaqa/inner/internal/solverstatus.hpp>
 #include <alpaqa/outer/alm.hpp>
-#include <alpaqa/implementation/outer/internal/alm-helpers.tpp>
 
 #include <algorithm>
 #include <iomanip>
@@ -10,8 +8,11 @@
 #include <utility>
 
 #include <alpaqa/config/config.hpp>
-#include <alpaqa/util/quadmath/quadmath-print.hpp>
+#include <alpaqa/implementation/outer/internal/alm-helpers.tpp>
 #include <alpaqa/implementation/util/print.tpp>
+#include <alpaqa/inner/inner-solve-options.hpp>
+#include <alpaqa/inner/internal/solverstatus.hpp>
+#include <alpaqa/util/quadmath/quadmath-print.hpp>
 
 namespace alpaqa {
 
@@ -33,7 +34,13 @@ ALMSolver<InnerSolverT>::operator()(const Problem &p, rvec x, rvec y) {
     if (m == 0) { // No general constraints, only box constraints
         Stats s;
         vec Σ(0), error(0);
-        auto ps = inner_solver(p, Σ, params.ε, true, x, y, error);
+        InnerSolveOptions<config_t> opts{
+            .always_overwrite_results = true,
+            .max_time                 = params.max_time,
+            .tolerance                = params.ε,
+            .os                       = os,
+        };
+        auto ps              = inner_solver(p, opts, x, y, Σ, error);
         bool inner_converged = ps.status == SolverStatus::Converged;
         auto time_elapsed    = std::chrono::steady_clock::now() - start_time;
         s.inner_convergence_failures = not inner_converged;
@@ -98,9 +105,16 @@ ALMSolver<InnerSolverT>::operator()(const Problem &p, rvec x, rvec y) {
         // Inner solver
         // ------------
 
+        auto time_elapsed = std::chrono::steady_clock::now() - start_time;
+        InnerSolveOptions<config_t> opts{
+            .always_overwrite_results = overwrite_results,
+            .max_time                 = params.max_time - time_elapsed,
+            .tolerance                = ε,
+            .os                       = os,
+        };
         // Call the inner solver to minimize the augmented lagrangian for fixed
         // Lagrange multipliers y.
-        auto ps = inner_solver(p, Σ, ε, overwrite_results, x, y, error_2);
+        auto ps = inner_solver(p, opts, x, y, Σ, error_2);
         // Reset the Lagrange multipliers for the penalty constraints to 0 again.
         y_penalty.setZero();
         // Check if the inner solver converged
@@ -109,8 +123,8 @@ ALMSolver<InnerSolverT>::operator()(const Problem &p, rvec x, rvec y) {
         s.inner_convergence_failures += not inner_converged;
         s.inner += ps;
 
-        auto time_elapsed = std::chrono::steady_clock::now() - start_time;
-        bool out_of_time  = time_elapsed > params.max_time;
+        time_elapsed     = std::chrono::steady_clock::now() - start_time;
+        bool out_of_time = time_elapsed > params.max_time;
         bool backtrack =
             not inner_converged && not overwrite_results && not out_of_time;
 

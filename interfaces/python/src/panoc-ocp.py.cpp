@@ -85,35 +85,43 @@ void register_panoc_ocp(py::module_ &m) {
             "fpr", [](const PANOCOCPProgressInfo &p) { return std::sqrt(p.norm_sq_p) / p.γ; },
             "Fixed-point residual :math:`\\left\\|p\\right\\| / \\gamma`");
 
-    using PANOCOCPSolver = alpaqa::PANOCOCPSolver<config_t>;
-    using ControlProblem = typename PANOCOCPSolver::Problem;
-    auto panoc_ocp_independent_solve_unconstr =
-        [](PANOCOCPSolver &solver, const ControlProblem &problem, real_t ε, std::optional<vec> u,
-           std::optional<vec> y, std::optional<vec> μ, bool async) {
-            auto N    = problem.get_N();
-            auto nu   = problem.get_nu();
-            auto nc   = problem.get_nc();
-            auto nc_N = problem.get_nc_N();
-            if (u)
-                alpaqa::util::check_dim<config_t>("u", *u, nu * N);
-            else
-                u = vec::Zero(nu * N);
-            if (y)
-                alpaqa::util::check_dim<config_t>("y", *y, nc * N + nc_N);
-            else if (nc * N + nc_N == 0)
-                y = vec{};
-            else
-                throw std::invalid_argument("Missing argument y");
-            if (μ)
-                alpaqa::util::check_dim<config_t>("μ", *μ, (nc == 0 && nc_N == 0) ? 0 : (N + 1));
-            else if (nc * N + nc_N == 0)
-                μ = vec{};
-            else
-                throw std::invalid_argument("Missing argument μ");
-            auto invoke_solver = [&] { return solver(problem, ε, *u, *y, *μ); };
-            auto &&stats       = async_solve(async, solver, invoke_solver, problem);
-            return std::make_tuple(std::move(*u), alpaqa::conv::stats_to_dict(stats));
-        };
+    using PANOCOCPSolver             = alpaqa::PANOCOCPSolver<config_t>;
+    using ControlProblem             = typename PANOCOCPSolver::Problem;
+    using InnerSolveOptions          = alpaqa::InnerSolveOptions<config_t>;
+    auto panoc_ocp_independent_solve = [](PANOCOCPSolver &solver, const ControlProblem &problem,
+                                          const InnerSolveOptions &opts, std::optional<vec> u,
+                                          std::optional<vec> y, std::optional<vec> μ, bool async) {
+        auto N     = problem.get_N();
+        auto nu    = problem.get_nu();
+        auto nc    = problem.get_nc();
+        auto nc_N  = problem.get_nc_N();
+        auto m     = nc * N + nc_N;
+        bool ret_y = y.has_value();
+        if (u)
+            alpaqa::util::check_dim<config_t>("u", *u, nu * N);
+        else
+            u = vec::Zero(nu * N);
+        if (y)
+            alpaqa::util::check_dim<config_t>("y", *y, m);
+        else if (m == 0)
+            y = vec{};
+        else
+            throw std::invalid_argument("Missing argument y");
+        if (μ)
+            alpaqa::util::check_dim<config_t>("μ", *μ, m == 0 ? 0 : (N + 1));
+        else if (m == 0)
+            μ = vec{};
+        else
+            throw std::invalid_argument("Missing argument μ");
+        vec err_z          = vec::Zero(m);
+        auto invoke_solver = [&] { return solver(problem, opts, *u, *y, *μ, err_z); };
+        auto &&stats       = async_solve(async, solver, invoke_solver, problem);
+        if (ret_y)
+            return py::make_tuple(std::move(*u), std::move(*y), std::move(err_z),
+                                  alpaqa::conv::stats_to_dict(stats));
+        else
+            return py::make_tuple(std::move(*u), alpaqa::conv::stats_to_dict(stats));
+    };
 
     py::class_<PANOCOCPSolver>(m, "PANOCOCPSolver",
                                "C++ documentation: :cpp:class:`alpaqa::PANOCOCPSolver`")
@@ -128,11 +136,11 @@ void register_panoc_ocp(py::module_ &m) {
             "__deepcopy__",
             [](const PANOCOCPSolver &self, py::dict) { return PANOCOCPSolver{self}; }, "memo"_a)
         // Call
-        .def("__call__", panoc_ocp_independent_solve_unconstr, "problem"_a, "ε"_a,
+        .def("__call__", panoc_ocp_independent_solve, "problem"_a, "opts"_a = py::dict(),
              "u"_a = py::none(), "y"_a = py::none(), "μ"_a = py::none(), "asynchronous"_a = true,
              "Solve.\n\n"
              ":param problem: Problem to solve\n"
-             ":param ε: Desired tolerance\n"
+             ":param opts: Options\n"
              ":param u: Initial guess\n"
              ":param y: Lagrange multipliers\n"
              ":param μ: Penalty factors\n"

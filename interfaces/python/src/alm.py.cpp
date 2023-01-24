@@ -17,11 +17,11 @@ constexpr auto ret_ref_internal = py::return_value_policy::reference_internal;
 #include <stdexcept>
 using namespace std::chrono_literals;
 
+#include <alpaqa/implementation/inner/panoc.tpp>
+#include <alpaqa/implementation/outer/alm.tpp>
 #include <alpaqa/inner/directions/panoc/structured-lbfgs.hpp>
 #include <alpaqa/inner/panoc.hpp>
-#include <alpaqa/implementation/inner/panoc.tpp>
 #include <alpaqa/outer/alm.hpp>
-#include <alpaqa/implementation/outer/alm.tpp>
 #include <alpaqa/util/check-dim.hpp>
 
 #include "kwargs-to-struct.hpp"
@@ -72,9 +72,6 @@ void register_alm(py::module_ &m) {
     using DefaultInnerSolver = alpaqa::PANOCSolver<alpaqa::StructuredLBFGSDirection<config_t>>;
     py::class_<InnerSolver>(m, "InnerSolver")
         .def(py::init<PANOCSolver>())
-        .def("__call__",
-             [](InnerSolver &self, const TypeErasedProblem &p, crvec Σ, real_t ε, bool a, rvec x,
-                rvec y, rvec e) { return self(p, Σ, ε, a, x, y, e).to_dict(); })
         .def_property_readonly("name", &InnerSolver::template get_name<>);
 
     using ALMSolver = alpaqa::ALMSolver<InnerSolver>;

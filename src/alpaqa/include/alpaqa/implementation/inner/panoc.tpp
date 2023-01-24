@@ -1,7 +1,6 @@
 #pragma once
 
 #include <alpaqa/inner/panoc.hpp>
-#include <alpaqa/implementation/inner/panoc-helpers.tpp>
 
 #include <cassert>
 #include <cmath>
@@ -10,14 +9,12 @@
 #include <stdexcept>
 
 #include <alpaqa/config/config.hpp>
+#include <alpaqa/implementation/inner/panoc-helpers.tpp>
+#include <alpaqa/implementation/util/print.tpp>
 #include <alpaqa/util/alloc-check.hpp>
 #include <alpaqa/util/quadmath/quadmath-print.hpp>
-#include <alpaqa/implementation/util/print.tpp>
 
 namespace alpaqa {
-
-using std::chrono::duration_cast;
-using std::chrono::nanoseconds;
 
 template <class DirectionProviderT>
 std::string PANOCSolver<DirectionProviderT>::get_name() const {
@@ -28,19 +25,19 @@ template <class DirectionProviderT>
 auto PANOCSolver<DirectionProviderT>::operator()(
     /// [in]    Problem description
     const Problem &problem,
-    /// [in]    Constraint weights @f$ \Sigma @f$
-    crvec Σ,
-    /// [in]    Tolerance @f$ \varepsilon @f$
-    real_t ε,
-    /// [in]    Overwrite @p x, @p y and @p err_z even if not converged
-    bool always_overwrite_results,
+    /// [in]    Solve options
+    const SolveOptions &opts,
     /// [inout] Decision variable @f$ x @f$
     rvec x,
     /// [inout] Lagrange multipliers @f$ y @f$
     rvec y,
-    /// [out]   Slack variable error @f$ g(x) - z @f$
+    /// [in]    Constraint weights @f$ \Sigma @f$
+    crvec Σ,
+    /// [out]   Slack variable error @f$ g(x) - \Pi_D(g(x) + \Sigma^{-1} y) @f$
     rvec err_z) -> Stats {
 
+    using std::chrono::nanoseconds;
+    auto os         = opts.os ? opts.os : this->os;
     auto start_time = std::chrono::steady_clock::now();
     Stats s;
 
@@ -108,9 +105,6 @@ auto PANOCSolver<DirectionProviderT>::operator()(
     };
     auto eval_grad_ψx̂ = [&problem, &work_n](Iterate &i, rvec grad_ψx̂) {
         problem.eval_grad_ψ_from_ŷ(i.x̂, i.ŷx̂, grad_ψx̂, work_n);
-    };
-    auto calc_err_z = [&problem, &y, &Σ](crvec x̂, rvec err_z) {
-        Helpers::calc_err_z(problem, x̂, y, Σ, err_z);
     };
 
     // Printing ----------------------------------------------------------------
@@ -231,16 +225,15 @@ auto PANOCSolver<DirectionProviderT>::operator()(
 
         auto time_elapsed = std::chrono::steady_clock::now() - start_time;
         auto stop_status  = Helpers::check_all_stop_conditions(
-            params, time_elapsed, k, stop_signal, ε, εₖ, no_progress);
+            params, opts, time_elapsed, k, stop_signal, εₖ, no_progress);
         if (stop_status != SolverStatus::Busy) {
-            // TODO: We could cache g(x) and ẑ, but would that faster?
-            //       It saves 1 evaluation of g per ALM iteration, but requires
-            //       many extra stores in the inner loops of PANOC.
             // TODO: move the computation of ẑ and g(x) to ALM?
             if (stop_status == SolverStatus::Converged ||
                 stop_status == SolverStatus::Interrupted ||
-                always_overwrite_results) {
-                calc_err_z(curr->x̂, /* in ⟹ out */ err_z);
+                opts.always_overwrite_results) {
+                auto &ŷ = curr->ŷx̂;
+                if (err_z.size() > 0)
+                    err_z = Σ.asDiagonal().inverse() * (ŷ - y);
                 x = std::move(curr->x̂);
                 y = std::move(curr->ŷx̂);
             }

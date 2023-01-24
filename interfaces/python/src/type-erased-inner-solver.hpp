@@ -1,5 +1,6 @@
 #pragma once
 
+#include <alpaqa/inner/inner-solve-options.hpp>
 #include <alpaqa/problem/type-erased-problem.hpp>
 #include "type-erased-solver-stats.hpp"
 
@@ -8,11 +9,12 @@ namespace alpaqa {
 template <Config Conf>
 struct InnerSolverVTable : util::BasicVTable {
     USING_ALPAQA_CONFIG(Conf);
-    using Stats   = TypeErasedInnerSolverStats<Conf>;
-    using Problem = TypeErasedProblem<Conf>;
+    using Stats        = TypeErasedInnerSolverStats<Conf>;
+    using Problem      = TypeErasedProblem<Conf>;
+    using SolveOptions = InnerSolveOptions<config_t>;
 
     // clang-format off
-    required_function_t<Stats(const Problem &, crvec, real_t, bool, rvec, rvec, rvec)>
+    required_function_t<Stats(const Problem &, const SolveOptions &, rvec, rvec, crvec, rvec)>
         call = nullptr;
     required_function_t<void()>
         stop = nullptr;

@@ -169,3 +169,15 @@ inline const dict_to_struct_table_t<alpaqa::GAAPGAParams>
     };
 
 #endif
+
+template <class T, class... Extra>
+auto register_dataclass(py::module_ &m, const char *name, const Extra &...extra) {
+    py::class_<T> cls(m, name, extra...);
+    cls //
+        .def(py::init(&dict_to_struct<T>))
+        .def(py::init(&kwargs_to_struct<T>))
+        .def("to_dict", &struct_to_dict<T>);
+    for (auto &&[key, getset] : dict_to_struct_table<T>::table)
+        cls.def_property(key.c_str(), getset.get, getset.set);
+    return cls;
+}

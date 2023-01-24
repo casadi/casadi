@@ -21,7 +21,7 @@ struct PANOCOCPParams {
     /// Maximum number of inner PANOC iterations.
     unsigned max_iter = 100;
     /// Maximum duration.
-    std::chrono::microseconds max_time = std::chrono::minutes(5);
+    std::chrono::nanoseconds max_time = std::chrono::minutes(5);
     /// Minimum weight factor between Newton step and projected gradient step,
     /// line search parameter.
     real_t τ_min = 1. / 256;
@@ -130,14 +130,16 @@ class PANOCOCPSolver {
     using Params       = PANOCOCPParams<config_t>;
     using Stats        = PANOCOCPStats<config_t>;
     using ProgressInfo = PANOCOCPProgressInfo<config_t>;
+    using SolveOptions = InnerSolveOptions<config_t>;
 
     PANOCOCPSolver(const Params &params) : params(params) {}
 
-    Stats operator()(const Problem &problem, // in
-                     real_t ε,               // in
-                     rvec u,                 // inout
-                     crvec y = vec{},        // in
-                     crvec μ = vec{});       // in
+    Stats operator()(const Problem &problem,   // in
+                     const SolveOptions &opts, // in
+                     rvec u,                   // inout
+                     rvec y,                   // in
+                     crvec μ,                  // in
+                     rvec err_z);              // out
 
     /// Specify a callable that is invoked with some intermediate results on
     /// each iteration of the algorithm.

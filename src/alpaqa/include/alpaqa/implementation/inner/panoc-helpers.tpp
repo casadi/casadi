@@ -2,6 +2,7 @@
 
 #include <alpaqa/config/config.hpp>
 #include <alpaqa/export.hpp>
+#include <alpaqa/inner/inner-solve-options.hpp>
 #include <alpaqa/inner/internal/panoc-stop-crit.hpp>
 #include <alpaqa/inner/internal/solverstatus.hpp>
 #include <alpaqa/problem/type-erased-problem.hpp>
@@ -215,82 +216,36 @@ struct PANOCHelpers {
     static SolverStatus check_all_stop_conditions(
         /// [in]    Parameters including `max_iter`, `max_time` and `max_no_progress`
         const ParamsT &params,
+        /// [in]    Options for the current solve
+        const InnerSolveOptions<config_t> &opts,
         /// [in]    Time elapsed since the start of the algorithm
         DurationT time_elapsed,
         /// [in]    The current iteration number
         unsigned iteration,
         /// [in]    A stop signal for the user to interrupt the algorithm
         const AtomicStopSignal &stop_signal,
-        /// [in]    Desired primal tolerance
-        real_t ε,
         /// [in]    Tolerance of the current iterate
         real_t εₖ,
         /// [in]    The number of successive iterations no progress was made
         unsigned no_progress) {
 
-        bool out_of_time     = time_elapsed > params.max_time;
-        bool out_of_iter     = iteration == params.max_iter;
-        bool interrupted     = stop_signal.stop_requested();
-        bool not_finite      = not std::isfinite(εₖ);
-        bool conv            = εₖ <= ε;
+        auto max_time = params.max_time;
+        if (opts.max_time)
+            max_time = std::min(max_time, *opts.max_time);
+        auto tolerance   = opts.tolerance > 0 ? opts.tolerance : real_t(1e-8);
+        bool out_of_time = time_elapsed > max_time;
+        bool out_of_iter = iteration == params.max_iter;
+        bool interrupted = stop_signal.stop_requested();
+        bool not_finite  = not std::isfinite(εₖ);
+        bool converged   = εₖ <= tolerance;
         bool max_no_progress = no_progress > params.max_no_progress;
-        return conv              ? SolverStatus::Converged
+        return converged         ? SolverStatus::Converged
                : out_of_time     ? SolverStatus::MaxTime
                : out_of_iter     ? SolverStatus::MaxIter
                : not_finite      ? SolverStatus::NotFinite
                : max_no_progress ? SolverStatus::NoProgress
                : interrupted     ? SolverStatus::Interrupted
                                  : SolverStatus::Busy;
-    }
-
-    /// Compute the Hessian matrix of the augmented Lagrangian function
-    /// @f[ \nabla^2_{xx} L_\Sigma(x, y) =
-    ///     \Big. \nabla_{xx}^2 L(x, y) \Big|_{\big(x,\, \hat y(x, y)\big)}
-    ///   + \sum_{i\in\mathcal{I}} \Sigma_i\,\nabla g_i(x) \nabla g_i(x)^\top @f]
-    static void calc_augmented_lagrangian_hessian(
-        /// [in]  Problem description
-        const Problem &problem,
-        /// [in]    Current iterate @f$ x^k @f$
-        crvec xₖ,
-        /// [in]   Intermediate vector @f$ \hat y(x^k) @f$
-        crvec ŷxₖ,
-        /// [in]    Lagrange multipliers @f$ y @f$
-        crvec y,
-        /// [in]    Penalty weights @f$ \Sigma @f$
-        crvec Σ,
-        /// [out]   The constraint values @f$ g(x^k) @f$
-        rvec g,
-        /// [out]   Hessian matrix @f$ H(x, y) @f$
-        mat &H,
-        ///         Dimension n
-        rvec work_n) {
-
-        // // Compute the Hessian of the Lagrangian
-        // problem.eval_hess_L(xₖ, ŷxₖ, H);
-        // // Compute the Hessian of the augmented Lagrangian
-        // problem.eval_g(xₖ, g);
-        // auto &&D = problem.get_D();
-        // for (index_t i = 0; i < problem.m; ++i) {
-        //     real_t ζ      = g(i) + y(i) / Σ(i);
-        //     bool inactive = D.lowerbound(i) < ζ && ζ < D.upperbound(i);
-        //     if (not inactive) {
-        //         problem.eval_grad_gi(xₖ, i, work_n);
-        //         H += work_n * Σ(i) * work_n.transpose();
-        //     }
-        // }
-
-        throw not_implemented_error(
-            "TODO: implement calc_augmented_lagrangian_hessian in "
-            "TypeErasedProblem");
-
-        (void)problem;
-        (void)xₖ;
-        (void)ŷxₖ;
-        (void)y;
-        (void)Σ;
-        (void)g;
-        (void)H;
-        (void)work_n;
     }
 
     /// Compute the Hessian matrix of the augmented Lagrangian function multiplied

@@ -9,10 +9,10 @@
 namespace py = pybind11;
 using namespace py::literals;
 
+#include <alpaqa/implementation/inner/panoc.tpp>
 #include <alpaqa/inner/directions/panoc/lbfgs.hpp>
 #include <alpaqa/inner/directions/panoc/structured-lbfgs.hpp>
 #include <alpaqa/inner/panoc.hpp>
-#include <alpaqa/implementation/inner/panoc.tpp>
 #include <alpaqa/util/check-dim.hpp>
 
 #include "async.hpp"
@@ -23,6 +23,9 @@ using namespace py::literals;
 template <alpaqa::Config Conf>
 void register_panoc(py::module_ &m) {
     USING_ALPAQA_CONFIG(Conf);
+
+    using InnerSolveOptions = alpaqa::InnerSolveOptions<config_t>;
+    register_dataclass<InnerSolveOptions>(m, "InnerSolveOptions");
 
     // ----------------------------------------------------------------------------------------- //
     using TypeErasedPANOCDirection = alpaqa::TypeErasedPANOCDirection<Conf>;
@@ -98,13 +101,12 @@ void register_panoc(py::module_ &m) {
     // Solve without ALM
     using PANOCSolver            = alpaqa::PANOCSolver<TypeErasedPANOCDirection>;
     using Problem                = typename PANOCSolver::Problem;
-    auto panoc_independent_solve = [](PANOCSolver &solver, const Problem &problem, crvec Σ,
-                                      real_t ε, std::optional<vec> x, std::optional<vec> y,
-                                      bool async) {
-        bool always_overwrite_results = true;
-        auto n                        = problem.get_n();
-        auto m                        = problem.get_m();
-        alpaqa::util::check_dim<config_t>("Σ", Σ, m);
+    auto panoc_independent_solve = [](PANOCSolver &solver, const Problem &problem,
+                                      const InnerSolveOptions &opt, std::optional<vec> x,
+                                      std::optional<vec> y, std::optional<vec> Σ, bool async) {
+        auto n     = problem.get_n();
+        auto m     = problem.get_m();
+        bool ret_y = y.has_value();
         if (x)
             alpaqa::util::check_dim<config_t>("x", *x, n);
         else
@@ -113,30 +115,20 @@ void register_panoc(py::module_ &m) {
             alpaqa::util::check_dim<config_t>("y", *y, m);
         else
             y = vec::Zero(m);
-        vec err_z          = vec::Zero(m);
-        auto invoke_solver = [&] {
-            return solver(problem, Σ, ε, always_overwrite_results, *x, *y, err_z);
-        };
-        auto &&stats = async_solve(async, solver, invoke_solver, problem);
-        return std::make_tuple(std::move(*x), std::move(*y), std::move(err_z),
-                               alpaqa::conv::stats_to_dict(stats));
-    };
-    // Solve without ALM and without constraints
-    auto panoc_independent_solve_unconstr = [](PANOCSolver &solver, const Problem &problem,
-                                               real_t ε, std::optional<vec> x, bool async) {
-        bool always_overwrite_results = true;
-        auto n                        = problem.get_n();
-        auto m                        = problem.get_m();
-        if (x)
-            alpaqa::util::check_dim<config_t>("x", *x, n);
+        if (Σ)
+            alpaqa::util::check_dim<config_t>("Σ", *Σ, m);
+        else if (m == 0)
+            Σ = vec{};
         else
-            x = vec::Zero(n);
-        vec Σ(0), y(0), err_z(0);
-        auto invoke_solver = [&] {
-            return solver(problem, Σ, ε, always_overwrite_results, *x, y, err_z);
-        };
-        auto &&stats = async_solve(async, solver, invoke_solver, problem);
-        return std::make_tuple(std::move(*x), alpaqa::conv::stats_to_dict(stats));
+            throw std::invalid_argument("Missing argument Σ");
+        vec err_z          = vec::Zero(m);
+        auto invoke_solver = [&] { return solver(problem, opt, *x, *y, *Σ, err_z); };
+        auto &&stats       = async_solve(async, solver, invoke_solver, problem);
+        if (ret_y)
+            return py::make_tuple(std::move(*x), std::move(*y), std::move(err_z),
+                                  alpaqa::conv::stats_to_dict(stats));
+        else
+            return py::make_tuple(std::move(*x), alpaqa::conv::stats_to_dict(stats));
     };
 
     py::class_<PANOCSolver>(m, "PANOCSolver", "C++ documentation: :cpp:class:`alpaqa::PANOCSolver`")
@@ -164,28 +156,21 @@ void register_panoc(py::module_ &m) {
             "__deepcopy__", [](const PANOCSolver &self, py::dict) { return PANOCSolver{self}; },
             "memo"_a)
         // Call
-        .def("__call__", panoc_independent_solve, "problem"_a, "Σ"_a, "ε"_a, "x"_a = py::none(),
-             "y"_a = py::none(), "asynchronous"_a = true, //
+        .def("__call__", panoc_independent_solve, "problem"_a, "opts"_a = py::dict(),
+             "x"_a = py::none(), "y"_a = py::none(), "Σ"_a = py::none(), "asynchronous"_a = true, //
              "Solve.\n\n"
              ":param problem: Problem to solve\n"
-             ":param Σ: Penalty factor\n"
-             ":param ε: Desired tolerance\n"
+             ":param opts: Solve options\n"
              ":param x: Initial guess\n"
              ":param y: Initial Lagrange multipliers\n\n"
+             ":param Σ: Penalty factor\n"
              ":param asynchronous: Release the GIL and run the solver on a separate thread\n"
              ":return: * Solution :math:`x`\n"
-             "         * Updated Lagrange multipliers :math:`y`\n"
-             "         * Slack variable error :math:`g(x) - z`\n"
-             "         * Statistics\n\n")
-        .def("__call__", panoc_independent_solve_unconstr, "problem"_a, "ε"_a, "x"_a = py::none(),
-             "asynchronous"_a = true, //
-             "Solve.\n\n"
-             ":param problem: Problem to solve\n"
-             ":param ε: Desired tolerance\n"
-             ":param x: Initial guess\n"
-             ":param asynchronous: Release the GIL and run the solver on a separate thread\n"
-             ":return: * Solution :math:`x`\n"
-             "         * Statistics\n\n")
+             "         * (Optional) Updated Lagrange multipliers :math:`y`\n"
+             "         * (Optional) Slack variable error :math:`g(x) - z`\n"
+             "         * Statistics\n\n"
+             "The updated multipliers and slack variable error are only returned if ``y`` is not "
+             "``None``\n\n")
         .def("__str__", &PANOCSolver::get_name)
         .def("set_progress_callback", &PANOCSolver::set_progress_callback, "callback"_a,
              "Specify a callable that is invoked with some intermediate results on each iteration "

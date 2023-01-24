@@ -71,7 +71,7 @@ struct ALMParams {
     /// Maximum number of outer ALM iterations.
     unsigned int max_iter = 100;
     /// Maximum duration.
-    std::chrono::microseconds max_time = std::chrono::minutes(5);
+    std::chrono::nanoseconds max_time = std::chrono::minutes(5);
 
     /// How many times can the initial penalty @ref Σ_0 or
     /// @ref σ_0 and the initial primal tolerance @ref ε_0

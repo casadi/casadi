@@ -2,6 +2,7 @@
 
 #include <alpaqa/export.hpp>
 #include <alpaqa/inner/directions/panoc-direction-update.hpp>
+#include <alpaqa/inner/inner-solve-options.hpp>
 #include <alpaqa/inner/internal/lipschitz.hpp>
 #include <alpaqa/inner/internal/panoc-helpers.hpp>
 #include <alpaqa/inner/internal/panoc-stop-crit.hpp>
@@ -27,7 +28,7 @@ struct PANOCParams {
     /// Maximum number of inner PANOC iterations.
     unsigned max_iter = 100;
     /// Maximum duration.
-    std::chrono::microseconds max_time = std::chrono::minutes(5);
+    std::chrono::nanoseconds max_time = std::chrono::minutes(5);
     /// Minimum weight factor between Newton step and projected gradient step.
     real_t τ_min = 1. / 256;
     /// Parameter β used in the line search (see Algorithm 2 in
@@ -108,6 +109,7 @@ class PANOCSolver {
     using Direction    = DirectionT;
     using Stats        = PANOCStats<config_t>;
     using ProgressInfo = PANOCProgressInfo<config_t>;
+    using SolveOptions = InnerSolveOptions<config_t>;
 
     PANOCSolver(const Params &params)
         requires std::default_initializable<Direction>
@@ -117,13 +119,12 @@ class PANOCSolver {
     PANOCSolver(const Params &params, const Direction &direction)
         : params(params), direction(direction) {}
 
-    Stats operator()(const Problem &problem,        // in
-                     crvec Σ,                       // in
-                     real_t ε,                      // in
-                     bool always_overwrite_results, // in
-                     rvec x,                        // inout
-                     rvec y,                        // inout
-                     rvec err_z);                   // out
+    Stats operator()(const Problem &problem,   // in
+                     const SolveOptions &opts, // in
+                     rvec x,                   // inout
+                     rvec y,                   // inout
+                     crvec Σ,                  // in
+                     rvec d);                  // out
 
     /// Specify a callable that is invoked with some intermediate results on
     /// each iteration of the algorithm.

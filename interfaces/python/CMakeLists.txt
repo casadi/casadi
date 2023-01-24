@@ -27,6 +27,7 @@ pybind11_add_module(_alpaqa MODULE
     "src/ocp.py.cpp"
     "src/problems.py.cpp"
     "src/control-problems.py.cpp"
+    "src/params/inner-solve-options.cpp"
     "src/params/lbfgs-direction-params.cpp"
     "src/params/lbfgs-params.cpp"
     "src/params/panoc-ocp-params.cpp"

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "inner-solve-options.hpp"
 #include "lbfgs-direction-params.hpp"
 #include "lbfgs-params.hpp"
 #include "panoc-ocp-params.hpp"
