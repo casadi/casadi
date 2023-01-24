@@ -35,38 +35,13 @@ void register_panoc(py::module_ &m) {
 
     // ----------------------------------------------------------------------------------------- //
     using LipschitzEstimateParams = alpaqa::LipschitzEstimateParams<config_t>;
-    py::class_<LipschitzEstimateParams>(
+    register_dataclass<LipschitzEstimateParams>(
         m, "LipschitzEstimateParams",
-        "C++ documentation: :cpp:class:`alpaqa::LipschitzEstimateParams`")
-        .def(py::init(&dict_to_struct<LipschitzEstimateParams>))
-        .def(py::init(&kwargs_to_struct<LipschitzEstimateParams>))
-        .def("to_dict", &struct_to_dict<LipschitzEstimateParams>)
-        .def_readwrite("L_0", &LipschitzEstimateParams::L_0)
-        .def_readwrite("ε", &LipschitzEstimateParams::ε)
-        .def_readwrite("δ", &LipschitzEstimateParams::δ)
-        .def_readwrite("Lγ_factor", &LipschitzEstimateParams::Lγ_factor);
+        "C++ documentation: :cpp:class:`alpaqa::LipschitzEstimateParams`");
 
     using PANOCParams = alpaqa::PANOCParams<config_t>;
-    py::class_<PANOCParams>(m, "PANOCParams", "C++ documentation: :cpp:class:`alpaqa::PANOCParams`")
-        .def(py::init(&dict_to_struct<PANOCParams>))
-        .def(py::init(&kwargs_to_struct<PANOCParams>))
-        .def("to_dict", &struct_to_dict<PANOCParams>)
-        // clang-format off
-        .def_readwrite("Lipschitz", &PANOCParams::Lipschitz)
-        .def_readwrite("max_iter", &PANOCParams::max_iter)
-        .def_readwrite("max_time", &PANOCParams::max_time)
-        .def_readwrite("τ_min", &PANOCParams::τ_min)
-        .def_readwrite("β", &PANOCParams::β)
-        .def_readwrite("L_min", &PANOCParams::L_min)
-        .def_readwrite("L_max", &PANOCParams::L_max)
-        .def_readwrite("stop_crit", &PANOCParams::stop_crit)
-        .def_readwrite("max_no_progress", &PANOCParams::max_no_progress)
-        .def_readwrite("print_interval", &PANOCParams::print_interval)
-        .def_readwrite("print_precision", &PANOCParams::print_precision)
-        .def_readwrite("quadratic_upperbound_tolerance_factor", &PANOCParams::quadratic_upperbound_tolerance_factor)
-        .def_readwrite("linesearch_tolerance_factor", &PANOCParams::linesearch_tolerance_factor)
-        // clang-format on
-        ;
+    register_dataclass<PANOCParams>(m, "PANOCParams",
+                                    "C++ documentation: :cpp:class:`alpaqa::PANOCParams`");
 
     // ----------------------------------------------------------------------------------------- //
     using PANOCProgressInfo = alpaqa::PANOCProgressInfo<config_t>;

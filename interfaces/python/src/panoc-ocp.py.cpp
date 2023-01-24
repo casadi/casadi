@@ -23,34 +23,8 @@ void register_panoc_ocp(py::module_ &m) {
 
     // ----------------------------------------------------------------------------------------- //
     using PANOCOCPParams = alpaqa::PANOCOCPParams<config_t>;
-    py::class_<PANOCOCPParams>(m, "PANOCOCPParams",
-                               "C++ documentation: :cpp:class:`alpaqa::PANOCOCPParams`")
-        .def(py::init(&dict_to_struct<PANOCOCPParams>))
-        .def(py::init(&kwargs_to_struct<PANOCOCPParams>))
-        .def("to_dict", &struct_to_dict<PANOCOCPParams>)
-        // clang-format off
-        .def_readwrite("Lipschitz", &PANOCOCPParams::Lipschitz)
-        .def_readwrite("max_iter", &PANOCOCPParams::max_iter)
-        .def_readwrite("max_time", &PANOCOCPParams::max_time)
-        .def_readwrite("τ_min", &PANOCOCPParams::τ_min)
-        .def_readwrite("β", &PANOCOCPParams::β)
-        .def_readwrite("L_min", &PANOCOCPParams::L_min)
-        .def_readwrite("L_max", &PANOCOCPParams::L_max)
-        .def_readwrite("L_max_inc", &PANOCOCPParams::L_max_inc)
-        .def_readwrite("stop_crit", &PANOCOCPParams::stop_crit)
-        .def_readwrite("max_no_progress", &PANOCOCPParams::max_no_progress)
-        .def_readwrite("gn_interval", &PANOCOCPParams::gn_interval)
-        .def_readwrite("gn_sticky", &PANOCOCPParams::gn_sticky)
-        .def_readwrite("reset_lbfgs_on_gn_step", &PANOCOCPParams::reset_lbfgs_on_gn_step)
-        .def_readwrite("lqr_factor_cholesky", &PANOCOCPParams::lqr_factor_cholesky)
-        .def_readwrite("lbfgs_params", &PANOCOCPParams::lbfgs_params)
-        .def_readwrite("print_interval", &PANOCOCPParams::print_interval)
-        .def_readwrite("print_precision", &PANOCOCPParams::print_precision)
-        .def_readwrite("quadratic_upperbound_tolerance_factor", &PANOCOCPParams::quadratic_upperbound_tolerance_factor)
-        .def_readwrite("linesearch_tolerance_factor", &PANOCOCPParams::linesearch_tolerance_factor)
-        .def_readwrite("disable_acceleration", &PANOCOCPParams::disable_acceleration)
-        // clang-format on
-        ;
+    register_dataclass<PANOCOCPParams>(m, "PANOCOCPParams",
+                                       "C++ documentation: :cpp:class:`alpaqa::PANOCOCPParams`");
 
     using PANOCOCPProgressInfo = alpaqa::PANOCOCPProgressInfo<config_t>;
     py::class_<PANOCOCPProgressInfo>(m, "PANOCOCPProgressInfo",

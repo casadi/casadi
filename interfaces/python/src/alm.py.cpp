@@ -76,35 +76,8 @@ void register_alm(py::module_ &m) {
 
     using ALMSolver = alpaqa::ALMSolver<InnerSolver>;
     using ALMParams = typename ALMSolver::Params;
-    py::class_<ALMParams>(m, "ALMParams", "C++ documentation: :cpp:class:`alpaqa::ALMParams`")
-        .def(py::init(&dict_to_struct<ALMParams>))
-        .def(py::init(&kwargs_to_struct<ALMParams>))
-        .def("to_dict", &struct_to_dict<ALMParams>)
-        .def_readwrite("ε", &ALMParams::ε)
-        .def_readwrite("δ", &ALMParams::δ)
-        .def_readwrite("Δ", &ALMParams::Δ)
-        .def_readwrite("Δ_lower", &ALMParams::Δ_lower)
-        .def_readwrite("Δ_min", &ALMParams::Δ_min)
-        .def_readwrite("Σ_0", &ALMParams::Σ_0)
-        .def_readwrite("σ_0", &ALMParams::σ_0)
-        .def_readwrite("Σ_0_lower", &ALMParams::Σ_0_lower)
-        .def_readwrite("ε_0", &ALMParams::ε_0)
-        .def_readwrite("ε_0_increase", &ALMParams::ε_0_increase)
-        .def_readwrite("ρ", &ALMParams::ρ)
-        .def_readwrite("ρ_increase", &ALMParams::ρ_increase)
-        .def_readwrite("ρ_max", &ALMParams::ρ_max)
-        .def_readwrite("θ", &ALMParams::θ)
-        .def_readwrite("M", &ALMParams::M)
-        .def_readwrite("penalty_alm_split", &ALMParams::penalty_alm_split)
-        .def_readwrite("Σ_max", &ALMParams::Σ_max)
-        .def_readwrite("Σ_min", &ALMParams::Σ_min)
-        .def_readwrite("max_iter", &ALMParams::max_iter)
-        .def_readwrite("max_time", &ALMParams::max_time)
-        .def_readwrite("max_num_initial_retries", &ALMParams::max_num_initial_retries)
-        .def_readwrite("max_num_retries", &ALMParams::max_num_retries)
-        .def_readwrite("max_total_num_retries", &ALMParams::max_total_num_retries)
-        .def_readwrite("print_interval", &ALMParams::print_interval)
-        .def_readwrite("single_penalty_factor", &ALMParams::single_penalty_factor);
+    register_dataclass<ALMParams>(m, "ALMParams",
+                                  "C++ documentation: :cpp:class:`alpaqa::ALMParams`");
 
     auto safe_alm_call = [](ALMSolver &solver, const TypeErasedProblem &p, std::optional<vec> x,
                             std::optional<vec> y, bool async) -> std::tuple<vec, vec, py::dict> {

@@ -23,27 +23,12 @@ void register_lbfgs(py::module_ &m) {
     py::class_<LBFGSParams> lbfgsparams(lbfgs, "Params",
                                         "C++ documentation :cpp:class:`alpaqa::LBFGSParams`");
     using CBFGS = alpaqa::CBFGSParams<config_t>;
-    py::class_<CBFGS> cbfgs(lbfgsparams, "CBFGS",
-                            "C++ documentation :cpp:class:`alpaqa::CBFGSParams`");
+    register_dataclass<CBFGS>(lbfgsparams, "CBFGS",
+                              "C++ documentation :cpp:class:`alpaqa::CBFGSParams`");
     using LBFGSSign = typename LBFGS::Sign;
     py::enum_<LBFGSSign> lbfgssign(lbfgs, "Sign",
                                    "C++ documentation :cpp:enum:`alpaqa::LBFGS::Sign`");
-    cbfgs //
-        .def(py::init(&dict_to_struct<CBFGS>))
-        .def(py::init(&kwargs_to_struct<CBFGS>))
-        .def("to_dict", &struct_to_dict<CBFGS>)
-        .def_readwrite("α", &CBFGS::α)
-        .def_readwrite("ϵ", &CBFGS::ϵ);
-    lbfgsparams //
-        .def(py::init(&dict_to_struct<LBFGSParams>))
-        .def(py::init(&kwargs_to_struct<LBFGSParams>))
-        .def("to_dict", &struct_to_dict<LBFGSParams>)
-        .def_readwrite("memory", &LBFGSParams::memory)
-        .def_readwrite("min_div_fac", &LBFGSParams::min_div_fac)
-        .def_readwrite("min_abs_s", &LBFGSParams::min_abs_s)
-        .def_readwrite("cbfgs", &LBFGSParams::cbfgs)
-        .def_readwrite("force_pos_def", &LBFGSParams::force_pos_def)
-        .def_readwrite("stepsize", &LBFGSParams::stepsize);
+    make_dataclass(lbfgsparams);
     lbfgssign //
         .value("Positive", LBFGSSign::Positive)
         .value("Negative", LBFGSSign::Negative)

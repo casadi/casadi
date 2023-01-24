@@ -33,14 +33,9 @@ void register_panoc_directions(py::module_ &m) {
 
     py::class_<LBFGSDir> lbfgs(m, "LBFGSDirection",
                                "C++ documentation: :cpp:class:`alpaqa::LBFGSDirection`");
-    py::class_<LBFGSDirParams> lbfgs_params(
+    register_dataclass<LBFGSDirParams>(
         lbfgs, "DirectionParams",
         "C++ documentation: :cpp:class:`alpaqa::LBFGSDirection::DirectionParams`");
-    lbfgs_params //
-        .def(py::init(&dict_to_struct<LBFGSDirParams>))
-        .def(py::init(&kwargs_to_struct<LBFGSDirParams>))
-        .def("to_dict", &struct_to_dict<LBFGSDirParams>)
-        .def_readwrite("rescale_when_γ_changes", &LBFGSDirParams::rescale_when_γ_changes);
     lbfgs //
         .def(py::init([](params_or_dict<LBFGSParams> lbfgs_params,
                          params_or_dict<LBFGSDirParams> direction_params) {
@@ -64,17 +59,9 @@ void register_panoc_directions(py::module_ &m) {
     py::class_<StructuredLBFGSDir> struc_lbfgs(
         m, "StructuredLBFGSDirection",
         "C++ documentation: :cpp:class:`alpaqa::StructuredLBFGSDirection`");
-    py::class_<StrucLBFGSDirParams> struc_lbfgs_params(
+    register_dataclass<StrucLBFGSDirParams>(
         struc_lbfgs, "DirectionParams",
         "C++ documentation: :cpp:class:`alpaqa::StructuredLBFGSDirection::DirectionParams`");
-    struc_lbfgs_params //
-        .def(py::init(&dict_to_struct<StrucLBFGSDirParams>))
-        .def(py::init(&kwargs_to_struct<StrucLBFGSDirParams>))
-        .def("to_dict", &struct_to_dict<StrucLBFGSDirParams>)
-        .def_readwrite("hessian_vec", &StrucLBFGSDirParams::hessian_vec)
-        .def_readwrite("hessian_vec_finite_differences",
-                       &StrucLBFGSDirParams::hessian_vec_finite_differences)
-        .def_readwrite("full_augmented_hessian", &StrucLBFGSDirParams::full_augmented_hessian);
     struc_lbfgs //
         .def(py::init([](params_or_dict<LBFGSParams> lbfgs_params,
                          params_or_dict<StrucLBFGSDirParams> direction_params) {
