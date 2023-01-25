@@ -5,7 +5,7 @@ function(alpaqa_install_debug_syms target component dest_lib dest_bin)
             DESTINATION ${dest_bin}
             CONFIGURATIONS Debug RelWithDebInfo
             COMPONENT ${component} 
-            PTIONAL EXCLUDE_FROM_ALL)
+            OPTIONAL EXCLUDE_FROM_ALL)
     elseif (CMAKE_STRIP AND CMAKE_OBJCOPY)
         set(DEBUG_FILE "$<TARGET_FILE_NAME:${target}>.debug")
         add_custom_command(TARGET ${target} POST_BUILD
