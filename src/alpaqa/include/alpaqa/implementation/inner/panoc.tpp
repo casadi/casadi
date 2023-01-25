@@ -242,6 +242,9 @@ auto PANOCSolver<DirectionProviderT>::operator()(
             s.elapsed_time = duration_cast<nanoseconds>(time_elapsed);
             s.status       = stop_status;
             s.final_γ      = curr->γ;
+            s.final_ψ      = curr->ψx̂;
+            s.final_h      = curr->hx̂;
+            s.final_φγ     = curr->fbe();
             return s;
         }
 

@@ -119,6 +119,9 @@ struct PANOCOCPStats {
     unsigned count_τ             = 0;
     real_t sum_τ                 = 0;
     real_t final_γ               = 0;
+    real_t final_ψ               = 0;
+    real_t final_h               = 0;
+    real_t final_φγ              = 0;
 };
 
 template <Config Conf>
@@ -165,6 +168,96 @@ class PANOCOCPSolver {
   public:
     std::ostream *os = &std::cout;
 };
+
+template <Config Conf>
+struct InnerStatsAccumulator<PANOCOCPStats<Conf>> {
+    USING_ALPAQA_CONFIG(Conf);
+
+    /// Total elapsed time in the inner solver.
+    std::chrono::nanoseconds elapsed_time{};
+    /// Total time spent computing proximal mappings.
+    std::chrono::nanoseconds time_prox{};
+    /// Total time spent doing forward simulations.
+    std::chrono::nanoseconds time_forward{};
+    /// Total time spent doing backward gradient evaluations.
+    std::chrono::nanoseconds time_backward{};
+    /// Total time spent computing dynamics Jacobians.
+    std::chrono::nanoseconds time_jacobians{};
+    /// Total time spent computing cost Hessians and Hessian-vector products.
+    std::chrono::nanoseconds time_hessians{};
+    /// Total time spent determining active indices.
+    std::chrono::nanoseconds time_indices{};
+    /// Total time spent performing LQR factorizations.
+    std::chrono::nanoseconds time_lqr_factor{};
+    /// Total time spent solving the (factorized) LQR problem.
+    std::chrono::nanoseconds time_lqr_solve{};
+    /// Total time spent determining active indices for L-BFGS applications.
+    std::chrono::nanoseconds time_lbfgs_indices{};
+    /// Total time spent applying L-BFGS estimates.
+    std::chrono::nanoseconds time_lbfgs_apply{};
+    /// Total time spent updating the L-BFGS estimate.
+    std::chrono::nanoseconds time_lbfgs_update{};
+    /// Total time spent in the user-provided progress callback.
+    std::chrono::nanoseconds time_progress_callback{};
+    /// Total number of inner PANOC iterations.
+    unsigned iterations = 0;
+    /// Total number of PANOC line search failures.
+    unsigned linesearch_failures = 0;
+    /// Total number of times that the L-BFGS direction was not finite.
+    unsigned lbfgs_failures = 0;
+    /// Total number of times that the L-BFGS update was rejected (i.e. it
+    /// could have resulted in a non-positive definite Hessian estimate).
+    unsigned lbfgs_rejected = 0;
+    /// Total number of times that a line search parameter of @f$ \tau = 1 @f$
+    /// was accepted (i.e. no backtracking necessary).
+    unsigned τ_1_accepted = 0;
+    /// The total number of line searches performed (used for computing the
+    /// average value of @f$ \tau @f$).
+    unsigned count_τ = 0;
+    /// The sum of the line search parameter @f$ \tau @f$ in all iterations
+    /// (used for computing the average value of @f$ \tau @f$).
+    real_t sum_τ = 0;
+    /// The final PANOC step size γ.
+    real_t final_γ = 0;
+    /// Final value of the smooth cost @f$ \psi(\hat x) @f$.
+    real_t final_ψ = 0;
+    /// Final value of the nonsmooth cost @f$ h(\hat x) @f$.
+    real_t final_h = 0;
+    /// Final value of the forward-backward envelope, @f$ \varphi_\gamma(x) @f$
+    /// (note that this is in the point @f$ x @f$, not @f$ \hat x @f$).
+    real_t final_φγ = 0;
+};
+
+template <Config Conf>
+InnerStatsAccumulator<PANOCOCPStats<Conf>> &
+operator+=(InnerStatsAccumulator<PANOCOCPStats<Conf>> &acc,
+           const PANOCOCPStats<Conf> &s) {
+    acc.iterations += s.iterations;
+    acc.elapsed_time += s.elapsed_time;
+    acc.time_prox += s.time_prox;
+    acc.time_forward += s.time_forward;
+    acc.time_backward += s.time_backward;
+    acc.time_jacobians += s.time_jacobians;
+    acc.time_hessians += s.time_hessians;
+    acc.time_indices += s.time_indices;
+    acc.time_lqr_factor += s.time_lqr_factor;
+    acc.time_lqr_solve += s.time_lqr_solve;
+    acc.time_lbfgs_indices += s.time_lbfgs_indices;
+    acc.time_lbfgs_apply += s.time_lbfgs_apply;
+    acc.time_lbfgs_update += s.time_lbfgs_update;
+    acc.time_progress_callback += s.time_progress_callback;
+    acc.linesearch_failures += s.linesearch_failures;
+    acc.lbfgs_failures += s.lbfgs_failures;
+    acc.lbfgs_rejected += s.lbfgs_rejected;
+    acc.τ_1_accepted += s.τ_1_accepted;
+    acc.count_τ += s.count_τ;
+    acc.sum_τ += s.sum_τ;
+    acc.final_γ  = s.final_γ;
+    acc.final_ψ  = s.final_ψ;
+    acc.final_h  = s.final_h;
+    acc.final_φγ = s.final_φγ;
+    return acc;
+}
 
 ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, PANOCOCPProgressInfo, DefaultConfig);
 ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, PANOCOCPProgressInfo, EigenConfigf);

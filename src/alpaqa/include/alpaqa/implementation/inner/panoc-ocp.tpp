@@ -527,8 +527,11 @@ auto PANOCOCPSolver<Conf>::operator()(
             s.ε            = εₖ;
             s.elapsed_time = duration_cast<nanoseconds>(time_elapsed);
             s.time_lqr_factor -= s.time_hessians;
-            s.status  = stop_status;
-            s.final_γ = curr->γ;
+            s.status   = stop_status;
+            s.final_γ  = curr->γ;
+            s.final_ψ  = curr->ψû;
+            s.final_h  = 0; // only box constraints
+            s.final_φγ = curr->fbe();
             return s;
         }
 

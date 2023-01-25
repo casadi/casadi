@@ -70,6 +70,9 @@ struct PANOCStats {
     unsigned count_τ             = 0;
     real_t sum_τ                 = 0;
     real_t final_γ               = 0;
+    real_t final_ψ               = 0;
+    real_t final_h               = 0;
+    real_t final_φγ              = 0;
 };
 
 template <Config Conf = DefaultConfig>
@@ -181,6 +184,13 @@ struct InnerStatsAccumulator<PANOCStats<Conf>> {
     real_t sum_τ = 0;
     /// The final PANOC step size γ.
     real_t final_γ = 0;
+    /// Final value of the smooth cost @f$ \psi(\hat x) @f$.
+    real_t final_ψ = 0;
+    /// Final value of the nonsmooth cost @f$ h(\hat x) @f$.
+    real_t final_h = 0;
+    /// Final value of the forward-backward envelope, @f$ \varphi_\gamma(x) @f$
+    /// (note that this is in the point @f$ x @f$, not @f$ \hat x @f$).
+    real_t final_φγ = 0;
 };
 
 template <Config Conf>
@@ -195,7 +205,10 @@ operator+=(InnerStatsAccumulator<PANOCStats<Conf>> &acc,
     acc.τ_1_accepted += s.τ_1_accepted;
     acc.count_τ += s.count_τ;
     acc.sum_τ += s.sum_τ;
-    acc.final_γ = s.final_γ;
+    acc.final_γ  = s.final_γ;
+    acc.final_ψ  = s.final_ψ;
+    acc.final_h  = s.final_h;
+    acc.final_φγ = s.final_φγ;
     return acc;
 }
 
