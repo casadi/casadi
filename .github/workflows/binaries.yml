@@ -203,7 +203,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.matrix-arch-py2-mac.outputs.matrix) }}
-  
+    env:
+      DEVELOPMENT_CERTIFICATE_DATA_AVAILABLE: ${{ secrets.DEVELOPMENT_CERTIFICATE_DATA != '' }}
     steps:
     
       - uses: casadi/action-setup-compiler@master
@@ -281,8 +282,10 @@ jobs:
           p12-file-base64: ${{ secrets.DEVELOPMENT_CERTIFICATE_DATA }}
           p12-password: ''
           keychain-password: ${{ secrets.KEYCHAIN_PASSWORD }}
+        if: ${{ env.DEVELOPMENT_CERTIFICATE_DATA_AVAILABLE}}
       - run: python misc/codesign.py "${{ secrets.CODESIGN_IDENTITY }}" install
         shell: bash -el {0}
+        if: ${{ env.DEVELOPMENT_CERTIFICATE_DATA_AVAILABLE}}
       - run: |
           version=$(python misc/get_version.py)
           echo "<$version>"
@@ -368,7 +371,9 @@ jobs:
           p12-file-base64: ${{ secrets.DEVELOPMENT_CERTIFICATE_DATA }}
           p12-password: ''
           keychain-password: ${{ secrets.KEYCHAIN_PASSWORD }}
+        if: ${{ env.DEVELOPMENT_CERTIFICATE_DATA_AVAILABLE}}
       - run: python misc/codesign.py "${{ secrets.CODESIGN_IDENTITY }}" install
+        if: ${{ env.DEVELOPMENT_CERTIFICATE_DATA_AVAILABLE}}
         shell: bash -el {0}
       - name: Easy Zip Files
         uses: vimtor/action-zip@v1.1
