@@ -691,6 +691,7 @@ auto PANOCOCPSolver<Conf>::operator()(
                 next->γ /= 2;
                 next->L *= 2;
                 τ = τ_init;
+                ++s.stepsize_backtracks;
                 continue;
             }
 
@@ -699,6 +700,7 @@ auto PANOCOCPSolver<Conf>::operator()(
                 τ /= 2;
                 if (τ < params.τ_min)
                     τ = 0;
+                ++s.linesearch_backtracks;
                 continue;
             }
 

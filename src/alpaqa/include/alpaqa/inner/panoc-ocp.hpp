@@ -111,17 +111,19 @@ struct PANOCOCPStats {
     std::chrono::nanoseconds time_lbfgs_apply{};
     std::chrono::nanoseconds time_lbfgs_update{};
     std::chrono::nanoseconds time_progress_callback{};
-    unsigned iterations          = 0;
-    unsigned linesearch_failures = 0;
-    unsigned lbfgs_failures      = 0;
-    unsigned lbfgs_rejected      = 0;
-    unsigned τ_1_accepted        = 0;
-    unsigned count_τ             = 0;
-    real_t sum_τ                 = 0;
-    real_t final_γ               = 0;
-    real_t final_ψ               = 0;
-    real_t final_h               = 0;
-    real_t final_φγ              = 0;
+    unsigned iterations            = 0;
+    unsigned linesearch_failures   = 0;
+    unsigned linesearch_backtracks = 0;
+    unsigned stepsize_backtracks   = 0;
+    unsigned lbfgs_failures        = 0;
+    unsigned lbfgs_rejected        = 0;
+    unsigned τ_1_accepted          = 0;
+    unsigned count_τ               = 0;
+    real_t sum_τ                   = 0;
+    real_t final_γ                 = 0;
+    real_t final_ψ                 = 0;
+    real_t final_h                 = 0;
+    real_t final_φγ                = 0;
 };
 
 template <Config Conf>
@@ -203,6 +205,10 @@ struct InnerStatsAccumulator<PANOCOCPStats<Conf>> {
     unsigned iterations = 0;
     /// Total number of PANOC line search failures.
     unsigned linesearch_failures = 0;
+    /// Total number of PANOC line search backtracking steps.
+    unsigned linesearch_backtracks = 0;
+    /// Total number of PANOC step size reductions.
+    unsigned stepsize_backtracks = 0;
     /// Total number of times that the L-BFGS direction was not finite.
     unsigned lbfgs_failures = 0;
     /// Total number of times that the L-BFGS update was rejected (i.e. it
@@ -247,6 +253,8 @@ operator+=(InnerStatsAccumulator<PANOCOCPStats<Conf>> &acc,
     acc.time_lbfgs_update += s.time_lbfgs_update;
     acc.time_progress_callback += s.time_progress_callback;
     acc.linesearch_failures += s.linesearch_failures;
+    acc.linesearch_backtracks += s.linesearch_backtracks;
+    acc.stepsize_backtracks += s.stepsize_backtracks;
     acc.lbfgs_failures += s.lbfgs_failures;
     acc.lbfgs_rejected += s.lbfgs_rejected;
     acc.τ_1_accepted += s.τ_1_accepted;
