@@ -314,7 +314,9 @@ jobs:
       fail-fast: false
       matrix:
         matlab: ["2018b"]
-        image: [macos-11,macos-m1]
+        image: [macos-11]
+    env:
+      DEVELOPMENT_CERTIFICATE_DATA_AVAILABLE: ${{ secrets.DEVELOPMENT_CERTIFICATE_DATA != '' }}
     steps:
       - uses: casadi/action-setup-compiler@master
         with:
