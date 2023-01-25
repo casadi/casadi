@@ -26,6 +26,7 @@ void register_panoc(py::module_ &m) {
 
     using InnerSolveOptions = alpaqa::InnerSolveOptions<config_t>;
     register_dataclass<InnerSolveOptions>(m, "InnerSolveOptions");
+    py::implicitly_convertible<py::dict, InnerSolveOptions>();
 
     // ----------------------------------------------------------------------------------------- //
     using TypeErasedPANOCDirection = alpaqa::TypeErasedPANOCDirection<Conf>;
