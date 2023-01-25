@@ -563,6 +563,16 @@ class TypeErasedProblem : public util::TypeErased<ProblemVTable<Conf>, Allocator
 
     /// Given g(x), compute the intermediate results ŷ and dᵀŷ that can later be
     /// used to compute ψ(x) and ∇ψ(x).
+    ///
+    /// Computes the result using the following algorithm:
+    /// @f[ \begin{aligned}
+    ///     \zeta &= g(x) + \Sigma^{-1} y \\[]
+    ///     d &= \zeta - \Pi_D(\zeta) 
+    ///        = \operatorname{eval\_proj\_diff\_g}(\zeta, \zeta) \\[]
+    ///     \hat y &= \Sigma d \\[]
+    /// \end{aligned} @f]
+    /// @see @ref page_math
+    ///
     /// @param[inout]   g_ŷ
     ///                 Input @f$ g(x) @f$, outputs @f$ \hat y @f$
     /// @param[in]      y
