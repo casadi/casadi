@@ -161,7 +161,7 @@ bool LBFGS<Conf>::apply_masked_impl(rvec q, real_t γ, const auto &J) const {
         // Check if we should include this pair of vectors
         if (not update_valid(params, yᵀs, sᵀs, 0)) {
             ρ(i) = NaN<config_t>;
-            return;
+            return; // continue foreach
         }
 
         α(i) = ρ(i) * dotJ(s(i), q); // αᵢ = ρᵢ〈sᵢ, q〉
@@ -183,7 +183,8 @@ bool LBFGS<Conf>::apply_masked_impl(rvec q, real_t γ, const auto &J) const {
 
     foreach_fwd([&](index_t i) {
         if (std::isnan(ρ(i)))
-            return;
+            return; // continue foreach
+
         real_t β = ρ(i) * dotJ(y(i), q); // βᵢ = ρᵢ〈yᵢ, q〉
         axmyJ(β - α(i), s(i), q);        // q -= (βᵢ - αᵢ) sᵢ
     });
