@@ -76,6 +76,7 @@ jobs:
                 if: ${{ env.BLESSED_REPO != '' }}
                 matrix:
                   image: [macos-m1]
+      - run: echo ${{ steps.build-matrix.outputs.matrix }}
     outputs:
       matrix: ${{ steps.build-matrix.outputs.matrix }}
 
@@ -119,7 +120,6 @@ jobs:
 
   core-dockcross:
     runs-on: ubuntu-20.04
-    if: true
     strategy:
       fail-fast: false
       matrix:
