@@ -61,13 +61,30 @@ jobs:
       with:
         name: casadi_source_wrapper
         path: casadi_source.zip
-          
+
+  matrix-arch-mac:
+    runs-on: ubuntu-20.04
+    steps:
+      - id: build-matrix
+        uses: jgillis/setup-build-matrix@v1.2.0
+        with:
+          config: |
+            matrix:
+              image: [macos-11]
+            operations:
+              - type: append
+                if: ${{ env.BLESSED_REPO != '' }}
+                matrix:
+                  image: [macos-m1]
+    outputs:
+      matrix: ${{ steps.build-matrix.outputs.matrix }}
+
   core-osx:
     runs-on: ${{matrix.image == 'macos-m1' && 'self-hosted' || matrix.image }}
     strategy:
       fail-fast: false
       matrix:
-        image: [macos-m1, macos-11]
+        image: ${{ fromJson(needs.matrix-arch-mac.outputs.matrix) }}
     steps:
       - uses: casadi/action-setup-compiler@master
         with:
@@ -180,13 +197,15 @@ jobs:
         with:
           config: |
             matrix:
-              image: [macos-m1]
-              py2: ["38","39","310","311"]
+              image: [macos-11]
+              py2: ["27","35","36","37","38","39","310","311"]
             operations:
               - type: append
+                if: ${{ env.BLESSED_REPO != '' }}
                 matrix:
-                  image: [macos-11]
-                  py2: ["27","35","36","37","38","39","310","311"]
+                  image: [macos-m1]
+                  py2: ["38","39","310","311"]
+
     outputs:
       matrix: ${{ steps.build-matrix.outputs.matrix }}
            
