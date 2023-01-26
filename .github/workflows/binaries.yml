@@ -302,7 +302,7 @@ jobs:
       - run: |
           version=$(python misc/get_version.py)
           echo "<$version>"
-          wheel=$(python misc/create_wheel_local.py 99+${{ env.GITHUB_REF_SLUG }} ${{matrix.py2}} osx 64 ${{matrix.image == 'macos-m1' && 'osx-m1' || 'osx'}} install/)
+          wheel=$(python misc/create_wheel_local.py $version.dev+${{ env.GITHUB_REF_SLUG }} ${{matrix.py2}} osx 64 ${{matrix.image == 'macos-m1' && 'osx-m1' || 'osx'}} install/)
           echo "<$wheel>"
           echo "wheel=$wheel" >> $GITHUB_OUTPUT
           wheel_wildcard=$(echo $wheel | sed -e 's/casadi-[^-]*-/casadi-\*-/')
@@ -595,7 +595,7 @@ jobs:
           version=$(python misc/get_version.py)
           echo "<$version>"
           pip install wheel==0.31.1
-          wheel=$(python misc/create_wheel_local.py 99+${{ env.GITHUB_REF_SLUG }} ${{matrix.py2}} ${{env.os}} ${{env.bitness}} ${{matrix.arch}} install/)
+          wheel=$(python misc/create_wheel_local.py $version.dev+${{ env.GITHUB_REF_SLUG }} ${{matrix.py2}} ${{env.os}} ${{env.bitness}} ${{matrix.arch}} install/)
           echo "<$wheel>"
           echo "wheel=$wheel" >> $GITHUB_OUTPUT
           wheel_wildcard=$(echo $wheel | sed -e 's/casadi-[^-]*-/casadi-\*-/')
