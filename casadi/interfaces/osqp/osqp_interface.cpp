@@ -192,7 +192,8 @@ namespace casadi {
     data.u = get_ptr(dummy);
 
     // Setup workspace
-    if(osqp_setup(&m->work, &data, &settings_)) return 1;
+    // if(osqp_setup(&m->work, &data, &settings_)) return 1;
+    if(osqp_setup(&data, &settings_)) return 1;
 
     m->fstats["preprocessing"]  = FStats();
     m->fstats["solver"]         = FStats();
