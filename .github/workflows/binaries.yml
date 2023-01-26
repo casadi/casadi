@@ -80,8 +80,8 @@ jobs:
       matrix: ${{ steps.build-matrix.outputs.matrix }}
 
   core-osx:
-    runs-on: ${{matrix.image == 'macos-m1' && 'self-hosted' || matrix.image }}
     needs: [matrix-arch-mac]
+    runs-on: ${{matrix.image == 'macos-m1' && 'self-hosted' || matrix.image }}
     strategy:
       fail-fast: false
       matrix:
