@@ -73,7 +73,7 @@ jobs:
               image: [macos-11]
             operations:
               - type: append
-                if: ${{ env.BLESSED_REPO != '' }}
+                if: ${{ vars.BLESSED_REPO != '' }}
                 matrix:
                   image: [macos-m1]
       - run: echo ${{ steps.build-matrix.outputs.matrix }}
@@ -87,6 +87,7 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJson(needs.matrix-arch-mac.outputs.matrix) }}
     steps:
+      - run: echo "${{ vars.BLESSED_REPO }} ${{ vars.BLESSED_REPO }}"
       - uses: casadi/action-setup-compiler@master
         with:
           cache-suffix: ''
@@ -201,7 +202,7 @@ jobs:
               py2: ["27","35","36","37","38","39","310","311"]
             operations:
               - type: append
-                if: ${{ env.BLESSED_REPO != '' }}
+                if: ${{ vars.BLESSED_REPO != '' }}
                 matrix:
                   image: [macos-m1]
                   py2: ["38","39","310","311"]
