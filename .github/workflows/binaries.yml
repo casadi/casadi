@@ -198,6 +198,7 @@ jobs:
       matrix: ${{ fromJson(needs.matrix-arch-py2-mac.outputs.matrix) }}
     env:
       DEVELOPMENT_CERTIFICATE_DATA_AVAILABLE: ${{ secrets.DEVELOPMENT_CERTIFICATE_DATA != '' }}
+      deploy_arch: ${{matrix.image == 'macos-m1' && 'osx_arm64' || 'osx64'}}
     steps:
     
       - uses: casadi/action-setup-compiler@master
@@ -244,21 +245,21 @@ jobs:
         with:
           files: install/
           recursive: false
-          dest: casadi-${{matrix.image == 'macos-m1' && 'osx_arm64' || 'osx64'}}-py${{matrix.py2}}.zip
+          dest: casadi-${{env.deploy_arch}}-py${{matrix.py2}}.zip
       - uses: actions/upload-artifact@v3.1.2
         with:
-          name: casadi-${{matrix.image == 'macos-m1' && 'osx_arm64' || 'osx64'}}-py${{matrix.py2}}
-          path: casadi-${{matrix.image == 'macos-m1' && 'osx_arm64' || 'osx64'}}-py${{matrix.py2}}.zip
+          name: casadi-${{env.deploy_arch}}-py${{matrix.py2}}
+          path: casadi-${{env.deploy_arch}}-py${{matrix.py2}}.zip
           retention-days: 5
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.4.0
-      - run: cp casadi-${{matrix.image == 'macos-m1' && 'osx_arm64' || 'osx64'}}-py${{matrix.py2}}.zip casadi-${{ env.GITHUB_REF_SLUG }}.${{ env.GITHUB_SHA_SHORT }}-${{matrix.image == 'macos-m1' && 'osx_arm64' || 'osx64'}}-py${{matrix.py2}}-untested.zip
+      - run: cp casadi-${{env.deploy_arch}}-py${{matrix.py2}}.zip casadi-${{ env.GITHUB_REF_SLUG }}.${{ env.GITHUB_SHA_SHORT }}-${{env.deploy_arch}}-untested.zip
       - name: Delete old release assets
         uses: mknejp/delete-release-assets@v1
         with:
           token: ${{ github.token }}
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
-          assets: casadi-*-${{matrix.image == 'macos-m1' && 'osx_arm64' || 'osx64'}}-py${{matrix.py2}}-untested.zip
+          assets: casadi-*-${{env.deploy_arch}}-py${{matrix.py2}}-untested.zip
           fail-if-no-release: false
           fail-if-no-assets: false
       - name: Upload files to a GitHub release
@@ -266,7 +267,7 @@ jobs:
         with:
           overwrite: true
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
-          file: casadi-${{ env.GITHUB_REF_SLUG }}.${{ env.GITHUB_SHA_SHORT }}-${{matrix.image == 'macos-m1' && 'osx_arm64' || 'osx64'}}-py${{matrix.py2}}-untested.zip
+          file: casadi-${{ env.GITHUB_REF_SLUG }}.${{ env.GITHUB_SHA_SHORT }}-${{env.deploy_arch}}-py${{matrix.py2}}-untested.zip
           prerelease: true
 
       - uses: jgillis/import-codesign-certs@master
