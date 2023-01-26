@@ -85,8 +85,7 @@ jobs:
     runs-on: ${{matrix.image == 'macos-m1' && 'self-hosted' || matrix.image }}
     strategy:
       fail-fast: false
-      matrix:
-        image: ${{ fromJson(needs.matrix-arch-mac.outputs.matrix) }}
+      matrix: ${{ fromJson(needs.matrix-arch-mac.outputs.matrix) }}
     steps:
       - uses: casadi/action-setup-compiler@master
         with:
