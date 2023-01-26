@@ -48,13 +48,13 @@ jobs:
     
     - name: Inject slug/short variables
       uses: rlespinasse/github-slug-action@v4.4.0
-    - run: cp casadi_source.zip casadi-${{ env.GITHUB_REF_SLUG }}.${{ env.GITHUB_SHA_SHORT }}-source.zip
+    - run: cp casadi_source.zip casadi-${{ env.GITHUB_REF_SLUG }}-source.zip
     - name: Upload files to a GitHub release
       uses: svenstaro/upload-release-action@2.4.0
       with:
         overwrite: true
         tag: nightly-${{ env.GITHUB_REF_SLUG }}
-        file: casadi-${{ env.GITHUB_REF_SLUG }}.${{ env.GITHUB_SHA_SHORT }}-source.zip
+        file: casadi-${{ env.GITHUB_REF_SLUG }}-source.zip
         prerelease: true
 
     - uses: actions/upload-artifact@v3.1.2
@@ -260,6 +260,15 @@ jobs:
           source_path: install/casadi
           destination_path: install/casadi
           search_paths: ${{env.COMPILER_LIB_SEARCH_PATH}}
+      - uses: jgillis/import-codesign-certs@master
+        with: 
+          p12-file-base64: ${{ secrets.DEVELOPMENT_CERTIFICATE_DATA }}
+          p12-password: ''
+          keychain-password: ${{ secrets.KEYCHAIN_PASSWORD }}
+        if: ${{ env.DEVELOPMENT_CERTIFICATE_DATA_AVAILABLE}}
+      - run: python misc/codesign.py "${{ secrets.CODESIGN_IDENTITY }}" install
+        shell: bash -el {0}
+        if: ${{ env.DEVELOPMENT_CERTIFICATE_DATA_AVAILABLE}}
       - name: Easy Zip Files
         uses: vimtor/action-zip@v1.1
         with:
@@ -273,13 +282,13 @@ jobs:
           retention-days: 5
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.4.0
-      - run: cp casadi-${{env.deploy_arch}}-py${{matrix.py2}}.zip casadi-${{ env.GITHUB_REF_SLUG }}.${{ env.GITHUB_SHA_SHORT }}-${{env.deploy_arch}}-untested.zip
+      - run: cp casadi-${{env.deploy_arch}}-py${{matrix.py2}}.zip casadi-${{ env.GITHUB_REF_SLUG }}-${{env.deploy_arch}}.zip
       - name: Delete old release assets
         uses: mknejp/delete-release-assets@v1
         with:
           token: ${{ github.token }}
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
-          assets: casadi-*-${{env.deploy_arch}}-py${{matrix.py2}}-untested.zip
+          assets: casadi-*-${{env.deploy_arch}}-py${{matrix.py2}}.zip
           fail-if-no-release: false
           fail-if-no-assets: false
       - name: Upload files to a GitHub release
@@ -287,22 +296,13 @@ jobs:
         with:
           overwrite: true
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
-          file: casadi-${{ env.GITHUB_REF_SLUG }}.${{ env.GITHUB_SHA_SHORT }}-${{env.deploy_arch}}-py${{matrix.py2}}-untested.zip
+          file: casadi-${{ env.GITHUB_REF_SLUG }}-${{env.deploy_arch}}-py${{matrix.py2}}.zip
           prerelease: true
 
-      - uses: jgillis/import-codesign-certs@master
-        with: 
-          p12-file-base64: ${{ secrets.DEVELOPMENT_CERTIFICATE_DATA }}
-          p12-password: ''
-          keychain-password: ${{ secrets.KEYCHAIN_PASSWORD }}
-        if: ${{ env.DEVELOPMENT_CERTIFICATE_DATA_AVAILABLE}}
-      - run: python misc/codesign.py "${{ secrets.CODESIGN_IDENTITY }}" install
-        shell: bash -el {0}
-        if: ${{ env.DEVELOPMENT_CERTIFICATE_DATA_AVAILABLE}}
       - run: |
           version=$(python misc/get_version.py)
           echo "<$version>"
-          wheel=$(python misc/create_wheel_local.py $version.dev+${{ env.GITHUB_REF_SLUG }}.${{ env.GITHUB_SHA_SHORT }} ${{matrix.py2}} osx 64 ${{matrix.image == 'macos-m1' && 'osx-m1' || 'osx'}} install/)
+          wheel=$(python misc/create_wheel_local.py 99+${{ env.GITHUB_REF_SLUG }} ${{matrix.py2}} osx 64 ${{matrix.image == 'macos-m1' && 'osx-m1' || 'osx'}} install/)
           echo "<$wheel>"
           echo "wheel=$wheel" >> $GITHUB_OUTPUT
           wheel_wildcard=$(echo $wheel | sed -e 's/casadi-[^-]*-/casadi-\*-/')
@@ -376,10 +376,6 @@ jobs:
           source_path: install/casadi
           destination_path: install/casadi
           search_paths: "${{env.COMPILER_LIB_SEARCH_PATH}}:${{ github.workspace }}/mockups/matlab/lib"
-      - run: |
-          cd install/casadi
-          ls ${{ github.workspace }}/mockups/matlab/lib | xargs rm -f
-          cd ../..
       - uses: jgillis/import-codesign-certs@master
         with: 
           p12-file-base64: ${{ secrets.DEVELOPMENT_CERTIFICATE_DATA }}
@@ -397,13 +393,13 @@ jobs:
           dest: casadi-${{env.os}}${{env.bitness}}-matlab${{matrix.matlab}}.zip
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.4.0
-      - run: cp casadi-${{env.os}}${{env.bitness}}-matlab${{matrix.matlab}}.zip casadi-${{ env.GITHUB_REF_SLUG }}.${{ env.GITHUB_SHA_SHORT }}-${{env.os}}${{env.bitness}}-matlab${{matrix.matlab}}-untested.zip
+      - run: cp casadi-${{env.os}}${{env.bitness}}-matlab${{matrix.matlab}}.zip casadi-${{ env.GITHUB_REF_SLUG }}-${{env.os}}${{env.bitness}}-matlab${{matrix.matlab}}.zip
       - name: Delete old release assets
         uses: mknejp/delete-release-assets@v1
         with:
           token: ${{ github.token }}
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
-          assets: casadi-*-${{env.os}}${{env.bitness}}-matlab${{matrix.matlab}}-untested.zip
+          assets: casadi-*-${{env.os}}${{env.bitness}}-matlab${{matrix.matlab}}.zip
           fail-if-no-release: false
           fail-if-no-assets: false
       - name: Upload files to a GitHub release
@@ -411,7 +407,7 @@ jobs:
         with:
           overwrite: true
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
-          file: casadi-${{ env.GITHUB_REF_SLUG }}.${{ env.GITHUB_SHA_SHORT }}-${{env.os}}${{env.bitness}}-matlab${{matrix.matlab}}-untested.zip
+          file: casadi-${{ env.GITHUB_REF_SLUG }}-${{env.os}}${{env.bitness}}-matlab${{matrix.matlab}}.zip
           prerelease: true
 
       - uses: actions/upload-artifact@v3.1.2
@@ -481,13 +477,13 @@ jobs:
           dest: casadi-${{env.os}}${{env.bitness}}-matlab${{matrix.matlab}}.zip
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.4.0
-      - run: cp casadi-${{env.os}}${{env.bitness}}-matlab${{matrix.matlab}}.zip casadi-${{ env.GITHUB_REF_SLUG }}.${{ env.GITHUB_SHA_SHORT }}-${{env.os}}${{env.bitness}}-matlab${{matrix.matlab}}-untested.zip
+      - run: cp casadi-${{env.os}}${{env.bitness}}-matlab${{matrix.matlab}}.zip casadi-${{ env.GITHUB_REF_SLUG }}-${{env.os}}${{env.bitness}}-matlab${{matrix.matlab}}.zip
       - name: Delete old release assets
         uses: mknejp/delete-release-assets@v1
         with:
           token: ${{ github.token }}
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
-          assets: casadi-*-${{env.os}}${{env.bitness}}-matlab${{matrix.matlab}}-untested.zip
+          assets: casadi-*-${{env.os}}${{env.bitness}}-matlab${{matrix.matlab}}.zip
           fail-if-no-release: false
           fail-if-no-assets: false
       - name: Upload files to a GitHub release
@@ -495,7 +491,7 @@ jobs:
         with:
           overwrite: true
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
-          file: casadi-${{ env.GITHUB_REF_SLUG }}.${{ env.GITHUB_SHA_SHORT }}-${{env.os}}${{env.bitness}}-matlab${{matrix.matlab}}-untested.zip
+          file: casadi-${{ env.GITHUB_REF_SLUG }}-${{env.os}}${{env.bitness}}-matlab${{matrix.matlab}}.zip
           prerelease: true
 
       - uses: actions/upload-artifact@v3.1.2
@@ -572,13 +568,13 @@ jobs:
           dest: casadi-${{env.os}}${{env.bitness}}-py${{matrix.py2}}.zip
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.4.0
-      - run: cp casadi-${{env.os}}${{env.bitness}}-py${{matrix.py2}}.zip casadi-${{ env.GITHUB_REF_SLUG }}.${{ env.GITHUB_SHA_SHORT }}-${{env.os}}${{env.bitness}}-py${{matrix.py2}}-untested.zip
+      - run: cp casadi-${{env.os}}${{env.bitness}}-py${{matrix.py2}}.zip casadi-${{ env.GITHUB_REF_SLUG }}-${{env.os}}${{env.bitness}}-py${{matrix.py2}}.zip
       - name: Delete old release assets
         uses: mknejp/delete-release-assets@v1
         with:
           token: ${{ github.token }}
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
-          assets: casadi-*-${{env.os}}${{env.bitness}}-py${{matrix.py2}}-untested.zip
+          assets: casadi-*-${{env.os}}${{env.bitness}}-py${{matrix.py2}}.zip
           fail-if-no-release: false
           fail-if-no-assets: false
       - name: Upload files to a GitHub release
@@ -586,7 +582,7 @@ jobs:
         with:
           overwrite: true
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
-          file: casadi-${{ env.GITHUB_REF_SLUG }}.${{ env.GITHUB_SHA_SHORT }}-${{env.os}}${{env.bitness}}-py${{matrix.py2}}-untested.zip
+          file: casadi-${{ env.GITHUB_REF_SLUG }}-${{env.os}}${{env.bitness}}-py${{matrix.py2}}.zip
           prerelease: true
 
       - uses: actions/upload-artifact@v3.1.2
@@ -599,7 +595,7 @@ jobs:
           version=$(python misc/get_version.py)
           echo "<$version>"
           pip install wheel==0.31.1
-          wheel=$(python misc/create_wheel_local.py $version.dev+${{ env.GITHUB_REF_SLUG }}.${{ env.GITHUB_SHA_SHORT }} ${{matrix.py2}} ${{env.os}} ${{env.bitness}} ${{matrix.arch}} install/)
+          wheel=$(python misc/create_wheel_local.py 99+${{ env.GITHUB_REF_SLUG }} ${{matrix.py2}} ${{env.os}} ${{env.bitness}} ${{matrix.arch}} install/)
           echo "<$wheel>"
           echo "wheel=$wheel" >> $GITHUB_OUTPUT
           wheel_wildcard=$(echo $wheel | sed -e 's/casadi-[^-]*-/casadi-\*-/')
@@ -668,24 +664,6 @@ jobs:
         uses: matlab-actions/run-command@v1.1.2
         with:
           command: addpath('${{ github.workspace }}/install/casadi');cd test/matlab;asorted_tests
-      - name: Inject slug/short variables
-        uses: rlespinasse/github-slug-action@v4.4.0
-      - run: cp casadi-${{env.os}}${{matrix.bit}}-matlab${{matrix.matlab}}.zip casadi-${{ env.GITHUB_REF_SLUG }}.${{ env.GITHUB_SHA_SHORT }}-${{env.os}}${{matrix.bit}}-matlab${{matrix.matlab}}-tested.zip
-      - name: Delete old release assets
-        uses: mknejp/delete-release-assets@v1
-        with:
-          token: ${{ github.token }}
-          tag: nightly-${{ env.GITHUB_REF_SLUG }}
-          assets: 'casadi-*-${{env.os}}${{matrix.bit}}-matlab${{matrix.matlab}}-tested.zip'
-          fail-if-no-release: false
-          fail-if-no-assets: false
-      - name: Upload files to a GitHub release
-        uses: svenstaro/upload-release-action@2.4.0
-        with:
-          overwrite: true
-          tag: nightly-${{ env.GITHUB_REF_SLUG }}
-          file: casadi-${{ env.GITHUB_REF_SLUG }}.${{ env.GITHUB_SHA_SHORT }}-${{env.os}}${{matrix.bit}}-matlab${{matrix.matlab}}-tested.zip
-          prerelease: true
 
   test-python:
     runs-on: ${{matrix.image == 'macos-m1' && 'self-hosted' || matrix.image }}
@@ -781,22 +759,3 @@ jobs:
           python alltests.py ${{matrix.image == '38' && '--run_slow' || '' }}
         shell: pwsh
         if: contains(matrix.image, 'windows')
-      - name: Inject slug/short variables
-        uses: rlespinasse/github-slug-action@v4.4.0
-      - run: cp casadi-${{env.os}}${{matrix.bit}}-py${{matrix.py2}}.zip casadi-${{ env.GITHUB_REF_SLUG }}.${{ env.GITHUB_SHA_SHORT }}-${{env.os}}${{matrix.bit}}-py${{matrix.py2}}-tested.zip
-      - name: Delete old release assets
-        uses: mknejp/delete-release-assets@v1
-        with:
-          token: ${{ github.token }}
-          tag: nightly-${{ env.GITHUB_REF_SLUG }}
-          assets: 'casadi-*-${{env.os}}${{matrix.bit}}-py${{matrix.py2}}-tested.zip'
-          fail-if-no-release: false
-          fail-if-no-assets: false
-      - name: Upload files to a GitHub release
-        uses: svenstaro/upload-release-action@2.4.0
-        with:
-          overwrite: true
-          tag: nightly-${{ env.GITHUB_REF_SLUG }}
-          file: casadi-${{ env.GITHUB_REF_SLUG }}.${{ env.GITHUB_SHA_SHORT }}-${{env.os}}${{matrix.bit}}-py${{matrix.py2}}-tested.zip
-          prerelease: true
-
