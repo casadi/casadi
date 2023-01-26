@@ -114,6 +114,176 @@ typedef struct {
     alpaqa_function_dict_t *extra_functions;
 } alpaqa_problem_register_t;
 
+typedef struct {
+    alpaqa_length_t N, nx, nu, nh, nh_N, nc, nc_N;
+
+    // clang-format off
+    void (*get_U)(
+        void *instance,
+        alpaqa_real_t *lb,
+        alpaqa_real_t *ub);
+    void (*get_D)(
+        void *instance,
+        alpaqa_real_t *lb,
+        alpaqa_real_t *ub);
+    void (*get_D_N)(
+        void *instance,
+        alpaqa_real_t *lb,
+        alpaqa_real_t *ub);
+    void (*get_x_init)(
+        void *instance,
+        alpaqa_real_t *x_init);
+    void (*eval_f)(
+        void *instance,
+        alpaqa_index_t timestep,
+        const alpaqa_real_t *x,
+        const alpaqa_real_t *u,
+        alpaqa_real_t *fxu);
+    void (*eval_jac_f)(
+        void *instance,
+        alpaqa_index_t timestep,
+        const alpaqa_real_t *x,
+        const alpaqa_real_t *u,
+        alpaqa_real_t *J_fxu);
+    void (*eval_grad_f_prod)(
+        void *instance,
+        alpaqa_index_t timestep,
+        const alpaqa_real_t *x,
+        const alpaqa_real_t *u,
+        const alpaqa_real_t *p,
+        alpaqa_real_t *grad_fxu_p);
+    void (*eval_h)(
+        void *instance,
+        alpaqa_index_t timestep,
+        const alpaqa_real_t *x,
+        const alpaqa_real_t *u,
+        alpaqa_real_t *h);
+    void (*eval_h_N)(
+        void *instance,
+        const alpaqa_real_t *x,
+        alpaqa_real_t *h);
+    alpaqa_real_t (*eval_l)(
+        void *instance,
+        alpaqa_index_t timestep,
+        const alpaqa_real_t *h);
+    alpaqa_real_t (*eval_l_N)(
+        void *instance,
+        const alpaqa_real_t *h);
+    void (*eval_qr)(
+        void *instance,
+        alpaqa_index_t timestep,
+        const alpaqa_real_t *xu,
+        const alpaqa_real_t *h,
+        alpaqa_real_t *qr);
+    void (*eval_q_N)(
+        void *instance,
+        const alpaqa_real_t *x,
+        const alpaqa_real_t *h,
+        alpaqa_real_t *q);
+    void (*eval_add_Q)(
+        void *instance,
+        alpaqa_index_t timestep,
+        const alpaqa_real_t *xu,
+        const alpaqa_real_t *h,
+        alpaqa_real_t *Q);
+    void (*eval_add_Q_N)(
+        void *instance,
+        const alpaqa_real_t *x,
+        const alpaqa_real_t *h,
+        alpaqa_real_t *Q);
+    void (*eval_add_R_masked)(
+        void *instance,
+        alpaqa_index_t timestep,
+        const alpaqa_real_t *xu,
+        const alpaqa_real_t *h,
+        const alpaqa_index_t *mask,
+        alpaqa_real_t *R,
+        alpaqa_real_t *work);
+    void (*eval_add_S_masked)(
+        void *instance,
+        alpaqa_index_t timestep,
+        const alpaqa_real_t *xu,
+        const alpaqa_real_t *h,
+        const alpaqa_index_t *mask,
+        alpaqa_real_t *S,
+        alpaqa_real_t *work);
+    void (*eval_add_R_prod_masked)(
+        void *instance,
+        alpaqa_index_t timestep,
+        const alpaqa_real_t *xu,
+        const alpaqa_real_t *h,
+        const alpaqa_index_t *mask_J,
+        const alpaqa_index_t *mask_K,
+        const alpaqa_real_t *v,
+        alpaqa_real_t *out,
+        alpaqa_real_t *work);
+    void (*eval_add_S_prod_masked)(
+        void *instance,
+        alpaqa_index_t timestep,
+        const alpaqa_real_t *xu,
+        const alpaqa_real_t *h,
+        const alpaqa_index_t *mask_K,
+        const alpaqa_real_t *v,
+        alpaqa_real_t *out,
+        alpaqa_real_t *work);
+    alpaqa_length_t (*get_R_work_size)(
+        void *instance);
+    alpaqa_length_t (*get_S_work_size)(
+        void *instance);
+    void (*eval_constr)(
+        void *instance,
+        alpaqa_index_t timestep,
+        const alpaqa_real_t *x,
+        alpaqa_real_t *c);
+    void (*eval_constr_N)(
+        void *instance,
+        const alpaqa_real_t *x,
+        alpaqa_real_t *c);
+    void (*eval_jac_constr)(
+        void *instance,
+        alpaqa_index_t timestep,
+        const alpaqa_real_t *x,
+        alpaqa_real_t *J_c);
+    void (*eval_jac_constr_N)(
+        void *instance,
+        const alpaqa_real_t *x,
+        alpaqa_real_t *J_c);
+    void (*eval_grad_constr_prod)(
+        void *instance,
+        alpaqa_index_t timestep,
+        const alpaqa_real_t *x,
+        const alpaqa_real_t *p,
+        alpaqa_real_t *grad_cx_p);
+    void (*eval_grad_constr_prod_N)(
+        void *instance,
+        const alpaqa_real_t *x,
+        const alpaqa_real_t *p,
+        alpaqa_real_t *grad_cx_p);
+    void (*eval_add_gn_hess_constr)(
+        void *instance,
+        alpaqa_index_t timestep,
+        const alpaqa_real_t *x,
+        const alpaqa_real_t *M,
+        alpaqa_real_t *out);
+    void (*eval_add_gn_hess_constr_N)(
+        void *instance,
+        const alpaqa_real_t *x,
+        const alpaqa_real_t *M,
+        alpaqa_real_t *out);
+    // clang-format on
+} alpaqa_control_problem_functions_t;
+
+typedef struct {
+    /// Owning pointer.
+    void *instance;
+    /// Non-owning pointer, lifetime at least as long as @ref instance.
+    alpaqa_control_problem_functions_t *functions;
+    /// Pointer to the function to clean up @ref instance.
+    void (*cleanup)(void *);
+    /// Pointer to a map of extra functions (C++ only).
+    alpaqa_function_dict_t *extra_functions;
+} alpaqa_control_problem_register_t;
+
 #ifdef __cplusplus
 }
 #endif
@@ -131,10 +301,15 @@ struct alpaqa_function_dict_s {
 
 namespace alpaqa {
 
-using function_dict_t     = alpaqa_function_dict_t;
-using problem_register_t  = alpaqa_problem_register_t;
-using problem_functions_t = alpaqa_problem_functions_t;
+using function_dict_t             = alpaqa_function_dict_t;
+using problem_register_t          = alpaqa_problem_register_t;
+using control_problem_register_t  = alpaqa_control_problem_register_t;
+using problem_functions_t         = alpaqa_problem_functions_t;
+using control_problem_functions_t = alpaqa_control_problem_functions_t;
 
+/// Make the given function available to alpaqa.
+/// @see @ref DLProblem::call_extra_func
+/// @see @ref DLControlProblem::call_extra_func
 template <class Func>
 void register_function(function_dict_t *&extra_functions, std::string name,
                        Func &&func) {
@@ -149,6 +324,17 @@ void register_function(problem_register_t &result, std::string name,
                        Func &&func) {
     register_function(result.extra_functions, std::move(name),
                       std::forward<Func>(func));
+}
+
+/// Cleans up the extra functions registered by @ref register_function.
+/// @note   This does not need to be called for the functions returned by the
+///         registration function, those functions will be cleaned up by alpaqa.
+/// @note   The @ref alpaqa_problem_register_t and
+///         @ref alpaqa_control_problem_register_t structs are part of the C API
+///         and do not automatically clean up their resources when destroyed,
+///         you have to do it manually by calling this function.
+inline void unregister_functions(function_dict_t *&extra_functions) {
+    delete extra_functions;
 }
 
 } // namespace alpaqa
