@@ -123,7 +123,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target: [manylinux1-x64,manylinux1-x86,manylinux2014-x64,manylinux2014-x86,windows-shared-x64-posix]
+        target: [manylinux1-x64,manylinux1-x86,manylinux2014-x64,manylinux2014-x86,manylinux2014-aarch64,windows-shared-x64-posix]
     steps:
       - uses: actions/checkout@v3.3.0
         with:
@@ -183,10 +183,10 @@ jobs:
                 matrix:
                   arch: [windows-shared-x64-posix]
                   py2: ["27","35","36","37","38","39","310","311"]
-              #- type: append
-              #  matrix:
-              #    arch: [manylinux2014-aarch64]
-              #    py2: ["35","36","37","38","39"]
+              - type: append
+                matrix:
+                  arch: [manylinux2014-aarch64]
+                  py2: ["35","36","37","38","39"]
     outputs:
       matrix: ${{ steps.build-matrix.outputs.matrix }}
   
@@ -427,7 +427,7 @@ jobs:
       fail-fast: false
       matrix:
         matlab: ["2018b"]
-        arch: [manylinux1-x64,manylinux2014-x64,windows-shared-x64-posix]
+        arch: [manylinux1-x64,manylinux2014-x64,manylinux2014-aarch64,windows-shared-x64-posix]
     steps: 
       - uses: actions/download-artifact@v3.0.2
         with:
