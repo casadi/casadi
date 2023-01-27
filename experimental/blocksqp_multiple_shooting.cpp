@@ -44,7 +44,6 @@
 #include <casadi/casadi.hpp>
 
 using namespace casadi;
-using namespace std;
 
 int main(){
   // Declare variables
@@ -175,15 +174,15 @@ int main(){
     r_opt[i] = V_opt.at(i*(nx+1));
     s_opt[i] = V_opt.at(1+i*(nx+1));
   }
-  cout << "r_opt = " << std::endl << r_opt << std::endl;
-  cout << "s_opt = " << std::endl << s_opt << std::endl;
+  std::cout << "r_opt = " << std::endl << r_opt << std::endl;
+  std::cout << "s_opt = " << std::endl << s_opt << std::endl;
 
   // Get the optimal control
   std::vector<double> u_opt(ns);
   for(int i=0; i<ns; ++i){
     u_opt[i] = V_opt.at(nx + i*(nx+1));
   }
-  cout << "u_opt = " << std::endl << u_opt << std::endl;
+  std::cout << "u_opt = " << std::endl << u_opt << std::endl;
 
 
   return 0;

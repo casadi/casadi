@@ -26,7 +26,6 @@
 #include "linsol_ldl.hpp"
 #include "casadi/core/global_options.hpp"
 
-using namespace std;
 namespace casadi {
 
   extern "C"

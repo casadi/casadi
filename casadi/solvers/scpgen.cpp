@@ -32,7 +32,6 @@
 #include <cfloat>
 #include <cstdlib>
 
-using namespace std;
 namespace casadi {
 
   extern "C"
@@ -930,17 +929,17 @@ namespace casadi {
                               bool ls_success) const {
     auto d_nlp = &m->d_nlp;
     stream << std::setw(4) << iter;
-    stream << scientific;
-    stream << std::setw(14) << setprecision(6) << obj;
-    stream << std::setw(11) << setprecision(2) << pr_inf;
+    stream << std::scientific;
+    stream << std::setw(14) << std::setprecision(6) << obj;
+    stream << std::setw(11) << std::setprecision(2) << pr_inf;
     stream << std::setw(11);
-    stream << setprecision(2) << du_inf;
-    stream << std::setw(11) << setprecision(2) << m->pr_step;
+    stream << std::setprecision(2) << du_inf;
+    stream << std::setw(11) << std::setprecision(2) << m->pr_step;
     stream << std::setw(11);
-    stream << setprecision(2) << m->du_step;
-    stream << fixed;
+    stream << std::setprecision(2) << m->du_step;
+    stream << std::fixed;
     if (rg>0) {
-      stream << std::setw(8) << setprecision(2) << log10(rg);
+      stream << std::setw(8) << std::setprecision(2) << log10(rg);
     } else {
       stream << std::setw(8) << "-";
     }
@@ -949,7 +948,7 @@ namespace casadi {
 
     // Print variables
     for (std::vector<casadi_int>::const_iterator i=print_x_.begin(); i!=print_x_.end(); ++i) {
-      stream << std::setw(9) << setprecision(4) << d_nlp->z[*i];
+      stream << std::setw(9) << std::setprecision(4) << d_nlp->z[*i];
     }
 
     // Print note

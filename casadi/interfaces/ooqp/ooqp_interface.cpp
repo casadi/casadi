@@ -35,7 +35,6 @@
 // This is the only possible way to access it using the C++ interface
 extern casadi_int gOoqpPrintLevel;
 
-using namespace std;
 namespace casadi {
 
   extern "C"

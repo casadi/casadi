@@ -25,7 +25,6 @@
 #include "hpmpc_interface.hpp"
 #include <numeric>
 
-using namespace std;
 namespace casadi {
 
   extern "C"

@@ -26,7 +26,6 @@
 #include "newton.hpp"
 #include <iomanip>
 
-using namespace std;
 namespace casadi {
 
   extern "C"
@@ -257,11 +256,11 @@ namespace casadi {
 
     std::ios_base::fmtflags f = stream.flags();
     stream << std::setw(5) << iter;
-    stream << std::setw(10) << scientific << setprecision(2) << abstol;
-    stream << std::setw(10) << scientific << setprecision(2) << abstolStep;
-    if (line_search_) stream << std::setw(10) << scientific << setprecision(2) << alpha;
+    stream << std::setw(10) << std::scientific << std::setprecision(2) << abstol;
+    stream << std::setw(10) << std::scientific << std::setprecision(2) << abstolStep;
+    if (line_search_) stream << std::setw(10) << std::scientific << std::setprecision(2) << alpha;
 
-    stream << fixed;
+    stream << std::fixed;
     stream << std::endl;
     stream.flags(f);
   }

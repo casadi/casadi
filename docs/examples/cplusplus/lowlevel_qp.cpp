@@ -30,7 +30,6 @@
   */
 
 using namespace casadi;
-using namespace std;
 
 // Matrix H in sparse triplet format
 const int H_nrow = 180;

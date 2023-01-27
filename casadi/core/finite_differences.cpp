@@ -260,7 +260,6 @@ namespace casadi {
           for (casadi_int j=0; j<n_in; ++j) {
             casadi_int nnz = derivative_of_.nnz_in(j);
             casadi_copy(x0[j], nnz, z + off);
-            //cout << "k = " << k << ": pert(k, h) = " << pert(k, h) << std::endl;
             if (seed[j]) casadi_axpy(nnz, pert(k, h), seed[j] + i*nnz, z + off);
             off += nnz;
           }

@@ -27,7 +27,6 @@
 #include <casadi/casadi.hpp>
 
 using namespace casadi;
-using namespace std;
 
 // Declare solvers to be loaded manually
 extern "C" void casadi_load_integrator_cvodes();
@@ -180,7 +179,7 @@ int main(){
   std::vector<double> Usol;
   solver({{"lbx", umin}, {"ubx", umax}, {"x0", u0}, {"lbg", gmin}, {"ubg", gmax}},
          {{"x", &Usol}});
-  cout << "optimal solution: " << Usol << std::endl;
+  std::cout << "optimal solution: " << Usol << std::endl;
 
   return 0;
 }

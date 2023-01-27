@@ -30,7 +30,6 @@
 #include <casadi/casadi.hpp>
 
 using namespace casadi;
-using namespace std;
 /**
  *  Example program demonstrating parametric NLPs in CasADi
  *  Note that there is currently no support for parametric sensitivities via this feature (although it would make a lot of sense).
@@ -94,24 +93,24 @@ int main(){
   res = solver(arg);
 
   // Print the solution
-  cout << "-----" << std::endl;
-  cout << "Optimal solution for p = " << arg.at("p") << ":" << std::endl;
-  cout << std::setw(30) << "Objective: " << res.at("f") << std::endl;
-  cout << std::setw(30) << "Primal solution: " << res.at("x") << std::endl;
-  cout << std::setw(30) << "Dual solution (x): " << res.at("lam_x") << std::endl;
-  cout << std::setw(30) << "Dual solution (g): " << res.at("lam_g") << std::endl;
+  std::cout << "-----" << std::endl;
+  std::cout << "Optimal solution for p = " << arg.at("p") << ":" << std::endl;
+  std::cout << std::setw(30) << "Objective: " << res.at("f") << std::endl;
+  std::cout << std::setw(30) << "Primal solution: " << res.at("x") << std::endl;
+  std::cout << std::setw(30) << "Dual solution (x): " << res.at("lam_x") << std::endl;
+  std::cout << std::setw(30) << "Dual solution (g): " << res.at("lam_g") << std::endl;
 
   // Change the parameter and resolve
   arg["p"] = 4.5;
   res = solver(arg);
 
   // Print the new solution
-  cout << "-----" << std::endl;
-  cout << "Optimal solution for p = " << arg.at("p") << ":" << std::endl;
-  cout << std::setw(30) << "Objective: " << res.at("f") << std::endl;
-  cout << std::setw(30) << "Primal solution: " << res.at("x") << std::endl;
-  cout << std::setw(30) << "Dual solution (x): " << res.at("lam_x") << std::endl;
-  cout << std::setw(30) << "Dual solution (g): " << res.at("lam_g") << std::endl;
+  std::cout << "-----" << std::endl;
+  std::cout << "Optimal solution for p = " << arg.at("p") << ":" << std::endl;
+  std::cout << std::setw(30) << "Objective: " << res.at("f") << std::endl;
+  std::cout << std::setw(30) << "Primal solution: " << res.at("x") << std::endl;
+  std::cout << std::setw(30) << "Dual solution (x): " << res.at("lam_x") << std::endl;
+  std::cout << std::setw(30) << "Dual solution (g): " << res.at("lam_g") << std::endl;
 
   return 0;
 }

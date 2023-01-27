@@ -32,7 +32,6 @@
 #include <iomanip>
 
 using namespace casadi;
-using namespace std;
 
 int main(int argc, char *argv[]) {
   // End time
@@ -70,7 +69,7 @@ int main(int argc, char *argv[]) {
   if (argc>1) solver = argv[1]; // chose a different solver from command line
 
   // Coefficients of the collocation equation
-  std::vector<std::vector<double> > C(d+1,vector<double>(d+1,0));
+  std::vector<std::vector<double> > C(d+1, std::vector<double>(d+1,0));
 
   // Coefficients of the continuity equation
   std::vector<double> D(d+1,0);
@@ -177,16 +176,16 @@ int main(int argc, char *argv[]) {
   // Make sure that both integrators give consistent results
   for(int integ=0; integ<2; ++integ){
     Function F = integ==0 ? irk_integrator : ref_integrator;
-    cout << "-------" << std::endl;
-    cout << "Testing " << F.name() << std::endl;
-    cout << "-------" << std::endl;
+    std::cout << "-------" << std::endl;
+    std::cout << "Testing " << F.name() << std::endl;
+    std::cout << "-------" << std::endl;
 
     // Generate a new function that calculates forward and reverse directional derivatives
     Function dF = F.factory("dF", {"x0", "p", "fwd:x0", "fwd:p", "adj:xf"},
                                   {"xf", "fwd:xf", "adj:x0", "adj:p"});
 
     // Arguments for evaluation
-    map<std::string, DM> arg, res;
+    std::map<std::string, DM> arg, res;
     arg["x0"] = x0_val;
     arg["p"] = p_val;
 
@@ -201,14 +200,14 @@ int main(int argc, char *argv[]) {
     res = dF(arg);
 
     // Get the nondifferentiated results
-    cout << std::setw(15) << "xf = " << res.at("xf") << std::endl;
+    std::cout << std::setw(15) << "xf = " << res.at("xf") << std::endl;
 
     // Get the forward sensitivities
-    cout << std::setw(15) << "d(xf)/d(p)+d(xf)/d(x0[0]) = " <<  res.at("fwd_xf") << std::endl;
+    std::cout << std::setw(15) << "d(xf)/d(p)+d(xf)/d(x0[0]) = " <<  res.at("fwd_xf") << std::endl;
 
     // Get the adjoint sensitivities
-    cout << std::setw(15) << "d(xf[2])/d(x0) = " << res.at("adj_x0") << std::endl;
-    cout << std::setw(15) << "d(xf[2])/d(p) = " << res.at("adj_p") << std::endl;
+    std::cout << std::setw(15) << "d(xf[2])/d(x0) = " << res.at("adj_x0") << std::endl;
+    std::cout << std::setw(15) << "d(xf[2])/d(p) = " << res.at("adj_p") << std::endl;
   }
   return 0;
 }

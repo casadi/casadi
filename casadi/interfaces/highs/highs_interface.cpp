@@ -28,8 +28,6 @@
 #include "highs_runtime_str.h"
 namespace casadi {
 
-  using namespace std;
-
   extern "C"
   int CASADI_CONIC_HIGHS_EXPORT
   casadi_register_conic_highs(Conic::Plugin* plugin) {

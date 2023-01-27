@@ -25,7 +25,6 @@
 
 #include "kinsol_interface.hpp"
 
-using namespace std;
 namespace casadi {
 
   extern "C"

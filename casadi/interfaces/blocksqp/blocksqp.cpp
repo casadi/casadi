@@ -27,7 +27,6 @@
 #include "casadi/core/casadi_misc.hpp"
 #include "casadi/core/conic.hpp"
 
-using namespace std;
 namespace casadi {
 
   extern "C"

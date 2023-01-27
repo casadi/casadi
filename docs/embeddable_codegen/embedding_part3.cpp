@@ -26,7 +26,6 @@
 #include <casadi/casadi.hpp>
 
 using namespace casadi;
-using namespace std;
 /**
  *  Solve an NLP using codegen  
  *  Part 2: solution

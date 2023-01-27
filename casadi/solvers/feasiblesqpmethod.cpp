@@ -38,7 +38,6 @@
 #include <cfloat>
 #include <signal.h>
 
-using namespace std;
 namespace casadi {
 
 
@@ -370,7 +369,7 @@ namespace casadi {
 
     // Use exact Hessian?
     exact_hessian_ = hessian_approximation =="exact";
-    cout << "print solve type" << solve_type << std::endl;
+    uout() << "print solve type" << solve_type << std::endl;
     use_sqp_ = solve_type=="SQP";
 
     convexify_ = false;
@@ -410,7 +409,7 @@ namespace casadi {
                         {"hess:gamma:x:x"}, {{"gamma", {"f", "g"}}});
         }
         Hsp_ = get_function("nlp_hess_l").sparsity_out(0);
-        cout << "Sparsity pattern: " << Hsp_ << std::endl;
+        uout() << "Sparsity pattern: " << Hsp_ << std::endl;
         casadi_assert(Hsp_.is_symmetric(), "Hessian must be symmetric");
         if (convexify_strategy!="none") {
           convexify_ = true;
@@ -439,18 +438,18 @@ namespace casadi {
     if (use_sqp_){
       qpsol_ = conic("qpsol", qpsol_plugin, {{"h", Hsp_}, {"a", Asp_}},
                    qpsol_options);
-      cout << qpsol_ <<std::endl;
+      uout() << qpsol_ <<std::endl;
     } else {
       Hsp_ = Sparsity(nx_, nx_);
-      cout << "Sparsity pattern: " << Hsp_ << std::endl;
-      cout << "Sparsity pattern: " << Asp_ << std::endl;
-      // cout << "Nonzeros: " << Hsp_.nnz() << std::endl;
+      uout() << "Sparsity pattern: " << Hsp_ << std::endl;
+      uout() << "Sparsity pattern: " << Asp_ << std::endl;
+      // uout() << "Nonzeros: " << Hsp_.nnz() << std::endl;
       // qpsol_ = conic("qpsol", qpsol_plugin, {{"h", Hsp_}, {"a", Asp_}},
       //              qpsol_options);
       qpsol_ = conic("qpsol", qpsol_plugin, {{"a", Asp_}},
                    qpsol_options);
       // qpsol_ = Function::load("/home/david/testproblems_feasible_casadi/qpsol.casadi");
-      cout << qpsol_ <<std::endl;
+      uout() << qpsol_ <<std::endl;
     }
     
     alloc(qpsol_);

@@ -29,8 +29,6 @@
 #include <ctime>
 #include <cstring>
 
-using namespace std;
-
 namespace casadi {
 
   extern "C"

@@ -29,11 +29,10 @@
 #include <casadi/casadi.hpp>
 
 using namespace casadi;
-using namespace std;
 
 int main(){
 
-  cout << "program started" << std::endl;
+  std::cout << "program started" << std::endl;
 
   // Dimensions
   int nu = 20;  // Number of control segments
@@ -100,19 +99,19 @@ int main(){
 
   // Print the optimal cost
   double cost(res.at("f"));
-  cout << "optimal cost: " << cost << std::endl;
+  std::cout << "optimal cost: " << cost << std::endl;
 
   // Print the optimal solution
   std::vector<double> uopt(res.at("x"));
-  cout << "optimal control: " << uopt << std::endl;
+  std::cout << "optimal control: " << uopt << std::endl;
 
   // Get the state trajectory
   Function xfcn("xfcn", {u}, {s_traj, v_traj, m_traj});
   std::vector<double> sopt, vopt, mopt;
   xfcn({uopt}, {&sopt, &vopt, &mopt});
-  cout << "position: " << sopt << std::endl;
-  cout << "velocity: " << vopt << std::endl;
-  cout << "mass:     " << mopt << std::endl;
+  std::cout << "position: " << sopt << std::endl;
+  std::cout << "velocity: " << vopt << std::endl;
+  std::cout << "mass:     " << mopt << std::endl;
 
   // Create Matlab script to plot the solution
   std::ofstream file;
@@ -161,7 +160,7 @@ int main(){
   file << "ylabel('Thrust [kg m/s^2]');" << std::endl << std::endl;
 
   file.close();
-  cout << "Results saved to \"" << filename << "\"" << std::endl;
+  std::cout << "Results saved to \"" << filename << "\"" << std::endl;
 
   return 0;
 }

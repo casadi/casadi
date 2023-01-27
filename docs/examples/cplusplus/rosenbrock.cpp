@@ -25,7 +25,6 @@
 #include <casadi/casadi.hpp>
 
 using namespace casadi;
-using namespace std;
 
 /**
 Solve the Rosenbrock problem, formulated as the NLP:
@@ -60,10 +59,10 @@ int main(){
   DMDict res = solver(arg);
 
   //  Print solution
-  cout << "Optimal cost:                     " << double(res.at("f")) << std::endl;
-  cout << "Primal solution:                  " << std::vector<double>(res.at("x")) << std::endl;
-  cout << "Dual solution (simple bounds):    " << std::vector<double>(res.at("lam_x")) << std::endl;
-  cout << "Dual solution (nonlinear bounds): " << std::vector<double>(res.at("lam_g")) << std::endl;
+  std::cout << "Optimal cost:                     " << double(res.at("f")) << std::endl;
+  std::cout << "Primal solution:                  " << std::vector<double>(res.at("x")) << std::endl;
+  std::cout << "Dual solution (simple bounds):    " << std::vector<double>(res.at("lam_x")) << std::endl;
+  std::cout << "Dual solution (nonlinear bounds): " << std::vector<double>(res.at("lam_g")) << std::endl;
 
   return 0;
 }

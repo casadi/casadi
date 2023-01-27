@@ -36,8 +36,6 @@
 #include <iomanip>
 #include <chrono>
 
-using namespace std;
-
 namespace casadi {
   extern "C"
   int CASADI_NLPSOL_BONMIN_EXPORT

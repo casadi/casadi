@@ -37,7 +37,6 @@
 #include <iomanip>
 #include <chrono>
 
-using namespace std;
 #include <IpIpoptApplication.hpp>
 
 namespace casadi {

@@ -199,12 +199,11 @@ int usage_c(){
 // C++ (and CasADi) from here on
 #include <casadi/casadi.hpp>
 using namespace casadi;
-using namespace std;
 
 void usage_cplusplus(){
-  cout << "---" << std::endl;
-  cout << "Usage from CasADi C++:" << std::endl;
-  cout << std::endl;
+  std::cout << "---" << std::endl;
+  std::cout << "Usage from CasADi C++:" << std::endl;
+  std::cout << std::endl;
 
   // Use CasADi's "external" to load the compiled function
   Function f = external("f");
@@ -214,8 +213,8 @@ void usage_cplusplus(){
   std::vector<DM> arg = {reshape(DM(x), 2, 2), 5};
   std::vector<DM> res = f(arg);
 
-  cout << "result (0): " << res.at(0) << std::endl;
-  cout << "result (1): " << res.at(1) << std::endl;
+  std::cout << "result (0): " << res.at(0) << std::endl;
+  std::cout << "result (1): " << res.at(1) << std::endl;
 }
 
 

@@ -32,9 +32,6 @@
 #include <vector>
 
 namespace casadi {
-
-  using namespace std;
-
   extern "C"
   int CASADI_CONIC_CPLEX_EXPORT
   casadi_register_conic_cplex(Conic::Plugin* plugin) {

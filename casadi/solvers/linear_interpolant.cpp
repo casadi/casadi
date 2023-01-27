@@ -25,7 +25,6 @@
 
 #include "linear_interpolant.hpp"
 
-using namespace std;
 namespace casadi {
 
   extern "C"

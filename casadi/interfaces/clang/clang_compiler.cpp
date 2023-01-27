@@ -37,7 +37,6 @@
 #include <dlfcn.h>
 #endif // _WIN32
 
-using namespace std;
 namespace casadi {
 
   extern "C"

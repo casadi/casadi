@@ -27,7 +27,6 @@
 #include "casadi/core/polynomial.hpp"
 #include "casadi/core/casadi_misc.hpp"
 
-using namespace std;
 namespace casadi {
 
   extern "C"

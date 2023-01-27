@@ -31,7 +31,6 @@
 #include "wsqic.hpp"
 #include "casadi/interfaces/sqic/resource_sqic.hpp"
 
-using namespace std;
 namespace casadi {
 
   extern "C"

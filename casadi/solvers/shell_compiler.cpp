@@ -36,7 +36,6 @@
 
 #include <cstdlib>
 
-using namespace std;
 namespace casadi {
 
   extern "C"

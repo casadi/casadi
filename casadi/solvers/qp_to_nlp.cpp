@@ -27,7 +27,6 @@
 #include "casadi/core/nlpsol.hpp"
 #include "casadi/core/nlpsol_impl.hpp"
 
-using namespace std;
 namespace casadi {
 
   extern "C"

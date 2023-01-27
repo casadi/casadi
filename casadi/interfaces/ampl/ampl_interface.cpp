@@ -28,7 +28,6 @@
 #include <cstdio>
 #include <cstdlib>
 #include <fstream>
-using namespace std;
 namespace casadi {
 
   extern "C"

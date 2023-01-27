@@ -26,7 +26,6 @@
 #include "lapack_lu.hpp"
 #include "../../core/casadi_misc.hpp"
 
-using namespace std;
 namespace casadi {
 
   extern "C"

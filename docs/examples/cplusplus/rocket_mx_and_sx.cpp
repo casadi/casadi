@@ -27,7 +27,6 @@
 #include <casadi/casadi.hpp>
 
 using namespace casadi;
-using namespace std;
 
 // CONSTRUCT THE INTEGRATOR
 Function create_integrator(int nj, int nu){
@@ -121,7 +120,7 @@ int main(){
   res = solver(arg);
 
   // Get the solution
-  cout << "optimal solution: " << res.at("x") << std::endl;
+  std::cout << "optimal solution: " << res.at("x") << std::endl;
 
   return 0;
 }

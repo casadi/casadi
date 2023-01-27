@@ -27,7 +27,6 @@
 #include "casadi/core/casadi_misc.hpp"
 
 
-using namespace std;
 using namespace proxsuite::proxqp;
 
 namespace casadi {

@@ -27,7 +27,6 @@
 #include <fstream>
 
 using namespace casadi;
-using namespace std;
 /**
  *  Solve an NLP using codegen  
  *  Part 1: generation

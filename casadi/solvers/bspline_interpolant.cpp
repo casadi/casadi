@@ -26,7 +26,6 @@
 #include "bspline_interpolant.hpp"
 #include "casadi/core/bspline.hpp"
 
-using namespace std;
 namespace casadi {
 
   extern "C"

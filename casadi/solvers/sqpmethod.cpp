@@ -36,7 +36,6 @@
 #include <cmath>
 #include <cfloat>
 
-using namespace std;
 namespace casadi {
 
 
@@ -419,7 +418,7 @@ int Sqpmethod::solve(void* mem) const {
     const double one = 1.;
 
     // Info for printing
-    string info = "";
+    std::string info = "";
 
     // gamma_1
     double gamma_1;

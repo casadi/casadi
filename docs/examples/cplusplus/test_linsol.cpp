@@ -31,7 +31,6 @@ Joel Andersson, K.U. Leuven, 2010
 #include "casadi/casadi.hpp"
 
 using namespace casadi;
-using namespace std;
 
 int main(int argc, char *argv[])
 {
@@ -71,22 +70,22 @@ int main(int argc, char *argv[])
     DM A_test;
     switch (s) {
     case UNSYM:
-      cout << "Unsymmetric linear system" << std::endl;
+      std::cout << "Unsymmetric linear system" << std::endl;
       A_test = A;
       break;
     case SYM:
-      cout << "Symmetric linear system" << std::endl;
+      std::cout << "Symmetric linear system" << std::endl;
       A_test = A + A.T();
       break;
     case PD:
-      cout << "Positive definite linear system" << std::endl;
+      std::cout << "Positive definite linear system" << std::endl;
       A_test = mtimes(A.T(), A);
       break;
     }
     for (auto t : tests) {
       if (t.type > s) continue; // Cannot be solved
       if (!Linsol::has_plugin(t.solver)) {
-        cout << t.solver << " not available" << std::endl;
+        std::cout << t.solver << " not available" << std::endl;
         continue;
       }
 
@@ -107,7 +106,7 @@ int main(int argc, char *argv[])
       if (F.solve(A_test.ptr(), x.ptr(), x.size2())) casadi_error("'solve' failed");
 
       // Print the solution
-      cout << "solution: " << x << " (" <<  t.solver << ")" << std::endl;
+      std::cout << "solution: " << x << " (" <<  t.solver << ")" << std::endl;
     }
   }
 

@@ -29,7 +29,6 @@
 #include <casadi/casadi.hpp>
 
 using namespace casadi;
-using namespace std;
 
 // dx/dt = f(x,u)
 MX f(const MX& x, const MX& u) {

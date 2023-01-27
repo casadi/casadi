@@ -30,7 +30,6 @@
 INPUTSCHEME(IntegratorInput)
 OUTPUTSCHEME(IntegratorOutput)
 
-using namespace std;
 namespace casadi {
 
   SundialsInterface::SundialsInterface(const std::string& name, const Function& dae)
@@ -226,7 +225,7 @@ namespace casadi {
     // Allocate work vectors
     alloc_w(np_, true); // p
     alloc_w(nrp_, true); // rp
-    alloc_w(2*max(nx_+nz_, nrx_+nrz_), true); // v1, v2
+    alloc_w(2 * std::max(nx_+nz_, nrx_+nrz_), true); // v1, v2
 
     // Allocate linear solvers
     linsolF_ = Linsol("linsolF", linear_solver_,

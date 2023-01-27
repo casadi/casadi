@@ -37,7 +37,6 @@
 #endif // CASADI_WITH_THREAD_MINGW
 #endif //CASADI_WITH_THREAD
 
-using namespace std;
 namespace casadi {
 
   extern "C"

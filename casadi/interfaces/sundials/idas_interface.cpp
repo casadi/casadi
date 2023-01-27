@@ -30,7 +30,6 @@
 #define THROWING(fcn, ...) \
 idas_error(CASADI_STR(fcn), fcn(__VA_ARGS__))
 
-using namespace std;
 namespace casadi {
 
   extern "C"

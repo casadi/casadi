@@ -35,7 +35,6 @@
 #include <cmath>
 #include <cfloat>
 
-using namespace std;
 namespace casadi {
 
   extern "C"

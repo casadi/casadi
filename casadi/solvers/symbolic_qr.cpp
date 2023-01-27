@@ -29,7 +29,6 @@
 #include <cstdlib>
 #endif // WITH_DL
 
-using namespace std;
 namespace casadi {
 
   extern "C"

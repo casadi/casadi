@@ -28,7 +28,6 @@
 
 #include "hpipm_runtime_str.h"
 
-using namespace std;
 namespace casadi {
 
   extern "C"

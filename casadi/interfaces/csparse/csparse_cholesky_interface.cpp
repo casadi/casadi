@@ -27,7 +27,6 @@
 
 /// \cond INTERFACE
 
-using namespace std;
 namespace casadi {
 
   extern "C"

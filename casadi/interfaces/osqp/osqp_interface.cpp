@@ -26,7 +26,6 @@
 #include "osqp_interface.hpp"
 #include "casadi/core/casadi_misc.hpp"
 
-using namespace std;
 namespace casadi {
 
   extern "C"

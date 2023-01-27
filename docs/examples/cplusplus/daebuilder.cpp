@@ -25,7 +25,6 @@
 
 #include <casadi/casadi.hpp>
 
-using namespace std;
 using namespace casadi;
 
 int main(){
@@ -63,7 +62,7 @@ int main(){
   dae.set_unit("m","kg");
 
   // Print DAE
-  dae.disp(cout, true);
+  dae.disp(std::cout, true);
 
   return 0;
 }

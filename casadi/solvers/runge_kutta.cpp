@@ -25,7 +25,6 @@
 
 #include "runge_kutta.hpp"
 
-using namespace std;
 namespace casadi {
 
   extern "C"
