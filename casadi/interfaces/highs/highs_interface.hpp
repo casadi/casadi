@@ -57,12 +57,6 @@ namespace casadi {
     // Problem data structure
     casadi_highs_data<double> d;
 
-    /// Constructor
-    HighsMemory();
-
-    /// Destructor
-    ~HighsMemory();
-
   };
 
   /** \brief \pluginbrief{Conic,highs}
@@ -112,6 +106,9 @@ namespace casadi {
 
     /** \brief Codegen for free_mem */
     void codegen_free_mem(CodeGenerator& g) const override;
+
+    /** \brief Thread-local memory object type */
+    std::string codegen_mem_type() const override { return "struct casadi_highs_data"; }
 
     // Initialize the solver
     void init(const Dict& opts) override;

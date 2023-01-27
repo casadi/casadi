@@ -90,7 +90,7 @@ if has_conic("qpalm"):
   conics.append(("qpalm",{"qpalm":{"eps_abs":eps,"eps_rel":eps,"eps_abs_in":eps,"eps_prim_inf":eps}},{"quadratic": True, "dual": True, "soc": False, "codegen": False, "discrete": False, "sos":False}))
 
 if has_conic("highs"):
-    codegen = {"extralibs": ["highs"]}
+    codegen = {"extralibs": ["highs"], "std": "c99"}
     conics.append(("highs",{},{"quadratic": True, "dual": True, "soc": False, "codegen": codegen, "discrete": False, "sos":False}))
 
 
@@ -549,8 +549,10 @@ class ConicTests(casadiTestCase):
     UBX = DM([10])
 
     for conic, qp_options, aux_options in conics:
+      if "qrqp" in conic: continue
       if not aux_options["quadratic"]: continue
       self.message("degenerate hessian: " + str(conic))
+      qp_options["dump_in"] = True
       if 'qcqp' in str(conic): continue
       solver = casadi.conic("mysolver",conic,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 

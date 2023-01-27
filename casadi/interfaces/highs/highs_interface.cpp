@@ -144,6 +144,8 @@ namespace casadi {
       init << v[i];
       if (i<v.size()-1) init << ", ";
     }
+    // ISO C forbids empty initializer braces
+    if (v.empty()) init << "0";
     init << "}";
     g.init_local(n, init.str());
   }
@@ -154,22 +156,28 @@ namespace casadi {
     codegen_local(g, "rowa", rowa_);
     codegen_local(g, "colindh", colindh_);
     codegen_local(g, "rowh", rowh_);
+    if (!discrete_.empty()) {
+      codegen_local(g, "integrality", integrality_);
+    }
     g << "p.colinda = colinda;\n";
     g << "p.rowa = rowa;\n";
     g << "p.colindh = colindh;\n";
     g << "p.rowh = rowh;\n";
-    g << "p.integrality = integrality;\n";
-
+    if (discrete_.empty()) {
+      g << "p.integrality = 0;\n";
+    } else {
+      g << "p.integrality = integrality;\n";
+    }
     g << "casadi_highs_setup(&p);\n";
   }
 
   void HighsInterface::codegen_init_mem(CodeGenerator& g) const {
-    g << "highs_init_mem(" + codegen_mem(g) + "->d);\n";
+    g << "highs_init_mem(&" + codegen_mem(g) + ");\n";
     g << "return 0;\n";
   }
 
   void HighsInterface::codegen_free_mem(CodeGenerator& g) const {
-    g << "highs_free_mem(" + codegen_mem(g) + "->d);\n";
+    g << "highs_free_mem(&" + codegen_mem(g) + ");\n";
   }
 
   void HighsInterface::set_highs_prob() {
@@ -234,12 +242,6 @@ namespace casadi {
     clear_mem();
   }
 
-  HighsMemory::HighsMemory() {
-  }
-
-  HighsMemory::~HighsMemory() {
-  }
-
   void HighsInterface::codegen_body(CodeGenerator& g) const {
     qp_codegen_body(g);
     g.add_auxiliary(CodeGenerator::AUX_PROJECT);
@@ -253,24 +255,24 @@ namespace casadi {
     g.add_auxiliary(CodeGenerator::AUX_CLIP_MAX);
     g.add_auxiliary(CodeGenerator::AUX_DOT);
     g.add_auxiliary(CodeGenerator::AUX_BILIN);
-    g.add_include("highs/interfaces/highs_c_api.h");
+    g.add_include("interfaces/highs_c_api.h");
 
     g.auxiliaries << g.sanitize_source(highs_runtime_str, {"casadi_real"});
 
 
-    g.local("d", "struct casadi_highs_data");
+    g.local("d", "struct casadi_highs_data*");
+    g.init_local("d", "&" + codegen_mem(g));
     g.local("p", "struct casadi_highs_prob");
-
     set_highs_prob(g);
 
     // Setup data structure (corresponds to set_work)
-    g << "d.prob = &p;\n";
-    g << "d.qp = &d_qp;\n";
-    g << "casadi_highs_init(&d, &arg, &res, &iw, &w);\n";
+    g << "d->prob = &p;\n";
+    g << "d->qp = &d_qp;\n";
+    g << "casadi_highs_init(d, &arg, &res, &iw, &w);\n";
 
-    g << "casadi_highs_solve(&d, arg, res, iw, w);\n";
+    g << "casadi_highs_solve(d, arg, res, iw, w);\n";
 
-    g << "if (d.return_status!=0) {\n";
+    g << "if (!d_qp.success) {\n";
     if (error_on_fail_) {
       g << "return -1000;\n";
     } else {
