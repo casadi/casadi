@@ -105,4 +105,42 @@ std::ostream &print_matlab(std::ostream &os, const Eigen::VectorX<F> &M) {
     return os << "];\n";
 }
 
+template <std::floating_point F>
+void print_elem_python(auto &buf, F value, std::ostream &os) {
+    os << float_to_str_vw(buf, value);
+}
+
+template <std::floating_point F>
+void print_elem_python(auto &buf, std::complex<F> value, std::ostream &os) {
+    os << float_to_str_vw(buf, value.real()) << " + "
+       << float_to_str_vw(buf, value.imag()) << 'j';
+}
+
+template <float_or_complex_float F>
+std::ostream &print_python(std::ostream &os, const Eigen::MatrixX<F> &M) {
+    os << "[[";
+    std::array<char, 64> buf;
+    for (decltype(M.rows()) r{}; r < M.rows(); ++r) {
+        for (decltype(M.cols()) c{}; c < M.cols(); ++c) {
+            print_elem_python(buf, M(r, c), os);
+            os << ", ";
+        }
+        if (r != M.rows() - 1)
+            os << "],\n [";
+    }
+    return os << "]]\n";
+}
+
+template <float_or_complex_float F>
+std::ostream &print_python(std::ostream &os, const Eigen::VectorX<F> &M) {
+    os << '[';
+    std::array<char, 64> buf{};
+    for (decltype(M.rows()) r{}; r < M.rows(); ++r) {
+        print_elem_python(buf, M(r), os);
+        if (r != M.rows() - 1)
+            os << ", ";
+    }
+    return os << "]\n";
+}
+
 } // namespace alpaqa

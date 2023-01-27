@@ -16,4 +16,9 @@ std::ostream &print_matlab(std::ostream &os, const Eigen::MatrixX<F> &M);
 template <float_or_complex_float F>
 std::ostream &print_matlab(std::ostream &os, const Eigen::VectorX<F> &M);
 
+template <float_or_complex_float F>
+std::ostream &print_python(std::ostream &os, const Eigen::MatrixX<F> &M);
+template <float_or_complex_float F>
+std::ostream &print_python(std::ostream &os, const Eigen::VectorX<F> &M);
+
 } // namespace alpaqa
