@@ -27,7 +27,6 @@
 #include "sparsity_interface.hpp"
 #include <typeinfo>
 
-using namespace std;
 namespace casadi {
 
   bool has_expm(const std::string& name) {

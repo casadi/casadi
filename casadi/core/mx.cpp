@@ -557,7 +557,7 @@ namespace casadi {
   }
 
   MX MX::inf(const Sparsity& sp) {
-    return create(ConstantMX::create(sp, numeric_limits<double>::infinity()));
+    return create(ConstantMX::create(sp, std::numeric_limits<double>::infinity()));
   }
 
   MX MX::nan(casadi_int nrow, casadi_int ncol) {
@@ -569,7 +569,7 @@ namespace casadi {
   }
 
   MX MX::nan(const Sparsity& sp) {
-    return create(ConstantMX::create(sp, numeric_limits<double>::quiet_NaN()));
+    return create(ConstantMX::create(sp, std::numeric_limits<double>::quiet_NaN()));
   }
 
   MX MX::eye(casadi_int n) {
@@ -1086,7 +1086,7 @@ namespace casadi {
     } else if (!x.front().is_column()) {
       // Vertcat operation only supports vectors, rewrite using horzcat
       std::vector<MX> xT = x;
-      for (vector<MX>::iterator i=xT.begin(); i!=xT.end(); ++i) *i = i->T();
+      for (std::vector<MX>::iterator i=xT.begin(); i!=xT.end(); ++i) *i = i->T();
       return horzcat(xT).T();
     } else {
       return x.front()->get_vertcat(x);
@@ -1228,7 +1228,7 @@ namespace casadi {
   MX MX::if_else(const MX &cond, const MX &x_true, const MX &x_false, bool short_circuit) {
     if (short_circuit) {
       // Get symbolic primitives
-      std::vector<MX> arg = symvar(veccat(vector<MX>{x_true, x_false}));
+      std::vector<MX> arg = symvar(veccat(std::vector<MX>{x_true, x_false}));
 
       // Form functions for cases
       Function f_true("f_true", arg, {x_true});
@@ -1377,7 +1377,7 @@ namespace casadi {
   }
 
   MX MX::substitute(const MX& ex, const MX& v, const MX& vdef) {
-    return substitute(vector<MX>{ex}, std::vector<MX>{v}, std::vector<MX>{vdef}).front();
+    return substitute(std::vector<MX>{ex}, std::vector<MX>{v}, std::vector<MX>{vdef}).front();
   }
 
   std::vector<MX> MX::substitute(const std::vector<MX> &ex, const std::vector<MX> &v,
@@ -1525,9 +1525,9 @@ namespace casadi {
       casadi_int v_ind = 0;
       for (auto&& op : opts) {
         if (op.first == "prefix") {
-          v_prefix = string(op.second);
+          v_prefix = std::string(op.second);
         } else if (op.first == "suffix") {
-          v_suffix = string(op.second);
+          v_suffix = std::string(op.second);
         } else if (op.first == "lift_shared") {
           lift_shared = op.second;
         } else if (op.first == "lift_calls") {
@@ -1535,7 +1535,7 @@ namespace casadi {
         } else if (op.first == "offset") {
           v_ind = op.second;
         } else {
-          casadi_error("No such option: " + string(op.first));
+          casadi_error("No such option: " + std::string(op.first));
         }
       }
       // Sort the expression
@@ -1740,7 +1740,7 @@ namespace casadi {
         } else if (op.first=="never_inline") {
           never_inline = op.second;
         } else {
-          casadi_error("No such option: " + string(op.first));
+          casadi_error("No such option: " + std::string(op.first));
         }
       }
       // Call internal function on a temporary object
@@ -1772,7 +1772,7 @@ namespace casadi {
         } else if (op.first=="never_inline") {
           never_inline = op.second;
         } else {
-          casadi_error("No such option: " + string(op.first));
+          casadi_error("No such option: " + std::string(op.first));
         }
       }
       // Call internal function on a temporary object
@@ -1815,7 +1815,7 @@ namespace casadi {
   }
 
   MX MX::matrix_expand(const MX& e, const std::vector<MX> &boundary, const Dict &options) {
-    return matrix_expand(vector<MX>{e}, boundary, options).at(0);
+    return matrix_expand(std::vector<MX>{e}, boundary, options).at(0);
   }
 
   std::vector<MX> MX::matrix_expand(const std::vector<MX>& e,
@@ -2026,7 +2026,7 @@ namespace casadi {
     std::vector<MX> swork(ff->workloc_.size()-1);
 
     // Allocate storage for split outputs
-    std::vector<vector<MX> > res_split(e.size());
+    std::vector<std::vector<MX> > res_split(e.size());
     for (casadi_int i=0; i<e.size(); ++i) res_split[i].resize(e[i].n_primitives());
 
     std::vector<MX> arg1, res1;

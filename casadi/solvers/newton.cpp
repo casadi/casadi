@@ -162,7 +162,7 @@ namespace casadi {
 
       // Check convergence
       double abstol = 0;
-      if (abstol_ != numeric_limits<double>::infinity()) {
+      if (abstol_ != std::numeric_limits<double>::infinity()) {
         for (casadi_int i=0; i<n_; ++i) {
           abstol = max(abstol, fabs(m->f[i]));
         }
@@ -178,7 +178,7 @@ namespace casadi {
 
       // Check convergence again
       double abstolStep=0;
-      if (numeric_limits<double>::infinity() != abstolStep_) {
+      if (std::numeric_limits<double>::infinity() != abstolStep_) {
         for (casadi_int i=0; i<n_; ++i) {
           abstolStep = max(abstolStep, fabs(m->f[i]));
         }
@@ -244,10 +244,10 @@ namespace casadi {
   }
 
   void Newton::printIteration(std::ostream &stream) const {
-    stream << setw(5) << "iter";
-    stream << setw(10) << "res";
-    stream << setw(10) << "step";
-    if (line_search_) stream << setw(10) << "alpha";
+    stream << std::setw(5) << "iter";
+    stream << std::setw(10) << "res";
+    stream << std::setw(10) << "step";
+    if (line_search_) stream << std::setw(10) << "alpha";
     stream << std::endl;
     stream.unsetf(std::ios::floatfield);
   }
@@ -256,10 +256,10 @@ namespace casadi {
                               double abstol, double abstolStep, double alpha) const {
 
     std::ios_base::fmtflags f = stream.flags();
-    stream << setw(5) << iter;
-    stream << setw(10) << scientific << setprecision(2) << abstol;
-    stream << setw(10) << scientific << setprecision(2) << abstolStep;
-    if (line_search_) stream << setw(10) << scientific << setprecision(2) << alpha;
+    stream << std::setw(5) << iter;
+    stream << std::setw(10) << scientific << setprecision(2) << abstol;
+    stream << std::setw(10) << scientific << setprecision(2) << abstolStep;
+    if (line_search_) stream << std::setw(10) << scientific << setprecision(2) << alpha;
 
     stream << fixed;
     stream << std::endl;

@@ -35,7 +35,7 @@ namespace casadi {
   ImporterInternal::~ImporterInternal() {
   }
 
-  void ImporterInternal::disp(ostream &stream, bool more) const {
+  void ImporterInternal::disp(std::ostream &stream, bool more) const {
   }
 
   std::map<std::string, ImporterInternal::Plugin> ImporterInternal::solvers_;

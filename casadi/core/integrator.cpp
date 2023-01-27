@@ -83,7 +83,7 @@ namespace casadi {
     case INTEGRATOR_RZ0: return "rz0";
     case INTEGRATOR_NUM_IN: break;
     }
-    return string();
+    return std::string();
   }
 
   std::string integrator_out(casadi_int ind) {
@@ -96,7 +96,7 @@ namespace casadi {
     case INTEGRATOR_RZF: return "rzf";
     case INTEGRATOR_NUM_OUT: break;
     }
-    return string();
+    return std::string();
   }
 
   casadi_int integrator_n_in() {
@@ -364,7 +364,7 @@ namespace casadi {
     MatType zero_t = MatType::zeros(t());
 
     // Forward directional derivatives
-    std::vector<vector<MatType>> seed(nfwd, std::vector<MatType>(DE_NUM_IN));
+    std::vector<std::vector<MatType>> seed(nfwd, std::vector<MatType>(DE_NUM_IN));
     for (casadi_int d=0; d<nfwd; ++d) {
       seed[d][DE_T] = zero_t;
       std::string pref = "aug" + str(d) + "_";
@@ -377,7 +377,7 @@ namespace casadi {
     }
 
     // Calculate directional derivatives
-    std::vector<vector<MatType>> sens;
+    std::vector<std::vector<MatType>> sens;
     oracle_->call_forward(arg, res, seed, sens, true, false);
 
     // Collect sensitivity equations
@@ -439,7 +439,7 @@ namespace casadi {
     MatType zero_t = MatType::zeros(t());
 
     // Reverse mode directional derivatives
-    std::vector<vector<MatType>> seed(nadj, std::vector<MatType>(DE_NUM_OUT));
+    std::vector<std::vector<MatType>> seed(nadj, std::vector<MatType>(DE_NUM_OUT));
     for (casadi_int d=0; d<nadj; ++d) {
       std::string pref = "aug" + str(d) + "_";
       aug_rx.push_back(vec(seed[d][DE_ODE] = MatType::sym(pref + "ode", x())));
@@ -451,7 +451,7 @@ namespace casadi {
     }
 
     // Calculate directional derivatives
-    std::vector<vector<MatType>> sens;
+    std::vector<std::vector<MatType>> sens;
     oracle_->call_reverse(arg, res, seed, sens, true, false);
 
     // Collect sensitivity equations
@@ -1282,7 +1282,7 @@ namespace casadi {
     m->k = 0;
 
     // Get consistent initial conditions
-    casadi_fill(get_ptr(m->Z), m->Z.size(), numeric_limits<double>::quiet_NaN());
+    casadi_fill(get_ptr(m->Z), m->Z.size(), std::numeric_limits<double>::quiet_NaN());
 
     // Add the first element in the tape
     if (nrx_>0) {
@@ -1311,7 +1311,7 @@ namespace casadi {
     m->k = nk_;
 
     // Get consistent initial conditions
-    casadi_fill(get_ptr(m->RZ), m->RZ.size(), numeric_limits<double>::quiet_NaN());
+    casadi_fill(get_ptr(m->RZ), m->RZ.size(), std::numeric_limits<double>::quiet_NaN());
   }
 
   ImplicitFixedStepIntegrator::

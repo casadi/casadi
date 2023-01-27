@@ -223,13 +223,13 @@ namespace casadi {
 
       // Evaluate the polynomial at the final time to get the
       // coefficients of the continuity equation
-      D[j] = lfcn(vector<DM>{1.}).at(0)->front();
+      D[j] = lfcn(std::vector<DM>{1.}).at(0)->front();
 
       // Evaluate the time derivative of the polynomial at all collocation points to
       // get the coefficients of the continuity equation
       Function tfcn("tfcn", {tau_sym}, {tangent(L, tau_sym)});
       for (casadi_int j2=0; j2<deg+1; ++j2) {
-        C[j2][j] =  tfcn(vector<DM>{etau_root[j2]}).at(0)->front();
+        C[j2][j] =  tfcn(std::vector<DM>{etau_root[j2]}).at(0)->front();
       }
     }
   }
@@ -247,7 +247,7 @@ namespace casadi {
     bool has_end = tau.back()==1;
 
     // Coefficients of the collocation equation
-    std::vector<vector<double> > C_(deg+1, std::vector<double>(deg+1, 0));
+    std::vector<std::vector<double> > C_(deg+1, std::vector<double>(deg+1, 0));
 
     // Coefficients of the continuity equation
     std::vector<double> D_(deg+1, 0);
@@ -377,7 +377,7 @@ namespace casadi {
     MX h = pp[0];
     MX p = reshape(pp[1], p_sp.size());
     MX f_in[] = {x, p};
-    MX xdot = f(vector<MX>(f_in, f_in+2)).at(0);
+    MX xdot = f(std::vector<MX>(f_in, f_in+2)).at(0);
     xdot *= h;
 
     // Form DAE function

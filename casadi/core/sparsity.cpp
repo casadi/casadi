@@ -1388,7 +1388,7 @@ namespace casadi {
       ret_nrow = sp[i].size1();
 
     // Append all patterns
-    for (vector<Sparsity>::const_iterator i=sp.begin(); i!=sp.end(); ++i) {
+    for (std::vector<Sparsity>::const_iterator i=sp.begin(); i!=sp.end(); ++i) {
       // Get sparsity pattern
       casadi_int sp_nrow = i->size1();
       casadi_int sp_ncol = i->size2();
@@ -1474,7 +1474,7 @@ namespace casadi {
       ret_ncol = sp[i].size2();
 
     // Append all patterns
-    for (vector<Sparsity>::const_iterator i=sp.begin(); i!=sp.end(); ++i) {
+    for (std::vector<Sparsity>::const_iterator i=sp.begin(); i!=sp.end(); ++i) {
       // Get sparsity pattern
       casadi_int sp_nrow = i->size1();
       casadi_int sp_ncol = i->size2();
@@ -1559,7 +1559,7 @@ namespace casadi {
       // Construct the sparsity pattern
       colind.resize(ncol+1);
       std::copy(colind_x+first_col, colind_x+last_col+1, colind.begin());
-      for (vector<casadi_int>::iterator it=colind.begin()+1; it!=colind.end(); ++it)
+      for (std::vector<casadi_int>::iterator it=colind.begin()+1; it!=colind.end(); ++it)
         *it -= colind[0];
       colind[0] = 0;
       row.resize(colind.back());

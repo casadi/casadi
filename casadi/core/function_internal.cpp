@@ -50,8 +50,6 @@
 #endif // WITH_DL
 #include <iomanip>
 
-using namespace std;
-
 namespace casadi {
 
   ProtoFunction::ProtoFunction(const std::string& name) : name_(name) {
@@ -143,17 +141,17 @@ namespace casadi {
     // Initialize the class hierarchy
     try {
       init(opts);
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       casadi_error("Error calling " + class_name() + "::init for '" + name_ + "':\n"
-        + string(e.what()));
+        + std::string(e.what()));
     }
 
     // Revisit class hierarchy in reverse order
     try {
       finalize();
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       casadi_error("Error calling " + class_name() + "::finalize for '" + name_ + "':\n"
-        + string(e.what()));
+        + std::string(e.what()));
     }
   }
 
@@ -736,7 +734,7 @@ namespace casadi {
     const std::string filesep("/");
     #endif
     std::stringstream ss;
-    ss << setfill('0') << setw(6) << id;
+    ss << std::setfill('0') << std::setw(6) << id;
     std::string count = ss.str();
     for (casadi_int i=0;i<n_in_;++i) {
       DM::to_file(dump_dir_+ filesep + name_ + "." + count + ".in." + name_in_[i] + "." +
@@ -752,7 +750,7 @@ namespace casadi {
     const std::string filesep("/");
     #endif
     std::stringstream ss;
-    ss << setfill('0') << setw(6) << id;
+    ss << std::setfill('0') << std::setw(6) << id;
     std::string count = ss.str();
     for (casadi_int i=0;i<n_out_;++i) {
       DM::to_file(dump_dir_+ filesep + name_ + "." + count + ".out." + name_out_[i] + "." +
@@ -869,7 +867,7 @@ namespace casadi {
     return ret;
   }
 
-  void FunctionInternal::print_dimensions(ostream &stream) const {
+  void FunctionInternal::print_dimensions(std::ostream &stream) const {
     stream << " Number of inputs: " << n_in_ << std::endl;
     for (casadi_int i=0; i<n_in_; ++i) {
       stream << "  Input " << i  << " (\"" << name_in_[i] << "\"): "
@@ -932,7 +930,7 @@ namespace casadi {
     return s.str();
   }
 
-  void FunctionInternal::disp(ostream &stream, bool more) const {
+  void FunctionInternal::disp(std::ostream &stream, bool more) const {
     stream << definition() << " " << class_name();
     if (more) {
       stream << std::endl;
@@ -1112,7 +1110,7 @@ namespace casadi {
 
     // Print
     if (verbose_) {
-      casadi_message(str(nsweep) + string(fwd ? " forward" : " reverse") + " sweeps "
+      casadi_message(str(nsweep) + std::string(fwd ? " forward" : " reverse") + " sweeps "
                      "needed for " + str(seed.size()) + " directions");
     }
 
@@ -1315,7 +1313,7 @@ namespace casadi {
             //casadi_assert_dev(value>=0);
 
             // Loop over the rows of the fine block
-            for (casadi_int fci = fci_offset;fci<min(fci_end-fci_start, fci_cap);++fci) {
+            for (casadi_int fci = fci_offset; fci<std::min(fci_end-fci_start, fci_cap); ++fci) {
 
               // Loop over the coarse block cols that appear in the
               // coloring for the current coarse seed direction
@@ -1333,7 +1331,7 @@ namespace casadi {
           }
 
           // Bump bvec_i for next major coarse direction
-          bvec_i+= min(n_fine_blocks_max, fci_cap);
+          bvec_i += std::min(n_fine_blocks_max, fci_cap);
 
           // Check if bvec buffer is full
           if (bvec_i==bvec_size || csd==D.size2()-1) {
@@ -1398,7 +1396,7 @@ namespace casadi {
           }
 
           if (n_fine_blocks_max>fci_cap) {
-            fci_offset += min(n_fine_blocks_max, fci_cap);
+            fci_offset += std::min(n_fine_blocks_max, fci_cap);
             bvec_i = 0;
             fci_cap = bvec_size;
           } else {
@@ -1521,7 +1519,7 @@ namespace casadi {
         (1-sp_w)*static_cast<double>(D2.size2());
       use_fwd = fwd_cost <= adj_cost;
       if (verbose_) {
-        casadi_message(string(use_fwd ? "Forward" : "Reverse") + " mode chosen "
+        casadi_message(std::string(use_fwd ? "Forward" : "Reverse") + " mode chosen "
             "(fwd cost: " + str(fwd_cost) + ", adj cost: " + str(adj_cost) + ")");
       }
 
@@ -1614,7 +1612,7 @@ namespace casadi {
             casadi_int value = -bvec_i + fci_offset + fci_start;
 
             // Loop over the rows of the fine block
-            for (casadi_int fci = fci_offset; fci<min(fci_end-fci_start, fci_cap); ++fci) {
+            for (casadi_int fci = fci_offset; fci < std::min(fci_end-fci_start, fci_cap); ++fci) {
 
               // Loop over the coarse block cols that appear in the coloring
               // for the current coarse seed direction
@@ -1632,7 +1630,7 @@ namespace casadi {
           }
 
           // Bump bvec_i for next major coarse direction
-          bvec_i+= min(n_fine_blocks_max, fci_cap);
+          bvec_i+= std::min(n_fine_blocks_max, fci_cap);
 
           // Check if bvec buffer is full
           if (bvec_i==bvec_size || csd==D.size2()-1) {
@@ -1696,7 +1694,7 @@ namespace casadi {
           }
 
           if (n_fine_blocks_max>fci_cap) {
-            fci_offset += min(n_fine_blocks_max, fci_cap);
+            fci_offset += std::min(n_fine_blocks_max, fci_cap);
             bvec_i = 0;
             fci_cap = bvec_size;
           } else {
@@ -1900,7 +1898,7 @@ namespace casadi {
       casadi_assert(allow_forward || allow_reverse, "Conflicting ad weights");
 
       // Best coloring encountered so far (relatively tight upper bound)
-      double best_coloring = numeric_limits<double>::infinity();
+      double best_coloring = std::numeric_limits<double>::infinity();
 
       // Test forward mode first?
       bool test_fwd_first = allow_forward && w*static_cast<double>(A.size1()) <=
@@ -2412,8 +2410,8 @@ namespace casadi {
       size_t sz_w = this->sz_w();
       for (casadi_int i=0; i<n_in_; ++i) {
         const Sparsity& s = sparsity_in_[i];
-        sz_w = max(sz_w, static_cast<size_t>(s.size1())); // To be able to copy a column
-        sz_w = max(sz_w, static_cast<size_t>(s.size2())); // To be able to copy a row
+        sz_w = std::max(sz_w, static_cast<size_t>(s.size1())); // To be able to copy a column
+        sz_w = std::max(sz_w, static_cast<size_t>(s.size2())); // To be able to copy a row
       }
       sz_w += i_nnz + o_nnz;
       g << CodeGenerator::array("casadi_real", "w", sz_w);
@@ -2688,7 +2686,7 @@ namespace casadi {
     if (persistent) {
       sz_arg_per_ += sz_arg;
     } else {
-      sz_arg_tmp_ = max(sz_arg_tmp_, sz_arg);
+      sz_arg_tmp_ = std::max(sz_arg_tmp_, sz_arg);
     }
   }
 
@@ -2696,7 +2694,7 @@ namespace casadi {
     if (persistent) {
       sz_res_per_ += sz_res;
     } else {
-      sz_res_tmp_ = max(sz_res_tmp_, sz_res);
+      sz_res_tmp_ = std::max(sz_res_tmp_, sz_res);
     }
   }
 
@@ -2704,7 +2702,7 @@ namespace casadi {
     if (persistent) {
       sz_iw_per_ += sz_iw;
     } else {
-      sz_iw_tmp_ = max(sz_iw_tmp_, sz_iw);
+      sz_iw_tmp_ = std::max(sz_iw_tmp_, sz_iw);
     }
   }
 
@@ -2712,7 +2710,7 @@ namespace casadi {
     if (persistent) {
       sz_w_per_ += sz_w;
     } else {
-      sz_w_tmp_ = max(sz_w_tmp_, sz_w);
+      sz_w_tmp_ = std::max(sz_w_tmp_, sz_w);
     }
   }
 
@@ -2846,7 +2844,7 @@ namespace casadi {
       casadi_int offset = 0;
       while (offset<nfwd) {
         // Number of derivatives, in this batch
-        casadi_int nfwd_batch = min(nfwd-offset, max_nfwd);
+        casadi_int nfwd_batch = std::min(nfwd-offset, max_nfwd);
 
         // All inputs and seeds
         std::vector<MX> darg;
@@ -2956,7 +2954,7 @@ namespace casadi {
       casadi_int offset = 0;
       while (offset<nadj) {
         // Number of derivatives, in this batch
-        casadi_int nadj_batch = min(nadj-offset, max_nadj);
+        casadi_int nadj_batch =  std::min(nadj-offset, max_nadj);
 
         // All inputs and seeds
         std::vector<MX> darg;
@@ -3188,7 +3186,7 @@ namespace casadi {
 
     casadi_int n = 1;
     for (casadi_int i=0; i<x_mod.size(); ++i) {
-      n = max(x_mod[i].size2()/size2_in(i), n);
+      n = std::max(x_mod[i].size2() / size2_in(i), n);
     }
 
     std::vector<casadi_int> reduce_in;
@@ -3212,7 +3210,7 @@ namespace casadi {
     // Calling with a scalar - set all
     if (arg.is_scalar()) return true;
     // Vectors that are transposes of each other
-    if (arg.is_vector() && inp.size()==make_pair(arg.size2(), arg.size1())) return true;
+    if (arg.is_vector() && inp.size()==std::make_pair(arg.size2(), arg.size1())) return true;
     // Horizontal repmat
     if (arg.size1()==inp.size1() && arg.size2()>0 && inp.size2()>0
         && inp.size2()%arg.size2()==0) return true;
@@ -3537,7 +3535,7 @@ namespace casadi {
         }
       } catch (KeyboardInterruptException&) {
         throw;
-      } catch (exception& e) {
+      } catch(std::exception& e) {
         casadi_error("Failed to evaluate 'eval_dm' for " + name_ + ":\n" + e.what());
       }
       // Successful return
@@ -3553,9 +3551,9 @@ namespace casadi {
     // Length of the name being printed
     size_t name_len=0;
     for (auto &&s : fstats) {
-      name_len = max(s.first.size(), name_len);
+      name_len = std::max(s.first.size(), name_len);
     }
-    name_len = max(name_.size(), name_len);
+    name_len = std::max(name_.size(), name_len);
 
     // Print name with a given length. Format: "%NNs "
     char namefmt[10];
@@ -3625,7 +3623,7 @@ namespace casadi {
     // Cleanup
     va_end(args);
     // Throw error if failure
-    casadi_assert(n>=0 && n<buf_sz, "Print failure while processing '" + string(fmt) + "'");
+    casadi_assert(n>=0 && n<buf_sz, "Print failure while processing '" + std::string(fmt) + "'");
   }
 
   void ProtoFunction::print(const char* fmt, ...) const {
@@ -3650,7 +3648,7 @@ namespace casadi {
     delete[] buf_dyn;
     va_end(args);
     // Throw error if failure
-    casadi_assert(n>=0, "Print failure while processing '" + string(fmt) + "'");
+    casadi_assert(n>=0, "Print failure while processing '" + std::string(fmt) + "'");
   }
 
   void FunctionInternal::
@@ -3733,7 +3731,7 @@ namespace casadi {
     if (jit_serialize_=="link" || jit_serialize_=="embed") {
       s.pack("FunctionInternal::jit_library", compiler_.library());
       if (jit_serialize_=="embed") {
-        std::ifstream binary(compiler_.library(), ios_base::binary);
+        std::ifstream binary(compiler_.library(), std::ios_base::binary);
         casadi_assert(binary.good(), "Could not open library '" + compiler_.library() + "'.");
         s.pack("FunctionInternal::jit_binary", binary);
       }
@@ -3811,13 +3809,13 @@ namespace casadi {
       s.unpack("FunctionInternal::jit_library", library);
       if (jit_serialize_=="embed") {
         // If file already exist
-        std::ifstream binary(library, ios_base::binary);
+        std::ifstream binary(library, std::ios_base::binary);
         if (binary.good()) { // library exists
           // Ignore packed contents
           std::stringstream ss;
           s.unpack("FunctionInternal::jit_binary", ss);
         } else { // library does not exist
-          std::ofstream binary(library, ios_base::binary | std::ios_base::out);
+          std::ofstream binary(library, std::ios_base::binary | std::ios_base::out);
           s.unpack("FunctionInternal::jit_binary", binary);
         }
       }

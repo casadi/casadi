@@ -70,7 +70,7 @@ int main(int argc, char *argv[]) {
   if (argc>1) solver = argv[1]; // chose a different solver from command line
 
   // Coefficients of the collocation equation
-  std::vector<vector<double> > C(d+1,vector<double>(d+1,0));
+  std::vector<std::vector<double> > C(d+1,vector<double>(d+1,0));
 
   // Coefficients of the continuity equation
   std::vector<double> D(d+1,0);
@@ -159,7 +159,7 @@ int main(int argc, char *argv[]) {
   // Do this iteratively for all finite elements
   MX Xk = X0;
   for(int i=0; i<n; ++i){
-    Xk = F(vector<MX>{Xk, P}).at(0);
+    Xk = F(std::vector<MX>{Xk, P}).at(0);
   }
 
   // Fixed-step integrator
@@ -201,14 +201,14 @@ int main(int argc, char *argv[]) {
     res = dF(arg);
 
     // Get the nondifferentiated results
-    cout << setw(15) << "xf = " << res.at("xf") << std::endl;
+    cout << std::setw(15) << "xf = " << res.at("xf") << std::endl;
 
     // Get the forward sensitivities
-    cout << setw(15) << "d(xf)/d(p)+d(xf)/d(x0[0]) = " <<  res.at("fwd_xf") << std::endl;
+    cout << std::setw(15) << "d(xf)/d(p)+d(xf)/d(x0[0]) = " <<  res.at("fwd_xf") << std::endl;
 
     // Get the adjoint sensitivities
-    cout << setw(15) << "d(xf[2])/d(x0) = " << res.at("adj_x0") << std::endl;
-    cout << setw(15) << "d(xf[2])/d(p) = " << res.at("adj_p") << std::endl;
+    cout << std::setw(15) << "d(xf[2])/d(x0) = " << res.at("adj_x0") << std::endl;
+    cout << std::setw(15) << "d(xf[2])/d(p) = " << res.at("adj_p") << std::endl;
   }
   return 0;
 }

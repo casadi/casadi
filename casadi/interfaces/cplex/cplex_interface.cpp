@@ -190,7 +190,7 @@ namespace casadi {
     if (m->env==nullptr) {
       char errmsg[CPXMESSAGEBUFSIZE];
       CPXXgeterrorstring(m->env, status, errmsg);
-      casadi_error(string("Cannot initialize CPLEX environment: ") + errmsg);
+      casadi_error(std::string("Cannot initialize CPLEX environment: ") + errmsg);
     }
 
     // Set parameters to their default values
@@ -665,7 +665,7 @@ namespace casadi {
     if (verbose_) {
       char status_string[CPXMESSAGEBUFSIZE];
       CPXXgetstatstring(m->env, m->return_status, status_string);
-      casadi_message(string("CPLEX return status: ") + status_string);
+      casadi_message(std::string("CPLEX return status: ") + status_string);
     }
 
     // Next time we warm start

@@ -476,7 +476,7 @@ namespace casadi {
     return size1()*size2();
   }
 
-  void SparsityInternal::disp(ostream &stream, bool more) const {
+  void SparsityInternal::disp(std::ostream &stream, bool more) const {
     stream << dim(!is_dense());
     if (more) {
       stream << std::endl;
@@ -503,7 +503,7 @@ namespace casadi {
     return transpose(mapping);
   }
 
-  Sparsity SparsityInternal::transpose(vector<casadi_int>& mapping, bool invert_mapping) const {
+  Sparsity SparsityInternal::transpose(std::vector<casadi_int>& mapping, bool invert_mapping) const {
     // Get the sparsity of the transpose in sparse triplet form
     std::vector<casadi_int> trans_col = get_row();
     std::vector<casadi_int> trans_row = get_col();
@@ -1070,7 +1070,7 @@ namespace casadi {
     Copyright(c) Timothy A. Davis, 2006-2009
     Licensed as a derivative work under the GNU LGPL
     */
-    std::vector<casadi_int> &rr = *static_cast<vector<casadi_int> *>(other);
+    std::vector<casadi_int> &rr = *static_cast<std::vector<casadi_int> *>(other);
     return (i >= rr[1] && i < rr[2]) ;
   }
 
@@ -1929,7 +1929,7 @@ namespace casadi {
     // Handle index-1, negative indices
     if (ind1 || has_negative(rr)) {
       std::vector<casadi_int> rr_mod = rr;
-      for (vector<casadi_int>::iterator i=rr_mod.begin(); i!=rr_mod.end(); ++i) {
+      for (std::vector<casadi_int>::iterator i=rr_mod.begin(); i!=rr_mod.end(); ++i) {
         if (ind1) (*i)--;
         if (*i<0) *i += numel();
       }
@@ -2014,7 +2014,7 @@ namespace casadi {
         || !is_nondecreasing(rr) || !is_nondecreasing(cc)) {
       // Create substitute rr
       std::vector<casadi_int> rr_mod = rr;
-      for (vector<casadi_int>::iterator i=rr_mod.begin(); i!=rr_mod.end(); ++i) {
+      for (std::vector<casadi_int>::iterator i=rr_mod.begin(); i!=rr_mod.end(); ++i) {
         if (ind1) (*i)--;
         if (*i<0) *i += size1();
       }
@@ -2022,7 +2022,7 @@ namespace casadi {
 
       // Create substitute cc
       std::vector<casadi_int> cc_mod = cc;
-      for (vector<casadi_int>::iterator i=cc_mod.begin(); i!=cc_mod.end(); ++i) {
+      for (std::vector<casadi_int>::iterator i=cc_mod.begin(); i!=cc_mod.end(); ++i) {
         if (ind1) (*i)--;
         if (*i<0) *i += size2();
       }
@@ -2155,7 +2155,7 @@ namespace casadi {
     // Handle index-1, negative indices
     if (ind1 || has_negative(rr)) {
       std::vector<casadi_int> rr_mod = rr;
-      for (vector<casadi_int>::iterator i=rr_mod.begin(); i!=rr_mod.end(); ++i) {
+      for (std::vector<casadi_int>::iterator i=rr_mod.begin(); i!=rr_mod.end(); ++i) {
         casadi_assert(!(ind1 && (*i)<=0),
           "Matlab is 1-based, but requested index " + str(*i) +  ". "
           "Note that negative slices are disabled in the Matlab interface. "
@@ -2196,7 +2196,7 @@ namespace casadi {
 
     // Handle index-1, negative indices in rr
     std::vector<casadi_int> tmp = rr;
-    for (vector<casadi_int>::iterator i=tmp.begin(); i!=tmp.end(); ++i) {
+    for (std::vector<casadi_int>::iterator i=tmp.begin(); i!=tmp.end(); ++i) {
       if (ind1) (*i)--;
       if (*i<0) *i += size1();
     }
@@ -2205,7 +2205,7 @@ namespace casadi {
 
     // Handle index-1, negative indices in cc
     tmp = cc;
-    for (vector<casadi_int>::iterator i=tmp.begin(); i!=tmp.end(); ++i) {
+    for (std::vector<casadi_int>::iterator i=tmp.begin(); i!=tmp.end(); ++i) {
       if (ind1) (*i)--;
       if (*i<0) *i += size2();
     }
@@ -2596,7 +2596,7 @@ namespace casadi {
     // Handle index-1, negative indices
     if (ind1 || has_negative(cc)) {
       std::vector<casadi_int> cc_mod = cc;
-      for (vector<casadi_int>::iterator i=cc_mod.begin(); i!=cc_mod.end(); ++i) {
+      for (std::vector<casadi_int>::iterator i=cc_mod.begin(); i!=cc_mod.end(); ++i) {
         if (ind1) (*i)--;
         if (*i<0) *i += ncol;
       }
@@ -2636,7 +2636,7 @@ namespace casadi {
     // Handle index-1, negative indices
     if (ind1 || has_negative(rr)) {
       std::vector<casadi_int> rr_mod = rr;
-      for (vector<casadi_int>::iterator i=rr_mod.begin(); i!=rr_mod.end(); ++i) {
+      for (std::vector<casadi_int>::iterator i=rr_mod.begin(); i!=rr_mod.end(); ++i) {
         if (ind1) (*i)--;
         if (*i<0) *i += nrow;
       }
@@ -2869,7 +2869,7 @@ namespace casadi {
 
     // Make a sanity check
     casadi_int last=-1;
-    for (vector<casadi_int>::iterator it=indices.begin(); it!=indices.end(); ++it) {
+    for (std::vector<casadi_int>::iterator it=indices.begin(); it!=indices.end(); ++it) {
       if (*it>=0) {
         casadi_int el = *it;
         if (el<last) {
@@ -3409,7 +3409,7 @@ namespace casadi {
 
     // Vector for binary sort
     std::vector<casadi_int> degree_count(max_degree+1, 0);
-    for (vector<casadi_int>::const_iterator it=degree.begin(); it!=degree.end(); ++it) {
+    for (std::vector<casadi_int>::const_iterator it=degree.begin(); it!=degree.end(); ++it) {
       degree_count.at(*it+1)++;
     }
 

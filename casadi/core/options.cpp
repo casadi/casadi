@@ -106,7 +106,7 @@ namespace casadi {
 
   std::vector<std::string> Options::suggestions(const std::string& word, casadi_int amount) const {
     // Best distances so far
-    const double inf = numeric_limits<double>::infinity();
+    const double inf = std::numeric_limits<double>::infinity();
     std::vector<pair<double, string> > best(amount, {inf, ""});
 
     // Iterate over elements

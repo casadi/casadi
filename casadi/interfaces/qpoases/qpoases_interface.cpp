@@ -229,7 +229,7 @@ namespace casadi {
       } else if (op.first=="max_schur") {
         max_schur_ = op.second;
       } else if (op.first=="linsol_plugin") {
-        linsol_plugin_ = string(op.second);
+        linsol_plugin_ = std::string(op.second);
       } else if (op.first=="nWSR") {
         max_nWSR_ = op.second;
       } else if (op.first=="CPUtime") {

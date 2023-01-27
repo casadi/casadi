@@ -283,7 +283,7 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton, bool codegen, b
   MX H = h0_;
   for(int k=0; k<n_meas_; ++k){
     // Take a step
-    std::vector<MX> f_res = f_(vector<MX>{P,U,V,H});
+    std::vector<MX> f_res = f_(std::vector<MX>{P,U,V,H});
     U = f_res[0];
     V = f_res[1];
     H = f_res[2];
@@ -480,37 +480,37 @@ int main(){
   double tol=1e-3;
 
   cout <<
-  setw(10) << "drag" <<  "  &" <<
-  setw(10) << "depth" << "  &" <<
-  setw(10) << "iter_ss" << "  &" <<
-  setw(10) << "time_ss" << "  &" <<
-  setw(10) << "iter_ms" << "  &" <<
-  setw(10) << "time_ms" << "  \\\\ \%" <<
-  setw(10) << "edrag_ss" <<
-  setw(10) << "edepth_ss" <<
-  setw(10) << "edrag_ms" <<
-  setw(10) << "edepth_ms" << std::endl;
+  std::setw(10) << "drag" <<  "  &" <<
+  std::setw(10) << "depth" << "  &" <<
+  std::setw(10) << "iter_ss" << "  &" <<
+  std::setw(10) << "time_ss" << "  &" <<
+  std::setw(10) << "iter_ms" << "  &" <<
+  std::setw(10) << "time_ms" << "  \\\\ \%" <<
+  std::setw(10) << "edrag_ss" <<
+  std::setw(10) << "edepth_ss" <<
+  std::setw(10) << "edrag_ms" <<
+  std::setw(10) << "edepth_ms" << std::endl;
   for(int test=0; test<n_tests; ++test){
-    cout << setw(10) << drag_guess[test] << "  &";
-    cout << setw(10) << depth_guess[test] << "  &";
+    cout << std::setw(10) << drag_guess[test] << "  &";
+    cout << std::setw(10) << depth_guess[test] << "  &";
     if(fabs(drag_est_gn[test]-drag_true) + fabs(depth_est_gn[test]-depth_true)<tol){
-      cout << setw(10) << iter_count_gn[test] << "  &";
-      cout << setw(10) << sol_time_gn[test] << "  &";
+      cout << std::setw(10) << iter_count_gn[test] << "  &";
+      cout << std::setw(10) << sol_time_gn[test] << "  &";
     } else {
-      cout << setw(10) << "$\\infty$" << "  &";
-      cout << setw(10) << "$\\infty$" << "  &";
+      cout << std::setw(10) << "$\\infty$" << "  &";
+      cout << std::setw(10) << "$\\infty$" << "  &";
     }
     if(fabs(drag_est_eh[test]-drag_true) + fabs(depth_est_eh[test]-depth_true)<tol){
-      cout << setw(10) << iter_count_eh[test] << "  &";
-      cout << setw(10) << sol_time_eh[test] << "  \\\\ \%";
+      cout << std::setw(10) << iter_count_eh[test] << "  &";
+      cout << std::setw(10) << sol_time_eh[test] << "  \\\\ \%";
     } else {
-      cout << setw(10) << "$\\infty$" << "  &";
-      cout << setw(10) << "$\\infty$" << "  \\\\ \%";
+      cout << std::setw(10) << "$\\infty$" << "  &";
+      cout << std::setw(10) << "$\\infty$" << "  \\\\ \%";
     }
-    cout << setw(10) << drag_est_gn[test];
-    cout << setw(10) << depth_est_gn[test];
-    cout << setw(10) << drag_est_eh[test];
-    cout << setw(10) << depth_est_eh[test] << std::endl;
+    cout << std::setw(10) << drag_est_gn[test];
+    cout << std::setw(10) << depth_est_gn[test];
+    cout << std::setw(10) << drag_est_eh[test];
+    cout << std::setw(10) << depth_est_eh[test] << std::endl;
   }
 
   return 0;

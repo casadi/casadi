@@ -269,7 +269,7 @@ namespace casadi {
     return Function(name, arg, res, inames, onames, opts);
   }
 
-  void Switch::disp_more(ostream &stream) const {
+  void Switch::disp_more(std::ostream &stream) const {
     // Print more
     if (f_.size()==1) {
       // Print as if-then-else

@@ -84,7 +84,7 @@ namespace casadi {
   MXNode::~MXNode() {
 
     // Start destruction method if any of the dependencies has dependencies
-    for (vector<MX>::iterator cc=dep_.begin(); cc!=dep_.end(); ++cc) {
+    for (std::vector<MX>::iterator cc=dep_.begin(); cc!=dep_.end(); ++cc) {
       // Skip if constant
       if (cc->is_constant()) continue;
 
@@ -153,7 +153,7 @@ namespace casadi {
     casadi_error("'reset_input' not defined for class " + class_name());
   }
 
-  void MXNode::primitives(vector<MX>::iterator& it) const {
+  void MXNode::primitives(std::vector<MX>::iterator& it) const {
     *it++ = shared_from_this<MX>();
   }
 
@@ -161,7 +161,7 @@ namespace casadi {
     *it++ = x;
   }
 
-  MX MXNode::join_primitives(vector<MX>::const_iterator& it) const {
+  MX MXNode::join_primitives(std::vector<MX>::const_iterator& it) const {
     MX ret = *it++;
     if (ret.size()==size()) {
       return ret;
@@ -316,13 +316,13 @@ namespace casadi {
     casadi_error("'eval_mx' not defined for class " + class_name());
   }
 
-  void MXNode::ad_forward(const std::vector<vector<MX> >& fseed,
-                       std::vector<vector<MX> >& fsens) const {
+  void MXNode::ad_forward(const std::vector<std::vector<MX> >& fseed,
+                       std::vector<std::vector<MX> >& fsens) const {
     casadi_error("'ad_forward' not defined for class " + class_name());
   }
 
-  void MXNode::ad_reverse(const std::vector<vector<MX> >& aseed,
-                       std::vector<vector<MX> >& asens) const {
+  void MXNode::ad_reverse(const std::vector<std::vector<MX> >& aseed,
+                       std::vector<std::vector<MX> >& asens) const {
     casadi_error("'ad_reverse' not defined for class " + class_name());
   }
 

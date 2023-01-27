@@ -101,7 +101,7 @@ namespace casadi {
     tau_root.insert(tau_root.begin(), 0);
 
     // Coefficients of the collocation equation
-    std::vector<vector<double> > C(deg_+1, std::vector<double>(deg_+1, 0));
+    std::vector<std::vector<double> > C(deg_+1, std::vector<double>(deg_+1, 0));
 
     // Coefficients of the continuity equation
     std::vector<double> D(deg_+1, 0);

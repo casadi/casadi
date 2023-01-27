@@ -161,7 +161,7 @@ namespace casadi {
     v_ = nlp_.x;
 
     if (binary_) {
-      streampos offset = s_.tellg();
+      std::streampos offset = s_.tellg();
       s_.close();
       s_.open(filename.c_str(), std::ifstream::binary);
       s_.seekg(offset);
@@ -369,7 +369,7 @@ namespace casadi {
             case 54:
             {
               MX r = 0;
-              for (vector<MX>::const_iterator it=args.begin();
+              for (std::vector<MX>::const_iterator it=args.begin();
               it!=args.end(); ++it) r += *it;
               return r;
             }

@@ -25,8 +25,6 @@
 
 #include "finite_differences.hpp"
 
-using namespace std;
-
 namespace casadi {
 
   FiniteDiff::FiniteDiff(const std::string& name, casadi_int n)

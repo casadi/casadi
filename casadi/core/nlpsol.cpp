@@ -237,7 +237,7 @@ namespace casadi {
     case NLPSOL_LAM_G0: return "lam_g0";
     case NLPSOL_NUM_IN: break;
     }
-    return string();
+    return std::string();
   }
 
   std::string nlpsol_out(casadi_int ind) {
@@ -250,7 +250,7 @@ namespace casadi {
     case NLPSOL_LAM_P: return "lam_p";
     case NLPSOL_NUM_OUT: break;
     }
-    return string();
+    return std::string();
   }
 
   casadi_int nlpsol_n_in() {

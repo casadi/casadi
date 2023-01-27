@@ -97,7 +97,7 @@ namespace casadi {
     return true;
   }
 
-  void SXFunction::disp_more(ostream &stream) const {
+  void SXFunction::disp_more(std::ostream &stream) const {
     stream << "Algorithm:";
 
     // Iterator to free variables
@@ -271,7 +271,7 @@ namespace casadi {
     // Sort the nodes by type
     constants_.clear();
     operations_.clear();
-    for (vector<SXNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it) {
+    for (std::vector<SXNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it) {
       SXNode* t = *it;
       if (t) {
         if (t->is_constant())
@@ -299,7 +299,7 @@ namespace casadi {
     // Get the sequence of instructions for the virtual machine
     algorithm_.resize(0);
     algorithm_.reserve(nodes.size());
-    for (vector<SXNode*>::iterator it=nodes.begin(); it!=nodes.end(); ++it) {
+    for (std::vector<SXNode*>::iterator it=nodes.begin(); it!=nodes.end(); ++it) {
       // Current node
       SXNode* n = *it;
 
@@ -455,7 +455,7 @@ namespace casadi {
 
     // Locate free variables
     free_vars_.clear();
-    for (vector<pair<int, SXNode*> >::const_iterator it=symb_loc.begin();
+    for (std::vector<pair<int, SXNode*> >::const_iterator it=symb_loc.begin();
          it!=symb_loc.end(); ++it) {
       if (it->second->temp!=0) {
         // Save to list of free parameters
@@ -566,8 +566,8 @@ namespace casadi {
     return 0;
   }
 
-  void SXFunction::ad_forward(const std::vector<vector<SX> >& fseed,
-                                std::vector<vector<SX> >& fsens) const {
+  void SXFunction::ad_forward(const std::vector<std::vector<SX> >& fseed,
+                                std::vector<std::vector<SX> >& fsens) const {
     if (verbose_) casadi_message(name_ + "::ad_forward");
 
     // Number of forward seeds
@@ -592,7 +592,7 @@ namespace casadi {
       for (casadi_int i=0; i<n_in_; ++i) {
         if (it->at(i).sparsity()!=sparsity_in_[i]) {
           // Correct sparsity
-          std::vector<vector<SX> > fseed2(fseed);
+          std::vector<std::vector<SX> > fseed2(fseed);
           for (auto&& r : fseed2) {
             for (casadi_int i=0; i<n_in_; ++i) r[i] = project(r[i], sparsity_in_[i]);
           }
@@ -667,8 +667,8 @@ namespace casadi {
     }
   }
 
-  void SXFunction::ad_reverse(const std::vector<vector<SX> >& aseed,
-                                std::vector<vector<SX> >& asens) const {
+  void SXFunction::ad_reverse(const std::vector<std::vector<SX> >& aseed,
+                                std::vector<std::vector<SX> >& asens) const {
     if (verbose_) casadi_message(name_ + "::ad_reverse");
 
     // number of adjoint seeds
@@ -697,7 +697,7 @@ namespace casadi {
 
     // Correct sparsity if needed
     if (!matching_sparsity) {
-      std::vector<vector<SX> > aseed2(aseed);
+      std::vector<std::vector<SX> > aseed2(aseed);
       for (casadi_int d=0; d<nadj; ++d)
         for (casadi_int i=0; i<n_out_; ++i)
           if (aseed2[d][i].sparsity()!=sparsity_out_[i])

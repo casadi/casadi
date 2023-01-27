@@ -31,8 +31,6 @@
 
 #include "function.hpp"
 
-using namespace std;
-
 namespace casadi {
 
   /// \cond INTERNAL
@@ -223,7 +221,7 @@ namespace casadi {
     own(new IntVectorType(temp));
   }
 
-  GenericType::GenericType(const std::vector<vector<casadi_int> >& ivv) {
+  GenericType::GenericType(const std::vector<std::vector<casadi_int> >& ivv) {
     own(new IntVectorVectorType(ivv));
   }
 
@@ -394,7 +392,7 @@ namespace casadi {
     return ret;
   }
 
-  std::vector<vector<casadi_int> > GenericType::to_int_vector_vector() const {
+  std::vector<std::vector<casadi_int> > GenericType::to_int_vector_vector() const {
     casadi_assert(is_int_vector_vector(), "type mismatch");
     return as_int_vector_vector();
   }

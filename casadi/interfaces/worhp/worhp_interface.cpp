@@ -378,7 +378,7 @@ namespace casadi {
     }
 
     // Replace infinite bounds with m->worhp_p.Infty
-    double inf = numeric_limits<double>::infinity();
+    double inf = std::numeric_limits<double>::infinity();
     for (casadi_int i=0; i<nx_; ++i)
       if (m->worhp_o.XL[i]==-inf) m->worhp_o.XL[i] = -m->worhp_p.Infty;
     for (casadi_int i=0; i<nx_; ++i)

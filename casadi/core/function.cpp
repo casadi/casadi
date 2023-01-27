@@ -40,20 +40,18 @@
 #include <fstream>
 #include <typeinfo>
 
-using namespace std;
-
 namespace casadi {
   // Throw informative error message
   #define THROW_ERROR(FNAME, WHAT) \
   throw CasadiException("Error in Function::" FNAME " for '" + this->name() + "' "\
     "[" + this->class_name() + "] at " + CASADI_WHERE + ":\n"\
-    + string(WHAT));
+    + std::string(WHAT));
 
   // Throw informative error message from constructor
   #define THROW_ERROR_NOOBJ(FNAME, WHAT, CLASS_NAME) \
   throw CasadiException("Error in Function::" FNAME " for '" + name + "' "\
       "[" CLASS_NAME "] at " + CASADI_WHERE + ":\n"\
-      + string(WHAT));
+      + std::string(WHAT));
 
   Function::Function() {
   }
@@ -70,7 +68,7 @@ namespace casadi {
     std::string tmp;
     while (true) {
       // Read a word
-      streampos cur_pos = file.tellg();
+      std::streampos cur_pos = file.tellg();
       file >> tmp;
       if (!file.good()) return false;
 
@@ -79,7 +77,7 @@ namespace casadi {
 
       // If comment, continue to the end of the line
       if (tmp.at(0)=='#') {
-        file.ignore(numeric_limits<streamsize>::max(), '\n');
+        file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         continue;
       }
 
@@ -218,7 +216,7 @@ namespace casadi {
     try {
       own(new SXFunction(name, ex_in, ex_out, name_in, name_out));
       (*this)->construct(opts);
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR_NOOBJ("Function", e.what(), "SXFunction");
     }
   }
@@ -243,7 +241,7 @@ namespace casadi {
           operator=((*this).expand((*this).name(), it->second));
         }
       }
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR_NOOBJ("Function", e.what(), "MXFunction");
     }
   }
@@ -266,7 +264,7 @@ namespace casadi {
     try {
       return create(new JitFunction(name, body, name_in, name_out,
                                     sparsity_in, sparsity_out), opts);
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR_NOOBJ("jit", e.what(), "JitFunction");
     }
   }
@@ -324,7 +322,7 @@ namespace casadi {
                       bool always_inline, bool never_inline) const {
     try {
       (*this)->call(arg, res, always_inline, never_inline);
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR("call", e.what());
     }
   }
@@ -333,7 +331,7 @@ namespace casadi {
                       bool always_inline, bool never_inline) const {
     try {
       (*this)->call(arg, res, always_inline, never_inline);
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR("call", e.what());
     }
   }
@@ -342,7 +340,7 @@ namespace casadi {
                       bool always_inline, bool never_inline) const {
     try {
       (*this)->call(arg, res, always_inline, never_inline);
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR("call", e.what());
     }
   }
@@ -425,7 +423,7 @@ namespace casadi {
   }
 
   template<typename D>
-  void Function::call_gen(vector<const D*> arg, std::vector<D*> res) const {
+  void Function::call_gen(std::vector<const D*> arg, std::vector<D*> res) const {
     // Input buffer
     casadi_assert_dev(arg.size()>=n_in());
     arg.resize(sz_arg());
@@ -443,15 +441,15 @@ namespace casadi {
   }
 
 
-  void Function::operator()(vector<const double*> arg, std::vector<double*> res) const {
+  void Function::operator()(std::vector<const double*> arg, std::vector<double*> res) const {
     return call_gen(arg, res);
   }
 
-  void Function::operator()(vector<const bvec_t*> arg, std::vector<bvec_t*> res) const {
+  void Function::operator()(std::vector<const bvec_t*> arg, std::vector<bvec_t*> res) const {
     return call_gen(arg, res);
   }
 
-  void Function::operator()(vector<const SXElem*> arg, std::vector<SXElem*> res) const {
+  void Function::operator()(std::vector<const SXElem*> arg, std::vector<SXElem*> res) const {
     return call_gen(arg, res);
   }
 
@@ -522,14 +520,14 @@ namespace casadi {
     casadi_int n_in = this->n_in(), n_out = this->n_out();
     // Consistency checks
     casadi_assert(!chain.empty(), "mapaccum: chain must be non-empty");
-    casadi_assert(n_accum<=min(n_in, n_out), "mapaccum: too many accumulators");
+    casadi_assert(n_accum<=std::min(n_in, n_out), "mapaccum: too many accumulators");
     // Quick return?
     if (chain.size()==1) return chain[0];
     // Get symbolic expressions for inputs and outputs
     std::vector<MX> arg = mx_in();
     std::vector<MX> res;
     // Vectorized inputs and outputs
-    std::vector<vector<MX>> varg(n_in), vres(n_out);
+    std::vector<std::vector<MX>> varg(n_in), vres(n_out);
     for (casadi_int i=0; i<n_accum; ++i) varg[i].push_back(arg[i]);
     // For each function call
     for (const auto& f : chain) {
@@ -714,7 +712,7 @@ namespace casadi {
         const std::vector<casadi_int>& order_out, const Dict& opts) const {
     try {
       return (*this)->slice(name, order_in, order_out, opts);
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR("slice", e.what());
     }
   }
@@ -723,7 +721,7 @@ namespace casadi {
                               const std::string& parallelization) const {
     try {
       return (*this)->mapsum_mx(x, parallelization);
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR("mapsum", e.what());
     }
   }
@@ -732,7 +730,7 @@ namespace casadi {
                                  const Function& f_def, const Dict& opts) {
     try {
       return create(new Switch(name, f, f_def), opts);
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR_NOOBJ("conditional", e.what(), "Switch");
     }
   }
@@ -749,7 +747,7 @@ namespace casadi {
       Function dummy("dummy_" + f.name(), dummy_in, dummy_out, f.name_in(), f.name_out());
       // Form a conditional call
       return if_else(name, f, dummy, opts);
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR_NOOBJ("conditional", e.what(), "Switch");
     }
   }
@@ -768,7 +766,7 @@ namespace casadi {
       opts_bspline["lookup_mode"] = lookup_mode;
       MX y = MX::bspline(x, DM(coeffs), knots, degree, m, opts_bspline);
       return Function(name, {x}, {y}, opts_remainder);
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR_NOOBJ("bspline", e.what(), "BSpline");
     }
   }
@@ -777,7 +775,7 @@ namespace casadi {
                              const Function& f_false, const Dict& opts) {
     try {
       return create(new Switch(name, std::vector<Function>(1, f_false), f_true), opts);
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR_NOOBJ("if_else", e.what(), "Switch");
     }
   }
@@ -873,7 +871,7 @@ namespace casadi {
   sparsity_jac(casadi_int iind, casadi_int oind, bool compact, bool symmetric) const {
     try {
       return (*this)->jac_sparsity(oind, iind, compact, symmetric);
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR("sparsity_jac", e.what());
     }
   }
@@ -882,7 +880,7 @@ namespace casadi {
   Function Function::jacobian() const {
     try {
       return (*this)->jacobian();
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR("jacobian", e.what());
     }
   }
@@ -909,7 +907,7 @@ namespace casadi {
   Sparsity Function::jac_sparsity(casadi_int oind, casadi_int iind, bool compact) const {
     try {
       return (*this)->jac_sparsity(oind, iind, compact, (*this)->jac_is_symm(oind, iind));
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR("jac_sparsity", e.what());
     }
   }
@@ -925,7 +923,7 @@ namespace casadi {
   casadi_int Function::index_in(const std::string &name) const {
     try {
       return (*this)->index_in(name);
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR("index_in", e.what());
     }
   }
@@ -933,7 +931,7 @@ namespace casadi {
   casadi_int Function::index_out(const std::string &name) const {
     try {
       return (*this)->index_out(name);
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR("index_out", e.what());
     }
   }
@@ -941,7 +939,7 @@ namespace casadi {
   const std::string& Function::name_in(casadi_int ind) const {
     try {
       return (*this)->name_in_.at(ind);
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR("name_in", e.what());
     }
   }
@@ -949,7 +947,7 @@ namespace casadi {
   const std::string& Function::name_out(casadi_int ind) const {
     try {
       return (*this)->name_out_.at(ind);
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR("name_out", e.what());
     }
   }
@@ -957,7 +955,7 @@ namespace casadi {
   const Sparsity& Function::sparsity_in(casadi_int ind) const {
     try {
       return (*this)->sparsity_in_.at(ind);
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR("sparsity_in", e.what());
     }
   }
@@ -965,7 +963,7 @@ namespace casadi {
   const Sparsity& Function::sparsity_in(const std::string &iname) const {
     try {
       return sparsity_in(index_in(iname));
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR("sparsity_in", e.what());
     }
   }
@@ -973,7 +971,7 @@ namespace casadi {
   const Sparsity& Function::sparsity_out(casadi_int ind) const {
     try {
       return (*this)->sparsity_out_.at(ind);
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR("sparsity_out", e.what());
     }
   }
@@ -981,7 +979,7 @@ namespace casadi {
   const Sparsity& Function::sparsity_out(const std::string &iname) const {
     try {
       return sparsity_out(index_out(iname));
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR("sparsity_out", e.what());
     }
   }
@@ -989,7 +987,7 @@ namespace casadi {
   bool Function::is_diff_in(casadi_int ind) const {
     try {
       return (*this)->is_diff_in_.at(ind);
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR("is_diff_in", e.what());
     }
   }
@@ -997,7 +995,7 @@ namespace casadi {
   bool Function::is_diff_out(casadi_int ind) const {
     try {
       return (*this)->is_diff_out_.at(ind);
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR("is_diff_out", e.what());
     }
   }
@@ -1005,7 +1003,7 @@ namespace casadi {
   std::vector<bool> Function::is_diff_in() const {
     try {
       return (*this)->is_diff_in_;
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR("is_diff_in", e.what());
     }
   }
@@ -1013,7 +1011,7 @@ namespace casadi {
   std::vector<bool> Function::is_diff_out() const {
     try {
       return (*this)->is_diff_out_;
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR("is_diff_out", e.what());
     }
   }
@@ -1034,7 +1032,7 @@ namespace casadi {
                             casadi_int* iw, bvec_t* w, int mem) const {
     try {
       return (*this)->sp_forward(arg, res, iw, w, memory(mem));
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR("operator()", e.what());
     }
   }
@@ -1042,7 +1040,7 @@ namespace casadi {
   int Function::rev(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, int mem) const {
     try {
       return (*this)->sp_reverse(arg, res, iw, w, memory(mem));
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR("rev", e.what());
     }
   }
@@ -1051,7 +1049,7 @@ namespace casadi {
                           int mem) const {
     try {
       (*this)->set_work(memory(mem), arg, res, iw, w);
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR("set_work", e.what());
     }
   }
@@ -1060,7 +1058,7 @@ namespace casadi {
                           int mem) const {
     try {
       (*this)->set_temp(memory(mem), arg, res, iw, w);
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR("set_temp", e.what());
     }
   }
@@ -1069,7 +1067,7 @@ namespace casadi {
                           int mem) const {
     try {
       (*this)->setup(memory(mem), arg, res, iw, w);
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR("setup", e.what());
     }
   }
@@ -1077,7 +1075,7 @@ namespace casadi {
   Function Function::forward(casadi_int nfwd) const {
     try {
       return (*this)->forward(nfwd);
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR("forward", e.what());
     }
   }
@@ -1085,16 +1083,16 @@ namespace casadi {
   Function Function::reverse(casadi_int nadj) const {
     try {
       return (*this)->reverse(nadj);
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR("reverse", e.what());
     }
   }
 
-  void Function::print_dimensions(ostream &stream) const {
+  void Function::print_dimensions(std::ostream &stream) const {
     (*this)->print_dimensions(stream);
   }
 
-  void Function::print_options(ostream &stream) const {
+  void Function::print_options(std::ostream &stream) const {
     (*this)->print_options(stream);
   }
 
@@ -1105,7 +1103,7 @@ namespace casadi {
   bool Function::has_option(const std::string &option_name) const {
     try {
       return (*this)->has_option(option_name);
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR("has_option", e.what());
       return false;  // never reached
     }
@@ -1118,7 +1116,7 @@ namespace casadi {
         casadi_error("Option '" + option_name + "' does not exist");
       // Call internal class
       (*this)->change_option(option_name, option_value);
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR("change_option", e.what());
     }
   }
@@ -1390,7 +1388,7 @@ namespace casadi {
                       bool always_inline, bool never_inline) const {
     try {
       call_gen(arg, res, always_inline, never_inline);
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR("call", e.what());
     }
   }
@@ -1399,7 +1397,7 @@ namespace casadi {
                       bool always_inline, bool never_inline) const {
     try {
       call_gen(arg, res, always_inline, never_inline);
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR("call", e.what());
     }
   }
@@ -1408,7 +1406,7 @@ namespace casadi {
                       bool always_inline, bool never_inline) const {
     try {
       call_gen(arg, res, always_inline, never_inline);
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR("call", e.what());
     }
   }
@@ -1466,7 +1464,7 @@ namespace casadi {
       call_depth_--;
 #endif // WITH_EXTRA_CHECKS
       throw;
-    } catch (exception& e) {
+    } catch(std::exception& e) {
 #ifdef WITH_EXTRA_CHECKS
       call_depth_--;
 #endif // WITH_EXTRA_CHECKS
@@ -1479,7 +1477,7 @@ namespace casadi {
       casadi_int* iw, SXElem* w, int mem) const {
     try {
       return (*this)->eval_sx(arg, res, iw, w, memory(mem));
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR("operator()", e.what());
     }
   }
@@ -1487,7 +1485,7 @@ namespace casadi {
   const SX Function::sx_in(casadi_int iind) const {
     try {
       return (*this)->sx_in(iind);
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR("sx_in", e.what());
     }
   }
@@ -1495,7 +1493,7 @@ namespace casadi {
   const SX Function::sx_out(casadi_int oind) const {
     try {
       return (*this)->sx_out(oind);
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR("sx_out", e.what());
     }
   }
@@ -1503,7 +1501,7 @@ namespace casadi {
   const std::vector<SX> Function::sx_in() const {
     try {
       return (*this)->sx_in();
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR("sx_in", e.what());
     }
   }
@@ -1511,7 +1509,7 @@ namespace casadi {
   const std::vector<SX> Function::sx_out() const {
     try {
       return (*this)->sx_out();
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR("sx_out", e.what());
     }
   }
@@ -1603,7 +1601,7 @@ namespace casadi {
   std::vector<SX> Function::free_sx() const {
     try {
       return (*this)->free_sx();
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR("free_sx", e.what());
     }
   }
@@ -1611,7 +1609,7 @@ namespace casadi {
   std::vector<MX> Function::free_mx() const {
     try {
       return (*this)->free_mx();
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR("free_mx", e.what());
     }
   }
@@ -1631,7 +1629,7 @@ namespace casadi {
   void Function::generate_lifted(Function& vdef_fcn, Function& vinit_fcn) const {
     try {
       (*this)->generate_lifted(vdef_fcn, vinit_fcn);
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR("generate_lifted", e.what());
     }
   }
@@ -1639,7 +1637,7 @@ namespace casadi {
   casadi_int Function::n_instructions() const {
     try {
       return (*this)->n_instructions();
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR("n_instructions", e.what());
     }
   }
@@ -1647,7 +1645,7 @@ namespace casadi {
   MX Function::instruction_MX(casadi_int k) const {
     try {
       return (*this)->instruction_MX(k);
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR("instruction_MX", e.what());
     }
   }
@@ -1655,7 +1653,7 @@ namespace casadi {
   SX Function::instructions_sx() const {
     try {
       return (*this)->instructions_sx();
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR("instructions_sx", e.what());
     }
   }
@@ -1663,7 +1661,7 @@ namespace casadi {
   casadi_int Function::instruction_id(casadi_int k) const {
     try {
       return (*this)->instruction_id(k);
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR("instruction_id", e.what());
     }
   }
@@ -1671,7 +1669,7 @@ namespace casadi {
   std::vector<casadi_int> Function::instruction_input(casadi_int k) const {
     try {
       return (*this)->instruction_input(k);
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR("instruction_input", e.what());
     }
   }
@@ -1679,7 +1677,7 @@ namespace casadi {
   double Function::instruction_constant(casadi_int k) const {
     try {
       return (*this)->instruction_constant(k);
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR("instruction_constant", e.what());
     }
   }
@@ -1687,7 +1685,7 @@ namespace casadi {
   std::vector<casadi_int> Function::instruction_output(casadi_int k) const {
     try {
       return (*this)->instruction_output(k);
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR("instruction_output", e.what());
     }
   }
@@ -1695,7 +1693,7 @@ namespace casadi {
   casadi_int Function::n_nodes() const {
     try {
       return (*this)->n_nodes();
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR("n_nodes", e.what());
     }
   }
@@ -1735,7 +1733,7 @@ namespace casadi {
           const Dict& opts) const {
      try {
        return (*this)->factory(name, s_in, s_out, aux, opts);
-     } catch (exception& e) {
+     } catch(std::exception& e) {
        THROW_ERROR("factory", "Failed to create " + name + ":" + str(s_in) + "->" + str(s_out)
         + " with " + str(aux) + ":\n" + str(e.what()));
      }
@@ -1745,7 +1743,7 @@ namespace casadi {
   which_depends(const std::string& s_in, const std::vector<std::string>& s_out, casadi_int order, bool tr) const {
     try {
       return (*this)->which_depends(s_in, s_out, order, tr);
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR("which_depends", e.what());
     }
   }
@@ -1753,7 +1751,7 @@ namespace casadi {
   std::vector<std::string> Function::get_function() const {
     try {
       return (*this)->get_function();
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR("get_function", e.what());
     }
   }
@@ -1761,7 +1759,7 @@ namespace casadi {
   Function Function::get_function(const std::string &name) const {
     try {
       return (*this)->get_function(name);
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR("get_function", e.what());
     }
   }
@@ -1769,7 +1767,7 @@ namespace casadi {
   bool Function::has_function(const std::string& fname) const {
     try {
       return (*this)->has_function(fname);
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR("has_function", e.what());
       return false;
     }
@@ -1787,7 +1785,7 @@ namespace casadi {
       ret.reserve(all_fun.size());
       for (auto&& e : all_fun) ret.push_back(e.second);
       return ret;
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR("find", e.what());
       return {};
     }
@@ -1806,7 +1804,7 @@ namespace casadi {
       }
       // Not found
       casadi_error("'" + name + "' not found");
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR("find", e.what());
       return Function();
     }
@@ -1816,7 +1814,7 @@ namespace casadi {
   Function Function::oracle() const {
     try {
       return (*this)->oracle();
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR("oracle", e.what());
     }
   }
@@ -1834,7 +1832,7 @@ namespace casadi {
       casadi_assert(!is_null(), "lhs is null");
       casadi_assert(!f.is_null(), "rhs is null");
       return get()==f.get();
-    } catch (exception& e) {
+    } catch(std::exception& e) {
       THROW_ERROR("operator==", e.what());
     }
   }

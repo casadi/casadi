@@ -26,7 +26,6 @@
 #include "dple_impl.hpp"
 #include <typeinfo>
 
-using namespace std;
 namespace casadi {
 
   bool has_dple(const std::string& name) {
@@ -118,7 +117,7 @@ namespace casadi {
     case DPLE_V:      return "v";
     case DPLE_NUM_IN: break;
     }
-    return string();
+    return std::string();
   }
 
   std::string dple_out(casadi_int ind) {
@@ -126,7 +125,7 @@ namespace casadi {
       case DPLE_P:      return "p";
       case DPLE_NUM_OUT: break;
     }
-    return string();
+    return std::string();
   }
 
   casadi_int dple_n_in() {

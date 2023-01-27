@@ -49,7 +49,7 @@ namespace casadi {
   }
 
   int UnaryMX::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
-    double dummy = numeric_limits<double>::quiet_NaN();
+    double dummy = std::numeric_limits<double>::quiet_NaN();
     casadi_math<double>::fun(op_, arg[0], dummy, res[0], nnz());
     return 0;
   }

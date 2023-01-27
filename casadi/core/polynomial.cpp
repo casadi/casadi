@@ -100,7 +100,7 @@ namespace casadi {
   }
 
   Polynomial& Polynomial::operator/=(double d) {
-    for (vector<double>::iterator it=p_.begin(); it!=p_.end(); ++it) {
+    for (std::vector<double>::iterator it=p_.begin(); it!=p_.end(); ++it) {
       *it /= d;
     }
     return *this;

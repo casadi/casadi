@@ -204,8 +204,6 @@ namespace casadi {
   template<typename MatType>
   std::string Factory<MatType>::
   request_output(const std::string& s) {
-    using namespace std;
-
     // Quick return if already available
     if (has_out(s)) return s;
 
@@ -603,8 +601,6 @@ namespace casadi {
 
   template<typename MatType>
   MatType Factory<MatType>::get_output(const std::string& s) {
-    using namespace std;
-
     // Quick return if output
     auto it = omap_.find(s);
     if (it!=omap_.end()) return out_.at(it->second);

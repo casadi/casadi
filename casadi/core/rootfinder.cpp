@@ -51,7 +51,7 @@ namespace casadi {
     case ROOTFINDER_P:   return "p";
     case ROOTFINDER_NUM_IN: break;
     }
-    return string();
+    return std::string();
   }
 
   std::string rootfinder_out(casadi_int ind) {
@@ -59,7 +59,7 @@ namespace casadi {
     case ROOTFINDER_X:  return "x";
     case ROOTFINDER_NUM_OUT: break;
     }
-    return string();
+    return std::string();
   }
 
   casadi_int rootfinder_n_in() {
@@ -305,7 +305,7 @@ namespace casadi {
                 const Dict& opts) const {
     // Symbolic expression for the input
     std::vector<MX> arg = mx_in(), res = mx_out();
-    std::vector<vector<MX>> fseed = fwd_seed<MX>(nfwd), fsens;
+    std::vector<std::vector<MX>> fseed = fwd_seed<MX>(nfwd), fsens;
     arg[iin_] = MX::sym(arg[iin_].name(), Sparsity(arg[iin_].size()));
     for (auto&& e : fseed) e[iin_] = MX::sym(e[iin_].name(), e[iin_].size());
     ad_forward(arg, res, fseed, fsens, false, false);
@@ -335,7 +335,7 @@ namespace casadi {
     arg[iin_] = MX::sym(arg[iin_].name() + "_guess",
                         Sparsity(arg[iin_].size()));
     std::vector<MX> res = mx_out();
-    std::vector<vector<MX> > aseed = symbolicAdjSeed(nadj, res), asens;
+    std::vector<std::vector<MX> > aseed = symbolicAdjSeed(nadj, res), asens;
     ad_reverse(arg, res, aseed, asens, false, false);
 
     // Construct return function
@@ -487,7 +487,7 @@ namespace casadi {
     // Get adjoint seeds for calling f
     std::vector<MX> f_res(res);
     f_res[iout_] = MX(size_in(iin_)); // zero residual
-    std::vector<vector<MX> > f_aseed(nadj);
+    std::vector<std::vector<MX> > f_aseed(nadj);
     for (casadi_int d=0; d<nadj; ++d) {
       f_aseed[d].resize(n_out_);
       for (casadi_int i=0; i<n_out_; ++i) f_aseed[d][i] = i==iout_ ? f_res[iout_] : aseed[d][i];
@@ -495,7 +495,7 @@ namespace casadi {
 
     // Propagate dependencies from auxiliary outputs
     std::vector<MX> rhs(nadj);
-    std::vector<vector<MX> > asens_aux;
+    std::vector<std::vector<MX> > asens_aux;
     if (n_out_>1) {
       oracle_->call_reverse(f_arg, f_res, f_aseed, asens_aux, always_inline, never_inline);
       for (casadi_int d=0; d<nadj; ++d) rhs[d] = vec(asens_aux[d][iin_] + aseed[d][iout_]);

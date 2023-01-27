@@ -286,7 +286,7 @@ namespace casadi {
     casadi_int nA=0, nC=0, /*mz=0, */ nnzA=0, nnzC=0;
     for (casadi_int j=0; j<na_; ++j) {
       if (lba[j] == -numeric_limits<double>::infinity() &&
-          uba[j] ==  numeric_limits<double>::infinity()) {
+          uba[j] ==  std::numeric_limits<double>::infinity()) {
         // Redundant constraint
         c_index_[j] = 0;
       } else if (lba[j]==uba[j]) {

@@ -31,8 +31,6 @@
 #include "function_internal.hpp"
 #include "runtime/shared.hpp"
 
-using namespace std;
-
 namespace casadi {
 
   Einstein::Einstein(const MX& C, const MX& A, const MX& B,

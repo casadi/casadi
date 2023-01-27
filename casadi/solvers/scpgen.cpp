@@ -250,8 +250,8 @@ namespace casadi {
       // Lagrange multipliers corresponding to the definition of the dependent variables
       std::stringstream ss;
       casadi_int i=0;
-      for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-        ss.str(string());
+      for (std::vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
+        ss.str(std::string());
         ss << "lam_x" << i++;
         it->v_lam = MX::sym(ss.str(), it->v.sparsity());
       }
@@ -265,10 +265,10 @@ namespace casadi {
 
       // Adjoint sweep to get the definitions of the lifted dual variables
       // (Equation 3.8 in Albersmeyer2010)
-      std::vector<vector<MX> > aseed(1), asens(1);
+      std::vector<std::vector<MX> > aseed(1), asens(1);
       aseed[0].push_back(1.0);
       aseed[0].push_back(g_lam);
-      for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
+      for (std::vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
         aseed[0].push_back(it->v_lam);
       }
       vdef_fcn->call_reverse(vdef_in, vdef_out, aseed, asens, true, false);
@@ -280,7 +280,7 @@ namespace casadi {
       p_defL = asens[0].at(i++);
       if (p_defL.is_null()) p_defL = MX::zeros(p.sparsity()); // Needed?
 
-      for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
+      for (std::vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
         it->v_defL = asens[0].at(i++);
         if (it->v_defL.is_null()) {
           it->v_defL = MX::zeros(it->v.sparsity());
@@ -299,12 +299,12 @@ namespace casadi {
     casadi_int n=0;
     res_fcn_in.push_back(x);             res_x_ = n++;
     res_fcn_in.push_back(p);             res_p_ = n++;
-    for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
+    for (std::vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
       res_fcn_in.push_back(it->v);        it->res_var = n++;
     }
     if (!gauss_newton_) {
       res_fcn_in.push_back(g_lam);        res_g_lam_ = n++;
-      for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
+      for (std::vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
         res_fcn_in.push_back(it->v_lam);  it->res_lam = n++;
       }
     }
@@ -316,12 +316,12 @@ namespace casadi {
     res_fcn_out.push_back(gL_defL);                        res_gl_ = n++;
     res_fcn_out.push_back(vdef_out[1]);                    res_g_ = n++;
     res_fcn_out.push_back(p_defL);                         res_p_d_ = n++;
-    for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
+    for (std::vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
       res_fcn_out.push_back(it->v_def - it->v);             it->res_d = n++;
     }
 
     if (!gauss_newton_) {
-      for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
+      for (std::vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
         res_fcn_out.push_back(it->v_defL - it->v_lam);     it->res_lam_d = n++;
       }
     }
@@ -335,8 +335,8 @@ namespace casadi {
     // Declare difference vector d and substitute out p and v
     std::stringstream ss;
     casadi_int i=0;
-    for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-      ss.str(string());
+    for (std::vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
+      ss.str(std::string());
       ss << "d" << i++;
       it->d = MX::sym(ss.str(), it->v.sparsity());
       it->d_def = it->v_def - it->d;
@@ -345,8 +345,8 @@ namespace casadi {
     // Declare difference vector lam_d and substitute out lam
     if (!gauss_newton_) {
       casadi_int i=0;
-      for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
-        ss.str(string());
+      for (std::vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
+        ss.str(std::string());
         ss << "d_lam" << i++;
         it->d_lam = MX::sym(ss.str(), it->v.sparsity());
         it->d_defL = it->v_defL - it->d_lam;
@@ -355,12 +355,12 @@ namespace casadi {
 
     // Variables to be substituted and their definitions
     std::vector<MX> svar, sdef;
-    for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
+    for (std::vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
       svar.push_back(it->v);
       sdef.push_back(it->d_def);
     }
     if (!gauss_newton_) {
-      for (vector<Var>::reverse_iterator it=v_.rbegin(); it!=v_.rend(); ++it) {
+      for (std::vector<Var>::reverse_iterator it=v_.rbegin(); it!=v_.rend(); ++it) {
         svar.push_back(it->v_lam);
         sdef.push_back(it->d_defL);
       }
@@ -374,11 +374,11 @@ namespace casadi {
 
     substitute_inplace(svar, sdef, ex, false);
     i=0;
-    for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
+    for (std::vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
       it->d_def = sdef[i++];
     }
     if (!gauss_newton_) {
-      for (vector<Var>::reverse_iterator it=v_.rbegin(); it!=v_.rend(); ++it) {
+      for (std::vector<Var>::reverse_iterator it=v_.rbegin(); it!=v_.rend(); ++it) {
         it->d_defL = sdef[i++];
       }
     }
@@ -393,7 +393,7 @@ namespace casadi {
     n=0;
     mfcn_in.push_back(p);                               mod_p_ = n++;
     mfcn_in.push_back(x);                               mod_x_ = n++;
-    for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
+    for (std::vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
       mfcn_in.push_back(it->d);                          it->mod_var = n++;
     }
 
@@ -406,7 +406,7 @@ namespace casadi {
     if (!gauss_newton_) {
       n = mfcn_in.size();
       mfcn_in.push_back(g_lam);                          mod_g_lam_ = n++;
-      for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
+      for (std::vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
         mfcn_in.push_back(it->d_lam);                    it->mod_lam = n++;
       }
     }
@@ -437,7 +437,7 @@ namespace casadi {
 
     // Definition of intermediate variables
     n = mfcn_out.size();
-    for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
+    for (std::vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
       mfcn_out.push_back(it->d_def);         it->mod_def = n++;
       if (!gauss_newton_) {
         mfcn_out.push_back(it->d_defL);      it->mod_defL = n++;
@@ -448,11 +448,11 @@ namespace casadi {
     Function mfcn("mfcn", mfcn_in, mfcn_out);
 
     // Directional derivative of Z
-    std::vector<vector<MX> > mfcn_fwdSeed(1, mfcn_in), mfcn_fwdSens(1, mfcn_out);
+    std::vector<std::vector<MX> > mfcn_fwdSeed(1, mfcn_in), mfcn_fwdSens(1, mfcn_out);
 
     // Linearization in the d-direction (see Equation (2.12) in Alberspeyer2010)
     fill(mfcn_fwdSeed[0].begin(), mfcn_fwdSeed[0].end(), MX());
-    for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
+    for (std::vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
       mfcn_fwdSeed[0][it->mod_var] = it->d;
       if (!gauss_newton_) {
         mfcn_fwdSeed[0][it->mod_lam] = it->d_lam;
@@ -487,12 +487,12 @@ namespace casadi {
     // Interpret the Jacobian-vector multiplication as a forward directional derivative
     fill(mfcn_fwdSeed[0].begin(), mfcn_fwdSeed[0].end(), MX());
     mfcn_fwdSeed[0][mod_x_] = du;
-    for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
+    for (std::vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
       mfcn_fwdSeed[0][it->mod_var] = -it->d;
     }
     if (!gauss_newton_) {
       mfcn_fwdSeed[0][mod_g_lam_] = g_dlam;
-      for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
+      for (std::vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
         mfcn_fwdSeed[0][it->mod_lam] = -it->d_lam;
       }
     }
@@ -508,12 +508,12 @@ namespace casadi {
     // Step expansion function outputs
     std::vector<MX> exp_fcn_out;
     n=0;
-    for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
+    for (std::vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
       exp_fcn_out.push_back(mfcn_fwdSens[0][it->mod_def]); it->exp_def = n++;
     }
 
     if (!gauss_newton_) {
-      for (vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
+      for (std::vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
         exp_fcn_out.push_back(mfcn_fwdSens[0][it->mod_defL]); it->exp_defL = n++;
       }
     }
@@ -595,18 +595,18 @@ namespace casadi {
 
       // Count the total number of variables
       casadi_int n_lifted = 0;
-      for (vector<Var>::const_iterator i=v_.begin(); i!=v_.end(); ++i) {
+      for (std::vector<Var>::const_iterator i=v_.begin(); i!=v_.end(); ++i) {
         n_lifted += i->n;
       }
 
       uout()
         << std::endl
-        << "Number of reduced variables:               " << setw(9) << nx_ << std::endl
-        << "Number of reduced constraints:             " << setw(9) << ng_ << std::endl
-        << "Number of lifted variables/constraints:    " << setw(9) << n_lifted << std::endl
-        << "Number of parameters:                      " << setw(9) << np_ << std::endl
-        << "Total number of variables:                 " << setw(9) << (nx_+n_lifted) << std::endl
-        << "Total number of constraints:               " << setw(9) << (ng_+n_lifted) << std::endl
+        << "Number of reduced variables:               " << std::setw(9) << nx_ << std::endl
+        << "Number of reduced constraints:             " << std::setw(9) << ng_ << std::endl
+        << "Number of lifted variables/constraints:    " << std::setw(9) << n_lifted << std::endl
+        << "Number of parameters:                      " << std::setw(9) << np_ << std::endl
+        << "Total number of variables:                 " << std::setw(9) << (nx_+n_lifted) << std::endl
+        << "Total number of constraints:               " << std::setw(9) << (ng_+n_lifted) << std::endl
         << std::endl;
 
       uout()
@@ -877,12 +877,12 @@ namespace casadi {
     // Write timers
     if (print_time_) {
       uout() << std::endl;
-      uout() << "time spent in eval_mat:    " << setw(9) << m->t_eval_mat << " s." << std::endl;
-      uout() << "time spent in eval_res:    " << setw(9) << m->t_eval_res << " s." << std::endl;
-      uout() << "time spent in eval_vec:    " << setw(9) << m->t_eval_vec << " s." << std::endl;
-      uout() << "time spent in eval_exp:    " << setw(9) << m->t_eval_exp << " s." << std::endl;
-      uout() << "time spent in solve_qp:    " << setw(9) << m->t_solve_qp << " s." << std::endl;
-      uout() << "time spent in main loop:   " << setw(9) << m->t_mainloop << " s." << std::endl;
+      uout() << "time spent in eval_mat:    " << std::setw(9) << m->t_eval_mat << " s." << std::endl;
+      uout() << "time spent in eval_res:    " << std::setw(9) << m->t_eval_res << " s." << std::endl;
+      uout() << "time spent in eval_vec:    " << std::setw(9) << m->t_eval_vec << " s." << std::endl;
+      uout() << "time spent in eval_exp:    " << std::setw(9) << m->t_eval_exp << " s." << std::endl;
+      uout() << "time spent in solve_qp:    " << std::setw(9) << m->t_solve_qp << " s." << std::endl;
+      uout() << "time spent in main loop:   " << std::setw(9) << m->t_mainloop << " s." << std::endl;
     }
 
     uout() << std::endl;
@@ -906,19 +906,19 @@ namespace casadi {
   }
 
   void Scpgen::printIteration(ScpgenMemory* m, std::ostream &stream) const {
-    stream << setw(4)  << "iter";
-    stream << setw(14) << "objective";
-    stream << setw(11) << "inf_pr";
-    stream << setw(11) << "inf_du";
-    stream << setw(11) << "pr_step";
-    stream << setw(11) << "du_step";
-    stream << setw(8) << "lg(rg)";
-    stream << setw(3) << "ls";
+    stream << std::setw(4)  << "iter";
+    stream << std::setw(14) << "objective";
+    stream << std::setw(11) << "inf_pr";
+    stream << std::setw(11) << "inf_du";
+    stream << std::setw(11) << "pr_step";
+    stream << std::setw(11) << "du_step";
+    stream << std::setw(8) << "lg(rg)";
+    stream << std::setw(3) << "ls";
     stream << ' ';
 
     // Print variables
-    for (vector<casadi_int>::const_iterator i=print_x_.begin(); i!=print_x_.end(); ++i) {
-      stream << setw(9) << name_x_.at(*i);
+    for (std::vector<casadi_int>::const_iterator i=print_x_.begin(); i!=print_x_.end(); ++i) {
+      stream << std::setw(9) << name_x_.at(*i);
     }
 
     stream << std::endl;
@@ -929,27 +929,27 @@ namespace casadi {
                               double pr_inf, double du_inf, double rg, casadi_int ls_trials,
                               bool ls_success) const {
     auto d_nlp = &m->d_nlp;
-    stream << setw(4) << iter;
+    stream << std::setw(4) << iter;
     stream << scientific;
-    stream << setw(14) << setprecision(6) << obj;
-    stream << setw(11) << setprecision(2) << pr_inf;
-    stream << setw(11);
+    stream << std::setw(14) << setprecision(6) << obj;
+    stream << std::setw(11) << setprecision(2) << pr_inf;
+    stream << std::setw(11);
     stream << setprecision(2) << du_inf;
-    stream << setw(11) << setprecision(2) << m->pr_step;
-    stream << setw(11);
+    stream << std::setw(11) << setprecision(2) << m->pr_step;
+    stream << std::setw(11);
     stream << setprecision(2) << m->du_step;
     stream << fixed;
     if (rg>0) {
-      stream << setw(8) << setprecision(2) << log10(rg);
+      stream << std::setw(8) << setprecision(2) << log10(rg);
     } else {
-      stream << setw(8) << "-";
+      stream << std::setw(8) << "-";
     }
-    stream << setw(3) << ls_trials;
+    stream << std::setw(3) << ls_trials;
     stream << (ls_success ? ' ' : 'F');
 
     // Print variables
-    for (vector<casadi_int>::const_iterator i=print_x_.begin(); i!=print_x_.end(); ++i) {
-      stream << setw(9) << setprecision(4) << d_nlp->z[*i];
+    for (std::vector<casadi_int>::const_iterator i=print_x_.begin(); i!=print_x_.end(); ++i) {
+      stream << std::setw(9) << setprecision(4) << d_nlp->z[*i];
     }
 
     // Print note

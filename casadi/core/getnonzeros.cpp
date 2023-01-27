@@ -430,7 +430,7 @@ namespace casadi {
 
         // Filter out ignored entries and check if there is anything to add at all
         bool elements_to_add = false;
-        for (vector<casadi_int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k) {
+        for (std::vector<casadi_int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k) {
           if (*k>=0) {
             if (nz[*k]>=0) {
               elements_to_add = true;
@@ -449,7 +449,7 @@ namespace casadi {
         asens0.sparsity().get_nz(r_ind);
 
         // Enlarge the sparsity pattern of the sensitivity if not all additions fit
-        for (vector<casadi_int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k) {
+        for (std::vector<casadi_int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k) {
           if (*k>=0 && r_ind[nz[*k]]<0) {
 
             // Create a new pattern which includes both the the previous seed and the addition
@@ -465,7 +465,7 @@ namespace casadi {
         }
 
         // Have r_nz point to locations in the sensitivity instead of the output
-        for (vector<casadi_int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k) {
+        for (std::vector<casadi_int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k) {
           if (*k>=0) {
             *k = r_ind[nz[*k]];
           }
@@ -508,7 +508,7 @@ namespace casadi {
 
     // Eliminate recursive calls
     std::vector<casadi_int> nz_new(nz);
-    for (vector<casadi_int>::iterator i=nz_new.begin(); i!=nz_new.end(); ++i) {
+    for (std::vector<casadi_int>::iterator i=nz_new.begin(); i!=nz_new.end(); ++i) {
       if (*i>=0) *i = nz_all[*i];
     }
     return dep()->get_nzref(sp, nz_new);

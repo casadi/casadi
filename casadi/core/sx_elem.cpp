@@ -629,28 +629,28 @@ namespace casadi {
 
 using namespace casadi;
 namespace std {
-  SXElem numeric_limits<SXElem>::infinity() throw() {
+  SXElem std::numeric_limits<SXElem>::infinity() throw() {
     return casadi::casadi_limits<SXElem>::inf;
   }
 
-  SXElem numeric_limits<SXElem>::quiet_NaN() throw() {
+  SXElem std::numeric_limits<SXElem>::quiet_NaN() throw() {
     return casadi::casadi_limits<SXElem>::nan;
   }
 
-  SXElem numeric_limits<SXElem>::min() throw() {
-    return SXElem(numeric_limits<double>::min());
+  SXElem std::numeric_limits<SXElem>::min() throw() {
+    return SXElem(std::numeric_limits<double>::min());
   }
 
-  SXElem numeric_limits<SXElem>::max() throw() {
-    return SXElem(numeric_limits<double>::max());
+  SXElem std::numeric_limits<SXElem>::max() throw() {
+    return SXElem(std::numeric_limits<double>::max());
   }
 
-  SXElem numeric_limits<SXElem>::epsilon() throw() {
-    return SXElem(numeric_limits<double>::epsilon());
+  SXElem std::numeric_limits<SXElem>::epsilon() throw() {
+    return SXElem(std::numeric_limits<double>::epsilon());
   }
 
-  SXElem numeric_limits<SXElem>::round_error() throw() {
-    return SXElem(numeric_limits<double>::round_error());
+  SXElem std::numeric_limits<SXElem>::round_error() throw() {
+    return SXElem(std::numeric_limits<double>::round_error());
   }
 
 } // namespace std

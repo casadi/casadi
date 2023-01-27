@@ -96,10 +96,10 @@ int main(){
   // Print the solution
   cout << "-----" << std::endl;
   cout << "Optimal solution for p = " << arg.at("p") << ":" << std::endl;
-  cout << setw(30) << "Objective: " << res.at("f") << std::endl;
-  cout << setw(30) << "Primal solution: " << res.at("x") << std::endl;
-  cout << setw(30) << "Dual solution (x): " << res.at("lam_x") << std::endl;
-  cout << setw(30) << "Dual solution (g): " << res.at("lam_g") << std::endl;
+  cout << std::setw(30) << "Objective: " << res.at("f") << std::endl;
+  cout << std::setw(30) << "Primal solution: " << res.at("x") << std::endl;
+  cout << std::setw(30) << "Dual solution (x): " << res.at("lam_x") << std::endl;
+  cout << std::setw(30) << "Dual solution (g): " << res.at("lam_g") << std::endl;
 
   // Change the parameter and resolve
   arg["p"] = 4.5;
@@ -108,10 +108,10 @@ int main(){
   // Print the new solution
   cout << "-----" << std::endl;
   cout << "Optimal solution for p = " << arg.at("p") << ":" << std::endl;
-  cout << setw(30) << "Objective: " << res.at("f") << std::endl;
-  cout << setw(30) << "Primal solution: " << res.at("x") << std::endl;
-  cout << setw(30) << "Dual solution (x): " << res.at("lam_x") << std::endl;
-  cout << setw(30) << "Dual solution (g): " << res.at("lam_g") << std::endl;
+  cout << std::setw(30) << "Objective: " << res.at("f") << std::endl;
+  cout << std::setw(30) << "Primal solution: " << res.at("x") << std::endl;
+  cout << std::setw(30) << "Dual solution (x): " << res.at("lam_x") << std::endl;
+  cout << std::setw(30) << "Dual solution (g): " << res.at("lam_g") << std::endl;
 
   return 0;
 }

@@ -53,7 +53,7 @@ namespace casadi {
   }
 
   double SXNode::to_double() const {
-    return numeric_limits<double>::quiet_NaN();
+    return std::numeric_limits<double>::quiet_NaN();
   }
 
   casadi_int SXNode::to_int() const {

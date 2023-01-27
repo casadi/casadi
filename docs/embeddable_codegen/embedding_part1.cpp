@@ -52,7 +52,7 @@ int main(){
   MX g = x[0]+x[1]-10;
     
   // Infinity
-  double inf = numeric_limits<double>::infinity();
+  double inf = std::numeric_limits<double>::infinity();
 
   // Create IPOPT instance
   Function solver = nlpsol("solver", "ipopt", {{"x", x}, {"f", f}, {"g", g}});

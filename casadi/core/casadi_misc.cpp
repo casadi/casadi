@@ -350,7 +350,7 @@ std::string simple_mkstemps(const std::string& prefix, const std::string& suffix
     return simple_mkstemps(prefix, suffix);
     #else // HAVE_SIMPLE_MKSTEMPS
     // Fallback, may result in deprecation warnings
-    return prefix + string(tmpnam(nullptr)) + suffix;
+    return prefix + std::string(tmpnam(nullptr)) + suffix;
     #endif // HAVE_SIMPLE_MKSTEMPS
     #endif // HAVE_MKSTEMPS
   }
