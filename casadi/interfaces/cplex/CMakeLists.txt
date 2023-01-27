@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.12)
+cmake_minimum_required(VERSION 3.10.2)
 include_directories(${CPLEX_INCLUDE_DIR})
 
 casadi_plugin(Conic cplex

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.12)
+cmake_minimum_required(VERSION 3.10.2)
 
 casadi_plugin(Linsol mumps
   mumps_interface.hpp
