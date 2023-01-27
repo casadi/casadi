@@ -144,12 +144,11 @@ void register_counters(py::module_ &m) {
                 return py::make_tuple(p.f, p.jac_f, p.grad_f_prod, p.h, p.h_N, p.l, p.l_N, p.qr,
                                       p.q_N, p.add_Q, p.add_Q_N, p.add_R_masked, p.add_S_masked,
                                       p.add_R_prod_masked, p.add_S_prod_masked, p.constr,
-                                      p.constr_N, p.jac_constr, p.jac_constr_N, p.grad_constr_prod,
-                                      p.grad_constr_prod_N, p.add_gn_hess_constr,
-                                      p.add_gn_hess_constr_N);
+                                      p.constr_N, p.grad_constr_prod, p.grad_constr_prod_N,
+                                      p.add_gn_hess_constr, p.add_gn_hess_constr_N);
             },
             [](py::tuple t) { // __setstate__
-                if (t.size() != 23)
+                if (t.size() != 21)
                     throw std::runtime_error("Invalid state!");
                 using T = alpaqa::OCPEvalCounter::OCPEvalTimer;
                 return T{
@@ -170,12 +169,10 @@ void register_counters(py::module_ &m) {
                     py::cast<decltype(T::add_S_prod_masked)>(t[14]),
                     py::cast<decltype(T::constr)>(t[15]),
                     py::cast<decltype(T::constr_N)>(t[16]),
-                    py::cast<decltype(T::jac_constr)>(t[17]),
-                    py::cast<decltype(T::jac_constr_N)>(t[18]),
-                    py::cast<decltype(T::grad_constr_prod)>(t[19]),
-                    py::cast<decltype(T::grad_constr_prod_N)>(t[20]),
-                    py::cast<decltype(T::add_gn_hess_constr)>(t[21]),
-                    py::cast<decltype(T::add_gn_hess_constr_N)>(t[22]),
+                    py::cast<decltype(T::grad_constr_prod)>(t[17]),
+                    py::cast<decltype(T::grad_constr_prod_N)>(t[18]),
+                    py::cast<decltype(T::add_gn_hess_constr)>(t[19]),
+                    py::cast<decltype(T::add_gn_hess_constr_N)>(t[20]),
                 };
             }))
         // clang-format off
@@ -196,8 +193,6 @@ void register_counters(py::module_ &m) {
         .def_readwrite("add_S_prod_masked", &alpaqa::OCPEvalCounter::OCPEvalTimer::add_S_prod_masked)
         .def_readwrite("constr", &alpaqa::OCPEvalCounter::OCPEvalTimer::constr)
         .def_readwrite("constr_N", &alpaqa::OCPEvalCounter::OCPEvalTimer::constr_N)
-        .def_readwrite("jac_constr", &alpaqa::OCPEvalCounter::OCPEvalTimer::jac_constr)
-        .def_readwrite("jac_constr_N", &alpaqa::OCPEvalCounter::OCPEvalTimer::jac_constr_N)
         .def_readwrite("grad_constr_prod", &alpaqa::OCPEvalCounter::OCPEvalTimer::grad_constr_prod)
         .def_readwrite("grad_constr_prod_N", &alpaqa::OCPEvalCounter::OCPEvalTimer::grad_constr_prod_N)
         .def_readwrite("add_gn_hess_constr", &alpaqa::OCPEvalCounter::OCPEvalTimer::add_gn_hess_constr)
@@ -211,12 +206,11 @@ void register_counters(py::module_ &m) {
                 return py::make_tuple(p.f, p.jac_f, p.grad_f_prod, p.h, p.h_N, p.l, p.l_N, p.qr,
                                       p.q_N, p.add_Q, p.add_Q_N, p.add_R_masked, p.add_S_masked,
                                       p.add_R_prod_masked, p.add_S_prod_masked, p.constr,
-                                      p.constr_N, p.jac_constr, p.jac_constr_N, p.grad_constr_prod,
-                                      p.grad_constr_prod_N, p.add_gn_hess_constr,
-                                      p.add_gn_hess_constr_N, p.time);
+                                      p.constr_N, p.grad_constr_prod, p.grad_constr_prod_N,
+                                      p.add_gn_hess_constr, p.add_gn_hess_constr_N, p.time);
             },
             [](py::tuple t) { // __setstate__
-                if (t.size() != 24)
+                if (t.size() != 22)
                     throw std::runtime_error("Invalid state!");
                 using T = alpaqa::OCPEvalCounter;
                 return T{
@@ -237,13 +231,11 @@ void register_counters(py::module_ &m) {
                     py::cast<decltype(T::add_S_prod_masked)>(t[14]),
                     py::cast<decltype(T::constr)>(t[15]),
                     py::cast<decltype(T::constr_N)>(t[16]),
-                    py::cast<decltype(T::jac_constr)>(t[17]),
-                    py::cast<decltype(T::jac_constr_N)>(t[18]),
-                    py::cast<decltype(T::grad_constr_prod)>(t[19]),
-                    py::cast<decltype(T::grad_constr_prod_N)>(t[20]),
-                    py::cast<decltype(T::add_gn_hess_constr)>(t[21]),
-                    py::cast<decltype(T::add_gn_hess_constr_N)>(t[22]),
-                    py::cast<decltype(T::time)>(t[23]),
+                    py::cast<decltype(T::grad_constr_prod)>(t[17]),
+                    py::cast<decltype(T::grad_constr_prod_N)>(t[18]),
+                    py::cast<decltype(T::add_gn_hess_constr)>(t[19]),
+                    py::cast<decltype(T::add_gn_hess_constr_N)>(t[20]),
+                    py::cast<decltype(T::time)>(t[21]),
                 };
             }))
         // clang-format off
@@ -264,8 +256,6 @@ void register_counters(py::module_ &m) {
         .def_readwrite("add_S_prod_masked", &alpaqa::OCPEvalCounter::add_S_prod_masked)
         .def_readwrite("constr", &alpaqa::OCPEvalCounter::constr)
         .def_readwrite("constr_N", &alpaqa::OCPEvalCounter::constr_N)
-        .def_readwrite("jac_constr", &alpaqa::OCPEvalCounter::jac_constr)
-        .def_readwrite("jac_constr_N", &alpaqa::OCPEvalCounter::jac_constr_N)
         .def_readwrite("grad_constr_prod", &alpaqa::OCPEvalCounter::grad_constr_prod)
         .def_readwrite("grad_constr_prod_N", &alpaqa::OCPEvalCounter::grad_constr_prod_N)
         .def_readwrite("add_gn_hess_constr", &alpaqa::OCPEvalCounter::add_gn_hess_constr)

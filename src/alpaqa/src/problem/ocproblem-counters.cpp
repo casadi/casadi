@@ -64,10 +64,6 @@ std::ostream &operator<<(std::ostream &os, const OCPEvalCounter &c) {
        << CountResult{c.constr, c.time.constr};
     os << "            constr_N:" //
        << CountResult{c.constr_N, c.time.constr_N};
-    os << "          jac_constr:" //
-       << CountResult{c.jac_constr, c.time.jac_constr};
-    os << "        jac_constr_N:" //
-       << CountResult{c.jac_constr_N, c.time.jac_constr_N};
     os << "    grad_constr_prod:" //
        << CountResult{c.grad_constr_prod, c.time.grad_constr_prod};
     os << "  grad_constr_prod_N:" //

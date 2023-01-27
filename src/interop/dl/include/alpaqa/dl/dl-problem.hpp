@@ -222,6 +222,8 @@ class DLControlProblem : private DLLoader {
     length_t get_nc() const { return functions->nc; }
     length_t get_nc_N() const { return functions->nc_N; }
 
+    void check() const {} // TODO
+
     // clang-format off
     void get_U(Box &U) const;
     void get_D(Box &D) const;
@@ -246,8 +248,6 @@ class DLControlProblem : private DLLoader {
     [[nodiscard]] length_t get_S_work_size() const;
     void eval_constr(index_t timestep, crvec x, rvec c) const;
     void eval_constr_N(crvec x, rvec c) const;
-    void eval_jac_constr(index_t timestep, crvec x, rmat J_c) const;
-    void eval_jac_constr_N(crvec x, rmat J_c) const;
     void eval_grad_constr_prod(index_t timestep, crvec x, crvec p, rvec grad_cx_p) const;
     void eval_grad_constr_prod_N(crvec x, crvec p, rvec grad_cx_p) const;
     void eval_add_gn_hess_constr(index_t timestep, crvec x, crvec M, rmat out) const;
@@ -262,8 +262,6 @@ class DLControlProblem : private DLLoader {
     [[nodiscard]] bool provides_get_S_work_size() const;
     [[nodiscard]] bool provides_eval_constr() const;
     [[nodiscard]] bool provides_eval_constr_N() const;
-    [[nodiscard]] bool provides_eval_jac_constr() const;
-    [[nodiscard]] bool provides_eval_jac_constr_N() const;
     [[nodiscard]] bool provides_eval_grad_constr_prod() const;
     [[nodiscard]] bool provides_eval_grad_constr_prod_N() const;
     [[nodiscard]] bool provides_eval_add_gn_hess_constr() const;

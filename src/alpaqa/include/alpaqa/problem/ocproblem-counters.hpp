@@ -25,8 +25,6 @@ struct OCPEvalCounter {
     unsigned add_S_prod_masked{};
     unsigned constr{};
     unsigned constr_N{};
-    unsigned jac_constr{};
-    unsigned jac_constr_N{};
     unsigned grad_constr_prod{};
     unsigned grad_constr_prod_N{};
     unsigned add_gn_hess_constr{};
@@ -50,8 +48,6 @@ struct OCPEvalCounter {
         std::chrono::nanoseconds add_S_prod_masked{};
         std::chrono::nanoseconds constr{};
         std::chrono::nanoseconds constr_N{};
-        std::chrono::nanoseconds jac_constr{};
-        std::chrono::nanoseconds jac_constr_N{};
         std::chrono::nanoseconds grad_constr_prod{};
         std::chrono::nanoseconds grad_constr_prod_N{};
         std::chrono::nanoseconds add_gn_hess_constr{};
@@ -82,8 +78,6 @@ inline OCPEvalCounter::OCPEvalTimer &operator+=(OCPEvalCounter::OCPEvalTimer &a,
     a.add_S_prod_masked += b.add_S_prod_masked;
     a.constr += b.constr;
     a.constr_N += b.constr_N;
-    a.jac_constr += b.jac_constr;
-    a.jac_constr_N += b.jac_constr_N;
     a.grad_constr_prod += b.grad_constr_prod;
     a.grad_constr_prod_N += b.grad_constr_prod_N;
     a.add_gn_hess_constr += b.add_gn_hess_constr;
@@ -109,8 +103,6 @@ inline OCPEvalCounter &operator+=(OCPEvalCounter &a, const OCPEvalCounter &b) {
     a.add_S_prod_masked += b.add_S_prod_masked;
     a.constr += b.constr;
     a.constr_N += b.constr_N;
-    a.jac_constr += b.jac_constr;
-    a.jac_constr_N += b.jac_constr_N;
     a.grad_constr_prod += b.grad_constr_prod;
     a.grad_constr_prod_N += b.grad_constr_prod_N;
     a.add_gn_hess_constr += b.add_gn_hess_constr;

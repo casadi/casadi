@@ -239,15 +239,6 @@ typedef struct {
         void *instance,
         const alpaqa_real_t *x,
         alpaqa_real_t *c);
-    void (*eval_jac_constr)(
-        void *instance,
-        alpaqa_index_t timestep,
-        const alpaqa_real_t *x,
-        alpaqa_real_t *J_c);
-    void (*eval_jac_constr_N)(
-        void *instance,
-        const alpaqa_real_t *x,
-        alpaqa_real_t *J_c);
     void (*eval_grad_constr_prod)(
         void *instance,
         alpaqa_index_t timestep,
@@ -324,6 +315,33 @@ void register_function(problem_register_t &result, std::string name,
                        Func &&func) {
     register_function(result.extra_functions, std::move(name),
                       std::forward<Func>(func));
+}
+
+template <class Func>
+void register_function(control_problem_register_t &result, std::string name,
+                       Func &&func) {
+    register_function(result.extra_functions, std::move(name),
+                      std::forward<Func>(func));
+}
+
+template <class Result, class T, class Ret, class... Args>
+void register_member_function(Result &result, std::string name,
+                              Ret (T::*member)(Args...)) {
+    register_function(result, std::move(name),
+                      [member](void *self_, Args... args) {
+                          auto *self = reinterpret_cast<T *>(self_);
+                          (self->*member)(std::forward<Args>(args)...);
+                      });
+}
+
+template <class Result, class T, class Ret, class... Args>
+void register_member_function(Result &result, std::string name,
+                              Ret (T::*member)(Args...) const) {
+    register_function(result, std::move(name),
+                      [member](const void *self_, Args... args) {
+                          const auto *self = reinterpret_cast<const T *>(self_);
+                          (self->*member)(std::forward<Args>(args)...);
+                      });
 }
 
 /// Cleans up the extra functions registered by @ref register_function.

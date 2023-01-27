@@ -125,8 +125,6 @@ auto DLControlProblem::get_R_work_size() const -> length_t { return functions->g
 auto DLControlProblem::get_S_work_size() const -> length_t { return functions->get_S_work_size(instance.get()); }
 auto DLControlProblem::eval_constr(index_t timestep, crvec x, rvec c) const -> void { return functions->eval_constr(instance.get(), timestep, x.data(), c.data()); }
 auto DLControlProblem::eval_constr_N(crvec x, rvec c) const -> void { return functions->eval_constr_N(instance.get(), x.data(), c.data()); }
-auto DLControlProblem::eval_jac_constr(index_t timestep, crvec x, rmat J_c) const -> void { return functions->eval_jac_constr(instance.get(), timestep, x.data(), J_c.data()); }
-auto DLControlProblem::eval_jac_constr_N(crvec x, rmat J_c) const -> void { return functions->eval_jac_constr_N(instance.get(), x.data(), J_c.data()); }
 auto DLControlProblem::eval_grad_constr_prod(index_t timestep, crvec x, crvec p, rvec grad_cx_p) const -> void { return functions->eval_grad_constr_prod(instance.get(), timestep, x.data(), p.data(), grad_cx_p.data()); }
 auto DLControlProblem::eval_grad_constr_prod_N(crvec x, crvec p, rvec grad_cx_p) const -> void { return functions->eval_grad_constr_prod_N(instance.get(), x.data(), p.data(), grad_cx_p.data()); }
 auto DLControlProblem::eval_add_gn_hess_constr(index_t timestep, crvec x, crvec M, rmat out) const -> void { return functions->eval_add_gn_hess_constr(instance.get(), timestep, x.data(), M.data(), out.data()); }
@@ -141,8 +139,6 @@ bool DLControlProblem::provides_get_R_work_size() const { return functions->get_
 bool DLControlProblem::provides_get_S_work_size() const { return functions->get_S_work_size != nullptr; }
 bool DLControlProblem::provides_eval_constr() const { return functions->eval_constr != nullptr; }
 bool DLControlProblem::provides_eval_constr_N() const { return functions->eval_constr_N != nullptr; }
-bool DLControlProblem::provides_eval_jac_constr() const { return functions->eval_jac_constr != nullptr; }
-bool DLControlProblem::provides_eval_jac_constr_N() const { return functions->eval_jac_constr_N != nullptr; }
 bool DLControlProblem::provides_eval_grad_constr_prod() const { return functions->eval_grad_constr_prod != nullptr; }
 bool DLControlProblem::provides_eval_grad_constr_prod_N() const { return functions->eval_grad_constr_prod_N != nullptr; }
 bool DLControlProblem::provides_eval_add_gn_hess_constr() const { return functions->eval_add_gn_hess_constr != nullptr; }

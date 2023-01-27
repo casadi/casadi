@@ -421,11 +421,6 @@ void CasADiControlProblem<Conf>::eval_constr(index_t, crvec x, rvec c) const {
 }
 
 template <Config Conf>
-void CasADiControlProblem<Conf>::eval_jac_constr(index_t, crvec, rmat) const {
-    throw std::logic_error("'eval_jac_constr' not implemented");
-}
-
-template <Config Conf>
 void CasADiControlProblem<Conf>::eval_grad_constr_prod(index_t, crvec x,
                                                        crvec p,
                                                        rvec grad_cx_p) const {

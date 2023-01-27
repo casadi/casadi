@@ -61,7 +61,6 @@ class CasADiControlProblem {
     [[nodiscard]] length_t get_R_work_size() const;
     [[nodiscard]] length_t get_S_work_size() const;
     void eval_constr(index_t timestep, crvec x, rvec c) const;
-    void eval_jac_constr(index_t timestep, crvec x, rmat J_c) const;
     void eval_grad_constr_prod(index_t timestep, crvec x, crvec p,
                                rvec grad_cx_p) const;
     void eval_add_gn_hess_constr(index_t timestep, crvec x, crvec M,

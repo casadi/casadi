@@ -187,10 +187,15 @@ struct OCPEvaluator {
         for (index_t t = 0; t < N; ++t) {
             auto xk = vars.xk(storage, t);
             auto uk = vars.uk(storage, t);
-            auto hk = vars.hk(storage, t);
             auto ck = vars.ck(storage, t);
-            problem->eval_h(t, xk, uk, hk);
-            V += problem->eval_l(t, hk);
+            if (vars.nh() > 0) {
+                auto hk = vars.hk(storage, t);
+                problem->eval_h(t, xk, uk, hk);
+                V += problem->eval_l(t, hk);
+            } else {
+                auto xuk = vars.xuk(storage, t);
+                V += problem->eval_l(t, xuk);
+            }
             if (nc > 0) {
                 problem->eval_constr(t, xk, ck);
                 auto yk = y.segment(t * nc, nc);
@@ -201,10 +206,14 @@ struct OCPEvaluator {
             problem->eval_f(t, xk, uk, vars.xk(storage, t + 1));
         }
         auto xN = vars.xk(storage, N);
-        auto hN = vars.hk(storage, N);
         auto cN = vars.ck(storage, N);
-        problem->eval_h_N(xN, hN);
-        V += problem->eval_l_N(hN);
+        if (vars.nh_N() > 0) {
+            auto hN = vars.hk(storage, N);
+            problem->eval_h_N(xN, hN);
+            V += problem->eval_l_N(hN);
+        } else {
+            V += problem->eval_l_N(xN);
+        }
         if (nc_N > 0) {
             problem->eval_constr_N(xN, cN);
             auto yN = y.segment(N * nc, nc_N);
@@ -221,17 +230,21 @@ struct OCPEvaluator {
         for (index_t t = 0; t < N(); ++t) {
             auto xk = vars.xk(storage, t);
             auto uk = vars.uk(storage, t);
-            auto hk = vars.hk(storage, t);
             auto ck = vars.ck(storage, t);
-            problem->eval_h(t, xk, uk, hk);
+            if (vars.nh() > 0) {
+                auto hk = vars.hk(storage, t);
+                problem->eval_h(t, xk, uk, hk);
+            }
             if (vars.nc() > 0)
                 problem->eval_constr(t, xk, ck);
             problem->eval_f(t, xk, uk, vars.xk(storage, t + 1));
         }
         auto xN = vars.xk(storage, N());
-        auto hN = vars.hk(storage, N());
         auto cN = vars.ck(storage, N());
-        problem->eval_h_N(xN, hN);
+        if (vars.nh_N() > 0) {
+            auto hN = vars.hk(storage, N());
+            problem->eval_h_N(xN, hN);
+        }
         if (vars.nc_N() > 0)
             problem->eval_constr_N(xN, cN);
     }
