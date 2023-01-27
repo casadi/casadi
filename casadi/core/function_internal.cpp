@@ -2248,7 +2248,7 @@ namespace casadi {
     g.auxiliaries << "static int " << stack_counter  << " = -1;\n";
     g.auxiliaries << "static int " << stack << "[CASADI_MAX_NUM_THREADS];\n";
     g.auxiliaries << "static " << codegen_mem_type() <<
-               " *" << mem_array << "[CASADI_MAX_NUM_THREADS];\n\n";
+               " " << mem_array << "[CASADI_MAX_NUM_THREADS];\n\n";
     g << "int mid;\n";
     g << "if (" << stack_counter << ">=0) {\n";
     g << "return " << stack << "[" << stack_counter << "--];\n";
