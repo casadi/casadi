@@ -30,8 +30,6 @@
 #include <sstream>
 #include <vector>
 
-using namespace std;
-
 namespace casadi {
 
   UnaryMX::UnaryMX(Operation op, MX x) : op_(op) {

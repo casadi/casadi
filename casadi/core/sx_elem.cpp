@@ -35,7 +35,6 @@
 #include "global_options.hpp"
 #include "sx_function.hpp"
 
-using namespace std;
 namespace casadi {
 
 

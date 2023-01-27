@@ -34,8 +34,6 @@
 throw CasadiException("Error in Sparsity::" FNAME " at " + CASADI_WHERE + ":\n"\
   + std::string(WHAT));
 
-using namespace std;
-
 namespace casadi {
   /// \cond INTERNAL
   // Singletons
@@ -568,7 +566,7 @@ namespace casadi {
 
   Sparsity Sparsity::diag(casadi_int nrow, casadi_int ncol) {
     // Smallest dimension
-    casadi_int n = min(nrow, ncol);
+    casadi_int n = std::min(nrow, ncol);
 
     // Column offset
     std::vector<casadi_int> colind(ncol+1, n);
@@ -1071,7 +1069,7 @@ namespace casadi {
 
     offset = std::min(p, casadi_int(0));
     for (casadi_int i=0;i<n+1;i++) {
-      colind[i]=max(min(i+offset, nc), casadi_int(0));
+      colind[i] = std::max(std::min(i+offset, nc), casadi_int(0));
     }
 
     return Sparsity(n, n, colind, row);

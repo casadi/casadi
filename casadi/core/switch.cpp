@@ -26,8 +26,6 @@
 #include "switch.hpp"
 #include "serializing_stream.hpp"
 
-using namespace std;
-
 namespace casadi {
 
   Switch::Switch(const std::string& name,

@@ -25,8 +25,6 @@
 
 #include "subassign.hpp"
 
-using namespace std;
-
 namespace casadi {
 
   SubAssign::SubAssign(const MX& x, const MX& y, const Slice& i, const Slice& j) : i_(i), j_(j) {

@@ -27,8 +27,6 @@
 
 #include "sx_function.hpp"
 
-using namespace std;
-
 namespace casadi {
 
   template<>
@@ -59,7 +57,7 @@ namespace casadi {
 
       // Make a copy of the string and modify it as to remove the special characters
       std::string modname = name;
-      for (string::iterator it=modname.begin(); it!=modname.end(); ++it) {
+      for (std::string::iterator it=modname.begin(); it!=modname.end(); ++it) {
         switch (*it) {
         case '(': case ')': case '[': case ']': case '{': case '}': case ',': case ';': *it = ' ';
         }
@@ -935,7 +933,7 @@ namespace casadi {
       v.push_back(SXElem::sym(v_name.str()));
     }
     // Consistency check
-    casadi_assert(vdef.size()<numeric_limits<int>::max(), "Integer overflow");
+    casadi_assert(vdef.size() < std::numeric_limits<int>::max(), "Integer overflow");
     // Mark the above expressions
     for (casadi_int i=0; i<vdef.size(); ++i) {
       vdef[i].set_temp(static_cast<int>(i)+1);

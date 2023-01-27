@@ -1096,7 +1096,6 @@ namespace casadi {
           const std::vector<std::string>& s_out,
           const Function::AuxOut& aux,
           const Dict& opts) const {
-    using namespace std;
 
     Dict g_ops = generate_options("clone");
     Dict f_options;
@@ -1164,7 +1163,6 @@ namespace casadi {
   std::vector<bool> XFunction<DerivedType, MatType, NodeType>::
   which_depends(const std::string& s_in, const std::vector<std::string>& s_out,
       casadi_int order, bool tr) const {
-    using namespace std;
 
     // Input arguments
     auto it = std::find(name_in_.begin(), name_in_.end(), s_in);

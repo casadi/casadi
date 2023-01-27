@@ -25,7 +25,6 @@
 
 #include "xml_file_internal.hpp"
 
-using namespace std;
 namespace casadi {
 
   XmlFileInternal::XmlFileInternal() {

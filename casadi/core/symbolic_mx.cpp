@@ -27,8 +27,6 @@
 #include "casadi_misc.hpp"
 #include "serializing_stream.hpp"
 
-using namespace std;
-
 namespace casadi {
 
   SymbolicMX::SymbolicMX(const std::string& name, casadi_int nrow, casadi_int ncol) : name_(name) {

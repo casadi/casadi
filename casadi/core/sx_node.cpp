@@ -33,7 +33,6 @@
 #include <limits>
 #include <stack>
 
-using namespace std;
 namespace casadi {
 
   SXNode::SXNode() {

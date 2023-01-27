@@ -31,8 +31,6 @@
 #include <cstdlib>
 #include <cmath>
 
-using namespace std;
-
 namespace casadi {
   void SparsityInternal::etree(const casadi_int* sp, casadi_int* parent,
       casadi_int *w, casadi_int ata) {
@@ -2539,10 +2537,10 @@ namespace casadi {
     if (nnz()==numel()) return true;
 
     // Check the number of non-zeros per col
-    if (!equal(colind, colind+size2()+1, y_colind)) return false;
+    if (!std::equal(colind, colind+size2()+1, y_colind)) return false;
 
     // Finally check the row indices
-    if (!equal(row, row+nz, y_row)) return false;
+    if (!std::equal(row, row+nz, y_row)) return false;
 
     // Equal if reached this point
     return true;
@@ -2833,7 +2831,7 @@ namespace casadi {
   }
 
   void SparsityInternal::find(std::vector<casadi_int>& loc, bool ind1) const {
-    casadi_assert(!mul_overflows(size1(), size2()), "Integer overflow detected");
+    casadi_assert(!std::mul_overflows(size1(), size2()), "Integer overflow detected");
     if (is_dense()) {
       loc = range(ind1, numel()+ind1);
       return;

@@ -28,8 +28,6 @@
 #include "global_options.hpp"
 #include "serializing_stream.hpp"
 
-using namespace std;
-
 namespace casadi {
 
   Split::Split(DeserializingStream& s) : MultipleOutput(s) {

@@ -26,8 +26,6 @@
 #include "transpose.hpp"
 #include "serializing_stream.hpp"
 
-using namespace std;
-
 namespace casadi {
 
   Transpose::Transpose(const MX& x) {

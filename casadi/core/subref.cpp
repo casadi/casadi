@@ -25,8 +25,6 @@
 
 #include "subref.hpp"
 
-using namespace std;
-
 namespace casadi {
 
   SubRef::SubRef(const MX& x, const Slice& i, const Slice& j) : i_(i), j_(j) {

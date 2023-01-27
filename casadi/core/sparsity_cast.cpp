@@ -27,8 +27,6 @@
 #include "casadi_misc.hpp"
 #include "getnonzeros.hpp"
 
-using namespace std;
-
 namespace casadi {
 
   SparsityCast::SparsityCast(const MX& x, Sparsity sp) {

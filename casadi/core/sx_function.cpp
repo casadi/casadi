@@ -37,9 +37,6 @@
 
 namespace casadi {
 
-  using namespace std;
-
-
   SXFunction::SXFunction(const std::string& name,
                          const std::vector<SX >& inputv,
                          const std::vector<SX >& outputv,
