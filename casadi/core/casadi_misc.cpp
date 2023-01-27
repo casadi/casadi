@@ -50,8 +50,6 @@
 
 #undef CASADI_NEED_UNISTD
 
-using namespace std;
-
 namespace casadi {
 
   int to_int(casadi_int rhs) {
@@ -342,7 +340,7 @@ std::string simple_mkstemps(const std::string& prefix, const std::string& suffix
   std::string temporary_file(const std::string& prefix, const std::string& suffix) {
     #ifdef HAVE_MKSTEMPS
     // Preferred solution
-    string ret = prefix + "XXXXXX" + suffix;
+    std::string ret = prefix + "XXXXXX" + suffix;
     if (mkstemps(&ret[0], static_cast<int>(suffix.size())) == -1) {
       casadi_error("Failed to create temporary file: '" + ret + "'");
     }

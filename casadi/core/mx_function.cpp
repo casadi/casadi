@@ -140,12 +140,12 @@ namespace casadi {
     stack<MXNode*> s;
 
     // All nodes
-    vector<MXNode*> nodes;
+    std::vector<MXNode*> nodes;
 
     // Add the list of nodes
     for (casadi_int ind=0; ind<out_.size(); ++ind) {
       // Loop over primitives of each output
-      vector<MX> prim = out_[ind].primitives();
+      std::vector<MX> prim = out_[ind].primitives();
       casadi_int nz_offset=0;
       for (casadi_int p=0; p<prim.size(); ++p) {
         // Get the nodes using a depth first search
@@ -164,14 +164,14 @@ namespace casadi {
     }
 
     // Place in the algorithm for each node
-    vector<casadi_int> place_in_alg;
+    std::vector<casadi_int> place_in_alg;
     place_in_alg.reserve(nodes.size());
 
     // Input instructions
-    vector<pair<casadi_int, MXNode*> > symb_loc;
+    std::vector<pair<casadi_int, MXNode*> > symb_loc;
 
     // Count the number of times each node is used
-    vector<casadi_int> refcount(nodes.size(), 0);
+    std::vector<casadi_int> refcount(nodes.size(), 0);
 
     // Get the sequence of instructions for the virtual machine
     algorithm_.resize(0);
@@ -183,7 +183,7 @@ namespace casadi {
 
       // Store location if parameter (or input)
       if (op==OP_PARAMETER) {
-        symb_loc.push_back(make_pair(algorithm_.size(), n));
+        symb_loc.push_back(std::make_pair(algorithm_.size(), n));
       }
 
       // If a new element in the algorithm needs to be added
@@ -234,7 +234,7 @@ namespace casadi {
     }
 
     // Place in the work vector for each of the nodes in the tree (overwrites the reference counter)
-    vector<casadi_int>& place = place_in_alg; // Reuse memory as it is no longer needed
+    std::vector<casadi_int>& place = place_in_alg; // Reuse memory as it is no longer needed
     place.resize(nodes.size());
 
     // Stack with unused elements in the work vector, sorted by sparsity pattern
@@ -366,7 +366,7 @@ namespace casadi {
     // Add input instructions, loop over inputs
     for (casadi_int ind=0; ind<in_.size(); ++ind) {
       // Loop over symbolic primitives of each input
-      vector<MX> prim = in_[ind].primitives();
+      std::vector<MX> prim = in_[ind].primitives();
       casadi_int nz_offset=0;
       for (casadi_int p=0; p<prim.size(); ++p) {
         casadi_int i = prim[p].get_temp()-1;
@@ -435,7 +435,7 @@ namespace casadi {
         if (arg[i]==nullptr) {
           fill(w1, w1+nnz, 0);
         } else {
-          copy(arg[i]+nz_offset, arg[i]+nz_offset+nnz, w1);
+          std::copy(arg[i]+nz_offset, arg[i]+nz_offset+nnz, w1);
         }
       } else if (e.op==OP_OUTPUT) {
         // Get an output
@@ -443,7 +443,7 @@ namespace casadi {
         casadi_int nnz=e.data->dep().nnz();
         casadi_int i=e.data->ind();
         casadi_int nz_offset=e.data->offset();
-        if (res[i]) copy(w1, w1+nnz, res[i]+nz_offset);
+        if (res[i]) std::copy(w1, w1+nnz, res[i]+nz_offset);
       } else {
         // Point pointers to the data corresponding to the element
         for (casadi_int i=0; i<e.arg.size(); ++i)
@@ -462,8 +462,8 @@ namespace casadi {
     return 0;
   }
 
-  string MXFunction::print(const AlgEl& el) const {
-    stringstream s;
+  std::string MXFunction::print(const AlgEl& el) const {
+    std::stringstream s;
     if (el.op==OP_OUTPUT) {
       s << "output[" << el.data->ind() << "][" << el.data->segment() << "]"
         << " = @" << el.arg.at(0);
@@ -471,7 +471,7 @@ namespace casadi {
       if (el.res.front()!=el.arg.at(0)) {
         s << "@" << el.res.front() << " = @" << el.arg.at(0) << "; ";
       }
-      vector<string> arg(2);
+      std::vector<std::string> arg(2);
       arg[0] = "@" + str(el.res.front());
       arg[1] = "@" + str(el.arg.at(1));
       s << el.data->disp(arg);
@@ -490,7 +490,7 @@ namespace casadi {
         }
         s << "} = ";
       }
-      vector<string> arg;
+      std::vector<std::string> arg;
       if (el.op!=OP_INPUT) {
         arg.resize(el.arg.size());
         for (casadi_int i=0; i<el.arg.size(); ++i) {
@@ -530,7 +530,7 @@ namespace casadi {
     stream << "Algorithm:";
     for (auto&& e : algorithm_) {
       InterruptHandler::check();
-      stream << endl << print(e);
+      stream << std::endl << print(e);
     }
   }
 
@@ -553,9 +553,9 @@ namespace casadi {
         const bvec_t* argi = arg[i];
         bvec_t* w1 = w + workloc_[e.res.front()];
         if (argi!=nullptr) {
-          copy(argi+nz_offset, argi+nz_offset+nnz, w1);
+          std::copy(argi+nz_offset, argi+nz_offset+nnz, w1);
         } else {
-          fill_n(w1, nnz, 0);
+          std::fill_n(w1, nnz, 0);
         }
       } else if (e.op==OP_OUTPUT) {
         // Get the output sensitivities
@@ -564,7 +564,7 @@ namespace casadi {
         casadi_int nz_offset=e.data->offset();
         bvec_t* resi = res[i];
         bvec_t* w1 = w + workloc_[e.arg.front()];
-        if (resi!=nullptr) copy(w1, w1+nnz, resi+nz_offset);
+        if (resi!=nullptr) std::copy(w1, w1+nnz, resi+nz_offset);
       } else {
         // Point pointers to the data corresponding to the element
         for (casadi_int i=0; i<e.arg.size(); ++i)
@@ -588,7 +588,7 @@ namespace casadi {
     bvec_t** arg1=arg+n_in_;
     bvec_t** res1=res+n_out_;
 
-    fill_n(w, sz_w(), 0);
+    std::fill_n(w, sz_w(), 0);
 
     // Propagate sparsity backwards
     for (auto it=algorithm_.rbegin(); it!=algorithm_.rend(); it++) {
@@ -600,7 +600,7 @@ namespace casadi {
         bvec_t* argi = arg[i];
         bvec_t* w1 = w + workloc_[it->res.front()];
         if (argi!=nullptr) for (casadi_int k=0; k<nnz; ++k) argi[nz_offset+k] |= w1[k];
-        fill_n(w1, nnz, 0);
+        std::fill_n(w1, nnz, 0);
       } else if (it->op==OP_OUTPUT) {
         // Pass output seeds
         casadi_int nnz=it->data.dep().nnz();
@@ -610,7 +610,7 @@ namespace casadi {
         bvec_t* w1 = w + workloc_[it->arg.front()];
         if (resi!=nullptr) {
           for (casadi_int k=0; k<nnz; ++k) w1[k] |= resi[k];
-          fill_n(resi, nnz, 0);
+          std::fill_n(resi, nnz, 0);
 
         }
       } else {
@@ -657,7 +657,7 @@ namespace casadi {
 
       // Trivial inline by default if output known
       if (!never_inline && isInput(arg)) {
-        copy(out_.begin(), out_.end(), res.begin());
+        std::copy(out_.begin(), out_.end(), res.begin());
         return;
       }
 
@@ -667,18 +667,18 @@ namespace casadi {
       }
 
       // Symbolic work, non-differentiated
-      vector<MX> swork(workloc_.size()-1);
+      std::vector<MX> swork(workloc_.size()-1);
       if (verbose_) casadi_message("Allocated work vector");
 
       // Split up inputs analogous to symbolic primitives
-      vector<vector<MX> > arg_split(in_.size());
+      std::vector<vector<MX> > arg_split(in_.size());
       for (casadi_int i=0; i<in_.size(); ++i) arg_split[i] = in_[i].split_primitives(arg[i]);
 
       // Allocate storage for split outputs
-      vector<vector<MX> > res_split(out_.size());
+      std::vector<vector<MX> > res_split(out_.size());
       for (casadi_int i=0; i<out_.size(); ++i) res_split[i].resize(out_[i].n_primitives());
 
-      vector<MX> arg1, res1;
+      std::vector<MX> arg1, res1;
 
       // Loop over computational nodes in forward order
       casadi_int alg_counter = 0;
@@ -748,7 +748,7 @@ namespace casadi {
           // New argument without all-zero directions
           std::vector<std::vector<MX> > fseed_purged, fsens_purged;
           fseed_purged.reserve(nfwd);
-          vector<casadi_int> index_purged;
+          std::vector<casadi_int> index_purged;
           for (casadi_int d=0; d<nfwd; ++d) {
             if (purgable(fseed[d])) {
               for (casadi_int i=0; i<fsens[d].size(); ++i) {
@@ -784,7 +784,7 @@ namespace casadi {
       if (verbose_) casadi_message("Allocated derivative work vector (forward mode)");
 
       // Split up fseed analogous to symbolic primitives
-      vector<vector<vector<MX> > > fseed_split(nfwd);
+      std::vector<vector<vector<MX> > > fseed_split(nfwd);
       for (casadi_int d=0; d<nfwd; ++d) {
         fseed_split[d].resize(fseed[d].size());
         for (casadi_int i=0; i<fseed[d].size(); ++i) {
@@ -793,7 +793,7 @@ namespace casadi {
       }
 
       // Allocate splited forward sensitivities
-      vector<vector<vector<MX> > > fsens_split(nfwd);
+      std::vector<vector<vector<MX> > > fsens_split(nfwd);
       for (casadi_int d=0; d<nfwd; ++d) {
         fsens_split[d].resize(out_.size());
         for (casadi_int i=0; i<out_.size(); ++i) {
@@ -802,10 +802,10 @@ namespace casadi {
       }
 
       // Pointers to the arguments of the current operation
-      vector<vector<MX> > oseed, osens;
+      std::vector<vector<MX> > oseed, osens;
       oseed.reserve(nfwd);
       osens.reserve(nfwd);
-      vector<bool> skip(nfwd, false);
+      std::vector<bool> skip(nfwd, false);
 
       // Loop over computational nodes in forward order
       for (auto&& e : algorithm_) {
@@ -831,7 +831,7 @@ namespace casadi {
           oseed.clear();
           for (casadi_int d=0; d<nfwd; ++d) {
             // Collect seeds, skipping directions with only zeros
-            vector<MX> seed(e.arg.size());
+            std::vector<MX> seed(e.arg.size());
             skip[d] = true; // All seeds are zero?
             for (casadi_int i=0; i<e.arg.size(); ++i) {
               casadi_int el = e.arg[i];
@@ -848,7 +848,7 @@ namespace casadi {
           // Perform the operation
           osens.resize(oseed.size());
           if (!osens.empty()) {
-            fill(osens.begin(), osens.end(), vector<MX>(e.res.size()));
+            fill(osens.begin(), osens.end(), std::vector<MX>(e.res.size()));
             e.data.ad_forward(oseed, osens);
           }
 
@@ -908,7 +908,7 @@ namespace casadi {
           // New argument without all-zero directions
           std::vector<std::vector<MX> > aseed_purged, asens_purged;
           aseed_purged.reserve(nadj);
-          vector<casadi_int> index_purged;
+          std::vector<casadi_int> index_purged;
           for (casadi_int d=0; d<nadj; ++d) {
             if (purgable(aseed[d])) {
               for (casadi_int i=0; i<asens[d].size(); ++i) {
@@ -932,7 +932,7 @@ namespace casadi {
       }
 
       if (!enable_reverse_) {
-        vector<vector<MX> > v;
+        std::vector<vector<MX> > v;
         // Do the non-inlining call from FunctionInternal
         // NOLINTNEXTLINE(bugprone-parent-virtual-call)
         FunctionInternal::call_reverse(in_, out_, aseed, v, false, false);
@@ -951,7 +951,7 @@ namespace casadi {
       }
 
       // Split up aseed analogous to symbolic primitives
-      vector<vector<vector<MX> > > aseed_split(nadj);
+      std::vector<vector<vector<MX> > > aseed_split(nadj);
       for (casadi_int d=0; d<nadj; ++d) {
         aseed_split[d].resize(out_.size());
         for (casadi_int i=0; i<out_.size(); ++i) {
@@ -960,7 +960,7 @@ namespace casadi {
       }
 
       // Allocate splited adjoint sensitivities
-      vector<vector<vector<MX> > > asens_split(nadj);
+      std::vector<vector<vector<MX> > > asens_split(nadj);
       for (casadi_int d=0; d<nadj; ++d) {
         asens_split[d].resize(in_.size());
         for (casadi_int i=0; i<in_.size(); ++i) {
@@ -969,10 +969,10 @@ namespace casadi {
       }
 
       // Pointers to the arguments of the current operation
-      vector<vector<MX> > oseed, osens;
+      std::vector<vector<MX> > oseed, osens;
       oseed.reserve(nadj);
       osens.reserve(nadj);
-      vector<bool> skip(nadj, false);
+      std::vector<bool> skip(nadj, false);
 
       // Work vector, adjoint derivatives
       std::vector<std::vector<MX> > dwork(workloc_.size()-1);
@@ -1010,7 +1010,7 @@ namespace casadi {
             skip[d] = true;
 
             // Seeds for direction d
-            vector<MX> seed(it->res.size());
+            std::vector<MX> seed(it->res.size());
             for (casadi_int i=0; i<it->res.size(); ++i) {
               // Get and clear seed
               casadi_int el = it->res[i];
@@ -1091,8 +1091,8 @@ namespace casadi {
   int MXFunction::eval_sx(const SXElem** arg, SXElem** res,
       casadi_int* iw, SXElem* w, void* mem) const {
     // Work vector and temporaries to hold pointers to operation input and outputs
-    vector<const SXElem*> argp(sz_arg());
-    vector<SXElem*> resp(sz_res());
+    std::vector<const SXElem*> argp(sz_arg());
+    std::vector<SXElem*> resp(sz_res());
 
     // Evaluate all of the nodes of the algorithm:
     // should only evaluate nodes that have not yet been calculated!
@@ -1194,7 +1194,7 @@ namespace casadi {
     casadi_int k=0;
 
     // Names of operation argument and results
-    vector<casadi_int> arg, res;
+    std::vector<casadi_int> arg, res;
 
     // Codegen the algorithm
     for (auto&& e : algorithm_) {
@@ -1231,25 +1231,25 @@ namespace casadi {
   }
 
   void MXFunction::generate_lifted(Function& vdef_fcn, Function& vinit_fcn) const {
-    vector<MX> swork(workloc_.size()-1);
+    std::vector<MX> swork(workloc_.size()-1);
 
-    vector<MX> arg1, res1;
+    std::vector<MX> arg1, res1;
 
     // Get input primitives
-    vector<vector<MX> > in_split(in_.size());
+    std::vector<vector<MX> > in_split(in_.size());
     for (casadi_int i=0; i<in_.size(); ++i) in_split[i] = in_[i].primitives();
 
     // Definition of intermediate variables
-    vector<MX> y;
-    vector<MX> g;
-    vector<vector<MX> > f_G(out_.size());
+    std::vector<MX> y;
+    std::vector<MX> g;
+    std::vector<vector<MX> > f_G(out_.size());
     for (casadi_int i=0; i<out_.size(); ++i) f_G[i].resize(out_[i].n_primitives());
 
     // Initial guess for intermediate variables
-    vector<MX> x_init;
+    std::vector<MX> x_init;
 
-    // Temporary stringstream
-    stringstream ss;
+    // Temporary std::stringstream
+    std::stringstream ss;
 
     for (casadi_int algNo=0; algNo<2; ++algNo) {
       for (auto&& e : algorithm_) {
@@ -1309,9 +1309,9 @@ namespace casadi {
     }
 
     // Definition of intermediate variables
-    vector<MX> f_in = in_;
+    std::vector<MX> f_in = in_;
     f_in.insert(f_in.end(), y.begin(), y.end());
-    vector<MX> f_out;
+    std::vector<MX> f_out;
     for (casadi_int i=0; i<out_.size(); ++i) f_out.push_back(out_[i].join_primitives(f_G[i]));
     f_out.insert(f_out.end(), g.begin(), g.end());
     vdef_fcn = Function("lifting_variable_definition", f_in, f_out);
@@ -1337,11 +1337,11 @@ namespace casadi {
   }
 
   void MXFunction::substitute_inplace(std::vector<MX>& vdef, std::vector<MX>& ex) const {
-    vector<MX> work(workloc_.size()-1);
-    vector<MX> oarg, ores;
+    std::vector<MX> work(workloc_.size()-1);
+    std::vector<MX> oarg, ores;
 
     // Output segments
-    vector<vector<MX>> out_split(out_.size());
+    std::vector<vector<MX>> out_split(out_.size());
     for (casadi_int i = 0; i < out_split.size(); ++i) out_split[i].resize(out_[i].n_primitives());
 
     // Evaluate algorithm

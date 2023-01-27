@@ -145,23 +145,23 @@ namespace casadi {
     std::string bare_name = "tmp_casadi_compiler_shell";
     std::string directory = "";
 
-    vector<string> compiler_flags;
-    vector<string> linker_flags;
-    string suffix = OBJECT_FILE_SUFFIX;
+    std::vector<std::string> compiler_flags;
+    std::vector<std::string> linker_flags;
+    std::string suffix = OBJECT_FILE_SUFFIX;
 
 #ifdef _WIN32
-    string compiler = "cl.exe";
-    string linker = "link.exe";
-    string compiler_setup = "/c";
-    string linker_setup = "/DLL";
+    std::string compiler = "cl.exe";
+    std::string linker = "link.exe";
+    std::string compiler_setup = "/c";
+    std::string linker_setup = "/DLL";
     std::string compiler_output_flag = "/Fo";
     std::string linker_output_flag = "/out:";
     extra_suffixes_ = {".exp", ".lib"};
 #else
-    string compiler = "gcc";
-    string linker = "gcc";
-    string compiler_setup = "-fPIC -c";
-    string linker_setup = "-shared";
+    std::string compiler = "gcc";
+    std::string linker = "gcc";
+    std::string compiler_setup = "-fPIC -c";
+    std::string linker_setup = "-shared";
     std::string compiler_output_flag = "-o ";
     std::string linker_output_flag = "-o ";
 #endif
@@ -218,9 +218,9 @@ namespace casadi {
 #endif // _WIN32
 
     // Construct the compiler command
-    stringstream cccmd;
+    std::stringstream cccmd;
     cccmd << compiler;
-    for (vector<string>::const_iterator i=compiler_flags.begin(); i!=compiler_flags.end(); ++i) {
+    for (vector<std::string>::const_iterator i=compiler_flags.begin(); i!=compiler_flags.end(); ++i) {
       cccmd << " " << *i;
     }
     cccmd << " " << compiler_setup;
@@ -238,14 +238,14 @@ namespace casadi {
     }
 
     // Link step
-    stringstream ldcmd;
+    std::stringstream ldcmd;
     ldcmd << linker;
 
     // Temporary file
     ldcmd << " " << obj_name_ << " " + linker_output_flag + bin_name_;
 
     // Add flags
-    for (vector<string>::const_iterator i=linker_flags.begin(); i!=linker_flags.end(); ++i) {
+    for (vector<std::string>::const_iterator i=linker_flags.begin(); i!=linker_flags.end(); ++i) {
       ldcmd << " " << *i;
     }
     ldcmd << " " << linker_setup;

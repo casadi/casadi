@@ -974,7 +974,7 @@ void DaeBuilderInternal::sanity_check() const {
 }
 
 std::string DaeBuilderInternal::qualified_name(const XmlNode& nn) {
-  // Stringstream to assemble name
+  // std::stringstream to assemble name
   std::stringstream qn;
 
   for (casadi_int i=0; i<nn.size(); ++i) {

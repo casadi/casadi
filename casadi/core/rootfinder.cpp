@@ -33,19 +33,19 @@
 using namespace std;
 namespace casadi {
 
-  vector<string> rootfinder_in() {
-    vector<string> ret(rootfinder_n_in());
+  std::vector<std::string> rootfinder_in() {
+    std::vector<std::string> ret(rootfinder_n_in());
     for (size_t i=0; i<ret.size(); ++i) ret[i]=rootfinder_in(i);
     return ret;
   }
 
-  vector<string> rootfinder_out() {
-    vector<string> ret(rootfinder_n_out());
+  std::vector<std::string> rootfinder_out() {
+    std::vector<std::string> ret(rootfinder_n_out());
     for (size_t i=0; i<ret.size(); ++i) ret[i]=rootfinder_out(i);
     return ret;
   }
 
-  string rootfinder_in(casadi_int ind) {
+  std::string rootfinder_in(casadi_int ind) {
     switch (static_cast<RootfinderInput>(ind)) {
     case ROOTFINDER_X0:  return "x0";
     case ROOTFINDER_P:   return "p";
@@ -54,7 +54,7 @@ namespace casadi {
     return string();
   }
 
-  string rootfinder_out(casadi_int ind) {
+  std::string rootfinder_out(casadi_int ind) {
     switch (static_cast<RootfinderOutput>(ind)) {
     case ROOTFINDER_X:  return "x";
     case ROOTFINDER_NUM_OUT: break;
@@ -82,24 +82,24 @@ namespace casadi {
     return Rootfinder::plugin_options(name).info(op);
   }
 
-  bool has_rootfinder(const string& name) {
+  bool has_rootfinder(const std::string& name) {
     return Rootfinder::has_plugin(name);
   }
 
-  void load_rootfinder(const string& name) {
+  void load_rootfinder(const std::string& name) {
     Rootfinder::load_plugin(name);
   }
 
-  string doc_rootfinder(const string& name) {
+  std::string doc_rootfinder(const std::string& name) {
     return Rootfinder::getPlugin(name).doc;
   }
 
-  Function rootfinder(const string& name, const string& solver,
+  Function rootfinder(const std::string& name, const std::string& solver,
                       const SXDict& rfp, const Dict& opts) {
     return rootfinder(name, solver, Rootfinder::create_oracle(rfp, opts), opts);
   }
 
-  Function rootfinder(const string& name, const string& solver,
+  Function rootfinder(const std::string& name, const std::string& solver,
                       const MXDict& rfp, const Dict& opts) {
     return rootfinder(name, solver, Rootfinder::create_oracle(rfp, opts), opts);
   }
@@ -184,7 +184,7 @@ namespace casadi {
 
     // Default (temporary) options
     Dict linear_solver_options;
-    string linear_solver = "qr";
+    std::string linear_solver = "qr";
     Function jac; // Jacobian of f with respect to z
 
     // Read options
@@ -304,15 +304,15 @@ namespace casadi {
                 const std::vector<std::string>& onames,
                 const Dict& opts) const {
     // Symbolic expression for the input
-    vector<MX> arg = mx_in(), res = mx_out();
-    vector<vector<MX>> fseed = fwd_seed<MX>(nfwd), fsens;
+    std::vector<MX> arg = mx_in(), res = mx_out();
+    std::vector<vector<MX>> fseed = fwd_seed<MX>(nfwd), fsens;
     arg[iin_] = MX::sym(arg[iin_].name(), Sparsity(arg[iin_].size()));
     for (auto&& e : fseed) e[iin_] = MX::sym(e[iin_].name(), e[iin_].size());
     ad_forward(arg, res, fseed, fsens, false, false);
 
     // Construct return function
     arg.insert(arg.end(), res.begin(), res.end());
-    vector<MX> v(nfwd);
+    std::vector<MX> v(nfwd);
     for (casadi_int i=0; i<n_in_; ++i) {
       for (casadi_int d=0; d<nfwd; ++d) v[d] = fseed[d][i];
       arg.push_back(horzcat(v));
@@ -331,16 +331,16 @@ namespace casadi {
                 const std::vector<std::string>& onames,
                 const Dict& opts) const {
     // Symbolic expression for the input
-    vector<MX> arg = mx_in();
+    std::vector<MX> arg = mx_in();
     arg[iin_] = MX::sym(arg[iin_].name() + "_guess",
                         Sparsity(arg[iin_].size()));
-    vector<MX> res = mx_out();
-    vector<vector<MX> > aseed = symbolicAdjSeed(nadj, res), asens;
+    std::vector<MX> res = mx_out();
+    std::vector<vector<MX> > aseed = symbolicAdjSeed(nadj, res), asens;
     ad_reverse(arg, res, aseed, asens, false, false);
 
     // Construct return function
     arg.insert(arg.end(), res.begin(), res.end());
-    vector<MX> v(nadj);
+    std::vector<MX> v(nadj);
     for (casadi_int i=0; i<n_out_; ++i) {
       for (casadi_int d=0; d<nadj; ++d) v[d] = aseed[d][i];
       arg.push_back(horzcat(v));
@@ -360,22 +360,22 @@ namespace casadi {
 
     // Propagate dependencies through the function
     const bvec_t** arg1 = arg+n_in_;
-    copy(arg, arg+n_in_, arg1);
+    std::copy(arg, arg+n_in_, arg1);
     arg1[iin_] = nullptr;
     bvec_t** res1 = res+n_out_;
-    fill_n(res1, n_out_, static_cast<bvec_t*>(nullptr));
+    std::fill_n(res1, n_out_, static_cast<bvec_t*>(nullptr));
     res1[iout_] = tmp1;
     oracle_(arg1, res1, iw, w, 0);
 
     // "Solve" in order to propagate to z
-    fill_n(tmp2, n_, 0);
+    std::fill_n(tmp2, n_, 0);
     sp_jac_.spsolve(tmp2, tmp1, false);
-    if (res[iout_]) copy(tmp2, tmp2+n_, res[iout_]);
+    if (res[iout_]) std::copy(tmp2, tmp2+n_, res[iout_]);
 
     // Propagate to auxiliary outputs
     if (n_out_>1) {
       arg1[iin_] = tmp2;
-      copy(res, res+n_out_, res1);
+      std::copy(res, res+n_out_, res1);
       res1[iout_] = nullptr;
       oracle_(arg1, res1, iw, w, 0);
     }
@@ -389,25 +389,25 @@ namespace casadi {
 
     // Get & clear seed corresponding to implicitly defined variable
     if (res[iout_]) {
-      copy(res[iout_], res[iout_]+n_, tmp1);
-      fill_n(res[iout_], n_, 0);
+      std::copy(res[iout_], res[iout_]+n_, tmp1);
+      std::fill_n(res[iout_], n_, 0);
     } else {
-      fill_n(tmp1, n_, 0);
+      std::fill_n(tmp1, n_, 0);
     }
 
     // Propagate dependencies from auxiliary outputs to z
     bvec_t** res1 = res+n_out_;
-    copy(res, res+n_out_, res1);
+    std::copy(res, res+n_out_, res1);
     res1[iout_] = nullptr;
     bvec_t** arg1 = arg+n_in_;
-    copy(arg, arg+n_in_, arg1);
+    std::copy(arg, arg+n_in_, arg1);
     arg1[iin_] = tmp1;
     if (n_out_>1) {
       if (oracle_.rev(arg1, res1, iw, w, 0)) return 1;
     }
 
     // "Solve" in order to get seed
-    fill_n(tmp2, n_, 0);
+    std::fill_n(tmp2, n_, 0);
     sp_jac_.spsolve(tmp2, tmp1, true);
 
     // Propagate dependencies through the function
@@ -435,9 +435,9 @@ namespace casadi {
     if (nfwd==0) return;
 
     // Propagate through f_
-    vector<MX> f_arg(arg);
+    std::vector<MX> f_arg(arg);
     f_arg.at(iin_) = res.at(iout_);
-    vector<MX> f_res(res);
+    std::vector<MX> f_res(res);
     f_res.at(iout_) = MX(size_in(iin_)); // zero residual
     std::vector<std::vector<MX> > f_fseed(fseed);
     for (casadi_int d=0; d<nfwd; ++d) {
@@ -451,7 +451,7 @@ namespace casadi {
     MX J = jac(f_arg).front();
 
     // Solve for all the forward derivatives at once
-    vector<MX> rhs(nfwd);
+    std::vector<MX> rhs(nfwd);
     for (casadi_int d=0; d<nfwd; ++d) rhs[d] = vec(fsens[d][iout_]);
     rhs = horzsplit(J->get_solve(-horzcat(rhs), false, linsol_));
     for (casadi_int d=0; d<nfwd; ++d) fsens[d][iout_] = reshape(rhs[d], size_in(iin_));
@@ -479,23 +479,23 @@ namespace casadi {
     if (nadj==0) return;
 
     // Get expression of Jacobian
-    vector<MX> f_arg(arg);
+    std::vector<MX> f_arg(arg);
     f_arg[iin_] = res.at(iout_);
     Function jac = get_function("jac_f_z");
     MX J = jac(f_arg).front();
 
     // Get adjoint seeds for calling f
-    vector<MX> f_res(res);
+    std::vector<MX> f_res(res);
     f_res[iout_] = MX(size_in(iin_)); // zero residual
-    vector<vector<MX> > f_aseed(nadj);
+    std::vector<vector<MX> > f_aseed(nadj);
     for (casadi_int d=0; d<nadj; ++d) {
       f_aseed[d].resize(n_out_);
       for (casadi_int i=0; i<n_out_; ++i) f_aseed[d][i] = i==iout_ ? f_res[iout_] : aseed[d][i];
     }
 
     // Propagate dependencies from auxiliary outputs
-    vector<MX> rhs(nadj);
-    vector<vector<MX> > asens_aux;
+    std::vector<MX> rhs(nadj);
+    std::vector<vector<MX> > asens_aux;
     if (n_out_>1) {
       oracle_->call_reverse(f_arg, f_res, f_aseed, asens_aux, always_inline, never_inline);
       for (casadi_int d=0; d<nadj; ++d) rhs[d] = vec(asens_aux[d][iin_] + aseed[d][iout_]);
@@ -517,7 +517,7 @@ namespace casadi {
     }
 
     // No dependency on guess (1)
-    vector<MX> tmp(nadj);
+    std::vector<MX> tmp(nadj);
     for (casadi_int d=0; d<nadj; ++d) {
       asens[d].resize(n_in_);
       tmp[d] = asens[d][iin_].is_empty(true) ? MX(size_in(iin_)) : asens[d][iin_];

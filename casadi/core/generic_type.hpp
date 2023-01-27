@@ -59,7 +59,7 @@ namespace casadi {
     OT_UNKNOWN};
 #endif // SWIG
 
-  /** \brief Generic data type, can hold different types such as bool, casadi_int, string etc.
+  /** \brief Generic data type, can hold different types such as bool, casadi_int, std::string etc.
 
       \author Joel Andersson
       \date 2010

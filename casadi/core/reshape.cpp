@@ -46,7 +46,7 @@ namespace casadi {
 
   template<typename T>
   int Reshape::eval_gen(const T** arg, T** res, casadi_int* iw, T* w) const {
-    if (arg[0]!=res[0]) copy(arg[0], arg[0]+nnz(), res[0]);
+    if (arg[0]!=res[0]) std::copy(arg[0], arg[0]+nnz(), res[0]);
     return 0;
   }
 

@@ -159,7 +159,7 @@ namespace casadi {
   void Factory<MatType>::
   add_input(const std::string& s, const MatType& e, bool is_diff) {
     size_t ind = in_.size();
-    auto it = imap_.insert(make_pair(s, ind));
+    auto it = imap_.insert(std::make_pair(s, ind));
     casadi_assert(it.second, "Duplicate input expression \"" + s + "\"");
     is_diff_in_.push_back(is_diff);
     in_.push_back(e);
@@ -170,7 +170,7 @@ namespace casadi {
   void Factory<MatType>::
   add_output(const std::string& s, const MatType& e, bool is_diff) {
     size_t ind = out_.size();
-    auto it = omap_.insert(make_pair(s, ind));
+    auto it = omap_.insert(std::make_pair(s, ind));
     casadi_assert(it.second, "Duplicate output expression \"" + s + "\"");
     is_diff_out_.push_back(is_diff);
     out_.push_back(e);
@@ -212,7 +212,7 @@ namespace casadi {
     // Get prefix
     casadi_assert(has_prefix(s), "Cannot process \"" + s + "\" as output."
       " Available: " + join(oname()) + ".");
-    pair<string, string> ss = split_prefix(s);
+    std::pair<std::string, std::string> ss = split_prefix(s);
 
     if (ss.first=="fwd") {
       fwd_out_.push_back(omap(ss.second));
@@ -230,7 +230,7 @@ namespace casadi {
     }
 
     // Replace colons with underscore
-    string ret = s;
+    std::string ret = s;
     replace(ret.begin(), ret.end(), ':', '_');
     return ret;
   }
@@ -611,8 +611,8 @@ namespace casadi {
 
     // Assume attribute
     casadi_assert(has_prefix(s), "Cannot process \"" + s + "\"");
-    pair<string, string> ss = split_prefix(s);
-    string a = ss.first;
+    std::pair<std::string, std::string> ss = split_prefix(s);
+    std::string a = ss.first;
     MatType r = get_output(ss.second);
 
     // Process attributes
@@ -648,7 +648,7 @@ namespace casadi {
     casadi_assert_dev(!s.empty());
     size_t pos = s.find(':');
     casadi_assert(pos<s.size(), "Cannot process \"" + s + "\"");
-    return make_pair(s.substr(0, pos), s.substr(pos+1, std::string::npos));
+    return std::make_pair(s.substr(0, pos), s.substr(pos+1, std::string::npos));
   }
 
   template<typename MatType>

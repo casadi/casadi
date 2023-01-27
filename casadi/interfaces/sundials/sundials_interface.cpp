@@ -124,9 +124,9 @@ namespace casadi {
     use_precon_ = true;
     max_krylov_ = 10;
     linear_solver_ = "qr";
-    string newton_scheme = "direct";
+    std::string newton_scheme = "direct";
     quad_err_con_ = false;
-    string interpolation_type = "hermite";
+    std::string interpolation_type = "hermite";
     steps_per_checkpoint_ = 20;
     disable_internal_warnings_ = false;
     max_multistep_order_ = 5;

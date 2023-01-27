@@ -44,7 +44,7 @@ namespace casadi {
   void LinsolInternal::disp(ostream &stream, bool more) const {
     stream << "Linear solver " << class_name();
     if (more) {
-      stream << endl;
+      stream << std::endl;
       disp_more(stream);
     }
   }

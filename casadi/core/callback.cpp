@@ -24,8 +24,6 @@
 
 #include "callback_internal.hpp"
 
-using namespace std;
-
 namespace casadi {
 
   Callback::Callback() {

@@ -769,7 +769,7 @@ namespace casadi {
     // Prefix
     std::string prefix;
 
-    // Stringstreams holding the different parts of the file being generated
+    // std::stringstreams holding the different parts of the file being generated
     std::stringstream includes;
     std::stringstream auxiliaries;
     std::stringstream body;

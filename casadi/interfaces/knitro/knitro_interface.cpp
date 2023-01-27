@@ -215,7 +215,7 @@ namespace casadi {
     casadi_assert(status == 0, "KN_set_puts_callback failed");
 
     // Jacobian sparsity
-    vector<int> Jcol, Jrow;
+    std::vector<int> Jcol, Jrow;
     if (!jacg_sp_.is_null()) {
       assign_vector(jacg_sp_.get_col(), Jcol);
       assign_vector(jacg_sp_.get_row(), Jrow);
@@ -223,7 +223,7 @@ namespace casadi {
 
     // Hessian sparsity
     casadi_int nnzH = hesslag_sp_.is_null() ? 0 : hesslag_sp_.nnz();
-    vector<int> Hcol, Hrow;
+    std::vector<int> Hcol, Hrow;
     if (nnzH>0) {
       assign_vector(hesslag_sp_.get_col(), Hcol);
       assign_vector(hesslag_sp_.get_row(), Hrow);
@@ -255,7 +255,7 @@ namespace casadi {
           continue;
         case KN_PARAMTYPE_STRING:
           {
-            string str = op.second.to_string();
+            std::string str = op.second.to_string();
             casadi_assert(!KN_set_char_param(m->kc, param_id, str.c_str()),
               "Error when setting option '" + op.first + "'.");
           }
@@ -275,8 +275,8 @@ namespace casadi {
     for (casadi_int i=0; i<ng_; ++i) if (isinf(m->wlbg[i])) m->wlbg[i] = -KN_INFINITY;
     for (casadi_int i=0; i<ng_; ++i) if (isinf(m->wubg[i])) m->wubg[i] =  KN_INFINITY;
 
-    vector<int> xindex(nx_);
-    vector<int> gindex(ng_);
+    std::vector<int> xindex(nx_);
+    std::vector<int> gindex(ng_);
     iota (begin(xindex), end(xindex), 0);
     iota (begin(gindex), end(gindex), 0);
 
@@ -298,7 +298,7 @@ namespace casadi {
     casadi_assert(status==0, "KN_set_var_primal_init_values failed");
     if (mi_) {
         // Types of variables
-        vector<int> vtype;
+        std::vector<int> vtype;
         vtype.reserve(nx_);
         for (auto&& e : discrete_) {
             vtype.push_back(e ? KN_VARTYPE_INTEGER : KN_VARTYPE_CONTINUOUS);
@@ -332,7 +332,7 @@ namespace casadi {
     casadi_assert(status==0, "KN_set_cb_user_params failed");
 
     // Lagrange multipliers
-    vector<double> lambda(nx_+ng_);
+    std::vector<double> lambda(nx_+ng_);
 
     // objective solution
     double objSol;
@@ -442,7 +442,7 @@ namespace casadi {
       return KN_RC_USER_TERMINATION;
     } catch(exception& ex) {
       uerr() << "KnitroInterface::callback caught exception: "
-                               << ex.what() << endl;
+                               << ex.what() << std::endl;
       return -1;
     }
 

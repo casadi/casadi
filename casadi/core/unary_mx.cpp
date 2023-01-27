@@ -104,7 +104,7 @@ namespace casadi {
   void UnaryMX::generate(CodeGenerator& g,
                           const std::vector<casadi_int>& arg,
                           const std::vector<casadi_int>& res) const {
-    string r, x;
+    std::string r, x;
     if (nnz()==1) {
       // Scalar assignment
       r = g.workel(res[0]);

@@ -518,12 +518,12 @@ namespace casadi {
               << "Warning: intermediate_callback is disfunctional in your installation. "
               "You will only be able to use stats(). "
               "See https://github.com/casadi/casadi/wiki/enableBonminCallback to enable it."
-              << endl;
+              << std::endl;
           }
         }
 
         // Inputs
-        fill_n(m->arg, fcallback_.n_in(), nullptr);
+        std::fill_n(m->arg, fcallback_.n_in(), nullptr);
         if (full_callback) {
           // The values used below are meaningless
           // when not doing a full_callback
@@ -536,7 +536,7 @@ namespace casadi {
         }
 
         // Outputs
-        fill_n(m->res, fcallback_.n_out(), nullptr);
+        std::fill_n(m->res, fcallback_.n_out(), nullptr);
         double ret_double;
         m->res[0] = &ret_double;
 
@@ -552,7 +552,7 @@ namespace casadi {
       return 0;
     } catch(exception& ex) {
       if (iteration_callback_ignore_errors_) {
-        uerr() << "intermediate_callback: " << ex.what() << endl;
+        uerr() << "intermediate_callback: " << ex.what() << std::endl;
         return 1;
       }
       return 0;
@@ -584,7 +584,7 @@ namespace casadi {
       m->success = status==Bonmin::TMINLP::SUCCESS;
       if (status==Bonmin::TMINLP::LIMIT_EXCEEDED) m->unified_return_status = SOLVER_RET_LIMITED;
     } catch(exception& ex) {
-      uerr() << "finalize_solution failed: " << ex.what() << endl;
+      uerr() << "finalize_solution failed: " << ex.what() << std::endl;
     }
   }
 
@@ -603,7 +603,7 @@ namespace casadi {
       casadi_copy(d_nlp->ubz+nx_, ng_, g_u);
       return true;
     } catch(exception& ex) {
-      uerr() << "get_bounds_info failed: " << ex.what() << endl;
+      uerr() << "get_bounds_info failed: " << ex.what() << std::endl;
       return false;
     }
   }
@@ -634,7 +634,7 @@ namespace casadi {
 
       return true;
     } catch(exception& ex) {
-      uerr() << "get_starting_point failed: " << ex.what() << endl;
+      uerr() << "get_starting_point failed: " << ex.what() << std::endl;
       return false;
     }
   }
@@ -655,7 +655,7 @@ namespace casadi {
       nnz_h_lag = exact_hessian_ ? hesslag_sp_.nnz() : 0;
 
     } catch(exception& ex) {
-      uerr() << "get_nlp_info failed: " << ex.what() << endl;
+      uerr() << "get_nlp_info failed: " << ex.what() << std::endl;
     }
   }
 
@@ -671,7 +671,7 @@ namespace casadi {
         return nv;
       }
     } catch(exception& ex) {
-      uerr() << "get_number_of_nonlinear_variables failed: " << ex.what() << endl;
+      uerr() << "get_number_of_nonlinear_variables failed: " << ex.what() << std::endl;
       return -1;
     }
   }
@@ -684,7 +684,7 @@ namespace casadi {
       }
       return true;
     } catch(exception& ex) {
-      uerr() << "get_list_of_nonlinear_variables failed: " << ex.what() << endl;
+      uerr() << "get_list_of_nonlinear_variables failed: " << ex.what() << std::endl;
       return false;
     }
   }

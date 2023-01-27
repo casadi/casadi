@@ -430,8 +430,8 @@ namespace casadi {
     if (restore_feas_) {
       // get orignal nlp
       Function nlp = oracle_;
-      vector<MX> resv;
-      vector<MX> argv = nlp.mx_in();
+      std::vector<MX> resv;
+      std::vector<MX> argv = nlp.mx_in();
 
       // build fesibility restoration phase nlp
       MX p = MX::sym("p", nlp.size1_in("x"));
@@ -639,7 +639,7 @@ namespace casadi {
     casadi_int ret = 0;
 
     // Create problem evaluation object
-    vector<casadi_int> blocks = blocks_;
+    std::vector<casadi_int> blocks = blocks_;
 
     /*-------------------------------------------------*/
     /* Create blockSQP method object and run algorithm */
@@ -1449,7 +1449,7 @@ namespace casadi {
     DMDict solver_in;
 
     // The reference point is the starting value for the restoration phase
-    vector<double> in_x0(d_nlp->z, d_nlp->z+nx_);
+    std::vector<double> in_x0(d_nlp->z, d_nlp->z+nx_);
 
     // Initialize slack variables such that the constraints are feasible
     for (casadi_int i=0; i<ng_; i++) {
@@ -1462,21 +1462,21 @@ namespace casadi {
     }
 
     // Add current iterate xk to parameter p
-    vector<double> in_p(d_nlp->p, d_nlp->p+np_);
-    vector<double> in_p2(d_nlp->z, d_nlp->z+nx_);
+    std::vector<double> in_p(d_nlp->p, d_nlp->p+np_);
+    std::vector<double> in_p2(d_nlp->z, d_nlp->z+nx_);
     in_p.insert(in_p.end(), in_p2.begin(), in_p2.end());
 
     // Set bounds for variables
-    vector<double> in_lbx(d_nlp->lbz, d_nlp->lbz+nx_);
-    vector<double> in_ubx(d_nlp->ubz, d_nlp->ubz+nx_);
+    std::vector<double> in_lbx(d_nlp->lbz, d_nlp->lbz+nx_);
+    std::vector<double> in_ubx(d_nlp->ubz, d_nlp->ubz+nx_);
     for (casadi_int i=0; i<ng_; i++) {
       in_lbx.push_back(-inf);
       in_ubx.push_back(inf);
     }
 
     // Set bounds for constraints
-    vector<double> in_lbg(d_nlp->lbz+nx_, d_nlp->lbz+nx_+ng_);
-    vector<double> in_ubg(d_nlp->ubz+nx_, d_nlp->ubz+nx_+ng_);
+    std::vector<double> in_lbg(d_nlp->lbz+nx_, d_nlp->lbz+nx_+ng_);
+    std::vector<double> in_ubg(d_nlp->ubz+nx_, d_nlp->ubz+nx_+ng_);
 
     solver_in["x0"] = in_x0;
     solver_in["p"] = in_p;
@@ -1507,7 +1507,7 @@ namespace casadi {
     int n_out = rp_solver_.n_out();
 
     // Get default inputs
-    vector<DM> arg_v(n_in);
+    std::vector<DM> arg_v(n_in);
     for (casadi_int i=0; i<arg_v.size(); i++)
       arg_v[i] = DM::repmat(rp_solver_.default_in(i), rp_solver_.size1_in(i), 1);
 
@@ -2152,7 +2152,7 @@ namespace casadi {
     // Bdelta = B*delta (if sizing is enabled, B is the sized B!)
     // h1 = delta^T * B * delta
     // h2 = delta^T * gamma
-    vector<double> Bdelta(dim, 0.0);
+    std::vector<double> Bdelta(dim, 0.0);
     for (casadi_int i=0; i<dim; i++) {
       for (casadi_int k=0; k<dim; k++)
         Bdelta[i] += B[i+k*dim] * delta[k];
@@ -2216,7 +2216,7 @@ namespace casadi {
 
     // gmBdelta = gamma - B*delta
     // h = (gamma - B*delta)^T * delta
-    vector<double> gmBdelta(dim);
+    std::vector<double> gmBdelta(dim);
     for (casadi_int i=0; i<dim; i++) {
       gmBdelta[i] = gamma[i];
       for (casadi_int k=0; k<dim; k++)

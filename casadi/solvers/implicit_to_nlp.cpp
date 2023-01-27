@@ -70,7 +70,7 @@ namespace casadi {
     Rootfinder::init(opts);
 
     // Default options
-    string nlpsol_plugin;
+    std::string nlpsol_plugin;
     Dict nlpsol_options;
 
     // Read user options
@@ -89,7 +89,7 @@ namespace casadi {
     std::vector<MX> inputs;
     for (casadi_int i=0; i<n_in_; ++i) {
       if (i!=iin_) {
-        stringstream ss;
+        std::stringstream ss;
         ss << "p" << i;
         inputs.push_back(MX::sym(ss.str(), sparsity_in_[i]));
       }
@@ -139,8 +139,8 @@ namespace casadi {
     auto m = static_cast<ImplicitToNlpMemory*>(mem);
 
     // Buffers for calling the NLP solver
-    fill_n(m->arg, static_cast<casadi_int>(NLPSOL_NUM_IN), nullptr);
-    fill_n(m->res, static_cast<casadi_int>(NLPSOL_NUM_OUT), nullptr);
+    std::fill_n(m->arg, static_cast<casadi_int>(NLPSOL_NUM_IN), nullptr);
+    std::fill_n(m->res, static_cast<casadi_int>(NLPSOL_NUM_OUT), nullptr);
 
     // Initial guess
     m->arg[NLPSOL_X] = m->iarg[iin_];
@@ -150,9 +150,9 @@ namespace casadi {
     m->arg[NLPSOL_UBG] = nullptr;
 
     // Variable bounds
-    fill_n(m->lbx, n_, -std::numeric_limits<double>::infinity());
+    std::fill_n(m->lbx, n_, -std::numeric_limits<double>::infinity());
     m->arg[NLPSOL_LBX] = m->lbx;
-    fill_n(m->ubx, n_,  std::numeric_limits<double>::infinity());
+    std::fill_n(m->ubx, n_,  std::numeric_limits<double>::infinity());
     m->arg[NLPSOL_UBX] = m->ubx;
     for (casadi_int k=0; k<u_c_.size(); ++k) {
       if (u_c_[k] > 0) m->lbx[k] = 0;
@@ -190,9 +190,9 @@ namespace casadi {
 
     // Evaluate auxilary outputs, if necessary
     if (has_aux) {
-      copy_n(m->iarg, n_in_, m->arg);
+      std::copy_n(m->iarg, n_in_, m->arg);
       m->arg[iin_] = m->x;
-      copy_n(m->ires, n_out_, m->res);
+      std::copy_n(m->ires, n_out_, m->res);
       m->res[iout_] = nullptr;
       oracle_(m->arg, m->res, m->iw, m->w, 0);
     }

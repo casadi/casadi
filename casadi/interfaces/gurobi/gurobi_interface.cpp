@@ -475,11 +475,11 @@ namespace casadi {
       // Get the optimal solution, if requested
       if (x) {
         flag = GRBgetdblattrarray(model, GRB_DBL_ATTR_X, 0, nx_, x);
-        if (flag) fill_n(x, nx_, casadi::nan);
+        if (flag) std::fill_n(x, nx_, casadi::nan);
       }
 
-      if (lam_x) fill_n(lam_x, nx_, casadi::nan);
-      if (lam_a) fill_n(lam_a, na_, casadi::nan);
+      if (lam_x) std::fill_n(lam_x, nx_, casadi::nan);
+      if (lam_a) std::fill_n(lam_a, na_, casadi::nan);
 
       // Free memory
       GRBfreemodel(model);

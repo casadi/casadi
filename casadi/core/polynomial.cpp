@@ -80,7 +80,7 @@ namespace casadi {
   }
 
   Polynomial Polynomial::operator*(const Polynomial& a) const {
-    vector<double> p_ret(p_.size() + a.p_.size() - 1, 0);
+    std::vector<double> p_ret(p_.size() + a.p_.size() - 1, 0);
     for (casadi_int d=0; d<p_.size(); ++d) {
       for (casadi_int d_a=0; d_a<a.p_.size(); ++d_a) {
         p_ret[d+d_a] += p_[d] * a.p_[d_a];
@@ -134,13 +134,13 @@ namespace casadi {
   void Polynomial::trim() {
     // Remove trailing zeros
     size_t new_size = p_.size();
-    vector<double>::const_reverse_iterator it=p_.rbegin();
+    std::vector<double>::const_reverse_iterator it=p_.rbegin();
     while (it!=p_.rend() && 0==*it++) new_size--;
     p_.resize(new_size);
   }
 
   Polynomial Polynomial::derivative() const {
-    vector<double> ret_p(p_.size()-1);
+    std::vector<double> ret_p(p_.size()-1);
     for (casadi_int k=1; k<p_.size(); ++k) {
       ret_p[k-1] = static_cast<double>(k)*p_[k];
     }
@@ -148,7 +148,7 @@ namespace casadi {
   }
 
   Polynomial Polynomial::anti_derivative() const {
-    vector<double> ret_p(p_.size()+1);
+    std::vector<double> ret_p(p_.size()+1);
     ret_p[0] = 0;
     for (casadi_int k=0; k<p_.size(); ++k) {
       ret_p[k+1] = p_[k]/static_cast<double>(k+1);

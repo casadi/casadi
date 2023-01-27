@@ -61,16 +61,16 @@ int main(){
   solver.generate_dependencies("nlp.c");
 
   // Generate Makefile
-  ofstream makefile;
+  std::ofstream makefile;
   makefile.open("./CMakeLists.txt");
-  makefile << "cmake_minimum_required(VERSION 3.10.2)" << endl;
-  makefile << "project(nlp-codegen-autogen C)" << endl;
+  makefile << "cmake_minimum_required(VERSION 3.10.2)" << std::endl;
+  makefile << "project(nlp-codegen-autogen C)" << std::endl;
   
   // Generate compilation instructions
-  makefile << "add_library(nlp SHARED nlp.c)" << endl;
-  makefile << "set_target_properties(nlp PROPERTIES PREFIX \"\")" << endl;
-  makefile << "set_target_properties(nlp PROPERTIES SUFFIX \".casadi\")" << endl;
-  makefile << endl;
+  makefile << "add_library(nlp SHARED nlp.c)" << std::endl;
+  makefile << "set_target_properties(nlp PROPERTIES PREFIX \"\")" << std::endl;
+  makefile << "set_target_properties(nlp PROPERTIES SUFFIX \".casadi\")" << std::endl;
+  makefile << std::endl;
 
   // Finalize makefile
   makefile.close();

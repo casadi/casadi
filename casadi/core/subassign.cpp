@@ -59,7 +59,7 @@ namespace casadi {
   }
 
   std::string SubAssign::disp(const std::vector<std::string>& arg) const {
-    stringstream ss;
+    std::stringstream ss;
     ss << "(" << arg.at(0) << "[" << i_ << ", " << j_ << "]=" << arg.at(1) << ")";
     return ss.str();
   }

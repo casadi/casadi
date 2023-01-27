@@ -166,7 +166,7 @@ namespace casadi {
     MX dt = h/N;
 
     std::vector<MX> k(order);
-    vector<MX> f_arg(2);
+    std::vector<MX> f_arg(2);
 
     // Integrate
     MX xf = x0;
@@ -247,13 +247,13 @@ namespace casadi {
     bool has_end = tau.back()==1;
 
     // Coefficients of the collocation equation
-    vector<vector<double> > C_(deg+1, vector<double>(deg+1, 0));
+    std::vector<vector<double> > C_(deg+1, std::vector<double>(deg+1, 0));
 
     // Coefficients of the continuity equation
-    vector<double> D_(deg+1, 0);
+    std::vector<double> D_(deg+1, 0);
 
     // Coefficients of the quadratures
-    vector<double> B_(deg+1, 0);
+    std::vector<double> B_(deg+1, 0);
 
     // For all collocation points
     for (casadi_int j=0; j<deg+1; ++j) {
@@ -373,7 +373,7 @@ namespace casadi {
 
     // Normalized xdot
     casadi_int u_offset[] = {0, 1, 1+p_sp.size1()};
-    vector<MX> pp = vertsplit(u, vector<casadi_int>(u_offset, u_offset+3));
+    std::vector<MX> pp = vertsplit(u, std::vector<casadi_int>(u_offset, u_offset+3));
     MX h = pp[0];
     MX p = reshape(pp[1], p_sp.size());
     MX f_in[] = {x, p};

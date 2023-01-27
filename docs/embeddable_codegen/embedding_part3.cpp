@@ -49,11 +49,11 @@ int main(){
   auto res = solver(arg);
 
   // Print solution
-  cout << "-----" << endl;
-  cout << "objective at solution = " << res.at("f") << endl;
-  cout << "primal solution = " << res.at("x") << endl;
-  cout << "dual solution (x) = " << res.at("lam_x") << endl;
-  cout << "dual solution (g) = " << res.at("lam_g") << endl;
+  cout << "-----" << std::endl;
+  cout << "objective at solution = " << res.at("f") << std::endl;
+  cout << "primal solution = " << res.at("x") << std::endl;
+  cout << "dual solution (x) = " << res.at("lam_x") << std::endl;
+  cout << "dual solution (g) = " << res.at("lam_g") << std::endl;
   
   return 0;
 }

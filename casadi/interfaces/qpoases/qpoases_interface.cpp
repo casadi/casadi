@@ -210,7 +210,7 @@ namespace casadi {
       } else if (op.first=="schur") {
         schur_=  op.second;
       } else if (op.first=="hessian_type") {
-        string h = op.second;
+        std::string h = op.second;
         if (h=="unknown") {
           hess_ = qpOASES::HessianType::HST_UNKNOWN;
         } else if (h=="posdef") {
@@ -762,7 +762,7 @@ namespace casadi {
     }
 
     // Default error message
-    stringstream ss;
+    std::stringstream ss;
     ss << "Unknown error flag: " << flag << ". Consult qpOASES documentation.";
     return ss.str();
   }

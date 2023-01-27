@@ -219,7 +219,7 @@ namespace casadi {
     lbfgs_memory_ = 10;
     tol_pr_ = 1e-6;
     tol_du_ = 1e-6;
-    string hessian_approximation = "exact";
+    std::string hessian_approximation = "exact";
     // min_step_size_ = 1e-10;
     std::string solve_type = "SQP";
     std::string qpsol_plugin = "qpoases";
@@ -984,7 +984,7 @@ int Feasiblesqpmethod::solve(void* mem) const {
     const double one = 1.;
 
     // Info for printing
-    string info = "";
+    std::string info = "";
 
     casadi_clear(d->dx, nx_);
 
@@ -1345,7 +1345,7 @@ int Feasiblesqpmethod::solve(void* mem) const {
                            double* x_opt, double* dlam, int mode) const {
     ScopedTiming tic(m->fstats.at("QP"));
     // Inputs
-    fill_n(m->arg, qpsol_.n_in(), nullptr);
+    std::fill_n(m->arg, qpsol_.n_in(), nullptr);
     // double lol;
     m->arg[CONIC_H] = nullptr;
     m->arg[CONIC_G] = g;
@@ -1359,7 +1359,7 @@ int Feasiblesqpmethod::solve(void* mem) const {
     m->arg[CONIC_UBA] = ubdz+nx_;
 
     // Outputs
-    fill_n(m->res, qpsol_.n_out(), nullptr);
+    std::fill_n(m->res, qpsol_.n_out(), nullptr);
     m->res[CONIC_X] = x_opt;
     m->res[CONIC_LAM_X] = dlam;
     m->res[CONIC_LAM_A] = dlam + nx_;
@@ -1381,7 +1381,7 @@ int Feasiblesqpmethod::solve(void* mem) const {
                            double* x_opt, double* dlam, int mode) const {
     ScopedTiming tic(m->fstats.at("QP"));
     // Inputs
-    fill_n(m->arg, qpsol_.n_in(), nullptr);
+    std::fill_n(m->arg, qpsol_.n_in(), nullptr);
     m->arg[CONIC_H] = H;
     m->arg[CONIC_G] = g;
     m->arg[CONIC_X0] = x_opt;
@@ -1394,7 +1394,7 @@ int Feasiblesqpmethod::solve(void* mem) const {
     m->arg[CONIC_UBA] = ubdz+nx_;
 
     // Outputs
-    fill_n(m->res, qpsol_.n_out(), nullptr);
+    std::fill_n(m->res, qpsol_.n_out(), nullptr);
     m->res[CONIC_X] = x_opt;
     m->res[CONIC_LAM_X] = dlam;
     m->res[CONIC_LAM_A] = dlam + nx_;

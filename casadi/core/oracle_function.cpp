@@ -122,7 +122,7 @@ namespace casadi {
     }
 
     // Set corresponding monitors
-    for (const string& fname : monitor_) {
+    for (const std::string& fname : monitor_) {
       auto it = all_functions_.find(fname);
       if (it==all_functions_.end()) {
         casadi_warning("Ignoring monitor '" + fname + "'."
@@ -224,7 +224,7 @@ namespace casadi {
 
     // Input buffers
     if (arg) {
-      fill_n(ml->arg, n_in, nullptr);
+      std::fill_n(ml->arg, n_in, nullptr);
       for (casadi_int i=0; i<n_in; ++i) ml->arg[i] = *arg++;
     }
 

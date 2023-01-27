@@ -67,12 +67,12 @@ namespace casadi {
   }
 
   int SymbolicMX::sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
-    fill_n(res[0], nnz(), 0);
+    std::fill_n(res[0], nnz(), 0);
     return 0;
   }
 
   int SymbolicMX::sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
-    fill_n(res[0], nnz(), 0);
+    std::fill_n(res[0], nnz(), 0);
     return 0;
   }
 

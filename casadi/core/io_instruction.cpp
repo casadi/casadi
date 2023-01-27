@@ -34,17 +34,17 @@ namespace casadi {
     set_sparsity(sp);
   }
 
-  string Input::disp(const vector<string>& arg) const {
-    stringstream s;
+  std::string Input::disp(const std::vector<std::string>& arg) const {
+    std::stringstream s;
     s << "input[" << ind_ << "][" << segment_ << "]";
     return s.str();
   }
 
   void Input::generate(CodeGenerator& g,
-                       const vector<casadi_int>& arg, const vector<casadi_int>& res) const {
+                       const std::vector<casadi_int>& arg, const std::vector<casadi_int>& res) const {
     casadi_int nnz = this->nnz();
     if (nnz==0) return; // quick return
-    string a = g.arg(ind_);
+    std::string a = g.arg(ind_);
     casadi_int i = res.front();
     if (nnz==1) {
       g << g.workel(i) << " = " << a << " ? " << a << "[" << offset_ << "] : 0;\n";
@@ -61,18 +61,18 @@ namespace casadi {
     set_dep(x);
   }
 
-  string Output::disp(const vector<string>& arg) const {
-    stringstream s;
+  std::string Output::disp(const std::vector<std::string>& arg) const {
+    std::stringstream s;
     s << "output[" << ind_ << "][" << segment_ << "]";
     return s.str();
   }
 
   void Output::generate(CodeGenerator& g,
-                       const vector<casadi_int>& arg, const vector<casadi_int>& res) const {
+                       const std::vector<casadi_int>& arg, const std::vector<casadi_int>& res) const {
     casadi_int nnz = dep().nnz();
     if (nnz==0) return; // quick return
     casadi_int i = arg.front();
-    string r = g.res(ind_);
+    std::string r = g.res(ind_);
     if (nnz==1) {
       g << "if (" << r << ") " << r << "[" << offset_ << "] = " << g.workel(i) << ";\n";
     } else if (offset_==0) {

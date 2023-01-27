@@ -73,7 +73,7 @@ int main(){
   MX U = MX::sym("U",nu); // control for all segments
 
   // Initial position
-  vector<double> X0(3);
+  std::vector<double> X0(3);
   X0[0] = 0; // initial position
   X0[1] = 0; // initial speed
   X0[2] = 1; // initial mass
@@ -82,7 +82,7 @@ int main(){
   MX X=X0;
   for(int k=0; k<nu; ++k){
     // Assemble the input
-    vector<MX> input(2);
+    std::vector<MX> input(2);
     input[0] = U(k);
     input[1] = X;
 
@@ -111,7 +111,7 @@ int main(){
   arg["x0"] = 0.4;
 
   // Bounds on g
-  vector<double> Gmin(2), Gmax(2);
+  std::vector<double> Gmin(2), Gmax(2);
   Gmin[0] = Gmax[0] = 10;
   Gmin[1] = Gmax[1] =  0;
   arg["lbg"] = Gmin;
@@ -121,7 +121,7 @@ int main(){
   res = solver(arg);
 
   // Get the solution
-  cout << "optimal solution: " << res.at("x") << endl;
+  cout << "optimal solution: " << res.at("x") << std::endl;
 
   return 0;
 }

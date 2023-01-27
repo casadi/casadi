@@ -262,7 +262,7 @@ namespace casadi {
       inner = to_slice(v);
       outer.start = 0;
       outer.step = outer.stop = inner.stop;
-      return make_pair(inner, outer);
+      return std::make_pair(inner, outer);
     }
 
     // Get the slices
@@ -286,7 +286,7 @@ namespace casadi {
       if (outer.step>0) outer.stop++;
       else              outer.stop--;
     } while (outer.stop % outer.step!=0);
-    return make_pair(inner, outer);
+    return std::make_pair(inner, outer);
   }
 
 

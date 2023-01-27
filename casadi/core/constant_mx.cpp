@@ -29,8 +29,6 @@
 #include "casadi_misc.hpp"
 #include "serializing_stream.hpp"
 
-using namespace std;
-
 namespace casadi {
 
   ConstantMX::ConstantMX(const Sparsity& sp) {
@@ -89,12 +87,12 @@ namespace casadi {
   }
 
   int ConstantMX::sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
-    fill_n(res[0], nnz(), 0);
+    std::fill_n(res[0], nnz(), 0);
     return 0;
   }
 
   int ConstantMX::sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
-    fill_n(res[0], nnz(), 0);
+    std::fill_n(res[0], nnz(), 0);
     return 0;
   }
 
@@ -102,7 +100,7 @@ namespace casadi {
                             const std::vector<casadi_int>& arg,
                             const std::vector<casadi_int>& res) const {
     // Print the constant
-    string ind = g.constant(x_.nonzeros());
+    std::string ind = g.constant(x_.nonzeros());
 
     // Copy the constant to the work vector
     g << g.copy(ind, nnz(), g.work(res[0], nnz())) << '\n';
@@ -147,7 +145,7 @@ namespace casadi {
       return create(val.sparsity(), val.scalar());
     } else {
       // Check if all values are the same
-      const vector<double> vdata = val.nonzeros();
+      const std::vector<double> vdata = val.nonzeros();
       double v = vdata[0];
       for (auto&& i : vdata) {
         if (i!=v) {

@@ -56,7 +56,7 @@ namespace casadi {
                                              const std::vector<T>& mat) {
     casadi_assert_dev(id.size()==mat.size());
     std::vector<std::pair<std::string, T>> r(id.size());
-    for (casadi_uint i=0; i<r.size(); ++i) r[i] = make_pair(id[i], mat[i]);
+    for (casadi_uint i=0; i<r.size(); ++i) r[i] = std::make_pair(id[i], mat[i]);
     return r;
   }
 

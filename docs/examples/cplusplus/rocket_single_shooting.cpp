@@ -59,7 +59,7 @@ int main(){
   double tf = T/nu;
 
   // Initial position
-  vector<double> X0(3);
+  std::vector<double> X0(3);
   X0[0] = 0; // initial position
   X0[1] = 0; // initial speed
   X0[2] = 1; // initial mass
@@ -81,13 +81,13 @@ int main(){
   SX rhs = SX::vertcat({v, (u-alpha*v*v)/m, -beta*u*u});
 
   // Initial conditions
-  vector<double> x0 = {0, 0, 1};
+  std::vector<double> x0 = {0, 0, 1};
 
   // DAE
   SXDict dae = {{"x", x}, {"p", u}, {"t", t}, {"ode", rhs}};
 
   // Integrator options
-  string plugin;
+  std::string plugin;
   Dict opts;
   if(sundials_integrator){
     if(explicit_integrator){
@@ -147,7 +147,7 @@ int main(){
 
   // NLP solver options
   Dict solver_opts;
-  string solver_name;
+  std::string solver_name;
   if(lifted_newton){
     solver_name = "scpgen";
     solver_opts["verbose"] = true;
@@ -171,16 +171,16 @@ int main(){
   Function solver = nlpsol("nlpsol", solver_name, nlp, solver_opts);
 
   // Bounds on u and initial condition
-  vector<double> umin(nu, -10), umax(nu, 10), u0(nu, 0.4);
+  std::vector<double> umin(nu, -10), umax(nu, 10), u0(nu, 0.4);
 
   // Bounds on g
-  vector<double> gmin = {10, 0}, gmax = {10, 0};
+  std::vector<double> gmin = {10, 0}, gmax = {10, 0};
 
   // Solve NLP
-  vector<double> Usol;
+  std::vector<double> Usol;
   solver({{"lbx", umin}, {"ubx", umax}, {"x0", u0}, {"lbg", gmin}, {"ubg", gmax}},
          {{"x", &Usol}});
-  cout << "optimal solution: " << Usol << endl;
+  cout << "optimal solution: " << Usol << std::endl;
 
   return 0;
 }

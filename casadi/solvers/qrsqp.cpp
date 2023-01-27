@@ -130,9 +130,9 @@ namespace casadi {
     tol_pr_ = 1e-6;
     tol_du_ = 1e-6;
     regularize_ = false;
-    string hessian_approximation = "exact";
+    std::string hessian_approximation = "exact";
     min_step_size_ = 1e-10;
-    string qpsol_plugin = "qrqp";
+    std::string qpsol_plugin = "qrqp";
     Dict qpsol_options;
     print_header_ = true;
     print_iteration_ = true;
@@ -539,7 +539,7 @@ namespace casadi {
                            const double* lbdz, const double* ubdz,
                            const double* A, double* x_opt, double* dlam) const {
     // Inputs
-    fill_n(m->arg, qpsol_.n_in(), nullptr);
+    std::fill_n(m->arg, qpsol_.n_in(), nullptr);
     m->arg[CONIC_H] = H;
     m->arg[CONIC_G] = g;
     m->arg[CONIC_X0] = x_opt;
@@ -552,7 +552,7 @@ namespace casadi {
     m->arg[CONIC_UBA] = ubdz + nx_;
 
     // Outputs
-    fill_n(m->res, qpsol_.n_out(), nullptr);
+    std::fill_n(m->res, qpsol_.n_out(), nullptr);
     m->res[CONIC_X] = x_opt;
     m->res[CONIC_LAM_X] = dlam;
     m->res[CONIC_LAM_A] = dlam + nx_;

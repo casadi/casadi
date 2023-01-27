@@ -274,9 +274,9 @@ namespace casadi {
     *userclass = new IpoptUserClass(*this, m);
 
     if (verbose_) {
-      uout() << "There are " << nx_ << " variables and " << ng_ << " constraints." << endl;
-      if (exact_hessian_) uout() << "Using exact Hessian" << endl;
-      else             uout() << "Using limited memory Hessian approximation" << endl;
+      uout() << "There are " << nx_ << " variables and " << ng_ << " constraints." << std::endl;
+      if (exact_hessian_) uout() << "Using exact Hessian" << std::endl;
+      else             uout() << "Using limited memory Hessian approximation" << std::endl;
     }
 
     // Get all options available in (s)IPOPT
@@ -507,12 +507,12 @@ namespace casadi {
               << "Warning: intermediate_callback is disfunctional in your installation. "
               "You will only be able to use stats(). "
               "See https://github.com/casadi/casadi/wiki/enableIpoptCallback to enable it."
-              << endl;
+              << std::endl;
           }
         }
 
         // Inputs
-        fill_n(m->arg, fcallback_.n_in(), nullptr);
+        std::fill_n(m->arg, fcallback_.n_in(), nullptr);
         if (full_callback) {
           // The values used below are meaningless
           // when not doing a full_callback
@@ -525,7 +525,7 @@ namespace casadi {
         }
 
         // Outputs
-        fill_n(m->res, fcallback_.n_out(), nullptr);
+        std::fill_n(m->res, fcallback_.n_out(), nullptr);
         double ret_double;
         m->res[0] = &ret_double;
 
@@ -540,7 +540,7 @@ namespace casadi {
     } catch(KeyboardInterruptException& ex) {
       return 0;
     } catch(exception& ex) {
-      uerr() << "intermediate_callback: " << ex.what() << endl;
+      uerr() << "intermediate_callback: " << ex.what() << std::endl;
       if (iteration_callback_ignore_errors_) return 1;
       return 0;
     }
@@ -573,7 +573,7 @@ namespace casadi {
       m->iter_count = iter_count;
 
     } catch(exception& ex) {
-      uerr() << "finalize_solution failed: " << ex.what() << endl;
+      uerr() << "finalize_solution failed: " << ex.what() << std::endl;
     }
   }
 
@@ -588,7 +588,7 @@ namespace casadi {
       casadi_copy(d_nlp->ubz+nx_, ng_, g_u);
       return true;
     } catch(exception& ex) {
-      uerr() << "get_bounds_info failed: " << ex.what() << endl;
+      uerr() << "get_bounds_info failed: " << ex.what() << std::endl;
       return false;
     }
   }
@@ -619,7 +619,7 @@ namespace casadi {
 
       return true;
     } catch(exception& ex) {
-      uerr() << "get_starting_point failed: " << ex.what() << endl;
+      uerr() << "get_starting_point failed: " << ex.what() << std::endl;
       return false;
     }
   }
@@ -640,7 +640,7 @@ namespace casadi {
       nnz_h_lag = exact_hessian_ ? hesslag_sp_.nnz() : 0;
 
     } catch(exception& ex) {
-      uerr() << "get_nlp_info failed: " << ex.what() << endl;
+      uerr() << "get_nlp_info failed: " << ex.what() << std::endl;
     }
   }
 
@@ -656,7 +656,7 @@ namespace casadi {
         return nv;
       }
     } catch(exception& ex) {
-      uerr() << "get_number_of_nonlinear_variables failed: " << ex.what() << endl;
+      uerr() << "get_number_of_nonlinear_variables failed: " << ex.what() << std::endl;
       return -1;
     }
   }
@@ -669,18 +669,18 @@ namespace casadi {
       }
       return true;
     } catch(exception& ex) {
-      uerr() << "get_list_of_nonlinear_variables failed: " << ex.what() << endl;
+      uerr() << "get_list_of_nonlinear_variables failed: " << ex.what() << std::endl;
       return false;
     }
   }
 
   bool IpoptInterface::
-  get_var_con_metadata(std::map<string, vector<string> >& var_string_md,
-                       std::map<string, vector<int> >& var_integer_md,
-                       std::map<string, vector<double> >& var_numeric_md,
-                       std::map<string, vector<string> >& con_string_md,
-                       std::map<string, vector<int> >& con_integer_md,
-                       std::map<string, vector<double> >& con_numeric_md) const {
+  get_var_con_metadata(std::map<std::string, std::vector<std::string> >& var_string_md,
+                       std::map<std::string, std::vector<int> >& var_integer_md,
+                       std::map<std::string, std::vector<double> >& var_numeric_md,
+                       std::map<std::string, std::vector<std::string> >& con_string_md,
+                       std::map<std::string, std::vector<int> >& con_integer_md,
+                       std::map<std::string, std::vector<double> >& con_numeric_md) const {
     for (auto&& op : var_string_md_) var_string_md[op.first] = op.second;
     for (auto&& op : var_integer_md_) var_integer_md[op.first] = op.second;
     for (auto&& op : var_numeric_md_) var_numeric_md[op.first] = op.second;

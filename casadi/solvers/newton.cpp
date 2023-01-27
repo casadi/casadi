@@ -153,10 +153,10 @@ namespace casadi {
       m->iter++;
 
       // Use x to evaluate g and J
-      copy_n(m->iarg, n_in_, m->arg);
+      std::copy_n(m->iarg, n_in_, m->arg);
       m->arg[iin_] = m->x;
       m->res[0] = m->jac;
-      copy_n(m->ires, n_out_, m->res+1);
+      std::copy_n(m->ires, n_out_, m->res+1);
       m->res[1+iout_] = m->f;
       calc_function(m, "jac_f_z");
 
@@ -190,19 +190,19 @@ namespace casadi {
 
       double alpha = 1;
       if (line_search_) {
-        copy_n(m->iarg, n_in_, m->arg);
+        std::copy_n(m->iarg, n_in_, m->arg);
         m->arg[iin_] = m->x_trial;
-        copy_n(m->ires, n_out_, m->res);
+        std::copy_n(m->ires, n_out_, m->res);
         m->res[iout_] = m->f_trial;
         while (1) {
           // Xtrial = Xk - alpha*J^(-1) F
-          copy_n(m->x, n_, m->x_trial);
+          std::copy_n(m->x, n_, m->x_trial);
           casadi_axpy(n_, -alpha, m->f, m->x_trial);
           calc_function(m, "g");
 
           double abstol_trial = casadi_norm_inf(n_, m->f_trial);
           if (abstol_trial<=(1-alpha/2)*abstol) {
-            copy_n(m->x_trial, n_, m->x);
+            std::copy_n(m->x_trial, n_, m->x);
             break;
           }
           if (alpha*abstolStep <= abstolStep_) {

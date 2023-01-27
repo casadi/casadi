@@ -166,11 +166,11 @@ namespace casadi {
   void LinsolQr::generate(CodeGenerator& g, const std::string& A, const std::string& x,
                           casadi_int nrhs, bool tr) const {
     // Codegen the integer vectors
-    string prinv = g.constant(prinv_);
-    string pc = g.constant(pc_);
-    string sp = g.sparsity(sp_);
-    string sp_v = g.sparsity(sp_v_);
-    string sp_r = g.sparsity(sp_r_);
+    std::string prinv = g.constant(prinv_);
+    std::string pc = g.constant(pc_);
+    std::string sp = g.sparsity(sp_);
+    std::string sp_v = g.sparsity(sp_v_);
+    std::string sp_r = g.sparsity(sp_r_);
 
     // Place in block to avoid conflicts caused by local variables
     g << "{\n";

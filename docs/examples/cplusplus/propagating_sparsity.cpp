@@ -49,7 +49,7 @@ void print_binary(bvec_t v){
       cout << 0;
     }
   }
-  cout << endl;
+  cout << std::endl;
 }
 
 int main(){
@@ -59,23 +59,23 @@ int main(){
     // Create a simple function
     Function f;
     if(test==0){
-      cout << "SX:" << endl;
+      cout << "SX:" << std::endl;
       SX x = SX::sym("x",3);
       SX z = x(0)*x(0)+x(2) + 3;
       f = Function("f", {x}, {z});
     } else {
-      cout << "MX:" << endl;
+      cout << "MX:" << std::endl;
       MX x = MX::sym("x",3);
       MX z = x(0)*x(0)+x(2) + 3;
       f = Function("f", {x}, {z});
     }
 
     // Memory for inputs and outputs
-    vector<bvec_t> f_in(f.nnz_in(0), 0);
-    vector<bvec_t> f_out(f.nnz_out(0), 0);
+    std::vector<bvec_t> f_in(f.nnz_in(0), 0);
+    std::vector<bvec_t> f_out(f.nnz_out(0), 0);
 
     // Propagate from input to output (forward mode)
-    cout << "forward mode" << endl;
+    cout << "forward mode" << std::endl;
 
     // Make sure that the class is able to support the dependency propagation
     casadi_assert(f.has_spfwd(), "Forward sparsity propagation not supported");
@@ -95,7 +95,7 @@ int main(){
     print_binary(f_out[0]);
 
     // Propagate from output to input (adjoint/reverse/backward mode)
-    cout << "backward mode" << endl;
+    cout << "backward mode" << std::endl;
 
     // Make sure that the class is able to support the dependency propagation
     casadi_assert(f.has_sprev(), "Backward sparsity propagation not supported");

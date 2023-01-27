@@ -55,15 +55,15 @@ int main(){
 
   // Solve the Rosenbrock problem
   DMDict arg;
-  arg["x0"] = vector<double>{2.5,3.0,0.75};
+  arg["x0"] = std::vector<double>{2.5,3.0,0.75};
   arg["lbg"] = arg["ubg"] = 0;
   DMDict res = solver(arg);
 
   //  Print solution
-  cout << "Optimal cost:                     " << double(res.at("f")) << endl;
-  cout << "Primal solution:                  " << vector<double>(res.at("x")) << endl;
-  cout << "Dual solution (simple bounds):    " << vector<double>(res.at("lam_x")) << endl;
-  cout << "Dual solution (nonlinear bounds): " << vector<double>(res.at("lam_g")) << endl;
+  cout << "Optimal cost:                     " << double(res.at("f")) << std::endl;
+  cout << "Primal solution:                  " << std::vector<double>(res.at("x")) << std::endl;
+  cout << "Dual solution (simple bounds):    " << std::vector<double>(res.at("lam_x")) << std::endl;
+  cout << "Dual solution (nonlinear bounds): " << std::vector<double>(res.at("lam_g")) << std::endl;
 
   return 0;
 }

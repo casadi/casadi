@@ -85,7 +85,7 @@ namespace casadi {
     Conic::init(opts);
 
     // Default options
-    string nlpsol_plugin;
+    std::string nlpsol_plugin;
     Dict nlpsol_options;
 
     // Read user options
@@ -151,8 +151,8 @@ namespace casadi {
     // Buffers for calling the NLP solver
     const double** arg1 = arg + n_in_;
     double** res1 = res + n_out_;
-    fill_n(arg1, static_cast<casadi_int>(NLPSOL_NUM_IN), nullptr);
-    fill_n(res1, static_cast<casadi_int>(NLPSOL_NUM_OUT), nullptr);
+    std::fill_n(arg1, static_cast<casadi_int>(NLPSOL_NUM_IN), nullptr);
+    std::fill_n(res1, static_cast<casadi_int>(NLPSOL_NUM_OUT), nullptr);
 
     // NLP inputs
     arg1[NLPSOL_X0] = x0_;
@@ -167,27 +167,27 @@ namespace casadi {
     // Quadratic term
     casadi_int nh = nnz_in(CONIC_H);
     if (h_) {
-      copy_n(h_, nh, w);
+      std::copy_n(h_, nh, w);
     } else {
-      fill_n(w, nh, 0);
+      std::fill_n(w, nh, 0);
     }
     w += nh;
 
     // Linear objective term
     casadi_int ng = nnz_in(CONIC_G);
     if (g_) {
-      copy_n(g_, ng, w);
+      std::copy_n(g_, ng, w);
     } else {
-      fill_n(w, ng, 0);
+      std::fill_n(w, ng, 0);
     }
     w += ng;
 
     // Linear constraints
     casadi_int na = nnz_in(CONIC_A);
     if (a_) {
-      copy_n(a_, na, w);
+      std::copy_n(a_, na, w);
     } else {
-      fill_n(w, na, 0);
+      std::fill_n(w, na, 0);
     }
     w += na;
 

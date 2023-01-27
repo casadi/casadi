@@ -496,7 +496,7 @@ namespace casadi {
 
   std::string OoqpInterface::printBounds(const std::vector<double>& b,
                                       const std::vector<char>& ib, casadi_int n, const char *sign) {
-    stringstream ss;
+    std::stringstream ss;
     ss << "[";
     for (casadi_int i=0; i<n; ++i) {
       if (i!=0) ss << ", ";

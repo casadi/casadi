@@ -189,7 +189,7 @@ namespace casadi {
     } catch(int flag) { // recoverable error
       return flag;
     } catch(exception& e) { // non-recoverable error
-      uerr() << "res failed: " << e.what() << endl;
+      uerr() << "res failed: " << e.what() << std::endl;
       return -1;
     }
   }
@@ -199,9 +199,9 @@ namespace casadi {
     try {
       //auto m = to_mem(eh_data);
       //auto& s = m->self;
-      uerr() << msg << endl;
+      uerr() << msg << std::endl;
     } catch(exception& e) {
-      uerr() << "ehfun failed: " << e.what() << endl;
+      uerr() << "ehfun failed: " << e.what() << std::endl;
     }
   }
 
@@ -228,7 +228,7 @@ namespace casadi {
     } catch(int flag) { // recoverable error
       return flag;
     } catch(exception& e) { // non-recoverable error
-      uerr() << "jtimes failed: " << e.what() << endl;
+      uerr() << "jtimes failed: " << e.what() << std::endl;
       return -1;
     }
   }
@@ -260,7 +260,7 @@ namespace casadi {
     } catch(int flag) { // recoverable error
       return flag;
     } catch(exception& e) { // non-recoverable error
-      uerr() << "jtimesB failed: " << e.what() << endl;
+      uerr() << "jtimesB failed: " << e.what() << std::endl;
       return -1;
     }
   }
@@ -304,7 +304,7 @@ namespace casadi {
     // Set constraints
     if (!y_c_.empty()) {
       N_Vector domain  = N_VNew_Serial(nx_+nz_);
-      copy(y_c_.begin(), y_c_.end(), NV_DATA_S(domain));
+      std::copy(y_c_.begin(), y_c_.end(), NV_DATA_S(domain));
 
       // Pass to IDA
       int flag = IDASetConstraints(m->mem, domain);
@@ -323,7 +323,7 @@ namespace casadi {
     if (!abstolv_.empty()) {
       // Vector absolute tolerances
       N_Vector nv_abstol = N_VNew_Serial(abstolv_.size());
-      copy(abstolv_.begin(), abstolv_.end(), NV_DATA_S(nv_abstol));
+      std::copy(abstolv_.begin(), abstolv_.end(), NV_DATA_S(nv_abstol));
       THROWING(IDASVtolerances, m->mem, reltol_, nv_abstol);
       N_VDestroy_Serial(nv_abstol);
     } else {
@@ -336,8 +336,8 @@ namespace casadi {
 
     // Set algebraic components
     N_Vector id = N_VNew_Serial(nx_+nz_);
-    fill_n(NV_DATA_S(id), nx_, 1);
-    fill_n(NV_DATA_S(id)+nx_, nz_, 0);
+    std::fill_n(NV_DATA_S(id), nx_, 1);
+    std::fill_n(NV_DATA_S(id)+nx_, nz_, 0);
 
     // Pass this information to IDAS
     THROWING(IDASetId, m->mem, id);
@@ -411,7 +411,7 @@ namespace casadi {
 
     // Re-initialize
     N_VConst(0.0, m->xzdot);
-    copy(init_xdot_.begin(), init_xdot_.end(), NV_DATA_S(m->xzdot));
+    std::copy(init_xdot_.begin(), init_xdot_.end(), NV_DATA_S(m->xzdot));
 
     THROWING(IDAReInit, m->mem, grid_.front(), m->xz, m->xzdot);
 
@@ -497,8 +497,8 @@ namespace casadi {
 
       // Set algebraic components
       N_Vector id = N_VNew_Serial(nrx_+nrz_);
-      fill_n(NV_DATA_S(id), nrx_, 1);
-      fill_n(NV_DATA_S(id)+nrx_, nrz_, 0);
+      std::fill_n(NV_DATA_S(id), nrx_, 1);
+      std::fill_n(NV_DATA_S(id)+nrx_, nrz_, 0);
       THROWING(IDASetIdB, m->mem, m->whichB, id);
       N_VDestroy_Serial(id);
 
@@ -585,7 +585,7 @@ namespace casadi {
     if (flag>=IDA_SUCCESS) return;
     // Construct error message
     char* flagname = IDAGetReturnFlagName(flag);
-    stringstream ss;
+    std::stringstream ss;
     ss << module << " returned \"" << flagname << "\". Consult IDAS documentation.";
     free(flagname); // NOLINT
     casadi_error(ss.str());
@@ -607,7 +607,7 @@ namespace casadi {
     } catch(int flag) { // recoverable error
       return flag;
     } catch(exception& e) { // non-recoverable error
-      uerr() << "rhsQ failed: " << e.what() << endl;
+      uerr() << "rhsQ failed: " << e.what() << std::endl;
       return -1;
     }
   }
@@ -635,7 +635,7 @@ namespace casadi {
     } catch(int flag) { // recoverable error
       return flag;
     } catch(exception& e) { // non-recoverable error
-      uerr() << "resB failed: " << e.what() << endl;
+      uerr() << "resB failed: " << e.what() << std::endl;
       return -1;
     }
   }
@@ -662,7 +662,7 @@ namespace casadi {
     } catch(int flag) { // recoverable error
       return flag;
     } catch(exception& e) { // non-recoverable error
-      uerr() << "resQB failed: " << e.what() << endl;
+      uerr() << "resQB failed: " << e.what() << std::endl;
       return -1;
     }
   }
@@ -746,7 +746,7 @@ namespace casadi {
     } catch(int flag) { // recoverable error
       return flag;
     } catch(exception& e) { // non-recoverable error
-      uerr() << "psolve failed: " << e.what() << endl;
+      uerr() << "psolve failed: " << e.what() << std::endl;
       return -1;
     }
   }
@@ -829,7 +829,7 @@ namespace casadi {
     } catch(int flag) { // recoverable error
       return flag;
     } catch(exception& e) { // non-recoverable error
-      uerr() << "psolveB failed: " << e.what() << endl;
+      uerr() << "psolveB failed: " << e.what() << std::endl;
       return -1;
     }
   }
@@ -855,7 +855,7 @@ namespace casadi {
     } catch(int flag) { // recoverable error
       return flag;
     } catch(exception& e) { // non-recoverable error
-      uerr() << "psetup failed: " << e.what() << endl;
+      uerr() << "psetup failed: " << e.what() << std::endl;
       return -1;
     }
   }
@@ -885,7 +885,7 @@ namespace casadi {
     } catch(int flag) { // recoverable error
       return flag;
     } catch(exception& e) { // non-recoverable error
-      uerr() << "psetupB failed: " << e.what() << endl;
+      uerr() << "psetupB failed: " << e.what() << std::endl;
       return -1;
     }
   }
@@ -937,7 +937,7 @@ namespace casadi {
     } catch(int flag) { // recoverable error
       return flag;
     } catch(exception& e) { // non-recoverable error
-      uerr() << "lsetupB failed: " << e.what() << endl;
+      uerr() << "lsetupB failed: " << e.what() << std::endl;
       return -1;
     }
   }
@@ -971,7 +971,7 @@ namespace casadi {
     } catch(int flag) { // recoverable error
       return flag;
     } catch(exception& e) { // non-recoverable error
-      uerr() << "lsolve failed: " << e.what() << endl;
+      uerr() << "lsolve failed: " << e.what() << std::endl;
       return -1;
     }
   }
@@ -1018,7 +1018,7 @@ namespace casadi {
     } catch(int flag) { // recoverable error
       return flag;
     } catch(exception& e) { // non-recoverable error
-      uerr() << "lsolveB failed: " << e.what() << endl;
+      uerr() << "lsolveB failed: " << e.what() << std::endl;
       return -1;
     }
   }
@@ -1029,8 +1029,8 @@ namespace casadi {
 
   template<typename MatType>
   Function IdasInterface::getJ(bool backward) const {
-    vector<MatType> a = MatType::get_input(oracle_);
-    vector<MatType> r = const_cast<Function&>(oracle_)(a); // NOLINT
+    std::vector<MatType> a = MatType::get_input(oracle_);
+    std::vector<MatType> r = const_cast<Function&>(oracle_)(a); // NOLINT
     MatType cj = MatType::sym("cj");
 
     // Get the Jacobian in the Newton iteration

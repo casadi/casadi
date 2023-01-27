@@ -217,7 +217,7 @@ namespace casadi {
                 const std::vector<std::string>& onames,
                 const Dict& opts) const {
     // Derivative of each case
-    vector<Function> der(f_.size());
+    std::vector<Function> der(f_.size());
     for (casadi_int k=0; k<f_.size(); ++k) {
       if (!f_[k].is_null()) der[k] = f_[k].forward(nfwd);
     }
@@ -230,8 +230,8 @@ namespace casadi {
     Function sw = Function::conditional("switch_" + name, der, der_def);
 
     // Get expressions for the derivative switch
-    vector<MX> arg = sw.mx_in();
-    vector<MX> res = sw(arg);
+    std::vector<MX> arg = sw.mx_in();
+    std::vector<MX> res = sw(arg);
 
     // Ignore seed for ind
     arg.insert(arg.begin() + n_in_ + n_out_, MX(1, nfwd));
@@ -246,7 +246,7 @@ namespace casadi {
                 const std::vector<std::string>& onames,
                 const Dict& opts) const {
     // Derivative of each case
-    vector<Function> der(f_.size());
+    std::vector<Function> der(f_.size());
     for (casadi_int k=0; k<f_.size(); ++k) {
       if (!f_[k].is_null()) der[k] = f_[k].reverse(nadj);
     }
@@ -259,8 +259,8 @@ namespace casadi {
     Function sw = Function::conditional("switch_" + name, der, der_def);
 
     // Get expressions for the derivative switch
-    vector<MX> arg = sw.mx_in();
-    vector<MX> res = sw(arg);
+    std::vector<MX> arg = sw.mx_in();
+    std::vector<MX> res = sw(arg);
 
     // No derivatives with respect to index
     res.insert(res.begin(), MX(1, nadj));
@@ -313,7 +313,7 @@ namespace casadi {
 
       if (k==0) {
         // For the default case, redirect the temporary results to res
-        copy_n(res, n_out_, res_temp);
+        std::copy_n(res, n_out_, res_temp);
       } else {
         // For the other cases, store the temporary results
         for (casadi_int i=0; i<n_out_; ++i) {
@@ -322,8 +322,8 @@ namespace casadi {
         }
       }
 
-      copy_n(arg+1, n_in_-1, arg1);
-      copy_n(res_temp, n_out_, res1);
+      std::copy_n(arg+1, n_in_-1, arg1);
+      std::copy_n(res_temp, n_out_, res1);
 
       const Function& fk = k==0 ? f_def_ : f_[k-1];
 

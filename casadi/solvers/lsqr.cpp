@@ -77,7 +77,7 @@ namespace casadi {
   void Lsqr::generate(CodeGenerator& g, const std::string& A, const std::string& x,
                           casadi_int nrhs, bool tr) const {
     // Codegen the integer vectors
-    string sp = g.sparsity(sp_);
+    std::string sp = g.sparsity(sp_);
 
         // Place in block to avoid conflicts caused by local variables
     g << "{\n";

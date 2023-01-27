@@ -59,18 +59,18 @@ int main(){
   int nu = u.size1();
 
   // Bounds and initial guess for the control
-  vector<double> u_min =  { -0.75 };
-  vector<double> u_max  = {  1.0  };
-  vector<double> u_init = {  0.0  };
+  std::vector<double> u_min =  { -0.75 };
+  std::vector<double> u_max  = {  1.0  };
+  std::vector<double> u_init = {  0.0  };
 
   // Bounds and initial guess for the state
-  vector<double> x0_min = {   0,    1 };
-  vector<double> x0_max = {   0,    1 };
-  vector<double> x_min  = {-inf, -inf };
-  vector<double> x_max  = { inf,  inf };
-  vector<double> xf_min = {   0,    0 };
-  vector<double> xf_max = {   0,    0 };
-  vector<double> x_init = {   0,    0 };
+  std::vector<double> x0_min = {   0,    1 };
+  std::vector<double> x0_max = {   0,    1 };
+  std::vector<double> x_min  = {-inf, -inf };
+  std::vector<double> x_max  = { inf,  inf };
+  std::vector<double> xf_min = {   0,    0 };
+  std::vector<double> xf_max = {   0,    0 };
+  std::vector<double> x_init = {   0,    0 };
 
   // Final time
   double tf = 20.0;
@@ -93,13 +93,13 @@ int main(){
   MX V = MX::sym("V",NV);
 
   // NLP variable bounds and initial guess
-  vector<double> v_min,v_max,v_init;
+  std::vector<double> v_min,v_max,v_init;
 
   // Offset in V
   int offset=0;
 
   // State at each shooting node and control for each shooting interval
-  vector<MX> X, U;
+  std::vector<MX> X, U;
   for(int k=0; k<ns; ++k){
     // Local state
     X.push_back( V.nz(Slice(offset,offset+nx)));
@@ -135,7 +135,7 @@ int main(){
   MX J = 0;
 
   //Constraint function and bounds
-  vector<MX> g;
+  std::vector<MX> g;
 
   // Loop over shooting nodes
   for(int k=0; k<ns; ++k){
@@ -167,23 +167,23 @@ int main(){
   res = solver(arg);
 
   // Optimal solution of the NLP
-  vector<double> V_opt(res.at("x"));
+  std::vector<double> V_opt(res.at("x"));
 
   // Get the optimal state trajectory
-  vector<double> r_opt(ns+1), s_opt(ns+1);
+  std::vector<double> r_opt(ns+1), s_opt(ns+1);
   for(int i=0; i<=ns; ++i){
     r_opt[i] = V_opt.at(i*(nx+1));
     s_opt[i] = V_opt.at(1+i*(nx+1));
   }
-  cout << "r_opt = " << endl << r_opt << endl;
-  cout << "s_opt = " << endl << s_opt << endl;
+  cout << "r_opt = " << std::endl << r_opt << std::endl;
+  cout << "s_opt = " << std::endl << s_opt << std::endl;
 
   // Get the optimal control
-  vector<double> u_opt(ns);
+  std::vector<double> u_opt(ns);
   for(int i=0; i<ns; ++i){
     u_opt[i] = V_opt.at(nx + i*(nx+1));
   }
-  cout << "u_opt = " << endl << u_opt << endl;
+  cout << "u_opt = " << std::endl << u_opt << std::endl;
 
 
   return 0;

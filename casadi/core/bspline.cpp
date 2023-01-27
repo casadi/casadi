@@ -25,7 +25,6 @@
 
 #include "bspline_impl.hpp"
 
-using namespace std;
 namespace casadi {
 
   MXNode* BSplineCommon::deserialize(DeserializingStream& s) {

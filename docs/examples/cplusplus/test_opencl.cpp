@@ -46,23 +46,23 @@ int main(int, char**) {
   if(ret != CL_SUCCESS) return 1;
 
   for(int i=0; i<ret_num_platforms && i<max_num_platforms; ++i){
-    cout << "Platform " << i << " of " << ret_num_platforms << ":" << endl;
+    cout << "Platform " << i << " of " << ret_num_platforms << ":" << std::endl;
     cl_device_id device_id[max_num_devices];
     cl_uint ret_num_devices = 0;
     ret = clGetDeviceIDs(platform_id[i], CL_DEVICE_TYPE_DEFAULT, max_num_devices, device_id, &ret_num_devices);
     if(ret != CL_SUCCESS) return 1;
     
     for(int j=0; j<ret_num_devices && j<max_num_devices ; ++j){
-      cout << "Device " << j << " of " << ret_num_devices << ":" << endl;
+      cout << "Device " << j << " of " << ret_num_devices << ":" << std::endl;
       
       // Separator
-      cout << ">>>>>>>>>>>" << endl;
+      cout << ">>>>>>>>>>>" << std::endl;
     
       // Device name
       char name[256];
       ret = clGetDeviceInfo(device_id[j],CL_DEVICE_NAME,sizeof(name),&name,&ret_size);
       if(ret != CL_SUCCESS) return 1;
-      cout << "Name " << name << endl; 
+      cout << "Name " << name << std::endl; 
 
       // Print type
       cl_device_type type;
@@ -76,10 +76,10 @@ int main(int, char**) {
         case CL_DEVICE_TYPE_DEFAULT: cout << "DEFAULT"; break;
         default: return 1;
       }
-      cout << endl;
+      cout << std::endl;
       
       // Separator
-      cout << "<<<<<<<<<<<" << endl;
+      cout << "<<<<<<<<<<<" << std::endl;
     }
   }
   return 0;

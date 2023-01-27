@@ -35,7 +35,7 @@ using namespace std;
 // Matrix H in sparse triplet format
 const int H_nrow = 180;
 const int H_ncol = 180;
-const vector<casadi_int> H_colind = {
+const std::vector<casadi_int> H_colind = {
   0,  4,  8, 12, 16, 20, 20, 20, 20, 20, 20,
   24, 28, 32, 36, 40, 40, 40, 40, 40, 40,
   44, 48, 52, 56, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60,
@@ -55,13 +55,13 @@ const vector<casadi_int> H_colind = {
   80, 80, 80, 80, 80, 80, 80, 80, 80, 80,
   80, 80, 80, 80, 80, 80
 };
-const vector<casadi_int> H_row = {
+const std::vector<casadi_int> H_row = {
   0, 10, 20, 34, 1, 11, 21, 35, 2, 12, 22, 36, 3, 13, 23, 37, 4, 14, 24, 38,
    0, 10, 20, 34, 1, 11, 21, 35, 2, 12, 22, 36, 3, 13, 23, 37, 4, 14, 24, 38,
    0, 10, 20, 34, 1, 11, 21, 35, 2, 12, 22, 36, 3, 13, 23, 37, 4, 14, 24, 38,
    0, 10, 20, 34, 1, 11, 21, 35, 2, 12, 22, 36, 3, 13, 23, 37, 4, 14, 24, 38
 };
-const vector<double> H_nz = {
+const std::vector<double> H_nz = {
   10, 1, 1, 1, 10, 1, 1, 1, 10, 1, 1, 1, 10, 1, 1, 1, 10, 1, 1,
     1, 1, 10, 1, 1, 1, 10, 1, 1, 1, 10, 1, 1, 1, 10, 1, 1, 1, 10, 1, 1, 1, 1,
     10, 1, 1, 1, 10, 1, 1, 1, 10, 1, 1, 1, 10, 1, 1, 1, 10, 1, 1, 1, 1, 10, 1,
@@ -71,7 +71,7 @@ const vector<double> H_nz = {
 // Matrix A in sparse triplet format
 const int A_nrow = 91;
 const int A_ncol = 180;
-const vector<casadi_int> A_colind = {
+const std::vector<casadi_int> A_colind = {
   0,  10,  20,  30,  40,  50,  60,  70,  80,  90, 100, 110, 120,
   130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270,
   280, 290, 300, 301, 302, 303, 304, 305, 306, 307, 308, 309, 310, 311, 312,
@@ -86,7 +86,7 @@ const vector<casadi_int> A_colind = {
   610, 611, 612, 613, 614, 615, 616, 617, 618, 628, 638, 648, 650, 653, 655,
   658, 660, 663
 };
-const vector<casadi_int> A_row = {
+const std::vector<casadi_int> A_row = {
   0, 14, 35, 36, 71, 72, 85, 86, 87, 88, 1, 14, 35, 36, 71, 72, 85,
   86, 87, 88, 2, 14, 35, 36, 71, 72, 85, 86, 87, 88, 3, 14, 35, 36, 71, 72,
   85, 86, 87, 88, 4, 14, 35, 36, 71, 72, 85, 86, 87, 88, 5, 14, 35, 36, 71,
@@ -123,7 +123,7 @@ const vector<casadi_int> A_row = {
   90, 11, 15, 69, 70, 79, 80, 81, 82, 83, 84, 12, 16, 67, 68, 73, 74, 75, 76,
   77, 78, 35, 90, 36, 89, 90, 37, 84, 38, 83, 84, 39, 78, 40, 77, 78
 };
-const vector<double> A_nz = {
+const std::vector<double> A_nz = {
   -1.0000000000000000e+00,  1.0000000000000000e+00,  8.8678200000000004e+01,
    9.3617050000000006e+01,  1.6000000000000000e+01,  8.1999999999999993e+00,
    9.9000000000000000e+01,  8.0000000000000000e+01,  1.2000000000000000e+01,
@@ -347,7 +347,7 @@ const vector<double> A_nz = {
    -1.0000000000000000e+00,  1.0000000000000000e+00,  5.0000000000000000e-01
 };
 
-const vector<double> g = {
+const std::vector<double> g = {
   +0e+00, +0e+00, +0e+00, +0e+00, +0e+00, +0e+00, +0e+00, +0e+00,
   +0e+00, +0e+00, +0e+00, +0e+00, +0e+00, +0e+00, +0e+00, +0e+00, +0e+00,
   +0e+00, +0e+00, +0e+00, +0e+00, +0e+00, +0e+00, +0e+00, +0e+00, +0e+00,
@@ -370,7 +370,7 @@ const vector<double> g = {
   -1e-01, +0e+00, +0e+00, +0e+00, +0e+00, +0e+00, +0e+00, +0e+00, +0e+00,
   +0e+00
 };
-const vector<double> lbx = {
+const std::vector<double> lbx = {
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 0, -inf, 0, -inf, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 5,
@@ -379,7 +379,7 @@ const vector<double> lbx = {
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 10, 5, 10, 5, 0, 10, 0, 5, 0, 10, 0, 0,
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-const vector<double> ubx = {
+const std::vector<double> ubx = {
   inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf,
   inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf,
   inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf,
@@ -393,14 +393,14 @@ const vector<double> ubx = {
   0, inf, inf, inf, inf, inf, inf, inf, inf, inf
 };
 
-const vector<double> lba = {
+const std::vector<double> lba = {
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -inf, -inf,
   -inf, -inf, -inf, -inf, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   0
 };
-const vector<double> uba = {
+const std::vector<double> uba = {
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -425,7 +425,7 @@ int main(){
                 {"lbx", lbx}, {"ubx", ubx},
                 {"lba", lba}, {"uba", uba}};
   DMDict res = F(arg);
-  cout << "res = " << res << endl;
+  cout << "res = " << res << std::endl;
 
   return 0;
 }

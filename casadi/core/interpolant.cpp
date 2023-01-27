@@ -32,15 +32,15 @@
 using namespace std;
 namespace casadi {
 
-  bool has_interpolant(const string& name) {
+  bool has_interpolant(const std::string& name) {
     return Interpolant::has_plugin(name);
   }
 
-  void load_interpolant(const string& name) {
+  void load_interpolant(const std::string& name) {
     Interpolant::load_plugin(name);
   }
 
-  string doc_interpolant(const string& name) {
+  std::string doc_interpolant(const std::string& name) {
     return Interpolant::getPlugin(name).doc;
   }
 
@@ -130,9 +130,9 @@ namespace casadi {
                        const Dict& opts) {
       Interpolant::check_grid(grid);
       // Get offset for each input dimension
-      vector<casadi_int> offset;
+      std::vector<casadi_int> offset;
       // Stack input grids
-      vector<double> stacked;
+      std::vector<double> stacked;
 
        // Consistency check, number of elements
       casadi_uint nel=1;
@@ -195,9 +195,9 @@ namespace casadi {
       Interpolant::check_grid(grid);
 
       // Get offset for each input dimension
-      vector<casadi_int> offset;
+      std::vector<casadi_int> offset;
       // Stack input grids
-      vector<double> stacked;
+      std::vector<double> stacked;
 
       Interpolant::stack_grid(grid, offset, stacked);
       return Interpolant::construct(solver, name, stacked, offset, std::vector<double>{}, m, opts);

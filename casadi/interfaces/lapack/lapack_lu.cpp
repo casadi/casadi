@@ -119,12 +119,12 @@ namespace casadi {
               get_ptr(m->c), &colcnd, &rowcnd, &amax, &info);
       if (info < 0) return 1;
       if (info > 0) {
-        stringstream ss;
+        std::stringstream ss;
         ss << "LapackLu::prepare: ";
         if (info<=ncol)  ss << (info-1) << "-th row (zero-based) is exactly zero";
         else             ss << (info-1-ncol) << "-th col (zero-based) is exactly zero";
-        uout() << "Warning: " << ss.str() << endl;
-        if (allow_equilibration_failure_)  uout() << "Warning: " << ss.str() << endl;
+        uout() << "Warning: " << ss.str() << std::endl;
+        if (allow_equilibration_failure_)  uout() << "Warning: " << ss.str() << std::endl;
         else                              casadi_error(ss.str());
       }
 

@@ -303,7 +303,7 @@ namespace casadi {
     WorhpInit(&m->worhp_o, &m->worhp_w, &m->worhp_p, &m->worhp_c);
     m->init_ = true;
     if (m->worhp_c.status != FirstCall) {
-      string msg = return_codes(m->worhp_c.status);
+      std::string msg = return_codes(m->worhp_c.status);
       casadi_error("Main: Initialisation failed. Status: " + msg);
     }
 
@@ -412,7 +412,7 @@ namespace casadi {
             m->alpha_pr = m->worhp_w.ArmijoAlpha;
 
             // Inputs
-            fill_n(m->arg, fcallback_.n_in(), nullptr);
+            std::fill_n(m->arg, fcallback_.n_in(), nullptr);
             m->arg[NLPSOL_X] = m->worhp_o.X;
             m->arg[NLPSOL_F] = &m->worhp_o.F;
             m->arg[NLPSOL_G] = m->worhp_o.G;
@@ -421,7 +421,7 @@ namespace casadi {
             m->arg[NLPSOL_LAM_G] = m->worhp_o.Mu;
 
             // Outputs
-            fill_n(m->res, fcallback_.n_out(), nullptr);
+            std::fill_n(m->res, fcallback_.n_out(), nullptr);
             double ret_double;
             m->res[0] = &ret_double;
 

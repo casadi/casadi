@@ -38,10 +38,10 @@ namespace casadi {
   void NlpBuilder::disp(std::ostream& stream, bool more) const {
     stream << "#x=" << this->x.size() << ", #g=" << this->g.size();
     if (more) {
-      stream << endl;
-      stream << "x = " << this->x << endl;
-      stream << "f = " << this->f << endl;
-      stream << "g = " << this->g << endl;
+      stream << std::endl;
+      stream << "x = " << this->x << std::endl;
+      stream << "f = " << this->f << std::endl;
+      stream << "g = " << this->g << std::endl;
     }
   }
 
@@ -55,8 +55,8 @@ namespace casadi {
       if (op.first == "verbose") {
         verbose_ = op.second;
       } else {
-        stringstream ss;
-        ss << "Unknown option \"" << op.first << "\"" << endl;
+        std::stringstream ss;
+        ss << "Unknown option \"" << op.first << "\"" << std::endl;
         throw CasadiException(ss.str());
       }
     }
@@ -66,7 +66,7 @@ namespace casadi {
 
     // Read the header of the NL-file (first 10 lines)
     const casadi_int header_sz = 10;
-    vector<string> header(header_sz);
+    std::vector<std::string> header(header_sz);
     for (casadi_int k=0; k<header_sz; ++k) {
       getline(s_, header[k]);
     }
@@ -81,7 +81,7 @@ namespace casadi {
     }
 
     // Get the number of objectives and constraints
-    stringstream ss(header[1]);
+    std::stringstream ss(header[1]);
     ss >> n_var_ >> n_con_ >> n_obj_ >> n_eq_ >> n_lcon_;
     if (verbose_) {
       casadi_message("n_var=" + str(n_var_) + ", n_con =" + str(n_con_) + ", "
@@ -90,14 +90,14 @@ namespace casadi {
     }
 
     // Get the number of nonlinear vars in constraints, objectives, both
-    stringstream ss4(header[4]);
+    std::stringstream ss4(header[4]);
     ss4 >> nlvc_ >> nlvo_ >> nlvb_;
     if (verbose_) {
       casadi_message("nlvc=" + str(nlvc_) + ", nlvo=" + str(nlvo_) + ", nlvb=" + str(nlvb_));
     }
 
     // Get the number of discrete variables
-    stringstream ss6(header[6]);
+    std::stringstream ss6(header[6]);
     ss6 >> nbv_ >> niv_ >> nlvbi_ >> nlvci_ >> nlvoi_;
     if (verbose_) {
       casadi_message("nbv=" + str(nbv_) + ", niv =" + str(niv_) + ", "
@@ -216,7 +216,7 @@ namespace casadi {
     double d;
 
     // Error message
-    stringstream msg;
+    std::stringstream msg;
 
     // Process instruction
     switch (inst) {
@@ -350,7 +350,7 @@ namespace casadi {
           int n = read_int();
 
           // Collect the arguments
-          vector<MX> args(n);
+          std::vector<MX> args(n);
           for (int k=0; k<n; ++k) {
             args[k] = expr();
           }
@@ -651,7 +651,7 @@ namespace casadi {
 
   void NlImporter::k_segment() {
     // Get row offsets
-    vector<casadi_int> rowind(n_var_+1);
+    std::vector<casadi_int> rowind(n_var_+1);
 
     // Get the number of offsets
     int k = read_int();

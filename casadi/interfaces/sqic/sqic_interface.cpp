@@ -166,11 +166,11 @@ namespace casadi {
 
   std::map<casadi_int, string> SqicInterface::flagmap = SqicInterface::calc_flagmap();
 
-  void SqicInterface::sqic_error(const string& module, casadi_int flag) {
+  void SqicInterface::sqic_error(const std::string& module, casadi_int flag) {
     // Find the error
     std::map<casadi_int, string>::const_iterator it = flagmap.find(flag);
 
-    stringstream ss;
+    std::stringstream ss;
     if (it == flagmap.end()) {
       ss << "Unknown error (" << flag << ") from module \"" << module << "\".";
     } else {

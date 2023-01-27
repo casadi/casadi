@@ -80,7 +80,7 @@ namespace casadi {
     SX A = SX::sym("A", sp_);
 
     // BTF factorization
-    vector<casadi_int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
+    std::vector<casadi_int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
     sp_.btf(rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock);
 
     // Get the inverted column permutation
@@ -119,7 +119,7 @@ namespace casadi {
     SX x = xperm(inv_colperm, Slice()); // NOLINT(cppcoreguidelines-slicing)
 
     // Generate the QR solve function
-    vector<SX> solv_in = {Q, R, b};
+    std::vector<SX> solv_in = {Q, R, b};
     solve_ = Function("QR_solv", solv_in, {x}, fopts_);
 
     // Solve transposed
@@ -161,9 +161,9 @@ namespace casadi {
     auto m = static_cast<SymbolicQrMemory*>(mem);
 
     // Factorize
-    fill_n(get_ptr(m->arg), factorize_.n_in(), nullptr);
+    std::fill_n(get_ptr(m->arg), factorize_.n_in(), nullptr);
     m->arg[0] = A;
-    fill_n(get_ptr(m->res), factorize_.n_out(), nullptr);
+    std::fill_n(get_ptr(m->res), factorize_.n_out(), nullptr);
     m->res[0] = get_ptr(m->q);
     m->res[1] = get_ptr(m->r);
     if (factorize_(get_ptr(m->arg), get_ptr(m->res), get_ptr(m->iw), get_ptr(m->w))) return 1;
@@ -177,12 +177,12 @@ namespace casadi {
     const Function& solv = tr ? solveT_ : solve_;
 
     // Solve for all right hand sides
-    fill_n(get_ptr(m->arg), solv.n_in(), nullptr);
+    std::fill_n(get_ptr(m->arg), solv.n_in(), nullptr);
     m->arg[0] = get_ptr(m->q);
     m->arg[1] = get_ptr(m->r);
-    fill_n(get_ptr(m->res), solv.n_out(), nullptr);
+    std::fill_n(get_ptr(m->res), solv.n_out(), nullptr);
     for (casadi_int i=0; i<nrhs; ++i) {
-      copy_n(x, nrow(), get_ptr(m->w)); // Copy x to a temporary
+      std::copy_n(x, nrow(), get_ptr(m->w)); // Copy x to a temporary
       m->arg[2] = get_ptr(m->w);
       m->res[0] = x;
       if (solv(get_ptr(m->arg), get_ptr(m->res),
@@ -202,8 +202,8 @@ namespace casadi {
 
     // Get A and factorize it
     SX A = SX::zeros(sp_);
-    copy(arg[1], arg[1]+A.nnz(), A->begin());
-    vector<SX> v = factorize_(A);
+    std::copy(arg[1], arg[1]+A.nnz(), A->begin());
+    std::vector<SX> v = factorize_(A);
 
     // Select solve function
     const Function& solv = tr ? solveT_ : solve_;
@@ -213,9 +213,9 @@ namespace casadi {
     const SXElem* a=arg[0];
     SXElem* r=res[0];
     for (casadi_int i=0; i<nrhs; ++i) {
-      copy(a, a+v[2].nnz(), v[2]->begin());
+      std::copy(a, a+v[2].nnz(), v[2]->begin());
       SX rr = solv(v).at(0);
-      copy(rr->begin(), rr->end(), r);
+      std::copy(rr->begin(), rr->end(), r);
       r += rr.nnz();
       a += v[2].nnz();
     }

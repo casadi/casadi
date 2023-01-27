@@ -73,20 +73,20 @@ namespace casadi {
 
     // Intermediate variables (does not enter in F_, only in G_)
     MX v = MX::sym("v", x0.size1(), x0.size2()*3);
-    vector<MX> x = horzsplit(v, x0.size2());
+    std::vector<MX> x = horzsplit(v, x0.size2());
     casadi_assert_dev(x.size()==3);
 
     // Definitions of x
-    vector<MX> x_def(3);
+    std::vector<MX> x_def(3);
 
     // Time points
-    vector<MX> tt(3);
+    std::vector<MX> tt(3);
 
     // Forward integration
     {
       // Arguments when calling f
-      vector<MX> f_arg(DAE_NUM_IN);
-      vector<MX> f_res;
+      std::vector<MX> f_arg(DAE_NUM_IN);
+      std::vector<MX> f_res;
       f_arg[DAE_P] = p;
 
       // k1
@@ -142,11 +142,11 @@ namespace casadi {
 
       // Intermediate variables (do not enter in G_)
       MX rv = MX::sym("rv", rx0.size1(), 3*rx0.size2());
-      vector<MX> rx_def(3);
+      std::vector<MX> rx_def(3);
 
       // Arguments when calling g
-      vector<MX> g_arg(RDAE_NUM_IN);
-      vector<MX> g_res;
+      std::vector<MX> g_arg(RDAE_NUM_IN);
+      std::vector<MX> g_res;
       g_arg[RDAE_P] = p;
       g_arg[RDAE_RP] = rp;
 

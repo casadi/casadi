@@ -347,7 +347,7 @@ Function Opti::to_function(const std::string& name,
     const Dict& opts) {
   std::vector<MX> ex_in(name_in.size()), ex_out(name_out.size());
   for (auto&& i : dict) {
-    vector<string>::const_iterator it;
+    std::vector<std::string>::const_iterator it;
     if ((it=find(name_in.begin(), name_in.end(), i.first))!=name_in.end()) {
       // Input expression
       ex_in[it-name_in.begin()] = i.second;
