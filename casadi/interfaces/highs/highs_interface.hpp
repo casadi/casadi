@@ -29,6 +29,7 @@
 #include <casadi/interfaces/highs/casadi_conic_highs_export.h>
 
 #include "Highs.h"
+#include "interfaces/highs_c_api.h"
 #include <string>
 
 
