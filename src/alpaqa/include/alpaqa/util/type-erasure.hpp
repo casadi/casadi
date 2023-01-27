@@ -107,16 +107,19 @@ template <class... ExtraArgs>
 struct Launderer {
   private:
     template <auto M, class V, class T, class R, class... Args>
-    static constexpr auto do_invoke(V *self, Args... args, ExtraArgs...) -> R {
+    [[gnu::always_inline]] static constexpr auto
+    do_invoke(V *self, Args... args, ExtraArgs...) -> R {
         return std::invoke(M, *std::launder(reinterpret_cast<T *>(self)),
                            std::forward<Args>(args)...);
     }
     template <auto M, class T, class R, class... Args>
-    static constexpr auto invoker_ovl(R (T::*)(Args...) const) {
+    [[gnu::always_inline]] static constexpr auto invoker_ovl(R (T::*)(Args...)
+                                                                 const) {
         return do_invoke<M, const void, const T, R, Args...>;
     }
     template <auto M, class T, class R, class... Args>
-    static constexpr auto invoker_ovl(R (T::*)(Args...)) {
+    [[gnu::always_inline]] static constexpr auto
+    invoker_ovl(R (T::*)(Args...)) {
         return do_invoke<M, void, T, R, Args...>;
     }
 
@@ -126,7 +129,7 @@ struct Launderer {
     /// @p Method with it, passing on the arguments to @p Method. The function
     /// can also accept additional arguments at the end, of type @p ExtraArgs.
     template <auto Method>
-    static constexpr auto invoker() {
+    [[gnu::always_inline]] static constexpr auto invoker() {
         return invoker_ovl<Method>(Method);
     }
 };
@@ -134,7 +137,7 @@ struct Launderer {
 
 /// @copydoc detail::Launderer::invoker
 template <auto Method, class... ExtraArgs>
-constexpr auto type_erased_wrapped() {
+[[gnu::always_inline]] constexpr auto type_erased_wrapped() {
     return detail::Launderer<ExtraArgs...>::template invoker<Method>();
 }
 
@@ -466,8 +469,8 @@ class TypeErased {
     /// implicitly passing the @ref self pointer and @ref vtable reference if
     /// necessary.
     template <class Ret, class... FArgs, class... Args>
-    decltype(auto) call(Ret (*f)(const void *, FArgs...),
-                        Args &&...args) const {
+    [[gnu::always_inline]] decltype(auto) call(Ret (*f)(const void *, FArgs...),
+                                               Args &&...args) const {
         assert(f);
         assert(self);
         using LastArg = util::last_type_t<FArgs...>;
@@ -478,7 +481,8 @@ class TypeErased {
     }
     /// @copydoc call
     template <class Ret, class... FArgs, class... Args>
-    decltype(auto) call(Ret (*f)(void *, FArgs...), Args &&...args) {
+    [[gnu::always_inline]] decltype(auto) call(Ret (*f)(void *, FArgs...),
+                                               Args &&...args) {
         assert(f);
         assert(self);
         using LastArg = util::last_type_t<FArgs...>;
@@ -489,28 +493,30 @@ class TypeErased {
     }
     /// @copydoc call
     template <class Ret>
-    decltype(auto) call(Ret (*f)(const void *)) const {
+    [[gnu::always_inline]] decltype(auto) call(Ret (*f)(const void *)) const {
         assert(f);
         assert(self);
         return f(self);
     }
     /// @copydoc call
     template <class Ret>
-    decltype(auto) call(Ret (*f)(void *)) {
+    [[gnu::always_inline]] decltype(auto) call(Ret (*f)(void *)) {
         assert(f);
         assert(self);
         return f(self);
     }
     /// @copydoc call
     template <class Ret>
-    decltype(auto) call(Ret (*f)(const void *, const VTable &)) const {
+    [[gnu::always_inline]] decltype(auto) call(Ret (*f)(const void *,
+                                                        const VTable &)) const {
         assert(f);
         assert(self);
         return f(self, vtable);
     }
     /// @copydoc call
     template <class Ret>
-    decltype(auto) call(Ret (*f)(void *, const VTable &)) {
+    [[gnu::always_inline]] decltype(auto) call(Ret (*f)(void *,
+                                                        const VTable &)) {
         assert(f);
         assert(self);
         return f(self, vtable);
