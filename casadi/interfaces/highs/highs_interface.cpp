@@ -161,7 +161,15 @@ namespace casadi {
     g << "p.integrality = integrality;\n";
 
     g << "casadi_highs_setup(&p);\n";
+  }
 
+  void HighsInterface::codegen_init_mem(CodeGenerator& g) const {
+    g << "highs_init_mem(" + codegen_mem(g) + "->d);\n";
+    g << "return 0;\n";
+  }
+
+  void HighsInterface::codegen_free_mem(CodeGenerator& g) const {
+    g << "highs_free_mem(" + codegen_mem(g) + "->d);\n";
   }
 
   void HighsInterface::set_highs_prob() {
@@ -179,6 +187,7 @@ namespace casadi {
     if (Conic::init_mem(mem)) return 1;
     if (!mem) return 1;
     auto m = static_cast<HighsMemory*>(mem);
+    highs_init_mem(&m->d);
 
     m->add_stat("preprocessing");
     m->add_stat("solver");
@@ -186,6 +195,12 @@ namespace casadi {
 
     return 0;
   }
+
+  void HighsInterface::free_mem(void* mem) const {
+    auto m = static_cast<HighsMemory*>(mem);
+    highs_free_mem(&m->d);
+    delete static_cast<HighsMemory*>(mem);
+   }
 
   /** \brief Set the (persistent) work vectors */
   void HighsInterface::set_work(void* mem, const double**& arg, double**& res,
@@ -238,7 +253,7 @@ namespace casadi {
     g.add_auxiliary(CodeGenerator::AUX_CLIP_MAX);
     g.add_auxiliary(CodeGenerator::AUX_DOT);
     g.add_auxiliary(CodeGenerator::AUX_BILIN);
-    g.add_include("Highs.h");
+    g.add_include("highs/interfaces/highs_c_api.h");
 
     g.auxiliaries << g.sanitize_source(highs_runtime_str, {"casadi_real"});
 

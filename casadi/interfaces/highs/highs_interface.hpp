@@ -107,6 +107,12 @@ namespace casadi {
     /** \brief Generate code for the function body */
     void codegen_body(CodeGenerator& g) const override;
 
+    /** \brief Codegen decref for init_mem*/
+    void codegen_init_mem(CodeGenerator& g) const override;
+
+    /** \brief Codegen for free_mem */
+    void codegen_free_mem(CodeGenerator& g) const override;
+
     // Initialize the solver
     void init(const Dict& opts) override;
 
@@ -120,7 +126,7 @@ namespace casadi {
     int init_mem(void* mem) const override;
 
     /** \brief Free memory block */
-    void free_mem(void *mem) const override { delete static_cast<HighsMemory*>(mem);}
+    void free_mem(void *mem) const override;
 
     /** \brief Set the (persistent) work vectors */
     void set_work(void* mem, const double**& arg, double**& res,
