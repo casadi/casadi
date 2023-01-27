@@ -122,7 +122,7 @@ std::string OptiNode::format_stacktrace(const Dict& stacktrace, casadi_int inden
   if (name!="Unknown" && name!= "<module>")
     description += " in " + stacktrace.at("name").as_string();
   try {
-    ifstream file(filename);
+    std::ifstream file(filename);
     for (casadi_int i=0; i<line-1; ++i) {
       file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }

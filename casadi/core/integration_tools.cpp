@@ -31,8 +31,6 @@
 
 #include <vector>
 
-using namespace std;
-
 namespace casadi {
 
   const long double legendre_points1[] = { 0.50000000000000000000 };

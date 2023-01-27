@@ -25,7 +25,6 @@
 
 #include "importer_internal.hpp"
 
-using namespace std;
 namespace casadi {
 
   ImporterInternal::ImporterInternal(const std::string& name) : name_(name) {
@@ -71,7 +70,7 @@ namespace casadi {
     // Read meta information from file
     if (can_have_meta()) {
       casadi_int offset = 0;
-      ifstream file(name_);
+      std::ifstream file(name_);
       std::string line;
       while (getline(file, line)) {
         // Update offset
@@ -125,7 +124,7 @@ namespace casadi {
     }
   }
 
-  void ImporterInternal::read_meta(istream& file, casadi_int& offset) {
+  void ImporterInternal::read_meta(std::istream& file, casadi_int& offset) {
     // Loop over the lines
     std::string line;
     while (getline(file, line)) {
@@ -173,7 +172,7 @@ namespace casadi {
   }
 
   void ImporterInternal::
-  read_external(const std::string& sym, bool inlined, istream& file, casadi_int& offset) {
+  read_external(const std::string& sym, bool inlined, std::istream& file, casadi_int& offset) {
     // New entry
     std::stringstream ss;
 

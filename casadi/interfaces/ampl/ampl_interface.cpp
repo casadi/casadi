@@ -355,7 +355,7 @@ namespace casadi {
     if (verbose_) casadi_message("Removed " + nlname);
 
     // Open .out file and dump to screen
-    ifstream out(outname, ifstream::in);
+    std::ifstream out(outname, std::ifstream::in);
     casadi_assert(out.is_open(), "Failed to open " + outname);
     std::string line;
     while (!out.eof()) {
@@ -371,7 +371,7 @@ namespace casadi {
     if (verbose_) casadi_message("Removed " + outname);
 
     // Open .sol file
-    ifstream sol(solname, ifstream::in);
+    std::ifstream sol(solname, std::ifstream::in);
     casadi_assert(sol.is_open(), "Failed to open " + solname);
     if (verbose_) casadi_message("Opened " + solname);
 

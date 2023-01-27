@@ -26,7 +26,6 @@
 #include "integrator_impl.hpp"
 #include "casadi_misc.hpp"
 
-using namespace std;
 namespace casadi {
 
   bool has_integrator(const std::string& name) {

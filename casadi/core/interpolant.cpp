@@ -29,7 +29,6 @@
 #include "casadi_low.hpp"
 #include <typeinfo>
 
-using namespace std;
 namespace casadi {
 
   bool has_interpolant(const std::string& name) {

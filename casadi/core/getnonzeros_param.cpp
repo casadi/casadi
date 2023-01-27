@@ -27,8 +27,6 @@
 #include "casadi_misc.hpp"
 #include "serializing_stream.hpp"
 
-using namespace std;
-
 namespace casadi {
 
   MX GetNonzerosParam::create(const MX& x, const MX& nz) {

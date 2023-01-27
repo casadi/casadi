@@ -25,8 +25,6 @@
 #define CASADI_IM_INSTANTIATOR_CPP
 #include "matrix_impl.hpp"
 
-using namespace std;
-
 namespace casadi {
 
   bool CASADI_EXPORT is_slice(const IM& x, bool ind1) {
