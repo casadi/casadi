@@ -146,6 +146,12 @@ class PANOCOCPSolver {
                      crvec μ,                  // in
                      rvec err_z);              // out
 
+    template <class P>
+    Stats operator()(const P &problem, const SolveOptions &opts, rvec u, rvec y,
+                     crvec μ, rvec e) {
+        return operator()(Problem::template make<P>(problem), opts, u, y, μ, e);
+    }
+
     /// Specify a callable that is invoked with some intermediate results on
     /// each iteration of the algorithm.
     /// @see @ref ProgressInfo
