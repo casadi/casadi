@@ -114,7 +114,7 @@ namespace casadi {
     void init(const Dict& opts) override;
 
     // Initialize dependant read-only members of class
-    void init_dependant();
+    void init_dependent();
 
     /** \brief Create memory block */
     void* alloc_mem() const override { return new HighsMemory();}

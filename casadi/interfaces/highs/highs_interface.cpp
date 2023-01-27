@@ -106,7 +106,7 @@ namespace casadi {
     }
     // Initialize read-only members of class that don't require saving
     // since they can be derived from other read-only members
-    init_dependant();
+    init_dependent();
     set_highs_prob();
 
     // Allocate memory
@@ -119,7 +119,7 @@ namespace casadi {
     alloc_w(sz_w, true);
   }
 
-  void HighsInterface::init_dependant() {
+  void HighsInterface::init_dependent() {
     colinda_.resize(A_.size2()+1);
     rowa_.resize(A_.nnz());
     colindh_.resize(H_.size2()+1);
@@ -309,7 +309,7 @@ namespace casadi {
   HighsInterface::HighsInterface(DeserializingStream& s) : Conic(s) {
     s.version("HighsInterface", 1);
     s.unpack("HighsInterface::opts", opts_);
-    init_dependant();
+    init_dependent();
     set_highs_prob();
   }
 
