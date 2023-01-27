@@ -91,7 +91,7 @@ if has_conic("qpalm"):
 
 if has_conic("highs"):
     codegen = {"extralibs": ["highs"], "std": "c99"}
-    conics.append(("highs",{},{"quadratic": True, "dual": True, "soc": False, "codegen": codegen, "discrete": False, "sos":False}))
+    conics.append(("highs",{"highs": {"primal_feasibility_tolerance":1e-7,"solver":"choose","output_flag":False,"ipm_iteration_limit":50000}},{"quadratic": True, "dual": True, "soc": False, "codegen": codegen, "discrete": False, "sos":False}))
 
 
 

@@ -1323,7 +1323,12 @@ namespace casadi {
       << ", " << res << ", " << sparsity(sp_res) << ", " << w << ");";
     return s.str();
   }
-
+  string CodeGenerator::constant(const std::string& v) {
+    string ret = v;
+    ret = replace(ret, "\\", "\\\\");
+    ret = replace(ret, "\"", "\\\"");
+    return "\"" + ret + "\"";
+  }
   string CodeGenerator::constant(casadi_int v) {
     return constant(static_cast<double>(v));
   }
@@ -1808,11 +1813,7 @@ namespace casadi {
 
       // Perform string replacements
       for (auto&& it = rep.rbegin(); it!=rep.rend(); ++it) {
-        string::size_type n = 0;
-        while ((n = line.find(it->first, n)) != string::npos) {
-          line.replace(n, it->first.size(), it->second);
-          n += it->second.size();
-        }
+        line = replace(line, it->first, it->second);
       }
 
       // Append to return

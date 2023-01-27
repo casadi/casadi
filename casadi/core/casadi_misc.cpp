@@ -287,6 +287,16 @@ namespace casadi {
     return true;
   }
 
+  CASADI_EXPORT std::string replace(const std::string& s, const std::string& p, const std::string& r) {
+    std::string ret = s;
+    string::size_type n = 0;
+    while ((n = ret.find(p, n)) != string::npos) {
+      ret.replace(n, p.size(), r);
+      n += r.size();
+    }
+    return ret;
+  }
+
 #ifdef HAVE_SIMPLE_MKSTEMPS
 int simple_mkstemps_fd(const std::string& prefix, const std::string& suffix, std::string &result) {
     // Characters available for inventing filenames

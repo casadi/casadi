@@ -81,29 +81,6 @@ namespace casadi {
       }
     }
 
-    // set HiGHS options, option verification is done by HiGHS
-    for (auto&& op : opts_) {
-      auto it = std::find(param_bool.begin(), param_bool.end(), op.first);
-      if(it != param_bool.end() || op.second.getType() == OT_BOOL) {
-        casadi_assert(highs_.setOptionValue(op.first, op.second.to_bool()) == HighsStatus::kOk,
-          "Error setting option '" + op.first + "'.");
-      } 
-      else if(op.second.getType() == OT_INT){
-        casadi_assert(highs_.setOptionValue(op.first, static_cast<int>(op.second.to_int())) == HighsStatus::kOk,
-          "Error setting option '" + op.first + "'.");
-      }
-      else if(op.second.getType() == OT_DOUBLE) {
-        casadi_assert(highs_.setOptionValue(op.first, op.second.to_double()) == HighsStatus::kOk,
-          "Error setting option '" + op.first + "'.");
-      }
-      else if(op.second.getType() == OT_STRING) {
-        casadi_assert(highs_.setOptionValue(op.first, op.second.to_string()) == HighsStatus::kOk,
-          "Error setting option '" + op.first + "'.");
-      }
-      else {
-        casadi_assert(false, "Option type for '" + op.first + "'not supported!");
-      }
-    }
     // Initialize read-only members of class that don't require saving
     // since they can be derived from other read-only members
     init_dependent();
@@ -223,6 +200,30 @@ namespace casadi {
 
     casadi_highs_init(&m->d, &arg, &res, &iw, &w);
 
+    for (auto&& op : opts_) {
+      auto it = std::find(param_bool.begin(), param_bool.end(), op.first);
+      if (it != param_bool.end() || op.second.getType() == OT_BOOL) {
+        casadi_assert(kHighsStatusOk ==
+          Highs_setBoolOptionValue(m->d.highs, op.first.c_str(), op.second.to_bool()),
+          "Error setting option '" + op.first + "'.");
+      } else if (op.second.getType() == OT_INT){
+        casadi_assert(kHighsStatusOk ==
+          Highs_setIntOptionValue(m->d.highs, op.first.c_str(), op.second.to_int()),
+          "Error setting option '" + op.first + "'.");
+      } else if (op.second.getType() == OT_DOUBLE) {
+        casadi_assert(kHighsStatusOk ==
+          Highs_setDoubleOptionValue(m->d.highs, op.first.c_str(), op.second.to_double()),
+          "Error setting option '" + op.first + "'.");
+      } else if (op.second.getType() == OT_STRING) {
+        std::string v = op.second.to_string();
+        casadi_assert(kHighsStatusOk ==
+          Highs_setStringOptionValue(m->d.highs, op.first.c_str(), v.c_str()),
+          "Error setting option '" + op.first + "'.");
+      } else {
+        casadi_assert(false, "Option type for '" + op.first + "'not supported!");
+      }
+    }
+
   }
 
   int HighsInterface::
@@ -269,6 +270,25 @@ namespace casadi {
     g << "d->prob = &p;\n";
     g << "d->qp = &d_qp;\n";
     g << "casadi_highs_init(d, &arg, &res, &iw, &w);\n";
+  
+    for (auto&& op : opts_) {
+      auto it = std::find(param_bool.begin(), param_bool.end(), op.first);
+      if (it != param_bool.end() || op.second.getType() == OT_BOOL) {
+        g << "Highs_setBoolOptionValue(d->highs, " << g.constant(op.first) << ", "
+          << int(op.second.to_bool()) << ");\n";
+      } else if (op.second.getType() == OT_INT){
+        g << "Highs_setIntOptionValue(d->highs, " << g.constant(op.first) << ", "
+          << int(op.second.to_int()) << ");\n";
+      } else if (op.second.getType() == OT_DOUBLE) {
+        g << "Highs_setDoubleOptionValue(d->highs, " << g.constant(op.first) << ", "
+          << g.constant(op.second.to_int()) << ");\n";
+      } else if (op.second.getType() == OT_STRING) {
+        g << "Highs_setStringOptionValue(d->highs, " << g.constant(op.first) << ", "
+          << g.constant(op.second.to_string()) << ");\n";
+      } else {
+        casadi_assert(false, "Option type for '" + op.first + "'not supported!");
+      }
+    }
 
     g << "casadi_highs_solve(d, arg, res, iw, w);\n";
 

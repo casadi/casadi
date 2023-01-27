@@ -220,6 +220,7 @@ namespace casadi {
         \identifier{sj} */
     std::string constant(double v);
     std::string constant(casadi_int v);
+    std::string constant(const std::string& v);
 
     /** \brief Print an intializer
 
