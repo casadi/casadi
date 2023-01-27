@@ -27,7 +27,6 @@
 #include "core.hpp"
 #include <fstream>
 
-using namespace std;
 namespace casadi {
 
   void NlpBuilder::import_nl(const std::string& filename, const Dict& opts) {

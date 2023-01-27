@@ -30,7 +30,6 @@
 
 #include "global_options.hpp"
 
-using namespace std;
 namespace casadi {
 
   std::vector<std::string> rootfinder_in() {
@@ -249,7 +248,7 @@ namespace casadi {
     alloc(oracle_);
     size_t sz_w = oracle_.sz_w();
     if (!jac.is_null()) {
-      sz_w = max(sz_w, jac.sz_w());
+      sz_w = std::max(sz_w, jac.sz_w());
     }
     alloc_w(sz_w + 2*static_cast<size_t>(n_));
   }

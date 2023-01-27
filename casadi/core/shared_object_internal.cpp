@@ -24,7 +24,6 @@
 
 #include "shared_object_internal.hpp"
 
-using namespace std;
 namespace casadi {
 
   SharedObjectInternal::SharedObjectInternal(const SharedObjectInternal& node) {

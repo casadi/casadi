@@ -1008,7 +1008,7 @@ int Sqpmethod::solve(void* mem) const {
 
   double Sqpmethod::calc_gamma_1(SqpmethodMemory* m) const {
     auto d = &m->d;
-    return max(gamma_0_*casadi_norm_inf(nx_, d->gf), gamma_1_min_);
+    return std::max(gamma_0_*casadi_norm_inf(nx_, d->gf), gamma_1_min_);
   }
 
 void Sqpmethod::codegen_declarations(CodeGenerator& g) const {

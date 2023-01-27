@@ -28,7 +28,6 @@
 #include "function_internal.hpp"
 #include "global_options.hpp"
 
-using namespace std;
 namespace casadi {
 
 class InternalOptiCallback : public FunctionInternal {

@@ -155,7 +155,7 @@ namespace casadi {
     Sparsity H_triu = Sparsity::triu(H_);
 
     Sparsity Asp = vertcat(Sparsity::diag(nx_), A_);
-    std::vector<double> dummy(max(nx_+na_, max(Asp.nnz(), H_.nnz())));
+    std::vector<double> dummy(std::max(nx_+na_, std::max(Asp.nnz(), H_.nnz())));
 
     std::vector<c_int> A_row = vector_static_cast<c_int>(Asp.get_row());
     std::vector<c_int> A_colind = vector_static_cast<c_int>(Asp.get_colind());
@@ -301,7 +301,7 @@ namespace casadi {
 
   void OsqpInterface::codegen_init_mem(CodeGenerator& g) const {
     Sparsity Asp = vertcat(Sparsity::diag(nx_), A_);
-    casadi_int dummy_size = max(nx_+na_, max(Asp.nnz(), H_.nnz()));
+    casadi_int dummy_size = std::max(nx_+na_, std::max(Asp.nnz(), H_.nnz()));
 
     g.local("A", "csc");
     g.local("dummy[" + str(dummy_size) + "]", "casadi_real");

@@ -1252,7 +1252,7 @@ namespace casadi {
       }
 
       // Clear the seeds
-      fill(seed.begin(), seed.end(), 0);
+      std::fill(seed.begin(), seed.end(), 0);
 
       // Subdivide the coarse block
       for (casadi_int k=0; k<coarse.size()-1; ++k) {
@@ -1387,7 +1387,7 @@ namespace casadi {
             }
 
             // Clear the forward seeds/adjoint sensitivities, ready for next bvec sweep
-            fill(seed.begin(), seed.end(), 0);
+            std::fill(seed.begin(), seed.end(), 0);
 
             // Clean lookup table
             lookup_col.clear();
@@ -1648,7 +1648,7 @@ namespace casadi {
               JacSparsityTraits<true>::sp(this, get_ptr(arg_fwd), get_ptr(res),
                 get_ptr(iw), get_ptr(w), memory(0));
             } else {
-              fill(w.begin(), w.end(), 0);
+              std::fill(w.begin(), w.end(), 0);
               JacSparsityTraits<false>::sp(this, get_ptr(arg_adj), get_ptr(res),
                 get_ptr(iw), get_ptr(w), memory(0));
             }
@@ -1682,10 +1682,10 @@ namespace casadi {
             }
 
             // Clear the forward seeds/adjoint sensitivities, ready for next bvec sweep
-            fill(s_in.begin(), s_in.end(), 0);
+            std::fill(s_in.begin(), s_in.end(), 0);
 
             // Clear the adjoint seeds/forward sensitivities, ready for next bvec sweep
-            fill(s_out.begin(), s_out.end(), 0);
+            std::fill(s_out.begin(), s_out.end(), 0);
 
             // Clean lookup table
             lookup_col.clear();

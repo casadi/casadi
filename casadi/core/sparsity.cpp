@@ -716,7 +716,7 @@ namespace casadi {
     try {
       return (*this)->btf(rowperm, colperm, rowblock, colblock,
                           coarse_rowblock, coarse_colblock);
-    } catch (exception &e) {
+    } catch (std::exception &e) {
       CASADI_THROW_ERROR("btf", e.what());
     }
   }
@@ -1062,14 +1062,14 @@ namespace casadi {
 
     std::vector< casadi_int >          row(nc);
 
-    casadi_int offset = max(p, casadi_int(0));
+    casadi_int offset = std::max(p, casadi_int(0));
     for (casadi_int i=0;i<nc;i++) {
       row[i]=i+offset;
     }
 
     std::vector< casadi_int >          colind(n+1);
 
-    offset = min(p, casadi_int(0));
+    offset = std::min(p, casadi_int(0));
     for (casadi_int i=0;i<n+1;i++) {
       colind[i]=max(min(i+offset, nc), casadi_int(0));
     }
@@ -1171,7 +1171,7 @@ namespace casadi {
     // Number of elements in each row
     std::vector<casadi_int>& rowcount = mapping1; // reuse memory
     rowcount.resize(nrow+1);
-    fill(rowcount.begin(), rowcount.end(), 0);
+    std::fill(rowcount.begin(), rowcount.end(), 0);
     for (std::vector<casadi_int>::const_iterator it=row.begin(); it!=row.end(); ++it) {
       rowcount[*it+1]++;
     }

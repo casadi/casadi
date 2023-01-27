@@ -72,8 +72,6 @@
 
 #include <typeinfo>
 
-using namespace std;
-
 namespace casadi {
 
   MXNode::MXNode() {

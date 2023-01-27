@@ -607,7 +607,7 @@ namespace casadi {
     }
 
     //restore A; unmark all nodes
-    fill(marked.begin(), marked.end(), false);
+    std::fill(marked.begin(), marked.end(), false);
 
     top = size2();
     casadi_int nb = size2();
@@ -1270,11 +1270,11 @@ namespace casadi {
 
     // coarse col decomposition
     coarse_rowblock.resize(5);
-    fill(coarse_rowblock.begin(), coarse_rowblock.end(), 0);
+    std::fill(coarse_rowblock.begin(), coarse_rowblock.end(), 0);
 
     // coarse row decomposition
     coarse_colblock.resize(5);
-    fill(coarse_colblock.begin(), coarse_colblock.end(), 0);
+    std::fill(coarse_colblock.begin(), coarse_colblock.end(), 0);
 
     // max transversal
     std::vector<casadi_int> imatch, jmatch;
@@ -2343,7 +2343,7 @@ namespace casadi {
     if (is_equal(y)) {
       if (with_mapping) {
         mapping.resize(y.nnz());
-        fill(mapping.begin(), mapping.end(), 1 | 2);
+        std::fill(mapping.begin(), mapping.end(), 1 | 2);
       }
       return y;
     }
@@ -2940,7 +2940,7 @@ namespace casadi {
     }
 
     // Add trailing elements not in pattern
-    fill(it, indices.end(), -1);
+    std::fill(it, indices.end(), -1);
   }
 
   Sparsity SparsityInternal::uni_coloring(const Sparsity& AT, casadi_int cutoff) const {
@@ -3403,7 +3403,7 @@ namespace casadi {
     casadi_int max_degree = 0;
     for (casadi_int k=0; k<size2(); ++k) {
       degree[k] = degree[k+1]-degree[k];
-      max_degree = max(max_degree, 1+degree[k]);
+      max_degree = std::max(max_degree, 1+degree[k]);
     }
     degree.resize(size2());
 

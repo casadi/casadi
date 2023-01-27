@@ -31,8 +31,6 @@
 #include "function_internal.hpp"
 #include "serializing_stream.hpp"
 
-using namespace std;
-
 namespace casadi {
 
   Multiplication::Multiplication(const MX& z, const MX& x, const MX& y) {

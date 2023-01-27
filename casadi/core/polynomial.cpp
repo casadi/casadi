@@ -27,7 +27,6 @@
 #include "casadi_misc.hpp"
 #include <sstream>
 
-using namespace std;
 namespace casadi {
 
   Polynomial::Polynomial(double scalar) : p_(1, scalar) {
@@ -112,7 +111,7 @@ namespace casadi {
   }
 
   Polynomial& Polynomial::operator+=(const Polynomial& b) {
-    p_.resize(max(p_.size(), b.p_.size()), 0);
+    p_.resize(std::max(p_.size(), b.p_.size()), 0);
     transform(b.p_.begin(), b.p_.end(), p_.begin(), p_.begin(), std::plus<double>());
     trim();
     return *this;
@@ -124,7 +123,7 @@ namespace casadi {
   }
 
   Polynomial& Polynomial::operator-=(const Polynomial& b) {
-    p_.resize(max(p_.size(), b.p_.size()), 0);
+    p_.resize(std::max(p_.size(), b.p_.size()), 0);
     transform(p_.begin(), p_.begin()+b.p_.size(),
               b.p_.begin(), p_.begin(), std::minus<double>());
     trim();

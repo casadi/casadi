@@ -27,8 +27,6 @@
 #include <algorithm>
 #include <locale>
 
-using namespace std;
-
 namespace casadi {
 
   const Options::Entry* Options::find(const std::string& name) const {
@@ -94,7 +92,7 @@ namespace casadi {
         if (s != t)
           cost = 1;
 
-        v1[j+1] = min(min(v1[j] + 1, v0[j+1] + 1), v0[j] + cost);
+        v1[j+1] = std::min(std::min(v1[j] + 1, v0[j+1] + 1), v0[j] + cost);
       }
 
       for (casadi_int j=0; j<nb+1; j++)
@@ -107,7 +105,7 @@ namespace casadi {
   std::vector<std::string> Options::suggestions(const std::string& word, casadi_int amount) const {
     // Best distances so far
     const double inf = std::numeric_limits<double>::infinity();
-    std::vector<pair<double, string> > best(amount, {inf, ""});
+    std::vector<std::pair<double, std::string>> best(amount, {inf, ""});
 
     // Iterate over elements
     best_matches(word, best);
@@ -127,7 +125,7 @@ namespace casadi {
   }
 
   void Options::best_matches(const std::string& word,
-                             std::vector<pair<double, string> >& best) const {
+                             std::vector<std::pair<double, std::string> >& best) const {
     // Iterate over bases
     for (auto&& b : bases) {
       b->best_matches(word, best);

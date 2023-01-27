@@ -864,7 +864,7 @@ namespace casadi {
 
     // Add dummy inputs (outputs of the nondifferentiated funciton)
     dd.resize(INTEGRATOR_NUM_OUT);
-    fill(dd.begin(), dd.end(), MX());
+    std::fill(dd.begin(), dd.end(), MX());
     dd[INTEGRATOR_XF]  = MX::sym("xf_dummy", Sparsity(x().size()));
     dd[INTEGRATOR_QF]  = MX::sym("qf_dummy", Sparsity(q().size()));
     dd[INTEGRATOR_ZF]  = MX::sym("zf_dummy", Sparsity(z().size()));
@@ -875,7 +875,7 @@ namespace casadi {
 
     // Add adjoint seeds
     dd.resize(INTEGRATOR_NUM_OUT);
-    fill(dd.begin(), dd.end(), MX());
+    std::fill(dd.begin(), dd.end(), MX());
     for (casadi_int dir=0; dir<nadj; ++dir) {
       // Suffix
       std::string suff;
@@ -935,7 +935,7 @@ namespace casadi {
 
     // Collect the adjoint sensitivities
     dd.resize(INTEGRATOR_NUM_IN);
-    fill(dd.begin(), dd.end(), MX());
+    std::fill(dd.begin(), dd.end(), MX());
     for (casadi_int dir=0; dir<nadj; ++dir) {
       dd[INTEGRATOR_X0]  = reshape(rxf_aug.at(dir+1), x().size());
       dd[INTEGRATOR_P]   = reshape(rqf_aug.at(dir+1), p().size());

@@ -241,7 +241,7 @@ namespace casadi {
     }
 
     // Stack used to sort the computational graph
-    stack<SXNode*> s;
+    std::stack<SXNode*> s;
 
     // All nodes
     std::vector<SXNode*> nodes;
@@ -282,7 +282,7 @@ namespace casadi {
     }
 
     // Input instructions
-    std::vector<pair<int, SXNode*> > symb_loc;
+    std::vector<std::pair<int, SXNode*> > symb_loc;
 
     // Current output and nonzero, start with the first one
     int curr_oind, curr_nz=0;
@@ -360,7 +360,7 @@ namespace casadi {
     std::vector<int> place(nodes.size());
 
     // Stack with unused elements in the work vector
-    stack<int> unused;
+    std::stack<int> unused;
 
     // Work vector size
     int worksize = 0;
@@ -455,7 +455,7 @@ namespace casadi {
 
     // Locate free variables
     free_vars_.clear();
-    for (std::vector<pair<int, SXNode*> >::const_iterator it=symb_loc.begin();
+    for (std::vector<std::pair<int, SXNode*> >::const_iterator it=symb_loc.begin();
          it!=symb_loc.end(); ++it) {
       if (it->second->temp!=0) {
         // Save to list of free parameters
@@ -712,7 +712,7 @@ namespace casadi {
         if (asens[d][i].sparsity()!=sparsity_in_[i]) {
           asens[d][i] = SX::zeros(sparsity_in_[i]);
         } else {
-          fill(asens[d][i]->begin(), asens[d][i]->end(), 0);
+          std::fill(asens[d][i]->begin(), asens[d][i]->end(), 0);
         }
       }
     }

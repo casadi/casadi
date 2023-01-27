@@ -32,7 +32,6 @@
 #include "generic_type.hpp"
 #include <iomanip>
 
-using namespace std;
 namespace casadi {
 
     StringSerializer::StringSerializer(const Dict& opts) :
@@ -90,7 +89,7 @@ namespace casadi {
       return ret;
     }
     void StringDeserializer::decode(const std::string& string) {
-      casadi_assert(dstream_->peek()==char_traits<char>::eof(),
+      casadi_assert(dstream_->peek() == std::char_traits<char>::eof(),
         "StringDeserializer::decode does not apply: current string not fully consumed yet.");
       static_cast<std::stringstream*>(dstream_.get())->str(string);
       dstream_->clear(); // reset error flags
@@ -126,7 +125,7 @@ namespace casadi {
     }
 
     DeserializingStream& DeserializerBase::deserializer() {
-      casadi_assert(dstream_->peek()!=char_traits<char>::eof(),
+      casadi_assert(dstream_->peek() != std::char_traits<char>::eof(),
         "Deserializer reached end of stream. Nothing left to unpack.");
       return *deserializer_;
     }

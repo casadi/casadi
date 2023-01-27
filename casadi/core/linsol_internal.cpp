@@ -25,7 +25,6 @@
 
 #include "linsol_internal.hpp"
 
-using namespace std;
 namespace casadi {
 
   LinsolInternal::LinsolInternal(const std::string& name, const Sparsity& sp)

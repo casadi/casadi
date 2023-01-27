@@ -36,7 +36,6 @@
 #include "function_internal.hpp"
 #include <iomanip>
 
-using namespace std;
 namespace casadi {
 
     static casadi_int serialization_protocol_version = 3;

@@ -26,8 +26,6 @@
 #include "reshape.hpp"
 #include "casadi_misc.hpp"
 
-using namespace std;
-
 namespace casadi {
 
   Reshape::Reshape(const MX& x, Sparsity sp) {

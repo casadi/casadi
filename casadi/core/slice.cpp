@@ -27,7 +27,6 @@
 #include "casadi_misc.hpp"
 #include "serializing_stream.hpp"
 
-using namespace std;
 namespace casadi {
 
   Slice::Slice() : start(0), stop(std::numeric_limits<casadi_int>::max()), step(1) {

@@ -211,7 +211,7 @@ namespace casadi {
     std::map<SXNode*, casadi_int> indices;
 
     // Stack of nodes that are not yet expanded
-    stack<SXNode*> to_be_expanded;
+    std::stack<SXNode*> to_be_expanded;
     to_be_expanded.push(ex.get());
 
     while (!to_be_expanded.empty()) { // as long as there are nodes to be expanded

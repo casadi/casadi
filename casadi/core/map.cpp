@@ -34,8 +34,6 @@
 #endif // CASADI_WITH_THREAD_MINGW
 #endif // CASADI_WITH_THREAD
 
-using namespace std;
-
 namespace casadi {
 
   Function Map::create(const std::string& parallelization, const Function& f, casadi_int n) {

@@ -164,7 +164,7 @@ namespace casadi {
       double abstol = 0;
       if (abstol_ != std::numeric_limits<double>::infinity()) {
         for (casadi_int i=0; i<n_; ++i) {
-          abstol = max(abstol, fabs(m->f[i]));
+          abstol = std::max(abstol, fabs(m->f[i]));
         }
         if (abstol <= abstol_) {
           if (verbose_) casadi_message("Converged to acceptable tolerance: " + str(abstol_));
@@ -180,7 +180,7 @@ namespace casadi {
       double abstolStep=0;
       if (std::numeric_limits<double>::infinity() != abstolStep_) {
         for (casadi_int i=0; i<n_; ++i) {
-          abstolStep = max(abstolStep, fabs(m->f[i]));
+          abstolStep = std::max(abstolStep, fabs(m->f[i]));
         }
         if (abstolStep <= abstolStep_) {
           if (verbose_) casadi_message("Minimal step size reached: " + str(abstolStep_));

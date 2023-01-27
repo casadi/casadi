@@ -28,7 +28,6 @@
 #endif // WITH_EXTRA_CHECKS
 #include <typeinfo>
 
-using namespace std;
 namespace casadi {
 
   SharedObject::SharedObject() {

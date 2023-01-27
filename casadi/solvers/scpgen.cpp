@@ -451,7 +451,7 @@ namespace casadi {
     std::vector<std::vector<MX> > mfcn_fwdSeed(1, mfcn_in), mfcn_fwdSens(1, mfcn_out);
 
     // Linearization in the d-direction (see Equation (2.12) in Alberspeyer2010)
-    fill(mfcn_fwdSeed[0].begin(), mfcn_fwdSeed[0].end(), MX());
+    std::fill(mfcn_fwdSeed[0].begin(), mfcn_fwdSeed[0].end(), MX());
     for (std::vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
       mfcn_fwdSeed[0][it->mod_var] = it->d;
       if (!gauss_newton_) {
@@ -485,7 +485,7 @@ namespace casadi {
     }
 
     // Interpret the Jacobian-vector multiplication as a forward directional derivative
-    fill(mfcn_fwdSeed[0].begin(), mfcn_fwdSeed[0].end(), MX());
+    std::fill(mfcn_fwdSeed[0].begin(), mfcn_fwdSeed[0].end(), MX());
     mfcn_fwdSeed[0][mod_x_] = du;
     for (std::vector<Var>::iterator it=v_.begin(); it!=v_.end(); ++it) {
       mfcn_fwdSeed[0][it->mod_var] = -it->d;

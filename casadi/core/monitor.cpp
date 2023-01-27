@@ -25,8 +25,6 @@
 
 #include "monitor.hpp"
 
-using namespace std;
-
 namespace casadi {
 
   Monitor::Monitor(const MX& x, const std::string& comment) : comment_(comment) {

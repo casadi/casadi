@@ -38,8 +38,6 @@
 throw CasadiException("Error in MXFunction::" FNAME " at " + CASADI_WHERE + ":\n"\
   + std::string(WHAT));
 
-using namespace std;
-
 namespace casadi {
 
   MXFunction::MXFunction(const std::string& name,
@@ -137,7 +135,7 @@ namespace casadi {
     if (cse_opt) out_ = cse(out_);
 
     // Stack used to sort the computational graph
-    stack<MXNode*> s;
+    std::stack<MXNode*> s;
 
     // All nodes
     std::vector<MXNode*> nodes;
@@ -168,7 +166,7 @@ namespace casadi {
     place_in_alg.reserve(nodes.size());
 
     // Input instructions
-    std::vector<pair<casadi_int, MXNode*> > symb_loc;
+    std::vector<std::pair<casadi_int, MXNode*> > symb_loc;
 
     // Count the number of times each node is used
     std::vector<casadi_int> refcount(nodes.size(), 0);
@@ -197,7 +195,7 @@ namespace casadi {
         }
         ae.res.resize(n->nout());
         if (n->has_output()) {
-          fill(ae.res.begin(), ae.res.end(), -1);
+          std::fill(ae.res.begin(), ae.res.end(), -1);
         } else if (!ae.res.empty()) {
           ae.res[0] = n->temp;
         }
@@ -238,7 +236,7 @@ namespace casadi {
     place.resize(nodes.size());
 
     // Stack with unused elements in the work vector, sorted by sparsity pattern
-    SPARSITY_MAP<casadi_int, stack<casadi_int> > unused_all;
+    SPARSITY_MAP<casadi_int, std::stack<casadi_int> > unused_all;
 
     // Work vector size
     casadi_int worksize = 0;
@@ -297,7 +295,7 @@ namespace casadi {
               casadi_int nnz = e.data->sparsity(c).nnz();
 
               // Get a reference to the stack for the current sparsity
-              stack<casadi_int>& unused = unused_all[nnz];
+              std::stack<casadi_int>& unused = unused_all[nnz];
 
               // Try to reuse a variable from the stack if possible (last in, first out)
               if (!unused.empty()) {
@@ -325,7 +323,7 @@ namespace casadi {
 
     // Allocate work vectors (numeric)
     workloc_.resize(worksize+1);
-    fill(workloc_.begin(), workloc_.end(), -1);
+    std::fill(workloc_.begin(), workloc_.end(), -1);
     size_t wind=0, sz_w=0;
     for (auto&& e : algorithm_) {
       if (e.op!=OP_OUTPUT) {
@@ -334,7 +332,7 @@ namespace casadi {
             alloc_arg(e.data->sz_arg());
             alloc_res(e.data->sz_res());
             alloc_iw(e.data->sz_iw());
-            sz_w = max(sz_w, e.data->sz_w());
+            sz_w = std::max(sz_w, e.data->sz_w());
             if (workloc_[e.res[c]] < 0) {
               workloc_[e.res[c]] = wind;
               wind += e.data->sparsity(c).nnz();
@@ -433,7 +431,7 @@ namespace casadi {
         casadi_int i=e.data->ind();
         casadi_int nz_offset=e.data->offset();
         if (arg[i]==nullptr) {
-          fill(w1, w1+nnz, 0);
+          std::fill(w1, w1+nnz, 0);
         } else {
           std::copy(arg[i]+nz_offset, arg[i]+nz_offset+nnz, w1);
         }
@@ -784,7 +782,7 @@ namespace casadi {
       if (verbose_) casadi_message("Allocated derivative work vector (forward mode)");
 
       // Split up fseed analogous to symbolic primitives
-      std::vector<std::vector<vector<MX> > > fseed_split(nfwd);
+      std::vector<std::vector<std::vector<MX>>> fseed_split(nfwd);
       for (casadi_int d=0; d<nfwd; ++d) {
         fseed_split[d].resize(fseed[d].size());
         for (casadi_int i=0; i<fseed[d].size(); ++i) {
@@ -793,7 +791,7 @@ namespace casadi {
       }
 
       // Allocate splited forward sensitivities
-      std::vector<std::vector<vector<MX> > > fsens_split(nfwd);
+      std::vector<std::vector<std::vector<MX>>> fsens_split(nfwd);
       for (casadi_int d=0; d<nfwd; ++d) {
         fsens_split[d].resize(out_.size());
         for (casadi_int i=0; i<out_.size(); ++i) {
@@ -951,7 +949,7 @@ namespace casadi {
       }
 
       // Split up aseed analogous to symbolic primitives
-      std::vector<std::vector<vector<MX> > > aseed_split(nadj);
+      std::vector<std::vector<std::vector<MX>>> aseed_split(nadj);
       for (casadi_int d=0; d<nadj; ++d) {
         aseed_split[d].resize(out_.size());
         for (casadi_int i=0; i<out_.size(); ++i) {
@@ -960,7 +958,7 @@ namespace casadi {
       }
 
       // Allocate splited adjoint sensitivities
-      std::vector<std::vector<vector<MX> > > asens_split(nadj);
+      std::vector<std::vector<std::vector<MX>>> asens_split(nadj);
       for (casadi_int d=0; d<nadj; ++d) {
         asens_split[d].resize(in_.size());
         for (casadi_int i=0; i<in_.size(); ++i) {
@@ -969,7 +967,7 @@ namespace casadi {
       }
 
       // Pointers to the arguments of the current operation
-      std::vector<std::vector<MX> > oseed, osens;
+      std::vector<std::vector<MX>> oseed, osens;
       oseed.reserve(nadj);
       osens.reserve(nadj);
       std::vector<bool> skip(nadj, false);
@@ -1146,14 +1144,14 @@ namespace casadi {
   }
 
   void MXFunction::codegen_incref(CodeGenerator& g) const {
-    set<void*> added;
+    std::set<void*> added;
     for (auto&& a : algorithm_) {
       a.data->codegen_incref(g, added);
     }
   }
 
   void MXFunction::codegen_decref(CodeGenerator& g) const {
-    set<void*> added;
+    std::set<void*> added;
     for (auto&& a : algorithm_) {
       a.data->codegen_decref(g, added);
     }

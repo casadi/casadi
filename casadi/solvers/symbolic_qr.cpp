@@ -222,10 +222,10 @@ namespace casadi {
   }
 
   void SymbolicQrMemory::alloc(const Function& f) {
-    arg.resize(max(arg.size(), f.sz_arg()));
-    res.resize(max(res.size(), f.sz_res()));
-    iw.resize(max(iw.size(), f.sz_iw()));
-    w.resize(max(w.size(), f.sz_w()));
+    arg.resize(std::max(arg.size(), f.sz_arg()));
+    res.resize(std::max(res.size(), f.sz_res()));
+    iw.resize(std::max(iw.size(), f.sz_iw()));
+    w.resize(std::max(w.size(), f.sz_w()));
   }
 
   SymbolicQr::SymbolicQr(DeserializingStream& s) : LinsolInternal(s) {

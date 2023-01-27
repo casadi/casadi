@@ -316,7 +316,7 @@ namespace casadi {
           "Nonzero " + str(k) + " is not-a-number");
         casadi_assert(!isinf(fdata[k]),
           "Nonzero " + str(k) + " is infinite");
-      } catch(exception& ex) {
+      } catch(std::exception& ex) {
         std::stringstream ss;
         ss << ex.what() << std::endl;
         if (verbose_) {
@@ -335,7 +335,7 @@ namespace casadi {
       auto this_ = static_cast<KinsolMemory*>(user_data);
       this_->self.func(*this_, u, fval);
       return 0;
-    } catch(exception& e) {
+    } catch(std::exception& e) {
       uerr() << "func failed: " << e.what() << std::endl;
       return 1;
     }
@@ -348,7 +348,7 @@ namespace casadi {
       auto this_ = static_cast<KinsolMemory*>(user_data);
       this_->self.djac(*this_, N, u, fu, J, tmp1, tmp2);
       return 0;
-    } catch(exception& e) {
+    } catch(std::exception& e) {
       uerr() << "djac failed: " << e.what() << std::endl;;
       return 1;
     }
@@ -389,7 +389,7 @@ namespace casadi {
       auto this_ = static_cast<KinsolMemory*>(user_data);
       this_->self.bjac(*this_, N, mupper, mlower, u, fu, J, tmp1, tmp2);
       return 0;
-    } catch(exception& e) {
+    } catch(std::exception& e) {
       uerr() << "bjac failed: " << e.what() << std::endl;;
       return 1;
     }
@@ -431,7 +431,7 @@ namespace casadi {
       auto this_ = static_cast<KinsolMemory*>(user_data);
       this_->self.jtimes(*this_, v, Jv, u, new_u);
       return 0;
-    } catch(exception& e) {
+    } catch(std::exception& e) {
       uerr() << "jtimes failed: " << e.what() << std::endl;;
       return 1;
     }
@@ -455,7 +455,7 @@ namespace casadi {
       auto this_ = static_cast<KinsolMemory*>(user_data);
       this_->self.psetup(*this_, u, uscale, fval, fscale, tmp1, tmp2);
       return 0;
-    } catch(exception& e) {
+    } catch(std::exception& e) {
       uerr() << "psetup failed: " << e.what() << std::endl;;
       return 1;
     }
@@ -487,7 +487,7 @@ namespace casadi {
       auto this_ = static_cast<KinsolMemory*>(user_data);
       this_->self.psolve(*this_, u, uscale, fval, fscale, v, tmp);
       return 0;
-    } catch(exception& e) {
+    } catch(std::exception& e) {
       uerr() << "psolve failed: " << e.what() << std::endl;;
       return 1;
     }
@@ -513,7 +513,7 @@ namespace casadi {
       s.psetup(*m, u, uscale, fval, fscale, tmp1, tmp2);
 
       return 0;
-    } catch(exception& e) {
+    } catch(std::exception& e) {
       uerr() << "lsetup failed: " << e.what() << std::endl;;
       return -1;
     }
@@ -546,7 +546,7 @@ namespace casadi {
       *sFdotJp = N_VDotProd(fval, b);
 
       return 0;
-    } catch(exception& e) {
+    } catch(std::exception& e) {
       uerr() << "lsolve failed: " << e.what() << std::endl;;
       return -1;
     }
@@ -560,7 +560,7 @@ namespace casadi {
       if (!s.disable_internal_warnings_) {
         uerr() << msg << std::endl;
       }
-    } catch(exception& e) {
+    } catch(std::exception& e) {
       uerr() << "ehfun failed: " << e.what() << std::endl;
     }
   }
@@ -570,7 +570,7 @@ namespace casadi {
       // auto m = to_mem(ih_data);
       // auto& s = m->self;
       uout() << "[" << module << "] " << function << "\n   " << msg << std::endl;
-    } catch(exception& e) {
+    } catch(std::exception& e) {
       uout() << "ihfun failed: " << e.what() << std::endl;
     }
   }

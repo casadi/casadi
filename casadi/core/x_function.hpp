@@ -622,7 +622,7 @@ namespace casadi {
           if (symmetric) {
             // Initialize to zero
             tmp.resize(nnz_out(oind));
-            fill(tmp.begin(), tmp.end(), 0);
+            std::fill(tmp.begin(), tmp.end(), 0);
 
             // "Multiply" Jacobian sparsity by seed vector
             for (casadi_int el = D1.colind(offset_nfdir+d); el<D1.colind(offset_nfdir+d+1); ++el) {
@@ -648,10 +648,10 @@ namespace casadi {
 
           // Assignments to the Jacobian
           adds.resize(fsens[d][oind].nnz());
-          fill(adds.begin(), adds.end(), -1);
+          std::fill(adds.begin(), adds.end(), -1);
           if (symmetric) {
             adds2.resize(adds.size());
-            fill(adds2.begin(), adds2.end(), -1);
+            std::fill(adds2.begin(), adds2.end(), -1);
           }
 
           // For all the input nonzeros treated in the sweep

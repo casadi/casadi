@@ -24,7 +24,6 @@
 
 
 #include "logsumexp.hpp"
-using namespace std;
 namespace casadi {
 
   LogSumExp::LogSumExp(const MX& A) {

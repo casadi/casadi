@@ -26,7 +26,6 @@
 #include "exception.hpp"
 #include "global_options.hpp"
 
-using namespace std;
 namespace casadi {
 
 // Throw informative error message

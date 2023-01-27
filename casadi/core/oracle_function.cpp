@@ -30,8 +30,6 @@
 #include <iomanip>
 #include <iostream>
 
-using namespace std;
-
 namespace casadi {
 
   OracleFunction::OracleFunction(const std::string& name, const Function& oracle)
@@ -113,10 +111,10 @@ namespace casadi {
       // Compute strides for multi threading
       size_t sz_arg, sz_res, sz_iw, sz_w;
       fcn.sz_work(sz_arg, sz_res, sz_iw, sz_w);
-      stride_arg_ = max(stride_arg_, sz_arg);
-      stride_res_ = max(stride_res_, sz_res);
-      stride_iw_ = max(stride_iw_, sz_iw);
-      stride_w_ = max(stride_w_, sz_w);
+      stride_arg_ = std::max(stride_arg_, sz_arg);
+      stride_res_ = std::max(stride_res_, sz_res);
+      stride_iw_ = std::max(stride_iw_, sz_iw);
+      stride_w_ = std::max(stride_w_, sz_w);
       bool persistent = false;
       alloc(fcn, persistent, max_num_threads_);
     }
@@ -253,7 +251,7 @@ namespace casadi {
     // Evaluate memory-less
     try {
       f(ml->arg, ml->res, ml->iw, ml->w);
-    } catch(exception& ex) {
+    } catch(std::exception& ex) {
       // Fatal error
       if (show_eval_warnings_) {
         casadi_warning(name_ + ":" + fcn + " failed:" + std::string(ex.what()));
@@ -286,11 +284,11 @@ namespace casadi {
     // Make sure not NaN or Inf
     for (casadi_int i=0; i<n_out; ++i) {
       if (!ml->res[i]) continue;
-      if (!all_of(ml->res[i], ml->res[i]+f.nnz_out(i), [](double v) { return isfinite(v);})) {
+      if (!std::all_of(ml->res[i], ml->res[i]+f.nnz_out(i), [](double v) { return isfinite(v);})) {
         std::stringstream ss;
 
-        auto it = find_if(ml->res[i], ml->res[i]+f.nnz_out(i), [](double v) { return !isfinite(v);});
-        casadi_int k = distance(ml->res[i], it);
+        auto it = std::find_if(ml->res[i], ml->res[i] + f.nnz_out(i), [](double v) { return !isfinite(v);});
+        casadi_int k = std::distance(ml->res[i], it);
         bool is_nan = isnan(ml->res[i][k]);
         ss << name_ << ":" << fcn << " failed: " << (is_nan? "NaN" : "Inf") <<
         " detected for output " << f.name_out(i) << ", at " << f.sparsity_out(i).repr_el(k) << ".";

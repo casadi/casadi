@@ -550,7 +550,7 @@ namespace casadi {
       }
     } catch(KeyboardInterruptException& ex) {
       return 0;
-    } catch(exception& ex) {
+    } catch(std::exception& ex) {
       if (iteration_callback_ignore_errors_) {
         uerr() << "intermediate_callback: " << ex.what() << std::endl;
         return 1;
@@ -583,7 +583,7 @@ namespace casadi {
       m->return_status = return_status_string(status);
       m->success = status==Bonmin::TMINLP::SUCCESS;
       if (status==Bonmin::TMINLP::LIMIT_EXCEEDED) m->unified_return_status = SOLVER_RET_LIMITED;
-    } catch(exception& ex) {
+    } catch(std::exception& ex) {
       uerr() << "finalize_solution failed: " << ex.what() << std::endl;
     }
   }
@@ -602,7 +602,7 @@ namespace casadi {
       casadi_copy(d_nlp->lbz+nx_, ng_, g_l);
       casadi_copy(d_nlp->ubz+nx_, ng_, g_u);
       return true;
-    } catch(exception& ex) {
+    } catch(std::exception& ex) {
       uerr() << "get_bounds_info failed: " << ex.what() << std::endl;
       return false;
     }
@@ -622,8 +622,8 @@ namespace casadi {
       // Initialize dual variables (simple bounds)
       if (init_z) {
         for (casadi_int i=0; i<nx_; ++i) {
-          z_L[i] = max(0., -d_nlp->lam[i]);
-          z_U[i] = max(0., d_nlp->lam[i]);
+          z_L[i] = std::max(0., -d_nlp->lam[i]);
+          z_U[i] = std::max(0., d_nlp->lam[i]);
         }
       }
 
@@ -633,7 +633,7 @@ namespace casadi {
       }
 
       return true;
-    } catch(exception& ex) {
+    } catch(std::exception& ex) {
       uerr() << "get_starting_point failed: " << ex.what() << std::endl;
       return false;
     }
@@ -654,7 +654,7 @@ namespace casadi {
       // Number of Hessian nonzeros (only upper triangular half)
       nnz_h_lag = exact_hessian_ ? hesslag_sp_.nnz() : 0;
 
-    } catch(exception& ex) {
+    } catch(std::exception& ex) {
       uerr() << "get_nlp_info failed: " << ex.what() << std::endl;
     }
   }
@@ -670,7 +670,7 @@ namespace casadi {
         for (auto&& i : nl_ex_) if (i) nv++;
         return nv;
       }
-    } catch(exception& ex) {
+    } catch(std::exception& ex) {
       uerr() << "get_number_of_nonlinear_variables failed: " << ex.what() << std::endl;
       return -1;
     }
@@ -683,7 +683,7 @@ namespace casadi {
         if (nl_ex_[i]) *pos_nonlin_vars++ = i;
       }
       return true;
-    } catch(exception& ex) {
+    } catch(std::exception& ex) {
       uerr() << "get_list_of_nonlinear_variables failed: " << ex.what() << std::endl;
       return false;
     }

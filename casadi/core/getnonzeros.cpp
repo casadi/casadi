@@ -247,7 +247,7 @@ namespace casadi {
 
     // Sparsity pattern for the result
     r_colind.resize(osp.size2()+1); // Col count
-    fill(r_colind.begin(), r_colind.end(), 0);
+    std::fill(r_colind.begin(), r_colind.end(), 0);
     r_row.clear();
 
     // Perform the assignments
@@ -339,7 +339,7 @@ namespace casadi {
 
         // Sparsity pattern for the result
         r_colind.resize(osp.size2()+1); // Col count
-        fill(r_colind.begin(), r_colind.end(), 0);
+        std::fill(r_colind.begin(), r_colind.end(), 0);
         r_row.clear();
 
         // Perform the assignments

@@ -47,7 +47,6 @@ throw CasadiException("Error in MX::" FNAME " at " + CASADI_WHERE + ":\n"\
 throw CasadiException("Error in MX::" FNAME " for node of type " \
   + this->class_name() + " at " + CASADI_WHERE + ":\n" + std::string(WHAT));
 
-using namespace std;
 namespace casadi {
 
   template class GenericMatrix< MX >;
@@ -1547,9 +1546,9 @@ namespace casadi {
       // Count how many times an expression has been used
       std::vector<casadi_int> usecount(work.size(), 0);
       // Remember the origin of every calculation
-      std::vector<pair<casadi_int, casadi_int> > origin(work.size(), std::make_pair(-1, -1));
+      std::vector<std::pair<casadi_int, casadi_int> > origin(work.size(), std::make_pair(-1, -1));
       // Which evaluations to replace
-      std::vector<pair<casadi_int, casadi_int> > replace;
+      std::vector<std::pair<casadi_int, casadi_int> > replace;
       // Evaluate the algorithm to identify which evaluations to replace
       casadi_int k=0;
       for (auto it=algorithm.begin(); it<algorithm.end(); ++it, ++k) {
@@ -1613,7 +1612,7 @@ namespace casadi {
       if (replace.empty()) return;
       // Sort the elements to be replaced in the order of appearence in the algorithm
       sort(replace.begin(), replace.end());
-      std::vector<pair<casadi_int, casadi_int> >::const_iterator replace_it=replace.begin();
+      std::vector<std::pair<casadi_int, casadi_int> >::const_iterator replace_it=replace.begin();
       // Arguments for calling the atomic operations
       std::vector<MX> oarg, ores;
       // Evaluate the algorithm

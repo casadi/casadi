@@ -26,8 +26,6 @@
 #include "io_instruction.hpp"
 #include "serializing_stream.hpp"
 
-using namespace std;
-
 namespace casadi {
   Input::Input(const Sparsity& sp, casadi_int ind, casadi_int segment, casadi_int offset)
     : IOInstruction(ind, segment, offset) {

@@ -25,7 +25,6 @@
 
 #include "mmin.hpp"
 
-using namespace std;
 namespace casadi {
 
   MMin::MMin(const MX& x) {

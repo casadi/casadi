@@ -26,8 +26,6 @@
 #include "mapsum.hpp"
 #include "serializing_stream.hpp"
 
-using namespace std;
-
 namespace casadi {
 
   Function MapSum::create(const std::string& name, const std::string& parallelization,

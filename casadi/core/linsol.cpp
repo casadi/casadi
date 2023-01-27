@@ -26,7 +26,6 @@
 #include "linsol_internal.hpp"
 #include "mx_node.hpp"
 
-using namespace std;
 namespace casadi {
 
   Linsol::Linsol() {

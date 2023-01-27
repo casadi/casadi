@@ -145,7 +145,7 @@ namespace casadi {
       }
 
       // Only need the largest of these work vectors
-      sz_buf = max(sz_buf, sz_buf_k);
+      sz_buf = std::max(sz_buf, sz_buf_k);
     }
 
     // Memory for the work vectors

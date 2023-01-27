@@ -29,7 +29,6 @@
 #include "nlp_builder.hpp"
 #include "nlp_tools.hpp"
 
-using namespace std;
 namespace casadi {
 
   bool has_nlpsol(const std::string& name) {
@@ -1199,7 +1198,7 @@ namespace casadi {
     } catch(KeyboardInterruptException& ex) {
       (void)ex;  // unused
       throw;
-    } catch(exception& ex) {
+    } catch(std::exception& ex) {
       print("WARNING: intermediate_callback error: %s\n", ex.what());
       if (!iteration_callback_ignore_errors_) ret=1;
     }

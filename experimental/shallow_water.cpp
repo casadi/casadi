@@ -470,7 +470,7 @@ int main(){
 		   sol==0 ? depth_est_gn[test] : depth_est_eh[test]);
 
 	// Estimated drag
-      } catch(exception& ex){
+      } catch(std::exception& ex){
 	cout << "Test " << test << " failed: " << ex.what() << std::endl;
       }
     }

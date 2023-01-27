@@ -27,8 +27,6 @@
 #include "casadi_misc.hpp"
 #include "serializing_stream.hpp"
 
-using namespace std;
-
 namespace casadi {
 
   HorzRepmat::HorzRepmat(const MX& x, casadi_int n) : n_(n) {

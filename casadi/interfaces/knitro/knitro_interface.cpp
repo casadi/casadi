@@ -440,7 +440,7 @@ namespace casadi {
       return 0;
     } catch(KeyboardInterruptException& ex) {
       return KN_RC_USER_TERMINATION;
-    } catch(exception& ex) {
+    } catch(std::exception& ex) {
       uerr() << "KnitroInterface::callback caught exception: "
                                << ex.what() << std::endl;
       return -1;

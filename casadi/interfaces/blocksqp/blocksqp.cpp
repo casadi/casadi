@@ -499,7 +499,7 @@ namespace casadi {
         // Find the next cutoff
         casadi_int next=ind+1;
         while (ind<next && ind<nx_) {
-          for (casadi_int k=colind[ind]; k<colind[ind+1]; ++k) next = max(next, 1+row[k]);
+          for (casadi_int k=colind[ind]; k<colind[ind+1]; ++k) next = std::max(next, 1+row[k]);
           ind++;
         }
         blocks_.push_back(next);
@@ -515,7 +515,7 @@ namespace casadi {
     nnz_H_ = 0;
     for (casadi_int i=0; i<nblocks_; ++i) {
       dim_[i] = blocks_[i+1]-blocks_[i];
-      max_size = max(max_size, dim_[i]);
+      max_size = std::max(max_size, dim_[i]);
       nnz_H_ += dim_[i]*dim_[i];
     }
 
