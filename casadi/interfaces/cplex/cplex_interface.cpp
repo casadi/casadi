@@ -562,7 +562,7 @@ namespace casadi {
 
       int stat = CPXXgetstat(m->env, m->lp);
       if (stat == CPX_STAT_INFEASIBLE) {
-        m->unified_return_status = SOLVER_RET_INFEASIBLE;
+        m->d_qp.unified_return_status = SOLVER_RET_INFEASIBLE;
       }
 
       // Get objective value
@@ -602,7 +602,7 @@ namespace casadi {
 
       int stat = CPXXgetstat(m->env, m->lp);
       if (stat == CPX_STAT_INFEASIBLE) {
-        m->unified_return_status = SOLVER_RET_INFEASIBLE;
+        m->d_qp.unified_return_status = SOLVER_RET_INFEASIBLE;
       }
 
       m->fstats.at("solver").toc();
@@ -634,7 +634,7 @@ namespace casadi {
           // Retrieving solution
           int sol_ret = CPXXsolution(m->env, m->lp, &solstat, &f, x, lam_a, get_ptr(slack), lam_x);
           if (sol_ret == CPXERR_NO_SOLN) {
-            m->unified_return_status = SOLVER_RET_INFEASIBLE;
+            m->d_qp.unified_return_status = SOLVER_RET_INFEASIBLE;
           }
 
           if (sol_ret) {
