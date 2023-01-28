@@ -1265,7 +1265,7 @@ endif()
 if(WITH_PROXQP)
   if(WITH_BUILD_PROXQP)
     ExternalProject_Add(proxqp-external
-        DEPENDS simde-external eigen3-external
+        DEPENDS Simde eigen3
         GIT_REPOSITORY ${BUILD_PROXQP_GIT_REPO}
         GIT_TAG ${BUILD_PROXQP_VERSION}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
