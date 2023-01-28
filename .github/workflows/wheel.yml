@@ -235,8 +235,8 @@ jobs:
           path: dist
       - name: Test
         run: |
-          python3 -m pip install -U pip pytest cmake ninja
-          python3 -m pip install --find-links=dist ${PACKAGE_NAME}==${PACKAGE_VERSION}
+          python3 -m pip install -U pip cmake ninja
+          python3 -m pip install --find-links=dist "${PACKAGE_NAME}[test]==${PACKAGE_VERSION}"
           pytest -rP
 
 
@@ -310,8 +310,8 @@ jobs:
       - name: Test
         shell: powershell
         run: |
-          python3 -m pip install -U pip pytest cmake
-          python3 -m pip install --find-links=dist $Env:PACKAGE_NAME==$Env:PACKAGE_VERSION
+          python3 -m pip install -U pip cmake
+          python3 -m pip install --find-links=dist "$($Env:PACKAGE_NAME)[test]==$($Env:PACKAGE_VERSION)"
           pytest -rP
 
 
@@ -391,8 +391,8 @@ jobs:
           path: dist
       - name: Test
         run: |
-          python3 -m pip install -U pip pytest cmake ninja
-          python3 -m pip install --find-links=dist ${PACKAGE_NAME}==${PACKAGE_VERSION}
+          python3 -m pip install -U pip cmake ninja
+          python3 -m pip install --find-links=dist "${PACKAGE_NAME}[test]==${PACKAGE_VERSION}"
           pytest -rP
 
 
