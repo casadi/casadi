@@ -204,7 +204,7 @@ namespace casadi {
     OP_EXPM1,
 
     OP_HYPOT,
-  
+
     OP_LOGSUMEXP,
 
     OP_REMAINDER
@@ -800,7 +800,8 @@ namespace casadi {
   /// Remainder of division
   template<>
   struct BinaryOperation<OP_REMAINDER>{
-    template<typename T> static inline void fcn(const T& x, const T& y, T& f) { f = remainder(x, y);}
+    template<typename T> static inline void fcn(const T& x, const T& y, T& f) {
+      f = remainder(x, y);}
     template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d) {
       d[0]=1; d[1]=(f-x)/y;}
   };
@@ -1548,7 +1549,7 @@ case OP_HYPOT:     DerBinaryOperation<OP_HYPOT>::derf(X, Y, F, D);      break;
     case OP_ERFINV:                              \
     case OP_LOG1P:                               \
     case OP_EXPM1:
-  
+
   template<typename T>
   bool casadi_math<T>::is_binary(unsigned char op) {
     switch (op) {

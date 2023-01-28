@@ -43,7 +43,8 @@
 // Throw informative error message
 #define THROW_ERROR_NODE(FNAME, NODE, WHAT) \
 throw CasadiException("Error in DaeBuilderInternal::" FNAME " for '" + this->name_ \
-  + "', node '" + NODE.name + "' (line " + str(NODE.line) + ") at " + CASADI_WHERE + ":\n" + std::string(WHAT));
+  + "', node '" + NODE.name + "' (line " + str(NODE.line) + ") at " \
+  + CASADI_WHERE + ":\n" + std::string(WHAT));
 
 namespace casadi {
 

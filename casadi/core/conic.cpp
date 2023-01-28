@@ -119,7 +119,7 @@ namespace casadi {
     Dict opt = opts;
     auto it = opt.find("expand");
     bool expand = false;
-    bool error_on_fail = get_from_dict(opts, "error_on_fail", true); 
+    bool error_on_fail = get_from_dict(opts, "error_on_fail", true);
     if (it!=opt.end()) {
       expand = it->second;
       opt.erase(it);

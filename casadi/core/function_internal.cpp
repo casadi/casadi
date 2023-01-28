@@ -3464,7 +3464,8 @@ namespace casadi {
   }
 
   std::vector<bool> FunctionInternal::
-  which_depends(const std::string& s_in, const std::vector<std::string>& s_out, casadi_int order, bool tr) const {
+  which_depends(const std::string& s_in, const std::vector<std::string>& s_out,
+      casadi_int order, bool tr) const {
     casadi_error("'which_depends' not defined for " + class_name());
     return std::vector<bool>();
   }

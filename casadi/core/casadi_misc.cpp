@@ -182,7 +182,7 @@ namespace casadi {
     }
     return ret;
   }
-  
+
   // Better have a bool return flag saying if we need reorer at all
   std::vector<casadi_int> tensor_permute_mapping(const std::vector<casadi_int>& dims,
       const std::vector<casadi_int>& order) {

@@ -31,7 +31,8 @@ void casadi_dense_lsqr_sym_ortho(T1 a, T1 b, T1* cs, T1* sn, T1* rho) {
 // SYMBOL "lsqr_single_solve"
 // Ref: scipy
 template<typename T1>
-int casadi_dense_lsqr_single_solve(const T1* A, T1* x, casadi_int tr, const casadi_int ncol, const casadi_int nrow, T1* w) {
+int casadi_dense_lsqr_single_solve(const T1* A, T1* x, casadi_int tr, const casadi_int ncol,
+      const casadi_int nrow, T1* w) {
     casadi_int m, n, i;
     T1 damp, atol, btol, conlim, ctol, anorm, acond, dampsq, ddnorm, res2, xnorm, xxnorm, z;
     T1 cs2, sn2, alpha, beta, rhobar, phibar, bnorm, rnorm, arnorm, rhobar1, cs1, sn1, psi;
@@ -182,7 +183,7 @@ int casadi_dense_lsqr_single_solve(const T1* A, T1* x, casadi_int tr, const casa
 // SYMBOL "lsqr_solve"
 template<typename T1>
 int casadi_dense_lsqr_solve(const T1* A, T1* x, casadi_int nrhs, casadi_int tr,
-        const casadi_int ncol, const casadi_int nrow, T1* w) {
+      const casadi_int ncol, const casadi_int nrow, T1* w) {
     casadi_int i;
     for (i=0; i<nrhs;++i) {
       // if (casadi_dense_lsqr_single_solve(A, x+i*sp[1], tr, ncol, nrow, w)) return 1;

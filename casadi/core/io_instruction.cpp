@@ -39,7 +39,7 @@ namespace casadi {
   }
 
   void Input::generate(CodeGenerator& g,
-                       const std::vector<casadi_int>& arg, const std::vector<casadi_int>& res) const {
+      const std::vector<casadi_int>& arg, const std::vector<casadi_int>& res) const {
     casadi_int nnz = this->nnz();
     if (nnz==0) return; // quick return
     std::string a = g.arg(ind_);
@@ -66,7 +66,7 @@ namespace casadi {
   }
 
   void Output::generate(CodeGenerator& g,
-                       const std::vector<casadi_int>& arg, const std::vector<casadi_int>& res) const {
+      const std::vector<casadi_int>& arg, const std::vector<casadi_int>& res) const {
     casadi_int nnz = dep().nnz();
     if (nnz==0) return; // quick return
     casadi_int i = arg.front();

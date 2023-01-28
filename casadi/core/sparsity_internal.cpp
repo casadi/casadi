@@ -501,7 +501,8 @@ namespace casadi {
     return transpose(mapping);
   }
 
-  Sparsity SparsityInternal::transpose(std::vector<casadi_int>& mapping, bool invert_mapping) const {
+  Sparsity SparsityInternal::transpose(
+      std::vector<casadi_int>& mapping, bool invert_mapping) const {
     // Get the sparsity of the transpose in sparse triplet form
     std::vector<casadi_int> trans_col = get_row();
     std::vector<casadi_int> trans_row = get_col();
@@ -2002,8 +2003,9 @@ namespace casadi {
     return Sparsity(size1(), size2(), ret_colind, ret_row);
   }
 
-  Sparsity SparsityInternal::_erase(const std::vector<casadi_int>& rr, const std::vector<casadi_int>& cc,
-                                      bool ind1, std::vector<casadi_int>& mapping) const {
+  Sparsity SparsityInternal::_erase(
+      const std::vector<casadi_int>& rr, const std::vector<casadi_int>& cc,
+      bool ind1, std::vector<casadi_int>& mapping) const {
     casadi_assert_in_range(rr, -size1()+ind1, size1()+ind1);
     casadi_assert_in_range(cc, -size2()+ind1, size2()+ind1);
 
@@ -2187,8 +2189,9 @@ namespace casadi {
     return Sparsity(sp.size1(), sp.size2(), ret_colind, ret_row);
   }
 
-  Sparsity SparsityInternal::sub(const std::vector<casadi_int>& rr, const std::vector<casadi_int>& cc,
-                                 std::vector<casadi_int>& mapping, bool ind1) const {
+  Sparsity SparsityInternal::sub(
+      const std::vector<casadi_int>& rr, const std::vector<casadi_int>& cc,
+      std::vector<casadi_int>& mapping, bool ind1) const {
     casadi_assert_in_range(rr, -size1()+ind1, size1()+ind1);
     casadi_assert_in_range(cc, -size2()+ind1, size2()+ind1);
 

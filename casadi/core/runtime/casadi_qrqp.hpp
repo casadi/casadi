@@ -93,7 +93,8 @@ struct casadi_qrqp_data {
 
 // SYMBOL "qrqp_work"
 template<typename T1>
-void casadi_qrqp_work(const casadi_qrqp_prob<T1>* p, casadi_int* sz_arg, casadi_int* sz_res, casadi_int* sz_iw, casadi_int* sz_w) {
+void casadi_qrqp_work(const casadi_qrqp_prob<T1>* p, casadi_int* sz_arg, casadi_int* sz_res,
+    casadi_int* sz_iw, casadi_int* sz_w) {
   // Local variables
   casadi_int nnz_a, nnz_kkt, nnz_v, nnz_r;
   casadi_qp_work(p->qp, sz_arg, sz_res, sz_iw, sz_w);

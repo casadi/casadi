@@ -857,7 +857,8 @@ namespace casadi {
     return shorthand("s" + str(get_constant(v, true)));
   }
 
-  void CodeGenerator::constant_copy(const std::string& name, const std::vector<casadi_int>& v, const std::string& type) {
+  void CodeGenerator::constant_copy(
+      const std::string& name, const std::vector<casadi_int>& v, const std::string& type) {
     std::string ref = constant(v);
     if (!v.empty()) {
       local(name+"[" + str(v.size()) + "]", type);
@@ -1459,11 +1460,12 @@ namespace casadi {
     return s.str();
   }
 
-  std::string CodeGenerator::interpn(const std::string& res, casadi_int ndim, const std::string& grid,
-                                   const std::string& offset,
-                                   const std::string& values, const std::string& x,
-                                   const std::string& lookup_mode, casadi_int m,
-                                   const std::string& iw, const std::string& w) {
+  std::string CodeGenerator::interpn(
+      const std::string& res, casadi_int ndim, const std::string& grid,
+      const std::string& offset,
+      const std::string& values, const std::string& x,
+      const std::string& lookup_mode, casadi_int m,
+      const std::string& iw, const std::string& w) {
     add_auxiliary(AUX_INTERPN);
     std::stringstream s;
     s << "casadi_interpn(" << res << ", " << ndim << ", " << grid << ", "  << offset << ", "
@@ -1472,10 +1474,10 @@ namespace casadi {
   }
 
   std::string CodeGenerator::interpn_grad(const std::string& grad,
-                                   casadi_int ndim, const std::string& grid, const std::string& offset,
-                                   const std::string& values, const std::string& x,
-                                   const std::string& lookup_mode, casadi_int m,
-                                   const std::string& iw, const std::string& w) {
+      casadi_int ndim, const std::string& grid, const std::string& offset,
+      const std::string& values, const std::string& x,
+      const std::string& lookup_mode, casadi_int m,
+      const std::string& iw, const std::string& w) {
     add_auxiliary(AUX_INTERPN_GRAD);
     std::stringstream s;
     s << "casadi_interpn_grad(" << grad << ", " << ndim << ", " << grid << ", " << offset << ", "
@@ -1857,8 +1859,9 @@ namespace casadi {
 
   std::string CodeGenerator::
   qr(const std::string& sp, const std::string& A, const std::string& w,
-     const std::string& sp_v, const std::string& v, const std::string& sp_r,
-     const std::string& r, const std::string& beta, const std::string& prinv, const std::string& pc) {
+      const std::string& sp_v, const std::string& v, const std::string& sp_r,
+      const std::string& r, const std::string& beta, const std::string& prinv,
+      const std::string& pc) {
     add_auxiliary(CodeGenerator::AUX_QR);
     return "casadi_qr(" + sp + ", " + A + ", " + w + ", "
            + sp_v + ", " + v + ", " + sp_r + ", " + r + ", "
@@ -1867,10 +1870,10 @@ namespace casadi {
 
   std::string CodeGenerator::
   qr_solve(const std::string& x, casadi_int nrhs, bool tr,
-           const std::string& sp_v, const std::string& v,
-           const std::string& sp_r, const std::string& r,
-           const std::string& beta, const std::string& prinv,
-           const std::string& pc, const std::string& w) {
+      const std::string& sp_v, const std::string& v,
+      const std::string& sp_r, const std::string& r,
+      const std::string& beta, const std::string& prinv,
+      const std::string& pc, const std::string& w) {
     add_auxiliary(CodeGenerator::AUX_QR);
     return "casadi_qr_solve(" + x + ", " + str(nrhs) + ", " + (tr ? "1" : "0") + ", "
            + sp_v + ", " + v + ", " + sp_r + ", " + r + ", "

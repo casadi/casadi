@@ -120,7 +120,7 @@ namespace casadi {
   }
 
   std::vector<MX> MX::createMultipleOutput(MXNode* node) {
-    casadi_assert_dev(dynamic_cast<MultipleOutput*>(node)!=nullptr);
+    casadi_assert_dev(dynamic_cast<MultipleOutput*>(node) != nullptr);
     MX x =  MX::create(node);
     std::vector<MX> ret(x->nout());
     for (casadi_int i=0; i<ret.size(); ++i) {
@@ -2018,7 +2018,8 @@ namespace casadi {
 
   std::vector<MX> MX::cse(const std::vector<MX>& e) {
     MX c = veccat(e);
-    Function f("f", std::vector<MX>{}, e, {{"live_variables", false}, {"max_io", 0}, {"cse", false}});
+    Function f("f", std::vector<MX>{}, e,
+      {{"live_variables", false}, {"max_io", 0}, {"cse", false}});
     MXFunction *ff = f.get<MXFunction>();
 
     // Symbolic work, non-differentiated
@@ -2093,13 +2094,16 @@ namespace casadi {
       options["is_diff_in"] = std::vector<bool>{false};
       options["is_diff_out"] = std::vector<bool>{true};
     } else if (order==2) {
-      options["forward_options"] = Dict{{"is_diff_in", std::vector<bool>{false, true, true} }, {"is_diff_out", std::vector<bool>{true}}};
-      options["reverse_options"] = Dict{{"is_diff_in", std::vector<bool>{false, true, true} }, {"is_diff_out", std::vector<bool>{true}}};
-      options["jacobian_options"] = Dict{{"is_diff_in", std::vector<bool>{false, true} }, {"is_diff_out", std::vector<bool>{false}}};
+      options["forward_options"] = Dict{{"is_diff_in", std::vector<bool>{false, true, true} },
+        {"is_diff_out", std::vector<bool>{true}}};
+      options["reverse_options"] = Dict{{"is_diff_in", std::vector<bool>{false, true, true} },
+        {"is_diff_out", std::vector<bool>{true}}};
+      options["jacobian_options"] = Dict{{"is_diff_in", std::vector<bool>{false, true} },
+        {"is_diff_out", std::vector<bool>{false}}};
     } else {
       casadi_error("stop_diff: order must be 1 or 2, got " + str(order) + ".");
     }
-    
+
     Function FS("FS", {x}, {expr}, {"x"}, {"z"}, options);
     return FS(std::vector<MX>{x})[0];
   }
@@ -2109,7 +2113,7 @@ namespace casadi {
     std::vector<MX> xv = symvar(var);
     std::vector<MX> s = symvar(expr);
     std::vector<MX> yv = difference(s, xv);
-    
+
     MX x = veccat(xv);
     MX y = veccat(yv);
 
@@ -2119,13 +2123,18 @@ namespace casadi {
       options["is_diff_in"] = std::vector<bool>{false, true};
       options["is_diff_out"] = std::vector<bool>{true};
     } else if (order==2) {
-      options["forward_options"] = Dict{{"is_diff_in", std::vector<bool>{false, true, false, true, true} }, {"is_diff_out", std::vector<bool>{true}}};
-      options["reverse_options"] = Dict{{"is_diff_in", std::vector<bool>{false, true, false, true} }, {"is_diff_out", std::vector<bool>{false, true}}};
-      options["jacobian_options"] = Dict{{"is_diff_in", std::vector<bool>{false, true, true} }, {"is_diff_out", std::vector<bool>{true}}};
+      options["forward_options"] = Dict{{"is_diff_in",
+        std::vector<bool>{false, true, false, true, true} },
+        {"is_diff_out", std::vector<bool>{true}}};
+      options["reverse_options"] = Dict{{"is_diff_in",
+        std::vector<bool>{false, true, false, true}},
+        {"is_diff_out", std::vector<bool>{false, true}}};
+      options["jacobian_options"] = Dict{{"is_diff_in", std::vector<bool>{false, true, true}},
+        {"is_diff_out", std::vector<bool>{true}}};
     } else {
       casadi_error("stop_diff: order must be 1 or 2, got " + str(order) + ".");
     }
-    
+
     Function FS("FS", {x, y}, {expr}, {"x", "y"}, {"z"}, options);
     return FS(std::vector<MX>{x, y})[0];
   }

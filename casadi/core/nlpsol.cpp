@@ -46,7 +46,7 @@ namespace casadi {
   template<class X>
   Function construct_nlpsol(const std::string& name, const std::string& solver,
                   const std::map<std::string, X>& nlp, const Dict& opts) {
-    
+
     if (get_from_dict(opts, "detect_simple_bounds", false)) {
       X x = get_from_dict(nlp, "x", X(0, 1));
       X p = get_from_dict(nlp, "p", X(0, 1));
@@ -62,7 +62,7 @@ namespace casadi {
       // Read dimensions
       casadi_int ng = g.size1();
       casadi_int nx = x.size1();
-      
+
       // Get constraint Jacobian sparsity
       Sparsity sp = jacobian_sparsity(g, x).T();
 
@@ -86,7 +86,9 @@ namespace casadi {
 
       // Detect  f2(p)x+f1(p)==0
       Function gf = Function("gf", std::vector<X>{p},
-                                   substitute(std::vector<X>{jtimes(g_bounds, x, X::ones(nx, 1)), g_bounds}, std::vector<X>{x}, std::vector<X>{X(0)}));
+        substitute(std::vector<X>{jtimes(g_bounds, x, X::ones(nx, 1)), g_bounds},
+          std::vector<X>{x},
+          std::vector<X>{X(0)}));
       casadi_assert_dev(!gf.has_free());
 
       std::vector<casadi_int> target_x;
@@ -102,7 +104,6 @@ namespace casadi {
       nlpsol_opts["detect_simple_bounds_parts"] = gf;
       nlpsol_opts["detect_simple_bounds_target_x"] = target_x;
 
- 
       std::map<std::string, X> nlpsol_nlp = nlp;
       nlpsol_nlp["g"] = g(gi);
       return nlpsol(name, solver, Nlpsol::create_oracle(nlpsol_nlp, opts), nlpsol_opts);
@@ -393,7 +394,8 @@ namespace casadi {
         "Automatically detect simple bounds (lbx/ubx) (default false). "
         "This is hopefully beneficial to speed and robustness but may also have adverse affects: "
         "1) Subtleties in heuristics and stopping criteria may change the solution, "
-        "2) IPOPT may lie about multipliers of simple equality bounds unless 'fixed_variable_treatment' is set to 'relax_bounds'."}},
+        "2) IPOPT may lie about multipliers of simple equality bounds unless "
+        "'fixed_variable_treatment' is set to 'relax_bounds'."}},
       {"detect_simple_bounds_is_simple",
        {OT_BOOLVECTOR,
         "For internal use only."}},
@@ -839,12 +841,14 @@ namespace casadi {
         if (d_bounds.target_l[i]<nx_) {
           if (d_nlp->lam_x) d_nlp->lam_x[i] += (d_nlp->lam[i]<0)*d_nlp->lam[i];
         } else {
-          if (d_nlp->lam_g) d_nlp->lam_g[d_bounds.target_l[i]-nx_] += (d_nlp->lam[i]<0)*d_nlp->lam[i];
+          if (d_nlp->lam_g)
+            d_nlp->lam_g[d_bounds.target_l[i]-nx_] += (d_nlp->lam[i]<0)*d_nlp->lam[i];
         }
         if (d_bounds.target_u[i]<nx_) {
           if (d_nlp->lam_x) d_nlp->lam_x[i] += (d_nlp->lam[i]>0)*d_nlp->lam[i];
         } else {
-          if (d_nlp->lam_g) d_nlp->lam_g[d_bounds.target_u[i]-nx_] += (d_nlp->lam[i]>0)*d_nlp->lam[i];
+          if (d_nlp->lam_g)
+            d_nlp->lam_g[d_bounds.target_u[i]-nx_] += (d_nlp->lam[i]>0)*d_nlp->lam[i];
         }
       }
     }
@@ -885,7 +889,7 @@ namespace casadi {
     d_nlp.lam_x = res[NLPSOL_LAM_X];
     d_nlp.lam_g = res[NLPSOL_LAM_G];
     d_nlp.lam_p = res[NLPSOL_LAM_P];
-    
+
 
     arg += NLPSOL_NUM_IN;
     res += NLPSOL_NUM_OUT;
@@ -931,7 +935,8 @@ namespace casadi {
               const std::vector<std::string>& inames,
               const std::vector<std::string>& onames,
               const Dict& opts) const {
-    casadi_assert(detect_simple_bounds_is_simple_.empty(), "Simple bound detection not compatible with get_forward");
+    casadi_assert(detect_simple_bounds_is_simple_.empty(),
+      "Simple bound detection not compatible with get_forward");
 
     // Symbolic expression for the input
     std::vector<MX> arg = mx_in(), res = mx_out();
@@ -1058,7 +1063,8 @@ namespace casadi {
               const std::vector<std::string>& inames,
               const std::vector<std::string>& onames,
               const Dict& opts) const {
-    casadi_assert(detect_simple_bounds_is_simple_.empty(), "Simple bound detection not compatible with get_reverse");
+    casadi_assert(detect_simple_bounds_is_simple_.empty(),
+      "Simple bound detection not compatible with get_reverse");
 
     // Symbolic expression for the input
     std::vector<MX> arg = mx_in(), res = mx_out();

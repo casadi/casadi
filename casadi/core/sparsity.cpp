@@ -1341,7 +1341,8 @@ namespace casadi {
   }
 
   Sparsity Sparsity::permutation(const std::vector<casadi_int>& p, bool invert) {
-    casadi_assert(casadi::is_permutation(p), "Sparsity::permutation supplied list is not a permutation.");
+    casadi_assert(casadi::is_permutation(p),
+      "Sparsity::permutation supplied list is not a permutation.");
     std::vector<casadi_int> colind = range(p.size()+1);
     if (invert) {
       return Sparsity(p.size(), p.size(), colind, p);

@@ -10,6 +10,6 @@ void casadi_clip_max(T1* x, casadi_int n, T1 max, const casadi_int* mask) {
           x[i] = max;
         }
       }
-    } 
+    }
   }
 }

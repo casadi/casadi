@@ -143,7 +143,6 @@ namespace casadi {
   }
 
   void OracleFunction::join_results(OracleMemory* m) const {
-    
     // Combine runtime statistics
     // Note: probably not correct to simply add wall times
     for (int i = 0; i < max_num_threads_; ++i) {
@@ -287,7 +286,8 @@ namespace casadi {
       if (!std::all_of(ml->res[i], ml->res[i]+f.nnz_out(i), [](double v) { return isfinite(v);})) {
         std::stringstream ss;
 
-        auto it = std::find_if(ml->res[i], ml->res[i] + f.nnz_out(i), [](double v) { return !isfinite(v);});
+        auto it = std::find_if(ml->res[i], ml->res[i] + f.nnz_out(i),
+          [](double v) { return !isfinite(v);});
         casadi_int k = std::distance(ml->res[i], it);
         bool is_nan = isnan(ml->res[i][k]);
         ss << name_ << ":" << fcn << " failed: " << (is_nan? "NaN" : "Inf") <<
@@ -373,7 +373,7 @@ namespace casadi {
       m->thread_local_mem.push_back(new LocalOracleMemory());
       if (OracleFunction::local_init_mem(m->thread_local_mem[i])) return 1;
     }
-    
+
     return 0;
   }
 

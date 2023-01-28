@@ -119,11 +119,13 @@ namespace casadi {
     construct(name, ex_in, ex_out, name_in, name_out, opts);
   }
 
-  Function::Function(const std::string& name, SXIList ex_in, const SXVector& ex_out, const Dict& opts) {
+  Function::Function(const std::string& name,
+      SXIList ex_in, const SXVector& ex_out, const Dict& opts) {
     construct(name, SXVector(ex_in), ex_out, {}, {}, opts);
   }
 
-  Function::Function(const std::string& name, const SXVector& ex_in, SXIList ex_out, const Dict& opts) {
+  Function::Function(const std::string& name,
+      const SXVector& ex_in, SXIList ex_out, const Dict& opts) {
     construct(name, ex_in, SXVector(ex_out), {}, {}, opts);
   }
 
@@ -132,13 +134,13 @@ namespace casadi {
   }
 
   Function::Function(const std::string& name, SXIList ex_in, const SXVector& ex_out,
-                     const StringVector& name_in,
-                     const StringVector& name_out, const Dict& opts) {
+      const StringVector& name_in,
+      const StringVector& name_out, const Dict& opts) {
     construct(name, SXVector(ex_in), ex_out, name_in, name_out, opts);
   }
 
   Function::Function(const std::string& name, const SXVector& ex_in, SXIList ex_out,
-                     const StringVector& name_in, const StringVector& name_out, const Dict& opts) {
+      const StringVector& name_in, const StringVector& name_out, const Dict& opts) {
     construct(name, ex_in, SXVector(ex_out), name_in, name_out, opts);
   }
 
@@ -147,11 +149,13 @@ namespace casadi {
     construct(name, SXVector(ex_in), SXVector(ex_out), name_in, name_out, opts);
   }
 
-  Function::Function(const std::string& name, MXIList ex_in, const MXVector& ex_out, const Dict& opts) {
+  Function::Function(const std::string& name,
+      MXIList ex_in, const MXVector& ex_out, const Dict& opts) {
     construct(name, MXVector(ex_in), ex_out, {}, {}, opts);
   }
 
-  Function::Function(const std::string& name, const MXVector& ex_in, MXIList ex_out, const Dict& opts) {
+  Function::Function(const std::string& name,
+      const MXVector& ex_in, MXIList ex_out, const Dict& opts) {
     construct(name, ex_in, MXVector(ex_out), {}, {}, opts);
   }
 
@@ -160,29 +164,29 @@ namespace casadi {
   }
 
   Function::Function(const std::string& name, MXIList ex_in, const MXVector& ex_out,
-                     const StringVector& name_in, const StringVector& name_out, const Dict& opts) {
+      const StringVector& name_in, const StringVector& name_out, const Dict& opts) {
     construct(name, MXVector(ex_in), ex_out, name_in, name_out, opts);
   }
 
   Function::Function(const std::string& name, const MXVector& ex_in, MXIList ex_out,
-                     const StringVector& name_in, const StringVector& name_out, const Dict& opts) {
+      const StringVector& name_in, const StringVector& name_out, const Dict& opts) {
     construct(name, ex_in, MXVector(ex_out), name_in, name_out, opts);
   }
 
   Function::Function(const std::string& name, MXIList ex_in, MXIList ex_out,
-                     const StringVector& name_in, const StringVector& name_out, const Dict& opts) {
+      const StringVector& name_in, const StringVector& name_out, const Dict& opts) {
     construct(name, MXVector(ex_in), MXVector(ex_out), name_in, name_out, opts);
   }
 
   Function::Function(const std::string& name, const std::map<std::string, SX>& dict,
-                     const std::vector<std::string>& name_in, const std::vector<std::string>& name_out,
-                     const Dict& opts) {
+      const std::vector<std::string>& name_in, const std::vector<std::string>& name_out,
+      const Dict& opts) {
     construct(name, dict, name_in, name_out, opts);
   }
 
   Function::Function(const std::string& name, const std::map<std::string, MX>& dict,
-                     const std::vector<std::string>& name_in, const std::vector<std::string>& name_out,
-                     const Dict& opts) {
+      const std::vector<std::string>& name_in, const std::vector<std::string>& name_out,
+      const Dict& opts) {
     construct(name, dict, name_in, name_out, opts);
   }
 
@@ -1740,7 +1744,8 @@ namespace casadi {
   }
 
   std::vector<bool> Function::
-  which_depends(const std::string& s_in, const std::vector<std::string>& s_out, casadi_int order, bool tr) const {
+  which_depends(const std::string& s_in, const std::vector<std::string>& s_out,
+      casadi_int order, bool tr) const {
     try {
       return (*this)->which_depends(s_in, s_out, order, tr);
     } catch(std::exception& e) {

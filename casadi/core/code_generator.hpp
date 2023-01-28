@@ -116,7 +116,10 @@ namespace casadi {
     /** \brief Represent an array constant; adding it when new
 
         \identifier{s0} */
-    void constant_copy(const std::string& var_name, const std::vector<casadi_int>& v, const std::string& type="casadi_int");
+    void constant_copy(
+        const std::string& var_name,
+        const std::vector<casadi_int>& v,
+        const std::string& type="casadi_int");
 
     /** \brief Represent an array constant; adding it when new
 

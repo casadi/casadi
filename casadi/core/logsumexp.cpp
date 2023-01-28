@@ -74,7 +74,8 @@ namespace casadi {
                         const std::vector<casadi_int>& arg,
                         const std::vector<casadi_int>& res) const {
     // Perform operation inplace
-    g << g.workel(res[0]) << " = " << g.logsumexp(g.work(arg[0], dep(0).nnz()), dep(0).nnz()) << "\n";
+    g << g.workel(res[0]) << " = " << g.logsumexp(g.work(arg[0], dep(0).nnz()), dep(0).nnz())
+      << "\n";
   }
 
 } // namespace casadi

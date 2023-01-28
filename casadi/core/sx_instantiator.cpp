@@ -594,7 +594,8 @@ namespace casadi {
 
     SX c = veccat(e);
     //std::vector<SX> args = symvar(c);
-    Function f("f", std::vector<SX>{}, e, {{"live_variables", false}, {"max_io", 0}, {"cse", false}});
+    Function f("f", std::vector<SX>{}, e, {{"live_variables", false},
+      {"max_io", 0}, {"cse", false}});
     SXFunction *ff = f.get<SXFunction>();
 
     std::vector<SX> ret;
@@ -1119,8 +1120,9 @@ namespace casadi {
   }
 
   template<>
-  void CASADI_EXPORT SX::print_split(casadi_int nnz, const SXElem* nonzeros, std::vector<std::string>& nz,
-                      std::vector<std::string>& inter) {
+  void CASADI_EXPORT SX::print_split(casadi_int nnz, const SXElem* nonzeros,
+      std::vector<std::string>& nz,
+      std::vector<std::string>& inter) {
     // Find out which noded can be inlined
     std::map<const SXNode*, casadi_int> nodeind;
     for (casadi_int i=0; i<nnz; ++i) nonzeros[i]->can_inline(nodeind);

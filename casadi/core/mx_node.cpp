@@ -375,7 +375,7 @@ namespace casadi {
   }
 
   void MXNode::generate(CodeGenerator& g,
-                        const std::vector<casadi_int>& arg, const std::vector<casadi_int>& res) const {
+      const std::vector<casadi_int>& arg, const std::vector<casadi_int>& res) const {
     casadi_warning("Cannot code generate MX nodes of type " + class_name() +
                    "The generation will proceed, but compilation of the code will "
                    "not be possible.");
@@ -466,7 +466,8 @@ namespace casadi {
 
 
   MX MXNode::get_mac(const MX& y, const MX& z) const {
-    if (sparsity().is_orthonormal() && y.is_column() && y.is_dense() && y.sparsity()==z.sparsity() && z.is_zero()) {
+    if (sparsity().is_orthonormal() && y.is_column() && y.is_dense()
+        && y.sparsity()==z.sparsity() && z.is_zero()) {
       std::vector<casadi_int> perm = sparsity().permutation_vector();
       MX nz = sparsity_cast(shared_from_this<MX>(), Sparsity::dense(nnz()));
       return (nz*y)(perm);

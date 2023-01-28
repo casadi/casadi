@@ -101,7 +101,7 @@ namespace casadi {
     MX m = shared_from_this<MX>()==dep(0);
     MX N = sum2(sum1(m));
     for (casadi_int d=0; d<fsens.size(); ++d) {
-      fsens[d][0] = dot(fseed[d][0],m)/N;
+      fsens[d][0] = dot(fseed[d][0], m) / N;
     }
   }
 
@@ -119,7 +119,7 @@ namespace casadi {
     MX m = shared_from_this<MX>()==dep(0);
     MX N = sum2(sum1(m));
     for (casadi_int d=0; d<fsens.size(); ++d) {
-      fsens[d][0] = dot(fseed[d][0],m)/N;
+      fsens[d][0] = dot(fseed[d][0], m) / N;
     }
   }
 

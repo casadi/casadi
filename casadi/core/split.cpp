@@ -349,7 +349,7 @@ namespace casadi {
     for (auto&& e : x) {
       if (e.nnz()!=0) X.push_back(e);
     }
- 
+
     // Check x length
     if (X.size()!=nout()) {
       return MXNode::get_horzcat(x);

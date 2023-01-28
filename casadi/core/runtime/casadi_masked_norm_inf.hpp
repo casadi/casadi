@@ -10,6 +10,6 @@ T1 casadi_masked_norm_inf(casadi_int n, const T1* x, const casadi_int* mask) {
       ret = fmax(ret, fabs(x[i]));
     }
   }
-    
+
   return ret;
 }
