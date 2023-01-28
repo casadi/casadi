@@ -80,7 +80,7 @@ int main(){
   // Bounds on g
   std::vector<double> gmin = {10, 0};
   std::vector<double> gmax = {10, 0};
-  gmin.resize(2+nu, -numeric_limits<double>::infinity());
+  gmin.resize(2+nu, -std::numeric_limits<double>::infinity());
   gmax.resize(2+nu, 1.1);
 
   // Solve the problem
