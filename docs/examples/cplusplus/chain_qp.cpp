@@ -160,7 +160,7 @@ int main(int argc, char* argv[]) {
   DMDict res = solver(arg);
   DM x_opt = res["x"];
   double f_opt(res["f"]);
-  cout << "f_opt = " << f_opt << std::endl;
+  std::cout << "f_opt = " << f_opt << std::endl;
 
   // Retrieve the result
   DM y_opt = x_opt(Slice(0, x_opt.size1(), 2));
@@ -190,7 +190,7 @@ int main(int argc, char* argv[]) {
   file << "ylabel('z [m]');" << std::endl;
 
   file.close();
-  cout << "Results saved to \"" << filename << "\"" << std::endl;
+  std::cout << "Results saved to \"" << filename << "\"" << std::endl;
 
   return 0;
 }

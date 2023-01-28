@@ -424,7 +424,7 @@ int main(){
                 {"lbx", lbx}, {"ubx", ubx},
                 {"lba", lba}, {"uba", uba}};
   DMDict res = F(arg);
-  cout << "res = " << res << std::endl;
+  std::cout << "res = " << res << std::endl;
 
   return 0;
 }
