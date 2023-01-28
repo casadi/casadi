@@ -3,6 +3,7 @@
 #include <alpaqa/config/config.hpp>
 #include <Eigen/Cholesky>
 #include <Eigen/LU>
+#include <cassert>
 
 namespace alpaqa {
 
