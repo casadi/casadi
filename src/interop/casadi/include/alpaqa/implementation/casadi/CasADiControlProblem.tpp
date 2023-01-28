@@ -44,6 +44,10 @@ struct CasADiControlFunctionsWithParam {
     CasADiFunctionEvaluator<Conf, 1 + WithParam, 1> c;
     CasADiFunctionEvaluator<Conf, 2 + WithParam, 1> grad_c_prod;
     CasADiFunctionEvaluator<Conf, 2 + WithParam, 1> gn_hess_c;
+
+    CasADiFunctionEvaluator<Conf, 1 + WithParam, 1> c_N;
+    CasADiFunctionEvaluator<Conf, 2 + WithParam, 1> grad_c_prod_N;
+    CasADiFunctionEvaluator<Conf, 2 + WithParam, 1> gn_hess_c_N;
 };
 
 } // namespace casadi_loader
@@ -117,10 +121,25 @@ CasADiControlProblem<Conf>::CasADiControlProblem(const std::string &so_name,
             throw std::invalid_argument(
                 "Invalid number of output arguments: got "s +
                 std::to_string(cfun.n_in()) + ", should be 1.");
-        nc   = static_cast<length_t>(cfun.size1_out(0));
-        nc_N = nc; // TODO
+        nc = static_cast<length_t>(cfun.size1_out(0));
         CasADiFunctionEvaluator<Conf, 2, 1> c{std::move(cfun)};
         c.validate_dimensions({dim(nx, 1), dim(p, 1)}, {dim(nc, 1)});
+        return c;
+    };
+    auto load_c_N = [&]() -> CasADiFunctionEvaluator<Conf, 2, 1> {
+        casadi::Function cfun = casadi::external("c_N", so_name);
+        using namespace std::literals::string_literals;
+        if (cfun.n_in() != 2)
+            throw std::invalid_argument(
+                "Invalid number of input arguments: got "s +
+                std::to_string(cfun.n_in()) + ", should be 2.");
+        if (cfun.n_out() != 1)
+            throw std::invalid_argument(
+                "Invalid number of output arguments: got "s +
+                std::to_string(cfun.n_in()) + ", should be 1.");
+        nc_N = static_cast<length_t>(cfun.size1_out(0));
+        CasADiFunctionEvaluator<Conf, 2, 1> c{std::move(cfun)};
+        c.validate_dimensions({dim(nx, 1), dim(p, 1)}, {dim(nc_N, 1)});
         return c;
     };
     // Load the functions "f", "h", and "c" to determine the unknown dimensions.
@@ -128,12 +147,13 @@ CasADiControlProblem<Conf>::CasADiControlProblem(const std::string &so_name,
     auto h   = wrap_load(so_name, "h", load_h);
     auto h_N = wrap_load(so_name, "h_N", load_h_N);
     auto c   = wrap_load(so_name, "c", load_c);
+    auto c_N = wrap_load(so_name, "c_N", load_c_N);
 
     this->x_init = vec::Constant(nx, alpaqa::NaN<Conf>);
     this->param  = vec::Constant(p, alpaqa::NaN<Conf>);
     this->U      = Box{nu};
     this->D      = Box{nc};
-    this->D_N    = Box{nc};
+    this->D_N    = Box{nc_N};
 
     impl = std::make_unique<CasADiControlFunctionsWithParam<Conf>>(
         CasADiControlFunctionsWithParam<Conf>{
@@ -165,12 +185,18 @@ CasADiControlProblem<Conf>::CasADiControlProblem(const std::string &so_name,
                 so_name, "grad_c_prod", dims(nx, p, nc), dims(nx)),
             .gn_hess_c = wrapped_load<CasADiFunctionEvaluator<Conf, 3, 1>>(
                 so_name, "gn_hess_c", dims(nx, p, nc), dims(dim{nx, nx})),
+            .c_N           = std::move(c_N),
+            .grad_c_prod_N = wrapped_load<CasADiFunctionEvaluator<Conf, 3, 1>>(
+                so_name, "grad_c_prod_N", dims(nx, p, nc_N), dims(nx)),
+            .gn_hess_c_N = wrapped_load<CasADiFunctionEvaluator<Conf, 3, 1>>(
+                so_name, "gn_hess_c_N", dims(nx, p, nc_N), dims(dim{nx, nx})),
         });
 
     auto n_work = std::max({
         impl->Q.fun.sparsity_out(0).nnz(),
         impl->Q_N.fun.sparsity_out(0).nnz(),
         impl->gn_hess_c.fun.sparsity_out(0).nnz(),
+        impl->gn_hess_c_N.fun.sparsity_out(0).nnz(),
     });
     this->work  = vec::Constant(static_cast<length_t>(n_work), NaN<Conf>);
 }
@@ -450,4 +476,43 @@ void CasADiControlProblem<Conf>::eval_add_gn_hess_constr(index_t, crvec x,
             nx, nx, sparse.nnz(), sparse.colind(), sparse.row(), work.data(),
         };
 }
+
+template <Config Conf>
+void CasADiControlProblem<Conf>::eval_constr_N(crvec x, rvec c) const {
+    if (nc_N == 0)
+        return;
+    assert(x.size() == nx);
+    assert(c.size() == nc_N);
+    impl->c_N({x.data(), param.data()}, {c.data()});
+}
+
+template <Config Conf>
+void CasADiControlProblem<Conf>::eval_grad_constr_prod_N(crvec x, crvec p,
+                                                         rvec grad_cx_p) const {
+    assert(x.size() == nx);
+    assert(p.size() == nc_N);
+    assert(grad_cx_p.size() == nx);
+    impl->grad_c_prod_N({x.data(), param.data(), p.data()}, {grad_cx_p.data()});
+}
+
+template <Config Conf>
+void CasADiControlProblem<Conf>::eval_add_gn_hess_constr_N(crvec x, crvec M,
+                                                           rmat out) const {
+    auto &&sparse = impl->gn_hess_c.fun.sparsity_out(0);
+    assert(x.size() == nx);
+    assert(M.size() == nc_N);
+    assert(out.rows() == nx);
+    assert(out.cols() == nx);
+    assert(work.size() >= sparse.nnz());
+    impl->gn_hess_c_N({x.data(), param.data(), M.data()}, {work.data()});
+    using spmat   = Eigen::SparseMatrix<real_t, Eigen::ColMajor, casadi_int>;
+    using cmspmat = Eigen::Map<const spmat>;
+    if (sparse.is_dense())
+        out += cmmat{work.data(), nx, nx};
+    else
+        out += cmspmat{
+            nx, nx, sparse.nnz(), sparse.colind(), sparse.row(), work.data(),
+        };
+}
+
 } // namespace alpaqa

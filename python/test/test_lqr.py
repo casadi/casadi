@@ -108,7 +108,7 @@ def test_lqr():
 
     # Compile problem
     problem = cl.generate_and_compile_casadi_control_problem(
-        N, f=f, l=l, l_N = lN, h=h, h_N=hN, c=c)
+        N, f=f, l=l, l_N = lN, h=h, h_N=hN, c=c, c_N=c)
     
     # Convert to single-shooting problem
     ocp = OCProblemData(f=f, l=l, l_N=lN, h=h, h_N=hN, c=c, N=N)

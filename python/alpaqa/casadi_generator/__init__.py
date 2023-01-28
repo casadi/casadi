@@ -416,12 +416,47 @@ def generate_casadi_control_problem(
         ["gn_hess_" + c.name_out(0)],
     ))
 
-    # TODO
-    assert c_N is None, "Specific terminal constraints not yet supported"
-    # if c_N is None:
-    #     c_N = cs.Function("c_N", [x_var, p_var], [cs.vertcat()])
-    # else:
-    #     assert c_N.n_in() in [1, 2]
-    #     c_N, _, _ = _add_parameter(c_N, 1)
+    # constraints
+    if c_N is None:
+        c_N = cs.Function("c_N", [x_var, p_var], [cs.vertcat()])
+    else:
+        assert c_N.n_in() in [1, 2]
+        c_N, _, _ = _add_parameter(c_N, 1)
+    assert c_N.size1_in(0) == nx
+    assert c_N.size2_in(0) == 1
+    assert c_N.size1_in(1) == p
+    assert c_N.size2_in(1) == 1
+    assert c_N.n_out() == 1
+    nc_N = c_N.size1_out(0)
+    assert c_N.size2_out(0) in [0, 1]
+
+    wN_var = cs.SX.sym("wN", nc_N)
+
+    cg.add(cs.Function(
+        "c_N",
+        [x_var, p_var],
+        [c_N(x_var, p_var)],
+        [c_N.name_in(i) for i in range(2)],
+        [c_N.name_out(0)],
+    ))
+
+    cg.add(cs.Function(
+        "grad_c_prod_N",
+        [x_var, p_var, wN_var],
+        [cs.jtimes(c_N(x_var, p_var), x_var, wN_var, True) if nc_N > 0 else cs.DM.zeros(nx)],
+        [c_N.name_in(i) for i in range(2)] + ["w"],
+        ["grad_" + c_N.name_out(0) + "_prod"],
+    ))
+
+    mN_var = cs.SX.sym("mN", nc_N)
+    JcN = cs.jacobian(c_N(x_var, p_var), x_var)
+    JhᵀMJhN = JcN.T @ cs.diag(mN_var) @ JcN
+    cg.add(cs.Function(
+        "gn_hess_c_N",
+        [x_var, p_var, mN_var],
+        [JhᵀMJhN],
+        [c_N.name_in(i) for i in range(2)] + ["m"],
+        ["gn_hess_" + c_N.name_out(0)],
+    ))
 
     return cg

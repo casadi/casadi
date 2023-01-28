@@ -65,6 +65,9 @@ class CasADiControlProblem {
                                rvec grad_cx_p) const;
     void eval_add_gn_hess_constr(index_t timestep, crvec x, crvec M,
                                  rmat out) const;
+    void eval_constr_N(crvec x, rvec c) const;
+    void eval_grad_constr_prod_N(crvec x, crvec p, rvec grad_cx_p) const;
+    void eval_add_gn_hess_constr_N(crvec x, crvec M, rmat out) const;
 
     void check() const {} // TODO
 
