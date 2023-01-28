@@ -69,6 +69,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: stubs
+          retention-days: 1
           path: stubs.tar
 
   build-linux:
@@ -157,11 +158,13 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: whl-${{ matrix.pypy }}${{ matrix.python-version }}-linux
+          retention-days: 1
           path: dist/*.whl
       - name: Upload debug Wheels
         uses: actions/upload-artifact@v3
         with:
           name: whl-${{ matrix.pypy }}${{ matrix.python-version }}-debug-linux
+          retention-days: 1
           path: dist-debug/*.whl
 
   build-linux-src:
@@ -212,6 +215,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: src-dist
+          retention-days: 1
           path: dist/*.tar.gz
 
   test-linux:
@@ -282,6 +286,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: whl-${{ matrix.python-version }}-windows
+          retention-days: 1
           path: dist/*.whl
 
   test-windows:
@@ -363,6 +368,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: whl-${{ matrix.python-version }}-macos
+          retention-days: 1
           path: dist/*.whl
 
   test-macos:

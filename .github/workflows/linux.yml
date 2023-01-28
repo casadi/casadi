@@ -83,6 +83,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: alpaqa-${{ matrix.host }}
+          retention-days: 1
           path: |
             package/alpaqa*.tar.gz
             package/*alpaqa*.deb
@@ -125,6 +126,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: alpaqa-${{ matrix.host }}-test-examples-release
+          retention-days: 1
           path: |
             build-examples/C++/CustomCppProblem/RelWithDebInfo/custom-cpp-problem-example
             build-examples/C++/FortranProblem/RelWithDebInfo/fortran-problem-example
@@ -142,6 +144,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: alpaqa-${{ matrix.host }}-test-examples-debug
+          retention-days: 1
           path: |
             build-examples/C++/CustomCppProblem/Debug/custom-cpp-problem-example
             build-examples/C++/FortranProblem/Debug/fortran-problem-example

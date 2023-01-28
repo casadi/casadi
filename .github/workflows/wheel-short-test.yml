@@ -71,6 +71,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: whl-${{ env.PYTHON_VERSION }}-linux-test
+          retention-days: 1
           path: dist/*.whl
 
   test-linux:
@@ -87,7 +88,7 @@ jobs:
           path: dist
       - name: Test
         run: |
-          python3 -m pip install -U pip pytest cmake ninja qpalm scipy
+          python3 -m pip install -U pip pytest cmake ninja
           python3 -m pip install --find-links=dist ${PACKAGE_NAME}==${PACKAGE_VERSION}
           pytest -rP
         env:
