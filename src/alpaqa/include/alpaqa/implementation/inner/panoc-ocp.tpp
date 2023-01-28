@@ -93,7 +93,7 @@ auto PANOCOCPSolver<Conf>::operator()(
     vec work_2x(nx * 2);
 
     // ALM
-    assert((nc == 0 && nc_N == 0) || μ.size() == N + 1);
+    assert(μ.size() == nc * N + nc_N);
     assert(y.size() == nc * N + nc_N);
 
     // Functions for accessing the LQR matrices and index sets
@@ -507,19 +507,21 @@ auto PANOCOCPSolver<Conf>::operator()(
                     for (index_t t = 0; t < N; ++t) {
                         auto ct = vars.ck(curr->xû, t);
                         auto yt = y.segment(nc * t, nc);
-                        auto ζ  = ct + (real_t(1) / μ(t)) * yt;
+                        auto μt = μ.segment(nc * t, nc);
+                        auto ζ  = ct + μt.asDiagonal().inverse() * yt;
                         auto et = err_z.segment(nc * t, nc);
                         et      = projecting_difference(ζ, D);
-                        et -= (real_t(1) / μ(t)) * yt;
-                        yt += μ(t) * et;
+                        et -= μt.asDiagonal().inverse() * yt;
+                        yt += μt.asDiagonal() * et;
                     }
                     auto ct = vars.ck(curr->xû, N);
                     auto yt = y.segment(nc * N, nc_N);
-                    auto ζ  = ct + (real_t(1) / μ(N)) * yt;
+                    auto μt = μ.segment(nc * N, nc_N);
+                    auto ζ  = ct + μt.asDiagonal().inverse() * yt;
                     auto et = err_z.segment(nc * N, nc_N);
                     et      = projecting_difference(ζ, D_N);
-                    et -= (real_t(1) / μ(N)) * yt;
-                    yt += μ(N) * et;
+                    et -= μt.asDiagonal().inverse() * yt;
+                    yt += μt.asDiagonal() * et;
                 }
                 assign_extract_u(curr->xû, u);
             }

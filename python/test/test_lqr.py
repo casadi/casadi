@@ -73,6 +73,7 @@ def test_lqr():
     # States and inputs
     N = 51
     nx, nu = 5, 7
+    nc = nc_N = nx
     x_sym = cs.SX.sym("x", nx)
     u_sym = cs.SX.sym("u", nu)
 
@@ -118,7 +119,7 @@ def test_lqr():
     # Random initialization
     u = rng.uniform(-2, 2, (N * nu,))
     y = rng.uniform(-0.5, 0.5, (nx * N + nx,))
-    μ = rng.exponential(1, (N + 1,))
+    μ = rng.exponential(1, (nx * N + nx,))
     problem.x_init = rng.uniform(-1, 1, (nx,))
 
     # Check cost and gradient
@@ -146,7 +147,7 @@ def test_lqr():
 
     ss_D_lb = np.concatenate((np.tile(problem.D.lowerbound, N), problem.D_N.lowerbound))
     ss_D_ub = np.concatenate((np.tile(problem.D.upperbound, N), problem.D_N.upperbound))
-    ss_μ = np.repeat(μ, nx)
+    ss_μ = μ.copy()
     proj_D = lambda g: cs.fmax(ss_D_lb, cs.fmin(g, ss_D_ub))
     ζ = ss_constr(cs_u, problem.x_init) + y / ss_μ
     cs_aug_lagr = cs.Function("al", [cs_u],
@@ -196,13 +197,14 @@ def test_lqr():
     for i in range(N):
         xi = xu[i * nxu:i * nxu + nx]
         ui = xu[i * nxu + nx:i * nxu + nxu]
+        μi = μ[i * nc:i * nc + nc]
         Jhx = cs.substitute(cs.jacobian(h(x_sym, ui), x_sym), x_sym, xi)
         Jhu = cs.substitute(cs.jacobian(h(xi, u_sym), u_sym), u_sym, ui)
         Lhh = cs.substitute(cs.hessian(l(hsym), hsym)[0], hsym, h(xi, ui))
         proj_D = lambda g: cs.fmax(problem.D.lowerbound, cs.fmin(g, problem.D.upperbound))
         c_sym = cs.SX.sym("c", nx)
-        ζ = c_sym + y[i * nx:i * nx + nx] / μ[i]
-        penalty = 0.5 * μ[i] * cs.sum1((ζ - proj_D(ζ))**2)
+        ζ = c_sym + y[i * nx:i * nx + nx] / μi
+        penalty = 0.5 * cs.sum1(μi * (ζ - proj_D(ζ))**2)
         ci = ocp.c(xi)
         M = cs.substitute(cs.hessian(penalty, c_sym)[0], c_sym, ci)
         Jc = cs.substitute(cs.jacobian(ocp.c(x_sym), x_sym), x_sym, xi)
@@ -214,26 +216,27 @@ def test_lqr():
         cs_Q_qp[i * nxu + nx:i * nxu + nxu, i * nxu:i * nxu + nx] = cs.evalf(Sk)
         cs_Q_qp[i * nxu:i * nxu + nx, i * nxu + nx:i * nxu + nxu] = cs.evalf(Sk).T
         grad_l = cs.substitute(cs.gradient(l(hsym), hsym), hsym, h(xi, ui))
-        ζ = ci + y[i * nx:i * nx + nx] / μ[i]
-        qi = Jhx.T @ grad_l + Jc.T @ (μ[i] * (ζ - proj_D(ζ)))
+        ζ = ci + y[i * nx:i * nx + nx] / μi
+        qi = Jhx.T @ grad_l + Jc.T @ (μi * (ζ - proj_D(ζ)))
         ri = Jhu.T @ grad_l
         cs_qr_qp[i * nxu:i * nxu + nx] = cs.evalf(qi).full().ravel()
         cs_qr_qp[i * nxu + nx:i * nxu + nxu] = cs.evalf(ri).full().ravel()
+    μN = μ[N * nc:N * nc + nc_N]
     xN = xu[N * nxu:N * nxu + nx]
     JhN = cs.substitute(cs.jacobian(hN(x_sym), x_sym), x_sym, xN)
     LNhh = cs.substitute(cs.hessian(lN(hNsym), hNsym)[0], hNsym, hN(xN))
     proj_D_N = lambda g: cs.fmax(problem.D_N.lowerbound, cs.fmin(g, problem.D_N.upperbound))
     c_sym = cs.SX.sym("c", nx) # TODO: terminal constraints
-    ζ = c_sym + y[N * nx:N * nx + nx] / μ[N]
-    penalty = 0.5 * μ[N] * cs.sum1((ζ - proj_D_N(ζ))**2)
+    ζ = c_sym + y[N * nx:N * nx + nx] / μN
+    penalty = 0.5 * cs.sum1(μN * (ζ - proj_D_N(ζ))**2)
     cN = ocp.c(xN)
     MN = cs.substitute(cs.hessian(penalty, c_sym)[0], c_sym, cN)
     JcN = cs.substitute(cs.jacobian(ocp.c(x_sym), x_sym), x_sym, xN)
     QN = JhN.T @ LNhh @ JhN + JcN.T @ MN @ JcN
     cs_Q_qp[N * nxu:N * nxu + nx, N * nxu:N * nxu + nx] = cs.evalf(QN)
     grad_lN = cs.substitute(cs.gradient(lN(hNsym), hNsym), hNsym, hN(xN))
-    ζ = cN + y[N * nx:N * nx + nx] / μ[N]
-    qN = JhN.T @ grad_lN + JcN.T @ (μ[N] * (ζ - proj_D_N(ζ)))
+    ζ = cN + y[N * nx:N * nx + nx] / μN
+    qN = JhN.T @ grad_lN + JcN.T @ (μN * (ζ - proj_D_N(ζ)))
     cs_qr_qp[N * nxu:N * nxu + nx] = cs.evalf(qN).full().ravel()
 
     print("‖Q(C++) - Q(CasADi)‖ =", la.norm(Q_qp - cs_Q_qp))

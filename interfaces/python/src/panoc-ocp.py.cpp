@@ -82,7 +82,7 @@ void register_panoc_ocp(py::module_ &m) {
         else
             throw std::invalid_argument("Missing argument y");
         if (μ)
-            alpaqa::util::check_dim<config_t>("μ", *μ, m == 0 ? 0 : (N + 1));
+            alpaqa::util::check_dim<config_t>("μ", *μ, m);
         else if (m == 0)
             μ = vec{};
         else

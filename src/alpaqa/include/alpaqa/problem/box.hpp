@@ -72,7 +72,7 @@ template <Config Conf>
 inline auto dist_squared(const auto &v,        ///< [in] The vector to project
                          const Box<Conf> &box, ///< [in] The box to project onto
                          const auto &Σ         ///< [in] Diagonal matrix defining norm
-) {
+                         ) -> real_t<Conf> {
     // TODO: Does this allocate?
     //       Does it have dangling references to temporaries?
     auto d = v - project(v, box);

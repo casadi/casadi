@@ -6,6 +6,7 @@
 #include <alpaqa/util/index-set.hpp>
 #include <pybind11/eigen.h>
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 
 namespace py = pybind11;
 using namespace py::literals;
@@ -40,7 +41,7 @@ void register_ocp(py::module_ &m) {
             else
                 throw std::invalid_argument("Missing argument y");
             if (μ)
-                alpaqa::util::check_dim<config_t>("μ", *μ, (nc == 0 && nc_N == 0) ? 0 : (N + 1));
+                alpaqa::util::check_dim<config_t>("μ", *μ, nc * N + nc_N);
             else if (nc * N + nc_N == 0)
                 μ = vec{};
             else

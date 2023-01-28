@@ -140,15 +140,6 @@ struct is_config<EigenConfigl> : std::true_type {};
 
 namespace vec_util {
 
-/// Get the Σ norm squared of a given vector, with Σ a diagonal matrix.
-/// @returns @f$ \langle v, \Sigma v \rangle @f$
-template <class Derived>
-    requires(Derived::ColsAtCompileTime == 1)
-auto norm_squared_weighted(const Eigen::MatrixBase<Derived> &v,
-                           const Eigen::MatrixBase<Derived> &Σ) {
-    return v.dot(Σ.asDiagonal() * v);
-}
-
 /// Get the maximum or infinity-norm of the given vector.
 /// @returns @f$ \left\|v\right\|_\infty @f$
 template <class Derived>

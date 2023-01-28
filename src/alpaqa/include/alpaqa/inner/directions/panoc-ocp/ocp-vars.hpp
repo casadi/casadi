@@ -199,9 +199,9 @@ struct OCPEvaluator {
             if (nc > 0) {
                 problem->eval_constr(t, xk, ck);
                 auto yk = y.segment(t * nc, nc);
-                auto ζ  = ck + (real_t(1) / μ(t)) * yk;
-                V += real_t(0.5) * μ(t) *
-                     projecting_difference(ζ, D).squaredNorm();
+                auto μk = μ.segment(t * nc, nc);
+                auto ζ  = ck + μk.asDiagonal().inverse() * yk;
+                V += real_t(0.5) * dist_squared(ζ, D, μk);
             }
             problem->eval_f(t, xk, uk, vars.xk(storage, t + 1));
         }
@@ -217,9 +217,9 @@ struct OCPEvaluator {
         if (nc_N > 0) {
             problem->eval_constr_N(xN, cN);
             auto yN = y.segment(N * nc, nc_N);
-            auto ζ  = cN + (real_t(1) / μ(N)) * yN;
-            V += real_t(0.5) * μ(N) *
-                 projecting_difference(ζ, D_N).squaredNorm();
+            auto μN = μ.segment(N * nc, nc_N);
+            auto ζ  = cN + μN.asDiagonal().inverse() * yN;
+            V += real_t(0.5) * dist_squared(ζ, D_N, μN);
         }
         return V;
     }
@@ -283,8 +283,9 @@ struct OCPEvaluator {
         if (nc_N > 0) {
             auto cN = vars.ck(storage, N);
             auto yN = y.segment(N * nc, nc_N);
-            auto ζ  = cN + (real_t(1) / μ(N)) * yN;
-            vN      = μ(N) * projecting_difference(ζ, D_N);
+            auto μN = μ.segment(N * nc, nc_N);
+            auto ζ  = cN + μN.asDiagonal().inverse() * yN;
+            vN      = μN.asDiagonal() * projecting_difference(ζ, D_N);
             problem->eval_grad_constr_prod_N(xN, vN, w);
             λ += w;
         }
@@ -311,8 +312,9 @@ struct OCPEvaluator {
             if (nc > 0) {
                 auto ck = vars.ck(storage, t);
                 auto yk = y.segment(t * nc, nc);
-                auto ζ  = ck + (real_t(1) / μ(t)) * yk;
-                vk      = μ(t) * projecting_difference(ζ, D);
+                auto μk = μ.segment(t * nc, nc);
+                auto ζ  = ck + μk.asDiagonal().inverse() * yk;
+                vk      = μk.asDiagonal() * projecting_difference(ζ, D);
                 problem->eval_grad_constr_prod(t, xk, vk, w);
                 qk += w;
             }
@@ -340,16 +342,17 @@ struct OCPEvaluator {
         if (nc > 0 || nc_N > 0) {
             auto ck = vars.ck(storage, k);
             auto yk = y.segment(k * nc, k < N ? nc : nc_N);
-            auto ζ  = ck + (real_t(1) / μ(k)) * yk;
+            auto μk = μ.segment(k * nc, k < N ? nc : nc_N);
+            auto ζ  = ck + μk.asDiagonal().inverse() * yk;
             if (k < N) {
                 for (index_t i = 0; i < nc; ++i)
-                    work_ck(i) = μ(k) * (ζ(i) < D.lowerbound(i) ||
-                                         ζ(i) > D.upperbound(i));
+                    work_ck(i) = μk(i) * (ζ(i) < D.lowerbound(i) ||
+                                          ζ(i) > D.upperbound(i));
                 problem->eval_add_gn_hess_constr(k, xk, work_ck, out);
             } else {
                 for (index_t i = 0; i < nc_N; ++i)
-                    work_cN(i) = μ(k) * (ζ(i) < D_N.lowerbound(i) ||
-                                         ζ(i) > D_N.upperbound(i));
+                    work_cN(i) = μk(i) * (ζ(i) < D_N.lowerbound(i) ||
+                                          ζ(i) > D_N.upperbound(i));
                 problem->eval_add_gn_hess_constr_N(xk, work_cN, out);
             }
         }
