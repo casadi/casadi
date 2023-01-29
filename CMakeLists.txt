@@ -796,10 +796,10 @@ foreach(PKG HIGHS PROXQP BONMIN IPOPT CBC CLP MUMPS SPRAL METIS HPIPM BLASFEO LA
       find_package(${PKG})
     endif()
     if (WITH_BUILD_${PKG} OR (WITH_BUILD_REQUIRED AND NOT ${PKG}_FOUND))
-      set(WITH_BUILD_${PKG} ON CACHE BOOL "Automatically selected sourcebuild for ${PKG}" FORCE)
 
       # Add it to FeatureSummary
       get_property(PKG_HELP CACHE WITH_BUILD_${PKG} PROPERTY HELPSTRING)
+      set(WITH_BUILD_${PKG} ON CACHE BOOL "${PKG_HELP}" FORCE)
       add_feature_info(${PKG_LOWER}-sourcebuild ON ${PKG_HELP})
 
       # Remove from PACKAGES_NOT_FOUND
