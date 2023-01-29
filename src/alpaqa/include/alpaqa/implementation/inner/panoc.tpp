@@ -18,7 +18,7 @@ namespace alpaqa {
 
 template <class DirectionProviderT>
 std::string PANOCSolver<DirectionProviderT>::get_name() const {
-    return "PANOCSolver<" + direction.get_name() + ">";
+    return "PANOCSolver<" + std::string(direction.get_name()) + ">";
 }
 
 template <class DirectionProviderT>
