@@ -75,6 +75,9 @@ namespace casadi {
     // Initialize the base classes
     Conic::init(opts);
 
+    warm_start_primal_ = true;
+    warm_start_dual_ = true;
+
     // Read options
     for (auto&& op : opts) {
       if (op.first=="warm_start_primal") {
