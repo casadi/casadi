@@ -254,7 +254,7 @@ namespace casadi {
         break;
       case CPX_PARAMTYPE_STRING:
         status = CPXXsetstrparam(m->env, whichparam,
-                                static_cast<string>(op.second).c_str());
+                                static_cast<std::string>(op.second).c_str());
         break;
       case CPX_PARAMTYPE_LONG:
         status = CPXXsetlongparam(m->env, whichparam,

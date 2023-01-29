@@ -89,7 +89,7 @@ int main(){
   std::vector<double> gmin(2), gmax(2);
   gmin[0] = gmax[0] = 10;
   gmin[1] = gmax[1] =  0;
-  gmin.resize(2+nu, -numeric_limits<double>::infinity());
+  gmin.resize(2+nu, -std::numeric_limits<double>::infinity());
   gmax.resize(2+nu, 1.1);
   arg["lbg"] = gmin;
   arg["ubg"] = gmax;
