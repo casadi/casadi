@@ -1325,8 +1325,53 @@ fun:PyParser_ASTFromFile
    fun:call_init.part.0
 }
 
+{
+   py38
+   Memcheck:Addr4
+   fun:address_in_range
+   fun:pymalloc_free.isra.0
+}
 
+{
+   py38.1
+   Memcheck:Addr4
+   fun:address_in_range
+   fun:pymalloc_realloc
+}
 
+{
+   py38.2
+   Memcheck:Cond
+   fun:address_in_range
+   fun:pymalloc_realloc
+   fun:_PyObject_Realloc
+}
 
+{
+   py38.3
+   Memcheck:Value8
+   fun:address_in_range
+   fun:pymalloc_realloc
+}
 
+{
+   py38.4
+   Memcheck:Cond
+   fun:address_in_range
+   fun:pymalloc_realloc
+}
+
+{
+   py38.5
+   Memcheck:Cond
+   fun:address_in_range
+   fun:pymalloc_free.isra.0
+}
+
+{
+   py38.6
+   Memcheck:Value8
+   fun:address_in_range
+   fun:pymalloc_free.isra.0
+}
 
