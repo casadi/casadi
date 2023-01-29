@@ -615,7 +615,7 @@ option(WITH_BUILD_EIGEN3 "Build Eigen (BUILD_EIGEN3_VERSION=${BUILD_EIGEN3_VERSI
 
 set(BUILD_SIMDE_VERSION "v0.7.2")
 set(BUILD_SIMDE_GIT_REPO "https://github.com/simd-everywhere/simde.git")
-option(WITH_BUILD_SIMDE "Build Eigen (BUILD_SIMDE_VERSION=${BUILD_SIMDE_VERSION}) from downloaded source (BUILD_SIMDE_GIT_REPO=${BUILD_SIMDE_GIT_REPO})." OFF)
+option(WITH_BUILD_SIMDE "Build Simde (BUILD_SIMDE_VERSION=${BUILD_SIMDE_VERSION}) from downloaded source (BUILD_SIMDE_GIT_REPO=${BUILD_SIMDE_GIT_REPO})." OFF)
 
 
 # PROXQP: A QP solver based on proximal methods
@@ -1240,6 +1240,7 @@ if(WITH_BUILD_EIGEN3)
       CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
       CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
   add_library(eigen3 INTERFACE)
+  add_dependencies(eigen3 eigen3-external)
   target_include_directories(eigen3 INTERFACE "${CMAKE_BINARY_DIR}/external_projects/include/eigen3")
   install(DIRECTORY
     "${CMAKE_BINARY_DIR}/external_projects/include/eigen3"
@@ -1256,6 +1257,7 @@ if(WITH_BUILD_SIMDE)
       INSTALL_COMMAND ${EXTERNAL_CMAKE_COMMAND} -E copy_directory
                     <SOURCE_DIR>/simde <INSTALL_DIR>/include/simde)
   add_library(Simde INTERFACE)
+  add_dependencies(Simde Simde-external)
   target_include_directories(Simde INTERFACE "${CMAKE_BINARY_DIR}/external_projects/include/simde")
   install(DIRECTORY
     "${CMAKE_BINARY_DIR}/external_projects/include/simde"
