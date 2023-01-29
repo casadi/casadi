@@ -620,8 +620,8 @@ option(WITH_BUILD_SIMDE "Build Simde (BUILD_SIMDE_VERSION=${BUILD_SIMDE_VERSION}
 
 # PROXQP: A QP solver based on proximal methods
 option(WITH_PROXQP "Compile the interface to PROXQP" OFF)
-set(BUILD_PROXQP_VERSION "46086651000de8cab7341c4dfdaca56ef4594e5b")
-set(BUILD_PROXQP_GIT_REPO "https://github.com/jgillis/proxsuite.git")
+set(BUILD_PROXQP_VERSION "v0.3.2")
+set(BUILD_PROXQP_GIT_REPO "https://github.com/Simple-Robotics/proxsuite.git")
 option(WITH_BUILD_PROXQP "Build PROXQP (BUILD_PROXQP_VERSION=${BUILD_PROXQP_VERSION}) from downloaded source (BUILD_PROXQP_GIT_REPO=${BUILD_PROXQP_GIT_REPO})." OFF)
 set(BUILD_PROXQP_DEPENDENCIES EIGEN3 SIMDE)
 

@@ -189,39 +189,39 @@ namespace casadi {
     // Use lhs_equals_rhs_constraint to split double-sided bounds into one-sided
     // bound for equality constraints and double-sided for inequality constraints
     const Eigen::Array<bool, Eigen::Dynamic, 1> lhs_equals_rhs_constraint = (m->uba_vector.array() == m->lba_vector.array()).eval();
+    std::vector<double> tmp_eq_vector;
+    std::vector<double> tmp_ineq_lb_vector;
+    std::vector<double> tmp_ineq_ub_vector;
     {
-      std::vector<double*> tmp_eq_vector;
-      std::vector<double*> tmp_ineq_lb_vector;
-      std::vector<double*> tmp_ineq_ub_vector;
       for (std::size_t k=0; k<lhs_equals_rhs_constraint.size(); ++k)
       {
         if (lhs_equals_rhs_constraint[k])
         {
-          tmp_eq_vector.push_back(&m->lba_vector[k]);
+          tmp_eq_vector.push_back(m->lba_vector[k]);
         }
         else
         {
-          tmp_ineq_lb_vector.push_back(&m->lba_vector[k]);
-          tmp_ineq_ub_vector.push_back(&m->uba_vector[k]);
+          tmp_ineq_lb_vector.push_back(m->lba_vector[k]);
+          tmp_ineq_ub_vector.push_back(m->uba_vector[k]);
         }
       }
 
       m->b_vector.resize(tmp_eq_vector.size());
       if (tmp_eq_vector.size() > 0)
       {
-        m->b_vector = Eigen::Map<Eigen::VectorXd>(tmp_eq_vector[0], tmp_eq_vector.size());
+        m->b_vector = Eigen::Map<Eigen::VectorXd>(get_ptr(tmp_eq_vector), tmp_eq_vector.size());
       }
 
       m->lba_vector.resize(tmp_ineq_lb_vector.size());
       if (tmp_ineq_lb_vector.size() > 0)
       {
-        m->lba_vector = Eigen::Map<Eigen::VectorXd>(tmp_ineq_lb_vector[0], tmp_ineq_lb_vector.size());
+        m->lba_vector = Eigen::Map<Eigen::VectorXd>(get_ptr(tmp_ineq_lb_vector), tmp_ineq_lb_vector.size());
       }
 
       m->uba_vector.resize(tmp_ineq_ub_vector.size());
       if (tmp_ineq_ub_vector.size() > 0)
       {
-        m->uba_vector = Eigen::Map<Eigen::VectorXd>(tmp_ineq_ub_vector[0], tmp_ineq_ub_vector.size());
+        m->uba_vector = Eigen::Map<Eigen::VectorXd>(get_ptr(tmp_ineq_ub_vector), tmp_ineq_ub_vector.size());
       }
     }
     std::size_t n_eq = m->b_vector.size();

@@ -456,7 +456,7 @@ class ConicTests(casadiTestCase):
     for conic, qp_options, aux_options in conics:
       self.message("equality: " + str(conic))
       if not aux_options["quadratic"]: continue
-      if "ooqp" in str(conic) or "proxqp" in str(conic):
+      if "ooqp" in str(conic):
         continue
       solver = casadi.conic("mysolver",conic,{'h':H.sparsity(),'a':Sparsity.dense(3,2)},qp_options)
 
