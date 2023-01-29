@@ -25,7 +25,6 @@
 
 #include "xml_file_internal.hpp"
 
-using namespace std;
 namespace casadi {
 
   XmlFileInternal::XmlFileInternal() {
@@ -38,7 +37,7 @@ namespace casadi {
 
   const std::string XmlFileInternal::infix_ = "xmlfile";
 
-  void XmlFileInternal::disp(ostream &stream, bool more) const {
+  void XmlFileInternal::disp(std::ostream &stream, bool more) const {
   }
 
   XmlNode XmlFileInternal::parse(const std::string& filename) {

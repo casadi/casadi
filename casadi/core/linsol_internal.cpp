@@ -25,7 +25,6 @@
 
 #include "linsol_internal.hpp"
 
-using namespace std;
 namespace casadi {
 
   LinsolInternal::LinsolInternal(const std::string& name, const Sparsity& sp)
@@ -41,10 +40,10 @@ namespace casadi {
 
   }
 
-  void LinsolInternal::disp(ostream &stream, bool more) const {
+  void LinsolInternal::disp(std::ostream &stream, bool more) const {
     stream << "Linear solver " << class_name();
     if (more) {
-      stream << endl;
+      stream << std::endl;
       disp_more(stream);
     }
   }

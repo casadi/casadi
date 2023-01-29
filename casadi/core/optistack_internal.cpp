@@ -28,7 +28,6 @@
 #include "function_internal.hpp"
 #include "global_options.hpp"
 
-using namespace std;
 namespace casadi {
 
 class InternalOptiCallback : public FunctionInternal {
@@ -122,7 +121,7 @@ std::string OptiNode::format_stacktrace(const Dict& stacktrace, casadi_int inden
   if (name!="Unknown" && name!= "<module>")
     description += " in " + stacktrace.at("name").as_string();
   try {
-    ifstream file(filename);
+    std::ifstream file(filename);
     for (casadi_int i=0; i<line-1; ++i) {
       file.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
@@ -430,7 +429,7 @@ void OptiNode::update_user_dict(const MX& m, const Dict& meta) {
     }
     set_meta_con(m, m_update);
     set_meta(m_update.dual_canon, m_update2);
-  } catch (exception& e) {
+  } catch(std::exception& e) {
     (void)e;  // unused
     for (const auto & s : MX::symvar(m)) {
       MetaVar m_update = get_meta(s);
@@ -445,7 +444,7 @@ Dict OptiNode::user_dict(const MX& m) const {
   try {
     MetaCon meta = get_meta_con(m);
     return meta.extra;
-  } catch (exception& e) {
+  } catch(std::exception& e) {
     (void)e;  // unused
     MetaVar meta = get_meta(m);
     return meta.extra;
@@ -1329,7 +1328,7 @@ Function OptiNode::to_function(const std::string& name,
 
 }
 
-void OptiNode::disp(ostream &stream, bool more) const {
+void OptiNode::disp(std::ostream &stream, bool more) const {
 
 }
 

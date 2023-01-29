@@ -30,7 +30,6 @@
 #include <linsys/common.h>
 #include <cstring>
 
-using namespace std;
 namespace casadi {
 
   extern "C"

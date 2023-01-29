@@ -29,7 +29,6 @@
 #define THROWING(fcn, ...) \
 cvodes_error(CASADI_STR(fcn), fcn(__VA_ARGS__))
 
-using namespace std;
 namespace casadi {
 
   extern "C"
@@ -81,8 +80,8 @@ namespace casadi {
     SundialsInterface::init(opts);
 
     // Default options
-    string linear_multistep_method = "bdf";
-    string nonlinear_solver_iteration = "newton";
+    std::string linear_multistep_method = "bdf";
+    std::string nonlinear_solver_iteration = "newton";
     min_step_size_ = 0;
 
     // Read options
@@ -230,8 +229,8 @@ namespace casadi {
       return 0;
     } catch(int flag) { // recoverable error
       return flag;
-    } catch(exception& e) { // non-recoverable error
-      uerr() << "rhs failed: " << e.what() << endl;
+    } catch(std::exception& e) { // non-recoverable error
+      uerr() << "rhs failed: " << e.what() << std::endl;
       return -1;
     }
   }
@@ -386,7 +385,7 @@ namespace casadi {
     if (flag>=CV_SUCCESS) return;
     // Construct error message
     char* flagname = CVodeGetReturnFlagName(flag);
-    stringstream ss;
+    std::stringstream ss;
     ss << module << " returned \"" << flagname << "\". Consult CVODES documentation.";
     free(flagname); // NOLINT
     casadi_error(ss.str());
@@ -399,10 +398,10 @@ namespace casadi {
       auto m = to_mem(user_data);
       auto& s = m->self;
       if (!s.disable_internal_warnings_) {
-        uerr() << msg << endl;
+        uerr() << msg << std::endl;
       }
-    } catch(exception& e) {
-      uerr() << "ehfun failed: " << e.what() << endl;
+    } catch(std::exception& e) {
+      uerr() << "ehfun failed: " << e.what() << std::endl;
     }
   }
 
@@ -418,8 +417,8 @@ namespace casadi {
       return 0;
     } catch(int flag) { // recoverable error
       return flag;
-    } catch(exception& e) { // non-recoverable error
-      uerr() << "rhsQ failed: " << e.what() << endl;
+    } catch(std::exception& e) { // non-recoverable error
+      uerr() << "rhsQ failed: " << e.what() << std::endl;
       return -1;
     }
   }
@@ -444,8 +443,8 @@ namespace casadi {
       return 0;
     } catch(int flag) { // recoverable error
       return flag;
-    } catch(exception& e) { // non-recoverable error
-      uerr() << "rhsB failed: " << e.what() << endl;
+    } catch(std::exception& e) { // non-recoverable error
+      uerr() << "rhsB failed: " << e.what() << std::endl;
       return -1;
     }
   }
@@ -470,8 +469,8 @@ namespace casadi {
       return 0;
     } catch(int flag) { // recoverable error
       return flag;
-    } catch(exception& e) { // non-recoverable error
-      uerr() << "rhsQB failed: " << e.what() << endl;
+    } catch(std::exception& e) { // non-recoverable error
+      uerr() << "rhsQB failed: " << e.what() << std::endl;
       return -1;
     }
   }
@@ -490,8 +489,8 @@ namespace casadi {
       return 0;
     } catch(casadi_int flag) { // recoverable error
       return flag;
-    } catch(exception& e) { // non-recoverable error
-      uerr() << "jtimes failed: " << e.what() << endl;
+    } catch(std::exception& e) { // non-recoverable error
+      uerr() << "jtimes failed: " << e.what() << std::endl;
       return -1;
     }
   }
@@ -513,8 +512,8 @@ namespace casadi {
       return 0;
     } catch(int flag) { // recoverable error
       return flag;
-    } catch(exception& e) { // non-recoverable error
-      uerr() << "jtimes failed: " << e.what() << endl;
+    } catch(std::exception& e) { // non-recoverable error
+      uerr() << "jtimes failed: " << e.what() << std::endl;
       return -1;
     }
   }
@@ -570,8 +569,8 @@ namespace casadi {
       return 0;
     } catch(int flag) { // recoverable error
       return flag;
-    } catch(exception& e) { // non-recoverable error
-      uerr() << "psolve failed: " << e.what() << endl;
+    } catch(std::exception& e) { // non-recoverable error
+      uerr() << "psolve failed: " << e.what() << std::endl;
       return -1;
     }
   }
@@ -624,8 +623,8 @@ namespace casadi {
       return 0;
     } catch(int flag) { // recoverable error
       return flag;
-    } catch(exception& e) { // non-recoverable error
-      uerr() << "psolveB failed: " << e.what() << endl;
+    } catch(std::exception& e) { // non-recoverable error
+      uerr() << "psolveB failed: " << e.what() << std::endl;
       return -1;
     }
   }
@@ -658,8 +657,8 @@ namespace casadi {
       return 0;
     } catch(int flag) { // recoverable error
       return flag;
-    } catch(exception& e) { // non-recoverable error
-      uerr() << "psetup failed: " << e.what() << endl;
+    } catch(std::exception& e) { // non-recoverable error
+      uerr() << "psetup failed: " << e.what() << std::endl;
       return -1;
     }
   }
@@ -694,8 +693,8 @@ namespace casadi {
       return 0;
     } catch(int flag) { // recoverable error
       return flag;
-    } catch(exception& e) { // non-recoverable error
-      uerr() << "psetupB failed: " << e.what() << endl;
+    } catch(std::exception& e) { // non-recoverable error
+      uerr() << "psetupB failed: " << e.what() << std::endl;
       return -1;
     }
   }
@@ -720,8 +719,8 @@ namespace casadi {
       return 0;
     } catch(int flag) { // recoverable error
       return flag;
-    } catch(exception& e) { // non-recoverable error
-      uerr() << "lsetup failed: " << e.what() << endl;
+    } catch(std::exception& e) { // non-recoverable error
+      uerr() << "lsetup failed: " << e.what() << std::endl;
       return -1;
     }
   }
@@ -756,8 +755,8 @@ namespace casadi {
       return 0;
     } catch(int flag) { // recoverable error
       return flag;
-    } catch(exception& e) { // non-recoverable error
-      uerr() << "lsetupB failed: " << e.what() << endl;
+    } catch(std::exception& e) { // non-recoverable error
+      uerr() << "lsetupB failed: " << e.what() << std::endl;
       return -1;
     }
   }
@@ -787,8 +786,8 @@ namespace casadi {
       return 0;
     } catch(int flag) { // recoverable error
       return flag;
-    } catch(exception& e) { // non-recoverable error
-      uerr() << "lsolve failed: " << e.what() << endl;
+    } catch(std::exception& e) { // non-recoverable error
+      uerr() << "lsolve failed: " << e.what() << std::endl;
       return -1;
     }
   }
@@ -830,8 +829,8 @@ namespace casadi {
       return 0;
     } catch(int flag) { // recoverable error
       return flag;
-    } catch(exception& e) { // non-recoverable error
-      uerr() << "lsolveB failed: " << e.what() << endl;
+    } catch(std::exception& e) { // non-recoverable error
+      uerr() << "lsolveB failed: " << e.what() << std::endl;
       return -1;
     }
   }
@@ -842,8 +841,8 @@ namespace casadi {
 
   template<typename MatType>
   Function CvodesInterface::getJ(bool backward) const {
-    vector<MatType> a = MatType::get_input(oracle_);
-    vector<MatType> r = const_cast<Function&>(oracle_)(a); // NOLINT
+    std::vector<MatType> a = MatType::get_input(oracle_);
+    std::vector<MatType> r = const_cast<Function&>(oracle_)(a); // NOLINT
     MatType c_x = MatType::sym("c_x");
     MatType c_xdot = MatType::sym("c_xdot");
 

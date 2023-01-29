@@ -27,8 +27,6 @@
 #include "casadi_misc.hpp"
 #include "getnonzeros.hpp"
 
-using namespace std;
-
 namespace casadi {
 
   SparsityCast::SparsityCast(const MX& x, Sparsity sp) {
@@ -47,7 +45,7 @@ namespace casadi {
 
   template<typename T>
   int SparsityCast::eval_gen(const T** arg, T** res, casadi_int* iw, T* w) const {
-    if (arg[0]!=res[0]) copy(arg[0], arg[0]+nnz(), res[0]);
+    if (arg[0]!=res[0]) std::copy(arg[0], arg[0]+nnz(), res[0]);
     return 0;
   }
 
@@ -110,7 +108,7 @@ namespace casadi {
     return sparsity_cast(dep(0), sp);
   }
 
-  MX SparsityCast::get_nzref(const Sparsity& sp, const vector<casadi_int>& nz) const {
+  MX SparsityCast::get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz) const {
     return GetNonzeros::create(sp, dep(), nz);
   }
 

@@ -26,7 +26,6 @@
 #include "linsol_internal.hpp"
 #include "mx_node.hpp"
 
-using namespace std;
 namespace casadi {
 
   Linsol::Linsol() {
@@ -148,7 +147,7 @@ namespace casadi {
       for (size_t nz = 0; nz < nonzeros.size(); ++nz)
         nonzeros[nz] = std::to_string(A[nz]);
       // Create .m file
-      ofstream mfile;
+      std::ofstream mfile;
       std::string fname = (*this)->class_name() + "_" + (*this)->name_ + "_debug.m";
       mfile.open(fname.c_str());
       Dict opts;
@@ -203,15 +202,15 @@ namespace casadi {
   }
 
 
-  bool has_linsol(const string& name) {
+  bool has_linsol(const std::string& name) {
     return Linsol::has_plugin(name);
   }
 
-  void load_linsol(const string& name) {
+  void load_linsol(const std::string& name) {
     Linsol::load_plugin(name);
   }
 
-  string doc_linsol(const string& name) {
+  std::string doc_linsol(const std::string& name) {
     return Linsol::doc(name);
   }
 

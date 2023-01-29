@@ -31,8 +31,6 @@
 #include <sstream>
 
 namespace casadi {
-  using namespace std;
-
   JitFunction::JitFunction(const std::string& name, const std::string& body,
                       const std::vector<std::string>& name_in,
                       const std::vector<std::string>& name_out,

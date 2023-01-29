@@ -25,8 +25,6 @@
 
 #include "determinant.hpp"
 
-using namespace std;
-
 namespace casadi {
 
   Determinant::Determinant(const MX& x) {

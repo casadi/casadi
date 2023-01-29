@@ -25,8 +25,6 @@
 
 #include "inverse.hpp"
 
-using namespace std;
-
 namespace casadi {
 
   Inverse::Inverse(const MX& x) {

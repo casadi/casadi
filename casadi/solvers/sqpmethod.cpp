@@ -36,7 +36,6 @@
 #include <cmath>
 #include <cfloat>
 
-using namespace std;
 namespace casadi {
 
 
@@ -169,7 +168,7 @@ namespace casadi {
     lbfgs_memory_ = 10;
     tol_pr_ = 1e-6;
     tol_du_ = 1e-6;
-    string hessian_approximation = "exact";
+    std::string hessian_approximation = "exact";
     min_step_size_ = 1e-10;
     std::string qpsol_plugin = "qpoases";
     Dict qpsol_options;
@@ -419,7 +418,7 @@ int Sqpmethod::solve(void* mem) const {
     const double one = 1.;
 
     // Info for printing
-    string info = "";
+    std::string info = "";
 
     // gamma_1
     double gamma_1;
@@ -839,7 +838,7 @@ int Sqpmethod::solve(void* mem) const {
                            double* x_opt, double* dlam, int mode) const {
     ScopedTiming tic(m->fstats.at("QP"));
     // Inputs
-    fill_n(m->arg, qpsol_.n_in(), nullptr);
+    std::fill_n(m->arg, qpsol_.n_in(), nullptr);
     m->arg[CONIC_H] = H;
     m->arg[CONIC_G] = g;
     m->arg[CONIC_X0] = x_opt;
@@ -852,7 +851,7 @@ int Sqpmethod::solve(void* mem) const {
     m->arg[CONIC_UBA] = ubdz+nx_;
 
     // Outputs
-    fill_n(m->res, qpsol_.n_out(), nullptr);
+    std::fill_n(m->res, qpsol_.n_out(), nullptr);
     m->res[CONIC_X] = x_opt;
     m->res[CONIC_LAM_X] = dlam;
     m->res[CONIC_LAM_A] = dlam + nx_;
@@ -879,7 +878,7 @@ int Sqpmethod::solve(void* mem) const {
                            double* x_opt, double* dlam) const {
     ScopedTiming tic(m->fstats.at("QP"));
     // Inputs
-    fill_n(m->arg, qpsol_ela_.n_in(), nullptr);
+    std::fill_n(m->arg, qpsol_ela_.n_in(), nullptr);
     m->arg[CONIC_H] = H;
     m->arg[CONIC_G] = g;
     m->arg[CONIC_X0] = x_opt;
@@ -892,7 +891,7 @@ int Sqpmethod::solve(void* mem) const {
     m->arg[CONIC_UBA] = ubdz + nx_ + 2*ng_;
 
     // Outputs
-    fill_n(m->res, qpsol_ela_.n_out(), nullptr);
+    std::fill_n(m->res, qpsol_ela_.n_out(), nullptr);
     m->res[CONIC_X] = x_opt;
     m->res[CONIC_LAM_X] = dlam;
     m->res[CONIC_LAM_A] = dlam + nx_ + 2*ng_;
@@ -1008,7 +1007,7 @@ int Sqpmethod::solve(void* mem) const {
 
   double Sqpmethod::calc_gamma_1(SqpmethodMemory* m) const {
     auto d = &m->d;
-    return max(gamma_0_*casadi_norm_inf(nx_, d->gf), gamma_1_min_);
+    return std::max(gamma_0_*casadi_norm_inf(nx_, d->gf), gamma_1_min_);
   }
 
 void Sqpmethod::codegen_declarations(CodeGenerator& g) const {

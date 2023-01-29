@@ -26,8 +26,6 @@
 #include "transpose.hpp"
 #include "serializing_stream.hpp"
 
-using namespace std;
-
 namespace casadi {
 
   Transpose::Transpose(const MX& x) {
@@ -77,7 +75,7 @@ namespace casadi {
   int Transpose::eval_gen(const T* const* arg, T* const* res,
                           casadi_int* iw, T* w) const {
     // Get sparsity patterns
-    //const vector<casadi_int>& x_colind = input[0]->colind();
+    //const std::vector<casadi_int>& x_colind = input[0]->colind();
     const casadi_int* x_row = dep(0).row();
     casadi_int x_sz = dep(0).nnz();
     const casadi_int* xT_colind = sparsity().colind();
@@ -87,7 +85,7 @@ namespace casadi {
     T* xT = res[0];
 
     // Transpose
-    copy(xT_colind, xT_colind+xT_ncol+1, iw);
+    std::copy(xT_colind, xT_colind+xT_ncol+1, iw);
     for (casadi_int el=0; el<x_sz; ++el) {
       xT[iw[x_row[el]]++] = x[el];
     }
@@ -124,7 +122,7 @@ namespace casadi {
     casadi_int xT_ncol = sparsity().size2();
 
     // Loop over the nonzeros of the argument
-    copy(xT_colind, xT_colind+xT_ncol+1, iw);
+    std::copy(xT_colind, xT_colind+xT_ncol+1, iw);
     for (casadi_int el=0; el<nz; ++el) {
       xT[iw[*x_row++]++] = *x++;
     }
@@ -144,7 +142,7 @@ namespace casadi {
     casadi_int xT_ncol = sparsity().size2();
 
     // Loop over the nonzeros of the argument
-    copy(xT_colind, xT_colind+xT_ncol+1, iw);
+    std::copy(xT_colind, xT_colind+xT_ncol+1, iw);
     for (casadi_int el=0; el<nz; ++el) {
       casadi_int elT = iw[*x_row++]++;
       *x++ |= xT[elT];

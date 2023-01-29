@@ -26,7 +26,6 @@
 #include "qrqp.hpp"
 #include "casadi/core/nlpsol.hpp"
 
-using namespace std;
 namespace casadi {
 
   extern "C"

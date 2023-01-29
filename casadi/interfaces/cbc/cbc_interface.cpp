@@ -29,8 +29,6 @@
 
 namespace casadi {
 
-  using namespace std;
-
   extern "C"
   int CASADI_CONIC_CBC_EXPORT
   casadi_register_conic_cbc(Conic::Plugin* plugin) {

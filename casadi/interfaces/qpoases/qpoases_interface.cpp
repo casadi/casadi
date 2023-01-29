@@ -29,7 +29,6 @@
 #define ALLOW_QPROBLEMB true
 #define ALLOW_ALL_OPTIONS
 
-using namespace std;
 namespace casadi {
 
   extern "C"
@@ -210,7 +209,7 @@ namespace casadi {
       } else if (op.first=="schur") {
         schur_=  op.second;
       } else if (op.first=="hessian_type") {
-        string h = op.second;
+        std::string h = op.second;
         if (h=="unknown") {
           hess_ = qpOASES::HessianType::HST_UNKNOWN;
         } else if (h=="posdef") {
@@ -229,7 +228,7 @@ namespace casadi {
       } else if (op.first=="max_schur") {
         max_schur_ = op.second;
       } else if (op.first=="linsol_plugin") {
-        linsol_plugin_ = string(op.second);
+        linsol_plugin_ = std::string(op.second);
       } else if (op.first=="nWSR") {
         max_nWSR_ = op.second;
       } else if (op.first=="CPUtime") {
@@ -762,7 +761,7 @@ namespace casadi {
     }
 
     // Default error message
-    stringstream ss;
+    std::stringstream ss;
     ss << "Unknown error flag: " << flag << ". Consult qpOASES documentation.";
     return ss.str();
   }

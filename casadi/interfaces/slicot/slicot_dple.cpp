@@ -35,7 +35,6 @@
 #include <ctime>
 #include <numeric>
 
-using namespace std;
 namespace casadi {
 
   extern "C"

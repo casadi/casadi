@@ -101,7 +101,7 @@ void casadi_feasiblesqpmethod_work(const casadi_feasiblesqpmethod_prob<T1>* p,
   // merit_mem
   // if (p->max_iter_ls>0) *sz_w += p->merit_memsize;
 
-  if (sz_anderson_memory > 0){
+  if (sz_anderson_memory > 0) {
     // for step (dx)
     *sz_w += sz_anderson_memory*nx;
     // for x
@@ -128,7 +128,8 @@ void casadi_feasiblesqpmethod_work(const casadi_feasiblesqpmethod_prob<T1>* p,
 
 // SYMBOL "sqpmethod_init"
 template<typename T1>
-void casadi_feasiblesqpmethod_init(casadi_feasiblesqpmethod_data<T1>* d, casadi_int** iw, T1** w, int sz_anderson_memory) {
+void casadi_feasiblesqpmethod_init(casadi_feasiblesqpmethod_data<T1>* d,
+    casadi_int** iw, T1** w, int sz_anderson_memory) {
   // Local variables
   casadi_int nnz_h, nnz_a, nx, ng, i;
   const casadi_feasiblesqpmethod_prob<T1>* p = d->prob;
@@ -179,7 +180,6 @@ void casadi_feasiblesqpmethod_init(casadi_feasiblesqpmethod_data<T1>* d, casadi_
   // Jacobian
   d->Jk = *w; *w += nnz_a;
   // Anderson vector
-  d->anderson_memory_step = *w; *w += sz_anderson_memory*nx;
-  d->anderson_memory_iterate = *w; *w += sz_anderson_memory*nx;
-  
+  d->anderson_memory_step = *w; *w += sz_anderson_memory * nx;
+  d->anderson_memory_iterate = *w; *w += sz_anderson_memory * nx;
 }

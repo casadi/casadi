@@ -26,18 +26,17 @@
 #include "dple_impl.hpp"
 #include <typeinfo>
 
-using namespace std;
 namespace casadi {
 
-  bool has_dple(const string& name) {
+  bool has_dple(const std::string& name) {
     return Dple::has_plugin(name);
   }
 
-  void load_dple(const string& name) {
+  void load_dple(const std::string& name) {
     Dple::load_plugin(name);
   }
 
-  string doc_dple(const string& name) {
+  std::string doc_dple(const std::string& name) {
     return Dple::getPlugin(name).doc;
   }
 
@@ -95,38 +94,38 @@ namespace casadi {
       return diagsplit(f_out["p"], f_out["p"].size1()/A.size());
   }
 
-  Function dplesol(const string& name, const string& solver,
+  Function dplesol(const std::string& name, const std::string& solver,
                 const SpDict& st, const Dict& opts) {
     return Function::create(Dple::instantiate(name, solver, st), opts);
   }
 
-  vector<string> dple_in() {
-    vector<string> ret(dple_n_in());
+  std::vector<std::string> dple_in() {
+    std::vector<std::string> ret(dple_n_in());
     for (size_t i=0; i<ret.size(); ++i) ret[i]=dple_in(i);
     return ret;
   }
 
-  vector<string> dple_out() {
-    vector<string> ret(dple_n_out());
+  std::vector<std::string> dple_out() {
+    std::vector<std::string> ret(dple_n_out());
     for (size_t i=0; i<ret.size(); ++i) ret[i]=dple_out(i);
     return ret;
   }
 
-  string dple_in(casadi_int ind) {
+  std::string dple_in(casadi_int ind) {
     switch (static_cast<DpleInput>(ind)) {
     case DPLE_A:      return "a";
     case DPLE_V:      return "v";
     case DPLE_NUM_IN: break;
     }
-    return string();
+    return std::string();
   }
 
-  string dple_out(casadi_int ind) {
+  std::string dple_out(casadi_int ind) {
     switch (static_cast<DpleOutput>(ind)) {
       case DPLE_P:      return "p";
       case DPLE_NUM_OUT: break;
     }
-    return string();
+    return std::string();
   }
 
   casadi_int dple_n_in() {

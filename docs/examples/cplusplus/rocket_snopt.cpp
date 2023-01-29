@@ -29,11 +29,10 @@
 #include <casadi/casadi.hpp>
 
 using namespace casadi;
-using namespace std;
 
 int main(){
 
-  cout << "program started" << endl;
+  std::cout << "program started" << std::endl;
 
   // Dimensions
   int nu = 20;  // Number of control segments
@@ -87,7 +86,7 @@ int main(){
   arg["x0"] = 0.4;
 
   // Bounds on g
-  vector<double> gmin(2), gmax(2);
+  std::vector<double> gmin(2), gmax(2);
   gmin[0] = gmax[0] = 10;
   gmin[1] = gmax[1] =  0;
   gmin.resize(2+nu, -numeric_limits<double>::infinity());
@@ -100,68 +99,68 @@ int main(){
 
   // Print the optimal cost
   double cost(res.at("f"));
-  cout << "optimal cost: " << cost << endl;
+  std::cout << "optimal cost: " << cost << std::endl;
 
   // Print the optimal solution
-  vector<double> uopt(res.at("x"));
-  cout << "optimal control: " << uopt << endl;
+  std::vector<double> uopt(res.at("x"));
+  std::cout << "optimal control: " << uopt << std::endl;
 
   // Get the state trajectory
   Function xfcn("xfcn", {u}, {s_traj, v_traj, m_traj});
-  vector<double> sopt, vopt, mopt;
+  std::vector<double> sopt, vopt, mopt;
   xfcn({uopt}, {&sopt, &vopt, &mopt});
-  cout << "position: " << sopt << endl;
-  cout << "velocity: " << vopt << endl;
-  cout << "mass:     " << mopt << endl;
+  std::cout << "position: " << sopt << std::endl;
+  std::cout << "velocity: " << vopt << std::endl;
+  std::cout << "mass:     " << mopt << std::endl;
 
   // Create Matlab script to plot the solution
-  ofstream file;
-  string filename = "rocket_snopt_results.m";
+  std::ofstream file;
+  std::string filename = "rocket_snopt_results.m";
   file.open(filename.c_str());
-  file << "% Results file from " __FILE__ << endl;
-  file << "% Generated " __DATE__ " at " __TIME__ << endl;
-  file << endl;
-  file << "cost = " << cost << ";" << endl;
-  file << "u = " << uopt << ";" << endl;
+  file << "% Results file from " __FILE__ << std::endl;
+  file << "% Generated " __DATE__ " at " __TIME__ << std::endl;
+  file << std::endl;
+  file << "cost = " << cost << ";" << std::endl;
+  file << "u = " << uopt << ";" << std::endl;
 
   // Save results to file
-  file << "t = linspace(0,10.0," << nu << ");"<< endl;
-  file << "s = " << sopt << ";" << endl;
-  file << "v = " << vopt << ";" << endl;
-  file << "m = " << mopt << ";" << endl;
+  file << "t = linspace(0,10.0," << nu << ");"<< std::endl;
+  file << "s = " << sopt << ";" << std::endl;
+  file << "v = " << vopt << ";" << std::endl;
+  file << "m = " << mopt << ";" << std::endl;
 
   // Finalize the results file
-  file << endl;
-  file << "% Plot the results" << endl;
-  file << "figure(1);" << endl;
-  file << "clf;" << endl << endl;
+  file << std::endl;
+  file << "% Plot the results" << std::endl;
+  file << "figure(1);" << std::endl;
+  file << "clf;" << std::endl << std::endl;
 
-  file << "subplot(2,2,1);" << endl;
-  file << "plot(t,s);" << endl;
-  file << "grid on;" << endl;
-  file << "xlabel('time [s]');" << endl;
-  file << "ylabel('position [m]');" << endl << endl;
+  file << "subplot(2,2,1);" << std::endl;
+  file << "plot(t,s);" << std::endl;
+  file << "grid on;" << std::endl;
+  file << "xlabel('time [s]');" << std::endl;
+  file << "ylabel('position [m]');" << std::endl << std::endl;
 
-  file << "subplot(2,2,2);" << endl;
-  file << "plot(t,v);" << endl;
-  file << "grid on;" << endl;
-  file << "xlabel('time [s]');" << endl;
-  file << "ylabel('velocity [m/s]');" << endl << endl;
+  file << "subplot(2,2,2);" << std::endl;
+  file << "plot(t,v);" << std::endl;
+  file << "grid on;" << std::endl;
+  file << "xlabel('time [s]');" << std::endl;
+  file << "ylabel('velocity [m/s]');" << std::endl << std::endl;
 
-  file << "subplot(2,2,3);" << endl;
-  file << "plot(t,m);" << endl;
-  file << "grid on;" << endl;
-  file << "xlabel('time [s]');" << endl;
-  file << "ylabel('mass [kg]');" << endl << endl;
+  file << "subplot(2,2,3);" << std::endl;
+  file << "plot(t,m);" << std::endl;
+  file << "grid on;" << std::endl;
+  file << "xlabel('time [s]');" << std::endl;
+  file << "ylabel('mass [kg]');" << std::endl << std::endl;
 
-  file << "subplot(2,2,4);" << endl;
-  file << "plot(t,u);" << endl;
-  file << "grid on;" << endl;
-  file << "xlabel('time [s]');" << endl;
-  file << "ylabel('Thrust [kg m/s^2]');" << endl << endl;
+  file << "subplot(2,2,4);" << std::endl;
+  file << "plot(t,u);" << std::endl;
+  file << "grid on;" << std::endl;
+  file << "xlabel('time [s]');" << std::endl;
+  file << "ylabel('Thrust [kg m/s^2]');" << std::endl << std::endl;
 
   file.close();
-  cout << "Results saved to \"" << filename << "\"" << endl;
+  std::cout << "Results saved to \"" << filename << "\"" << std::endl;
 
   return 0;
 }

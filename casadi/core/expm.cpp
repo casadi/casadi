@@ -27,22 +27,21 @@
 #include "sparsity_interface.hpp"
 #include <typeinfo>
 
-using namespace std;
 namespace casadi {
 
-  bool has_expm(const string& name) {
+  bool has_expm(const std::string& name) {
     return Expm::has_plugin(name);
   }
 
-  void load_expm(const string& name) {
+  void load_expm(const std::string& name) {
     Expm::load_plugin(name);
   }
 
-  string doc_expm(const string& name) {
+  std::string doc_expm(const std::string& name) {
     return Expm::getPlugin(name).doc;
   }
 
-  Function expmsol(const string& name, const string& solver,
+  Function expmsol(const std::string& name, const std::string& solver,
                 const Sparsity& A, const Dict& opts) {
     return Function::create(Expm::instantiate(name, solver, A), opts);
   }

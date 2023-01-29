@@ -26,7 +26,6 @@
 #include "linsol_ldl.hpp"
 #include "casadi/core/global_options.hpp"
 
-using namespace std;
 namespace casadi {
 
   extern "C"
@@ -153,9 +152,9 @@ namespace casadi {
   void LinsolLdl::generate(CodeGenerator& g, const std::string& A, const std::string& x,
                           casadi_int nrhs, bool tr) const {
     // Codegen the integer vectors
-    string sp = g.sparsity(sp_);
-    string sp_Lt = g.sparsity(sp_Lt_);
-    string p = g.constant(p_);
+    std::string sp = g.sparsity(sp_);
+    std::string sp_Lt = g.sparsity(sp_Lt_);
+    std::string p = g.constant(p_);
 
     // Place in block to avoid conflicts caused by local variables
     g << "{\n";

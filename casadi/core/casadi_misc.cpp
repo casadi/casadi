@@ -50,8 +50,6 @@
 
 #undef CASADI_NEED_UNISTD
 
-using namespace std;
-
 namespace casadi {
 
   int to_int(casadi_int rhs) {
@@ -184,7 +182,7 @@ namespace casadi {
     }
     return ret;
   }
-  
+
   // Better have a bool return flag saying if we need reorer at all
   std::vector<casadi_int> tensor_permute_mapping(const std::vector<casadi_int>& dims,
       const std::vector<casadi_int>& order) {
@@ -352,7 +350,7 @@ std::string simple_mkstemps(const std::string& prefix, const std::string& suffix
   std::string temporary_file(const std::string& prefix, const std::string& suffix) {
     #ifdef HAVE_MKSTEMPS
     // Preferred solution
-    string ret = prefix + "XXXXXX" + suffix;
+    std::string ret = prefix + "XXXXXX" + suffix;
     if (mkstemps(&ret[0], static_cast<int>(suffix.size())) == -1) {
       casadi_error("Failed to create temporary file: '" + ret + "'");
     }
@@ -362,7 +360,7 @@ std::string simple_mkstemps(const std::string& prefix, const std::string& suffix
     return simple_mkstemps(prefix, suffix);
     #else // HAVE_SIMPLE_MKSTEMPS
     // Fallback, may result in deprecation warnings
-    return prefix + string(tmpnam(nullptr)) + suffix;
+    return prefix + std::string(tmpnam(nullptr)) + suffix;
     #endif // HAVE_SIMPLE_MKSTEMPS
     #endif // HAVE_MKSTEMPS
   }

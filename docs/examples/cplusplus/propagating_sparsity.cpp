@@ -36,20 +36,19 @@
 #include "casadi/casadi.hpp"
 
 using namespace casadi;
-using namespace std;
 
 // Print a (typically 64-bit) unsigned integer
 void print_binary(bvec_t v){
   for(int k=0; k<bvec_size; ++k){
-    if(k%4==0) cout << " ";
-    if(k%16==0) cout << " ";
+    if(k%4==0) std::cout << " ";
+    if(k%16==0) std::cout << " ";
     if(v & (bvec_t(1)<<k)){
-      cout << 1;
+      std::cout << 1;
     } else {
-      cout << 0;
+      std::cout << 0;
     }
   }
-  cout << endl;
+  std::cout << std::endl;
 }
 
 int main(){
@@ -59,23 +58,23 @@ int main(){
     // Create a simple function
     Function f;
     if(test==0){
-      cout << "SX:" << endl;
+      std::cout << "SX:" << std::endl;
       SX x = SX::sym("x",3);
       SX z = x(0)*x(0)+x(2) + 3;
       f = Function("f", {x}, {z});
     } else {
-      cout << "MX:" << endl;
+      std::cout << "MX:" << std::endl;
       MX x = MX::sym("x",3);
       MX z = x(0)*x(0)+x(2) + 3;
       f = Function("f", {x}, {z});
     }
 
     // Memory for inputs and outputs
-    vector<bvec_t> f_in(f.nnz_in(0), 0);
-    vector<bvec_t> f_out(f.nnz_out(0), 0);
+    std::vector<bvec_t> f_in(f.nnz_in(0), 0);
+    std::vector<bvec_t> f_out(f.nnz_out(0), 0);
 
     // Propagate from input to output (forward mode)
-    cout << "forward mode" << endl;
+    std::cout << "forward mode" << std::endl;
 
     // Make sure that the class is able to support the dependency propagation
     casadi_assert(f.has_spfwd(), "Forward sparsity propagation not supported");
@@ -95,7 +94,7 @@ int main(){
     print_binary(f_out[0]);
 
     // Propagate from output to input (adjoint/reverse/backward mode)
-    cout << "backward mode" << endl;
+    std::cout << "backward mode" << std::endl;
 
     // Make sure that the class is able to support the dependency propagation
     casadi_assert(f.has_sprev(), "Backward sparsity propagation not supported");

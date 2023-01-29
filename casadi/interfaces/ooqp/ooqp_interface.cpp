@@ -35,7 +35,6 @@
 // This is the only possible way to access it using the C++ interface
 extern casadi_int gOoqpPrintLevel;
 
-using namespace std;
 namespace casadi {
 
   extern "C"
@@ -286,7 +285,7 @@ namespace casadi {
     casadi_int nA=0, nC=0, /*mz=0, */ nnzA=0, nnzC=0;
     for (casadi_int j=0; j<na_; ++j) {
       if (lba[j] == -numeric_limits<double>::infinity() &&
-          uba[j] ==  numeric_limits<double>::infinity()) {
+          uba[j] ==  std::numeric_limits<double>::infinity()) {
         // Redundant constraint
         c_index_[j] = 0;
       } else if (lba[j]==uba[j]) {
@@ -496,7 +495,7 @@ namespace casadi {
 
   std::string OoqpInterface::printBounds(const std::vector<double>& b,
                                       const std::vector<char>& ib, casadi_int n, const char *sign) {
-    stringstream ss;
+    std::stringstream ss;
     ss << "[";
     for (casadi_int i=0; i<n; ++i) {
       if (i!=0) ss << ", ";

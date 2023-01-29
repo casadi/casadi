@@ -31,8 +31,6 @@
 #include "function_internal.hpp"
 #include "runtime/shared.hpp"
 
-using namespace std;
-
 namespace casadi {
 
   Einstein::Einstein(const MX& C, const MX& A, const MX& B,
@@ -64,7 +62,7 @@ namespace casadi {
 
   template<typename T>
   int Einstein::eval_gen(const T** arg, T** res, casadi_int* iw, T* w) const {
-    if (arg[0]!=res[0]) copy(arg[0], arg[0]+dep(0).nnz(), res[0]);
+    if (arg[0]!=res[0]) std::copy(arg[0], arg[0]+dep(0).nnz(), res[0]);
 
     einstein_eval(n_iter_, iter_dims_, strides_a_, strides_b_, strides_c_, arg[1], arg[2], res[0]);
     return 0;

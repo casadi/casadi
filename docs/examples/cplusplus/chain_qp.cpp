@@ -53,11 +53,10 @@
 */
 
 using namespace casadi;
-using namespace std;
 
 int main(int argc, char* argv[]) {
   // Default options
-  string plugin_name = "qpoases";
+  std::string plugin_name = "qpoases";
   bool schur = false;
   bool nlp = false;
   bool large = false;
@@ -81,16 +80,16 @@ int main(int argc, char* argv[]) {
   SX Vchain = 0;
 
   // Variables
-  vector<SX> x;
+  std::vector<SX> x;
 
   // Variable bounds
-  vector<double> lbx, ubx;
+  std::vector<double> lbx, ubx;
 
   // Constraints
-  vector<SX> g;
+  std::vector<SX> g;
 
   // Constraint bounds
-  vector<double> lbg, ubg;
+  std::vector<double> lbg, ubg;
 
   // Loop over all chain elements
   SX y_prev, z_prev, y_i, z_i;
@@ -161,37 +160,37 @@ int main(int argc, char* argv[]) {
   DMDict res = solver(arg);
   DM x_opt = res["x"];
   double f_opt(res["f"]);
-  cout << "f_opt = " << f_opt << endl;
+  std::cout << "f_opt = " << f_opt << std::endl;
 
   // Retrieve the result
   DM y_opt = x_opt(Slice(0, x_opt.size1(), 2));
   DM z_opt = x_opt(Slice(1, x_opt.size1(), 2));
 
   // Create Matlab script to plot the solution
-  ofstream file;
-  string filename = "chain_qp_results.m";
+  std::ofstream file;
+  std::string filename = "chain_qp_results.m";
   file.open(filename.c_str());
-  file << "% Results file from " __FILE__ << endl;
-  file << "% Generated " __DATE__ " at " __TIME__ << endl;
-  file << endl;
-  file << "t = linspace(-2,2," << N << ");"<< endl;
-  file << "f_opt = " << f_opt << ";" << endl;
-  file << "x_opt = " << x_opt << ";" << endl;
-  file << "y_opt = " << y_opt << ";" << endl;
-  file << "z_opt = " << z_opt << ";" << endl;
+  file << "% Results file from " __FILE__ << std::endl;
+  file << "% Generated " __DATE__ " at " __TIME__ << std::endl;
+  file << std::endl;
+  file << "t = linspace(-2,2," << N << ");"<< std::endl;
+  file << "f_opt = " << f_opt << ";" << std::endl;
+  file << "x_opt = " << x_opt << ";" << std::endl;
+  file << "y_opt = " << y_opt << ";" << std::endl;
+  file << "z_opt = " << z_opt << ";" << std::endl;
 
   // Finalize the results file
-  file << endl;
-  file << "% Plot the results" << endl;
-  file << "figure(1);" << endl;
-  file << "clf;" << endl;
-  file << "plot(y_opt, z_opt);" << endl;
-  file << "grid on;" << endl;
-  file << "xlabel('y [m]');" << endl;
-  file << "ylabel('z [m]');" << endl;
+  file << std::endl;
+  file << "% Plot the results" << std::endl;
+  file << "figure(1);" << std::endl;
+  file << "clf;" << std::endl;
+  file << "plot(y_opt, z_opt);" << std::endl;
+  file << "grid on;" << std::endl;
+  file << "xlabel('y [m]');" << std::endl;
+  file << "ylabel('z [m]');" << std::endl;
 
   file.close();
-  cout << "Results saved to \"" << filename << "\"" << endl;
+  std::cout << "Results saved to \"" << filename << "\"" << std::endl;
 
   return 0;
 }

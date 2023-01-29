@@ -30,8 +30,6 @@
 #include <sstream>
 #include <vector>
 
-using namespace std;
-
 namespace casadi {
 
   UnaryMX::UnaryMX(Operation op, MX x) : op_(op) {
@@ -49,7 +47,7 @@ namespace casadi {
   }
 
   int UnaryMX::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
-    double dummy = numeric_limits<double>::quiet_NaN();
+    double dummy = std::numeric_limits<double>::quiet_NaN();
     casadi_math<double>::fun(op_, arg[0], dummy, res[0], nnz());
     return 0;
   }
@@ -104,7 +102,7 @@ namespace casadi {
   void UnaryMX::generate(CodeGenerator& g,
                           const std::vector<casadi_int>& arg,
                           const std::vector<casadi_int>& res) const {
-    string r, x;
+    std::string r, x;
     if (nnz()==1) {
       // Scalar assignment
       r = g.workel(res[0]);

@@ -149,7 +149,6 @@ int usage_c(){
 // C++ (and CasADi) from here on
 #include <casadi/casadi.hpp>
 using namespace casadi;
-using namespace std;
 
 int main(){
 

@@ -27,7 +27,6 @@
 #include "linsol_tridiag.hpp"
 #include "casadi/core/global_options.hpp"
 
-using namespace std;
 namespace casadi {
 
   extern "C"

@@ -2,7 +2,6 @@
 #include <iostream>
 
 namespace myproject {
-  using namespace std;
 
   int ultimateQuestion() {
     return 42;

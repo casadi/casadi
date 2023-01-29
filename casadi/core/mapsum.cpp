@@ -26,8 +26,6 @@
 #include "mapsum.hpp"
 #include "serializing_stream.hpp"
 
-using namespace std;
-
 namespace casadi {
 
   Function MapSum::create(const std::string& name, const std::string& parallelization,
@@ -41,7 +39,7 @@ namespace casadi {
     casadi_assert(reduce_out.size()==f.n_out(), "Dimension mismatch");
 
     if (parallelization == "serial") {
-      string suffix = str(reduce_in)+str(reduce_out);
+      std::string suffix = str(reduce_in)+str(reduce_out);
       Function ret;
       if (!f->incache(name, ret, suffix)) {
         // Create new serial map
@@ -149,7 +147,7 @@ namespace casadi {
   template<typename T>
   int MapSum::eval_gen(const T** arg, T** res, casadi_int* iw, T* w, int mem) const {
     const T** arg1 = arg+n_in_;
-    copy_n(arg, n_in_, arg1);
+    std::copy_n(arg, n_in_, arg1);
     T** res1 = res+n_out_;
 
     T* w_scratch = w + f_.sz_w();
@@ -205,9 +203,9 @@ namespace casadi {
       }
     }
     bvec_t** arg1 = arg+n_in_;
-    copy_n(arg, n_in_, arg1);
+    std::copy_n(arg, n_in_, arg1);
     bvec_t** res1 = res+n_out_;
-    copy_n(res, n_out_, res1);
+    std::copy_n(res, n_out_, res1);
     for (casadi_int i=0; i<n_; ++i) {
       // Restore res1[j] from scratch space
       w_scratch = w + f_.sz_w();
@@ -299,12 +297,12 @@ namespace casadi {
       df, n_, reduce_in, reduce_out_);
 
     // Input expressions
-    vector<MX> arg = dm.mx_in();
+    std::vector<MX> arg = dm.mx_in();
 
     // Need to reorder sensitivity inputs
-    vector<MX> res = arg;
-    vector<MX>::iterator it=res.begin()+n_in_+n_out_;
-    vector<casadi_int> ind;
+    std::vector<MX> res = arg;
+    std::vector<MX>::iterator it=res.begin()+n_in_+n_out_;
+    std::vector<casadi_int> ind;
     for (casadi_int i=0; i<n_in_; ++i, ++it) {
       if (reduce_in_[i]) continue;
       casadi_int sz = f_.size2_in(i);
@@ -361,12 +359,12 @@ namespace casadi {
       df, n_, reduce_in, reduce_in_);
 
     // Input expressions
-    vector<MX> arg = dm.mx_in();
+    std::vector<MX> arg = dm.mx_in();
 
     // Need to reorder sensitivity inputs
-    vector<MX> res = arg;
-    vector<MX>::iterator it=res.begin()+n_in_+n_out_;
-    vector<casadi_int> ind;
+    std::vector<MX> res = arg;
+    std::vector<MX>::iterator it=res.begin()+n_in_+n_out_;
+    std::vector<casadi_int> ind;
     for (casadi_int i=0; i<n_out_; ++i, ++it) {
       if (reduce_out_[i]) continue;
       casadi_int sz = f_.size2_out(i);

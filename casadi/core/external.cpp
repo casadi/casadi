@@ -70,7 +70,8 @@ void External::init_external() {
   incref_ = (signal_t)li_.get_function(name_ + "_incref");
   decref_ = (signal_t)li_.get_function(name_ + "_decref");
 
-  casadi_assert((bool) checkout_ == (bool) checkout_, "External must either define both incref+decref or neither.");
+  casadi_assert(static_cast<bool>(incref_) == static_cast<bool>(decref_),
+    "External must either define both incref and decref or neither.");
 
   // Getting default arguments
   get_default_in_ = (default_t)li_.get_function(name_ + "_default_in");
@@ -118,7 +119,8 @@ void GenericExternal::init_external() {
   checkout_ = (casadi_checkout_t) li_.get_function(name_ + "_checkout");
   release_ = (casadi_release_t) li_.get_function(name_ + "_release");
 
-  casadi_assert((bool) checkout_ == (bool) checkout_, "External must either define both checkout+release or neither.");
+  casadi_assert(static_cast<bool>(checkout_) == static_cast<bool>(release_),
+    "External must either define both checkout and release or neither.");
 
   // Function for numerical evaluation
   eval_ = (eval_t)li_.get_function(name_);

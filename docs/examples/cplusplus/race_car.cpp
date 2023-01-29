@@ -29,7 +29,6 @@
 #include <casadi/casadi.hpp>
 
 using namespace casadi;
-using namespace std;
 
 // dx/dt = f(x,u)
 MX f(const MX& x, const MX& u) {
@@ -93,27 +92,27 @@ int main(){
   auto sol = opti.solve();   // actual solve
 
   // Create Matlab script to plot the solution
-  ofstream file;
-  string filename = "race_car_results.m";
+  std::ofstream file;
+  std::string filename = "race_car_results.m";
   file.open(filename.c_str());
-  file << "% Results file from " __FILE__ << endl;
-  file << "% Generated " __DATE__ " at " __TIME__ << endl;
-  file << endl;
+  file << "% Results file from " __FILE__ << std::endl;
+  file << "% Generated " __DATE__ " at " __TIME__ << std::endl;
+  file << std::endl;
   
   // Save results to file
-  file << "t = linspace(0," << sol.value(T) << "," << N << "+1);"<< endl;
-  file << "speed = " << std::vector<double>(sol.value(speed)) << ";" << endl;
-  file << "pos = " << std::vector<double>(sol.value(pos)) << ";" << endl;
-  file << "U = " << std::vector<double>(sol.value(U)) << ";" << endl;
+  file << "t = linspace(0," << sol.value(T) << "," << N << "+1);"<< std::endl;
+  file << "speed = " << std::vector<double>(sol.value(speed)) << ";" << std::endl;
+  file << "pos = " << std::vector<double>(sol.value(pos)) << ";" << std::endl;
+  file << "U = " << std::vector<double>(sol.value(U)) << ";" << std::endl;
 
-  file << "figure;" << endl;
-  file << "hold on;" << endl;
-  file << "plot(t,speed);" << endl;
-  file << "plot(t,pos);" << endl;
-  file << "plot(t,1-sin(2*pi*pos)/2,'r--');" << endl;
-  file << "stairs(t(1:end-1),U,'k');" << endl;
-  file << "xlabel('Time [s]');" << endl;
-  file << "legend('speed','pos','speed limit','throttle','Location','northwest');" << endl;
+  file << "figure;" << std::endl;
+  file << "hold on;" << std::endl;
+  file << "plot(t,speed);" << std::endl;
+  file << "plot(t,pos);" << std::endl;
+  file << "plot(t,1-sin(2*pi*pos)/2,'r--');" << std::endl;
+  file << "stairs(t(1:end-1),U,'k');" << std::endl;
+  file << "xlabel('Time [s]');" << std::endl;
+  file << "legend('speed','pos','speed limit','throttle','Location','northwest');" << std::endl;
 
   // Have a look at the constraint Jacobian
   jacobian(opti.g(), opti.x()).sparsity().spy_matlab("race_car_jac_g.m");

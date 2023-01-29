@@ -25,7 +25,6 @@
 
 #include "norm.hpp"
 
-using namespace std;
 namespace casadi {
 
   Norm::Norm(const MX& x) {

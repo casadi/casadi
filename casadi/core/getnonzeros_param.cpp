@@ -27,8 +27,6 @@
 #include "casadi_misc.hpp"
 #include "serializing_stream.hpp"
 
-using namespace std;
-
 namespace casadi {
 
   MX GetNonzerosParam::create(const MX& x, const MX& nz) {
@@ -194,25 +192,25 @@ namespace casadi {
   }
 
   std::string GetNonzerosParamVector::disp(const std::vector<std::string>& arg) const {
-    stringstream ss;
+    std::stringstream ss;
     ss << arg.at(0) << "[" << arg.at(1) << "]";
     return ss.str();
   }
 
   std::string GetNonzerosParamSlice::disp(const std::vector<std::string>& arg) const {
-    stringstream ss;
+    std::stringstream ss;
     ss << arg.at(0) << "[(" << arg.at(1) << ";" << outer_ << ")]";
     return ss.str();
   }
 
   std::string GetNonzerosSliceParam::disp(const std::vector<std::string>& arg) const {
-    stringstream ss;
+    std::stringstream ss;
     ss << arg.at(0) << "[(" << inner_ << ";" << arg.at(1) << ")]";
     return ss.str();
   }
 
   std::string GetNonzerosParamParam::disp(const std::vector<std::string>& arg) const {
-    stringstream ss;
+    std::stringstream ss;
     ss << arg.at(0) << "[(" << arg.at(1) << ";" << arg.at(2) << ")]";
     return ss.str();
   }

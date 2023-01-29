@@ -43,7 +43,8 @@
 // Throw informative error message
 #define THROW_ERROR_NODE(FNAME, NODE, WHAT) \
 throw CasadiException("Error in DaeBuilderInternal::" FNAME " for '" + this->name_ \
-  + "', node '" + NODE.name + "' (line " + str(NODE.line) + ") at " + CASADI_WHERE + ":\n" + std::string(WHAT));
+  + "', node '" + NODE.name + "' (line " + str(NODE.line) + ") at " \
+  + CASADI_WHERE + ":\n" + std::string(WHAT));
 
 namespace casadi {
 
@@ -974,7 +975,7 @@ void DaeBuilderInternal::sanity_check() const {
 }
 
 std::string DaeBuilderInternal::qualified_name(const XmlNode& nn) {
-  // Stringstream to assemble name
+  // std::stringstream to assemble name
   std::stringstream qn;
 
   for (casadi_int i=0; i<nn.size(); ++i) {

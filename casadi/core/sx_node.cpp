@@ -33,7 +33,6 @@
 #include <limits>
 #include <stack>
 
-using namespace std;
 namespace casadi {
 
   SXNode::SXNode() {
@@ -53,7 +52,7 @@ namespace casadi {
   }
 
   double SXNode::to_double() const {
-    return numeric_limits<double>::quiet_NaN();
+    return std::numeric_limits<double>::quiet_NaN();
   }
 
   casadi_int SXNode::to_int() const {
@@ -82,8 +81,8 @@ namespace casadi {
     can_inline(nodeind);
 
     // Print expression
-    vector<string> intermed;
-    string s = print_compact(nodeind, intermed);
+    std::vector<std::string> intermed;
+    std::string s = print_compact(nodeind, intermed);
 
     // Print intermediate expressions
     for (casadi_int i=0; i<intermed.size(); ++i)
@@ -106,7 +105,7 @@ namespace casadi {
     std::map<const SXNode*, casadi_int>::iterator it=nodeind.find(this);
     if (it==nodeind.end()) {
       // First time encountered, mark inlined
-      nodeind.insert(it, make_pair(this, 0));
+      nodeind.insert(it, std::make_pair(this, 0));
 
       // Handle dependencies with recursion
       for (casadi_int i=0; i<n_dep(); ++i) {
@@ -125,7 +124,7 @@ namespace casadi {
 
     // If positive, already in intermediate expressions
     if (ind>0) {
-      stringstream ss;
+      std::stringstream ss;
       ss << "@" << ind;
       return ss.str();
     }
@@ -137,7 +136,7 @@ namespace casadi {
     }
 
     // Get expression for this
-    string s = print(arg[0], arg[1]);
+    std::string s = print(arg[0], arg[1]);
 
     // Decide what to do with the expression
     if (ind==0) {
@@ -147,7 +146,7 @@ namespace casadi {
       // Add to list of intermediate expressions and return reference
       intermed.push_back(s);
       ind = intermed.size(); // For subsequent references
-      stringstream ss;
+      std::stringstream ss;
       ss << "@" << ind;
       return ss.str();
     }
