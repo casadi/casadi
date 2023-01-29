@@ -1325,7 +1325,7 @@ namespace casadi {
   }
 
   std::string CodeGenerator::constant(const std::string& v) {
-    std""string ret = v;
+    std::string ret = v;
     ret = replace(ret, "\\", "\\\\");
     ret = replace(ret, "\"", "\\\"");
     return "\"" + ret + "\"";
@@ -1816,7 +1816,7 @@ namespace casadi {
 
       // Perform string replacements
       for (auto&& it = rep.rbegin(); it!=rep.rend(); ++it) {
-        line = std::replace(line, it->first, it->second);
+        line = replace(line, it->first, it->second);
       }
 
       // Append to return

@@ -287,8 +287,8 @@ namespace casadi {
 
   CASADI_EXPORT std::string replace(const std::string& s, const std::string& p, const std::string& r) {
     std::string ret = s;
-    string::size_type n = 0;
-    while ((n = ret.find(p, n)) != string::npos) {
+    std::string::size_type n = 0;
+    while ((n = ret.find(p, n)) != std::string::npos) {
       ret.replace(n, p.size(), r);
       n += r.size();
     }
