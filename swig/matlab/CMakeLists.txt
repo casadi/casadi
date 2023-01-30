@@ -75,17 +75,17 @@ if (WITH_OCTAVE AND NOT SWIG_EXPORT)
 
   # Compile MEX file
   add_library(casadiOCTAVE MODULE ${MEX_FILE})
-  target_include_directories(casadiOCTAVE PUBLIC ${OCTAVE_INCLUDE_DIRS})
+  target_compile_definitions(casadiOCTAVE PRIVATE HAVE_OCTAVE)
+  target_link_libraries(casadiOCTAVE octave::octave casadi)
   if(APPLE)
-    target_link_libraries(casadiOCTAVE casadi)
     set_target_properties(casadiOCTAVE PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
-  else()
-    target_link_libraries(casadiOCTAVE ${OCTAVE_LIBRARIES} casadi)
   endif()
+
   set_target_properties(casadiOCTAVE
     PROPERTIES OUTPUT_NAME "casadiMEX"
                PREFIX ""
-               SUFFIX .mex)
+               SUFFIX .${OCTAVE_MEX_EXT})
+
   install(TARGETS casadiOCTAVE DESTINATION ${MATLAB_PREFIX})
     install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/../octave/import.m DESTINATION ${MATLAB_PREFIX}/octave-extra)
     if (WITH_OCTAVE_IMPORT)

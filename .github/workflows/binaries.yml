@@ -335,8 +335,19 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        matlab: ["2018b"]
-        image: [macos-11]
+        include:
+         - image: macos-11
+           host: "matlab"
+           version: "2018b"
+         - image: macos-11
+           host: "octave"
+           version: "7.3.0"
+         - image: macos-m1
+           host: "matlab"
+           version: "2018b"
+         - image: macos-m1
+           host: "octave"
+           version: "7.3.0"
     env:
       DEVELOPMENT_CERTIFICATE_DATA_AVAILABLE: ${{ secrets.DEVELOPMENT_CERTIFICATE_DATA != '' }}
     steps:
@@ -361,7 +372,7 @@ jobs:
           ls mockups/cmake
       - name: Build
         run: |
-          CC=${{ env.CC }} FC=${{ env.FC }} CXX=${{ env.CXX }} cmake -DCMAKE_OSX_SYSROOT=${{env.CONDA_BUILD_SYSROOT}} -Bbuild -DWITH_MATLAB=ON -USWIG_IMPORT -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/install -DSKIP_CONFIG_H_GENERATION=ON -DCMAKE_PREFIX_PATH=${{ github.workspace }}/mockups/cmake
+          CC=${{ env.CC }} FC=${{ env.FC }} CXX=${{ env.CXX }} cmake -DCMAKE_OSX_SYSROOT=${{env.CONDA_BUILD_SYSROOT}} -Bbuild -DWITH_${{matrix.host == 'matlab' && 'MATLAB' || 'OCTAVE' }}=ON -USWIG_IMPORT -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/install -DSKIP_CONFIG_H_GENERATION=ON -DCMAKE_PREFIX_PATH=${{ github.workspace }}/mockups/cmake
           cmake --build build --target install -v
       - uses: kanga333/variable-mapper@v0.3.0
         with:
@@ -376,7 +387,7 @@ jobs:
         with:
           source_path: install/casadi
           destination_path: install/casadi
-          search_paths: "${{env.COMPILER_LIB_SEARCH_PATH}}:${{ github.workspace }}/mockups/matlab/lib"
+          search_paths: "${{env.COMPILER_LIB_SEARCH_PATH}}:${{ github.workspace }}/mockups/${{matrix.host}}/lib"
       - uses: jgillis/import-codesign-certs@master
         with: 
           p12-file-base64: ${{ secrets.DEVELOPMENT_CERTIFICATE_DATA }}
@@ -391,16 +402,16 @@ jobs:
         with:
           files: install/
           recursive: false
-          dest: casadi-${{env.os}}${{env.bitness}}-matlab${{matrix.matlab}}.zip
+          dest: casadi-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.4.0
-      - run: cp casadi-${{env.os}}${{env.bitness}}-matlab${{matrix.matlab}}.zip casadi-${{ env.GITHUB_REF_SLUG }}-${{env.os}}${{env.bitness}}-matlab${{matrix.matlab}}.zip
+      - run: cp casadi-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip casadi-${{ env.GITHUB_REF_SLUG }}-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip
       - name: Delete old release assets
         uses: mknejp/delete-release-assets@v1
         with:
           token: ${{ github.token }}
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
-          assets: casadi-*-${{env.os}}${{env.bitness}}-matlab${{matrix.matlab}}.zip
+          assets: casadi-*-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip
           fail-if-no-release: false
           fail-if-no-assets: false
       - name: Upload files to a GitHub release
@@ -408,13 +419,13 @@ jobs:
         with:
           overwrite: true
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
-          file: casadi-${{ env.GITHUB_REF_SLUG }}-${{env.os}}${{env.bitness}}-matlab${{matrix.matlab}}.zip
+          file: casadi-${{ env.GITHUB_REF_SLUG }}-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip
           prerelease: true
 
       - uses: actions/upload-artifact@v3.1.2
         with:
-          name: casadi-${{env.os}}${{env.bitness}}-matlab${{matrix.matlab}}
-          path: casadi-${{env.os}}${{env.bitness}}-matlab${{matrix.matlab}}.zip
+          name: casadi-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}
+          path: casadi-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip
           retention-days: 5
                   
   matlab-dockcross:
@@ -423,8 +434,19 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        matlab: ["2018b"]
-        arch: [manylinux1-x64,manylinux2014-x64,windows-shared-x64-posix]
+        include:
+          - host: matlab
+            version: 2018b
+            arch: manylinux2014-x64
+          - host: octave
+            version: 7.3.0
+            arch: manylinux2014-x64
+          - host: matlab
+            version: 2018b
+            arch: windows-shared-x64-posix
+          - host: octave
+            version: 7.3.0
+            arch: windows-shared-x64-posix
     steps: 
       - uses: actions/download-artifact@v3.0.2
         with:
@@ -449,7 +471,7 @@ jobs:
       - name: Build
         run: |
           ./dockcross ls /work/mockups/cmake
-          ./dockcross cmake -Bbuild -DWITH_MATLAB=ON -USWIG_IMPORT  -DCMAKE_INSTALL_PREFIX=/work/install -DSKIP_CONFIG_H_GENERATION=ON -DCMAKE_PREFIX_PATH=/work/mockups/cmake
+          ./dockcross cmake -Bbuild -DWITH_${{matrix.host == 'matlab' && 'MATLAB' || 'OCTAVE' }}=ON -USWIG_IMPORT  -DCMAKE_INSTALL_PREFIX=/work/install -DSKIP_CONFIG_H_GENERATION=ON -DCMAKE_PREFIX_PATH=/work/mockups/cmake
           ./dockcross cmake --build build --target install -v
       - uses: kanga333/variable-mapper@v0.3.0
         with:
@@ -475,16 +497,16 @@ jobs:
         with:
           files: install/
           recursive: false
-          dest: casadi-${{env.os}}${{env.bitness}}-matlab${{matrix.matlab}}.zip
+          dest: casadi-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.4.0
-      - run: cp casadi-${{env.os}}${{env.bitness}}-matlab${{matrix.matlab}}.zip casadi-${{ env.GITHUB_REF_SLUG }}-${{env.os}}${{env.bitness}}-matlab${{matrix.matlab}}.zip
+      - run: cp casadi-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip casadi-${{ env.GITHUB_REF_SLUG }}-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip
       - name: Delete old release assets
         uses: mknejp/delete-release-assets@v1
         with:
           token: ${{ github.token }}
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
-          assets: casadi-*-${{env.os}}${{env.bitness}}-matlab${{matrix.matlab}}.zip
+          assets: casadi-*-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip
           fail-if-no-release: false
           fail-if-no-assets: false
       - name: Upload files to a GitHub release
@@ -492,13 +514,13 @@ jobs:
         with:
           overwrite: true
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
-          file: casadi-${{ env.GITHUB_REF_SLUG }}-${{env.os}}${{env.bitness}}-matlab${{matrix.matlab}}.zip
+          file: casadi-${{ env.GITHUB_REF_SLUG }}-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip
           prerelease: true
 
       - uses: actions/upload-artifact@v3.1.2
         with:
-          name: casadi-${{env.os}}${{env.bitness}}-matlab${{matrix.matlab}}
-          path: casadi-${{env.os}}${{env.bitness}}-matlab${{matrix.matlab}}.zip
+          name: casadi-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}
+          path: casadi-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip
           retention-days: 5
       
   python-dockcross:

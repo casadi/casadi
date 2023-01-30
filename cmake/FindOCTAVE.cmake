@@ -59,6 +59,12 @@
 # either expressed or implied, of the FreeBSD Project.
 #=============================================================================
 
+message("OCTAVE: find via CONFIG")
+find_package(OCTAVE CONFIG NO_CMAKE_FIND_ROOT_PATH)
+message("OCTAVE: ${OCTAVE_FOUND}")
+
+if(NOT OCTAVE_FOUND)
+
 find_program( OCTAVE_CONFIG_EXECUTABLE
               NAMES octave-config
             )
@@ -188,3 +194,14 @@ mark_as_advanced (
   OCTAVE_MINOR_VERSION
   OCTAVE_PATCH_VERSION
 )
+
+add_library(octave::octave INTERFACE IMPORTED)
+
+if (WIN32)
+  target_link_libraries(octave::octave INTERFACE ${OCTAVE_LIBRARIES})
+endif()
+target_include_directories(octave::octave INTERFACE ${OCTAVE_INCLUDE_DIR})
+
+set(OCTAVE_MEX_EXT "mex")
+
+endif()
