@@ -13,8 +13,8 @@ jobs:
         fetch-depth: 0 # for git-restore-mtime
 
     - run: |
-      mkdir build
-      cd build
-      cmake ..
-      cd test
-      make lint
+        mkdir build
+        cd build
+        cmake ..
+        cd test
+        make lint
