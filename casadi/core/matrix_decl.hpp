@@ -120,12 +120,12 @@ namespace casadi {
     /** \brief  Access functions of the node
 
         \identifier{18i} */
-    std::vector<Scalar>* operator->() { return &nonzeros_;}
+    std::vector<Scalar>* operator->();
 
     /** \brief  Const access functions of the node
 
         \identifier{18j} */
-    const std::vector<Scalar>* operator->() const { return &nonzeros_;}
+    const std::vector<Scalar>* operator->() const;
 #endif // SWIG
 
     /** \brief Create a sparse matrix from a sparsity pattern.
@@ -216,7 +216,7 @@ namespace casadi {
 #endif // SWIG
 
     /// Returns true if the matrix has a non-zero at location rr, cc
-    bool has_nz(casadi_int rr, casadi_int cc) const { return sparsity().has_nz(rr, cc); }
+    bool has_nz(casadi_int rr, casadi_int cc) const;
 
     /// Returns the truth value of a Matrix
     bool __nonzero__() const;
@@ -976,7 +976,7 @@ namespace casadi {
     /** \brief Get an owning reference to the sparsity pattern
 
         \identifier{19j} */
-    Sparsity get_sparsity() const { return sparsity();}
+    Sparsity get_sparsity() const;
 
     /** \brief Construct a sparse matrix from triplet form
 
@@ -1127,12 +1127,12 @@ namespace casadi {
     /** \brief Get all nonzeros
 
         \identifier{1a2} */
-    std::vector<Scalar> get_nonzeros() const { return nonzeros_;}
+    std::vector<Scalar> get_nonzeros() const;
 
     /** \brief Get all elements
 
         \identifier{1a3} */
-    std::vector<Scalar> get_elements() const { return static_cast< std::vector<Scalar> >(*this);}
+    std::vector<Scalar> get_elements() const;
 
 #ifndef SWIG
     /** \brief Get all nonzeros
@@ -1194,15 +1194,12 @@ namespace casadi {
     /** \brief Create a matrix with uniformly distributed random numbers
 
         \identifier{1ab} */
-    static Matrix<Scalar> rand(casadi_int nrow=1, // NOLINT(runtime/threadsafe_fn)
-                               casadi_int ncol=1) {
-      return rand(Sparsity::dense(nrow, ncol)); // NOLINT(runtime/threadsafe_fn)
-    }
-    static Matrix<Scalar> rand(const Sparsity& sp); // NOLINT(runtime/threadsafe_fn)
-    static Matrix<Scalar>
-        rand(const std::pair<casadi_int, casadi_int>& rc) { // NOLINT(runtime/threadsafe_fn)
-      return rand(rc.first, rc.second); // NOLINT(runtime/threadsafe_fn)
-    }
+    static Matrix<Scalar> rand(
+        casadi_int nrow=1,
+        casadi_int ncol=1);  // NOLINT(runtime/threadsafe_fn)
+    static Matrix<Scalar> rand(const Sparsity& sp);  // NOLINT(runtime/threadsafe_fn)
+    static Matrix<Scalar> rand(
+        const std::pair<casadi_int, casadi_int>& rc);  // NOLINT(runtime/threadsafe_fn)
     ///@}
 
     /** \brief Export matrix in specific language

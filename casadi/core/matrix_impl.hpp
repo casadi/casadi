@@ -62,6 +62,11 @@ namespace casadi {
   }
 
   template<typename Scalar>
+  bool Matrix<Scalar>::has_nz(casadi_int rr, casadi_int cc) const {
+    return sparsity().has_nz(rr, cc);
+  }
+
+  template<typename Scalar>
   bool Matrix<Scalar>::__nonzero__() const {
     if (numel()!=1) {
       casadi_error("Only scalar Matrix could have a truth value, but you "
@@ -585,6 +590,16 @@ namespace casadi {
     sparsity_ = m.sparsity_;
     nonzeros_ = m.nonzeros_;
     return *this;
+  }
+
+  template<typename Scalar>
+  std::vector<Scalar>* Matrix<Scalar>::operator->() {
+    return &nonzeros_;
+  }
+
+  template<typename Scalar>
+  const std::vector<Scalar>* Matrix<Scalar>::operator->() const {
+    return &nonzeros_;
   }
 
   template<typename Scalar>
@@ -1127,6 +1142,11 @@ namespace casadi {
   }
 
   template<typename Scalar>
+  Sparsity Matrix<Scalar>::get_sparsity() const {
+    return sparsity();
+  }
+
+  template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::mtimes(const Matrix<Scalar> &x, const Matrix<Scalar> &y) {
     if (x.is_scalar() || y.is_scalar()) {
       // Use element-wise multiplication if at least one factor scalar
@@ -1632,6 +1652,16 @@ namespace casadi {
   }
 
   template<typename Scalar>
+  std::vector<Scalar> Matrix<Scalar>::get_nonzeros() const {
+    return nonzeros_;
+  }
+
+  template<typename Scalar>
+  std::vector<Scalar> Matrix<Scalar>::get_elements() const {
+    return static_cast< std::vector<Scalar>>(*this);
+  }
+
+  template<typename Scalar>
   std::string Matrix<Scalar>::name() const {
     casadi_error("'name' not defined for " + type_name());
   }
@@ -1644,6 +1674,16 @@ namespace casadi {
   template<typename Scalar>
   casadi_int Matrix<Scalar>::n_dep() const {
     casadi_error("'n_dep' not defined for " + type_name());
+  }
+
+  template<typename Scalar>
+  Matrix<Scalar> Matrix<Scalar>::rand(casadi_int nrow, casadi_int ncol) {
+    return rand(Sparsity::dense(nrow, ncol));
+  }
+
+  template<typename Scalar>
+   Matrix<Scalar> Matrix<Scalar>::rand(const std::pair<casadi_int, casadi_int>& rc) {
+      return rand(rc.first, rc.second);
   }
 
   template<typename Scalar>
