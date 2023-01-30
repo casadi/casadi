@@ -413,7 +413,9 @@ namespace casadi {
     m->fstats.at("postprocessing").toc();
 
     m->return_status = model.status();
-    m->d_qp.success = m->return_status==0 && model.isProvenOptimal() && model.secondaryStatus() <= 1;
+    m->d_qp.success = m->return_status==0 &&
+                      model.isProvenOptimal() &&
+                      model.secondaryStatus() <= 1;
     m->secondary_return_status = model.secondaryStatus();
     m->iter_count = model.getIterationCount();
     m->node_count = model.getNodeCount();

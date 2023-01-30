@@ -25,7 +25,7 @@
 #include "highs_interface.hpp"
 #include "casadi/core/nlp_tools.hpp"
 
-#include "highs_runtime_str.h"
+#include <highs_runtime_str.h>
 namespace casadi {
 
   extern "C"
@@ -204,7 +204,7 @@ namespace casadi {
         casadi_assert(kHighsStatusOk ==
           Highs_setBoolOptionValue(m->d.highs, op.first.c_str(), op.second.to_bool()),
           "Error setting option '" + op.first + "'.");
-      } else if (op.second.getType() == OT_INT){
+      } else if (op.second.getType() == OT_INT) {
         casadi_assert(kHighsStatusOk ==
           Highs_setIntOptionValue(m->d.highs, op.first.c_str(), op.second.to_int()),
           "Error setting option '" + op.first + "'.");
@@ -268,15 +268,15 @@ namespace casadi {
     g << "d->prob = &p;\n";
     g << "d->qp = &d_qp;\n";
     g << "casadi_highs_init(d, &arg, &res, &iw, &w);\n";
-  
+
     for (auto&& op : opts_) {
       auto it = std::find(param_bool.begin(), param_bool.end(), op.first);
       if (it != param_bool.end() || op.second.getType() == OT_BOOL) {
         g << "Highs_setBoolOptionValue(d->highs, " << g.constant(op.first) << ", "
-          << int(op.second.to_bool()) << ");\n";
-      } else if (op.second.getType() == OT_INT){
+          << static_cast<int>(op.second.to_bool()) << ");\n";
+      } else if (op.second.getType() == OT_INT) {
         g << "Highs_setIntOptionValue(d->highs, " << g.constant(op.first) << ", "
-          << int(op.second.to_int()) << ");\n";
+          << static_cast<int>(op.second.to_int()) << ");\n";
       } else if (op.second.getType() == OT_DOUBLE) {
         g << "Highs_setDoubleOptionValue(d->highs, " << g.constant(op.first) << ", "
           << g.constant(op.second.to_int()) << ");\n";
@@ -304,7 +304,8 @@ namespace casadi {
     Dict stats = Conic::get_stats(mem);
     Highs highs;
     auto m = static_cast<HighsMemory*>(mem);
-    stats["return_status"] = highs.modelStatusToString(static_cast<HighsModelStatus>(m->d.return_status));
+    stats["return_status"] =
+      highs.modelStatusToString(static_cast<HighsModelStatus>(m->d.return_status));
     stats["simplex_iteration_count"] = m->d.simplex_iteration_count;
     stats["simplex_iteration_count"] = m->d.simplex_iteration_count;
     stats["ipm_iteration_count"] = m->d.ipm_iteration_count;

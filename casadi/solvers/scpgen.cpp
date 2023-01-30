@@ -600,12 +600,18 @@ namespace casadi {
 
       uout()
         << std::endl
-        << "Number of reduced variables:               " << std::setw(9) << nx_ << std::endl
-        << "Number of reduced constraints:             " << std::setw(9) << ng_ << std::endl
-        << "Number of lifted variables/constraints:    " << std::setw(9) << n_lifted << std::endl
-        << "Number of parameters:                      " << std::setw(9) << np_ << std::endl
-        << "Total number of variables:                 " << std::setw(9) << (nx_+n_lifted) << std::endl
-        << "Total number of constraints:               " << std::setw(9) << (ng_+n_lifted) << std::endl
+        << "Number of reduced variables:               "
+        << std::setw(9) << nx_ << std::endl
+        << "Number of reduced constraints:             "
+        << std::setw(9) << ng_ << std::endl
+        << "Number of lifted variables/constraints:    "
+        << std::setw(9) << n_lifted << std::endl
+        << "Number of parameters:                      "
+        << std::setw(9) << np_ << std::endl
+        << "Total number of variables:                 "
+        << std::setw(9) << (nx_+n_lifted) << std::endl
+        << "Total number of constraints:               "
+        << std::setw(9) << (ng_+n_lifted) << std::endl
         << std::endl;
 
       uout()
@@ -876,12 +882,18 @@ namespace casadi {
     // Write timers
     if (print_time_) {
       uout() << std::endl;
-      uout() << "time spent in eval_mat:    " << std::setw(9) << m->t_eval_mat << " s." << std::endl;
-      uout() << "time spent in eval_res:    " << std::setw(9) << m->t_eval_res << " s." << std::endl;
-      uout() << "time spent in eval_vec:    " << std::setw(9) << m->t_eval_vec << " s." << std::endl;
-      uout() << "time spent in eval_exp:    " << std::setw(9) << m->t_eval_exp << " s." << std::endl;
-      uout() << "time spent in solve_qp:    " << std::setw(9) << m->t_solve_qp << " s." << std::endl;
-      uout() << "time spent in main loop:   " << std::setw(9) << m->t_mainloop << " s." << std::endl;
+      uout() << "time spent in eval_mat:    "
+             << std::setw(9) << m->t_eval_mat << " s." << std::endl;
+      uout() << "time spent in eval_res:    "
+             << std::setw(9) << m->t_eval_res << " s." << std::endl;
+      uout() << "time spent in eval_vec:    "
+             << std::setw(9) << m->t_eval_vec << " s." << std::endl;
+      uout() << "time spent in eval_exp:    "
+             << std::setw(9) << m->t_eval_exp << " s." << std::endl;
+      uout() << "time spent in solve_qp:    "
+             << std::setw(9) << m->t_solve_qp << " s." << std::endl;
+      uout() << "time spent in main loop:   "
+             << std::setw(9) << m->t_mainloop << " s." << std::endl;
     }
 
     uout() << std::endl;

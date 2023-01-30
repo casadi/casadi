@@ -1194,12 +1194,12 @@ namespace casadi {
     /** \brief Create a matrix with uniformly distributed random numbers
 
         \identifier{1ab} */
-    static Matrix<Scalar> rand(
+    static Matrix<Scalar> rand(  // NOLINT(runtime/threadsafe_fn)
         casadi_int nrow=1,
-        casadi_int ncol=1);  // NOLINT(runtime/threadsafe_fn)
+        casadi_int ncol=1);
     static Matrix<Scalar> rand(const Sparsity& sp);  // NOLINT(runtime/threadsafe_fn)
-    static Matrix<Scalar> rand(
-        const std::pair<casadi_int, casadi_int>& rc);  // NOLINT(runtime/threadsafe_fn)
+    static Matrix<Scalar> rand(  // NOLINT(runtime/threadsafe_fn)
+        const std::pair<casadi_int, casadi_int>& rc);
     ///@}
 
     /** \brief Export matrix in specific language

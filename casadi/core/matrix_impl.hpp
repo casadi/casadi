@@ -1125,7 +1125,7 @@ namespace casadi {
   std::vector<Scalar>& Matrix<Scalar>::nonzeros() {
     return nonzeros_;
   }
-  
+
   template<typename Scalar>
   const std::vector<Scalar>& Matrix<Scalar>::nonzeros() const {
     return nonzeros_;
@@ -1677,13 +1677,16 @@ namespace casadi {
   }
 
   template<typename Scalar>
-  Matrix<Scalar> Matrix<Scalar>::rand(casadi_int nrow, casadi_int ncol) {
-    return rand(Sparsity::dense(nrow, ncol));
+  Matrix<Scalar> Matrix<Scalar>::rand(  // NOLINT(runtime/threadsafe_fn)
+      casadi_int nrow,
+      casadi_int ncol) {
+    return rand(Sparsity::dense(nrow, ncol));  // NOLINT(runtime/threadsafe_fn)
   }
 
   template<typename Scalar>
-   Matrix<Scalar> Matrix<Scalar>::rand(const std::pair<casadi_int, casadi_int>& rc) {
-      return rand(rc.first, rc.second);
+   Matrix<Scalar> Matrix<Scalar>::rand( // NOLINT(runtime/threadsafe_fn)
+        const std::pair<casadi_int, casadi_int>& rc) {
+      return rand(rc.first, rc.second); // NOLINT(runtime/threadsafe_fn)
   }
 
   template<typename Scalar>

@@ -175,7 +175,8 @@ namespace casadi {
     compInst.getHeaderSearchOpts().ResourceDir = resourcedir;
 
     // Read the system includes (C or C++)
-    std::vector<std::pair<std::string, bool> > system_include = getIncludes("system_includes.txt", jit_include);
+    std::vector<std::pair<std::string, bool> >
+    system_include = getIncludes("system_includes.txt", jit_include);
     for (auto i=system_include.begin(); i!=system_include.end(); ++i) {
       compInst.getHeaderSearchOpts().AddPath(i->first,
                                              clang::frontend::System, i->second, false);

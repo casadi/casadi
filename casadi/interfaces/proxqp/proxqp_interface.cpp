@@ -98,22 +98,21 @@ namespace casadi {
           } else if (op.first=="eps_rel") {
             settings_.eps_rel = op.second;
           } else if (op.first=="max_iter") {
-            settings_.max_iter = double(op.second);
-            max_iter = double(op.second);
+            settings_.max_iter = static_cast<double>(op.second);
+            max_iter = static_cast<double>(op.second);
           } else if (op.first=="verbose") {
             settings_.verbose = op.second;
           } else if (op.first=="backend") {
             if (op.second == "sparse") {
               sparse_backend = true;
-            }
-            else if (op.second == "dense") {
+            } else if (op.second == "dense") {
               sparse_backend = false;
-            }
-            else {
+            } else {
               casadi_error("[Backend option] Please specify either sparse or dense");
             }
           } else {
-            casadi_error("[ProxQP settings] User-specified option <" + str(op.first) + "> not recognized.");
+            casadi_error("[ProxQP settings] User-specified option "
+                         "'" + str(op.first) + "' not recognized.");
           }
         }
       }
@@ -131,7 +130,7 @@ namespace casadi {
     alloc_w(na_, true); // uba
     alloc_w(nH_, true); // H
     alloc_w(nA_, true); // A
-    
+
   }
 
   int ProxqpInterface::init_mem(void* mem) const {
@@ -191,40 +190,37 @@ namespace casadi {
 
     // Use lhs_equals_rhs_constraint to split double-sided bounds into one-sided
     // bound for equality constraints and double-sided for inequality constraints
-    const Eigen::Array<bool, Eigen::Dynamic, 1> lhs_equals_rhs_constraint = (m->uba_vector.array() == m->lba_vector.array()).eval();
+    const Eigen::Array<bool, Eigen::Dynamic, 1>
+    lhs_equals_rhs_constraint = (m->uba_vector.array() == m->lba_vector.array()).eval();
     std::vector<double> tmp_eq_vector;
     std::vector<double> tmp_ineq_lb_vector;
     std::vector<double> tmp_ineq_ub_vector;
     {
-      for (std::size_t k=0; k<lhs_equals_rhs_constraint.size(); ++k)
-      {
-        if (lhs_equals_rhs_constraint[k])
-        {
+      for (std::size_t k=0; k<lhs_equals_rhs_constraint.size(); ++k) {
+        if (lhs_equals_rhs_constraint[k]) {
           tmp_eq_vector.push_back(m->lba_vector[k]);
-        }
-        else
-        {
+        } else {
           tmp_ineq_lb_vector.push_back(m->lba_vector[k]);
           tmp_ineq_ub_vector.push_back(m->uba_vector[k]);
         }
       }
 
       m->b_vector.resize(tmp_eq_vector.size());
-      if (tmp_eq_vector.size() > 0)
-      {
-        m->b_vector = Eigen::Map<Eigen::VectorXd>(get_ptr(tmp_eq_vector), tmp_eq_vector.size());
+      if (tmp_eq_vector.size() > 0) {
+        m->b_vector = Eigen::Map<Eigen::VectorXd>(
+          get_ptr(tmp_eq_vector), tmp_eq_vector.size());
       }
 
       m->lba_vector.resize(tmp_ineq_lb_vector.size());
-      if (tmp_ineq_lb_vector.size() > 0)
-      {
-        m->lba_vector = Eigen::Map<Eigen::VectorXd>(get_ptr(tmp_ineq_lb_vector), tmp_ineq_lb_vector.size());
+      if (tmp_ineq_lb_vector.size() > 0) {
+        m->lba_vector = Eigen::Map<Eigen::VectorXd>(
+          get_ptr(tmp_ineq_lb_vector), tmp_ineq_lb_vector.size());
       }
 
       m->uba_vector.resize(tmp_ineq_ub_vector.size());
-      if (tmp_ineq_ub_vector.size() > 0)
-      {
-        m->uba_vector = Eigen::Map<Eigen::VectorXd>(get_ptr(tmp_ineq_ub_vector), tmp_ineq_ub_vector.size());
+      if (tmp_ineq_ub_vector.size() > 0) {
+        m->uba_vector = Eigen::Map<Eigen::VectorXd>(
+          get_ptr(tmp_ineq_ub_vector), tmp_ineq_ub_vector.size());
       }
     }
     std::size_t n_eq = m->b_vector.size();
@@ -232,11 +228,13 @@ namespace casadi {
 
     // Convert H_ from casadi::Sparsity to Eigen::SparseMatrix
     H_.get_triplet(m->row, m->col);
-    for (int k=0; k<H_.nnz(); ++k)
-    {
-      m->tripletList.push_back(T(double(m->row[k]), double(m->col[k]), double(H[k])));
+    for (int k=0; k<H_.nnz(); ++k) {
+      m->tripletList.push_back(T(
+        static_cast<double>(m->row[k]),
+        static_cast<double>(m->col[k]),
+        static_cast<double>(H[k])));
     }
-    Eigen::SparseMatrix<double> H_spa(H_.size1(),H_.size2());
+    Eigen::SparseMatrix<double> H_spa(H_.size1(), H_.size2());
     H_spa.setFromTriplets(m->tripletList.begin(), m->tripletList.end());
     m->tripletList.clear();
 
@@ -245,26 +243,29 @@ namespace casadi {
     m->tripletList.reserve(A_.nnz());
     A_.get_triplet(m->row, m->col);
 
-    for (int k=0; k<A_.nnz(); ++k)
-    {
+    for (int k=0; k<A_.nnz(); ++k) {
       // Detect equality constraint
-      if (lhs_equals_rhs_constraint[m->row[k]])
-      {
-        m->tripletListEq.push_back(T(double(m->row[k]), double(m->col[k]), double(A[k])));
-      }
-      else
-      {
-        m->tripletList.push_back(T(double(m->row[k]), double(m->col[k]), double(A[k])));
+      if (lhs_equals_rhs_constraint[m->row[k]]) {
+        m->tripletListEq.push_back(T(
+          static_cast<double>(m->row[k]),
+          static_cast<double>(m->col[k]),
+          static_cast<double>(A[k])));
+      } else {
+        m->tripletList.push_back(T(
+          static_cast<double>(m->row[k]),
+          static_cast<double>(m->col[k]),
+          static_cast<double>(A[k])));
       }
     }
 
     // Handle constraints on decision variable x in inequality constraint matrix C
     uint32_t n_constraints_x = 0;
-    if (m->ubx_vector.size() > 0 || m->lbx_vector.size() > 0)
-    {
-      for (int k=0; k<nx_; ++k)
-      {
-        m->tripletList.push_back(T(double(m->lba_vector.size() + k), double(k), double(1.0)));
+    if (m->ubx_vector.size() > 0 || m->lbx_vector.size() > 0) {
+      for (int k=0; k<nx_; ++k) {
+        m->tripletList.push_back(T(
+          static_cast<double>(m->lba_vector.size() + k),
+          static_cast<double>(k),
+          static_cast<double>(1.0)));
         ++n_constraints_x;
       }
     }
@@ -280,21 +281,15 @@ namespace casadi {
     // Get stacked lower and upper inequality bounds
     m->ub_vector.resize(n_ineq);
     m->lb_vector.resize(n_ineq);
-    if (m->uba_vector.size() > 0)
-    {
+    if (m->uba_vector.size() > 0) {
       m->ub_vector << m->uba_vector, m->ubx_vector;
-    }
-    else
-    {
+    } else {
       m->ub_vector << m->ubx_vector;
     }
-    
-    if (m->lba_vector.size() > 0)
-    {
+
+    if (m->lba_vector.size() > 0) {
       m->lb_vector << m->lba_vector, m->lbx_vector;
-    }
-    else
-    {
+    } else {
       m->lb_vector << m->lbx_vector;
     }
     m->fstats.at("preprocessing").toc();
@@ -302,10 +297,11 @@ namespace casadi {
     // Solve Problem
     m->fstats.at("solver").tic();
 
-    if (sparse_backend)
-    {
+    if (sparse_backend) {
       m->sparse_solver = proxsuite::proxqp::sparse::QP<double, long long> (nx_, n_eq, n_ineq);
-      m->sparse_solver.init(H_spa, m->g_vector, A_spa, m->b_vector, C_spa, m->lb_vector, m->ub_vector);
+      m->sparse_solver.init(H_spa, m->g_vector,
+                            A_spa, m->b_vector,
+                            C_spa, m->lb_vector, m->ub_vector);
       m->sparse_solver.settings = settings_;
 
       m->sparse_solver.solve();
@@ -315,11 +311,11 @@ namespace casadi {
       m->results_z = std::make_unique<Eigen::VectorXd>(m->sparse_solver.results.z);
       m->objValue = m->sparse_solver.results.info.objValue;
       m->status = m->sparse_solver.results.info.status;
-    }
-    else
-    {
+    } else {
       m->dense_solver = proxsuite::proxqp::dense::QP<double> (nx_, n_eq, n_ineq);
-      m->dense_solver.init(Eigen::MatrixXd(H_spa), m->g_vector, Eigen::MatrixXd(A_spa), m->b_vector, Eigen::MatrixXd(C_spa), m->lb_vector, m->ub_vector);
+      m->dense_solver.init(Eigen::MatrixXd(H_spa), m->g_vector,
+        Eigen::MatrixXd(A_spa), m->b_vector,
+        Eigen::MatrixXd(C_spa), m->lb_vector, m->ub_vector);
       m->dense_solver.settings = settings_;
 
       m->dense_solver.solve();
@@ -336,67 +332,48 @@ namespace casadi {
     m->fstats.at("postprocessing").tic();
     casadi_copy(m->results_x->data(), nx_, res[CONIC_X]);
 
-    // Copy back the multipliers. Note, casadi has LAM_X (multipliers for constraints on variable x) and
-    // LAM_A (multipliers for in- and equality constraints) while proxqp has results_y 
+    // Copy back the multipliers.
+    // Note, casadi has LAM_X (multipliers for constraints on variable x) and
+    // LAM_A (multipliers for in- and equality constraints) while proxqp has results_y
     // (equality multipliers) and results_z (inequality multipliers).
-    if (n_constraints_x > 0)
-    {
+    if (n_constraints_x > 0) {
       casadi_copy(m->results_z->tail(n_constraints_x).data(), n_constraints_x, res[CONIC_LAM_X]);
     }
-    if (!n_eq)
-    {
+    if (!n_eq) {
       uint32_t n_lam_a = m->results_z->size() - n_constraints_x;
-      assert (n_lam_a == na_);
+      casadi_assert_dev(n_lam_a == na_);
       casadi_copy(m->results_z->head(n_lam_a).data(), n_lam_a, res[CONIC_LAM_A]);
-    }
-    else if (!n_ineq)
-    {
+    } else if (!n_ineq) {
       casadi_copy(m->results_z->data(), na_, res[CONIC_LAM_A]);
-    }
-    else
-    {
+    } else {
       bool ineq_constraints_a = (lhs_equals_rhs_constraint == 0).any();
-      if (!ineq_constraints_a)
-      {
+      if (!ineq_constraints_a) {
         casadi_copy(m->results_y->data(), na_, res[CONIC_LAM_A]);
-      }
-      else
-      {
+      } else {
         Eigen::VectorXd lam_a(na_);
 
-        for (int k=0; k<lhs_equals_rhs_constraint.size(); ++k)
-        {
-          if (lhs_equals_rhs_constraint[k])
-          {
+        for (int k=0; k<lhs_equals_rhs_constraint.size(); ++k) {
+          if (lhs_equals_rhs_constraint[k]) {
             lam_a[k] = m->results_y->coeff(k);
-          }
-          else
-          {
+          } else {
             lam_a[k] = m->results_z->coeff(k);
           }
         }
         casadi_copy(lam_a.data(), na_, res[CONIC_LAM_A]);
       }
     }
-    
-    if (res[CONIC_COST])
-    {
+
+    if (res[CONIC_COST]) {
       *res[CONIC_COST] = m->objValue;
     }
 
     m->d_qp.success = m->status == QPSolverOutput::PROXQP_SOLVED;
-    if (m->d_qp.success)
-    {
+    if (m->d_qp.success) {
       m->d_qp.unified_return_status = SOLVER_RET_SUCCESS;
-    }
-    else
-    {
-      if (m->status == QPSolverOutput::PROXQP_MAX_ITER_REACHED)
-      {
+    } else {
+      if (m->status == QPSolverOutput::PROXQP_MAX_ITER_REACHED) {
         m->d_qp.unified_return_status = SOLVER_RET_LIMITED;
-      }
-      else  // primal or dual infeasibility
-      {
+      } else { // primal or dual infeasibility
         m->d_qp.unified_return_status = SOLVER_RET_UNKNOWN;
       }
     }
@@ -410,22 +387,15 @@ namespace casadi {
 
     Dict stats = Conic::get_stats(mem);
     auto m = static_cast<ProxqpMemory*>(mem);
-    
+
     std::string ret_status;
-    if (m->status == QPSolverOutput::PROXQP_SOLVED)
-    {
+    if (m->status == QPSolverOutput::PROXQP_SOLVED) {
       ret_status = "PROXQP_SOLVED";
-    }
-    else if (m->status == QPSolverOutput::PROXQP_MAX_ITER_REACHED)
-    {
+    } else if (m->status == QPSolverOutput::PROXQP_MAX_ITER_REACHED) {
       ret_status = "PROXQP_MAX_ITER_REACHED";
-    }
-    else if (m->status == QPSolverOutput::PROXQP_PRIMAL_INFEASIBLE)
-    {
+    } else if (m->status == QPSolverOutput::PROXQP_PRIMAL_INFEASIBLE) {
       ret_status = "PROXQP_PRIMAL_INFEASIBLE";
-    }
-    else if (m->status == QPSolverOutput::PROXQP_DUAL_INFEASIBLE)
-    {
+    } else if (m->status == QPSolverOutput::PROXQP_DUAL_INFEASIBLE) {
       ret_status = "PROXQP_DUAL_INFEASIBLE";
     }
 
@@ -433,9 +403,9 @@ namespace casadi {
     return stats;
   }
 
-  ProxqpMemory::ProxqpMemory() 
-    : sparse_solver(1,0,0),
-      dense_solver(1,0,0) {
+  ProxqpMemory::ProxqpMemory()
+    : sparse_solver(1, 0, 0),
+      dense_solver(1, 0, 0) {
   }
 
   ProxqpMemory::~ProxqpMemory() {
@@ -469,7 +439,7 @@ namespace casadi {
     s.pack("ProxqpInterface::settings::default_mu_in", settings_.default_mu_in);
     s.pack("ProxqpInterface::settings::eps_abs", settings_.eps_abs);
     s.pack("ProxqpInterface::settings::eps_rel", settings_.eps_rel);
-    s.pack("ProxqpInterface::settings::max_iter", double(settings_.max_iter));
+    s.pack("ProxqpInterface::settings::max_iter", static_cast<double>(settings_.max_iter));
     s.pack("ProxqpInterface::settings::verbose", settings_.verbose);
     s.pack("ProxqpInterface::settings::sparse_backend", sparse_backend);
   }

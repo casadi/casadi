@@ -26,7 +26,7 @@
 #include <numeric>
 #include <cstring>
 
-#include "hpipm_runtime_str.h"
+#include <hpipm_runtime_str.h>
 
 namespace casadi {
 
@@ -483,13 +483,14 @@ namespace casadi {
   }
 
 
-  void codegen_unpack_block(CodeGenerator& g, const std::string& name, const std::vector<casadi_hpipm_block>& blocks) {
-      std::string n = "block_" + name + "[" + str(blocks.size()) + "]";
-      g.local(n, "static struct casadi_hpipm_block");
-      g << "p." << name << " = block_" + name + ";\n";
-      g << "casadi_hpipm_unpack_blocks(" << blocks.size()
-      << ", p." << name
-      << ", " << g.constant(hpipm_blocks_pack(blocks)) << ");\n";
+  void codegen_unpack_block(CodeGenerator& g, const std::string& name,
+      const std::vector<casadi_hpipm_block>& blocks) {
+    std::string n = "block_" + name + "[" + str(blocks.size()) + "]";
+    g.local(n, "static struct casadi_hpipm_block");
+    g << "p." << name << " = block_" + name + ";\n";
+    g << "casadi_hpipm_unpack_blocks(" << blocks.size()
+    << ", p." << name
+    << ", " << g.constant(hpipm_blocks_pack(blocks)) << ");\n";
   }
 
   void codegen_local(CodeGenerator& g, const std::string& name, const std::vector<int>& v) {
@@ -591,12 +592,12 @@ namespace casadi {
     codegen_unpack_block(g, "R", R_blocks);
     codegen_unpack_block(g, "I", I_blocks);
     codegen_unpack_block(g, "S", S_blocks);
-    codegen_unpack_block(g, "Q", Q_blocks);  
-  
+    codegen_unpack_block(g, "Q", Q_blocks);
+
     codegen_unpack_block(g, "b", b_blocks);
     codegen_unpack_block(g, "lug", lug_blocks);
     codegen_unpack_block(g, "u", u_blocks);
-    codegen_unpack_block(g, "x", x_blocks);   
+    codegen_unpack_block(g, "x", x_blocks);
 
 
     codegen_unpack_block(g, "lam_ul", lam_ul_blocks);
@@ -720,7 +721,9 @@ namespace casadi {
 
     uout() << "HPIPM finished after " << m->d.iter_count << " iterations." << std::endl;
     uout() << "return status: " << m->d.return_status << std::endl;
-    uout() << "HPIPM residuals: " << m->d.res_stat << ", " << m->d.res_eq << ", " << m->d.res_ineq << ", " << m->d.res_comp << std::endl;
+    uout() << "HPIPM residuals: " << m->d.res_stat << ", " <<
+              m->d.res_eq << ", " << m->d.res_ineq << ", " <<
+              m->d.res_comp << std::endl;
 
     return 0;
   }
