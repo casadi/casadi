@@ -127,7 +127,7 @@ namespace casadi {
   void ImplicitToNlp::set_work(void* mem, const double**& arg, double**& res,
                         casadi_int*& iw, double*& w) const {
       Rootfinder::set_work(mem, arg, res, iw, w);
-      auto m = static_cast<ImplicitToNlpMemory*>(mem);
+      auto *m = static_cast<ImplicitToNlpMemory*>(mem);
       m->lbx = w; w += n_;
       m->ubx = w; w += n_;
       m->p = w; w += oracle_.nnz_in() - nnz_in(iin_);
@@ -135,7 +135,7 @@ namespace casadi {
    }
 
   int ImplicitToNlp::solve(void* mem) const {
-    auto m = static_cast<ImplicitToNlpMemory*>(mem);
+    auto *m = static_cast<ImplicitToNlpMemory*>(mem);
 
     // Buffers for calling the NLP solver
     std::fill_n(m->arg, static_cast<casadi_int>(NLPSOL_NUM_IN), nullptr);
@@ -198,7 +198,7 @@ namespace casadi {
 
     // Shared-object free access to nlpsol return status
     void* nlpsol_mem = solver_.memory(0);
-    auto nlpsol_m = static_cast<NlpsolMemory*>(nlpsol_mem);
+    auto *nlpsol_m = static_cast<NlpsolMemory*>(nlpsol_mem);
     m->success = nlpsol_m->success;
     m->unified_return_status = nlpsol_m->unified_return_status;
 
