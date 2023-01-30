@@ -16,5 +16,4 @@ jobs:
         mkdir build
         cd build
         cmake ..
-        cd test
         make lint
