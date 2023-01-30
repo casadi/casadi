@@ -16,8 +16,13 @@ jobs:
       run: |
         mkdir build
         cd build
-        cmake -DWITH_LINT=ON ..
+        cmake -DWITH_LINT=ON -DWITH_CLANG_TIDY=ON ..
     - name: lint
       run: |
         cd build
         make lint
+    - name: clang-tide
+      run: |
+        cd build
+        clang-tidy --version
+        make clang-tidy
