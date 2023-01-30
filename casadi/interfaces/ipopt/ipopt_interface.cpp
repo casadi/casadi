@@ -337,7 +337,8 @@ namespace casadi {
         bool ret = (*app)->Options()->SetStringValue("linear_solver", default_solver, false);
         casadi_assert(ret, "Corrupted IPOPT_DEFAULT_LINEAR_SOLVER environmental variable");
       } else {
-        // Fall back to MUMPS (avoid user issues after SPRAL was added to binaries and chosen default by Ipopt)
+        // Fall back to MUMPS (avoid user issues after SPRAL was added to binaries and
+        // chosen default by Ipopt)
         bool ret = (*app)->Options()->SetStringValue("linear_solver", "mumps", false);
         casadi_assert_dev(ret);
       }

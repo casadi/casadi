@@ -219,7 +219,7 @@ namespace casadi {
     // Construct the compiler command
     std::stringstream cccmd;
     cccmd << compiler;
-    for (std::vector<std::string>::const_iterator i=compiler_flags.begin(); i!=compiler_flags.end(); ++i) {
+    for (auto i=compiler_flags.begin(); i!=compiler_flags.end(); ++i) {
       cccmd << " " << *i;
     }
     cccmd << " " << compiler_setup;
@@ -244,7 +244,7 @@ namespace casadi {
     ldcmd << " " << obj_name_ << " " + linker_output_flag + bin_name_;
 
     // Add flags
-    for (std::vector<std::string>::const_iterator i=linker_flags.begin(); i!=linker_flags.end(); ++i) {
+    for (auto i=linker_flags.begin(); i!=linker_flags.end(); ++i) {
       ldcmd << " " << *i;
     }
     ldcmd << " " << linker_setup;

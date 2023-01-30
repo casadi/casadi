@@ -451,13 +451,17 @@ namespace casadi {
     m->return_status = flag;
     m->d_qp.success = flag==qpOASES::SUCCESSFUL_RETURN;
     if (m->d_qp.success) m->d_qp.unified_return_status = SOLVER_RET_SUCCESS;
-    if (flag==qpOASES::RET_MAX_NWSR_REACHED) {
+    if (flag == qpOASES::RET_MAX_NWSR_REACHED) {
       m->d_qp.unified_return_status = SOLVER_RET_LIMITED;
     }
-    
-    if (flag==qpOASES::RET_INIT_FAILED_INFEASIBILITY || flag==qpOASES::RET_QP_INFEASIBLE ||
-        flag==qpOASES::RET_HOTSTART_STOPPED_INFEASIBILITY || flag==qpOASES::RET_ADDCONSTRAINT_FAILED_INFEASIBILITY ||
-        flag==qpOASES::RET_ADDBOUND_FAILED_INFEASIBILITY || flag==qpOASES::RET_ENSURELI_FAILED_NOINDEX || flag==qpOASES::RET_ENSURELI_FAILED_CYCLING) {
+
+    if (flag==qpOASES::RET_INIT_FAILED_INFEASIBILITY
+        || flag == qpOASES::RET_QP_INFEASIBLE
+        || flag == qpOASES::RET_HOTSTART_STOPPED_INFEASIBILITY
+        || flag == qpOASES::RET_ADDCONSTRAINT_FAILED_INFEASIBILITY
+        || flag == qpOASES::RET_ADDBOUND_FAILED_INFEASIBILITY
+        || flag == qpOASES::RET_ENSURELI_FAILED_NOINDEX
+        || flag == qpOASES::RET_ENSURELI_FAILED_CYCLING) {
       m->d_qp.unified_return_status = SOLVER_RET_INFEASIBLE;
     }
 
