@@ -463,7 +463,7 @@ jobs:
           docker pull ghcr.io/jgillis/${{ matrix.arch }}:production
           docker run --rm ghcr.io/jgillis/${{ matrix.arch }}:production > dockcross
           chmod +x dockcross
-      - uses: meco-group/mockups@master
+      - uses: casadi/mockups@master
         with:
           tag: ${{ matrix.arch }}
       - run: |
