@@ -1,0 +1,20 @@
+name: binaries
+
+on: push
+
+jobs:
+  swig:
+    runs-on: ubuntu-22.04
+
+    steps:
+
+    - uses: actions/checkout@v3.3.0
+      with:
+        fetch-depth: 0 # for git-restore-mtime
+
+    - run: |
+      mkdir build
+      cd build
+      cmake ..
+      cd test
+      make lint
