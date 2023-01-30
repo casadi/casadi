@@ -956,20 +956,20 @@ namespace casadi {
 #ifndef SWIG
     ///@{
     /// Access the non-zero elements
-    std::vector<Scalar>& nonzeros() { return nonzeros_;}
-    const std::vector<Scalar>& nonzeros() const { return nonzeros_;}
+    std::vector<Scalar>& nonzeros();
+    const std::vector<Scalar>& nonzeros() const;
     ///@}
 
     ///@{
     /// Get a pointer to the data
-    Scalar* ptr() { return nonzeros_.empty() ? nullptr : &nonzeros_.front(); }
-    const Scalar* ptr() const { return nonzeros_.empty() ? nullptr : &nonzeros_.front(); }
+    Scalar* ptr();
+    const Scalar* ptr() const;
     friend inline Scalar* get_ptr(Matrix<Scalar>& v) { return v.ptr(); }
     friend inline const Scalar* get_ptr(const Matrix<Scalar>& v) { return v.ptr(); }
     ///@}
 
     /// Const access the sparsity - reference to data member
-    const Sparsity& sparsity() const { return sparsity_; }
+    const Sparsity& sparsity() const;
 
 #endif // SWIG
 

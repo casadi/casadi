@@ -1102,6 +1102,31 @@ namespace casadi {
   }
 
   template<typename Scalar>
+  const Sparsity& Matrix<Scalar>::sparsity() const {
+    return sparsity_;
+  }
+
+  template<typename Scalar>
+  std::vector<Scalar>& Matrix<Scalar>::nonzeros() {
+    return nonzeros_;
+  }
+  
+  template<typename Scalar>
+  const std::vector<Scalar>& Matrix<Scalar>::nonzeros() const {
+    return nonzeros_;
+  }
+
+  template<typename Scalar>
+  Scalar* Matrix<Scalar>::ptr() {
+    return nonzeros_.empty() ? nullptr : &nonzeros_.front();
+  }
+
+  template<typename Scalar>
+  const Scalar* Matrix<Scalar>::ptr() const {
+    return nonzeros_.empty() ? nullptr : &nonzeros_.front();
+  }
+
+  template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::mtimes(const Matrix<Scalar> &x, const Matrix<Scalar> &y) {
     if (x.is_scalar() || y.is_scalar()) {
       // Use element-wise multiplication if at least one factor scalar
