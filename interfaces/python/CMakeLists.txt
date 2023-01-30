@@ -18,6 +18,7 @@ find_pybind11_python_first()
 pybind11_add_module(_alpaqa MODULE
     "src/alm.py.cpp"
     "src/alpaqa.py.cpp"
+    "src/anderson.py.cpp"
     "src/counters.py.cpp"
     "src/enums.py.cpp"
     "src/lbfgs.py.cpp"
@@ -27,6 +28,8 @@ pybind11_add_module(_alpaqa MODULE
     "src/ocp.py.cpp"
     "src/problems.py.cpp"
     "src/control-problems.py.cpp"
+    "src/params/anderson-direction-params.cpp"
+    "src/params/anderson-params.cpp"
     "src/params/inner-solve-options.cpp"
     "src/params/lbfgs-direction-params.cpp"
     "src/params/lbfgs-params.cpp"

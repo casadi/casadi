@@ -1,5 +1,7 @@
 #pragma once
 
+#include "anderson-direction-params.hpp"
+#include "anderson-params.hpp"
 #include "inner-solve-options.hpp"
 #include "lbfgs-direction-params.hpp"
 #include "lbfgs-params.hpp"

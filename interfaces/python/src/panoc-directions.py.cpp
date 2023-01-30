@@ -8,6 +8,7 @@
 namespace py = pybind11;
 using namespace py::literals;
 
+#include <alpaqa/inner/directions/panoc/anderson.hpp>
 #include <alpaqa/inner/directions/panoc/lbfgs.hpp>
 #include <alpaqa/inner/directions/panoc/structured-lbfgs.hpp>
 
@@ -77,6 +78,32 @@ void register_panoc_directions(py::module_ &m) {
     te_direction.def(py::init(
         &alpaqa::erase_direction_with_params_dict<StructuredLBFGSDir, const StructuredLBFGSDir &>));
     py::implicitly_convertible<StructuredLBFGSDir, TypeErasedPANOCDirection>();
+
+    // ----------------------------------------------------------------------------------------- //
+    using AndersonDir       = alpaqa::AndersonDirection<config_t>;
+    using AndersonParams    = alpaqa::AndersonAccelParams<config_t>;
+    using AndersonDirParams = alpaqa::AndersonDirectionParams<config_t>;
+
+    py::class_<AndersonDir> anderson(m, "AndersonDirection",
+                                     "C++ documentation: :cpp:class:`alpaqa::AndersonDirection`");
+    register_dataclass<AndersonDirParams>(
+        anderson, "DirectionParams",
+        "C++ documentation: :cpp:class:`alpaqa::AndersonDirection::DirectionParams`");
+    anderson //
+        .def(py::init([](params_or_dict<AndersonParams> anderson_params,
+                         params_or_dict<AndersonDirParams> direction_params) {
+                 return AndersonDir{var_kwargs_to_struct(anderson_params),
+                                    var_kwargs_to_struct(direction_params)};
+             }),
+             "anderson_params"_a = py::dict{}, "direction_params"_a = py::dict{})
+        .def_property_readonly(
+            "params",
+            py::cpp_function(&AndersonDir::get_params, py::return_value_policy::reference_internal))
+        .def("__str__", &AndersonDir::get_name);
+
+    te_direction.def(
+        py::init(&alpaqa::erase_direction_with_params_dict<AndersonDir, const AndersonDir &>));
+    py::implicitly_convertible<AndersonDir, TypeErasedPANOCDirection>();
 
     // ----------------------------------------------------------------------------------------- //
     // Catch-all, must be last
