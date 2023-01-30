@@ -92,7 +92,8 @@ private:
   CASADI_EXPORT bool startswith(const std::string& s, const std::string& p);
 
   /// Replace all occurences of p with r in s
-  CASADI_EXPORT std::string replace(const std::string& s, const std::string& p, const std::string& r);
+  CASADI_EXPORT std::string replace(const std::string& s,
+    const std::string& p, const std::string& r);
 
   /**  \brief Range function
 
