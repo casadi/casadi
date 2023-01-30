@@ -277,6 +277,31 @@ auto PANOCOCPSolver<Conf>::operator()(
         detail::assign_extract_u(vars, xu, u);
     };
 
+    auto write_solution = [&](Iterate &it) {
+        // Update multipliers and constraint error
+        if (nc > 0 || nc_N > 0) {
+            for (index_t t = 0; t < N; ++t) {
+                auto ct = vars.ck(it.xû, t);
+                auto yt = y.segment(nc * t, nc);
+                auto μt = μ.segment(nc * t, nc);
+                auto ζ  = ct + μt.asDiagonal().inverse() * yt;
+                auto et = err_z.segment(nc * t, nc);
+                et      = projecting_difference(ζ, D);
+                et -= μt.asDiagonal().inverse() * yt;
+                yt += μt.asDiagonal() * et;
+            }
+            auto ct = vars.ck(it.xû, N);
+            auto yt = y.segment(nc * N, nc_N);
+            auto μt = μ.segment(nc * N, nc_N);
+            auto ζ  = ct + μt.asDiagonal().inverse() * yt;
+            auto et = err_z.segment(nc * N, nc_N);
+            et      = projecting_difference(ζ, D_N);
+            et -= μt.asDiagonal().inverse() * yt;
+            yt += μt.asDiagonal() * et;
+        }
+        assign_extract_u(it.xû, u);
+    };
+
     // @pre    @ref Iterate::γ, @ref Iterate::xu, @ref Iterate::grad_ψ
     // @post   @ref Iterate::xû, @ref Iterate::p, @ref Iterate::pᵀp,
     //         @ref Iterate::grad_ψᵀp
@@ -502,28 +527,7 @@ auto PANOCOCPSolver<Conf>::operator()(
             if (stop_status == SolverStatus::Converged ||
                 stop_status == SolverStatus::Interrupted ||
                 opts.always_overwrite_results) {
-                // Update multipliers and constraint error
-                if (nc > 0 || nc_N > 0) {
-                    for (index_t t = 0; t < N; ++t) {
-                        auto ct = vars.ck(curr->xû, t);
-                        auto yt = y.segment(nc * t, nc);
-                        auto μt = μ.segment(nc * t, nc);
-                        auto ζ  = ct + μt.asDiagonal().inverse() * yt;
-                        auto et = err_z.segment(nc * t, nc);
-                        et      = projecting_difference(ζ, D);
-                        et -= μt.asDiagonal().inverse() * yt;
-                        yt += μt.asDiagonal() * et;
-                    }
-                    auto ct = vars.ck(curr->xû, N);
-                    auto yt = y.segment(nc * N, nc_N);
-                    auto μt = μ.segment(nc * N, nc_N);
-                    auto ζ  = ct + μt.asDiagonal().inverse() * yt;
-                    auto et = err_z.segment(nc * N, nc_N);
-                    et      = projecting_difference(ζ, D_N);
-                    et -= μt.asDiagonal().inverse() * yt;
-                    yt += μt.asDiagonal() * et;
-                }
-                assign_extract_u(curr->xû, u);
+                write_solution(*curr);
             }
             s.iterations   = k;
             s.ε            = εₖ;
@@ -725,9 +729,11 @@ auto PANOCOCPSolver<Conf>::operator()(
         if (enable_lbfgs) {
             const bool force = true;
             assign_extract_u(next->xu, next->u);
-            if (did_gn && params.reset_lbfgs_on_gn_step) {
+            bool reset_because_gn = did_gn && params.reset_lbfgs_on_gn_step;
+            if (reset_because_gn || curr->γ != next->γ) {
                 lbfgs.reset();
-            } else {
+            }
+            if (!reset_because_gn) {
                 alpaqa::detail::Timed t{s.time_lbfgs_update};
                 s.lbfgs_rejected += not lbfgs.update(
                     curr->u, next->u, curr->grad_ψ, next->grad_ψ,
