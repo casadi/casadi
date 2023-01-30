@@ -1,9 +1,9 @@
-name: binaries
+name: style
 
 on: push
 
 jobs:
-  swig:
+  main:
     runs-on: ubuntu-22.04
 
     steps:
