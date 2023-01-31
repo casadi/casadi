@@ -32,7 +32,7 @@ cmake_policy(SET CMP0011 OLD)
 endif()
 
 # cmake_policy avoid escaping in add_definitions
-cmake_policy(SET CMP0005 OLD)
+cmake_policy(SET CMP0005 NEW)
 
 # cmake_policy how to interpret string arguments
 if(POLICY CMP0054)
