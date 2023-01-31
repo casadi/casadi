@@ -36,7 +36,9 @@ if (TARGET alpaqa::casadi-loader)
     target_link_libraries(tests PRIVATE alpaqa::casadi-loader)
 endif()
 
-gtest_discover_tests(tests DISCOVERY_TIMEOUT 60)
+if (NOT CMAKE_CROSSCOMPILING)
+    gtest_discover_tests(tests DISCOVERY_TIMEOUT 60)
+endif()
 add_executable(alpaqa::tests ALIAS tests)
                                     
 if (${CMAKE_VERSION} VERSION_GREATER_EQUAL 3.21) 
