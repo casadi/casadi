@@ -46,7 +46,8 @@ target_compile_definitions(_alpaqa PRIVATE
     VERSION_INFO="${PY_FULL_VERSION}")
 set_target_properties(_alpaqa PROPERTIES
     CXX_VISIBILITY_PRESET "hidden"
-    VISIBILITY_INLINES_HIDDEN true)
+    VISIBILITY_INLINES_HIDDEN true
+    RELWITHDEBINFO_POSTFIX "")
 if (CMAKE_SYSTEM_NAME MATCHES "Linux")
     target_link_options(_alpaqa PRIVATE "LINKER:--exclude-libs,ALL")
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")

@@ -35,6 +35,7 @@ if (MSVC)
     set(CMAKE_CXX_FLAGS "/utf-8 /Dnot=! /D__PRETTY_FUNCTION__=__FUNCSIG__ ${CMAKE_CXX_FLAGS}")
 endif()
 set(CMAKE_DEBUG_POSTFIX "_d")
+set(CMAKE_RELWITHDEBINFO_POSTFIX "_rd")
 
 # Sanitizers
 include(cmake/Sanitizers.cmake)
