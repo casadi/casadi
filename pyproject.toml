@@ -25,7 +25,7 @@ dynamic = ["version", "description"]
 [project.optional-dependencies]
 docs = ["sphinx~=5.1", "matplotlib", "breathe", "furo"]
 debug = ["alpaqa-debug==1.0.0a7"]
-test = ["pytest~=7.2.0", "qpalm~=1.1.4", "scipy~=1.10.0"]
+test = ["pytest~=7.2.0", "qpalm~=1.1.4", "scipy~=1.7.3"]
 
 [project.urls]
 "Documentation" = "https://kul-optec.github.io/alpaqa"
