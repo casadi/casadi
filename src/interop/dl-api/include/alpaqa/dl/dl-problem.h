@@ -44,6 +44,12 @@ typedef struct {
         const alpaqa_real_t *x,
         const alpaqa_real_t *y,
         alpaqa_real_t *H);
+    void (*eval_hess_ψ)(
+        void *instance,
+        const alpaqa_real_t *x,
+        const alpaqa_real_t *y,
+        const alpaqa_real_t *Σ,
+        alpaqa_real_t *H);
     alpaqa_real_t (*eval_f_grad_f)(
         void *instance,
         const alpaqa_real_t *x,

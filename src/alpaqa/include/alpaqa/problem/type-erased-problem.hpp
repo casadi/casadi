@@ -50,6 +50,8 @@ struct ProblemVTable : util::BasicVTable {
         eval_hess_L_prod = &default_eval_hess_L_prod;
     optional_const_function_t<void(crvec x, crvec y, rmat H)>
         eval_hess_L = &default_eval_hess_L;
+    optional_const_function_t<void(crvec x, crvec y, crvec Σ, rmat H)>
+        eval_hess_ψ = &default_eval_hess_ψ;
 
     // Combined evaluations
     optional_const_function_t<real_t(crvec x, rvec grad_fx)>
@@ -122,6 +124,10 @@ struct ProblemVTable : util::BasicVTable {
     }
     static void default_eval_hess_L(const void *, crvec, crvec, rmat, const ProblemVTable &) {
         throw not_implemented_error("eval_hess_L");
+    }
+    static void default_eval_hess_ψ(const void *, crvec, crvec, crvec, rmat,
+                                    const ProblemVTable &) {
+        throw not_implemented_error("eval_hess_ψ");
     }
 
     static real_t default_eval_f_grad_f(const void *self, crvec x, rvec grad_fx,
@@ -216,6 +222,7 @@ struct ProblemVTable : util::BasicVTable {
         ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_grad_gi, t.t);
         ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_hess_L_prod, t.t);
         ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_hess_L, t.t);
+        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_hess_ψ, t.t);
         // Combined evaluations
         ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_f_grad_f, t.t);
         ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_f_g, t.t);
@@ -414,6 +421,20 @@ class TypeErasedProblem : public util::TypeErased<ProblemVTable<Conf>, Allocator
     ///
     /// Required for second-order solvers only.
     void eval_hess_L(crvec x, crvec y, rmat H) const;
+    /// **[Optional]**
+    /// Function that evaluates the Hessian of the augmented Lagrangian,
+    /// @f$ \nabla_{xx}^2L_\Sigma(x, y) @f$
+    /// @param  [in] x
+    ///         Decision variable @f$ x \in \R^n @f$
+    /// @param  [in] y
+    ///         Lagrange multipliers @f$ y \in \R^m @f$
+    /// @param  [in] Σ
+    ///         Penalty weights @f$ \Sigma @f$
+    /// @param  [out] H
+    ///         Hessian @f$ \nabla_{xx}^2 L_\Sigma(x, y) \in \R^{n\times n} @f$
+    ///
+    /// Required for second-order solvers only.
+    void eval_hess_ψ(crvec x, crvec y, crvec Σ, rmat H) const;
 
     /// @}
 
@@ -512,6 +533,9 @@ class TypeErasedProblem : public util::TypeErased<ProblemVTable<Conf>, Allocator
     /// Returns true if the problem provides an implementation of
     /// @ref eval_hess_L.
     bool provides_eval_hess_L() const { return vtable.eval_hess_L != vtable.default_eval_hess_L; }
+    /// Returns true if the problem provides an implementation of
+    /// @ref eval_hess_ψ.
+    bool provides_eval_hess_ψ() const { return vtable.eval_hess_ψ != vtable.default_eval_hess_ψ; }
     /// Returns true if the problem provides a specialized implementation of
     /// @ref eval_f_grad_f, false if it uses the default implementation.
     bool provides_eval_f_grad_f() const {
@@ -567,7 +591,7 @@ class TypeErasedProblem : public util::TypeErased<ProblemVTable<Conf>, Allocator
     /// Computes the result using the following algorithm:
     /// @f[ \begin{aligned}
     ///     \zeta &= g(x) + \Sigma^{-1} y \\[]
-    ///     d &= \zeta - \Pi_D(\zeta) 
+    ///     d &= \zeta - \Pi_D(\zeta)
     ///        = \operatorname{eval\_proj\_diff\_g}(\zeta, \zeta) \\[]
     ///     \hat y &= \Sigma d \\[]
     /// \end{aligned} @f]
@@ -648,6 +672,10 @@ void TypeErasedProblem<Conf, Allocator>::eval_hess_L_prod(crvec x, crvec y, crve
 template <Config Conf, class Allocator>
 void TypeErasedProblem<Conf, Allocator>::eval_hess_L(crvec x, crvec y, rmat H) const {
     return call(vtable.eval_hess_L, x, y, H);
+}
+template <Config Conf, class Allocator>
+void TypeErasedProblem<Conf, Allocator>::eval_hess_ψ(crvec x, crvec y, crvec Σ, rmat H) const {
+    return call(vtable.eval_hess_ψ, x, y, Σ, H);
 }
 template <Config Conf, class Allocator>
 auto TypeErasedProblem<Conf, Allocator>::eval_f_grad_f(crvec x, rvec grad_fx) const -> real_t {
@@ -735,6 +763,7 @@ struct ProblemWithCounters {
     void eval_grad_gi(crvec x, index_t i, rvec grad_gi) const requires requires { &std::remove_cvref_t<Problem>::eval_grad_gi; } { ++evaluations->grad_gi; return timed(evaluations->time.grad_gi, std::bind(&std::remove_cvref_t<Problem>::eval_grad_gi, &problem, x, i, grad_gi)); }
     void eval_hess_L_prod(crvec x, crvec y, crvec v, rvec Hv) const requires requires { &std::remove_cvref_t<Problem>::eval_hess_L_prod; } { ++evaluations->hess_L_prod; return timed(evaluations->time.hess_L_prod, std::bind(&std::remove_cvref_t<Problem>::eval_hess_L_prod, &problem, x, y, v, Hv)); }
     void eval_hess_L(crvec x, crvec y, rmat H) const requires requires { &std::remove_cvref_t<Problem>::eval_hess_L; } { ++evaluations->hess_L; return timed(evaluations->time.hess_L, std::bind(&std::remove_cvref_t<Problem>::eval_hess_L, &problem, x, y, H)); }
+    void eval_hess_ψ(crvec x, crvec y, crvec Σ, rmat H) const requires requires { &std::remove_cvref_t<Problem>::eval_hess_ψ; } { ++evaluations->hess_ψ; return timed(evaluations->time.hess_ψ, std::bind(&std::remove_cvref_t<Problem>::eval_hess_ψ, &problem, x, y, Σ, H)); }
     real_t eval_f_grad_f(crvec x, rvec grad_fx) const requires requires { &std::remove_cvref_t<Problem>::eval_f_grad_f; } { ++evaluations->f_grad_f; return timed(evaluations->time.f_grad_f, std::bind(&std::remove_cvref_t<Problem>::eval_f_grad_f, &problem, x, grad_fx)); }
     real_t eval_f_g(crvec x, rvec g) const requires requires { &std::remove_cvref_t<Problem>::eval_f_g; } { ++evaluations->f_g; return timed(evaluations->time.f_g, std::bind(&std::remove_cvref_t<Problem>::eval_f_g, &problem, x, g)); }
     real_t eval_f_grad_f_g(crvec x, rvec grad_fx, rvec g) const requires requires { &std::remove_cvref_t<Problem>::eval_f_grad_f_g; } { ++evaluations->f_grad_f_g; return timed(evaluations->time.f_grad_f_g, std::bind(&std::remove_cvref_t<Problem>::eval_f_grad_f_g, &problem, x, grad_fx, g)); }
@@ -751,6 +780,7 @@ struct ProblemWithCounters {
     [[nodiscard]] bool provides_eval_grad_gi() const requires requires (Problem p) { { p.provides_eval_grad_gi() } -> std::convertible_to<bool>; } { return problem.provides_eval_grad_gi(); }
     [[nodiscard]] bool provides_eval_hess_L_prod() const requires requires (Problem p) { { p.provides_eval_hess_L_prod() } -> std::convertible_to<bool>; } { return problem.provides_eval_hess_L_prod(); }
     [[nodiscard]] bool provides_eval_hess_L() const requires requires (Problem p) { { p.provides_eval_hess_L() } -> std::convertible_to<bool>; } { return problem.provides_eval_hess_L(); }
+    [[nodiscard]] bool provides_eval_hess_ψ() const requires requires (Problem p) { { p.provides_eval_hess_ψ() } -> std::convertible_to<bool>; } { return problem.provides_eval_hess_ψ(); }
     [[nodiscard]] bool provides_eval_f_grad_f() const requires requires (Problem p) { { p.provides_eval_f_grad_f() } -> std::convertible_to<bool>; } { return problem.provides_eval_f_grad_f(); }
     [[nodiscard]] bool provides_eval_f_g() const requires requires (Problem p) { { p.provides_eval_f_g() } -> std::convertible_to<bool>; } { return problem.provides_eval_f_g(); }
     [[nodiscard]] bool provides_eval_f_grad_f_g() const requires requires (Problem p) { { p.provides_eval_f_grad_f_g() } -> std::convertible_to<bool>; } { return problem.provides_eval_f_grad_f_g(); }
@@ -930,6 +960,7 @@ class FunctionalProblem : public BoxConstrProblem<Conf> {
     std::function<void(crvec, index_t, rvec)> grad_gi;
     std::function<void(crvec, crvec, crvec, rvec)> hess_L_prod;
     std::function<void(crvec, crvec, rmat)> hess_L;
+    std::function<void(crvec, crvec, crvec, rmat)> hess_ψ;
 
     // clang-format off
     real_t eval_f(crvec x) const { ScopedMallocAllower ma; return f(x); }
@@ -939,6 +970,7 @@ class FunctionalProblem : public BoxConstrProblem<Conf> {
     void eval_grad_gi(crvec x, index_t i, rvec grad_i) const { ScopedMallocAllower ma; grad_gi(x, i, grad_i); }
     void eval_hess_L_prod(crvec x, crvec y, crvec v, rvec Hv) const { ScopedMallocAllower ma; hess_L_prod(x, y, v, Hv); }
     void eval_hess_L(crvec x, crvec y, rmat H) const { ScopedMallocAllower ma; hess_L(x, y, H); }
+    void eval_hess_ψ(crvec x, crvec y, crvec Σ, rmat H) const { ScopedMallocAllower ma; hess_ψ(x, y, Σ, H); }
     // clang-format on
 
     /// @see @ref TypeErasedProblem::provides_eval_grad_gi
@@ -947,12 +979,33 @@ class FunctionalProblem : public BoxConstrProblem<Conf> {
     bool provides_eval_hess_L_prod() const { return bool{hess_L_prod}; }
     /// @see @ref TypeErasedProblem::provides_eval_hess_L
     bool provides_eval_hess_L() const { return bool{hess_L}; }
+    /// @see @ref TypeErasedProblem::provides_eval_hess_ψ
+    bool provides_eval_hess_ψ() const { return bool{hess_ψ}; }
 
     FunctionalProblem(const FunctionalProblem &)                = default;
     FunctionalProblem &operator=(const FunctionalProblem &)     = default;
     FunctionalProblem(FunctionalProblem &&) noexcept            = default;
     FunctionalProblem &operator=(FunctionalProblem &&) noexcept = default;
 };
+
+template <Config Conf>
+void print_provided_functions(std::ostream &os, const TypeErasedProblem<Conf> &problem) {
+    os << "           eval_grad_gi: " << problem.provides_eval_grad_gi() << '\n'
+       << "       eval_hess_L_prod: " << problem.provides_eval_hess_L_prod() << '\n'
+       << "            eval_hess_L: " << problem.provides_eval_hess_L() << '\n'
+       << "            eval_hess_ψ: " << problem.provides_eval_hess_ψ() << '\n'
+       << "          eval_f_grad_f: " << problem.provides_eval_f_grad_f() << '\n'
+       << "               eval_f_g: " << problem.provides_eval_f_g() << '\n'
+       << "        eval_f_grad_f_g: " << problem.provides_eval_f_grad_f_g() << '\n'
+       << "eval_grad_f_grad_g_prod: " << problem.provides_eval_grad_f_grad_g_prod() << '\n'
+       << "            eval_grad_L: " << problem.provides_eval_grad_L() << '\n'
+       << "                 eval_ψ: " << problem.provides_eval_ψ() << '\n'
+       << "     eval_grad_ψ_from_ŷ: " << problem.provides_eval_grad_ψ_from_ŷ() << '\n'
+       << "            eval_grad_ψ: " << problem.provides_eval_grad_ψ() << '\n'
+       << "          eval_ψ_grad_ψ: " << problem.provides_eval_ψ_grad_ψ() << '\n'
+       << "              get_box_C: " << problem.provides_get_box_C() << '\n'
+       << "              get_box_D: " << problem.provides_get_box_D() << '\n';
+}
 
 /// @}
 

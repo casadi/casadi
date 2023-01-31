@@ -143,6 +143,7 @@ void register_problems(py::module_ &m) {
         void eval_grad_gi(crvec x, index_t i, rvec grad_gi) const { py::gil_scoped_acquire gil; o.attr("eval_grad_gi")(x, i, grad_gi); }
         void eval_hess_L_prod(crvec x, crvec y, crvec v, rvec Hv) const { py::gil_scoped_acquire gil; o.attr("eval_hess_L_prod")(x, y, v, Hv); }
         void eval_hess_L(crvec x, crvec y, rmat H) const { py::gil_scoped_acquire gil; o.attr("eval_hess_L")(x, y, H); }
+        void eval_hess_ψ(crvec x, crvec y, crvec Σ, rmat H) const { py::gil_scoped_acquire gil; o.attr("eval_hess_ψ")(x, y, Σ, H); }
         real_t eval_f_grad_f(crvec x, rvec grad_fx) const { py::gil_scoped_acquire gil; return py::cast<real_t>(o.attr("eval_f_grad_f")(x, grad_fx)); }
         real_t eval_f_g(crvec x, rvec g) const { py::gil_scoped_acquire gil; return py::cast<real_t>(o.attr("eval_f_g")(x, g)); }
         real_t eval_f_grad_f_g(crvec x, rvec grad_fx, rvec g) const { py::gil_scoped_acquire gil; return py::cast<real_t>(o.attr("eval_f_grad_f_g")(x, grad_fx, g)); }
@@ -159,6 +160,7 @@ void register_problems(py::module_ &m) {
         bool provides_eval_grad_gi() const { py::gil_scoped_acquire gil; return py::hasattr(o, "eval_grad_gi"); }
         bool provides_eval_hess_L_prod() const { py::gil_scoped_acquire gil; return py::hasattr(o, "eval_hess_L_prod"); }
         bool provides_eval_hess_L() const { py::gil_scoped_acquire gil; return py::hasattr(o, "eval_hess_L"); }
+        bool provides_eval_hess_ψ() const { py::gil_scoped_acquire gil; return py::hasattr(o, "eval_hess_ψ"); }
         bool provides_eval_f_grad_f() const { py::gil_scoped_acquire gil; return py::hasattr(o, "eval_f_grad_f"); }
         bool provides_eval_f_g() const { py::gil_scoped_acquire gil; return py::hasattr(o, "eval_f_g"); }
         bool provides_eval_f_grad_f_g() const { py::gil_scoped_acquire gil; return py::hasattr(o, "eval_f_grad_f_g"); }
@@ -200,6 +202,7 @@ void register_problems(py::module_ &m) {
         .def("eval_grad_gi", &TEProblem::eval_grad_gi, "x"_a, "i"_a, "grad_gi"_a)
         .def("eval_hess_L_prod", &TEProblem::eval_hess_L_prod, "x"_a, "y"_a, "v"_a, "Hv"_a)
         .def("eval_hess_L", &TEProblem::eval_hess_L, "x"_a, "y"_a, "H"_a)
+        .def("eval_hess_ψ", &TEProblem::eval_hess_ψ, "x"_a, "y"_a, "Σ"_a, "H"_a)
         .def("eval_f_grad_f", &TEProblem::eval_f_grad_f, "x"_a, "grad_fx"_a)
         .def("eval_f_g", &TEProblem::eval_f_g, "x"_a, "g"_a)
         .def("eval_f_grad_f_g", &TEProblem::eval_f_grad_f_g, "x"_a, "grad_fx"_a, "g"_a)
@@ -215,6 +218,7 @@ void register_problems(py::module_ &m) {
         .def("provides_eval_grad_gi", &TEProblem::provides_eval_grad_gi)
         .def("provides_eval_hess_L_prod", &TEProblem::provides_eval_hess_L_prod)
         .def("provides_eval_hess_L", &TEProblem::provides_eval_hess_L)
+        .def("provides_eval_hess_ψ", &TEProblem::provides_eval_hess_ψ)
         .def("provides_eval_f_grad_f", &TEProblem::provides_eval_f_grad_f)
         .def("provides_eval_f_g", &TEProblem::provides_eval_f_g)
         .def("provides_eval_f_grad_f_g", &TEProblem::provides_eval_f_grad_f_g)
@@ -341,6 +345,7 @@ void register_problems(py::module_ &m) {
             .def("eval_grad_gi", &CasADiProblem::eval_grad_gi, "x"_a, "i"_a, "grad_gi"_a)
             .def("eval_hess_L_prod", &CasADiProblem::eval_hess_L_prod, "x"_a, "y"_a, "v"_a, "Hv"_a)
             .def("eval_hess_L", &CasADiProblem::eval_hess_L, "x"_a, "y"_a, "H"_a)
+            .def("eval_hess_ψ", &CasADiProblem::eval_hess_ψ, "x"_a, "y"_a, "Σ"_a, "H"_a)
             .def("eval_grad_L", &CasADiProblem::eval_grad_L, "x"_a, "y"_a, "grad_L"_a, "work_n"_a)
             .def("eval_ψ", &CasADiProblem::eval_ψ, "x"_a, "y"_a, "Σ"_a, "ŷ"_a)
             .def("eval_grad_ψ_from_ŷ", &CasADiProblem::eval_grad_ψ_from_ŷ, "x"_a, "ŷ"_a, "grad_ψ"_a, "work_n"_a)

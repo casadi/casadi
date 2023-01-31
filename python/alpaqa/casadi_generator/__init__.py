@@ -128,6 +128,15 @@ def generate_casadi_problem(
                 [*xp_names, "y", "v"],
                 ["hess_L_prod"],
             ))
+        cg.add(
+            cs.Function(
+                "hess_psi",
+                [*xp_def, y, Σ, zl, zu],
+                [cs.hessian(ψ, x)[0]],
+                [*xp_names, "y", "Σ", "zl", "zu"],
+                ["hess_psi"],
+            )
+        )
     return cg, n, m, p
 
 def _add_parameter(f: cs.Function, expected_inputs: int) -> Tuple[cs.Function, cs.SX, str]:

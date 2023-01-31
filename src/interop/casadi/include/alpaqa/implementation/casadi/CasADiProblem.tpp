@@ -31,6 +31,7 @@ struct CasADiFunctionsWithParam {
     struct HessFun {
         CasADiFunctionEvaluator<Conf, 3 + WithParam, 1> hess_L_prod;
         CasADiFunctionEvaluator<Conf, 2 + WithParam, 1> hess_L;
+        CasADiFunctionEvaluator<Conf, 5 + WithParam, 1> hess_ψ;
     };
     std::optional<HessFun> hess;
 };
@@ -131,6 +132,9 @@ CasADiProblem<Conf>::CasADiProblem(const std::string &so_name, length_t n,
                     so_name, "hess_L_prod", dims(n, p, m, n), dims(n)),
                 wrapped_load<CasADiFunctionEvaluator<Conf, 3, 1>>( //
                     so_name, "hess_L", dims(n, p, m), dims(dim(n, n))),
+                wrapped_load<CasADiFunctionEvaluator<Conf, 6, 1>>( //
+                    so_name, "hess_psi", dims(n, p, m, m, m, m),
+                    dims(dim(n, n))),
             });
 }
 
@@ -253,6 +257,12 @@ template <Config Conf>
 void CasADiProblem<Conf>::eval_hess_L(crvec x, crvec y, rmat H) const {
     impl->hess->hess_L({x.data(), param.data(), y.data()}, {H.data()});
 }
+template <Config Conf>
+void CasADiProblem<Conf>::eval_hess_ψ(crvec x, crvec y, crvec Σ, rmat H) const {
+    impl->hess->hess_ψ({x.data(), param.data(), y.data(), Σ.data(),
+                        this->D.lowerbound.data(), this->D.upperbound.data()},
+                       {H.data()});
+}
 
 template <Config Conf>
 bool CasADiProblem<Conf>::provides_eval_grad_gi() const {
@@ -264,6 +274,10 @@ bool CasADiProblem<Conf>::provides_eval_hess_L_prod() const {
 }
 template <Config Conf>
 bool CasADiProblem<Conf>::provides_eval_hess_L() const {
+    return impl->hess.has_value();
+}
+template <Config Conf>
+bool CasADiProblem<Conf>::provides_eval_hess_ψ() const {
     return impl->hess.has_value();
 }
 

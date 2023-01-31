@@ -17,9 +17,9 @@ from ..cache import get_alpaqa_cache_dir
 # TODO: factor out caching logic
 
 
-def _load_casadi_problem(sofile, n, m, p):
+def _load_casadi_problem(sofile, n, m, p, second_order):
     print("-- Loading:", sofile)
-    prob = pa.load_casadi_problem(sofile, n=n, m=m, p=p)
+    prob = pa.load_casadi_problem(sofile, n=n, m=m, p=p, second_order=second_order)
     return prob
 
 
@@ -52,7 +52,7 @@ def generate_and_compile_casadi_problem(
             probdir = join(cachedir, str(uid))
             sofile = join(probdir, soname)
             try:
-                return _load_casadi_problem(sofile, *dim)
+                return _load_casadi_problem(sofile, *dim, second_order)
             except:
                 del cache[key]
                 # if os.path.exists(probdir) and os.path.isdir(probdir):
@@ -102,7 +102,7 @@ def generate_and_compile_casadi_problem(
         soname = os.path.relpath(sofile, probdir)
         cache[key] = uid, soname, (n, m, p)
 
-        return _load_casadi_problem(sofile, n, m, p)
+        return _load_casadi_problem(sofile, n, m, p, second_order)
 
 
 def _load_casadi_control_problem(sofile, N, nx, nu, p):

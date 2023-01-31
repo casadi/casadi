@@ -58,6 +58,7 @@ auto DLProblem::eval_grad_g_prod(crvec x, crvec y, rvec grad_gxy) const -> void 
 auto DLProblem::eval_grad_gi(crvec x, index_t i, rvec grad_gi) const -> void { return functions->eval_grad_gi(instance.get(), x.data(), i, grad_gi.data()); }
 auto DLProblem::eval_hess_L_prod(crvec x, crvec y, crvec v, rvec Hv) const -> void { return functions->eval_hess_L_prod(instance.get(), x.data(), y.data(), v.data(), Hv.data()); }
 auto DLProblem::eval_hess_L(crvec x, crvec y, rmat H) const -> void { return functions->eval_hess_L(instance.get(), x.data(), y.data(), H.data()); }
+auto DLProblem::eval_hess_ψ(crvec x, crvec y, crvec Σ, rmat H) const -> void { return functions->eval_hess_ψ(instance.get(), x.data(), y.data(), Σ.data(), H.data()); }
 auto DLProblem::eval_f_grad_f(crvec x, rvec grad_fx) const -> real_t { return functions->eval_f_grad_f(instance.get(), x.data(), grad_fx.data()); }
 auto DLProblem::eval_f_g(crvec x, rvec g) const -> real_t { return functions->eval_f_g(instance.get(), x.data(), g.data()); }
 auto DLProblem::eval_f_grad_f_g(crvec x, rvec grad_fx, rvec g) const -> real_t { return functions->eval_f_grad_f_g(instance.get(), x.data(), grad_fx.data(), g.data()); }
@@ -75,6 +76,7 @@ bool DLProblem::provides_eval_grad_g_prod() const { return functions->eval_grad_
 bool DLProblem::provides_eval_grad_gi() const { return functions->eval_grad_gi != nullptr; }
 bool DLProblem::provides_eval_hess_L_prod() const { return functions->eval_hess_L_prod != nullptr; }
 bool DLProblem::provides_eval_hess_L() const { return functions->eval_hess_L != nullptr; }
+bool DLProblem::provides_eval_hess_ψ() const { return functions->eval_hess_ψ != nullptr; }
 bool DLProblem::provides_eval_f_grad_f() const { return functions->eval_f_grad_f != nullptr; }
 bool DLProblem::provides_eval_f_g() const { return functions->eval_f_g != nullptr; }
 bool DLProblem::provides_eval_f_grad_f_g() const { return functions->eval_f_grad_f_g != nullptr; }
