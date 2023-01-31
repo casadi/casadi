@@ -62,9 +62,10 @@ float_to_str_vw(auto &buf, __float128 value,
 }
 #endif
 
-std::string float_to_str(std::floating_point auto value) {
+template <std::floating_point F>
+std::string float_to_str(F value, int precision) {
     std::array<char, 64> buf;
-    return std::string{float_to_str_vw(buf, value)};
+    return std::string{float_to_str_vw(buf, value, precision)};
 }
 
 template <std::floating_point F>
