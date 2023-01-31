@@ -304,7 +304,12 @@ void CasADiControlProblem<Conf>::eval_add_Q(index_t, crvec xu, crvec h,
         Q += cmmat{work.data(), nx, nx};
     else
         Q += cmspmat{
-            nx, nx, sparse.nnz(), sparse.colind(), sparse.row(), work.data(),
+            nx,
+            nx,
+            static_cast<length_t>(sparse.nnz()),
+            sparse.colind(),
+            sparse.row(),
+            work.data(),
         };
 }
 template <Config Conf>
@@ -321,7 +326,12 @@ void CasADiControlProblem<Conf>::eval_add_Q_N(crvec x, crvec h, rmat Q) const {
         Q += cmmat{work.data(), nx, nx};
     else
         Q += cmspmat{
-            nx, nx, sparse.nnz(), sparse.colind(), sparse.row(), work.data(),
+            nx,
+            nx,
+            static_cast<length_t>(sparse.nnz()),
+            sparse.colind(),
+            sparse.row(),
+            work.data(),
         };
 }
 
@@ -336,7 +346,7 @@ void CasADiControlProblem<Conf>::eval_add_R_masked(index_t, crvec xu, crvec h,
     assert(R.cols() <= nu);
     assert(R.rows() == mask.size());
     assert(R.cols() == mask.size());
-    assert(work.size() >= sparse.nnz());
+    assert(work.size() >= static_cast<length_t>(sparse.nnz()));
     impl->R({xu.data(), h.data(), param.data()}, {work.data()});
     using spmat   = Eigen::SparseMatrix<real_t, Eigen::ColMajor, casadi_int>;
     using cmspmat = Eigen::Map<const spmat>;
@@ -345,7 +355,12 @@ void CasADiControlProblem<Conf>::eval_add_R_masked(index_t, crvec xu, crvec h,
         R += R_full(mask, mask);
     } else {
         cmspmat R_full{
-            nu, nu, sparse.nnz(), sparse.colind(), sparse.row(), work.data(),
+            nu,
+            nu,
+            static_cast<length_t>(sparse.nnz()),
+            sparse.colind(),
+            sparse.row(),
+            work.data(),
         };
         util::sparse_add_masked(R_full, R, mask);
     }
@@ -361,7 +376,7 @@ void CasADiControlProblem<Conf>::eval_add_S_masked(index_t, crvec xu, crvec h,
     assert(S.rows() <= nu);
     assert(S.rows() == mask.size());
     assert(S.cols() == nx);
-    assert(work.size() >= sparse.nnz());
+    assert(work.size() >= static_cast<length_t>(sparse.nnz()));
     impl->S({xu.data(), h.data(), param.data()}, {work.data()});
     using spmat   = Eigen::SparseMatrix<real_t, Eigen::ColMajor, casadi_int>;
     using cmspmat = Eigen::Map<const spmat>;
@@ -371,7 +386,12 @@ void CasADiControlProblem<Conf>::eval_add_S_masked(index_t, crvec xu, crvec h,
         S += S_full(mask, all);
     } else {
         cmspmat S_full{
-            nu, nx, sparse.nnz(), sparse.colind(), sparse.row(), work.data(),
+            nu,
+            nx,
+            static_cast<length_t>(sparse.nnz()),
+            sparse.colind(),
+            sparse.row(),
+            work.data(),
         };
         util::sparse_add_masked_rows(S_full, S, mask);
     }
@@ -386,7 +406,7 @@ void CasADiControlProblem<Conf>::eval_add_R_prod_masked(index_t, crvec, crvec,
     auto &&sparse = impl->R.fun.sparsity_out(0);
     assert(v.size() == nu);
     assert(out.size() == mask_J.size());
-    assert(work.size() >= sparse.nnz());
+    assert(work.size() >= static_cast<length_t>(sparse.nnz()));
     using spmat   = Eigen::SparseMatrix<real_t, Eigen::ColMajor, casadi_int>;
     using cmspmat = Eigen::Map<const spmat>;
     if (sparse.is_dense()) {
@@ -394,7 +414,12 @@ void CasADiControlProblem<Conf>::eval_add_R_prod_masked(index_t, crvec, crvec,
         out.noalias() += R(mask_J, mask_K) * v(mask_K);
     } else {
         cmspmat R{
-            nu, nu, sparse.nnz(), sparse.colind(), sparse.row(), work.data(),
+            nu,
+            nu,
+            static_cast<length_t>(sparse.nnz()),
+            sparse.colind(),
+            sparse.row(),
+            work.data(),
         };
         // out += R_full(mask_J,mask_K) * v(mask_K);
         util::sparse_matvec_add_masked_rows_cols(R, v, out, mask_J, mask_K);
@@ -409,7 +434,7 @@ void CasADiControlProblem<Conf>::eval_add_S_prod_masked(index_t, crvec, crvec,
     auto &&sparse = impl->S.fun.sparsity_out(0);
     assert(v.size() == nu);
     assert(out.size() == nx);
-    assert(work.size() >= sparse.nnz());
+    assert(work.size() >= static_cast<length_t>(sparse.nnz()));
     using spmat   = Eigen::SparseMatrix<real_t, Eigen::ColMajor, casadi_int>;
     using cmspmat = Eigen::Map<const spmat>;
     using Eigen::indexing::all;
@@ -418,7 +443,12 @@ void CasADiControlProblem<Conf>::eval_add_S_prod_masked(index_t, crvec, crvec,
         out.noalias() += Sᵀ(all, mask_K) * v(mask_K);
     } else {
         cmspmat S{
-            nu, nx, sparse.nnz(), sparse.colind(), sparse.row(), work.data(),
+            nu,
+            nx,
+            static_cast<length_t>(sparse.nnz()),
+            sparse.colind(),
+            sparse.row(),
+            work.data(),
         };
         // out += S(mask_K,:)ᵀ * v(mask_K);
         util::sparse_matvec_add_transpose_masked_rows(S, v, out, mask_K);
@@ -428,13 +458,13 @@ void CasADiControlProblem<Conf>::eval_add_S_prod_masked(index_t, crvec, crvec,
 template <Config Conf>
 auto CasADiControlProblem<Conf>::get_R_work_size() const -> length_t {
     auto &&sparse = impl->R.fun.sparsity_out(0);
-    return sparse.nnz();
+    return static_cast<length_t>(sparse.nnz());
 }
 
 template <Config Conf>
 auto CasADiControlProblem<Conf>::get_S_work_size() const -> length_t {
     auto &&sparse = impl->S.fun.sparsity_out(0);
-    return sparse.nnz();
+    return static_cast<length_t>(sparse.nnz());
 }
 
 template <Config Conf>
@@ -465,7 +495,7 @@ void CasADiControlProblem<Conf>::eval_add_gn_hess_constr(index_t, crvec x,
     assert(M.size() == nc);
     assert(out.rows() == nx);
     assert(out.cols() == nx);
-    assert(work.size() >= sparse.nnz());
+    assert(work.size() >= static_cast<length_t>(sparse.nnz()));
     impl->gn_hess_c({x.data(), param.data(), M.data()}, {work.data()});
     using spmat   = Eigen::SparseMatrix<real_t, Eigen::ColMajor, casadi_int>;
     using cmspmat = Eigen::Map<const spmat>;
@@ -473,7 +503,12 @@ void CasADiControlProblem<Conf>::eval_add_gn_hess_constr(index_t, crvec x,
         out += cmmat{work.data(), nx, nx};
     else
         out += cmspmat{
-            nx, nx, sparse.nnz(), sparse.colind(), sparse.row(), work.data(),
+            nx,
+            nx,
+            static_cast<length_t>(sparse.nnz()),
+            sparse.colind(),
+            sparse.row(),
+            work.data(),
         };
 }
 
@@ -503,7 +538,7 @@ void CasADiControlProblem<Conf>::eval_add_gn_hess_constr_N(crvec x, crvec M,
     assert(M.size() == nc_N);
     assert(out.rows() == nx);
     assert(out.cols() == nx);
-    assert(work.size() >= sparse.nnz());
+    assert(work.size() >= static_cast<length_t>(sparse.nnz()));
     impl->gn_hess_c_N({x.data(), param.data(), M.data()}, {work.data()});
     using spmat   = Eigen::SparseMatrix<real_t, Eigen::ColMajor, casadi_int>;
     using cmspmat = Eigen::Map<const spmat>;
@@ -511,7 +546,12 @@ void CasADiControlProblem<Conf>::eval_add_gn_hess_constr_N(crvec x, crvec M,
         out += cmmat{work.data(), nx, nx};
     else
         out += cmspmat{
-            nx, nx, sparse.nnz(), sparse.colind(), sparse.row(), work.data(),
+            nx,
+            nx,
+            static_cast<length_t>(sparse.nnz()),
+            sparse.colind(),
+            sparse.row(),
+            work.data(),
         };
 }
 
