@@ -130,16 +130,6 @@ else()
 endif()
 
 if(CXX11FLAG)
-  try_compile(HAS_COPYSIGN
-    ${CMAKE_BINARY_DIR}
-    ${CMAKE_MODULE_PATH}/check_copysign.cpp
-    CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${CXX11FLAG}
-    OUTPUT_VARIABLE OUTPUT)
-  if(HAS_COPYSIGN)
-    add_definitions(-DHAS_COPYSIGN)
-  endif()
-
-
   try_compile(HAS_ERF
     ${CMAKE_BINARY_DIR}
     ${CMAKE_MODULE_PATH}/check_erf.cpp

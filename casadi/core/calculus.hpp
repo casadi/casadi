@@ -254,6 +254,7 @@ namespace casadi {
   using std::log1p;
   using std::expm1;
   using std::hypot;
+  using std::copysign;
   ///@}
 
   ///@{
@@ -279,12 +280,6 @@ namespace casadi {
   }
   inline bool is_equal(double x, double y, casadi_int depth=0) { return x==y;}
 
-  #ifdef HAS_COPYSIGN
-  using std::copysign;
-  #else
-  /// copysign function
-  inline double copysign(double x, double y) { return y>=0 ? fabs(x) : -fabs(x);}
-  #endif //HAS_COPYSIGN
 
   // Integer maximum and minimum
   inline casadi_int casadi_max(casadi_int x, casadi_int y) { return std::max(x, y);}
