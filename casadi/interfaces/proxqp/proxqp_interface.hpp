@@ -48,7 +48,7 @@
 namespace casadi {
 
   struct CASADI_CONIC_PROXQP_EXPORT ProxqpMemory : public ConicMemory {
-    
+
     typedef Eigen::Triplet<double> T;
     // Solvers
     proxsuite::proxqp::sparse::QP<double, long long> sparse_solver;
@@ -76,7 +76,7 @@ namespace casadi {
     std::unique_ptr<Eigen::VectorXd> results_z;
     double objValue;
     proxsuite::proxqp::QPSolverOutput status;
-    
+
     /// Constructor
     ProxqpMemory();
 

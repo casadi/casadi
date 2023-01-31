@@ -486,12 +486,13 @@ class Misctests(casadiTestCase):
         with self.assertOutput(included, excluded):
           solver.solve(A,vertcat(1,2,3))
 
+  @memory_heavy()
   def test_record_time(self):
 
 
     x = MX.sym("x")
     f = x**2
-    for i in range(1000):
+    for i in range(10000):
       f =sin(f)*f
     f=f+x**2
 
@@ -499,29 +500,29 @@ class Misctests(casadiTestCase):
     ff = Function("f",[x],[f],opts)
     ff(3)
     self.assertTrue("t_proc_total" in ff.stats())
-    self.assertTrue(ff.stats()["t_proc_total"]>=0)
+    self.assertTrue(ff.stats()["t_wall_total"]>=0)
 
     if has_nlpsol("ipopt"):
       solver = nlpsol("nlpsol","ipopt",{"x":x,"f":f},opts)
       solver()
       self.assertTrue("t_proc_total" in solver.stats())
-      self.assertTrue(solver.stats()["t_proc_total"]>0)
+      self.assertTrue(solver.stats()["t_wall_total"]>0)
 
     if has_conic("qpoases"):
       solver = qpsol("qpsol","qpoases",{"x":x,"f":f},opts)
       solver()
       self.assertTrue("t_proc_total" in solver.stats())
-      self.assertTrue(solver.stats()["t_proc_total"]>0)
+      self.assertTrue(solver.stats()["t_wall_total"]>0)
 
     solver = rootfinder("rootfinder","newton",{"x":x,"g":x},opts)
     solver()
     self.assertTrue("t_proc_total" in solver.stats())
-    self.assertTrue(solver.stats()["t_proc_total"]>=0)
+    self.assertTrue(solver.stats()["t_wall_total"]>=0)
 
     solver = integrator("integrator","rk",{"x":x,"ode":f},opts)
     solver()
     self.assertTrue("t_proc_total" in solver.stats())
-    self.assertTrue(solver.stats()["t_proc_total"]>=0)
+    self.assertTrue(solver.stats()["t_wall_total"]>=0)
 
     integr_options = {}
     integr_options["simplify"] = True
@@ -529,14 +530,14 @@ class Misctests(casadiTestCase):
     solver = integrator("integrator","rk",{"x":x,"ode":f},integr_options)
     solver()
     self.assertTrue("t_proc_total" in solver.stats())
-    self.assertTrue(solver.stats()["t_proc_total"]>=0)
+    self.assertTrue(solver.stats()["t_wall_total"]>=0)
 
     A = DM.rand(3,3)
     if has_linsol("lapacklu"):
       solver = Linsol("linsol","lapacklu",A.sparsity(),opts)
       solver.solve(A,vertcat(1,2,3))
       self.assertTrue("t_proc_total" in solver.stats())
-      self.assertTrue(solver.stats()["t_proc_total"]>=0)
+      self.assertTrue(solver.stats()["t_wall_total"]>=0)
 
 if __name__ == '__main__':
     unittest.main()

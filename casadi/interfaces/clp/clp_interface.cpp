@@ -26,8 +26,6 @@
 
 namespace casadi {
 
-  using namespace std;
-
   extern "C"
   int CASADI_CONIC_CLP_EXPORT
   casadi_register_conic_clp(Conic::Plugin* plugin) {
@@ -428,9 +426,9 @@ namespace casadi {
 
     m->fstats.at("postprocessing").toc();
     m->return_status = model.status();
-    m->success = m->return_status==0;
+    m->d_qp.success = m->return_status==0;
     m->secondary_return_status = model.secondaryStatus();
-    if (m->return_status==3) m->unified_return_status = SOLVER_RET_LIMITED;
+    if (m->return_status==3) m->d_qp.unified_return_status = SOLVER_RET_LIMITED;
 
     if (verbose_) casadi_message("CLP return status: " + return_status_string(m->return_status));
     if (verbose_) casadi_message(

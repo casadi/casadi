@@ -25,8 +25,6 @@
 
 #include "casadi_find.hpp"
 
-using namespace std;
-
 namespace casadi {
 
   Find::Find(const MX& x) {

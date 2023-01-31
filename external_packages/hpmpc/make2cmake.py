@@ -50,7 +50,7 @@ for t in targets:
   target_data[t] = data
 
 with file('CMakeLists.txt','w') as f:
-  f.write("cmake_minimum_required(VERSION 2.8.12)\n")
+  f.write("cmake_minimum_required(VERSION 3.10.2)\n")
   f.write("""
     if(WIN32)
     set(HPMPC_FLAGS -DOS_WINDOWS)

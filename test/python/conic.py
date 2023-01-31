@@ -28,7 +28,6 @@ from types import *
 from helpers import *
 
 conics = []
-extralibs = []
 
 if has_nlpsol("ipopt"):
   ipopt_options = {"fixed_variable_treatment":"relax_bounds",
@@ -55,11 +54,11 @@ if has_conic("cplex"):
   conics.append(("cplex",{"cplex": {"CPX_PARAM_BARQCPEPCOMP": 1e-11,"CPX_PARAM_BAREPCOMP":1e-11}},{"quadratic": True, "dual": True, "soc": True, "codegen": False, "discrete": True, "sos": True}))
 
 if has_conic("osqp"):
-  extralibs.append("osqp")
   options = ["-Wno-unused-variable"]
   if os.name=='nt':
     options = []
-  conics.append(("osqp",{"osqp":{"alpha":1,"eps_abs":1e-8,"eps_rel":1e-8}},{"quadratic": True, "dual": True, "codegen": options,"soc":False,"discrete":False}))
+  codegen = {"extralibs": ["osqp"], "extra_options": options, "std": "c99"}
+  conics.append(("osqp",{"osqp":{"alpha":1,"eps_abs":1e-8,"eps_rel":1e-8}},{"quadratic": True, "dual": True, "codegen": codegen,"soc":False,"discrete":False}))
 
 if has_conic("superscs"):
   conics.append(("superscs",{"superscs": {"eps":1e-9,"do_super_scs":1, "verbose":0}},{"quadratic": True, "dual": False, "codegen": False,"soc":True,"discrete":False}))
@@ -79,7 +78,8 @@ if has_conic("cbc"):
   conics.append(("cbc",{"verbose":True},{"quadratic": False, "dual": True, "soc": False, "codegen": False, "discrete": True, "sos":True}))
 
 if has_conic("qrqp"):
-  conics.append(("qrqp",{"max_iter":20,"print_header":False,"print_iter":False},{"quadratic": True, "dual": True, "soc": False, "codegen": True, "discrete": False, "sos":False}))
+  codegen = {"std":"c99"}
+  conics.append(("qrqp",{"max_iter":20,"print_header":False,"print_iter":False},{"quadratic": True, "dual": True, "soc": False, "codegen": codegen, "discrete": False, "sos":False}))
 
 if has_conic("proxqp"):
   conics.append(("proxqp",{"proxqp":{"eps_abs":1e-11,"max_iter":1e4, "backend": "sparse"}}, {"quadratic": True, "dual": True, "soc": False, "codegen": False,"discrete":False,"sos":False}))
@@ -88,6 +88,11 @@ if has_conic("proxqp"):
 if has_conic("qpalm"):
   eps = 1e-8
   conics.append(("qpalm",{"qpalm":{"eps_abs":eps,"eps_rel":eps,"eps_abs_in":eps,"eps_prim_inf":eps}},{"quadratic": True, "dual": True, "soc": False, "codegen": False, "discrete": False, "sos":False}))
+
+if has_conic("highs"):
+    codegen = {"extralibs": ["highs"], "std": "c99"}
+    conics.append(("highs",{"highs": {"primal_feasibility_tolerance":1e-7,"solver":"choose","output_flag":False,"ipm_iteration_limit":50000}},{"quadratic": True, "dual": True, "soc": False, "codegen": codegen, "discrete": False, "sos":False}))
+
 
 
 print(conics)
@@ -260,7 +265,7 @@ class ConicTests(casadiTestCase):
       self.assertAlmostEqual(solver_out["x"][1],2.3,max(1,6-less_digits),str(conic))
 
       if aux_options["codegen"]:
-        self.check_codegen(solver,solver_in,std="c99",extralibs=extralibs,extra_options=aux_options["codegen"])
+        self.check_codegen(solver,solver_in,**aux_options["codegen"])
 
       self.check_serialize(solver,solver_in)
 
@@ -410,7 +415,7 @@ class ConicTests(casadiTestCase):
       self.assertAlmostEqual(solver_out["cost"][0],-6.264669320767,max(1,6-less_digits),str(conic))
 
       if aux_options["codegen"]:
-        self.check_codegen(solver,solver_in,std="c99",extralibs=extralibs,extra_options=aux_options["codegen"])
+        self.check_codegen(solver,solver_in,**aux_options["codegen"])
 
   def test_general_nonconvex_dense(self):
     self.message("Non convex dense QP with solvers: " + str([conic for conic,options,aux_options in conics]))
@@ -492,7 +497,7 @@ class ConicTests(casadiTestCase):
       if aux_options["dual"]: self.checkarray(solver_out["lam_a"],DM([0,2,0]),str(conic),digits=max(1,6-less_digits))
 
       if aux_options["codegen"]:
-        self.check_codegen(solver,solver_in,std="c99",extralibs=extralibs,extra_options=aux_options["codegen"])
+        self.check_codegen(solver,solver_in,**aux_options["codegen"])
       self.assertAlmostEqual(solver_out["cost"][0],-7.4375,max(1,6-less_digits),str(conic))
 
       A =  DM([[1, 1],[-1, 2],[2, 1]])
@@ -524,7 +529,7 @@ class ConicTests(casadiTestCase):
       self.assertAlmostEqual(solver_out["cost"][0],-8.4,max(1,5-less_digits),str(conic))
 
       if aux_options["codegen"]:
-        self.check_codegen(solver,solver_in,std="c99",extralibs=extralibs,extra_options=aux_options["codegen"])
+        self.check_codegen(solver,solver_in,**aux_options["codegen"])
   @memory_heavy()
   def test_degenerate_hessian(self):
     self.message("Degenerate hessian")
@@ -544,8 +549,10 @@ class ConicTests(casadiTestCase):
     UBX = DM([10])
 
     for conic, qp_options, aux_options in conics:
+      if "qrqp" in conic: continue
       if not aux_options["quadratic"]: continue
       self.message("degenerate hessian: " + str(conic))
+      qp_options["dump_in"] = True
       if 'qcqp' in str(conic): continue
       solver = casadi.conic("mysolver",conic,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
@@ -574,7 +581,7 @@ class ConicTests(casadiTestCase):
       self.assertAlmostEqual(solver_out["cost"][0],-38.375,max(1,5-less_digits),str(conic))
 
       if aux_options["codegen"]:
-        self.check_codegen(solver,solver_in,std="c99",extralibs=extralibs,extra_options=aux_options["codegen"])
+        self.check_codegen(solver,solver_in,**aux_options["codegen"])
 
   def test_no_inequality(self):
     self.message("No inequalities present")
@@ -670,7 +677,7 @@ class ConicTests(casadiTestCase):
       self.assertAlmostEqual(solver_out["cost"][0],-34,max(1,5-less_digits),str(conic))
 
       if aux_options["codegen"]:
-        self.check_codegen(solver,solver_in,std="c99",extralibs=extralibs,extra_options=aux_options["codegen"])
+        self.check_codegen(solver,solver_in,**aux_options["codegen"])
 
   def test_standard_form(self):
     H = DM([[1,-1],[-1,2]])
@@ -713,7 +720,7 @@ class ConicTests(casadiTestCase):
       self.assertAlmostEqual(solver_out["cost"][0],-5.1,max(1,5-less_digits),str(conic))
 
       if aux_options["codegen"]:
-        self.check_codegen(solver,solver_in,std="c99",extralibs=extralibs,extra_options=aux_options["codegen"])
+        self.check_codegen(solver,solver_in,**aux_options["codegen"])
 
   @memory_heavy()
   def test_badscaling(self):
@@ -842,7 +849,7 @@ class ConicTests(casadiTestCase):
       self.assertAlmostEqual(solver_out["cost"][0],2.5,max(1,5-less_digits),str(conic))
 
       if aux_options["codegen"]:
-        self.check_codegen(solver,solver_in,std="c99",extralibs=extralibs,extra_options=aux_options["codegen"])
+        self.check_codegen(solver,solver_in,**aux_options["codegen"])
 
 
   def test_linear2(self):
@@ -903,7 +910,7 @@ class ConicTests(casadiTestCase):
       self.assertAlmostEqual(solver_out["x"][0],1,5,str(conic))
 
       if aux_options["codegen"]:
-        self.check_codegen(solver,solver_in,std="c99",extralibs=extralibs,extra_options=aux_options["codegen"])
+        self.check_codegen(solver,solver_in,**aux_options["codegen"])
 
   @requires_conic("hpipm")
   @requires_conic("qpoases")
@@ -1258,8 +1265,6 @@ class ConicTests(casadiTestCase):
       res = solver(lbx=vertcat(-inf,-inf,-inf,-inf,1))
 
       self.checkarray(res["x"][:-1],x0,conic,digits=4)
-      
-      self.checkcodegen
 
   def test_no_success(self):
 

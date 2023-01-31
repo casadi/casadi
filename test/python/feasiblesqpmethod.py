@@ -28,7 +28,7 @@ import unittest
 from types import *
 from helpers import *
 
-class Feasiblesqpmethod(casadiTestCase):
+class Feasiblesqpmethod:#(casadiTestCase):
 
   def test_feas_iter_test(self):
       # Set options

@@ -298,7 +298,8 @@ def SX_from_array(m, check_only=True):
   if isinstance(m, np.ndarray):
     if len(m.shape)>2:
       return False
-    if m.dtype!=np.object: return None
+    np_object=np.object if hasattr(np,'object') else object
+    if m.dtype!=np_object: return None
     shape = m.shape + (1, 1)
     nrow, ncol = shape[0], shape[1]
     return (nrow,ncol,m.flat)
@@ -3598,6 +3599,12 @@ DECL M casadi_bspline(const M& x,
 DECL M casadi_convexify(const M& H,
         const Dict& opts = Dict()) {
   return convexify(H, opts);
+}
+DECL M casadi_stop_diff(const M& expr, casadi_int order) {
+  return stop_diff(expr, order);
+}
+DECL M casadi_stop_diff(const M& expr, const M& var, casadi_int order) {
+  return stop_diff(expr, var, order);
 }
 
 #endif

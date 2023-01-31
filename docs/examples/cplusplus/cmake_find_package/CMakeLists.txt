@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.6)
+cmake_minimum_required(VERSION 3.10.2)
 
 # export CMAKE_PREFIX_PATH=../casadi_install/casadi/cmake/
 find_package(casadi)

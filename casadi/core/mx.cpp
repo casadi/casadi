@@ -47,7 +47,6 @@ throw CasadiException("Error in MX::" FNAME " at " + CASADI_WHERE + ":\n"\
 throw CasadiException("Error in MX::" FNAME " for node of type " \
   + this->class_name() + " at " + CASADI_WHERE + ":\n" + std::string(WHAT));
 
-using namespace std;
 namespace casadi {
 
   template class GenericMatrix< MX >;
@@ -121,7 +120,7 @@ namespace casadi {
   }
 
   std::vector<MX> MX::createMultipleOutput(MXNode* node) {
-    casadi_assert_dev(dynamic_cast<MultipleOutput*>(node)!=nullptr);
+    casadi_assert_dev(dynamic_cast<MultipleOutput*>(node) != nullptr);
     MX x =  MX::create(node);
     std::vector<MX> ret(x->nout());
     for (casadi_int i=0; i<ret.size(); ++i) {
@@ -557,7 +556,7 @@ namespace casadi {
   }
 
   MX MX::inf(const Sparsity& sp) {
-    return create(ConstantMX::create(sp, numeric_limits<double>::infinity()));
+    return create(ConstantMX::create(sp, std::numeric_limits<double>::infinity()));
   }
 
   MX MX::nan(casadi_int nrow, casadi_int ncol) {
@@ -569,7 +568,7 @@ namespace casadi {
   }
 
   MX MX::nan(const Sparsity& sp) {
-    return create(ConstantMX::create(sp, numeric_limits<double>::quiet_NaN()));
+    return create(ConstantMX::create(sp, std::numeric_limits<double>::quiet_NaN()));
   }
 
   MX MX::eye(casadi_int n) {
@@ -976,25 +975,25 @@ namespace casadi {
   }
 
   // Helper function
-  bool has_empty(const vector<MX>& x, bool both=false) {
+  bool has_empty(const std::vector<MX>& x, bool both=false) {
     for (auto&& i : x) {
       if (i.is_empty(both)) return true;
     }
     return false;
   }
 
-  vector<MX> trim_empty(const vector<MX>& x, bool both=false) {
-    vector<MX> ret;
+  std::vector<MX> trim_empty(const std::vector<MX>& x, bool both=false) {
+    std::vector<MX> ret;
     for (auto&& i : x) {
       if (!i.is_empty(both)) ret.push_back(i);
     }
     return ret;
   }
 
-  MX MX::horzcat(const vector<MX>& x) {
+  MX MX::horzcat(const std::vector<MX>& x) {
     // Check dimensions
     if (x.size()>1) {
-      vector<MX> ne = trim_empty(x, true);
+      std::vector<MX> ne = trim_empty(x, true);
       for (casadi_int i=0;i<ne.size();i++) {
         casadi_assert(ne[i].size1()==ne[0].size1(),
           "horzcat dimension mismatch  x[" + str(i) + "]:" + ne[i].dim() +
@@ -1027,7 +1026,7 @@ namespace casadi {
     }
   }
 
-  MX MX::diagcat(const vector<MX>& x) {
+  MX MX::diagcat(const std::vector<MX>& x) {
     if (x.empty()) {
       return MX();
     } else if (x.size()==1) {
@@ -1052,10 +1051,10 @@ namespace casadi {
     }
   }
 
-  MX MX::vertcat(const vector<MX>& x) {
+  MX MX::vertcat(const std::vector<MX>& x) {
     // Check dimensions
     if (x.size()>1) {
-      vector<MX> ne = trim_empty(x, true);
+      std::vector<MX> ne = trim_empty(x, true);
       for (casadi_int i=0;i<ne.size();i++) {
         casadi_assert(ne[i].size2()==ne[0].size2(),
           "vertcat dimension mismatch  x[" + str(i) + "]:" + ne[i].dim() +
@@ -1085,8 +1084,8 @@ namespace casadi {
       }
     } else if (!x.front().is_column()) {
       // Vertcat operation only supports vectors, rewrite using horzcat
-      vector<MX> xT = x;
-      for (vector<MX>::iterator i=xT.begin(); i!=xT.end(); ++i) *i = i->T();
+      std::vector<MX> xT = x;
+      for (std::vector<MX>::iterator i=xT.begin(); i!=xT.end(); ++i) *i = i->T();
       return horzcat(xT).T();
     } else {
       return x.front()->get_vertcat(x);
@@ -1102,9 +1101,9 @@ namespace casadi {
 
     // Trivial return if possible
     if (offset.size()==1) {
-      return vector<MX>(0);
+      return std::vector<MX>(0);
     } else if (offset.size()==2) {
-      return vector<MX>(1, x);
+      return std::vector<MX>(1, x);
     } else {
       return x->get_horzsplit(offset);
     }
@@ -1137,9 +1136,9 @@ namespace casadi {
 
       // Trivial return if possible
       if (offset.size()==1) {
-        return vector<MX>();
+        return std::vector<MX>();
       } else if (offset.size()==2) {
-        return vector<MX>(1, x);
+        return std::vector<MX>(1, x);
       } else {
         return x->get_vertsplit(offset);
       }
@@ -1228,7 +1227,7 @@ namespace casadi {
   MX MX::if_else(const MX &cond, const MX &x_true, const MX &x_false, bool short_circuit) {
     if (short_circuit) {
       // Get symbolic primitives
-      vector<MX> arg = symvar(veccat(vector<MX>{x_true, x_false}));
+      std::vector<MX> arg = symvar(veccat(std::vector<MX>{x_true, x_false}));
 
       // Form functions for cases
       Function f_true("f_true", arg, {x_true});
@@ -1238,7 +1237,7 @@ namespace casadi {
       Function sw = Function::if_else("switch", f_true, f_false);
 
       // Call the Switch
-      vector<MX> sw_arg;
+      std::vector<MX> sw_arg;
       sw_arg.push_back(cond);
       sw_arg.insert(sw_arg.end(), arg.begin(), arg.end());
       return sw(sw_arg).at(0);
@@ -1256,9 +1255,9 @@ namespace casadi {
       arg = symvar(veccat(arg));
 
       // Form functions for cases
-      vector<Function> f(x.size());
+      std::vector<Function> f(x.size());
       for (casadi_int k=0; k<x.size(); ++k) {
-        stringstream ss;
+        std::stringstream ss;
         ss << "f_case" << k;
         f[k] = Function(ss.str(), arg, {x[k]});
       }
@@ -1268,7 +1267,7 @@ namespace casadi {
       Function sw = Function::conditional("switch", f, f_default);
 
       // Call the Switch
-      vector<MX> sw_arg;
+      std::vector<MX> sw_arg;
       sw_arg.push_back(ind);
       sw_arg.insert(sw_arg.end(), arg.begin(), arg.end());
       return sw(sw_arg).at(0);
@@ -1328,7 +1327,7 @@ namespace casadi {
   }
 
   casadi_int MX::n_nodes(const MX& x) {
-    Function f("tmp_n_nodes", vector<MX>{}, {x}, Dict{{"max_io", 0}, {"cse", false}});
+    Function f("tmp_n_nodes", std::vector<MX>{}, {x}, Dict{{"max_io", 0}, {"cse", false}});
     return f.n_nodes();
   }
 
@@ -1377,7 +1376,7 @@ namespace casadi {
   }
 
   MX MX::substitute(const MX& ex, const MX& v, const MX& vdef) {
-    return substitute(vector<MX>{ex}, vector<MX>{v}, vector<MX>{vdef}).front();
+    return substitute(std::vector<MX>{ex}, std::vector<MX>{v}, std::vector<MX>{vdef}).front();
   }
 
   std::vector<MX> MX::substitute(const std::vector<MX> &ex, const std::vector<MX> &v,
@@ -1415,18 +1414,18 @@ namespace casadi {
       + str(expr.size()) + " <-> " + str(exprs.size()) + ".");
 
     // Sort the expression
-    Function f("tmp_graph_substitute", vector<MX>{}, ex, Dict{{"max_io", 0}});
+    Function f("tmp_graph_substitute", std::vector<MX>{}, ex, Dict{{"max_io", 0}});
     MXFunction *ff = f.get<MXFunction>();
 
     // Get references to the internal data structures
-    const vector<MXAlgEl>& algorithm = ff->algorithm_;
-    vector<MX> swork(ff->workloc_.size()-1);
+    const std::vector<MXAlgEl>& algorithm = ff->algorithm_;
+    std::vector<MX> swork(ff->workloc_.size()-1);
 
     // A boolean vector indicated whoch nodes are tainted by substitutions
-    vector<bool> tainted(swork.size());
+    std::vector<bool> tainted(swork.size());
 
-    // Temporary stringstream
-    stringstream ss;
+    // Temporary std::stringstream
+    std::stringstream ss;
 
     // Construct lookup table for expressions
     std::map<const MXNode*, casadi_int> expr_lookup;
@@ -1438,8 +1437,8 @@ namespace casadi {
     std::vector<bool> expr_found(expr.size());
 
     // Allocate output vector
-    vector<MX> f_out(f.n_out());
-    vector<MX> oarg, ores;
+    std::vector<MX> f_out(f.n_out());
+    std::vector<MX> oarg, ores;
 
     // expr_lookup iterator
     std::map<const MXNode*, casadi_int>::const_iterator it_lookup;
@@ -1525,9 +1524,9 @@ namespace casadi {
       casadi_int v_ind = 0;
       for (auto&& op : opts) {
         if (op.first == "prefix") {
-          v_prefix = string(op.second);
+          v_prefix = std::string(op.second);
         } else if (op.first == "suffix") {
-          v_suffix = string(op.second);
+          v_suffix = std::string(op.second);
         } else if (op.first == "lift_shared") {
           lift_shared = op.second;
         } else if (op.first == "lift_calls") {
@@ -1535,21 +1534,21 @@ namespace casadi {
         } else if (op.first == "offset") {
           v_ind = op.second;
         } else {
-          casadi_error("No such option: " + string(op.first));
+          casadi_error("No such option: " + std::string(op.first));
         }
       }
       // Sort the expression
-      Function f("tmp_extract", vector<MX>{}, ex, Dict{{"max_io", 0}});
+      Function f("tmp_extract", std::vector<MX>{}, ex, Dict{{"max_io", 0}});
       auto *ff = f.get<MXFunction>();
       // Get references to the internal data structures
-      const vector<MXAlgEl>& algorithm = ff->algorithm_;
-      vector<MX> work(ff->workloc_.size()-1);
+      const std::vector<MXAlgEl>& algorithm = ff->algorithm_;
+      std::vector<MX> work(ff->workloc_.size()-1);
       // Count how many times an expression has been used
-      vector<casadi_int> usecount(work.size(), 0);
+      std::vector<casadi_int> usecount(work.size(), 0);
       // Remember the origin of every calculation
-      vector<pair<casadi_int, casadi_int> > origin(work.size(), make_pair(-1, -1));
+      std::vector<std::pair<casadi_int, casadi_int> > origin(work.size(), std::make_pair(-1, -1));
       // Which evaluations to replace
-      vector<pair<casadi_int, casadi_int> > replace;
+      std::vector<std::pair<casadi_int, casadi_int> > replace;
       // Evaluate the algorithm to identify which evaluations to replace
       casadi_int k=0;
       for (auto it=algorithm.begin(); it<algorithm.end(); ++it, ++k) {
@@ -1591,7 +1590,7 @@ namespace casadi {
           for (casadi_int c=0; c<it->res.size(); ++c) {
             if (it->res[c]>=0) {
               work[it->res[c]] = it->data.get_output(c);
-              origin[it->res[c]] = make_pair(k, c);
+              origin[it->res[c]] = std::make_pair(k, c);
               if (lift_calls && it->op == OP_CALL) {
                 // If function call, replace right away
                 replace.push_back(origin.at(it->res[c]));
@@ -1613,9 +1612,9 @@ namespace casadi {
       if (replace.empty()) return;
       // Sort the elements to be replaced in the order of appearence in the algorithm
       sort(replace.begin(), replace.end());
-      vector<pair<casadi_int, casadi_int> >::const_iterator replace_it=replace.begin();
+      std::vector<std::pair<casadi_int, casadi_int> >::const_iterator replace_it=replace.begin();
       // Arguments for calling the atomic operations
-      vector<MX> oarg, ores;
+      std::vector<MX> oarg, ores;
       // Evaluate the algorithm
       k = 0;
       for (auto it=algorithm.begin(); it<algorithm.end(); ++it, ++k) {
@@ -1740,7 +1739,7 @@ namespace casadi {
         } else if (op.first=="never_inline") {
           never_inline = op.second;
         } else {
-          casadi_error("No such option: " + string(op.first));
+          casadi_error("No such option: " + std::string(op.first));
         }
       }
       // Call internal function on a temporary object
@@ -1772,7 +1771,7 @@ namespace casadi {
         } else if (op.first=="never_inline") {
           never_inline = op.second;
         } else {
-          casadi_error("No such option: " + string(op.first));
+          casadi_error("No such option: " + std::string(op.first));
         }
       }
       // Call internal function on a temporary object
@@ -1810,12 +1809,12 @@ namespace casadi {
   }
 
   std::vector<MX> MX::symvar(const MX& x) {
-    Function f("f", vector<MX>{}, {x});
+    Function f("f", std::vector<MX>{}, {x});
     return f.free_mx();
   }
 
   MX MX::matrix_expand(const MX& e, const std::vector<MX> &boundary, const Dict &options) {
-    return matrix_expand(vector<MX>{e}, boundary, options).at(0);
+    return matrix_expand(std::vector<MX>{e}, boundary, options).at(0);
   }
 
   std::vector<MX> MX::matrix_expand(const std::vector<MX>& e,
@@ -1935,7 +1934,7 @@ namespace casadi {
     Function temp("tmp_depends_on", {arg}, {x}, Dict{{"max_io", 0}});
 
     // Perform a single dependency sweep
-    vector<bvec_t> t_in(arg.nnz(), 1), t_out(x.nnz());
+    std::vector<bvec_t> t_in(arg.nnz(), 1), t_out(x.nnz());
     temp({get_ptr(t_in)}, {get_ptr(t_out)});
 
     // Loop over results
@@ -2012,25 +2011,26 @@ namespace casadi {
     private:
       std::stringstream ss;
       // List of references to keep alive
-      vector<MX> ref;
+      std::vector<MX> ref;
       SerializingStream serializer;
   };
 
 
   std::vector<MX> MX::cse(const std::vector<MX>& e) {
     MX c = veccat(e);
-    Function f("f", std::vector<MX>{}, e, {{"live_variables", false}, {"max_io", 0}, {"cse", false}});
+    Function f("f", std::vector<MX>{}, e,
+      {{"live_variables", false}, {"max_io", 0}, {"cse", false}});
     MXFunction *ff = f.get<MXFunction>();
 
     // Symbolic work, non-differentiated
-    vector<MX> swork(ff->workloc_.size()-1);
+    std::vector<MX> swork(ff->workloc_.size()-1);
 
     // Allocate storage for split outputs
-    vector<vector<MX> > res_split(e.size());
+    std::vector<std::vector<MX> > res_split(e.size());
     for (casadi_int i=0; i<e.size(); ++i) res_split[i].resize(e[i].n_primitives());
 
-    vector<MX> arg1, res1;
-    vector<MX> res(e.size());
+    std::vector<MX> arg1, res1;
+    std::vector<MX> res(e.size());
 
     std::unordered_map<std::string, MX > cache;
     IncrementalSerializer s;
@@ -2083,6 +2083,76 @@ namespace casadi {
     for (casadi_int i=0; i<res.size(); ++i) res[i] = e[i].join_primitives(res_split[i]);
 
     return res;
+  }
+
+  MX MX::stop_diff(const MX& expr, casadi_int order) {
+    std::vector<MX> s = symvar(expr);
+    MX x = veccat(s);
+    Dict options;
+    options["never_inline"] = true;
+    if (order==1) {
+      options["is_diff_in"] = std::vector<bool>{false};
+      options["is_diff_out"] = std::vector<bool>{true};
+    } else if (order==2) {
+      options["forward_options"] = Dict{{"is_diff_in", std::vector<bool>{false, true, true} },
+        {"is_diff_out", std::vector<bool>{true}}};
+      options["reverse_options"] = Dict{{"is_diff_in", std::vector<bool>{false, true, true} },
+        {"is_diff_out", std::vector<bool>{true}}};
+      options["jacobian_options"] = Dict{{"is_diff_in", std::vector<bool>{false, true} },
+        {"is_diff_out", std::vector<bool>{false}}};
+    } else {
+      casadi_error("stop_diff: order must be 1 or 2, got " + str(order) + ".");
+    }
+
+    Function FS("FS", {x}, {expr}, {"x"}, {"z"}, options);
+    return FS(std::vector<MX>{x})[0];
+  }
+
+  MX MX::stop_diff(const MX& expr, const MX& var, casadi_int order) {
+    casadi_warning("stop_diff(expr, var, order) is not well tested.");
+    std::vector<MX> xv = symvar(var);
+    std::vector<MX> s = symvar(expr);
+    std::vector<MX> yv = difference(s, xv);
+
+    MX x = veccat(xv);
+    MX y = veccat(yv);
+
+    Dict options;
+    options["never_inline"] = true;
+    if (order==1) {
+      options["is_diff_in"] = std::vector<bool>{false, true};
+      options["is_diff_out"] = std::vector<bool>{true};
+    } else if (order==2) {
+      options["forward_options"] = Dict{{"is_diff_in",
+        std::vector<bool>{false, true, false, true, true} },
+        {"is_diff_out", std::vector<bool>{true}}};
+      options["reverse_options"] = Dict{{"is_diff_in",
+        std::vector<bool>{false, true, false, true}},
+        {"is_diff_out", std::vector<bool>{false, true}}};
+      options["jacobian_options"] = Dict{{"is_diff_in", std::vector<bool>{false, true, true}},
+        {"is_diff_out", std::vector<bool>{true}}};
+    } else {
+      casadi_error("stop_diff: order must be 1 or 2, got " + str(order) + ".");
+    }
+
+    Function FS("FS", {x, y}, {expr}, {"x", "y"}, {"z"}, options);
+    return FS(std::vector<MX>{x, y})[0];
+  }
+
+  std::vector<MX> difference(const std::vector<MX>& a, const std::vector<MX>& b) {
+    // Create a set of MXNodes from b
+    std::set<MXNode*> bs;
+    for (const auto& e : b) {
+      if (!e.is_null()) bs.insert(e.get());
+    }
+    std::vector<MX> ret;
+    for (auto&& e : a) {
+      // If the element is not in the set, add it to the return vector
+      if (bs.find(e.get())==bs.end()) {
+        ret.push_back(e);
+      }
+    }
+    return ret;
   }
 
   MX interpn_G(casadi_int i, // Dimension to interpolate along

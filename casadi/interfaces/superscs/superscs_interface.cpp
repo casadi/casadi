@@ -30,7 +30,6 @@
 #include <linsys/common.h>
 #include <cstring>
 
-using namespace std;
 namespace casadi {
 
   extern "C"
@@ -466,7 +465,7 @@ namespace casadi {
 
     casadi_int status = scs(&m->data, &m->cone, m->sol, m->info);
 
-    m->success = SCS_SOLVED==status;
+    m->d_qp.success = SCS_SOLVED==status;
 
     casadi_copy(m->sol->x, nx_, res[CONIC_X]);
     if (res[CONIC_COST])

@@ -27,7 +27,6 @@
 #include "casadi/core/casadi_misc.hpp"
 #include "casadi/core/nlp_tools.hpp"
 
-using namespace std;
 namespace casadi {
 
   extern "C"
@@ -461,10 +460,10 @@ namespace casadi {
         " (" << optimstatus <<")" << std::endl;
 
       m->return_status = optimstatus;
-      m->success = optimstatus==GRB_OPTIMAL;
+      m->d_qp.success = optimstatus==GRB_OPTIMAL;
       if (optimstatus==GRB_ITERATION_LIMIT || optimstatus==GRB_TIME_LIMIT
           || optimstatus==GRB_NODE_LIMIT || optimstatus==GRB_SOLUTION_LIMIT)
-        m->unified_return_status = SOLVER_RET_LIMITED;
+        m->d_qp.unified_return_status = SOLVER_RET_LIMITED;
 
       // Get the objective value, if requested
       if (cost) {
@@ -475,11 +474,11 @@ namespace casadi {
       // Get the optimal solution, if requested
       if (x) {
         flag = GRBgetdblattrarray(model, GRB_DBL_ATTR_X, 0, nx_, x);
-        if (flag) fill_n(x, nx_, casadi::nan);
+        if (flag) std::fill_n(x, nx_, casadi::nan);
       }
 
-      if (lam_x) fill_n(lam_x, nx_, casadi::nan);
-      if (lam_a) fill_n(lam_a, na_, casadi::nan);
+      if (lam_x) std::fill_n(lam_x, nx_, casadi::nan);
+      if (lam_a) std::fill_n(lam_a, na_, casadi::nan);
 
       // Free memory
       GRBfreemodel(model);

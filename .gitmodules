@@ -7,6 +7,3 @@
 [submodule "external_packages/superscs"]
 	path = external_packages/superscs
 	url = https://github.com/jgillis/scs.git
-[submodule "external_packages/proxqp/proxqp"]
-	path = external_packages/proxqp/proxqp
-	url = git@github.com:Simple-Robotics/proxsuite.git

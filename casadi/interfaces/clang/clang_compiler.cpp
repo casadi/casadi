@@ -37,7 +37,6 @@
 #include <dlfcn.h>
 #endif // _WIN32
 
-using namespace std;
 namespace casadi {
 
   extern "C"
@@ -98,7 +97,7 @@ namespace casadi {
     }
 
     // Arguments to pass to the clang frontend
-    vector<const char *> args(1, name_.c_str());
+    std::vector<const char *> args(1, name_.c_str());
     for (auto&& f : flags_) {
       args.push_back(f.c_str());
     }
@@ -176,7 +175,8 @@ namespace casadi {
     compInst.getHeaderSearchOpts().ResourceDir = resourcedir;
 
     // Read the system includes (C or C++)
-    vector<pair<string, bool> > system_include = getIncludes("system_includes.txt", jit_include);
+    std::vector<std::pair<std::string, bool> >
+    system_include = getIncludes("system_includes.txt", jit_include);
     for (auto i=system_include.begin(); i!=system_include.end(); ++i) {
       compInst.getHeaderSearchOpts().AddPath(i->first,
                                              clang::frontend::System, i->second, false);
@@ -261,7 +261,7 @@ namespace casadi {
 #endif // _WIN32
 
     // Return value
-    vector<pair<string, bool> > ret;
+    std::vector<std::pair<std::string, bool> > ret;
 
     // Read line-by-line
     std::ifstream setup_file(path + sep + file);
@@ -272,7 +272,7 @@ namespace casadi {
 
       // Check if framework
       size_t loc = line.find(" (framework directory)");
-      bool isframework = loc != string::npos;
+      bool isframework = loc != std::string::npos;
       if (isframework) {
         // Truncate path
         line = line.substr(0, loc);
@@ -287,10 +287,10 @@ namespace casadi {
 
       if (relative) {
         // Relative path, make absolute
-        ret.push_back(make_pair(path + sep + line, isframework));
+        ret.push_back(std::make_pair(path + sep + line, isframework));
       } else {
         // Absolute path
-        ret.push_back(make_pair(line, isframework));
+        ret.push_back(std::make_pair(line, isframework));
       }
     }
 

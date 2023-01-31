@@ -25,7 +25,6 @@
 
 #include "kinsol_interface.hpp"
 
-using namespace std;
 namespace casadi {
 
   extern "C"
@@ -142,11 +141,11 @@ namespace casadi {
     Rootfinder::init(opts);
 
     // Default (temporary) options
-    string strategy = "none";
-    vector<double> u_scale;
-    vector<double> f_scale;
-    string linear_solver_type = "dense";
-    string iterative_solver = "gmres";
+    std::string strategy = "none";
+    std::vector<double> u_scale;
+    std::vector<double> f_scale;
+    std::string linear_solver_type = "dense";
+    std::string iterative_solver = "gmres";
 
     // Read options
     for (auto&& op : opts) {
@@ -198,7 +197,7 @@ namespace casadi {
     // Set scaling factors on variables
     if (!u_scale.empty()) {
       casadi_assert_dev(u_scale.size()==NV_LENGTH_S(u_scale_));
-      copy(u_scale.begin(), u_scale.end(), NV_DATA_S(u_scale_));
+      std::copy(u_scale.begin(), u_scale.end(), NV_DATA_S(u_scale_));
     } else {
       N_VConst(1.0, u_scale_);
     }
@@ -206,7 +205,7 @@ namespace casadi {
     // Set scaling factors on equations
     if (!f_scale.empty()) {
       casadi_assert_dev(f_scale.size()==NV_LENGTH_S(f_scale_));
-      copy(f_scale.begin(), f_scale.end(), NV_DATA_S(f_scale_));
+      std::copy(f_scale.begin(), f_scale.end(), NV_DATA_S(f_scale_));
     } else {
       N_VConst(1.0, f_scale_);
     }
@@ -261,9 +260,9 @@ namespace casadi {
    }
 
   void KinsolInterface::get_jtimes() {
-    vector<string> jtimes_in = oracle_.name_in();
+    std::vector<std::string> jtimes_in = oracle_.name_in();
     jtimes_in.push_back("fwd:" + oracle_.name_in(iin_));
-    vector<string> jtimes_out = {"fwd:" + oracle_.name_out(iout_)};
+    std::vector<std::string> jtimes_out = {"fwd:" + oracle_.name_out(iout_)};
     jtimes_ = oracle_.factory("jtimes", jtimes_in, jtimes_out);
     alloc(jtimes_);
   }
@@ -291,9 +290,9 @@ namespace casadi {
     // Evaluate auxiliary outputs
     if (n_out_>0) {
       // Evaluate f_
-      copy_n(m->iarg, n_in_, m->arg);
+      std::copy_n(m->iarg, n_in_, m->arg);
       m->arg[iin_] = NV_DATA_S(m->u);
-      copy_n(m->ires, n_out_, m->res);
+      std::copy_n(m->ires, n_out_, m->res);
       m->res[iout_] = nullptr;
       oracle_(m->arg, m->res, m->iw, m->w, 0);
     }
@@ -302,9 +301,9 @@ namespace casadi {
 
   void KinsolInterface::func(KinsolMemory& m, N_Vector u, N_Vector fval) const {
     // Evaluate f_
-    copy_n(m.iarg, n_in_, m.arg);
+    std::copy_n(m.iarg, n_in_, m.arg);
     m.arg[iin_] = NV_DATA_S(u);
-    fill_n(m.res, n_out_, nullptr);
+    std::fill_n(m.res, n_out_, nullptr);
     m.res[iout_] = NV_DATA_S(fval);
     oracle_(m.arg, m.res, m.iw, m.w, 0);
 
@@ -316,9 +315,9 @@ namespace casadi {
           "Nonzero " + str(k) + " is not-a-number");
         casadi_assert(!isinf(fdata[k]),
           "Nonzero " + str(k) + " is infinite");
-      } catch(exception& ex) {
-        stringstream ss;
-        ss << ex.what() << endl;
+      } catch(std::exception& ex) {
+        std::stringstream ss;
+        ss << ex.what() << std::endl;
         if (verbose_) {
           uout() << "u = ";
           N_VPrint_Serial(u);
@@ -335,8 +334,8 @@ namespace casadi {
       auto this_ = static_cast<KinsolMemory*>(user_data);
       this_->self.func(*this_, u, fval);
       return 0;
-    } catch(exception& e) {
-      uerr() << "func failed: " << e.what() << endl;
+    } catch(std::exception& e) {
+      uerr() << "func failed: " << e.what() << std::endl;
       return 1;
     }
   }
@@ -348,8 +347,8 @@ namespace casadi {
       auto this_ = static_cast<KinsolMemory*>(user_data);
       this_->self.djac(*this_, N, u, fu, J, tmp1, tmp2);
       return 0;
-    } catch(exception& e) {
-      uerr() << "djac failed: " << e.what() << endl;;
+    } catch(std::exception& e) {
+      uerr() << "djac failed: " << e.what() << std::endl;;
       return 1;
     }
   }
@@ -357,9 +356,9 @@ namespace casadi {
   void KinsolInterface::djac(KinsolMemory& m, long N, N_Vector u, N_Vector fu, DlsMat J,
                           N_Vector tmp1, N_Vector tmp2) const {
     // Evaluate jac_
-    copy_n(m.iarg, n_in_, m.arg);
+    std::copy_n(m.iarg, n_in_, m.arg);
     m.arg[iin_] = NV_DATA_S(u);
-    fill_n(m.res, n_out_+1, nullptr);
+    std::fill_n(m.res, n_out_+1, nullptr);
     m.res[0] = m.jac;
     calc_function(&m, "jac_f_z");
 
@@ -389,8 +388,8 @@ namespace casadi {
       auto this_ = static_cast<KinsolMemory*>(user_data);
       this_->self.bjac(*this_, N, mupper, mlower, u, fu, J, tmp1, tmp2);
       return 0;
-    } catch(exception& e) {
-      uerr() << "bjac failed: " << e.what() << endl;;
+    } catch(std::exception& e) {
+      uerr() << "bjac failed: " << e.what() << std::endl;;
       return 1;
     }
   }
@@ -398,9 +397,9 @@ namespace casadi {
   void KinsolInterface::bjac(KinsolMemory& m, long N, long mupper, long mlower, N_Vector u,
                           N_Vector fu, DlsMat J, N_Vector tmp1, N_Vector tmp2) const {
     // Evaluate jac_
-    copy_n(m.iarg, n_in_, m.arg);
+    std::copy_n(m.iarg, n_in_, m.arg);
     m.arg[iin_] = NV_DATA_S(u);
-    fill_n(m.res, n_out_+1, nullptr);
+    std::fill_n(m.res, n_out_+1, nullptr);
     m.res[0] = m.jac;
     calc_function(&m, "jac_f_z");
 
@@ -431,8 +430,8 @@ namespace casadi {
       auto this_ = static_cast<KinsolMemory*>(user_data);
       this_->self.jtimes(*this_, v, Jv, u, new_u);
       return 0;
-    } catch(exception& e) {
-      uerr() << "jtimes failed: " << e.what() << endl;;
+    } catch(std::exception& e) {
+      uerr() << "jtimes failed: " << e.what() << std::endl;;
       return 1;
     }
   }
@@ -440,7 +439,7 @@ namespace casadi {
   void KinsolInterface::jtimes(KinsolMemory& m, N_Vector v, N_Vector Jv,
                             N_Vector u, int* new_u) const {
     // Evaluate f_fwd_
-    copy_n(m.iarg, n_in_, m.arg);
+    std::copy_n(m.iarg, n_in_, m.arg);
     m.arg[iin_] = NV_DATA_S(u);
     m.arg[n_in_] = NV_DATA_S(v);
     m.res[0] = NV_DATA_S(Jv);
@@ -455,8 +454,8 @@ namespace casadi {
       auto this_ = static_cast<KinsolMemory*>(user_data);
       this_->self.psetup(*this_, u, uscale, fval, fscale, tmp1, tmp2);
       return 0;
-    } catch(exception& e) {
-      uerr() << "psetup failed: " << e.what() << endl;;
+    } catch(std::exception& e) {
+      uerr() << "psetup failed: " << e.what() << std::endl;;
       return 1;
     }
   }
@@ -465,9 +464,9 @@ namespace casadi {
   psetup(KinsolMemory& m, N_Vector u, N_Vector uscale, N_Vector fval,
          N_Vector fscale, N_Vector tmp1, N_Vector tmp2) const {
     // Evaluate jac_
-    copy_n(m.iarg, n_in_, m.arg);
+    std::copy_n(m.iarg, n_in_, m.arg);
     m.arg[iin_] = NV_DATA_S(u);
-    fill_n(m.res, n_out_+1, nullptr);
+    std::fill_n(m.res, n_out_+1, nullptr);
     m.res[0] = m.jac;
     if (calc_function(&m, "jac_f_z")) casadi_error("Jacobian calculation failed");
 
@@ -487,8 +486,8 @@ namespace casadi {
       auto this_ = static_cast<KinsolMemory*>(user_data);
       this_->self.psolve(*this_, u, uscale, fval, fscale, v, tmp);
       return 0;
-    } catch(exception& e) {
-      uerr() << "psolve failed: " << e.what() << endl;;
+    } catch(std::exception& e) {
+      uerr() << "psolve failed: " << e.what() << std::endl;;
       return 1;
     }
   }
@@ -513,8 +512,8 @@ namespace casadi {
       s.psetup(*m, u, uscale, fval, fscale, tmp1, tmp2);
 
       return 0;
-    } catch(exception& e) {
-      uerr() << "lsetup failed: " << e.what() << endl;;
+    } catch(std::exception& e) {
+      uerr() << "lsetup failed: " << e.what() << std::endl;;
       return -1;
     }
   }
@@ -546,8 +545,8 @@ namespace casadi {
       *sFdotJp = N_VDotProd(fval, b);
 
       return 0;
-    } catch(exception& e) {
-      uerr() << "lsolve failed: " << e.what() << endl;;
+    } catch(std::exception& e) {
+      uerr() << "lsolve failed: " << e.what() << std::endl;;
       return -1;
     }
   }
@@ -558,10 +557,10 @@ namespace casadi {
       auto m = to_mem(eh_data);
       auto& s = m->self;
       if (!s.disable_internal_warnings_) {
-        uerr() << msg << endl;
+        uerr() << msg << std::endl;
       }
-    } catch(exception& e) {
-      uerr() << "ehfun failed: " << e.what() << endl;
+    } catch(std::exception& e) {
+      uerr() << "ehfun failed: " << e.what() << std::endl;
     }
   }
 
@@ -569,13 +568,13 @@ namespace casadi {
     try {
       // auto m = to_mem(ih_data);
       // auto& s = m->self;
-      uout() << "[" << module << "] " << function << "\n   " << msg << endl;
-    } catch(exception& e) {
-      uout() << "ihfun failed: " << e.what() << endl;
+      uout() << "[" << module << "] " << function << "\n   " << msg << std::endl;
+    } catch(std::exception& e) {
+      uout() << "ihfun failed: " << e.what() << std::endl;
     }
   }
 
-  void KinsolInterface::kinsol_error(const string& module, int flag, bool fatal) const {
+  void KinsolInterface::kinsol_error(const std::string& module, int flag, bool fatal) const {
     // Get the error message
     const char *id, *msg;
     switch (flag) {
@@ -677,14 +676,14 @@ namespace casadi {
     }
 
     // Construct message
-    stringstream ss;
+    std::stringstream ss;
     if (msg==nullptr) {
       ss << "Unknown " << (fatal? "error" : "warning") <<" (" << flag << ")"
         " from module \"" << module << "\".";
     } else {
-      ss << "Module \"" << module << "\" returned flag \"" << id << "\"." << endl;
-      ss << "The description of this flag is: " << endl;
-      ss << "\"" << msg << "\"" << endl;
+      ss << "Module \"" << module << "\" returned flag \"" << id << "\"." << std::endl;
+      ss << "The description of this flag is: " << std::endl;
+      ss << "\"" << msg << "\"" << std::endl;
     }
     ss << "Consult KINSOL documentation for more information.";
     if (fatal) {
@@ -747,7 +746,7 @@ namespace casadi {
     // Set constraints
     if (!u_c_.empty()) {
       N_Vector domain  = N_VNew_Serial(n_);
-      copy(u_c_.begin(), u_c_.end(), NV_DATA_S(domain));
+      std::copy(u_c_.begin(), u_c_.end(), NV_DATA_S(domain));
 
       // Pass to KINSOL
       flag = KINSetConstraints(m->mem, domain);

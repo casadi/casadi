@@ -28,8 +28,13 @@
 #include "casadi/core/conic_impl.hpp"
 #include <casadi/interfaces/highs/casadi_conic_highs_export.h>
 
-#include "Highs.h"
+#include <Highs.h>
+#include "interfaces/highs_c_api.h"
 #include <string>
+
+namespace casadi {
+  #include "highs_runtime.hpp"
+}
 
 /** \defgroup plugin_Conic_highs Title
     \par
@@ -48,31 +53,8 @@
 namespace casadi {
 
   struct CASADI_CONIC_HIGHS_EXPORT HighsMemory : public ConicMemory {
-    /// Constructor
-    HighsMemory();
-
-    /// Destructor
-    ~HighsMemory();
-
-    std::vector<int> colinda, rowa, colindh, rowh, integrality;
-
-    int return_status;
-
-    int simplex_iteration_count;
-    int ipm_iteration_count;
-    int qp_iteration_count;
-    int crossover_iteration_count;
-    int primal_solution_status;
-    int dual_solution_status;
-    int basis_validity;
-    double mip_dual_bound;
-    double mip_gap;
-    int num_primal_infeasibilities;
-    double max_primal_infeasibility;
-    double sum_primal_infeasibilities;
-    int num_dual_infeasibilities;
-    double max_dual_infeasibility;
-    double sum_dual_infeasibilities;
+    // Problem data structure
+    casadi_highs_data<double> d;
 
   };
 
@@ -112,8 +94,26 @@ namespace casadi {
     const Options& get_options() const override { return options_;}
     ///@}
 
+    void set_highs_prob();
+    void set_highs_prob(CodeGenerator& g) const;
+
+    /** \brief Generate code for the function body */
+    void codegen_body(CodeGenerator& g) const override;
+
+    /** \brief Codegen decref for init_mem*/
+    void codegen_init_mem(CodeGenerator& g) const override;
+
+    /** \brief Codegen for free_mem */
+    void codegen_free_mem(CodeGenerator& g) const override;
+
+    /** \brief Thread-local memory object type */
+    std::string codegen_mem_type() const override { return "struct casadi_highs_data"; }
+
     // Initialize the solver
     void init(const Dict& opts) override;
+
+    // Initialize dependant read-only members of class
+    void init_dependent();
 
     /** \brief Create memory block */
     void* alloc_mem() const override { return new HighsMemory();}
@@ -122,7 +122,11 @@ namespace casadi {
     int init_mem(void* mem) const override;
 
     /** \brief Free memory block */
-    void free_mem(void *mem) const override { delete static_cast<HighsMemory*>(mem);}
+    void free_mem(void *mem) const override;
+
+    /** \brief Set the (persistent) work vectors */
+    void set_work(void* mem, const double**& arg, double**& res,
+                          casadi_int*& iw, double*& w) const override;
 
     /// Get all statistics
     Dict get_stats(void* mem) const override;
@@ -150,7 +154,18 @@ namespace casadi {
     explicit HighsInterface(DeserializingStream& s);
 
   private:
+
+    // Memory structure
+    casadi_highs_prob<double> p_;
+
     static std::list<std::string> param_bool;
+
+    std::vector<int> colinda_, rowa_;
+    std::vector<int> colindh_, rowh_;
+    std::vector<int> integrality_;
+
+    // Object to store options; distinct from actual solver object
+    Highs highs_;
 
   };
 } // end namespace casadi

@@ -26,7 +26,6 @@
 #include <casadi/casadi.hpp>
 
 using namespace casadi;
-using namespace std;
 /**
  *  Solve an NLP using codegen  
  *  Part 2: solution
@@ -49,11 +48,11 @@ int main(){
   auto res = solver(arg);
 
   // Print solution
-  cout << "-----" << endl;
-  cout << "objective at solution = " << res.at("f") << endl;
-  cout << "primal solution = " << res.at("x") << endl;
-  cout << "dual solution (x) = " << res.at("lam_x") << endl;
-  cout << "dual solution (g) = " << res.at("lam_g") << endl;
+  std::cout << "-----" << std::endl;
+  std::cout << "objective at solution = " << res.at("f") << std::endl;
+  std::cout << "primal solution = " << res.at("x") << std::endl;
+  std::cout << "dual solution (x) = " << res.at("lam_x") << std::endl;
+  std::cout << "dual solution (g) = " << res.at("lam_g") << std::endl;
   
   return 0;
 }

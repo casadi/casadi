@@ -568,7 +568,7 @@ std::string DaeBuilder::der(const std::string& name) const {
     size_t ind = find(name);
     // Differentiate
     ind = variable(ind).der;
-    casadi_assert(ind >= 0, "No derivative expression for " + name);
+    casadi_assert(ind != size_t(-1), "No derivative expression for " + name);
     // Return name
     return variable(ind).name;
   } catch (std::exception& e) {

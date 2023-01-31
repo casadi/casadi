@@ -26,9 +26,8 @@
 #include <numeric>
 #include <cstring>
 
-#include "hpipm_runtime_str.h"
+#include <hpipm_runtime_str.h>
 
-using namespace std;
 namespace casadi {
 
   extern "C"
@@ -484,13 +483,14 @@ namespace casadi {
   }
 
 
-  void codegen_unpack_block(CodeGenerator& g, const std::string& name, const std::vector<casadi_hpipm_block>& blocks) {
-      std::string n = "block_" + name + "[" + str(blocks.size()) + "]";
-      g.local(n, "static struct casadi_hpipm_block");
-      g << "p." << name << " = block_" + name + ";\n";
-      g << "casadi_hpipm_unpack_blocks(" << blocks.size()
-      << ", p." << name
-      << ", " << g.constant(hpipm_blocks_pack(blocks)) << ");\n";
+  void codegen_unpack_block(CodeGenerator& g, const std::string& name,
+      const std::vector<casadi_hpipm_block>& blocks) {
+    std::string n = "block_" + name + "[" + str(blocks.size()) + "]";
+    g.local(n, "static struct casadi_hpipm_block");
+    g << "p." << name << " = block_" + name + ";\n";
+    g << "casadi_hpipm_unpack_blocks(" << blocks.size()
+    << ", p." << name
+    << ", " << g.constant(hpipm_blocks_pack(blocks)) << ");\n";
   }
 
   void codegen_local(CodeGenerator& g, const std::string& name, const std::vector<int>& v) {
@@ -592,12 +592,12 @@ namespace casadi {
     codegen_unpack_block(g, "R", R_blocks);
     codegen_unpack_block(g, "I", I_blocks);
     codegen_unpack_block(g, "S", S_blocks);
-    codegen_unpack_block(g, "Q", Q_blocks);  
-  
+    codegen_unpack_block(g, "Q", Q_blocks);
+
     codegen_unpack_block(g, "b", b_blocks);
     codegen_unpack_block(g, "lug", lug_blocks);
     codegen_unpack_block(g, "u", u_blocks);
-    codegen_unpack_block(g, "x", x_blocks);   
+    codegen_unpack_block(g, "x", x_blocks);
 
 
     codegen_unpack_block(g, "lam_ul", lam_ul_blocks);
@@ -680,19 +680,16 @@ namespace casadi {
     p_.lam_cl = get_ptr(lam_cl_blocks);
     p_.lam_cu = get_ptr(lam_cu_blocks);
 
-    uout() << "p"<< p_.nu[0] << nus_[0] << std::endl;
     casadi_hpipm_setup(&p_);
-
-    uout() << "p"<< p_.nu[0] << std::endl;
   }
 
   int HpipmInterface::init_mem(void* mem) const {
     if (Conic::init_mem(mem)) return 1;
     auto m = static_cast<HpipmMemory*>(mem);
 
-    m->fstats["preprocessing"]  = FStats();
-    m->fstats["solver"]         = FStats();
-    m->fstats["postprocessing"] = FStats();
+    m->add_stat("preprocessing");
+    m->add_stat("solver");
+    m->add_stat("postprocessing");
     return 0;
   }
 
@@ -702,34 +699,31 @@ namespace casadi {
 
     auto m = static_cast<HpipmMemory*>(mem);
 
-    uout() << "set_work" << std::endl;
-
-    uout() << "p"<< p_.nu[0] << nus_[0] << std::endl;
     Conic::set_work(mem, arg, res, iw, w);
 
     m->d.prob = &p_;
     m->d.qp = &m->d_qp;
-    uout() << "p_" << &p_ << p_.nu[0] << std::endl;
     casadi_hpipm_init(&m->d, &arg, &res, &iw, &w);
-
-    m->iter_count = 0;
-
-    uout() << "pset_work"<< p_.nu[0] << std::endl;
   }
 
   int HpipmInterface::
   solve(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
     auto m = static_cast<HpipmMemory*>(mem);
+
     // Statistics
-    m->fstats.at("preprocessing").tic();
+    m->fstats.at("solver").tic();
 
     casadi_hpipm_solve(&m->d, arg, res, iw, w);
 
-    m->success = m->d.return_status==0;
+    m->fstats.at("solver").toc();
+
+    m->d_qp.success = m->d.return_status==0;
 
     uout() << "HPIPM finished after " << m->d.iter_count << " iterations." << std::endl;
     uout() << "return status: " << m->d.return_status << std::endl;
-    uout() << "HPIPM residuals: " << m->d.res_stat << ", " << m->d.res_eq << ", " << m->d.res_ineq << ", " << m->d.res_comp << std::endl;
+    uout() << "HPIPM residuals: " << m->d.res_stat << ", " <<
+              m->d.res_eq << ", " << m->d.res_ineq << ", " <<
+              m->d.res_comp << std::endl;
 
     return 0;
   }

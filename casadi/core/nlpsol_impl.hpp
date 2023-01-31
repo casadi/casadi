@@ -45,7 +45,7 @@ namespace casadi {
     // Success?
     bool success;
     // Return status
-    FunctionInternal::UnifiedReturnStatus unified_return_status;
+    UnifiedReturnStatus unified_return_status;
   };
 
   /** \brief NLP solver storage class
@@ -80,6 +80,11 @@ namespace casadi {
     /// Linear solver and options
     std::string sens_linsol_;
     Dict sens_linsol_options_;
+
+    std::vector<char> detect_simple_bounds_is_simple_;
+    Function detect_simple_bounds_parts_;
+    std::vector<casadi_int> detect_simple_bounds_target_x_;
+    std::vector<casadi_int> detect_simple_bounds_target_g_;
 
     ///@{
     /** \brief Options

@@ -1124,11 +1124,12 @@ class Matrixtests(casadiTestCase):
     numpy.random.seed(1)
     p = np.random.permutation(n)
     S = Sparsity.permutation(p)
+    self.checkarray(DM(p).T,S.permutation_vector())
     self.assertTrue(S.is_permutation())
     v = DM.rand(n)
-    self.checkarray(S @ v, v[p])
+    self.checkarray(mtimes(S,v), v[p])
     S = Sparsity.permutation(p, True)
-    self.checkarray((S @ v)[p], v)
+    self.checkarray((mtimes(S,v))[p], v)
 
   def test_sparsity_orthonormality(self):
     alltests = [('is_orthonormal_rows',True),('is_orthonormal_columns',True),('is_selection',True),('is_orthonormal_rows',False),('is_orthonormal_columns',False),('is_selection',False),('is_permutation',),('is_orthonormal',False),('is_orthonormal',True)]

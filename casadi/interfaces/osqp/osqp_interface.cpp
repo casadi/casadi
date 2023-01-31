@@ -26,7 +26,6 @@
 #include "osqp_interface.hpp"
 #include "casadi/core/casadi_misc.hpp"
 
-using namespace std;
 namespace casadi {
 
   extern "C"
@@ -155,7 +154,7 @@ namespace casadi {
     Sparsity H_triu = Sparsity::triu(H_);
 
     Sparsity Asp = vertcat(Sparsity::diag(nx_), A_);
-    std::vector<double> dummy(max(nx_+na_, max(Asp.nnz(), H_.nnz())));
+    std::vector<double> dummy(std::max(nx_+na_, std::max(Asp.nnz(), H_.nnz())));
 
     std::vector<c_int> A_row = vector_static_cast<c_int>(Asp.get_row());
     std::vector<c_int> A_colind = vector_static_cast<c_int>(Asp.get_colind());
@@ -279,18 +278,18 @@ namespace casadi {
     casadi_copy(m->work->solution->y+nx_, na_, res[CONIC_LAM_A]);
     if (res[CONIC_COST]) *res[CONIC_COST] = m->work->info->obj_val;
 
-    m->success = m->work->info->status_val == OSQP_SOLVED;
-    if (m->success) {
-      m->unified_return_status = SOLVER_RET_SUCCESS;
+    m->d_qp.success = m->work->info->status_val == OSQP_SOLVED;
+    if (m->d_qp.success) {
+      m->d_qp.unified_return_status = SOLVER_RET_SUCCESS;
     } else if (m->work->info->status_val == OSQP_PRIMAL_INFEASIBLE || 
         m->work->info->status_val == OSQP_MAX_ITER_REACHED ||
         m->work->info->status_val == OSQP_DUAL_INFEASIBLE ||
         m->work->info->status_val == OSQP_NON_CVX ||
         m->work->info->status_val == OSQP_PRIMAL_INFEASIBLE_INACCURATE ||
         m->work->info->status_val == OSQP_DUAL_INFEASIBLE_INACCURATE) {
-          m->unified_return_status = SOLVER_RET_INFEASIBLE;
+          m->d_qp.unified_return_status = SOLVER_RET_INFEASIBLE;
     } else {
-      m->unified_return_status = SOLVER_RET_UNKNOWN;
+      m->d_qp.unified_return_status = SOLVER_RET_UNKNOWN;
     }
 
     return 0;
@@ -302,7 +301,7 @@ namespace casadi {
 
   void OsqpInterface::codegen_init_mem(CodeGenerator& g) const {
     Sparsity Asp = vertcat(Sparsity::diag(nx_), A_);
-    casadi_int dummy_size = max(nx_+na_, max(Asp.nnz(), H_.nnz()));
+    casadi_int dummy_size = std::max(nx_+na_, std::max(Asp.nnz(), H_.nnz()));
 
     g.local("A", "csc");
     g.local("dummy[" + str(dummy_size) + "]", "casadi_real");

@@ -1,0 +1,9 @@
+#!/bin/bash
+
+TOOLCHAIN=/usr/src/mxe/usr/x86_64-w64-mingw32.shared.posix/share/cmake/mxe-conf.cmake
+
+if test -f "$TOOLCHAIN"; then
+    echo "set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE BOTH)" | sudo tee -a $TOOLCHAIN
+fi
+
+"$@"

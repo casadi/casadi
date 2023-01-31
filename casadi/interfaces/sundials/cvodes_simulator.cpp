@@ -183,6 +183,7 @@ int CvodesSimulator::init_mem(void* mem) const {
       case NewtonScheme::GMRES: THROWING(CVSpgmr, m->mem, pretype, max_krylov_); break;
       case NewtonScheme::BCGSTAB: THROWING(CVSpbcg, m->mem, pretype, max_krylov_); break;
       case NewtonScheme::TFQMR: THROWING(CVSptfqmr, m->mem, pretype, max_krylov_); break;
+      default: casadi_error("No such Newton scheme");
     }
     THROWING(CVSpilsSetJacTimesVecFn, m->mem, jtimes);
     if (use_precon_) THROWING(CVSpilsSetPreconditioner, m->mem, psetup, psolve);

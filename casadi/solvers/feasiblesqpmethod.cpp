@@ -38,7 +38,6 @@
 #include <cfloat>
 #include <signal.h>
 
-using namespace std;
 namespace casadi {
 
 
@@ -219,7 +218,7 @@ namespace casadi {
     lbfgs_memory_ = 10;
     tol_pr_ = 1e-6;
     tol_du_ = 1e-6;
-    string hessian_approximation = "exact";
+    std::string hessian_approximation = "exact";
     // min_step_size_ = 1e-10;
     std::string solve_type = "SQP";
     std::string qpsol_plugin = "qpoases";
@@ -367,7 +366,7 @@ namespace casadi {
 
     // Use exact Hessian?
     exact_hessian_ = hessian_approximation =="exact";
-    cout << "print solve type" << solve_type << std::endl;
+    uout() << "print solve type" << solve_type << std::endl;
     use_sqp_ = solve_type=="SQP";
 
     convexify_ = false;
@@ -407,7 +406,7 @@ namespace casadi {
                         {"hess:gamma:x:x"}, {{"gamma", {"f", "g"}}});
         }
         Hsp_ = get_function("nlp_hess_l").sparsity_out(0);
-        cout << "Sparsity pattern: " << Hsp_ << std::endl;
+        uout() << "Sparsity pattern: " << Hsp_ << std::endl;
         casadi_assert(Hsp_.is_symmetric(), "Hessian must be symmetric");
         if (convexify_strategy!="none") {
           convexify_ = true;
@@ -436,18 +435,26 @@ namespace casadi {
     if (use_sqp_){
       qpsol_ = conic("qpsol", qpsol_plugin, {{"h", Hsp_}, {"a", Asp_}},
                    qpsol_options);
+<<<<<<< HEAD
       // cout << qpsol_ <<std::endl;
+=======
+      uout() << qpsol_ <<std::endl;
+>>>>>>> casadi_original/develop
     } else {
       Hsp_ = Sparsity(nx_, nx_);
-      cout << "Sparsity pattern: " << Hsp_ << std::endl;
-      cout << "Sparsity pattern: " << Asp_ << std::endl;
-      // cout << "Nonzeros: " << Hsp_.nnz() << std::endl;
+      uout() << "Sparsity pattern: " << Hsp_ << std::endl;
+      uout() << "Sparsity pattern: " << Asp_ << std::endl;
+      // uout() << "Nonzeros: " << Hsp_.nnz() << std::endl;
       // qpsol_ = conic("qpsol", qpsol_plugin, {{"h", Hsp_}, {"a", Asp_}},
       //              qpsol_options);
       qpsol_ = conic("qpsol", qpsol_plugin, {{"a", Asp_}},
                    qpsol_options);
       // qpsol_ = Function::load("/home/david/testproblems_feasible_casadi/qpsol.casadi");
+<<<<<<< HEAD
       // cout << qpsol_ <<std::endl;
+=======
+      uout() << qpsol_ <<std::endl;
+>>>>>>> casadi_original/develop
     }
     
     alloc(qpsol_);
@@ -554,7 +561,7 @@ int Feasiblesqpmethod::step_update(void* mem, double tr_ratio) const {
   if (tr_ratio > tr_acceptance_){
     // This is not properly implemented yet: d_nlp->z_old = d_mlp->z;
     casadi_copy(d->z_feas, nx_ + ng_, d_nlp->z);
-    d_nlp->f = d->f_feas;
+    d_nlp->objective = d->f_feas;
     casadi_copy(d->dlam_feas, nx_ + ng_, d_nlp->lam);
 
     uout() << "ACCEPTED" << std::endl;
@@ -1001,7 +1008,7 @@ int Feasiblesqpmethod::solve(void* mem) const {
     const double one = 1.;
 
     // Info for printing
-    string info = "";
+    std::string info = "";
 
     casadi_clear(d->dx, nx_);
 
@@ -1012,7 +1019,7 @@ int Feasiblesqpmethod::solve(void* mem) const {
       // Evaluate f, g and first order derivative information
       /*m->arg[0] = d_nlp->z;
       m->arg[1] = d_nlp->p;
-      m->res[0] = &d_nlp->f;
+      m->res[0] = &d_nlp->objective;
       m->res[1] = d->gf;
       m->res[2] = d_nlp->z + nx_;
       m->res[3] = d->Jk;
@@ -1033,7 +1040,7 @@ int Feasiblesqpmethod::solve(void* mem) const {
         // Evaluate f
         m->arg[0] = d_nlp->z;
         m->arg[1] = d_nlp->p;
-        m->res[0] = &d_nlp->f;
+        m->res[0] = &d_nlp->objective;
         if (calc_function(m, "nlp_f")) {
           uout() << "What does it mean that calc_function fails here??" << std::endl;
         }
@@ -1069,7 +1076,7 @@ int Feasiblesqpmethod::solve(void* mem) const {
 
         }
         // uout() << "x0: " << *d_nlp->z << std::endl;
-        // uout() << "nlp_f: " << d_nlp->f << std::endl;
+        // uout() << "nlp_f: " << d_nlp->objective << std::endl;
         // uout() << "nlp_g: " << *(d_nlp->z + nx_) << std::endl;
 
         if (use_sqp_){
@@ -1132,7 +1139,7 @@ int Feasiblesqpmethod::solve(void* mem) const {
             return 1;
         }
         // uout() << "x0: " << *d_nlp->z << std::endl;
-        // uout() << "nlp_f: " << d_nlp->f << std::endl;
+        // uout() << "nlp_f: " << d_nlp->objective << std::endl;
         // uout() << "nlp_g: " << *(d_nlp->z + nx_) << std::endl;
 
         if (use_sqp_){
@@ -1180,12 +1187,12 @@ int Feasiblesqpmethod::solve(void* mem) const {
       // uout() << "HERE!!!!" << *d->dx << std::endl;
       double dx_norminf = casadi_norm_inf(nx_, d->dx);
 
-      // uout() << "objective value: " << d_nlp->f << std::endl;
+      // uout() << "objective value: " << d_nlp->objective << std::endl;
       // Printing information about the actual iterate
       if (print_iteration_) {
         // if (m->iter_count % 10 == 0) print_iteration();
         print_iteration();
-        print_iteration(m->iter_count, d_nlp->f, m_k, tr_ratio,
+        print_iteration(m->iter_count, d_nlp->objective, m_k, tr_ratio,
                         pr_inf, du_inf, dx_norminf, m->reg, tr_rad_prev, info);
         info = "";
       }
@@ -1294,7 +1301,7 @@ int Feasiblesqpmethod::solve(void* mem) const {
         if (calc_function(m, "nlp_f")) {
           uout() << "What does it mean that calc_function fails here??" << std::endl;
         }
-        tr_ratio = eval_tr_ratio(d_nlp->f, d->f_feas, m_k);
+        tr_ratio = eval_tr_ratio(d_nlp->objective, d->f_feas, m_k);
         tr_update(mem, tr_rad, tr_ratio);
         if (tr_rad < feas_tol_){
           if (print_status_) print("MESSAGE(feasiblesqpmethod): Trust-region radius smaller than feasibility!! "
@@ -1352,7 +1359,7 @@ int Feasiblesqpmethod::solve(void* mem) const {
                            double* x_opt, double* dlam, int mode) const {
     ScopedTiming tic(m->fstats.at("QP"));
     // Inputs
-    fill_n(m->arg, qpsol_.n_in(), nullptr);
+    std::fill_n(m->arg, qpsol_.n_in(), nullptr);
     // double lol;
     m->arg[CONIC_H] = nullptr;
     m->arg[CONIC_G] = g;
@@ -1366,7 +1373,7 @@ int Feasiblesqpmethod::solve(void* mem) const {
     m->arg[CONIC_UBA] = ubdz+nx_;
 
     // Outputs
-    fill_n(m->res, qpsol_.n_out(), nullptr);
+    std::fill_n(m->res, qpsol_.n_out(), nullptr);
     m->res[CONIC_X] = x_opt;
     m->res[CONIC_LAM_X] = dlam;
     m->res[CONIC_LAM_A] = dlam + nx_;
@@ -1388,7 +1395,7 @@ int Feasiblesqpmethod::solve(void* mem) const {
                            double* x_opt, double* dlam, int mode) const {
     ScopedTiming tic(m->fstats.at("QP"));
     // Inputs
-    fill_n(m->arg, qpsol_.n_in(), nullptr);
+    std::fill_n(m->arg, qpsol_.n_in(), nullptr);
     m->arg[CONIC_H] = H;
     m->arg[CONIC_G] = g;
     m->arg[CONIC_X0] = x_opt;
@@ -1401,7 +1408,7 @@ int Feasiblesqpmethod::solve(void* mem) const {
     m->arg[CONIC_UBA] = ubdz+nx_;
 
     // Outputs
-    fill_n(m->res, qpsol_.n_out(), nullptr);
+    std::fill_n(m->res, qpsol_.n_out(), nullptr);
     m->res[CONIC_X] = x_opt;
     m->res[CONIC_LAM_X] = dlam;
     m->res[CONIC_LAM_A] = dlam + nx_;
@@ -1437,6 +1444,7 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
     g.local("m_p", "const casadi_real", "*");
     g.init_local("m_p", g.arg(NLPSOL_P));
     g.local("m_f", "casadi_real");
+<<<<<<< HEAD
     g.local("m_f_feas", "casadi_real");
     g.copy_default(g.arg(NLPSOL_X0), nx_, "d_nlp.z", "0", false);
     g.copy_default(g.arg(NLPSOL_LAM_X0), nx_, "d_nlp.lam", "0", false);
@@ -1444,8 +1452,16 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
     g.copy_default(g.arg(NLPSOL_LBX), nx_, "d_nlp.lbz", "-casadi_inf", false);
     g.copy_default(g.arg(NLPSOL_UBX), nx_, "d_nlp.ubz", "casadi_inf", false);
     g.copy_default(g.arg(NLPSOL_LBG), ng_, "d_nlp.lbz+"+str(nx_),
+=======
+    g.copy_default("d_nlp.x0", nx_, "d_nlp.z", "0", false);
+    g.copy_default("d_nlp.lam_x0", nx_, "d_nlp.lam", "0", false);
+    g.copy_default("d_nlp.lam_g0", ng_, "d_nlp.lam+"+str(nx_), "0", false);
+    g.copy_default("d_nlp.lbx", nx_, "d_nlp.lbz", "-casadi_inf", false);
+    g.copy_default("d_nlp.ubx", nx_, "d_nlp.ubz", "casadi_inf", false);
+    g.copy_default("d_nlp.lbg", ng_, "d_nlp.lbz+"+str(nx_),
+>>>>>>> casadi_original/develop
       "-casadi_inf", false);
-    g.copy_default(g.arg(NLPSOL_UBG), ng_, "d_nlp.ubz+"+str(nx_),
+    g.copy_default("d_nlp.ubg", ng_, "d_nlp.ubz+"+str(nx_),
       "casadi_inf", false);
     casadi_assert(exact_hessian_, "Codegen implemented for exact Hessian only.", false);
 

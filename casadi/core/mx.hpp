@@ -569,7 +569,7 @@ namespace casadi {
             const Dict& opts = Dict());
     static std::vector<bool> which_depends(const MX &expr, const MX &var,
         casadi_int order=1, bool tr=false);
-    static Sparsity jacobian_sparsity(const MX& f, const MX& x);    
+    static Sparsity jacobian_sparsity(const MX& f, const MX& x);
     static MX substitute(const MX& ex, const MX& v, const MX& vdef);
     static std::vector<MX> substitute(const std::vector<MX> &ex,
                                          const std::vector<MX> &v,
@@ -653,6 +653,8 @@ namespace casadi {
             casadi_int m,
             const Dict& opts = Dict());
     static MX convexify(const MX& H, const Dict& opts = Dict());
+    static MX stop_diff(const MX& expr, casadi_int order);
+    static MX stop_diff(const MX& expr, const MX& var, casadi_int order);
     ///@}
     /// \endcond
 
@@ -801,8 +803,41 @@ namespace casadi {
       return MX::evalf(expr);
     }
 
+    /** \brief Stop derivatives of an expression wrt to all its symbolic variables
+    */
+    inline friend MX stop_diff(const MX& expr, casadi_int order) {
+      return MX::stop_diff(expr, order);
+    }
+
+    /** \brief Stop first derivatives of an expression wrt to all its symbolic variables
+     * 
+     * \seealso stop_diff
+    */
+    inline friend MX no_grad(const MX& expr) {
+      return MX::stop_diff(expr, 1);
+    }
+
+    /** \brief Stop second derivatives of an expression wrt to all its symbolic variables
+     * 
+     * \seealso stop_diff
+    */
+    inline friend MX no_hess(const MX& expr) {
+      return MX::stop_diff(expr, 2);
+    }
+
+
+    /** \brief Stop derivatives of an expression wrt to a select set of symbolic variables
+    */
+    inline friend MX stop_diff(const MX& expr, const MX& var, casadi_int order) {
+      return MX::stop_diff(expr, var, order);
+    }
+
+
 /** @} */
 #endif // SWIG
+
+    /** \bried Return all elements of a that do not occur in b, preserving order */
+    friend std::vector<MX> difference(const std::vector<MX>& a, const std::vector<MX>& b);
 
     /** \brief returns itself, but with an assertion attached
     *

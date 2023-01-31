@@ -56,7 +56,7 @@ namespace casadi {
                                              const std::vector<T>& mat) {
     casadi_assert_dev(id.size()==mat.size());
     std::vector<std::pair<std::string, T>> r(id.size());
-    for (casadi_uint i=0; i<r.size(); ++i) r[i] = make_pair(id[i], mat[i]);
+    for (casadi_uint i=0; i<r.size(); ++i) r[i] = std::make_pair(id[i], mat[i]);
     return r;
   }
 
@@ -117,7 +117,7 @@ namespace casadi {
     ///@}
 
     /// Reconstruct options dict
-    virtual Dict generate_options(bool is_temp=false) const;
+    virtual Dict generate_options(const std::string& target) const;
 
     /** \brief Print list of options
 
@@ -300,7 +300,7 @@ namespace casadi {
     ///@}
 
     /// Reconstruct options dict
-    Dict generate_options(bool is_temp=false) const override;
+    Dict generate_options(const std::string& target) const override;
 
     /** \brief Change option after object creation for debugging
 
@@ -1342,15 +1342,6 @@ namespace casadi {
     template<typename MatType>
     std::vector<std::vector<MatType> >
     symbolicAdjSeed(casadi_int nadj, const std::vector<MatType>& v) const;
-
-    /** Unified return status for solvers */
-    enum UnifiedReturnStatus {
-        SOLVER_RET_SUCCESS,
-        SOLVER_RET_UNKNOWN,
-        SOLVER_RET_LIMITED, // Out of time
-        SOLVER_RET_NAN,
-        SOLVER_RET_INFEASIBLE
-    };
 
     static std::string string_from_UnifiedReturnStatus(UnifiedReturnStatus status);
 

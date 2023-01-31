@@ -25,8 +25,6 @@
 
 #include "casadi_low.hpp"
 
-using namespace std;
-
 namespace casadi {
 
   Low::Low(const MX& v, const MX& p, const Dict& opts) {
@@ -103,12 +101,12 @@ namespace casadi {
   }
 
   int Low::sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
-    fill_n(res[0], nnz(), 0);
+    std::fill_n(res[0], nnz(), 0);
     return 0;
   }
 
   int Low::sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
-    fill_n(res[0], nnz(), 0);
+    std::fill_n(res[0], nnz(), 0);
     return 0;
   }
 

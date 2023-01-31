@@ -28,8 +28,6 @@
 #include "casadi_misc.hpp"
 #include "serializing_stream.hpp"
 
-using namespace std;
-
 namespace casadi {
 
   MultipleOutput::MultipleOutput() {

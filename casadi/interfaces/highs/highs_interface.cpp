@@ -23,12 +23,10 @@
  */
 
 #include "highs_interface.hpp"
-
 #include "casadi/core/nlp_tools.hpp"
 
+#include <highs_runtime_str.h>
 namespace casadi {
-
-  using namespace std;
 
   extern "C"
   int CASADI_CONIC_HIGHS_EXPORT
@@ -81,169 +79,160 @@ namespace casadi {
       }
     }
 
-    // Allocate work vectors
-    alloc_w(nx_, true); // g
-    alloc_w(nx_, true); // lbx
-    alloc_w(nx_, true); // ubx
-    alloc_w(na_, true); // lba
-    alloc_w(na_, true); // uba
-    alloc_w(nnz_in(CONIC_H), true); // H
-    alloc_w(nnz_in(CONIC_A), true); // A
+    // Initialize read-only members of class that don't require saving
+    // since they can be derived from other read-only members
+    init_dependent();
+    set_highs_prob();
+
+    // Allocate memory
+    casadi_int sz_arg, sz_res, sz_w, sz_iw;
+    casadi_highs_work(&p_, &sz_arg, &sz_res, &sz_iw, &sz_w);
+
+    alloc_arg(sz_arg, true);
+    alloc_res(sz_res, true);
+    alloc_iw(sz_iw, true);
+    alloc_w(sz_w, true);
+  }
+
+  void HighsInterface::init_dependent() {
+    colinda_.resize(A_.size2()+1);
+    rowa_.resize(A_.nnz());
+    colindh_.resize(H_.size2()+1);
+    rowh_.resize(H_.nnz());
+    copy_vector(A_.colind(), colinda_);
+    copy_vector(A_.row(), rowa_);
+    copy_vector(H_.colind(), colindh_);
+    copy_vector(H_.row(), rowh_);
+    if (!discrete_.empty()) {
+      integrality_.resize(nx_);
+      assign_vector(discrete_, integrality_);
+    }
+  }
+
+
+  void codegen_local(CodeGenerator& g, const std::string& name, const std::vector<int>& v) {
+    std::string n = name + "[]";
+    g.local(n, "static const int");
+    std::stringstream init;
+    init << "{";
+    for (casadi_int i=0;i<v.size();++i) {
+      init << v[i];
+      if (i<v.size()-1) init << ", ";
+    }
+    // ISO C forbids empty initializer braces
+    if (v.empty()) init << "0";
+    init << "}";
+    g.init_local(n, init.str());
+  }
+
+  void HighsInterface::set_highs_prob(CodeGenerator& g) const {
+    g << "p.qp = &p_qp;\n";
+    codegen_local(g, "colinda", colinda_);
+    codegen_local(g, "rowa", rowa_);
+    codegen_local(g, "colindh", colindh_);
+    codegen_local(g, "rowh", rowh_);
+    if (!discrete_.empty()) {
+      codegen_local(g, "integrality", integrality_);
+    }
+    g << "p.colinda = colinda;\n";
+    g << "p.rowa = rowa;\n";
+    g << "p.colindh = colindh;\n";
+    g << "p.rowh = rowh;\n";
+    if (discrete_.empty()) {
+      g << "p.integrality = 0;\n";
+    } else {
+      g << "p.integrality = integrality;\n";
+    }
+    g << "casadi_highs_setup(&p);\n";
+  }
+
+  void HighsInterface::codegen_init_mem(CodeGenerator& g) const {
+    g << "highs_init_mem(&" + codegen_mem(g) + ");\n";
+    g << "return 0;\n";
+  }
+
+  void HighsInterface::codegen_free_mem(CodeGenerator& g) const {
+    g << "highs_free_mem(&" + codegen_mem(g) + ");\n";
+  }
+
+  void HighsInterface::set_highs_prob() {
+    p_.qp = &p_qp_;
+    p_.colinda  = get_ptr(colinda_);
+    p_.rowa  = get_ptr(rowa_);
+    p_.colindh  = get_ptr(colindh_);
+    p_.rowh  = get_ptr(rowh_);
+    p_.integrality  = get_ptr(integrality_);
+
+    casadi_highs_setup(&p_);
   }
 
   int HighsInterface::init_mem(void* mem) const {
     if (Conic::init_mem(mem)) return 1;
     if (!mem) return 1;
     auto m = static_cast<HighsMemory*>(mem);
+    highs_init_mem(&m->d);
 
     m->add_stat("preprocessing");
     m->add_stat("solver");
     m->add_stat("postprocessing");
 
-    m->colinda.resize(A_.size2()+1);
-    m->rowa.resize(A_.nnz());
-    m->colindh.resize(H_.size2()+1);
-    m->rowh.resize(H_.nnz());
-    m->integrality.resize(nx_);
-
     return 0;
+  }
+
+  void HighsInterface::free_mem(void* mem) const {
+    auto m = static_cast<HighsMemory*>(mem);
+    highs_free_mem(&m->d);
+    delete static_cast<HighsMemory*>(mem);
+   }
+
+  /** \brief Set the (persistent) work vectors */
+  void HighsInterface::set_work(void* mem, const double**& arg, double**& res,
+                          casadi_int*& iw, double*& w) const {
+
+    auto m = static_cast<HighsMemory*>(mem);
+
+    Conic::set_work(mem, arg, res, iw, w);
+
+    m->d.prob = &p_;
+    m->d.qp = &m->d_qp;
+
+    casadi_highs_init(&m->d, &arg, &res, &iw, &w);
+
+    for (auto&& op : opts_) {
+      auto it = std::find(param_bool.begin(), param_bool.end(), op.first);
+      if (it != param_bool.end() || op.second.getType() == OT_BOOL) {
+        casadi_assert(kHighsStatusOk ==
+          Highs_setBoolOptionValue(m->d.highs, op.first.c_str(), op.second.to_bool()),
+          "Error setting option '" + op.first + "'.");
+      } else if (op.second.getType() == OT_INT) {
+        casadi_assert(kHighsStatusOk ==
+          Highs_setIntOptionValue(m->d.highs, op.first.c_str(), op.second.to_int()),
+          "Error setting option '" + op.first + "'.");
+      } else if (op.second.getType() == OT_DOUBLE) {
+        casadi_assert(kHighsStatusOk ==
+          Highs_setDoubleOptionValue(m->d.highs, op.first.c_str(), op.second.to_double()),
+          "Error setting option '" + op.first + "'.");
+      } else if (op.second.getType() == OT_STRING) {
+        std::string v = op.second.to_string();
+        casadi_assert(kHighsStatusOk ==
+          Highs_setStringOptionValue(m->d.highs, op.first.c_str(), v.c_str()),
+          "Error setting option '" + op.first + "'.");
+      } else {
+        casadi_assert(false, "Option type for '" + op.first + "'not supported!");
+      }
+    }
+
   }
 
   int HighsInterface::
   solve(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
     auto m = static_cast<HighsMemory*>(mem);
 
-    // Problem has not been solved at this point
-    m->return_status = static_cast<int>(HighsStatus::kError);
-
-    m->fstats.at("preprocessing").tic();
-
-    // Get inputs
-    double* g=w; w += nx_;
-    casadi_copy(arg[CONIC_G], nx_, g);
-    double* lbx=w; w += nx_;
-    casadi_copy(arg[CONIC_LBX], nx_, lbx);
-    double* ubx=w; w += nx_;
-    casadi_copy(arg[CONIC_UBX], nx_, ubx);
-    double* lba=w; w += na_;
-    casadi_copy(arg[CONIC_LBA], na_, lba);
-    double* uba=w; w += na_;
-    casadi_copy(arg[CONIC_UBA], na_, uba);
-    double* H=w; w += nnz_in(CONIC_H);
-    casadi_copy(arg[CONIC_H], nnz_in(CONIC_H), H);
-    double* A=w; w += nnz_in(CONIC_A);
-    casadi_copy(arg[CONIC_A], nnz_in(CONIC_A), A);
-
-    copy_vector(A_.colind(), m->colinda);
-    copy_vector(A_.row(), m->rowa);
-    copy_vector(H_.colind(), m->colindh);
-    copy_vector(H_.row(), m->rowh);
-
-
-    // Create HiGHS instance and pass problem
-    Highs highs;
-    HighsStatus status;
-    const int matrix_format = 1;
-    const int sense = 1;
-    const double offset = 0.0;
-
-    // set HiGHS options, option verification is done by HiGHS
-    for (auto&& op : opts_) {
-      auto it = std::find(param_bool.begin(), param_bool.end(), op.first);
-      if(it != param_bool.end() || op.second.getType() == OT_BOOL) {
-        casadi_assert(highs.setOptionValue(op.first, op.second.to_bool()) == HighsStatus::kOk,
-          "Error setting option '" + op.first + "'.");
-      } 
-      else if(op.second.getType() == OT_INT){
-        casadi_assert(highs.setOptionValue(op.first, static_cast<int>(op.second.to_int())) == HighsStatus::kOk,
-          "Error setting option '" + op.first + "'.");
-      }
-      else if(op.second.getType() == OT_DOUBLE) {
-        casadi_assert(highs.setOptionValue(op.first, op.second.to_double()) == HighsStatus::kOk,
-          "Error setting option '" + op.first + "'.");
-      }
-      else if(op.second.getType() == OT_STRING) {
-        casadi_assert(highs.setOptionValue(op.first, op.second.to_string()) == HighsStatus::kOk,
-          "Error setting option '" + op.first + "'.");
-      }
-      else {
-        casadi_assert(false, "Option type for '" + op.first + "'not supported!");
-      }
-    }
-
-    // if variables are declared as discrete, set integrality pointer and flag discrete variables
-    int* integrality_ptr = nullptr;
-    if (!discrete_.empty()) {
-      integrality_ptr = get_ptr(m->integrality);
-      for (casadi_int i=0; i<nx_; ++i) {
-        m->integrality[i] = discrete_.at(i) ? 1 : 0;
-      }
-    }
-    status = highs.passModel(nx_, na_, nnz_in(CONIC_A), nnz_in(CONIC_H),
-      matrix_format, matrix_format, sense, offset,
-      g, lbx, ubx, lba, uba,
-      get_ptr(m->colinda), get_ptr(m->rowa), A,
-      get_ptr(m->colindh), get_ptr(m->rowh), H,      
-      integrality_ptr);
-    
-    // check that passing model is successful
-    casadi_assert(status == HighsStatus::kOk, "invalid data to build HiGHS model");
-
-    m->fstats.at("preprocessing").toc();
+    // Statistics
     m->fstats.at("solver").tic();
 
-    // solve incumbent model
-    status = highs.run();
-    casadi_assert(status == HighsStatus::kOk, "running HiGHS failed");
-    
+    casadi_highs_solve(&m->d, arg, res, iw, w);
     m->fstats.at("solver").toc();
-    m->fstats.at("postprocessing").tic();
-
-    // get primal and dual solution
-    HighsSolution solution = highs.getSolution();
-    casadi_copy(solution.col_value.data(), nx_, res[CONIC_X]);
-    
-    if (res[CONIC_LAM_X]) {
-      casadi_copy(solution.col_dual.data(), nx_, res[CONIC_LAM_X]);
-      casadi_scal(nx_, -1., res[CONIC_LAM_X]);
-    }
-    if (res[CONIC_LAM_A]) {
-      casadi_copy(solution.row_dual.data(), na_, res[CONIC_LAM_A]);
-      casadi_scal(na_, -1., res[CONIC_LAM_A]);
-    }
-    // get information
-    const HighsInfo& info = highs.getInfo();
-
-    if (res[CONIC_COST]) {
-      *res[CONIC_COST] = info.objective_function_value;
-    }
-
-    m->fstats.at("postprocessing").toc();
-
-    HighsModelStatus model_status = highs.getModelStatus();
-    m->return_status = static_cast<int>(model_status);
-    m->success = model_status==HighsModelStatus::kOptimal;
-
-    if (model_status==HighsModelStatus::kTimeLimit
-          || model_status==HighsModelStatus::kIterationLimit)
-      m->unified_return_status = SOLVER_RET_LIMITED;
-
-    m->simplex_iteration_count = info.simplex_iteration_count;
-    m->simplex_iteration_count = info.simplex_iteration_count;
-    m->ipm_iteration_count = info.ipm_iteration_count;
-    m->qp_iteration_count = info.qp_iteration_count;
-    m->crossover_iteration_count = info.crossover_iteration_count;
-    m->primal_solution_status  = info.primal_solution_status;
-    m->dual_solution_status = info.dual_solution_status;
-    m->basis_validity = info.basis_validity;
-    m->mip_dual_bound = info.mip_dual_bound;
-    m->mip_gap = info.mip_gap;
-    m->num_primal_infeasibilities = info.num_primal_infeasibilities;
-    m->max_primal_infeasibility = info.max_primal_infeasibility;
-    m->sum_primal_infeasibilities = info.sum_primal_infeasibilities;
-    m->num_dual_infeasibilities = info.num_dual_infeasibilities;
-    m->max_dual_infeasibility = info.max_dual_infeasibility;
-    m->sum_dual_infeasibilities = info.sum_dual_infeasibilities;
 
     return 0;
   }
@@ -252,40 +241,95 @@ namespace casadi {
     clear_mem();
   }
 
-  HighsMemory::HighsMemory() {
-  }
+  void HighsInterface::codegen_body(CodeGenerator& g) const {
+    qp_codegen_body(g);
+    g.add_auxiliary(CodeGenerator::AUX_PROJECT);
+    g.add_auxiliary(CodeGenerator::AUX_SCAL);
+    g.add_auxiliary(CodeGenerator::AUX_SPARSIFY);
+    g.add_auxiliary(CodeGenerator::AUX_MAX);
+    g.add_auxiliary(CodeGenerator::AUX_SPARSITY);
+    g.add_auxiliary(CodeGenerator::AUX_SUM);
+    g.add_auxiliary(CodeGenerator::AUX_FILL);
+    g.add_auxiliary(CodeGenerator::AUX_CLIP_MIN);
+    g.add_auxiliary(CodeGenerator::AUX_CLIP_MAX);
+    g.add_auxiliary(CodeGenerator::AUX_DOT);
+    g.add_auxiliary(CodeGenerator::AUX_BILIN);
+    g.add_include("interfaces/highs_c_api.h");
 
-  HighsMemory::~HighsMemory() {
-  }
+    g.auxiliaries << g.sanitize_source(highs_runtime_str, {"casadi_real"});
 
+
+    g.local("d", "struct casadi_highs_data*");
+    g.init_local("d", "&" + codegen_mem(g));
+    g.local("p", "struct casadi_highs_prob");
+    set_highs_prob(g);
+
+    // Setup data structure (corresponds to set_work)
+    g << "d->prob = &p;\n";
+    g << "d->qp = &d_qp;\n";
+    g << "casadi_highs_init(d, &arg, &res, &iw, &w);\n";
+
+    for (auto&& op : opts_) {
+      auto it = std::find(param_bool.begin(), param_bool.end(), op.first);
+      if (it != param_bool.end() || op.second.getType() == OT_BOOL) {
+        g << "Highs_setBoolOptionValue(d->highs, " << g.constant(op.first) << ", "
+          << static_cast<int>(op.second.to_bool()) << ");\n";
+      } else if (op.second.getType() == OT_INT) {
+        g << "Highs_setIntOptionValue(d->highs, " << g.constant(op.first) << ", "
+          << static_cast<int>(op.second.to_int()) << ");\n";
+      } else if (op.second.getType() == OT_DOUBLE) {
+        g << "Highs_setDoubleOptionValue(d->highs, " << g.constant(op.first) << ", "
+          << g.constant(op.second.to_int()) << ");\n";
+      } else if (op.second.getType() == OT_STRING) {
+        g << "Highs_setStringOptionValue(d->highs, " << g.constant(op.first) << ", "
+          << g.constant(op.second.to_string()) << ");\n";
+      } else {
+        casadi_assert(false, "Option type for '" + op.first + "'not supported!");
+      }
+    }
+
+    g << "casadi_highs_solve(d, arg, res, iw, w);\n";
+
+    g << "if (!d_qp.success) {\n";
+    if (error_on_fail_) {
+      g << "return -1000;\n";
+    } else {
+      g << "return -1;\n";
+    }
+    g << "}\n";
+    g << "return 0;\n";
+  }
 
   Dict HighsInterface::get_stats(void* mem) const {
     Dict stats = Conic::get_stats(mem);
     Highs highs;
     auto m = static_cast<HighsMemory*>(mem);
-    stats["return_status"] = highs.modelStatusToString(static_cast<HighsModelStatus>(m->return_status));
-    stats["simplex_iteration_count"] = m->simplex_iteration_count;
-    stats["simplex_iteration_count"] = m->simplex_iteration_count;
-    stats["ipm_iteration_count"] = m->ipm_iteration_count;
-    stats["qp_iteration_count"] = m->qp_iteration_count;
-    stats["crossover_iteration_count"] = m->crossover_iteration_count;
-    stats["primal_solution_status"]  = highs.solutionStatusToString(m->primal_solution_status);
-    stats["dual_solution_status"] = highs.solutionStatusToString(m->dual_solution_status);
-    stats["basis_validity"] = highs.basisValidityToString(m->basis_validity);
-    stats["mip_dual_bound"] = m->mip_dual_bound;
-    stats["mip_gap"] = m->mip_gap;
-    stats["num_primal_infeasibilities"] = m->num_primal_infeasibilities;
-    stats["max_primal_infeasibility"] = m->max_primal_infeasibility;
-    stats["sum_primal_infeasibilities"] = m->sum_primal_infeasibilities;
-    stats["num_dual_infeasibilities"] = m->num_dual_infeasibilities;
-    stats["max_dual_infeasibility"] = m->max_dual_infeasibility;
-    stats["sum_dual_infeasibilities"] = m->sum_dual_infeasibilities;
+    stats["return_status"] =
+      highs.modelStatusToString(static_cast<HighsModelStatus>(m->d.return_status));
+    stats["simplex_iteration_count"] = m->d.simplex_iteration_count;
+    stats["simplex_iteration_count"] = m->d.simplex_iteration_count;
+    stats["ipm_iteration_count"] = m->d.ipm_iteration_count;
+    stats["qp_iteration_count"] = m->d.qp_iteration_count;
+    stats["crossover_iteration_count"] = m->d.crossover_iteration_count;
+    stats["primal_solution_status"]  = highs.solutionStatusToString(m->d.primal_solution_status);
+    stats["dual_solution_status"] = highs.solutionStatusToString(m->d.dual_solution_status);
+    stats["basis_validity"] = highs.basisValidityToString(m->d.basis_validity);
+    stats["mip_dual_bound"] = m->d.mip_dual_bound;
+    stats["mip_gap"] = m->d.mip_gap;
+    stats["num_primal_infeasibilities"] = m->d.num_primal_infeasibilities;
+    stats["max_primal_infeasibility"] = m->d.max_primal_infeasibility;
+    stats["sum_primal_infeasibilities"] = m->d.sum_primal_infeasibilities;
+    stats["num_dual_infeasibilities"] = m->d.num_dual_infeasibilities;
+    stats["max_dual_infeasibility"] = m->d.max_dual_infeasibility;
+    stats["sum_dual_infeasibilities"] = m->d.sum_dual_infeasibilities;
     return stats;
   }
 
   HighsInterface::HighsInterface(DeserializingStream& s) : Conic(s) {
     s.version("HighsInterface", 1);
     s.unpack("HighsInterface::opts", opts_);
+    init_dependent();
+    set_highs_prob();
   }
 
   void HighsInterface::serialize_body(SerializingStream &s) const {

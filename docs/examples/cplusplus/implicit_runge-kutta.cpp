@@ -32,7 +32,6 @@
 #include <iomanip>
 
 using namespace casadi;
-using namespace std;
 
 int main(int argc, char *argv[]) {
   // End time
@@ -62,18 +61,18 @@ int main(int argc, char *argv[]) {
   int d = 4;
 
   // Choose collocation points
-  vector<double> tau_root = collocation_points(d, "legendre");
+  std::vector<double> tau_root = collocation_points(d, "legendre");
   tau_root.insert(tau_root.begin(), 0);
 
   // Nonlinear solver to use
-  string solver = "newton";
+  std::string solver = "newton";
   if (argc>1) solver = argv[1]; // chose a different solver from command line
 
   // Coefficients of the collocation equation
-  vector<vector<double> > C(d+1,vector<double>(d+1,0));
+  std::vector<std::vector<double> > C(d+1, std::vector<double>(d+1,0));
 
   // Coefficients of the continuity equation
-  vector<double> D(d+1,0);
+  std::vector<double> D(d+1,0);
 
   // For all collocation points
   for(int j=0; j<d+1; ++j){
@@ -102,14 +101,14 @@ int main(int argc, char *argv[]) {
   MX V = MX::sym("V",d*nx);
 
   // Get the state at each collocation point
-  vector<MX> X(1,X0);
+  std::vector<MX> X(1,X0);
   for(int r=0; r<d; ++r){
     X.push_back(V.nz(Slice(r*nx,(r+1)*nx)));
   }
 
   // Get the collocation equations (that define V)
   Function f("f", {dae["x"], dae["p"]}, {dae["ode"]});
-  vector<MX> V_eq;
+  std::vector<MX> V_eq;
   for(int j=1; j<d+1; ++j){
     // Expression for the state derivative at the collocation point
     MX xp_j = 0;
@@ -118,7 +117,7 @@ int main(int argc, char *argv[]) {
     }
 
     // Append collocation equations
-    vector<MX> v = {X[j], P};
+    std::vector<MX> v = {X[j], P};
     v = f(v);
     V_eq.push_back(h*v[0] - xp_j);
   }
@@ -142,7 +141,7 @@ int main(int argc, char *argv[]) {
   Function ifcn = rootfinder("ifcn", solver, vfcn_sx, opts);
 
   // Get an expression for the state at the end of the finite element
-  vector<MX> ifcn_arg = {MX(), X0, P};
+  std::vector<MX> ifcn_arg = {MX(), X0, P};
   V = ifcn(ifcn_arg).front();
   X.resize(1);
   for(int r=0; r<d; ++r){
@@ -159,7 +158,7 @@ int main(int argc, char *argv[]) {
   // Do this iteratively for all finite elements
   MX Xk = X0;
   for(int i=0; i<n; ++i){
-    Xk = F(vector<MX>{Xk, P}).at(0);
+    Xk = F(std::vector<MX>{Xk, P}).at(0);
   }
 
   // Fixed-step integrator
@@ -171,44 +170,44 @@ int main(int argc, char *argv[]) {
                                        "cvodes", dae, {{"tf", tf}});
 
   // Test values
-  vector<double> x0_val = {0, 1, 0};
+  std::vector<double> x0_val = {0, 1, 0};
   double p_val = 0.2;
 
   // Make sure that both integrators give consistent results
   for(int integ=0; integ<2; ++integ){
     Function F = integ==0 ? irk_integrator : ref_integrator;
-    cout << "-------" << endl;
-    cout << "Testing " << F.name() << endl;
-    cout << "-------" << endl;
+    std::cout << "-------" << std::endl;
+    std::cout << "Testing " << F.name() << std::endl;
+    std::cout << "-------" << std::endl;
 
     // Generate a new function that calculates forward and reverse directional derivatives
     Function dF = F.factory("dF", {"x0", "p", "fwd:x0", "fwd:p", "adj:xf"},
                                   {"xf", "fwd:xf", "adj:x0", "adj:p"});
 
     // Arguments for evaluation
-    map<string, DM> arg, res;
+    std::map<std::string, DM> arg, res;
     arg["x0"] = x0_val;
     arg["p"] = p_val;
 
     // Forward sensitivity analysis, first direction: seed p and x0[0]
-    arg["fwd_x0"] = vector<double>{1, 0, 0};
+    arg["fwd_x0"] = std::vector<double>{1, 0, 0};
     arg["fwd_p"] = 1;
 
     // Adjoint sensitivity analysis, seed xf[2]
-    arg["adj_xf"] = vector<double>{0, 0, 1};
+    arg["adj_xf"] = std::vector<double>{0, 0, 1};
 
     // Integrate
     res = dF(arg);
 
     // Get the nondifferentiated results
-    cout << setw(15) << "xf = " << res.at("xf") << endl;
+    std::cout << std::setw(15) << "xf = " << res.at("xf") << std::endl;
 
     // Get the forward sensitivities
-    cout << setw(15) << "d(xf)/d(p)+d(xf)/d(x0[0]) = " <<  res.at("fwd_xf") << endl;
+    std::cout << std::setw(15) << "d(xf)/d(p)+d(xf)/d(x0[0]) = " <<  res.at("fwd_xf") << std::endl;
 
     // Get the adjoint sensitivities
-    cout << setw(15) << "d(xf[2])/d(x0) = " << res.at("adj_x0") << endl;
-    cout << setw(15) << "d(xf[2])/d(p) = " << res.at("adj_p") << endl;
+    std::cout << std::setw(15) << "d(xf[2])/d(x0) = " << res.at("adj_x0") << std::endl;
+    std::cout << std::setw(15) << "d(xf[2])/d(p) = " << res.at("adj_p") << std::endl;
   }
   return 0;
 }

@@ -26,28 +26,27 @@
 #include "conic_impl.hpp"
 #include "nlpsol_impl.hpp"
 
-using namespace std;
 namespace casadi {
 
-  bool has_conic(const string& name) {
+  bool has_conic(const std::string& name) {
     return Conic::has_plugin(name);
   }
 
-  void load_conic(const string& name) {
+  void load_conic(const std::string& name) {
     Conic::load_plugin(name);
   }
 
-  string doc_conic(const string& name) {
+  std::string doc_conic(const std::string& name) {
     return Conic::getPlugin(name).doc;
   }
 
-  Function conic(const string& name, const string& solver,
+  Function conic(const std::string& name, const std::string& solver,
                 const SpDict& qp, const Dict& opts) {
     return Function::create(Conic::instantiate(name, solver, qp), opts);
   }
 
   void conic_debug(const Function& f, const std::string &filename) {
-    ofstream file;
+    std::ofstream file;
     file.open(filename.c_str());
     conic_debug(f, file);
   }
@@ -58,19 +57,19 @@ namespace casadi {
     return n->generateNativeCode(file);
   }
 
-  vector<string> conic_in() {
-    vector<string> ret(conic_n_in());
+  std::vector<std::string> conic_in() {
+    std::vector<std::string> ret(conic_n_in());
     for (size_t i=0; i<ret.size(); ++i) ret[i]=conic_in(i);
     return ret;
   }
 
-  vector<string> conic_out() {
-    vector<string> ret(conic_n_out());
+  std::vector<std::string> conic_out() {
+    std::vector<std::string> ret(conic_n_out());
     for (size_t i=0; i<ret.size(); ++i) ret[i]=conic_out(i);
     return ret;
   }
 
-  string conic_in(casadi_int ind) {
+  std::string conic_in(casadi_int ind) {
     switch (static_cast<ConicInput>(ind)) {
     case CONIC_H:      return "h";
     case CONIC_G:      return "g";
@@ -86,10 +85,10 @@ namespace casadi {
     case CONIC_LAM_A0: return "lam_a0";
     case CONIC_NUM_IN: break;
     }
-    return string();
+    return std::string();
   }
 
-  string conic_out(casadi_int ind) {
+  std::string conic_out(casadi_int ind) {
     switch (static_cast<ConicOutput>(ind)) {
     case CONIC_X:     return "x";
     case CONIC_COST:  return "cost";
@@ -97,7 +96,7 @@ namespace casadi {
     case CONIC_LAM_X: return "lam_x";
     case CONIC_NUM_OUT: break;
     }
-    return string();
+    return std::string();
   }
 
   casadi_int conic_n_in() {
@@ -120,7 +119,7 @@ namespace casadi {
     Dict opt = opts;
     auto it = opt.find("expand");
     bool expand = false;
-    bool error_on_fail = get_from_dict(opts, "error_on_fail", true); 
+    bool error_on_fail = get_from_dict(opts, "error_on_fail", true);
     if (it!=opt.end()) {
       expand = it->second;
       opt.erase(it);
@@ -207,7 +206,7 @@ namespace casadi {
                               {"p", P.sparsity()}, {"q", Q.sparsity()}}, opt);
 
     // Create an MXFunction with the right signature
-    vector<MX> ret_in(NLPSOL_NUM_IN);
+    std::vector<MX> ret_in(NLPSOL_NUM_IN);
     ret_in[NLPSOL_X0] = MX::sym("x0", x.sparsity());
     ret_in[NLPSOL_P] = MX::sym("p", p.sparsity());
     ret_in[NLPSOL_LBX] = MX::sym("lbx", x.sparsity());
@@ -216,10 +215,10 @@ namespace casadi {
     ret_in[NLPSOL_UBG] = MX::sym("ubg", g.sparsity());
     ret_in[NLPSOL_LAM_X0] = MX::sym("lam_x0", x.sparsity());
     ret_in[NLPSOL_LAM_G0] = MX::sym("lam_g0", g.sparsity());
-    vector<MX> ret_out(NLPSOL_NUM_OUT);
+    std::vector<MX> ret_out(NLPSOL_NUM_OUT);
 
 
-    vector<MX> v(NL_NUM_IN);
+    std::vector<MX> v(NL_NUM_IN);
     v[NL_X] = ret_in[NLPSOL_X0];
     v[NL_P] = ret_in[NLPSOL_P];
     // Evaluate constant part of objective
@@ -228,7 +227,7 @@ namespace casadi {
     v = prob(v);
 
     // Call the QP solver
-    vector<MX> w(CONIC_NUM_IN);
+    std::vector<MX> w(CONIC_NUM_IN);
     w[CONIC_H] = v.at(0);
     w[CONIC_G] = v.at(1);
     w[CONIC_A] = v.at(2);
@@ -430,12 +429,6 @@ namespace casadi {
       "Selected solver does not support psd constraints.");
 
     set_qp_prob();
-
-    // Allocate memory
-    casadi_int sz_w, sz_iw;
-    casadi_qp_work(&p_qp_, &sz_iw, &sz_w);
-    alloc_iw(sz_iw, true);
-    alloc_w(sz_w, true);
   }
 
   /** \brief Initalize memory block */
@@ -468,9 +461,9 @@ namespace casadi {
     d_qp.f = res[CONIC_COST];
 
     // Problem has not been solved at this point
-    m->success = false;
-    m->unified_return_status = SOLVER_RET_UNKNOWN;
-    m->iter_count = -1;
+    d_qp.success = false;
+    d_qp.unified_return_status = SOLVER_RET_UNKNOWN;
+    d_qp.iter_count = -1;
   }
 
   Conic::~Conic() {
@@ -540,7 +533,7 @@ namespace casadi {
 
     int ret = solve(arg, res, iw, w, mem);
 
-    if (error_on_fail_ && !m->success)
+    if (error_on_fail_ && !m->d_qp.success)
       casadi_error("conic process failed. "
                    "Set 'error_on_fail' option to false to ignore this error.");
     return ret;
@@ -697,9 +690,9 @@ namespace casadi {
     Dict stats = FunctionInternal::get_stats(mem);
     auto m = static_cast<ConicMemory*>(mem);
 
-    stats["success"] = m->success;
-    stats["unified_return_status"] = string_from_UnifiedReturnStatus(m->unified_return_status);
-    stats["iter_count"] = m->iter_count;
+    stats["success"] = m->d_qp.success;
+    stats["unified_return_status"] = string_from_UnifiedReturnStatus(m->d_qp.unified_return_status);
+    stats["iter_count"] = m->d_qp.iter_count;
     return stats;
   }
 

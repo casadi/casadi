@@ -36,7 +36,7 @@ namespace casadi {
 
   /** \brief casadi_limits class
 
-  The following class, which acts as a complements to the standard numeric_limits class, allows
+  The following class, which acts as a complements to the standard std::numeric_limits class, allows
   specifying certain properties of scalar objects. The template can be specialized for
   e.g. symbolic scalars
   \author Joel Andersson

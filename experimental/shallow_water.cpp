@@ -29,7 +29,6 @@
 #include <cstdlib>
 
 using namespace casadi;
-using namespace std;
 
 class Tester{
 public:
@@ -63,13 +62,13 @@ public:
   Function f_;
 
   // Generated measurements
-  vector<DM> H_meas_;
+  std::vector<DM> H_meas_;
 
   // Height of the splash
   double spheight_;
 
   // Scaling factors for the parameters
-  vector<double> p_scale_;
+  std::vector<double> p_scale_;
 
   /// NLP solver
   Function nlpsol_;
@@ -88,7 +87,7 @@ void Tester::model(){
   double dt = endtime/ntimesteps;
   double dx = poolwidth/n_;
   double dy = poolwidth/n_;
-  vector<double> x(n_), y(n_);
+  std::vector<double> x(n_), y(n_);
   for(int i=0; i<n_; ++i){
     x[i] = (i+0.5)*dx;
     y[i] = (i+0.5)*dy;
@@ -157,26 +156,26 @@ void Tester::model(){
   h += d1*(u(Slice(1,n_+1),Slice())-u(Slice(0,n_),Slice())) + d2*(v(Slice(),Slice(1,n_+1))-v(Slice(),Slice(0,n_)));
 
   // Create an integrator function
-  vector<MX> f_step_in(4);
+  std::vector<MX> f_step_in(4);
   f_step_in[0] = p;
   f_step_in[1] = uk;
   f_step_in[2] = vk;
   f_step_in[3] = hk;
-  vector<MX> f_step_out(3);
+  std::vector<MX> f_step_out(3);
   f_step_out[0] = u;
   f_step_out[1] = v;
   f_step_out[2] = h;
   Function f_step("f_step_mx", f_step_in, f_step_out, {"p", "u0", "v0", "h0"}, {"uf", "vf", "hf"});
-  cout << "generated single step dynamics (" << f_step.n_nodes() << " nodes)" << endl;
+  std::cout << "generated single step dynamics (" << f_step.n_nodes() << " nodes)" << std::endl;
 
   // Expand the discrete dynamics?
   if(false){
     f_step = f_step.expand();
-    cout << "generated single step dynamics, SX (" << f_step.n_nodes() << " nodes)" << endl;
+    std::cout << "generated single step dynamics, SX (" << f_step.n_nodes() << " nodes)" << std::endl;
   }
 
   // Integrate over one subinterval
-  vector<MX> f_in(4);
+  std::vector<MX> f_in(4);
   MX P = MX::sym("P",2);
   MX Uk = MX::sym("Uk",n_+1, n_);
   MX Vk = MX::sym("Vk",n_  , n_+1);
@@ -185,8 +184,8 @@ void Tester::model(){
   f_in[1] = Uk;
   f_in[2] = Vk;
   f_in[3] = Hk;
-  vector<MX> f_inter = f_in;
-  vector<MX> f_out;
+  std::vector<MX> f_inter = f_in;
+  std::vector<MX> f_out;
   for(int j=0; j<n_euler_; ++j){
     // Create a call node
     f_out = f_step(f_inter);
@@ -199,7 +198,7 @@ void Tester::model(){
 
   // Create an integrator function
   f_ = Function("f_mx", f_in, f_out, {"P", "U0", "V0", "H0"}, {"UF", "VF", "HF"});
-  cout << "generated discrete dynamics for one finite element (" << f_.n_nodes() << " MX nodes)" << endl;
+  std::cout << "generated discrete dynamics for one finite element (" << f_.n_nodes() << " MX nodes)" << std::endl;
 
   // Integrate over the complete interval
   if(n_finite_elements_>1){
@@ -220,13 +219,13 @@ void Tester::model(){
 
     // Create an integrator function
     f_ = Function("f_mx", f_in, f_out, {"P", "U0", "V0", "H0"}, {"UF", "VF", "HF"});
-    cout << "generated discrete dynamics for complete interval (" << f_.n_nodes() << " MX nodes)" << endl;
+    cout << "generated discrete dynamics for complete interval (" << f_.n_nodes() << " MX nodes)" << std::endl;
   }
 
   // Expand the discrete dynamics
   if(false){
     f_ = f_.expand("f_sx");
-    cout << "generated discrete dynamics, SX (" << f_.n_nodes() << " nodes)" << endl;
+    std::cout << "generated discrete dynamics, SX (" << f_.n_nodes() << " nodes)" << std::endl;
   }
 }
 
@@ -236,16 +235,16 @@ void Tester::simulate(double drag_true, double depth_true){
   H_meas_.reserve(n_meas_);
 
   // Unscaled parameter values
-  vector<double> p_true(2); p_true[0]=drag_true; p_true[1]=depth_true;
+  std::vector<double> p_true(2); p_true[0]=drag_true; p_true[1]=depth_true;
   for(int i=0; i<2; ++i){
     p_true[i] /= p_scale_[i];
   }
 
   // Simulate once to generate "measurements"
-  vector<DM> arg = {p_true, u0_, v0_, h0_};
+  std::vector<DM> arg = {p_true, u0_, v0_, h0_};
   clock_t time1 = clock();
   for(int k=0; k<n_meas_; ++k){
-    vector<DM> res = f_(arg);
+    std::vector<DM> res = f_(arg);
     const DM& u = res.at(0);
     const DM& v = res.at(1);
     const DM& h = res.at(2);
@@ -258,7 +257,7 @@ void Tester::simulate(double drag_true, double depth_true){
   }
   clock_t time2 = clock();
   double t_elapsed = double(time2-time1)/CLOCKS_PER_SEC;
-  cout << "measurements generated in " << t_elapsed << " seconds." << endl;
+  std::cout << "measurements generated in " << t_elapsed << " seconds." << std::endl;
 }
 
 
@@ -268,14 +267,14 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton, bool codegen, b
   MX P = MX::sym("P",2);
 
   // Variables in the lifted NLP
-  stringstream ss;
+  std::stringstream ss;
 
   // Objective function terms
-  vector<MX> nlp_fv;
+  std::vector<MX> nlp_fv;
   if(!gauss_newton) nlp_fv.push_back(0);
 
   // Constraint function terms
-  vector<MX> nlp_gv;
+  std::vector<MX> nlp_gv;
 
   // Generate full-space NLP
   MX U = u0_;
@@ -283,7 +282,7 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton, bool codegen, b
   MX H = h0_;
   for(int k=0; k<n_meas_; ++k){
     // Take a step
-    vector<MX> f_res = f_(vector<MX>{P,U,V,H});
+    std::vector<MX> f_res = f_(std::vector<MX>{P,U,V,H});
     U = f_res[0];
     V = f_res[1];
     H = f_res[2];
@@ -316,7 +315,7 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton, bool codegen, b
   }
 
   MXDict nlp = {{"x", P}, {"f", vertcat(nlp_fv)}, {"g", vertcat(nlp_gv)}};
-  cout << "Generated single-shooting NLP" << endl;
+  std::cout << "Generated single-shooting NLP" << std::endl;
 
   // NLP Solver
   Dict opts;
@@ -330,13 +329,13 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton, bool codegen, b
   //opts["merit_memory"] = 1;
   opts["max_iter"] = 100;
   opts["compiler"] = "shell";
-  opts["jit_options"] = Dict{{"compiler", "clang"}, {"flags", vector<string>{"-O2"}}};
+  opts["jit_options"] = Dict{{"compiler", "clang"}, {"flags", std::vector<std::string>{"-O2"}}};
   if(gauss_newton){
     opts["hessian_approximation"] = "gauss-newton";
   }
 
   // Print both of the variables
-  opts["name_x"] = vector<string>{"drag", "depth"};
+  opts["name_x"] = std::vector<std::string>{"drag", "depth"};
   opts["print_x"] = range(2);
 
   if(ipopt_as_qpsol){
@@ -353,22 +352,22 @@ void Tester::transcribe(bool single_shooting, bool gauss_newton, bool codegen, b
 }
 
 void Tester::optimize(double drag_guess, double depth_guess, int& iter_count, double& sol_time, double& drag_est, double& depth_est){
-  cout << "Starting parameter estimation" << endl;
+  std::cout << "Starting parameter estimation" << std::endl;
 
   // Initial guess
-  vector<double> p_init(2);
+  std::vector<double> p_init(2);
   p_init[0] = drag_guess/p_scale_[0];
   p_init[1] = depth_guess/p_scale_[1];
 
   // Bounds on the variables
-  vector<double> lbu(2), ubu(2);
+  std::vector<double> lbu(2), ubu(2);
   lbu.at(0) = 1.0e-1 / p_scale_[0]; // drag positive
   lbu.at(1) = 5.0e-4 / p_scale_[1]; // depth positive
   ubu.at(0) = 100.0 / p_scale_[0]; // max drag
   ubu.at(1) =  0.10 / p_scale_[1]; // max depth
 
   clock_t time1 = clock();
-  map<string, DM> w = {{"x0", p_init},
+  std::map<std::string, DM> w = {{"x0", p_init},
                        {"lbx", lbu},
                        {"ubx", ubu},
                        {"lbg", -spheight_},
@@ -378,7 +377,7 @@ void Tester::optimize(double drag_guess, double depth_guess, int& iter_count, do
 
   // Solution statistics
   sol_time = double(time2-time1)/CLOCKS_PER_SEC;
-  const vector<double>& x_opt = w.at("x").nonzeros();
+  const std::vector<double>& x_opt = w.at("x").nonzeros();
   drag_est = x_opt.at(0)*p_scale_[0];
   depth_est = x_opt.at(1)*p_scale_[1];
   iter_count = nlpsol_.stats().at("iter_count");
@@ -410,7 +409,7 @@ int main(){
   int n = 15, n_euler = 20, n_finite_elements = 1, n_meas = 20;
 
   // Initial guesses
-  vector<double> drag_guess, depth_guess;
+  std::vector<double> drag_guess, depth_guess;
   drag_guess.push_back( 2.0); depth_guess.push_back(0.01); // Optimal solution
   drag_guess.push_back( 0.5); depth_guess.push_back(0.01);
   drag_guess.push_back( 5.0); depth_guess.push_back(0.01);
@@ -429,18 +428,18 @@ int main(){
   const int n_tests = drag_guess.size();
 
   // Number of iterations
-  vector<int> iter_count_gn(n_tests,-1);
-  vector<int> iter_count_eh(n_tests,-1);
+  std::vector<int> iter_count_gn(n_tests,-1);
+  std::vector<int> iter_count_eh(n_tests,-1);
 
   // Solution time
-  vector<double> sol_time_gn(n_tests,-1);
-  vector<double> sol_time_eh(n_tests,-1);
+  std::vector<double> sol_time_gn(n_tests,-1);
+  std::vector<double> sol_time_eh(n_tests,-1);
 
   // Estimated drag and depth
-  vector<double> drag_est_gn(n_tests,-1);
-  vector<double> depth_est_gn(n_tests,-1);
-  vector<double> drag_est_eh(n_tests,-1);
-  vector<double> depth_est_eh(n_tests,-1);
+  std::vector<double> drag_est_gn(n_tests,-1);
+  std::vector<double> depth_est_gn(n_tests,-1);
+  std::vector<double> drag_est_eh(n_tests,-1);
+  std::vector<double> depth_est_eh(n_tests,-1);
 
   // Create a tester object
   Tester t(n,n_euler,n_finite_elements,n_meas);
@@ -461,7 +460,7 @@ int main(){
     // Run tests
     for(int test=0; test<n_tests; ++test){
       // Print progress
-      cout << "test " << test << endl;
+      std::cout << "test " << test << std::endl;
       try{
 	t.optimize(drag_guess[test],depth_guess[test],
 		   sol==0 ? iter_count_gn[test] : iter_count_eh[test],
@@ -470,8 +469,8 @@ int main(){
 		   sol==0 ? depth_est_gn[test] : depth_est_eh[test]);
 
 	// Estimated drag
-      } catch(exception& ex){
-	cout << "Test " << test << " failed: " << ex.what() << endl;
+      } catch(std::exception& ex){
+	      std::cout << "Test " << test << " failed: " << ex.what() << std::endl;
       }
     }
   }
@@ -480,37 +479,37 @@ int main(){
   double tol=1e-3;
 
   cout <<
-  setw(10) << "drag" <<  "  &" <<
-  setw(10) << "depth" << "  &" <<
-  setw(10) << "iter_ss" << "  &" <<
-  setw(10) << "time_ss" << "  &" <<
-  setw(10) << "iter_ms" << "  &" <<
-  setw(10) << "time_ms" << "  \\\\ \%" <<
-  setw(10) << "edrag_ss" <<
-  setw(10) << "edepth_ss" <<
-  setw(10) << "edrag_ms" <<
-  setw(10) << "edepth_ms" << endl;
+  std::setw(10) << "drag" <<  "  &" <<
+  std::setw(10) << "depth" << "  &" <<
+  std::setw(10) << "iter_ss" << "  &" <<
+  std::setw(10) << "time_ss" << "  &" <<
+  std::setw(10) << "iter_ms" << "  &" <<
+  std::setw(10) << "time_ms" << "  \\\\ \%" <<
+  std::setw(10) << "edrag_ss" <<
+  std::setw(10) << "edepth_ss" <<
+  std::setw(10) << "edrag_ms" <<
+  std::setw(10) << "edepth_ms" << std::endl;
   for(int test=0; test<n_tests; ++test){
-    cout << setw(10) << drag_guess[test] << "  &";
-    cout << setw(10) << depth_guess[test] << "  &";
+    std::cout << std::setw(10) << drag_guess[test] << "  &";
+    std::cout << std::setw(10) << depth_guess[test] << "  &";
     if(fabs(drag_est_gn[test]-drag_true) + fabs(depth_est_gn[test]-depth_true)<tol){
-      cout << setw(10) << iter_count_gn[test] << "  &";
-      cout << setw(10) << sol_time_gn[test] << "  &";
+      std::cout << std::setw(10) << iter_count_gn[test] << "  &";
+      std::cout << std::setw(10) << sol_time_gn[test] << "  &";
     } else {
-      cout << setw(10) << "$\\infty$" << "  &";
-      cout << setw(10) << "$\\infty$" << "  &";
+      std::cout << std::setw(10) << "$\\infty$" << "  &";
+      std::cout << std::setw(10) << "$\\infty$" << "  &";
     }
     if(fabs(drag_est_eh[test]-drag_true) + fabs(depth_est_eh[test]-depth_true)<tol){
-      cout << setw(10) << iter_count_eh[test] << "  &";
-      cout << setw(10) << sol_time_eh[test] << "  \\\\ \%";
+      std::cout << std::setw(10) << iter_count_eh[test] << "  &";
+      std::cout << std::setw(10) << sol_time_eh[test] << "  \\\\ \%";
     } else {
-      cout << setw(10) << "$\\infty$" << "  &";
-      cout << setw(10) << "$\\infty$" << "  \\\\ \%";
+      std::cout << std::setw(10) << "$\\infty$" << "  &";
+      std::cout << std::setw(10) << "$\\infty$" << "  \\\\ \%";
     }
-    cout << setw(10) << drag_est_gn[test];
-    cout << setw(10) << depth_est_gn[test];
-    cout << setw(10) << drag_est_eh[test];
-    cout << setw(10) << depth_est_eh[test] << endl;
+    std::cout << std::setw(10) << drag_est_gn[test];
+    std::cout << std::setw(10) << depth_est_gn[test];
+    std::cout << std::setw(10) << drag_est_eh[test];
+    std::cout << std::setw(10) << depth_est_eh[test] << std::endl;
   }
 
   return 0;

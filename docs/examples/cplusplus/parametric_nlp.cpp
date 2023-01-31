@@ -30,7 +30,6 @@
 #include <casadi/casadi.hpp>
 
 using namespace casadi;
-using namespace std;
 /**
  *  Example program demonstrating parametric NLPs in CasADi
  *  Note that there is currently no support for parametric sensitivities via this feature (although it would make a lot of sense).
@@ -66,16 +65,16 @@ int main(){
   );
 
   // Initial guess and bounds for the optimization variables
-  vector<double> x0  = {0.15, 0.15, 0.00};
-  vector<double> lbx = {0.00, 0.00, 0.00};
-  vector<double> ubx = { inf,  inf,  inf};
+  std::vector<double> x0  = {0.15, 0.15, 0.00};
+  std::vector<double> lbx = {0.00, 0.00, 0.00};
+  std::vector<double> ubx = { inf,  inf,  inf};
 
   // Nonlinear bounds
-  vector<double> lbg = {0.00, 0.00};
-  vector<double> ubg = {0.00, 0.00};
+  std::vector<double> lbg = {0.00, 0.00};
+  std::vector<double> ubg = {0.00, 0.00};
 
   // Original parameter values
-  vector<double> p0  = {5.00, 1.00};
+  std::vector<double> p0  = {5.00, 1.00};
 
   // NLP
   SXDict nlp = {{"x", x}, {"p", p}, {"f", f}, {"g", g}};
@@ -94,24 +93,24 @@ int main(){
   res = solver(arg);
 
   // Print the solution
-  cout << "-----" << endl;
-  cout << "Optimal solution for p = " << arg.at("p") << ":" << endl;
-  cout << setw(30) << "Objective: " << res.at("f") << endl;
-  cout << setw(30) << "Primal solution: " << res.at("x") << endl;
-  cout << setw(30) << "Dual solution (x): " << res.at("lam_x") << endl;
-  cout << setw(30) << "Dual solution (g): " << res.at("lam_g") << endl;
+  std::cout << "-----" << std::endl;
+  std::cout << "Optimal solution for p = " << arg.at("p") << ":" << std::endl;
+  std::cout << std::setw(30) << "Objective: " << res.at("f") << std::endl;
+  std::cout << std::setw(30) << "Primal solution: " << res.at("x") << std::endl;
+  std::cout << std::setw(30) << "Dual solution (x): " << res.at("lam_x") << std::endl;
+  std::cout << std::setw(30) << "Dual solution (g): " << res.at("lam_g") << std::endl;
 
   // Change the parameter and resolve
   arg["p"] = 4.5;
   res = solver(arg);
 
   // Print the new solution
-  cout << "-----" << endl;
-  cout << "Optimal solution for p = " << arg.at("p") << ":" << endl;
-  cout << setw(30) << "Objective: " << res.at("f") << endl;
-  cout << setw(30) << "Primal solution: " << res.at("x") << endl;
-  cout << setw(30) << "Dual solution (x): " << res.at("lam_x") << endl;
-  cout << setw(30) << "Dual solution (g): " << res.at("lam_g") << endl;
+  std::cout << "-----" << std::endl;
+  std::cout << "Optimal solution for p = " << arg.at("p") << ":" << std::endl;
+  std::cout << std::setw(30) << "Objective: " << res.at("f") << std::endl;
+  std::cout << std::setw(30) << "Primal solution: " << res.at("x") << std::endl;
+  std::cout << std::setw(30) << "Dual solution (x): " << res.at("lam_x") << std::endl;
+  std::cout << std::setw(30) << "Dual solution (g): " << res.at("lam_g") << std::endl;
 
   return 0;
 }

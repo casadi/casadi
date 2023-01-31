@@ -25,7 +25,6 @@
 
 #include "tinyxml_interface.hpp"
 
-using namespace std;
 namespace casadi {
 
   extern "C"
@@ -67,7 +66,7 @@ namespace casadi {
     }
 
     // Save attributes
-    if (n->ToElement()) {    
+    if (n->ToElement()) {
       for (const TiXmlAttribute* pAttrib=n->ToElement()->FirstAttribute();
                                  pAttrib; pAttrib=pAttrib->Next()) {
         ret.set_attribute(pAttrib->Name(), pAttrib->Value());

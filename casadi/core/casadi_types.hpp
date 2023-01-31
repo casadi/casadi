@@ -50,4 +50,16 @@ typedef unsigned CASADI_INT_TYPE casadi_uint;
 
 typedef casadi_int casadi_index;
 
+namespace casadi {
+    /** Unified return status for solvers */
+    enum UnifiedReturnStatus {
+        SOLVER_RET_SUCCESS,
+        SOLVER_RET_UNKNOWN,
+        SOLVER_RET_LIMITED, // Out of time
+        SOLVER_RET_NAN,
+        SOLVER_RET_INFEASIBLE
+    };
+}
+
+
 #endif // CASADI_TYPES_HPP

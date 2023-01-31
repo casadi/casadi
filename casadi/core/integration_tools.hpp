@@ -162,17 +162,17 @@ namespace casadi {
   Function simpleIntegrator(Function f, const std::string& integrator="cvodes",
                               const Dict& integrator_options = Dict());
 
- 
+
   /** \brief Reduce index
-   * 
-   * 
+   *
+   *
    * Index reduction leads to a new set of variables and equations.
-   * 
+   *
    * In the process, a set of constraints (algebraic equations or derivatives) a.k.a invariants is constructed
    * that are invariant to the problem: whenever an initial point satisfies these constraints,
    * the boundary-value-problem outcome will keep satisfying those constraints automatically,
    * even though they are *not* part of the reduced DAE.
-   * 
+   *
    * For any practical numerical integration method, there will be numerical drift away from satisfaction of those constraints.
    * In other words, you will see the value of invariants slowly moving away from original zero.
    * 
@@ -279,10 +279,12 @@ namespace casadi {
   /// @{
   CASADI_EXPORT
   Function dae_init_gen(const MXDict& dae, const MXDict& dae_red,
-    const std::string& init_solver, const DMDict& init_strength=DMDict(), const Dict& init_solver_options=Dict());
+    const std::string& init_solver, const DMDict& init_strength=DMDict(),
+    const Dict& init_solver_options=Dict());
   CASADI_EXPORT
   Function dae_init_gen(const SXDict& dae, const SXDict& dae_red,
-    const std::string& init_solver, const DMDict& init_strength=DMDict(), const Dict& init_solver_options=Dict());
+    const std::string& init_solver, const DMDict& init_strength=DMDict(),
+    const Dict& init_solver_options=Dict());
   /// @}
 
 } // namespace casadi

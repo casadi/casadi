@@ -2523,7 +2523,15 @@ class Functiontests(casadiTestCase):
 
     LUT_param = casadi.interpolant('name','linear',[N,M],2, {"lookup_mode": ["exact","linear"]})
 
-    LUT_param_ref = LUT_param.wrap_as_needed({"ad_weight_sp":-1,"enable_fd": True, "enable_forward": False, "enable_reverse": False})
+    only_fd = {"enable_fd": True, "enable_forward": False, "enable_reverse": False}
+    options = {"ad_weight_sp":-1}
+    options.update(only_fd)
+    options["forward_options"] = only_fd
+    options["reverse_options"] = only_fd
+    #options["jacobian_options"] = only_fd
+
+    print(options)
+    LUT_param_ref = LUT_param.wrap_as_needed(options)
     J_ref = LUT_param_ref.jacobian()
 
     d_knots_cat = vcat(d_knots[0]+d_knots[1])
@@ -2535,6 +2543,7 @@ class Functiontests(casadiTestCase):
 
     self.checkarray(LUT_param(*inputs),LUT_param_ref(*inputs))
     inputs+= [0]
+    print("J_ref",J_ref,J_ref(*inputs))
     self.checkfunction(J,J_ref,inputs=inputs,digits=8,digits_sens=1,evals=1)
 
 
@@ -2779,6 +2788,216 @@ class Functiontests(casadiTestCase):
         self.assertTrue(f1.n_instructions()>3)
         self.assertTrue(f2.n_instructions()<=3)
 
+  @memory_heavy()
+  def test_stop_diff(self):
+    x = MX.sym("x")
+    y = sin(x)
     
+    max_order = 2
+    for order in range(1, max_order+1):
+    
+        test_z = 3*x**(order-1)
+        fa = Function('f',[x],[stop_diff(test_z,order)],['x'],['z'])
+        fb = Function('f',[x],[test_z],['x'],['z'])
+        self.checkfunction(fa, fb, inputs=[DM.rand(1,1)])
+        
+        z = stop_diff(y,order)
+        DM.rng(1)
+        
+        v0 = DM.rand(1)#v.sparsity())
+        expr0 = DM.rand(1)#expr.sparsity())
+        
+        for op in [gradient,jacobian,lambda expr,v : jtimes(expr,v,v0),lambda expr,v : jtimes(expr,v,expr0,True)]:
+            yd = y
+            zd = z
+            for i in range(max_order+2):
+                
+                f = Function('f',[x],[yd,zd])
+                x0 = DM.rand(f.sparsity_in(0))
+                res = f(x0)
+                
+
+                if i>=order:
+                    self.assertTrue(res[1].is_zero())
+                else:
+                    self.assertEqual(res[0],res[1])
+        
+                if i<order:
+                    yd = op(yd,x)
+                    zd = op(zd,x)
+        
+        f = Function('f',[x],[z],['x'],['z'])
+        f_normal = Function('f',[x],[y],['x'],['z'])
+        f_ref = Function('f',[x],[test_z],['x'],['z'])
+        
+        for i in range(3):
+            inputs = [DM.rand(f.sparsity_in(i)) for i in range(f.n_in())]
+            if i>=order:
+                res = f.call(inputs,False,False)
+                res_ref = f_ref.call(inputs,False,False)
+                for e,e_ref in zip(res,res_ref):
+                    if e_ref.is_zero():
+                        self.assertTrue(e.is_zero())
+                    else:
+                        self.assertFalse(e.is_zero())
+            else:
+                self.checkfunction_light(f,f_normal,inputs=inputs)
+                
+            if i<order:
+                
+                in_labels = f.name_in()+['fwd:'+e for e in f.name_in()]+['adj:'+e for e in f.name_out()]
+                out_labels = ['fwd:'+e for e in f.name_out()]+['adj:'+e for e in f.name_in()]
+                for e_in in f.name_in():
+                    for e_out in f.name_out():
+                        out_labels.append('jac:%s:%s' % (e_out,e_in))
+                        out_labels.append('grad:%s:%s' % (e_out,e_in))
+                        
+                f,f_normal,f_ref = [fe.factory('f',in_labels,out_labels) for fe in [f,f_normal,f_ref]]
+
+  @memory_heavy()
+  def test_stop_diff_cross(self):
+    x = MX.sym("x",2)
+    y = sin(x[0])+exp(x[1])+cos(x[0]**2*x[1]**2)
+    
+    max_order = 2
+    for order in range(1, max_order+1):
+    
+        test_z = 3*x**(order-1)
+        fa = Function('f',[x],[stop_diff(test_z,order)],['x'],['z'])
+        fb = Function('f',[x],[test_z],['x'],['z'])
+        self.checkfunction(fa, fb, inputs=[DM.rand(1,1)])
+        
+        z = stop_diff(y,order)
+        DM.rng(1)
+
+        for op in [jacobian,lambda expr,v : jtimes(expr,v,DM.rand(v.sparsity())),lambda expr,v : jtimes(expr,v,DM.rand(expr.sparsity()),True)]:
+            yd = y
+            zd = z
+            for i in range(max_order+1):
+                
+                f = Function('f',[x],[yd,zd])
+                x0 = DM.rand(f.sparsity_in(0))
+                res = f(x0)
+                
+
+                if i>=order:
+                    self.assertTrue(res[1].is_zero())
+                else:
+                    self.checkarray(res[0],res[1])
+        
+                if i<order:
+                    DM.rng(5+i)
+                    yd = op(yd,x)
+                    DM.rng(5+i)
+                    zd = op(zd,x)
+        
+        f = Function('f',[x],[z],['x'],['z'])
+        f_normal = Function('f',[x],[y],['x'],['z'])
+        f_ref = Function('f',[x],[test_z],['x'],['z'])
+        
+        if order<=1:
+            for i in range(3):
+                inputs = [DM.rand(f.sparsity_in(i)) for i in range(f.n_in())]
+                if i>=order:
+                    res = f.call(inputs,False,False)
+                    res_ref = f_ref.call(inputs,False,False)
+                    for e,e_ref in zip(res,res_ref):
+                        if e_ref.is_zero():
+                            self.assertTrue(e.is_zero())
+                        else:
+                            self.assertFalse(e.is_zero())
+                else:
+                    self.checkfunction_light(f,f_normal,inputs=inputs)
+                    
+                if i<order:
+                    
+                    in_labels = f.name_in()+['fwd:'+e for e in f.name_in()]+['adj:'+e for e in f.name_out()]
+                    out_labels = ['fwd:'+e for e in f.name_out()]+['adj:'+e for e in f.name_in()]
+                    for e_in in f.name_in():
+                        for e_out in f.name_out():
+                            out_labels.append('jac:%s:%s' % (e_out,e_in))
+                            
+                    f,f_normal,f_ref = [fe.factory('f',in_labels,out_labels) for fe in [f,f_normal,f_ref]]
+
+  @memory_heavy()
+  def test_stop_diff_p(self):
+    # Drop this -> not implemented
+    x = MX.sym("x")
+    y = MX.sym("y")
+    yy = sin(y*x)
+    
+    max_order = 2
+    
+    for order in range(1, max_order+1):
+        DM.rng(1)
+        print("order",order)
+        test_z = 3*(y*x)**(order-1)+y**order
+        test_z = sin(y)*x**(order-1)
+        """fa = Function('f',[x,p],[stop_diff(test_z,x,order)],['x','p'],['z'])
+        fb = Function('f',[x,p],[test_z],['x','p'],['z'])
+        print()
+        self.checkfunction(fa, fb, inputs=[DM.rand(1,1),DM.rand(1,1)])
+        continue"""
+        
+        z = stop_diff(yy,x,order)
+
+        
+        v0 = DM.rand(1)#v.sparsity())
+        expr0 = DM.rand(1)#expr.sparsity())
+        
+        
+        for op in [gradient,jacobian,lambda expr,v : jtimes(expr,v,v0),lambda expr,v : jtimes(expr,v,expr0,True)]:
+            yd = yy
+            zd = z
+            for i in range(max_order+2):
+                
+                f = Function('f',[x,y],[yd,zd])
+                x0 = DM.rand(f.sparsity_in(0))
+                p0 = DM.rand(f.sparsity_in(1))
+                res = f(x0, p0)
+                
+
+                if i>=order:
+                    self.assertTrue(res[1].is_zero())
+                else:
+                    self.assertEqual(res[0],res[1])
+        
+                if i<order:
+                    yd = op(yd,x)
+                    zd = op(zd,x)
+        
+        f = Function('f',[x,y],[z],['x','y'],['z'])
+        f_normal = Function('f',[x,y],[yy],['x','y'],['z'])
+        f_ref = Function('f',[x,y],[test_z],['x','y'],['z'])
+        
+        for i in range(3):
+            inputs = [DM.rand(f.sparsity_in(i)) for i in range(f.n_in())]
+            if i>=order:
+                res = f.call(inputs,False,False)
+                res_ref = f_ref.call(inputs,False,False)
+                f_ref.disp(True)
+                f.generate('f.c')
+                for e,e_ref,name in zip(res,res_ref,f.name_out()):
+                    print("check",name,e,e_ref)
+                    if e_ref.is_zero():
+                        self.assertTrue(e.is_zero())
+                    else:
+                        self.assertFalse(e.is_zero())
+            else:
+                self.checkfunction_light(f,f_normal,inputs=inputs)
+                
+            if i<order:
+                
+                in_labels = f.name_in()+['fwd:'+e for e in f.name_in()]*0+['adj:'+e for e in f.name_out()]
+                out_labels = f.name_out()+['fwd:'+e for e in f.name_out()]*0+['adj:'+e for e in f.name_in()]
+                #for e_in in f.name_in():
+                #    for e_out in f.name_out():
+                #        out_labels.append('jac:%s:%s' % (e_out,e_in))
+                #        out_labels.append('grad:%s:%s' % (e_out,e_in))
+                        
+                f,f_normal,f_ref = [fe.factory('f',in_labels,out_labels) for fe in [f,f_normal,f_ref]]
+            
+        
+   
 if __name__ == '__main__':
     unittest.main()

@@ -24,7 +24,6 @@
 
 
 #include "rank1.hpp"
-using namespace std;
 namespace casadi {
 
   Rank1::Rank1(const MX& A, const MX& alpha, const MX& x, const MX& y) {
@@ -79,7 +78,7 @@ namespace casadi {
 
   int Rank1::sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
     /* If not inline, copy to result */
-    if (arg[0]!=res[0]) copy(arg[0], arg[0]+dep(0).nnz(), res[0]);
+    if (arg[0]!=res[0]) std::copy(arg[0], arg[0]+dep(0).nnz(), res[0]);
 
     /* Get sparsities */
     casadi_int ncol_A = sparsity().size2();

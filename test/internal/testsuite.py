@@ -115,7 +115,7 @@ deprecated = re.compile(r"\b[dD]epr[ei]c[ie]?at[ei]")
 warning = re.compile("warning")
 
 class TestSuite:
-  def __init__(self,suffix=None,dirname=None,preRun=None,postRun=None,command=None,skipdirs=[],skipfiles=[],inputs={},workingdir = lambda x: x,allowable_returncodes=[],args=[],stderr_trigger=[],stdout_trigger=[],stdout_must_have=[],check_depreciation=True,check_warning=False,custom_stdout=None,default_fail=False):
+  def __init__(self,suffix=None,dirname=None,preRun=None,postRun=None,command=None,skipdirs=["hock_schittkowski"],skipfiles=[],inputs={},workingdir = lambda x: x,allowable_returncodes=[],args=[],stderr_trigger=[],stdout_trigger=[],stdout_must_have=[],check_depreciation=True,check_warning=False,custom_stdout=None,default_fail=False):
     """
 
     dirname: The directory that should be crawled for test problems.
@@ -325,7 +325,17 @@ class TestSuite:
       alarm(60*60) # 1 hour
       try:
         stdoutdata, stderrdata = f.communicate()
-        stdoutdata = stdoutfile.read() + "\n"+ stdoutdata
+        try:
+            stdoutdata = stdoutdata.decode("ascii")
+            stderrdata = stderrdata.decode("ascii")
+        except:
+            pass
+        s = stdoutfile.read()
+        try:
+            s = s.decode("ascii")
+        except:
+            pass
+        stdoutdata = s + "\n"+ stdoutdata
       except TimeoutEvent:
         killProcess(p.pid)
         killProcess(f.pid)

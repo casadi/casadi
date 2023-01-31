@@ -13,6 +13,7 @@ struct casadi_qp_prob {
   const casadi_int *sp_a, *sp_h;
   // Dimensions
   casadi_int nx, na, nz;
+  casadi_int nnz_a, nnz_h;
 };
 // C-REPLACE "casadi_qp_prob<T1>" "struct casadi_qp_prob"
 
@@ -22,13 +23,24 @@ void casadi_qp_setup(casadi_qp_prob<T1>* p) {
   p->na = p->sp_a[0];
   p->nx = p->sp_a[1];
   p->nz = p->na+p->nx;
+  p->nnz_a = p->sp_a[2+p->sp_a[1]];
+  p->nnz_h = p->sp_h[2+p->sp_h[1]];
 }
+
+// C-REPLACE "UnifiedReturnStatus" "int"
+// C-REPLACE "bool" "int"
 
 // SYMBOL "qp_data"
 template<typename T1>
 struct casadi_qp_data {
   // Problem structure
   const casadi_qp_prob<T1>* prob;
+
+  UnifiedReturnStatus unified_return_status;
+  bool success;
+
+  // Number of iterations performed
+  casadi_int iter_count;
 
   // QP data, pointers to arg (no allocations needed)
   const T1 *a, *h, *g, *lbx, *ubx, *lba, *uba, *x0, *lam_x0, *lam_a0;
@@ -47,7 +59,10 @@ void casadi_qp_init(casadi_qp_data<T1>* d, casadi_int** iw, T1** w) {
 
 // SYMBOL "qp_work"
 template<typename T1>
-void casadi_qp_work(const casadi_qp_prob<T1>* p, casadi_int* sz_iw, casadi_int* sz_w) {
+void casadi_qp_work(const casadi_qp_prob<T1>* p, casadi_int* sz_arg, casadi_int* sz_res,
+    casadi_int* sz_iw, casadi_int* sz_w) {
+  // Reset sz_arg, sz_res
+  *sz_arg = *sz_res = 0;
   // Reset sz_w, sz_iw
   *sz_w = *sz_iw = 0;
 }

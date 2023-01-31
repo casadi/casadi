@@ -25,8 +25,6 @@
 
 #include "subassign.hpp"
 
-using namespace std;
-
 namespace casadi {
 
   SubAssign::SubAssign(const MX& x, const MX& y, const Slice& i, const Slice& j) : i_(i), j_(j) {
@@ -59,7 +57,7 @@ namespace casadi {
   }
 
   std::string SubAssign::disp(const std::vector<std::string>& arg) const {
-    stringstream ss;
+    std::stringstream ss;
     ss << "(" << arg.at(0) << "[" << i_ << ", " << j_ << "]=" << arg.at(1) << ")";
     return ss.str();
   }

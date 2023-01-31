@@ -26,7 +26,6 @@
 #include "importer.hpp"
 #include "importer_internal.hpp"
 
-using namespace std;
 namespace casadi {
 
   Importer::Importer() {

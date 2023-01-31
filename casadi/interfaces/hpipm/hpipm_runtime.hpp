@@ -161,10 +161,8 @@ struct casadi_hpipm_data {
 // SYMBOL "qp_work"
 template<typename T1>
 void casadi_hpipm_work(const casadi_hpipm_prob<T1>* p, casadi_int* sz_arg, casadi_int* sz_res, casadi_int* sz_iw, casadi_int* sz_w) {
-  casadi_qp_work(p->qp, sz_iw, sz_w);
+  casadi_qp_work(p->qp, sz_arg, sz_res, sz_iw, sz_w);
 
-  // Reset sz_w, sz_iw
-  *sz_w = *sz_iw = 0;
   // Temporary work vectors
   *sz_w = casadi_max(*sz_w, 2*(p->qp->nx+p->qp->na)); // pv
   // Persistent work vectors

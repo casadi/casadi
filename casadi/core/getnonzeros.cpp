@@ -27,8 +27,6 @@
 #include "casadi_misc.hpp"
 #include "serializing_stream.hpp"
 
-using namespace std;
-
 namespace casadi {
 
   MX GetNonzeros::create(const Sparsity& sp, const MX& x, const std::vector<casadi_int>& nz) {
@@ -38,7 +36,7 @@ namespace casadi {
     if (is_slice(nz)) return create(sp, x, to_slice(nz));
     // Simplify to slice2
     if (is_slice2(nz)) {
-      pair<Slice, Slice> sl = to_slice2(nz);
+      std::pair<Slice, Slice> sl = to_slice2(nz);
       return create(sp, x, sl.first, sl.second);
     }
     return MX::create(new GetNonzerosVector(sp, x, nz));
@@ -204,52 +202,52 @@ namespace casadi {
   }
 
   std::string GetNonzerosVector::disp(const std::vector<std::string>& arg) const {
-    stringstream ss;
+    std::stringstream ss;
     ss << arg.at(0) << nz_;
     return ss.str();
   }
 
   std::string GetNonzerosSlice::disp(const std::vector<std::string>& arg) const {
-    stringstream ss;
+    std::stringstream ss;
     ss << arg.at(0) << "[" << s_ << "]";
     return ss.str();
   }
 
   std::string GetNonzerosSlice2::disp(const std::vector<std::string>& arg) const {
-    stringstream ss;
+    std::stringstream ss;
     ss << arg.at(0) << "[" << outer_ << ";" << inner_ << "]";
     return ss.str();
   }
 
   void GetNonzeros::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
     // Get all the nonzeros
-    vector<casadi_int> nz = all();
+    std::vector<casadi_int> nz = all();
 
     // Output sparsity
     const Sparsity& osp = sparsity();
     const casadi_int* orow = osp.row();
-    vector<casadi_int> ocol = osp.get_col();
+    std::vector<casadi_int> ocol = osp.get_col();
 
     // Input sparsity
     const Sparsity& isp = dep().sparsity();
-    //const vector<casadi_int>& irow = isp.row();
-    vector<casadi_int> icol = isp.get_col();
+    //const std::vector<casadi_int>& irow = isp.row();
+    std::vector<casadi_int> icol = isp.get_col();
 
     // Get all input elements
-    vector<casadi_int> el_input;
+    std::vector<casadi_int> el_input;
     isp.find(el_input);
 
     // Sparsity pattern being formed and corresponding nonzero mapping
-    vector<casadi_int> r_colind, r_row, r_nz, r_ind;
+    std::vector<casadi_int> r_colind, r_row, r_nz, r_ind;
 
     // Get the matching nonzeros
     r_ind.resize(el_input.size());
-    copy(el_input.begin(), el_input.end(), r_ind.begin());
+    std::copy(el_input.begin(), el_input.end(), r_ind.begin());
     arg[0].sparsity().get_nz(r_ind);
 
     // Sparsity pattern for the result
     r_colind.resize(osp.size2()+1); // Col count
-    fill(r_colind.begin(), r_colind.end(), 0);
+    std::fill(r_colind.begin(), r_colind.end(), 0);
     r_row.clear();
 
     // Perform the assignments
@@ -295,7 +293,7 @@ namespace casadi {
                             std::vector<std::vector<MX> >& fsens) const {
 
     // Get all the nonzeros
-    vector<casadi_int> nz = all();
+    std::vector<casadi_int> nz = all();
 
     // Number of derivative directions
     casadi_int nfwd = fsens.size();
@@ -303,18 +301,18 @@ namespace casadi {
     // Output sparsity
     const Sparsity& osp = sparsity();
     const casadi_int* orow = osp.row();
-    vector<casadi_int> ocol = osp.get_col();
+    std::vector<casadi_int> ocol = osp.get_col();
 
     // Input sparsity
     const Sparsity& isp = dep().sparsity();
-    //const vector<casadi_int>& irow = isp.row();
-    vector<casadi_int> icol;
+    //const std::vector<casadi_int>& irow = isp.row();
+    std::vector<casadi_int> icol;
 
     // Get all input elements
-    vector<casadi_int> el_input;
+    std::vector<casadi_int> el_input;
 
     // Sparsity pattern being formed and corresponding nonzero mapping
-    vector<casadi_int> r_colind, r_row, r_nz, r_ind;
+    std::vector<casadi_int> r_colind, r_row, r_nz, r_ind;
 
     // Nondifferentiated function and forward sensitivities
     for (casadi_int d=0; d<nfwd; ++d) {
@@ -336,12 +334,12 @@ namespace casadi {
 
         // Get the matching nonzeros
         r_ind.resize(el_input.size());
-        copy(el_input.begin(), el_input.end(), r_ind.begin());
+        std::copy(el_input.begin(), el_input.end(), r_ind.begin());
         arg.sparsity().get_nz(r_ind);
 
         // Sparsity pattern for the result
         r_colind.resize(osp.size2()+1); // Col count
-        fill(r_colind.begin(), r_colind.end(), 0);
+        std::fill(r_colind.begin(), r_colind.end(), 0);
         r_row.clear();
 
         // Perform the assignments
@@ -388,25 +386,25 @@ namespace casadi {
   void GetNonzeros::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                             std::vector<std::vector<MX> >& asens) const {
     // Get all the nonzeros
-    vector<casadi_int> nz = all();
+    std::vector<casadi_int> nz = all();
 
     // Number of derivative directions
     casadi_int nadj = aseed.size();
 
     // Output sparsity
     const Sparsity& osp = sparsity();
-    vector<casadi_int> ocol;
+    std::vector<casadi_int> ocol;
 
     // Input sparsity
     const Sparsity& isp = dep().sparsity();
-    //const vector<casadi_int>& irow = isp.row();
-    vector<casadi_int> icol;
+    //const std::vector<casadi_int>& irow = isp.row();
+    std::vector<casadi_int> icol;
 
     // Get all input elements
-    vector<casadi_int> el_input;
+    std::vector<casadi_int> el_input;
 
     // Sparsity pattern being formed and corresponding nonzero mapping
-    vector<casadi_int> r_colind, r_row, r_nz, r_ind;
+    std::vector<casadi_int> r_colind, r_row, r_nz, r_ind;
 
     // Adjoint sensitivities
     for (casadi_int d=0; d<nadj; ++d) {
@@ -430,7 +428,7 @@ namespace casadi {
 
         // Filter out ignored entries and check if there is anything to add at all
         bool elements_to_add = false;
-        for (vector<casadi_int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k) {
+        for (std::vector<casadi_int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k) {
           if (*k>=0) {
             if (nz[*k]>=0) {
               elements_to_add = true;
@@ -445,11 +443,11 @@ namespace casadi {
 
         // Get the nz locations in the adjoint sensitivity corresponding to the inputs
         r_ind.resize(el_input.size());
-        copy(el_input.begin(), el_input.end(), r_ind.begin());
+        std::copy(el_input.begin(), el_input.end(), r_ind.begin());
         asens0.sparsity().get_nz(r_ind);
 
         // Enlarge the sparsity pattern of the sensitivity if not all additions fit
-        for (vector<casadi_int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k) {
+        for (std::vector<casadi_int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k) {
           if (*k>=0 && r_ind[nz[*k]]<0) {
 
             // Create a new pattern which includes both the the previous seed and the addition
@@ -457,7 +455,7 @@ namespace casadi {
             asens0 = asens0->get_project(sp);
 
             // Recalculate the nz locations in the adjoint sensitivity corresponding to the inputs
-            copy(el_input.begin(), el_input.end(), r_ind.begin());
+            std::copy(el_input.begin(), el_input.end(), r_ind.begin());
             asens0.sparsity().get_nz(r_ind);
 
             break;
@@ -465,7 +463,7 @@ namespace casadi {
         }
 
         // Have r_nz point to locations in the sensitivity instead of the output
-        for (vector<casadi_int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k) {
+        for (std::vector<casadi_int>::iterator k=r_nz.begin(); k!=r_nz.end(); ++k) {
           if (*k>=0) {
             *k = r_ind[nz[*k]];
           }
@@ -477,7 +475,7 @@ namespace casadi {
   }
 
   Matrix<casadi_int> GetNonzeros::mapping() const {
-    vector<casadi_int> nz = all();
+    std::vector<casadi_int> nz = all();
     return Matrix<casadi_int>(sparsity(), nz, false);
   }
 
@@ -485,7 +483,7 @@ namespace casadi {
                                     const std::vector<casadi_int>& arg,
                                     const std::vector<casadi_int>& res) const {
     // Codegen the indices
-    string ind = g.constant(nz_);
+    std::string ind = g.constant(nz_);
 
     // Codegen the assignments
     g.local("cii", "const casadi_int", "*");
@@ -504,11 +502,11 @@ namespace casadi {
 
   MX GetNonzeros::get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz) const {
     // Get all the nonzeros
-    vector<casadi_int> nz_all = all();
+    std::vector<casadi_int> nz_all = all();
 
     // Eliminate recursive calls
-    vector<casadi_int> nz_new(nz);
-    for (vector<casadi_int>::iterator i=nz_new.begin(); i!=nz_new.end(); ++i) {
+    std::vector<casadi_int> nz_new(nz);
+    for (std::vector<casadi_int>::iterator i=nz_new.begin(); i!=nz_new.end(); ++i) {
       if (*i>=0) *i = nz_all[*i];
     }
     return dep()->get_nzref(sp, nz_new);

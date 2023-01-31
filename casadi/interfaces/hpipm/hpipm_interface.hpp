@@ -133,7 +133,7 @@ namespace casadi {
     void set_hpipm_prob();
     void set_hpipm_prob(CodeGenerator& g) const;
 
-   /** \brief Generate code for the function body */
+    /** \brief Generate code for the function body */
     void codegen_body(CodeGenerator& g) const override;
 
     /** \brief  Initialize */
@@ -175,7 +175,7 @@ namespace casadi {
 
   protected:
     explicit HpipmInterface(DeserializingStream& s);
-    
+
     // Memory structure
     casadi_hpipm_prob<double> p_;
 
@@ -191,8 +191,10 @@ namespace casadi {
     std::vector< casadi_hpipm_block > R_blocks, S_blocks, Q_blocks;
     std::vector< casadi_hpipm_block > b_blocks, lug_blocks;
     std::vector< casadi_hpipm_block > u_blocks, x_blocks;
-    std::vector< casadi_hpipm_block > lam_ul_blocks, lam_xl_blocks, lam_uu_blocks, lam_xu_blocks, lam_cl_blocks;
-    std::vector< casadi_hpipm_block > lam_cu_blocks, A_blocks, B_blocks, C_blocks, D_blocks, I_blocks;
+    std::vector< casadi_hpipm_block > lam_ul_blocks, lam_xl_blocks,
+      lam_uu_blocks, lam_xu_blocks, lam_cl_blocks;
+    std::vector< casadi_hpipm_block > lam_cu_blocks, A_blocks, B_blocks,
+      C_blocks, D_blocks, I_blocks;
 
     std::vector<int> nxs_;
     std::vector<int> nus_;

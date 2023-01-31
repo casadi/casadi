@@ -25,7 +25,6 @@
 
 #include "linear_interpolant.hpp"
 
-using namespace std;
 namespace casadi {
 
   extern "C"
@@ -57,10 +56,10 @@ namespace casadi {
   };
 
   LinearInterpolant::
-  LinearInterpolant(const string& name,
+  LinearInterpolant(const std::string& name,
                     const std::vector<double>& grid,
                     const std::vector<casadi_int>& offset,
-                    const vector<double>& values,
+                    const std::vector<double>& values,
                     casadi_int m)
                     : Interpolant(name, grid, offset, values, m) {
   }
@@ -237,19 +236,16 @@ namespace casadi {
 
     std::vector<MX> args = {x};
     std::vector<std::string> arg_names = {"x"};
-    std::vector<bool> is_diff_in = {true};
     if (grid.empty()) {
       args.push_back(g);
       arg_names.push_back("g");
-      is_diff_in.push_back(false);
     }
     if (values.empty()) {
       args.push_back(c);
       arg_names.push_back("c");
-      is_diff_in.push_back(false);
     }
 
-    return Function(name, args, {f.T()}, arg_names, {"f"}, Dict{{"is_diff_in", is_diff_in}});
+    return Function(name, args, {f.T()}, arg_names, {"f"});
   }
 
 } // namespace casadi

@@ -30,7 +30,6 @@
 INPUTSCHEME(IntegratorInput)
 OUTPUTSCHEME(IntegratorOutput)
 
-using namespace std;
 namespace casadi {
 
   SundialsInterface::SundialsInterface(const std::string& name, const Function& dae)
@@ -124,9 +123,9 @@ namespace casadi {
     use_precon_ = true;
     max_krylov_ = 10;
     linear_solver_ = "qr";
-    string newton_scheme = "direct";
+    std::string newton_scheme = "direct";
     quad_err_con_ = false;
-    string interpolation_type = "hermite";
+    std::string interpolation_type = "hermite";
     steps_per_checkpoint_ = 20;
     disable_internal_warnings_ = false;
     max_multistep_order_ = 5;
@@ -226,7 +225,7 @@ namespace casadi {
     // Allocate work vectors
     alloc_w(np_, true); // p
     alloc_w(nrp_, true); // rp
-    alloc_w(2*max(nx_+nz_, nrx_+nrz_), true); // v1, v2
+    alloc_w(2 * std::max(nx_+nz_, nrx_+nrz_), true); // v1, v2
 
     // Allocate linear solvers
     linsolF_ = Linsol("linsolF", linear_solver_,
@@ -382,8 +381,8 @@ namespace casadi {
     // Work vectors
     m->p = w; w += np_;
     m->rp = w; w += nrp_;
-    m->v1 = w; w += max(nx_+nz_, nrx_+nrz_);
-    m->v2 = w; w += max(nx_+nz_, nrx_+nrz_);
+    m->v1 = w; w += std::max(nx_+nz_, nrx_+nrz_);
+    m->v2 = w; w += std::max(nx_+nz_, nrx_+nrz_);
     m->jac = w; w += get_function("jacF").nnz_out(0);
     if (nrx_>0) {
       m->jacB = w; w += get_function("jacB").nnz_out(0);

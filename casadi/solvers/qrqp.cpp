@@ -26,7 +26,6 @@
 #include "qrqp.hpp"
 #include "casadi/core/nlpsol.hpp"
 
-using namespace std;
 namespace casadi {
 
   extern "C"
@@ -128,8 +127,10 @@ namespace casadi {
     }
 
     // Allocate memory
-    casadi_int sz_w, sz_iw;
-    casadi_qrqp_work(&p_, &sz_iw, &sz_w);
+    casadi_int sz_arg, sz_res, sz_w, sz_iw;
+    casadi_qrqp_work(&p_, &sz_arg, &sz_res, &sz_iw, &sz_w);
+    alloc_arg(sz_arg, true);
+    alloc_res(sz_res, true);
     alloc_iw(sz_iw, true);
     alloc_w(sz_w, true);
 
@@ -237,11 +238,11 @@ namespace casadi {
         break;
       case QP_MAX_ITER:
         m->return_status = "Maximum number of iterations reached";
-        m->unified_return_status = SOLVER_RET_LIMITED;
+        m->d_qp.unified_return_status = SOLVER_RET_LIMITED;
         break;
       case QP_NO_SEARCH_DIR:
         m->return_status = "Failed to calculate search direction";
-        m->unified_return_status = SOLVER_RET_INFEASIBLE;
+        m->d_qp.unified_return_status = SOLVER_RET_INFEASIBLE;
         break;
       case QP_PRINTING_ERROR:
         m->return_status = "Printing error";
@@ -254,7 +255,7 @@ namespace casadi {
     casadi_copy(d.lam+nx_, na_, d_qp.lam_a);
     // Return
     if (verbose_) casadi_warning(m->return_status);
-    m->success = d.status == QP_SUCCESS;
+    m->d_qp.success = d.status == QP_SUCCESS;
     return 0;
   }
 

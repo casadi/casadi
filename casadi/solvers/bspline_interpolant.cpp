@@ -26,7 +26,6 @@
 #include "bspline_interpolant.hpp"
 #include "casadi/core/bspline.hpp"
 
-using namespace std;
 namespace casadi {
 
   extern "C"
@@ -75,10 +74,10 @@ namespace casadi {
   }
 
   BSplineInterpolant::
-  BSplineInterpolant(const string& name,
+  BSplineInterpolant(const std::string& name,
                     const std::vector<double>& grid,
                     const std::vector<casadi_int>& offset,
-                    const vector<double>& values,
+                    const std::vector<double>& values,
                     casadi_int m)
                     : Interpolant(name, grid, offset, values, m) {
 

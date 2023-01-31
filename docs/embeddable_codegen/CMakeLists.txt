@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.10.2)
 set (CMAKE_CXX_STANDARD 11)
 project(casadi-standalone-example CXX)
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/../../cmake)

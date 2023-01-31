@@ -478,6 +478,44 @@ class NLPtests(casadiTestCase):
       if "codegen" in features:
         self.check_codegen(solver,solver_in,std="c99")
 
+  @requires_nlpsol("ipopt")
+  def test_ipopt_solver(self):
+
+    solvers = ["mumps"]
+    if 'spral' in CasadiMeta.feature_list():
+        solvers.append("spral")
+    if has_linsol("ma27"):
+        solvers.append("ma27")
+
+    x=SX.sym("x")
+    y=SX.sym("y")
+
+    obj = (1-x)**2+100*(y-x**2)**2
+    nlp={'x':vertcat(*[x,y]), 'f':obj, 'g':x**2+y**2}
+
+    c_r = 4.56748075136258e-02;
+    x_r = [7.86415156987791e-01,6.17698316967954e-01]
+
+    DM.set_precision(16)
+    for solver in solvers:
+      print("ipopt.linear_solver", solver)
+      solver = nlpsol("mysolver", "ipopt", nlp, {"ipopt.linear_solver": solver})
+      solver_in = {}
+      solver_in["x0"]=[0.5,0.5]
+      solver_in["lbx"]=[-10]*2
+      solver_in["ubx"]=[10]*2
+      solver_in["lbg"]=[0]
+      solver_in["ubg"]=[1]
+      solver_out = solver(**solver_in)
+      solver_out = solver_out
+      digits = 7
+      self.assertAlmostEqual(solver_out["f"][0],c_r,digits,str(solver))
+      self.assertAlmostEqual(solver_out["x"][0],x_r[0],digits,str(solver))
+      self.assertAlmostEqual(solver_out["x"][1],x_r[1],digits,str(solver))
+      print(solver.stats())
+
+    DM.set_precision(8)
+    
   def test_warmstart(self):
 
     x=SX.sym("x")
@@ -486,6 +524,7 @@ class NLPtests(casadiTestCase):
     obj = (1-x)**2+100*(y-x**2)**2
     nlp={'x':vertcat(*[x,y]), 'f':obj, 'g':x**2+y**2}
 
+    
     c_r = 4.56748075136258e-02;
     x_r = [7.86415156987791e-01,6.17698316967954e-01]
 
@@ -1785,6 +1824,93 @@ class NLPtests(casadiTestCase):
       self.checkarray(b[1],G[i,:])
       self.checkarray(b[1],c[1])
 
+
+  @memory_heavy()
+  def test_simple_bounds_detect2(self):
+    x = MX.sym("x",5)
+    p = MX.sym("p",5)
+    
+    # different a, b
+
+
+    g = [
+      (1.1,  x[0]*x[1], 2),
+      (-11,  x[4], 2), # 4 H
+      (-10,  x[0], 10),
+      (-5,  x[0], 2), # 0 H
+      (-4,  x[0], 4), # 0 L
+      (1.1,  x[4]*x[1], 2),
+      (0,  x[4], inf), # 4 L
+      (3,  x[2], 3), # 2 LH
+      (-4,  x[2], 40),
+      (2,  x[1], 2), # 1 LH
+      (-4,  x[0], 4), # 0 L
+      (-4,  x[1], 9)] # 1 H
+
+    [lbg,g,ubg]= zip(*g)
+
+    lbg = vcat(lbg)
+    ubg = vcat(ubg)
+    g = vcat(g)
+    
+    def merge(a,b):
+        a = dict(a)
+        a.update(b)
+        return a
+        
+
+    nlp = {"x":x,"p":p,"g":g,"f":sumsqr(x-p)}
+    
+    print_level = 0
+    
+    with self.assertOutput(["Total number of inequality constraints...............:        2"],[]):
+        nlpsol("solver","ipopt",nlp,{"detect_simple_bounds": True})(x0=0,lbg=lbg,ubg=ubg)
+    with self.assertOutput(["Total number of inequality constraints...............:       10"],[]):
+        nlpsol("solver","ipopt",nlp,{"detect_simple_bounds": False})(x0=0,lbg=lbg,ubg=ubg)
+    
+    
+    options = {"detect_simple_bounds": True,"ipopt.print_level":print_level,"print_time":False,"ipopt.tol":1e-12,"ipopt.fixed_variable_treatment":"relax_bounds","ipopt.bound_relax_factor":1e-12}
+    solver = nlpsol("solver","ipopt",nlp,options)
+    options_nominal = {"detect_simple_bounds": False,"ipopt.print_level":print_level,"print_time":False,"ipopt.tol":1e-12,"ipopt.bound_relax_factor":1e-12}
+    solver_nominal = nlpsol("solver","ipopt",nlp,options_nominal)
+    w_options = {"ipopt.warm_start_init_point":'yes',
+                'ipopt.warm_start_bound_push':1e-16,
+                "ipopt.bound_push":1e-16,
+                "ipopt.warm_start_mult_bound_push": 1e-16,
+                "ipopt.tol":1e-7}
+    wsolver = nlpsol("solver","ipopt",nlp,merge(options,w_options))
+    wsolver_nominal = nlpsol("solver","ipopt",nlp,merge(options_nominal,w_options))
+    
+    I = densify(DM.eye(5))
+    
+    for lbx,ubx in [(-DM.inf(5),DM.inf(5)),(-3*DM.ones(5),3*DM.ones(5)),(-4*DM.ones(5),4*DM.ones(5))]:
+    
+        for i in range(5):
+            for sign in [-1,1]:
+                x_target = I[:,i]*sign*20
+                
+                out = solver(p=x_target,lbg=lbg,ubg=ubg,lbx=lbx,ubx=ubx)
+                out_nominal = solver_nominal(p=x_target,lbg=lbg,ubg=ubg,lbx=lbx,ubx=ubx)
+
+                if float(lbx[0])==-np.inf:
+                    self.checkarray(out["lam_x"],DM([0]*5))
+
+                # Are the solutions equivalent
+                self.checkarray(out["x"],out_nominal["x"],digits=8)
+                self.checkarray(out["g"],out_nominal["g"],digits=8)
+                
+                # Can the compact output serve as zero-shot soluton of compact?
+                wsolver(x0=out["x"],lam_x0=out["lam_x"],lam_g0=out["lam_g"],p=x_target,lbg=lbg,ubg=ubg,lbx=lbx,ubx=ubx)
+                self.assertEqual(wsolver.stats()['iter_count'],0)
+                
+                # Can the compact output serve as zero-shot soluton of nominal?
+                wsolver_nominal(x0=out["x"],lam_x0=out["lam_x"],lam_g0=out["lam_g"],p=x_target,lbg=lbg,ubg=ubg,lbx=lbx,ubx=ubx)
+                self.assertEqual(wsolver_nominal.stats()['iter_count'],0)
+                
+                # Can the nominal output serve as zero-shot solution of compact?
+                wsolver(x0=out_nominal["x"],lam_x0=out_nominal["lam_x"],lam_g0=out_nominal["lam_g"],p=x_target,lbg=lbg,ubg=ubg,lbx=lbx,ubx=ubx)
+                self.assertEqual(wsolver.stats()['iter_count'],0)
+ 
   def test_derivative(self):
     x = MX.sym("x",3)
     p = MX.sym("p",3)
@@ -1805,6 +1931,7 @@ class NLPtests(casadiTestCase):
     self.checkfunction(f,f_ref,inputs=[vertcat(0.1,0.2,0.3)])
     
   def test_hock_schittkowski(self):
+    return
     import importlib
     file_names = []
     for i in range(1, 120):

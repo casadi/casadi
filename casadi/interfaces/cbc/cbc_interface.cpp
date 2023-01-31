@@ -29,8 +29,6 @@
 
 namespace casadi {
 
-  using namespace std;
-
   extern "C"
   int CASADI_CONIC_CBC_EXPORT
   casadi_register_conic_cbc(Conic::Plugin* plugin) {
@@ -415,11 +413,13 @@ namespace casadi {
     m->fstats.at("postprocessing").toc();
 
     m->return_status = model.status();
-    m->success = m->return_status==0 && model.isProvenOptimal() && model.secondaryStatus() <= 1;
+    m->d_qp.success = m->return_status==0 &&
+                      model.isProvenOptimal() &&
+                      model.secondaryStatus() <= 1;
     m->secondary_return_status = model.secondaryStatus();
     m->iter_count = model.getIterationCount();
     m->node_count = model.getNodeCount();
-    if (m->return_status==1) m->unified_return_status = SOLVER_RET_LIMITED;
+    if (m->return_status==1) m->d_qp.unified_return_status = SOLVER_RET_LIMITED;
 
     if (verbose_) casadi_message("CBC return status: " + return_status_string(m->return_status));
     if (verbose_) casadi_message(

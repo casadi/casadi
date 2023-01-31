@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.12)
+cmake_minimum_required(VERSION 3.10.2)
 project(casadi C CXX)
 
 set(CASADI_MAJOR_VERSION 3)
@@ -28,16 +28,11 @@ cmake_policy(SET CMP0003 NEW)
 
 # cmake_policy propagation rules
 if(POLICY CMP0011)
-cmake_policy(SET CMP0011 OLD)
+cmake_policy(SET CMP0011 NEW)
 endif()
 
 # cmake_policy avoid escaping in add_definitions
-cmake_policy(SET CMP0005 OLD)
-
-# cmake_policy use MACOSX_RPATH=ON by default
-if(POLICY CMP0042)
-  cmake_policy(SET CMP0042 NEW)
-endif()
+cmake_policy(SET CMP0005 NEW)
 
 # cmake_policy how to interpret string arguments
 if(POLICY CMP0054)
@@ -135,25 +130,6 @@ else()
 endif()
 
 if(CXX11FLAG)
-  try_compile(HAS_COPYSIGN
-    ${CMAKE_BINARY_DIR}
-    ${CMAKE_MODULE_PATH}/check_copysign.cpp
-    CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${CXX11FLAG}
-    OUTPUT_VARIABLE OUTPUT)
-  if(HAS_COPYSIGN)
-    add_definitions(-DHAS_COPYSIGN)
-  endif()
-
-
-  try_compile(HAS_ERF
-    ${CMAKE_BINARY_DIR}
-    ${CMAKE_MODULE_PATH}/check_erf.cpp
-    CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${CXX11FLAG}
-    OUTPUT_VARIABLE OUTPUT)
-  if(HAS_ERF)
-    add_definitions(-DHAS_ERF)
-  endif()
-
   try_compile(HAS_ERFINV
     ${CMAKE_BINARY_DIR}
     ${CMAKE_MODULE_PATH}/check_erfinv.cpp
@@ -598,7 +574,7 @@ option(WITH_BUILD_BLASFEO "Build BLASFEO (BUILD_BLASFEO_VERSION=${BUILD_BLASFEO_
 option(WITH_HPIPM "Compile the interface to HPIPM" OFF)
 set(BUILD_HPIPM_VERSION "0e0c9f4e0d4081dceafa9b37c396db50bce0e81a")
 set(BUILD_HPIPM_GIT_REPO "https://github.com/jgillis/hpipm.git")
-option(WITH_BUILD_HPIPM "Build HPIPM (BUILD_HPIPM_VERSION=${BUILD_HPIPM_VERSION}) from downloaded source." OFF)
+option(WITH_BUILD_HPIPM "Build HPIPM (BUILD_HPIPM_VERSION=${BUILD_HPIPM_VERSION}) from downloaded source (BUILD_HPIPM_GIT_REPO=${BUILD_HPIPM_GIT_REPO})." OFF)
 set(BUILD_HPIPM_DEPENDENCIES BLASFEO)
 
 # SuperSCS: An conic solver
@@ -609,9 +585,21 @@ add_feature_info(superscs-interface WITH_SUPERSCS "Interface to Conic solver Sup
 option(WITH_OSQP "Compile the interface to OSQP (the source code for OSQP is included)" OFF)
 add_feature_info(osqp-interface WITH_OSQP "Interface to QP solver OSQP.")
 
+set(BUILD_EIGEN3_VERSION "3.4.0")
+set(BUILD_EIGEN3_GIT_REPO "https://gitlab.com/libeigen/eigen.git")
+option(WITH_BUILD_EIGEN3 "Build Eigen (BUILD_EIGEN3_VERSION=${BUILD_EIGEN3_VERSION}) from downloaded source (BUILD_EIGEN3_GIT_REPO=${BUILD_EIGEN3_GIT_REPO})." OFF)
+
+set(BUILD_SIMDE_VERSION "v0.7.2")
+set(BUILD_SIMDE_GIT_REPO "https://github.com/simd-everywhere/simde.git")
+option(WITH_BUILD_SIMDE "Build Simde (BUILD_SIMDE_VERSION=${BUILD_SIMDE_VERSION}) from downloaded source (BUILD_SIMDE_GIT_REPO=${BUILD_SIMDE_GIT_REPO})." OFF)
+
+
 # PROXQP: A QP solver based on proximal methods
-option(WITH_PROXQP "Compile the interface to PROXQP (the source code for PROXQP is included)" OFF)
-add_feature_info(proxqp-interface WITH_PROXQP "Interface to QP solver PROXQP.")
+option(WITH_PROXQP "Compile the interface to PROXQP" OFF)
+set(BUILD_PROXQP_VERSION "v0.3.2")
+set(BUILD_PROXQP_GIT_REPO "https://github.com/Simple-Robotics/proxsuite.git")
+option(WITH_BUILD_PROXQP "Build PROXQP (BUILD_PROXQP_VERSION=${BUILD_PROXQP_VERSION}) from downloaded source (BUILD_PROXQP_GIT_REPO=${BUILD_PROXQP_GIT_REPO})." OFF)
+set(BUILD_PROXQP_DEPENDENCIES EIGEN3 SIMDE)
 
 # TinyXML: An XML reader, needed e.g. by the Modelica interface
 option(WITH_BUILD_TINYXML "Compile the included TinyXML source code" ON)
@@ -726,6 +714,12 @@ set(BUILD_METIS_TP_VERSION "2.0.0")
 option(WITH_BUILD_MUMPS "Build MUMPS (BUILD_MUMPS_TP_VERSION=${BUILD_MUMPS_TP_VERSION}) from downloaded source." OFF)
 set(BUILD_MUMPS_DEPENDENCIES LAPACK)
 
+# SPRAL
+option(WITH_SPRAL "Enable SPRAL interface" OFF)
+set(BUILD_SPRAL_VERSION "d385d2c9e858366d257cafaaf05760ffa6543e26")
+option(WITH_BUILD_SPRAL "Build SPRAL (BUILD_SPRAL_VERSION=${BUILD_SPRAL_VERSION}) from downloaded source." OFF)
+set(BUILD_SPRAL_DEPENDENCIES LAPACK)
+
 # HSL: Sparse direct linear solvers
 option(WITH_HSL "Enable HSL interface" OFF)
 if(WITH_HSL)
@@ -736,8 +730,11 @@ add_feature_info(hsl-interface WITH_HSL "Interface to HSL.")
 # HIGHS: A MILP / QP solver
 option(WITH_HIGHS "Compile the HiGHS interface" OFF)
 set(BUILD_HIGHS_GIT_REPO "https://github.com/ERGO-Code/HiGHS")
-set(BUILD_HIGHS_VERSION "46f6ceb269ed44934c79fc9e488487fcb6313b6a") # v1.3.0 suffers from https://github.com/ERGO-Code/HiGHS/issues/928
+set(BUILD_HIGHS_VERSION "v1.4.1")
 option(WITH_BUILD_HIGHS "Build HiGHS (BUILD_HIGHS_VERSION=${BUILD_HIGHS_VERSION}) from downloaded source (BUILD_HIGHS_GIT_REPO=${BUILD_HIGHS_GIT_REPO})." OFF)
+
+
+option(ALLOW_DOCKER "System has docker installed" OFF)
 
 function(libraries2flags libraries out)
 # libtool cannot handle absoulte paths (i.e. it omits the library from the list of dependencies)
@@ -747,13 +744,18 @@ function(libraries2flags libraries out)
       # Pass -l, -L as-is
       set(local "${local} ${LIB}")
     else()
-      get_filename_component(LIB_DIR "${LIB}" DIRECTORY)
-      get_filename_component(LIB_NAME "${LIB}" NAME)
-      string(REGEX REPLACE "${CMAKE_SHARED_LIBRARY_PREFIX}([A-Za-z0-9_]+)${CMAKE_SHARED_LIBRARY_SUFFIX}" "\\1" LIB_NAME_MOD ${LIB_NAME})
-      if(LIB_NAME STREQUAL LIB_NAME_MOD)
-        set(local "${local} ${LIB}")
+      if (LIB MATCHES "System/Library/Frameworks/Accelerate.framework")
+        #set(${out} "-framework Accelerate" PARENT_SCOPE)
+        set(local "${local} -framework Accelerate")
       else()
-        set(local "${local} -L${LIB_DIR} -l${LIB_NAME_MOD}")
+          get_filename_component(LIB_DIR "${LIB}" DIRECTORY)
+          get_filename_component(LIB_NAME "${LIB}" NAME)
+          string(REGEX REPLACE "${CMAKE_SHARED_LIBRARY_PREFIX}([A-Za-z0-9_]+)${CMAKE_SHARED_LIBRARY_SUFFIX}" "\\1" LIB_NAME_MOD ${LIB_NAME})
+          if(LIB_NAME STREQUAL LIB_NAME_MOD)
+            set(local "${local} ${LIB}")
+          else()
+            set(local "${local} -L${LIB_DIR} -l${LIB_NAME_MOD}")
+          endif()
       endif()
     endif()
     set(${out} "${local}" PARENT_SCOPE)
@@ -761,7 +763,7 @@ function(libraries2flags libraries out)
 endfunction()
 
 # Packages must be sorted from high to low in the dependency graph
-foreach(PKG HIGHS BONMIN IPOPT CBC CLP MUMPS HPIPM BLASFEO LAPACK)
+foreach(PKG HIGHS PROXQP BONMIN IPOPT CBC CLP MUMPS SPRAL METIS HPIPM BLASFEO LAPACK EIGEN3 SIMDE)
   string(TOLOWER ${PKG} PKG_LOWER)
   if(WITH_${PKG})
     if(NOT WITH_BUILD_${PKG})
@@ -770,10 +772,10 @@ foreach(PKG HIGHS BONMIN IPOPT CBC CLP MUMPS HPIPM BLASFEO LAPACK)
       find_package(${PKG})
     endif()
     if (WITH_BUILD_${PKG} OR (WITH_BUILD_REQUIRED AND NOT ${PKG}_FOUND))
-      set(WITH_BUILD_${PKG} ON)
 
       # Add it to FeatureSummary
       get_property(PKG_HELP CACHE WITH_BUILD_${PKG} PROPERTY HELPSTRING)
+      set(WITH_BUILD_${PKG} ON CACHE BOOL "${PKG_HELP}" FORCE)
       add_feature_info(${PKG_LOWER}-sourcebuild ON ${PKG_HELP})
 
       # Remove from PACKAGES_NOT_FOUND
@@ -811,11 +813,12 @@ if(WITH_LAPACK)
       PREFIX "${CMAKE_BINARY_DIR}/external_projects"
       UPDATE_COMMAND ""
       CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
-      CMAKE_ARGS -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_LIBDIR=lib -DTARGET=CORE2 -DUSE_THREAD=ON -DNUM_THREADS=16 -DBUILD_SINGLE=ON -DBUILD_DOUBLE=ON -DBUILD_COMPLEX=ON -DBUILD_COMPLEX16=ON -DDYNAMIC_ARCH=OFF -DUSE_OPENMP=OFF -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
+      CMAKE_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_LIBDIR=lib -DTARGET=CORE2 -DUSE_THREAD=ON -DNUM_THREADS=16 -DBUILD_SINGLE=ON -DBUILD_DOUBLE=ON -DBUILD_COMPLEX=ON -DBUILD_COMPLEX16=ON -DDYNAMIC_ARCH=OFF -DUSE_OPENMP=OFF -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
     set(LAPACK_LIBRARIES "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}openblas${CMAKE_SHARED_LIBRARY_SUFFIX}")    
     set(LAPACK_DEPENDS_TARGET openblas-external)
 
     add_library(lapack SHARED IMPORTED)
+    add_dependencies(lapack openblas-external)
     set_target_properties(lapack PROPERTIES
       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}openblas${CMAKE_SHARED_LIBRARY_SUFFIX}"
       IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}openblas${CMAKE_IMPORT_LIBRARY_SUFFIX}"
@@ -846,11 +849,12 @@ if(WITH_BLASFEO)
       PREFIX "${CMAKE_BINARY_DIR}/external_projects"
       UPDATE_COMMAND ""
       CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
-      CMAKE_ARGS ${C_FLAGS} -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
+      CMAKE_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} ${C_FLAGS} -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
     set(BLASFEO_PATH "${CMAKE_BINARY_DIR}/external_projects")
     set(BLASFEO_DEPENDS_TARGET blasfeo-external)
 
     add_library(blasfeo SHARED IMPORTED)
+    add_dependencies(blasfeo blasfeo-external)
     set_target_properties(blasfeo PROPERTIES
       INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include"
       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}blasfeo${CMAKE_SHARED_LIBRARY_SUFFIX}"
@@ -876,8 +880,9 @@ if(WITH_HPIPM)
       PREFIX "${CMAKE_BINARY_DIR}/external_projects"
       UPDATE_COMMAND ""
       CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
-      CMAKE_ARGS -DHPIPM_TESTING=OFF -DBUILD_SHARED_LIBS=ON -DBLASFEO_PATH=${BLASFEO_PATH} -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
+      CMAKE_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DHPIPM_TESTING=OFF -DBUILD_SHARED_LIBS=ON -DBLASFEO_PATH=${BLASFEO_PATH} -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
     add_library(hpipm SHARED IMPORTED)
+    add_dependencies(hpipm hpipm-external)
     target_link_libraries(hpipm INTERFACE blasfeo)
     set_target_properties(hpipm PROPERTIES
        IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}hpipm${CMAKE_SHARED_LIBRARY_SUFFIX}"
@@ -897,36 +902,59 @@ message(STATUS "CMAKE_SYSTEM_NAME: ${CMAKE_SYSTEM_NAME} ${WIN32}")
 
 add_feature_info(lapack-interface WITH_LAPACK "Interface to LAPACK.")
 
-if(WITH_MUMPS)
-  if(WITH_BUILD_MUMPS)
-    add_feature_info(metis-sourcebuild ON "Build METIS (BUILD_METIS_TP_VERSION=${BUILD_METIS_TP_VERSION}) from downloaded source.")
-    ExternalProject_Add(metis-external
+if (WITH_MUMPS OR WITH_SPRAL)
+  set(WITH_COINMETIS ON)
+  set(WITH_BUILD_COINMETIS ON)
+endif()
+
+
+
+if(WITH_COINMETIS)
+  if(WITH_BUILD_COINMETIS)
+    add_feature_info(coinmetis-sourcebuild ON "Build METIS (BUILD_METIS_TP_VERSION=${BUILD_METIS_TP_VERSION}) from downloaded source.")
+    if(ALLOW_DOCKER)
+       set(COIN_RECONFIG_CMD docker run --rm -v <SOURCE_DIR>:/work ghcr.io/casadi/coinbuild:latest /bin/bash ./run_autotools /work COMMAND)
+    else()
+       set(COIN_RECONFIG_CMD)
+    endif()
+    ExternalProject_Add(coinmetis-external
         GIT_REPOSITORY https://github.com/coin-or-tools/ThirdParty-Metis.git
         GIT_TAG releases/${BUILD_METIS_TP_VERSION}
         DEPENDS ${LAPACK_DEPENDS_TARGET}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
-        CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR>
+        CONFIGURE_COMMAND ${COIN_RECONFIG_CMD} <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR>
 
           # GKFree is not defined (variadic definition in utils.c); fails on MacOS target
           "CFLAGS=-Wno-implicit-function-declaration"
         PATCH_COMMAND COMMAND cd <SOURCE_DIR> && ./get.Metis)
-    set(EXTERNAL_METIS_LIBS coinmetis)
+    add_library(coinmetis INTERFACE IMPORTED)
+    add_dependencies(coinmetis coinmetis-external)
+    set_target_properties(coinmetis PROPERTIES
+      INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include/coin-or/metis"
+      IMPORTED_LIBNAME "coinmetis"
+    )
 
-    set(DEPENDENT_LIBRARIES ${DEPENDENT_LIBRARIES} ${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}${EXTERNAL_METIS_LIBS}${CMAKE_SHARED_LIBRARY_SUFFIX})
+  endif()
+endif()
 
+if(WITH_MUMPS)
+  if(WITH_BUILD_MUMPS)
+    get_target_property(METIS_INCLUDE_DIR coinmetis INTERFACE_INCLUDE_DIRECTORIES)
+    get_target_property(METIS_LIB coinmetis IMPORTED_LIBNAME)
     ExternalProject_Add(mumps-external
-        DEPENDS metis-external
+        DEPENDS coinmetis-external
         GIT_REPOSITORY https://github.com/coin-or-tools/ThirdParty-Mumps.git
         GIT_TAG releases/${BUILD_MUMPS_TP_VERSION}
-        DEPENDS ${LAPACK_DEPENDS_TARGET} metis-external
+        DEPENDS ${LAPACK_DEPENDS_TARGET} coinmetis-external
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
-        CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS}  --prefix=<INSTALL_DIR> "--with-metis-cflags=-I${CMAKE_BINARY_DIR}/external_projects/include/coin-or/metis" "--with-metis-lflags=-L${CMAKE_BINARY_DIR}/external_projects/lib -l${EXTERNAL_METIS_LIBS} -lm" "--with-lapack-lflags=${LAPACK_LFLAGS}" ${CROSS_FLAGS_FORTRAN}
+        CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS}  --prefix=<INSTALL_DIR> "--with-metis-cflags=-I${METIS_INCLUDE_DIR}" "--with-metis-lflags=-L${CMAKE_BINARY_DIR}/external_projects/lib -l${METIS_LIB} -lm" "--with-lapack-lflags=${LAPACK_LFLAGS}" ${CROSS_FLAGS_FORTRAN}
         PATCH_COMMAND COMMAND cd <SOURCE_DIR> && ./get.Mumps)
 
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/coin-or")
     add_library(mumps SHARED IMPORTED)
+    add_dependencies(mumps mumps-external)
     set_target_properties(mumps PROPERTIES
       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}coinmumps${CMAKE_SHARED_LIBRARY_SUFFIX}"
       IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}coinmumps${CMAKE_IMPORT_LIBRARY_SUFFIX}"
@@ -936,8 +964,41 @@ if(WITH_MUMPS)
 endif()
 add_feature_info(mumps-interface WITH_MUMPS "Interface to MUMPS.")
 
-if(WITH_CLP)
-  if(WITH_BUILD_CLP)
+set(SPRAL_DEPENDS_TARGET )
+set(SPRAL_FLAGS )
+
+message("WITH_SPRAL ${WITH_SPRAL} WITH_BUILD_SPRAL ${WITH_BUILD_SPRAL}")
+if(WITH_SPRAL)
+
+  # configure performed to resolve
+  #      PKG_PROG_PKG_CONFIG: command not found"
+  #      syntax error near unexpected token `HWLOC,'
+  #      `PKG_CHECK_MODULES(HWLOC, hwloc,'
+  if(ALLOW_DOCKER)
+    set(SPRAL_RECONFIG_CMD docker run --rm -v <SOURCE_DIR>:/work ghcr.io/casadi/coinbuild:latest autoreconf -ivf -I /usr/share/aclocal /work COMMAND)
+  else()
+    set(SPRAL_RECONFIG_CMD autoreconf -ivf -I /usr/share/aclocal <SOURCE_DIR> COMMAND)
+  endif()
+  if(WITH_BUILD_SPRAL)
+    get_target_property(METIS_INCLUDE_DIR coinmetis INTERFACE_INCLUDE_DIRECTORIES)
+    get_target_property(METIS_LIB coinmetis IMPORTED_LIBNAME)
+    ExternalProject_Add(spral-external
+        DEPENDS coinmetis-external
+        GIT_REPOSITORY https://github.com/ralna/spral.git
+        GIT_TAG ${BUILD_SPRAL_VERSION}
+        DEPENDS ${LAPACK_DEPENDS_TARGET}
+        PREFIX "${CMAKE_BINARY_DIR}/external_projects"
+        UPDATE_COMMAND ""
+        CONFIGURE_COMMAND ${SPRAL_RECONFIG_CMD} CFLAGS=-fPIC CXXFLAGS=-fPIC FFLAGS=-fPIC FCFLAGS=-fPIC <SOURCE_DIR>/configure ${CROSS_FLAGS} --disable-gpu --prefix=<INSTALL_DIR> --disable-openmp "--with-metis-inc-dir=${METIS_INCLUDE_DIR}" "--with-metis=-L${CMAKE_BINARY_DIR}/external_projects/lib -l${METIS_LIB} -lm" "--with-lapack=${LAPACK_LFLAGS}" "--with-blas=${LAPACK_LFLAGS}" ${CROSS_FLAGS_FORTRAN})
+    set(SPRAL_DEPENDS_TARGET spral-external)
+    set(SPRAL_FLAGS "--with-spral-cflags=-I${CMAKE_BINARY_DIR}/external_projects/include"
+        "--with-spral-lflags=-L${CMAKE_BINARY_DIR}/external_projects/lib -lspral -lgfortran -lm -lcoinmetis ${LAPACK_LFLAGS}")
+    install(FILES ${CMAKE_BINARY_DIR}/external_projects/src/spral-external/LICENCE DESTINATION ${INCLUDE_PREFIX}/licenses RENAME spral.txt)
+  endif()
+endif()
+add_feature_info(spral-interface WITH_SPRAL "Interface to SPRAL.")
+
+if((WITH_CLP AND WITH_BUILD_CLP) OR (WITH_CBC AND WITH_BUILD_CBC))
     add_feature_info(coinutils-sourcebuild ON "Build COINUTILS (BUILD_COINUTILS_VERSION=${BUILD_COINUTILS_VERSION}) from downloaded source.")
     ExternalProject_Add(coinutils-external
           DEPENDS ${LAPACK_DEPENDS_TARGET}
@@ -946,6 +1007,16 @@ if(WITH_CLP)
           PREFIX "${CMAKE_BINARY_DIR}/external_projects"
           UPDATE_COMMAND ""
           CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} "--with-lapack-lflags=${LAPACK_LFLAGS}" --prefix=<INSTALL_DIR> )
+    add_library(coinutils SHARED IMPORTED)
+    add_dependencies(coinutils coinutils-external)
+    set_target_properties(coinutils PROPERTIES
+      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}CoinUtils${CMAKE_SHARED_LIBRARY_SUFFIX}"
+      IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}CoinUtils${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+    )
+endif()
+
+if(WITH_CLP)
+  if(WITH_BUILD_CLP)
     add_feature_info(osi-sourcebuild ON "Build OSI (BUILD_OSI_VERSION=${BUILD_OSI_VERSION}) from downloaded source.")
     ExternalProject_Add(osi-external
         DEPENDS coinutils-external
@@ -958,10 +1029,16 @@ if(WITH_CLP)
 	--enable-pkg-config
     )
     add_library(osi SHARED IMPORTED)
+    add_dependencies(osi osi-external)
     set_target_properties(osi PROPERTIES
       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}Osi${CMAKE_SHARED_LIBRARY_SUFFIX}"
       IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}Osi${CMAKE_IMPORT_LIBRARY_SUFFIX}"
     )
+    set(APPLE_FLAGS "")
+    if(APPLE)
+        # Delocate step wants to grow zlib install name
+        set(APPLE_FLAGS "ADD_CXXFLAGS=-Wl,-headerpad_max_install_names")
+    endif()
     ExternalProject_Add(clp-external
         DEPENDS osi-external mumps-external coinutils-external ${LAPACK_DEPENDS_TARGET}
         GIT_REPOSITORY https://github.com/coin-or/Clp.git
@@ -971,16 +1048,19 @@ if(WITH_CLP)
         CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} "--with-lapack-lflags=${LAPACK_LFLAGS}" --prefix=<INSTALL_DIR>  ${CROSS_FLAGS_FORTRAN}
 	# For unknown reasons, Coin-or/configure disables pkg-config by default for clang compilers 
 	--enable-pkg-config
+	${APPLE_FLAGS}
 	)
 
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/coin")
     add_library(clp-raw SHARED IMPORTED)
+    add_dependencies(clp-raw clp-external)
     set_target_properties(clp-raw PROPERTIES
       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}Clp${CMAKE_SHARED_LIBRARY_SUFFIX}"
       IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}Clp${CMAKE_IMPORT_LIBRARY_SUFFIX}"
       INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include/coin"
     )
     add_library(osi-clp SHARED IMPORTED)
+    add_dependencies(osi-clp clp-external)
     set_target_properties(osi-clp PROPERTIES
       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}OsiClp${CMAKE_SHARED_LIBRARY_SUFFIX}"
       IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}OsiClp${CMAKE_IMPORT_LIBRARY_SUFFIX}"
@@ -1005,11 +1085,7 @@ if(WITH_CBC)
 	# For unknown reasons, Coin-or/configure disables pkg-config by default for clang compilers 
 	--enable-pkg-config
 	)
-    add_library(coinutils SHARED IMPORTED)
-    set_target_properties(coinutils PROPERTIES
-      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}CoinUtils${CMAKE_SHARED_LIBRARY_SUFFIX}"
-      IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}CoinUtils${CMAKE_IMPORT_LIBRARY_SUFFIX}"
-    )
+
     ExternalProject_Add(cbc-external
         DEPENDS coinutils-external cgl-external osi-external mumps-external clp-external ${LAPACK_DEPENDS_TARGET}
         GIT_REPOSITORY https://github.com/coin-or/Cbc.git
@@ -1022,12 +1098,14 @@ if(WITH_CBC)
 	)
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/coin")
     add_library(cbc-raw SHARED IMPORTED)
+    add_dependencies(cbc-raw cbc-external)
     set_target_properties(cbc-raw PROPERTIES
       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}Cbc${CMAKE_SHARED_LIBRARY_SUFFIX}"
       IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}Cbc${CMAKE_IMPORT_LIBRARY_SUFFIX}"
       INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include/coin"
     )
     add_library(cbc-solver SHARED IMPORTED)
+    add_dependencies(cbc-solver cbc-external)
     set_target_properties(cbc-solver PROPERTIES
       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}CbcSolver${CMAKE_SHARED_LIBRARY_SUFFIX}"
       IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}CbcSolver${CMAKE_IMPORT_LIBRARY_SUFFIX}"
@@ -1038,20 +1116,34 @@ if(WITH_CBC)
 endif()
 add_feature_info(cbc-interface WITH_CBC "Interface to the LP solver CBC.")
 
+set(COIN_FLAGS "")
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+set(COIN_FLAGS "--enable-debug")
+endif()
+
+
 if(WITH_IPOPT)
   if(WITH_BUILD_IPOPT)
     ExternalProject_Add(ipopt-external
-        DEPENDS ${LAPACK_DEPENDS_TARGET} mumps-external
+        DEPENDS ${LAPACK_DEPENDS_TARGET} mumps-external ${SPRAL_DEPENDS_TARGET} 
         URL https://www.coin-or.org/download/source/Ipopt/Ipopt-${BUILD_IPOPT_VERSION}.zip
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
-        CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR> "--with-mumps-cflags=-I${CMAKE_BINARY_DIR}/external_projects/include/coin-or/mumps" "--with-mumps-lflags=-L${CMAKE_BINARY_DIR}/external_projects/lib ${WHOLE_ARCHIVE_ON}-lcoinmumps ${WHOLE_ARCHIVE_OFF}" "--with-lapack-lflags= ${LAPACK_LFLAGS}" ${CROSS_FLAGS_FORTRAN}
+        PATCH_COMMAND patch -p0 < ${CMAKE_CURRENT_SOURCE_DIR}/casadi/interfaces/ipopt/ipopt3_14.patch
+        CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR> "--with-mumps-cflags=-I${CMAKE_BINARY_DIR}/external_projects/include/coin-or/mumps" "--with-mumps-lflags=-L${CMAKE_BINARY_DIR}/external_projects/lib ${WHOLE_ARCHIVE_ON}-lcoinmumps ${WHOLE_ARCHIVE_OFF}"
+        ${SPRAL_FLAGS}
+        "--with-lapack-lflags= ${LAPACK_LFLAGS}" ${CROSS_FLAGS_FORTRAN}
+	--disable-java
 	# For unknown reasons, Coin-or/configure disables pkg-config by default for clang compilers 
 	--enable-pkg-config
+	--enable-dependency-linking
+	${COIN_FLAGS}
 	)
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/coin-or")
+    set(WITH_IPOPT_CALLBACK ON)
 
     add_library(ipopt SHARED IMPORTED)
+    add_dependencies(ipopt ipopt-external)
     set_target_properties(ipopt PROPERTIES
       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}ipopt${CMAKE_SHARED_LIBRARY_SUFFIX}"
       IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}ipopt${CMAKE_IMPORT_LIBRARY_SUFFIX}"
@@ -1064,7 +1156,7 @@ add_feature_info(ipopt-interface WITH_IPOPT "Interface to the NLP solver Ipopt."
 if(WITH_BONMIN)
   if(WITH_BUILD_BONMIN)
     ExternalProject_Add(bonmin-external
-        DEPENDS mumps-external metis-external coinutils-external osi-external clp-external cgl-external cbc-external ipopt-external
+        DEPENDS mumps-external coinmetis-external coinutils-external osi-external clp-external cgl-external cbc-external ipopt-external
         GIT_REPOSITORY https://github.com/coin-or/Bonmin.git
         GIT_TAG releases/${BUILD_BONMIN_VERSION}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
@@ -1072,10 +1164,14 @@ if(WITH_BONMIN)
         CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR>  ${CROSS_FLAGS_FORTRAN}
 	# For unknown reasons, Coin-or/configure disables pkg-config by default for clang compilers 
 	--enable-pkg-config
+	# issue #2988
+	--enable-dependency-linking
+	${MINGW_FLAG}
 	)
 
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/coin")
     add_library(bonmin-raw SHARED IMPORTED)
+    add_dependencies(bonmin-raw bonmin-external)
     set_target_properties(bonmin-raw PROPERTIES
       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}bonmin${CMAKE_SHARED_LIBRARY_SUFFIX}"
       IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}bonmin${CMAKE_IMPORT_LIBRARY_SUFFIX}"
@@ -1095,9 +1191,10 @@ if(WITH_HIGHS)
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
         CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
-        CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
+        CMAKE_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DCMAKE_INSTALL_LIBDIR=lib -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/highs")
     add_library(highs SHARED IMPORTED)
+    add_dependencies(highs highs-external)
     set_target_properties(highs PROPERTIES
        INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include/highs"
        IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}highs${CMAKE_SHARED_LIBRARY_SUFFIX}"
@@ -1110,6 +1207,60 @@ if(WITH_HIGHS)
 endif()
 add_feature_info(highs-interface WITH_HIGHS "Interface to the MILP / QP solver HiGHS.")
 
+if(WITH_BUILD_EIGEN3)
+  ExternalProject_Add(eigen3-external
+      GIT_REPOSITORY ${BUILD_EIGEN3_GIT_REPO}
+      GIT_TAG ${BUILD_EIGEN3_VERSION}
+      PREFIX "${CMAKE_BINARY_DIR}/external_projects"
+      UPDATE_COMMAND ""
+      CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
+      CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
+  add_library(eigen3 INTERFACE)
+  add_dependencies(eigen3 eigen3-external)
+  target_include_directories(eigen3 INTERFACE "${CMAKE_BINARY_DIR}/external_projects/include/eigen3")
+  install(DIRECTORY
+    "${CMAKE_BINARY_DIR}/external_projects/include/eigen3"
+    DESTINATION "${INCLUDE_PREFIX}")
+endif()
+
+if(WITH_BUILD_SIMDE)
+  ExternalProject_Add(simde-external
+      GIT_REPOSITORY ${BUILD_SIMDE_GIT_REPO}
+      GIT_TAG ${BUILD_SIMDE_VERSION}
+      PREFIX "${CMAKE_BINARY_DIR}/external_projects"
+      CONFIGURE_COMMAND ""
+      BUILD_COMMAND ""
+      INSTALL_COMMAND ${EXTERNAL_CMAKE_COMMAND} -E copy_directory
+                    <SOURCE_DIR>/simde <INSTALL_DIR>/include/simde)
+  add_library(Simde INTERFACE)
+  add_dependencies(Simde Simde-external)
+  target_include_directories(Simde INTERFACE "${CMAKE_BINARY_DIR}/external_projects/include/simde")
+  install(DIRECTORY
+    "${CMAKE_BINARY_DIR}/external_projects/include/simde"
+    DESTINATION "${INCLUDE_PREFIX}")
+endif()
+
+if(WITH_PROXQP)
+  if(WITH_BUILD_PROXQP)
+    ExternalProject_Add(proxqp-external
+        DEPENDS Simde eigen3
+        GIT_REPOSITORY ${BUILD_PROXQP_GIT_REPO}
+        GIT_TAG ${BUILD_PROXQP_VERSION}
+        PREFIX "${CMAKE_BINARY_DIR}/external_projects"
+        BUILD_ALWAYS 1
+        UPDATE_COMMAND ""
+        CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
+        CMAKE_ARGS --debug-find -DCMAKE_FIND_ROOT_PATH_MODE_PACKAGE=BOTH -DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=BOTH -DSimde_DIR=${CMAKE_BINARY_DIR}/external_projects/share/eigen3/cmake -DEigen3_DIR=${CMAKE_BINARY_DIR}/external_projects/share/eigen3/cmake -DCMAKE_PREFIX_PATH=${CMAKE_BINARY_DIR}/external_projects/include/ -DCMAKE_INCLUDE_PATH=${CMAKE_BINARY_DIR}/external_projects/include/ -DBUILD_TESTING=OFF -DBUILD_PYTHON_INTERFACE=OFF -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
+        # --debug-find
+    add_library(proxqp INTERFACE)
+    target_include_directories(proxqp INTERFACE "${CMAKE_BINARY_DIR}/external_projects/include")
+    target_link_libraries(proxqp INTERFACE eigen3)
+    install(DIRECTORY
+      "${CMAKE_BINARY_DIR}/external_projects/include/proxsuite"
+      DESTINATION "${INCLUDE_PREFIX}")
+  endif()
+endif()
+add_feature_info(proxqp-interface WITH_PROXQP "Interface to QP solver PROXQP.")
 
 # SNOPT: An SQP method
 option(WITH_SNOPT "Compile the SNOPT interface if SNOPT libraries can be found" OFF)

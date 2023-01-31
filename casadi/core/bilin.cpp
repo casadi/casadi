@@ -25,7 +25,6 @@
 
 #include "bilin.hpp"
 
-using namespace std;
 namespace casadi {
 
   Bilin::Bilin(const MX& A, const MX& x, const MX& y) {

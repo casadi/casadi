@@ -28,8 +28,6 @@
 #include "global_options.hpp"
 #include "serializing_stream.hpp"
 
-using namespace std;
-
 namespace casadi {
 
   Split::Split(DeserializingStream& s) : MultipleOutput(s) {
@@ -68,7 +66,7 @@ namespace casadi {
       casadi_int nz_first = offset_[i];
       casadi_int nz_last = offset_[i+1];
       if (res[i]!=nullptr) {
-        copy(arg[0]+nz_first, arg[0]+nz_last, res[i]);
+        std::copy(arg[0]+nz_first, arg[0]+nz_last, res[i]);
       }
     }
     return 0;
@@ -160,7 +158,7 @@ namespace casadi {
 
   void Horzsplit::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
     // Get column offsets
-    vector<casadi_int> col_offset;
+    std::vector<casadi_int> col_offset;
     col_offset.reserve(offset_.size());
     col_offset.push_back(0);
     for (auto&& s : output_sparsity_) {
@@ -175,7 +173,7 @@ namespace casadi {
     casadi_int nfwd = fsens.size();
 
     // Get column offsets
-    vector<casadi_int> col_offset;
+    std::vector<casadi_int> col_offset;
     col_offset.reserve(offset_.size());
     col_offset.push_back(0);
     for (auto&& s : output_sparsity_) {
@@ -193,7 +191,7 @@ namespace casadi {
     casadi_int nadj = aseed.size();
 
     // Get column offsets
-    vector<casadi_int> col_offset;
+    std::vector<casadi_int> col_offset;
     col_offset.reserve(offset_.size());
     col_offset.push_back(0);
     for (auto&& s : output_sparsity_) {
@@ -228,10 +226,10 @@ namespace casadi {
 
   void Diagsplit::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
     // Get offsets
-    vector<casadi_int> offset1;
+    std::vector<casadi_int> offset1;
     offset1.reserve(offset_.size());
     offset1.push_back(0);
-    vector<casadi_int> offset2;
+    std::vector<casadi_int> offset2;
     offset2.reserve(offset_.size());
     offset2.push_back(0);
     for (auto&& s : output_sparsity_) {
@@ -246,10 +244,10 @@ namespace casadi {
                           std::vector<std::vector<MX> >& fsens) const {
     casadi_int nfwd = fsens.size();
     // Get offsets
-    vector<casadi_int> offset1;
+    std::vector<casadi_int> offset1;
     offset1.reserve(offset_.size());
     offset1.push_back(0);
-    vector<casadi_int> offset2;
+    std::vector<casadi_int> offset2;
     offset2.reserve(offset_.size());
     offset2.push_back(0);
     for (auto&& s : output_sparsity_) {
@@ -268,10 +266,10 @@ namespace casadi {
     casadi_int nadj = asens.size();
 
     // Get offsets
-    vector<casadi_int> offset1;
+    std::vector<casadi_int> offset1;
     offset1.reserve(offset_.size());
     offset1.push_back(0);
-    vector<casadi_int> offset2;
+    std::vector<casadi_int> offset2;
     offset2.reserve(offset_.size());
     offset2.push_back(0);
     for (auto&& s : output_sparsity_) {
@@ -302,7 +300,7 @@ namespace casadi {
 
   void Vertsplit::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
     // Get row offsets
-    vector<casadi_int> row_offset;
+    std::vector<casadi_int> row_offset;
     row_offset.reserve(offset_.size());
     row_offset.push_back(0);
     for (auto&& s : output_sparsity_) {
@@ -317,7 +315,7 @@ namespace casadi {
     casadi_int nfwd = fsens.size();
 
     // Get row offsets
-    vector<casadi_int> row_offset;
+    std::vector<casadi_int> row_offset;
     row_offset.reserve(offset_.size());
     row_offset.push_back(0);
     for (auto&& s : output_sparsity_) {
@@ -334,7 +332,7 @@ namespace casadi {
     casadi_int nadj = aseed.size();
 
     // Get row offsets
-    vector<casadi_int> row_offset;
+    std::vector<casadi_int> row_offset;
     row_offset.reserve(offset_.size());
     row_offset.push_back(0);
     for (auto&& s : output_sparsity_) {
@@ -351,7 +349,7 @@ namespace casadi {
     for (auto&& e : x) {
       if (e.nnz()!=0) X.push_back(e);
     }
- 
+
     // Check x length
     if (X.size()!=nout()) {
       return MXNode::get_horzcat(x);

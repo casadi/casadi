@@ -508,7 +508,7 @@ namespace casadi {
 
         // Sparsity pattern for the result
         r_colind.resize(isp.size2()+1); // Col count
-        fill(r_colind.begin(), r_colind.end(), 0);
+        std::fill(r_colind.begin(), r_colind.end(), 0);
         r_row.clear();
 
         // Perform the assignments
@@ -580,7 +580,7 @@ namespace casadi {
     if (idata0 != odata) {
       std::copy(idata0, idata0+this->dep(0).nnz(), odata);
     }
-    for (std::vector<casadi_int>::const_iterator k=this->nz_.begin(); k!=this->nz_.end(); ++k, ++idata) {
+    for (auto k=this->nz_.begin(); k!=this->nz_.end(); ++k, ++idata) {
       if (Add) {
         if (*k>=0) odata[*k] += *idata;
       } else {
@@ -671,7 +671,7 @@ namespace casadi {
 
     // Propagate sparsity
     if (r != a0) std::copy(a0, a0+n, r);
-    for (std::vector<casadi_int>::const_iterator k=this->nz_.begin(); k!=this->nz_.end(); ++k, ++a) {
+    for (auto k=this->nz_.begin(); k!=this->nz_.end(); ++k, ++a) {
       if (Add) {
         if (*k>=0) r[*k] |= *a;
       } else {
@@ -686,7 +686,7 @@ namespace casadi {
   sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
     bvec_t *a = arg[1];
     bvec_t *r = res[0];
-    for (std::vector<casadi_int>::const_iterator k=this->nz_.begin(); k!=this->nz_.end(); ++k, ++a) {
+    for (auto k=this->nz_.begin(); k!=this->nz_.end(); ++k, ++a) {
       if (*k>=0) {
         *a |= r[*k];
         if (!Add) {

@@ -25,15 +25,13 @@
 #define CASADI_DM_INSTANTIATOR_CPP
 #include "matrix_impl.hpp"
 
-using namespace std;
-
 namespace casadi {
 
 
   template<>
   DM CASADI_EXPORT DM::
   solve(const DM& A, const DM& b,
-        const string& lsolver, const Dict& dict) {
+        const std::string& lsolver, const Dict& dict) {
     Linsol mysolver("tmp_solve", lsolver, A.sparsity(), dict);
     return mysolver.solve(A, b, false);
   }
@@ -41,13 +39,13 @@ namespace casadi {
   template<>
   DM CASADI_EXPORT DM::
   inv(const DM& A,
-        const string& lsolver, const Dict& dict) {
+        const std::string& lsolver, const Dict& dict) {
     return solve(A, DM::eye(A.size1()), lsolver, dict);
   }
 
   template<>
   DM CASADI_EXPORT DM::
-  pinv(const DM& A, const string& lsolver,
+  pinv(const DM& A, const std::string& lsolver,
        const Dict& dict) {
     if (A.size1()>=A.size2()) {
       return solve(mtimes(A.T(), A), A.T(), lsolver, dict);
@@ -178,7 +176,7 @@ namespace casadi {
       // Special case for dense (for readibility of exported code)
       stream << indent << name << " = reshape(";
       stream << name << "_nz, ";
-      stream << size1() << ", " << size2() << ");" << endl;
+      stream << size1() << ", " << size2() << ");" << std::endl;
     } else {
       // For sparse matrices, export Sparsity and use sparse constructor
       Dict opts;
@@ -189,7 +187,7 @@ namespace casadi {
       sparsity().export_code(lang, stream, opts);
       stream << indent << name << " = sparse(" << name << "_i, " << name << "_j, ";
       stream << name << "_nz, ";
-      stream << size1() << ", " << size2() << ");" << endl;
+      stream << size1() << ", " << size2() << ");" << std::endl;
     }
   }
 

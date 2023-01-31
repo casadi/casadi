@@ -1134,7 +1134,7 @@ namespace casadi {
     /** \brief Name of the function
 
         \identifier{1xv} */
-    std::string name() const;
+    const std::string& name() const;
 
     /** \brief Check if the function is of a particular type
 

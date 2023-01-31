@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.12)
+cmake_minimum_required(VERSION 3.10.2)
 
 # Workaround to be removed when cmake version is high enough for either:
 #  - PkgConfig to support absolute paths

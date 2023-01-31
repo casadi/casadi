@@ -116,7 +116,10 @@ namespace casadi {
     /** \brief Represent an array constant; adding it when new
 
         \identifier{s0} */
-    void constant_copy(const std::string& var_name, const std::vector<casadi_int>& v, const std::string& type="casadi_int");
+    void constant_copy(
+        const std::string& var_name,
+        const std::vector<casadi_int>& v,
+        const std::string& type="casadi_int");
 
     /** \brief Represent an array constant; adding it when new
 
@@ -220,6 +223,7 @@ namespace casadi {
         \identifier{sj} */
     std::string constant(double v);
     std::string constant(casadi_int v);
+    std::string constant(const std::string& v);
 
     /** \brief Print an intializer
 
@@ -815,7 +819,7 @@ namespace casadi {
     // Prefix
     std::string prefix;
 
-    // Stringstreams holding the different parts of the file being generated
+    // std::stringstreams holding the different parts of the file being generated
     std::stringstream includes;
     std::stringstream auxiliaries;
     std::stringstream body;

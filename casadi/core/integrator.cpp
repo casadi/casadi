@@ -26,32 +26,31 @@
 #include "integrator_impl.hpp"
 #include "casadi_misc.hpp"
 
-using namespace std;
 namespace casadi {
 
-  bool has_integrator(const string& name) {
+  bool has_integrator(const std::string& name) {
     return Integrator::has_plugin(name);
   }
 
-  void load_integrator(const string& name) {
+  void load_integrator(const std::string& name) {
     Integrator::load_plugin(name);
   }
 
-  string doc_integrator(const string& name) {
+  std::string doc_integrator(const std::string& name) {
     return Integrator::getPlugin(name).doc;
   }
 
-  Function integrator(const string& name, const string& solver,
+  Function integrator(const std::string& name, const std::string& solver,
                       const SXDict& dae, const Dict& opts) {
     return integrator(name, solver, Integrator::map2oracle("dae", dae), opts);
   }
 
-  Function integrator(const string& name, const string& solver,
+  Function integrator(const std::string& name, const std::string& solver,
                       const MXDict& dae, const Dict& opts) {
     return integrator(name, solver, Integrator::map2oracle("dae", dae), opts);
   }
 
-  Function integrator(const string& name, const string& solver,
+  Function integrator(const std::string& name, const std::string& solver,
                       const Function& dae, const Dict& opts) {
     // Make sure that dae is sound
     if (dae.has_free()) {
@@ -61,19 +60,19 @@ namespace casadi {
     return intg->create_advanced(opts);
   }
 
-  vector<string> integrator_in() {
-    vector<string> ret(integrator_n_in());
+  std::vector<std::string> integrator_in() {
+    std::vector<std::string> ret(integrator_n_in());
     for (size_t i=0; i<ret.size(); ++i) ret[i]=integrator_in(i);
     return ret;
   }
 
-  vector<string> integrator_out() {
-    vector<string> ret(integrator_n_out());
+  std::vector<std::string> integrator_out() {
+    std::vector<std::string> ret(integrator_n_out());
     for (size_t i=0; i<ret.size(); ++i) ret[i]=integrator_out(i);
     return ret;
   }
 
-  string integrator_in(casadi_int ind) {
+  std::string integrator_in(casadi_int ind) {
     switch (static_cast<IntegratorInput>(ind)) {
     case INTEGRATOR_X0:  return "x0";
     case INTEGRATOR_P:   return "p";
@@ -83,10 +82,10 @@ namespace casadi {
     case INTEGRATOR_RZ0: return "rz0";
     case INTEGRATOR_NUM_IN: break;
     }
-    return string();
+    return std::string();
   }
 
-  string integrator_out(casadi_int ind) {
+  std::string integrator_out(casadi_int ind) {
     switch (static_cast<IntegratorOutput>(ind)) {
     case INTEGRATOR_XF:  return "xf";
     case INTEGRATOR_QF:  return "qf";
@@ -96,7 +95,7 @@ namespace casadi {
     case INTEGRATOR_RZF: return "rzf";
     case INTEGRATOR_NUM_OUT: break;
     }
-    return string();
+    return std::string();
   }
 
   casadi_int integrator_n_in() {
@@ -336,12 +335,12 @@ namespace casadi {
   }
 
   template<typename MatType>
-  std::map<string, MatType> Integrator::aug_fwd(casadi_int nfwd) const {
+  std::map<std::string, MatType> Integrator::aug_fwd(casadi_int nfwd) const {
     if (verbose_) casadi_message(name_ + "::aug_fwd");
 
     // Get input expressions
-    vector<MatType> arg = MatType::get_input(oracle_);
-    vector<MatType> aug_x, aug_z, aug_p, aug_rx, aug_rz, aug_rp;
+    std::vector<MatType> arg = MatType::get_input(oracle_);
+    std::vector<MatType> aug_x, aug_z, aug_p, aug_rx, aug_rz, aug_rp;
     MatType aug_t = arg.at(DE_T);
     aug_x.push_back(vec(arg.at(DE_X)));
     aug_z.push_back(vec(arg.at(DE_Z)));
@@ -351,8 +350,8 @@ namespace casadi {
     aug_rp.push_back(vec(arg.at(DE_RP)));
 
     // Get output expressions
-    vector<MatType> res = oracle_(arg);
-    vector<MatType> aug_ode, aug_alg, aug_quad, aug_rode, aug_ralg, aug_rquad;
+    std::vector<MatType> res = oracle_(arg);
+    std::vector<MatType> aug_ode, aug_alg, aug_quad, aug_rode, aug_ralg, aug_rquad;
     aug_ode.push_back(vec(res.at(DE_ODE)));
     aug_alg.push_back(vec(res.at(DE_ALG)));
     aug_quad.push_back(vec(res.at(DE_QUAD)));
@@ -364,10 +363,10 @@ namespace casadi {
     MatType zero_t = MatType::zeros(t());
 
     // Forward directional derivatives
-    vector<vector<MatType>> seed(nfwd, vector<MatType>(DE_NUM_IN));
+    std::vector<std::vector<MatType>> seed(nfwd, std::vector<MatType>(DE_NUM_IN));
     for (casadi_int d=0; d<nfwd; ++d) {
       seed[d][DE_T] = zero_t;
-      string pref = "aug" + str(d) + "_";
+      std::string pref = "aug" + str(d) + "_";
       aug_x.push_back(vec(seed[d][DE_X] = MatType::sym(pref + "x", x())));
       aug_z.push_back(vec(seed[d][DE_Z] = MatType::sym(pref + "z", z())));
       aug_p.push_back(vec(seed[d][DE_P] = MatType::sym(pref + "p", p())));
@@ -377,7 +376,7 @@ namespace casadi {
     }
 
     // Calculate directional derivatives
-    vector<vector<MatType>> sens;
+    std::vector<std::vector<MatType>> sens;
     oracle_->call_forward(arg, res, seed, sens, true, false);
 
     // Collect sensitivity equations
@@ -393,7 +392,7 @@ namespace casadi {
     }
 
     // Construct return object
-    std::map<string, MatType> ret;
+    std::map<std::string, MatType> ret;
     ret["t"] = aug_t;
     ret["x"] = horzcat(aug_x);
     ret["z"] = horzcat(aug_z);
@@ -411,12 +410,12 @@ namespace casadi {
   }
 
   template<typename MatType>
-  std::map<string, MatType> Integrator::aug_adj(casadi_int nadj) const {
+  std::map<std::string, MatType> Integrator::aug_adj(casadi_int nadj) const {
     if (verbose_) casadi_message(name_ + "::aug_adj");
 
     // Get input expressions
-    vector<MatType> arg = MatType::get_input(oracle_);
-    vector<MatType> aug_x, aug_z, aug_p, aug_rx, aug_rz, aug_rp;
+    std::vector<MatType> arg = MatType::get_input(oracle_);
+    std::vector<MatType> aug_x, aug_z, aug_p, aug_rx, aug_rz, aug_rp;
     MatType aug_t = arg.at(DE_T);
     aug_x.push_back(vec(arg.at(DE_X)));
     aug_z.push_back(vec(arg.at(DE_Z)));
@@ -426,8 +425,8 @@ namespace casadi {
     aug_rp.push_back(vec(arg.at(DE_RP)));
 
     // Get output expressions
-    vector<MatType> res = oracle_(arg);
-    vector<MatType> aug_ode, aug_alg, aug_quad, aug_rode, aug_ralg, aug_rquad;
+    std::vector<MatType> res = oracle_(arg);
+    std::vector<MatType> aug_ode, aug_alg, aug_quad, aug_rode, aug_ralg, aug_rquad;
     aug_ode.push_back(vec(res.at(DE_ODE)));
     aug_alg.push_back(vec(res.at(DE_ALG)));
     aug_quad.push_back(vec(res.at(DE_QUAD)));
@@ -439,9 +438,9 @@ namespace casadi {
     MatType zero_t = MatType::zeros(t());
 
     // Reverse mode directional derivatives
-    vector<vector<MatType>> seed(nadj, vector<MatType>(DE_NUM_OUT));
+    std::vector<std::vector<MatType>> seed(nadj, std::vector<MatType>(DE_NUM_OUT));
     for (casadi_int d=0; d<nadj; ++d) {
-      string pref = "aug" + str(d) + "_";
+      std::string pref = "aug" + str(d) + "_";
       aug_rx.push_back(vec(seed[d][DE_ODE] = MatType::sym(pref + "ode", x())));
       aug_rz.push_back(vec(seed[d][DE_ALG] = MatType::sym(pref + "alg", z())));
       aug_rp.push_back(vec(seed[d][DE_QUAD] = MatType::sym(pref + "quad", q())));
@@ -451,7 +450,7 @@ namespace casadi {
     }
 
     // Calculate directional derivatives
-    vector<vector<MatType>> sens;
+    std::vector<std::vector<MatType>> sens;
     oracle_->call_reverse(arg, res, seed, sens, true, false);
 
     // Collect sensitivity equations
@@ -467,7 +466,7 @@ namespace casadi {
     }
 
     // Construct return object
-    std::map<string, MatType> ret;
+    std::map<std::string, MatType> ret;
     ret["t"] = aug_t;
     ret["x"] = vertcat(aug_x);
     ret["z"] = vertcat(aug_z);
@@ -490,7 +489,7 @@ namespace casadi {
       f = Function("f", {ret["t"], ret["x"], ret["z"], ret["p"],
                          ret["rx"], ret["rz"], ret["rp"]},
                         {ret["ode"], ret["alg"], ret["quad"]});
-      vector<MatType> v = {ret["t"], ret["x"], ret["z"], ret["p"], 0, 0, 0};
+      std::vector<MatType> v = {ret["t"], ret["x"], ret["z"], ret["p"], 0, 0, 0};
       v = f(v);
       ret["ode"] = v.at(0);
       ret["alg"] = v.at(1);
@@ -512,11 +511,11 @@ namespace casadi {
 
     // Propagate forward
     const bvec_t** arg1 = arg+n_in_;
-    fill_n(arg1, static_cast<size_t>(DE_NUM_IN), nullptr);
+    std::fill_n(arg1, static_cast<size_t>(DE_NUM_IN), nullptr);
     arg1[DE_X] = arg[INTEGRATOR_X0];
     arg1[DE_P] = arg[INTEGRATOR_P];
     bvec_t** res1 = res+n_out_;
-    fill_n(res1, static_cast<size_t>(DE_NUM_OUT), nullptr);
+    std::fill_n(res1, static_cast<size_t>(DE_NUM_OUT), nullptr);
     res1[DE_ODE] = tmp_x;
     res1[DE_ALG] = tmp_z;
     oracle_(arg1, res1, iw, w, 0);
@@ -526,13 +525,13 @@ namespace casadi {
     }
 
     // "Solve" in order to resolve interdependencies (cf. Rootfinder)
-    copy_n(tmp_x, nx_+nz_, w);
-    fill_n(tmp_x, nx_+nz_, 0);
+    std::copy_n(tmp_x, nx_+nz_, w);
+    std::fill_n(tmp_x, nx_+nz_, 0);
     sp_jac_dae_.spsolve(tmp_x, w, false);
 
     // Get xf and zf
-    if (res[INTEGRATOR_XF]) copy_n(tmp_x, nx_, res[INTEGRATOR_XF]);
-    if (res[INTEGRATOR_ZF]) copy_n(tmp_z, nz_, res[INTEGRATOR_ZF]);
+    if (res[INTEGRATOR_XF]) std::copy_n(tmp_x, nx_, res[INTEGRATOR_XF]);
+    if (res[INTEGRATOR_ZF]) std::copy_n(tmp_z, nz_, res[INTEGRATOR_ZF]);
 
     // Propagate to quadratures
     if (nq_>0 && res[INTEGRATOR_QF]) {
@@ -545,14 +544,14 @@ namespace casadi {
 
     if (nrx_>0) {
       // Propagate through g
-      fill_n(arg1, static_cast<size_t>(DE_NUM_IN), nullptr);
+      std::fill_n(arg1, static_cast<size_t>(DE_NUM_IN), nullptr);
       arg1[DE_X] = tmp_x;
       arg1[DE_P] = arg[INTEGRATOR_P];
       arg1[DE_Z] = tmp_z;
       arg1[DE_RX] = arg[INTEGRATOR_X0];
       arg1[DE_RX] = arg[INTEGRATOR_RX0];
       arg1[DE_RP] = arg[INTEGRATOR_RP];
-      fill_n(res1, static_cast<size_t>(DE_NUM_OUT), nullptr);
+      std::fill_n(res1, static_cast<size_t>(DE_NUM_OUT), nullptr);
       res1[DE_RODE] = tmp_rx;
       res1[DE_RALG] = tmp_rz;
       oracle_(arg1, res1, iw, w, 0);
@@ -562,13 +561,13 @@ namespace casadi {
       }
 
       // "Solve" in order to resolve interdependencies (cf. Rootfinder)
-      copy_n(tmp_rx, nrx_+nrz_, w);
-      fill_n(tmp_rx, nrx_+nrz_, 0);
+      std::copy_n(tmp_rx, nrx_+nrz_, w);
+      std::fill_n(tmp_rx, nrx_+nrz_, 0);
       sp_jac_rdae_.spsolve(tmp_rx, w, false);
 
       // Get rxf and rzf
-      if (res[INTEGRATOR_RXF]) copy_n(tmp_rx, nrx_, res[INTEGRATOR_RXF]);
-      if (res[INTEGRATOR_RZF]) copy_n(tmp_rz, nrz_, res[INTEGRATOR_RZF]);
+      if (res[INTEGRATOR_RXF]) std::copy_n(tmp_rx, nrx_, res[INTEGRATOR_RXF]);
+      if (res[INTEGRATOR_RZF]) std::copy_n(tmp_rz, nrz_, res[INTEGRATOR_RZF]);
 
       // Propagate to quadratures
       if (nrq_>0 && res[INTEGRATOR_RQF]) {
@@ -601,16 +600,16 @@ namespace casadi {
 
     // Propagate from outputs to state vectors
     if (xf) {
-      copy_n(xf, nx_, tmp_x);
-      fill_n(xf, nx_, 0);
+      std::copy_n(xf, nx_, tmp_x);
+      std::fill_n(xf, nx_, 0);
     } else {
-      fill_n(tmp_x, nx_, 0);
+      std::fill_n(tmp_x, nx_, 0);
     }
     if (zf) {
-      copy_n(zf, nz_, tmp_z);
-      fill_n(zf, nz_, 0);
+      std::copy_n(zf, nz_, tmp_z);
+      std::fill_n(zf, nz_, 0);
     } else {
-      fill_n(tmp_z, nz_, 0);
+      std::fill_n(tmp_z, nz_, 0);
     }
 
     if (nrx_>0) {
@@ -627,21 +626,21 @@ namespace casadi {
 
       // Propagate from outputs to state vectors
       if (rxf) {
-        copy_n(rxf, nrx_, tmp_rx);
-        fill_n(rxf, nrx_, 0);
+        std::copy_n(rxf, nrx_, tmp_rx);
+        std::fill_n(rxf, nrx_, 0);
       } else {
-        fill_n(tmp_rx, nrx_, 0);
+        std::fill_n(tmp_rx, nrx_, 0);
       }
       if (rzf) {
-        copy_n(rzf, nrz_, tmp_rz);
-        fill_n(rzf, nrz_, 0);
+        std::copy_n(rzf, nrz_, tmp_rz);
+        std::fill_n(rzf, nrz_, 0);
       } else {
-        fill_n(tmp_rz, nrz_, 0);
+        std::fill_n(tmp_rz, nrz_, 0);
       }
 
       // Get dependencies from backward quadratures
-      fill_n(res1, static_cast<size_t>(DE_NUM_OUT), nullptr);
-      fill_n(arg1, static_cast<size_t>(DE_NUM_IN), nullptr);
+      std::fill_n(res1, static_cast<size_t>(DE_NUM_OUT), nullptr);
+      std::fill_n(arg1, static_cast<size_t>(DE_NUM_IN), nullptr);
       res1[DE_RQUAD] = rqf;
       arg1[DE_X] = tmp_x;
       arg1[DE_Z] = tmp_z;
@@ -652,9 +651,9 @@ namespace casadi {
       if (oracle_.rev(arg1, res1, iw, w, 0)) return 1;
 
       // Propagate interdependencies
-      fill_n(w, nrx_+nrz_, 0);
+      std::fill_n(w, nrx_+nrz_, 0);
       sp_jac_rdae_.spsolve(w, tmp_rx, true);
-      copy_n(w, nrx_+nrz_, tmp_rx);
+      std::copy_n(w, nrx_+nrz_, tmp_rx);
 
       // Direct dependency rx0 -> rxf
       if (rx0) for (casadi_int i=0; i<nrx_; ++i) rx0[i] |= tmp_rx[i];
@@ -669,8 +668,8 @@ namespace casadi {
     }
 
     // Get dependencies from forward quadratures
-    fill_n(res1, static_cast<size_t>(DE_NUM_OUT), nullptr);
-    fill_n(arg1, static_cast<size_t>(DE_NUM_IN), nullptr);
+    std::fill_n(res1, static_cast<size_t>(DE_NUM_OUT), nullptr);
+    std::fill_n(arg1, static_cast<size_t>(DE_NUM_IN), nullptr);
     res1[DE_QUAD] = qf;
     arg1[DE_X] = tmp_x;
     arg1[DE_Z] = tmp_z;
@@ -680,9 +679,9 @@ namespace casadi {
     }
 
     // Propagate interdependencies
-    fill_n(w, nx_+nz_, 0);
+    std::fill_n(w, nx_+nz_, 0);
     sp_jac_dae_.spsolve(w, tmp_x, true);
-    copy_n(w, nx_+nz_, tmp_x);
+    std::copy_n(w, nx_+nz_, tmp_x);
 
     // Direct dependency x0 -> xf
     if (x0) for (casadi_int i=0; i<nx_; ++i) x0[i] |= tmp_x[i];
@@ -712,8 +711,8 @@ namespace casadi {
 
     // Create integrator for augmented DAE
     Function aug_dae;
-    string aug_prefix = "fsens" + str(nfwd) + "_";
-    string dae_name = aug_prefix + oracle_.name();
+    std::string aug_prefix = "fsens" + str(nfwd) + "_";
+    std::string dae_name = aug_prefix + oracle_.name();
     Dict dae_opts = {{"derivative_of", oracle_}};
     if (oracle_.is_a("SXFunction")) {
       aug_dae = map2oracle(dae_name, aug_fwd<SX>(nfwd));
@@ -725,20 +724,20 @@ namespace casadi {
       aug_dae, aug_opts);
 
     // All inputs of the return function
-    vector<MX> ret_in;
+    std::vector<MX> ret_in;
     ret_in.reserve(INTEGRATOR_NUM_IN*(1+nfwd) + INTEGRATOR_NUM_OUT);
 
     // Augmented state
-    vector<MX> x0_aug, p_aug, z0_aug, rx0_aug, rp_aug, rz0_aug;
+    std::vector<MX> x0_aug, p_aug, z0_aug, rx0_aug, rp_aug, rz0_aug;
 
     // Add nondifferentiated inputs and forward seeds
     for (casadi_int dir=-1; dir<nfwd; ++dir) {
       // Suffix
-      string suff;
+      std::string suff;
       if (dir>=0) suff = "_" + str(dir);
 
       // Augmented problem
-      vector<MX> din(INTEGRATOR_NUM_IN);
+      std::vector<MX> din(INTEGRATOR_NUM_IN);
       x0_aug.push_back(vec(din[INTEGRATOR_X0] = MX::sym("x0" + suff, x())));
       p_aug.push_back(vec(din[INTEGRATOR_P] = MX::sym("p" + suff, p())));
       z0_aug.push_back(vec(din[INTEGRATOR_Z0] = MX::sym("z0" + suff, z())));
@@ -749,7 +748,7 @@ namespace casadi {
 
       // Dummy outputs
       if (dir==-1) {
-        vector<MX> dout(INTEGRATOR_NUM_OUT);
+        std::vector<MX> dout(INTEGRATOR_NUM_OUT);
         dout[INTEGRATOR_XF]  = MX::sym("xf_dummy", Sparsity(size_out(INTEGRATOR_XF)));
         dout[INTEGRATOR_QF]  = MX::sym("qf_dummy", Sparsity(q().size()));
         dout[INTEGRATOR_ZF]  = MX::sym("zf_dummy", Sparsity(z().size()));
@@ -761,34 +760,34 @@ namespace casadi {
     }
 
     // Call the integrator
-    vector<MX> integrator_in(INTEGRATOR_NUM_IN);
+    std::vector<MX> integrator_in(INTEGRATOR_NUM_IN);
     integrator_in[INTEGRATOR_X0] = horzcat(x0_aug);
     integrator_in[INTEGRATOR_P] = horzcat(p_aug);
     integrator_in[INTEGRATOR_Z0] = horzcat(z0_aug);
     integrator_in[INTEGRATOR_RX0] = horzcat(rx0_aug);
     integrator_in[INTEGRATOR_RP] = horzcat(rp_aug);
     integrator_in[INTEGRATOR_RZ0] = horzcat(rz0_aug);
-    vector<MX> integrator_out = aug_int(integrator_in);
+    std::vector<MX> integrator_out = aug_int(integrator_in);
     for (auto&& e : integrator_out) {
       // Workaround
       if (e.size2()!=1+nfwd) e = reshape(e, -1, 1+nfwd);
     }
 
     // Augmented results
-    vector<casadi_int> offset = range(1+nfwd+1);
-    vector<MX> xf_aug = horzsplit(integrator_out[INTEGRATOR_XF], offset);
-    vector<MX> qf_aug = horzsplit(integrator_out[INTEGRATOR_QF], offset);
-    vector<MX> zf_aug = horzsplit(integrator_out[INTEGRATOR_ZF], offset);
-    vector<MX> rxf_aug = horzsplit(integrator_out[INTEGRATOR_RXF], offset);
-    vector<MX> rqf_aug = horzsplit(integrator_out[INTEGRATOR_RQF], offset);
-    vector<MX> rzf_aug = horzsplit(integrator_out[INTEGRATOR_RZF], offset);
+    std::vector<casadi_int> offset = range(1+nfwd+1);
+    std::vector<MX> xf_aug = horzsplit(integrator_out[INTEGRATOR_XF], offset);
+    std::vector<MX> qf_aug = horzsplit(integrator_out[INTEGRATOR_QF], offset);
+    std::vector<MX> zf_aug = horzsplit(integrator_out[INTEGRATOR_ZF], offset);
+    std::vector<MX> rxf_aug = horzsplit(integrator_out[INTEGRATOR_RXF], offset);
+    std::vector<MX> rqf_aug = horzsplit(integrator_out[INTEGRATOR_RQF], offset);
+    std::vector<MX> rzf_aug = horzsplit(integrator_out[INTEGRATOR_RZF], offset);
 
     // All outputs of the return function
-    vector<MX> ret_out;
+    std::vector<MX> ret_out;
     ret_out.reserve(INTEGRATOR_NUM_OUT*nfwd);
 
     // Collect the forward sensitivities
-    vector<MX> dd(INTEGRATOR_NUM_IN);
+    std::vector<MX> dd(INTEGRATOR_NUM_IN);
     for (casadi_int dir=0; dir<nfwd; ++dir) {
       dd[INTEGRATOR_XF]  = reshape(xf_aug.at(dir+1), x().size());
       dd[INTEGRATOR_QF]  = reshape(qf_aug.at(dir+1), q().size());
@@ -800,7 +799,7 @@ namespace casadi {
     }
 
     // Concatenate forward seeds
-    vector<MX> v(nfwd);
+    std::vector<MX> v(nfwd);
     auto r_it = ret_in.begin() + n_in_ + n_out_;
     for (casadi_int i=0; i<n_in_; ++i) {
       for (casadi_int d=0; d<nfwd; ++d) v[d] = *(r_it + d*n_in_);
@@ -835,8 +834,8 @@ namespace casadi {
 
     // Create integrator for augmented DAE
     Function aug_dae;
-    string aug_prefix = "asens" + str(nadj) + "_";
-    string dae_name = aug_prefix + oracle_.name();
+    std::string aug_prefix = "asens" + str(nadj) + "_";
+    std::string dae_name = aug_prefix + oracle_.name();
     if (oracle_.is_a("SXFunction")) {
       aug_dae = map2oracle(dae_name, aug_adj<SX>(nadj));
     } else {
@@ -847,14 +846,14 @@ namespace casadi {
       aug_dae, aug_opts);
 
     // All inputs of the return function
-    vector<MX> ret_in;
+    std::vector<MX> ret_in;
     ret_in.reserve(INTEGRATOR_NUM_IN + INTEGRATOR_NUM_OUT*(1+nadj));
 
     // Augmented state
-    vector<MX> x0_aug, p_aug, z0_aug, rx0_aug, rp_aug, rz0_aug;
+    std::vector<MX> x0_aug, p_aug, z0_aug, rx0_aug, rp_aug, rz0_aug;
 
     // Inputs or forward/adjoint seeds in one direction
-    vector<MX> dd(INTEGRATOR_NUM_IN);
+    std::vector<MX> dd(INTEGRATOR_NUM_IN);
     x0_aug.push_back(vec(dd[INTEGRATOR_X0] = MX::sym("x0", x())));
     p_aug.push_back(vec(dd[INTEGRATOR_P] = MX::sym("p", p())));
     z0_aug.push_back(vec(dd[INTEGRATOR_Z0] = MX::sym("r0", z())));
@@ -865,7 +864,7 @@ namespace casadi {
 
     // Add dummy inputs (outputs of the nondifferentiated funciton)
     dd.resize(INTEGRATOR_NUM_OUT);
-    fill(dd.begin(), dd.end(), MX());
+    std::fill(dd.begin(), dd.end(), MX());
     dd[INTEGRATOR_XF]  = MX::sym("xf_dummy", Sparsity(x().size()));
     dd[INTEGRATOR_QF]  = MX::sym("qf_dummy", Sparsity(q().size()));
     dd[INTEGRATOR_ZF]  = MX::sym("zf_dummy", Sparsity(z().size()));
@@ -876,10 +875,10 @@ namespace casadi {
 
     // Add adjoint seeds
     dd.resize(INTEGRATOR_NUM_OUT);
-    fill(dd.begin(), dd.end(), MX());
+    std::fill(dd.begin(), dd.end(), MX());
     for (casadi_int dir=0; dir<nadj; ++dir) {
       // Suffix
-      string suff;
+      std::string suff;
       if (dir>=0) suff = "_" + str(dir);
 
       // Augmented problem
@@ -893,24 +892,24 @@ namespace casadi {
     }
 
     // Call the integrator
-    vector<MX> integrator_in(INTEGRATOR_NUM_IN);
+    std::vector<MX> integrator_in(INTEGRATOR_NUM_IN);
     integrator_in[INTEGRATOR_X0] = vertcat(x0_aug);
     integrator_in[INTEGRATOR_P] = vertcat(p_aug);
     integrator_in[INTEGRATOR_Z0] = vertcat(z0_aug);
     integrator_in[INTEGRATOR_RX0] = vertcat(rx0_aug);
     integrator_in[INTEGRATOR_RP] = vertcat(rp_aug);
     integrator_in[INTEGRATOR_RZ0] = vertcat(rz0_aug);
-    vector<MX> integrator_out = aug_int(integrator_in);
+    std::vector<MX> integrator_out = aug_int(integrator_in);
 
     // Get offset in the splitted problem
-    vector<casadi_int> off_x = {0, x().numel()};
-    vector<casadi_int> off_z = {0, z().numel()};
-    vector<casadi_int> off_q = {0, q().numel()};
-    vector<casadi_int> off_p = {0, p().numel()};
-    vector<casadi_int> off_rx = {0, rx().numel()};
-    vector<casadi_int> off_rz = {0, rz().numel()};
-    vector<casadi_int> off_rq = {0, rq().numel()};
-    vector<casadi_int> off_rp = {0, rp().numel()};
+    std::vector<casadi_int> off_x = {0, x().numel()};
+    std::vector<casadi_int> off_z = {0, z().numel()};
+    std::vector<casadi_int> off_q = {0, q().numel()};
+    std::vector<casadi_int> off_p = {0, p().numel()};
+    std::vector<casadi_int> off_rx = {0, rx().numel()};
+    std::vector<casadi_int> off_rz = {0, rz().numel()};
+    std::vector<casadi_int> off_rq = {0, rq().numel()};
+    std::vector<casadi_int> off_rp = {0, rp().numel()};
     for (casadi_int dir=0; dir<nadj; ++dir) {
       off_x.push_back(off_x.back() + rx().numel());
       off_z.push_back(off_z.back() + rz().numel());
@@ -923,20 +922,20 @@ namespace casadi {
     }
 
     // Augmented results
-    vector<MX> xf_aug = vertsplit(integrator_out[INTEGRATOR_XF], off_x);
-    vector<MX> qf_aug = vertsplit(integrator_out[INTEGRATOR_QF], off_q);
-    vector<MX> zf_aug = vertsplit(integrator_out[INTEGRATOR_ZF], off_z);
-    vector<MX> rxf_aug = vertsplit(integrator_out[INTEGRATOR_RXF], off_rx);
-    vector<MX> rqf_aug = vertsplit(integrator_out[INTEGRATOR_RQF], off_rq);
-    vector<MX> rzf_aug = vertsplit(integrator_out[INTEGRATOR_RZF], off_rz);
+    std::vector<MX> xf_aug = vertsplit(integrator_out[INTEGRATOR_XF], off_x);
+    std::vector<MX> qf_aug = vertsplit(integrator_out[INTEGRATOR_QF], off_q);
+    std::vector<MX> zf_aug = vertsplit(integrator_out[INTEGRATOR_ZF], off_z);
+    std::vector<MX> rxf_aug = vertsplit(integrator_out[INTEGRATOR_RXF], off_rx);
+    std::vector<MX> rqf_aug = vertsplit(integrator_out[INTEGRATOR_RQF], off_rq);
+    std::vector<MX> rzf_aug = vertsplit(integrator_out[INTEGRATOR_RZF], off_rz);
 
     // All outputs of the return function
-    vector<MX> ret_out;
+    std::vector<MX> ret_out;
     ret_out.reserve(INTEGRATOR_NUM_IN*nadj);
 
     // Collect the adjoint sensitivities
     dd.resize(INTEGRATOR_NUM_IN);
-    fill(dd.begin(), dd.end(), MX());
+    std::fill(dd.begin(), dd.end(), MX());
     for (casadi_int dir=0; dir<nadj; ++dir) {
       dd[INTEGRATOR_X0]  = reshape(rxf_aug.at(dir+1), x().size());
       dd[INTEGRATOR_P]   = reshape(rqf_aug.at(dir+1), p().size());
@@ -948,7 +947,7 @@ namespace casadi {
     }
 
     // Concatenate forward seeds
-    vector<MX> v(nadj);
+    std::vector<MX> v(nadj);
     auto r_it = ret_in.begin() + n_in_ + n_out_;
     for (casadi_int i=0; i<n_out_; ++i) {
       for (casadi_int d=0; d<nadj; ++d) v[d] = *(r_it + d*n_out_);
@@ -1134,8 +1133,8 @@ namespace casadi {
 
     // Allocate tape if backward states are present
     if (nrx_>0) {
-      m->x_tape.resize(nk_+1, vector<double>(nx_));
-      m->Z_tape.resize(nk_, vector<double>(nZ_));
+      m->x_tape.resize(nk_+1, std::vector<double>(nx_));
+      m->Z_tape.resize(nk_, std::vector<double>(nZ_));
     }
 
     // Allocate state
@@ -1169,14 +1168,14 @@ namespace casadi {
     const Function& F = getExplicit();
 
     // Discrete dynamics function inputs ...
-    fill_n(m->arg, F.n_in(), nullptr);
+    std::fill_n(m->arg, F.n_in(), nullptr);
     m->arg[DAE_T] = &m->t;
     m->arg[DAE_X] = get_ptr(m->x_prev);
     m->arg[DAE_Z] = get_ptr(m->Z_prev);
     m->arg[DAE_P] = get_ptr(m->p);
 
     // ... and outputs
-    fill_n(m->res, F.n_out(), nullptr);
+    std::fill_n(m->res, F.n_out(), nullptr);
     m->res[DAE_ODE] = get_ptr(m->x);
     m->res[DAE_ALG] = get_ptr(m->Z);
     m->res[DAE_QUAD] = get_ptr(m->q);
@@ -1223,7 +1222,7 @@ namespace casadi {
     const Function& G = getExplicitB();
 
     // Discrete dynamics function inputs ...
-    fill_n(m->arg, G.n_in(), nullptr);
+    std::fill_n(m->arg, G.n_in(), nullptr);
     m->arg[RDAE_T] = &m->t;
     m->arg[RDAE_P] = get_ptr(m->p);
     m->arg[RDAE_RX] = get_ptr(m->rx_prev);
@@ -1231,7 +1230,7 @@ namespace casadi {
     m->arg[RDAE_RP] = get_ptr(m->rp);
 
     // ... and outputs
-    fill_n(m->res, G.n_out(), nullptr);
+    std::fill_n(m->res, G.n_out(), nullptr);
     m->res[RDAE_ODE] = get_ptr(m->rx);
     m->res[RDAE_ALG] = get_ptr(m->RZ);
     m->res[RDAE_QUAD] = get_ptr(m->rq);
@@ -1282,7 +1281,7 @@ namespace casadi {
     m->k = 0;
 
     // Get consistent initial conditions
-    casadi_fill(get_ptr(m->Z), m->Z.size(), numeric_limits<double>::quiet_NaN());
+    casadi_fill(get_ptr(m->Z), m->Z.size(), std::numeric_limits<double>::quiet_NaN());
 
     // Add the first element in the tape
     if (nrx_>0) {
@@ -1311,7 +1310,7 @@ namespace casadi {
     m->k = nk_;
 
     // Get consistent initial conditions
-    casadi_fill(get_ptr(m->RZ), m->RZ.size(), numeric_limits<double>::quiet_NaN());
+    casadi_fill(get_ptr(m->RZ), m->RZ.size(), std::numeric_limits<double>::quiet_NaN());
   }
 
   ImplicitFixedStepIntegrator::
@@ -1365,7 +1364,7 @@ namespace casadi {
       Dict backward_rootfinder_options = rootfinder_options;
       backward_rootfinder_options["implicit_input"] = RDAE_RZ;
       backward_rootfinder_options["implicit_output"] = RDAE_ALG;
-      string backward_implicit_function_name = implicit_function_name;
+      std::string backward_implicit_function_name = implicit_function_name;
 
       // Allocate a Newton solver
       backward_rootfinder_ =

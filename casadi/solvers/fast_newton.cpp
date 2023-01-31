@@ -27,7 +27,6 @@
 #include <iomanip>
 #include "../core/linsol_internal.hpp"
 
-using namespace std;
 namespace casadi {
 
   extern "C"

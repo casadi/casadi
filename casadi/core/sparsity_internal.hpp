@@ -549,7 +549,7 @@ namespace casadi {
 
     /** \brief  Are the columns of the pattern orthonormal ?*/
     bool is_orthonormal_columns(bool allow_empty=false) const;
-  
+
     /// Is symmetric?
     bool is_symmetric() const;
 

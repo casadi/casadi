@@ -32,9 +32,6 @@
 #include <vector>
 
 namespace casadi {
-
-  using namespace std;
-
   extern "C"
   int CASADI_CONIC_CPLEX_EXPORT
   casadi_register_conic_cplex(Conic::Plugin* plugin) {
@@ -190,7 +187,7 @@ namespace casadi {
     if (m->env==nullptr) {
       char errmsg[CPXMESSAGEBUFSIZE];
       CPXXgeterrorstring(m->env, status, errmsg);
-      casadi_error(string("Cannot initialize CPLEX environment: ") + errmsg);
+      casadi_error(std::string("Cannot initialize CPLEX environment: ") + errmsg);
     }
 
     // Set parameters to their default values
@@ -257,7 +254,7 @@ namespace casadi {
         break;
       case CPX_PARAMTYPE_STRING:
         status = CPXXsetstrparam(m->env, whichparam,
-                                static_cast<string>(op.second).c_str());
+                                static_cast<std::string>(op.second).c_str());
         break;
       case CPX_PARAMTYPE_LONG:
         status = CPXXsetlongparam(m->env, whichparam,
@@ -562,7 +559,7 @@ namespace casadi {
 
       int stat = CPXXgetstat(m->env, m->lp);
       if (stat == CPX_STAT_INFEASIBLE) {
-        m->unified_return_status = SOLVER_RET_INFEASIBLE;
+        m->d_qp.unified_return_status = SOLVER_RET_INFEASIBLE;
       }
 
       // Get objective value
@@ -602,7 +599,7 @@ namespace casadi {
 
       int stat = CPXXgetstat(m->env, m->lp);
       if (stat == CPX_STAT_INFEASIBLE) {
-        m->unified_return_status = SOLVER_RET_INFEASIBLE;
+        m->d_qp.unified_return_status = SOLVER_RET_INFEASIBLE;
       }
 
       m->fstats.at("solver").toc();
@@ -634,14 +631,14 @@ namespace casadi {
           // Retrieving solution
           int sol_ret = CPXXsolution(m->env, m->lp, &solstat, &f, x, lam_a, get_ptr(slack), lam_x);
           if (sol_ret == CPXERR_NO_SOLN) {
-            m->unified_return_status = SOLVER_RET_INFEASIBLE;
+            m->d_qp.unified_return_status = SOLVER_RET_INFEASIBLE;
           }
 
           if (sol_ret) {
             if (error_on_fail_) {
               casadi_error("CPXXsolution failed");
             } else {
-              m->success = false;
+              m->d_qp.success = false;
             }
           }
       }
@@ -657,15 +654,15 @@ namespace casadi {
     casadi_scal(nx_, -1., lam_x);
 
     m->return_status = CPXXgetstat(m->env, m->lp);
-    m->success  = m->return_status==CPX_STAT_OPTIMAL;
-    m->success |= m->return_status==CPX_STAT_FIRSTORDER;
-    m->success |= m->return_status==CPXMIP_OPTIMAL;
-    m->success |= m->return_status==CPXMIP_OPTIMAL_TOL;
+    m->d_qp.success  = m->return_status==CPX_STAT_OPTIMAL;
+    m->d_qp.success |= m->return_status==CPX_STAT_FIRSTORDER;
+    m->d_qp.success |= m->return_status==CPXMIP_OPTIMAL;
+    m->d_qp.success |= m->return_status==CPXMIP_OPTIMAL_TOL;
 
     if (verbose_) {
       char status_string[CPXMESSAGEBUFSIZE];
       CPXXgetstatstring(m->env, m->return_status, status_string);
-      casadi_message(string("CPLEX return status: ") + status_string);
+      casadi_message(std::string("CPLEX return status: ") + status_string);
     }
 
     // Next time we warm start

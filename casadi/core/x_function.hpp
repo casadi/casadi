@@ -622,7 +622,7 @@ namespace casadi {
           if (symmetric) {
             // Initialize to zero
             tmp.resize(nnz_out(oind));
-            fill(tmp.begin(), tmp.end(), 0);
+            std::fill(tmp.begin(), tmp.end(), 0);
 
             // "Multiply" Jacobian sparsity by seed vector
             for (casadi_int el = D1.colind(offset_nfdir+d); el<D1.colind(offset_nfdir+d+1); ++el) {
@@ -648,10 +648,10 @@ namespace casadi {
 
           // Assignments to the Jacobian
           adds.resize(fsens[d][oind].nnz());
-          fill(adds.begin(), adds.end(), -1);
+          std::fill(adds.begin(), adds.end(), -1);
           if (symmetric) {
             adds2.resize(adds.size());
-            fill(adds2.begin(), adds2.end(), -1);
+            std::fill(adds2.begin(), adds2.end(), -1);
           }
 
           // For all the input nonzeros treated in the sweep
@@ -785,7 +785,7 @@ namespace casadi {
 
       // All inputs of the return function
       std::vector<MatType> ret_in(inames.size());
-      copy(in_.begin(), in_.end(), ret_in.begin());
+      std::copy(in_.begin(), in_.end(), ret_in.begin());
       for (casadi_int i=0; i<n_out_; ++i) {
         ret_in.at(n_in_+i) = MatType::sym(inames[n_in_+i], Sparsity(out_.at(i).size()));
       }
@@ -807,8 +807,10 @@ namespace casadi {
       }
 
       Dict options = opts;
-      options["is_diff_in"] = join(is_diff_in_, is_diff_out_, is_diff_in_);
-      options["is_diff_out"] = is_diff_out_;
+      if (opts.find("is_diff_in")==opts.end())
+        options["is_diff_in"] = join(is_diff_in_, is_diff_out_, is_diff_in_);
+      if (opts.find("is_diff_out")==opts.end())
+        options["is_diff_out"] = is_diff_out_;
       // Assemble function and return
       return Function(name, ret_in, ret_out, inames, onames, options);
     } catch (std::exception& e) {
@@ -831,7 +833,7 @@ namespace casadi {
 
       // All inputs of the return function
       std::vector<MatType> ret_in(inames.size());
-      copy(in_.begin(), in_.end(), ret_in.begin());
+      std::copy(in_.begin(), in_.end(), ret_in.begin());
       for (casadi_int i=0; i<n_out_; ++i) {
         ret_in.at(n_in_ + i) = MatType::sym(inames[n_in_+i], Sparsity(out_.at(i).size()));
       }
@@ -853,8 +855,10 @@ namespace casadi {
       }
 
       Dict options = opts;
-      options["is_diff_in"] = join(is_diff_in_, is_diff_out_, is_diff_out_);
-      options["is_diff_out"] = is_diff_in_;
+      if (opts.find("is_diff_in")==opts.end())
+        options["is_diff_in"] = join(is_diff_in_, is_diff_out_, is_diff_out_);
+      if (opts.find("is_diff_out")==opts.end())
+        options["is_diff_out"] = is_diff_in_;
 
       // Assemble function and return
       return Function(name, ret_in, ret_out, inames, onames, options);
@@ -870,7 +874,7 @@ namespace casadi {
                  const std::vector<std::string>& onames,
                  const Dict& opts) const {
     try {
-      Dict tmp_options = generate_options(true);
+      Dict tmp_options = generate_options("tmp");
       // Temporary single-input, single-output function FIXME(@jaeandersson)
       Function tmp("flattened_" + name, {veccat(in_)}, {veccat(out_)}, tmp_options);
 
@@ -898,10 +902,16 @@ namespace casadi {
 
       // All inputs of the return function
       std::vector<MatType> ret_in(inames.size());
-      copy(in_.begin(), in_.end(), ret_in.begin());
+      std::copy(in_.begin(), in_.end(), ret_in.begin());
       for (casadi_int i=0; i<n_out_; ++i) {
         ret_in.at(n_in_+i) = MatType::sym(inames[n_in_+i], Sparsity(out_.at(i).size()));
       }
+
+      Dict options = opts;
+      if (opts.find("is_diff_in")==opts.end())
+        options["is_diff_in"] = join(is_diff_in_, is_diff_out_);
+      if (opts.find("is_diff_out")==opts.end())
+        options["is_diff_out"] = is_diff_out_;
 
       // Assemble function and return
       return Function(name, ret_in, ret_out, inames, onames, opts);
@@ -1086,9 +1096,8 @@ namespace casadi {
           const std::vector<std::string>& s_out,
           const Function::AuxOut& aux,
           const Dict& opts) const {
-    using namespace std;
 
-    Dict g_ops = generate_options();
+    Dict g_ops = generate_options("clone");
     Dict f_options;
     f_options["helper_options"] = g_ops;
     f_options["final_options"] = g_ops;
@@ -1104,8 +1113,8 @@ namespace casadi {
     f.add_dual(aux);
 
     // Specify input expressions to be calculated
-    vector<string> ret_iname;
-    for (const string& s : s_in) {
+    std::vector<std::string> ret_iname;
+    for (const std::string& s : s_in) {
       try {
         ret_iname.push_back(f.request_input(s));
       } catch (CasadiException& ex) {
@@ -1114,8 +1123,8 @@ namespace casadi {
     }
 
     // Specify output expressions to be calculated
-    vector<string> ret_oname;
-    for (const string& s : s_out) {
+    std::vector<std::string> ret_oname;
+    for (const std::string& s : s_out) {
       try {
         ret_oname.push_back(f.request_output(s));
       } catch (CasadiException& ex) {
@@ -1127,22 +1136,22 @@ namespace casadi {
     f.calculate(f_options);
 
     // Get input expressions
-    vector<MatType> ret_in;
+    std::vector<MatType> ret_in;
     ret_in.reserve(s_in.size());
-    for (const string& s : s_in) ret_in.push_back(f.get_input(s));
+    for (const std::string& s : s_in) ret_in.push_back(f.get_input(s));
 
     // Get output expressions
-    vector<MatType> ret_out;
+    std::vector<MatType> ret_out;
     ret_out.reserve(s_out.size());
-    for (const string& s : s_out) ret_out.push_back(f.get_output(s));
+    for (const std::string& s : s_out) ret_out.push_back(f.get_output(s));
 
     // Create function and return
     Function ret(name, ret_in, ret_out, ret_iname, ret_oname, final_options);
     if (ret.has_free()) {
       // Substitute free variables with zeros
       // We assume that the free variables are caused by false positive dependencies
-      vector<MatType> free_in = MatType::get_free(ret);
-      vector<MatType> free_sub = free_in;
+      std::vector<MatType> free_in = MatType::get_free(ret);
+      std::vector<MatType> free_sub = free_in;
       for (auto&& e : free_sub) e = MatType::zeros(e.sparsity());
       ret_out = substitute(ret_out, free_in, free_sub);
       ret = Function(name, ret_in, ret_out, ret_iname, ret_oname, final_options);
@@ -1154,7 +1163,6 @@ namespace casadi {
   std::vector<bool> XFunction<DerivedType, MatType, NodeType>::
   which_depends(const std::string& s_in, const std::vector<std::string>& s_out,
       casadi_int order, bool tr) const {
-    using namespace std;
 
     // Input arguments
     auto it = std::find(name_in_.begin(), name_in_.end(), s_in);
@@ -1162,7 +1170,7 @@ namespace casadi {
     MatType arg = in_.at(it-name_in_.begin());
 
     // Output arguments
-    vector<MatType> res;
+    std::vector<MatType> res;
     for (auto&& s : s_out) {
       it = std::find(name_out_.begin(), name_out_.end(), s);
       casadi_assert_dev(it!=name_out_.end());
