@@ -96,48 +96,13 @@ else()
   endif()
 endif()
 
-########################################################################
-############################# C++11 ####################################
-########################################################################
-# Check if the compiler supports C++11
-foreach(CXX11FLAG_TEST "" "-std=c++11" "-std=c++0x")
-  if(NOT USE_CXX11)
-    # Try to compile test with the proposed flag
-    try_compile(USE_CXX11
-      ${CMAKE_BINARY_DIR}
-      ${CMAKE_MODULE_PATH}/check_cxx11.cpp
-      CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${CXX11FLAG_TEST}
-      OUTPUT_VARIABLE OUTPUT)
-
-    # Save flag, if successful
-    if(USE_CXX11)
-      set(CXX11FLAG ${CXX11FLAG_TEST} CACHE INTERNAL "C++11 compile flag")
-    endif()
-  endif()
-endforeach()
-
-# If found, set flag
-if(USE_CXX11)
-  if(CXX11FLAG)
-    message(STATUS "Flag needed for enabling C++11 features: ${CXX11FLAG}")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CXX11FLAG}")
-  else()
-    message(STATUS "No flag needed for enabling C++11 features.")
-  endif()
-  add_definitions(-DUSE_CXX11)
-else()
-  message(FATAL_ERROR "Cannot enable C++11 features.")
-endif()
-
-if(CXX11FLAG)
-  try_compile(HAS_ERFINV
-    ${CMAKE_BINARY_DIR}
-    ${CMAKE_MODULE_PATH}/check_erfinv.cpp
-    CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${CXX11FLAG}
-    OUTPUT_VARIABLE OUTPUT)
-  if(HAS_ERFINV)
-    add_definitions(-DHAS_ERFINV)
-  endif()
+# Inverse of error function not yet (?) part of the C++ standard
+try_compile(HAS_ERFINV
+  ${CMAKE_BINARY_DIR}
+  ${CMAKE_MODULE_PATH}/check_erfinv.cpp
+  OUTPUT_VARIABLE OUTPUT)
+if(HAS_ERFINV)
+  add_definitions(-DHAS_ERFINV)
 endif()
 
 # Check if mkstemps is available
