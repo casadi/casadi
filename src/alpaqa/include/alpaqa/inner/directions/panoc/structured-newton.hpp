@@ -138,8 +138,8 @@ struct StructuredNewtonDirection {
         }
 
         // There are active indices K
-        auto J = JK.topRows(nJ);
-        auto K = JK.bottomRows(n - nJ);
+        crindexvec J = JK.topRows(nJ);
+        rindexvec K  = JK.bottomRows(n - nJ);
         detail::IndexSet<config_t>::compute_complement(J, K, n);
 
         // Compute right-hand side of 6.1c
