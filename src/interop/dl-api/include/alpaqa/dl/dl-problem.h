@@ -1,11 +1,13 @@
 #pragma once
 
+#include <stddef.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 typedef double alpaqa_real_t;
-typedef long int alpaqa_length_t;
+typedef ptrdiff_t alpaqa_length_t;
 typedef alpaqa_length_t alpaqa_index_t;
 
 typedef struct {

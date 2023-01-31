@@ -8,8 +8,8 @@ USING_ALPAQA_CONFIG(alpaqa::EigenConfigd);
 
 // External Fortran routines
 extern "C" {
-int64_t problem_get_num_vars(void);
-int64_t problem_get_num_constr(void);
+ptrdiff_t problem_get_num_vars(void);
+ptrdiff_t problem_get_num_constr(void);
 double problem_eval_f(const double *);
 void problem_eval_grad_f(const double *, double *);
 void problem_eval_g(const double *, double *);

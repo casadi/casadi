@@ -1,10 +1,10 @@
 module problem
 
-   use, intrinsic::iso_c_binding, only: c_double, c_int64_t
+   use, intrinsic::iso_c_binding, only: c_double, c_ptrdiff_t
    implicit none (type,external)
 
-   integer(c_int64_t), parameter :: n = 2
-   integer(c_int64_t), parameter :: m = 1
+   integer(c_ptrdiff_t), parameter :: n = 2
+   integer(c_ptrdiff_t), parameter :: m = 1
    real(c_double) :: Q(n, n)
    data Q /3, -1, -1, 3/
    real(c_double) :: A(m, n)
@@ -46,12 +46,12 @@ contains
    end subroutine
 
    ! Get the number of variables of the problem
-   pure integer(c_int64_t) function problem_get_num_vars() bind(C)
+   pure integer(c_ptrdiff_t) function problem_get_num_vars() bind(C)
       problem_get_num_vars = n
    end function
 
    ! Get the number of constraints of the problem
-   pure integer(c_int64_t) function problem_get_num_constr() bind(C)
+   pure integer(c_ptrdiff_t) function problem_get_num_constr() bind(C)
       problem_get_num_constr = m
    end function
 
