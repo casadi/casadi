@@ -59,7 +59,7 @@ auto build_test_problem() {
 // Test the evaluation of PANOC's objective function ψ(x) and its gradient ∇ψ(x)
 TEST(PANOC, calc_ψ_grad_ψ) {
     auto op = build_test_problem();
-    auto p = alpaqa::TypeErasedProblem<config_t>{op};
+    auto p  = alpaqa::TypeErasedProblem<config_t>{op};
 
     auto f = [&p](crvec x) { return p.eval_f(x); };
     auto g = [&p](crvec x) {
@@ -210,7 +210,7 @@ auto build_test_problem2() {
 // Test the evaluation of PANOC's augmented Lagrangian hessian
 TEST(PANOC, hessian) {
     auto op = build_test_problem2();
-    auto p = alpaqa::TypeErasedProblem<config_t>{op};
+    auto p  = alpaqa::TypeErasedProblem<config_t>{op};
 
     auto f = [&p](crvec x) { return p.eval_f(x); };
     auto g = [&p](crvec x) {
@@ -357,7 +357,7 @@ TEST(PANOC, hessian) {
     };
 
     // TODO: enable again when implemented
-
+    static_cast<void>(grad_ψi);
     // vec gv(2);
     // Helpers::calc_augmented_lagrangian_hessian(p, x, ŷ, y, Σ, gv, H_res,
     //                                            work_n);
