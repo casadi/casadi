@@ -130,15 +130,6 @@ else()
 endif()
 
 if(CXX11FLAG)
-  try_compile(HAS_ERF
-    ${CMAKE_BINARY_DIR}
-    ${CMAKE_MODULE_PATH}/check_erf.cpp
-    CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${CXX11FLAG}
-    OUTPUT_VARIABLE OUTPUT)
-  if(HAS_ERF)
-    add_definitions(-DHAS_ERF)
-  endif()
-
   try_compile(HAS_ERFINV
     ${CMAKE_BINARY_DIR}
     ${CMAKE_MODULE_PATH}/check_erfinv.cpp
