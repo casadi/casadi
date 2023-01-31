@@ -1243,9 +1243,10 @@ namespace casadi {
     return ss.str();
   }
 
-  std::string Function::name() const {
+  const std::string& Function::name() const {
     if (is_null()) {
-      return "null";
+      static std::string null = "null";
+      return null;
     } else {
       return (*this)->name_;
     }
