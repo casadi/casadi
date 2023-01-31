@@ -129,7 +129,13 @@ class PANOCSolver {
                      rvec x,                   // inout
                      rvec y,                   // inout
                      crvec Σ,                  // in
-                     rvec d);                  // out
+                     rvec err_z);              // out
+
+    template <class P>
+    Stats operator()(const P &problem, const SolveOptions &opts, rvec u, rvec y,
+                     crvec Σ, rvec e) {
+        return operator()(Problem::template make<P>(problem), opts, u, y, Σ, e);
+    }
 
     /// Specify a callable that is invoked with some intermediate results on
     /// each iteration of the algorithm.
