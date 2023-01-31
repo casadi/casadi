@@ -36,6 +36,7 @@ pybind11_add_module(_alpaqa MODULE
     "src/params/panoc-ocp-params.cpp"
     "src/params/panoc-params.cpp"
     "src/params/structured-lbfgs-direction-params.cpp"
+    "src/params/structured-newton-direction-params.cpp"
     # NO_EXTRAS # Prevent pybind11 from stripping the binary
 )
 target_include_directories(_alpaqa PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)

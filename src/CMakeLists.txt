@@ -23,6 +23,7 @@ add_library(alpaqa
     "alpaqa/src/structured-panoc-alm.cpp"
     "alpaqa/src/inner/internal/solverstatus.cpp"
     "alpaqa/src/inner/directions/panoc/structured-lbfgs.cpp"
+    "alpaqa/src/inner/directions/panoc/structured-newton.cpp"
     "alpaqa/src/inner/internal/panoc-helpers.cpp"
 )
 target_compile_features(alpaqa PUBLIC cxx_std_20)

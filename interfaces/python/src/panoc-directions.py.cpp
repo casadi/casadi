@@ -11,6 +11,7 @@ using namespace py::literals;
 #include <alpaqa/inner/directions/panoc/anderson.hpp>
 #include <alpaqa/inner/directions/panoc/lbfgs.hpp>
 #include <alpaqa/inner/directions/panoc/structured-lbfgs.hpp>
+#include <alpaqa/inner/directions/panoc/structured-newton.hpp>
 
 #include "params/params.hpp"
 #include "stats-to-dict.hpp"
@@ -78,6 +79,31 @@ void register_panoc_directions(py::module_ &m) {
     te_direction.def(py::init(
         &alpaqa::erase_direction_with_params_dict<StructuredLBFGSDir, const StructuredLBFGSDir &>));
     py::implicitly_convertible<StructuredLBFGSDir, TypeErasedPANOCDirection>();
+
+    // ----------------------------------------------------------------------------------------- //
+    using StructuredNewtonDir  = alpaqa::StructuredNewtonDirection<config_t>;
+    using StrucNewtonDirParams = alpaqa::StructuredNewtonDirectionParams<config_t>;
+
+    py::class_<StructuredNewtonDir> struc_newton(
+        m, "StructuredNewtonDirection",
+        "C++ documentation: :cpp:class:`alpaqa::StructuredNewtonDirection`");
+    register_dataclass<StrucNewtonDirParams>(
+        struc_newton, "DirectionParams",
+        "C++ documentation: :cpp:class:`alpaqa::StructuredNewtonDirection::DirectionParams`");
+    struc_newton //
+        .def(py::init([](params_or_dict<StrucNewtonDirParams> direction_params) {
+                 return StructuredNewtonDir{var_kwargs_to_struct(direction_params)};
+             }),
+             "direction_params"_a = py::dict{})
+        .def_property_readonly("params",
+                               py::cpp_function(&StructuredNewtonDir::get_params,
+                                                py::return_value_policy::reference_internal))
+        .def("__str__", &StructuredNewtonDir::get_name);
+
+    te_direction.def(
+        py::init(&alpaqa::erase_direction_with_params_dict<StructuredNewtonDir,
+                                                           const StructuredNewtonDir &>));
+    py::implicitly_convertible<StructuredNewtonDir, TypeErasedPANOCDirection>();
 
     // ----------------------------------------------------------------------------------------- //
     using AndersonDir       = alpaqa::AndersonDirection<config_t>;
