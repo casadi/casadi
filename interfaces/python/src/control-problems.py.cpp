@@ -49,7 +49,8 @@ void register_control_problems(py::module_ &m) {
         struct CasADiControlProblem {};
         auto load_CasADi_control_problem = [](const char *so_name,
                                               unsigned N) -> std::unique_ptr<CasADiControlProblem> {
-            throw std::runtime_error("This version of alpaqa was compiled without CasADi support");
+            throw std::runtime_error(
+                "This version of alpaqa was compiled without CasADi optimal control support");
         };
 #endif
 

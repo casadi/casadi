@@ -67,6 +67,8 @@ def convert_to_multiple_shooting_alm(ocp: OCProblemData, y, μ, D, D_N):
     return mpc_cost
 
 def test_lqr():
+    if not pa.with_casadi_ocp:
+        return
     tol = 1e-10
     rng = nprand.default_rng(112233)
 
