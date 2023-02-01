@@ -2,6 +2,7 @@
 
 #include <alpaqa/config/config.hpp>
 #include <Eigen/Sparse>
+#include <cassert>
 #include <memory>
 #include <span>
 #include <type_traits>
