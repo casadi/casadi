@@ -183,13 +183,8 @@ void casadi_feasiblesqpmethod_init(casadi_feasiblesqpmethod_data<T1>* d,
   // Jacobian
   d->Jk = *w; *w += nnz_a;
   // Anderson vector
-<<<<<<< HEAD
   d->anderson_memory_step = *w; *w += sz_anderson_memory*nx;
   d->anderson_memory_iterate = *w; *w += sz_anderson_memory*nx;
   d->gamma = *w; *w += sz_anderson_memory;
   
-=======
-  d->anderson_memory_step = *w; *w += sz_anderson_memory * nx;
-  d->anderson_memory_iterate = *w; *w += sz_anderson_memory * nx;
->>>>>>> casadi_original/develop
 }
