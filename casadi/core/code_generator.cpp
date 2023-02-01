@@ -1614,41 +1614,37 @@ namespace casadi {
     return "casadi_axpy(" + str(n) + ", " + a + ", " + x + ", " + y + ");";
   }
 
-<<<<<<< HEAD
-  string CodeGenerator::clip_min(const string& x, casadi_int n,
-                                  const string& min, const string& mask) {
+  std::string CodeGenerator::clip_min(const std::string& x, casadi_int n,
+                                  const std::string& min, const std::string& mask) {
     add_auxiliary(AUX_CLIP_MIN);
     return "casadi_clip_min(" + x + ", " + str(n) + ", " + min + ", " + mask + ");";
   }
 
-  string CodeGenerator::clip_max(const string& x, casadi_int n,
-                                  const string& min, const string& mask) {
+  std::string CodeGenerator::clip_max(const std::string& x, casadi_int n,
+                                  const std::string& min, const std::string& mask) {
     add_auxiliary(AUX_CLIP_MAX);
     return "casadi_clip_max(" + x + ", " + str(n) + ", " + min + ", " + mask + ");";
   }
 
-  string CodeGenerator::vector_fmax(casadi_int n, const string& x,
-                                  const string& y, const string& z) {
+  std::string CodeGenerator::vector_fmax(casadi_int n, const std::string& x,
+                                  const std::string& y, const std::string& z) {
     add_auxiliary(AUX_VECTOR_FMAX);
     return "casadi_vector_fmax(" + str(n) + ", " + x + ", " + y + ", " + z + ");";
   }
 
-  string CodeGenerator::vector_fmin(casadi_int n, const string& x,
-                                  const string& y, const string& z) {
+  std::string CodeGenerator::vector_fmin(casadi_int n, const std::string& x,
+                                  const std::string& y, const std::string& z) {
     add_auxiliary(AUX_VECTOR_FMIN);
     return "casadi_vector_fmin(" + str(n) + ", " + x + ", " + y + ", " + z + ");";
   }
 
-  string CodeGenerator::masked_norm_inf(casadi_int n, const string& x, 
-                                  const string& mask) {
+  std::string CodeGenerator::masked_norm_inf(casadi_int n, const std::string& x, 
+                                  const std::string& mask) {
     add_auxiliary(AUX_MASKED_NORM_INF);
     return "casadi_masked_norm_inf(" + str(n) + ", " + x + ", " + mask + ")";
   }
 
-  string CodeGenerator::scal(casadi_int n, const string& alpha, const string& x) {
-=======
   std::string CodeGenerator::scal(casadi_int n, const std::string& alpha, const std::string& x) {
->>>>>>> casadi_original/develop
     add_auxiliary(AUX_SCAL);
     return "casadi_scal(" + str(n) + ", " + alpha + ", " + x + ");";
   }

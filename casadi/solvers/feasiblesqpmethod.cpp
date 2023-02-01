@@ -435,11 +435,7 @@ namespace casadi {
     if (use_sqp_){
       qpsol_ = conic("qpsol", qpsol_plugin, {{"h", Hsp_}, {"a", Asp_}},
                    qpsol_options);
-<<<<<<< HEAD
       // cout << qpsol_ <<std::endl;
-=======
-      uout() << qpsol_ <<std::endl;
->>>>>>> casadi_original/develop
     } else {
       Hsp_ = Sparsity(nx_, nx_);
       uout() << "Sparsity pattern: " << Hsp_ << std::endl;
@@ -450,11 +446,7 @@ namespace casadi {
       qpsol_ = conic("qpsol", qpsol_plugin, {{"a", Asp_}},
                    qpsol_options);
       // qpsol_ = Function::load("/home/david/testproblems_feasible_casadi/qpsol.casadi");
-<<<<<<< HEAD
       // cout << qpsol_ <<std::endl;
-=======
-      uout() << qpsol_ <<std::endl;
->>>>>>> casadi_original/develop
     }
     
     alloc(qpsol_);
@@ -1444,7 +1436,6 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
     g.local("m_p", "const casadi_real", "*");
     g.init_local("m_p", g.arg(NLPSOL_P));
     g.local("m_f", "casadi_real");
-<<<<<<< HEAD
     g.local("m_f_feas", "casadi_real");
     g.copy_default(g.arg(NLPSOL_X0), nx_, "d_nlp.z", "0", false);
     g.copy_default(g.arg(NLPSOL_LAM_X0), nx_, "d_nlp.lam", "0", false);
@@ -1452,14 +1443,6 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
     g.copy_default(g.arg(NLPSOL_LBX), nx_, "d_nlp.lbz", "-casadi_inf", false);
     g.copy_default(g.arg(NLPSOL_UBX), nx_, "d_nlp.ubz", "casadi_inf", false);
     g.copy_default(g.arg(NLPSOL_LBG), ng_, "d_nlp.lbz+"+str(nx_),
-=======
-    g.copy_default("d_nlp.x0", nx_, "d_nlp.z", "0", false);
-    g.copy_default("d_nlp.lam_x0", nx_, "d_nlp.lam", "0", false);
-    g.copy_default("d_nlp.lam_g0", ng_, "d_nlp.lam+"+str(nx_), "0", false);
-    g.copy_default("d_nlp.lbx", nx_, "d_nlp.lbz", "-casadi_inf", false);
-    g.copy_default("d_nlp.ubx", nx_, "d_nlp.ubz", "casadi_inf", false);
-    g.copy_default("d_nlp.lbg", ng_, "d_nlp.lbz+"+str(nx_),
->>>>>>> casadi_original/develop
       "-casadi_inf", false);
     g.copy_default("d_nlp.ubg", ng_, "d_nlp.ubz+"+str(nx_),
       "casadi_inf", false);
