@@ -20,9 +20,9 @@ void register_ocp(py::module_ &m) {
         using OCPVars = alpaqa::OCPVariables<config_t>;
         alpaqa::util::copyable_unique_ptr<Problem> problem;
         alpaqa::OCPEvaluator<config_t> eval;
-        alpaqa::Box<config_t> U{alpaqa::Box<config_t>::NaN(eval.vars.nu())};
-        alpaqa::Box<config_t> D{alpaqa::Box<config_t>::NaN(eval.vars.nc())};
-        alpaqa::Box<config_t> D_N{alpaqa::Box<config_t>::NaN(eval.vars.nc_N())};
+        alpaqa::Box<Conf> U{alpaqa::Box<Conf>::NaN(eval.vars.nu())};
+        alpaqa::Box<Conf> D{alpaqa::Box<Conf>::NaN(eval.vars.nc())};
+        alpaqa::Box<Conf> D_N{alpaqa::Box<Conf>::NaN(eval.vars.nc_N())};
         OCPEvaluator(const Problem &p) : problem{std::make_unique<Problem>(p)}, eval{*problem} {
             eval.problem->get_U(U);
             eval.problem->get_D(D);
