@@ -44,10 +44,10 @@ function(add_warnings_target tgt_name warnings_as_errors)
         /wd4251 # 'x' needs to have dll-interface to be used by clients of 'y'
         /wd4305 # 'initializing': truncation from 'double' to 'float'
         /wd4661 # no suitable definition provided for explicit template instantiation request
-        /permissive-
+        /wd5030 # attribute 'attribute-name' is not recognized
     )
     # Intel ICC
-    set(INTEL_WARNINGS 
+    set(INTEL_WARNINGS
         -Wall
         -Wextra
     )
