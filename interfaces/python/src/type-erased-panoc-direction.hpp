@@ -113,8 +113,6 @@ class TypeErasedPANOCDirection
     }
 };
 
-
-
 template <class T, class... Args>
 auto erase_direction(Args &&...args) {
     return TypeErasedPANOCDirection<typename T::config_t>::template make<T>(
@@ -137,13 +135,13 @@ inline py::object to_dict_tup(py::object o) { return std::move(o); }
 
 template <class T, class... Args>
 auto erase_direction_with_params_dict(Args &&...args) {
-    struct S : T {
+    struct DirectionWrapper : T {
+        DirectionWrapper(const T &d) : T{d} {}
+        DirectionWrapper(T &&d) : T{std::move(d)} {}
         using T::T;
-        S(const T &d) : T{d} {}
-        S(T &&d) : T{std::move(d)} {}
         py::object get_params() const { return detail::to_dict_tup(T::get_params()); }
     };
-    return TypeErasedPANOCDirection<typename T::config_t>::template make<S>(
+    return TypeErasedPANOCDirection<typename T::config_t>::template make<DirectionWrapper>(
         std::forward<Args>(args)...);
 }
 
