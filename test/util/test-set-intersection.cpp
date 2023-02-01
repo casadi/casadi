@@ -4,7 +4,9 @@
 
 #include <alpaqa/util/set-intersection.hpp>
 #include <algorithm>
+#include <array>
 #include <iterator>
+#include <vector>
 
 TEST(SetIntersection, sameFirst) {
     std::array set_A{1, 3, 10, 22, 23, 24, 25, 30, 32};
