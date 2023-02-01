@@ -266,7 +266,8 @@ def test_lqr():
     def add_block(r, c, M, triplets):
         for col in range(M.shape[1]):
             for row in range(M.shape[0]):
-                if val := M[row, col]:
+                val = M[row, col]
+                if val:
                     triplets += [(r + row, c + col, val)]
     # Dynamics
     for i in range(N + 1):
