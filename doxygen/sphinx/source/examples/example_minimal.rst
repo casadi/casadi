@@ -44,9 +44,10 @@ We start by building the optimization problem for |cpp_name| to solve::
 Note that this is purely `CasADi <https://web.casadi.org/>`_ code, so thus far, everything we've done is independent of |pylib_name|. We now use the |casadi| objects to build C-code of the cost and constraints for |cpp_name| to optimize::
 
     import alpaqa as pa
+    import alpaqa.casadi_loader as cl
     import numpy as np
 
-    prob = pa.generate_and_compile_casadi_problem(cost_function, g_function, name=name)
+    prob = cl.generate_and_compile_casadi_problem(cost_function, g_function, name=name)
 
 The resulting object `prob` is an instance of :py:class:`alpaqa._alpaqa.float64.Problem`. Before 
 we can solve the problem, we need to set a few numerical values to the 
