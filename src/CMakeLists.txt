@@ -40,6 +40,7 @@ target_compile_definitions(alpaqa PUBLIC
     $<$<BOOL:${ALPAQA_WITH_QUAD_PRECISION}>:ALPAQA_WITH_QUAD_PRECISION>)
 target_link_libraries(alpaqa PUBLIC
     $<$<BOOL:${ALPAQA_WITH_QUAD_PRECISION}>:quadmath>)
+set_target_properties(alpaqa PROPERTIES SOVERSION ${PROJECT_VERSION})
 add_library(alpaqa::alpaqa ALIAS alpaqa)
 list(APPEND ALPAQA_INSTALL_TARGETS alpaqa)
 
@@ -67,6 +68,7 @@ if (ALPAQA_WITH_CASADI)
         PUBLIC  alpaqa::alpaqa
         PRIVATE casadi Threads::Threads alpaqa::warnings)
     alpaqa_configure_visibility(casadi-loader)
+    set_target_properties(casadi-loader PROPERTIES SOVERSION ${PROJECT_VERSION})
     add_library(alpaqa::casadi-loader ALIAS casadi-loader)
     list(APPEND ALPAQA_INSTALL_TARGETS casadi-loader)
     generate_export_header(casadi-loader
@@ -102,6 +104,7 @@ if (ALPAQA_WITH_CASADI_OCP)
         PUBLIC  alpaqa::alpaqa
         PRIVATE casadi Threads::Threads alpaqa::warnings)
     alpaqa_configure_visibility(casadi-ocp-loader)
+    set_target_properties(casadi-ocp-loader PROPERTIES SOVERSION ${PROJECT_VERSION})
     add_library(alpaqa::casadi-ocp-loader ALIAS casadi-ocp-loader)
     list(APPEND ALPAQA_INSTALL_TARGETS casadi-ocp-loader)
     generate_export_header(casadi-ocp-loader
@@ -126,6 +129,7 @@ if (CMAKE_DL_LIBS)
     target_link_libraries(dl-loader
         PUBLIC alpaqa::alpaqa alpaqa::dl-api
         PRIVATE ${CMAKE_DL_LIBS} alpaqa::warnings)
+    set_target_properties(dl-loader PROPERTIES SOVERSION ${PROJECT_VERSION})
     add_library(alpaqa::dl-loader ALIAS dl-loader)
     list(APPEND ALPAQA_INSTALL_TARGETS dl-loader)
     message(STATUS "Compiling WITH dl support")
