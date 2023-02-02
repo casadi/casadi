@@ -74,7 +74,7 @@ jobs:
               image: [macos-11]
             operations:
               - type: append
-                if: ${{ vars.BLESSED_REPO != '' }}
+                if: ${{ vars.BLESSED_REPO == 'yes' }}
                 matrix:
                   image: [macos-m1]
       - run: echo ${{ steps.build-matrix.outputs.matrix }}
@@ -203,7 +203,7 @@ jobs:
               py2: ["27","35","36","37","38","39","310","311"]
             operations:
               - type: append
-                if: ${{ vars.BLESSED_REPO != '' }}
+                if: ${{ vars.BLESSED_REPO == 'yes' }}
                 matrix:
                   image: [macos-m1]
                   py2: ["38","39","310","311"]
