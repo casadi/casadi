@@ -36,9 +36,9 @@ class CasADiProblem : public BoxConstrProblem<Conf> {
     /// The file should contain functions with the names `f`, `grad_f`, `g` and
     /// `grad_g`. These functions evaluate the objective function, its gradient,
     /// the constraints, and the constraint gradient times a vector respecitvely.
-    /// If @p second_order is true, additional functions `hess_L`, `hess_ψ` and
-    /// `hess_L_prod` should be provided to evaluate the Hessian of the
-    /// Lagrangian and Hessian-vector products.
+    /// If @p second_order is true, additional functions `hess_L`, `hess_ψ`,
+    /// `hess_L_prod` and `hess_ψ_prod` should be provided to evaluate the
+    /// Hessian of the (augmented) Lagrangian and Hessian-vector products.
     ///
     /// If any of the dimensions are less than or equal to zero, they are
     /// determined from the `g` function in the given file.
@@ -67,6 +67,7 @@ class CasADiProblem : public BoxConstrProblem<Conf> {
     void eval_grad_gi(crvec x, index_t i, rvec grad_i) const;
     void eval_hess_L_prod(crvec x, crvec y, crvec v, rvec Hv) const;
     void eval_hess_L(crvec x, crvec y, rmat H) const;
+    void eval_hess_ψ_prod(crvec x, crvec y, crvec Σ, crvec v, rvec Hv) const;
     void eval_hess_ψ(crvec x, crvec y, crvec Σ, rmat H) const;
     // clang-format on
 
@@ -76,6 +77,8 @@ class CasADiProblem : public BoxConstrProblem<Conf> {
     [[nodiscard]] bool provides_eval_hess_L_prod() const;
     /// @see @ref TypeErasedProblem::provides_eval_hess_L
     [[nodiscard]] bool provides_eval_hess_L() const;
+    /// @see @ref TypeErasedProblem::provides_eval_hess_ψ_prod
+    [[nodiscard]] bool provides_eval_hess_ψ_prod() const;
     /// @see @ref TypeErasedProblem::provides_eval_hess_ψ
     [[nodiscard]] bool provides_eval_hess_ψ() const;
 

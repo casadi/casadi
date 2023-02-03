@@ -60,6 +60,8 @@ std::ostream &operator<<(std::ostream &os, const EvalCounter &c) {
        << CountResult{c.hess_L_prod, c.time.hess_L_prod};
     os << "             hess_L:" //
        << CountResult{c.hess_L, c.time.hess_L};
+    os << "        hess_ψ_prod:" //
+       << CountResult{c.hess_ψ_prod, c.time.hess_ψ_prod};
     os << "             hess_ψ:" //
        << CountResult{c.hess_ψ, c.time.hess_ψ};
     os << "                  ψ:" //
