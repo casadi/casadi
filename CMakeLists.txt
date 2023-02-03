@@ -34,8 +34,10 @@ endif()
 if (MSVC)
     set(CMAKE_CXX_FLAGS "/utf-8 /Dnot=! /D__PRETTY_FUNCTION__=__FUNCSIG__ ${CMAKE_CXX_FLAGS} /bigobj /permissive-")
 endif()
+set(CMAKE_RELEASE_POSTFIX "")
 set(CMAKE_DEBUG_POSTFIX "_d")
 set(CMAKE_RELWITHDEBINFO_POSTFIX "_rd")
+set(CMAKE_MINSIZEREL_POSTFIX "_rs")
 
 # Sanitizers
 include(cmake/Sanitizers.cmake)
