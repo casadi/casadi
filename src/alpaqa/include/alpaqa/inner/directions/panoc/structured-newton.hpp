@@ -113,27 +113,24 @@ struct StructuredNewtonDirection {
             // If all indices are free, we can factor the entire matrix.
             // Find the minimum eigenvalue to regularize the Hessian matrix and
             // make it positive definite.
-            auto [λ_min, λ_max] = [&] {
-                ScopedMallocAllower ma;
-                auto ev =
-                    H.template selfadjointView<Eigen::Lower>().eigenvalues();
-                return std::make_tuple(ev.minCoeff(), ev.maxCoeff());
-            }();
+            ScopedMallocAllower ma;
+            // Find the minimum eigenvalue to regularize the Hessian matrix and
+            // make it positive definite.
+            Eigen::SelfAdjointEigenSolver<mat> eig{H,
+                                                   Eigen::ComputeEigenvectors};
+
+            auto λ_min = eig.eigenvalues().minCoeff(),
+                 λ_max = eig.eigenvalues().maxCoeff();
+
             if (direction_params.print_eig)
-                std::cout << "λ(H): " << float_to_str(λ_min, 3) << ", "
+                std::cout << "λ(H):    " << float_to_str(λ_min, 3) << ", "
                           << float_to_str(λ_max, 3) << std::endl;
+            // Regularization
             real_t ε = direction_params.min_eig * (1 + std::abs(λ_max)); // TODO
-            if (λ_min <= ε)
-                H.noalias() -= mat::Identity(n, n) * (λ_min - ε);
-            // Factor the matrix using LDLᵀ decomposition
-            auto ldl = [&] {
-                ScopedMallocAllower ma;
-                return Eigen::LDLT<rmat, Eigen::Lower>{H};
-            }();
-            if (ldl.info() != Eigen::ComputationInfo::Success)
-                return false;
             // Solve the system
-            ldl.solveInPlace(qₖ);
+            qₖ = eig.eigenvectors().transpose() * qₖ;
+            qₖ = eig.eigenvalues().cwiseMax(ε).asDiagonal().inverse() * qₖ;
+            qₖ = eig.eigenvectors() * qₖ;
             return true;
         }
 
@@ -153,31 +150,26 @@ struct StructuredNewtonDirection {
         // Since it's symmetric, only the lower part is copied.
         HJ.template triangularView<Eigen::Lower>() =
             H(J, J).template triangularView<Eigen::Lower>();
+
+        ScopedMallocAllower ma;
         // Find the minimum eigenvalue to regularize the Hessian matrix and
         // make it positive definite.
-        auto [λ_min, λ_max] = [&] {
-            ScopedMallocAllower ma;
-            auto ev = HJ.template selfadjointView<Eigen::Lower>().eigenvalues();
-            return std::make_tuple(ev.minCoeff(), ev.maxCoeff());
-        }();
+        Eigen::SelfAdjointEigenSolver<mat> eig{HJ, Eigen::ComputeEigenvectors};
+
+        auto λ_min = eig.eigenvalues().minCoeff(),
+             λ_max = eig.eigenvalues().maxCoeff();
+
         if (direction_params.print_eig)
             std::cout << "λ(H_JJ): " << float_to_str(λ_min, 3) << ", "
                       << float_to_str(λ_max, 3) << std::endl;
+        // Regularization
         real_t ε = direction_params.min_eig * (1 + std::abs(λ_max)); // TODO
-        if (λ_min <= ε)
-            HJ.noalias() -= mat::Identity(nJ, nJ) * (λ_min - ε);
-        // Factor the matrix using LDLᵀ decomposition
-        auto ldl = [&] {
-            ScopedMallocAllower ma;
-            return Eigen::LDLT<rmat, Eigen::Lower>{HJ};
-        }();
-        if (ldl.info() != Eigen::ComputationInfo::Success)
-            return false;
         // Solve the system
         auto qJ = H.col(0).topRows(nJ);
         qJ      = qₖ(J);
-        ldl.solveInPlace(qJ);
-        qₖ(J) = qJ;
+        qJ      = eig.eigenvectors().transpose() * qJ;
+        qJ      = eig.eigenvalues().cwiseMax(ε).asDiagonal().inverse() * qJ;
+        qₖ(J)   = eig.eigenvectors() * qJ;
         return true;
     }
 
