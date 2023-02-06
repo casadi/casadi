@@ -29,8 +29,8 @@ jobs:
           cmake -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} -H.
           cmake --build build -v
     
-  windows:
-    runs-on: windows-2022
+  windows-2019:
+    runs-on: windows-2019
     strategy:
       fail-fast: false
       matrix:
@@ -42,4 +42,15 @@ jobs:
             cmake -Bbuild -G "Visual Studio 16 2019" -A ${{ matrix.arch }} -DWITH_SELFCONTAINED=ON -DCMAKE_INSTALL_PREFIX=install
             cmake --build build --target install --config Release -v
 
-
+  windows-2022:
+    runs-on: windows-2022
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [x64,Win32]
+    steps:
+      - uses: actions/checkout@v2.4.0
+      - name : Build
+        run: |
+            cmake -Bbuild -G "Visual Studio 17 2022" -A ${{ matrix.arch }} -DWITH_SELFCONTAINED=ON -DCMAKE_INSTALL_PREFIX=install
+            cmake --build build --target install --config Release -v
