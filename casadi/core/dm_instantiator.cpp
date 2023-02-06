@@ -337,7 +337,6 @@ namespace casadi {
       std::vector<casadi_int> row, col;
       normalized_setup(stream);
 
-      casadi_int i=0;
       // Read line-by-line
       while (std::getline(in, line)) {
         // Ignore empty lines
@@ -369,7 +368,6 @@ namespace casadi {
           row.push_back(r-1);
           col.push_back(c-1);
           values.push_back(val);
-          i++;
         }
       }
       return DM::triplet(row, col, values, n_row, n_col);
