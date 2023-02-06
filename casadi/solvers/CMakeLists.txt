@@ -68,8 +68,8 @@ casadi_plugin(Nlpsol sqpmethod
   sqpmethod.hpp sqpmethod.cpp sqpmethod_meta.cpp)
 
 # FeasibleSQPMethod -  An implementation of FP-SQP
-#casadi_plugin(Nlpsol feasiblesqpmethod
-#  feasiblesqpmethod.hpp feasiblesqpmethod.cpp feasiblesqpmethod_meta.cpp)
+casadi_plugin(Nlpsol feasiblesqpmethod
+  feasiblesqpmethod.hpp feasiblesqpmethod.cpp feasiblesqpmethod_meta.cpp)
 
 # SCPgen -  An implementation of Lifted Newton SQP
 casadi_plugin(Nlpsol scpgen

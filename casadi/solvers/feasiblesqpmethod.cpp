@@ -1992,7 +1992,7 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
       const std::string& tr_rad, const std::string& tr_ratio) const {
     cg << "if (tr_ratio < " << tr_eta1_ << ") {\n";
     cg << "tr_rad = " << tr_alpha1_ <<"*" << cg.masked_norm_inf(nx_, "d.dx", "d.tr_mask") << ";\n";
-    std::string tol = "fabs(" << cg.masked_norm_inf(nx_, "d.dx", "d.tr_mask") << " - tr_rad)";
+    std::string tol = "fabs(" << cg.masked_norm_inf(nx_, "d.dx", "d.tr_mask") + " - tr_rad)";
     cg << "} else if (tr_ratio > " << tr_eta2_ << " && " << tol << " < " << optim_tol_ << " ) {\n";
     cg << "tr_rad = " << cg.fmin(str(tr_alpha2_)+"*tr_rad", str(tr_rad_max_)) << ";\n";
     cg << "}\n";
