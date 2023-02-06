@@ -82,3 +82,14 @@ jobs:
         run: |
             cmake -Bbuild -G "Visual Studio 17 2022" -A ${{ matrix.arch }} -DWITH_SELFCONTAINED=ON -DCMAKE_INSTALL_PREFIX=install
             cmake --build build --target install --config Release -v
+            
+  windows-latest-mingw:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v2.4.0
+      - name : Build
+        run: |
+            cmake -Bbuild -G "MinGW Makefiles" -DWITH_SELFCONTAINED=ON -DCMAKE_INSTALL_PREFIX=install
+            cmake --build build --target install --config Release -v
