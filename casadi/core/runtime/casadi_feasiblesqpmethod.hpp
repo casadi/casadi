@@ -134,7 +134,7 @@ template<typename T1>
 void casadi_feasiblesqpmethod_init(casadi_feasiblesqpmethod_data<T1>* d,
     casadi_int** iw, T1** w, int sz_anderson_memory) {
   // Local variables
-  casadi_int nnz_h, nnz_a, nx, ng, i;
+  casadi_int nnz_h, nnz_a, nx, ng;
   const casadi_feasiblesqpmethod_prob<T1>* p = d->prob;
   // Get matrix number of nonzeros
   nnz_h = p->sp_h[2+p->sp_h[1]];
@@ -186,5 +186,5 @@ void casadi_feasiblesqpmethod_init(casadi_feasiblesqpmethod_data<T1>* d,
   d->anderson_memory_step = *w; *w += sz_anderson_memory*nx;
   d->anderson_memory_iterate = *w; *w += sz_anderson_memory*nx;
   d->gamma = *w; *w += sz_anderson_memory;
-  
+
 }
