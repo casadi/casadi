@@ -421,7 +421,7 @@ int Sqpmethod::solve(void* mem) const {
   std::string info = "";
 
   // gamma_1
-  double gamma_1;
+  double gamma_1 = 0.0; // Fix may be used uninitialized warning
 
   // ela_it
   casadi_int ela_it = -1;
@@ -567,7 +567,7 @@ int Sqpmethod::solve(void* mem) const {
         if (ret == SOLVER_RET_INFEASIBLE) continue;
       } else if (ela_it == -1) {
         double pi_inf = casadi_norm_inf(ng_, d->dlam+nx_);
-        gamma_1 = calc_gamma_1(m);;
+        gamma_1 = calc_gamma_1(m);
 
         if (pi_inf > gamma_1) {
           ela_it = 0;

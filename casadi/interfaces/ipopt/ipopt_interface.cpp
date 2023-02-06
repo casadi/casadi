@@ -409,6 +409,8 @@ namespace casadi {
       return "Maximum_CpuTime_Exceeded";
     case Feasible_Point_Found:
       return "Feasible_Point_Found";
+    case Maximum_WallTime_Exceeded:
+      return "Maximum_WallTime_Exceeded";
     }
     return "Unknown";
   }
@@ -442,7 +444,9 @@ namespace casadi {
     m->return_status = return_status_string(status);
     m->success = status==Solve_Succeeded || status==Solved_To_Acceptable_Level
                  || status==Feasible_Point_Found;
-    if (status==Maximum_Iterations_Exceeded) m->unified_return_status = SOLVER_RET_LIMITED;
+    if (status==Maximum_Iterations_Exceeded ||
+        status==Maximum_WallTime_Exceeded ||
+        status==Maximum_CpuTime_Exceeded) m->unified_return_status = SOLVER_RET_LIMITED;
 
     // Save results to outputs
     casadi_copy(m->gk, ng_, d_nlp->z + nx_);
