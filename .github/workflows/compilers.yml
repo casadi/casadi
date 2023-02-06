@@ -22,9 +22,6 @@ jobs:
 
   osx:
     runs-on: macos-12
-    strategy:
-      matrix:
-        compiler: ['9','10','11','12']
     steps:
       - uses: actions/checkout@v2.4.0
       - name: Build
