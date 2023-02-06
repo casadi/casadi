@@ -534,7 +534,6 @@ double Feasiblesqpmethod::eval_tr_ratio(double val_f, double val_f_corr, double 
 
 void Feasiblesqpmethod::tr_update(void* mem, double& tr_rad, double tr_ratio) const {
   auto m = static_cast<FeasiblesqpmethodMemory*>(mem);
-  auto d_nlp = &m->d_nlp;
   auto d = &m->d;
 
   if (tr_ratio < tr_eta1_) {
@@ -850,10 +849,10 @@ int Feasiblesqpmethod::feasibility_iterations(void* mem, double tr_rad) const {
     // DM(std::vector<double>(d->dlam_feas+nx_, d->dlam_feas+nx_+ng_)).to_file("lam_g.mtx");
 
     if (use_sqp_) {
-      int ret = solve_QP(m, d->Bk, d->gf_feas, d->lbdz_feas, d->ubdz_feas,
+      solve_QP(m, d->Bk, d->gf_feas, d->lbdz_feas, d->ubdz_feas,
         d->Jk, d->dx_feas, d->dlam_feas, 0);
     } else {
-      int ret = solve_LP(m, d->gf_feas, d->lbdz_feas, d->ubdz_feas,
+      solve_LP(m, d->gf_feas, d->lbdz_feas, d->ubdz_feas,
         d->Jk, d->dx_feas, d->dlam_feas, 0);
     }
 
@@ -945,7 +944,7 @@ int Feasiblesqpmethod::feasibility_iterations(void* mem, double tr_rad) const {
         // kappa_acceptance = true;
         return 0;
       }
-    //           if kappa_watch > self.contraction_acceptance or\
+    //           if kappa_watch > self.contraction_acceptance or
     //                   accumulated_as_ex/self.watchdog > 0.5:
     //               self.kappa_acceptance = False
     //               break
@@ -1394,7 +1393,6 @@ int Feasiblesqpmethod::solve(void* mem) const {
 
     // Solve the QP
     qpsol_(m->arg, m->res, m->iw, m->w, 0);
-    auto m_qpsol = static_cast<ConicMemory*>(qpsol_->memory(0));
 
     if (verbose_) print("QP solved\n");
     return 0;
@@ -1429,7 +1427,6 @@ int Feasiblesqpmethod::solve(void* mem) const {
 
     // Solve the QP
     qpsol_(m->arg, m->res, m->iw, m->w, 0);
-    auto m_qpsol = static_cast<ConicMemory*>(qpsol_->memory(0));
 
     if (verbose_) print("QP solved\n");
     return 0;
@@ -1992,7 +1989,7 @@ void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
       const std::string& tr_rad, const std::string& tr_ratio) const {
     cg << "if (tr_ratio < " << tr_eta1_ << ") {\n";
     cg << "tr_rad = " << tr_alpha1_ <<"*" << cg.masked_norm_inf(nx_, "d.dx", "d.tr_mask") << ";\n";
-    std::string tol = "fabs(" << cg.masked_norm_inf(nx_, "d.dx", "d.tr_mask") + " - tr_rad)";
+    std::string tol = "fabs(" + cg.masked_norm_inf(nx_, "d.dx", "d.tr_mask") + " - tr_rad)";
     cg << "} else if (tr_ratio > " << tr_eta2_ << " && " << tol << " < " << optim_tol_ << " ) {\n";
     cg << "tr_rad = " << cg.fmin(str(tr_alpha2_)+"*tr_rad", str(tr_rad_max_)) << ";\n";
     cg << "}\n";
