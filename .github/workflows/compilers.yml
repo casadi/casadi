@@ -1,0 +1,47 @@
+name: compilers
+
+on: push
+
+env:
+  cache-suffix: v11
+  build_flags: "-DWITH_COMMON=OFF -DWITH_THREAD=ON -DWITH_WERROR=ON -DWITH_EXTRA_WARNINGS=ON"
+
+
+jobs:
+  linux:
+    runs-on: ubuntu-22.04
+    matrix:
+        compiler: ['9','10','11','12']
+    steps:
+      - uses: actions/checkout@v2.4.0
+      - name: Build
+        run: |
+          CC=gcc-${{ matrix.compiler }} FC=gfortran-${{ matrix.compiler }} CXX=g++-${{ matrix.compiler }} cmake -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} -H.
+          cmake --build build -v
+
+  osx:
+    runs-on: macos-12
+    matrix:
+        compiler: ['9','10','11','12']
+    steps:
+      - uses: actions/checkout@v2.4.0
+      - name: Build
+        run: |
+          cmake -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} -H.
+          cmake --build build -v
+    
+  windows:
+    runs-on: windows-2022
+    if: false
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [x64,Win32]
+    steps:
+      - uses: actions/checkout@v2.4.0
+      - name : Build
+        run: |
+            cmake -Bbuild -G "Visual Studio 16 2019" -A ${{ matrix.arch }} -DWITH_SELFCONTAINED=ON -DCMAKE_INSTALL_PREFIX=install
+            cmake --build build --target install --config Release -v
+
+
