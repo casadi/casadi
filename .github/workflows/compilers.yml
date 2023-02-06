@@ -10,7 +10,8 @@ env:
 jobs:
   linux:
     runs-on: ubuntu-22.04
-    matrix:
+    strategy:
+      matrix:
         compiler: ['9','10','11','12']
     steps:
       - uses: actions/checkout@v2.4.0
@@ -21,7 +22,8 @@ jobs:
 
   osx:
     runs-on: macos-12
-    matrix:
+    strategy:
+      matrix:
         compiler: ['9','10','11','12']
     steps:
       - uses: actions/checkout@v2.4.0
