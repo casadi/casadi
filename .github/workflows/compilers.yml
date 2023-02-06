@@ -31,7 +31,6 @@ jobs:
     
   windows:
     runs-on: windows-2022
-    if: false
     strategy:
       fail-fast: false
       matrix:
