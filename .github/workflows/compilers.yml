@@ -11,6 +11,7 @@ jobs:
   linux-22.04:
     runs-on: ubuntu-22.04
     strategy:
+      fail-fast: false
       matrix:
         compiler: ['9','10','11','12']
     steps:
