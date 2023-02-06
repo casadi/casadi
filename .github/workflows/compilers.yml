@@ -8,7 +8,7 @@ env:
 
 
 jobs:
-  linux:
+  linux-22.04:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
@@ -20,7 +20,25 @@ jobs:
           CC=gcc-${{ matrix.compiler }} FC=gfortran-${{ matrix.compiler }} CXX=g++-${{ matrix.compiler }} cmake -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} -H.
           cmake --build build -v
 
-  osx:
+  linux-latest:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v2.4.0
+      - name: Build
+        run: |
+          cmake -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} -H.
+          cmake --build build -v
+
+  macos-latest:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2.4.0
+      - name: Build
+        run: |
+          cmake -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} -H.
+          cmake --build build -v
+
+  macos-12:
     runs-on: macos-12
     steps:
       - uses: actions/checkout@v2.4.0
@@ -28,7 +46,16 @@ jobs:
         run: |
           cmake -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} -H.
           cmake --build build -v
-    
+
+  macos-12-clang15:
+    runs-on: macos-12
+    steps:
+      - uses: actions/checkout@v2.4.0
+      - name: Build
+        run: |
+          CC=$(brew --prefix llvm@15)/bin/clang FC=gfortran-11 CXX=$(brew --prefix llvm@15)/bin/clang++ cmake -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} -H.
+          cmake --build build -v
+
   windows-2019:
     runs-on: windows-2019
     strategy:
