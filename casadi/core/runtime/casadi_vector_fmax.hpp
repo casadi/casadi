@@ -1,6 +1,6 @@
 // NOLINT(legal/copyright)
 
-// SYMBOL "vfmax"
+// SYMBOL "vector_fmax"
 // elementwise fmax of two vectors
 template<typename T1>
 void casadi_vector_fmax(casadi_int n, const T1* x, const T1* y, T1* z) {

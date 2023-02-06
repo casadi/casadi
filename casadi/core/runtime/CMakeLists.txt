@@ -28,10 +28,10 @@ set(RUNTIME_SRC
   casadi_mmin.hpp
   casadi_mmax.hpp
   casadi_mtimes.hpp
-  casadi_vector_fmin.hpp
-  casadi_vector_fmax.hpp
   casadi_vfmin.hpp
   casadi_vfmax.hpp
+  casadi_vector_fmin.hpp
+  casadi_vector_fmax.hpp
   casadi_mv.hpp
   casadi_trilsolve.hpp
   casadi_triusolve.hpp
