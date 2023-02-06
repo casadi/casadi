@@ -370,13 +370,7 @@ void Opti::callback_class(OptiCallback* callback) {
 
 void Opti::callback_class() {
   try {
-    if ((*this)->has_callback_class() && getCount()!=1) {
-      Opti ret = copy();
-      ret.callback_class();
-      *this = ret;
-    } else {
-      (*this)->callback_class();
-    }
+    (*this)->callback_class();
   } catch(std::exception& e) {
     THROW_ERROR("callback_class", e.what());
   }
