@@ -24,9 +24,9 @@ INT_TARGET=octave
 export FLAGS="-DWITH_COMMON=OFF -DWITH_BUILD_REQUIRED=ON -DWITH_BUILD_BONMIN=OFF -DWITH_BONMIN=OFF -DWITH_IPOPT=ON -DWITH_BUILD_LAPACK=ON -DWITH_LAPACK=ON -DWITH_MUMPS=ON -DWITH_CLP=OFF -DWITH_CBC=OFF -DWITH_THREAD=ON -DWITH_QPOASES=ON -DWITH_HPIPM=ON -DWITH_BLASFEO=ON -DWITH_BUILD_HPIPM=ON -DWITH_BUILD_BLASFEO=ON -DWITH_HIGHS=OFF -DWITH_BUILD_HIGHS=OFF -DWITH_BUILD_SPRAL=ON -DWITH_SPRAL=ON  -DWITH_PROXQP=ON -DWITH_BUILD_PROXQP=ON -DWITH_BUILD_EIGEN3=ON -DWITH_BUILD_SIMDE=ON -DWITH_BUILD_SUNDIALS=ON -DWITH_SUNDIALS=ON"
 
 
-curl -OL https://github.com/casadi/mockups/releases/download/v28/mockups_$TARGET.zip
-rm -rf mockups
-unzip mockups_$TARGET.zip -d mockups
+curl -OL https://github.com/casadi/mockups/releases/download/v32/mockups_$TARGET.zip
+rm -rf mockups-$TARGET
+unzip mockups_$TARGET.zip -d mockups-$TARGET
 
 
 rm -f  build-local-$TARGET/CMakeCache.txt
@@ -47,12 +47,12 @@ case $INT_TARGET in
 
   matlab)
     docker run --rm -v`pwd`:/local ghcr.io/casadi/ci-swig:latest /bin/bash -c "mkdir build-temp && cd build-temp && cmake -DWITH_SELFCONTAINED=ON -DWITH_MATLAB=ON -DSWIG_EXPORT=ON -DWITH_COMMON=OFF .. && make matlab_source && cd .. && rm -rf build-temp"
-    ./dockcross.$TARGET cmake -Bbuild-local-$TARGET -DSKIP_CONFIG_H_GENERATION=ON -DWITH_SELFCONTAINED=ON $FLAGS -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=/work/install-$INT_TARGET-$TARGET -DSWIG_IMPORT=ON -DWITH_MATLAB=ON -DCMAKE_PREFIX_PATH=/work/mockups/cmake -H.
+    ./dockcross.$TARGET cmake -Bbuild-local-$TARGET -DSKIP_CONFIG_H_GENERATION=ON -DWITH_SELFCONTAINED=ON $FLAGS -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=/work/install-$INT_TARGET-$TARGET -DSWIG_IMPORT=ON -DWITH_MATLAB=ON -DCMAKE_PREFIX_PATH=/work/mockups-$TARGET/cmake -H.
     ;;
 
   octave)
     docker run --rm -v`pwd`:/local ghcr.io/casadi/ci-swig:latest /bin/bash -c "mkdir build-temp && cd build-temp && cmake -DWITH_SELFCONTAINED=ON -DWITH_MATLAB=ON -DSWIG_EXPORT=ON -DWITH_COMMON=OFF .. && make matlab_source && cd .. && rm -rf build-temp"
-    ./dockcross.$TARGET cmake -Bbuild-local-$TARGET -DSKIP_CONFIG_H_GENERATION=ON -DWITH_SELFCONTAINED=ON $FLAGS -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=/work/install-$INT_TARGET-$TARGET -DSWIG_IMPORT=ON -DWITH_OCTAVE=ON -DCMAKE_PREFIX_PATH=/work/mockups/cmake -H.
+    ./dockcross.$TARGET cmake -Bbuild-local-$TARGET -DSKIP_CONFIG_H_GENERATION=ON -DWITH_SELFCONTAINED=ON $FLAGS -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=/work/install-$INT_TARGET-$TARGET -DSWIG_IMPORT=ON -DWITH_OCTAVE=ON -DWITH_OCTAVE_IMPORT=ON -DCMAKE_PREFIX_PATH=/work/mockups-$TARGET/cmake -H.
     ;;
 
   cpp)
