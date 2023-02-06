@@ -36,7 +36,6 @@ throw CasadiException("Error in Opti::" FNAME " "\
 
 
 OptiNode* Opti::operator->() {
-  if (getCount()!=1) *this = copy();
   return static_cast<OptiNode*>(SharedObject::operator->());
 }
 

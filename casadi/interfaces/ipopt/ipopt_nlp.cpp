@@ -236,7 +236,7 @@ namespace casadi {
       g_[c_pos[i]] += tnlp_adapter->c_rhs_[i];
     }
 
-    tnlp_adapter->ResortBnds(z_L, z_L_, z_U, z_U_);
+    tnlp_adapter->ResortBounds(z_L, z_L_, z_U, z_U_);
     // Copied from Ipopt source: Hopefully the following is correct to recover the bound
     // multipliers for fixed variables (sign ok?)
     if (tnlp_adapter->fixed_variable_treatment_==TNLPAdapter::MAKE_CONSTRAINT &&
