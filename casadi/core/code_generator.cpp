@@ -1638,7 +1638,7 @@ namespace casadi {
     return "casadi_vector_fmin(" + str(n) + ", " + x + ", " + y + ", " + z + ");";
   }
 
-  std::string CodeGenerator::masked_norm_inf(casadi_int n, const std::string& x, 
+  std::string CodeGenerator::masked_norm_inf(casadi_int n, const std::string& x,
                                   const std::string& mask) {
     add_auxiliary(AUX_MASKED_NORM_INF);
     return "casadi_masked_norm_inf(" + str(n) + ", " + x + ", " + mask + ")";

@@ -115,7 +115,7 @@ namespace casadi {
     void anderson_acc_step_update(void* mem, casadi_int iter_index) const;
 
     void anderson_acc_init_memory(void* mem, double* step, double* iterate) const;
-    
+
     void anderson_acc_update_memory(void* mem, double* step, double* iterate) const;
 
     // Solve the NLP
@@ -214,9 +214,9 @@ namespace casadi {
     void print_iteration() const;
 
     /// Print iteration
-    void print_iteration(casadi_int iter, double obj, double m_k, 
+    void print_iteration(casadi_int iter, double obj, double m_k,
                          double tr_ratio, double pr_inf, double du_inf,
-                         double dx_norm, double rg, double tr_rad, 
+                         double dx_norm, double rg, double tr_rad,
                          std::string info) const;
 
     // Solve the QP subproblem: mode 0 = normal, mode 1 = SOC
@@ -230,19 +230,20 @@ namespace casadi {
                           const double* lbdz, const double* ubdz,
                           const double* A,
                           double* x_opt, double* dlam, int mode) const;
-    
-
 
     // Solve the QP subproblem
     void codegen_qp_solve(CodeGenerator& cg, const std::string& H, const std::string& g,
               const std::string& lbdz, const std::string& ubdz,
-              const std::string& A, const std::string& x_opt, const std::string& dlam, int mode) const;
+              const std::string& A, const std::string& x_opt,
+              const std::string& dlam, int mode) const;
 
-    void codegen_tr_update(CodeGenerator& cg, const std::string& tr_rad, const std::string& tr_ratio) const;
-    
+    void codegen_tr_update(CodeGenerator& cg,
+      const std::string& tr_rad, const std::string& tr_ratio) const;
+
     void codegen_eval_m_k(CodeGenerator& cg) const;
 
-    void codegen_eval_tr_ratio(CodeGenerator& cg, const std::string& val_f, const std::string& val_f_corr, const std::string& val_m_k) const;
+    void codegen_eval_tr_ratio(CodeGenerator& cg,
+      const std::string& val_f, const std::string& val_f_corr, const std::string& val_m_k) const;
 
     void codegen_step_update(CodeGenerator& cg, const std::string& tr_ratio) const;
 
