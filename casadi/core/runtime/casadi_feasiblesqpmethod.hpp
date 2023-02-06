@@ -2,7 +2,7 @@
 
 // C-REPLACE "casadi_nlpsol_prob<T1>" "struct casadi_nlpsol_prob"
 
-// SYMBOL "sqpmethod_prob"
+// SYMBOL "feasiblesqpmethod_prob"
 template<typename T1>
 struct casadi_feasiblesqpmethod_prob {
   const casadi_nlpsol_prob<T1>* nlp;
@@ -11,10 +11,10 @@ struct casadi_feasiblesqpmethod_prob {
   // casadi_int merit_memsize;
   // casadi_int max_iter_ls;
 };
-// C-REPLACE "casadi_sqpmethod_prob<T1>" "struct casadi_sqpmethod_prob"
+// C-REPLACE "casadi_feasiblesqpmethod_prob<T1>" "struct casadi_feasiblesqpmethod_prob"
 
 
-// SYMBOL "sqpmethod_data"
+// SYMBOL "feasiblesqpmethod_data"
 template<typename T1>
 struct casadi_feasiblesqpmethod_data {
   // Problem structure
@@ -45,6 +45,7 @@ struct casadi_feasiblesqpmethod_data {
   // Anderson vectors
   T1* anderson_memory_step;
   T1* anderson_memory_iterate;
+  T1* gamma;
 
   // Function value of feasibility iterate
   T1 f_feas;
@@ -58,7 +59,7 @@ struct casadi_feasiblesqpmethod_data {
 // C-REPLACE "casadi_feasiblesqpmethod_data<T1>" "struct casadi_feasiblesqpmethod_data"
 
 
-// SYMBOL "sqpmethod_work"
+// SYMBOL "feasiblesqpmethod_work"
 template<typename T1>
 void casadi_feasiblesqpmethod_work(const casadi_feasiblesqpmethod_prob<T1>* p,
     casadi_int* sz_iw, casadi_int* sz_w, int sz_anderson_memory) {
@@ -106,6 +107,8 @@ void casadi_feasiblesqpmethod_work(const casadi_feasiblesqpmethod_prob<T1>* p,
     *sz_w += sz_anderson_memory*nx;
     // for x
     *sz_w += sz_anderson_memory*nx;
+    // for gamma
+    *sz_w += sz_anderson_memory;
   }
 
   // if (elastic_mode) {
@@ -126,7 +129,7 @@ void casadi_feasiblesqpmethod_work(const casadi_feasiblesqpmethod_prob<T1>* p,
   // if (so_corr) *sz_w += nx+nx+ng; // Temp memory for failing soc
 }
 
-// SYMBOL "sqpmethod_init"
+// SYMBOL "feasiblesqpmethod_init"
 template<typename T1>
 void casadi_feasiblesqpmethod_init(casadi_feasiblesqpmethod_data<T1>* d,
     casadi_int** iw, T1** w, int sz_anderson_memory) {
@@ -173,13 +176,15 @@ void casadi_feasiblesqpmethod_init(casadi_feasiblesqpmethod_data<T1>* d,
   d->lbdz_feas = *w; *w += nx + ng;
   d->ubdz_feas = *w; *w += nx + ng;
   // x tmp for QPs
-  d->z_tmp = *w; *w += nx+ng;
+  d->z_tmp = *w; *w += sz_anderson_memory*nx+ng;
   // trust-region scale vector
   d->tr_scale_vector = *w; *w += nx;
   d->tr_mask = *iw; *iw += nx;
   // Jacobian
   d->Jk = *w; *w += nnz_a;
   // Anderson vector
-  d->anderson_memory_step = *w; *w += sz_anderson_memory * nx;
-  d->anderson_memory_iterate = *w; *w += sz_anderson_memory * nx;
+  d->anderson_memory_step = *w; *w += sz_anderson_memory*nx;
+  d->anderson_memory_iterate = *w; *w += sz_anderson_memory*nx;
+  d->gamma = *w; *w += sz_anderson_memory;
+  
 }

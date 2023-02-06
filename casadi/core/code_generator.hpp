@@ -261,7 +261,45 @@ namespace casadi {
     std::string axpy(casadi_int n, const std::string& a,
                      const std::string& x, const std::string& y);
 
-    /** \brief Codegen axpy: x *= alpha
+    /**
+     * @brief Codegen clip_min: Clips the smaller entries in a vector than min
+     * to the min
+     
+     */
+    std::string clip_min(const std::string& x, casadi_int n,
+                                  const std::string& min, const std::string& mask);
+
+    /**
+     * @brief Codegen clip_max: Clips the larger entries in a vector than max
+     * to the max
+     
+     */
+    std::string clip_max(const std::string& x, casadi_int n,
+                                    const std::string& min, const std::string& mask);
+
+    /**
+     * @brief Codegen vector_fmax: Takes vectorwise max of a vector and writes
+     * the result to second vector
+     */
+    std::string vector_fmax(casadi_int n, const std::string& x, 
+                                    const std::string& y, const std::string& z);
+
+    /**
+     * @brief Codegen vector_fmin: Takes vectorwise min of a vector and writes
+     * the result to second vector
+     */
+    std::string vector_fmin(casadi_int n, const std::string& x, 
+                                    const std::string& y, const std::string& z);
+
+    /**
+     * @brief codegen masked_norm_inf: The mask tells what entry is used in the
+     * inf-norm.
+     */
+    std::string masked_norm_inf(casadi_int n, const std::string& x, 
+                                    const std::string& mask);
+
+
+    /** \brief What does scal do??
 
         \identifier{sq} */
     std::string scal(casadi_int n, const std::string& alpha, const std::string& x);
@@ -421,6 +459,11 @@ namespace casadi {
         \identifier{te} */
     std::string norm_inf(casadi_int n, const std::string& x);
 
+    /** 
+     * \brief norm_2
+    */
+    std::string norm_2(casadi_int n, const std::string& x);
+
     /** \brief max_viol
 
         \identifier{tf} */
@@ -486,7 +529,12 @@ namespace casadi {
       AUX_RANK1,
       AUX_NORM_1,
       AUX_NORM_2,
+      AUX_CLIP_MAX,
+      AUX_CLIP_MIN,
+      AUX_VECTOR_FMAX,
+      AUX_VECTOR_FMIN,
       AUX_NORM_INF,
+      AUX_MASKED_NORM_INF,
       AUX_IAMAX,
       AUX_CLEAR,
       AUX_FILL,
@@ -551,8 +599,6 @@ namespace casadi {
       AUX_MMIN,
       AUX_MMAX,
       AUX_LOGSUMEXP,
-      AUX_CLIP_MIN,
-      AUX_CLIP_MAX,
       AUX_SPARSITY
     };
 
