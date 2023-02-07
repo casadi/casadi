@@ -95,7 +95,7 @@ if not os.path.exists(distinfo_dir):
   os.mkdir(distinfo_dir)
 
 for d in os.listdir(dir_name):
-  if not d.startswith("casadi") and not os.path.isfile(d):
+  if not d.startswith("casadi") and os.path.isfile(os.path.join(dir_name, d)):
     shutil.copytree(os.path.join(dir_name, d),os.path.join(bdist_dir,"casadi",d),dirs_exist_ok=True)
     shutil.rmtree(os.path.join(dir_name, d))
 
