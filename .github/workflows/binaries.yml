@@ -151,13 +151,6 @@ jobs:
           # In MXE land, (cross).pkg-config does not listen to PKG_CONFIG_PATH straight see https://mxe.cc/#tutorial-4
           # Needed to make CoinUtils work
           ./dockcross --args "--env PKG_CONFIG_PATH_x86_64_w64_mingw32_shared_posix=/work/build/external_projects/lib64/pkgconfig:/work/build/external_projects/lib/pkgconfig:/work/build/external_projects/share/pkgconfig" -- /work/.github/workflows/patch_toolchain cmake --build build -v
-      - name: Easy Zip Files - fails to ignore some bad symlinks
-        if: false
-        uses: vimtor/action-zip@v1.1
-        with:
-          files: build/
-          recursive: false
-          dest: ${{github.job}}-${{matrix.target}}.zip
       - run: zip -rq ${{github.job}}-${{matrix.target}}.zip build
       - uses: actions/upload-artifact@v3.1.2
         with:
@@ -579,12 +572,6 @@ jobs:
              cd install
              echo "This file (and the casadi directory) should end up in a folder called 'casadi-${{env.os}}${{env.bitness}}-py${{matrix.py2}}'" > dummy.txt
              zip -rq ../casadi-${{env.os}}${{env.bitness}}-py${{matrix.py2}}.zip .
-      - name: Easy Zip Files
-        uses: vimtor/action-zip@v1.1
-        with:
-          files: install/
-          recursive: false
-          dest: casadi-${{env.os}}${{env.bitness}}-py${{matrix.py2}}.zip
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.4.0
       - run: cp casadi-${{env.os}}${{env.bitness}}-py${{matrix.py2}}.zip casadi-${{ env.GITHUB_REF_SLUG }}-${{env.os}}${{env.bitness}}-py${{matrix.py2}}.zip
