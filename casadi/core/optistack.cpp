@@ -731,10 +731,10 @@ void OptiAdvanced::assert_baked() const {
 }
 
 OptiAdvanced Opti::debug() const {
-  return *this;
+  return copy();
 }
 OptiAdvanced Opti::advanced() const {
-  return *this;
+  return copy();
 }
 Opti Opti::copy() const {
   return (*this)->copy();

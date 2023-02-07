@@ -999,7 +999,7 @@ OptiSol OptiNode::solve(bool accept_limit) {
     "Solver failed. You may use opti.debug.value to investigate the latest values of variables."
     " return_status is '" + ret + "'");
 
-  return Opti(this);
+  return copy();
 }
 
 // Solve the problem
