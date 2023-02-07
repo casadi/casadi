@@ -706,7 +706,7 @@ jobs:
                echo "${{ github.workspace }}/octave-7.3.0-w64/mingw64/bin/"  >> $GITHUB_PATH
         if: "contains(env.os, 'windows')"
       - run: octave-7.3.0-w64/mingw64/bin/octave.exe --no-gui --no-window-system --eval "addpath('${{ github.workspace }}/casadi');cd test/matlab;asorted_tests"
-        if: "!contains(env.os, 'windows')"
+        if: "contains(env.os, 'windows')"
       - run: octave --no-gui --no-window-system --eval "addpath('${{ github.workspace }}/casadi');cd test/matlab;asorted_tests"
         if: "!contains(env.os, 'windows')"
         
