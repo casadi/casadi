@@ -6,9 +6,7 @@ jobs:
   linux:
     runs-on: ubuntu-22.04
     steps:
-    - name: Set up Homebrew
-      id: set-up-homebrew
-      uses: Homebrew/actions/setup-homebrew@master
+    - run: echo "/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin" >> $GITHUB_PATH
     - run: homebrew install octave
     - run: octave
 
