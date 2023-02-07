@@ -8,24 +8,24 @@ jobs:
     steps:
     - run: echo "/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin" >> $GITHUB_PATH
     - run: brew install octave
-    - run: octave
+    - run: octave  --no-gui --no-window-system --eval "disp(1+2)"
 
   osx:
     runs-on: macos-12
     steps:
     - run: brew install octave
-    - run: octave
+    - run: octave  --no-gui --no-window-system --eval "disp(1+2)"
     
   osx-m1:
     runs-on: self-hosted
     steps:
     - run: brew install octave
-    - run: octave
+    - run: octave  --no-gui --no-window-system --eval "disp(1+2)"
     
   windows:
     runs-on: windows-latest
     steps:
     - run: C:\msys64\usr\bin\wget.exe https://ftpmirror.gnu.org/octave/windows/octave-7.3.0-w64.zip
-    - run: unzip octave-7.3.0-w64.zip -d octave
-    - run: octave/mingw64/bin/octave.exe
+    - run: unzip octave-7.3.0-w64.zip
+    - run: octave-7.3.0-w64/mingw64/bin/octave.exe --no-gui --no-window-system --eval "disp(1+2)"
     
