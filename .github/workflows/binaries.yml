@@ -270,12 +270,10 @@ jobs:
       - run: python misc/codesign.py "${{ secrets.CODESIGN_IDENTITY }}" install
         shell: bash -el {0}
         if: env.DEVELOPMENT_CERTIFICATE_DATA_AVAILABLE=='yes'
-      - name: Easy Zip Files
-        uses: vimtor/action-zip@v1.1
-        with:
-          files: install/
-          recursive: false
-          dest: casadi-${{env.deploy_arch}}-py${{matrix.py2}}.zip
+      - run: |
+             cd install
+             echo "This file (and the casadi directory) should end up in a folder called 'casadi-${{env.os}}${{env.bitness}}-py${{matrix.py2}}'" > dummy.txt
+             zip -rq ../casadi-${{env.deploy_arch}}-py${{matrix.py2}}.zip .
       - uses: actions/upload-artifact@v3.1.2
         with:
           name: casadi-${{env.deploy_arch}}-py${{matrix.py2}}
@@ -397,12 +395,9 @@ jobs:
       - run: python misc/codesign.py "${{ secrets.CODESIGN_IDENTITY }}" install
         if: ${{ env.DEVELOPMENT_CERTIFICATE_DATA_AVAILABLE == 'true' }}
         shell: bash -el {0}
-      - name: Easy Zip Files
-        uses: vimtor/action-zip@v1.1
-        with:
-          files: install/
-          recursive: false
-          dest: casadi-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip
+      - run: |
+             cd install/casadi
+             zip -rq ../../casadi-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip .
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.4.0
       - run: cp casadi-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip casadi-${{ env.GITHUB_REF_SLUG }}-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip
@@ -492,12 +487,9 @@ jobs:
           destination_path: install/casadi
           dockcross: ${{ matrix.arch }}
           bitness: ${{env.bitness}}
-      - name: Easy Zip Files
-        uses: vimtor/action-zip@v1.1
-        with:
-          files: install/
-          recursive: false
-          dest: casadi-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip
+      - run: |
+             cd install/casadi
+             zip -rq ../../casadi-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip .
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.4.0
       - run: cp casadi-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip casadi-${{ env.GITHUB_REF_SLUG }}-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip
@@ -583,6 +575,10 @@ jobs:
           destination_path: install/casadi
           dockcross: ${{ matrix.arch }}
           bitness: ${{env.bitness}}
+      - run: |
+             cd install
+             echo "This file (and the casadi directory) should end up in a folder called 'casadi-${{env.os}}${{env.bitness}}-py${{matrix.py2}}'" > dummy.txt
+             zip -rq ../casadi-${{env.os}}${{env.bitness}}-py${{matrix.py2}}.zip .
       - name: Easy Zip Files
         uses: vimtor/action-zip@v1.1
         with:
@@ -675,10 +671,8 @@ jobs:
           name: casadi-${{env.os}}${{matrix.bit}}-matlab${{matrix.matlab}}
       - run: ls
       - name: Unpack source
-        run: unzip casadi-${{env.os}}${{matrix.bit}}-matlab${{matrix.matlab}}.zip
+        run: unzip casadi-${{env.os}}${{matrix.bit}}-matlab${{matrix.matlab}}.zip -d casadi
       - run: ls
-      - run: ls install
-      - run: ls install/casadi
       # Make cl.exe available on Windows
       - uses: ilammy/msvc-dev-cmd@v1.12.0
       - name: Set up MATLAB
@@ -686,7 +680,7 @@ jobs:
       - name: Run script
         uses: matlab-actions/run-command@v1.1.2
         with:
-          command: addpath('${{ github.workspace }}/install/casadi');cd test/matlab;asorted_tests
+          command: addpath('${{ github.workspace }}/casadi');cd test/matlab;asorted_tests
 
   test-python:
     runs-on: ${{matrix.image == 'macos-m1' && 'self-hosted' || matrix.image }}
@@ -727,7 +721,7 @@ jobs:
           name: casadi-${{env.os}}${{matrix.bit}}-py${{matrix.py2}}
       - run: ls
       - name: Unpack source
-        run: unzip casadi-${{env.os}}${{matrix.bit}}-py${{matrix.py2}}.zip
+        run: unzip casadi-${{env.os}}${{matrix.bit}}-py${{matrix.py2}}.zip -d casadi
       # Make cl.exe available on Windows
       - uses: ilammy/msvc-dev-cmd@v1.12.0
       - id: get-id
@@ -755,28 +749,28 @@ jobs:
         shell: pwsh
         if: contains(matrix.image, 'windows')
       - env:
-          PYTHONPATH: ${{ github.workspace }}/install
+          PYTHONPATH: ${{ github.workspace }}/casadi
         run: |
           cd test/python
           python -c "from casadi.tools import *;loadAllCompiledPlugins()"
         shell: bash -el {0}
         if: "!contains(matrix.image, 'windows')"
       - env:
-          PYTHONPATH: ${{ github.workspace }}/install
+          PYTHONPATH: ${{ github.workspace }}/casadi
         run: |
           cd test/python
           python -c "from casadi.tools import *;loadAllCompiledPlugins()"
         shell: pwsh
         if: contains(matrix.image, 'windows')
       - env:
-          PYTHONPATH: ${{ github.workspace }}/install
+          PYTHONPATH: ${{ github.workspace }}/casadi
         run: |
           cd test/python
           python alltests.py ${{matrix.image == '38' && '--run_slow' || '' }}
         shell: bash -el {0}
         if: "!contains(matrix.image, 'windows')"
       - env:
-          PYTHONPATH: ${{ github.workspace }}/install
+          PYTHONPATH: ${{ github.workspace }}/casadi
         run: |
           cd test/python
           python alltests.py ${{matrix.image == '38' && '--run_slow' || '' }}
