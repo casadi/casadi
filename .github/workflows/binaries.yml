@@ -682,6 +682,19 @@ jobs:
         with:
           command: addpath('${{ github.workspace }}/casadi');cd test/matlab;asorted_tests
 
+
+      - run: echo "/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin" >> $GITHUB_PATH
+        if: "contains(env.os, 'linux')"
+      - run: brew install octave
+        if: "!contains(env.os, 'windows')"
+      - run: |
+               C:\msys64\usr\bin\wget.exe https://ftpmirror.gnu.org/octave/windows/octave-7.3.0-w64.zip
+               unzip octave-7.3.0-w64.zip
+               echo "${{ github.workspace }}/octave-7.3.0-w64/mingw64/bin/"  >> $GITHUB_PATH
+        if: "contains(env.os, 'windows')"
+      - run: octave --no-gui --no-window-system --eval "addpath('${{ github.workspace }}/casadi');cd test/matlab;asorted_tests"
+
+
   test-python:
     runs-on: ${{matrix.image == 'macos-m1' && 'self-hosted' || matrix.image }}
     needs: [python-osx,python-dockcross]
