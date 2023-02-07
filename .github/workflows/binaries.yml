@@ -4,13 +4,13 @@ on: push
 
 jobs:
   linux:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - run: homebrew install octave
     - run: octave
 
   osx:
-    runs-on: macos-11
+    runs-on: macos-12
     steps:
     - run: brew install octave
     - run: octave
