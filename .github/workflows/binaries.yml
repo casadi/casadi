@@ -27,7 +27,7 @@ jobs:
   windows:
     runs-on: windows-latest
     steps:
-    - run: wget https://ftpmirror.gnu.org/octave/windows/octave-7.3.0-w64.zip
+    - run: C:\msys64\usr\bin\wget.exe wget https://ftpmirror.gnu.org/octave/windows/octave-7.3.0-w64.zip
     - run: unzip octave-7.3.0-w64.zip -d octave
     - run: octave/mingw64/bin/octave.exe
     
