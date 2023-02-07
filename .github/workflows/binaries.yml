@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
     - run: echo "/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin" >> $GITHUB_PATH
-    - run: homebrew install octave
+    - run: brew install octave
     - run: octave
 
   osx:
