@@ -682,7 +682,33 @@ jobs:
         with:
           command: addpath('${{ github.workspace }}/casadi');cd test/matlab;asorted_tests
 
-
+  test-octave:
+    runs-on: ${{matrix.image}}
+    needs: [matlab-dockcross,matlab-osx]
+    strategy:
+     fail-fast: false
+     matrix:
+       matlab: ["7.3.0"]
+       image: ["windows-2022","ubuntu-22.04","macos-12"]
+       bit: [64]
+    steps:
+      - uses: actions/checkout@v3.3.0
+      - uses: kanga333/variable-mapper@v0.3.0
+        with:
+          key: "${{matrix.image}}"
+          map: |
+           {
+              "windows-2022": {"os": "windows"},
+              "ubuntu-20.04": {"os": "linux"},
+              "macos-11": {"os": "osx"}
+           }
+          export_to: env
+      - uses: actions/download-artifact@v3.0.2
+        with:
+          name: casadi-${{env.os}}${{matrix.bit}}-octave${{matrix.version}}
+      - run: ls
+      - name: Unpack source
+        run: unzip casadi-${{env.os}}${{matrix.bit}}-octave${{matrix.version}}.zip -d casadi
       - run: echo "/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin" >> $GITHUB_PATH
         if: "contains(env.os, 'linux')"
       - run: brew install octave
@@ -692,9 +718,11 @@ jobs:
                unzip octave-7.3.0-w64.zip
                echo "${{ github.workspace }}/octave-7.3.0-w64/mingw64/bin/"  >> $GITHUB_PATH
         if: "contains(env.os, 'windows')"
+      - run: octave-7.3.0-w64/mingw64/bin/octave.exe --no-gui --no-window-system --eval "addpath('${{ github.workspace }}/casadi');cd test/matlab;asorted_tests"
+        if: "!contains(env.os, 'windows')"
       - run: octave --no-gui --no-window-system --eval "addpath('${{ github.workspace }}/casadi');cd test/matlab;asorted_tests"
-
-
+        if: "!contains(env.os, 'windows')"
+        
   test-python:
     runs-on: ${{matrix.image == 'macos-m1' && 'self-hosted' || matrix.image }}
     needs: [python-osx,python-dockcross]
