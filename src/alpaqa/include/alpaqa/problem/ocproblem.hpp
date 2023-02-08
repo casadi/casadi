@@ -183,6 +183,54 @@ struct ControlProblemVTable : util::BasicVTable {
     }
 };
 
+/**
+ * Nonlinear optimal control problem with finite horizon @f$ N @f$.
+ * @f[
+ * \newcommand\U{U}
+ * \newcommand\D{D}
+ * \newcommand\nnu{{n_u}}
+ * \newcommand\nnx{{n_x}}
+ * \newcommand\nny{{n_y}}
+ * \newcommand\xinit{x_\text{init}}
+ * \begin{equation}\label{eq:OCP} \tag{OCP}\hspace{-0.8em}
+ *     \begin{aligned}
+ *         &\minimize_{u,x} && \sum_{k=0}^{N-1} \ell_k\big(h_k(x^k, u^k)\big) + \ell_N\big(h_N(x^N)\big)\hspace{-0.8em} \\
+ *         &\subjto && u^k \in \U \\
+ *         &&& c_k(x^k) \in \D \\
+ *         &&& c_N(x^N) \in \D_N \\
+ *         &&& x^0 = \xinit \\
+ *         &&& x^{k+1} = f(x^k, u^k) \quad\quad (0 \le k \lt N)
+ *     \end{aligned}
+ * \end{equation}
+ * @f]
+ * 
+ * The function @f$ f : \R^\nnx \times \R^\nnu \to \R^\nnx @f$ models the 
+ * discrete-time, nonlinear dynamics of the system, which starts from an initial
+ * state @f$ \xinit @f$. 
+ * The functions @f$ h_k : \R^\nnx \times \R^\nnu \to \R^{n_h} @f$ for
+ * @f$ 0 \le k \lt N @f$ and @f$ h_N : \R^\nnx \to \R^{n_h^N} @f$ can be used to
+ * represent the (possibly time-varying) output mapping of the system,
+ * and the convex functions @f$ \ell_k : \R^{n_h} \to \R @f$ and
+ * @f$ \ell_N : \R^{n_h^N} \to \R @f$ define the stage costs and the terminal
+ * cost respectively. Stage constraints and terminal constraints are represented
+ * by the functions @f$ c_k : \R^{n_x} \to \R^{n_c} @f$ and
+ * @f$ c_N : \R^{n_x} \to \R^{n_c^N} @f$, and the boxes @f$ D @f$ and
+ * @f$ D_N @f$.
+ *
+ * Additional functions for computing Gauss-Newton approximations of the cost
+ * Hessian are included as well:
+ * @f[ \begin{aligned}
+ * q^k &\defeq \tp{\jac_{h_k}^x\!(\barxuk)} \nabla \ell_k(\hhbar^k) \\
+ * r^k &\defeq \tp{\jac_{h_k}^u\!(\barxuk)} \nabla \ell_k(\hhbar^k) \\
+ * \Lambda_k &\defeq \partial^2 \ell_k(\hhbar^k) \\
+ * Q_k &\defeq \tp{\jac_{h_k}^x\!(\barxuk)} \Lambda_k\, \jac_{h_k}^x\!(\barxuk) \\
+ * S_k &\defeq \tp{\jac_{h_k}^u\!(\barxuk)} \Lambda_k\, \jac_{h_k}^x\!(\barxuk) \\
+ * R_k &\defeq \tp{\jac_{h_k}^u\!(\barxuk)} \Lambda_k\, \jac_{h_k}^u\!(\barxuk). \\
+ * \end{aligned} @f]
+ * See @cite pas2022gaussnewton for more details.
+ *
+ * @ingroup grp_Problems
+ */
 template <Config Conf = DefaultConfig, class Allocator = std::allocator<std::byte>>
 class TypeErasedControlProblem : public util::TypeErased<ControlProblemVTable<Conf>, Allocator> {
   public:
@@ -235,38 +283,137 @@ class TypeErasedControlProblem : public util::TypeErased<ControlProblemVTable<Co
 
     /// @}
 
+    /// @name Constraint sets
+    /// @{
+
+    /// Input box constraints @f$ U @f$.
     void get_U(Box &U) const;
+    /// Stage box constraints @f$ D @f$.
     void get_D(Box &D) const;
+    /// Terminal box constraints @f$ D_N @f$.
     void get_D_N(Box &D) const;
+
+    /// @}
+
+    /// @name Dynamics and initial state
+    /// @{
+
+    /// Initial state @f$ x_\text{init} @f$.
     void get_x_init(rvec x_init) const;
+    /// Discrete-time dynamics @f$ x^{k+1} = f_k(x^k, u^k) @f$.
     void eval_f(index_t timestep, crvec x, crvec u, rvec fxu) const;
+    /// Jacobian of discrete-time dynamics @f$ \jac_f(x^k, u^k) @f$.
     void eval_jac_f(index_t timestep, crvec x, crvec u, rmat J_fxu) const;
+    /// Gradient-vector product of discrete-time dynamics @f$ \nabla f(x^k, u^k)\,p @f$.
     void eval_grad_f_prod(index_t timestep, crvec x, crvec u, crvec p, rvec grad_fxu_p) const;
+
+    /// @}
+
+    /// @name Output mapping
+    /// @{
+
+    /// Stage output mapping @f$ h_k(x^k, u^k) @f$.
     void eval_h(index_t timestep, crvec x, crvec u, rvec h) const;
+    /// Terminal output mapping @f$ h_N(x^N) @f$.
     void eval_h_N(crvec x, rvec h) const;
+
+    /// @}
+
+    /// @name Stage and terminal cost
+    /// @{
+
+    /// Stage cost @f$ \ell_k(\hbar^k) @f$.
     [[nodiscard]] real_t eval_l(index_t timestep, crvec h) const;
+    /// Terminal cost @f$ \ell_N(\hbar^N) @f$.
     [[nodiscard]] real_t eval_l_N(crvec h) const;
+
+    /// @}
+
+    /// @name Gauss-Newton approximations
+    /// @{
+
+    /// Cost gradients w.r.t. states and inputs
+    /// @f$ q^k = \tp{\jac_{h_k}^x\!(\barxuk)} \nabla \ell_k(\hbar^k) @f$ and
+    /// @f$ r^k = \tp{\jac_{h_k}^u\!(\barxuk)} \nabla \ell_k(\hbar^k) @f$.
     void eval_qr(index_t timestep, crvec xu, crvec h, rvec qr) const;
+    /// Terminal cost gradient w.r.t. states
+    /// @f$ q^N = \tp{\jac_{h_N}(\bar x^N)} \nabla \ell_k(\hbar^N) @f$.
     void eval_q_N(crvec x, crvec h, rvec q) const;
+    /// Cost Hessian w.r.t. states @f$ Q_k = \tp{\jac_{h_k}^x\!(\barxuk)}
+    /// \partial^2\ell_k(\hbar^k)\, \jac_{h_k}^x\!(\barxuk) @f$,
+    /// added to the given matrix @p Q.
+    /// @f$ Q \leftarrow Q + Q_k @f$.
     void eval_add_Q(index_t timestep, crvec xu, crvec h, rmat Q) const;
+    /// Terminal cost Hessian w.r.t. states @f$ Q_N = \tp{\jac_{h_N}(\bar x^N)}
+    /// \partial^2\ell_N(\hbar^N)\, \jac_{h_N}(\bar x^N) @f$,
+    /// added to the given matrix @p Q.
+    /// @f$ Q \leftarrow Q + Q_N @f$.
     void eval_add_Q_N(crvec x, crvec h, rmat Q) const;
+    /// Cost Hessian w.r.t. inputs @f$ R_k = \tp{\jac_{h_k}^u\!(\barxuk)}
+    /// \partial^2\ell_k(\hbar^k)\, \jac_{h_k}^u\!(\barxuk) @f$, keeping only
+    /// rows and columns in the mask @f$ \mathcal J @f$, added to the given
+    /// matrix @p R.
+    /// @f$ R \leftarrow R + R_k[\mathcal J, \mathcal J] @f$.
+    /// The size of @p work should be @ref get_R_work_size().
     void eval_add_R_masked(index_t timestep, crvec xu, crvec h, crindexvec mask, rmat R,
                            rvec work) const;
+    /// Cost Hessian w.r.t. inputs and states @f$ S_k = \tp{\jac_{h_k}^u\!(\barxuk)}
+    /// \partial^2\ell_k(\hbar^k)\, \jac_{h_k}^x\!(\barxuk) @f$, keeping only
+    /// rows in the mask @f$ \mathcal J @f$, added to the given matrix @p S.
+    /// @f$ S \leftarrow S + S_k[\mathcal J, \cdot] @f$.
+    /// The size of @p work should be @ref get_S_work_size().
     void eval_add_S_masked(index_t timestep, crvec xu, crvec h, crindexvec mask, rmat S,
                            rvec work) const;
+    /// @f$ out \leftarrow out + R[\mathcal J, \mathcal K]\,v[\mathcal K] @f$.
+    /// Work should contain the contents written to it by a prior call to
+    /// @ref eval_add_R_masked() in the same point.
     void eval_add_R_prod_masked(index_t timestep, crvec xu, crvec h, crindexvec mask_J,
                                 crindexvec mask_K, crvec v, rvec out, rvec work) const;
+    /// @f$ out \leftarrow out + \tp{S[\mathcal K, \cdot]}\, v[\mathcal K] @f$.
+    /// Work should contain the contents written to it by a prior call to
+    /// @ref eval_add_S_masked() in the same point.
     void eval_add_S_prod_masked(index_t timestep, crvec xu, crvec h, crindexvec mask_K, crvec v,
                                 rvec out, rvec work) const;
+    /// Size of the workspace required by @ref eval_add_R_masked() and
+    /// @ref eval_add_R_prod_masked().
     [[nodiscard]] length_t get_R_work_size() const;
+    /// Size of the workspace required by @ref eval_add_S_masked() and
+    /// @ref eval_add_S_prod_masked().
     [[nodiscard]] length_t get_S_work_size() const;
+
+    /// @}
+
+    /// @name Constraints
+    /// @{
+
+    /// Stage constraints @f$ c_k(x^k) @f$.
     void eval_constr(index_t timestep, crvec x, rvec c) const;
+    /// Terminal constraints @f$ c_N(x^N) @f$.
     void eval_constr_N(crvec x, rvec c) const;
+    /// Gradient-vector product of stage constraints @f$ \nabla c_k(x^k)\, p @f$.
     void eval_grad_constr_prod(index_t timestep, crvec x, crvec p, rvec grad_cx_p) const;
+    /// Gradient-vector product of terminal constraints @f$ \nabla c_N(x^N)\, p @f$.
     void eval_grad_constr_prod_N(crvec x, crvec p, rvec grad_cx_p) const;
+    /// Gauss-Newton Hessian of stage constraints @f$ \tp{\jac_{c_k}}(x^k)\,
+    /// \operatorname{diag}(M)\; \jac_{c_k}(x^k) @f$.
     void eval_add_gn_hess_constr(index_t timestep, crvec x, crvec M, rmat out) const;
+    /// Gauss-Newton Hessian of terminal constraints @f$ \tp{\jac_{c_N}}(x^N)\,
+    /// \operatorname{diag}(M)\; \jac_{c_N}(x^N) @f$.
     void eval_add_gn_hess_constr_N(crvec x, crvec M, rmat out) const;
+
+    /// @}
+
+    /// @name Checks
+    /// @{
+
+    /// Check that the problem formulation is well-defined, the dimensions match,
+    /// etc. Throws an exception if this is not the case.
     void check() const;
+
+    /// @}
+
+    /// @name Querying specialized implementations
+    /// @{
 
     // clang-format off
     [[nodiscard]] bool provides_get_D() const { return vtable.get_D != nullptr; }
@@ -285,6 +432,8 @@ class TypeErasedControlProblem : public util::TypeErased<ControlProblemVTable<Co
     [[nodiscard]] bool provides_eval_add_gn_hess_constr() const { return vtable.eval_add_gn_hess_constr != nullptr; }
     [[nodiscard]] bool provides_eval_add_gn_hess_constr_N() const { return vtable.eval_add_gn_hess_constr_N != &vtable.default_eval_add_gn_hess_constr_N; }
     // clang-format on
+
+    /// @}
 };
 
 // clang-format off
