@@ -84,6 +84,8 @@ auto PANOCSolver<DirectionProviderT>::operator()(
 
     auto linesearch_violated = [this](const Iterate &curr,
                                       const Iterate &next) {
+        if (params.force_linesearch)
+            return false;
         real_t σ  = params.β * (1 - curr.γ * curr.L) / (2 * curr.γ);
         real_t φγ = curr.fbe();
         real_t margin = (1 + std::abs(φγ)) * params.linesearch_tolerance_factor;

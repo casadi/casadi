@@ -31,6 +31,9 @@ struct PANOCParams {
     std::chrono::nanoseconds max_time = std::chrono::minutes(5);
     /// Minimum weight factor between Newton step and projected gradient step.
     real_t τ_min = 1. / 256;
+    /// Ignore the line search condition and always accept the accelerated step.
+    /// (For testing purposes only).
+    bool force_linesearch = false;
     /// Parameter β used in the line search (see Algorithm 2 in
     /// @cite de_marchi_proximal_2022). @f$ 0 < \beta < 1 @f$
     real_t β = 0.95;
