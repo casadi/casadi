@@ -48,7 +48,7 @@ include = ["README.md", "CMakeLists.txt", "src", "cmake", "interfaces"]
 exclude = []
 
 [tool.py-build-cmake.cmake]
-minimum_version = "3.21"
+minimum_version = "3.24"
 source_path = "."
 config = []
 args = ["-Wdev"]
