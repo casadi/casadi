@@ -295,7 +295,7 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
     import_model_structure(fmi_desc["ModelStructure"]);
 
   // Postprocess / sort variables
-  for (size_t k = 0; k < variables_.size(); ++k) {
+  for (size_t k = 0; k < n_variables(); ++k) {
     // Get reference to the variable
     Variable& v = variables_[k];
     // Skip variable if name starts with underscore
@@ -491,7 +491,7 @@ MX DaeBuilderInternal::read_expr(const XmlNode& node) {
     } else if (name=="Cos") {
       return cos(read_expr(node[0]));
     } else if (name=="Der") {
-      return variables_.at(read_variable(node[0]).der_of).v;
+      return variable(read_variable(node[0]).der_of).v;
     } else if (name=="Div") {
       return read_expr(node[0]) / read_expr(node[1]);
     } else if (name=="Exp") {
@@ -743,7 +743,7 @@ void DaeBuilderInternal::sort_z(const std::vector<std::string>& z_order) {
   // Make sure lengths agree
   casadi_assert(z_order.size() == z_.size(), "Dimension mismatch");
   // Mark existing components in z
-  std::vector<bool> old_z(variables_.size(), false);
+  std::vector<bool> old_z(n_variables(), false);
   for (size_t i : z_) old_z.at(i) = true;
   // New vector of z
   std::vector<size_t> new_z;
@@ -827,7 +827,7 @@ void DaeBuilderInternal::prune(bool prune_p, bool prune_u) {
   // Create a function
   Function f("prune_fcn", f_in, f_out, f_in_name, f_out_name);
   // Mark which variables are free
-  std::vector<bool> free_variables(variables_.size(), false);
+  std::vector<bool> free_variables(n_variables(), false);
   for (const std::string& s : f.get_free()) {
     auto it = varind_.find(s);
     casadi_assert(it != varind_.end(), "No such variable: \"" + s + "\".");
@@ -1012,7 +1012,7 @@ bool DaeBuilderInternal::has_variable(const std::string& name) const {
 
 std::vector<std::string> DaeBuilderInternal::all_variables() const {
   std::vector<std::string> r;
-  r.reserve(variables_.size());
+  r.reserve(n_variables());
   for (const Variable& v : variables_) r.push_back(v.name);
   return r;
 }
@@ -1021,7 +1021,7 @@ size_t DaeBuilderInternal::add_variable(const std::string& name, const Variable&
   // Try to find the component
   casadi_assert(!has_variable(name), "Variable \"" + name + "\" has already been added.");
   // Index of the variable
-  size_t ind = variables_.size();
+  size_t ind = n_variables();
   // Add to the map of all variables
   varind_[name] = ind;
   variables_.push_back(var);
@@ -1075,7 +1075,7 @@ const MX& DaeBuilderInternal::var(const std::string& name) const {
 }
 
 MX DaeBuilderInternal::der(const std::string& name) const {
-  return variables_.at(variable(name).der_of).v;
+  return variable(variable(name).der_of).v;
 }
 
 MX DaeBuilderInternal::der(const MX& var) const {
@@ -2207,7 +2207,7 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
       // Add variable offset, make index 1
       it->der_of -= 1;
       // Set der
-      variables_.at(it->der_of).der = it - variables_.begin();
+      variable(it->der_of).der = it - variables_.begin();
     }
   }
 }
@@ -2219,7 +2219,7 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
       // Get index
       outputs_.push_back(e.attribute<casadi_int>("index", 0) - 1);
       // Corresponding variable
-      Variable& v = variables_.at(outputs_.back());
+      Variable& v = variable(outputs_.back());
       // Get dependencies
       v.dependencies = e.attribute<std::vector<casadi_int>>("dependencies", {});
       // dependenciesKind attribute, if present
@@ -2234,7 +2234,7 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
       }
       // Mark interdependencies, change to index-0
       for (casadi_int& d : v.dependencies) {
-        variables_.at(--d).dependency = true;
+        variable(--d).dependency = true;
       }
     }
   }
@@ -2244,7 +2244,7 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
       // Get index
       derivatives_.push_back(e.attribute<casadi_int>("index", 0) - 1);
       // Corresponding variable
-      Variable& v = variables_.at(derivatives_.back());
+      Variable& v = variable(derivatives_.back());
       // Get dependencies
       v.dependencies = e.attribute<std::vector<casadi_int>>("dependencies", {});
       // dependenciesKind attribute, if present
@@ -2259,7 +2259,7 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
       }
       // Mark interdependencies, change to index-0
       for (casadi_int& d : v.dependencies) {
-        variables_.at(--d).dependency = true;
+        variable(--d).dependency = true;
       }
     }
   }
@@ -2270,14 +2270,14 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
       initial_unknowns_.push_back(e.attribute<casadi_int>("index", 0) - 1);
       // Get dependencies
       for (casadi_int d : e.attribute<std::vector<casadi_int>>("dependencies", {})) {
-        variables_.at(d - 1).dependency = true;
+        variable(d - 1).dependency = true;
       }
     }
   }
 }
 
 const MX& DaeBuilderInternal::var(size_t ind) const {
-  return variables_.at(ind).v;
+  return variable(ind).v;
 }
 
 std::vector<MX> DaeBuilderInternal::var(const std::vector<size_t>& ind) const {
@@ -2401,14 +2401,14 @@ void DaeBuilderInternal::set_string_attribute(Attribute a,
 Sparsity DaeBuilderInternal::jac_sparsity(const std::vector<size_t>& oind,
     const std::vector<size_t>& iind) const {
   // Mark inputs
-  std::vector<casadi_int> lookup(variables_.size(), -1);
+  std::vector<casadi_int> lookup(n_variables(), -1);
   for (size_t i = 0; i < iind.size(); ++i)
     lookup.at(iind[i]) = i;
   // Sparsity pattern for the Jacobian block
   std::vector<casadi_int> row, col;
   // Loop over output nonzeros
   for (casadi_int j = 0; j < oind.size(); ++j) {
-    for (casadi_int d : variables_.at(oind[j]).dependencies) {
+    for (casadi_int d : variable(oind[j]).dependencies) {
       casadi_int i = lookup.at(d);
       if (i >= 0) {
         row.push_back(j);  // Note: May not be sorted in ascending order
@@ -2423,7 +2423,7 @@ Sparsity DaeBuilderInternal::jac_sparsity(const std::vector<size_t>& oind,
 Sparsity DaeBuilderInternal::hess_sparsity(const std::vector<size_t>& oind,
     const std::vector<size_t>& iind) const {
   // Mark inputs
-  std::vector<casadi_int> lookup(variables_.size(), -1);
+  std::vector<casadi_int> lookup(n_variables(), -1);
   for (size_t i = 0; i < iind.size(); ++i) lookup.at(iind[i]) = i;
   // Which variables enter as a nonlinear dependency in any variable in oind
   std::vector<bool> nonlin(iind.size(), false);
@@ -2433,7 +2433,7 @@ Sparsity DaeBuilderInternal::hess_sparsity(const std::vector<size_t>& oind,
   std::vector<casadi_int> row, col;
   // Loop over output variables
   for (casadi_int j = 0; j < oind.size(); ++j) {
-    const Variable& v = variables_.at(oind[j]);
+    const Variable& v = variable(oind[j]);
     // Loop over dependencies
     for (size_t k = 0; k < v.dependencies.size(); ++k) {
       if (v.dependenciesKind.empty() || v.dependenciesKind.at(k) == DependenciesKind::DEPENDENT) {

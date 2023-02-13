@@ -311,6 +311,9 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   /// Get a list of all variables
   std::vector<std::string> all_variables() const;
 
+  /// Length of variables array
+  size_t n_variables() const {return variables_.size();}
+
   ///@{
   /// Access a variable by index
   Variable& variable(size_t ind) {return variables_.at(ind);}

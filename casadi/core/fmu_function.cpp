@@ -89,10 +89,10 @@ std::string Fmu::dll_suffix() {
 void Fmu::init(const DaeBuilderInternal* dae) {
   // Mark input indices
   size_t numel = 0;
-  std::vector<bool> lookup(dae->variables_.size(), false);
+  std::vector<bool> lookup(dae->n_variables(), false);
   for (auto&& n : scheme_in_) {
     for (size_t i : scheme_.at(n)) {
-      casadi_assert(!lookup.at(i), "Duplicate variable: " + dae->variables_.at(i).name);
+      casadi_assert(!lookup.at(i), "Duplicate variable: " + dae->variable(i).name);
       lookup.at(i) = true;
       numel++;
     }
@@ -113,7 +113,7 @@ void Fmu::init(const DaeBuilderInternal* dae) {
   std::fill(lookup.begin(), lookup.end(), false);
   for (auto&& n : scheme_out_) {
     for (size_t i : scheme_.at(n)) {
-      casadi_assert(!lookup.at(i), "Duplicate variable: " + dae->variables_.at(i).name);
+      casadi_assert(!lookup.at(i), "Duplicate variable: " + dae->variable(i).name);
       lookup.at(i) = true;
       numel++;
     }
@@ -155,7 +155,7 @@ void Fmu::init(const DaeBuilderInternal* dae) {
   vn_in_.reserve(iind_.size());
   vr_in_.reserve(iind_.size());
   for (size_t i : iind_) {
-    const Variable& v = dae->variables_.at(i);
+    const Variable& v = dae->variable(i);
     nominal_in_.push_back(v.nominal);
     min_in_.push_back(v.min);
     max_in_.push_back(v.max);
@@ -169,7 +169,7 @@ void Fmu::init(const DaeBuilderInternal* dae) {
   vn_out_.reserve(oind_.size());
   vr_out_.reserve(oind_.size());
   for (size_t i : oind_) {
-    const Variable& v = dae->variables_.at(i);
+    const Variable& v = dae->variable(i);
     nominal_out_.push_back(v.nominal);
     min_out_.push_back(v.min);
     max_out_.push_back(v.max);
