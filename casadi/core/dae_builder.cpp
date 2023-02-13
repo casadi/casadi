@@ -227,6 +227,14 @@ void DaeBuilder::load_fmi_description(const std::string& filename) {
   }
 }
 
+void DaeBuilder::export_fmu(const std::string& file_prefix, const Dict& opts) {
+  try {
+    (*this)->export_fmu(file_prefix, opts);
+  } catch (std::exception& e) {
+    THROW_ERROR("export_fmu", e.what());
+  }
+}
+
 void DaeBuilder::eliminate_quad() {
   try {
     (*this)->eliminate_quad();

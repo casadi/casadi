@@ -425,6 +425,9 @@ public:
   /// Import problem description from FMI or XML
   void load_fmi_description(const std::string& filename);
 
+  /// Export instance into an FMU
+  void export_fmu(const std::string& file_prefix, const Dict& opts=Dict());
+
   /// Add a named linear combination of output expressions
   void add_lc(const std::string& name, const std::vector<std::string>& f_out);
 

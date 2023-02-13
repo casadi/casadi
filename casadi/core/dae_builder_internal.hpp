@@ -129,6 +129,9 @@ struct CASADI_EXPORT Variable {
 
   // Default initial attribute, per specification
   static Initial default_initial(Causality causality, Variability variability);
+
+  // Export as XML
+  XmlNode export_xml() const;
 };
 
 /// \cond INTERNAL
@@ -203,6 +206,18 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   ///@{
   /// Import existing problem from FMI/XML
   void load_fmi_description(const std::string& filename);
+
+  /// Generate FMU XML file
+  XmlNode generate_model_description();
+
+  /// Get current date and time in the ISO 8601 format
+  static std::string iso_8601_time();
+
+  // Generate a random 32 digit hexadecimal number
+  static std::string generate_guid();
+
+  /// Export instance into an FMU (experimental)
+  void export_fmu(const std::string& file_prefix, const Dict& opts);
 
   // Input convension in codegen
   enum DaeBuilderInternalIn {

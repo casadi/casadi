@@ -221,6 +221,22 @@ Variable::Variable(const std::string& name) : name(name),
   casadi_assert(!name.empty(), "Name is empty string");
 }
 
+XmlNode Variable::export_xml() const {
+  // Create new XmlNode
+  XmlNode r;
+  r.name = name;
+  // Value reference
+  r.set_attribute("valueReference", std::to_string(value_reference));
+  // Description, if any
+  if (!description.empty()) r.set_attribute("description", description);
+  // Causality
+  r.set_attribute("causality", to_string(causality));
+  // Variability
+  r.set_attribute("variability", to_string(variability));
+  // Return XML representation
+  return r;
+}
+
 DaeBuilderInternal::~DaeBuilderInternal() {
 }
 
@@ -378,6 +394,63 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
       }
     }
   }
+}
+
+XmlNode DaeBuilderInternal::generate_model_description() {
+  casadi_warning("FMU generation is experimental")
+  // Default arguments
+  int fmi_major = 3;
+  int fmi_minor = 0;
+  std::string model_name = name_;
+  std::string description;  // none
+  std::string author;  // none
+  std::string version;  // none
+  std::string copyright;  // none
+  std::string license;  // none
+  // Return object
+  XmlNode r;
+  // Preamble
+  r.name = "fmiModelDescription";
+  r.set_attribute("fmiVersion", std::to_string(fmi_major) + "." + std::to_string(fmi_minor));
+  r.set_attribute("modelName", model_name);
+  r.set_attribute(fmi_major >= 3 ? "instantiationToken" : "guid", generate_guid());
+  if (!description.empty()) r.set_attribute("description", description);
+  if (!author.empty()) r.set_attribute("author", author);
+  if (!version.empty()) r.set_attribute("version", version);
+  if (!copyright.empty()) r.set_attribute("copyright", copyright);
+  if (!license.empty()) r.set_attribute("license", license);
+  r.set_attribute("generationTool", "CasADi");
+  r.set_attribute("generationDateAndTime", iso_8601_time());
+  r.set_attribute("variableNamingConvention", "structured");  // flat better?
+  if (fmi_major < 3) r.set_attribute("numberOfEventIndicators", "0");
+  // Model variables
+  XmlNode mv;
+  mv.name = "ModelVariables";
+  for (auto&& v : variables_) {
+    mv.children.push_back(v.export_xml());
+  }
+  r.children.push_back(mv);
+  // Return the model description representation
+  return r;
+}
+
+void DaeBuilderInternal::export_fmu(const std::string& file_prefix, const Dict& opts) {
+  (void)opts;  // unused
+  // Path separator
+#ifdef _WIN32
+  char sep = '\\';
+#else
+  char sep = '/';
+#endif
+  // XML file name
+  std::string xml_filename = "ModelDescription.xml";
+  if (!file_prefix.empty()) xml_filename = file_prefix + sep + xml_filename;
+  // Construct ModelDescription
+  XmlNode model_description;
+  model_description.children.push_back(generate_model_description());
+  // Export to file
+  XmlFile xml_file("tinyxml");
+  xml_file.dump(xml_filename, model_description);
 }
 
 Variable& DaeBuilderInternal::read_variable(const XmlNode& node) {
@@ -2391,6 +2464,28 @@ Sparsity DaeBuilderInternal::hess_sparsity(const std::vector<size_t>& oind,
   }
   // Create sparsity pattern
   return Sparsity::triplet(iind.size(), iind.size(), row, col);
+}
+
+std::string DaeBuilderInternal::iso_8601_time() {
+  // Get current time
+  std::time_t now = std::time({});
+  // Convert to ISO 8601 format and return
+  std::vector<char> buf(std::size("YYYY-MM-DDThh:mm:ssZ"));
+  std::strftime(&buf.front(), buf.size(), "%FT%TZ",
+    std::gmtime(&now));  // NOLINT(runtime/threadsafe_fn)
+  return &buf.front();
+}
+
+std::string DaeBuilderInternal::generate_guid() {
+  // Possible characters
+  const char h[] = "0123456789abcdef";
+  // Length of GUID
+  const size_t len = 32;
+  // Generate random hex string
+  std::vector<char> buf(len);
+  for (size_t i = 0; i < len; ++i)
+    buf[i] = h[rand() % 16];  // NOLINT(runtime/threadsafe_fn)
+  return std::string(&buf.front(), len);
 }
 
 } // namespace casadi
