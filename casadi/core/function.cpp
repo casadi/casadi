@@ -1175,6 +1175,8 @@ namespace casadi {
 
   std::vector<DM> Function::generate_in(const std::string& fname) {
     DM data = DM::from_file(fname, "txt");
+    // Empty files are okay
+    if (data.is_empty(true)) data = DM(0, 1);
     casadi_assert(data.is_vector() && data.is_dense(), "Expected dense vector");
     casadi_assert(data.numel()==nnz_in(),
       "Dimension mismatch: file contains a vector of size " + str(data.numel())
@@ -1185,6 +1187,8 @@ namespace casadi {
 
   std::vector<DM> Function::generate_out(const std::string& fname) {
     DM data = DM::from_file(fname, "txt");
+    // Empty files are okay
+    if (data.is_empty(true)) data = DM(0, 1);
     casadi_assert(data.is_vector() && data.is_dense(), "Expected dense vector");
     casadi_assert(data.numel()==nnz_out(),
       "Dimension mismatch: file contains a vector of size " + str(data.numel())
