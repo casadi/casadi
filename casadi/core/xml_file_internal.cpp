@@ -27,22 +27,26 @@
 
 namespace casadi {
 
-  XmlFileInternal::XmlFileInternal() {
-  }
+XmlFileInternal::XmlFileInternal() {
+}
 
-  XmlFileInternal::~XmlFileInternal() {
-  }
+XmlFileInternal::~XmlFileInternal() {
+}
 
-  std::map<std::string, XmlFileInternal::Plugin> XmlFileInternal::solvers_;
+std::map<std::string, XmlFileInternal::Plugin> XmlFileInternal::solvers_;
 
-  const std::string XmlFileInternal::infix_ = "xmlfile";
+const std::string XmlFileInternal::infix_ = "xmlfile";
 
-  void XmlFileInternal::disp(std::ostream &stream, bool more) const {
-  }
+void XmlFileInternal::disp(std::ostream &stream, bool more) const {
+}
 
-  XmlNode XmlFileInternal::parse(const std::string& filename) {
-    casadi_error("parse not defined for " + class_name());
-    return XmlNode();
-  }
+XmlNode XmlFileInternal::parse(const std::string& filename) {
+  casadi_error("parse not defined for " + class_name());
+  return XmlNode();
+}
+
+void XmlFileInternal::dump(const std::string& filename, const XmlNode& node) {
+  casadi_error("dump not defined for " + class_name());
+}
 
 } // namespace casadi

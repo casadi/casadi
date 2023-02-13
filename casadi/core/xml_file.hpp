@@ -81,6 +81,10 @@ namespace casadi {
 
     // Parse an XML file
     XmlNode parse(const std::string& filename);
+
+    // Save an XML file to disk
+    void dump(const std::string& filename, const XmlNode& node);
+
 #endif // SWIG
   };
 

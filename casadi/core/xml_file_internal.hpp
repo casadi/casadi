@@ -50,6 +50,9 @@ namespace casadi {
     // Parse an XML file
     virtual XmlNode parse(const std::string& filename);
 
+    // Save a parsed XML file to disk
+    virtual void dump(const std::string& filename, const XmlNode& node);
+
     // Creator function for internal class
     typedef XmlFileInternal* (*Creator)();
 

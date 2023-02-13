@@ -71,8 +71,14 @@ namespace casadi {
     // Parse an XML file
     XmlNode parse(const std::string& filename) override;
 
-    // Parse an XML tree
-    XmlNode addNode(TiXmlNode* n);
+    // Save a parsed XML file to disk
+    void dump(const std::string& filename, const XmlNode& node) override;
+
+    // Read an XML tree
+    XmlNode import_node(TiXmlNode* n);
+
+    // Write an XML tree
+    void export_node(TiXmlNode* n, const XmlNode& node);
 
     // Destructor
     ~TinyXmlInterface() override;
