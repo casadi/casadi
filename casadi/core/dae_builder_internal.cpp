@@ -238,6 +238,9 @@ XmlNode Variable::export_xml() const {
 }
 
 DaeBuilderInternal::~DaeBuilderInternal() {
+  for (Variable* v : variables_) {
+    if (v) delete v;
+  }
 }
 
 DaeBuilderInternal::DaeBuilderInternal(const std::string& name, const std::string& path,
@@ -263,7 +266,7 @@ DaeBuilderInternal::DaeBuilderInternal(const std::string& name, const std::strin
 
 void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
   // Ensure no variables already
-  casadi_assert(variables_.empty(), "Instance already has variables");
+  casadi_assert(n_variables() == 0, "Instance already has variables");
 
   // Parse XML file
   XmlFile xml_file("tinyxml");
@@ -297,7 +300,7 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
   // Postprocess / sort variables
   for (size_t k = 0; k < n_variables(); ++k) {
     // Get reference to the variable
-    Variable& v = variables_[k];
+    Variable& v = variable(k);
     // Skip variable if name starts with underscore
     if (v.name.rfind("_", 0) == 0) continue;
     // Sort by types
@@ -427,7 +430,7 @@ XmlNode DaeBuilderInternal::generate_model_description() {
   XmlNode mv;
   mv.name = "ModelVariables";
   for (auto&& v : variables_) {
-    mv.children.push_back(v.export_xml());
+    mv.children.push_back(v->export_xml());
   }
   r.children.push_back(mv);
   // Return the model description representation
@@ -899,39 +902,39 @@ void DaeBuilderInternal::tearing_variables(std::vector<std::string>* res,
   // Any hold variable?
   bool any_hold = false;
   // Collect residual variables, iteration variables, expression for hold indices, if any
-  for (const Variable& v : variables_) {
+  for (const Variable* v : variables_) {
     // Residual variables are specified with a "res__" prefix
-    if (v.name.rfind(res_prefix, 0) == 0) {
+    if (v->name.rfind(res_prefix, 0) == 0) {
       // Process iteration variable name, names of hold markers
       std::string iv_name, res_hold_name, iv_hold_name;
       // Iteration variable, hold markers are contained in the remainder of the name
       try {
         size_t pos = res_prefix.size();
         // Find the next "__", if any
-        size_t end = v.name.find("__", pos);
-        if (end == std::string::npos) end = v.name.size();
+        size_t end = v->name.find("__", pos);
+        if (end == std::string::npos) end = v->name.size();
         // Look up iteration variable
-        iv_name = v.name.substr(pos, end - pos);
+        iv_name = v->name.substr(pos, end - pos);
         // Ensure that the variable exists
         casadi_assert(has_variable(iv_name), "No such variable: " + iv_name);
         // Get hold indices, if any
-        if (end != v.name.size()) {
+        if (end != v->name.size()) {
           // Find next "__", read hold index for residual variable
           pos = end + 2;
-          end = v.name.find("__", pos);
-          if (end == std::string::npos) end = v.name.size();
-          res_hold_name = v.name.substr(pos, end - pos);
+          end = v->name.find("__", pos);
+          if (end == std::string::npos) end = v->name.size();
+          res_hold_name = v->name.substr(pos, end - pos);
           // Ensure that the variable exists
           casadi_assert(has_variable(res_hold_name), "No such variable: " + res_hold_name);
           // The remainder of the name contains iv_hold_name
-          if (end != v.name.size()) {
-            iv_hold_name = v.name.substr(end + 2);
+          if (end != v->name.size()) {
+            iv_hold_name = v->name.substr(end + 2);
             casadi_assert(has_variable(iv_hold_name), "No such variable: " + iv_hold_name);
           }
         }
       } catch (std::exception& e) {
         // Generate warning
-        casadi_warning("Cannot process residual variable: " + v.name + ":" + std::string(e.what()));
+        casadi_warning("Cannot process residual variable: " + v->name + ":" + std::string(e.what()));
         continue;
       }
       // Add residual variable, corresponding hold variable
@@ -942,7 +945,7 @@ void DaeBuilderInternal::tearing_variables(std::vector<std::string>* res,
         r_hold.push_back(variable(res_hold_name).v);
         casadi_assert(r_hold.back().is_scalar(), "Non-scalar hold variable for " + res_hold_name);
       }
-      if (res) res->push_back(v.name);
+      if (res) res->push_back(v->name);
       // Add iteration variable, corresponding hold variable
       if (iv_hold_name.empty()) {
         iv_hold.push_back(false);
@@ -1013,7 +1016,7 @@ bool DaeBuilderInternal::has_variable(const std::string& name) const {
 std::vector<std::string> DaeBuilderInternal::all_variables() const {
   std::vector<std::string> r;
   r.reserve(n_variables());
-  for (const Variable& v : variables_) r.push_back(v.name);
+  for (const Variable* v : variables_) r.push_back(v->name);
   return r;
 }
 
@@ -1024,7 +1027,7 @@ size_t DaeBuilderInternal::add_variable(const std::string& name, const Variable&
   size_t ind = n_variables();
   // Add to the map of all variables
   varind_[name] = ind;
-  variables_.push_back(var);
+  variables_.push_back(new Variable(var));
   // Clear cache
   clear_cache_ = true;
   // Return index of new variable
@@ -1092,8 +1095,8 @@ void DaeBuilderInternal::eliminate_w() {
   sort_w();
   // Expressions where the variables are also being used
   std::vector<MX> ex;
-  for (const Variable& v : variables_) {
-    if (!v.beq.is_constant()) ex.push_back(v.beq);
+  for (const Variable* v : variables_) {
+    if (!v->beq.is_constant()) ex.push_back(v->beq);
   }
   // Perform elimination
   std::vector<MX> w = var(w_);
@@ -1103,8 +1106,8 @@ void DaeBuilderInternal::eliminate_w() {
   w_.clear();
   // Get binding equations
   auto it = ex.begin();
-  for (Variable& v : variables_) {
-    if (!v.beq.is_constant()) v.beq = *it++;
+  for (Variable* v : variables_) {
+    if (!v->beq.is_constant()) v->beq = *it++;
   }
   // Consistency check
   casadi_assert_dev(it == ex.end());
@@ -2202,12 +2205,12 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
     (void)add_variable(name, var);
   }
   // Handle derivatives
-  for (auto it = variables_.begin(); it != variables_.end(); ++it) {
-    if (it->der_of >= 0) {
+  for (size_t i = 0; i < n_variables(); ++i) {
+    if (variable(i).der_of >= 0) {
       // Add variable offset, make index 1
-      it->der_of -= 1;
+      variable(i).der_of -= 1;
       // Set der
-      variable(it->der_of).der = it - variables_.begin();
+      variable(variable(i).der_of).der = i;
     }
   }
 }
@@ -2346,9 +2349,9 @@ Function DaeBuilderInternal::fun(const std::string& name) const {
 }
 
 void DaeBuilderInternal::reset() {
-  for (Variable& v : variables_) {
-    v.value = nan;
-    v.stringvalue = std::string();
+  for (Variable* v : variables_) {
+    v->value = nan;
+    v->stringvalue = std::string();
   }
 }
 

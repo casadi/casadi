@@ -316,8 +316,8 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
 
   ///@{
   /// Access a variable by index
-  Variable& variable(size_t ind) {return variables_.at(ind);}
-  const Variable& variable(size_t ind) const {return variables_.at(ind);}
+  Variable& variable(size_t ind) {return *variables_.at(ind);}
+  const Variable& variable(size_t ind) const {return *variables_.at(ind);}
   ///@}
 
   ///@{
@@ -385,7 +385,7 @@ protected:
   bool symbolic_;
 
   /// All variables
-  std::vector<Variable> variables_;
+  std::vector<Variable*> variables_;
 
   // Model structure
   std::vector<size_t> outputs_, derivatives_, initial_unknowns_;

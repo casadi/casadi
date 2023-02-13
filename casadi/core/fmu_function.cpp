@@ -189,7 +189,8 @@ void Fmu::init(const DaeBuilderInternal* dae) {
   init_integer_.clear();
   init_boolean_.clear();
   init_string_.clear();
-  for (const Variable& v : dae->variables_) {
+  for (size_t i = 0; i < dae->n_variables(); ++i) {
+    const Variable& v = dae->variable(i);
     // Skip if the wrong type
     if (v.causality != Causality::PARAMETER && v.causality != Causality::INPUT) continue;
     // If nan - variable has not been set - keep default value
