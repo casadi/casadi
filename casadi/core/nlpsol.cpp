@@ -1263,7 +1263,7 @@ namespace casadi {
   void Nlpsol::serialize_body(SerializingStream &s) const {
     OracleFunction::serialize_body(s);
 
-    s.version("Nlpsol", 2);
+    s.version("Nlpsol", 3);
     s.pack("Nlpsol::nx", nx_);
     s.pack("Nlpsol::ng", ng_);
     s.pack("Nlpsol::np", np_);
@@ -1299,13 +1299,13 @@ namespace casadi {
   }
 
   Nlpsol::Nlpsol(DeserializingStream & s) : OracleFunction(s) {
-    int version = s.version("Nlpsol", 1, 2);
+    int version = s.version("Nlpsol", 1, 3);
     s.unpack("Nlpsol::nx", nx_);
     s.unpack("Nlpsol::ng", ng_);
     s.unpack("Nlpsol::np", np_);
     s.unpack("Nlpsol::fcallback", fcallback_);
     s.unpack("Nlpsol::callback_step", callback_step_);
-    if (version==1) {
+    if (version<=2) {
       s.unpack("Nlpsol::error_on_fail", error_on_fail_);
     }
     s.unpack("Nlpsol::eval_errors_fatal", eval_errors_fatal_);
@@ -1328,9 +1328,11 @@ namespace casadi {
       sens_linsol_ = "qr";
     }
 
-    s.unpack("Nlpsol::detect_simple_bounds_is_simple", detect_simple_bounds_is_simple_);
-    s.unpack("Nlpsol::detect_simple_bounds_parts", detect_simple_bounds_parts_);
-    s.unpack("Nlpsol::detect_simple_bounds_target_x", detect_simple_bounds_target_x_);
+    if (version>=3) {
+      s.unpack("Nlpsol::detect_simple_bounds_is_simple", detect_simple_bounds_is_simple_);
+      s.unpack("Nlpsol::detect_simple_bounds_parts", detect_simple_bounds_parts_);
+      s.unpack("Nlpsol::detect_simple_bounds_target_x", detect_simple_bounds_target_x_);
+    }
     for (casadi_int i=0;i<detect_simple_bounds_is_simple_.size();++i) {
       if (detect_simple_bounds_is_simple_[i]) {
         detect_simple_bounds_target_g_.push_back(i);
