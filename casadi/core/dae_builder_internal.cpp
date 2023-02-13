@@ -209,9 +209,9 @@ Initial Variable::default_initial(Causality causality, Variability variability) 
   }
   // Initial value not available
   return Initial::NA;
-}
+} 
 
-Variable::Variable(const std::string& name) : name(name),
+Variable::Variable(size_t index, const std::string& name) : index(index), name(name),
     value_reference(-1), description(""),
     type(Type::REAL), causality(Causality::LOCAL), variability(Variability::CONTINUOUS),
     unit(""), display_unit(""),
@@ -570,7 +570,7 @@ MX DaeBuilderInternal::read_expr(const XmlNode& node) {
       std::vector<MX> farg(args.size());
       for (casadi_int i = 0; i < args.size(); ++i) {
         // Lift input arguments
-        Variable v("w_" + str(w_.size()));
+        Variable v(-1, "w_" + str(w_.size()));
         v.v = MX::sym(v.name);
         // Add to list of variables
         w_.push_back(add_variable(v.name, v));
@@ -580,7 +580,7 @@ MX DaeBuilderInternal::read_expr(const XmlNode& node) {
         farg[i] = v.v;
       }
       // Return argument (scalar for now)
-      Variable r("w_" + str(w_.size()));
+      Variable r(-1, "w_" + str(w_.size()));
       r.v = MX::sym(r.name);
       // Add to list of variables
       w_.push_back(add_variable(r.name, r));
@@ -1020,6 +1020,20 @@ std::vector<std::string> DaeBuilderInternal::all_variables() const {
   return r;
 }
 
+Variable& DaeBuilderInternal::new_variable(const std::string& name) {
+  // Try to find the component
+  casadi_assert(!has_variable(name), "Variable \"" + name + "\" already exists.");
+  // Index of the variable
+  size_t ind = n_variables();
+  // Add to the map of all variables
+  varind_[name] = ind;
+  variables_.push_back(new Variable(ind, name));
+  // Clear cache
+  clear_cache_ = true;
+  // Return reference to new variable
+  return *variables_.back();
+}
+
 size_t DaeBuilderInternal::add_variable(const std::string& name, const Variable& var) {
   // Try to find the component
   casadi_assert(!has_variable(name), "Variable \"" + name + "\" has already been added.");
@@ -1028,6 +1042,7 @@ size_t DaeBuilderInternal::add_variable(const std::string& name, const Variable&
   // Add to the map of all variables
   varind_[name] = ind;
   variables_.push_back(new Variable(var));
+  variables_.back()->index = ind;
   // Clear cache
   clear_cache_ = true;
   // Return index of new variable
@@ -1129,7 +1144,7 @@ void DaeBuilderInternal::lift(bool lift_shared, bool lift_calls) {
   extract(ex, new_w, new_wdef, opts);
   // Register as dependent variables
   for (size_t i = 0; i < new_w.size(); ++i) {
-    Variable v(new_w.at(i).name());
+    Variable v(-1, new_w.at(i).name());
     v.v = new_w.at(i);
     v.beq = new_wdef.at(i);
     w_.push_back(add_variable(v.name, v));
@@ -1985,7 +2000,7 @@ std::vector<MX> DaeBuilderInternal::quad() const {
 
 MX DaeBuilderInternal::add_t(const std::string& name) {
   casadi_assert(t_.empty(), "'t' already defined");
-  Variable v(name);
+  Variable v(-1, name);
   v.v = MX::sym(name);
   v.causality = Causality::INDEPENDENT;
   t_.push_back(add_variable(name, v));
@@ -1993,7 +2008,7 @@ MX DaeBuilderInternal::add_t(const std::string& name) {
 }
 
 MX DaeBuilderInternal::add_p(const std::string& name) {
-  Variable v(name);
+  Variable v(-1, name);
   v.v = MX::sym(name);
   v.variability = Variability::FIXED;
   v.causality = Causality::INPUT;
@@ -2002,7 +2017,7 @@ MX DaeBuilderInternal::add_p(const std::string& name) {
 }
 
 MX DaeBuilderInternal::add_u(const std::string& name) {
-  Variable v(name);
+  Variable v(-1, name);
   v.v = MX::sym(name);
   v.variability = Variability::CONTINUOUS;
   v.causality = Causality::INPUT;
@@ -2011,7 +2026,7 @@ MX DaeBuilderInternal::add_u(const std::string& name) {
 }
 
 MX DaeBuilderInternal::add_x(const std::string& name) {
-  Variable v(name);
+  Variable v(-1, name);
   v.v = MX::sym(name);
   v.variability = Variability::CONTINUOUS;
   v.causality = Causality::LOCAL;
@@ -2020,7 +2035,7 @@ MX DaeBuilderInternal::add_x(const std::string& name) {
 }
 
 MX DaeBuilderInternal::add_z(const std::string& name) {
-  Variable v(name);
+  Variable v(-1, name);
   v.v = MX::sym(name);
   v.variability = Variability::CONTINUOUS;
   v.causality = Causality::LOCAL;
@@ -2029,7 +2044,7 @@ MX DaeBuilderInternal::add_z(const std::string& name) {
 }
 
 MX DaeBuilderInternal::add_q(const std::string& name) {
-  Variable v(name);
+  Variable v(-1, name);
   v.v = MX::sym(name);
   v.variability = Variability::CONTINUOUS;
   v.causality = Causality::LOCAL;
@@ -2038,7 +2053,7 @@ MX DaeBuilderInternal::add_q(const std::string& name) {
 }
 
 MX DaeBuilderInternal::add_c(const std::string& name, const MX& new_cdef) {
-  Variable v(name);
+  Variable v(-1, name);
   v.v = MX::sym(name);
   v.variability = Variability::CONSTANT;
   v.beq = new_cdef;
@@ -2047,7 +2062,7 @@ MX DaeBuilderInternal::add_c(const std::string& name, const MX& new_cdef) {
 }
 
 MX DaeBuilderInternal::add_d(const std::string& name, const MX& new_ddef) {
-  Variable v(name);
+  Variable v(-1, name);
   v.v = MX::sym(name);
   v.variability = Variability::FIXED;
   v.causality = Causality::CALCULATED_PARAMETER;
@@ -2057,7 +2072,7 @@ MX DaeBuilderInternal::add_d(const std::string& name, const MX& new_ddef) {
 }
 
 MX DaeBuilderInternal::add_w(const std::string& name, const MX& new_wdef) {
-  Variable v(name);
+  Variable v(-1, name);
   v.v = MX::sym(name);
   v.variability = Variability::CONTINUOUS;
   v.beq = new_wdef;
@@ -2066,7 +2081,7 @@ MX DaeBuilderInternal::add_w(const std::string& name, const MX& new_wdef) {
 }
 
 MX DaeBuilderInternal::add_y(const std::string& name, const MX& new_ydef) {
-  Variable v(name);
+  Variable v(-1, name);
   v.v = MX::sym(name);
   v.causality = Causality::OUTPUT;
   v.beq = new_ydef;
@@ -2080,7 +2095,7 @@ void DaeBuilderInternal::set_ode(const std::string& name, const MX& ode_rhs) {
   // Check if derivative exists
   if (x.der < 0) {
     // New derivative variable
-    Variable xdot("der_" + name);
+    Variable xdot(-1, "der_" + name);
     xdot.v = MX::sym(xdot.name);
     xdot.causality = Causality::OUTPUT;
     xdot.der_of = find(name);
@@ -2099,7 +2114,7 @@ void DaeBuilderInternal::set_alg(const std::string& name, const MX& alg_rhs) {
   // Check if residual exists
   if (z.alg < 0) {
     // New derivative variable
-    Variable alg("alg_" + name);
+    Variable alg(-1, "alg_" + name);
     alg.v = MX::sym(alg.name);
     alg.causality = Causality::OUTPUT;
     alg.beq = alg_rhs;
@@ -2153,7 +2168,7 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
     }
 
     // Create new variable
-    Variable var(name);
+    Variable var(-1, name);
     var.v = MX::sym(name);
 
     // Read common attributes, cf. FMI 2.0.2 specification, 2.2.7

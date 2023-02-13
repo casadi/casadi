@@ -314,14 +314,14 @@ MX DaeBuilder::add_variable(const std::string& name, casadi_int n) {
 }
 
 MX DaeBuilder::add_variable(const std::string& name, const Sparsity& sp) {
-  Variable v(name);
+  Variable v(-1, name);
   v.v = MX::sym(name, sp);
   (void)add_variable(name, v);
   return v.v;
 }
 
 void DaeBuilder::add_variable(const MX& new_v) {
-  Variable v(new_v.name());
+  Variable v(-1, new_v.name());
   v.v = new_v;
   (void)add_variable(new_v.name(), v);
 }
@@ -331,13 +331,13 @@ size_t DaeBuilder::add_variable_new(const std::string& name, casadi_int n) {
 }
 
 size_t DaeBuilder::add_variable_new(const std::string& name, const Sparsity& sp) {
-  Variable v(name);
+  Variable v(-1, name);
   v.v = MX::sym(name, sp);
   return add_variable(name, v);
 }
 
 size_t DaeBuilder::add_variable_new(const MX& new_v) {
-  Variable v(new_v.name());
+  Variable v(-1, new_v.name());
   v.v = new_v;
   return add_variable(new_v.name(), v);
 }

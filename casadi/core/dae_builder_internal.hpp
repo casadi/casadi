@@ -63,7 +63,10 @@ enum class DependenciesKind {DEPENDENT, CONSTANT, FIXED, TUNABLE, DISCRETE, NUME
     \identifier{t} */
 struct CASADI_EXPORT Variable {
   /// Constructor
-  Variable(const std::string& name = "");
+  Variable(size_t index, const std::string& name);
+
+  /// @brief Location in variable vector
+  size_t index;
 
   /** Attributes common to all types of variables, cf. FMI specification */
   ///@{
@@ -302,7 +305,10 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
     return ss.str();
   }
 
-  /// Add a variable
+  /// Create a new variable
+  Variable& new_variable(const std::string& name);
+
+  /// Add a variable (to be removed)
   size_t add_variable(const std::string& name, const Variable& var);
 
   /// Check if a particular variable exists
