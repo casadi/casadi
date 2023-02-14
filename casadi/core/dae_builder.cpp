@@ -301,11 +301,11 @@ std::vector<std::string> DaeBuilder::all_variables() const {
   }
 }
 
-size_t DaeBuilder::add_variable(const std::string& name, const Variable& var) {
+Variable& DaeBuilder::new_variable(const std::string& name) {
   try {
-    return (*this)->add_variable(name, var);
+    return (*this)->new_variable(name);
   } catch (std::exception& e) {
-    THROW_ERROR("add_variable", e.what());
+    THROW_ERROR("new_variable", e.what());
   }
 }
 
@@ -314,16 +314,14 @@ MX DaeBuilder::add_variable(const std::string& name, casadi_int n) {
 }
 
 MX DaeBuilder::add_variable(const std::string& name, const Sparsity& sp) {
-  Variable v(-1, name);
+  Variable& v = new_variable(name);
   v.v = MX::sym(name, sp);
-  (void)add_variable(name, v);
   return v.v;
 }
 
 void DaeBuilder::add_variable(const MX& new_v) {
-  Variable v(-1, new_v.name());
+  Variable& v = new_variable(new_v.name());
   v.v = new_v;
-  (void)add_variable(new_v.name(), v);
 }
 
 size_t DaeBuilder::add_variable_new(const std::string& name, casadi_int n) {
@@ -331,15 +329,15 @@ size_t DaeBuilder::add_variable_new(const std::string& name, casadi_int n) {
 }
 
 size_t DaeBuilder::add_variable_new(const std::string& name, const Sparsity& sp) {
-  Variable v(-1, name);
+  Variable& v = new_variable(name);
   v.v = MX::sym(name, sp);
-  return add_variable(name, v);
+  return v.index;
 }
 
 size_t DaeBuilder::add_variable_new(const MX& new_v) {
-  Variable v(-1, new_v.name());
+  Variable& v = new_variable(new_v.name());
   v.v = new_v;
-  return add_variable(new_v.name(), v);
+  return v.index;
 }
 
 void DaeBuilder::register_t(const std::string& name) {

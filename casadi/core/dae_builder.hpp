@@ -68,7 +68,7 @@ class DaeBuilderInternal;
 class CASADI_EXPORT DaeBuilder
   : public SharedObject,
     public SWIG_IF_ELSE(PrintableCommon, Printable<DaeBuilder>) {
-public:
+ public:
 
   /// Readable name of the class
   std::string type_name() const {return "DaeBuilder";}
@@ -650,8 +650,8 @@ public:
     const std::vector<std::string>& inames) const;
 
 #ifndef SWIG
-  /// Add a variable
-  size_t add_variable(const std::string& name, const Variable& var);
+  /// Create a new variable
+  Variable& new_variable(const std::string& name);
 
   ///@{
   /// Access a variable by name
