@@ -134,7 +134,7 @@ double Variable::attribute(Attribute a) const {
       return start.front();
     case Attribute::VALUE:
       casadi_assert(numel == 1, "Not a scalar variable");
-      return valuE.front();
+      return value.front();
     default:
       break;
   }
@@ -157,7 +157,7 @@ void Variable::set_attribute(Attribute a, double val) {
       std::fill(start.begin(), start.end(), val);
       return;
     case Attribute::VALUE:
-      std::fill(valuE.begin(), valuE.end(), val);
+      std::fill(value.begin(), value.end(), val);
       return;
     default:
       break;
@@ -228,7 +228,7 @@ Variable::Variable(casadi_int index, casadi_int numel, const std::string& name, 
   der_of = -1;
   der = -1;
   alg = -1;
-  valuE.resize(numel, nan);
+  value.resize(numel, nan);
   dependency = false;
 }
 
@@ -2365,7 +2365,7 @@ Function DaeBuilderInternal::fun(const std::string& name) const {
 
 void DaeBuilderInternal::reset() {
   for (Variable* v : variables_) {
-    std::fill(v->valuE.begin(), v->valuE.end(), nan);
+    std::fill(v->value.begin(), v->value.end(), nan);
     v->stringvalue = std::string();
   }
 }

@@ -195,22 +195,22 @@ void Fmu::init(const DaeBuilderInternal* dae) {
     // Skip if the wrong type
     if (v.causality != Causality::PARAMETER && v.causality != Causality::INPUT) continue;
     // If nan - variable has not been set - keep default value
-    if (std::isnan(v.valuE.front())) continue;
+    if (std::isnan(v.value.front())) continue;
     // Value reference
     fmi2ValueReference vr = v.value_reference;
     // Get value
     switch (v.type) {
       case Type::REAL:
-        init_real_.push_back(static_cast<fmi2Real>(v.valuE.front()));
+        init_real_.push_back(static_cast<fmi2Real>(v.value.front()));
         vr_real_.push_back(vr);
         break;
       case Type::INTEGER:
       case Type::ENUM:
-        init_integer_.push_back(static_cast<fmi2Integer>(v.valuE.front()));
+        init_integer_.push_back(static_cast<fmi2Integer>(v.value.front()));
         vr_integer_.push_back(vr);
         break;
       case Type::BOOLEAN:
-        init_boolean_.push_back(static_cast<fmi2Boolean>(v.valuE.front()));
+        init_boolean_.push_back(static_cast<fmi2Boolean>(v.value.front()));
         vr_boolean_.push_back(vr);
         break;
       case Type::STRING:
