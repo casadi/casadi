@@ -66,11 +66,17 @@ struct CASADI_EXPORT Variable {
 
  private:
   /// Constructor (only accessible via DaeBuilderInternal::new_variable)
-  Variable(size_t index, const std::string& name);
+  Variable(casadi_int index, casadi_int numel, const std::string& name, const MX& v);
 
  public:
   /// @brief Location in variable vector
-  size_t index;
+  casadi_int index;
+
+  /// Number of elements - product of all dimensions
+  casadi_int numel;
+
+  /// Dimensions
+  std::vector<casadi_int> dimension;
 
   /** Attributes common to all types of variables, cf. FMI specification */
   ///@{
@@ -94,7 +100,7 @@ struct CASADI_EXPORT Variable {
   double max;
   double nominal;
   // bool unbounded;
-  double start;
+  std::vector<double> starT;
   casadi_int der_of;  // 'derivative' in FMI specification
   casadi_int der;  // corresponding derivative variable
   casadi_int alg;  // corresponding residual variable
@@ -310,7 +316,7 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   }
 
   /// Create a new variable
-  Variable& new_variable(const std::string& name);
+  Variable& new_variable(const std::string& name, casadi_int numel = 1, const MX& v = MX());
 
   /// Check if a particular variable exists
   bool has_variable(const std::string& name) const;

@@ -130,7 +130,8 @@ double Variable::attribute(Attribute a) const {
     case Attribute::NOMINAL:
       return nominal;
     case Attribute::START:
-      return start;
+      casadi_assert(numel == 1, "Not a scalar variable");
+      return starT.front();
     case Attribute::VALUE:
       return value;
     default:
@@ -152,7 +153,7 @@ void Variable::set_attribute(Attribute a, double val) {
       nominal = val;
       return;
     case Attribute::START:
-      start = val;
+      std::fill(starT.begin(), starT.end(), val);
       return;
     case Attribute::VALUE:
       value = val;
@@ -211,14 +212,23 @@ Initial Variable::default_initial(Causality causality, Variability variability) 
   return Initial::NA;
 } 
 
-Variable::Variable(size_t index, const std::string& name) : index(index), name(name),
-    value_reference(-1), description(""),
-    type(Type::REAL), causality(Causality::LOCAL), variability(Variability::CONTINUOUS),
-    unit(""), display_unit(""),
-    min(-std::numeric_limits<double>::infinity()), max(std::numeric_limits<double>::infinity()),
-    nominal(1.0), start(0.0), der_of(-1), der(-1), alg(-1), value(nan), stringvalue(),
-    dependency(false) {
-  casadi_assert(!name.empty(), "Name is empty string");
+Variable::Variable(casadi_int index, casadi_int numel, const std::string& name, const MX& v)
+    : index(index), numel(numel), name(name), v(v) {
+  // Default arguments
+  dimension = {numel};
+  value_reference = index;
+  type = Type::REAL;
+  causality = Causality::LOCAL;
+  variability = Variability::CONTINUOUS;
+  min = -std::numeric_limits<double>::infinity();
+  max = std::numeric_limits<double>::infinity(),
+  nominal = 1.0;
+  starT.resize(numel, 0.0);
+  der_of = -1;
+  der = -1;
+  alg = -1;
+  value = nan;
+  dependency = false;
 }
 
 XmlNode Variable::export_xml() const {
@@ -312,7 +322,7 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
     } else if (v.variability == Variability::CONSTANT) {
       // Named constant
       c_.push_back(k);
-      v.beq = v.start;
+      v.beq = v.starT;
     } else if (v.variability == Variability::FIXED || v.variability == Variability::TUNABLE) {
       p_.push_back(k);
     } else if (v.variability == Variability::CONTINUOUS) {
@@ -1020,14 +1030,22 @@ std::vector<std::string> DaeBuilderInternal::all_variables() const {
   return r;
 }
 
-Variable& DaeBuilderInternal::new_variable(const std::string& name) {
+Variable& DaeBuilderInternal::new_variable(const std::string& name, casadi_int numel, const MX& v) {
+  // Name check
+  casadi_assert(!name.empty(), "Name is empty string");
+  // If v is provided, make sure name and dimensions are consistent
+  if (!v.is_empty()) {
+    casadi_assert(v.is_symbolic(), "Expression not symbolic");
+    casadi_assert(name == v.name(), "Name (" + name + ") does not match expression: " + v.name());
+    casadi_assert(numel == v.numel(), "Dimension mismatch");
+  }
   // Try to find the component
   casadi_assert(!has_variable(name), "Variable \"" + name + "\" already exists.");
   // Index of the variable
   size_t ind = n_variables();
   // Add to the map of all variables
   varind_[name] = ind;
-  variables_.push_back(new Variable(ind, name));
+  variables_.push_back(new Variable(ind, numel, name, v));
   // Clear cache
   clear_cache_ = true;
   // Return reference to new variable
@@ -2183,7 +2201,7 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
       var.min = props.attribute<double>("min", -inf);
       var.max = props.attribute<double>("max", inf);
       var.nominal = props.attribute<double>("nominal", 1.);
-      var.start = props.attribute<double>("start", 0.);
+      var.set_attribute(Attribute::START, props.attribute<double>("start", 0.));
       var.der_of = props.attribute<casadi_int>("derivative", var.der_of);
     } else if (vnode.has_child("Integer")) {
       const XmlNode& props = vnode["Integer"];

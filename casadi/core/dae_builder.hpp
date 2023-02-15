@@ -526,6 +526,12 @@ class CASADI_EXPORT DaeBuilder
   void set_display_unit(const std::string& name, const std::string& val);
   ///@}
 
+  /// Get the number of elements of a variable
+  casadi_int numel(const std::string& name) const;
+
+  /// Get the dimensions of a variable
+  std::vector<casadi_int> dimension(const std::string& name) const;
+
   // The following routines are not needed in MATLAB and would cause ambiguity
   // Note that a multirow strings can be interpreted as a vector of strings
 #if !(defined(SWIG) && defined(SWIGMATLAB))
@@ -651,7 +657,7 @@ class CASADI_EXPORT DaeBuilder
 
 #ifndef SWIG
   /// Create a new variable
-  Variable& new_variable(const std::string& name);
+  Variable& new_variable(const std::string& name, casadi_int numel = 1);
 
   ///@{
   /// Access a variable by name

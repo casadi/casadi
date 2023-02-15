@@ -301,9 +301,9 @@ std::vector<std::string> DaeBuilder::all_variables() const {
   }
 }
 
-Variable& DaeBuilder::new_variable(const std::string& name) {
+Variable& DaeBuilder::new_variable(const std::string& name, casadi_int numel) {
   try {
-    return (*this)->new_variable(name);
+    return (*this)->new_variable(name, numel);
   } catch (std::exception& e) {
     THROW_ERROR("new_variable", e.what());
   }
@@ -691,6 +691,14 @@ void DaeBuilder::set_display_unit(const std::string& name, const std::string& va
   variable(name).display_unit = val;
 }
 
+casadi_int DaeBuilder::numel(const std::string& name) const {
+  return variable(name).numel;
+}
+
+std::vector<casadi_int> DaeBuilder::dimension(const std::string& name) const {
+  return variable(name).dimension;
+}
+
 void DaeBuilder::add_lc(const std::string& name,
     const std::vector<std::string>& f_out) {
   try {
@@ -1060,7 +1068,8 @@ void DaeBuilder::set_nominal(const std::vector<std::string>& name, const std::ve
 
 double DaeBuilder::start(const std::string& name) const {
   try {
-    return variable(name).start;
+    casadi_assert(numel(name) == 1, "Variable " + name + " is not scalar");
+    return variable(name).starT.front();
   } catch (std::exception& e) {
     THROW_ERROR("start", e.what());
     return 0; // never reached
@@ -1078,7 +1087,7 @@ std::vector<double> DaeBuilder::start(const std::vector<std::string>& name) cons
 
 void DaeBuilder::set_start(const std::string& name, double val) {
   try {
-    variable(name).start = val;
+    (*this)->set_attribute(Attribute::START, name, val);
   } catch (std::exception& e) {
     THROW_ERROR("set_start", e.what());
   }
