@@ -1069,7 +1069,7 @@ void DaeBuilder::set_nominal(const std::vector<std::string>& name, const std::ve
 double DaeBuilder::start(const std::string& name) const {
   try {
     casadi_assert(numel(name) == 1, "Variable " + name + " is not scalar");
-    return variable(name).starT.front();
+    return variable(name).start.front();
   } catch (std::exception& e) {
     THROW_ERROR("start", e.what());
     return 0; // never reached

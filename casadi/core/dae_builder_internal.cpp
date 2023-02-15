@@ -131,7 +131,7 @@ double Variable::attribute(Attribute a) const {
       return nominal;
     case Attribute::START:
       casadi_assert(numel == 1, "Not a scalar variable");
-      return starT.front();
+      return start.front();
     case Attribute::VALUE:
       return value;
     default:
@@ -153,7 +153,7 @@ void Variable::set_attribute(Attribute a, double val) {
       nominal = val;
       return;
     case Attribute::START:
-      std::fill(starT.begin(), starT.end(), val);
+      std::fill(start.begin(), start.end(), val);
       return;
     case Attribute::VALUE:
       value = val;
@@ -223,7 +223,7 @@ Variable::Variable(casadi_int index, casadi_int numel, const std::string& name, 
   min = -std::numeric_limits<double>::infinity();
   max = std::numeric_limits<double>::infinity(),
   nominal = 1.0;
-  starT.resize(numel, 0.0);
+  start.resize(numel, 0.0);
   der_of = -1;
   der = -1;
   alg = -1;
@@ -322,7 +322,7 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
     } else if (v.variability == Variability::CONSTANT) {
       // Named constant
       c_.push_back(k);
-      v.beq = v.starT;
+      v.beq = v.start;
     } else if (v.variability == Variability::FIXED || v.variability == Variability::TUNABLE) {
       p_.push_back(k);
     } else if (v.variability == Variability::CONTINUOUS) {

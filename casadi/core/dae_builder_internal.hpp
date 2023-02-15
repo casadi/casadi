@@ -100,7 +100,7 @@ struct CASADI_EXPORT Variable {
   double max;
   double nominal;
   // bool unbounded;
-  std::vector<double> starT;
+  std::vector<double> start;
   casadi_int der_of;  // 'derivative' in FMI specification
   casadi_int der;  // corresponding derivative variable
   casadi_int alg;  // corresponding residual variable
