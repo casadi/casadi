@@ -108,7 +108,7 @@ struct CASADI_EXPORT Variable {
   ///@}
 
   /// Numerical value (also for booleans, integers, enums)
-  double value;
+  std::vector<double> valuE;
 
   /// String value (if string-valued)
   std::string stringvalue;

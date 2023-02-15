@@ -191,25 +191,26 @@ void Fmu::init(const DaeBuilderInternal* dae) {
   init_string_.clear();
   for (size_t i = 0; i < dae->n_variables(); ++i) {
     const Variable& v = dae->variable(i);
+    casadi_assert(v.numel == 1, "Vector variable support not implemented");
     // Skip if the wrong type
     if (v.causality != Causality::PARAMETER && v.causality != Causality::INPUT) continue;
     // If nan - variable has not been set - keep default value
-    if (std::isnan(v.value)) continue;
+    if (std::isnan(v.valuE.front())) continue;
     // Value reference
     fmi2ValueReference vr = v.value_reference;
     // Get value
     switch (v.type) {
       case Type::REAL:
-        init_real_.push_back(static_cast<fmi2Real>(v.value));
+        init_real_.push_back(static_cast<fmi2Real>(v.valuE.front()));
         vr_real_.push_back(vr);
         break;
       case Type::INTEGER:
       case Type::ENUM:
-        init_integer_.push_back(static_cast<fmi2Integer>(v.value));
+        init_integer_.push_back(static_cast<fmi2Integer>(v.valuE.front()));
         vr_integer_.push_back(vr);
         break;
       case Type::BOOLEAN:
-        init_boolean_.push_back(static_cast<fmi2Boolean>(v.value));
+        init_boolean_.push_back(static_cast<fmi2Boolean>(v.valuE.front()));
         vr_boolean_.push_back(vr);
         break;
       case Type::STRING:
