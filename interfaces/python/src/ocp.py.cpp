@@ -101,10 +101,12 @@ void register_ocp(py::module_ &m) {
             return out;
         }
 
-        auto active_indices(crvec u, crvec grad_ψ, real_t γ, rvec q) {
+        auto inactive_indices(crvec u, crvec grad_ψ, real_t γ, rvec q, bool masked = true) {
             auto N                  = eval.vars.N;
             auto nu                 = eval.vars.nu();
             auto is_constr_inactive = [&](index_t t, index_t i) {
+                if (!masked)
+                    return true;
                 real_t ui = u(nu * t + i);
                 // Gradient descent step.
                 real_t gs = ui - γ * grad_ψ(t * nu + i);
@@ -141,7 +143,7 @@ void register_ocp(py::module_ &m) {
             eval.backward(storage, grad, vars.qr_mut(qr), vars.qN_mut(qr), D, D_N, μ, y);
             // Find active indices
             vec q(N * nu);
-            auto J = active_indices(u, grad, γ, q);
+            auto J = inactive_indices(u, grad, γ, q);
             // Compute dynamics Jacobians
             mat jacs = vars.create_AB();
             for (index_t t = 0; t < N; ++t)
@@ -161,6 +163,63 @@ void register_ocp(py::module_ &m) {
             lqr.solve_masked(vars.AB(jacs), Jk, q, work_2x);
             return q;
         }
+
+        auto lqr_factor_solve_QRS(crvec u, real_t γ, const py::list &Q, const py::list &R,
+                                  const py::list &S, std::optional<vec> y_, std::optional<vec> μ_,
+                                  bool masked = true) {
+            auto &vars    = eval.vars;
+            auto N        = vars.N;
+            auto nu       = vars.nu();
+            auto nx       = vars.nx();
+            auto &&[y, μ] = prepare_y_μ(std::move(y_), std::move(μ_));
+            // Compute x, h, c
+            vec storage = prepare_storage(u);
+            eval.forward_simulate(storage);
+            // Compute gradients
+            vec grad(N * nu);
+            vec qr = vars.create_qr();
+            eval.backward(storage, grad, vars.qr_mut(qr), vars.qN_mut(qr), D, D_N, μ, y);
+            // Find active indices
+            vec q(N * nu);
+            auto J = inactive_indices(u, grad, γ, q, masked);
+            // Compute dynamics Jacobians
+            mat jacs = vars.create_AB();
+            for (index_t t = 0; t < N; ++t)
+                problem->eval_jac_f(t, vars.xk(storage, t), vars.uk(storage, t), vars.ABk(jacs, t));
+            // LQR factor
+            using LQRFactor = alpaqa::StatefulLQRFactor<config_t>;
+            LQRFactor lqr{{.N = N, .nx = nx, .nu = nu}};
+            using Eigen::indexing::all;
+            bool use_cholesky = false;
+            auto uk_eq        = [&](index_t k) -> crvec { return q.segment(k * nu, nu); };
+            auto Jk           = [&](index_t k) -> crindexvec { return J.indices(k); };
+            auto Kk           = [&](index_t k) -> crindexvec { return J.compl_indices(k); };
+            auto Qk = [&](index_t k) { return [&, k](rmat out) { out += py::cast<crmat>(Q[k]); }; };
+            auto Rk = [&](index_t k) {
+                return
+                    [&, k](crindexvec mask, rmat out) { out += py::cast<crmat>(R[k])(mask, mask); };
+            };
+            auto Sk = [&](index_t k) {
+                return
+                    [&, k](crindexvec mask, rmat out) { out += py::cast<crmat>(S[k])(mask, all); };
+            };
+            auto Rk_prod = [&](index_t k) {
+                return [&, k](crindexvec mask_J, crindexvec mask_K, crvec v, rvec out) {
+                    out += py::cast<crmat>(R[k])(mask_J, mask_K) * v(mask_K);
+                };
+            };
+            auto Sk_prod = [&](index_t k) {
+                return [&, k](crindexvec mask_K, crvec v, rvec out) {
+                    out += py::cast<crmat>(S[k])(mask_K, all).transpose() * v(mask_K);
+                };
+            };
+            lqr.factor_masked(vars.AB(jacs), Qk, Rk, Sk, Rk_prod, Sk_prod, vars.q(qr), vars.r(qr),
+                              uk_eq, Jk, Kk, use_cholesky);
+            // LQR solve
+            vec work_2x(2 * nx);
+            lqr.solve_masked(vars.AB(jacs), Jk, q, work_2x);
+            return q;
+        }
     };
 
     py::class_<OCPEvaluator>(m, "OCPEvaluator")
@@ -173,7 +232,9 @@ void register_ocp(py::module_ &m) {
         .def("Rk", &OCPEvaluator::Rk, "k"_a, "u"_a, "mask"_a)
         .def("Sk", &OCPEvaluator::Sk, "k"_a, "u"_a, "mask"_a)
         .def("lqr_factor_solve", &OCPEvaluator::lqr_factor_solve, "u"_a, "γ"_a, "y"_a = py::none(),
-             "μ"_a = py::none());
+             "μ"_a = py::none())
+        .def("lqr_factor_solve_QRS", &OCPEvaluator::lqr_factor_solve_QRS, "u"_a, "γ"_a, "Q"_a,
+             "R"_a, "S"_a, "y"_a = py::none(), "μ"_a = py::none(), "masked"_a = true);
 }
 
 template void register_ocp<alpaqa::EigenConfigd>(py::module_ &);

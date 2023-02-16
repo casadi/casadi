@@ -8,6 +8,7 @@ const dict_to_struct_table_t<alpaqa::PANOCParams<Conf>>
         {"max_iter", &alpaqa::PANOCParams<Conf>::max_iter},
         {"max_time", &alpaqa::PANOCParams<Conf>::max_time},
         {"τ_min", &alpaqa::PANOCParams<Conf>::τ_min},
+        {"force_linesearch", &alpaqa::PANOCParams<Conf>::force_linesearch},
         {"β", &alpaqa::PANOCParams<Conf>::β},
         {"L_min", &alpaqa::PANOCParams<Conf>::L_min},
         {"L_max", &alpaqa::PANOCParams<Conf>::L_max},
