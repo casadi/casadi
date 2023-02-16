@@ -2224,7 +2224,7 @@ void DaeBuilderInternal::set_ode(const std::string& name, const MX& ode_rhs) {
     // New derivative variable
     Variable& xdot = new_variable("der_" + name);
     xdot.v = MX::sym(xdot.name);
-    xdot.causality = Causality::OUTPUT;
+    xdot.causality = Causality::LOCAL;
     xdot.der_of = find(name);
     xdot.beq = ode_rhs;
     variable(name).der = xdot.index;
