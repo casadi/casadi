@@ -199,7 +199,7 @@ void Fmu::init(const DaeBuilderInternal* dae) {
     // Value reference
     fmi2ValueReference vr = v.value_reference;
     // Get value
-    switch (v.type) {
+    switch (to_fmi2(v.type)) {
       case TypeFmi2::REAL:
         init_real_.push_back(static_cast<fmi2Real>(v.value.front()));
         vr_real_.push_back(vr);
@@ -236,7 +236,7 @@ void Fmu::init(const DaeBuilderInternal* dae) {
     // Convert to expected type
     fmi2ValueReference vr = v.value_reference;
     // Sort by type
-    switch (v.type) {
+    switch (to_fmi2(v.type)) {
       case TypeFmi2::REAL:
         // Real
         vn_aux_real_.push_back(v.name);

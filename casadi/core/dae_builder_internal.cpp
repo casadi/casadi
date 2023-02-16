@@ -275,7 +275,7 @@ Variable::Variable(casadi_int index, casadi_int numel, const std::string& name, 
   // Default arguments
   dimension = {numel};
   value_reference = index;
-  type = TypeFmi2::REAL;
+  type = Type::FLOAT64;
   causality = Causality::LOCAL;
   variability = Variability::CONTINUOUS;
   min = -std::numeric_limits<double>::infinity();
@@ -2265,15 +2265,15 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
       var.der_of = props.attribute<casadi_int>("derivative", var.der_of);
     } else if (vnode.has_child("Integer")) {
       const XmlNode& props = vnode["Integer"];
-      var.type = TypeFmi2::INTEGER;
+      var.type = Type::INT32;
       var.min = props.attribute<double>("min", -inf);
       var.max = props.attribute<double>("max", inf);
     } else if (vnode.has_child("Boolean")) {
-      var.type = TypeFmi2::BOOLEAN;
+      var.type = Type::BOOLEAN;
     } else if (vnode.has_child("String")) {
-      var.type = TypeFmi2::STRING;
+      var.type = Type::STRING;
     } else if (vnode.has_child("Enumeration")) {
-      var.type = TypeFmi2::ENUM;
+      var.type = Type::ENUMERATION;
     } else {
       casadi_warning("Unknown type for " + name);
     }

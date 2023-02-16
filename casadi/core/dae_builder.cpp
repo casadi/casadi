@@ -648,7 +648,12 @@ std::string DaeBuilder::type(const std::string& name) const {
 }
 
 void DaeBuilder::set_type(const std::string& name, const std::string& val) {
-  variable(name).type = to_enum<TypeFmi2>(val);
+  // Fallback to FMI 2, if necessary
+  if (has_enum<TypeFmi2>(val) && !has_enum<Type>(val)) {
+    variable(name).type = from_fmi2(to_enum<TypeFmi2>(val));
+  }
+  // Assume FMI 3
+  variable(name).type = to_enum<Type>(val);
 }
 
 std::string DaeBuilder::causality(const std::string& name) const {

@@ -87,7 +87,7 @@ struct CASADI_EXPORT Variable {
   std::string name;
   casadi_int value_reference;
   std::string description;
-  TypeFmi2 type;
+  Type type;
   Causality causality;
   Variability variability;
   Initial initial;
