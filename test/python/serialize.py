@@ -33,12 +33,13 @@ from collections import defaultdict
 
 class SerializeTests(casadiTestCase):
 
+
   def test_compat(self):
   
   
     dir = "serialize_3.5.5"
     
-    errors = set()
+    errors = {}
     
     inputs = defaultdict(list)
     outputs = defaultdict(list)
@@ -48,19 +49,26 @@ class SerializeTests(casadiTestCase):
         data = inputs if "_in" in n else outputs
         data[n.split("_")[0]].append(n)
     for fun in functions:
-      print("fun",fun)
       try:
           f = Function.load(os.path.join(dir,fun))
       except Exception as e:
-          errors.add(str(e))
-          continue
+          if "CommonExternal" in str(e):
+             continue
+          else:
+             raise e
+
       key = fun.split(".")[0]
       for in_name,out_name in zip(inputs[key],outputs[key]):
+          print(f)
           inp = f.generate_in(os.path.join(dir,in_name))
-          outp = f.generate_out(os.path.join(dir,out_name))
+          outp_ref = f.generate_out(os.path.join(dir,out_name))
+          print(inp,outp_ref)
+          outp = f.call(inp,False,False)
+          self.assertEqual(len(outp),len(outp_ref))
+          print(in_name)
+          for o,o_ref in zip(outp,outp_ref):
+            self.checkarray(o,o_ref)
+
       
-    for e in errors:
-      if "Mismatch" in e:
-        print(e)
 if __name__ == '__main__':
     unittest.main()
