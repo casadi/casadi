@@ -648,7 +648,7 @@ std::string DaeBuilder::type(const std::string& name) const {
 }
 
 void DaeBuilder::set_type(const std::string& name, const std::string& val) {
-  variable(name).type = to_enum<Type>(val);
+  variable(name).type = to_enum<TypeFmi2>(val);
 }
 
 std::string DaeBuilder::causality(const std::string& name) const {

@@ -200,20 +200,20 @@ void Fmu::init(const DaeBuilderInternal* dae) {
     fmi2ValueReference vr = v.value_reference;
     // Get value
     switch (v.type) {
-      case Type::REAL:
+      case TypeFmi2::REAL:
         init_real_.push_back(static_cast<fmi2Real>(v.value.front()));
         vr_real_.push_back(vr);
         break;
-      case Type::INTEGER:
-      case Type::ENUM:
+      case TypeFmi2::INTEGER:
+      case TypeFmi2::ENUM:
         init_integer_.push_back(static_cast<fmi2Integer>(v.value.front()));
         vr_integer_.push_back(vr);
         break;
-      case Type::BOOLEAN:
+      case TypeFmi2::BOOLEAN:
         init_boolean_.push_back(static_cast<fmi2Boolean>(v.value.front()));
         vr_boolean_.push_back(vr);
         break;
-      case Type::STRING:
+      case TypeFmi2::STRING:
         init_string_.push_back(v.stringvalue);
         vr_string_.push_back(vr);
         break;
@@ -237,23 +237,23 @@ void Fmu::init(const DaeBuilderInternal* dae) {
     fmi2ValueReference vr = v.value_reference;
     // Sort by type
     switch (v.type) {
-      case Type::REAL:
+      case TypeFmi2::REAL:
         // Real
         vn_aux_real_.push_back(v.name);
         vr_aux_real_.push_back(vr);
         break;
-      case Type::INTEGER:
-      case Type::ENUM:
+      case TypeFmi2::INTEGER:
+      case TypeFmi2::ENUM:
         // Integer or enum
         vn_aux_integer_.push_back(v.name);
         vr_aux_integer_.push_back(vr);
         break;
-      case Type::BOOLEAN:
+      case TypeFmi2::BOOLEAN:
         // Boolean
         vn_aux_boolean_.push_back(v.name);
         vr_aux_boolean_.push_back(vr);
         break;
-      case Type::STRING:
+      case TypeFmi2::STRING:
         // String
         vn_aux_string_.push_back(v.name);
         vr_aux_string_.push_back(vr);

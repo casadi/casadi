@@ -37,16 +37,20 @@ namespace casadi {
 // Forward declarations
 class XmlNode;
 
-/// Variable type
-enum class Type {REAL, INTEGER, BOOLEAN, STRING, ENUM, NUMEL};
+/// Variable type (FMI 2)
+enum class TypeFmi2 {REAL, INTEGER, BOOLEAN, STRING, ENUM, NUMEL};
 
-/// Causality: FMI 2.0 specification, section 2.2.7
+/// Variable type (FMI 3)
+enum class Type {FLOAT32, FLOAT64, INT8, UINT8, INT16, UINT16, INT32, UINT32, INT64, UINT64,
+  BOOLEAN, STRING, BINARY, ENUMERATION, CLOCK, NUMEL};
+
+/// Causality: FMI 2.0 specification, section 2.2.7 or FMI 3.0 specification, section 2.4.7.4
 enum class Causality {PARAMETER, CALCULATED_PARAMETER, INPUT, OUTPUT, LOCAL, INDEPENDENT, NUMEL};
 
-/// Variability: FMI 2.0 specification, section 2.2.7
+/// Variability: FMI 2.0 specification, section 2.2.7 or FMI 3.0 specification, section 2.4.7.4
 enum class Variability {CONSTANT, FIXED, TUNABLE, DISCRETE, CONTINUOUS, NUMEL};
 
-/// Initial: FMI 2.0 specification, section 2.2.7
+/// Initial: FMI 2.0 specification, section 2.2.7 or FMI 3.0 specification, section 2.4.7.5
 enum class Initial {EXACT, APPROX, CALCULATED, NA, NUMEL};
 
 // Attributes
@@ -83,7 +87,7 @@ struct CASADI_EXPORT Variable {
   std::string name;
   casadi_int value_reference;
   std::string description;
-  Type type;
+  TypeFmi2 type;
   Causality causality;
   Variability variability;
   Initial initial;
@@ -599,7 +603,14 @@ template<> struct enum_traits<DaeBuilderInternal::DaeBuilderInternalOut> {
 ///@}
 
 ///@{
+/// Version mappings
+CASADI_EXPORT Type from_fmi2(TypeFmi2 v);
+CASADI_EXPORT TypeFmi2 to_fmi2(Type v);
+///@}
+
+///@{
 /// Convert to string
+CASADI_EXPORT std::string to_string(TypeFmi2 v);
 CASADI_EXPORT std::string to_string(Type v);
 CASADI_EXPORT std::string to_string(Causality v);
 CASADI_EXPORT std::string to_string(Variability v);

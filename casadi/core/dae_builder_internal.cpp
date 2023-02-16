@@ -48,13 +48,70 @@ throw CasadiException("Error in DaeBuilderInternal::" FNAME " for '" + this->nam
 
 namespace casadi {
 
+Type from_fmi2(TypeFmi2 v) {
+  switch (v) {
+  case TypeFmi2::REAL: return Type::FLOAT64;
+  case TypeFmi2::INTEGER: return Type::INT32;
+  case TypeFmi2::BOOLEAN: return Type::BOOLEAN;
+  case TypeFmi2::STRING: return Type::STRING;
+  case TypeFmi2::ENUM: return Type::ENUMERATION;
+  default: break;
+  }
+  return Type::NUMEL;
+}
+
+TypeFmi2 to_fmi2(Type v) {
+  switch (v) {
+  case Type::FLOAT64: return TypeFmi2::REAL;
+  case Type::INT32: return TypeFmi2::INTEGER;
+  case Type::BOOLEAN: return TypeFmi2::BOOLEAN;
+  case Type::STRING: return TypeFmi2::STRING;
+  case Type::ENUMERATION: return TypeFmi2::ENUM;
+  case Type::FLOAT32:  // fall-through
+  case Type::INT8:  // fall-through
+  case Type::UINT8:  // fall-through
+  case Type::INT16:  // fall-through
+  case Type::UINT16:  // fall-through
+  case Type::UINT32:  // fall-through
+  case Type::INT64:  // fall-through
+  case Type::UINT64:  // fall-through
+  case Type::BINARY:  // fall-through
+  case Type::CLOCK:  // fall-through
+    casadi_error(to_string(v) + " cannot be converted to FMI 2");
+  default: break;
+  }
+  return TypeFmi2::NUMEL;
+}
+
+std::string to_string(TypeFmi2 v) {
+  switch (v) {
+  case TypeFmi2::REAL: return "real";
+  case TypeFmi2::INTEGER: return "integer";
+  case TypeFmi2::BOOLEAN: return "boolean";
+  case TypeFmi2::STRING: return "string";
+  case TypeFmi2::ENUM: return "enum";
+  default: break;
+  }
+  return "";
+}
+
 std::string to_string(Type v) {
   switch (v) {
-  case Type::REAL: return "real";
-  case Type::INTEGER: return "integer";
-  case Type::BOOLEAN: return "boolean";
-  case Type::STRING: return "string";
-  case Type::ENUM: return "enum";
+  case Type::FLOAT32: return "Float32";
+  case Type::FLOAT64: return "Float64";
+  case Type::INT8: return "Int8";
+  case Type::UINT8: return "UInt8";
+  case Type::INT16: return "Int16";
+  case Type::UINT16: return "UInt16";
+  case Type::INT32: return "Int32";
+  case Type::UINT32: return "UInt32";
+  case Type::INT64: return "Int64";
+  case Type::UINT64: return "UInt64";
+  case Type::BOOLEAN: return "Boolean";
+  case Type::STRING: return "String";
+  case Type::BINARY: return "Binary";
+  case Type::ENUMERATION: return "Enumeration";
+  case Type::CLOCK: return "Clock";
   default: break;
   }
   return "";
@@ -218,7 +275,7 @@ Variable::Variable(casadi_int index, casadi_int numel, const std::string& name, 
   // Default arguments
   dimension = {numel};
   value_reference = index;
-  type = Type::REAL;
+  type = TypeFmi2::REAL;
   causality = Causality::LOCAL;
   variability = Variability::CONTINUOUS;
   min = -std::numeric_limits<double>::infinity();
@@ -235,7 +292,9 @@ Variable::Variable(casadi_int index, casadi_int numel, const std::string& name, 
 XmlNode Variable::export_xml() const {
   // Create new XmlNode
   XmlNode r;
-  r.name = name;
+  r.name = to_string(type);
+  // Name of variable
+  r.set_attribute("name", name);
   // Value reference
   r.set_attribute("valueReference", std::to_string(value_reference));
   // Description, if any
@@ -457,7 +516,7 @@ void DaeBuilderInternal::export_fmu(const std::string& file_prefix, const Dict& 
   char sep = '/';
 #endif
   // XML file name
-  std::string xml_filename = "ModelDescription.xml";
+  std::string xml_filename = "modelDescription.xml";
   if (!file_prefix.empty()) xml_filename = file_prefix + sep + xml_filename;
   // Construct ModelDescription
   XmlNode model_description;
@@ -2206,15 +2265,15 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
       var.der_of = props.attribute<casadi_int>("derivative", var.der_of);
     } else if (vnode.has_child("Integer")) {
       const XmlNode& props = vnode["Integer"];
-      var.type = Type::INTEGER;
+      var.type = TypeFmi2::INTEGER;
       var.min = props.attribute<double>("min", -inf);
       var.max = props.attribute<double>("max", inf);
     } else if (vnode.has_child("Boolean")) {
-      var.type = Type::BOOLEAN;
+      var.type = TypeFmi2::BOOLEAN;
     } else if (vnode.has_child("String")) {
-      var.type = Type::STRING;
+      var.type = TypeFmi2::STRING;
     } else if (vnode.has_child("Enumeration")) {
-      var.type = Type::ENUM;
+      var.type = TypeFmi2::ENUM;
     } else {
       casadi_warning("Unknown type for " + name);
     }
