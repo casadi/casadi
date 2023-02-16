@@ -141,9 +141,6 @@ namespace casadi {
     // Reshape an expression
     OP_RESHAPE,
 
-    // Sparsity cast
-    OP_SPARSITY_CAST,
-
     // Submatrix reference
     OP_SUBREF,
 
@@ -198,6 +195,9 @@ namespace casadi {
     OP_BSPLINE,
 
     OP_CONVEXIFY,
+
+    // Sparsity cast
+    OP_SPARSITY_CAST,
 
     OP_LOG1P,
 
