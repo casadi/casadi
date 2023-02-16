@@ -703,6 +703,23 @@ class casadiTestCase(unittest.TestCase):
         for i in range(F.n_out()):
           self.checkarray(Fout[i],Fout2[i],digits=16)
 
+
+      if False:
+          import hashlib
+          h = hashlib.md5(F.serialize({"debug":True}).encode("ascii")).hexdigest()
+          path = "serialize_"+casadi.__version__
+          os.makedirs(path, exist_ok=True)
+          F.save(os.path.join(path,h+".casadi"),{"debug":True})
+          DM.set_precision(16)
+          h_in = hashlib.md5(str(inputs).encode("ascii")).hexdigest()
+          DM.set_precision(7)
+          if isinstance(inputs,dict):
+            inputs = F.convert_in(inputs)
+            Fout = F.convert_out(Fout)
+          F.generate_in(os.path.join(path,h+"_"+h_in+"_in.txt"),inputs)
+          F.generate_out(os.path.join(path,h+"_"+ h_in +"_out.txt"),Fout)
+
+
   def check_pure(self,F,inputs=None):
       Fout = F.call(inputs)
       Fout2 = F.call(inputs)
