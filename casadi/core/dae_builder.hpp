@@ -492,7 +492,7 @@ class CASADI_EXPORT DaeBuilder
 
   ///@{
   /// Get/set the type
-  std::string type(const std::string& name) const;
+  std::string type(const std::string& name, casadi_int fmi_version = 3) const;
   void set_type(const std::string& name, const std::string& val);
   ///@}
 

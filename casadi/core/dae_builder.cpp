@@ -643,7 +643,14 @@ void DaeBuilder::set_description(const std::string& name, const std::string& val
   variable(name).description = val;
 }
 
-std::string DaeBuilder::type(const std::string& name) const {
+std::string DaeBuilder::type(const std::string& name, casadi_int fmi_version) const {
+  // Check version
+  casadi_assert(fmi_version == 2 || fmi_version == 3, "Only FMI version 2 or 3 supported");
+  // Handle FMI 2
+  if (fmi_version == 2) {
+    return to_string(to_fmi2(variable(name).type));
+  }
+  // Assume FMI 3
   return to_string(variable(name).type);
 }
 
