@@ -260,17 +260,17 @@ auto PANOCSolver<DirectionProviderT>::operator()(
             τ_init = 0;
         }
         if (k > 0 || direction.has_initial_direction()) {
-            τ_init = 1;
-            direction.apply(curr->γ, curr->x, curr->x̂, curr->p, curr->grad_ψ,
-                            q);
-        }
-        // Make sure quasi-Newton step is valid
-        if (not q.allFinite()) {
-            if (τ_init == 1) { // If we computed a quasi-Newton step
+            τ_init = direction.apply(curr->γ, curr->x, curr->x̂, curr->p,
+                                     curr->grad_ψ, q)
+                         ? 1
+                         : 0;
+            // Make sure quasi-Newton step is valid
+            if (τ_init == 1 && not q.allFinite())
+                τ_init = 0;
+            if (τ_init != 1) { // If we computed a quasi-Newton step
                 ++s.lbfgs_failures;
                 direction.reset(); // Is there anything else we can do?
             }
-            τ_init = 0;
         }
 
         // Line search ---------------------------------------------------------
