@@ -82,7 +82,7 @@ struct CASADI_EXPORT Variable {
   /// Dimensions
   std::vector<casadi_int> dimension;
 
-  /** Attributes common to all types of variables, cf. FMI specification */
+  /** Attributes common to all types of variables, cf. Table 17 in FMI specification */
   ///@{
   std::string name;
   casadi_int value_reference;
@@ -90,26 +90,30 @@ struct CASADI_EXPORT Variable {
   Type type;
   Causality causality;
   Variability variability;
-  Initial initial;
   ///@}
 
-  /** Attributes specific to Real, cf. FMI specification */
+  /** Type specific attributes common to all types, cf. Table FMI 3.0 specification */
   ///@{
   // std::string declared_type;
-  // std::string quantity;
   std::string unit;
   std::string display_unit;
+  Initial initial;
+  // std::string quantity;
   // bool relative_quantity;
+  // bool unbounded;
   double min;
   double max;
   double nominal;
-  // bool unbounded;
   std::vector<double> start;
   casadi_int der_of;  // 'derivative' in FMI specification
-  casadi_int der;  // corresponding derivative variable
-  casadi_int alg;  // corresponding residual variable
   // bool reinit;
   ///@}
+
+  // corresponding residual variable
+  casadi_int alg;
+
+  // corresponding derivative variable
+  casadi_int der;
 
   /// Numerical value (also for booleans, integers, enums)
   std::vector<double> value;
@@ -148,7 +152,13 @@ struct CASADI_EXPORT Variable {
   static Initial default_initial(Causality causality, Variability variability);
 
   // Export as XML
-  XmlNode export_xml() const;
+  XmlNode export_xml(const DaeBuilderInternal& self) const;
+
+  // Is the variable real?
+  bool is_real() const {return type == Type::FLOAT32 || type == Type::FLOAT64;}
+
+  // Does the variable need a start attribute?
+  bool has_start() const;
 };
 
 /// \cond INTERNAL

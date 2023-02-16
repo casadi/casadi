@@ -278,8 +278,8 @@ Variable::Variable(casadi_int index, casadi_int numel, const std::string& name, 
   type = Type::FLOAT64;
   causality = Causality::LOCAL;
   variability = Variability::CONTINUOUS;
-  min = -std::numeric_limits<double>::infinity();
-  max = std::numeric_limits<double>::infinity(),
+  min = -inf;
+  max = inf,
   nominal = 1.0;
   start.resize(numel, 0.0);
   der_of = -1;
@@ -289,7 +289,7 @@ Variable::Variable(casadi_int index, casadi_int numel, const std::string& name, 
   dependency = false;
 }
 
-XmlNode Variable::export_xml() const {
+XmlNode Variable::export_xml(const DaeBuilderInternal& self) const {
   // Create new XmlNode
   XmlNode r;
   r.name = to_string(type);
@@ -300,11 +300,70 @@ XmlNode Variable::export_xml() const {
   // Description, if any
   if (!description.empty()) r.set_attribute("description", description);
   // Causality
-  r.set_attribute("causality", to_string(causality));
-  // Variability
-  r.set_attribute("variability", to_string(variability));
+  if (causality != Causality::LOCAL)
+    r.set_attribute("causality", to_string(causality));
+  // Variability (real variables are continuous by default)
+  if (!(is_real() && variability == Variability::CONTINUOUS))
+    r.set_attribute("variability", to_string(variability));
+  // Minimum attribute
+  if (min != -inf) {
+    if (is_real()) {
+      r.set_attribute("min", std::to_string(min));
+    } else {
+      r.set_attribute("min", std::to_string(static_cast<casadi_int>(min)));
+    }
+  }
+  // Maximum attribute
+  if (max != inf) {
+    if (is_real()) {
+      r.set_attribute("max", std::to_string(max));
+    } else {
+      r.set_attribute("max", std::to_string(static_cast<casadi_int>(max)));
+    }
+  }
+  // Unit
+  if (!unit.empty()) r.set_attribute("unit", unit);
+  // Display unit
+  if (!display_unit.empty()) r.set_attribute("displayUnit", display_unit);
+  // Nominal value, only for floats
+  if (is_real() && nominal != 1.) {
+      r.set_attribute("nominal", std::to_string(nominal));
+  }
+  // Start attribute, if any
+  if (has_start()) {
+    if (type == Type::BINARY || type == Type::STRING) {
+      casadi_warning("Start attribute for String, Binary not implemented.");
+    } else {
+      // Convert to string
+      std::stringstream ss;
+      for (size_t i = 0; i < start.size(); ++i) {
+        if (i > 0) ss << " ";
+        if (is_real()) {
+          ss << start.at(i);
+        } else {
+          ss << static_cast<casadi_int>(start.at(i));
+        }
+      }
+      r.set_attribute("start", ss.str());
+    }
+  }
+  // Derivative attribute, if any
+  if (der_of >= 0) {
+      r.set_attribute("derivative", std::to_string(self.variable(der_of).value_reference));
+  }
   // Return XML representation
   return r;
+}
+
+
+bool Variable::has_start() const {
+  // Rules, according to the FMI 3.0 specification, Section 2.4.7.5.
+  if (initial == Initial::EXACT || initial == Initial::APPROX) return true;
+  if (initial == Initial::CALCULATED || causality == Causality::INDEPENDENT) return false;
+  if (causality == Causality::PARAMETER) return true;
+  if (causality == Causality::INPUT) return true;
+  if (variability == Variability::CONSTANT) return true;
+  return false;
 }
 
 DaeBuilderInternal::~DaeBuilderInternal() {
@@ -496,11 +555,16 @@ XmlNode DaeBuilderInternal::generate_model_description() {
   r.set_attribute("generationDateAndTime", iso_8601_time());
   r.set_attribute("variableNamingConvention", "structured");  // flat better?
   if (fmi_major < 3) r.set_attribute("numberOfEventIndicators", "0");
+  // Model exchange marker
+  XmlNode me;
+  me.name = "ModelExchange";
+  me.set_attribute("modelIdentifier", model_name);  // sanitize name?
+  r.children.push_back(me);
   // Model variables
   XmlNode mv;
   mv.name = "ModelVariables";
   for (auto&& v : variables_) {
-    mv.children.push_back(v->export_xml());
+    mv.children.push_back(v->export_xml(*this));
   }
   r.children.push_back(mv);
   // Return the model description representation
