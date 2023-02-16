@@ -288,7 +288,7 @@ namespace casadi {
   template<bool Tr>
   void Solve<Tr>::serialize_type(SerializingStream& s) const {
     MXNode::serialize_type(s);
-    s.pack("LinsolCall::Tr", Tr);
+    s.pack("Solve::Tr", Tr);
   }
 
   template<bool Tr>
@@ -298,14 +298,14 @@ namespace casadi {
   template<bool Tr>
   MXNode* Solve<Tr>::deserialize(DeserializingStream& s) {
     bool tr;
-    s.unpack("LinsolCall::Tr", tr);
+    s.unpack("Solve::Tr", tr);
     casadi_error("Not implemented");
   }
 
   template<bool Tr>
   void LinsolCall<Tr>::serialize_body(SerializingStream& s) const {
     Solve<Tr>::serialize_body(s);
-    s.pack("LinsolCall::Linsol", linsol_);
+    s.pack("Solve::Linsol", linsol_);
   }
 
   template<bool Tr>
@@ -315,13 +315,13 @@ namespace casadi {
 
   template<bool Tr>
   LinsolCall<Tr>::LinsolCall(DeserializingStream& s) : Solve<Tr>(s) {
-    s.unpack("LinsolCall::Linsol", linsol_);
+    s.unpack("Solve::Linsol", linsol_);
   }
 
   template<bool Tr>
   MXNode* LinsolCall<Tr>::deserialize(DeserializingStream& s) {
     bool tr;
-    s.unpack("LinsolCall::Tr", tr);
+    s.unpack("Solve::Tr", tr);
 
     if (tr) {
       return new LinsolCall<true>(s);
