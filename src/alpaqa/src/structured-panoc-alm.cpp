@@ -6,6 +6,14 @@
 namespace alpaqa {
 
 // clang-format off
+ALPAQA_EXPORT_TEMPLATE(class, PANOCSolver, StructuredLBFGSDirection<DefaultConfig>);
+ALPAQA_EXPORT_TEMPLATE(class, PANOCSolver, StructuredLBFGSDirection<EigenConfigf>);
+ALPAQA_EXPORT_TEMPLATE(class, PANOCSolver, StructuredLBFGSDirection<EigenConfigd>);
+ALPAQA_EXPORT_TEMPLATE(class, PANOCSolver, StructuredLBFGSDirection<EigenConfigl>);
+#ifdef ALPAQA_WITH_QUAD_PRECISION
+ALPAQA_EXPORT_TEMPLATE(class, PANOCSolver, StructuredLBFGSDirection<EigenConfigq>);
+#endif
+
 ALPAQA_EXPORT_TEMPLATE(class, ALMSolver, PANOCSolver<StructuredLBFGSDirection<DefaultConfig>>);
 ALPAQA_EXPORT_TEMPLATE(class, ALMSolver, PANOCSolver<StructuredLBFGSDirection<EigenConfigf>>);
 ALPAQA_EXPORT_TEMPLATE(class, ALMSolver, PANOCSolver<StructuredLBFGSDirection<EigenConfigd>>);
