@@ -235,7 +235,13 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   void load_fmi_description(const std::string& filename);
 
   /// Generate FMU XML file
-  XmlNode generate_model_description();
+  XmlNode generate_model_description() const;
+
+  /// Generate FMU ModelVariables
+  XmlNode generate_model_variables() const;
+
+  /// Generate FMU ModelStructure
+  XmlNode generate_model_structure() const;
 
   /// Get current date and time in the ISO 8601 format
   static std::string iso_8601_time();

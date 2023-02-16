@@ -528,7 +528,7 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
   }
 }
 
-XmlNode DaeBuilderInternal::generate_model_description() {
+XmlNode DaeBuilderInternal::generate_model_description() const {
   casadi_warning("FMU generation is experimental")
   // Default arguments
   int fmi_major = 3;
@@ -561,13 +561,56 @@ XmlNode DaeBuilderInternal::generate_model_description() {
   me.set_attribute("modelIdentifier", model_name);  // sanitize name?
   r.children.push_back(me);
   // Model variables
-  XmlNode mv;
-  mv.name = "ModelVariables";
-  for (auto&& v : variables_) {
-    mv.children.push_back(v->export_xml(*this));
-  }
-  r.children.push_back(mv);
+  r.children.push_back(generate_model_variables());
+  // Model structure
+  r.children.push_back(generate_model_structure());
   // Return the model description representation
+  return r;
+}
+
+XmlNode DaeBuilderInternal::generate_model_variables() const {
+  XmlNode r;
+  r.name = "ModelVariables";
+  for (auto&& v : variables_) {
+    r.children.push_back(v->export_xml(*this));
+  }
+  return r;
+}
+
+XmlNode DaeBuilderInternal::generate_model_structure() const {
+  XmlNode r;
+  r.name = "ModelStructure";
+  // Add outputs
+  for (size_t y : y_) {
+    XmlNode c;
+    c.name = "Output";
+    c.set_attribute("valueReference", std::to_string(variable(y).value_reference));
+    r.children.push_back(c);
+  }
+  // Add state derivatives
+  for (size_t x : x_) {
+    XmlNode c;
+    c.name = "ContinuousStateDerivative";
+    c.set_attribute("valueReference",
+      std::to_string(variable(variable(x).der).value_reference));
+    r.children.push_back(c);
+  }
+  // Add initial unknowns: States
+  for (size_t x : x_) {
+    XmlNode c;
+    c.name = "InitialUnknown";
+    c.set_attribute("valueReference",
+      std::to_string(variable(x).value_reference));
+    r.children.push_back(c);
+  }
+  // Add initial unknowns: State derivative
+  for (size_t x : x_) {
+    XmlNode c;
+    c.name = "InitialUnknown";
+    c.set_attribute("valueReference",
+      std::to_string(variable(variable(x).der).value_reference));
+    r.children.push_back(c);
+  }
   return r;
 }
 
