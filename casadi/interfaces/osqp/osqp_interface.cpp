@@ -191,7 +191,7 @@ namespace casadi {
     data.u = get_ptr(dummy);
 
     // Setup workspace
-    if(osqp_setup(&m->work, &data, &settings_)) return 1;
+    if (osqp_setup(&m->work, &data, &settings_)) return 1;
     // if(osqp_setup(&data, &settings_)) return 1;
 
     m->fstats["preprocessing"]  = FStats();
@@ -281,7 +281,7 @@ namespace casadi {
     m->d_qp.success = m->work->info->status_val == OSQP_SOLVED;
     if (m->d_qp.success) {
       m->d_qp.unified_return_status = SOLVER_RET_SUCCESS;
-    } else if (m->work->info->status_val == OSQP_PRIMAL_INFEASIBLE || 
+    } else if (m->work->info->status_val == OSQP_PRIMAL_INFEASIBLE ||
         m->work->info->status_val == OSQP_MAX_ITER_REACHED ||
         m->work->info->status_val == OSQP_DUAL_INFEASIBLE ||
         m->work->info->status_val == OSQP_NON_CVX ||
