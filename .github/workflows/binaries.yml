@@ -790,6 +790,12 @@ jobs:
           python -c "from casadi.tools import *;loadAllCompiledPlugins()"
         shell: pwsh
         if: contains(matrix.image, 'windows')
+      - run: |
+          cd test/python
+          wget https://github.com/casadi/testbot/releases/download/perpetual/serialize_3.5.5.zip
+          unzip serialize_3.5.5.zip
+        shell: bash -el {0}
+        if: "!contains(matrix.image, 'windows') && matrix.image == '38'"
       - env:
           PYTHONPATH: ${{ github.workspace }}/casadi
         run: |

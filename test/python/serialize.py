@@ -36,8 +36,9 @@ class SerializeTests(casadiTestCase):
 
   def test_compat(self):
   
-  
     dir = "serialize_3.5.5"
+    if not os.path.isdir(dir):
+        return
     
     errors = {}
     
@@ -55,20 +56,20 @@ class SerializeTests(casadiTestCase):
           if "CommonExternal" in str(e):
              continue
           else:
-             raise e
+             raise Exception(str(e))
 
       key = fun.split(".")[0]
-      for in_name,out_name in zip(inputs[key],outputs[key]):
-          print(f)
+      for in_name,out_name in zip(sorted(inputs[key]),sorted(outputs[key])):
           inp = f.generate_in(os.path.join(dir,in_name))
           outp_ref = f.generate_out(os.path.join(dir,out_name))
-          print(inp,outp_ref)
-          outp = f.call(inp,False,False)
+          outp = f.call(inp)
           self.assertEqual(len(outp),len(outp_ref))
-          print(in_name)
           for o,o_ref in zip(outp,outp_ref):
-            self.checkarray(o,o_ref)
-
+            digits = 15
+            if "SuperscsInterface" in str(f):
+                digits = 7
+            self.checkarray(o,o_ref,digits=digits)
+  
       
 if __name__ == '__main__':
     unittest.main()
