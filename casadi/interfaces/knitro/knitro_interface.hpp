@@ -50,7 +50,7 @@ namespace casadi {
 
     // KNITRO context pointer
     KN_context *kc;
-    
+
     // KNITRO callback pointer
     CB_context *cb;
 

@@ -162,7 +162,8 @@ namespace casadi {
         mip_numthreads = op.second;
       }
     }
-    max_num_threads_ = std::max({processor_count, ms_numthreads, findiff_numthreads, numthreads, mip_numthreads});
+    max_num_threads_ = std::max({processor_count, ms_numthreads,
+                                 findiff_numthreads, numthreads, mip_numthreads});
 
     // Allocate persistent memory
     alloc_w(nx_, true); // wlbx_
@@ -276,8 +277,8 @@ namespace casadi {
 
     std::vector<int> xindex(nx_);
     std::vector<int> gindex(ng_);
-    iota (begin(xindex), end(xindex), 0);
-    iota (begin(gindex), end(gindex), 0);
+    iota(begin(xindex), end(xindex), 0);
+    iota(begin(gindex), end(gindex), 0);
 
     status = KN_add_vars(m->kc, nx_, get_ptr(xindex));
     casadi_assert(status==0, "KN_add_vars failed");
@@ -315,7 +316,8 @@ namespace casadi {
     status = KN_add_eval_callback(m->kc, true, ng_, get_ptr(gindex), &callback, &m->cb);
     casadi_assert(status==0, "KN_add_eval_callback failed");
 
-    status = KN_set_cb_grad(m->kc, m->cb, nx_, get_ptr(xindex), Jcol.size(), get_ptr(Jrow), get_ptr(Jcol), &callback);
+    status = KN_set_cb_grad(m->kc, m->cb, nx_, get_ptr(xindex),
+                            Jcol.size(), get_ptr(Jrow), get_ptr(Jcol), &callback);
     casadi_assert(status==0, "KN_set_cb_grad failed");
 
     if (nnzH>0) {
@@ -338,7 +340,7 @@ namespace casadi {
 
     // Solve NLP
     status = KN_solve(m->kc);
-    int statusKnitro = int(status);
+    int statusKnitro = staic_cast<int>(status);
 
     m->return_status = return_codes(status);
     m->success = status==KN_RC_OPTIMAL_OR_SATISFACTORY ||
@@ -360,7 +362,7 @@ namespace casadi {
     casadi_copy(get_ptr(lambda)+ng_, nx_, d_nlp->lam);
 
     d_nlp->objective = objSol;
-    
+
     // Calculate constraints
     if (ng_>0) {
       m->arg[0] = d_nlp->z;
@@ -430,7 +432,9 @@ namespace casadi {
       ml->arg[2] = &sigma;
       ml->arg[3] = lambda;
       ml->res[0] = hess;
-      if (m->self.calc_function(m, "nlp_hess_l", nullptr, thread_id)) {casadi_error("calc_hess_l failed");}
+      if (m->self.calc_function(m, "nlp_hess_l", nullptr, thread_id)) {
+        casadi_error("calc_hess_l failed");
+      }
       break;
       default:
         casadi_error("KnitroInterface::callback: unknown method");
