@@ -268,7 +268,7 @@ Initial Variable::default_initial(Causality causality, Variability variability) 
   }
   // Initial value not available
   return Initial::NA;
-} 
+}
 
 Variable::Variable(casadi_int index, casadi_int numel, const std::string& name, const MX& v)
     : index(index), numel(numel), name(name), v(v) {
@@ -1111,7 +1111,8 @@ void DaeBuilderInternal::tearing_variables(std::vector<std::string>* res,
         }
       } catch (std::exception& e) {
         // Generate warning
-        casadi_warning("Cannot process residual variable: " + v->name + ":" + std::string(e.what()));
+        casadi_warning("Cannot process residual variable: " + v->name + ":" +
+                       std::string(e.what()));
         continue;
       }
       // Add residual variable, corresponding hold variable
@@ -2654,7 +2655,8 @@ std::string DaeBuilderInternal::iso_8601_time() {
   // Get current time
   std::time_t now = std::time({});
   // Convert to ISO 8601 format and return
-  std::vector<char> buf(std::size("YYYY-MM-DDThh:mm:ssZ"));
+  std::string format = "YYYY-MM-DDThh:mm:ssZ";
+  std::vector<char> buf(format.size());
   std::strftime(&buf.front(), buf.size(), "%FT%TZ",
     std::gmtime(&now));  // NOLINT(runtime/threadsafe_fn)
   return &buf.front();
