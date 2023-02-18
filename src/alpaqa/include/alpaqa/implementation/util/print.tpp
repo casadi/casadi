@@ -118,7 +118,8 @@ void print_elem_python(auto &buf, std::complex<F> value, std::ostream &os) {
 }
 
 template <float_or_complex_float F>
-std::ostream &print_python(std::ostream &os, const Eigen::MatrixX<F> &M) {
+std::ostream &print_python(std::ostream &os, const Eigen::MatrixX<F> &M,
+                           std::string_view end) {
     os << "[[";
     std::array<char, 64> buf;
     for (decltype(M.rows()) r{}; r < M.rows(); ++r) {
@@ -129,11 +130,12 @@ std::ostream &print_python(std::ostream &os, const Eigen::MatrixX<F> &M) {
         if (r != M.rows() - 1)
             os << "],\n [";
     }
-    return os << "]]\n";
+    return os << "]]" << end;
 }
 
 template <float_or_complex_float F>
-std::ostream &print_python(std::ostream &os, const Eigen::VectorX<F> &M) {
+std::ostream &print_python(std::ostream &os, const Eigen::VectorX<F> &M,
+                           std::string_view end) {
     os << '[';
     std::array<char, 64> buf{};
     for (decltype(M.rows()) r{}; r < M.rows(); ++r) {
@@ -141,7 +143,7 @@ std::ostream &print_python(std::ostream &os, const Eigen::VectorX<F> &M) {
         if (r != M.rows() - 1)
             os << ", ";
     }
-    return os << "]\n";
+    return os << "]" << end;
 }
 
 } // namespace alpaqa

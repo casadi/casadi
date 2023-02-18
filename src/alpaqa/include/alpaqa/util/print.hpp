@@ -24,9 +24,11 @@ ALPAQA_EXPORT std::ostream &print_matlab(std::ostream &os,
 
 template <float_or_complex_float F>
 ALPAQA_EXPORT std::ostream &print_python(std::ostream &os,
-                                         const Eigen::MatrixX<F> &M);
+                                         const Eigen::MatrixX<F> &M,
+                                         std::string_view end = "\n");
 template <float_or_complex_float F>
 ALPAQA_EXPORT std::ostream &print_python(std::ostream &os,
-                                         const Eigen::VectorX<F> &M);
+                                         const Eigen::VectorX<F> &M,
+                                         std::string_view end = "\n");
 
 } // namespace alpaqa
