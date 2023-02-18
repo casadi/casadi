@@ -584,7 +584,10 @@ option(WITH_SUPERSCS "Compile the interface to SuperSCS (the source code for Sup
 add_feature_info(superscs-interface WITH_SUPERSCS "Interface to Conic solver SuperSCS.")
 
 # OSQP: An operator-splitting QP solver
-option(WITH_OSQP "Compile the interface to OSQP (the source code for OSQP is included)" OFF)
+option(WITH_OSQP "Compile the interface to OSQP" OFF)
+set(BUILD_OSQP_VERSION "v0.6.2")
+set(BUILD_OSQP_GIT_REPO "https://github.com/osqp/osqp.git")
+option(WITH_BUILD_OSQP "Build OSQP (BUILD_OSQP_VERSION=${BUILD_OSQP_VERSION}) from downloaded source (BUILD_OSQP_GIT_REPO=${BUILD_OSQP_GIT_REPO})." OFF)
 add_feature_info(osqp-interface WITH_OSQP "Interface to QP solver OSQP.")
 
 set(BUILD_EIGEN3_VERSION "3.4.0")
@@ -769,7 +772,7 @@ function(libraries2flags libraries out)
 endfunction()
 
 # Packages must be sorted from high to low in the dependency graph
-foreach(PKG HIGHS PROXQP BONMIN IPOPT CBC CLP MUMPS SPRAL METIS HPIPM BLASFEO LAPACK EIGEN3 SIMDE)
+foreach(PKG HIGHS PROXQP OSQP BONMIN IPOPT CBC CLP MUMPS SPRAL METIS HPIPM BLASFEO LAPACK EIGEN3 SIMDE)
   string(TOLOWER ${PKG} PKG_LOWER)
   if(WITH_${PKG})
     if(NOT WITH_BUILD_${PKG})
@@ -1268,6 +1271,30 @@ if(WITH_PROXQP)
   endif()
 endif()
 add_feature_info(proxqp-interface WITH_PROXQP "Interface to QP solver PROXQP.")
+
+if(WITH_OSQP)
+  if(WITH_BUILD_OSQP)
+    ExternalProject_Add(osqp-external
+        GIT_REPOSITORY ${BUILD_OSQP_GIT_REPO}
+        GIT_TAG ${BUILD_OSQP_VERSION}
+        PREFIX "${CMAKE_BINARY_DIR}/external_projects"
+        UPDATE_COMMAND ""
+        CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
+        CMAKE_ARGS -DENABLE_MKL_PARDISO=OFF -DPROFILING=OFF -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/osqp")
+    add_library(osqp SHARED IMPORTED)
+    add_dependencies(osqp osqp-external)
+    set_target_properties(osqp PROPERTIES
+       INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include/osqp"
+       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}osqp${CMAKE_SHARED_LIBRARY_SUFFIX}"
+       IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}osqp${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+    )
+    install(DIRECTORY
+      "${CMAKE_BINARY_DIR}/external_projects/include/osqp"
+      DESTINATION "${INCLUDE_PREFIX}")
+  endif()
+endif()
+add_feature_info(osqp-interface WITH_OSQP "Interface to QP solver OSQP.")
 
 # SNOPT: An SQP method
 option(WITH_SNOPT "Compile the SNOPT interface if SNOPT libraries can be found" OFF)
