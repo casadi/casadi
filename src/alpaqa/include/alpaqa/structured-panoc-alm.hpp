@@ -7,6 +7,7 @@
 namespace alpaqa {
 
 // clang-format off
+ALPAQA_EXPORT_EXTERN_TEMPLATE(class, PANOCSolver, StructuredLBFGSDirection<DefaultConfig>);
 ALPAQA_EXPORT_EXTERN_TEMPLATE(class, PANOCSolver, StructuredLBFGSDirection<EigenConfigf>);
 ALPAQA_EXPORT_EXTERN_TEMPLATE(class, PANOCSolver, StructuredLBFGSDirection<EigenConfigd>);
 ALPAQA_EXPORT_EXTERN_TEMPLATE(class, PANOCSolver, StructuredLBFGSDirection<EigenConfigl>);
