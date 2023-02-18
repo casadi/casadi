@@ -26,7 +26,3 @@ if(WITH_SUPERSCS)
   add_subdirectory(superscs)
 endif()
 
-if(WITH_OSQP)
-  add_subdirectory(osqp)
-endif()
-
