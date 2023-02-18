@@ -2373,6 +2373,15 @@ namespace casadi {
       << "return 0;\n"
       << "}\n\n";
 
+    // Also add to header file to allow getting
+     if (g.with_header) {
+      g.header
+        << "#define " << name_ << "_SZ_ARG " << sz_arg() << "\n"
+        << "#define " << name_ << "_SZ_RES " << sz_res() << "\n"
+        << "#define " << name_ << "_SZ_IW " << sz_iw() << "\n"
+        << "#define " << name_ << "_SZ_W " << sz_w() << "\n";
+     }
+
     // Which inputs are differentiable
     if (!all(is_diff_in_)) {
       g << g.declare("int " + name_ + "_diff_in(casadi_int i)") << " {\n"
