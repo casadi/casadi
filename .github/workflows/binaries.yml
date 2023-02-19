@@ -93,6 +93,7 @@ jobs:
         with:
           cache-suffix: ''
           target: ${{matrix.image == 'macos-m1' && 'arm64' || 'x86_64'}}
+      - run: brew install pkg-config
       - uses: actions/checkout@v3.3.0
         with:
           fetch-depth: 0 # for git-restore-mtime
