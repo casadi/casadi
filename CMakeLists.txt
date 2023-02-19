@@ -570,7 +570,8 @@ add_feature_info(csparse-interface WITH_CSPARSE "Interface to the sparse direct 
 # BLASFEO
 option(WITH_BLASFEO "Compile the interface to BLASFEO" OFF)
 set(BUILD_BLASFEO_VERSION "edf92b396adddd9e548b9786f87ad290a0971329")
-option(WITH_BUILD_BLASFEO "Build BLASFEO (BUILD_BLASFEO_VERSION=${BUILD_BLASFEO_VERSION}) from downloaded source." OFF)
+set(BUILD_BLASFEO_GIT_REPO "https://github.com/giaf/blasfeo.git")
+option(WITH_BUILD_BLASFEO "Build BLASFEO (BUILD_BLASFEO_VERSION=${BUILD_BLASFEO_VERSION}) from downloaded source (BUILD_BLASFEO_GIT_REPO=${BUILD_BLASFEO_GIT_REPO})." OFF)
 
 # HPIPM
 option(WITH_HPIPM "Compile the interface to HPIPM" OFF)
@@ -581,6 +582,8 @@ set(BUILD_HPIPM_DEPENDENCIES BLASFEO)
 
 # SuperSCS: An conic solver
 option(WITH_SUPERSCS "Compile the interface to SuperSCS (the source code for SuperSCS is included)" ${WITH_SUPERSCS_DEF})
+set(BUILD_SUPERSCS_VERSION "662fd0752edf608d8ebbca8ec3db1e4e9346fb13")
+set(BUILD_SUPERSCS_GIT_REPO "https://github.com/jgillis/scs.git")
 add_feature_info(superscs-interface WITH_SUPERSCS "Interface to Conic solver SuperSCS.")
 
 # OSQP: An operator-splitting QP solver
@@ -676,8 +679,9 @@ add_feature_info(blocksqp-interface WITH_BLOCKSQP "Interface to the NLP solver b
 
 # IPOPT: A sparse interior point NLP solver with filter line-search
 option(WITH_IPOPT "Compile the interface to IPOPT" ${WITH_IPOPT_DEF})
-set(BUILD_IPOPT_VERSION "3.14.4")
-option(WITH_BUILD_IPOPT "Build IPOPT (BUILD_IPOPT_VERSION=${BUILD_IPOPT_VERSION}) from downloaded source." OFF)
+set(BUILD_IPOPT_GIT_REPO "https://github.com/jgillis/Ipopt-1.git")
+set(BUILD_IPOPT_VERSION "3.14.11.mod")
+option(WITH_BUILD_IPOPT "Build IPOPT (BUILD_IPOPT_VERSION=${BUILD_IPOPT_VERSION}) from downloaded source (BUILD_IPOPT_GIT_REPO=${BUILD_IPOPT_GIT_REPO})." OFF)
 set(BUILD_IPOPT_DEPENDENCIES MUMPS)
 
 # Knitro: An NLP solver
@@ -697,36 +701,47 @@ add_feature_info(cplex-interface WITH_CPLEX "Interface to the QP solver CPLEX.")
 
 # Bonmin: An MINLP solver
 option(WITH_BONMIN "Compile the interface to BONMIN" OFF)
-set(BUILD_BONMIN_VERSION "1.8.8")
-option(WITH_BUILD_BONMIN "Build BONMIN (BUILD_BONMIN_VERSION=${BUILD_BONMIN_VERSION}) from downloaded source." OFF)
+set(BUILD_BONMIN_GIT_REPO https://github.com/coin-or/Bonmin.git)
+set(BUILD_BONMIN_VERSION "releases/1.8.8")
+option(WITH_BUILD_BONMIN "Build BONMIN (BUILD_BONMIN_VERSION=${BUILD_BONMIN_VERSION}) from downloaded source (BUILD_BONMIN_GIT_REPO=${BUILD_BONMIN_GIT_REPO})." OFF)
 set(BUILD_BONMIN_DEPENDENCIES IPOPT CBC)
 
 # CBC: A sparse mixed-integer linear solver
 option(WITH_CBC "Compile the CBC interface" OFF)
-set(BUILD_CBC_VERSION "2.10.6")
+set(BUILD_CBC_VERSION "releases/2.10.6")
+set(BUILD_CBC_GIT_REPO "https://github.com/coin-or/Cbc.git")
+
 option(WITH_BUILD_CBC "Build CBC (BUILD_CBC_VERSION=${BUILD_CBC_VERSION}) from downloaded source." OFF)
 set(BUILD_CBC_DEPENDENCIES CLP)
 
 # CLP: A sparse linear solver
 option(WITH_CLP "Compile the CLP interface" OFF)
-set(BUILD_CLP_VERSION "1.17.7")
-set(BUILD_COINUTILS_VERSION "2.11.6")
-set(BUILD_CGL_VERSION "0.60.4")
-set(BUILD_OSI_VERSION "0.108.7")
-option(WITH_BUILD_CLP "Build CLP (BUILD_CLP_VERSION=${BUILD_CLP_VERSION}) from downloaded source." OFF)
+set(BUILD_CLP_VERSION "releases/1.17.7")
+set(BUILD_CLP_GIT_REPO "https://github.com/coin-or/Clp.git")
+set(BUILD_COINUTILS_VERSION "releases/2.11.6")
+set(BUILD_COINUTILS_GIT_REPO "https://github.com/coin-or/CoinUtils.git")
+set(BUILD_CGL_VERSION "releases/0.60.4")
+set(BUILD_CGL_GIT_REPO "https://github.com/coin-or/Cgl.git")
+set(BUILD_OSI_VERSION "releases/0.108.7")
+set(BUILD_OSI_GIT_REPO "https://github.com/coin-or/Osi.git")
+
+option(WITH_BUILD_CLP "Build CLP (BUILD_CLP_VERSION=${BUILD_CLP_VERSION}) from downloaded source (BUILD_CLP_GIT_REPO=${BUILD_CLP_GIT_REPO})." OFF)
 set(BUILD_CLP_DEPENDENCIES MUMPS LAPACK)
 
 # MUMPS: Sparse direct linear solver
 option(WITH_MUMPS "Enable MUMPS interface" OFF)
-set(BUILD_MUMPS_TP_VERSION "3.0.2")
-set(BUILD_METIS_TP_VERSION "2.0.0")
-option(WITH_BUILD_MUMPS "Build MUMPS (BUILD_MUMPS_TP_VERSION=${BUILD_MUMPS_TP_VERSION}) from downloaded source." OFF)
+set(BUILD_MUMPS_TP_VERSION "releases/3.0.2")
+set(BUILD_METIS_TP_VERSION "releases/2.0.0")
+set(BUILD_METIS_TP_GIT_REPO "https://github.com/coin-or-tools/ThirdParty-Metis.git")
+set(BUILD_MUMPS_TP_GIT_REPO "https://github.com/coin-or-tools/ThirdParty-Mumps.git")
+option(WITH_BUILD_MUMPS "Build MUMPS (BUILD_MUMPS_TP_VERSION=${BUILD_MUMPS_TP_VERSION}) from downloaded source (BUILD_MUMPS_TP_GIT_REPO=${BUILD_MUMPS_TP_GIT_REPO})." OFF)
 set(BUILD_MUMPS_DEPENDENCIES LAPACK)
 
 # SPRAL
 option(WITH_SPRAL "Enable SPRAL interface" OFF)
 set(BUILD_SPRAL_VERSION "d385d2c9e858366d257cafaaf05760ffa6543e26")
-option(WITH_BUILD_SPRAL "Build SPRAL (BUILD_SPRAL_VERSION=${BUILD_SPRAL_VERSION}) from downloaded source." OFF)
+set(BUILD_SPRAL_GIT_REPO "https://github.com/ralna/spral.git")
+option(WITH_BUILD_SPRAL "Build SPRAL (BUILD_SPRAL_VERSION=${BUILD_SPRAL_VERSION}) from downloaded source (BUILD_SPRAL_GIT_REPO=${BUILD_SPRAL_GIT_REPO})." OFF)
 set(BUILD_SPRAL_DEPENDENCIES LAPACK)
 
 # HSL: Sparse direct linear solvers
@@ -772,7 +787,7 @@ function(libraries2flags libraries out)
 endfunction()
 
 # Packages must be sorted from high to low in the dependency graph
-foreach(PKG HIGHS PROXQP OSQP BONMIN IPOPT CBC CLP MUMPS SPRAL METIS HPIPM BLASFEO LAPACK EIGEN3 SIMDE)
+foreach(PKG HIGHS PROXQP OSQP SUPERSCS BONMIN IPOPT CBC CLP MUMPS SPRAL METIS HPIPM BLASFEO LAPACK EIGEN3 SIMDE)
   string(TOLOWER ${PKG} PKG_LOWER)
   if(WITH_${PKG})
     if(NOT WITH_BUILD_${PKG})
@@ -854,7 +869,7 @@ if(WITH_BLASFEO)
         set(C_FLAGS "-DCMAKE_C_FLAGS=-std=c99")
     endif()
     ExternalProject_Add(blasfeo-external
-      GIT_REPOSITORY https://github.com/giaf/blasfeo.git
+      GIT_REPOSITORY ${BUILD_BLASFEO_GIT_REPO}
       GIT_TAG ${BUILD_BLASFEO_VERSION}
       PREFIX "${CMAKE_BINARY_DIR}/external_projects"
       UPDATE_COMMAND ""
@@ -928,8 +943,8 @@ if(WITH_COINMETIS)
        set(COIN_RECONFIG_CMD)
     endif()
     ExternalProject_Add(coinmetis-external
-        GIT_REPOSITORY https://github.com/coin-or-tools/ThirdParty-Metis.git
-        GIT_TAG releases/${BUILD_METIS_TP_VERSION}
+        GIT_REPOSITORY ${BUILD_METIS_TP_GIT_REPO}
+        GIT_TAG ${BUILD_METIS_TP_VERSION}
         DEPENDS ${LAPACK_DEPENDS_TARGET}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
@@ -954,8 +969,8 @@ if(WITH_MUMPS)
     get_target_property(METIS_LIB coinmetis IMPORTED_LIBNAME)
     ExternalProject_Add(mumps-external
         DEPENDS coinmetis-external
-        GIT_REPOSITORY https://github.com/coin-or-tools/ThirdParty-Mumps.git
-        GIT_TAG releases/${BUILD_MUMPS_TP_VERSION}
+        GIT_REPOSITORY ${BUILD_MUMPS_TP_GIT_REPO}
+        GIT_TAG ${BUILD_MUMPS_TP_VERSION}
         DEPENDS ${LAPACK_DEPENDS_TARGET} coinmetis-external
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
@@ -994,7 +1009,7 @@ if(WITH_SPRAL)
     get_target_property(METIS_LIB coinmetis IMPORTED_LIBNAME)
     ExternalProject_Add(spral-external
         DEPENDS coinmetis-external
-        GIT_REPOSITORY https://github.com/ralna/spral.git
+        GIT_REPOSITORY ${BUILD_SPRAL_GIT_REPO}
         GIT_TAG ${BUILD_SPRAL_VERSION}
         DEPENDS ${LAPACK_DEPENDS_TARGET}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
@@ -1012,8 +1027,8 @@ if((WITH_CLP AND WITH_BUILD_CLP) OR (WITH_CBC AND WITH_BUILD_CBC))
     add_feature_info(coinutils-sourcebuild ON "Build COINUTILS (BUILD_COINUTILS_VERSION=${BUILD_COINUTILS_VERSION}) from downloaded source.")
     ExternalProject_Add(coinutils-external
           DEPENDS ${LAPACK_DEPENDS_TARGET}
-          GIT_REPOSITORY https://github.com/coin-or/CoinUtils.git
-          GIT_TAG releases/${BUILD_COINUTILS_VERSION}
+          GIT_REPOSITORY ${BUILD_COINUTILS_GIT_REPO}
+          GIT_TAG ${BUILD_COINUTILS_VERSION}
           PREFIX "${CMAKE_BINARY_DIR}/external_projects"
           UPDATE_COMMAND ""
           CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} "--with-lapack-lflags=${LAPACK_LFLAGS}" --prefix=<INSTALL_DIR> )
@@ -1030,8 +1045,8 @@ if(WITH_CLP)
     add_feature_info(osi-sourcebuild ON "Build OSI (BUILD_OSI_VERSION=${BUILD_OSI_VERSION}) from downloaded source.")
     ExternalProject_Add(osi-external
         DEPENDS coinutils-external
-        GIT_REPOSITORY https://github.com/coin-or/Osi.git
-        GIT_TAG releases/${BUILD_OSI_VERSION}
+        GIT_REPOSITORY ${BUILD_OSI_GIT_REPO}
+        GIT_TAG ${BUILD_OSI_VERSION}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
         CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR> ${CROSS_FLAGS_FORTRAN}
@@ -1051,8 +1066,8 @@ if(WITH_CLP)
     endif()
     ExternalProject_Add(clp-external
         DEPENDS osi-external mumps-external coinutils-external ${LAPACK_DEPENDS_TARGET}
-        GIT_REPOSITORY https://github.com/coin-or/Clp.git
-        GIT_TAG releases/${BUILD_CLP_VERSION}
+        GIT_REPOSITORY ${BUILD_CLP_GIT_REPO}
+        GIT_TAG ${BUILD_CLP_VERSION}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
         CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} "--with-lapack-lflags=${LAPACK_LFLAGS}" --prefix=<INSTALL_DIR>  ${CROSS_FLAGS_FORTRAN}
@@ -1087,8 +1102,8 @@ if(WITH_CBC)
     add_feature_info(cgl-sourcebuild ON "Build CGL (BUILD_CGL_VERSION=${BUILD_CGL_VERSION}) from downloaded source.")
     ExternalProject_Add(cgl-external
         DEPENDS osi-external clp-external coinutils-external
-        GIT_REPOSITORY https://github.com/coin-or/Cgl.git
-        GIT_TAG releases/${BUILD_CGL_VERSION}
+        GIT_REPOSITORY ${BUILD_CGL_GIT_REPO}
+        GIT_TAG ${BUILD_CGL_VERSION}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
         CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR> ${CROSS_FLAGS_FORTRAN}
@@ -1098,8 +1113,8 @@ if(WITH_CBC)
 
     ExternalProject_Add(cbc-external
         DEPENDS coinutils-external cgl-external osi-external mumps-external clp-external ${LAPACK_DEPENDS_TARGET}
-        GIT_REPOSITORY https://github.com/coin-or/Cbc.git
-        GIT_TAG releases/${BUILD_CBC_VERSION}
+        GIT_REPOSITORY ${BUILD_CBC_GIT_REPO}
+        GIT_TAG ${BUILD_CBC_VERSION}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
         CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR> "--with-lapack-lflags=${LAPACK_LFLAGS}"  ${CROSS_FLAGS_FORTRAN}
@@ -1135,11 +1150,11 @@ endif()
 if(WITH_IPOPT)
   if(WITH_BUILD_IPOPT)
     ExternalProject_Add(ipopt-external
-        DEPENDS ${LAPACK_DEPENDS_TARGET} mumps-external ${SPRAL_DEPENDS_TARGET} 
-        URL https://www.coin-or.org/download/source/Ipopt/Ipopt-${BUILD_IPOPT_VERSION}.zip
+        DEPENDS ${LAPACK_DEPENDS_TARGET} mumps-external ${SPRAL_DEPENDS_TARGET}
+        GIT_REPOSITORY ${BUILD_IPOPT_GIT_REPO}
+        GIT_TAG ${BUILD_IPOPT_VERSION}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
-        PATCH_COMMAND patch -p0 < ${CMAKE_CURRENT_SOURCE_DIR}/casadi/interfaces/ipopt/ipopt3_14.patch
         CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR> "--with-mumps-cflags=-I${CMAKE_BINARY_DIR}/external_projects/include/coin-or/mumps" "--with-mumps-lflags=-L${CMAKE_BINARY_DIR}/external_projects/lib ${WHOLE_ARCHIVE_ON}-lcoinmumps ${WHOLE_ARCHIVE_OFF}"
         ${SPRAL_FLAGS}
         "--with-lapack-lflags= ${LAPACK_LFLAGS}" ${CROSS_FLAGS_FORTRAN}
@@ -1167,8 +1182,8 @@ if(WITH_BONMIN)
   if(WITH_BUILD_BONMIN)
     ExternalProject_Add(bonmin-external
         DEPENDS mumps-external coinmetis-external coinutils-external osi-external clp-external cgl-external cbc-external ipopt-external
-        GIT_REPOSITORY https://github.com/coin-or/Bonmin.git
-        GIT_TAG releases/${BUILD_BONMIN_VERSION}
+        GIT_REPOSITORY ${BUILD_BONMIN_GIT_REPO}
+        GIT_TAG ${BUILD_BONMIN_VERSION}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
         CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} --prefix=<INSTALL_DIR>  ${CROSS_FLAGS_FORTRAN}
@@ -1257,7 +1272,6 @@ if(WITH_PROXQP)
         GIT_REPOSITORY ${BUILD_PROXQP_GIT_REPO}
         GIT_TAG ${BUILD_PROXQP_VERSION}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
-        BUILD_ALWAYS 1
         UPDATE_COMMAND ""
         CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
         CMAKE_ARGS --debug-find -DCMAKE_FIND_ROOT_PATH_MODE_PACKAGE=BOTH -DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=BOTH -DSimde_DIR=${CMAKE_BINARY_DIR}/external_projects/share/eigen3/cmake -DEigen3_DIR=${CMAKE_BINARY_DIR}/external_projects/share/eigen3/cmake -DCMAKE_PREFIX_PATH=${CMAKE_BINARY_DIR}/external_projects/include/ -DCMAKE_INCLUDE_PATH=${CMAKE_BINARY_DIR}/external_projects/include/ -DBUILD_TESTING=OFF -DBUILD_PYTHON_INTERFACE=OFF -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
@@ -1295,6 +1309,30 @@ if(WITH_OSQP)
   endif()
 endif()
 add_feature_info(osqp-interface WITH_OSQP "Interface to QP solver OSQP.")
+
+if(WITH_SUPERSCS)
+  if(WITH_BUILD_SUPERSCS)
+    ExternalProject_Add(superscs-external
+        GIT_REPOSITORY ${BUILD_SUPERSCS_GIT_REPO}
+        GIT_TAG ${BUILD_SUPERSCS_VERSION}
+        PREFIX "${CMAKE_BINARY_DIR}/external_projects"
+        UPDATE_COMMAND ""
+        CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
+        CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/superscs")
+    add_library(superscs SHARED IMPORTED)
+    add_dependencies(superscs superscs-external)
+    target_link_libraries(superscs INTERFACE lapack)
+    set_target_properties(superscs PROPERTIES
+       INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include/superscs"
+       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}superscs${CMAKE_STATIC_LIBRARY_SUFFIX}"
+    )
+    install(DIRECTORY
+      "${CMAKE_BINARY_DIR}/external_projects/include/superscs"
+      DESTINATION "${INCLUDE_PREFIX}")
+  endif()
+endif()
+add_feature_info(superscs-interface WITH_SUPERSCS "Interface to QP solver SUPERSCS.")
 
 # SNOPT: An SQP method
 option(WITH_SNOPT "Compile the SNOPT interface if SNOPT libraries can be found" OFF)
