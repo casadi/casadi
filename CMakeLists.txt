@@ -584,6 +584,7 @@ set(BUILD_HPIPM_DEPENDENCIES BLASFEO)
 option(WITH_SUPERSCS "Compile the interface to SuperSCS (the source code for SuperSCS is included)" ${WITH_SUPERSCS_DEF})
 set(BUILD_SUPERSCS_VERSION "662fd0752edf608d8ebbca8ec3db1e4e9346fb13")
 set(BUILD_SUPERSCS_GIT_REPO "https://github.com/jgillis/scs.git")
+option(WITH_BUILD_SUPERSCS "Build SuperSCS (BUILD_SUPERSCS_VERSION=${BUILD_SUPERSCS_VERSION}) from downloaded source (BUILD_SUPERSCS_GIT_REPO=${BUILD_SUPERSCS_GIT_REPO})." OFF)
 add_feature_info(superscs-interface WITH_SUPERSCS "Interface to Conic solver SuperSCS.")
 
 # OSQP: An operator-splitting QP solver
@@ -1315,6 +1316,7 @@ if(WITH_SUPERSCS)
     ExternalProject_Add(superscs-external
         GIT_REPOSITORY ${BUILD_SUPERSCS_GIT_REPO}
         GIT_TAG ${BUILD_SUPERSCS_VERSION}
+        DEPENDS ${LAPACK_DEPENDS_TARGET}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
         CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
