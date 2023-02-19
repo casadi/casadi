@@ -1765,26 +1765,30 @@ const Function& DaeBuilderInternal::oracle(bool sx, bool elim_w, bool lifted_cal
     casadi_assert(!(elim_w && lifted_calls), "Incompatible options");
     // Do we need to substitute out v
     bool subst_v = false;
-    // Collect all DAE input variables with at least one entry
-    for (casadi_int i = 0; i != DAE_BUILDER_NUM_IN; ++i) {
-      if (i == DAE_BUILDER_Y) continue;  // fixme
+    // Collect all DAE input variables
+    for (size_t i = 0; i != DAE_BUILDER_NUM_IN; ++i) {
+      if (i == DAE_BUILDER_Y) continue;  // fixme2 
+      f_in_name.push_back(to_string(static_cast<DaeBuilderInternalIn>(i)));
       v = input(static_cast<DaeBuilderInternalIn>(i));
-      if (!v.empty()) {
+      if (v.empty()) {
+        f_in.push_back(MX(0, 1));
+      } else {
         if (elim_w && i == DAE_BUILDER_W) {
           subst_v = true;
         } else {
           f_in.push_back(vertcat(v));
-          f_in_name.push_back(to_string(static_cast<DaeBuilderInternalIn>(i)));
         }
       }
     }
-    // Collect all DAE output variables with at least one entry
-    for (casadi_int i = 0; i != DAE_BUILDER_NUM_OUT; ++i) {
+    // Collect all DAE output variables
+    for (size_t i = 0; i != DAE_BUILDER_NUM_OUT; ++i) {
+      f_out_name.push_back(to_string(static_cast<DaeBuilderInternalOut>(i)));
       v = output(static_cast<DaeBuilderInternalOut>(i));
-      if (!v.empty()) {
+      if (v.empty()) {
+        f_out.push_back(MX(0, 1));
+      } else {
         if (i == DAE_BUILDER_WDEF) wdef_ind = f_out.size();
         f_out.push_back(vertcat(v));
-        f_out_name.push_back(to_string(static_cast<DaeBuilderInternalOut>(i)));
       }
     }
     // Eliminate v from inputs
