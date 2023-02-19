@@ -582,7 +582,7 @@ set(BUILD_HPIPM_DEPENDENCIES BLASFEO)
 
 # SuperSCS: An conic solver
 option(WITH_SUPERSCS "Compile the interface to SuperSCS (the source code for SuperSCS is included)" ${WITH_SUPERSCS_DEF})
-set(BUILD_SUPERSCS_VERSION "662fd0752edf608d8ebbca8ec3db1e4e9346fb13")
+set(BUILD_SUPERSCS_VERSION "4d2d1bd03ed4cf93e684a880b233760ce34ca69c")
 set(BUILD_SUPERSCS_GIT_REPO "https://github.com/jgillis/scs.git")
 option(WITH_BUILD_SUPERSCS "Build SuperSCS (BUILD_SUPERSCS_VERSION=${BUILD_SUPERSCS_VERSION}) from downloaded source (BUILD_SUPERSCS_GIT_REPO=${BUILD_SUPERSCS_GIT_REPO})." OFF)
 add_feature_info(superscs-interface WITH_SUPERSCS "Interface to Conic solver SuperSCS.")
@@ -1323,11 +1323,20 @@ if(WITH_SUPERSCS)
         CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/superscs")
     add_library(superscs STATIC IMPORTED)
-    add_dependencies(superscs superscs-external)
-    target_link_libraries(superscs INTERFACE lapack)
+    add_library(superscs-linsys STATIC IMPORTED)
+    add_library(superscs-linsys-indirect STATIC IMPORTED)    
+    add_dependencies(superscs superscs-external superscs-linsys superscs-linsys-indirect casadi)
+    target_link_libraries(superscs INTERFACE lapack superscs-linsys superscs-linsys-indirect casadi)
+    target_link_libraries(superscs-linsys-indirect INTERFACE superscs)
     set_target_properties(superscs PROPERTIES
        INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include/superscs"
        IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}superscs${CMAKE_STATIC_LIBRARY_SUFFIX}"
+    )
+    set_target_properties(superscs-linsys PROPERTIES
+       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}linsys${CMAKE_STATIC_LIBRARY_SUFFIX}"
+    )
+    set_target_properties(superscs-linsys-indirect PROPERTIES
+       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}indirect${CMAKE_STATIC_LIBRARY_SUFFIX}"
     )
     install(DIRECTORY
       "${CMAKE_BINARY_DIR}/external_projects/include/superscs"
