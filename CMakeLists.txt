@@ -1322,7 +1322,7 @@ if(WITH_SUPERSCS)
         CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
         CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/superscs")
-    add_library(superscs SHARED IMPORTED)
+    add_library(superscs STATIC IMPORTED)
     add_dependencies(superscs superscs-external)
     target_link_libraries(superscs INTERFACE lapack)
     set_target_properties(superscs PROPERTIES
