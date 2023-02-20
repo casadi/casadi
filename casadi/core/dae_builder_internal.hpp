@@ -244,7 +244,7 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   std::vector<std::string> export_fmu(const Dict& opts) const;
 
   /// Generate FMU wrapper file (fmi3Functions.c)
-  std::string generate_wrapper(const std::string& guid) const;
+  std::string generate_wrapper(const std::string& guid, const CodeGenerator& gen) const;
 
   /// Generate FMU XML file
   std::string generate_model_description(const std::string& guid) const;
@@ -361,7 +361,7 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
 
   /// Start values for all variables
   std::vector<double> start_all() const;
-  
+
   ///@{
   /// Access a variable by index
   Variable& variable(size_t ind) {return *variables_.at(ind);}

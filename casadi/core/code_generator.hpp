@@ -745,6 +745,9 @@ namespace casadi {
     /// Print file header
     static void file_close(std::ofstream& f, bool cpp);
 
+    /** \brief Get number of temporary variables needed for all functions */
+    void sz_work(size_t& sz_arg, size_t& sz_res, size_t& sz_iw, size_t& sz_w) const;
+
   private:
 
     // Generate casadi_real definition

@@ -2088,4 +2088,14 @@ namespace casadi {
     str(stride) + ", " + str(sz) + ", " + str(key_sz) + ", " + val + ")";
   }
 
+  void CodeGenerator::sz_work(size_t& sz_arg, size_t& sz_res, size_t& sz_iw, size_t& sz_w) const {
+    sz_arg = sz_res = sz_iw = sz_w = 0;
+    for (auto&& f : added_functions_) {
+      sz_arg = std::max(sz_arg, f.f.sz_arg());
+      sz_res = std::max(sz_res, f.f.sz_res());
+      sz_iw = std::max(sz_iw, f.f.sz_iw());
+      sz_w = std::max(sz_w, f.f.sz_w());
+    }
+  }
+
 } // namespace casadi

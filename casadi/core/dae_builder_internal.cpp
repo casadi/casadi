@@ -640,11 +640,14 @@ std::vector<std::string> DaeBuilderInternal::export_fmu(const Dict& opts) const 
   // Generate C code for model equations
   Dict codegen_opts;
   codegen_opts["with_header"] = true;
-  dae.generate(codegen_opts);
-  ret.push_back(dae_filename + ".c");
+  CodeGenerator gen(dae_filename, codegen_opts);
+  gen.add(dae);
+  gen.add(dae.forward(1));
+  gen.add(dae.reverse(1));
+  ret.push_back(gen.generate());
   ret.push_back(dae_filename + ".h");
   // Generate FMU wrapper file
-  std::string wrapper_filename = generate_wrapper(guid);
+  std::string wrapper_filename = generate_wrapper(guid, gen);
   ret.push_back(wrapper_filename);
   // Generate modelDescription file
   std::string xml_filename = generate_model_description(guid);
@@ -691,7 +694,7 @@ std::vector<double> DaeBuilderInternal::start_all() const {
   return r;
 }
 
-std::string DaeBuilderInternal::generate_wrapper(const std::string& guid) const {
+std::string DaeBuilderInternal::generate_wrapper(const std::string& guid, const CodeGenerator& gen) const {
   // Create file
   std::string wrapper_filename = "fmi3Functions.c";
   std::ofstream f;
@@ -708,6 +711,14 @@ std::string DaeBuilderInternal::generate_wrapper(const std::string& guid) const 
   // Memory size
   f << "#define SZ_MEM " << n_mem() << "\n";
 
+  // Work vectors sizes
+  size_t sz_arg, sz_res, sz_iw, sz_w;
+  gen.sz_work(sz_arg, sz_res, sz_iw, sz_w);
+  f << "#define SZ_ARG " << sz_arg << "\n"
+    << "#define SZ_RES " << sz_res << "\n"
+    << "#define SZ_IW " << sz_iw << "\n"
+    << "#define SZ_W " << sz_w << "\n";
+
   // Memory offsets
   f << "const size_t var_offset[N_VAR + 1] = {0";
   size_t mem_ind = 0;
@@ -722,28 +733,28 @@ std::string DaeBuilderInternal::generate_wrapper(const std::string& guid) const 
   
   // States
   f << "#define N_X " << x_.size() << "\n"
-    << "size_t x_vr[N_X] = " << generate(x_) << ";\n"
+    << "fmi3ValueReference x_vr[N_X] = " << generate(x_) << ";\n"
     << "\n";
 
   // Controls
   f << "#define N_U " << u_.size() << "\n"
-    << "size_t u_vr[N_U] = " << generate(u_) << ";\n"
+    << "fmi3ValueReference u_vr[N_U] = " << generate(u_) << ";\n"
     << "\n";
 
   // Parameters
   f << "#define N_P " << p_.size() << "\n"
-    << "size_t p_vr[N_P] = " << generate(p_) << ";\n"
+    << "fmi3ValueReference p_vr[N_P] = " << generate(p_) << ";\n"
     << "\n";
 
   // State derivatives
   std::vector<size_t> xdot;
   for (size_t v : x_) xdot.push_back(variable(v).der);
-  f << "size_t xdot_vr[N_X] = " << generate(xdot) << ";\n"
+  f << "fmi3ValueReference xdot_vr[N_X] = " << generate(xdot) << ";\n"
     << "\n";
 
   // Outputs
   f << "#define N_Y " << y_.size() << "\n"
-    << "size_t y_vr[N_Y] = " << generate(y_) << ";\n"
+    << "fmi3ValueReference y_vr[N_Y] = " << generate(y_) << ";\n"
     << "\n";
 
   // Memory structure
