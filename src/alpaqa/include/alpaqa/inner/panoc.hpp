@@ -56,6 +56,9 @@ struct PANOCParams {
         10 * std::numeric_limits<real_t>::epsilon();
     real_t linesearch_tolerance_factor =
         10 * std::numeric_limits<real_t>::epsilon();
+
+    bool update_direction_in_candidate              = false;
+    bool recompute_last_prox_step_after_lbfgs_flush = false;
 };
 
 template <Config Conf = DefaultConfig>

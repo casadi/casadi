@@ -275,10 +275,12 @@ auto PANOCSolver<DirectionProviderT>::operator()(
 
         // Line search ---------------------------------------------------------
 
-        next->γ       = curr->γ;
-        next->L       = curr->L;
-        τ             = τ_init;
-        real_t τ_prev = -1;
+        next->γ                         = curr->γ;
+        next->L                         = curr->L;
+        τ                               = τ_init;
+        real_t τ_prev                   = -1;
+        bool update_lbfgs_in_linesearch = params.update_direction_in_candidate;
+        bool update_lbfgs_later         = !update_lbfgs_in_linesearch;
 
         // xₖ₊₁ = xₖ + pₖ
         auto take_safe_step = [&] {
@@ -327,7 +329,18 @@ auto PANOCSolver<DirectionProviderT>::operator()(
                 next->L *= 2;
                 τ = τ_init;
                 ++s.stepsize_backtracks;
+                update_lbfgs_in_linesearch = false;
+                update_lbfgs_later         = true;
                 continue;
+            }
+
+            // Update L-BFGS
+            if (τ == 1 && update_lbfgs_in_linesearch) {
+                s.lbfgs_rejected += not direction.update(
+                    curr->γ, next->γ, curr->x, next->x, curr->p, next->p,
+                    curr->grad_ψ, next->grad_ψ);
+                update_lbfgs_in_linesearch = false;
+                update_lbfgs_later         = false;
             }
 
             // Line search condition
@@ -354,12 +367,19 @@ auto PANOCSolver<DirectionProviderT>::operator()(
 
         // Update L-BFGS -------------------------------------------------------
 
-        if (curr->γ != next->γ) // Flush L-BFGS if γ changed
-            direction.changed_γ(next->γ, curr->γ);
-
-        s.lbfgs_rejected +=
-            not direction.update(curr->γ, next->γ, curr->x, next->x, curr->p,
-                                 next->p, curr->grad_ψ, next->grad_ψ);
+        if (τ_init < 1 || update_lbfgs_later) {
+            if (curr->γ != next->γ) { // Flush L-BFGS if γ changed
+                direction.changed_γ(next->γ, curr->γ);
+                if (params.recompute_last_prox_step_after_lbfgs_flush) {
+                    curr->γ = next->γ;
+                    curr->L = next->L;
+                    eval_prox_grad_step(*curr);
+                }
+            }
+            s.lbfgs_rejected += not direction.update(
+                curr->γ, next->γ, curr->x, next->x, curr->p, next->p,
+                curr->grad_ψ, next->grad_ψ);
+        }
 
         // Advance step --------------------------------------------------------
         std::swap(curr, next);
