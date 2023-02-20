@@ -155,7 +155,7 @@ jobs:
       - name: Build
         run: |
           rm -f build/CMakeCache.txt
-          ./dockcross cmake -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} ${{ contains(matrix.target,'86') && env.build_flags_32bit || ''}} ${{ contains(matrix.target,'manylinux1') && env.build_flags_manylinux1 || ''}} ${{ contains(matrix.target,'windows') && env.build_flags_windows || ''}} -DCMAKE_PREFIX_PATH=${{ github.workspace }}/mockups/cmake -H.
+          ./dockcross cmake -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} ${{ contains(matrix.target,'86') && env.build_flags_32bit || ''}} ${{ contains(matrix.target,'manylinux1') && env.build_flags_manylinux1 || ''}} ${{ contains(matrix.target,'windows') && env.build_flags_windows || ''}} -DCMAKE_PREFIX_PATH=/work/mockups/cmake -H.
 
           # In MXE land, (cross).pkg-config does not listen to PKG_CONFIG_PATH straight see https://mxe.cc/#tutorial-4
           # Needed to make CoinUtils work
