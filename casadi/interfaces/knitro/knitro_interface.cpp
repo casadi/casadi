@@ -227,10 +227,10 @@ namespace casadi {
     if (nnzH>0) {
       assign_vector(hesslag_sp_.get_col(), Hcol);
       assign_vector(hesslag_sp_.get_row(), Hrow);
-      status = KN_set_int_param(m->kc, KN_PARAM_HESSOPT, KN_HESSOPT_EXACT);
+      status = KN_set_int_param_by_name(m->kc, "hessopt", KN_HESSOPT_EXACT);
       casadi_assert(status==0, "KN_set_int_param failed");
     } else {
-      status = KN_set_int_param(m->kc, KN_PARAM_HESSOPT, KN_HESSOPT_LBFGS);
+      status = KN_set_int_param_by_name(m->kc, "hessopt", KN_HESSOPT_LBFGS);
       casadi_assert(status==0, "KN_set_int_param failed");
     }
 
@@ -329,7 +329,7 @@ namespace casadi {
     casadi_assert(status==0, "KN_set_cb_user_params failed");
 
     // NumThreads to 1 to prevent segmentation fault
-    status = KN_set_int_param(m->kc, KN_PARAM_NUMTHREADS, 1);
+    status = KN_set_int_param_by_name(m->kc, "numthreads", 1);
     casadi_assert(status==0, "KN_set_cb_user_params failed");
 
     // Lagrange multipliers
