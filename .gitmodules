@@ -1,9 +1,3 @@
 [submodule "external_packages/snopt-interface/snopt-interface"]
 	path = external_packages/snopt-interface/snopt-interface
 	url = https://github.com/snopt/snopt-interface.git
-[submodule "external_packages/osqp/osqp"]
-	path = external_packages/osqp/osqp
-	url = https://github.com/oxfordcontrol/osqp.git
-[submodule "external_packages/superscs"]
-	path = external_packages/superscs
-	url = https://github.com/jgillis/scs.git
