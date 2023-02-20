@@ -306,7 +306,7 @@ namespace casadi {
     return s.str();
   }
 
-  void CodeGenerator::file_open(std::ofstream& f, const std::string& name) const {
+  void CodeGenerator::file_open(std::ofstream& f, const std::string& name, bool cpp) {
     // Open a file for writing
     f.open(name);
 
@@ -315,16 +315,16 @@ namespace casadi {
       << "   The CasADi copyright holders make no ownership claim of its contents. */\n";
 
     // C linkage
-    if (!this->cpp) {
+    if (!cpp) {
       f << "#ifdef __cplusplus\n"
         << "extern \"C\" {\n"
         << "#endif\n\n";
     }
   }
 
-  void CodeGenerator::file_close(std::ofstream& f) const {
+  void CodeGenerator::file_close(std::ofstream& f, bool cpp) {
     // C linkage
-    if (!this->cpp) {
+    if (!cpp) {
       f << "#ifdef __cplusplus\n"
         << "} /* extern \"C\" */\n"
         << "#endif\n";
@@ -390,7 +390,7 @@ namespace casadi {
     // Create c file
     std::ofstream s;
     std::string fullname = prefix + this->name + this->suffix;
-    file_open(s, fullname);
+    file_open(s, fullname, this->cpp);
 
     // Dump code to file
     dump(s);
@@ -402,12 +402,12 @@ namespace casadi {
     if (this->main) generate_main(s);
 
     // Finalize file
-    file_close(s);
+    file_close(s, this->cpp);
 
     // Generate header
     if (this->with_header) {
       // Create a header file
-      file_open(s, prefix + this->name + ".h");
+      file_open(s, prefix + this->name + ".h", this->cpp);
 
       // Define the casadi_real type (typically double)
       generate_casadi_real(s);
@@ -422,7 +422,7 @@ namespace casadi {
       s << this->header.str();
 
       // Finalize file
-      file_close(s);
+      file_close(s, this->cpp);
     }
     return fullname;
   }
@@ -1336,6 +1336,10 @@ namespace casadi {
     s << "casadi_from_mex(" << arg
       << ", " << res << ", " << sparsity(sp_res) << ", " << w << ");";
     return s.str();
+  }
+
+  std::string CodeGenerator::fmu_helpers() {
+    return casadi_fmu_str;
   }
 
   std::string CodeGenerator::constant(const std::string& v) {

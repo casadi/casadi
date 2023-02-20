@@ -234,15 +234,6 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   /// Import existing problem from FMI/XML
   void load_fmi_description(const std::string& filename);
 
-  /// Generate FMU XML file
-  XmlNode generate_model_description() const;
-
-  /// Generate FMU ModelVariables
-  XmlNode generate_model_variables() const;
-
-  /// Generate FMU ModelStructure
-  XmlNode generate_model_structure() const;
-
   /// Get current date and time in the ISO 8601 format
   static std::string iso_8601_time();
 
@@ -250,7 +241,25 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   static std::string generate_guid();
 
   /// Export instance into an FMU (experimental)
-  void export_fmu(const std::string& file_prefix, const Dict& opts);
+  std::vector<std::string> export_fmu(const Dict& opts) const;
+
+  /// Generate FMU wrapper file (fmi3Functions.c)
+  std::string generate_wrapper(const std::string& guid) const;
+
+  /// Generate FMU XML file
+  std::string generate_model_description(const std::string& guid) const;
+
+  /// Generate FMU ModelVariables
+  XmlNode generate_model_variables() const;
+
+  /// Generate FMU ModelStructure
+  XmlNode generate_model_structure() const;
+
+  ///@{
+  /// Helper function: generate constants
+  static std::string generate(const std::vector<size_t>& v);
+  static std::string generate(const std::vector<double>& v);
+  ///@}
 
   // Input convension in codegen
   enum DaeBuilderInternalIn {
@@ -347,6 +356,12 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   /// Length of variables array
   size_t n_variables() const {return variables_.size();}
 
+  /// Length of memory for all variables
+  size_t n_mem() const;
+
+  /// Start values for all variables
+  std::vector<double> start_all() const;
+  
   ///@{
   /// Access a variable by index
   Variable& variable(size_t ind) {return *variables_.at(ind);}

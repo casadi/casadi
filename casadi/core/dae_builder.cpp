@@ -227,9 +227,9 @@ void DaeBuilder::load_fmi_description(const std::string& filename) {
   }
 }
 
-void DaeBuilder::export_fmu(const std::string& file_prefix, const Dict& opts) {
+std::vector<std::string> DaeBuilder::export_fmu(const Dict& opts) {
   try {
-    (*this)->export_fmu(file_prefix, opts);
+    return (*this)->export_fmu(opts);
   } catch (std::exception& e) {
     THROW_ERROR("export_fmu", e.what());
   }

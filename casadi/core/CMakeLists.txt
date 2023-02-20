@@ -216,7 +216,7 @@ foreach(FILE ${CASADI_RUNTIME_SRC})
   set(CASADI_INTERNAL ${CASADI_INTERNAL} runtime/${FILE})
   set(RUNTIME_SRC ${RUNTIME_SRC} runtime/${FILE})
 endforeach()
-set(RUNTIME_SRC ${RUNTIME_SRC} runtime/casadi_to_mex.hpp runtime/casadi_from_mex.hpp)
+set(RUNTIME_SRC ${RUNTIME_SRC} runtime/casadi_to_mex.hpp runtime/casadi_from_mex.hpp runtime/casadi_fmu.hpp)
 
 string (REPLACE ";" "$<SEMICOLON>" ESCAPED_RUNTIME_SRC "${RUNTIME_SRC}")
 

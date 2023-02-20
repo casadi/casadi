@@ -707,6 +707,10 @@ namespace casadi {
                          const std::string& res, std::size_t res_off, const Sparsity& sp_res,
                          const std::string& w);
 
+    /** \brief FMU helper functions
+     */
+    static std::string fmu_helpers();
+
     /** \brief Printf
 
         \identifier{u5} */
@@ -734,13 +738,14 @@ namespace casadi {
     std::string cache_check(const std::string& key, const std::string& cache,
         const std::string& loc, casadi_int stride, casadi_int sz, casadi_int key_sz,
         const std::string& val);
+
+    /// Print file header
+    static void file_open(std::ofstream& f, const std::string& name, bool cpp);
+
+    /// Print file header
+    static void file_close(std::ofstream& f, bool cpp);
+
   private:
-
-    /// Print file header
-    void file_open(std::ofstream& f, const std::string& name) const;
-
-    /// Print file header
-    void file_close(std::ofstream& f) const;
 
     // Generate casadi_real definition
     void generate_casadi_real(std::ostream &s) const;

@@ -528,8 +528,7 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
   }
 }
 
-XmlNode DaeBuilderInternal::generate_model_description() const {
-  casadi_warning("FMU generation is experimental")
+std::string DaeBuilderInternal::generate_model_description(const std::string& guid) const {
   // Default arguments
   int fmi_major = 3;
   int fmi_minor = 0;
@@ -539,13 +538,13 @@ XmlNode DaeBuilderInternal::generate_model_description() const {
   std::string version;  // none
   std::string copyright;  // none
   std::string license;  // none
-  // Return object
+  // Construct XML file
   XmlNode r;
   // Preamble
   r.name = "fmiModelDescription";
   r.set_attribute("fmiVersion", std::to_string(fmi_major) + "." + std::to_string(fmi_minor));
   r.set_attribute("modelName", model_name);
-  r.set_attribute(fmi_major >= 3 ? "instantiationToken" : "guid", generate_guid());
+  r.set_attribute(fmi_major >= 3 ? "instantiationToken" : "guid", guid);
   if (!description.empty()) r.set_attribute("description", description);
   if (!author.empty()) r.set_attribute("author", author);
   if (!version.empty()) r.set_attribute("version", version);
@@ -564,8 +563,15 @@ XmlNode DaeBuilderInternal::generate_model_description() const {
   r.children.push_back(generate_model_variables());
   // Model structure
   r.children.push_back(generate_model_structure());
-  // Return the model description representation
-  return r;
+  // XML file name
+  std::string xml_filename = "modelDescription.xml";
+  // Construct ModelDescription
+  XmlNode model_description;
+  model_description.children.push_back(r);
+  // Export to file
+  XmlFile xml_file("tinyxml");
+  xml_file.dump(xml_filename, model_description);
+  return xml_filename;
 }
 
 XmlNode DaeBuilderInternal::generate_model_variables() const {
@@ -614,23 +620,138 @@ XmlNode DaeBuilderInternal::generate_model_structure() const {
   return r;
 }
 
-void DaeBuilderInternal::export_fmu(const std::string& file_prefix, const Dict& opts) {
-  (void)opts;  // unused
-  // Path separator
-#ifdef _WIN32
-  char sep = '\\';
-#else
-  char sep = '/';
-#endif
-  // XML file name
-  std::string xml_filename = "modelDescription.xml";
-  if (!file_prefix.empty()) xml_filename = file_prefix + sep + xml_filename;
-  // Construct ModelDescription
-  XmlNode model_description;
-  model_description.children.push_back(generate_model_description());
-  // Export to file
-  XmlFile xml_file("tinyxml");
-  xml_file.dump(xml_filename, model_description);
+std::vector<std::string> DaeBuilderInternal::export_fmu(const Dict& opts) const {
+  // Default options
+  bool no_warning = false;
+  for (auto&& op : opts) {
+    if (op.first == "no_warning") {
+      no_warning = op.second;
+    }
+  }
+  // Feature incomplete
+  if (!no_warning) casadi_warning("FMU generation is experimental and incomplete")
+  // Return object
+  std::vector<std::string> ret;
+  // GUID
+  std::string guid = generate_guid();
+  // Generate model function
+  std::string dae_filename = "daefun";
+  Function dae = shared_from_this<DaeBuilder>().create(dae_filename);
+  // Generate C code for model equations
+  Dict codegen_opts;
+  codegen_opts["with_header"] = true;
+  dae.generate(codegen_opts);
+  ret.push_back(dae_filename + ".c");
+  ret.push_back(dae_filename + ".h");
+  // Generate FMU wrapper file
+  std::string wrapper_filename = generate_wrapper(guid);
+  ret.push_back(wrapper_filename);
+  // Generate modelDescription file
+  std::string xml_filename = generate_model_description(guid);
+  ret.push_back(xml_filename);
+  // Return list of files
+  return ret;
+}
+
+std::string DaeBuilderInternal::generate(const std::vector<size_t>& v) {
+  std::stringstream ss;
+  ss << "{";
+  bool first = true;
+  for (double e : v) {
+    // Separator
+    if (!first) ss << ", ";
+    first = false;
+    // Print element
+    ss << e;
+  }
+  ss << "}";
+  return ss.str();
+}
+
+std::string DaeBuilderInternal::generate(const std::vector<double>& v) {
+  std::stringstream ss;
+  ss << "{";
+  bool first = true;
+  for (double e : v) {
+    // Separator
+    if (!first) ss << ", ";
+    first = false;
+    // Print element
+    ss << std::scientific << std::setprecision(std::numeric_limits<double>::digits10 + 1) << e;
+  }
+  ss << "}";
+  return ss.str();
+}
+
+std::vector<double> DaeBuilderInternal::start_all() const {
+  std::vector<double> r;
+  for (const Variable* v : variables_) {
+    for (double s : v->start) r.push_back(s);
+  }
+  return r;
+}
+
+std::string DaeBuilderInternal::generate_wrapper(const std::string& guid) const {
+  // Create file
+  std::string wrapper_filename = "fmi3Functions.c";
+  std::ofstream f;
+  CodeGenerator::file_open(f, wrapper_filename, false);
+
+  // Add includes
+  f << "#include <fmi3Functions.h>\n"
+    << "#include \"daefun.h\"\n"
+    << "\n";
+
+  // Total number of variables
+  f << "#define N_VAR " << n_variables() << "\n";
+
+  // Memory size
+  f << "#define SZ_MEM " << n_mem() << "\n";
+
+  // Memory offsets
+  f << "const size_t var_offset[N_VAR + 1] = {0";
+  size_t mem_ind = 0;
+  for (const Variable* v : variables_) {
+    mem_ind += v->numel;
+    f << ", " << mem_ind;
+  }
+  f << "};\n\n";
+
+  // Start attributes
+  f << "casadi_real start[SZ_MEM] = " << generate(start_all()) << ";\n\n";
+  
+  // States
+  f << "#define N_X " << x_.size() << "\n"
+    << "size_t x_vr[N_X] = " << generate(x_) << ";\n"
+    << "\n";
+
+  // Controls
+  f << "#define N_U " << u_.size() << "\n"
+    << "size_t u_vr[N_U] = " << generate(u_) << ";\n"
+    << "\n";
+
+  // Parameters
+  f << "#define N_P " << p_.size() << "\n"
+    << "size_t p_vr[N_P] = " << generate(p_) << ";\n"
+    << "\n";
+
+  // State derivatives
+  std::vector<size_t> xdot;
+  for (size_t v : x_) xdot.push_back(variable(v).der);
+  f << "size_t xdot_vr[N_X] = " << generate(xdot) << ";\n"
+    << "\n";
+
+  // Outputs
+  f << "#define N_Y " << y_.size() << "\n"
+    << "size_t y_vr[N_Y] = " << generate(y_) << ";\n"
+    << "\n";
+
+  // Memory structure
+  f << CodeGenerator::fmu_helpers();
+
+  // Finalize file
+  CodeGenerator::file_close(f, false);
+  return wrapper_filename;
 }
 
 Variable& DaeBuilderInternal::read_variable(const XmlNode& node) {
@@ -1196,6 +1317,12 @@ std::vector<std::string> DaeBuilderInternal::all_variables() const {
   r.reserve(n_variables());
   for (const Variable* v : variables_) r.push_back(v->name);
   return r;
+}
+
+size_t DaeBuilderInternal::n_mem() const {
+  size_t n = 0;
+  for (const Variable* v : variables_) n += v->numel;
+  return n;
 }
 
 Variable& DaeBuilderInternal::new_variable(const std::string& name, casadi_int numel, const MX& v) {
@@ -2667,6 +2794,12 @@ std::string DaeBuilderInternal::iso_8601_time() {
 }
 
 std::string DaeBuilderInternal::generate_guid() {
+  // Initialize random seed
+  static bool initialized = false;
+  if (!initialized) {
+      srand(time(nullptr));  // NOLINT(runtime/threadsafe_fn)
+    initialized = true;
+  }
   // Possible characters
   const char h[] = "0123456789abcdef";
   // Length of GUID
