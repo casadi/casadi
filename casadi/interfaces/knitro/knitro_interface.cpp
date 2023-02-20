@@ -340,7 +340,7 @@ namespace casadi {
 
     // Solve NLP
     status = KN_solve(m->kc);
-    int statusKnitro = staic_cast<int>(status);
+    int statusKnitro = static_cast<int>(status);
 
     m->return_status = return_codes(status);
     m->success = status==KN_RC_OPTIMAL_OR_SATISFACTORY ||
