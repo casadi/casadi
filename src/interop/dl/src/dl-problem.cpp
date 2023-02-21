@@ -50,6 +50,14 @@ DLProblem::DLProblem(std::string so_filename, std::string symbol_prefix,
     extra_functions = std::shared_ptr<function_dict_t>{std::move(unique_extra)};
 }
 
+auto DLProblem::eval_prox_grad_step(real_t γ, crvec x, crvec grad_ψ, rvec x̂,
+                                    rvec p) const -> real_t {
+    if (functions->eval_prox_grad_step)
+        return functions->eval_prox_grad_step(
+            instance.get(), γ, x.data(), grad_ψ.data(), x̂.data(), p.data());
+    return BoxConstrProblem<config_t>::eval_prox_grad_step(γ, x, grad_ψ, x̂, p);
+}
+
 // clang-format off
 auto DLProblem::eval_f(crvec x) const -> real_t { return functions->eval_f(instance.get(), x.data()); }
 auto DLProblem::eval_grad_f(crvec x, rvec grad_fx) const -> void { return functions->eval_grad_f(instance.get(), x.data(), grad_fx.data()); }
@@ -86,6 +94,7 @@ bool DLProblem::provides_eval_ψ() const { return functions->eval_ψ != nullptr;
 bool DLProblem::provides_eval_grad_ψ_from_ŷ() const { return functions->eval_grad_ψ_from_ŷ != nullptr; }
 bool DLProblem::provides_eval_grad_ψ() const { return functions->eval_grad_ψ != nullptr; }
 bool DLProblem::provides_eval_ψ_grad_ψ() const { return functions->eval_ψ_grad_ψ != nullptr; }
+bool DLProblem::provides_get_box_C() const { return functions->eval_prox_grad_step == nullptr; }
 // clang-format on
 
 DLControlProblem::DLControlProblem(std::string so_filename,

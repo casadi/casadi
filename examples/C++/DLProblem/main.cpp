@@ -7,7 +7,7 @@
 namespace fs = std::filesystem;
 
 // Double precision, same as in C
-USING_ALPAQA_CONFIG(alpaqa::EigenConfigd);
+USING_ALPAQA_CONFIG(alpaqa::DefaultConfig);
 
 int main(int argc, char *argv[]) {
     // Find the problem to load

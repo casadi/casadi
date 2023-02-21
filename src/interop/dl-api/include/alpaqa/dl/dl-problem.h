@@ -105,6 +105,13 @@ typedef struct {
         alpaqa_real_t *grad_ψ,
         alpaqa_real_t *work_n,
         alpaqa_real_t *work_m);
+    alpaqa_real_t (*eval_prox_grad_step)(
+        void *instance,
+        alpaqa_real_t γ,
+        const alpaqa_real_t *x,
+        const alpaqa_real_t *grad_ψ,
+        alpaqa_real_t *x̂,
+        alpaqa_real_t *p);
     // clang-format on
 } alpaqa_problem_functions_t;
 

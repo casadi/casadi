@@ -104,9 +104,9 @@ class DLLoader {
 ///
 /// @ingroup    grp_Problems
 /// @see @ref   TypeErasedProblem
-class DLProblem : private DLLoader, public BoxConstrProblem<EigenConfigd> {
+class DLProblem : private DLLoader, public BoxConstrProblem<DefaultConfig> {
   public:
-    USING_ALPAQA_CONFIG(EigenConfigd);
+    USING_ALPAQA_CONFIG(DefaultConfig);
 
     /// Load a problem from a shared library.
     DLProblem(
@@ -127,6 +127,7 @@ class DLProblem : private DLLoader, public BoxConstrProblem<EigenConfigd> {
 
   public:
     // clang-format off
+    real_t eval_prox_grad_step(real_t γ, crvec x, crvec grad_ψ, rvec x̂, rvec p) const;
     real_t eval_f(crvec x) const;
     void eval_grad_f(crvec x, rvec grad_fx) const;
     void eval_g(crvec x, rvec gx) const;
@@ -162,6 +163,7 @@ class DLProblem : private DLLoader, public BoxConstrProblem<EigenConfigd> {
     [[nodiscard]] bool provides_eval_grad_ψ_from_ŷ() const;
     [[nodiscard]] bool provides_eval_grad_ψ() const;
     [[nodiscard]] bool provides_eval_ψ_grad_ψ() const;
+    [[nodiscard]] bool provides_get_box_C() const;
     // clang-format on
 
     using instance_t = DLLoader::instance_t;
@@ -195,7 +197,7 @@ class DLProblem : private DLLoader, public BoxConstrProblem<EigenConfigd> {
 /// @see @ref   TypeErasedControlProblem
 class DLControlProblem : private DLLoader {
   public:
-    USING_ALPAQA_CONFIG(EigenConfigd);
+    USING_ALPAQA_CONFIG(DefaultConfig);
     using Box = alpaqa::Box<config_t>;
 
     /// Load a problem from a shared library.
