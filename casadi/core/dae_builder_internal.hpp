@@ -125,10 +125,10 @@ struct CASADI_EXPORT Variable {
   bool dependency;
 
   /// Dependencies
-  std::vector<casadi_int> dependencies;
+  mutable std::vector<casadi_int> dependencies;
 
   /// Dependencies
-  std::vector<DependenciesKind> dependenciesKind;
+  mutable std::vector<DependenciesKind> dependenciesKind;
 
   /// Variable expression
   MX v;
@@ -254,6 +254,9 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
 
   /// Generate FMU ModelStructure
   XmlNode generate_model_structure() const;
+
+  /// Update model variable dependencies
+  void update_dependencies() const;
 
   ///@{
   /// Helper function: generate constants

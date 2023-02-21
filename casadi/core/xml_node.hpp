@@ -65,6 +65,14 @@ struct CASADI_EXPORT XmlNode {
       \identifier{vd} */
   void set_attribute(const std::string& att_name, const std::string& att);
 
+  /** \brief Add an integer attribute */
+  void set_attribute(const std::string& att_name, casadi_int att) {
+    set_attribute(att_name, std::to_string(att));
+  }
+
+  /** \brief Add a vector attribute */
+  void set_attribute(const std::string& att_name, const std::vector<casadi_int>& att);
+
   /** \brief  Names of children
 
       \identifier{ve} */

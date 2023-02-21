@@ -587,37 +587,85 @@ XmlNode DaeBuilderInternal::generate_model_structure() const {
   XmlNode r;
   r.name = "ModelStructure";
   // Add outputs
-  for (size_t y : y_) {
+  for (size_t i : y_) {
+    const Variable& y = variable(i);
     XmlNode c;
     c.name = "Output";
-    c.set_attribute("valueReference", std::to_string(variable(y).value_reference));
-    r.children.push_back(c);
+    c.set_attribute("valueReference", y.value_reference);
+    c.set_attribute("dependencies", y.dependencies);
+ r.children.push_back(c);
   }
   // Add state derivatives
-  for (size_t x : x_) {
+  for (size_t i : x_) {
+    const Variable& xdot = variable(variable(i).der);
     XmlNode c;
     c.name = "ContinuousStateDerivative";
-    c.set_attribute("valueReference",
-      std::to_string(variable(variable(x).der).value_reference));
+    c.set_attribute("valueReference", xdot.value_reference);
+    c.set_attribute("dependencies", xdot.dependencies);
     r.children.push_back(c);
   }
-  // Add initial unknowns: States
-  for (size_t x : x_) {
+  // Add initial unknowns: Outputs
+  for (size_t i : y_) {
+    const Variable& y = variable(i);
     XmlNode c;
     c.name = "InitialUnknown";
-    c.set_attribute("valueReference",
-      std::to_string(variable(x).value_reference));
+    c.set_attribute("valueReference", y.value_reference);
+    c.set_attribute("dependencies", y.dependencies);
     r.children.push_back(c);
   }
   // Add initial unknowns: State derivative
-  for (size_t x : x_) {
+  for (size_t i : x_) {
+    const Variable& xdot = variable(variable(i).der);
     XmlNode c;
     c.name = "InitialUnknown";
-    c.set_attribute("valueReference",
-      std::to_string(variable(variable(x).der).value_reference));
+    c.set_attribute("valueReference", xdot.value_reference);
+    c.set_attribute("dependencies", xdot.dependencies);
     r.children.push_back(c);
   }
   return r;
+}
+
+void DaeBuilderInternal::update_dependencies() const {
+  // Get oracle function
+  const Function& oracle = this->oracle();
+  // Dependendencies of the ODE right-hand-side
+  Sparsity dode_dxT = oracle.jac_sparsity(oracle.index_out("ode"), oracle.index_in("x")).T();
+  Sparsity dode_duT = oracle.jac_sparsity(oracle.index_out("ode"), oracle.index_in("u")).T();
+  for (casadi_int i = 0; i < x_.size(); ++i) {
+    // Get output variable
+    const Variable& xdot = variable(variable(x_.at(i)).der);
+    // Clear dependencies
+    xdot.dependencies.clear();
+    // Dependencies on states
+    for (casadi_int k = dode_dxT.colind(i); k < dode_dxT.colind(i + 1); ++k) {
+      casadi_int j = dode_dxT.row(k);
+      xdot.dependencies.push_back(variable(x_.at(j)).value_reference);
+    }
+    // Dependencies on controls
+    for (casadi_int k = dode_duT.colind(i); k < dode_duT.colind(i + 1); ++k) {
+      casadi_int j = dode_duT.row(k);
+      xdot.dependencies.push_back(variable(u_.at(j)).value_reference);
+    }
+  }
+  // Dependendencies of the output function
+  Sparsity dydef_dxT = oracle.jac_sparsity(oracle.index_out("ydef"), oracle.index_in("x")).T();
+  Sparsity dydef_duT = oracle.jac_sparsity(oracle.index_out("ydef"), oracle.index_in("u")).T();
+  for (casadi_int i = 0; i < y_.size(); ++i) {
+    // Get output variable
+    const Variable& y = variable(y_.at(i));
+    // Clear dependencies
+    y.dependencies.clear();
+    // Dependencies on states
+    for (casadi_int k = dydef_dxT.colind(i); k < dydef_dxT.colind(i + 1); ++k) {
+      casadi_int j = dydef_dxT.row(k);
+      y.dependencies.push_back(variable(x_.at(j)).value_reference);
+    }
+    // Dependencies on controls
+    for (casadi_int k = dydef_duT.colind(i); k < dydef_duT.colind(i + 1); ++k) {
+      casadi_int j = dydef_duT.row(k);
+      y.dependencies.push_back(variable(u_.at(j)).value_reference);
+    }
+  }
 }
 
 std::vector<std::string> DaeBuilderInternal::export_fmu(const Dict& opts) const {
@@ -646,6 +694,8 @@ std::vector<std::string> DaeBuilderInternal::export_fmu(const Dict& opts) const 
   gen.add(dae.reverse(1));
   ret.push_back(gen.generate());
   ret.push_back(dae_filename + ".h");
+  // Make sure dependencies are up-to-date
+  update_dependencies();
   // Generate FMU wrapper file
   std::string wrapper_filename = generate_wrapper(guid, gen);
   ret.push_back(wrapper_filename);

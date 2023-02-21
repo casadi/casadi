@@ -61,6 +61,15 @@ void XmlNode::set_attribute(const std::string& attribute_name, const std::string
   this->attributes[attribute_name] = attribute;
 }
 
+void XmlNode::set_attribute(const std::string& att_name, const std::vector<casadi_int>& att) {
+  std::stringstream ss;
+  if (!att.empty()) {
+    ss << att.at(0);
+    for (size_t i = 1; i < att.size(); ++i) ss << " " << att.at(i);
+  }
+  return set_attribute(att_name, ss.str());
+}
+
 std::ostream& operator<<(std::ostream &stream, const XmlNode& node) {
   node.dump(stream);
   return stream;
