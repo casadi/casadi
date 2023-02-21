@@ -2,9 +2,11 @@ find_package(Eigen3 REQUIRED)
 
 function(alpaqa_configure_visibility target)
     set_target_properties(${target} PROPERTIES CXX_VISIBILITY_PRESET "hidden"
+                                               C_VISIBILITY_PRESET "hidden"
                                                VISIBILITY_INLINES_HIDDEN true)
     if (CMAKE_SYSTEM_NAME MATCHES "Linux")
-        target_link_options(${target} PRIVATE "LINKER:--exclude-libs,ALL")
+        target_link_options(${target} PRIVATE
+            $<$<LINK_LANGUAGE:C,CXX>:LINKER:--exclude-libs,ALL>)
     endif()
 endfunction()
 
