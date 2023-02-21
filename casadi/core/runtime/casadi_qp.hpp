@@ -1090,18 +1090,18 @@ int casadi_qp_prepare(casadi_qp_data<T1>* d) {
   // Termination message
   if (!d->sing && d->index == -1) {
     d->status = QP_SUCCESS;
-    d->msg = "Converged";
-    d->msg_ind = -2;
+    //d->msg = "Converged";
+    //d->msg_ind = -2;
     return 1;
   } else if (d->iter >= p->max_iter) {
     d->status = QP_MAX_ITER;
-    d->msg = "Max iter";
-    d->msg_ind = -2;
+    //d->msg = "Max iter";
+    //d->msg_ind = -2;
     return 1;
   } else if (!d->sing && d->ipr < 0 && d->idu < 0) {
     d->status = QP_SUCCESS;
-    d->msg = "No primal or dual error";
-    d->msg_ind = -2;
+    //d->msg = "No primal or dual error";
+    //d->msg_ind = -2;
     return 1;
   } else {
     // Keep iterating
@@ -1135,9 +1135,9 @@ template<typename T1>
 int casadi_qp_print_header(casadi_qp_data<T1>* d, char* buf, size_t buf_sz) {
   int flag;
   // Print to string
-  flag = snprintf(buf, buf_sz, "%5s %5s %9s %9s %5s %9s %5s %9s %5s %9s %5s %9s  %4s",
+  flag = snprintf(buf, buf_sz, "%5s %5s %9s %9s %5s %9s %5s %9s %5s %9s  %4s",
           "Iter", "Sing", "fk", "|pr|", "con", "|du|", "var", "|co|", "var",
-          "min_R", "con", "last_tau", "Note");
+          "last_tau", "Note");
   // Check if error
   if (flag < 0) {
     d->status = QP_PRINTING_ERROR;
@@ -1204,12 +1204,12 @@ int casadi_qp_print_iteration(casadi_qp_data<T1>* d, char* buf, int buf_sz) {
   int flag;
   // Print iteration data without note to string
   flag = snprintf(buf, buf_sz,
-    "%5d %5d %9.2g %9.2g %5d %9.2g %5d %9.2g %5d %9.2g %5d %9.2g  ",
+    "%5d %5d %9.2g %9.2g %5d %9.2g %5d %9.2g %5d %9.2g  ",
     static_cast<int>(d->iter), static_cast<int>(d->sing), d->f,
     d->pr, static_cast<int>(d->ipr),
     d->du, static_cast<int>(d->idu),
     d->co, static_cast<int>(d->ico),
-    d->mina, static_cast<int>(d->imina), d->tau);
+    d->tau);
   // Check if error
   if (flag < 0) {
     d->status = QP_PRINTING_ERROR;

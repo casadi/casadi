@@ -130,13 +130,13 @@ if(WITH_SUNDIALS AND WITH_CSPARSE)
   target_link_libraries(implicit_runge-kutta casadi)
 endif()
 
-if (WITH_QPOASES)
+#if (WITH_QPOASES)
   add_executable(chain_qp chain_qp.cpp)
   target_link_libraries(chain_qp casadi)
 
   add_executable(lowlevel_qp lowlevel_qp.cpp)
   target_link_libraries(lowlevel_qp casadi)
-endif()
+#endif()
 
 if(WITH_BLOCKSQP)
   add_executable(test_blocksqp test_blocksqp.cpp)

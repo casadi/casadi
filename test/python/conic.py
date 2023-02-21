@@ -30,53 +30,53 @@ from helpers import *
 conics = []
 extralibs = []
 
-if has_nlpsol("ipopt"):
-  ipopt_options = {"fixed_variable_treatment":"relax_bounds",
-                   "jac_c_constant":"yes",
-                   "jac_d_constant":"yes",
-                   "hessian_constant":"yes",
-                   "tol":1e-12,
-                   "print_level":0}
-  conics.append(("nlpsol",{"nlpsol":"ipopt", "nlpsol_options.ipopt": ipopt_options},{"quadratic": True, "dual": True, "soc": False, "codegen": False, "discrete": False, "sos":False}))
+# if has_nlpsol("ipopt"):
+#   ipopt_options = {"fixed_variable_treatment":"relax_bounds",
+#                    "jac_c_constant":"yes",
+#                    "jac_d_constant":"yes",
+#                    "hessian_constant":"yes",
+#                    "tol":1e-12,
+#                    "print_level":0}
+#   conics.append(("nlpsol",{"nlpsol":"ipopt", "nlpsol_options.ipopt": ipopt_options},{"quadratic": True, "dual": True, "soc": False, "codegen": False, "discrete": False, "sos":False}))
 
-if has_nlpsol("worhp"):
-  worhp_options = {"TolOpti":1e-13}
-  conics.append(("nlpsol",{"nlpsol":"worhp", "nlpsol_options.worhp": worhp_options},{"less_digits":1,"quadratic": True, "dual": False, "soc": False, "codegen": False, "discrete": False, "sos":False}))
+# if has_nlpsol("worhp"):
+#   worhp_options = {"TolOpti":1e-13}
+#   conics.append(("nlpsol",{"nlpsol":"worhp", "nlpsol_options.worhp": worhp_options},{"less_digits":1,"quadratic": True, "dual": False, "soc": False, "codegen": False, "discrete": False, "sos":False}))
 
-if has_conic("ooqp"):
-  conics.append(("ooqp",{},{"less_digits":1,"quadratic": True, "dual": True, "soc": False, "codegen": False, "discrete": False, "sos":False}))
-
-
-if has_conic("qpoases"):
-  conics.append(("qpoases",{"printLevel":"low"},{"quadratic": True, "dual": True, "soc": False, "codegen": False,"discrete": False, "sos":False}))
+# if has_conic("ooqp"):
+#   conics.append(("ooqp",{},{"less_digits":1,"quadratic": True, "dual": True, "soc": False, "codegen": False, "discrete": False, "sos":False}))
 
 
-if has_conic("cplex"):
-  conics.append(("cplex",{"cplex": {"CPX_PARAM_BARQCPEPCOMP": 1e-11,"CPX_PARAM_BAREPCOMP":1e-11}},{"quadratic": True, "dual": True, "soc": True, "codegen": False, "discrete": True, "sos": True}))
+# if has_conic("qpoases"):
+#   conics.append(("qpoases",{"printLevel":"low"},{"quadratic": True, "dual": True, "soc": False, "codegen": False,"discrete": False, "sos":False}))
 
-if has_conic("osqp"):
-  extralibs.append("osqp")
-  options = ["-Wno-unused-variable"]
-  if os.name=='nt':
-    options = []
-  conics.append(("osqp",{"osqp":{"alpha":1,"eps_abs":1e-8,"eps_rel":1e-8}},{"quadratic": True, "dual": True, "codegen": options,"soc":False,"discrete":False}))
 
-if has_conic("superscs"):
-  conics.append(("superscs",{"superscs": {"eps":1e-9,"do_super_scs":1, "verbose":0}},{"quadratic": True, "dual": False, "codegen": False,"soc":True,"discrete":False}))
+# if has_conic("cplex"):
+#   conics.append(("cplex",{"cplex": {"CPX_PARAM_BARQCPEPCOMP": 1e-11,"CPX_PARAM_BAREPCOMP":1e-11}},{"quadratic": True, "dual": True, "soc": True, "codegen": False, "discrete": True, "sos": True}))
 
-# No solution for licensing on travis
+# if has_conic("osqp"):
+#   extralibs.append("osqp")
+#   options = ["-Wno-unused-variable"]
+#   if os.name=='nt':
+#     options = []
+#   conics.append(("osqp",{"osqp":{"alpha":1,"eps_abs":1e-8,"eps_rel":1e-8}},{"quadratic": True, "dual": True, "codegen": options,"soc":False,"discrete":False}))
 
-if "SKIP_GUROBI_TESTS" not in os.environ and has_conic("gurobi"):
-  conics.append(("gurobi",{"gurobi": {"BarQCPConvTol":1e-10}},{"quadratic": True, "dual": False, "soc": True, "codegen": False,"discrete":True,"sos":True}))
+# if has_conic("superscs"):
+#   conics.append(("superscs",{"superscs": {"eps":1e-9,"do_super_scs":1, "verbose":0}},{"quadratic": True, "dual": False, "codegen": False,"soc":True,"discrete":False}))
 
-# if has_conic("sqic"):
-#   conics.append(("sqic",{},{}))
+# # No solution for licensing on travis
 
-if has_conic("clp"):
-  conics.append(("clp",{"verbose":True},{"quadratic": False, "dual": True, "soc": False, "codegen": False, "discrete": False, "sos":False}))
+# if "SKIP_GUROBI_TESTS" not in os.environ and has_conic("gurobi"):
+#   conics.append(("gurobi",{"gurobi": {"BarQCPConvTol":1e-10}},{"quadratic": True, "dual": False, "soc": True, "codegen": False,"discrete":True,"sos":True}))
 
-if has_conic("cbc"):
-  conics.append(("cbc",{"verbose":True},{"quadratic": False, "dual": True, "soc": False, "codegen": False, "discrete": True, "sos":True}))
+# # if has_conic("sqic"):
+# #   conics.append(("sqic",{},{}))
+
+# if has_conic("clp"):
+#   conics.append(("clp",{"verbose":True},{"quadratic": False, "dual": True, "soc": False, "codegen": False, "discrete": False, "sos":False}))
+
+# if has_conic("cbc"):
+#   conics.append(("cbc",{"verbose":True},{"quadratic": False, "dual": True, "soc": False, "codegen": False, "discrete": True, "sos":True}))
 
 if has_conic("qrqp"):
   conics.append(("qrqp",{"max_iter":20,"print_header":False,"print_iter":False},{"quadratic": True, "dual": True, "soc": False, "codegen": True, "discrete": False, "sos":False}))
