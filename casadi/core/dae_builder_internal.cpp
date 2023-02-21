@@ -694,7 +694,8 @@ std::vector<double> DaeBuilderInternal::start_all() const {
   return r;
 }
 
-std::string DaeBuilderInternal::generate_wrapper(const std::string& guid, const CodeGenerator& gen) const {
+std::string DaeBuilderInternal::generate_wrapper(const std::string& guid,
+    const CodeGenerator& gen) const {
   // Create file
   std::string wrapper_filename = "fmi3Functions.c";
   std::ofstream f;
@@ -730,7 +731,7 @@ std::string DaeBuilderInternal::generate_wrapper(const std::string& guid, const 
 
   // Start attributes
   f << "casadi_real start[SZ_MEM] = " << generate(start_all()) << ";\n\n";
-  
+
   // States
   f << "#define N_X " << x_.size() << "\n"
     << "fmi3ValueReference x_vr[N_X] = " << generate(x_) << ";\n"
@@ -1905,7 +1906,7 @@ const Function& DaeBuilderInternal::oracle(bool sx, bool elim_w, bool lifted_cal
     bool subst_v = false;
     // Collect all DAE input variables
     for (size_t i = 0; i != DAE_BUILDER_NUM_IN; ++i) {
-      if (i == DAE_BUILDER_Y) continue;  // fixme2 
+      if (i == DAE_BUILDER_Y) continue;  // fixme2
       f_in_name.push_back(to_string(static_cast<DaeBuilderInternalIn>(i)));
       v = input(static_cast<DaeBuilderInternalIn>(i));
       if (v.empty()) {
