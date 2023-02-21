@@ -70,11 +70,16 @@ void XmlNode::set_attribute(const std::string& att_name, const std::vector<casad
   return set_attribute(att_name, ss.str());
 }
 
+void XmlNode::set_attribute(const std::string& att_name, double att) {
+  std::stringstream ss;
+  ss << std::scientific << std::setprecision(std::numeric_limits<double>::digits10 + 1) << att;
+  set_attribute(att_name, ss.str());
+}
+
 std::ostream& operator<<(std::ostream &stream, const XmlNode& node) {
   node.dump(stream);
   return stream;
 }
-
 
 void XmlNode::dump(std::ostream &stream, casadi_int indent) const {
   // Print name

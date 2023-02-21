@@ -296,7 +296,7 @@ XmlNode Variable::export_xml(const DaeBuilderInternal& self) const {
   // Name of variable
   r.set_attribute("name", name);
   // Value reference
-  r.set_attribute("valueReference", std::to_string(value_reference));
+  r.set_attribute("valueReference", value_reference);
   // Description, if any
   if (!description.empty()) r.set_attribute("description", description);
   // Causality
@@ -308,17 +308,17 @@ XmlNode Variable::export_xml(const DaeBuilderInternal& self) const {
   // Minimum attribute
   if (min != -inf) {
     if (is_real()) {
-      r.set_attribute("min", std::to_string(min));
+      r.set_attribute("min", min);
     } else {
-      r.set_attribute("min", std::to_string(static_cast<casadi_int>(min)));
+      r.set_attribute("min", static_cast<casadi_int>(min));
     }
   }
   // Maximum attribute
   if (max != inf) {
     if (is_real()) {
-      r.set_attribute("max", std::to_string(max));
+      r.set_attribute("max", max);
     } else {
-      r.set_attribute("max", std::to_string(static_cast<casadi_int>(max)));
+      r.set_attribute("max", static_cast<casadi_int>(max));
     }
   }
   // Unit
@@ -326,9 +326,7 @@ XmlNode Variable::export_xml(const DaeBuilderInternal& self) const {
   // Display unit
   if (!display_unit.empty()) r.set_attribute("displayUnit", display_unit);
   // Nominal value, only for floats
-  if (is_real() && nominal != 1.) {
-      r.set_attribute("nominal", std::to_string(nominal));
-  }
+  if (is_real() && nominal != 1.) r.set_attribute("nominal", nominal);
   // Start attribute, if any
   if (has_start()) {
     if (type == Type::BINARY || type == Type::STRING) {
@@ -349,7 +347,7 @@ XmlNode Variable::export_xml(const DaeBuilderInternal& self) const {
   }
   // Derivative attribute, if any
   if (der_of >= 0) {
-      r.set_attribute("derivative", std::to_string(self.variable(der_of).value_reference));
+      r.set_attribute("derivative", self.variable(der_of).value_reference);
   }
   // Return XML representation
   return r;
