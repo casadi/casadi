@@ -11,6 +11,7 @@
 #include <chrono>
 #include <stdexcept>
 #include <type_traits>
+#include <utility>
 
 namespace alpaqa {
 
@@ -840,10 +841,14 @@ struct ProblemWithCounters {
     std::shared_ptr<EvalCounter> evaluations = std::make_shared<EvalCounter>();
     Problem problem;
 
-    ProblemWithCounters(const Problem &problem) : problem(problem) {}
-    ProblemWithCounters(Problem &&problem)
+    template <class P>
+    explicit ProblemWithCounters(P &&problem)
+        requires std::is_same_v<std::remove_cvref_t<P>, std::remove_cvref_t<Problem>>
+        : problem{std::forward<P>(problem)} {}
+    template <class... Args>
+    explicit ProblemWithCounters(std::in_place_t, Args &&...args)
         requires(!std::is_lvalue_reference_v<Problem>)
-        : problem(std::forward<Problem>(problem)) {}
+        : problem{std::forward<Args>(args)...} {}
 
     /// Reset all evaluation counters and timers to zero. Affects all instances
     /// that share the same evaluations. If you only want to reset the counters
