@@ -359,6 +359,50 @@ void register_member_function(Result &result, std::string name,
                       });
 }
 
+namespace detail {
+template <auto Member, class Class, class Ret, class... Args>
+static auto member_caller(Ret (Class::*)(Args...)) {
+    return [](void *self_, Args... args) -> Ret {
+        auto *self = reinterpret_cast<Class *>(self_);
+        return (self->*Member)(std::forward<Args>(args)...);
+    };
+}
+
+template <auto Member, class Class, class Ret, class... Args>
+static auto member_caller(Ret (Class::*)(Args...) const) {
+    return []<class Self>(Self * self_, Args... args) -> Ret
+               requires std::is_void_v<Self>
+    {
+        const auto *self = reinterpret_cast<const Class *>(self_);
+        return (self->*Member)(std::forward<Args>(args)...);
+    };
+}
+
+template <auto Member, class Class, class Ret>
+static auto member_caller(Ret Class::*) {
+    return []<class Self>(Self * self_) -> decltype(auto)
+               requires std::is_void_v<Self>
+    {
+        using CClass = std::conditional_t<std::is_const_v<Self>,
+                                          std::add_const_t<Class>, Class>;
+        auto *self   = reinterpret_cast<CClass *>(self_);
+        return self->*Member;
+    };
+}
+} // namespace detail
+
+/// Wrap the given member function of signature into a lambda function that
+/// accepts the instance as a void pointer.
+///
+/// - `Ret Class::member(args...)` → `Ret(void *self, args...)`
+/// - `Ret Class::member(args...) const` → `Ret(const void *self, args...)`
+/// - `Type Class::member` → `Type &(void *self)`
+/// - `Type Class::member` → `const Type &(const void *self)`
+template <auto Member>
+static auto member_caller() {
+    return detail::member_caller<Member>(Member);
+}
+
 /// Cleans up the extra functions registered by @ref register_function.
 /// @note   This does not need to be called for the functions returned by the
 ///         registration function, those functions will be cleaned up by alpaqa.
