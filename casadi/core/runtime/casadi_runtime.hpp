@@ -306,6 +306,7 @@ namespace casadi {
   #include "casadi_logsumexp.hpp"
   #include "casadi_sum.hpp"
   #include "casadi_sparsity.hpp"
+  #include "casadi_jac.hpp"
 
 } // namespace casadi
 
