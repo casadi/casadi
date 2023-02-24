@@ -432,7 +432,8 @@ struct CASADI_EXPORT Fmu {
   size_t index_out(const std::string& n) const;
 
   // Load an FMI function
-  signal_t load_function(const std::string& symname);
+  template<typename T>
+  T* load_function(const std::string& symname);
 
   // New memory object
   fmi2Component instantiate() const;
