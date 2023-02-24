@@ -424,39 +424,6 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
   if (fmi_desc.has_child("ModelStructure"))
     import_model_structure(fmi_desc["ModelStructure"]);
 
-  // Postprocess / sort variables
-  for (size_t k = 0; k < n_variables(); ++k) {
-    // Get reference to the variable
-    Variable& v = variable(k);
-    // Skip variable if name starts with underscore
-    if (v.name.rfind("_", 0) == 0) continue;
-    // Sort by types
-    if (v.causality == Causality::INDEPENDENT) {
-      // Independent (time) variable
-      t_.push_back(k);
-    } else if (v.causality == Causality::INPUT) {
-      u_.push_back(k);
-    } else if (v.variability == Variability::CONSTANT) {
-      // Named constant
-      c_.push_back(k);
-      v.beq = v.start;
-    } else if (v.variability == Variability::FIXED || v.variability == Variability::TUNABLE) {
-      p_.push_back(k);
-    } else if (v.variability == Variability::CONTINUOUS) {
-      // Add to list of differential equations?
-      if (v.der >= 0) {
-        x_.push_back(k);
-      }
-      // Is it (also) an output variable?
-      if (v.causality == Causality::OUTPUT) {
-        y_.push_back(k);
-        v.beq = v.v;
-      }
-    } else if (v.dependency) {
-      casadi_warning("Cannot sort " + v.name);
-    }
-  }
-
   // **** Add binding equations ****
   if (fmi_desc.has_child("equ:BindingEquations")) {
     // Get a reference to the BindingEquations node
@@ -2576,6 +2543,19 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
     } else {
       casadi_warning("Unknown type for " + name);
     }
+    // Initial classification of variables (states/outputs to be added later)
+    if (var.causality == Causality::INDEPENDENT) {
+      // Independent (time) variable
+      t_.push_back(var.index);
+    } else if (var.causality == Causality::INPUT) {
+      u_.push_back(var.index);
+    } else if (var.variability == Variability::CONSTANT) {
+      // Named constant
+      c_.push_back(var.index);
+      var.beq = var.start;
+    } else if (var.variability == Variability::FIXED || var.variability == Variability::TUNABLE) {
+      p_.push_back(var.index);
+    }
   }
   // Handle derivatives
   for (size_t i = 0; i < n_variables(); ++i) {
@@ -2596,6 +2576,11 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
       outputs_.push_back(e.attribute<casadi_int>("index", 0) - 1);
       // Corresponding variable
       Variable& v = variable(outputs_.back());
+      // Add to y, unless state
+      if (v.der < 0) {
+        y_.push_back(v.index);
+        v.beq = v.v;
+      }
       // Get dependencies
       v.dependencies = e.attribute<std::vector<casadi_int>>("dependencies", {});
       // dependenciesKind attribute, if present
@@ -2621,6 +2606,9 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
       derivatives_.push_back(e.attribute<casadi_int>("index", 0) - 1);
       // Corresponding variable
       Variable& v = variable(derivatives_.back());
+      // Add to list of states
+      casadi_assert(v.der_of >= 0, "Error processing derivative info for " + v.name);
+      x_.push_back(v.der_of);
       // Get dependencies
       v.dependencies = e.attribute<std::vector<casadi_int>>("dependencies", {});
       // dependenciesKind attribute, if present
