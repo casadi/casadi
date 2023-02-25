@@ -20,12 +20,12 @@ void register_counters(py::module_ &m) {
             [](const alpaqa::EvalCounter::EvalTimer &p) { // __getstate__
                 return py::make_tuple(p.proj_diff_g, p.proj_multipliers, p.prox_grad_step, p.f,
                                       p.grad_f, p.f_grad_f, p.f_g, p.f_grad_f_g,
-                                      p.grad_f_grad_g_prod, p.g, p.grad_g_prod, p.grad_gi, p.grad_L,
-                                      p.hess_L_prod, p.hess_L, p.hess_ψ_prod, p.hess_ψ, p.ψ,
-                                      p.grad_ψ, p.grad_ψ_from_ŷ, p.ψ_grad_ψ);
+                                      p.grad_f_grad_g_prod, p.g, p.grad_g_prod, p.grad_gi, p.jac_g,
+                                      p.grad_L, p.hess_L_prod, p.hess_L, p.hess_ψ_prod, p.hess_ψ,
+                                      p.ψ, p.grad_ψ, p.grad_ψ_from_ŷ, p.ψ_grad_ψ);
             },
             [](py::tuple t) { // __setstate__
-                if (t.size() != 21)
+                if (t.size() != 22)
                     throw std::runtime_error("Invalid state!");
                 using T = alpaqa::EvalCounter::EvalTimer;
                 return T{
@@ -41,15 +41,16 @@ void register_counters(py::module_ &m) {
                     .g                  = py::cast<decltype(T::g)>(t[9]),
                     .grad_g_prod        = py::cast<decltype(T::grad_g_prod)>(t[10]),
                     .grad_gi            = py::cast<decltype(T::grad_gi)>(t[11]),
-                    .grad_L             = py::cast<decltype(T::grad_L)>(t[12]),
-                    .hess_L_prod        = py::cast<decltype(T::hess_L_prod)>(t[13]),
-                    .hess_L             = py::cast<decltype(T::hess_L)>(t[14]),
-                    .hess_ψ_prod        = py::cast<decltype(T::hess_ψ_prod)>(t[15]),
-                    .hess_ψ             = py::cast<decltype(T::hess_ψ)>(t[16]),
-                    .ψ                  = py::cast<decltype(T::ψ)>(t[17]),
-                    .grad_ψ             = py::cast<decltype(T::grad_ψ)>(t[18]),
-                    .grad_ψ_from_ŷ      = py::cast<decltype(T::grad_ψ_from_ŷ)>(t[19]),
-                    .ψ_grad_ψ           = py::cast<decltype(T::ψ_grad_ψ)>(t[20]),
+                    .jac_g              = py::cast<decltype(T::grad_gi)>(t[12]),
+                    .grad_L             = py::cast<decltype(T::grad_L)>(t[13]),
+                    .hess_L_prod        = py::cast<decltype(T::hess_L_prod)>(t[14]),
+                    .hess_L             = py::cast<decltype(T::hess_L)>(t[15]),
+                    .hess_ψ_prod        = py::cast<decltype(T::hess_ψ_prod)>(t[16]),
+                    .hess_ψ             = py::cast<decltype(T::hess_ψ)>(t[17]),
+                    .ψ                  = py::cast<decltype(T::ψ)>(t[18]),
+                    .grad_ψ             = py::cast<decltype(T::grad_ψ)>(t[19]),
+                    .grad_ψ_from_ŷ      = py::cast<decltype(T::grad_ψ_from_ŷ)>(t[20]),
+                    .ψ_grad_ψ           = py::cast<decltype(T::ψ_grad_ψ)>(t[21]),
                 };
             }))
         .def_readwrite("proj_diff_g", &alpaqa::EvalCounter::EvalTimer::proj_diff_g)
@@ -64,6 +65,7 @@ void register_counters(py::module_ &m) {
         .def_readwrite("g", &alpaqa::EvalCounter::EvalTimer::g)
         .def_readwrite("grad_g_prod", &alpaqa::EvalCounter::EvalTimer::grad_g_prod)
         .def_readwrite("grad_gi", &alpaqa::EvalCounter::EvalTimer::grad_gi)
+        .def_readwrite("jac_g", &alpaqa::EvalCounter::EvalTimer::grad_gi)
         .def_readwrite("grad_L", &alpaqa::EvalCounter::EvalTimer::grad_L)
         .def_readwrite("hess_L_prod", &alpaqa::EvalCounter::EvalTimer::hess_L_prod)
         .def_readwrite("hess_L", &alpaqa::EvalCounter::EvalTimer::hess_L)
@@ -79,12 +81,12 @@ void register_counters(py::module_ &m) {
             [](const alpaqa::EvalCounter &p) { // __getstate__
                 return py::make_tuple(p.proj_diff_g, p.proj_multipliers, p.prox_grad_step, p.f,
                                       p.grad_f, p.f_grad_f, p.f_g, p.f_grad_f_g,
-                                      p.grad_f_grad_g_prod, p.g, p.grad_g_prod, p.grad_gi, p.grad_L,
-                                      p.hess_L_prod, p.hess_L, p.hess_ψ_prod, p.hess_ψ, p.ψ,
-                                      p.grad_ψ, p.grad_ψ_from_ŷ, p.ψ_grad_ψ, p.time);
+                                      p.grad_f_grad_g_prod, p.g, p.grad_g_prod, p.grad_gi, p.jac_g,
+                                      p.grad_L, p.hess_L_prod, p.hess_L, p.hess_ψ_prod, p.hess_ψ,
+                                      p.ψ, p.grad_ψ, p.grad_ψ_from_ŷ, p.ψ_grad_ψ, p.time);
             },
             [](py::tuple t) { // __setstate__
-                if (t.size() != 22)
+                if (t.size() != 23)
                     throw std::runtime_error("Invalid state!");
                 using T = alpaqa::EvalCounter;
                 return T{
@@ -100,16 +102,17 @@ void register_counters(py::module_ &m) {
                     .g                  = py::cast<decltype(T::g)>(t[9]),
                     .grad_g_prod        = py::cast<decltype(T::grad_g_prod)>(t[10]),
                     .grad_gi            = py::cast<decltype(T::grad_gi)>(t[11]),
-                    .grad_L             = py::cast<decltype(T::grad_L)>(t[12]),
-                    .hess_L_prod        = py::cast<decltype(T::hess_L_prod)>(t[13]),
-                    .hess_L             = py::cast<decltype(T::hess_L)>(t[14]),
-                    .hess_ψ_prod        = py::cast<decltype(T::hess_ψ_prod)>(t[15]),
-                    .hess_ψ             = py::cast<decltype(T::hess_ψ)>(t[16]),
-                    .ψ                  = py::cast<decltype(T::ψ)>(t[17]),
-                    .grad_ψ             = py::cast<decltype(T::grad_ψ)>(t[18]),
-                    .grad_ψ_from_ŷ      = py::cast<decltype(T::grad_ψ_from_ŷ)>(t[19]),
-                    .ψ_grad_ψ           = py::cast<decltype(T::ψ_grad_ψ)>(t[20]),
-                    .time               = py::cast<decltype(T::time)>(t[21]),
+                    .jac_g              = py::cast<decltype(T::jac_g)>(t[12]),
+                    .grad_L             = py::cast<decltype(T::grad_L)>(t[13]),
+                    .hess_L_prod        = py::cast<decltype(T::hess_L_prod)>(t[14]),
+                    .hess_L             = py::cast<decltype(T::hess_L)>(t[15]),
+                    .hess_ψ_prod        = py::cast<decltype(T::hess_ψ_prod)>(t[16]),
+                    .hess_ψ             = py::cast<decltype(T::hess_ψ)>(t[17]),
+                    .ψ                  = py::cast<decltype(T::ψ)>(t[18]),
+                    .grad_ψ             = py::cast<decltype(T::grad_ψ)>(t[19]),
+                    .grad_ψ_from_ŷ      = py::cast<decltype(T::grad_ψ_from_ŷ)>(t[20]),
+                    .ψ_grad_ψ           = py::cast<decltype(T::ψ_grad_ψ)>(t[21]),
+                    .time               = py::cast<decltype(T::time)>(t[22]),
                 };
             }))
         .def_readwrite("proj_diff_g", &alpaqa::EvalCounter::proj_diff_g)
@@ -124,6 +127,7 @@ void register_counters(py::module_ &m) {
         .def_readwrite("g", &alpaqa::EvalCounter::g)
         .def_readwrite("grad_g_prod", &alpaqa::EvalCounter::grad_g_prod)
         .def_readwrite("grad_gi", &alpaqa::EvalCounter::grad_gi)
+        .def_readwrite("jac_g", &alpaqa::EvalCounter::jac_g)
         .def_readwrite("grad_L", &alpaqa::EvalCounter::grad_L)
         .def_readwrite("hess_L_prod", &alpaqa::EvalCounter::hess_L_prod)
         .def_readwrite("hess_L", &alpaqa::EvalCounter::hess_L)

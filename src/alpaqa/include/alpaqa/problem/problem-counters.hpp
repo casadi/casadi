@@ -20,6 +20,7 @@ struct EvalCounter {
     unsigned g{};
     unsigned grad_g_prod{};
     unsigned grad_gi{};
+    unsigned jac_g{};
     unsigned grad_L{};
     unsigned hess_L_prod{};
     unsigned hess_L{};
@@ -43,6 +44,7 @@ struct EvalCounter {
         std::chrono::nanoseconds g{};
         std::chrono::nanoseconds grad_g_prod{};
         std::chrono::nanoseconds grad_gi{};
+        std::chrono::nanoseconds jac_g{};
         std::chrono::nanoseconds grad_L{};
         std::chrono::nanoseconds hess_L_prod{};
         std::chrono::nanoseconds hess_L{};
@@ -73,6 +75,7 @@ inline EvalCounter::EvalTimer &operator+=(EvalCounter::EvalTimer &a,
     a.g += b.g;
     a.grad_g_prod += b.grad_g_prod;
     a.grad_gi += b.grad_gi;
+    a.jac_g += b.jac_g;
     a.grad_L += b.grad_L;
     a.hess_L_prod += b.hess_L_prod;
     a.hess_L += b.hess_L;
@@ -98,6 +101,7 @@ inline EvalCounter &operator+=(EvalCounter &a, const EvalCounter &b) {
     a.g += b.g;
     a.grad_g_prod += b.grad_g_prod;
     a.grad_gi += b.grad_gi;
+    a.jac_g += b.jac_g;
     a.grad_L += b.grad_L;
     a.hess_L_prod += b.hess_L_prod;
     a.hess_L += b.hess_L;

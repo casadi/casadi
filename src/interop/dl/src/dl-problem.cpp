@@ -64,9 +64,14 @@ auto DLProblem::eval_grad_f(crvec x, rvec grad_fx) const -> void { return functi
 auto DLProblem::eval_g(crvec x, rvec gx) const -> void { return functions->eval_g(instance.get(), x.data(), gx.data()); }
 auto DLProblem::eval_grad_g_prod(crvec x, crvec y, rvec grad_gxy) const -> void { return functions->eval_grad_g_prod(instance.get(), x.data(), y.data(), grad_gxy.data()); }
 auto DLProblem::eval_grad_gi(crvec x, index_t i, rvec grad_gi) const -> void { return functions->eval_grad_gi(instance.get(), x.data(), i, grad_gi.data()); }
-auto DLProblem::eval_hess_L_prod(crvec x, crvec y, crvec v, rvec Hv) const -> void { return functions->eval_hess_L_prod(instance.get(), x.data(), y.data(), v.data(), Hv.data()); }
-auto DLProblem::eval_hess_L(crvec x, crvec y, rmat H) const -> void { return functions->eval_hess_L(instance.get(), x.data(), y.data(), H.data()); }
-auto DLProblem::eval_hess_ψ(crvec x, crvec y, crvec Σ, rmat H) const -> void { return functions->eval_hess_ψ(instance.get(), x.data(), y.data(), Σ.data(), H.data()); }
+auto DLProblem::eval_jac_g(crvec x, rindexvec inner_idx, rindexvec outer_ptr, rvec J_values) const -> void { return functions->eval_jac_g(instance.get(), x.data(), inner_idx.data(), outer_ptr.data(), J_values.size() == 0 ? nullptr : J_values.data()); }
+auto DLProblem::get_jac_g_num_nonzeros() const -> length_t { return functions->get_jac_g_num_nonzeros(instance.get()); }
+auto DLProblem::eval_hess_L_prod(crvec x, crvec y, real_t scale, crvec v, rvec Hv) const -> void { return functions->eval_hess_L_prod(instance.get(), x.data(), y.data(), scale, v.data(), Hv.data()); }
+auto DLProblem::eval_hess_L(crvec x, crvec y, real_t scale, rindexvec inner_idx, rindexvec outer_ptr, rvec H_values) const -> void { return functions->eval_hess_L(instance.get(), x.data(), y.data(), scale, inner_idx.data(), outer_ptr.data(), H_values.size() == 0 ? nullptr : H_values.data()); }
+auto DLProblem::get_hess_L_num_nonzeros() const -> length_t { return functions->get_hess_L_num_nonzeros(instance.get()); }
+auto DLProblem::eval_hess_ψ_prod(crvec x, crvec y, crvec Σ, real_t scale, crvec v, rvec Hv) const -> void { return functions->eval_hess_ψ_prod(instance.get(), x.data(), y.data(), Σ.data(), scale, v.data(), Hv.data()); }
+auto DLProblem::eval_hess_ψ(crvec x, crvec y, crvec Σ, real_t scale, rindexvec inner_idx, rindexvec outer_ptr, rvec H_values) const -> void { return functions->eval_hess_ψ(instance.get(), x.data(), y.data(), Σ.data(), scale, inner_idx.data(), outer_ptr.data(), H_values.size() == 0 ? nullptr : H_values.data()); }
+auto DLProblem::get_hess_ψ_num_nonzeros() const -> length_t { return functions->get_hess_ψ_num_nonzeros(instance.get()); }
 auto DLProblem::eval_f_grad_f(crvec x, rvec grad_fx) const -> real_t { return functions->eval_f_grad_f(instance.get(), x.data(), grad_fx.data()); }
 auto DLProblem::eval_f_g(crvec x, rvec g) const -> real_t { return functions->eval_f_g(instance.get(), x.data(), g.data()); }
 auto DLProblem::eval_f_grad_f_g(crvec x, rvec grad_fx, rvec g) const -> real_t { return functions->eval_f_grad_f_g(instance.get(), x.data(), grad_fx.data(), g.data()); }
@@ -81,9 +86,11 @@ bool DLProblem::provides_eval_f() const { return functions->eval_f != nullptr; }
 bool DLProblem::provides_eval_grad_f() const { return functions->eval_grad_f != nullptr; }
 bool DLProblem::provides_eval_g() const { return functions->eval_g != nullptr; }
 bool DLProblem::provides_eval_grad_g_prod() const { return functions->eval_grad_g_prod != nullptr; }
+bool DLProblem::provides_eval_jac_g() const { return functions->eval_jac_g != nullptr; }
 bool DLProblem::provides_eval_grad_gi() const { return functions->eval_grad_gi != nullptr; }
 bool DLProblem::provides_eval_hess_L_prod() const { return functions->eval_hess_L_prod != nullptr; }
 bool DLProblem::provides_eval_hess_L() const { return functions->eval_hess_L != nullptr; }
+bool DLProblem::provides_eval_hess_ψ_prod() const { return functions->eval_hess_ψ_prod != nullptr; }
 bool DLProblem::provides_eval_hess_ψ() const { return functions->eval_hess_ψ != nullptr; }
 bool DLProblem::provides_eval_f_grad_f() const { return functions->eval_f_grad_f != nullptr; }
 bool DLProblem::provides_eval_f_g() const { return functions->eval_f_g != nullptr; }
@@ -96,6 +103,8 @@ bool DLProblem::provides_eval_grad_ψ() const { return functions->eval_grad_ψ !
 bool DLProblem::provides_eval_ψ_grad_ψ() const { return functions->eval_ψ_grad_ψ != nullptr; }
 bool DLProblem::provides_get_box_C() const { return functions->eval_prox_grad_step == nullptr; }
 // clang-format on
+
+#if ALPAQA_WITH_OCP
 
 DLControlProblem::DLControlProblem(std::string so_filename,
                                    std::string symbol_prefix, void *user_param)
@@ -155,5 +164,7 @@ bool DLControlProblem::provides_eval_grad_constr_prod_N() const { return functio
 bool DLControlProblem::provides_eval_add_gn_hess_constr() const { return functions->eval_add_gn_hess_constr != nullptr; }
 bool DLControlProblem::provides_eval_add_gn_hess_constr_N() const { return functions->eval_add_gn_hess_constr_N != nullptr; }
 // clang-format on
+
+#endif
 
 } // namespace alpaqa::dl

@@ -20,8 +20,8 @@ int main(int argc, char *argv[]) {
         so_name = fs::canonical(fs::path(argv[0])).parent_path() / so_name;
     std::cout << "Loading " << so_name << std::endl;
 
-    // Load the problem (with 3 decision variables and 1 general constraint)
-    auto problem = alpaqa::CasADiProblem<config_t>(so_name.string(), 3, 1);
+    // Load the problem
+    alpaqa::CasADiProblem<config_t> problem{so_name.string()};
 
     // Specify the bounds
     problem.C.upperbound = vec::Constant(3, alpaqa::inf<config_t>);

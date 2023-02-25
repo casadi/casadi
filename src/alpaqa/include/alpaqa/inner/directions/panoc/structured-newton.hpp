@@ -63,6 +63,15 @@ struct StructuredNewtonDirection {
         JK.resize(n);
         H_storage.resize(n * n);
         HJ_storage.resize(n * n);
+        // Store sparsity of H
+        length_t nnz_H = problem.get_hess_ψ_num_nonzeros();
+        if (nnz_H > 0) {
+            inner_idx_H.resize(nnz_H);
+            outer_ptr_H.resize(n + 1);
+            mvec null{nullptr, 0};
+            problem.eval_hess_ψ(x_0, y, Σ, 1, inner_idx_H, outer_ptr_H, null);
+            throw std::logic_error("Sparse hessians not yet implemented");
+        }
     }
 
     /// @see @ref PANOCDirection::has_initial_direction
@@ -106,7 +115,8 @@ struct StructuredNewtonDirection {
 
         // Compute the Hessian
         mmat H{H_storage.data(), n, n};
-        problem->eval_hess_ψ(xₖ, *y, *Σ, H);
+        problem->eval_hess_ψ(xₖ, *y, *Σ, 1, inner_idx_H, outer_ptr_H,
+                             H_storage);
 
         // There are no active indices K
         if (nJ == n) {
@@ -201,6 +211,7 @@ struct StructuredNewtonDirection {
     mutable indexvec JK;
     mutable vec H_storage;
     mutable vec HJ_storage;
+    mutable indexvec inner_idx_H, outer_ptr_H;
 
   public:
     DirectionParams direction_params;

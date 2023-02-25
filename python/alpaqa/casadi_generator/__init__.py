@@ -1,11 +1,11 @@
 import casadi as cs
-from typing import Tuple, Optional
+from typing import Tuple, Optional, Literal
 
 
 def generate_casadi_problem(
     f: cs.Function,
     g: Optional[cs.Function],
-    second_order: bool = False,
+    second_order: Literal['no', 'full', 'prod', 'L', 'psi_prod', 'psi'] = 'no',
     name: str = "alpaqa_problem",
 ) -> Tuple[cs.CodeGenerator, int, int, int]:
     """Convert the objective and constraint functions into a CasADi code
@@ -22,6 +22,8 @@ def generate_casadi_problem(
                * Number of nonlinear constraints (dual dimension).
                * Number of parameters.
     """
+
+    assert second_order in ['no', 'full', 'prod', 'L', 'psi_prod', 'psi']
 
     assert f.n_in() in [1, 2]
     assert f.n_out() == 1
@@ -43,19 +45,24 @@ def generate_casadi_problem(
           else (f.name_in(0), "p")
     x = xp[0]
     y = cs.SX.sym("y", m)
+    s = cs.SX.sym("s")
     v = cs.SX.sym("v", n)
     Σ = cs.SX.sym("Σ", m)
     zl = cs.SX.sym("zl", m)
     zu = cs.SX.sym("zu", m)
 
     if m > 0:
+        sL = s * f(*xp) + cs.dot(y, g(*xp))
         L = f(*xp) + cs.dot(y, g(*xp))
         ζ = g(*xp) + (y / Σ)
         ẑ = cs.fmax(zl, cs.fmin(ζ, zu))
         d = ζ - ẑ
         ŷ = Σ * d
+        sψ = s * f(*xp) + 0.5 * cs.dot(ŷ, d)
         ψ = f(*xp) + 0.5 * cs.dot(ŷ, d)
     else:
+        sL = s * f(*xp)
+        sψ = s * f(*xp)
         L = f(*xp)
         ψ = f(*xp)
 
@@ -111,38 +118,49 @@ def generate_casadi_problem(
                 ["ψ", "ŷ"],
             ))
 
-    if second_order:
+    if second_order in ['full', 'L']:
+        cg.add(
+            cs.Function(
+                "jacobian_g",
+                [*xp_def],
+                [cs.jacobian(g, x)],
+                [*xp_names],
+                ["jac_g"],
+            ))
         cg.add(
             cs.Function(
                 "hess_L",
-                [*xp_def, y],
-                [cs.hessian(L, x)[0]],
-                [*xp_names, "y"],
+                [*xp_def, y, s],
+                [cs.hessian(sL, x)[0]],
+                [*xp_names, "y", "s"],
                 ["hess_L"],
             ))
+    if second_order in ['full', 'prod', 'L']:
         cg.add(
             cs.Function(
                 "hess_L_prod",
-                [*xp_def, y, v],
-                [cs.gradient(cs.jtimes(L, x, v, False), x)],
-                [*xp_names, "y", "v"],
+                [*xp_def, y, s, v],
+                [cs.gradient(cs.jtimes(sL, x, v, False), x)],
+                [*xp_names, "y", "s", "v"],
                 ["hess_L_prod"],
             ))
+    if second_order in ['full', 'psi']:
         cg.add(
             cs.Function(
                 "hess_psi",
-                [*xp_def, y, Σ, zl, zu],
-                [cs.hessian(ψ, x)[0]],
-                [*xp_names, "y", "Σ", "zl", "zu"],
+                [*xp_def, y, Σ, s, zl, zu],
+                [cs.hessian(sψ, x)[0]],
+                [*xp_names, "y", "Σ", "s", "zl", "zu"],
                 ["hess_psi"],
             )
         )
+    if second_order in ['full', 'prod', 'psi_prod', 'psi_prod']:
         cg.add(
             cs.Function(
                 "hess_psi_prod",
-                [*xp_def, y, Σ, zl, zu, v],
-                [cs.gradient(cs.jtimes(ψ, x, v, False), x)],
-                [*xp_names, "y", "Σ", "zl", "zu", "v"],
+                [*xp_def, y, Σ, s, zl, zu, v],
+                [cs.gradient(cs.jtimes(sψ, x, v, False), x)],
+                [*xp_names, "y", "Σ", "s", "zl", "zu", "v"],
                 ["hess_psi_prod"],
             ))
     return cg, n, m, p

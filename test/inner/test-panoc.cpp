@@ -182,12 +182,13 @@ auto build_test_problem2() {
             -x(0);
         grad = gradmat.col(i);
     };
-    p.hess_L = [](crvec x, crvec y, rmat H) {
+    p.hess_L = [](crvec x, crvec y, real_t scale, rmat H) {
         // Hessian of f
         H(0, 0) = 1. / 4 * std::pow(x(0), 2) + 1. / 12 * std::pow(x(1), 4);
         H(0, 1) = -2 + 1. / 3 * x(0) * std::pow(x(1), 3);
         H(1, 0) = H(0, 1);
         H(1, 1) = 1. / 2 * std::pow(x(0), 2) * std::pow(x(1), 2);
+        H *= scale;
 
         mat Hg1(2, 2);
         Hg1(0, 0) = 0.5 * std::pow(x(1), 2) - 8;
@@ -326,7 +327,8 @@ TEST(PANOC, hessian) {
     vec hess_f1_fd = pa_ref::finite_diff(grad_fi(0), x);
     vec hess_f2_fd = pa_ref::finite_diff(grad_fi(1), x);
     mat H_res(2, 2);
-    p.eval_hess_L(x, vec::Zero(2), H_res);
+    indexvec inner, outer;
+    p.eval_hess_L(x, vec::Zero(2), 1, inner, outer, H_res.reshaped());
     EXPECT_THAT(H_res.col(0),
                 EigenAlmostEqual(hess_f1_fd, std::abs(H_res.col(0)(0)) * 5e-6));
     EXPECT_THAT(H_res.col(1),
@@ -339,7 +341,7 @@ TEST(PANOC, hessian) {
             return grad_L_res(i);
         };
     };
-    p.eval_hess_L(x, y, H_res);
+    p.eval_hess_L(x, y, 1, inner, outer, H_res.reshaped());
     vec hess_L1_fd = pa_ref::finite_diff(grad_Li(0), x);
     vec hess_L2_fd = pa_ref::finite_diff(grad_Li(1), x);
     EXPECT_THAT(H_res.col(0),

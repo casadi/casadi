@@ -132,10 +132,15 @@ class DLProblem : private DLLoader, public BoxConstrProblem<DefaultConfig> {
     void eval_grad_f(crvec x, rvec grad_fx) const;
     void eval_g(crvec x, rvec gx) const;
     void eval_grad_g_prod(crvec x, crvec y, rvec grad_gxy) const;
+    void eval_jac_g(crvec x, rindexvec inner_idx, rindexvec outer_ptr, rvec J_values) const;
+    length_t get_jac_g_num_nonzeros() const;
     void eval_grad_gi(crvec x, index_t i, rvec grad_gi) const;
-    void eval_hess_L_prod(crvec x, crvec y, crvec v, rvec Hv) const;
-    void eval_hess_L(crvec x, crvec y, rmat H) const;
-    void eval_hess_ψ(crvec x, crvec y, crvec Σ, rmat H) const;
+    void eval_hess_L_prod(crvec x, crvec y, real_t scale, crvec v, rvec Hv) const;
+    void eval_hess_L(crvec x, crvec y, real_t scale, rindexvec inner_idx, rindexvec outer_ptr, rvec H_values) const;
+    length_t get_hess_L_num_nonzeros() const;
+    void eval_hess_ψ_prod(crvec x, crvec y, crvec Σ, real_t scale, crvec v, rvec Hv) const;
+    void eval_hess_ψ(crvec x, crvec y, crvec Σ, real_t scale, rindexvec inner_idx, rindexvec outer_ptr, rvec H_values) const;
+    length_t get_hess_ψ_num_nonzeros() const;
     real_t eval_f_grad_f(crvec x, rvec grad_fx) const;
     real_t eval_f_g(crvec x, rvec g) const;
     real_t eval_f_grad_f_g(crvec x, rvec grad_fx, rvec g) const;
@@ -150,9 +155,11 @@ class DLProblem : private DLLoader, public BoxConstrProblem<DefaultConfig> {
     [[nodiscard]] bool provides_eval_grad_f() const;
     [[nodiscard]] bool provides_eval_g() const;
     [[nodiscard]] bool provides_eval_grad_g_prod() const;
+    [[nodiscard]] bool provides_eval_jac_g() const;
     [[nodiscard]] bool provides_eval_grad_gi() const;
     [[nodiscard]] bool provides_eval_hess_L_prod() const;
     [[nodiscard]] bool provides_eval_hess_L() const;
+    [[nodiscard]] bool provides_eval_hess_ψ_prod() const;
     [[nodiscard]] bool provides_eval_hess_ψ() const;
     [[nodiscard]] bool provides_eval_f_grad_f() const;
     [[nodiscard]] bool provides_eval_f_g() const;
@@ -181,6 +188,8 @@ class DLProblem : private DLLoader, public BoxConstrProblem<DefaultConfig> {
                                       name, std::forward<Args>(args)...);
     }
 };
+
+#if ALPAQA_WITH_OCP
 
 /// Class that loads an optimal control problem using `dlopen`.
 ///
@@ -287,5 +296,7 @@ class DLControlProblem : private DLLoader {
                                       name, std::forward<Args>(args)...);
     }
 };
+
+#endif
 
 } // namespace alpaqa::dl

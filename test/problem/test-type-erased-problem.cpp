@@ -120,8 +120,8 @@ struct TestOptProblem : TestReqProblem {
 
     // clang-format off
     MOCK_METHOD(void, eval_grad_gi, (crvec x, index_t i, rvec grad_gi), (const));
-    MOCK_METHOD(void, eval_hess_L_prod, (crvec x, crvec y, crvec v, rvec Hv), (const));
-    MOCK_METHOD(void, eval_hess_L, (crvec x, crvec y, rmat H), (const));
+    MOCK_METHOD(void, eval_hess_L_prod, (crvec x, crvec y, real_t scale, crvec v, rvec Hv), (const));
+    MOCK_METHOD(void, eval_hess_L, (crvec x, crvec y, real_t scale, rindexvec inner_idx, rindexvec outer_ptr, rvec H_values), (const));
     MOCK_METHOD(real_t, eval_f_grad_f, (crvec x, rvec grad_fx), (const));
     MOCK_METHOD(real_t, eval_f_g, (crvec x, rvec g), (const));
     MOCK_METHOD(real_t, eval_f_grad_f_g, (crvec x, rvec grad_fx, rvec g), (const));
@@ -138,7 +138,7 @@ TEST(TypeErasedProblem, OptionalProblem) {
     USING_ALPAQA_CONFIG(alpaqa::DefaultConfig);
     auto te_prob = alpaqa::TestTypeErasedProblem<>::make<TestOptProblem>();
     vec x;
-    mat H;
+    indexvec i;
 
     ASSERT_NE(te_prob.vtable.eval_proj_diff_g, nullptr);
     EXPECT_CALL(te_prob.as<TestOptProblem>(), eval_proj_diff_g);
@@ -182,12 +182,13 @@ TEST(TypeErasedProblem, OptionalProblem) {
 
     ASSERT_NE(te_prob.vtable.eval_hess_L_prod, nullptr);
     EXPECT_CALL(te_prob.as<TestOptProblem>(), eval_hess_L_prod);
-    te_prob.vtable.eval_hess_L_prod(te_prob.self, x, x, x, x, te_prob.vtable);
+    te_prob.vtable.eval_hess_L_prod(te_prob.self, x, x, 1, x, x,
+                                    te_prob.vtable);
     testing::Mock::VerifyAndClearExpectations(&te_prob.as<TestOptProblem>());
 
     ASSERT_NE(te_prob.vtable.eval_hess_L, nullptr);
     EXPECT_CALL(te_prob.as<TestOptProblem>(), eval_hess_L);
-    te_prob.vtable.eval_hess_L(te_prob.self, x, x, H, te_prob.vtable);
+    te_prob.vtable.eval_hess_L(te_prob.self, x, x, 1, i, i, x, te_prob.vtable);
     testing::Mock::VerifyAndClearExpectations(&te_prob.as<TestOptProblem>());
 
     ASSERT_NE(te_prob.vtable.eval_f_grad_f, nullptr);
@@ -245,7 +246,7 @@ TEST(TypeErasedProblem, CountedOptionalProblem) {
     auto te_prob = alpaqa::TestTypeErasedProblem<>::make<Problem>(prob);
     auto &evals  = *te_prob.as<Problem>().evaluations;
     vec x;
-    mat H;
+    indexvec i;
 
     EXPECT_EQ(evals.proj_diff_g, 0);
     ASSERT_NE(te_prob.vtable.eval_proj_diff_g, nullptr);
@@ -306,14 +307,15 @@ TEST(TypeErasedProblem, CountedOptionalProblem) {
     EXPECT_EQ(evals.hess_L_prod, 0);
     ASSERT_NE(te_prob.vtable.eval_hess_L_prod, nullptr);
     EXPECT_CALL(prob, eval_hess_L_prod);
-    te_prob.vtable.eval_hess_L_prod(te_prob.self, x, x, x, x, te_prob.vtable);
+    te_prob.vtable.eval_hess_L_prod(te_prob.self, x, x, 1, x, x,
+                                    te_prob.vtable);
     testing::Mock::VerifyAndClearExpectations(&prob);
     EXPECT_EQ(evals.hess_L_prod, 1);
 
     EXPECT_EQ(evals.hess_L, 0);
     ASSERT_NE(te_prob.vtable.eval_hess_L, nullptr);
     EXPECT_CALL(prob, eval_hess_L);
-    te_prob.vtable.eval_hess_L(te_prob.self, x, x, H, te_prob.vtable);
+    te_prob.vtable.eval_hess_L(te_prob.self, x, x, 1, i, i, x, te_prob.vtable);
     testing::Mock::VerifyAndClearExpectations(&prob);
     EXPECT_EQ(evals.hess_L, 1);
 
@@ -432,7 +434,7 @@ TEST(TypeErasedProblem, TEOptionalProblem) {
     USING_ALPAQA_CONFIG(alpaqa::DefaultConfig);
     auto te_prob = alpaqa::TypeErasedProblem<>::make<TestOptProblem>();
     vec x;
-    mat H;
+    indexvec i;
 
     EXPECT_CALL(te_prob.as<TestOptProblem>(), eval_proj_diff_g);
     te_prob.eval_proj_diff_g(x, x);
@@ -467,11 +469,11 @@ TEST(TypeErasedProblem, TEOptionalProblem) {
     testing::Mock::VerifyAndClearExpectations(&te_prob.as<TestOptProblem>());
 
     EXPECT_CALL(te_prob.as<TestOptProblem>(), eval_hess_L_prod);
-    te_prob.eval_hess_L_prod(x, x, x, x);
+    te_prob.eval_hess_L_prod(x, x, 1, x, x);
     testing::Mock::VerifyAndClearExpectations(&te_prob.as<TestOptProblem>());
 
     EXPECT_CALL(te_prob.as<TestOptProblem>(), eval_hess_L);
-    te_prob.eval_hess_L(x, x, H);
+    te_prob.eval_hess_L(x, x, 1, i, i, x);
     testing::Mock::VerifyAndClearExpectations(&te_prob.as<TestOptProblem>());
 
     EXPECT_CALL(te_prob.as<TestOptProblem>(), eval_f_grad_f);
@@ -515,7 +517,7 @@ TEST(TypeErasedProblem, TEprovidesNoHess) {
     USING_ALPAQA_CONFIG(alpaqa::DefaultConfig);
     auto te_prob = alpaqa::TypeErasedProblem<>::make<TestOptProblemNoHess>();
     vec x;
-    mat H;
+    indexvec i;
 
     EXPECT_TRUE(te_prob.provides_eval_grad_gi());
     EXPECT_FALSE(te_prob.provides_eval_hess_L_prod());
@@ -526,8 +528,9 @@ TEST(TypeErasedProblem, TEprovidesNoHess) {
     testing::Mock::VerifyAndClearExpectations(
         &te_prob.as<TestOptProblemNoHess>());
 
-    EXPECT_THROW(te_prob.eval_hess_L_prod(x, x, x, x),
+    EXPECT_THROW(te_prob.eval_hess_L_prod(x, x, 1, x, x),
                  alpaqa::not_implemented_error);
 
-    EXPECT_THROW(te_prob.eval_hess_L(x, x, H), alpaqa::not_implemented_error);
+    EXPECT_THROW(te_prob.eval_hess_L(x, x, 1, i, i, x),
+                 alpaqa::not_implemented_error);
 }

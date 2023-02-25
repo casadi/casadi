@@ -3,7 +3,7 @@
 #include <alpaqa/casadi-loader-export.hpp>
 #include <alpaqa/config/config.hpp>
 #include <alpaqa/problem/type-erased-problem.hpp>
-#include "alpaqa/util/copyable_unique_ptr.hpp"
+#include <alpaqa/util/copyable_unique_ptr.hpp>
 
 namespace alpaqa {
 namespace casadi_loader {
@@ -23,30 +23,17 @@ class CasADiProblem : public BoxConstrProblem<Conf> {
     ///
     /// @param  filename
     ///         Filename of the shared library to load the functions from.
-    /// @param  n
-    ///         Number of decision variables (@f$ x \in \R^n @f$).
-    /// @param  m
-    ///         Number of general constraints (@f$ g(x) \in \R^m @f$).
-    /// @param  p
-    ///         The number of parameters of the problem (second argument to all
-    ///         CasADi functions).
-    /// @param  second_order
-    ///         Load the additional functions required for second-order PANOC.
     ///
     /// The file should contain functions with the names `f`, `grad_f`, `g` and
     /// `grad_g`. These functions evaluate the objective function, its gradient,
-    /// the constraints, and the constraint gradient times a vector respecitvely.
-    /// If @p second_order is true, additional functions `hess_L`, `hess_ψ`,
-    /// `hess_L_prod` and `hess_ψ_prod` should be provided to evaluate the
+    /// the constraints, and the constraint gradient times a vector respectively.
+    /// For second order solvers, additional functions `hess_L`, `hess_ψ`,
+    /// `hess_L_prod` and `hess_ψ_prod` can be provided to evaluate the
     /// Hessian of the (augmented) Lagrangian and Hessian-vector products.
-    ///
-    /// If any of the dimensions are less than or equal to zero, they are
-    /// determined from the `g` function in the given file.
     ///
     /// @throws std::invalid_argument
     ///         The dimensions of the loaded functions do not match.
-    CasADiProblem(const std::string &filename, length_t n = 0, length_t m = 0,
-                  length_t p = 0, bool second_order = false);
+    CasADiProblem(const std::string &filename);
     ~CasADiProblem();
 
     CasADiProblem(const CasADiProblem &);
@@ -65,14 +52,20 @@ class CasADiProblem : public BoxConstrProblem<Conf> {
     [[nodiscard]] real_t eval_ψ(crvec x, crvec y, crvec Σ, rvec ŷ) const;
     void eval_grad_ψ_from_ŷ(crvec x, crvec ŷ, rvec grad_ψ, rvec work_n) const;
     void eval_grad_gi(crvec x, index_t i, rvec grad_i) const;
-    void eval_hess_L_prod(crvec x, crvec y, crvec v, rvec Hv) const;
-    void eval_hess_L(crvec x, crvec y, rmat H) const;
-    void eval_hess_ψ_prod(crvec x, crvec y, crvec Σ, crvec v, rvec Hv) const;
-    void eval_hess_ψ(crvec x, crvec y, crvec Σ, rmat H) const;
+    [[nodiscard]] length_t get_jac_g_num_nonzeros() const;
+    void eval_jac_g(crvec x, rindexvec inner_idx, rindexvec outer_ptr, rvec J_values) const;
+    void eval_hess_L_prod(crvec x, crvec y, real_t scale, crvec v, rvec Hv) const;
+    [[nodiscard]] length_t get_hess_L_num_nonzeros() const;
+    void eval_hess_L(crvec x, crvec y, real_t scale, rindexvec inner_idx, rindexvec outer_ptr, rvec H_values) const;
+    void eval_hess_ψ_prod(crvec x, crvec y, crvec Σ, real_t scale, crvec v, rvec Hv) const;
+    [[nodiscard]] length_t get_hess_ψ_num_nonzeros() const;
+    void eval_hess_ψ(crvec x, crvec y, crvec Σ, real_t scale, rindexvec inner_idx, rindexvec outer_ptr, rvec H_values) const;
     // clang-format on
 
     /// @see @ref TypeErasedProblem::provides_eval_grad_gi
     [[nodiscard]] bool provides_eval_grad_gi() const;
+    /// @see @ref TypeErasedProblem::provides_eval_jac_g
+    [[nodiscard]] bool provides_eval_jac_g() const;
     /// @see @ref TypeErasedProblem::provides_eval_hess_L_prod
     [[nodiscard]] bool provides_eval_hess_L_prod() const;
     /// @see @ref TypeErasedProblem::provides_eval_hess_L

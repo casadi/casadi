@@ -11,6 +11,7 @@ typedef ptrdiff_t alpaqa_length_t;
 typedef alpaqa_length_t alpaqa_index_t;
 
 typedef struct {
+    char version[16];
     alpaqa_length_t n, m;
 
     // clang-format off
@@ -30,6 +31,14 @@ typedef struct {
         const alpaqa_real_t *x,
         const alpaqa_real_t *y,
         alpaqa_real_t *grad_gxy);
+    void (*eval_jac_g)(
+        void *instance,
+        const alpaqa_real_t *x,
+        alpaqa_index_t *inner_idx,
+        alpaqa_index_t *outer_ptr,
+        alpaqa_real_t *J_values);
+    alpaqa_length_t (*get_jac_g_num_nonzeros)(
+        void *instance);
     void (*eval_grad_gi)(
         void *instance,
         const alpaqa_real_t *x,
@@ -39,19 +48,38 @@ typedef struct {
         void *instance,
         const alpaqa_real_t *x,
         const alpaqa_real_t *y,
+        alpaqa_real_t scale,
         const alpaqa_real_t *v,
         alpaqa_real_t *Hv);
     void (*eval_hess_L)(
         void *instance,
         const alpaqa_real_t *x,
         const alpaqa_real_t *y,
-        alpaqa_real_t *H);
+        alpaqa_real_t scale,
+        alpaqa_index_t *inner_idx,
+        alpaqa_index_t *outer_ptr,
+        alpaqa_real_t *H_values);
+    alpaqa_length_t (*get_hess_L_num_nonzeros)(
+        void *instance);
+    void (*eval_hess_ψ_prod)(
+        void *instance,
+        const alpaqa_real_t *x,
+        const alpaqa_real_t *y,
+        const alpaqa_real_t *Σ,
+        alpaqa_real_t scale,
+        const alpaqa_real_t *v,
+        alpaqa_real_t *Hv);
     void (*eval_hess_ψ)(
         void *instance,
         const alpaqa_real_t *x,
         const alpaqa_real_t *y,
         const alpaqa_real_t *Σ,
-        alpaqa_real_t *H);
+        alpaqa_real_t scale,
+        alpaqa_index_t *inner_idx,
+        alpaqa_index_t *outer_ptr,
+        alpaqa_real_t *H_values);
+    alpaqa_length_t (*get_hess_ψ_num_nonzeros)(
+        void *instance);
     alpaqa_real_t (*eval_f_grad_f)(
         void *instance,
         const alpaqa_real_t *x,
@@ -130,6 +158,7 @@ typedef struct {
 } alpaqa_problem_register_t;
 
 typedef struct {
+    char version[16];
     alpaqa_length_t N, nx, nu, nh, nh_N, nc, nc_N;
 
     // clang-format off

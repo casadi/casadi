@@ -8,8 +8,8 @@
 TEST(ALM, casadi) {
     USING_ALPAQA_CONFIG(alpaqa::EigenConfigd);
 
-    // Load the problem (with 2 decision variables and 1 general constraint)
-    auto problem = alpaqa::CasADiProblem<config_t>(ROSENBROCK_FUNC_DLL, 2, 1);
+    // Load the problem
+    alpaqa::CasADiProblem<config_t> problem{ROSENBROCK_FUNC_DLL};
 
     // Specify the bounds
     problem.C.lowerbound = vec::Constant(2, 0.);
@@ -81,17 +81,4 @@ TEST(ALM, casadi) {
     EXPECT_EQ(stats.status, alpaqa::SolverStatus::Converged);
     EXPECT_THAT(x, EigenAlmostEqualRel(x_expected, 1e-6));
     EXPECT_THAT(y, EigenAlmostEqualRel(y_expected, 1e-6));
-}
-
-TEST(ALM, casadiWrongDimension) {
-    USING_ALPAQA_CONFIG(alpaqa::EigenConfigd);
-
-    // True dimension: (2, 1, 1)
-    EXPECT_THROW(alpaqa::CasADiProblem<config_t>(ROSENBROCK_FUNC_DLL, 3, 1, 1),
-                 std::invalid_argument);
-    EXPECT_THROW(alpaqa::CasADiProblem<config_t>(ROSENBROCK_FUNC_DLL, 2, 2, 1),
-                 std::invalid_argument);
-    EXPECT_THROW(alpaqa::CasADiProblem<config_t>(ROSENBROCK_FUNC_DLL, 2, 1, 2),
-                 std::invalid_argument);
-    EXPECT_NO_THROW(alpaqa::CasADiProblem<config_t>(ROSENBROCK_FUNC_DLL));
 }

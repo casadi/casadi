@@ -45,16 +45,24 @@ struct ProblemVTable : util::BasicVTable {
         eval_grad_g_prod;
 
     // Second order
+    optional_const_function_t<void(crvec x, rindexvec inner_idx, rindexvec outer_ptr, rvec J_values)>
+        eval_jac_g = &default_eval_jac_g;
+    optional_const_function_t<length_t()>
+        get_jac_g_num_nonzeros = &default_get_jac_g_num_nonzeros;
     optional_const_function_t<void(crvec x, index_t i, rvec grad_gi)>
         eval_grad_gi = &default_eval_grad_gi;
-    optional_const_function_t<void(crvec x, crvec y, crvec v, rvec Hv)>
+    optional_const_function_t<void(crvec x, crvec y, real_t scale, crvec v, rvec Hv)>
         eval_hess_L_prod = &default_eval_hess_L_prod;
-    optional_const_function_t<void(crvec x, crvec y, rmat H)>
+    optional_const_function_t<void(crvec x, crvec y, real_t scale, rindexvec inner_idx, rindexvec outer_ptr, rvec H_values)>
         eval_hess_L = &default_eval_hess_L;
-    optional_const_function_t<void(crvec x, crvec y, crvec Σ, crvec v, rvec Hv)>
+    optional_const_function_t<length_t()>
+        get_hess_L_num_nonzeros = &default_get_hess_L_num_nonzeros;
+    optional_const_function_t<void(crvec x, crvec y, crvec Σ, real_t scale, crvec v, rvec Hv)>
         eval_hess_ψ_prod = &default_eval_hess_ψ_prod;
-    optional_const_function_t<void(crvec x, crvec y, crvec Σ, rmat H)>
+    optional_const_function_t<void(crvec x, crvec y, crvec Σ, real_t scale, rindexvec inner_idx, rindexvec outer_ptr, rvec H_values)>
         eval_hess_ψ = &default_eval_hess_ψ;
+    optional_const_function_t<length_t()>
+        get_hess_ψ_num_nonzeros = &default_get_hess_ψ_num_nonzeros;
 
     // Combined evaluations
     optional_const_function_t<real_t(crvec x, rvec grad_fx)>
@@ -118,27 +126,42 @@ struct ProblemVTable : util::BasicVTable {
         }
     }
 
+    static void default_eval_jac_g(const void *, crvec, rindexvec, rindexvec, rvec,
+                                   const ProblemVTable &) {
+        throw not_implemented_error("eval_jac_g");
+    }
+    static length_t default_get_jac_g_num_nonzeros(const void *, const ProblemVTable &) {
+        return 0;
+    }
     static void default_eval_grad_gi(const void *, crvec, index_t, rvec, const ProblemVTable &) {
         throw not_implemented_error("eval_grad_gi");
     }
-    static void default_eval_hess_L_prod(const void *, crvec, crvec, crvec, rvec,
+    static void default_eval_hess_L_prod(const void *, crvec, crvec, real_t, crvec, rvec,
                                          const ProblemVTable &) {
         throw not_implemented_error("eval_hess_L_prod");
     }
-    static void default_eval_hess_L(const void *, crvec, crvec, rmat, const ProblemVTable &) {
+    static void default_eval_hess_L(const void *, crvec, crvec, real_t, rindexvec, rindexvec, rvec,
+                                    const ProblemVTable &) {
         throw not_implemented_error("eval_hess_L");
     }
-    static void default_eval_hess_ψ_prod(const void *self, crvec x, crvec y, crvec, crvec v,
-                                         rvec Hv, const ProblemVTable &vtable) {
+    static length_t default_get_hess_L_num_nonzeros(const void *, const ProblemVTable &) {
+        return 0;
+    }
+    static void default_eval_hess_ψ_prod(const void *self, crvec x, crvec y, crvec, real_t scale,
+                                         crvec v, rvec Hv, const ProblemVTable &vtable) {
         if (y.size() == 0 && vtable.eval_hess_L_prod != default_eval_hess_L_prod)
-            return vtable.eval_hess_L_prod(self, x, y, v, Hv, vtable);
+            return vtable.eval_hess_L_prod(self, x, y, scale, v, Hv, vtable);
         throw not_implemented_error("eval_hess_ψ_prod");
     }
-    static void default_eval_hess_ψ(const void *self, crvec x, crvec y, crvec, rmat H,
+    static void default_eval_hess_ψ(const void *self, crvec x, crvec y, crvec, real_t scale,
+                                    rindexvec inner_idx, rindexvec outer_ptr, rvec H_values,
                                     const ProblemVTable &vtable) {
         if (y.size() == 0 && vtable.eval_hess_L != default_eval_hess_L)
-            return vtable.eval_hess_L(self, x, y, H, vtable);
+            return vtable.eval_hess_L(self, x, y, scale, inner_idx, outer_ptr, H_values, vtable);
         throw not_implemented_error("eval_hess_ψ");
+    }
+    static length_t default_get_hess_ψ_num_nonzeros(const void *, const ProblemVTable &) {
+        return 0;
     }
 
     static real_t default_eval_f_grad_f(const void *self, crvec x, rvec grad_fx,
@@ -230,11 +253,15 @@ struct ProblemVTable : util::BasicVTable {
         ALPAQA_TE_REQUIRED_METHOD(vtable, P, eval_g);
         ALPAQA_TE_REQUIRED_METHOD(vtable, P, eval_grad_g_prod);
         // Second order
+        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_jac_g, t.t);
+        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, get_jac_g_num_nonzeros, t.t);
         ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_grad_gi, t.t);
         ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_hess_L_prod, t.t);
         ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_hess_L, t.t);
+        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, get_hess_L_num_nonzeros, t.t);
         ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_hess_ψ_prod, t.t);
         ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_hess_ψ, t.t);
+        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, get_hess_ψ_num_nonzeros, t.t);
         // Combined evaluations
         ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_f_grad_f, t.t);
         ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_f_g, t.t);
@@ -393,6 +420,31 @@ class TypeErasedProblem : public util::TypeErased<ProblemVTable<Conf>, Allocator
     /// @{
 
     /// **[Optional]**
+    /// Function that evaluates the Jacobian of the constraints as a sparse
+    /// matrix, @f$ \jac_g(x) @f$
+    /// @param  [in] x
+    ///         Decision variable @f$ x \in \R^n @f$
+    /// @param  [inout] inner_idx
+    ///         Inner indices (row indices of nonzeros).
+    /// @param  [inout] outer_ptr
+    ///         Outer pointers (points to the first nonzero in each column).
+    /// @param  [out] J_values
+    ///         Nonzero values of the Jacobian
+    ///         @f$ \jac_g(x) \in \R^{m\times n} @f$
+    /// If @p J_values has size zero, this function should initialize
+    /// @p inner_idx and @p outer_ptr. If @p J_values is nonempty, @p inner_idx
+    /// and @p outer_ptr can be assumed to be initialized, and this function
+    /// should evaluate @p J_values.
+    ///
+    /// Required for second-order solvers only.
+    void eval_jac_g(crvec x, rindexvec inner_idx, rindexvec outer_ptr, rvec J_values) const;
+    /// **[Optional]**
+    /// Function that gets the number of nonzeros of the Jacobian of the
+    /// constraints.
+    ///
+    /// Required for second-order solvers only.
+    length_t get_jac_g_num_nonzeros() const;
+    /// **[Optional]**
     /// Function that evaluates the gradient of one specific constraint,
     /// @f$ \nabla g_i(x) @f$
     /// @param  [in] x
@@ -413,6 +465,8 @@ class TypeErasedProblem : public util::TypeErased<ProblemVTable<Conf>, Allocator
     ///         Decision variable @f$ x \in \R^n @f$
     /// @param  [in] y
     ///         Lagrange multipliers @f$ y \in \R^m @f$
+    /// @param  [in] scale
+    ///         Scale factor for the cost function.
     /// @param  [in] v
     ///         Vector to multiply by @f$ v \in \R^n @f$
     /// @param  [out] Hv
@@ -420,19 +474,37 @@ class TypeErasedProblem : public util::TypeErased<ProblemVTable<Conf>, Allocator
     ///         @f$ \nabla_{xx}^2 L(x, y)\,v \in \R^{n} @f$
     ///
     /// Required for second-order solvers only.
-    void eval_hess_L_prod(crvec x, crvec y, crvec v, rvec Hv) const;
+    void eval_hess_L_prod(crvec x, crvec y, real_t scale, crvec v, rvec Hv) const;
     /// **[Optional]**
-    /// Function that evaluates the Hessian of the Lagrangian,
+    /// Function that evaluates the Hessian of the Lagrangian as a sparse matrix,
     /// @f$ \nabla_{xx}^2L(x, y) @f$
     /// @param  [in] x
     ///         Decision variable @f$ x \in \R^n @f$
     /// @param  [in] y
     ///         Lagrange multipliers @f$ y \in \R^m @f$
-    /// @param  [out] H
-    ///         Hessian @f$ \nabla_{xx}^2 L(x, y) \in \R^{n\times n} @f$
+    /// @param  [in] scale
+    ///         Scale factor for the cost function.
+    /// @param  [inout] inner_idx
+    ///         Inner indices (row indices of nonzeros).
+    /// @param  [inout] outer_ptr
+    ///         Outer pointers (points to the first nonzero in each column).
+    /// @param  [out] H_values
+    ///         Nonzero values of the Hessian
+    ///         @f$ \nabla_{xx}^2 L(x, y) \in \R^{n\times n} @f$.
+    /// If @p H_values has size zero, this function should initialize
+    /// @p inner_idx and @p outer_ptr. If @p H_values is nonempty, @p inner_idx
+    /// and @p outer_ptr can be assumed to be initialized, and this function
+    /// should evaluate @p H_values.
     ///
     /// Required for second-order solvers only.
-    void eval_hess_L(crvec x, crvec y, rmat H) const;
+    void eval_hess_L(crvec x, crvec y, real_t scale, rindexvec inner_idx, rindexvec outer_ptr,
+                     rvec H_Values) const;
+    /// **[Optional]**
+    /// Function that gets the number of nonzeros of the Hessian of the
+    /// Lagrangian.
+    ///
+    /// Required for second-order solvers only.
+    length_t get_hess_L_num_nonzeros() const;
     /// **[Optional]**
     /// Function that evaluates the Hessian of the augmented Lagrangian
     /// multiplied by a vector,
@@ -443,6 +515,8 @@ class TypeErasedProblem : public util::TypeErased<ProblemVTable<Conf>, Allocator
     ///         Lagrange multipliers @f$ y \in \R^m @f$
     /// @param  [in] Σ
     ///         Penalty weights @f$ \Sigma @f$
+    /// @param  [in] scale
+    ///         Scale factor for the cost function.
     /// @param  [in] v
     ///         Vector to multiply by @f$ v \in \R^n @f$
     /// @param  [out] Hv
@@ -450,7 +524,7 @@ class TypeErasedProblem : public util::TypeErased<ProblemVTable<Conf>, Allocator
     ///         @f$ \nabla_{xx}^2 L_\Sigma(x, y)\,v \in \R^{n} @f$
     ///
     /// Required for second-order solvers only.
-    void eval_hess_ψ_prod(crvec x, crvec y, crvec Σ, crvec v, rvec Hv) const;
+    void eval_hess_ψ_prod(crvec x, crvec y, crvec Σ, real_t scale, crvec v, rvec Hv) const;
     /// **[Optional]**
     /// Function that evaluates the Hessian of the augmented Lagrangian,
     /// @f$ \nabla_{xx}^2L_\Sigma(x, y) @f$
@@ -460,11 +534,29 @@ class TypeErasedProblem : public util::TypeErased<ProblemVTable<Conf>, Allocator
     ///         Lagrange multipliers @f$ y \in \R^m @f$
     /// @param  [in] Σ
     ///         Penalty weights @f$ \Sigma @f$
-    /// @param  [out] H
-    ///         Hessian @f$ \nabla_{xx}^2 L_\Sigma(x, y) \in \R^{n\times n} @f$
+    /// @param  [in] scale
+    ///         Scale factor for the cost function.
+    /// @param  [inout] inner_idx
+    ///         Inner indices (row indices of nonzeros).
+    /// @param  [inout] outer_ptr
+    ///         Outer pointers (points to the first nonzero in each column).
+    /// @param  [out] H_values
+    ///         Nonzero values of the Hessian
+    ///         @f$ \nabla_{xx}^2 L_\Sigma(x, y) \in \R^{n\times n} @f$
+    /// If @p H_values has size zero, this function should initialize
+    /// @p inner_idx and @p outer_ptr. If @p H_values is nonempty, @p inner_idx
+    /// and @p outer_ptr can be assumed to be initialized, and this function
+    /// should evaluate @p H_values.
     ///
     /// Required for second-order solvers only.
-    void eval_hess_ψ(crvec x, crvec y, crvec Σ, rmat H) const;
+    void eval_hess_ψ(crvec x, crvec y, crvec Σ, real_t scale, rindexvec inner_idx,
+                     rindexvec outer_ptr, rvec H_values) const;
+    /// **[Optional]**
+    /// Function that gets the number of nonzeros of the Hessian of the
+    /// augmented Lagrangian.
+    ///
+    /// Required for second-order solvers only.
+    length_t get_hess_ψ_num_nonzeros() const;
 
     /// @}
 
@@ -551,6 +643,14 @@ class TypeErasedProblem : public util::TypeErased<ProblemVTable<Conf>, Allocator
     /// @{
 
     /// Returns true if the problem provides an implementation of
+    /// @ref eval_jac_g.
+    bool provides_eval_jac_g() const { return vtable.eval_jac_g != vtable.default_eval_jac_g; }
+    /// Returns true if the problem provides an implementation of
+    /// @ref get_jac_g_num_nonzeros.
+    bool provides_get_jac_g_num_nonzeros() const {
+        return vtable.get_jac_g_num_nonzeros != vtable.default_get_jac_g_num_nonzeros;
+    }
+    /// Returns true if the problem provides an implementation of
     /// @ref eval_grad_gi.
     bool provides_eval_grad_gi() const {
         return vtable.eval_grad_gi != vtable.default_eval_grad_gi;
@@ -564,6 +664,11 @@ class TypeErasedProblem : public util::TypeErased<ProblemVTable<Conf>, Allocator
     /// @ref eval_hess_L.
     bool provides_eval_hess_L() const { return vtable.eval_hess_L != vtable.default_eval_hess_L; }
     /// Returns true if the problem provides an implementation of
+    /// @ref get_hess_L_num_nonzeros.
+    bool provides_get_hess_L_num_nonzeros() const {
+        return vtable.get_hess_L_num_nonzeros != vtable.default_get_hess_L_num_nonzeros;
+    }
+    /// Returns true if the problem provides an implementation of
     /// @ref eval_hess_ψ_prod.
     bool provides_eval_hess_ψ_prod() const {
         return vtable.eval_hess_ψ_prod != vtable.default_eval_hess_ψ_prod;
@@ -571,6 +676,11 @@ class TypeErasedProblem : public util::TypeErased<ProblemVTable<Conf>, Allocator
     /// Returns true if the problem provides an implementation of
     /// @ref eval_hess_ψ.
     bool provides_eval_hess_ψ() const { return vtable.eval_hess_ψ != vtable.default_eval_hess_ψ; }
+    /// Returns true if the problem provides an implementation of
+    /// @ref get_hess_ψ_num_nonzeros.
+    bool provides_get_hess_ψ_num_nonzeros() const {
+        return vtable.get_hess_ψ_num_nonzeros != vtable.default_get_hess_ψ_num_nonzeros;
+    }
     /// Returns true if the problem provides a specialized implementation of
     /// @ref eval_f_grad_f, false if it uses the default implementation.
     bool provides_eval_f_grad_f() const {
@@ -700,22 +810,43 @@ void TypeErasedProblem<Conf, Allocator>::eval_grad_gi(crvec x, index_t i, rvec g
     return call(vtable.eval_grad_gi, x, i, grad_gi);
 }
 template <Config Conf, class Allocator>
-void TypeErasedProblem<Conf, Allocator>::eval_hess_L_prod(crvec x, crvec y, crvec v,
+void TypeErasedProblem<Conf, Allocator>::eval_jac_g(crvec x, rindexvec inner_idx,
+                                                    rindexvec outer_ptr, rvec J_values) const {
+    return call(vtable.eval_jac_g, x, inner_idx, outer_ptr, J_values);
+}
+template <Config Conf, class Allocator>
+auto TypeErasedProblem<Conf, Allocator>::get_jac_g_num_nonzeros() const -> length_t {
+    return call(vtable.get_jac_g_num_nonzeros);
+}
+template <Config Conf, class Allocator>
+void TypeErasedProblem<Conf, Allocator>::eval_hess_L_prod(crvec x, crvec y, real_t scale, crvec v,
                                                           rvec Hv) const {
-    return call(vtable.eval_hess_L_prod, x, y, v, Hv);
+    return call(vtable.eval_hess_L_prod, x, y, scale, v, Hv);
 }
 template <Config Conf, class Allocator>
-void TypeErasedProblem<Conf, Allocator>::eval_hess_L(crvec x, crvec y, rmat H) const {
-    return call(vtable.eval_hess_L, x, y, H);
+void TypeErasedProblem<Conf, Allocator>::eval_hess_L(crvec x, crvec y, real_t scale,
+                                                     rindexvec inner_idx, rindexvec outer_ptr,
+                                                     rvec H_values) const {
+    return call(vtable.eval_hess_L, x, y, scale, inner_idx, outer_ptr, H_values);
 }
 template <Config Conf, class Allocator>
-void TypeErasedProblem<Conf, Allocator>::eval_hess_ψ_prod(crvec x, crvec y, crvec Σ, crvec v,
-                                                          rvec Hv) const {
-    return call(vtable.eval_hess_ψ_prod, x, y, Σ, v, Hv);
+auto TypeErasedProblem<Conf, Allocator>::get_hess_L_num_nonzeros() const -> length_t {
+    return call(vtable.get_hess_L_num_nonzeros);
 }
 template <Config Conf, class Allocator>
-void TypeErasedProblem<Conf, Allocator>::eval_hess_ψ(crvec x, crvec y, crvec Σ, rmat H) const {
-    return call(vtable.eval_hess_ψ, x, y, Σ, H);
+void TypeErasedProblem<Conf, Allocator>::eval_hess_ψ_prod(crvec x, crvec y, crvec Σ, real_t scale,
+                                                          crvec v, rvec Hv) const {
+    return call(vtable.eval_hess_ψ_prod, x, y, Σ, scale, v, Hv);
+}
+template <Config Conf, class Allocator>
+void TypeErasedProblem<Conf, Allocator>::eval_hess_ψ(crvec x, crvec y, crvec Σ, real_t scale,
+                                                     rindexvec inner_idx, rindexvec outer_ptr,
+                                                     rvec H_values) const {
+    return call(vtable.eval_hess_ψ, x, y, Σ, scale, inner_idx, outer_ptr, H_values);
+}
+template <Config Conf, class Allocator>
+auto TypeErasedProblem<Conf, Allocator>::get_hess_ψ_num_nonzeros() const -> length_t {
+    return call(vtable.get_hess_ψ_num_nonzeros);
 }
 template <Config Conf, class Allocator>
 auto TypeErasedProblem<Conf, Allocator>::eval_f_grad_f(crvec x, rvec grad_fx) const -> real_t {
@@ -801,10 +932,14 @@ struct ProblemWithCounters {
     void eval_g(crvec x, rvec gx) const { ++evaluations->g; return timed(evaluations->time.g, std::bind(&std::remove_cvref_t<Problem>::eval_g, &problem, x, gx)); }
     void eval_grad_g_prod(crvec x, crvec y, rvec grad_gxy) const { ++evaluations->grad_g_prod; return timed(evaluations->time.grad_g_prod, std::bind(&std::remove_cvref_t<Problem>::eval_grad_g_prod, &problem, x, y, grad_gxy)); }
     void eval_grad_gi(crvec x, index_t i, rvec grad_gi) const requires requires { &std::remove_cvref_t<Problem>::eval_grad_gi; } { ++evaluations->grad_gi; return timed(evaluations->time.grad_gi, std::bind(&std::remove_cvref_t<Problem>::eval_grad_gi, &problem, x, i, grad_gi)); }
-    void eval_hess_L_prod(crvec x, crvec y, crvec v, rvec Hv) const requires requires { &std::remove_cvref_t<Problem>::eval_hess_L_prod; } { ++evaluations->hess_L_prod; return timed(evaluations->time.hess_L_prod, std::bind(&std::remove_cvref_t<Problem>::eval_hess_L_prod, &problem, x, y, v, Hv)); }
-    void eval_hess_L(crvec x, crvec y, rmat H) const requires requires { &std::remove_cvref_t<Problem>::eval_hess_L; } { ++evaluations->hess_L; return timed(evaluations->time.hess_L, std::bind(&std::remove_cvref_t<Problem>::eval_hess_L, &problem, x, y, H)); }
-    void eval_hess_ψ_prod(crvec x, crvec y, crvec Σ, crvec v, rvec Hv) const requires requires { &std::remove_cvref_t<Problem>::eval_hess_ψ_prod; } { ++evaluations->hess_ψ_prod; return timed(evaluations->time.hess_ψ_prod, std::bind(&std::remove_cvref_t<Problem>::eval_hess_ψ_prod, &problem, x, y, Σ, v, Hv)); }
-    void eval_hess_ψ(crvec x, crvec y, crvec Σ, rmat H) const requires requires { &std::remove_cvref_t<Problem>::eval_hess_ψ; } { ++evaluations->hess_ψ; return timed(evaluations->time.hess_ψ, std::bind(&std::remove_cvref_t<Problem>::eval_hess_ψ, &problem, x, y, Σ, H)); }
+    void eval_jac_g(crvec x, rindexvec inner_idx, rindexvec outer_ptr, rvec J_values) const requires requires { &std::remove_cvref_t<Problem>::eval_jac_g; } { ++evaluations->jac_g; return timed(evaluations->time.jac_g, std::bind(&std::remove_cvref_t<Problem>::eval_jac_g, &problem, x, inner_idx, outer_ptr, J_values)); }
+    length_t get_jac_g_num_nonzeros() const requires requires { &std::remove_cvref_t<Problem>::get_jac_g_num_nonzeros; } { return problem.get_jac_g_num_nonzeros(); }
+    void eval_hess_L_prod(crvec x, crvec y, real_t scale, crvec v, rvec Hv) const requires requires { &std::remove_cvref_t<Problem>::eval_hess_L_prod; } { ++evaluations->hess_L_prod; return timed(evaluations->time.hess_L_prod, std::bind(&std::remove_cvref_t<Problem>::eval_hess_L_prod, &problem, x, y, scale, v, Hv)); }
+    void eval_hess_L(crvec x, crvec y, real_t scale, rindexvec inner_idx, rindexvec outer_ptr, rvec H_values) const requires requires { &std::remove_cvref_t<Problem>::eval_hess_L; } { ++evaluations->hess_L; return timed(evaluations->time.hess_L, std::bind(&std::remove_cvref_t<Problem>::eval_hess_L, &problem, x, y, scale, inner_idx, outer_ptr, H_values)); }
+    length_t get_hess_L_num_nonzeros() const requires requires { &std::remove_cvref_t<Problem>::get_hess_L_num_nonzeros; } { return problem.get_hess_L_num_nonzeros(); }
+    void eval_hess_ψ_prod(crvec x, crvec y, crvec Σ, real_t scale, crvec v, rvec Hv) const requires requires { &std::remove_cvref_t<Problem>::eval_hess_ψ_prod; } { ++evaluations->hess_ψ_prod; return timed(evaluations->time.hess_ψ_prod, std::bind(&std::remove_cvref_t<Problem>::eval_hess_ψ_prod, &problem, x, y, Σ, scale, v, Hv)); }
+    void eval_hess_ψ(crvec x, crvec y, crvec Σ, real_t scale, rindexvec inner_idx, rindexvec outer_ptr, rvec H_values) const requires requires { &std::remove_cvref_t<Problem>::eval_hess_ψ; } { ++evaluations->hess_ψ; return timed(evaluations->time.hess_ψ, std::bind(&std::remove_cvref_t<Problem>::eval_hess_ψ, &problem, x, y, Σ, scale, inner_idx, outer_ptr, H_values)); }
+    length_t get_hess_ψ_num_nonzeros() const requires requires { &std::remove_cvref_t<Problem>::get_hess_ψ_num_nonzeros; } { return problem.get_hess_ψ_num_nonzeros(); }
     real_t eval_f_grad_f(crvec x, rvec grad_fx) const requires requires { &std::remove_cvref_t<Problem>::eval_f_grad_f; } { ++evaluations->f_grad_f; return timed(evaluations->time.f_grad_f, std::bind(&std::remove_cvref_t<Problem>::eval_f_grad_f, &problem, x, grad_fx)); }
     real_t eval_f_g(crvec x, rvec g) const requires requires { &std::remove_cvref_t<Problem>::eval_f_g; } { ++evaluations->f_g; return timed(evaluations->time.f_g, std::bind(&std::remove_cvref_t<Problem>::eval_f_g, &problem, x, g)); }
     real_t eval_f_grad_f_g(crvec x, rvec grad_fx, rvec g) const requires requires { &std::remove_cvref_t<Problem>::eval_f_grad_f_g; } { ++evaluations->f_grad_f_g; return timed(evaluations->time.f_grad_f_g, std::bind(&std::remove_cvref_t<Problem>::eval_f_grad_f_g, &problem, x, grad_fx, g)); }
@@ -819,9 +954,13 @@ struct ProblemWithCounters {
     void check() const { problem.check(); }
 
     [[nodiscard]] bool provides_eval_grad_gi() const requires requires (Problem p) { { p.provides_eval_grad_gi() } -> std::convertible_to<bool>; } { return problem.provides_eval_grad_gi(); }
+    [[nodiscard]] bool provides_eval_jac_g() const requires requires (Problem p) { { p.provides_eval_jac_g() } -> std::convertible_to<bool>; } { return problem.provides_eval_jac_g(); }
+    [[nodiscard]] bool provides_get_jac_g_num_nozeros() const requires requires (Problem p) { { p.provides_get_jac_g_num_nozeros() } -> std::convertible_to<bool>; } { return problem.provides_get_jac_g_num_nozeros(); }
     [[nodiscard]] bool provides_eval_hess_L_prod() const requires requires (Problem p) { { p.provides_eval_hess_L_prod() } -> std::convertible_to<bool>; } { return problem.provides_eval_hess_L_prod(); }
     [[nodiscard]] bool provides_eval_hess_L() const requires requires (Problem p) { { p.provides_eval_hess_L() } -> std::convertible_to<bool>; } { return problem.provides_eval_hess_L(); }
+    [[nodiscard]] bool provides_get_hess_L_num_nozeros() const requires requires (Problem p) { { p.provides_get_hess_L_num_nozeros() } -> std::convertible_to<bool>; } { return problem.provides_get_hess_L_num_nozeros(); }
     [[nodiscard]] bool provides_eval_hess_ψ() const requires requires (Problem p) { { p.provides_eval_hess_ψ() } -> std::convertible_to<bool>; } { return problem.provides_eval_hess_ψ(); }
+    [[nodiscard]] bool provides_get_hess_ψ_num_nozeros() const requires requires (Problem p) { { p.provides_get_hess_ψ_num_nozeros() } -> std::convertible_to<bool>; } { return problem.provides_get_hess_ψ_num_nozeros(); }
     [[nodiscard]] bool provides_eval_f_grad_f() const requires requires (Problem p) { { p.provides_eval_f_grad_f() } -> std::convertible_to<bool>; } { return problem.provides_eval_f_grad_f(); }
     [[nodiscard]] bool provides_eval_f_g() const requires requires (Problem p) { { p.provides_eval_f_g() } -> std::convertible_to<bool>; } { return problem.provides_eval_f_g(); }
     [[nodiscard]] bool provides_eval_f_grad_f_g() const requires requires (Problem p) { { p.provides_eval_f_grad_f_g() } -> std::convertible_to<bool>; } { return problem.provides_eval_f_grad_f_g(); }
@@ -1002,26 +1141,39 @@ class FunctionalProblem : public BoxConstrProblem<Conf> {
     std::function<void(crvec, rvec)> grad_f;
     std::function<void(crvec, rvec)> g;
     std::function<void(crvec, crvec, rvec)> grad_g_prod;
-    std::function<void(crvec, index_t, rvec)> grad_gi;
-    std::function<void(crvec, crvec, crvec, rvec)> hess_L_prod;
-    std::function<void(crvec, crvec, rmat)> hess_L;
-    std::function<void(crvec, crvec, crvec, crvec, rvec)> hess_ψ_prod;
-    std::function<void(crvec, crvec, crvec, rmat)> hess_ψ;
+    std::function<void(crvec, rmat)> jac_g;
+    std::function<void(crvec, crvec, real_t, crvec, rvec)> hess_L_prod;
+    std::function<void(crvec, crvec, real_t, rmat)> hess_L;
+    std::function<void(crvec, crvec, crvec, real_t, crvec, rvec)> hess_ψ_prod;
+    std::function<void(crvec, crvec, crvec, real_t, rmat)> hess_ψ;
 
     // clang-format off
     real_t eval_f(crvec x) const { ScopedMallocAllower ma; return f(x); }
     void eval_grad_f(crvec x, rvec grad_fx) const { ScopedMallocAllower ma; grad_f(x, grad_fx); }
     void eval_g(crvec x, rvec gx) const { ScopedMallocAllower ma; g(x, gx); }
     void eval_grad_g_prod(crvec x, crvec y, rvec grad_gxy) const { ScopedMallocAllower ma; grad_g_prod(x, y, grad_gxy); }
-    void eval_grad_gi(crvec x, index_t i, rvec grad_i) const { ScopedMallocAllower ma; grad_gi(x, i, grad_i); }
-    void eval_hess_L_prod(crvec x, crvec y, crvec v, rvec Hv) const { ScopedMallocAllower ma; hess_L_prod(x, y, v, Hv); }
-    void eval_hess_L(crvec x, crvec y, rmat H) const { ScopedMallocAllower ma; hess_L(x, y, H); }
-    void eval_hess_ψ_prod(crvec x, crvec y, crvec Σ, crvec v, rvec Hv) const { ScopedMallocAllower ma; hess_ψ_prod(x, y, Σ, v, Hv); }
-    void eval_hess_ψ(crvec x, crvec y, crvec Σ, rmat H) const { ScopedMallocAllower ma; hess_ψ(x, y, Σ, H); }
+    void eval_hess_L_prod(crvec x, crvec y, real_t scale, crvec v, rvec Hv) const { ScopedMallocAllower ma; hess_L_prod(x, y, scale, v, Hv); }
+    void eval_hess_ψ_prod(crvec x, crvec y, crvec Σ, real_t scale, crvec v, rvec Hv) const { ScopedMallocAllower ma; hess_ψ_prod(x, y, Σ, scale, v, Hv); }
     // clang-format on
+    void eval_jac_g(crvec x, rindexvec, rindexvec, rvec J_values) const {
+        ScopedMallocAllower ma;
+        if (J_values.size() > 0)
+            jac_g(x, J_values.reshaped(this->m, this->n));
+    }
+    void eval_hess_L(crvec x, crvec y, real_t scale, rindexvec, rindexvec, rvec H_values) const {
+        ScopedMallocAllower ma;
+        if (H_values.size() > 0)
+            hess_L(x, y, scale, H_values.reshaped(this->n, this->n));
+    }
+    void eval_hess_ψ(crvec x, crvec y, crvec Σ, real_t scale, rindexvec, rindexvec,
+                     rvec H_values) const {
+        ScopedMallocAllower ma;
+        if (H_values.size() > 0)
+            hess_ψ(x, y, Σ, scale, H_values.reshaped(this->n, this->n));
+    }
 
-    /// @see @ref TypeErasedProblem::provides_eval_grad_gi
-    bool provides_eval_grad_gi() const { return bool{grad_gi}; }
+    /// @see @ref TypeErasedProblem::provides_eval_jac_g
+    bool provides_eval_jac_g() const { return bool{jac_g}; }
     /// @see @ref TypeErasedProblem::provides_eval_hess_L_prod
     bool provides_eval_hess_L_prod() const { return bool{hess_L_prod}; }
     /// @see @ref TypeErasedProblem::provides_eval_hess_L
@@ -1040,6 +1192,7 @@ class FunctionalProblem : public BoxConstrProblem<Conf> {
 template <Config Conf>
 void print_provided_functions(std::ostream &os, const TypeErasedProblem<Conf> &problem) {
     os << "           eval_grad_gi: " << problem.provides_eval_grad_gi() << '\n'
+       << "                  jac_g: " << problem.provides_eval_jac_g() << '\n'
        << "       eval_hess_L_prod: " << problem.provides_eval_hess_L_prod() << '\n'
        << "            eval_hess_L: " << problem.provides_eval_hess_L() << '\n'
        << "       eval_hess_ψ_prod: " << problem.provides_eval_hess_ψ_prod() << '\n'

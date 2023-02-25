@@ -107,24 +107,36 @@ void StructuredLBFGSDirection<Conf>::approximate_hessian_vec_term(
     }
     // Or using an exact AD
     else {
-        // Compute the product with the Hessian of the Lagrangian
-        problem->eval_hess_L_prod(xₖ, *y, qₖ, HqK);
-        // And then add the Hessian of the penalty terms, to get the
-        // Hessian of the full augmented Lagrangian (if required)
-        if (direction_params.full_augmented_hessian) {
-            assert(m == 0 || problem->provides_eval_grad_gi());
-            auto &g = work_m;
-            problem->eval_g(xₖ, g);
-            for (index_t i = 0; i < m; ++i) {
-                real_t ζ      = g(i) + (*y)(i) / (*Σ)(i);
-                bool inactive = D.lowerbound(i) < ζ && ζ < D.upperbound(i);
-                if (not inactive) {
-                    problem->eval_grad_gi(xₖ, i, work_n);
-                    auto t = (*Σ)(i)*work_n.dot(qₖ);
-                    // TODO: the dot product is more work than
-                    //       strictly necessary (only over K)
-                    for (auto j : J)
-                        HqK(j) += work_n(j) * t;
+        if (!direction_params.full_augmented_hessian) {
+            // Compute the product with the Hessian of the Lagrangian
+            problem->eval_hess_L_prod(xₖ, *y, 1, qₖ, HqK);
+        } else {
+            if (problem->provides_eval_hess_ψ_prod()) {
+                // Compute the product with the Hessian of the augmented
+                // Lagrangian
+                problem->eval_hess_ψ_prod(xₖ, *y, *Σ, 1, qₖ, HqK);
+            } else {
+                // Compute the product with the Hessian of the Lagrangian
+                problem->eval_hess_L_prod(xₖ, *y, 1, qₖ, HqK);
+                // And then add the Hessian of the penalty terms, to get the
+                // Hessian of the full augmented Lagrangian (if required)
+                if (direction_params.full_augmented_hessian) {
+                    assert(m == 0 || problem->provides_eval_grad_gi());
+                    auto &g = work_m;
+                    problem->eval_g(xₖ, g);
+                    for (index_t i = 0; i < m; ++i) {
+                        real_t ζ = g(i) + (*y)(i) / (*Σ)(i);
+                        bool inactive =
+                            D.lowerbound(i) < ζ && ζ < D.upperbound(i);
+                        if (not inactive) {
+                            problem->eval_grad_gi(xₖ, i, work_n);
+                            auto t = (*Σ)(i)*work_n.dot(qₖ);
+                            // TODO: the dot product is more work than
+                            //       strictly necessary (only over K)
+                            for (auto j : J)
+                                HqK(j) += work_n(j) * t;
+                        }
+                    }
                 }
             }
         }
