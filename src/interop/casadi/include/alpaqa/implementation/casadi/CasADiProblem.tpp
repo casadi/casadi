@@ -21,6 +21,7 @@ template <Config Conf>
 struct CasADiFunctionsWithParam {
     USING_ALPAQA_CONFIG(Conf);
     CasADiFunctionEvaluator<Conf, 2, 1> f;
+    CasADiFunctionEvaluator<Conf, 2, 2> f_grad_f;
     // CasADiFunctionEvaluator<6, 1> grad_ψ;
     CasADiFunctionEvaluator<Conf, 6, 2> ψ_grad_ψ;
     struct ConstrFun {
@@ -101,8 +102,10 @@ CasADiProblem<Conf>::CasADiProblem(const std::string &so_name)
 
     impl = std::make_unique<CasADiFunctionsWithParam<Conf>>(
         CasADiFunctionsWithParam<Conf>{
-            .f = wrapped_load<CasADiFunctionEvaluator<Conf, 2, 1>>( //
+            .f        = wrapped_load<CasADiFunctionEvaluator<Conf, 2, 1>>( //
                 so_name, "f", dims(n, p), dims(1)),
+            .f_grad_f = wrapped_load<CasADiFunctionEvaluator<Conf, 2, 2>>( //
+                so_name, "f_grad_f", dims(n, p), dims(1, n)),
             // .grad_ψ = wrapped_load<CasADiFunctionEvaluator<6, 1>>( //
             //     so_name, "grad_psi", dims(n, p, m, m, m, m), dims(n)),
             .ψ_grad_ψ = wrapped_load<CasADiFunctionEvaluator<Conf, 6, 2>>( //
@@ -118,7 +121,7 @@ CasADiProblem<Conf>::CasADiProblem(const std::string &so_name)
                 so_name, "psi", dims(n, p, m, m, m, m), dims(1, m)));
 
     impl->hess_L_prod = try_load<CasADiFunctionEvaluator<Conf, 5, 1>>( //
-        so_name, "hess_L_prod", dims(n, p, 1, m, n), dims(n));
+        so_name, "hess_L_prod", dims(n, p, m, 1, n), dims(n));
     impl->hess_L      = try_load<CasADiFunctionEvaluator<Conf, 4, 1>>( //
         so_name, "hess_L", dims(n, p, m, 1), dims(dim(n, n)));
     impl->hess_ψ_prod = try_load<CasADiFunctionEvaluator<Conf, 8, 1>>( //
@@ -151,8 +154,16 @@ auto CasADiProblem<Conf>::eval_f(crvec x) const -> real_t {
 }
 
 template <Config Conf>
-void CasADiProblem<Conf>::eval_grad_f(crvec, rvec) const {
-    throw not_implemented_error("CasADiProblem::eval_grad_f"); // TODO
+void CasADiProblem<Conf>::eval_grad_f(crvec x, rvec grad_fx) const {
+    real_t f;
+    impl->f_grad_f({x.data(), param.data()}, {&f, grad_fx.data()});
+}
+
+template <Config Conf>
+auto CasADiProblem<Conf>::eval_f_grad_f(crvec x, rvec grad_fx) const -> real_t {
+    real_t f;
+    impl->f_grad_f({x.data(), param.data()}, {&f, grad_fx.data()});
+    return f;
 }
 
 template <Config Conf>
@@ -255,10 +266,10 @@ void CasADiProblem<Conf>::eval_jac_g(crvec x, rindexvec inner_idx,
         auto &&sparsity = impl->jac_g->fun.sparsity_out(0);
         using detail::casadi_to_index;
         if (!sparsity.is_dense()) {
-            std::transform(sparsity.colind(),
-                           sparsity.colind() + sparsity.nnz(),
+            std::transform(sparsity.row(), sparsity.row() + sparsity.nnz(),
                            inner_idx.begin(), casadi_to_index<config_t>);
-            std::transform(sparsity.row(), sparsity.row() + this->get_n() + 1,
+            std::transform(sparsity.colind(),
+                           sparsity.colind() + this->get_n() + 1,
                            outer_ptr.begin(), casadi_to_index<config_t>);
         }
     }
@@ -291,10 +302,10 @@ void CasADiProblem<Conf>::eval_hess_L(crvec x, crvec y, real_t scale,
         auto &&sparsity = impl->hess_L->fun.sparsity_out(0);
         using detail::casadi_to_index;
         if (!sparsity.is_dense()) {
-            std::transform(sparsity.colind(),
-                           sparsity.colind() + sparsity.nnz(),
+            std::transform(sparsity.row(), sparsity.row() + sparsity.nnz(),
                            inner_idx.begin(), casadi_to_index<config_t>);
-            std::transform(sparsity.row(), sparsity.row() + this->get_n() + 1,
+            std::transform(sparsity.colind(),
+                           sparsity.colind() + this->get_n() + 1,
                            outer_ptr.begin(), casadi_to_index<config_t>);
         }
     }
@@ -331,10 +342,10 @@ void CasADiProblem<Conf>::eval_hess_ψ(crvec x, crvec y, crvec Σ, real_t scale,
         auto &&sparsity = impl->hess_ψ->fun.sparsity_out(0);
         using detail::casadi_to_index;
         if (!sparsity.is_dense()) {
-            std::transform(sparsity.colind(),
-                           sparsity.colind() + sparsity.nnz(),
+            std::transform(sparsity.row(), sparsity.row() + sparsity.nnz(),
                            inner_idx.begin(), casadi_to_index<config_t>);
-            std::transform(sparsity.row(), sparsity.row() + this->get_n() + 1,
+            std::transform(sparsity.colind(),
+                           sparsity.colind() + this->get_n() + 1,
                            outer_ptr.begin(), casadi_to_index<config_t>);
         }
     }

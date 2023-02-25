@@ -77,6 +77,14 @@ def generate_casadi_problem(
     ))
     cg.add(
         cs.Function(
+            "f_grad_f",
+            [*xp_def],
+            [f(*xp), cs.gradient(f(*xp), x)],
+            [*xp_names],
+            ["f", "grad_f"],
+        ))
+    cg.add(
+        cs.Function(
             "g",
             [*xp_def],
             [g(*xp)] if m > 0 else [],
@@ -123,15 +131,18 @@ def generate_casadi_problem(
             cs.Function(
                 "jacobian_g",
                 [*xp_def],
-                [cs.jacobian(g, x)],
+                [cs.jacobian(g(*xp), x)],
                 [*xp_names],
                 ["jac_g"],
             ))
+        HL = cs.hessian(sL, x)[0]
+        if not HL.is_dense():
+            HL = cs.triu(HL)
         cg.add(
             cs.Function(
                 "hess_L",
                 [*xp_def, y, s],
-                [cs.hessian(sL, x)[0]],
+                [HL],
                 [*xp_names, "y", "s"],
                 ["hess_L"],
             ))
@@ -145,11 +156,14 @@ def generate_casadi_problem(
                 ["hess_L_prod"],
             ))
     if second_order in ['full', 'psi']:
+        Hψ = cs.hessian(sψ, x)[0]
+        if not Hψ.is_dense():
+            Hψ = cs.triu(Hψ)
         cg.add(
             cs.Function(
                 "hess_psi",
                 [*xp_def, y, Σ, s, zl, zu],
-                [cs.hessian(sψ, x)[0]],
+                [Hψ],
                 [*xp_names, "y", "Σ", "s", "zl", "zu"],
                 ["hess_psi"],
             )
