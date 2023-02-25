@@ -54,7 +54,7 @@ std::ostream &operator<<(std::ostream &os, const EvalCounter &c) {
        << CountResult{c.grad_g_prod, c.time.grad_g_prod};
     os << "            grad_gi:" //
        << CountResult{c.grad_gi, c.time.grad_gi};
-    os << "            grad_gi:" //
+    os << "              jac_g:" //
        << CountResult{c.jac_g, c.time.jac_g};
     os << "             grad_L:" //
        << CountResult{c.grad_L, c.time.grad_L};
