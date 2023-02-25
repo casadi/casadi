@@ -24,8 +24,6 @@ pybind11_add_module(_alpaqa MODULE
     "src/lbfgs.py.cpp"
     "src/panoc.py.cpp"
     "src/panoc-directions.py.cpp"
-    "src/panoc-ocp.py.cpp"
-    "src/ocp.py.cpp"
     "src/problems.py.cpp"
     "src/control-problems.py.cpp"
     "src/params/anderson-direction-params.cpp"
@@ -33,12 +31,18 @@ pybind11_add_module(_alpaqa MODULE
     "src/params/inner-solve-options.cpp"
     "src/params/lbfgs-direction-params.cpp"
     "src/params/lbfgs-params.cpp"
-    "src/params/panoc-ocp-params.cpp"
     "src/params/panoc-params.cpp"
     "src/params/structured-lbfgs-direction-params.cpp"
     "src/params/structured-newton-direction-params.cpp"
     # NO_EXTRAS # Prevent pybind11 from stripping the binary
 )
+if (ALPAQA_WITH_OCP)
+    target_sources(_alpaqa PRIVATE
+        "src/panoc-ocp.py.cpp"
+        "src/ocp.py.cpp"
+        "src/params/panoc-ocp-params.cpp"
+    )
+endif()
 target_include_directories(_alpaqa PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 target_link_libraries(_alpaqa PRIVATE pybind11::pybind11 alpaqa::alpaqa)
 target_compile_definitions(_alpaqa PRIVATE

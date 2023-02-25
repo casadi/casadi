@@ -46,6 +46,30 @@ py::dict stats_to_dict(const PANOCStats<Conf> &s) {
 }
 
 template <Config Conf>
+py::dict stats_to_dict(const InnerStatsAccumulator<PANOCStats<Conf>> &s) {
+    using namespace py::literals;
+    return py::dict{
+        "elapsed_time"_a          = s.elapsed_time,
+        "iterations"_a            = s.iterations,
+        "linesearch_failures"_a   = s.linesearch_failures,
+        "linesearch_backtracks"_a = s.linesearch_backtracks,
+        "stepsize_backtracks"_a   = s.stepsize_backtracks,
+        "lbfgs_failures"_a        = s.lbfgs_failures,
+        "lbfgs_rejected"_a        = s.lbfgs_rejected,
+        "τ_1_accepted"_a          = s.τ_1_accepted,
+        "count_τ"_a               = s.count_τ,
+        "sum_τ"_a                 = s.sum_τ,
+        "final_γ"_a               = s.final_γ,
+        "final_ψ"_a               = s.final_ψ,
+        "final_h"_a               = s.final_h,
+        "final_φγ"_a              = s.final_φγ,
+    };
+}
+
+
+#if ALPAQA_WITH_OCP
+
+template <Config Conf>
 py::dict stats_to_dict(const PANOCOCPStats<Conf> &s) {
     using namespace py::literals;
     return py::dict{
@@ -80,27 +104,6 @@ py::dict stats_to_dict(const PANOCOCPStats<Conf> &s) {
 }
 
 template <Config Conf>
-py::dict stats_to_dict(const InnerStatsAccumulator<PANOCStats<Conf>> &s) {
-    using namespace py::literals;
-    return py::dict{
-        "elapsed_time"_a          = s.elapsed_time,
-        "iterations"_a            = s.iterations,
-        "linesearch_failures"_a   = s.linesearch_failures,
-        "linesearch_backtracks"_a = s.linesearch_backtracks,
-        "stepsize_backtracks"_a   = s.stepsize_backtracks,
-        "lbfgs_failures"_a        = s.lbfgs_failures,
-        "lbfgs_rejected"_a        = s.lbfgs_rejected,
-        "τ_1_accepted"_a          = s.τ_1_accepted,
-        "count_τ"_a               = s.count_τ,
-        "sum_τ"_a                 = s.sum_τ,
-        "final_γ"_a               = s.final_γ,
-        "final_ψ"_a               = s.final_ψ,
-        "final_h"_a               = s.final_h,
-        "final_φγ"_a              = s.final_φγ,
-    };
-}
-
-template <Config Conf>
 py::dict stats_to_dict(const InnerStatsAccumulator<PANOCOCPStats<Conf>> &s) {
     using namespace py::literals;
     return py::dict{
@@ -131,6 +134,8 @@ py::dict stats_to_dict(const InnerStatsAccumulator<PANOCOCPStats<Conf>> &s) {
         "final_φγ"_a               = s.final_φγ,
     };
 }
+
+#endif
 
 template <class Inner>
 py::dict stats_to_dict(const typename ALMSolver<Inner>::Stats &s) {

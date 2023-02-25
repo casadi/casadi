@@ -10,6 +10,9 @@ function(alpaqa_configure_visibility target)
     endif()
 endfunction()
 
+option(ALPAQA_WITH_OCP 
+    "Enable solvers tailored for optimal control problems" Off)
+
 add_library(alpaqa
     "alpaqa/src/util/type-erasure.cpp"
     "alpaqa/src/util/demangled-typename.cpp"
@@ -31,6 +34,9 @@ add_library(alpaqa
     "alpaqa/src/inner/directions/panoc/structured-newton.cpp"
     "alpaqa/src/inner/internal/panoc-helpers.cpp"
 )
+if (ALPAQA_WITH_OCP)
+    target_sources(alpaqa PRIVATE "alpaqa/src/inner/panoc-ocp.cpp")
+endif()
 target_compile_features(alpaqa PUBLIC cxx_std_20)
 target_include_directories(alpaqa PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/alpaqa/include>
@@ -43,6 +49,8 @@ target_link_libraries(alpaqa PRIVATE warnings)
 alpaqa_configure_visibility(alpaqa)
 target_compile_definitions(alpaqa PUBLIC
     $<$<BOOL:${ALPAQA_WITH_QUAD_PRECISION}>:ALPAQA_WITH_QUAD_PRECISION>)
+target_compile_definitions(alpaqa PUBLIC
+    $<$<BOOL:${ALPAQA_WITH_OCP}>:ALPAQA_WITH_OCP>)
 target_link_libraries(alpaqa PUBLIC
     $<$<BOOL:${ALPAQA_WITH_QUAD_PRECISION}>:quadmath>)
 set_target_properties(alpaqa PROPERTIES SOVERSION ${PROJECT_VERSION})
@@ -86,7 +94,7 @@ else()
     message(STATUS "Compiling WITHOUT CasADi support")
 endif()
 
-set(ALPAQA_WITH_CASADI_OCP_SUPPORTED true)
+set(ALPAQA_WITH_CASADI_OCP_SUPPORTED ${ALPAQA_WITH_OCP})
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND
     CMAKE_CXX_COMPILER_VERSION VERSION_LESS 16.0.0)
     set(ALPAQA_WITH_CASADI_OCP_SUPPORTED false)
