@@ -3606,6 +3606,12 @@ DECL M casadi_stop_diff(const M& expr, casadi_int order) {
 DECL M casadi_stop_diff(const M& expr, const M& var, casadi_int order) {
   return stop_diff(expr, var, order);
 }
+DECL M casadi_no_hess(const M& expr) {
+  return no_hess(expr);
+}
+DECL M casadi_no_grad(const M& expr) {
+  return no_grad(expr);
+}
 
 #endif
 %enddef
