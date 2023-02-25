@@ -2090,10 +2090,19 @@ namespace casadi {
     MX x = veccat(s);
     Dict options;
     options["never_inline"] = true;
+
+    Dict inline_options;
+    inline_options["never_inline"] = false;
+    inline_options["always_inline"] = true;
+    Dict der_options = Dict{{"forward_options", inline_options},
+      {"reverse_options", inline_options},
+      {"jacobian_options", inline_options}};
     if (order==1) {
       options["is_diff_in"] = std::vector<bool>{false};
       options["is_diff_out"] = std::vector<bool>{true};
+      options = combine(options, der_options);
     } else if (order==2) {
+      options["der_options"] = der_options;
       options["forward_options"] = Dict{{"is_diff_in", std::vector<bool>{false, true, true} },
         {"is_diff_out", std::vector<bool>{true}}};
       options["reverse_options"] = Dict{{"is_diff_in", std::vector<bool>{false, true, true} },
@@ -2119,10 +2128,19 @@ namespace casadi {
 
     Dict options;
     options["never_inline"] = true;
+
+    Dict inline_options;
+    inline_options["never_inline"] = false;
+    inline_options["always_inline"] = true;
+    Dict der_options = Dict{{"forward_options", inline_options},
+      {"reverse_options", inline_options},
+      {"jacobian_options", inline_options}};
     if (order==1) {
       options["is_diff_in"] = std::vector<bool>{false, true};
       options["is_diff_out"] = std::vector<bool>{true};
+      options = combine(options, der_options);
     } else if (order==2) {
+      options["der_options"] = der_options;
       options["forward_options"] = Dict{{"is_diff_in",
         std::vector<bool>{false, true, false, true, true} },
         {"is_diff_out", std::vector<bool>{true}}};

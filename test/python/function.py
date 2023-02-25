@@ -2998,6 +2998,33 @@ class Functiontests(casadiTestCase):
                 f,f_normal,f_ref = [fe.factory('f',in_labels,out_labels) for fe in [f,f_normal,f_ref]]
             
         
+  def test_no_hess2(self):
+    y = MX.sym("y",2)
+
+    f = Function("foo",[y],[vertcat(sin(y[0]*y[1]),cos(y[0]*y[1]))],{"never_inline":True,"print_out":True})
+
+
+    opti = Opti()
+
+    x = opti.variable(2)
+
+    opti.subject_to(no_hess(f(x**2))>=0)
+
+    opti.minimize(sumsqr(x-2))
+
+    opti.solver("sqpmethod")
+
+    F = opti.to_function("F",[x],[x])
+    F.generate('F.c')
+    with open('F.c','r') as inp:
+        code = inp.read()
+    for m in re.findall(r"\w+FS",code):
+        self.assertTrue(len(m.split("_"))<=2)
+    for m in re.findall(r"\w+foo",code):
+        pass
+        # bug 3019
+        #self.assertTrue(len(m.split("_"))<=2)
+
    
 if __name__ == '__main__':
     unittest.main()
