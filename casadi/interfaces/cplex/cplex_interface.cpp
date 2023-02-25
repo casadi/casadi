@@ -30,7 +30,7 @@
 #include <cstdlib>
 #include <sstream>
 #include <vector>
-
+#include <cstdlib>
 namespace casadi {
   extern "C"
   int CASADI_CONIC_CPLEX_EXPORT
@@ -88,7 +88,12 @@ namespace casadi {
         "Weights corresponding to SOS entries."}},
       {"sos_types",
        {OT_INTVECTOR,
-        "Specify 1 or 2 for each SOS group."}}
+        "Specify 1 or 2 for each SOS group."}},
+      {"version_suffix",
+       {OT_STRING,
+        "Specify version of cplex to load. "
+        "We will attempt to load libcplex<version_suffix>.[so|dll|dylib]. "
+        "Default value is taken from CPLEX_VERSION env variable."}}
      }
   };
 
@@ -136,6 +141,12 @@ namespace casadi {
       }
     }
 
+    #ifdef CPLEX_ADAPTOR
+      char buffer[200];
+      int ret = cplex_adaptor_load(buffer, sizeof(buffer));
+      casadi_assert(ret==0, "Failed to load CPLEX adaptor: " + std::string(buffer) + ".");
+    #endif
+
     // Validaty SOS constraints
     check_sos(nx_, sos_groups, sos_weights, sos_types);
 
@@ -175,6 +186,14 @@ namespace casadi {
     alloc_w(na_, true); // lam_a
   }
 
+  int param_by_name(CPXENVptr env, const std::string &name) {
+    int whichparam;
+    if (CPXXgetparamnum(env, name.c_str(), &whichparam)) {
+      casadi_error("No such CPLEX parameter: " + name);
+    }
+    return whichparam;
+  }
+
   int CplexInterface::init_mem(void* mem) const {
     if (Conic::init_mem(mem)) return 1;
     if (!mem) return 1;
@@ -196,33 +215,40 @@ namespace casadi {
     }
 
     // Enable output by default
-    if (CPXXsetintparam(m->env, CPX_PARAM_SCRIND, CPX_ON)) {
+    int screen_output = 0;
+    try {
+      screen_output = param_by_name(m->env, "CPXPARAM_ScreenOutput");
+    } catch (std::exception& e) {
+      screen_output = param_by_name(m->env, "CPX_PARAM_SCRIND");
+    }
+    if (CPXXsetintparam(m->env, screen_output, CPX_ON)) {
       casadi_error("Failure setting CPX_PARAM_SCRIND");
     }
 
     // Optimality tolerance
-    if (CPXXsetdblparam(m->env, CPX_PARAM_EPOPT, tol_)) {
+    if (CPXXsetdblparam(m->env, param_by_name(m->env, "CPX_PARAM_EPOPT"), tol_)) {
       casadi_error("Failure setting CPX_PARAM_EPOPT");
     }
 
     // Feasibility tolerance
-    if (CPXXsetdblparam(m->env, CPX_PARAM_EPRHS, tol_)) {
+    if (CPXXsetdblparam(m->env, param_by_name(m->env, "CPX_PARAM_EPRHS"), tol_)) {
       casadi_error("Failure setting CPX_PARAM_EPRHS");
     }
 
     // We start with barrier if crossover was chosen.
-    if (CPXXsetintparam(m->env, CPX_PARAM_QPMETHOD, qp_method_ == 7 ? 4 : qp_method_)) {
+    if (CPXXsetintparam(m->env, param_by_name(m->env, "CPX_PARAM_QPMETHOD"),
+        qp_method_ == 7 ? 4 : qp_method_)) {
       casadi_error("Failure setting CPX_PARAM_QPMETHOD");
     }
 
     // Setting dependency check option
-    if (CPXXsetintparam(m->env, CPX_PARAM_DEPIND, dep_check_)) {
+    if (CPXXsetintparam(m->env, param_by_name(m->env, "CPX_PARAM_DEPIND"), dep_check_)) {
       casadi_error("Failure setting CPX_PARAM_DEPIND");
     }
 
     // Setting crossover algorithm
     if (qp_method_ == 7) {
-      if (CPXXsetintparam(m->env, CPX_PARAM_BARCROSSALG, 1)) {
+      if (CPXXsetintparam(m->env, param_by_name(m->env, "CPX_PARAM_BARCROSSALG"), 1)) {
         casadi_error("Failure setting CPX_PARAM_BARCROSSALG");
       }
     }
@@ -364,7 +390,7 @@ namespace casadi {
 
     // We change method in crossover
     if (m->is_warm && qp_method_ == 7) {
-      (void)CPXXsetintparam(m->env, CPX_PARAM_QPMETHOD, 1);
+      (void)CPXXsetintparam(m->env, param_by_name(m->env, "CPX_PARAM_QPMETHOD"), 1);
     }
 
     for (casadi_int i = 0; i < na_; ++i) {
@@ -682,6 +708,9 @@ namespace casadi {
   }
 
   CplexInterface::~CplexInterface() {
+    #ifdef CPLEX_ADAPTOR
+      cplex_adaptor_unload();
+    #endif
     clear_mem();
   }
 
