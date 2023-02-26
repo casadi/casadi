@@ -685,20 +685,19 @@ set(BUILD_IPOPT_VERSION "3.14.11.mod")
 option(WITH_BUILD_IPOPT "Build IPOPT (BUILD_IPOPT_VERSION=${BUILD_IPOPT_VERSION}) from downloaded source (BUILD_IPOPT_GIT_REPO=${BUILD_IPOPT_GIT_REPO})." OFF)
 set(BUILD_IPOPT_DEPENDENCIES MUMPS)
 
+
+option(WITH_MOCKUP_REQUIRED ON)
+set(BUILD_MOCKUPS_GIT_REPO https://github.com/casadi/mockups.git)
+set(BUILD_MOCKUPS_VERSION v47)
+
 # Knitro: An NLP solver
 option(WITH_KNITRO "Compile the interface to KNITRO" OFF)
-if(WITH_KNITRO)
-  find_package(KNITRO REQUIRED)
-endif()
-add_feature_info(knitro-interface WITH_KNITRO "Interface to the NLP solver KNITRO.")
+option(WITH_MOCKUP_KNITRO "Use mockup KNITRO (BUILD_MOCKUPS_VERSION=${BUILD_MOCKUPS_VERSION}) from downloaded source (BUILD_MOCKUPS_GIT_REPO=${BUILD_MOCKUPS_GIT_REPO})." OFF)
 
 # CPLEX: A sparse mixed-integer QP solver
 option(WITH_CPLEX "Compile the interface to CPLEX" OFF)
 option(WITH_CPLEX_SHARED "Use shared cplex libraries" OFF)
-if(WITH_CPLEX)
-  find_package(CPLEX REQUIRED)
-endif()
-add_feature_info(cplex-interface WITH_CPLEX "Interface to the QP solver CPLEX.")
+option(WITH_MOCKUP_CPLEX "Use mockup CPLEX (BUILD_MOCKUPS_VERSION=${BUILD_MOCKUPS_VERSION}) from downloaded source (BUILD_MOCKUPS_GIT_REPO=${BUILD_MOCKUPS_GIT_REPO})." OFF)
 
 # Bonmin: An MINLP solver
 option(WITH_BONMIN "Compile the interface to BONMIN" OFF)
@@ -787,6 +786,40 @@ function(libraries2flags libraries out)
   endforeach()
 endfunction()
 
+set(WITH_BUILD_MOCKUPS OFF)
+# Packages must be sorted from high to low in the dependency graph
+foreach(PKG CPLEX KNITRO)
+  string(TOLOWER ${PKG} PKG_LOWER)
+  if(WITH_${PKG})
+    if(NOT WITH_MOCKUP_${PKG})
+      get_property(PACKAGES_NOT_FOUND_BACKUP GLOBAL PROPERTY PACKAGES_NOT_FOUND)
+      get_property(PACKAGES_FOUND_BACKUP GLOBAL PROPERTY PACKAGES_FOUND)
+      find_package(${PKG})
+    endif()
+    if (WITH_MOCKUP_${PKG} OR (WITH_MOCKUP_REQUIRED AND NOT ${PKG}_FOUND))
+
+      # Add it to FeatureSummary
+      get_property(PKG_HELP CACHE WITH_MOCKUP_${PKG} PROPERTY HELPSTRING)
+      set(WITH_BUILD_${PKG} ON CACHE BOOL "${PKG_HELP}" FORCE)
+      add_feature_info(${PKG_LOWER}-mockup-build ON ${PKG_HELP})
+
+      # Remove from PACKAGES_NOT_FOUND
+      set_property(GLOBAL PROPERTY PACKAGES_NOT_FOUND ${PACKAGES_NOT_FOUND_BACKUP})
+      set_property(GLOBAL PROPERTY PACKAGES_FOUND ${PACKAGES_FOUND_BACKUP})
+
+      # We are going to need build dependencies
+      foreach(DEP ${BUILD_${PKG}_DEPENDENCIES})
+        set(WITH_${DEP} ON)
+      endforeach()
+      set(${PKG}_FOUND ON)
+      set(WITH_BUILD_MOCKUPS ON)
+    endif()
+    if(NOT ${PKG}_FOUND)
+      message(FATAL_ERROR "${PKG} not found on your system yet required. Set WITH_MOCKUP_${PKG} or WITH_MOCKUP_REQUIRED ON to build a mockup version such that the CasADi build can proceed.")
+    endif()
+  endif()
+endforeach()
+
 # Packages must be sorted from high to low in the dependency graph
 foreach(PKG HIGHS PROXQP OSQP SUPERSCS BONMIN IPOPT CBC CLP MUMPS SPRAL METIS HPIPM BLASFEO LAPACK EIGEN3 SIMDE)
   string(TOLOWER ${PKG} PKG_LOWER)
@@ -828,6 +861,44 @@ else()
         set(SHARED_LIBRARY64_RELDIR lib)
     endif()
 endif()
+
+
+
+if (WITH_BUILD_MOCKUPS)
+ExternalProject_Add(mockups-external
+  GIT_REPOSITORY ${BUILD_MOCKUPS_GIT_REPO}
+  GIT_TAG ${BUILD_MOCKUPS_VERSION}
+  PREFIX "${CMAKE_BINARY_DIR}/external_projects"
+  UPDATE_COMMAND ""
+  CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
+  CMAKE_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>/mockups)
+endif()
+
+if(WITH_MOCKUP_CPLEX)
+  add_library(cplex::cplex SHARED IMPORTED)
+  add_dependencies(cplex::cplex mockups-external)
+  set(CPLEX_ADAPTOR_LIB "${CMAKE_BINARY_DIR}/external_projects/mockups/cplex/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}cplex_adaptor${CMAKE_SHARED_LIBRARY_SUFFIX}")
+  set_target_properties(cplex::cplex PROPERTIES
+    INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/mockups/cplex/include"
+    IMPORTED_LOCATION "${CPLEX_ADAPTOR_LIB}"
+    IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/mockups/cplex/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}cplex_adaptor${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+  )
+  install(FILES
+  ${CPLEX_ADAPTOR_LIB}
+  DESTINATION "${LIB_PREFIX}")
+endif()
+add_feature_info(cplex-interface WITH_CPLEX "Interface to the QP solver CPLEX.")
+
+if(WITH_MOCKUP_KNITRO)
+  add_library(knitro::knitro SHARED IMPORTED)
+  add_dependencies(knitro::knitro mockups-external)
+  set_target_properties(knitro::knitro PROPERTIES
+    INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/mockups/knitro/include"
+    IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/mockups/knitro/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}knitro${CMAKE_SHARED_LIBRARY_SUFFIX}"
+    IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/mockups/knitro/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}knitro${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+  )
+endif()
+add_feature_info(knitro-interface WITH_KNITRO "Interface to the NLP solver KNITRO.")
 
 if(WITH_LAPACK)
   if (WITH_BUILD_LAPACK)
