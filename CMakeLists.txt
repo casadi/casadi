@@ -878,6 +878,7 @@ if(WITH_CPLEX AND WITH_MOCKUP_CPLEX)
   add_library(cplex::cplex SHARED IMPORTED)
   add_dependencies(cplex::cplex mockups-external)
   set(CPLEX_ADAPTOR_LIB "${CMAKE_BINARY_DIR}/external_projects/mockups/cplex/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}cplex_adaptor${CMAKE_SHARED_LIBRARY_SUFFIX}")
+  file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/mockups/cplex/include")
   set_target_properties(cplex::cplex PROPERTIES
     INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/mockups/cplex/include"
     IMPORTED_LOCATION "${CPLEX_ADAPTOR_LIB}"
@@ -892,6 +893,7 @@ add_feature_info(cplex-interface WITH_CPLEX "Interface to the QP solver CPLEX.")
 if(WITH_KNITRO AND WITH_MOCKUP_KNITRO)
   add_library(knitro::knitro SHARED IMPORTED)
   add_dependencies(knitro::knitro mockups-external)
+  file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/mockups/knitro/include")
   set_target_properties(knitro::knitro PROPERTIES
     INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/mockups/knitro/include"
     IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/mockups/knitro/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}knitro${CMAKE_SHARED_LIBRARY_SUFFIX}"
