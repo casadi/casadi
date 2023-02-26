@@ -108,7 +108,7 @@ cmake_dependent_option(ALPAQA_WITH_CASADI_OCP
 # Optimal control problems
 if (ALPAQA_WITH_CASADI_OCP)
     add_library(casadi-ocp-loader "interop/casadi/src/CasADiControlProblem.cpp")
-    target_include_directories(alpaqa PUBLIC
+    target_include_directories(casadi-ocp-loader PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/interop/casadi/include>
         $<INSTALL_INTERFACE:include>)
     set_property(TARGET casadi-ocp-loader
@@ -148,6 +148,35 @@ if (CMAKE_DL_LIBS)
     message(STATUS "Compiling WITH dl support")
 else()
     message(STATUS "Compiling WITHOUT dl support")
+endif()
+
+find_package(PkgConfig)
+if (PKG_CONFIG_FOUND)
+    pkg_check_modules(IPOPT IMPORTED_TARGET ipopt)
+endif()
+if (TARGET PkgConfig::IPOPT)
+    message(STATUS "Compiling Ipopt problem adapter")
+    add_library(ipopt-adapter "interop/ipopt/src/ipopt-adapter.cpp")
+    target_link_libraries(ipopt-adapter 
+        PUBLIC PkgConfig::IPOPT alpaqa::alpaqa PRIVATE alpaqa::warnings)
+    # TODO: write a proper FindIpopt.cmake file
+    target_link_directories(ipopt-adapter PUBLIC
+        $<BUILD_INTERFACE:${IPOPT_LIBRARY_DIRS}>)
+    target_link_options(ipopt-adapter PUBLIC
+        $<BUILD_INTERFACE:LINKER:-rpath-link,${IPOPT_LIBRARY_DIRS}>)
+    target_include_directories(ipopt-adapter PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/interop/ipopt/include>
+        $<INSTALL_INTERFACE:include>)
+    set_property(TARGET ipopt-adapter
+        PROPERTY OUTPUT_NAME alpaqa-ipopt-adapter)
+    alpaqa_configure_visibility(ipopt-adapter)
+    set_target_properties(ipopt-adapter PROPERTIES SOVERSION ${PROJECT_VERSION})
+    add_library(alpaqa::ipopt-adapter ALIAS ipopt-adapter)
+    list(APPEND ALPAQA_INSTALL_TARGETS ipopt-adapter)
+    generate_export_header(ipopt-adapter
+        EXPORT_FILE_NAME export/alpaqa/ipopt-adapter-export.h)
+    target_include_directories(ipopt-adapter PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/export>)
 endif()
 
 # Installation
