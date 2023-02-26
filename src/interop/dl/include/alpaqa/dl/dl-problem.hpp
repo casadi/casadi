@@ -43,7 +43,7 @@ class DLLoader {
         requires std::is_function_v<Signature>
     const std::function<Signature> &extra_func(const std::string &name) const {
         if (!extra_functions)
-            throw std::logic_error("DLProblem: no extra functions");
+            throw std::out_of_range("DLProblem: no extra functions");
         auto it = extra_functions->dict.find(name);
         if (it == extra_functions->dict.end())
             throw std::out_of_range("DLProblem: no extra function named \"" +

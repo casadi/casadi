@@ -67,6 +67,8 @@ typedef struct {
         const alpaqa_real_t *y,
         const alpaqa_real_t *Σ,
         alpaqa_real_t scale,
+        const alpaqa_real_t *zl,
+        const alpaqa_real_t *zu,
         const alpaqa_real_t *v,
         alpaqa_real_t *Hv);
     void (*eval_hess_ψ)(
@@ -75,6 +77,8 @@ typedef struct {
         const alpaqa_real_t *y,
         const alpaqa_real_t *Σ,
         alpaqa_real_t scale,
+        const alpaqa_real_t *zl,
+        const alpaqa_real_t *zu,
         alpaqa_index_t *inner_idx,
         alpaqa_index_t *outer_ptr,
         alpaqa_real_t *H_values);
@@ -110,6 +114,8 @@ typedef struct {
         const alpaqa_real_t *x,
         const alpaqa_real_t *y,
         const alpaqa_real_t *Σ,
+        const alpaqa_real_t *zl,
+        const alpaqa_real_t *zu,
         alpaqa_real_t *ŷ);
     void (*eval_grad_ψ_from_ŷ)(
         void *instance,
@@ -122,6 +128,8 @@ typedef struct {
         const alpaqa_real_t *x,
         const alpaqa_real_t *y,
         const alpaqa_real_t *Σ,
+        const alpaqa_real_t *zl,
+        const alpaqa_real_t *zu,
         alpaqa_real_t *grad_ψ,
         alpaqa_real_t *work_n,
         alpaqa_real_t *work_m);
@@ -130,6 +138,8 @@ typedef struct {
         const alpaqa_real_t *x,
         const alpaqa_real_t *y,
         const alpaqa_real_t *Σ,
+        const alpaqa_real_t *zl,
+        const alpaqa_real_t *zu,
         alpaqa_real_t *grad_ψ,
         alpaqa_real_t *work_n,
         alpaqa_real_t *work_m);
@@ -140,6 +150,14 @@ typedef struct {
         const alpaqa_real_t *grad_ψ,
         alpaqa_real_t *x̂,
         alpaqa_real_t *p);
+    void (*get_C)(
+        void *instance,
+        alpaqa_real_t *lb,
+        alpaqa_real_t *ub);
+    void (*get_D)(
+        void *instance,
+        alpaqa_real_t *lb,
+        alpaqa_real_t *ub);
     // clang-format on
 } alpaqa_problem_functions_t;
 
