@@ -251,7 +251,8 @@ void CasADiProblem<Conf>::eval_grad_gi(crvec, index_t, rvec) const {
 
 template <Config Conf>
 auto CasADiProblem<Conf>::get_jac_g_num_nonzeros() const -> length_t {
-    assert(impl->jac_g.has_value());
+    if (!impl->jac_g.has_value())
+        return 0;
     auto &&sparsity = impl->jac_g->fun.sparsity_out(0);
     return sparsity.is_dense() ? 0 : static_cast<length_t>(sparsity.nnz());
 }
@@ -285,7 +286,8 @@ void CasADiProblem<Conf>::eval_hess_L_prod(crvec x, crvec y, real_t scale,
 
 template <Config Conf>
 auto CasADiProblem<Conf>::get_hess_L_num_nonzeros() const -> length_t {
-    assert(impl->hess_L.has_value());
+    if (!impl->hess_L.has_value())
+        return 0;
     auto &&sparsity = impl->hess_L->fun.sparsity_out(0);
     return sparsity.is_dense() ? 0 : static_cast<length_t>(sparsity.nnz());
 }
@@ -324,7 +326,8 @@ void CasADiProblem<Conf>::eval_hess_ψ_prod(crvec x, crvec y, crvec Σ,
 
 template <Config Conf>
 auto CasADiProblem<Conf>::get_hess_ψ_num_nonzeros() const -> length_t {
-    assert(impl->hess_ψ.has_value());
+    if (!impl->hess_ψ.has_value())
+        return 0;
     auto &&sparsity = impl->hess_ψ->fun.sparsity_out(0);
     return sparsity.is_dense() ? 0 : static_cast<length_t>(sparsity.nnz());
 }
