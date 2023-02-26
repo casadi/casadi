@@ -874,7 +874,7 @@ ExternalProject_Add(mockups-external
   CMAKE_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>/mockups)
 endif()
 
-if(WITH_MOCKUP_CPLEX)
+if(WITH_CPLEX AND WITH_MOCKUP_CPLEX)
   add_library(cplex::cplex SHARED IMPORTED)
   add_dependencies(cplex::cplex mockups-external)
   set(CPLEX_ADAPTOR_LIB "${CMAKE_BINARY_DIR}/external_projects/mockups/cplex/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}cplex_adaptor${CMAKE_SHARED_LIBRARY_SUFFIX}")
@@ -889,7 +889,7 @@ if(WITH_MOCKUP_CPLEX)
 endif()
 add_feature_info(cplex-interface WITH_CPLEX "Interface to the QP solver CPLEX.")
 
-if(WITH_MOCKUP_KNITRO)
+if(WITH_KNITRO AND WITH_MOCKUP_KNITRO)
   add_library(knitro::knitro SHARED IMPORTED)
   add_dependencies(knitro::knitro mockups-external)
   set_target_properties(knitro::knitro PROPERTIES
