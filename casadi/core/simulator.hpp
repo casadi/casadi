@@ -93,9 +93,9 @@ namespace casadi {
   enum DynIn {
     DYN_T,
     DYN_X,
-    DYN_U,
     DYN_Z,
     DYN_P,
+    DYN_U,
     DYN_NUM_IN};
 
   /// Inputs of the symbolic representation of the DAE

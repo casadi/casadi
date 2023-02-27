@@ -32,9 +32,9 @@ std::string to_string(DynIn v) {
   switch (v) {
   case DYN_T: return "t";
   case DYN_X: return "x";
-  case DYN_U: return "u";
   case DYN_Z: return "z";
   case DYN_P: return "p";
+  case DYN_U: return "u";
   default: break;
   }
   return "";
@@ -516,9 +516,9 @@ void Simulator::eval_y(SimulatorMemory* mem) const {
   std::fill_n(mem->arg, enum_traits<DynIn>::n_enum, nullptr);
   mem->arg[DYN_T] = &mem->t;
   mem->arg[DYN_X] = mem->xk;
-  mem->arg[DYN_U] = mem->u;
   mem->arg[DYN_Z] = mem->zk;
   mem->arg[DYN_P] = mem->p;
+  mem->arg[DYN_U] = mem->u;
   std::fill_n(mem->res, enum_traits<DynOut>::n_enum, nullptr);
   mem->res[DYN_YDEF] = mem->y;
   if (calc_function(mem, "dae")) casadi_error("'dae' calculation failed");

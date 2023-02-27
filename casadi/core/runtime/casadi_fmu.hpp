@@ -34,18 +34,24 @@ int evaluate(casadi_fmi_memory* m) {
   int mem, flag;
   // Copy states, inputs and parameters to input buffers
   for (i = 0; i < N_X; ++i) m->x[i] = m->v[x_vr[i]];
-  for (i = 0; i < N_U; ++i) m->u[i] = m->v[u_vr[i]];
   for (i = 0; i < N_P; ++i) m->p[i] = m->v[p_vr[i]];
+  for (i = 0; i < N_U; ++i) m->u[i] = m->v[u_vr[i]];
+
+  // Map inputs to evaluation buffer
+  i = 0;
+  m->arg[i++] = &m->t;
+  m->arg[i++] = m->x;
+  m->arg[i++] = 0;
+  m->arg[i++] = m->p;
+  m->arg[i++] = m->u;
+
+  // Map outputs to evaluation buffer
+  i = 0;
+  m->res[i++] = m->xdot;
+  m->res[i++] = 0;
+  m->res[i++] = m->y;
 
   // Evaluate
-  m->arg[0] = &m->t;
-  m->arg[1] = m->x;
-  m->arg[2] = m->u;
-  m->arg[3] = 0;
-  m->arg[4] = m->p;
-  m->res[0] = m->xdot;
-  m->res[1] = 0;
-  m->res[2] = m->y;
   mem = daefun_checkout();
   flag = daefun(m->arg, m->res, m->iw, m->w, mem);
   daefun_release(mem);
@@ -63,16 +69,16 @@ int evaluate_forward(casadi_fmi_memory* m) {
   int mem, flag;
   // Copy seeds for states, inputs and parameters to input buffers
   for (i = 0; i < N_X; ++i) m->dx[i] = m->d[x_vr[i]];
-  for (i = 0; i < N_U; ++i) m->du[i] = m->d[u_vr[i]];
   for (i = 0; i < N_P; ++i) m->dp[i] = m->d[p_vr[i]];
+  for (i = 0; i < N_U; ++i) m->du[i] = m->d[u_vr[i]];
 
   // Map nondifferentiated inputs to evaluation buffer
   i = 0;
   m->arg[i++] = 0;
   m->arg[i++] = m->x;
-  m->arg[i++] = m->u;
   m->arg[i++] = 0;
   m->arg[i++] = m->p;
+  m->arg[i++] = m->u;
 
   // Map nondifferentiated outputs to evaluation buffer
   m->arg[i++] = m->xdot;
@@ -82,9 +88,9 @@ int evaluate_forward(casadi_fmi_memory* m) {
   // Map forward seeds
   m->arg[i++] = 0;
   m->arg[i++] = m->dx;
-  m->arg[i++] = m->du;
   m->arg[i++] = 0;
   m->arg[i++] = m->dp;
+  m->arg[i++] = m->du;
 
   // Map forward sensitivities
   i = 0;
@@ -115,16 +121,16 @@ int evaluate_adjoint(casadi_fmi_memory* m) {
 
   // Clear sensitivities
   for (i = 0; i < N_X; ++i) m->dx[i] = 0;
-  for (i = 0; i < N_U; ++i) m->du[i] = 0;
   for (i = 0; i < N_P; ++i) m->dp[i] = 0;
+  for (i = 0; i < N_U; ++i) m->du[i] = 0;
 
   // Map nondifferentiated inputs to evaluation buffer
   i = 0;
   m->arg[i++] = 0;
   m->arg[i++] = m->x;
-  m->arg[i++] = m->u;
   m->arg[i++] = 0;
   m->arg[i++] = m->p;
+  m->arg[i++] = m->u;
 
   // Map nondifferentiated outputs to evaluation buffer
   m->arg[i++] = m->xdot;
@@ -140,9 +146,9 @@ int evaluate_adjoint(casadi_fmi_memory* m) {
   i = 0;
   m->res[i++] = 0;
   m->res[i++] = m->dx;
-  m->res[i++] = m->du;
   m->res[i++] = 0;
   m->res[i++] = m->dp;
+  m->res[i++] = m->du;
 
   // Evaluate
   mem = adj1_daefun_checkout();
@@ -151,8 +157,8 @@ int evaluate_adjoint(casadi_fmi_memory* m) {
 
   // Copy from input buffers
   for (i = 0; i < N_X; ++i) m->d[x_vr[i]] = m->dx[i];
-  for (i = 0; i < N_U; ++i) m->d[u_vr[i]] = m->du[i];
   for (i = 0; i < N_P; ++i) m->d[p_vr[i]] = m->dp[i];
+  for (i = 0; i < N_U; ++i) m->d[u_vr[i]] = m->du[i];
 
   // Return evaluation flag
   return flag;
