@@ -52,6 +52,9 @@ namespace casadi {
   }
 
   GurobiInterface::~GurobiInterface() {
+    #ifdef GUROBI_ADAPTOR
+      gurobi_adaptor_unload();
+    #endif
     clear_mem();
   }
 
@@ -100,6 +103,12 @@ namespace casadi {
         sos_types = op.second.to_int_vector();
       }
     }
+
+    #ifdef GUROBI_ADAPTOR
+      char buffer[200];
+      int ret = gurobi_adaptor_load(buffer, sizeof(buffer));
+      casadi_assert(ret==0, "Failed to load Gurobi adaptor: " + std::string(buffer) + ".");
+    #endif
 
     // Validaty SOS constraints
     check_sos(nx_, sos_groups, sos_weights, sos_types);

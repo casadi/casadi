@@ -688,7 +688,7 @@ set(BUILD_IPOPT_DEPENDENCIES MUMPS)
 
 option(WITH_MOCKUP_REQUIRED ON)
 set(BUILD_MOCKUPS_GIT_REPO https://github.com/casadi/mockups.git)
-set(BUILD_MOCKUPS_VERSION v47)
+set(BUILD_MOCKUPS_VERSION v50)
 
 # Knitro: An NLP solver
 option(WITH_KNITRO "Compile the interface to KNITRO" OFF)
@@ -698,6 +698,10 @@ option(WITH_MOCKUP_KNITRO "Use mockup KNITRO (BUILD_MOCKUPS_VERSION=${BUILD_MOCK
 option(WITH_CPLEX "Compile the interface to CPLEX" OFF)
 option(WITH_CPLEX_SHARED "Use shared cplex libraries" OFF)
 option(WITH_MOCKUP_CPLEX "Use mockup CPLEX (BUILD_MOCKUPS_VERSION=${BUILD_MOCKUPS_VERSION}) from downloaded source (BUILD_MOCKUPS_GIT_REPO=${BUILD_MOCKUPS_GIT_REPO})." OFF)
+
+# GUROBI: A sparse mixed-integer QP solver
+option(WITH_GUROBI "Compile the interface to GUROBI" OFF)
+option(WITH_MOCKUP_GUROBI "Use mockup GUROBI (BUILD_MOCKUPS_VERSION=${BUILD_MOCKUPS_VERSION}) from downloaded source (BUILD_MOCKUPS_GIT_REPO=${BUILD_MOCKUPS_GIT_REPO})." OFF)
 
 # Bonmin: An MINLP solver
 option(WITH_BONMIN "Compile the interface to BONMIN" OFF)
@@ -788,7 +792,7 @@ endfunction()
 
 set(WITH_BUILD_MOCKUPS OFF)
 # Packages must be sorted from high to low in the dependency graph
-foreach(PKG CPLEX KNITRO)
+foreach(PKG CPLEX KNITRO GUROBI)
   string(TOLOWER ${PKG} PKG_LOWER)
   if(WITH_${PKG})
     if(NOT WITH_MOCKUP_${PKG})
@@ -889,6 +893,22 @@ if(WITH_CPLEX AND WITH_MOCKUP_CPLEX)
   DESTINATION "${LIB_PREFIX}")
 endif()
 add_feature_info(cplex-interface WITH_CPLEX "Interface to the QP solver CPLEX.")
+
+if(WITH_GUROBI AND WITH_MOCKUP_GUROBI)
+  add_library(gurobi::gurobi SHARED IMPORTED)
+  add_dependencies(gurobi::gurobi mockups-external)
+  set(GUROBI_ADAPTOR_LIB "${CMAKE_BINARY_DIR}/external_projects/mockups/gurobi/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}gurobi_adaptor${CMAKE_SHARED_LIBRARY_SUFFIX}")
+  file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/mockups/gurobi/include")
+  set_target_properties(gurobi::gurobi PROPERTIES
+    INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/mockups/gurobi/include"
+    IMPORTED_LOCATION "${GUROBI_ADAPTOR_LIB}"
+    IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/mockups/gurobi/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}gurobi_adaptor${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+  )
+  install(FILES
+  ${GUROBI_ADAPTOR_LIB}
+  DESTINATION "${LIB_PREFIX}")
+endif()
+add_feature_info(gurobi-interface WITH_GUROBI "Interface to the (mixed-integer) QP solver GUROBI")
 
 if(WITH_KNITRO AND WITH_MOCKUP_KNITRO)
   add_library(knitro::knitro SHARED IMPORTED)
@@ -1441,13 +1461,6 @@ if(WITH_OOQP)
   find_package(OOQP REQUIRED)
 endif()
 add_feature_info(ooqp-interface WITH_OOQP "Interface to the QP solver OOQP (requires BLAS and HSL libraries).")
-
-# GUROBI: A sparse mixed-integer QP solver
-option(WITH_GUROBI "Compile the interface to GUROBI" OFF)
-if(WITH_GUROBI)
-  find_package(GUROBI REQUIRED)
-endif()
-add_feature_info(gurobi-interface WITH_GUROBI "Interface to the (mixed-integer) QP solver GUROBI")
 
 # SQIC: A QP solver
 option(WITH_SQIC "Enable SQIC interface" OFF)
