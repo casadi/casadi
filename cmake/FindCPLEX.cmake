@@ -61,7 +61,7 @@
 
 message("CPLEX: find via CONFIG")
 find_package(CPLEX CONFIG NO_CMAKE_FIND_ROOT_PATH)
-message("CPLEX: ${KNITRO_FOUND}")
+message("CPLEX: ${CPLEX_FOUND}")
 
 if(NOT CPLEX_FOUND)
 

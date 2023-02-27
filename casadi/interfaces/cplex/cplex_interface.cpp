@@ -30,7 +30,7 @@
 #include <cstdlib>
 #include <sstream>
 #include <vector>
-#include <cstdlib>
+
 namespace casadi {
   extern "C"
   int CASADI_CONIC_CPLEX_EXPORT
