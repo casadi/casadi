@@ -420,38 +420,38 @@ std::map<std::string, MatType> Integrator::aug_fwd(casadi_int nfwd) const {
   // Get input expressions
   std::vector<MatType> arg = MatType::get_input(oracle_);
   std::vector<MatType> aug_x, aug_z, aug_p, aug_rx, aug_rz, aug_rp;
-  MatType aug_t = arg.at(DE_T);
-  aug_x.push_back(vec(arg.at(DE_X)));
-  aug_z.push_back(vec(arg.at(DE_Z)));
-  aug_p.push_back(vec(arg.at(DE_P)));
-  aug_rx.push_back(vec(arg.at(DE_RX)));
-  aug_rz.push_back(vec(arg.at(DE_RZ)));
-  aug_rp.push_back(vec(arg.at(DE_RP)));
+  MatType aug_t = arg.at(DYN_T);
+  aug_x.push_back(vec(arg.at(DYN_X)));
+  aug_z.push_back(vec(arg.at(DYN_Z)));
+  aug_p.push_back(vec(arg.at(DYN_P)));
+  aug_rx.push_back(vec(arg.at(DYN_RX)));
+  aug_rz.push_back(vec(arg.at(DYN_RZ)));
+  aug_rp.push_back(vec(arg.at(DYN_RP)));
 
   // Get output expressions
   std::vector<MatType> res = oracle_(arg);
   std::vector<MatType> aug_ode, aug_alg, aug_quad, aug_rode, aug_ralg, aug_rquad;
-  aug_ode.push_back(vec(res.at(DE_ODE)));
-  aug_alg.push_back(vec(res.at(DE_ALG)));
-  aug_quad.push_back(vec(res.at(DE_QUAD)));
-  aug_rode.push_back(vec(res.at(DE_RODE)));
-  aug_ralg.push_back(vec(res.at(DE_RALG)));
-  aug_rquad.push_back(vec(res.at(DE_RQUAD)));
+  aug_ode.push_back(vec(res.at(DYN_ODE)));
+  aug_alg.push_back(vec(res.at(DYN_ALG)));
+  aug_quad.push_back(vec(res.at(DYN_QUAD)));
+  aug_rode.push_back(vec(res.at(DYN_RODE)));
+  aug_ralg.push_back(vec(res.at(DYN_RALG)));
+  aug_rquad.push_back(vec(res.at(DYN_RQUAD)));
 
   // Zero of time dimension
   MatType zero_t = MatType::zeros(t());
 
   // Forward directional derivatives
-  std::vector<std::vector<MatType>> seed(nfwd, std::vector<MatType>(DE_NUM_IN));
+  std::vector<std::vector<MatType>> seed(nfwd, std::vector<MatType>(DYN_NUM_IN));
   for (casadi_int d=0; d<nfwd; ++d) {
-    seed[d][DE_T] = zero_t;
+    seed[d][DYN_T] = zero_t;
     std::string pref = "aug" + str(d) + "_";
-    aug_x.push_back(vec(seed[d][DE_X] = MatType::sym(pref + "x", x())));
-    aug_z.push_back(vec(seed[d][DE_Z] = MatType::sym(pref + "z", z())));
-    aug_p.push_back(vec(seed[d][DE_P] = MatType::sym(pref + "p", p())));
-    aug_rx.push_back(vec(seed[d][DE_RX] = MatType::sym(pref + "rx", rx())));
-    aug_rz.push_back(vec(seed[d][DE_RZ] = MatType::sym(pref + "rz", rz())));
-    aug_rp.push_back(vec(seed[d][DE_RP] = MatType::sym(pref + "rp", rp())));
+    aug_x.push_back(vec(seed[d][DYN_X] = MatType::sym(pref + "x", x())));
+    aug_z.push_back(vec(seed[d][DYN_Z] = MatType::sym(pref + "z", z())));
+    aug_p.push_back(vec(seed[d][DYN_P] = MatType::sym(pref + "p", p())));
+    aug_rx.push_back(vec(seed[d][DYN_RX] = MatType::sym(pref + "rx", rx())));
+    aug_rz.push_back(vec(seed[d][DYN_RZ] = MatType::sym(pref + "rz", rz())));
+    aug_rp.push_back(vec(seed[d][DYN_RP] = MatType::sym(pref + "rp", rp())));
   }
 
   // Calculate directional derivatives
@@ -461,13 +461,13 @@ std::map<std::string, MatType> Integrator::aug_fwd(casadi_int nfwd) const {
   // Collect sensitivity equations
   casadi_assert_dev(sens.size()==nfwd);
   for (casadi_int d=0; d<nfwd; ++d) {
-    casadi_assert_dev(sens[d].size()==DE_NUM_OUT);
-    aug_ode.push_back(vec(project(sens[d][DE_ODE], x())));
-    aug_alg.push_back(vec(project(sens[d][DE_ALG], z())));
-    aug_quad.push_back(vec(project(sens[d][DE_QUAD], q())));
-    aug_rode.push_back(vec(project(sens[d][DE_RODE], rx())));
-    aug_ralg.push_back(vec(project(sens[d][DE_RALG], rz())));
-    aug_rquad.push_back(vec(project(sens[d][DE_RQUAD], rq())));
+    casadi_assert_dev(sens[d].size()==DYN_NUM_OUT);
+    aug_ode.push_back(vec(project(sens[d][DYN_ODE], x())));
+    aug_alg.push_back(vec(project(sens[d][DYN_ALG], z())));
+    aug_quad.push_back(vec(project(sens[d][DYN_QUAD], q())));
+    aug_rode.push_back(vec(project(sens[d][DYN_RODE], rx())));
+    aug_ralg.push_back(vec(project(sens[d][DYN_RALG], rz())));
+    aug_rquad.push_back(vec(project(sens[d][DYN_RQUAD], rq())));
   }
 
   // Construct return object
@@ -495,37 +495,37 @@ std::map<std::string, MatType> Integrator::aug_adj(casadi_int nadj) const {
   // Get input expressions
   std::vector<MatType> arg = MatType::get_input(oracle_);
   std::vector<MatType> aug_x, aug_z, aug_p, aug_rx, aug_rz, aug_rp;
-  MatType aug_t = arg.at(DE_T);
-  aug_x.push_back(vec(arg.at(DE_X)));
-  aug_z.push_back(vec(arg.at(DE_Z)));
-  aug_p.push_back(vec(arg.at(DE_P)));
-  aug_rx.push_back(vec(arg.at(DE_RX)));
-  aug_rz.push_back(vec(arg.at(DE_RZ)));
-  aug_rp.push_back(vec(arg.at(DE_RP)));
+  MatType aug_t = arg.at(DYN_T);
+  aug_x.push_back(vec(arg.at(DYN_X)));
+  aug_z.push_back(vec(arg.at(DYN_Z)));
+  aug_p.push_back(vec(arg.at(DYN_P)));
+  aug_rx.push_back(vec(arg.at(DYN_RX)));
+  aug_rz.push_back(vec(arg.at(DYN_RZ)));
+  aug_rp.push_back(vec(arg.at(DYN_RP)));
 
   // Get output expressions
   std::vector<MatType> res = oracle_(arg);
   std::vector<MatType> aug_ode, aug_alg, aug_quad, aug_rode, aug_ralg, aug_rquad;
-  aug_ode.push_back(vec(res.at(DE_ODE)));
-  aug_alg.push_back(vec(res.at(DE_ALG)));
-  aug_quad.push_back(vec(res.at(DE_QUAD)));
-  aug_rode.push_back(vec(res.at(DE_RODE)));
-  aug_ralg.push_back(vec(res.at(DE_RALG)));
-  aug_rquad.push_back(vec(res.at(DE_RQUAD)));
+  aug_ode.push_back(vec(res.at(DYN_ODE)));
+  aug_alg.push_back(vec(res.at(DYN_ALG)));
+  aug_quad.push_back(vec(res.at(DYN_QUAD)));
+  aug_rode.push_back(vec(res.at(DYN_RODE)));
+  aug_ralg.push_back(vec(res.at(DYN_RALG)));
+  aug_rquad.push_back(vec(res.at(DYN_RQUAD)));
 
   // Zero of time dimension
   MatType zero_t = MatType::zeros(t());
 
   // Reverse mode directional derivatives
-  std::vector<std::vector<MatType>> seed(nadj, std::vector<MatType>(DE_NUM_OUT));
+  std::vector<std::vector<MatType>> seed(nadj, std::vector<MatType>(DYN_NUM_OUT));
   for (casadi_int d=0; d<nadj; ++d) {
     std::string pref = "aug" + str(d) + "_";
-    aug_rx.push_back(vec(seed[d][DE_ODE] = MatType::sym(pref + "ode", x())));
-    aug_rz.push_back(vec(seed[d][DE_ALG] = MatType::sym(pref + "alg", z())));
-    aug_rp.push_back(vec(seed[d][DE_QUAD] = MatType::sym(pref + "quad", q())));
-    aug_x.push_back(vec(seed[d][DE_RODE] = MatType::sym(pref + "rode", rx())));
-    aug_z.push_back(vec(seed[d][DE_RALG] = MatType::sym(pref + "ralg", rz())));
-    aug_p.push_back(vec(seed[d][DE_RQUAD] = MatType::sym(pref + "rquad", rq())));
+    aug_rx.push_back(vec(seed[d][DYN_ODE] = MatType::sym(pref + "ode", x())));
+    aug_rz.push_back(vec(seed[d][DYN_ALG] = MatType::sym(pref + "alg", z())));
+    aug_rp.push_back(vec(seed[d][DYN_QUAD] = MatType::sym(pref + "quad", q())));
+    aug_x.push_back(vec(seed[d][DYN_RODE] = MatType::sym(pref + "rode", rx())));
+    aug_z.push_back(vec(seed[d][DYN_RALG] = MatType::sym(pref + "ralg", rz())));
+    aug_p.push_back(vec(seed[d][DYN_RQUAD] = MatType::sym(pref + "rquad", rq())));
   }
 
   // Calculate directional derivatives
@@ -535,13 +535,13 @@ std::map<std::string, MatType> Integrator::aug_adj(casadi_int nadj) const {
   // Collect sensitivity equations
   casadi_assert_dev(sens.size()==nadj);
   for (casadi_int d=0; d<nadj; ++d) {
-    casadi_assert_dev(sens[d].size()==DE_NUM_IN);
-    aug_rode.push_back(vec(project(sens[d][DE_X], x())));
-    aug_ralg.push_back(vec(project(sens[d][DE_Z], z())));
-    aug_rquad.push_back(vec(project(sens[d][DE_P], p())));
-    aug_ode.push_back(vec(project(sens[d][DE_RX], rx())));
-    aug_alg.push_back(vec(project(sens[d][DE_RZ], rz())));
-    aug_quad.push_back(vec(project(sens[d][DE_RP], rp())));
+    casadi_assert_dev(sens[d].size()==DYN_NUM_IN);
+    aug_rode.push_back(vec(project(sens[d][DYN_X], x())));
+    aug_ralg.push_back(vec(project(sens[d][DYN_Z], z())));
+    aug_rquad.push_back(vec(project(sens[d][DYN_P], p())));
+    aug_ode.push_back(vec(project(sens[d][DYN_RX], rx())));
+    aug_alg.push_back(vec(project(sens[d][DYN_RZ], rz())));
+    aug_quad.push_back(vec(project(sens[d][DYN_RP], rp())));
   }
 
   // Construct return object
@@ -590,13 +590,13 @@ sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, void* me
 
   // Propagate forward
   const bvec_t** arg1 = arg+n_in_;
-  std::fill_n(arg1, static_cast<size_t>(DE_NUM_IN), nullptr);
-  arg1[DE_X] = arg[INTEGRATOR_X0];
-  arg1[DE_P] = arg[INTEGRATOR_P];
+  std::fill_n(arg1, static_cast<size_t>(DYN_NUM_IN), nullptr);
+  arg1[DYN_X] = arg[INTEGRATOR_X0];
+  arg1[DYN_P] = arg[INTEGRATOR_P];
   bvec_t** res1 = res+n_out_;
-  std::fill_n(res1, static_cast<size_t>(DE_NUM_OUT), nullptr);
-  res1[DE_ODE] = tmp_x;
-  res1[DE_ALG] = tmp_z;
+  std::fill_n(res1, static_cast<size_t>(DYN_NUM_OUT), nullptr);
+  res1[DYN_ODE] = tmp_x;
+  res1[DYN_ALG] = tmp_z;
   oracle_(arg1, res1, iw, w, 0);
   if (arg[INTEGRATOR_X0]) {
     const bvec_t *tmp = arg[INTEGRATOR_X0];
@@ -614,25 +614,25 @@ sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, void* me
 
   // Propagate to quadratures
   if (nq_>0 && res[INTEGRATOR_QF]) {
-    arg1[DE_X] = tmp_x;
-    arg1[DE_Z] = tmp_z;
-    res1[DE_ODE] = res1[DE_ALG] = nullptr;
-    res1[DE_QUAD] = res[INTEGRATOR_QF];
+    arg1[DYN_X] = tmp_x;
+    arg1[DYN_Z] = tmp_z;
+    res1[DYN_ODE] = res1[DYN_ALG] = nullptr;
+    res1[DYN_QUAD] = res[INTEGRATOR_QF];
     if (oracle_(arg1, res1, iw, w, 0)) return 1;
   }
 
   if (nrx_>0) {
     // Propagate through g
-    std::fill_n(arg1, static_cast<size_t>(DE_NUM_IN), nullptr);
-    arg1[DE_X] = tmp_x;
-    arg1[DE_P] = arg[INTEGRATOR_P];
-    arg1[DE_Z] = tmp_z;
-    arg1[DE_RX] = arg[INTEGRATOR_X0];
-    arg1[DE_RX] = arg[INTEGRATOR_RX0];
-    arg1[DE_RP] = arg[INTEGRATOR_RP];
-    std::fill_n(res1, static_cast<size_t>(DE_NUM_OUT), nullptr);
-    res1[DE_RODE] = tmp_rx;
-    res1[DE_RALG] = tmp_rz;
+    std::fill_n(arg1, static_cast<size_t>(DYN_NUM_IN), nullptr);
+    arg1[DYN_X] = tmp_x;
+    arg1[DYN_P] = arg[INTEGRATOR_P];
+    arg1[DYN_Z] = tmp_z;
+    arg1[DYN_RX] = arg[INTEGRATOR_X0];
+    arg1[DYN_RX] = arg[INTEGRATOR_RX0];
+    arg1[DYN_RP] = arg[INTEGRATOR_RP];
+    std::fill_n(res1, static_cast<size_t>(DYN_NUM_OUT), nullptr);
+    res1[DYN_RODE] = tmp_rx;
+    res1[DYN_RALG] = tmp_rz;
     oracle_(arg1, res1, iw, w, 0);
     if (arg[INTEGRATOR_RX0]) {
       const bvec_t *tmp = arg[INTEGRATOR_RX0];
@@ -650,10 +650,10 @@ sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, void* me
 
     // Propagate to quadratures
     if (nrq_>0 && res[INTEGRATOR_RQF]) {
-      arg1[DE_RX] = tmp_rx;
-      arg1[DE_RZ] = tmp_rz;
-      res1[DE_RODE] = res1[DE_RALG] = nullptr;
-      res1[DE_RQUAD] = res[INTEGRATOR_RQF];
+      arg1[DYN_RX] = tmp_rx;
+      arg1[DYN_RZ] = tmp_rz;
+      res1[DYN_RODE] = res1[DYN_RALG] = nullptr;
+      res1[DYN_RQUAD] = res[INTEGRATOR_RQF];
       if (oracle_(arg1, res1, iw, w, 0)) return 1;
     }
   }
@@ -718,15 +718,15 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
     }
 
     // Get dependencies from backward quadratures
-    std::fill_n(res1, static_cast<size_t>(DE_NUM_OUT), nullptr);
-    std::fill_n(arg1, static_cast<size_t>(DE_NUM_IN), nullptr);
-    res1[DE_RQUAD] = rqf;
-    arg1[DE_X] = tmp_x;
-    arg1[DE_Z] = tmp_z;
-    arg1[DE_P] = p;
-    arg1[DE_RX] = tmp_rx;
-    arg1[DE_RZ] = tmp_rz;
-    arg1[DE_RP] = rp;
+    std::fill_n(res1, static_cast<size_t>(DYN_NUM_OUT), nullptr);
+    std::fill_n(arg1, static_cast<size_t>(DYN_NUM_IN), nullptr);
+    res1[DYN_RQUAD] = rqf;
+    arg1[DYN_X] = tmp_x;
+    arg1[DYN_Z] = tmp_z;
+    arg1[DYN_P] = p;
+    arg1[DYN_RX] = tmp_rx;
+    arg1[DYN_RZ] = tmp_rz;
+    arg1[DYN_RP] = rp;
     if (oracle_.rev(arg1, res1, iw, w, 0)) return 1;
 
     // Propagate interdependencies
@@ -738,21 +738,21 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
     if (rx0) for (casadi_int i=0; i<nrx_; ++i) rx0[i] |= tmp_rx[i];
 
     // Indirect dependency via g
-    res1[DE_RODE] = tmp_rx;
-    res1[DE_RALG] = tmp_rz;
-    res1[DE_RQUAD] = nullptr;
-    arg1[DE_RX] = rx0;
-    arg1[DE_RZ] = nullptr; // arg[INTEGRATOR_RZ0] is a guess, no dependency
+    res1[DYN_RODE] = tmp_rx;
+    res1[DYN_RALG] = tmp_rz;
+    res1[DYN_RQUAD] = nullptr;
+    arg1[DYN_RX] = rx0;
+    arg1[DYN_RZ] = nullptr; // arg[INTEGRATOR_RZ0] is a guess, no dependency
     if (oracle_.rev(arg1, res1, iw, w, 0)) return 1;
   }
 
   // Get dependencies from forward quadratures
-  std::fill_n(res1, static_cast<size_t>(DE_NUM_OUT), nullptr);
-  std::fill_n(arg1, static_cast<size_t>(DE_NUM_IN), nullptr);
-  res1[DE_QUAD] = qf;
-  arg1[DE_X] = tmp_x;
-  arg1[DE_Z] = tmp_z;
-  arg1[DE_P] = p;
+  std::fill_n(res1, static_cast<size_t>(DYN_NUM_OUT), nullptr);
+  std::fill_n(arg1, static_cast<size_t>(DYN_NUM_IN), nullptr);
+  res1[DYN_QUAD] = qf;
+  arg1[DYN_X] = tmp_x;
+  arg1[DYN_Z] = tmp_z;
+  arg1[DYN_P] = p;
   if (qf && nq_>0) {
     if (oracle_.rev(arg1, res1, iw, w, 0)) return 1;
   }
@@ -766,11 +766,11 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
   if (x0) for (casadi_int i=0; i<nx_; ++i) x0[i] |= tmp_x[i];
 
   // Indirect dependency through f
-  res1[DE_ODE] = tmp_x;
-  res1[DE_ALG] = tmp_z;
-  res1[DE_QUAD] = nullptr;
-  arg1[DE_X] = x0;
-  arg1[DE_Z] = nullptr; // arg[INTEGRATOR_Z0] is a guess, no dependency
+  res1[DYN_ODE] = tmp_x;
+  res1[DYN_ALG] = tmp_z;
+  res1[DYN_QUAD] = nullptr;
+  arg1[DYN_X] = x0;
+  arg1[DYN_Z] = nullptr; // arg[INTEGRATOR_Z0] is a guess, no dependency
   if (oracle_.rev(arg1, res1, iw, w, 0)) return 1;
   return 0;
 }
@@ -1053,7 +1053,7 @@ Dict Integrator::getDerivativeOptions(bool fwd) const {
 
 Sparsity Integrator::sp_jac_dae() {
   // Start with the sparsity pattern of the ODE part
-  Sparsity jac_ode_x = oracle_.jac_sparsity(DE_ODE, DE_X);
+  Sparsity jac_ode_x = oracle_.jac_sparsity(DYN_ODE, DYN_X);
 
   // Add diagonal to get interdependencies
   jac_ode_x = jac_ode_x + Sparsity::diag(nx_);
@@ -1062,16 +1062,16 @@ Sparsity Integrator::sp_jac_dae() {
   if (nz_==0) return jac_ode_x;
 
   // Add contribution from algebraic variables and equations
-  Sparsity jac_ode_z = oracle_.jac_sparsity(DE_ODE, DE_Z);
-  Sparsity jac_alg_x = oracle_.jac_sparsity(DE_ALG, DE_X);
-  Sparsity jac_alg_z = oracle_.jac_sparsity(DE_ALG, DE_Z);
+  Sparsity jac_ode_z = oracle_.jac_sparsity(DYN_ODE, DYN_Z);
+  Sparsity jac_alg_x = oracle_.jac_sparsity(DYN_ALG, DYN_X);
+  Sparsity jac_alg_z = oracle_.jac_sparsity(DYN_ALG, DYN_Z);
   return blockcat(jac_ode_x, jac_ode_z,
                   jac_alg_x, jac_alg_z);
 }
 
 Sparsity Integrator::sp_jac_rdae() {
   // Start with the sparsity pattern of the ODE part
-  Sparsity jac_ode_x = oracle_.jac_sparsity(DE_RODE, DE_RX);
+  Sparsity jac_ode_x = oracle_.jac_sparsity(DYN_RODE, DYN_RX);
 
   // Add diagonal to get interdependencies
   jac_ode_x = jac_ode_x + Sparsity::diag(nrx_);
@@ -1080,9 +1080,9 @@ Sparsity Integrator::sp_jac_rdae() {
   if (nrz_==0) return jac_ode_x;
 
   // Add contribution from algebraic variables and equations
-  Sparsity jac_ode_z = oracle_.jac_sparsity(DE_RODE, DE_RZ);
-  Sparsity jac_alg_x = oracle_.jac_sparsity(DE_RALG, DE_RX);
-  Sparsity jac_alg_z = oracle_.jac_sparsity(DE_RALG, DE_RZ);
+  Sparsity jac_ode_z = oracle_.jac_sparsity(DYN_RODE, DYN_RZ);
+  Sparsity jac_alg_x = oracle_.jac_sparsity(DYN_RALG, DYN_RX);
+  Sparsity jac_alg_z = oracle_.jac_sparsity(DYN_RALG, DYN_RZ);
   return blockcat(jac_ode_x, jac_ode_z,
                   jac_alg_x, jac_alg_z);
 }
@@ -1457,51 +1457,51 @@ void ImplicitFixedStepIntegrator::init(const Dict& opts) {
 template<typename XType>
 Function Integrator::map2oracle(const std::string& name,
   const std::map<std::string, XType>& d, const Dict& opts) {
-  std::vector<XType> de_in(DE_NUM_IN), de_out(DE_NUM_OUT);
+  std::vector<XType> de_in(DYN_NUM_IN), de_out(DYN_NUM_OUT);
 
   for (auto&& i : d) {
     if (i.first=="t") {
-      de_in[DE_T]=i.second;
+      de_in[DYN_T]=i.second;
     } else if (i.first=="x") {
-      de_in[DE_X]=i.second;
+      de_in[DYN_X]=i.second;
     } else if (i.first=="z") {
-      de_in[DE_Z]=i.second;
+      de_in[DYN_Z]=i.second;
     } else if (i.first=="p") {
-      de_in[DE_P]=i.second;
+      de_in[DYN_P]=i.second;
     } else if (i.first=="rx") {
-      de_in[DE_RX]=i.second;
+      de_in[DYN_RX]=i.second;
     } else if (i.first=="rz") {
-      de_in[DE_RZ]=i.second;
+      de_in[DYN_RZ]=i.second;
     } else if (i.first=="rp") {
-      de_in[DE_RP]=i.second;
+      de_in[DYN_RP]=i.second;
     } else if (i.first=="ode") {
-      de_out[DE_ODE]=i.second;
+      de_out[DYN_ODE]=i.second;
     } else if (i.first=="alg") {
-      de_out[DE_ALG]=i.second;
+      de_out[DYN_ALG]=i.second;
     } else if (i.first=="quad") {
-      de_out[DE_QUAD]=i.second;
+      de_out[DYN_QUAD]=i.second;
     } else if (i.first=="rode") {
-      de_out[DE_RODE]=i.second;
+      de_out[DYN_RODE]=i.second;
     } else if (i.first=="ralg") {
-      de_out[DE_RALG]=i.second;
+      de_out[DYN_RALG]=i.second;
     } else if (i.first=="rquad") {
-      de_out[DE_RQUAD]=i.second;
+      de_out[DYN_RQUAD]=i.second;
     } else {
       casadi_error("No such field: " + i.first);
     }
   }
 
   // Make sure x and ode exist
-  casadi_assert(!de_in[DE_X].is_empty(), "Ill-posed ODE - no state");
+  casadi_assert(!de_in[DYN_X].is_empty(), "Ill-posed ODE - no state");
 
   // Number of right-hand-sides
-  casadi_int nrhs = de_in[DE_X].size2();
+  casadi_int nrhs = de_in[DYN_X].size2();
 
   // Make sure consistent number of right-hand-sides
   for (bool b : {true, false}) {
     for (auto&& e : b ? de_in : de_out) {
       // Skip time
-      if (&e == &de_in[DE_T]) continue;
+      if (&e == &de_in[DYN_T]) continue;
       // Number of rows
       casadi_int nr = e.size1();
       // Make sure no change in number of elements
@@ -1511,27 +1511,27 @@ Function Integrator::map2oracle(const std::string& name,
   }
 
   // Consistent sparsity for x
-  casadi_assert(de_in[DE_X].size()==de_out[DE_ODE].size(),
+  casadi_assert(de_in[DYN_X].size()==de_out[DYN_ODE].size(),
     "Dimension mismatch for 'ode'");
-  de_out[DE_ODE] = project(de_out[DE_ODE], de_in[DE_X].sparsity());
+  de_out[DYN_ODE] = project(de_out[DYN_ODE], de_in[DYN_X].sparsity());
 
   // Consistent sparsity for z
-  casadi_assert(de_in[DE_Z].size()==de_out[DE_ALG].size(),
+  casadi_assert(de_in[DYN_Z].size()==de_out[DYN_ALG].size(),
     "Dimension mismatch for 'alg'");
-  de_out[DE_ALG] = project(de_out[DE_ALG], de_in[DE_Z].sparsity());
+  de_out[DYN_ALG] = project(de_out[DYN_ALG], de_in[DYN_Z].sparsity());
 
   // Consistent sparsity for rx
-  casadi_assert(de_in[DE_RX].size()==de_out[DE_RODE].size(),
+  casadi_assert(de_in[DYN_RX].size()==de_out[DYN_RODE].size(),
     "Dimension mismatch for 'rode'");
-  de_out[DE_RODE] = project(de_out[DE_RODE], de_in[DE_RX].sparsity());
+  de_out[DYN_RODE] = project(de_out[DYN_RODE], de_in[DYN_RX].sparsity());
 
   // Consistent sparsity for rz
-  casadi_assert(de_in[DE_RZ].size()==de_out[DE_RALG].size(),
+  casadi_assert(de_in[DYN_RZ].size()==de_out[DYN_RALG].size(),
     "Dimension mismatch for 'ralg'");
-  de_out[DE_RALG] = project(de_out[DE_RALG], de_in[DE_RZ].sparsity());
+  de_out[DYN_RALG] = project(de_out[DYN_RALG], de_in[DYN_RZ].sparsity());
 
   // Construct
-  return Function(name, de_in, de_out, DE_INPUTS, DE_OUTPUTS, opts);
+  return Function(name, de_in, de_out, dyn_in(), dyn_out(), opts);
 }
 
 void Integrator::serialize_body(SerializingStream &s) const {

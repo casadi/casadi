@@ -1034,24 +1034,24 @@ Function IdasInterface::getJ(bool backward) const {
 
   // Get the Jacobian in the Newton iteration
   if (backward) {
-    MatType jac = MatType::jacobian(r[DE_RODE], a[DE_RX]) + cj*MatType::eye(nrx_);
+    MatType jac = MatType::jacobian(r[DYN_RODE], a[DYN_RX]) + cj*MatType::eye(nrx_);
     if (nrz_>0) {
       jac = horzcat(vertcat(jac,
-                            MatType::jacobian(r[DE_RALG], a[DE_RX])),
-                    vertcat(MatType::jacobian(r[DE_RODE], a[DE_RZ]),
-                            MatType::jacobian(r[DE_RALG], a[DE_RZ])));
+                            MatType::jacobian(r[DYN_RALG], a[DYN_RX])),
+                    vertcat(MatType::jacobian(r[DYN_RODE], a[DYN_RZ]),
+                            MatType::jacobian(r[DYN_RALG], a[DYN_RZ])));
     }
-    return Function("jacB", {a[DE_T], a[DE_RX], a[DE_RZ], a[DE_RP],
-                              a[DE_X], a[DE_Z], a[DE_P], cj}, {jac});
+    return Function("jacB", {a[DYN_T], a[DYN_RX], a[DYN_RZ], a[DYN_RP],
+                              a[DYN_X], a[DYN_Z], a[DYN_P], cj}, {jac});
     } else {
-    MatType jac = MatType::jacobian(r[DE_ODE], a[DE_X]) - cj*MatType::eye(nx_);
+    MatType jac = MatType::jacobian(r[DYN_ODE], a[DYN_X]) - cj*MatType::eye(nx_);
     if (nz_>0) {
       jac = horzcat(vertcat(jac,
-                            MatType::jacobian(r[DE_ALG], a[DE_X])),
-                    vertcat(MatType::jacobian(r[DE_ODE], a[DE_Z]),
-                            MatType::jacobian(r[DE_ALG], a[DE_Z])));
+                            MatType::jacobian(r[DYN_ALG], a[DYN_X])),
+                    vertcat(MatType::jacobian(r[DYN_ODE], a[DYN_Z]),
+                            MatType::jacobian(r[DYN_ALG], a[DYN_Z])));
     }
-    return Function("jacF", {a[DE_T], a[DE_X], a[DE_Z], a[DE_P], cj}, {jac});
+    return Function("jacF", {a[DYN_T], a[DYN_X], a[DYN_Z], a[DYN_P], cj}, {jac});
   }
 }
 

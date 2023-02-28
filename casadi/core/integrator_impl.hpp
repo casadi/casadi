@@ -230,15 +230,15 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
 
   ///@{
   // Shorthands
-  const Sparsity&  t() const { return oracle_.sparsity_in(DE_T);}
-  const Sparsity&  x() const { return oracle_.sparsity_in(DE_X);}
-  const Sparsity&  z() const { return oracle_.sparsity_in(DE_Z);}
-  const Sparsity&  p() const { return oracle_.sparsity_in(DE_P);}
-  const Sparsity&  q() const { return oracle_.sparsity_out(DE_QUAD);}
-  const Sparsity& rx() const { return oracle_.sparsity_in(DE_RX);}
-  const Sparsity& rz() const { return oracle_.sparsity_in(DE_RZ);}
-  const Sparsity& rp() const { return oracle_.sparsity_in(DE_RP);}
-  const Sparsity& rq() const { return oracle_.sparsity_out(DE_RQUAD);}
+  const Sparsity&  t() const { return oracle_.sparsity_in(DYN_T);}
+  const Sparsity&  x() const { return oracle_.sparsity_in(DYN_X);}
+  const Sparsity&  z() const { return oracle_.sparsity_in(DYN_Z);}
+  const Sparsity&  p() const { return oracle_.sparsity_in(DYN_P);}
+  const Sparsity&  q() const { return oracle_.sparsity_out(DYN_QUAD);}
+  const Sparsity& rx() const { return oracle_.sparsity_in(DYN_RX);}
+  const Sparsity& rz() const { return oracle_.sparsity_in(DYN_RZ);}
+  const Sparsity& rp() const { return oracle_.sparsity_in(DYN_RP);}
+  const Sparsity& rq() const { return oracle_.sparsity_out(DYN_RQUAD);}
   ///@}
 
   // Initial time

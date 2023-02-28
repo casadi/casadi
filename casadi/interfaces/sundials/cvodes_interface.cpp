@@ -848,15 +848,15 @@ Function CvodesInterface::getJ(bool backward) const {
 
   // Get the Jacobian in the Newton iteration
   if (backward) {
-    MatType jac = c_x*MatType::jacobian(r[DE_RODE], a[DE_RX])
+    MatType jac = c_x*MatType::jacobian(r[DYN_RODE], a[DYN_RX])
                 + c_xdot*MatType::eye(nrx_);
     return Function("jacB",
-                    {a[DE_T], a[DE_RX], a[DE_RP],
-                      a[DE_X], a[DE_P], c_x, c_xdot}, {jac});
+                    {a[DYN_T], a[DYN_RX], a[DYN_RP],
+                      a[DYN_X], a[DYN_P], c_x, c_xdot}, {jac});
     } else {
-    MatType jac = c_x*MatType::jacobian(r[DE_ODE], a[DE_X])
+    MatType jac = c_x*MatType::jacobian(r[DYN_ODE], a[DYN_X])
                 + c_xdot*MatType::eye(nx_);
-    return Function("jacF", {a[DE_T], a[DE_X], a[DE_P], c_x, c_xdot}, {jac});
+    return Function("jacF", {a[DYN_T], a[DYN_X], a[DYN_P], c_x, c_xdot}, {jac});
   }
 }
 

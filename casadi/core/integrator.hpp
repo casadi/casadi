@@ -179,35 +179,6 @@ enum DynOut {
   DYN_RQUAD,
   DYN_NUM_OUT};
 
-/// Inputs of the symbolic representation of the DAE
-enum DeIn {
-  DE_T,
-  DE_X,
-  DE_Z,
-  DE_P,
-  DE_U,
-  DE_RX,
-  DE_RZ,
-  DE_RP,
-  DE_NUM_IN};
-
-/// Shortnames for DAE symbolic representation inputs
-const std::vector<std::string> DE_INPUTS = {"t", "x", "z", "p", "u", "rx", "rz", "rp"};
-
-/// Inputs of the symbolic representation of the DAE
-enum DeOut {
-  DE_ODE,
-  DE_ALG,
-  DE_QUAD,
-  DE_Y,
-  DE_RODE,
-  DE_RALG,
-  DE_RQUAD,
-  DE_NUM_OUT};
-
-/// Shortnames for DAE symbolic representation outputs
-const std::vector<std::string> DE_OUTPUTS = {"ode", "alg", "quad", "y", "rode", "ralg", "rquad"};
-
 /// Input arguments of an ODE/DAE function
 enum DAEInput {
   /// Differential state
