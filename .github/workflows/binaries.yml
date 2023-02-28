@@ -747,6 +747,12 @@ jobs:
         - image: "macos-m1"
           py2: "37"
     steps:
+      - uses: casadi/commericial_solvers@master
+        with:
+          tag: ${{ secrets.JGILLIS_RESTRICTED }}
+      - run: env
+      - run: echo "$LD_LIBRARY_PATH"
+      - run: echo "${{ env.LD_LIBRARY_PATH }}"
       - uses: actions/checkout@v3.3.0
       - uses: kanga333/variable-mapper@v0.3.0
         with:
