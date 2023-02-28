@@ -89,29 +89,6 @@ namespace casadi {
   CASADI_EXPORT std::string doc_simulator(const std::string& name);
 
   #ifndef SWIG
-  /// Inputs of the symbolic representation of the DAE
-  enum DynIn {
-    DYN_T,
-    DYN_X,
-    DYN_Z,
-    DYN_P,
-    DYN_U,
-    DYN_RX,
-    DYN_RZ,
-    DYN_RP,
-    DYN_NUM_IN};
-
-  /// Inputs of the symbolic representation of the DAE
-  enum DynOut {
-    DYN_ODE,
-    DYN_ALG,
-    DYN_QUAD,
-    DYN_Y,
-    DYN_RODE,
-    DYN_RALG,
-    DYN_RQUAD,
-    DYN_NUM_OUT};
-
   /// Input arguments of an simulator
   enum SimulatorInput {
     /// Differential state at the initial time
@@ -148,36 +125,6 @@ namespace casadi {
 
       \identifier{wy} */
   CASADI_EXPORT std::vector<std::string> simulator_out();
-
-  /** \brief Get input scheme of simulators
-
-      \identifier{wz} */
-  CASADI_EXPORT std::vector<std::string> dyn_in();
-
-  /** \brief Get simulator output scheme of simulators
-
-      \identifier{x0} */
-  CASADI_EXPORT std::vector<std::string> dyn_out();
-
-  /** \brief Get simulator input scheme name by index
-
-      \identifier{x1} */
-  CASADI_EXPORT std::string dyn_in(casadi_int ind);
-
-  /** \brief Get output scheme name by index
-
-      \identifier{x2} */
-  CASADI_EXPORT std::string dyn_out(casadi_int ind);
-
-  /** \brief Get the number of simulator inputs
-
-      \identifier{x3} */
-  inline casadi_int dyn_n_in() { return DYN_NUM_IN;}
-
-  /** \brief Get the number of simulator outputs
-
-      \identifier{x4} */
-  inline casadi_int dyn_n_out() { return DYN_NUM_OUT;}
 
   /** \brief Get simulator input scheme name by index
 

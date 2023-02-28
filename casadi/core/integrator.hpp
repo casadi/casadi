@@ -134,9 +134,51 @@ namespace casadi {
 
       \identifier{7g} */
   CASADI_EXPORT casadi_int integrator_n_out();
+
+  /** \brief Get input scheme of simulators */
+  CASADI_EXPORT std::vector<std::string> dyn_in();
+
+  /** \brief Get simulator output scheme of simulators */
+  CASADI_EXPORT std::vector<std::string> dyn_out();
+
+  /** \brief Get simulator input scheme name by index */
+  CASADI_EXPORT std::string dyn_in(casadi_int ind);
+
+  /** \brief Get output scheme name by index */
+  CASADI_EXPORT std::string dyn_out(casadi_int ind);
+
+  /** \brief Get the number of simulator inputs */
+  CASADI_EXPORT casadi_int dyn_n_in();
+
+  /** \brief Get the number of simulator outputs  */
+  CASADI_EXPORT casadi_int dyn_n_out();
+
   /** @} */
 
 #ifndef SWIG
+/// Inputs of the symbolic representation of the DAE
+enum DynIn {
+  DYN_T,
+  DYN_X,
+  DYN_Z,
+  DYN_P,
+  DYN_U,
+  DYN_RX,
+  DYN_RZ,
+  DYN_RP,
+  DYN_NUM_IN};
+
+/// Inputs of the symbolic representation of the DAE
+enum DynOut {
+  DYN_ODE,
+  DYN_ALG,
+  DYN_QUAD,
+  DYN_Y,
+  DYN_RODE,
+  DYN_RALG,
+  DYN_RQUAD,
+  DYN_NUM_OUT};
+
 /// Inputs of the symbolic representation of the DAE
 enum DeIn {
   DE_T,
