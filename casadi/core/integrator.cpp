@@ -1559,7 +1559,6 @@ void Integrator::serialize_body(SerializingStream &s) const {
   s.pack("Integrator::ns", ns_);
   s.pack("Integrator::augmented_options", augmented_options_);
   s.pack("Integrator::opts", opts_);
-  s.pack("Integrator::onestep", onestep_);
   s.pack("Integrator::print_stats", print_stats_);
   s.pack("Integrator::t0", t0_);
   s.pack("Integrator::tout", tout_);
@@ -1597,7 +1596,6 @@ Integrator::Integrator(DeserializingStream & s) : OracleFunction(s) {
   s.unpack("Integrator::ns", ns_);
   s.unpack("Integrator::augmented_options", augmented_options_);
   s.unpack("Integrator::opts", opts_);
-  s.unpack("Integrator::onestep", onestep_);
   s.unpack("Integrator::print_stats", print_stats_);
   if (version >= 2) {
     s.unpack("Integrator::t0", t0_);

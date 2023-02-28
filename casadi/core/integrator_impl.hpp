@@ -250,9 +250,6 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   // Copy of the options
   Dict opts_;
 
-  /// One step
-  Function onestep_;
-
   /// Options
   bool print_stats_;
 
