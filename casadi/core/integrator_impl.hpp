@@ -35,22 +35,6 @@
 
 namespace casadi {
 
-///@{
-/// Number of entries in enums
-template<> struct enum_traits<DynIn> {
-  static const size_t n_enum = DYN_NUM_IN;
-};
-template<> struct enum_traits<DynOut> {
-  static const size_t n_enum = DYN_NUM_OUT;
-};
-///@}
-
-///@{
-/// Convert to string
-CASADI_EXPORT std::string to_string(DynIn v);
-CASADI_EXPORT std::string to_string(DynOut v);
-///@}
-
 /** \brief Integrator memory
 
     \identifier{1lp} */

@@ -29,9 +29,7 @@
 #include "simulator.hpp"
 #include "oracle_function.hpp"
 #include "plugin_interface.hpp"
-#include "casadi_enum.hpp"
 #include "integrator.hpp"
-#include "integrator_impl.hpp"
 
 /// \cond INTERNAL
 
