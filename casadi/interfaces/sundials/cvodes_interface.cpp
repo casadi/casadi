@@ -258,19 +258,19 @@ void CvodesInterface::reset(IntegratorMemory* mem, double t, const double* x,
   }
 
   // Set the stop time of the integration -- don't integrate past this point
-  if (stop_at_end_) setStopTime(m, grid_.back());
+  if (stop_at_end_) setStopTime(m, tout_.back());
 }
 
 void CvodesInterface::advance(IntegratorMemory* mem, double t, double* x,
                               double* z, double* q) const {
   auto m = to_mem(mem);
 
-  casadi_assert(t>=grid_.front(),
+  casadi_assert(t>=t0_,
     "CvodesInterface::integrate(" + str(t) + "): "
-    "Cannot integrate to a time earlier than t0 (" + str(grid_.front()) + ")");
-  casadi_assert(t<=grid_.back() || !stop_at_end_,
+    "Cannot integrate to a time earlier than t0 (" + str(t0_) + ")");
+  casadi_assert(t<=tout_.back() || !stop_at_end_,
     "CvodesInterface::integrate(" + str(t) + "): "
-    "Cannot integrate past a time later than tf (" + str(grid_.back()) + ") "
+    "Cannot integrate past a time later than tf (" + str(tout_.back()) + ") "
     "unless stop_at_end is set to False.");
 
   // Integrate, unless already at desired time
@@ -313,7 +313,7 @@ void CvodesInterface::resetB(IntegratorMemory* mem, double t, const double* rx,
   if (m->first_callB) {
     // Create backward problem
     THROWING(CVodeCreateB, m->mem, lmm_, iter_, &m->whichB);
-    THROWING(CVodeInitB, m->mem, m->whichB, rhsB, grid_.back(), m->rxz);
+    THROWING(CVodeInitB, m->mem, m->whichB, rhsB, tout_.back(), m->rxz);
     THROWING(CVodeSStolerancesB, m->mem, m->whichB, reltol_, abstol_);
     THROWING(CVodeSetUserDataB, m->mem, m->whichB, m);
     if (newton_scheme_==SD_DIRECT) {
@@ -349,7 +349,7 @@ void CvodesInterface::resetB(IntegratorMemory* mem, double t, const double* rx,
     // Mark initialized
     m->first_callB = false;
   } else {
-    THROWING(CVodeReInitB, m->mem, m->whichB, grid_.back(), m->rxz);
+    THROWING(CVodeReInitB, m->mem, m->whichB, tout_.back(), m->rxz);
     THROWING(CVodeQuadReInitB, m->mem, m->whichB, m->rq);
   }
 }

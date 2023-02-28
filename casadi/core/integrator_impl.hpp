@@ -242,9 +242,6 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   /// Number of sensitivities
   casadi_int ns_;
 
-  // Time grid (to be removed)
-  std::vector<double> grid_;
-
   // Augmented user option
   Dict augmented_options_;
 
@@ -256,9 +253,6 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
 
   /// Options
   bool print_stats_;
-
-  /// Output the state at the initial time (to be removed)
-  bool output_t0_;
 
   // Creator function for internal class
   typedef Integrator* (*Creator)(const std::string& name, const Function& oracle,

@@ -121,7 +121,7 @@ void IdasInterface::init(const Dict& opts) {
 
   // Default dependent options
   calc_icB_ = calc_ic_;
-  first_time_ = grid_.back();
+  first_time_ = tout_.back();
 
   // Read dependent options
   for (auto&& op : opts) {
@@ -412,7 +412,7 @@ void IdasInterface::reset(IntegratorMemory* mem, double t, const double* _x,
   N_VConst(0.0, m->xzdot);
   std::copy(init_xdot_.begin(), init_xdot_.end(), NV_DATA_S(m->xzdot));
 
-  THROWING(IDAReInit, m->mem, grid_.front(), m->xz, m->xzdot);
+  THROWING(IDAReInit, m->mem, t0_, m->xz, m->xzdot);
 
   // Re-initialize quadratures
   if (nq_>0) THROWING(IDAQuadReInit, m->mem, m->q);
@@ -427,19 +427,19 @@ void IdasInterface::reset(IntegratorMemory* mem, double t, const double* _x,
   if (nrx_>0) THROWING(IDAAdjReInit, m->mem);
 
   // Set the stop time of the integration -- don't integrate past this point
-  if (stop_at_end_) setStopTime(m, grid_.back());
+  if (stop_at_end_) setStopTime(m, tout_.back());
 }
 
 void IdasInterface::
 advance(IntegratorMemory* mem, double t, double* x, double* z, double* q) const {
   auto m = to_mem(mem);
 
-  casadi_assert(t>=grid_.front(),
+  casadi_assert(t>=t0_,
     "IdasInterface::integrate(" + str(t) + "): "
-    "Cannot integrate to a time earlier than t0 (" + str(grid_.front()) + ")");
-  casadi_assert(t<=grid_.back() || !stop_at_end_,
+    "Cannot integrate to a time earlier than t0 (" + str(t0_) + ")");
+  casadi_assert(t<=tout_.back() || !stop_at_end_,
     "IdasInterface::integrate(" + str(t) + "): "
-    "Cannot integrate past a time later than tf (" + str(grid_.back()) + ") "
+    "Cannot integrate past a time later than tf (" + str(tout_.back()) + ") "
     "unless stop_at_end is set to False.");
 
   // Integrate, unless already at desired time
@@ -489,7 +489,7 @@ void IdasInterface::resetB(IntegratorMemory* mem, double t, const double* rx,
   if (m->first_callB) {
     // Create backward problem
     THROWING(IDACreateB, m->mem, &m->whichB);
-    THROWING(IDAInitB, m->mem, m->whichB, resB, grid_.back(), m->rxz, m->rxzdot);
+    THROWING(IDAInitB, m->mem, m->whichB, resB, tout_.back(), m->rxz, m->rxzdot);
     THROWING(IDASStolerancesB, m->mem, m->whichB, reltol_, abstol_);
     THROWING(IDASetUserDataB, m->mem, m->whichB, m);
     THROWING(IDASetMaxNumStepsB, m->mem, m->whichB, max_num_steps_);
@@ -535,7 +535,7 @@ void IdasInterface::resetB(IntegratorMemory* mem, double t, const double* rx,
     m->first_callB = false;
   } else {
     // Re-initialize
-    THROWING(IDAReInitB, m->mem, m->whichB, grid_.back(), m->rxz, m->rxzdot);
+    THROWING(IDAReInitB, m->mem, m->whichB, tout_.back(), m->rxz, m->rxzdot);
     if (nrq_>0) {
       // Workaround (bug in SUNDIALS)
       // THROWING(IDAQuadReInitB, m->mem, m->whichB[dir], m->rq[dir]);
@@ -546,7 +546,7 @@ void IdasInterface::resetB(IntegratorMemory* mem, double t, const double* rx,
 
   // Correct initial values for the integration if necessary
   if (calc_icB_) {
-    THROWING(IDACalcICB, m->mem, m->whichB, grid_.front(), m->xz, m->xzdot);
+    THROWING(IDACalcICB, m->mem, m->whichB, t0_, m->xz, m->xzdot);
     THROWING(IDAGetConsistentICB, m->mem, m->whichB, m->rxz, m->rxzdot);
   }
 }

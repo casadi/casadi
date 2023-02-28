@@ -114,7 +114,6 @@ Integrator::Integrator(const std::string& name, const Function& oracle,
 
   // Default options
   print_stats_ = false;
-  output_t0_ = false;
 }
 
 Integrator::~Integrator() {
@@ -230,23 +229,30 @@ void Integrator::init(const Dict& opts) {
   // Default (temporary) options
   double t0=0, tf=1;
   bool expand = false;
+  bool output_t0 = false;
+  std::vector<double> grid;
+  bool uses_legacy_options = false;
 
   // Read options
   for (auto&& op : opts) {
     if (op.first=="expand") {
       expand = op.second;
     } else if (op.first=="output_t0") {
-      output_t0_ = op.second;
+      output_t0 = op.second;
+      uses_legacy_options = true;
     } else if (op.first=="print_stats") {
       print_stats_ = op.second;
     } else if (op.first=="grid") {
-      grid_ = op.second;
+      grid = op.second;
+      uses_legacy_options = true;
     } else if (op.first=="augmented_options") {
       augmented_options_ = op.second;
     } else if (op.first=="t0") {
       t0 = op.second;
+      uses_legacy_options = true;
     } else if (op.first=="tf") {
       tf = op.second;
+      uses_legacy_options = true;
     }
   }
 
@@ -256,15 +262,18 @@ void Integrator::init(const Dict& opts) {
   // Store a copy of the options, for creating augmented integrators
   opts_ = opts;
 
-  // If grid unset, default to [t0, tf]
-  if (grid_.empty()) {
-    grid_ = {t0, tf};
-  }
+  // Construct t0_ and tout_ gbased on legacy options
+  if (uses_legacy_options) {
+    // If grid unset, default to [t0, tf]
+    if (grid.empty()) {
+      grid = {t0, tf};
+    }
 
-  // Construct t0 and tout from grid and output_t0
-  t0_ = grid_.front();
-  tout_ = grid_;
-  if (!output_t0_) tout_.erase(tout_.begin());
+    // Construct t0 and tout from grid and output_t0
+    t0_ = grid.front();
+    tout_ = grid;
+    if (!output_t0) tout_.erase(tout_.begin());
+  }
 
   // Call the base class method
   OracleFunction::init(opts);
@@ -1048,7 +1057,7 @@ Function FixedStepIntegrator::create_advanced(const Dict& opts) {
   auto it = opts.find("simplify");
   if (it!=opts.end()) simplify = it->second;
 
-  if (simplify && nrx_==0 && grid_.size()==2) {
+  if (simplify && nrx_==0 && tout_.size()==1) {
     // Retrieve explicit simulation step (one finite element)
     Function F = getExplicit();
 
@@ -1456,7 +1465,7 @@ Function Integrator::map2oracle(const std::string& name,
 void Integrator::serialize_body(SerializingStream &s) const {
   OracleFunction::serialize_body(s);
 
-  s.version("Integrator", 1);
+  s.version("Integrator", 2);
   s.pack("Integrator::sp_jac_dae", sp_jac_dae_);
   s.pack("Integrator::sp_jac_rdae", sp_jac_rdae_);
   s.pack("Integrator::nx", nx_);
@@ -1476,14 +1485,12 @@ void Integrator::serialize_body(SerializingStream &s) const {
   s.pack("Integrator::np1", np1_);
   s.pack("Integrator::nrp1", nrp1_);
   s.pack("Integrator::ns", ns_);
-  s.pack("Integrator::grid", grid_);
-  s.pack("Integrator::ngrid", std::vector<casadi_int>(grid_.size()));
   s.pack("Integrator::augmented_options", augmented_options_);
   s.pack("Integrator::opts", opts_);
   s.pack("Integrator::onestep", onestep_);
   s.pack("Integrator::print_stats", print_stats_);
-  s.pack("Integrator::output_t0", output_t0_);
-  s.pack("Integrator::ntout", std::vector<casadi_int>(tout_.size()));
+  s.pack("Integrator::t0", t0_);
+  s.pack("Integrator::tout", tout_);
 }
 
 void Integrator::serialize_type(SerializingStream &s) const {
@@ -1496,7 +1503,7 @@ ProtoFunction* Integrator::deserialize(DeserializingStream& s) {
 }
 
 Integrator::Integrator(DeserializingStream & s) : OracleFunction(s) {
-  s.version("Integrator", 1);
+  int version = s.version("Integrator", 1, 2);
   s.unpack("Integrator::sp_jac_dae", sp_jac_dae_);
   s.unpack("Integrator::sp_jac_rdae", sp_jac_rdae_);
   s.unpack("Integrator::nx", nx_);
@@ -1520,13 +1527,21 @@ Integrator::Integrator(DeserializingStream & s) : OracleFunction(s) {
   s.unpack("Integrator::opts", opts_);
   s.unpack("Integrator::onestep", onestep_);
   s.unpack("Integrator::print_stats", print_stats_);
-  // Options to be removed
-  s.unpack("Integrator::output_t0", output_t0_);
-  s.unpack("Integrator::grid", grid_);
-  // Construct t0 and tout from grid and output_t0
-  t0_ = grid_.front();
-  tout_ = grid_;
-  if (!output_t0_) tout_.erase(tout_.begin());
+  if (version >= 2) {
+    s.unpack("Integrator::t0", t0_);
+    s.unpack("Integrator::tout", tout_);
+  } else {
+    // Time grid
+    std::vector<double> grid;
+    s.unpack("Integrator::grid", grid);
+    // Is the first time point in output?
+    bool output_t0;
+    s.unpack("Integrator::output_t0", output_t0);
+    // Construct t0 and tout from grid and output_t0
+    t0_ = grid.front();
+    tout_ = grid;
+    if (!output_t0) tout_.erase(tout_.begin());
+  }
 }
 
 void FixedStepIntegrator::serialize_body(SerializingStream &s) const {
