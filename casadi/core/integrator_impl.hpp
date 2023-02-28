@@ -260,7 +260,6 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
 
   /// Output the state at the initial time (to be removed)
   bool output_t0_;
-  casadi_int ntout_;
 
   // Creator function for internal class
   typedef Integrator* (*Creator)(const std::string& name, const Function& oracle,

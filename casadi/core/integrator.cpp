@@ -125,9 +125,9 @@ Sparsity Integrator::get_sparsity_in(casadi_int i) {
   case INTEGRATOR_X0: return x();
   case INTEGRATOR_P: return p();
   case INTEGRATOR_Z0: return z();
-  case INTEGRATOR_RX0: return repmat(rx(), 1, ntout_);
-  case INTEGRATOR_RP: return repmat(rp(), 1, ntout_);
-  case INTEGRATOR_RZ0: return repmat(rz(), 1, ntout_);
+  case INTEGRATOR_RX0: return repmat(rx(), 1, tout_.size());
+  case INTEGRATOR_RP: return repmat(rp(), 1, tout_.size());
+  case INTEGRATOR_RZ0: return repmat(rz(), 1, tout_.size());
   case INTEGRATOR_NUM_IN: break;
   }
   return Sparsity();
@@ -135,9 +135,9 @@ Sparsity Integrator::get_sparsity_in(casadi_int i) {
 
 Sparsity Integrator::get_sparsity_out(casadi_int i) {
   switch (static_cast<IntegratorOutput>(i)) {
-  case INTEGRATOR_XF: return repmat(x(), 1, ntout_);
-  case INTEGRATOR_QF: return repmat(q(), 1, ntout_);
-  case INTEGRATOR_ZF: return repmat(z(), 1, ntout_);
+  case INTEGRATOR_XF: return repmat(x(), 1, tout_.size());
+  case INTEGRATOR_QF: return repmat(q(), 1, tout_.size());
+  case INTEGRATOR_ZF: return repmat(z(), 1, tout_.size());
   case INTEGRATOR_RXF: return rx();
   case INTEGRATOR_RQF: return rq();
   case INTEGRATOR_RZF: return rz();
@@ -262,7 +262,6 @@ void Integrator::init(const Dict& opts) {
   }
 
   ngrid_ = grid_.size();
-  ntout_ = output_t0_ ? ngrid_ : ngrid_-1;
 
   // Construct t0 and tout from grid and output_t0
   t0_ = grid_.front();
@@ -1486,7 +1485,7 @@ void Integrator::serialize_body(SerializingStream &s) const {
   s.pack("Integrator::onestep", onestep_);
   s.pack("Integrator::print_stats", print_stats_);
   s.pack("Integrator::output_t0", output_t0_);
-  s.pack("Integrator::ntout", ntout_);
+  s.pack("Integrator::ntout", std::vector<casadi_int>(tout_.size()));
 }
 
 void Integrator::serialize_type(SerializingStream &s) const {
@@ -1527,7 +1526,6 @@ Integrator::Integrator(DeserializingStream & s) : OracleFunction(s) {
   s.unpack("Integrator::output_t0", output_t0_);
   s.unpack("Integrator::grid", grid_);
   s.unpack("Integrator::ngrid", ngrid_);
-  s.unpack("Integrator::ntout", ntout_);
   // Construct t0 and tout from grid and output_t0
   t0_ = grid_.front();
   tout_ = grid_;
