@@ -1,11 +1,12 @@
 import casadi as cs
-from typing import Tuple, Optional, Literal
+from typing import Tuple, Optional, Literal, get_args
 
+SECOND_ORDER_SPEC = Literal['no', 'full', 'prod', 'L', 'psi_prod', 'psi']
 
 def generate_casadi_problem(
     f: cs.Function,
     g: Optional[cs.Function],
-    second_order: Literal['no', 'full', 'prod', 'L', 'psi_prod', 'psi'] = 'no',
+    second_order: SECOND_ORDER_SPEC = 'no',
     name: str = "alpaqa_problem",
 ) -> Tuple[cs.CodeGenerator, int, int, int]:
     """Convert the objective and constraint functions into a CasADi code
@@ -23,7 +24,7 @@ def generate_casadi_problem(
                * Number of parameters.
     """
 
-    assert second_order in ['no', 'full', 'prod', 'L', 'psi_prod', 'psi']
+    assert second_order in get_args(SECOND_ORDER_SPEC)
 
     assert f.n_in() in [1, 2]
     assert f.n_out() == 1

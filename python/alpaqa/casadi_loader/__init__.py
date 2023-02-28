@@ -11,22 +11,22 @@ import subprocess
 import platform
 import sys
 import warnings
-from ..casadi_generator import generate_casadi_problem, generate_casadi_control_problem
+from ..casadi_generator import generate_casadi_problem, generate_casadi_control_problem, SECOND_ORDER_SPEC
 from ..cache import get_alpaqa_cache_dir
 
 # TODO: factor out caching logic
 
 
-def _load_casadi_problem(sofile, n, m, p, second_order):
+def _load_casadi_problem(sofile):
     print("-- Loading:", sofile)
-    prob = pa.load_casadi_problem(sofile, n=n, m=m, p=p, second_order=second_order)
+    prob = pa.load_casadi_problem(sofile)
     return prob
 
 
 def generate_and_compile_casadi_problem(
     f: cs.Function,
     g: cs.Function,
-    second_order: bool = False,
+    second_order: SECOND_ORDER_SPEC = 'no',
     name: str = "alpaqa_problem",
 ) -> pa.CasADiProblem:
     """Compile the objective and constraint functions into a alpaqa Problem.
@@ -52,7 +52,7 @@ def generate_and_compile_casadi_problem(
             probdir = join(cachedir, str(uid))
             sofile = join(probdir, soname)
             try:
-                return _load_casadi_problem(sofile, *dim, second_order)
+                return _load_casadi_problem(sofile)
             except:
                 del cache[key]
                 # if os.path.exists(probdir) and os.path.isdir(probdir):
@@ -102,7 +102,7 @@ def generate_and_compile_casadi_problem(
         soname = os.path.relpath(sofile, probdir)
         cache[key] = uid, soname, (n, m, p)
 
-        return _load_casadi_problem(sofile, n, m, p, second_order)
+        return _load_casadi_problem(sofile)
 
 
 def _load_casadi_control_problem(sofile, N, nx, nu, p):
