@@ -261,8 +261,6 @@ void Integrator::init(const Dict& opts) {
     grid_ = {t0, tf};
   }
 
-  ngrid_ = grid_.size();
-
   // Construct t0 and tout from grid and output_t0
   t0_ = grid_.front();
   tout_ = grid_;
@@ -1479,7 +1477,7 @@ void Integrator::serialize_body(SerializingStream &s) const {
   s.pack("Integrator::nrp1", nrp1_);
   s.pack("Integrator::ns", ns_);
   s.pack("Integrator::grid", grid_);
-  s.pack("Integrator::ngrid", ngrid_);
+  s.pack("Integrator::ngrid", std::vector<casadi_int>(grid_.size()));
   s.pack("Integrator::augmented_options", augmented_options_);
   s.pack("Integrator::opts", opts_);
   s.pack("Integrator::onestep", onestep_);
@@ -1525,7 +1523,6 @@ Integrator::Integrator(DeserializingStream & s) : OracleFunction(s) {
   // Options to be removed
   s.unpack("Integrator::output_t0", output_t0_);
   s.unpack("Integrator::grid", grid_);
-  s.unpack("Integrator::ngrid", ngrid_);
   // Construct t0 and tout from grid and output_t0
   t0_ = grid_.front();
   tout_ = grid_;

@@ -244,7 +244,6 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
 
   // Time grid (to be removed)
   std::vector<double> grid_;
-  casadi_int ngrid_;
 
   // Augmented user option
   Dict augmented_options_;
