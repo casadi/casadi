@@ -224,6 +224,12 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   const Sparsity& rq() const { return oracle_.sparsity_out(DE_RQUAD);}
   ///@}
 
+  // Initial time
+  double t0_;
+
+  // Output time grid
+  std::vector<double> tout_;
+
   /// Number of states for the forward integration
   casadi_int nx_, nz_, nq_, nx1_, nz1_, nq1_;
 
@@ -236,7 +242,7 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   /// Number of sensitivities
   casadi_int ns_;
 
-  // Time grid
+  // Time grid (to be removed)
   std::vector<double> grid_;
   casadi_int ngrid_;
 
@@ -252,7 +258,7 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   /// Options
   bool print_stats_;
 
-  /// Output the state at the initial time
+  /// Output the state at the initial time (to be removed)
   bool output_t0_;
   casadi_int ntout_;
 

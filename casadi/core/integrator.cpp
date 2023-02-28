@@ -107,9 +107,7 @@ casadi_int integrator_n_out() {
 }
 
 Integrator::Integrator(const std::string& name, const Function& oracle,
-    double t0, const std::vector<double>& tout) : OracleFunction(name, oracle) {
-  (void)t0;  // unused
-  (void)tout;  // unused
+    double t0, const std::vector<double>& tout) : OracleFunction(name, oracle), t0_(t0), tout_(tout) {
 
   // Negative number of parameters for consistancy checking
   np_ = -1;
@@ -178,15 +176,11 @@ eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) con
   setup(m, arg, res, iw, w);
 
   // Reset solver, take time to t0
-  reset(m, grid_.front(), x0, z0, p);
+  reset(m, t0_, x0, z0, p);
 
   // Integrate forward
-  for (casadi_int k=0; k<grid_.size(); ++k) {
-    // Skip t0?
-    if (k==0 && !output_t0_) continue;
-
-    // Integrate forward
-    advance(m, grid_[k], x, z, q);
+  for (casadi_int k = 0; k < tout_.size(); ++k) {
+    advance(m, tout_[k], x, z, q);
     if (x) x += nx_;
     if (z) z += nz_;
     if (q) q += nq_;
@@ -195,10 +189,10 @@ eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) con
   // If backwards integration is needed
   if (nrx_>0) {
     // Integrate backward
-    resetB(m, grid_.back(), rx0, rz0, rp);
+    resetB(m, t0_, rx0, rz0, rp);
 
     // Proceed to t0
-    retreat(m, grid_.front(), rx, rz, rq);
+    retreat(m, t0_, rx, rz, rq);
   }
 
   if (print_stats_) print_stats(m);
@@ -269,6 +263,11 @@ void Integrator::init(const Dict& opts) {
 
   ngrid_ = grid_.size();
   ntout_ = output_t0_ ? ngrid_ : ngrid_-1;
+
+  // Construct t0 and tout from grid and output_t0
+  t0_ = grid_.front();
+  tout_ = grid_;
+  if (!output_t0_) tout_.erase(tout_.begin());
 
   // Call the base class method
   OracleFunction::init(opts);
@@ -1070,7 +1069,7 @@ Function FixedStepIntegrator::create_advanced(const Dict& opts) {
 
     // Prepare return Function outputs
     std::vector<MX> intg_out(INTEGRATOR_NUM_OUT);
-    F_in[DAE_T] = grid_[0];
+    F_in[DAE_T] = t0_;
 
     std::vector<MX> F_out;
     // Loop over finite elements
@@ -1115,7 +1114,7 @@ void FixedStepIntegrator::init(const Dict& opts) {
 
   // Number of finite elements and time steps
   casadi_assert_dev(nk_>0);
-  h_ = static_cast<double>(grid_.back() - grid_.front())/static_cast<double>(nk_);
+  h_ = (tout_.back() - t0_)/static_cast<double>(nk_);
 
   // Setup discrete time dynamics
   setupFG();
@@ -1162,7 +1161,7 @@ void FixedStepIntegrator::advance(IntegratorMemory* mem, double t,
   auto m = static_cast<FixedStepMemory*>(mem);
 
   // Get discrete time sought
-  casadi_int k_out = static_cast<casadi_int>(std::ceil((t - grid_.front())/h_));
+  casadi_int k_out = static_cast<casadi_int>(std::ceil((t - t0_)/h_));
   k_out = std::min(k_out, nk_); //  make sure that rounding errors does not result in k_out>nk_
   casadi_assert_dev(k_out>=0);
 
@@ -1201,7 +1200,7 @@ void FixedStepIntegrator::advance(IntegratorMemory* mem, double t,
 
     // Advance time
     m->k++;
-    m->t = static_cast<double>(grid_.front()) + static_cast<double>(m->k)*h_;
+    m->t = t0_ + static_cast<double>(m->k)*h_;
   }
 
   // Return to user TODO(@jaeandersson): interpolate
@@ -1215,7 +1214,7 @@ void FixedStepIntegrator::retreat(IntegratorMemory* mem, double t,
   auto m = static_cast<FixedStepMemory*>(mem);
 
   // Get discrete time sought
-  casadi_int k_out = static_cast<casadi_int>(std::floor((t - grid_.front())/h_));
+  casadi_int k_out = static_cast<casadi_int>(std::floor((t - t0_)/h_));
   //  make sure that rounding errors does not result in k_out>nk_
   k_out = std::max(k_out, casadi_int(0));
   casadi_assert_dev(k_out<=nk_);
@@ -1241,7 +1240,7 @@ void FixedStepIntegrator::retreat(IntegratorMemory* mem, double t,
   while (m->k>k_out) {
     // Advance time
     m->k--;
-    m->t = static_cast<double>(grid_.front()) + static_cast<double>(m->k)*h_;
+    m->t = t0_ + static_cast<double>(m->k)*h_;
 
     // Update the previous step
     casadi_copy(get_ptr(m->rx), nrx_, get_ptr(m->rx_prev));
@@ -1520,16 +1519,20 @@ Integrator::Integrator(DeserializingStream & s) : OracleFunction(s) {
   s.unpack("Integrator::np1", np1_);
   s.unpack("Integrator::nrp1", nrp1_);
   s.unpack("Integrator::ns", ns_);
-  s.unpack("Integrator::grid", grid_);
-  s.unpack("Integrator::ngrid", ngrid_);
   s.unpack("Integrator::augmented_options", augmented_options_);
   s.unpack("Integrator::opts", opts_);
   s.unpack("Integrator::onestep", onestep_);
   s.unpack("Integrator::print_stats", print_stats_);
+  // Options to be removed
   s.unpack("Integrator::output_t0", output_t0_);
+  s.unpack("Integrator::grid", grid_);
+  s.unpack("Integrator::ngrid", ngrid_);
   s.unpack("Integrator::ntout", ntout_);
+  // Construct t0 and tout from grid and output_t0
+  t0_ = grid_.front();
+  tout_ = grid_;
+  if (!output_t0_) tout_.erase(tout_.begin());
 }
-
 
 void FixedStepIntegrator::serialize_body(SerializingStream &s) const {
   Integrator::serialize_body(s);
