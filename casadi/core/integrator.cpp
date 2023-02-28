@@ -192,9 +192,9 @@ Sparsity Integrator::get_sparsity_in(casadi_int i) {
   case INTEGRATOR_X0: return x();
   case INTEGRATOR_P: return p();
   case INTEGRATOR_Z0: return z();
-  case INTEGRATOR_RX0: return repmat(rx(), 1, tout_.size());
-  case INTEGRATOR_RP: return repmat(rp(), 1, tout_.size());
-  case INTEGRATOR_RZ0: return repmat(rz(), 1, tout_.size());
+  case INTEGRATOR_RX0: return repmat(rx(), 1, nt());
+  case INTEGRATOR_RP: return repmat(rp(), 1, nt());
+  case INTEGRATOR_RZ0: return repmat(rz(), 1, nt());
   case INTEGRATOR_NUM_IN: break;
   }
   return Sparsity();
@@ -202,9 +202,9 @@ Sparsity Integrator::get_sparsity_in(casadi_int i) {
 
 Sparsity Integrator::get_sparsity_out(casadi_int i) {
   switch (static_cast<IntegratorOutput>(i)) {
-  case INTEGRATOR_XF: return repmat(x(), 1, tout_.size());
-  case INTEGRATOR_QF: return repmat(q(), 1, tout_.size());
-  case INTEGRATOR_ZF: return repmat(z(), 1, tout_.size());
+  case INTEGRATOR_XF: return repmat(x(), 1, nt());
+  case INTEGRATOR_QF: return repmat(q(), 1, nt());
+  case INTEGRATOR_ZF: return repmat(z(), 1, nt());
   case INTEGRATOR_RXF: return rx();
   case INTEGRATOR_RQF: return rq();
   case INTEGRATOR_RZF: return rz();
@@ -246,7 +246,7 @@ eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) con
   reset(m, t0_, x0, z0, p);
 
   // Integrate forward
-  for (casadi_int k = 0; k < tout_.size(); ++k) {
+  for (casadi_int k = 0; k < nt(); ++k) {
     advance(m, tout_[k], x, z, q);
     if (x) x += nx_;
     if (z) z += nz_;
@@ -1129,7 +1129,7 @@ Function FixedStepIntegrator::create_advanced(const Dict& opts) {
   auto it = opts.find("simplify");
   if (it!=opts.end()) simplify = it->second;
 
-  if (simplify && nrx_==0 && tout_.size()==1) {
+  if (simplify && nrx_==0 && nt()==1) {
     // Retrieve explicit simulation step (one finite element)
     Function F = getExplicit();
 

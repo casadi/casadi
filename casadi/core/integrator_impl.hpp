@@ -223,6 +223,7 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   const Sparsity& rz() const { return oracle_.sparsity_in(DYN_RZ);}
   const Sparsity& rp() const { return oracle_.sparsity_in(DYN_RP);}
   const Sparsity& rq() const { return oracle_.sparsity_out(DYN_RQUAD);}
+  inline casadi_int nt() const { return tout_.size();}
   ///@}
 
   // Initial time
