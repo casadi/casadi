@@ -224,19 +224,19 @@ const Options Integrator::options_
       "Print out statistics after integration"}},
     {"t0",
       {OT_DOUBLE,
-      "Beginning of the time horizon"}},
+      "[DEPRECATED] Beginning of the time horizon"}},
     {"tf",
       {OT_DOUBLE,
-      "End of the time horizon"}},
+      "[DEPRECATED] End of the time horizon"}},
     {"grid",
       {OT_DOUBLEVECTOR,
-      "Time grid"}},
+      "[DEPRECATED] Time grid"}},
     {"augmented_options",
       {OT_DICT,
       "Options to be passed down to the augmented integrator, if one is constructed."}},
     {"output_t0",
       {OT_BOOL,
-      "Output the state at the initial time"}}
+      "[DEPRECATED] Output the state at the initial time"}}
     }
 };
 
@@ -279,6 +279,10 @@ void Integrator::init(const Dict& opts) {
 
   // Construct t0_ and tout_ gbased on legacy options
   if (uses_legacy_options) {
+    // Deprecation warning
+    casadi_warning("The options 't0', 'tf', 'grid' and 'output_t0' have been deprecated. "
+      "Set the time grid by proving additional argument to the 'integrator' call instead.");
+
     // If grid unset, default to [t0, tf]
     if (grid.empty()) {
       grid = {t0, tf};
