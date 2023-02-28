@@ -688,11 +688,16 @@ set(BUILD_IPOPT_DEPENDENCIES MUMPS)
 
 option(WITH_MOCKUP_REQUIRED ON)
 set(BUILD_MOCKUPS_GIT_REPO https://github.com/casadi/mockups.git)
-set(BUILD_MOCKUPS_VERSION v50)
+set(BUILD_MOCKUPS_VERSION v51)
 
 # Knitro: An NLP solver
 option(WITH_KNITRO "Compile the interface to KNITRO" OFF)
 option(WITH_MOCKUP_KNITRO "Use mockup KNITRO (BUILD_MOCKUPS_VERSION=${BUILD_MOCKUPS_VERSION}) from downloaded source (BUILD_MOCKUPS_GIT_REPO=${BUILD_MOCKUPS_GIT_REPO})." OFF)
+
+
+# Worhp: A sparse SQP method
+option(WITH_WORHP "Compile the WORHP interface" OFF)
+option(WITH_MOCKUP_WORHP "Use mockup WORHP (BUILD_MOCKUPS_VERSION=${BUILD_MOCKUPS_VERSION}) from downloaded source (BUILD_MOCKUPS_GIT_REPO=${BUILD_MOCKUPS_GIT_REPO})." OFF)
 
 # CPLEX: A sparse mixed-integer QP solver
 option(WITH_CPLEX "Compile the interface to CPLEX" OFF)
@@ -792,7 +797,7 @@ endfunction()
 
 set(WITH_BUILD_MOCKUPS OFF)
 # Packages must be sorted from high to low in the dependency graph
-foreach(PKG CPLEX KNITRO GUROBI)
+foreach(PKG CPLEX KNITRO GUROBI WORHP)
   string(TOLOWER ${PKG} PKG_LOWER)
   if(WITH_${PKG})
     if(NOT WITH_MOCKUP_${PKG})
@@ -921,6 +926,19 @@ if(WITH_KNITRO AND WITH_MOCKUP_KNITRO)
   )
 endif()
 add_feature_info(knitro-interface WITH_KNITRO "Interface to the NLP solver KNITRO.")
+
+if(WITH_WORHP AND WITH_MOCKUP_WORHP)
+  add_library(worhp::worhp SHARED IMPORTED)
+  add_dependencies(worhp::worhp mockups-external)
+  file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/mockups/worhp/include")
+  set_target_properties(worhp::worhp PROPERTIES
+    INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/mockups/worhp/include"
+    IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/mockups/worhp/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}worhp${CMAKE_SHARED_LIBRARY_SUFFIX}"
+    IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/mockups/worhp/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}worhp${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+  )
+endif()
+add_feature_info(worhp-interface WITH_WORHP "Interface to the NLP solver Worhp (requires gfortran, gomp).")
+
 
 if(WITH_LAPACK)
   if (WITH_BUILD_LAPACK)
@@ -1488,13 +1506,6 @@ if(WITH_SLICOT)
   find_package(SLICOT REQUIRED)
 endif()
 add_feature_info(slicot-interface WITH_SLICOT "Interface to the controls library SLICOT.")
-
-# Worhp: A sparse SQP method
-option(WITH_WORHP "Compile the WORHP interface" OFF)
-if(WITH_WORHP)
-  find_package(WORHP REQUIRED)
-endif()
-add_feature_info(worhp-interface WITH_WORHP "Interface to the NLP solver Worhp (requires gfortran, gomp).")
 
 ######################################################
 ##################### paths ##########################
