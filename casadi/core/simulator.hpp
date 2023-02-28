@@ -96,13 +96,20 @@ namespace casadi {
     DYN_Z,
     DYN_P,
     DYN_U,
+    DYN_RX,
+    DYN_RZ,
+    DYN_RP,
     DYN_NUM_IN};
 
   /// Inputs of the symbolic representation of the DAE
   enum DynOut {
     DYN_ODE,
     DYN_ALG,
-    DYN_YDEF,
+    DYN_QUAD,
+    DYN_Y,
+    DYN_RODE,
+    DYN_RALG,
+    DYN_RQUAD,
     DYN_NUM_OUT};
 
   /// Input arguments of an simulator

@@ -41,15 +41,22 @@ int evaluate(casadi_fmi_memory* m) {
   i = 0;
   m->arg[i++] = &m->t;
   m->arg[i++] = m->x;
-  m->arg[i++] = 0;
+  m->arg[i++] = 0;  // z
   m->arg[i++] = m->p;
   m->arg[i++] = m->u;
+  m->arg[i++] = 0;  // rx
+  m->arg[i++] = 0;  // rz
+  m->arg[i++] = 0;  // rp
 
   // Map outputs to evaluation buffer
   i = 0;
   m->res[i++] = m->xdot;
-  m->res[i++] = 0;
+  m->res[i++] = 0;  // alg
+  m->res[i++] = 0;  // quad
   m->res[i++] = m->y;
+  m->res[i++] = 0;  // rode
+  m->res[i++] = 0;  // ralg
+  m->res[i++] = 0;  // rquad
 
   // Evaluate
   mem = daefun_checkout();
@@ -74,29 +81,43 @@ int evaluate_forward(casadi_fmi_memory* m) {
 
   // Map nondifferentiated inputs to evaluation buffer
   i = 0;
-  m->arg[i++] = 0;
+  m->arg[i++] = 0;  // t
   m->arg[i++] = m->x;
-  m->arg[i++] = 0;
+  m->arg[i++] = 0;  // z
   m->arg[i++] = m->p;
   m->arg[i++] = m->u;
+  m->arg[i++] = 0;  // rx
+  m->arg[i++] = 0;  // rz
+  m->arg[i++] = 0;  // rp
 
   // Map nondifferentiated outputs to evaluation buffer
   m->arg[i++] = m->xdot;
-  m->arg[i++] = 0;
+  m->arg[i++] = 0;  // alg
+  m->arg[i++] = 0;  // quad
   m->arg[i++] = m->y;
+  m->arg[i++] = 0;  // rode
+  m->arg[i++] = 0;  // ralg
+  m->arg[i++] = 0;  // rquad
 
   // Map forward seeds
   m->arg[i++] = 0;
   m->arg[i++] = m->dx;
-  m->arg[i++] = 0;
+  m->arg[i++] = 0;  // z
   m->arg[i++] = m->dp;
   m->arg[i++] = m->du;
+  m->arg[i++] = 0;  // rx
+  m->arg[i++] = 0;  // rz
+  m->arg[i++] = 0;  // rp
 
   // Map forward sensitivities
   i = 0;
   m->res[i++] = m->dxdot;
-  m->res[i++] = 0;
+  m->res[i++] = 0;  // alg
+  m->res[i++] = 0;  // quad
   m->res[i++] = m->dy;
+  m->res[i++] = 0;  // rode
+  m->res[i++] = 0;  // ralg
+  m->res[i++] = 0;  // rquad
 
   // Evaluate
   mem = fwd1_daefun_checkout();
@@ -126,29 +147,43 @@ int evaluate_adjoint(casadi_fmi_memory* m) {
 
   // Map nondifferentiated inputs to evaluation buffer
   i = 0;
-  m->arg[i++] = 0;
+  m->arg[i++] = 0;  // t
   m->arg[i++] = m->x;
-  m->arg[i++] = 0;
+  m->arg[i++] = 0;  // z
   m->arg[i++] = m->p;
   m->arg[i++] = m->u;
+  m->arg[i++] = 0;  // rx
+  m->arg[i++] = 0;  // rz
+  m->arg[i++] = 0;  // rp
 
   // Map nondifferentiated outputs to evaluation buffer
   m->arg[i++] = m->xdot;
-  m->arg[i++] = 0;
+  m->arg[i++] = 0;  // alg
+  m->arg[i++] = 0;  // quad
   m->arg[i++] = m->y;
+  m->arg[i++] = 0;  // rode
+  m->arg[i++] = 0;  // ralg
+  m->arg[i++] = 0;  // rquad
 
   // Map adjoint seeds
   m->arg[i++] = m->dxdot;
-  m->arg[i++] = 0;
+  m->arg[i++] = 0;  // alg
+  m->arg[i++] = 0;  // quad
   m->arg[i++] = m->dy;
+  m->arg[i++] = 0;  // rode
+  m->arg[i++] = 0;  // ralg
+  m->arg[i++] = 0;  // rquad
 
   // Map adjoint sensitivities
   i = 0;
-  m->res[i++] = 0;
+  m->res[i++] = 0;  // t
   m->res[i++] = m->dx;
-  m->res[i++] = 0;
+  m->res[i++] = 0;  // z
   m->res[i++] = m->dp;
   m->res[i++] = m->du;
+  m->res[i++] = 0;  // rx
+  m->res[i++] = 0;  // rz
+  m->res[i++] = 0;  // rp
 
   // Evaluate
   mem = adj1_daefun_checkout();
