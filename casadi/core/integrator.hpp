@@ -88,6 +88,12 @@ namespace casadi {
     const MXDict& dae, const Dict& opts=Dict());
   CASADI_EXPORT Function integrator(const std::string& name, const std::string& solver,
     const Function& dae, const Dict& opts=Dict());
+  CASADI_EXPORT Function integrator(const std::string& name, const std::string& solver,
+    const SXDict& dae, double t0, const std::vector<double>& tout, const Dict& opts=Dict());
+  CASADI_EXPORT Function integrator(const std::string& name, const std::string& solver,
+    const MXDict& dae, double t0, const std::vector<double>& tout, const Dict& opts=Dict());
+  CASADI_EXPORT Function integrator(const std::string& name, const std::string& solver,
+    const Function& dae, double t0, const std::vector<double>& tout, const Dict& opts=Dict());
   ///@}
 
   /// Check if a particular plugin is available

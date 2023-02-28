@@ -41,22 +41,37 @@ std::string doc_integrator(const std::string& name) {
 }
 
 Function integrator(const std::string& name, const std::string& solver,
-                    const SXDict& dae, const Dict& opts) {
-  return integrator(name, solver, Integrator::map2oracle("dae", dae), opts);
+    const SXDict& dae, const Dict& opts) {
+  return integrator(name, solver, dae, 0, {1}, opts);
 }
 
 Function integrator(const std::string& name, const std::string& solver,
-                    const MXDict& dae, const Dict& opts) {
-  return integrator(name, solver, Integrator::map2oracle("dae", dae), opts);
+    const MXDict& dae, const Dict& opts) {
+  return integrator(name, solver, dae, 0, {1}, opts);
 }
 
 Function integrator(const std::string& name, const std::string& solver,
-                    const Function& dae, const Dict& opts) {
+    const Function& dae, const Dict& opts) {
+  return integrator(name, solver, dae, 0, {1}, opts);
+}
+
+Function integrator(const std::string& name, const std::string& solver,
+    const SXDict& dae, double t0, const std::vector<double>& tout, const Dict& opts) {
+  return integrator(name, solver, Integrator::map2oracle("dae", dae), t0, tout, opts);
+}
+
+Function integrator(const std::string& name, const std::string& solver,
+    const MXDict& dae, double t0, const std::vector<double>& tout, const Dict& opts) {
+  return integrator(name, solver, Integrator::map2oracle("dae", dae), t0, tout, opts);
+}
+
+Function integrator(const std::string& name, const std::string& solver,
+    const Function& dae, double t0, const std::vector<double>& tout, const Dict& opts) {
   // Make sure that dae is sound
   if (dae.has_free()) {
     casadi_error("Cannot create '" + name + "' since " + str(dae.get_free()) + " are free.");
   }
-  Integrator* intg = Integrator::getPlugin(solver).creator(name, dae, 0, {1});
+  Integrator* intg = Integrator::getPlugin(solver).creator(name, dae, t0, tout);
   return intg->create_advanced(opts);
 }
 
@@ -728,7 +743,7 @@ get_forward(casadi_int nfwd, const std::string& name,
   }
   aug_opts["derivative_of"] = self();
   Function aug_int = integrator(aug_prefix + name_, plugin_name(),
-    aug_dae, aug_opts);
+    aug_dae, t0_, tout_, aug_opts);
 
   // All inputs of the return function
   std::vector<MX> ret_in;
@@ -850,7 +865,7 @@ get_reverse(casadi_int nadj, const std::string& name,
   }
   aug_opts["derivative_of"] = self();
   Function aug_int = integrator(aug_prefix + name_, plugin_name(),
-    aug_dae, aug_opts);
+    aug_dae, t0_, tout_, aug_opts);
 
   // All inputs of the return function
   std::vector<MX> ret_in;

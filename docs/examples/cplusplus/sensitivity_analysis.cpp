@@ -136,9 +136,7 @@ int main(){
       std::cout << "Solving \"" << test.name << "\" using \"" << solver.plugin << "\"" << std::endl;
 
       // Get integrator
-      Dict opts = solver.opts;
-      opts["tf"] = test.tf;
-      Function I = integrator("I", solver.plugin, test.dae, opts);
+      Function I = integrator("I", solver.plugin, test.dae, 0, {test.tf}, solver.opts);
 
       // Buffers for evaluation
       std::map<std::string, DM> arg, res;
