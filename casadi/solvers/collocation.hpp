@@ -56,14 +56,16 @@ namespace casadi {
   */
   class CASADI_INTEGRATOR_COLLOCATION_EXPORT Collocation :
         public ImplicitFixedStepIntegrator {
-  public:
+   public:
 
     /// Constructor
-    explicit Collocation(const std::string& name, const Function& dae);
+    Collocation(const std::string& name, const Function& dae,
+      double t0, const std::vector<double>& tout);
 
     /** \brief  Create a new integrator */
-    static Integrator* creator(const std::string& name, const Function& dae) {
-      return new Collocation(name, dae);
+    static Integrator* creator(const std::string& name, const Function& dae,
+        double t0, const std::vector<double>& tout) {
+      return new Collocation(name, dae, t0, tout);
     }
 
     /// Destructor

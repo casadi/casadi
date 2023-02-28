@@ -89,7 +89,8 @@ namespace casadi {
   class CASADI_SUNDIALS_COMMON_EXPORT SundialsInterface : public Integrator {
   public:
     /** \brief  Constructor */
-    SundialsInterface(const std::string& name, const Function& dae);
+    SundialsInterface(const std::string& name, const Function& dae,
+      double t0, const std::vector<double>& tout);
 
     /** \brief  Destructor */
     ~SundialsInterface() override=0;

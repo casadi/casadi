@@ -32,8 +32,9 @@ OUTPUTSCHEME(IntegratorOutput)
 
 namespace casadi {
 
-  SundialsInterface::SundialsInterface(const std::string& name, const Function& dae)
-    : Integrator(name, dae) {
+  SundialsInterface::SundialsInterface(const std::string& name, const Function& dae,
+      double t0, const std::vector<double>& tout)
+     : Integrator(name, dae, t0, tout) {
   }
 
   SundialsInterface::~SundialsInterface() {

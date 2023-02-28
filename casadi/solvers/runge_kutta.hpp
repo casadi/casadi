@@ -56,11 +56,13 @@ namespace casadi {
   public:
 
     /// Constructor
-    explicit RungeKutta(const std::string& name, const Function& dae);
+    RungeKutta(const std::string& name, const Function& dae, double t0,
+      const std::vector<double>& tout);
 
     /** \brief  Create a new integrator */
-    static Integrator* creator(const std::string& name, const Function& dae) {
-      return new RungeKutta(name, dae);
+    static Integrator* creator(const std::string& name, const Function& dae,
+        double t0, const std::vector<double>& tout) {
+      return new RungeKutta(name, dae, t0, tout);
     }
 
     /// Destructor

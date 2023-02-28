@@ -80,14 +80,16 @@ namespace casadi {
   */
   class CASADI_INTEGRATOR_IDAS_EXPORT IdasInterface : public SundialsInterface {
 
-  public:
+   public:
 
     /** \brief  Constructor */
-    explicit IdasInterface(const std::string& name, const Function& dae);
+    IdasInterface(const std::string& name, const Function& dae,
+      double t0, const std::vector<double>& tout);
 
     /** \brief  Create a new integrator */
-    static Integrator* creator(const std::string& name, const Function& dae) {
-      return new IdasInterface(name, dae);
+    static Integrator* creator(const std::string& name, const Function& dae,
+        double t0, const std::vector<double>& tout) {
+      return new IdasInterface(name, dae, t0, tout);
     }
 
     /** \brief  Destructor */

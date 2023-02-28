@@ -48,8 +48,8 @@ void CASADI_INTEGRATOR_CVODES_EXPORT casadi_load_integrator_cvodes() {
   Integrator::registerPlugin(casadi_register_integrator_cvodes);
 }
 
-CvodesInterface::CvodesInterface(const std::string& name, const Function& dae)
-  : SundialsInterface(name, dae) {
+CvodesInterface::CvodesInterface(const std::string& name, const Function& dae,
+    double t0, const std::vector<double>& tout) : SundialsInterface(name, dae, t0, tout) {
 }
 
 CvodesInterface::~CvodesInterface() {

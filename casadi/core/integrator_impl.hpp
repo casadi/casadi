@@ -53,7 +53,8 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   /** \brief  Constructor
 
       \identifier{1lr} */
-  Integrator(const std::string& name, const Function& oracle);
+  Integrator(const std::string& name, const Function& oracle,
+    double t0, const std::vector<double>& tout);
 
   /** \brief  Destructor
 
@@ -256,7 +257,8 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   casadi_int ntout_;
 
   // Creator function for internal class
-  typedef Integrator* (*Creator)(const std::string& name, const Function& oracle);
+  typedef Integrator* (*Creator)(const std::string& name, const Function& oracle,
+    double t0, const std::vector<double>& tout);
 
   // No static functions exposed
   struct Exposed{ };
@@ -323,7 +325,8 @@ class CASADI_EXPORT FixedStepIntegrator : public Integrator {
  public:
 
   /// Constructor
-  explicit FixedStepIntegrator(const std::string& name, const Function& dae);
+  explicit FixedStepIntegrator(const std::string& name, const Function& dae,
+    double t0, const std::vector<double>& tout);
 
   /// Destructor
   ~FixedStepIntegrator() override;
@@ -416,7 +419,8 @@ class CASADI_EXPORT ImplicitFixedStepIntegrator : public FixedStepIntegrator {
  public:
 
   /// Constructor
-  explicit ImplicitFixedStepIntegrator(const std::string& name, const Function& dae);
+  explicit ImplicitFixedStepIntegrator(const std::string& name, const Function& dae,
+    double t0, const std::vector<double>& tout);
 
   /// Destructor
   ~ImplicitFixedStepIntegrator() override;

@@ -44,8 +44,9 @@ namespace casadi {
     Integrator::registerPlugin(casadi_register_integrator_rk);
   }
 
-  RungeKutta::RungeKutta(const std::string& name, const Function& dae)
-    : FixedStepIntegrator(name, dae) {
+  RungeKutta::RungeKutta(const std::string& name, const Function& dae, double t0,
+      const std::vector<double>& tout)
+      : FixedStepIntegrator(name, dae, t0, tout) {
   }
 
   RungeKutta::~RungeKutta() {

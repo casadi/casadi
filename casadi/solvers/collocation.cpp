@@ -46,8 +46,9 @@ namespace casadi {
     Integrator::registerPlugin(casadi_register_integrator_collocation);
   }
 
-  Collocation::Collocation(const std::string& name, const Function& dae)
-    : ImplicitFixedStepIntegrator(name, dae) {
+  Collocation::Collocation(const std::string& name, const Function& dae,
+      double t0, const std::vector<double>& tout)
+      : ImplicitFixedStepIntegrator(name, dae, t0, tout) {
   }
 
   Collocation::~Collocation() {

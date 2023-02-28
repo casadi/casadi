@@ -56,7 +56,7 @@ Function integrator(const std::string& name, const std::string& solver,
   if (dae.has_free()) {
     casadi_error("Cannot create '" + name + "' since " + str(dae.get_free()) + " are free.");
   }
-  Integrator* intg = Integrator::getPlugin(solver).creator(name, dae);
+  Integrator* intg = Integrator::getPlugin(solver).creator(name, dae, 0, {1});
   return intg->create_advanced(opts);
 }
 
@@ -106,8 +106,10 @@ casadi_int integrator_n_out() {
   return INTEGRATOR_NUM_OUT;
 }
 
-Integrator::Integrator(const std::string& name, const Function& oracle)
-  : OracleFunction(name, oracle) {
+Integrator::Integrator(const std::string& name, const Function& oracle,
+    double t0, const std::vector<double>& tout) : OracleFunction(name, oracle) {
+  (void)t0;  // unused
+  (void)tout;  // unused
 
   // Negative number of parameters for consistancy checking
   np_ = -1;
@@ -1016,8 +1018,8 @@ void Integrator::setStopTime(IntegratorMemory* mem, double tf) const {
   casadi_error("setStopTime not defined for class " + class_name());
 }
 
-FixedStepIntegrator::FixedStepIntegrator(const std::string& name, const Function& dae)
-  : Integrator(name, dae) {
+FixedStepIntegrator::FixedStepIntegrator(const std::string& name, const Function& dae,
+    double t0, const std::vector<double>& tout) : Integrator(name, dae, t0, tout) {
 
   // Default options
   nk_ = 20;
@@ -1313,9 +1315,9 @@ void FixedStepIntegrator::resetB(IntegratorMemory* mem, double t, const double* 
   casadi_fill(get_ptr(m->RZ), m->RZ.size(), std::numeric_limits<double>::quiet_NaN());
 }
 
-ImplicitFixedStepIntegrator::
-ImplicitFixedStepIntegrator(const std::string& name, const Function& dae)
-  : FixedStepIntegrator(name, dae) {
+ImplicitFixedStepIntegrator::ImplicitFixedStepIntegrator(
+    const std::string& name, const Function& dae, double t0, const std::vector<double>& tout)
+    : FixedStepIntegrator(name, dae, t0, tout) {
 }
 
 ImplicitFixedStepIntegrator::~ImplicitFixedStepIntegrator() {

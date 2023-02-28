@@ -49,8 +49,8 @@ void CASADI_INTEGRATOR_IDAS_EXPORT casadi_load_integrator_idas() {
   Integrator::registerPlugin(casadi_register_integrator_idas);
 }
 
-IdasInterface::IdasInterface(const std::string& name, const Function& dae)
-  : SundialsInterface(name, dae) {
+IdasInterface::IdasInterface(const std::string& name, const Function& dae,
+    double t0, const std::vector<double>& tout) : SundialsInterface(name, dae, t0, tout) {
 }
 
 IdasInterface::~IdasInterface() {
