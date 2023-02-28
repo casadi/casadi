@@ -83,13 +83,11 @@ namespace casadi {
   */
   ///@{
   CASADI_EXPORT Function integrator(const std::string& name, const std::string& solver,
-                                    const SXDict& dae, const Dict& opts=Dict());
+    const SXDict& dae, const Dict& opts=Dict());
   CASADI_EXPORT Function integrator(const std::string& name, const std::string& solver,
-                                    const MXDict& dae, const Dict& opts=Dict());
-#ifndef SWIG
+    const MXDict& dae, const Dict& opts=Dict());
   CASADI_EXPORT Function integrator(const std::string& name, const std::string& solver,
-                                    const Function& dae, const Dict& opts=Dict());
-#endif // SWIG
+    const Function& dae, const Dict& opts=Dict());
   ///@}
 
   /// Check if a particular plugin is available
