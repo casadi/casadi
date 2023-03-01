@@ -688,7 +688,7 @@ set(BUILD_IPOPT_DEPENDENCIES MUMPS)
 
 option(WITH_MOCKUP_REQUIRED ON)
 set(BUILD_MOCKUPS_GIT_REPO https://github.com/casadi/mockups.git)
-set(BUILD_MOCKUPS_VERSION v51)
+set(BUILD_MOCKUPS_VERSION v52)
 
 # Knitro: An NLP solver
 option(WITH_KNITRO "Compile the interface to KNITRO" OFF)
@@ -755,10 +755,7 @@ set(BUILD_SPRAL_DEPENDENCIES LAPACK)
 
 # HSL: Sparse direct linear solvers
 option(WITH_HSL "Enable HSL interface" OFF)
-if(WITH_HSL)
-  find_package(HSL REQUIRED)
-endif()
-add_feature_info(hsl-interface WITH_HSL "Interface to HSL.")
+option(WITH_MOCKUP_HSL "Use mockup WORHP (BUILD_MOCKUPS_VERSION=${BUILD_MOCKUPS_VERSION}) from downloaded source (BUILD_MOCKUPS_GIT_REPO=${BUILD_MOCKUPS_GIT_REPO})." OFF)
 
 # HIGHS: A MILP / QP solver
 option(WITH_HIGHS "Compile the HiGHS interface" OFF)
@@ -797,7 +794,7 @@ endfunction()
 
 set(WITH_BUILD_MOCKUPS OFF)
 # Packages must be sorted from high to low in the dependency graph
-foreach(PKG CPLEX KNITRO GUROBI WORHP)
+foreach(PKG CPLEX KNITRO GUROBI WORHP HSL)
   string(TOLOWER ${PKG} PKG_LOWER)
   if(WITH_${PKG})
     if(NOT WITH_MOCKUP_${PKG})
@@ -879,6 +876,7 @@ ExternalProject_Add(mockups-external
   GIT_TAG ${BUILD_MOCKUPS_VERSION}
   PREFIX "${CMAKE_BINARY_DIR}/external_projects"
   UPDATE_COMMAND ""
+  BUILD_ALWAYS ON
   CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
   CMAKE_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>/mockups)
 endif()
@@ -939,6 +937,15 @@ if(WITH_WORHP AND WITH_MOCKUP_WORHP)
 endif()
 add_feature_info(worhp-interface WITH_WORHP "Interface to the NLP solver Worhp (requires gfortran, gomp).")
 
+if(WITH_HSL AND WITH_MOCKUP_HSL)
+  add_library(hsl::hsl SHARED IMPORTED)
+  add_dependencies(hsl::hsl mockups-external)
+  set_target_properties(hsl::hsl PROPERTIES
+    IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/mockups/hsl/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}hsl${CMAKE_SHARED_LIBRARY_SUFFIX}"
+    IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/mockups/hsl/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}hsl${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+  )
+endif()
+add_feature_info(hsl-interface WITH_HSL "Interface to HSL.")
 
 if(WITH_LAPACK)
   if (WITH_BUILD_LAPACK)
