@@ -170,8 +170,6 @@ template <Config Conf>
 void CasADiProblem<Conf>::eval_g(crvec x, rvec g) const {
     if (impl->constr)
         impl->constr->g({x.data(), param.data()}, {g.data()});
-    else
-        throw std::logic_error("No constraints function g"); // TODO
 }
 
 template <Config Conf>
@@ -214,7 +212,7 @@ void CasADiProblem<Conf>::eval_grad_L(crvec x, crvec y, rvec grad_L,
         impl->constr->grad_L({x.data(), param.data(), y.data()},
                              {grad_L.data()});
     else
-        throw std::logic_error("No function grad_L");
+        eval_f_grad_f(x, grad_L);
 }
 
 template <Config Conf>

@@ -44,11 +44,11 @@ class CasADiProblem : public BoxConstrProblem<Conf> {
     // clang-format off
     [[nodiscard]] real_t eval_f(crvec x) const;
     void eval_grad_f(crvec x, rvec grad_fx) const;
-    [[nodiscard]] real_t eval_f_grad_f(crvec x, rvec grad_fx) const;
+    real_t eval_f_grad_f(crvec x, rvec grad_fx) const; // NOLINT(*nodiscard)
     void eval_g(crvec x, rvec g) const;
     void eval_grad_g_prod(crvec x, crvec y, rvec grad_gxy) const;
     void eval_grad_ψ(crvec x, crvec y, crvec Σ, rvec grad_ψ, rvec work_n, rvec work_m) const;
-    [[nodiscard]] real_t eval_ψ_grad_ψ(crvec x, crvec y, crvec Σ, rvec grad_ψ, rvec work_n, rvec work_m) const;
+    real_t eval_ψ_grad_ψ(crvec x, crvec y, crvec Σ, rvec grad_ψ, rvec work_n, rvec work_m) const; // NOLINT(*nodiscard)
     void eval_grad_L(crvec x, crvec y, rvec grad_L, rvec work_n) const;
     [[nodiscard]] real_t eval_ψ(crvec x, crvec y, crvec Σ, rvec ŷ) const;
     void eval_grad_ψ_from_ŷ(crvec x, crvec ŷ, rvec grad_ψ, rvec work_n) const;
