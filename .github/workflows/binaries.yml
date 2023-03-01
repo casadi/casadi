@@ -747,7 +747,7 @@ jobs:
         - image: "macos-m1"
           py2: "37"
     steps:
-      - uses: casadi/commericial_solvers@master
+      - uses: casadi/commercial_solvers@master
         with:
           tag: ${{ secrets.JGILLIS_RESTRICTED }}
       - run: env
