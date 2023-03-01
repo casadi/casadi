@@ -747,12 +747,6 @@ jobs:
         - image: "macos-m1"
           py2: "37"
     steps:
-      - uses: casadi/commercial_solvers@master
-        with:
-          token: ${{ secrets.JGILLIS_RESTRICTED }}
-      - run: env
-      - run: echo "$LD_LIBRARY_PATH"
-      - run: echo "${{ env.LD_LIBRARY_PATH }}"
       - uses: actions/checkout@v3.3.0
       - uses: kanga333/variable-mapper@v0.3.0
         with:
@@ -771,6 +765,9 @@ jobs:
       - run: ls
       - name: Unpack source
         run: unzip casadi-${{env.os}}${{matrix.bit}}-py${{matrix.py2}}.zip -d casadi
+      - uses: casadi/commercial_solvers@master
+        with:
+          token: ${{ secrets.JGILLIS_RESTRICTED }}
       # Make cl.exe available on Windows
       - uses: ilammy/msvc-dev-cmd@v1.12.0
       - id: get-id
