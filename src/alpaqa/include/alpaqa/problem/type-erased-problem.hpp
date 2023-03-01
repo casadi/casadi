@@ -15,183 +15,6 @@
 
 namespace alpaqa {
 
-namespace detail {
-
-// These functions are defined in this namespace because they require address
-// identity. If defined as static member functions inside of the ProblemVTable
-// class, multiple copies of the functions would end up in binaries, resulting
-// in the provides_<name> functions not working correctly.
-
-template <class VT, Config C>
-ALPAQA_EXPORT real_t<C> calc_ŷ_dᵀŷ(const void *self, rvec<C> g_ŷ, crvec<C> y, crvec<C> Σ,
-                                   const VT &vtable) {
-    USING_ALPAQA_CONFIG_TEMPLATE(VT::config_t);
-    if (Σ.size() == 1) {
-        // ζ = g(x) + Σ⁻¹y
-        g_ŷ += (1 / Σ(0)) * y;
-        // d = ζ - Π(ζ, D)
-        vtable.eval_proj_diff_g(self, g_ŷ, g_ŷ);
-        // dᵀŷ, ŷ = Σ d
-        real_t dᵀŷ = Σ(0) * g_ŷ.dot(g_ŷ);
-        g_ŷ *= Σ(0);
-        return dᵀŷ;
-    } else {
-        // ζ = g(x) + Σ⁻¹y
-        g_ŷ += Σ.asDiagonal().inverse() * y;
-        // d = ζ - Π(ζ, D)
-        vtable.eval_proj_diff_g(self, g_ŷ, g_ŷ);
-        // dᵀŷ, ŷ = Σ d
-        real_t dᵀŷ = 0;
-        for (index_t i = 0; i < y.size(); ++i) {
-            dᵀŷ += g_ŷ(i) * Σ(i) * g_ŷ(i); // TODO: vectorize
-            g_ŷ(i) = Σ(i) * g_ŷ(i);
-        }
-        return dᵀŷ;
-    }
-}
-
-template <class VT, Config C>
-ALPAQA_EXPORT void default_eval_jac_g(const void *, crvec<C>, rindexvec<C>, rindexvec<C>, rvec<C>,
-                                      const VT &) {
-    throw not_implemented_error("eval_jac_g");
-}
-template <class VT, Config C>
-ALPAQA_EXPORT length_t<C> default_get_jac_g_num_nonzeros(const void *, const VT &) {
-    return 0;
-}
-template <class VT, Config C>
-ALPAQA_EXPORT void default_eval_grad_gi(const void *, crvec<C>, index_t<C>, rvec<C>, const VT &) {
-    throw not_implemented_error("eval_grad_gi");
-}
-template <class VT, Config C>
-ALPAQA_EXPORT void default_eval_hess_L_prod(const void *, crvec<C>, crvec<C>, real_t<C>, crvec<C>,
-                                            rvec<C>, const VT &) {
-    throw not_implemented_error("eval_hess_L_prod");
-}
-template <class VT, Config C>
-ALPAQA_EXPORT void default_eval_hess_L(const void *, crvec<C>, crvec<C>, real_t<C>, rindexvec<C>,
-                                       rindexvec<C>, rvec<C>, const VT &) {
-    throw not_implemented_error("eval_hess_L");
-}
-template <class VT, Config C>
-ALPAQA_EXPORT length_t<C> default_get_hess_L_num_nonzeros(const void *, const VT &) {
-    return 0;
-}
-template <class VT, Config C>
-ALPAQA_EXPORT void default_eval_hess_ψ_prod(const void *self, crvec<C> x, crvec<C> y, crvec<C>,
-                                            real_t<C> scale, crvec<C> v, rvec<C> Hv,
-                                            const VT &vtable) {
-    if (y.size() == 0 && vtable.eval_hess_L_prod != default_eval_hess_L_prod<VT, C>)
-        return vtable.eval_hess_L_prod(self, x, y, scale, v, Hv, vtable);
-    throw not_implemented_error("eval_hess_ψ_prod");
-}
-template <class VT, Config C>
-ALPAQA_EXPORT void default_eval_hess_ψ(const void *self, crvec<C> x, crvec<C> y, crvec<C>,
-                                       real_t<C> scale, rindexvec<C> inner_idx,
-                                       rindexvec<C> outer_ptr, rvec<C> H_values, const VT &vtable) {
-    if (y.size() == 0 && vtable.eval_hess_L != default_eval_hess_L<VT, C>)
-        return vtable.eval_hess_L(self, x, y, scale, inner_idx, outer_ptr, H_values, vtable);
-    throw not_implemented_error("eval_hess_ψ");
-}
-template <class VT, Config C>
-ALPAQA_EXPORT length_t<C> default_get_hess_ψ_num_nonzeros(const void *, const VT &) {
-    return 0;
-}
-
-template <class VT, Config C>
-ALPAQA_EXPORT real_t<C> default_eval_f_grad_f(const void *self, crvec<C> x, rvec<C> grad_fx,
-                                              const VT &vtable) {
-    vtable.eval_grad_f(self, x, grad_fx);
-    return vtable.eval_f(self, x);
-}
-
-template <class VT, Config C>
-ALPAQA_EXPORT real_t<C> default_eval_f_g(const void *self, crvec<C> x, rvec<C> g,
-                                         const VT &vtable) {
-    vtable.eval_g(self, x, g);
-    return vtable.eval_f(self, x);
-}
-
-template <class VT, Config C>
-ALPAQA_EXPORT real_t<C> default_eval_f_grad_f_g(const void *self, crvec<C> x, rvec<C> grad_fx,
-                                                rvec<C> g, const VT &vtable) {
-    vtable.eval_g(self, x, g);
-    return vtable.eval_f_grad_f(self, x, grad_fx, vtable);
-}
-template <class VT, Config C>
-ALPAQA_EXPORT void default_eval_grad_f_grad_g_prod(const void *self, crvec<C> x, crvec<C> y,
-                                                   rvec<C> grad_f, rvec<C> grad_gxy,
-                                                   const VT &vtable) {
-    vtable.eval_grad_f(self, x, grad_f);
-    vtable.eval_grad_g_prod(self, x, y, grad_gxy);
-}
-template <class VT, Config C>
-ALPAQA_EXPORT void default_eval_grad_L(const void *self, crvec<C> x, crvec<C> y, rvec<C> grad_L,
-                                       rvec<C> work_n, const VT &vtable) {
-    vtable.eval_grad_f_grad_g_prod(self, x, y, grad_L, work_n, vtable);
-    grad_L += work_n;
-}
-template <class VT, Config C>
-ALPAQA_EXPORT real_t<C> default_eval_ψ(const void *self, crvec<C> x, crvec<C> y, crvec<C> Σ,
-                                       rvec<C> ŷ, const VT &vtable) {
-    USING_ALPAQA_CONFIG_TEMPLATE(VT::config_t);
-    if (y.size() == 0) /* [[unlikely]] */
-        return vtable.eval_f(self, x);
-
-    auto f   = vtable.eval_f_g(self, x, ŷ, vtable);
-    auto dᵀŷ = calc_ŷ_dᵀŷ<VT, C>(self, ŷ, y, Σ, vtable);
-    // ψ(x) = f(x) + ½ dᵀŷ
-    auto ψ = f + real_t(0.5) * dᵀŷ;
-    return ψ;
-}
-template <class VT, Config C>
-ALPAQA_EXPORT void default_eval_grad_ψ_from_ŷ(const void *self, crvec<C> x, crvec<C> ŷ,
-                                              rvec<C> grad_ψ, rvec<C> work_n, const VT &vtable) {
-    if (ŷ.size() == 0) /* [[unlikely]] */
-        vtable.eval_grad_f(self, x, grad_ψ);
-    else
-        vtable.eval_grad_L(self, x, ŷ, grad_ψ, work_n, vtable);
-}
-template <class VT, Config C>
-ALPAQA_EXPORT void default_eval_grad_ψ(const void *self, crvec<C> x, crvec<C> y, crvec<C> Σ,
-                                       rvec<C> grad_ψ, rvec<C> work_n, rvec<C> work_m,
-                                       const VT &vtable) {
-    if (y.size() == 0) /* [[unlikely]] */ {
-        vtable.eval_grad_f(self, x, grad_ψ);
-    } else {
-        vtable.eval_g(self, x, work_m);
-        (void)calc_ŷ_dᵀŷ<VT, C>(self, work_m, y, Σ, vtable);
-        vtable.eval_grad_ψ_from_ŷ(self, x, work_m, grad_ψ, work_n, vtable);
-    }
-}
-template <class VT, Config C>
-ALPAQA_EXPORT real_t<C> default_eval_ψ_grad_ψ(const void *self, crvec<C> x, crvec<C> y, crvec<C> Σ,
-                                              rvec<C> grad_ψ, rvec<C> work_n, rvec<C> work_m,
-                                              const VT &vtable) {
-    USING_ALPAQA_CONFIG_TEMPLATE(VT::config_t);
-    if (y.size() == 0) /* [[unlikely]] */
-        return vtable.eval_f_grad_f(self, x, grad_ψ, vtable);
-
-    auto &ŷ = work_m;
-    // ψ(x) = f(x) + ½ dᵀŷ
-    auto f   = vtable.eval_f_g(self, x, ŷ, vtable);
-    auto dᵀŷ = calc_ŷ_dᵀŷ<VT, C>(self, ŷ, y, Σ, vtable);
-    auto ψ   = f + real_t(0.5) * dᵀŷ;
-    // ∇ψ(x) = ∇f(x) + ∇g(x) ŷ
-    vtable.eval_grad_L(self, x, ŷ, grad_ψ, work_n, vtable);
-    return ψ;
-}
-template <class VT, Config C>
-ALPAQA_EXPORT const Box<C> &default_get_box_C(const void *, const VT &) {
-    throw not_implemented_error("get_box_C");
-}
-template <class VT, Config C>
-ALPAQA_EXPORT const Box<C> &default_get_box_D(const void *, const VT &) {
-    throw not_implemented_error("get_box_D");
-}
-
-} // namespace detail
-
 template <Config Conf>
 struct ProblemVTable : util::BasicVTable {
     USING_ALPAQA_CONFIG(Conf);
@@ -273,29 +96,55 @@ struct ProblemVTable : util::BasicVTable {
     required_const_function_t<void()>
         check;
 
-    static constexpr auto calc_ŷ_dᵀŷ = detail::calc_ŷ_dᵀŷ<ProblemVTable, config_t>;
-    static constexpr auto default_eval_jac_g = detail::default_eval_jac_g<ProblemVTable, config_t>;
-    static constexpr auto default_get_jac_g_num_nonzeros = detail::default_get_jac_g_num_nonzeros<ProblemVTable, config_t>;
-    static constexpr auto default_eval_grad_gi = detail::default_eval_grad_gi<ProblemVTable, config_t>;
-    static constexpr auto default_eval_hess_L_prod = detail::default_eval_hess_L_prod<ProblemVTable, config_t>;
-    static constexpr auto default_eval_hess_L = detail::default_eval_hess_L<ProblemVTable, config_t>;
-    static constexpr auto default_get_hess_L_num_nonzeros = detail::default_get_hess_L_num_nonzeros<ProblemVTable, config_t>;
-    static constexpr auto default_eval_hess_ψ_prod = detail::default_eval_hess_ψ_prod<ProblemVTable, config_t>;
-    static constexpr auto default_eval_hess_ψ = detail::default_eval_hess_ψ<ProblemVTable, config_t>;
-    static constexpr auto default_get_hess_ψ_num_nonzeros = detail::default_get_hess_ψ_num_nonzeros<ProblemVTable, config_t>;
-    static constexpr auto default_eval_f_grad_f = detail::default_eval_f_grad_f<ProblemVTable, config_t>;
-    static constexpr auto default_eval_f_g = detail::default_eval_f_g<ProblemVTable, config_t>;
-    static constexpr auto default_eval_f_grad_f_g = detail::default_eval_f_grad_f_g<ProblemVTable, config_t>;
-    static constexpr auto default_eval_grad_f_grad_g_prod = detail::default_eval_grad_f_grad_g_prod<ProblemVTable, config_t>;
-    static constexpr auto default_eval_grad_L = detail::default_eval_grad_L<ProblemVTable, config_t>;
-    static constexpr auto default_eval_ψ = detail::default_eval_ψ<ProblemVTable, config_t>;
-    static constexpr auto default_eval_grad_ψ_from_ŷ = detail::default_eval_grad_ψ_from_ŷ<ProblemVTable, config_t>;
-    static constexpr auto default_eval_grad_ψ = detail::default_eval_grad_ψ<ProblemVTable, config_t>;
-    static constexpr auto default_eval_ψ_grad_ψ = detail::default_eval_ψ_grad_ψ<ProblemVTable, config_t>;
-    static constexpr auto default_get_box_C = detail::default_get_box_C<ProblemVTable, config_t>;
-    static constexpr auto default_get_box_D = detail::default_get_box_D<ProblemVTable, config_t>;
-
     // clang-format on
+
+    ALPAQA_EXPORT static real_t calc_ŷ_dᵀŷ(const void *self, rvec g_ŷ, crvec y, crvec Σ,
+                                           const ProblemVTable &vtable);
+    ALPAQA_EXPORT static void default_eval_jac_g(const void *, crvec, rindexvec, rindexvec, rvec,
+                                                 const ProblemVTable &);
+    ALPAQA_EXPORT static length_t default_get_jac_g_num_nonzeros(const void *,
+                                                                 const ProblemVTable &);
+    ALPAQA_EXPORT static void default_eval_grad_gi(const void *, crvec, index_t, rvec,
+                                                   const ProblemVTable &);
+    ALPAQA_EXPORT static void default_eval_hess_L_prod(const void *, crvec, crvec, real_t, crvec,
+                                                       rvec, const ProblemVTable &);
+    ALPAQA_EXPORT static void default_eval_hess_L(const void *, crvec, crvec, real_t, rindexvec,
+                                                  rindexvec, rvec, const ProblemVTable &);
+    ALPAQA_EXPORT static length_t default_get_hess_L_num_nonzeros(const void *,
+                                                                  const ProblemVTable &);
+    ALPAQA_EXPORT static void default_eval_hess_ψ_prod(const void *self, crvec x, crvec y, crvec,
+                                                       real_t scale, crvec v, rvec Hv,
+                                                       const ProblemVTable &vtable);
+    ALPAQA_EXPORT static void default_eval_hess_ψ(const void *self, crvec x, crvec y, crvec,
+                                                  real_t scale, rindexvec inner_idx,
+                                                  rindexvec outer_ptr, rvec H_values,
+                                                  const ProblemVTable &vtable);
+    ALPAQA_EXPORT static length_t default_get_hess_ψ_num_nonzeros(const void *,
+                                                                  const ProblemVTable &);
+    ALPAQA_EXPORT static real_t default_eval_f_grad_f(const void *self, crvec x, rvec grad_fx,
+                                                      const ProblemVTable &vtable);
+    ALPAQA_EXPORT static real_t default_eval_f_g(const void *self, crvec x, rvec g,
+                                                 const ProblemVTable &vtable);
+    ALPAQA_EXPORT static real_t default_eval_f_grad_f_g(const void *self, crvec x, rvec grad_fx,
+                                                        rvec g, const ProblemVTable &vtable);
+    ALPAQA_EXPORT static void default_eval_grad_f_grad_g_prod(const void *self, crvec x, crvec y,
+                                                              rvec grad_f, rvec grad_gxy,
+                                                              const ProblemVTable &vtable);
+    ALPAQA_EXPORT static void default_eval_grad_L(const void *self, crvec x, crvec y, rvec grad_L,
+                                                  rvec work_n, const ProblemVTable &vtable);
+    ALPAQA_EXPORT static real_t default_eval_ψ(const void *self, crvec x, crvec y, crvec Σ, rvec ŷ,
+                                               const ProblemVTable &vtable);
+    ALPAQA_EXPORT static void default_eval_grad_ψ_from_ŷ(const void *self, crvec x, crvec ŷ,
+                                                         rvec grad_ψ, rvec work_n,
+                                                         const ProblemVTable &vtable);
+    ALPAQA_EXPORT static void default_eval_grad_ψ(const void *self, crvec x, crvec y, crvec Σ,
+                                                  rvec grad_ψ, rvec work_n, rvec work_m,
+                                                  const ProblemVTable &vtable);
+    ALPAQA_EXPORT static real_t default_eval_ψ_grad_ψ(const void *self, crvec x, crvec y, crvec Σ,
+                                                      rvec grad_ψ, rvec work_n, rvec work_m,
+                                                      const ProblemVTable &vtable);
+    ALPAQA_EXPORT static const Box &default_get_box_C(const void *, const ProblemVTable &);
+    ALPAQA_EXPORT static const Box &default_get_box_D(const void *, const ProblemVTable &);
 
     length_t n, m;
 
@@ -347,6 +196,14 @@ struct ProblemVTable : util::BasicVTable {
     }
     ProblemVTable() = default;
 };
+
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, ProblemVTable, DefaultConfig);
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, ProblemVTable, EigenConfigf);
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, ProblemVTable, EigenConfigd);
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, ProblemVTable, EigenConfigl);
+#ifdef ALPAQA_WITH_QUAD_PRECISION
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, ProblemVTable, EigenConfigq);
+#endif
 
 /// @addtogroup grp_Problems
 /// @{
@@ -1017,12 +874,12 @@ struct ProblemWithCounters {
 
     [[nodiscard]] bool provides_eval_grad_gi() const requires requires (Problem p) { { p.provides_eval_grad_gi() } -> std::convertible_to<bool>; } { return problem.provides_eval_grad_gi(); }
     [[nodiscard]] bool provides_eval_jac_g() const requires requires (Problem p) { { p.provides_eval_jac_g() } -> std::convertible_to<bool>; } { return problem.provides_eval_jac_g(); }
-    [[nodiscard]] bool provides_get_jac_g_num_nozeros() const requires requires (Problem p) { { p.provides_get_jac_g_num_nozeros() } -> std::convertible_to<bool>; } { return problem.provides_get_jac_g_num_nozeros(); }
+    [[nodiscard]] bool provides_get_jac_g_num_nonzeros() const requires requires (Problem p) { { p.provides_get_jac_g_num_nonzeros() } -> std::convertible_to<bool>; } { return problem.provides_get_jac_g_num_nonzeros(); }
     [[nodiscard]] bool provides_eval_hess_L_prod() const requires requires (Problem p) { { p.provides_eval_hess_L_prod() } -> std::convertible_to<bool>; } { return problem.provides_eval_hess_L_prod(); }
     [[nodiscard]] bool provides_eval_hess_L() const requires requires (Problem p) { { p.provides_eval_hess_L() } -> std::convertible_to<bool>; } { return problem.provides_eval_hess_L(); }
-    [[nodiscard]] bool provides_get_hess_L_num_nozeros() const requires requires (Problem p) { { p.provides_get_hess_L_num_nozeros() } -> std::convertible_to<bool>; } { return problem.provides_get_hess_L_num_nozeros(); }
+    [[nodiscard]] bool provides_get_hess_L_num_nonzeros() const requires requires (Problem p) { { p.provides_get_hess_L_num_nonzeros() } -> std::convertible_to<bool>; } { return problem.provides_get_hess_L_num_nonzeros(); }
     [[nodiscard]] bool provides_eval_hess_ψ() const requires requires (Problem p) { { p.provides_eval_hess_ψ() } -> std::convertible_to<bool>; } { return problem.provides_eval_hess_ψ(); }
-    [[nodiscard]] bool provides_get_hess_ψ_num_nozeros() const requires requires (Problem p) { { p.provides_get_hess_ψ_num_nozeros() } -> std::convertible_to<bool>; } { return problem.provides_get_hess_ψ_num_nozeros(); }
+    [[nodiscard]] bool provides_get_hess_ψ_num_nonzeros() const requires requires (Problem p) { { p.provides_get_hess_ψ_num_nonzeros() } -> std::convertible_to<bool>; } { return problem.provides_get_hess_ψ_num_nonzeros(); }
     [[nodiscard]] bool provides_eval_f_grad_f() const requires requires (Problem p) { { p.provides_eval_f_grad_f() } -> std::convertible_to<bool>; } { return problem.provides_eval_f_grad_f(); }
     [[nodiscard]] bool provides_eval_f_g() const requires requires (Problem p) { { p.provides_eval_f_g() } -> std::convertible_to<bool>; } { return problem.provides_eval_f_g(); }
     [[nodiscard]] bool provides_eval_f_grad_f_g() const requires requires (Problem p) { { p.provides_eval_f_grad_f_g() } -> std::convertible_to<bool>; } { return problem.provides_eval_f_grad_f_g(); }
@@ -1148,10 +1005,12 @@ class BoxConstrProblem {
 
     static void eval_proj_multipliers_box(const Box &D, rvec y, real_t M,
                                           index_t penalty_alm_split) {
+        // If there's no lower bound, the multipliers can only be positive
         auto max_lb = [M](real_t y, real_t z_lb) {
             real_t y_lb = z_lb == -alpaqa::inf<config_t> ? 0 : -M;
             return std::max(y, y_lb);
         };
+        // If there's no upper bound, the multipliers can only be negative
         auto min_ub = [M](real_t y, real_t z_ub) {
             real_t y_ub = z_ub == alpaqa::inf<config_t> ? 0 : M;
             return std::min(y, y_ub);

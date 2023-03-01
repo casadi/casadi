@@ -20,6 +20,7 @@ add_library(alpaqa
     "alpaqa/src/accelerators/lbfgs.cpp"
     "alpaqa/src/problem/problem-counters.cpp"
     "alpaqa/src/problem/ocproblem-counters.cpp"
+    "alpaqa/src/problem/type-erased-problem.cpp"
     "alpaqa/src/outer/alm.cpp"
     "alpaqa/src/outer/internal/alm-helpers.cpp"
     "alpaqa/src/inner/panoc.cpp"
