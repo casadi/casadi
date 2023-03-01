@@ -1,6 +1,7 @@
 #pragma once
 
 #include <alpaqa/config/config.hpp>
+#include <alpaqa/export.hpp>
 #include <alpaqa/problem/box.hpp>
 #include <alpaqa/problem/problem-counters.hpp>
 #include <alpaqa/util/alloc-check.hpp>
