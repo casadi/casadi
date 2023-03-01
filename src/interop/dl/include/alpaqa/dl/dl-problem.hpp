@@ -156,11 +156,14 @@ class DLProblem : private DLLoader, public BoxConstrProblem<DefaultConfig> {
     [[nodiscard]] bool provides_eval_g() const;
     [[nodiscard]] bool provides_eval_grad_g_prod() const;
     [[nodiscard]] bool provides_eval_jac_g() const;
+    [[nodiscard]] bool provides_get_jac_g_num_nonzeros() const;
     [[nodiscard]] bool provides_eval_grad_gi() const;
     [[nodiscard]] bool provides_eval_hess_L_prod() const;
     [[nodiscard]] bool provides_eval_hess_L() const;
+    [[nodiscard]] bool provides_get_hess_L_num_nonzeros() const;
     [[nodiscard]] bool provides_eval_hess_ψ_prod() const;
     [[nodiscard]] bool provides_eval_hess_ψ() const;
+    [[nodiscard]] bool provides_get_hess_ψ_num_nonzeros() const;
     [[nodiscard]] bool provides_eval_f_grad_f() const;
     [[nodiscard]] bool provides_eval_f_g() const;
     [[nodiscard]] bool provides_eval_f_grad_f_g() const;
