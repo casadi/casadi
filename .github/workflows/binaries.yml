@@ -749,7 +749,7 @@ jobs:
     steps:
       - uses: casadi/commercial_solvers@master
         with:
-          tag: ${{ secrets.JGILLIS_RESTRICTED }}
+          token: ${{ secrets.JGILLIS_RESTRICTED }}
       - run: env
       - run: echo "$LD_LIBRARY_PATH"
       - run: echo "${{ env.LD_LIBRARY_PATH }}"
