@@ -1127,7 +1127,7 @@ void DaeBuilderInternal::set_z(const std::vector<std::string>& name,
   }
 }
 
-void DaeBuilderInternal::clear_in(const std::string& v) {
+void DaeBuilderInternal::clear_all(const std::string& v) {
   ind_in(v).clear();
 }
 

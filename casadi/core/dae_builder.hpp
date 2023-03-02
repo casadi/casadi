@@ -329,6 +329,9 @@ class CASADI_EXPORT DaeBuilder
   void sanity_check() const;
   ///@}
 
+  /// Clear all variables of a type
+  void clear_all(const std::string& v);
+
   /** @name Register an existing variable */
   ///@{
   void register_t(const std::string& name);
@@ -358,8 +361,10 @@ class CASADI_EXPORT DaeBuilder
    */
   ///@{
 
-  /// Clear input variable
-  void clear_in(const std::string& v);
+#ifdef WITH_DEPRECATED_FEATURES
+  /// [DEPRECATED] Clear input variable: Replaced by clear_all
+  void clear_in(const std::string& v) { clear_all(v);}
+#endif  // WITH_DEPRECATED_FEATURES
 
   /// Eliminate all dependent variables
   void eliminate_w();

@@ -423,11 +423,11 @@ void DaeBuilder::set_y(const std::vector<std::string>& name) {
   }
 }
 
-void DaeBuilder::clear_in(const std::string& v) {
+void DaeBuilder::clear_all(const std::string& v) {
   try {
-    (*this)->clear_in(v);
+    (*this)->clear_all(v);
   } catch (std::exception& e) {
-    THROW_ERROR("clear_in", e.what());
+    THROW_ERROR("clear_all", e.what());
   }
 }
 

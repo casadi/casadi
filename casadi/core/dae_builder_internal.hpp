@@ -205,17 +205,17 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   /// Sort algebraic variables
   void sort_z(const std::vector<std::string>& z_order);
 
-  /// Input indices (mutable)
+  /// Classified variable indices (mutable)
   std::vector<size_t>& ind_in(const std::string& v);
 
-  /// Input indices (immutable)
+  /// Classified variable indices (immutable)
   const std::vector<size_t>& ind_in(const std::string& v) const;
 
   // Set all algebraic variables
   void set_z(const std::vector<std::string>& name, const std::vector<std::string>& alg);
 
-  /// Clear input variable
-  void clear_in(const std::string& v);
+  /// Clear all variables of a class
+  void clear_all(const std::string& v);
 
   /// Prune unused controls
   void prune(bool prune_p, bool prune_u);
