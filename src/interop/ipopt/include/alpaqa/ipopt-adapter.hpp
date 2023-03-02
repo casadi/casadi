@@ -1,6 +1,6 @@
 #pragma once
 
-#include <alpaqa/ipopt-interface-export.h>
+#include <alpaqa/ipopt-adapter-export.h>
 #include <alpaqa/problem/type-erased-problem.hpp>
 
 #include <IpTNLP.hpp>
