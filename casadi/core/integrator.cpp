@@ -48,7 +48,7 @@ std::string to_string(DynOut v) {
   case DYN_ODE: return "ode";
   case DYN_ALG: return "alg";
   case DYN_QUAD: return "quad";
-  case DYN_Y: return "y";
+  case DYN_YDEF: return "ydef";
   case DYN_RODE: return "rode";
   case DYN_RALG: return "ralg";
   case DYN_RQUAD: return "rquad";

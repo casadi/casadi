@@ -482,7 +482,7 @@ void Simulator::eval_y(SimulatorMemory* mem) const {
   mem->arg[DYN_P] = mem->p;
   mem->arg[DYN_U] = mem->u;
   std::fill_n(mem->res, enum_traits<DynOut>::n_enum, nullptr);
-  mem->res[DYN_Y] = mem->y;
+  mem->res[DYN_YDEF] = mem->y;
   if (calc_function(mem, "dae")) casadi_error("'dae' calculation failed");
 }
 

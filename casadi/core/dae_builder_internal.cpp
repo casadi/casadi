@@ -39,6 +39,7 @@
 #include "xml_file.hpp"
 #include "external.hpp"
 #include "fmu_function.hpp"
+#include "integrator.hpp"
 
 // Throw informative error message
 #define THROW_ERROR_NODE(FNAME, NODE, WHAT) \
@@ -2208,6 +2209,9 @@ Function DaeBuilderInternal::fmu_fun(const std::string& name,
       casadi_error(std::string("Cannot read 'scheme': ") + e.what());
     }
   } else {
+    // Initialize all scheme entries
+    for (auto&& s : dyn_in()) scheme[s] = std::vector<size_t>();
+    for (auto&& s : dyn_out()) scheme[s] = std::vector<size_t>();
     // Default IO scheme
     scheme["t"] = ind_in("t");
     scheme["x"] = ind_in("x");

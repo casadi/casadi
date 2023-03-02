@@ -174,7 +174,7 @@ enum DynOut {
   DYN_ODE,
   DYN_ALG,
   DYN_QUAD,
-  DYN_Y,
+  DYN_YDEF,
   DYN_RODE,
   DYN_RALG,
   DYN_RQUAD,
