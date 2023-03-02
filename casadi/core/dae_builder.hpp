@@ -332,6 +332,9 @@ class CASADI_EXPORT DaeBuilder
   /// Clear all variables of a type
   void clear_all(const std::string& v);
 
+  /// Set all variables of a type
+  void set_all(const std::string& v, const std::vector<std::string>& name);
+
   /** @name Register an existing variable */
   ///@{
   void register_t(const std::string& name);
@@ -346,15 +349,17 @@ class CASADI_EXPORT DaeBuilder
   void register_y(const std::string& name);
   ///@}
 
-  /** @name Specify all variables of a type */
+#ifdef WITH_DEPRECATED_FEATURES
+  /** @name [DEPRECATED] Specify all variables of a type: Call set_all instead */
   ///@{
-  void set_u(const std::vector<std::string>& name);
-  void set_x(const std::vector<std::string>& name);
+  void set_u(const std::vector<std::string>& name) { set_all("u", name);}
+  void set_x(const std::vector<std::string>& name) { set_all("x", name);}
   void set_z(const std::vector<std::string>& name,
     const std::vector<std::string>& alg = std::vector<std::string>());
-  void set_q(const std::vector<std::string>& name);
-  void set_y(const std::vector<std::string>& name);
+  void set_q(const std::vector<std::string>& name) { set_all("q", name);}
+  void set_y(const std::vector<std::string>& name) { set_all("y", name);}
   ///@}
+#endif  // WITH_DEPRECATED_FEATURES
 
   /** @name Manipulation
    *  Reformulate the dynamic optimization problem.

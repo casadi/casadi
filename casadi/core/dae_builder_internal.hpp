@@ -211,11 +211,11 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   /// Classified variable indices (immutable)
   const std::vector<size_t>& ind_in(const std::string& v) const;
 
-  // Set all algebraic variables
-  void set_z(const std::vector<std::string>& name, const std::vector<std::string>& alg);
-
   /// Clear all variables of a class
   void clear_all(const std::string& v);
+
+  /// Set all variables of a type
+  void set_all(const std::string& v, const std::vector<std::string>& name);
 
   /// Prune unused controls
   void prune(bool prune_p, bool prune_u);

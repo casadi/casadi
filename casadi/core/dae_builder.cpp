@@ -385,41 +385,20 @@ void DaeBuilder::register_y(const std::string& name) {
 
 void DaeBuilder::set_z(const std::vector<std::string>& name, const std::vector<std::string>& alg) {
   try {
-    (*this)->set_z(name, alg);
+    // Consistency check
+    if (!alg.empty()) {
+      casadi_assert(alg.size() == name.size(), "Inconsistent number of algebraic variables");
+    }
+
+    // Update z
+    set_all("z", name);
+
+    // Update algebraic equations
+    if (!alg.empty()) {
+      for (size_t i = 0; i < name.size(); ++i) variable(name[i]).alg = find(alg[i]);
+    }
   } catch (std::exception& e) {
     THROW_ERROR("set_z", e.what());
-  }
-}
-
-void DaeBuilder::set_u(const std::vector<std::string>& name) {
-  try {
-    (*this)->u_ = find(name);
-  } catch (std::exception& e) {
-    THROW_ERROR("set_u", e.what());
-  }
-}
-
-void DaeBuilder::set_x(const std::vector<std::string>& name) {
-  try {
-    (*this)->x_ = find(name);
-  } catch (std::exception& e) {
-    THROW_ERROR("set_x", e.what());
-  }
-}
-
-void DaeBuilder::set_q(const std::vector<std::string>& name) {
-  try {
-    (*this)->q_ = find(name);
-  } catch (std::exception& e) {
-    THROW_ERROR("set_q", e.what());
-  }
-}
-
-void DaeBuilder::set_y(const std::vector<std::string>& name) {
-  try {
-    (*this)->y_ = find(name);
-  } catch (std::exception& e) {
-    THROW_ERROR("set_y", e.what());
   }
 }
 
@@ -428,6 +407,14 @@ void DaeBuilder::clear_all(const std::string& v) {
     (*this)->clear_all(v);
   } catch (std::exception& e) {
     THROW_ERROR("clear_all", e.what());
+  }
+}
+
+void DaeBuilder::set_all(const std::string& v, const std::vector<std::string>& name) {
+  try {
+    (*this)->set_all(v, name);
+  } catch (std::exception& e) {
+    THROW_ERROR("set_all", e.what());
   }
 }
 
