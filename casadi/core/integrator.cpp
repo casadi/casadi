@@ -256,7 +256,7 @@ eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) con
   // If backwards integration is needed
   if (nrx_>0) {
     // Integrate backward
-    resetB(m, t0_, rx0, rz0, rp);
+    resetB(m, tout_.back(), rx0, rz0, rp);
 
     // Proceed to t0
     retreat(m, t0_, rx, rz, rq);
