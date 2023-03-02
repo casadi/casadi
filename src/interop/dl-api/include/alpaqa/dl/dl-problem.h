@@ -390,9 +390,9 @@ template <class Result, class T, class Ret, class... Args>
 void register_member_function(Result &result, std::string name,
                               Ret (T::*member)(Args...)) {
     register_function(result, std::move(name),
-                      [member](void *self_, Args... args) {
+                      [member](void *self_, Args... args) -> Ret {
                           auto *self = reinterpret_cast<T *>(self_);
-                          (self->*member)(std::forward<Args>(args)...);
+                          return (self->*member)(std::forward<Args>(args)...);
                       });
 }
 
@@ -400,9 +400,9 @@ template <class Result, class T, class Ret, class... Args>
 void register_member_function(Result &result, std::string name,
                               Ret (T::*member)(Args...) const) {
     register_function(result, std::move(name),
-                      [member](const void *self_, Args... args) {
+                      [member](const void *self_, Args... args) -> Ret {
                           const auto *self = reinterpret_cast<const T *>(self_);
-                          (self->*member)(std::forward<Args>(args)...);
+                          return (self->*member)(std::forward<Args>(args)...);
                       });
 }
 
