@@ -825,16 +825,11 @@ get_forward(casadi_int nfwd, const std::string& name,
     rz0_aug.push_back(vec(din[INTEGRATOR_RZ0] = MX::sym("rz0" + suff, rz())));
     ret_in.insert(ret_in.end(), din.begin(), din.end());
 
-    // Dummy outputs
+    // Nondifferentiated outputs not used by the derivative function
     if (dir==-1) {
-      std::vector<MX> dout(INTEGRATOR_NUM_OUT);
-      dout[INTEGRATOR_XF]  = MX::sym("xf_dummy", Sparsity(size_out(INTEGRATOR_XF)));
-      dout[INTEGRATOR_QF]  = MX::sym("qf_dummy", Sparsity(q().size()));
-      dout[INTEGRATOR_ZF]  = MX::sym("zf_dummy", Sparsity(z().size()));
-      dout[INTEGRATOR_RXF]  = MX::sym("rxf_dummy", Sparsity(rx().size()));
-      dout[INTEGRATOR_RQF]  = MX::sym("rqf_dummy", Sparsity(rq().size()));
-      dout[INTEGRATOR_RZF]  = MX::sym("rzf_dummy", Sparsity(rz().size()));
-      ret_in.insert(ret_in.end(), dout.begin(), dout.end());
+      for (casadi_int i = 0; i < INTEGRATOR_NUM_OUT; ++i) {
+        ret_in.push_back(MX::sym(integrator_out(i) + "_dummy", Sparsity(size_out(i))));
+      }
     }
   }
 
@@ -941,16 +936,10 @@ get_reverse(casadi_int nadj, const std::string& name,
   rz0_aug.push_back(vec(dd[INTEGRATOR_RZ0] = MX::sym("rz0", rz())));
   ret_in.insert(ret_in.end(), dd.begin(), dd.end());
 
-  // Add dummy inputs (outputs of the nondifferentiated funciton)
-  dd.resize(INTEGRATOR_NUM_OUT);
-  std::fill(dd.begin(), dd.end(), MX());
-  dd[INTEGRATOR_XF]  = MX::sym("xf_dummy", Sparsity(x().size()));
-  dd[INTEGRATOR_QF]  = MX::sym("qf_dummy", Sparsity(q().size()));
-  dd[INTEGRATOR_ZF]  = MX::sym("zf_dummy", Sparsity(z().size()));
-  dd[INTEGRATOR_RXF]  = MX::sym("rxf_dummy", Sparsity(rx().size()));
-  dd[INTEGRATOR_RQF]  = MX::sym("rqf_dummy", Sparsity(rq().size()));
-  dd[INTEGRATOR_RZF]  = MX::sym("rzf_dummy", Sparsity(rz().size()));
-  ret_in.insert(ret_in.end(), dd.begin(), dd.end());
+  // Nondifferentiated outputs not used by the derivative function
+  for (casadi_int i = 0; i < INTEGRATOR_NUM_OUT; ++i) {
+    ret_in.push_back(MX::sym(integrator_out(i) + "_dummy", Sparsity(size_out(i))));
+  }
 
   // Add adjoint seeds
   dd.resize(INTEGRATOR_NUM_OUT);
