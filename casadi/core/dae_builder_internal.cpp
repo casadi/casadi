@@ -2553,11 +2553,7 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
       t_.push_back(var.index);
     } else if (var.causality == Causality::INPUT) {
       u_.push_back(var.index);
-    } else if (var.variability == Variability::CONSTANT) {
-      // Named constant
-      c_.push_back(var.index);
-      var.beq = var.start;
-    } else if (var.variability == Variability::FIXED || var.variability == Variability::TUNABLE) {
+    } else if (var.variability == Variability::TUNABLE) {
       p_.push_back(var.index);
     }
   }
