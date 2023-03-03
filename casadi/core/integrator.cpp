@@ -235,6 +235,35 @@ bool Integrator::grid_out(casadi_int i) {
   return false;
 }
 
+casadi_int Integrator::adjmap_in(casadi_int i) {
+  switch (static_cast<IntegratorOutput>(i)) {
+    case INTEGRATOR_XF: return INTEGRATOR_RX0;
+    case INTEGRATOR_QF: return INTEGRATOR_RP;
+    case INTEGRATOR_ZF: return INTEGRATOR_RZ0;
+    case INTEGRATOR_RXF: return INTEGRATOR_X0;
+    case INTEGRATOR_RQF: return INTEGRATOR_P;
+    case INTEGRATOR_RZF: return INTEGRATOR_Z0;
+    default: break;
+  }
+  return -1;
+}
+
+casadi_int Integrator::adjmap_out(casadi_int i) {
+  switch (static_cast<IntegratorInput>(i)) {
+    case INTEGRATOR_X0: return INTEGRATOR_RXF;
+    case INTEGRATOR_P: return INTEGRATOR_RQF;
+    case INTEGRATOR_Z0: return INTEGRATOR_RZF;
+    case INTEGRATOR_RX0: return INTEGRATOR_XF;
+    case INTEGRATOR_RP: return INTEGRATOR_QF;
+    case INTEGRATOR_RZ0: return INTEGRATOR_ZF;
+    default: break;
+  }
+  return -1;
+
+}
+
+
+
 Function Integrator::create_advanced(const Dict& opts) {
   return Function::create(this, opts);
 }
@@ -943,35 +972,22 @@ get_reverse(casadi_int nadj, const std::string& name,
     ret_in.push_back(horzcat(v)); 
   }
 
-  // Augmented state
-  std::vector<MX> x0_aug, p_aug, z0_aug, rx0_aug, rp_aug, rz0_aug;
-
-  // Inputs or forward/adjoint seeds in one direction
-  x0_aug.push_back(vec(ret_in[INTEGRATOR_X0]));
-  p_aug.push_back(vec(ret_in[INTEGRATOR_P]));
-  z0_aug.push_back(vec(ret_in[INTEGRATOR_Z0]));
-  rx0_aug.push_back(vec(ret_in[INTEGRATOR_RX0]));
-  rp_aug.push_back(vec(ret_in[INTEGRATOR_RP]));
-  rz0_aug.push_back(vec(ret_in[INTEGRATOR_RZ0]));
-
-  // Add adjoint seeds
-  for (casadi_int d=0; d<nadj; ++d) {
-    rx0_aug.push_back(vec(aug_in[INTEGRATOR_XF][d]));
-    rp_aug.push_back(vec(aug_in[INTEGRATOR_QF][d]));
-    rz0_aug.push_back(vec(aug_in[INTEGRATOR_ZF][d]));
-    x0_aug.push_back(vec(aug_in[INTEGRATOR_RXF][d]));
-    p_aug.push_back(vec(aug_in[INTEGRATOR_RQF][d]));
-    z0_aug.push_back(vec(aug_in[INTEGRATOR_RZF][d]));
-  }
-
-  // Call the integrator
+  // Call the augmented integrator
   std::vector<MX> integrator_in(INTEGRATOR_NUM_IN);
-  integrator_in[INTEGRATOR_X0] = vertcat(x0_aug);
-  integrator_in[INTEGRATOR_P] = vertcat(p_aug);
-  integrator_in[INTEGRATOR_Z0] = vertcat(z0_aug);
-  integrator_in[INTEGRATOR_RX0] = vertcat(rx0_aug);
-  integrator_in[INTEGRATOR_RP] = vertcat(rp_aug);
-  integrator_in[INTEGRATOR_RZ0] = vertcat(rz0_aug);
+  for (casadi_int i = 0; i < INTEGRATOR_NUM_IN; ++i) {
+    if (size1_in(i) > 0 && grid_in(i) && nadj > 1 && nt() > 1) {
+      // Need to reorder columns
+      casadi_error("Not implemented");
+    } else {
+      // No reordering necessary
+      std::vector<MX> integrator_in_split = {vec(ret_in[i])};
+      casadi_int j = adjmap_out(i);
+      for (casadi_int d=0; d<nadj; ++d) {
+        integrator_in_split.push_back(vec(aug_in[j][d]));
+      }
+      integrator_in[i] = vertcat(integrator_in_split);
+    }
+  }
   std::vector<MX> integrator_out = aug_int(integrator_in);
 
   // Get offset in the splitted problem

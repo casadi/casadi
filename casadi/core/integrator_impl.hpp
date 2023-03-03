@@ -291,11 +291,17 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
       \identifier{1mg} */
   std::string serialize_base_function() const override { return "Integrator"; }
 
-  /// Helper function: Is an input repeated for each grid point?
+  /// Is an input repeated for each grid point?
   static bool grid_in(casadi_int i);
 
-  /// Helper function: Is an output repeated for each grid point?
+  /// Is an output repeated for each grid point?
   static bool grid_out(casadi_int i);
+
+  /// Which input is used to calculate a given output in adjoint sensitivity analysis
+  static casadi_int adjmap_in(casadi_int i);
+
+  /// Which output is used to calculate a given input in adjoint sensitivity analysis
+  static casadi_int adjmap_out(casadi_int i);
 
  protected:
   /** \brief Deserializing constructor
