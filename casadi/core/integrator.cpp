@@ -824,24 +824,13 @@ get_forward(casadi_int nfwd, const std::string& name,
   Function aug_int = integrator(aug_prefix + name_, plugin_name(),
     aug_dae, t0_, tout_, aug_opts);
 
-  // Create symbolic expressions for augmented problem
-  std::vector<std::vector<MX>> aug_in(INTEGRATOR_NUM_IN);
-  for (casadi_int dir=-1; dir<nfwd; ++dir) {
-    // Suffix, if any
-    std::string suff = dir >= 0 ? "_" + str(dir) : "";
-    // Augmented problem
-    for (casadi_int i = 0; i < INTEGRATOR_NUM_IN; ++i) {
-      aug_in[i].push_back(MX::sym(integrator_in(i) + suff, sparsity_in(i)));
-    }
-  }
-
   // All inputs of the return function
   std::vector<MX> ret_in;
   ret_in.reserve(INTEGRATOR_NUM_IN + INTEGRATOR_NUM_OUT + INTEGRATOR_NUM_IN);
 
   // Add nondifferentiated inputs to ret_in
   for (casadi_int i = 0; i < INTEGRATOR_NUM_IN; ++i) {
-    ret_in.push_back(aug_in[i].front());
+    ret_in.push_back(MX::sym(integrator_in(i), sparsity_in(i)));
   }
 
   // Add nondifferentiated outputs (unused) to ret_in
@@ -849,10 +838,14 @@ get_forward(casadi_int nfwd, const std::string& name,
     ret_in.push_back(MX::sym("out_" + integrator_out(i), Sparsity(size_out(i))));
   }
 
-  // Add forward seeds to ret_in
+  // Create symbolic expressions for augmented problem, add forward seeds to ret_in
+  std::vector<std::vector<MX>> aug_in(INTEGRATOR_NUM_IN);
   std::vector<MX> v(nfwd);
   for (casadi_int i = 0; i < INTEGRATOR_NUM_IN; ++i) {
-    for (casadi_int d=0; d<nfwd; ++d) v[d] = aug_in[i].at(d + 1);
+    for (casadi_int d=0; d<nfwd; ++d) {
+      v[d] = MX::sym("fwd" + str(d) + "_" + integrator_in(i), sparsity_in(i));
+      aug_in[i].push_back(v[d]);
+    }
     ret_in.push_back(horzcat(v)); 
   }
 
@@ -864,7 +857,9 @@ get_forward(casadi_int nfwd, const std::string& name,
       casadi_error("Not implemented");
     } else {
       // No reordering necessary
-      integrator_in[i] = horzcat(aug_in[i]);
+      v = aug_in[i];
+      v.insert(v.begin(), ret_in[i]);
+      integrator_in[i] = horzcat(v);
     }
   }
   std::vector<MX> integrator_out = aug_int(integrator_in);
@@ -922,6 +917,19 @@ get_reverse(casadi_int nadj, const std::string& name,
   aug_opts["derivative_of"] = self();
   Function aug_int = integrator(aug_prefix + name_, plugin_name(),
     aug_dae, t0_, tout_, aug_opts);
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   // All inputs of the return function
   std::vector<MX> ret_in;
