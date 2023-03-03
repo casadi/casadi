@@ -918,57 +918,50 @@ get_reverse(casadi_int nadj, const std::string& name,
   Function aug_int = integrator(aug_prefix + name_, plugin_name(),
     aug_dae, t0_, tout_, aug_opts);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
   // All inputs of the return function
   std::vector<MX> ret_in;
-  ret_in.reserve(INTEGRATOR_NUM_IN + INTEGRATOR_NUM_OUT*(1+nadj));
+  ret_in.reserve(INTEGRATOR_NUM_IN + INTEGRATOR_NUM_OUT + INTEGRATOR_NUM_IN);
+
+  // Add nondifferentiated inputs to ret_in
+  for (casadi_int i = 0; i < INTEGRATOR_NUM_IN; ++i) {
+    ret_in.push_back(MX::sym(integrator_in(i), sparsity_in(i)));
+  }
+
+  // Add nondifferentiated outputs (unused) to ret_in
+  for (casadi_int i = 0; i < INTEGRATOR_NUM_OUT; ++i) {
+    ret_in.push_back(MX::sym("out_" + integrator_out(i), Sparsity(size_out(i))));
+  }
+
+  // Create symbolic expressions for augmented problem, add adjoint seeds to ret_in
+  std::vector<std::vector<MX>> aug_in(INTEGRATOR_NUM_OUT);
+  std::vector<MX> v(nadj);
+  for (casadi_int i = 0; i < INTEGRATOR_NUM_OUT; ++i) {
+    for (casadi_int d=0; d<nadj; ++d) {
+      v[d] = MX::sym("adj" + str(d) + "_" + integrator_out(i), sparsity_out(i));
+      aug_in[i].push_back(v[d]);
+    }
+    ret_in.push_back(horzcat(v)); 
+  }
 
   // Augmented state
   std::vector<MX> x0_aug, p_aug, z0_aug, rx0_aug, rp_aug, rz0_aug;
 
   // Inputs or forward/adjoint seeds in one direction
-  std::vector<MX> dd(INTEGRATOR_NUM_IN);
-  x0_aug.push_back(vec(dd[INTEGRATOR_X0] = MX::sym("x0", x())));
-  p_aug.push_back(vec(dd[INTEGRATOR_P] = MX::sym("p", p())));
-  z0_aug.push_back(vec(dd[INTEGRATOR_Z0] = MX::sym("r0", z())));
-  rx0_aug.push_back(vec(dd[INTEGRATOR_RX0] = MX::sym("rx0", rx())));
-  rp_aug.push_back(vec(dd[INTEGRATOR_RP] = MX::sym("rp", rp())));
-  rz0_aug.push_back(vec(dd[INTEGRATOR_RZ0] = MX::sym("rz0", rz())));
-  ret_in.insert(ret_in.end(), dd.begin(), dd.end());
-
-  // Nondifferentiated outputs not used by the derivative function
-  for (casadi_int i = 0; i < INTEGRATOR_NUM_OUT; ++i) {
-    ret_in.push_back(MX::sym(integrator_out(i) + "_dummy", Sparsity(size_out(i))));
-  }
+  x0_aug.push_back(vec(ret_in[INTEGRATOR_X0]));
+  p_aug.push_back(vec(ret_in[INTEGRATOR_P]));
+  z0_aug.push_back(vec(ret_in[INTEGRATOR_Z0]));
+  rx0_aug.push_back(vec(ret_in[INTEGRATOR_RX0]));
+  rp_aug.push_back(vec(ret_in[INTEGRATOR_RP]));
+  rz0_aug.push_back(vec(ret_in[INTEGRATOR_RZ0]));
 
   // Add adjoint seeds
-  dd.resize(INTEGRATOR_NUM_OUT);
-  std::fill(dd.begin(), dd.end(), MX());
-  for (casadi_int dir=0; dir<nadj; ++dir) {
-    // Suffix
-    std::string suff;
-    if (dir>=0) suff = "_" + str(dir);
-
-    // Augmented problem
-    rx0_aug.push_back(vec(dd[INTEGRATOR_XF] = MX::sym("xf" + suff, x())));
-    rp_aug.push_back(vec(dd[INTEGRATOR_QF] = MX::sym("qf" + suff, q())));
-    rz0_aug.push_back(vec(dd[INTEGRATOR_ZF] = MX::sym("zf" + suff, z())));
-    x0_aug.push_back(vec(dd[INTEGRATOR_RXF] = MX::sym("rxf" + suff, rx())));
-    p_aug.push_back(vec(dd[INTEGRATOR_RQF] = MX::sym("rqf" + suff, rq())));
-    z0_aug.push_back(vec(dd[INTEGRATOR_RZF] = MX::sym("rzf" + suff, rz())));
-    ret_in.insert(ret_in.end(), dd.begin(), dd.end());
+  for (casadi_int d=0; d<nadj; ++d) {
+    rx0_aug.push_back(vec(aug_in[INTEGRATOR_XF][d]));
+    rp_aug.push_back(vec(aug_in[INTEGRATOR_QF][d]));
+    rz0_aug.push_back(vec(aug_in[INTEGRATOR_ZF][d]));
+    x0_aug.push_back(vec(aug_in[INTEGRATOR_RXF][d]));
+    p_aug.push_back(vec(aug_in[INTEGRATOR_RQF][d]));
+    z0_aug.push_back(vec(aug_in[INTEGRATOR_RZF][d]));
   }
 
   // Call the integrator
@@ -1014,8 +1007,7 @@ get_reverse(casadi_int nadj, const std::string& name,
   ret_out.reserve(INTEGRATOR_NUM_IN*nadj);
 
   // Collect the adjoint sensitivities
-  dd.resize(INTEGRATOR_NUM_IN);
-  std::fill(dd.begin(), dd.end(), MX());
+  std::vector<MX> dd(INTEGRATOR_NUM_IN);
   for (casadi_int dir=0; dir<nadj; ++dir) {
     dd[INTEGRATOR_X0]  = reshape(rxf_aug.at(dir+1), x().size());
     dd[INTEGRATOR_P]   = reshape(rqf_aug.at(dir+1), p().size());
@@ -1026,17 +1018,8 @@ get_reverse(casadi_int nadj, const std::string& name,
     ret_out.insert(ret_out.end(), dd.begin(), dd.end());
   }
 
-  // Concatenate forward seeds
-  std::vector<MX> v(nadj);
-  auto r_it = ret_in.begin() + n_in_ + n_out_;
-  for (casadi_int i=0; i<n_out_; ++i) {
-    for (casadi_int d=0; d<nadj; ++d) v[d] = *(r_it + d*n_out_);
-    *r_it++ = horzcat(v);
-  }
-  ret_in.resize(n_in_ + n_out_ + n_out_);
-
   // Concatenate forward sensitivites
-  r_it = ret_out.begin();
+  auto r_it = ret_out.begin();
   for (casadi_int i=0; i<n_in_; ++i) {
     for (casadi_int d=0; d<nadj; ++d) v[d] = *(r_it + d*n_in_);
     *r_it++ = horzcat(v);
