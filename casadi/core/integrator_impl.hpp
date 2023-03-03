@@ -291,6 +291,12 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
       \identifier{1mg} */
   std::string serialize_base_function() const override { return "Integrator"; }
 
+  /// Helper function: Is an input repeated for each grid point?
+  static bool grid_in(casadi_int i);
+
+  /// Helper function: Is an output repeated for each grid point?
+  static bool grid_out(casadi_int i);
+
  protected:
   /** \brief Deserializing constructor
 

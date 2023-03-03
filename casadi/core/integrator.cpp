@@ -213,6 +213,28 @@ Sparsity Integrator::get_sparsity_out(casadi_int i) {
   return Sparsity();
 }
 
+bool Integrator::grid_in(casadi_int i) {
+  switch (static_cast<IntegratorInput>(i)) {
+    case INTEGRATOR_RX0:
+    case INTEGRATOR_RP:
+    case INTEGRATOR_RZ0:
+      return true;
+    default: break;
+  }
+  return false;
+}
+
+bool Integrator::grid_out(casadi_int i) {
+  switch (static_cast<IntegratorOutput>(i)) {
+    case INTEGRATOR_XF:
+    case INTEGRATOR_QF:
+    case INTEGRATOR_ZF:
+      return true;
+    default: break;
+  }
+  return false;
+}
+
 Function Integrator::create_advanced(const Dict& opts) {
   return Function::create(this, opts);
 }
@@ -837,31 +859,38 @@ get_forward(casadi_int nfwd, const std::string& name,
   // Call the augmented integrator
   std::vector<MX> integrator_in(INTEGRATOR_NUM_IN);
   for (casadi_int i = 0; i < INTEGRATOR_NUM_IN; ++i) {
-    for (MX& e : aug_in[i]) e = vec(e);
-    integrator_in[i] = horzcat(aug_in[i]);
-  }
-  std::vector<MX> integrator_out = aug_int(integrator_in);
-  for (auto&& e : integrator_out) {
-    // Workaround
-    if (e.size2()!=1+nfwd) e = reshape(e, -1, 1+nfwd);
-  }
-
-  // Augmented results
-  std::vector<casadi_int> offset = range(1+nfwd+1);
-  std::vector<std::vector<MX>> aug_out(INTEGRATOR_NUM_OUT);
-  for (casadi_int i = 0; i < INTEGRATOR_NUM_OUT; ++i) {
-    aug_out[i] = horzsplit(integrator_out[i], offset);
-    for (casadi_int d = 0; d <= nfwd; ++d) {
-      aug_out[i].at(d) = reshape(aug_out[i].at(d), size_out(i));
+    if (size1_in(i) > 0 && grid_in(i) && nfwd > 1 && nt() > 1) {
+      // Need to reorder columns
+      casadi_error("Not implemented");
+    } else {
+      // No reordering necessary
+      integrator_in[i] = horzcat(aug_in[i]);
     }
   }
+  std::vector<MX> integrator_out = aug_int(integrator_in);
 
   // Concatenate forward sensitivites
   std::vector<MX> ret_out;
   ret_out.reserve(INTEGRATOR_NUM_OUT);
-  for (casadi_int i=0; i<n_out_; ++i) {
-    for (casadi_int d=0; d<nfwd; ++d) v[d] = aug_out[i].at(d + 1);
-    ret_out.push_back(horzcat(v));
+  for (casadi_int i = 0; i < INTEGRATOR_NUM_OUT; ++i) {
+    // Split return by grid points and sensitivities
+    casadi_int n_grid = grid_out(i) ? nt() : 1;
+    std::vector<casadi_int> offset = {0};
+    for (casadi_int k = 0; k < n_grid; ++k) {
+      for (casadi_int d = 0; d <= nfwd; ++d) {
+        offset.push_back(offset.back() + size2_out(i) / n_grid);
+      }     
+    }
+    std::vector<MX> integrator_out_split = horzsplit(integrator_out[i], offset);
+    // Collect sensitivity blocks in the right order
+    std::vector<MX> ret_out_split;
+    ret_out_split.reserve(n_grid * nfwd);
+    for (casadi_int d = 0; d < nfwd; ++d) {
+      for (casadi_int k = 0; k < n_grid; ++k) {
+        ret_out_split.push_back(integrator_out_split.at((nfwd + 1) * k + d + 1));
+      }
+    }
+    ret_out.push_back(horzcat(ret_out_split));
   }
 
   // Create derivative function and return
