@@ -802,36 +802,44 @@ get_forward(casadi_int nfwd, const std::string& name,
   Function aug_int = integrator(aug_prefix + name_, plugin_name(),
     aug_dae, t0_, tout_, aug_opts);
 
-  // All inputs of the return function
-  std::vector<MX> ret_in;
-  ret_in.reserve(INTEGRATOR_NUM_IN*(1+nfwd) + INTEGRATOR_NUM_OUT);
-
-  // Augmented state
+  // Create symbolic expressions for augmented problem
   std::vector<std::vector<MX>> aug_in(INTEGRATOR_NUM_IN);
-
-  // Add nondifferentiated inputs and forward seeds
   for (casadi_int dir=-1; dir<nfwd; ++dir) {
-    // Suffix
-    std::string suff;
-    if (dir>=0) suff = "_" + str(dir);
-
+    // Suffix, if any
+    std::string suff = dir >= 0 ? "_" + str(dir) : "";
     // Augmented problem
     for (casadi_int i = 0; i < INTEGRATOR_NUM_IN; ++i) {
-      ret_in.push_back(MX::sym(integrator_in(i) + suff, sparsity_in(i)));
-      aug_in[i].push_back(vec(ret_in.back()));
-    }
-
-    // Nondifferentiated outputs not used by the derivative function
-    if (dir==-1) {
-      for (casadi_int i = 0; i < INTEGRATOR_NUM_OUT; ++i) {
-        ret_in.push_back(MX::sym(integrator_out(i) + "_dummy", Sparsity(size_out(i))));
-      }
+      aug_in[i].push_back(MX::sym(integrator_in(i) + suff, sparsity_in(i)));
     }
   }
 
-  // Call the integrator
+  // All inputs of the return function
+  std::vector<MX> ret_in;
+  ret_in.reserve(INTEGRATOR_NUM_IN + INTEGRATOR_NUM_OUT + INTEGRATOR_NUM_IN);
+
+  // Add nondifferentiated inputs to ret_in
+  for (casadi_int i = 0; i < INTEGRATOR_NUM_IN; ++i) {
+    ret_in.push_back(aug_in[i].front());
+  }
+
+  // Add nondifferentiated outputs (unused) to ret_in
+  for (casadi_int i = 0; i < INTEGRATOR_NUM_OUT; ++i) {
+    ret_in.push_back(MX::sym("out_" + integrator_out(i), Sparsity(size_out(i))));
+  }
+
+  // Add forward seeds to ret_in
+  std::vector<MX> v(nfwd);
+  for (casadi_int i = 0; i < INTEGRATOR_NUM_IN; ++i) {
+    for (casadi_int d=0; d<nfwd; ++d) v[d] = aug_in[i].at(d + 1);
+    ret_in.push_back(horzcat(v)); 
+  }
+
+  // Call the augmented integrator
   std::vector<MX> integrator_in(INTEGRATOR_NUM_IN);
-  for (casadi_int i = 0; i < INTEGRATOR_NUM_IN; ++i) integrator_in[i] = horzcat(aug_in[i]);
+  for (casadi_int i = 0; i < INTEGRATOR_NUM_IN; ++i) {
+    for (MX& e : aug_in[i]) e = vec(e);
+    integrator_in[i] = horzcat(aug_in[i]);
+  }
   std::vector<MX> integrator_out = aug_int(integrator_in);
   for (auto&& e : integrator_out) {
     // Workaround
@@ -847,15 +855,6 @@ get_forward(casadi_int nfwd, const std::string& name,
       aug_out[i].at(d) = reshape(aug_out[i].at(d), size_out(i));
     }
   }
-
-  // Concatenate forward seeds
-  std::vector<MX> v(nfwd);
-  auto r_it = ret_in.begin() + n_in_ + n_out_;
-  for (casadi_int i=0; i<n_in_; ++i) {
-    for (casadi_int d=0; d<nfwd; ++d) v[d] = *(r_it + d*n_in_);
-    *r_it++ = horzcat(v);
-  }
-  ret_in.resize(n_in_ + n_out_ + n_in_);
 
   // Concatenate forward sensitivites
   std::vector<MX> ret_out;
