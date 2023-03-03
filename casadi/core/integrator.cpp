@@ -807,7 +807,7 @@ get_forward(casadi_int nfwd, const std::string& name,
   ret_in.reserve(INTEGRATOR_NUM_IN*(1+nfwd) + INTEGRATOR_NUM_OUT);
 
   // Augmented state
-  std::vector<MX> x0_aug, p_aug, z0_aug, rx0_aug, rp_aug, rz0_aug;
+  std::vector<std::vector<MX>> aug_in(INTEGRATOR_NUM_IN);
 
   // Add nondifferentiated inputs and forward seeds
   for (casadi_int dir=-1; dir<nfwd; ++dir) {
@@ -816,14 +816,10 @@ get_forward(casadi_int nfwd, const std::string& name,
     if (dir>=0) suff = "_" + str(dir);
 
     // Augmented problem
-    std::vector<MX> din(INTEGRATOR_NUM_IN);
-    x0_aug.push_back(vec(din[INTEGRATOR_X0] = MX::sym("x0" + suff, x())));
-    p_aug.push_back(vec(din[INTEGRATOR_P] = MX::sym("p" + suff, p())));
-    z0_aug.push_back(vec(din[INTEGRATOR_Z0] = MX::sym("z0" + suff, z())));
-    rx0_aug.push_back(vec(din[INTEGRATOR_RX0] = MX::sym("rx0" + suff, rx())));
-    rp_aug.push_back(vec(din[INTEGRATOR_RP] = MX::sym("rp" + suff, rp())));
-    rz0_aug.push_back(vec(din[INTEGRATOR_RZ0] = MX::sym("rz0" + suff, rz())));
-    ret_in.insert(ret_in.end(), din.begin(), din.end());
+    for (casadi_int i = 0; i < INTEGRATOR_NUM_IN; ++i) {
+      ret_in.push_back(MX::sym(integrator_in(i) + suff, sparsity_in(i)));
+      aug_in[i].push_back(vec(ret_in.back()));
+    }
 
     // Nondifferentiated outputs not used by the derivative function
     if (dir==-1) {
@@ -835,12 +831,7 @@ get_forward(casadi_int nfwd, const std::string& name,
 
   // Call the integrator
   std::vector<MX> integrator_in(INTEGRATOR_NUM_IN);
-  integrator_in[INTEGRATOR_X0] = horzcat(x0_aug);
-  integrator_in[INTEGRATOR_P] = horzcat(p_aug);
-  integrator_in[INTEGRATOR_Z0] = horzcat(z0_aug);
-  integrator_in[INTEGRATOR_RX0] = horzcat(rx0_aug);
-  integrator_in[INTEGRATOR_RP] = horzcat(rp_aug);
-  integrator_in[INTEGRATOR_RZ0] = horzcat(rz0_aug);
+  for (casadi_int i = 0; i < INTEGRATOR_NUM_IN; ++i) integrator_in[i] = horzcat(aug_in[i]);
   std::vector<MX> integrator_out = aug_int(integrator_in);
   for (auto&& e : integrator_out) {
     // Workaround
@@ -849,27 +840,12 @@ get_forward(casadi_int nfwd, const std::string& name,
 
   // Augmented results
   std::vector<casadi_int> offset = range(1+nfwd+1);
-  std::vector<MX> xf_aug = horzsplit(integrator_out[INTEGRATOR_XF], offset);
-  std::vector<MX> qf_aug = horzsplit(integrator_out[INTEGRATOR_QF], offset);
-  std::vector<MX> zf_aug = horzsplit(integrator_out[INTEGRATOR_ZF], offset);
-  std::vector<MX> rxf_aug = horzsplit(integrator_out[INTEGRATOR_RXF], offset);
-  std::vector<MX> rqf_aug = horzsplit(integrator_out[INTEGRATOR_RQF], offset);
-  std::vector<MX> rzf_aug = horzsplit(integrator_out[INTEGRATOR_RZF], offset);
-
-  // All outputs of the return function
-  std::vector<MX> ret_out;
-  ret_out.reserve(INTEGRATOR_NUM_OUT*nfwd);
-
-  // Collect the forward sensitivities
-  std::vector<MX> dd(INTEGRATOR_NUM_IN);
-  for (casadi_int dir=0; dir<nfwd; ++dir) {
-    dd[INTEGRATOR_XF]  = reshape(xf_aug.at(dir+1), x().size());
-    dd[INTEGRATOR_QF]  = reshape(qf_aug.at(dir+1), q().size());
-    dd[INTEGRATOR_ZF]  = reshape(zf_aug.at(dir+1), z().size());
-    dd[INTEGRATOR_RXF] = reshape(rxf_aug.at(dir+1), rx().size());
-    dd[INTEGRATOR_RQF] = reshape(rqf_aug.at(dir+1), rq().size());
-    dd[INTEGRATOR_RZF] = reshape(rzf_aug.at(dir+1), rz().size());
-    ret_out.insert(ret_out.end(), dd.begin(), dd.end());
+  std::vector<std::vector<MX>> aug_out(INTEGRATOR_NUM_OUT);
+  for (casadi_int i = 0; i < INTEGRATOR_NUM_OUT; ++i) {
+    aug_out[i] = horzsplit(integrator_out[i], offset);
+    for (casadi_int d = 0; d <= nfwd; ++d) {
+      aug_out[i].at(d) = reshape(aug_out[i].at(d), size_out(i));
+    }
   }
 
   // Concatenate forward seeds
@@ -882,12 +858,12 @@ get_forward(casadi_int nfwd, const std::string& name,
   ret_in.resize(n_in_ + n_out_ + n_in_);
 
   // Concatenate forward sensitivites
-  r_it = ret_out.begin();
+  std::vector<MX> ret_out;
+  ret_out.reserve(INTEGRATOR_NUM_OUT);
   for (casadi_int i=0; i<n_out_; ++i) {
-    for (casadi_int d=0; d<nfwd; ++d) v[d] = *(r_it + d*n_out_);
-    *r_it++ = horzcat(v);
+    for (casadi_int d=0; d<nfwd; ++d) v[d] = aug_out[i].at(d + 1);
+    ret_out.push_back(horzcat(v));
   }
-  ret_out.resize(n_out_);
 
   // Create derivative function and return
   return Function(name, ret_in, ret_out, inames, onames, opts);
