@@ -569,44 +569,44 @@ add_feature_info(csparse-interface WITH_CSPARSE "Interface to the sparse direct 
 
 # BLASFEO
 option(WITH_BLASFEO "Compile the interface to BLASFEO" OFF)
-set(BUILD_BLASFEO_VERSION "edf92b396adddd9e548b9786f87ad290a0971329")
-set(BUILD_BLASFEO_GIT_REPO "https://github.com/giaf/blasfeo.git")
+set(BUILD_BLASFEO_VERSION "edf92b396adddd9e548b9786f87ad290a0971329" CACHE STRING "Tag/branch/hash to be used for BUILD_BLASFEO_GIT_REPO")
+set(BUILD_BLASFEO_GIT_REPO "https://github.com/giaf/blasfeo.git" CACHE STRING "Git repo used together with BUILD_BLASFEO_VERSION")
 option(WITH_BUILD_BLASFEO "Build BLASFEO (BUILD_BLASFEO_VERSION=${BUILD_BLASFEO_VERSION}) from downloaded source (BUILD_BLASFEO_GIT_REPO=${BUILD_BLASFEO_GIT_REPO})." OFF)
 
 # HPIPM
 option(WITH_HPIPM "Compile the interface to HPIPM" OFF)
-set(BUILD_HPIPM_VERSION "0e0c9f4e0d4081dceafa9b37c396db50bce0e81a")
-set(BUILD_HPIPM_GIT_REPO "https://github.com/jgillis/hpipm.git")
+set(BUILD_HPIPM_VERSION "0e0c9f4e0d4081dceafa9b37c396db50bce0e81a" CACHE STRING "Tag/branch/hash to be used for BUILD_HPIPM_GIT_REPO")
+set(BUILD_HPIPM_GIT_REPO "https://github.com/jgillis/hpipm.git" CACHE STRING "Git repo used together with BUILD_HPIPM_VERSION")
 option(WITH_BUILD_HPIPM "Build HPIPM (BUILD_HPIPM_VERSION=${BUILD_HPIPM_VERSION}) from downloaded source (BUILD_HPIPM_GIT_REPO=${BUILD_HPIPM_GIT_REPO})." OFF)
 set(BUILD_HPIPM_DEPENDENCIES BLASFEO)
 
 # SuperSCS: An conic solver
 option(WITH_SUPERSCS "Compile the interface to SuperSCS (the source code for SuperSCS is included)" ${WITH_SUPERSCS_DEF})
-set(BUILD_SUPERSCS_VERSION "4d2d1bd03ed4cf93e684a880b233760ce34ca69c")
-set(BUILD_SUPERSCS_GIT_REPO "https://github.com/jgillis/scs.git")
+set(BUILD_SUPERSCS_VERSION "4d2d1bd03ed4cf93e684a880b233760ce34ca69c" CACHE STRING "Tag/branch/hash to be used for BUILD_SUPERSCS_GIT_REPO")
+set(BUILD_SUPERSCS_GIT_REPO "https://github.com/jgillis/scs.git" CACHE STRING "Git repo used together with BUILD_SUPERSCS_VERSION")
 option(WITH_BUILD_SUPERSCS "Build SuperSCS (BUILD_SUPERSCS_VERSION=${BUILD_SUPERSCS_VERSION}) from downloaded source (BUILD_SUPERSCS_GIT_REPO=${BUILD_SUPERSCS_GIT_REPO})." OFF)
 add_feature_info(superscs-interface WITH_SUPERSCS "Interface to Conic solver SuperSCS.")
 
 # OSQP: An operator-splitting QP solver
 option(WITH_OSQP "Compile the interface to OSQP" OFF)
-set(BUILD_OSQP_VERSION "v0.6.2")
-set(BUILD_OSQP_GIT_REPO "https://github.com/osqp/osqp.git")
+set(BUILD_OSQP_VERSION "v0.6.2" CACHE STRING "Tag/branch/hash to be used for BUILD_OSQP_GIT_REPO")
+set(BUILD_OSQP_GIT_REPO "https://github.com/osqp/osqp.git" CACHE STRING "Git repo used together with BUILD_OSQP_VERSION")
 option(WITH_BUILD_OSQP "Build OSQP (BUILD_OSQP_VERSION=${BUILD_OSQP_VERSION}) from downloaded source (BUILD_OSQP_GIT_REPO=${BUILD_OSQP_GIT_REPO})." OFF)
 add_feature_info(osqp-interface WITH_OSQP "Interface to QP solver OSQP.")
 
-set(BUILD_EIGEN3_VERSION "3.4.0")
-set(BUILD_EIGEN3_GIT_REPO "https://gitlab.com/libeigen/eigen.git")
+set(BUILD_EIGEN3_VERSION "3.4.0" CACHE STRING "Tag/branch/hash to be used for BUILD_EIGEN3_GIT_REPO")
+set(BUILD_EIGEN3_GIT_REPO "https://gitlab.com/libeigen/eigen.git" CACHE STRING "Git repo used together with BUILD_EIGEN3_VERSION")
 option(WITH_BUILD_EIGEN3 "Build Eigen (BUILD_EIGEN3_VERSION=${BUILD_EIGEN3_VERSION}) from downloaded source (BUILD_EIGEN3_GIT_REPO=${BUILD_EIGEN3_GIT_REPO})." OFF)
 
-set(BUILD_SIMDE_VERSION "v0.7.2")
-set(BUILD_SIMDE_GIT_REPO "https://github.com/simd-everywhere/simde.git")
+set(BUILD_SIMDE_VERSION "v0.7.2" CACHE STRING "Tag/branch/hash to be used for BUILD_SIMDE_GIT_REPO")
+set(BUILD_SIMDE_GIT_REPO "https://github.com/simd-everywhere/simde.git" CACHE STRING "Git repo used together with BUILD_BLASFEO_VERSION")
 option(WITH_BUILD_SIMDE "Build Simde (BUILD_SIMDE_VERSION=${BUILD_SIMDE_VERSION}) from downloaded source (BUILD_SIMDE_GIT_REPO=${BUILD_SIMDE_GIT_REPO})." OFF)
 
 
 # PROXQP: A QP solver based on proximal methods
 option(WITH_PROXQP "Compile the interface to PROXQP" OFF)
-set(BUILD_PROXQP_VERSION "v0.3.2")
-set(BUILD_PROXQP_GIT_REPO "https://github.com/Simple-Robotics/proxsuite.git")
+set(BUILD_PROXQP_VERSION "v0.3.2" CACHE STRING "Tag/branch/hash to be used for BUILD_PROXQP_GIT_REPO")
+set(BUILD_PROXQP_GIT_REPO "https://github.com/Simple-Robotics/proxsuite.git" CACHE STRING "Git repo used together with BUILD_PROXQP_VERSION")
 option(WITH_BUILD_PROXQP "Build PROXQP (BUILD_PROXQP_VERSION=${BUILD_PROXQP_VERSION}) from downloaded source (BUILD_PROXQP_GIT_REPO=${BUILD_PROXQP_GIT_REPO})." OFF)
 set(BUILD_PROXQP_DEPENDENCIES EIGEN3 SIMDE)
 
@@ -652,10 +652,8 @@ add_feature_info(clang-interface WITH_CLANG "Interface to the Clang JIT compiler
 # Lapack: Dense linear solvers
 option(WITH_LAPACK "Compile the interface to LAPACK" ${WITH_LAPACK_DEF})
 option(WITH_BUILD_LAPACK "Download and install OpenBLAS for LAPACK+BLAS" OFF)
-set(BUILD_LAPACK_GIT_REPO https://github.com/jgillis/OpenBLAS.git)
-set(BUILD_LAPACK_VERSION ee15f53c9ef7148b05e1b2ff80003df1685f0f10)
-set(BUILD_LAPACK_GIT_REPO https://github.com/xianyi/OpenBLAS.git)
-set(BUILD_LAPACK_VERSION v0.3.21)
+set(BUILD_LAPACK_GIT_REPO https://github.com/xianyi/OpenBLAS.git  CACHE STRING "Git repo used together with BUILD_LAPACK_VERSION")
+set(BUILD_LAPACK_VERSION v0.3.21 CACHE STRING "Tag/branch/hash to be used for BUILD_LAPACK_GIT_REPO")
 
 # qpOASES: An active-set QP solver
 option(WITH_QPOASES "Compile the interface to qpOASES (the source code for qpOASES is included)" ${WITH_QPOASES_DEF})
@@ -680,15 +678,15 @@ add_feature_info(blocksqp-interface WITH_BLOCKSQP "Interface to the NLP solver b
 
 # IPOPT: A sparse interior point NLP solver with filter line-search
 option(WITH_IPOPT "Compile the interface to IPOPT" ${WITH_IPOPT_DEF})
-set(BUILD_IPOPT_GIT_REPO "https://github.com/jgillis/Ipopt-1.git")
-set(BUILD_IPOPT_VERSION "3.14.11.mod")
+set(BUILD_IPOPT_GIT_REPO "https://github.com/jgillis/Ipopt-1.git" CACHE STRING "Git repo used together with BUILD_IPOPT_VERSION")
+set(BUILD_IPOPT_VERSION "3.14.11.mod" CACHE STRING "Tag/branch/hash to be used for BUILD_IPOPT_GIT_REPO")
 option(WITH_BUILD_IPOPT "Build IPOPT (BUILD_IPOPT_VERSION=${BUILD_IPOPT_VERSION}) from downloaded source (BUILD_IPOPT_GIT_REPO=${BUILD_IPOPT_GIT_REPO})." OFF)
 set(BUILD_IPOPT_DEPENDENCIES MUMPS)
 
 
 option(WITH_MOCKUP_REQUIRED ON)
-set(BUILD_MOCKUPS_GIT_REPO https://github.com/casadi/mockups.git)
-set(BUILD_MOCKUPS_VERSION v53)
+set(BUILD_MOCKUPS_GIT_REPO https://github.com/casadi/mockups.git CACHE STRING "Git repo used together with BUILD_MOCKUPS_VERSION")
+set(BUILD_MOCKUPS_VERSION v53 CACHE STRING "Tag/branch/hash to be used for BUILD_MOCKUPS_GIT_REPO")
 
 # Knitro: An NLP solver
 option(WITH_KNITRO "Compile the interface to KNITRO" OFF)
@@ -710,46 +708,46 @@ option(WITH_MOCKUP_GUROBI "Use mockup GUROBI (BUILD_MOCKUPS_VERSION=${BUILD_MOCK
 
 # Bonmin: An MINLP solver
 option(WITH_BONMIN "Compile the interface to BONMIN" OFF)
-set(BUILD_BONMIN_GIT_REPO https://github.com/coin-or/Bonmin.git)
-set(BUILD_BONMIN_VERSION "releases/1.8.8")
+set(BUILD_BONMIN_GIT_REPO https://github.com/coin-or/Bonmin.git CACHE STRING "Git repo used together with BUILD_BONMIN_VERSION")
+set(BUILD_BONMIN_VERSION "releases/1.8.8" CACHE STRING "Tag/branch/hash to be used for BUILD_BONMIN_GIT_REPO")
 option(WITH_BUILD_BONMIN "Build BONMIN (BUILD_BONMIN_VERSION=${BUILD_BONMIN_VERSION}) from downloaded source (BUILD_BONMIN_GIT_REPO=${BUILD_BONMIN_GIT_REPO})." OFF)
 set(BUILD_BONMIN_DEPENDENCIES IPOPT CBC)
 
 # CBC: A sparse mixed-integer linear solver
 option(WITH_CBC "Compile the CBC interface" OFF)
-set(BUILD_CBC_VERSION "releases/2.10.6")
-set(BUILD_CBC_GIT_REPO "https://github.com/coin-or/Cbc.git")
+set(BUILD_CBC_VERSION "releases/2.10.6" CACHE STRING "Tag/branch/hash to be used for BUILD_CBC_GIT_REPO")
+set(BUILD_CBC_GIT_REPO "https://github.com/coin-or/Cbc.git" CACHE STRING "Git repo used together with BUILD_CBC_VERSION")
 
 option(WITH_BUILD_CBC "Build CBC (BUILD_CBC_VERSION=${BUILD_CBC_VERSION}) from downloaded source." OFF)
 set(BUILD_CBC_DEPENDENCIES CLP)
 
 # CLP: A sparse linear solver
 option(WITH_CLP "Compile the CLP interface" OFF)
-set(BUILD_CLP_VERSION "releases/1.17.7")
-set(BUILD_CLP_GIT_REPO "https://github.com/coin-or/Clp.git")
-set(BUILD_COINUTILS_VERSION "releases/2.11.6")
-set(BUILD_COINUTILS_GIT_REPO "https://github.com/coin-or/CoinUtils.git")
-set(BUILD_CGL_VERSION "releases/0.60.4")
-set(BUILD_CGL_GIT_REPO "https://github.com/coin-or/Cgl.git")
-set(BUILD_OSI_VERSION "releases/0.108.7")
-set(BUILD_OSI_GIT_REPO "https://github.com/coin-or/Osi.git")
+set(BUILD_CLP_VERSION "releases/1.17.7" CACHE STRING "Tag/branch/hash to be used for BUILD_CLP_GIT_REPO")
+set(BUILD_CLP_GIT_REPO "https://github.com/coin-or/Clp.git" CACHE STRING "Git repo used together with BUILD_CLP_VERSION")
+set(BUILD_COINUTILS_VERSION "releases/2.11.6" CACHE STRING "Tag/branch/hash to be used for BUILD_COINUTILS_GIT_REPO")
+set(BUILD_COINUTILS_GIT_REPO "https://github.com/coin-or/CoinUtils.git" CACHE STRING "Git repo used together with BUILD_COINUTILS_VERSION")
+set(BUILD_CGL_VERSION "releases/0.60.4" CACHE STRING "Tag/branch/hash to be used for BUILD_CGL_GIT_REPO")
+set(BUILD_CGL_GIT_REPO "https://github.com/coin-or/Cgl.git" CACHE STRING "Git repo used together with BUILD_CGL_VERSION")
+set(BUILD_OSI_VERSION "releases/0.108.7" CACHE STRING "Tag/branch/hash to be used for BUILD_OSI_GIT_REPO")
+set(BUILD_OSI_GIT_REPO "https://github.com/coin-or/Osi.git" CACHE STRING "Git repo used together with BUILD_OSI_VERSION")
 
 option(WITH_BUILD_CLP "Build CLP (BUILD_CLP_VERSION=${BUILD_CLP_VERSION}) from downloaded source (BUILD_CLP_GIT_REPO=${BUILD_CLP_GIT_REPO})." OFF)
 set(BUILD_CLP_DEPENDENCIES MUMPS LAPACK)
 
 # MUMPS: Sparse direct linear solver
 option(WITH_MUMPS "Enable MUMPS interface" OFF)
-set(BUILD_MUMPS_TP_VERSION "releases/3.0.2")
-set(BUILD_METIS_TP_VERSION "releases/2.0.0")
-set(BUILD_METIS_TP_GIT_REPO "https://github.com/coin-or-tools/ThirdParty-Metis.git")
-set(BUILD_MUMPS_TP_GIT_REPO "https://github.com/coin-or-tools/ThirdParty-Mumps.git")
+set(BUILD_MUMPS_TP_VERSION "releases/3.0.2" CACHE STRING "Tag/branch/hash to be used for BUILD_MUMPS_TP_GIT_REPO")
+set(BUILD_METIS_TP_VERSION "releases/2.0.0" CACHE STRING "Tag/branch/hash to be used for BUILD_BETIS_TP_GIT_REPO")
+set(BUILD_METIS_TP_GIT_REPO "https://github.com/coin-or-tools/ThirdParty-Metis.git" CACHE STRING "Git repo used together with BUILD_METIS_TP_VERSION")
+set(BUILD_MUMPS_TP_GIT_REPO "https://github.com/coin-or-tools/ThirdParty-Mumps.git" CACHE STRING "Git repo used together with BUILD_MUMPS_TP_VERSION")
 option(WITH_BUILD_MUMPS "Build MUMPS (BUILD_MUMPS_TP_VERSION=${BUILD_MUMPS_TP_VERSION}) from downloaded source (BUILD_MUMPS_TP_GIT_REPO=${BUILD_MUMPS_TP_GIT_REPO})." OFF)
 set(BUILD_MUMPS_DEPENDENCIES LAPACK)
 
 # SPRAL
 option(WITH_SPRAL "Enable SPRAL interface" OFF)
-set(BUILD_SPRAL_VERSION "d385d2c9e858366d257cafaaf05760ffa6543e26")
-set(BUILD_SPRAL_GIT_REPO "https://github.com/ralna/spral.git")
+set(BUILD_SPRAL_VERSION "d385d2c9e858366d257cafaaf05760ffa6543e26" CACHE STRING "Tag/branch/hash to be used for BUILD_SPRAL_GIT_REPO")
+set(BUILD_SPRAL_GIT_REPO "https://github.com/ralna/spral.git" CACHE STRING "Git repo used together with BUILD_SPRAL_VERSION")
 option(WITH_BUILD_SPRAL "Build SPRAL (BUILD_SPRAL_VERSION=${BUILD_SPRAL_VERSION}) from downloaded source (BUILD_SPRAL_GIT_REPO=${BUILD_SPRAL_GIT_REPO})." OFF)
 set(BUILD_SPRAL_DEPENDENCIES LAPACK)
 
@@ -759,8 +757,8 @@ option(WITH_MOCKUP_HSL "Use mockup WORHP (BUILD_MOCKUPS_VERSION=${BUILD_MOCKUPS_
 
 # HIGHS: A MILP / QP solver
 option(WITH_HIGHS "Compile the HiGHS interface" OFF)
-set(BUILD_HIGHS_GIT_REPO "https://github.com/ERGO-Code/HiGHS")
-set(BUILD_HIGHS_VERSION "v1.4.1")
+set(BUILD_HIGHS_GIT_REPO "https://github.com/ERGO-Code/HiGHS" CACHE STRING "Git repo used together with BUILD_HIGHS_VERSION")
+set(BUILD_HIGHS_VERSION "v1.4.1" CACHE STRING "Tag/branch/hash to be used for BUILD_HIGHS_GIT_REPO")
 option(WITH_BUILD_HIGHS "Build HiGHS (BUILD_HIGHS_VERSION=${BUILD_HIGHS_VERSION}) from downloaded source (BUILD_HIGHS_GIT_REPO=${BUILD_HIGHS_GIT_REPO})." OFF)
 
 
