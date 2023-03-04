@@ -52,10 +52,10 @@ namespace casadi {
   }
 
   GurobiInterface::~GurobiInterface() {
+    clear_mem();
     #ifdef GUROBI_ADAPTOR
       gurobi_adaptor_unload();
     #endif
-    clear_mem();
   }
 
   const Options GurobiInterface::options_

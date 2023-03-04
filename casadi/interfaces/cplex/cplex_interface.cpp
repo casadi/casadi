@@ -708,10 +708,10 @@ namespace casadi {
   }
 
   CplexInterface::~CplexInterface() {
+    clear_mem();
     #ifdef CPLEX_ADAPTOR
       cplex_adaptor_unload();
     #endif
-    clear_mem();
   }
 
   Dict CplexInterface::get_stats(void* mem) const {
