@@ -2333,10 +2333,10 @@ class MXtests(casadiTestCase):
   def test_expand_free(self):
     x = MX.sym("x")
     y = MX.sym("y")
-    f = Function('f',[x],[x+y])
     with self.assertInException("free"):
-      f.expand()
+      f = Function('f',[x],[x+y])
 
+    f = Function('f',[x],[x+y],{"allow_free": True})
     g = Function('g',[x,y],[f(x)])
     ge = g.expand()
     self.checkfunction(g,g,inputs=[1,2])

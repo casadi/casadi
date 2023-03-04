@@ -1990,7 +1990,7 @@ class Functiontests(casadiTestCase):
       x = SX.sym("x")
       p = SX.sym("p")
 
-      f = Function('f',[x],[p])
+      f = Function('f',[x],[p], {"allow_free":True})
 
       #SXFunction with free parameters
       pickle.loads(pickle.dumps(f))
@@ -2041,7 +2041,7 @@ class Functiontests(casadiTestCase):
     f = Function('f',[x],[],["x"],[])
     self.assertTrue("(x)->()" in str(f))
 
-    f = Function('f',[],[x],[],["y"])
+    f = Function('f',[],[x],[],["y"], {"allow_free": True})
     self.assertTrue("()->(y)" in str(f))
 
     f = Function('f',[x],[x**2],["x"],["y"])
@@ -2440,7 +2440,7 @@ class Functiontests(casadiTestCase):
   def test_map_exception(self):
     x = MX.sym("x",4)
     y = MX.sym("y",4)
-    f = Function("f",[x],[x+y])
+    f = Function("f",[x],[x+y],{"allow_free":True})
 
     if "CASADI_WITH_THREAD" in CasadiMeta.compiler_flags():
       message = "Evaluation failed"
@@ -2783,8 +2783,8 @@ class Functiontests(casadiTestCase):
         self.assertFalse(w.is_zero())
         res = cse(w)
         self.assertTrue(res.is_zero())
-        f1 = Function('f',[x,y],[w],{"cse":False})
-        f2 = Function('f',[x,y],[w],{"cse":True})
+        f1 = Function('f',[x,y,p],[w],{"cse":False})
+        f2 = Function('f',[x,y,p],[w],{"cse":True})
         self.assertTrue(f1.n_instructions()>3)
         self.assertTrue(f2.n_instructions()<=3)
 

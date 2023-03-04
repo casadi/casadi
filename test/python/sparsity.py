@@ -473,7 +473,7 @@ class Sparsitytests(casadiTestCase):
 
     p = SX.sym("p")
 
-    g = Function('g', [X,p],[vertcat(*[X*p,P])], {'verbose':True})
+    g = Function('g', [X,P,p],[vertcat(*[X*p,P])], {'verbose':True})
 
     J = jacobian_old(g, 0, 0)
 

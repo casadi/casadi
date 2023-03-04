@@ -875,6 +875,7 @@ namespace casadi {
                  const Dict& opts) const {
     try {
       Dict tmp_options = generate_options("tmp");
+      tmp_options["allow_free"] = true;
       // Temporary single-input, single-output function FIXME(@jaeandersson)
       Function tmp("flattened_" + name, {veccat(in_)}, {veccat(out_)}, tmp_options);
 
@@ -908,13 +909,10 @@ namespace casadi {
       }
 
       Dict options = opts;
-      if (opts.find("is_diff_in")==opts.end())
-        options["is_diff_in"] = join(is_diff_in_, is_diff_out_);
-      if (opts.find("is_diff_out")==opts.end())
-        options["is_diff_out"] = is_diff_out_;
+      options["allow_free"] = true;
 
       // Assemble function and return
-      return Function(name, ret_in, ret_out, inames, onames, opts);
+      return Function(name, ret_in, ret_out, inames, onames, options);
     } catch (std::exception& e) {
       CASADI_THROW_ERROR("get_jacobian", e.what());
     }
@@ -1183,7 +1181,8 @@ namespace casadi {
 
   template<typename MatType>
   Sparsity _jacobian_sparsity(const MatType &expr, const MatType &var) {
-    Function f = Function("tmp_jacobian_sparsity", {var}, {expr});
+    Dict opts{{"max_io", 0}, {"allow_free", true}};
+    Function f = Function("tmp_jacobian_sparsity", {var}, {expr}, opts);
     return f.jac_sparsity(0, 0, false);
   }
 
@@ -1206,7 +1205,8 @@ namespace casadi {
       e = jtimes(e, var, v);
     }
 
-    Function f = Function("tmp_which_depends", {var}, {e});
+    Dict opts{{"max_io", 0}, {"allow_free", true}};
+    Function f = Function("tmp_which_depends", {var}, {e}, opts);
     // Propagate sparsities backwards seeding all outputs
     std::vector<bvec_t> seed(tr? f.nnz_in(0) : f.nnz_out(0), 1);
     std::vector<bvec_t> sens(tr? f.nnz_out(0) : f.nnz_in(0), 0);
