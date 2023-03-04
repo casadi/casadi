@@ -1175,8 +1175,8 @@ class MXtests(casadiTestCase):
     
     self.check_codegen(f,inputs=[vertcat(-200, 200, -100, 100, 0)])
 
-    x = MX.sym('x', 5)
-    y = MX.sym('y', 5)
+    x = MX.sym('x', 8)
+    y = MX.sym('y', 8)
     
     z = logic_and(x,y)
     z2 = logic_or(x,y)
