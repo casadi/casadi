@@ -32,21 +32,21 @@ extern "C" {
 
 #ifndef CASADI_CASADI_HPP
 
-// Used to manage symbol visibility
+/* Used to manage symbol visibility */
 #ifndef CASADI_EXPORT
 #define CASADI_EXPORT
-#endif // CASADI_EXPORT
+#endif /* CASADI_EXPORT */
 
-// Integer type
+/* Integer type */
 #ifndef casadi_int
 #define casadi_int long long int
-#endif // casadi_int
+#endif /* casadi_int */
 
-#endif // CASADI_CASADI_HPP
+#endif /* CASADI_CASADI_HPP */
 
-// ==================================
-//   Managing CasADi Functions
-// ==================================
+/* ==================================
+*   Managing CasADi Functions
+*  ================================== */
 
 /** \brief Read from a serialized CasADi file
  * 
@@ -90,9 +90,9 @@ CASADI_EXPORT int casadi_c_int_width();
 /** \brief Get width of real type double */
 CASADI_EXPORT int casadi_c_real_width();
 
-// ===================================================
-//   Codegen-like API for evaluating CasADi Functions
-// ===================================================
+/* ===================================================
+*   Codegen-like API for evaluating CasADi Functions
+*  =================================================== */
 
 
 CASADI_EXPORT void casadi_c_incref(void);
@@ -133,4 +133,4 @@ CASADI_EXPORT int casadi_c_eval_id(int id, const double** arg, double** res,
 }
 #endif
 
-#endif // CASADI_C_H
+#endif /* CASADI_C_H */
