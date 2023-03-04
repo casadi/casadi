@@ -1165,6 +1165,27 @@ class MXtests(casadiTestCase):
         T2 = t2!=0
         f_out = f([t1,t2])
         self.checkarray(f_out,DM([T1 and T2,T1 or T2,not T1]),"bool(%d,%d): %s" % (t1,t2,str(f_out)))
+  
+  def test_short_circuiting_codegen(self):
+    x = MX.sym('x', 5)
+
+    y = if_else(x > 0, 0, x)
+
+    f = Function('f', [x], [y], ['x'], ['y'])
+    
+    self.check_codegen(f,inputs=[vertcat(-200, 200, -100, 100, 0)])
+
+    x = MX.sym('x', 5)
+    y = MX.sym('y', 5)
+    
+    z = logic_and(x,y)
+    z2 = logic_or(x,y)
+
+    f = Function('f', [x,y], [z,z2])
+    
+    self.check_codegen(f,inputs=[vertcat(0, 1, 0, 1, 0, 1, 0, 1),vertcat(0, 0, 1, 1, 0, 0, 1, 1)])
+
+
 
   def test_MXineq(self):
     self.message("SX ineq")
