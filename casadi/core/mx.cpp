@@ -1002,7 +1002,7 @@ namespace casadi {
     }
 
     if (x.empty()) {
-      return MX();
+      return MX(1, 0);
     } else if (x.size()==1) {
       return x.front();
     } else if (has_empty(x)) {
@@ -1028,7 +1028,7 @@ namespace casadi {
 
   MX MX::diagcat(const std::vector<MX>& x) {
     if (x.empty()) {
-      return MX();
+      return MX(0, 0);
     } else if (x.size()==1) {
       return x.front();
     } else if (has_empty(x)) {
@@ -1063,7 +1063,7 @@ namespace casadi {
     }
 
     if (x.empty()) {
-      return MX();
+      return MX(0, 1);
     } else if (x.size()==1) {
       return x.front();
     } else if (has_empty(x)) {

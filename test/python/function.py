@@ -2450,7 +2450,32 @@ class Functiontests(casadiTestCase):
     with self.assertInException(message):
       F = f.map(4,"thread",2)
       F(3)
-
+      
+  def test_DM_arg(self):
+    f = Function('f',[DM(0,1)],[])
+    print(f)
+    f = Function('f',[DM(0,1),SX.sym("x")],[])
+    print(f)
+    f = Function('f',[DM(0,1),MX.sym("x")],[])
+    print(f)
+    self.assertTrue(isinstance(vertcat(),DM))
+    self.assertEqual(vertcat().shape,(0,1))
+    self.assertTrue(isinstance(horzcat(),DM))
+    self.assertEqual(horzcat().shape,(1,0))
+    self.assertTrue(isinstance(veccat(),DM))
+    self.assertEqual(veccat().shape,(0,1))
+    self.assertTrue(isinstance(diagcat(),DM))
+    self.assertEqual(diagcat().shape,(0,0))
+    self.assertTrue(isinstance(vcat([]),DM))
+    self.assertEqual(vcat([]).shape,(0,1))
+    self.assertTrue(isinstance(hcat([]),DM))
+    self.assertEqual(hcat([]).shape,(1,0))
+    self.assertTrue(isinstance(vvcat([]),DM))
+    self.assertEqual(vvcat([]).shape,(0,1))
+    self.assertTrue(isinstance(dcat([]),DM))
+    self.assertEqual(dcat([]).shape,(0,0))
+    
+    
   def test_nondiff(self):
 
     for X in [SX,MX]:

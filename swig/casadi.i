@@ -2497,14 +2497,62 @@ arccosh = lambda x: _casadi.acosh(x)
 %rename(_horzcat) casadi_horzcat;
 %rename(_diagcat) casadi_diagcat;
 %pythoncode %{
-def veccat(*args): return _veccat(args)
-def vertcat(*args): return _vertcat(args)
-def horzcat(*args): return _horzcat(args)
-def diagcat(*args): return _diagcat(args)
-def vvcat(args): return _veccat(args)
-def vcat(args): return _vertcat(args)
-def hcat(args): return _horzcat(args)
-def dcat(args): return _diagcat(args)
+def veccat(*args):
+    try:
+        if len(args)==0:
+            return DM(0,1)
+    except:
+        pass
+    return _veccat(args)
+def vertcat(*args):
+    try:
+        if len(args)==0:
+            return DM(0,1)
+    except:
+        pass
+    return _vertcat(args)
+def horzcat(*args):
+    try:
+        if len(args)==0:
+            return DM(1,0)
+    except:
+        pass
+    return _horzcat(args)
+def diagcat(*args):
+    try:
+        if len(args)==0:
+            return DM(0,0)
+    except:
+        pass
+    return _diagcat(args)
+def vvcat(args):
+    try:
+        if len(args)==0:
+            return DM(0,1)
+    except:
+        pass
+    return _veccat(args)
+def vcat(args):
+    try:
+        if len(args)==0:
+            return DM(0,1)
+    except:
+        pass
+    return _vertcat(args)
+def hcat(args):
+    try:
+        if len(args)==0:
+            return DM(1,0)
+    except:
+        pass
+    return _horzcat(args)
+def dcat(args):
+    try:
+        if len(args)==0:
+            return DM(0,0)
+    except:
+        pass
+    return _diagcat(args)
 %}
 
 // Non-fatal errors (returning NotImplemented singleton)
