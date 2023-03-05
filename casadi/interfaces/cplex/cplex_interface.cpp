@@ -52,6 +52,11 @@ namespace casadi {
   CplexInterface::CplexInterface(const std::string& name,
                                  const std::map<std::string, Sparsity>& st)
     : Conic(name, st) {
+    #ifdef CPLEX_ADAPTOR
+      char buffer[200];
+      int ret = cplex_adaptor_load(buffer, sizeof(buffer));
+      casadi_assert(ret==0, "Failed to load CPLEX adaptor: " + std::string(buffer) + ".");
+    #endif
   }
 
   const Options CplexInterface::options_
@@ -140,12 +145,6 @@ namespace casadi {
         sos_types = op.second.to_int_vector();
       }
     }
-
-    #ifdef CPLEX_ADAPTOR
-      char buffer[200];
-      int ret = cplex_adaptor_load(buffer, sizeof(buffer));
-      casadi_assert(ret==0, "Failed to load CPLEX adaptor: " + std::string(buffer) + ".");
-    #endif
 
     // Validaty SOS constraints
     check_sos(nx_, sos_groups, sos_weights, sos_types);
@@ -759,6 +758,11 @@ namespace casadi {
   }
 
   CplexInterface::CplexInterface(DeserializingStream& s) : Conic(s) {
+    #ifdef CPLEX_ADAPTOR
+      char buffer[200];
+      int ret = cplex_adaptor_load(buffer, sizeof(buffer));
+      casadi_assert(ret==0, "Failed to load CPLEX adaptor: " + std::string(buffer) + ".");
+    #endif
     s.version("CplexInterface", 1);
     s.unpack("CplexInterface::opts", opts_);
     s.unpack("CplexInterface::qp_method", qp_method_);
