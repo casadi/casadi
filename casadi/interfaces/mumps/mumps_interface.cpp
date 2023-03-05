@@ -201,4 +201,17 @@ namespace casadi {
     }
   }
 
+  MumpsInterface::MumpsInterface(DeserializingStream& s) : LinsolInternal(s) {
+    s.version("Mumps", 1);
+    s.unpack("MumpsInterface::symmetric", symmetric_);
+    s.unpack("MumpsInterface::posdef", posdef_);
+  }
+
+  void MumpsInterface::serialize_body(SerializingStream &s) const {
+    LinsolInternal::serialize_body(s);
+    s.version("Mumps", 1);
+    s.pack("MumpsInterface::symmetric", symmetric_);
+    s.pack("MumpsInterface::posdef", posdef_);
+  }
+
 } // namespace casadi

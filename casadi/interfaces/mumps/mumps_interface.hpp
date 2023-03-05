@@ -113,6 +113,9 @@ namespace casadi {
     // Get name of the class
     std::string class_name() const override { return "MumpsInterface";}
 
+    /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream &s) const override;
+
     /** \brief Deserialize with type disambiguation */
     static ProtoFunction* deserialize(DeserializingStream& s) { return new MumpsInterface(s); }
 
@@ -123,7 +126,7 @@ namespace casadi {
 
   protected:
     /** \brief Deserializing constructor */
-    explicit MumpsInterface(DeserializingStream& s) : LinsolInternal(s) {}
+    explicit MumpsInterface(DeserializingStream& s);
   };
 
 } // namespace casadi
