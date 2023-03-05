@@ -254,7 +254,7 @@ namespace casadi {
   }
 
   void SundialsInterface::reset(IntegratorMemory* mem, double t, const double* x,
-                                const double* z, const double* p) const {
+      const double* z, const double* p) const {
     auto m = static_cast<SundialsMemory*>(mem);
 
     // Update time
@@ -265,14 +265,14 @@ namespace casadi {
 
     // Set the state
     casadi_copy(x, nx_, NV_DATA_S(m->xz));
-    casadi_copy(z, nz_, NV_DATA_S(m->xz)+nx_);
+    casadi_copy(z, nz_, NV_DATA_S(m->xz) + nx_);
 
     // Reset summation states
     N_VConst(0., m->q);
   }
 
-  void SundialsInterface::resetB(IntegratorMemory* mem, double t, const double* rx,
-                                 const double* rz, const double* rp) const {
+  void SundialsInterface::resetB(IntegratorMemory* mem, double t,
+      const double* rx, const double* rz, const double* rp) const {
     auto m = static_cast<SundialsMemory*>(mem);
 
     // Update time
@@ -281,11 +281,24 @@ namespace casadi {
     // Set parameters
     casadi_copy(rp, nrp_, m->rp);
 
-    // Get the backward state
+    // Set the backward state
     casadi_copy(rx, nrx_, NV_DATA_S(m->rxz));
+    casadi_copy(rz, nrz_, NV_DATA_S(m->rxz) + nrx_);
 
     // Reset summation states
     N_VConst(0., m->rq);
+  }
+
+  void SundialsInterface::impulseB(IntegratorMemory* mem,
+      const double* rx, const double* rz, const double* rp) const {
+    auto m = static_cast<SundialsMemory*>(mem);
+
+    // Add impulse to backward parameters
+    casadi_axpy(nrp_, 1., rp, m->rp);
+
+    // Add impulse to state
+    casadi_axpy(nrx_, 1., rx, NV_DATA_S(m->rxz));
+    casadi_axpy(nrz_, 1., rz, NV_DATA_S(m->rxz) + nrx_);
   }
 
   SundialsMemory::SundialsMemory() {

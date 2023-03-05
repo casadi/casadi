@@ -412,7 +412,7 @@ void IdasInterface::reset(IntegratorMemory* mem, double t, const double* _x,
   N_VConst(0.0, m->xzdot);
   std::copy(init_xdot_.begin(), init_xdot_.end(), NV_DATA_S(m->xzdot));
 
-  THROWING(IDAReInit, m->mem, t0_, m->xz, m->xzdot);
+  THROWING(IDAReInit, m->mem, t, m->xz, m->xzdot);
 
   // Re-initialize quadratures
   if (nq_>0) THROWING(IDAQuadReInit, m->mem, m->q);
@@ -472,8 +472,8 @@ advance(IntegratorMemory* mem, double t, double* x, double* z, double* q) const 
 
 }
 
-void IdasInterface::resetB(IntegratorMemory* mem, double t, const double* rx,
-                            const double* rz, const double* rp) const {
+void IdasInterface::resetB(IntegratorMemory* mem, double t,
+    const double* rx, const double* rz, const double* rp) const {
   if (verbose_) casadi_message(name_ + "::resetB");
   auto m = to_mem(mem);
 
@@ -489,7 +489,7 @@ void IdasInterface::resetB(IntegratorMemory* mem, double t, const double* rx,
   if (m->first_callB) {
     // Create backward problem
     THROWING(IDACreateB, m->mem, &m->whichB);
-    THROWING(IDAInitB, m->mem, m->whichB, resB, tout_.back(), m->rxz, m->rxzdot);
+    THROWING(IDAInitB, m->mem, m->whichB, resB, t, m->rxz, m->rxzdot);
     THROWING(IDASStolerancesB, m->mem, m->whichB, reltol_, abstol_);
     THROWING(IDASetUserDataB, m->mem, m->whichB, m);
     THROWING(IDASetMaxNumStepsB, m->mem, m->whichB, max_num_steps_);
@@ -535,7 +535,7 @@ void IdasInterface::resetB(IntegratorMemory* mem, double t, const double* rx,
     m->first_callB = false;
   } else {
     // Re-initialize
-    THROWING(IDAReInitB, m->mem, m->whichB, tout_.back(), m->rxz, m->rxzdot);
+    THROWING(IDAReInitB, m->mem, m->whichB, t, m->rxz, m->rxzdot);
     if (nrq_>0) {
       // Workaround (bug in SUNDIALS)
       // THROWING(IDAQuadReInitB, m->mem, m->whichB[dir], m->rq[dir]);
@@ -551,8 +551,25 @@ void IdasInterface::resetB(IntegratorMemory* mem, double t, const double* rx,
   }
 }
 
-void IdasInterface::retreat(IntegratorMemory* mem, double t, double* rx,
-                            double* rz, double* rq) const {
+void IdasInterface::impulseB(IntegratorMemory* mem,
+    const double* rx, const double* rz, const double* rp) const {
+  auto m = to_mem(mem);
+
+  // Call method in base class
+  SundialsInterface::impulseB(mem, rx, rz, rp);
+
+  // Re-initialize
+  THROWING(IDAReInitB, m->mem, m->whichB, m->t, m->rxz, m->rxzdot);
+  if (nrq_>0) {
+    // Workaround (bug in SUNDIALS)
+    // THROWING(IDAQuadReInitB, m->mem, m->whichB[dir], m->rq[dir]);
+    void* memB = IDAGetAdjIDABmem(m->mem, m->whichB);
+    THROWING(IDAQuadReInit, memB, m->rq);
+  }
+}
+
+void IdasInterface::retreat(IntegratorMemory* mem, double t,
+    double* rx, double* rz, double* rq) const {
   auto m = to_mem(mem);
 
   // Integrate, unless already at desired time

@@ -304,13 +304,31 @@ eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) con
     if (q) q += nq_;
   }
 
-  // If backwards integration is needed
+  // Backwards integration, if needed
   if (nrx_>0) {
-    // Integrate backward
-    resetB(m, tout_.back(), rx0, rz0, rp);
+    // Take rx0, rz0, rp past the last grid point
+    if (rx0) rx0 += nrx_ * nt();
+    if (rz0) rz0 += nrz_ * nt();
+    if (rp) rp += nrp_ * nt();
 
-    // Proceed to t0
-    retreat(m, t0_, rx, rz, rq);
+    // Integrate backward
+    for (casadi_int k = nt(); k-- > 0; ) {
+      // Reset the solver, add impulse to backwards integration
+      if (rx0) rx0 -= nrx_;
+      if (rz0) rz0 -= nrz_;
+      if (rp) rp -= nrp_;
+      if (k == nt() - 1) {
+       resetB(m, tout_[k], rx0, rz0, rp);
+      } else {
+       impulseB(m, rx0, rz0, rp);
+      }
+      // Proceed to the previous time point or t0
+      if (k > 0) {
+        retreat(m, tout_[k - 1], 0, 0, 0);
+      } else {
+        retreat(m, t0_, rx, rz, rq);
+      }
+    }
   }
 
   if (print_stats_) print_stats(m);
@@ -1344,7 +1362,7 @@ reset(IntegratorMemory* mem, double t,
 }
 
 void FixedStepIntegrator::resetB(IntegratorMemory* mem, double t, const double* rx,
-                                  const double* rz, const double* rp) const {
+    const double* rz, const double* rp) const {
   auto m = static_cast<FixedStepMemory*>(mem);
 
   // Update time
@@ -1365,6 +1383,17 @@ void FixedStepIntegrator::resetB(IntegratorMemory* mem, double t, const double* 
 
   // Get consistent initial conditions
   casadi_fill(get_ptr(m->RZ), m->RZ.size(), std::numeric_limits<double>::quiet_NaN());
+}
+
+void FixedStepIntegrator::impulseB(IntegratorMemory* mem,
+    const double* rx, const double* rz, const double* rp) const {
+  auto m = static_cast<FixedStepMemory*>(mem);
+  // Add impulse to backward parameters
+  casadi_axpy(nrp_, 1., rp, get_ptr(m->rp));
+
+  // Add impulse to state
+  casadi_axpy(nrx_, 1., rx, get_ptr(m->rx));
+  casadi_axpy(nrz_, 1., rz, get_ptr(m->rz));
 }
 
 ImplicitFixedStepIntegrator::ImplicitFixedStepIntegrator(

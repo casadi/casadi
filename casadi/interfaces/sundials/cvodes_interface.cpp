@@ -304,7 +304,7 @@ void CvodesInterface::advance(IntegratorMemory* mem, double t, double* x,
 }
 
 void CvodesInterface::resetB(IntegratorMemory* mem, double t, const double* rx,
-                              const double* rz, const double* rp) const {
+    const double* rz, const double* rp) const {
   auto m = to_mem(mem);
 
   // Reset the base classes
@@ -313,7 +313,7 @@ void CvodesInterface::resetB(IntegratorMemory* mem, double t, const double* rx,
   if (m->first_callB) {
     // Create backward problem
     THROWING(CVodeCreateB, m->mem, lmm_, iter_, &m->whichB);
-    THROWING(CVodeInitB, m->mem, m->whichB, rhsB, tout_.back(), m->rxz);
+    THROWING(CVodeInitB, m->mem, m->whichB, rhsB, t, m->rxz);
     THROWING(CVodeSStolerancesB, m->mem, m->whichB, reltol_, abstol_);
     THROWING(CVodeSetUserDataB, m->mem, m->whichB, m);
     if (newton_scheme_==SD_DIRECT) {
@@ -349,9 +349,21 @@ void CvodesInterface::resetB(IntegratorMemory* mem, double t, const double* rx,
     // Mark initialized
     m->first_callB = false;
   } else {
-    THROWING(CVodeReInitB, m->mem, m->whichB, tout_.back(), m->rxz);
+    THROWING(CVodeReInitB, m->mem, m->whichB, t, m->rxz);
     THROWING(CVodeQuadReInitB, m->mem, m->whichB, m->rq);
   }
+}
+
+void CvodesInterface::impulseB(IntegratorMemory* mem,
+    const double* rx, const double* rz, const double* rp) const {
+  auto m = to_mem(mem);
+
+  // Call method in base class
+  SundialsInterface::impulseB(mem, rx, rz, rp);
+
+  // Reinitialize solver
+  THROWING(CVodeReInitB, m->mem, m->whichB, m->t, m->rxz);
+  THROWING(CVodeQuadReInitB, m->mem, m->whichB, m->rq);
 }
 
 void CvodesInterface::retreat(IntegratorMemory* mem, double t,

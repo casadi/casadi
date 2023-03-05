@@ -120,13 +120,15 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
 
       \identifier{1m0} */
   virtual void advance(IntegratorMemory* mem, double t,
-                        double* x, double* z, double* q) const = 0;
+    double* x, double* z, double* q) const = 0;
 
-  /** \brief Reset the backward problem
-
-      \identifier{1m1} */
+  /** \brief Reset the backward problem */
   virtual void resetB(IntegratorMemory* mem, double t,
-                      const double* rx, const double* rz, const double* rp) const = 0;
+    const double* rx, const double* rz, const double* rp) const = 0;
+
+  /** \brief Introduce an impulse into the backwards integration at the current time */
+  virtual void impulseB(IntegratorMemory* mem,
+    const double* rx, const double* rz, const double* rp) const = 0;
 
   /** \brief  Retreat solution in time
 
@@ -430,15 +432,11 @@ class CASADI_EXPORT FixedStepIntegrator : public Integrator {
   /// Setup F and G
   virtual void setupFG() = 0;
 
-  /** \brief Reset the forward problem
-
-      \identifier{1mm} */
+  /** \brief Reset the forward problem */
   void reset(IntegratorMemory* mem, double t,
     const double* x, const double* z, const double* p) const override;
 
-  /** \brief  Advance solution in time
-
-      \identifier{1mn} */
+  /** \brief  Advance solution in time */
   void advance(IntegratorMemory* mem, double t,
     double* x, double* z, double* q) const override;
 
@@ -446,9 +444,11 @@ class CASADI_EXPORT FixedStepIntegrator : public Integrator {
   void resetB(IntegratorMemory* mem, double t,
     const double* rx, const double* rz, const double* rp) const override;
 
-  /** \brief  Retreat solution in time
+  /// Introduce an impulse into the backwards integration at the current time
+  void impulseB(IntegratorMemory* mem,
+    const double* rx, const double* rz, const double* rp) const override;
 
-      \identifier{1mo} */
+  /** \brief Retreat solution in time */
   void retreat(IntegratorMemory* mem, double t,
     double* rx, double* rz, double* rq) const override;
 
