@@ -130,87 +130,98 @@ int main(){
   for (auto&& test : tests) {
     // Loop over all solvers
     for (auto&& solver : solvers) {
-      // Skip if problem cannot be handled
-      if (solver.ode_only && !test.is_ode) continue;
-      // Printout
-      std::cout << "Solving \"" << test.name << "\" using \"" << solver.plugin << "\"" << std::endl;
+      // Test with or without multiple output times
+      for (int ntout : {1, 3}) {
+        // Skip if problem cannot be handled
+        if (solver.ode_only && !test.is_ode) continue;
+        // Printout
+        std::cout << "Solving \"" << test.name << "\" using \"" << solver.plugin << "\", " << ntout << " output times" << std::endl;
+        // Output time grid
+        std::vector<double> tout;
+        if (ntout == 1) {
+          tout = {test.tf};
+        } else {
+          tout = {0, 0.5 * test.tf, test.tf};
+        }
+        // Create integrator instance
+        Function I = integrator("I", solver.plugin, test.dae, 0, tout, solver.opts);
 
-      // Get integrator
-      Function I = integrator("I", solver.plugin, test.dae, 0, {test.tf}, solver.opts);
+        // Buffers for evaluation
+        std::map<std::string, DM> arg, res;
 
-      // Buffers for evaluation
-      std::map<std::string, DM> arg, res;
+        // Integrate to get results
+        arg = decltype(arg){{"x0", test.x0},
+                            {"p", test.u0}};
+        res = I(arg);
+        DM xf(res.at("xf"));
+        DM qf(res.at("qf"));
+        std::cout << std::setw(50) << "Unperturbed solution: " << "xf  = " << xf.nonzeros() <<  ", qf  = " << qf.nonzeros() << std::endl;
 
-      // Integrate to get results
-      arg = decltype(arg){{"x0", test.x0},
-                          {"p", test.u0}};
-      res = I(arg);
-      std::vector<double> xf(res.at("xf"));
-      std::vector<double> qf(res.at("qf"));
-      std::cout << std::setw(50) << "Unperturbed solution: " << "xf  = " << xf <<  ", qf  = " << qf << std::endl;
+        // Perturb solution to get a finite difference approximation
+        double h = 0.001;
+        arg["p"] = test.u0+h;
+        res = I(arg);
+        DM fd_xf = (res.at("xf")-xf)/h;
+        DM fd_qf = (res.at("qf")-qf)/h;
+        std::cout << std::setw(50) << "Finite difference approximation: " << "d(xf)/d(p) = " << fd_xf.nonzeros() << ", d(qf)/d(p) = " << fd_qf.nonzeros() << std::endl;
 
-      // Perturb solution to get a finite difference approximation
-      double h = 0.001;
-      arg["p"] = test.u0+h;
-      res = I(arg);
-      std::vector<double> fd_xf((res.at("xf")-xf)/h);
-      std::vector<double> fd_qf((res.at("qf")-qf)/h);
-      std::cout << std::setw(50) << "Finite difference approximation: " << "d(xf)/d(p) = " << fd_xf << ", d(qf)/d(p) = " << fd_qf << std::endl;
+        // Calculate once, forward
+        Function I_fwd = I.factory("I_fwd", {"x0", "p", "fwd:x0", "fwd:p"},
+                                            {"fwd:xf", "fwd:qf"});
+        arg = decltype(arg){{"x0", test.x0},
+                            {"p", test.u0},
+                            {"fwd_x0", 0},
+                            {"fwd_p", 1}};
+        res = I_fwd(arg);
+        DM fwd_xf = res.at("fwd_xf");
+        DM fwd_qf = res.at("fwd_qf");
+        std::cout << std::setw(50) << "Forward sensitivities: " << "d(xf)/d(p) = " << fwd_xf.nonzeros() << ", d(qf)/d(p) = " << fwd_qf.nonzeros() << std::endl;
 
-      // Calculate once, forward
-      Function I_fwd = I.factory("I_fwd", {"x0", "p", "fwd:x0", "fwd:p"},
-                                          {"fwd:xf", "fwd:qf"});
-      arg = decltype(arg){{"x0", test.x0},
-                          {"p", test.u0},
-                          {"fwd_x0", 0},
-                          {"fwd_p", 1}};
-      res = I_fwd(arg);
-      std::vector<double> fwd_xf(res.at("fwd_xf"));
-      std::vector<double> fwd_qf(res.at("fwd_qf"));
-      std::cout << std::setw(50) << "Forward sensitivities: " << "d(xf)/d(p) = " << fwd_xf << ", d(qf)/d(p) = " << fwd_qf << std::endl;
+        // Calculate once, adjoint
+        std::vector<double> adj_qf(ntout, 0);
+        adj_qf.back() = 1;
+        Function I_adj = I.factory("I_adj", {"x0", "p", "adj:xf", "adj:qf"},
+                                            {"adj:p", "adj:x0"});
+        arg = decltype(arg){{"x0", test.x0}, {"p", test.u0}, {"adj_xf", 0}, {"adj_qf", adj_qf}};
+        res = I_adj(arg);
+        DM adj_x0 = res.at("adj_x0");
+        DM adj_p = res.at("adj_p");
+        std::cout << std::setw(50) << "Adjoint sensitivities: " << "d(qf)/d(x0) = " << adj_x0.nonzeros() << ", d(qf)/d(p) = " << adj_p.nonzeros() << std::endl;
 
-      // Calculate once, adjoint
-      Function I_adj = I.factory("I_adj", {"x0", "p", "adj:xf", "adj:qf"},
-                                          {"adj:p", "adj:x0"});
-      arg = decltype(arg){{"x0", test.x0}, {"p", test.u0}, {"adj_xf", 0}, {"adj_qf", 1}};
-      res = I_adj(arg);
-      std::vector<double> adj_x0(res.at("adj_x0"));
-      std::vector<double> adj_p(res.at("adj_p"));
-      std::cout << std::setw(50) << "Adjoint sensitivities: " << "d(qf)/d(x0) = " << adj_x0 << ", d(qf)/d(p) = " << adj_p << std::endl;
+        // Perturb adjoint solution to get a finite difference approximation of the second order sensitivities
+        arg["p"] = test.u0+h;
+        res = I_adj(arg);
+        DM fd_adj_x0 = (res.at("adj_x0")-adj_x0)/h;
+        DM fd_adj_p = (res.at("adj_p")-adj_p)/h;
+        std::cout << std::setw(50) << "FD of adjoint sensitivities: " << "d2(qf)/d(x0)d(p) = " << fd_adj_x0.nonzeros() << ", d2(qf)/d(p)d(p) = " << fd_adj_p.nonzeros() << std::endl;
 
-      // Perturb adjoint solution to get a finite difference approximation of the second order sensitivities
-      arg["p"] = test.u0+h;
-      res = I_adj(arg);
-      std::vector<double> fd_adj_x0((res.at("adj_x0")-adj_x0)/h);
-      std::vector<double> fd_adj_p((res.at("adj_p")-adj_p)/h);
-      std::cout << std::setw(50) << "FD of adjoint sensitivities: " << "d2(qf)/d(x0)d(p) = " << fd_adj_x0 << ", d2(qf)/d(p)d(p) = " << fd_adj_p << std::endl;
+        // Forward over adjoint to get the second order sensitivities
+        Function I_foa = I_adj.factory("I_foa",
+                                      {"x0", "p", "fwd:p", "adj_xf", "adj_qf"},
+                                      {"fwd:adj_x0", "fwd:adj_p"});
+        arg = decltype(arg){{"x0", test.x0},
+                            {"p", test.u0},
+                            {"fwd_p", 1},
+                            {"adj_xf", 0},
+                            {"adj_qf", adj_qf}};
+        res = I_foa(arg);
+        DM fwd_adj_x0 = res.at("fwd_adj_x0");
+        DM fwd_adj_p = res.at("fwd_adj_p");
+        std::cout << std::setw(50) << "Forward over adjoint sensitivities: " << "d2(qf)/d(x0)d(p) = " << fwd_adj_x0.nonzeros() << ", d2(qf)/d(p)d(p) = " << fwd_adj_p.nonzeros() << std::endl;
 
-      // Forward over adjoint to get the second order sensitivities
-      Function I_foa = I_adj.factory("I_foa",
-                                     {"x0", "p", "fwd:p", "adj_xf", "adj_qf"},
-                                     {"fwd:adj_x0", "fwd:adj_p"});
-      arg = decltype(arg){{"x0", test.x0},
-                          {"p", test.u0},
-                          {"fwd_p", 1},
-                          {"adj_xf", 0},
-                          {"adj_qf", 1}};
-      res = I_foa(arg);
-      std::vector<double> fwd_adj_x0(res.at("fwd_adj_x0"));
-      std::vector<double> fwd_adj_p(res.at("fwd_adj_p"));
-      std::cout << std::setw(50) << "Forward over adjoint sensitivities: " << "d2(qf)/d(x0)d(p) = " << fwd_adj_x0 << ", d2(qf)/d(p)d(p) = " << fwd_adj_p << std::endl;
-
-      // Adjoint over adjoint to get the second order sensitivities
-      Function I_aoa = I_adj.factory("I_aoa", {"x0", "p", "adj_xf", "adj_qf", "adj:adj_p"},
-                                              {"adj:x0", "adj:p"});
-      arg = decltype(arg){{"x0", test.x0},
-                          {"p", test.u0},
-                          {"adj_xf", 0},
-                          {"adj_qf", 1},
-                          {"adj_adj_p", 1}};
-      res = I_aoa(arg);
-      std::vector<double> adj_adj_x0(res.at("adj_x0"));
-      std::vector<double> adj_adj_p(res.at("adj_p"));
-      std::cout << std::setw(50) << "Adjoint over adjoint sensitivities: " << "d2(qf)/d(x0)d(p) = " << adj_adj_x0 << ", d2(qf)/d(p)d(p) = " << adj_adj_p << std::endl;
+        // Adjoint over adjoint to get the second order sensitivities
+        Function I_aoa = I_adj.factory("I_aoa", {"x0", "p", "adj_xf", "adj_qf", "adj:adj_p"},
+                                                {"adj:x0", "adj:p"});
+        arg = decltype(arg){{"x0", test.x0},
+                            {"p", test.u0},
+                            {"adj_xf", 0},
+                            {"adj_qf", adj_qf},
+                            {"adj_adj_p", 1}};
+        res = I_aoa(arg);
+        DM adj_adj_x0 = res.at("adj_x0");
+        DM adj_adj_p = res.at("adj_p");
+        std::cout << std::setw(50) << "Adjoint over adjoint sensitivities: " << "d2(qf)/d(x0)d(p) = " << adj_adj_x0.nonzeros() << ", d2(qf)/d(p)d(p) = " << adj_adj_p.nonzeros() << std::endl;
+      }
     }
   }
   return 0;
