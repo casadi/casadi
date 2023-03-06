@@ -745,10 +745,11 @@ jobs:
           python-version: 3.11
           activate-environment: py311
           auto-update-conda: true
-      - run: sudo apt-get install octave -y
+      - run: sudo apt update && sudo apt install octave -y
       - run: |
+          pip install numpy
           cd docs/users_guide && pip install -r requirements.txt && cd ../..
-          sudo apt-install latexmk graphviz texlive-science texlive-latex-base texlive-latex-recommended texlive-latex-extra -y
+          sudo apt install latexmk graphviz texlive-science texlive-latex-base texlive-latex-recommended texlive-latex-extra -y
         shell: bash -el {0}
       - run: octave --no-gui --no-window-system --eval "addpath('${{ github.workspace }}/casadi_octave');savepath;"
       - run: |
