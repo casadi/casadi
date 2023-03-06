@@ -221,11 +221,11 @@ print("optimal cost: ", float(res["f"]))
 opt = V(res["x"])
 
 # Get values at the beginning of each finite element
-x0_opt = opt["X",:,0,"x",0]
-x1_opt = opt["X",:,0,"x",1]
-x2_opt = opt["X",:,0,"L"]
+x0_opt = vcat(opt["X",:,0,"x",0])
+x1_opt = vcat(opt["X",:,0,"x",1])
+x2_opt = vcat(opt["X",:,0,"L"])
 
-u_opt = opt["U",:,0]
+u_opt = vcat(opt["U",:,0])
 
 tgrid = NP.linspace(0,tf,nk+1)
 tgrid_u = NP.linspace(0,tf,nk)

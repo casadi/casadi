@@ -64,7 +64,9 @@ for tol in tolerances:
   F = integrator('F', 'cvodes', dae, opts)
   res = F(x0=[1,0])
   endresult.append(res['xf'][0])
-  
+
+endresult = vcat(endresult)
+
 figure()
 loglog(tolerances,(array(endresult)-1),'b',label='Positive error')
 loglog(tolerances,-(array(endresult)-1),'r',label='Negative error')

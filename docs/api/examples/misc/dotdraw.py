@@ -51,7 +51,7 @@ zz = x+y+6
 
 dotdraw(zz)
 
-f = Function("magic", [z,y],[z+x[0,0],x-y])
+f = Function("magic", [z,y],[z+x[0,0],x-y],{"allow_free":True})
 
 z,z2 = f(vertcat(x,y),zz.T)
 
