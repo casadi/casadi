@@ -724,7 +724,50 @@ jobs:
         if: "contains(env.os, 'windows')"
       - run: octave --no-gui --no-window-system --eval "addpath('${{ github.workspace }}/casadi');cd test/matlab;asorted_tests"
         if: "!contains(env.os, 'windows')"
-        
+  
+  docs:
+    runs-on: ubuntu-22.04
+    needs: [python-dockcross,matlab-dockcross]
+    steps:
+      - uses: actions/checkout@v3.3.0
+      - uses: actions/download-artifact@v3.0.2
+        with:
+          name: casadi-linux64-py311
+      - name: Unpack source
+        run: unzip casadi-linux64-py311.zip -d casadi_python
+      - uses: actions/download-artifact@v3.0.2
+        with:
+          name: casadi-linux64-octave7.3.0
+      - name: Unpack source
+        run: unzip casadi-linux64-octave7.3.0.zip -d casadi_octave
+      - uses: conda-incubator/setup-miniconda@v2.2.0
+        with:
+          python-version: 311
+          activate-environment: py311
+          auto-update-conda: true
+      - run: echo "/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin" >> $GITHUB_PATH
+      - run: brew install octave
+      - run: octave --no-gui --no-window-system --eval "addpath('${{ github.workspace }}/casadi');savepath;"
+      - run: |
+          cd casadi_python && pip install -e . && cd ..
+          cd docs/users_guide && pip install -r requirements.txt && cd ../..
+          sudo apt-install latexmk graphviz texlive-science texlive-latex-base texlive-latex-recommended texlive-latex-extra -y
+        shell: bash -el {0}
+      - run: |
+          cd docs/users_guide && make && cd ../..
+          cd tests
+          make user_guide_snippets_py
+          make user_guide_snippets_oct
+          cd ..
+          cd docs/users_guide && rm -rf build && make && cd ../..
+        shell: bash -el {0}
+      - uses: svenstaro/upload-release-action@2.4.0
+        with:
+          overwrite: true
+          tag: nightly-${{ env.GITHUB_REF_SLUG }}
+          file: docs/users_guide/users_guide.pdf
+          prerelease: true
+          
   test-python:
     runs-on: ${{matrix.image == 'macos-m1' && 'self-hosted' || matrix.image }}
     needs: [python-osx,python-dockcross]
