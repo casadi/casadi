@@ -889,7 +889,7 @@ get_forward(casadi_int nfwd, const std::string& name,
   std::vector<std::vector<MX>> aug_in(INTEGRATOR_NUM_IN);
   std::vector<MX> v(nfwd);
   for (casadi_int i = 0; i < INTEGRATOR_NUM_IN; ++i) {
-    for (casadi_int d=0; d<nfwd; ++d) {
+    for (casadi_int d = 0; d < nfwd; ++d) {
       v[d] = MX::sym("fwd" + str(d) + "_" + integrator_in(i), sparsity_in(i));
       aug_in[i].push_back(v[d]);
     }
@@ -899,9 +899,23 @@ get_forward(casadi_int nfwd, const std::string& name,
   // Call the augmented integrator
   std::vector<MX> integrator_in(INTEGRATOR_NUM_IN);
   for (casadi_int i = 0; i < INTEGRATOR_NUM_IN; ++i) {
-    if (size1_in(i) > 0 && grid_in(i) && nfwd > 1 && nt() > 1) {
-      // Need to reorder columns
-      casadi_error("Not implemented");
+    if (size1_in(i) > 0 && grid_in(i) && nt() > 1) {
+      // Split nondifferentiated input by grid point
+      std::vector<MX> ret_in_split = horzsplit(ret_in[i], ret_in[i].size2() / nt());
+      // Split augmented input by grid point
+      std::vector<std::vector<MX>> aug_in_split(nfwd);
+      for (casadi_int d = 0; d < nfwd; ++d) {
+        aug_in_split[d] = horzsplit(aug_in[i][d], aug_in[i][d].size2() / nt());
+      }
+      // Reorder columns
+      v.clear();
+      for (casadi_int k = 0; k < nt(); ++k) {
+        v.push_back(ret_in_split.at(k));
+        for (casadi_int d = 0; d < nfwd; ++d) {
+          v.push_back(aug_in_split[d].at(k));
+        }
+      }
+      integrator_in[i] = horzcat(v);
     } else {
       // No reordering necessary
       v = aug_in[i];
