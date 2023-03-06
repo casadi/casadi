@@ -1007,19 +1007,40 @@ get_reverse(casadi_int nadj, const std::string& name,
   // Call the augmented integrator
   std::vector<MX> integrator_in(INTEGRATOR_NUM_IN);
   for (casadi_int i = 0; i < INTEGRATOR_NUM_IN; ++i) {
+    // Output index contributing to adjoint seeds
+    casadi_int j = adjmap_out(i);
+    // Number of grid points for this integrator input
     casadi_int n_grid = grid_in(i) ? nt() : 1;
-    if (size1_in(i) > 0 && grid_in(i) && nadj > 1 && n_grid > 1) {
-      // Need to reorder columns
-      casadi_error("Not implemented");
+    // Split input and seeds by grid points, if necessary
+    std::vector<MX> ret_in_split;
+    std::vector<std::vector<MX>> aug_in_split(nadj);
+    if (size1_in(i) > 0 && grid_in(i) && n_grid > 1) {
+      // Split nondifferentiated input by grid point
+      ret_in_split = horzsplit(ret_in[i], ret_in[i].size2() / nt());
+      // Split augmented input by grid point
+      for (casadi_int d = 0; d < nadj; ++d) {
+        aug_in_split[d] = horzsplit(aug_in[j][d], aug_in[j][d].size2() / nt());
+      }
     } else {
       // No reordering necessary
-      std::vector<MX> integrator_in_split = {vec(ret_in[i])};
-      casadi_int j = adjmap_out(i);
-      for (casadi_int d=0; d<nadj; ++d) {
-        integrator_in_split.push_back(vec(aug_in[j][d]));
-      }
-      integrator_in[i] = reshape(vertcat(integrator_in_split), -1, n_grid);
+      ret_in_split = {ret_in[i]};
+      for (casadi_int d = 0; d < nadj; ++d) aug_in_split[d] = {aug_in[j][d]};
     }
+    // Vectorize all inputs to allow concatenation (unlike forward sensitivities,
+    // number of rows for sensitivities may be different from original inputs)
+    for (auto&& e : ret_in_split) e = vec(e);
+    for (auto&& e1 : aug_in_split) {
+      for (auto&& e2 : e1) e2 = vec(e2);
+    }
+    // Assemble input argument
+    v.clear();
+    for (casadi_int k = 0; k < ret_in_split.size(); ++k) {
+      v.push_back(ret_in_split.at(k));
+      for (casadi_int d = 0; d < nadj; ++d) {
+        v.push_back(aug_in_split[d].at(k));
+      }
+    }
+    integrator_in[i] = reshape(vertcat(v), -1, n_grid);
   }
   std::vector<MX> integrator_out = aug_int(integrator_in);
 
