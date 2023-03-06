@@ -745,10 +745,8 @@ jobs:
           python-version: 3.11
           activate-environment: py311
           auto-update-conda: true
-      - run: echo "/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin" >> $GITHUB_PATH
-      - run: brew install octave
+      - run: sudo apt-get install octave -y
       - run: |
-          cd casadi_python && pip install -e . && cd ..
           cd docs/users_guide && pip install -r requirements.txt && cd ../..
           sudo apt-install latexmk graphviz texlive-science texlive-latex-base texlive-latex-recommended texlive-latex-extra -y
         shell: bash -el {0}
@@ -760,6 +758,8 @@ jobs:
           make user_guide_snippets_oct
           cd ..
           cd docs/users_guide && rm -rf build && make && cd ../..
+        env:
+          PYTHONPATH: ${{ github.workspace }}/casadi
         shell: bash -el {0}
       - uses: svenstaro/upload-release-action@2.4.0
         with:
