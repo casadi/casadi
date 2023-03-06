@@ -760,7 +760,7 @@ jobs:
           cd ..
           cd docs/users_guide && rm -rf build && make && cd ../..
         env:
-          PYTHONPATH: ${{ github.workspace }}/casadi
+          PYTHONPATH: ${{ github.workspace }}/casadi_python
         shell: bash -el {0}
       - uses: svenstaro/upload-release-action@2.4.0
         with:
