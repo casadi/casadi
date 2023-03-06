@@ -342,7 +342,7 @@ namespace casadi {
     auto m = to_mem(mem);
     print("FORWARD INTEGRATION:\n");
     print("Number of steps taken by SUNDIALS: %ld\n", m->nsteps);
-    print("Number of calls to the user’s f function: %ld\n", m->nfevals);
+    print("Number of calls to the user's f function: %ld\n", m->nfevals);
     print("Number of calls made to the linear solver setup function: %ld\n", m->nlinsetups);
     print("Number of error test failures: %ld\n", m->netfails);
     print("Method order used on the last internal step: %d\n", m->qlast);
@@ -356,7 +356,7 @@ namespace casadi {
     if (nrx_>0) {
       print("BACKWARD INTEGRATION:\n");
       print("Number of steps taken by SUNDIALS: %ld\n", m->nstepsB);
-      print("Number of calls to the user’s f function: %ld\n", m->nfevalsB);
+      print("Number of calls to the user's f function: %ld\n", m->nfevalsB);
       print("Number of calls made to the linear solver setup function: %ld\n", m->nlinsetupsB);
       print("Number of error test failures: %ld\n", m->netfailsB);
       print("Method order used on the last internal step: %d\n" , m->qlastB);

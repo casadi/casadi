@@ -319,7 +319,7 @@ Dict SundialsSimulator::get_stats(void* mem) const {
 void SundialsSimulator::print_stats(SimulatorMemory* mem) const {
   auto m = to_mem(mem);
   print("Number of steps taken by SUNDIALS: %ld\n", m->nsteps);
-  print("Number of calls to the user’s f function: %ld\n", m->nfevals);
+  print("Number of calls to the user's f function: %ld\n", m->nfevals);
   print("Number of calls made to the linear solver setup function: %ld\n", m->nlinsetups);
   print("Number of error test failures: %ld\n", m->netfails);
   print("Method order used on the last internal step: %d\n", m->qlast);
