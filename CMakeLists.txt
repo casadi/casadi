@@ -643,11 +643,10 @@ add_feature_info(dsdp-interface WITH_DSDP "Interface to the interior point SDP s
 # CLANG: A just-in-time compiler
 option(OLD_LLVM "Use pre-3.5 LLVM" OFF)
 option(WITH_CLANG "Compile the interface to clang JIT" OFF)
-if(WITH_CLANG)
-  # try to find system CLANG
-  find_package(CLANG REQUIRED)
-endif()
+option(WITH_BUILD_LAPACK "Download and install CLANG" OFF)
 add_feature_info(clang-interface WITH_CLANG "Interface to the Clang JIT compiler.")
+set(BUILD_CLANG_GIT_REPO https://github.com/llvm/llvm-project.git  CACHE STRING "Git repo used together with BUILD_CLANG_VERSION")
+set(BUILD_CLANG_VERSION llvmorg-12.0.1 CACHE STRING "Tag/branch/hash to be used for BUILD_CLANG_GIT_REPO")
 
 # Lapack: Dense linear solvers
 option(WITH_LAPACK "Compile the interface to LAPACK" ${WITH_LAPACK_DEF})
@@ -825,7 +824,7 @@ foreach(PKG CPLEX KNITRO GUROBI WORHP HSL)
 endforeach()
 
 # Packages must be sorted from high to low in the dependency graph
-foreach(PKG HIGHS PROXQP OSQP SUPERSCS BONMIN IPOPT CBC CLP MUMPS SPRAL METIS HPIPM BLASFEO LAPACK EIGEN3 SIMDE)
+foreach(PKG CLANG HIGHS PROXQP OSQP SUPERSCS BONMIN IPOPT CBC CLP MUMPS SPRAL METIS HPIPM BLASFEO LAPACK EIGEN3 SIMDE)
   string(TOLOWER ${PKG} PKG_LOWER)
   if(WITH_${PKG})
     if(NOT WITH_BUILD_${PKG})
@@ -975,9 +974,23 @@ if(LAPACK_FOUND)
   message("LAPACK_LFLAGS: ${LAPBLASFEO_PATHACK_LFLAGS}")
 endif()
 
-
-
-
+if(WITH_CLANG)
+  if (WITH_BUILD_CLANG)
+    ExternalProject_Add(clang-external
+          GIT_REPOSITORY ${BUILD_CLANG_GIT_REPO}
+          GIT_TAG ${BUILD_CLANG_VERSION}
+          GIT_SHALLOW TRUE
+          GIT_PROGRESS TRUE
+          SOURCE_SUBDIR "llvm"
+          PREFIX "${CMAKE_BINARY_DIR}/external_projects"
+          UPDATE_COMMAND ""
+          CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
+          CMAKE_ARGS -DLLVM_ENABLE_PROJECTS=clang -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
+          
+    add_library(clang::clang SHARED IMPORTED)
+    add_dependencies(clang::clang clang-external)
+  endif()
+endif()
 
 if(WITH_BLASFEO)
   if (WITH_BUILD_BLASFEO)

@@ -1,32 +1,5 @@
 # This file was partly taken from Sarcasm/irony-mode and modified
 
-if (OLD_LLVM)
-# Legacy version, to be removed
-message(STATUS "Looking for clang 3.4.2")
-
-set(LLVM_INSTALL_PREFIX $ENV{CLANG})
-set(CLANG_LLVM_LIB_DIR ${LLVM_INSTALL_PREFIX}/lib)
-
-set(LLVM_DEP LLVMJIT LLVMInterpreter LLVMX86CodeGen LLVMBitWriter LLVMIRReader LLVMipo LLVMLinker LLVMRuntimeDyld LLVMExecutionEngine LLVMAsmPrinter LLVMSelectionDAG LLVMX86Desc LLVMAsmParser LLVMBitReader LLVMVectorize LLVMMCParser LLVMCodeGen LLVMX86AsmPrinter LLVMX86Info LLVMObjCARCOpts LLVMScalarOpts LLVMX86Utils LLVMInstCombine LLVMTransformUtils LLVMipa LLVMAnalysis LLVMTarget LLVMCore LLVMMC LLVMObject LLVMSupport LLVMBitWriter LLVMIRReader LLVMipo LLVMLinker LLVMVectorize LLVMInstrumentation LLVMBitReader LLVMOption LLVMX86CodeGen LLVMAsmParser LLVMAArch64AsmParser LLVMAArch64Disassembler LLVMARMCodeGen LLVMARMAsmParser LLVMARMDisassembler LLVMCppBackendCodeGen LLVMHexagonCodeGen LLVMMipsCodeGen LLVMMipsAsmParser LLVMMipsDisassembler LLVMMSP430CodeGen LLVMNVPTXCodeGen LLVMPowerPCCodeGen LLVMPowerPCAsmParser LLVMR600CodeGen LLVMSparcCodeGen LLVMSystemZCodeGen LLVMSystemZAsmParser LLVMSystemZDisassembler LLVMX86AsmParser LLVMX86Disassembler LLVMX86Desc LLVMX86AsmPrinter LLVMX86Utils LLVMX86Info LLVMXCoreCodeGen LLVMXCoreDisassembler LLVMAArch64CodeGen LLVMAsmPrinter LLVMMCParser LLVMSelectionDAG LLVMCodeGen LLVMObjCARCOpts LLVMScalarOpts LLVMInstCombine LLVMTransformUtils LLVMipa LLVMAnalysis LLVMARMDesc LLVMCppBackendInfo LLVMHexagonAsmPrinter LLVMMipsDesc LLVMMSP430Desc LLVMNVPTXDesc LLVMPowerPCDesc LLVMR600Desc LLVMSparcDesc LLVMSystemZDesc LLVMXCoreDesc LLVMAArch64Desc LLVMARMAsmPrinter LLVMARMInfo LLVMHexagonDesc LLVMMipsAsmPrinter LLVMMipsInfo LLVMMSP430AsmPrinter LLVMMSP430Info LLVMNVPTXAsmPrinter LLVMNVPTXInfo LLVMPowerPCAsmPrinter LLVMPowerPCInfo LLVMR600AsmPrinter LLVMR600Info LLVMSparcInfo LLVMSystemZAsmPrinter LLVMSystemZInfo LLVMXCoreAsmPrinter LLVMXCoreInfo LLVMAArch64AsmPrinter LLVMAArch64Info LLVMTarget LLVMHexagonInfo LLVMAArch64Utils LLVMCore LLVMMC LLVMObject LLVMSupport)
-
-set(CLANG_DEFINITIONS "-DCLANG_ENABLE_OBJC_REWRITER" "-DGTEST_HAS_RTTI=0" "-D_GNU_SOURCE" "-D__STDC_CONSTANT_MACROS" "-D__STDC_FORMAT_MACROS" "-D__STDC_LIMIT_MACROS")
-set(CLANG_CXX_FLAGS "-fPIC -fvisibility-inlines-hidden -ffunction-sections -fdata-sections -fno-common -fno-strict-aliasing")
-
-# Clang shares include directory with llvm
-set(CLANG_INCLUDE_DIR ${LLVM_INSTALL_PREFIX}/include)
-
-# All clang libraries
-set(CLANG_DEP clangFrontend clangDriver clangCodeGen clangRewriteFrontend clangSerialization clangParse clangSema clangAnalysis clangEdit clangAST clangLex clangBasic ${LLVM_DEP})
-
-# Get libraries
-set(CLANG_LIBRARIES)
-foreach(D ${CLANG_DEP})
-  find_library(CLANG_DEP_${D} ${D} ${LLVM_INSTALL_PREFIX}/lib)
-  set(CLANG_LIBRARIES ${CLANG_LIBRARIES} ${CLANG_DEP_${D}})
-endforeach()
-
-else (OLD_LLVM)
-
 # Return variables
 set(CLANG_LIBRARIES)
 set(CLANG_DEFINITIONS)
@@ -145,8 +118,6 @@ foreach(D ${CLANG_LLVM_CXXFLAGS})
   endif()
 endforeach()
 
-endif (OLD_LLVM)
-
 if(MINGW)
   message("/usr/${PREFIX}/lib")
   find_library(IMAGEHLP imagehlp /usr/${PREFIX}/lib)
@@ -162,3 +133,11 @@ endif()
 
 
 set(CLANG_FOUND TRUE)
+
+
+add_library(clang::clang INTERFACE IMPORTED)
+set_target_properties(clang::clang PROPERTIES
+  INTERFACE_SYSTEM_INCLUDE_DIRECTORIES ${CLANG_INCLUDE_DIR}
+)
+target_link_libraries(clang::clang INTERFACE ${CLANG_LIBRARIES})
+
