@@ -1002,7 +1002,7 @@ namespace casadi {
     }
 
     if (x.empty()) {
-      return MX();
+      return MX(1, 0);
     } else if (x.size()==1) {
       return x.front();
     } else if (has_empty(x)) {
@@ -1028,7 +1028,7 @@ namespace casadi {
 
   MX MX::diagcat(const std::vector<MX>& x) {
     if (x.empty()) {
-      return MX();
+      return MX(0, 0);
     } else if (x.size()==1) {
       return x.front();
     } else if (has_empty(x)) {
@@ -1063,7 +1063,7 @@ namespace casadi {
     }
 
     if (x.empty()) {
-      return MX();
+      return MX(0, 1);
     } else if (x.size()==1) {
       return x.front();
     } else if (has_empty(x)) {
@@ -1327,7 +1327,8 @@ namespace casadi {
   }
 
   casadi_int MX::n_nodes(const MX& x) {
-    Function f("tmp_n_nodes", std::vector<MX>{}, {x}, Dict{{"max_io", 0}, {"cse", false}});
+    Dict opts{{"max_io", 0}, {"cse", false}, {"allow_free", true}};
+    Function f("tmp_n_nodes", std::vector<MX>{}, {x}, opts);
     return f.n_nodes();
   }
 
@@ -1371,7 +1372,7 @@ namespace casadi {
     // implemented in MXFunction
     std::vector<MX> f_out = vdef;
     f_out.insert(f_out.end(), ex.begin(), ex.end());
-    Function temp("tmp_substitute_inplace", {v}, f_out, Dict{{"max_io", 0}});
+    Function temp("tmp_substitute_inplace", {v}, f_out, Dict{{"max_io", 0}, {"allow_free", true}});
     temp.get<MXFunction>()->substitute_inplace(vdef, ex);
   }
 
@@ -1395,7 +1396,7 @@ namespace casadi {
     if (all_equal) return ex;
 
     // Otherwise, evaluate symbolically
-    Function F("tmp_substitute", v, ex, Dict{{"max_io", 0}});
+    Function F("tmp_substitute", v, ex, Dict{{"max_io", 0}, {"allow_free", true}});
     std::vector<MX> ret;
     F.call(vdef, ret, true);
     return ret;
@@ -1414,7 +1415,8 @@ namespace casadi {
       + str(expr.size()) + " <-> " + str(exprs.size()) + ".");
 
     // Sort the expression
-    Function f("tmp_graph_substitute", std::vector<MX>{}, ex, Dict{{"max_io", 0}});
+    Dict opts({{"max_io", 0}, {"allow_free", true}});
+    Function f("tmp_graph_substitute", std::vector<MX>{}, ex, opts);
     MXFunction *ff = f.get<MXFunction>();
 
     // Get references to the internal data structures
@@ -1538,7 +1540,7 @@ namespace casadi {
         }
       }
       // Sort the expression
-      Function f("tmp_extract", std::vector<MX>{}, ex, Dict{{"max_io", 0}});
+      Function f("tmp_extract", std::vector<MX>{}, ex, Dict{{"max_io", 0}, {"allow_free", true}});
       auto *ff = f.get<MXFunction>();
       // Get references to the internal data structures
       const std::vector<MXAlgEl>& algorithm = ff->algorithm_;
@@ -1699,6 +1701,7 @@ namespace casadi {
     try {
       Dict h_opts;
       Dict opts_remainder = extract_from_dict(opts, "helper_options", h_opts);
+      h_opts["allow_free"] = true;
       Function h("helper_jacobian_MX", {x}, {f}, h_opts);
       return h.get<MXFunction>()->jac(opts_remainder).at(0);
     } catch (std::exception& e) {
@@ -1733,6 +1736,7 @@ namespace casadi {
 
       Dict h_opts;
       Dict opts_remainder = extract_from_dict(opts, "helper_options", h_opts);
+      h_opts["allow_free"] = true;
       for (auto&& op : opts_remainder) {
         if (op.first=="always_inline") {
           always_inline = op.second;
@@ -1764,6 +1768,7 @@ namespace casadi {
 
       Dict h_opts;
       Dict opts_remainder = extract_from_dict(opts, "helper_options", h_opts);
+      h_opts["allow_free"] = true;
 
       for (auto&& op : opts_remainder) {
         if (op.first=="always_inline") {
@@ -1809,7 +1814,7 @@ namespace casadi {
   }
 
   std::vector<MX> MX::symvar(const MX& x) {
-    Function f("f", std::vector<MX>{}, {x});
+    Function f("f", std::vector<MX>{}, {x}, {{"allow_free", true}});
     return f.free_mx();
   }
 
@@ -1835,7 +1840,7 @@ namespace casadi {
     std::vector<MX> v = symvar(veccat(ret));
 
     // Construct an MXFunction with it
-    Function f("tmp_matrix_expand", v, ret, Dict{{"max_io", 0}});
+    Function f("tmp_matrix_expand", v, ret, Dict{{"max_io", 0}, {"allow_free", true}});
 
     // Expand to SXFunction
     Function s = f.expand("expand_" + f.name(), options);
@@ -1931,7 +1936,7 @@ namespace casadi {
     if (x.nnz()==0) return false;
 
     // Construct a temporary algorithm
-    Function temp("tmp_depends_on", {arg}, {x}, Dict{{"max_io", 0}});
+    Function temp("tmp_depends_on", {arg}, {x}, Dict{{"max_io", 0}, {"allow_free", true}});
 
     // Perform a single dependency sweep
     std::vector<bvec_t> t_in(arg.nnz(), 1), t_out(x.nnz());
@@ -2019,7 +2024,7 @@ namespace casadi {
   std::vector<MX> MX::cse(const std::vector<MX>& e) {
     MX c = veccat(e);
     Function f("f", std::vector<MX>{}, e,
-      {{"live_variables", false}, {"max_io", 0}, {"cse", false}});
+      {{"live_variables", false}, {"max_io", 0}, {"cse", false}, {"allow_free", true}});
     MXFunction *ff = f.get<MXFunction>();
 
     // Symbolic work, non-differentiated
@@ -2090,10 +2095,19 @@ namespace casadi {
     MX x = veccat(s);
     Dict options;
     options["never_inline"] = true;
+
+    Dict inline_options;
+    inline_options["never_inline"] = false;
+    inline_options["always_inline"] = true;
+    Dict der_options = Dict{{"forward_options", inline_options},
+      {"reverse_options", inline_options},
+      {"jacobian_options", inline_options}};
     if (order==1) {
       options["is_diff_in"] = std::vector<bool>{false};
       options["is_diff_out"] = std::vector<bool>{true};
+      options = combine(options, der_options);
     } else if (order==2) {
+      options["der_options"] = der_options;
       options["forward_options"] = Dict{{"is_diff_in", std::vector<bool>{false, true, true} },
         {"is_diff_out", std::vector<bool>{true}}};
       options["reverse_options"] = Dict{{"is_diff_in", std::vector<bool>{false, true, true} },
@@ -2119,10 +2133,19 @@ namespace casadi {
 
     Dict options;
     options["never_inline"] = true;
+
+    Dict inline_options;
+    inline_options["never_inline"] = false;
+    inline_options["always_inline"] = true;
+    Dict der_options = Dict{{"forward_options", inline_options},
+      {"reverse_options", inline_options},
+      {"jacobian_options", inline_options}};
     if (order==1) {
       options["is_diff_in"] = std::vector<bool>{false, true};
       options["is_diff_out"] = std::vector<bool>{true};
+      options = combine(options, der_options);
     } else if (order==2) {
+      options["der_options"] = der_options;
       options["forward_options"] = Dict{{"is_diff_in",
         std::vector<bool>{false, true, false, true, true} },
         {"is_diff_out", std::vector<bool>{true}}};

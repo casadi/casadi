@@ -59,89 +59,101 @@
 
 # else()
 
-  if( "$ENV{CPLEX}" STREQUAL "" )
-    set(CPLEX_ROOT_DIR "" CACHE PATH "CPLEX root directory.")
-  else()
-    set(CPLEX_ROOT_DIR $ENV{CPLEX})
-  endif()
-  set(CPLEX_WIN_PLATFORM "")  
+message("CPLEX: find via CONFIG")
+find_package(CPLEX CONFIG NO_CMAKE_FIND_ROOT_PATH)
+message("CPLEX: ${CPLEX_FOUND}")
 
-FIND_PATH(CPLEX_INCLUDE_DIR
-  ilcplex/cplex.h
-  HINTS ${CPLEX_ROOT_DIR}/cplex/include ${CPLEX_ROOT_DIR}/include
-  PATHS ENV C_INCLUDE_PATH
-        ENV C_PLUS_INCLUDE_PATH
-        ENV INCLUDE_PATH
-  )
+if(NOT CPLEX_FOUND)
+
+      if( "$ENV{CPLEX}" STREQUAL "" )
+        set(CPLEX_ROOT_DIR "" CACHE PATH "CPLEX root directory.")
+      else()
+        set(CPLEX_ROOT_DIR $ENV{CPLEX})
+      endif()
+      set(CPLEX_WIN_PLATFORM "")  
+
+    FIND_PATH(CPLEX_INCLUDE_DIR
+      ilcplex/cplex.h
+      HINTS ${CPLEX_ROOT_DIR}/cplex/include ${CPLEX_ROOT_DIR}/include
+      PATHS ENV C_INCLUDE_PATH
+            ENV C_PLUS_INCLUDE_PATH
+            ENV INCLUDE_PATH
+      )
 
 
-if(WITH_CPLEX_SHARED)
-  FIND_LIBRARY(CPLEX_LIBRARY
-  NAMES cplex${CPLEX_VERSION} cplex
-  HINTS ${CPLEX_ROOT_DIR}/cplex/bin/${CPLEX_WIN_PLATFORM} #windows
-        ${CPLEX_ROOT_DIR}/cplex/bin/x86-64_debian4.0_4.1 #unix
-        ${CPLEX_ROOT_DIR}/cplex/bin/x86-64_sles10_4.1 #unix 
-        ${CPLEX_ROOT_DIR}/cplex/bin/x86-64_linux #unix 
-        ${CPLEX_ROOT_DIR}/cplex/bin/x86-64_osx #osx 
-        ${CPLEX_ROOT_DIR}/cplex/bin/x86-64_darwin #osx 
-        ${CPLEX_ROOT_DIR}/cplex/bin/x64_win64 #windows
-        ${CPLEX_ROOT_DIR}/bin/${CPLEX_WIN_PLATFORM} #windows
-        ${CPLEX_ROOT_DIR}/bin/x86-64_debian4.0_4.1 #unix
-        ${CPLEX_ROOT_DIR}/bin/x86-64_sles10_4.1 #unix 
-        ${CPLEX_ROOT_DIR}/bin/x86-64_linux #unix 
-        ${CPLEX_ROOT_DIR}/bin/x86-64_osx #osx 
-        ${CPLEX_ROOT_DIR}/bin/x86-64_darwin #osx 
-        ${CPLEX_ROOT_DIR}/bin/x64_win64 #windows
-  PATHS ENV LIBRARY_PATH #unix
-        ENV LD_LIBRARY_PATH #unix
-  )
-  message(STATUS "CPLEX Library: ${CPLEX_LIBRARY}")
-else()
+    if(WITH_CPLEX_SHARED)
+      FIND_LIBRARY(CPLEX_LIBRARY
+      NAMES cplex${CPLEX_VERSION} cplex
+      HINTS ${CPLEX_ROOT_DIR}/cplex/bin/${CPLEX_WIN_PLATFORM} #windows
+            ${CPLEX_ROOT_DIR}/cplex/bin/x86-64_debian4.0_4.1 #unix
+            ${CPLEX_ROOT_DIR}/cplex/bin/x86-64_sles10_4.1 #unix 
+            ${CPLEX_ROOT_DIR}/cplex/bin/x86-64_linux #unix 
+            ${CPLEX_ROOT_DIR}/cplex/bin/x86-64_osx #osx 
+            ${CPLEX_ROOT_DIR}/cplex/bin/x86-64_darwin #osx 
+            ${CPLEX_ROOT_DIR}/cplex/bin/x64_win64 #windows
+            ${CPLEX_ROOT_DIR}/bin/${CPLEX_WIN_PLATFORM} #windows
+            ${CPLEX_ROOT_DIR}/bin/x86-64_debian4.0_4.1 #unix
+            ${CPLEX_ROOT_DIR}/bin/x86-64_sles10_4.1 #unix 
+            ${CPLEX_ROOT_DIR}/bin/x86-64_linux #unix 
+            ${CPLEX_ROOT_DIR}/bin/x86-64_osx #osx 
+            ${CPLEX_ROOT_DIR}/bin/x86-64_darwin #osx 
+            ${CPLEX_ROOT_DIR}/bin/x64_win64 #windows
+      PATHS ENV LIBRARY_PATH #unix
+            ENV LD_LIBRARY_PATH #unix
+      )
+      message(STATUS "CPLEX Library: ${CPLEX_LIBRARY}")
+    else()
 
-  FIND_LIBRARY(CPLEX_LIBRARY
-    NAMES cplex${CPLEX_WIN_VERSION} cplex
-    HINTS ${CPLEX_ROOT_DIR}/cplex/lib/${CPLEX_WIN_PLATFORM} #windows
-          ${CPLEX_ROOT_DIR}/cplex/lib/x86-64_debian4.0_4.1/static_pic #unix
-          ${CPLEX_ROOT_DIR}/cplex/lib/x86-64_sles10_4.1/static_pic #unix 
-          ${CPLEX_ROOT_DIR}/cplex/lib/x86-64_linux/static_pic #unix 
-          ${CPLEX_ROOT_DIR}/cplex/lib/x86-64_osx/static_pic #osx 
-          ${CPLEX_ROOT_DIR}/cplex/lib/x86-64_darwin/static_pic #osx 
-    PATHS ENV LIBRARY_PATH #unix
-          ENV LD_LIBRARY_PATH #unix
+      FIND_LIBRARY(CPLEX_LIBRARY
+        NAMES cplex${CPLEX_WIN_VERSION} cplex
+        HINTS ${CPLEX_ROOT_DIR}/cplex/lib/${CPLEX_WIN_PLATFORM} #windows
+              ${CPLEX_ROOT_DIR}/cplex/lib/x86-64_debian4.0_4.1/static_pic #unix
+              ${CPLEX_ROOT_DIR}/cplex/lib/x86-64_sles10_4.1/static_pic #unix 
+              ${CPLEX_ROOT_DIR}/cplex/lib/x86-64_linux/static_pic #unix 
+              ${CPLEX_ROOT_DIR}/cplex/lib/x86-64_osx/static_pic #osx 
+              ${CPLEX_ROOT_DIR}/cplex/lib/x86-64_darwin/static_pic #osx 
+        PATHS ENV LIBRARY_PATH #unix
+              ENV LD_LIBRARY_PATH #unix
+        )
+      message(STATUS "CPLEX Library: ${CPLEX_LIBRARY}")
+    endif()
+
+    INCLUDE(FindPackageHandleStandardArgs)
+
+    if(WITH_CPLEX_SHARED)
+
+      FIND_PACKAGE_HANDLE_STANDARD_ARGS(CPLEX DEFAULT_MSG 
+       CPLEX_LIBRARY CPLEX_INCLUDE_DIR)
+
+      IF(CPLEX_FOUND)
+        SET(CPLEX_INCLUDE_DIRS ${CPLEX_INCLUDE_DIR})
+        SET(CPLEX_LIBRARIES ${CPLEX_LIBRARY} )
+        IF(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+          SET(CPLEX_LIBRARIES "${CPLEX_LIBRARIES};m;pthread")
+        ENDIF(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+      ENDIF(CPLEX_FOUND)
+
+      MARK_AS_ADVANCED(CPLEX_LIBRARY CPLEX_INCLUDE_DIR)
+
+    else()
+      FIND_PACKAGE_HANDLE_STANDARD_ARGS(CPLEX DEFAULT_MSG 
+       CPLEX_LIBRARY CPLEX_INCLUDE_DIR)
+
+      IF(CPLEX_FOUND)
+        SET(CPLEX_INCLUDE_DIRS ${CPLEX_INCLUDE_DIR})
+        SET(CPLEX_LIBRARIES ${CPLEX_LIBRARY} )
+        IF(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+          SET(CPLEX_LIBRARIES "${CPLEX_LIBRARIES};m;pthread")
+        ENDIF(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+      ENDIF(CPLEX_FOUND)
+
+      MARK_AS_ADVANCED(CPLEX_LIBRARY CPLEX_INCLUDE_DIR)
+
+    endif()
+    
+    add_library(cplex::cplex INTERFACE IMPORTED)
+    set_target_properties(cplex::cplex PROPERTIES
+      INTERFACE_INCLUDE_DIRECTORIES ${CPLEX_INCLUDE_DIRS}
     )
-  message(STATUS "CPLEX Library: ${CPLEX_LIBRARY}")
+    target_link_libraries(cplex::cplex INTERFACE ${CPLEX_LIBRARIES})
 endif()
-
-INCLUDE(FindPackageHandleStandardArgs)
-
-if(WITH_CPLEX_SHARED)
-
-  FIND_PACKAGE_HANDLE_STANDARD_ARGS(CPLEX DEFAULT_MSG 
-   CPLEX_LIBRARY CPLEX_INCLUDE_DIR)
-
-  IF(CPLEX_FOUND)
-    SET(CPLEX_INCLUDE_DIRS ${CPLEX_INCLUDE_DIR})
-    SET(CPLEX_LIBRARIES ${CPLEX_LIBRARY} )
-    IF(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-      SET(CPLEX_LIBRARIES "${CPLEX_LIBRARIES};m;pthread")
-    ENDIF(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-  ENDIF(CPLEX_FOUND)
-
-  MARK_AS_ADVANCED(CPLEX_LIBRARY CPLEX_INCLUDE_DIR)
-
-else()
-  FIND_PACKAGE_HANDLE_STANDARD_ARGS(CPLEX DEFAULT_MSG 
-   CPLEX_LIBRARY CPLEX_INCLUDE_DIR)
-
-  IF(CPLEX_FOUND)
-    SET(CPLEX_INCLUDE_DIRS ${CPLEX_INCLUDE_DIR})
-    SET(CPLEX_LIBRARIES ${CPLEX_LIBRARY} )
-    IF(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-      SET(CPLEX_LIBRARIES "${CPLEX_LIBRARIES};m;pthread")
-    ENDIF(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-  ENDIF(CPLEX_FOUND)
-
-  MARK_AS_ADVANCED(CPLEX_LIBRARY CPLEX_INCLUDE_DIR)
-
-endif()
-

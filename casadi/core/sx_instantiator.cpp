@@ -114,7 +114,7 @@ namespace casadi {
   template<>
   bool CASADI_EXPORT SX::is_smooth() const {
     // Make a function
-    Function temp("tmp_is_smooth", {SX()}, {*this}, Dict{{"max_io", 0}});
+    Function temp("tmp_is_smooth", {SX()}, {*this}, Dict{{"max_io", 0}, {"allow_free", true}});
 
     // Run the function on the temporary variable
     SXFunction* t = temp.get<SXFunction>();
@@ -462,7 +462,7 @@ namespace casadi {
 
 
     // Otherwise, evaluate symbolically
-    Function F("tmp_substitute", v, ex, Dict{{"max_io", 0}});
+    Function F("tmp_substitute", v, ex, Dict{{"max_io", 0}, {"allow_free", true}});
     return F(vdef);
   }
 
@@ -494,7 +494,7 @@ namespace casadi {
     f_out.insert(f_out.end(), ex.begin(), ex.end());
 
     // Write the mapping function
-    Function f("tmp_substitute_inplace", f_in, f_out, Dict{{"max_io", 0}});
+    Function f("tmp_substitute_inplace", f_in, f_out, Dict{{"max_io", 0}, {"allow_free", true}});
 
     // Get references to the internal data structures
     SXFunction *ff = f.get<SXFunction>();
@@ -550,7 +550,7 @@ namespace casadi {
     if (x.nnz()==0) return false;
 
     // Construct a temporary algorithm
-    Function temp("tmp_depends_on", {arg}, {x}, Dict{{"max_io", 0}});
+    Function temp("tmp_depends_on", {arg}, {x}, Dict{{"max_io", 0}, {"allow_free", true}});
 
     // Perform a single dependency sweep
     std::vector<bvec_t> t_in(arg.nnz(), 1), t_out(x.nnz());
@@ -595,7 +595,7 @@ namespace casadi {
     SX c = veccat(e);
     //std::vector<SX> args = symvar(c);
     Function f("f", std::vector<SX>{}, e, {{"live_variables", false},
-      {"max_io", 0}, {"cse", false}});
+      {"max_io", 0}, {"cse", false}, {"allow_free", true}});
     SXFunction *ff = f.get<SXFunction>();
 
     std::vector<SX> ret;
@@ -676,6 +676,7 @@ namespace casadi {
     // Propagate verbose option to helper function
     Dict h_opts;
     Dict opts_remainder = extract_from_dict(opts, "helper_options", h_opts);
+    h_opts["allow_free"] = true;
     Function h("jac_helper", {x}, {f}, h_opts);
     return h.get<SXFunction>()->jac(opts_remainder).at(0);
   }
@@ -701,6 +702,7 @@ namespace casadi {
 
     Dict h_opts;
     Dict opts_remainder = extract_from_dict(opts, "helper_options", h_opts);
+    h_opts["allow_free"] = true;
     // Read options
     bool always_inline = false;
     bool never_inline = false;
@@ -727,7 +729,7 @@ namespace casadi {
 
     Dict h_opts;
     Dict opts_remainder = extract_from_dict(opts, "helper_options", h_opts);
-
+    h_opts["allow_free"] = true;
     // Read options
     bool always_inline = false;
     bool never_inline = false;
@@ -821,7 +823,8 @@ namespace casadi {
 
   template<>
   casadi_int CASADI_EXPORT SX::n_nodes(const SX& x) {
-    Function f("tmp_n_nodes", {SX()}, {x}, Dict{{"max_io", 0}, {"cse", false}});
+    Dict opts{{"max_io", 0}, {"cse", false}, {"allow_free", true}};
+    Function f("tmp_n_nodes", {SX()}, {x}, opts);
     return f.n_nodes();
   }
 
@@ -841,7 +844,8 @@ namespace casadi {
 
   template<>
   std::vector<SX> CASADI_EXPORT SX::symvar(const SX& x) {
-    Function f("tmp_symvar", std::vector<SX>{}, {x}, Dict{{"max_io", 0}, {"cse", false}});
+    Dict opts{{"max_io", 0}, {"cse", false}, {"allow_free", true}};
+    Function f("tmp_symvar", std::vector<SX>{}, {x}, opts);
     return f.free_sx();
   }
 
@@ -871,7 +875,7 @@ namespace casadi {
     casadi_assert(lift_shared, "Not implemented");
     casadi_assert(!lift_calls, "Not implemented");
     // Sort the expression
-    Function f("tmp_extract", std::vector<SX>(), ex, Dict{{"max_io", 0}});
+    Function f("tmp_extract", std::vector<SX>(), ex, Dict{{"max_io", 0}, {"allow_free", true}});
     SXFunction *ff = f.get<SXFunction>();
     // Get references to the internal data structures
     const std::vector<ScalarAtomic>& algorithm = ff->algorithm_;

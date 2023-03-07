@@ -1990,7 +1990,7 @@ class Functiontests(casadiTestCase):
       x = SX.sym("x")
       p = SX.sym("p")
 
-      f = Function('f',[x],[p])
+      f = Function('f',[x],[p], {"allow_free":True})
 
       #SXFunction with free parameters
       pickle.loads(pickle.dumps(f))
@@ -2041,7 +2041,7 @@ class Functiontests(casadiTestCase):
     f = Function('f',[x],[],["x"],[])
     self.assertTrue("(x)->()" in str(f))
 
-    f = Function('f',[],[x],[],["y"])
+    f = Function('f',[],[x],[],["y"], {"allow_free": True})
     self.assertTrue("()->(y)" in str(f))
 
     f = Function('f',[x],[x**2],["x"],["y"])
@@ -2440,7 +2440,7 @@ class Functiontests(casadiTestCase):
   def test_map_exception(self):
     x = MX.sym("x",4)
     y = MX.sym("y",4)
-    f = Function("f",[x],[x+y])
+    f = Function("f",[x],[x+y],{"allow_free":True})
 
     if "CASADI_WITH_THREAD" in CasadiMeta.compiler_flags():
       message = "Evaluation failed"
@@ -2450,7 +2450,32 @@ class Functiontests(casadiTestCase):
     with self.assertInException(message):
       F = f.map(4,"thread",2)
       F(3)
-
+      
+  def test_DM_arg(self):
+    f = Function('f',[DM(0,1)],[])
+    print(f)
+    f = Function('f',[DM(0,1),SX.sym("x")],[])
+    print(f)
+    f = Function('f',[DM(0,1),MX.sym("x")],[])
+    print(f)
+    self.assertTrue(isinstance(vertcat(),DM))
+    self.assertEqual(vertcat().shape,(0,1))
+    self.assertTrue(isinstance(horzcat(),DM))
+    self.assertEqual(horzcat().shape,(1,0))
+    self.assertTrue(isinstance(veccat(),DM))
+    self.assertEqual(veccat().shape,(0,1))
+    self.assertTrue(isinstance(diagcat(),DM))
+    self.assertEqual(diagcat().shape,(0,0))
+    self.assertTrue(isinstance(vcat([]),DM))
+    self.assertEqual(vcat([]).shape,(0,1))
+    self.assertTrue(isinstance(hcat([]),DM))
+    self.assertEqual(hcat([]).shape,(1,0))
+    self.assertTrue(isinstance(vvcat([]),DM))
+    self.assertEqual(vvcat([]).shape,(0,1))
+    self.assertTrue(isinstance(dcat([]),DM))
+    self.assertEqual(dcat([]).shape,(0,0))
+    
+    
   def test_nondiff(self):
 
     for X in [SX,MX]:
@@ -2783,8 +2808,8 @@ class Functiontests(casadiTestCase):
         self.assertFalse(w.is_zero())
         res = cse(w)
         self.assertTrue(res.is_zero())
-        f1 = Function('f',[x,y],[w],{"cse":False})
-        f2 = Function('f',[x,y],[w],{"cse":True})
+        f1 = Function('f',[x,y,p],[w],{"cse":False})
+        f2 = Function('f',[x,y,p],[w],{"cse":True})
         self.assertTrue(f1.n_instructions()>3)
         self.assertTrue(f2.n_instructions()<=3)
 
@@ -2998,6 +3023,33 @@ class Functiontests(casadiTestCase):
                 f,f_normal,f_ref = [fe.factory('f',in_labels,out_labels) for fe in [f,f_normal,f_ref]]
             
         
+  def test_no_hess2(self):
+    y = MX.sym("y",2)
+
+    f = Function("foo",[y],[vertcat(sin(y[0]*y[1]),cos(y[0]*y[1]))],{"never_inline":True,"print_out":True})
+
+
+    opti = Opti()
+
+    x = opti.variable(2)
+
+    opti.subject_to(no_hess(f(x**2))>=0)
+
+    opti.minimize(sumsqr(x-2))
+
+    opti.solver("sqpmethod")
+
+    F = opti.to_function("F",[x],[x])
+    F.generate('F.c')
+    with open('F.c','r') as inp:
+        code = inp.read()
+    for m in re.findall(r"\w+FS",code):
+        self.assertTrue(len(m.split("_"))<=2)
+    for m in re.findall(r"\w+foo",code):
+        pass
+        # bug 3019
+        #self.assertTrue(len(m.split("_"))<=2)
+
    
 if __name__ == '__main__':
     unittest.main()

@@ -168,7 +168,7 @@ namespace casadi {
       if (!ScY) {
         g.local("cs", "const casadi_real", "*");
         g << ", cs=" << g.work(arg[1], dep(1).nnz());
-        if (op_==OP_OR || op_==OP_AND) {
+        if (op_==OP_OR || op_==OP_AND || op_==OP_IF_ELSE_ZERO) {
           // Avoid short-circuiting with side effects
           y = "cs[i]";
         } else {

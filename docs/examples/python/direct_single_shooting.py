@@ -111,8 +111,8 @@ x_opt = [[0, 1]]
 for k in range(N):
     Fk = F(x0=x_opt[-1], p=u_opt[k])
     x_opt += [Fk['xf'].full()]
-x1_opt = [r[0] for r in x_opt]
-x2_opt = [r[1] for r in x_opt]
+x1_opt = vcat([r[0] for r in x_opt])
+x2_opt = vcat([r[1] for r in x_opt])
 
 tgrid = [T/N*k for k in range(N+1)]
 import matplotlib.pyplot as plt

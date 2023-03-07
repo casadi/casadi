@@ -140,7 +140,7 @@ namespace casadi {
     void SerializerBase::pack(const Type& e) { \
       serializer().pack(static_cast<char>(SERIALIZED_ ## TYPE));\
       serializer().pack(Function("tmp_serializer", std::vector< BaseType >{}, arg, \
-        Dict{{"max_io", 0}, {"cse", false}})); \
+        Dict{{"max_io", 0}, {"cse", false}, {"allow_free", true}})); \
       serializer().pack(e); \
     } \
     \

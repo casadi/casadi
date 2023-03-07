@@ -104,7 +104,7 @@ class ImplicitFunctiontests(casadiTestCase):
       self.message(Solver)
       x=SX.sym("x")
       p=SX.sym("p")
-      f=Function("f", [x], [sin(x+p)])
+      f=Function("f", [x], [sin(x+p)],{"allow_free":True})
       with self.assertInException("[p] are free"):
         rootfinder("solver", Solver, f, options)
 

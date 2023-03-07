@@ -630,7 +630,7 @@ std::map<std::string, MatType> Integrator::aug_adj(casadi_int nadj) const {
 
   // Make sure that forward problem does not depend on backward states
   Function f("f", {ret["t"], ret["x"], ret["z"], ret["p"]},
-                  {ret["ode"], ret["alg"], ret["quad"]});
+                  {ret["ode"], ret["alg"], ret["quad"]}, {{"allow_free", true}});
   if (f.has_free()) {
     // Replace dependencies of rx, rz and rp with zeros
     f = Function("f", {ret["t"], ret["x"], ret["z"], ret["p"],

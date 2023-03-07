@@ -129,7 +129,7 @@ as follows.
 
         g = 9.81 [hidden]
 
-        dae = DaeBuilder()
+        dae = DaeBuilder('rocket')
         # Add input expressions
         a = dae.add_p('a')
         b = dae.add_p('b')
@@ -141,9 +141,9 @@ as follows.
         hdot = v
         vdot = (u-a*v**2)/m-g
         mdot = -b*u**2
-        dae.add_ode('hdot', hdot)
-        dae.add_ode('vdot', vdot)
-        dae.add_ode('mdot', mdot)
+        dae.set_ode('h', hdot)
+        dae.set_ode('v', vdot)
+        dae.set_ode('m', mdot)
         # Specify initial conditions
         dae.set_start('h', 0)
         dae.set_start('v', 0)
@@ -159,7 +159,7 @@ as follows.
 
         g = 9.81; [hidden]
 
-        dae = DaeBuilder;
+        dae = DaeBuilder('rocket')
         % Add input expressions
         a = dae.add_p('a');
         b = dae.add_p('b');
@@ -171,9 +171,9 @@ as follows.
         hdot = v;
         vdot = (u-a*v^2)/m-g;
         mdot = -b*u^2;
-        dae.add_ode('hdot', hdot);
-        dae.add_ode('vdot', vdot);
-        dae.add_ode('mdot', mdot);
+        dae.set_ode('h', hdot);
+        dae.set_ode('v', vdot);
+        dae.set_ode('m', mdot);
         % Specify initial conditions
         dae.set_start('h', 0);
         dae.set_start('v', 0);

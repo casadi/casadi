@@ -1307,7 +1307,7 @@ namespace casadi {
     std::string dump_format_;
 
     // Forward/reverse/Jacobian options
-    Dict forward_options_, reverse_options_, jacobian_options_;
+    Dict forward_options_, reverse_options_, jacobian_options_, der_options_;
 
     // Store a reference to a custom Jacobian
     Function custom_jacobian_;

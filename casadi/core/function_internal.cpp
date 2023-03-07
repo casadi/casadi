@@ -317,6 +317,10 @@ namespace casadi {
       {"jacobian_options",
        {OT_DICT,
         "Options to be passed to a Jacobian constructor"}},
+      {"der_options",
+       {OT_DICT,
+        "Default options to be used to populate forward_options, reverse_options, and "
+        "jacobian_options before those options are merged in."}},
       {"custom_jacobian",
        {OT_FUNCTION,
         "Override CasADi's AD. Use together with 'jac_penalty': 0. "
@@ -387,6 +391,8 @@ namespace casadi {
       opts["enable_fd"] = enable_fd_op_;
       opts["reverse_options"] = reverse_options_;
       opts["forward_options"] = forward_options_;
+      opts["jacobian_options"] = jacobian_options_;
+      opts["der_options"] = der_options_;
       opts["derivative_of"] = derivative_of_;
     }
     opts["fd_options"] = fd_options_;
@@ -507,6 +513,8 @@ namespace casadi {
         reverse_options_ = op.second;
       } else if (op.first=="jacobian_options") {
         jacobian_options_ = op.second;
+      } else if (op.first=="der_options") {
+        der_options_ = op.second;
       } else if (op.first=="custom_jacobian") {
         custom_jacobian_ = op.second.to_function();
         casadi_assert(custom_jacobian_.name() == "jac_" + name_,
@@ -1993,7 +2001,8 @@ namespace casadi {
       std::vector<std::string> onames;
       for (i=0; i<n_out_; ++i) onames.push_back("fwd_" + name_out_[i]);
       // Options
-      Dict opts = combine(forward_options_, generate_options("forward"));
+      Dict opts = combine(forward_options_, der_options_);
+      opts = combine(opts, generate_options("forward"));
       if (!enable_forward_) opts = fd_options_;
       opts["derivative_of"] = self();
       // Generate derivative function
@@ -2051,7 +2060,8 @@ namespace casadi {
       std::vector<std::string> onames;
       for (casadi_int i=0; i<n_in_; ++i) onames.push_back("adj_" + name_in_[i]);
       // Options
-      Dict opts = combine(reverse_options_, generate_options("reverse"));
+      Dict opts = combine(reverse_options_, der_options_);
+      opts = combine(opts, generate_options("reverse"));
       opts["derivative_of"] = self();
       // Generate derivative function
       casadi_assert_dev(enable_reverse_);
@@ -2168,7 +2178,7 @@ namespace casadi {
         }
       }
       // Options
-      Dict opts = jacobian_options_;
+      Dict opts = combine(jacobian_options_, der_options_);
       opts["derivative_of"] = self();
       // Generate derivative function
       casadi_assert_dev(enable_jacobian_);
@@ -3727,7 +3737,7 @@ namespace casadi {
 
   void FunctionInternal::serialize_body(SerializingStream& s) const {
     ProtoFunction::serialize_body(s);
-    s.version("FunctionInternal", 4);
+    s.version("FunctionInternal", 5);
     s.pack("FunctionInternal::is_diff_in", is_diff_in_);
     s.pack("FunctionInternal::is_diff_out", is_diff_out_);
     s.pack("FunctionInternal::sp_in", sparsity_in_);
@@ -3786,6 +3796,8 @@ namespace casadi {
     s.pack("FunctionInternal::dump_format", dump_format_);
     s.pack("FunctionInternal::forward_options", forward_options_);
     s.pack("FunctionInternal::reverse_options", reverse_options_);
+    s.pack("FunctionInternal::jacobian_options", jacobian_options_);
+    s.pack("FunctionInternal::der_options", der_options_);
     s.pack("FunctionInternal::custom_jacobian", custom_jacobian_);
 
     s.pack("FunctionInternal::sz_arg_per", sz_arg_per_);
@@ -3799,7 +3811,7 @@ namespace casadi {
   }
 
   FunctionInternal::FunctionInternal(DeserializingStream& s) : ProtoFunction(s) {
-    int version = s.version("FunctionInternal", 1, 4);
+    int version = s.version("FunctionInternal", 1, 5);
     s.unpack("FunctionInternal::is_diff_in", is_diff_in_);
     s.unpack("FunctionInternal::is_diff_out", is_diff_out_);
     s.unpack("FunctionInternal::sp_in", sparsity_in_);
@@ -3879,6 +3891,10 @@ namespace casadi {
     dump_ = false;
     s.unpack("FunctionInternal::forward_options", forward_options_);
     s.unpack("FunctionInternal::reverse_options", reverse_options_);
+    if (version>=5) {
+      s.unpack("FunctionInternal::jacobian_options", jacobian_options_);
+      s.unpack("FunctionInternal::der_options", der_options_);
+    }
     s.unpack("FunctionInternal::custom_jacobian", custom_jacobian_);
     if (!custom_jacobian_.is_null()) {
       casadi_assert_dev(custom_jacobian_.name() == "jac_" + name_);

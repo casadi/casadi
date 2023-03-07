@@ -19,7 +19,7 @@ for lang in langs:
          if lang == "python":
            args = ["python",f]
          if lang == "octave":
-           args = ["octave-cli","--eval","try,run('%s'),catch e,e.message,exit(1),end" % f]
+           args = ["octave","--no-gui","--no-window-system","--eval","try,run('%s'),catch e,e.message,exit(1),end" % f]
          
          p = subprocess.Popen(args,stdout=myoutput, stderr=myoutput)
          p.wait()
@@ -32,4 +32,4 @@ for lang in langs:
     print("Processed %d snippets" % len(snippets))
 
 if not success:
-  os.exit(1)
+  exit(1)
