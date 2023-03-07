@@ -985,7 +985,11 @@ if(WITH_CLANG)
           PREFIX "${CMAKE_BINARY_DIR}/external_projects"
           UPDATE_COMMAND ""
           CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
-          CMAKE_ARGS -DLLVM_BUILD_TOOLS=OFF -DLLVM_INCLUDE_TOOLS=OFF -DLLVM_INCLUDE_UTILS=OFF -DLLVM_BUILD_UTILS=OFF -DLLVM_INCLUDE_RUNTIMES=OFF -DLLVM_BUILD_RUNTIMES=OFF -DLLVM_INCLUDE_TESTS=OFF -DLLVM_ENABLE_PROJECTS=clang -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
+          CMAKE_ARGS -DLLVM_BUILD_TOOLS=OFF -DLLVM_INCLUDE_TOOLS=OFF -DLLVM_INCLUDE_UTILS=OFF -DLLVM_BUILD_UTILS=OFF -DLLVM_INCLUDE_TESTS=OFF -DLLVM_ENABLE_PROJECTS=clang -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
+          
+          # LLVM_ENABLE_RUNTIMES: Build libc++, libc++abi, libunwind or compiler-rt using the just-built compiler.
+          # LLVM_BUILD_TOOLS: e.g. executables like llvm-as
+          # UTILS: utility binaries like FileChec
           
     add_library(clang::clang SHARED IMPORTED)
     add_dependencies(clang::clang clang-external)
