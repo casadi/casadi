@@ -1144,7 +1144,9 @@ namespace casadi {
     for (const std::string& s : s_out) ret_out.push_back(f.get_output(s));
 
     // Create function and return
-    Function ret(name, ret_in, ret_out, ret_iname, ret_oname, final_options);
+    Dict final_options_allow_free = final_options;
+    final_options_allow_free["allow_free"] = true;
+    Function ret(name, ret_in, ret_out, ret_iname, ret_oname, final_options_allow_free);
     if (ret.has_free()) {
       // Substitute free variables with zeros
       // We assume that the free variables are caused by false positive dependencies
