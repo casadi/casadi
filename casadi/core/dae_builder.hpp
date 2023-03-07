@@ -444,7 +444,7 @@ class CASADI_EXPORT DaeBuilder
   /// Construct a function object, legacy syntax
   Function create(const std::string& fname,
     const std::vector<std::string>& name_in,
-    const std::vector<std::string>& name_out, bool sx = false, bool lifted_calls = false) const;
+    const std::vector<std::string>& name_out, bool sx, bool lifted_calls = false) const;
 
   /** \brief  Construct a function object, names provided
 
