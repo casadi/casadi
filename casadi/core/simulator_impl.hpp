@@ -42,19 +42,19 @@ struct CASADI_EXPORT SimulatorMemory : public OracleMemory {
   // Input arguments
   const double *x0, *u, *z0, *p;
   // Nondifferentiated outputs
-  const double *out_x, *out_z, *out_y;
+  const double *out_x, *out_z;
   // Forward seeds
   const double *fwd_x0, *fwd_u, *fwd_z0, *fwd_p;
   // Outputs
   double *x, *z, *y;
   // Forward sensitivities
-  double *fwd_x, *fwd_z, *fwd_y;
+  double *fwd_x, *fwd_z;
   // Current time
   double t;
   // Current state
   double *xk, *zk, *yk;
   // Current forward sensitivities
-  double *fwd_xk, *fwd_zk, *fwd_yk;
+  double *fwd_xk, *fwd_zk;
 };
 
 /** \brief Internal storage for simulator related data
@@ -143,11 +143,6 @@ Simulator : public OracleFunction, public PluginInterface<Simulator> {
       \identifier{1n7} */
   casadi_int next_stop(casadi_int k, const double* u) const;
 
-  /** \brief  Evaluate output function
-
-      \identifier{1n8} */
-  virtual void eval_y(SimulatorMemory* mem) const;
-
   /** \brief  evaluate
 
       \identifier{1n9} */
@@ -171,7 +166,6 @@ Simulator : public OracleFunction, public PluginInterface<Simulator> {
   const Sparsity&  u() const { return oracle_.sparsity_in(DYN_U);}
   const Sparsity&  z() const { return oracle_.sparsity_in(DYN_Z);}
   const Sparsity&  p() const { return oracle_.sparsity_in(DYN_P);}
-  const Sparsity&  y() const { return oracle_.sparsity_out(DYN_YDEF);}
   ///@}
 
   // Time grid

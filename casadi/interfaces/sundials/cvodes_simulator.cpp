@@ -241,8 +241,6 @@ void CvodesSimulator::reset(SimulatorMemory* mem) const {
     int ism = CV_SIMULTANEOUS;  // or CV_STAGGERED
     THROWING(CVodeSensReInit, m->mem, ism, get_ptr(m->fwd_xz));
   }
-  // Get outputs at initial time
-  eval_y(m);
 }
 
 void CvodesSimulator::advance(SimulatorMemory* mem, double t, double t_stop) const {
@@ -259,8 +257,6 @@ void CvodesSimulator::advance(SimulatorMemory* mem, double t, double t_stop) con
       casadi_copy(NV_DATA_S(m->fwd_xz[i]), nx_, m->fwd_xk + i * nx_);
     }
   }
-  // Get outputs
-  eval_y(m);
   // Get stats
   THROWING(CVodeGetIntegratorStats, m->mem, &m->nsteps, &m->nfevals, &m->nlinsetups,
     &m->netfails, &m->qlast, &m->qcur, &m->hinused,

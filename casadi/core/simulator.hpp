@@ -107,8 +107,6 @@ namespace casadi {
   enum SimulatorOutput {
     /// Differential state
     SIMULATOR_X,
-    /// Outputs
-    SIMULATOR_Y,
     /// Algebraic variable
     SIMULATOR_Z,
     /// Number of output arguments of an simulator

@@ -87,7 +87,6 @@ std::string simulator_out(casadi_int ind) {
   switch (static_cast<SimulatorOutput>(ind)) {
   case SIMULATOR_X:  return "x";
   case SIMULATOR_Z:  return "z";
-  case SIMULATOR_Y:  return "y";
   case SIMULATOR_NUM_OUT: break;
   }
   return std::string();
@@ -141,7 +140,6 @@ Sparsity Simulator::get_sparsity_in(casadi_int i) {
     switch (i) {
       case SIMULATOR_X: return repmat(Sparsity(x().size()), 1, ng_);
       case SIMULATOR_Z: return repmat(Sparsity(z().size()), 1, ng_);
-      case SIMULATOR_Y: return repmat(Sparsity(y().size()), 1, ng_);
     }
     i -= SIMULATOR_NUM_OUT;
   }
@@ -165,7 +163,6 @@ Sparsity Simulator::get_sparsity_out(casadi_int i) {
     switch (i) {
       case SIMULATOR_X: return repmat(x(), 1, ng_);
       case SIMULATOR_Z: return repmat(z(), 1, ng_);
-      case SIMULATOR_Y: return repmat(y(), 1, ng_);
     }
     i -= SIMULATOR_NUM_OUT;
   }
@@ -174,7 +171,6 @@ Sparsity Simulator::get_sparsity_out(casadi_int i) {
     switch (i) {
       case SIMULATOR_X: return repmat(x(), 1, ng_ * nfwd_);
       case SIMULATOR_Z: return repmat(z(), 1, ng_ * nfwd_);
-      case SIMULATOR_Y: return repmat(y(), 1, ng_ * nfwd_);
     }
     i -= SIMULATOR_NUM_OUT;
   }
@@ -234,10 +230,9 @@ void Simulator::set_work(void* mem, const double**& arg, double**& res,
   if (!nondiff_ && nfwd_ > 0) {
     m->out_x = arg[SIMULATOR_X];
     m->out_z = arg[SIMULATOR_Z];
-    m->out_y = arg[SIMULATOR_Y];
     arg += SIMULATOR_NUM_OUT;
   } else {
-    m->out_x = m->out_z = m->out_y = 0;
+    m->out_x = m->out_z = 0;
   }
   // Forward seeds
   if (nfwd_ > 0) {
@@ -253,7 +248,6 @@ void Simulator::set_work(void* mem, const double**& arg, double**& res,
   if (nondiff_) {
     m->x = res[SIMULATOR_X];
     m->z = res[SIMULATOR_Z];
-    m->y = res[SIMULATOR_Y];
     res += SIMULATOR_NUM_OUT;
   } else {
     m->x = m->z = m->y = 0;
@@ -262,10 +256,9 @@ void Simulator::set_work(void* mem, const double**& arg, double**& res,
   if (nfwd_ > 0) {
     m->fwd_x = res[SIMULATOR_X];
     m->fwd_z = res[SIMULATOR_Z];
-    m->fwd_y = res[SIMULATOR_Y];
     res += SIMULATOR_NUM_OUT;
   } else {
-    m->fwd_x = m->fwd_z = m->fwd_y = 0;
+    m->fwd_x = m->fwd_z = 0;
   }
   // Current state
   m->xk = w;  w += nx_;
@@ -378,7 +371,6 @@ void Simulator::init(const Dict& opts) {
   nu_ = u().nnz();
   nz_ = z().nnz();
   np_ = p().nnz();
-  ny_ = y().nnz();
 
   // Sensitivities not implemented
   if (nfwd_ > 0) casadi_warning("Forward sensitivities experimental");
@@ -469,21 +461,6 @@ Function Simulator::map2oracle(const std::string& name,
   de_out[DYN_ALG] = project(de_out[DYN_ALG], de_in[DYN_Z].sparsity());
   // Construct
   return Function(name, de_in, de_out, dyn_in(), dyn_out(), opts);
-}
-
-void Simulator::eval_y(SimulatorMemory* mem) const {
-  // Quick return if nothing to calculate
-  if (!mem->y || ny_ == 0) return;
-  // Calculate outputs
-  std::fill_n(mem->arg, enum_traits<DynIn>::n_enum, nullptr);
-  mem->arg[DYN_T] = &mem->t;
-  mem->arg[DYN_X] = mem->xk;
-  mem->arg[DYN_Z] = mem->zk;
-  mem->arg[DYN_P] = mem->p;
-  mem->arg[DYN_U] = mem->u;
-  std::fill_n(mem->res, enum_traits<DynOut>::n_enum, nullptr);
-  mem->res[DYN_YDEF] = mem->y;
-  if (calc_function(mem, "dae")) casadi_error("'dae' calculation failed");
 }
 
 casadi_int Simulator::next_stop(casadi_int k, const double* u) const {
