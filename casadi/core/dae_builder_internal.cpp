@@ -650,7 +650,7 @@ std::vector<std::string> DaeBuilderInternal::export_fmu(const Dict& opts) const 
   std::string guid = generate_guid();
   // Generate model function
   std::string dae_filename = "daefun";
-  Function dae = shared_from_this<DaeBuilder>().create(dae_filename);
+  Function dae = shared_from_this<DaeBuilder>().create(dae_filename, {"t", "x", "p", "u"}, {"ode", "ydef"});
   // Generate C code for model equations
   Dict codegen_opts;
   codegen_opts["with_header"] = true;
