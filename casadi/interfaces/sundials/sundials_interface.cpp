@@ -146,7 +146,9 @@ namespace casadi {
         max_num_steps_ = op.second;
       } else if (op.first=="stop_at_end") {
         stop_at_end_ = op.second;
-        if (!stop_at_end_) casadi_warning("The 'stop_at_end' option has been deprecated and is currently ignored");
+        if (!stop_at_end_) {
+          casadi_warning("The 'stop_at_end' option has been deprecated and is currently ignored");
+        }
       } else if (op.first=="use_preconditioner") {
         use_precon_ = op.second;
       } else if (op.first=="max_krylov") {

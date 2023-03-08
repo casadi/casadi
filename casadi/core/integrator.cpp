@@ -177,7 +177,8 @@ casadi_int dyn_n_out() {
 }
 
 Integrator::Integrator(const std::string& name, const Function& oracle,
-    double t0, const std::vector<double>& tout) : OracleFunction(name, oracle), t0_(t0), tout_(tout) {
+    double t0, const std::vector<double>& tout)
+    : OracleFunction(name, oracle), t0_(t0), tout_(tout) {
 
   // Negative number of parameters for consistancy checking
   np_ = -1;
@@ -929,7 +930,7 @@ get_forward(casadi_int nfwd, const std::string& name,
       v[d] = MX::sym("fwd" + str(d) + "_" + integrator_in(i), sparsity_in(i));
       aug_in[i].push_back(v[d]);
     }
-    ret_in.push_back(horzcat(v)); 
+    ret_in.push_back(horzcat(v));
   }
 
   // Call the augmented integrator
@@ -1037,7 +1038,7 @@ get_reverse(casadi_int nadj, const std::string& name,
       v[d] = MX::sym("adj" + str(d) + "_" + integrator_out(i), sparsity_out(i));
       aug_in[i].push_back(v[d]);
     }
-    ret_in.push_back(horzcat(v)); 
+    ret_in.push_back(horzcat(v));
   }
 
   // Call the augmented integrator
@@ -1100,7 +1101,8 @@ get_reverse(casadi_int nadj, const std::string& name,
     ret_out_split.reserve(n_grid * nadj);
     for (casadi_int d = 0; d < nadj; ++d) {
       for (casadi_int k = 0; k < n_grid; ++k) {
-        ret_out_split.push_back(reshape(integrator_out_split.at((nadj + 1) * k + d + 1), size1_in(i), size2_in(i) / n_grid));
+        ret_out_split.push_back(reshape(integrator_out_split.at((nadj + 1) * k + d + 1),
+          size1_in(i), size2_in(i) / n_grid));
       }
     }
     ret_out.push_back(horzcat(ret_out_split));
