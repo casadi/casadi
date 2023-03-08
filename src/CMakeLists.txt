@@ -180,5 +180,26 @@ if (TARGET PkgConfig::IPOPT)
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/export>)
 endif()
 
+find_package(lbfgspp)
+if (TARGET lbfgspp)
+    message(STATUS "Compiling LBFGS++ solver adapter")
+    add_library(lbfgspp-adapter "interop/lbfgspp/src/lbfgsb-adapter.cpp")
+    target_link_libraries(lbfgspp-adapter 
+        PUBLIC lbfgspp alpaqa::alpaqa PRIVATE alpaqa::warnings)
+    target_include_directories(lbfgspp-adapter PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/interop/lbfgspp/include>
+        $<INSTALL_INTERFACE:include>)
+    set_property(TARGET lbfgspp-adapter
+        PROPERTY OUTPUT_NAME alpaqa-lbfgspp-adapter)
+    alpaqa_configure_visibility(lbfgspp-adapter)
+    set_target_properties(lbfgspp-adapter PROPERTIES SOVERSION ${PROJECT_VERSION})
+    add_library(alpaqa::lbfgspp-adapter ALIAS lbfgspp-adapter)
+    list(APPEND ALPAQA_INSTALL_TARGETS lbfgspp-adapter)
+    generate_export_header(lbfgspp-adapter
+        EXPORT_FILE_NAME export/alpaqa/lbfgspp-adapter-export.h)
+    target_include_directories(lbfgspp-adapter PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/export>)
+endif()
+
 # Installation
 include(cmake/Install.cmake)
