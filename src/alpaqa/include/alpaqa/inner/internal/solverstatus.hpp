@@ -16,6 +16,7 @@ enum class SolverStatus {
     NotFinite,   ///< Intermediate results were infinite or not-a-number.
     NoProgress,  ///< No progress was made in the last iteration.
     Interrupted, ///< Solver was interrupted by the user.
+    Exception,   ///< An unexpected exception was thrown.
 };
 
 /// @related    SolverStatus
@@ -29,6 +30,7 @@ inline constexpr const char *enum_name(SolverStatus s) {
         case Status::NotFinite: return "NotFinite";
         case Status::NoProgress: return "NoProgress";
         case Status::Interrupted: return "Interrupted";
+        case Status::Exception: return "Exception";
         default:;
     }
     throw std::out_of_range("invalid value for alpaqa::SolverStatus");
