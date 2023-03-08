@@ -96,10 +96,10 @@ void CvodesInterface::init(const Dict& opts) {
   }
 
   // Create function
-  create_function("odeF", {"x", "p", "t"}, {"ode"});
-  create_function("quadF", {"x", "p", "t"}, {"quad"});
-  create_function("odeB", {"rx", "rp", "x", "p", "t"}, {"rode"});
-  create_function("quadB", {"rx", "rp", "x", "p", "t"}, {"rquad"});
+  create_function("odeF", {"x", "p", "u", "t"}, {"ode"});
+  create_function("quadF", {"x", "p", "u", "t"}, {"quad"});
+  create_function("odeB", {"rx", "rp", "x", "p", "u", "t"}, {"rode"});
+  create_function("quadB", {"rx", "rp", "x", "p", "u", "t"}, {"rquad"});
 
   // Algebraic variables not supported
   casadi_assert(nz_==0 && nrz_==0,
@@ -123,10 +123,10 @@ void CvodesInterface::init(const Dict& opts) {
 
   // Attach functions for jacobian information
   if (newton_scheme_!=SD_DIRECT || (ns_>0 && second_order_correction_)) {
-    create_function("jtimesF", {"t", "x", "p", "fwd:x"}, {"fwd:ode"});
+    create_function("jtimesF", {"t", "x", "p", "u", "fwd:x"}, {"fwd:ode"});
     if (nrx_>0) {
       create_function("jtimesB",
-                      {"t", "x", "p", "rx", "rp", "fwd:rx"}, {"fwd:rode"});
+                      {"t", "x", "p", "u", "rx", "rp", "fwd:rx"}, {"fwd:rode"});
     }
   }
 }
@@ -223,7 +223,8 @@ int CvodesInterface::rhs(double t, N_Vector x, N_Vector xdot, void *user_data) {
     auto& s = m->self;
     m->arg[0] = NV_DATA_S(x);
     m->arg[1] = m->p;
-    m->arg[2] = &t;
+    m->arg[2] = m->u;
+    m->arg[3] = &t;
     m->res[0] = NV_DATA_S(xdot);
     s.calc_function(m, "odeF");
     return 0;
@@ -262,10 +263,8 @@ void CvodesInterface::advance(IntegratorMemory* mem, double t_next, double t_sto
     const double* u, double* x, double* z, double* q) const {
   auto m = to_mem(mem);
 
-  // Controls not implemented
-  (void)u;
-  (void)t_stop;
-  casadi_assert(nu_ == 0, "Not implemented");
+  // Set controls
+  casadi_copy(u, nu_, m->u);
 
   // Do not integrate past change in input signals or past the end
   THROWING(CVodeSetStopTime, m->mem, t_stop);
@@ -420,7 +419,8 @@ int CvodesInterface::rhsQ(double t, N_Vector x, N_Vector qdot, void *user_data) 
     auto& s = m->self;
     m->arg[0] = NV_DATA_S(x);
     m->arg[1] = m->p;
-    m->arg[2] = &t;
+    m->arg[2] = m->u;
+    m->arg[3] = &t;
     m->res[0] = NV_DATA_S(qdot);
     s.calc_function(m, "quadF");
     return 0;
@@ -442,7 +442,8 @@ int CvodesInterface::rhsB(double t, N_Vector x, N_Vector rx, N_Vector rxdot,
     m->arg[1] = m->rp;
     m->arg[2] = NV_DATA_S(x);
     m->arg[3] = m->p;
-    m->arg[4] = &t;
+    m->arg[4] = m->u;
+    m->arg[5] = &t;
     m->res[0] = NV_DATA_S(rxdot);
     s.calc_function(m, "odeB");
 
@@ -468,7 +469,8 @@ int CvodesInterface::rhsQB(double t, N_Vector x, N_Vector rx,
     m->arg[1] = m->rp;
     m->arg[2] = NV_DATA_S(x);
     m->arg[3] = m->p;
-    m->arg[4] = &t;
+    m->arg[4] = m->u;
+    m->arg[5] = &t;
     m->res[0] = NV_DATA_S(rqdot);
     s.calc_function(m, "quadB");
 
@@ -492,7 +494,8 @@ int CvodesInterface::jtimes(N_Vector v, N_Vector Jv, double t, N_Vector x,
     m->arg[0] = &t;
     m->arg[1] = NV_DATA_S(x);
     m->arg[2] = m->p;
-    m->arg[3] = NV_DATA_S(v);
+    m->arg[3] = m->u;
+    m->arg[4] = NV_DATA_S(v);
     m->res[0] = NV_DATA_S(Jv);
     s.calc_function(m, "jtimesF");
     return 0;
@@ -513,9 +516,10 @@ int CvodesInterface::jtimesB(N_Vector v, N_Vector Jv, double t, N_Vector x,
     m->arg[0] = &t;
     m->arg[1] = NV_DATA_S(x);
     m->arg[2] = m->p;
-    m->arg[3] = NV_DATA_S(rx);
-    m->arg[4] = m->rp;
-    m->arg[5] = NV_DATA_S(v);
+    m->arg[3] = m->u;
+    m->arg[4] = NV_DATA_S(rx);
+    m->arg[5] = m->rp;
+    m->arg[6] = NV_DATA_S(v);
     m->res[0] = NV_DATA_S(Jv);
     s.calc_function(m, "jtimesB");
     return 0;
@@ -553,7 +557,8 @@ int CvodesInterface::psolve(double t, N_Vector x, N_Vector xdot, N_Vector r,
         m->arg[0] = &t; // t
         m->arg[1] = NV_DATA_S(x); // x
         m->arg[2] = m->p; // p
-        m->arg[3] = v; // fwd:x
+        m->arg[3] = m->u; // u
+        m->arg[4] = v; // fwd:x
         m->res[0] = m->v2; // fwd:ode
         s.calc_function(m, "jtimesF");
 
@@ -604,9 +609,10 @@ int CvodesInterface::psolveB(double t, N_Vector x, N_Vector xB, N_Vector xdotB,
         m->arg[0] = &t; // t
         m->arg[1] = NV_DATA_S(x); // x
         m->arg[2] = m->p; // p
-        m->arg[3] = NV_DATA_S(xB); // rx
-        m->arg[4] = m->rp; // rp
-        m->arg[5] = v; // fwd:rx
+        m->arg[3] = m->u; // u
+        m->arg[4] = NV_DATA_S(xB); // rx
+        m->arg[5] = m->rp; // rp
+        m->arg[6] = v; // fwd:rx
         m->res[0] = m->v2; // fwd:rode
         s.calc_function(m, "jtimesB");
 

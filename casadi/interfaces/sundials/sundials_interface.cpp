@@ -228,6 +228,7 @@ namespace casadi {
 
     // Allocate work vectors
     alloc_w(np_, true); // p
+    alloc_w(nu_, true); // u
     alloc_w(nrp_, true); // rp
     alloc_w(2 * std::max(nx_+nz_, nrx_+nrz_), true); // v1, v2
 
@@ -397,6 +398,7 @@ namespace casadi {
 
     // Work vectors
     m->p = w; w += np_;
+    m->u = w; w += nu_;
     m->rp = w; w += nrp_;
     m->v1 = w; w += std::max(nx_+nz_, nrx_+nrz_);
     m->v2 = w; w += std::max(nx_+nz_, nrx_+nrz_);

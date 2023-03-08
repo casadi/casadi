@@ -56,6 +56,9 @@ namespace casadi {
     // Parameters
     double *p, *rp;
 
+    // Controls
+    double *u;
+
     // Jacobian
     double *jac, *jacB;
 
