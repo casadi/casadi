@@ -46,13 +46,13 @@ struct CASADI_EXPORT SimulatorMemory : public OracleMemory {
   // Forward seeds
   const double *fwd_x0, *fwd_u, *fwd_z0, *fwd_p;
   // Outputs
-  double *x, *z, *y;
+  double *x, *z;
   // Forward sensitivities
   double *fwd_x, *fwd_z;
   // Current time
   double t;
   // Current state
-  double *xk, *zk, *yk;
+  double *xk, *zk;
   // Current forward sensitivities
   double *fwd_xk, *fwd_zk;
 };
@@ -182,9 +182,6 @@ Simulator : public OracleFunction, public PluginInterface<Simulator> {
 
   /// Number of parameters
   casadi_int np_;
-
-  /// Number of outputs
-  casadi_int ny_;
 
   /// Output nondifferentiated
   bool nondiff_;

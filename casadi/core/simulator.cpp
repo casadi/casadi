@@ -250,7 +250,7 @@ void Simulator::set_work(void* mem, const double**& arg, double**& res,
     m->z = res[SIMULATOR_Z];
     res += SIMULATOR_NUM_OUT;
   } else {
-    m->x = m->z = m->y = 0;
+    m->x = m->z = 0;
   }
   // Forward sensitivities
   if (nfwd_ > 0) {
@@ -291,7 +291,6 @@ int Simulator::eval(const double** arg, double** res, casadi_int* iw, double* w,
   // Advance output time
   if (m->x) m->x += nx_;
   if (m->z) m->z += nz_;
-  if (m->y) m->y += ny_;
   // Next stop time due to step change in input
   casadi_int k_stop = next_stop(1, m->u);
   // Integrate forward
@@ -314,7 +313,6 @@ int Simulator::eval(const double** arg, double** res, casadi_int* iw, double* w,
     if (m->u) m->u += nu_;
     if (m->fwd_u) m->fwd_u += nu_;
     if (m->z) m->z += nz_;
-    if (m->y) m->y += ny_;
   }
   // Print stats
   if (print_stats_) print_stats(m);
