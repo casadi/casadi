@@ -1,4 +1,3 @@
-#
 #     This file is part of CasADi.
 #
 #     CasADi -- A symbolic framework for dynamic optimization.
@@ -19,19 +18,18 @@
 #     You should have received a copy of the GNU Lesser General Public
 #     License along with CasADi; if not, write to the Free Software
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
-#
-#
+
 from casadi import *
 
-#! A simple case of Callback
-#!================================
+# A simple case of Callback
+# ================================
 
-#! Callback allows the user to create functions that can be embedded into
-#! CasADi expressions. The user creates a class that inherits from this class
-#! and implements a subset of the virtual methods.
-#! Although Callback itself is implemented is C++, the virtual methods can be
-#! implemented in Python or MATLAB thanks to cross-language polymorphism as
-#! supported by the SWIG framework.
+# Callback allows the user to create functions that can be embedded into
+# CasADi expressions. The user creates a class that inherits from this class
+# and implements a subset of the virtual methods.
+# Although Callback itself is implemented is C++, the virtual methods can be
+# implemented in Python or MATLAB thanks to cross-language polymorphism as
+# supported by the SWIG framework.
 
 class Fac(Callback):
   def __init__(self, name, opts={}):
@@ -50,13 +48,13 @@ class Fac(Callback):
 
 fac = Fac('fac')
 
-#! Evaluate numerically
+# Evaluate numerically
 y = fac(4)
 
 print("4! = ", y)
 
-#! Using the function in a graph
-#!==============================
+# Using the function in a graph
+# ==============================
 
 x = MX.sym("x")
 y = fac(x)

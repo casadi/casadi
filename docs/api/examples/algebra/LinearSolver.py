@@ -1,4 +1,4 @@
-#
+# + {"active": "py"}
 #     This file is part of CasADi.
 #
 #     CasADi -- A symbolic framework for dynamic optimization.
@@ -21,46 +21,49 @@
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #
-#! Linear solvers
-#! =================
-#!
-#! We demonstrate solving a dense system A.x=b by using different linear solvers.
-#!
+# Linear solvers
+# =================
+#
+# We demonstrate solving a dense system A.x=b by using different linear solvers.
+
 from casadi import *
 from numpy import *
 import time
 
 n=100
-#$ We generate $A \in \mathbf{R}^{n \times n}$, $x \in \mathbf{R}^{n}$ with $n=100$
+
+# $ We generate $A \in \mathbf{R}^{n \times n}$, $x \in \mathbf{R}^{n}$ with $n=100$
+
 A=DM([[cos(i*j)-sin(i) for i in range(n)] for j in range(n)])
 x=DM([tan(i) for i in range(n)])
 
-#! We generate the b vector:
-b=mtimes(A,x)
+# We generate the b vector:
+
+b= mtimes(A,x)
 
 # Commented out pendling completion #1615
 
-# #! We demonstrate the LinearSolver API with CSparse:
+# # We demonstrate the LinearSolver API with CSparse:
 # s = LinearSolver("s", "csparse", A.sparsity())
 
-# #! Give it the matrix A
+# # Give it the matrix A
 # s.setInput(A,"A")
-# #! Do the LU factorization
+# # Do the LU factorization
 # s.prepare()
 
-# #! Give it the matrix b
+# # Give it the matrix b
 # s.setInput(b,"B")
 
-# #! And we are off to find x...
+# # And we are off to find x...
 # s.solve()
 
 # x_ = s.getOutput("X")
 
-# #! By looking at the residuals between the x we knew in advance and the computed x, we see that the CSparse solver works
+# # By looking at the residuals between the x we knew in advance and the computed x, we see that the CSparse solver works
 # print "Sum of residuals = %.2e" % norm_1(x-x_)
 
-# #! Comparison of different linear solvers
-# #! ======================================
+# # Comparison of different linear solvers
+# # ======================================
 # for solver in ("lapacklu","lapackqr","csparse"):
 #   s = LinearSolver("s", solver, A.sparsity()) # We create a solver
 
@@ -88,4 +91,4 @@ b=mtimes(A,x)
 #   print "Solve time       = %0.2f ms" % (st*1000)
 #   assert(norm_1(x-x_)<1e-9)
   
-# #! Note that these 
+# # Note that these 

@@ -19,26 +19,30 @@
 #     You should have received a copy of the GNU Lesser General Public
 #     License along with CasADi; if not, write to the Free Software
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+
 #
-#
-#! SX.sym
-#!======================
+# SX.sym
+#======================
+
 from casadi import *
 
-#! Construct using a single name
-#! =====================================
-#! The names of the entries of the SX will be derived from the name provided as argument to SX.sym.
+# Construct using a single name
+# =====================================
+# The names of the entries of the SX will be derived from the name provided as argument to SX.sym.
 
-#! Without shape arguments, a 1-by-1 matrix is constructed:
+# Without shape arguments, a 1-by-1 matrix is constructed:
 
 x = SX.sym("x")
 print(type(x), x)
 
-#! Create a column matrix 
+# Create a column matrix 
+
 print(SX.sym("x",2,1))
 
-#! Create a row matrix 
+# Create a row matrix 
+
 print(SX.sym("x",1,2))
 
-#! Create a matrix 
+# Create a matrix 
+
 print(SX.sym("x",2,3))

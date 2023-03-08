@@ -20,13 +20,15 @@
 #     License along with CasADi; if not, write to the Free Software
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
-#
-#! n_nodes
-#!======================
+
+# n_nodes
+# ======================
+
 from casadi import *
 from casadi.tools import *
 
-#! Let's build a trivial symbolic SX graph
+# Let's build a trivial symbolic SX graph
+
 x = SX.sym("x")
 y = SX.sym("y")
 z = x*y+2*y

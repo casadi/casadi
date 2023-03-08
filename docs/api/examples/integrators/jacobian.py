@@ -20,15 +20,16 @@
 #     License along with CasADi; if not, write to the Free Software
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
-#
-#! Integrator jacobian
-#! =====================
+
+# Integrator jacobian
+# =====================
+
 from casadi import *
 from numpy import *
 
-#! We will investigate the working of integrator jacobian with the help of the parametrically exited Duffing equation:
-#!
-#$ $\ddot{u}+\dot{u}-\epsilon (2 \mu \dot{u}+\alpha u^3+2 k u \cos(\Omega t))$ with $\Omega = 2 + \epsilon \sigma$.
+# We will investigate the working of integrator jacobian with the help of the parametrically exited Duffing equation:
+#
+# $\ddot{u}+\dot{u}-\epsilon (2 \mu \dot{u}+\alpha u^3+2 k u \cos(\Omega t))$ with $\Omega = 2 + \epsilon \sigma$.
 
 t = SX.sym('t')
 u = SX.sym('u')
@@ -49,5 +50,6 @@ dae = {'x':states, 'p':params, 't':t, 'ode':rhs}
 
 F = integrator('F', 'cvodes', dae)
 
-#! First argument is input index, secpnd argument is output index
+# First argument is input index, secpnd argument is output index
+
 jac = F.factory('jac_F', F.name_in(), ['jac:xf:p'])

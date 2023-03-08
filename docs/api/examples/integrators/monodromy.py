@@ -19,17 +19,18 @@
 #     You should have received a copy of the GNU Lesser General Public
 #     License along with CasADi; if not, write to the Free Software
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+
 #
-#
-#! Monodromy matrix
-#! =====================
+# Monodromy matrix
+# =====================
+
 from casadi import *
 from numpy import *
 from pylab import *
 
-#! We will investigate the monodromy matrix with the help of a simple 2-state system, as found in 1. Nayfeh AH, Balachandran B. Applied nonlinear dynamics. 1995. Available at: http://onlinelibrary.wiley.com/doi/10.1002/9783527617548.biblio/summary [Accessed June 16, 2011], page 52.
-#$ $\dot{x_1} = x_2$
-#$ $\dot{x_2} = -(-w_0^2 x_1 + a_3 x_1^3 + a_5 x_1^5) - (2 mu_1 x_2 + mu_3 x_2^3) + f$.
+# We will investigate the monodromy matrix with the help of a simple 2-state system, as found in 1. Nayfeh AH, Balachandran B. Applied nonlinear dynamics. 1995. Available at: http://onlinelibrary.wiley.com/doi/10.1002/9783527617548.biblio/summary [Accessed June 16, 2011], page 52.
+# $\dot{x_1} = x_2$
+# $\dot{x_2} = -(-w_0^2 x_1 + a_3 x_1^3 + a_5 x_1^5) - (2 mu_1 x_2 + mu_3 x_2^3) + f$.
 
 x  = SX.sym("x",2)
 x1 = x[0]
@@ -61,7 +62,7 @@ dae={'x':x, 'p':params, 'ode':rhs}
 
 # N = 500
 
-# #! Let's get acquainted with the system by drawing a phase portrait
+# # Let's get acquainted with the system by drawing a phase portrait
 # ts = linspace(0,tf,N)
 
 # sim = Simulator("sim", integrator,ts)
@@ -86,9 +87,9 @@ dae={'x':x, 'p':params, 'ode':rhs}
 
 # x0 = DM([-3.1,0])
 
-# #! Monodromy matrix at tf - Jacobian of integrator
-# #! ===============================================
-# #! First argument is input index, second argument is output index
+# # Monodromy matrix at tf - Jacobian of integrator
+# # ===============================================
+# # First argument is input index, second argument is output index
 # jac = integrator.jacobian("x0","xf")
 
 # jac.setInput(x0,"x0")

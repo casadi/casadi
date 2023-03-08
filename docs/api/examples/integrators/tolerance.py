@@ -19,10 +19,11 @@
 #     You should have received a copy of the GNU Lesser General Public
 #     License along with CasADi; if not, write to the Free Software
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+
 #
-#
-#! Integrator tolerances
-#! =====================
+# Integrator tolerances
+# =====================
+
 from casadi import *
 from numpy import *
 from pylab import *
@@ -44,9 +45,7 @@ for tol in tolerances:
   opts = {'reltol':10.0**tol, 'abstol':10.0**tol, 'grid':ts, 'output_t0':True}
   F = integrator('F', 'cvodes', dae, opts)
   res = F(x0=[1,0])
-
   plot(ts,array(res['xf'])[0,:].T,label='tol = 1e%d' % tol)
-
 legend( loc='upper left')
 xlabel('Time [s]')
 ylabel('State x [-]')

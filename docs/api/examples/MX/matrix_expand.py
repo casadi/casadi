@@ -20,11 +20,12 @@
 #     License along with CasADi; if not, write to the Free Software
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
-#
+
 from casadi import *
 from casadi.tools import *
 
-#! Let's revisit briefly the difference between SX and MX
+# Let's revisit briefly the difference between SX and MX
+
 a = MX.sym("a",2,2)
 b = MX.sym("b",2,2)
 c = MX.sym("c",2,2)
@@ -32,23 +33,24 @@ c = MX.sym("c",2,2)
 d = a+b
 e = d*c
 
-#! The element-wise addition and multiplication operators appear just as a single node in the MX expression graph
+# The element-wise addition and multiplication operators appear just as a single node in the MX expression graph
+
 dotdraw(e)
 
-#! We can use expand to expand into subexpressions
+# We can use expand to expand into subexpressions
 
 f = Function("f", [a,b,c],[e])
-
 g = f.expand('g')
-
 dotdraw(g(*g.sx_in()))
 
-#! There is also a variant to perform expansion immediately on the MX graph
-#! The expanded SX graph is hidden inside an SX graph call
+# There is also a variant to perform expansion immediately on the MX graph
+# The expanded SX graph is hidden inside an SX graph call
+
 dotdraw(matrix_expand(e))
 
-#! An additional features of this variant is that one can choose which expressions remin outside of the expansion scope.
-#! In the following we list 'a+b=d' as a node on the boundary of expansion:
+# An additional features of this variant is that one can choose which expressions remin outside of the expansion scope.
+# In the following we list 'a+b=d' as a node on the boundary of expansion:
+
 dotdraw(matrix_expand(e,[d]))
 
-#! Note how the additions is not expanded, while the multiplication ended up in the expression
+# Note how the additions is not expanded, while the multiplication ended up in the expression

@@ -20,25 +20,30 @@
 #     License along with CasADi; if not, write to the Free Software
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
-#
-#! sparsity_jac
-#!======================
+
+# sparsity_jac
+# ======================
+
 from casadi import *
 from numpy import *
 import casadi as c
 from pylab import spy, show
 
-#! We construct a simple SX expression
+# We construct a simple SX expression
+
 x = SX.sym("x",40)
 y = x[:-2]-2*x[1:-1]+x[2:]
 
-#! Let's see what the first 5 entries of y look like
+# Let's see what the first 5 entries of y look like
+
 print(y[:5])
 
-#! Next, we construct a function
+# Next, we construct a function
+
 f = Function("f", [x],[y])
 
-#! And we visualize the sparsity of the jacobian
+# And we visualize the sparsity of the jacobian
+
 spy(f.sparsity_jac(0, 0))
 
 show()

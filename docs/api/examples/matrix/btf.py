@@ -19,12 +19,13 @@
 #     You should have received a copy of the GNU Lesser General Public
 #     License along with CasADi; if not, write to the Free Software
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
-#
-#
+
+
 from casadi import *
 import numpy
 
-#! Let's construct a block diagonal structure
+# Let's construct a block diagonal structure
+
 b1 = DM([[2,3],[4,5]])
 b2 = DM([[6,7,8],[9,10,11],[12,13,14]])
 A = diagcat(1,b1,b2,15)
@@ -32,7 +33,8 @@ A = diagcat(1,b1,b2,15)
 print("original: ")
 print(A)
 
-#! Ruin the nice structure
+# Ruin the nice structure
+
 numpy.random.seed(0)
 p1 = numpy.random.permutation(A.size1())
 p2 = numpy.random.permutation(A.size2())

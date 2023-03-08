@@ -19,38 +19,43 @@
 #     You should have received a copy of the GNU Lesser General Public
 #     License along with CasADi; if not, write to the Free Software
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+
 #
-#
-#! expand
-#!======================
+# expand
+# ======================
+
 from casadi import *
 import casadi as c
 
-#! We construct a simple MX expression
+# We construct a simple MX expression
+
 x = MX.sym("x",2,2)
 y = MX.sym("y",2,1)
 
 z = mtimes(x,y)
 
-#! Let's construct an MXfunction
+# Let's construct an MXfunction
+
 f = Function("f", [x,y],[z])
 
-#! We expand the MX expression into an SX expression
+# We expand the MX expression into an SX expression
+
 fSX = f.expand('fSX')
 
 print("Expanded expression = ", fSX.str(True))
 
 
-#! Limitations
-#! =============
-#! Not all MX graphs can be expanded.
-#! Here is an example of a situation where it will not work.
-#!
+# Limitations
+# =============
+# Not all MX graphs can be expanded.
+# Here is an example of a situation where it will not work.
+
 linear_solver = Linsol("linear_solver", "csparse", x.sparsity())
 g = linear_solver.solve(x, y)
 G = Function("G", [x,y], [g])
 
-#! This function cannot be expanded.
+# This function cannot be expanded.
+
 try:
   G.expand('G_sx')
 except Exception as e:

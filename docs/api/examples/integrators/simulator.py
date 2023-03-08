@@ -19,17 +19,18 @@
 #     You should have received a copy of the GNU Lesser General Public
 #     License along with CasADi; if not, write to the Free Software
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+
 #
-#
-#! Simulator
-#! =====================
+# Simulator
+# =====================
+
 from casadi import *
 from numpy import *
 from pylab import *
 
-#! We will investigate the working of Simulator with the help of the parametrically exited Duffing equation:
-#!
-#$ $\ddot{u}+\dot{u}-\epsilon (2 \mu \dot{u}+\alpha u^3+2 k u \cos(\Omega t))$ with $\Omega = 2 + \epsilon \sigma$.
+# We will investigate the working of Simulator with the help of the parametrically exited Duffing equation:
+#
+# $\ddot{u}+\dot{u}-\epsilon (2 \mu \dot{u}+\alpha u^3+2 k u \cos(\Omega t))$ with $\Omega = 2 + \epsilon \sigma$.
 
 t = SX.sym('t')
 
@@ -47,14 +48,16 @@ Omega = 2 + eps*sigma
 params = vertcat(eps,mu,alpha,k,sigma)
 rhs    = vertcat(v,-u-eps*(2*mu*v+alpha*u**3+2*k*u*cos(Omega*t)))
 
-#! We will simulate over 50 seconds, 1000 timesteps.
+# We will simulate over 50 seconds, 1000 timesteps.
+
 dae={'x':states, 'p':params, 't':t, 'ode':rhs}
 ts = linspace(0, 50, 1000)
 integrator = integrator('integrator', 'cvodes', dae, {'grid':ts, 'output_t0':True})
 
 sol = integrator(x0=[1,0], p=[0.1,0.1,0.1,0.3,0.1])
 
-#! Plot the solution
+# Plot the solution
+
 plot(array(sol['xf'])[0,:], array(sol['xf'])[1,:])
 xlabel('u')
 ylabel('u_dot')

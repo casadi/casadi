@@ -19,11 +19,12 @@
 #     You should have received a copy of the GNU Lesser General Public
 #     License along with CasADi; if not, write to the Free Software
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
-#
-#
+
+
 from casadi import *
 
-#! Read all about coloring in the seminal paper "What color is your Jacobian?" http://www.cs.odu.edu/~pothen/Papers/sirev2005.pdf
+# Read all about coloring in the seminal paper "What color is your Jacobian?" http://www.cs.odu.edu/~pothen/Papers/sirev2005.pdf
+
 def color(A):
   print("="*80)
   print("Original:")
@@ -33,25 +34,33 @@ def color(A):
 
 A = Sparsity.diag(5)
 color(A)
-#! One direction needed to capture all
+
+# One direction needed to capture all
+
 color(Sparsity.dense(5,10))
-#! We need 5 directions.
-#! The colored response reads: each row corresponds to a direction;
-#! each column correspond to a row of the original matrix.
+
+# We need 5 directions.
+# The colored response reads: each row corresponds to a direction;
+# each column correspond to a row of the original matrix.
 
 color(A+Sparsity.triplet(5,5,[0],[4]))
-#! First 4 rows can be taken together, the fifth row is taken separately
+
+# First 4 rows can be taken together, the fifth row is taken separately
+
 color(A+Sparsity.triplet(5,5,[4],[0]))
-#! First 4 rows can be taken together, the fifth row is taken separately
+
+# First 4 rows can be taken together, the fifth row is taken separately
 
 color(A+Sparsity.triplet(5,5,[0]*5,list(range(5))))
-#! The first row is taken separately.
-#! The remainding rows are lumped together in one direction.
+
+# The first row is taken separately.
+# The remainding rows are lumped together in one direction.
 
 color(A+Sparsity.triplet(5,5,list(range(5)),[0]*5))
-#! We need 5 directions.
 
-#! Next, we look at star_coloring
+# We need 5 directions.
+
+# Next, we look at star_coloring
 
 def color(A):
   print("="*80)
@@ -61,16 +70,19 @@ def color(A):
   print(repr(DM(A.star_coloring(1),1)))
   
 color(A)
-#! One direction needed to capture all
+
+# One direction needed to capture all
 
 color(Sparsity.dense(5,5))
-#! We need 5 directions.
+
+# We need 5 directions.
 
 color(A+Sparsity.triplet(5,5,[0]*5,list(range(5)))+Sparsity.triplet(5,5,list(range(5)),[0]*5))
-#! The first row/col is taken separately.
-#! The remainding rows/cols are lumped together in one direction.
 
-#! Let's take an example from the paper
+# The first row/col is taken separately.
+# The remainding rows/cols are lumped together in one direction.
+
+# Let's take an example from the paper
 
 A = DM([[1,1,0,0,0,0],[1,1,1,0,1,1],[0,1,1,1,0,0],[0,0,1,1,0,1],[0,1,0,0,1,0],[0,1,0,1,0,1]])
 A = sparsify(A)

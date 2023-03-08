@@ -20,7 +20,7 @@
 #     License along with CasADi; if not, write to the Free Software
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
-#
+
 from casadi import *
 
 a = SX.sym("a")
@@ -35,20 +35,23 @@ print(d)
 
 f = Function("f", [a,b],[d])
 
-#! When the graph is evaluated, a printout of c will occur (if you have set WITH_PRINTME to ON in CMakeCache.txt)
-#! Printout reads '|> 13: 7'
-#! 13 is an identifier of choice, 7 is the numerical value of c
+# When the graph is evaluated, a printout of c will occur (if you have set WITH_PRINTME to ON in CMakeCache.txt)
+# Printout reads '|> 13: 7'
+# 13 is an identifier of choice, 7 is the numerical value of c
+
 f(4,3)
 
 dd_da = jacobian(d, a)
 J = Function('J', [a,b], [dd_da])
 
-#! The first derivative still depends on c
-#! Printout reads '|> 13: 11'
+# The first derivative still depends on c
+# Printout reads '|> 13: 11'
+
 J(2,9)
 
 d2d_da2 = jacobian(dd_da, a)
 J = Function('J', [a,b], [d2d_da2])
 
-#! second derivative doesn't, so we don't get a printout
+# second derivative doesn't, so we don't get a printout
+
 J(2,9)

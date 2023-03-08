@@ -20,13 +20,14 @@
 #     License along with CasADi; if not, write to the Free Software
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
-#
+
 from casadi import *
 
-#! CasADi provides a mechanism to add assertions in an MX expression graph
-#! This can be useful to debug yor code, e.g. debugging why the end-result of a computation yields NaN
+# CasADi provides a mechanism to add assertions in an MX expression graph
+# This can be useful to debug yor code, e.g. debugging why the end-result of a computation yields NaN
 
-#! Consider this example:
+# Consider this example:
+
 x = MX.sym("x")
 y = sin(x)
 z = sqrt(y)
@@ -37,9 +38,10 @@ z0 = f(5)
 
 print(z0)
 
-#! For some mysterious reason we get NaN here
+# For some mysterious reason we get NaN here
 
-#! Next, we add an assertion:
+# Next, we add an assertion:
+
 y = y.attachAssert(y>0, "bummer") # Add assertion here
 z = sqrt(y)
 
@@ -52,7 +54,8 @@ except Exception as e:
   print(e)
 
 
-#! You can combine this with Callback to do powerful assertions
+# You can combine this with Callback to do powerful assertions
+
 class Dummy(Callback):
   def __init__(self, name, opts={}):
     Callback.__init__(self)

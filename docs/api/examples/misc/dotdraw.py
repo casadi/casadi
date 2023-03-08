@@ -20,11 +20,12 @@
 #     License along with CasADi; if not, write to the Free Software
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
-#
+
 from casadi import *
 from casadi.tools import *
 
-#! An SX graph
+# An SX graph
+
 a = SX.sym("a")
 b = SX.sym("b")
 
@@ -35,13 +36,14 @@ print(c)
 
 dotdraw(c)
 
-#! An SX
+# An SX
 
 dotdraw(SX.sym("x",Sparsity.lower(3)))
 
 dotdraw(SX.sym("x",Sparsity.lower(3))**2)
 
-#! An MX graph
+# An MX graph
+
 x = MX.sym("x",Sparsity.lower(2))
 y = MX.sym("y",Sparsity.lower(2))
 
