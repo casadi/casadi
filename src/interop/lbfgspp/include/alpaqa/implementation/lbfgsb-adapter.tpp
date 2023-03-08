@@ -2,6 +2,7 @@
 
 #include <alpaqa/lbfgsb-adapter.hpp>
 #include <cmath>
+#include <exception>
 
 namespace alpaqa::lbfgspp {
 
@@ -27,6 +28,7 @@ auto LBFGSBSolver<Conf>::operator()(
 
     using std::chrono::nanoseconds;
     auto start_time = std::chrono::steady_clock::now();
+    auto os         = opts.os ? opts.os : this->os;
     auto max_time   = nanoseconds::max();
     if (opts.max_time)
         max_time = std::min(max_time, *opts.max_time);
@@ -45,6 +47,7 @@ auto LBFGSBSolver<Conf>::operator()(
 
     ::LBFGSpp::LBFGSBParam<real_t> effective_params = params;
     effective_params.epsilon                        = opts.tolerance;
+    effective_params.epsilon_rel                    = 0;
     ::LBFGSpp::LBFGSBSolver<real_t> solver{effective_params};
 
     // Evaluate cost and its gradient, checking for termination
@@ -85,6 +88,9 @@ auto LBFGSBSolver<Conf>::operator()(
             s.status = SolverStatus::MaxIter;
     } catch (const BreakException &e) {
         s.status = e.status;
+    } catch (const std::exception &e) {
+        s.status = SolverStatus::Exception;
+        *os << "[LBFGSB] Exception: " << e.what() << std::endl;
     }
     auto time_elapsed = std::chrono::steady_clock::now() - start_time;
     s.elapsed_time    = duration_cast<nanoseconds>(time_elapsed);

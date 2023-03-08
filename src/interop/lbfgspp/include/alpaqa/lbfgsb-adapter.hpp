@@ -66,31 +66,6 @@ class LBFGSBSolver {
     std::ostream *os = &std::cout;
 };
 
-template <class InnerSolverStats>
-struct InnerStatsAccumulator;
-
-template <Config Conf>
-struct InnerStatsAccumulator<LBFGSBStats<Conf>> {
-    USING_ALPAQA_CONFIG(Conf);
-
-    /// Total elapsed time in the inner solver.
-    std::chrono::nanoseconds elapsed_time{};
-    /// Total number of inner PANOC iterations.
-    unsigned iterations = 0;
-    /// Final value of the smooth cost @f$ \psi(\hat x) @f$.
-    real_t final_ψ = 0;
-};
-
-template <Config Conf>
-InnerStatsAccumulator<LBFGSBStats<Conf>> &
-operator+=(InnerStatsAccumulator<LBFGSBStats<Conf>> &acc,
-           const LBFGSBStats<Conf> &s) {
-    acc.iterations += s.iterations;
-    acc.elapsed_time += s.elapsed_time;
-    acc.final_ψ = s.final_ψ;
-    return acc;
-}
-
 ALPAQA_LBFGSPP_EXPORT_EXTERN_TEMPLATE(struct, LBFGSBStats, DefaultConfig);
 ALPAQA_LBFGSPP_EXPORT_EXTERN_TEMPLATE(struct, LBFGSBStats, EigenConfigf);
 ALPAQA_LBFGSPP_EXPORT_EXTERN_TEMPLATE(struct, LBFGSBStats, EigenConfigd);
@@ -108,3 +83,32 @@ ALPAQA_LBFGSPP_EXPORT_EXTERN_TEMPLATE(class, LBFGSBSolver, EigenConfigq);
 #endif
 
 } // namespace alpaqa::lbfgspp
+
+namespace alpaqa {
+
+template <class InnerSolverStats>
+struct InnerStatsAccumulator;
+
+template <Config Conf>
+struct InnerStatsAccumulator<lbfgspp::LBFGSBStats<Conf>> {
+    USING_ALPAQA_CONFIG(Conf);
+
+    /// Total elapsed time in the inner solver.
+    std::chrono::nanoseconds elapsed_time{};
+    /// Total number of inner PANOC iterations.
+    unsigned iterations = 0;
+    /// Final value of the smooth cost @f$ \psi(\hat x) @f$.
+    real_t final_ψ = 0;
+};
+
+template <Config Conf>
+InnerStatsAccumulator<lbfgspp::LBFGSBStats<Conf>> &
+operator+=(InnerStatsAccumulator<lbfgspp::LBFGSBStats<Conf>> &acc,
+           const lbfgspp::LBFGSBStats<Conf> &s) {
+    acc.iterations += s.iterations;
+    acc.elapsed_time += s.elapsed_time;
+    acc.final_ψ = s.final_ψ;
+    return acc;
+}
+
+} // namespace alpaqa
