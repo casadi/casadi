@@ -132,10 +132,10 @@ void IdasInterface::init(const Dict& opts) {
     }
   }
 
-  create_function("daeF", {"x", "z", "p", "t"}, {"ode", "alg"});
-  create_function("quadF", {"x", "z", "p", "t"}, {"quad"});
-  create_function("daeB", {"rx", "rz", "rp", "x", "z", "p", "t"}, {"rode", "ralg"});
-  create_function("quadB", {"rx", "rz", "rp", "x", "z", "p", "t"}, {"rquad"});
+  create_function("daeF", {"x", "z", "p", "u", "t"}, {"ode", "alg"});
+  create_function("quadF", {"x", "z", "p", "u", "t"}, {"quad"});
+  create_function("daeB", {"rx", "rz", "rp", "x", "z", "p", "u", "t"}, {"rode", "ralg"});
+  create_function("quadB", {"rx", "rz", "rp", "x", "z", "p", "u", "t"}, {"rquad"});
 
   // Get initial conditions for the state derivatives
   if (init_xdot_.empty()) {
@@ -159,11 +159,11 @@ void IdasInterface::init(const Dict& opts) {
   // Attach functions for jacobian information
   if (newton_scheme_!=SD_DIRECT || (ns_>0 && second_order_correction_)) {
     create_function("jtimesF",
-      {"t", "x", "z", "p", "fwd:x", "fwd:z"},
+      {"t", "x", "z", "p", "u", "fwd:x", "fwd:z"},
       {"fwd:ode", "fwd:alg"});
     if (nrx_>0) {
       create_function("jtimesB",
-        {"t", "x", "z", "p", "rx", "rz", "rp", "fwd:rx", "fwd:rz"},
+        {"t", "x", "z", "p", "u", "rx", "rz", "rp", "fwd:rx", "fwd:rz"},
         {"fwd:rode", "fwd:ralg"});
     }
   }
@@ -177,7 +177,8 @@ int IdasInterface::res(double t, N_Vector xz, N_Vector xzdot,
     m->arg[0] = NV_DATA_S(xz);
     m->arg[1] = NV_DATA_S(xz)+s.nx_;
     m->arg[2] = m->p;
-    m->arg[3] = &t;
+    m->arg[3] = m->u;
+    m->arg[4] = &t;
     m->res[0] = NV_DATA_S(rr);
     m->res[1] = NV_DATA_S(rr)+s.nx_;
     s.calc_function(m, "daeF");
@@ -214,8 +215,9 @@ int IdasInterface::jtimes(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, N_
     m->arg[1] = NV_DATA_S(xz);
     m->arg[2] = NV_DATA_S(xz)+s.nx_;
     m->arg[3] = m->p;
-    m->arg[4] = NV_DATA_S(v);
-    m->arg[5] = NV_DATA_S(v)+s.nx_;
+    m->arg[4] = m->u;
+    m->arg[5] = NV_DATA_S(v);
+    m->arg[6] = NV_DATA_S(v)+s.nx_;
     m->res[0] = NV_DATA_S(Jv);
     m->res[1] = NV_DATA_S(Jv)+s.nx_;
     s.calc_function(m, "jtimesF");
@@ -243,11 +245,12 @@ int IdasInterface::jtimesB(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB,
     m->arg[1] = NV_DATA_S(xz);
     m->arg[2] = NV_DATA_S(xz)+s.nx_;
     m->arg[3] = m->p;
-    m->arg[4] = NV_DATA_S(xzB);
-    m->arg[5] = NV_DATA_S(xzB)+s.nrx_;
-    m->arg[6] = m->rp;
-    m->arg[7] = NV_DATA_S(vB);
-    m->arg[8] = NV_DATA_S(vB)+s.nrx_;
+    m->arg[4] = m->u;
+    m->arg[5] = NV_DATA_S(xzB);
+    m->arg[6] = NV_DATA_S(xzB)+s.nrx_;
+    m->arg[7] = m->rp;
+    m->arg[8] = NV_DATA_S(vB);
+    m->arg[9] = NV_DATA_S(vB)+s.nrx_;
     m->res[0] = NV_DATA_S(JvB);
     m->res[1] = NV_DATA_S(JvB) + s.nrx_;
     s.calc_function(m, "jtimesB");
@@ -432,10 +435,8 @@ advance(IntegratorMemory* mem, double t_next, double t_stop,
     const double* u, double* x, double* z, double* q) const {
   auto m = to_mem(mem);
 
-  // Controls not implemented
-  (void)u;
-  (void)t_stop;
-  casadi_assert(nu_ == 0, "Not implemented");
+  // Set controls
+  casadi_copy(u, nu_, m->u);
 
   // Do not integrate past change in input signals or past the end
   THROWING(IDASetStopTime, m->mem, t_stop);
@@ -613,7 +614,8 @@ int IdasInterface::rhsQ(double t, N_Vector xz, N_Vector xzdot, N_Vector rhsQ,
     m->arg[0] = NV_DATA_S(xz);
     m->arg[1] = NV_DATA_S(xz)+s.nx_;
     m->arg[2] = m->p;
-    m->arg[3] = &t;
+    m->arg[3] = m->u;
+    m->arg[4] = &t;
     m->res[0] = NV_DATA_S(rhsQ);
     s.calc_function(m, "quadF");
 
@@ -637,7 +639,8 @@ int IdasInterface::resB(double t, N_Vector xz, N_Vector xzdot, N_Vector rxz,
     m->arg[3] = NV_DATA_S(xz);
     m->arg[4] = NV_DATA_S(xz)+s.nx_;
     m->arg[5] = m->p;
-    m->arg[6] = &t;
+    m->arg[6] = m->u;
+    m->arg[7] = &t;
     m->res[0] = NV_DATA_S(rr);
     m->res[1] = NV_DATA_S(rr)+s.nrx_;
     s.calc_function(m, "daeB");
@@ -665,7 +668,8 @@ int IdasInterface::rhsQB(double t, N_Vector xz, N_Vector xzdot, N_Vector rxz,
     m->arg[3] = NV_DATA_S(xz);
     m->arg[4] = NV_DATA_S(xz)+s.nx_;
     m->arg[5] = m->p;
-    m->arg[6] = &t;
+    m->arg[6] = m->u;
+    m->arg[7] = &t;
     m->res[0] = NV_DATA_S(rqdot);
     s.calc_function(m, "quadB");
 
@@ -718,8 +722,9 @@ int IdasInterface::psolve(double t, N_Vector xz, N_Vector xzdot, N_Vector rr,
         m->arg[1] = NV_DATA_S(xz); // x
         m->arg[2] = NV_DATA_S(xz)+s.nx_; // z
         m->arg[3] = m->p; // p
-        m->arg[4] = vx; // fwd:x
-        m->arg[5] = vz; // fwd:z
+        m->arg[4] = m->u; // u
+        m->arg[5] = vx; // fwd:x
+        m->arg[6] = vz; // fwd:z
         m->res[0] = m->v2; // fwd:ode
         m->res[1] = m->v2 + s.nx_; // fwd:alg
         s.calc_function(m, "jtimesF");
@@ -798,11 +803,12 @@ int IdasInterface::psolveB(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB,
         m->arg[1] = NV_DATA_S(xz); // x
         m->arg[2] = NV_DATA_S(xz)+s.nx_; // z
         m->arg[3] = m->p; // p
-        m->arg[4] = NV_DATA_S(xzB); // rx
-        m->arg[5] = NV_DATA_S(xzB)+s.nrx_; // rz
-        m->arg[6] = m->rp; // rp
-        m->arg[7] = vx; // fwd:rx
-        m->arg[8] = vz; // fwd:rz
+        m->arg[4] = m->u; // u
+        m->arg[5] = NV_DATA_S(xzB); // rx
+        m->arg[6] = NV_DATA_S(xzB)+s.nrx_; // rz
+        m->arg[7] = m->rp; // rp
+        m->arg[8] = vx; // fwd:rx
+        m->arg[9] = vz; // fwd:rz
         m->res[0] = m->v2; // fwd:rode
         m->res[1] = m->v2 + s.nrx_; // fwd:ralg
         s.calc_function(m, "jtimesB");
