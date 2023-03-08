@@ -42,8 +42,7 @@ L = x1**2 + x2**2 + u**2
 if False:
    # CVODES from the SUNDIALS suite
    dae = {'x':x, 'p':u, 'ode':xdot, 'quad':L}
-   opts = {'tf':T/N}
-   F = integrator('F', 'cvodes', dae, opts)
+   F = integrator('F', 'cvodes', dae, 0, T/N)
 else:
    # Fixed step Runge-Kutta 4 integrator
    M = 4 # RK4 steps per interval

@@ -85,9 +85,7 @@ num_nodes = 20
 iopts = {}
 iopts["abstol"] = 1e-8 # abs. tolerance
 iopts["reltol"] = 1e-8 # rel. tolerance
-iopts["t0"] = 0.0
-iopts["tf"] = tf/num_nodes
-I = integrator("I", "cvodes", dae, iopts)
+I = integrator("I", "cvodes", dae, 0, tf/num_nodes, iopts)
 
 # Variables for the states at each shooting node
 X = MX.sym('X',nX,num_nodes+1)
@@ -131,7 +129,7 @@ print(X_sol)
 tgrid = NP.linspace(0,tf,100)
 
 # Simulator to get optimal state and control trajectories
-simulator = integrator('simulator', 'cvodes', dae, {'grid':tgrid,'output_t0':True})
+simulator = integrator('simulator', 'cvodes', dae, 0, tgrid)
 
 # Simulate to get the trajectories
 sol = simulator(x0 = X_sol[0:4])["xf"]

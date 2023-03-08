@@ -95,6 +95,14 @@ namespace casadi {
     const MXDict& dae, double t0, const std::vector<double>& tout, const Dict& opts=Dict());
   CASADI_EXPORT Function integrator(const std::string& name, const std::string& solver,
     const Function& dae, double t0, const std::vector<double>& tout, const Dict& opts=Dict());
+#ifndef SWIGMATLAB
+  CASADI_EXPORT Function integrator(const std::string& name, const std::string& solver,
+    const SXDict& dae, double t0, double tf, const Dict& opts=Dict());
+  CASADI_EXPORT Function integrator(const std::string& name, const std::string& solver,
+    const MXDict& dae, double t0, double tf, const Dict& opts=Dict());
+  CASADI_EXPORT Function integrator(const std::string& name, const std::string& solver,
+    const Function& dae, double t0, double tf, const Dict& opts=Dict());
+#endif // SWIGMATLAB
   ///@}
 
   /// Check if a particular plugin is available

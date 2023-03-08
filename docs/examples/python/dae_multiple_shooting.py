@@ -62,8 +62,8 @@ f_q = x0**2 + x1**2 + u**2
 
 # Create an integrator
 dae = {'x':x, 'z':z, 'p':u, 'ode':f_x, 'alg':f_z, 'quad':f_q}
-opts = {'tf':0.5} # interval length
-I = integrator('I', 'idas', dae, opts)
+# interval length 0.5s
+I = integrator('I', 'idas', dae, 0, 0.5)
 
 # Number of intervals
 nk = 20

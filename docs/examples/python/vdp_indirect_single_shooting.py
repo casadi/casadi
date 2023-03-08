@@ -77,9 +77,7 @@ dae = {'x':vertcat(x,lam), 'ode':f}
 opts = {}
 opts['abstol'] = 1e-8 # abs. tolerance
 opts['reltol'] = 1e-8 # rel. tolerance
-opts['t0'] = 0.0
-opts['tf'] = 10.0
-I = integrator('I', 'cvodes', dae, opts)
+I = integrator('I', 'cvodes', dae, 0, 10, opts)
 
 # The initial state
 x_init = NP.array([0.,1.])
@@ -123,7 +121,7 @@ l_init_opt = NP.array(l_init_opt.nonzeros())
 tgrid = NP.linspace(0, 10, 100)
 
 # Simulator to get optimal state and control trajectories
-simulator = integrator('simulator', 'cvodes', dae, {'grid':tgrid, 'output_t0':True})
+simulator = integrator('simulator', 'cvodes', dae, 0, tgrid)
 
 # Simulate to get the state trajectory
 sol = simulator(x0 = NP.concatenate((x_init, l_init_opt)))['xf']

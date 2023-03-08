@@ -114,13 +114,13 @@ for ode=0:1
     disp(sprintf('========'));
 
     % Integrator options
-    opts = struct('tf', tf);
+    opts = struct();
     if strcmp(MyIntegrator,'collocation')
       opts.rootfinder = 'kinsol';
     end
 
     % Integrator
-    I = casadi.integrator('I', MyIntegrator, dae, opts);
+    I = casadi.integrator('I', MyIntegrator, dae, 0, tf, opts);
 
     % Integrate to get results
     res = I('x0', x0, 'p', u0);

@@ -138,7 +138,7 @@ irk_integrator = Function('irk_integrator', {'x0':X0, 'p':P, 'xf':X},
                           integrator_in(), integrator_out())
 
 # Create a convensional integrator for reference
-ref_integrator = integrator('ref_integrator', 'cvodes', dae, {'tf':tf})
+ref_integrator = integrator('ref_integrator', 'cvodes', dae, 0, tf)
 
 # Test values
 x0_val  = N.array([0,1,0])

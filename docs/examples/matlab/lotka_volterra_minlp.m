@@ -59,8 +59,7 @@ L = (x(1) - 1)^2 + (x(2) - 1)^2 + 1e-4*u^2;
 if false
    % CVODES from the SUNDIALS suite
    dae = struct('x',x, 'p',u, 'ode',xdot, 'quad',L);
-   opts = struct('tf',T/N);
-   F = integrator('F', 'cvodes', dae, opts);
+   F = integrator('F', 'cvodes', dae, 0, T/N);
 else
    % Fixed step Runge-Kutta 4 integrator
    M = 4; % RK4 steps per interval

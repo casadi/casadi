@@ -113,12 +113,12 @@ for Integrators in (ODE_integrators,DAE_integrators):
     print('========')
 
     # Integrator options
-    opts = {'tf':tf}
+    opts = {}
     if MyIntegrator=='collocation':
       opts['rootfinder'] = 'kinsol'
 
     # Integrator
-    I = integrator('I', MyIntegrator, dae, opts)
+    I = integrator('I', MyIntegrator, dae, 0, tf, opts)
 
     # Integrate to get results
     res = I(x0=x0, p=u0)

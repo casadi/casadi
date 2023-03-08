@@ -104,6 +104,21 @@ Function integrator(const std::string& name, const std::string& solver,
   return intg->create_advanced(opts);
 }
 
+Function integrator(const std::string& name, const std::string& solver,
+    const SXDict& dae, double t0, double tf, const Dict& opts) {
+  return integrator(name, solver, dae, t0, std::vector<double>{tf}, opts);
+}
+
+Function integrator(const std::string& name, const std::string& solver,
+    const MXDict& dae, double t0, double tf, const Dict& opts) {
+  return integrator(name, solver, dae, t0, std::vector<double>{tf}, opts);
+}
+
+Function integrator(const std::string& name, const std::string& solver,
+    const Function& dae, double t0, double tf, const Dict& opts) {
+  return integrator(name, solver, dae, t0, std::vector<double>{tf}, opts);
+}
+
 std::vector<std::string> integrator_in() {
   std::vector<std::string> ret(integrator_n_in());
   for (size_t i=0; i<ret.size(); ++i) ret[i]=integrator_in(i);

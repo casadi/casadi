@@ -110,7 +110,7 @@ ode = struct('x', x, 'ode', x)
 opts = struct
 opts.verbose = true
 
-intg = casadi.integrator('integrator', 'rk', ode, opts);
+intg = casadi.integrator('integrator', 'rk', ode, 0, 1, opts);
 intg.call(struct);
 diary off
 

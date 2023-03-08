@@ -80,8 +80,8 @@ print("Both are kept in 'I' though: the resulting DAE invariants.")
 [dae_se, state_to_orig, phi] = dae_map_semi_expl(dae, dae_reduced)
 
 grid = list(np.linspace(0,5,1000))
-tf = DM(grid[1:]).T
-intg = integrator("intg","idas",dae_se,{"grid": grid})
+tf = DM(grid).T
+intg = integrator("intg","idas",dae_se,0,grid)
 
 # Before we can integrate, we need a consistant initial guess
 # Let's say we start at y=-0.5, dx=-0.1;
@@ -118,6 +118,8 @@ print(phi(x=xz0['x0'],z=xz0['z0']))
 # Integrate and get resultant xf,zf on grid
 sol = intg(**xz0)
 
+print(sol['xf'].shape)
+
 # Solution projected into original DAE space
 sol_orig = state_to_orig(xf=sol["xf"],zf=sol["zf"])
 
@@ -151,7 +153,7 @@ plt.title("Evolution trajectory of invariants")
 # Drift is absent now.
 (dae_reduced,stats) = dae_reduce_index(dae, {"baumgarte_pole": -1})
 [dae_se, state_to_orig, phi] = dae_map_semi_expl(dae, dae_reduced)
-intg = integrator("intg","idas",dae_se,{"grid": grid})
+intg = integrator("intg","idas",dae_se,0,grid)
 init_gen = dae_init_gen(dae, dae_reduced, "ipopt", init_strength)
 xz0 = init_gen(**init)
 sol = intg(**xz0)
@@ -180,7 +182,7 @@ for i,pole in enumerate(poles):
   for j,precision in enumerate(precisions):
     (dae_reduced,stats) = dae_reduce_index(dae, {"baumgarte_pole": pole})
     [dae_se, state_to_orig, phi] = dae_map_semi_expl(dae, dae_reduced)
-    intg = integrator("intg","idas",dae_se,{"grid": grid,"abstol":abstol_default*precision,"reltol":reltol_default*precision})
+    intg = integrator("intg","idas",dae_se,0,grid,{"abstol":abstol_default*precision,"reltol":reltol_default*precision})
     init_gen = dae_init_gen(dae, dae_reduced, "ipopt", init_strength, {"ipopt.print_level":0,"print_time": False})
     xz0 = init_gen(**init)
     sol = intg(**xz0)

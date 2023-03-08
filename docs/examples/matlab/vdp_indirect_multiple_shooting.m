@@ -84,9 +84,7 @@ num_nodes = 20;
 iopts = struct;
 iopts.abstol = 1e-8; % abs. tolerance
 iopts.reltol = 1e-8; % rel. tolerance
-iopts.t0 = 0.0;
-iopts.tf = tf/num_nodes;
-I = integrator('I', 'cvodes', dae, iopts);
+I = integrator('I', 'cvodes', dae, 0.0, tf/num_nodes, iopts);
 
 % Variables for the states at each shooting node
 X = MX.sym('X',nX,num_nodes+1);
@@ -131,7 +129,7 @@ X_sol = getfield(solver('x0',0),'x');
 tgrid = linspace(0,tf,100);
 
 % Simulator to get optimal state and control trajectories
-simulator = integrator('simulator', 'cvodes', dae, struct('grid',tgrid,'output_t0',true));
+simulator = integrator('simulator', 'cvodes', dae, tgrid);
 
 % Simulate to get the trajectories
 sol = full(getfield(simulator('x0',X_sol(1:4)),'xf'));
