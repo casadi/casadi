@@ -482,6 +482,7 @@ void Integrator::init(const Dict& opts) {
   nrz_ = rz().nnz();
   nrp_ = rp().nnz();
   nrq_ = rq().nnz();
+  nuq_ = uq().nnz();
 
   // Number of sensitivities
   ns_ = x().size2()-1;
@@ -699,6 +700,7 @@ sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, void* me
   std::fill_n(arg1, static_cast<size_t>(DYN_NUM_IN), nullptr);
   arg1[DYN_X] = arg[INTEGRATOR_X0];
   arg1[DYN_P] = arg[INTEGRATOR_P];
+  arg1[DYN_U] = arg[INTEGRATOR_U];
   bvec_t** res1 = res+n_out_;
   std::fill_n(res1, static_cast<size_t>(DYN_NUM_OUT), nullptr);
   res1[DYN_ODE] = tmp_x;
@@ -732,6 +734,7 @@ sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, void* me
     std::fill_n(arg1, static_cast<size_t>(DYN_NUM_IN), nullptr);
     arg1[DYN_X] = tmp_x;
     arg1[DYN_P] = arg[INTEGRATOR_P];
+    arg1[DYN_U] = arg[INTEGRATOR_U];
     arg1[DYN_Z] = tmp_z;
     arg1[DYN_RX] = arg[INTEGRATOR_X0];
     arg1[DYN_RX] = arg[INTEGRATOR_RX0];
@@ -779,6 +782,7 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
   // Shorthands
   bvec_t* x0 = arg[INTEGRATOR_X0];
   bvec_t* p = arg[INTEGRATOR_P];
+  bvec_t* u = arg[INTEGRATOR_U];
   bvec_t* xf = res[INTEGRATOR_XF];
   bvec_t* zf = res[INTEGRATOR_ZF];
   bvec_t* qf = res[INTEGRATOR_QF];
@@ -808,6 +812,7 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
     bvec_t* rxf = res[INTEGRATOR_RXF];
     bvec_t* rzf = res[INTEGRATOR_RZF];
     bvec_t* rqf = res[INTEGRATOR_RQF];
+    bvec_t* uqf = res[INTEGRATOR_UQF];
 
     // Propagate from outputs to state vectors
     if (rxf) {
@@ -830,6 +835,7 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
     arg1[DYN_X] = tmp_x;
     arg1[DYN_Z] = tmp_z;
     arg1[DYN_P] = p;
+    arg1[DYN_U] = u;
     arg1[DYN_RX] = tmp_rx;
     arg1[DYN_RZ] = tmp_rz;
     arg1[DYN_RP] = rp;
@@ -859,6 +865,7 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
   arg1[DYN_X] = tmp_x;
   arg1[DYN_Z] = tmp_z;
   arg1[DYN_P] = p;
+  arg1[DYN_U] = u;
   if (qf && nq_>0) {
     if (oracle_.rev(arg1, res1, iw, w, 0)) return 1;
   }
@@ -1186,6 +1193,9 @@ const Options FixedStepIntegrator::options_
 Function FixedStepIntegrator::create_advanced(const Dict& opts) {
   Function temp = Function::create(this, opts);
 
+  // Controls and not implemented
+  casadi_assert(nu_ == 0, "Not implemented");
+
   // Check if we need to simplify
   bool simplify = false;
   auto it = opts.find("simplify");
@@ -1282,17 +1292,20 @@ int FixedStepIntegrator::init_mem(void* mem) const {
   m->x.resize(nx_);
   m->z.resize(nz_);
   m->p.resize(np_);
+  m->u.resize(nu_);
   m->q.resize(nq_);
   m->rx.resize(nrx_);
   m->rz.resize(nrz_);
   m->rp.resize(nrp_);
   m->rq.resize(nrq_);
+  m->uq.resize(nuq_);
   m->x_prev.resize(nx_);
   m->Z_prev.resize(nZ_);
   m->q_prev.resize(nq_);
   m->rx_prev.resize(nrx_);
   m->RZ_prev.resize(nRZ_);
   m->rq_prev.resize(nrq_);
+
   return 0;
 }
 
@@ -1300,10 +1313,11 @@ void FixedStepIntegrator::advance(IntegratorMemory* mem, double t_next, double t
     const double* u, double* x, double* z, double* q) const {
   auto m = static_cast<FixedStepMemory*>(mem);
 
-  // Controls not implemented
-  (void)u;
-  (void)t_stop;
-  casadi_assert(nu_ == 0, "Not implemented");
+  // The fixed-step integrators take steps aligned with output times, t_stop not needed
+  (void)t_stop;  // unused
+
+  // Set controls
+  casadi_copy(u, nu_, get_ptr(m->u));
 
   // Get discrete time sought
   casadi_int k_out = static_cast<casadi_int>(std::ceil((t_next - t0_)/h_));
@@ -1319,6 +1333,7 @@ void FixedStepIntegrator::advance(IntegratorMemory* mem, double t_next, double t
   m->arg[FSTEP_X0] = get_ptr(m->x_prev);
   m->arg[FSTEP_Z0] = get_ptr(m->Z_prev);
   m->arg[FSTEP_P] = get_ptr(m->p);
+  m->arg[FSTEP_U] = get_ptr(m->u);
 
   // ... and outputs
   std::fill_n(m->res, F.n_out(), nullptr);
@@ -1358,7 +1373,7 @@ void FixedStepIntegrator::retreat(IntegratorMemory* mem, double t_next, double t
     double* rx, double* rz, double* rq) const {
   auto m = static_cast<FixedStepMemory*>(mem);
 
-  // The fixed-step integrator always takes one step, t_stop is not needed
+  // The fixed-step integrators take steps aligned with output times, t_stop not needed
   (void)t_stop;  // unused
 
   // Get discrete time sought
@@ -1374,6 +1389,7 @@ void FixedStepIntegrator::retreat(IntegratorMemory* mem, double t_next, double t
   std::fill_n(m->arg, G.n_in(), nullptr);
   m->arg[BSTEP_T] = &m->t;
   m->arg[BSTEP_P] = get_ptr(m->p);
+  m->arg[BSTEP_U] = get_ptr(m->u);
   m->arg[BSTEP_RX0] = get_ptr(m->rx_prev);
   m->arg[BSTEP_RZ0] = get_ptr(m->RZ_prev);
   m->arg[BSTEP_RP] = get_ptr(m->rp);

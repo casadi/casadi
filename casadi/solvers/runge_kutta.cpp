@@ -62,13 +62,14 @@ namespace casadi {
   }
 
   void RungeKutta::setupFG() {
-    f_ = create_function("f", {"x", "z", "p", "t"}, {"ode", "alg", "quad"});
-    g_ = create_function("g", {"rx", "rz", "rp", "x", "z", "p", "t"},
+    f_ = create_function("f", {"x", "z", "p", "u", "t"}, {"ode", "alg", "quad"});
+    g_ = create_function("g", {"rx", "rz", "rp", "x", "z", "p", "u", "t"},
                               {"rode", "ralg", "rquad"});
 
     // Symbolic inputs
     MX x0 = MX::sym("x0", this->x());
     MX p = MX::sym("p", this->p());
+    MX u = MX::sym("u", this->u());
     MX t = MX::sym("t", this->t());
 
     // Intermediate variables (does not enter in F_, only in G_)
@@ -88,6 +89,7 @@ namespace casadi {
       std::vector<MX> f_arg(FSTEP_NUM_IN);
       std::vector<MX> f_res;
       f_arg[FSTEP_P] = p;
+      f_arg[FSTEP_U] = u;
 
       // k1
       f_arg[FSTEP_T] = t;
@@ -126,6 +128,7 @@ namespace casadi {
       f_arg[FSTEP_T] = t;
       f_arg[FSTEP_X0] = x0;
       f_arg[FSTEP_P] = p;
+      f_arg[FSTEP_U] = u;
       f_arg[FSTEP_Z0] = v;
       f_res[FSTEP_XF] = xf;
       f_res[FSTEP_QF] = qf;
@@ -148,6 +151,7 @@ namespace casadi {
       std::vector<MX> g_arg(BSTEP_NUM_IN);
       std::vector<MX> g_res;
       g_arg[BSTEP_P] = p;
+      g_arg[BSTEP_U] = u;
       g_arg[BSTEP_RP] = rp;
 
       // k1
@@ -190,6 +194,7 @@ namespace casadi {
       g_arg[BSTEP_T] = t;
       g_arg[BSTEP_X] = x0;
       g_arg[BSTEP_P] = p;
+      g_arg[BSTEP_U] = u;
       g_arg[BSTEP_Z] = v;
       g_arg[BSTEP_RX0] = rx0;
       g_arg[BSTEP_RP] = rp;

@@ -92,8 +92,8 @@ namespace casadi {
   }
 
   void Collocation::setupFG() {
-    f_ = create_function("f", {"x", "z", "p", "t"}, {"ode", "alg", "quad"});
-    g_ = create_function("g", {"rx", "rz", "rp", "x", "z", "p", "t"},
+    f_ = create_function("f", {"x", "z", "p", "u", "t"}, {"ode", "alg", "quad"});
+    g_ = create_function("g", {"rx", "rz", "rp", "x", "z", "p", "u", "t"},
                               {"rode", "ralg", "rquad"});
 
     // All collocation time points
@@ -143,6 +143,7 @@ namespace casadi {
     // Symbolic inputs
     MX x0 = MX::sym("x0", this->x());
     MX p = MX::sym("p", this->p());
+    MX u = MX::sym("u", this->u());
     MX t = MX::sym("t", this->t());
 
     // Implicitly defined variables (z and x)
@@ -186,6 +187,7 @@ namespace casadi {
       std::vector<MX> f_arg(FSTEP_NUM_IN);
       f_arg[FSTEP_T] = tt[j];
       f_arg[FSTEP_P] = p;
+      f_arg[FSTEP_U] = u;
       f_arg[FSTEP_X0] = x[j];
       f_arg[FSTEP_Z0] = z[j];
       std::vector<MX> f_res = f_(f_arg);
@@ -214,6 +216,7 @@ namespace casadi {
     F_in[FSTEP_T] = t;
     F_in[FSTEP_X0] = x0;
     F_in[FSTEP_P] = p;
+    F_in[FSTEP_U] = u;
     F_in[FSTEP_Z0] = v;
     std::vector<MX> F_out(FSTEP_NUM_OUT);
     F_out[FSTEP_XF] = xf;
@@ -265,6 +268,7 @@ namespace casadi {
         std::vector<MX> g_arg(BSTEP_NUM_IN);
         g_arg[BSTEP_T] = tt[j];
         g_arg[BSTEP_P] = p;
+        g_arg[BSTEP_U] = u;
         g_arg[BSTEP_X] = x[j];
         g_arg[BSTEP_Z] = z[j];
         g_arg[BSTEP_RX0] = rx[j];
@@ -296,6 +300,7 @@ namespace casadi {
       G_in[BSTEP_T] = t;
       G_in[BSTEP_X] = x0;
       G_in[BSTEP_P] = p;
+      G_in[BSTEP_U] = u;
       G_in[BSTEP_Z] = v;
       G_in[BSTEP_RX0] = rx0;
       G_in[BSTEP_RP] = rp;

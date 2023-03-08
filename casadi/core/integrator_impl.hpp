@@ -320,6 +320,8 @@ enum FStepIn {
   FSTEP_Z0,
   /// Parameter
   FSTEP_P,
+  /// Controls
+  FSTEP_U,
   /// Explicit time dependence
   FSTEP_T,
   /// Number of arguments
@@ -352,6 +354,8 @@ enum BStepIn {
   BSTEP_Z,
   /// Parameter vector
   BSTEP_P,
+  /// Controls
+  BSTEP_U,
   /// Explicit time dependence
   BSTEP_T,
   /// Number of arguments
@@ -378,7 +382,7 @@ struct CASADI_EXPORT FixedStepMemory : public IntegratorMemory {
   casadi_int k;
 
   // Current state
-  std::vector<double> x, z, p, q, rx, rz, rp, rq;
+  std::vector<double> x, z, p, u, q, rx, rz, rp, rq, uq;
 
   // Previous state
   std::vector<double> x_prev, Z_prev, q_prev, rx_prev, RZ_prev, rq_prev;
