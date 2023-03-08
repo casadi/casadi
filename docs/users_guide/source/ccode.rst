@@ -185,7 +185,7 @@ which invokes the system compiler via the command line:
 
         x = MX.sym('x') [hidden]
         f = Function('f',[x],[sin(x)]) [hidden]
-        C = Importer('gen.c','clang')
+        C = Importer('gen.c','shell')
         f = external('f',C)
         print(f(3.14))
     &&
@@ -196,7 +196,7 @@ which invokes the system compiler via the command line:
         f = Function('f',{x},{sin(x)}); [hidden]
         f.generate('gen.c'); [hidden]
 
-        C = Importer('gen.c','clang');
+        C = Importer('gen.c','shell');
         f = external('f',C);
         disp(f(3.14))
 
