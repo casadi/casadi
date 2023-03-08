@@ -2,6 +2,7 @@ import glob
 import subprocess
 import os
 import sys
+import re
 
 langs = ["python","octave"]
 
@@ -15,14 +16,26 @@ for lang in langs:
     snippets = glob.glob('snippets/*.%s.in' % lang)
     for f in snippets:
        out_file = f.replace("in","out")
+       if lang == "python":
+         args = ["python",f]
+       if lang == "octave":
+         args = ["octave","--no-gui","--no-window-system","--eval","try,run('%s'),catch e,e.message,exit(1),end" % f]
+     
+       p = subprocess.run(args,stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
        with open(f.replace("in","out"), 'w') as myoutput:
-         if lang == "python":
-           args = ["python",f]
-         if lang == "octave":
-           args = ["octave","--no-gui","--no-window-system","--eval","try,run('%s'),catch e,e.message,exit(1),end" % f]
+       
+         out = p.stdout
+         # Filter out Ipopt copyright notice
+         out = re.sub(r'\*{5,}.*Ipopt.*\*{5,}','',out,flags=re.MULTILINE|re.DOTALL)
+         # remove leading empty lines
+         out_split = out.split("\n")
+         for i,line in enumerate(out_split):
+            line = line.rstrip()
+            if len(line)!=0:
+                out = "\n".join(out_split[i:])
+                break
          
-         p = subprocess.Popen(args,stdout=myoutput, stderr=myoutput)
-         p.wait()
+         myoutput.write(out)
        if p.returncode!=0:
          print(("="*5) + f)
          print(open(f,'r').read())

@@ -52,4 +52,4 @@ for example in examples:
       pass
     shutil.copyfile(src+m.group(1) + '.pdf','html/'+m.group(1) + '.pdf')
     shutil.copyfile(src+m.group(1) + '.py', 'html/'+m.group(1) + '.py')
-    print m.group(1) + '.pdf'
+    print(m.group(1) + '.pdf')

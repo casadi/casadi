@@ -24,53 +24,10 @@
 import re
 import os
 
-builddir = 'build/'
-topdir = '../../../../'
-makedir = 'docs/api/examples/ctemplate/CMakeFiles/ctemplate.dir/'
+import casadi
 
-cextension = 'cc'
-
-absbuilddir = os.path.abspath(topdir+builddir)
-
-# Write a linker script
-link = open(topdir+builddir+makedir+'link.txt','r')
-linker = link.readline()
-linker = re.sub(' \.\./\.\./\.\./\.\.',' '+ absbuilddir,linker)
-linker = re.sub('CMakeFiles/ctemplate.dir/ctemplate(\.cpp)?\.o','"$1.o"',linker)
-linker = re.sub('-o (.*?) ','-o "$1.run" ',linker)
-
-linkerscript = open('linker.sh','w')
-linkerscript.write('#!/bin/bash\n')
-linkerscript.write(linker)
-linkerscript.close()
-link.close()
-
-# Write a compiler script
-myflags=''
-mydefines=''
-myincludes=''
-
-with open(topdir+builddir+makedir+'flags.make','r') as flags:
-    for l in flags:
-      m = re.search("CXX_FLAGS = (.*)",l)
-      if m:
-        myflags = m.group(1)
-      m = re.search("CXX_DEFINES = (.*)",l)
-      if m:
-        mydefines = m.group(1)
-      m = re.search("CXX_INCLUDES = (.*)",l)
-      if m:
-        myincludes = m.group(1)
-    compiler = linker.split(' ')[0] + ' ' + myflags +" "+ mydefines +" "+ myincludes+ ' -o "$1.o" -c "$1.%s"' % cextension
 
 with open('compiler.sh','w') as compilerscript:
     compilerscript.write('#!/bin/bash\n')
-    compilerscript.write(compiler)
-
-link.close()
-
-print(compiler)
-print(linker)
-
-print("Done")
+    compilerscript.write(f"""g++ "$1" -D_GLIBCXX_USE_CXX11_ABI=0 {casadi.CasadiMeta.compiler_flags()} -I{casadi.GlobalOptions.getCasadiIncludePath()} -L{casadi.GlobalOptions.getCasadiPath()} -Wl,-rpath,{casadi.GlobalOptions.getCasadiPath()} -lcasadi -o "$2" """)
 

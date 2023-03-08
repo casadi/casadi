@@ -1,5 +1,5 @@
 REVISION=$(shell git rev-parse HEAD)
-READABLEREVISION=$(shell python -c "import casadi;print casadi.__version__")
+READABLEREVISION=$(shell python -c "import casadi;print(casadi.__version__)")
 
 .PHONY: export
 

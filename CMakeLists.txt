@@ -1583,7 +1583,6 @@ add_subdirectory(misc)
 option(WITH_EXAMPLES "Build examples" ON)
 if(WITH_EXAMPLES)
   add_subdirectory(docs/examples)
-  add_subdirectory(docs/api/examples/ctemplate)
 endif()
 
 #####################################################

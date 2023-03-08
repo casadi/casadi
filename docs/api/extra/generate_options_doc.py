@@ -234,7 +234,12 @@ for name,meta in metadata.items():
         
         optionsdict = "".join(lines[start:stop])
 
-        results = parse_options_group_collection.parseString(optionsdict)
+        try:
+            results = parse_options_group_collection.parseString(optionsdict)
+        except Exception as e:
+            print("parse_options_group_collection",parse_options_group_collection)
+            print("optionsdict",optionsdict)
+            raise e
 
         for optiongroup in results:
           if isinstance(optiongroup,str):
