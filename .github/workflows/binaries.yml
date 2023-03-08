@@ -732,36 +732,16 @@ jobs:
       - uses: actions/checkout@v3.3.0
       - uses: actions/download-artifact@v3.0.2
         with:
-          name: casadi-linux64-py311
+          name: casadi-linux64-py310
       - name: Unpack source
-        run: unzip casadi-linux64-py311.zip -d casadi_python
+        run: unzip casadi-linux64-py310.zip -d casadi_python
       - uses: actions/download-artifact@v3.0.2
         with:
           name: casadi-linux64-octave7.3.0
       - name: Unpack source
         run: unzip casadi-linux64-octave7.3.0.zip -d casadi_octave
-      - uses: conda-incubator/setup-miniconda@v2.2.0
-        with:
-          python-version: 3.11
-          activate-environment: py311
-          auto-update-conda: true
-      - run: sudo apt update && sudo apt install octave -y
-      - run: |
-          pip install numpy
-          cd docs/users_guide && pip install -r requirements.txt && cd ../..
-          sudo apt install latexmk graphviz texlive-science texlive-latex-base texlive-latex-recommended texlive-latex-extra -y
         shell: bash -el {0}
-      - run: octave --no-gui --no-window-system --eval "addpath('${{ github.workspace }}/casadi_octave');savepath;"
-      - run: |
-          cd docs/users_guide && make && cd ../..
-          cd tests
-          make user_guide_snippets_py
-          make user_guide_snippets_oct
-          cd ..
-          cd docs/users_guide && rm -rf build && make && cd ../..
-        env:
-          PYTHONPATH: ${{ github.workspace }}/casadi_python
-        shell: bash -el {0}
+      - run: docker run --rm -v`pwd`:/local -v${{ github.workspace }}/casadi_python:/casadi_python:ro -v${{ github.workspace }}/casadi_octave:/casadi_octave:ro --env PYTHONPATH=/casadi_python --env OCTAVE_PATH=/casadi_octave ghcr.io/casadi/ci-doc:latest /bin/bash -c "cd docs/users_guide && rm -rf build && rm -f snippets/* && make && cd ../../test && make user_guide_snippets_py user_guide_snippets_oct && cd .. && rm -rf docs/users_guide/build && cd docs/api && make full doxexport doxpublish"
       - uses: svenstaro/upload-release-action@2.4.0
         with:
           overwrite: true
