@@ -183,11 +183,11 @@ namespace casadi {
       //for (casadi_int j=deg_; j>=1; --j) {
 
       // Evaluate the DAE
-      std::vector<MX> f_arg(DAE_NUM_IN);
-      f_arg[DAE_T] = tt[j];
-      f_arg[DAE_P] = p;
-      f_arg[DAE_X] = x[j];
-      f_arg[DAE_Z] = z[j];
+      std::vector<MX> f_arg(FSTEP_NUM_IN);
+      f_arg[FSTEP_T] = tt[j];
+      f_arg[FSTEP_P] = p;
+      f_arg[FSTEP_X0] = x[j];
+      f_arg[FSTEP_Z0] = z[j];
       std::vector<MX> f_res = f_(f_arg);
 
       // Get an expression for the state derivative at the collocation point
@@ -197,28 +197,28 @@ namespace casadi {
       }
 
       // Add collocation equation
-      eq.push_back(vec(h_*f_res[DAE_ODE] - xp_j));
+      eq.push_back(vec(h_*f_res[FSTEP_XF] - xp_j));
 
       // Add the algebraic conditions
-      eq.push_back(vec(f_res[DAE_ALG]));
+      eq.push_back(vec(f_res[FSTEP_RES]));
 
       // Add contribution to the final state
       xf += D[j]*x[j];
 
       // Add contribution to quadratures
-      qf += (B[j]*h_)*f_res[DAE_QUAD];
+      qf += (B[j]*h_)*f_res[FSTEP_QF];
     }
 
     // Form forward discrete time dynamics
-    std::vector<MX> F_in(DAE_NUM_IN);
-    F_in[DAE_T] = t;
-    F_in[DAE_X] = x0;
-    F_in[DAE_P] = p;
-    F_in[DAE_Z] = v;
-    std::vector<MX> F_out(DAE_NUM_OUT);
-    F_out[DAE_ODE] = xf;
-    F_out[DAE_ALG] = vertcat(eq);
-    F_out[DAE_QUAD] = qf;
+    std::vector<MX> F_in(FSTEP_NUM_IN);
+    F_in[FSTEP_T] = t;
+    F_in[FSTEP_X0] = x0;
+    F_in[FSTEP_P] = p;
+    F_in[FSTEP_Z0] = v;
+    std::vector<MX> F_out(FSTEP_NUM_OUT);
+    F_out[FSTEP_XF] = xf;
+    F_out[FSTEP_RES] = vertcat(eq);
+    F_out[FSTEP_QF] = qf;
     F_ = Function("dae", F_in, F_out);
     alloc(F_);
 
@@ -262,14 +262,14 @@ namespace casadi {
       for (casadi_int j=1; j<deg_+1; ++j) {
 
         // Evaluate the backward DAE
-        std::vector<MX> g_arg(RDAE_NUM_IN);
-        g_arg[RDAE_T] = tt[j];
-        g_arg[RDAE_P] = p;
-        g_arg[RDAE_X] = x[j];
-        g_arg[RDAE_Z] = z[j];
-        g_arg[RDAE_RX] = rx[j];
-        g_arg[RDAE_RZ] = rz[j];
-        g_arg[RDAE_RP] = rp;
+        std::vector<MX> g_arg(BSTEP_NUM_IN);
+        g_arg[BSTEP_T] = tt[j];
+        g_arg[BSTEP_P] = p;
+        g_arg[BSTEP_X] = x[j];
+        g_arg[BSTEP_Z] = z[j];
+        g_arg[BSTEP_RX0] = rx[j];
+        g_arg[BSTEP_RZ0] = rz[j];
+        g_arg[BSTEP_RP] = rp;
         std::vector<MX> g_res = g_(g_arg);
 
         // Get an expression for the state derivative at the collocation point
@@ -279,31 +279,31 @@ namespace casadi {
         }
 
         // Add collocation equation
-        eq.push_back(vec(h_*B[j]*g_res[RDAE_ODE] - rxp_j));
+        eq.push_back(vec(h_*B[j]*g_res[BSTEP_RXF] - rxp_j));
 
         // Add the algebraic conditions
-        eq.push_back(vec(g_res[RDAE_ALG]));
+        eq.push_back(vec(g_res[BSTEP_RES]));
 
         // Add contribution to the final state
         rxf += -B[j]*C[0][j]*rx[j];
 
         // Add contribution to quadratures
-        rqf += h_*B[j]*g_res[RDAE_QUAD];
+        rqf += h_*B[j]*g_res[BSTEP_QF];
       }
 
       // Form backward discrete time dynamics
-      std::vector<MX> G_in(RDAE_NUM_IN);
-      G_in[RDAE_T] = t;
-      G_in[RDAE_X] = x0;
-      G_in[RDAE_P] = p;
-      G_in[RDAE_Z] = v;
-      G_in[RDAE_RX] = rx0;
-      G_in[RDAE_RP] = rp;
-      G_in[RDAE_RZ] = rv;
-      std::vector<MX> G_out(RDAE_NUM_OUT);
-      G_out[RDAE_ODE] = rxf;
-      G_out[RDAE_ALG] = vertcat(eq);
-      G_out[RDAE_QUAD] = rqf;
+      std::vector<MX> G_in(BSTEP_NUM_IN);
+      G_in[BSTEP_T] = t;
+      G_in[BSTEP_X] = x0;
+      G_in[BSTEP_P] = p;
+      G_in[BSTEP_Z] = v;
+      G_in[BSTEP_RX0] = rx0;
+      G_in[BSTEP_RP] = rp;
+      G_in[BSTEP_RZ0] = rv;
+      std::vector<MX> G_out(BSTEP_NUM_OUT);
+      G_out[BSTEP_RXF] = rxf;
+      G_out[BSTEP_RES] = vertcat(eq);
+      G_out[BSTEP_QF] = rqf;
       G_ = Function("rdae", G_in, G_out);
       alloc(G_);
     }

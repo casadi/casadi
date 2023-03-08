@@ -59,7 +59,7 @@ struct CASADI_EXPORT SimulatorMemory : public OracleMemory {
 
 /** \brief Internal storage for simulator related data
 
-    @copydoc DAE_doc
+
     \author Joel Andersson
     \date 2010
 

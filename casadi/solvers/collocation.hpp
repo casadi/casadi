@@ -48,7 +48,7 @@ namespace casadi {
   /**
      \brief \pluginbrief{Integrator,collocation}
 
-     @copydoc DAE_doc
+ 
      @copydoc plugin_Integrator_collocation
 
      \author Joel Andersson

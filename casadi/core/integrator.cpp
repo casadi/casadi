@@ -1200,31 +1200,31 @@ Function FixedStepIntegrator::create_advanced(const Dict& opts) {
 
     // Prepare return Function inputs
     std::vector<MX> intg_in(INTEGRATOR_NUM_IN);
-    intg_in[INTEGRATOR_X0] = F_in[DAE_X];
-    intg_in[INTEGRATOR_P] = F_in[DAE_P];
+    intg_in[INTEGRATOR_X0] = F_in[FSTEP_X0];
+    intg_in[INTEGRATOR_P] = F_in[FSTEP_P];
     intg_in[INTEGRATOR_Z0] = z0;
-    F_in[DAE_Z] = algebraic_state_init(intg_in[INTEGRATOR_X0], z0);
+    F_in[FSTEP_Z0] = algebraic_state_init(intg_in[INTEGRATOR_X0], z0);
 
     // Prepare return Function outputs
     std::vector<MX> intg_out(INTEGRATOR_NUM_OUT);
-    F_in[DAE_T] = t0_;
+    F_in[FSTEP_T] = t0_;
 
     std::vector<MX> F_out;
     // Loop over finite elements
-    for (casadi_int k=0;k<nk_;++k) {
+    for (casadi_int k=0; k<nk_; ++k) {
       F_out = F(F_in);
 
-      F_in[DAE_X] = F_out[DAE_ODE];
-      F_in[DAE_Z] = F_out[DAE_ALG];
-      intg_out[INTEGRATOR_QF] = k==0? F_out[DAE_QUAD] : intg_out[INTEGRATOR_QF]+F_out[DAE_QUAD];
-      F_in[DAE_T] += h_;
+      F_in[FSTEP_X0] = F_out[FSTEP_XF];
+      F_in[FSTEP_Z0] = F_out[FSTEP_RES];
+      intg_out[INTEGRATOR_QF] = k==0? F_out[FSTEP_QF] : intg_out[INTEGRATOR_QF]+F_out[FSTEP_QF];
+      F_in[FSTEP_T] += h_;
     }
 
-    intg_out[INTEGRATOR_XF] = F_out[DAE_ODE];
+    intg_out[INTEGRATOR_XF] = F_out[FSTEP_XF];
 
-    // If-clause needed because rk abuses DAE_ALG output for intermediate state output
+    // If-clause needed because rk abuses FSTEP_RES output for intermediate state output
     if (nz_) {
-      intg_out[INTEGRATOR_ZF] = algebraic_state_output(F_out[DAE_ALG]);
+      intg_out[INTEGRATOR_ZF] = algebraic_state_output(F_out[FSTEP_RES]);
     }
 
     // Extract options for Function constructor
@@ -1258,8 +1258,8 @@ void FixedStepIntegrator::init(const Dict& opts) {
   setupFG();
 
   // Get discrete time dimensions
-  nZ_ = F_.nnz_in(DAE_Z);
-  nRZ_ =  G_.is_null() ? 0 : G_.nnz_in(RDAE_RZ);
+  nZ_ = F_.nnz_in(FSTEP_Z0);
+  nRZ_ =  G_.is_null() ? 0 : G_.nnz_in(BSTEP_RZ0);
 }
 
 int FixedStepIntegrator::init_mem(void* mem) const {
@@ -1267,8 +1267,8 @@ int FixedStepIntegrator::init_mem(void* mem) const {
   auto m = static_cast<FixedStepMemory*>(mem);
 
   // Discrete time algebraic variable
-  m->Z.resize(F_.nnz_in(DAE_Z));
-  if (!G_.is_null()) m->RZ.resize(G_.nnz_in(RDAE_RZ));
+  m->Z.resize(F_.nnz_in(FSTEP_Z0));
+  if (!G_.is_null()) m->RZ.resize(G_.nnz_in(BSTEP_RZ0));
 
   // Allocate tape if backward states are present
   if (nrx_>0) {
@@ -1313,16 +1313,16 @@ void FixedStepIntegrator::advance(IntegratorMemory* mem, double t_next, double t
 
   // Discrete dynamics function inputs ...
   std::fill_n(m->arg, F.n_in(), nullptr);
-  m->arg[DAE_T] = &m->t;
-  m->arg[DAE_X] = get_ptr(m->x_prev);
-  m->arg[DAE_Z] = get_ptr(m->Z_prev);
-  m->arg[DAE_P] = get_ptr(m->p);
+  m->arg[FSTEP_T] = &m->t;
+  m->arg[FSTEP_X0] = get_ptr(m->x_prev);
+  m->arg[FSTEP_Z0] = get_ptr(m->Z_prev);
+  m->arg[FSTEP_P] = get_ptr(m->p);
 
   // ... and outputs
   std::fill_n(m->res, F.n_out(), nullptr);
-  m->res[DAE_ODE] = get_ptr(m->x);
-  m->res[DAE_ALG] = get_ptr(m->Z);
-  m->res[DAE_QUAD] = get_ptr(m->q);
+  m->res[FSTEP_XF] = get_ptr(m->x);
+  m->res[FSTEP_RES] = get_ptr(m->Z);
+  m->res[FSTEP_QF] = get_ptr(m->q);
 
   // Take time steps until end time has been reached
   while (m->k<k_out) {
@@ -1370,17 +1370,17 @@ void FixedStepIntegrator::retreat(IntegratorMemory* mem, double t_next, double t
 
   // Discrete dynamics function inputs ...
   std::fill_n(m->arg, G.n_in(), nullptr);
-  m->arg[RDAE_T] = &m->t;
-  m->arg[RDAE_P] = get_ptr(m->p);
-  m->arg[RDAE_RX] = get_ptr(m->rx_prev);
-  m->arg[RDAE_RZ] = get_ptr(m->RZ_prev);
-  m->arg[RDAE_RP] = get_ptr(m->rp);
+  m->arg[BSTEP_T] = &m->t;
+  m->arg[BSTEP_P] = get_ptr(m->p);
+  m->arg[BSTEP_RX0] = get_ptr(m->rx_prev);
+  m->arg[BSTEP_RZ0] = get_ptr(m->RZ_prev);
+  m->arg[BSTEP_RP] = get_ptr(m->rp);
 
   // ... and outputs
   std::fill_n(m->res, G.n_out(), nullptr);
-  m->res[RDAE_ODE] = get_ptr(m->rx);
-  m->res[RDAE_ALG] = get_ptr(m->RZ);
-  m->res[RDAE_QUAD] = get_ptr(m->rq);
+  m->res[BSTEP_RXF] = get_ptr(m->rx);
+  m->res[BSTEP_RES] = get_ptr(m->RZ);
+  m->res[BSTEP_QF] = get_ptr(m->rq);
 
   // Take time steps until end time has been reached
   while (m->k>k_out) {
@@ -1394,8 +1394,8 @@ void FixedStepIntegrator::retreat(IntegratorMemory* mem, double t_next, double t
     casadi_copy(get_ptr(m->rq), nrq_, get_ptr(m->rq_prev));
 
     // Take step
-    m->arg[RDAE_X] = get_ptr(m->x_tape.at(m->k));
-    m->arg[RDAE_Z] = get_ptr(m->Z_tape.at(m->k));
+    m->arg[BSTEP_X] = get_ptr(m->x_tape.at(m->k));
+    m->arg[BSTEP_Z] = get_ptr(m->Z_tape.at(m->k));
     G(m->arg, m->res, m->iw, m->w);
     casadi_axpy(nrq_, 1., get_ptr(m->rq_prev), get_ptr(m->rq));
   }
@@ -1508,8 +1508,8 @@ void ImplicitFixedStepIntegrator::init(const Dict& opts) {
   }
 
   // Complete rootfinder dictionary
-  rootfinder_options["implicit_input"] = DAE_Z;
-  rootfinder_options["implicit_output"] = DAE_ALG;
+  rootfinder_options["implicit_input"] = FSTEP_Z0;
+  rootfinder_options["implicit_output"] = FSTEP_RES;
 
   // Allocate a solver
   rootfinder_ = rootfinder(name_ + "_rootfinder", implicit_function_name,
@@ -1520,8 +1520,8 @@ void ImplicitFixedStepIntegrator::init(const Dict& opts) {
   if (nRZ_>0) {
     // Options
     Dict backward_rootfinder_options = rootfinder_options;
-    backward_rootfinder_options["implicit_input"] = RDAE_RZ;
-    backward_rootfinder_options["implicit_output"] = RDAE_ALG;
+    backward_rootfinder_options["implicit_input"] = BSTEP_RZ0;
+    backward_rootfinder_options["implicit_output"] = BSTEP_RES;
     std::string backward_implicit_function_name = implicit_function_name;
 
     // Allocate a Newton solver

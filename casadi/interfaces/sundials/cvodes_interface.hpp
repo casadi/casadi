@@ -79,7 +79,7 @@ namespace casadi {
 
   /** \brief \pluginbrief{Integrator,cvodes}
 
-      @copydoc DAE_doc
+  
       @copydoc plugin_Integrator_cvodes
 
   */

@@ -46,7 +46,7 @@ namespace casadi {
   /** \brief \pluginbrief{Integrator,rk}
 
 
-      @copydoc DAE_doc
+  
       @copydoc plugin_Integrator_rk
 
       \author Joel Andersson

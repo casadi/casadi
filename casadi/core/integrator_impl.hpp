@@ -43,7 +43,7 @@ struct CASADI_EXPORT IntegratorMemory : public OracleMemory {
 
 /** \brief Internal storage for integrator related data
 
-    @copydoc DAE_doc
+
     \author Joel Andersson
     \date 2010
 
@@ -312,62 +312,62 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   explicit Integrator(DeserializingStream& s);
 };
 
-/// Input arguments of an ODE/DAE function
-enum DAEInput {
+/// Input arguments of a forward stepping function
+enum FStepIn {
   /// Differential state
-  DAE_X,
+  FSTEP_X0,
   /// Algebraic state
-  DAE_Z,
+  FSTEP_Z0,
   /// Parameter
-  DAE_P,
+  FSTEP_P,
   /// Explicit time dependence
-  DAE_T,
+  FSTEP_T,
   /// Number of arguments
-  DAE_NUM_IN
+  FSTEP_NUM_IN
 };
 
-/// Output arguments of an DAE function
-enum DAEOutput {
-  /// Right hand side of the implicit ODE
-  DAE_ODE,
-  /// Right hand side of algebraic equations
-  DAE_ALG,
+/// Output arguments of a forward stepping function
+enum FStepOut {
+  /// Differerential state at the end of the interval
+  FSTEP_XF,
+  /// Residual equations
+  FSTEP_RES,
   /// Right hand side of quadratures equations
-  DAE_QUAD,
+  FSTEP_QF,
   /// Number of arguments
-  DAE_NUM_OUT
+  FSTEP_NUM_OUT
 };
 
-/// Input arguments of an ODE/DAE backward integration function
-enum RDAEInput {
+/// Input arguments of a backward stepping function
+enum BStepIn {
   /// Backward differential state
-  RDAE_RX,
+  BSTEP_RX0,
   /// Backward algebraic state
-  RDAE_RZ,
+  BSTEP_RZ0,
   /// Backward  parameter vector
-  RDAE_RP,
+  BSTEP_RP,
   /// Forward differential state
-  RDAE_X,
+  BSTEP_X,
   /// Forward algebraic state
-  RDAE_Z,
+  BSTEP_Z,
   /// Parameter vector
-  RDAE_P,
+  BSTEP_P,
   /// Explicit time dependence
-  RDAE_T,
+  BSTEP_T,
   /// Number of arguments
-  RDAE_NUM_IN
+  BSTEP_NUM_IN
 };
 
-/// Output arguments of an ODE/DAE backward integration function
-enum RDAEOutput {
+/// Output arguments of a backward stepping function
+enum BStepOut {
   /// Right hand side of ODE
-  RDAE_ODE,
+  BSTEP_RXF,
   /// Right hand side of algebraic equations
-  RDAE_ALG,
+  BSTEP_RES,
   /// Right hand side of quadratures
-  RDAE_QUAD,
+  BSTEP_QF,
   /// Number of arguments
-  RDAE_NUM_OUT
+  BSTEP_NUM_OUT
 };
 
 struct CASADI_EXPORT FixedStepMemory : public IntegratorMemory {

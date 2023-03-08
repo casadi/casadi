@@ -72,7 +72,6 @@ struct CASADI_SIMULATOR_CVODES_EXPORT CvodesSimMemory : public SundialsSimMemory
 
 /** \brief \pluginbrief{Simulator,cvodes}
 
-    @copydoc DAE_doc
     @copydoc plugin_Simulator_cvodes
 
 */
