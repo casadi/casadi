@@ -425,35 +425,33 @@ void IdasInterface::reset(IntegratorMemory* mem, double t, const double* _x,
 
   // Re-initialize backward integration
   if (nrx_>0) THROWING(IDAAdjReInit, m->mem);
-
-  // Set the stop time of the integration -- don't integrate past this point
-  if (stop_at_end_) setStopTime(m, tout_.back());
 }
 
 void IdasInterface::
-advance(IntegratorMemory* mem, double t, double* x, double* z, double* q) const {
+advance(IntegratorMemory* mem, double t_next, double t_stop,
+    const double* u, double* x, double* z, double* q) const {
   auto m = to_mem(mem);
 
-  casadi_assert(t>=t0_,
-    "IdasInterface::integrate(" + str(t) + "): "
-    "Cannot integrate to a time earlier than t0 (" + str(t0_) + ")");
-  casadi_assert(t<=tout_.back() || !stop_at_end_,
-    "IdasInterface::integrate(" + str(t) + "): "
-    "Cannot integrate past a time later than tf (" + str(tout_.back()) + ") "
-    "unless stop_at_end is set to False.");
+  // Controls not implemented
+  (void)u;
+  (void)t_stop;
+  casadi_assert(nu_ == 0, "Not implemented");
+
+  // Do not integrate past change in input signals or past the end
+  THROWING(IDASetStopTime, m->mem, t_stop);
 
   // Integrate, unless already at desired time
   double ttol = 1e-9;   // tolerance
-  if (fabs(m->t-t)>=ttol) {
+  if (fabs(m->t - t_next) >= ttol) {
     // Integrate forward ...
     if (nrx_>0) { // ... with taping
-      THROWING(IDASolveF, m->mem, t, &m->t, m->xz, m->xzdot, IDA_NORMAL, &m->ncheck);
+      THROWING(IDASolveF, m->mem, t_next, &m->t, m->xz, m->xzdot, IDA_NORMAL, &m->ncheck);
     } else { // ... without taping
-      THROWING(IDASolve, m->mem, t, &m->t, m->xz, m->xzdot, IDA_NORMAL);
+      THROWING(IDASolve, m->mem, t_next, &m->t, m->xz, m->xzdot, IDA_NORMAL);
     }
 
     // Get quadratures
-    if (nq_>0) {
+    if (nq_ > 0) {
       double tret;
       THROWING(IDAGetQuad, m->mem, &tret, m->q);
     }
@@ -568,15 +566,15 @@ void IdasInterface::impulseB(IntegratorMemory* mem,
   }
 }
 
-void IdasInterface::retreat(IntegratorMemory* mem, double t,
+void IdasInterface::retreat(IntegratorMemory* mem, double t_next, double t_stop,
     double* rx, double* rz, double* rq) const {
   auto m = to_mem(mem);
 
   // Integrate, unless already at desired time
-  if (t<m->t) {
-    THROWING(IDASolveB, m->mem, t, IDA_NORMAL);
+  if (t_next < m->t) {
+    THROWING(IDASolveB, m->mem, t_next, IDA_NORMAL);
     THROWING(IDAGetB, m->mem, m->whichB, &m->t, m->rxz, m->rxzdot);
-    if (nrq_>0) {
+    if (nrq_ > 0) {
       THROWING(IDAGetQuadB, m->mem, m->whichB, &m->t, m->rq);
     }
   }
@@ -681,13 +679,6 @@ int IdasInterface::rhsQB(double t, N_Vector xz, N_Vector xzdot, N_Vector rxz,
     uerr() << "resQB failed: " << e.what() << std::endl;
     return -1;
   }
-}
-
-void IdasInterface::setStopTime(IntegratorMemory* mem, double tf) const {
-  // Set the stop time of the integration -- don't integrate past this point
-  auto m = to_mem(mem);
-  //auto& s = m->self;
-  THROWING(IDASetStopTime, m->mem, tf);
 }
 
 int IdasInterface::psolve(double t, N_Vector xz, N_Vector xzdot, N_Vector rr,

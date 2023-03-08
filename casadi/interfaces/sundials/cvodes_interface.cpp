@@ -256,37 +256,34 @@ void CvodesInterface::reset(IntegratorMemory* mem, double t, const double* x,
   if (nrx_>0) {
     THROWING(CVodeAdjReInit, m->mem);
   }
-
-  // Set the stop time of the integration -- don't integrate past this point
-  if (stop_at_end_) setStopTime(m, tout_.back());
 }
 
-void CvodesInterface::advance(IntegratorMemory* mem, double t, double* x,
-                              double* z, double* q) const {
+void CvodesInterface::advance(IntegratorMemory* mem, double t_next, double t_stop,
+    const double* u, double* x, double* z, double* q) const {
   auto m = to_mem(mem);
 
-  casadi_assert(t>=t0_,
-    "CvodesInterface::integrate(" + str(t) + "): "
-    "Cannot integrate to a time earlier than t0 (" + str(t0_) + ")");
-  casadi_assert(t<=tout_.back() || !stop_at_end_,
-    "CvodesInterface::integrate(" + str(t) + "): "
-    "Cannot integrate past a time later than tf (" + str(tout_.back()) + ") "
-    "unless stop_at_end is set to False.");
+  // Controls not implemented
+  (void)u;
+  (void)t_stop;
+  casadi_assert(nu_ == 0, "Not implemented");
+
+  // Do not integrate past change in input signals or past the end
+  THROWING(CVodeSetStopTime, m->mem, t_stop);
 
   // Integrate, unless already at desired time
   const double ttol = 1e-9;
-  if (fabs(m->t-t)>=ttol) {
+  if (fabs(m->t - t_next)>=ttol) {
     // Integrate forward ...
     if (nrx_>0) {
       // ... with taping
-      THROWING(CVodeF, m->mem, t, m->xz, &m->t, CV_NORMAL, &m->ncheck);
+      THROWING(CVodeF, m->mem, t_next, m->xz, &m->t, CV_NORMAL, &m->ncheck);
     } else {
       // ... without taping
-      THROWING(CVode, m->mem, t, m->xz, &m->t, CV_NORMAL);
+      THROWING(CVode, m->mem, t_next, m->xz, &m->t, CV_NORMAL);
     }
 
     // Get quadratures
-    if (nq_>0) {
+    if (nq_ > 0) {
       double tret;
       THROWING(CVodeGetQuad, m->mem, &tret, m->q);
     }
@@ -366,12 +363,12 @@ void CvodesInterface::impulseB(IntegratorMemory* mem,
   THROWING(CVodeQuadReInitB, m->mem, m->whichB, m->rq);
 }
 
-void CvodesInterface::retreat(IntegratorMemory* mem, double t,
-                              double* rx, double* rz, double* rq) const {
+void CvodesInterface::retreat(IntegratorMemory* mem, double t_next, double t_stop,
+    double* rx, double* rz, double* rq) const {
   auto m = to_mem(mem);
   // Integrate, unless already at desired time
-  if (t<m->t) {
-    THROWING(CVodeB, m->mem, t, CV_NORMAL);
+  if (t_next < m->t) {
+    THROWING(CVodeB, m->mem, t_next, CV_NORMAL);
     THROWING(CVodeGetB, m->mem, m->whichB, &m->t, m->rxz);
     if (nrq_>0) {
       THROWING(CVodeGetQuadB, m->mem, m->whichB, &m->t, m->rq);
@@ -528,12 +525,6 @@ int CvodesInterface::jtimesB(N_Vector v, N_Vector Jv, double t, N_Vector x,
     uerr() << "jtimes failed: " << e.what() << std::endl;
     return -1;
   }
-}
-
-void CvodesInterface::setStopTime(IntegratorMemory* mem, double tf) const {
-  // Set the stop time of the integration -- don't integrate past this point
-  auto m = to_mem(mem);
-  THROWING(CVodeSetStopTime, m->mem, tf);
 }
 
 int CvodesInterface::psolve(double t, N_Vector x, N_Vector xdot, N_Vector r,

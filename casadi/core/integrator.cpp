@@ -51,6 +51,7 @@ std::string to_string(DynOut v) {
   case DYN_RODE: return "rode";
   case DYN_RALG: return "ralg";
   case DYN_RQUAD: return "rquad";
+  case DYN_UQUAD: return "uquad";
   default: break;
   }
   return "";
@@ -119,6 +120,7 @@ std::string integrator_in(casadi_int ind) {
   switch (static_cast<IntegratorInput>(ind)) {
   case INTEGRATOR_X0:  return "x0";
   case INTEGRATOR_P:   return "p";
+  case INTEGRATOR_U:   return "u";
   case INTEGRATOR_Z0:  return "z0";
   case INTEGRATOR_RX0: return "rx0";
   case INTEGRATOR_RP:  return "rp";
@@ -136,6 +138,7 @@ std::string integrator_out(casadi_int ind) {
   case INTEGRATOR_RXF: return "rxf";
   case INTEGRATOR_RQF: return "rqf";
   case INTEGRATOR_RZF: return "rzf";
+  case INTEGRATOR_UQF: return "uqf";
   case INTEGRATOR_NUM_OUT: break;
   }
   return std::string();
@@ -190,6 +193,7 @@ Sparsity Integrator::get_sparsity_in(casadi_int i) {
   switch (static_cast<IntegratorInput>(i)) {
   case INTEGRATOR_X0: return x();
   case INTEGRATOR_P: return p();
+  case INTEGRATOR_U: return repmat(u(), 1, nt());
   case INTEGRATOR_Z0: return z();
   case INTEGRATOR_RX0: return repmat(rx(), 1, nt());
   case INTEGRATOR_RP: return repmat(rp(), 1, nt());
@@ -207,6 +211,7 @@ Sparsity Integrator::get_sparsity_out(casadi_int i) {
   case INTEGRATOR_RXF: return rx();
   case INTEGRATOR_RQF: return rq();
   case INTEGRATOR_RZF: return rz();
+  case INTEGRATOR_UQF: return repmat(uq(), 1, nt());
   case INTEGRATOR_NUM_OUT: break;
   }
   return Sparsity();
@@ -214,6 +219,7 @@ Sparsity Integrator::get_sparsity_out(casadi_int i) {
 
 bool Integrator::grid_in(casadi_int i) {
   switch (static_cast<IntegratorInput>(i)) {
+    case INTEGRATOR_U:
     case INTEGRATOR_RX0:
     case INTEGRATOR_RP:
     case INTEGRATOR_RZ0:
@@ -228,6 +234,7 @@ bool Integrator::grid_out(casadi_int i) {
     case INTEGRATOR_XF:
     case INTEGRATOR_QF:
     case INTEGRATOR_ZF:
+    case INTEGRATOR_UQF:
       return true;
     default: break;
   }
@@ -242,6 +249,7 @@ casadi_int Integrator::adjmap_in(casadi_int i) {
     case INTEGRATOR_RXF: return INTEGRATOR_X0;
     case INTEGRATOR_RQF: return INTEGRATOR_P;
     case INTEGRATOR_RZF: return INTEGRATOR_Z0;
+    case INTEGRATOR_UQF: return INTEGRATOR_U;
     default: break;
   }
   return -1;
@@ -251,6 +259,7 @@ casadi_int Integrator::adjmap_out(casadi_int i) {
   switch (static_cast<IntegratorInput>(i)) {
     case INTEGRATOR_X0: return INTEGRATOR_RXF;
     case INTEGRATOR_P: return INTEGRATOR_RQF;
+    case INTEGRATOR_U: return INTEGRATOR_UQF;
     case INTEGRATOR_Z0: return INTEGRATOR_RZF;
     case INTEGRATOR_RX0: return INTEGRATOR_XF;
     case INTEGRATOR_RP: return INTEGRATOR_QF;
@@ -275,6 +284,7 @@ eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) con
   const double* x0 = arg[INTEGRATOR_X0];
   const double* z0 = arg[INTEGRATOR_Z0];
   const double* p = arg[INTEGRATOR_P];
+  const double* u = arg[INTEGRATOR_U];
   const double* rx0 = arg[INTEGRATOR_RX0];
   const double* rz0 = arg[INTEGRATOR_RZ0];
   const double* rp = arg[INTEGRATOR_RP];
@@ -295,37 +305,57 @@ eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) con
   // Reset solver, take time to t0
   reset(m, t0_, x0, z0, p);
 
+  // Next stop time due to step change in input
+  casadi_int k_stop = next_stop(0, u);
+
   // Integrate forward
   for (casadi_int k = 0; k < nt(); ++k) {
-    advance(m, tout_[k], x, z, q);
+    // Update stopping time, if needed
+    if (k > k_stop) k_stop = next_stop(k, u);
+    // Advance solution
+    double t_next = tout_[k], t_stop = tout_[k_stop];
+    if (verbose_) casadi_message("Integrating forward to output time " + str(k) + ": t_next = "
+      + str(t_next) + ", t_stop = " + str(t_stop));
+    advance(m, t_next, t_stop, u, x, z, q);
     if (x) x += nx_;
     if (z) z += nz_;
     if (q) q += nq_;
+    if (u) u += nu_;
   }
 
   // Backwards integration, if needed
-  if (nrx_>0) {
+  if (nrx_ > 0) {
     // Take rx0, rz0, rp past the last grid point
     if (rx0) rx0 += nrx_ * nt();
     if (rz0) rz0 += nrz_ * nt();
     if (rp) rp += nrp_ * nt();
-
+    // Next stop time due to step change in input
+    casadi_int k_stop = nt();
     // Integrate backward
     for (casadi_int k = nt(); k-- > 0; ) {
       // Reset the solver, add impulse to backwards integration
       if (rx0) rx0 -= nrx_;
       if (rz0) rz0 -= nrz_;
       if (rp) rp -= nrp_;
+      if (u) u -= nu_;
       if (k == nt() - 1) {
        resetB(m, tout_[k], rx0, rz0, rp);
       } else {
        impulseB(m, rx0, rz0, rp);
       }
+      // Next output time, or beginning
+      casadi_int k_next = k - 1;
+      double t_next = k_next < 0 ? t0_ : tout_[k_next];
+      // Update integrator stopping time
+      if (k_next < k_stop) k_stop = next_stopB(k, u);
+      double t_stop = k_stop < 0 ? t0_ : tout_[k_stop];
       // Proceed to the previous time point or t0
+      if (verbose_) casadi_message("Integrating backward from output time " + str(k) + ": t_next = "
+        + str(t_next) + ", t_stop = " + str(t_stop));
       if (k > 0) {
-        retreat(m, tout_[k - 1], 0, 0, 0);
+        retreat(m, t_next, t_stop, 0, 0, 0);
       } else {
-        retreat(m, t0_, rx, rz, rq);
+        retreat(m, t_next, t_stop, rx, rz, rq);
       }
     }
   }
@@ -434,16 +464,19 @@ void Integrator::init(const Dict& opts) {
   nz1_ = z().size1();
   nq1_ = q().size1();
   np1_  = p().size1();
+  nu1_  = u().size1();
   nrx1_ = rx().size1();
   nrz1_ = rz().size1();
   nrp1_ = rp().size1();
   nrq1_ = rq().size1();
+  nuq1_ = uq().size1();
 
   // Get dimensions (including sensitivity equations)
   nx_ = x().nnz();
   nz_ = z().nnz();
   nq_ = q().nnz();
   np_  = p().nnz();
+  nu_  = u().nnz();
   nrx_ = rx().nnz();
   nrz_ = rz().nnz();
   nrp_ = rp().nnz();
@@ -544,6 +577,7 @@ std::map<std::string, MatType> Integrator::aug_fwd(casadi_int nfwd) const {
   ret["x"] = horzcat(aug_x);
   ret["z"] = horzcat(aug_z);
   ret["p"] = horzcat(aug_p);
+  ret["u"] = MatType(0, ret["x"].size2());
   ret["ode"] = horzcat(aug_ode);
   ret["alg"] = horzcat(aug_alg);
   ret["quad"] = horzcat(aug_quad);
@@ -553,6 +587,7 @@ std::map<std::string, MatType> Integrator::aug_fwd(casadi_int nfwd) const {
   ret["rode"] = horzcat(aug_rode);
   ret["ralg"] = horzcat(aug_ralg);
   ret["rquad"] = horzcat(aug_rquad);
+  ret["uquad"] = MatType(0, ret["x"].size2());
   return ret;
 }
 
@@ -618,6 +653,7 @@ std::map<std::string, MatType> Integrator::aug_adj(casadi_int nadj) const {
   ret["x"] = vertcat(aug_x);
   ret["z"] = vertcat(aug_z);
   ret["p"] = vertcat(aug_p);
+  ret["u"] = MatType(0, ret["x"].size2());
   ret["ode"] = vertcat(aug_ode);
   ret["alg"] = vertcat(aug_alg);
   ret["quad"] = vertcat(aug_quad);
@@ -627,6 +663,7 @@ std::map<std::string, MatType> Integrator::aug_adj(casadi_int nadj) const {
   ret["rode"] = vertcat(aug_rode);
   ret["ralg"] = vertcat(aug_ralg);
   ret["rquad"] = vertcat(aug_rquad);
+  ret["uquad"] = MatType(0, ret["x"].size2());
 
   // Make sure that forward problem does not depend on backward states
   Function f("f", {ret["t"], ret["x"], ret["z"], ret["p"]},
@@ -1118,10 +1155,6 @@ std::map<std::string, Integrator::Plugin> Integrator::solvers_;
 
 const std::string Integrator::infix_ = "integrator";
 
-void Integrator::setStopTime(IntegratorMemory* mem, double tf) const {
-  casadi_error("setStopTime not defined for class " + class_name());
-}
-
 FixedStepIntegrator::FixedStepIntegrator(const std::string& name, const Function& dae,
     double t0, const std::vector<double>& tout) : Integrator(name, dae, t0, tout) {
 
@@ -1261,12 +1294,17 @@ int FixedStepIntegrator::init_mem(void* mem) const {
   return 0;
 }
 
-void FixedStepIntegrator::advance(IntegratorMemory* mem, double t,
-                                  double* x, double* z, double* q) const {
+void FixedStepIntegrator::advance(IntegratorMemory* mem, double t_next, double t_stop,
+    const double* u, double* x, double* z, double* q) const {
   auto m = static_cast<FixedStepMemory*>(mem);
 
+  // Controls not implemented
+  (void)u;
+  (void)t_stop;
+  casadi_assert(nu_ == 0, "Not implemented");
+
   // Get discrete time sought
-  casadi_int k_out = static_cast<casadi_int>(std::ceil((t - t0_)/h_));
+  casadi_int k_out = static_cast<casadi_int>(std::ceil((t_next - t0_)/h_));
   k_out = std::min(k_out, nk_); //  make sure that rounding errors does not result in k_out>nk_
   casadi_assert_dev(k_out>=0);
 
@@ -1314,15 +1352,18 @@ void FixedStepIntegrator::advance(IntegratorMemory* mem, double t,
   casadi_copy(get_ptr(m->q), nq_, q);
 }
 
-void FixedStepIntegrator::retreat(IntegratorMemory* mem, double t,
-                                  double* rx, double* rz, double* rq) const {
+void FixedStepIntegrator::retreat(IntegratorMemory* mem, double t_next, double t_stop,
+    double* rx, double* rz, double* rq) const {
   auto m = static_cast<FixedStepMemory*>(mem);
 
+  // The fixed-step integrator always takes one step, t_stop is not needed
+  (void)t_stop;  // unused
+
   // Get discrete time sought
-  casadi_int k_out = static_cast<casadi_int>(std::floor((t - t0_)/h_));
+  casadi_int k_out = static_cast<casadi_int>(std::floor((t_next - t0_)/h_));
   //  make sure that rounding errors does not result in k_out>nk_
   k_out = std::max(k_out, casadi_int(0));
-  casadi_assert_dev(k_out<=nk_);
+  casadi_assert_dev(k_out <= nk_);
 
   // Explicit discrete time dynamics
   const Function& G = getExplicitB();
@@ -1506,6 +1547,8 @@ Function Integrator::map2oracle(const std::string& name,
       de_in[DYN_Z]=i.second;
     } else if (i.first=="p") {
       de_in[DYN_P]=i.second;
+    } else if (i.first=="u") {
+      de_in[DYN_U]=i.second;
     } else if (i.first=="rx") {
       de_in[DYN_RX]=i.second;
     } else if (i.first=="rz") {
@@ -1524,6 +1567,8 @@ Function Integrator::map2oracle(const std::string& name,
       de_out[DYN_RALG]=i.second;
     } else if (i.first=="rquad") {
       de_out[DYN_RQUAD]=i.second;
+    } else if (i.first=="uquad") {
+      de_out[DYN_UQUAD]=i.second;
     } else {
       casadi_error("No such field: " + i.first);
     }
@@ -1587,12 +1632,16 @@ void Integrator::serialize_body(SerializingStream &s) const {
   s.pack("Integrator::nrx", nrx_);
   s.pack("Integrator::nrz", nrz_);
   s.pack("Integrator::nrq", nrq_);
+  s.pack("Integrator::nuq", nuq_);
   s.pack("Integrator::nrx1", nrx1_);
   s.pack("Integrator::nrz1", nrz1_);
   s.pack("Integrator::nrq1", nrq1_);
+  s.pack("Integrator::nuq1", nuq1_);
   s.pack("Integrator::np", np_);
+  s.pack("Integrator::nu", nu_);
   s.pack("Integrator::nrp", nrp_);
   s.pack("Integrator::np1", np1_);
+  s.pack("Integrator::nu1", nu1_);
   s.pack("Integrator::nrp1", nrp1_);
   s.pack("Integrator::ns", ns_);
   s.pack("Integrator::augmented_options", augmented_options_);
@@ -1638,6 +1687,10 @@ Integrator::Integrator(DeserializingStream & s) : OracleFunction(s) {
   if (version >= 2) {
     s.unpack("Integrator::t0", t0_);
     s.unpack("Integrator::tout", tout_);
+    s.unpack("Integrator::nu", nu_);
+    s.unpack("Integrator::nu1", nu1_);
+    s.unpack("Integrator::nuq", nuq_);
+    s.unpack("Integrator::nuq1", nuq1_);
   } else {
     // Time grid
     std::vector<double> grid;
@@ -1649,6 +1702,8 @@ Integrator::Integrator(DeserializingStream & s) : OracleFunction(s) {
     t0_ = grid.front();
     tout_ = grid;
     if (!output_t0) tout_.erase(tout_.begin());
+    // Controls did not exist in version 1
+    nu_ = nu1_ = nuq_ = nuq1_ = 0;
   }
 }
 
@@ -1688,5 +1743,44 @@ ImplicitFixedStepIntegrator::ImplicitFixedStepIntegrator(DeserializingStream & s
   s.unpack("ImplicitFixedStepIntegrator::rootfinder", rootfinder_);
   s.unpack("ImplicitFixedStepIntegrator::backward_rootfinder", backward_rootfinder_);
 }
+
+casadi_int Integrator::next_stop(casadi_int k, const double* u) const {
+  // Integrate till the end if no input signals
+  if (nu_ == 0 || u == 0) return nt() - 1;
+  // Find the next discontinuity, if any
+  for (; k + 1 < nt(); ++k) {
+    // Next control value
+    const double *u_next = u + nu_;
+    // Check if there is any change in input from k to k + 1
+    for (casadi_int i = 0; i < nu_; ++i) {
+      // Step change detected: stop integration at k
+      if (u[i] != u_next[i]) return k;
+    }
+    // Shift u
+    u = u_next;
+  }
+  // No step changes detected
+  return k;
+}
+
+casadi_int Integrator::next_stopB(casadi_int k, const double* u) const {
+  // Integrate till the beginning if no input signals
+  if (nu_ == 0 || u == 0) return -1;
+  // Find the next discontinuity, if any
+  for (; k-- > 0; ) {
+    // Next control value
+    const double *u_next = u - nu_;
+    // Check if there is any change in input from k to k + 1
+    for (casadi_int i = 0; i < nu_; ++i) {
+      // Step change detected: stop integration at k
+      if (u[i] != u_next[i]) return k;
+    }
+    // Shift u
+    u = u_next;
+  }
+  // No step changes detected
+  return k;
+}
+
 
 } // namespace casadi

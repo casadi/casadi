@@ -68,7 +68,7 @@ namespace casadi {
         "Precondition the iterative solver [default: true]"}},
       {"stop_at_end",
        {OT_BOOL,
-        "Stop the integrator at the end of the interval"}},
+        "[DEPRECATED] Stop the integrator at the end of the interval"}},
       {"disable_internal_warnings",
        {OT_BOOL,
         "Disable SUNDIALS internal warning messages"}},
@@ -146,6 +146,7 @@ namespace casadi {
         max_num_steps_ = op.second;
       } else if (op.first=="stop_at_end") {
         stop_at_end_ = op.second;
+        if (!stop_at_end_) casadi_warning("The 'stop_at_end' option has been deprecated and is currently ignored");
       } else if (op.first=="use_preconditioner") {
         use_precon_ = op.second;
       } else if (op.first=="max_krylov") {

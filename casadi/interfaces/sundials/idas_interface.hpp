@@ -127,8 +127,8 @@ namespace casadi {
       const double* x, const double* z, const double* p) const override;
 
     /** \brief  Advance solution in time */
-    void advance(IntegratorMemory* mem, double t,
-      double* x, double* z, double* q) const override;
+    void advance(IntegratorMemory* mem, double t_next, double t_stop,
+      const double* u, double* x, double* z, double* q) const override;
 
     /** \brief  Reset the backward problem and take time to tf */
     void resetB(IntegratorMemory* mem, double t,
@@ -139,11 +139,8 @@ namespace casadi {
       const double* rx, const double* rz, const double* rp) const override;
 
     /** \brief  Retreat solution in time */
-    void retreat(IntegratorMemory* mem, double t,
+    void retreat(IntegratorMemory* mem, double t_next, double t_stop,
       double* rx, double* rz, double* rq) const override;
-
-    /** \brief  Set the stop time of the forward integration */
-    void setStopTime(IntegratorMemory* mem, double tf) const override;
 
     /** \brief Cast to memory object */
     static IdasMemory* to_mem(void *mem) {

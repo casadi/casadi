@@ -177,6 +177,7 @@ enum DynOut {
   DYN_RODE,
   DYN_RALG,
   DYN_RQUAD,
+  DYN_UQUAD,
   DYN_NUM_OUT};
 
 /// Input arguments of an integrator
@@ -185,13 +186,15 @@ enum IntegratorInput {
   INTEGRATOR_X0,
   /// Parameters
   INTEGRATOR_P,
-  /// Initial guess for the algebraic variable
+  /// Piecewise constant control, a new control interval starts at each output time
+  INTEGRATOR_U,
+  /// Initial guess for the algebraic variable at the initial time
   INTEGRATOR_Z0,
-  /// Backward differential state at the final time
+  /// Backward differential state impulse at each output time
   INTEGRATOR_RX0,
-  /// Backward parameter vector
+  /// Backward parameter vector impulse at each output time
   INTEGRATOR_RP,
-  /// Initial guess for the backwards algebraic variable
+  /// Initial guess for the backwards algebraic variable at each output time
   INTEGRATOR_RZ0,
   /// Number of input arguments of an integrator
   INTEGRATOR_NUM_IN
@@ -199,11 +202,11 @@ enum IntegratorInput {
 
 /// Output arguments of an integrator
 enum IntegratorOutput {
-  /// Differential state at the final time
+  /// Differential state at all output times
   INTEGRATOR_XF,
-  /// Quadrature state at the final time
+  /// Quadrature state at all output times
   INTEGRATOR_QF,
-  /// Algebraic variable at the final time
+  /// Algebraic variable at all output times
   INTEGRATOR_ZF,
   /// Backward differential state at the initial time
   INTEGRATOR_RXF,
@@ -211,6 +214,8 @@ enum IntegratorOutput {
   INTEGRATOR_RQF,
   /// Backward algebraic variable at the initial time
   INTEGRATOR_RZF,
+  /// Backward gridded quadrature for each control interval
+  INTEGRATOR_UQF,
   /// Number of output arguments of an integrator
   INTEGRATOR_NUM_OUT
 };
