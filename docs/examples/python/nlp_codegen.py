@@ -73,10 +73,11 @@ for mode in ["jit","external"]:
 
     import subprocess
     # On Windows, use other flags
-    subprocess.Popen([compiler,"-fPIC","-shared"]+flags+["nlp.c","-o","nlp.so"]).wait()
+    cmd_args = [compiler,"-fPIC","-shared"]+flags+["nlp.c","-o","nlp.so"]
+    subprocess.run(cmd_args)
 
     # Create a new NLP solver instance from the compiled code
-    solver = nlpsol("solver", "ipopt", "nlp.so")
+    solver = nlpsol("solver", "ipopt", "./nlp.so")
 
   arg = {}
 
