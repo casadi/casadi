@@ -94,7 +94,7 @@ namespace casadi {
   void Collocation::setupFG() {
     f_ = create_function("f", {"x", "z", "p", "u", "t"}, {"ode", "alg", "quad"});
     g_ = create_function("g", {"rx", "rz", "rp", "x", "z", "p", "u", "t"},
-                              {"rode", "ralg", "rquad"});
+      {"rode", "ralg", "rquad", "uquad"});
 
     // All collocation time points
     std::vector<double> tau_root = collocation_points(deg_, collocation_scheme_);
@@ -257,6 +257,7 @@ namespace casadi {
 
       // Quadratures
       MX rqf = MX::zeros(this->rq());
+      MX uqf = MX::zeros(this->uq());
 
       // End state
       MX rxf = D[0]*rx0;
@@ -292,7 +293,8 @@ namespace casadi {
         rxf += -B[j]*C[0][j]*rx[j];
 
         // Add contribution to quadratures
-        rqf += h_*B[j]*g_res[BSTEP_QF];
+        rqf += h_*B[j]*g_res[BSTEP_RQF];
+        uqf += h_*B[j]*g_res[BSTEP_UQF];
       }
 
       // Form backward discrete time dynamics
@@ -308,7 +310,8 @@ namespace casadi {
       std::vector<MX> G_out(BSTEP_NUM_OUT);
       G_out[BSTEP_RXF] = rxf;
       G_out[BSTEP_RES] = vertcat(eq);
-      G_out[BSTEP_QF] = rqf;
+      G_out[BSTEP_RQF] = rqf;
+      G_out[BSTEP_UQF] = uqf;
       G_ = Function("rdae", G_in, G_out);
       alloc(G_);
     }

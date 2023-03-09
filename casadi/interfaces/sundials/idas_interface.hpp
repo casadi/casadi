@@ -140,7 +140,7 @@ namespace casadi {
 
     /** \brief  Retreat solution in time */
     void retreat(IntegratorMemory* mem, double t_next, double t_stop,
-      double* rx, double* rz, double* rq) const override;
+      double* rx, double* rz, double* rq, double* uq) const override;
 
     /** \brief Cast to memory object */
     static IdasMemory* to_mem(void *mem) {
@@ -173,8 +173,8 @@ namespace casadi {
                        N_Vector resvalB, N_Vector vB, N_Vector JvB, double cjB,
                        void *user_data, N_Vector tmp1B, N_Vector tmp2B);
     static int rhsQ(double t, N_Vector xz, N_Vector xzdot, N_Vector qdot, void *user_data);
-    static int rhsQB(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB,
-                     N_Vector qdotA, void *user_data);
+    static int rhsQB(double t, N_Vector xz, N_Vector xzdot, N_Vector rxz,
+      N_Vector rxzdot, N_Vector ruqdot, void *user_data);
     static int psolve(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, N_Vector rvec,
                       N_Vector zvec, double cj, double delta, void *user_data,
                       N_Vector tmp);

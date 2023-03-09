@@ -135,7 +135,7 @@ void IdasInterface::init(const Dict& opts) {
   create_function("daeF", {"x", "z", "p", "u", "t"}, {"ode", "alg"});
   create_function("quadF", {"x", "z", "p", "u", "t"}, {"quad"});
   create_function("daeB", {"rx", "rz", "rp", "x", "z", "p", "u", "t"}, {"rode", "ralg"});
-  create_function("quadB", {"rx", "rz", "rp", "x", "z", "p", "u", "t"}, {"rquad"});
+  create_function("quadB", {"rx", "rz", "rp", "x", "z", "p", "u", "t"}, {"rquad", "uquad"});
 
   // Get initial conditions for the state derivatives
   if (init_xdot_.empty()) {
@@ -524,7 +524,7 @@ void IdasInterface::resetB(IntegratorMemory* mem, double t,
     }
 
     // Quadratures for the adjoint problem
-    THROWING(IDAQuadInitB, m->mem, m->whichB, rhsQB, m->rq);
+    THROWING(IDAQuadInitB, m->mem, m->whichB, rhsQB, m->ruq);
     if (quad_err_con_) {
       THROWING(IDASetQuadErrConB, m->mem, m->whichB, true);
       THROWING(IDAQuadSStolerancesB, m->mem, m->whichB, reltol_, abstol_);
@@ -535,11 +535,11 @@ void IdasInterface::resetB(IntegratorMemory* mem, double t,
   } else {
     // Re-initialize
     THROWING(IDAReInitB, m->mem, m->whichB, t, m->rxz, m->rxzdot);
-    if (nrq_>0) {
+    if (nrq_ > 0 || nuq_ > 0) {
       // Workaround (bug in SUNDIALS)
       // THROWING(IDAQuadReInitB, m->mem, m->whichB[dir], m->rq[dir]);
       void* memB = IDAGetAdjIDABmem(m->mem, m->whichB);
-      THROWING(IDAQuadReInit, memB, m->rq);
+      THROWING(IDAQuadReInit, memB, m->ruq);
     }
   }
 
@@ -559,31 +559,32 @@ void IdasInterface::impulseB(IntegratorMemory* mem,
 
   // Re-initialize
   THROWING(IDAReInitB, m->mem, m->whichB, m->t, m->rxz, m->rxzdot);
-  if (nrq_>0) {
+  if (nrq_ > 0 || nuq_ > 0) {
     // Workaround (bug in SUNDIALS)
     // THROWING(IDAQuadReInitB, m->mem, m->whichB[dir], m->rq[dir]);
     void* memB = IDAGetAdjIDABmem(m->mem, m->whichB);
-    THROWING(IDAQuadReInit, memB, m->rq);
+    THROWING(IDAQuadReInit, memB, m->ruq);
   }
 }
 
 void IdasInterface::retreat(IntegratorMemory* mem, double t_next, double t_stop,
-    double* rx, double* rz, double* rq) const {
+    double* rx, double* rz, double* rq, double* uq) const {
   auto m = to_mem(mem);
 
   // Integrate, unless already at desired time
   if (t_next < m->t) {
     THROWING(IDASolveB, m->mem, t_next, IDA_NORMAL);
     THROWING(IDAGetB, m->mem, m->whichB, &m->t, m->rxz, m->rxzdot);
-    if (nrq_ > 0) {
-      THROWING(IDAGetQuadB, m->mem, m->whichB, &m->t, m->rq);
+    if (nrq_ > 0, nuq_ > 0) {
+      THROWING(IDAGetQuadB, m->mem, m->whichB, &m->t, m->ruq);
     }
   }
 
   // Save outputs
   casadi_copy(NV_DATA_S(m->rxz), nrx_, rx);
-  casadi_copy(NV_DATA_S(m->rxz)+nrx_, nrz_, rz);
-  casadi_copy(NV_DATA_S(m->rq), nrq_, rq);
+  casadi_copy(NV_DATA_S(m->rxz) + nrx_, nrz_, rz);
+  casadi_copy(NV_DATA_S(m->ruq), nrq_, rq);
+  casadi_copy(NV_DATA_S(m->ruq) + nrq_, nuq_, uq);
 
   // Get stats
   IDAMem IDA_mem = IDAMem(m->mem);
@@ -658,7 +659,7 @@ int IdasInterface::resB(double t, N_Vector xz, N_Vector xzdot, N_Vector rxz,
 }
 
 int IdasInterface::rhsQB(double t, N_Vector xz, N_Vector xzdot, N_Vector rxz,
-                                N_Vector rxzdot, N_Vector rqdot, void *user_data) {
+    N_Vector rxzdot, N_Vector ruqdot, void *user_data) {
   try {
     auto m = to_mem(user_data);
     auto& s = m->self;
@@ -670,11 +671,12 @@ int IdasInterface::rhsQB(double t, N_Vector xz, N_Vector xzdot, N_Vector rxz,
     m->arg[5] = m->p;
     m->arg[6] = m->u;
     m->arg[7] = &t;
-    m->res[0] = NV_DATA_S(rqdot);
+    m->res[0] = NV_DATA_S(ruqdot);
+    m->res[1] = NV_DATA_S(ruqdot) + s.nrq_;
     s.calc_function(m, "quadB");
 
     // Negate (note definition of g)
-    casadi_scal(s.nrq_, -1., NV_DATA_S(rqdot));
+    casadi_scal(s.nrq_ + s.nuq_, -1., NV_DATA_S(ruqdot));
 
     return 0;
   } catch(int flag) { // recoverable error
@@ -857,7 +859,8 @@ int IdasInterface::psetup(double t, N_Vector xz, N_Vector xzdot, N_Vector rr,
     m->arg[1] = NV_DATA_S(xz);
     m->arg[2] = NV_DATA_S(xz)+s.nx_;
     m->arg[3] = m->p;
-    m->arg[4] = &cj;
+    m->arg[4] = m->u;
+    m->arg[5] = &cj;
     m->res[0] = m->jac;
     if (s.calc_function(m, "jacF")) casadi_error("Calculating Jacobian failed");
 
@@ -887,7 +890,8 @@ int IdasInterface::psetupB(double t, N_Vector xz, N_Vector xzdot,
     m->arg[4] = NV_DATA_S(xz);
     m->arg[5] = NV_DATA_S(xz)+s.nx_;
     m->arg[6] = m->p;
-    m->arg[7] = &cj;
+    m->arg[7] = m->u;
+    m->arg[8] = &cj;
     m->res[0] = m->jacB;
     if (s.calc_function(m, "jacB")) casadi_error("'jacB' calculation failed");
 
@@ -1056,7 +1060,7 @@ Function IdasInterface::getJ(bool backward) const {
                             MatType::jacobian(r[DYN_RALG], a[DYN_RZ])));
     }
     return Function("jacB", {a[DYN_T], a[DYN_RX], a[DYN_RZ], a[DYN_RP],
-                              a[DYN_X], a[DYN_Z], a[DYN_P], cj}, {jac});
+                              a[DYN_X], a[DYN_Z], a[DYN_P], a[DYN_U], cj}, {jac});
     } else {
     MatType jac = MatType::jacobian(r[DYN_ODE], a[DYN_X]) - cj*MatType::eye(nx_);
     if (nz_>0) {
@@ -1065,7 +1069,7 @@ Function IdasInterface::getJ(bool backward) const {
                     vertcat(MatType::jacobian(r[DYN_ODE], a[DYN_Z]),
                             MatType::jacobian(r[DYN_ALG], a[DYN_Z])));
     }
-    return Function("jacF", {a[DYN_T], a[DYN_X], a[DYN_Z], a[DYN_P], cj}, {jac});
+    return Function("jacF", {a[DYN_T], a[DYN_X], a[DYN_Z], a[DYN_P], a[DYN_U], cj}, {jac});
   }
 }
 

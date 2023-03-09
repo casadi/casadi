@@ -313,6 +313,7 @@ eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) con
   double* rx = res[INTEGRATOR_RXF];
   double* rz = res[INTEGRATOR_RZF];
   double* rq = res[INTEGRATOR_RQF];
+  double* uq = res[INTEGRATOR_UQF];
   res += INTEGRATOR_NUM_OUT;
 
   // Setup memory object
@@ -345,6 +346,7 @@ eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) con
     if (rx0) rx0 += nrx_ * nt();
     if (rz0) rz0 += nrz_ * nt();
     if (rp) rp += nrp_ * nt();
+    if (uq) uq += nuq_ * nt();
     // Next stop time due to step change in input
     casadi_int k_stop = nt();
     // Integrate backward
@@ -353,6 +355,7 @@ eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) con
       if (rx0) rx0 -= nrx_;
       if (rz0) rz0 -= nrz_;
       if (rp) rp -= nrp_;
+      if (uq) uq -= nuq_;
       if (u) u -= nu_;
       if (k == nt() - 1) {
        resetB(m, tout_[k], rx0, rz0, rp);
@@ -369,9 +372,16 @@ eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) con
       if (verbose_) casadi_message("Integrating backward from output time " + str(k) + ": t_next = "
         + str(t_next) + ", t_stop = " + str(t_stop));
       if (k > 0) {
-        retreat(m, t_next, t_stop, 0, 0, 0);
+        retreat(m, t_next, t_stop, 0, 0, 0, uq);
       } else {
-        retreat(m, t_next, t_stop, rx, rz, rq);
+        retreat(m, t_next, t_stop, rx, rz, rq, uq);
+      }
+    }
+    // uq should contain the contribution from the grid point, not cumulative
+    if (uq) {
+      for (casadi_int k = 0; k < nt() - 1; ++k) {
+        casadi_axpy(nuq_, -1., uq + nuq_, uq);
+        uq += nuq_;
       }
     }
   }
@@ -537,24 +547,26 @@ std::map<std::string, MatType> Integrator::aug_fwd(casadi_int nfwd) const {
 
   // Get input expressions
   std::vector<MatType> arg = MatType::get_input(oracle_);
-  std::vector<MatType> aug_x, aug_z, aug_p, aug_rx, aug_rz, aug_rp;
+  std::vector<MatType> aug_x, aug_z, aug_p, aug_u, aug_rx, aug_rz, aug_rp;
   MatType aug_t = arg.at(DYN_T);
   aug_x.push_back(vec(arg.at(DYN_X)));
   aug_z.push_back(vec(arg.at(DYN_Z)));
   aug_p.push_back(vec(arg.at(DYN_P)));
+  aug_u.push_back(vec(arg.at(DYN_U)));
   aug_rx.push_back(vec(arg.at(DYN_RX)));
   aug_rz.push_back(vec(arg.at(DYN_RZ)));
   aug_rp.push_back(vec(arg.at(DYN_RP)));
 
   // Get output expressions
   std::vector<MatType> res = oracle_(arg);
-  std::vector<MatType> aug_ode, aug_alg, aug_quad, aug_rode, aug_ralg, aug_rquad;
+  std::vector<MatType> aug_ode, aug_alg, aug_quad, aug_rode, aug_ralg, aug_rquad, aug_uquad;
   aug_ode.push_back(vec(res.at(DYN_ODE)));
   aug_alg.push_back(vec(res.at(DYN_ALG)));
   aug_quad.push_back(vec(res.at(DYN_QUAD)));
   aug_rode.push_back(vec(res.at(DYN_RODE)));
   aug_ralg.push_back(vec(res.at(DYN_RALG)));
   aug_rquad.push_back(vec(res.at(DYN_RQUAD)));
+  aug_uquad.push_back(vec(res.at(DYN_UQUAD)));
 
   // Zero of time dimension
   MatType zero_t = MatType::zeros(t());
@@ -567,6 +579,7 @@ std::map<std::string, MatType> Integrator::aug_fwd(casadi_int nfwd) const {
     aug_x.push_back(vec(seed[d][DYN_X] = MatType::sym(pref + "x", x())));
     aug_z.push_back(vec(seed[d][DYN_Z] = MatType::sym(pref + "z", z())));
     aug_p.push_back(vec(seed[d][DYN_P] = MatType::sym(pref + "p", p())));
+    aug_u.push_back(vec(seed[d][DYN_U] = MatType::sym(pref + "u", u())));
     aug_rx.push_back(vec(seed[d][DYN_RX] = MatType::sym(pref + "rx", rx())));
     aug_rz.push_back(vec(seed[d][DYN_RZ] = MatType::sym(pref + "rz", rz())));
     aug_rp.push_back(vec(seed[d][DYN_RP] = MatType::sym(pref + "rp", rp())));
@@ -586,6 +599,7 @@ std::map<std::string, MatType> Integrator::aug_fwd(casadi_int nfwd) const {
     aug_rode.push_back(vec(project(sens[d][DYN_RODE], rx())));
     aug_ralg.push_back(vec(project(sens[d][DYN_RALG], rz())));
     aug_rquad.push_back(vec(project(sens[d][DYN_RQUAD], rq())));
+    aug_uquad.push_back(vec(project(sens[d][DYN_UQUAD], uq())));
   }
 
   // Construct return object
@@ -594,7 +608,7 @@ std::map<std::string, MatType> Integrator::aug_fwd(casadi_int nfwd) const {
   ret["x"] = horzcat(aug_x);
   ret["z"] = horzcat(aug_z);
   ret["p"] = horzcat(aug_p);
-  ret["u"] = MatType(0, ret["x"].size2());
+  ret["u"] = horzcat(aug_u);
   ret["ode"] = horzcat(aug_ode);
   ret["alg"] = horzcat(aug_alg);
   ret["quad"] = horzcat(aug_quad);
@@ -604,7 +618,8 @@ std::map<std::string, MatType> Integrator::aug_fwd(casadi_int nfwd) const {
   ret["rode"] = horzcat(aug_rode);
   ret["ralg"] = horzcat(aug_ralg);
   ret["rquad"] = horzcat(aug_rquad);
-  ret["uquad"] = MatType(0, ret["x"].size2());
+  ret["uquad"] = horzcat(aug_uquad);
+
   return ret;
 }
 
@@ -614,24 +629,26 @@ std::map<std::string, MatType> Integrator::aug_adj(casadi_int nadj) const {
 
   // Get input expressions
   std::vector<MatType> arg = MatType::get_input(oracle_);
-  std::vector<MatType> aug_x, aug_z, aug_p, aug_rx, aug_rz, aug_rp;
+  std::vector<MatType> aug_x, aug_z, aug_p, aug_u, aug_rx, aug_rz, aug_rp;
   MatType aug_t = arg.at(DYN_T);
   aug_x.push_back(vec(arg.at(DYN_X)));
   aug_z.push_back(vec(arg.at(DYN_Z)));
   aug_p.push_back(vec(arg.at(DYN_P)));
+  aug_u.push_back(vec(arg.at(DYN_U)));
   aug_rx.push_back(vec(arg.at(DYN_RX)));
   aug_rz.push_back(vec(arg.at(DYN_RZ)));
   aug_rp.push_back(vec(arg.at(DYN_RP)));
 
   // Get output expressions
   std::vector<MatType> res = oracle_(arg);
-  std::vector<MatType> aug_ode, aug_alg, aug_quad, aug_rode, aug_ralg, aug_rquad;
+  std::vector<MatType> aug_ode, aug_alg, aug_quad, aug_rode, aug_ralg, aug_rquad, aug_uquad;
   aug_ode.push_back(vec(res.at(DYN_ODE)));
   aug_alg.push_back(vec(res.at(DYN_ALG)));
   aug_quad.push_back(vec(res.at(DYN_QUAD)));
   aug_rode.push_back(vec(res.at(DYN_RODE)));
   aug_ralg.push_back(vec(res.at(DYN_RALG)));
   aug_rquad.push_back(vec(res.at(DYN_RQUAD)));
+  aug_uquad.push_back(vec(res.at(DYN_UQUAD)));
 
   // Zero of time dimension
   MatType zero_t = MatType::zeros(t());
@@ -646,6 +663,7 @@ std::map<std::string, MatType> Integrator::aug_adj(casadi_int nadj) const {
     aug_x.push_back(vec(seed[d][DYN_RODE] = MatType::sym(pref + "rode", rx())));
     aug_z.push_back(vec(seed[d][DYN_RALG] = MatType::sym(pref + "ralg", rz())));
     aug_p.push_back(vec(seed[d][DYN_RQUAD] = MatType::sym(pref + "rquad", rq())));
+    aug_u.push_back(vec(seed[d][DYN_UQUAD] = MatType::sym(pref + "uquad", uq())));
   }
 
   // Calculate directional derivatives
@@ -659,6 +677,7 @@ std::map<std::string, MatType> Integrator::aug_adj(casadi_int nadj) const {
     aug_rode.push_back(vec(project(sens[d][DYN_X], x())));
     aug_ralg.push_back(vec(project(sens[d][DYN_Z], z())));
     aug_rquad.push_back(vec(project(sens[d][DYN_P], p())));
+    aug_uquad.push_back(vec(project(sens[d][DYN_U], u())));
     aug_ode.push_back(vec(project(sens[d][DYN_RX], rx())));
     aug_alg.push_back(vec(project(sens[d][DYN_RZ], rz())));
     aug_quad.push_back(vec(project(sens[d][DYN_RP], rp())));
@@ -670,7 +689,7 @@ std::map<std::string, MatType> Integrator::aug_adj(casadi_int nadj) const {
   ret["x"] = vertcat(aug_x);
   ret["z"] = vertcat(aug_z);
   ret["p"] = vertcat(aug_p);
-  ret["u"] = MatType(0, ret["x"].size2());
+  ret["u"] = vertcat(aug_u);
   ret["ode"] = vertcat(aug_ode);
   ret["alg"] = vertcat(aug_alg);
   ret["quad"] = vertcat(aug_quad);
@@ -680,17 +699,17 @@ std::map<std::string, MatType> Integrator::aug_adj(casadi_int nadj) const {
   ret["rode"] = vertcat(aug_rode);
   ret["ralg"] = vertcat(aug_ralg);
   ret["rquad"] = vertcat(aug_rquad);
-  ret["uquad"] = MatType(0, ret["x"].size2());
+  ret["uquad"] =  vertcat(aug_uquad);
 
   // Make sure that forward problem does not depend on backward states
-  Function f("f", {ret["t"], ret["x"], ret["z"], ret["p"]},
+  Function f("f", {ret["t"], ret["x"], ret["z"], ret["p"], ret["u"]},
                   {ret["ode"], ret["alg"], ret["quad"]}, {{"allow_free", true}});
   if (f.has_free()) {
     // Replace dependencies of rx, rz and rp with zeros
-    f = Function("f", {ret["t"], ret["x"], ret["z"], ret["p"],
+    f = Function("f", {ret["t"], ret["x"], ret["z"], ret["p"], ret["u"],
                         ret["rx"], ret["rz"], ret["rp"]},
                       {ret["ode"], ret["alg"], ret["quad"]});
-    std::vector<MatType> v = {ret["t"], ret["x"], ret["z"], ret["p"], 0, 0, 0};
+    std::vector<MatType> v = {ret["t"], ret["x"], ret["z"], ret["p"], ret["u"], 0, 0, 0};
     v = f(v);
     ret["ode"] = v.at(0);
     ret["alg"] = v.at(1);
@@ -847,6 +866,7 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
     std::fill_n(res1, static_cast<size_t>(DYN_NUM_OUT), nullptr);
     std::fill_n(arg1, static_cast<size_t>(DYN_NUM_IN), nullptr);
     res1[DYN_RQUAD] = rqf;
+    res1[DYN_UQUAD] = uqf;
     arg1[DYN_X] = tmp_x;
     arg1[DYN_Z] = tmp_z;
     arg1[DYN_P] = p;
@@ -868,6 +888,7 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
     res1[DYN_RODE] = tmp_rx;
     res1[DYN_RALG] = tmp_rz;
     res1[DYN_RQUAD] = nullptr;
+    res1[DYN_UQUAD] = nullptr;
     arg1[DYN_RX] = rx0;
     arg1[DYN_RZ] = nullptr; // arg[INTEGRATOR_RZ0] is a guess, no dependency
     if (oracle_.rev(arg1, res1, iw, w, 0)) return 1;
@@ -1208,13 +1229,10 @@ const Options FixedStepIntegrator::options_
 Function FixedStepIntegrator::create_advanced(const Dict& opts) {
   Function temp = Function::create(this, opts);
 
-  // Controls and not implemented
-  casadi_assert(nu_ == 0, "Not implemented");
-
   // Check if we need to simplify
   bool simplify = false;
   auto it = opts.find("simplify");
-  if (it!=opts.end()) simplify = it->second;
+  if (it != opts.end()) simplify = it->second;
 
   if (simplify && nrx_==0 && nt()==1) {
     // Retrieve explicit simulation step (one finite element)
@@ -1229,6 +1247,7 @@ Function FixedStepIntegrator::create_advanced(const Dict& opts) {
     std::vector<MX> intg_in(INTEGRATOR_NUM_IN);
     intg_in[INTEGRATOR_X0] = F_in[FSTEP_X0];
     intg_in[INTEGRATOR_P] = F_in[FSTEP_P];
+    intg_in[INTEGRATOR_U] = F_in[FSTEP_U];
     intg_in[INTEGRATOR_Z0] = z0;
     F_in[FSTEP_Z0] = algebraic_state_init(intg_in[INTEGRATOR_X0], z0);
 
@@ -1320,6 +1339,7 @@ int FixedStepIntegrator::init_mem(void* mem) const {
   m->rx_prev.resize(nrx_);
   m->RZ_prev.resize(nRZ_);
   m->rq_prev.resize(nrq_);
+  m->uq_prev.resize(nuq_);
 
   return 0;
 }
@@ -1378,14 +1398,14 @@ void FixedStepIntegrator::advance(IntegratorMemory* mem, double t_next, double t
     m->t = t0_ + static_cast<double>(m->k)*h_;
   }
 
-  // Return to user TODO(@jaeandersson): interpolate
+  // Return to user
   casadi_copy(get_ptr(m->x), nx_, x);
-  casadi_copy(get_ptr(m->Z)+m->Z.size()-nz_, nz_, z);
+  casadi_copy(get_ptr(m->Z) + m->Z.size()-nz_, nz_, z);
   casadi_copy(get_ptr(m->q), nq_, q);
 }
 
 void FixedStepIntegrator::retreat(IntegratorMemory* mem, double t_next, double t_stop,
-    double* rx, double* rz, double* rq) const {
+    double* rx, double* rz, double* rq, double* uq) const {
   auto m = static_cast<FixedStepMemory*>(mem);
 
   // The fixed-step integrators take steps aligned with output times, t_stop not needed
@@ -1413,7 +1433,8 @@ void FixedStepIntegrator::retreat(IntegratorMemory* mem, double t_next, double t
   std::fill_n(m->res, G.n_out(), nullptr);
   m->res[BSTEP_RXF] = get_ptr(m->rx);
   m->res[BSTEP_RES] = get_ptr(m->RZ);
-  m->res[BSTEP_QF] = get_ptr(m->rq);
+  m->res[BSTEP_RQF] = get_ptr(m->rq);
+  m->res[BSTEP_UQF] = get_ptr(m->uq);
 
   // Take time steps until end time has been reached
   while (m->k>k_out) {
@@ -1425,18 +1446,21 @@ void FixedStepIntegrator::retreat(IntegratorMemory* mem, double t_next, double t
     casadi_copy(get_ptr(m->rx), nrx_, get_ptr(m->rx_prev));
     casadi_copy(get_ptr(m->RZ), nRZ_, get_ptr(m->RZ_prev));
     casadi_copy(get_ptr(m->rq), nrq_, get_ptr(m->rq_prev));
+    casadi_copy(get_ptr(m->uq), nuq_, get_ptr(m->uq_prev));
 
     // Take step
     m->arg[BSTEP_X] = get_ptr(m->x_tape.at(m->k));
     m->arg[BSTEP_Z] = get_ptr(m->Z_tape.at(m->k));
     G(m->arg, m->res, m->iw, m->w);
     casadi_axpy(nrq_, 1., get_ptr(m->rq_prev), get_ptr(m->rq));
+    casadi_axpy(nuq_, 1., get_ptr(m->uq_prev), get_ptr(m->uq));
   }
 
-  // Return to user TODO(@jaeandersson): interpolate
+  // Return to user
   casadi_copy(get_ptr(m->rx), nrx_, rx);
-  casadi_copy(get_ptr(m->RZ)+m->RZ.size()-nrz_, nrz_, rz);
+  casadi_copy(get_ptr(m->RZ) + m->RZ.size() - nrz_, nrz_, rz);
   casadi_copy(get_ptr(m->rq), nrq_, rq);
+  casadi_copy(get_ptr(m->uq), nuq_, uq);
 }
 
 void FixedStepIntegrator::
@@ -1485,6 +1509,7 @@ void FixedStepIntegrator::resetB(IntegratorMemory* mem, double t, const double* 
 
   // Reset summation states
   casadi_clear(get_ptr(m->rq), nrq_);
+  casadi_clear(get_ptr(m->uq), nuq_);
 
   // Bring discrete time to the end
   m->k = nk_;

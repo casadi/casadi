@@ -64,7 +64,7 @@ namespace casadi {
   void RungeKutta::setupFG() {
     f_ = create_function("f", {"x", "z", "p", "u", "t"}, {"ode", "alg", "quad"});
     g_ = create_function("g", {"rx", "rz", "rp", "x", "z", "p", "u", "t"},
-                              {"rode", "ralg", "rquad"});
+      {"rode", "ralg", "rquad", "uquad"});
 
     // Symbolic inputs
     MX x0 = MX::sym("x0", this->x());
@@ -160,15 +160,17 @@ namespace casadi {
       g_arg[BSTEP_RX0] = rx0;
       g_res = g_(g_arg);
       MX k1 = g_res[BSTEP_RXF];
-      MX k1q = g_res[BSTEP_QF];
+      MX k1rq = g_res[BSTEP_RQF];
+      MX k1uq = g_res[BSTEP_UQF];
 
       // k2
       g_arg[BSTEP_T] = tt[1];
       g_arg[BSTEP_X] = x[1];
       g_arg[BSTEP_RX0] = rx_def[2] = rx0 + (h_/2) * k1;
       g_res = g_(g_arg);
-      MX  k2 = g_res[BSTEP_RXF];
-      MX  k2q = g_res[BSTEP_QF];
+      MX k2 = g_res[BSTEP_RXF];
+      MX k2rq = g_res[BSTEP_RQF];
+      MX k2uq = g_res[BSTEP_UQF];
 
       // k3
       g_arg[BSTEP_T] = tt[0];
@@ -176,7 +178,8 @@ namespace casadi {
       g_arg[BSTEP_RX0] = rx_def[1] = rx0 + (h_/2) * k2;
       g_res = g_(g_arg);
       MX k3 = g_res[BSTEP_RXF];
-      MX k3q = g_res[BSTEP_QF];
+      MX k3rq = g_res[BSTEP_RQF];
+      MX k3uq = g_res[BSTEP_UQF];
 
       // k4
       g_arg[BSTEP_T] = t;
@@ -184,11 +187,13 @@ namespace casadi {
       g_arg[BSTEP_RX0] = rx_def[0] = rx0 + h_ * k3;
       g_res = g_(g_arg);
       MX k4 = g_res[BSTEP_RXF];
-      MX  k4q = g_res[BSTEP_QF];
+      MX k4rq = g_res[BSTEP_RQF];
+      MX k4uq = g_res[BSTEP_UQF];
 
       // Take step
       MX rxf = rx0 + (h_/6)*(k1 + 2*k2 + 2*k3 + k4);
-      MX rqf = (h_/6)*(k1q + 2*k2q + 2*k3q + k4q);
+      MX rqf = (h_/6)*(k1rq + 2*k2rq + 2*k3rq + k4rq);
+      MX uqf = (h_/6)*(k1uq + 2*k2uq + 2*k3uq + k4uq);
 
       // Define discrete time dynamics
       g_arg[BSTEP_T] = t;
@@ -200,8 +205,9 @@ namespace casadi {
       g_arg[BSTEP_RP] = rp;
       g_arg[BSTEP_RZ0] = rv;
       g_res[BSTEP_RXF] = rxf;
-      g_res[BSTEP_QF] = rqf;
       g_res[BSTEP_RES] = horzcat(rx_def);
+      g_res[BSTEP_RQF] = rqf;
+      g_res[BSTEP_UQF] = uqf;
       G_ = Function("rdae", g_arg, g_res);
       alloc(G_);
     }

@@ -134,7 +134,7 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
 
   /** \brief  Retreat solution in time */
   virtual void retreat(IntegratorMemory* mem, double t_next, double t_stop,
-    double* rx, double* rz, double* rq) const = 0;
+    double* rx, double* rz, double* rq, double* uq) const = 0;
 
   /** \brief  evaluate
 
@@ -364,12 +364,14 @@ enum BStepIn {
 
 /// Output arguments of a backward stepping function
 enum BStepOut {
-  /// Right hand side of ODE
+  /// Backwards state at the next time
   BSTEP_RXF,
-  /// Right hand side of algebraic equations
+  /// Right hand side of algebraic equations, backwards problem
   BSTEP_RES,
-  /// Right hand side of quadratures
-  BSTEP_QF,
+  /// Backwards quadrature contribution, summing
+  BSTEP_RQF,
+  /// Backwards quadrature contribution, non-summing
+  BSTEP_UQF,
   /// Number of arguments
   BSTEP_NUM_OUT
 };
@@ -385,7 +387,7 @@ struct CASADI_EXPORT FixedStepMemory : public IntegratorMemory {
   std::vector<double> x, z, p, u, q, rx, rz, rp, rq, uq;
 
   // Previous state
-  std::vector<double> x_prev, Z_prev, q_prev, rx_prev, RZ_prev, rq_prev;
+  std::vector<double> x_prev, Z_prev, q_prev, rx_prev, RZ_prev, rq_prev, uq_prev;
 
   /// Algebraic variables for the discrete time integration
   std::vector<double> Z, RZ;
@@ -454,7 +456,7 @@ class CASADI_EXPORT FixedStepIntegrator : public Integrator {
 
   /** \brief Retreat solution in time */
   void retreat(IntegratorMemory* mem, double t_next, double t_stop,
-    double* rx, double* rz, double* rq) const override;
+    double* rx, double* rz, double* rq, double* uq) const override;
 
   /// Get explicit dynamics
   virtual const Function& getExplicit() const { return F_;}

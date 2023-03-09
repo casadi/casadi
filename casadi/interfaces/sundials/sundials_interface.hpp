@@ -48,7 +48,7 @@ namespace casadi {
     N_Vector xz, xzdot, q;
 
     // N-vectors for the backward integration
-    N_Vector rxz, rxzdot, rq;
+    N_Vector rxz, rxzdot, ruq;
 
     // Initialize or reinitialize?
     bool first_callB;

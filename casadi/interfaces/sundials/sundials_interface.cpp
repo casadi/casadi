@@ -249,7 +249,7 @@ namespace casadi {
     m->xz = N_VNew_Serial(nx_+nz_);
     m->q = N_VNew_Serial(nq_);
     m->rxz = N_VNew_Serial(nrx_+nrz_);
-    m->rq = N_VNew_Serial(nrq_);
+    m->ruq = N_VNew_Serial(nrq_ + nuq_);
 
     m->mem_linsolF = linsolF_.checkout();
     if (!linsolB_.is_null()) m->mem_linsolB = linsolB_.checkout();
@@ -290,7 +290,7 @@ namespace casadi {
     casadi_copy(rz, nrz_, NV_DATA_S(m->rxz) + nrx_);
 
     // Reset summation states
-    N_VConst(0., m->rq);
+    N_VConst(0., m->ruq);
   }
 
   void SundialsInterface::impulseB(IntegratorMemory* mem,
@@ -309,7 +309,7 @@ namespace casadi {
     this->xz  = nullptr;
     this->q = nullptr;
     this->rxz = nullptr;
-    this->rq = nullptr;
+    this->ruq = nullptr;
     this->first_callB = true;
     this->mem_linsolF = -1;
     this->mem_linsolB = -1;
@@ -319,7 +319,7 @@ namespace casadi {
     if (this->xz) N_VDestroy_Serial(this->xz);
     if (this->q) N_VDestroy_Serial(this->q);
     if (this->rxz) N_VDestroy_Serial(this->rxz);
-    if (this->rq) N_VDestroy_Serial(this->rq);
+    if (this->ruq) N_VDestroy_Serial(this->ruq);
   }
 
   Dict SundialsInterface::get_stats(void* mem) const {

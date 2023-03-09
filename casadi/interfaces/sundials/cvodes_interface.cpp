@@ -99,7 +99,7 @@ void CvodesInterface::init(const Dict& opts) {
   create_function("odeF", {"x", "p", "u", "t"}, {"ode"});
   create_function("quadF", {"x", "p", "u", "t"}, {"quad"});
   create_function("odeB", {"rx", "rp", "x", "p", "u", "t"}, {"rode"});
-  create_function("quadB", {"rx", "rp", "x", "p", "u", "t"}, {"rquad"});
+  create_function("quadB", {"rx", "rp", "x", "p", "u", "t"}, {"rquad", "uquad"});
 
   // Algebraic variables not supported
   casadi_assert(nz_==0 && nrz_==0,
@@ -336,7 +336,7 @@ void CvodesInterface::resetB(IntegratorMemory* mem, double t, const double* rx,
     }
 
     // Quadratures for the backward problem
-    THROWING(CVodeQuadInitB, m->mem, m->whichB, rhsQB, m->rq);
+    THROWING(CVodeQuadInitB, m->mem, m->whichB, rhsQB, m->ruq);
     if (quad_err_con_) {
       THROWING(CVodeSetQuadErrConB, m->mem, m->whichB, true);
       THROWING(CVodeQuadSStolerancesB, m->mem, m->whichB, reltol_, abstol_);
@@ -346,7 +346,7 @@ void CvodesInterface::resetB(IntegratorMemory* mem, double t, const double* rx,
     m->first_callB = false;
   } else {
     THROWING(CVodeReInitB, m->mem, m->whichB, t, m->rxz);
-    THROWING(CVodeQuadReInitB, m->mem, m->whichB, m->rq);
+    THROWING(CVodeQuadReInitB, m->mem, m->whichB, m->ruq);
   }
 }
 
@@ -359,24 +359,25 @@ void CvodesInterface::impulseB(IntegratorMemory* mem,
 
   // Reinitialize solver
   THROWING(CVodeReInitB, m->mem, m->whichB, m->t, m->rxz);
-  THROWING(CVodeQuadReInitB, m->mem, m->whichB, m->rq);
+  THROWING(CVodeQuadReInitB, m->mem, m->whichB, m->ruq);
 }
 
 void CvodesInterface::retreat(IntegratorMemory* mem, double t_next, double t_stop,
-    double* rx, double* rz, double* rq) const {
+    double* rx, double* rz, double* rq, double* uq) const {
   auto m = to_mem(mem);
   // Integrate, unless already at desired time
   if (t_next < m->t) {
     THROWING(CVodeB, m->mem, t_next, CV_NORMAL);
     THROWING(CVodeGetB, m->mem, m->whichB, &m->t, m->rxz);
-    if (nrq_>0) {
-      THROWING(CVodeGetQuadB, m->mem, m->whichB, &m->t, m->rq);
+    if (nrq_ > 0 || nuq_ > 0) {
+      THROWING(CVodeGetQuadB, m->mem, m->whichB, &m->t, m->ruq);
     }
   }
 
   // Save outputs
   casadi_copy(NV_DATA_S(m->rxz), nrx_, rx);
-  casadi_copy(NV_DATA_S(m->rq), nrq_, rq);
+  casadi_copy(NV_DATA_S(m->ruq), nrq_, rq);
+  casadi_copy(NV_DATA_S(m->ruq) + nrq_, nuq_, uq);
 
   // Get stats
   CVodeMem cv_mem = static_cast<CVodeMem>(m->mem);
@@ -459,8 +460,7 @@ int CvodesInterface::rhsB(double t, N_Vector x, N_Vector rx, N_Vector rxdot,
   }
 }
 
-int CvodesInterface::rhsQB(double t, N_Vector x, N_Vector rx,
-                            N_Vector rqdot, void *user_data) {
+int CvodesInterface::rhsQB(double t, N_Vector x, N_Vector rx, N_Vector ruqdot, void *user_data) {
   try {
     casadi_assert_dev(user_data);
     auto m = to_mem(user_data);
@@ -471,11 +471,12 @@ int CvodesInterface::rhsQB(double t, N_Vector x, N_Vector rx,
     m->arg[3] = m->p;
     m->arg[4] = m->u;
     m->arg[5] = &t;
-    m->res[0] = NV_DATA_S(rqdot);
+    m->res[0] = NV_DATA_S(ruqdot);
+    m->res[1] = NV_DATA_S(ruqdot) + s.nrq_;
     s.calc_function(m, "quadB");
 
     // Negate (note definition of g)
-    casadi_scal(s.nrq_, -1., NV_DATA_S(rqdot));
+    casadi_scal(s.nrq_ + s.nuq_, -1., NV_DATA_S(ruqdot));
 
     return 0;
   } catch(int flag) { // recoverable error
@@ -652,8 +653,9 @@ int CvodesInterface::psetup(double t, N_Vector x, N_Vector xdot, booleantype jok
     m->arg[0] = &t;
     m->arg[1] = NV_DATA_S(x);
     m->arg[2] = m->p;
-    m->arg[3] = &d1;
-    m->arg[4] = &d2;
+    m->arg[3] = m->u;
+    m->arg[4] = &d1;
+    m->arg[5] = &d2;
     m->res[0] = m->jac;
     if (s.calc_function(m, "jacF")) casadi_error("'jacF' calculation failed");
 
@@ -688,8 +690,9 @@ int CvodesInterface::psetupB(double t, N_Vector x, N_Vector rx, N_Vector rxdot,
     m->arg[2] = m->rp;
     m->arg[3] = NV_DATA_S(x);
     m->arg[4] = m->p;
-    m->arg[5] = &gammaB;
-    m->arg[6] = &one;
+    m->arg[5] = m->u;
+    m->arg[6] = &gammaB;
+    m->arg[7] = &one;
     m->res[0] = m->jacB;
     if (s.calc_function(m, "jacB")) casadi_error("'jacB' calculation failed");
 
@@ -861,11 +864,11 @@ Function CvodesInterface::getJ(bool backward) const {
                 + c_xdot*MatType::eye(nrx_);
     return Function("jacB",
                     {a[DYN_T], a[DYN_RX], a[DYN_RP],
-                      a[DYN_X], a[DYN_P], c_x, c_xdot}, {jac});
+                      a[DYN_X], a[DYN_P], a[DYN_U], c_x, c_xdot}, {jac});
     } else {
     MatType jac = c_x*MatType::jacobian(r[DYN_ODE], a[DYN_X])
                 + c_xdot*MatType::eye(nx_);
-    return Function("jacF", {a[DYN_T], a[DYN_X], a[DYN_P], c_x, c_xdot}, {jac});
+    return Function("jacF", {a[DYN_T], a[DYN_X], a[DYN_P], a[DYN_U], c_x, c_xdot}, {jac});
   }
 }
 
