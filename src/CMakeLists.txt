@@ -201,5 +201,17 @@ if (TARGET lbfgspp)
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/export>)
 endif()
 
+option(ALPAQA_WITH_LBFGSB
+    "Include the L-BFGS-B solver" On)
+
+if (ALPAQA_WITH_LBFGSB)
+    add_library(lbfgsb-fortran
+        "thirdparty/lbfgsb/Lbfgsb.3.0/lbfgsb.f"
+        "thirdparty/lbfgsb/Lbfgsb.3.0/timer.f"
+        "thirdparty/lbfgsb/Lbfgsb.3.0/blas.f"
+        "thirdparty/lbfgsb/Lbfgsb.3.0/linpack.f"
+    )
+endif()
+
 # Installation
 include(cmake/Install.cmake)
