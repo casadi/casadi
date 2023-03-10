@@ -119,29 +119,29 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   virtual MX algebraic_state_output(const MX& Z) const { return Z; }
 
   /** \brief Reset the forward problem */
-  virtual void reset(IntegratorMemory* mem, double t,
+  virtual void reset(IntegratorMemory* mem,
     const double* x, const double* z, const double* p) const = 0;
 
   /** \brief  Find next stop time */
   casadi_int next_stop(casadi_int k, const double* u) const;
 
   /** \brief  Advance solution in time */
-  virtual void advance(IntegratorMemory* mem, casadi_int k, double t_next, double t_stop,
+  virtual void advance(IntegratorMemory* mem,
     const double* u, double* x, double* z, double* q) const = 0;
 
   /** \brief Reset the backward problem */
-  virtual void resetB(IntegratorMemory* mem, double t,
+  virtual void resetB(IntegratorMemory* mem,
     const double* rx, const double* rz, const double* rp) const = 0;
 
   /** \brief  Find next stop time */
   casadi_int next_stopB(casadi_int k, const double* u) const;
 
   /** \brief Introduce an impulse into the backwards integration at the current time */
-  virtual void impulseB(IntegratorMemory* mem, casadi_int k,
+  virtual void impulseB(IntegratorMemory* mem,
     const double* rx, const double* rz, const double* rp) const = 0;
 
   /** \brief  Retreat solution in time */
-  virtual void retreat(IntegratorMemory* mem, casadi_int k, double t_next, double t_stop,
+  virtual void retreat(IntegratorMemory* mem,
     double* rx, double* rz, double* rq, double* uq) const = 0;
 
   /** \brief  evaluate
@@ -451,23 +451,23 @@ class CASADI_EXPORT FixedStepIntegrator : public Integrator {
   virtual void setupFG() = 0;
 
   /** \brief Reset the forward problem */
-  void reset(IntegratorMemory* mem, double t,
+  void reset(IntegratorMemory* mem,
     const double* x, const double* z, const double* p) const override;
 
   /** \brief  Advance solution in time */
-  void advance(IntegratorMemory* mem, casadi_int k, double t_next, double t_stop,
+  void advance(IntegratorMemory* mem,
     const double* u, double* x, double* z, double* q) const override;
 
   /// Reset the backward problem and take time to tf
-  void resetB(IntegratorMemory* mem, double t,
+  void resetB(IntegratorMemory* mem,
     const double* rx, const double* rz, const double* rp) const override;
 
   /// Introduce an impulse into the backwards integration at the current time
-  void impulseB(IntegratorMemory* mem, casadi_int k,
+  void impulseB(IntegratorMemory* mem,
     const double* rx, const double* rz, const double* rp) const override;
 
   /** \brief Retreat solution in time */
-  void retreat(IntegratorMemory* mem, casadi_int k, double t_next, double t_stop,
+  void retreat(IntegratorMemory* mem,
     double* rx, double* rz, double* rq, double* uq) const override;
 
   /// Get explicit dynamics

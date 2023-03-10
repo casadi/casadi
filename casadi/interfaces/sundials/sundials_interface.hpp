@@ -126,15 +126,15 @@ namespace casadi {
     void print_stats(IntegratorMemory* mem) const override;
 
     /** \brief  Reset the forward problem and bring the time back to t0 */
-    void reset(IntegratorMemory* mem, double t, const double* x,
+    void reset(IntegratorMemory* mem, const double* x,
       const double* z, const double* p) const override;
 
     /** \brief  Reset the backward problem and take time to tf */
-    void resetB(IntegratorMemory* mem, double t, const double* rx,
+    void resetB(IntegratorMemory* mem, const double* rx,
       const double* rz, const double* rp) const override;
 
     /** \brief Introduce an impulse into the backwards integration at the current time */
-    void impulseB(IntegratorMemory* mem, casadi_int k,
+    void impulseB(IntegratorMemory* mem,
       const double* rx, const double* rz, const double* rp) const override;
 
     /** \brief Cast to memory object */

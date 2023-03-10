@@ -125,23 +125,23 @@ namespace casadi {
     void free_mem(void *mem) const override { delete static_cast<CvodesMemory*>(mem);}
 
     /** \brief  Reset the forward problem and bring the time back to t0 */
-    void reset(IntegratorMemory* mem, double t,
+    void reset(IntegratorMemory* mem,
       const double* x, const double* z, const double* p) const override;
 
     /** \brief  Advance solution in time */
-    void advance(IntegratorMemory* mem, casadi_int k, double t_next, double t_stop,
+    void advance(IntegratorMemory* mem,
       const double* u, double* x, double* z, double* q) const override;
 
     /** \brief  Reset the backward problem and take time to tf */
-    void resetB(IntegratorMemory* mem, double t,
+    void resetB(IntegratorMemory* mem,
       const double* rx, const double* rz, const double* rp) const override;
 
     /** \brief Introduce an impulse into the backwards integration at the current time */
-    void impulseB(IntegratorMemory* mem, casadi_int k,
+    void impulseB(IntegratorMemory* mem,
       const double* rx, const double* rz, const double* rp) const override;
 
     /** \brief  Retreat solution in time */
-    void retreat(IntegratorMemory* mem, casadi_int k, double t_next, double t_stop,
+    void retreat(IntegratorMemory* mem,
       double* rx, double* rz, double* rq, double* uq) const override;
 
     /** \brief Cast to memory object */

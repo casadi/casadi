@@ -320,16 +320,16 @@ namespace casadi {
     }
   }
 
-  void Collocation::reset(IntegratorMemory* mem, double t, const double* x,
-                                const double* z, const double* p) const {
+  void Collocation::reset(IntegratorMemory* mem,
+      const double* x, const double* z, const double* p) const {
     auto m = static_cast<FixedStepMemory*>(mem);
 
     // Reset the base classes
-    ImplicitFixedStepIntegrator::reset(mem, t, x, z, p);
+    ImplicitFixedStepIntegrator::reset(mem, x, z, p);
 
     // Initial guess for Z
     double* Z = get_ptr(m->Z);
-    for (casadi_int d=0; d<deg_; ++d) {
+    for (casadi_int d = 0; d < deg_; ++d) {
       casadi_copy(x, nx_, Z);
       Z += nx_;
       casadi_copy(z, nz_, Z);
@@ -337,16 +337,16 @@ namespace casadi {
     }
   }
 
-  void Collocation::resetB(IntegratorMemory* mem, double t, const double* rx,
-                               const double* rz, const double* rp) const {
+  void Collocation::resetB(IntegratorMemory* mem,
+      const double* rx, const double* rz, const double* rp) const {
     auto m = static_cast<FixedStepMemory*>(mem);
 
     // Reset the base classes
-    ImplicitFixedStepIntegrator::resetB(mem, t, rx, rz, rp);
+    ImplicitFixedStepIntegrator::resetB(mem, rx, rz, rp);
 
     // Initial guess for RZ
     double* RZ = get_ptr(m->RZ);
-    for (casadi_int d=0; d<deg_; ++d) {
+    for (casadi_int d = 0; d < deg_; ++d) {
       casadi_copy(rx, nrx_, RZ);
       RZ += nrx_;
       casadi_copy(rz, nrz_, RZ);

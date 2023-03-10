@@ -403,22 +403,22 @@ int IdasInterface::init_mem(void* mem) const {
   return 0;
 }
 
-void IdasInterface::reset(IntegratorMemory* mem, double t, const double* _x,
-                          const double* _z, const double* _p) const {
+void IdasInterface::reset(IntegratorMemory* mem,
+    const double* _x, const double* _z, const double* _p) const {
   if (verbose_) casadi_message(name_ + "::reset");
   auto m = to_mem(mem);
 
   // Reset the base classes
-  SundialsInterface::reset(mem, t, _x, _z, _p);
+  SundialsInterface::reset(mem, _x, _z, _p);
 
   // Re-initialize
   N_VConst(0.0, m->xzdot);
   std::copy(init_xdot_.begin(), init_xdot_.end(), NV_DATA_S(m->xzdot));
 
-  THROWING(IDAReInit, m->mem, t, m->xz, m->xzdot);
+  THROWING(IDAReInit, m->mem, m->t, m->xz, m->xzdot);
 
   // Re-initialize quadratures
-  if (nq_>0) THROWING(IDAQuadReInit, m->mem, m->q);
+  if (nq_ > 0) THROWING(IDAQuadReInit, m->mem, m->q);
 
   // Correct initial conditions, if necessary
   if (calc_ic_) {
@@ -427,28 +427,27 @@ void IdasInterface::reset(IntegratorMemory* mem, double t, const double* _x,
   }
 
   // Re-initialize backward integration
-  if (nrx_>0) THROWING(IDAAdjReInit, m->mem);
+  if (nrx_ > 0) THROWING(IDAAdjReInit, m->mem);
 }
 
-void IdasInterface::advance(IntegratorMemory* mem, casadi_int k, double t_next, double t_stop,
+void IdasInterface::advance(IntegratorMemory* mem,
     const double* u, double* x, double* z, double* q) const {
-  (void)k;  // unused
   auto m = to_mem(mem);
 
   // Set controls
   casadi_copy(u, nu_, m->u);
 
   // Do not integrate past change in input signals or past the end
-  THROWING(IDASetStopTime, m->mem, t_stop);
+  THROWING(IDASetStopTime, m->mem, m->t_stop);
 
   // Integrate, unless already at desired time
   double ttol = 1e-9;   // tolerance
-  if (fabs(m->t_old - t_next) >= ttol) {
+  if (fabs(m->t_old - m->t_next) >= ttol) {
     // Integrate forward ...
     if (nrx_>0) { // ... with taping
-      THROWING(IDASolveF, m->mem, t_next, &m->t_old, m->xz, m->xzdot, IDA_NORMAL, &m->ncheck);
+      THROWING(IDASolveF, m->mem, m->t_next, &m->t_old, m->xz, m->xzdot, IDA_NORMAL, &m->ncheck);
     } else { // ... without taping
-      THROWING(IDASolve, m->mem, t_next, &m->t_old, m->xz, m->xzdot, IDA_NORMAL);
+      THROWING(IDASolve, m->mem, m->t_next, &m->t_old, m->xz, m->xzdot, IDA_NORMAL);
     }
 
     // Get quadratures
@@ -465,13 +464,12 @@ void IdasInterface::advance(IntegratorMemory* mem, casadi_int k, double t_next, 
 
   // Get stats
   THROWING(IDAGetIntegratorStats, m->mem, &m->nsteps, &m->nfevals, &m->nlinsetups,
-            &m->netfails, &m->qlast, &m->qcur, &m->hinused,
-            &m->hlast, &m->hcur, &m->tcur);
+    &m->netfails, &m->qlast, &m->qcur, &m->hinused, &m->hlast, &m->hcur, &m->tcur);
   THROWING(IDAGetNonlinSolvStats, m->mem, &m->nniters, &m->nncfails);
 
 }
 
-void IdasInterface::resetB(IntegratorMemory* mem, double t,
+void IdasInterface::resetB(IntegratorMemory* mem,
     const double* rx, const double* rz, const double* rp) const {
   if (verbose_) casadi_message(name_ + "::resetB");
   auto m = to_mem(mem);
@@ -480,7 +478,7 @@ void IdasInterface::resetB(IntegratorMemory* mem, double t,
   N_VConst(0.0, m->rxz);
 
   // Reset the base classes
-  SundialsInterface::resetB(mem, t, rx, rz, rp);
+  SundialsInterface::resetB(mem, rx, rz, rp);
 
   // Reset initial guess
   N_VConst(0.0, m->rxzdot);
@@ -488,7 +486,7 @@ void IdasInterface::resetB(IntegratorMemory* mem, double t,
   if (m->first_callB) {
     // Create backward problem
     THROWING(IDACreateB, m->mem, &m->whichB);
-    THROWING(IDAInitB, m->mem, m->whichB, resB, t, m->rxz, m->rxzdot);
+    THROWING(IDAInitB, m->mem, m->whichB, resB, m->t, m->rxz, m->rxzdot);
     THROWING(IDASStolerancesB, m->mem, m->whichB, reltol_, abstol_);
     THROWING(IDASetUserDataB, m->mem, m->whichB, m);
     THROWING(IDASetMaxNumStepsB, m->mem, m->whichB, max_num_steps_);
@@ -534,7 +532,7 @@ void IdasInterface::resetB(IntegratorMemory* mem, double t,
     m->first_callB = false;
   } else {
     // Re-initialize
-    THROWING(IDAReInitB, m->mem, m->whichB, t, m->rxz, m->rxzdot);
+    THROWING(IDAReInitB, m->mem, m->whichB, m->t, m->rxz, m->rxzdot);
     if (nrq_ > 0 || nuq_ > 0) {
       // Workaround (bug in SUNDIALS)
       // THROWING(IDAQuadReInitB, m->mem, m->whichB[dir], m->rq[dir]);
@@ -550,12 +548,12 @@ void IdasInterface::resetB(IntegratorMemory* mem, double t,
   }
 }
 
-void IdasInterface::impulseB(IntegratorMemory* mem, casadi_int k,
+void IdasInterface::impulseB(IntegratorMemory* mem,
     const double* rx, const double* rz, const double* rp) const {
   auto m = to_mem(mem);
 
   // Call method in base class
-  SundialsInterface::impulseB(mem, k, rx, rz, rp);
+  SundialsInterface::impulseB(mem, rx, rz, rp);
 
   // Re-initialize
   THROWING(IDAReInitB, m->mem, m->whichB, m->t_old, m->rxz, m->rxzdot);
@@ -567,14 +565,13 @@ void IdasInterface::impulseB(IntegratorMemory* mem, casadi_int k,
   }
 }
 
-void IdasInterface::retreat(IntegratorMemory* mem, casadi_int k, double t_next, double t_stop,
+void IdasInterface::retreat(IntegratorMemory* mem,
     double* rx, double* rz, double* rq, double* uq) const {
-  (void)k;  // unused
   auto m = to_mem(mem);
 
   // Integrate, unless already at desired time
-  if (t_next < m->t_old) {
-    THROWING(IDASolveB, m->mem, t_next, IDA_NORMAL);
+  if (m->t_next < m->t_old) {
+    THROWING(IDASolveB, m->mem, m->t_next, IDA_NORMAL);
     THROWING(IDAGetB, m->mem, m->whichB, &m->t_old, m->rxz, m->rxzdot);
     if (nrq_ > 0 || nuq_ > 0) {
       THROWING(IDAGetQuadB, m->mem, m->whichB, &m->t_old, m->ruq);

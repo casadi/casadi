@@ -320,7 +320,8 @@ eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) con
   setup(m, arg, res, iw, w);
 
   // Reset solver, take time to t0
-  reset(m, t0_, x0, z0, p);
+  m->t = t0_;
+  reset(m, x0, z0, p);
 
   // Next stop time due to step change in input
   casadi_int k_stop = next_stop(0, u);
@@ -330,14 +331,16 @@ eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) con
     // Update stopping time, if needed
     if (m->k > k_stop) k_stop = next_stop(m->k, u);
     // Advance solution
-    m->t_next = tout_[m->k], m->t_stop = tout_[k_stop];
+    m->t_next = tout_[m->k];
+    m->t_stop = tout_[k_stop];
     if (verbose_) casadi_message("Integrating forward to output time " + str(m->k) + ": t_next = "
       + str(m->t_next) + ", t_stop = " + str(m->t_stop));
-    advance(m, m->k, m->t_next, m->t_stop, u, x, z, q);
+    advance(m, u, x, z, q);
     if (x) x += nx_;
     if (z) z += nz_;
     if (q) q += nq_;
     if (u) u += nu_;
+    m->t = m->t_next;
   }
 
   // Backwards integration, if needed
@@ -351,6 +354,7 @@ eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) con
     k_stop = nt();
     // Integrate backward
     for (m->k = nt(); m->k-- > 0; ) {
+      m->t = tout_[m->k];
       // Reset the solver, add impulse to backwards integration
       if (rx0) rx0 -= nrx_;
       if (rz0) rz0 -= nrz_;
@@ -358,9 +362,9 @@ eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) con
       if (uq) uq -= nuq_;
       if (u) u -= nu_;
       if (m->k == nt() - 1) {
-       resetB(m, tout_[m->k], rx0, rz0, rp);
+        resetB(m, rx0, rz0, rp);
       } else {
-       impulseB(m, m->k, rx0, rz0, rp);
+       impulseB(m, rx0, rz0, rp);
       }
       // Next output time, or beginning
       casadi_int k_next = m->k - 1;
@@ -369,12 +373,12 @@ eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) con
       if (k_next < k_stop) k_stop = next_stopB(m->k, u);
       m->t_stop = k_stop < 0 ? t0_ : tout_[k_stop];
       // Proceed to the previous time point or t0
-      if (verbose_) casadi_message("Integrating backward from output time " + str(m->k) + ": t_next = "
-        + str(m->t_next) + ", t_stop = " + str(m->t_stop));
+      if (verbose_) casadi_message("Integrating backward from output time " + str(m->k)
+        + ": t_next = " + str(m->t_next) + ", t_stop = " + str(m->t_stop));
       if (m->k > 0) {
-        retreat(m, m->k, m->t_next, m->t_stop, 0, 0, 0, uq);
+        retreat(m, 0, 0, 0, uq);
       } else {
-        retreat(m, m->k, m->t_next, m->t_stop, rx, rz, rq, uq);
+        retreat(m, rx, rz, rq, uq);
       }
     }
     // uq should contain the contribution from the grid point, not cumulative
@@ -1360,12 +1364,9 @@ int FixedStepIntegrator::init_mem(void* mem) const {
   return 0;
 }
 
-void FixedStepIntegrator::advance(IntegratorMemory* mem, casadi_int k,
-    double t_next, double t_stop, const double* u, double* x, double* z, double* q) const {
+void FixedStepIntegrator::advance(IntegratorMemory* mem,
+    const double* u, double* x, double* z, double* q) const {
   auto m = static_cast<FixedStepMemory*>(mem);
-
-  // The fixed-step integrators take steps aligned with output times, t_stop not needed
-  (void)t_stop;  // unused
 
   // Set controls
   casadi_copy(u, nu_, get_ptr(m->u));
@@ -1391,12 +1392,11 @@ void FixedStepIntegrator::advance(IntegratorMemory* mem, casadi_int k,
   m->res[FSTEP_RES] = get_ptr(m->Z);
   m->res[FSTEP_QF] = get_ptr(m->q);
 
-
-
-
   // Get discrete time sought
-  casadi_int k_out = static_cast<casadi_int>(std::ceil((t_next - t0_)/h));
-  k_out = std::min(k_out, disc_.back()); //  make sure that rounding errors does not result in k_out>nk_
+  casadi_int k_out = static_cast<casadi_int>(std::ceil((m->t_next - t0_)/h));
+
+  // make sure that rounding errors does not result in k_out>nk_
+  k_out = std::min(k_out, disc_.back());
   casadi_assert_dev(k_out>=0);
 
 
@@ -1428,18 +1428,15 @@ void FixedStepIntegrator::advance(IntegratorMemory* mem, casadi_int k,
   casadi_copy(get_ptr(m->q), nq_, q);
 }
 
-void FixedStepIntegrator::retreat(IntegratorMemory* mem, casadi_int k, double t_next, double t_stop,
+void FixedStepIntegrator::retreat(IntegratorMemory* mem,
     double* rx, double* rz, double* rq, double* uq) const {
   auto m = static_cast<FixedStepMemory*>(mem);
-
-  // The fixed-step integrators take steps aligned with output times, t_stop not needed
-  (void)t_stop;  // unused
 
   // Number of finite elements and time steps
   double h = (tout_.back() - t0_)/static_cast<double>(disc_.back());
 
   // Get discrete time sought
-  casadi_int k_out = static_cast<casadi_int>(std::floor((t_next - t0_)/h));
+  casadi_int k_out = static_cast<casadi_int>(std::floor((m->t_next - t0_)/h));
   //  make sure that rounding errors does not result in k_out>nk_
   k_out = std::max(k_out, casadi_int(0));
   casadi_assert_dev(k_out <= disc_.back());
@@ -1492,12 +1489,12 @@ void FixedStepIntegrator::retreat(IntegratorMemory* mem, casadi_int k, double t_
 }
 
 void FixedStepIntegrator::
-reset(IntegratorMemory* mem, double t,
+reset(IntegratorMemory* mem,
       const double* x, const double* z, const double* p) const {
   auto m = static_cast<FixedStepMemory*>(mem);
 
   // Update time
-  m->t_old = t;
+  m->t_old = m->t;
 
   // Set parameters
   casadi_copy(p, np_, get_ptr(m->p));
@@ -1521,12 +1518,12 @@ reset(IntegratorMemory* mem, double t,
   }
 }
 
-void FixedStepIntegrator::resetB(IntegratorMemory* mem, double t, const double* rx,
-    const double* rz, const double* rp) const {
+void FixedStepIntegrator::resetB(IntegratorMemory* mem,
+    const double* rx, const double* rz, const double* rp) const {
   auto m = static_cast<FixedStepMemory*>(mem);
 
   // Update time
-  m->t_old = t;
+  m->t_old = m->t;
 
   // Set parameters
   casadi_copy(rp, nrp_, get_ptr(m->rp));
@@ -1546,7 +1543,7 @@ void FixedStepIntegrator::resetB(IntegratorMemory* mem, double t, const double* 
   casadi_fill(get_ptr(m->RZ), m->RZ.size(), std::numeric_limits<double>::quiet_NaN());
 }
 
-void FixedStepIntegrator::impulseB(IntegratorMemory* mem, casadi_int k,
+void FixedStepIntegrator::impulseB(IntegratorMemory* mem,
     const double* rx, const double* rz, const double* rp) const {
   auto m = static_cast<FixedStepMemory*>(mem);
   // Add impulse to backward parameters

@@ -236,50 +236,49 @@ int CvodesInterface::rhs(double t, N_Vector x, N_Vector xdot, void *user_data) {
   }
 }
 
-void CvodesInterface::reset(IntegratorMemory* mem, double t, const double* x,
-                            const double* z, const double* _p) const {
+void CvodesInterface::reset(IntegratorMemory* mem,
+    const double* x, const double* z, const double* _p) const {
   if (verbose_) casadi_message(name_ + "::reset");
   auto m = to_mem(mem);
 
   // Reset the base classes
-  SundialsInterface::reset(mem, t, x, z, _p);
+  SundialsInterface::reset(mem, x, z, _p);
 
   // Re-initialize
-  THROWING(CVodeReInit, m->mem, t, m->xz);
+  THROWING(CVodeReInit, m->mem, m->t, m->xz);
 
   // Re-initialize quadratures
-  if (nq_>0) {
+  if (nq_ > 0) {
     N_VConst(0.0, m->q);
     THROWING(CVodeQuadReInit, m->mem, m->q);
   }
 
   // Re-initialize backward integration
-  if (nrx_>0) {
+  if (nrx_ > 0) {
     THROWING(CVodeAdjReInit, m->mem);
   }
 }
 
-void CvodesInterface::advance(IntegratorMemory* mem, casadi_int k, double t_next, double t_stop,
+void CvodesInterface::advance(IntegratorMemory* mem,
     const double* u, double* x, double* z, double* q) const {
-  (void)k;  // unused
   auto m = to_mem(mem);
 
   // Set controls
   casadi_copy(u, nu_, m->u);
 
   // Do not integrate past change in input signals or past the end
-  THROWING(CVodeSetStopTime, m->mem, t_stop);
+  THROWING(CVodeSetStopTime, m->mem, m->t_stop);
 
   // Integrate, unless already at desired time
   const double ttol = 1e-9;
-  if (fabs(m->t_old - t_next)>=ttol) {
+  if (fabs(m->t_old - m->t_next)>=ttol) {
     // Integrate forward ...
     if (nrx_>0) {
       // ... with taping
-      THROWING(CVodeF, m->mem, t_next, m->xz, &m->t_old, CV_NORMAL, &m->ncheck);
+      THROWING(CVodeF, m->mem, m->t_next, m->xz, &m->t_old, CV_NORMAL, &m->ncheck);
     } else {
       // ... without taping
-      THROWING(CVode, m->mem, t_next, m->xz, &m->t_old, CV_NORMAL);
+      THROWING(CVode, m->mem, m->t_next, m->xz, &m->t_old, CV_NORMAL);
     }
 
     // Get quadratures
@@ -300,17 +299,17 @@ void CvodesInterface::advance(IntegratorMemory* mem, casadi_int k, double t_next
   THROWING(CVodeGetNonlinSolvStats, m->mem, &m->nniters, &m->nncfails);
 }
 
-void CvodesInterface::resetB(IntegratorMemory* mem, double t, const double* rx,
-    const double* rz, const double* rp) const {
+void CvodesInterface::resetB(IntegratorMemory* mem,
+    const double* rx, const double* rz, const double* rp) const {
   auto m = to_mem(mem);
 
   // Reset the base classes
-  SundialsInterface::resetB(mem, t, rx, rz, rp);
+  SundialsInterface::resetB(mem, rx, rz, rp);
 
   if (m->first_callB) {
     // Create backward problem
     THROWING(CVodeCreateB, m->mem, lmm_, iter_, &m->whichB);
-    THROWING(CVodeInitB, m->mem, m->whichB, rhsB, t, m->rxz);
+    THROWING(CVodeInitB, m->mem, m->whichB, rhsB, m->t, m->rxz);
     THROWING(CVodeSStolerancesB, m->mem, m->whichB, reltol_, abstol_);
     THROWING(CVodeSetUserDataB, m->mem, m->whichB, m);
     if (newton_scheme_==SD_DIRECT) {
@@ -318,7 +317,7 @@ void CvodesInterface::resetB(IntegratorMemory* mem, double t, const double* rx,
       CVodeMem cv_mem = static_cast<CVodeMem>(m->mem);
       CVadjMem ca_mem = cv_mem->cv_adj_mem;
       CVodeBMem cvB_mem = ca_mem->cvB_mem;
-      cvB_mem->cv_lmem   = m;
+      cvB_mem->cv_lmem = m;
       cvB_mem->cv_mem->cv_lmem = m;
       cvB_mem->cv_mem->cv_lsetup = lsetupB;
       cvB_mem->cv_mem->cv_lsolve = lsolveB;
@@ -346,30 +345,29 @@ void CvodesInterface::resetB(IntegratorMemory* mem, double t, const double* rx,
     // Mark initialized
     m->first_callB = false;
   } else {
-    THROWING(CVodeReInitB, m->mem, m->whichB, t, m->rxz);
+    THROWING(CVodeReInitB, m->mem, m->whichB, m->t, m->rxz);
     THROWING(CVodeQuadReInitB, m->mem, m->whichB, m->ruq);
   }
 }
 
-void CvodesInterface::impulseB(IntegratorMemory* mem, casadi_int k,
+void CvodesInterface::impulseB(IntegratorMemory* mem,
     const double* rx, const double* rz, const double* rp) const {
   auto m = to_mem(mem);
 
   // Call method in base class
-  SundialsInterface::impulseB(mem, k, rx, rz, rp);
+  SundialsInterface::impulseB(mem, rx, rz, rp);
 
   // Reinitialize solver
   THROWING(CVodeReInitB, m->mem, m->whichB, m->t_old, m->rxz);
   THROWING(CVodeQuadReInitB, m->mem, m->whichB, m->ruq);
 }
 
-void CvodesInterface::retreat(IntegratorMemory* mem, casadi_int k, double t_next, double t_stop,
+void CvodesInterface::retreat(IntegratorMemory* mem,
     double* rx, double* rz, double* rq, double* uq) const {
-  (void)k;  // unused
   auto m = to_mem(mem);
   // Integrate, unless already at desired time
-  if (t_next < m->t_old) {
-    THROWING(CVodeB, m->mem, t_next, CV_NORMAL);
+  if (m->t_next < m->t_old) {
+    THROWING(CVodeB, m->mem, m->t_next, CV_NORMAL);
     THROWING(CVodeGetB, m->mem, m->whichB, &m->t_old, m->rxz);
     if (nrq_ > 0 || nuq_ > 0) {
       THROWING(CVodeGetQuadB, m->mem, m->whichB, &m->t_old, m->ruq);
@@ -403,7 +401,7 @@ void CvodesInterface::cvodes_error(const char* module, int flag) {
 }
 
 void CvodesInterface::ehfun(int error_code, const char *module, const char *function,
-                            char *msg, void *user_data) {
+    char *msg, void *user_data) {
   try {
     casadi_assert_dev(user_data);
     auto m = to_mem(user_data);
@@ -435,8 +433,7 @@ int CvodesInterface::rhsQ(double t, N_Vector x, N_Vector qdot, void *user_data) 
   }
 }
 
-int CvodesInterface::rhsB(double t, N_Vector x, N_Vector rx, N_Vector rxdot,
-                          void *user_data) {
+int CvodesInterface::rhsB(double t, N_Vector x, N_Vector rx, N_Vector rxdot, void *user_data) {
   try {
     casadi_assert_dev(user_data);
     auto m = to_mem(user_data);
