@@ -1,7 +1,6 @@
 #include <alpaqa/implementation/util/print.tpp>
 #include <alpaqa/lbfgsb/lbfgsb-adapter.hpp>
 
-#include <cstring>
 #include <iomanip>
 #include <stdexcept>
 
@@ -85,6 +84,10 @@ auto LBFGSBSolver::operator()(
     const real_t &τ_rel          = dsave.coeffRef(13);
     // const int &lbfgs_tot         = isave.coeffRef(30);
 
+    auto set_task = [&](std::string_view s) {
+        std::fill(std::copy(s.begin(), s.end(), task.begin()), task.end(), ' ');
+    };
+
     std::array<char, 64> print_buf;
     auto print_real = [this, &print_buf](real_t x) {
         return float_to_str_vw(print_buf, x, params.print_precision);
@@ -94,7 +97,7 @@ auto LBFGSBSolver::operator()(
     };
     auto print_progress_1 = [&](int k, real_t ψₖ, crvec grad_ψₖ, real_t εₖ) {
         if (k == 0)
-            *os << "┌─[FBETrust]\n";
+            *os << "┌─[LBFGSB]\n";
         else
             *os << "├─ " << std::setw(6) << k << " ──\n";
         *os << "│     ψ = " << print_real(ψₖ)             //
@@ -115,7 +118,7 @@ auto LBFGSBSolver::operator()(
     bool did_print = false;
 
     // Start solving
-    std::strcpy(task.data(), "START");
+    set_task("START");
 
     while (true) {
         // Invoke solver
@@ -140,47 +143,56 @@ auto LBFGSBSolver::operator()(
             // Check termination
             if (proj_grad_norm <= opts.tolerance) {
                 s.status = SolverStatus::Converged;
-                std::strcpy(task.data(), "STOP: projected gradient norm");
+                set_task("STOP: projected gradient norm");
                 break;
             } else if (clock::now() - start_time >= max_time) {
                 s.status = SolverStatus::MaxTime;
-                std::strcpy(task.data(), "STOP: time");
+                set_task("STOP: time");
                 break;
             } else if (static_cast<unsigned>(num_iter) >= params.max_iter) {
                 s.status = SolverStatus::MaxIter;
-                std::strcpy(task.data(), "STOP: number iterations");
+                set_task("STOP: number iterations");
                 break;
             } else if (stop_signal.stop_requested()) {
                 s.status = SolverStatus::Interrupted;
-                std::strcpy(task.data(), "STOP: user request");
+                set_task("STOP: user request");
                 break;
             } else {
                 // Print info
                 if (std::exchange(do_print, false))
-                    print_progress_1(num_iter, ψ, grad_ψ, proj_grad_norm);
+                    print_progress_1(num_iter - 1, ψ, grad_ψ, proj_grad_norm);
             }
         }
         // Stop
+        else if (task_sv.starts_with("CONVERGENCE: REL_REDUCTION_OF_F")) {
+            s.status = SolverStatus::NoProgress;
+            break;
+        }
+        // Unexpected status
         else {
             std::string_view task_trimmed = task_sv;
             auto trim_pos                 = task_sv.find('\0');
+            trim_pos = task_sv.find_last_not_of(' ', trim_pos);
             if (trim_pos != task_trimmed.npos)
                 task_trimmed.remove_suffix(task_trimmed.size() - trim_pos);
-            throw std::logic_error("[LBFGSB] Unexpected task: '" +
-                                   std::string(task_trimmed) + "'");
+            *os << "[LBFGSB] Unexpected task: '" << task_trimmed << "'"
+                << std::endl;
+            s.status = SolverStatus::Exception;
+            break;
         }
     }
 
     if (std::exchange(did_print, false))
         print_progress_2(τ_max, τ_rel, num_free_var);
     else if (params.print_interval != 0)
-        print_progress_1(num_iter, ψ, grad_ψ, proj_grad_norm);
+        print_progress_1(num_iter - 1, ψ, grad_ψ, proj_grad_norm);
     if (params.print_interval != 0)
         print_progress_n(s.status);
 
     auto time_elapsed = clock::now() - start_time;
     s.elapsed_time    = duration_cast<nanoseconds>(time_elapsed);
     s.lbfgs_rejected  = static_cast<unsigned>(lbfgs_skipped);
+    s.iterations      = static_cast<unsigned>(num_iter);
 
     // Check final error
     s.ε = proj_grad_norm;

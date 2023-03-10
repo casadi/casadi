@@ -230,9 +230,6 @@ if (ALPAQA_WITH_LBFGSB)
         EXPORT_FILE_NAME export/alpaqa/lbfgsb-adapter-export.h)
     target_include_directories(lbfgsb-adapter PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/export>)
-    # TODO:
-    target_compile_options(lbfgsb-fortran PUBLIC "-g3" "-ggdb" "-fsanitize=undefined,address")
-    target_link_options(lbfgsb-fortran PUBLIC "-fsanitize=undefined,address")
 endif()
 
 # Installation
