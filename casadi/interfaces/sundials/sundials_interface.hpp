@@ -42,7 +42,7 @@ namespace casadi {
   // IdasMemory
   struct CASADI_SUNDIALS_COMMON_EXPORT SundialsMemory : public IntegratorMemory {
     // Current time
-    double t;
+    double t_old;
 
     // N-vectors for the forward integration
     N_Vector xz, xzdot, q;

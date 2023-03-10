@@ -262,7 +262,7 @@ namespace casadi {
     auto m = static_cast<SundialsMemory*>(mem);
 
     // Update time
-    m->t = t;
+    m->t_old = t;
 
     // Set parameters
     casadi_copy(p, np_, m->p);
@@ -280,7 +280,7 @@ namespace casadi {
     auto m = static_cast<SundialsMemory*>(mem);
 
     // Update time
-    m->t = t;
+    m->t_old = t;
 
     // Set parameters
     casadi_copy(rp, nrp_, m->rp);

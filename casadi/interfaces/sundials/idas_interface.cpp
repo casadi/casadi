@@ -443,12 +443,12 @@ void IdasInterface::advance(IntegratorMemory* mem, casadi_int k, double t_next, 
 
   // Integrate, unless already at desired time
   double ttol = 1e-9;   // tolerance
-  if (fabs(m->t - t_next) >= ttol) {
+  if (fabs(m->t_old - t_next) >= ttol) {
     // Integrate forward ...
     if (nrx_>0) { // ... with taping
-      THROWING(IDASolveF, m->mem, t_next, &m->t, m->xz, m->xzdot, IDA_NORMAL, &m->ncheck);
+      THROWING(IDASolveF, m->mem, t_next, &m->t_old, m->xz, m->xzdot, IDA_NORMAL, &m->ncheck);
     } else { // ... without taping
-      THROWING(IDASolve, m->mem, t_next, &m->t, m->xz, m->xzdot, IDA_NORMAL);
+      THROWING(IDASolve, m->mem, t_next, &m->t_old, m->xz, m->xzdot, IDA_NORMAL);
     }
 
     // Get quadratures
@@ -558,7 +558,7 @@ void IdasInterface::impulseB(IntegratorMemory* mem, casadi_int k,
   SundialsInterface::impulseB(mem, k, rx, rz, rp);
 
   // Re-initialize
-  THROWING(IDAReInitB, m->mem, m->whichB, m->t, m->rxz, m->rxzdot);
+  THROWING(IDAReInitB, m->mem, m->whichB, m->t_old, m->rxz, m->rxzdot);
   if (nrq_ > 0 || nuq_ > 0) {
     // Workaround (bug in SUNDIALS)
     // THROWING(IDAQuadReInitB, m->mem, m->whichB[dir], m->rq[dir]);
@@ -573,11 +573,11 @@ void IdasInterface::retreat(IntegratorMemory* mem, casadi_int k, double t_next, 
   auto m = to_mem(mem);
 
   // Integrate, unless already at desired time
-  if (t_next < m->t) {
+  if (t_next < m->t_old) {
     THROWING(IDASolveB, m->mem, t_next, IDA_NORMAL);
-    THROWING(IDAGetB, m->mem, m->whichB, &m->t, m->rxz, m->rxzdot);
+    THROWING(IDAGetB, m->mem, m->whichB, &m->t_old, m->rxz, m->rxzdot);
     if (nrq_ > 0 || nuq_ > 0) {
-      THROWING(IDAGetQuadB, m->mem, m->whichB, &m->t, m->ruq);
+      THROWING(IDAGetQuadB, m->mem, m->whichB, &m->t_old, m->ruq);
     }
   }
 

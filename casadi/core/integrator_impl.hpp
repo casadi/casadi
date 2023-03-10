@@ -382,10 +382,10 @@ enum BStepOut {
 
 struct CASADI_EXPORT FixedStepMemory : public IntegratorMemory {
   // Current time
-  double t;
+  double t_old;
 
   // Discrete time
-  casadi_int k;
+  casadi_int k_old;
 
   // Current state
   std::vector<double> x, z, p, u, q, rx, rz, rp, rq, uq;

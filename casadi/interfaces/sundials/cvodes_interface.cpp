@@ -272,14 +272,14 @@ void CvodesInterface::advance(IntegratorMemory* mem, casadi_int k, double t_next
 
   // Integrate, unless already at desired time
   const double ttol = 1e-9;
-  if (fabs(m->t - t_next)>=ttol) {
+  if (fabs(m->t_old - t_next)>=ttol) {
     // Integrate forward ...
     if (nrx_>0) {
       // ... with taping
-      THROWING(CVodeF, m->mem, t_next, m->xz, &m->t, CV_NORMAL, &m->ncheck);
+      THROWING(CVodeF, m->mem, t_next, m->xz, &m->t_old, CV_NORMAL, &m->ncheck);
     } else {
       // ... without taping
-      THROWING(CVode, m->mem, t_next, m->xz, &m->t, CV_NORMAL);
+      THROWING(CVode, m->mem, t_next, m->xz, &m->t_old, CV_NORMAL);
     }
 
     // Get quadratures
@@ -359,7 +359,7 @@ void CvodesInterface::impulseB(IntegratorMemory* mem, casadi_int k,
   SundialsInterface::impulseB(mem, k, rx, rz, rp);
 
   // Reinitialize solver
-  THROWING(CVodeReInitB, m->mem, m->whichB, m->t, m->rxz);
+  THROWING(CVodeReInitB, m->mem, m->whichB, m->t_old, m->rxz);
   THROWING(CVodeQuadReInitB, m->mem, m->whichB, m->ruq);
 }
 
@@ -368,11 +368,11 @@ void CvodesInterface::retreat(IntegratorMemory* mem, casadi_int k, double t_next
   (void)k;  // unused
   auto m = to_mem(mem);
   // Integrate, unless already at desired time
-  if (t_next < m->t) {
+  if (t_next < m->t_old) {
     THROWING(CVodeB, m->mem, t_next, CV_NORMAL);
-    THROWING(CVodeGetB, m->mem, m->whichB, &m->t, m->rxz);
+    THROWING(CVodeGetB, m->mem, m->whichB, &m->t_old, m->rxz);
     if (nrq_ > 0 || nuq_ > 0) {
-      THROWING(CVodeGetQuadB, m->mem, m->whichB, &m->t, m->ruq);
+      THROWING(CVodeGetQuadB, m->mem, m->whichB, &m->t_old, m->ruq);
     }
   }
 
