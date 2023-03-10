@@ -53,7 +53,7 @@ namespace casadi {
       \date 2011-2014
   */
   class CASADI_INTEGRATOR_RK_EXPORT RungeKutta : public FixedStepIntegrator {
-  public:
+   public:
 
     /// Constructor
     RungeKutta(const std::string& name, const Function& dae, double t0,
@@ -91,7 +91,17 @@ namespace casadi {
 
     /** \brief Deserialize into MX */
     static ProtoFunction* deserialize(DeserializingStream& s) { return new RungeKutta(s); }
-  protected:
+
+   protected:
+
+    ///@{
+    /** \brief IO conventions for continuous time dynamics */
+    enum OdeIn { ODE_T, ODE_X, ODE_P, ODE_U, ODE_NUM_IN};
+    enum OdeOut { ODE_ODE, ODE_QUAD, ODE_NUM_OUT};
+    enum ROdeIn { RODE_T, RODE_X, RODE_P, RODE_U, RODE_RX, RODE_RP, RODE_NUM_IN};
+    enum ROdeOut { RODE_RODE, RODE_RQUAD, RODE_UQUAD, RODE_NUM_OUT};
+    ///@}
+
     /** \brief Deserializing constructor */
     explicit RungeKutta(DeserializingStream& s);
   };

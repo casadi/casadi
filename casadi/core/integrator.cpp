@@ -1253,7 +1253,8 @@ Function FixedStepIntegrator::create_advanced(const Dict& opts) {
 
     // Prepare return Function outputs
     std::vector<MX> intg_out(INTEGRATOR_NUM_OUT);
-    F_in[FSTEP_T] = t0_;
+    F_in[FSTEP_T0] = t0_;
+    F_in[FSTEP_H] = h_;
 
     std::vector<MX> F_out;
     // Loop over finite elements
@@ -1263,7 +1264,7 @@ Function FixedStepIntegrator::create_advanced(const Dict& opts) {
       F_in[FSTEP_X0] = F_out[FSTEP_XF];
       F_in[FSTEP_Z0] = F_out[FSTEP_RES];
       intg_out[INTEGRATOR_QF] = k==0? F_out[FSTEP_QF] : intg_out[INTEGRATOR_QF]+F_out[FSTEP_QF];
-      F_in[FSTEP_T] += h_;
+      F_in[FSTEP_T0] += h_;
     }
 
     intg_out[INTEGRATOR_XF] = F_out[FSTEP_XF];
@@ -1364,7 +1365,8 @@ void FixedStepIntegrator::advance(IntegratorMemory* mem, double t_next, double t
 
   // Discrete dynamics function inputs ...
   std::fill_n(m->arg, F.n_in(), nullptr);
-  m->arg[FSTEP_T] = &m->t;
+  m->arg[FSTEP_T0] = &m->t;
+  m->arg[FSTEP_H] = &h_;
   m->arg[FSTEP_X0] = get_ptr(m->x_prev);
   m->arg[FSTEP_Z0] = get_ptr(m->Z_prev);
   m->arg[FSTEP_P] = get_ptr(m->p);
@@ -1422,7 +1424,8 @@ void FixedStepIntegrator::retreat(IntegratorMemory* mem, double t_next, double t
 
   // Discrete dynamics function inputs ...
   std::fill_n(m->arg, G.n_in(), nullptr);
-  m->arg[BSTEP_T] = &m->t;
+  m->arg[BSTEP_T0] = &m->t;
+  m->arg[BSTEP_H] = &h_;
   m->arg[BSTEP_P] = get_ptr(m->p);
   m->arg[BSTEP_U] = get_ptr(m->u);
   m->arg[BSTEP_RX0] = get_ptr(m->rx_prev);
