@@ -564,9 +564,12 @@ void IdasInterface::impulseB(IntegratorMemory* mem,
   }
 }
 
-void IdasInterface::retreat(IntegratorMemory* mem,
+void IdasInterface::retreat(IntegratorMemory* mem, const double* u,
     double* rx, double* rz, double* rq, double* uq) const {
   auto m = to_mem(mem);
+
+  // Set controls
+  casadi_copy(u, nu_, m->u);
 
   // Integrate, unless already at desired time
   if (m->t_next < m->t) {

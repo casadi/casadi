@@ -141,7 +141,7 @@ namespace casadi {
       const double* rx, const double* rz, const double* rp) const override;
 
     /** \brief  Retreat solution in time */
-    void retreat(IntegratorMemory* mem,
+    void retreat(IntegratorMemory* mem, const double* u,
       double* rx, double* rz, double* rq, double* uq) const override;
 
     /** \brief Cast to memory object */

@@ -376,9 +376,9 @@ eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) con
       if (verbose_) casadi_message("Integrating backward from output time " + str(m->k)
         + ": t_next = " + str(m->t_next) + ", t_stop = " + str(m->t_stop));
       if (m->k > 0) {
-        retreat(m, 0, 0, 0, uq);
+        retreat(m, u, 0, 0, 0, uq);
       } else {
-        retreat(m, rx, rz, rq, uq);
+        retreat(m, u, rx, rz, rq, uq);
       }
     }
     // uq should contain the contribution from the grid point, not cumulative
@@ -1423,9 +1423,12 @@ void FixedStepIntegrator::advance(IntegratorMemory* mem,
   casadi_copy(get_ptr(m->q), nq_, q);
 }
 
-void FixedStepIntegrator::retreat(IntegratorMemory* mem,
+void FixedStepIntegrator::retreat(IntegratorMemory* mem, const double* u,
     double* rx, double* rz, double* rq, double* uq) const {
   auto m = static_cast<FixedStepMemory*>(mem);
+
+  // Set controls
+  casadi_copy(u, nu_, get_ptr(m->u));
 
   // Number of finite elements and time steps
   double h = (tout_.back() - t0_)/static_cast<double>(disc_.back());

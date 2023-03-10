@@ -141,7 +141,7 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
     const double* rx, const double* rz, const double* rp) const = 0;
 
   /** \brief  Retreat solution in time */
-  virtual void retreat(IntegratorMemory* mem,
+  virtual void retreat(IntegratorMemory* mem, const double* u,
     double* rx, double* rz, double* rq, double* uq) const = 0;
 
   /** \brief  evaluate
@@ -467,7 +467,7 @@ class CASADI_EXPORT FixedStepIntegrator : public Integrator {
     const double* rx, const double* rz, const double* rp) const override;
 
   /** \brief Retreat solution in time */
-  void retreat(IntegratorMemory* mem,
+  void retreat(IntegratorMemory* mem, const double* u,
     double* rx, double* rz, double* rq, double* uq) const override;
 
   /// Get explicit dynamics

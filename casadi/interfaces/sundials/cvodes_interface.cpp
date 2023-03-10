@@ -362,9 +362,13 @@ void CvodesInterface::impulseB(IntegratorMemory* mem,
   THROWING(CVodeQuadReInitB, m->mem, m->whichB, m->ruq);
 }
 
-void CvodesInterface::retreat(IntegratorMemory* mem,
+void CvodesInterface::retreat(IntegratorMemory* mem, const double* u,
     double* rx, double* rz, double* rq, double* uq) const {
   auto m = to_mem(mem);
+
+  // Set controls
+  casadi_copy(u, nu_, m->u);
+
   // Integrate, unless already at desired time
   if (m->t_next < m->t) {
     THROWING(CVodeB, m->mem, m->t_next, CV_NORMAL);
