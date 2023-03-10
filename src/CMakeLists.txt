@@ -205,12 +205,34 @@ option(ALPAQA_WITH_LBFGSB
     "Include the L-BFGS-B solver" On)
 
 if (ALPAQA_WITH_LBFGSB)
+    message(STATUS "Compiling L-BFGS-B solver adapter")
     add_library(lbfgsb-fortran
         "thirdparty/lbfgsb/Lbfgsb.3.0/lbfgsb.f"
+        "thirdparty/lbfgsb/Lbfgsb.3.0/lbfgsb_c.f90"
         "thirdparty/lbfgsb/Lbfgsb.3.0/timer.f"
         "thirdparty/lbfgsb/Lbfgsb.3.0/blas.f"
         "thirdparty/lbfgsb/Lbfgsb.3.0/linpack.f"
     )
+    list(APPEND ALPAQA_INSTALL_TARGETS lbfgsb-fortran)
+    add_library(lbfgsb-adapter "interop/lbfgsb/src/lbfgsb-adapter.cpp")
+    target_link_libraries(lbfgsb-adapter 
+        PUBLIC lbfgsb-fortran alpaqa::alpaqa PRIVATE alpaqa::warnings)
+    target_include_directories(lbfgsb-adapter PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/interop/lbfgsb/include>
+        $<INSTALL_INTERFACE:include>)
+    set_property(TARGET lbfgsb-adapter
+        PROPERTY OUTPUT_NAME alpaqa-lbfgsb-adapter)
+    alpaqa_configure_visibility(lbfgsb-adapter)
+    set_target_properties(lbfgsb-adapter PROPERTIES SOVERSION ${PROJECT_VERSION})
+    add_library(alpaqa::lbfgsb-adapter ALIAS lbfgsb-adapter)
+    list(APPEND ALPAQA_INSTALL_TARGETS lbfgsb-adapter)
+    generate_export_header(lbfgsb-adapter
+        EXPORT_FILE_NAME export/alpaqa/lbfgsb-adapter-export.h)
+    target_include_directories(lbfgsb-adapter PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/export>)
+    # TODO:
+    target_compile_options(lbfgsb-fortran PUBLIC "-g3" "-ggdb" "-fsanitize=undefined,address")
+    target_link_options(lbfgsb-fortran PUBLIC "-fsanitize=undefined,address")
 endif()
 
 # Installation
