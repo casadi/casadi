@@ -442,17 +442,16 @@ void IdasInterface::advance(IntegratorMemory* mem,
 
   // Integrate, unless already at desired time
   double ttol = 1e-9;   // tolerance
-  if (fabs(m->t_old - m->t_next) >= ttol) {
+  if (fabs(m->t - m->t_next) >= ttol) {
     // Integrate forward ...
+    double tret = m->t;
     if (nrx_>0) { // ... with taping
-      THROWING(IDASolveF, m->mem, m->t_next, &m->t_old, m->xz, m->xzdot, IDA_NORMAL, &m->ncheck);
+      THROWING(IDASolveF, m->mem, m->t_next, &tret, m->xz, m->xzdot, IDA_NORMAL, &m->ncheck);
     } else { // ... without taping
-      THROWING(IDASolve, m->mem, m->t_next, &m->t_old, m->xz, m->xzdot, IDA_NORMAL);
+      THROWING(IDASolve, m->mem, m->t_next, &tret, m->xz, m->xzdot, IDA_NORMAL);
     }
-
     // Get quadratures
     if (nq_ > 0) {
-      double tret;
       THROWING(IDAGetQuad, m->mem, &tret, m->q);
     }
   }
@@ -556,7 +555,7 @@ void IdasInterface::impulseB(IntegratorMemory* mem,
   SundialsInterface::impulseB(mem, rx, rz, rp);
 
   // Re-initialize
-  THROWING(IDAReInitB, m->mem, m->whichB, m->t_old, m->rxz, m->rxzdot);
+  THROWING(IDAReInitB, m->mem, m->whichB, m->t, m->rxz, m->rxzdot);
   if (nrq_ > 0 || nuq_ > 0) {
     // Workaround (bug in SUNDIALS)
     // THROWING(IDAQuadReInitB, m->mem, m->whichB[dir], m->rq[dir]);
@@ -570,11 +569,12 @@ void IdasInterface::retreat(IntegratorMemory* mem,
   auto m = to_mem(mem);
 
   // Integrate, unless already at desired time
-  if (m->t_next < m->t_old) {
+  if (m->t_next < m->t) {
+    double tret = m->t;
     THROWING(IDASolveB, m->mem, m->t_next, IDA_NORMAL);
-    THROWING(IDAGetB, m->mem, m->whichB, &m->t_old, m->rxz, m->rxzdot);
+    THROWING(IDAGetB, m->mem, m->whichB, &tret, m->rxz, m->rxzdot);
     if (nrq_ > 0 || nuq_ > 0) {
-      THROWING(IDAGetQuadB, m->mem, m->whichB, &m->t_old, m->ruq);
+      THROWING(IDAGetQuadB, m->mem, m->whichB, &tret, m->ruq);
     }
   }
 
@@ -589,8 +589,8 @@ void IdasInterface::retreat(IntegratorMemory* mem,
   IDAadjMem IDAADJ_mem = IDA_mem->ida_adj_mem;
   IDABMem IDAB_mem = IDAADJ_mem->IDAB_mem;
   THROWING(IDAGetIntegratorStats, IDAB_mem->IDA_mem, &m->nstepsB, &m->nfevalsB,
-            &m->nlinsetupsB, &m->netfailsB, &m->qlastB, &m->qcurB, &m->hinusedB,
-            &m->hlastB, &m->hcurB, &m->tcurB);
+    &m->nlinsetupsB, &m->netfailsB, &m->qlastB, &m->qcurB, &m->hinusedB,
+    &m->hlastB, &m->hcurB, &m->tcurB);
   THROWING(IDAGetNonlinSolvStats, IDAB_mem->IDA_mem, &m->nnitersB, &m->nncfailsB);
 }
 

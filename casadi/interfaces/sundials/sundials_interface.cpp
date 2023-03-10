@@ -261,9 +261,6 @@ namespace casadi {
       const double* z, const double* p) const {
     auto m = static_cast<SundialsMemory*>(mem);
 
-    // Update time
-    m->t_old = m->t;
-
     // Set parameters
     casadi_copy(p, np_, m->p);
 
@@ -278,10 +275,7 @@ namespace casadi {
   void SundialsInterface::resetB(IntegratorMemory* mem,
       const double* rx, const double* rz, const double* rp) const {
     auto m = static_cast<SundialsMemory*>(mem);
-
-    // Update time
-    m->t_old = m->t;
-
+    
     // Set parameters
     casadi_copy(rp, nrp_, m->rp);
 
