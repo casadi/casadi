@@ -364,7 +364,7 @@ eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) con
       if (m->k == nt() - 1) {
         resetB(m, rx0, rz0, rp);
       } else {
-       impulseB(m, rx0, rz0, rp);
+        impulseB(m, rx0, rz0, rp);
       }
       // Next output time, or beginning
       casadi_int k_next = m->k - 1;
@@ -1375,11 +1375,15 @@ void FixedStepIntegrator::advance(IntegratorMemory* mem,
   const Function& F = getExplicit();
 
   // Number of finite elements and time steps
-  double h = (tout_.back() - t0_)/static_cast<double>(disc_.back());
+  casadi_int nj = disc_[m->k + 1] - disc_[m->k];
+  double h = (m->t_next - m->t) / nj;
+ 
+  // Current time
+  double t = m->t;
 
   // Discrete dynamics function inputs ...
   std::fill_n(m->arg, F.n_in(), nullptr);
-  m->arg[FSTEP_T0] = &m->t_old;
+  m->arg[FSTEP_T0] = &t;
   m->arg[FSTEP_H] = &h;
   m->arg[FSTEP_X0] = get_ptr(m->x_prev);
   m->arg[FSTEP_Z0] = get_ptr(m->Z_prev);
@@ -1392,16 +1396,8 @@ void FixedStepIntegrator::advance(IntegratorMemory* mem,
   m->res[FSTEP_RES] = get_ptr(m->Z);
   m->res[FSTEP_QF] = get_ptr(m->q);
 
-  // Get discrete time sought
-  casadi_int k_out = static_cast<casadi_int>(std::ceil((m->t_next - t0_)/h));
-
-  // make sure that rounding errors does not result in k_out>nk_
-  k_out = std::min(k_out, disc_.back());
-  casadi_assert_dev(k_out>=0);
-
-
-  // Take time steps until end time has been reached
-  while (m->k_old < k_out) {
+  // Take steps
+  for (casadi_int j = 0; j < nj; ++j) {
     // Update the previous step
     casadi_copy(get_ptr(m->x), nx_, get_ptr(m->x_prev));
     casadi_copy(get_ptr(m->Z), nZ_, get_ptr(m->Z_prev));
@@ -1411,15 +1407,14 @@ void FixedStepIntegrator::advance(IntegratorMemory* mem,
     F(m->arg, m->res, m->iw, m->w);
     casadi_axpy(nq_, 1., get_ptr(m->q_prev), get_ptr(m->q));
 
-    // Tape
-    if (nrx_>0) {
-      casadi_copy(get_ptr(m->x), nx_, get_ptr(m->x_tape.at(m->k_old + 1)));
-      casadi_copy(get_ptr(m->Z), m->Z.size(), get_ptr(m->Z_tape.at(m->k_old)));
+    // Save state, if needed
+    if (nrx_ > 0) {
+      casadi_copy(get_ptr(m->x), nx_, get_ptr(m->x_tape.at(disc_[m->k] + j + 1)));
+      casadi_copy(get_ptr(m->Z), m->Z.size(), get_ptr(m->Z_tape.at(disc_[m->k] + j)));
     }
 
     // Advance time
-    m->k_old++;
-    m->t_old = t0_ + static_cast<double>(m->k_old) * h;
+    t += h;
   }
 
   // Return to user
@@ -1493,9 +1488,6 @@ reset(IntegratorMemory* mem,
       const double* x, const double* z, const double* p) const {
   auto m = static_cast<FixedStepMemory*>(mem);
 
-  // Update time
-  m->t_old = m->t;
-
   // Set parameters
   casadi_copy(p, np_, get_ptr(m->p));
 
@@ -1505,9 +1497,6 @@ reset(IntegratorMemory* mem,
 
   // Reset summation states
   casadi_clear(get_ptr(m->q), nq_);
-
-  // Bring discrete time to the beginning
-  m->k_old = 0;
 
   // Get consistent initial conditions
   casadi_fill(get_ptr(m->Z), m->Z.size(), std::numeric_limits<double>::quiet_NaN());
