@@ -134,7 +134,7 @@ namespace casadi {
       const double* rz, const double* rp) const override;
 
     /** \brief Introduce an impulse into the backwards integration at the current time */
-    void impulseB(IntegratorMemory* mem,
+    void impulseB(IntegratorMemory* mem, casadi_int k,
       const double* rx, const double* rz, const double* rp) const override;
 
     /** \brief Cast to memory object */

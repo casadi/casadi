@@ -259,8 +259,9 @@ void CvodesInterface::reset(IntegratorMemory* mem, double t, const double* x,
   }
 }
 
-void CvodesInterface::advance(IntegratorMemory* mem, double t_next, double t_stop,
+void CvodesInterface::advance(IntegratorMemory* mem, casadi_int k, double t_next, double t_stop,
     const double* u, double* x, double* z, double* q) const {
+  (void)k;  // unused
   auto m = to_mem(mem);
 
   // Set controls
@@ -350,20 +351,21 @@ void CvodesInterface::resetB(IntegratorMemory* mem, double t, const double* rx,
   }
 }
 
-void CvodesInterface::impulseB(IntegratorMemory* mem,
+void CvodesInterface::impulseB(IntegratorMemory* mem, casadi_int k,
     const double* rx, const double* rz, const double* rp) const {
   auto m = to_mem(mem);
 
   // Call method in base class
-  SundialsInterface::impulseB(mem, rx, rz, rp);
+  SundialsInterface::impulseB(mem, k, rx, rz, rp);
 
   // Reinitialize solver
   THROWING(CVodeReInitB, m->mem, m->whichB, m->t, m->rxz);
   THROWING(CVodeQuadReInitB, m->mem, m->whichB, m->ruq);
 }
 
-void CvodesInterface::retreat(IntegratorMemory* mem, double t_next, double t_stop,
+void CvodesInterface::retreat(IntegratorMemory* mem, casadi_int k, double t_next, double t_stop,
     double* rx, double* rz, double* rq, double* uq) const {
+  (void)k;  // unused
   auto m = to_mem(mem);
   // Integrate, unless already at desired time
   if (t_next < m->t) {

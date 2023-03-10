@@ -430,9 +430,9 @@ void IdasInterface::reset(IntegratorMemory* mem, double t, const double* _x,
   if (nrx_>0) THROWING(IDAAdjReInit, m->mem);
 }
 
-void IdasInterface::
-advance(IntegratorMemory* mem, double t_next, double t_stop,
+void IdasInterface::advance(IntegratorMemory* mem, casadi_int k, double t_next, double t_stop,
     const double* u, double* x, double* z, double* q) const {
+  (void)k;  // unused
   auto m = to_mem(mem);
 
   // Set controls
@@ -550,12 +550,12 @@ void IdasInterface::resetB(IntegratorMemory* mem, double t,
   }
 }
 
-void IdasInterface::impulseB(IntegratorMemory* mem,
+void IdasInterface::impulseB(IntegratorMemory* mem, casadi_int k,
     const double* rx, const double* rz, const double* rp) const {
   auto m = to_mem(mem);
 
   // Call method in base class
-  SundialsInterface::impulseB(mem, rx, rz, rp);
+  SundialsInterface::impulseB(mem, k, rx, rz, rp);
 
   // Re-initialize
   THROWING(IDAReInitB, m->mem, m->whichB, m->t, m->rxz, m->rxzdot);
@@ -567,8 +567,9 @@ void IdasInterface::impulseB(IntegratorMemory* mem,
   }
 }
 
-void IdasInterface::retreat(IntegratorMemory* mem, double t_next, double t_stop,
+void IdasInterface::retreat(IntegratorMemory* mem, casadi_int k, double t_next, double t_stop,
     double* rx, double* rz, double* rq, double* uq) const {
+  (void)k;  // unused
   auto m = to_mem(mem);
 
   // Integrate, unless already at desired time

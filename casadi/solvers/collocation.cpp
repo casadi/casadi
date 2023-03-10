@@ -200,7 +200,7 @@ namespace casadi {
       }
 
       // Add collocation equation
-      eq.push_back(vec(h_*f_res[DAE_ODE] - xp_j));
+      eq.push_back(vec(h * f_res[DAE_ODE] - xp_j));
 
       // Add the algebraic conditions
       eq.push_back(vec(f_res[DAE_ALG]));
@@ -286,7 +286,7 @@ namespace casadi {
         }
 
         // Add collocation equation
-        eq.push_back(vec(h_*B[j] * g_res[RDAE_RODE] - rxp_j));
+        eq.push_back(vec(h * B[j] * g_res[RDAE_RODE] - rxp_j));
 
         // Add the algebraic conditions
         eq.push_back(vec(g_res[RDAE_RALG]));

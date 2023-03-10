@@ -333,7 +333,7 @@ eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) con
     double t_next = tout_[k], t_stop = tout_[k_stop];
     if (verbose_) casadi_message("Integrating forward to output time " + str(k) + ": t_next = "
       + str(t_next) + ", t_stop = " + str(t_stop));
-    advance(m, t_next, t_stop, u, x, z, q);
+    advance(m, k, t_next, t_stop, u, x, z, q);
     if (x) x += nx_;
     if (z) z += nz_;
     if (q) q += nq_;
@@ -360,7 +360,7 @@ eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) con
       if (k == nt() - 1) {
        resetB(m, tout_[k], rx0, rz0, rp);
       } else {
-       impulseB(m, rx0, rz0, rp);
+       impulseB(m, k, rx0, rz0, rp);
       }
       // Next output time, or beginning
       casadi_int k_next = k - 1;
@@ -372,9 +372,9 @@ eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) con
       if (verbose_) casadi_message("Integrating backward from output time " + str(k) + ": t_next = "
         + str(t_next) + ", t_stop = " + str(t_stop));
       if (k > 0) {
-        retreat(m, t_next, t_stop, 0, 0, 0, uq);
+        retreat(m, k, t_next, t_stop, 0, 0, 0, uq);
       } else {
-        retreat(m, t_next, t_stop, rx, rz, rq, uq);
+        retreat(m, k, t_next, t_stop, rx, rz, rq, uq);
       }
     }
     // uq should contain the contribution from the grid point, not cumulative
@@ -1204,7 +1204,7 @@ FixedStepIntegrator::FixedStepIntegrator(const std::string& name, const Function
     double t0, const std::vector<double>& tout) : Integrator(name, dae, t0, tout) {
 
   // Default options
-  nk_ = 20;
+  nk_target_ = 20;
 }
 
 FixedStepIntegrator::~FixedStepIntegrator() {
@@ -1215,7 +1215,8 @@ const Options FixedStepIntegrator::options_
 = {{&Integrator::options_},
     {{"number_of_finite_elements",
       {OT_INT,
-      "Number of finite elements"}},
+      "Target number of finite elements. "
+      "The actual number may be higher to accommodate all output times"}},
     {"simplify",
       {OT_BOOL,
       "Implement as MX Function (codegeneratable/serializable) default: false"}},
@@ -1251,20 +1252,23 @@ Function FixedStepIntegrator::create_advanced(const Dict& opts) {
     intg_in[INTEGRATOR_Z0] = z0;
     F_in[FSTEP_Z0] = algebraic_state_init(intg_in[INTEGRATOR_X0], z0);
 
+    // Number of finite elements and time steps
+    double h = (tout_.back() - t0_)/static_cast<double>(disc_.back());
+
     // Prepare return Function outputs
     std::vector<MX> intg_out(INTEGRATOR_NUM_OUT);
     F_in[FSTEP_T0] = t0_;
-    F_in[FSTEP_H] = h_;
+    F_in[FSTEP_H] = h;
 
     std::vector<MX> F_out;
     // Loop over finite elements
-    for (casadi_int k=0; k<nk_; ++k) {
+    for (casadi_int k=0; k<disc_.back(); ++k) {
       F_out = F(F_in);
 
       F_in[FSTEP_X0] = F_out[FSTEP_XF];
       F_in[FSTEP_Z0] = F_out[FSTEP_RES];
       intg_out[INTEGRATOR_QF] = k==0? F_out[FSTEP_QF] : intg_out[INTEGRATOR_QF]+F_out[FSTEP_QF];
-      F_in[FSTEP_T0] += h_;
+      F_in[FSTEP_T0] += h;
     }
 
     intg_out[INTEGRATOR_XF] = F_out[FSTEP_XF];
@@ -1293,13 +1297,24 @@ void FixedStepIntegrator::init(const Dict& opts) {
   // Read options
   for (auto&& op : opts) {
     if (op.first=="number_of_finite_elements") {
-      nk_ = op.second;
+      nk_target_ = op.second;
     }
   }
 
-  // Number of finite elements and time steps
-  casadi_assert_dev(nk_>0);
-  h_ = (tout_.back() - t0_)/static_cast<double>(nk_);
+  // Consistency check
+  casadi_assert(nk_target_ > 0, "Number of finite elements must be strictly positive");
+
+  // Target interval length
+  double h_target = (tout_.back() - t0_) / nk_target_;
+
+  // Number of finite elements for each control interval and in total
+  disc_.reserve(1 + nt());
+  disc_.push_back(0);
+  double t_cur = t0_;
+  for (double t_next : tout_) {
+    disc_.push_back(disc_.back() + std::ceil((t_next - t_cur) / h_target));
+    t_cur = t_next;
+  }
 
   // Setup discrete time dynamics
   setupFG();
@@ -1319,8 +1334,8 @@ int FixedStepIntegrator::init_mem(void* mem) const {
 
   // Allocate tape if backward states are present
   if (nrx_>0) {
-    m->x_tape.resize(nk_+1, std::vector<double>(nx_));
-    m->Z_tape.resize(nk_, std::vector<double>(nZ_));
+    m->x_tape.resize(disc_.back() + 1, std::vector<double>(nx_));
+    m->Z_tape.resize(disc_.back(), std::vector<double>(nZ_));
   }
 
   // Allocate state
@@ -1345,8 +1360,8 @@ int FixedStepIntegrator::init_mem(void* mem) const {
   return 0;
 }
 
-void FixedStepIntegrator::advance(IntegratorMemory* mem, double t_next, double t_stop,
-    const double* u, double* x, double* z, double* q) const {
+void FixedStepIntegrator::advance(IntegratorMemory* mem, casadi_int k,
+    double t_next, double t_stop, const double* u, double* x, double* z, double* q) const {
   auto m = static_cast<FixedStepMemory*>(mem);
 
   // The fixed-step integrators take steps aligned with output times, t_stop not needed
@@ -1355,18 +1370,16 @@ void FixedStepIntegrator::advance(IntegratorMemory* mem, double t_next, double t
   // Set controls
   casadi_copy(u, nu_, get_ptr(m->u));
 
-  // Get discrete time sought
-  casadi_int k_out = static_cast<casadi_int>(std::ceil((t_next - t0_)/h_));
-  k_out = std::min(k_out, nk_); //  make sure that rounding errors does not result in k_out>nk_
-  casadi_assert_dev(k_out>=0);
-
   // Explicit discrete time dynamics
   const Function& F = getExplicit();
+
+  // Number of finite elements and time steps
+  double h = (tout_.back() - t0_)/static_cast<double>(disc_.back());
 
   // Discrete dynamics function inputs ...
   std::fill_n(m->arg, F.n_in(), nullptr);
   m->arg[FSTEP_T0] = &m->t;
-  m->arg[FSTEP_H] = &h_;
+  m->arg[FSTEP_H] = &h;
   m->arg[FSTEP_X0] = get_ptr(m->x_prev);
   m->arg[FSTEP_Z0] = get_ptr(m->Z_prev);
   m->arg[FSTEP_P] = get_ptr(m->p);
@@ -1377,6 +1390,15 @@ void FixedStepIntegrator::advance(IntegratorMemory* mem, double t_next, double t
   m->res[FSTEP_XF] = get_ptr(m->x);
   m->res[FSTEP_RES] = get_ptr(m->Z);
   m->res[FSTEP_QF] = get_ptr(m->q);
+
+
+
+
+  // Get discrete time sought
+  casadi_int k_out = static_cast<casadi_int>(std::ceil((t_next - t0_)/h));
+  k_out = std::min(k_out, disc_.back()); //  make sure that rounding errors does not result in k_out>nk_
+  casadi_assert_dev(k_out>=0);
+
 
   // Take time steps until end time has been reached
   while (m->k<k_out) {
@@ -1397,7 +1419,7 @@ void FixedStepIntegrator::advance(IntegratorMemory* mem, double t_next, double t
 
     // Advance time
     m->k++;
-    m->t = t0_ + static_cast<double>(m->k)*h_;
+    m->t = t0_ + static_cast<double>(m->k)*h;
   }
 
   // Return to user
@@ -1406,18 +1428,21 @@ void FixedStepIntegrator::advance(IntegratorMemory* mem, double t_next, double t
   casadi_copy(get_ptr(m->q), nq_, q);
 }
 
-void FixedStepIntegrator::retreat(IntegratorMemory* mem, double t_next, double t_stop,
+void FixedStepIntegrator::retreat(IntegratorMemory* mem, casadi_int k, double t_next, double t_stop,
     double* rx, double* rz, double* rq, double* uq) const {
   auto m = static_cast<FixedStepMemory*>(mem);
 
   // The fixed-step integrators take steps aligned with output times, t_stop not needed
   (void)t_stop;  // unused
 
+  // Number of finite elements and time steps
+  double h = (tout_.back() - t0_)/static_cast<double>(disc_.back());
+
   // Get discrete time sought
-  casadi_int k_out = static_cast<casadi_int>(std::floor((t_next - t0_)/h_));
+  casadi_int k_out = static_cast<casadi_int>(std::floor((t_next - t0_)/h));
   //  make sure that rounding errors does not result in k_out>nk_
   k_out = std::max(k_out, casadi_int(0));
-  casadi_assert_dev(k_out <= nk_);
+  casadi_assert_dev(k_out <= disc_.back());
 
   // Explicit discrete time dynamics
   const Function& G = getExplicitB();
@@ -1425,7 +1450,7 @@ void FixedStepIntegrator::retreat(IntegratorMemory* mem, double t_next, double t
   // Discrete dynamics function inputs ...
   std::fill_n(m->arg, G.n_in(), nullptr);
   m->arg[BSTEP_T0] = &m->t;
-  m->arg[BSTEP_H] = &h_;
+  m->arg[BSTEP_H] = &h;
   m->arg[BSTEP_P] = get_ptr(m->p);
   m->arg[BSTEP_U] = get_ptr(m->u);
   m->arg[BSTEP_RX0] = get_ptr(m->rx_prev);
@@ -1443,7 +1468,7 @@ void FixedStepIntegrator::retreat(IntegratorMemory* mem, double t_next, double t
   while (m->k>k_out) {
     // Advance time
     m->k--;
-    m->t = t0_ + static_cast<double>(m->k)*h_;
+    m->t = t0_ + static_cast<double>(m->k)*h;
 
     // Update the previous step
     casadi_copy(get_ptr(m->rx), nrx_, get_ptr(m->rx_prev));
@@ -1515,13 +1540,13 @@ void FixedStepIntegrator::resetB(IntegratorMemory* mem, double t, const double* 
   casadi_clear(get_ptr(m->uq), nuq_);
 
   // Bring discrete time to the end
-  m->k = nk_;
+  m->k = disc_.back();
 
   // Get consistent initial conditions
   casadi_fill(get_ptr(m->RZ), m->RZ.size(), std::numeric_limits<double>::quiet_NaN());
 }
 
-void FixedStepIntegrator::impulseB(IntegratorMemory* mem,
+void FixedStepIntegrator::impulseB(IntegratorMemory* mem, casadi_int k,
     const double* rx, const double* rz, const double* rp) const {
   auto m = static_cast<FixedStepMemory*>(mem);
   // Add impulse to backward parameters
@@ -1774,8 +1799,8 @@ void FixedStepIntegrator::serialize_body(SerializingStream &s) const {
   s.version("FixedStepIntegrator", 1);
   s.pack("FixedStepIntegrator::F", F_);
   s.pack("FixedStepIntegrator::G", G_);
-  s.pack("FixedStepIntegrator::nk", nk_);
-  s.pack("FixedStepIntegrator::h", h_);
+  //s.pack("FixedStepIntegrator::nk", nk_);
+  //s.pack("FixedStepIntegrator::h", h_);
   s.pack("FixedStepIntegrator::nZ", nZ_);
   s.pack("FixedStepIntegrator::nRZ", nRZ_);
 }
@@ -1784,8 +1809,8 @@ FixedStepIntegrator::FixedStepIntegrator(DeserializingStream & s) : Integrator(s
   s.version("FixedStepIntegrator", 1);
   s.unpack("FixedStepIntegrator::F", F_);
   s.unpack("FixedStepIntegrator::G", G_);
-  s.unpack("FixedStepIntegrator::nk", nk_);
-  s.unpack("FixedStepIntegrator::h", h_);
+  //s.unpack("FixedStepIntegrator::nk", nk_);
+  //s.unpack("FixedStepIntegrator::h", h_);
   s.unpack("FixedStepIntegrator::nZ", nZ_);
   s.unpack("FixedStepIntegrator::nRZ", nRZ_);
 }

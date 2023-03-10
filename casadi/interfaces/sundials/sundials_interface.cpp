@@ -293,8 +293,9 @@ namespace casadi {
     N_VConst(0., m->ruq);
   }
 
-  void SundialsInterface::impulseB(IntegratorMemory* mem,
+  void SundialsInterface::impulseB(IntegratorMemory* mem, casadi_int k,
       const double* rx, const double* rz, const double* rp) const {
+    (void)k;  // unused
     auto m = static_cast<SundialsMemory*>(mem);
 
     // Add impulse to backward parameters

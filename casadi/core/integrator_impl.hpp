@@ -118,7 +118,7 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   casadi_int next_stop(casadi_int k, const double* u) const;
 
   /** \brief  Advance solution in time */
-  virtual void advance(IntegratorMemory* mem, double t_next, double t_stop,
+  virtual void advance(IntegratorMemory* mem, casadi_int k, double t_next, double t_stop,
     const double* u, double* x, double* z, double* q) const = 0;
 
   /** \brief Reset the backward problem */
@@ -129,11 +129,11 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   casadi_int next_stopB(casadi_int k, const double* u) const;
 
   /** \brief Introduce an impulse into the backwards integration at the current time */
-  virtual void impulseB(IntegratorMemory* mem,
+  virtual void impulseB(IntegratorMemory* mem, casadi_int k,
     const double* rx, const double* rz, const double* rp) const = 0;
 
   /** \brief  Retreat solution in time */
-  virtual void retreat(IntegratorMemory* mem, double t_next, double t_stop,
+  virtual void retreat(IntegratorMemory* mem, casadi_int k, double t_next, double t_stop,
     double* rx, double* rz, double* rq, double* uq) const = 0;
 
   /** \brief  evaluate
@@ -447,7 +447,7 @@ class CASADI_EXPORT FixedStepIntegrator : public Integrator {
     const double* x, const double* z, const double* p) const override;
 
   /** \brief  Advance solution in time */
-  void advance(IntegratorMemory* mem, double t_next, double t_stop,
+  void advance(IntegratorMemory* mem, casadi_int k, double t_next, double t_stop,
     const double* u, double* x, double* z, double* q) const override;
 
   /// Reset the backward problem and take time to tf
@@ -455,11 +455,11 @@ class CASADI_EXPORT FixedStepIntegrator : public Integrator {
     const double* rx, const double* rz, const double* rp) const override;
 
   /// Introduce an impulse into the backwards integration at the current time
-  void impulseB(IntegratorMemory* mem,
+  void impulseB(IntegratorMemory* mem, casadi_int k,
     const double* rx, const double* rz, const double* rp) const override;
 
   /** \brief Retreat solution in time */
-  void retreat(IntegratorMemory* mem, double t_next, double t_stop,
+  void retreat(IntegratorMemory* mem, casadi_int k, double t_next, double t_stop,
     double* rx, double* rz, double* rq, double* uq) const override;
 
   /// Get explicit dynamics
@@ -471,11 +471,11 @@ class CASADI_EXPORT FixedStepIntegrator : public Integrator {
   // Discrete time dynamics
   Function F_, G_;
 
-  // Number of finite elements
-  casadi_int nk_;
+  // Target number of finite elements
+  casadi_int nk_target_;
 
-  // Time step size
-  double h_;
+  // Number of steps per control interval
+  std::vector<casadi_int> disc_;
 
   /// Number of algebraic variables for the discrete time integration
   casadi_int nZ_, nRZ_;
