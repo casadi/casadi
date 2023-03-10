@@ -326,14 +326,14 @@ eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) con
   casadi_int k_stop = next_stop(0, u);
 
   // Integrate forward
-  for (casadi_int k = 0; k < nt(); ++k) {
+  for (m->k = 0; m->k < nt(); ++m->k) {
     // Update stopping time, if needed
-    if (k > k_stop) k_stop = next_stop(k, u);
+    if (m->k > k_stop) k_stop = next_stop(m->k, u);
     // Advance solution
-    double t_next = tout_[k], t_stop = tout_[k_stop];
-    if (verbose_) casadi_message("Integrating forward to output time " + str(k) + ": t_next = "
-      + str(t_next) + ", t_stop = " + str(t_stop));
-    advance(m, k, t_next, t_stop, u, x, z, q);
+    m->t_next = tout_[m->k], m->t_stop = tout_[k_stop];
+    if (verbose_) casadi_message("Integrating forward to output time " + str(m->k) + ": t_next = "
+      + str(m->t_next) + ", t_stop = " + str(m->t_stop));
+    advance(m, m->k, m->t_next, m->t_stop, u, x, z, q);
     if (x) x += nx_;
     if (z) z += nz_;
     if (q) q += nq_;
@@ -348,38 +348,38 @@ eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) con
     if (rp) rp += nrp_ * nt();
     if (uq) uq += nuq_ * nt();
     // Next stop time due to step change in input
-    casadi_int k_stop = nt();
+    k_stop = nt();
     // Integrate backward
-    for (casadi_int k = nt(); k-- > 0; ) {
+    for (m->k = nt(); m->k-- > 0; ) {
       // Reset the solver, add impulse to backwards integration
       if (rx0) rx0 -= nrx_;
       if (rz0) rz0 -= nrz_;
       if (rp) rp -= nrp_;
       if (uq) uq -= nuq_;
       if (u) u -= nu_;
-      if (k == nt() - 1) {
-       resetB(m, tout_[k], rx0, rz0, rp);
+      if (m->k == nt() - 1) {
+       resetB(m, tout_[m->k], rx0, rz0, rp);
       } else {
-       impulseB(m, k, rx0, rz0, rp);
+       impulseB(m, m->k, rx0, rz0, rp);
       }
       // Next output time, or beginning
-      casadi_int k_next = k - 1;
-      double t_next = k_next < 0 ? t0_ : tout_[k_next];
+      casadi_int k_next = m->k - 1;
+      m->t_next = k_next < 0 ? t0_ : tout_[k_next];
       // Update integrator stopping time
-      if (k_next < k_stop) k_stop = next_stopB(k, u);
-      double t_stop = k_stop < 0 ? t0_ : tout_[k_stop];
+      if (k_next < k_stop) k_stop = next_stopB(m->k, u);
+      m->t_stop = k_stop < 0 ? t0_ : tout_[k_stop];
       // Proceed to the previous time point or t0
-      if (verbose_) casadi_message("Integrating backward from output time " + str(k) + ": t_next = "
-        + str(t_next) + ", t_stop = " + str(t_stop));
-      if (k > 0) {
-        retreat(m, k, t_next, t_stop, 0, 0, 0, uq);
+      if (verbose_) casadi_message("Integrating backward from output time " + str(m->k) + ": t_next = "
+        + str(m->t_next) + ", t_stop = " + str(m->t_stop));
+      if (m->k > 0) {
+        retreat(m, m->k, m->t_next, m->t_stop, 0, 0, 0, uq);
       } else {
-        retreat(m, k, t_next, t_stop, rx, rz, rq, uq);
+        retreat(m, m->k, m->t_next, m->t_stop, rx, rz, rq, uq);
       }
     }
     // uq should contain the contribution from the grid point, not cumulative
     if (uq) {
-      for (casadi_int k = 0; k < nt() - 1; ++k) {
+      for (m->k = 0; m->k < nt() - 1; ++m->k) {
         casadi_axpy(nuq_, -1., uq + nuq_, uq);
         uq += nuq_;
       }

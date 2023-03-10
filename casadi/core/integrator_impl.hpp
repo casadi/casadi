@@ -39,6 +39,14 @@ namespace casadi {
 
     \identifier{1lp} */
 struct CASADI_EXPORT IntegratorMemory : public OracleMemory {
+  // Current control interval
+  casadi_int k;
+  // Current time
+  double t;
+  // Next time to be visited by the integrator
+  double t_next;
+  // Next stop time due to step change in input, continuous
+  double t_stop;
 };
 
 /** \brief Internal storage for integrator related data
