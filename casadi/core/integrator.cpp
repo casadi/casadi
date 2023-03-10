@@ -1377,9 +1377,9 @@ void FixedStepIntegrator::advance(IntegratorMemory* mem,
   // Number of finite elements and time steps
   casadi_int nj = disc_[m->k + 1] - disc_[m->k];
   double h = (m->t_next - m->t) / nj;
- 
+
   // Current time
-  double t = m->t;
+  double t;
 
   // Discrete dynamics function inputs ...
   std::fill_n(m->arg, F.n_in(), nullptr);
@@ -1398,6 +1398,9 @@ void FixedStepIntegrator::advance(IntegratorMemory* mem,
 
   // Take steps
   for (casadi_int j = 0; j < nj; ++j) {
+    // Update time
+    t = m->t + j * h;
+
     // Update the previous step
     casadi_copy(get_ptr(m->x), nx_, get_ptr(m->x_prev));
     casadi_copy(get_ptr(m->Z), nZ_, get_ptr(m->Z_prev));
@@ -1409,12 +1412,10 @@ void FixedStepIntegrator::advance(IntegratorMemory* mem,
 
     // Save state, if needed
     if (nrx_ > 0) {
-      casadi_copy(get_ptr(m->x), nx_, get_ptr(m->x_tape.at(disc_[m->k] + j + 1)));
-      casadi_copy(get_ptr(m->Z), m->Z.size(), get_ptr(m->Z_tape.at(disc_[m->k] + j)));
+      casadi_int tapeind = disc_[m->k] + j;
+      casadi_copy(get_ptr(m->x), nx_, get_ptr(m->x_tape.at(tapeind + 1)));
+      casadi_copy(get_ptr(m->Z), m->Z.size(), get_ptr(m->Z_tape.at(tapeind)));
     }
-
-    // Advance time
-    t += h;
   }
 
   // Return to user
@@ -1430,21 +1431,19 @@ void FixedStepIntegrator::retreat(IntegratorMemory* mem, const double* u,
   // Set controls
   casadi_copy(u, nu_, get_ptr(m->u));
 
-  // Number of finite elements and time steps
-  double h = (tout_.back() - t0_)/static_cast<double>(disc_.back());
-
-  // Get discrete time sought
-  casadi_int k_out = static_cast<casadi_int>(std::floor((m->t_next - t0_)/h));
-  //  make sure that rounding errors does not result in k_out>nk_
-  k_out = std::max(k_out, casadi_int(0));
-  casadi_assert_dev(k_out <= disc_.back());
-
   // Explicit discrete time dynamics
   const Function& G = getExplicitB();
 
+  // Number of finite elements and time steps
+  casadi_int nj = disc_[m->k + 1] - disc_[m->k];
+  double h = (m->t - m->t_next) / nj;
+
+  // Current time
+  double t;
+
   // Discrete dynamics function inputs ...
   std::fill_n(m->arg, G.n_in(), nullptr);
-  m->arg[BSTEP_T0] = &m->t_old;
+  m->arg[BSTEP_T0] = &t;
   m->arg[BSTEP_H] = &h;
   m->arg[BSTEP_P] = get_ptr(m->p);
   m->arg[BSTEP_U] = get_ptr(m->u);
@@ -1459,11 +1458,10 @@ void FixedStepIntegrator::retreat(IntegratorMemory* mem, const double* u,
   m->res[BSTEP_RQF] = get_ptr(m->rq);
   m->res[BSTEP_UQF] = get_ptr(m->uq);
 
-  // Take time steps until end time has been reached
-  while (m->k_old > k_out) {
-    // Advance time
-    m->k_old--;
-    m->t_old = t0_ + static_cast<double>(m->k_old) * h;
+  // Take steps
+  for (casadi_int j = nj; j-- > 0; ) {
+    // Update time
+    t = m->t_next + j * h;
 
     // Update the previous step
     casadi_copy(get_ptr(m->rx), nrx_, get_ptr(m->rx_prev));
@@ -1472,8 +1470,9 @@ void FixedStepIntegrator::retreat(IntegratorMemory* mem, const double* u,
     casadi_copy(get_ptr(m->uq), nuq_, get_ptr(m->uq_prev));
 
     // Take step
-    m->arg[BSTEP_X] = get_ptr(m->x_tape.at(m->k_old));
-    m->arg[BSTEP_Z] = get_ptr(m->Z_tape.at(m->k_old));
+    casadi_int tapeind = disc_[m->k] + j;
+    m->arg[BSTEP_X] = get_ptr(m->x_tape.at(tapeind));
+    m->arg[BSTEP_Z] = get_ptr(m->Z_tape.at(tapeind));
     G(m->arg, m->res, m->iw, m->w);
     casadi_axpy(nrq_, 1., get_ptr(m->rq_prev), get_ptr(m->rq));
     casadi_axpy(nuq_, 1., get_ptr(m->uq_prev), get_ptr(m->uq));
@@ -1514,9 +1513,6 @@ void FixedStepIntegrator::resetB(IntegratorMemory* mem,
     const double* rx, const double* rz, const double* rp) const {
   auto m = static_cast<FixedStepMemory*>(mem);
 
-  // Update time
-  m->t_old = m->t;
-
   // Set parameters
   casadi_copy(rp, nrp_, get_ptr(m->rp));
 
@@ -1527,9 +1523,6 @@ void FixedStepIntegrator::resetB(IntegratorMemory* mem,
   // Reset summation states
   casadi_clear(get_ptr(m->rq), nrq_);
   casadi_clear(get_ptr(m->uq), nuq_);
-
-  // Bring discrete time to the end
-  m->k_old = disc_.back();
 
   // Get consistent initial conditions
   casadi_fill(get_ptr(m->RZ), m->RZ.size(), std::numeric_limits<double>::quiet_NaN());

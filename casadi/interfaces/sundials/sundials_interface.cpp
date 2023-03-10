@@ -275,7 +275,7 @@ namespace casadi {
   void SundialsInterface::resetB(IntegratorMemory* mem,
       const double* rx, const double* rz, const double* rp) const {
     auto m = static_cast<SundialsMemory*>(mem);
-    
+
     // Set parameters
     casadi_copy(rp, nrp_, m->rp);
 
