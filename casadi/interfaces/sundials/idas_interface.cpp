@@ -575,7 +575,7 @@ void IdasInterface::retreat(IntegratorMemory* mem, double t_next, double t_stop,
   if (t_next < m->t) {
     THROWING(IDASolveB, m->mem, t_next, IDA_NORMAL);
     THROWING(IDAGetB, m->mem, m->whichB, &m->t, m->rxz, m->rxzdot);
-    if (nrq_ > 0, nuq_ > 0) {
+    if (nrq_ > 0 || nuq_ > 0) {
       THROWING(IDAGetQuadB, m->mem, m->whichB, &m->t, m->ruq);
     }
   }
