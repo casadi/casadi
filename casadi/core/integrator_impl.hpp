@@ -398,8 +398,8 @@ struct CASADI_EXPORT FixedStepMemory : public IntegratorMemory {
   /// Work vectors, dependent variables
   double *v, *rv;
 
-  // Previous state
-  std::vector<double> x_prev, v_prev, q_prev, rx_prev, rv_prev, rq_prev, uq_prev;
+  /// Work vectors, previous state
+  double *x_prev, *v_prev, *q_prev, *rx_prev, *rv_prev, *rq_prev, *uq_prev;
 
   // Tape
   std::vector<double> x_tape, v_tape;
