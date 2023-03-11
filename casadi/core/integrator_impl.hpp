@@ -399,7 +399,7 @@ struct CASADI_EXPORT FixedStepMemory : public IntegratorMemory {
   std::vector<double> v, rv;
 
   // Tape
-  std::vector<std::vector<double>> x_tape, v_tape;
+  std::vector<double> x_tape, v_tape;
 };
 
 class CASADI_EXPORT FixedStepIntegrator : public Integrator {

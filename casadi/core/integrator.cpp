@@ -1338,8 +1338,8 @@ int FixedStepIntegrator::init_mem(void* mem) const {
 
   // Allocate tape if backward states are present
   if (nrx_>0) {
-    m->x_tape.resize(disc_.back() + 1, std::vector<double>(nx_));
-    m->v_tape.resize(disc_.back(), std::vector<double>(nv_));
+    m->x_tape.resize((disc_.back() + 1) * nx_);
+    m->v_tape.resize(disc_.back() * nv_);
   }
 
   // Allocate state
@@ -1413,14 +1413,14 @@ void FixedStepIntegrator::advance(IntegratorMemory* mem,
     // Save state, if needed
     if (nrx_ > 0) {
       casadi_int tapeind = disc_[m->k] + j;
-      casadi_copy(get_ptr(m->x), nx_, get_ptr(m->x_tape.at(tapeind + 1)));
-      casadi_copy(get_ptr(m->v), m->v.size(), get_ptr(m->v_tape.at(tapeind)));
+      casadi_copy(get_ptr(m->x), nx_, get_ptr(m->x_tape) + nx_ * (tapeind + 1));
+      casadi_copy(get_ptr(m->v), nv_, get_ptr(m->v_tape) + nv_ * tapeind);
     }
   }
 
   // Return to user
   casadi_copy(get_ptr(m->x), nx_, x);
-  casadi_copy(get_ptr(m->v) + m->v.size()-nz_, nz_, z);
+  casadi_copy(get_ptr(m->v) + nv_ - nz_, nz_, z);
   casadi_copy(get_ptr(m->q), nq_, q);
 }
 
@@ -1471,8 +1471,8 @@ void FixedStepIntegrator::retreat(IntegratorMemory* mem, const double* u,
 
     // Take step
     casadi_int tapeind = disc_[m->k] + j;
-    m->arg[BSTEP_X] = get_ptr(m->x_tape.at(tapeind));
-    m->arg[BSTEP_V] = get_ptr(m->v_tape.at(tapeind));
+    m->arg[BSTEP_X] = get_ptr(m->x_tape) + nx_ * tapeind;
+    m->arg[BSTEP_V] = get_ptr(m->v_tape) + nv_ * tapeind;
     G(m->arg, m->res, m->iw, m->w);
     casadi_axpy(nrq_, 1., get_ptr(m->rq_prev), get_ptr(m->rq));
     casadi_axpy(nuq_, 1., get_ptr(m->uq_prev), get_ptr(m->uq));
@@ -1480,7 +1480,7 @@ void FixedStepIntegrator::retreat(IntegratorMemory* mem, const double* u,
 
   // Return to user
   casadi_copy(get_ptr(m->rx), nrx_, rx);
-  casadi_copy(get_ptr(m->rv) + m->rv.size() - nrz_, nrz_, rz);
+  casadi_copy(get_ptr(m->rv) + nrv_ - nrz_, nrz_, rz);
   casadi_copy(get_ptr(m->rq), nrq_, rq);
   casadi_copy(get_ptr(m->uq), nuq_, uq);
 }
@@ -1501,11 +1501,11 @@ reset(IntegratorMemory* mem,
   casadi_clear(get_ptr(m->q), nq_);
 
   // Get consistent initial conditions
-  casadi_fill(get_ptr(m->v), m->v.size(), std::numeric_limits<double>::quiet_NaN());
+  casadi_fill(get_ptr(m->v), nv_, std::numeric_limits<double>::quiet_NaN());
 
   // Add the first element in the tape
-  if (nrx_>0) {
-    casadi_copy(x, nx_, get_ptr(m->x_tape.at(0)));
+  if (nrx_ > 0) {
+    casadi_copy(x, nx_, get_ptr(m->x_tape));
   }
 }
 
@@ -1525,7 +1525,7 @@ void FixedStepIntegrator::resetB(IntegratorMemory* mem,
   casadi_clear(get_ptr(m->uq), nuq_);
 
   // Get consistent initial conditions
-  casadi_fill(get_ptr(m->rv), m->rv.size(), std::numeric_limits<double>::quiet_NaN());
+  casadi_fill(get_ptr(m->rv), nrv_, std::numeric_limits<double>::quiet_NaN());
 }
 
 void FixedStepIntegrator::impulseB(IntegratorMemory* mem,
