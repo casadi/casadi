@@ -1254,7 +1254,7 @@ Function FixedStepIntegrator::create_advanced(const Dict& opts) {
     intg_in[INTEGRATOR_P] = F_in[FSTEP_P];
     intg_in[INTEGRATOR_U] = F_in[FSTEP_U];
     intg_in[INTEGRATOR_Z0] = z0;
-    F_in[FSTEP_Z0] = algebraic_state_init(intg_in[INTEGRATOR_X0], z0);
+    F_in[FSTEP_V0] = algebraic_state_init(intg_in[INTEGRATOR_X0], z0);
 
     // Number of finite elements and time steps
     double h = (tout_.back() - t0_)/static_cast<double>(disc_.back());
@@ -1270,16 +1270,16 @@ Function FixedStepIntegrator::create_advanced(const Dict& opts) {
       F_out = F(F_in);
 
       F_in[FSTEP_X0] = F_out[FSTEP_XF];
-      F_in[FSTEP_Z0] = F_out[FSTEP_RES];
+      F_in[FSTEP_V0] = F_out[FSTEP_VF];
       intg_out[INTEGRATOR_QF] = k==0? F_out[FSTEP_QF] : intg_out[INTEGRATOR_QF]+F_out[FSTEP_QF];
       F_in[FSTEP_T0] += h;
     }
 
     intg_out[INTEGRATOR_XF] = F_out[FSTEP_XF];
 
-    // If-clause needed because rk abuses FSTEP_RES output for intermediate state output
+    // If-clause needed because rk abuses FSTEP_VF output for intermediate state output
     if (nz_) {
-      intg_out[INTEGRATOR_ZF] = algebraic_state_output(F_out[FSTEP_RES]);
+      intg_out[INTEGRATOR_ZF] = algebraic_state_output(F_out[FSTEP_VF]);
     }
 
     // Extract options for Function constructor
@@ -1324,8 +1324,8 @@ void FixedStepIntegrator::init(const Dict& opts) {
   setupFG();
 
   // Get discrete time dimensions
-  nZ_ = F_.nnz_in(FSTEP_Z0);
-  nRZ_ =  G_.is_null() ? 0 : G_.nnz_in(BSTEP_RZ0);
+  nZ_ = F_.nnz_in(FSTEP_V0);
+  nRZ_ =  G_.is_null() ? 0 : G_.nnz_in(BSTEP_RV0);
 }
 
 int FixedStepIntegrator::init_mem(void* mem) const {
@@ -1333,8 +1333,8 @@ int FixedStepIntegrator::init_mem(void* mem) const {
   auto m = static_cast<FixedStepMemory*>(mem);
 
   // Discrete time algebraic variable
-  m->Z.resize(F_.nnz_in(FSTEP_Z0));
-  if (!G_.is_null()) m->RZ.resize(G_.nnz_in(BSTEP_RZ0));
+  m->Z.resize(F_.nnz_in(FSTEP_V0));
+  if (!G_.is_null()) m->RZ.resize(G_.nnz_in(BSTEP_RV0));
 
   // Allocate tape if backward states are present
   if (nrx_>0) {
@@ -1386,14 +1386,14 @@ void FixedStepIntegrator::advance(IntegratorMemory* mem,
   m->arg[FSTEP_T0] = &t;
   m->arg[FSTEP_H] = &h;
   m->arg[FSTEP_X0] = get_ptr(m->x_prev);
-  m->arg[FSTEP_Z0] = get_ptr(m->Z_prev);
+  m->arg[FSTEP_V0] = get_ptr(m->Z_prev);
   m->arg[FSTEP_P] = get_ptr(m->p);
   m->arg[FSTEP_U] = get_ptr(m->u);
 
   // ... and outputs
   std::fill_n(m->res, F.n_out(), nullptr);
   m->res[FSTEP_XF] = get_ptr(m->x);
-  m->res[FSTEP_RES] = get_ptr(m->Z);
+  m->res[FSTEP_VF] = get_ptr(m->Z);
   m->res[FSTEP_QF] = get_ptr(m->q);
 
   // Take steps
@@ -1448,13 +1448,13 @@ void FixedStepIntegrator::retreat(IntegratorMemory* mem, const double* u,
   m->arg[BSTEP_P] = get_ptr(m->p);
   m->arg[BSTEP_U] = get_ptr(m->u);
   m->arg[BSTEP_RX0] = get_ptr(m->rx_prev);
-  m->arg[BSTEP_RZ0] = get_ptr(m->RZ_prev);
+  m->arg[BSTEP_RV0] = get_ptr(m->RZ_prev);
   m->arg[BSTEP_RP] = get_ptr(m->rp);
 
   // ... and outputs
   std::fill_n(m->res, G.n_out(), nullptr);
   m->res[BSTEP_RXF] = get_ptr(m->rx);
-  m->res[BSTEP_RES] = get_ptr(m->RZ);
+  m->res[BSTEP_RVF] = get_ptr(m->RZ);
   m->res[BSTEP_RQF] = get_ptr(m->rq);
   m->res[BSTEP_UQF] = get_ptr(m->uq);
 
@@ -1472,7 +1472,7 @@ void FixedStepIntegrator::retreat(IntegratorMemory* mem, const double* u,
     // Take step
     casadi_int tapeind = disc_[m->k] + j;
     m->arg[BSTEP_X] = get_ptr(m->x_tape.at(tapeind));
-    m->arg[BSTEP_Z] = get_ptr(m->Z_tape.at(tapeind));
+    m->arg[BSTEP_V] = get_ptr(m->Z_tape.at(tapeind));
     G(m->arg, m->res, m->iw, m->w);
     casadi_axpy(nrq_, 1., get_ptr(m->rq_prev), get_ptr(m->rq));
     casadi_axpy(nuq_, 1., get_ptr(m->uq_prev), get_ptr(m->uq));
@@ -1576,20 +1576,20 @@ void ImplicitFixedStepIntegrator::init(const Dict& opts) {
   }
 
   // Complete rootfinder dictionary
-  rootfinder_options["implicit_input"] = FSTEP_Z0;
-  rootfinder_options["implicit_output"] = FSTEP_RES;
+  rootfinder_options["implicit_input"] = FSTEP_V0;
+  rootfinder_options["implicit_output"] = FSTEP_VF;
 
   // Allocate a solver
   rootfinder_ = rootfinder(name_ + "_rootfinder", implicit_function_name,
-                                F_, rootfinder_options);
+    F_, rootfinder_options);
   alloc(rootfinder_);
 
   // Allocate a root-finding solver for the backward problem
   if (nRZ_>0) {
     // Options
     Dict backward_rootfinder_options = rootfinder_options;
-    backward_rootfinder_options["implicit_input"] = BSTEP_RZ0;
-    backward_rootfinder_options["implicit_output"] = BSTEP_RES;
+    backward_rootfinder_options["implicit_input"] = BSTEP_RV0;
+    backward_rootfinder_options["implicit_output"] = BSTEP_RVF;
     std::string backward_implicit_function_name = implicit_function_name;
 
     // Allocate a Newton solver

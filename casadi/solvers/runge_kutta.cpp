@@ -131,13 +131,13 @@ namespace casadi {
       f_arg[FSTEP_T0] = t0;
       f_arg[FSTEP_H] = h;
       f_arg[FSTEP_X0] = x0;
-      f_arg[FSTEP_Z0] = v;
+      f_arg[FSTEP_V0] = v;
       f_arg[FSTEP_P] = p;
       f_arg[FSTEP_U] = u;
       f_res.resize(FSTEP_NUM_OUT);
       f_res[FSTEP_XF] = xf;
       f_res[FSTEP_QF] = qf;
-      f_res[FSTEP_RES] = horzcat(x_def);
+      f_res[FSTEP_VF] = horzcat(x_def);
       F_ = Function("fstep", f_arg, f_res);
       alloc(F_);
     }
@@ -207,13 +207,13 @@ namespace casadi {
       g_arg[BSTEP_X] = x0;
       g_arg[BSTEP_P] = p;
       g_arg[BSTEP_U] = u;
-      g_arg[BSTEP_Z] = v;
+      g_arg[BSTEP_V] = v;
       g_arg[BSTEP_RX0] = rx0;
       g_arg[BSTEP_RP] = rp;
-      g_arg[BSTEP_RZ0] = rv;
+      g_arg[BSTEP_RV0] = rv;
       g_res.resize(BSTEP_NUM_OUT);
       g_res[BSTEP_RXF] = rxf;
-      g_res[BSTEP_RES] = horzcat(rx_def);
+      g_res[BSTEP_RVF] = horzcat(rx_def);
       g_res[BSTEP_RQF] = rqf;
       g_res[BSTEP_UQF] = uqf;
       G_ = Function("bstep", g_arg, g_res);

@@ -326,10 +326,10 @@ enum FStepIn {
   FSTEP_T0,
   /// Step size
   FSTEP_H,
-  /// Differential state
+  /// State vector
   FSTEP_X0,
-  /// Algebraic state
-  FSTEP_Z0,
+  /// Dependent variables
+  FSTEP_V0,
   /// Parameter
   FSTEP_P,
   /// Controls
@@ -340,11 +340,11 @@ enum FStepIn {
 
 /// Output arguments of a forward stepping function
 enum FStepOut {
-  /// Differerential state at the end of the interval
+  /// State vector at next time
   FSTEP_XF,
-  /// Residual equations
-  FSTEP_RES,
-  /// Right hand side of quadratures equations
+  /// Dependent variables at next time
+  FSTEP_VF,
+  /// Quadrature state contribution
   FSTEP_QF,
   /// Number of arguments
   FSTEP_NUM_OUT
@@ -356,17 +356,17 @@ enum BStepIn {
   BSTEP_T0,
   /// Step size
   BSTEP_H,
-  /// Backward differential state
+  /// State vector for backward problem
   BSTEP_RX0,
-  /// Backward algebraic state
-  BSTEP_RZ0,
-  /// Backward  parameter vector
+  /// Dependent variables for backward problem
+  BSTEP_RV0,
+  /// Parameter vector for backward problem
   BSTEP_RP,
-  /// Forward differential state
+  /// State vector for forward problem
   BSTEP_X,
-  /// Forward algebraic state
-  BSTEP_Z,
-  /// Parameter vector
+  /// Dependent variables for forward problem
+  BSTEP_V,
+  /// Parameter vector for forward problem
   BSTEP_P,
   /// Controls
   BSTEP_U,
@@ -376,25 +376,19 @@ enum BStepIn {
 
 /// Output arguments of a backward stepping function
 enum BStepOut {
-  /// Backwards state at the next time
+  /// State vector for backward problem at the next time
   BSTEP_RXF,
-  /// Right hand side of algebraic equations, backwards problem
-  BSTEP_RES,
-  /// Backwards quadrature contribution, summing
+  /// Dependent variables for backward problem at the next time
+  BSTEP_RVF,
+  /// Quadrature state contribution for backward problem, summing
   BSTEP_RQF,
-  /// Backwards quadrature contribution, non-summing
+  /// Quadrature state contribution for backward problem, non-summing
   BSTEP_UQF,
   /// Number of arguments
   BSTEP_NUM_OUT
 };
 
 struct CASADI_EXPORT FixedStepMemory : public IntegratorMemory {
-  // Current time
-  double t_old;
-
-  // Discrete time
-  casadi_int k_old;
-
   // Current state
   std::vector<double> x, z, p, u, q, rx, rz, rp, rq, uq;
 
