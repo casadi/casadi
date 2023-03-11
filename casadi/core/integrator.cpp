@@ -1324,8 +1324,8 @@ void FixedStepIntegrator::init(const Dict& opts) {
   setupFG();
 
   // Get discrete time dimensions
-  nZ_ = F_.nnz_in(FSTEP_V0);
-  nRZ_ =  G_.is_null() ? 0 : G_.nnz_in(BSTEP_RV0);
+  nv_ = F_.nnz_in(FSTEP_V0);
+  nrv_ =  G_.is_null() ? 0 : G_.nnz_in(BSTEP_RV0);
 }
 
 int FixedStepIntegrator::init_mem(void* mem) const {
@@ -1333,13 +1333,13 @@ int FixedStepIntegrator::init_mem(void* mem) const {
   auto m = static_cast<FixedStepMemory*>(mem);
 
   // Discrete time algebraic variable
-  m->Z.resize(F_.nnz_in(FSTEP_V0));
-  if (!G_.is_null()) m->RZ.resize(G_.nnz_in(BSTEP_RV0));
+  m->v.resize(F_.nnz_in(FSTEP_V0));
+  if (!G_.is_null()) m->rv.resize(G_.nnz_in(BSTEP_RV0));
 
   // Allocate tape if backward states are present
   if (nrx_>0) {
     m->x_tape.resize(disc_.back() + 1, std::vector<double>(nx_));
-    m->Z_tape.resize(disc_.back(), std::vector<double>(nZ_));
+    m->v_tape.resize(disc_.back(), std::vector<double>(nv_));
   }
 
   // Allocate state
@@ -1354,10 +1354,10 @@ int FixedStepIntegrator::init_mem(void* mem) const {
   m->rq.resize(nrq_);
   m->uq.resize(nuq_);
   m->x_prev.resize(nx_);
-  m->Z_prev.resize(nZ_);
+  m->v_prev.resize(nv_);
   m->q_prev.resize(nq_);
   m->rx_prev.resize(nrx_);
-  m->RZ_prev.resize(nRZ_);
+  m->rv_prev.resize(nrv_);
   m->rq_prev.resize(nrq_);
   m->uq_prev.resize(nuq_);
 
@@ -1386,14 +1386,14 @@ void FixedStepIntegrator::advance(IntegratorMemory* mem,
   m->arg[FSTEP_T0] = &t;
   m->arg[FSTEP_H] = &h;
   m->arg[FSTEP_X0] = get_ptr(m->x_prev);
-  m->arg[FSTEP_V0] = get_ptr(m->Z_prev);
+  m->arg[FSTEP_V0] = get_ptr(m->v_prev);
   m->arg[FSTEP_P] = get_ptr(m->p);
   m->arg[FSTEP_U] = get_ptr(m->u);
 
   // ... and outputs
   std::fill_n(m->res, F.n_out(), nullptr);
   m->res[FSTEP_XF] = get_ptr(m->x);
-  m->res[FSTEP_VF] = get_ptr(m->Z);
+  m->res[FSTEP_VF] = get_ptr(m->v);
   m->res[FSTEP_QF] = get_ptr(m->q);
 
   // Take steps
@@ -1403,7 +1403,7 @@ void FixedStepIntegrator::advance(IntegratorMemory* mem,
 
     // Update the previous step
     casadi_copy(get_ptr(m->x), nx_, get_ptr(m->x_prev));
-    casadi_copy(get_ptr(m->Z), nZ_, get_ptr(m->Z_prev));
+    casadi_copy(get_ptr(m->v), nv_, get_ptr(m->v_prev));
     casadi_copy(get_ptr(m->q), nq_, get_ptr(m->q_prev));
 
     // Take step
@@ -1414,13 +1414,13 @@ void FixedStepIntegrator::advance(IntegratorMemory* mem,
     if (nrx_ > 0) {
       casadi_int tapeind = disc_[m->k] + j;
       casadi_copy(get_ptr(m->x), nx_, get_ptr(m->x_tape.at(tapeind + 1)));
-      casadi_copy(get_ptr(m->Z), m->Z.size(), get_ptr(m->Z_tape.at(tapeind)));
+      casadi_copy(get_ptr(m->v), m->v.size(), get_ptr(m->v_tape.at(tapeind)));
     }
   }
 
   // Return to user
   casadi_copy(get_ptr(m->x), nx_, x);
-  casadi_copy(get_ptr(m->Z) + m->Z.size()-nz_, nz_, z);
+  casadi_copy(get_ptr(m->v) + m->v.size()-nz_, nz_, z);
   casadi_copy(get_ptr(m->q), nq_, q);
 }
 
@@ -1448,13 +1448,13 @@ void FixedStepIntegrator::retreat(IntegratorMemory* mem, const double* u,
   m->arg[BSTEP_P] = get_ptr(m->p);
   m->arg[BSTEP_U] = get_ptr(m->u);
   m->arg[BSTEP_RX0] = get_ptr(m->rx_prev);
-  m->arg[BSTEP_RV0] = get_ptr(m->RZ_prev);
+  m->arg[BSTEP_RV0] = get_ptr(m->rv_prev);
   m->arg[BSTEP_RP] = get_ptr(m->rp);
 
   // ... and outputs
   std::fill_n(m->res, G.n_out(), nullptr);
   m->res[BSTEP_RXF] = get_ptr(m->rx);
-  m->res[BSTEP_RVF] = get_ptr(m->RZ);
+  m->res[BSTEP_RVF] = get_ptr(m->rv);
   m->res[BSTEP_RQF] = get_ptr(m->rq);
   m->res[BSTEP_UQF] = get_ptr(m->uq);
 
@@ -1465,14 +1465,14 @@ void FixedStepIntegrator::retreat(IntegratorMemory* mem, const double* u,
 
     // Update the previous step
     casadi_copy(get_ptr(m->rx), nrx_, get_ptr(m->rx_prev));
-    casadi_copy(get_ptr(m->RZ), nRZ_, get_ptr(m->RZ_prev));
+    casadi_copy(get_ptr(m->rv), nrv_, get_ptr(m->rv_prev));
     casadi_copy(get_ptr(m->rq), nrq_, get_ptr(m->rq_prev));
     casadi_copy(get_ptr(m->uq), nuq_, get_ptr(m->uq_prev));
 
     // Take step
     casadi_int tapeind = disc_[m->k] + j;
     m->arg[BSTEP_X] = get_ptr(m->x_tape.at(tapeind));
-    m->arg[BSTEP_V] = get_ptr(m->Z_tape.at(tapeind));
+    m->arg[BSTEP_V] = get_ptr(m->v_tape.at(tapeind));
     G(m->arg, m->res, m->iw, m->w);
     casadi_axpy(nrq_, 1., get_ptr(m->rq_prev), get_ptr(m->rq));
     casadi_axpy(nuq_, 1., get_ptr(m->uq_prev), get_ptr(m->uq));
@@ -1480,7 +1480,7 @@ void FixedStepIntegrator::retreat(IntegratorMemory* mem, const double* u,
 
   // Return to user
   casadi_copy(get_ptr(m->rx), nrx_, rx);
-  casadi_copy(get_ptr(m->RZ) + m->RZ.size() - nrz_, nrz_, rz);
+  casadi_copy(get_ptr(m->rv) + m->rv.size() - nrz_, nrz_, rz);
   casadi_copy(get_ptr(m->rq), nrq_, rq);
   casadi_copy(get_ptr(m->uq), nuq_, uq);
 }
@@ -1501,7 +1501,7 @@ reset(IntegratorMemory* mem,
   casadi_clear(get_ptr(m->q), nq_);
 
   // Get consistent initial conditions
-  casadi_fill(get_ptr(m->Z), m->Z.size(), std::numeric_limits<double>::quiet_NaN());
+  casadi_fill(get_ptr(m->v), m->v.size(), std::numeric_limits<double>::quiet_NaN());
 
   // Add the first element in the tape
   if (nrx_>0) {
@@ -1525,7 +1525,7 @@ void FixedStepIntegrator::resetB(IntegratorMemory* mem,
   casadi_clear(get_ptr(m->uq), nuq_);
 
   // Get consistent initial conditions
-  casadi_fill(get_ptr(m->RZ), m->RZ.size(), std::numeric_limits<double>::quiet_NaN());
+  casadi_fill(get_ptr(m->rv), m->rv.size(), std::numeric_limits<double>::quiet_NaN());
 }
 
 void FixedStepIntegrator::impulseB(IntegratorMemory* mem,
@@ -1585,7 +1585,7 @@ void ImplicitFixedStepIntegrator::init(const Dict& opts) {
   alloc(rootfinder_);
 
   // Allocate a root-finding solver for the backward problem
-  if (nRZ_>0) {
+  if (nrv_>0) {
     // Options
     Dict backward_rootfinder_options = rootfinder_options;
     backward_rootfinder_options["implicit_input"] = BSTEP_RV0;
@@ -1783,8 +1783,8 @@ void FixedStepIntegrator::serialize_body(SerializingStream &s) const {
   s.pack("FixedStepIntegrator::G", G_);
   //s.pack("FixedStepIntegrator::nk", nk_);
   //s.pack("FixedStepIntegrator::h", h_);
-  s.pack("FixedStepIntegrator::nZ", nZ_);
-  s.pack("FixedStepIntegrator::nRZ", nRZ_);
+  s.pack("FixedStepIntegrator::nZ", nv_);
+  s.pack("FixedStepIntegrator::nRZ", nrv_);
 }
 
 FixedStepIntegrator::FixedStepIntegrator(DeserializingStream & s) : Integrator(s) {
@@ -1793,8 +1793,8 @@ FixedStepIntegrator::FixedStepIntegrator(DeserializingStream & s) : Integrator(s
   s.unpack("FixedStepIntegrator::G", G_);
   //s.unpack("FixedStepIntegrator::nk", nk_);
   //s.unpack("FixedStepIntegrator::h", h_);
-  s.unpack("FixedStepIntegrator::nZ", nZ_);
-  s.unpack("FixedStepIntegrator::nRZ", nRZ_);
+  s.unpack("FixedStepIntegrator::nZ", nv_);
+  s.unpack("FixedStepIntegrator::nRZ", nrv_);
 }
 
 void ImplicitFixedStepIntegrator::serialize_body(SerializingStream &s) const {

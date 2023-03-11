@@ -393,13 +393,13 @@ struct CASADI_EXPORT FixedStepMemory : public IntegratorMemory {
   std::vector<double> x, z, p, u, q, rx, rz, rp, rq, uq;
 
   // Previous state
-  std::vector<double> x_prev, Z_prev, q_prev, rx_prev, RZ_prev, rq_prev, uq_prev;
+  std::vector<double> x_prev, v_prev, q_prev, rx_prev, rv_prev, rq_prev, uq_prev;
 
-  /// Algebraic variables for the discrete time integration
-  std::vector<double> Z, RZ;
+  /// Dependent variables for the discrete time integration
+  std::vector<double> v, rv;
 
   // Tape
-  std::vector<std::vector<double> > x_tape, Z_tape;
+  std::vector<std::vector<double>> x_tape, v_tape;
 };
 
 class CASADI_EXPORT FixedStepIntegrator : public Integrator {
@@ -479,8 +479,8 @@ class CASADI_EXPORT FixedStepIntegrator : public Integrator {
   // Number of steps per control interval
   std::vector<casadi_int> disc_;
 
-  /// Number of algebraic variables for the discrete time integration
-  casadi_int nZ_, nRZ_;
+  /// Number of dependent variables in the discrete time integration
+  casadi_int nv_, nrv_;
 
   /** \brief Serialize an object without type information
 

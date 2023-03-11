@@ -327,13 +327,13 @@ namespace casadi {
     // Reset the base classes
     ImplicitFixedStepIntegrator::reset(mem, x, z, p);
 
-    // Initial guess for Z
-    double* Z = get_ptr(m->Z);
+    // Initial guess for v
+    double* v = get_ptr(m->v);
     for (casadi_int d = 0; d < deg_; ++d) {
-      casadi_copy(x, nx_, Z);
-      Z += nx_;
-      casadi_copy(z, nz_, Z);
-      Z += nz_;
+      casadi_copy(x, nx_, v);
+      v += nx_;
+      casadi_copy(z, nz_, v);
+      v += nz_;
     }
   }
 
@@ -344,13 +344,13 @@ namespace casadi {
     // Reset the base classes
     ImplicitFixedStepIntegrator::resetB(mem, rx, rz, rp);
 
-    // Initial guess for RZ
-    double* RZ = get_ptr(m->RZ);
+    // Initial guess for rv
+    double* rv = get_ptr(m->rv);
     for (casadi_int d = 0; d < deg_; ++d) {
-      casadi_copy(rx, nrx_, RZ);
-      RZ += nrx_;
-      casadi_copy(rz, nrz_, RZ);
-      RZ += nrz_;
+      casadi_copy(rx, nrx_, rv);
+      rv += nrx_;
+      casadi_copy(rz, nrz_, rv);
+      rv += nrz_;
     }
   }
 
