@@ -1341,11 +1341,11 @@ void FixedStepIntegrator::init(const Dict& opts) {
   alloc_w(nrq_, true); // rq
   alloc_w(nuq_, true); // uq
 
-  /// Work vectors, dependent variables
+  // Work vectors, dependent variables
   alloc_w(nv_, true); // v
   alloc_w(nrv_, true); // rv
 
-  /// Work vectors, previous state
+  // Work vectors, previous state
   alloc_w(nx_, true); // x_prev
   alloc_w(nv_, true); // v_prev
   alloc_w(nq_, true); // q_prev
@@ -1353,6 +1353,12 @@ void FixedStepIntegrator::init(const Dict& opts) {
   alloc_w(nrv_, true); // rv_prev
   alloc_w(nrq_, true); // rq_prev
   alloc_w(nuq_, true); // uq_prev
+
+  // Allocate tape if backward states are present
+  if (nrx_ > 0) {
+    alloc_w((disc_.back() + 1) * nx_, true); // x_tape
+    alloc_w(disc_.back() * nv_, true); // v_tape
+  }
 }
 
 void FixedStepIntegrator::set_work(void* mem, const double**& arg, double**& res,
@@ -1376,11 +1382,11 @@ void FixedStepIntegrator::set_work(void* mem, const double**& arg, double**& res
   m->rq = w; w += nrq_;
   m->uq = w; w += nuq_;
 
-  /// Work vectors, dependent variables
+  // Work vectors, dependent variables
   m->v = w; w += nv_;
   m->rv = w; w += nrv_;
 
-  /// Work vectors, previous state
+  // Work vectors, previous state
   m->x_prev = w; w += nx_;
   m->v_prev = w; w += nv_;
   m->q_prev = w; w += nq_;
@@ -1388,17 +1394,17 @@ void FixedStepIntegrator::set_work(void* mem, const double**& arg, double**& res
   m->rv_prev = w; w += nrv_;
   m->rq_prev = w; w += nrq_;
   m->uq_prev = w; w += nuq_;
+
+  // Allocate tape if backward states are present
+  if (nrx_ > 0) {
+    m->x_tape = w; w += (disc_.back() + 1) * nx_;
+    m->v_tape = w; w += disc_.back() * nv_;
+  }
 }
 
 int FixedStepIntegrator::init_mem(void* mem) const {
   if (Integrator::init_mem(mem)) return 1;
   auto m = static_cast<FixedStepMemory*>(mem);
-
-  // Allocate tape if backward states are present
-  if (nrx_>0) {
-    m->x_tape.resize((disc_.back() + 1) * nx_);
-    m->v_tape.resize(disc_.back() * nv_);
-  }
 
   return 0;
 }
@@ -1453,8 +1459,8 @@ void FixedStepIntegrator::advance(IntegratorMemory* mem,
     // Save state, if needed
     if (nrx_ > 0) {
       casadi_int tapeind = disc_[m->k] + j;
-      casadi_copy(m->x, nx_, get_ptr(m->x_tape) + nx_ * (tapeind + 1));
-      casadi_copy(m->v, nv_, get_ptr(m->v_tape) + nv_ * tapeind);
+      casadi_copy(m->x, nx_, m->x_tape + nx_ * (tapeind + 1));
+      casadi_copy(m->v, nv_, m->v_tape + nv_ * tapeind);
     }
   }
 
@@ -1511,8 +1517,8 @@ void FixedStepIntegrator::retreat(IntegratorMemory* mem, const double* u,
 
     // Take step
     casadi_int tapeind = disc_[m->k] + j;
-    m->arg[BSTEP_X] = get_ptr(m->x_tape) + nx_ * tapeind;
-    m->arg[BSTEP_V] = get_ptr(m->v_tape) + nv_ * tapeind;
+    m->arg[BSTEP_X] = m->x_tape + nx_ * tapeind;
+    m->arg[BSTEP_V] = m->v_tape + nv_ * tapeind;
     G(m->arg, m->res, m->iw, m->w);
     casadi_axpy(nrq_, 1., m->rq_prev, m->rq);
     casadi_axpy(nuq_, 1., m->uq_prev, m->uq);
@@ -1545,7 +1551,7 @@ reset(IntegratorMemory* mem,
 
   // Add the first element in the tape
   if (nrx_ > 0) {
-    casadi_copy(x, nx_, get_ptr(m->x_tape));
+    casadi_copy(x, nx_, m->x_tape);
   }
 }
 
