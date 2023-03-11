@@ -390,7 +390,8 @@ enum BStepOut {
 
 struct CASADI_EXPORT FixedStepMemory : public IntegratorMemory {
   // Current state
-  std::vector<double> x, z, p, u, q, rx, rz, rp, rq, uq;
+  double *x, *z, *p, *u, *q;
+  std::vector<double> rx, rz, rp, rq, uq;
 
   // Previous state
   std::vector<double> x_prev, v_prev, q_prev, rx_prev, rv_prev, rq_prev, uq_prev;
@@ -422,6 +423,10 @@ class CASADI_EXPORT FixedStepIntegrator : public Integrator {
 
   /// Initialize stage
   void init(const Dict& opts) override;
+
+  /** \brief Set the (persistent) work vectors */
+  void set_work(void* mem, const double**& arg, double**& res,
+    casadi_int*& iw, double*& w) const override;
 
   /** Helper for a more powerful 'integrator' factory */
   Function create_advanced(const Dict& opts) override;
