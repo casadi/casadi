@@ -851,29 +851,41 @@ int CvodesInterface::lsolveB(CVodeMem cv_mem, N_Vector b, N_Vector weight,
   }
 }
 
-Function CvodesInterface::getJ(bool b) const {
-  return oracle_.is_a("SXFunction") ? getJ<SX>(b) : getJ<MX>(b);
+Function CvodesInterface::get_jacF() const {
+  if (oracle_.is_a("SXFunction")) {
+    return get_jacF<SX>();
+  } else {
+    return get_jacF<MX>();
+  }
 }
 
 template<typename MatType>
-Function CvodesInterface::getJ(bool backward) const {
+Function CvodesInterface::get_jacF() const {
   std::vector<MatType> a = MatType::get_input(oracle_);
   std::vector<MatType> r = const_cast<Function&>(oracle_)(a); // NOLINT
   MatType c_x = MatType::sym("c_x");
   MatType c_xdot = MatType::sym("c_xdot");
+  MatType J = c_x*MatType::jacobian(r[DYN_ODE], a[DYN_X]) + c_xdot*MatType::eye(nx_);
+  return Function("jacF", {a[DYN_T], a[DYN_X], a[DYN_P], a[DYN_U], c_x, c_xdot}, {J});
+}
 
-  // Get the Jacobian in the Newton iteration
-  if (backward) {
-    MatType jac = c_x*MatType::jacobian(r[DYN_RODE], a[DYN_RX])
-                + c_xdot*MatType::eye(nrx_);
-    return Function("jacB",
-                    {a[DYN_T], a[DYN_RX], a[DYN_RP],
-                      a[DYN_X], a[DYN_P], a[DYN_U], c_x, c_xdot}, {jac});
-    } else {
-    MatType jac = c_x*MatType::jacobian(r[DYN_ODE], a[DYN_X])
-                + c_xdot*MatType::eye(nx_);
-    return Function("jacF", {a[DYN_T], a[DYN_X], a[DYN_P], a[DYN_U], c_x, c_xdot}, {jac});
+Function CvodesInterface::get_jacB() const {
+  if (oracle_.is_a("SXFunction")) {
+    return get_jacB<SX>();
+  } else {
+    return get_jacB<MX>();
   }
+}
+
+template<typename MatType>
+Function CvodesInterface::get_jacB() const {
+  std::vector<MatType> a = MatType::get_input(oracle_);
+  std::vector<MatType> r = const_cast<Function&>(oracle_)(a); // NOLINT
+  MatType c_x = MatType::sym("c_x");
+  MatType c_xdot = MatType::sym("c_xdot");
+  MatType J = c_x*MatType::jacobian(r[DYN_RODE], a[DYN_RX]) + c_xdot*MatType::eye(nrx_);
+  return Function("jacB", {a[DYN_T], a[DYN_RX], a[DYN_RP],
+    a[DYN_X], a[DYN_P], a[DYN_U], c_x, c_xdot}, {J});
 }
 
 CvodesMemory::CvodesMemory(const CvodesInterface& s) : self(s) {

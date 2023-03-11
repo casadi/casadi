@@ -1041,37 +1041,51 @@ int IdasInterface::lsolveB(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector
   }
 }
 
-Function IdasInterface::getJ(bool backward) const {
-  return oracle_.is_a("SXFunction") ? getJ<SX>(backward) : getJ<MX>(backward);
+Function IdasInterface::get_jacF() const {
+  if (oracle_.is_a("SXFunction")) {
+    return get_jacF<SX>();
+  } else {
+    return get_jacF<MX>();
+  }
 }
 
 template<typename MatType>
-Function IdasInterface::getJ(bool backward) const {
+Function IdasInterface::get_jacF() const {
   std::vector<MatType> a = MatType::get_input(oracle_);
   std::vector<MatType> r = const_cast<Function&>(oracle_)(a); // NOLINT
   MatType cj = MatType::sym("cj");
-
-  // Get the Jacobian in the Newton iteration
-  if (backward) {
-    MatType jac = MatType::jacobian(r[DYN_RODE], a[DYN_RX]) + cj*MatType::eye(nrx_);
-    if (nrz_>0) {
-      jac = horzcat(vertcat(jac,
-                            MatType::jacobian(r[DYN_RALG], a[DYN_RX])),
-                    vertcat(MatType::jacobian(r[DYN_RODE], a[DYN_RZ]),
-                            MatType::jacobian(r[DYN_RALG], a[DYN_RZ])));
-    }
-    return Function("jacB", {a[DYN_T], a[DYN_RX], a[DYN_RZ], a[DYN_RP],
-                              a[DYN_X], a[DYN_Z], a[DYN_P], a[DYN_U], cj}, {jac});
-    } else {
-    MatType jac = MatType::jacobian(r[DYN_ODE], a[DYN_X]) - cj*MatType::eye(nx_);
-    if (nz_>0) {
-      jac = horzcat(vertcat(jac,
-                            MatType::jacobian(r[DYN_ALG], a[DYN_X])),
-                    vertcat(MatType::jacobian(r[DYN_ODE], a[DYN_Z]),
-                            MatType::jacobian(r[DYN_ALG], a[DYN_Z])));
-    }
-    return Function("jacF", {a[DYN_T], a[DYN_X], a[DYN_Z], a[DYN_P], a[DYN_U], cj}, {jac});
+  MatType J = MatType::jacobian(r[DYN_ODE], a[DYN_X]) - cj*MatType::eye(nx_);
+  if (nz_ > 0) {
+    J = horzcat(vertcat(J,
+                        MatType::jacobian(r[DYN_ALG], a[DYN_X])),
+                vertcat(MatType::jacobian(r[DYN_ODE], a[DYN_Z]),
+                        MatType::jacobian(r[DYN_ALG], a[DYN_Z])));
   }
+  return Function("jacF", {a[DYN_T], a[DYN_X], a[DYN_Z], a[DYN_P], a[DYN_U], cj}, {J});
+}
+
+Function IdasInterface::get_jacB() const {
+  if (oracle_.is_a("SXFunction")) {
+    return get_jacB<SX>();
+  } else {
+    return get_jacB<MX>();
+  }
+}
+
+template<typename MatType>
+Function IdasInterface::get_jacB() const {
+  std::vector<MatType> a = MatType::get_input(oracle_);
+  std::vector<MatType> r = const_cast<Function&>(oracle_)(a); // NOLINT
+  MatType cj = MatType::sym("cj");
+  MatType J = MatType::jacobian(r[DYN_RODE], a[DYN_RX]) + cj*MatType::eye(nrx_);
+  if (nrz_>0) {
+    J = horzcat(vertcat(J,
+                        MatType::jacobian(r[DYN_RALG], a[DYN_RX])),
+                vertcat(MatType::jacobian(r[DYN_RODE], a[DYN_RZ]),
+                        MatType::jacobian(r[DYN_RALG], a[DYN_RZ])));
+  }
+  return Function("jacB", {a[DYN_T], a[DYN_RX], a[DYN_RZ], a[DYN_RP],
+    a[DYN_X], a[DYN_Z], a[DYN_P], a[DYN_U], cj}, {J});
 }
 
 IdasMemory::IdasMemory(const IdasInterface& s) : self(s) {

@@ -152,9 +152,15 @@ namespace casadi {
     }
 
     ///@{
-    // Get system Jacobian
-    Function getJ(bool backward) const override;
-    template<typename MatType> Function getJ(bool backward) const;
+    // Get system Jacobian, forward problem
+    Function get_jacF() const override;
+    template<typename MatType> Function get_jacF() const;
+    ///@}
+
+    ///@{
+    // Get system Jacobian, backward problem
+    Function get_jacB() const override;
+    template<typename MatType> Function get_jacB() const;
     ///@}
 
     /// A documentation string

@@ -204,26 +204,44 @@ namespace casadi {
       casadi_error("Unknown interpolation type: " + interpolation_type);
     }
 
-    // Get or create Jacobians and linear system solvers
-    for (bool backward : {false, true}) {
-      // Skip backward?
-      if (backward && nrx_==0) continue;
+    // If derivative, use Jacobian from non-augmented system if possible
+    SundialsInterface* d = 0;
+    if (ns_ > 0) {
+      d = derivative_of_.get<SundialsInterface>();
+      casadi_assert_dev(d != nullptr);
+    }
 
-      // Get Jacobian function
-      Function J;
-      if (ns_==0) {
-        J = getJ(backward);
+    // Get Jacobian function, forward problem
+    Function jacF;
+    if (d == 0) {
+      jacF = get_jacF();
+    } else if (d->ns_ == 0) {
+      jacF = d->get_function("jacF");
+    } else {
+      jacF = d->get_jacF();
+    }
+    set_function(jacF, jacF.name(), true);
+    alloc_w(jacF.nnz_out(0), true);
+
+    // Linear solver for forward problem
+    linsolF_ = Linsol("linsolF", linear_solver_, jacF.sparsity_out(0), linear_solver_options_);
+
+    // Initialize backward problem
+    if (nrx_ > 0) {
+      // Get Jacobian function, backward problem
+      Function jacB;
+      if (d == 0) {
+        jacB = get_jacB();
+      } else if (d->ns_ == 0) {
+        jacB = d->get_function("jacB");
       } else {
-        SundialsInterface* d = derivative_of_.get<SundialsInterface>();
-        casadi_assert_dev(d!=nullptr);
-        if (d->ns_==0) {
-          J = backward ? d->get_function("jacB") : d->get_function("jacF");
-        } else {
-          J = d->getJ(backward);
-        }
+        jacB = d->get_jacB();
       }
-      set_function(J, J.name(), true);
-      alloc_w(J.nnz_out(0), true);
+      set_function(jacB, jacB.name(), true);
+      alloc_w(jacB.nnz_out(0), true);
+
+      // Linear solver for backward problem
+      linsolB_ = Linsol("linsolB", linear_solver_, jacB.sparsity_out(0), linear_solver_options_);
     }
 
     // Allocate work vectors
@@ -231,14 +249,6 @@ namespace casadi {
     alloc_w(nu_, true); // u
     alloc_w(nrp_, true); // rp
     alloc_w(2 * std::max(nx_+nz_, nrx_+nrz_), true); // v1, v2
-
-    // Allocate linear solvers
-    linsolF_ = Linsol("linsolF", linear_solver_,
-      get_function("jacF").sparsity_out(0), linear_solver_options_);
-    if (nrx_>0) {
-      linsolB_ = Linsol("linsolB", linear_solver_,
-        get_function("jacB").sparsity_out(0), linear_solver_options_);
-    }
   }
 
   int SundialsInterface::init_mem(void* mem) const {
