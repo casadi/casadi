@@ -1333,8 +1333,8 @@ int FixedStepIntegrator::init_mem(void* mem) const {
   auto m = static_cast<FixedStepMemory*>(mem);
 
   // Discrete time algebraic variable
-  m->v.resize(F_.nnz_in(FSTEP_V0));
-  if (!G_.is_null()) m->rv.resize(G_.nnz_in(BSTEP_RV0));
+  m->v.resize(nv_);
+  m->rv.resize(nrv_);
 
   // Allocate tape if backward states are present
   if (nrx_>0) {
