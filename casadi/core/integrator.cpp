@@ -1327,12 +1327,14 @@ void FixedStepIntegrator::init(const Dict& opts) {
   nv_ = F_.nnz_in(FSTEP_V0);
   nrv_ =  G_.is_null() ? 0 : G_.nnz_in(BSTEP_RV0);
 
-  // Allocate work vectors
+  // Work vectors, forward problem
   alloc_w(nx_, true); // x
   alloc_w(nz_, true); // z
   alloc_w(np_, true); // p
   alloc_w(nu_, true); // u
   alloc_w(nq_, true); // q
+
+  // Work vectors, backward problem
   alloc_w(nrx_, true); // rx
   alloc_w(nrz_, true); // rz
   alloc_w(nrp_, true); // rp
@@ -1347,12 +1349,20 @@ void FixedStepIntegrator::set_work(void* mem, const double**& arg, double**& res
   // Set work in base classes
   Integrator::set_work(mem, arg, res, iw, w);
 
-  // Work vectors
+  // Work vectors, forward problem
   m->x = w; w += nx_;
   m->z = w; w += nz_;
   m->p = w; w += np_;
   m->u = w; w += nu_;
   m->q = w; w += nq_;
+
+  // Work vectors, backward problem
+  m->rx = w; w += nrx_;
+  m->rz = w; w += nrz_;
+  m->rp = w; w += nrp_;
+  m->rq = w; w += nrq_;
+  m->uq = w; w += nuq_;
+
 }
 
 int FixedStepIntegrator::init_mem(void* mem) const {
@@ -1370,11 +1380,6 @@ int FixedStepIntegrator::init_mem(void* mem) const {
   }
 
   // Allocate state
-  m->rx.resize(nrx_);
-  m->rz.resize(nrz_);
-  m->rp.resize(nrp_);
-  m->rq.resize(nrq_);
-  m->uq.resize(nuq_);
   m->x_prev.resize(nx_);
   m->v_prev.resize(nv_);
   m->q_prev.resize(nq_);
@@ -1472,14 +1477,14 @@ void FixedStepIntegrator::retreat(IntegratorMemory* mem, const double* u,
   m->arg[BSTEP_U] = m->u;
   m->arg[BSTEP_RX0] = get_ptr(m->rx_prev);
   m->arg[BSTEP_RV0] = get_ptr(m->rv_prev);
-  m->arg[BSTEP_RP] = get_ptr(m->rp);
+  m->arg[BSTEP_RP] = m->rp;
 
   // ... and outputs
   std::fill_n(m->res, G.n_out(), nullptr);
-  m->res[BSTEP_RXF] = get_ptr(m->rx);
+  m->res[BSTEP_RXF] = m->rx;
   m->res[BSTEP_RVF] = get_ptr(m->rv);
-  m->res[BSTEP_RQF] = get_ptr(m->rq);
-  m->res[BSTEP_UQF] = get_ptr(m->uq);
+  m->res[BSTEP_RQF] = m->rq;
+  m->res[BSTEP_UQF] = m->uq;
 
   // Take steps
   for (casadi_int j = nj; j-- > 0; ) {
@@ -1487,25 +1492,25 @@ void FixedStepIntegrator::retreat(IntegratorMemory* mem, const double* u,
     t = m->t_next + j * h;
 
     // Update the previous step
-    casadi_copy(get_ptr(m->rx), nrx_, get_ptr(m->rx_prev));
+    casadi_copy(m->rx, nrx_, get_ptr(m->rx_prev));
     casadi_copy(get_ptr(m->rv), nrv_, get_ptr(m->rv_prev));
-    casadi_copy(get_ptr(m->rq), nrq_, get_ptr(m->rq_prev));
-    casadi_copy(get_ptr(m->uq), nuq_, get_ptr(m->uq_prev));
+    casadi_copy(m->rq, nrq_, get_ptr(m->rq_prev));
+    casadi_copy(m->uq, nuq_, get_ptr(m->uq_prev));
 
     // Take step
     casadi_int tapeind = disc_[m->k] + j;
     m->arg[BSTEP_X] = get_ptr(m->x_tape) + nx_ * tapeind;
     m->arg[BSTEP_V] = get_ptr(m->v_tape) + nv_ * tapeind;
     G(m->arg, m->res, m->iw, m->w);
-    casadi_axpy(nrq_, 1., get_ptr(m->rq_prev), get_ptr(m->rq));
-    casadi_axpy(nuq_, 1., get_ptr(m->uq_prev), get_ptr(m->uq));
+    casadi_axpy(nrq_, 1., get_ptr(m->rq_prev), m->rq);
+    casadi_axpy(nuq_, 1., get_ptr(m->uq_prev), m->uq);
   }
 
   // Return to user
-  casadi_copy(get_ptr(m->rx), nrx_, rx);
+  casadi_copy(m->rx, nrx_, rx);
   casadi_copy(get_ptr(m->rv) + nrv_ - nrz_, nrz_, rz);
-  casadi_copy(get_ptr(m->rq), nrq_, rq);
-  casadi_copy(get_ptr(m->uq), nuq_, uq);
+  casadi_copy(m->rq, nrq_, rq);
+  casadi_copy(m->uq, nuq_, uq);
 }
 
 void FixedStepIntegrator::
@@ -1537,15 +1542,15 @@ void FixedStepIntegrator::resetB(IntegratorMemory* mem,
   auto m = static_cast<FixedStepMemory*>(mem);
 
   // Set parameters
-  casadi_copy(rp, nrp_, get_ptr(m->rp));
+  casadi_copy(rp, nrp_, m->rp);
 
   // Update the state
-  casadi_copy(rx, nrx_, get_ptr(m->rx));
-  casadi_copy(rz, nrz_, get_ptr(m->rz));
+  casadi_copy(rx, nrx_, m->rx);
+  casadi_copy(rz, nrz_, m->rz);
 
   // Reset summation states
-  casadi_clear(get_ptr(m->rq), nrq_);
-  casadi_clear(get_ptr(m->uq), nuq_);
+  casadi_clear(m->rq, nrq_);
+  casadi_clear(m->uq, nuq_);
 
   // Get consistent initial conditions
   casadi_fill(get_ptr(m->rv), nrv_, std::numeric_limits<double>::quiet_NaN());
@@ -1555,11 +1560,11 @@ void FixedStepIntegrator::impulseB(IntegratorMemory* mem,
     const double* rx, const double* rz, const double* rp) const {
   auto m = static_cast<FixedStepMemory*>(mem);
   // Add impulse to backward parameters
-  casadi_axpy(nrp_, 1., rp, get_ptr(m->rp));
+  casadi_axpy(nrp_, 1., rp, m->rp);
 
   // Add impulse to state
-  casadi_axpy(nrx_, 1., rx, get_ptr(m->rx));
-  casadi_axpy(nrz_, 1., rz, get_ptr(m->rz));
+  casadi_axpy(nrx_, 1., rx, m->rx);
+  casadi_axpy(nrz_, 1., rz, m->rz);
 }
 
 ImplicitFixedStepIntegrator::ImplicitFixedStepIntegrator(
