@@ -1340,6 +1340,10 @@ void FixedStepIntegrator::init(const Dict& opts) {
   alloc_w(nrp_, true); // rp
   alloc_w(nrq_, true); // rq
   alloc_w(nuq_, true); // uq
+
+  /// Work vectors, dependent variables
+  alloc_w(nv_, true); // v
+  alloc_w(nrv_, true); // rv
 }
 
 void FixedStepIntegrator::set_work(void* mem, const double**& arg, double**& res,
@@ -1363,15 +1367,14 @@ void FixedStepIntegrator::set_work(void* mem, const double**& arg, double**& res
   m->rq = w; w += nrq_;
   m->uq = w; w += nuq_;
 
+  /// Work vectors, dependent variables
+  m->v = w; w += nv_;
+  m->rv = w; w += nrv_;
 }
 
 int FixedStepIntegrator::init_mem(void* mem) const {
   if (Integrator::init_mem(mem)) return 1;
   auto m = static_cast<FixedStepMemory*>(mem);
-
-  // Discrete time algebraic variable
-  m->v.resize(nv_);
-  m->rv.resize(nrv_);
 
   // Allocate tape if backward states are present
   if (nrx_>0) {
@@ -1421,7 +1424,7 @@ void FixedStepIntegrator::advance(IntegratorMemory* mem,
   // ... and outputs
   std::fill_n(m->res, F.n_out(), nullptr);
   m->res[FSTEP_XF] = m->x;
-  m->res[FSTEP_VF] = get_ptr(m->v);
+  m->res[FSTEP_VF] = m->v;
   m->res[FSTEP_QF] = m->q;
 
   // Take steps
@@ -1431,7 +1434,7 @@ void FixedStepIntegrator::advance(IntegratorMemory* mem,
 
     // Update the previous step
     casadi_copy(m->x, nx_, get_ptr(m->x_prev));
-    casadi_copy(get_ptr(m->v), nv_, get_ptr(m->v_prev));
+    casadi_copy(m->v, nv_, get_ptr(m->v_prev));
     casadi_copy(m->q, nq_, get_ptr(m->q_prev));
 
     // Take step
@@ -1442,13 +1445,13 @@ void FixedStepIntegrator::advance(IntegratorMemory* mem,
     if (nrx_ > 0) {
       casadi_int tapeind = disc_[m->k] + j;
       casadi_copy(m->x, nx_, get_ptr(m->x_tape) + nx_ * (tapeind + 1));
-      casadi_copy(get_ptr(m->v), nv_, get_ptr(m->v_tape) + nv_ * tapeind);
+      casadi_copy(m->v, nv_, get_ptr(m->v_tape) + nv_ * tapeind);
     }
   }
 
   // Return to user
   casadi_copy(m->x, nx_, x);
-  casadi_copy(get_ptr(m->v) + nv_ - nz_, nz_, z);
+  casadi_copy(m->v + nv_ - nz_, nz_, z);
   casadi_copy(m->q, nq_, q);
 }
 
@@ -1482,7 +1485,7 @@ void FixedStepIntegrator::retreat(IntegratorMemory* mem, const double* u,
   // ... and outputs
   std::fill_n(m->res, G.n_out(), nullptr);
   m->res[BSTEP_RXF] = m->rx;
-  m->res[BSTEP_RVF] = get_ptr(m->rv);
+  m->res[BSTEP_RVF] = m->rv;
   m->res[BSTEP_RQF] = m->rq;
   m->res[BSTEP_UQF] = m->uq;
 
@@ -1493,7 +1496,7 @@ void FixedStepIntegrator::retreat(IntegratorMemory* mem, const double* u,
 
     // Update the previous step
     casadi_copy(m->rx, nrx_, get_ptr(m->rx_prev));
-    casadi_copy(get_ptr(m->rv), nrv_, get_ptr(m->rv_prev));
+    casadi_copy(m->rv, nrv_, get_ptr(m->rv_prev));
     casadi_copy(m->rq, nrq_, get_ptr(m->rq_prev));
     casadi_copy(m->uq, nuq_, get_ptr(m->uq_prev));
 
@@ -1508,7 +1511,7 @@ void FixedStepIntegrator::retreat(IntegratorMemory* mem, const double* u,
 
   // Return to user
   casadi_copy(m->rx, nrx_, rx);
-  casadi_copy(get_ptr(m->rv) + nrv_ - nrz_, nrz_, rz);
+  casadi_copy(m->rv + nrv_ - nrz_, nrz_, rz);
   casadi_copy(m->rq, nrq_, rq);
   casadi_copy(m->uq, nuq_, uq);
 }
@@ -1529,7 +1532,7 @@ reset(IntegratorMemory* mem,
   casadi_clear(m->q, nq_);
 
   // Get consistent initial conditions
-  casadi_fill(get_ptr(m->v), nv_, std::numeric_limits<double>::quiet_NaN());
+  casadi_fill(m->v, nv_, std::numeric_limits<double>::quiet_NaN());
 
   // Add the first element in the tape
   if (nrx_ > 0) {
@@ -1553,7 +1556,7 @@ void FixedStepIntegrator::resetB(IntegratorMemory* mem,
   casadi_clear(m->uq, nuq_);
 
   // Get consistent initial conditions
-  casadi_fill(get_ptr(m->rv), nrv_, std::numeric_limits<double>::quiet_NaN());
+  casadi_fill(m->rv, nrv_, std::numeric_limits<double>::quiet_NaN());
 }
 
 void FixedStepIntegrator::impulseB(IntegratorMemory* mem,

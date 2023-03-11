@@ -395,11 +395,11 @@ struct CASADI_EXPORT FixedStepMemory : public IntegratorMemory {
   // Work vectors, backward problem
   double *rx, *rz, *rp, *rq, *uq;
 
+  /// Work vectors, dependent variables
+  double *v, *rv;
+
   // Previous state
   std::vector<double> x_prev, v_prev, q_prev, rx_prev, rv_prev, rq_prev, uq_prev;
-
-  /// Dependent variables for the discrete time integration
-  std::vector<double> v, rv;
 
   // Tape
   std::vector<double> x_tape, v_tape;
