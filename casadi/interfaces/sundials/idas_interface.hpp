@@ -63,8 +63,11 @@ namespace casadi {
     /// Ids of backward problem
     int whichB;
 
-    /// Jacobian memory blocks
+    /// Jacobian memory blocks, forward problem
     double *jac_ode_x, *jac_alg_x, *jac_ode_z, *jac_alg_z;
+
+    /// Jacobian memory blocks, backward problem
+    double *jac_rode_rx, *jac_ralg_rx, *jac_rode_rz, *jac_ralg_rz;
 
     /// Constructor
     IdasMemory(const IdasInterface& s);
@@ -156,11 +159,8 @@ namespace casadi {
     // Get system Jacobian, forward problem
     Function get_jacF(Sparsity* sp) const override;
 
-    ///@{
     // Get system Jacobian, backward problem
     Function get_jacB(Sparsity* sp) const override;
-    template<typename MatType> Function get_jacB(Sparsity* sp) const;
-    ///@}
 
     /// A documentation string
     static const std::string meta_doc;
