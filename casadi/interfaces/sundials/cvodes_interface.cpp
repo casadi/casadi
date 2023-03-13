@@ -129,6 +129,9 @@ void CvodesInterface::init(const Dict& opts) {
                       {"t", "x", "p", "u", "rx", "rp", "fwd:rx"}, {"fwd:rode"});
     }
   }
+
+  // Misc
+  alloc_w(nx_); // casadi_project
 }
 
 int CvodesInterface::init_mem(void* mem) const {
@@ -644,24 +647,43 @@ int CvodesInterface::psolveB(double t, N_Vector x, N_Vector xB, N_Vector xdotB,
 }
 
 int CvodesInterface::psetup(double t, N_Vector x, N_Vector xdot, booleantype jok,
-                            booleantype *jcurPtr, double gamma, void *user_data,
-                            N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) {
+    booleantype *jcurPtr, double gamma, void *user_data,
+    N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) {
   try {
     auto m = to_mem(user_data);
     auto& s = m->self;
     // Store gamma for later
     m->gamma = gamma;
 
+    // Sparsity patterns
+    const Sparsity& sp_jac_ode_x = s.get_function("jacF").sparsity_out(0);
+    const Sparsity& sp_jacF = s.linsolF_.sparsity();
+
+    // Offset for storing the sparser Jacobian, to allow overwriting entries
+    casadi_int jac_offset = sp_jacF.nnz() - sp_jac_ode_x.nnz();
+
     // Calculate Jacobian
-    double d1 = -gamma, d2 = 1.;
     m->arg[0] = &t;
     m->arg[1] = NV_DATA_S(x);
     m->arg[2] = m->p;
     m->arg[3] = m->u;
-    m->arg[4] = &d1;
-    m->arg[5] = &d2;
-    m->res[0] = m->jacF;
+    m->res[0] = m->jacF + jac_offset;
     if (s.calc_function(m, "jacF")) casadi_error("'jacF' calculation failed");
+
+    // Project to expected sparsity pattern (with diagonal)
+    casadi_project(m->jacF + jac_offset, sp_jac_ode_x, m->jacF, sp_jacF, m->w);
+
+    // Scale and shift diagonal
+    const casadi_int *colind = sp_jacF.colind(), *row = sp_jacF.row();
+    for (casadi_int c = 0; c < sp_jacF.size2(); ++c) {
+      for (casadi_int k = colind[c]; k < colind[c + 1]; ++k) {
+        casadi_int r = row[k];
+        // Scale Jacobian
+        m->jacF[k] *= -gamma;
+        // Add contribution to diagonal
+        if (r == c) m->jacF[k] += 1;
+      }
+    }
 
     // Jacobian is now current
     *jcurPtr = 1;
@@ -852,22 +874,9 @@ int CvodesInterface::lsolveB(CVodeMem cv_mem, N_Vector b, N_Vector weight,
 }
 
 Function CvodesInterface::get_jacF(Sparsity* sp) const {
-  if (oracle_.is_a("SXFunction")) {
-    return get_jacF<SX>(sp);
-  } else {
-    return get_jacF<MX>(sp);
-  }
-}
-
-template<typename MatType>
-Function CvodesInterface::get_jacF(Sparsity* sp) const {
-  std::vector<MatType> a = MatType::get_input(oracle_);
-  std::vector<MatType> r = const_cast<Function&>(oracle_)(a); // NOLINT
-  MatType c_x = MatType::sym("c_x");
-  MatType c_xdot = MatType::sym("c_xdot");
-  MatType J = c_x*MatType::jacobian(r[DYN_ODE], a[DYN_X]) + c_xdot*MatType::eye(nx_);
-  if (sp) *sp = J.sparsity();
-  return Function("jacF", {a[DYN_T], a[DYN_X], a[DYN_P], a[DYN_U], c_x, c_xdot}, {J});
+  Function J = oracle_.factory("jacF", {"t", "x", "p", "u"}, {"jac:ode:x"});
+  if (sp) *sp = J.sparsity_out(0) + Sparsity::diag(nx_);
+  return J;
 }
 
 Function CvodesInterface::get_jacB(Sparsity* sp) const {

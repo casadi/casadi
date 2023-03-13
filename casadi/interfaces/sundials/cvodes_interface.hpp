@@ -151,11 +151,8 @@ namespace casadi {
       return m;
     }
 
-    ///@{
     // Get system Jacobian, forward problem
     Function get_jacF(Sparsity* sp) const override;
-    template<typename MatType> Function get_jacF(Sparsity* sp) const;
-    ///@}
 
     ///@{
     // Get system Jacobian, backward problem
