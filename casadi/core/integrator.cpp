@@ -71,17 +71,17 @@ std::string doc_integrator(const std::string& name) {
 
 Function integrator(const std::string& name, const std::string& solver,
     const SXDict& dae, const Dict& opts) {
-  return integrator(name, solver, dae, 0, {1}, opts);
+  return integrator(name, solver, dae, 0.0, std::vector<double>{1.0}, opts);
 }
 
 Function integrator(const std::string& name, const std::string& solver,
     const MXDict& dae, const Dict& opts) {
-  return integrator(name, solver, dae, 0, {1}, opts);
+  return integrator(name, solver, dae, 0.0, std::vector<double>{1.0}, opts);
 }
 
 Function integrator(const std::string& name, const std::string& solver,
     const Function& dae, const Dict& opts) {
-  return integrator(name, solver, dae, 0, {1}, opts);
+  return integrator(name, solver, dae, 0.0, std::vector<double>{1.0}, opts);
 }
 
 Function integrator(const std::string& name, const std::string& solver,
