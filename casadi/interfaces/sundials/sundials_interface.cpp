@@ -416,9 +416,9 @@ namespace casadi {
     m->rp = w; w += nrp_;
     m->v1 = w; w += std::max(nx_+nz_, nrx_+nrz_);
     m->v2 = w; w += std::max(nx_+nz_, nrx_+nrz_);
-    m->jac = w; w += get_function("jacF").nnz_out(0);
+    m->jacF = w; w += linsolF_.sparsity().nnz();
     if (nrx_>0) {
-      m->jacB = w; w += get_function("jacB").nnz_out(0);
+      m->jacB = w; w += linsolB_.sparsity().nnz();
     }
   }
 

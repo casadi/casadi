@@ -707,7 +707,7 @@ int IdasInterface::psolve(double t, N_Vector xz, N_Vector xzdot, N_Vector rr,
     }
 
     // Solve for undifferentiated right-hand-side, save to output
-    if (s.linsolF_.solve(m->jac, m->v1, 1, false, m->mem_linsolF))
+    if (s.linsolF_.solve(m->jacF, m->v1, 1, false, m->mem_linsolF))
       casadi_error("'jac' solve failed");
     vx = NV_DATA_S(zvec); // possibly different from rvec
     vz = vx + s.nx_;
@@ -743,7 +743,7 @@ int IdasInterface::psolve(double t, N_Vector xz, N_Vector xzdot, N_Vector rr,
       }
 
       // Solve for sensitivity right-hand-sides
-      if (s.linsolF_.solve(m->jac, m->v1 + s.nx1_ + s.nz1_, s.ns_, false, m->mem_linsolF)) {
+      if (s.linsolF_.solve(m->jacF, m->v1 + s.nx1_ + s.nz1_, s.ns_, false, m->mem_linsolF)) {
         casadi_error("'jac' solve failed");
       }
 
@@ -862,11 +862,11 @@ int IdasInterface::psetup(double t, N_Vector xz, N_Vector xzdot, N_Vector rr,
     m->arg[3] = m->p;
     m->arg[4] = m->u;
     m->arg[5] = &cj;
-    m->res[0] = m->jac;
+    m->res[0] = m->jacF;
     if (s.calc_function(m, "jacF")) casadi_error("Calculating Jacobian failed");
 
     // Factorize the linear system
-    if (s.linsolF_.nfact(m->jac, m->mem_linsolF)) casadi_error("Linear solve failed");
+    if (s.linsolF_.nfact(m->jacF, m->mem_linsolF)) casadi_error("Linear solve failed");
 
     return 0;
   } catch(int flag) { // recoverable error

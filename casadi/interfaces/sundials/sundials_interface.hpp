@@ -57,7 +57,7 @@ namespace casadi {
     double *u;
 
     // Jacobian
-    double *jac, *jacB;
+    double *jacF, *jacB;
 
     /// Stats
     long nsteps, nfevals, nlinsetups, netfails;

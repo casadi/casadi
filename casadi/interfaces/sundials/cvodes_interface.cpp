@@ -548,7 +548,7 @@ int CvodesInterface::psolve(double t, N_Vector x, N_Vector xdot, N_Vector r,
     casadi_copy(v, s.nx_, m->v1);
 
     // Solve for undifferentiated right-hand-side, save to output
-    if (s.linsolF_.solve(m->jac, m->v1, 1, false, m->mem_linsolF))
+    if (s.linsolF_.solve(m->jacF, m->v1, 1, false, m->mem_linsolF))
       casadi_error("Linear system solve failed");
     v = NV_DATA_S(z); // possibly different from r
     casadi_copy(m->v1, s.nx1_, v);
@@ -572,7 +572,7 @@ int CvodesInterface::psolve(double t, N_Vector x, N_Vector xdot, N_Vector r,
       }
 
       // Solve for sensitivity right-hand-sides
-      if (s.linsolF_.solve(m->jac, m->v1 + s.nx1_, s.ns_, false, m->mem_linsolF))
+      if (s.linsolF_.solve(m->jacF, m->v1 + s.nx1_, s.ns_, false, m->mem_linsolF))
         casadi_error("Linear solve failed");
 
       // Save to output, reordered
@@ -660,14 +660,14 @@ int CvodesInterface::psetup(double t, N_Vector x, N_Vector xdot, booleantype jok
     m->arg[3] = m->u;
     m->arg[4] = &d1;
     m->arg[5] = &d2;
-    m->res[0] = m->jac;
+    m->res[0] = m->jacF;
     if (s.calc_function(m, "jacF")) casadi_error("'jacF' calculation failed");
 
     // Jacobian is now current
     *jcurPtr = 1;
 
     // Prepare the solution of the linear system (e.g. factorize)
-    if (s.linsolF_.nfact(m->jac, m->mem_linsolF)) casadi_error("'jacF' factorization failed");
+    if (s.linsolF_.nfact(m->jacF, m->mem_linsolF)) casadi_error("'jacF' factorization failed");
 
     return 0;
   } catch(int flag) { // recoverable error
