@@ -217,6 +217,7 @@ namespace casadi {
       jacF = get_jacF();
     } else if (d->ns_ == 0) {
       jacF = d->get_function("jacF");
+      linsolF_ = d->linsolF_;
     } else {
       jacF = d->get_jacF();
     }
@@ -224,7 +225,9 @@ namespace casadi {
     alloc_w(jacF.nnz_out(0), true);
 
     // Linear solver for forward problem
-    linsolF_ = Linsol("linsolF", linear_solver_, jacF.sparsity_out(0), linear_solver_options_);
+    if (linsolF_.is_null()) {
+      linsolF_ = Linsol("linsolF", linear_solver_, jacF.sparsity_out(0), linear_solver_options_);
+    }
 
     // Initialize backward problem
     if (nrx_ > 0) {
