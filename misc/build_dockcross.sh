@@ -69,7 +69,8 @@ case $INT_TARGET in
     ;;
 esac
 
+mkdir -p install-$INT_TARGET-$TARGET/casadi
 cp mockups-${TARGET}-${BUILD_TYPE_MOCKUPS}/cplex/lib/* install-$INT_TARGET-$TARGET/casadi
 
-./dockcross.$TARGET --args "--env PKG_CONFIG_PATH_x86_64_w64_mingw32_shared_posix=/work/build/external_projects/lib64/pkgconfig:/work/build/external_projects/lib/pkgconfig:/work/build/external_projects/share/pkgconfig" -- .github/workflows/patch_toolchain cmake --build build-local-$TARGET --parallel 12 -v
+./dockcross.$TARGET --args "--env PKG_CONFIG_PATH_x86_64_w64_mingw32_shared_posix=/work/build-local-$TARGET/external_projects/lib64/pkgconfig:/work/build-local-$TARGET/external_projects/lib/pkgconfig:/work/build-local-$TARGET/external_projects/share/pkgconfig" -- .github/workflows/patch_toolchain cmake --build build-local-$TARGET --parallel 1 -v
 ./dockcross.$TARGET cmake --build build-local-$TARGET --target install -v
