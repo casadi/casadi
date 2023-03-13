@@ -261,6 +261,25 @@ namespace casadi {
     alloc_w(2 * std::max(nx_+nz_, nrx_+nrz_), true); // v1, v2
   }
 
+  void SundialsInterface::set_work(void* mem, const double**& arg, double**& res,
+      casadi_int*& iw, double*& w) const {
+    auto m = static_cast<SundialsMemory*>(mem);
+
+    // Set work in base classes
+    Integrator::set_work(mem, arg, res, iw, w);
+
+    // Work vectors
+    m->p = w; w += np_;
+    m->u = w; w += nu_;
+    m->rp = w; w += nrp_;
+    m->v1 = w; w += std::max(nx_+nz_, nrx_+nrz_);
+    m->v2 = w; w += std::max(nx_+nz_, nrx_+nrz_);
+    m->jacF = w; w += linsolF_.sparsity().nnz();
+    if (nrx_>0) {
+      m->jacB = w; w += linsolB_.sparsity().nnz();
+    }
+  }
+
   int SundialsInterface::init_mem(void* mem) const {
     if (Integrator::init_mem(mem)) return 1;
     auto m = static_cast<SundialsMemory*>(mem);
@@ -401,25 +420,6 @@ namespace casadi {
       print("Number of nonlinear convergence failures: %ld\n", m->nncfailsB);
     }
     print("\n");
-  }
-
-  void SundialsInterface::set_work(void* mem, const double**& arg, double**& res,
-                                casadi_int*& iw, double*& w) const {
-    auto m = static_cast<SundialsMemory*>(mem);
-
-    // Set work in base classes
-    Integrator::set_work(mem, arg, res, iw, w);
-
-    // Work vectors
-    m->p = w; w += np_;
-    m->u = w; w += nu_;
-    m->rp = w; w += nrp_;
-    m->v1 = w; w += std::max(nx_+nz_, nrx_+nrz_);
-    m->v2 = w; w += std::max(nx_+nz_, nrx_+nrz_);
-    m->jacF = w; w += linsolF_.sparsity().nnz();
-    if (nrx_>0) {
-      m->jacB = w; w += linsolB_.sparsity().nnz();
-    }
   }
 
   SundialsInterface::SundialsInterface(DeserializingStream& s) : Integrator(s) {

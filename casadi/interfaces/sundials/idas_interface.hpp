@@ -57,11 +57,14 @@ namespace casadi {
     /// Function object
     const IdasInterface& self;
 
-    // Idas memory block
+    /// Idas memory block
     void* mem;
 
-    // Ids of backward problem
+    /// Ids of backward problem
     int whichB;
+
+    /// Jacobian memory blocks
+    double *jac_ode_x, *jac_alg_x, *jac_ode_z, *jac_alg_z;
 
     /// Constructor
     IdasMemory(const IdasInterface& s);
@@ -110,8 +113,9 @@ namespace casadi {
     /** \brief  Initialize */
     void init(const Dict& opts) override;
 
-    /** \brief Initialize the taping */
-    void initTaping(IdasMemory* m) const;
+    /** \brief Set the (persistent) work vectors */
+    void set_work(void* mem, const double**& arg, double**& res,
+      casadi_int*& iw, double*& w) const override;
 
     /** \brief Create memory block */
     void* alloc_mem() const override { return new IdasMemory(*this);}
@@ -149,11 +153,8 @@ namespace casadi {
       return m;
     }
 
-    ///@{
     // Get system Jacobian, forward problem
     Function get_jacF(Sparsity* sp) const override;
-    template<typename MatType> Function get_jacF(Sparsity* sp) const;
-    ///@}
 
     ///@{
     // Get system Jacobian, backward problem

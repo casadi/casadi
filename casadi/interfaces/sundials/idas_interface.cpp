@@ -167,10 +167,35 @@ void IdasInterface::init(const Dict& opts) {
         {"fwd:rode", "fwd:ralg"});
     }
   }
+
+  // For Jacobian calculation
+  const Function& jacF = get_function("jacF");
+  alloc_w(jacF.nnz_out("jac_ode_x"), true);  // jac_ode_x
+  alloc_w(jacF.nnz_out("jac_alg_x"), true);  // jac_alg_x
+  alloc_w(jacF.nnz_out("jac_ode_z"), true);  // jac_ode_z
+  alloc_w(jacF.nnz_out("jac_alg_z"), true);  // jac_alg_z
+  alloc_w(nx_ + nz_); // casadi_copy_block
+  if (nrx_ > 0) {
+    alloc_w(nrx_ + nrz_); // casadi_copy_block
+  }
 }
 
-int IdasInterface::res(double t, N_Vector xz, N_Vector xzdot,
-                              N_Vector rr, void *user_data) {
+void IdasInterface::set_work(void* mem, const double**& arg, double**& res,
+    casadi_int*& iw, double*& w) const {
+  auto m = to_mem(mem);
+
+  // Set work in base classes
+  SundialsInterface::set_work(mem, arg, res, iw, w);
+
+  // Work vectors
+  const Function& jacF = get_function("jacF");
+  m->jac_ode_x = w; w += jacF.nnz_out("jac_ode_x");
+  m->jac_alg_x = w; w += jacF.nnz_out("jac_alg_x");
+  m->jac_ode_z = w; w += jacF.nnz_out("jac_ode_z");
+  m->jac_alg_z = w; w += jacF.nnz_out("jac_alg_z");
+}
+
+int IdasInterface::res(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, void *user_data) {
   try {
     auto m = to_mem(user_data);
     auto& s = m->self;
@@ -206,8 +231,7 @@ void IdasInterface::ehfun(int error_code, const char *module, const char *functi
 }
 
 int IdasInterface::jtimes(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, N_Vector v,
-                                  N_Vector Jv, double cj, void *user_data,
-                                  N_Vector tmp1, N_Vector tmp2) {
+    N_Vector Jv, double cj, void *user_data, N_Vector tmp1, N_Vector tmp2) {
   try {
     auto m = to_mem(user_data);
     auto& s = m->self;
@@ -235,9 +259,9 @@ int IdasInterface::jtimes(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, N_
 }
 
 int IdasInterface::jtimesB(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB,
-                                  N_Vector xzdotB, N_Vector resvalB, N_Vector vB, N_Vector JvB,
-                                  double cjB, void *user_data,
-                                  N_Vector tmp1B, N_Vector tmp2B) {
+    N_Vector xzdotB, N_Vector resvalB, N_Vector vB, N_Vector JvB,
+    double cjB, void *user_data,
+    N_Vector tmp1B, N_Vector tmp2B) {
   try {
     auto m = to_mem(user_data);
     auto& s = m->self;
@@ -850,20 +874,78 @@ int IdasInterface::psolveB(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB,
   }
 }
 
+template<typename T1>
+void casadi_copy_block(const T1* x, const casadi_int* sp_x, T1* y, const casadi_int* sp_y,
+    casadi_int r_begin, casadi_int c_begin, T1* w) {
+  // x and y should be distinct
+  casadi_int nrow_x, ncol_x, ncol_y, i_x, i_y, j, el, r_end;
+  const casadi_int *colind_x, *row_x, *colind_y, *row_y;
+  nrow_x = sp_x[0];
+  ncol_x = sp_x[1];
+  colind_x = sp_x+2; row_x = sp_x + 2 + ncol_x+1;
+  ncol_y = sp_y[1];
+  colind_y = sp_y+2; row_y = sp_y + 2 + ncol_y+1;
+  // End of the rows to be copied
+  r_end = r_begin + nrow_x;
+  // w will correspond to a column of x, initialize to zero
+  casadi_clear(w, nrow_x);
+  // Loop over columns in x
+  for (i_x = 0; i_x < ncol_x; ++i_x) {
+    // Corresponding row in y
+    i_y = i_x + c_begin;
+    // Copy x entries to w
+    for (el=colind_x[i_x]; el<colind_x[i_x + 1]; ++el) w[row_x[el]] = x[el];
+    // Copy entries to y, if in interval
+    for (el=colind_y[i_y]; el<colind_y[i_y + 1]; ++el) {
+      j = row_y[el];
+      if (j >= r_begin && j < r_end) y[el] = w[j - r_begin];
+    }
+    // Restore w
+    for (el=colind_x[i_x]; el<colind_x[i_x + 1]; ++el) w[row_x[el]] = 0;
+  }
+}
+
 int IdasInterface::psetup(double t, N_Vector xz, N_Vector xzdot, N_Vector rr,
-                                  double cj, void* user_data,
-                                  N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) {
+    double cj, void* user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) {
   try {
+
     auto m = to_mem(user_data);
     auto& s = m->self;
+
+    // Sparsity patterns
+    const Function& jacF = s.get_function("jacF");
+    const Sparsity& sp_jac_ode_x = jacF.sparsity_out("jac_ode_x");
+    const Sparsity& sp_jac_alg_x = jacF.sparsity_out("jac_alg_x");
+    const Sparsity& sp_jac_ode_z = jacF.sparsity_out("jac_ode_z");
+    const Sparsity& sp_jac_alg_z = jacF.sparsity_out("jac_alg_z");
+    const Sparsity& sp_jacF = s.linsolF_.sparsity();
+
+    // Calculate Jacobian blocks
     m->arg[0] = &t;
     m->arg[1] = NV_DATA_S(xz);
-    m->arg[2] = NV_DATA_S(xz)+s.nx_;
+    m->arg[2] = NV_DATA_S(xz) + s.nx_;
     m->arg[3] = m->p;
     m->arg[4] = m->u;
-    m->arg[5] = &cj;
-    m->res[0] = m->jacF;
-    if (s.calc_function(m, "jacF")) casadi_error("Calculating Jacobian failed");
+    m->res[0] = m->jac_ode_x;
+    m->res[1] = m->jac_alg_x;
+    m->res[2] = m->jac_ode_z;
+    m->res[3] = m->jac_alg_z;
+    if (s.calc_function(m, "jacF")) casadi_error("'jacF' calculation failed");
+
+    // Copy to jacF structure
+    casadi_int nx_jac = sp_jac_ode_x.size1();  // excludes sensitivity equations
+    casadi_copy_block(m->jac_ode_x, sp_jac_ode_x, m->jacF, sp_jacF, 0, 0, m->w);
+    casadi_copy_block(m->jac_alg_x, sp_jac_alg_x, m->jacF, sp_jacF, nx_jac, 0, m->w);
+    casadi_copy_block(m->jac_ode_z, sp_jac_ode_z, m->jacF, sp_jacF, 0, nx_jac, m->w);
+    casadi_copy_block(m->jac_alg_z, sp_jac_alg_z, m->jacF, sp_jacF, nx_jac, nx_jac, m->w);
+
+    // Shift diagonal corresponding to jac_ode_x
+    const casadi_int *colind = sp_jacF.colind(), *row = sp_jacF.row();
+    for (casadi_int c = 0; c < nx_jac; ++c) {
+      for (casadi_int k = colind[c]; k < colind[c + 1]; ++k) {
+        if (row[k] == c) m->jacF[k] -= cj;
+      }
+    }
 
     // Factorize the linear system
     if (s.linsolF_.nfact(m->jacF, m->mem_linsolF)) casadi_error("Linear solve failed");
@@ -877,10 +959,8 @@ int IdasInterface::psetup(double t, N_Vector xz, N_Vector xzdot, N_Vector rr,
   }
 }
 
-int IdasInterface::psetupB(double t, N_Vector xz, N_Vector xzdot,
-                                  N_Vector rxz, N_Vector rxzdot,
-                                  N_Vector rresval, double cj, void *user_data,
-                                  N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) {
+int IdasInterface::psetupB(double t, N_Vector xz, N_Vector xzdot, N_Vector rxz, N_Vector rxzdot,
+    N_Vector rresval, double cj, void *user_data, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) {
   try {
     auto m = to_mem(user_data);
     auto& s = m->self;
@@ -1042,27 +1122,13 @@ int IdasInterface::lsolveB(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector
 }
 
 Function IdasInterface::get_jacF(Sparsity* sp) const {
-  if (oracle_.is_a("SXFunction")) {
-    return get_jacF<SX>(sp);
-  } else {
-    return get_jacF<MX>(sp);
-  }
-}
-
-template<typename MatType>
-Function IdasInterface::get_jacF(Sparsity* sp) const {
-  std::vector<MatType> a = MatType::get_input(oracle_);
-  std::vector<MatType> r = const_cast<Function&>(oracle_)(a); // NOLINT
-  MatType cj = MatType::sym("cj");
-  MatType J = MatType::jacobian(r[DYN_ODE], a[DYN_X]) - cj*MatType::eye(nx_);
-  if (nz_ > 0) {
-    J = horzcat(vertcat(J,
-                        MatType::jacobian(r[DYN_ALG], a[DYN_X])),
-                vertcat(MatType::jacobian(r[DYN_ODE], a[DYN_Z]),
-                        MatType::jacobian(r[DYN_ALG], a[DYN_Z])));
-  }
-  if (sp) *sp = J.sparsity();
-  return Function("jacF", {a[DYN_T], a[DYN_X], a[DYN_Z], a[DYN_P], a[DYN_U], cj}, {J});
+  Function J = oracle_.factory("jacF", {"t", "x", "z", "p", "u"},
+    {"jac:ode:x", "jac:alg:x", "jac:ode:z", "jac:alg:z"});
+  if (sp) *sp = horzcat(vertcat(J.sparsity_out("jac_ode_x") + Sparsity::diag(nx_),
+                                J.sparsity_out("jac_alg_x")),
+                        vertcat(J.sparsity_out("jac_ode_z"),
+                                J.sparsity_out("jac_alg_z")));
+  return J;
 }
 
 Function IdasInterface::get_jacB(Sparsity* sp) const {

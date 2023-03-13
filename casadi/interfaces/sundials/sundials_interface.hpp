@@ -104,6 +104,10 @@ namespace casadi {
     /** \brief  Initialize */
     void init(const Dict& opts) override;
 
+    /** \brief Set the (persistent) work vectors */
+    void set_work(void* mem, const double**& arg, double**& res,
+      casadi_int*& iw, double*& w) const override;
+
     /** \brief Initalize memory block */
     int init_mem(void* mem) const override;
 
@@ -175,10 +179,6 @@ namespace casadi {
 
     /// Linear solver data (dense) -- what is this?
     struct LinSolDataDense {};
-
-    /** \brief Set the (persistent) work vectors */
-    void set_work(void* mem, const double**& arg, double**& res,
-                          casadi_int*& iw, double*& w) const override;
 
     // Print a variable
     static void printvar(const std::string& id, double v) {
