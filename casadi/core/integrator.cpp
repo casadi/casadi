@@ -1404,7 +1404,7 @@ void FixedStepIntegrator::set_work(void* mem, const double**& arg, double**& res
 
 int FixedStepIntegrator::init_mem(void* mem) const {
   if (Integrator::init_mem(mem)) return 1;
-  auto m = static_cast<FixedStepMemory*>(mem);
+  // auto m = static_cast<FixedStepMemory*>(mem);
 
   return 0;
 }
