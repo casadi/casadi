@@ -114,10 +114,10 @@ namespace casadi {
     double get_abstol() const override { return abstol_;}
 
     // Get system Jacobian, forward problem
-    virtual Function get_jacF() const = 0;
+    virtual Function get_jacF(Sparsity* sp) const = 0;
 
     // Get system Jacobian, backward problem
-    virtual Function get_jacB() const = 0;
+    virtual Function get_jacB(Sparsity* sp) const = 0;
 
     /// Get all statistics
     Dict get_stats(void* mem) const override;

@@ -1041,16 +1041,16 @@ int IdasInterface::lsolveB(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector
   }
 }
 
-Function IdasInterface::get_jacF() const {
+Function IdasInterface::get_jacF(Sparsity* sp) const {
   if (oracle_.is_a("SXFunction")) {
-    return get_jacF<SX>();
+    return get_jacF<SX>(sp);
   } else {
-    return get_jacF<MX>();
+    return get_jacF<MX>(sp);
   }
 }
 
 template<typename MatType>
-Function IdasInterface::get_jacF() const {
+Function IdasInterface::get_jacF(Sparsity* sp) const {
   std::vector<MatType> a = MatType::get_input(oracle_);
   std::vector<MatType> r = const_cast<Function&>(oracle_)(a); // NOLINT
   MatType cj = MatType::sym("cj");
@@ -1061,19 +1061,20 @@ Function IdasInterface::get_jacF() const {
                 vertcat(MatType::jacobian(r[DYN_ODE], a[DYN_Z]),
                         MatType::jacobian(r[DYN_ALG], a[DYN_Z])));
   }
+  if (sp) *sp = J.sparsity();
   return Function("jacF", {a[DYN_T], a[DYN_X], a[DYN_Z], a[DYN_P], a[DYN_U], cj}, {J});
 }
 
-Function IdasInterface::get_jacB() const {
+Function IdasInterface::get_jacB(Sparsity* sp) const {
   if (oracle_.is_a("SXFunction")) {
-    return get_jacB<SX>();
+    return get_jacB<SX>(sp);
   } else {
-    return get_jacB<MX>();
+    return get_jacB<MX>(sp);
   }
 }
 
 template<typename MatType>
-Function IdasInterface::get_jacB() const {
+Function IdasInterface::get_jacB(Sparsity* sp) const {
   std::vector<MatType> a = MatType::get_input(oracle_);
   std::vector<MatType> r = const_cast<Function&>(oracle_)(a); // NOLINT
   MatType cj = MatType::sym("cj");
@@ -1084,6 +1085,7 @@ Function IdasInterface::get_jacB() const {
                 vertcat(MatType::jacobian(r[DYN_RODE], a[DYN_RZ]),
                         MatType::jacobian(r[DYN_RALG], a[DYN_RZ])));
   }
+  if (sp) *sp = J.sparsity();
   return Function("jacB", {a[DYN_T], a[DYN_RX], a[DYN_RZ], a[DYN_RP],
     a[DYN_X], a[DYN_Z], a[DYN_P], a[DYN_U], cj}, {J});
 }

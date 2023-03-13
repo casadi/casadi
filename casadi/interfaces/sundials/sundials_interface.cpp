@@ -213,38 +213,45 @@ namespace casadi {
 
     // Get Jacobian function, forward problem
     Function jacF;
+    Sparsity jacF_sp;
     if (d == 0) {
-      jacF = get_jacF();
+      jacF = get_jacF(&jacF_sp);
     } else if (d->ns_ == 0) {
       jacF = d->get_function("jacF");
       linsolF_ = d->linsolF_;
+      jacF_sp = linsolF_.sparsity();
     } else {
-      jacF = d->get_jacF();
+      jacF = d->get_jacF(&jacF_sp);
     }
     set_function(jacF, jacF.name(), true);
-    alloc_w(jacF.nnz_out(0), true);
+    alloc_w(jacF_sp.nnz(), true);  // jacF
 
     // Linear solver for forward problem
     if (linsolF_.is_null()) {
-      linsolF_ = Linsol("linsolF", linear_solver_, jacF.sparsity_out(0), linear_solver_options_);
+      linsolF_ = Linsol("linsolF", linear_solver_, jacF_sp, linear_solver_options_);
     }
 
     // Initialize backward problem
     if (nrx_ > 0) {
       // Get Jacobian function, backward problem
       Function jacB;
+      Sparsity jacB_sp;
       if (d == 0) {
-        jacB = get_jacB();
+        jacB = get_jacB(&jacB_sp);
       } else if (d->ns_ == 0) {
         jacB = d->get_function("jacB");
+        linsolB_ = d->linsolB_;
+        jacB_sp = linsolB_.sparsity();
       } else {
-        jacB = d->get_jacB();
+        jacB = d->get_jacB(&jacB_sp);
       }
       set_function(jacB, jacB.name(), true);
-      alloc_w(jacB.nnz_out(0), true);
+      alloc_w(jacB_sp.nnz(), true);  // jacB
 
       // Linear solver for backward problem
-      linsolB_ = Linsol("linsolB", linear_solver_, jacB.sparsity_out(0), linear_solver_options_);
+      if (linsolB_.is_null()) {
+        linsolB_ = Linsol("linsolB", linear_solver_, jacB_sp, linear_solver_options_);
+      }
     }
 
     // Allocate work vectors

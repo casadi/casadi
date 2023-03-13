@@ -851,39 +851,41 @@ int CvodesInterface::lsolveB(CVodeMem cv_mem, N_Vector b, N_Vector weight,
   }
 }
 
-Function CvodesInterface::get_jacF() const {
+Function CvodesInterface::get_jacF(Sparsity* sp) const {
   if (oracle_.is_a("SXFunction")) {
-    return get_jacF<SX>();
+    return get_jacF<SX>(sp);
   } else {
-    return get_jacF<MX>();
+    return get_jacF<MX>(sp);
   }
 }
 
 template<typename MatType>
-Function CvodesInterface::get_jacF() const {
+Function CvodesInterface::get_jacF(Sparsity* sp) const {
   std::vector<MatType> a = MatType::get_input(oracle_);
   std::vector<MatType> r = const_cast<Function&>(oracle_)(a); // NOLINT
   MatType c_x = MatType::sym("c_x");
   MatType c_xdot = MatType::sym("c_xdot");
   MatType J = c_x*MatType::jacobian(r[DYN_ODE], a[DYN_X]) + c_xdot*MatType::eye(nx_);
+  if (sp) *sp = J.sparsity();
   return Function("jacF", {a[DYN_T], a[DYN_X], a[DYN_P], a[DYN_U], c_x, c_xdot}, {J});
 }
 
-Function CvodesInterface::get_jacB() const {
+Function CvodesInterface::get_jacB(Sparsity* sp) const {
   if (oracle_.is_a("SXFunction")) {
-    return get_jacB<SX>();
+    return get_jacB<SX>(sp);
   } else {
-    return get_jacB<MX>();
+    return get_jacB<MX>(sp);
   }
 }
 
 template<typename MatType>
-Function CvodesInterface::get_jacB() const {
+Function CvodesInterface::get_jacB(Sparsity* sp) const {
   std::vector<MatType> a = MatType::get_input(oracle_);
   std::vector<MatType> r = const_cast<Function&>(oracle_)(a); // NOLINT
   MatType c_x = MatType::sym("c_x");
   MatType c_xdot = MatType::sym("c_xdot");
   MatType J = c_x*MatType::jacobian(r[DYN_RODE], a[DYN_RX]) + c_xdot*MatType::eye(nrx_);
+  if (sp) *sp = J.sparsity();
   return Function("jacB", {a[DYN_T], a[DYN_RX], a[DYN_RP],
     a[DYN_X], a[DYN_P], a[DYN_U], c_x, c_xdot}, {J});
 }
