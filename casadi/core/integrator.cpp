@@ -824,120 +824,118 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
     casadi_int* iw, bvec_t* w, void* mem) const {
   if (verbose_) casadi_message(name_ + "::sp_reverse");
 
-  // Work vectors
-  bvec_t** arg1 = arg+n_in_;
-  bvec_t** res1 = res+n_out_;
-  bvec_t *tmp_x = w; w += nx_;
-  bvec_t *tmp_z = w; w += nz_;
-
-  // Shorthands
+  // Inputs
   bvec_t* x0 = arg[INTEGRATOR_X0];
   bvec_t* p = arg[INTEGRATOR_P];
   bvec_t* u = arg[INTEGRATOR_U];
+  bvec_t* rx0 = arg[INTEGRATOR_RX0];
+  bvec_t* rp = arg[INTEGRATOR_RP];
+  arg += n_in_;
+
+  // Outputs
   bvec_t* xf = res[INTEGRATOR_XF];
   bvec_t* zf = res[INTEGRATOR_ZF];
   bvec_t* qf = res[INTEGRATOR_QF];
+  bvec_t* rxf = res[INTEGRATOR_RXF];
+  bvec_t* rzf = res[INTEGRATOR_RZF];
+  bvec_t* rqf = res[INTEGRATOR_RQF];
+  bvec_t* uqf = res[INTEGRATOR_UQF];
+  res += n_out_;
+
+  // Work vectors
+  bvec_t *x = w; w += nx_;
+  bvec_t *z = w; w += nz_;
+  bvec_t *rx = w; w += nrx_;
+  bvec_t *rz = w; w += nrz_;
 
   // Propagate from outputs to state vectors
   if (xf) {
-    std::copy_n(xf, nx_, tmp_x);
+    std::copy_n(xf, nx_, x);
     std::fill_n(xf, nx_, 0);
   } else {
-    std::fill_n(tmp_x, nx_, 0);
+    std::fill_n(x, nx_, 0);
   }
   if (zf) {
-    std::copy_n(zf, nz_, tmp_z);
+    std::copy_n(zf, nz_, z);
     std::fill_n(zf, nz_, 0);
   } else {
-    std::fill_n(tmp_z, nz_, 0);
+    std::fill_n(z, nz_, 0);
   }
 
   if (nrx_>0) {
-    // Work vectors
-    bvec_t *tmp_rx = w; w += nrx_;
-    bvec_t *tmp_rz = w; w += nrz_;
-
-    // Shorthands
-    bvec_t* rx0 = arg[INTEGRATOR_RX0];
-    bvec_t* rp = arg[INTEGRATOR_RP];
-    bvec_t* rxf = res[INTEGRATOR_RXF];
-    bvec_t* rzf = res[INTEGRATOR_RZF];
-    bvec_t* rqf = res[INTEGRATOR_RQF];
-    bvec_t* uqf = res[INTEGRATOR_UQF];
-
     // Propagate from outputs to state vectors
     if (rxf) {
-      std::copy_n(rxf, nrx_, tmp_rx);
+      std::copy_n(rxf, nrx_, rx);
       std::fill_n(rxf, nrx_, 0);
     } else {
-      std::fill_n(tmp_rx, nrx_, 0);
+      std::fill_n(rx, nrx_, 0);
     }
     if (rzf) {
-      std::copy_n(rzf, nrz_, tmp_rz);
+      std::copy_n(rzf, nrz_, rz);
       std::fill_n(rzf, nrz_, 0);
     } else {
-      std::fill_n(tmp_rz, nrz_, 0);
+      std::fill_n(rz, nrz_, 0);
     }
 
     // Get dependencies from backward quadratures
-    std::fill_n(res1, static_cast<size_t>(DYN_NUM_OUT), nullptr);
-    std::fill_n(arg1, static_cast<size_t>(DYN_NUM_IN), nullptr);
-    res1[DYN_RQUAD] = rqf;
-    res1[DYN_UQUAD] = uqf;
-    arg1[DYN_X] = tmp_x;
-    arg1[DYN_Z] = tmp_z;
-    arg1[DYN_P] = p;
-    arg1[DYN_U] = u;
-    arg1[DYN_RX] = tmp_rx;
-    arg1[DYN_RZ] = tmp_rz;
-    arg1[DYN_RP] = rp;
-    if (oracle_.rev(arg1, res1, iw, w, 0)) return 1;
+    std::fill(res, res + DYN_NUM_OUT, nullptr);
+    res[DYN_RQUAD] = rqf;
+    res[DYN_UQUAD] = uqf;
+    std::fill(arg, res + DYN_NUM_IN, nullptr);
+    arg[DYN_X] = x;
+    arg[DYN_Z] = z;
+    arg[DYN_P] = p;
+    arg[DYN_U] = u;
+    arg[DYN_RX] = rx;
+    arg[DYN_RZ] = rz;
+    arg[DYN_RP] = rp;
+    if (oracle_.rev(arg, res, iw, w, 0)) return 1;
 
     // Propagate interdependencies
     std::fill_n(w, nrx_+nrz_, 0);
-    sp_jac_rdae_.spsolve(w, tmp_rx, true);
-    std::copy_n(w, nrx_+nrz_, tmp_rx);
+    sp_jac_rdae_.spsolve(w, rx, true);
+    std::copy_n(w, nrx_+nrz_, rx);
 
     // Direct dependency rx0 -> rxf
-    if (rx0) for (casadi_int i=0; i<nrx_; ++i) rx0[i] |= tmp_rx[i];
+    if (rx0) for (casadi_int i=0; i<nrx_; ++i) rx0[i] |= rx[i];
 
     // Indirect dependency via g
-    res1[DYN_RODE] = tmp_rx;
-    res1[DYN_RALG] = tmp_rz;
-    res1[DYN_RQUAD] = nullptr;
-    res1[DYN_UQUAD] = nullptr;
-    arg1[DYN_RX] = rx0;
-    arg1[DYN_RZ] = nullptr; // arg[INTEGRATOR_RZ0] is a guess, no dependency
-    if (oracle_.rev(arg1, res1, iw, w, 0)) return 1;
+    res[DYN_RODE] = rx;
+    res[DYN_RALG] = rz;
+    res[DYN_RQUAD] = nullptr;
+    res[DYN_UQUAD] = nullptr;
+    arg[DYN_RX] = rx0;
+    arg[DYN_RZ] = nullptr; // INTEGRATOR_RZ0 is a guess, not a dependency
+    if (oracle_.rev(arg, res, iw, w, 0)) return 1;
   }
 
   // Get dependencies from forward quadratures
-  std::fill_n(res1, static_cast<size_t>(DYN_NUM_OUT), nullptr);
-  std::fill_n(arg1, static_cast<size_t>(DYN_NUM_IN), nullptr);
-  res1[DYN_QUAD] = qf;
-  arg1[DYN_X] = tmp_x;
-  arg1[DYN_Z] = tmp_z;
-  arg1[DYN_P] = p;
-  arg1[DYN_U] = u;
+  std::fill(res, res + DYN_NUM_OUT, nullptr);
+  res[DYN_QUAD] = qf;
+  std::fill(arg, arg + DYN_NUM_IN, nullptr);
+  arg[DYN_X] = x;
+  arg[DYN_Z] = z;
+  arg[DYN_P] = p;
+  arg[DYN_U] = u;
   if (qf && nq_>0) {
-    if (oracle_.rev(arg1, res1, iw, w, 0)) return 1;
+    if (oracle_.rev(arg, res, iw, w, 0)) return 1;
   }
 
   // Propagate interdependencies
   std::fill_n(w, nx_+nz_, 0);
-  sp_jac_dae_.spsolve(w, tmp_x, true);
-  std::copy_n(w, nx_+nz_, tmp_x);
+  sp_jac_dae_.spsolve(w, x, true);
+  std::copy_n(w, nx_+nz_, x);
 
   // Direct dependency x0 -> xf
-  if (x0) for (casadi_int i=0; i<nx_; ++i) x0[i] |= tmp_x[i];
+  if (x0) for (casadi_int i=0; i<nx_; ++i) x0[i] |= x[i];
 
   // Indirect dependency through f
-  res1[DYN_ODE] = tmp_x;
-  res1[DYN_ALG] = tmp_z;
-  res1[DYN_QUAD] = nullptr;
-  arg1[DYN_X] = x0;
-  arg1[DYN_Z] = nullptr; // arg[INTEGRATOR_Z0] is a guess, no dependency
-  if (oracle_.rev(arg1, res1, iw, w, 0)) return 1;
+  res[DYN_ODE] = x;
+  res[DYN_ALG] = z;
+  res[DYN_QUAD] = nullptr;
+  arg[DYN_X] = x0;
+  arg[DYN_Z] = nullptr; // INTEGRATOR_Z0 is a guess, no dependency
+  if (oracle_.rev(arg, res, iw, w, 0)) return 1;
   return 0;
 }
 
