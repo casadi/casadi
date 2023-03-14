@@ -870,7 +870,6 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
 int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
     casadi_int* iw, bvec_t* w, void* mem) const {
   if (verbose_) casadi_message(name_ + "::sp_reverse");
-  casadi_assert(nt() == 1, "Not implemented");
 
   // Inputs
   bvec_t* x0 = arg[INTEGRATOR_X0];
@@ -911,6 +910,7 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
   }
 
   if (nrx_ > 0) {
+    casadi_assert(nt() == 1, "Not implemented");
     // Propagate from outputs to state vectors
     if (rxf) {
       std::copy_n(rxf, nrx_, rx);
@@ -955,35 +955,53 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
     arg[DYN_RX] = rx0;
     arg[DYN_RZ] = nullptr; // INTEGRATOR_RZ0 is a guess, not a dependency
     if (oracle_.rev(arg, res, iw, w, 0)) return 1;
+  } else {
+    // Take u past the last grid point
+    if (u) u += nu_ * nt();
   }
 
-  // Get dependencies from forward quadratures
-  std::fill(res, res + DYN_NUM_OUT, nullptr);
-  res[DYN_QUAD] = qf;
-  std::fill(arg, arg + DYN_NUM_IN, nullptr);
-  arg[DYN_X] = x;
-  arg[DYN_Z] = z;
-  arg[DYN_P] = p;
-  arg[DYN_U] = u;
-  if (qf && nq_>0) {
+  // Take xf, zf, qf past the last grid point
+  if (xf) xf += nx_ * nt();
+  if (zf) zf += nz_ * nt();
+  if (qf) qf += nq_ * nt();
+
+  // Step backwards through forward problem
+  for (casadi_int k = nt(); k-- > 0; ) {
+    // Shift time
+    if (xf) xf -= nx_;
+    if (zf) zf -= nz_;
+    if (qf) qf -= nq_;
+    if (u) u -= nu_;
+
+    // Get dependencies from forward quadratures
+    std::fill(res, res + DYN_NUM_OUT, nullptr);
+    res[DYN_QUAD] = qf;
+    std::fill(arg, arg + DYN_NUM_IN, nullptr);
+    arg[DYN_X] = x;
+    arg[DYN_Z] = z;
+    arg[DYN_P] = p;
+    arg[DYN_U] = u;
+    if (nq_ > 0 && qf) {
+      if (oracle_.rev(arg, res, iw, w, 0)) return 1;
+    }
+
+    // Propagate interdependencies
+    std::fill_n(w, nx_ + nz_, 0);
+    sp_jac_dae_.spsolve(w, x, true);
+    std::copy_n(w, nx_ + nz_, x);
+
+    // Direct dependency x0 -> xf
+    casadi_assert(nt() == 1, "Not implemented");
+    if (x0) for (casadi_int i=0; i<nx_; ++i) x0[i] |= x[i];
+
+    // Indirect dependency through f
+    res[DYN_ODE] = x;
+    res[DYN_ALG] = z;
+    res[DYN_QUAD] = nullptr;
+    arg[DYN_X] = x0;
+    arg[DYN_Z] = nullptr; // INTEGRATOR_Z0 is a guess, no dependency
     if (oracle_.rev(arg, res, iw, w, 0)) return 1;
   }
-
-  // Propagate interdependencies
-  std::fill_n(w, nx_+nz_, 0);
-  sp_jac_dae_.spsolve(w, x, true);
-  std::copy_n(w, nx_+nz_, x);
-
-  // Direct dependency x0 -> xf
-  if (x0) for (casadi_int i=0; i<nx_; ++i) x0[i] |= x[i];
-
-  // Indirect dependency through f
-  res[DYN_ODE] = x;
-  res[DYN_ALG] = z;
-  res[DYN_QUAD] = nullptr;
-  arg[DYN_X] = x0;
-  arg[DYN_Z] = nullptr; // INTEGRATOR_Z0 is a guess, no dependency
-  if (oracle_.rev(arg, res, iw, w, 0)) return 1;
   return 0;
 }
 
