@@ -740,20 +740,25 @@ option(WITH_MUMPS "Enable MUMPS interface" OFF)
 set(BUILD_MUMPS_TP_VERSION "releases/3.0.2" CACHE STRING "Tag/branch/hash to be used for BUILD_MUMPS_TP_GIT_REPO")
 set(BUILD_METIS_TP_VERSION "releases/2.0.0" CACHE STRING "Tag/branch/hash to be used for BUILD_BETIS_TP_GIT_REPO")
 set(BUILD_METIS_TP_GIT_REPO "https://github.com/coin-or-tools/ThirdParty-Metis.git" CACHE STRING "Git repo used together with BUILD_METIS_TP_VERSION")
+option(WITH_BUILD_METIS "Build Metis from downloaded source." OFF)
 set(BUILD_MUMPS_TP_GIT_REPO "https://github.com/coin-or-tools/ThirdParty-Mumps.git" CACHE STRING "Git repo used together with BUILD_MUMPS_TP_VERSION")
+
 option(WITH_BUILD_MUMPS "Build MUMPS (BUILD_MUMPS_TP_VERSION=${BUILD_MUMPS_TP_VERSION}) from downloaded source (BUILD_MUMPS_TP_GIT_REPO=${BUILD_MUMPS_TP_GIT_REPO})." OFF)
-set(BUILD_MUMPS_DEPENDENCIES LAPACK)
+set(BUILD_MUMPS_DEPENDENCIES LAPACK METIS)
 
 # SPRAL
 option(WITH_SPRAL "Enable SPRAL interface" OFF)
 set(BUILD_SPRAL_VERSION "d385d2c9e858366d257cafaaf05760ffa6543e26" CACHE STRING "Tag/branch/hash to be used for BUILD_SPRAL_GIT_REPO")
 set(BUILD_SPRAL_GIT_REPO "https://github.com/ralna/spral.git" CACHE STRING "Git repo used together with BUILD_SPRAL_VERSION")
 option(WITH_BUILD_SPRAL "Build SPRAL (BUILD_SPRAL_VERSION=${BUILD_SPRAL_VERSION}) from downloaded source (BUILD_SPRAL_GIT_REPO=${BUILD_SPRAL_GIT_REPO})." OFF)
-set(BUILD_SPRAL_DEPENDENCIES LAPACK)
+set(BUILD_SPRAL_DEPENDENCIES LAPACK METIS)
 
 # HSL: Sparse direct linear solvers
 option(WITH_HSL "Enable HSL interface" OFF)
 option(WITH_MOCKUP_HSL "Use mockup WORHP (BUILD_MOCKUPS_VERSION=${BUILD_MOCKUPS_VERSION}) from downloaded source (BUILD_MOCKUPS_GIT_REPO=${BUILD_MOCKUPS_GIT_REPO})." OFF)
+option(WITH_BUILD_HSL "Build HSL from supplied source directory (BUILD_HSL_SRC=${BUILD_HSL_SRC})." OFF)
+set(BUILD_HSL_SRC "." CACHE STRING "Source loction of coinhsl")
+set(BUILD_HSL_DEPENDENCIES LAPACK METIS)
 
 # HIGHS: A MILP / QP solver
 option(WITH_HIGHS "Compile the HiGHS interface" OFF)
@@ -794,7 +799,7 @@ set(WITH_BUILD_MOCKUPS OFF)
 # Packages must be sorted from high to low in the dependency graph
 foreach(PKG CPLEX KNITRO GUROBI WORHP HSL)
   string(TOLOWER ${PKG} PKG_LOWER)
-  if(WITH_${PKG})
+  if(WITH_${PKG} AND NOT WITH_BUILD_${PKG})
     if(NOT WITH_MOCKUP_${PKG})
       get_property(PACKAGES_NOT_FOUND_BACKUP GLOBAL PROPERTY PACKAGES_NOT_FOUND)
       get_property(PACKAGES_FOUND_BACKUP GLOBAL PROPERTY PACKAGES_FOUND)
@@ -804,7 +809,7 @@ foreach(PKG CPLEX KNITRO GUROBI WORHP HSL)
 
       # Add it to FeatureSummary
       get_property(PKG_HELP CACHE WITH_MOCKUP_${PKG} PROPERTY HELPSTRING)
-      set(WITH_BUILD_${PKG} ON CACHE BOOL "${PKG_HELP}" FORCE)
+      set(WITH_MOCKUP_${PKG} ON CACHE BOOL "${PKG_HELP}" FORCE)
       add_feature_info(${PKG_LOWER}-mockup-build ON ${PKG_HELP})
 
       # Remove from PACKAGES_NOT_FOUND
@@ -825,7 +830,7 @@ foreach(PKG CPLEX KNITRO GUROBI WORHP HSL)
 endforeach()
 
 # Packages must be sorted from high to low in the dependency graph
-foreach(PKG HIGHS PROXQP OSQP SUPERSCS BONMIN IPOPT CBC CLP MUMPS SPRAL METIS HPIPM BLASFEO LAPACK EIGEN3 SIMDE)
+foreach(PKG HIGHS PROXQP OSQP SUPERSCS BONMIN IPOPT CBC CLP MUMPS SPRAL HSL METIS HPIPM BLASFEO LAPACK EIGEN3 SIMDE)
   string(TOLOWER ${PKG} PKG_LOWER)
   if(WITH_${PKG})
     if(NOT WITH_BUILD_${PKG})
@@ -836,6 +841,7 @@ foreach(PKG HIGHS PROXQP OSQP SUPERSCS BONMIN IPOPT CBC CLP MUMPS SPRAL METIS HP
     if (WITH_BUILD_${PKG} OR (WITH_BUILD_REQUIRED AND NOT ${PKG}_FOUND))
 
       # Add it to FeatureSummary
+      message("get_property(PKG_HELP CACHE WITH_BUILD_${PKG} PROPERTY HELPSTRING)")
       get_property(PKG_HELP CACHE WITH_BUILD_${PKG} PROPERTY HELPSTRING)
       set(WITH_BUILD_${PKG} ON CACHE BOOL "${PKG_HELP}" FORCE)
       add_feature_info(${PKG_LOWER}-sourcebuild ON ${PKG_HELP})
@@ -935,16 +941,6 @@ if(WITH_WORHP AND WITH_MOCKUP_WORHP)
 endif()
 add_feature_info(worhp-interface WITH_WORHP "Interface to the NLP solver Worhp (requires gfortran, gomp).")
 
-if(WITH_HSL AND WITH_MOCKUP_HSL)
-  add_library(hsl::hsl SHARED IMPORTED)
-  add_dependencies(hsl::hsl mockups-external)
-  set_target_properties(hsl::hsl PROPERTIES
-    IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/mockups/hsl/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}hsl${CMAKE_SHARED_LIBRARY_SUFFIX}"
-    IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/mockups/hsl/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}hsl${CMAKE_IMPORT_LIBRARY_SUFFIX}"
-  )
-endif()
-add_feature_info(hsl-interface WITH_HSL "Interface to HSL.")
-
 if(WITH_LAPACK)
   if (WITH_BUILD_LAPACK)
     # Requires gcc>=5.0
@@ -974,10 +970,6 @@ if(LAPACK_FOUND)
   libraries2flags("${LAPACK_LIBRARIES}" LAPACK_LFLAGS)
   message("LAPACK_LFLAGS: ${LAPBLASFEO_PATHACK_LFLAGS}")
 endif()
-
-
-
-
 
 if(WITH_BLASFEO)
   if (WITH_BUILD_BLASFEO)
@@ -1044,22 +1036,14 @@ message(STATUS "CMAKE_SYSTEM_NAME: ${CMAKE_SYSTEM_NAME} ${WIN32}")
 
 add_feature_info(lapack-interface WITH_LAPACK "Interface to LAPACK.")
 
-if (WITH_MUMPS OR WITH_SPRAL)
-  set(WITH_COINMETIS ON)
-  set(WITH_BUILD_COINMETIS ON)
-endif()
-
-
-
-if(WITH_COINMETIS)
-  if(WITH_BUILD_COINMETIS)
-    add_feature_info(coinmetis-sourcebuild ON "Build METIS (BUILD_METIS_TP_VERSION=${BUILD_METIS_TP_VERSION}) from downloaded source.")
-    if(ALLOW_DOCKER)
-       set(COIN_RECONFIG_CMD docker run --rm -v <SOURCE_DIR>:/work ghcr.io/casadi/coinbuild:latest /bin/bash ./run_autotools /work COMMAND)
-    else()
-       set(COIN_RECONFIG_CMD)
-    endif()
-    ExternalProject_Add(coinmetis-external
+if(WITH_BUILD_METIS)
+  add_feature_info(metis-sourcebuild ON "Build METIS (BUILD_METIS_TP_VERSION=${BUILD_METIS_TP_VERSION}) from downloaded source.")
+  if(ALLOW_DOCKER)
+     set(COIN_RECONFIG_CMD docker run --rm -v <SOURCE_DIR>:/work ghcr.io/casadi/coinbuild:latest /bin/bash ./run_autotools /work COMMAND)
+  else()
+     set(COIN_RECONFIG_CMD)
+  endif()
+  ExternalProject_Add(metis-external
         GIT_REPOSITORY ${BUILD_METIS_TP_GIT_REPO}
         GIT_TAG ${BUILD_METIS_TP_VERSION}
         DEPENDS ${LAPACK_DEPENDS_TARGET}
@@ -1070,25 +1054,57 @@ if(WITH_COINMETIS)
           # GKFree is not defined (variadic definition in utils.c); fails on MacOS target
           "CFLAGS=-Wno-implicit-function-declaration"
         PATCH_COMMAND COMMAND cd <SOURCE_DIR> && ./get.Metis)
-    add_library(coinmetis INTERFACE IMPORTED)
-    add_dependencies(coinmetis coinmetis-external)
-    set_target_properties(coinmetis PROPERTIES
-      INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include/coin-or/metis"
-      IMPORTED_LIBNAME "coinmetis"
-    )
+  add_library(metis INTERFACE IMPORTED)
+  add_dependencies(metis metis-external)
+  set_target_properties(metis PROPERTIES
+    INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include/coin-or/metis"
+    IMPORTED_LIBNAME "coinmetis"
+  )
+  message("metis exported")
+endif()
 
+if(WITH_HSL)
+  if (WITH_MOCKUP_HSL)
+      add_library(hsl::hsl SHARED IMPORTED)
+      add_dependencies(hsl::hsl mockups-external)
+      set_target_properties(hsl::hsl PROPERTIES
+        IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/mockups/hsl/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}hsl${CMAKE_SHARED_LIBRARY_SUFFIX}"
+        IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/mockups/hsl/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}hsl${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+      )
+  elseif(WITH_BUILD_HSL)
+    add_feature_info(hsl-sourcebuild ON "Build CoinHSL from supplied source.")
+    get_target_property(METIS_INCLUDE_DIR metis INTERFACE_INCLUDE_DIRECTORIES)
+    get_target_property(METIS_LIB metis IMPORTED_LIBNAME)
+    message("metis: ${METIS_LIB} ${METIS_INCLUDE_DIR}")
+    # Copy source
+
+    ExternalProject_Add(hsl-external
+        SOURCE_DIR ${BUILD_HSL_SRC}
+        DEPENDS metis
+        PREFIX "${CMAKE_BINARY_DIR}/external_projects"
+        UPDATE_COMMAND ""
+        PATCH_COMMAND ${EXTERNAL_CMAKE_COMMAND} -DSRC=<SOURCE_DIR>  -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/patch_hsl.cmake
+        CONFIGURE_COMMAND <SOURCE_DIR>/configure --disable-static "--with-blas=${LAPACK_LFLAGS}" ${CROSS_FLAGS} "FCFLAGS=${LAPACK_LFLAGS} -L${CMAKE_BINARY_DIR}/external_projects/lib -Wl,-rpath,${CMAKE_BINARY_DIR}/external_projects/lib -l${METIS_LIB} -lm" --prefix=<INSTALL_DIR>
+        BUILD_COMMAND make
+        INSTALL_COMMAND make install
+        COMMAND cp ${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}coinhsl${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}hsl${CMAKE_SHARED_LIBRARY_SUFFIX})
+      add_library(hsl::hsl SHARED IMPORTED)
+      add_dependencies(hsl::hsl hsl-external coinmetis lapack)
+      set_target_properties(hsl::hsl PROPERTIES
+        IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}coinhsl${CMAKE_SHARED_LIBRARY_SUFFIX}"
+        IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}coinhsl${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+      )
   endif()
 endif()
 
 if(WITH_MUMPS)
   if(WITH_BUILD_MUMPS)
-    get_target_property(METIS_INCLUDE_DIR coinmetis INTERFACE_INCLUDE_DIRECTORIES)
-    get_target_property(METIS_LIB coinmetis IMPORTED_LIBNAME)
+    get_target_property(METIS_INCLUDE_DIR metis INTERFACE_INCLUDE_DIRECTORIES)
+    get_target_property(METIS_LIB metis IMPORTED_LIBNAME)
     ExternalProject_Add(mumps-external
-        DEPENDS coinmetis-external
         GIT_REPOSITORY ${BUILD_MUMPS_TP_GIT_REPO}
         GIT_TAG ${BUILD_MUMPS_TP_VERSION}
-        DEPENDS ${LAPACK_DEPENDS_TARGET} coinmetis-external
+        DEPENDS ${LAPACK_DEPENDS_TARGET} metis
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
         CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS}  --prefix=<INSTALL_DIR> "--with-metis-cflags=-I${METIS_INCLUDE_DIR}" "--with-metis-lflags=-L${CMAKE_BINARY_DIR}/external_projects/lib -l${METIS_LIB} -lm" "--with-lapack-lflags=${LAPACK_LFLAGS}" ${CROSS_FLAGS_FORTRAN}
@@ -1122,13 +1138,12 @@ if(WITH_SPRAL)
     set(SPRAL_RECONFIG_CMD autoreconf -ivf -I /usr/share/aclocal <SOURCE_DIR> COMMAND)
   endif()
   if(WITH_BUILD_SPRAL)
-    get_target_property(METIS_INCLUDE_DIR coinmetis INTERFACE_INCLUDE_DIRECTORIES)
-    get_target_property(METIS_LIB coinmetis IMPORTED_LIBNAME)
+    get_target_property(METIS_INCLUDE_DIR metis INTERFACE_INCLUDE_DIRECTORIES)
+    get_target_property(METIS_LIB metis IMPORTED_LIBNAME)
     ExternalProject_Add(spral-external
-        DEPENDS coinmetis-external
         GIT_REPOSITORY ${BUILD_SPRAL_GIT_REPO}
         GIT_TAG ${BUILD_SPRAL_VERSION}
-        DEPENDS ${LAPACK_DEPENDS_TARGET}
+        DEPENDS ${LAPACK_DEPENDS_TARGET} metis
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
         CONFIGURE_COMMAND ${SPRAL_RECONFIG_CMD} CFLAGS=-fPIC CXXFLAGS=-fPIC FFLAGS=-fPIC FCFLAGS=-fPIC <SOURCE_DIR>/configure ${CROSS_FLAGS} --disable-gpu --prefix=<INSTALL_DIR> --disable-openmp "--with-metis-inc-dir=${METIS_INCLUDE_DIR}" "--with-metis=-L${CMAKE_BINARY_DIR}/external_projects/lib -l${METIS_LIB} -lm" "--with-lapack=${LAPACK_LFLAGS}" "--with-blas=${LAPACK_LFLAGS}" ${CROSS_FLAGS_FORTRAN})
@@ -1151,6 +1166,7 @@ if((WITH_CLP AND WITH_BUILD_CLP) OR (WITH_CBC AND WITH_BUILD_CBC))
           CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS} "--with-lapack-lflags=${LAPACK_LFLAGS}" --prefix=<INSTALL_DIR> )
     add_library(coinutils SHARED IMPORTED)
     add_dependencies(coinutils coinutils-external)
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/coin")
     set_target_properties(coinutils PROPERTIES
       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}CoinUtils${CMAKE_SHARED_LIBRARY_SUFFIX}"
       IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}CoinUtils${CMAKE_IMPORT_LIBRARY_SUFFIX}"
@@ -1298,7 +1314,7 @@ add_feature_info(ipopt-interface WITH_IPOPT "Interface to the NLP solver Ipopt."
 if(WITH_BONMIN)
   if(WITH_BUILD_BONMIN)
     ExternalProject_Add(bonmin-external
-        DEPENDS mumps-external coinmetis-external coinutils-external osi-external clp-external cgl-external cbc-external ipopt-external
+        DEPENDS mumps-external metis-external coinutils-external osi-external clp-external cgl-external cbc-external ipopt-external
         GIT_REPOSITORY ${BUILD_BONMIN_GIT_REPO}
         GIT_TAG ${BUILD_BONMIN_VERSION}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
