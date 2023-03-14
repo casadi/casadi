@@ -892,22 +892,14 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
   // Work vectors
   bvec_t *x = w; w += nx_;
   bvec_t *z = w; w += nz_;
+  bvec_t *x_prev = w; w += nx_;
   bvec_t *rx = w; w += nrx_;
   bvec_t *rz = w; w += nrz_;
+  // bvec_t *rx_prev = w; w += nrx_;
 
-  // Propagate from outputs to state vectors
-  if (xf) {
-    std::copy_n(xf, nx_, x);
-    std::fill_n(xf, nx_, 0);
-  } else {
-    std::fill_n(x, nx_, 0);
-  }
-  if (zf) {
-    std::copy_n(zf, nz_, z);
-    std::fill_n(zf, nz_, 0);
-  } else {
-    std::fill_n(z, nz_, 0);
-  }
+  // Clear state vector
+  std::fill_n(x, nx_, 0);
+  std::fill_n(z, nz_, 0);
 
   if (nrx_ > 0) {
     casadi_assert(nt() == 1, "Not implemented");
@@ -973,7 +965,17 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
     if (qf) qf -= nq_;
     if (u) u -= nu_;
 
-    // Get dependencies from forward quadratures
+    // Add impulse from outputs
+    if (xf) {
+      for (casadi_int i = 0; i < nx_; ++i) x[i] |= xf[i];
+      std::fill_n(xf, nx_, 0);
+    }
+    if (zf) {
+      for (casadi_int i = 0; i < nz_; ++i) z[i] |= zf[i];
+      std::fill_n(zf, nz_, 0);
+    }
+
+    // Get dependencies from forward quadratures, if any
     std::fill(res, res + DYN_NUM_OUT, nullptr);
     res[DYN_QUAD] = qf;
     std::fill(arg, arg + DYN_NUM_IN, nullptr);
@@ -990,18 +992,27 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
     sp_jac_dae_.spsolve(w, x, true);
     std::copy_n(w, nx_ + nz_, x);
 
-    // Direct dependency x0 -> xf
-    casadi_assert(nt() == 1, "Not implemented");
-    if (x0) for (casadi_int i=0; i<nx_; ++i) x0[i] |= x[i];
+    // Direct dependency x_prev -> x
+    std::copy_n(x, nx_, x_prev);
 
     // Indirect dependency through f
     res[DYN_ODE] = x;
     res[DYN_ALG] = z;
     res[DYN_QUAD] = nullptr;
-    arg[DYN_X] = x0;
+    arg[DYN_X] = x_prev;
     arg[DYN_Z] = nullptr; // INTEGRATOR_Z0 is a guess, no dependency
     if (oracle_.rev(arg, res, iw, w, 0)) return 1;
+
+    // Update x, z
+    std::copy_n(x_prev, nx_, x);
+    std::fill_n(z, nz_, 0);
   }
+
+  // Direct dependency x0 -> x
+  if (x0) {
+    for (casadi_int i = 0; i < nx_; ++i) x0[i] |= x_prev[i];
+  }
+
   return 0;
 }
 
