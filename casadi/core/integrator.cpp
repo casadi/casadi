@@ -729,7 +729,6 @@ std::map<std::string, MatType> Integrator::aug_adj(casadi_int nadj) const {
 int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
     casadi_int* iw, bvec_t* w, void* mem) const {
   if (verbose_) casadi_message(name_ + "::sp_forward");
-  casadi_assert(nt() == 1, "Not implemented");
 
   // Inputs
   const bvec_t* x0 = arg[INTEGRATOR_X0];
@@ -760,35 +759,49 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
   std::copy_n(x0, nx_, x_prev);
 
   // Propagate forward
-  std::fill(arg, arg + DYN_NUM_IN, nullptr);
-  arg[DYN_X] = x_prev;
-  arg[DYN_P] = p;
-  arg[DYN_U] = u;
-  std::fill(res, res + DYN_NUM_OUT, nullptr);
-  res[DYN_ODE] = x;
-  res[DYN_ALG] = z;
-  oracle_(arg, res, iw, w, 0);
-  for (casadi_int i = 0; i < nx_; ++i) x[i] |= x_prev[i];
+  for (casadi_int k = 0; k < nt(); ++k) {
+    // Propagate through DAE function
+    std::fill(arg, arg + DYN_NUM_IN, nullptr);
+    arg[DYN_X] = x_prev;
+    arg[DYN_P] = p;
+    arg[DYN_U] = u;
+    std::fill(res, res + DYN_NUM_OUT, nullptr);
+    res[DYN_ODE] = x;
+    res[DYN_ALG] = z;
+    oracle_(arg, res, iw, w, 0);
+    for (casadi_int i = 0; i < nx_; ++i) x[i] |= x_prev[i];
 
-  // "Solve" in order to resolve interdependencies (cf. Rootfinder)
-  std::copy_n(x, nx_ + nz_, w);
-  std::fill_n(x, nx_ + nz_, 0);
-  sp_jac_dae_.spsolve(x, w, false);
+    // "Solve" in order to resolve interdependencies (cf. Rootfinder)
+    std::copy_n(x, nx_ + nz_, w);
+    std::fill_n(x, nx_ + nz_, 0);
+    sp_jac_dae_.spsolve(x, w, false);
 
-  // Get xf and zf
-  if (xf) std::copy_n(x, nx_, xf);
-  if (zf) std::copy_n(z, nz_, zf);
+    // Get xf and zf
+    if (xf) std::copy_n(x, nx_, xf);
+    if (zf) std::copy_n(z, nz_, zf);
 
-  // Propagate to quadratures
-  if (nq_ > 0 && qf) {
-    arg[DYN_X] = x;
-    arg[DYN_Z] = z;
-    res[DYN_ODE] = res[DYN_ALG] = nullptr;
-    res[DYN_QUAD] = qf;
-    if (oracle_(arg, res, iw, w, 0)) return 1;
+    // Propagate to quadratures
+    if (nq_ > 0 && qf) {
+      arg[DYN_X] = x;
+      arg[DYN_Z] = z;
+      res[DYN_ODE] = res[DYN_ALG] = nullptr;
+      res[DYN_QUAD] = qf;
+      if (oracle_(arg, res, iw, w, 0)) return 1;
+    }
+
+    // Shift time
+    if (k + 1 < nt()) {
+      std::copy_n(x, nx_, x_prev);
+      if (xf) xf += nx_;
+      if (zf) zf += nz_;
+      if (qf) qf += nq_;
+      if (u) u += nu_;
+    }
   }
 
   if (nrx_ > 0) {
+    casadi_assert(nt() == 1, "Not implemented");
+
     // Copy initial guess to rx_prev
     std::copy_n(rx0, nrx_, rx_prev);
 
