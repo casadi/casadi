@@ -56,10 +56,12 @@ if(NOT GUROBI_FOUND)
 
     endif(GUROBI_INCLUDE_DIR)
 
-    add_library(gurobi::gurobi INTERFACE IMPORTED)
-    set_target_properties(gurobi::gurobi PROPERTIES
-      INTERFACE_INCLUDE_DIRECTORIES ${GUROBI_INCLUDE_DIR}
-    )
-    target_link_libraries(gurobi::gurobi INTERFACE ${GUROBI_LIBRARIES})
+    if(GUROBI_FOUND)
+      add_library(gurobi::gurobi INTERFACE IMPORTED)
+      set_target_properties(gurobi::gurobi PROPERTIES
+        INTERFACE_INCLUDE_DIRECTORIES ${GUROBI_INCLUDE_DIR}
+      )
+      target_link_libraries(gurobi::gurobi INTERFACE ${GUROBI_LIBRARIES})
+    endif()
 
 endif()

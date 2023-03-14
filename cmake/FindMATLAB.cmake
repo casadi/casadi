@@ -354,6 +354,7 @@ mark_as_advanced(
   MATLAB_FLIBS
 )
 
+if(MATLAB_FOUND)
   add_library(matlab::matlab INTERFACE IMPORTED)
   
   set(MEX_VERSION_FILE "")
@@ -363,5 +364,6 @@ mark_as_advanced(
 
   target_link_libraries(matlab::matlab INTERFACE ${MATLAB_LIBRARIES})
   target_include_directories(matlab::matlab INTERFACE ${MATLAB_INCLUDE_DIR})
+endif()
 
 endif()

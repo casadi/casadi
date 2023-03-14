@@ -195,12 +195,14 @@ mark_as_advanced (
   OCTAVE_PATCH_VERSION
 )
 
-add_library(octave::octave INTERFACE IMPORTED)
+if(OCTAVE_FOUND)
+  add_library(octave::octave INTERFACE IMPORTED)
 
-if (WIN32)
-  target_link_libraries(octave::octave INTERFACE ${OCTAVE_LIBRARIES})
+  if (WIN32)
+    target_link_libraries(octave::octave INTERFACE ${OCTAVE_LIBRARIES})
+  endif()
+  target_include_directories(octave::octave INTERFACE ${OCTAVE_INCLUDE_DIR})
 endif()
-target_include_directories(octave::octave INTERFACE ${OCTAVE_INCLUDE_DIR})
 
 set(OCTAVE_MEX_EXT "mex")
 

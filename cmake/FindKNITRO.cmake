@@ -29,11 +29,12 @@ if(NOT KNITRO_FOUND)
       set(KNITRO_FOUND TRUE)
     endif(KNITRO_FOUND_INCLUDE AND KNITRO_LIBRARIES)
 
-
+    if(KNITRO_FOUND)
     add_library(knitro::knitro SHARED IMPORTED)
     set_target_properties(knitro::knitro PROPERTIES
       INTERFACE_INCLUDE_DIRECTORIES ${KNITRO_INCLUDE_DIR}
       IMPORTED_LOCATION "${KNITRO_LIBRARIES}"
     )
+    endif()
     
 endif()

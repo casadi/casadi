@@ -19,7 +19,8 @@ if(NOT HSL_FOUND)
       message(STATUS "Could not find HSL; looking in environmental variable HSL ($ENV{HSL})")
     endif(HSL_LIB)
 
-    add_library(hsl::hsl INTERFACE IMPORTED)
-    target_link_libraries(hsl::hsl INTERFACE ${HSL_LIB})
-    
+    if(HSL_FOUND)
+      add_library(hsl::hsl INTERFACE IMPORTED)
+      target_link_libraries(hsl::hsl INTERFACE ${HSL_LIB})
+    endif()
 endif()

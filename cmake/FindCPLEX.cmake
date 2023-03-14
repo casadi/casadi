@@ -151,9 +151,11 @@ if(NOT CPLEX_FOUND)
 
     endif()
     
-    add_library(cplex::cplex INTERFACE IMPORTED)
-    set_target_properties(cplex::cplex PROPERTIES
-      INTERFACE_INCLUDE_DIRECTORIES ${CPLEX_INCLUDE_DIRS}
-    )
-    target_link_libraries(cplex::cplex INTERFACE ${CPLEX_LIBRARIES})
+    if(CPLEX_FOUND)
+      add_library(cplex::cplex INTERFACE IMPORTED)
+      set_target_properties(cplex::cplex PROPERTIES
+        INTERFACE_INCLUDE_DIRECTORIES ${CPLEX_INCLUDE_DIRS}
+      )
+      target_link_libraries(cplex::cplex INTERFACE ${CPLEX_LIBRARIES})
+    endif()
 endif()

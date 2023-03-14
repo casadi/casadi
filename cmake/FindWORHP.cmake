@@ -47,6 +47,7 @@ if(NOT WORHP_FOUND)
       message(STATUS "Will not compile worhp interface")
     endif()
     
+    if(WORHP_FOUND)
     add_library(worhp::worhp INTERFACE IMPORTED)
     set_target_properties(worhp::worhp PROPERTIES
       INTERFACE_INCLUDE_DIRECTORIES ${WORHP_INCLUDE_DIR}
@@ -55,6 +56,7 @@ if(NOT WORHP_FOUND)
     
     if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
         target_compile_options(worhp::worhp INTERFACE "-Wno-unused-function")
+    endif()
     endif()
 
 endif()
