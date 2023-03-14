@@ -433,7 +433,8 @@ namespace casadi {
 
     // Function prototype
     if (this->cpp) s << "extern \"C\"\n"; // C linkage
-    s << "void mexFunction(int resc, mxArray *resv[], int argc, const mxArray *argv[]) {"
+    s << this->dll_export
+      << "void mexFunction(int resc, mxArray *resv[], int argc, const mxArray *argv[]) {"
       << std::endl;
 
     // Create a buffer
@@ -475,7 +476,7 @@ namespace casadi {
   }
 
   void CodeGenerator::generate_main(std::ostream &s) const {
-    s << "int main(int argc, char* argv[]) {\n";
+    s << this->dll_export << "int main(int argc, char* argv[]) {\n";
 
     // Create switch
     s << "  if (argc<2) {\n"
