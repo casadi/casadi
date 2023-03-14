@@ -729,6 +729,7 @@ std::map<std::string, MatType> Integrator::aug_adj(casadi_int nadj) const {
 int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
     casadi_int* iw, bvec_t* w, void* mem) const {
   if (verbose_) casadi_message(name_ + "::sp_forward");
+  casadi_assert(nt() == 1, "Not implemented");
 
   // Inputs
   const bvec_t* x0 = arg[INTEGRATOR_X0];
