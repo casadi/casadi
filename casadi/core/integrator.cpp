@@ -292,8 +292,8 @@ Function Integrator::create_advanced(const Dict& opts) {
   return Function::create(this, opts);
 }
 
-int Integrator::
-eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
+int Integrator::eval(const double** arg, double** res,
+    casadi_int* iw, double* w, void* mem) const {
   auto m = static_cast<IntegratorMemory*>(mem);
 
   // Read inputs
@@ -537,6 +537,7 @@ void Integrator::init(const Dict& opts) {
   alloc_w(nrx_, true); // rx
   alloc_w(nrz_, true); // rz
   alloc_w(nrx_, true); // rx_prev
+  alloc_w(nrq_, true); // rq
   alloc_w(nx_+nz_);  // Sparsity::sp_solve
   alloc_w(nrx_+nrz_);  // Sparsity::sp_solve
 }
@@ -745,6 +746,7 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
   bvec_t* rxf = res[INTEGRATOR_RXF];
   bvec_t* rzf = res[INTEGRATOR_RZF];
   bvec_t* rqf = res[INTEGRATOR_RQF];
+  bvec_t* uqf = res[INTEGRATOR_UQF];
   res += n_out_;
 
   // Work vectors
@@ -754,6 +756,7 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
   bvec_t *rx = w; w += nrx_;
   bvec_t *rz = w; w += nrz_;
   bvec_t *rx_prev = w; w += nrx_;
+  bvec_t *rq = w; w += nrq_;
 
   // Copy initial guess to x_prev
   std::copy_n(x0, nx_, x_prev);
@@ -790,52 +793,76 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
     }
 
     // Shift time
-    if (k + 1 < nt()) {
-      std::copy_n(x, nx_, x_prev);
-      if (xf) xf += nx_;
-      if (zf) zf += nz_;
-      if (qf) qf += nq_;
-      if (u) u += nu_;
-    }
+    std::copy_n(x, nx_, x_prev);
+    if (xf) xf += nx_;
+    if (zf) zf += nz_;
+    if (qf) qf += nq_;
+    if (u) u += nu_;
   }
 
   if (nrx_ > 0) {
-    casadi_assert(nt() == 1, "Not implemented");
+    // Clear rx_prev, rqf
+    std::fill_n(rx_prev, nrx_, 0);
+    std::fill_n(rqf, nrq_, 0);
 
-    // Copy initial guess to rx_prev
-    std::copy_n(rx0, nrx_, rx_prev);
+    // Take rx0, rp, uqf past the last grid point
+    if (rx0) rx0 += nrx_ * nt();
+    if (rp) rp += nrp_ * nt();
+    if (uqf) uqf += nuq_ * nt();
 
-    // Propagate through g
-    std::fill(arg, arg + DYN_NUM_IN, nullptr);
-    arg[DYN_X] = x;
-    arg[DYN_P] = p;
-    arg[DYN_U] = u;
-    arg[DYN_Z] = z;
-    arg[DYN_RX] = rx_prev;
-    arg[DYN_RP] = rp;
-    std::fill(res, res + DYN_NUM_OUT, nullptr);
-    res[DYN_RODE] = rx;
-    res[DYN_RALG] = rz;
-    oracle_(arg, res, iw, w, 0);
-    for (casadi_int i = 0; i < nrx_; ++i) rx[i] |= rx_prev[i];
+    // Integrate backward
+    for (casadi_int k = nt(); k-- > 0; ) {
+      // Shift time
+      if (rx0) rx0 -= nrx_;
+      if (rp) rp -= nrp_;
+      if (uqf) uqf -= nuq_;
+      if (u) u -= nu_;
 
-    // "Solve" in order to resolve interdependencies (cf. Rootfinder)
-    std::copy_n(rx, nrx_ + nrz_, w);
-    std::fill_n(rx, nrx_ + nrz_, 0);
-    sp_jac_rdae_.spsolve(rx, w, false);
+      // Add impulse from rx0
+      if (rx0) {
+        for (casadi_int i = 0; i < nrx_; ++i) rx_prev[i] |= rx0[i];
+      }
 
-    // Get rxf and rzf
+      // Propagate through DAE function
+      std::fill(arg, arg + DYN_NUM_IN, nullptr);
+      arg[DYN_X] = x;
+      arg[DYN_P] = p;
+      arg[DYN_U] = u;
+      arg[DYN_Z] = z;
+      arg[DYN_RX] = rx_prev;
+      arg[DYN_RP] = rp;
+      std::fill(res, res + DYN_NUM_OUT, nullptr);
+      res[DYN_RODE] = rx;
+      res[DYN_RALG] = rz;
+      oracle_(arg, res, iw, w, 0);
+      for (casadi_int i = 0; i < nrx_; ++i) rx[i] |= rx_prev[i];
+
+      // "Solve" in order to resolve interdependencies (cf. Rootfinder)
+      std::copy_n(rx, nrx_ + nrz_, w);
+      std::fill_n(rx, nrx_ + nrz_, 0);
+      sp_jac_rdae_.spsolve(rx, w, false);
+
+      // Propagate to quadratures
+      if ((nrq_ > 0 && rqf) || (nuq_ > 0 && uqf)) {
+        arg[DYN_RX] = rx;
+        arg[DYN_RZ] = rz;
+        res[DYN_RODE] = res[DYN_RALG] = nullptr;
+        res[DYN_RQUAD] = rq;
+        res[DYN_UQUAD] = uqf;
+        if (oracle_(arg, res, iw, w, 0)) return 1;
+        // Sum contributions to rqf
+        if (rqf) {
+          for (casadi_int i = 0; i < nrq_; ++i) rqf[i] |= rq[i];
+        }
+      }
+
+      // Update rx_prev
+      std::copy_n(rx, nx_, rx_prev);
+    }
+
+    // Get rxf and rzf at initial time
     if (rxf) std::copy_n(rx, nrx_, rxf);
     if (rzf) std::copy_n(rz, nrz_, rzf);
-
-    // Propagate to quadratures
-    if (nrq_ > 0 && rqf) {
-      arg[DYN_RX] = rx;
-      arg[DYN_RZ] = rz;
-      res[DYN_RODE] = res[DYN_RALG] = nullptr;
-      res[DYN_RQUAD] = rqf;
-      if (oracle_(arg, res, iw, w, 0)) return 1;
-    }
   }
   return 0;
 }
@@ -1369,7 +1396,6 @@ void FixedStepIntegrator::init(const Dict& opts) {
   // Work vectors, backward problem
   alloc_w(nrv_, true); // rv
   alloc_w(nrp_, true); // rp
-  alloc_w(nrq_, true); // rq
   alloc_w(nuq_, true); // uq
   alloc_w(nrv_, true); // rv_prev
   alloc_w(nrq_, true); // rq_prev
@@ -1396,6 +1422,7 @@ void FixedStepIntegrator::set_work(void* mem, const double**& arg, double**& res
   m->rz = w; w += nrz_;
   m->x_prev = w; w += nx_;
   m->rx_prev = w; w += nrx_;
+  m->rq = w; w += nrq_;
 
   // Work vectors, forward problem
   m->v = w; w += nv_;
@@ -1408,7 +1435,6 @@ void FixedStepIntegrator::set_work(void* mem, const double**& arg, double**& res
   // Work vectors, backward problem
   m->rv = w; w += nrv_;
   m->rp = w; w += nrp_;
-  m->rq = w; w += nrq_;
   m->uq = w; w += nuq_;
   m->rv_prev = w; w += nrv_;
   m->rq_prev = w; w += nrq_;
