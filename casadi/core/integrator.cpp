@@ -870,6 +870,7 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
 int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
     casadi_int* iw, bvec_t* w, void* mem) const {
   if (verbose_) casadi_message(name_ + "::sp_reverse");
+  casadi_assert(nt() == 1, "Not implemented");
 
   // Inputs
   bvec_t* x0 = arg[INTEGRATOR_X0];
@@ -909,7 +910,7 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
     std::fill_n(z, nz_, 0);
   }
 
-  if (nrx_>0) {
+  if (nrx_ > 0) {
     // Propagate from outputs to state vectors
     if (rxf) {
       std::copy_n(rxf, nrx_, rx);
