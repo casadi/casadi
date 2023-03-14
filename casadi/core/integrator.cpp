@@ -723,85 +723,98 @@ std::map<std::string, MatType> Integrator::aug_adj(casadi_int nadj) const {
   return ret;
 }
 
-int Integrator::
-sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, void* mem) const {
+int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
+    casadi_int* iw, bvec_t* w, void* mem) const {
   if (verbose_) casadi_message(name_ + "::sp_forward");
 
+  // Inputs
+  const bvec_t* x0 = arg[INTEGRATOR_X0];
+  const bvec_t* p = arg[INTEGRATOR_P];
+  const bvec_t* u = arg[INTEGRATOR_U];
+  const bvec_t* rx0 = arg[INTEGRATOR_RX0];
+  const bvec_t* rp = arg[INTEGRATOR_RP];
+  arg += n_in_;
+
+  // Outputs
+  bvec_t* xf = res[INTEGRATOR_XF];
+  bvec_t* zf = res[INTEGRATOR_ZF];
+  bvec_t* qf = res[INTEGRATOR_QF];
+  bvec_t* rxf = res[INTEGRATOR_RXF];
+  bvec_t* rzf = res[INTEGRATOR_RZF];
+  bvec_t* rqf = res[INTEGRATOR_RQF];
+  res += n_out_;
+
   // Work vectors
-  bvec_t *tmp_x = w; w += nx_;
-  bvec_t *tmp_z = w; w += nz_;
-  bvec_t *tmp_rx = w; w += nrx_;
-  bvec_t *tmp_rz = w; w += nrz_;
+  bvec_t *x = w; w += nx_;
+  bvec_t *z = w; w += nz_;
+  bvec_t *rx = w; w += nrx_;
+  bvec_t *rz = w; w += nrz_;
 
   // Propagate forward
-  const bvec_t** arg1 = arg+n_in_;
-  std::fill_n(arg1, static_cast<size_t>(DYN_NUM_IN), nullptr);
-  arg1[DYN_X] = arg[INTEGRATOR_X0];
-  arg1[DYN_P] = arg[INTEGRATOR_P];
-  arg1[DYN_U] = arg[INTEGRATOR_U];
-  bvec_t** res1 = res+n_out_;
-  std::fill_n(res1, static_cast<size_t>(DYN_NUM_OUT), nullptr);
-  res1[DYN_ODE] = tmp_x;
-  res1[DYN_ALG] = tmp_z;
-  oracle_(arg1, res1, iw, w, 0);
-  if (arg[INTEGRATOR_X0]) {
-    const bvec_t *tmp = arg[INTEGRATOR_X0];
-    for (casadi_int i=0; i<nx_; ++i) tmp_x[i] |= *tmp++;
+  std::fill(arg, arg + DYN_NUM_IN, nullptr);
+  arg[DYN_X] = x0;
+  arg[DYN_P] = p;
+  arg[DYN_U] = u;
+  std::fill(res, res + DYN_NUM_OUT, nullptr);
+  res[DYN_ODE] = x;
+  res[DYN_ALG] = z;
+  oracle_(arg, res, iw, w, 0);
+  if (x0) {
+    for (casadi_int i = 0; i < nx_; ++i) x[i] |= *x0++;
   }
 
   // "Solve" in order to resolve interdependencies (cf. Rootfinder)
-  std::copy_n(tmp_x, nx_+nz_, w);
-  std::fill_n(tmp_x, nx_+nz_, 0);
-  sp_jac_dae_.spsolve(tmp_x, w, false);
+  std::copy_n(x, nx_+nz_, w);
+  std::fill_n(x, nx_+nz_, 0);
+  sp_jac_dae_.spsolve(x, w, false);
 
   // Get xf and zf
-  if (res[INTEGRATOR_XF]) std::copy_n(tmp_x, nx_, res[INTEGRATOR_XF]);
-  if (res[INTEGRATOR_ZF]) std::copy_n(tmp_z, nz_, res[INTEGRATOR_ZF]);
+  if (xf) std::copy_n(x, nx_, xf);
+  if (zf) std::copy_n(z, nz_, zf);
 
   // Propagate to quadratures
-  if (nq_>0 && res[INTEGRATOR_QF]) {
-    arg1[DYN_X] = tmp_x;
-    arg1[DYN_Z] = tmp_z;
-    res1[DYN_ODE] = res1[DYN_ALG] = nullptr;
-    res1[DYN_QUAD] = res[INTEGRATOR_QF];
-    if (oracle_(arg1, res1, iw, w, 0)) return 1;
+  if (nq_ > 0 && qf) {
+    arg[DYN_X] = x;
+    arg[DYN_Z] = z;
+    res[DYN_ODE] = res[DYN_ALG] = nullptr;
+    res[DYN_QUAD] = qf;
+    if (oracle_(arg, res, iw, w, 0)) return 1;
   }
 
-  if (nrx_>0) {
+  if (nrx_ > 0) {
     // Propagate through g
-    std::fill_n(arg1, static_cast<size_t>(DYN_NUM_IN), nullptr);
-    arg1[DYN_X] = tmp_x;
-    arg1[DYN_P] = arg[INTEGRATOR_P];
-    arg1[DYN_U] = arg[INTEGRATOR_U];
-    arg1[DYN_Z] = tmp_z;
-    arg1[DYN_RX] = arg[INTEGRATOR_X0];
-    arg1[DYN_RX] = arg[INTEGRATOR_RX0];
-    arg1[DYN_RP] = arg[INTEGRATOR_RP];
-    std::fill_n(res1, static_cast<size_t>(DYN_NUM_OUT), nullptr);
-    res1[DYN_RODE] = tmp_rx;
-    res1[DYN_RALG] = tmp_rz;
-    oracle_(arg1, res1, iw, w, 0);
-    if (arg[INTEGRATOR_RX0]) {
-      const bvec_t *tmp = arg[INTEGRATOR_RX0];
-      for (casadi_int i=0; i<nrx_; ++i) tmp_rx[i] |= *tmp++;
+    std::fill(arg, arg + DYN_NUM_IN, nullptr);
+    arg[DYN_X] = x;
+    arg[DYN_P] = p;
+    arg[DYN_U] = u;
+    arg[DYN_Z] = z;
+    arg[DYN_RX] = rx0;
+    arg[DYN_RP] = rp;
+    std::fill(res, res + DYN_NUM_OUT, nullptr);
+    res[DYN_RODE] = rx;
+    res[DYN_RALG] = rz;
+    oracle_(arg, res, iw, w, 0);
+    if (rx0) {
+      const bvec_t *tmp = rx0;
+      for (casadi_int i = 0; i < nrx_; ++i) rx[i] |= *tmp++;
     }
 
     // "Solve" in order to resolve interdependencies (cf. Rootfinder)
-    std::copy_n(tmp_rx, nrx_+nrz_, w);
-    std::fill_n(tmp_rx, nrx_+nrz_, 0);
-    sp_jac_rdae_.spsolve(tmp_rx, w, false);
+    std::copy_n(rx, nrx_ + nrz_, w);
+    std::fill_n(rx, nrx_ + nrz_, 0);
+    sp_jac_rdae_.spsolve(rx, w, false);
 
     // Get rxf and rzf
-    if (res[INTEGRATOR_RXF]) std::copy_n(tmp_rx, nrx_, res[INTEGRATOR_RXF]);
-    if (res[INTEGRATOR_RZF]) std::copy_n(tmp_rz, nrz_, res[INTEGRATOR_RZF]);
+    if (rxf) std::copy_n(rx, nrx_, rxf);
+    if (rzf) std::copy_n(rz, nrz_, rzf);
 
     // Propagate to quadratures
-    if (nrq_>0 && res[INTEGRATOR_RQF]) {
-      arg1[DYN_RX] = tmp_rx;
-      arg1[DYN_RZ] = tmp_rz;
-      res1[DYN_RODE] = res1[DYN_RALG] = nullptr;
-      res1[DYN_RQUAD] = res[INTEGRATOR_RQF];
-      if (oracle_(arg1, res1, iw, w, 0)) return 1;
+    if (nrq_ > 0 && rqf) {
+      arg[DYN_RX] = rx;
+      arg[DYN_RZ] = rz;
+      res[DYN_RODE] = res[DYN_RALG] = nullptr;
+      res[DYN_RQUAD] = rqf;
+      if (oracle_(arg, res, iw, w, 0)) return 1;
     }
   }
   return 0;
