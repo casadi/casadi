@@ -389,17 +389,14 @@ enum BStepOut {
 };
 
 struct CASADI_EXPORT FixedStepMemory : public IntegratorMemory {
+  // Work vectors, allocated in base class
+  double *x, *z, *rx, *rz, *x_prev, *rx_prev;
+
   /// Work vectors, forward problem
-  double *x, *z, *p, *u, *q;
+  double *v, *p, *u, *q, *v_prev, *q_prev;
 
   /// Work vectors, backward problem
-  double *rx, *rz, *rp, *rq, *uq;
-
-  /// Work vectors, dependent variables
-  double *v, *rv;
-
-  /// Work vectors, previous state
-  double *x_prev, *v_prev, *q_prev, *rx_prev, *rv_prev, *rq_prev, *uq_prev;
+  double *rv, *rp, *rq, *uq, *rv_prev, *rq_prev, *uq_prev;
 
   /// State and dependent variables at all times
   double *x_tape, *v_tape;
