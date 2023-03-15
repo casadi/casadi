@@ -41,69 +41,30 @@
 <tr><td>DPLE_P</td><td>p</td><td>Lyapunov matrix (horzcat when const_dim, diagcat otherwise) (Cholesky of P if pos_def) [p].</td></tr>
 </table>
 */
-/** \defgroup scheme_DAEInput
-<a name='schemes'></a><table>
-<caption>Input scheme: casadi::DAEInput  (DAE_NUM_IN = 4)</caption>
-<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>DAE_X</td><td>x</td><td>Differential state.</td></tr>
-<tr><td>DAE_Z</td><td>z</td><td>Algebraic state.</td></tr>
-<tr><td>DAE_P</td><td>p</td><td>Parameter.</td></tr>
-<tr><td>DAE_T</td><td>t</td><td>Explicit time dependence.</td></tr>
-</table>
-*/
-/** \defgroup scheme_DAEOutput
-<a name='schemes'></a><table>
-<caption>Output scheme: casadi::DAEOutput  (DAE_NUM_OUT = 3)</caption>
-<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>DAE_ODE</td><td>ode</td><td>Right hand side of the implicit ODE.</td></tr>
-<tr><td>DAE_ALG</td><td>alg</td><td>Right hand side of algebraic equations.</td></tr>
-<tr><td>DAE_QUAD</td><td>quad</td><td>Right hand side of quadratures equations.</td></tr>
-</table>
-*/
-/** \defgroup scheme_RDAEInput
-<a name='schemes'></a><table>
-<caption>Input scheme: casadi::RDAEInput  (RDAE_NUM_IN = 7)</caption>
-<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>RDAE_RX</td><td>rx</td><td>Backward differential state.</td></tr>
-<tr><td>RDAE_RZ</td><td>rz</td><td>Backward algebraic state.</td></tr>
-<tr><td>RDAE_RP</td><td>rp</td><td>Backward parameter vector.</td></tr>
-<tr><td>RDAE_X</td><td>x</td><td>Forward differential state.</td></tr>
-<tr><td>RDAE_Z</td><td>z</td><td>Forward algebraic state.</td></tr>
-<tr><td>RDAE_P</td><td>p</td><td>Parameter vector.</td></tr>
-<tr><td>RDAE_T</td><td>t</td><td>Explicit time dependence.</td></tr>
-</table>
-*/
-/** \defgroup scheme_RDAEOutput
-<a name='schemes'></a><table>
-<caption>Output scheme: casadi::RDAEOutput  (RDAE_NUM_OUT = 3)</caption>
-<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>RDAE_ODE</td><td>ode</td><td>Right hand side of ODE.</td></tr>
-<tr><td>RDAE_ALG</td><td>alg</td><td>Right hand side of algebraic equations.</td></tr>
-<tr><td>RDAE_QUAD</td><td>quad</td><td>Right hand side of quadratures.</td></tr>
-</table>
-*/
 /** \defgroup scheme_IntegratorInput
 <a name='schemes'></a><table>
-<caption>Input scheme: casadi::IntegratorInput  (INTEGRATOR_NUM_IN = 6)</caption>
+<caption>Input scheme: casadi::IntegratorInput  (INTEGRATOR_NUM_IN = 7)</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
 <tr><td>INTEGRATOR_X0</td><td>x0</td><td>Differential state at the initial time.</td></tr>
 <tr><td>INTEGRATOR_P</td><td>p</td><td>Parameters.</td></tr>
-<tr><td>INTEGRATOR_Z0</td><td>z0</td><td>Initial guess for the algebraic variable.</td></tr>
-<tr><td>INTEGRATOR_RX0</td><td>rx0</td><td>Backward differential state at the final time.</td></tr>
-<tr><td>INTEGRATOR_RP</td><td>rp</td><td>Backward parameter vector.</td></tr>
-<tr><td>INTEGRATOR_RZ0</td><td>rz0</td><td>Initial guess for the backwards algebraic variable.</td></tr>
+<tr><td>INTEGRATOR_U</td><td>u</td><td>Piecewise constant control, a new control interval starts at each output time.</td></tr>
+<tr><td>INTEGRATOR_Z0</td><td>z0</td><td>Initial guess for the algebraic variable at the initial time.</td></tr>
+<tr><td>INTEGRATOR_RX0</td><td>rx0</td><td>Backward differential state impulse at each output time.</td></tr>
+<tr><td>INTEGRATOR_RP</td><td>rp</td><td>Backward parameter vector impulse at each output time.</td></tr>
+<tr><td>INTEGRATOR_RZ0</td><td>rz0</td><td>Initial guess for the backwards algebraic variable at each output time.</td></tr>
 </table>
 */
 /** \defgroup scheme_IntegratorOutput
 <a name='schemes'></a><table>
-<caption>Output scheme: casadi::IntegratorOutput  (INTEGRATOR_NUM_OUT = 6)</caption>
+<caption>Output scheme: casadi::IntegratorOutput  (INTEGRATOR_NUM_OUT = 7)</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>INTEGRATOR_XF</td><td>xf</td><td>Differential state at the final time.</td></tr>
-<tr><td>INTEGRATOR_QF</td><td>qf</td><td>Quadrature state at the final time.</td></tr>
-<tr><td>INTEGRATOR_ZF</td><td>zf</td><td>Algebraic variable at the final time.</td></tr>
+<tr><td>INTEGRATOR_XF</td><td>xf</td><td>Differential state at all output times.</td></tr>
+<tr><td>INTEGRATOR_QF</td><td>qf</td><td>Quadrature state at all output times.</td></tr>
+<tr><td>INTEGRATOR_ZF</td><td>zf</td><td>Algebraic variable at all output times.</td></tr>
 <tr><td>INTEGRATOR_RXF</td><td>rxf</td><td>Backward differential state at the initial time.</td></tr>
 <tr><td>INTEGRATOR_RQF</td><td>rqf</td><td>Backward quadrature state at the initial time.</td></tr>
 <tr><td>INTEGRATOR_RZF</td><td>rzf</td><td>Backward algebraic variable at the initial time.</td></tr>
+<tr><td>INTEGRATOR_UQF</td><td>uqf</td><td>Backward gridded quadrature for each control interval.</td></tr>
 </table>
 */
 /** \defgroup scheme_NLPInput
@@ -175,10 +136,9 @@
 */
 /** \defgroup scheme_SimulatorOutput
 <a name='schemes'></a><table>
-<caption>Output scheme: casadi::SimulatorOutput  (SIMULATOR_NUM_OUT = 3)</caption>
+<caption>Output scheme: casadi::SimulatorOutput  (SIMULATOR_NUM_OUT = 2)</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
 <tr><td>SIMULATOR_X</td><td>x</td><td>Differential state.</td></tr>
-<tr><td>SIMULATOR_Y</td><td>y</td><td>Outputs.</td></tr>
 <tr><td>SIMULATOR_Z</td><td>z</td><td>Algebraic variable.</td></tr>
 </table>
 */
