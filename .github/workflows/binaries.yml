@@ -568,7 +568,7 @@ jobs:
         with:
           repo: casadi/commercial_solvers
           file:  libgfortran.so.3
-          target: install/casadi/
+          target: install/casadi/libgfortran.so.3
         if: contains(matrix.arch, 'linux')
       - uses: kanga333/variable-mapper@v0.3.0
         with:
