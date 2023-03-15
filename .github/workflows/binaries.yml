@@ -140,7 +140,7 @@ jobs:
         run: |
           docker pull ghcr.io/jgillis/${{ matrix.target }}:production
           docker image inspect ghcr.io/jgillis/${{ matrix.target }}:production
-          docker run --rm ghcr.io/jgillis/${{ matrix.target }}:production > dockcross
+          docker run --rm --env DEFAULT_DOCKCROSS_IMAGE=ghcr.io/jgillis/${{ matrix.target }}:production ghcr.io/jgillis/${{ matrix.target }}:production > dockcross
           chmod +x dockcross
           pwd
           ls -al dockcross
@@ -461,7 +461,7 @@ jobs:
       - name: Setup dockcross
         run: |
           docker pull ghcr.io/jgillis/${{ matrix.arch }}:production
-          docker run --rm ghcr.io/jgillis/${{ matrix.arch }}:production > dockcross
+          docker run --rm --env DEFAULT_DOCKCROSS_IMAGE=ghcr.io/jgillis/${{ matrix.arch }}:production ghcr.io/jgillis/${{ matrix.arch }}:production > dockcross
           chmod +x dockcross
       - uses: casadi/mockups@master
         with:
@@ -541,7 +541,7 @@ jobs:
       - name: Setup dockcross
         run: |
           docker pull ghcr.io/jgillis/${{ matrix.arch }}:production
-          docker run --rm ghcr.io/jgillis/${{ matrix.arch }}:production > dockcross
+          docker run --rm --env DEFAULT_DOCKCROSS_IMAGE=ghcr.io/jgillis/${{ matrix.arch }}:production ghcr.io/jgillis/${{ matrix.arch }}:production > dockcross
           chmod +x dockcross
       - run: echo ${{env.GITHUB_WORKSPACE}}
       - run: cat $GITHUB_ENV

@@ -11,8 +11,8 @@ export TARGET=manylinux2014-x64
 
 echo "TARGET: $TARGET"
 
-#docker run --rm ghcr.io/jgillis/$TARGET:production > dockcross.$TARGET
-#chmod +x dockcross.$TARGET
+docker run --rm --env DEFAULT_DOCKCROSS_IMAGE=ghcr.io/jgillis/$TARGET:production ghcr.io/jgillis/$TARGET:production > dockcross.$TARGET
+chmod +x dockcross.$TARGET
 
 #INT_TARGET=python
 #INT_TARGET=matlab
