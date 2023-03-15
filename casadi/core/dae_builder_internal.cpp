@@ -494,6 +494,42 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
   }
 }
 
+std::string DaeBuilderInternal::generate_build_description(const std::vector<std::string>& cfiles) const {
+  // Default arguments
+  int fmi_major = 3;
+  int fmi_minor = 0;
+  std::string model_name = name_;
+  // Construct XML file
+  XmlNode r;
+  // Preamble
+  r.name = "fmiBuildDescription";
+  r.set_attribute("fmiVersion", std::to_string(fmi_major) + "." + std::to_string(fmi_minor));
+  // Set of source files
+  XmlNode source_file_set;
+  source_file_set.name = "SourceFileSet";
+  for (auto&& f : cfiles) {
+    XmlNode source_file;
+    source_file.name = "SourceFile";
+    source_file.set_attribute("name", f);
+    source_file_set.children.push_back(source_file);
+  }
+  // Build configurations
+  XmlNode bc;
+  bc.name = "BuildConfiguration";
+  bc.set_attribute("modelIdentifier", model_name);
+  bc.children.push_back(source_file_set);
+  r.children.push_back(bc);
+  // XML file name
+  std::string xml_filename = "buildDescription.xml";
+  // Construct ModelDescription
+  XmlNode build_description;
+  build_description.children.push_back(r);
+  // Export to file
+  XmlFile xml_file("tinyxml");
+  xml_file.dump(xml_filename, build_description);
+  return xml_filename;
+}
+
 std::string DaeBuilderInternal::generate_model_description(const std::string& guid) const {
   // Default arguments
   int fmi_major = 3;
@@ -539,6 +575,7 @@ std::string DaeBuilderInternal::generate_model_description(const std::string& gu
   xml_file.dump(xml_filename, model_description);
   return xml_filename;
 }
+
 
 XmlNode DaeBuilderInternal::generate_model_variables() const {
   XmlNode r;
@@ -649,7 +686,7 @@ std::vector<std::string> DaeBuilderInternal::export_fmu(const Dict& opts) const 
   // GUID
   std::string guid = generate_guid();
   // Generate model function
-  std::string dae_filename = "daefun";
+  std::string dae_filename = name_;
   Function dae = shared_from_this<DaeBuilder>().create(dae_filename,
     {"t", "x", "p", "u"}, {"ode", "ydef"});
   // Generate C code for model equations
@@ -666,9 +703,10 @@ std::vector<std::string> DaeBuilderInternal::export_fmu(const Dict& opts) const 
   // Generate FMU wrapper file
   std::string wrapper_filename = generate_wrapper(guid, gen);
   ret.push_back(wrapper_filename);
+  // Generate build description
+  ret.push_back(generate_build_description(ret));
   // Generate modelDescription file
-  std::string xml_filename = generate_model_description(guid);
-  ret.push_back(xml_filename);
+  ret.push_back(generate_model_description(guid));
   // Return list of files
   return ret;
 }
@@ -714,13 +752,13 @@ std::vector<double> DaeBuilderInternal::start_all() const {
 std::string DaeBuilderInternal::generate_wrapper(const std::string& guid,
     const CodeGenerator& gen) const {
   // Create file
-  std::string wrapper_filename = "fmi3Functions.c";
+  std::string wrapper_filename = name_ + "_wrap.c";
   std::ofstream f;
   CodeGenerator::file_open(f, wrapper_filename, false);
 
   // Add includes
   f << "#include <fmi3Functions.h>\n"
-    << "#include \"daefun.h\"\n"
+    << "#include \"" << name_ << "\".h\"\n"
     << "\n";
 
   // Total number of variables

@@ -246,7 +246,10 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   /// Generate FMU wrapper file (fmi3Functions.c)
   std::string generate_wrapper(const std::string& guid, const CodeGenerator& gen) const;
 
-  /// Generate FMU XML file
+  /// Generate buildDescription.xml
+  std::string generate_build_description(const std::vector<std::string>& cfiles) const;
+
+  /// Generate modelDescription.xml
   std::string generate_model_description(const std::string& guid) const;
 
   /// Generate FMU ModelVariables
