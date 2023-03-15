@@ -895,15 +895,15 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
   bvec_t *x_prev = w; w += nx_;
   bvec_t *rx = w; w += nrx_;
   bvec_t *rz = w; w += nrz_;
-  // bvec_t *rx_prev = w; w += nrx_;
+  bvec_t *rx_prev = w; w += nrx_;
+  bvec_t *rq = w; w += nrq_;
 
   // Clear state vector
   std::fill_n(x, nx_, 0);
   std::fill_n(z, nz_, 0);
 
   if (nrx_ > 0) {
-    casadi_assert(nt() == 1, "Not implemented");
-    // Propagate from outputs to state vectors
+    // Propagate from rxf and rzf at initial time
     if (rxf) {
       std::copy_n(rxf, nrx_, rx);
       std::fill_n(rxf, nrx_, 0);
@@ -917,36 +917,63 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
       std::fill_n(rz, nrz_, 0);
     }
 
-    // Get dependencies from backward quadratures
-    std::fill(res, res + DYN_NUM_OUT, nullptr);
-    res[DYN_RQUAD] = rqf;
-    res[DYN_UQUAD] = uqf;
-    std::fill(arg, res + DYN_NUM_IN, nullptr);
-    arg[DYN_X] = x;
-    arg[DYN_Z] = z;
-    arg[DYN_P] = p;
-    arg[DYN_U] = u;
-    arg[DYN_RX] = rx;
-    arg[DYN_RZ] = rz;
-    arg[DYN_RP] = rp;
-    if (oracle_.rev(arg, res, iw, w, 0)) return 1;
+    // Save rqf: See note below
+    std::copy_n(rqf, nrq_, rq);
 
-    // Propagate interdependencies
-    std::fill_n(w, nrx_+nrz_, 0);
-    sp_jac_rdae_.spsolve(w, rx, true);
-    std::copy_n(w, nrx_+nrz_, rx);
+    // Step backwards through backward problem
+    for (casadi_int k = 0; k < nt(); ++k) {
+      // Restore rqf: See note below
+      std::copy_n(rq, nrq_, rqf);
 
-    // Direct dependency rx0 -> rxf
-    if (rx0) for (casadi_int i=0; i<nrx_; ++i) rx0[i] |= rx[i];
+      // Add impulse from rx0
+      if (rx0) {
+        for (casadi_int i = 0; i < nrx_; ++i) rx[i] |= rx0[i];
+        std::fill_n(rx0, nrx_, 0);
+      }
 
-    // Indirect dependency via g
-    res[DYN_RODE] = rx;
-    res[DYN_RALG] = rz;
-    res[DYN_RQUAD] = nullptr;
-    res[DYN_UQUAD] = nullptr;
-    arg[DYN_RX] = rx0;
-    arg[DYN_RZ] = nullptr; // INTEGRATOR_RZ0 is a guess, not a dependency
-    if (oracle_.rev(arg, res, iw, w, 0)) return 1;
+      // Get dependencies from backward quadratures
+      std::fill(res, res + DYN_NUM_OUT, nullptr);
+      res[DYN_RQUAD] = rqf;  // Note: will set rqf to zero, hence the restoration step above
+      res[DYN_UQUAD] = uqf;
+      std::fill(arg, res + DYN_NUM_IN, nullptr);
+      arg[DYN_X] = x;
+      arg[DYN_Z] = z;
+      arg[DYN_P] = p;
+      arg[DYN_U] = u;
+      arg[DYN_RX] = rx;
+      arg[DYN_RZ] = rz;
+      arg[DYN_RP] = rp;
+      if ((nrq_ > 0 && rqf) || (nuq_ > 0 && uqf)) {
+        if (oracle_.rev(arg, res, iw, w, 0)) return 1;
+      }
+
+      // Propagate interdependencies
+      std::fill_n(w, nrx_+nrz_, 0);
+      sp_jac_rdae_.spsolve(w, rx, true);
+      std::copy_n(w, nrx_+nrz_, rx);
+
+      // Direct dependency rx_prev -> rx
+      std::copy_n(rx, nrx_, rx_prev);
+
+      // Indirect dependency via g
+      res[DYN_RODE] = rx;
+      res[DYN_RALG] = rz;
+      res[DYN_RQUAD] = nullptr;
+      res[DYN_UQUAD] = nullptr;
+      arg[DYN_RX] = rx_prev;
+      arg[DYN_RZ] = nullptr; // INTEGRATOR_RZ0 is a guess, not a dependency
+      if (oracle_.rev(arg, res, iw, w, 0)) return 1;
+
+      // Update rx, rz
+      std::copy_n(rx_prev, nrx_, rx);
+      std::fill_n(rz, nrz_, 0);
+
+      // Shift time
+      if (rx0) rx0 += nrx_;
+      if (rp) rp += nrp_;
+      if (uqf) uqf += nuq_;
+      if (u) u += nu_;
+    }
   } else {
     // Take u past the last grid point
     if (u) u += nu_ * nt();
