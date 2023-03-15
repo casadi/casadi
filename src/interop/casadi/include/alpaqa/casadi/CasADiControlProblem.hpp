@@ -79,6 +79,51 @@ class CasADiControlProblem {
     [[nodiscard]] length_t get_nc() const { return nc; }
     [[nodiscard]] length_t get_nc_N() const { return nc_N; }
 
+    /// @see @ref TypeErasedControlProblem::eval_proj_diff_g
+    void eval_proj_diff_g(crvec z, rvec p) const {
+        for (index_t t = 0; t < N; ++t)
+            p.segment(t * nc, nc) =
+                alpaqa::projecting_difference(z.segment(t * nc, nc), D);
+        p.segment(N * nc, nc_N) =
+            alpaqa::projecting_difference(z.segment(N * nc, nc_N), D_N);
+    }
+    /// @see @ref TypeErasedControlProblem::eval_proj_multipliers
+    void eval_proj_multipliers(rvec y, real_t M,
+                               index_t penalty_alm_split) const {
+        // If there's no lower bound, the multipliers can only be positive
+        auto max_lb = [M](real_t y, real_t z_lb) {
+            real_t y_lb = z_lb == -alpaqa::inf<config_t> ? 0 : -M;
+            return std::max(y, y_lb);
+        };
+        // If there's no upper bound, the multipliers can only be negative
+        auto min_ub = [M](real_t y, real_t z_ub) {
+            real_t y_ub = z_ub == alpaqa::inf<config_t> ? 0 : M;
+            return std::min(y, y_ub);
+        };
+        for (index_t t = 0; t < N; ++t) {
+            auto num_alm    = nc - penalty_alm_split;
+            auto &&yt       = y.segment(t * nc, nc);
+            auto &&y_qpm    = yt.topRows(penalty_alm_split);
+            auto &&y_alm    = yt.bottomRows(num_alm);
+            auto &&z_alm_lb = D.lowerbound.bottomRows(num_alm);
+            auto &&z_alm_ub = D.upperbound.bottomRows(num_alm);
+            y_qpm.setZero();
+            y_alm =
+                y_alm.binaryExpr(z_alm_lb, max_lb).binaryExpr(z_alm_ub, min_ub);
+        }
+        {
+            auto &&yt       = y.segment(N * nc, nc_N);
+            auto num_alm    = nc_N - penalty_alm_split;
+            auto &&y_qpm    = yt.topRows(penalty_alm_split);
+            auto &&y_alm    = yt.bottomRows(num_alm);
+            auto &&z_alm_lb = D.lowerbound.bottomRows(num_alm);
+            auto &&z_alm_ub = D.upperbound.bottomRows(num_alm);
+            y_qpm.setZero();
+            y_alm =
+                y_alm.binaryExpr(z_alm_lb, max_lb).binaryExpr(z_alm_ub, min_ub);
+        }
+    }
+
   private:
     using Functions = casadi_loader::CasADiControlFunctionsWithParam<Conf>;
     util::copyable_unique_ptr<Functions> impl;

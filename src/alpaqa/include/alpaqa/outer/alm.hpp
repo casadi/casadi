@@ -102,9 +102,9 @@ class ALMSolver {
   public:
     USING_ALPAQA_CONFIG_TEMPLATE(InnerSolverT::config_t);
 
-    using Problem     = TypeErasedProblem<config_t>;
     using Params      = ALMParams<config_t>;
     using InnerSolver = InnerSolverT;
+    using Problem     = typename InnerSolver::Problem;
 
     struct Stats {
         /// Total number of outer ALM iterations (i.e. the number of times that

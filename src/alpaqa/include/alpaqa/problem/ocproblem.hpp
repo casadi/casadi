@@ -35,6 +35,10 @@ struct ControlProblemVTable : util::BasicVTable {
         util::BasicVTable::optional_const_function_t<F, ControlProblemVTable>;
 
     // clang-format off
+    required_const_function_t<void(crvec z, rvec p)>
+        eval_proj_diff_g;
+    required_const_function_t<void(rvec y, real_t M, index_t penalty_alm_split)>
+        eval_proj_multipliers;
     required_const_function_t<void(Box &U)>
         get_U;
     optional_const_function_t<void(Box &D)>
@@ -97,6 +101,8 @@ struct ControlProblemVTable : util::BasicVTable {
 
     template <class P>
     ControlProblemVTable(util::VTableTypeTag<P> t) : util::BasicVTable{t} {
+        ALPAQA_TE_REQUIRED_METHOD(*this, P, eval_proj_diff_g);
+        ALPAQA_TE_REQUIRED_METHOD(*this, P, eval_proj_multipliers);
         ALPAQA_TE_REQUIRED_METHOD(*this, P, get_U);
         ALPAQA_TE_OPTIONAL_METHOD(*this, P, get_D, t.t);
         ALPAQA_TE_OPTIONAL_METHOD(*this, P, get_D_N, t.t);
@@ -280,6 +286,35 @@ class TypeErasedControlProblem : public util::TypeErased<ControlProblemVTable<Co
             .nc_N = vtable.nc_N,
         };
     }
+    /// Total number of variables.
+    [[nodiscard]] length_t get_n() const { return get_N() * get_nu(); }
+    /// Total number of constraints.
+    [[nodiscard]] length_t get_m() const { return get_N() * get_nc() + get_nc_N(); }
+
+    /// @}
+
+    /// @name Projections onto constraint sets
+    /// @{
+
+    /// **[Required]**
+    /// Function that evaluates the difference between the given point @f$ z @f$
+    /// and its projection onto the constraint set @f$ D @f$.
+    /// @param  [in] z
+    ///         Slack variable, @f$ z \in \R^m @f$
+    /// @param  [out] p
+    ///         The difference relative to its projection,
+    ///         @f$ p = z - \Pi_D(z) \in \R^m @f$
+    /// @note   @p z and @p p can refer to the same vector.
+    void eval_proj_diff_g(crvec z, rvec p) const;
+    /// **[Required]**
+    /// Function that projects the Lagrange multipliers for ALM.
+    /// @param  [inout] y
+    ///         Multipliers, @f$ y \leftarrow \Pi_Y(y) \in \R^m @f$
+    /// @param  [in] M
+    ///         The radius/size of the set @f$ Y @f$. See @ref ALMParams::M.
+    /// @param  [in] penalty_alm_split
+    ///         See @ref ALMParams::penalty_alm_split.
+    void eval_proj_multipliers(rvec y, real_t M, index_t penalty_alm_split) const;
 
     /// @}
 
@@ -439,6 +474,8 @@ class TypeErasedControlProblem : public util::TypeErased<ControlProblemVTable<Co
 // clang-format off
 #ifdef NDEBUG
 [[gnu::always_inline]] inline void check_finiteness(auto &&, auto &&) {}
+template <Config Conf, class Allocator> [[gnu::always_inline]] inline void TypeErasedControlProblem<Conf, Allocator>::eval_proj_diff_g(crvec z, rvec p) const { return call(vtable.eval_proj_diff_g, z, p); }
+template <Config Conf, class Allocator> [[gnu::always_inline]] inline void TypeErasedControlProblem<Conf, Allocator>::eval_proj_multipliers(rvec y, real_t M, index_t penalty_alm_split) const { return call(vtable.eval_proj_multipliers, y, M, penalty_alm_split); }
 template <Config Conf, class Allocator> [[gnu::always_inline]] inline void TypeErasedControlProblem<Conf, Allocator>::get_U(Box &U) const { return call(vtable.get_U, U); }
 template <Config Conf, class Allocator> [[gnu::always_inline]] inline void TypeErasedControlProblem<Conf, Allocator>::get_D(Box &D) const { return call(vtable.get_D, D); }
 template <Config Conf, class Allocator> [[gnu::always_inline]] inline void TypeErasedControlProblem<Conf, Allocator>::get_D_N(Box &D) const { return call(vtable.get_D_N, D); }
@@ -484,6 +521,8 @@ inline void check_finiteness(const std::floating_point auto &v, std::string_view
         throw std::runtime_error(std::string(msg));
     }
 }
+template <Config Conf, class Allocator> [[gnu::always_inline]] inline void TypeErasedControlProblem<Conf, Allocator>::eval_proj_diff_g(crvec z, rvec p) const { return call(vtable.eval_proj_diff_g, z, p); }
+template <Config Conf, class Allocator> [[gnu::always_inline]] inline void TypeErasedControlProblem<Conf, Allocator>::eval_proj_multipliers(rvec y, real_t M, index_t penalty_alm_split) const { return call(vtable.eval_proj_multipliers, y, M, penalty_alm_split); }
 template <Config Conf, class Allocator> [[gnu::always_inline]] inline void TypeErasedControlProblem<Conf, Allocator>::get_U(Box &U) const { return call(vtable.get_U, U); }
 template <Config Conf, class Allocator> [[gnu::always_inline]] inline void TypeErasedControlProblem<Conf, Allocator>::get_D(Box &D) const { return call(vtable.get_D, D); }
 template <Config Conf, class Allocator> [[gnu::always_inline]] inline void TypeErasedControlProblem<Conf, Allocator>::get_D_N(Box &D_N) const { return call(vtable.get_D_N, D_N); }
@@ -529,6 +568,8 @@ struct ControlProblemWithCounters {
     [[nodiscard, gnu::always_inline]] length_t get_nc_N() const { return problem.get_nc_N(); }
 
     // clang-format off
+    [[gnu::always_inline]] void eval_proj_diff_g(crvec z, rvec p) const { return problem.eval_proj_diff_g(z, p); }
+    [[gnu::always_inline]] void eval_proj_multipliers(rvec y, real_t M, index_t penalty_alm_split) const { return problem.eval_proj_multipliers(y, M, penalty_alm_split); }
     [[gnu::always_inline]] void get_x_init(rvec x_init) const { return problem.get_x_init(x_init); }
     [[nodiscard, gnu::always_inline]] length_t get_R_work_size() const requires requires { &std::remove_cvref_t<Problem>::get_R_work_size; } { return problem.get_R_work_size(); }
     [[nodiscard, gnu::always_inline]] length_t get_S_work_size() const requires requires { &std::remove_cvref_t<Problem>::get_S_work_size; } { return problem.get_S_work_size(); }
@@ -576,10 +617,23 @@ struct ControlProblemWithCounters {
     std::shared_ptr<OCPEvalCounter> evaluations = std::make_shared<OCPEvalCounter>();
     Problem problem;
 
-    ControlProblemWithCounters(const Problem &problem) : problem(problem) {}
-    ControlProblemWithCounters(Problem &&problem)
+    template <class P>
+    explicit ControlProblemWithCounters(P &&problem)
+        requires std::is_same_v<std::remove_cvref_t<P>, std::remove_cvref_t<Problem>>
+        : problem{std::forward<P>(problem)} {}
+    template <class... Args>
+    explicit ControlProblemWithCounters(std::in_place_t, Args &&...args)
         requires(!std::is_lvalue_reference_v<Problem>)
-        : problem(std::forward<Problem>(problem)) {}
+        : problem{std::forward<Args>(args)...} {}
+
+    /// Reset all evaluation counters and timers to zero. Affects all instances
+    /// that share the same evaluations. If you only want to reset the counters
+    /// of this instance, use @ref decouple_evaluations first.
+    void reset_evaluations() { evaluations.reset(); }
+    /// Give this instance its own evaluation counters and timers, decoupling
+    /// it from any other instances they might have previously been shared with.
+    /// The evaluation counters and timers are preserved (a copy is made).
+    void decouple_evaluations() { evaluations = std::make_shared<OCPEvalCounter>(*evaluations); }
 
   private:
     template <class TimeT, class FunT>

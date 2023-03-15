@@ -1,6 +1,9 @@
 #pragma once
 
 #include <alpaqa/outer/alm.hpp>
+#if ALPAQA_WITH_OCP
+#include <alpaqa/problem/ocproblem.hpp>
+#endif
 
 #include <algorithm>
 
@@ -76,6 +79,17 @@ struct ALMHelpers {
         σ = std::min(σ, params.Σ_max);
         Σ.fill(σ);
     }
+
+#if ALPAQA_WITH_OCP
+    static void initialize_penalty(
+        [[maybe_unused]] const TypeErasedControlProblem<config_t> &p,
+        const ALMParams<config_t> &params, [[maybe_unused]] crvec x0, rvec Σ) {
+        real_t σ = 1;
+        σ        = std::max(σ, params.Σ_min);
+        σ        = std::min(σ, params.Σ_max);
+        Σ.fill(σ);
+    }
+#endif
 };
 
 ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, ALMHelpers, DefaultConfig);
