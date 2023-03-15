@@ -1,4 +1,3 @@
-# + {"active": "py"}
 #     This file is part of CasADi.
 #
 #     CasADi -- A symbolic framework for dynamic optimization.
@@ -20,7 +19,7 @@
 #     License along with CasADi; if not, write to the Free Software
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
-#
+
 # Linear solvers
 # =================
 #
@@ -32,7 +31,7 @@ import time
 
 n=100
 
-# $ We generate $A \in \mathbf{R}^{n \times n}$, $x \in \mathbf{R}^{n}$ with $n=100$
+# We generate $A \in \mathbf{R}^{n \times n}$, $x \in \mathbf{R}^{n}$ with $n=100$
 
 A=DM([[cos(i*j)-sin(i) for i in range(n)] for j in range(n)])
 x=DM([tan(i) for i in range(n)])
