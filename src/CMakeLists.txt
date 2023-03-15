@@ -11,7 +11,7 @@ function(alpaqa_configure_visibility target)
 endfunction()
 
 option(ALPAQA_WITH_OCP 
-    "Enable solvers tailored for optimal control problems" Off)
+    "Enable solvers tailored for optimal control problems" On)
 
 add_library(alpaqa
     "alpaqa/src/util/type-erasure.cpp"
@@ -98,7 +98,7 @@ endif()
 set(ALPAQA_WITH_CASADI_OCP_SUPPORTED ${ALPAQA_WITH_OCP})
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND
     CMAKE_CXX_COMPILER_VERSION VERSION_LESS 16.0.0)
-    set(ALPAQA_WITH_CASADI_OCP_SUPPORTED false)
+    set(ALPAQA_WITH_CASADI_OCP_SUPPORTED Off)
 endif()
 
 include(CMakeDependentOption)
