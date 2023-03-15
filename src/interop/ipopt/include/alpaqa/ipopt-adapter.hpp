@@ -14,12 +14,15 @@ class IPOPT_ADAPTER_EXPORT IpoptAdapter : public Ipopt::TNLP {
     using Problem = TypeErasedProblem<config_t>;
     const Problem &problem;
     vec initial_guess;
+    vec initial_guess_bounds_multipliers_l;
+    vec initial_guess_bounds_multipliers_u;
+    vec initial_guess_multipliers;
     using Index  = Ipopt::Index;
     using Number = Ipopt::Number;
 
     struct Results {
         Ipopt::SolverReturn status = Ipopt::SolverReturn::UNASSIGNED;
-        vec solution_x, solution_y, solution_g;
+        vec solution_x, solution_z_L, solution_z_U, solution_y, solution_g;
         real_t solution_f, infeasibility, nlp_error;
         length_t iter_count;
     } results;

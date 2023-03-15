@@ -49,20 +49,30 @@ bool IpoptAdapter::get_bounds_info(Index n, Number *x_l, Number *x_u, Index m,
 }
 
 bool IpoptAdapter::get_starting_point(Index n, bool init_x, Number *x,
-                                      [[maybe_unused]] bool init_z,
-                                      [[maybe_unused]] Number *z_L,
-                                      [[maybe_unused]] Number *z_U,
-                                      [[maybe_unused]] Index m,
-                                      [[maybe_unused]] bool init_lambda,
-                                      [[maybe_unused]] Number *lambda) {
-    assert(init_x == true);
-    assert(init_z == false);
-    assert(init_lambda == false);
+                                      bool init_z, Number *z_L, Number *z_U,
+                                      Index m, bool init_lambda,
+                                      Number *lambda) {
     if (init_x) {
         if (initial_guess.size() > 0)
             mvec{x, n} = initial_guess;
         else
             mvec{x, n}.setZero();
+    }
+    if (init_z) {
+        if (initial_guess_bounds_multipliers_l.size() > 0)
+            mvec{z_L, n} = initial_guess_bounds_multipliers_l;
+        else
+            mvec{z_L, n}.setZero();
+        if (initial_guess_bounds_multipliers_u.size() > 0)
+            mvec{z_U, n} = initial_guess_bounds_multipliers_u;
+        else
+            mvec{z_U, n}.setZero();
+    }
+    if (init_lambda) {
+        if (initial_guess_multipliers.size() > 0)
+            mvec{lambda, m} = initial_guess_multipliers;
+        else
+            mvec{lambda, m}.setZero();
     }
     return true;
 }
@@ -125,13 +135,17 @@ bool IpoptAdapter::eval_h(Index n, const Number *x, [[maybe_unused]] bool new_x,
     }
     return true;
 }
-void IpoptAdapter::finalize_solution(
-    Ipopt::SolverReturn status, Index n, const Number *x,
-    [[maybe_unused]] const Number *z_L, [[maybe_unused]] const Number *z_U,
-    Index m, const Number *g, const Number *lambda, Number obj_value,
-    const Ipopt::IpoptData *ip_data, Ipopt::IpoptCalculatedQuantities *ip_cq) {
+void IpoptAdapter::finalize_solution(Ipopt::SolverReturn status, Index n,
+                                     const Number *x, const Number *z_L,
+                                     const Number *z_U, Index m,
+                                     const Number *g, const Number *lambda,
+                                     Number obj_value,
+                                     const Ipopt::IpoptData *ip_data,
+                                     Ipopt::IpoptCalculatedQuantities *ip_cq) {
     results.status        = status;
     results.solution_x    = cmvec{x, n};
+    results.solution_z_L  = cmvec{z_L, n};
+    results.solution_z_U  = cmvec{z_U, n};
     results.solution_y    = cmvec{lambda, m};
     results.solution_g    = cmvec{g, m};
     results.solution_f    = obj_value;
