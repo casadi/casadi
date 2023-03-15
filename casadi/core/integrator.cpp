@@ -595,7 +595,8 @@ std::map<std::string, MatType> Integrator::aug_fwd(casadi_int nfwd) const {
 
   // Calculate directional derivatives
   std::vector<std::vector<MatType>> sens;
-  oracle_->call_forward(arg, res, seed, sens, true, false);
+  bool always_inline = oracle_.is_a("SXFunction") || oracle_.is_a("MXFunction");
+  oracle_->call_forward(arg, res, seed, sens, always_inline, false);
 
   // Collect sensitivity equations
   casadi_assert_dev(sens.size()==nfwd);
@@ -676,7 +677,8 @@ std::map<std::string, MatType> Integrator::aug_adj(casadi_int nadj) const {
 
   // Calculate directional derivatives
   std::vector<std::vector<MatType>> sens;
-  oracle_->call_reverse(arg, res, seed, sens, true, false);
+  bool always_inline = oracle_.is_a("SXFunction") || oracle_.is_a("MXFunction");
+  oracle_->call_reverse(arg, res, seed, sens, always_inline, false);
 
   // Collect sensitivity equations
   casadi_assert_dev(sens.size()==nadj);
