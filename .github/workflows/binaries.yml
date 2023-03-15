@@ -746,14 +746,30 @@ jobs:
           name: casadi-linux64-octave7.3.0
       - name: Unpack source
         run: unzip casadi-linux64-octave7.3.0.zip -d casadi_octave
-        shell: bash -el {0}
-      - run: docker run --rm -v`pwd`:/local -v${{ github.workspace }}/casadi_python:/casadi_python:ro -v${{ github.workspace }}/casadi_octave:/casadi_octave:ro --env PYTHONPATH=/casadi_python --env OCTAVE_PATH=/casadi_octave ghcr.io/casadi/ci-doc:latest /bin/bash -c "cd docs/users_guide && rm -rf build && rm -f snippets/* && make && cd ../../test && make user_guide_snippets_py user_guide_snippets_oct && cd .. && rm -rf docs/users_guide/build && cd docs/api && make full doxexport doxpublish"
+      - run: chmod -R a+w . && docker run --rm -v`pwd`:/local -v${{ github.workspace }}/casadi_python:/casadi_python:ro -v${{ github.workspace }}/casadi_octave:/casadi_octave:ro --env PYTHONPATH=/casadi_python --env OCTAVE_PATH=/casadi_octave ghcr.io/casadi/ci-doc:latest /bin/bash -c "cd docs/users_guide && rm -rf build && rm -f snippets/* && make && cd ../../test && make user_guide_snippets_py user_guide_snippets_oct && cd .. && rm -rf docs/users_guide/build && cd docs/api && make full doxexport doxpublish"
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v4.4.0
       - uses: svenstaro/upload-release-action@2.4.0
         with:
           overwrite: true
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
           file: docs/users_guide/users_guide.pdf
           prerelease: true
+      - run: git status
+      - run: |
+          git stash
+          git pull origin ${{ env.GITHUB_REF_SLUG }}
+          # If stash is nonempty, pop it
+          git stash list | grep -q . && git stash pop
+          git config --local user.email "casaditestbot@gmail.com"
+          git config --local user.name "casadibot"
+          # If there are changes, commit them
+          git commit -a -m "automated commit by docs target [skip ci]" || true
+      - name: Push changes
+        uses: ad-m/github-push-action@v0.6.0
+        with:
+          branch: ${{ env.GITHUB_REF_SLUG }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           
   test-python:
     runs-on: ${{matrix.image == 'macos-m1' && 'self-hosted' || matrix.image }}
