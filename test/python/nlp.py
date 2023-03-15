@@ -35,7 +35,7 @@ import os
 
 solvers= []
 
-if has_nlpsol("worhp")  and not args.ignore_memory_heavy:
+if "SKIP_WORHP_TESTS" not in os.environ and has_nlpsol("worhp")  and not args.ignore_memory_heavy:
   solvers.append(("worhp",{"worhp": {"TolOpti":1e-9}},set()))
   #solvers.append(("worhp",{"TolOpti":1e-20,"TolFeas":1e-20,"UserHM": False}))
   pass
