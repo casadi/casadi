@@ -40,33 +40,37 @@ if "SKIP_WORHP_TESTS" not in os.environ and has_nlpsol("worhp")  and not args.ig
   #solvers.append(("worhp",{"TolOpti":1e-20,"TolFeas":1e-20,"UserHM": False}))
   pass
 
-if has_nlpsol("ipopt"):
+if "SKIP_IPOPT_TESTS" not in os.environ and has_nlpsol("ipopt"):
   solvers.append(("ipopt",{"print_time":False,"ipopt": {"tol": 1e-10, "derivative_test":"second-order","print_level":0}},set()))
   solvers.append(("ipopt",{"print_time":False,"ipopt": {"tol": 1e-10, "derivative_test":"first-order","hessian_approximation": "limited-memory","print_level":0}},set()))
 
-if has_nlpsol("ipopt") and has_nlpsol("sqpmethod"):
+if "SKIP_IPOPT_TESTS" not in os.environ and has_nlpsol("ipopt") and has_nlpsol("sqpmethod"):
   qpsol_options = {"nlpsol": "ipopt", "nlpsol_options": {"ipopt.tol": 1e-12,"ipopt.tiny_step_tol": 1e-20, "ipopt.fixed_variable_treatment":"make_constraint","ipopt.print_level":0,"print_time":False,"print_time":False} }
   solvers.append(("sqpmethod",{"qpsol": "nlpsol","qpsol_options": qpsol_options,"print_header":False,"print_iteration":True,"print_time":False},set()))
   solvers.append(("sqpmethod",{"qpsol": "nlpsol","qpsol_options": qpsol_options,"hessian_approximation": "limited-memory","tol_du":1e-10,"tol_pr":1e-10,"min_step_size":1e-14,"print_header":False,"print_iteration":True,"print_time":False,"max_iter":55},set()))
 
-if has_conic("qrqp") and has_nlpsol("sqpmethod"):
+if "SKIP_QRQP_TESTS" not in os.environ and has_conic("qrqp") and has_nlpsol("sqpmethod"):
   qpsol_options = {"print_iter":False,"print_header":False,"error_on_fail" : False}
   solvers.append(("sqpmethod",{"qpsol": "qrqp","qpsol_options": qpsol_options,"print_header":False,"print_iteration":False,"print_time":False},{"codegen"}))
   solvers.append(("sqpmethod",{"qpsol": "qrqp","max_iter_ls":0,"qpsol_options": qpsol_options,"print_header":False,"print_iteration":False,"print_time":False},{"codegen"}))
   solvers.append(("sqpmethod",{"qpsol": "qrqp","convexify_strategy":"regularize","max_iter":500,"qpsol_options": qpsol_options,"print_header":False,"print_iteration":True,"print_time":False,"tol_du":1e-8,"min_step_size":1e-12},{"codegen"}))
 
-if has_nlpsol("blocksqp"):
+if "SKIP_BLOCKSQP_TESTS" not in os.environ and has_nlpsol("blocksqp"):
   try:
     load_linsol("ma27")
     solvers.append(("blocksqp",{},set()))
   except:
     pass
 
-if has_nlpsol("bonmin"):
+if "SKIP_BONMIN_TESTS" not in os.environ and has_nlpsol("bonmin"):
   solvers.append(("bonmin",{},{"discrete"}))
 
 if "SKIP_KNITRO_TESTS" not in os.environ and has_nlpsol("knitro"):
   solvers.append(("knitro",{"knitro":{"feastol":1e-9,"opttol":1e-9,"ftol":1e-20}},set()))
+
+if "SKIP_SNOPT_TESTS" not in os.environ and has_nlpsol("snopt"):
+  solvers.append(("snopt",{"snopt": {"Verify_level": 3,"Major_optimality_tolerance":1e-12,"Minor_feasibility_tolerance":1e-12,"Major_feasibility_tolerance":1e-12}}))
+
 
 print(solvers)
 

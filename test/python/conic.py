@@ -26,10 +26,11 @@ import numpy
 import unittest
 from types import *
 from helpers import *
+import os
 
 conics = []
 
-if has_nlpsol("ipopt"):
+if "SKIP_IPOPT_TESTS" not in os.environ and has_nlpsol("ipopt"):
   ipopt_options = {"fixed_variable_treatment":"relax_bounds",
                    "jac_c_constant":"yes",
                    "jac_d_constant":"yes",
@@ -38,29 +39,29 @@ if has_nlpsol("ipopt"):
                    "print_level":0}
   conics.append(("nlpsol",{"nlpsol":"ipopt", "nlpsol_options.ipopt": ipopt_options},{"quadratic": True, "dual": True, "soc": False, "codegen": False, "discrete": False, "sos":False}))
 
-if has_nlpsol("worhp"):
+if "SKIP_WORHP_TESTS" not in os.environ and has_nlpsol("worhp"):
   worhp_options = {"TolOpti":1e-13}
   conics.append(("nlpsol",{"nlpsol":"worhp", "nlpsol_options.worhp": worhp_options},{"less_digits":1,"quadratic": True, "dual": False, "soc": False, "codegen": False, "discrete": False, "sos":False}))
 
-if has_conic("ooqp"):
+if "SKIP_OOQP_TESTS" not in os.environ and has_conic("ooqp"):
   conics.append(("ooqp",{},{"less_digits":1,"quadratic": True, "dual": True, "soc": False, "codegen": False, "discrete": False, "sos":False}))
 
 
-if has_conic("qpoases"):
+if "SKIP_QPOASES_TESTS" not in os.environ and has_conic("qpoases"):
   conics.append(("qpoases",{"printLevel":"low"},{"quadratic": True, "dual": True, "soc": False, "codegen": False,"discrete": False, "sos":False}))
 
 
-if has_conic("cplex"):
+if "SKIP_CPLEX_TESTS" not in os.environ and has_conic("cplex"):
   conics.append(("cplex",{"cplex": {"CPX_PARAM_BARQCPEPCOMP": 1e-10,"CPX_PARAM_BAREPCOMP":1e-10}},{"quadratic": True, "dual": True, "soc": True, "codegen": False, "discrete": True, "sos": True}))
 
-if has_conic("osqp"):
+if "SKIP_OSQP_TESTS" not in os.environ and has_conic("osqp"):
   options = ["-Wno-unused-variable"]
   if os.name=='nt':
     options = []
   codegen = {"extralibs": ["osqp"], "extra_options": options, "std": "c99"}
   conics.append(("osqp",{"osqp":{"alpha":1,"eps_abs":1e-8,"eps_rel":1e-8}},{"quadratic": True, "dual": True, "codegen": codegen,"soc":False,"discrete":False}))
 
-if has_conic("superscs"):
+if "SKIP_SUPERSCS_TESTS" not in os.environ and has_conic("superscs"):
   conics.append(("superscs",{"superscs": {"eps":1e-9,"do_super_scs":1, "verbose":0}},{"quadratic": True, "dual": False, "codegen": False,"soc":True,"discrete":False}))
 
 # No solution for licensing on travis
@@ -71,25 +72,25 @@ if "SKIP_GUROBI_TESTS" not in os.environ and has_conic("gurobi"):
 # if has_conic("sqic"):
 #   conics.append(("sqic",{},{}))
 
-if has_conic("clp"):
+if "SKIP_CLP_TESTS" not in os.environ and has_conic("clp"):
   conics.append(("clp",{"verbose":True},{"quadratic": False, "dual": True, "soc": False, "codegen": False, "discrete": False, "sos":False}))
 
-if has_conic("cbc"):
+if "SKIP_CBC_TESTS" not in os.environ and has_conic("cbc"):
   conics.append(("cbc",{"verbose":True},{"quadratic": False, "dual": True, "soc": False, "codegen": False, "discrete": True, "sos":True}))
 
-if has_conic("qrqp"):
+if "SKIP_QRQP_TESTS" not in os.environ and has_conic("qrqp"):
   codegen = {"std":"c99"}
   conics.append(("qrqp",{"max_iter":20,"print_header":False,"print_iter":False},{"quadratic": True, "dual": True, "soc": False, "codegen": codegen, "discrete": False, "sos":False}))
 
-if has_conic("proxqp"):
+if "SKIP_PROXQP_TESTS" not in os.environ and has_conic("proxqp"):
   conics.append(("proxqp",{"proxqp":{"eps_abs":1e-11,"max_iter":1e4, "backend": "sparse"}}, {"quadratic": True, "dual": True, "soc": False, "codegen": False,"discrete":False,"sos":False}))
   conics.append(("proxqp",{"proxqp":{"eps_abs":1e-11,"max_iter":1e4, "backend": "dense"}}, {"quadratic": True, "dual": True, "soc": False, "codegen": False,"discrete":False,"sos":False}))
 
-if has_conic("qpalm"):
+if "SKIP_QPALM_TESTS" not in os.environ and has_conic("qpalm"):
   eps = 1e-8
   conics.append(("qpalm",{"qpalm":{"eps_abs":eps,"eps_rel":eps,"eps_abs_in":eps,"eps_prim_inf":eps}},{"quadratic": True, "dual": True, "soc": False, "codegen": False, "discrete": False, "sos":False}))
 
-if has_conic("highs"):
+if "SKIP_HIGHS_TESTS" not in os.environ and has_conic("highs"):
     codegen = {"extralibs": ["highs"], "std": "c99"}
     conics.append(("highs",{"highs": {"primal_feasibility_tolerance":1e-7,"solver":"choose","output_flag":False,"ipm_iteration_limit":50000}},{"quadratic": True, "dual": True, "soc": False, "codegen": codegen, "discrete": False, "sos":False}))
 
@@ -738,6 +739,7 @@ class ConicTests(casadiTestCase):
     UBX = DM([1000]*N)
 
     for conic, qp_options, aux_options in conics:
+      print(conic,qp_options)
       if not aux_options["quadratic"]: continue
       if 'cplex' in str(conic):
         continue
