@@ -1045,11 +1045,10 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
   return 0;
 }
 
-Function Integrator::
-get_forward(casadi_int nfwd, const std::string& name,
-            const std::vector<std::string>& inames,
-            const std::vector<std::string>& onames,
-            const Dict& opts) const {
+Function Integrator::get_forward(casadi_int nfwd, const std::string& name,
+    const std::vector<std::string>& inames,
+    const std::vector<std::string>& onames,
+    const Dict& opts) const {
   if (verbose_) casadi_message(name_ + "::get_forward");
 
   // Integrator options
@@ -1116,13 +1115,14 @@ get_forward(casadi_int nfwd, const std::string& name,
           v.push_back(aug_in_split[d].at(k));
         }
       }
-      integrator_in[i] = horzcat(v);
     } else {
       // No reordering necessary
       v = aug_in[i];
       v.insert(v.begin(), ret_in[i]);
-      integrator_in[i] = horzcat(v);
     }
+    // Flatten all elements
+    for (MX& e : v) e = vec(e);
+    integrator_in[i] = horzcat(v);
   }
   std::vector<MX> integrator_out = aug_int(integrator_in);
 
@@ -1138,7 +1138,7 @@ get_forward(casadi_int nfwd, const std::string& name,
         offset.push_back(offset.back() + size2_out(i) / n_grid);
       }
     }
-    std::vector<MX> integrator_out_split = horzsplit(integrator_out[i], offset);
+    std::vector<MX> integrator_out_split = horzsplit(reshape(integrator_out[i], size1_out(i), offset.back()), offset);
     // Collect sensitivity blocks in the right order
     std::vector<MX> ret_out_split;
     ret_out_split.reserve(n_grid * nfwd);
