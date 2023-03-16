@@ -682,9 +682,10 @@ jobs:
         run: unzip casadi-${{env.os}}${{matrix.bit}}-matlab${{matrix.matlab}}.zip -d casadi
       - run: ls
       # Make cl.exe available on Windows
-      - uses: TheMrMilchmann/setup-msvc-dev@master
+      - uses: TheMrMilchmann/setup-msvc-dev@v2.0.0
         with:
           arch: x64
+        if: contains(matrix.image, 'windows')
       - name: Set up MATLAB
         uses: matlab-actions/setup-matlab@v1.2.4
       - name: Run script
@@ -818,9 +819,10 @@ jobs:
         with:
           token: ${{ secrets.JGILLIS_RESTRICTED }}
       # Make cl.exe available on Windows
-      - uses: TheMrMilchmann/setup-msvc-dev@master
+      - uses: TheMrMilchmann/setup-msvc-dev@v2.0.0
         with:
           arch: x64
+        if: contains(matrix.image, 'windows')
       - id: get-id
         uses: actions/github-script@v6.3.3
         env:
