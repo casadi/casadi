@@ -462,6 +462,7 @@ namespace casadi {
     std::string norm_inf(casadi_int n, const std::string& x);
 
     /** 
+
      * \brief norm_2
 
                 \identifier{256} */

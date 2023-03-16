@@ -31,6 +31,7 @@
 #include <casadi/solvers/casadi_nlpsol_feasiblesqpmethod_export.h>
 
 /** \defgroup plugin_Nlpsol_feasiblesqpmethod
+    \par
  A textbook FeasibleSQPMethod
 
     \identifier{241} */
