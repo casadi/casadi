@@ -50,9 +50,9 @@ int evaluate(casadi_fmi_memory* m) {
   m->res[i++] = m->y;
 
   // Evaluate
-  mem = daefun_checkout();
-  flag = daefun(m->arg, m->res, m->iw, m->w, mem);
-  daefun_release(mem);
+  mem = MODELNAME_checkout();
+  flag = MODELNAME(m->arg, m->res, m->iw, m->w, mem);
+  MODELNAME_release(mem);
 
   // Copy from output buffers
   for (i = 0; i < N_X; ++i) m->v[xdot_vr[i]] = m->xdot[i];
@@ -93,9 +93,9 @@ int evaluate_forward(casadi_fmi_memory* m) {
   m->res[i++] = m->dy;
 
   // Evaluate
-  mem = fwd1_daefun_checkout();
-  flag = fwd1_daefun(m->arg, m->res, m->iw, m->w, mem);
-  fwd1_daefun_release(mem);
+  mem = fwd1_MODELNAME_checkout();
+  flag = fwd1_MODELNAME(m->arg, m->res, m->iw, m->w, mem);
+  fwd1_MODELNAME_release(mem);
 
   // Copy from output buffers
   for (i = 0; i < N_X; ++i) m->d[xdot_vr[i]] = m->dxdot[i];
@@ -141,9 +141,9 @@ int evaluate_adjoint(casadi_fmi_memory* m) {
   m->res[i++] = m->du;
 
   // Evaluate
-  mem = adj1_daefun_checkout();
-  flag = adj1_daefun(m->arg, m->res, m->iw, m->w, mem);
-  adj1_daefun_release(mem);
+  mem = adj1_MODELNAME_checkout();
+  flag = adj1_MODELNAME(m->arg, m->res, m->iw, m->w, mem);
+  adj1_MODELNAME_release(mem);
 
   // Copy from input buffers
   for (i = 0; i < N_X; ++i) m->d[x_vr[i]] = m->dx[i];
@@ -191,7 +191,7 @@ FMI3_Export fmi3Instance fmi3InstantiateModelExchange(
   // If allocation was successful
   if (m) {
     // Increase counter for codegen
-    daefun_incref();
+    MODELNAME_incref();
     // Copy meta data
     m->instance_name = instanceName;
     // Call reset function (return flag does not need to be checked)
@@ -206,7 +206,7 @@ FMI3_Export void fmi3FreeInstance(fmi3Instance instance) {
     // Free memory structure
     free(instance);
     // Decrease counter for codegen
-    daefun_decref();
+    MODELNAME_decref();
   }
 }
 

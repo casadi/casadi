@@ -709,7 +709,7 @@ namespace casadi {
 
     /** \brief FMU helper functions
      */
-    static std::string fmu_helpers();
+    static std::string fmu_helpers(const std::string& modelname);
 
     /** \brief Printf
 

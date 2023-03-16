@@ -1339,8 +1339,20 @@ namespace casadi {
     return s.str();
   }
 
-  std::string CodeGenerator::fmu_helpers() {
-    return casadi_fmu_str;
+  std::string CodeGenerator::fmu_helpers(const std::string& modelname) {
+    // Process C++ source
+    std::stringstream ret;
+    std::string line;
+    std::istringstream stream(casadi_fmu_str);
+    while (std::getline(stream, line)) {
+      // Replacements
+      if (line.find("MODELNAME") != std::string::npos) {
+        line = replace(line, "MODELNAME", modelname);
+      }
+      // Append to return
+      ret << line << "\n";
+    }
+    return ret.str();
   }
 
   std::string CodeGenerator::constant(const std::string& v) {

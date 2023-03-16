@@ -57,13 +57,22 @@ dae.disp(True)
 
 # Export FMU
 funcs = dae.export_fmu()
-print(funcs)
+print('Generated files: {}'.format(funcs))
+
+# Compile DLL
+import os
+os.system('gcc --shared -fPIC -I../../../external_packages/FMI-Standard-3.0/headers/ vdp.c vdp_wrap.c -o vdp.so')
+print('Compiled vdp.so')
 
 # Package into an FMU
 import zipfile
 with zipfile.ZipFile('vdp_generated.fmu', 'w') as fmufile:
+    # Add generated files to the archive
     for f in funcs:
       arcname = f if f == 'modelDescription.xml' else 'sources/' + f
       fmufile.write(f, arcname = arcname)
-
-
+      os.remove(f)
+    # Add compile DLL to the archive (assume Linux 64 but)
+    fmufile.write('vdp.so', arcname = 'binaries/x86-linux/vdp.so')
+    os.remove('vdp.so')
+print('Created FMU: vdp_generated.fmu')

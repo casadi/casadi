@@ -758,7 +758,7 @@ std::string DaeBuilderInternal::generate_wrapper(const std::string& guid,
 
   // Add includes
   f << "#include <fmi3Functions.h>\n"
-    << "#include \"" << name_ << "\".h\"\n"
+    << "#include \"" << name_ << ".h\"\n"
     << "\n";
 
   // Total number of variables
@@ -814,7 +814,7 @@ std::string DaeBuilderInternal::generate_wrapper(const std::string& guid,
     << "\n";
 
   // Memory structure
-  f << CodeGenerator::fmu_helpers();
+  f << CodeGenerator::fmu_helpers(name_);
 
   // Finalize file
   CodeGenerator::file_close(f, false);
