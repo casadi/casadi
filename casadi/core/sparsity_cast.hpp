@@ -53,32 +53,48 @@ namespace casadi {
     /// Evaluate the function symbolically (SX)
     int eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const override;
 
-    /** \brief  Evaluate symbolically (MX) */
+    /** \brief  Evaluate symbolically (MX)
+
+        \identifier{24i} */
     void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
 
-    /** \brief Calculate forward mode directional derivatives */
+    /** \brief Calculate forward mode directional derivatives
+
+        \identifier{24j} */
     void ad_forward(const std::vector<std::vector<MX> >& fseed,
                          std::vector<std::vector<MX> >& fsens) const override;
 
-    /** \brief Calculate reverse mode directional derivatives */
+    /** \brief Calculate reverse mode directional derivatives
+
+        \identifier{24k} */
     void ad_reverse(const std::vector<std::vector<MX> >& aseed,
                          std::vector<std::vector<MX> >& asens) const override;
 
-    /** \brief  Propagate sparsity forward */
+    /** \brief  Propagate sparsity forward
+
+        \identifier{24l} */
     int sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
-    /** \brief  Propagate sparsity backwards */
+    /** \brief  Propagate sparsity backwards
+
+        \identifier{24m} */
     int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
-    /** \brief  Print expression */
+    /** \brief  Print expression
+
+        \identifier{24n} */
     std::string disp(const std::vector<std::string>& arg) const override;
 
-    /** \brief Generate code for the operation */
+    /** \brief Generate code for the operation
+
+        \identifier{24o} */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
                   const std::vector<casadi_int>& res) const override;
 
-    /** \brief Get the operation */
+    /** \brief Get the operation
+
+        \identifier{24p} */
     casadi_int op() const override { return OP_SPARSITY_CAST;}
 
     /// Can the operation be performed inplace (i.e. overwrite the result)
@@ -87,32 +103,46 @@ namespace casadi {
     /// SparsityCast
     MX get_reshape(const Sparsity& sp) const override;
 
-    /** \brief Get the nonzeros of matrix */
+    /** \brief Get the nonzeros of matrix
+
+        \identifier{24q} */
     MX get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz) const override;
 
     /// SparsityCast
     MX get_sparsity_cast(const Sparsity& sp) const override;
 
-    /** \brief Check if two nodes are equivalent up to a given depth */
+    /** \brief Check if two nodes are equivalent up to a given depth
+
+        \identifier{24r} */
     bool is_equal(const MXNode* node, casadi_int depth) const override
     { return sameOpAndDeps(node, depth) && sparsity()==node->sparsity();}
 
     /// Transpose (if a dimension is one)
     MX get_transpose() const override;
 
-    /** \brief  Check if valid function input */
+    /** \brief  Check if valid function input
+
+        \identifier{24s} */
     bool is_valid_input() const override;
 
-    /** \brief Detect duplicate symbolic expressions */
+    /** \brief Detect duplicate symbolic expressions
+
+        \identifier{24t} */
     bool has_duplicates() const override;
 
-    /** \brief Reset the marker for an input expression */
+    /** \brief Reset the marker for an input expression
+
+        \identifier{24u} */
     void reset_input() const override;
 
-    /** \brief Deserialize without type information */
+    /** \brief Deserialize without type information
+
+        \identifier{24v} */
     static MXNode* deserialize(DeserializingStream& s) { return new SparsityCast(s); }
   protected:
-    /** \brief Deserializing constructor */
+    /** \brief Deserializing constructor
+
+        \identifier{24w} */
     explicit SparsityCast(DeserializingStream& s) : MXNode(s) {}
   };
 

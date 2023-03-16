@@ -372,7 +372,8 @@ namespace casadi {
     }
 
     /** \brief Cast matrix nonzeros to different Sparsity
-    */
+
+        \identifier{24z} */
     inline friend MatType sparsity_cast(const MatType& x, const Sparsity& sp) {
       return MatType::sparsity_cast(x, sp);
     }

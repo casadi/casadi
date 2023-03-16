@@ -535,19 +535,29 @@ namespace casadi {
     /// Is square?
     bool is_square() const;
 
-    /** \brief Is this a permutation matrix? */
+    /** \brief Is this a permutation matrix?
+
+        \identifier{25v} */
     bool is_permutation() const;
 
-    /** \brief Is this a selection matrix */
+    /** \brief Is this a selection matrix
+
+        \identifier{25w} */
     bool is_selection(bool allow_empty=false) const;
 
-    /** \brief Are the rows and columns of the pattern orthonormal ? */
+    /** \brief Are the rows and columns of the pattern orthonormal ?
+
+        \identifier{25x} */
     bool is_orthonormal(bool allow_empty=false) const;
 
-    /** \brief Are the rows of the pattern orthonormal ?  */
+    /** \brief Are the rows of the pattern orthonormal ?
+
+        \identifier{25y} */
     bool is_orthonormal_rows(bool allow_empty=false) const;
 
-    /** \brief  Are the columns of the pattern orthonormal ?*/
+    /** \brief  Are the columns of the pattern orthonormal ?
+
+        \identifier{25z} */
     bool is_orthonormal_columns(bool allow_empty=false) const;
 
     /// Is symmetric?

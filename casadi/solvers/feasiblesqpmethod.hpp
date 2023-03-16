@@ -32,7 +32,8 @@
 
 /** \defgroup plugin_Nlpsol_feasiblesqpmethod
  A textbook FeasibleSQPMethod
-*/
+
+    \identifier{241} */
 
 /** \pluginsection{Nlpsol,feasiblesqpmethod} */
 

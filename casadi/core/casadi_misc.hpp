@@ -162,7 +162,9 @@ private:
   template<typename T>
   std::vector<T> join(const std::vector<T> &a, const std::vector<T> &b, const std::vector<T> &c);
 
-  /** \brief Does the list represent a permutation? */
+  /** \brief Does the list represent a permutation?
+
+      \identifier{250} */
   bool is_permutation(const std::vector<casadi_int> &order);
 
   /** \brief permute a list
@@ -171,7 +173,9 @@ private:
   template<typename T>
   std::vector<T> permute(const std::vector<T> &a, const std::vector<casadi_int> &order);
 
-  /** \brief inverse a permutation vector */
+  /** \brief inverse a permutation vector
+
+      \identifier{251} */
   std::vector<casadi_int> invert_permutation(const std::vector<casadi_int> &a);
 
   /** \brief find nonzeros

@@ -604,7 +604,9 @@ class GenericExpression : public GenericExpressionCommon {
     ///@}
 
     ///@{
-    /** \brief Remainder after division: (x,y) -> remainder(x,y) */
+    /** \brief Remainder after division: (x,y) -> remainder(x,y)
+
+        \identifier{24x} */
     static ExType remainder(const ExType& x, const ExType& y) {
       return ExType::binary(OP_REMAINDER, x, y);
     }

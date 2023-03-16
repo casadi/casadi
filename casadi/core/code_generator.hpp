@@ -108,7 +108,9 @@ namespace casadi {
         \identifier{rz} */
     std::string constant(const std::vector<casadi_int>& v);
 
-    /** \brief Represent an array constant; adding it when new */
+    /** \brief Represent an array constant; adding it when new
+
+        \identifier{255} */
     std::string constant(const std::vector<int>& v) {
         return constant(vector_static_cast<casadi_int>(v));
     }
@@ -461,7 +463,8 @@ namespace casadi {
 
     /** 
      * \brief norm_2
-    */
+
+                \identifier{256} */
     std::string norm_2(casadi_int n, const std::string& x);
 
     /** \brief max_viol
@@ -708,7 +711,8 @@ namespace casadi {
                          const std::string& w);
 
     /** \brief FMU helper functions
-     */
+
+        \identifier{257} */
     static std::string fmu_helpers(const std::string& modelname);
 
     /** \brief Printf
@@ -745,7 +749,9 @@ namespace casadi {
     /// Print file header
     static void file_close(std::ofstream& f, bool cpp);
 
-    /** \brief Get number of temporary variables needed for all functions */
+    /** \brief Get number of temporary variables needed for all functions
+
+        \identifier{258} */
     void sz_work(size_t& sz_arg, size_t& sz_res, size_t& sz_iw, size_t& sz_w) const;
 
   private:
