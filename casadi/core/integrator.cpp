@@ -199,6 +199,7 @@ Integrator::Integrator(const std::string& name, const Function& oracle,
   np_ = -1;
 
   // Default options
+  nfwd_ = 0;
   print_stats_ = false;
 }
 
@@ -403,6 +404,9 @@ const Options Integrator::options_
     {"print_stats",
       {OT_BOOL,
       "Print out statistics after integration"}},
+    {"nfwd",
+     {OT_INT,
+      "Number of forward sensitivities to be calculated [0]"}},
     {"t0",
       {OT_DOUBLE,
       "[DEPRECATED] Beginning of the time horizon"}},
@@ -438,6 +442,8 @@ void Integrator::init(const Dict& opts) {
       uses_legacy_options = true;
     } else if (op.first=="print_stats") {
       print_stats_ = op.second;
+    } else if (op.first=="nfwd") {
+      nfwd_ = op.second;
     } else if (op.first=="grid") {
       grid = op.second;
       uses_legacy_options = true;
@@ -515,6 +521,7 @@ void Integrator::init(const Dict& opts) {
 
   // Number of sensitivities
   ns_ = x().size2()-1;
+  casadi_assert(ns_ == nfwd_, "Inconsistent number of sensitivities: " + str(ns_) + " != " + str(nfwd_));
 
   // Get the sparsities of the forward and reverse DAE
   sp_jac_dae_ = sp_jac_dae();
@@ -1068,6 +1075,7 @@ Function Integrator::get_forward(casadi_int nfwd, const std::string& name,
     aug_dae = map2oracle(dae_name, aug_fwd<MX>(nfwd));
   }
   aug_opts["derivative_of"] = self();
+  aug_opts["nfwd"] = nfwd;
   Function aug_int = integrator(aug_prefix + name_, plugin_name(),
     aug_dae, t0_, tout_, aug_opts);
 
@@ -1176,6 +1184,7 @@ Function Integrator::get_reverse(casadi_int nadj, const std::string& name,
     aug_dae = map2oracle(dae_name, aug_adj<MX>(nadj));
   }
   aug_opts["derivative_of"] = self();
+  aug_opts["nfwd"] = 0;
   Function aug_int = integrator(aug_prefix + name_, plugin_name(),
     aug_dae, t0_, tout_, aug_opts);
 
@@ -1843,6 +1852,7 @@ void Integrator::serialize_body(SerializingStream &s) const {
   s.pack("Integrator::sp_jac_rdae", sp_jac_rdae_);
   s.pack("Integrator::t0", t0_);
   s.pack("Integrator::tout", tout_);
+  s.pack("Integrator::nfwd", nfwd_);
 
   s.pack("Integrator::nx", nx_);
   s.pack("Integrator::nz", nz_);
@@ -1873,6 +1883,7 @@ void Integrator::serialize_body(SerializingStream &s) const {
   s.pack("Integrator::augmented_options", augmented_options_);
   s.pack("Integrator::opts", opts_);
   s.pack("Integrator::print_stats", print_stats_);
+  
 }
 
 void Integrator::serialize_type(SerializingStream &s) const {
@@ -1891,6 +1902,7 @@ Integrator::Integrator(DeserializingStream & s) : OracleFunction(s) {
   s.unpack("Integrator::sp_jac_rdae", sp_jac_rdae_);
   s.unpack("Integrator::t0", t0_);
   s.unpack("Integrator::tout", tout_);
+  s.unpack("Integrator::nfwd", nfwd_);
 
   s.unpack("Integrator::nx", nx_);
   s.unpack("Integrator::nz", nz_);
