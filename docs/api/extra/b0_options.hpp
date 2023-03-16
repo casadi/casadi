@@ -793,6 +793,7 @@
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>grid</td><td>OT_DOUBLEVECTOR</td><td>[DEPRECATED] Time grid</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>interpolation_order</td><td>OT_INT</td><td>Order of the interpolating polynomials</td><td>casadi::Collocation</td></tr>
+<tr><td>nfwd</td><td>OT_INT</td><td>Number of forward sensitivities to be calculated [0]</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INT</td><td>Target number of finite elements. The actual number may be higher to accommodate all output times</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>output_t0</td><td>OT_BOOL</td><td>[DEPRECATED] Output the state at the initial time</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
@@ -816,6 +817,7 @@
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td></tr>
 <tr><td>grid</td><td>OT_DOUBLEVECTOR</td><td>[DEPRECATED] Time grid</td></tr>
 <tr><td>interpolation_order</td><td>OT_INT</td><td>Order of the interpolating polynomials</td></tr>
+<tr><td>nfwd</td><td>OT_INT</td><td>Number of forward sensitivities to be calculated [0]</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INT</td><td>Target number of finite elements. The actual number may be higher to accommodate all output times</td></tr>
 <tr><td>output_t0</td><td>OT_BOOL</td><td>[DEPRECATED] Output the state at the initial time</td></tr>
 <tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td></tr>
@@ -838,6 +840,7 @@
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>grid</td><td>OT_DOUBLEVECTOR</td><td>[DEPRECATED] Time grid</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>interpolation_order</td><td>OT_INT</td><td>Order of the interpolating polynomials</td><td>casadi::Collocation</td></tr>
+<tr><td>nfwd</td><td>OT_INT</td><td>Number of forward sensitivities to be calculated [0]</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INT</td><td>Target number of finite elements. The actual number may be higher to accommodate all output times</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>output_t0</td><td>OT_BOOL</td><td>[DEPRECATED] Output the state at the initial time</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
@@ -1798,6 +1801,7 @@
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::FixedStepIntegrator</td></tr>
 <tr><td>grid</td><td>OT_DOUBLEVECTOR</td><td>[DEPRECATED] Time grid</td><td>casadi::FixedStepIntegrator</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>Set of user problem functions to be monitored</td><td>casadi::OracleFunction</td></tr>
+<tr><td>nfwd</td><td>OT_INT</td><td>Number of forward sensitivities to be calculated [0]</td><td>casadi::FixedStepIntegrator</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INT</td><td>Target number of finite elements. The actual number may be higher to accommodate all output times</td><td>casadi::FixedStepIntegrator</td></tr>
 <tr><td>output_t0</td><td>OT_BOOL</td><td>[DEPRECATED] Output the state at the initial time</td><td>casadi::FixedStepIntegrator</td></tr>
 <tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::FixedStepIntegrator</td></tr>
@@ -1823,6 +1827,7 @@
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::FixedStepIntegrator</td></tr>
 <tr><td>grid</td><td>OT_DOUBLEVECTOR</td><td>[DEPRECATED] Time grid</td><td>casadi::FixedStepIntegrator</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>Set of user problem functions to be monitored</td><td>casadi::OracleFunction</td></tr>
+<tr><td>nfwd</td><td>OT_INT</td><td>Number of forward sensitivities to be calculated [0]</td><td>casadi::FixedStepIntegrator</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INT</td><td>Target number of finite elements. The actual number may be higher to accommodate all output times</td><td>casadi::FixedStepIntegrator</td></tr>
 <tr><td>output_t0</td><td>OT_BOOL</td><td>[DEPRECATED] Output the state at the initial time</td><td>casadi::FixedStepIntegrator</td></tr>
 <tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::FixedStepIntegrator</td></tr>
@@ -2329,6 +2334,7 @@
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>grid</td><td>OT_DOUBLEVECTOR</td><td>[DEPRECATED] Time grid</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>Set of user problem functions to be monitored</td><td>casadi::OracleFunction</td></tr>
+<tr><td>nfwd</td><td>OT_INT</td><td>Number of forward sensitivities to be calculated [0]</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INT</td><td>Target number of finite elements. The actual number may be higher to accommodate all output times</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>output_t0</td><td>OT_BOOL</td><td>[DEPRECATED] Output the state at the initial time</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
@@ -2354,6 +2360,7 @@
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>grid</td><td>OT_DOUBLEVECTOR</td><td>[DEPRECATED] Time grid</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>Set of user problem functions to be monitored</td><td>casadi::OracleFunction</td></tr>
+<tr><td>nfwd</td><td>OT_INT</td><td>Number of forward sensitivities to be calculated [0]</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INT</td><td>Target number of finite elements. The actual number may be higher to accommodate all output times</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>output_t0</td><td>OT_BOOL</td><td>[DEPRECATED] Output the state at the initial time</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
@@ -2443,6 +2450,7 @@
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Integrator</td></tr>
 <tr><td>grid</td><td>OT_DOUBLEVECTOR</td><td>[DEPRECATED] Time grid</td><td>casadi::Integrator</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>Set of user problem functions to be monitored</td><td>casadi::OracleFunction</td></tr>
+<tr><td>nfwd</td><td>OT_INT</td><td>Number of forward sensitivities to be calculated [0]</td><td>casadi::Integrator</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INT</td><td>Target number of finite elements. The actual number may be higher to accommodate all output times</td><td>casadi::Integrator</td></tr>
 <tr><td>output_t0</td><td>OT_BOOL</td><td>[DEPRECATED] Output the state at the initial time</td><td>casadi::Integrator</td></tr>
 <tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::Integrator</td></tr>
@@ -2468,6 +2476,7 @@
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Integrator</td></tr>
 <tr><td>grid</td><td>OT_DOUBLEVECTOR</td><td>[DEPRECATED] Time grid</td><td>casadi::Integrator</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>Set of user problem functions to be monitored</td><td>casadi::OracleFunction</td></tr>
+<tr><td>nfwd</td><td>OT_INT</td><td>Number of forward sensitivities to be calculated [0]</td><td>casadi::Integrator</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INT</td><td>Target number of finite elements. The actual number may be higher to accommodate all output times</td><td>casadi::Integrator</td></tr>
 <tr><td>output_t0</td><td>OT_BOOL</td><td>[DEPRECATED] Output the state at the initial time</td><td>casadi::Integrator</td></tr>
 <tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::Integrator</td></tr>
@@ -5062,6 +5071,7 @@
 <tr><td>max_order</td><td>OT_DOUBLE</td><td>Maximum order</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_step_size</td><td>OT_DOUBLE</td><td>Max step size [default: 0/inf]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>newton_scheme</td><td>OT_STRING</td><td>Linear solver scheme in the Newton method: DIRECT|gmres|bcgstab|tfqmr</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>nfwd</td><td>OT_INT</td><td>Number of forward sensitivities to be calculated [0]</td><td>casadi::Integrator</td></tr>
 <tr><td>nonlin_conv_coeff</td><td>OT_DOUBLE</td><td>Coefficient in the nonlinear convergence test</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INT</td><td>Target number of finite elements. The actual number may be higher to accommodate all output times</td><td>casadi::Integrator</td></tr>
 <tr><td>output_t0</td><td>OT_BOOL</td><td>[DEPRECATED] Output the state at the initial time</td><td>casadi::Integrator</td></tr>
@@ -5104,6 +5114,7 @@
 <tr><td>max_order</td><td>OT_DOUBLE</td><td>Maximum order</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>max_step_size</td><td>OT_DOUBLE</td><td>Max step size [default: 0/inf]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>newton_scheme</td><td>OT_STRING</td><td>Linear solver scheme in the Newton method: DIRECT|gmres|bcgstab|tfqmr</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>nfwd</td><td>OT_INT</td><td>Number of forward sensitivities to be calculated [0]</td><td>casadi::Integrator</td></tr>
 <tr><td>nonlin_conv_coeff</td><td>OT_DOUBLE</td><td>Coefficient in the nonlinear convergence test</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>number_of_finite_elements</td><td>OT_INT</td><td>Target number of finite elements. The actual number may be higher to accommodate all output times</td><td>casadi::Integrator</td></tr>
 <tr><td>output_t0</td><td>OT_BOOL</td><td>[DEPRECATED] Output the state at the initial time</td><td>casadi::Integrator</td></tr>

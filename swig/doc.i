@@ -51819,6 +51819,12 @@ General information
 |                  |                 | functions to be  |                  |
 |                  |                 | monitored        |                  |
 +------------------+-----------------+------------------+------------------+
+| nfwd             | OT_INT          | Number of        | casadi::Integrat |
+|                  |                 | forward          | or               |
+|                  |                 | sensitivities to |                  |
+|                  |                 | be calculated    |                  |
+|                  |                 | [0]              |                  |
++------------------+-----------------+------------------+------------------+
 | number_of_finite | OT_INT          | Target number of | casadi::Integrat |
 | _elements        |                 | finite elements. | or               |
 |                  |                 | The actual       |                  |
@@ -52207,6 +52213,10 @@ Extra doc: https://github.com/casadi/casadi/wiki/L_234
 +---------------------------+-----------------+----------------------------+
 | interpolation_order       | OT_INT          | Order of the interpolating |
 |                           |                 | polynomials                |
++---------------------------+-----------------+----------------------------+
+| nfwd                      | OT_INT          | Number of forward          |
+|                           |                 | sensitivities to be        |
+|                           |                 | calculated [0]             |
 +---------------------------+-----------------+----------------------------+
 | number_of_finite_elements | OT_INT          | Target number of finite    |
 |                           |                 | elements. The actual       |
