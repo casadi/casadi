@@ -1,0 +1,19 @@
+matrix:
+ - name: cpp
+   pipeline:
+     - pyspelling.filters.cpp
+   sources:
+     - "casadi/**/*.hpp"
+   pipeline:
+   - pyspelling.filters.context:
+      context_visible_first: true
+      delimiters:
+       - open: '\\'
+         content: '\w*'
+         close: '\b'
+       - open: '#'
+         content: '\w*'
+         close: '\b'
+   dictionary:
+     wordlists:
+       - misc/casadi.dic 
