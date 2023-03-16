@@ -804,7 +804,8 @@ namespace casadi {
     }
 
     /** \brief Stop derivatives of an expression wrt to all its symbolic variables
-    */
+
+        \identifier{25l} */
     inline friend MX stop_diff(const MX& expr, casadi_int order) {
       return MX::stop_diff(expr, order);
     }
@@ -812,7 +813,8 @@ namespace casadi {
     /** \brief Stop first derivatives of an expression wrt to all its symbolic variables
      * 
      * \seealso stop_diff
-    */
+
+        \identifier{25m} */
     inline friend MX no_grad(const MX& expr) {
       return MX::stop_diff(expr, 1);
     }
@@ -820,14 +822,16 @@ namespace casadi {
     /** \brief Stop second derivatives of an expression wrt to all its symbolic variables
      * 
      * \seealso stop_diff
-    */
+
+        \identifier{25n} */
     inline friend MX no_hess(const MX& expr) {
       return MX::stop_diff(expr, 2);
     }
 
 
     /** \brief Stop derivatives of an expression wrt to a select set of symbolic variables
-    */
+
+        \identifier{25o} */
     inline friend MX stop_diff(const MX& expr, const MX& var, casadi_int order) {
       return MX::stop_diff(expr, var, order);
     }

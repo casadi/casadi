@@ -874,7 +874,8 @@ namespace casadi {
     /** \brief Get the sparsity pattern of a jacobian
      * 
      * Equivalent to, but cheaper to compute than, jacobian(f,x).sparsity()
-     */
+
+        \identifier{259} */
     inline friend Sparsity jacobian_sparsity(const MatType &f, const MatType &x) {
       return MatType::jacobian_sparsity(f, x);
     }

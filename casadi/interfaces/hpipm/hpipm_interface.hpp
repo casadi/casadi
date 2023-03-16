@@ -53,8 +53,7 @@ In order to use this interface, you must:
    where I must be a diagonal sparse matrix
  - Either supply all of N, nx, ng, nu options or rely on automatic detection
 
-
-*/
+    \identifier{242} */
 
 #include <blasfeo_d_aux_ext_dep.h>
 

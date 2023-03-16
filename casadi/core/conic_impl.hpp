@@ -147,7 +147,9 @@ namespace casadi {
     /// Get all statistics
     Dict get_stats(void* mem) const override;
 
-    /** \brief Generate code for the function body */
+    /** \brief Generate code for the function body
+
+        \identifier{24y} */
     void qp_codegen_body(CodeGenerator& g) const;
 
   protected:

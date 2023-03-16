@@ -118,29 +118,43 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   virtual MX algebraic_state_init(const MX& x0, const MX& z0) const { return z0; }
   virtual MX algebraic_state_output(const MX& Z) const { return Z; }
 
-  /** \brief Reset the forward problem */
+  /** \brief Reset the forward problem
+
+      \identifier{25a} */
   virtual void reset(IntegratorMemory* mem,
     const double* x, const double* z, const double* p) const = 0;
 
-  /** \brief  Find next stop time */
+  /** \brief  Find next stop time
+
+      \identifier{25b} */
   casadi_int next_stop(casadi_int k, const double* u) const;
 
-  /** \brief  Advance solution in time */
+  /** \brief  Advance solution in time
+
+      \identifier{25c} */
   virtual void advance(IntegratorMemory* mem,
     const double* u, double* x, double* z, double* q) const = 0;
 
-  /** \brief Reset the backward problem */
+  /** \brief Reset the backward problem
+
+      \identifier{25d} */
   virtual void resetB(IntegratorMemory* mem,
     const double* rx, const double* rz, const double* rp) const = 0;
 
-  /** \brief  Find next stop time */
+  /** \brief  Find next stop time
+
+      \identifier{25e} */
   casadi_int next_stopB(casadi_int k, const double* u) const;
 
-  /** \brief Introduce an impulse into the backwards integration at the current time */
+  /** \brief Introduce an impulse into the backwards integration at the current time
+
+      \identifier{25f} */
   virtual void impulseB(IntegratorMemory* mem,
     const double* rx, const double* rz, const double* rp) const = 0;
 
-  /** \brief  Retreat solution in time */
+  /** \brief  Retreat solution in time
+
+      \identifier{25g} */
   virtual void retreat(IntegratorMemory* mem, const double* u,
     double* rx, double* rz, double* rq, double* uq) const = 0;
 
@@ -423,7 +437,9 @@ class CASADI_EXPORT FixedStepIntegrator : public Integrator {
   /// Initialize stage
   void init(const Dict& opts) override;
 
-  /** \brief Set the (persistent) work vectors */
+  /** \brief Set the (persistent) work vectors
+
+      \identifier{25h} */
   void set_work(void* mem, const double**& arg, double**& res,
     casadi_int*& iw, double*& w) const override;
 
@@ -448,11 +464,15 @@ class CASADI_EXPORT FixedStepIntegrator : public Integrator {
   /// Setup F and G
   virtual void setupFG() = 0;
 
-  /** \brief Reset the forward problem */
+  /** \brief Reset the forward problem
+
+      \identifier{25i} */
   void reset(IntegratorMemory* mem,
     const double* x, const double* z, const double* p) const override;
 
-  /** \brief  Advance solution in time */
+  /** \brief  Advance solution in time
+
+      \identifier{25j} */
   void advance(IntegratorMemory* mem,
     const double* u, double* x, double* z, double* q) const override;
 
@@ -464,7 +484,9 @@ class CASADI_EXPORT FixedStepIntegrator : public Integrator {
   void impulseB(IntegratorMemory* mem,
     const double* rx, const double* rz, const double* rp) const override;
 
-  /** \brief Retreat solution in time */
+  /** \brief Retreat solution in time
+
+      \identifier{25k} */
   void retreat(IntegratorMemory* mem, const double* u,
     double* rx, double* rz, double* rq, double* uq) const override;
 

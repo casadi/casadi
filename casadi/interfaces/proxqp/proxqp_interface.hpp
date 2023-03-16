@@ -40,7 +40,8 @@
 
 /** \defgroup plugin_Conic_osqp
     Interface to the PROXQP Solver for quadratic programming
-*/
+
+    \identifier{243} */
 
 /** \pluginsection{Conic,proxqp} */
 
