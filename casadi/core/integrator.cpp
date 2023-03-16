@@ -524,21 +524,20 @@ void Integrator::init(const Dict& opts) {
   nuq_ = uq().nnz();
 
   // Number of sensitivities
-  ns_ = x().size2()-1;
-  casadi_assert(ns_ == nfwd_, "Inconsistent number of sensitivities: " + str(ns_) + " != " + str(nfwd_));
+  ns_ = x().size2() - 1;
+  casadi_assert(ns_ == nfwd_,
+    "Inconsistent number of sensitivities: " + str(ns_) + " != " + str(nfwd_));
 
   // Get the sparsities of the forward and reverse DAE
   sp_jac_dae_ = sp_jac_dae();
   casadi_assert(!sp_jac_dae_.is_singular(),
-                        "Jacobian of the forward problem is structurally rank-deficient. "
-                        "sprank(J)=" + str(sprank(sp_jac_dae_)) + "<"
-                        + str(nx_+nz_));
-  if (nrx_>0) {
+    "Jacobian of the forward problem is structurally rank-deficient. "
+    "sprank(J)=" + str(sprank(sp_jac_dae_)) + "<" + str(nx_+nz_));
+  if (nrx_ > 0) {
     sp_jac_rdae_ = sp_jac_rdae();
     casadi_assert(!sp_jac_rdae_.is_singular(),
-                          "Jacobian of the backward problem is structurally rank-deficient. "
-                          "sprank(J)=" + str(sprank(sp_jac_rdae_)) + "<"
-                          + str(nrx_+nrz_));
+      "Jacobian of the backward problem is structurally rank-deficient. "
+      "sprank(J)=" + str(sprank(sp_jac_rdae_)) + "<" + str(nrx_+nrz_));
   }
 
   // Work vectors for sparsity pattern propagation: Can be reused in derived classes
@@ -1150,7 +1149,8 @@ Function Integrator::get_forward(casadi_int nfwd, const std::string& name,
         offset.push_back(offset.back() + size2_out(i) / n_grid);
       }
     }
-    std::vector<MX> integrator_out_split = horzsplit(reshape(integrator_out[i], size1_out(i), offset.back()), offset);
+    std::vector<MX> integrator_out_split = horzsplit(
+      reshape(integrator_out[i], size1_out(i), offset.back()), offset);
     // Collect sensitivity blocks in the right order
     std::vector<MX> ret_out_split;
     ret_out_split.reserve(n_grid * nfwd);
@@ -1887,7 +1887,6 @@ void Integrator::serialize_body(SerializingStream &s) const {
   s.pack("Integrator::augmented_options", augmented_options_);
   s.pack("Integrator::opts", opts_);
   s.pack("Integrator::print_stats", print_stats_);
-  
 }
 
 void Integrator::serialize_type(SerializingStream &s) const {
