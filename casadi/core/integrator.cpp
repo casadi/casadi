@@ -1841,12 +1841,14 @@ void Integrator::serialize_body(SerializingStream &s) const {
   s.version("Integrator", 2);
   s.pack("Integrator::sp_jac_dae", sp_jac_dae_);
   s.pack("Integrator::sp_jac_rdae", sp_jac_rdae_);
+
   s.pack("Integrator::nx", nx_);
   s.pack("Integrator::nz", nz_);
   s.pack("Integrator::nq", nq_);
   s.pack("Integrator::nx1", nx1_);
   s.pack("Integrator::nz1", nz1_);
   s.pack("Integrator::nq1", nq1_);
+
   s.pack("Integrator::nrx", nrx_);
   s.pack("Integrator::nrz", nrz_);
   s.pack("Integrator::nrq", nrq_);
@@ -1855,13 +1857,17 @@ void Integrator::serialize_body(SerializingStream &s) const {
   s.pack("Integrator::nrz1", nrz1_);
   s.pack("Integrator::nrq1", nrq1_);
   s.pack("Integrator::nuq1", nuq1_);
+
   s.pack("Integrator::np", np_);
-  s.pack("Integrator::nu", nu_);
   s.pack("Integrator::nrp", nrp_);
   s.pack("Integrator::np1", np1_);
-  s.pack("Integrator::nu1", nu1_);
   s.pack("Integrator::nrp1", nrp1_);
+
+  s.pack("Integrator::nu", nu_);
+  s.pack("Integrator::nu1", nu1_);
+
   s.pack("Integrator::ns", ns_);
+
   s.pack("Integrator::augmented_options", augmented_options_);
   s.pack("Integrator::opts", opts_);
   s.pack("Integrator::print_stats", print_stats_);
@@ -1879,72 +1885,63 @@ ProtoFunction* Integrator::deserialize(DeserializingStream& s) {
 }
 
 Integrator::Integrator(DeserializingStream & s) : OracleFunction(s) {
-  int version = s.version("Integrator", 1, 2);
+  s.version("Integrator", 2);
   s.unpack("Integrator::sp_jac_dae", sp_jac_dae_);
   s.unpack("Integrator::sp_jac_rdae", sp_jac_rdae_);
+
   s.unpack("Integrator::nx", nx_);
   s.unpack("Integrator::nz", nz_);
   s.unpack("Integrator::nq", nq_);
   s.unpack("Integrator::nx1", nx1_);
   s.unpack("Integrator::nz1", nz1_);
   s.unpack("Integrator::nq1", nq1_);
+
   s.unpack("Integrator::nrx", nrx_);
   s.unpack("Integrator::nrz", nrz_);
   s.unpack("Integrator::nrq", nrq_);
+  s.unpack("Integrator::nuq", nrq_);
   s.unpack("Integrator::nrx1", nrx1_);
   s.unpack("Integrator::nrz1", nrz1_);
   s.unpack("Integrator::nrq1", nrq1_);
+  s.unpack("Integrator::nuq1", nuq1_);
+
   s.unpack("Integrator::np", np_);
   s.unpack("Integrator::nrp", nrp_);
   s.unpack("Integrator::np1", np1_);
   s.unpack("Integrator::nrp1", nrp1_);
+
+  s.unpack("Integrator::nu", nu_);
+  s.unpack("Integrator::nu1", nu1_);
+
   s.unpack("Integrator::ns", ns_);
+
   s.unpack("Integrator::augmented_options", augmented_options_);
   s.unpack("Integrator::opts", opts_);
   s.unpack("Integrator::print_stats", print_stats_);
-  if (version >= 2) {
-    s.unpack("Integrator::t0", t0_);
-    s.unpack("Integrator::tout", tout_);
-    s.unpack("Integrator::nu", nu_);
-    s.unpack("Integrator::nu1", nu1_);
-    s.unpack("Integrator::nuq", nuq_);
-    s.unpack("Integrator::nuq1", nuq1_);
-  } else {
-    // Time grid
-    std::vector<double> grid;
-    s.unpack("Integrator::grid", grid);
-    // Is the first time point in output?
-    bool output_t0;
-    s.unpack("Integrator::output_t0", output_t0);
-    // Construct t0 and tout from grid and output_t0
-    t0_ = grid.front();
-    tout_ = grid;
-    if (!output_t0) tout_.erase(tout_.begin());
-    // Controls did not exist in version 1
-    nu_ = nu1_ = nuq_ = nuq1_ = 0;
-  }
+  s.unpack("Integrator::t0", t0_);
+  s.unpack("Integrator::tout", tout_);
 }
 
 void FixedStepIntegrator::serialize_body(SerializingStream &s) const {
   Integrator::serialize_body(s);
 
-  s.version("FixedStepIntegrator", 1);
+  s.version("FixedStepIntegrator", 2);
   s.pack("FixedStepIntegrator::F", F_);
   s.pack("FixedStepIntegrator::G", G_);
-  //s.pack("FixedStepIntegrator::nk", nk_);
-  //s.pack("FixedStepIntegrator::h", h_);
-  s.pack("FixedStepIntegrator::nZ", nv_);
-  s.pack("FixedStepIntegrator::nRZ", nrv_);
+  s.pack("FixedStepIntegrator::nk_target", nk_target_);
+  s.pack("FixedStepIntegrator::disc", disc_);
+  s.pack("FixedStepIntegrator::nv", nv_);
+  s.pack("FixedStepIntegrator::nrv", nrv_);
 }
 
 FixedStepIntegrator::FixedStepIntegrator(DeserializingStream & s) : Integrator(s) {
-  s.version("FixedStepIntegrator", 1);
+  s.version("FixedStepIntegrator", 2);
   s.unpack("FixedStepIntegrator::F", F_);
   s.unpack("FixedStepIntegrator::G", G_);
-  //s.unpack("FixedStepIntegrator::nk", nk_);
-  //s.unpack("FixedStepIntegrator::h", h_);
-  s.unpack("FixedStepIntegrator::nZ", nv_);
-  s.unpack("FixedStepIntegrator::nRZ", nrv_);
+  s.unpack("FixedStepIntegrator::nk_target", nk_target_);
+  s.unpack("FixedStepIntegrator::disc", disc_);
+  s.unpack("FixedStepIntegrator::nv", nv_);
+  s.unpack("FixedStepIntegrator::nrv", nrv_);
 }
 
 void ImplicitFixedStepIntegrator::serialize_body(SerializingStream &s) const {
