@@ -1154,11 +1154,10 @@ Function Integrator::get_forward(casadi_int nfwd, const std::string& name,
   return Function(name, ret_in, ret_out, inames, onames, opts);
 }
 
-Function Integrator::
-get_reverse(casadi_int nadj, const std::string& name,
-            const std::vector<std::string>& inames,
-            const std::vector<std::string>& onames,
-            const Dict& opts) const {
+Function Integrator::get_reverse(casadi_int nadj, const std::string& name,
+    const std::vector<std::string>& inames,
+    const std::vector<std::string>& onames,
+    const Dict& opts) const {
   if (verbose_) casadi_message(name_ + "::get_reverse");
 
   // Integrator options
@@ -1254,9 +1253,9 @@ get_reverse(casadi_int nadj, const std::string& name,
     casadi_int n_grid = grid_out(j) ? nt() : 1;
     std::vector<casadi_int> offset = {0};
     for (casadi_int k = 0; k < n_grid; ++k) {
-      offset.push_back(offset.back() + size1_out(j));
+      offset.push_back(offset.back() + numel_out(j) / n_grid);
       for (casadi_int d = 0; d < nadj; ++d) {
-        offset.push_back(offset.back() + size1_in(i));
+        offset.push_back(offset.back() + numel_in(i) / n_grid);
       }
     }
     std::vector<MX> integrator_out_split = vertsplit(vec(integrator_out[j]), offset);
