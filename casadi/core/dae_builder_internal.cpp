@@ -494,7 +494,8 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
   }
 }
 
-std::string DaeBuilderInternal::generate_build_description(const std::vector<std::string>& cfiles) const {
+std::string DaeBuilderInternal::generate_build_description(
+    const std::vector<std::string>& cfiles) const {
   // Default arguments
   int fmi_major = 3;
   int fmi_minor = 0;
