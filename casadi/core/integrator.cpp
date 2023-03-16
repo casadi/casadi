@@ -1477,9 +1477,9 @@ void FixedStepIntegrator::set_work(void* mem, const double**& arg, double**& res
   // Work vectors, allocated in base class
   m->x = w; w += nx_;
   m->z = w; w += nz_;
+  m->x_prev = w; w += nx_;
   m->rx = w; w += nrx_;
   m->rz = w; w += nrz_;
-  m->x_prev = w; w += nx_;
   m->rx_prev = w; w += nrx_;
   m->rq = w; w += nrq_;
 
@@ -1839,8 +1839,11 @@ void Integrator::serialize_body(SerializingStream &s) const {
   OracleFunction::serialize_body(s);
 
   s.version("Integrator", 2);
+
   s.pack("Integrator::sp_jac_dae", sp_jac_dae_);
   s.pack("Integrator::sp_jac_rdae", sp_jac_rdae_);
+  s.pack("Integrator::t0", t0_);
+  s.pack("Integrator::tout", tout_);
 
   s.pack("Integrator::nx", nx_);
   s.pack("Integrator::nz", nz_);
@@ -1871,8 +1874,6 @@ void Integrator::serialize_body(SerializingStream &s) const {
   s.pack("Integrator::augmented_options", augmented_options_);
   s.pack("Integrator::opts", opts_);
   s.pack("Integrator::print_stats", print_stats_);
-  s.pack("Integrator::t0", t0_);
-  s.pack("Integrator::tout", tout_);
 }
 
 void Integrator::serialize_type(SerializingStream &s) const {
@@ -1886,8 +1887,11 @@ ProtoFunction* Integrator::deserialize(DeserializingStream& s) {
 
 Integrator::Integrator(DeserializingStream & s) : OracleFunction(s) {
   s.version("Integrator", 2);
+
   s.unpack("Integrator::sp_jac_dae", sp_jac_dae_);
   s.unpack("Integrator::sp_jac_rdae", sp_jac_rdae_);
+  s.unpack("Integrator::t0", t0_);
+  s.unpack("Integrator::tout", tout_);
 
   s.unpack("Integrator::nx", nx_);
   s.unpack("Integrator::nz", nz_);
@@ -1899,7 +1903,7 @@ Integrator::Integrator(DeserializingStream & s) : OracleFunction(s) {
   s.unpack("Integrator::nrx", nrx_);
   s.unpack("Integrator::nrz", nrz_);
   s.unpack("Integrator::nrq", nrq_);
-  s.unpack("Integrator::nuq", nrq_);
+  s.unpack("Integrator::nuq", nuq_);
   s.unpack("Integrator::nrx1", nrx1_);
   s.unpack("Integrator::nrz1", nrz1_);
   s.unpack("Integrator::nrq1", nrq1_);
@@ -1918,8 +1922,6 @@ Integrator::Integrator(DeserializingStream & s) : OracleFunction(s) {
   s.unpack("Integrator::augmented_options", augmented_options_);
   s.unpack("Integrator::opts", opts_);
   s.unpack("Integrator::print_stats", print_stats_);
-  s.unpack("Integrator::t0", t0_);
-  s.unpack("Integrator::tout", tout_);
 }
 
 void FixedStepIntegrator::serialize_body(SerializingStream &s) const {
