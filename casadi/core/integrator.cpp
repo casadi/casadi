@@ -491,9 +491,13 @@ void Integrator::init(const Dict& opts) {
   casadi_assert(x().is_dense(), "Sparse DAE not supported");
   casadi_assert(z().is_dense(), "Sparse DAE not supported");
   casadi_assert(p().is_dense(), "Sparse DAE not supported");
+  casadi_assert(u().is_dense(), "Sparse DAE not supported");
+  casadi_assert(q().is_dense(), "Sparse DAE not supported");
   casadi_assert(rx().is_dense(), "Sparse DAE not supported");
   casadi_assert(rz().is_dense(), "Sparse DAE not supported");
   casadi_assert(rp().is_dense(), "Sparse DAE not supported");
+  casadi_assert(rq().is_dense(), "Sparse DAE not supported");
+  casadi_assert(uq().is_dense(), "Sparse DAE not supported");
 
   // Get dimensions (excluding sensitivity equations)
   nx1_ = x().size1();
