@@ -664,6 +664,9 @@ jobs:
           bit: 32
     steps:
       - uses: actions/checkout@v3.3.0
+      # Make cl.exe available on Windows
+      - uses: ilammy/msvc-dev-cmd@v1.12.1
+        if: contains(matrix.image, 'windows')
       - uses: kanga333/variable-mapper@v0.3.0
         with:
           key: "${{matrix.image}}"
@@ -681,11 +684,6 @@ jobs:
       - name: Unpack source
         run: unzip casadi-${{env.os}}${{matrix.bit}}-matlab${{matrix.matlab}}.zip -d casadi
       - run: ls
-      # Make cl.exe available on Windows
-      - uses: TheMrMilchmann/setup-msvc-dev@v2.0.0
-        with:
-          arch: x64
-        if: contains(matrix.image, 'windows')
       - name: Set up MATLAB
         uses: matlab-actions/setup-matlab@v1.2.4
       - name: Run script
@@ -798,6 +796,9 @@ jobs:
           py2: "37"
     steps:
       - uses: actions/checkout@v3.3.0
+      # Make cl.exe available on Windows
+      - uses: ilammy/msvc-dev-cmd@v1.12.1
+        if: contains(matrix.image, 'windows')
       - uses: kanga333/variable-mapper@v0.3.0
         with:
           key: "${{matrix.image}}"
@@ -818,11 +819,6 @@ jobs:
       - uses: casadi/commercial_solvers@master
         with:
           token: ${{ secrets.JGILLIS_RESTRICTED }}
-      # Make cl.exe available on Windows
-      - uses: TheMrMilchmann/setup-msvc-dev@v2.0.0
-        with:
-          arch: x64
-        if: contains(matrix.image, 'windows')
       - id: get-id
         uses: actions/github-script@v6.3.3
         env:
