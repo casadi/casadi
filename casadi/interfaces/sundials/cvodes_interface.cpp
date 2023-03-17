@@ -238,20 +238,20 @@ int CvodesInterface::rhs(double t, N_Vector x, N_Vector xdot, void *user_data) {
     auto m = to_mem(user_data);
     auto& s = m->self;
     // Evaluate nondifferentiated
-    m->arg[0] = NV_DATA_S(x);  // x
-    m->arg[1] = m->p;  // p
-    m->arg[2] = m->u;  // u
-    m->arg[3] = &t;  // t
-    m->res[0] = NV_DATA_S(xdot);  // ode
+    m->arg[ODEF_X] = NV_DATA_S(x);  // x
+    m->arg[ODEF_P] = m->p;  // p
+    m->arg[ODEF_U] = m->u;  // u
+    m->arg[ODEF_T] = &t;  // t
+    m->res[ODEF_ODE] = NV_DATA_S(xdot);  // ode
     s.calc_function(m, "odeF");
     // Evaluate sensitivities
     if (s.ns_ > 0) {
-      m->arg[4] = NV_DATA_S(xdot);  // out:ode
-      m->arg[5] = m->arg[0] + s.nx1_;  // fwd:x
-      m->arg[6] = m->arg[1] + s.np1_;  // fwd:p
-      m->arg[7] = m->arg[2] + s.nu1_;  // fwd:u
-      m->arg[8] = 0;  // fwd:t
-      m->res[0] = NV_DATA_S(xdot) + s.nx1_;  // fwd:ode
+      m->arg[ODEF_NUM_IN + ODEF_ODE] = NV_DATA_S(xdot);  // out:ode
+      m->arg[ODEF_NUM_IN + ODEF_NUM_OUT + ODEF_X] = m->arg[ODEF_X] + s.nx1_;  // fwd:x
+      m->arg[ODEF_NUM_IN + ODEF_NUM_OUT + ODEF_P] = m->arg[ODEF_P] + s.np1_;  // fwd:p
+      m->arg[ODEF_NUM_IN + ODEF_NUM_OUT + ODEF_U] = m->arg[ODEF_U] + s.nu1_;  // fwd:u
+      m->arg[ODEF_NUM_IN + ODEF_NUM_OUT + ODEF_T] = 0;  // fwd:t
+      m->res[ODEF_ODE] = NV_DATA_S(xdot) + s.nx1_;  // fwd:ode
       s.calc_forward(m, "odeF", s.ns_);
     }
     return 0;
