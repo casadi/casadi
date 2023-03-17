@@ -133,12 +133,15 @@ void CvodesInterface::init(const Dict& opts) {
     casadi_error("Unknown nonlinear solver iteration: " + nonlinear_solver_iteration);
   }
 
-  // Attach functions for jacobian information
-  if (newton_scheme_!=SD_DIRECT || (ns_>0 && second_order_correction_)) {
-    create_function("jtimesF", {"t", "x", "p", "u", "fwd:x"}, {"fwd:ode"});
-    if (nrx_>0) {
+  // Attach functions for jacobian information, foward problem
+  if (newton_scheme_!=SD_DIRECT || (ns_ > 0 && second_order_correction_)) {
+    create_function(nonaug_oracle_, "jtimesF", {"t", "x", "p", "u", "fwd:x"}, {"fwd:ode"});
+    if (ns_ > 0) {
+      create_forward("jtimesF", ns_);
+    }
+    if (nrx_ > 0) {
       create_function("jtimesB",
-                      {"t", "x", "p", "u", "rx", "rp", "fwd:rx"}, {"fwd:rode"});
+        {"t", "x", "p", "u", "rx", "rp", "fwd:rx"}, {"fwd:rode"});
     }
   }
 
@@ -954,13 +957,25 @@ Function CvodesInterface::get_jacB(Sparsity* sp) const {
 
 void CvodesInterface::calc_fwd_odeF(CvodesMemory* m, double t, const double* x, const double* ode,
     const double* fwd_x, double* fwd_ode) const {
-  m->arg[JTIMESF_T] = &t;
-  m->arg[JTIMESF_X] = x;
-  m->arg[JTIMESF_P] = m->p;
-  m->arg[JTIMESF_U] = m->u;
-  m->arg[JTIMESF_FWD_X] = fwd_x;
-  m->res[JTIMESF_FWD_ODE] = fwd_ode;
+  // Evaluate nondifferentiated
+  m->arg[JTIMESF_T] = &t;  // t
+  m->arg[JTIMESF_X] = x;  // x
+  m->arg[JTIMESF_P] = m->p;  // p
+  m->arg[JTIMESF_U] = m->u;  // u
+  m->arg[JTIMESF_FWD_X] = fwd_x;  // fwd:x
+  m->res[JTIMESF_FWD_ODE] = fwd_ode;  // fwd:ode
   calc_function(m, "jtimesF");
+  // Evaluate sensitivities
+  if (ns_ > 0) {
+    m->arg[JTIMESF_NUM_IN + JTIMESF_FWD_ODE] = fwd_ode;  // out:ode
+    m->arg[JTIMESF_NUM_IN + JTIMESF_NUM_OUT + JTIMESF_T] = 0;  // fwd:t
+    m->arg[JTIMESF_NUM_IN + JTIMESF_NUM_OUT + JTIMESF_X] = x + nx1_;  // fwd:x
+    m->arg[JTIMESF_NUM_IN + JTIMESF_NUM_OUT + JTIMESF_P] = m->p + np1_;  // fwd:p
+    m->arg[JTIMESF_NUM_IN + JTIMESF_NUM_OUT + JTIMESF_U] = m->u + nu1_;  // fwd:u
+    m->arg[JTIMESF_NUM_IN + JTIMESF_NUM_OUT + JTIMESF_FWD_X] = fwd_x + nx1_;  // fwd:fwd:x
+    m->res[JTIMESF_FWD_ODE] = fwd_ode + nx1_;  // fwd:fwd:ode
+    calc_forward(m, "jtimesF", ns_);
+  }
 }
 
 CvodesMemory::CvodesMemory(const CvodesInterface& s) : self(s) {
