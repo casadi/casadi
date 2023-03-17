@@ -201,6 +201,11 @@ namespace casadi {
     casadi_int lmm_; // linear multistep method
     casadi_int iter_; // nonlinear solver iteration
 
+    ///@{
+    /** \brief IO conventions for continuous time dynamics */
+    enum OdeBIn { ODEB_RX, ODEB_RP, ODEB_X, ODEB_P, ODEB_U, ODEB_T, ODEB_NUM_IN};
+    enum OdeBOut { ODEB_RODE, ODEB_NUM_OUT};
+    ///@}
 
   public:
 
