@@ -129,12 +129,22 @@ namespace casadi {
     // Replace MX oracle with SX oracle?
     void expand();
 
+    /** Create an oracle function, using a different oracle function
+     * Temporary addition to allow transition from one oracle formulation to another.
+     */
+    Function create_function(const Function& oracle, const std::string& fname,
+      const std::vector<std::string>& s_in,
+      const std::vector<std::string>& s_out,
+      const Function::AuxOut& aux=Function::AuxOut());
+
     /** Create an oracle function */
-    Function
-    create_function(const std::string& fname,
-                    const std::vector<std::string>& s_in,
-                    const std::vector<std::string>& s_out,
-                    const Function::AuxOut& aux=Function::AuxOut());
+    Function create_function(const std::string& fname,
+      const std::vector<std::string>& s_in,
+      const std::vector<std::string>& s_out,
+      const Function::AuxOut& aux=Function::AuxOut());
+
+    /** Create an oracle function as a forward derivative of a different function */
+    Function create_forward(const std::string& fname, casadi_int nfwd);
 
     /** Register the function for evaluation and statistics gathering */
     void set_function(const Function& fcn, const std::string& fname, bool jit=false);
@@ -144,7 +154,11 @@ namespace casadi {
 
     // Calculate an oracle function
     int calc_function(OracleMemory* m, const std::string& fcn,
-                      const double* const* arg=nullptr, int thread_id=0) const;
+      const double* const* arg=nullptr, int thread_id=0) const;
+
+    // Calculate an oracle function, forward derivative
+    int calc_forward(OracleMemory* m, const std::string& fcn, casadi_int nfwd,
+      const double* const* arg=nullptr, int thread_id=0) const;
 
     /** \brief Get list of dependency functions
 

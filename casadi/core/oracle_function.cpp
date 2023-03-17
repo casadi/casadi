@@ -154,9 +154,16 @@ namespace casadi {
   }
 
   Function OracleFunction::create_function(const std::string& fname,
-                                   const std::vector<std::string>& s_in,
-                                   const std::vector<std::string>& s_out,
-                                   const Function::AuxOut& aux) {
+      const std::vector<std::string>& s_in,
+      const std::vector<std::string>& s_out,
+      const Function::AuxOut& aux) {
+    return create_function(oracle_, fname, s_in, s_out, aux);
+  }
+
+  Function OracleFunction::create_function(const Function& oracle, const std::string& fname,
+      const std::vector<std::string>& s_in,
+      const std::vector<std::string>& s_out,
+      const Function::AuxOut& aux) {
     // Print progress
     if (verbose_) {
       casadi_message(name_ + "::create_function " + fname + ":" + str(s_in) + "->" + str(s_out));
@@ -171,7 +178,7 @@ namespace casadi {
     Dict opt = combine(specific_options, common_options_);
 
     // Generate the function
-    Function ret = oracle_.factory(fname, s_in, s_out, aux, opt);
+    Function ret = oracle.factory(fname, s_in, s_out, aux, opt);
 
     // Make sure that it's sound
     if (ret.has_free()) {
@@ -180,6 +187,13 @@ namespace casadi {
 
     // Save and return
     set_function(ret, fname, true);
+    return ret;
+  }
+
+  Function OracleFunction::create_forward(const std::string& fname, casadi_int nfwd) {
+    // Create derivative
+    Function ret = get_function(fname).forward(nfwd);
+    set_function(ret, ret.name(), true);
     return ret;
   }
 
@@ -304,6 +318,11 @@ namespace casadi {
 
     // Success
     return 0;
+  }
+
+  int OracleFunction::calc_forward(OracleMemory* m, const std::string& fcn, casadi_int nfwd,
+      const double* const* arg, int thread_id) const {
+    return calc_function(m, "fwd" + str(nfwd) + "_" + fcn, arg, thread_id);
   }
 
   std::string OracleFunction::
