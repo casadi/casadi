@@ -583,14 +583,14 @@ int CvodesInterface::jtimesB(N_Vector v, N_Vector Jv, double t, N_Vector x,
   try {
     auto m = to_mem(user_data);
     auto& s = m->self;
-    m->arg[0] = &t;
-    m->arg[1] = NV_DATA_S(x);
-    m->arg[2] = m->p;
-    m->arg[3] = m->u;
-    m->arg[4] = NV_DATA_S(rx);
-    m->arg[5] = m->rp;
-    m->arg[6] = NV_DATA_S(v);
-    m->res[0] = NV_DATA_S(Jv);
+    m->arg[JTIMESB_T] = &t;
+    m->arg[JTIMESB_X] = NV_DATA_S(x);
+    m->arg[JTIMESB_P] = m->p;
+    m->arg[JTIMESB_U] = m->u;
+    m->arg[JTIMESB_RX] = NV_DATA_S(rx);
+    m->arg[JTIMESB_RP] = m->rp;
+    m->arg[JTIMESB_FWD_RX] = NV_DATA_S(v);
+    m->res[JTIMESB_FWD_RODE] = NV_DATA_S(Jv);
     s.calc_function(m, "jtimesB");
     return 0;
   } catch(int flag) { // recoverable error
