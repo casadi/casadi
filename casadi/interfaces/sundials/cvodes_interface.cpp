@@ -450,23 +450,23 @@ int CvodesInterface::rhsQ(double t, N_Vector x, N_Vector qdot, void *user_data) 
   try {
     auto m = to_mem(user_data);
     auto& s = m->self;
-    // Evaluate nondifferentiated
-    m->arg[0] = NV_DATA_S(x);  // x
-    m->arg[1] = m->p;  // p
-    m->arg[2] = m->u;  // u
-    m->arg[3] = &t;  // t
-    m->res[0] = NV_DATA_S(qdot);  // quad
+    m->arg[ODEF_X] = NV_DATA_S(x);  // x
+    m->arg[ODEF_P] = m->p;  // p
+    m->arg[ODEF_U] = m->u;  // u
+    m->arg[ODEF_T] = &t;  // t
+    m->res[QUADF_QUAD] = NV_DATA_S(qdot);  // quad
     s.calc_function(m, "quadF");
     // Evaluate sensitivities
     if (s.ns_ > 0) {
-      m->arg[4] = NV_DATA_S(qdot);  // out:quad
-      m->arg[5] = m->arg[0] + s.nx1_;  // fwd:x
-      m->arg[6] = m->arg[1] + s.np1_;  // fwd:p
-      m->arg[7] = m->arg[2] + s.nu1_;  // fwd:u
-      m->arg[8] = 0;  // fwd:t
-      m->res[0] = NV_DATA_S(qdot) + s.nq1_;  // fwd:quad
+      m->arg[ODEF_NUM_IN + QUADF_QUAD] = NV_DATA_S(qdot);  // out:quad
+      m->arg[ODEF_NUM_IN + QUADF_NUM_OUT + ODEF_X] = m->arg[ODEF_X] + s.nx1_;  // fwd:x
+      m->arg[ODEF_NUM_IN + QUADF_NUM_OUT + ODEF_P] = m->arg[ODEF_P] + s.np1_;  // fwd:p
+      m->arg[ODEF_NUM_IN + QUADF_NUM_OUT + ODEF_U] = m->arg[ODEF_U] + s.nu1_;  // fwd:u
+      m->arg[ODEF_NUM_IN + QUADF_NUM_OUT + ODEF_T] = 0;  // fwd:t
+      m->res[QUADF_QUAD] = NV_DATA_S(qdot) + s.nq1_;  // fwd:quad
       s.calc_forward(m, "quadF", s.ns_);
     }
+
     return 0;
   } catch(int flag) { // recoverable error
     return flag;

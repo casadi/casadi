@@ -205,6 +205,7 @@ namespace casadi {
     /** \brief IO conventions for continuous time dynamics */
     enum OdeFIn { ODEF_X, ODEF_P, ODEF_U, ODEF_T, ODEF_NUM_IN};
     enum OdeFOut { ODEF_ODE, ODEF_NUM_OUT};
+    enum QuadFOut { QUADF_QUAD, QUADF_NUM_OUT};
     enum OdeBIn { ODEB_RX, ODEB_RP, ODEB_X, ODEB_P, ODEB_U, ODEB_T, ODEB_NUM_IN};
     enum OdeBOut { ODEB_RODE, ODEB_NUM_OUT};
     enum QuadBOut { QUADB_RQUAD, QUADB_UQUAD, QUADB_NUM_OUT};
