@@ -97,10 +97,11 @@ void CvodesInterface::init(const Dict& opts) {
 
   // Create function
   create_function(nonaug_oracle_, "odeF", {"x", "p", "u", "t"}, {"ode"});
+  create_function(nonaug_oracle_, "quadF", {"x", "p", "u", "t"}, {"quad"});
   if (ns_ > 0) {
     create_forward("odeF", ns_);
+    create_forward("quadF", ns_);
   }
-  create_function("quadF", {"x", "p", "u", "t"}, {"quad"});
   create_function("odeB", {"rx", "rp", "x", "p", "u", "t"}, {"rode"});
   create_function("quadB", {"rx", "rp", "x", "p", "u", "t"}, {"rquad", "uquad"});
 
@@ -441,12 +442,23 @@ int CvodesInterface::rhsQ(double t, N_Vector x, N_Vector qdot, void *user_data) 
   try {
     auto m = to_mem(user_data);
     auto& s = m->self;
-    m->arg[0] = NV_DATA_S(x);
-    m->arg[1] = m->p;
-    m->arg[2] = m->u;
-    m->arg[3] = &t;
-    m->res[0] = NV_DATA_S(qdot);
+    // Evaluate nondifferentiated
+    m->arg[0] = NV_DATA_S(x);  // x
+    m->arg[1] = m->p;  // p
+    m->arg[2] = m->u;  // u
+    m->arg[3] = &t;  // t
+    m->res[0] = NV_DATA_S(qdot);  // quad
     s.calc_function(m, "quadF");
+    // Evaluate sensitivities
+    if (s.ns_ > 0) {
+      m->arg[4] = NV_DATA_S(qdot);  // out:quad
+      m->arg[5] = m->arg[0] + s.nx1_;  // fwd:x
+      m->arg[6] = m->arg[1] + s.np1_;  // fwd:p
+      m->arg[7] = m->arg[2] + s.nu1_;  // fwd:u
+      m->arg[8] = 0;  // fwd:t
+      m->res[0] = NV_DATA_S(qdot) + s.nq1_;  // fwd:quad
+      s.calc_forward(m, "quadF", s.ns_);
+    }
     return 0;
   } catch(int flag) { // recoverable error
     return flag;
