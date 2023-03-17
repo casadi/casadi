@@ -809,7 +809,11 @@ macro(eager_update DEP_NAME)
       file(WRITE ${VERSION_FILE} "${VERSION}")
     endif()
 
-    if(NOT "${VERSION}" STREQUAL "$(file(READ ${VERSION_FILE}))")
+
+    # Read the version file
+    file(READ ${VERSION_FILE} VERSION_FILE_CONTENTS)
+    if(NOT VERSION STREQUAL VERSION_FILE_CONTENTS)
+      message("${DEP_NAME} is out of date. Removing old version.")
       file(WRITE ${VERSION_FILE} "${VERSION}")
       file(GLOB TO_REMOVE LIST_DIRECTORIES true "${CMAKE_BINARY_DIR}/external_projects/src/${DEP_NAME_LOWERCASE}-*")
       if(TO_REMOVE)
