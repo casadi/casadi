@@ -209,6 +209,8 @@ namespace casadi {
     enum OdeBIn { ODEB_RX, ODEB_RP, ODEB_X, ODEB_P, ODEB_U, ODEB_T, ODEB_NUM_IN};
     enum OdeBOut { ODEB_RODE, ODEB_NUM_OUT};
     enum QuadBOut { QUADB_RQUAD, QUADB_UQUAD, QUADB_NUM_OUT};
+    enum JtimesFIn { JTIMESF_T, JTIMESF_X, JTIMESF_P, JTIMESF_U, JTIMESF_FWD_X, JTIMESF_NUM_IN};
+    enum JtimesFOut { JTIMESF_FWD_ODE, JTIMESF_NUM_OUT};
     ///@}
 
   public:

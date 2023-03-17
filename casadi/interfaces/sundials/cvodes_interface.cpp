@@ -562,12 +562,12 @@ int CvodesInterface::jtimes(N_Vector v, N_Vector Jv, double t, N_Vector x,
   try {
     auto m = to_mem(user_data);
     auto& s = m->self;
-    m->arg[0] = &t;
-    m->arg[1] = NV_DATA_S(x);
-    m->arg[2] = m->p;
-    m->arg[3] = m->u;
-    m->arg[4] = NV_DATA_S(v);
-    m->res[0] = NV_DATA_S(Jv);
+    m->arg[JTIMESF_T] = &t;
+    m->arg[JTIMESF_X] = NV_DATA_S(x);
+    m->arg[JTIMESF_P] = m->p;
+    m->arg[JTIMESF_U] = m->u;
+    m->arg[JTIMESF_FWD_X] = NV_DATA_S(v);
+    m->res[JTIMESF_FWD_ODE] = NV_DATA_S(Jv);
     s.calc_function(m, "jtimesF");
     return 0;
   } catch(casadi_int flag) { // recoverable error
