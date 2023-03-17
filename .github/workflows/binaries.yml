@@ -841,9 +841,6 @@ jobs:
       - run: ls /d/a/_temp && ls /d/a/_temp/knitro
         shell: bash
         if: contains(matrix.image, 'windows')
-      - run: tree $RUNNER_TEMP
-        shell: bash
-        if: contains(matrix.image, 'windows')
       - run: |
           pip install numpy scipy pandas
         shell: bash -el {0}
