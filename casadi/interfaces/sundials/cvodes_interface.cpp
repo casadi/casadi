@@ -140,8 +140,11 @@ void CvodesInterface::init(const Dict& opts) {
       create_forward("jtimesF", ns_);
     }
     if (nrx_ > 0) {
-      create_function("jtimesB",
+      create_function(nonaug_oracle_, "jtimesB",
         {"t", "x", "p", "u", "rx", "rp", "fwd:rx"}, {"fwd:rode"});
+      if (ns_ > 0) {
+        create_forward("jtimesB", ns_);
+      }
     }
   }
 
@@ -952,7 +955,7 @@ void CvodesInterface::calc_fwd_odeF(CvodesMemory* m, double t, const double* x, 
   calc_function(m, "jtimesF");
   // Evaluate sensitivities
   if (ns_ > 0) {
-    m->arg[JTIMESF_NUM_IN + JTIMESF_FWD_ODE] = fwd_ode;  // out:ode
+    m->arg[JTIMESF_NUM_IN + JTIMESF_FWD_ODE] = fwd_ode;  // out:fwd:ode
     m->arg[JTIMESF_NUM_IN + JTIMESF_NUM_OUT + JTIMESF_T] = 0;  // fwd:t
     m->arg[JTIMESF_NUM_IN + JTIMESF_NUM_OUT + JTIMESF_X] = x + nx1_;  // fwd:x
     m->arg[JTIMESF_NUM_IN + JTIMESF_NUM_OUT + JTIMESF_P] = m->p + np1_;  // fwd:p
@@ -965,15 +968,29 @@ void CvodesInterface::calc_fwd_odeF(CvodesMemory* m, double t, const double* x, 
 
 void CvodesInterface::calc_fwd_odeB(CvodesMemory* m, double t, const double* x, const double* rx,
     const double* rode, const double* fwd_rx, double* fwd_rode) const {
-  m->arg[JTIMESB_T] = &t;
-  m->arg[JTIMESB_X] = x;
-  m->arg[JTIMESB_P] = m->p;
-  m->arg[JTIMESB_U] = m->u;
-  m->arg[JTIMESB_RX] = rx;
-  m->arg[JTIMESB_RP] = m->rp;
-  m->arg[JTIMESB_FWD_RX] = fwd_rx;
-  m->res[JTIMESB_FWD_RODE] = fwd_rode;
+  // Evaluate nondifferentiated
+  m->arg[JTIMESB_T] = &t;  // t
+  m->arg[JTIMESB_X] = x;  // x
+  m->arg[JTIMESB_P] = m->p;  // p
+  m->arg[JTIMESB_U] = m->u;  // u
+  m->arg[JTIMESB_RX] = rx;  // rx
+  m->arg[JTIMESB_RP] = m->rp;  // rp
+  m->arg[JTIMESB_FWD_RX] = fwd_rx;  // fwd:rx
+  m->res[JTIMESB_FWD_RODE] = fwd_rode;  // fwd:rode
   calc_function(m, "jtimesB");
+  // Evaluate sensitivities
+  if (ns_ > 0) {
+    m->arg[JTIMESB_NUM_IN + JTIMESB_FWD_RODE] = fwd_rode;  // out:fwd:rode
+    m->arg[JTIMESB_NUM_IN + JTIMESB_NUM_OUT + JTIMESB_T] = 0;  // fwd:t
+    m->arg[JTIMESB_NUM_IN + JTIMESB_NUM_OUT + JTIMESB_X] = x + nx1_;  // fwd:x
+    m->arg[JTIMESB_NUM_IN + JTIMESB_NUM_OUT + JTIMESB_P] = m->p + np1_;  // fwd:p
+    m->arg[JTIMESB_NUM_IN + JTIMESB_NUM_OUT + JTIMESB_U] = m->u + nu1_;  // fwd:u
+    m->arg[JTIMESB_NUM_IN + JTIMESB_NUM_OUT + JTIMESB_RX] = rx + nrx1_;  // fwd:rx
+    m->arg[JTIMESB_NUM_IN + JTIMESB_NUM_OUT + JTIMESB_RP] = m->rp + nrp1_;  // fwd:rp
+    m->arg[JTIMESB_NUM_IN + JTIMESB_NUM_OUT + JTIMESB_FWD_RX] = fwd_rx + nrx1_;  // fwd:fwd:rx
+    m->res[JTIMESB_FWD_RODE] = fwd_rode + nrx1_;  // fwd:fwd:rode
+    calc_forward(m, "jtimesB", ns_);
+ }
 }
 
 CvodesMemory::CvodesMemory(const CvodesInterface& s) : self(s) {
