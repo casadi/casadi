@@ -209,19 +209,20 @@ namespace casadi {
     if (ns_ > 0) {
       d = derivative_of_.get<SundialsInterface>();
       casadi_assert_dev(d != nullptr);
+      nonaug_oracle_ = d->oracle_;
+    } else {
+      nonaug_oracle_ = oracle_;
     }
 
     // Get Jacobian function, forward problem
     Function jacF;
     Sparsity jacF_sp;
-    if (d == 0) {
+    if (d == 0 || d->ns_ > 0) {
       jacF = get_jacF(&jacF_sp);
-    } else if (d->ns_ == 0) {
+    } else {
       jacF = d->get_function("jacF");
       linsolF_ = d->linsolF_;
       jacF_sp = linsolF_.sparsity();
-    } else {
-      jacF = d->get_jacF(&jacF_sp);
     }
     set_function(jacF, jacF.name(), true);
     alloc_w(jacF_sp.nnz(), true);  // jacF
@@ -236,14 +237,12 @@ namespace casadi {
       // Get Jacobian function, backward problem
       Function jacB;
       Sparsity jacB_sp;
-      if (d == 0) {
+      if (d == 0 || d->ns_ > 0) {
         jacB = get_jacB(&jacB_sp);
-      } else if (d->ns_ == 0) {
+      } else {
         jacB = d->get_function("jacB");
         linsolB_ = d->linsolB_;
         jacB_sp = linsolB_.sparsity();
-      } else {
-        jacB = d->get_jacB(&jacB_sp);
       }
       set_function(jacB, jacB.name(), true);
       alloc_w(jacB_sp.nnz(), true);  // jacB
@@ -449,6 +448,7 @@ namespace casadi {
     s.unpack("SundialsInterface::nonlin_conv_coeff", nonlin_conv_coeff_);
     s.unpack("SundialsInterface::max_order", max_order_);
 
+    s.unpack("SundialsInterface::nonaug_oracle", nonaug_oracle_);
     s.unpack("SundialsInterface::linsolF", linsolF_);
     s.unpack("SundialsInterface::linsolB", linsolB_);
 
@@ -486,6 +486,7 @@ namespace casadi {
     s.pack("SundialsInterface::nonlin_conv_coeff", nonlin_conv_coeff_);
     s.pack("SundialsInterface::max_order", max_order_);
 
+    s.pack("SundialsInterface::nonaug_oracle", nonaug_oracle_);
     s.pack("SundialsInterface::linsolF", linsolF_);
     s.pack("SundialsInterface::linsolB", linsolB_);
 

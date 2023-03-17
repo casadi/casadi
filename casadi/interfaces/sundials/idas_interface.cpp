@@ -1159,9 +1159,9 @@ int IdasInterface::lsolveB(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector
 }
 
 Function IdasInterface::get_jacF(Sparsity* sp) const {
-  Function J = oracle_.factory("jacF", {"t", "x", "z", "p", "u"},
+  Function J = nonaug_oracle_.factory("jacF", {"t", "x", "z", "p", "u"},
     {"jac:ode:x", "jac:alg:x", "jac:ode:z", "jac:alg:z"});
-  if (sp) *sp = horzcat(vertcat(J.sparsity_out("jac_ode_x") + Sparsity::diag(nx_),
+  if (sp) *sp = horzcat(vertcat(J.sparsity_out("jac_ode_x") + Sparsity::diag(nx1_),
                                 J.sparsity_out("jac_alg_x")),
                         vertcat(J.sparsity_out("jac_ode_z"),
                                 J.sparsity_out("jac_alg_z")));
@@ -1169,9 +1169,9 @@ Function IdasInterface::get_jacF(Sparsity* sp) const {
 }
 
 Function IdasInterface::get_jacB(Sparsity* sp) const {
-  Function J = oracle_.factory("jacB", {"t", "x", "z", "p", "u", "rx", "rz", "rp"},
+  Function J = nonaug_oracle_.factory("jacB", {"t", "x", "z", "p", "u", "rx", "rz", "rp"},
     {"jac:rode:rx", "jac:ralg:rx", "jac:rode:rz", "jac:ralg:rz"});
-  if (sp) *sp = horzcat(vertcat(J.sparsity_out("jac_rode_rx") + Sparsity::diag(nrx_),
+  if (sp) *sp = horzcat(vertcat(J.sparsity_out("jac_rode_rx") + Sparsity::diag(nrx1_),
                                 J.sparsity_out("jac_ralg_rx")),
                         vertcat(J.sparsity_out("jac_rode_rz"),
                                 J.sparsity_out("jac_ralg_rz")));

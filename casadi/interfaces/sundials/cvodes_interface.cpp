@@ -891,14 +891,14 @@ int CvodesInterface::lsolveB(CVodeMem cv_mem, N_Vector b, N_Vector weight,
 }
 
 Function CvodesInterface::get_jacF(Sparsity* sp) const {
-  Function J = oracle_.factory("jacF", {"t", "x", "p", "u"}, {"jac:ode:x"});
-  if (sp) *sp = J.sparsity_out(0) + Sparsity::diag(nx_);
+  Function J = nonaug_oracle_.factory("jacF", {"t", "x", "p", "u"}, {"jac:ode:x"});
+  if (sp) *sp = J.sparsity_out(0) + Sparsity::diag(nx1_);
   return J;
 }
 
 Function CvodesInterface::get_jacB(Sparsity* sp) const {
-  Function J = oracle_.factory("jacB", {"t", "x", "p", "u", "rx", "rp"}, {"jac:rode:rx"});
-  if (sp) *sp = J.sparsity_out(0) + Sparsity::diag(nrx_);
+  Function J = nonaug_oracle_.factory("jacB", {"t", "x", "p", "u", "rx", "rp"}, {"jac:rode:rx"});
+  if (sp) *sp = J.sparsity_out(0) + Sparsity::diag(nrx1_);
   return J;
 }
 
