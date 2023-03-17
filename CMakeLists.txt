@@ -798,6 +798,26 @@ function(libraries2flags libraries out)
   endforeach()
 endfunction()
 
+
+macro(eager_update DEP_NAME)
+    set(VERSION "VERSION:${BUILD_${DEP_NAME}_VERSION}\nREPO:${BUILD_${DEP_NAME}_GIT_REPO}")
+    set(VERSION_FILE "${CMAKE_BINARY_DIR}/external_projects/versions/${DEP_NAME}_version.txt")
+    # Get lowercase version of DEP_NAME
+    string(TOLOWER "${DEP_NAME}" DEP_NAME_LOWERCASE)
+
+    if(NOT EXISTS ${VERSION_FILE})
+      file(WRITE ${VERSION_FILE} "${VERSION}")
+    endif()
+
+    if(NOT "${VERSION}" STREQUAL "$(file(READ ${VERSION_FILE}))")
+      file(WRITE ${VERSION_FILE} "${VERSION}")
+      file(GLOB TO_REMOVE LIST_DIRECTORIES true "${CMAKE_BINARY_DIR}/external_projects/src/${DEP_NAME_LOWERCASE}-*")
+      if(TO_REMOVE)
+       file(REMOVE_RECURSE ${TO_REMOVE})
+      endif()
+    endif()
+endmacro()
+
 set(WITH_BUILD_MOCKUPS OFF)
 # Packages must be sorted from high to low in the dependency graph
 foreach(PKG CPLEX KNITRO GUROBI WORHP HSL)
@@ -825,6 +845,7 @@ foreach(PKG CPLEX KNITRO GUROBI WORHP HSL)
       endforeach()
       set(${PKG}_FOUND ON)
       set(WITH_BUILD_MOCKUPS ON)
+      eager_update(MOCKUPS)
     endif()
     if(NOT ${PKG}_FOUND)
       message(FATAL_ERROR "${PKG} not found on your system yet required. Set WITH_MOCKUP_${PKG} or WITH_MOCKUP_REQUIRED ON to build a mockup version such that the CasADi build can proceed.")
@@ -858,6 +879,7 @@ foreach(PKG HIGHS PROXQP OSQP SUPERSCS BONMIN IPOPT CBC CLP MUMPS SPRAL HSL METI
         set(WITH_${DEP} ON)
       endforeach()
       set(${PKG}_FOUND ON)
+      eager_update(${PKG})
     endif()
     if(NOT ${PKG}_FOUND)
       message(FATAL_ERROR "${PKG} not found on your system yet required. Set WITH_BUILD_${PKG} or WITH_BUILD_REQUIRED ON to build this required package from source.")
