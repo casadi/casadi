@@ -570,7 +570,7 @@ int CvodesInterface::jtimesF(N_Vector v, N_Vector Jv, double t, N_Vector x,
   } catch(casadi_int flag) { // recoverable error
     return flag;
   } catch(std::exception& e) { // non-recoverable error
-    uerr() << "jtimes failed: " << e.what() << std::endl;
+    uerr() << "jtimesF failed: " << e.what() << std::endl;
     return -1;
   }
 }
@@ -580,20 +580,13 @@ int CvodesInterface::jtimesB(N_Vector v, N_Vector Jv, double t, N_Vector x,
   try {
     auto m = to_mem(user_data);
     auto& s = m->self;
-    m->arg[JTIMESB_T] = &t;
-    m->arg[JTIMESB_X] = NV_DATA_S(x);
-    m->arg[JTIMESB_P] = m->p;
-    m->arg[JTIMESB_U] = m->u;
-    m->arg[JTIMESB_RX] = NV_DATA_S(rx);
-    m->arg[JTIMESB_RP] = m->rp;
-    m->arg[JTIMESB_FWD_RX] = NV_DATA_S(v);
-    m->res[JTIMESB_FWD_RODE] = NV_DATA_S(Jv);
-    s.calc_function(m, "jtimesB");
+    s.calc_fwd_odeB(m, t, NV_DATA_S(x), NV_DATA_S(rx), NV_DATA_S(rxdot),
+      NV_DATA_S(v), NV_DATA_S(Jv));
     return 0;
   } catch(int flag) { // recoverable error
     return flag;
   } catch(std::exception& e) { // non-recoverable error
-    uerr() << "jtimes failed: " << e.what() << std::endl;
+    uerr() << "jtimesB failed: " << e.what() << std::endl;
     return -1;
   }
 }
@@ -663,17 +656,9 @@ int CvodesInterface::psolveB(double t, N_Vector x, N_Vector xB, N_Vector xdotB, 
     if (s.ns_>0) {
       // Second order correction
       if (s.second_order_correction_) {
-        // The outputs will double as seeds for jtimesF
+        // The outputs will double as seeds for jtimesB
         casadi_clear(v + s.nrx1_, s.nrx_ - s.nrx1_);
-        m->arg[0] = &t; // t
-        m->arg[1] = NV_DATA_S(x); // x
-        m->arg[2] = m->p; // p
-        m->arg[3] = m->u; // u
-        m->arg[4] = NV_DATA_S(xB); // rx
-        m->arg[5] = m->rp; // rp
-        m->arg[6] = v; // fwd:rx
-        m->res[0] = m->v2; // fwd:rode
-        s.calc_function(m, "jtimesB");
+        s.calc_fwd_odeB(m, t, NV_DATA_S(x), NV_DATA_S(xB), NV_DATA_S(xdotB), v, m->v2);
 
         // Subtract m->v2 from m->v1, scaled with gammaB
         casadi_axpy(s.nrx_-s.nrx1_, -m->gammaB, m->v2 + s.nrx1_, m->v1 + s.nrx1_);
@@ -976,6 +961,19 @@ void CvodesInterface::calc_fwd_odeF(CvodesMemory* m, double t, const double* x, 
     m->res[JTIMESF_FWD_ODE] = fwd_ode + nx1_;  // fwd:fwd:ode
     calc_forward(m, "jtimesF", ns_);
   }
+}
+
+void CvodesInterface::calc_fwd_odeB(CvodesMemory* m, double t, const double* x, const double* rx,
+    const double* rode, const double* fwd_rx, double* fwd_rode) const {
+  m->arg[JTIMESB_T] = &t;
+  m->arg[JTIMESB_X] = x;
+  m->arg[JTIMESB_P] = m->p;
+  m->arg[JTIMESB_U] = m->u;
+  m->arg[JTIMESB_RX] = rx;
+  m->arg[JTIMESB_RP] = m->rp;
+  m->arg[JTIMESB_FWD_RX] = fwd_rx;
+  m->res[JTIMESB_FWD_RODE] = fwd_rode;
+  calc_function(m, "jtimesB");
 }
 
 CvodesMemory::CvodesMemory(const CvodesInterface& s) : self(s) {
