@@ -838,7 +838,7 @@ jobs:
       - run: echo "$env:PATH"
         shell: powershell
         if: contains(matrix.image, 'windows')
-      - run: ls /d/a/_temp && ls /d/a/_temp/knitro
+      - run: ls /d/a/_temp && ls /d/a/_temp/knitro-13.2.0-Win64
         shell: bash
         if: contains(matrix.image, 'windows')
       - run: |
