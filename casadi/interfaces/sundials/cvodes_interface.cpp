@@ -203,7 +203,7 @@ int CvodesInterface::init_mem(void* mem) const {
     case SD_BCGSTAB: THROWING(CVSpbcg, m->mem, pretype, max_krylov_); break;
     case SD_TFQMR: THROWING(CVSptfqmr, m->mem, pretype, max_krylov_); break;
     }
-    THROWING(CVSpilsSetJacTimesVecFn, m->mem, jtimes);
+    THROWING(CVSpilsSetJacTimesVecFn, m->mem, jtimesF);
     if (use_precon_) THROWING(CVSpilsSetPreconditioner, m->mem, psetup, psolve);
   }
 
@@ -557,18 +557,12 @@ int CvodesInterface::rhsQB(double t, N_Vector x, N_Vector rx, N_Vector ruqdot, v
   }
 }
 
-int CvodesInterface::jtimes(N_Vector v, N_Vector Jv, double t, N_Vector x,
+int CvodesInterface::jtimesF(N_Vector v, N_Vector Jv, double t, N_Vector x,
     N_Vector xdot, void *user_data, N_Vector tmp) {
   try {
     auto m = to_mem(user_data);
     auto& s = m->self;
-    m->arg[JTIMESF_T] = &t;
-    m->arg[JTIMESF_X] = NV_DATA_S(x);
-    m->arg[JTIMESF_P] = m->p;
-    m->arg[JTIMESF_U] = m->u;
-    m->arg[JTIMESF_FWD_X] = NV_DATA_S(v);
-    m->res[JTIMESF_FWD_ODE] = NV_DATA_S(Jv);
-    s.calc_function(m, "jtimesF");
+    s.calc_fwd_odeF(m, t, NV_DATA_S(x), NV_DATA_S(xdot), NV_DATA_S(v), NV_DATA_S(Jv));
     return 0;
   } catch(casadi_int flag) { // recoverable error
     return flag;
@@ -623,13 +617,7 @@ int CvodesInterface::psolve(double t, N_Vector x, N_Vector xdot, N_Vector r,
       if (s.second_order_correction_) {
         // The outputs will double as seeds for jtimesF
         casadi_clear(v + s.nx1_, s.nx_ - s.nx1_);
-        m->arg[0] = &t; // t
-        m->arg[1] = NV_DATA_S(x); // x
-        m->arg[2] = m->p; // p
-        m->arg[3] = m->u; // u
-        m->arg[4] = v; // fwd:x
-        m->res[0] = m->v2; // fwd:ode
-        s.calc_function(m, "jtimesF");
+        s.calc_fwd_odeF(m, t, NV_DATA_S(x), NV_DATA_S(xdot), v, m->v2);
 
         // Subtract m->v2 from m->v1, scaled with -gamma
         casadi_axpy(s.nx_ - s.nx1_, m->gamma, m->v2 + s.nx1_, m->v1 + s.nx1_);
@@ -962,6 +950,17 @@ Function CvodesInterface::get_jacB(Sparsity* sp) const {
   Function J = nonaug_oracle_.factory("jacB", {"t", "x", "p", "u", "rx", "rp"}, {"jac:rode:rx"});
   if (sp) *sp = J.sparsity_out(0) + Sparsity::diag(nrx1_);
   return J;
+}
+
+void CvodesInterface::calc_fwd_odeF(CvodesMemory* m, double t, const double* x, const double* ode,
+    const double* fwd_x, double* fwd_ode) const {
+  m->arg[JTIMESF_T] = &t;
+  m->arg[JTIMESF_X] = x;
+  m->arg[JTIMESF_P] = m->p;
+  m->arg[JTIMESF_U] = m->u;
+  m->arg[JTIMESF_FWD_X] = fwd_x;
+  m->res[JTIMESF_FWD_ODE] = fwd_ode;
+  calc_function(m, "jtimesF");
 }
 
 CvodesMemory::CvodesMemory(const CvodesInterface& s) : self(s) {

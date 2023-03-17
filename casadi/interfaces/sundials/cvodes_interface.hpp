@@ -157,6 +157,10 @@ namespace casadi {
     // Get system Jacobian, backward problem
     Function get_jacB(Sparsity* sp) const override;
 
+    // Jacobian of ODE-times-vector function
+    void calc_fwd_odeF(CvodesMemory* m, double t, const double* x, const double* ode,
+      const double* fwd_x, double* fwd_ode) const;
+
     /// A documentation string
     static const std::string meta_doc;
 
@@ -169,7 +173,7 @@ namespace casadi {
     static int rhsQ(double t, N_Vector x, N_Vector qdot, void *user_data);
     static int rhsB(double t, N_Vector x, N_Vector xB, N_Vector xdotB, void *user_data);
     static int rhsQB(double t, N_Vector x, N_Vector rx, N_Vector ruqdot, void *user_data);
-    static int jtimes(N_Vector v, N_Vector Jv, double t, N_Vector x, N_Vector xdot,
+    static int jtimesF(N_Vector v, N_Vector Jv, double t, N_Vector x, N_Vector xdot,
                       void *user_data, N_Vector tmp);
     static int jtimesB(N_Vector vB, N_Vector JvB, double t, N_Vector x, N_Vector xB,
                        N_Vector xdotB, void *user_data , N_Vector tmpB);
