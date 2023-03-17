@@ -686,7 +686,7 @@ set(BUILD_IPOPT_DEPENDENCIES MUMPS)
 
 option(WITH_MOCKUP_REQUIRED ON)
 set(BUILD_MOCKUPS_GIT_REPO https://github.com/casadi/mockups.git CACHE STRING "Git repo used together with BUILD_MOCKUPS_VERSION")
-set(BUILD_MOCKUPS_VERSION v53 CACHE STRING "Tag/branch/hash to be used for BUILD_MOCKUPS_GIT_REPO")
+set(BUILD_MOCKUPS_VERSION v54 CACHE STRING "Tag/branch/hash to be used for BUILD_MOCKUPS_GIT_REPO")
 
 # Knitro: An NLP solver
 option(WITH_KNITRO "Compile the interface to KNITRO" OFF)
@@ -867,8 +867,10 @@ endforeach()
 
 set(SHARED_LIBRARY_RELDIR lib)
 set(SHARED_LIBRARY64_RELDIR lib64)
+set(CMAKE_SHARED_LIBRARY_PREFIX_SHORT ${CMAKE_SHARED_LIBRARY_PREFIX})
 if (WIN32)
     set(SHARED_LIBRARY_RELDIR bin)
+    set(CMAKE_SHARED_LIBRARY_PREFIX_SHORT "")
 else()
     if (CMAKE_SIZEOF_VOID_P EQUAL 4)
         set(SHARED_LIBRARY64_RELDIR lib)
@@ -926,8 +928,8 @@ if(WITH_KNITRO AND WITH_MOCKUP_KNITRO)
   file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/mockups/knitro/include")
   set_target_properties(knitro::knitro PROPERTIES
     INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/mockups/knitro/include"
-    IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/mockups/knitro/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}knitro${CMAKE_SHARED_LIBRARY_SUFFIX}"
-    IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/mockups/knitro/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}knitro${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+    IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/mockups/knitro/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX_SHORT}knitro${CMAKE_SHARED_LIBRARY_SUFFIX}"
+    IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/mockups/knitro/lib/${CMAKE_SHARED_LIBRARY_PREFIX_SHORT}knitro${CMAKE_IMPORT_LIBRARY_SUFFIX}"
   )
 endif()
 add_feature_info(knitro-interface WITH_KNITRO "Interface to the NLP solver KNITRO.")
@@ -938,8 +940,8 @@ if(WITH_WORHP AND WITH_MOCKUP_WORHP)
   file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/mockups/worhp/include")
   set_target_properties(worhp::worhp PROPERTIES
     INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/mockups/worhp/include"
-    IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/mockups/worhp/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}worhp${CMAKE_SHARED_LIBRARY_SUFFIX}"
-    IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/mockups/worhp/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}worhp${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+    IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/mockups/worhp/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX_SHORT}worhp${CMAKE_SHARED_LIBRARY_SUFFIX}"
+    IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/mockups/worhp/lib/${CMAKE_SHARED_LIBRARY_PREFIX_SHORT}worhp${CMAKE_IMPORT_LIBRARY_SUFFIX}"
   )
 endif()
 add_feature_info(worhp-interface WITH_WORHP "Interface to the NLP solver Worhp (requires gfortran, gomp).")
