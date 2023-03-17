@@ -106,11 +106,12 @@ void CvodesInterface::init(const Dict& opts) {
   // Create problem functions, backward problem
   if (nrx_ > 0) {
     create_function(nonaug_oracle_, "odeB", {"rx", "rp", "x", "p", "u", "t"}, {"rode"});
+    create_function(nonaug_oracle_, "quadB", {"rx", "rp", "x", "p", "u", "t"}, {"rquad", "uquad"});
     if (ns_ > 0) {
       create_forward("odeB", ns_);
+      create_forward("quadB", ns_);
     }
   }
-  create_function("quadB", {"rx", "rp", "x", "p", "u", "t"}, {"rquad", "uquad"});
 
   // Algebraic variables not supported
   casadi_assert(nz_==0 && nrz_==0,
@@ -518,18 +519,34 @@ int CvodesInterface::rhsQB(double t, N_Vector x, N_Vector rx, N_Vector ruqdot, v
     casadi_assert_dev(user_data);
     auto m = to_mem(user_data);
     auto& s = m->self;
-    m->arg[0] = NV_DATA_S(rx);
-    m->arg[1] = m->rp;
-    m->arg[2] = NV_DATA_S(x);
-    m->arg[3] = m->p;
-    m->arg[4] = m->u;
-    m->arg[5] = &t;
-    m->res[0] = NV_DATA_S(ruqdot);
-    m->res[1] = NV_DATA_S(ruqdot) + s.nrq_;
+    // OFfset for uquad
+    casadi_int uquad_off = s.nrq1_ *  (1 + s.ns_);
+    // Evaluate nondifferentiated
+    m->arg[ODEB_RX] = NV_DATA_S(rx);  // rx
+    m->arg[ODEB_RP] = m->rp;  // rp
+    m->arg[ODEB_X] = NV_DATA_S(x);  // x
+    m->arg[ODEB_P] = m->p;  // p
+    m->arg[ODEB_U] = m->u;  // u
+    m->arg[ODEB_T] = &t;  // t
+    m->res[QUADB_RQUAD] = NV_DATA_S(ruqdot);  // rquad
+    m->res[QUADB_UQUAD] = NV_DATA_S(ruqdot) + uquad_off;  // uquad
     s.calc_function(m, "quadB");
-
+    // Evaluate sensitivities
+    if (s.ns_ > 0) {
+      m->arg[ODEB_NUM_IN + QUADB_RQUAD] = NV_DATA_S(ruqdot);  // out:rquad
+      m->arg[ODEB_NUM_IN + QUADB_UQUAD] = NV_DATA_S(ruqdot) + uquad_off;  // out:uquad
+      m->arg[ODEB_NUM_IN + QUADB_NUM_OUT + ODEB_RX] = m->arg[ODEB_RX] + s.nrx1_;  // fwd:rx
+      m->arg[ODEB_NUM_IN + QUADB_NUM_OUT + ODEB_RP] = m->arg[ODEB_RP] + s.nrp1_;  // fwd:rp
+      m->arg[ODEB_NUM_IN + QUADB_NUM_OUT + ODEB_X] = m->arg[ODEB_X] + s.nx1_;  // fwd:x
+      m->arg[ODEB_NUM_IN + QUADB_NUM_OUT + ODEB_P] = m->arg[ODEB_P] + s.np1_;  // fwd:p
+      m->arg[ODEB_NUM_IN + QUADB_NUM_OUT + ODEB_U] = m->arg[ODEB_U] + s.nu1_;  // fwd:u
+      m->arg[ODEB_NUM_IN + QUADB_NUM_OUT + ODEB_T] = 0;  // fwd:t
+      m->res[QUADB_RQUAD] = NV_DATA_S(ruqdot) + s.nrq1_;  // fwd:rquad
+      m->res[QUADB_UQUAD] = NV_DATA_S(ruqdot) + uquad_off + s.nuq1_;  // fwd:uquad
+      s.calc_forward(m, "quadB", s.ns_);
+    }
     // Negate (note definition of g)
-    casadi_scal(s.nrq_ + s.nuq_, -1., NV_DATA_S(ruqdot));
+    casadi_scal((s.nrq1_ + s.nuq1_) * (1 + s.ns_), -1., NV_DATA_S(ruqdot));
 
     return 0;
   } catch(int flag) { // recoverable error
