@@ -627,12 +627,7 @@ int CvodesInterface::psetup(double t, N_Vector x, N_Vector xdot, booleantype jok
     casadi_int jac_offset = sp_jacF.nnz() - sp_jac_ode_x.nnz();
 
     // Calculate Jacobian
-    m->arg[0] = &t;
-    m->arg[1] = NV_DATA_S(x);
-    m->arg[2] = m->p;
-    m->arg[3] = m->u;
-    m->res[0] = m->jacF + jac_offset;
-    if (s.calc_function(m, "jacF")) casadi_error("'jacF' calculation failed");
+    s.calc_jacF(m, t, NV_DATA_S(x), NV_DATA_S(xdot), m->jacF + jac_offset);
 
     // Project to expected sparsity pattern (with diagonal)
     casadi_project(m->jacF + jac_offset, sp_jac_ode_x, m->jacF, sp_jacF, m->w);
@@ -681,14 +676,7 @@ int CvodesInterface::psetupB(double t, N_Vector x, N_Vector rx, N_Vector rxdot,
     casadi_int jac_offset = sp_jacB.nnz() - sp_jac_rode_rx.nnz();
 
     // Calculate Jacobian
-    m->arg[0] = &t;
-    m->arg[1] = NV_DATA_S(x);
-    m->arg[2] = m->p;
-    m->arg[3] = m->u;
-    m->arg[4] = NV_DATA_S(rx);
-    m->arg[5] = m->rp;
-    m->res[0] = m->jacB + jac_offset;
-    if (s.calc_function(m, "jacB")) casadi_error("'jacB' calculation failed");
+    s.calc_jacB(m, t, NV_DATA_S(x), NV_DATA_S(rx), NV_DATA_S(rxdot), m->jacB + jac_offset);
 
     // Project to expected sparsity pattern (with diagonal)
     casadi_project(m->jacB + jac_offset, sp_jac_rode_rx, m->jacB, sp_jacB, m->w);
@@ -1008,6 +996,29 @@ void CvodesInterface::calc_quadB(CvodesMemory* m, double t, const double* x, con
     m->res[QUADB_UQUAD] = uquad + nuq1_;  // fwd:uquad
     calc_forward(m, "quadB", ns_);
   }
+}
+
+void CvodesInterface::calc_jacF(CvodesMemory* m, double t, const double* x, const double* ode,
+    double* jac_ode_x) const {
+  // Calculate Jacobian
+  m->arg[0] = &t;
+  m->arg[1] = x;
+  m->arg[2] = m->p;
+  m->arg[3] = m->u;
+  m->res[0] = jac_ode_x;
+  if (calc_function(m, "jacF")) casadi_error("'jacF' calculation failed");
+}
+
+void CvodesInterface::calc_jacB(CvodesMemory* m, double t, const double* x, const double* rx,
+    const double* rode, double* jac_rode_rx) const {
+  m->arg[0] = &t;
+  m->arg[1] = x;
+  m->arg[2] = m->p;
+  m->arg[3] = m->u;
+  m->arg[4] = rx;
+  m->arg[5] = m->rp;
+  m->res[0] = jac_rode_rx;
+  if (calc_function(m, "jacB")) casadi_error("'jacB' calculation failed");
 }
 
 CvodesMemory::CvodesMemory(const CvodesInterface& s) : self(s) {

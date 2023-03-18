@@ -171,6 +171,14 @@ namespace casadi {
     void calc_quadB(CvodesMemory* m, double t, const double* x, const double* rx,
       double* rquad, double* uquad) const;
 
+    // Jacobian of ODE right-hand-side function, forward problem
+    void calc_jacF(CvodesMemory* m, double t, const double* x, const double* ode,
+      double* jac_ode_x) const;
+
+    // Jacobian of ODE right-hand-side function, backward problem
+    void calc_jacB(CvodesMemory* m, double t, const double* x, const double* rx,
+      const double* rode, double* jac_rode_rx) const;
+
     // Jacobian of ODE-times-vector function, forward problem
     void calc_jtimesF(CvodesMemory* m, double t, const double* x, const double* ode,
       const double* fwd_x, double* fwd_ode) const;
