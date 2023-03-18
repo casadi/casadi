@@ -505,40 +505,40 @@ void Integrator::init(const Dict& opts) {
   alloc(oracle_);
 
   // Error if sparse input
-  casadi_assert(x().is_dense(), "Sparse DAE not supported");
-  casadi_assert(z().is_dense(), "Sparse DAE not supported");
-  casadi_assert(p().is_dense(), "Sparse DAE not supported");
-  casadi_assert(u().is_dense(), "Sparse DAE not supported");
-  casadi_assert(q().is_dense(), "Sparse DAE not supported");
-  casadi_assert(rx().is_dense(), "Sparse DAE not supported");
-  casadi_assert(rz().is_dense(), "Sparse DAE not supported");
-  casadi_assert(rp().is_dense(), "Sparse DAE not supported");
-  casadi_assert(rq().is_dense(), "Sparse DAE not supported");
-  casadi_assert(uq().is_dense(), "Sparse DAE not supported");
-
-  // Get dimensions (including sensitivity equations)
-  nx_ = x().numel();
-  nz_ = z().numel();
-  nq_ = q().numel();
-  np_  = p().numel();
-  nu_  = u().numel();
-  nrx_ = rx().numel();
-  nrz_ = rz().numel();
-  nrp_ = rp().numel();
-  nrq_ = rq().numel();
-  nuq_ = uq().numel();
+  casadi_assert(x1().is_dense(), "Sparse DAE not supported");
+  casadi_assert(z1().is_dense(), "Sparse DAE not supported");
+  casadi_assert(p1().is_dense(), "Sparse DAE not supported");
+  casadi_assert(u1().is_dense(), "Sparse DAE not supported");
+  casadi_assert(q1().is_dense(), "Sparse DAE not supported");
+  casadi_assert(rx1().is_dense(), "Sparse DAE not supported");
+  casadi_assert(rz1().is_dense(), "Sparse DAE not supported");
+  casadi_assert(rp1().is_dense(), "Sparse DAE not supported");
+  casadi_assert(rq1().is_dense(), "Sparse DAE not supported");
+  casadi_assert(uq1().is_dense(), "Sparse DAE not supported");
 
   // Get dimensions (excluding sensitivity equations)
-  nx1_ = nx_ / (1 + nfwd_);
-  nz1_ = nz_ / (1 + nfwd_);
-  nq1_ = nq_ / (1 + nfwd_);
-  np1_  = np_ / (1 + nfwd_);
-  nu1_  = nu_ / (1 + nfwd_);
-  nrx1_ = nrx_ / (1 + nfwd_);
-  nrz1_ = nrz_ / (1 + nfwd_);
-  nrp1_ = nrp_ / (1 + nfwd_);
-  nrq1_ = nrq_ / (1 + nfwd_);
-  nuq1_ = nuq_ / (1 + nfwd_);
+  nx1_ = x1().numel();
+  nz1_ = z1().numel();
+  nq1_ = q1().numel();
+  np1_ = p1().numel();
+  nu1_ = u1().numel();
+  nrx1_ = rx1().numel();
+  nrz1_ = rz1().numel();
+  nrp1_ = rp1().numel();
+  nrq1_ = rq1().numel();
+  nuq1_ = uq1().numel();
+
+  // Get dimensions (including sensitivity equations)
+  nx_ = nx1_ * (1 + ns_);
+  nz_ = nz1_ * (1 + ns_);
+  nq_ = nq1_ * (1 + ns_);
+  np_ = np1_ * (1 + ns_);
+  nu_ = nu1_ * (1 + ns_);
+  nrx_ = nrx1_ * (1 + ns_);
+  nrz_ = nrz1_ * (1 + ns_);
+  nrp_ = nrp1_ * (1 + ns_);
+  nrq_ = nrq1_ * (1 + ns_);
+  nuq_ = nuq1_ * (1 + ns_);
 
   // Get the sparsities of the forward and reverse DAE
   sp_jac_dae_ = sp_jac_dae();
