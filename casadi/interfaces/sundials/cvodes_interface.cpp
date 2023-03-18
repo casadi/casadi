@@ -117,7 +117,8 @@ void CvodesInterface::init(const Dict& opts) {
 
   // Attach functions for jacobian information, foward problem
   if (newton_scheme_!=SD_DIRECT || (ns_ > 0 && second_order_correction_)) {
-    create_function(nonaug_oracle_, "jtimesF", {"t", "x", "p", "u", "fwd:x"}, {"fwd:ode"});
+    create_function(nonaug_oracle_, "jtimesF", {"t", "x", "z", "p", "u", "fwd:x", "fwd:z"},
+      {"fwd:ode", "fwd:alg"});
     if (ns_ > 0) {
       create_forward("jtimesF", ns_);
     }
@@ -475,7 +476,7 @@ int CvodesInterface::jtimesF(N_Vector v, N_Vector Jv, double t, N_Vector x,
   try {
     auto m = to_mem(user_data);
     auto& s = m->self;
-    s.calc_jtimesF(m, t, NV_DATA_S(x), NV_DATA_S(xdot), NV_DATA_S(v), NV_DATA_S(Jv));
+    s.calc_jtimesF(m, t, NV_DATA_S(x), nullptr, NV_DATA_S(v), nullptr, NV_DATA_S(Jv), nullptr);
     return 0;
   } catch(casadi_int flag) { // recoverable error
     return flag;
@@ -523,7 +524,7 @@ int CvodesInterface::psolve(double t, N_Vector x, N_Vector xdot, N_Vector r,
       if (s.second_order_correction_) {
         // The outputs will double as seeds for jtimesF
         casadi_clear(v + s.nx1_, s.nx_ - s.nx1_);
-        s.calc_jtimesF(m, t, NV_DATA_S(x), NV_DATA_S(xdot), v, m->v2);
+        s.calc_jtimesF(m, t, NV_DATA_S(x), nullptr, v, nullptr, m->v2, nullptr);
 
         // Subtract m->v2 from m->v1, scaled with -gamma
         casadi_axpy(s.nx_ - s.nx1_, m->gamma, m->v2 + s.nx1_, m->v1 + s.nx1_);
@@ -838,25 +839,32 @@ Function CvodesInterface::get_jacB(Sparsity* sp) const {
   return J;
 }
 
-void CvodesInterface::calc_jtimesF(CvodesMemory* m, double t, const double* x, const double* ode,
-    const double* fwd_x, double* fwd_ode) const {
+void CvodesInterface::calc_jtimesF(CvodesMemory* m, double t, const double* x, const double* z,
+    const double* fwd_x, const double* fwd_z, double* fwd_ode, double* fwd_alg) const {
   // Evaluate nondifferentiated
   m->arg[JTIMESF_T] = &t;  // t
   m->arg[JTIMESF_X] = x;  // x
+  m->arg[JTIMESF_Z] = z;  // z
   m->arg[JTIMESF_P] = m->p;  // p
   m->arg[JTIMESF_U] = m->u;  // u
   m->arg[JTIMESF_FWD_X] = fwd_x;  // fwd:x
+  m->arg[JTIMESF_FWD_Z] = fwd_z;  // fwd:z
   m->res[JTIMESF_FWD_ODE] = fwd_ode;  // fwd:ode
+  m->res[JTIMESF_FWD_ALG] = fwd_alg;  // fwd:alg
   calc_function(m, "jtimesF");
   // Evaluate sensitivities
   if (ns_ > 0) {
     m->arg[JTIMESF_NUM_IN + JTIMESF_FWD_ODE] = fwd_ode;  // out:fwd:ode
+    m->arg[JTIMESF_NUM_IN + JTIMESF_FWD_ALG] = fwd_alg;  // out:fwd:alg
     m->arg[JTIMESF_NUM_IN + JTIMESF_NUM_OUT + JTIMESF_T] = 0;  // fwd:t
     m->arg[JTIMESF_NUM_IN + JTIMESF_NUM_OUT + JTIMESF_X] = x + nx1_;  // fwd:x
+    m->arg[JTIMESF_NUM_IN + JTIMESF_NUM_OUT + JTIMESF_Z] = z + nz1_;  // fwd:z
     m->arg[JTIMESF_NUM_IN + JTIMESF_NUM_OUT + JTIMESF_P] = m->p + np1_;  // fwd:p
     m->arg[JTIMESF_NUM_IN + JTIMESF_NUM_OUT + JTIMESF_U] = m->u + nu1_;  // fwd:u
     m->arg[JTIMESF_NUM_IN + JTIMESF_NUM_OUT + JTIMESF_FWD_X] = fwd_x + nx1_;  // fwd:fwd:x
+    m->arg[JTIMESF_NUM_IN + JTIMESF_NUM_OUT + JTIMESF_FWD_Z] = fwd_z + nz1_;  // fwd:fwd:z
     m->res[JTIMESF_FWD_ODE] = fwd_ode + nx1_;  // fwd:fwd:ode
+    m->res[JTIMESF_FWD_ALG] = fwd_alg + nz1_;  // fwd:fwd:alg
     calc_forward(m, "jtimesF", ns_);
   }
 }

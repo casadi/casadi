@@ -166,8 +166,8 @@ namespace casadi {
       const double* rode, double* jac_rode_rx) const;
 
     // Jacobian of ODE-times-vector function, forward problem
-    void calc_jtimesF(CvodesMemory* m, double t, const double* x, const double* ode,
-      const double* fwd_x, double* fwd_ode) const;
+    void calc_jtimesF(CvodesMemory* m, double t, const double* x, const double* z,
+      const double* fwd_x, const double* fwd_z, double* fwd_ode, double* fwd_alg) const;
 
     // Jacobian of ODE-times-vector function, backward problem
     void calc_jtimesB(CvodesMemory* m, double t, const double* x, const double* rx,
@@ -219,8 +219,9 @@ namespace casadi {
 
     ///@{
     /** \brief IO conventions for continuous time dynamics */
-    enum JtimesFIn { JTIMESF_T, JTIMESF_X, JTIMESF_P, JTIMESF_U, JTIMESF_FWD_X, JTIMESF_NUM_IN};
-    enum JtimesFOut { JTIMESF_FWD_ODE, JTIMESF_NUM_OUT};
+    enum JtimesFIn { JTIMESF_T, JTIMESF_X, JTIMESF_Z, JTIMESF_P, JTIMESF_U, JTIMESF_FWD_X,
+      JTIMESF_FWD_Z, JTIMESF_NUM_IN};
+    enum JtimesFOut { JTIMESF_FWD_ODE, JTIMESF_FWD_ALG, JTIMESF_NUM_OUT};
     enum JtimesBIn { JTIMESB_T, JTIMESB_X, JTIMESB_P, JTIMESB_U, JTIMESB_RX, JTIMESB_RP,
       JTIMESB_FWD_RX, JTIMESB_NUM_IN};
     enum JtimesBOut { JTIMESB_FWD_RODE, JTIMESB_NUM_OUT};
