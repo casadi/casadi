@@ -150,16 +150,6 @@ void IdasInterface::init(const Dict& opts) {
     "Constraint vector if supplied, must be of length nx+nz, but got "
     + str(y_c_.size()) + " and nx+nz = " + str(nx_+nz_) + ".");
 
-
-  // Attach functions for jacobian information
-  if (newton_scheme_!=SD_DIRECT || (ns_>0 && second_order_correction_)) {
-    if (nrx_>0) {
-      create_function("jtimesB",
-        {"t", "x", "z", "p", "u", "rx", "rz", "rp", "fwd:rx", "fwd:rz"},
-        {"fwd:rode", "fwd:ralg"});
-    }
-  }
-
   // For Jacobian calculation
   const Function& jacF = get_function("jacF");
   alloc_w(jacF.nnz_out("jac_ode_x"), true);  // jac_ode_x
@@ -247,29 +237,19 @@ int IdasInterface::jtimesF(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, N
   }
 }
 
-int IdasInterface::jtimesB(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB,
-    N_Vector xzdotB, N_Vector resvalB, N_Vector vB, N_Vector JvB,
-    double cjB, void *user_data,
-    N_Vector tmp1B, N_Vector tmp2B) {
+int IdasInterface::jtimesB(double t, N_Vector xz, N_Vector xzdot, N_Vector rxz,
+    N_Vector rxzdot, N_Vector resvalB, N_Vector v, N_Vector Jv,
+    double cjB, void *user_data, N_Vector tmp1B, N_Vector tmp2B) {
   try {
     auto m = to_mem(user_data);
     auto& s = m->self;
-    m->arg[0] = &t;
-    m->arg[1] = NV_DATA_S(xz);
-    m->arg[2] = NV_DATA_S(xz)+s.nx_;
-    m->arg[3] = m->p;
-    m->arg[4] = m->u;
-    m->arg[5] = NV_DATA_S(xzB);
-    m->arg[6] = NV_DATA_S(xzB)+s.nrx_;
-    m->arg[7] = m->rp;
-    m->arg[8] = NV_DATA_S(vB);
-    m->arg[9] = NV_DATA_S(vB)+s.nrx_;
-    m->res[0] = NV_DATA_S(JvB);
-    m->res[1] = NV_DATA_S(JvB) + s.nrx_;
-    s.calc_function(m, "jtimesB");
+    s.calc_jtimesB(m, t, NV_DATA_S(xz), NV_DATA_S(xz) + s.nx_,
+      NV_DATA_S(rxz), NV_DATA_S(rxz) + s.nrx_,
+      NV_DATA_S(v), NV_DATA_S(v) + s.nrx_,
+      NV_DATA_S(Jv), NV_DATA_S(Jv) + s.nrx_);
 
     // Subtract state derivative to get residual
-    casadi_axpy(s.nrx_, cjB, NV_DATA_S(vB), NV_DATA_S(JvB));
+    casadi_axpy(s.nrx_, cjB, NV_DATA_S(v), NV_DATA_S(Jv));
 
     return 0;
   } catch(int flag) { // recoverable error
@@ -782,19 +762,9 @@ int IdasInterface::psolveB(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB,
         casadi_clear(vz + s.nrz1_, s.nrz_ - s.nrz1_);
 
         // Get second-order-correction, save to m->v2
-        m->arg[0] = &t; // t
-        m->arg[1] = NV_DATA_S(xz); // x
-        m->arg[2] = NV_DATA_S(xz)+s.nx_; // z
-        m->arg[3] = m->p; // p
-        m->arg[4] = m->u; // u
-        m->arg[5] = NV_DATA_S(xzB); // rx
-        m->arg[6] = NV_DATA_S(xzB)+s.nrx_; // rz
-        m->arg[7] = m->rp; // rp
-        m->arg[8] = vx; // fwd:rx
-        m->arg[9] = vz; // fwd:rz
-        m->res[0] = m->v2; // fwd:rode
-        m->res[1] = m->v2 + s.nrx_; // fwd:ralg
-        s.calc_function(m, "jtimesB");
+        s.calc_jtimesB(m, t, NV_DATA_S(xz), NV_DATA_S(xz) + s.nx_,
+          NV_DATA_S(xzB), NV_DATA_S(xzB) + s.nrx_,
+          vx, vz, m->v2, m->v2 + s.nrx_);
 
         // Subtract m->v2 (reordered) from m->v1
         v_it = m->v1 + s.nrx1_ + s.nrz1_;

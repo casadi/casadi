@@ -143,6 +143,11 @@ namespace casadi {
     void calc_jtimesF(SundialsMemory* m, double t, const double* x, const double* z,
       const double* fwd_x, const double* fwd_z, double* fwd_ode, double* fwd_alg) const;
 
+    // Jacobian of ODE-times-vector function, backward problem
+    void calc_jtimesB(SundialsMemory* m, double t, const double* x, const double* z,
+      const double* rx, const double* rz, const double* fwd_rx, const double* fwd_rz,
+      double* fwd_rode, double* fwd_ralg) const;
+
     /// Get all statistics
     Dict get_stats(void* mem) const override;
 
@@ -179,6 +184,10 @@ namespace casadi {
     enum JtimesFIn { JTIMESF_T, JTIMESF_X, JTIMESF_Z, JTIMESF_P, JTIMESF_U, JTIMESF_FWD_X,
       JTIMESF_FWD_Z, JTIMESF_NUM_IN};
     enum JtimesFOut { JTIMESF_FWD_ODE, JTIMESF_FWD_ALG, JTIMESF_NUM_OUT};
+    enum JtimesBIn { JTIMESB_T, JTIMESB_X, JTIMESB_Z, JTIMESB_P, JTIMESB_U,
+      JTIMESB_RX, JTIMESB_RZ, JTIMESB_RP,
+      JTIMESB_FWD_RX, JTIMESB_FWD_RZ, JTIMESB_NUM_IN};
+    enum JtimesBOut { JTIMESB_FWD_RODE, JTIMESB_FWD_RALG, JTIMESB_NUM_OUT};
     ///@}
 
     ///@{

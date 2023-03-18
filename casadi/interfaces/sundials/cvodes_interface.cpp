@@ -115,18 +115,6 @@ void CvodesInterface::init(const Dict& opts) {
     casadi_error("Unknown nonlinear solver iteration: " + nonlinear_solver_iteration);
   }
 
-  // Attach functions for jacobian information, foward problem
-  if (newton_scheme_!=SD_DIRECT || (ns_ > 0 && second_order_correction_)) {
-    if (nrx_ > 0) {
-      create_function(nonaug_oracle_, "jtimesB",
-        {"t", "x", "z", "p", "u", "rx", "rz", "rp", "fwd:rx", "fwd:rz"},
-        {"fwd:rode", "fwd:ralg"});
-      if (ns_ > 0) {
-        create_forward("jtimesB", ns_);
-      }
-    }
-  }
-
   // Misc
   alloc_w(nx_); // casadi_project
   alloc_w(nrx_); // casadi_project
@@ -834,43 +822,6 @@ Function CvodesInterface::get_jacB(Sparsity* sp) const {
   Function J = nonaug_oracle_.factory("jacB", {"t", "x", "p", "u", "rx", "rp"}, {"jac:rode:rx"});
   if (sp) *sp = J.sparsity_out(0) + Sparsity::diag(nrx1_);
   return J;
-}
-
-void CvodesInterface::calc_jtimesB(CvodesMemory* m, double t, const double* x, const double* z,
-    const double* rx, const double* rz, const double* fwd_rx, const double* fwd_rz,
-    double* fwd_rode, double* fwd_ralg) const {
-  // Evaluate nondifferentiated
-  m->arg[JTIMESB_T] = &t;  // t
-  m->arg[JTIMESB_X] = x;  // x
-  m->arg[JTIMESB_Z] = z;  // z
-  m->arg[JTIMESB_P] = m->p;  // p
-  m->arg[JTIMESB_U] = m->u;  // u
-  m->arg[JTIMESB_RX] = rx;  // rx
-  m->arg[JTIMESB_RZ] = rz;  // rz
-  m->arg[JTIMESB_RP] = m->rp;  // rp
-  m->arg[JTIMESB_FWD_RX] = fwd_rx;  // fwd:rx
-  m->arg[JTIMESB_FWD_RZ] = fwd_rz;  // fwd:rz
-  m->res[JTIMESB_FWD_RODE] = fwd_rode;  // fwd:rode
-  m->res[JTIMESB_FWD_RALG] = fwd_ralg;  // fwd:ralg
-  calc_function(m, "jtimesB");
-  // Evaluate sensitivities
-  if (ns_ > 0) {
-    m->arg[JTIMESB_NUM_IN + JTIMESB_FWD_RODE] = fwd_rode;  // out:fwd:rode
-    m->arg[JTIMESB_NUM_IN + JTIMESB_FWD_RALG] = fwd_ralg;  // out:fwd:ralg
-    m->arg[JTIMESB_NUM_IN + JTIMESB_NUM_OUT + JTIMESB_T] = 0;  // fwd:t
-    m->arg[JTIMESB_NUM_IN + JTIMESB_NUM_OUT + JTIMESB_X] = x + nx1_;  // fwd:x
-    m->arg[JTIMESB_NUM_IN + JTIMESB_NUM_OUT + JTIMESB_Z] = z + nz1_;  // fwd:z
-    m->arg[JTIMESB_NUM_IN + JTIMESB_NUM_OUT + JTIMESB_P] = m->p + np1_;  // fwd:p
-    m->arg[JTIMESB_NUM_IN + JTIMESB_NUM_OUT + JTIMESB_U] = m->u + nu1_;  // fwd:u
-    m->arg[JTIMESB_NUM_IN + JTIMESB_NUM_OUT + JTIMESB_RX] = rx + nrx1_;  // fwd:rx
-    m->arg[JTIMESB_NUM_IN + JTIMESB_NUM_OUT + JTIMESB_RZ] = rz + nrz1_;  // fwd:rz
-    m->arg[JTIMESB_NUM_IN + JTIMESB_NUM_OUT + JTIMESB_RP] = m->rp + nrp1_;  // fwd:rp
-    m->arg[JTIMESB_NUM_IN + JTIMESB_NUM_OUT + JTIMESB_FWD_RX] = fwd_rx + nrx1_;  // fwd:fwd:rx
-    m->arg[JTIMESB_NUM_IN + JTIMESB_NUM_OUT + JTIMESB_FWD_RZ] = fwd_rz + nrz1_;  // fwd:fwd:rz
-    m->res[JTIMESB_FWD_RODE] = fwd_rode + nrx1_;  // fwd:fwd:rode
-    m->res[JTIMESB_FWD_RALG] = fwd_ralg + nrz1_;  // fwd:fwd:ralg
-    calc_forward(m, "jtimesB", ns_);
- }
 }
 
 void CvodesInterface::calc_jacF(CvodesMemory* m, double t, const double* x, const double* ode,
