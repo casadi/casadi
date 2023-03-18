@@ -1,5 +1,6 @@
 #pragma once
 
+#include <alpaqa/export.hpp>
 #include <alpaqa/util/float.hpp>
 
 #include <iosfwd>
@@ -11,17 +12,21 @@
 namespace alpaqa {
 
 template <std::floating_point F>
-std::string float_to_str(F value,
-                         int precision = std::numeric_limits<F>::max_digits10);
+ALPAQA_EXPORT std::string
+float_to_str(F value, int precision = std::numeric_limits<F>::max_digits10);
 
 template <float_or_complex_float F>
-std::ostream &print_matlab(std::ostream &os, const Eigen::MatrixX<F> &M);
+ALPAQA_EXPORT std::ostream &print_matlab(std::ostream &os,
+                                         const Eigen::MatrixX<F> &M);
 template <float_or_complex_float F>
-std::ostream &print_matlab(std::ostream &os, const Eigen::VectorX<F> &M);
+ALPAQA_EXPORT std::ostream &print_matlab(std::ostream &os,
+                                         const Eigen::VectorX<F> &M);
 
 template <float_or_complex_float F>
-std::ostream &print_python(std::ostream &os, const Eigen::MatrixX<F> &M);
+ALPAQA_EXPORT std::ostream &print_python(std::ostream &os,
+                                         const Eigen::MatrixX<F> &M);
 template <float_or_complex_float F>
-std::ostream &print_python(std::ostream &os, const Eigen::VectorX<F> &M);
+ALPAQA_EXPORT std::ostream &print_python(std::ostream &os,
+                                         const Eigen::VectorX<F> &M);
 
 } // namespace alpaqa
