@@ -173,7 +173,7 @@ namespace casadi {
                     N_Vector rrB, void *user_data);
     static void ehfun(int error_code, const char *module, const char *function, char *msg,
                       void *eh_data);
-    static int jtimes(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, N_Vector v,
+    static int jtimesF(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, N_Vector v,
                       N_Vector Jv, double cj, void *user_data,
                       N_Vector tmp1, N_Vector tmp2);
     static int jtimesB(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB,

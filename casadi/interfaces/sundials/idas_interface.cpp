@@ -153,9 +153,6 @@ void IdasInterface::init(const Dict& opts) {
 
   // Attach functions for jacobian information
   if (newton_scheme_!=SD_DIRECT || (ns_>0 && second_order_correction_)) {
-    create_function("jtimesF",
-      {"t", "x", "z", "p", "u", "fwd:x", "fwd:z"},
-      {"fwd:ode", "fwd:alg"});
     if (nrx_>0) {
       create_function("jtimesB",
         {"t", "x", "z", "p", "u", "rx", "rz", "rp", "fwd:rx", "fwd:rz"},
@@ -230,21 +227,13 @@ void IdasInterface::ehfun(int error_code, const char *module, const char *functi
   }
 }
 
-int IdasInterface::jtimes(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, N_Vector v,
+int IdasInterface::jtimesF(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, N_Vector v,
     N_Vector Jv, double cj, void *user_data, N_Vector tmp1, N_Vector tmp2) {
   try {
     auto m = to_mem(user_data);
     auto& s = m->self;
-    m->arg[0] = &t;
-    m->arg[1] = NV_DATA_S(xz);
-    m->arg[2] = NV_DATA_S(xz)+s.nx_;
-    m->arg[3] = m->p;
-    m->arg[4] = m->u;
-    m->arg[5] = NV_DATA_S(v);
-    m->arg[6] = NV_DATA_S(v)+s.nx_;
-    m->res[0] = NV_DATA_S(Jv);
-    m->res[1] = NV_DATA_S(Jv)+s.nx_;
-    s.calc_function(m, "jtimesF");
+    s.calc_jtimesF(m, t, NV_DATA_S(xz), NV_DATA_S(xz) + s.nx_, NV_DATA_S(v), NV_DATA_S(v) + s.nx_,
+      NV_DATA_S(Jv), NV_DATA_S(Jv) + s.nx_);
 
     // Subtract state derivative to get residual
     casadi_axpy(s.nx_, -cj, NV_DATA_S(v), NV_DATA_S(Jv));
@@ -253,7 +242,7 @@ int IdasInterface::jtimes(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, N_
   } catch(int flag) { // recoverable error
     return flag;
   } catch(std::exception& e) { // non-recoverable error
-    uerr() << "jtimes failed: " << e.what() << std::endl;
+    uerr() << "jtimesF failed: " << e.what() << std::endl;
     return -1;
   }
 }
@@ -387,7 +376,7 @@ int IdasInterface::init_mem(void* mem) const {
     case SD_BCGSTAB: THROWING(IDASpbcg, m->mem, max_krylov_); break;
     case SD_TFQMR: THROWING(IDASptfqmr, m->mem, max_krylov_); break;
     }
-    THROWING(IDASpilsSetJacTimesVecFn, m->mem, jtimes);
+    THROWING(IDASpilsSetJacTimesVecFn, m->mem, jtimesF);
     if (use_precon_) THROWING(IDASpilsSetPreconditioner, m->mem, psetup, psolve);
   }
 
@@ -720,16 +709,8 @@ int IdasInterface::psolve(double t, N_Vector xz, N_Vector xzdot, N_Vector rr,
         // The outputs will double as seeds for jtimesF
         casadi_clear(vx + s.nx1_, s.nx_ - s.nx1_);
         casadi_clear(vz + s.nz1_, s.nz_ - s.nz1_);
-        m->arg[0] = &t; // t
-        m->arg[1] = NV_DATA_S(xz); // x
-        m->arg[2] = NV_DATA_S(xz)+s.nx_; // z
-        m->arg[3] = m->p; // p
-        m->arg[4] = m->u; // u
-        m->arg[5] = vx; // fwd:x
-        m->arg[6] = vz; // fwd:z
-        m->res[0] = m->v2; // fwd:ode
-        m->res[1] = m->v2 + s.nx_; // fwd:alg
-        s.calc_function(m, "jtimesF");
+        s.calc_jtimesF(m, t, NV_DATA_S(xz), NV_DATA_S(xz) + s.nx_,
+          vx, vz, m->v2, m->v2 + s.nx_);
 
         // Subtract m->v2 (reordered) from m->v1
         v_it = m->v1 + s.nx1_ + s.nz1_;

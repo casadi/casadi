@@ -139,6 +139,10 @@ namespace casadi {
     void calc_quadB(SundialsMemory* m, double t, const double* x, const double* z,
       const double* rx, const double* rz, double* rquad, double* uquad) const;
 
+    // Jacobian of ODE-times-vector function, forward problem
+    void calc_jtimesF(SundialsMemory* m, double t, const double* x, const double* z,
+      const double* fwd_x, const double* fwd_z, double* fwd_ode, double* fwd_alg) const;
+
     /// Get all statistics
     Dict get_stats(void* mem) const override;
 
@@ -172,6 +176,9 @@ namespace casadi {
     enum DaeBIn { DAEB_RX, DAEB_RZ, DAEB_RP, DAEB_X, DAEB_Z, DAEB_P, DAEB_U, DAEB_T, DAEB_NUM_IN};
     enum DAEBOut { DAEB_RODE, DAEB_RALG, DAEB_NUM_OUT};
     enum QuadBOut { QUADB_RQUAD, QUADB_UQUAD, QUADB_NUM_OUT};
+    enum JtimesFIn { JTIMESF_T, JTIMESF_X, JTIMESF_Z, JTIMESF_P, JTIMESF_U, JTIMESF_FWD_X,
+      JTIMESF_FWD_Z, JTIMESF_NUM_IN};
+    enum JtimesFOut { JTIMESF_FWD_ODE, JTIMESF_FWD_ALG, JTIMESF_NUM_OUT};
     ///@}
 
     ///@{
