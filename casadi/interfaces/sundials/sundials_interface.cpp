@@ -286,7 +286,17 @@ void SundialsInterface::init(const Dict& opts) {
     if (ns_ > 0) {
       create_forward("jtimesF", ns_);
     }
+    if (nrx_ > 0) {
+      // create_function(nonaug_oracle_, "jtimesB",
+      //   {"t", "x", "z", "p", "u", "rx", "rz", "rp", "fwd:rx", "fwd:rz"},
+      //   {"fwd:rode", "fwd:ralg"});
+      if (ns_ > 0) {
+        // create_forward("jtimesB", ns_);
+      }
+    }
   }
+
+
 }
 
 void SundialsInterface::set_work(void* mem, const double**& arg, double**& res,

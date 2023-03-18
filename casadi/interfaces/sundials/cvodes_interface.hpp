@@ -166,8 +166,9 @@ namespace casadi {
       const double* rode, double* jac_rode_rx) const;
 
     // Jacobian of ODE-times-vector function, backward problem
-    void calc_jtimesB(CvodesMemory* m, double t, const double* x, const double* rx,
-        const double* rode, const double* fwd_rx, double* fwd_rode) const;
+    void calc_jtimesB(CvodesMemory* m, double t, const double* x, const double* z,
+        const double* rx, const double* rz, const double* fwd_rx, const double* fwd_rz,
+        double* fwd_rode, double* fwd_ralg) const;
 
     /// A documentation string
     static const std::string meta_doc;
@@ -215,9 +216,10 @@ namespace casadi {
 
     ///@{
     /** \brief IO conventions for continuous time dynamics */
-    enum JtimesBIn { JTIMESB_T, JTIMESB_X, JTIMESB_P, JTIMESB_U, JTIMESB_RX, JTIMESB_RP,
-      JTIMESB_FWD_RX, JTIMESB_NUM_IN};
-    enum JtimesBOut { JTIMESB_FWD_RODE, JTIMESB_NUM_OUT};
+    enum JtimesBIn { JTIMESB_T, JTIMESB_X, JTIMESB_Z, JTIMESB_P, JTIMESB_U,
+      JTIMESB_RX, JTIMESB_RZ, JTIMESB_RP,
+      JTIMESB_FWD_RX, JTIMESB_FWD_RZ, JTIMESB_NUM_IN};
+    enum JtimesBOut { JTIMESB_FWD_RODE, JTIMESB_FWD_RALG, JTIMESB_NUM_OUT};
     ///@}
 
   public:
