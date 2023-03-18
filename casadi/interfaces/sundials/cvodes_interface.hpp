@@ -158,14 +158,16 @@ namespace casadi {
     Function get_jacB(Sparsity* sp) const override;
 
     // ODE right-hand-side, forward problem
-    void calc_odeF(CvodesMemory* m, double t, const double* x, double* ode) const;
+    void calc_daeF(CvodesMemory* m, double t, const double* x, const double* z,
+      double* ode, double* alg) const;
 
     // ODE right-hand-side, forward problem
     void calc_odeB(CvodesMemory* m, double t, const double* x, const double* rx,
       double* rode) const;
 
     // Quadrature right-hand-side, forward problem
-    void calc_quadF(CvodesMemory* m, double t, const double* x, double* quad) const;
+    void calc_quadF(CvodesMemory* m, double t, const double* x, const double* z,
+      double* quad) const;
 
     // Quadrature right-hand-side, backward problem
     void calc_quadB(CvodesMemory* m, double t, const double* x, const double* rx,
@@ -233,8 +235,8 @@ namespace casadi {
 
     ///@{
     /** \brief IO conventions for continuous time dynamics */
-    enum OdeFIn { ODEF_X, ODEF_P, ODEF_U, ODEF_T, ODEF_NUM_IN};
-    enum OdeFOut { ODEF_ODE, ODEF_NUM_OUT};
+    enum DaeFIn { DAEF_X, DAEF_Z, DAEF_P, DAEF_U, DAEF_T, DAEF_NUM_IN};
+    enum DaeFOut { DAEF_ODE, DAEF_ALG, DAEF_NUM_OUT};
     enum QuadFOut { QUADF_QUAD, QUADF_NUM_OUT};
     enum OdeBIn { ODEB_RX, ODEB_RP, ODEB_X, ODEB_P, ODEB_U, ODEB_T, ODEB_NUM_IN};
     enum OdeBOut { ODEB_RODE, ODEB_NUM_OUT};
