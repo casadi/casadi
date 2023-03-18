@@ -1471,6 +1471,15 @@ if(WITH_OSQP)
     install(DIRECTORY
       "${CMAKE_BINARY_DIR}/external_projects/include/osqp"
       DESTINATION "${INCLUDE_PREFIX}")
+    if(CMAKE_CROSS_COMPILING AND MINGW)
+    add_custom_command(TARGET osqp-external POST_BUILD
+      COMMAND gendef "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}osqp${CMAKE_SHARED_LIBRARY_SUFFIX}"
+      COMMAND $ENV{DLLTOOL} --dllname "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}osqp${CMAKE_SHARED_LIBRARY_SUFFIX}" --def libosqp.def --output-lib osqp.lib
+    )
+    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/osqp.lib"
+      DESTINATION ${DEF_LIB_PREFIX}
+    )
+    endif()
   endif()
 endif()
 add_feature_info(osqp-interface WITH_OSQP "Interface to QP solver OSQP.")

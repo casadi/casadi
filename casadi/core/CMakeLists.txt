@@ -258,6 +258,15 @@ if(RT)
   target_link_libraries(casadi ${RT})
 endif()
 
+if(CMAKE_CROSS_COMPILING AND MINGW)
+  add_custom_command(TARGET casadi POST_BUILD
+    COMMAND $ENV{DLLTOOL} --dllname $<TARGET_FILE:casadi> --def "${CMAKE_CURRENT_SOURCE_DIR}/casadi.def" --output-lib casadi.lib
+  )
+  install(FILES "${CMAKE_CURRENT_BINARY_DIR}/casadi.lib"
+    DESTINATION ${DEF_LIB_PREFIX}
+  )
+endif()
+
 install(FILES ${CASADI_PUBLIC} ${CMAKE_CURRENT_BINARY_DIR}/casadi_export.h
   DESTINATION ${INCLUDE_PREFIX}/casadi/core
 )
