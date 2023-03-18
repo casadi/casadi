@@ -595,7 +595,7 @@ int CvodesInterface::psetup(double t, N_Vector x, N_Vector xdot, booleantype jok
     casadi_int jac_offset = sp_jacF.nnz() - sp_jac_ode_x.nnz();
 
     // Calculate Jacobian
-    s.calc_jacF(m, t, NV_DATA_S(x), NV_DATA_S(xdot), m->jacF + jac_offset);
+    s.calc_jacF(m, t, NV_DATA_S(x), nullptr, m->jacF + jac_offset, nullptr, nullptr, nullptr);
 
     // Project to expected sparsity pattern (with diagonal)
     casadi_project(m->jacF + jac_offset, sp_jac_ode_x, m->jacF, sp_jacF, m->w);
@@ -824,8 +824,8 @@ Function CvodesInterface::get_jacB(Sparsity* sp) const {
   return J;
 }
 
-void CvodesInterface::calc_jacF(CvodesMemory* m, double t, const double* x, const double* ode,
-    double* jac_ode_x) const {
+void CvodesInterface::calc_jacF(CvodesMemory* m, double t, const double* x, const double* z,
+    double* jac_ode_x, double* jac_alg_x, double* jac_ode_z, double* jac_alg_z) const {
   // Calculate Jacobian
   m->arg[0] = &t;
   m->arg[1] = x;

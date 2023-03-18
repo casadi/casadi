@@ -260,8 +260,8 @@ void SundialsInterface::init(const Dict& opts) {
   alloc_w(2 * std::max(nx_+nz_, nrx_+nrz_), true); // v1, v2
 
   // Create problem functions, forward problem
-  create_function(nonaug_oracle_, "daeF", {"x", "z", "p", "u", "t"}, {"ode", "alg"});
-  create_function(nonaug_oracle_, "quadF", {"x", "z", "p", "u", "t"}, {"quad"});
+  create_function(nonaug_oracle_, "daeF", { "t", "x", "z", "p", "u"}, {"ode", "alg"});
+  create_function(nonaug_oracle_, "quadF", {"t", "x", "z", "p", "u"}, {"quad"});
   if (ns_ > 0) {
     create_forward("daeF", ns_);
     create_forward("quadF", ns_);
@@ -269,9 +269,9 @@ void SundialsInterface::init(const Dict& opts) {
 
   // Create problem functions, backward problem
   if (nrx_ > 0) {
-    create_function(nonaug_oracle_, "daeB", {"rx", "rz", "rp", "x", "z", "p", "u", "t"},
+    create_function(nonaug_oracle_, "daeB", {"t", "x", "z", "p", "u", "rx", "rz", "rp"},
       {"rode", "ralg"});
-    create_function(nonaug_oracle_, "quadB", {"rx", "rz", "rp", "x", "z", "p", "u", "t"},
+    create_function(nonaug_oracle_, "quadB", {"t", "x", "z", "p", "u", "rx", "rz", "rp"},
       {"rquad", "uquad"});
     if (ns_ > 0) {
       create_forward("daeB", ns_);
@@ -536,11 +536,11 @@ void SundialsInterface::serialize_body(SerializingStream &s) const {
 void SundialsInterface::calc_daeF(SundialsMemory* m, double t, const double* x, const double* z,
     double* ode, double* alg) const {
   // Evaluate nondifferentiated
+  m->arg[DAEF_T] = &t;  // t
   m->arg[DAEF_X] = x;  // x
-  m->arg[DAEF_Z] = z;  // x
+  m->arg[DAEF_Z] = z;  // z
   m->arg[DAEF_P] = m->p;  // p
   m->arg[DAEF_U] = m->u;  // u
-  m->arg[DAEF_T] = &t;  // t
   m->res[DAEF_ODE] = ode;  // ode
   m->res[DAEF_ALG] = alg;  // alg
   calc_function(m, "daeF");
@@ -548,11 +548,11 @@ void SundialsInterface::calc_daeF(SundialsMemory* m, double t, const double* x, 
   if (ns_ > 0) {
     m->arg[DAEF_NUM_IN + DAEF_ODE] = ode;  // out:ode
     m->arg[DAEF_NUM_IN + DAEF_ALG] = alg;  // out:alg
+    m->arg[DAEF_NUM_IN + DAEF_NUM_OUT + DAEF_T] = 0;  // fwd:t
     m->arg[DAEF_NUM_IN + DAEF_NUM_OUT + DAEF_X] = x + nx1_;  // fwd:x
     m->arg[DAEF_NUM_IN + DAEF_NUM_OUT + DAEF_Z] = z ? z + nz1_ : 0;  // fwd:z
     m->arg[DAEF_NUM_IN + DAEF_NUM_OUT + DAEF_P] = m->p + np1_;  // fwd:p
     m->arg[DAEF_NUM_IN + DAEF_NUM_OUT + DAEF_U] = m->u + nu1_;  // fwd:u
-    m->arg[DAEF_NUM_IN + DAEF_NUM_OUT + DAEF_T] = 0;  // fwd:t
     m->res[DAEF_ODE] = ode ? ode + nx1_ : 0;  // fwd:ode
     m->res[DAEF_ALG] = alg ? alg + nz1_ : 0;  // fwd:alg
     calc_forward(m, "daeF", ns_);
@@ -562,14 +562,14 @@ void SundialsInterface::calc_daeF(SundialsMemory* m, double t, const double* x, 
 void SundialsInterface::calc_daeB(SundialsMemory* m, double t, const double* x, const double* z,
     const double* rx, const double* rz, double* rode, double* ralg) const {
   // Evaluate nondifferentiated
-  m->arg[DAEB_RX] = rx;  // rx
-  m->arg[DAEB_RZ] = rz;  // rz
-  m->arg[DAEB_RP] = m->rp;  // rp
+  m->arg[DAEB_T] = &t;  // t
   m->arg[DAEB_X] = x;  // x
   m->arg[DAEB_Z] = z;  // z
   m->arg[DAEB_P] = m->p;  // p
   m->arg[DAEB_U] = m->u;  // u
-  m->arg[DAEB_T] = &t;  // t
+  m->arg[DAEB_RX] = rx;  // rx
+  m->arg[DAEB_RZ] = rz;  // rz
+  m->arg[DAEB_RP] = m->rp;  // rp
   m->res[DAEB_RODE] = rode;  // rode
   m->res[DAEB_RALG] = ralg;  // ralg
   calc_function(m, "daeB");
@@ -577,14 +577,14 @@ void SundialsInterface::calc_daeB(SundialsMemory* m, double t, const double* x, 
   if (ns_ > 0) {
     m->arg[DAEB_NUM_IN + DAEB_RODE] = rode;  // out:rode
     m->arg[DAEB_NUM_IN + DAEB_RALG] = ralg;  // out:ralg
-    m->arg[DAEB_NUM_IN + DAEB_NUM_OUT + DAEB_RX] = rx ? rx + nrx1_ : 0;  // fwd:rx
-    m->arg[DAEB_NUM_IN + DAEB_NUM_OUT + DAEB_RZ] = rz ? rz + nrz1_ : 0;  // fwd:rz
-    m->arg[DAEB_NUM_IN + DAEB_NUM_OUT + DAEB_RP] = m->rp + nrp1_;  // fwd:rp
+    m->arg[DAEB_NUM_IN + DAEB_NUM_OUT + DAEB_T] = 0;  // fwd:t
     m->arg[DAEB_NUM_IN + DAEB_NUM_OUT + DAEB_X] = x ? x + nx1_ : x;  // fwd:x
     m->arg[DAEB_NUM_IN + DAEB_NUM_OUT + DAEB_Z] = z ? z + nz1_ : z;  // fwd:z
     m->arg[DAEB_NUM_IN + DAEB_NUM_OUT + DAEB_P] = m->p + np1_;  // fwd:p
     m->arg[DAEB_NUM_IN + DAEB_NUM_OUT + DAEB_U] = m->u + nu1_;  // fwd:u
-    m->arg[DAEB_NUM_IN + DAEB_NUM_OUT + DAEB_T] = 0;  // fwd:t
+    m->arg[DAEB_NUM_IN + DAEB_NUM_OUT + DAEB_RX] = rx ? rx + nrx1_ : 0;  // fwd:rx
+    m->arg[DAEB_NUM_IN + DAEB_NUM_OUT + DAEB_RZ] = rz ? rz + nrz1_ : 0;  // fwd:rz
+    m->arg[DAEB_NUM_IN + DAEB_NUM_OUT + DAEB_RP] = m->rp + nrp1_;  // fwd:rp
     m->res[DAEB_RODE] = rode ? rode + nrx1_ : 0;  // fwd:rode
     m->res[DAEB_RALG] = ralg ? ralg + nrz1_ : 0;  // fwd:ralg
     calc_forward(m, "daeB", ns_);
@@ -593,21 +593,21 @@ void SundialsInterface::calc_daeB(SundialsMemory* m, double t, const double* x, 
 
 void SundialsInterface::calc_quadF(SundialsMemory* m, double t, const double* x, const double* z,
     double* quad) const {
+  m->arg[DAEF_T] = &t;  // t
   m->arg[DAEF_X] = x;  // x
   m->arg[DAEF_Z] = z;  // z
   m->arg[DAEF_P] = m->p;  // p
   m->arg[DAEF_U] = m->u;  // u
-  m->arg[DAEF_T] = &t;  // t
   m->res[QUADF_QUAD] = quad;  // quad
   calc_function(m, "quadF");
   // Evaluate sensitivities
   if (ns_ > 0) {
     m->arg[DAEF_NUM_IN + QUADF_QUAD] = quad;  // out:quad
+    m->arg[DAEF_NUM_IN + QUADF_NUM_OUT + DAEF_T] = 0;  // fwd:t
     m->arg[DAEF_NUM_IN + QUADF_NUM_OUT + DAEF_X] = x + nx1_;  // fwd:x
     m->arg[DAEF_NUM_IN + QUADF_NUM_OUT + DAEF_X] = z ? z + nz1_ : 0;  // fwd:z
     m->arg[DAEF_NUM_IN + QUADF_NUM_OUT + DAEF_P] = m->p + np1_;  // fwd:p
     m->arg[DAEF_NUM_IN + QUADF_NUM_OUT + DAEF_U] = m->u + nu1_;  // fwd:u
-    m->arg[DAEF_NUM_IN + QUADF_NUM_OUT + DAEF_T] = 0;  // fwd:t
     m->res[QUADF_QUAD] = quad ? quad + nq1_ : 0;  // fwd:quad
     calc_forward(m, "quadF", ns_);
   }
@@ -616,14 +616,14 @@ void SundialsInterface::calc_quadF(SundialsMemory* m, double t, const double* x,
 void SundialsInterface::calc_quadB(SundialsMemory* m, double t, const double* x, const double* z,
     const double* rx, const double* rz, double* rquad, double* uquad) const {
   // Evaluate nondifferentiated
-  m->arg[DAEB_RX] = rx;  // rx
-  m->arg[DAEB_RZ] = rz;  // rz
-  m->arg[DAEB_RP] = m->rp;  // rp
+  m->arg[DAEB_T] = &t;  // t
   m->arg[DAEB_X] = x;  // x
   m->arg[DAEB_Z] = z;  // z
   m->arg[DAEB_P] = m->p;  // p
   m->arg[DAEB_U] = m->u;  // u
-  m->arg[DAEB_T] = &t;  // t
+  m->arg[DAEB_RX] = rx;  // rx
+  m->arg[DAEB_RZ] = rz;  // rz
+  m->arg[DAEB_RP] = m->rp;  // rp
   m->res[QUADB_RQUAD] = rquad;  // rquad
   m->res[QUADB_UQUAD] = uquad;  // uquad
   calc_function(m, "quadB");
@@ -631,14 +631,14 @@ void SundialsInterface::calc_quadB(SundialsMemory* m, double t, const double* x,
   if (ns_ > 0) {
     m->arg[DAEB_NUM_IN + QUADB_RQUAD] = rquad;  // out:rquad
     m->arg[DAEB_NUM_IN + QUADB_UQUAD] = uquad;  // out:uquad
-    m->arg[DAEB_NUM_IN + QUADB_NUM_OUT + DAEB_RX] = rx ? rx + nrx1_ : 0;  // fwd:rx
-    m->arg[DAEB_NUM_IN + QUADB_NUM_OUT + DAEB_RZ] = rz ? rz + nrz1_ : 0;  // fwd:rz
-    m->arg[DAEB_NUM_IN + QUADB_NUM_OUT + DAEB_RP] = m->rp + nrp1_;  // fwd:rp
+    m->arg[DAEB_NUM_IN + QUADB_NUM_OUT + DAEB_T] = 0;  // fwd:t
     m->arg[DAEB_NUM_IN + QUADB_NUM_OUT + DAEB_X] = x ? x + nx1_ : 0;  // fwd:x
     m->arg[DAEB_NUM_IN + QUADB_NUM_OUT + DAEB_Z] = z ? z + nz1_ : 0;  // fwd:z
     m->arg[DAEB_NUM_IN + QUADB_NUM_OUT + DAEB_P] = m->p + np1_;  // fwd:p
     m->arg[DAEB_NUM_IN + QUADB_NUM_OUT + DAEB_U] = m->u + nu1_;  // fwd:u
-    m->arg[DAEB_NUM_IN + QUADB_NUM_OUT + DAEB_T] = 0;  // fwd:t
+    m->arg[DAEB_NUM_IN + QUADB_NUM_OUT + DAEB_RX] = rx ? rx + nrx1_ : 0;  // fwd:rx
+    m->arg[DAEB_NUM_IN + QUADB_NUM_OUT + DAEB_RZ] = rz ? rz + nrz1_ : 0;  // fwd:rz
+    m->arg[DAEB_NUM_IN + QUADB_NUM_OUT + DAEB_RP] = m->rp + nrp1_;  // fwd:rp
     m->res[QUADB_RQUAD] = rquad + nrq1_;  // fwd:rquad
     m->res[QUADB_UQUAD] = uquad + nuq1_;  // fwd:uquad
     calc_forward(m, "quadB", ns_);
