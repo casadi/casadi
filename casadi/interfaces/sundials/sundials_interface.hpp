@@ -210,9 +210,6 @@ namespace casadi {
     casadi_int max_order_;
     ///@}
 
-    /// New oracle, to replace existing oracle
-    Function nonaug_oracle_;
-
     /// Linear solver
     Linsol linsolF_, linsolB_;
 

@@ -208,13 +208,13 @@ Integrator::~Integrator() {
 
 Sparsity Integrator::get_sparsity_in(casadi_int i) {
   switch (static_cast<IntegratorInput>(i)) {
-  case INTEGRATOR_X0: return x();
-  case INTEGRATOR_P: return p();
-  case INTEGRATOR_U: return repmat(u(), 1, nt());
-  case INTEGRATOR_Z0: return z();
-  case INTEGRATOR_RX0: return repmat(rx(), 1, nt());
-  case INTEGRATOR_RP: return repmat(rp(), 1, nt());
-  case INTEGRATOR_RZ0: return repmat(rz(), 1, nt());
+  case INTEGRATOR_X0: return repmat(vec(x1()), 1, 1 + ns_);
+  case INTEGRATOR_P: return repmat(vec(p1()), 1, 1 + ns_);
+  case INTEGRATOR_U: return repmat(vec(u1()), 1, nt() * (1 + ns_));
+  case INTEGRATOR_Z0: return repmat(vec(z1()), 1, 1 + ns_);
+  case INTEGRATOR_RX0: return repmat(vec(rx1()), 1, nt() * (1 + ns_));
+  case INTEGRATOR_RP: return repmat(vec(rp1()), 1, nt() * (1 + ns_));
+  case INTEGRATOR_RZ0: return repmat(vec(rz1()), 1, nt() * (1 + ns_));
   case INTEGRATOR_NUM_IN: break;
   }
   return Sparsity();
@@ -222,13 +222,13 @@ Sparsity Integrator::get_sparsity_in(casadi_int i) {
 
 Sparsity Integrator::get_sparsity_out(casadi_int i) {
   switch (static_cast<IntegratorOutput>(i)) {
-  case INTEGRATOR_XF: return repmat(x(), 1, nt());
-  case INTEGRATOR_QF: return repmat(q(), 1, nt());
-  case INTEGRATOR_ZF: return repmat(z(), 1, nt());
-  case INTEGRATOR_RXF: return rx();
-  case INTEGRATOR_RQF: return rq();
-  case INTEGRATOR_RZF: return rz();
-  case INTEGRATOR_UQF: return repmat(uq(), 1, nt());
+  case INTEGRATOR_XF: return repmat(vec(x1()), 1, nt() * (1 + ns_));
+  case INTEGRATOR_QF: return repmat(vec(q1()), 1, nt() * (1 + ns_));
+  case INTEGRATOR_ZF: return repmat(vec(z1()), 1, nt() * (1 + ns_));
+  case INTEGRATOR_RXF: return repmat(vec(rx1()), 1, 1 + ns_);
+  case INTEGRATOR_RQF: return repmat(vec(rq1()), 1, 1 + ns_);
+  case INTEGRATOR_RZF: return repmat(vec(rz1()), 1, 1 + ns_);
+  case INTEGRATOR_UQF: return repmat(vec(uq1()), 1, nt() * (1 + ns_));
   case INTEGRATOR_NUM_OUT: break;
   }
   return Sparsity();
@@ -461,6 +461,22 @@ void Integrator::init(const Dict& opts) {
   // Replace MX oracle with SX oracle?
   if (expand) this->expand();
 
+  // Number of sensitivities
+  ns_ = nfwd_;
+
+  // The class is being refactored to use oracle without sensitivity right-hand-sides
+  Integrator* d = 0;
+  if (nfwd_ > 0) {
+    auto it = opts.find("derivative_of");
+    casadi_assert_dev(it != opts.end());
+    Function derivative_of = it->second;
+    d = derivative_of.get<Integrator>();
+    casadi_assert_dev(d != nullptr);
+    nonaug_oracle_ = d->oracle_;
+  } else {
+    nonaug_oracle_ = oracle_;
+  }
+
   // Store a copy of the options, for creating augmented integrators
   opts_ = opts;
 
@@ -483,6 +499,7 @@ void Integrator::init(const Dict& opts) {
 
   // Call the base class method
   OracleFunction::init(opts);
+
 
   // For sparsity pattern propagation
   alloc(oracle_);
@@ -522,9 +539,6 @@ void Integrator::init(const Dict& opts) {
   nrp1_ = nrp_ / (1 + nfwd_);
   nrq1_ = nrq_ / (1 + nfwd_);
   nuq1_ = nuq_ / (1 + nfwd_);
-
-  // Number of sensitivities
-  ns_ = nfwd_;
 
   // Get the sparsities of the forward and reverse DAE
   sp_jac_dae_ = sp_jac_dae();
@@ -1852,6 +1866,7 @@ void Integrator::serialize_body(SerializingStream &s) const {
 
   s.pack("Integrator::sp_jac_dae", sp_jac_dae_);
   s.pack("Integrator::sp_jac_rdae", sp_jac_rdae_);
+  s.pack("Integrator::nonaug_oracle", nonaug_oracle_);
   s.pack("Integrator::t0", t0_);
   s.pack("Integrator::tout", tout_);
   s.pack("Integrator::nfwd", nfwd_);
@@ -1901,6 +1916,7 @@ Integrator::Integrator(DeserializingStream & s) : OracleFunction(s) {
 
   s.unpack("Integrator::sp_jac_dae", sp_jac_dae_);
   s.unpack("Integrator::sp_jac_rdae", sp_jac_rdae_);
+  s.unpack("Integrator::nonaug_oracle", nonaug_oracle_);
   s.unpack("Integrator::t0", t0_);
   s.unpack("Integrator::tout", tout_);
   s.unpack("Integrator::nfwd", nfwd_);

@@ -209,9 +209,6 @@ void SundialsInterface::init(const Dict& opts) {
   if (ns_ > 0) {
     d = derivative_of_.get<SundialsInterface>();
     casadi_assert_dev(d != nullptr);
-    nonaug_oracle_ = d->oracle_;
-  } else {
-    nonaug_oracle_ = oracle_;
   }
 
   // Get Jacobian function, forward problem
@@ -487,7 +484,6 @@ SundialsInterface::SundialsInterface(DeserializingStream& s) : Integrator(s) {
   s.unpack("SundialsInterface::nonlin_conv_coeff", nonlin_conv_coeff_);
   s.unpack("SundialsInterface::max_order", max_order_);
 
-  s.unpack("SundialsInterface::nonaug_oracle", nonaug_oracle_);
   s.unpack("SundialsInterface::linsolF", linsolF_);
   s.unpack("SundialsInterface::linsolB", linsolB_);
 
@@ -525,7 +521,6 @@ void SundialsInterface::serialize_body(SerializingStream &s) const {
   s.pack("SundialsInterface::nonlin_conv_coeff", nonlin_conv_coeff_);
   s.pack("SundialsInterface::max_order", max_order_);
 
-  s.pack("SundialsInterface::nonaug_oracle", nonaug_oracle_);
   s.pack("SundialsInterface::linsolF", linsolF_);
   s.pack("SundialsInterface::linsolB", linsolB_);
 
