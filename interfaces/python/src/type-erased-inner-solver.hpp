@@ -42,6 +42,7 @@ class TypeErasedInnerSolver : public util::TypeErased<InnerSolverVTable<Conf>, A
     using allocator_type = Allocator;
     using TypeErased     = util::TypeErased<VTable, allocator_type>;
     using Stats          = typename VTable::Stats;
+    using Problem        = typename VTable::Problem;
     using TypeErased::TypeErased;
 
   protected:
