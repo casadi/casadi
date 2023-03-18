@@ -132,11 +132,6 @@ void IdasInterface::init(const Dict& opts) {
     }
   }
 
-  create_function("daeF", {"x", "z", "p", "u", "t"}, {"ode", "alg"});
-  create_function("quadF", {"x", "z", "p", "u", "t"}, {"quad"});
-  create_function("daeB", {"rx", "rz", "rp", "x", "z", "p", "u", "t"}, {"rode", "ralg"});
-  create_function("quadB", {"rx", "rz", "rp", "x", "z", "p", "u", "t"}, {"rquad", "uquad"});
-
   // Get initial conditions for the state derivatives
   if (init_xdot_.empty()) {
     init_xdot_.resize(nx_, 0);
@@ -211,14 +206,7 @@ int IdasInterface::res(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, void 
   try {
     auto m = to_mem(user_data);
     auto& s = m->self;
-    m->arg[0] = NV_DATA_S(xz);
-    m->arg[1] = NV_DATA_S(xz)+s.nx_;
-    m->arg[2] = m->p;
-    m->arg[3] = m->u;
-    m->arg[4] = &t;
-    m->res[0] = NV_DATA_S(rr);
-    m->res[1] = NV_DATA_S(rr)+s.nx_;
-    s.calc_function(m, "daeF");
+    s.calc_daeF(m, t, NV_DATA_S(xz), NV_DATA_S(xz) + s.nx_, NV_DATA_S(rr), NV_DATA_S(rr) + s.nx_);
 
     // Subtract state derivative to get residual
     casadi_axpy(s.nx_, -1., NV_DATA_S(xzdot), NV_DATA_S(rr));
@@ -644,18 +632,11 @@ void IdasInterface::idas_error(const char* module, int flag) {
   casadi_error(ss.str());
 }
 
-int IdasInterface::rhsQ(double t, N_Vector xz, N_Vector xzdot, N_Vector rhsQ,
-                                void *user_data) {
+int IdasInterface::rhsQ(double t, N_Vector xz, N_Vector xzdot, N_Vector qdot, void *user_data) {
   try {
     auto m = to_mem(user_data);
     auto& s = m->self;
-    m->arg[0] = NV_DATA_S(xz);
-    m->arg[1] = NV_DATA_S(xz)+s.nx_;
-    m->arg[2] = m->p;
-    m->arg[3] = m->u;
-    m->arg[4] = &t;
-    m->res[0] = NV_DATA_S(rhsQ);
-    s.calc_function(m, "quadF");
+    s.calc_quadF(m, t, NV_DATA_S(xz), NV_DATA_S(xz) + s.nx_, NV_DATA_S(qdot));
 
     return 0;
   } catch(int flag) { // recoverable error
@@ -667,21 +648,12 @@ int IdasInterface::rhsQ(double t, N_Vector xz, N_Vector xzdot, N_Vector rhsQ,
 }
 
 int IdasInterface::resB(double t, N_Vector xz, N_Vector xzdot, N_Vector rxz,
-                                N_Vector rxzdot, N_Vector rr, void *user_data) {
+    N_Vector rxzdot, N_Vector rr, void *user_data) {
   try {
     auto m = to_mem(user_data);
     auto& s = m->self;
-    m->arg[0] = NV_DATA_S(rxz);
-    m->arg[1] = NV_DATA_S(rxz)+s.nrx_;
-    m->arg[2] = m->rp;
-    m->arg[3] = NV_DATA_S(xz);
-    m->arg[4] = NV_DATA_S(xz)+s.nx_;
-    m->arg[5] = m->p;
-    m->arg[6] = m->u;
-    m->arg[7] = &t;
-    m->res[0] = NV_DATA_S(rr);
-    m->res[1] = NV_DATA_S(rr)+s.nrx_;
-    s.calc_function(m, "daeB");
+    s.calc_daeB(m, t, NV_DATA_S(xz), NV_DATA_S(xz) + s.nx_, NV_DATA_S(rxz), NV_DATA_S(rxz) + s.nrx_,
+      NV_DATA_S(rr), NV_DATA_S(rr) + s.nrx_);
 
     // Subtract state derivative to get residual
     casadi_axpy(s.nrx_, 1., NV_DATA_S(rxzdot), NV_DATA_S(rr));
@@ -700,20 +672,12 @@ int IdasInterface::rhsQB(double t, N_Vector xz, N_Vector xzdot, N_Vector rxz,
   try {
     auto m = to_mem(user_data);
     auto& s = m->self;
-    m->arg[0] = NV_DATA_S(rxz);
-    m->arg[1] = NV_DATA_S(rxz)+s.nrx_;
-    m->arg[2] = m->rp;
-    m->arg[3] = NV_DATA_S(xz);
-    m->arg[4] = NV_DATA_S(xz)+s.nx_;
-    m->arg[5] = m->p;
-    m->arg[6] = m->u;
-    m->arg[7] = &t;
-    m->res[0] = NV_DATA_S(ruqdot);
-    m->res[1] = NV_DATA_S(ruqdot) + s.nrq_;
-    s.calc_function(m, "quadB");
+    s.calc_quadB(m, t, NV_DATA_S(xz), NV_DATA_S(xz) + s.nx_,
+      NV_DATA_S(rxz), NV_DATA_S(rxz) + s.nrx_,
+      NV_DATA_S(ruqdot), NV_DATA_S(ruqdot) + s.nrq1_ *  (1 + s.ns_));
 
     // Negate (note definition of g)
-    casadi_scal(s.nrq_ + s.nuq_, -1., NV_DATA_S(ruqdot));
+    casadi_scal((s.nrq1_ + s.nuq1_) * (1 + s.ns_), -1., NV_DATA_S(ruqdot));
 
     return 0;
   } catch(int flag) { // recoverable error

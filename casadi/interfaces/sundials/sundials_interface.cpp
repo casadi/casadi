@@ -32,466 +32,598 @@ OUTPUTSCHEME(IntegratorOutput)
 
 namespace casadi {
 
-  SundialsInterface::SundialsInterface(const std::string& name, const Function& dae,
-      double t0, const std::vector<double>& tout)
-     : Integrator(name, dae, t0, tout) {
-  }
+SundialsInterface::SundialsInterface(const std::string& name, const Function& dae,
+    double t0, const std::vector<double>& tout)
+    : Integrator(name, dae, t0, tout) {
+}
 
-  SundialsInterface::~SundialsInterface() {
-  }
+SundialsInterface::~SundialsInterface() {
+}
 
-  const Options SundialsInterface::options_
-  = {{&Integrator::options_},
-     {{"max_num_steps",
-       {OT_INT,
-        "Maximum number of integrator steps"}},
-      {"reltol",
-       {OT_DOUBLE,
-        "Relative tolerence for the IVP solution"}},
-      {"abstol",
-       {OT_DOUBLE,
-        "Absolute tolerence for the IVP solution"}},
-      {"newton_scheme",
-       {OT_STRING,
-        "Linear solver scheme in the Newton method: DIRECT|gmres|bcgstab|tfqmr"}},
-      {"max_krylov",
-       {OT_INT,
-        "Maximum Krylov subspace size"}},
-      {"sensitivity_method",
-       {OT_STRING,
-        "Sensitivity method: SIMULTANEOUS|staggered"}},
-      {"max_multistep_order",
-       {OT_INT,
-        "Maximum order for the (variable-order) multistep method"}},
-      {"use_preconditioner",
-       {OT_BOOL,
-        "Precondition the iterative solver [default: true]"}},
-      {"stop_at_end",
-       {OT_BOOL,
-        "[DEPRECATED] Stop the integrator at the end of the interval"}},
-      {"disable_internal_warnings",
-       {OT_BOOL,
-        "Disable SUNDIALS internal warning messages"}},
-      {"quad_err_con",
-       {OT_BOOL,
-        "Should the quadratures affect the step size control"}},
-      {"fsens_err_con",
-       {OT_BOOL,
-        "include the forward sensitivities in all error controls"}},
-      {"steps_per_checkpoint",
-       {OT_INT,
-        "Number of steps between two consecutive checkpoints"}},
-      {"interpolation_type",
-       {OT_STRING,
-        "Type of interpolation for the adjoint sensitivities"}},
-      {"linear_solver",
-       {OT_STRING,
-        "A custom linear solver creator function [default: qr]"}},
-      {"linear_solver_options",
-       {OT_DICT,
-        "Options to be passed to the linear solver"}},
-      {"second_order_correction",
-       {OT_BOOL,
-        "Second order correction in the augmented system Jacobian [true]"}},
-      {"step0",
-       {OT_DOUBLE,
-        "initial step size [default: 0/estimated]"}},
-      {"max_step_size",
-       {OT_DOUBLE,
-        "Max step size [default: 0/inf]"}},
-      {"max_order",
-       {OT_DOUBLE,
-        "Maximum order"}},
-      {"nonlin_conv_coeff",
-       {OT_DOUBLE,
-        "Coefficient in the nonlinear convergence test"}}
-     }
-  };
+const Options SundialsInterface::options_
+= {{&Integrator::options_},
+    {{"max_num_steps",
+      {OT_INT,
+      "Maximum number of integrator steps"}},
+    {"reltol",
+      {OT_DOUBLE,
+      "Relative tolerence for the IVP solution"}},
+    {"abstol",
+      {OT_DOUBLE,
+      "Absolute tolerence for the IVP solution"}},
+    {"newton_scheme",
+      {OT_STRING,
+      "Linear solver scheme in the Newton method: DIRECT|gmres|bcgstab|tfqmr"}},
+    {"max_krylov",
+      {OT_INT,
+      "Maximum Krylov subspace size"}},
+    {"sensitivity_method",
+      {OT_STRING,
+      "Sensitivity method: SIMULTANEOUS|staggered"}},
+    {"max_multistep_order",
+      {OT_INT,
+      "Maximum order for the (variable-order) multistep method"}},
+    {"use_preconditioner",
+      {OT_BOOL,
+      "Precondition the iterative solver [default: true]"}},
+    {"stop_at_end",
+      {OT_BOOL,
+      "[DEPRECATED] Stop the integrator at the end of the interval"}},
+    {"disable_internal_warnings",
+      {OT_BOOL,
+      "Disable SUNDIALS internal warning messages"}},
+    {"quad_err_con",
+      {OT_BOOL,
+      "Should the quadratures affect the step size control"}},
+    {"fsens_err_con",
+      {OT_BOOL,
+      "include the forward sensitivities in all error controls"}},
+    {"steps_per_checkpoint",
+      {OT_INT,
+      "Number of steps between two consecutive checkpoints"}},
+    {"interpolation_type",
+      {OT_STRING,
+      "Type of interpolation for the adjoint sensitivities"}},
+    {"linear_solver",
+      {OT_STRING,
+      "A custom linear solver creator function [default: qr]"}},
+    {"linear_solver_options",
+      {OT_DICT,
+      "Options to be passed to the linear solver"}},
+    {"second_order_correction",
+      {OT_BOOL,
+      "Second order correction in the augmented system Jacobian [true]"}},
+    {"step0",
+      {OT_DOUBLE,
+      "initial step size [default: 0/estimated]"}},
+    {"max_step_size",
+      {OT_DOUBLE,
+      "Max step size [default: 0/inf]"}},
+    {"max_order",
+      {OT_DOUBLE,
+      "Maximum order"}},
+    {"nonlin_conv_coeff",
+      {OT_DOUBLE,
+      "Coefficient in the nonlinear convergence test"}}
+    }
+};
 
-  void SundialsInterface::init(const Dict& opts) {
-    // Call the base class method
-    Integrator::init(opts);
+void SundialsInterface::init(const Dict& opts) {
+  // Call the base class method
+  Integrator::init(opts);
 
-    // If sensitivity equations, make sure derivative_of_ is available
-    casadi_assert(ns_==0 || !derivative_of_.is_null(),
-      "Not implemented.");
+  // If sensitivity equations, make sure derivative_of_ is available
+  casadi_assert(ns_==0 || !derivative_of_.is_null(),
+    "Not implemented.");
 
-    // Default options
-    abstol_ = 1e-8;
-    reltol_ = 1e-6;
-    max_num_steps_ = 10000;
-    stop_at_end_ = true;
-    use_precon_ = true;
-    max_krylov_ = 10;
-    linear_solver_ = "qr";
-    std::string newton_scheme = "direct";
-    quad_err_con_ = false;
-    std::string interpolation_type = "hermite";
-    steps_per_checkpoint_ = 20;
-    disable_internal_warnings_ = false;
-    max_multistep_order_ = 5;
-    second_order_correction_ = true;
-    step0_ = 0;
-    max_step_size_ = 0;
-    max_order_ = 0;
-    nonlin_conv_coeff_ = 0;
+  // Default options
+  abstol_ = 1e-8;
+  reltol_ = 1e-6;
+  max_num_steps_ = 10000;
+  stop_at_end_ = true;
+  use_precon_ = true;
+  max_krylov_ = 10;
+  linear_solver_ = "qr";
+  std::string newton_scheme = "direct";
+  quad_err_con_ = false;
+  std::string interpolation_type = "hermite";
+  steps_per_checkpoint_ = 20;
+  disable_internal_warnings_ = false;
+  max_multistep_order_ = 5;
+  second_order_correction_ = true;
+  step0_ = 0;
+  max_step_size_ = 0;
+  max_order_ = 0;
+  nonlin_conv_coeff_ = 0;
 
-    // Read options
-    for (auto&& op : opts) {
-      if (op.first=="abstol") {
-        abstol_ = op.second;
-      } else if (op.first=="reltol") {
-        reltol_ = op.second;
-      } else if (op.first=="max_num_steps") {
-        max_num_steps_ = op.second;
-      } else if (op.first=="stop_at_end") {
-        stop_at_end_ = op.second;
-        if (!stop_at_end_) {
-          casadi_warning("The 'stop_at_end' option has been deprecated and is currently ignored");
-        }
-      } else if (op.first=="use_preconditioner") {
-        use_precon_ = op.second;
-      } else if (op.first=="max_krylov") {
-        max_krylov_ = op.second;
-      } else if (op.first=="newton_scheme") {
-        newton_scheme = op.second.to_string();
-      } else if (op.first=="linear_solver") {
-        linear_solver_ = op.second.to_string();
-      } else if (op.first=="linear_solver_options") {
-        linear_solver_options_ = op.second;
-      } else if (op.first=="quad_err_con") {
-        quad_err_con_ = op.second;
-      } else if (op.first=="interpolation_type") {
-        interpolation_type = op.second.to_string();
-      } else if (op.first=="steps_per_checkpoint") {
-        steps_per_checkpoint_ = op.second;
-      } else if (op.first=="disable_internal_warnings") {
-        disable_internal_warnings_ = op.second;
-      } else if (op.first=="max_multistep_order") {
-        max_multistep_order_ = op.second;
-      } else if (op.first=="second_order_correction") {
-        second_order_correction_ = op.second;
-      } else if (op.first=="step0") {
-        step0_ = op.second;
-      } else if (op.first=="max_step_size") {
-        max_step_size_ = op.second;
-      } else if (op.first=="max_order") {
-        max_order_ = op.second;
-      } else if (op.first=="nonlin_conv_coeff") {
-        nonlin_conv_coeff_ = op.second;
+  // Read options
+  for (auto&& op : opts) {
+    if (op.first=="abstol") {
+      abstol_ = op.second;
+    } else if (op.first=="reltol") {
+      reltol_ = op.second;
+    } else if (op.first=="max_num_steps") {
+      max_num_steps_ = op.second;
+    } else if (op.first=="stop_at_end") {
+      stop_at_end_ = op.second;
+      if (!stop_at_end_) {
+        casadi_warning("The 'stop_at_end' option has been deprecated and is currently ignored");
       }
+    } else if (op.first=="use_preconditioner") {
+      use_precon_ = op.second;
+    } else if (op.first=="max_krylov") {
+      max_krylov_ = op.second;
+    } else if (op.first=="newton_scheme") {
+      newton_scheme = op.second.to_string();
+    } else if (op.first=="linear_solver") {
+      linear_solver_ = op.second.to_string();
+    } else if (op.first=="linear_solver_options") {
+      linear_solver_options_ = op.second;
+    } else if (op.first=="quad_err_con") {
+      quad_err_con_ = op.second;
+    } else if (op.first=="interpolation_type") {
+      interpolation_type = op.second.to_string();
+    } else if (op.first=="steps_per_checkpoint") {
+      steps_per_checkpoint_ = op.second;
+    } else if (op.first=="disable_internal_warnings") {
+      disable_internal_warnings_ = op.second;
+    } else if (op.first=="max_multistep_order") {
+      max_multistep_order_ = op.second;
+    } else if (op.first=="second_order_correction") {
+      second_order_correction_ = op.second;
+    } else if (op.first=="step0") {
+      step0_ = op.second;
+    } else if (op.first=="max_step_size") {
+      max_step_size_ = op.second;
+    } else if (op.first=="max_order") {
+      max_order_ = op.second;
+    } else if (op.first=="nonlin_conv_coeff") {
+      nonlin_conv_coeff_ = op.second;
     }
+  }
 
-    // Type of Newton scheme
-    if (newton_scheme=="direct") {
-      newton_scheme_ = SD_DIRECT;
-    } else if (newton_scheme=="gmres") {
-      newton_scheme_ = SD_GMRES;
-    } else if (newton_scheme=="bcgstab") {
-      newton_scheme_ = SD_BCGSTAB;
-    } else if (newton_scheme=="tfqmr") {
-      newton_scheme_ = SD_TFQMR;
-    } else {
-      casadi_error("Unknown Newton scheme: " + newton_scheme);
-    }
+  // Type of Newton scheme
+  if (newton_scheme=="direct") {
+    newton_scheme_ = SD_DIRECT;
+  } else if (newton_scheme=="gmres") {
+    newton_scheme_ = SD_GMRES;
+  } else if (newton_scheme=="bcgstab") {
+    newton_scheme_ = SD_BCGSTAB;
+  } else if (newton_scheme=="tfqmr") {
+    newton_scheme_ = SD_TFQMR;
+  } else {
+    casadi_error("Unknown Newton scheme: " + newton_scheme);
+  }
 
-    // Interpolation_type
-    if (interpolation_type=="hermite") {
-      interp_ = SD_HERMITE;
-    } else if (interpolation_type=="polynomial") {
-      interp_ = SD_POLYNOMIAL;
-    } else {
-      casadi_error("Unknown interpolation type: " + interpolation_type);
-    }
+  // Interpolation_type
+  if (interpolation_type=="hermite") {
+    interp_ = SD_HERMITE;
+  } else if (interpolation_type=="polynomial") {
+    interp_ = SD_POLYNOMIAL;
+  } else {
+    casadi_error("Unknown interpolation type: " + interpolation_type);
+  }
 
-    // If derivative, use Jacobian from non-augmented system if possible
-    SundialsInterface* d = 0;
-    if (ns_ > 0) {
-      d = derivative_of_.get<SundialsInterface>();
-      casadi_assert_dev(d != nullptr);
-      nonaug_oracle_ = d->oracle_;
-    } else {
-      nonaug_oracle_ = oracle_;
-    }
+  // If derivative, use Jacobian from non-augmented system if possible
+  SundialsInterface* d = 0;
+  if (ns_ > 0) {
+    d = derivative_of_.get<SundialsInterface>();
+    casadi_assert_dev(d != nullptr);
+    nonaug_oracle_ = d->oracle_;
+  } else {
+    nonaug_oracle_ = oracle_;
+  }
 
-    // Get Jacobian function, forward problem
-    Function jacF;
-    Sparsity jacF_sp;
+  // Get Jacobian function, forward problem
+  Function jacF;
+  Sparsity jacF_sp;
+  if (d == 0 || d->ns_ > 0) {
+    jacF = get_jacF(&jacF_sp);
+  } else {
+    jacF = d->get_function("jacF");
+    linsolF_ = d->linsolF_;
+    jacF_sp = linsolF_.sparsity();
+  }
+  set_function(jacF, jacF.name(), true);
+  alloc_w(jacF_sp.nnz(), true);  // jacF
+
+  // Linear solver for forward problem
+  if (linsolF_.is_null()) {
+    linsolF_ = Linsol("linsolF", linear_solver_, jacF_sp, linear_solver_options_);
+  }
+
+  // Initialize backward problem
+  if (nrx_ > 0) {
+    // Get Jacobian function, backward problem
+    Function jacB;
+    Sparsity jacB_sp;
     if (d == 0 || d->ns_ > 0) {
-      jacF = get_jacF(&jacF_sp);
+      jacB = get_jacB(&jacB_sp);
     } else {
-      jacF = d->get_function("jacF");
-      linsolF_ = d->linsolF_;
-      jacF_sp = linsolF_.sparsity();
+      jacB = d->get_function("jacB");
+      linsolB_ = d->linsolB_;
+      jacB_sp = linsolB_.sparsity();
     }
-    set_function(jacF, jacF.name(), true);
-    alloc_w(jacF_sp.nnz(), true);  // jacF
+    set_function(jacB, jacB.name(), true);
+    alloc_w(jacB_sp.nnz(), true);  // jacB
 
-    // Linear solver for forward problem
-    if (linsolF_.is_null()) {
-      linsolF_ = Linsol("linsolF", linear_solver_, jacF_sp, linear_solver_options_);
-    }
-
-    // Initialize backward problem
-    if (nrx_ > 0) {
-      // Get Jacobian function, backward problem
-      Function jacB;
-      Sparsity jacB_sp;
-      if (d == 0 || d->ns_ > 0) {
-        jacB = get_jacB(&jacB_sp);
-      } else {
-        jacB = d->get_function("jacB");
-        linsolB_ = d->linsolB_;
-        jacB_sp = linsolB_.sparsity();
-      }
-      set_function(jacB, jacB.name(), true);
-      alloc_w(jacB_sp.nnz(), true);  // jacB
-
-      // Linear solver for backward problem
-      if (linsolB_.is_null()) {
-        linsolB_ = Linsol("linsolB", linear_solver_, jacB_sp, linear_solver_options_);
-      }
-    }
-
-    // Allocate work vectors
-    alloc_w(np_, true); // p
-    alloc_w(nu_, true); // u
-    alloc_w(nrp_, true); // rp
-    alloc_w(2 * std::max(nx_+nz_, nrx_+nrz_), true); // v1, v2
-  }
-
-  void SundialsInterface::set_work(void* mem, const double**& arg, double**& res,
-      casadi_int*& iw, double*& w) const {
-    auto m = static_cast<SundialsMemory*>(mem);
-
-    // Set work in base classes
-    Integrator::set_work(mem, arg, res, iw, w);
-
-    // Work vectors
-    m->p = w; w += np_;
-    m->u = w; w += nu_;
-    m->rp = w; w += nrp_;
-    m->v1 = w; w += std::max(nx_+nz_, nrx_+nrz_);
-    m->v2 = w; w += std::max(nx_+nz_, nrx_+nrz_);
-    m->jacF = w; w += linsolF_.sparsity().nnz();
-    if (nrx_>0) {
-      m->jacB = w; w += linsolB_.sparsity().nnz();
+    // Linear solver for backward problem
+    if (linsolB_.is_null()) {
+      linsolB_ = Linsol("linsolB", linear_solver_, jacB_sp, linear_solver_options_);
     }
   }
 
-  int SundialsInterface::init_mem(void* mem) const {
-    if (Integrator::init_mem(mem)) return 1;
-    auto m = static_cast<SundialsMemory*>(mem);
+  // Allocate work vectors
+  alloc_w(np_, true); // p
+  alloc_w(nu_, true); // u
+  alloc_w(nrp_, true); // rp
+  alloc_w(2 * std::max(nx_+nz_, nrx_+nrz_), true); // v1, v2
 
-    // Allocate n-vectors
-    m->xz = N_VNew_Serial(nx_+nz_);
-    m->q = N_VNew_Serial(nq_);
-    m->rxz = N_VNew_Serial(nrx_+nrz_);
-    m->ruq = N_VNew_Serial(nrq_ + nuq_);
-
-    m->mem_linsolF = linsolF_.checkout();
-    if (!linsolB_.is_null()) m->mem_linsolB = linsolB_.checkout();
-
-    return 0;
+  // Create problem functions, forward problem
+  create_function(nonaug_oracle_, "daeF", {"x", "z", "p", "u", "t"}, {"ode", "alg"});
+  create_function(nonaug_oracle_, "quadF", {"x", "z", "p", "u", "t"}, {"quad"});
+  if (ns_ > 0) {
+    create_forward("daeF", ns_);
+    create_forward("quadF", ns_);
   }
 
-  void SundialsInterface::reset(IntegratorMemory* mem, const double* x,
-      const double* z, const double* p) const {
-    auto m = static_cast<SundialsMemory*>(mem);
-
-    // Set parameters
-    casadi_copy(p, np_, m->p);
-
-    // Set the state
-    casadi_copy(x, nx_, NV_DATA_S(m->xz));
-    casadi_copy(z, nz_, NV_DATA_S(m->xz) + nx_);
-
-    // Reset summation states
-    N_VConst(0., m->q);
-  }
-
-  void SundialsInterface::resetB(IntegratorMemory* mem,
-      const double* rx, const double* rz, const double* rp) const {
-    auto m = static_cast<SundialsMemory*>(mem);
-
-    // Set parameters
-    casadi_copy(rp, nrp_, m->rp);
-
-    // Set the backward state
-    casadi_copy(rx, nrx_, NV_DATA_S(m->rxz));
-    casadi_copy(rz, nrz_, NV_DATA_S(m->rxz) + nrx_);
-
-    // Reset summation states
-    N_VConst(0., m->ruq);
-  }
-
-  void SundialsInterface::impulseB(IntegratorMemory* mem,
-      const double* rx, const double* rz, const double* rp) const {
-    auto m = static_cast<SundialsMemory*>(mem);
-
-    // Add impulse to backward parameters
-    casadi_axpy(nrp_, 1., rp, m->rp);
-
-    // Add impulse to state
-    casadi_axpy(nrx_, 1., rx, NV_DATA_S(m->rxz));
-    casadi_axpy(nrz_, 1., rz, NV_DATA_S(m->rxz) + nrx_);
-  }
-
-  SundialsMemory::SundialsMemory() {
-    this->xz  = nullptr;
-    this->q = nullptr;
-    this->rxz = nullptr;
-    this->ruq = nullptr;
-    this->first_callB = true;
-    this->mem_linsolF = -1;
-    this->mem_linsolB = -1;
-  }
-
-  SundialsMemory::~SundialsMemory() {
-    if (this->xz) N_VDestroy_Serial(this->xz);
-    if (this->q) N_VDestroy_Serial(this->q);
-    if (this->rxz) N_VDestroy_Serial(this->rxz);
-    if (this->ruq) N_VDestroy_Serial(this->ruq);
-  }
-
-  Dict SundialsInterface::get_stats(void* mem) const {
-    Dict stats = Integrator::get_stats(mem);
-    auto m = static_cast<SundialsMemory*>(mem);
-
-    // Counters, forward problem
-    stats["nsteps"] = static_cast<casadi_int>(m->nsteps);
-    stats["nfevals"] = static_cast<casadi_int>(m->nfevals);
-    stats["nlinsetups"] = static_cast<casadi_int>(m->nlinsetups);
-    stats["netfails"] = static_cast<casadi_int>(m->netfails);
-    stats["qlast"] = m->qlast;
-    stats["qcur"] = m->qcur;
-    stats["hinused"] = m->hinused;
-    stats["hlast"] = m->hlast;
-    stats["hcur"] = m->hcur;
-    stats["tcur"] = m->tcur;
-    stats["nniters"] = static_cast<casadi_int>(m->nniters);
-    stats["nncfails"] = static_cast<casadi_int>(m->nncfails);
-
-    // Counters, backward problem
-    stats["nstepsB"] = static_cast<casadi_int>(m->nstepsB);
-    stats["nfevalsB"] = static_cast<casadi_int>(m->nfevalsB);
-    stats["nlinsetupsB"] = static_cast<casadi_int>(m->nlinsetupsB);
-    stats["netfailsB"] = static_cast<casadi_int>(m->netfailsB);
-    stats["qlastB"] = m->qlastB;
-    stats["qcurB"] = m->qcurB;
-    stats["hinusedB"] = m->hinusedB;
-    stats["hlastB"] = m->hlastB;
-    stats["hcurB"] = m->hcurB;
-    stats["tcurB"] = m->tcurB;
-    stats["nnitersB"] = static_cast<casadi_int>(m->nnitersB);
-    stats["nncfailsB"] = static_cast<casadi_int>(m->nncfailsB);
-    return stats;
-  }
-
-  void SundialsInterface::print_stats(IntegratorMemory* mem) const {
-    auto m = to_mem(mem);
-    print("FORWARD INTEGRATION:\n");
-    print("Number of steps taken by SUNDIALS: %ld\n", m->nsteps);
-    print("Number of calls to the user's f function: %ld\n", m->nfevals);
-    print("Number of calls made to the linear solver setup function: %ld\n", m->nlinsetups);
-    print("Number of error test failures: %ld\n", m->netfails);
-    print("Method order used on the last internal step: %d\n", m->qlast);
-    print("Method order to be used on the next internal step: %d\n", m->qcur);
-    print("Actual value of initial step size: %g\n", m->hinused);
-    print("Step size taken on the last internal step: %g\n", m->hlast);
-    print("Step size to be attempted on the next internal step: %g\n", m->hcur);
-    print("Current internal time reached: %g\n", m->tcur);
-    print("Number of nonlinear iterations performed: %ld\n", m->nniters);
-    print("Number of nonlinear convergence failures: %ld\n", m->nncfails);
-    if (nrx_>0) {
-      print("BACKWARD INTEGRATION:\n");
-      print("Number of steps taken by SUNDIALS: %ld\n", m->nstepsB);
-      print("Number of calls to the user's f function: %ld\n", m->nfevalsB);
-      print("Number of calls made to the linear solver setup function: %ld\n", m->nlinsetupsB);
-      print("Number of error test failures: %ld\n", m->netfailsB);
-      print("Method order used on the last internal step: %d\n" , m->qlastB);
-      print("Method order to be used on the next internal step: %d\n", m->qcurB);
-      print("Actual value of initial step size: %g\n", m->hinusedB);
-      print("Step size taken on the last internal step: %g\n", m->hlastB);
-      print("Step size to be attempted on the next internal step: %g\n", m->hcurB);
-      print("Current internal time reached: %g\n", m->tcurB);
-      print("Number of nonlinear iterations performed: %ld\n", m->nnitersB);
-      print("Number of nonlinear convergence failures: %ld\n", m->nncfailsB);
+  // Create problem functions, backward problem
+  if (nrx_ > 0) {
+    create_function(nonaug_oracle_, "daeB", {"rx", "rz", "rp", "x", "z", "p", "u", "t"},
+      {"rode", "ralg"});
+    create_function(nonaug_oracle_, "quadB", {"rx", "rz", "rp", "x", "z", "p", "u", "t"},
+      {"rquad", "uquad"});
+    if (ns_ > 0) {
+      create_forward("daeB", ns_);
+      create_forward("quadB", ns_);
     }
-    print("\n");
+  }
+}
+
+void SundialsInterface::set_work(void* mem, const double**& arg, double**& res,
+    casadi_int*& iw, double*& w) const {
+  auto m = static_cast<SundialsMemory*>(mem);
+
+  // Set work in base classes
+  Integrator::set_work(mem, arg, res, iw, w);
+
+  // Work vectors
+  m->p = w; w += np_;
+  m->u = w; w += nu_;
+  m->rp = w; w += nrp_;
+  m->v1 = w; w += std::max(nx_+nz_, nrx_+nrz_);
+  m->v2 = w; w += std::max(nx_+nz_, nrx_+nrz_);
+  m->jacF = w; w += linsolF_.sparsity().nnz();
+  if (nrx_>0) {
+    m->jacB = w; w += linsolB_.sparsity().nnz();
+  }
+}
+
+int SundialsInterface::init_mem(void* mem) const {
+  if (Integrator::init_mem(mem)) return 1;
+  auto m = static_cast<SundialsMemory*>(mem);
+
+  // Allocate n-vectors
+  m->xz = N_VNew_Serial(nx_+nz_);
+  m->q = N_VNew_Serial(nq_);
+  m->rxz = N_VNew_Serial(nrx_+nrz_);
+  m->ruq = N_VNew_Serial(nrq_ + nuq_);
+
+  m->mem_linsolF = linsolF_.checkout();
+  if (!linsolB_.is_null()) m->mem_linsolB = linsolB_.checkout();
+
+  return 0;
+}
+
+void SundialsInterface::reset(IntegratorMemory* mem, const double* x,
+    const double* z, const double* p) const {
+  auto m = static_cast<SundialsMemory*>(mem);
+
+  // Set parameters
+  casadi_copy(p, np_, m->p);
+
+  // Set the state
+  casadi_copy(x, nx_, NV_DATA_S(m->xz));
+  casadi_copy(z, nz_, NV_DATA_S(m->xz) + nx_);
+
+  // Reset summation states
+  N_VConst(0., m->q);
+}
+
+void SundialsInterface::resetB(IntegratorMemory* mem,
+    const double* rx, const double* rz, const double* rp) const {
+  auto m = static_cast<SundialsMemory*>(mem);
+
+  // Set parameters
+  casadi_copy(rp, nrp_, m->rp);
+
+  // Set the backward state
+  casadi_copy(rx, nrx_, NV_DATA_S(m->rxz));
+  casadi_copy(rz, nrz_, NV_DATA_S(m->rxz) + nrx_);
+
+  // Reset summation states
+  N_VConst(0., m->ruq);
+}
+
+void SundialsInterface::impulseB(IntegratorMemory* mem,
+    const double* rx, const double* rz, const double* rp) const {
+  auto m = static_cast<SundialsMemory*>(mem);
+
+  // Add impulse to backward parameters
+  casadi_axpy(nrp_, 1., rp, m->rp);
+
+  // Add impulse to state
+  casadi_axpy(nrx_, 1., rx, NV_DATA_S(m->rxz));
+  casadi_axpy(nrz_, 1., rz, NV_DATA_S(m->rxz) + nrx_);
+}
+
+SundialsMemory::SundialsMemory() {
+  this->xz  = nullptr;
+  this->q = nullptr;
+  this->rxz = nullptr;
+  this->ruq = nullptr;
+  this->first_callB = true;
+  this->mem_linsolF = -1;
+  this->mem_linsolB = -1;
+}
+
+SundialsMemory::~SundialsMemory() {
+  if (this->xz) N_VDestroy_Serial(this->xz);
+  if (this->q) N_VDestroy_Serial(this->q);
+  if (this->rxz) N_VDestroy_Serial(this->rxz);
+  if (this->ruq) N_VDestroy_Serial(this->ruq);
+}
+
+Dict SundialsInterface::get_stats(void* mem) const {
+  Dict stats = Integrator::get_stats(mem);
+  auto m = static_cast<SundialsMemory*>(mem);
+
+  // Counters, forward problem
+  stats["nsteps"] = static_cast<casadi_int>(m->nsteps);
+  stats["nfevals"] = static_cast<casadi_int>(m->nfevals);
+  stats["nlinsetups"] = static_cast<casadi_int>(m->nlinsetups);
+  stats["netfails"] = static_cast<casadi_int>(m->netfails);
+  stats["qlast"] = m->qlast;
+  stats["qcur"] = m->qcur;
+  stats["hinused"] = m->hinused;
+  stats["hlast"] = m->hlast;
+  stats["hcur"] = m->hcur;
+  stats["tcur"] = m->tcur;
+  stats["nniters"] = static_cast<casadi_int>(m->nniters);
+  stats["nncfails"] = static_cast<casadi_int>(m->nncfails);
+
+  // Counters, backward problem
+  stats["nstepsB"] = static_cast<casadi_int>(m->nstepsB);
+  stats["nfevalsB"] = static_cast<casadi_int>(m->nfevalsB);
+  stats["nlinsetupsB"] = static_cast<casadi_int>(m->nlinsetupsB);
+  stats["netfailsB"] = static_cast<casadi_int>(m->netfailsB);
+  stats["qlastB"] = m->qlastB;
+  stats["qcurB"] = m->qcurB;
+  stats["hinusedB"] = m->hinusedB;
+  stats["hlastB"] = m->hlastB;
+  stats["hcurB"] = m->hcurB;
+  stats["tcurB"] = m->tcurB;
+  stats["nnitersB"] = static_cast<casadi_int>(m->nnitersB);
+  stats["nncfailsB"] = static_cast<casadi_int>(m->nncfailsB);
+  return stats;
+}
+
+void SundialsInterface::print_stats(IntegratorMemory* mem) const {
+  auto m = to_mem(mem);
+  print("FORWARD INTEGRATION:\n");
+  print("Number of steps taken by SUNDIALS: %ld\n", m->nsteps);
+  print("Number of calls to the user's f function: %ld\n", m->nfevals);
+  print("Number of calls made to the linear solver setup function: %ld\n", m->nlinsetups);
+  print("Number of error test failures: %ld\n", m->netfails);
+  print("Method order used on the last internal step: %d\n", m->qlast);
+  print("Method order to be used on the next internal step: %d\n", m->qcur);
+  print("Actual value of initial step size: %g\n", m->hinused);
+  print("Step size taken on the last internal step: %g\n", m->hlast);
+  print("Step size to be attempted on the next internal step: %g\n", m->hcur);
+  print("Current internal time reached: %g\n", m->tcur);
+  print("Number of nonlinear iterations performed: %ld\n", m->nniters);
+  print("Number of nonlinear convergence failures: %ld\n", m->nncfails);
+  if (nrx_>0) {
+    print("BACKWARD INTEGRATION:\n");
+    print("Number of steps taken by SUNDIALS: %ld\n", m->nstepsB);
+    print("Number of calls to the user's f function: %ld\n", m->nfevalsB);
+    print("Number of calls made to the linear solver setup function: %ld\n", m->nlinsetupsB);
+    print("Number of error test failures: %ld\n", m->netfailsB);
+    print("Method order used on the last internal step: %d\n" , m->qlastB);
+    print("Method order to be used on the next internal step: %d\n", m->qcurB);
+    print("Actual value of initial step size: %g\n", m->hinusedB);
+    print("Step size taken on the last internal step: %g\n", m->hlastB);
+    print("Step size to be attempted on the next internal step: %g\n", m->hcurB);
+    print("Current internal time reached: %g\n", m->tcurB);
+    print("Number of nonlinear iterations performed: %ld\n", m->nnitersB);
+    print("Number of nonlinear convergence failures: %ld\n", m->nncfailsB);
+  }
+  print("\n");
+}
+
+SundialsInterface::SundialsInterface(DeserializingStream& s) : Integrator(s) {
+  int version = s.version("SundialsInterface", 1, 2);
+  s.unpack("SundialsInterface::abstol", abstol_);
+  s.unpack("SundialsInterface::reltol", reltol_);
+  s.unpack("SundialsInterface::max_num_steps", max_num_steps_);
+  s.unpack("SundialsInterface::stop_at_end", stop_at_end_);
+  s.unpack("SundialsInterface::quad_err_con", quad_err_con_);
+  s.unpack("SundialsInterface::steps_per_checkpoint", steps_per_checkpoint_);
+  s.unpack("SundialsInterface::disable_internal_warnings", disable_internal_warnings_);
+  s.unpack("SundialsInterface::max_multistep_order", max_multistep_order_);
+  s.unpack("SundialsInterface::linear_solver", linear_solver_);
+  s.unpack("SundialsInterface::linear_solver_options", linear_solver_options_);
+
+  s.unpack("SundialsInterface::max_krylov", max_krylov_);
+  s.unpack("SundialsInterface::use_precon", use_precon_);
+  s.unpack("SundialsInterface::second_order_correction", second_order_correction_);
+
+  s.unpack("SundialsInterface::step0", step0_);
+  if (version>=2) {
+    s.unpack("SundialsInterface::max_step_size", max_step_size_);
+  } else {
+    max_step_size_ = 0;
   }
 
-  SundialsInterface::SundialsInterface(DeserializingStream& s) : Integrator(s) {
-    int version = s.version("SundialsInterface", 1, 2);
-    s.unpack("SundialsInterface::abstol", abstol_);
-    s.unpack("SundialsInterface::reltol", reltol_);
-    s.unpack("SundialsInterface::max_num_steps", max_num_steps_);
-    s.unpack("SundialsInterface::stop_at_end", stop_at_end_);
-    s.unpack("SundialsInterface::quad_err_con", quad_err_con_);
-    s.unpack("SundialsInterface::steps_per_checkpoint", steps_per_checkpoint_);
-    s.unpack("SundialsInterface::disable_internal_warnings", disable_internal_warnings_);
-    s.unpack("SundialsInterface::max_multistep_order", max_multistep_order_);
-    s.unpack("SundialsInterface::linear_solver", linear_solver_);
-    s.unpack("SundialsInterface::linear_solver_options", linear_solver_options_);
+  s.unpack("SundialsInterface::nonlin_conv_coeff", nonlin_conv_coeff_);
+  s.unpack("SundialsInterface::max_order", max_order_);
 
-    s.unpack("SundialsInterface::max_krylov", max_krylov_);
-    s.unpack("SundialsInterface::use_precon", use_precon_);
-    s.unpack("SundialsInterface::second_order_correction", second_order_correction_);
+  s.unpack("SundialsInterface::nonaug_oracle", nonaug_oracle_);
+  s.unpack("SundialsInterface::linsolF", linsolF_);
+  s.unpack("SundialsInterface::linsolB", linsolB_);
 
-    s.unpack("SundialsInterface::step0", step0_);
-    if (version>=2) {
-      s.unpack("SundialsInterface::max_step_size", max_step_size_);
-    } else {
-      max_step_size_ = 0;
-    }
+  int newton_scheme;
+  s.unpack("SundialsInterface::newton_scheme", newton_scheme);
+  newton_scheme_ = static_cast<NewtonScheme>(newton_scheme);
 
-    s.unpack("SundialsInterface::nonlin_conv_coeff", nonlin_conv_coeff_);
-    s.unpack("SundialsInterface::max_order", max_order_);
+  int interp;
+  s.unpack("SundialsInterface::interp", interp);
+  interp_ = static_cast<InterpType>(interp);
 
-    s.unpack("SundialsInterface::nonaug_oracle", nonaug_oracle_);
-    s.unpack("SundialsInterface::linsolF", linsolF_);
-    s.unpack("SundialsInterface::linsolB", linsolB_);
+}
 
-    int newton_scheme;
-    s.unpack("SundialsInterface::newton_scheme", newton_scheme);
-    newton_scheme_ = static_cast<NewtonScheme>(newton_scheme);
+void SundialsInterface::serialize_body(SerializingStream &s) const {
+  Integrator::serialize_body(s);
+  s.version("SundialsInterface", 2);
+  s.pack("SundialsInterface::abstol", abstol_);
+  s.pack("SundialsInterface::reltol", reltol_);
+  s.pack("SundialsInterface::max_num_steps", max_num_steps_);
+  s.pack("SundialsInterface::stop_at_end", stop_at_end_);
+  s.pack("SundialsInterface::quad_err_con", quad_err_con_);
+  s.pack("SundialsInterface::steps_per_checkpoint", steps_per_checkpoint_);
+  s.pack("SundialsInterface::disable_internal_warnings", disable_internal_warnings_);
+  s.pack("SundialsInterface::max_multistep_order", max_multistep_order_);
 
-    int interp;
-    s.unpack("SundialsInterface::interp", interp);
-    interp_ = static_cast<InterpType>(interp);
+  s.pack("SundialsInterface::linear_solver", linear_solver_);
+  s.pack("SundialsInterface::linear_solver_options", linear_solver_options_);
+  s.pack("SundialsInterface::max_krylov", max_krylov_);
+  s.pack("SundialsInterface::use_precon", use_precon_);
+  s.pack("SundialsInterface::second_order_correction", second_order_correction_);
 
+  s.pack("SundialsInterface::step0", step0_);
+  s.pack("SundialsInterface::max_step_size", max_step_size_);
+
+  s.pack("SundialsInterface::nonlin_conv_coeff", nonlin_conv_coeff_);
+  s.pack("SundialsInterface::max_order", max_order_);
+
+  s.pack("SundialsInterface::nonaug_oracle", nonaug_oracle_);
+  s.pack("SundialsInterface::linsolF", linsolF_);
+  s.pack("SundialsInterface::linsolB", linsolB_);
+
+  s.pack("SundialsInterface::newton_scheme", static_cast<int>(newton_scheme_));
+  s.pack("SundialsInterface::interp", static_cast<int>(interp_));
+}
+
+void SundialsInterface::calc_daeF(SundialsMemory* m, double t, const double* x, const double* z,
+    double* ode, double* alg) const {
+  // Evaluate nondifferentiated
+  m->arg[DAEF_X] = x;  // x
+  m->arg[DAEF_Z] = z;  // x
+  m->arg[DAEF_P] = m->p;  // p
+  m->arg[DAEF_U] = m->u;  // u
+  m->arg[DAEF_T] = &t;  // t
+  m->res[DAEF_ODE] = ode;  // ode
+  m->res[DAEF_ALG] = alg;  // alg
+  calc_function(m, "daeF");
+  // Evaluate sensitivities
+  if (ns_ > 0) {
+    m->arg[DAEF_NUM_IN + DAEF_ODE] = ode;  // out:ode
+    m->arg[DAEF_NUM_IN + DAEF_ALG] = alg;  // out:alg
+    m->arg[DAEF_NUM_IN + DAEF_NUM_OUT + DAEF_X] = x + nx1_;  // fwd:x
+    m->arg[DAEF_NUM_IN + DAEF_NUM_OUT + DAEF_Z] = z ? z + nz1_ : 0;  // fwd:z
+    m->arg[DAEF_NUM_IN + DAEF_NUM_OUT + DAEF_P] = m->p + np1_;  // fwd:p
+    m->arg[DAEF_NUM_IN + DAEF_NUM_OUT + DAEF_U] = m->u + nu1_;  // fwd:u
+    m->arg[DAEF_NUM_IN + DAEF_NUM_OUT + DAEF_T] = 0;  // fwd:t
+    m->res[DAEF_ODE] = ode ? ode + nx1_ : 0;  // fwd:ode
+    m->res[DAEF_ALG] = alg ? alg + nz1_ : 0;  // fwd:alg
+    calc_forward(m, "daeF", ns_);
   }
+}
 
-  void SundialsInterface::serialize_body(SerializingStream &s) const {
-    Integrator::serialize_body(s);
-    s.version("SundialsInterface", 2);
-    s.pack("SundialsInterface::abstol", abstol_);
-    s.pack("SundialsInterface::reltol", reltol_);
-    s.pack("SundialsInterface::max_num_steps", max_num_steps_);
-    s.pack("SundialsInterface::stop_at_end", stop_at_end_);
-    s.pack("SundialsInterface::quad_err_con", quad_err_con_);
-    s.pack("SundialsInterface::steps_per_checkpoint", steps_per_checkpoint_);
-    s.pack("SundialsInterface::disable_internal_warnings", disable_internal_warnings_);
-    s.pack("SundialsInterface::max_multistep_order", max_multistep_order_);
-
-    s.pack("SundialsInterface::linear_solver", linear_solver_);
-    s.pack("SundialsInterface::linear_solver_options", linear_solver_options_);
-    s.pack("SundialsInterface::max_krylov", max_krylov_);
-    s.pack("SundialsInterface::use_precon", use_precon_);
-    s.pack("SundialsInterface::second_order_correction", second_order_correction_);
-
-    s.pack("SundialsInterface::step0", step0_);
-    s.pack("SundialsInterface::max_step_size", max_step_size_);
-
-    s.pack("SundialsInterface::nonlin_conv_coeff", nonlin_conv_coeff_);
-    s.pack("SundialsInterface::max_order", max_order_);
-
-    s.pack("SundialsInterface::nonaug_oracle", nonaug_oracle_);
-    s.pack("SundialsInterface::linsolF", linsolF_);
-    s.pack("SundialsInterface::linsolB", linsolB_);
-
-    s.pack("SundialsInterface::newton_scheme", static_cast<int>(newton_scheme_));
-    s.pack("SundialsInterface::interp", static_cast<int>(interp_));
+void SundialsInterface::calc_daeB(SundialsMemory* m, double t, const double* x, const double* z,
+    const double* rx, const double* rz, double* rode, double* ralg) const {
+  // Evaluate nondifferentiated
+  m->arg[DAEB_RX] = rx;  // rx
+  m->arg[DAEB_RZ] = rz;  // rz
+  m->arg[DAEB_RP] = m->rp;  // rp
+  m->arg[DAEB_X] = x;  // x
+  m->arg[DAEB_Z] = z;  // z
+  m->arg[DAEB_P] = m->p;  // p
+  m->arg[DAEB_U] = m->u;  // u
+  m->arg[DAEB_T] = &t;  // t
+  m->res[DAEB_RODE] = rode;  // rode
+  m->res[DAEB_RALG] = ralg;  // ralg
+  calc_function(m, "daeB");
+  // Evaluate sensitivities
+  if (ns_ > 0) {
+    m->arg[DAEB_NUM_IN + DAEB_RODE] = rode;  // out:rode
+    m->arg[DAEB_NUM_IN + DAEB_RALG] = ralg;  // out:ralg
+    m->arg[DAEB_NUM_IN + DAEB_NUM_OUT + DAEB_RX] = rx ? rx + nrx1_ : 0;  // fwd:rx
+    m->arg[DAEB_NUM_IN + DAEB_NUM_OUT + DAEB_RZ] = rz ? rz + nrz1_ : 0;  // fwd:rz
+    m->arg[DAEB_NUM_IN + DAEB_NUM_OUT + DAEB_RP] = m->rp + nrp1_;  // fwd:rp
+    m->arg[DAEB_NUM_IN + DAEB_NUM_OUT + DAEB_X] = x ? x + nx1_ : x;  // fwd:x
+    m->arg[DAEB_NUM_IN + DAEB_NUM_OUT + DAEB_Z] = z ? z + nz1_ : z;  // fwd:z
+    m->arg[DAEB_NUM_IN + DAEB_NUM_OUT + DAEB_P] = m->p + np1_;  // fwd:p
+    m->arg[DAEB_NUM_IN + DAEB_NUM_OUT + DAEB_U] = m->u + nu1_;  // fwd:u
+    m->arg[DAEB_NUM_IN + DAEB_NUM_OUT + DAEB_T] = 0;  // fwd:t
+    m->res[DAEB_RODE] = rode ? rode + nrx1_ : 0;  // fwd:rode
+    m->res[DAEB_RALG] = ralg ? ralg + nrz1_ : 0;  // fwd:ralg
+    calc_forward(m, "daeB", ns_);
   }
+}
+
+void SundialsInterface::calc_quadF(SundialsMemory* m, double t, const double* x, const double* z,
+    double* quad) const {
+  m->arg[DAEF_X] = x;  // x
+  m->arg[DAEF_Z] = z;  // z
+  m->arg[DAEF_P] = m->p;  // p
+  m->arg[DAEF_U] = m->u;  // u
+  m->arg[DAEF_T] = &t;  // t
+  m->res[QUADF_QUAD] = quad;  // quad
+  calc_function(m, "quadF");
+  // Evaluate sensitivities
+  if (ns_ > 0) {
+    m->arg[DAEF_NUM_IN + QUADF_QUAD] = quad;  // out:quad
+    m->arg[DAEF_NUM_IN + QUADF_NUM_OUT + DAEF_X] = x + nx1_;  // fwd:x
+    m->arg[DAEF_NUM_IN + QUADF_NUM_OUT + DAEF_X] = z ? z + nz1_ : 0;  // fwd:z
+    m->arg[DAEF_NUM_IN + QUADF_NUM_OUT + DAEF_P] = m->p + np1_;  // fwd:p
+    m->arg[DAEF_NUM_IN + QUADF_NUM_OUT + DAEF_U] = m->u + nu1_;  // fwd:u
+    m->arg[DAEF_NUM_IN + QUADF_NUM_OUT + DAEF_T] = 0;  // fwd:t
+    m->res[QUADF_QUAD] = quad ? quad + nq1_ : 0;  // fwd:quad
+    calc_forward(m, "quadF", ns_);
+  }
+}
+
+void SundialsInterface::calc_quadB(SundialsMemory* m, double t, const double* x, const double* z,
+    const double* rx, const double* rz, double* rquad, double* uquad) const {
+  // Evaluate nondifferentiated
+  m->arg[DAEB_RX] = rx;  // rx
+  m->arg[DAEB_RZ] = rz;  // rz
+  m->arg[DAEB_RP] = m->rp;  // rp
+  m->arg[DAEB_X] = x;  // x
+  m->arg[DAEB_Z] = z;  // z
+  m->arg[DAEB_P] = m->p;  // p
+  m->arg[DAEB_U] = m->u;  // u
+  m->arg[DAEB_T] = &t;  // t
+  m->res[QUADB_RQUAD] = rquad;  // rquad
+  m->res[QUADB_UQUAD] = uquad;  // uquad
+  calc_function(m, "quadB");
+  // Evaluate sensitivities
+  if (ns_ > 0) {
+    m->arg[DAEB_NUM_IN + QUADB_RQUAD] = rquad;  // out:rquad
+    m->arg[DAEB_NUM_IN + QUADB_UQUAD] = uquad;  // out:uquad
+    m->arg[DAEB_NUM_IN + QUADB_NUM_OUT + DAEB_RX] = rx ? rx + nrx1_ : 0;  // fwd:rx
+    m->arg[DAEB_NUM_IN + QUADB_NUM_OUT + DAEB_RZ] = rz ? rz + nrz1_ : 0;  // fwd:rz
+    m->arg[DAEB_NUM_IN + QUADB_NUM_OUT + DAEB_RP] = m->rp + nrp1_;  // fwd:rp
+    m->arg[DAEB_NUM_IN + QUADB_NUM_OUT + DAEB_X] = x ? x + nx1_ : 0;  // fwd:x
+    m->arg[DAEB_NUM_IN + QUADB_NUM_OUT + DAEB_Z] = z ? z + nz1_ : 0;  // fwd:z
+    m->arg[DAEB_NUM_IN + QUADB_NUM_OUT + DAEB_P] = m->p + np1_;  // fwd:p
+    m->arg[DAEB_NUM_IN + QUADB_NUM_OUT + DAEB_U] = m->u + nu1_;  // fwd:u
+    m->arg[DAEB_NUM_IN + QUADB_NUM_OUT + DAEB_T] = 0;  // fwd:t
+    m->res[QUADB_RQUAD] = rquad + nrq1_;  // fwd:rquad
+    m->res[QUADB_UQUAD] = uquad + nuq1_;  // fwd:uquad
+    calc_forward(m, "quadB", ns_);
+  }
+}
 
 } // namespace casadi

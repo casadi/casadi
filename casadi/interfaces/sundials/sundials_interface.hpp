@@ -123,6 +123,22 @@ namespace casadi {
     // Get system Jacobian, backward problem
     virtual Function get_jacB(Sparsity* sp) const = 0;
 
+    // ODE right-hand-side, forward problem
+    void calc_daeF(SundialsMemory* m, double t, const double* x, const double* z,
+      double* ode, double* alg) const;
+
+    // ODE right-hand-side, forward problem
+    void calc_daeB(SundialsMemory* m, double t, const double* x, const double* z,
+      const double* rx, const double* rz, double* rode, double* ralg) const;
+
+    // Quadrature right-hand-side, forward problem
+    void calc_quadF(SundialsMemory* m, double t, const double* x, const double* z,
+      double* quad) const;
+
+    // Quadrature right-hand-side, backward problem
+    void calc_quadB(SundialsMemory* m, double t, const double* x, const double* z,
+      const double* rx, const double* rz, double* rquad, double* uquad) const;
+
     /// Get all statistics
     Dict get_stats(void* mem) const override;
 
@@ -147,6 +163,16 @@ namespace casadi {
       casadi_assert_dev(m);
       return m;
     }
+
+    ///@{
+    /** \brief IO conventions for continuous time dynamics */
+    enum DaeFIn { DAEF_X, DAEF_Z, DAEF_P, DAEF_U, DAEF_T, DAEF_NUM_IN};
+    enum DaeFOut { DAEF_ODE, DAEF_ALG, DAEF_NUM_OUT};
+    enum QuadFOut { QUADF_QUAD, QUADF_NUM_OUT};
+    enum DaeBIn { DAEB_RX, DAEB_RZ, DAEB_RP, DAEB_X, DAEB_Z, DAEB_P, DAEB_U, DAEB_T, DAEB_NUM_IN};
+    enum DAEBOut { DAEB_RODE, DAEB_RALG, DAEB_NUM_OUT};
+    enum QuadBOut { QUADB_RQUAD, QUADB_UQUAD, QUADB_NUM_OUT};
+    ///@}
 
     ///@{
     /// Options

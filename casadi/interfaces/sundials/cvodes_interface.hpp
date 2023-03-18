@@ -157,22 +157,6 @@ namespace casadi {
     // Get system Jacobian, backward problem
     Function get_jacB(Sparsity* sp) const override;
 
-    // ODE right-hand-side, forward problem
-    void calc_daeF(CvodesMemory* m, double t, const double* x, const double* z,
-      double* ode, double* alg) const;
-
-    // ODE right-hand-side, forward problem
-    void calc_daeB(CvodesMemory* m, double t, const double* x, const double* z,
-      const double* rx, const double* rz, double* rode, double* ralg) const;
-
-    // Quadrature right-hand-side, forward problem
-    void calc_quadF(CvodesMemory* m, double t, const double* x, const double* z,
-      double* quad) const;
-
-    // Quadrature right-hand-side, backward problem
-    void calc_quadB(CvodesMemory* m, double t, const double* x, const double* z,
-      const double* rx, const double* rz, double* rquad, double* uquad) const;
-
     // Jacobian of ODE right-hand-side function, forward problem
     void calc_jacF(CvodesMemory* m, double t, const double* x, const double* ode,
       double* jac_ode_x) const;
@@ -235,12 +219,6 @@ namespace casadi {
 
     ///@{
     /** \brief IO conventions for continuous time dynamics */
-    enum DaeFIn { DAEF_X, DAEF_Z, DAEF_P, DAEF_U, DAEF_T, DAEF_NUM_IN};
-    enum DaeFOut { DAEF_ODE, DAEF_ALG, DAEF_NUM_OUT};
-    enum QuadFOut { QUADF_QUAD, QUADF_NUM_OUT};
-    enum DaeBIn { DAEB_RX, DAEB_RZ, DAEB_RP, DAEB_X, DAEB_Z, DAEB_P, DAEB_U, DAEB_T, DAEB_NUM_IN};
-    enum DAEBOut { DAEB_RODE, DAEB_RALG, DAEB_NUM_OUT};
-    enum QuadBOut { QUADB_RQUAD, QUADB_UQUAD, QUADB_NUM_OUT};
     enum JtimesFIn { JTIMESF_T, JTIMESF_X, JTIMESF_P, JTIMESF_U, JTIMESF_FWD_X, JTIMESF_NUM_IN};
     enum JtimesFOut { JTIMESF_FWD_ODE, JTIMESF_NUM_OUT};
     enum JtimesBIn { JTIMESB_T, JTIMESB_X, JTIMESB_P, JTIMESB_U, JTIMESB_RX, JTIMESB_RP,
