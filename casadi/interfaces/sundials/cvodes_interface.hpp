@@ -157,12 +157,26 @@ namespace casadi {
     // Get system Jacobian, backward problem
     Function get_jacB(Sparsity* sp) const override;
 
+    // ODE right-hand-side, forward problem
+    void calc_odeF(CvodesMemory* m, double t, const double* x, double* ode) const;
+
+    // ODE right-hand-side, forward problem
+    void calc_odeB(CvodesMemory* m, double t, const double* x, const double* rx,
+      double* rode) const;
+
+    // Quadrature right-hand-side, forward problem
+    void calc_quadF(CvodesMemory* m, double t, const double* x, double* quad) const;
+
+    // Quadrature right-hand-side, backward problem
+    void calc_quadB(CvodesMemory* m, double t, const double* x, const double* rx,
+      double* rquad, double* uquad) const;
+
     // Jacobian of ODE-times-vector function, forward problem
-    void calc_fwd_odeF(CvodesMemory* m, double t, const double* x, const double* ode,
+    void calc_jtimesF(CvodesMemory* m, double t, const double* x, const double* ode,
       const double* fwd_x, double* fwd_ode) const;
 
     // Jacobian of ODE-times-vector function, backward problem
-    void calc_fwd_odeB(CvodesMemory* m, double t, const double* x, const double* rx,
+    void calc_jtimesB(CvodesMemory* m, double t, const double* x, const double* rx,
         const double* rode, const double* fwd_rx, double* fwd_rode) const;
 
     /// A documentation string
