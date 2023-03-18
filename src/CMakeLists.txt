@@ -201,8 +201,15 @@ if (TARGET lbfgspp)
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/export>)
 endif()
 
+set(ALPAQA_HAVE_FORTRAN Off)
+include(CheckLanguage)
+check_language(Fortran)
+if (CMAKE_Fortran_COMPILER)
+    set(ALPAQA_HAVE_FORTRAN On)
+    enable_language(Fortran)
+endif()
 option(ALPAQA_WITH_LBFGSB
-    "Include the L-BFGS-B solver" On)
+    "Include the L-BFGS-B solver" ${ALPAQA_HAVE_FORTRAN})
 
 if (ALPAQA_WITH_LBFGSB)
     message(STATUS "Compiling L-BFGS-B solver adapter")
