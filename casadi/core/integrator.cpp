@@ -499,34 +499,32 @@ void Integrator::init(const Dict& opts) {
   casadi_assert(rq().is_dense(), "Sparse DAE not supported");
   casadi_assert(uq().is_dense(), "Sparse DAE not supported");
 
-  // Get dimensions (excluding sensitivity equations)
-  nx1_ = x().size1();
-  nz1_ = z().size1();
-  nq1_ = q().size1();
-  np1_  = p().size1();
-  nu1_  = u().size1();
-  nrx1_ = rx().size1();
-  nrz1_ = rz().size1();
-  nrp1_ = rp().size1();
-  nrq1_ = rq().size1();
-  nuq1_ = uq().size1();
-
   // Get dimensions (including sensitivity equations)
-  nx_ = x().nnz();
-  nz_ = z().nnz();
-  nq_ = q().nnz();
-  np_  = p().nnz();
-  nu_  = u().nnz();
-  nrx_ = rx().nnz();
-  nrz_ = rz().nnz();
-  nrp_ = rp().nnz();
-  nrq_ = rq().nnz();
-  nuq_ = uq().nnz();
+  nx_ = x().numel();
+  nz_ = z().numel();
+  nq_ = q().numel();
+  np_  = p().numel();
+  nu_  = u().numel();
+  nrx_ = rx().numel();
+  nrz_ = rz().numel();
+  nrp_ = rp().numel();
+  nrq_ = rq().numel();
+  nuq_ = uq().numel();
+
+  // Get dimensions (excluding sensitivity equations)
+  nx1_ = nx_ / (1 + nfwd_);
+  nz1_ = nz_ / (1 + nfwd_);
+  nq1_ = nq_ / (1 + nfwd_);
+  np1_  = np_ / (1 + nfwd_);
+  nu1_  = nu_ / (1 + nfwd_);
+  nrx1_ = nrx_ / (1 + nfwd_);
+  nrz1_ = nrz_ / (1 + nfwd_);
+  nrp1_ = nrp_ / (1 + nfwd_);
+  nrq1_ = nrq_ / (1 + nfwd_);
+  nuq1_ = nuq_ / (1 + nfwd_);
 
   // Number of sensitivities
-  ns_ = x().size2() - 1;
-  casadi_assert(ns_ == nfwd_,
-    "Inconsistent number of sensitivities: " + str(ns_) + " != " + str(nfwd_));
+  ns_ = nfwd_;
 
   // Get the sparsities of the forward and reverse DAE
   sp_jac_dae_ = sp_jac_dae();
