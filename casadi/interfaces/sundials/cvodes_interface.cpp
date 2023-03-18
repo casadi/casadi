@@ -105,10 +105,12 @@ void CvodesInterface::init(const Dict& opts) {
 
   // Create problem functions, backward problem
   if (nrx_ > 0) {
-    create_function(nonaug_oracle_, "odeB", {"rx", "rp", "x", "p", "u", "t"}, {"rode"});
-    create_function(nonaug_oracle_, "quadB", {"rx", "rp", "x", "p", "u", "t"}, {"rquad", "uquad"});
+    create_function(nonaug_oracle_, "daeB", {"rx", "rz", "rp", "x", "z", "p", "u", "t"},
+      {"rode", "ralg"});
+    create_function(nonaug_oracle_, "quadB", {"rx", "rz", "rp", "x", "z", "p", "u", "t"},
+      {"rquad", "uquad"});
     if (ns_ > 0) {
-      create_forward("odeB", ns_);
+      create_forward("daeB", ns_);
       create_forward("quadB", ns_);
     }
   }
@@ -456,7 +458,7 @@ int CvodesInterface::rhsB(double t, N_Vector x, N_Vector rx, N_Vector rxdot, voi
     casadi_assert_dev(user_data);
     auto m = to_mem(user_data);
     auto& s = m->self;
-    s.calc_odeB(m, t, NV_DATA_S(x), NV_DATA_S(rx), NV_DATA_S(rxdot));
+    s.calc_daeB(m, t, NV_DATA_S(x), nullptr, NV_DATA_S(rx), nullptr, NV_DATA_S(rxdot), nullptr);
     // Negate (note definition of g)
     casadi_scal(s.nrx1_ * (1 + s.ns_), -1., NV_DATA_S(rxdot));
     return 0;
@@ -473,7 +475,7 @@ int CvodesInterface::rhsQB(double t, N_Vector x, N_Vector rx, N_Vector ruqdot, v
     casadi_assert_dev(user_data);
     auto m = to_mem(user_data);
     auto& s = m->self;
-    s.calc_quadB(m, t, NV_DATA_S(x), NV_DATA_S(rx),
+    s.calc_quadB(m, t, NV_DATA_S(x), nullptr, NV_DATA_S(rx), nullptr,
       NV_DATA_S(ruqdot), NV_DATA_S(ruqdot) + s.nrq1_ *  (1 + s.ns_));
 
     // Negate (note definition of g)
@@ -932,28 +934,35 @@ void CvodesInterface::calc_daeF(CvodesMemory* m, double t, const double* x, cons
   }
 }
 
-void CvodesInterface::calc_odeB(CvodesMemory* m, double t, const double* x,
-    const double* rx, double* rode) const {
+void CvodesInterface::calc_daeB(CvodesMemory* m, double t, const double* x, const double* z,
+    const double* rx, const double* rz, double* rode, double* ralg) const {
   // Evaluate nondifferentiated
-  m->arg[ODEB_RX] = rx;  // rx
-  m->arg[ODEB_RP] = m->rp;  // rp
-  m->arg[ODEB_X] = x;  // x
-  m->arg[ODEB_P] = m->p;  // p
-  m->arg[ODEB_U] = m->u;  // u
-  m->arg[ODEB_T] = &t;  // t
-  m->res[ODEB_RODE] = rode;  // rode
-  calc_function(m, "odeB");
+  m->arg[DAEB_RX] = rx;  // rx
+  m->arg[DAEB_RZ] = rz;  // rz
+  m->arg[DAEB_RP] = m->rp;  // rp
+  m->arg[DAEB_X] = x;  // x
+  m->arg[DAEB_Z] = z;  // z
+  m->arg[DAEB_P] = m->p;  // p
+  m->arg[DAEB_U] = m->u;  // u
+  m->arg[DAEB_T] = &t;  // t
+  m->res[DAEB_RODE] = rode;  // rode
+  m->res[DAEB_RALG] = ralg;  // ralg
+  calc_function(m, "daeB");
   // Evaluate sensitivities
   if (ns_ > 0) {
-    m->arg[ODEB_NUM_IN + ODEB_RODE] = rode;  // out:rode
-    m->arg[ODEB_NUM_IN + ODEB_NUM_OUT + ODEB_RX] = m->arg[ODEB_RX] + nrx1_;  // fwd:rx
-    m->arg[ODEB_NUM_IN + ODEB_NUM_OUT + ODEB_RP] = m->arg[ODEB_RP] + nrp1_;  // fwd:rp
-    m->arg[ODEB_NUM_IN + ODEB_NUM_OUT + ODEB_X] = m->arg[ODEB_X] + nx1_;  // fwd:x
-    m->arg[ODEB_NUM_IN + ODEB_NUM_OUT + ODEB_P] = m->arg[ODEB_P] + np1_;  // fwd:p
-    m->arg[ODEB_NUM_IN + ODEB_NUM_OUT + ODEB_U] = m->arg[ODEB_U] + nu1_;  // fwd:u
-    m->arg[ODEB_NUM_IN + ODEB_NUM_OUT + ODEB_T] = 0;  // fwd:t
-    m->res[ODEB_RODE] = rode + nrx1_;  // fwd:rode
-    calc_forward(m, "odeB", ns_);
+    m->arg[DAEB_NUM_IN + DAEB_RODE] = rode;  // out:rode
+    m->arg[DAEB_NUM_IN + DAEB_RALG] = ralg;  // out:ralg
+    m->arg[DAEB_NUM_IN + DAEB_NUM_OUT + DAEB_RX] = rx ? rx + nrx1_ : 0;  // fwd:rx
+    m->arg[DAEB_NUM_IN + DAEB_NUM_OUT + DAEB_RZ] = rz ? rz + nrz1_ : 0;  // fwd:rz
+    m->arg[DAEB_NUM_IN + DAEB_NUM_OUT + DAEB_RP] = m->rp + nrp1_;  // fwd:rp
+    m->arg[DAEB_NUM_IN + DAEB_NUM_OUT + DAEB_X] = x ? x + nx1_ : x;  // fwd:x
+    m->arg[DAEB_NUM_IN + DAEB_NUM_OUT + DAEB_Z] = z ? z + nz1_ : z;  // fwd:z
+    m->arg[DAEB_NUM_IN + DAEB_NUM_OUT + DAEB_P] = m->p + np1_;  // fwd:p
+    m->arg[DAEB_NUM_IN + DAEB_NUM_OUT + DAEB_U] = m->u + nu1_;  // fwd:u
+    m->arg[DAEB_NUM_IN + DAEB_NUM_OUT + DAEB_T] = 0;  // fwd:t
+    m->res[DAEB_RODE] = rode ? rode + nrx1_ : 0;  // fwd:rode
+    m->res[DAEB_RALG] = ralg ? ralg + nrz1_ : 0;  // fwd:ralg
+    calc_forward(m, "daeB", ns_);
   }
 }
 
@@ -979,28 +988,32 @@ void CvodesInterface::calc_quadF(CvodesMemory* m, double t, const double* x, con
   }
 }
 
-void CvodesInterface::calc_quadB(CvodesMemory* m, double t, const double* x, const double* rx,
-    double* rquad, double* uquad) const {
+void CvodesInterface::calc_quadB(CvodesMemory* m, double t, const double* x, const double* z,
+    const double* rx, const double* rz, double* rquad, double* uquad) const {
   // Evaluate nondifferentiated
-  m->arg[ODEB_RX] = rx;  // rx
-  m->arg[ODEB_RP] = m->rp;  // rp
-  m->arg[ODEB_X] = x;  // x
-  m->arg[ODEB_P] = m->p;  // p
-  m->arg[ODEB_U] = m->u;  // u
-  m->arg[ODEB_T] = &t;  // t
+  m->arg[DAEB_RX] = rx;  // rx
+  m->arg[DAEB_RZ] = rz;  // rz
+  m->arg[DAEB_RP] = m->rp;  // rp
+  m->arg[DAEB_X] = x;  // x
+  m->arg[DAEB_Z] = z;  // z
+  m->arg[DAEB_P] = m->p;  // p
+  m->arg[DAEB_U] = m->u;  // u
+  m->arg[DAEB_T] = &t;  // t
   m->res[QUADB_RQUAD] = rquad;  // rquad
   m->res[QUADB_UQUAD] = uquad;  // uquad
   calc_function(m, "quadB");
   // Evaluate sensitivities
   if (ns_ > 0) {
-    m->arg[ODEB_NUM_IN + QUADB_RQUAD] = rquad;  // out:rquad
-    m->arg[ODEB_NUM_IN + QUADB_UQUAD] = uquad;  // out:uquad
-    m->arg[ODEB_NUM_IN + QUADB_NUM_OUT + ODEB_RX] = m->arg[ODEB_RX] + nrx1_;  // fwd:rx
-    m->arg[ODEB_NUM_IN + QUADB_NUM_OUT + ODEB_RP] = m->arg[ODEB_RP] + nrp1_;  // fwd:rp
-    m->arg[ODEB_NUM_IN + QUADB_NUM_OUT + ODEB_X] = m->arg[ODEB_X] + nx1_;  // fwd:x
-    m->arg[ODEB_NUM_IN + QUADB_NUM_OUT + ODEB_P] = m->arg[ODEB_P] + np1_;  // fwd:p
-    m->arg[ODEB_NUM_IN + QUADB_NUM_OUT + ODEB_U] = m->arg[ODEB_U] + nu1_;  // fwd:u
-    m->arg[ODEB_NUM_IN + QUADB_NUM_OUT + ODEB_T] = 0;  // fwd:t
+    m->arg[DAEB_NUM_IN + QUADB_RQUAD] = rquad;  // out:rquad
+    m->arg[DAEB_NUM_IN + QUADB_UQUAD] = uquad;  // out:uquad
+    m->arg[DAEB_NUM_IN + QUADB_NUM_OUT + DAEB_RX] = rx ? rx + nrx1_ : 0;  // fwd:rx
+    m->arg[DAEB_NUM_IN + QUADB_NUM_OUT + DAEB_RZ] = rz ? rz + nrz1_ : 0;  // fwd:rz
+    m->arg[DAEB_NUM_IN + QUADB_NUM_OUT + DAEB_RP] = m->rp + nrp1_;  // fwd:rp
+    m->arg[DAEB_NUM_IN + QUADB_NUM_OUT + DAEB_X] = x ? x + nx1_ : 0;  // fwd:x
+    m->arg[DAEB_NUM_IN + QUADB_NUM_OUT + DAEB_Z] = z ? z + nz1_ : 0;  // fwd:z
+    m->arg[DAEB_NUM_IN + QUADB_NUM_OUT + DAEB_P] = m->p + np1_;  // fwd:p
+    m->arg[DAEB_NUM_IN + QUADB_NUM_OUT + DAEB_U] = m->u + nu1_;  // fwd:u
+    m->arg[DAEB_NUM_IN + QUADB_NUM_OUT + DAEB_T] = 0;  // fwd:t
     m->res[QUADB_RQUAD] = rquad + nrq1_;  // fwd:rquad
     m->res[QUADB_UQUAD] = uquad + nuq1_;  // fwd:uquad
     calc_forward(m, "quadB", ns_);
