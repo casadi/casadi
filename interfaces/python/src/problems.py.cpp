@@ -3,6 +3,7 @@
 #include <pybind11/functional.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+#include <sstream>
 #include <variant>
 
 namespace py = pybind11;
@@ -440,6 +441,12 @@ void register_problems(py::module_ &m) {
     m.def(
         "problem_with_counters", [](py::object p) { return te_pwc(PyProblem{std::move(p)}); },
         "problem"_a);
+
+    m.def("provided_functions", [](const TEProblem &problem) {
+        std::ostringstream os;
+        alpaqa::print_provided_functions(os, problem);
+        return os.str();
+    });
 
     // Must be last
     te_problem.def(py::init([](py::object o) { return TEProblem::template make<PyProblem>(o); }));
