@@ -406,7 +406,7 @@ class NLPtests(casadiTestCase):
     for Solver, solver_options, features in solvers:
       if "sqpmethod"==Solver and "regularize" in str(solver_options): continue
       if "snopt"==Solver: continue
-      self.message(str(Solver))
+      self.message(str(Solver)+str(solver_options))
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
       solver_in = {}
       solver_in["lbx"]=[-10]*2
