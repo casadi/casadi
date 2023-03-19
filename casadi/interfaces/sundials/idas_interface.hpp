@@ -162,9 +162,9 @@ class CASADI_INTEGRATOR_IDAS_EXPORT IdasInterface : public SundialsInterface {
  protected:
 
   // Sundials callback functions
-  static int res(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, void *user_data);
-  static int resB(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB,
-    N_Vector rrB, void *user_data);
+  static int resF(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, void *user_data);
+  static int resB(double t, N_Vector xz, N_Vector xzdot, N_Vector rxz, N_Vector rxzdot,
+    N_Vector rr, void *user_data);
   static void ehfun(int error_code, const char *module, const char *function, char *msg,
     void *eh_data);
   static int jtimesF(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, N_Vector v,
@@ -172,22 +172,22 @@ class CASADI_INTEGRATOR_IDAS_EXPORT IdasInterface : public SundialsInterface {
   static int jtimesB(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB,
     N_Vector resvalB, N_Vector vB, N_Vector JvB, double cjB,
     void *user_data, N_Vector tmp1B, N_Vector tmp2B);
-  static int rhsQ(double t, N_Vector xz, N_Vector xzdot, N_Vector qdot, void *user_data);
+  static int rhsQF(double t, N_Vector xz, N_Vector xzdot, N_Vector qdot, void *user_data);
   static int rhsQB(double t, N_Vector xz, N_Vector xzdot, N_Vector rxz,
     N_Vector rxzdot, N_Vector ruqdot, void *user_data);
-  static int psolve(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, N_Vector rvec,
+  static int psolveF(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, N_Vector rvec,
     N_Vector zvec, double cj, double delta, void *user_data, N_Vector tmp);
-  static int psetup(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, double cj,
+  static int psetupF(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, double cj,
     void* user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
-  static int psolveB(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB,
+  static int psolveB(double t, N_Vector xz, N_Vector xzdot, N_Vector rxz, N_Vector rxzdot,
     N_Vector resvalB, N_Vector rvecB, N_Vector zvecB, double cjB,
     double deltaB, void *user_dataB, N_Vector tmpB);
-  static int psetupB(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB,
+  static int psetupB(double t, N_Vector xz, N_Vector xzdot, N_Vector rxz, N_Vector rxzdot,
     N_Vector resvalB, double cjB, void *user_dataB,
     N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
-  static int lsetup(IDAMem IDA_mem, N_Vector xz, N_Vector xzdot, N_Vector resp,
+  static int lsetupF(IDAMem IDA_mem, N_Vector xz, N_Vector xzdot, N_Vector resp,
     N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
-  static int lsolve(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector ycur,
+  static int lsolveF(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector ycur,
     N_Vector xzdotcur, N_Vector rescur);
   static int lsetupB(IDAMem IDA_mem, N_Vector xz, N_Vector xzdot, N_Vector resp,
     N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);

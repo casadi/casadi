@@ -189,7 +189,7 @@ void IdasInterface::set_work(void* mem, const double**& arg, double**& res,
   }
 }
 
-int IdasInterface::res(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, void *user_data) {
+int IdasInterface::resF(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, void *user_data) {
   try {
     auto m = to_mem(user_data);
     auto& s = m->self;
@@ -281,7 +281,7 @@ int IdasInterface::init_mem(void* mem) const {
   double t0 = 0;
   N_VConst(0.0, m->xz);
   N_VConst(0.0, m->xzdot);
-  IDAInit(m->mem, res, t0, m->xz, m->xzdot);
+  IDAInit(m->mem, resF, t0, m->xz, m->xzdot);
   if (verbose_) casadi_message("IDA initialized");
 
   // Include algebraic variables in error testing
@@ -345,8 +345,8 @@ int IdasInterface::init_mem(void* mem) const {
     // Direct scheme
     IDAMem IDA_mem = IDAMem(m->mem);
     IDA_mem->ida_lmem   = m;
-    IDA_mem->ida_lsetup = lsetup;
-    IDA_mem->ida_lsolve = lsolve;
+    IDA_mem->ida_lsetup = lsetupF;
+    IDA_mem->ida_lsolve = lsolveF;
     IDA_mem->ida_setupNonNull = TRUE;
   } else {
     // Iterative scheme
@@ -357,14 +357,14 @@ int IdasInterface::init_mem(void* mem) const {
     case SD_TFQMR: THROWING(IDASptfqmr, m->mem, max_krylov_); break;
     }
     THROWING(IDASpilsSetJacTimesVecFn, m->mem, jtimesF);
-    if (use_precon_) THROWING(IDASpilsSetPreconditioner, m->mem, psetup, psolve);
+    if (use_precon_) THROWING(IDASpilsSetPreconditioner, m->mem, psetupF, psolveF);
   }
 
   // Quadrature equations
-  if (nq_>0) {
+  if (nq1_ > 0) {
 
     // Initialize quadratures in IDAS
-    THROWING(IDAQuadInit, m->mem, rhsQ, m->q);
+    THROWING(IDAQuadInit, m->mem, rhsQF, m->q);
 
     // Should the quadrature errors be used for step size control?
     if (quad_err_con_) {
@@ -379,7 +379,7 @@ int IdasInterface::init_mem(void* mem) const {
   if (verbose_) casadi_message("Attached linear solver");
 
   // Adjoint sensitivity problem
-  if (nrx_>0) {
+  if (nrx1_ > 0) {
     m->rxzdot = N_VNew_Serial(nrx_+nrz_);
     N_VConst(0.0, m->rxz);
     N_VConst(0.0, m->rxzdot);
@@ -387,7 +387,7 @@ int IdasInterface::init_mem(void* mem) const {
   if (verbose_) casadi_message("Initialized adjoint sensitivities");
 
   // Initialize adjoint sensitivities
-  if (nrx_>0) {
+  if (nrx1_ > 0) {
     int interpType = interp_==SD_HERMITE ? IDA_HERMITE : IDA_POLYNOMIAL;
     THROWING(IDAAdjInit, m->mem, steps_per_checkpoint_, interpType);
   }
@@ -411,7 +411,7 @@ void IdasInterface::reset(IntegratorMemory* mem,
   THROWING(IDAReInit, m->mem, m->t, m->xz, m->xzdot);
 
   // Re-initialize quadratures
-  if (nq_ > 0) THROWING(IDAQuadReInit, m->mem, m->q);
+  if (nq1_ > 0) THROWING(IDAQuadReInit, m->mem, m->q);
 
   // Correct initial conditions, if necessary
   if (calc_ic_) {
@@ -420,7 +420,7 @@ void IdasInterface::reset(IntegratorMemory* mem,
   }
 
   // Re-initialize backward integration
-  if (nrx_ > 0) THROWING(IDAAdjReInit, m->mem);
+  if (nrx1_ > 0) THROWING(IDAAdjReInit, m->mem);
 }
 
 void IdasInterface::advance(IntegratorMemory* mem,
@@ -444,9 +444,7 @@ void IdasInterface::advance(IntegratorMemory* mem,
       THROWING(IDASolve, m->mem, m->t_next, &tret, m->xz, m->xzdot, IDA_NORMAL);
     }
     // Get quadratures
-    if (nq_ > 0) {
-      THROWING(IDAGetQuad, m->mem, &tret, m->q);
-    }
+    if (nq1_ > 0) THROWING(IDAGetQuad, m->mem, &tret, m->q);
   }
 
   // Set function outputs
@@ -601,7 +599,7 @@ void IdasInterface::idas_error(const char* module, int flag) {
   casadi_error(ss.str());
 }
 
-int IdasInterface::rhsQ(double t, N_Vector xz, N_Vector xzdot, N_Vector qdot, void *user_data) {
+int IdasInterface::rhsQF(double t, N_Vector xz, N_Vector xzdot, N_Vector qdot, void *user_data) {
   try {
     auto m = to_mem(user_data);
     auto& s = m->self;
@@ -657,7 +655,7 @@ int IdasInterface::rhsQB(double t, N_Vector xz, N_Vector xzdot, N_Vector rxz,
   }
 }
 
-int IdasInterface::psolve(double t, N_Vector xz, N_Vector xzdot, N_Vector rr,
+int IdasInterface::psolveF(double t, N_Vector xz, N_Vector xzdot, N_Vector rr,
     N_Vector rvec, N_Vector zvec, double cj, double delta, void *user_data, N_Vector tmp) {
   try {
     auto m = to_mem(user_data);
@@ -831,7 +829,7 @@ void casadi_copy_block(const T1* x, const casadi_int* sp_x, T1* y, const casadi_
   }
 }
 
-int IdasInterface::psetup(double t, N_Vector xz, N_Vector xzdot, N_Vector rr,
+int IdasInterface::psetupF(double t, N_Vector xz, N_Vector xzdot, N_Vector rr,
     double cj, void* user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) {
   try {
     auto m = to_mem(user_data);
@@ -932,8 +930,8 @@ int IdasInterface::psetupB(double t, N_Vector xz, N_Vector xzdot, N_Vector rxz, 
   }
 }
 
-int IdasInterface::lsetup(IDAMem IDA_mem, N_Vector xz, N_Vector xzdot, N_Vector resp,
-                                  N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3) {
+int IdasInterface::lsetupF(IDAMem IDA_mem, N_Vector xz, N_Vector xzdot, N_Vector resp,
+    N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3) {
   // Current time
   double t = IDA_mem->ida_tn;
 
@@ -941,14 +939,14 @@ int IdasInterface::lsetup(IDAMem IDA_mem, N_Vector xz, N_Vector xzdot, N_Vector 
   double cj = IDA_mem->ida_cj;
 
   // Call the preconditioner setup function (which sets up the linear solver)
-  if (psetup(t, xz, xzdot, nullptr, cj, IDA_mem->ida_lmem,
+  if (psetupF(t, xz, xzdot, nullptr, cj, IDA_mem->ida_lmem,
     vtemp1, vtemp1, vtemp3)) return 1;
 
   return 0;
 }
 
 int IdasInterface::lsetupB(IDAMem IDA_mem, N_Vector xzB, N_Vector xzdotB, N_Vector respB,
-                                    N_Vector vtemp1B, N_Vector vtemp2B, N_Vector vtemp3B) {
+    N_Vector vtemp1B, N_Vector vtemp2B, N_Vector vtemp3B) {
   try {
     auto m = to_mem(IDA_mem->ida_lmem);
     //auto& s = m->self;
@@ -984,8 +982,8 @@ int IdasInterface::lsetupB(IDAMem IDA_mem, N_Vector xzB, N_Vector xzdotB, N_Vect
   }
 }
 
-int IdasInterface::lsolve(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector xz,
-                                  N_Vector xzdot, N_Vector rr) {
+int IdasInterface::lsolveF(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector xz,
+    N_Vector xzdot, N_Vector rr) {
   try {
     auto m = to_mem(IDA_mem->ida_lmem);
     auto& s = m->self;
@@ -1000,7 +998,7 @@ int IdasInterface::lsolve(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector 
     double delta = 0.0;
 
     // Call the preconditioner solve function (which solves the linear system)
-    if (psolve(t, xz, xzdot, rr, b, b, cj,
+    if (psolveF(t, xz, xzdot, rr, b, b, cj,
       delta, static_cast<void*>(m), nullptr)) return 1;
 
     // Scale the correction to account for change in cj
@@ -1019,7 +1017,7 @@ int IdasInterface::lsolve(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector 
 }
 
 int IdasInterface::lsolveB(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector xzB,
-                                  N_Vector xzdotB, N_Vector rrB) {
+    N_Vector xzdotB, N_Vector rrB) {
   try {
     auto m = to_mem(IDA_mem->ida_lmem);
     auto& s = m->self;
