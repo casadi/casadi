@@ -1384,7 +1384,7 @@ Function FixedStepIntegrator::create_advanced(const Dict& opts) {
 
   if (simplify && nrx_==0 && nt()==1) {
     // Retrieve explicit simulation step (one finite element)
-    Function F = getExplicit();
+    Function F = stepF();
 
     MX z0 = MX::sym("z0", sparsity_in(INTEGRATOR_Z0));
 
@@ -1548,7 +1548,7 @@ void FixedStepIntegrator::advance(IntegratorMemory* mem,
   casadi_copy(u, nu_, m->u);
 
   // Explicit discrete time dynamics
-  const Function& F = getExplicit();
+  const Function& F = stepF();
 
   // Number of finite elements and time steps
   casadi_int nj = disc_[m->k + 1] - disc_[m->k];
@@ -1608,7 +1608,7 @@ void FixedStepIntegrator::retreat(IntegratorMemory* mem, const double* u,
   casadi_copy(u, nu_, m->u);
 
   // Explicit discrete time dynamics
-  const Function& G = getExplicitB();
+  const Function& G = stepB();
 
   // Number of finite elements and time steps
   casadi_int nj = disc_[m->k + 1] - disc_[m->k];
@@ -1761,7 +1761,7 @@ void ImplicitFixedStepIntegrator::init(const Dict& opts) {
   alloc(rootfinder_);
 
   // Allocate a root-finding solver for the backward problem
-  if (nrv_>0) {
+  if (nrv_ > 0) {
     // Options
     Dict backward_rootfinder_options = rootfinder_options;
     backward_rootfinder_options["implicit_input"] = BSTEP_RV0;
@@ -1769,10 +1769,8 @@ void ImplicitFixedStepIntegrator::init(const Dict& opts) {
     std::string backward_implicit_function_name = implicit_function_name;
 
     // Allocate a Newton solver
-    backward_rootfinder_ =
-      rootfinder(name_+ "_backward_rootfinder",
-                  backward_implicit_function_name,
-                  G_, backward_rootfinder_options);
+    backward_rootfinder_ = rootfinder(name_+ "_backward_rootfinder",
+      backward_implicit_function_name, G_, backward_rootfinder_options);
     alloc(backward_rootfinder_);
   }
 }

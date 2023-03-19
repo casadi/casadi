@@ -511,10 +511,10 @@ class CASADI_EXPORT FixedStepIntegrator : public Integrator {
     double* rx, double* rz, double* rq, double* uq) const override;
 
   /// Get explicit dynamics
-  virtual const Function& getExplicit() const { return F_;}
+  virtual const Function& stepF() const { return F_;}
 
   /// Get explicit dynamics (backward problem)
-  virtual const Function& getExplicitB() const { return G_;}
+  virtual const Function& stepB() const { return G_;}
 
   // Discrete time dynamics
   Function F_, G_;
@@ -562,10 +562,10 @@ class CASADI_EXPORT ImplicitFixedStepIntegrator : public FixedStepIntegrator {
   void init(const Dict& opts) override;
 
   /// Get explicit dynamics
-  const Function& getExplicit() const override { return rootfinder_;}
+  const Function& stepF() const override { return rootfinder_;}
 
   /// Get explicit dynamics (backward problem)
-  const Function& getExplicitB() const override { return backward_rootfinder_;}
+  const Function& stepB() const override { return backward_rootfinder_;}
 
   // Implicit function solver
   Function rootfinder_, backward_rootfinder_;
