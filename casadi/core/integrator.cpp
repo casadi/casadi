@@ -1553,9 +1553,6 @@ void FixedStepIntegrator::advance(IntegratorMemory* mem,
   // Set controls
   casadi_copy(u, nu_, m->u);
 
-  // Explicit discrete time dynamics
-  const Function& F = get_function("stepF");
-
   // Number of finite elements and time steps
   casadi_int nj = disc_[m->k + 1] - disc_[m->k];
   double h = (m->t_next - m->t) / nj;
@@ -1564,7 +1561,7 @@ void FixedStepIntegrator::advance(IntegratorMemory* mem,
   double t;
 
   // Discrete dynamics function inputs ...
-  std::fill_n(m->arg, F.n_in(), nullptr);
+  std::fill(m->arg, m->arg + FSTEP_NUM_IN, nullptr);
   m->arg[FSTEP_T0] = &t;
   m->arg[FSTEP_H] = &h;
   m->arg[FSTEP_X0] = m->x_prev;
@@ -1573,7 +1570,7 @@ void FixedStepIntegrator::advance(IntegratorMemory* mem,
   m->arg[FSTEP_U] = m->u;
 
   // ... and outputs
-  std::fill_n(m->res, F.n_out(), nullptr);
+  std::fill(m->res, m->res + FSTEP_NUM_OUT, nullptr);
   m->res[FSTEP_XF] = m->x;
   m->res[FSTEP_VF] = m->v;
   m->res[FSTEP_QF] = m->q;
@@ -1589,7 +1586,7 @@ void FixedStepIntegrator::advance(IntegratorMemory* mem,
     casadi_copy(m->q, nq_, m->q_prev);
 
     // Take step
-    F(m->arg, m->res, m->iw, m->w);
+    calc_function(m, "stepF");
     casadi_axpy(nq_, 1., m->q_prev, m->q);
 
     // Save state, if needed
@@ -1613,9 +1610,6 @@ void FixedStepIntegrator::retreat(IntegratorMemory* mem, const double* u,
   // Set controls
   casadi_copy(u, nu_, m->u);
 
-  // Explicit discrete time dynamics
-  const Function& G = get_function("stepB");
-
   // Number of finite elements and time steps
   casadi_int nj = disc_[m->k + 1] - disc_[m->k];
   double h = (m->t - m->t_next) / nj;
@@ -1624,7 +1618,7 @@ void FixedStepIntegrator::retreat(IntegratorMemory* mem, const double* u,
   double t;
 
   // Discrete dynamics function inputs ...
-  std::fill_n(m->arg, G.n_in(), nullptr);
+  std::fill(m->arg, m->arg + FSTEP_NUM_IN, nullptr);
   m->arg[BSTEP_T0] = &t;
   m->arg[BSTEP_H] = &h;
   m->arg[BSTEP_P] = m->p;
@@ -1634,7 +1628,7 @@ void FixedStepIntegrator::retreat(IntegratorMemory* mem, const double* u,
   m->arg[BSTEP_RP] = m->rp;
 
   // ... and outputs
-  std::fill_n(m->res, G.n_out(), nullptr);
+  std::fill(m->res, m->res + FSTEP_NUM_OUT, nullptr);
   m->res[BSTEP_RXF] = m->rx;
   m->res[BSTEP_RVF] = m->rv;
   m->res[BSTEP_RQF] = m->rq;
@@ -1655,7 +1649,7 @@ void FixedStepIntegrator::retreat(IntegratorMemory* mem, const double* u,
     casadi_int tapeind = disc_[m->k] + j;
     m->arg[BSTEP_X] = m->x_tape + nx_ * tapeind;
     m->arg[BSTEP_V] = m->v_tape + nv_ * tapeind;
-    G(m->arg, m->res, m->iw, m->w);
+    calc_function(m, "stepB");
     casadi_axpy(nrq_, 1., m->rq_prev, m->rq);
     casadi_axpy(nuq_, 1., m->uq_prev, m->uq);
   }
