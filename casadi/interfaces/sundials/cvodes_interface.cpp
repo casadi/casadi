@@ -644,7 +644,8 @@ int CvodesInterface::psetupB(double t, N_Vector x, N_Vector rx, N_Vector rxdot,
     casadi_int jac_offset = sp_jacB.nnz() - sp_jac_rode_rx.nnz();
 
     // Calculate Jacobian
-    s.calc_jacB(m, t, NV_DATA_S(x), NV_DATA_S(rx), NV_DATA_S(rxdot), m->jacB + jac_offset);
+    s.calc_jacB(m, t, NV_DATA_S(x), nullptr, NV_DATA_S(rx), nullptr,
+      m->jacB + jac_offset, nullptr, nullptr, nullptr);
 
     // Project to expected sparsity pattern (with diagonal)
     casadi_project(m->jacB + jac_offset, sp_jac_rode_rx, m->jacB, sp_jacB, m->w);
@@ -813,20 +814,31 @@ int CvodesInterface::lsolveB(CVodeMem cv_mem, N_Vector b, N_Vector weight,
 }
 
 Function CvodesInterface::get_jacB(Sparsity* sp) const {
-  Function J = nonaug_oracle_.factory("jacB", {"t", "x", "p", "u", "rx", "rp"}, {"jac:rode:rx"});
-  if (sp) *sp = J.sparsity_out(0) + Sparsity::diag(nrx1_);
+  Function J = nonaug_oracle_.factory("jacB", {"t", "x", "z", "p", "u", "rx", "rz", "rp"},
+    {"jac:rode:rx", "jac:ralg:rx", "jac:rode:rz", "jac:ralg:rz"});
+  *sp = J.sparsity_out(JACB_RODE_RX) + Sparsity::diag(nrx1_);
+  if (nrz1_ > 0) {
+    *sp = horzcat(vertcat(*sp, J.sparsity_out(JACB_RALG_RX)),
+      vertcat(J.sparsity_out(JACB_RODE_RZ), J.sparsity_out(JACB_RALG_RZ)));
+  }
   return J;
 }
 
-void CvodesInterface::calc_jacB(CvodesMemory* m, double t, const double* x, const double* rx,
-    const double* rode, double* jac_rode_rx) const {
-  m->arg[0] = &t;
-  m->arg[1] = x;
-  m->arg[2] = m->p;
-  m->arg[3] = m->u;
-  m->arg[4] = rx;
-  m->arg[5] = m->rp;
-  m->res[0] = jac_rode_rx;
+void CvodesInterface::calc_jacB(CvodesMemory* m, double t, const double* x, const double* z,
+    const double* rx, const double* rz,
+    double* jac_rode_rx, double* jac_ralg_rx, double* jac_rode_rz, double* jac_ralg_rz) const {
+  m->arg[DAEB_T] = &t;
+  m->arg[DAEB_X] = x;
+  m->arg[DAEB_Z] = z;
+  m->arg[DAEB_P] = m->p;
+  m->arg[DAEB_U] = m->u;
+  m->arg[DAEB_RX] = rx;
+  m->arg[DAEB_RZ] = rz;
+  m->arg[DAEB_RP] = m->rp;
+  m->res[JACB_RODE_RX] = jac_rode_rx;
+  m->res[JACB_RALG_RX] = jac_ralg_rx;
+  m->res[JACB_RODE_RZ] = jac_rode_rz;
+  m->res[JACB_RALG_RZ] = jac_ralg_rz;
   if (calc_function(m, "jacB")) casadi_error("'jacB' calculation failed");
 }
 
