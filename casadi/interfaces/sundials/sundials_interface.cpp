@@ -600,7 +600,7 @@ void SundialsInterface::calc_quadF(SundialsMemory* m, double t, const double* x,
     m->arg[DAEF_NUM_IN + QUADF_QUAD] = quad;  // out:quad
     m->arg[DAEF_NUM_IN + QUADF_NUM_OUT + DAEF_T] = 0;  // fwd:t
     m->arg[DAEF_NUM_IN + QUADF_NUM_OUT + DAEF_X] = x + nx1_;  // fwd:x
-    m->arg[DAEF_NUM_IN + QUADF_NUM_OUT + DAEF_X] = z ? z + nz1_ : 0;  // fwd:z
+    m->arg[DAEF_NUM_IN + QUADF_NUM_OUT + DAEF_Z] = z ? z + nz1_ : 0;  // fwd:z
     m->arg[DAEF_NUM_IN + QUADF_NUM_OUT + DAEF_P] = m->p + np1_;  // fwd:p
     m->arg[DAEF_NUM_IN + QUADF_NUM_OUT + DAEF_U] = m->u + nu1_;  // fwd:u
     m->res[QUADF_QUAD] = quad ? quad + nq1_ : 0;  // fwd:quad
