@@ -136,7 +136,7 @@ int CvodesInterface::init_mem(void* mem) const {
 
   // Initialize CVodes
   double t0 = 0;
-  THROWING(CVodeInit, m->mem, rhs, t0, m->xz);
+  THROWING(CVodeInit, m->mem, rhsF, t0, m->xz);
 
   // Set tolerances
   THROWING(CVodeSStolerances, m->mem, reltol_, abstol_);
@@ -164,8 +164,8 @@ int CvodesInterface::init_mem(void* mem) const {
     // Direct scheme
     CVodeMem cv_mem = static_cast<CVodeMem>(m->mem);
     cv_mem->cv_lmem   = m;
-    cv_mem->cv_lsetup = lsetup;
-    cv_mem->cv_lsolve = lsolve;
+    cv_mem->cv_lsetup = lsetupF;
+    cv_mem->cv_lsolve = lsolveF;
     cv_mem->cv_setupNonNull = TRUE;
   } else {
     // Iterative scheme
@@ -177,13 +177,13 @@ int CvodesInterface::init_mem(void* mem) const {
     case SD_TFQMR: THROWING(CVSptfqmr, m->mem, pretype, max_krylov_); break;
     }
     THROWING(CVSpilsSetJacTimesVecFn, m->mem, jtimesF);
-    if (use_precon_) THROWING(CVSpilsSetPreconditioner, m->mem, psetup, psolve);
+    if (use_precon_) THROWING(CVSpilsSetPreconditioner, m->mem, psetupF, psolveF);
   }
 
   // Quadrature equations
   if (nq_>0) {
     // Initialize quadratures in CVodes
-    THROWING(CVodeQuadInit, m->mem, rhsQ, m->q);
+    THROWING(CVodeQuadInit, m->mem, rhsQF, m->q);
 
     // Should the quadrature errors be used for step size control?
     if (quad_err_con_) {
@@ -205,7 +205,7 @@ int CvodesInterface::init_mem(void* mem) const {
   return 0;
 }
 
-int CvodesInterface::rhs(double t, N_Vector x, N_Vector xdot, void *user_data) {
+int CvodesInterface::rhsF(double t, N_Vector x, N_Vector xdot, void *user_data) {
   try {
     casadi_assert_dev(user_data);
     auto m = to_mem(user_data);
@@ -403,7 +403,7 @@ void CvodesInterface::ehfun(int error_code, const char *module, const char *func
   }
 }
 
-int CvodesInterface::rhsQ(double t, N_Vector x, N_Vector qdot, void *user_data) {
+int CvodesInterface::rhsQF(double t, N_Vector x, N_Vector qdot, void *user_data) {
   try {
     auto m = to_mem(user_data);
     auto& s = m->self;
@@ -486,7 +486,7 @@ int CvodesInterface::jtimesB(N_Vector v, N_Vector Jv, double t, N_Vector x,
   }
 }
 
-int CvodesInterface::psolve(double t, N_Vector x, N_Vector xdot, N_Vector r,
+int CvodesInterface::psolveF(double t, N_Vector x, N_Vector xdot, N_Vector r,
     N_Vector z, double gamma, double delta, int lr, void *user_data, N_Vector tmp) {
   try {
     auto m = to_mem(user_data);
@@ -578,7 +578,7 @@ int CvodesInterface::psolveB(double t, N_Vector x, N_Vector xB, N_Vector xdotB, 
   }
 }
 
-int CvodesInterface::psetup(double t, N_Vector x, N_Vector xdot, booleantype jok,
+int CvodesInterface::psetupF(double t, N_Vector x, N_Vector xdot, booleantype jok,
     booleantype *jcurPtr, double gamma, void *user_data,
     N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) {
   try {
@@ -677,22 +677,14 @@ int CvodesInterface::psetupB(double t, N_Vector x, N_Vector rx, N_Vector rxdot,
   }
 }
 
-int CvodesInterface::lsetup(CVodeMem cv_mem, int convfail, N_Vector x, N_Vector xdot,
-                            booleantype *jcurPtr,
-                            N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3) {
+int CvodesInterface::lsetupF(CVodeMem cv_mem, int convfail, N_Vector x, N_Vector xdot,
+    booleantype *jcurPtr, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3) {
   try {
     auto m = to_mem(cv_mem->cv_lmem);
-    //auto& s = m->self;
-
-    // Current time
-    double t = cv_mem->cv_tn;
-
-    // Scaling factor before J
-    double gamma = cv_mem->cv_gamma;
 
     // Call the preconditioner setup function (which sets up the linear solver)
-    if (psetup(t, x, xdot, FALSE, jcurPtr,
-                gamma, static_cast<void*>(m), vtemp1, vtemp2, vtemp3)) return 1;
+    if (psetupF(cv_mem->cv_tn, x, xdot, FALSE, jcurPtr,
+      cv_mem->cv_gamma, static_cast<void*>(m), vtemp1, vtemp2, vtemp3)) return 1;
 
     return 0;
   } catch(int flag) { // recoverable error
@@ -704,8 +696,7 @@ int CvodesInterface::lsetup(CVodeMem cv_mem, int convfail, N_Vector x, N_Vector 
 }
 
 int CvodesInterface::lsetupB(CVodeMem cv_mem, int convfail, N_Vector x, N_Vector xdot,
-                              booleantype *jcurPtr,
-                              N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3) {
+    booleantype *jcurPtr, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3) {
   try {
     auto m = to_mem(cv_mem->cv_lmem);
     CVadjMem ca_mem;
@@ -739,8 +730,8 @@ int CvodesInterface::lsetupB(CVodeMem cv_mem, int convfail, N_Vector x, N_Vector
   }
 }
 
-int CvodesInterface::lsolve(CVodeMem cv_mem, N_Vector b, N_Vector weight,
-                            N_Vector x, N_Vector xdot) {
+int CvodesInterface::lsolveF(CVodeMem cv_mem, N_Vector b, N_Vector weight,
+    N_Vector x, N_Vector xdot) {
   try {
     auto m = to_mem(cv_mem->cv_lmem);
     //auto& s = m->self;
@@ -758,20 +749,19 @@ int CvodesInterface::lsolve(CVodeMem cv_mem, N_Vector b, N_Vector weight,
     casadi_int lr = 1;
 
     // Call the preconditioner solve function (which solves the linear system)
-    if (psolve(t, x, xdot, b, b, gamma, delta,
-                lr, static_cast<void*>(m), nullptr)) return 1;
+    if (psolveF(t, x, xdot, b, b, gamma, delta, lr, static_cast<void*>(m), nullptr)) return 1;
 
     return 0;
   } catch(int flag) { // recoverable error
     return flag;
   } catch(std::exception& e) { // non-recoverable error
-    uerr() << "lsolve failed: " << e.what() << std::endl;
+    uerr() << "lsolveF failed: " << e.what() << std::endl;
     return -1;
   }
 }
 
 int CvodesInterface::lsolveB(CVodeMem cv_mem, N_Vector b, N_Vector weight,
-                              N_Vector x, N_Vector xdot) {
+    N_Vector x, N_Vector xdot) {
   try {
     auto m = to_mem(cv_mem->cv_lmem);
     CVadjMem ca_mem;
