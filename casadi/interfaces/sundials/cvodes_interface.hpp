@@ -151,15 +151,8 @@ namespace casadi {
       return m;
     }
 
-    // Get system Jacobian, forward problem
-    Function get_jacF(Sparsity* sp) const override;
-
     // Get system Jacobian, backward problem
     Function get_jacB(Sparsity* sp) const override;
-
-    // Jacobian of DAE right-hand-side function, forward problem
-    void calc_jacF(CvodesMemory* m, double t, const double* x, const double* z,
-      double* jac_ode_x, double* jac_alg_x, double* jac_ode_z, double* jac_alg_z) const;
 
     // Jacobian of DAE right-hand-side function, backward problem
     void calc_jacB(CvodesMemory* m, double t, const double* x, const double* rx,

@@ -117,17 +117,14 @@ namespace casadi {
     /** \brief Get absolute tolerance */
     double get_abstol() const override { return abstol_;}
 
-    // Get system Jacobian, forward problem
-    virtual Function get_jacF(Sparsity* sp) const = 0;
-
     // Get system Jacobian, backward problem
     virtual Function get_jacB(Sparsity* sp) const = 0;
 
-    // ODE right-hand-side, forward problem
+    // DAE right-hand-side, forward problem
     void calc_daeF(SundialsMemory* m, double t, const double* x, const double* z,
       double* ode, double* alg) const;
 
-    // ODE right-hand-side, forward problem
+    // DAE right-hand-side, forward problem
     void calc_daeB(SundialsMemory* m, double t, const double* x, const double* z,
       const double* rx, const double* rz, double* rode, double* ralg) const;
 
@@ -139,14 +136,18 @@ namespace casadi {
     void calc_quadB(SundialsMemory* m, double t, const double* x, const double* z,
       const double* rx, const double* rz, double* rquad, double* uquad) const;
 
-    // Jacobian of ODE-times-vector function, forward problem
+    // Jacobian of DAE-times-vector function, forward problem
     void calc_jtimesF(SundialsMemory* m, double t, const double* x, const double* z,
       const double* fwd_x, const double* fwd_z, double* fwd_ode, double* fwd_alg) const;
 
-    // Jacobian of ODE-times-vector function, backward problem
+    // Jacobian of DAE-times-vector function, backward problem
     void calc_jtimesB(SundialsMemory* m, double t, const double* x, const double* z,
       const double* rx, const double* rz, const double* fwd_rx, const double* fwd_rz,
       double* fwd_rode, double* fwd_ralg) const;
+
+    // Jacobian of DAE right-hand-side function, forward problem
+    void calc_jacF(SundialsMemory* m, double t, const double* x, const double* z,
+      double* jac_ode_x, double* jac_alg_x, double* jac_ode_z, double* jac_alg_z) const;
 
     /// Get all statistics
     Dict get_stats(void* mem) const override;
@@ -188,6 +189,8 @@ namespace casadi {
       JTIMESB_RX, JTIMESB_RZ, JTIMESB_RP,
       JTIMESB_FWD_RX, JTIMESB_FWD_RZ, JTIMESB_NUM_IN};
     enum JtimesBOut { JTIMESB_FWD_RODE, JTIMESB_FWD_RALG, JTIMESB_NUM_OUT};
+    enum JacFOut {JACF_ODE_X, JACF_ALG_X, JACF_ODE_Z, JACF_ALG_Z, JACF_NUM_OUT};
+    enum JacBOut {JACB_RODE_RX, JACB_RALG_RX, JACB_RODE_RZ, JACB_RALG_RZ, JACB_NUM_OUT};
     ///@}
 
     ///@{

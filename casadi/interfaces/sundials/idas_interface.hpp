@@ -156,9 +156,6 @@ namespace casadi {
       return m;
     }
 
-    // Get system Jacobian, forward problem
-    Function get_jacF(Sparsity* sp) const override;
-
     // Get system Jacobian, backward problem
     Function get_jacB(Sparsity* sp) const override;
 

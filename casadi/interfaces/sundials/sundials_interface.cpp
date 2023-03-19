@@ -215,13 +215,19 @@ void SundialsInterface::init(const Dict& opts) {
   Function jacF;
   Sparsity jacF_sp;
   if (d == 0 || d->ns_ > 0) {
-    jacF = get_jacF(&jacF_sp);
+    jacF = create_function(nonaug_oracle_, "jacF", {"t", "x", "z", "p", "u"},
+      {"jac:ode:x", "jac:alg:x", "jac:ode:z", "jac:alg:z"});
+    jacF_sp = jacF.sparsity_out(JACF_ODE_X) + Sparsity::diag(nx1_);
+    if (nz_ > 0) {
+      jacF_sp = horzcat(vertcat(jacF_sp, jacF.sparsity_out(JACF_ALG_X)),
+        vertcat(jacF.sparsity_out(JACF_ODE_Z), jacF.sparsity_out(JACF_ALG_Z)));
+    }
   } else {
     jacF = d->get_function("jacF");
+    set_function(jacF, jacF.name(), true);
     linsolF_ = d->linsolF_;
     jacF_sp = linsolF_.sparsity();
   }
-  set_function(jacF, jacF.name(), true);
   alloc_w(jacF_sp.nnz(), true);  // jacF
 
   // Linear solver for forward problem
@@ -705,6 +711,21 @@ void SundialsInterface::calc_jtimesB(SundialsMemory* m, double t, const double* 
     m->res[JTIMESB_FWD_RALG] = fwd_ralg + nrz1_;  // fwd:fwd:ralg
     calc_forward(m, "jtimesB", ns_);
  }
+}
+
+void SundialsInterface::calc_jacF(SundialsMemory* m, double t, const double* x, const double* z,
+    double* jac_ode_x, double* jac_alg_x, double* jac_ode_z, double* jac_alg_z) const {
+  // Calculate Jacobian
+  m->arg[DAEF_T] = &t;
+  m->arg[DAEF_X] = x;
+  m->arg[DAEF_Z] = z;
+  m->arg[DAEF_P] = m->p;
+  m->arg[DAEF_U] = m->u;
+  m->res[JACF_ODE_X] = jac_ode_x;
+  m->res[JACF_ALG_X] = jac_alg_x;
+  m->res[JACF_ODE_Z] = jac_ode_z;
+  m->res[JACF_ALG_Z] = jac_alg_z;
+  if (calc_function(m, "jacF")) casadi_error("'jacF' calculation failed");
 }
 
 } // namespace casadi

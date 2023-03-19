@@ -846,16 +846,8 @@ int IdasInterface::psetup(double t, N_Vector xz, N_Vector xzdot, N_Vector rr,
     const Sparsity& sp_jacF = s.linsolF_.sparsity();
 
     // Calculate Jacobian blocks
-    m->arg[0] = &t;
-    m->arg[1] = NV_DATA_S(xz);
-    m->arg[2] = NV_DATA_S(xz) + s.nx_;
-    m->arg[3] = m->p;
-    m->arg[4] = m->u;
-    m->res[0] = m->jac_ode_x;
-    m->res[1] = m->jac_alg_x;
-    m->res[2] = m->jac_ode_z;
-    m->res[3] = m->jac_alg_z;
-    if (s.calc_function(m, "jacF")) casadi_error("'jacF' calculation failed");
+    s.calc_jacF(m, t, NV_DATA_S(xz), NV_DATA_S(xz) + s.nx_,
+      m->jac_ode_x, m->jac_alg_x, m->jac_ode_z, m->jac_alg_z);
 
     // Copy to jacF structure
     casadi_int nx_jac = sp_jac_ode_x.size1();  // excludes sensitivity equations
@@ -1071,16 +1063,6 @@ int IdasInterface::lsolveB(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector
     uerr() << "lsolveB failed: " << e.what() << std::endl;
     return -1;
   }
-}
-
-Function IdasInterface::get_jacF(Sparsity* sp) const {
-  Function J = nonaug_oracle_.factory("jacF", {"t", "x", "z", "p", "u"},
-    {"jac:ode:x", "jac:alg:x", "jac:ode:z", "jac:alg:z"});
-  if (sp) *sp = horzcat(vertcat(J.sparsity_out("jac_ode_x") + Sparsity::diag(nx1_),
-                                J.sparsity_out("jac_alg_x")),
-                        vertcat(J.sparsity_out("jac_ode_z"),
-                                J.sparsity_out("jac_alg_z")));
-  return J;
 }
 
 Function IdasInterface::get_jacB(Sparsity* sp) const {

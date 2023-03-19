@@ -812,27 +812,10 @@ int CvodesInterface::lsolveB(CVodeMem cv_mem, N_Vector b, N_Vector weight,
   }
 }
 
-Function CvodesInterface::get_jacF(Sparsity* sp) const {
-  Function J = nonaug_oracle_.factory("jacF", {"t", "x", "p", "u"}, {"jac:ode:x"});
-  if (sp) *sp = J.sparsity_out(0) + Sparsity::diag(nx1_);
-  return J;
-}
-
 Function CvodesInterface::get_jacB(Sparsity* sp) const {
   Function J = nonaug_oracle_.factory("jacB", {"t", "x", "p", "u", "rx", "rp"}, {"jac:rode:rx"});
   if (sp) *sp = J.sparsity_out(0) + Sparsity::diag(nrx1_);
   return J;
-}
-
-void CvodesInterface::calc_jacF(CvodesMemory* m, double t, const double* x, const double* z,
-    double* jac_ode_x, double* jac_alg_x, double* jac_ode_z, double* jac_alg_z) const {
-  // Calculate Jacobian
-  m->arg[0] = &t;
-  m->arg[1] = x;
-  m->arg[2] = m->p;
-  m->arg[3] = m->u;
-  m->res[0] = jac_ode_x;
-  if (calc_function(m, "jacF")) casadi_error("'jacF' calculation failed");
 }
 
 void CvodesInterface::calc_jacB(CvodesMemory* m, double t, const double* x, const double* rx,
