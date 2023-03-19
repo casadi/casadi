@@ -504,6 +504,8 @@ void Integrator::init(const Dict& opts) {
   // For sparsity pattern propagation
   alloc(oracle_);
 
+  casadi_assert(x().is_vector(), "Only vector states are supported");
+
   // Error if sparse input
   casadi_assert(x1().is_dense(), "Sparse DAE not supported");
   casadi_assert(z1().is_dense(), "Sparse DAE not supported");
@@ -636,20 +638,20 @@ std::map<std::string, MatType> Integrator::aug_fwd(casadi_int nfwd) const {
   // Construct return object
   std::map<std::string, MatType> ret;
   ret["t"] = aug_t;
-  ret["x"] = horzcat(aug_x);
-  ret["z"] = horzcat(aug_z);
-  ret["p"] = horzcat(aug_p);
-  ret["u"] = horzcat(aug_u);
-  ret["ode"] = horzcat(aug_ode);
-  ret["alg"] = horzcat(aug_alg);
-  ret["quad"] = horzcat(aug_quad);
-  ret["rx"] = horzcat(aug_rx);
-  ret["rz"] = horzcat(aug_rz);
-  ret["rp"] = horzcat(aug_rp);
-  ret["rode"] = horzcat(aug_rode);
-  ret["ralg"] = horzcat(aug_ralg);
-  ret["rquad"] = horzcat(aug_rquad);
-  ret["uquad"] = horzcat(aug_uquad);
+  ret["x"] = vertcat(aug_x);
+  ret["z"] = vertcat(aug_z);
+  ret["p"] = vertcat(aug_p);
+  ret["u"] = vertcat(aug_u);
+  ret["ode"] = vertcat(aug_ode);
+  ret["alg"] = vertcat(aug_alg);
+  ret["quad"] = vertcat(aug_quad);
+  ret["rx"] = vertcat(aug_rx);
+  ret["rz"] = vertcat(aug_rz);
+  ret["rp"] = vertcat(aug_rp);
+  ret["rode"] = vertcat(aug_rode);
+  ret["ralg"] = vertcat(aug_ralg);
+  ret["rquad"] = vertcat(aug_rquad);
+  ret["uquad"] = vertcat(aug_uquad);
 
   return ret;
 }
@@ -731,7 +733,7 @@ std::map<std::string, MatType> Integrator::aug_adj(casadi_int nadj) const {
   ret["rode"] = vertcat(aug_rode);
   ret["ralg"] = vertcat(aug_ralg);
   ret["rquad"] = vertcat(aug_rquad);
-  ret["uquad"] =  vertcat(aug_uquad);
+  ret["uquad"] = vertcat(aug_uquad);
 
   // Make sure that forward problem does not depend on backward states
   Function f("f", {ret["t"], ret["x"], ret["z"], ret["p"], ret["u"]},

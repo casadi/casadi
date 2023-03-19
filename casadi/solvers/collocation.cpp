@@ -160,8 +160,8 @@ namespace casadi {
     // Collocated states
     std::vector<MX> x(deg_+1), z(deg_+1);
     for (casadi_int d=1; d<=deg_; ++d) {
-      x[d] = reshape(*vv_it++, size_in(INTEGRATOR_X0));
-      z[d] = reshape(*vv_it++, size_in(INTEGRATOR_Z0));
+      x[d] = *vv_it++;
+      z[d] = *vv_it++;
     }
     casadi_assert_dev(vv_it==vv.end());
 
