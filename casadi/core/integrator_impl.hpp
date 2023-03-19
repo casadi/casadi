@@ -481,8 +481,8 @@ class CASADI_EXPORT FixedStepIntegrator : public Integrator {
       \identifier{1ml} */
   void free_mem(void *mem) const override { delete static_cast<FixedStepMemory*>(mem);}
 
-  /// Setup F and G
-  virtual void setupFG() = 0;
+  /// Setup step functions
+  virtual void setup_step() = 0;
 
   /** \brief Reset the forward problem
 
@@ -509,15 +509,6 @@ class CASADI_EXPORT FixedStepIntegrator : public Integrator {
       \identifier{25k} */
   void retreat(IntegratorMemory* mem, const double* u,
     double* rx, double* rz, double* rq, double* uq) const override;
-
-  /// Get explicit dynamics
-  virtual const Function& stepF() const { return F_;}
-
-  /// Get explicit dynamics (backward problem)
-  virtual const Function& stepB() const { return G_;}
-
-  // Discrete time dynamics
-  Function F_, G_;
 
   // Target number of finite elements
   casadi_int nk_target_;
@@ -560,15 +551,6 @@ class CASADI_EXPORT ImplicitFixedStepIntegrator : public FixedStepIntegrator {
 
   /// Initialize stage
   void init(const Dict& opts) override;
-
-  /// Get explicit dynamics
-  const Function& stepF() const override { return rootfinder_;}
-
-  /// Get explicit dynamics (backward problem)
-  const Function& stepB() const override { return backward_rootfinder_;}
-
-  // Implicit function solver
-  Function rootfinder_, backward_rootfinder_;
 
   /** \brief Serialize an object without type information
 

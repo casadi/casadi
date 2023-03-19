@@ -91,9 +91,9 @@ namespace casadi {
     return Z(Slice(Z.size1()-nz_, Z.size1()));
   }
 
-  void Collocation::setupFG() {
-    f_ = create_function("f", {"t", "x", "z", "p", "u"}, {"ode", "alg", "quad"});
-    g_ = create_function("g", {"t", "x", "z", "p", "u", "rx", "rz", "rp"},
+  void Collocation::setup_step() {
+    f_ = create_function("daeF", {"t", "x", "z", "p", "u"}, {"ode", "alg", "quad"});
+    g_ = create_function("daeB", {"t", "x", "z", "p", "u", "rx", "rz", "rp"},
       {"rode", "ralg", "rquad", "uquad"});
 
     // All collocation time points
@@ -224,8 +224,8 @@ namespace casadi {
     F_out[FSTEP_XF] = xf;
     F_out[FSTEP_VF] = vertcat(eq);
     F_out[FSTEP_QF] = qf;
-    F_ = Function("fstep", F_in, F_out);
-    alloc(F_);
+    Function F("implicit_stepF", F_in, F_out);
+    set_function(F, F.name(), true);
 
     // Backwards dynamics
     // NOTE: The following is derived so that it will give the exact adjoint
@@ -315,8 +315,8 @@ namespace casadi {
       G_out[BSTEP_RVF] = vertcat(eq);
       G_out[BSTEP_RQF] = rqf;
       G_out[BSTEP_UQF] = uqf;
-      G_ = Function("bstep", G_in, G_out);
-      alloc(G_);
+      Function G("implicit_stepB", G_in, G_out);
+      set_function(G, G.name(), true);
     }
   }
 

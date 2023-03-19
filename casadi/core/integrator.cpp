@@ -1384,7 +1384,7 @@ Function FixedStepIntegrator::create_advanced(const Dict& opts) {
 
   if (simplify && nrx_==0 && nt()==1) {
     // Retrieve explicit simulation step (one finite element)
-    Function F = stepF();
+    Function F = get_function("stepF");
 
     MX z0 = MX::sym("z0", sparsity_in(INTEGRATOR_Z0));
 
@@ -1464,11 +1464,17 @@ void FixedStepIntegrator::init(const Dict& opts) {
   }
 
   // Setup discrete time dynamics
-  setupFG();
+  setup_step();
 
   // Get discrete time dimensions
-  nv_ = F_.nnz_in(FSTEP_V0);
-  nrv_ =  G_.is_null() ? 0 : G_.nnz_in(BSTEP_RV0);
+  const Function& F = get_function(has_function("stepF") ? "stepF" : "implicit_stepF");
+  nv_ = F.nnz_in(FSTEP_V0);
+  if (nrx1_ > 0) {
+    const Function& G = get_function(has_function("stepB") ? "stepB" : "implicit_stepB");
+    nrv_ = G.nnz_in(BSTEP_RV0);
+  } else {
+    nrv_ = 0;
+  }
 
   // Work vectors, forward problem
   alloc_w(nv_, true); // v
@@ -1548,7 +1554,7 @@ void FixedStepIntegrator::advance(IntegratorMemory* mem,
   casadi_copy(u, nu_, m->u);
 
   // Explicit discrete time dynamics
-  const Function& F = stepF();
+  const Function& F = get_function("stepF");
 
   // Number of finite elements and time steps
   casadi_int nj = disc_[m->k + 1] - disc_[m->k];
@@ -1608,7 +1614,7 @@ void FixedStepIntegrator::retreat(IntegratorMemory* mem, const double* u,
   casadi_copy(u, nu_, m->u);
 
   // Explicit discrete time dynamics
-  const Function& G = stepB();
+  const Function& G = get_function("stepB");
 
   // Number of finite elements and time steps
   casadi_int nj = disc_[m->k + 1] - disc_[m->k];
@@ -1756,9 +1762,9 @@ void ImplicitFixedStepIntegrator::init(const Dict& opts) {
   rootfinder_options["implicit_output"] = FSTEP_VF;
 
   // Allocate a solver
-  rootfinder_ = rootfinder(name_ + "_rootfinder", implicit_function_name,
-    F_, rootfinder_options);
-  alloc(rootfinder_);
+  Function rf = rootfinder("stepF", implicit_function_name,
+    get_function("implicit_stepF"), rootfinder_options);
+  set_function(rf, rf.name(), false);
 
   // Allocate a root-finding solver for the backward problem
   if (nrv_ > 0) {
@@ -1769,9 +1775,9 @@ void ImplicitFixedStepIntegrator::init(const Dict& opts) {
     std::string backward_implicit_function_name = implicit_function_name;
 
     // Allocate a Newton solver
-    backward_rootfinder_ = rootfinder(name_+ "_backward_rootfinder",
-      backward_implicit_function_name, G_, backward_rootfinder_options);
-    alloc(backward_rootfinder_);
+    Function brf = rootfinder("stepB", backward_implicit_function_name,
+      get_function("implicit_stepB"), backward_rootfinder_options);
+    set_function(brf, brf.name(), false);
   }
 }
 
@@ -1956,8 +1962,6 @@ void FixedStepIntegrator::serialize_body(SerializingStream &s) const {
   Integrator::serialize_body(s);
 
   s.version("FixedStepIntegrator", 2);
-  s.pack("FixedStepIntegrator::F", F_);
-  s.pack("FixedStepIntegrator::G", G_);
   s.pack("FixedStepIntegrator::nk_target", nk_target_);
   s.pack("FixedStepIntegrator::disc", disc_);
   s.pack("FixedStepIntegrator::nv", nv_);
@@ -1966,8 +1970,6 @@ void FixedStepIntegrator::serialize_body(SerializingStream &s) const {
 
 FixedStepIntegrator::FixedStepIntegrator(DeserializingStream & s) : Integrator(s) {
   s.version("FixedStepIntegrator", 2);
-  s.unpack("FixedStepIntegrator::F", F_);
-  s.unpack("FixedStepIntegrator::G", G_);
   s.unpack("FixedStepIntegrator::nk_target", nk_target_);
   s.unpack("FixedStepIntegrator::disc", disc_);
   s.unpack("FixedStepIntegrator::nv", nv_);
@@ -1977,16 +1979,12 @@ FixedStepIntegrator::FixedStepIntegrator(DeserializingStream & s) : Integrator(s
 void ImplicitFixedStepIntegrator::serialize_body(SerializingStream &s) const {
   FixedStepIntegrator::serialize_body(s);
 
-  s.version("ImplicitFixedStepIntegrator", 1);
-  s.pack("ImplicitFixedStepIntegrator::rootfinder", rootfinder_);
-  s.pack("ImplicitFixedStepIntegrator::backward_rootfinder", backward_rootfinder_);
+  s.version("ImplicitFixedStepIntegrator", 2);
 }
 
 ImplicitFixedStepIntegrator::ImplicitFixedStepIntegrator(DeserializingStream & s) :
     FixedStepIntegrator(s) {
-  s.version("ImplicitFixedStepIntegrator", 1);
-  s.unpack("ImplicitFixedStepIntegrator::rootfinder", rootfinder_);
-  s.unpack("ImplicitFixedStepIntegrator::backward_rootfinder", backward_rootfinder_);
+  s.version("ImplicitFixedStepIntegrator", 2);
 }
 
 casadi_int Integrator::next_stop(casadi_int k, const double* u) const {

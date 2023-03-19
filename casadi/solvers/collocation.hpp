@@ -85,8 +85,8 @@ namespace casadi {
     /// Initialize stage
     void init(const Dict& opts) override;
 
-    /// Setup F and G
-    void setupFG() override;
+    /// Setup step functions
+    void setup_step() override;
 
     // Return zero if smaller than machine epsilon
     static double zeroIfSmall(double x);

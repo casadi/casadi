@@ -77,8 +77,8 @@ namespace casadi {
     /// Initialize stage
     void init(const Dict& opts) override;
 
-    /// Setup F and G
-    void setupFG() override;
+    /// Setup step functions
+    void setup_step() override;
 
     /// A documentation string
     static const std::string meta_doc;

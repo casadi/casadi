@@ -61,9 +61,9 @@ namespace casadi {
       "Explicit Runge-Kutta integrators do not support algebraic variables");
   }
 
-  void RungeKutta::setupFG() {
-    f_ = create_function("f", {"t", "x", "p", "u"}, {"ode", "quad"});
-    g_ = create_function("g", {"t", "x", "p", "u", "rx", "rp"}, {"rode", "rquad", "uquad"});
+  void RungeKutta::setup_step() {
+    f_ = create_function("odeF", {"t", "x", "p", "u"}, {"ode", "quad"});
+    g_ = create_function("odeB", {"t", "x", "p", "u", "rx", "rp"}, {"rode", "rquad", "uquad"});
 
     // Symbolic inputs
     MX t0 = MX::sym("t0", this->t());
@@ -138,8 +138,8 @@ namespace casadi {
       f_res[FSTEP_XF] = xf;
       f_res[FSTEP_QF] = qf;
       f_res[FSTEP_VF] = horzcat(x_def);
-      F_ = Function("fstep", f_arg, f_res);
-      alloc(F_);
+      Function F("stepF", f_arg, f_res);
+      set_function(F, F.name(), true);
     }
 
     // Backward integration
@@ -216,8 +216,8 @@ namespace casadi {
       g_res[BSTEP_RVF] = horzcat(rx_def);
       g_res[BSTEP_RQF] = rqf;
       g_res[BSTEP_UQF] = uqf;
-      G_ = Function("bstep", g_arg, g_res);
-      alloc(G_);
+      Function G("stepB", g_arg, g_res);
+      set_function(G, G.name(), true);
     }
   }
 
