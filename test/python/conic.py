@@ -1182,7 +1182,7 @@ class ConicTests(casadiTestCase):
       y = MX.sym("y")
       z = MX.sym("z")
       if not aux_options["soc"]: continue
-
+      print(conic,qp_options)
 
       #  min  2 x + y
       #
