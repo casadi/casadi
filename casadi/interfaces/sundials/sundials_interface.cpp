@@ -241,13 +241,19 @@ void SundialsInterface::init(const Dict& opts) {
     Function jacB;
     Sparsity jacB_sp;
     if (d == 0 || d->ns_ > 0) {
-      jacB = get_jacB(&jacB_sp);
+      jacB = create_function(nonaug_oracle_, "jacB", {"t", "x", "z", "p", "u", "rx", "rz", "rp"},
+        {"jac:rode:rx", "jac:ralg:rx", "jac:rode:rz", "jac:ralg:rz"});
+      jacB_sp = jacB.sparsity_out(JACB_RODE_RX) + Sparsity::diag(nrx1_);
+      if (nrz1_ > 0) {
+        jacB_sp = horzcat(vertcat(jacB_sp, jacB.sparsity_out(JACB_RALG_RX)),
+          vertcat(jacB.sparsity_out(JACB_RODE_RZ), jacB.sparsity_out(JACB_RALG_RZ)));
+      }
     } else {
       jacB = d->get_function("jacB");
+      set_function(jacB, jacB.name(), true);
       linsolB_ = d->linsolB_;
       jacB_sp = linsolB_.sparsity();
     }
-    set_function(jacB, jacB.name(), true);
     alloc_w(jacB_sp.nnz(), true);  // jacB
 
     // Linear solver for backward problem
@@ -726,6 +732,24 @@ void SundialsInterface::calc_jacF(SundialsMemory* m, double t, const double* x, 
   m->res[JACF_ODE_Z] = jac_ode_z;
   m->res[JACF_ALG_Z] = jac_alg_z;
   if (calc_function(m, "jacF")) casadi_error("'jacF' calculation failed");
+}
+
+void SundialsInterface::calc_jacB(SundialsMemory* m, double t, const double* x, const double* z,
+    const double* rx, const double* rz,
+    double* jac_rode_rx, double* jac_ralg_rx, double* jac_rode_rz, double* jac_ralg_rz) const {
+  m->arg[DAEB_T] = &t;
+  m->arg[DAEB_X] = x;
+  m->arg[DAEB_Z] = z;
+  m->arg[DAEB_P] = m->p;
+  m->arg[DAEB_U] = m->u;
+  m->arg[DAEB_RX] = rx;
+  m->arg[DAEB_RZ] = rz;
+  m->arg[DAEB_RP] = m->rp;
+  m->res[JACB_RODE_RX] = jac_rode_rx;
+  m->res[JACB_RALG_RX] = jac_ralg_rx;
+  m->res[JACB_RODE_RZ] = jac_rode_rz;
+  m->res[JACB_RALG_RZ] = jac_ralg_rz;
+  if (calc_function(m, "jacB")) casadi_error("'jacB' calculation failed");
 }
 
 } // namespace casadi

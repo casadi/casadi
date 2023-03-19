@@ -117,9 +117,6 @@ namespace casadi {
     /** \brief Get absolute tolerance */
     double get_abstol() const override { return abstol_;}
 
-    // Get system Jacobian, backward problem
-    virtual Function get_jacB(Sparsity* sp) const = 0;
-
     // DAE right-hand-side, forward problem
     void calc_daeF(SundialsMemory* m, double t, const double* x, const double* z,
       double* ode, double* alg) const;
@@ -148,6 +145,11 @@ namespace casadi {
     // Jacobian of DAE right-hand-side function, forward problem
     void calc_jacF(SundialsMemory* m, double t, const double* x, const double* z,
       double* jac_ode_x, double* jac_alg_x, double* jac_ode_z, double* jac_alg_z) const;
+
+    // Jacobian of DAE right-hand-side function, backward problem
+    void calc_jacB(SundialsMemory* m, double t, const double* x, const double* z,
+      const double* rx, const double* rz,
+      double* jac_rode_rx, double* jac_ralg_rx, double* jac_rode_rz, double* jac_ralg_rz) const;
 
     /// Get all statistics
     Dict get_stats(void* mem) const override;

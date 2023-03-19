@@ -813,35 +813,6 @@ int CvodesInterface::lsolveB(CVodeMem cv_mem, N_Vector b, N_Vector weight,
   }
 }
 
-Function CvodesInterface::get_jacB(Sparsity* sp) const {
-  Function J = nonaug_oracle_.factory("jacB", {"t", "x", "z", "p", "u", "rx", "rz", "rp"},
-    {"jac:rode:rx", "jac:ralg:rx", "jac:rode:rz", "jac:ralg:rz"});
-  *sp = J.sparsity_out(JACB_RODE_RX) + Sparsity::diag(nrx1_);
-  if (nrz1_ > 0) {
-    *sp = horzcat(vertcat(*sp, J.sparsity_out(JACB_RALG_RX)),
-      vertcat(J.sparsity_out(JACB_RODE_RZ), J.sparsity_out(JACB_RALG_RZ)));
-  }
-  return J;
-}
-
-void CvodesInterface::calc_jacB(CvodesMemory* m, double t, const double* x, const double* z,
-    const double* rx, const double* rz,
-    double* jac_rode_rx, double* jac_ralg_rx, double* jac_rode_rz, double* jac_ralg_rz) const {
-  m->arg[DAEB_T] = &t;
-  m->arg[DAEB_X] = x;
-  m->arg[DAEB_Z] = z;
-  m->arg[DAEB_P] = m->p;
-  m->arg[DAEB_U] = m->u;
-  m->arg[DAEB_RX] = rx;
-  m->arg[DAEB_RZ] = rz;
-  m->arg[DAEB_RP] = m->rp;
-  m->res[JACB_RODE_RX] = jac_rode_rx;
-  m->res[JACB_RALG_RX] = jac_ralg_rx;
-  m->res[JACB_RODE_RZ] = jac_rode_rz;
-  m->res[JACB_RALG_RZ] = jac_ralg_rz;
-  if (calc_function(m, "jacB")) casadi_error("'jacB' calculation failed");
-}
-
 CvodesMemory::CvodesMemory(const CvodesInterface& s) : self(s) {
   this->mem = nullptr;
 

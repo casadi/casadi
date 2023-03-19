@@ -156,9 +156,6 @@ namespace casadi {
       return m;
     }
 
-    // Get system Jacobian, backward problem
-    Function get_jacB(Sparsity* sp) const override;
-
     /// A documentation string
     static const std::string meta_doc;
 
