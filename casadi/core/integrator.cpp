@@ -477,9 +477,6 @@ void Integrator::init(const Dict& opts) {
     nonaug_oracle_ = oracle_;
   }
 
-  // Forward directional derivatives of oracle
-  if (ns_ > 0) fwd_oracle_ = oracle_.forward(1);
-
   // Store a copy of the options, for creating augmented integrators
   opts_ = opts;
 
@@ -503,10 +500,9 @@ void Integrator::init(const Dict& opts) {
   // Call the base class method
   OracleFunction::init(opts);
 
+
   // For sparsity pattern propagation
   alloc(oracle_);
-  alloc(nonaug_oracle_);
-  if (ns_ > 0) alloc(fwd_oracle_);
 
   casadi_assert(x().is_vector(), "Only vector states are supported");
 
@@ -757,13 +753,6 @@ std::map<std::string, MatType> Integrator::aug_adj(casadi_int nadj) const {
   return ret;
 }
 
-int Integrator::oracle_forward(const bvec_t** arg, bvec_t** res,
-    casadi_int* iw, bvec_t* w) const {
-  // Evaluate nondifferentiated
-  if (oracle_(arg, res, iw, w, 0)) return 1;
-  return 0;
-}
-
 int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
     casadi_int* iw, bvec_t* w, void* mem) const {
   if (verbose_) casadi_message(name_ + "::sp_forward");
@@ -808,7 +797,7 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
     std::fill(res, res + DYN_NUM_OUT, nullptr);
     res[DYN_ODE] = x;
     res[DYN_ALG] = z;
-    if (oracle_forward(arg, res, iw, w)) return 1;
+    oracle_(arg, res, iw, w, 0);
     for (casadi_int i = 0; i < nx_; ++i) x[i] |= x_prev[i];
 
     // "Solve" in order to resolve interdependencies (cf. Rootfinder)
@@ -822,14 +811,11 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
 
     // Propagate to quadratures
     if (nq_ > 0 && qf) {
-      std::fill(arg, arg + DYN_NUM_IN, nullptr);
       arg[DYN_X] = x;
       arg[DYN_Z] = z;
-      arg[DYN_P] = p;
-      arg[DYN_U] = u;
-      std::fill(res, res + DYN_NUM_OUT, nullptr);
+      res[DYN_ODE] = res[DYN_ALG] = nullptr;
       res[DYN_QUAD] = qf;
-      if (oracle_forward(arg, res, iw, w)) return 1;
+      if (oracle_(arg, res, iw, w, 0)) return 1;
     }
 
     // Shift time
@@ -866,15 +852,15 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
       // Propagate through DAE function
       std::fill(arg, arg + DYN_NUM_IN, nullptr);
       arg[DYN_X] = x;
-      arg[DYN_Z] = z;
       arg[DYN_P] = p;
       arg[DYN_U] = u;
+      arg[DYN_Z] = z;
       arg[DYN_RX] = rx_prev;
       arg[DYN_RP] = rp;
       std::fill(res, res + DYN_NUM_OUT, nullptr);
       res[DYN_RODE] = rx;
       res[DYN_RALG] = rz;
-      if (oracle_forward(arg, res, iw, w)) return 1;
+      oracle_(arg, res, iw, w, 0);
       for (casadi_int i = 0; i < nrx_; ++i) rx[i] |= rx_prev[i];
 
       // "Solve" in order to resolve interdependencies (cf. Rootfinder)
@@ -884,17 +870,12 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
 
       // Propagate to quadratures
       if ((nrq_ > 0 && rqf) || (nuq_ > 0 && uqf)) {
-        std::fill(arg, arg + DYN_NUM_IN, nullptr);
-        arg[DYN_X] = x;
-        arg[DYN_Z] = z;
-        arg[DYN_P] = p;
-        arg[DYN_U] = u;
         arg[DYN_RX] = rx;
         arg[DYN_RZ] = rz;
-        std::fill(res, res + DYN_NUM_OUT, nullptr);
+        res[DYN_RODE] = res[DYN_RALG] = nullptr;
         res[DYN_RQUAD] = rq;
         res[DYN_UQUAD] = uqf;
-        if (oracle_forward(arg, res, iw, w)) return 1;
+        if (oracle_(arg, res, iw, w, 0)) return 1;
         // Sum contributions to rqf
         if (rqf) {
           for (casadi_int i = 0; i < nrq_; ++i) rqf[i] |= rq[i];
@@ -1888,7 +1869,6 @@ void Integrator::serialize_body(SerializingStream &s) const {
   s.pack("Integrator::sp_jac_dae", sp_jac_dae_);
   s.pack("Integrator::sp_jac_rdae", sp_jac_rdae_);
   s.pack("Integrator::nonaug_oracle", nonaug_oracle_);
-  s.pack("Integrator::fwd_oracle", fwd_oracle_);
   s.pack("Integrator::t0", t0_);
   s.pack("Integrator::tout", tout_);
   s.pack("Integrator::nfwd", nfwd_);
@@ -1939,7 +1919,6 @@ Integrator::Integrator(DeserializingStream & s) : OracleFunction(s) {
   s.unpack("Integrator::sp_jac_dae", sp_jac_dae_);
   s.unpack("Integrator::sp_jac_rdae", sp_jac_rdae_);
   s.unpack("Integrator::nonaug_oracle", nonaug_oracle_);
-  s.unpack("Integrator::fwd_oracle", fwd_oracle_);
   s.unpack("Integrator::t0", t0_);
   s.unpack("Integrator::tout", tout_);
   s.unpack("Integrator::nfwd", nfwd_);

@@ -234,9 +234,6 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   /// New oracle, to replace existing oracle
   Function nonaug_oracle_;
 
-  /// Forward derivatives of oracle
-  Function fwd_oracle_;
-
   ///@{
   // Shorthands
   const Sparsity&  t() const { return oracle_.sparsity_in(DYN_T);}
@@ -349,9 +346,6 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
 
   /// Which output is used to calculate a given input in adjoint sensitivity analysis
   static casadi_int adjmap_out(casadi_int i);
-
-  /// Propagate sparsities forward through the oracle
-  int oracle_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const;
 
  protected:
   /** \brief Deserializing constructor
