@@ -42,7 +42,7 @@ namespace casadi {
     plugin->options = &CplexInterface::options_;
     plugin->deserialize = &CplexInterface::deserialize;
     #ifdef CPLEX_ADAPTOR
-      char buffer[200];
+      char buffer[400];
       int ret = cplex_adaptor_load(buffer, sizeof(buffer));
       if (ret!=0) {
         casadi_warning("Failed to load CPLEX adaptor: " + std::string(buffer) + ".");

@@ -39,7 +39,7 @@ namespace casadi {
     plugin->options = &GurobiInterface::options_;
     plugin->deserialize = &GurobiInterface::deserialize;
     #ifdef GUROBI_ADAPTOR
-      char buffer[200];
+      char buffer[400];
       int ret = gurobi_adaptor_load(buffer, sizeof(buffer));
       if (ret!=0) {
         casadi_warning("Failed to load Gurobi adaptor: " + std::string(buffer) + ".");
