@@ -837,6 +837,76 @@ jobs:
       - run: ls
       - name: Unpack source
         run: unzip casadi-${{env.os}}${{matrix.bit}}-py${{matrix.py2}}.zip -d casadi
+      - id: get-id
+        uses: actions/github-script@v6.3.3
+        env:
+          py2: "${{ matrix.py2 }}"
+        with:
+          result-encoding: string
+          script: |
+            const { py2 } = process.env;
+            const major = py2.substr(0,1);
+            const minor = py2.substr(1);
+            core.setOutput('pydot2', major+"."+minor)
+      - uses: conda-incubator/setup-miniconda@v2.2.0
+        with:
+          python-version: ${{steps.get-id.outputs.pydot2}}
+          activate-environment: py${{steps.get-id.outputs.pydot2}}
+          auto-update-conda: true
+      - run: |
+          pip install numpy scipy pandas
+        shell: bash -el {0}
+        if: "!contains(matrix.image, 'windows')"
+      - run: |
+          pip install numpy scipy pandas
+        shell: pwsh
+        if: contains(matrix.image, 'windows')
+      - env:
+          PYTHONPATH: ${{ github.workspace }}/casadi
+        run: |
+          cd test/python
+          python alltests.py
+        shell: bash -el {0}
+        if: "!contains(matrix.image, 'windows')"
+      - env:
+          PYTHONPATH: ${{ github.workspace }}/casadi
+        run: |
+          cd test/python
+          python alltests.py
+        shell: pwsh
+        if: contains(matrix.image, 'windows')
+
+  test-python-long:
+    runs-on: ${{matrix.image == 'macos-m1' && 'self-hosted' || matrix.image }}
+    needs: [python-osx,python-dockcross]
+    strategy:
+     fail-fast: false
+     matrix:
+       py2: ["310"]
+       image: ["windows-2022","ubuntu-20.04","macos-m1","macos-11"]
+       bit: [64]
+    steps:
+      - uses: actions/checkout@v3.3.0
+      # Make cl.exe available on Windows
+      - uses: ilammy/msvc-dev-cmd@v1.12.1
+        if: contains(matrix.image, 'windows')
+      - uses: kanga333/variable-mapper@v0.3.0
+        with:
+          key: "${{matrix.image}}"
+          map: |
+           {
+              "windows-2022": {"os": "windows"},
+              "ubuntu-20.04": {"os": "linux"},
+              "macos-11": {"os": "osx"},
+              "macos-m1": {"os": "osx_arm"}
+           }
+          export_to: env
+      - uses: actions/download-artifact@v3.0.2
+        with:
+          name: casadi-${{env.os}}${{matrix.bit}}-py${{matrix.py2}}
+      - run: ls
+      - name: Unpack source
+        run: unzip casadi-${{env.os}}${{matrix.bit}}-py${{matrix.py2}}.zip -d casadi
       - uses: casadi/commercial_solvers@master
         with:
           token: ${{ secrets.JGILLIS_RESTRICTED }}
@@ -856,12 +926,6 @@ jobs:
           python-version: ${{steps.get-id.outputs.pydot2}}
           activate-environment: py${{steps.get-id.outputs.pydot2}}
           auto-update-conda: true
-      - run: echo "$env:PATH"
-        shell: powershell
-        if: contains(matrix.image, 'windows')
-      - run: ls /d/a/_temp && ls /d/a/_temp/knitro-13.2.0-Win64
-        shell: bash
-        if: contains(matrix.image, 'windows')
       - run: |
           pip install numpy scipy pandas
         shell: bash -el {0}
@@ -889,18 +953,18 @@ jobs:
           wget https://github.com/casadi/testbot/releases/download/perpetual/serialize_3.5.5.zip
           unzip serialize_3.5.5.zip
         shell: bash -el {0}
-        if: "!contains(matrix.image, 'windows') && matrix.image == '38'"
+        if: "!contains(matrix.image, 'windows')"
       - env:
           PYTHONPATH: ${{ github.workspace }}/casadi
         run: |
           cd test/python
-          python alltests.py ${{matrix.image == '38' && '--run_slow' || '' }}
+          python alltests.py --run_slow
         shell: bash -el {0}
         if: "!contains(matrix.image, 'windows')"
       - env:
           PYTHONPATH: ${{ github.workspace }}/casadi
         run: |
           cd test/python
-          python alltests.py ${{matrix.image == '38' && '--run_slow' || '' }}
+          python alltests.py --run_slow
         shell: pwsh
         if: contains(matrix.image, 'windows')
