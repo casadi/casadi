@@ -332,25 +332,46 @@ jobs:
           file: ${{ steps.wheel.outputs.wheel }}
           prerelease: true
 
+  matrix-arch-matlab-mac:
+    runs-on: ubuntu-20.04
+    steps:
+      - id: build-matrix
+        uses: jgillis/setup-build-matrix@v1.2.0-if
+        with:
+          config: |
+            matrix:
+              image: [macos-11]
+              host: ["matlab"]
+              version: ["2018b"]
+            operations:
+              - type: append
+                matrix:
+                  image: [macos-11]
+                  host: ["octave"]
+                  version: ["7.3.0"]
+              - type: append
+                if: ${{ vars.BLESSED_REPO == 'yes' }}
+                matrix:
+                  image: [macos-m1]
+                  host: ["matlab"]
+                  version: ["2018b"]
+              - type: append
+                if: ${{ vars.BLESSED_REPO == 'yes' }}
+                matrix:
+                  image: [macos-m1]
+                  host: ["octave"]
+                  version: ["7.3.0"]
+
+
+    outputs:
+      matrix: ${{ steps.build-matrix.outputs.matrix }}
+
   matlab-osx:
-    needs: [core-osx,swig]
+    needs: [core-osx,matrix-arch-matlab-mac,swig]
     runs-on: ${{matrix.image == 'macos-m1' && 'self-hosted' || matrix.image }}
     strategy:
       fail-fast: false
-      matrix:
-        include:
-         - image: macos-11
-           host: "matlab"
-           version: "2018b"
-         - image: macos-11
-           host: "octave"
-           version: "7.3.0"
-         - image: macos-m1
-           host: "matlab"
-           version: "2018b"
-         - image: macos-m1
-           host: "octave"
-           version: "7.3.0"
+      matrix: ${{ fromJson(needs.matrix-arch-matlab-mac.outputs.matrix) }}
     env:
       DEVELOPMENT_CERTIFICATE_DATA_AVAILABLE: ${{ secrets.DEVELOPMENT_CERTIFICATE_DATA != '' }}
     steps:
