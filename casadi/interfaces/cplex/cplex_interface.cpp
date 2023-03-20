@@ -41,6 +41,14 @@ namespace casadi {
     plugin->version = CASADI_VERSION;
     plugin->options = &CplexInterface::options_;
     plugin->deserialize = &CplexInterface::deserialize;
+    #ifdef CPLEX_ADAPTOR
+      char buffer[200];
+      int ret = cplex_adaptor_load(buffer, sizeof(buffer));
+      if (ret!=0) {
+        casadi_warning("Failed to load CPLEX adaptor: " + std::string(buffer) + ".");
+        return 1;
+      }
+    #endif
     return 0;
   }
 
@@ -52,11 +60,6 @@ namespace casadi {
   CplexInterface::CplexInterface(const std::string& name,
                                  const std::map<std::string, Sparsity>& st)
     : Conic(name, st) {
-    #ifdef CPLEX_ADAPTOR
-      char buffer[200];
-      int ret = cplex_adaptor_load(buffer, sizeof(buffer));
-      casadi_assert(ret==0, "Failed to load CPLEX adaptor: " + std::string(buffer) + ".");
-    #endif
   }
 
   const Options CplexInterface::options_
@@ -708,9 +711,6 @@ namespace casadi {
 
   CplexInterface::~CplexInterface() {
     clear_mem();
-    #ifdef CPLEX_ADAPTOR
-      cplex_adaptor_unload();
-    #endif
   }
 
   Dict CplexInterface::get_stats(void* mem) const {
@@ -758,11 +758,6 @@ namespace casadi {
   }
 
   CplexInterface::CplexInterface(DeserializingStream& s) : Conic(s) {
-    #ifdef CPLEX_ADAPTOR
-      char buffer[200];
-      int ret = cplex_adaptor_load(buffer, sizeof(buffer));
-      casadi_assert(ret==0, "Failed to load CPLEX adaptor: " + std::string(buffer) + ".");
-    #endif
     s.version("CplexInterface", 1);
     s.unpack("CplexInterface::opts", opts_);
     s.unpack("CplexInterface::qp_method", qp_method_);

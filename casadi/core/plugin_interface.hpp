@@ -205,7 +205,7 @@ namespace casadi {
 
     // Set the fields
     int flag = regfcn(&plugin);
-    casadi_assert_dev(flag==0);
+    casadi_assert(flag==0, "Registration of plugin failed.");
 
     return plugin;
   }
