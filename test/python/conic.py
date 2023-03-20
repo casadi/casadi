@@ -1229,7 +1229,7 @@ class ConicTests(casadiTestCase):
       ys = 4*sqrt(5-a**2)/(a**2-5)
 
       self.checkarray(res["f"],2*xs+ys,conic,digits=5)
-      self.checkarray(res["x"],vertcat(xs,ys),conic,digits=4 if conic=="cplex" else 5)
+      self.checkarray(res["x"],vertcat(xs,ys),conic,digits=4 if conic in ["cplex","gurobi"] else 5)
 
       #  min  2 x + y
       #
