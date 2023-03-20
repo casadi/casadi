@@ -944,12 +944,12 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
     }
 
     // Save rqf: See note below
-    std::copy_n(rqf, nrq_, rq);
+    if (rqf) std::copy_n(rqf, nrq_, rq);
 
     // Step backwards through backward problem
     for (casadi_int k = 0; k < nt(); ++k) {
       // Restore rqf: See note below
-      std::copy_n(rq, nrq_, rqf);
+      if (rqf) std::copy_n(rq, nrq_, rqf);
 
       // Add impulse from rx0
       if (rx0) {
