@@ -62,10 +62,8 @@ namespace casadi {
   }
 
   void RungeKutta::setup_step() {
-    f_ = create_function(nonaug_oracle_, "odeF", {"t", "x", "p", "u"},
-      {"ode", "quad"});
-    g_ = create_function(nonaug_oracle_, "odeB", {"t", "x", "p", "u", "rx", "rp"},
-      {"rode", "rquad", "uquad"});
+    Function f = create_function(nonaug_oracle_, "odeF",
+      {"t", "x", "p", "u"}, {"ode", "quad"});
 
     // Symbolic inputs
     MX t0 = MX::sym("t0", this->t());
@@ -99,28 +97,28 @@ namespace casadi {
       // k1
       f_arg[ODE_T] = t0;
       f_arg[ODE_X] = x0;
-      f_res = f_(f_arg);
+      f_res = f(f_arg);
       MX k1 = f_res[ODE_ODE];
       MX k1q = f_res[ODE_QUAD];
 
       // k2
       tt[0] = f_arg[ODE_T] = t0 + h_half;
       x_def[0] = f_arg[ODE_X] = x0 + h_half * k1;
-      f_res = f_(f_arg);
+      f_res = f(f_arg);
       MX k2 = f_res[ODE_ODE];
       MX k2q = f_res[ODE_QUAD];
 
       // k3
       tt[1] = tt[0];
       x_def[1] = f_arg[ODE_X] = x0 + h_half * k2;
-      f_res = f_(f_arg);
+      f_res = f(f_arg);
       MX k3 = f_res[ODE_ODE];
       MX k3q = f_res[ODE_QUAD];
 
       // k4
       tt[2] = f_arg[ODE_T] = t0 + h;
       x_def[2] = f_arg[ODE_X] = x0 + h * k3;
-      f_res = f_(f_arg);
+      f_res = f(f_arg);
       MX k4 = f_res[ODE_ODE];
       MX k4q = f_res[ODE_QUAD];
 
@@ -147,7 +145,12 @@ namespace casadi {
     }
 
     // Backward integration
-    if (!g_.is_null()) {
+    if (nrx1_ > 0) {
+      // Continuous-time dynamics, backward problem
+      Function g = create_function(nonaug_oracle_, "odeB",
+        {"t", "x", "p", "u", "rx", "rp"},
+        {"rode", "rquad", "uquad"});
+
       // Symbolic inputs
       MX rx0 = MX::sym("rx0", this->rx1());
       MX rp = MX::sym("rp", this->rp1());
@@ -167,7 +170,7 @@ namespace casadi {
       g_arg[RODE_T] = tt[2];
       g_arg[RODE_X] = x[2];
       g_arg[RODE_RX] = rx0;
-      g_res = g_(g_arg);
+      g_res = g(g_arg);
       MX k1 = g_res[RODE_RODE];
       MX k1rq = g_res[RODE_RQUAD];
       MX k1uq = g_res[RODE_UQUAD];
@@ -176,7 +179,7 @@ namespace casadi {
       g_arg[RODE_T] = tt[1];
       g_arg[RODE_X] = x[1];
       g_arg[RODE_RX] = rx_def[2] = rx0 + h_half * k1;
-      g_res = g_(g_arg);
+      g_res = g(g_arg);
       MX k2 = g_res[RODE_RODE];
       MX k2rq = g_res[RODE_RQUAD];
       MX k2uq = g_res[RODE_UQUAD];
@@ -185,7 +188,7 @@ namespace casadi {
       g_arg[RODE_T] = tt[0];
       g_arg[RODE_X] = x[0];
       g_arg[RODE_RX] = rx_def[1] = rx0 + h_half * k2;
-      g_res = g_(g_arg);
+      g_res = g(g_arg);
       MX k3 = g_res[RODE_RODE];
       MX k3rq = g_res[RODE_RQUAD];
       MX k3uq = g_res[RODE_UQUAD];
@@ -194,7 +197,7 @@ namespace casadi {
       g_arg[RODE_T] = t0;
       g_arg[RODE_X] = x0;
       g_arg[RODE_RX] = rx_def[0] = rx0 + h * k3;
-      g_res = g_(g_arg);
+      g_res = g(g_arg);
       MX k4 = g_res[RODE_RODE];
       MX k4rq = g_res[RODE_RQUAD];
       MX k4uq = g_res[RODE_UQUAD];
@@ -229,16 +232,12 @@ namespace casadi {
   }
 
   RungeKutta::RungeKutta(DeserializingStream& s) : FixedStepIntegrator(s) {
-    s.version("RungeKutta", 1);
-    s.unpack("RungeKutta::f", f_);
-    s.unpack("RungeKutta::g", g_);
+    s.version("RungeKutta", 2);
   }
 
   void RungeKutta::serialize_body(SerializingStream &s) const {
     FixedStepIntegrator::serialize_body(s);
-    s.version("RungeKutta", 1);
-    s.pack("RungeKutta::f", f_);
-    s.pack("RungeKutta::g", g_);
+    s.version("RungeKutta", 2);
   }
 
 } // namespace casadi

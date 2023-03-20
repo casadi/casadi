@@ -83,9 +83,6 @@ namespace casadi {
     /// A documentation string
     static const std::string meta_doc;
 
-    /// Continuous time dynamics
-    Function f_, g_;
-
     /** \brief Serialize an object without type information */
     void serialize_body(SerializingStream &s) const override;
 
