@@ -138,7 +138,8 @@ namespace casadi {
       f_res[FSTEP_XF] = xf;
       f_res[FSTEP_QF] = qf;
       f_res[FSTEP_VF] = horzcat(x_def);
-      Function F("stepF", f_arg, f_res);
+      Function F("stepF", f_arg, f_res,
+        {"t", "h", "x0", "v0", "p", "u"}, {"xf", "vf", "qf"});
       set_function(F, F.name(), true);
     }
 
@@ -216,7 +217,9 @@ namespace casadi {
       g_res[BSTEP_RVF] = horzcat(rx_def);
       g_res[BSTEP_RQF] = rqf;
       g_res[BSTEP_UQF] = uqf;
-      Function G("stepB", g_arg, g_res);
+      Function G("stepB", g_arg, g_res,
+        {"t", "h", "rx0", "rv0", "rp", "x", "v", "p", "u"},
+        {"rxf", "rvf", "rqf", "uqf"});
       set_function(G, G.name(), true);
     }
   }

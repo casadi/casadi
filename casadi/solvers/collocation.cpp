@@ -224,7 +224,8 @@ namespace casadi {
     F_out[FSTEP_XF] = xf;
     F_out[FSTEP_VF] = vertcat(eq);
     F_out[FSTEP_QF] = qf;
-    Function F("implicit_stepF", F_in, F_out);
+    Function F("implicit_stepF", F_in, F_out,
+      {"t", "h", "x0", "v0", "p", "u"}, {"xf", "vf", "qf"});
     set_function(F, F.name(), true);
 
     // Backwards dynamics
@@ -315,7 +316,9 @@ namespace casadi {
       G_out[BSTEP_RVF] = vertcat(eq);
       G_out[BSTEP_RQF] = rqf;
       G_out[BSTEP_UQF] = uqf;
-      Function G("implicit_stepB", G_in, G_out);
+      Function G("implicit_stepB", G_in, G_out,
+        {"t", "h", "rx0", "rv0", "rp", "x", "v", "p", "u"},
+        {"rxf", "rvf", "rqf", "uqf"});
       set_function(G, G.name(), true);
     }
   }
