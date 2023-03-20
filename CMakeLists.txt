@@ -1053,6 +1053,15 @@ if(WITH_HPIPM)
        IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}hpipm${CMAKE_SHARED_LIBRARY_SUFFIX}"
        IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}hpipm${CMAKE_IMPORT_LIBRARY_SUFFIX}"
     )
+    if(CMAKE_CROSS_COMPILING AND MINGW)
+      add_custom_command(TARGET hpipm-external POST_BUILD
+        COMMAND gendef "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}hpipm${CMAKE_SHARED_LIBRARY_SUFFIX}"
+        COMMAND $ENV{DLLTOOL} --dllname "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}hpipm${CMAKE_SHARED_LIBRARY_SUFFIX}" --def libhpipm.def --output-lib hpipm.lib
+      )
+      install(FILES "${CMAKE_CURRENT_BINARY_DIR}/hpipm.lib"
+        DESTINATION ${DEF_LIB_PREFIX}
+      )
+    endif()
     file(GLOB HPIPM_HEADERS "${CMAKE_BINARY_DIR}/external_projects/include/hpipm*")
     install(FILES
       ${HPIPM_HEADERS}
@@ -1389,6 +1398,15 @@ if(WITH_HIGHS)
        IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}highs${CMAKE_SHARED_LIBRARY_SUFFIX}"
        IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}highs${CMAKE_IMPORT_LIBRARY_SUFFIX}"
     )
+    if(CMAKE_CROSS_COMPILING AND MINGW)
+      add_custom_command(TARGET highs-external POST_BUILD
+        COMMAND gendef "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}highs${CMAKE_SHARED_LIBRARY_SUFFIX}"
+        COMMAND $ENV{DLLTOOL} --dllname "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}highs${CMAKE_SHARED_LIBRARY_SUFFIX}" --def libhighs.def --output-lib highs.lib
+      )
+      install(FILES "${CMAKE_CURRENT_BINARY_DIR}/highs.lib"
+        DESTINATION ${DEF_LIB_PREFIX}
+      )
+    endif()
     install(DIRECTORY
       "${CMAKE_BINARY_DIR}/external_projects/include/highs"
       DESTINATION "${INCLUDE_PREFIX}")
@@ -1472,13 +1490,13 @@ if(WITH_OSQP)
       "${CMAKE_BINARY_DIR}/external_projects/include/osqp"
       DESTINATION "${INCLUDE_PREFIX}")
     if(CMAKE_CROSS_COMPILING AND MINGW)
-    add_custom_command(TARGET osqp-external POST_BUILD
-      COMMAND gendef "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}osqp${CMAKE_SHARED_LIBRARY_SUFFIX}"
-      COMMAND $ENV{DLLTOOL} --dllname "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}osqp${CMAKE_SHARED_LIBRARY_SUFFIX}" --def libosqp.def --output-lib osqp.lib
-    )
-    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/osqp.lib"
-      DESTINATION ${DEF_LIB_PREFIX}
-    )
+      add_custom_command(TARGET osqp-external POST_BUILD
+        COMMAND gendef "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}osqp${CMAKE_SHARED_LIBRARY_SUFFIX}"
+        COMMAND $ENV{DLLTOOL} --dllname "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}osqp${CMAKE_SHARED_LIBRARY_SUFFIX}" --def libosqp.def --output-lib osqp.lib
+      )
+      install(FILES "${CMAKE_CURRENT_BINARY_DIR}/osqp.lib"
+        DESTINATION ${DEF_LIB_PREFIX}
+      )
     endif()
   endif()
 endif()
