@@ -526,7 +526,7 @@ class CASADI_EXPORT FixedStepIntegrator : public Integrator {
   std::vector<casadi_int> disc_;
 
   /// Number of dependent variables in the discrete time integration
-  casadi_int nv_, nrv_;
+  casadi_int nv_, nv1_, nrv_, nrv1_;
 
   /** \brief Serialize an object without type information
 

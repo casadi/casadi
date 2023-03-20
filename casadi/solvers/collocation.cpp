@@ -92,8 +92,9 @@ namespace casadi {
   }
 
   void Collocation::setup_step() {
-    f_ = create_function("daeF", {"t", "x", "z", "p", "u"}, {"ode", "alg", "quad"});
-    g_ = create_function("daeB", {"t", "x", "z", "p", "u", "rx", "rz", "rp"},
+    f_ = create_function(nonaug_oracle_, "daeF", {"t", "x", "z", "p", "u"},
+      {"ode", "alg", "quad"});
+    g_ = create_function(nonaug_oracle_, "daeB", {"t", "x", "z", "p", "u", "rx", "rz", "rp"},
       {"rode", "ralg", "rquad", "uquad"});
 
     // All collocation time points
@@ -101,22 +102,22 @@ namespace casadi {
     tau_root.insert(tau_root.begin(), 0);
 
     // Coefficients of the collocation equation
-    std::vector<std::vector<double> > C(deg_+1, std::vector<double>(deg_+1, 0));
+    std::vector<std::vector<double> > C(deg_ + 1, std::vector<double>(deg_ + 1, 0));
 
     // Coefficients of the continuity equation
-    std::vector<double> D(deg_+1, 0);
+    std::vector<double> D(deg_ + 1, 0);
 
     // Coefficients of the quadratures
-    std::vector<double> B(deg_+1, 0);
+    std::vector<double> B(deg_ + 1, 0);
 
     // For all collocation points
-    for (casadi_int j=0; j<deg_+1; ++j) {
+    for (casadi_int j = 0; j < deg_ + 1; ++j) {
 
       // Construct Lagrange polynomials to get the polynomial basis at the collocation point
       Polynomial p = 1;
-      for (casadi_int r=0; r<deg_+1; ++r) {
+      for (casadi_int r = 0; r < deg_+1; ++r) {
         if (r!=j) {
-          p *= Polynomial(-tau_root[r], 1)/(tau_root[j]-tau_root[r]);
+          p *= Polynomial(-tau_root[r], 1) / (tau_root[j] - tau_root[r]);
         }
       }
 
@@ -131,7 +132,7 @@ namespace casadi {
       // Evaluate the time derivative of the polynomial at all collocation points to
       // get the coefficients of the continuity equation
       Polynomial dp = p.derivative();
-      for (casadi_int r=0; r<deg_+1; ++r) {
+      for (casadi_int r = 0; r < deg_ + 1; ++r) {
         C[j][r] = dp(tau_root[r]);
       }
 
@@ -143,31 +144,31 @@ namespace casadi {
     // Symbolic inputs
     MX t0 = MX::sym("t0", this->t());
     MX h = MX::sym("h");
-    MX x0 = MX::sym("x0", this->x());
-    MX p = MX::sym("p", this->p());
-    MX u = MX::sym("u", this->u());
+    MX x0 = MX::sym("x0", this->x1());
+    MX p = MX::sym("p", this->p1());
+    MX u = MX::sym("u", this->u1());
 
     // Implicitly defined variables (z and x)
-    MX v = MX::sym("v", deg_*(nx_+nz_));
+    MX v = MX::sym("v", deg_ * (nx1_ + nz1_));
     std::vector<casadi_int> v_offset(1, 0);
-    for (casadi_int d=0; d<deg_; ++d) {
-      v_offset.push_back(v_offset.back()+nx_);
-      v_offset.push_back(v_offset.back()+nz_);
+    for (casadi_int d = 0; d < deg_; ++d) {
+      v_offset.push_back(v_offset.back() + nx1_);
+      v_offset.push_back(v_offset.back() + nz1_);
     }
     std::vector<MX> vv = vertsplit(v, v_offset);
     std::vector<MX>::const_iterator vv_it = vv.begin();
 
     // Collocated states
-    std::vector<MX> x(deg_+1), z(deg_+1);
-    for (casadi_int d=1; d<=deg_; ++d) {
+    std::vector<MX> x(deg_ + 1), z(deg_ + 1);
+    for (casadi_int d = 1; d <= deg_; ++d) {
       x[d] = *vv_it++;
       z[d] = *vv_it++;
     }
-    casadi_assert_dev(vv_it==vv.end());
+    casadi_assert_dev(vv_it == vv.end());
 
     // Collocation time points
-    std::vector<MX> tt(deg_+1);
-    for (casadi_int d=0; d<=deg_; ++d) {
+    std::vector<MX> tt(deg_ + 1);
+    for (casadi_int d = 0; d <= deg_; ++d) {
       tt[d] = t0 + h * tau_root[d];
     }
 
@@ -175,14 +176,13 @@ namespace casadi {
     std::vector<MX> eq;
 
     // Quadratures
-    MX qf = MX::zeros(this->q());
+    MX qf = MX::zeros(this->q1());
 
     // End state
-    MX xf = D[0]*x0;
+    MX xf = D[0] * x0;
 
     // For all collocation points
-    for (casadi_int j=1; j<deg_+1; ++j) {
-      //for (casadi_int j=deg_; j>=1; --j) {
+    for (casadi_int j = 1; j < deg_ + 1; ++j) {
 
       // Evaluate the DAE
       std::vector<MX> f_arg(DAE_NUM_IN);
@@ -195,7 +195,7 @@ namespace casadi {
 
       // Get an expression for the state derivative at the collocation point
       MX xp_j = C[0][j] * x0;
-      for (casadi_int r=1; r<deg_+1; ++r) {
+      for (casadi_int r = 1; r < deg_ + 1; ++r) {
         xp_j += C[r][j] * x[r];
       }
 
@@ -206,10 +206,10 @@ namespace casadi {
       eq.push_back(vec(f_res[DAE_ALG]));
 
       // Add contribution to the final state
-      xf += D[j]*x[j];
+      xf += D[j] * x[j];
 
       // Add contribution to quadratures
-      qf += (B[j] * h)*f_res[DAE_QUAD];
+      qf += (B[j] * h) * f_res[DAE_QUAD];
     }
 
     // Form forward discrete time dynamics
@@ -234,39 +234,39 @@ namespace casadi {
     if (!g_.is_null()) {
 
       // Symbolic inputs
-      MX rx0 = MX::sym("rx0", this->rx());
-      MX rp = MX::sym("rp", this->rp());
+      MX rx0 = MX::sym("rx0", this->rx1());
+      MX rp = MX::sym("rp", this->rp1());
 
       // Implicitly defined variables (rz and rx)
-      MX rv = MX::sym("v", deg_*(nrx_+nrz_));
+      MX rv = MX::sym("v", deg_ * (nrx1_ + nrz1_));
       std::vector<casadi_int> rv_offset(1, 0);
-      for (casadi_int d=0; d<deg_; ++d) {
-        rv_offset.push_back(rv_offset.back()+nrx_);
-        rv_offset.push_back(rv_offset.back()+nrz_);
+      for (casadi_int d = 0; d < deg_; ++d) {
+        rv_offset.push_back(rv_offset.back() + nrx1_);
+        rv_offset.push_back(rv_offset.back() + nrz1_);
       }
       std::vector<MX> rvv = vertsplit(rv, rv_offset);
       std::vector<MX>::const_iterator rvv_it = rvv.begin();
 
       // Collocated states
-      std::vector<MX> rx(deg_+1), rz(deg_+1);
-      for (casadi_int d=1; d<=deg_; ++d) {
-        rx[d] = reshape(*rvv_it++, this->rx().size());
-        rz[d] = reshape(*rvv_it++, this->rz().size());
+      std::vector<MX> rx(deg_ + 1), rz(deg_ + 1);
+      for (casadi_int d = 1; d <= deg_; ++d) {
+        rx[d] = reshape(*rvv_it++, this->rx1().size());
+        rz[d] = reshape(*rvv_it++, this->rz1().size());
       }
-      casadi_assert_dev(rvv_it==rvv.end());
+      casadi_assert_dev(rvv_it == rvv.end());
 
       // Equations that implicitly define v
       eq.clear();
 
       // Quadratures
-      MX rqf = MX::zeros(this->rq());
-      MX uqf = MX::zeros(this->uq());
+      MX rqf = MX::zeros(this->rq1());
+      MX uqf = MX::zeros(this->uq1());
 
       // End state
-      MX rxf = D[0]*rx0;
+      MX rxf = D[0] * rx0;
 
       // For all collocation points
-      for (casadi_int j=1; j<deg_+1; ++j) {
+      for (casadi_int j = 1; j < deg_ + 1; ++j) {
 
         // Evaluate the backward DAE
         std::vector<MX> g_arg(RDAE_NUM_IN);
@@ -281,8 +281,8 @@ namespace casadi {
         std::vector<MX> g_res = g_(g_arg);
 
         // Get an expression for the state derivative at the collocation point
-        MX rxp_j = -D[j]*rx0;
-        for (casadi_int r=1; r<deg_+1; ++r) {
+        MX rxp_j = -D[j] * rx0;
+        for (casadi_int r = 1; r < deg_ + 1; ++r) {
           rxp_j += (B[r]*C[j][r]) * rx[r];
         }
 
@@ -330,13 +330,13 @@ namespace casadi {
     // Reset the base classes
     ImplicitFixedStepIntegrator::reset(mem, x, z, p);
 
-    // Initial guess for v
+    // Initial guess for v (only non-augmented system part)
     double* v = m->v;
     for (casadi_int d = 0; d < deg_; ++d) {
-      casadi_copy(x, nx_, v);
-      v += nx_;
-      casadi_copy(z, nz_, v);
-      v += nz_;
+      casadi_copy(x, nx1_, v);
+      v += nx1_;
+      casadi_copy(z, nz1_, v);
+      v += nz1_;
     }
   }
 

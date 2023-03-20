@@ -62,20 +62,22 @@ namespace casadi {
   }
 
   void RungeKutta::setup_step() {
-    f_ = create_function("odeF", {"t", "x", "p", "u"}, {"ode", "quad"});
-    g_ = create_function("odeB", {"t", "x", "p", "u", "rx", "rp"}, {"rode", "rquad", "uquad"});
+    f_ = create_function(nonaug_oracle_, "odeF", {"t", "x", "p", "u"},
+      {"ode", "quad"});
+    g_ = create_function(nonaug_oracle_, "odeB", {"t", "x", "p", "u", "rx", "rp"},
+      {"rode", "rquad", "uquad"});
 
     // Symbolic inputs
     MX t0 = MX::sym("t0", this->t());
     MX h = MX::sym("h");
-    MX x0 = MX::sym("x0", this->x());
-    MX p = MX::sym("p", this->p());
-    MX u = MX::sym("u", this->u());
+    MX x0 = MX::sym("x0", this->x1());
+    MX p = MX::sym("p", this->p1());
+    MX u = MX::sym("u", this->u1());
 
     // Intermediate variables (does not enter in F_, only in G_)
-    MX v = MX::sym("v", x0.size1(), x0.size2()*3);
+    MX v = MX::sym("v", x0.size1(), x0.size2() * 3);
     std::vector<MX> x = horzsplit(v, x0.size2());
-    casadi_assert_dev(x.size()==3);
+    casadi_assert_dev(x.size() == 3);
 
     // Definitions of x
     std::vector<MX> x_def(3);
@@ -141,16 +143,17 @@ namespace casadi {
       Function F("stepF", f_arg, f_res,
         {"t", "h", "x0", "v0", "p", "u"}, {"xf", "vf", "qf"});
       set_function(F, F.name(), true);
+      if (ns_ > 0) create_forward("stepF", ns_);
     }
 
     // Backward integration
     if (!g_.is_null()) {
       // Symbolic inputs
-      MX rx0 = MX::sym("rx0", this->rx());
-      MX rp = MX::sym("rp", this->rp());
+      MX rx0 = MX::sym("rx0", this->rx1());
+      MX rp = MX::sym("rp", this->rp1());
 
       // Intermediate variables (do not enter in G_)
-      MX rv = MX::sym("rv", rx0.size1(), 3*rx0.size2());
+      MX rv = MX::sym("rv", rx0.size1(), 3 * rx0.size2());
       std::vector<MX> rx_def(3);
 
       // Arguments when calling g
@@ -221,6 +224,7 @@ namespace casadi {
         {"t", "h", "rx0", "rv0", "rp", "x", "v", "p", "u"},
         {"rxf", "rvf", "rqf", "uqf"});
       set_function(G, G.name(), true);
+      if (ns_ > 0) create_forward("stepB", ns_);
     }
   }
 
