@@ -49,7 +49,7 @@ namespace casadi {
   struct CASADI_CONIC_SUPERSCS_EXPORT SuperscsMemory : public ConicMemory {
 
     ScsSolution* sol;
-    ScsData data;;
+    ScsData data;
 
     ScsInfo * info;
     ScsCone cone;
