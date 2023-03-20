@@ -264,6 +264,18 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   const Sparsity& uq1() const { return nonaug_oracle_.sparsity_out(DYN_UQUAD);}
   ///@}
 
+  ///@{
+  /** \brief IO conventions for continuous time dynamics */
+  enum FDynIn { FDYN_T, FDYN_X, FDYN_Z, FDYN_P, FDYN_U, FDYN_NUM_IN};
+  enum FDynOut { FDYN_ODE, FDYN_ALG, FDYN_QUAD, FDYN_NUM_OUT};
+  enum BDybIn { BDYN_T, BDYN_X, BDYN_Z, BDYN_P, BDYN_U, BDYN_RX, BDYN_RZ, BDYN_RP, BDYN_NUM_IN};
+  enum BDynOut { BDYN_RODE, BDYN_RALG, BDYN_RQUAD, BDYN_UQUAD, BDYN_NUM_OUT};
+  static std::vector<std::string> fdyn_in() { return {"t", "x", "z", "p", "u"}; }
+  static std::vector<std::string> fdyn_out() { return {"ode", "alg", "quad"}; }
+  static std::vector<std::string> bdyn_in() { return {"t", "x", "z", "p", "u", "rx", "rz", "rp"}; }
+  static std::vector<std::string> bdyn_out() { return {"rode", "ralg", "rquad", "uquad"}; }
+  ///@}
+
   // Initial time
   double t0_;
 

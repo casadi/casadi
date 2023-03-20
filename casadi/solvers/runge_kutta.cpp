@@ -62,8 +62,8 @@ namespace casadi {
   }
 
   void RungeKutta::setup_step() {
-    Function f = create_function(nonaug_oracle_, "odeF",
-      {"t", "x", "p", "u"}, {"ode", "quad"});
+    // Continuous-time dynamics, forward problem
+    Function f = get_function("dynF");
 
     // Symbolic inputs
     MX t0 = MX::sym("t0", this->t());
@@ -89,38 +89,38 @@ namespace casadi {
     // Forward integration
     {
       // Arguments when calling f
-      std::vector<MX> f_arg(ODE_NUM_IN);
+      std::vector<MX> f_arg(FDYN_NUM_IN);
       std::vector<MX> f_res;
-      f_arg[ODE_P] = p;
-      f_arg[ODE_U] = u;
+      f_arg[FDYN_P] = p;
+      f_arg[FDYN_U] = u;
 
       // k1
-      f_arg[ODE_T] = t0;
-      f_arg[ODE_X] = x0;
+      f_arg[FDYN_T] = t0;
+      f_arg[FDYN_X] = x0;
       f_res = f(f_arg);
-      MX k1 = f_res[ODE_ODE];
-      MX k1q = f_res[ODE_QUAD];
+      MX k1 = f_res[FDYN_ODE];
+      MX k1q = f_res[FDYN_QUAD];
 
       // k2
-      tt[0] = f_arg[ODE_T] = t0 + h_half;
-      x_def[0] = f_arg[ODE_X] = x0 + h_half * k1;
+      tt[0] = f_arg[FDYN_T] = t0 + h_half;
+      x_def[0] = f_arg[FDYN_X] = x0 + h_half * k1;
       f_res = f(f_arg);
-      MX k2 = f_res[ODE_ODE];
-      MX k2q = f_res[ODE_QUAD];
+      MX k2 = f_res[FDYN_ODE];
+      MX k2q = f_res[FDYN_QUAD];
 
       // k3
       tt[1] = tt[0];
-      x_def[1] = f_arg[ODE_X] = x0 + h_half * k2;
+      x_def[1] = f_arg[FDYN_X] = x0 + h_half * k2;
       f_res = f(f_arg);
-      MX k3 = f_res[ODE_ODE];
-      MX k3q = f_res[ODE_QUAD];
+      MX k3 = f_res[FDYN_ODE];
+      MX k3q = f_res[FDYN_QUAD];
 
       // k4
-      tt[2] = f_arg[ODE_T] = t0 + h;
-      x_def[2] = f_arg[ODE_X] = x0 + h * k3;
+      tt[2] = f_arg[FDYN_T] = t0 + h;
+      x_def[2] = f_arg[FDYN_X] = x0 + h * k3;
       f_res = f(f_arg);
-      MX k4 = f_res[ODE_ODE];
-      MX k4q = f_res[ODE_QUAD];
+      MX k4 = f_res[FDYN_ODE];
+      MX k4q = f_res[FDYN_QUAD];
 
       // Take step
       MX xf = x0 + h_sixth * (k1 + 2*k2 + 2*k3 + k4);
@@ -147,9 +147,7 @@ namespace casadi {
     // Backward integration
     if (nrx1_ > 0) {
       // Continuous-time dynamics, backward problem
-      Function g = create_function(nonaug_oracle_, "odeB",
-        {"t", "x", "p", "u", "rx", "rp"},
-        {"rode", "rquad", "uquad"});
+      Function g = get_function("dynB");
 
       // Symbolic inputs
       MX rx0 = MX::sym("rx0", this->rx1());
@@ -160,47 +158,47 @@ namespace casadi {
       std::vector<MX> rx_def(3);
 
       // Arguments when calling g
-      std::vector<MX> g_arg(RODE_NUM_IN);
+      std::vector<MX> g_arg(BDYN_NUM_IN);
       std::vector<MX> g_res;
-      g_arg[RODE_P] = p;
-      g_arg[RODE_U] = u;
-      g_arg[RODE_RP] = rp;
+      g_arg[BDYN_P] = p;
+      g_arg[BDYN_U] = u;
+      g_arg[BDYN_RP] = rp;
 
       // k1
-      g_arg[RODE_T] = tt[2];
-      g_arg[RODE_X] = x[2];
-      g_arg[RODE_RX] = rx0;
+      g_arg[BDYN_T] = tt[2];
+      g_arg[BDYN_X] = x[2];
+      g_arg[BDYN_RX] = rx0;
       g_res = g(g_arg);
-      MX k1 = g_res[RODE_RODE];
-      MX k1rq = g_res[RODE_RQUAD];
-      MX k1uq = g_res[RODE_UQUAD];
+      MX k1 = g_res[BDYN_RODE];
+      MX k1rq = g_res[BDYN_RQUAD];
+      MX k1uq = g_res[BDYN_UQUAD];
 
       // k2
-      g_arg[RODE_T] = tt[1];
-      g_arg[RODE_X] = x[1];
-      g_arg[RODE_RX] = rx_def[2] = rx0 + h_half * k1;
+      g_arg[BDYN_T] = tt[1];
+      g_arg[BDYN_X] = x[1];
+      g_arg[BDYN_RX] = rx_def[2] = rx0 + h_half * k1;
       g_res = g(g_arg);
-      MX k2 = g_res[RODE_RODE];
-      MX k2rq = g_res[RODE_RQUAD];
-      MX k2uq = g_res[RODE_UQUAD];
+      MX k2 = g_res[BDYN_RODE];
+      MX k2rq = g_res[BDYN_RQUAD];
+      MX k2uq = g_res[BDYN_UQUAD];
 
       // k3
-      g_arg[RODE_T] = tt[0];
-      g_arg[RODE_X] = x[0];
-      g_arg[RODE_RX] = rx_def[1] = rx0 + h_half * k2;
+      g_arg[BDYN_T] = tt[0];
+      g_arg[BDYN_X] = x[0];
+      g_arg[BDYN_RX] = rx_def[1] = rx0 + h_half * k2;
       g_res = g(g_arg);
-      MX k3 = g_res[RODE_RODE];
-      MX k3rq = g_res[RODE_RQUAD];
-      MX k3uq = g_res[RODE_UQUAD];
+      MX k3 = g_res[BDYN_RODE];
+      MX k3rq = g_res[BDYN_RQUAD];
+      MX k3uq = g_res[BDYN_UQUAD];
 
       // k4
-      g_arg[RODE_T] = t0;
-      g_arg[RODE_X] = x0;
-      g_arg[RODE_RX] = rx_def[0] = rx0 + h * k3;
+      g_arg[BDYN_T] = t0;
+      g_arg[BDYN_X] = x0;
+      g_arg[BDYN_RX] = rx_def[0] = rx0 + h * k3;
       g_res = g(g_arg);
-      MX k4 = g_res[RODE_RODE];
-      MX k4rq = g_res[RODE_RQUAD];
-      MX k4uq = g_res[RODE_UQUAD];
+      MX k4 = g_res[BDYN_RODE];
+      MX k4rq = g_res[BDYN_RQUAD];
+      MX k4uq = g_res[BDYN_UQUAD];
 
       // Take step
       MX rxf = rx0 + h_sixth * (k1 + 2*k2 + 2*k3 + k4);

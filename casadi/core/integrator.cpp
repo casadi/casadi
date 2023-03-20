@@ -487,9 +487,7 @@ void Integrator::init(const Dict& opts) {
       "Set the time grid by proving additional argument to the 'integrator' call instead.");
 
     // If grid unset, default to [t0, tf]
-    if (grid.empty()) {
-      grid = {t0, tf};
-    }
+    if (grid.empty()) grid = {t0, tf};
 
     // Construct t0 and tout from grid and output_t0
     t0_ = grid.front();
@@ -540,6 +538,10 @@ void Integrator::init(const Dict& opts) {
   nrp_ = nrp1_ * (1 + ns_);
   nrq_ = nrq1_ * (1 + ns_);
   nuq_ = nuq1_ * (1 + ns_);
+
+  // Create dynamic functions, forward and backward proble,
+  create_function(nonaug_oracle_, "dynF", fdyn_in(), fdyn_out());
+  if (nrx1_ > 0) create_function(nonaug_oracle_, "dynB", bdyn_in(), bdyn_out());
 
   // Get the sparsities of the forward and reverse DAE
   sp_jac_dae_ = sp_jac_dae();

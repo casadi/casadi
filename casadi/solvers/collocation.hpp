@@ -119,14 +119,6 @@ namespace casadi {
 
    protected:
 
-    ///@{
-    /** \brief IO conventions for continuous time dynamics */
-    enum DaeIn { DAE_T, DAE_X, DAE_Z, DAE_P, DAE_U, DAE_NUM_IN};
-    enum DaeOut { DAE_ODE, DAE_ALG, DAE_QUAD, DAE_NUM_OUT};
-    enum RDaeIn { RDAE_T, RDAE_X, RDAE_Z, RDAE_P, RDAE_U, RDAE_RX, RDAE_RZ, RDAE_RP, RDAE_NUM_IN};
-    enum RDaeOut { RDAE_RODE, RDAE_RALG, RDAE_RQUAD, RDAE_UQUAD, RDAE_NUM_OUT};
-    ///@}
-
     /** \brief Deserializing constructor */
     explicit Collocation(DeserializingStream& s);
   };

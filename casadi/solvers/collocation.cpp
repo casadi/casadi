@@ -93,8 +93,7 @@ namespace casadi {
 
   void Collocation::setup_step() {
     // Continuous-time dynamics, forward problem
-    Function f = create_function(nonaug_oracle_, "daeF",
-      {"t", "x", "z", "p", "u"}, {"ode", "alg", "quad"});
+    Function f = get_function("dynF");
 
     // All collocation time points
     std::vector<double> tau_root = collocation_points(deg_, collocation_scheme_);
@@ -184,12 +183,12 @@ namespace casadi {
     for (casadi_int j = 1; j < deg_ + 1; ++j) {
 
       // Evaluate the DAE
-      std::vector<MX> f_arg(DAE_NUM_IN);
-      f_arg[DAE_T] = tt[j];
-      f_arg[DAE_P] = p;
-      f_arg[DAE_U] = u;
-      f_arg[DAE_X] = x[j];
-      f_arg[DAE_Z] = z[j];
+      std::vector<MX> f_arg(FDYN_NUM_IN);
+      f_arg[FDYN_T] = tt[j];
+      f_arg[FDYN_P] = p;
+      f_arg[FDYN_U] = u;
+      f_arg[FDYN_X] = x[j];
+      f_arg[FDYN_Z] = z[j];
       std::vector<MX> f_res = f(f_arg);
 
       // Get an expression for the state derivative at the collocation point
@@ -199,16 +198,16 @@ namespace casadi {
       }
 
       // Add collocation equation
-      eq.push_back(vec(h * f_res[DAE_ODE] - xp_j));
+      eq.push_back(vec(h * f_res[FDYN_ODE] - xp_j));
 
       // Add the algebraic conditions
-      eq.push_back(vec(f_res[DAE_ALG]));
+      eq.push_back(vec(f_res[FDYN_ALG]));
 
       // Add contribution to the final state
       xf += D[j] * x[j];
 
       // Add contribution to quadratures
-      qf += (B[j] * h) * f_res[DAE_QUAD];
+      qf += (B[j] * h) * f_res[FDYN_QUAD];
     }
 
     // Form forward discrete time dynamics
@@ -232,9 +231,7 @@ namespace casadi {
     // sensitivities whenever g is the reverse mode derivative of f.
     if (nrx1_ > 0) {
       // Continuous-time dynamics, backward problem
-      Function g = create_function(nonaug_oracle_, "daeB",
-        {"t", "x", "z", "p", "u", "rx", "rz", "rp"},
-        {"rode", "ralg", "rquad", "uquad"});
+      Function g = get_function("dynB");
 
       // Symbolic inputs
       MX rx0 = MX::sym("rx0", this->rx1());
@@ -272,15 +269,15 @@ namespace casadi {
       for (casadi_int j = 1; j < deg_ + 1; ++j) {
 
         // Evaluate the backward DAE
-        std::vector<MX> g_arg(RDAE_NUM_IN);
-        g_arg[RDAE_T] = tt[j];
-        g_arg[RDAE_P] = p;
-        g_arg[RDAE_U] = u;
-        g_arg[RDAE_X] = x[j];
-        g_arg[RDAE_Z] = z[j];
-        g_arg[RDAE_RX] = rx[j];
-        g_arg[RDAE_RZ] = rz[j];
-        g_arg[RDAE_RP] = rp;
+        std::vector<MX> g_arg(BDYN_NUM_IN);
+        g_arg[BDYN_T] = tt[j];
+        g_arg[BDYN_P] = p;
+        g_arg[BDYN_U] = u;
+        g_arg[BDYN_X] = x[j];
+        g_arg[BDYN_Z] = z[j];
+        g_arg[BDYN_RX] = rx[j];
+        g_arg[BDYN_RZ] = rz[j];
+        g_arg[BDYN_RP] = rp;
         std::vector<MX> g_res = g(g_arg);
 
         // Get an expression for the state derivative at the collocation point
@@ -290,17 +287,17 @@ namespace casadi {
         }
 
         // Add collocation equation
-        eq.push_back(vec(h * B[j] * g_res[RDAE_RODE] - rxp_j));
+        eq.push_back(vec(h * B[j] * g_res[BDYN_RODE] - rxp_j));
 
         // Add the algebraic conditions
-        eq.push_back(vec(g_res[RDAE_RALG]));
+        eq.push_back(vec(g_res[BDYN_RALG]));
 
         // Add contribution to the final state
         rxf += -B[j] * C[0][j] * rx[j];
 
         // Add contribution to quadratures
-        rqf += h * B[j] * g_res[RDAE_RQUAD];
-        uqf += h * B[j] * g_res[RDAE_UQUAD];
+        rqf += h * B[j] * g_res[BDYN_RQUAD];
+        uqf += h * B[j] * g_res[BDYN_UQUAD];
       }
 
       // Form backward discrete time dynamics
