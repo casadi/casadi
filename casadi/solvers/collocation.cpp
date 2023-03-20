@@ -92,10 +92,9 @@ namespace casadi {
   }
 
   void Collocation::setup_step() {
-    f_ = create_function(nonaug_oracle_, "daeF", {"t", "x", "z", "p", "u"},
-      {"ode", "alg", "quad"});
-    g_ = create_function(nonaug_oracle_, "daeB", {"t", "x", "z", "p", "u", "rx", "rz", "rp"},
-      {"rode", "ralg", "rquad", "uquad"});
+    // Continuous-time dynamics, forward problem
+    Function f = create_function(nonaug_oracle_, "daeF",
+      {"t", "x", "z", "p", "u"}, {"ode", "alg", "quad"});
 
     // All collocation time points
     std::vector<double> tau_root = collocation_points(deg_, collocation_scheme_);
@@ -191,7 +190,7 @@ namespace casadi {
       f_arg[DAE_U] = u;
       f_arg[DAE_X] = x[j];
       f_arg[DAE_Z] = z[j];
-      std::vector<MX> f_res = f_(f_arg);
+      std::vector<MX> f_res = f(f_arg);
 
       // Get an expression for the state derivative at the collocation point
       MX xp_j = C[0][j] * x0;
@@ -231,7 +230,11 @@ namespace casadi {
     // Backwards dynamics
     // NOTE: The following is derived so that it will give the exact adjoint
     // sensitivities whenever g is the reverse mode derivative of f.
-    if (!g_.is_null()) {
+    if (nrx1_ > 0) {
+      // Continuous-time dynamics, backward problem
+      Function g = create_function(nonaug_oracle_, "daeB",
+        {"t", "x", "z", "p", "u", "rx", "rz", "rp"},
+        {"rode", "ralg", "rquad", "uquad"});
 
       // Symbolic inputs
       MX rx0 = MX::sym("rx0", this->rx1());
@@ -278,7 +281,7 @@ namespace casadi {
         g_arg[RDAE_RX] = rx[j];
         g_arg[RDAE_RZ] = rz[j];
         g_arg[RDAE_RP] = rp;
-        std::vector<MX> g_res = g_(g_arg);
+        std::vector<MX> g_res = g(g_arg);
 
         // Get an expression for the state derivative at the collocation point
         MX rxp_j = -D[j] * rx0;
@@ -358,20 +361,16 @@ namespace casadi {
   }
 
   Collocation::Collocation(DeserializingStream& s) : ImplicitFixedStepIntegrator(s) {
-    s.version("Collocation", 1);
+    s.version("Collocation", 2);
     s.unpack("Collocation::deg", deg_);
     s.unpack("Collocation::collocation_scheme", collocation_scheme_);
-    s.unpack("Collocation::f", f_);
-    s.unpack("Collocation::g", g_);
   }
 
   void Collocation::serialize_body(SerializingStream &s) const {
     ImplicitFixedStepIntegrator::serialize_body(s);
-    s.version("Collocation", 1);
+    s.version("Collocation", 2);
     s.pack("Collocation::deg", deg_);
     s.pack("Collocation::collocation_scheme", collocation_scheme_);
-    s.pack("Collocation::f", f_);
-    s.pack("Collocation::g", g_);
   }
 
 } // namespace casadi
