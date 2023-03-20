@@ -510,6 +510,15 @@ class CASADI_EXPORT FixedStepIntegrator : public Integrator {
   void retreat(IntegratorMemory* mem, const double* u,
     double* rx, double* rz, double* rq, double* uq) const override;
 
+  /// Take integrator step forward
+  void stepF(FixedStepMemory* m, double t, double h,
+    const double* x0, const double* v0, double* xf, double* vf, double* qf) const;
+
+  /// Take integrator step backward
+  void stepB(FixedStepMemory* m, double t, double h,
+    const double* x, const double* v, const double* rx0, const double* rv0,
+    double* rxf, double* rvf, double* rqf, double* uqf) const;
+
   // Target number of finite elements
   casadi_int nk_target_;
 
