@@ -300,29 +300,31 @@ namespace casadi {
   }
 
   void KinsolInterface::func(KinsolMemory& m, N_Vector u, N_Vector fval) const {
+    // Get nonzeros
+    const double *u_data = NV_DATA_S(u);
+    double *f_data = NV_DATA_S(fval);
+
     // Evaluate f_
     std::copy_n(m.iarg, n_in_, m.arg);
-    m.arg[iin_] = NV_DATA_S(u);
+    m.arg[iin_] = u_data;
     std::fill_n(m.res, n_out_, nullptr);
-    m.res[iout_] = NV_DATA_S(fval);
+    m.res[iout_] = f_data;
     oracle_(m.arg, m.res, m.iw, m.w, 0);
 
     // Make sure that all entries of the linear system are valid
-    double *fdata = NV_DATA_S(fval);
     for (int k=0; k<n_; ++k) {
       try {
-        casadi_assert(!isnan(fdata[k]),
+        casadi_assert(!isnan(f_data[k]),
           "Nonzero " + str(k) + " is not-a-number");
-        casadi_assert(!isinf(fdata[k]),
+        casadi_assert(!isinf(f_data[k]),
           "Nonzero " + str(k) + " is infinite");
       } catch(std::exception& ex) {
         std::stringstream ss;
         ss << ex.what() << std::endl;
         if (verbose_) {
-          uout() << "u = ";
-          N_VPrint_Serial(u);
+          uout() << "u = " << std::vector<double>(u_data, u_data + n_) << std::endl;
+          uout() << "f = " << std::vector<double>(f_data, f_data + n_) << std::endl;
         }
-
         throw CasadiException(ss.str());
       }
     }
