@@ -829,7 +829,7 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
   if (nrx_ > 0) {
     // Clear rx_prev, rqf
     std::fill_n(rx_prev, nrx_, 0);
-    std::fill_n(rqf, nrq_, 0);
+    if (rqf) std::fill_n(rqf, nrq_, 0);
 
     // Take rx0, rp, uqf past the last grid point
     if (rx0) rx0 += nrx_ * nt();
