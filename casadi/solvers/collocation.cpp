@@ -214,7 +214,7 @@ namespace casadi {
 
     // Form forward discrete time dynamics
     std::vector<MX> F_in(FSTEP_NUM_IN);
-    F_in[FSTEP_T0] = t0;
+    F_in[FSTEP_T] = t0;
     F_in[FSTEP_H] = h;
     F_in[FSTEP_X0] = x0;
     F_in[FSTEP_P] = p;
@@ -302,7 +302,7 @@ namespace casadi {
 
       // Form backward discrete time dynamics
       std::vector<MX> G_in(BSTEP_NUM_IN);
-      G_in[BSTEP_T0] = t0;
+      G_in[BSTEP_T] = t0;
       G_in[BSTEP_H] = h;
       G_in[BSTEP_X] = x0;
       G_in[BSTEP_P] = p;

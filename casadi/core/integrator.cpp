@@ -1403,7 +1403,7 @@ Function FixedStepIntegrator::create_advanced(const Dict& opts) {
 
     // Prepare return Function outputs
     std::vector<MX> intg_out(INTEGRATOR_NUM_OUT);
-    F_in[FSTEP_T0] = t0_;
+    F_in[FSTEP_T] = t0_;
     F_in[FSTEP_H] = h;
 
     std::vector<MX> F_out;
@@ -1414,7 +1414,7 @@ Function FixedStepIntegrator::create_advanced(const Dict& opts) {
       F_in[FSTEP_X0] = F_out[FSTEP_XF];
       F_in[FSTEP_V0] = F_out[FSTEP_VF];
       intg_out[INTEGRATOR_QF] = k==0? F_out[FSTEP_QF] : intg_out[INTEGRATOR_QF]+F_out[FSTEP_QF];
-      F_in[FSTEP_T0] += h;
+      F_in[FSTEP_T] += h;
     }
 
     intg_out[INTEGRATOR_XF] = F_out[FSTEP_XF];
@@ -1626,7 +1626,7 @@ void FixedStepIntegrator::stepF(FixedStepMemory* m, double t, double h,
     const double* x0, const double* v0, double* xf, double* vf, double* qf) const {
   // Evaluate nondifferentiated
   std::fill(m->arg, m->arg + FSTEP_NUM_IN, nullptr);
-  m->arg[FSTEP_T0] = &t;  // t0
+  m->arg[FSTEP_T] = &t;  // t
   m->arg[FSTEP_H] = &h;  // h
   m->arg[FSTEP_X0] = x0;  // x0
   m->arg[FSTEP_V0] = v0;  // v0
@@ -1642,7 +1642,7 @@ void FixedStepIntegrator::stepF(FixedStepMemory* m, double t, double h,
     m->arg[FSTEP_NUM_IN + FSTEP_XF] = xf;  // out:xf
     m->arg[FSTEP_NUM_IN + FSTEP_VF] = vf;  // out:vf
     m->arg[FSTEP_NUM_IN + FSTEP_QF] = qf;  // out:qf
-    m->arg[FSTEP_NUM_IN + FSTEP_NUM_OUT + FSTEP_T0] = nullptr;  // fwd:t0
+    m->arg[FSTEP_NUM_IN + FSTEP_NUM_OUT + FSTEP_T] = nullptr;  // fwd:t
     m->arg[FSTEP_NUM_IN + FSTEP_NUM_OUT + FSTEP_H] = nullptr;  // fwd:h
     m->arg[FSTEP_NUM_IN + FSTEP_NUM_OUT + FSTEP_X0] = x0 + nx1_;  // fwd:x0
     m->arg[FSTEP_NUM_IN + FSTEP_NUM_OUT + FSTEP_V0] = v0 + nv1_;  // fwd:v0
@@ -1660,7 +1660,7 @@ void FixedStepIntegrator::stepB(FixedStepMemory* m, double t, double h,
     double* rxf, double* rvf, double* rqf, double* uqf) const {
   // Evaluate nondifferentiated
   std::fill(m->arg, m->arg + BSTEP_NUM_IN, nullptr);
-  m->arg[BSTEP_T0] = &t;  // t0
+  m->arg[BSTEP_T] = &t;  // t
   m->arg[BSTEP_H] = &h;  // h
   m->arg[BSTEP_RX0] = rx0;  // rx0
   m->arg[BSTEP_RV0] = rv0;  // rv0
@@ -1681,7 +1681,7 @@ void FixedStepIntegrator::stepB(FixedStepMemory* m, double t, double h,
     m->arg[BSTEP_NUM_IN + BSTEP_RVF] = rvf;  // out:rvf
     m->arg[BSTEP_NUM_IN + BSTEP_RQF] = rqf;  // out:rqf
     m->arg[BSTEP_NUM_IN + BSTEP_UQF] = uqf;  // out:uqf
-    m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_T0] = nullptr;  // fwd:t0
+    m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_T] = nullptr;  // fwd:t
     m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_H] = nullptr;  // fwd:h
     m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_RX0] = rx0 + nrx1_;  // fwd:rx0
     m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_RV0] = rv0 + nrv1_;  // fwd:rv0

@@ -357,7 +357,7 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
 /// Input arguments of a forward stepping function
 enum FStepIn {
   /// Current time
-  FSTEP_T0,
+  FSTEP_T,
   /// Step size
   FSTEP_H,
   /// State vector
@@ -387,7 +387,7 @@ enum FStepOut {
 /// Input arguments of a backward stepping function
 enum BStepIn {
   /// Current time
-  BSTEP_T0,
+  BSTEP_T,
   /// Step size
   BSTEP_H,
   /// State vector for backward problem

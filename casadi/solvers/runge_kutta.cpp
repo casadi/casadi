@@ -130,7 +130,7 @@ namespace casadi {
 
       // Define discrete time dynamics
       f_arg.resize(FSTEP_NUM_IN);
-      f_arg[FSTEP_T0] = t0;
+      f_arg[FSTEP_T] = t0;
       f_arg[FSTEP_H] = h;
       f_arg[FSTEP_X0] = x0;
       f_arg[FSTEP_V0] = v;
@@ -206,7 +206,7 @@ namespace casadi {
 
       // Define discrete time dynamics
       g_arg.resize(BSTEP_NUM_IN);
-      g_arg[BSTEP_T0] = t0;
+      g_arg[BSTEP_T] = t0;
       g_arg[BSTEP_H] = h;
       g_arg[BSTEP_X] = x0;
       g_arg[BSTEP_P] = p;
