@@ -27,6 +27,7 @@ import unittest
 from types import *
 from helpers import *
 import os
+import platform
 
 conics = []
 
@@ -856,6 +857,8 @@ class ConicTests(casadiTestCase):
       self.assertAlmostEqual(solver_out["cost"][0],2.5,max(1,5-less_digits),str(conic))
 
       if aux_options["codegen"]:
+        # Known bug #3038
+        if conic=="superscs" and platform.system()=="Darwin": continue
         self.check_codegen(solver,solver_in,**aux_options["codegen"])
 
 
