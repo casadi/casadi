@@ -878,8 +878,8 @@ int Integrator::bquad_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t*
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_RX] = rx + (i + 1) * nrx1_;  // fwd:rx
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_RZ] = rz + (i + 1) * nrz1_;  // fwd:rz
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_RP] = rp + (i + 1) * nrp1_;  // fwd:rp
-    m->res[BQUAD_RQUAD] = rquad + (i + 1) * nrq1_;  // fwd:rquad
-    m->res[BQUAD_UQUAD] = uquad + (i + 1) * nuq1_;  // fwd:uquad
+    m->res[BQUAD_RQUAD] = rquad ? rquad + (i + 1) * nrq1_ : 0;  // fwd:rquad
+    m->res[BQUAD_UQUAD] = uquad ? uquad + (i + 1) * nuq1_ : 0;  // fwd:uquad
     if (calc_sp_forward(forward_name("quadB", 1), m->arg, m->res, m->iw, m->w)) return 1;
   }
   return 0;
@@ -985,12 +985,7 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
 
       // Propagate to quadratures
       if ((nrq_ > 0 && rqf) || (nuq_ > 0 && uqf)) {
-        arg[DYN_RX] = rx;
-        arg[DYN_RZ] = rz;
-        res[DYN_RODE] = res[DYN_RALG] = nullptr;
-        res[DYN_RQUAD] = rq;
-        res[DYN_UQUAD] = uqf;
-        if (oracle_(arg, res, iw, w, 0)) return 1;
+        if (bquad_sp_forward(&m, x, z, p, u, rx, rz, rp, rq, uqf)) return 1;
         // Sum contributions to rqf
         if (rqf) {
           for (casadi_int i = 0; i < nrq_; ++i) rqf[i] |= rq[i];
