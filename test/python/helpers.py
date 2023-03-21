@@ -624,7 +624,10 @@ class casadiTestCase(unittest.TestCase):
         if os.name=='nt':
           defs = " ".join(["/D"+d for d in definitions])
           commands = "cl.exe {shared} {definitions} {includedir} {name}.c {extra} /link  /libpath:{libdir}".format(shared="/LD" if shared else "",std=std,name=name,libdir=libdir,includedir=" ".join(["/I" + e for e in includedirs]),extra=extralibs + extra_options + extralibs + extra_options,definitions=defs)
-          output = "./" + name + (".dll" if shared else ".exe")
+          if shared:
+            output = "./" + name + ".dll"
+          else:
+            output = name + ".exe"
           return [commands, output]
         else:
           defs = " ".join(["-D"+d for d in definitions])
