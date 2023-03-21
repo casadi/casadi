@@ -770,11 +770,8 @@ std::map<std::string, MatType> Integrator::aug_adj(casadi_int nadj) const {
   return ret;
 }
 
-int Integrator::fdae_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t* p,
-    const bvec_t* u, bvec_t* ode, bvec_t* alg) const {
-  // Consistency checks
-  if (ode == 0 && nx1_ > 0) return 1;  // needed in out:ode
-  if (alg == 0 && nz1_ > 0) return 1;  // needed in out:alg
+int Integrator::fdae_sp_forward(SpForwardMem* m, const bvec_t* x,
+    const bvec_t* p, const bvec_t* u, bvec_t* ode, bvec_t* alg) const {
   // Evaluate nondifferentiated
   std::fill(m->arg, m->arg + FDYN_NUM_IN, nullptr);
   m->arg[FDYN_X] = x;  // x
@@ -794,6 +791,30 @@ int Integrator::fdae_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t* 
     m->res[FDAE_ODE] = ode + (i + 1) * nx1_;  // fwd:ode
     m->res[FDAE_ALG] = alg + (i + 1) * nz1_;  // fwd:alg
     if (calc_sp_forward(forward_name("daeF", 1), m->arg, m->res, m->iw, m->w)) return 1;
+  }
+  return 0;
+}
+
+int Integrator::fquad_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t* z,
+    const bvec_t* p, const bvec_t* u, bvec_t* quad) const {
+  // Evaluate nondifferentiated
+  std::fill(m->arg, m->arg + FDYN_NUM_IN, nullptr);
+  m->arg[FDYN_X] = x;  // x
+  m->arg[FDYN_Z] = z;  // z
+  m->arg[FDYN_P] = p;  // p
+  m->arg[FDYN_U] = u;  // u
+  std::fill(m->res, m->res + FQUAD_NUM_OUT, nullptr);
+  m->res[FQUAD_QUAD] = quad;  // quad
+  if (calc_sp_forward("quadF", m->arg, m->res, m->iw, m->w)) return 1;
+  // Evaluate sensitivities
+  for (casadi_int i = 0; i < ns_; ++i) {
+    m->arg[FDYN_NUM_IN + FQUAD_QUAD] = quad;  // out:quad
+    m->arg[FDYN_NUM_IN + FQUAD_NUM_OUT + FDYN_X] = x + (i + 1) * nx1_;  // fwd:x
+    m->arg[FDYN_NUM_IN + FQUAD_NUM_OUT + FDYN_Z] = z + (i + 1) * nz1_;  // fwd:z
+    m->arg[FDYN_NUM_IN + FQUAD_NUM_OUT + FDYN_P] = p + (i + 1) * np1_;  // fwd:p
+    m->arg[FDYN_NUM_IN + FQUAD_NUM_OUT + FDYN_U] = u + (i + 1) * nu1_;  // fwd:u
+    m->res[FQUAD_QUAD] = quad + (i + 1) * nq1_;  // fwd:quad
+    if (calc_sp_forward(forward_name("quadF", 1), m->arg, m->res, m->iw, m->w)) return 1;
   }
   return 0;
 }
@@ -853,11 +874,7 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
 
     // Propagate to quadratures
     if (nq_ > 0 && qf) {
-      arg[DYN_X] = x;
-      arg[DYN_Z] = z;
-      res[DYN_ODE] = res[DYN_ALG] = nullptr;
-      res[DYN_QUAD] = qf;
-      if (oracle_(arg, res, iw, w, 0)) return 1;
+      if (fquad_sp_forward(&m, x, z, p, u, qf)) return 1;
     }
 
     // Shift time
