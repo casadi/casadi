@@ -1035,6 +1035,32 @@ int Integrator::fdae_sp_reverse(SpReverseMem* m, bvec_t* x,
   return 0;
 }
 
+int Integrator::fquad_sp_reverse(SpReverseMem* m, bvec_t* x, bvec_t* z,
+    bvec_t* p, bvec_t* u, bvec_t* quad) const {
+  // Nondifferentiated inputs
+  m->arg[FDYN_T] = nullptr;  // t
+  m->arg[FDYN_X] = x;  // x
+  m->arg[FDYN_Z] = z;  // z
+  m->arg[FDYN_P] = p;  // p
+  m->arg[FDYN_U] = u;  // u
+  // Propagate through sensitivities
+  for (casadi_int i = 0; i < ns_; ++i) {
+    m->res[FQUAD_QUAD] = quad + (i + 1) * nq1_;  // fwd:quad
+    m->arg[FDYN_NUM_IN + FQUAD_QUAD] = quad;  // out:quad
+    m->arg[FDYN_NUM_IN + FQUAD_NUM_OUT + FDYN_T] = nullptr;  // fwd:t
+    m->arg[FDYN_NUM_IN + FQUAD_NUM_OUT + FDYN_X] = x + (i + 1) * nx1_;  // fwd:x
+    m->arg[FDYN_NUM_IN + FQUAD_NUM_OUT + FDYN_Z] = z + (i + 1) * nz1_;  // fwd:z
+    m->arg[FDYN_NUM_IN + FQUAD_NUM_OUT + FDYN_P] = p + (i + 1) * np1_;  // fwd:p
+    m->arg[FDYN_NUM_IN + FQUAD_NUM_OUT + FDYN_U] = u + (i + 1) * nu1_;  // fwd:u
+    if (calc_sp_reverse(forward_name("quadF", 1), m->arg, m->res, m->iw, m->w)) return 1;
+  }
+  // Propagate through nondifferentiated
+  m->res[FQUAD_QUAD] = quad;  // quad
+  if (calc_sp_reverse("quadF", m->arg, m->res, m->iw, m->w)) return 1;
+  return 0;
+}
+
+
 int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
     casadi_int* iw, bvec_t* w, void* mem) const {
   if (verbose_) casadi_message(name_ + "::sp_reverse");
@@ -1174,15 +1200,8 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
     }
 
     // Get dependencies from forward quadratures, if any
-    std::fill(res, res + DYN_NUM_OUT, nullptr);
-    res[DYN_QUAD] = qf;
-    std::fill(arg, arg + DYN_NUM_IN, nullptr);
-    arg[DYN_X] = x;
-    arg[DYN_Z] = z;
-    arg[DYN_P] = p;
-    arg[DYN_U] = u;
     if (nq_ > 0 && qf) {
-      if (oracle_.rev(arg, res, iw, w, 0)) return 1;
+      if (fquad_sp_reverse(&m, x, z, p, u, qf)) return 1;
     }
 
     // Propagate interdependencies
