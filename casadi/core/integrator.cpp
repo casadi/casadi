@@ -559,14 +559,6 @@ void Integrator::init(const Dict& opts) {
     }
   }
 
-  // Create dynamic functions, forward and backward proble,
-  create_function(nonaug_oracle_, "dynF", fdyn_in(), fdyn_out());
-  if (ns_ > 0) create_forward("dynF", 1);
-  if (nrx1_ > 0) {
-    create_function(nonaug_oracle_, "dynB", bdyn_in(), bdyn_out());
-    if (ns_ > 0) create_forward("dynB", 1);
-  }
-
   // Get the sparsities of the forward and reverse DAE
   sp_jac_dae_ = sp_jac_dae();
   casadi_assert(!sp_jac_dae_.is_singular(),
@@ -778,8 +770,8 @@ std::map<std::string, MatType> Integrator::aug_adj(casadi_int nadj) const {
   return ret;
 }
 
-int Integrator::fdyn_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t* p,
-    const bvec_t* u, bvec_t* ode, bvec_t* alg, bvec_t* quad) const {
+int Integrator::fdae_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t* p,
+    const bvec_t* u, bvec_t* ode, bvec_t* alg) const {
   // Consistency checks
   if (ode == 0 && nx1_ > 0) return 1;  // needed in out:ode
   if (alg == 0 && nz1_ > 0) return 1;  // needed in out:alg
@@ -788,23 +780,20 @@ int Integrator::fdyn_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t* 
   m->arg[FDYN_X] = x;  // x
   m->arg[FDYN_P] = p;  // p
   m->arg[FDYN_U] = u;  // u
-  std::fill(m->res, m->res + FDYN_NUM_OUT, nullptr);
-  m->res[FDYN_ODE] = ode;  // ode
-  m->res[FDYN_ALG] = alg;  // alg
-  m->res[FDYN_QUAD] = quad;  // quad
-  if (calc_sp_forward("dynF", m->arg, m->res, m->iw, m->w)) return 1;
+  std::fill(m->res, m->res + FDAE_NUM_OUT, nullptr);
+  m->res[FDAE_ODE] = ode;  // ode
+  m->res[FDAE_ALG] = alg;  // alg
+  if (calc_sp_forward("daeF", m->arg, m->res, m->iw, m->w)) return 1;
   // Evaluate sensitivities
   for (casadi_int i = 0; i < ns_; ++i) {
-    m->arg[FDYN_NUM_IN + FDYN_ODE] = ode;  // out:ode
-    m->arg[FDYN_NUM_IN + FDYN_ALG] = alg;  // out:alg
-    m->arg[FDYN_NUM_IN + FDYN_QUAD] = quad;  // out:quad
-    m->arg[FDYN_NUM_IN + FDYN_NUM_OUT + FDYN_X] = x + (i + 1) * nx1_;  // fwd:x
-    m->arg[FDYN_NUM_IN + FDYN_NUM_OUT + FDYN_P] = p + (i + 1) * np1_;  // fwd:p
-    m->arg[FDYN_NUM_IN + FDYN_NUM_OUT + FDYN_U] = u + (i + 1) * nu1_;  // fwd:u
-    m->res[FDYN_ODE] = ode + (i + 1) * nx1_;  // fwd:ode
-    m->res[FDYN_ALG] = alg + (i + 1) * nz1_;  // fwd:alg
-    m->res[FDYN_QUAD] = quad + (i + 1) * nq1_;  // fwd:quad
-    if (calc_sp_forward(forward_name("dynF", 1), m->arg, m->res, m->iw, m->w)) return 1;
+    m->arg[FDYN_NUM_IN + FDAE_ODE] = ode;  // out:ode
+    m->arg[FDYN_NUM_IN + FDAE_ALG] = alg;  // out:alg
+    m->arg[FDYN_NUM_IN + FDAE_NUM_OUT + FDYN_X] = x + (i + 1) * nx1_;  // fwd:x
+    m->arg[FDYN_NUM_IN + FDAE_NUM_OUT + FDYN_P] = p + (i + 1) * np1_;  // fwd:p
+    m->arg[FDYN_NUM_IN + FDAE_NUM_OUT + FDYN_U] = u + (i + 1) * nu1_;  // fwd:u
+    m->res[FDAE_ODE] = ode + (i + 1) * nx1_;  // fwd:ode
+    m->res[FDAE_ALG] = alg + (i + 1) * nz1_;  // fwd:alg
+    if (calc_sp_forward(forward_name("daeF", 1), m->arg, m->res, m->iw, m->w)) return 1;
   }
   return 0;
 }
@@ -849,7 +838,7 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
   // Propagate forward
   for (casadi_int k = 0; k < nt(); ++k) {
     // Propagate through DAE function
-    if (fdyn_sp_forward(&m, x_prev, p, u, x, z, nullptr)) return 1;
+    if (fdae_sp_forward(&m, x_prev, p, u, x, z)) return 1;
     for (casadi_int i = 0; i < nx_; ++i) x[i] |= x_prev[i];
 
     // "Solve" in order to resolve interdependencies (cf. Rootfinder)
@@ -1493,6 +1482,10 @@ Function FixedStepIntegrator::create_advanced(const Dict& opts) {
 void FixedStepIntegrator::init(const Dict& opts) {
   // Call the base class init
   Integrator::init(opts);
+
+  // Create dynamic functions, forward and backward problem
+  create_function(nonaug_oracle_, "dynF", fdyn_in(), fdyn_out());
+  if (nrx1_ > 0) create_function(nonaug_oracle_, "dynB", bdyn_in(), bdyn_out());
 
   // Read options
   for (auto&& op : opts) {

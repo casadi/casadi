@@ -177,8 +177,8 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   virtual void print_stats(IntegratorMemory* mem) const {}
 
   /// Forward sparsity pattern propagation to DAE
-  int fdyn_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t* p, const bvec_t* u,
-    bvec_t* ode, bvec_t* alg, bvec_t* quad) const;
+  int fdae_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t* p, const bvec_t* u,
+    bvec_t* ode, bvec_t* alg) const;
 
   /** \brief  Propagate sparsity forward
 
@@ -284,17 +284,17 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   static std::vector<std::string> fdyn_in() { return {"t", "x", "z", "p", "u"}; }
   enum FDynOut { FDYN_ODE, FDYN_ALG, FDYN_QUAD, FDYN_NUM_OUT};
   static std::vector<std::string> fdyn_out() { return {"ode", "alg", "quad"}; }
-  enum DaeFOut { DAEF_ODE, DAEF_ALG, DAEF_NUM_OUT};
+  enum DaeFOut { FDAE_ODE, FDAE_ALG, FDAE_NUM_OUT};
   static std::vector<std::string> fdae_out() { return {"ode", "alg"}; }
-  enum QuadFOut { QUADF_QUAD, QUADF_NUM_OUT};
+  enum QuadFOut { FQUAD_QUAD, FQUAD_NUM_OUT};
   static std::vector<std::string> fquad_out() { return {"quad"}; }
-  enum BDybIn { BDYN_T, BDYN_X, BDYN_Z, BDYN_P, BDYN_U, BDYN_RX, BDYN_RZ, BDYN_RP, BDYN_NUM_IN};
+  enum BDynIn { BDYN_T, BDYN_X, BDYN_Z, BDYN_P, BDYN_U, BDYN_RX, BDYN_RZ, BDYN_RP, BDYN_NUM_IN};
   static std::vector<std::string> bdyn_in() { return {"t", "x", "z", "p", "u", "rx", "rz", "rp"}; }
   enum BDynOut { BDYN_RODE, BDYN_RALG, BDYN_RQUAD, BDYN_UQUAD, BDYN_NUM_OUT};
   static std::vector<std::string> bdyn_out() { return {"rode", "ralg", "rquad", "uquad"}; }
-  enum DAEBOut { DAEB_RODE, DAEB_RALG, DAEB_NUM_OUT};
+  enum DAEBOut { BDAE_RODE, BDAE_RALG, BDAE_NUM_OUT};
   static std::vector<std::string> bdae_out() { return {"rode", "ralg"}; }
-  enum QuadBOut { QUADB_RQUAD, QUADB_UQUAD, QUADB_NUM_OUT};
+  enum QuadBOut { BQUAD_RQUAD, BQUAD_UQUAD, BQUAD_NUM_OUT};
   static std::vector<std::string> bquad_out() { return {"rquad", "uquad"}; }
   ///@}
 
