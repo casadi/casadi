@@ -29,6 +29,7 @@ extern "C" {
 #define casadi_f2 CASADI_PREFIX(f2)
 #define casadi_f3 CASADI_PREFIX(f3)
 #define casadi_f4 CASADI_PREFIX(f4)
+#define casadi_f5 CASADI_PREFIX(f5)
 #define casadi_fmax CASADI_PREFIX(fmax)
 #define casadi_fmin CASADI_PREFIX(fmin)
 #define casadi_s0 CASADI_PREFIX(s0)
@@ -165,8 +166,110 @@ CASADI_SYMBOL_EXPORT int f_work(casadi_int *sz_arg, casadi_int* sz_res, casadi_i
   return 0;
 }
 
-/* g:(i0[2],i1)->(g) */
+/* f_grad_f:(i0[2],i1)->(f,grad_f[2]) */
 static int casadi_f1(const casadi_real** arg, casadi_real** res, casadi_int* iw, casadi_real* w, int mem) {
+  casadi_real a0, a1, a2, a3, a4;
+  a0=1.;
+  a1=arg[0]? arg[0][0] : 0;
+  a0=(a0-a1);
+  a2=casadi_sq(a0);
+  a3=arg[0]? arg[0][1] : 0;
+  a4=casadi_sq(a1);
+  a3=(a3-a4);
+  a4=casadi_sq(a3);
+  a2=(a2+a4);
+  if (res[0]!=0) res[0][0]=a2;
+  a1=(a1+a1);
+  a3=(a3+a3);
+  a1=(a1*a3);
+  a0=(a0+a0);
+  a1=(a1+a0);
+  a1=(-a1);
+  if (res[1]!=0) res[1][0]=a1;
+  if (res[1]!=0) res[1][1]=a3;
+  return 0;
+}
+
+CASADI_SYMBOL_EXPORT int f_grad_f(const casadi_real** arg, casadi_real** res, casadi_int* iw, casadi_real* w, int mem){
+  return casadi_f1(arg, res, iw, w, mem);
+}
+
+CASADI_SYMBOL_EXPORT int f_grad_f_alloc_mem(void) {
+  return 0;
+}
+
+CASADI_SYMBOL_EXPORT int f_grad_f_init_mem(int mem) {
+  return 0;
+}
+
+CASADI_SYMBOL_EXPORT void f_grad_f_free_mem(int mem) {
+}
+
+CASADI_SYMBOL_EXPORT int f_grad_f_checkout(void) {
+  return 0;
+}
+
+CASADI_SYMBOL_EXPORT void f_grad_f_release(int mem) {
+}
+
+CASADI_SYMBOL_EXPORT void f_grad_f_incref(void) {
+}
+
+CASADI_SYMBOL_EXPORT void f_grad_f_decref(void) {
+}
+
+CASADI_SYMBOL_EXPORT casadi_int f_grad_f_n_in(void) { return 2;}
+
+CASADI_SYMBOL_EXPORT casadi_int f_grad_f_n_out(void) { return 2;}
+
+CASADI_SYMBOL_EXPORT casadi_real f_grad_f_default_in(casadi_int i){
+  switch (i) {
+    default: return 0;
+  }
+}
+
+CASADI_SYMBOL_EXPORT const char* f_grad_f_name_in(casadi_int i){
+  switch (i) {
+    case 0: return "i0";
+    case 1: return "i1";
+    default: return 0;
+  }
+}
+
+CASADI_SYMBOL_EXPORT const char* f_grad_f_name_out(casadi_int i){
+  switch (i) {
+    case 0: return "f";
+    case 1: return "grad_f";
+    default: return 0;
+  }
+}
+
+CASADI_SYMBOL_EXPORT const casadi_int* f_grad_f_sparsity_in(casadi_int i) {
+  switch (i) {
+    case 0: return casadi_s0;
+    case 1: return casadi_s1;
+    default: return 0;
+  }
+}
+
+CASADI_SYMBOL_EXPORT const casadi_int* f_grad_f_sparsity_out(casadi_int i) {
+  switch (i) {
+    case 0: return casadi_s1;
+    case 1: return casadi_s0;
+    default: return 0;
+  }
+}
+
+CASADI_SYMBOL_EXPORT int f_grad_f_work(casadi_int *sz_arg, casadi_int* sz_res, casadi_int *sz_iw, casadi_int *sz_w) {
+  if (sz_arg) *sz_arg = 2;
+  if (sz_res) *sz_res = 2;
+  if (sz_iw) *sz_iw = 0;
+  if (sz_w) *sz_w = 0;
+  return 0;
+}
+
+/* g:(i0[2],i1)->(g) */
+static int casadi_f2(const casadi_real** arg, casadi_real** res, casadi_int* iw, casadi_real* w, int mem) {
   casadi_real a0, a1, a2;
   a0=arg[0]? arg[0][0] : 0;
   a0=casadi_sq(a0);
@@ -180,7 +283,7 @@ static int casadi_f1(const casadi_real** arg, casadi_real** res, casadi_int* iw,
 }
 
 CASADI_SYMBOL_EXPORT int g(const casadi_real** arg, casadi_real** res, casadi_int* iw, casadi_real* w, int mem){
-  return casadi_f1(arg, res, iw, w, mem);
+  return casadi_f2(arg, res, iw, w, mem);
 }
 
 CASADI_SYMBOL_EXPORT int g_alloc_mem(void) {
@@ -256,7 +359,7 @@ CASADI_SYMBOL_EXPORT int g_work(casadi_int *sz_arg, casadi_int* sz_res, casadi_i
 }
 
 /* psi_grad_psi:(i0[2],i1,y,Σ,zl,zu)->(ψ,grad_ψ[2]) */
-static int casadi_f2(const casadi_real** arg, casadi_real** res, casadi_int* iw, casadi_real* w, int mem) {
+static int casadi_f3(const casadi_real** arg, casadi_real** res, casadi_int* iw, casadi_real* w, int mem) {
   casadi_real a0, a1, a10, a11, a12, a13, a14, a2, a3, a4, a5, a6, a7, a8, a9;
   a0=1.;
   a1=arg[0]? arg[0][0] : 0;
@@ -315,7 +418,7 @@ static int casadi_f2(const casadi_real** arg, casadi_real** res, casadi_int* iw,
 }
 
 CASADI_SYMBOL_EXPORT int psi_grad_psi(const casadi_real** arg, casadi_real** res, casadi_int* iw, casadi_real* w, int mem){
-  return casadi_f2(arg, res, iw, w, mem);
+  return casadi_f3(arg, res, iw, w, mem);
 }
 
 CASADI_SYMBOL_EXPORT int psi_grad_psi_alloc_mem(void) {
@@ -401,7 +504,7 @@ CASADI_SYMBOL_EXPORT int psi_grad_psi_work(casadi_int *sz_arg, casadi_int* sz_re
 }
 
 /* grad_L:(i0[2],i1,y)->(grad_L[2]) */
-static int casadi_f3(const casadi_real** arg, casadi_real** res, casadi_int* iw, casadi_real* w, int mem) {
+static int casadi_f4(const casadi_real** arg, casadi_real** res, casadi_int* iw, casadi_real* w, int mem) {
   casadi_real a0, a1, a2, a3, a4, a5;
   a0=arg[0]? arg[0][0] : 0;
   a1=(a0+a0);
@@ -429,7 +532,7 @@ static int casadi_f3(const casadi_real** arg, casadi_real** res, casadi_int* iw,
 }
 
 CASADI_SYMBOL_EXPORT int grad_L(const casadi_real** arg, casadi_real** res, casadi_int* iw, casadi_real* w, int mem){
-  return casadi_f3(arg, res, iw, w, mem);
+  return casadi_f4(arg, res, iw, w, mem);
 }
 
 CASADI_SYMBOL_EXPORT int grad_L_alloc_mem(void) {
@@ -507,7 +610,7 @@ CASADI_SYMBOL_EXPORT int grad_L_work(casadi_int *sz_arg, casadi_int* sz_res, cas
 }
 
 /* psi:(i0[2],i1,y,Σ,zl,zu)->(ψ,ŷ) */
-static int casadi_f4(const casadi_real** arg, casadi_real** res, casadi_int* iw, casadi_real* w, int mem) {
+static int casadi_f5(const casadi_real** arg, casadi_real** res, casadi_int* iw, casadi_real* w, int mem) {
   casadi_real a0, a1, a2, a3, a4, a5;
   a0=1.;
   a1=arg[0]? arg[0][0] : 0;
@@ -543,7 +646,7 @@ static int casadi_f4(const casadi_real** arg, casadi_real** res, casadi_int* iw,
 }
 
 CASADI_SYMBOL_EXPORT int psi(const casadi_real** arg, casadi_real** res, casadi_int* iw, casadi_real* w, int mem){
-  return casadi_f4(arg, res, iw, w, mem);
+  return casadi_f5(arg, res, iw, w, mem);
 }
 
 CASADI_SYMBOL_EXPORT int psi_alloc_mem(void) {
