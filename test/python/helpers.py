@@ -611,7 +611,22 @@ class casadiTestCase(unittest.TestCase):
       includedirs = [includedir,os.path.join(includedir,"highs")]
 
       if isinstance(extralibs,list):
-        extralibs = " " + " ".join([lib if "." in lib else (lib + ".lib" if os.name=='nt' else "-l"+lib) for lib in extralibs])
+        extralibs_clean = []
+        for lib in extralibs:
+            if os.name=='nt':
+                if "." in lib:
+                    if lib.endswith(".dll"):
+                        extralibs_clean.append(lib[:-4]+".lib")
+                    else:
+                        extralibs_clean.append(lib)
+                else:
+                    extralibs_clean.append(lib+".lib")
+            else:
+                if "." in lib:
+                    extralibs_clean.append(lib)
+                else:
+                    extralibs_clean.append("-l"+lib)
+        extralibs = " " + " ".join(extralibs_clean)
 
       if isinstance(extra_options,bool) or extra_options is None:
         extra_options = ""
@@ -637,14 +652,18 @@ class casadiTestCase(unittest.TestCase):
 
       [commands, libname] = get_commands(shared=True)
 
+      print("compile library",commands)
       p = subprocess.Popen(commands,shell=True).wait()
       F2 = external(F.name(), libname)
 
       if main:
         [commands, exename] = get_commands(shared=False)
-        print(commands)
+        print("here",commands)
         env = os.environ
-        env["LD_LIBRARY_PATH"] = libdir
+        if os.name=='nt':
+            env["PATH"] = env["PATH"]+";"+libdir
+        else:
+            env["LD_LIBRARY_PATH"] = libdir
         p = subprocess.Popen(commands,shell=True,env=env).wait()
         inputs_main = inputs
         if isinstance(inputs,dict):
