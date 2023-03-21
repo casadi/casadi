@@ -710,7 +710,8 @@ jobs:
       - name: Run script
         uses: matlab-actions/run-command@v1.1.2
         with:
-          command: addpath('${{ github.workspace }}/casadi');cd test/matlab;asorted_tests
+          command: addpath('${{ github.workspace }}/casadi');savepath;cd test/matlab;asorted_tests
+      - run: cd test && python internal/test_matlab.py matlab
 
   test-octave:
     runs-on: ${{matrix.image}}
@@ -746,13 +747,18 @@ jobs:
       - run: |
                C:\msys64\usr\bin\wget.exe https://ftpmirror.gnu.org/octave/windows/octave-7.3.0-w64.zip
                unzip octave-7.3.0-w64.zip
-               echo "${{ github.workspace }}/octave-7.3.0-w64/mingw64/bin/"  >> $GITHUB_PATH
+
         if: "contains(env.os, 'windows')"
-      - run: octave-7.3.0-w64/mingw64/bin/octave.exe --no-gui --no-window-system --eval "addpath('${{ github.workspace }}/casadi');cd test/matlab;asorted_tests"
+      - run: |
+               echo "PATH=${{ github.workspace }}\octave-7.3.0-w64\mingw64\bin;$env:PATH" >> $env:GITHUB_ENV
         if: "contains(env.os, 'windows')"
-      - run: octave --no-gui --no-window-system --eval "addpath('${{ github.workspace }}/casadi');cd test/matlab;asorted_tests"
+        shell: pwsh
+      - run: octave --no-gui --no-window-system --eval "addpath('${{ github.workspace }}/casadi');savepath;cd test/matlab;asorted_tests"
+        if: "contains(env.os, 'windows')"
+      - run: octave --no-gui --no-window-system --eval "addpath('${{ github.workspace }}/casadi');cd test/matlab;savepath;asorted_tests"
         if: "!contains(env.os, 'windows')"
-  
+      - run: cd test && python internal/test_octave.py octave
+
   docs:
     runs-on: ubuntu-22.04
     needs: [python-dockcross,matlab-dockcross]
