@@ -798,6 +798,20 @@ function(libraries2flags libraries out)
   endforeach()
 endfunction()
 
+macro(create_import_library TARGET) 
+  if(CMAKE_CROSS_COMPILING AND MINGW)
+    # Get target in lowercase
+    string(TOLOWER ${TARGET} TARGET_LOWER)
+    get_target_property(IMPORTED_LOCATION ${TARGET} IMPORTED_LOCATION)
+    add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${TARGET_LOWER}.lib" DEPENDS ${TARGET_LOWER}-external
+      COMMAND gendef "${IMPORTED_LOCATION}"
+      COMMAND $ENV{DLLTOOL} --dllname "${IMPORTED_LOCATION}" --def lib${TARGET_LOWER}.def --output-lib ${TARGET_LOWER}.lib
+    )
+    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${TARGET_LOWER}.lib"
+      DESTINATION ${DEF_LIB_PREFIX}
+    )
+  endif()
+endmacro()
 
 macro(eager_update DEP_NAME)
     set(VERSION "VERSION:${BUILD_${DEP_NAME}_VERSION}\nREPO:${BUILD_${DEP_NAME}_GIT_REPO}")
@@ -975,7 +989,7 @@ add_feature_info(worhp-interface WITH_WORHP "Interface to the NLP solver Worhp (
 if(WITH_LAPACK)
   if (WITH_BUILD_LAPACK)
     # Requires gcc>=5.0
-    ExternalProject_Add(openblas-external
+    ExternalProject_Add(lapack-external
       GIT_REPOSITORY ${BUILD_LAPACK_GIT_REPO}
       GIT_TAG ${BUILD_LAPACK_VERSION}
       PREFIX "${CMAKE_BINARY_DIR}/external_projects"
@@ -984,14 +998,15 @@ if(WITH_LAPACK)
       PATCH_COMMAND ${EXTERNAL_CMAKE_COMMAND} -DFILE=CMakeLists.txt -DCASADI_TP_SHARED_PREFIX=${CASADI_TP_SHARED_PREFIX} -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/patch_openblas.cmake
       CMAKE_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_LIBDIR=lib -DTARGET=CORE2 -DUSE_THREAD=ON -DNUM_THREADS=16 -DBUILD_SINGLE=ON -DBUILD_DOUBLE=ON -DBUILD_COMPLEX=ON -DBUILD_COMPLEX16=ON -DDYNAMIC_ARCH=OFF -DUSE_OPENMP=OFF -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
     set(LAPACK_LIBRARIES "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}${CASADI_TP_SHARED_PREFIX}openblas${CMAKE_SHARED_LIBRARY_SUFFIX}")    
-    set(LAPACK_DEPENDS_TARGET openblas-external)
+    set(LAPACK_DEPENDS_TARGET lapack-external)
 
     add_library(lapack SHARED IMPORTED)
-    add_dependencies(lapack openblas-external)
+    add_dependencies(lapack lapack-external)
     set_target_properties(lapack PROPERTIES
       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}${CASADI_TP_SHARED_PREFIX}openblas${CMAKE_SHARED_LIBRARY_SUFFIX}"
       IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}${CASADI_TP_SHARED_PREFIX}openblas${CMAKE_IMPORT_LIBRARY_SUFFIX}"
     )
+    create_import_library(lapack)
   else()
     add_library(lapack INTERFACE)
     target_link_libraries(lapack INTERFACE ${LAPACK_LIBRARIES})
@@ -1025,15 +1040,7 @@ if(WITH_BLASFEO)
       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}blasfeo${CMAKE_SHARED_LIBRARY_SUFFIX}"
       IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}blasfeo${CMAKE_IMPORT_LIBRARY_SUFFIX}"
     )
-    if(CMAKE_CROSS_COMPILING AND MINGW)
-      add_custom_command(TARGET blasfeo-external POST_BUILD
-        COMMAND gendef "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}blasfeo${CMAKE_SHARED_LIBRARY_SUFFIX}"
-        COMMAND $ENV{DLLTOOL} --dllname "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}blasfeo${CMAKE_SHARED_LIBRARY_SUFFIX}" --def libblasfeo.def --output-lib blasfeo.lib
-      )
-      install(FILES "${CMAKE_CURRENT_BINARY_DIR}/blafeo.lib"
-        DESTINATION ${DEF_LIB_PREFIX}
-      )
-    endif()
+    create_import_library(blasfeo)
     file(GLOB BLASFEO_HEADERS "${CMAKE_BINARY_DIR}/external_projects/include/blasfeo*")
     install(FILES
       ${BLASFEO_HEADERS}
@@ -1062,15 +1069,7 @@ if(WITH_HPIPM)
        IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}hpipm${CMAKE_SHARED_LIBRARY_SUFFIX}"
        IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}hpipm${CMAKE_IMPORT_LIBRARY_SUFFIX}"
     )
-    if(CMAKE_CROSS_COMPILING AND MINGW)
-      add_custom_command(TARGET hpipm-external POST_BUILD
-        COMMAND gendef "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}hpipm${CMAKE_SHARED_LIBRARY_SUFFIX}"
-        COMMAND $ENV{DLLTOOL} --dllname "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}hpipm${CMAKE_SHARED_LIBRARY_SUFFIX}" --def libhpipm.def --output-lib hpipm.lib
-      )
-      install(FILES "${CMAKE_CURRENT_BINARY_DIR}/hpipm.lib"
-        DESTINATION ${DEF_LIB_PREFIX}
-      )
-    endif()
+    create_import_library(hpipm)
     file(GLOB HPIPM_HEADERS "${CMAKE_BINARY_DIR}/external_projects/include/hpipm*")
     install(FILES
       ${HPIPM_HEADERS}
@@ -1406,15 +1405,7 @@ if(WITH_HIGHS)
        IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}highs${CMAKE_SHARED_LIBRARY_SUFFIX}"
        IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}highs${CMAKE_IMPORT_LIBRARY_SUFFIX}"
     )
-    if(CMAKE_CROSS_COMPILING AND MINGW)
-      add_custom_command(TARGET highs-external POST_BUILD
-        COMMAND gendef "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}highs${CMAKE_SHARED_LIBRARY_SUFFIX}"
-        COMMAND $ENV{DLLTOOL} --dllname "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}highs${CMAKE_SHARED_LIBRARY_SUFFIX}" --def libhighs.def --output-lib highs.lib
-      )
-      install(FILES "${CMAKE_CURRENT_BINARY_DIR}/highs.lib"
-        DESTINATION ${DEF_LIB_PREFIX}
-      )
-    endif()
+    create_import_library(highs)
     install(DIRECTORY
       "${CMAKE_BINARY_DIR}/external_projects/include/highs"
       DESTINATION "${INCLUDE_PREFIX}")
@@ -1497,15 +1488,7 @@ if(WITH_OSQP)
     install(DIRECTORY
       "${CMAKE_BINARY_DIR}/external_projects/include/osqp"
       DESTINATION "${INCLUDE_PREFIX}")
-    if(CMAKE_CROSS_COMPILING AND MINGW)
-      add_custom_command(TARGET osqp-external POST_BUILD
-        COMMAND gendef "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}osqp${CMAKE_SHARED_LIBRARY_SUFFIX}"
-        COMMAND $ENV{DLLTOOL} --dllname "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}osqp${CMAKE_SHARED_LIBRARY_SUFFIX}" --def libosqp.def --output-lib osqp.lib
-      )
-      install(FILES "${CMAKE_CURRENT_BINARY_DIR}/osqp.lib"
-        DESTINATION ${DEF_LIB_PREFIX}
-      )
-    endif()
+      create_import_library(osqp)
   endif()
 endif()
 add_feature_info(osqp-interface WITH_OSQP "Interface to QP solver OSQP.")

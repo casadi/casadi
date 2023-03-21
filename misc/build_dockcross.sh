@@ -3,9 +3,9 @@
 set -o pipefail
 set -e
 
-export TARGET=manylinux2014-x64
+#export TARGET=manylinux2014-x64
 #export TARGET=manylinux1-x64
-#export TARGET=windows-shared-x64-posix
+export TARGET=windows-shared-x64-posix
 #docker run --rm dockcross/$TARGET:latest > dockcross.$TARGET
 #chmod +x dockcross.$TARGET
 
