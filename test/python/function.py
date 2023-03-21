@@ -2784,7 +2784,11 @@ class Functiontests(casadiTestCase):
     c = conic("conic","osqp",{"a":Sparsity.dense(1,2),"h":Sparsity.dense(2,2)},{"print_problem":True,"osqp.verbose":False})
     inputs = {"h": DM([[1,0.2],[0.2,1]]),"g":vertcat(1,2),"a":horzcat(1,1),"lba":-1,"uba":1}
     inputs = c.convert_in(inputs)
-    self.check_codegen(c,inputs=inputs,main=True,std="c99",extra_options=["-Wno-endif-labels","-Wno-unused-variable"],extralibs=["osqp"])
+    extra_options = ["-Wno-endif-labels","-Wno-unused-variable"]
+    # No extra options on windows
+    if os.name == 'nt':
+      extra_options = []
+    self.check_codegen(c,inputs=inputs,main=True,std="c99",extra_options=extra_options,extralibs=["osqp"])
 
   @requires_conic('osqp')
   def test_memful_external(self):
@@ -2792,7 +2796,11 @@ class Functiontests(casadiTestCase):
     c = conic("conic","osqp",{"a":Sparsity.dense(1,2),"h":Sparsity.dense(2,2)},{"print_problem":True,"osqp.verbose":False})
     inputs = {"h": DM([[1,0.2],[0.2,1]]),"g":vertcat(1,2),"a":horzcat(1,1),"lba":-1,"uba":1}
     inputs = c.convert_in(inputs)
-    F,lib = self.check_codegen(c,inputs=inputs,std="c99",extra_options=["-Wno-endif-labels","-Wno-unused-variable"],extralibs=["osqp"])
+    extra_options = ["-Wno-endif-labels","-Wno-unused-variable"]
+    # No extra options on windows
+    if os.name == 'nt':
+      extra_options = []
+    F,lib = self.check_codegen(c,inputs=inputs,std="c99",extra_options=extra_options,extralibs=["osqp"])
     F = F.wrap()
     print("memful_external")
     self.check_codegen(F,inputs=inputs,main=True,extralibs=[lib])
