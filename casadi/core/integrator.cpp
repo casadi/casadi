@@ -783,6 +783,7 @@ int Integrator::fdae_sp_forward(SpForwardMem* m, const bvec_t* x,
   if (calc_sp_forward("daeF", m->arg, m->res, m->iw, m->w)) return 1;
   // Evaluate sensitivities
   for (casadi_int i = 0; i < ns_; ++i) {
+    std::fill(m->arg + FDYN_NUM_IN, m->arg + FDYN_NUM_IN + FDAE_NUM_OUT + FDYN_NUM_IN, nullptr);
     m->arg[FDYN_NUM_IN + FDAE_ODE] = ode;  // out:ode
     m->arg[FDYN_NUM_IN + FDAE_ALG] = alg;  // out:alg
     m->arg[FDYN_NUM_IN + FDAE_NUM_OUT + FDYN_X] = x + (i + 1) * nx1_;  // fwd:x
@@ -808,6 +809,7 @@ int Integrator::fquad_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t*
   if (calc_sp_forward("quadF", m->arg, m->res, m->iw, m->w)) return 1;
   // Evaluate sensitivities
   for (casadi_int i = 0; i < ns_; ++i) {
+    std::fill(m->arg + FDYN_NUM_IN, m->arg + FDYN_NUM_IN + FQUAD_NUM_OUT + FDYN_NUM_IN, nullptr);
     m->arg[FDYN_NUM_IN + FQUAD_QUAD] = quad;  // out:quad
     m->arg[FDYN_NUM_IN + FQUAD_NUM_OUT + FDYN_X] = x + (i + 1) * nx1_;  // fwd:x
     m->arg[FDYN_NUM_IN + FQUAD_NUM_OUT + FDYN_Z] = z + (i + 1) * nz1_;  // fwd:z
@@ -836,6 +838,7 @@ int Integrator::bdae_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t* 
   if (calc_sp_forward("daeB", m->arg, m->res, m->iw, m->w)) return 1;
   // Evaluate sensitivities
   for (casadi_int i = 0; i < ns_; ++i) {
+    std::fill(m->arg + BDYN_NUM_IN, m->arg + BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_NUM_IN, nullptr);
     m->arg[BDYN_NUM_IN + BDAE_RODE] = rode;  // out:rode
     m->arg[BDYN_NUM_IN + BDAE_RALG] = ralg;  // out:ralg
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_X] = x + (i + 1) * nx1_;  // fwd:x
@@ -869,6 +872,7 @@ int Integrator::bquad_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t*
   if (calc_sp_forward("quadB", m->arg, m->res, m->iw, m->w)) return 1;
   // Evaluate sensitivities
   for (casadi_int i = 0; i < ns_; ++i) {
+    std::fill(m->arg + BDYN_NUM_IN, m->arg + BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_NUM_IN, nullptr);
     m->arg[BDYN_NUM_IN + BQUAD_RQUAD] = rquad;  // out:rquad
     m->arg[BDYN_NUM_IN + BQUAD_UQUAD] = uquad;  // out:uquad
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_X] = x + (i + 1) * nx1_;  // fwd:x
