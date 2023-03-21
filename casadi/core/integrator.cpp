@@ -827,7 +827,7 @@ int Integrator::bdae_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t* 
   // Evaluate nondifferentiated
   std::fill(m->arg, m->arg + BDYN_NUM_IN, nullptr);
   m->arg[BDYN_X] = x;  // x
-  m->arg[BDYN_Z] = x;  // z
+  m->arg[BDYN_Z] = z;  // z
   m->arg[BDYN_P] = p;  // p
   m->arg[BDYN_U] = u;  // u
   m->arg[BDYN_RX] = rx;  // rx
