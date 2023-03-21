@@ -320,11 +320,6 @@ namespace casadi {
     return 0;
   }
 
-  int OracleFunction::calc_forward(OracleMemory* m, const std::string& fcn, casadi_int nfwd,
-      const double* const* arg, int thread_id) const {
-    return calc_function(m, "fwd" + str(nfwd) + "_" + fcn, arg, thread_id);
-  }
-
   std::string OracleFunction::
   generate_dependencies(const std::string& fname, const Dict& opts) const {
     CodeGenerator gen(fname, opts);

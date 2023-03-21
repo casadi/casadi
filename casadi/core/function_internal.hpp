@@ -601,6 +601,11 @@ namespace casadi {
     virtual Sparsity get_jac_sparsity(casadi_int oind, casadi_int iind, bool symmetric) const;
     ///@}
 
+    /// Helper function: Get name of forward derivative function
+    static std::string forward_name(const std::string& fcn, casadi_int nfwd) {
+      return "fwd" + str(nfwd) + "_" + fcn;
+    }
+
     ///@{
     /** \brief Return function that calculates forward derivatives
 
@@ -616,6 +621,11 @@ namespace casadi {
                                  const std::vector<std::string>& onames,
                                  const Dict& opts) const;
     ///@}
+
+    /// Helper function: Get name of adjoint derivative function
+    static std::string reverse_name(const std::string& fcn, casadi_int nadj) {
+      return "adj" + str(nadj) + "_" + fcn;
+    }
 
     ///@{
     /** \brief Return function that calculates adjoint derivatives

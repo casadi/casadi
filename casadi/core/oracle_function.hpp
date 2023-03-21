@@ -156,10 +156,6 @@ namespace casadi {
     int calc_function(OracleMemory* m, const std::string& fcn,
       const double* const* arg=nullptr, int thread_id=0) const;
 
-    // Calculate an oracle function, forward derivative
-    int calc_forward(OracleMemory* m, const std::string& fcn, casadi_int nfwd,
-      const double* const* arg=nullptr, int thread_id=0) const;
-
     /** \brief Get list of dependency functions
 
      * -1 Indicates irregularity

@@ -1989,7 +1989,7 @@ namespace casadi {
     }
     // Retrieve/generate cached
     Function f;
-    std::string fname = "fwd" + str(nfwd) + "_" + name_;
+    std::string fname = forward_name(name_, nfwd);
     if (!incache(fname, f)) {
       casadi_int i;
       // Names of inputs
@@ -2048,7 +2048,7 @@ namespace casadi {
     }
     // Retrieve/generate cached
     Function f;
-    std::string fname = "adj" + str(nadj) + "_" + name_;
+    std::string fname = reverse_name(name_, nadj);
     if (!incache(fname, f)) {
       casadi_int i;
       // Names of inputs

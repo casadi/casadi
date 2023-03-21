@@ -562,7 +562,7 @@ void SundialsInterface::calc_daeF(SundialsMemory* m, double t, const double* x, 
     m->arg[DAEF_NUM_IN + DAEF_NUM_OUT + DAEF_U] = m->u + nu1_;  // fwd:u
     m->res[DAEF_ODE] = ode ? ode + nx1_ : 0;  // fwd:ode
     m->res[DAEF_ALG] = alg ? alg + nz1_ : 0;  // fwd:alg
-    calc_forward(m, "daeF", ns_);
+    calc_function(m, forward_name("daeF", ns_));
   }
 }
 
@@ -594,7 +594,7 @@ void SundialsInterface::calc_daeB(SundialsMemory* m, double t, const double* x, 
     m->arg[DAEB_NUM_IN + DAEB_NUM_OUT + DAEB_RP] = m->rp + nrp1_;  // fwd:rp
     m->res[DAEB_RODE] = rode ? rode + nrx1_ : 0;  // fwd:rode
     m->res[DAEB_RALG] = ralg ? ralg + nrz1_ : 0;  // fwd:ralg
-    calc_forward(m, "daeB", ns_);
+    calc_function(m, forward_name("daeB", ns_));
   }
 }
 
@@ -616,7 +616,7 @@ void SundialsInterface::calc_quadF(SundialsMemory* m, double t, const double* x,
     m->arg[DAEF_NUM_IN + QUADF_NUM_OUT + DAEF_P] = m->p + np1_;  // fwd:p
     m->arg[DAEF_NUM_IN + QUADF_NUM_OUT + DAEF_U] = m->u + nu1_;  // fwd:u
     m->res[QUADF_QUAD] = quad ? quad + nq1_ : 0;  // fwd:quad
-    calc_forward(m, "quadF", ns_);
+    calc_function(m, forward_name("quadF", ns_));
   }
 }
 
@@ -648,7 +648,7 @@ void SundialsInterface::calc_quadB(SundialsMemory* m, double t, const double* x,
     m->arg[DAEB_NUM_IN + QUADB_NUM_OUT + DAEB_RP] = m->rp + nrp1_;  // fwd:rp
     m->res[QUADB_RQUAD] = rquad + nrq1_;  // fwd:rquad
     m->res[QUADB_UQUAD] = uquad + nuq1_;  // fwd:uquad
-    calc_forward(m, "quadB", ns_);
+    calc_function(m, forward_name("quadB", ns_));
   }
 }
 
@@ -678,7 +678,7 @@ void SundialsInterface::calc_jtimesF(SundialsMemory* m, double t, const double* 
     m->arg[JTIMESF_NUM_IN + JTIMESF_NUM_OUT + JTIMESF_FWD_Z] = fwd_z + nz1_;  // fwd:fwd:z
     m->res[JTIMESF_FWD_ODE] = fwd_ode + nx1_;  // fwd:fwd:ode
     m->res[JTIMESF_FWD_ALG] = fwd_alg + nz1_;  // fwd:fwd:alg
-    calc_forward(m, "jtimesF", ns_);
+    calc_function(m, forward_name("jtimesF", ns_));
   }
 }
 
@@ -715,7 +715,7 @@ void SundialsInterface::calc_jtimesB(SundialsMemory* m, double t, const double* 
     m->arg[JTIMESB_NUM_IN + JTIMESB_NUM_OUT + JTIMESB_FWD_RZ] = fwd_rz + nrz1_;  // fwd:fwd:rz
     m->res[JTIMESB_FWD_RODE] = fwd_rode + nrx1_;  // fwd:fwd:rode
     m->res[JTIMESB_FWD_RALG] = fwd_ralg + nrz1_;  // fwd:fwd:ralg
-    calc_forward(m, "jtimesB", ns_);
+    calc_function(m, forward_name("jtimesB", ns_));
  }
 }
 

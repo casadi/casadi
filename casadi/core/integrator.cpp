@@ -1665,7 +1665,7 @@ void FixedStepIntegrator::stepF(FixedStepMemory* m, double t, double h,
     m->res[FSTEP_XF] = xf + nx1_;  // fwd:xf
     m->res[FSTEP_VF] = vf + nv1_;  // fwd:vf
     m->res[FSTEP_QF] = qf + nq1_;  // fwd:qf
-    calc_forward(m, "stepF", ns_);
+    calc_function(m, forward_name("stepF", ns_));
   }
 }
 
@@ -1708,7 +1708,7 @@ void FixedStepIntegrator::stepB(FixedStepMemory* m, double t, double h,
     m->res[BSTEP_RVF] = rvf + nrv1_;  // fwd:rvf
     m->res[BSTEP_RQF] = rqf + nrq1_;  // fwd:rqf
     m->res[BSTEP_UQF] = uqf + nuq1_;  // fwd:uqf
-    calc_forward(m, "stepB", ns_);
+    calc_function(m, forward_name("stepB", ns_));
   }
 }
 
@@ -1808,8 +1808,8 @@ void ImplicitFixedStepIntegrator::init(const Dict& opts) {
   // Allocate a solver
   Function rf = rootfinder("stepF", implicit_function_name,
     get_function("implicit_stepF"), rootfinder_options);
-  set_function(rf, rf.name(), false);
-  if (ns_ > 0) create_forward("stepF", ns_);
+  set_function(rf);
+  if (ns_ > 0) set_function(rf.forward(ns_));
 
   // Allocate a root-finding solver for the backward problem
   if (nrv1_ > 0) {
@@ -1822,8 +1822,8 @@ void ImplicitFixedStepIntegrator::init(const Dict& opts) {
     // Allocate a Newton solver
     Function brf = rootfinder("stepB", backward_implicit_function_name,
       get_function("implicit_stepB"), backward_rootfinder_options);
-    set_function(brf, brf.name(), false);
-    if (ns_ > 0) create_forward("stepB", ns_);
+    set_function(brf);
+    if (ns_ > 0) set_function(brf.forward(ns_));
   }
 }
 
