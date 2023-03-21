@@ -773,20 +773,21 @@ std::map<std::string, MatType> Integrator::aug_adj(casadi_int nadj) const {
 int Integrator::fdae_sp_forward(SpForwardMem* m, const bvec_t* x,
     const bvec_t* p, const bvec_t* u, bvec_t* ode, bvec_t* alg) const {
   // Evaluate nondifferentiated
-  std::fill(m->arg, m->arg + FDYN_NUM_IN, nullptr);
+  m->arg[FDYN_T] = nullptr;  // t
   m->arg[FDYN_X] = x;  // x
+  m->arg[FDYN_Z] = nullptr;  // z
   m->arg[FDYN_P] = p;  // p
   m->arg[FDYN_U] = u;  // u
-  std::fill(m->res, m->res + FDAE_NUM_OUT, nullptr);
   m->res[FDAE_ODE] = ode;  // ode
   m->res[FDAE_ALG] = alg;  // alg
   if (calc_sp_forward("daeF", m->arg, m->res, m->iw, m->w)) return 1;
   // Evaluate sensitivities
   for (casadi_int i = 0; i < ns_; ++i) {
-    std::fill(m->arg + FDYN_NUM_IN, m->arg + FDYN_NUM_IN + FDAE_NUM_OUT + FDYN_NUM_IN, nullptr);
     m->arg[FDYN_NUM_IN + FDAE_ODE] = ode;  // out:ode
     m->arg[FDYN_NUM_IN + FDAE_ALG] = alg;  // out:alg
+    m->arg[FDYN_NUM_IN + FDAE_NUM_OUT + FDYN_T] = nullptr;  // fwd:t
     m->arg[FDYN_NUM_IN + FDAE_NUM_OUT + FDYN_X] = x + (i + 1) * nx1_;  // fwd:x
+    m->arg[FDYN_NUM_IN + FDAE_NUM_OUT + FDYN_Z] = nullptr;  // fwd:z
     m->arg[FDYN_NUM_IN + FDAE_NUM_OUT + FDYN_P] = p + (i + 1) * np1_;  // fwd:p
     m->arg[FDYN_NUM_IN + FDAE_NUM_OUT + FDYN_U] = u + (i + 1) * nu1_;  // fwd:u
     m->res[FDAE_ODE] = ode + (i + 1) * nx1_;  // fwd:ode
@@ -799,18 +800,17 @@ int Integrator::fdae_sp_forward(SpForwardMem* m, const bvec_t* x,
 int Integrator::fquad_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t* z,
     const bvec_t* p, const bvec_t* u, bvec_t* quad) const {
   // Evaluate nondifferentiated
-  std::fill(m->arg, m->arg + FDYN_NUM_IN, nullptr);
+  m->arg[FDYN_T] = nullptr;  // t
   m->arg[FDYN_X] = x;  // x
   m->arg[FDYN_Z] = z;  // z
   m->arg[FDYN_P] = p;  // p
   m->arg[FDYN_U] = u;  // u
-  std::fill(m->res, m->res + FQUAD_NUM_OUT, nullptr);
   m->res[FQUAD_QUAD] = quad;  // quad
   if (calc_sp_forward("quadF", m->arg, m->res, m->iw, m->w)) return 1;
   // Evaluate sensitivities
   for (casadi_int i = 0; i < ns_; ++i) {
-    std::fill(m->arg + FDYN_NUM_IN, m->arg + FDYN_NUM_IN + FQUAD_NUM_OUT + FDYN_NUM_IN, nullptr);
     m->arg[FDYN_NUM_IN + FQUAD_QUAD] = quad;  // out:quad
+    m->arg[FDYN_NUM_IN + FQUAD_NUM_OUT + FDYN_T] = nullptr;  // fwd:t
     m->arg[FDYN_NUM_IN + FQUAD_NUM_OUT + FDYN_X] = x + (i + 1) * nx1_;  // fwd:x
     m->arg[FDYN_NUM_IN + FQUAD_NUM_OUT + FDYN_Z] = z + (i + 1) * nz1_;  // fwd:z
     m->arg[FDYN_NUM_IN + FQUAD_NUM_OUT + FDYN_P] = p + (i + 1) * np1_;  // fwd:p
@@ -825,27 +825,28 @@ int Integrator::bdae_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t* 
     const bvec_t* p, const bvec_t* u, const bvec_t* rx, const bvec_t* rp,
     bvec_t* rode, bvec_t* ralg) const {
   // Evaluate nondifferentiated
-  std::fill(m->arg, m->arg + BDYN_NUM_IN, nullptr);
+  m->arg[BDYN_T] = nullptr;  // t
   m->arg[BDYN_X] = x;  // x
   m->arg[BDYN_Z] = z;  // z
   m->arg[BDYN_P] = p;  // p
   m->arg[BDYN_U] = u;  // u
   m->arg[BDYN_RX] = rx;  // rx
+  m->arg[BDYN_RZ] = nullptr;  // rz
   m->arg[BDYN_RP] = rp;  // rp
-  std::fill(m->res, m->res + BDAE_NUM_OUT, nullptr);
   m->res[BDAE_RODE] = rode;  // rode
   m->res[BDAE_RALG] = ralg;  // ralg
   if (calc_sp_forward("daeB", m->arg, m->res, m->iw, m->w)) return 1;
   // Evaluate sensitivities
   for (casadi_int i = 0; i < ns_; ++i) {
-    std::fill(m->arg + BDYN_NUM_IN, m->arg + BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_NUM_IN, nullptr);
     m->arg[BDYN_NUM_IN + BDAE_RODE] = rode;  // out:rode
     m->arg[BDYN_NUM_IN + BDAE_RALG] = ralg;  // out:ralg
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_T] = nullptr;  // fwd:t
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_X] = x + (i + 1) * nx1_;  // fwd:x
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_Z] = z + (i + 1) * nz1_;  // fwd:z
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_P] = p + (i + 1) * np1_;  // fwd:p
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_U] = u + (i + 1) * nu1_;  // fwd:u
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_RX] = rx + (i + 1) * nrx1_;  // fwd:rx
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_RZ] = nullptr;  // fwd:rz
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_RP] = rp + (i + 1) * nrz1_;  // fwd:rp
     m->res[BDAE_RODE] = rode + (i + 1) * nrx1_;  // fwd:rode
     m->res[BDAE_RALG] = ralg + (i + 1) * nrz1_;  // fwd:ralg
@@ -858,7 +859,7 @@ int Integrator::bquad_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t*
     const bvec_t* p, const bvec_t* u, const bvec_t* rx, const bvec_t* rz, const bvec_t* rp,
     bvec_t* rquad, bvec_t* uquad) const {
   // Evaluate nondifferentiated
-  std::fill(m->arg, m->arg + BDYN_NUM_IN, nullptr);
+  m->arg[BDYN_T] = nullptr;  // t
   m->arg[BDYN_X] = x;  // x
   m->arg[BDYN_Z] = z;  // z
   m->arg[BDYN_P] = p;  // p
@@ -866,15 +867,14 @@ int Integrator::bquad_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t*
   m->arg[BDYN_RX] = rx;  // rx
   m->arg[BDYN_RZ] = rz;  // rz
   m->arg[BDYN_RP] = rp;  // rp
-  std::fill(m->res, m->res + BQUAD_NUM_OUT, nullptr);
   m->res[BQUAD_RQUAD] = rquad;  // rquad
   m->res[BQUAD_UQUAD] = uquad;  // uquad
   if (calc_sp_forward("quadB", m->arg, m->res, m->iw, m->w)) return 1;
   // Evaluate sensitivities
   for (casadi_int i = 0; i < ns_; ++i) {
-    std::fill(m->arg + BDYN_NUM_IN, m->arg + BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_NUM_IN, nullptr);
     m->arg[BDYN_NUM_IN + BQUAD_RQUAD] = rquad;  // out:rquad
     m->arg[BDYN_NUM_IN + BQUAD_UQUAD] = uquad;  // out:uquad
+    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_T] = nullptr;  // fwd:t
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_X] = x + (i + 1) * nx1_;  // fwd:x
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_Z] = z + (i + 1) * nz1_;  // fwd:z
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_P] = p + (i + 1) * np1_;  // fwd:p
