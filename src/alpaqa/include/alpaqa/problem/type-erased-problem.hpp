@@ -1063,6 +1063,7 @@ class FunctionalProblem : public BoxConstrProblem<Conf> {
     std::function<void(crvec, rvec)> grad_f;
     std::function<void(crvec, rvec)> g;
     std::function<void(crvec, crvec, rvec)> grad_g_prod;
+    std::function<void(crvec, index_t, rvec)> grad_gi;
     std::function<void(crvec, rmat)> jac_g;
     std::function<void(crvec, crvec, real_t, crvec, rvec)> hess_L_prod;
     std::function<void(crvec, crvec, real_t, rmat)> hess_L;
@@ -1074,6 +1075,7 @@ class FunctionalProblem : public BoxConstrProblem<Conf> {
     void eval_grad_f(crvec x, rvec grad_fx) const { ScopedMallocAllower ma; grad_f(x, grad_fx); }
     void eval_g(crvec x, rvec gx) const { ScopedMallocAllower ma; g(x, gx); }
     void eval_grad_g_prod(crvec x, crvec y, rvec grad_gxy) const { ScopedMallocAllower ma; grad_g_prod(x, y, grad_gxy); }
+    void eval_grad_gi(crvec x, index_t i, rvec grad_gix) const { ScopedMallocAllower ma; grad_gi(x, i, grad_gix); }
     void eval_hess_L_prod(crvec x, crvec y, real_t scale, crvec v, rvec Hv) const { ScopedMallocAllower ma; hess_L_prod(x, y, scale, v, Hv); }
     void eval_hess_ψ_prod(crvec x, crvec y, crvec Σ, real_t scale, crvec v, rvec Hv) const { ScopedMallocAllower ma; hess_ψ_prod(x, y, Σ, scale, v, Hv); }
     // clang-format on
@@ -1094,6 +1096,8 @@ class FunctionalProblem : public BoxConstrProblem<Conf> {
             hess_ψ(x, y, Σ, scale, H_values.reshaped(this->n, this->n));
     }
 
+    /// @see @ref TypeErasedProblem::provides_eval_grad_gi
+    bool provides_eval_grad_gi() const { return bool{grad_gi}; }
     /// @see @ref TypeErasedProblem::provides_eval_jac_g
     bool provides_eval_jac_g() const { return bool{jac_g}; }
     /// @see @ref TypeErasedProblem::provides_eval_hess_L_prod

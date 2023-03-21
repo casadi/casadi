@@ -173,7 +173,7 @@ auto build_test_problem2() {
             -x(0);
         grad = gradmat * y;
     };
-    [[maybe_unused]] auto grad_gi = [](crvec x, unsigned i, rvec grad) {
+    p.grad_gi = [](crvec x, index_t i, rvec grad) {
         mat gradmat(2, 2);
         gradmat <<                                      //
             -8 * x(0) + 0.5 * x(0) * std::pow(x(1), 2), //
