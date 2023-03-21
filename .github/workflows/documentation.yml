@@ -34,6 +34,7 @@ jobs:
       run: |
         python3 -m pip install -r doxygen/requirements.txt
         python3 -m pip install '.[docs]'
+        python3 -m pip install cmake
       shell: bash
 
     # Generate the documentation and save it in /tmp/staging
