@@ -1199,7 +1199,6 @@ if(WITH_SPRAL)
     set(SPRAL_DEPENDS_TARGET spral-external)
     set(SPRAL_FLAGS "--with-spral-cflags=-I${CMAKE_BINARY_DIR}/external_projects/include"
         "--with-spral-lflags=-L${CMAKE_BINARY_DIR}/external_projects/lib -lspral -lgfortran -lm -lcoinmetis ${LAPACK_LFLAGS}")
-    install(FILES ${CMAKE_BINARY_DIR}/external_projects/src/spral-external/LICENCE DESTINATION ${INCLUDE_PREFIX}/licenses RENAME spral.txt)
   endif()
 endif()
 add_feature_info(spral-interface WITH_SPRAL "Interface to SPRAL.")
@@ -1595,6 +1594,22 @@ if(WITH_SLICOT)
   find_package(SLICOT REQUIRED)
 endif()
 add_feature_info(slicot-interface WITH_SLICOT "Interface to the controls library SLICOT.")
+
+if(WITH_SELFCONTAINED)
+  # Loop over prescribed folders
+  foreach(DIR "${CMAKE_BINARY_DIR}/external_projects/src" "${PROJECT_SOURCE_DIR}/external_packages")
+    # Find all LICENSE files
+    file(GLOB_RECURSE LICENSE_FILES_A RELATIVE "${DIR}" "${DIR}/**/LICENSE*")
+    # Loop over files
+    foreach(LICENSE_FILE ${LICENSE_FILES_A})
+      # Extract directory from LICENSE_FILE
+      get_filename_component(LICENSE_DIR ${LICENSE_FILE} DIRECTORY)
+      install(FILES "${DIR}/${LICENSE_FILE}" DESTINATION "${INCLUDE_PREFIX}/licenses/${LICENSE_DIR}")
+    endforeach()
+  endforeach()
+  install(FILES "${PROJECT_SOURCE_DIR}/LICENSE.txt" DESTINATION "${INCLUDE_PREFIX}/licenses/casadi/LICENSE")
+endif()
+
 
 ######################################################
 ##################### paths ##########################
