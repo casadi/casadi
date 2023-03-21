@@ -1025,6 +1025,15 @@ if(WITH_BLASFEO)
       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}blasfeo${CMAKE_SHARED_LIBRARY_SUFFIX}"
       IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}blasfeo${CMAKE_IMPORT_LIBRARY_SUFFIX}"
     )
+    if(CMAKE_CROSS_COMPILING AND MINGW)
+      add_custom_command(TARGET hpipm-external POST_BUILD
+        COMMAND gendef "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}blasfeo${CMAKE_SHARED_LIBRARY_SUFFIX}"
+        COMMAND $ENV{DLLTOOL} --dllname "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}blasfeo${CMAKE_SHARED_LIBRARY_SUFFIX}" --def libblasfeo.def --output-lib blasfeo.lib
+      )
+      install(FILES "${CMAKE_CURRENT_BINARY_DIR}/blafeo.lib"
+        DESTINATION ${DEF_LIB_PREFIX}
+      )
+    endif()
     file(GLOB BLASFEO_HEADERS "${CMAKE_BINARY_DIR}/external_projects/include/blasfeo*")
     install(FILES
       ${BLASFEO_HEADERS}
