@@ -49,6 +49,14 @@ struct CASADI_EXPORT IntegratorMemory : public OracleMemory {
   double t_stop;
 };
 
+/// Memory struct, sparsity pattern propagation
+struct CASADI_EXPORT SpForwardMem {
+  const bvec_t** arg;
+  bvec_t** res;
+  casadi_int* iw;
+  bvec_t* w;
+};
+
 /** \brief Internal storage for integrator related data
 
 
@@ -167,6 +175,10 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
 
       \identifier{1m4} */
   virtual void print_stats(IntegratorMemory* mem) const {}
+
+  /// Forward sparsity pattern propagation to DAE
+  int fdyn_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t* p, const bvec_t* u,
+    bvec_t* ode, bvec_t* alg, bvec_t* quad) const;
 
   /** \brief  Propagate sparsity forward
 

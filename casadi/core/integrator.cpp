@@ -754,6 +754,21 @@ std::map<std::string, MatType> Integrator::aug_adj(casadi_int nadj) const {
   return ret;
 }
 
+int Integrator::fdyn_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t* p,
+    const bvec_t* u, bvec_t* ode, bvec_t* alg, bvec_t* quad) const {
+  std::fill(m->arg, m->arg + DYN_NUM_IN, nullptr);
+  m->arg[DYN_X] = x;
+  m->arg[DYN_P] = p;
+  m->arg[DYN_U] = u;
+  std::fill(m->res, m->res + DYN_NUM_OUT, nullptr);
+  m->res[DYN_ODE] = ode;
+  m->res[DYN_ALG] = alg;
+  m->res[DYN_QUAD] = quad;
+  if (oracle_(m->arg, m->res, m->iw, m->w, 0)) return 1;
+
+  return 0;
+}
+
 int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
     casadi_int* iw, bvec_t* w, void* mem) const {
   if (verbose_) casadi_message(name_ + "::sp_forward");
@@ -785,24 +800,21 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
   bvec_t *rx_prev = w; w += nrx_;
   bvec_t *rq = w; w += nrq_;
 
+  // Memory struct for function calls below
+  SpForwardMem m = {arg, res, iw, w};
+
   // Copy initial guess to x_prev
   std::copy_n(x0, nx_, x_prev);
 
   // Propagate forward
   for (casadi_int k = 0; k < nt(); ++k) {
     // Propagate through DAE function
-    std::fill(arg, arg + DYN_NUM_IN, nullptr);
-    arg[DYN_X] = x_prev;
-    arg[DYN_P] = p;
-    arg[DYN_U] = u;
-    std::fill(res, res + DYN_NUM_OUT, nullptr);
-    res[DYN_ODE] = x;
-    res[DYN_ALG] = z;
-    oracle_(arg, res, iw, w, 0);
+    if (fdyn_sp_forward(&m, x_prev, p, u, x, z, nullptr)) return 1;
     for (casadi_int i = 0; i < nx_; ++i) x[i] |= x_prev[i];
 
     // "Solve" in order to resolve interdependencies (cf. Rootfinder)
-    std::copy_n(x, nx_ + nz_, w);
+    std::copy_n(x, nx_, w);
+    std::copy_n(z, nz_, w + nx_);
     std::fill_n(x, nx_ + nz_, 0);
     sp_jac_dae_.spsolve(x, w, false);
 
