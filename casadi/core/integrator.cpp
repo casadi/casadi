@@ -1060,6 +1060,43 @@ int Integrator::fquad_sp_reverse(SpReverseMem* m, bvec_t* x, bvec_t* z,
   return 0;
 }
 
+int Integrator::bdae_sp_reverse(SpReverseMem* m, bvec_t* x, bvec_t* z,
+    bvec_t* p, bvec_t* u, bvec_t* rx, bvec_t* rp,
+    bvec_t* rode, bvec_t* ralg) const {
+  // Nondifferentiated inputs
+  m->arg[BDYN_T] = nullptr;  // t
+  m->arg[BDYN_X] = x;  // x
+  m->arg[BDYN_Z] = z;  // z
+  m->arg[BDYN_P] = p;  // p
+  m->arg[BDYN_U] = u;  // u
+  m->arg[BDYN_RX] = rx;  // rx
+  m->arg[BDYN_RZ] = nullptr;  // rz
+  m->arg[BDYN_RP] = rp;  // rp
+  // Propagate through sensitivities
+  for (casadi_int i = 0; i < ns_; ++i) {
+    m->res[BDAE_RODE] = rode + (i + 1) * nrx1_;  // fwd:rode
+    m->res[BDAE_RALG] = ralg + (i + 1) * nrz1_;  // fwd:ralg
+    m->arg[BDYN_NUM_IN + BDAE_RODE] = rode;  // out:rode
+    m->arg[BDYN_NUM_IN + BDAE_RALG] = ralg;  // out:ralg
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_T] = nullptr;  // fwd:t
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_X] = x + (i + 1) * nx1_;  // fwd:x
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_Z] = z + (i + 1) * nz1_;  // fwd:z
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_P] = p + (i + 1) * np1_;  // fwd:p
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_U] = u + (i + 1) * nu1_;  // fwd:u
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_RX] = rx + (i + 1) * nrx1_;  // fwd:rx
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_RZ] = nullptr;  // fwd:rz
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_RP] = rp + (i + 1) * nrz1_;  // fwd:rp
+    if (calc_sp_reverse(forward_name("daeB", 1), m->arg, m->res, m->iw, m->w)) return 1;
+  }
+  // Propagate through nondifferentiated
+  m->res[BDAE_RODE] = rode;  // rode
+  m->res[BDAE_RALG] = ralg;  // ralg
+  if (calc_sp_reverse("daeB", m->arg, m->res, m->iw, m->w)) return 1;
+  return 0;
+}
+
+
+
 
 int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
     casadi_int* iw, bvec_t* w, void* mem) const {
@@ -1153,13 +1190,7 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
       std::copy_n(rx, nrx_, rx_prev);
 
       // Indirect dependency via g
-      res[DYN_RODE] = rx;
-      res[DYN_RALG] = rz;
-      res[DYN_RQUAD] = nullptr;
-      res[DYN_UQUAD] = nullptr;
-      arg[DYN_RX] = rx_prev;
-      arg[DYN_RZ] = nullptr; // INTEGRATOR_RZ0 is a guess, not a dependency
-      if (oracle_.rev(arg, res, iw, w, 0)) return 1;
+      if (bdae_sp_reverse(&m, x, z, p, u, rx_prev, rp, rx, rz)) return 1;
 
       // Update rx, rz
       std::copy_n(rx_prev, nrx_, rx);

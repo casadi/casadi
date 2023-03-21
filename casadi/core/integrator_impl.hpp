@@ -216,6 +216,11 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   int fquad_sp_reverse(SpReverseMem* m, bvec_t* x, bvec_t* z,
     bvec_t* p, bvec_t* u, bvec_t* quad) const;
 
+  /// Reverse sparsity pattern propagation through DAE, backward problem
+  int bdae_sp_reverse(SpReverseMem* m, bvec_t* x, bvec_t* z,
+    bvec_t* p, bvec_t* u, bvec_t* rx, bvec_t* rp,
+    bvec_t* rode, bvec_t* ralg) const;
+
   /** \brief  Propagate sparsity backwards
 
       \identifier{1m6} */
