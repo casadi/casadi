@@ -975,17 +975,7 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
       }
 
       // Propagate through DAE function
-      std::fill(arg, arg + DYN_NUM_IN, nullptr);
-      arg[DYN_X] = x;
-      arg[DYN_P] = p;
-      arg[DYN_U] = u;
-      arg[DYN_Z] = z;
-      arg[DYN_RX] = rx_prev;
-      arg[DYN_RP] = rp;
-      std::fill(res, res + DYN_NUM_OUT, nullptr);
-      res[DYN_RODE] = rx;
-      res[DYN_RALG] = rz;
-      oracle_(arg, res, iw, w, 0);
+      if (bdae_sp_forward(&m, x, z, p, u, rx_prev, rp, rx, rz)) return 1;
       for (casadi_int i = 0; i < nrx_; ++i) rx[i] |= rx_prev[i];
 
       // "Solve" in order to resolve interdependencies (cf. Rootfinder)
