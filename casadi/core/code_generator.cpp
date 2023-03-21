@@ -433,8 +433,7 @@ namespace casadi {
 
     // Function prototype
     if (this->cpp) s << "extern \"C\"\n"; // C linkage
-    s << this->dll_export
-      << "void mexFunction(int resc, mxArray *resv[], int argc, const mxArray *argv[]) {"
+    s << "void mexFunction(int resc, mxArray *resv[], int argc, const mxArray *argv[]) {"
       << std::endl;
 
     // Create a buffer
