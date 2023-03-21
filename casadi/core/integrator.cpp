@@ -1007,6 +1007,34 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
   return 0;
 }
 
+int Integrator::fdae_sp_reverse(SpReverseMem* m, bvec_t* x,
+    bvec_t* p, bvec_t* u, bvec_t* ode, bvec_t* alg) const {
+  // Nondifferentiated inputs
+  m->arg[FDYN_T] = nullptr;  // t
+  m->arg[FDYN_X] = x;  // x
+  m->arg[FDYN_Z] = nullptr;  // z
+  m->arg[FDYN_P] = p;  // p
+  m->arg[FDYN_U] = u;  // u
+  // Propagate through sensitivities
+  for (casadi_int i = 0; i < ns_; ++i) {
+    m->res[FDAE_ODE] = ode + (i + 1) * nx1_;  // fwd:ode
+    m->res[FDAE_ALG] = alg + (i + 1) * nz1_;  // fwd:alg
+    m->arg[FDYN_NUM_IN + FDAE_ODE] = ode;  // out:ode
+    m->arg[FDYN_NUM_IN + FDAE_ALG] = alg;  // out:alg
+    m->arg[FDYN_NUM_IN + FDAE_NUM_OUT + FDYN_T] = nullptr;  // fwd:t
+    m->arg[FDYN_NUM_IN + FDAE_NUM_OUT + FDYN_X] = x + (i + 1) * nx1_;  // fwd:x
+    m->arg[FDYN_NUM_IN + FDAE_NUM_OUT + FDYN_Z] = nullptr;  // fwd:z
+    m->arg[FDYN_NUM_IN + FDAE_NUM_OUT + FDYN_P] = p + (i + 1) * np1_;  // fwd:p
+    m->arg[FDYN_NUM_IN + FDAE_NUM_OUT + FDYN_U] = u + (i + 1) * nu1_;  // fwd:u
+    if (calc_sp_reverse(forward_name("daeF", 1), m->arg, m->res, m->iw, m->w)) return 1;
+  }
+  // Propagate through nondifferentiated
+  m->res[FDAE_ODE] = ode;  // ode
+  m->res[FDAE_ALG] = alg;  // alg
+  if (calc_sp_reverse("daeF", m->arg, m->res, m->iw, m->w)) return 1;
+  return 0;
+}
+
 int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
     casadi_int* iw, bvec_t* w, void* mem) const {
   if (verbose_) casadi_message(name_ + "::sp_reverse");
@@ -1037,6 +1065,9 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
   bvec_t *rz = w; w += nrz_;
   bvec_t *rx_prev = w; w += nrx_;
   bvec_t *rq = w; w += nrq_;
+
+  // Memory struct for function calls below
+  SpReverseMem m = {arg, res, iw, w};
 
   // Clear state vector
   std::fill_n(x, nx_, 0);
@@ -1163,12 +1194,7 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
     std::copy_n(x, nx_, x_prev);
 
     // Indirect dependency through f
-    res[DYN_ODE] = x;
-    res[DYN_ALG] = z;
-    res[DYN_QUAD] = nullptr;
-    arg[DYN_X] = x_prev;
-    arg[DYN_Z] = nullptr; // INTEGRATOR_Z0 is a guess, no dependency
-    if (oracle_.rev(arg, res, iw, w, 0)) return 1;
+    if (fdae_sp_reverse(&m, x_prev, p, u, x, z)) return 1;
 
     // Update x, z
     std::copy_n(x_prev, nx_, x);

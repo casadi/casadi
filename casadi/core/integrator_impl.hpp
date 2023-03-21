@@ -49,9 +49,17 @@ struct CASADI_EXPORT IntegratorMemory : public OracleMemory {
   double t_stop;
 };
 
-/// Memory struct, sparsity pattern propagation
+/// Memory struct, forward sparsity pattern propagation
 struct CASADI_EXPORT SpForwardMem {
   const bvec_t** arg;
+  bvec_t** res;
+  casadi_int* iw;
+  bvec_t* w;
+};
+
+/// Memory struct, backward sparsity pattern propagation
+struct CASADI_EXPORT SpReverseMem {
+  bvec_t** arg;
   bvec_t** res;
   casadi_int* iw;
   bvec_t* w;
@@ -199,6 +207,10 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
       \identifier{1m5} */
   int sp_forward(const bvec_t** arg, bvec_t** res,
     casadi_int* iw, bvec_t* w, void* mem) const override;
+
+  /// Reverse sparsity pattern propagation through DAE, forward problem
+  int fdae_sp_reverse(SpReverseMem* m, bvec_t* x,
+    bvec_t* p, bvec_t* u, bvec_t* ode, bvec_t* alg) const;
 
   /** \brief  Propagate sparsity backwards
 
