@@ -846,7 +846,11 @@ class ConicTests(casadiTestCase):
       solver_in["lba"]=LBA
       solver_in["uba"]=UBA
 
-      self.check_serialize(solver,solver_in)
+      # Known bug #3038
+      if conic=="superscs" and platform.system()=="Darwin":
+        pass
+      else:
+        self.check_serialize(solver,solver_in)
       solver_out = solver(**solver_in)
 
       self.checkarray(solver_out["x"],DM([0.5,1.5]),str(conic),digits=max(1,5-less_digits))
@@ -857,8 +861,6 @@ class ConicTests(casadiTestCase):
       self.assertAlmostEqual(solver_out["cost"][0],2.5,max(1,5-less_digits),str(conic))
 
       if aux_options["codegen"]:
-        # Known bug #3038
-        if conic=="superscs" and platform.system()=="Darwin": continue
         self.check_codegen(solver,solver_in,**aux_options["codegen"])
 
 
