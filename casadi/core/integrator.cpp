@@ -539,12 +539,32 @@ void Integrator::init(const Dict& opts) {
   nrq_ = nrq1_ * (1 + ns_);
   nuq_ = nuq1_ * (1 + ns_);
 
+  // Create problem functions, forward problem
+  create_function(nonaug_oracle_, "daeF", fdyn_in(), fdae_out());
+  create_function(nonaug_oracle_, "quadF", fdyn_in(), fquad_out());
+  if (ns_ > 0) {
+    // one direction to conserve memory, symbolic processing time
+    create_forward("daeF", 1);
+    create_forward("quadF", 1);
+  }
+
+  // Create problem functions, backward problem
+  if (nrx1_ > 0) {
+    create_function(nonaug_oracle_, "daeB", bdyn_in(), bdae_out());
+    create_function(nonaug_oracle_, "quadB", bdyn_in(), bquad_out());
+    if (ns_ > 0) {
+      // one direction to conserve memory, symbolic processing time
+      create_forward("daeB", 1);
+      create_forward("quadB", 1);
+    }
+  }
+
   // Create dynamic functions, forward and backward proble,
   create_function(nonaug_oracle_, "dynF", fdyn_in(), fdyn_out());
-  if (ns_ > 0) create_forward("dynF", 1);  // one direction to conserve memory, construction
+  if (ns_ > 0) create_forward("dynF", 1);
   if (nrx1_ > 0) {
     create_function(nonaug_oracle_, "dynB", bdyn_in(), bdyn_out());
-    if (ns_ > 0) create_forward("dynB", 1);  // one direction to conserve memory, construction
+    if (ns_ > 0) create_forward("dynB", 1);
   }
 
   // Get the sparsities of the forward and reverse DAE

@@ -178,12 +178,6 @@ namespace casadi {
 
     ///@{
     /** \brief IO conventions for continuous time dynamics */
-    enum DaeFIn { DAEF_T, DAEF_X, DAEF_Z, DAEF_P, DAEF_U, DAEF_NUM_IN};
-    enum DaeFOut { DAEF_ODE, DAEF_ALG, DAEF_NUM_OUT};
-    enum QuadFOut { QUADF_QUAD, QUADF_NUM_OUT};
-    enum DaeBIn { DAEB_T, DAEB_X, DAEB_Z, DAEB_P, DAEB_U, DAEB_RX, DAEB_RZ, DAEB_RP, DAEB_NUM_IN};
-    enum DAEBOut { DAEB_RODE, DAEB_RALG, DAEB_NUM_OUT};
-    enum QuadBOut { QUADB_RQUAD, QUADB_UQUAD, QUADB_NUM_OUT};
     enum JtimesFIn { JTIMESF_T, JTIMESF_X, JTIMESF_Z, JTIMESF_P, JTIMESF_U, JTIMESF_FWD_X,
       JTIMESF_FWD_Z, JTIMESF_NUM_IN};
     enum JtimesFOut { JTIMESF_FWD_ODE, JTIMESF_FWD_ALG, JTIMESF_NUM_OUT};

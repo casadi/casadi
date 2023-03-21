@@ -281,13 +281,21 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
 
       \identifier{260} */
   enum FDynIn { FDYN_T, FDYN_X, FDYN_Z, FDYN_P, FDYN_U, FDYN_NUM_IN};
-  enum FDynOut { FDYN_ODE, FDYN_ALG, FDYN_QUAD, FDYN_NUM_OUT};
-  enum BDybIn { BDYN_T, BDYN_X, BDYN_Z, BDYN_P, BDYN_U, BDYN_RX, BDYN_RZ, BDYN_RP, BDYN_NUM_IN};
-  enum BDynOut { BDYN_RODE, BDYN_RALG, BDYN_RQUAD, BDYN_UQUAD, BDYN_NUM_OUT};
   static std::vector<std::string> fdyn_in() { return {"t", "x", "z", "p", "u"}; }
+  enum FDynOut { FDYN_ODE, FDYN_ALG, FDYN_QUAD, FDYN_NUM_OUT};
   static std::vector<std::string> fdyn_out() { return {"ode", "alg", "quad"}; }
+  enum DaeFOut { DAEF_ODE, DAEF_ALG, DAEF_NUM_OUT};
+  static std::vector<std::string> fdae_out() { return {"ode", "alg"}; }
+  enum QuadFOut { QUADF_QUAD, QUADF_NUM_OUT};
+  static std::vector<std::string> fquad_out() { return {"quad"}; }
+  enum BDybIn { BDYN_T, BDYN_X, BDYN_Z, BDYN_P, BDYN_U, BDYN_RX, BDYN_RZ, BDYN_RP, BDYN_NUM_IN};
   static std::vector<std::string> bdyn_in() { return {"t", "x", "z", "p", "u", "rx", "rz", "rp"}; }
+  enum BDynOut { BDYN_RODE, BDYN_RALG, BDYN_RQUAD, BDYN_UQUAD, BDYN_NUM_OUT};
   static std::vector<std::string> bdyn_out() { return {"rode", "ralg", "rquad", "uquad"}; }
+  enum DAEBOut { DAEB_RODE, DAEB_RALG, DAEB_NUM_OUT};
+  static std::vector<std::string> bdae_out() { return {"rode", "ralg"}; }
+  enum QuadBOut { QUADB_RQUAD, QUADB_UQUAD, QUADB_NUM_OUT};
+  static std::vector<std::string> bquad_out() { return {"rquad", "uquad"}; }
   ///@}
 
   // Initial time
