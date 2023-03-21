@@ -498,9 +498,6 @@ void Integrator::init(const Dict& opts) {
   // Call the base class method
   OracleFunction::init(opts);
 
-  // For sparsity pattern propagation
-  alloc(oracle_);
-
   casadi_assert(x().is_vector(), "Only vector states are supported");
 
   // Error if sparse input
