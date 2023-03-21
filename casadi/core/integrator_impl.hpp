@@ -184,6 +184,16 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   int fquad_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t* z,
     const bvec_t* p, const bvec_t* u, bvec_t* quad) const;
 
+  /// Forward sparsity pattern propagation through DAE, backward problem
+  int bdae_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t* z,
+    const bvec_t* p, const bvec_t* u, const bvec_t* rx, const bvec_t* rp,
+    bvec_t* rode, bvec_t* ralg) const;
+
+  /// Forward sparsity pattern propagation through quadratures, backward problem
+  int bquad_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t* z,
+    const bvec_t* p, const bvec_t* u, const bvec_t* rx, const bvec_t* rz, const bvec_t* rp,
+    bvec_t* rquad, bvec_t* uquad) const;
+
   /** \brief  Propagate sparsity forward
 
       \identifier{1m5} */
