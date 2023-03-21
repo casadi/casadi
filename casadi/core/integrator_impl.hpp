@@ -277,7 +277,9 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   ///@}
 
   ///@{
-  /** \brief IO conventions for continuous time dynamics */
+  /** \brief IO conventions for continuous time dynamics
+
+      \identifier{260} */
   enum FDynIn { FDYN_T, FDYN_X, FDYN_Z, FDYN_P, FDYN_U, FDYN_NUM_IN};
   enum FDynOut { FDYN_ODE, FDYN_ALG, FDYN_QUAD, FDYN_NUM_OUT};
   enum BDybIn { BDYN_T, BDYN_X, BDYN_Z, BDYN_P, BDYN_U, BDYN_RX, BDYN_RZ, BDYN_RP, BDYN_NUM_IN};
