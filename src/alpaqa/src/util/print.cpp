@@ -1,3 +1,4 @@
+
 #include <alpaqa/export.h>
 #include <alpaqa/implementation/util/print.tpp>
 
@@ -51,10 +52,10 @@ template ALPAQA_EXPORT ostream &print_matlab(ostream &os, const MatrixX<complex<
 template ALPAQA_EXPORT ostream &print_matlab(ostream &os, const VectorX<__float128> &);
 template ALPAQA_EXPORT ostream &print_matlab(ostream &os, const VectorX<complex<__float128>> &);
 
-template ALPAQA_EXPORT ostream &print_python(ostream &os, const MatrixX<__float128> &);
-template ALPAQA_EXPORT ostream &print_python(ostream &os, const MatrixX<complex<__float128>> &);
-template ALPAQA_EXPORT ostream &print_python(ostream &os, const VectorX<__float128> &);
-template ALPAQA_EXPORT ostream &print_python(ostream &os, const VectorX<complex<__float128>> &);
+template ALPAQA_EXPORT ostream &print_python(ostream &os, const MatrixX<__float128> &, std::string_view);
+template ALPAQA_EXPORT ostream &print_python(ostream &os, const MatrixX<complex<__float128>> &, std::string_view);
+template ALPAQA_EXPORT ostream &print_python(ostream &os, const VectorX<__float128> &, std::string_view);
+template ALPAQA_EXPORT ostream &print_python(ostream &os, const VectorX<complex<__float128>> &, std::string_view);
 #endif
 
 // clang-format on
