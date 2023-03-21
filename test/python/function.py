@@ -2721,8 +2721,9 @@ class Functiontests(casadiTestCase):
 
       f = None
       g = None
-      with self.assertInException("No such file"):
-        g = Function.load('f.casadi')
+      if os.name!='nt': # Workaround for known bug #3039
+        with self.assertInException("No such file"):
+          g = Function.load('f.casadi')
 
 
     for case in test_cases("embed"):
