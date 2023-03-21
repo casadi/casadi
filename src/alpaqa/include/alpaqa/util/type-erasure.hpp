@@ -1,5 +1,7 @@
 #pragma once
 
+#include <alpaqa/export.hpp>
+#include <alpaqa/util/demangled-typename.hpp>
 #include <alpaqa/util/noop-delete.hpp>
 #include <alpaqa/util/type-traits.hpp>
 
@@ -9,17 +11,41 @@
 #include <functional>
 #include <memory>
 #include <new>
+#include <stdexcept>
 #include <type_traits>
-#include <utility>
-#ifndef NDEBUG
 #include <typeinfo>
-#endif
+#include <utility>
 
 namespace alpaqa::util {
 
 template <class T>
 struct VTableTypeTag {
     T *t = nullptr;
+};
+
+class ALPAQA_EXPORT bad_type_erased_type : public std::logic_error {
+  public:
+    bad_type_erased_type(const std::type_info &actual_type,
+                         const std::type_info &requested_type,
+                         const std::string &message = "")
+        : std::logic_error{message}, actual_type{actual_type},
+          requested_type{requested_type} {}
+
+    [[nodiscard]] const char *what() const noexcept override {
+        message = "";
+        if (const char *w = std::logic_error::what(); w && *w) {
+            message += w;
+            message += ": ";
+        }
+        message = "Type requested: " + demangled_typename(requested_type) +
+                  ", type contained: " + demangled_typename(actual_type);
+        return message.c_str();
+    }
+
+  private:
+    const std::type_info &actual_type;
+    const std::type_info &requested_type;
+    mutable std::string message;
 };
 
 /// Struct that stores the size of a polymorphic object, as well as pointers to
@@ -76,10 +102,8 @@ struct BasicVTable {
     required_function_t<void(void *storage)> move = nullptr;
     /// Destruct the given instance.
     required_function_t<void()> destroy = nullptr;
-#ifndef NDEBUG
     /// The original type of the stored object (available in debug mode only).
     const std::type_info *type = &typeid(void);
-#endif
 
     BasicVTable() = default;
 
@@ -96,9 +120,7 @@ struct BasicVTable {
         destroy = [](void *self) {
             std::launder(reinterpret_cast<T *>(self))->~T();
         };
-#ifndef NDEBUG
         type = &typeid(T);
-#endif
     }
 };
 
@@ -362,29 +384,31 @@ class TypeErased {
     /// Get a copy of the allocator.
     allocator_type get_allocator() const noexcept { return allocator; }
 
+    /// Query the contained type.
+    [[nodiscard]] const std::type_info &type() const noexcept {
+        return *vtable.type;
+    }
+
     /// Convert the type-erased object to the given type. The type is checked
     /// in debug builds only, use with caution.
     template <class T>
     T &as() & {
-#ifndef NDEBUG
-        assert(typeid(T) == *vtable.type);
-#endif
+        if (typeid(T) != type())
+            throw bad_type_erased_type(type(), typeid(T));
         return *reinterpret_cast<T *>(self);
     }
     /// @copydoc as()
     template <class T>
     const T &as() const & {
-#ifndef NDEBUG
-        assert(typeid(T) == *vtable.type);
-#endif
+        if (typeid(T) != type())
+            throw bad_type_erased_type(type(), typeid(T));
         return *reinterpret_cast<const T *>(self);
     }
     /// @copydoc as()
     template <class T>
     const T &&as() && {
-#ifndef NDEBUG
-        assert(typeid(T) == *vtable.type);
-#endif
+        if (typeid(T) != type())
+            throw bad_type_erased_type(type(), typeid(T));
         return std::move(*reinterpret_cast<T *>(self));
     }
 
