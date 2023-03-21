@@ -1095,8 +1095,40 @@ int Integrator::bdae_sp_reverse(SpReverseMem* m, bvec_t* x, bvec_t* z,
   return 0;
 }
 
-
-
+int Integrator::bquad_sp_reverse(SpReverseMem* m, bvec_t* x, bvec_t* z,
+    bvec_t* p, bvec_t* u, bvec_t* rx, bvec_t* rz, bvec_t* rp,
+    bvec_t* rquad, bvec_t* uquad) const {
+  // Nondifferentiated inputs
+  m->arg[BDYN_T] = nullptr;  // t
+  m->arg[BDYN_X] = x;  // x
+  m->arg[BDYN_Z] = z;  // z
+  m->arg[BDYN_P] = p;  // p
+  m->arg[BDYN_U] = u;  // u
+  m->arg[BDYN_RX] = rx;  // rx
+  m->arg[BDYN_RZ] = rz;  // rz
+  m->arg[BDYN_RP] = rp;  // rp
+  // Propagate through sensitivities
+  for (casadi_int i = 0; i < ns_; ++i) {
+    m->res[BQUAD_RQUAD] = rquad ? rquad + (i + 1) * nrq1_ : 0;  // fwd:rquad
+    m->res[BQUAD_UQUAD] = uquad ? uquad + (i + 1) * nuq1_ : 0;  // fwd:uquad
+    m->arg[BDYN_NUM_IN + BQUAD_RQUAD] = rquad;  // out:rquad
+    m->arg[BDYN_NUM_IN + BQUAD_UQUAD] = uquad;  // out:uquad
+    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_T] = nullptr;  // fwd:t
+    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_X] = x + (i + 1) * nx1_;  // fwd:x
+    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_Z] = z + (i + 1) * nz1_;  // fwd:z
+    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_P] = p + (i + 1) * np1_;  // fwd:p
+    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_U] = u + (i + 1) * nu1_;  // fwd:u
+    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_RX] = rx + (i + 1) * nrx1_;  // fwd:rx
+    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_RZ] = rz + (i + 1) * nrz1_;  // fwd:rz
+    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_RP] = rp + (i + 1) * nrp1_;  // fwd:rp
+    if (calc_sp_reverse(forward_name("quadB", 1), m->arg, m->res, m->iw, m->w)) return 1;
+  }
+  // Propagate through nondifferentiated
+  m->res[BQUAD_RQUAD] = rquad;  // rquad
+  m->res[BQUAD_UQUAD] = uquad;  // uquad
+  if (calc_sp_reverse("quadB", m->arg, m->res, m->iw, m->w)) return 1;
+  return 0;
+}
 
 int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
     casadi_int* iw, bvec_t* w, void* mem) const {
@@ -1166,19 +1198,8 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
       }
 
       // Get dependencies from backward quadratures
-      std::fill(res, res + DYN_NUM_OUT, nullptr);
-      res[DYN_RQUAD] = rqf;  // Note: will set rqf to zero, hence the restoration step above
-      res[DYN_UQUAD] = uqf;
-      std::fill(arg, res + DYN_NUM_IN, nullptr);
-      arg[DYN_X] = x;
-      arg[DYN_Z] = z;
-      arg[DYN_P] = p;
-      arg[DYN_U] = u;
-      arg[DYN_RX] = rx;
-      arg[DYN_RZ] = rz;
-      arg[DYN_RP] = rp;
       if ((nrq_ > 0 && rqf) || (nuq_ > 0 && uqf)) {
-        if (oracle_.rev(arg, res, iw, w, 0)) return 1;
+        if (bquad_sp_reverse(&m, x, z, p, u, rx, rz, rp, rqf, uqf)) return 1;
       }
 
       // Propagate interdependencies
