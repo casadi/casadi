@@ -245,7 +245,7 @@ TEST(TypeErasedProblem, CountedOptionalProblem) {
     TestOptProblem prob;
     auto te_prob = alpaqa::TestTypeErasedProblem<>::make<Problem>(prob);
     auto &evals  = *te_prob.as<Problem>().evaluations;
-    vec x;
+    vec x(1);
     indexvec i;
 
     EXPECT_EQ(evals.proj_diff_g, 0);
