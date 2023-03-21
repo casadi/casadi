@@ -802,12 +802,17 @@ macro(create_import_library TARGET)
   if(CMAKE_CROSS_COMPILING AND MINGW)
     # Get target in lowercase
     string(TOLOWER ${TARGET} TARGET_LOWER)
+    set(TARGET_LIB "${CMAKE_CURRENT_BINARY_DIR}/${TARGET_LOWER}.lib")
     get_target_property(IMPORTED_LOCATION ${TARGET} IMPORTED_LOCATION)
-    add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${TARGET_LOWER}.lib" DEPENDS ${TARGET_LOWER}-external
-      COMMAND gendef "${IMPORTED_LOCATION}"
+    add_custom_command(OUTPUT "${TARGET_LIB}" DEPENDS ${TARGET}
+      COMMAND gendef "${IMPORTED_LOCATION}" - > lib${TARGET_LOWER}.def
       COMMAND $ENV{DLLTOOL} --dllname "${IMPORTED_LOCATION}" --def lib${TARGET_LOWER}.def --output-lib ${TARGET_LOWER}.lib
     )
-    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${TARGET_LOWER}.lib"
+    add_custom_target(create_import_library_${TARGET_LOWER} ALL
+    DEPENDS "${TARGET_LIB}"
+    )
+    set("TARGET_LIB: ${TARGET_LIB}")
+    install(FILES "${TARGET_LIB}"
       DESTINATION ${DEF_LIB_PREFIX}
     )
   endif()
@@ -989,7 +994,7 @@ add_feature_info(worhp-interface WITH_WORHP "Interface to the NLP solver Worhp (
 if(WITH_LAPACK)
   if (WITH_BUILD_LAPACK)
     # Requires gcc>=5.0
-    ExternalProject_Add(lapack-external
+    ExternalProject_Add(openblas-external
       GIT_REPOSITORY ${BUILD_LAPACK_GIT_REPO}
       GIT_TAG ${BUILD_LAPACK_VERSION}
       PREFIX "${CMAKE_BINARY_DIR}/external_projects"
@@ -998,10 +1003,10 @@ if(WITH_LAPACK)
       PATCH_COMMAND ${EXTERNAL_CMAKE_COMMAND} -DFILE=CMakeLists.txt -DCASADI_TP_SHARED_PREFIX=${CASADI_TP_SHARED_PREFIX} -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/patch_openblas.cmake
       CMAKE_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_LIBDIR=lib -DTARGET=CORE2 -DUSE_THREAD=ON -DNUM_THREADS=16 -DBUILD_SINGLE=ON -DBUILD_DOUBLE=ON -DBUILD_COMPLEX=ON -DBUILD_COMPLEX16=ON -DDYNAMIC_ARCH=OFF -DUSE_OPENMP=OFF -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
     set(LAPACK_LIBRARIES "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}${CASADI_TP_SHARED_PREFIX}openblas${CMAKE_SHARED_LIBRARY_SUFFIX}")    
-    set(LAPACK_DEPENDS_TARGET lapack-external)
+    set(LAPACK_DEPENDS_TARGET openblas-external)
 
     add_library(lapack SHARED IMPORTED)
-    add_dependencies(lapack lapack-external)
+    add_dependencies(lapack openblas-external)
     set_target_properties(lapack PROPERTIES
       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}${CASADI_TP_SHARED_PREFIX}openblas${CMAKE_SHARED_LIBRARY_SUFFIX}"
       IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}${CASADI_TP_SHARED_PREFIX}openblas${CMAKE_IMPORT_LIBRARY_SUFFIX}"
@@ -1482,7 +1487,7 @@ if(WITH_OSQP)
     add_dependencies(osqp osqp-external)
     set_target_properties(osqp PROPERTIES
        INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include/osqp"
-       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}osqp${CMAKE_SHARED_LIBRARY_SUFFIX}"
+       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}osqp${CMAKE_SHARED_LIBRARY_SUFFIX}"
        IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}osqp${CMAKE_IMPORT_LIBRARY_SUFFIX}"
     )
     install(DIRECTORY
