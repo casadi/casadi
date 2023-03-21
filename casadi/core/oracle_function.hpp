@@ -156,6 +156,14 @@ namespace casadi {
     int calc_function(OracleMemory* m, const std::string& fcn,
       const double* const* arg=nullptr, int thread_id=0) const;
 
+    // Forward sparsity propagation through a function
+    int calc_sp_forward(const std::string& fcn, const bvec_t** arg, bvec_t** res,
+      casadi_int* iw, bvec_t* w) const;
+
+    // Reverse sparsity propagation through a function
+    int calc_sp_reverse(const std::string& fcn, bvec_t** arg, bvec_t** res,
+      casadi_int* iw, bvec_t* w) const;
+
     /** \brief Get list of dependency functions
 
      * -1 Indicates irregularity

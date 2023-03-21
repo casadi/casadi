@@ -541,7 +541,11 @@ void Integrator::init(const Dict& opts) {
 
   // Create dynamic functions, forward and backward proble,
   create_function(nonaug_oracle_, "dynF", fdyn_in(), fdyn_out());
-  if (nrx1_ > 0) create_function(nonaug_oracle_, "dynB", bdyn_in(), bdyn_out());
+  if (ns_ > 0) create_forward("dynF", 1);  // one direction to conserve memory, construction
+  if (nrx1_ > 0) {
+    create_function(nonaug_oracle_, "dynB", bdyn_in(), bdyn_out());
+    if (ns_ > 0) create_forward("dynB", 1);  // one direction to conserve memory, construction
+  }
 
   // Get the sparsities of the forward and reverse DAE
   sp_jac_dae_ = sp_jac_dae();
@@ -756,16 +760,32 @@ std::map<std::string, MatType> Integrator::aug_adj(casadi_int nadj) const {
 
 int Integrator::fdyn_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t* p,
     const bvec_t* u, bvec_t* ode, bvec_t* alg, bvec_t* quad) const {
-  std::fill(m->arg, m->arg + DYN_NUM_IN, nullptr);
-  m->arg[DYN_X] = x;
-  m->arg[DYN_P] = p;
-  m->arg[DYN_U] = u;
-  std::fill(m->res, m->res + DYN_NUM_OUT, nullptr);
-  m->res[DYN_ODE] = ode;
-  m->res[DYN_ALG] = alg;
-  m->res[DYN_QUAD] = quad;
-  if (oracle_(m->arg, m->res, m->iw, m->w, 0)) return 1;
-
+  // Consistency checks
+  if (ode == 0 && nx1_ > 0) return 1;  // needed in out:ode
+  if (alg == 0 && nz1_ > 0) return 1;  // needed in out:alg
+  // Evaluate nondifferentiated
+  std::fill(m->arg, m->arg + FDYN_NUM_IN, nullptr);
+  m->arg[FDYN_X] = x;  // x
+  m->arg[FDYN_P] = p;  // p
+  m->arg[FDYN_U] = u;  // u
+  std::fill(m->res, m->res + FDYN_NUM_OUT, nullptr);
+  m->res[FDYN_ODE] = ode;  // ode
+  m->res[FDYN_ALG] = alg;  // alg
+  m->res[FDYN_QUAD] = quad;  // quad
+  if (calc_sp_forward("dynF", m->arg, m->res, m->iw, m->w)) return 1;
+  // Evaluate sensitivities
+  for (casadi_int i = 0; i < ns_; ++i) {
+    m->arg[FDYN_NUM_IN + FDYN_ODE] = ode;  // out:ode
+    m->arg[FDYN_NUM_IN + FDYN_ALG] = alg;  // out:alg
+    m->arg[FDYN_NUM_IN + FDYN_QUAD] = quad;  // out:quad
+    m->arg[FDYN_NUM_IN + FDYN_NUM_OUT + FDYN_X] = x + (i + 1) * nx1_;  // fwd:x
+    m->arg[FDYN_NUM_IN + FDYN_NUM_OUT + FDYN_P] = p + (i + 1) * np1_;  // fwd:p
+    m->arg[FDYN_NUM_IN + FDYN_NUM_OUT + FDYN_U] = u + (i + 1) * nu1_;  // fwd:u
+    m->res[FDYN_ODE] = ode + (i + 1) * nx1_;  // fwd:ode
+    m->res[FDYN_ALG] = alg + (i + 1) * nz1_;  // fwd:alg
+    m->res[FDYN_QUAD] = quad + (i + 1) * nq1_;  // fwd:quad
+    if (calc_sp_forward(forward_name("dynF", 1), m->arg, m->res, m->iw, m->w)) return 1;
+  }
   return 0;
 }
 
