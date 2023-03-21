@@ -629,7 +629,10 @@ class ADtests(casadiTestCase):
             self.checkarray(fun_out[1],funsx_out[1])
           else:
             funsx_ad = None
-          self.check_codegen(fun,inputs=values,std=std)
+          if "pow" in str(out) and os.name=='nt':
+            pass # Known bug #3038
+          else:
+            self.check_codegen(fun,inputs=values,std=std)
           self.check_serialize(fun,inputs=values)
 
           J_ = fun_out[1]
