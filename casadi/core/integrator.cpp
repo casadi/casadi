@@ -465,17 +465,7 @@ void Integrator::init(const Dict& opts) {
   ns_ = nfwd_;
 
   // The class is being refactored to use oracle without sensitivity right-hand-sides
-  Integrator* d = 0;
-  if (nfwd_ > 0) {
-    auto it = opts.find("derivative_of");
-    casadi_assert_dev(it != opts.end());
-    Function derivative_of = it->second;
-    d = derivative_of.get<Integrator>();
-    casadi_assert_dev(d != nullptr);
-    nonaug_oracle_ = d->oracle_;
-  } else {
-    nonaug_oracle_ = oracle_;
-  }
+  nonaug_oracle_ = oracle_;
 
   // Form augmented oracle from nonaugmented oracle
   aug_oracle_ = augmented_dae();
@@ -1400,18 +1390,11 @@ Function Integrator::get_forward(casadi_int nfwd, const std::string& name,
   }
 
   // Create integrator for augmented DAE
-  Function aug_dae;
   std::string aug_prefix = "fsens" + str(nfwd) + "_";
-  std::string dae_name = aug_prefix + aug_oracle_.name();
-  if (aug_oracle_.is_a("SXFunction")) {
-    aug_dae = map2oracle(dae_name, aug_fwd<SX>(nfwd));
-  } else {
-    aug_dae = map2oracle(dae_name, aug_fwd<MX>(nfwd));
-  }
   aug_opts["derivative_of"] = self();
   aug_opts["nfwd"] = nfwd;
   Function aug_int = integrator(aug_prefix + name_, plugin_name(),
-    aug_dae, t0_, tout_, aug_opts);
+    aug_oracle_, t0_, tout_, aug_opts);
 
   // All inputs of the return function
   std::vector<MX> ret_in;
