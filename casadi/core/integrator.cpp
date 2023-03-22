@@ -208,13 +208,13 @@ Integrator::~Integrator() {
 
 Sparsity Integrator::get_sparsity_in(casadi_int i) {
   switch (static_cast<IntegratorInput>(i)) {
-  case INTEGRATOR_X0: return repmat(vec(x1()), 1, 1 + ns_);
-  case INTEGRATOR_P: return repmat(vec(p1()), 1, 1 + ns_);
-  case INTEGRATOR_U: return repmat(vec(u1()), 1, nt() * (1 + ns_));
-  case INTEGRATOR_Z0: return repmat(vec(z1()), 1, 1 + ns_);
-  case INTEGRATOR_RX0: return repmat(vec(rx1()), 1, nt() * (1 + ns_));
-  case INTEGRATOR_RP: return repmat(vec(rp1()), 1, nt() * (1 + ns_));
-  case INTEGRATOR_RZ0: return repmat(vec(rz1()), 1, nt() * (1 + ns_));
+  case INTEGRATOR_X0: return repmat(oracle_.sparsity_in(DYN_X), 1, 1 + ns_);
+  case INTEGRATOR_P: return repmat(oracle_.sparsity_in(DYN_P), 1, 1 + ns_);
+  case INTEGRATOR_U: return repmat(oracle_.sparsity_in(DYN_U), 1, nt() * (1 + ns_));
+  case INTEGRATOR_Z0: return repmat(oracle_.sparsity_in(DYN_Z), 1, 1 + ns_);
+  case INTEGRATOR_RX0: return repmat(oracle_.sparsity_in(DYN_RX), 1, nt() * (1 + ns_));
+  case INTEGRATOR_RP: return repmat(oracle_.sparsity_in(DYN_RP), 1, nt() * (1 + ns_));
+  case INTEGRATOR_RZ0: return repmat(oracle_.sparsity_in(DYN_RZ), 1, nt() * (1 + ns_));
   case INTEGRATOR_NUM_IN: break;
   }
   return Sparsity();
@@ -222,13 +222,13 @@ Sparsity Integrator::get_sparsity_in(casadi_int i) {
 
 Sparsity Integrator::get_sparsity_out(casadi_int i) {
   switch (static_cast<IntegratorOutput>(i)) {
-  case INTEGRATOR_XF: return repmat(vec(x1()), 1, nt() * (1 + ns_));
-  case INTEGRATOR_QF: return repmat(vec(q1()), 1, nt() * (1 + ns_));
-  case INTEGRATOR_ZF: return repmat(vec(z1()), 1, nt() * (1 + ns_));
-  case INTEGRATOR_RXF: return repmat(vec(rx1()), 1, 1 + ns_);
-  case INTEGRATOR_RQF: return repmat(vec(rq1()), 1, 1 + ns_);
-  case INTEGRATOR_RZF: return repmat(vec(rz1()), 1, 1 + ns_);
-  case INTEGRATOR_UQF: return repmat(vec(uq1()), 1, nt() * (1 + ns_));
+  case INTEGRATOR_XF: return repmat(oracle_.sparsity_in(DYN_X), 1, nt() * (1 + ns_));
+  case INTEGRATOR_QF: return repmat(oracle_.sparsity_out(DYN_QUAD), 1, nt() * (1 + ns_));
+  case INTEGRATOR_ZF: return repmat(oracle_.sparsity_in(DYN_Z), 1, nt() * (1 + ns_));
+  case INTEGRATOR_RXF: return repmat(oracle_.sparsity_in(DYN_RX), 1, 1 + ns_);
+  case INTEGRATOR_RQF: return repmat(oracle_.sparsity_out(DYN_RQUAD), 1, 1 + ns_);
+  case INTEGRATOR_RZF: return repmat(oracle_.sparsity_in(DYN_RZ), 1, 1 + ns_);
+  case INTEGRATOR_UQF: return repmat(oracle_.sparsity_out(DYN_UQUAD), 1, nt() * (1 + ns_));
   case INTEGRATOR_NUM_OUT: break;
   }
   return Sparsity();
