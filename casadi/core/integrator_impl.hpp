@@ -265,7 +265,9 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   virtual Dict getDerivativeOptions(bool fwd) const;
 
   ///@{
-  /** \brief Generate the augmented DAE system */
+  /** \brief Generate the augmented DAE system
+
+      \identifier{261} */
   template<typename MatType> Function get_augmented_dae(const std::string& name) const;
   Function augmented_dae() const;
   ///@}
