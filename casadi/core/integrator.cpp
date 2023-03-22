@@ -485,41 +485,40 @@ void Integrator::init(const Dict& opts) {
   // Call the base class method
   OracleFunction::init(opts);
 
-  // Vector inputs must be flattened before integrator creation
-  casadi_assert(x1().is_vector(), "DAE must consist of vectors only.");
-  casadi_assert(z1().is_vector(), "DAE must consist of vectors only.");
-  casadi_assert(p1().is_vector(), "DAE must consist of vectors only.");
-  casadi_assert(u1().is_vector(), "DAE must consist of vectors only.");
-  casadi_assert(q1().is_vector(), "DAE must consist of vectors only.");
-  casadi_assert(rx1().is_vector(), "DAE must consist of vectors only.");
-  casadi_assert(rz1().is_vector(), "DAE must consist of vectors only.");
-  casadi_assert(rp1().is_vector(), "DAE must consist of vectors only.");
-  casadi_assert(rq1().is_vector(), "DAE must consist of vectors only.");
-  casadi_assert(uq1().is_vector(), "DAE must consist of vectors only.");
+  // Consistency checks, input sparsities
+  for (casadi_int i = 0; i < DYN_NUM_IN; ++i) {
+    const Sparsity& sp = oracle_.sparsity_in(i);
+    if (i == DYN_T) {
+      casadi_assert(sp.is_empty() || sp.is_scalar(), "DAE time variable must be empty or scalar. "
+        "Got dimension " + str(sp.size()));
+    } else {
+      casadi_assert(sp.is_vector(), "DAE inputs must be vectors. "
+        + dyn_in(i) + " has dimension " + str(sp.size()) + ".");
+    }
+    casadi_assert(sp.is_dense(), "DAE inputs must be dense . "
+      + dyn_in(i) + " is sparse.");
+  }
 
-  // Error if sparse input
-  casadi_assert(x1().is_dense(), "Sparse DAE not supported");
-  casadi_assert(z1().is_dense(), "Sparse DAE not supported");
-  casadi_assert(p1().is_dense(), "Sparse DAE not supported");
-  casadi_assert(u1().is_dense(), "Sparse DAE not supported");
-  casadi_assert(q1().is_dense(), "Sparse DAE not supported");
-  casadi_assert(rx1().is_dense(), "Sparse DAE not supported");
-  casadi_assert(rz1().is_dense(), "Sparse DAE not supported");
-  casadi_assert(rp1().is_dense(), "Sparse DAE not supported");
-  casadi_assert(rq1().is_dense(), "Sparse DAE not supported");
-  casadi_assert(uq1().is_dense(), "Sparse DAE not supported");
+  // Consistency checks, output sparsities
+  for (casadi_int i = 0; i < DYN_NUM_OUT; ++i) {
+    const Sparsity& sp = oracle_.sparsity_out(i);
+    casadi_assert(sp.is_vector(), "DAE outputs must be vectors. "
+      + dyn_out(i) + " has dimension " + str(sp.size()));
+    casadi_assert(sp.is_dense(), "DAE outputs must be dense . "
+      + dyn_out(i) + " is sparse.");
+  }
 
   // Get dimensions (excluding sensitivity equations)
-  nx1_ = x1().numel();
-  nz1_ = z1().numel();
-  nq1_ = q1().numel();
-  np1_ = p1().numel();
-  nu1_ = u1().numel();
-  nrx1_ = rx1().numel();
-  nrz1_ = rz1().numel();
-  nrp1_ = rp1().numel();
-  nrq1_ = rq1().numel();
-  nuq1_ = uq1().numel();
+  nx1_ = oracle_.numel_in(DYN_X);
+  nz1_ = oracle_.numel_in(DYN_Z);
+  nq1_ = oracle_.numel_out(DYN_QUAD);
+  np1_ = oracle_.numel_in(DYN_P);
+  nu1_ = oracle_.numel_in(DYN_U);
+  nrx1_ = oracle_.numel_in(DYN_RX);
+  nrz1_ = oracle_.numel_in(DYN_RZ);
+  nrp1_ = oracle_.numel_in(DYN_RP);
+  nrq1_ = oracle_.numel_out(DYN_RQUAD);
+  nuq1_ = oracle_.numel_out(DYN_UQUAD);
 
   // Get dimensions (including sensitivity equations)
   nx_ = nx1_ * (1 + ns_);
