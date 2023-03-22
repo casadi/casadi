@@ -607,33 +607,20 @@ template<typename MatType>
 Function Integrator::get_augmented_dae(const std::string& name) const {
   if (verbose_) casadi_message(name_ + "::get_augmented_dae");
 
-  // Get input expressions
+  // Get input and expressions
   std::vector<MatType> arg = MatType::get_input(oracle_);
-  std::vector<MatType> aug_x, aug_z, aug_p, aug_u, aug_rx, aug_rz, aug_rp;
-  MatType aug_t = arg.at(DYN_T);
-  aug_x.push_back(arg.at(DYN_X));
-  aug_z.push_back(arg.at(DYN_Z));
-  aug_p.push_back(arg.at(DYN_P));
-  aug_u.push_back(arg.at(DYN_U));
-  aug_rx.push_back(arg.at(DYN_RX));
-  aug_rz.push_back(arg.at(DYN_RZ));
-  aug_rp.push_back(arg.at(DYN_RP));
-
-  // Get output expressions
   std::vector<MatType> res = oracle_(arg);
-  std::vector<MatType> aug_ode, aug_alg, aug_quad, aug_rode, aug_ralg, aug_rquad, aug_uquad;
-  aug_ode.push_back(res.at(DYN_ODE));
-  aug_alg.push_back(res.at(DYN_ALG));
-  aug_quad.push_back(res.at(DYN_QUAD));
-  aug_rode.push_back(res.at(DYN_RODE));
-  aug_ralg.push_back(res.at(DYN_RALG));
-  aug_rquad.push_back(res.at(DYN_RQUAD));
-  aug_uquad.push_back(res.at(DYN_UQUAD));
+
+  // Symbolic expression for augmented DAE
+  std::vector<std::vector<MatType>> aug_in(DYN_NUM_IN);
+  for (casadi_int i = 0; i < DYN_NUM_IN; ++i) aug_in[i].push_back(arg.at(i));
+  std::vector<std::vector<MatType>> aug_out(DYN_NUM_OUT);
+  for (casadi_int i = 0; i < DYN_NUM_OUT; ++i) aug_out[i].push_back(res.at(i));
 
   // Zero of time dimension
   MatType zero_t = MatType::zeros(oracle_.sparsity_in(DYN_T));
 
-  // Forward directional derivatives
+  // Augment aug_in with forward sensitivity seeds
   std::vector<std::vector<MatType>> seed(nfwd_, std::vector<MatType>(DYN_NUM_IN));
   for (casadi_int d = 0; d < nfwd_; ++d) {
     // Create expressions for augmented states
@@ -646,13 +633,9 @@ Function Integrator::get_augmented_dae(const std::string& name) const {
       }
     }
     // Save to augmented function inputs
-    aug_x.push_back(seed[d][DYN_X]);
-    aug_z.push_back(seed[d][DYN_Z]);
-    aug_p.push_back(seed[d][DYN_P]);
-    aug_u.push_back(seed[d][DYN_U]);
-    aug_rx.push_back(seed[d][DYN_RX]);
-    aug_rz.push_back(seed[d][DYN_RZ]);
-    aug_rp.push_back(seed[d][DYN_RP]);
+    for (casadi_int i = 0; i < DYN_NUM_IN; ++i) {
+      if (i != DYN_T) aug_in[i].push_back(seed[d][i]);
+    }
   }
 
   // Calculate directional derivatives
@@ -660,36 +643,19 @@ Function Integrator::get_augmented_dae(const std::string& name) const {
   bool always_inline = oracle_.is_a("SXFunction") || oracle_.is_a("MXFunction");
   oracle_->call_forward(arg, res, seed, sens, always_inline, false);
 
-  // Collect sensitivity equations
+  // Augment aug_out with forward sensitivity equations
   casadi_assert_dev(sens.size() == nfwd_);
   for (casadi_int d = 0; d < nfwd_; ++d) {
-    casadi_assert_dev(sens[d].size()==DYN_NUM_OUT);
-    aug_ode.push_back(project(sens[d][DYN_ODE], oracle_.sparsity_out(DYN_ODE)));
-    aug_alg.push_back(project(sens[d][DYN_ALG], oracle_.sparsity_out(DYN_ALG)));
-    aug_quad.push_back(project(sens[d][DYN_QUAD], oracle_.sparsity_out(DYN_QUAD)));
-    aug_rode.push_back(project(sens[d][DYN_RODE], oracle_.sparsity_out(DYN_RODE)));
-    aug_ralg.push_back(project(sens[d][DYN_RALG], oracle_.sparsity_out(DYN_RALG)));
-    aug_rquad.push_back(project(sens[d][DYN_RQUAD], oracle_.sparsity_out(DYN_RQUAD)));
-    aug_uquad.push_back(project(sens[d][DYN_UQUAD], oracle_.sparsity_out(DYN_UQUAD)));
+    casadi_assert_dev(sens[d].size() == DYN_NUM_OUT);
+    for (casadi_int i = 0; i < DYN_NUM_OUT; ++i) {
+      aug_out[i].push_back(project(sens[d][i], oracle_.sparsity_out(i)));
+    }
   }
 
   // Construct return expression
   std::map<std::string, MatType> r;
-  r["t"] = aug_t;
-  r["x"] = vertcat(aug_x);
-  r["z"] = vertcat(aug_z);
-  r["p"] = vertcat(aug_p);
-  r["u"] = vertcat(aug_u);
-  r["ode"] = vertcat(aug_ode);
-  r["alg"] = vertcat(aug_alg);
-  r["quad"] = vertcat(aug_quad);
-  r["rx"] = vertcat(aug_rx);
-  r["rz"] = vertcat(aug_rz);
-  r["rp"] = vertcat(aug_rp);
-  r["rode"] = vertcat(aug_rode);
-  r["ralg"] = vertcat(aug_ralg);
-  r["rquad"] = vertcat(aug_rquad);
-  r["uquad"] = vertcat(aug_uquad);
+  for (casadi_int i = 0; i < DYN_NUM_IN; ++i) r[dyn_in(i)] = vertcat(aug_in[i]);
+  for (casadi_int i = 0; i < DYN_NUM_OUT; ++i) r[dyn_out(i)] = vertcat(aug_out[i]);
 
   // Convert to oracle function and return
   return map2oracle(name, r);
