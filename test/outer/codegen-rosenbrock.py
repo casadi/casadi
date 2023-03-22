@@ -20,5 +20,7 @@ g = x**2 + p * y**2
 cg, _, _, _ = cg.generate_casadi_problem(
     cs.Function("f", [unknowns, p], [f]),
     cs.Function("g", [unknowns, p], [g]),
-    name=argv[1])
+    second_order="full",
+    name=argv[1],
+)
 cg.generate()

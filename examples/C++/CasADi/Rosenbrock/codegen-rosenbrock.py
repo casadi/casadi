@@ -24,5 +24,7 @@ g = z + (1 - x)**2 - y
 cg, _, _, _ = casadi_generator.generate_casadi_problem(
     cs.Function("f", [unknowns, p], [f]),
     cs.Function("g", [unknowns, p], [g]),
-    name=argv[1])
+    second_order="full",
+    name=argv[1],
+)
 cg.generate()
