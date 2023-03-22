@@ -464,9 +464,6 @@ void Integrator::init(const Dict& opts) {
   // Number of sensitivities
   ns_ = nfwd_;
 
-  // Form augmented oracle from nonaugmented oracle
-  aug_oracle_ = augmented_dae();
-
   // Store a copy of the options, for creating augmented integrators
   opts_ = opts;
 
@@ -695,11 +692,8 @@ Function Integrator::get_augmented_dae(const std::string& name) const {
 }
 
 template<typename MatType>
-std::map<std::string, MatType> Integrator::aug_adj(casadi_int nadj) const {
+std::map<std::string, MatType> Integrator::aug_adj(const Function& aug_oracle, casadi_int nadj) const {
   if (verbose_) casadi_message(name_ + "::aug_adj");
-
-  // Get the current oracle, augmented with forward sensitivity equations if any
-  Function aug_oracle = aug_oracle_;
 
   // Get input expressions
   std::vector<MatType> arg = MatType::get_input(aug_oracle);
@@ -1328,7 +1322,7 @@ Function Integrator::get_forward(casadi_int nfwd, const std::string& name,
   aug_opts["derivative_of"] = self();
   aug_opts["nfwd"] = nfwd;
   Function aug_int = integrator(aug_prefix + name_, plugin_name(),
-    aug_oracle_, t0_, tout_, aug_opts);
+    augmented_dae(), t0_, tout_, aug_opts);
 
   // All inputs of the return function
   std::vector<MX> ret_in;
@@ -1426,14 +1420,17 @@ Function Integrator::get_reverse(casadi_int nadj, const std::string& name,
     aug_opts[i.first] = i.second;
   }
 
+  // Get the current oracle, augmented with forward sensitivity equations if any
+  Function aug_oracle = augmented_dae();
+
   // Create integrator for augmented DAE
   Function aug_dae;
   std::string aug_prefix = "asens" + str(nadj) + "_";
-  std::string dae_name = aug_prefix + aug_oracle_.name();
-  if (aug_oracle_.is_a("SXFunction")) {
-    aug_dae = map2oracle(dae_name, aug_adj<SX>(nadj));
+  std::string dae_name = aug_prefix + aug_oracle.name();
+  if (aug_oracle.is_a("SXFunction")) {
+    aug_dae = map2oracle(dae_name, aug_adj<SX>(aug_oracle, nadj));
   } else {
-    aug_dae = map2oracle(dae_name, aug_adj<MX>(nadj));
+    aug_dae = map2oracle(dae_name, aug_adj<MX>(aug_oracle, nadj));
   }
   aug_opts["derivative_of"] = self();
   aug_opts["nfwd"] = 0;
@@ -2159,7 +2156,6 @@ void Integrator::serialize_body(SerializingStream &s) const {
 
   s.pack("Integrator::sp_jac_dae", sp_jac_dae_);
   s.pack("Integrator::sp_jac_rdae", sp_jac_rdae_);
-  s.pack("Integrator::aug_oracle", aug_oracle_);
   s.pack("Integrator::t0", t0_);
   s.pack("Integrator::tout", tout_);
   s.pack("Integrator::nfwd", nfwd_);
@@ -2209,7 +2205,6 @@ Integrator::Integrator(DeserializingStream & s) : OracleFunction(s) {
 
   s.unpack("Integrator::sp_jac_dae", sp_jac_dae_);
   s.unpack("Integrator::sp_jac_rdae", sp_jac_rdae_);
-  s.unpack("Integrator::aug_oracle", aug_oracle_);
   s.unpack("Integrator::t0", t0_);
   s.unpack("Integrator::tout", tout_);
   s.unpack("Integrator::nfwd", nfwd_);

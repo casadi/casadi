@@ -273,7 +273,8 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   /** \brief Generate a augmented DAE system with \a nadj adjoint sensitivities
 
       \identifier{1mc} */
-  template<typename MatType> std::map<std::string, MatType> aug_adj(casadi_int nadj) const;
+  template<typename MatType>
+  std::map<std::string, MatType> aug_adj(const Function& aug_oracle, casadi_int nadj) const;
 
   /// Helper function, get augmented system Jacobian
   Sparsity sp_jac_aug(const Sparsity& J, const Sparsity& J1) const;
@@ -286,9 +287,6 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
 
   // Sparsity pattern of the extended Jacobians
   Sparsity sp_jac_dae_, sp_jac_rdae_;
-
-  /// Legacy oracle
-  Function aug_oracle_;
 
   ///@{
   // Shorthands
