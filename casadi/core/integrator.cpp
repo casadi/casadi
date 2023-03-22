@@ -1564,51 +1564,7 @@ Sparsity Integrator::sp_jac_rdae() {
     J_zz = sp_jac_aug(J_zz, fwd_G.jac_sparsity(BDAE_RALG, BDYN_RZ));
   }
   // Assemble the block matrix
-  Sparsity J_new = blockcat(J_xx, J_xz, J_zx, J_zz);
-
-
-  // Old code:
-
-  // Start with the sparsity pattern of the ODE part
-  Sparsity jac_ode_x = oracle_.jac_sparsity(DYN_RODE, DYN_RX);
-
-  // Add diagonal to get interdependencies
-  jac_ode_x = jac_ode_x + Sparsity::diag(nrx_);
-
-  // Quick return if no algebraic variables
-  if (nrz_==0) return jac_ode_x;
-
-  // Add contribution from algebraic variables and equations
-  Sparsity jac_ode_z = oracle_.jac_sparsity(DYN_RODE, DYN_RZ);
-  Sparsity jac_alg_x = oracle_.jac_sparsity(DYN_RALG, DYN_RX);
-  Sparsity jac_alg_z = oracle_.jac_sparsity(DYN_RALG, DYN_RZ);
-  Sparsity J_old = blockcat(jac_ode_x, jac_ode_z, jac_alg_x, jac_alg_z);
-
-  // Consistency check
-  if (J_new != J_old) {
-    std::stringstream ss;
-    ss << "Mismatching Jacobians in Integrator::sp_jac_dae:\n";
-    ss << "Dimensions: nx1_ = " << nx1_ << ", nz1_ = " << nz1_ << ", ns_ = " << ns_ << std::endl;
-    ss << "Before refactoring J: " << DM::ones(J_old) << std::endl;
-    ss << "After refactoring: " << DM::ones(J_new) << std::endl;
-    ss << "Blocks:" << std::endl;
-    ss << "J_xx: " << DM::ones(J_xx) << std::endl;
-    ss << "J_xz: " << DM::ones(J_xz) << std::endl;
-    ss << "J_zx: " << DM::ones(J_zx) << std::endl;
-    ss << "J_zz: " << DM::ones(J_zz) << std::endl;
-    ss << "daeB " << G << ":\n";
-    G.disp(ss, true);
-
-    if (ns_ > 0) {
-      const Function& fwd_G = get_function(forward_name("daeB", 1));
-      ss << "Derivative " << fwd_G << ":\n";
-      fwd_G.disp(ss, true);
-    }
-
-    casadi_error(ss.str());
-  }
-
-  return J_new;
+  return blockcat(J_xx, J_xz, J_zx, J_zz);
 }
 
 std::map<std::string, Integrator::Plugin> Integrator::solvers_;
