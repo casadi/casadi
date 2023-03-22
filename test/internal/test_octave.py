@@ -28,12 +28,15 @@ import shutil
 
 from testsuite import TestSuite
 
+MATLABPATH = ""
+if "MATLABPATH" in os.environ:
+    MATLABPATH = "addpath('"+os.environ["MATLABPATH"]+"');"
 
 t = TestSuite(dirname=src,
   suffix="m",
   command = lambda dir,fn, opt:  ["octave","--no-gui","--no-window-system"] + opt,
   skipdirs=[".svn","ctemplate","defs"],
-   inputs = lambda dir,fn : {fn: "graphics_toolkit('gnuplot');"+open(dir + "/" + fn,"r").read()+"\ndisp('OCTAVEOKAY');"},
+   inputs = lambda dir,fn : {fn: MATLABPATH+"graphics_toolkit('gnuplot');"+open(dir + "/" + fn,"r").read()+"\ndisp('OCTAVEOKAY');"},
      stdout_trigger=["OCTAVEOKAY"],
     args=sys.argv[2:],
    #stderr_trigger=["^(?!(Reference counting|warning|$))"],

@@ -30,10 +30,14 @@ from testsuite import TestSuite
 
 iswindows = os.name=="nt"
 
+MATLABPATH = ""
+if "MATLABPATH" in os.environ:
+    MATLABPATH = "addpath('"+os.environ["MATLABPATH"]+"');"
+
 if iswindows:
   t = TestSuite(dirname=src,
     suffix="m",
-    command = lambda dir,fn, opt:  ["matlab","-logfile",fn + ".log","-batch","try," + fn[:-2]+", disp('MATLABOKAY') , catch E , disp(getReport(E)), disp('MATLABERROR'), end;quit"] + opt,
+    command = lambda dir,fn, opt:  ["matlab","-logfile",fn + ".log","-batch",MATLABPATH+"try," + fn[:-2]+", disp('MATLABOKAY') , catch E , disp(getReport(E)), disp('MATLABERROR'), end;quit"] + opt,
     skipdirs=[".svn","ctemplate","defs"],
      inputs = lambda dir,fn : {fn: open(dir + "/" + fn,"r").read()},
       args=sys.argv[2:],
@@ -44,7 +48,7 @@ if iswindows:
 else:
   t = TestSuite(dirname=src,
     suffix="m",
-    command = lambda dir,fn, opt:  ["matlab","-batch",fn[:-2]+";clear"] + opt,
+    command = lambda dir,fn, opt:  ["matlab","-batch",MATLABPATH+fn[:-2]+";clear"] + opt,
     skipdirs=[".svn","ctemplate","defs"],
      #inputs = lambda dir,fn : {fn: open(dir + "/" + fn,"r").read()},
       args=sys.argv[2:],

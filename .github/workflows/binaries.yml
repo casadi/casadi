@@ -704,13 +704,19 @@ jobs:
       - run: ls
       - name: Unpack source
         run: unzip casadi-${{env.os}}${{matrix.bit}}-matlab${{matrix.matlab}}.zip -d casadi
-      - run: ls
+      - run: echo "MATLABPATH=${{ github.workspace }}/casadi" >> $GITHUB_ENV
+        if: "!contains(env.os, 'windows')"
+      - run: echo "MATLABPATH=${{ github.workspace }}\casadi" >> $env:GITHUB_ENV
+        if: "contains(env.os, 'windows')"
       - name: Set up MATLAB
         uses: matlab-actions/setup-matlab@v1.2.4
+      - uses: casadi/commercial_solvers@master
+        with:
+          token: ${{ secrets.JGILLIS_RESTRICTED }}
       - name: Run script
         uses: matlab-actions/run-command@v1.1.2
         with:
-          command: addpath('${{ github.workspace }}/casadi');savepath;cd test/matlab;asorted_tests
+          command: addpath('${{ github.workspace }}/casadi');cd test/matlab;asorted_tests
       - run: cd test && python internal/test_matlab.py matlab
 
   test-octave:
@@ -747,15 +753,20 @@ jobs:
       - run: |
                C:\msys64\usr\bin\wget.exe https://ftpmirror.gnu.org/octave/windows/octave-7.3.0-w64.zip
                unzip octave-7.3.0-w64.zip
-
         if: "contains(env.os, 'windows')"
       - run: |
                echo "PATH=${{ github.workspace }}\octave-7.3.0-w64\mingw64\bin;$env:PATH" >> $env:GITHUB_ENV
+               echo "MATLABPATH=${{ github.workspace }}\casadi" >> $env:GITHUB_ENV
         if: "contains(env.os, 'windows')"
         shell: pwsh
-      - run: octave --no-gui --no-window-system --eval "addpath('${{ github.workspace }}/casadi');savepath;cd test/matlab;asorted_tests"
+      - uses: casadi/commercial_solvers@master
+        with:
+          token: ${{ secrets.JGILLIS_RESTRICTED }}
+      - run: echo "MATLABPATH=${{ github.workspace }}/casadi" >> $GITHUB_ENV
+        if: "!contains(env.os, 'windows')"
+      - run: octave --no-gui --no-window-system --eval "addpath('${{ github.workspace }}/casadi');cd test/matlab;asorted_tests"
         if: "contains(env.os, 'windows')"
-      - run: octave --no-gui --no-window-system --eval "addpath('${{ github.workspace }}/casadi');cd test/matlab;savepath;asorted_tests"
+      - run: octave --no-gui --no-window-system --eval "addpath('${{ github.workspace }}/casadi');cd test/matlab;asorted_tests"
         if: "!contains(env.os, 'windows')"
       - run: cd test && python internal/test_octave.py octave && python internal/test_octave.py matlab -skipfiles="callback.m nlp_callback.m"
 
