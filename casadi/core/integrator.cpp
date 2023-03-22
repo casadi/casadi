@@ -691,7 +691,8 @@ Function Integrator::get_augmented_dae(const std::string& name) const {
 }
 
 template<typename MatType>
-std::map<std::string, MatType> Integrator::aug_adj(const Function& aug_oracle, casadi_int nadj) const {
+std::map<std::string, MatType> Integrator::aug_adj(const Function& aug_oracle,
+    casadi_int nadj) const {
   if (verbose_) casadi_message(name_ + "::aug_adj");
 
   // Get input expressions
