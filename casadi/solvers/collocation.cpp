@@ -140,11 +140,11 @@ namespace casadi {
     }
 
     // Symbolic inputs
-    MX t0 = MX::sym("t0", this->t());
+    MX t0 = MX::sym("t0", f.sparsity_in(FDYN_T));
     MX h = MX::sym("h");
-    MX x0 = MX::sym("x0", this->x1());
-    MX p = MX::sym("p", this->p1());
-    MX u = MX::sym("u", this->u1());
+    MX x0 = MX::sym("x0", f.sparsity_in(FDYN_X));
+    MX p = MX::sym("p", f.sparsity_in(FDYN_P));
+    MX u = MX::sym("u", f.sparsity_in(FDYN_U));
 
     // Implicitly defined variables (z and x)
     MX v = MX::sym("v", deg_ * (nx1_ + nz1_));
@@ -174,7 +174,7 @@ namespace casadi {
     std::vector<MX> eq;
 
     // Quadratures
-    MX qf = MX::zeros(this->q1());
+    MX qf = MX::zeros(nq1_);
 
     // End state
     MX xf = D[0] * x0;
@@ -234,8 +234,8 @@ namespace casadi {
       Function g = get_function("dynB");
 
       // Symbolic inputs
-      MX rx0 = MX::sym("rx0", this->rx1());
-      MX rp = MX::sym("rp", this->rp1());
+      MX rx0 = MX::sym("rx0", g.sparsity_in(BDYN_RX));
+      MX rp = MX::sym("rp", g.sparsity_in(BDYN_RP));
 
       // Implicitly defined variables (rz and rx)
       MX rv = MX::sym("v", deg_ * (nrx1_ + nrz1_));
@@ -250,8 +250,8 @@ namespace casadi {
       // Collocated states
       std::vector<MX> rx(deg_ + 1), rz(deg_ + 1);
       for (casadi_int d = 1; d <= deg_; ++d) {
-        rx[d] = reshape(*rvv_it++, this->rx1().size());
-        rz[d] = reshape(*rvv_it++, this->rz1().size());
+        rx[d] = *rvv_it++;
+        rz[d] = *rvv_it++;
       }
       casadi_assert_dev(rvv_it == rvv.end());
 
@@ -259,8 +259,8 @@ namespace casadi {
       eq.clear();
 
       // Quadratures
-      MX rqf = MX::zeros(this->rq1());
-      MX uqf = MX::zeros(this->uq1());
+      MX rqf = MX::zeros(nrq1_);
+      MX uqf = MX::zeros(nuq1_);
 
       // End state
       MX rxf = D[0] * rx0;
@@ -290,7 +290,7 @@ namespace casadi {
         eq.push_back(vec(h * B[j] * g_res[BDYN_RODE] - rxp_j));
 
         // Add the algebraic conditions
-        eq.push_back(vec(g_res[BDYN_RALG]));
+        eq.push_back(g_res[BDYN_RALG]);
 
         // Add contribution to the final state
         rxf += -B[j] * C[0][j] * rx[j];

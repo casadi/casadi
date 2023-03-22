@@ -66,11 +66,11 @@ namespace casadi {
     Function f = get_function("dynF");
 
     // Symbolic inputs
-    MX t0 = MX::sym("t0", this->t());
+    MX t0 = MX::sym("t0", f.sparsity_in(FDYN_T));
     MX h = MX::sym("h");
-    MX x0 = MX::sym("x0", this->x1());
-    MX p = MX::sym("p", this->p1());
-    MX u = MX::sym("u", this->u1());
+    MX x0 = MX::sym("x0", f.sparsity_in(FDYN_X));
+    MX p = MX::sym("p", f.sparsity_in(FDYN_P));
+    MX u = MX::sym("u", f.sparsity_in(FDYN_U));
 
     // Intermediate variables (does not enter in F_, only in G_)
     MX v = MX::sym("v", x0.size1(), x0.size2() * 3);
@@ -150,8 +150,8 @@ namespace casadi {
       Function g = get_function("dynB");
 
       // Symbolic inputs
-      MX rx0 = MX::sym("rx0", this->rx1());
-      MX rp = MX::sym("rp", this->rp1());
+      MX rx0 = MX::sym("rx0", g.sparsity_in(BDYN_RX));
+      MX rp = MX::sym("rp", g.sparsity_in(BDYN_RP));
 
       // Intermediate variables (do not enter in G_)
       MX rv = MX::sym("rv", rx0.size1(), 3 * rx0.size2());
