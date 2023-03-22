@@ -2226,6 +2226,7 @@ void Integrator::serialize_body(SerializingStream &s) const {
   s.pack("Integrator::sp_jac_dae", sp_jac_dae_);
   s.pack("Integrator::sp_jac_rdae", sp_jac_rdae_);
   s.pack("Integrator::nonaug_oracle", nonaug_oracle_);
+  s.pack("Integrator::aug_oracle", aug_oracle_);
   s.pack("Integrator::t0", t0_);
   s.pack("Integrator::tout", tout_);
   s.pack("Integrator::nfwd", nfwd_);
@@ -2276,6 +2277,7 @@ Integrator::Integrator(DeserializingStream & s) : OracleFunction(s) {
   s.unpack("Integrator::sp_jac_dae", sp_jac_dae_);
   s.unpack("Integrator::sp_jac_rdae", sp_jac_rdae_);
   s.unpack("Integrator::nonaug_oracle", nonaug_oracle_);
+  s.unpack("Integrator::aug_oracle", aug_oracle_);
   s.unpack("Integrator::t0", t0_);
   s.unpack("Integrator::tout", tout_);
   s.unpack("Integrator::nfwd", nfwd_);
