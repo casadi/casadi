@@ -32,6 +32,7 @@ add_library(alpaqa
     "alpaqa/src/structured-zerofpr-alm.cpp"
     "alpaqa/src/zerofpr-alm.cpp"
     "alpaqa/src/newton-tr-pantr-alm.cpp"
+    "alpaqa/src/params/params.cpp"
     "alpaqa/src/inner/internal/solverstatus.cpp"
     "alpaqa/src/inner/directions/panoc/structured-lbfgs.cpp"
     "alpaqa/src/inner/directions/panoc/structured-newton.cpp"
