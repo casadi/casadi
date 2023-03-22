@@ -112,10 +112,6 @@ void SundialsInterface::init(const Dict& opts) {
   // Call the base class method
   Integrator::init(opts);
 
-  // If sensitivity equations, make sure derivative_of_ is available
-  casadi_assert(nfwd_==0 || !derivative_of_.is_null(),
-    "Not implemented.");
-
   // Default options
   abstol_ = 1e-8;
   reltol_ = 1e-6;
@@ -206,7 +202,7 @@ void SundialsInterface::init(const Dict& opts) {
 
   // If derivative, use Jacobian from non-augmented system if possible
   SundialsInterface* d = 0;
-  if (nfwd_ > 0) {
+  if (nfwd_ > 0 && !derivative_of_.is_null()) {
     d = derivative_of_.get<SundialsInterface>();
     casadi_assert_dev(d != nullptr);
   }
@@ -214,7 +210,8 @@ void SundialsInterface::init(const Dict& opts) {
   // Get Jacobian function, forward problem
   Function jacF;
   Sparsity jacF_sp;
-  if (d == 0 || d->nfwd_ > 0) {
+  if (d == 0) {
+    // New Jacobian function
     jacF = create_function("jacF", {"t", "x", "z", "p", "u"},
       {"jac:ode:x", "jac:alg:x", "jac:ode:z", "jac:alg:z"});
     jacF_sp = jacF.sparsity_out(JACF_ODE_X) + Sparsity::diag(nx1_);
@@ -223,6 +220,7 @@ void SundialsInterface::init(const Dict& opts) {
         vertcat(jacF.sparsity_out(JACF_ODE_Z), jacF.sparsity_out(JACF_ALG_Z)));
     }
   } else {
+    // Reuse existing Jacobian function
     jacF = d->get_function("jacF");
     set_function(jacF, jacF.name(), true);
     linsolF_ = d->linsolF_;
@@ -240,7 +238,8 @@ void SundialsInterface::init(const Dict& opts) {
     // Get Jacobian function, backward problem
     Function jacB;
     Sparsity jacB_sp;
-    if (d == 0 || d->nfwd_ > 0) {
+    if (d == 0) {
+      // New Jacobian function
       jacB = create_function("jacB", {"t", "x", "z", "p", "u", "rx", "rz", "rp"},
         {"jac:rode:rx", "jac:ralg:rx", "jac:rode:rz", "jac:ralg:rz"});
       jacB_sp = jacB.sparsity_out(JACB_RODE_RX) + Sparsity::diag(nrx1_);
@@ -249,6 +248,7 @@ void SundialsInterface::init(const Dict& opts) {
           vertcat(jacB.sparsity_out(JACB_RODE_RZ), jacB.sparsity_out(JACB_RALG_RZ)));
       }
     } else {
+      // Reuse existing Jacobian function
       jacB = d->get_function("jacB");
       set_function(jacB, jacB.name(), true);
       linsolB_ = d->linsolB_;
@@ -266,7 +266,7 @@ void SundialsInterface::init(const Dict& opts) {
   alloc_w(np_, true); // p
   alloc_w(nu_, true); // u
   alloc_w(nrp_, true); // rp
-  alloc_w(2 * std::max(nx_+nz_, nrx_+nrz_), true); // v1, v2
+  alloc_w(2 * std::max(nx_ + nz_, nrx_ + nrz_), true); // v1, v2
 
   // Attach functions to calculate DAE and quadrature RHS all-at-once
   if (nfwd_ > 0) {
@@ -307,8 +307,8 @@ void SundialsInterface::set_work(void* mem, const double**& arg, double**& res,
   m->p = w; w += np_;
   m->u = w; w += nu_;
   m->rp = w; w += nrp_;
-  m->v1 = w; w += std::max(nx_+nz_, nrx_+nrz_);
-  m->v2 = w; w += std::max(nx_+nz_, nrx_+nrz_);
+  m->v1 = w; w += std::max(nx_ + nz_, nrx_ + nrz_);
+  m->v2 = w; w += std::max(nx_ + nz_, nrx_ + nrz_);
   m->jacF = w; w += linsolF_.sparsity().nnz();
   if (nrx_>0) {
     m->jacB = w; w += linsolB_.sparsity().nnz();
@@ -320,9 +320,9 @@ int SundialsInterface::init_mem(void* mem) const {
   auto m = static_cast<SundialsMemory*>(mem);
 
   // Allocate n-vectors
-  m->xz = N_VNew_Serial(nx_+nz_);
+  m->xz = N_VNew_Serial(nx_ + nz_);
   m->q = N_VNew_Serial(nq_);
-  m->rxz = N_VNew_Serial(nrx_+nrz_);
+  m->rxz = N_VNew_Serial(nrx_ + nrz_);
   m->ruq = N_VNew_Serial(nrq_ + nuq_);
 
   m->mem_linsolF = linsolF_.checkout();
