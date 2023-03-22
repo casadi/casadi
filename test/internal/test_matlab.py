@@ -33,20 +33,20 @@ iswindows = os.name=="nt"
 if iswindows:
   t = TestSuite(dirname=src,
     suffix="m",
-    command = lambda dir,fn, opt:  ["matlab","-nodisplay","-nosplash","-nodesktop","-logfile",fn + ".log","-wait","-r","try," + fn[:-2]+", disp('MATLABOKAY') , catch E , disp(getReport(E)), disp('MATLABERROR'), end;quit"] + opt,
+    command = lambda dir,fn, opt:  ["matlab","-logfile",fn + ".log","-batch","try," + fn[:-2]+", disp('MATLABOKAY') , catch E , disp(getReport(E)), disp('MATLABERROR'), end;quit"] + opt,
     skipdirs=[".svn","ctemplate","defs"],
-     inputs = lambda dir,fn : {fn: file(dir + "/" + fn,"r").read()},
+     inputs = lambda dir,fn : {fn: open(dir + "/" + fn,"r").read()},
       args=sys.argv[2:],
      stdout_trigger=["MATLABOKAY"],
-     custom_stdout=lambda dir,fn : file(dir + "/" + fn + ".log","r").read(),
+     custom_stdout=lambda dir,fn : open(dir + "/" + fn + ".log","r").read(),
      default_fail=True
      )
 else:
   t = TestSuite(dirname=src,
     suffix="m",
-    command = lambda dir,fn, opt:  ["matlab","-nodisplay","-nosplash","-nodesktop","-r",fn[:-2]+";clear"] + opt,
+    command = lambda dir,fn, opt:  ["matlab","-batch",fn[:-2]+";clear"] + opt,
     skipdirs=[".svn","ctemplate","defs"],
-     #inputs = lambda dir,fn : {fn: file(dir + "/" + fn,"r").read()},
+     #inputs = lambda dir,fn : {fn: open(dir + "/" + fn,"r").read()},
       args=sys.argv[2:],
      stderr_trigger=["^(?!(Reference counting|Warning|$))"],
      check_depreciation=True
