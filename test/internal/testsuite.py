@@ -244,10 +244,12 @@ class TestSuite:
     if fn in inputs:
       inp = inputs[fn]
 
+    if inp is not None:
+      inp = inp.encode("ascii")
 
     alarm(15*60) # 15 mins
     try:
-      stdoutdata, stderrdata = p.communicate(inp.encode("ascii"))
+      stdoutdata, stderrdata = p.communicate(inp)
     except TimeoutEvent:
       killProcess(p.pid)
       raise Exception("Timout.")
