@@ -334,9 +334,6 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   /// Number of controls
   casadi_int nu_, nu1_;
 
-  /// Number of sensitivities
-  casadi_int ns_;
-
   /// Augmented user option
   Dict augmented_options_;
 

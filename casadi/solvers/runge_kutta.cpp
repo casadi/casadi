@@ -141,7 +141,7 @@ namespace casadi {
       Function F("stepF", f_arg, f_res,
         {"t", "h", "x0", "v0", "p", "u"}, {"xf", "vf", "qf"});
       set_function(F, F.name(), true);
-      if (ns_ > 0) create_forward("stepF", ns_);
+      if (nfwd_ > 0) create_forward("stepF", nfwd_);
     }
 
     // Backward integration
@@ -225,7 +225,7 @@ namespace casadi {
         {"t", "h", "rx0", "rv0", "rp", "x", "v", "p", "u"},
         {"rxf", "rvf", "rqf", "uqf"});
       set_function(G, G.name(), true);
-      if (ns_ > 0) create_forward("stepB", ns_);
+      if (nfwd_ > 0) create_forward("stepB", nfwd_);
     }
   }
 

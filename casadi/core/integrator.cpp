@@ -208,13 +208,13 @@ Integrator::~Integrator() {
 
 Sparsity Integrator::get_sparsity_in(casadi_int i) {
   switch (static_cast<IntegratorInput>(i)) {
-  case INTEGRATOR_X0: return repmat(oracle_.sparsity_in(DYN_X), 1, 1 + ns_);
-  case INTEGRATOR_P: return repmat(oracle_.sparsity_in(DYN_P), 1, 1 + ns_);
-  case INTEGRATOR_U: return repmat(oracle_.sparsity_in(DYN_U), 1, nt() * (1 + ns_));
-  case INTEGRATOR_Z0: return repmat(oracle_.sparsity_in(DYN_Z), 1, 1 + ns_);
-  case INTEGRATOR_RX0: return repmat(oracle_.sparsity_in(DYN_RX), 1, nt() * (1 + ns_));
-  case INTEGRATOR_RP: return repmat(oracle_.sparsity_in(DYN_RP), 1, nt() * (1 + ns_));
-  case INTEGRATOR_RZ0: return repmat(oracle_.sparsity_in(DYN_RZ), 1, nt() * (1 + ns_));
+  case INTEGRATOR_X0: return repmat(oracle_.sparsity_in(DYN_X), 1, 1 + nfwd_);
+  case INTEGRATOR_P: return repmat(oracle_.sparsity_in(DYN_P), 1, 1 + nfwd_);
+  case INTEGRATOR_U: return repmat(oracle_.sparsity_in(DYN_U), 1, nt() * (1 + nfwd_));
+  case INTEGRATOR_Z0: return repmat(oracle_.sparsity_in(DYN_Z), 1, 1 + nfwd_);
+  case INTEGRATOR_RX0: return repmat(oracle_.sparsity_in(DYN_RX), 1, nt() * (1 + nfwd_));
+  case INTEGRATOR_RP: return repmat(oracle_.sparsity_in(DYN_RP), 1, nt() * (1 + nfwd_));
+  case INTEGRATOR_RZ0: return repmat(oracle_.sparsity_in(DYN_RZ), 1, nt() * (1 + nfwd_));
   case INTEGRATOR_NUM_IN: break;
   }
   return Sparsity();
@@ -222,13 +222,13 @@ Sparsity Integrator::get_sparsity_in(casadi_int i) {
 
 Sparsity Integrator::get_sparsity_out(casadi_int i) {
   switch (static_cast<IntegratorOutput>(i)) {
-  case INTEGRATOR_XF: return repmat(oracle_.sparsity_in(DYN_X), 1, nt() * (1 + ns_));
-  case INTEGRATOR_QF: return repmat(oracle_.sparsity_out(DYN_QUAD), 1, nt() * (1 + ns_));
-  case INTEGRATOR_ZF: return repmat(oracle_.sparsity_in(DYN_Z), 1, nt() * (1 + ns_));
-  case INTEGRATOR_RXF: return repmat(oracle_.sparsity_in(DYN_RX), 1, 1 + ns_);
-  case INTEGRATOR_RQF: return repmat(oracle_.sparsity_out(DYN_RQUAD), 1, 1 + ns_);
-  case INTEGRATOR_RZF: return repmat(oracle_.sparsity_in(DYN_RZ), 1, 1 + ns_);
-  case INTEGRATOR_UQF: return repmat(oracle_.sparsity_out(DYN_UQUAD), 1, nt() * (1 + ns_));
+  case INTEGRATOR_XF: return repmat(oracle_.sparsity_in(DYN_X), 1, nt() * (1 + nfwd_));
+  case INTEGRATOR_QF: return repmat(oracle_.sparsity_out(DYN_QUAD), 1, nt() * (1 + nfwd_));
+  case INTEGRATOR_ZF: return repmat(oracle_.sparsity_in(DYN_Z), 1, nt() * (1 + nfwd_));
+  case INTEGRATOR_RXF: return repmat(oracle_.sparsity_in(DYN_RX), 1, 1 + nfwd_);
+  case INTEGRATOR_RQF: return repmat(oracle_.sparsity_out(DYN_RQUAD), 1, 1 + nfwd_);
+  case INTEGRATOR_RZF: return repmat(oracle_.sparsity_in(DYN_RZ), 1, 1 + nfwd_);
+  case INTEGRATOR_UQF: return repmat(oracle_.sparsity_out(DYN_UQUAD), 1, nt() * (1 + nfwd_));
   case INTEGRATOR_NUM_OUT: break;
   }
   return Sparsity();
@@ -461,9 +461,6 @@ void Integrator::init(const Dict& opts) {
   // Replace MX oracle with SX oracle?
   if (expand) this->expand();
 
-  // Number of sensitivities
-  ns_ = nfwd_;
-
   // Store a copy of the options, for creating augmented integrators
   opts_ = opts;
 
@@ -521,21 +518,21 @@ void Integrator::init(const Dict& opts) {
   nuq1_ = oracle_.numel_out(DYN_UQUAD);
 
   // Get dimensions (including sensitivity equations)
-  nx_ = nx1_ * (1 + ns_);
-  nz_ = nz1_ * (1 + ns_);
-  nq_ = nq1_ * (1 + ns_);
-  np_ = np1_ * (1 + ns_);
-  nu_ = nu1_ * (1 + ns_);
-  nrx_ = nrx1_ * (1 + ns_);
-  nrz_ = nrz1_ * (1 + ns_);
-  nrp_ = nrp1_ * (1 + ns_);
-  nrq_ = nrq1_ * (1 + ns_);
-  nuq_ = nuq1_ * (1 + ns_);
+  nx_ = nx1_ * (1 + nfwd_);
+  nz_ = nz1_ * (1 + nfwd_);
+  nq_ = nq1_ * (1 + nfwd_);
+  np_ = np1_ * (1 + nfwd_);
+  nu_ = nu1_ * (1 + nfwd_);
+  nrx_ = nrx1_ * (1 + nfwd_);
+  nrz_ = nrz1_ * (1 + nfwd_);
+  nrp_ = nrp1_ * (1 + nfwd_);
+  nrq_ = nrq1_ * (1 + nfwd_);
+  nuq_ = nuq1_ * (1 + nfwd_);
 
   // Create problem functions, forward problem
   create_function("daeF", fdyn_in(), fdae_out());
   create_function("quadF", fdyn_in(), fquad_out());
-  if (ns_ > 0) {
+  if (nfwd_ > 0) {
     // one direction to conserve memory, symbolic processing time
     create_forward("daeF", 1);
     create_forward("quadF", 1);
@@ -545,7 +542,7 @@ void Integrator::init(const Dict& opts) {
   if (nrx1_ > 0) {
     create_function("daeB", bdyn_in(), bdae_out());
     create_function("quadB", bdyn_in(), bquad_out());
-    if (ns_ > 0) {
+    if (nfwd_ > 0) {
       // one direction to conserve memory, symbolic processing time
       create_forward("daeB", 1);
       create_forward("quadB", 1);
@@ -585,9 +582,9 @@ int Integrator::init_mem(void* mem) const {
 
 Function Integrator::augmented_dae() const {
   // If no sensitivities, augmented oracle is the oracle itself
-  if (ns_ == 0) return oracle_;
+  if (nfwd_ == 0) return oracle_;
   // Name of augmented DAE
-  std::string aug_name = "fsens" + str(ns_) + "_" + oracle_.name();
+  std::string aug_name = "fsens" + str(nfwd_) + "_" + oracle_.name();
   // Use function in cache, if available
   Function ret;
   if (incache(aug_name, ret)) return ret;
@@ -637,8 +634,8 @@ Function Integrator::get_augmented_dae(const std::string& name) const {
   MatType zero_t = MatType::zeros(oracle_.sparsity_in(DYN_T));
 
   // Forward directional derivatives
-  std::vector<std::vector<MatType>> seed(ns_, std::vector<MatType>(DYN_NUM_IN));
-  for (casadi_int d=0; d<ns_; ++d) {
+  std::vector<std::vector<MatType>> seed(nfwd_, std::vector<MatType>(DYN_NUM_IN));
+  for (casadi_int d = 0; d < nfwd_; ++d) {
     // Create expressions for augmented states
     std::string pref = "aug" + str(d) + "_";
     for (casadi_int i = 0; i < DYN_NUM_IN; ++i) {
@@ -664,8 +661,8 @@ Function Integrator::get_augmented_dae(const std::string& name) const {
   oracle_->call_forward(arg, res, seed, sens, always_inline, false);
 
   // Collect sensitivity equations
-  casadi_assert_dev(sens.size()==ns_);
-  for (casadi_int d=0; d<ns_; ++d) {
+  casadi_assert_dev(sens.size() == nfwd_);
+  for (casadi_int d = 0; d < nfwd_; ++d) {
     casadi_assert_dev(sens[d].size()==DYN_NUM_OUT);
     aug_ode.push_back(project(sens[d][DYN_ODE], oracle_.sparsity_out(DYN_ODE)));
     aug_alg.push_back(project(sens[d][DYN_ALG], oracle_.sparsity_out(DYN_ALG)));
@@ -815,7 +812,7 @@ int Integrator::fdae_sp_forward(SpForwardMem* m, const bvec_t* x,
   m->res[FDAE_ALG] = alg;  // alg
   if (calc_sp_forward("daeF", m->arg, m->res, m->iw, m->w)) return 1;
   // Evaluate sensitivities
-  for (casadi_int i = 0; i < ns_; ++i) {
+  for (casadi_int i = 0; i < nfwd_; ++i) {
     m->arg[FDYN_NUM_IN + FDAE_ODE] = ode;  // out:ode
     m->arg[FDYN_NUM_IN + FDAE_ALG] = alg;  // out:alg
     m->arg[FDYN_NUM_IN + FDAE_NUM_OUT + FDYN_T] = nullptr;  // fwd:t
@@ -841,7 +838,7 @@ int Integrator::fquad_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t*
   m->res[FQUAD_QUAD] = quad;  // quad
   if (calc_sp_forward("quadF", m->arg, m->res, m->iw, m->w)) return 1;
   // Evaluate sensitivities
-  for (casadi_int i = 0; i < ns_; ++i) {
+  for (casadi_int i = 0; i < nfwd_; ++i) {
     m->arg[FDYN_NUM_IN + FQUAD_QUAD] = quad;  // out:quad
     m->arg[FDYN_NUM_IN + FQUAD_NUM_OUT + FDYN_T] = nullptr;  // fwd:t
     m->arg[FDYN_NUM_IN + FQUAD_NUM_OUT + FDYN_X] = x + (i + 1) * nx1_;  // fwd:x
@@ -870,7 +867,7 @@ int Integrator::bdae_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t* 
   m->res[BDAE_RALG] = ralg;  // ralg
   if (calc_sp_forward("daeB", m->arg, m->res, m->iw, m->w)) return 1;
   // Evaluate sensitivities
-  for (casadi_int i = 0; i < ns_; ++i) {
+  for (casadi_int i = 0; i < nfwd_; ++i) {
     m->arg[BDYN_NUM_IN + BDAE_RODE] = rode;  // out:rode
     m->arg[BDYN_NUM_IN + BDAE_RALG] = ralg;  // out:ralg
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_T] = nullptr;  // fwd:t
@@ -904,7 +901,7 @@ int Integrator::bquad_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t*
   m->res[BQUAD_UQUAD] = uquad;  // uquad
   if (calc_sp_forward("quadB", m->arg, m->res, m->iw, m->w)) return 1;
   // Evaluate sensitivities
-  for (casadi_int i = 0; i < ns_; ++i) {
+  for (casadi_int i = 0; i < nfwd_; ++i) {
     m->arg[BDYN_NUM_IN + BQUAD_RQUAD] = rquad;  // out:rquad
     m->arg[BDYN_NUM_IN + BQUAD_UQUAD] = uquad;  // out:uquad
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_T] = nullptr;  // fwd:t
@@ -1049,7 +1046,7 @@ int Integrator::fdae_sp_reverse(SpReverseMem* m, bvec_t* x,
   m->arg[FDYN_P] = p;  // p
   m->arg[FDYN_U] = u;  // u
   // Propagate through sensitivities
-  for (casadi_int i = 0; i < ns_; ++i) {
+  for (casadi_int i = 0; i < nfwd_; ++i) {
     m->res[FDAE_ODE] = ode + (i + 1) * nx1_;  // fwd:ode
     m->res[FDAE_ALG] = alg + (i + 1) * nz1_;  // fwd:alg
     m->arg[FDYN_NUM_IN + FDAE_ODE] = ode;  // out:ode
@@ -1077,7 +1074,7 @@ int Integrator::fquad_sp_reverse(SpReverseMem* m, bvec_t* x, bvec_t* z,
   m->arg[FDYN_P] = p;  // p
   m->arg[FDYN_U] = u;  // u
   // Propagate through sensitivities
-  for (casadi_int i = 0; i < ns_; ++i) {
+  for (casadi_int i = 0; i < nfwd_; ++i) {
     m->res[FQUAD_QUAD] = quad + (i + 1) * nq1_;  // fwd:quad
     m->arg[FDYN_NUM_IN + FQUAD_QUAD] = quad;  // out:quad
     m->arg[FDYN_NUM_IN + FQUAD_NUM_OUT + FDYN_T] = nullptr;  // fwd:t
@@ -1106,7 +1103,7 @@ int Integrator::bdae_sp_reverse(SpReverseMem* m, bvec_t* x, bvec_t* z,
   m->arg[BDYN_RZ] = nullptr;  // rz
   m->arg[BDYN_RP] = rp;  // rp
   // Propagate through sensitivities
-  for (casadi_int i = 0; i < ns_; ++i) {
+  for (casadi_int i = 0; i < nfwd_; ++i) {
     m->res[BDAE_RODE] = rode + (i + 1) * nrx1_;  // fwd:rode
     m->res[BDAE_RALG] = ralg + (i + 1) * nrz1_;  // fwd:ralg
     m->arg[BDYN_NUM_IN + BDAE_RODE] = rode;  // out:rode
@@ -1141,7 +1138,7 @@ int Integrator::bquad_sp_reverse(SpReverseMem* m, bvec_t* x, bvec_t* z,
   m->arg[BDYN_RZ] = rz;  // rz
   m->arg[BDYN_RP] = rp;  // rp
   // Propagate through sensitivities
-  for (casadi_int i = 0; i < ns_; ++i) {
+  for (casadi_int i = 0; i < nfwd_; ++i) {
     m->res[BQUAD_RQUAD] = rquad ? rquad + (i + 1) * nrq1_ : 0;  // fwd:rquad
     m->res[BQUAD_UQUAD] = uquad ? uquad + (i + 1) * nuq1_ : 0;  // fwd:uquad
     m->arg[BDYN_NUM_IN + BQUAD_RQUAD] = rquad;  // out:rquad
@@ -1548,11 +1545,11 @@ Dict Integrator::getDerivativeOptions(bool fwd) const {
 
 Sparsity Integrator::sp_jac_aug(const Sparsity& J, const Sparsity& J1) const {
   // Row 1, column 2 in the augmented Jacobian
-  Sparsity J12(J.size1(), ns_ * J.size2());
+  Sparsity J12(J.size1(), nfwd_ * J.size2());
   // Row 2, column 1 in the augmented Jacobian
-  Sparsity J21 = vertcat(std::vector<Sparsity>(ns_, J1));
+  Sparsity J21 = vertcat(std::vector<Sparsity>(nfwd_, J1));
   // Row 2, column 2 in the augmented Jacobian
-  Sparsity J22 = diagcat(std::vector<Sparsity>(ns_, J));
+  Sparsity J22 = diagcat(std::vector<Sparsity>(nfwd_, J));
   // Form block matrix
   return blockcat(J, J12, J21, J22);
 }
@@ -1567,7 +1564,7 @@ Sparsity Integrator::sp_jac_dae() {
   Sparsity J_zx = F.jac_sparsity(FDAE_ALG, FDYN_X);
   Sparsity J_zz = F.jac_sparsity(FDAE_ALG, FDYN_Z);
   // Augment with sensitivity equations
-  if (ns_ > 0) {
+  if (nfwd_ > 0) {
     const Function& fwd_F = get_function(forward_name("daeF", 1));
     J_xx = sp_jac_aug(J_xx, fwd_F.jac_sparsity(FDAE_ODE, FDYN_X));
     J_xz = sp_jac_aug(J_xz, fwd_F.jac_sparsity(FDAE_ODE, FDYN_Z));
@@ -1587,7 +1584,7 @@ Sparsity Integrator::sp_jac_rdae() {
   Sparsity J_zx = G.jac_sparsity(BDAE_RALG, BDYN_RX);
   Sparsity J_zz = G.jac_sparsity(BDAE_RALG, BDYN_RZ);
   // Augment with sensitivity equations
-  if (ns_ > 0) {
+  if (nfwd_ > 0) {
     const Function& fwd_G = get_function(forward_name("daeB", 1));
     J_xx = sp_jac_aug(J_xx, fwd_G.jac_sparsity(BDAE_RODE, BDYN_RX));
     J_xz = sp_jac_aug(J_xz, fwd_G.jac_sparsity(BDAE_RODE, BDYN_RZ));
@@ -1734,8 +1731,8 @@ void FixedStepIntegrator::init(const Dict& opts) {
   } else {
     nrv1_ = 0;
   }
-  nv_ = nv1_ * (1 + ns_);
-  nrv_ = nrv1_ * (1 + ns_);
+  nv_ = nv1_ * (1 + nfwd_);
+  nrv_ = nrv1_ * (1 + nfwd_);
 
   // Work vectors, forward problem
   alloc_w(nv_, true); // v
@@ -1898,7 +1895,7 @@ void FixedStepIntegrator::stepF(FixedStepMemory* m, double t, double h,
   m->res[FSTEP_QF] = qf;  // qf
   calc_function(m, "stepF");
   // Evaluate sensitivities
-  if (ns_ > 0) {
+  if (nfwd_ > 0) {
     m->arg[FSTEP_NUM_IN + FSTEP_XF] = xf;  // out:xf
     m->arg[FSTEP_NUM_IN + FSTEP_VF] = vf;  // out:vf
     m->arg[FSTEP_NUM_IN + FSTEP_QF] = qf;  // out:qf
@@ -1911,7 +1908,7 @@ void FixedStepIntegrator::stepF(FixedStepMemory* m, double t, double h,
     m->res[FSTEP_XF] = xf + nx1_;  // fwd:xf
     m->res[FSTEP_VF] = vf + nv1_;  // fwd:vf
     m->res[FSTEP_QF] = qf + nq1_;  // fwd:qf
-    calc_function(m, forward_name("stepF", ns_));
+    calc_function(m, forward_name("stepF", nfwd_));
   }
 }
 
@@ -1936,7 +1933,7 @@ void FixedStepIntegrator::stepB(FixedStepMemory* m, double t, double h,
   m->res[BSTEP_UQF] = uqf;  // uqf
   calc_function(m, "stepB");
   // Evaluate sensitivities
-  if (ns_ > 0) {
+  if (nfwd_ > 0) {
     m->arg[BSTEP_NUM_IN + BSTEP_RXF] = rxf;  // out:rxf
     m->arg[BSTEP_NUM_IN + BSTEP_RVF] = rvf;  // out:rvf
     m->arg[BSTEP_NUM_IN + BSTEP_RQF] = rqf;  // out:rqf
@@ -1954,7 +1951,7 @@ void FixedStepIntegrator::stepB(FixedStepMemory* m, double t, double h,
     m->res[BSTEP_RVF] = rvf + nrv1_;  // fwd:rvf
     m->res[BSTEP_RQF] = rqf + nrq1_;  // fwd:rqf
     m->res[BSTEP_UQF] = uqf + nuq1_;  // fwd:uqf
-    calc_function(m, forward_name("stepB", ns_));
+    calc_function(m, forward_name("stepB", nfwd_));
   }
 }
 
@@ -2055,7 +2052,7 @@ void ImplicitFixedStepIntegrator::init(const Dict& opts) {
   Function rf = rootfinder("stepF", implicit_function_name,
     get_function("implicit_stepF"), rootfinder_options);
   set_function(rf);
-  if (ns_ > 0) set_function(rf.forward(ns_));
+  if (nfwd_ > 0) set_function(rf.forward(nfwd_));
 
   // Allocate a root-finding solver for the backward problem
   if (nrv1_ > 0) {
@@ -2069,7 +2066,7 @@ void ImplicitFixedStepIntegrator::init(const Dict& opts) {
     Function brf = rootfinder("stepB", backward_implicit_function_name,
       get_function("implicit_stepB"), backward_rootfinder_options);
     set_function(brf);
-    if (ns_ > 0) set_function(brf.forward(ns_));
+    if (nfwd_ > 0) set_function(brf.forward(nfwd_));
   }
 }
 
@@ -2192,8 +2189,6 @@ void Integrator::serialize_body(SerializingStream &s) const {
   s.pack("Integrator::nu", nu_);
   s.pack("Integrator::nu1", nu1_);
 
-  s.pack("Integrator::ns", ns_);
-
   s.pack("Integrator::augmented_options", augmented_options_);
   s.pack("Integrator::opts", opts_);
   s.pack("Integrator::print_stats", print_stats_);
@@ -2240,8 +2235,6 @@ Integrator::Integrator(DeserializingStream & s) : OracleFunction(s) {
 
   s.unpack("Integrator::nu", nu_);
   s.unpack("Integrator::nu1", nu1_);
-
-  s.unpack("Integrator::ns", ns_);
 
   s.unpack("Integrator::augmented_options", augmented_options_);
   s.unpack("Integrator::opts", opts_);
