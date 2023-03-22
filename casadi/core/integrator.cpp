@@ -614,40 +614,48 @@ Function Integrator::get_augmented_dae(const std::string& name) const {
   std::vector<MatType> arg = MatType::get_input(oracle_);
   std::vector<MatType> aug_x, aug_z, aug_p, aug_u, aug_rx, aug_rz, aug_rp;
   MatType aug_t = arg.at(DYN_T);
-  aug_x.push_back(vec(arg.at(DYN_X)));
-  aug_z.push_back(vec(arg.at(DYN_Z)));
-  aug_p.push_back(vec(arg.at(DYN_P)));
-  aug_u.push_back(vec(arg.at(DYN_U)));
-  aug_rx.push_back(vec(arg.at(DYN_RX)));
-  aug_rz.push_back(vec(arg.at(DYN_RZ)));
-  aug_rp.push_back(vec(arg.at(DYN_RP)));
+  aug_x.push_back(arg.at(DYN_X));
+  aug_z.push_back(arg.at(DYN_Z));
+  aug_p.push_back(arg.at(DYN_P));
+  aug_u.push_back(arg.at(DYN_U));
+  aug_rx.push_back(arg.at(DYN_RX));
+  aug_rz.push_back(arg.at(DYN_RZ));
+  aug_rp.push_back(arg.at(DYN_RP));
 
   // Get output expressions
   std::vector<MatType> res = oracle_(arg);
   std::vector<MatType> aug_ode, aug_alg, aug_quad, aug_rode, aug_ralg, aug_rquad, aug_uquad;
-  aug_ode.push_back(vec(res.at(DYN_ODE)));
-  aug_alg.push_back(vec(res.at(DYN_ALG)));
-  aug_quad.push_back(vec(res.at(DYN_QUAD)));
-  aug_rode.push_back(vec(res.at(DYN_RODE)));
-  aug_ralg.push_back(vec(res.at(DYN_RALG)));
-  aug_rquad.push_back(vec(res.at(DYN_RQUAD)));
-  aug_uquad.push_back(vec(res.at(DYN_UQUAD)));
+  aug_ode.push_back(res.at(DYN_ODE));
+  aug_alg.push_back(res.at(DYN_ALG));
+  aug_quad.push_back(res.at(DYN_QUAD));
+  aug_rode.push_back(res.at(DYN_RODE));
+  aug_ralg.push_back(res.at(DYN_RALG));
+  aug_rquad.push_back(res.at(DYN_RQUAD));
+  aug_uquad.push_back(res.at(DYN_UQUAD));
 
   // Zero of time dimension
-  MatType zero_t = MatType::zeros(t());
+  MatType zero_t = MatType::zeros(oracle_.sparsity_in(DYN_T));
 
   // Forward directional derivatives
   std::vector<std::vector<MatType>> seed(ns_, std::vector<MatType>(DYN_NUM_IN));
   for (casadi_int d=0; d<ns_; ++d) {
-    seed[d][DYN_T] = zero_t;
+    // Create expressions for augmented states
     std::string pref = "aug" + str(d) + "_";
-    aug_x.push_back(vec(seed[d][DYN_X] = MatType::sym(pref + "x", x1())));
-    aug_z.push_back(vec(seed[d][DYN_Z] = MatType::sym(pref + "z", z1())));
-    aug_p.push_back(vec(seed[d][DYN_P] = MatType::sym(pref + "p", p1())));
-    aug_u.push_back(vec(seed[d][DYN_U] = MatType::sym(pref + "u", u1())));
-    aug_rx.push_back(vec(seed[d][DYN_RX] = MatType::sym(pref + "rx", rx1())));
-    aug_rz.push_back(vec(seed[d][DYN_RZ] = MatType::sym(pref + "rz", rz1())));
-    aug_rp.push_back(vec(seed[d][DYN_RP] = MatType::sym(pref + "rp", rp1())));
+    for (casadi_int i = 0; i < DYN_NUM_IN; ++i) {
+      if (i == DYN_T) {
+        seed[d][i] = zero_t;
+      } else {
+        seed[d][i] = MatType::sym(pref + dyn_in(i), oracle_.sparsity_in(i));
+      }
+    }
+    // Save to augmented function inputs
+    aug_x.push_back(seed[d][DYN_X]);
+    aug_z.push_back(seed[d][DYN_Z]);
+    aug_p.push_back(seed[d][DYN_P]);
+    aug_u.push_back(seed[d][DYN_U]);
+    aug_rx.push_back(seed[d][DYN_RX]);
+    aug_rz.push_back(seed[d][DYN_RZ]);
+    aug_rp.push_back(seed[d][DYN_RP]);
   }
 
   // Calculate directional derivatives
@@ -659,13 +667,13 @@ Function Integrator::get_augmented_dae(const std::string& name) const {
   casadi_assert_dev(sens.size()==ns_);
   for (casadi_int d=0; d<ns_; ++d) {
     casadi_assert_dev(sens[d].size()==DYN_NUM_OUT);
-    aug_ode.push_back(vec(project(sens[d][DYN_ODE], x1())));
-    aug_alg.push_back(vec(project(sens[d][DYN_ALG], z1())));
-    aug_quad.push_back(vec(project(sens[d][DYN_QUAD], q1())));
-    aug_rode.push_back(vec(project(sens[d][DYN_RODE], rx1())));
-    aug_ralg.push_back(vec(project(sens[d][DYN_RALG], rz1())));
-    aug_rquad.push_back(vec(project(sens[d][DYN_RQUAD], rq1())));
-    aug_uquad.push_back(vec(project(sens[d][DYN_UQUAD], uq1())));
+    aug_ode.push_back(project(sens[d][DYN_ODE], oracle_.sparsity_out(DYN_ODE)));
+    aug_alg.push_back(project(sens[d][DYN_ALG], oracle_.sparsity_out(DYN_ALG)));
+    aug_quad.push_back(project(sens[d][DYN_QUAD], oracle_.sparsity_out(DYN_QUAD)));
+    aug_rode.push_back(project(sens[d][DYN_RODE], oracle_.sparsity_out(DYN_RODE)));
+    aug_ralg.push_back(project(sens[d][DYN_RALG], oracle_.sparsity_out(DYN_RALG)));
+    aug_rquad.push_back(project(sens[d][DYN_RQUAD], oracle_.sparsity_out(DYN_RQUAD)));
+    aug_uquad.push_back(project(sens[d][DYN_UQUAD], oracle_.sparsity_out(DYN_UQUAD)));
   }
 
   // Construct return expression
@@ -719,7 +727,7 @@ std::map<std::string, MatType> Integrator::aug_adj(const Function& aug_oracle,
   aug_uquad.push_back(vec(res.at(DYN_UQUAD)));
 
   // Zero of time dimension
-  MatType zero_t = MatType::zeros(t());
+  MatType zero_t = MatType::zeros(aug_oracle.sparsity_in(DYN_T));
 
   // Reverse mode directional derivatives
   std::vector<std::vector<MatType>> seed(nadj, std::vector<MatType>(DYN_NUM_OUT));
