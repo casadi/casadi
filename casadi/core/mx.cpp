@@ -713,7 +713,7 @@ namespace casadi {
   }
 
   DM MX::evalf(const MX& m) {
-    Function f("f", std::vector<MX>{}, {m});
+    Function f("f", std::vector<MX>{}, {m}, {{"allow_free", true}});
     return f(std::vector<DM>{})[0];
   }
 
