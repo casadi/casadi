@@ -464,9 +464,6 @@ void Integrator::init(const Dict& opts) {
   // Number of sensitivities
   ns_ = nfwd_;
 
-  // The class is being refactored to use oracle without sensitivity right-hand-sides
-  nonaug_oracle_ = oracle_;
-
   // Form augmented oracle from nonaugmented oracle
   aug_oracle_ = augmented_dae();
 
@@ -530,8 +527,8 @@ void Integrator::init(const Dict& opts) {
   nuq_ = nuq1_ * (1 + ns_);
 
   // Create problem functions, forward problem
-  create_function(nonaug_oracle_, "daeF", fdyn_in(), fdae_out());
-  create_function(nonaug_oracle_, "quadF", fdyn_in(), fquad_out());
+  create_function("daeF", fdyn_in(), fdae_out());
+  create_function("quadF", fdyn_in(), fquad_out());
   if (ns_ > 0) {
     // one direction to conserve memory, symbolic processing time
     create_forward("daeF", 1);
@@ -540,8 +537,8 @@ void Integrator::init(const Dict& opts) {
 
   // Create problem functions, backward problem
   if (nrx1_ > 0) {
-    create_function(nonaug_oracle_, "daeB", bdyn_in(), bdae_out());
-    create_function(nonaug_oracle_, "quadB", bdyn_in(), bquad_out());
+    create_function("daeB", bdyn_in(), bdae_out());
+    create_function("quadB", bdyn_in(), bquad_out());
     if (ns_ > 0) {
       // one direction to conserve memory, symbolic processing time
       create_forward("daeB", 1);
@@ -665,15 +662,15 @@ std::map<std::string, MatType> Integrator::aug_fwd(casadi_int nfwd) const {
 
 Function Integrator::augmented_dae() const {
   // If no sensitivities, augmented oracle is the oracle itself
-  if (ns_ == 0) return nonaug_oracle_;
+  if (ns_ == 0) return oracle_;
   // Name of augmented DAE
-  std::string aug_name = "fsens" + str(ns_) + "_" + nonaug_oracle_.name();
+  std::string aug_name = "fsens" + str(ns_) + "_" + oracle_.name();
   // Use function in cache, if available
   Function ret;
   if (incache(aug_name, ret)) return ret;
   // Create new augmented oracle
   try {
-    if (nonaug_oracle_.is_a("SXFunction")) {
+    if (oracle_.is_a("SXFunction")) {
       ret = get_augmented_dae<SX>(aug_name);
     } else {
       ret = get_augmented_dae<MX>(aug_name);
@@ -691,7 +688,7 @@ Function Integrator::get_augmented_dae(const std::string& name) const {
   if (verbose_) casadi_message(name_ + "::get_augmented_dae");
 
   // Get input expressions
-  std::vector<MatType> arg = MatType::get_input(nonaug_oracle_);
+  std::vector<MatType> arg = MatType::get_input(oracle_);
   std::vector<MatType> aug_x, aug_z, aug_p, aug_u, aug_rx, aug_rz, aug_rp;
   MatType aug_t = arg.at(DYN_T);
   aug_x.push_back(vec(arg.at(DYN_X)));
@@ -703,7 +700,7 @@ Function Integrator::get_augmented_dae(const std::string& name) const {
   aug_rp.push_back(vec(arg.at(DYN_RP)));
 
   // Get output expressions
-  std::vector<MatType> res = nonaug_oracle_(arg);
+  std::vector<MatType> res = oracle_(arg);
   std::vector<MatType> aug_ode, aug_alg, aug_quad, aug_rode, aug_ralg, aug_rquad, aug_uquad;
   aug_ode.push_back(vec(res.at(DYN_ODE)));
   aug_alg.push_back(vec(res.at(DYN_ALG)));
@@ -732,8 +729,8 @@ Function Integrator::get_augmented_dae(const std::string& name) const {
 
   // Calculate directional derivatives
   std::vector<std::vector<MatType>> sens;
-  bool always_inline = nonaug_oracle_.is_a("SXFunction") || nonaug_oracle_.is_a("MXFunction");
-  nonaug_oracle_->call_forward(arg, res, seed, sens, always_inline, false);
+  bool always_inline = oracle_.is_a("SXFunction") || oracle_.is_a("MXFunction");
+  oracle_->call_forward(arg, res, seed, sens, always_inline, false);
 
   // Collect sensitivity equations
   casadi_assert_dev(sens.size()==ns_);
@@ -1758,8 +1755,8 @@ void FixedStepIntegrator::init(const Dict& opts) {
   Integrator::init(opts);
 
   // Create dynamic functions, forward and backward problem
-  create_function(nonaug_oracle_, "dynF", fdyn_in(), fdyn_out());
-  if (nrx1_ > 0) create_function(nonaug_oracle_, "dynB", bdyn_in(), bdyn_out());
+  create_function("dynF", fdyn_in(), fdyn_out());
+  if (nrx1_ > 0) create_function("dynB", bdyn_in(), bdyn_out());
 
   // Read options
   for (auto&& op : opts) {
@@ -2225,7 +2222,6 @@ void Integrator::serialize_body(SerializingStream &s) const {
 
   s.pack("Integrator::sp_jac_dae", sp_jac_dae_);
   s.pack("Integrator::sp_jac_rdae", sp_jac_rdae_);
-  s.pack("Integrator::nonaug_oracle", nonaug_oracle_);
   s.pack("Integrator::aug_oracle", aug_oracle_);
   s.pack("Integrator::t0", t0_);
   s.pack("Integrator::tout", tout_);
@@ -2276,7 +2272,6 @@ Integrator::Integrator(DeserializingStream & s) : OracleFunction(s) {
 
   s.unpack("Integrator::sp_jac_dae", sp_jac_dae_);
   s.unpack("Integrator::sp_jac_rdae", sp_jac_rdae_);
-  s.unpack("Integrator::nonaug_oracle", nonaug_oracle_);
   s.unpack("Integrator::aug_oracle", aug_oracle_);
   s.unpack("Integrator::t0", t0_);
   s.unpack("Integrator::tout", tout_);

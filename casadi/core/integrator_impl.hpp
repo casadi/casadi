@@ -292,14 +292,11 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   // Sparsity pattern of the extended Jacobians
   Sparsity sp_jac_dae_, sp_jac_rdae_;
 
-  /// New oracle, to replace existing oracle
-  Function nonaug_oracle_;
-
   /// Legacy oracle
   Function aug_oracle_;
 
   ///@{
-  // Shorthands
+  // Shorthands (old oracle definition)
   const Sparsity&  x() const { return aug_oracle_.sparsity_in(DYN_X);}
   const Sparsity&  z() const { return aug_oracle_.sparsity_in(DYN_Z);}
   const Sparsity&  p() const { return aug_oracle_.sparsity_in(DYN_P);}
@@ -313,18 +310,18 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   ///@}
 
   ///@{
-  // Shorthands (new oracle definition)
-  const Sparsity&  t() const { return nonaug_oracle_.sparsity_in(DYN_T);}
-  const Sparsity&  x1() const { return nonaug_oracle_.sparsity_in(DYN_X);}
-  const Sparsity&  z1() const { return nonaug_oracle_.sparsity_in(DYN_Z);}
-  const Sparsity&  p1() const { return nonaug_oracle_.sparsity_in(DYN_P);}
-  const Sparsity&  u1() const { return nonaug_oracle_.sparsity_in(DYN_U);}
-  const Sparsity&  q1() const { return nonaug_oracle_.sparsity_out(DYN_QUAD);}
-  const Sparsity& rx1() const { return nonaug_oracle_.sparsity_in(DYN_RX);}
-  const Sparsity& rz1() const { return nonaug_oracle_.sparsity_in(DYN_RZ);}
-  const Sparsity& rp1() const { return nonaug_oracle_.sparsity_in(DYN_RP);}
-  const Sparsity& rq1() const { return nonaug_oracle_.sparsity_out(DYN_RQUAD);}
-  const Sparsity& uq1() const { return nonaug_oracle_.sparsity_out(DYN_UQUAD);}
+  // Shorthands
+  const Sparsity&  t() const { return oracle_.sparsity_in(DYN_T);}
+  const Sparsity&  x1() const { return oracle_.sparsity_in(DYN_X);}
+  const Sparsity&  z1() const { return oracle_.sparsity_in(DYN_Z);}
+  const Sparsity&  p1() const { return oracle_.sparsity_in(DYN_P);}
+  const Sparsity&  u1() const { return oracle_.sparsity_in(DYN_U);}
+  const Sparsity&  q1() const { return oracle_.sparsity_out(DYN_QUAD);}
+  const Sparsity& rx1() const { return oracle_.sparsity_in(DYN_RX);}
+  const Sparsity& rz1() const { return oracle_.sparsity_in(DYN_RZ);}
+  const Sparsity& rp1() const { return oracle_.sparsity_in(DYN_RP);}
+  const Sparsity& rq1() const { return oracle_.sparsity_out(DYN_RQUAD);}
+  const Sparsity& uq1() const { return oracle_.sparsity_out(DYN_UQUAD);}
   inline casadi_int nt() const { return tout_.size();}
   ///@}
 

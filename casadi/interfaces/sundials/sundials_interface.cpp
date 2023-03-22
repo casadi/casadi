@@ -215,7 +215,7 @@ void SundialsInterface::init(const Dict& opts) {
   Function jacF;
   Sparsity jacF_sp;
   if (d == 0 || d->ns_ > 0) {
-    jacF = create_function(nonaug_oracle_, "jacF", {"t", "x", "z", "p", "u"},
+    jacF = create_function("jacF", {"t", "x", "z", "p", "u"},
       {"jac:ode:x", "jac:alg:x", "jac:ode:z", "jac:alg:z"});
     jacF_sp = jacF.sparsity_out(JACF_ODE_X) + Sparsity::diag(nx1_);
     if (nz_ > 0) {
@@ -241,7 +241,7 @@ void SundialsInterface::init(const Dict& opts) {
     Function jacB;
     Sparsity jacB_sp;
     if (d == 0 || d->ns_ > 0) {
-      jacB = create_function(nonaug_oracle_, "jacB", {"t", "x", "z", "p", "u", "rx", "rz", "rp"},
+      jacB = create_function("jacB", {"t", "x", "z", "p", "u", "rx", "rz", "rp"},
         {"jac:rode:rx", "jac:ralg:rx", "jac:rode:rz", "jac:ralg:rz"});
       jacB_sp = jacB.sparsity_out(JACB_RODE_RX) + Sparsity::diag(nrx1_);
       if (nrz1_ > 0) {
@@ -280,13 +280,13 @@ void SundialsInterface::init(const Dict& opts) {
 
   // Attach functions for jacobian information, foward problem
   if (newton_scheme_!=SD_DIRECT || (ns_ > 0 && second_order_correction_)) {
-    create_function(nonaug_oracle_, "jtimesF", {"t", "x", "z", "p", "u", "fwd:x", "fwd:z"},
+    create_function("jtimesF", {"t", "x", "z", "p", "u", "fwd:x", "fwd:z"},
       {"fwd:ode", "fwd:alg"});
     if (ns_ > 0) {
       create_forward("jtimesF", ns_);
     }
     if (nrx_ > 0) {
-      create_function(nonaug_oracle_, "jtimesB",
+      create_function("jtimesB",
         {"t", "x", "z", "p", "u", "rx", "rz", "rp", "fwd:rx", "fwd:rz"},
         {"fwd:rode", "fwd:ralg"});
       if (ns_ > 0) {
