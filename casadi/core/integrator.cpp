@@ -477,6 +477,9 @@ void Integrator::init(const Dict& opts) {
     nonaug_oracle_ = oracle_;
   }
 
+  // Form augmented oracle from nonaugmented oracle
+  aug_oracle_ = augmented_dae();
+
   // Store a copy of the options, for creating augmented integrators
   opts_ = opts;
 
@@ -592,7 +595,7 @@ std::map<std::string, MatType> Integrator::aug_fwd(casadi_int nfwd) const {
   if (verbose_) casadi_message(name_ + "::aug_fwd");
 
   // Get input expressions
-  std::vector<MatType> arg = MatType::get_input(oracle_);
+  std::vector<MatType> arg = MatType::get_input(aug_oracle_);
   std::vector<MatType> aug_x, aug_z, aug_p, aug_u, aug_rx, aug_rz, aug_rp;
   MatType aug_t = arg.at(DYN_T);
   aug_x.push_back(vec(arg.at(DYN_X)));
@@ -604,7 +607,7 @@ std::map<std::string, MatType> Integrator::aug_fwd(casadi_int nfwd) const {
   aug_rp.push_back(vec(arg.at(DYN_RP)));
 
   // Get output expressions
-  std::vector<MatType> res = oracle_(arg);
+  std::vector<MatType> res = aug_oracle_(arg);
   std::vector<MatType> aug_ode, aug_alg, aug_quad, aug_rode, aug_ralg, aug_rquad, aug_uquad;
   aug_ode.push_back(vec(res.at(DYN_ODE)));
   aug_alg.push_back(vec(res.at(DYN_ALG)));
@@ -633,8 +636,8 @@ std::map<std::string, MatType> Integrator::aug_fwd(casadi_int nfwd) const {
 
   // Calculate directional derivatives
   std::vector<std::vector<MatType>> sens;
-  bool always_inline = oracle_.is_a("SXFunction") || oracle_.is_a("MXFunction");
-  oracle_->call_forward(arg, res, seed, sens, always_inline, false);
+  bool always_inline = aug_oracle_.is_a("SXFunction") || aug_oracle_.is_a("MXFunction");
+  aug_oracle_->call_forward(arg, res, seed, sens, always_inline, false);
 
   // Collect sensitivity equations
   casadi_assert_dev(sens.size()==nfwd);
@@ -670,12 +673,35 @@ std::map<std::string, MatType> Integrator::aug_fwd(casadi_int nfwd) const {
   return ret;
 }
 
+Function Integrator::augmented_dae() const {
+  // If no sensitivities, augmented oracle is the oracle itself
+  if (ns_ == 0) return nonaug_oracle_;
+  // Name of augmented DAE
+  std::string aug_name = "fsens" + str(ns_) + "_" + nonaug_oracle_.name();
+  // Use function in cache, if available
+  Function ret;
+  if (incache(aug_name, ret)) return ret;
+  // Create new augmented oracle
+  try {
+    if (nonaug_oracle_.is_a("SXFunction")) {
+      ret = get_augmented_dae<SX>(aug_name);
+    } else {
+      ret = get_augmented_dae<MX>(aug_name);
+    }
+  } catch (std::exception& e) {
+    casadi_error("Failed to generate augmented DAE for " + name_ + ":\n" + e.what());
+  }
+  // Save to Function cache and return
+  tocache(ret);
+  return ret;
+}
+
 template<typename MatType>
-std::map<std::string, MatType> Integrator::aug_adj(casadi_int nadj) const {
-  if (verbose_) casadi_message(name_ + "::aug_adj");
+Function Integrator::get_augmented_dae(const std::string& name) const {
+  if (verbose_) casadi_message(name_ + "::get_augmented_dae");
 
   // Get input expressions
-  std::vector<MatType> arg = MatType::get_input(oracle_);
+  std::vector<MatType> arg = MatType::get_input(nonaug_oracle_);
   std::vector<MatType> aug_x, aug_z, aug_p, aug_u, aug_rx, aug_rz, aug_rp;
   MatType aug_t = arg.at(DYN_T);
   aug_x.push_back(vec(arg.at(DYN_X)));
@@ -687,7 +713,91 @@ std::map<std::string, MatType> Integrator::aug_adj(casadi_int nadj) const {
   aug_rp.push_back(vec(arg.at(DYN_RP)));
 
   // Get output expressions
-  std::vector<MatType> res = oracle_(arg);
+  std::vector<MatType> res = nonaug_oracle_(arg);
+  std::vector<MatType> aug_ode, aug_alg, aug_quad, aug_rode, aug_ralg, aug_rquad, aug_uquad;
+  aug_ode.push_back(vec(res.at(DYN_ODE)));
+  aug_alg.push_back(vec(res.at(DYN_ALG)));
+  aug_quad.push_back(vec(res.at(DYN_QUAD)));
+  aug_rode.push_back(vec(res.at(DYN_RODE)));
+  aug_ralg.push_back(vec(res.at(DYN_RALG)));
+  aug_rquad.push_back(vec(res.at(DYN_RQUAD)));
+  aug_uquad.push_back(vec(res.at(DYN_UQUAD)));
+
+  // Zero of time dimension
+  MatType zero_t = MatType::zeros(t());
+
+  // Forward directional derivatives
+  std::vector<std::vector<MatType>> seed(ns_, std::vector<MatType>(DYN_NUM_IN));
+  for (casadi_int d=0; d<ns_; ++d) {
+    seed[d][DYN_T] = zero_t;
+    std::string pref = "aug" + str(d) + "_";
+    aug_x.push_back(vec(seed[d][DYN_X] = MatType::sym(pref + "x", x1())));
+    aug_z.push_back(vec(seed[d][DYN_Z] = MatType::sym(pref + "z", z1())));
+    aug_p.push_back(vec(seed[d][DYN_P] = MatType::sym(pref + "p", p1())));
+    aug_u.push_back(vec(seed[d][DYN_U] = MatType::sym(pref + "u", u1())));
+    aug_rx.push_back(vec(seed[d][DYN_RX] = MatType::sym(pref + "rx", rx1())));
+    aug_rz.push_back(vec(seed[d][DYN_RZ] = MatType::sym(pref + "rz", rz1())));
+    aug_rp.push_back(vec(seed[d][DYN_RP] = MatType::sym(pref + "rp", rp1())));
+  }
+
+  // Calculate directional derivatives
+  std::vector<std::vector<MatType>> sens;
+  bool always_inline = nonaug_oracle_.is_a("SXFunction") || nonaug_oracle_.is_a("MXFunction");
+  nonaug_oracle_->call_forward(arg, res, seed, sens, always_inline, false);
+
+  // Collect sensitivity equations
+  casadi_assert_dev(sens.size()==ns_);
+  for (casadi_int d=0; d<ns_; ++d) {
+    casadi_assert_dev(sens[d].size()==DYN_NUM_OUT);
+    aug_ode.push_back(vec(project(sens[d][DYN_ODE], x1())));
+    aug_alg.push_back(vec(project(sens[d][DYN_ALG], z1())));
+    aug_quad.push_back(vec(project(sens[d][DYN_QUAD], q1())));
+    aug_rode.push_back(vec(project(sens[d][DYN_RODE], rx1())));
+    aug_ralg.push_back(vec(project(sens[d][DYN_RALG], rz1())));
+    aug_rquad.push_back(vec(project(sens[d][DYN_RQUAD], rq1())));
+    aug_uquad.push_back(vec(project(sens[d][DYN_UQUAD], uq1())));
+  }
+
+  // Construct return expression
+  std::map<std::string, MatType> r;
+  r["t"] = aug_t;
+  r["x"] = vertcat(aug_x);
+  r["z"] = vertcat(aug_z);
+  r["p"] = vertcat(aug_p);
+  r["u"] = vertcat(aug_u);
+  r["ode"] = vertcat(aug_ode);
+  r["alg"] = vertcat(aug_alg);
+  r["quad"] = vertcat(aug_quad);
+  r["rx"] = vertcat(aug_rx);
+  r["rz"] = vertcat(aug_rz);
+  r["rp"] = vertcat(aug_rp);
+  r["rode"] = vertcat(aug_rode);
+  r["ralg"] = vertcat(aug_ralg);
+  r["rquad"] = vertcat(aug_rquad);
+  r["uquad"] = vertcat(aug_uquad);
+
+  // Convert to oracle function and return
+  return map2oracle(name, r);
+}
+
+template<typename MatType>
+std::map<std::string, MatType> Integrator::aug_adj(casadi_int nadj) const {
+  if (verbose_) casadi_message(name_ + "::aug_adj");
+
+  // Get input expressions
+  std::vector<MatType> arg = MatType::get_input(aug_oracle_);
+  std::vector<MatType> aug_x, aug_z, aug_p, aug_u, aug_rx, aug_rz, aug_rp;
+  MatType aug_t = arg.at(DYN_T);
+  aug_x.push_back(vec(arg.at(DYN_X)));
+  aug_z.push_back(vec(arg.at(DYN_Z)));
+  aug_p.push_back(vec(arg.at(DYN_P)));
+  aug_u.push_back(vec(arg.at(DYN_U)));
+  aug_rx.push_back(vec(arg.at(DYN_RX)));
+  aug_rz.push_back(vec(arg.at(DYN_RZ)));
+  aug_rp.push_back(vec(arg.at(DYN_RP)));
+
+  // Get output expressions
+  std::vector<MatType> res = aug_oracle_(arg);
   std::vector<MatType> aug_ode, aug_alg, aug_quad, aug_rode, aug_ralg, aug_rquad, aug_uquad;
   aug_ode.push_back(vec(res.at(DYN_ODE)));
   aug_alg.push_back(vec(res.at(DYN_ALG)));
@@ -715,8 +825,8 @@ std::map<std::string, MatType> Integrator::aug_adj(casadi_int nadj) const {
 
   // Calculate directional derivatives
   std::vector<std::vector<MatType>> sens;
-  bool always_inline = oracle_.is_a("SXFunction") || oracle_.is_a("MXFunction");
-  oracle_->call_reverse(arg, res, seed, sens, always_inline, false);
+  bool always_inline = aug_oracle_.is_a("SXFunction") || aug_oracle_.is_a("MXFunction");
+  aug_oracle_->call_reverse(arg, res, seed, sens, always_inline, false);
 
   // Collect sensitivity equations
   casadi_assert_dev(sens.size()==nadj);
@@ -1292,8 +1402,8 @@ Function Integrator::get_forward(casadi_int nfwd, const std::string& name,
   // Create integrator for augmented DAE
   Function aug_dae;
   std::string aug_prefix = "fsens" + str(nfwd) + "_";
-  std::string dae_name = aug_prefix + oracle_.name();
-  if (oracle_.is_a("SXFunction")) {
+  std::string dae_name = aug_prefix + aug_oracle_.name();
+  if (aug_oracle_.is_a("SXFunction")) {
     aug_dae = map2oracle(dae_name, aug_fwd<SX>(nfwd));
   } else {
     aug_dae = map2oracle(dae_name, aug_fwd<MX>(nfwd));
@@ -1402,8 +1512,8 @@ Function Integrator::get_reverse(casadi_int nadj, const std::string& name,
   // Create integrator for augmented DAE
   Function aug_dae;
   std::string aug_prefix = "asens" + str(nadj) + "_";
-  std::string dae_name = aug_prefix + oracle_.name();
-  if (oracle_.is_a("SXFunction")) {
+  std::string dae_name = aug_prefix + aug_oracle_.name();
+  if (aug_oracle_.is_a("SXFunction")) {
     aug_dae = map2oracle(dae_name, aug_adj<SX>(nadj));
   } else {
     aug_dae = map2oracle(dae_name, aug_adj<MX>(nadj));

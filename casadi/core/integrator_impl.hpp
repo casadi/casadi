@@ -269,6 +269,12 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
       \identifier{1mb} */
   template<typename MatType> std::map<std::string, MatType> aug_fwd(casadi_int nfwd) const;
 
+  ///@{
+  /** \brief Generate the augmented DAE system */
+  template<typename MatType> Function get_augmented_dae(const std::string& name) const;
+  Function augmented_dae() const;
+  ///@}
+
   /** \brief Generate a augmented DAE system with \a nadj adjoint sensitivities
 
       \identifier{1mc} */
@@ -289,24 +295,26 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   /// New oracle, to replace existing oracle
   Function nonaug_oracle_;
 
+  /// Legacy oracle
+  Function aug_oracle_;
+
   ///@{
   // Shorthands
-  const Sparsity&  t() const { return oracle_.sparsity_in(DYN_T);}
-  const Sparsity&  x() const { return oracle_.sparsity_in(DYN_X);}
-  const Sparsity&  z() const { return oracle_.sparsity_in(DYN_Z);}
-  const Sparsity&  p() const { return oracle_.sparsity_in(DYN_P);}
-  const Sparsity&  u() const { return oracle_.sparsity_in(DYN_U);}
-  const Sparsity&  q() const { return oracle_.sparsity_out(DYN_QUAD);}
-  const Sparsity& rx() const { return oracle_.sparsity_in(DYN_RX);}
-  const Sparsity& rz() const { return oracle_.sparsity_in(DYN_RZ);}
-  const Sparsity& rp() const { return oracle_.sparsity_in(DYN_RP);}
-  const Sparsity& rq() const { return oracle_.sparsity_out(DYN_RQUAD);}
-  const Sparsity& uq() const { return oracle_.sparsity_out(DYN_UQUAD);}
-  inline casadi_int nt() const { return tout_.size();}
+  const Sparsity&  x() const { return aug_oracle_.sparsity_in(DYN_X);}
+  const Sparsity&  z() const { return aug_oracle_.sparsity_in(DYN_Z);}
+  const Sparsity&  p() const { return aug_oracle_.sparsity_in(DYN_P);}
+  const Sparsity&  u() const { return aug_oracle_.sparsity_in(DYN_U);}
+  const Sparsity&  q() const { return aug_oracle_.sparsity_out(DYN_QUAD);}
+  const Sparsity& rx() const { return aug_oracle_.sparsity_in(DYN_RX);}
+  const Sparsity& rz() const { return aug_oracle_.sparsity_in(DYN_RZ);}
+  const Sparsity& rp() const { return aug_oracle_.sparsity_in(DYN_RP);}
+  const Sparsity& rq() const { return aug_oracle_.sparsity_out(DYN_RQUAD);}
+  const Sparsity& uq() const { return aug_oracle_.sparsity_out(DYN_UQUAD);}
   ///@}
 
   ///@{
   // Shorthands (new oracle definition)
+  const Sparsity&  t() const { return nonaug_oracle_.sparsity_in(DYN_T);}
   const Sparsity&  x1() const { return nonaug_oracle_.sparsity_in(DYN_X);}
   const Sparsity&  z1() const { return nonaug_oracle_.sparsity_in(DYN_Z);}
   const Sparsity&  p1() const { return nonaug_oracle_.sparsity_in(DYN_P);}
@@ -317,6 +325,7 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   const Sparsity& rp1() const { return nonaug_oracle_.sparsity_in(DYN_RP);}
   const Sparsity& rq1() const { return nonaug_oracle_.sparsity_out(DYN_RQUAD);}
   const Sparsity& uq1() const { return nonaug_oracle_.sparsity_out(DYN_UQUAD);}
+  inline casadi_int nt() const { return tout_.size();}
   ///@}
 
   ///@{
@@ -341,10 +350,10 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   static std::vector<std::string> bquad_out() { return {"rquad", "uquad"}; }
   ///@}
 
-  // Initial time
+  /// Initial time
   double t0_;
 
-  // Output time grid
+  /// Output time grid
   std::vector<double> tout_;
 
   /// Number of sensitivities
@@ -365,10 +374,10 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   /// Number of sensitivities
   casadi_int ns_;
 
-  // Augmented user option
+  /// Augmented user option
   Dict augmented_options_;
 
-  // Copy of the options
+  /// Copy of the options
   Dict opts_;
 
   /// Options
