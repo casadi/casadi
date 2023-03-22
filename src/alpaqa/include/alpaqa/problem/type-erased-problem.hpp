@@ -879,6 +879,7 @@ struct ProblemWithCounters {
     [[nodiscard]] bool provides_eval_hess_L_prod() const requires requires (Problem p) { { p.provides_eval_hess_L_prod() } -> std::convertible_to<bool>; } { return problem.provides_eval_hess_L_prod(); }
     [[nodiscard]] bool provides_eval_hess_L() const requires requires (Problem p) { { p.provides_eval_hess_L() } -> std::convertible_to<bool>; } { return problem.provides_eval_hess_L(); }
     [[nodiscard]] bool provides_get_hess_L_num_nonzeros() const requires requires (Problem p) { { p.provides_get_hess_L_num_nonzeros() } -> std::convertible_to<bool>; } { return problem.provides_get_hess_L_num_nonzeros(); }
+    [[nodiscard]] bool provides_eval_hess_ψ_prod() const requires requires (Problem p) { { p.provides_eval_hess_ψ() } -> std::convertible_to<bool>; } { return problem.provides_eval_hess_ψ_prod(); }
     [[nodiscard]] bool provides_eval_hess_ψ() const requires requires (Problem p) { { p.provides_eval_hess_ψ() } -> std::convertible_to<bool>; } { return problem.provides_eval_hess_ψ(); }
     [[nodiscard]] bool provides_get_hess_ψ_num_nonzeros() const requires requires (Problem p) { { p.provides_get_hess_ψ_num_nonzeros() } -> std::convertible_to<bool>; } { return problem.provides_get_hess_ψ_num_nonzeros(); }
     [[nodiscard]] bool provides_eval_f_grad_f() const requires requires (Problem p) { { p.provides_eval_f_grad_f() } -> std::convertible_to<bool>; } { return problem.provides_eval_f_grad_f(); }
