@@ -488,7 +488,17 @@ void Integrator::init(const Dict& opts) {
   // Call the base class method
   OracleFunction::init(opts);
 
-  casadi_assert(x().is_vector(), "Only vector states are supported");
+  // Vector inputs must be flattened before integrator creation
+  casadi_assert(x1().is_vector(), "DAE must consist of vectors only.");
+  casadi_assert(z1().is_vector(), "DAE must consist of vectors only.");
+  casadi_assert(p1().is_vector(), "DAE must consist of vectors only.");
+  casadi_assert(u1().is_vector(), "DAE must consist of vectors only.");
+  casadi_assert(q1().is_vector(), "DAE must consist of vectors only.");
+  casadi_assert(rx1().is_vector(), "DAE must consist of vectors only.");
+  casadi_assert(rz1().is_vector(), "DAE must consist of vectors only.");
+  casadi_assert(rp1().is_vector(), "DAE must consist of vectors only.");
+  casadi_assert(rq1().is_vector(), "DAE must consist of vectors only.");
+  casadi_assert(uq1().is_vector(), "DAE must consist of vectors only.");
 
   // Error if sparse input
   casadi_assert(x1().is_dense(), "Sparse DAE not supported");
@@ -575,89 +585,6 @@ int Integrator::init_mem(void* mem) const {
 
   //auto m = static_cast<IntegratorMemory*>(mem);
   return 0;
-}
-
-template<typename MatType>
-std::map<std::string, MatType> Integrator::aug_fwd(casadi_int nfwd) const {
-  if (verbose_) casadi_message(name_ + "::aug_fwd");
-
-  // Get input expressions
-  std::vector<MatType> arg = MatType::get_input(aug_oracle_);
-  std::vector<MatType> aug_x, aug_z, aug_p, aug_u, aug_rx, aug_rz, aug_rp;
-  MatType aug_t = arg.at(DYN_T);
-  aug_x.push_back(vec(arg.at(DYN_X)));
-  aug_z.push_back(vec(arg.at(DYN_Z)));
-  aug_p.push_back(vec(arg.at(DYN_P)));
-  aug_u.push_back(vec(arg.at(DYN_U)));
-  aug_rx.push_back(vec(arg.at(DYN_RX)));
-  aug_rz.push_back(vec(arg.at(DYN_RZ)));
-  aug_rp.push_back(vec(arg.at(DYN_RP)));
-
-  // Get output expressions
-  std::vector<MatType> res = aug_oracle_(arg);
-  std::vector<MatType> aug_ode, aug_alg, aug_quad, aug_rode, aug_ralg, aug_rquad, aug_uquad;
-  aug_ode.push_back(vec(res.at(DYN_ODE)));
-  aug_alg.push_back(vec(res.at(DYN_ALG)));
-  aug_quad.push_back(vec(res.at(DYN_QUAD)));
-  aug_rode.push_back(vec(res.at(DYN_RODE)));
-  aug_ralg.push_back(vec(res.at(DYN_RALG)));
-  aug_rquad.push_back(vec(res.at(DYN_RQUAD)));
-  aug_uquad.push_back(vec(res.at(DYN_UQUAD)));
-
-  // Zero of time dimension
-  MatType zero_t = MatType::zeros(t());
-
-  // Forward directional derivatives
-  std::vector<std::vector<MatType>> seed(nfwd, std::vector<MatType>(DYN_NUM_IN));
-  for (casadi_int d=0; d<nfwd; ++d) {
-    seed[d][DYN_T] = zero_t;
-    std::string pref = "aug" + str(d) + "_";
-    aug_x.push_back(vec(seed[d][DYN_X] = MatType::sym(pref + "x", x())));
-    aug_z.push_back(vec(seed[d][DYN_Z] = MatType::sym(pref + "z", z())));
-    aug_p.push_back(vec(seed[d][DYN_P] = MatType::sym(pref + "p", p())));
-    aug_u.push_back(vec(seed[d][DYN_U] = MatType::sym(pref + "u", u())));
-    aug_rx.push_back(vec(seed[d][DYN_RX] = MatType::sym(pref + "rx", rx())));
-    aug_rz.push_back(vec(seed[d][DYN_RZ] = MatType::sym(pref + "rz", rz())));
-    aug_rp.push_back(vec(seed[d][DYN_RP] = MatType::sym(pref + "rp", rp())));
-  }
-
-  // Calculate directional derivatives
-  std::vector<std::vector<MatType>> sens;
-  bool always_inline = aug_oracle_.is_a("SXFunction") || aug_oracle_.is_a("MXFunction");
-  aug_oracle_->call_forward(arg, res, seed, sens, always_inline, false);
-
-  // Collect sensitivity equations
-  casadi_assert_dev(sens.size()==nfwd);
-  for (casadi_int d=0; d<nfwd; ++d) {
-    casadi_assert_dev(sens[d].size()==DYN_NUM_OUT);
-    aug_ode.push_back(vec(project(sens[d][DYN_ODE], x())));
-    aug_alg.push_back(vec(project(sens[d][DYN_ALG], z())));
-    aug_quad.push_back(vec(project(sens[d][DYN_QUAD], q())));
-    aug_rode.push_back(vec(project(sens[d][DYN_RODE], rx())));
-    aug_ralg.push_back(vec(project(sens[d][DYN_RALG], rz())));
-    aug_rquad.push_back(vec(project(sens[d][DYN_RQUAD], rq())));
-    aug_uquad.push_back(vec(project(sens[d][DYN_UQUAD], uq())));
-  }
-
-  // Construct return object
-  std::map<std::string, MatType> ret;
-  ret["t"] = aug_t;
-  ret["x"] = vertcat(aug_x);
-  ret["z"] = vertcat(aug_z);
-  ret["p"] = vertcat(aug_p);
-  ret["u"] = vertcat(aug_u);
-  ret["ode"] = vertcat(aug_ode);
-  ret["alg"] = vertcat(aug_alg);
-  ret["quad"] = vertcat(aug_quad);
-  ret["rx"] = vertcat(aug_rx);
-  ret["rz"] = vertcat(aug_rz);
-  ret["rp"] = vertcat(aug_rp);
-  ret["rode"] = vertcat(aug_rode);
-  ret["ralg"] = vertcat(aug_ralg);
-  ret["rquad"] = vertcat(aug_rquad);
-  ret["uquad"] = vertcat(aug_uquad);
-
-  return ret;
 }
 
 Function Integrator::augmented_dae() const {
@@ -771,8 +698,11 @@ template<typename MatType>
 std::map<std::string, MatType> Integrator::aug_adj(casadi_int nadj) const {
   if (verbose_) casadi_message(name_ + "::aug_adj");
 
+  // Get the current oracle, augmented with forward sensitivity equations if any
+  Function aug_oracle = aug_oracle_;
+
   // Get input expressions
-  std::vector<MatType> arg = MatType::get_input(aug_oracle_);
+  std::vector<MatType> arg = MatType::get_input(aug_oracle);
   std::vector<MatType> aug_x, aug_z, aug_p, aug_u, aug_rx, aug_rz, aug_rp;
   MatType aug_t = arg.at(DYN_T);
   aug_x.push_back(vec(arg.at(DYN_X)));
@@ -784,7 +714,7 @@ std::map<std::string, MatType> Integrator::aug_adj(casadi_int nadj) const {
   aug_rp.push_back(vec(arg.at(DYN_RP)));
 
   // Get output expressions
-  std::vector<MatType> res = aug_oracle_(arg);
+  std::vector<MatType> res = aug_oracle(arg);
   std::vector<MatType> aug_ode, aug_alg, aug_quad, aug_rode, aug_ralg, aug_rquad, aug_uquad;
   aug_ode.push_back(vec(res.at(DYN_ODE)));
   aug_alg.push_back(vec(res.at(DYN_ALG)));
@@ -801,31 +731,38 @@ std::map<std::string, MatType> Integrator::aug_adj(casadi_int nadj) const {
   std::vector<std::vector<MatType>> seed(nadj, std::vector<MatType>(DYN_NUM_OUT));
   for (casadi_int d=0; d<nadj; ++d) {
     std::string pref = "aug" + str(d) + "_";
-    aug_rx.push_back(vec(seed[d][DYN_ODE] = MatType::sym(pref + "ode", x())));
-    aug_rz.push_back(vec(seed[d][DYN_ALG] = MatType::sym(pref + "alg", z())));
-    aug_rp.push_back(vec(seed[d][DYN_QUAD] = MatType::sym(pref + "quad", q())));
-    aug_x.push_back(vec(seed[d][DYN_RODE] = MatType::sym(pref + "rode", rx())));
-    aug_z.push_back(vec(seed[d][DYN_RALG] = MatType::sym(pref + "ralg", rz())));
-    aug_p.push_back(vec(seed[d][DYN_RQUAD] = MatType::sym(pref + "rquad", rq())));
-    aug_u.push_back(vec(seed[d][DYN_UQUAD] = MatType::sym(pref + "uquad", uq())));
+    seed[d][DYN_ODE] = MatType::sym(pref + "ode", aug_oracle.sparsity_out(DYN_ODE));
+    seed[d][DYN_ALG] = MatType::sym(pref + "alg", aug_oracle.sparsity_out(DYN_ALG));
+    seed[d][DYN_QUAD] = MatType::sym(pref + "quad", aug_oracle.sparsity_out(DYN_QUAD));
+    seed[d][DYN_RODE] = MatType::sym(pref + "rode", aug_oracle.sparsity_out(DYN_RODE));
+    seed[d][DYN_RALG] = MatType::sym(pref + "ralg", aug_oracle.sparsity_out(DYN_RALG));
+    seed[d][DYN_RQUAD] = MatType::sym(pref + "rquad", aug_oracle.sparsity_out(DYN_RQUAD));
+    seed[d][DYN_UQUAD] = MatType::sym(pref + "uquad", aug_oracle.sparsity_out(DYN_UQUAD));
+    aug_rx.push_back(vec(seed[d][DYN_ODE]));
+    aug_rz.push_back(vec(seed[d][DYN_ALG]));
+    aug_rp.push_back(vec(seed[d][DYN_QUAD]));
+    aug_x.push_back(vec(seed[d][DYN_RODE]));
+    aug_z.push_back(vec(seed[d][DYN_RALG]));
+    aug_p.push_back(vec(seed[d][DYN_RQUAD]));
+    aug_u.push_back(vec(seed[d][DYN_UQUAD]));
   }
 
   // Calculate directional derivatives
   std::vector<std::vector<MatType>> sens;
-  bool always_inline = aug_oracle_.is_a("SXFunction") || aug_oracle_.is_a("MXFunction");
-  aug_oracle_->call_reverse(arg, res, seed, sens, always_inline, false);
+  bool always_inline = aug_oracle.is_a("SXFunction") || aug_oracle.is_a("MXFunction");
+  aug_oracle->call_reverse(arg, res, seed, sens, always_inline, false);
 
   // Collect sensitivity equations
   casadi_assert_dev(sens.size()==nadj);
   for (casadi_int d=0; d<nadj; ++d) {
     casadi_assert_dev(sens[d].size()==DYN_NUM_IN);
-    aug_rode.push_back(vec(project(sens[d][DYN_X], x())));
-    aug_ralg.push_back(vec(project(sens[d][DYN_Z], z())));
-    aug_rquad.push_back(vec(project(sens[d][DYN_P], p())));
-    aug_uquad.push_back(vec(project(sens[d][DYN_U], u())));
-    aug_ode.push_back(vec(project(sens[d][DYN_RX], rx())));
-    aug_alg.push_back(vec(project(sens[d][DYN_RZ], rz())));
-    aug_quad.push_back(vec(project(sens[d][DYN_RP], rp())));
+    aug_rode.push_back(vec(project(sens[d][DYN_X], aug_oracle.sparsity_in(DYN_X))));
+    aug_ralg.push_back(vec(project(sens[d][DYN_Z], aug_oracle.sparsity_in(DYN_Z))));
+    aug_rquad.push_back(vec(project(sens[d][DYN_P], aug_oracle.sparsity_in(DYN_P))));
+    aug_uquad.push_back(vec(project(sens[d][DYN_U], aug_oracle.sparsity_in(DYN_U))));
+    aug_ode.push_back(vec(project(sens[d][DYN_RX], aug_oracle.sparsity_in(DYN_RX))));
+    aug_alg.push_back(vec(project(sens[d][DYN_RZ], aug_oracle.sparsity_in(DYN_RZ))));
+    aug_quad.push_back(vec(project(sens[d][DYN_RP], aug_oracle.sparsity_in(DYN_RP))));
   }
 
   // Construct return object

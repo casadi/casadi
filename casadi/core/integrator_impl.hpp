@@ -264,11 +264,6 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
       \identifier{1ma} */
   virtual Dict getDerivativeOptions(bool fwd) const;
 
-  /** \brief Generate a augmented DAE system with \a nfwd forward sensitivities
-
-      \identifier{1mb} */
-  template<typename MatType> std::map<std::string, MatType> aug_fwd(casadi_int nfwd) const;
-
   ///@{
   /** \brief Generate the augmented DAE system */
   template<typename MatType> Function get_augmented_dae(const std::string& name) const;
@@ -294,20 +289,6 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
 
   /// Legacy oracle
   Function aug_oracle_;
-
-  ///@{
-  // Shorthands (old oracle definition)
-  const Sparsity&  x() const { return aug_oracle_.sparsity_in(DYN_X);}
-  const Sparsity&  z() const { return aug_oracle_.sparsity_in(DYN_Z);}
-  const Sparsity&  p() const { return aug_oracle_.sparsity_in(DYN_P);}
-  const Sparsity&  u() const { return aug_oracle_.sparsity_in(DYN_U);}
-  const Sparsity&  q() const { return aug_oracle_.sparsity_out(DYN_QUAD);}
-  const Sparsity& rx() const { return aug_oracle_.sparsity_in(DYN_RX);}
-  const Sparsity& rz() const { return aug_oracle_.sparsity_in(DYN_RZ);}
-  const Sparsity& rp() const { return aug_oracle_.sparsity_in(DYN_RP);}
-  const Sparsity& rq() const { return aug_oracle_.sparsity_out(DYN_RQUAD);}
-  const Sparsity& uq() const { return aug_oracle_.sparsity_out(DYN_UQUAD);}
-  ///@}
 
   ///@{
   // Shorthands
