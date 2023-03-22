@@ -1515,22 +1515,74 @@ Dict Integrator::getDerivativeOptions(bool fwd) const {
   return opts_;
 }
 
+Sparsity Integrator::sp_jac_aug(const Sparsity& J, const Sparsity& J1) const {
+  // Row 1, column 2 in the augmented Jacobian
+  Sparsity J12(J.size1(), ns_ * J.size2());
+  // Row 2, column 1 in the augmented Jacobian
+  Sparsity J21 = vertcat(std::vector<Sparsity>(ns_, J1));
+  // Row 2, column 2 in the augmented Jacobian
+  Sparsity J22 = diagcat(std::vector<Sparsity>(ns_, J));
+  // Form block matrix
+  return blockcat(J, J12, J21, J22);
+}
+
+
 Sparsity Integrator::sp_jac_dae() {
-  // Start with the sparsity pattern of the ODE part
-  Sparsity jac_ode_x = oracle_.jac_sparsity(DYN_ODE, DYN_X);
-
-  // Add diagonal to get interdependencies
-  jac_ode_x = jac_ode_x + Sparsity::diag(nx_);
-
-  // Quick return if no algebraic variables
-  if (nz_==0) return jac_ode_x;
-
+  // Start with the sparsity pattern of the ODE part and add diagonal to get interdependencies
+  Sparsity J = oracle_.jac_sparsity(DYN_ODE, DYN_X) + Sparsity::diag(nx_);
   // Add contribution from algebraic variables and equations
-  Sparsity jac_ode_z = oracle_.jac_sparsity(DYN_ODE, DYN_Z);
-  Sparsity jac_alg_x = oracle_.jac_sparsity(DYN_ALG, DYN_X);
-  Sparsity jac_alg_z = oracle_.jac_sparsity(DYN_ALG, DYN_Z);
-  return blockcat(jac_ode_x, jac_ode_z,
-                  jac_alg_x, jac_alg_z);
+  if (nz1_ > 0) {
+    J = blockcat(J, oracle_.jac_sparsity(DYN_ODE, DYN_Z),
+      oracle_.jac_sparsity(DYN_ALG, DYN_X), oracle_.jac_sparsity(DYN_ALG, DYN_Z));
+  }
+
+  // Save for comparison
+  Sparsity J_old = J;
+
+  // Get the functions
+  const Function& F = get_function("daeF");
+
+  // Sparsity pattern for nonaugmented system
+  Sparsity J_xx = F.jac_sparsity(FDAE_ODE, FDYN_X) + Sparsity::diag(nx1_);
+  Sparsity J_xz = F.jac_sparsity(FDAE_ODE, FDYN_Z);
+  Sparsity J_zx = F.jac_sparsity(FDAE_ALG, FDYN_X);
+  Sparsity J_zz = F.jac_sparsity(FDAE_ALG, FDYN_Z);
+
+  // Augment with sensitivity equations
+  if (ns_ > 0) {
+    const Function& fwd_F = get_function(forward_name("daeF", 1));
+    J_xx = sp_jac_aug(J_xx, fwd_F.jac_sparsity(FDAE_ODE, FDYN_X));
+    J_xz = sp_jac_aug(J_xz, fwd_F.jac_sparsity(FDAE_ODE, FDYN_Z));
+    J_zx = sp_jac_aug(J_zx, fwd_F.jac_sparsity(FDAE_ALG, FDYN_X));
+    J_zz = sp_jac_aug(J_zz, fwd_F.jac_sparsity(FDAE_ALG, FDYN_Z));
+  }
+
+  J = blockcat(J_xx, J_xz, J_zx, J_zz);
+
+  if (J != J_old) {
+    std::stringstream ss;
+    ss << "Mismatching Jacobians in Integrator::sp_jac_dae:\n";
+    ss << "Dimensions: nx1_ = " << nx1_ << ", nz1_ = " << nz1_ << ", ns_ = " << ns_ << std::endl;
+    ss << "Before refactoring J: " << DM::ones(J_old) << std::endl;
+    ss << "After refactoring: " << DM::ones(J) << std::endl;
+    ss << "Blocks:" << std::endl;
+    ss << "J_xx: " << DM::ones(J_xx) << std::endl;
+    ss << "J_xz: " << DM::ones(J_xz) << std::endl;
+    ss << "J_zx: " << DM::ones(J_zx) << std::endl;
+    ss << "J_zz: " << DM::ones(J_zz) << std::endl;
+    ss << "daeF " << F << ":\n";
+    F.disp(ss, true);
+
+    if (ns_ > 0) {
+      const Function& fwd_F = get_function(forward_name("daeF", 1));
+      ss << "Derivative " << fwd_F << ":\n";
+      fwd_F.disp(ss, true);
+    }
+
+    casadi_error(ss.str());
+  }
+
+  return J;
 }
 
 Sparsity Integrator::sp_jac_rdae() {
