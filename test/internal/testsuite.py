@@ -247,7 +247,7 @@ class TestSuite:
 
     alarm(15*60) # 15 mins
     try:
-      stdoutdata, stderrdata = p.communicate(inp)
+      stdoutdata, stderrdata = p.communicate(inp.encode("ascii"))
     except TimeoutEvent:
       killProcess(p.pid)
       raise Exception("Timout.")
