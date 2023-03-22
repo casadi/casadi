@@ -1293,7 +1293,6 @@ Function Integrator::get_forward(casadi_int nfwd, const std::string& name,
   Function aug_dae;
   std::string aug_prefix = "fsens" + str(nfwd) + "_";
   std::string dae_name = aug_prefix + oracle_.name();
-  Dict dae_opts = {{"derivative_of", oracle_}};
   if (oracle_.is_a("SXFunction")) {
     aug_dae = map2oracle(dae_name, aug_fwd<SX>(nfwd));
   } else {
