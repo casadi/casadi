@@ -121,13 +121,13 @@ auto PANTRSolver<DirectionProviderT>::operator()(
     };
     [[maybe_unused]] auto print_progress =
         [&](unsigned k, real_t φγ, real_t ψ, crvec grad_ψ, real_t pᵀp, crvec q,
-            real_t γ, real_t ε, real_t δ, real_t ρ) {
+            real_t γ, real_t ε, real_t Δ, real_t ρ) {
             *os << "[PANTR] " << std::setw(6) << k
                 << ": φγ = " << print_real(φγ) << ", ψ = " << print_real(ψ)
                 << ", ‖∇ψ‖ = " << print_real(grad_ψ.norm())
                 << ", ‖p‖ = " << print_real(std::sqrt(pᵀp))
                 << ", γ = " << print_real(γ) << ", ε = " << print_real(ε)
-                << ", δ = " << print_real3(δ);
+                << ", Δ = " << print_real3(Δ);
             if (k > 0)
                 *os << ", ρ = " << print_real3(ρ)
                     << ", ‖q‖ = " << print_real(q.norm());
@@ -135,7 +135,7 @@ auto PANTRSolver<DirectionProviderT>::operator()(
         };
 
     auto print_progress_1 = [&](unsigned k, real_t φₖ, real_t ψₖ, crvec grad_ψₖ,
-                                real_t pₖᵀpₖ, real_t γₖ, real_t εₖ, real_t δₖ) {
+                                real_t pₖᵀpₖ, real_t γₖ, real_t εₖ, real_t Δₖ) {
         if (k == 0)
             *os << "┌─[PANTR]\n";
         else
@@ -145,7 +145,7 @@ auto PANTRSolver<DirectionProviderT>::operator()(
             << ", ‖∇ψ‖ = " << print_real(grad_ψₖ.norm())   //
             << ",  ‖p‖ = " << print_real(std::sqrt(pₖᵀpₖ)) //
             << ",    γ = " << print_real(γₖ)               //
-            << ",    δ = " << print_real(δₖ)               //
+            << ",    Δ = " << print_real(Δₖ)               //
             << ",    ε = " << print_real(εₖ) << '\n';
     };
     auto print_progress_2 = [&](crvec qₖ, real_t ρₖ, bool accept,
@@ -205,9 +205,10 @@ auto PANTRSolver<DirectionProviderT>::operator()(
     // Keep track of how many successive iterations didn't update the iterate
     unsigned no_progress = 0;
     // Trust radius
-    real_t δ = params.Δ_0;
-    if (!std::isfinite(δ) || δ == 0)
-        δ = real_t(0.1) * curr->grad_ψ.norm();
+    real_t Δ = params.Δ_0;
+    if (!std::isfinite(Δ) || Δ == 0)
+        Δ = real_t(0.1) * curr->grad_ψ.norm();
+    Δ = std::fmax(Δ, params.Δ_min);
     // Reduction ratio
     real_t ρ = NaN<config_t>;
 
@@ -234,7 +235,7 @@ auto PANTRSolver<DirectionProviderT>::operator()(
             params.print_interval != 0 && k % params.print_interval == 0;
         if (do_print)
             print_progress_1(k, curr->fbe(), curr->ψx, curr->grad_ψ, curr->pᵀp,
-                             curr->γ, εₖ, δ);
+                             curr->γ, εₖ, Δ);
         if (progress_cb) {
             ScopedMallocAllower ma;
             progress_cb({.k          = k,
@@ -250,7 +251,7 @@ auto PANTRSolver<DirectionProviderT>::operator()(
                          .q          = q,
                          .L          = curr->L,
                          .γ          = curr->γ,
-                         .Δ          = δ,
+                         .Δ          = Δ,
                          .ρ          = ρ,
                          .ε          = εₖ,
                          .Σ          = Σ,
@@ -268,7 +269,7 @@ auto PANTRSolver<DirectionProviderT>::operator()(
             bool do_final_print = params.print_interval != 0;
             if (!do_print && do_final_print)
                 print_progress_1(k, curr->fbe(), curr->ψx, curr->grad_ψ,
-                                 curr->pᵀp, curr->γ, εₖ, δ);
+                                 curr->pᵀp, curr->γ, εₖ, Δ);
             if (do_print || do_final_print)
                 print_progress_n(stop_status);
             // Overwrite output arguments
@@ -348,23 +349,23 @@ auto PANTRSolver<DirectionProviderT>::operator()(
         };
 
         // update trust radius accordingly
-        auto compute_updated_radius = [this](crvec q, real_t ρ, real_t old_δ) {
+        auto compute_updated_radius = [this](crvec q, real_t ρ, real_t old_Δ) {
             // Very successful TR step
             if (ρ >= params.μ2)
-                return std::max(params.c3 * q.norm(), old_δ);
+                return std::max(params.c3 * q.norm(), old_Δ);
             // Successful TR step
             else if (ρ >= params.μ1)
-                return old_δ * params.c2;
+                return old_Δ * params.c2;
             // Unsuccessful TR step
             else
                 return params.c1 * q.norm();
         };
 
         // Compute trust region direction from x̂ₖ
-        auto compute_trust_region_step = [&](rvec q, real_t δ) {
+        auto compute_trust_region_step = [&](rvec q, real_t Δ) {
             auto t0 = std::chrono::steady_clock::now();
             real_t q_model = direction.apply(prox->γ, prox->x, prox->x̂, prox->p,
-                                             prox->grad_ψ, δ, q);
+                                             prox->grad_ψ, Δ, q);
             auto t1            = std::chrono::steady_clock::now();
             direction_duration = t1 - t0;
 
@@ -388,11 +389,11 @@ auto PANTRSolver<DirectionProviderT>::operator()(
         accept_candidate           = false;
         bool accelerated_iteration = k > 0 || direction.has_initial_direction();
         if (accelerated_iteration && !params.disable_acceleration) {
-            if (auto q_model = compute_trust_region_step(q, δ); q_model < 0) {
+            if (auto q_model = compute_trust_region_step(q, Δ); q_model < 0) {
                 compute_candidate_fbe(q);
                 ρ                = compute_candidate_ratio(q_model);
                 accept_candidate = ρ >= params.μ1;
-                δ                = compute_updated_radius(q, ρ, δ);
+                Δ = std::fmax(compute_updated_radius(q, ρ, Δ), params.Δ_min);
             }
         }
 
