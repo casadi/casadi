@@ -45,15 +45,28 @@ struct StructuredLBFGSDirectionParams {
 template <Config Conf = DefaultConfig>
 struct StructuredLBFGSDirection {
     USING_ALPAQA_CONFIG(Conf);
-    using Problem     = TypeErasedProblem<config_t>;
-    using LBFGS       = alpaqa::LBFGS<config_t>;
-    using LBFGSParams = typename LBFGS::Params;
+    using Problem           = TypeErasedProblem<config_t>;
+    using LBFGS             = alpaqa::LBFGS<config_t>;
+    using AcceleratorParams = typename LBFGS::Params;
+    using DirectionParams   = StructuredLBFGSDirectionParams<config_t>;
 
-    using DirectionParams = StructuredLBFGSDirectionParams<config_t>;
+    struct Params {
+        AcceleratorParams accelerator;
+        DirectionParams direction;
+    };
 
-    StructuredLBFGSDirection(const typename LBFGS::Params &params    = {},
-                             const DirectionParams &direction_params = {})
-        : lbfgs(params), direction_params(direction_params) {}
+    StructuredLBFGSDirection() = default;
+    StructuredLBFGSDirection(const Params &params)
+        : lbfgs(params.accelerator), direction_params(params.direction) {}
+    StructuredLBFGSDirection(const typename LBFGS::Params &params,
+                             const DirectionParams &directionparams = {})
+        : lbfgs(params), direction_params(directionparams) {}
+    StructuredLBFGSDirection(const LBFGS &lbfgs,
+                             const DirectionParams &directionparams = {})
+        : lbfgs(lbfgs), direction_params(directionparams) {}
+    StructuredLBFGSDirection(LBFGS &&lbfgs,
+                             const DirectionParams &directionparams = {})
+        : lbfgs(std::move(lbfgs)), direction_params(directionparams) {}
 
     /// @see @ref PANOCDirection::initialize
     void initialize(const Problem &problem, crvec y, crvec Σ, real_t γ_0,

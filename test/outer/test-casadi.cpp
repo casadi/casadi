@@ -18,8 +18,8 @@ TEST(ALM, casadi) {
     problem.D.lowerbound = vec::Constant(1, 0.);
 
     // Define the solvers to use
-    using Accelerator = alpaqa::LBFGSDirection<config_t>;
-    using InnerSolver = alpaqa::PANOCSolver<Accelerator>;
+    using Direction   = alpaqa::LBFGSDirection<config_t>;
+    using InnerSolver = alpaqa::PANOCSolver<Direction>;
     using OuterSolver = alpaqa::ALMSolver<InnerSolver>;
 
     // Settings for the outer augmented Lagrangian method
@@ -35,7 +35,7 @@ TEST(ALM, casadi) {
     panocparam.max_iter       = 500;
     panocparam.print_interval = 10;
     // Settings for the L-BFGS algorithm used by PANOC
-    Accelerator::LBFGSParams lbfgsparam;
+    Direction::AcceleratorParams lbfgsparam;
     lbfgsparam.memory = 10;
 
     // Create an ALM solver using PANOC as inner solver

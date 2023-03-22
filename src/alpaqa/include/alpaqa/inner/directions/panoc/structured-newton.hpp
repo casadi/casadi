@@ -20,12 +20,8 @@ namespace alpaqa {
 
 /// Parameters for the @ref StructuredNewtonDirection class.
 template <Config Conf>
-struct StructuredNewtonDirectionParams {
+struct StructuredNewtonRegularizationParams {
     USING_ALPAQA_CONFIG(Conf);
-    /// Set this option to true to include the Hessian-vector product
-    /// @f$ \nabla^2_{x_\mathcal{J}x_\mathcal{K}}\psi(x) q_\mathcal{K} @f$ from
-    /// equation 12b in @cite pas2022alpaqa, false to leave out that term.
-    bool hessian_vec = true;
     /// Minimum eigenvalue of the Hessian, scaled by
     /// @f$ 1 + |\lambda_\mathrm{max}| @f$, enforced by regularization using
     /// a multiple of identity.
@@ -34,15 +30,38 @@ struct StructuredNewtonDirectionParams {
     bool print_eig = false;
 };
 
+/// Parameters for the @ref StructuredNewtonDirection class.
+template <Config Conf>
+struct StructuredNewtonDirectionParams {
+    USING_ALPAQA_CONFIG(Conf);
+    /// Set this option to true to include the Hessian-vector product
+    /// @f$ \nabla^2_{x_\mathcal{J}x_\mathcal{K}}\psi(x) q_\mathcal{K} @f$ from
+    /// equation 12b in @cite pas2022alpaqa, false to leave out that term.
+    bool hessian_vec = true;
+};
+
 /// @ingroup grp_DirectionProviders
 template <Config Conf = DefaultConfig>
 struct StructuredNewtonDirection {
     USING_ALPAQA_CONFIG(Conf);
-    using Problem         = TypeErasedProblem<config_t>;
-    using DirectionParams = StructuredNewtonDirectionParams<config_t>;
+    using Problem           = TypeErasedProblem<config_t>;
+    using DirectionParams   = StructuredNewtonDirectionParams<config_t>;
+    using AcceleratorParams = StructuredNewtonRegularizationParams<config_t>;
 
     StructuredNewtonDirection(const DirectionParams &direction_params = {})
         : direction_params(direction_params) {}
+
+    struct Params {
+        AcceleratorParams accelerator;
+        DirectionParams direction;
+    };
+
+    StructuredNewtonDirection() = default;
+    StructuredNewtonDirection(const Params &params)
+        : reg_params(params.accelerator), direction_params(params.direction) {}
+    StructuredNewtonDirection(const AcceleratorParams &params,
+                              const DirectionParams &directionparams = {})
+        : reg_params(params), direction_params(directionparams) {}
 
     /// @see @ref PANOCDirection::initialize
     void initialize(const Problem &problem, crvec y, crvec Σ,
@@ -132,11 +151,11 @@ struct StructuredNewtonDirection {
             auto λ_min = eig.eigenvalues().minCoeff(),
                  λ_max = eig.eigenvalues().maxCoeff();
 
-            if (direction_params.print_eig)
+            if (reg_params.print_eig)
                 std::cout << "λ(H):    " << float_to_str(λ_min, 3) << ", "
                           << float_to_str(λ_max, 3) << std::endl;
             // Regularization
-            real_t ε = direction_params.min_eig * (1 + std::abs(λ_max)); // TODO
+            real_t ε = reg_params.min_eig * (1 + std::abs(λ_max)); // TODO
             // Solve the system
             qₖ = eig.eigenvectors().transpose() * qₖ;
             qₖ = eig.eigenvalues().cwiseMax(ε).asDiagonal().inverse() * qₖ;
@@ -169,11 +188,11 @@ struct StructuredNewtonDirection {
         auto λ_min = eig.eigenvalues().minCoeff(),
              λ_max = eig.eigenvalues().maxCoeff();
 
-        if (direction_params.print_eig)
+        if (reg_params.print_eig)
             std::cout << "λ(H_JJ): " << float_to_str(λ_min, 3) << ", "
                       << float_to_str(λ_max, 3) << std::endl;
         // Regularization
-        real_t ε = direction_params.min_eig * (1 + std::abs(λ_max)); // TODO
+        real_t ε = reg_params.min_eig * (1 + std::abs(λ_max)); // TODO
         // Solve the system
         auto qJ = H.col(0).topRows(nJ);
         qJ      = qₖ(J);
@@ -214,6 +233,7 @@ struct StructuredNewtonDirection {
     mutable indexvec inner_idx_H, outer_ptr_H;
 
   public:
+    AcceleratorParams reg_params;
     DirectionParams direction_params;
 };
 

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <alpaqa/accelerators/lbfgs.hpp>
 #include <alpaqa/accelerators/steihaugcg.hpp>
 #include <alpaqa/inner/directions/panoc-direction-update.hpp>
 #include <alpaqa/problem/type-erased-problem.hpp>
@@ -25,13 +24,21 @@ template <Config Conf>
 struct NewtonTRDirection {
     USING_ALPAQA_CONFIG(Conf);
 
-    using Problem         = TypeErasedProblem<config_t>;
-    using DirectionParams = NewtonTRDirectionParams<config_t>;
+    using Problem           = TypeErasedProblem<config_t>;
+    using AcceleratorParams = SteihaugCGParams<config_t>;
+    using DirectionParams   = NewtonTRDirectionParams<config_t>;
+
+    struct Params {
+        AcceleratorParams accelerator;
+        DirectionParams direction;
+    };
 
     NewtonTRDirection() = default;
-    NewtonTRDirection(const SteihaugCGParams<config_t> &steihaug_params,
+    NewtonTRDirection(const Params &params)
+        : steihaug(params.accelerator), direction_params(params.direction) {}
+    NewtonTRDirection(const AcceleratorParams &params,
                       const DirectionParams &directionparams = {})
-        : steihaug(steihaug_params), direction_params(directionparams) {}
+        : steihaug(params), direction_params(directionparams) {}
 
     /// @see @ref PANNewtonTRDirection::initialize
     void initialize(const Problem &problem, [[maybe_unused]] crvec y,

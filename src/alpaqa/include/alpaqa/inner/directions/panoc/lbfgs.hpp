@@ -17,18 +17,21 @@ template <Config Conf>
 struct LBFGSDirection {
     USING_ALPAQA_CONFIG(Conf);
 
-    using Problem     = TypeErasedProblem<config_t>;
-    using LBFGS       = alpaqa::LBFGS<config_t>;
-    using LBFGSParams = typename LBFGS::Params;
+    using Problem           = TypeErasedProblem<config_t>;
+    using LBFGS             = alpaqa::LBFGS<config_t>;
+    using AcceleratorParams = typename LBFGS::Params;
+    using DirectionParams   = LBFGSDirectionParams<config_t>;
 
     LBFGS lbfgs;
 
-    using DirectionParams = LBFGSDirectionParams<config_t>;
-    struct Params : LBFGS::Params, DirectionParams {};
+    struct Params {
+        AcceleratorParams accelerator;
+        DirectionParams direction;
+    };
 
     LBFGSDirection() = default;
     LBFGSDirection(const Params &params)
-        : lbfgs(params), direction_params(params) {}
+        : lbfgs(params.accelerator), direction_params(params.direction) {}
     LBFGSDirection(const typename LBFGS::Params &params,
                    const DirectionParams &directionparams = {})
         : lbfgs(params), direction_params(directionparams) {}

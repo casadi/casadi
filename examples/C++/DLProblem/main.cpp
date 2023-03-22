@@ -33,8 +33,8 @@ int main(int argc, char *argv[]) {
     problem.D.upperbound = b;
 
     // Define the solvers to use
-    using Accelerator = alpaqa::StructuredLBFGSDirection<config_t>;
-    using InnerSolver = alpaqa::PANOCSolver<Accelerator>;
+    using Direction   = alpaqa::StructuredLBFGSDirection<config_t>;
+    using InnerSolver = alpaqa::PANOCSolver<Direction>;
     using OuterSolver = alpaqa::ALMSolver<InnerSolver>;
 
     // Settings for the outer augmented Lagrangian method
@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
     panocparam.max_iter       = 500;
     panocparam.print_interval = 10;
     // Settings for the L-BFGS algorithm used by PANOC
-    Accelerator::LBFGSParams lbfgsparam;
+    Direction::AcceleratorParams lbfgsparam;
     lbfgsparam.memory = 2;
 
     // Create an ALM solver using PANOC as inner solver

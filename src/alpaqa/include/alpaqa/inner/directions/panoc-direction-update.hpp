@@ -5,6 +5,9 @@
 
 namespace alpaqa {
 
+/// This class outlines the interface for direction providers used by PANOC-like
+/// algorithms.
+///
 /// @ingroup grp_DirectionProviders
 template <Config Conf>
 struct PANOCDirection {

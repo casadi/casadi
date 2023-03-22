@@ -17,18 +17,21 @@ template <Config Conf>
 struct AndersonDirection {
     USING_ALPAQA_CONFIG(Conf);
 
-    using Problem             = TypeErasedProblem<config_t>;
-    using AndersonAccel       = alpaqa::AndersonAccel<config_t>;
-    using AndersonAccelParams = typename AndersonAccel::Params;
+    using Problem           = TypeErasedProblem<config_t>;
+    using AndersonAccel     = alpaqa::AndersonAccel<config_t>;
+    using AcceleratorParams = typename AndersonAccel::Params;
+    using DirectionParams   = AndersonDirectionParams<config_t>;
 
     mutable AndersonAccel anderson;
 
-    using DirectionParams = AndersonDirectionParams<config_t>;
-    struct Params : AndersonAccel::Params, DirectionParams {};
+    struct Params {
+        AcceleratorParams accelerator;
+        DirectionParams direction;
+    };
 
     AndersonDirection() = default;
     AndersonDirection(const Params &params)
-        : anderson(params), direction_params(params) {}
+        : anderson(params.accelerator), direction_params(params.direction) {}
     AndersonDirection(const typename AndersonAccel::Params &params,
                       const DirectionParams &directionparams = {})
         : anderson(params), direction_params(directionparams) {}
