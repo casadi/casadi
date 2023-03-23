@@ -590,8 +590,8 @@ void Integrator::init(const Dict& opts) {
 
   // Create problem functions, backward problem
   if (nrx1_ > 0) {
-    create_function("daeB", bdyn_in(), bdae_out());
-    create_function("quadB", bdyn_in(), bquad_out());
+    create_function(rdae_, "daeB", bdyn_in(), bdae_out());
+    create_function(rdae_, "quadB", bdyn_in(), bquad_out());
     if (nfwd_ > 0) {
       // one direction to conserve memory, symbolic processing time
       create_forward("daeB", 1);
