@@ -223,7 +223,10 @@ if (ALPAQA_WITH_LBFGSB)
         "thirdparty/lbfgsb/Lbfgsb.3.0/linpack.f"
     )
     list(APPEND ALPAQA_INSTALL_TARGETS lbfgsb-fortran)
-    add_library(lbfgsb-adapter "interop/lbfgsb/src/lbfgsb-adapter.cpp")
+    add_library(lbfgsb-adapter
+        "interop/lbfgsb/src/lbfgsb-adapter.cpp"
+        "interop/lbfgsb/src/lbfgsb-params.cpp"
+    )
     target_link_libraries(lbfgsb-adapter 
         PUBLIC lbfgsb-fortran alpaqa::alpaqa PRIVATE alpaqa::warnings)
     target_include_directories(lbfgsb-adapter PUBLIC
