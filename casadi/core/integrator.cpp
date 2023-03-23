@@ -673,23 +673,15 @@ std::map<std::string, MatType> Integrator::aug_adj(const Function& aug_oracle,
   // Symbolic expression for augmented DAE
   std::vector<std::vector<MatType>> aug_in(DYN_NUM_IN);
   for (casadi_int i = 0; i < DYN_NUM_IN; ++i) aug_in[i].push_back(arg.at(i));
-
-  // Get output expressions
-  std::vector<MatType> aug_ode, aug_alg, aug_quad, aug_rode, aug_ralg, aug_rquad, aug_uquad;
-  aug_ode.push_back(vec(res.at(DYN_ODE)));
-  aug_alg.push_back(vec(res.at(DYN_ALG)));
-  aug_quad.push_back(vec(res.at(DYN_QUAD)));
-  aug_rode.push_back(vec(res.at(DYN_RODE)));
-  aug_ralg.push_back(vec(res.at(DYN_RALG)));
-  aug_rquad.push_back(vec(res.at(DYN_RQUAD)));
-  aug_uquad.push_back(vec(res.at(DYN_UQUAD)));
+  std::vector<std::vector<MatType>> aug_out(DYN_NUM_OUT);
+  for (casadi_int i = 0; i < DYN_NUM_OUT; ++i) aug_out[i].push_back(res.at(i));
 
   // Zero of time dimension
   MatType zero_t = MatType::zeros(aug_oracle.sparsity_in(DYN_T));
 
   // Reverse mode directional derivatives
   std::vector<std::vector<MatType>> seed(nadj, std::vector<MatType>(DYN_NUM_OUT));
-  for (casadi_int d=0; d<nadj; ++d) {
+  for (casadi_int d = 0; d < nadj; ++d) {
     std::string pref = "aug" + str(d) + "_";
     for (casadi_int i = 0; i < DYN_NUM_OUT; ++i) {
       seed[d][i] = MatType::sym(pref + dyn_out(i), aug_oracle.sparsity_out(i));
@@ -710,44 +702,38 @@ std::map<std::string, MatType> Integrator::aug_adj(const Function& aug_oracle,
 
   // Collect sensitivity equations
   casadi_assert_dev(sens.size()==nadj);
-  for (casadi_int d=0; d<nadj; ++d) {
-    casadi_assert_dev(sens[d].size()==DYN_NUM_IN);
-    aug_rode.push_back(vec(project(sens[d][DYN_X], aug_oracle.sparsity_in(DYN_X))));
-    aug_ralg.push_back(vec(project(sens[d][DYN_Z], aug_oracle.sparsity_in(DYN_Z))));
-    aug_rquad.push_back(vec(project(sens[d][DYN_P], aug_oracle.sparsity_in(DYN_P))));
-    aug_uquad.push_back(vec(project(sens[d][DYN_U], aug_oracle.sparsity_in(DYN_U))));
-    aug_ode.push_back(vec(project(sens[d][DYN_RX], aug_oracle.sparsity_in(DYN_RX))));
-    aug_alg.push_back(vec(project(sens[d][DYN_RZ], aug_oracle.sparsity_in(DYN_RZ))));
-    aug_quad.push_back(vec(project(sens[d][DYN_RP], aug_oracle.sparsity_in(DYN_RP))));
+  for (casadi_int d = 0; d < nadj; ++d) {
+    casadi_assert_dev(sens[d].size() == DYN_NUM_IN);
+    aug_out[DYN_RODE].push_back(project(sens[d][DYN_X], aug_oracle.sparsity_in(DYN_X)));
+    aug_out[DYN_RALG].push_back(project(sens[d][DYN_Z], aug_oracle.sparsity_in(DYN_Z)));
+    aug_out[DYN_RQUAD].push_back(project(sens[d][DYN_P], aug_oracle.sparsity_in(DYN_P)));
+    aug_out[DYN_UQUAD].push_back(project(sens[d][DYN_U], aug_oracle.sparsity_in(DYN_U)));
+    aug_out[DYN_ODE].push_back(project(sens[d][DYN_RX], aug_oracle.sparsity_in(DYN_RX)));
+    aug_out[DYN_ALG].push_back(project(sens[d][DYN_RZ], aug_oracle.sparsity_in(DYN_RZ)));
+    aug_out[DYN_QUAD].push_back(project(sens[d][DYN_RP], aug_oracle.sparsity_in(DYN_RP)));
   }
 
-  // Construct return object
-  std::map<std::string, MatType> ret;
-  for (casadi_int i = 0; i < DYN_NUM_IN; ++i) ret[dyn_in(i)] = vertcat(aug_in[i]);
-  ret["ode"] = vertcat(aug_ode);
-  ret["alg"] = vertcat(aug_alg);
-  ret["quad"] = vertcat(aug_quad);
-  ret["rode"] = vertcat(aug_rode);
-  ret["ralg"] = vertcat(aug_ralg);
-  ret["rquad"] = vertcat(aug_rquad);
-  ret["uquad"] = vertcat(aug_uquad);
+  // Construct return expressions
+  std::map<std::string, MatType> r;
+  for (casadi_int i = 0; i < DYN_NUM_IN; ++i) r[dyn_in(i)] = vertcat(aug_in[i]);
+  for (casadi_int i = 0; i < DYN_NUM_OUT; ++i) r[dyn_out(i)] = vertcat(aug_out[i]);
 
   // Make sure that forward problem does not depend on backward states
-  Function f("f", {ret["t"], ret["x"], ret["z"], ret["p"], ret["u"]},
-                  {ret["ode"], ret["alg"], ret["quad"]}, {{"allow_free", true}});
+  Function f("f", {r["t"], r["x"], r["z"], r["p"], r["u"]},
+                  {r["ode"], r["alg"], r["quad"]}, {{"allow_free", true}});
   if (f.has_free()) {
     // Replace dependencies of rx, rz and rp with zeros
-    f = Function("f", {ret["t"], ret["x"], ret["z"], ret["p"], ret["u"],
-                        ret["rx"], ret["rz"], ret["rp"]},
-                      {ret["ode"], ret["alg"], ret["quad"]});
-    std::vector<MatType> v = {ret["t"], ret["x"], ret["z"], ret["p"], ret["u"], 0, 0, 0};
+    f = Function("f", {r["t"], r["x"], r["z"], r["p"], r["u"],
+                        r["rx"], r["rz"], r["rp"]},
+                      {r["ode"], r["alg"], r["quad"]});
+    std::vector<MatType> v = {r["t"], r["x"], r["z"], r["p"], r["u"], 0, 0, 0};
     v = f(v);
-    ret["ode"] = v.at(0);
-    ret["alg"] = v.at(1);
-    ret["quad"] = v.at(2);
+    r["ode"] = v.at(0);
+    r["alg"] = v.at(1);
+    r["quad"] = v.at(2);
   }
 
-  return ret;
+  return r;
 }
 
 int Integrator::fdae_sp_forward(SpForwardMem* m, const bvec_t* x,
