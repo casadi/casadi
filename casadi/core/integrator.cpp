@@ -530,42 +530,23 @@ void Integrator::init(const Dict& opts) {
       + dyn_out(i) + " is sparse.");
   }
 
-  // Get dimensions (excluding sensitivity equations)
+  // Get dimensions (excluding sensitivity equations), forward problem
   nx1_ = oracle_.numel_in(DYN_X);
   nz1_ = oracle_.numel_in(DYN_Z);
   nq1_ = oracle_.numel_out(DYN_QUAD);
   np1_ = oracle_.numel_in(DYN_P);
   nu1_ = oracle_.numel_in(DYN_U);
-  nrx1_ = oracle_.numel_in(DYN_RX);
-  nrz1_ = oracle_.numel_in(DYN_RZ);
-  nrp1_ = oracle_.numel_in(DYN_RP);
-  nrq1_ = oracle_.numel_out(DYN_RQUAD);
-  nuq1_ = oracle_.numel_out(DYN_UQUAD);
 
-  // Get/check dimensions in backwards DAE
+  // Get dimensions (excluding sensitivity equations), backward problem
   if (rdae_.is_null()) {
-    casadi_assert_dev(nrx1_ == 0);
+    nrx1_ = nrz1_ = nrp1_ = nrq1_ = nuq1_ = 0;
   } else {
-    casadi_assert_dev(nrx1_ > 0);
-    casadi_assert(nx1_ == rdae_.numel_in(BDYN_X), "Dimension mismatch");
-    casadi_assert(nz1_ == rdae_.numel_in(BDYN_Z), "Dimension mismatch");
-    casadi_assert(np1_ == rdae_.numel_in(BDYN_P), "Dimension mismatch");
-    casadi_assert(nu1_ == rdae_.numel_in(BDYN_U), "Dimension mismatch");
-    casadi_assert(nrx1_ == rdae_.numel_in(BDYN_RX), "Dimension mismatch");
-    casadi_assert(nrz1_ == rdae_.numel_in(BDYN_RZ), "Dimension mismatch");
-    casadi_assert(nrp1_ == rdae_.numel_in(BDYN_RP), "Dimension mismatch");
-    casadi_assert(oracle_.numel_out(DYN_RODE) == rdae_.numel_out(BDYN_RODE), "Dimension mismatch");
-    casadi_assert(oracle_.numel_out(DYN_RALG) == rdae_.numel_out(BDYN_RALG), "Dimension mismatch");
-    casadi_assert(nrq1_ == rdae_.numel_out(BDYN_RQUAD), "Dimension mismatch");
-    casadi_assert(nuq1_ == rdae_.numel_out(BDYN_UQUAD), "Dimension mismatch");
+    nrx1_ = rdae_.numel_in(BDYN_RX);
+    nrz1_ = rdae_.numel_in(BDYN_RZ);
+    nrp1_ = rdae_.numel_in(BDYN_RP);
+    nrq1_ = rdae_.numel_out(BDYN_RQUAD);
+    nuq1_ = rdae_.numel_out(BDYN_UQUAD);
   }
-
-  // Consistency checks
-  casadi_assert(nx1_ > 0, "Ill-posed ODE - no state");
-  casadi_assert(nx1_ == oracle_.numel_out(DYN_ODE), "Dimension mismatch for 'ode'");
-  casadi_assert(nz1_ == oracle_.numel_out(DYN_ALG), "Dimension mismatch for 'alg'");
-  casadi_assert(nrx1_ == oracle_.numel_out(DYN_RODE), "Dimension mismatch for 'rode'");
-  casadi_assert(nrz1_ == oracle_.numel_out(DYN_RALG), "Dimension mismatch for 'ralg'");
 
   // Get dimensions (including sensitivity equations)
   nx_ = nx1_ * (1 + nfwd_);
@@ -578,6 +559,20 @@ void Integrator::init(const Dict& opts) {
   nrp_ = nrp1_ * (1 + nfwd_);
   nrq_ = nrq1_ * (1 + nfwd_);
   nuq_ = nuq1_ * (1 + nfwd_);
+
+  // Consistency checks
+  casadi_assert(nx1_ > 0, "Ill-posed ODE - no state");
+  casadi_assert(nx1_ == oracle_.numel_out(DYN_ODE), "Dimension mismatch for 'ode'");
+  casadi_assert(nz1_ == oracle_.numel_out(DYN_ALG), "Dimension mismatch for 'alg'");
+  if (!rdae_.is_null()) {
+    casadi_assert_dev(nrx1_ > 0);
+    casadi_assert(nx1_ == rdae_.numel_in(BDYN_X), "Dimension mismatch");
+    casadi_assert(nz1_ == rdae_.numel_in(BDYN_Z), "Dimension mismatch");
+    casadi_assert(np1_ == rdae_.numel_in(BDYN_P), "Dimension mismatch");
+    casadi_assert(nu1_ == rdae_.numel_in(BDYN_U), "Dimension mismatch");
+    casadi_assert(nrq1_ == rdae_.numel_out(BDYN_RQUAD), "Dimension mismatch");
+    casadi_assert(nuq1_ == rdae_.numel_out(BDYN_UQUAD), "Dimension mismatch");
+  }
 
   // Create problem functions, forward problem
   create_function("daeF", fdyn_in(), fdae_out());
