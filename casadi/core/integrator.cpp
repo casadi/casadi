@@ -607,7 +607,7 @@ template<typename MatType>
 Function Integrator::get_augmented_dae(const std::string& name) const {
   if (verbose_) casadi_message(name_ + "::get_augmented_dae");
 
-  // Get input and expressions
+  // Get input and output expressions
   std::vector<MatType> arg = MatType::get_input(oracle_);
   std::vector<MatType> res = oracle_(arg);
 
@@ -666,20 +666,15 @@ std::map<std::string, MatType> Integrator::aug_adj(const Function& aug_oracle,
     casadi_int nadj) const {
   if (verbose_) casadi_message(name_ + "::aug_adj");
 
-  // Get input expressions
+  // Get input and output expressions
   std::vector<MatType> arg = MatType::get_input(aug_oracle);
-  std::vector<MatType> aug_x, aug_z, aug_p, aug_u, aug_rx, aug_rz, aug_rp;
-  MatType aug_t = arg.at(DYN_T);
-  aug_x.push_back(vec(arg.at(DYN_X)));
-  aug_z.push_back(vec(arg.at(DYN_Z)));
-  aug_p.push_back(vec(arg.at(DYN_P)));
-  aug_u.push_back(vec(arg.at(DYN_U)));
-  aug_rx.push_back(vec(arg.at(DYN_RX)));
-  aug_rz.push_back(vec(arg.at(DYN_RZ)));
-  aug_rp.push_back(vec(arg.at(DYN_RP)));
+  std::vector<MatType> res = aug_oracle(arg);
+
+  // Symbolic expression for augmented DAE
+  std::vector<std::vector<MatType>> aug_in(DYN_NUM_IN);
+  for (casadi_int i = 0; i < DYN_NUM_IN; ++i) aug_in[i].push_back(arg.at(i));
 
   // Get output expressions
-  std::vector<MatType> res = aug_oracle(arg);
   std::vector<MatType> aug_ode, aug_alg, aug_quad, aug_rode, aug_ralg, aug_rquad, aug_uquad;
   aug_ode.push_back(vec(res.at(DYN_ODE)));
   aug_alg.push_back(vec(res.at(DYN_ALG)));
@@ -696,20 +691,16 @@ std::map<std::string, MatType> Integrator::aug_adj(const Function& aug_oracle,
   std::vector<std::vector<MatType>> seed(nadj, std::vector<MatType>(DYN_NUM_OUT));
   for (casadi_int d=0; d<nadj; ++d) {
     std::string pref = "aug" + str(d) + "_";
-    seed[d][DYN_ODE] = MatType::sym(pref + "ode", aug_oracle.sparsity_out(DYN_ODE));
-    seed[d][DYN_ALG] = MatType::sym(pref + "alg", aug_oracle.sparsity_out(DYN_ALG));
-    seed[d][DYN_QUAD] = MatType::sym(pref + "quad", aug_oracle.sparsity_out(DYN_QUAD));
-    seed[d][DYN_RODE] = MatType::sym(pref + "rode", aug_oracle.sparsity_out(DYN_RODE));
-    seed[d][DYN_RALG] = MatType::sym(pref + "ralg", aug_oracle.sparsity_out(DYN_RALG));
-    seed[d][DYN_RQUAD] = MatType::sym(pref + "rquad", aug_oracle.sparsity_out(DYN_RQUAD));
-    seed[d][DYN_UQUAD] = MatType::sym(pref + "uquad", aug_oracle.sparsity_out(DYN_UQUAD));
-    aug_rx.push_back(vec(seed[d][DYN_ODE]));
-    aug_rz.push_back(vec(seed[d][DYN_ALG]));
-    aug_rp.push_back(vec(seed[d][DYN_QUAD]));
-    aug_x.push_back(vec(seed[d][DYN_RODE]));
-    aug_z.push_back(vec(seed[d][DYN_RALG]));
-    aug_p.push_back(vec(seed[d][DYN_RQUAD]));
-    aug_u.push_back(vec(seed[d][DYN_UQUAD]));
+    for (casadi_int i = 0; i < DYN_NUM_OUT; ++i) {
+      seed[d][i] = MatType::sym(pref + dyn_out(i), aug_oracle.sparsity_out(i));
+    }
+    aug_in[DYN_RX].push_back(seed[d][DYN_ODE]);
+    aug_in[DYN_RZ].push_back(seed[d][DYN_ALG]);
+    aug_in[DYN_RP].push_back(seed[d][DYN_QUAD]);
+    aug_in[DYN_X].push_back(seed[d][DYN_RODE]);
+    aug_in[DYN_Z].push_back(seed[d][DYN_RALG]);
+    aug_in[DYN_P].push_back(seed[d][DYN_RQUAD]);
+    aug_in[DYN_U].push_back(seed[d][DYN_UQUAD]);
   }
 
   // Calculate directional derivatives
@@ -732,17 +723,10 @@ std::map<std::string, MatType> Integrator::aug_adj(const Function& aug_oracle,
 
   // Construct return object
   std::map<std::string, MatType> ret;
-  ret["t"] = aug_t;
-  ret["x"] = vertcat(aug_x);
-  ret["z"] = vertcat(aug_z);
-  ret["p"] = vertcat(aug_p);
-  ret["u"] = vertcat(aug_u);
+  for (casadi_int i = 0; i < DYN_NUM_IN; ++i) ret[dyn_in(i)] = vertcat(aug_in[i]);
   ret["ode"] = vertcat(aug_ode);
   ret["alg"] = vertcat(aug_alg);
   ret["quad"] = vertcat(aug_quad);
-  ret["rx"] = vertcat(aug_rx);
-  ret["rz"] = vertcat(aug_rz);
-  ret["rp"] = vertcat(aug_rp);
   ret["rode"] = vertcat(aug_rode);
   ret["ralg"] = vertcat(aug_ralg);
   ret["rquad"] = vertcat(aug_rquad);
