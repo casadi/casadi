@@ -228,13 +228,13 @@ Integrator::~Integrator() {
 
 Sparsity Integrator::get_sparsity_in(casadi_int i) {
   switch (static_cast<IntegratorInput>(i)) {
-  case INTEGRATOR_X0: return repmat(oracle_.sparsity_in(DYN_X), 1, 1 + nfwd_);
-  case INTEGRATOR_P: return repmat(oracle_.sparsity_in(DYN_P), 1, 1 + nfwd_);
-  case INTEGRATOR_U: return repmat(oracle_.sparsity_in(DYN_U), 1, nt() * (1 + nfwd_));
-  case INTEGRATOR_Z0: return repmat(oracle_.sparsity_in(DYN_Z), 1, 1 + nfwd_);
-  case INTEGRATOR_RX0: return repmat(oracle_.sparsity_in(DYN_RX), 1, nt() * (1 + nfwd_));
-  case INTEGRATOR_RP: return repmat(oracle_.sparsity_in(DYN_RP), 1, nt() * (1 + nfwd_));
-  case INTEGRATOR_RZ0: return repmat(oracle_.sparsity_in(DYN_RZ), 1, nt() * (1 + nfwd_));
+  case INTEGRATOR_X0: return Sparsity::dense(nx1_, 1 + nfwd_);
+  case INTEGRATOR_P: return Sparsity::dense(np1_, 1 + nfwd_);
+  case INTEGRATOR_U: return Sparsity::dense(nu1_, nt() * (1 + nfwd_));
+  case INTEGRATOR_Z0: return Sparsity::dense(nz1_, 1 + nfwd_);
+  case INTEGRATOR_RX0: return Sparsity::dense(nrx1_, nt() * (1 + nfwd_));
+  case INTEGRATOR_RP: return Sparsity::dense(nrp1_, nt() * (1 + nfwd_));
+  case INTEGRATOR_RZ0: return Sparsity::dense(nrz1_, nt() * (1 + nfwd_));
   case INTEGRATOR_NUM_IN: break;
   }
   return Sparsity();
@@ -242,13 +242,13 @@ Sparsity Integrator::get_sparsity_in(casadi_int i) {
 
 Sparsity Integrator::get_sparsity_out(casadi_int i) {
   switch (static_cast<IntegratorOutput>(i)) {
-  case INTEGRATOR_XF: return repmat(oracle_.sparsity_in(DYN_X), 1, nt() * (1 + nfwd_));
-  case INTEGRATOR_QF: return repmat(oracle_.sparsity_out(DYN_QUAD), 1, nt() * (1 + nfwd_));
-  case INTEGRATOR_ZF: return repmat(oracle_.sparsity_in(DYN_Z), 1, nt() * (1 + nfwd_));
-  case INTEGRATOR_RXF: return repmat(oracle_.sparsity_in(DYN_RX), 1, 1 + nfwd_);
-  case INTEGRATOR_RQF: return repmat(oracle_.sparsity_out(DYN_RQUAD), 1, 1 + nfwd_);
-  case INTEGRATOR_RZF: return repmat(oracle_.sparsity_in(DYN_RZ), 1, 1 + nfwd_);
-  case INTEGRATOR_UQF: return repmat(oracle_.sparsity_out(DYN_UQUAD), 1, nt() * (1 + nfwd_));
+  case INTEGRATOR_XF: return Sparsity::dense(nx1_, nt() * (1 + nfwd_));
+  case INTEGRATOR_QF: return Sparsity::dense(nq1_, nt() * (1 + nfwd_));
+  case INTEGRATOR_ZF: return Sparsity::dense(nz1_, nt() * (1 + nfwd_));
+  case INTEGRATOR_RXF: return Sparsity::dense(nrx1_, 1 + nfwd_);
+  case INTEGRATOR_RQF: return Sparsity::dense(nrq1_, 1 + nfwd_);
+  case INTEGRATOR_RZF: return Sparsity::dense(nrz1_, 1 + nfwd_);
+  case INTEGRATOR_UQF: return Sparsity::dense(nuq1_, nt() * (1 + nfwd_));
   case INTEGRATOR_NUM_OUT: break;
   }
   return Sparsity();
@@ -504,8 +504,6 @@ void Integrator::init(const Dict& opts) {
     if (!output_t0) tout_.erase(tout_.begin());
   }
 
-  // Call the base class method
-  OracleFunction::init(opts);
 
   // Consistency checks, input sparsities
   for (casadi_int i = 0; i < DYN_NUM_IN; ++i) {
@@ -573,6 +571,9 @@ void Integrator::init(const Dict& opts) {
     casadi_assert(nrq1_ == rdae_.numel_out(BDYN_RQUAD), "Dimension mismatch");
     casadi_assert(nuq1_ == rdae_.numel_out(BDYN_UQUAD), "Dimension mismatch");
   }
+
+  // Call the base class method
+  OracleFunction::init(opts);
 
   // Create problem functions, forward problem
   create_function("daeF", fdyn_in(), fdae_out());
