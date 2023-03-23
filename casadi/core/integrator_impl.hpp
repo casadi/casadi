@@ -273,12 +273,15 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   Function augmented_dae(Function* rdae) const;
   ///@}
 
-  /** \brief Generate a augmented DAE system with \a nadj adjoint sensitivities
-
-      \identifier{1mc} */
+  /** \brief Generate a augmented DAE system, forward problem */
   template<typename MatType>
-  Function aug_adj(const Function& this_dae, const Function& this_rdae,
-    casadi_int nadj, Function* aug_rdae) const;
+  Function get_reverse_dae(const Function& this_dae, const Function& this_rdae,
+    casadi_int nadj) const;
+
+  /** \brief Generate a augmented DAE system, backward problem */
+  template<typename MatType>
+  Function get_reverse_rdae(const Function& this_dae, const Function& this_rdae,
+    casadi_int nadj) const;
 
   /// Helper function, get augmented system Jacobian
   Sparsity sp_jac_aug(const Sparsity& J, const Sparsity& J1) const;
