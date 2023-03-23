@@ -82,9 +82,7 @@ class Integrationtests(casadiTestCase):
     opts["abstol"] = 1e-15
     opts["fsens_err_con"] = True
     #opts["verbose"] = True
-    opts["t0"] = 0
-    opts["tf"] = 2.3
-    integrator = casadi.integrator("integrator", "cvodes", dae, opts)
+    integrator = casadi.integrator("integrator", "cvodes", dae, 0, 2.3, opts)
     tf = 2.3
 
     solution = Function("solution", {'x0':q, 'p':p, 'xf':q*exp(tf**3/(3*p))},
@@ -229,12 +227,10 @@ class Integrationtests(casadiTestCase):
                 message = "f_options: %s" % str(f_options)
                 print(message)
                 opts = {}
-                opts["t0"] = tstart_
-                opts["tf"] = tend_
                 for op in (options, f_options):
                   for (k,v) in list(op.items()):
                     opts[k] = v
-                integrator = casadi.integrator("integrator", Integrator, dae, opts)
+                integrator = casadi.integrator("integrator", Integrator, dae, tstart_, tend_, opts)
                 integrator_in = {}
                 for k,v in list(point.items()):
                   if not fs.sparsity_in(k).is_empty():
@@ -329,12 +325,10 @@ class Integrationtests(casadiTestCase):
               print(message)
 
               opts = {}
-              opts["t0"] = tstart_
-              opts["tf"] = tend_
               for op in (options, f_options):
                  for (k,v) in list(op.items()):
                     opts[k] = v
-              integrator = casadi.integrator("integrator", Integrator, dae, opts)
+              integrator = casadi.integrator("integrator", Integrator, dae, tstart_, tend_, opts)
               integrator_in = {}
 
               for k,v in list(point.items()):
@@ -470,16 +464,14 @@ class Integrationtests(casadiTestCase):
             fs = Function("fs", sol, casadi.integrator_in(), casadi.integrator_out())
 
             opts = dict(options)
-            opts["t0"] = tstart_
             if Integrator in ('cvodes', 'idas'):
               opts["abstol"] = 1e-9
               opts["reltol"] = 1e-9
-            opts["tf"] = tend_
             if Integrator=='idas':
               opts["init_xdot"] = DM(point["x0"]).nonzeros()
               opts["calc_icB"] = True
               opts["augmented_options"] = {"init_xdot":None, "abstol":1e-9,"reltol":1e-9}
-            integrator = casadi.integrator("integrator", Integrator, dae, opts)
+            integrator = casadi.integrator("integrator", Integrator, dae, tstart_, tend_, opts)
             integrator_in = {}
 
             for k,v in list(point.items()):
@@ -503,9 +495,7 @@ class Integrationtests(casadiTestCase):
     opts["abstol"] = 1e-15
     opts["fsens_err_con"] = True
     #opts["verbose"] = True
-    opts["t0"] = 0
-    opts["tf"] = 2.3
-    integrator = casadi.integrator("integrator", "cvodes", dae, opts)
+    integrator = casadi.integrator("integrator", "cvodes", dae, 0, 2.3, opts)
     q0   = MX.sym("q0")
     par  = MX.sym("p")
 
@@ -545,8 +535,6 @@ class Integrationtests(casadiTestCase):
     dae = {'t':t, 'x':vertcat(*[x,y]), 'ode':vertcat(*[x,(1+1e-9)*x])}
     opts = {}
     opts["fsens_err_con"] = True
-    opts["t0"] = 0
-    opts["tf"] = 1
     integrator = casadi.integrator("integrator", "cvodes", dae, opts)
     integrator_in = {}
 
@@ -570,8 +558,6 @@ class Integrationtests(casadiTestCase):
     opts = {}
     opts["fsens_err_con"] = True
     opts["reltol"] = 1e-12
-    opts["t0"] = 0
-    opts["tf"] = 1
     integrator = casadi.integrator("integrator", "cvodes", dae, opts)
 
     qend = integrator(x0=var)["xf"]
@@ -635,9 +621,7 @@ class Integrationtests(casadiTestCase):
     #opts["verbose"] = True
     opts["fsens_err_con"] = True
     opts["steps_per_checkpoint"] = 10000
-    opts["t0"] = 0
-    opts["tf"] = te
-    integrator = casadi.integrator("integrator", "cvodes", dae, opts)
+    integrator = casadi.integrator("integrator", "cvodes", dae, 0, te, opts)
 
     q0   = MX.sym("q0",3,1)
     par  = MX.sym("p",1,1)
@@ -656,9 +640,7 @@ class Integrationtests(casadiTestCase):
     #opts["verbose"] = True
     opts["fsens_err_con"] = True
     opts["steps_per_checkpoint"] = 10000
-    opts["t0"] = 0
-    opts["tf"] = te
-    integrator = casadi.integrator("integrator", "cvodes", dae, opts)
+    integrator = casadi.integrator("integrator", "cvodes", dae, 0, te, opts)
 
     q0   = MX.sym("q0",3,1)
     par  = MX.sym("p",1,1)
@@ -757,9 +739,7 @@ class Integrationtests(casadiTestCase):
     opts = {}
     opts["fsens_err_con"] = True
     opts["steps_per_checkpoint"] = 1000
-    opts["t0"] = 0
-    opts["tf"] = te
-    integrator = casadi.integrator("integrator", "cvodes", dae, opts)
+    integrator = casadi.integrator("integrator", "cvodes", dae, 0, te, opts)
     q0   = MX.sym("q0",3,1)
     par  = MX.sym("p",9,1)
     qend = integrator(x0=q0, p=par)["xf"]
@@ -787,9 +767,7 @@ class Integrationtests(casadiTestCase):
     opts["abstol"] = 1e-15
     #opts["verbose"] = True
     opts["steps_per_checkpoint"] = 10000
-    opts["t0"] = 0
-    opts["tf"] = te
-    integrator = casadi.integrator("integrator", "cvodes", dae, opts)
+    integrator = casadi.integrator("integrator", "cvodes", dae, 0, te, opts)
 
     q0   = MX.sym("q0",3,1)
     par  = MX.sym("p",9,1)
@@ -833,9 +811,7 @@ class Integrationtests(casadiTestCase):
     opts["abstol"] = 1e-15
     #opts["verbose"] = True
     opts["steps_per_checkpoint"] = 10000
-    opts["t0"] = 0
-    opts["tf"] = te
-    integrator = casadi.integrator("integrator", "cvodes", dae, opts)
+    integrator = casadi.integrator("integrator", "cvodes", dae, 0, te, opts)
 
     q0   = MX.sym("q0",2,1)
     par  = MX.sym("p",3,1)
@@ -874,9 +850,7 @@ class Integrationtests(casadiTestCase):
     #opts["verbose"] = True
     opts["steps_per_checkpoint"] = 10000
     opts["fsens_err_con"] = True
-    opts["t0"] = 0
-    opts["tf"] = te
-    integrator = casadi.integrator("integrator", "cvodes", dae, opts)
+    integrator = casadi.integrator("integrator", "cvodes", dae, 0, te, opts)
 
     t0   = MX(0)
     tend = MX(te)
@@ -989,7 +963,7 @@ class Integrationtests(casadiTestCase):
     rp=SX.sym("rp")
     dae = {'x': x, 'z': z, 'rx': rx, 'rz': rz, 'alg': x-z, 'ode': z, 'ralg': x-rz, 'rode': rz}
 
-    integrator = casadi.integrator("integrator", "idas", dae, {'calc_ic': True, 'tf': 2.3, 'reltol': 1e-10, 'augmented_options': {'reltol': 1e-09, 'abstol': 1e-09 }, 'calc_icB': True, 'abstol': 1e-10, 't0': 0.2})
+    integrator = casadi.integrator("integrator", "idas", dae, 0.2, 2.3, {'calc_ic': True, 'reltol': 1e-10, 'augmented_options': {'reltol': 1e-09, 'abstol': 1e-09 }, 'calc_icB': True, 'abstol': 1e-10})
     integrator_in = {}
 
     integrator_in["x0"]=7.1
@@ -1056,12 +1030,10 @@ class Integrationtests(casadiTestCase):
     opts = {
       "step0":    1e-4,
       "min_step_size": 1e-4,
-      "max_step_size": 1.1e-4,
-      "t0"      : 0.0,
-      "tf"      : 0.5
+      "max_step_size": 1.1e-4
     }
 
-    I = integrator("I","cvodes",{"x":x,"ode":sin((10*x)**2)}, opts)
+    I = integrator("I","cvodes",{"x":x,"ode":sin((10*x)**2)}, 0.0, 0.5, opts)
     I(x0=0)
     stats = I.stats()
 
@@ -1072,12 +1044,10 @@ class Integrationtests(casadiTestCase):
     x = SX.sym("x")
     opts = {
       "step0":    1e-4,
-      "max_step_size": 1.1e-4,
-      "t0"      : 0.0,
-      "tf"      : 0.5
+      "max_step_size": 1.1e-4
     }
 
-    I = integrator("I","cvodes",{"x":x,"ode":sin((10*x)**2)}, opts)
+    I = integrator("I","cvodes",{"x":x,"ode":sin((10*x)**2)}, 0.0, 0.5, opts)
     I(x0=0)
     stats = I.stats()
 
