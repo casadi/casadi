@@ -671,8 +671,7 @@ Function Integrator::get_augmented_dae(const std::string& name) const {
 }
 
 template<typename MatType>
-Function Integrator::aug_adj(const Function& aug_oracle,
-    casadi_int nadj) const {
+Function Integrator::aug_adj(const Function& aug_oracle, casadi_int nadj, Function* rdae) const {
   if (verbose_) casadi_message(name_ + "::aug_adj");
 
   // Get input and output expressions
@@ -743,6 +742,14 @@ Function Integrator::aug_adj(const Function& aug_oracle,
     res[DYN_ODE] = v.at(0);
     res[DYN_ALG] = v.at(1);
     res[DYN_QUAD] = v.at(2);
+  }
+
+  // Create backwards DAE
+  if (rdae != 0 && !arg[DYN_RX].is_empty()) {
+    std::vector<MatType> rdae_in, rdae_out;
+    for (auto& n : bdyn_in()) rdae_in.push_back(r.at(n));
+    for (auto& n : bdyn_out()) rdae_out.push_back(r.at(n));
+    *rdae = Function("rdae", rdae_in, rdae_out, bdyn_in(), bdyn_out());
   }
 
   // Convert to oracle function and return
@@ -1380,15 +1387,16 @@ Function Integrator::get_reverse(casadi_int nadj, const std::string& name,
   Function aug_oracle = augmented_dae();
 
   // Create integrator for augmented DAE
-  Function aug_dae;
+  Function aug_dae, rdae;
   std::string aug_prefix = "asens" + str(nadj) + "_";
   if (aug_oracle.is_a("SXFunction")) {
-    aug_dae = aug_adj<SX>(aug_oracle, nadj);
+    aug_dae = aug_adj<SX>(aug_oracle, nadj, &rdae);
   } else {
-    aug_dae = aug_adj<MX>(aug_oracle, nadj);
+    aug_dae = aug_adj<MX>(aug_oracle, nadj, &rdae);
   }
   aug_opts["derivative_of"] = self();
   aug_opts["nfwd"] = 0;
+  if (!rdae.is_null()) aug_opts["rdae"] = rdae;
   Function aug_int = integrator(aug_prefix + name_, plugin_name(),
     aug_dae, t0_, tout_, aug_opts);
 
