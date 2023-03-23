@@ -64,6 +64,7 @@ void set_param(T &f, ParamString s) {
 template void ALPAQA_EXPORT set_param(real_t<config_t> &, ParamString);
 template void ALPAQA_EXPORT set_param(index_t<config_t> &, ParamString);
 template void ALPAQA_EXPORT set_param(int &, ParamString);
+template void ALPAQA_EXPORT set_param(unsigned &, ParamString);
 
 template <>
 void set_param(alpaqa::vec<config_t> &v, ParamString s) {
@@ -359,6 +360,12 @@ template void ALPAQA_EXPORT set_params(ALMParams<config_t> &, std::string_view,
                                        std::span<const std::string_view>,
                                        std::optional<std::span<bool>>);
 template void ALPAQA_EXPORT set_params(length_t<config_t> &, std::string_view,
+                                       std::span<const std::string_view>,
+                                       std::optional<std::span<bool>>);
+template void ALPAQA_EXPORT set_params(int &, std::string_view,
+                                       std::span<const std::string_view>,
+                                       std::optional<std::span<bool>>);
+template void ALPAQA_EXPORT set_params(unsigned &, std::string_view,
                                        std::span<const std::string_view>,
                                        std::optional<std::span<bool>>);
 template void ALPAQA_EXPORT set_params(std::string_view &, std::string_view,

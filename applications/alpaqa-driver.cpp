@@ -133,10 +133,10 @@ do_experiment_impl(auto &problem, Solver &solver,
 
     // Solve the problems again to average runtimes
     auto avg_duration = stats.elapsed_time;
-    length_t N_exp    = 0;
+    unsigned N_exp    = 0;
     alpaqa::params::set_params(N_exp, "num_exp", extra_opts);
     std::cout.setstate(std::ios_base::badbit);
-    for (index_t i = 0; i < N_exp - 1; ++i) {
+    for (unsigned i = 0; i < N_exp; ++i) {
         x.setZero();
         y.setZero();
         avg_duration += solver(problem.problem, x, y).elapsed_time;
@@ -239,10 +239,10 @@ do_experiment_impl(auto &problem,
     // Solve the problems again to average runtimes
     using ns          = std::chrono::nanoseconds;
     auto avg_duration = duration_cast<ns>(t1 - t0);
-    length_t N_exp    = 0;
+    unsigned N_exp    = 0;
     alpaqa::params::set_params(N_exp, "num_exp", extra_opts);
     std::cout.setstate(std::ios_base::badbit);
-    for (index_t i = 0; i < N_exp - 1; ++i) {
+    for (unsigned i = 0; i < N_exp; ++i) {
         auto t0 = std::chrono::steady_clock::now();
         solver->OptimizeTNLP(nlp);
         auto t1 = std::chrono::steady_clock::now();
