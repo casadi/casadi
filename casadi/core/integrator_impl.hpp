@@ -268,8 +268,8 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   /** \brief Generate the augmented DAE system
 
       \identifier{261} */
-  template<typename MatType> Function get_augmented_dae(const std::string& name,
-    Function* rdae) const;
+  template<typename MatType> Function get_forward_dae(const std::string& name) const;
+  template<typename MatType> Function get_forward_rdae(const std::string& name) const;
   Function augmented_dae(Function* rdae) const;
   ///@}
 

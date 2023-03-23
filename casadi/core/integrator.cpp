@@ -644,9 +644,11 @@ Function Integrator::augmented_dae(Function* rdae) const {
   // Create new augmented oracle
   try {
     if (oracle_.is_a("SXFunction")) {
-      ret = get_augmented_dae<SX>(aug_name, rdae);
+      ret = get_forward_dae<SX>(aug_name);
+      if (rdae) *rdae = get_forward_rdae<SX>("dae");
     } else {
-      ret = get_augmented_dae<MX>(aug_name, rdae);
+      ret = get_forward_dae<MX>(aug_name);
+      if (rdae) *rdae = get_forward_rdae<MX>("dae");
     }
   } catch (std::exception& e) {
     casadi_error("Failed to generate augmented DAE for " + name_ + ":\n" + e.what());
@@ -657,8 +659,8 @@ Function Integrator::augmented_dae(Function* rdae) const {
 }
 
 template<typename MatType>
-Function Integrator::get_augmented_dae(const std::string& name, Function* rdae) const {
-  if (verbose_) casadi_message(name_ + "::get_augmented_dae");
+Function Integrator::get_forward_dae(const std::string& name) const {
+  if (verbose_) casadi_message(name_ + "::get_forward_dae");
 
   // Get input and output expressions
   std::vector<MatType> arg = MatType::get_input(oracle_);
@@ -709,21 +711,76 @@ Function Integrator::get_augmented_dae(const std::string& name, Function* rdae) 
   for (casadi_int i = 0; i < DYN_NUM_IN; ++i) arg.at(i) = vertcat(aug_in[i]);
   for (casadi_int i = 0; i < DYN_NUM_OUT; ++i) res.at(i) = vertcat(aug_out[i]);
 
-  // Create backwards DAE
-  if (rdae != 0 && !arg[DYN_RX].is_empty()) {
-    // Sort expressions by name
-    std::map<std::string, MatType> r;
-    for (casadi_int i = 0; i < DYN_NUM_IN; ++i) r[dyn_in(i)] = arg[i];
-    for (casadi_int i = 0; i < DYN_NUM_OUT; ++i) r[dyn_out(i)] = res[i];
-    // Construct backwards DAE
-    std::vector<MatType> rdae_in, rdae_out;
-    for (auto& n : bdyn_in()) rdae_in.push_back(r.at(n));
-    for (auto& n : bdyn_out()) rdae_out.push_back(r.at(n));
-    *rdae = Function("rdae", rdae_in, rdae_out, bdyn_in(), bdyn_out());
-  }
-
   // Convert to oracle function and return
   return Function(name, arg, res, dyn_in(), dyn_out());
+}
+
+template<typename MatType>
+Function Integrator::get_forward_rdae(const std::string& name) const {
+  if (verbose_) casadi_message(name_ + "::get_forward_rdae");
+
+  // Quick return if no backwards DAE
+  if (nrx1_ == 0) return Function();
+
+  // Get input and output expressions
+  std::vector<MatType> arg = MatType::get_input(oracle_);
+  std::vector<MatType> res = oracle_(arg);
+
+  // Symbolic expression for augmented DAE
+  std::vector<std::vector<MatType>> aug_in(DYN_NUM_IN);
+  for (casadi_int i = 0; i < DYN_NUM_IN; ++i) aug_in[i].push_back(arg.at(i));
+  std::vector<std::vector<MatType>> aug_out(DYN_NUM_OUT);
+  for (casadi_int i = 0; i < DYN_NUM_OUT; ++i) aug_out[i].push_back(res.at(i));
+
+  // Zero of time dimension
+  MatType zero_t = MatType::zeros(oracle_.sparsity_in(DYN_T));
+
+  // Augment aug_in with forward sensitivity seeds
+  std::vector<std::vector<MatType>> seed(nfwd_, std::vector<MatType>(DYN_NUM_IN));
+  for (casadi_int d = 0; d < nfwd_; ++d) {
+    // Create expressions for augmented states
+    std::string pref = "aug" + str(d) + "_";
+    for (casadi_int i = 0; i < DYN_NUM_IN; ++i) {
+      if (i == DYN_T) {
+        seed[d][i] = zero_t;
+      } else {
+        seed[d][i] = MatType::sym(pref + dyn_in(i), oracle_.sparsity_in(i));
+      }
+    }
+    // Save to augmented function inputs
+    for (casadi_int i = 0; i < DYN_NUM_IN; ++i) {
+      if (i != DYN_T) aug_in[i].push_back(seed[d][i]);
+    }
+  }
+
+  // Calculate directional derivatives
+  std::vector<std::vector<MatType>> sens;
+  bool always_inline = oracle_.is_a("SXFunction") || oracle_.is_a("MXFunction");
+  oracle_->call_forward(arg, res, seed, sens, always_inline, false);
+
+  // Augment aug_out with forward sensitivity equations
+  casadi_assert_dev(sens.size() == nfwd_);
+  for (casadi_int d = 0; d < nfwd_; ++d) {
+    casadi_assert_dev(sens[d].size() == DYN_NUM_OUT);
+    for (casadi_int i = 0; i < DYN_NUM_OUT; ++i) {
+      aug_out[i].push_back(project(sens[d][i], oracle_.sparsity_out(i)));
+    }
+  }
+
+  // Concatenate arrays
+  for (casadi_int i = 0; i < DYN_NUM_IN; ++i) arg.at(i) = vertcat(aug_in[i]);
+  for (casadi_int i = 0; i < DYN_NUM_OUT; ++i) res.at(i) = vertcat(aug_out[i]);
+
+  // Sort expressions by name
+  std::map<std::string, MatType> r;
+  for (casadi_int i = 0; i < DYN_NUM_IN; ++i) r[dyn_in(i)] = arg[i];
+  for (casadi_int i = 0; i < DYN_NUM_OUT; ++i) r[dyn_out(i)] = res[i];
+
+  // Convert to oracle function and return
+  std::vector<MatType> rdae_in, rdae_out;
+  for (auto& n : bdyn_in()) rdae_in.push_back(r.at(n));
+  for (auto& n : bdyn_out()) rdae_out.push_back(r.at(n));
+  return Function(name, rdae_in, rdae_out, bdyn_in(), bdyn_out());
 }
 
 template<typename MatType>
