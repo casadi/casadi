@@ -154,20 +154,19 @@ else()
     message(STATUS "Compiling WITHOUT dl support")
 endif()
 
-find_package(PkgConfig)
-if (PKG_CONFIG_FOUND)
-    pkg_check_modules(IPOPT IMPORTED_TARGET ipopt)
-endif()
-if (TARGET PkgConfig::IPOPT)
+list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/find")
+find_package(Ipopt)
+
+if (TARGET COIN::Ipopt)
     message(STATUS "Compiling Ipopt problem adapter")
-    add_library(ipopt-adapter "interop/ipopt/src/ipopt-adapter.cpp")
+    add_library(ipopt-adapter
+        "interop/ipopt/src/ipopt-adapter.cpp"
+        "interop/ipopt/src/ipopt-params.cpp"
+    )
     target_link_libraries(ipopt-adapter 
-        PUBLIC PkgConfig::IPOPT alpaqa::alpaqa PRIVATE alpaqa::warnings)
-    # TODO: write a proper FindIpopt.cmake file
+        PUBLIC COIN::Ipopt alpaqa::alpaqa PRIVATE alpaqa::warnings)
     target_link_directories(ipopt-adapter PUBLIC
         $<BUILD_INTERFACE:${IPOPT_LIBRARY_DIRS}>)
-    target_link_options(ipopt-adapter PUBLIC
-        $<BUILD_INTERFACE:LINKER:-rpath-link,${IPOPT_LIBRARY_DIRS}>)
     target_include_directories(ipopt-adapter PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/interop/ipopt/include>
         $<INSTALL_INTERFACE:include>)
