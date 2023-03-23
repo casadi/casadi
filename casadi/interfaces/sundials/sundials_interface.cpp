@@ -240,7 +240,7 @@ void SundialsInterface::init(const Dict& opts) {
     Sparsity jacB_sp;
     if (d == 0) {
       // New Jacobian function
-      jacB = create_function("jacB", {"t", "x", "z", "p", "u", "rx", "rz", "rp"},
+      jacB = create_function(rdae_, "jacB", {"t", "x", "z", "p", "u", "rx", "rz", "rp"},
         {"jac:rode:rx", "jac:ralg:rx", "jac:rode:rz", "jac:ralg:rz"});
       jacB_sp = jacB.sparsity_out(JACB_RODE_RX) + Sparsity::diag(nrx1_);
       if (nrz1_ > 0) {
@@ -286,7 +286,7 @@ void SundialsInterface::init(const Dict& opts) {
       create_forward("jtimesF", nfwd_);
     }
     if (nrx_ > 0) {
-      create_function("jtimesB",
+      create_function(rdae_, "jtimesB",
         {"t", "x", "z", "p", "u", "rx", "rz", "rp", "fwd:rx", "fwd:rz"},
         {"fwd:rode", "fwd:ralg"});
       if (nfwd_ > 0) {
