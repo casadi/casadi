@@ -4,7 +4,7 @@ cd "$( dirname "${BASH_SOURCE[0]}" )"/../..
 set -ex
 
 # Download compiler
-download_url="https://github.com/tttapa/cross-python/releases/download/0.0.10"
+download_url="https://github.com/tttapa/cross-python/releases/download/0.0.11"
 tools_dir="$PWD/toolchains"
 triple="x86_64-centos7-linux-gnu"
 mkdir -p "$tools_dir"

@@ -12,7 +12,7 @@ inputs:
     type: string
   tools-version:
     required: false
-    default: '0.0.10'
+    default: '0.0.11'
     type: string
   tools-url:
     required: false
