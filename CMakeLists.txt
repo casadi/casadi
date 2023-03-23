@@ -13,6 +13,8 @@ option(ALPAQA_WITH_TESTS
     "Build the tests" On)
 option(ALPAQA_WITH_EXAMPLES
     "Build the examples" On)
+option(ALPAQA_WITH_DRIVERS
+    "Build the solver drivers" On)
 option(ALPAQA_WITH_COVERAGE
     "Generate coverage information" Off)
 option(ALPAQA_WITH_CASADI
@@ -79,6 +81,11 @@ endif()
 # Examples
 if (ALPAQA_WITH_EXAMPLES)
     add_subdirectory(examples)
+endif()
+
+# Examples
+if (ALPAQA_WITH_DRIVERS)
+    add_subdirectory(applications)
 endif()
 
 # Packaging

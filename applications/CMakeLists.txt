@@ -1,0 +1,15 @@
+add_executable(alpaqa-driver "alpaqa-driver.cpp")
+target_link_libraries(alpaqa-driver
+    PRIVATE alpaqa::alpaqa alpaqa::casadi-loader
+            alpaqa::warnings alpaqa::dl-loader)
+if (ALPAQA_WITH_OCP)
+    target_link_libraries(alpaqa-driver PUBLIC alpaqa::casadi-ocp-loader)
+endif()
+if (TARGET alpaqa::ipopt-adapter)
+    target_link_libraries(alpaqa-driver PUBLIC alpaqa::ipopt-adapter)
+    target_compile_definitions(alpaqa-driver PUBLIC WITH_IPOPT)
+endif()
+if (TARGET alpaqa::lbfgsb-adapter)
+    target_link_libraries(alpaqa-driver PUBLIC alpaqa::lbfgsb-adapter)
+    target_compile_definitions(alpaqa-driver PUBLIC WITH_LBFGSB)
+endif()
