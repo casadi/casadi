@@ -659,13 +659,10 @@ Function Integrator::get_augmented_dae(const std::string& name) const {
     }
   }
 
-  // Construct return expression
-  std::map<std::string, MatType> r;
-  for (casadi_int i = 0; i < DYN_NUM_IN; ++i) r[dyn_in(i)] = vertcat(aug_in[i]);
-  for (casadi_int i = 0; i < DYN_NUM_OUT; ++i) r[dyn_out(i)] = vertcat(aug_out[i]);
-
   // Convert to oracle function and return
-  return map2oracle(name, r);
+  for (casadi_int i = 0; i < DYN_NUM_IN; ++i) arg.at(i) = vertcat(aug_in[i]);
+  for (casadi_int i = 0; i < DYN_NUM_OUT; ++i) res.at(i) = vertcat(aug_out[i]);
+  return Function(name, arg, res, dyn_in(), dyn_out());
 }
 
 template<typename MatType>
