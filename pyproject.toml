@@ -35,7 +35,11 @@ test = ["pytest~=7.2.0", "qpalm~=1.1.4", "scipy~=1.7.3"]
 alpaqa = "alpaqa.__main__:main"
 
 [build-system]
-requires = ["py-build-cmake~=0.1.1", "pybind11>=2.10.1,!=2.10.2,!=2.10.3", "pybind11-stubgen"]
+requires = [
+    "py-build-cmake~=0.1.1",
+    "pybind11>=2.10.1,!=2.10.2,!=2.10.3",
+    "pybind11-stubgen",
+]
 build-backend = "py_build_cmake.build"
 
 [tool.py-build-cmake.module]
@@ -43,7 +47,15 @@ name = "alpaqa"
 directory = "python"
 
 [tool.py-build-cmake.sdist]
-include = ["README.md", "CMakeLists.txt", "src", "cmake", "interfaces"]
+include = [
+    "README.md",
+    "CMakeLists.txt",
+    "src",
+    "cmake",
+    "interfaces",
+    "applications",
+    "test",
+]
 exclude = []
 
 [tool.py-build-cmake.cmake]
@@ -58,6 +70,7 @@ install_components = ["python_modules", "python_stubs"]
 "ALPAQA_WITH_PY_STUBS:BOOL" = "On"
 "ALPAQA_WITH_TESTS:BOOL" = "Off"
 "ALPAQA_WITH_EXAMPLES:BOOL" = "Off"
+"ALPAQA_WITH_DRIVERS:BOOL" = "Off"
 "ALPAQA_WITH_QUAD_PRECISION:BOOL" = "Off"
 "ALPAQA_WITH_UBSAN_DEBUG:BOOL" = "Off"
 "ALPAQA_WITH_ASAN_DEBUG:BOOL" = "Off"
