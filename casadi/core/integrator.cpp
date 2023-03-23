@@ -717,12 +717,15 @@ Function Integrator::aug_adj(const Function& aug_oracle,
     aug_out[DYN_QUAD].push_back(project(sens[d][DYN_RP], aug_oracle.sparsity_in(DYN_RP)));
   }
 
-  // Construct return expressions
-  std::map<std::string, MatType> r;
-  for (casadi_int i = 0; i < DYN_NUM_IN; ++i) r[dyn_in(i)] = vertcat(aug_in[i]);
-  for (casadi_int i = 0; i < DYN_NUM_OUT; ++i) r[dyn_out(i)] = vertcat(aug_out[i]);
+  // Concatenate expressions
+  for (casadi_int i = 0; i < DYN_NUM_IN; ++i) arg.at(i) = vertcat(aug_in[i]);
+  for (casadi_int i = 0; i < DYN_NUM_OUT; ++i) res.at(i) = vertcat(aug_out[i]);
 
-  // Make sure that forward problem does not depend on backward states
+  // Hack: Make sure that forward problem does not depend on backward states
+  // Should become unnecessary once #3047 is complete
+  std::map<std::string, MatType> r;
+  for (casadi_int i = 0; i < DYN_NUM_IN; ++i) r[dyn_in(i)] = arg[i];
+  for (casadi_int i = 0; i < DYN_NUM_OUT; ++i) r[dyn_out(i)] = res[i];
   Function f("f", {r["t"], r["x"], r["z"], r["p"], r["u"]},
                   {r["ode"], r["alg"], r["quad"]}, {{"allow_free", true}});
   if (f.has_free()) {
@@ -732,15 +735,15 @@ Function Integrator::aug_adj(const Function& aug_oracle,
                       {r["ode"], r["alg"], r["quad"]});
     std::vector<MatType> v = {r["t"], r["x"], r["z"], r["p"], r["u"], 0, 0, 0};
     v = f(v);
-    r["ode"] = v.at(0);
-    r["alg"] = v.at(1);
-    r["quad"] = v.at(2);
+    res[DYN_ODE] = v.at(0);
+    res[DYN_ALG] = v.at(1);
+    res[DYN_QUAD] = v.at(2);
   }
 
   // Convert to oracle function and return
   std::string aug_prefix = "asens" + str(nadj) + "_";
   std::string dae_name = aug_prefix + aug_oracle.name();
-  return map2oracle(dae_name, r);
+  return Function(dae_name, arg, res, dyn_in(), dyn_out());
 }
 
 int Integrator::fdae_sp_forward(SpForwardMem* m, const bvec_t* x,
