@@ -61,6 +61,10 @@ void set_param(T &f, ParamString s) {
                                     std::string(s.full_key) + "'");
 }
 
+template void ALPAQA_EXPORT set_param(real_t<config_t> &, ParamString);
+template void ALPAQA_EXPORT set_param(index_t<config_t> &, ParamString);
+template void ALPAQA_EXPORT set_param(int &, ParamString);
+
 template <>
 void set_param(alpaqa::vec<config_t> &v, ParamString s) {
     v.resize(std::count(s.value.begin(), s.value.end(), ',') + 1);
@@ -70,8 +74,6 @@ void set_param(alpaqa::vec<config_t> &v, ParamString s) {
         set_param(e, {.full_key = s.full_key, .key = "", .value = value});
     }
 }
-
-template void set_param(int &, ParamString);
 
 template <class Rep, class Period>
 void set_param(std::chrono::duration<Rep, Period> &t, ParamString s) {

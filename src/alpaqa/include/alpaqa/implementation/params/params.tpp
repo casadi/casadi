@@ -54,23 +54,24 @@ void unsupported_type(T &, [[maybe_unused]] ParamString s) {
 }
 
 template <>
-void set_param(bool &b, ParamString s);
+void ALPAQA_EXPORT set_param(bool &b, ParamString s);
 
 template <>
-void set_param(std::string_view &v, ParamString s);
+void ALPAQA_EXPORT set_param(std::string_view &v, ParamString s);
 
 template <>
-void set_param(std::string &v, ParamString s);
+void ALPAQA_EXPORT set_param(std::string &v, ParamString s);
 
 template <class T>
     requires((std::floating_point<T> || std::integral<T>) && !std::is_enum_v<T>)
-void set_param(T &f, ParamString s);
+void ALPAQA_EXPORT set_param(T &f, ParamString s);
 
 template <>
-void set_param(vec<config_t> &v, ParamString s);
+void ALPAQA_EXPORT set_param(vec<config_t> &v, ParamString s);
 
 template <class Rep, class Period>
-void set_param(std::chrono::duration<Rep, Period> &t, ParamString s);
+void ALPAQA_EXPORT set_param(std::chrono::duration<Rep, Period> &t,
+                             ParamString s);
 
 /// Return a function that applies @ref set_param to the given attribute of a
 /// value of type @p T.
@@ -119,7 +120,7 @@ auto possible_keys() {
 /// given by @p s.key.
 template <class T>
     requires requires { dict_to_struct_table<T>::table; }
-void set_param(T &t, ParamString s) {
+void ALPAQA_EXPORT set_param(T &t, ParamString s) {
     const auto &m         = dict_to_struct_table<T>::table;
     auto [key, remainder] = split_key(s.key);
     auto it               = m.find(key);
@@ -147,9 +148,9 @@ void set_param(T &t, ParamString s) {
     }
 
 template <class T>
-void set_params(T &t, std::string_view prefix,
-                std::span<const std::string_view> options,
-                std::optional<std::span<bool>> used) {
+void ALPAQA_EXPORT set_params(T &t, std::string_view prefix,
+                              std::span<const std::string_view> options,
+                              std::optional<std::span<bool>> used) {
     size_t index = 0;
     for (const auto &kv : options) {
         auto [key, value]     = split_key(kv, '=');
