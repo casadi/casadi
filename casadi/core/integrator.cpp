@@ -787,6 +787,8 @@ Function Integrator::get_reverse_dae(const Function& this_dae, const Function& t
   // Get input and output expressions
   std::vector<MatType> arg = MatType::get_input(this_dae);
   std::vector<MatType> res = this_dae(arg);
+  std::vector<MatType> rres;
+  if (!this_rdae.is_null()) rres = this_rdae(arg);
 
   // Symbolic expression for augmented DAE
   std::vector<std::vector<MatType>> aug_in(DYN_NUM_IN);
@@ -799,6 +801,7 @@ Function Integrator::get_reverse_dae(const Function& this_dae, const Function& t
 
   // Reverse mode directional derivatives
   std::vector<std::vector<MatType>> seed(nadj, std::vector<MatType>(DYN_NUM_OUT));
+  std::vector<std::vector<MatType>> rseed(nadj, std::vector<MatType>(BDYN_NUM_OUT));
   for (casadi_int d = 0; d < nadj; ++d) {
     std::string pref = "aug" + str(d) + "_";
     for (casadi_int i = 0; i < DYN_NUM_OUT; ++i) {
@@ -811,6 +814,22 @@ Function Integrator::get_reverse_dae(const Function& this_dae, const Function& t
     aug_in[DYN_Z].push_back(seed[d][DYN_RALG]);
     aug_in[DYN_P].push_back(seed[d][DYN_RQUAD]);
     aug_in[DYN_U].push_back(seed[d][DYN_UQUAD]);
+
+    for (casadi_int i = 0; i < DYN_NUM_OUT; ++i) {
+      if (i == DYN_RODE) {
+        rseed[d][BDYN_RODE] = seed[d][i];
+        seed[d][i] = MatType::zeros(seed[d][i].sparsity());
+      } else if (i == DYN_RALG) {
+        rseed[d][BDYN_RALG] = seed[d][i];
+        seed[d][i] = MatType::zeros(seed[d][i].sparsity());
+      } else if (i == DYN_RQUAD) {
+        rseed[d][BDYN_RQUAD] = seed[d][i];
+        seed[d][i] = MatType::zeros(seed[d][i].sparsity());
+      } else if (i == DYN_UQUAD) {
+        rseed[d][BDYN_UQUAD] = seed[d][i];
+        seed[d][i] = MatType::zeros(seed[d][i].sparsity());
+      }
+    }
   }
 
   // Calculate directional derivatives
@@ -818,17 +837,37 @@ Function Integrator::get_reverse_dae(const Function& this_dae, const Function& t
   bool always_inline = this_dae.is_a("SXFunction") || this_dae.is_a("MXFunction");
   this_dae->call_reverse(arg, res, seed, sens, always_inline, false);
 
-  // Collect sensitivity equations
-  casadi_assert_dev(sens.size()==nadj);
-  for (casadi_int d = 0; d < nadj; ++d) {
-    casadi_assert_dev(sens[d].size() == DYN_NUM_IN);
-    aug_out[DYN_RODE].push_back(project(sens[d][DYN_X], this_dae.sparsity_in(DYN_X)));
-    aug_out[DYN_RALG].push_back(project(sens[d][DYN_Z], this_dae.sparsity_in(DYN_Z)));
-    aug_out[DYN_RQUAD].push_back(project(sens[d][DYN_P], this_dae.sparsity_in(DYN_P)));
-    aug_out[DYN_UQUAD].push_back(project(sens[d][DYN_U], this_dae.sparsity_in(DYN_U)));
-    aug_out[DYN_ODE].push_back(project(sens[d][DYN_RX], this_dae.sparsity_in(DYN_RX)));
-    aug_out[DYN_ALG].push_back(project(sens[d][DYN_RZ], this_dae.sparsity_in(DYN_RZ)));
-    aug_out[DYN_QUAD].push_back(project(sens[d][DYN_RP], this_dae.sparsity_in(DYN_RP)));
+  if (this_rdae.is_null()) {
+    // Collect sensitivity equations
+    casadi_assert_dev(sens.size() == nadj);
+    for (casadi_int d = 0; d < nadj; ++d) {
+      casadi_assert_dev(sens[d].size() == DYN_NUM_IN);
+      aug_out[DYN_RODE].push_back(project(sens[d][DYN_X], this_dae.sparsity_in(DYN_X)));
+      aug_out[DYN_RALG].push_back(project(sens[d][DYN_Z], this_dae.sparsity_in(DYN_Z)));
+      aug_out[DYN_RQUAD].push_back(project(sens[d][DYN_P], this_dae.sparsity_in(DYN_P)));
+      aug_out[DYN_UQUAD].push_back(project(sens[d][DYN_U], this_dae.sparsity_in(DYN_U)));
+      aug_out[DYN_ODE].push_back(project(sens[d][DYN_RX], this_dae.sparsity_in(DYN_RX)));
+      aug_out[DYN_ALG].push_back(project(sens[d][DYN_RZ], this_dae.sparsity_in(DYN_RZ)));
+      aug_out[DYN_QUAD].push_back(project(sens[d][DYN_RP], this_dae.sparsity_in(DYN_RP)));
+    }
+  } else {
+    // Calculate directional derivatives, rdae
+    std::vector<std::vector<MatType>> rsens;
+    always_inline = this_rdae.is_a("SXFunction") || this_rdae.is_a("MXFunction");
+    this_rdae->call_reverse(arg, rres, rseed, rsens, always_inline, false);
+
+    // Collect sensitivity equations
+    casadi_assert_dev(sens.size() == nadj);
+    for (casadi_int d = 0; d < nadj; ++d) {
+      casadi_assert_dev(sens[d].size() == DYN_NUM_IN);
+      aug_out[DYN_RODE].push_back(project(sens[d][DYN_X] + rsens[d][BDYN_X], this_dae.sparsity_in(DYN_X)));
+      aug_out[DYN_RALG].push_back(project(sens[d][DYN_Z] + rsens[d][BDYN_Z], this_dae.sparsity_in(DYN_Z)));
+      aug_out[DYN_RQUAD].push_back(project(sens[d][DYN_P] + rsens[d][BDYN_P], this_dae.sparsity_in(DYN_P)));
+      aug_out[DYN_UQUAD].push_back(project(sens[d][DYN_U] + rsens[d][BDYN_U], this_dae.sparsity_in(DYN_U)));
+      aug_out[DYN_ODE].push_back(project(sens[d][DYN_RX] + rsens[d][BDYN_RX], this_dae.sparsity_in(DYN_RX)));
+      aug_out[DYN_ALG].push_back(project(sens[d][DYN_RZ] + rsens[d][BDYN_RZ], this_dae.sparsity_in(DYN_RZ)));
+      aug_out[DYN_QUAD].push_back(project(sens[d][DYN_RP] + rsens[d][BDYN_RP], this_dae.sparsity_in(DYN_RP)));
+    }
   }
 
   // Concatenate expressions
