@@ -1716,7 +1716,7 @@ void FixedStepIntegrator::init(const Dict& opts) {
 
   // Create dynamic functions, forward and backward problem
   create_function("dynF", fdyn_in(), fdyn_out());
-  if (nrx1_ > 0) create_function("dynB", bdyn_in(), bdyn_out());
+  if (nrx1_ > 0) set_function(rdae_);
 
   // Read options
   for (auto&& op : opts) {

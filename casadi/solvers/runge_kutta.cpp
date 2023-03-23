@@ -147,7 +147,7 @@ namespace casadi {
     // Backward integration
     if (nrx1_ > 0) {
       // Continuous-time dynamics, backward problem
-      Function g = get_function("dynB");
+      Function g = get_function("rdae");
 
       // Symbolic inputs
       MX rx0 = MX::sym("rx0", g.sparsity_in(BDYN_RX));
