@@ -407,6 +407,9 @@ const Options Integrator::options_
     {"nfwd",
      {OT_INT,
       "Number of forward sensitivities to be calculated [0]"}},
+    {"rdae",
+      {OT_FUNCTION,
+      "Function for evaluating the backwards DAE (transitional option - to be removed)"}},
     {"t0",
       {OT_DOUBLE,
       "[DEPRECATED] Beginning of the time horizon"}},
@@ -444,6 +447,8 @@ void Integrator::init(const Dict& opts) {
       print_stats_ = op.second;
     } else if (op.first=="nfwd") {
       nfwd_ = op.second;
+    } else if (op.first=="rdae") {
+      rdae_ = op.second;
     } else if (op.first=="grid") {
       grid = op.second;
       uses_legacy_options = true;
@@ -2095,6 +2100,7 @@ void Integrator::serialize_body(SerializingStream &s) const {
   s.pack("Integrator::t0", t0_);
   s.pack("Integrator::tout", tout_);
   s.pack("Integrator::nfwd", nfwd_);
+  s.pack("Integrator::rdae", rdae_);
 
   s.pack("Integrator::nx", nx_);
   s.pack("Integrator::nz", nz_);
@@ -2142,6 +2148,7 @@ Integrator::Integrator(DeserializingStream & s) : OracleFunction(s) {
   s.unpack("Integrator::t0", t0_);
   s.unpack("Integrator::tout", tout_);
   s.unpack("Integrator::nfwd", nfwd_);
+  s.unpack("Integrator::rdae", rdae_);
 
   s.unpack("Integrator::nx", nx_);
   s.unpack("Integrator::nz", nz_);

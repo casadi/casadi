@@ -324,6 +324,9 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   /// Number of sensitivities
   casadi_int nfwd_;
 
+  /// Backwards DAE function
+  Function rdae_;
+
   /// Number of states for the forward integration
   casadi_int nx_, nz_, nq_, nx1_, nz1_, nq1_;
 
