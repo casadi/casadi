@@ -86,12 +86,32 @@ Function integrator(const std::string& name, const std::string& solver,
 
 Function integrator(const std::string& name, const std::string& solver,
     const SXDict& dae, double t0, const std::vector<double>& tout, const Dict& opts) {
-  return integrator(name, solver, Integrator::map2oracle("dae", dae), t0, tout, opts);
+  // Create function oracle and backwards DAE, if any
+  Function oracle, rdae;
+  oracle = Integrator::map2oracle("dae", dae, &rdae);
+  // Create integrator instance
+  if (rdae.is_null()) {
+    return integrator(name, solver, oracle, t0, tout, opts);
+  } else {
+    Dict opts2 = opts;
+    opts2["rdae"] = rdae;
+    return integrator(name, solver, oracle, t0, tout, opts2);
+  }
 }
 
 Function integrator(const std::string& name, const std::string& solver,
     const MXDict& dae, double t0, const std::vector<double>& tout, const Dict& opts) {
-  return integrator(name, solver, Integrator::map2oracle("dae", dae), t0, tout, opts);
+  // Create function oracle and backwards DAE, if any
+  Function oracle, rdae;
+  oracle = Integrator::map2oracle("dae", dae, &rdae);
+  // Create integrator instance
+  if (rdae.is_null()) {
+    return integrator(name, solver, oracle, t0, tout, opts);
+  } else {
+    Dict opts2 = opts;
+    opts2["rdae"] = rdae;
+    return integrator(name, solver, oracle, t0, tout, opts2);
+  }
 }
 
 Function integrator(const std::string& name, const std::string& solver,
@@ -2030,7 +2050,7 @@ void ImplicitFixedStepIntegrator::init(const Dict& opts) {
 
 template<typename XType>
 Function Integrator::map2oracle(const std::string& name,
-  const std::map<std::string, XType>& d, const Dict& opts) {
+    const std::map<std::string, XType>& d, Function *rdae) {
   std::vector<XType> de_in(DYN_NUM_IN), de_out(DYN_NUM_OUT);
 
   for (auto&& i : d) {
@@ -2094,8 +2114,22 @@ Function Integrator::map2oracle(const std::string& name,
     de_out[i] = vec(densify(de_out[i]));
   }
 
+  // Backwards DAE, if any
+  if (rdae && de_in[DYN_RX].numel() > 0) {
+    // Sort expressions by name
+    std::map<std::string, XType> r;
+    for (casadi_int i = 0; i < DYN_NUM_IN; ++i) r[dyn_in(i)] = de_in[i];
+    for (casadi_int i = 0; i < DYN_NUM_OUT; ++i) r[dyn_out(i)] = de_out[i];
+    // Create new expressions corresponding to the rdae IO scheme
+    std::vector<XType> rdae_in, rdae_out;
+    for (auto& n : bdyn_in()) rdae_in.push_back(r.at(n));
+    for (auto& n : bdyn_out()) rdae_out.push_back(r.at(n));
+    // Form rdae instance
+    *rdae = Function("rdae", rdae_in, rdae_out, bdyn_in(), bdyn_out());
+  }
+
   // Construct
-  return Function(name, de_in, de_out, dyn_in(), dyn_out(), opts);
+  return Function(name, de_in, de_out, dyn_in(), dyn_out());
 }
 
 void Integrator::serialize_body(SerializingStream &s) const {
