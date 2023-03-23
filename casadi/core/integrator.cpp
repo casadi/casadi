@@ -542,6 +542,24 @@ void Integrator::init(const Dict& opts) {
   nrq1_ = oracle_.numel_out(DYN_RQUAD);
   nuq1_ = oracle_.numel_out(DYN_UQUAD);
 
+  // Get/check dimensions in backwards DAE
+  if (rdae_.is_null()) {
+    casadi_assert_dev(nrx1_ == 0);
+  } else {
+    casadi_assert_dev(nrx1_ > 0);
+    casadi_assert(nx1_ == rdae_.numel_in(BDYN_X), "Dimension mismatch");
+    casadi_assert(nz1_ == rdae_.numel_in(BDYN_Z), "Dimension mismatch");
+    casadi_assert(np1_ == rdae_.numel_in(BDYN_P), "Dimension mismatch");
+    casadi_assert(nu1_ == rdae_.numel_in(BDYN_U), "Dimension mismatch");
+    casadi_assert(nrx1_ == rdae_.numel_in(BDYN_RX), "Dimension mismatch");
+    casadi_assert(nrz1_ == rdae_.numel_in(BDYN_RZ), "Dimension mismatch");
+    casadi_assert(nrp1_ == rdae_.numel_in(BDYN_RP), "Dimension mismatch");
+    casadi_assert(oracle_.numel_out(DYN_RODE) == rdae_.numel_out(BDYN_RODE), "Dimension mismatch");
+    casadi_assert(oracle_.numel_out(DYN_RALG) == rdae_.numel_out(BDYN_RALG), "Dimension mismatch");
+    casadi_assert(nrq1_ == rdae_.numel_out(BDYN_RQUAD), "Dimension mismatch");
+    casadi_assert(nuq1_ == rdae_.numel_out(BDYN_UQUAD), "Dimension mismatch");
+  }
+
   // Consistency checks
   casadi_assert(nx1_ > 0, "Ill-posed ODE - no state");
   casadi_assert(nx1_ == oracle_.numel_out(DYN_ODE), "Dimension mismatch for 'ode'");
