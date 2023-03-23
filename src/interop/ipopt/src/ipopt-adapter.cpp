@@ -1,4 +1,4 @@
-#include <alpaqa/ipopt-adapter.hpp>
+#include <alpaqa/ipopt/ipopt-adapter.hpp>
 
 #include <IpIpoptCalculatedQuantities.hpp>
 
