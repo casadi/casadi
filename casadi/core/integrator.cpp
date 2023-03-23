@@ -612,9 +612,12 @@ int Integrator::init_mem(void* mem) const {
   return 0;
 }
 
-Function Integrator::augmented_dae() const {
+Function Integrator::augmented_dae(Function* rdae) const {
   // If no sensitivities, augmented oracle is the oracle itself
-  if (nfwd_ == 0) return oracle_;
+  if (nfwd_ == 0) {
+    if (rdae) *rdae = rdae_;
+    return oracle_;
+  }
   // Name of augmented DAE
   std::string aug_name = "fsens" + str(nfwd_) + "_" + oracle_.name();
   // Use function in cache, if available
@@ -623,9 +626,9 @@ Function Integrator::augmented_dae() const {
   // Create new augmented oracle
   try {
     if (oracle_.is_a("SXFunction")) {
-      ret = get_augmented_dae<SX>(aug_name);
+      ret = get_augmented_dae<SX>(aug_name, rdae);
     } else {
-      ret = get_augmented_dae<MX>(aug_name);
+      ret = get_augmented_dae<MX>(aug_name, rdae);
     }
   } catch (std::exception& e) {
     casadi_error("Failed to generate augmented DAE for " + name_ + ":\n" + e.what());
@@ -636,7 +639,7 @@ Function Integrator::augmented_dae() const {
 }
 
 template<typename MatType>
-Function Integrator::get_augmented_dae(const std::string& name) const {
+Function Integrator::get_augmented_dae(const std::string& name, Function* rdae) const {
   if (verbose_) casadi_message(name_ + "::get_augmented_dae");
 
   // Get input and output expressions
@@ -684,9 +687,24 @@ Function Integrator::get_augmented_dae(const std::string& name) const {
     }
   }
 
-  // Convert to oracle function and return
+  // Concatenate arrays
   for (casadi_int i = 0; i < DYN_NUM_IN; ++i) arg.at(i) = vertcat(aug_in[i]);
   for (casadi_int i = 0; i < DYN_NUM_OUT; ++i) res.at(i) = vertcat(aug_out[i]);
+
+  // Create backwards DAE
+  if (rdae != 0 && !arg[DYN_RX].is_empty()) {
+    // Sort expressions by name
+    std::map<std::string, MatType> r;
+    for (casadi_int i = 0; i < DYN_NUM_IN; ++i) r[dyn_in(i)] = arg[i];
+    for (casadi_int i = 0; i < DYN_NUM_OUT; ++i) r[dyn_out(i)] = res[i];
+    // Construct backwards DAE
+    std::vector<MatType> rdae_in, rdae_out;
+    for (auto& n : bdyn_in()) rdae_in.push_back(r.at(n));
+    for (auto& n : bdyn_out()) rdae_out.push_back(r.at(n));
+    *rdae = Function("rdae", rdae_in, rdae_out, bdyn_in(), bdyn_out());
+  }
+
+  // Convert to oracle function and return
   return Function(name, arg, res, dyn_in(), dyn_out());
 }
 
@@ -1301,12 +1319,17 @@ Function Integrator::get_forward(casadi_int nfwd, const std::string& name,
     aug_opts[i.first] = i.second;
   }
 
+  // Get current DAE, with any existing sensitivity equations augmented
+  Function this_dae, this_rdae;
+  this_dae = augmented_dae(&this_rdae);
+
   // Create integrator for augmented DAE
   std::string aug_prefix = "fsens" + str(nfwd) + "_";
   aug_opts["derivative_of"] = self();
   aug_opts["nfwd"] = nfwd;
+  if (!this_rdae.is_null()) aug_opts["rdae"] = this_rdae;
   Function aug_int = integrator(aug_prefix + name_, plugin_name(),
-    augmented_dae(), t0_, tout_, aug_opts);
+    this_dae, t0_, tout_, aug_opts);
 
   // All inputs of the return function
   std::vector<MX> ret_in;
@@ -1406,7 +1429,7 @@ Function Integrator::get_reverse(casadi_int nadj, const std::string& name,
 
   // Get the current oracle, augmented with forward sensitivity equations if any
   Function this_dae, this_rdae;
-  this_dae = augmented_dae();
+  this_dae = augmented_dae(&this_rdae);
 
   // Create integrator for augmented DAE
   Function aug_dae, aug_rdae;

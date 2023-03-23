@@ -268,8 +268,9 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   /** \brief Generate the augmented DAE system
 
       \identifier{261} */
-  template<typename MatType> Function get_augmented_dae(const std::string& name) const;
-  Function augmented_dae() const;
+  template<typename MatType> Function get_augmented_dae(const std::string& name,
+    Function* rdae) const;
+  Function augmented_dae(Function* rdae) const;
   ///@}
 
   /** \brief Generate a augmented DAE system with \a nadj adjoint sensitivities
