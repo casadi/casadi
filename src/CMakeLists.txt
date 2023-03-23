@@ -222,6 +222,10 @@ if (ALPAQA_WITH_LBFGSB)
         "thirdparty/lbfgsb/Lbfgsb.3.0/blas.f"
         "thirdparty/lbfgsb/Lbfgsb.3.0/linpack.f"
     )
+    set_target_properties(lbfgsb-fortran PROPERTIES LINKER_LANGUAGE Fortran)
+    if (CMAKE_Fortran_COMPILER_ID STREQUAL GNU)
+        target_link_libraries(lbfgsb-fortran INTERFACE gfortran)
+    endif()
     list(APPEND ALPAQA_INSTALL_TARGETS lbfgsb-fortran)
     add_library(lbfgsb-adapter
         "interop/lbfgsb/src/lbfgsb-adapter.cpp"
