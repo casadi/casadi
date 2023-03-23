@@ -691,12 +691,13 @@ Function Integrator::get_augmented_dae(const std::string& name) const {
 }
 
 template<typename MatType>
-Function Integrator::aug_adj(const Function& aug_oracle, casadi_int nadj, Function* rdae) const {
+Function Integrator::aug_adj(const Function& this_dae, const Function& this_rdae,
+    casadi_int nadj, Function* aug_rdae) const {
   if (verbose_) casadi_message(name_ + "::aug_adj");
 
   // Get input and output expressions
-  std::vector<MatType> arg = MatType::get_input(aug_oracle);
-  std::vector<MatType> res = aug_oracle(arg);
+  std::vector<MatType> arg = MatType::get_input(this_dae);
+  std::vector<MatType> res = this_dae(arg);
 
   // Symbolic expression for augmented DAE
   std::vector<std::vector<MatType>> aug_in(DYN_NUM_IN);
@@ -705,14 +706,14 @@ Function Integrator::aug_adj(const Function& aug_oracle, casadi_int nadj, Functi
   for (casadi_int i = 0; i < DYN_NUM_OUT; ++i) aug_out[i].push_back(res.at(i));
 
   // Zero of time dimension
-  MatType zero_t = MatType::zeros(aug_oracle.sparsity_in(DYN_T));
+  MatType zero_t = MatType::zeros(this_dae.sparsity_in(DYN_T));
 
   // Reverse mode directional derivatives
   std::vector<std::vector<MatType>> seed(nadj, std::vector<MatType>(DYN_NUM_OUT));
   for (casadi_int d = 0; d < nadj; ++d) {
     std::string pref = "aug" + str(d) + "_";
     for (casadi_int i = 0; i < DYN_NUM_OUT; ++i) {
-      seed[d][i] = MatType::sym(pref + dyn_out(i), aug_oracle.sparsity_out(i));
+      seed[d][i] = MatType::sym(pref + dyn_out(i), this_dae.sparsity_out(i));
     }
     aug_in[DYN_RX].push_back(seed[d][DYN_ODE]);
     aug_in[DYN_RZ].push_back(seed[d][DYN_ALG]);
@@ -725,20 +726,20 @@ Function Integrator::aug_adj(const Function& aug_oracle, casadi_int nadj, Functi
 
   // Calculate directional derivatives
   std::vector<std::vector<MatType>> sens;
-  bool always_inline = aug_oracle.is_a("SXFunction") || aug_oracle.is_a("MXFunction");
-  aug_oracle->call_reverse(arg, res, seed, sens, always_inline, false);
+  bool always_inline = this_dae.is_a("SXFunction") || this_dae.is_a("MXFunction");
+  this_dae->call_reverse(arg, res, seed, sens, always_inline, false);
 
   // Collect sensitivity equations
   casadi_assert_dev(sens.size()==nadj);
   for (casadi_int d = 0; d < nadj; ++d) {
     casadi_assert_dev(sens[d].size() == DYN_NUM_IN);
-    aug_out[DYN_RODE].push_back(project(sens[d][DYN_X], aug_oracle.sparsity_in(DYN_X)));
-    aug_out[DYN_RALG].push_back(project(sens[d][DYN_Z], aug_oracle.sparsity_in(DYN_Z)));
-    aug_out[DYN_RQUAD].push_back(project(sens[d][DYN_P], aug_oracle.sparsity_in(DYN_P)));
-    aug_out[DYN_UQUAD].push_back(project(sens[d][DYN_U], aug_oracle.sparsity_in(DYN_U)));
-    aug_out[DYN_ODE].push_back(project(sens[d][DYN_RX], aug_oracle.sparsity_in(DYN_RX)));
-    aug_out[DYN_ALG].push_back(project(sens[d][DYN_RZ], aug_oracle.sparsity_in(DYN_RZ)));
-    aug_out[DYN_QUAD].push_back(project(sens[d][DYN_RP], aug_oracle.sparsity_in(DYN_RP)));
+    aug_out[DYN_RODE].push_back(project(sens[d][DYN_X], this_dae.sparsity_in(DYN_X)));
+    aug_out[DYN_RALG].push_back(project(sens[d][DYN_Z], this_dae.sparsity_in(DYN_Z)));
+    aug_out[DYN_RQUAD].push_back(project(sens[d][DYN_P], this_dae.sparsity_in(DYN_P)));
+    aug_out[DYN_UQUAD].push_back(project(sens[d][DYN_U], this_dae.sparsity_in(DYN_U)));
+    aug_out[DYN_ODE].push_back(project(sens[d][DYN_RX], this_dae.sparsity_in(DYN_RX)));
+    aug_out[DYN_ALG].push_back(project(sens[d][DYN_RZ], this_dae.sparsity_in(DYN_RZ)));
+    aug_out[DYN_QUAD].push_back(project(sens[d][DYN_RP], this_dae.sparsity_in(DYN_RP)));
   }
 
   // Concatenate expressions
@@ -765,16 +766,16 @@ Function Integrator::aug_adj(const Function& aug_oracle, casadi_int nadj, Functi
   }
 
   // Create backwards DAE
-  if (rdae != 0 && !arg[DYN_RX].is_empty()) {
+  if (aug_rdae != 0 && !arg[DYN_RX].is_empty()) {
     std::vector<MatType> rdae_in, rdae_out;
     for (auto& n : bdyn_in()) rdae_in.push_back(r.at(n));
     for (auto& n : bdyn_out()) rdae_out.push_back(r.at(n));
-    *rdae = Function("rdae", rdae_in, rdae_out, bdyn_in(), bdyn_out());
+    *aug_rdae = Function("rdae", rdae_in, rdae_out, bdyn_in(), bdyn_out());
   }
 
   // Convert to oracle function and return
   std::string aug_prefix = "asens" + str(nadj) + "_";
-  std::string dae_name = aug_prefix + aug_oracle.name();
+  std::string dae_name = aug_prefix + this_dae.name();
   return Function(dae_name, arg, res, dyn_in(), dyn_out());
 }
 
@@ -1404,19 +1405,20 @@ Function Integrator::get_reverse(casadi_int nadj, const std::string& name,
   }
 
   // Get the current oracle, augmented with forward sensitivity equations if any
-  Function aug_oracle = augmented_dae();
+  Function this_dae, this_rdae;
+  this_dae = augmented_dae();
 
   // Create integrator for augmented DAE
-  Function aug_dae, rdae;
+  Function aug_dae, aug_rdae;
   std::string aug_prefix = "asens" + str(nadj) + "_";
-  if (aug_oracle.is_a("SXFunction")) {
-    aug_dae = aug_adj<SX>(aug_oracle, nadj, &rdae);
+  if (this_dae.is_a("SXFunction")) {
+    aug_dae = aug_adj<SX>(this_dae, this_rdae, nadj, &aug_rdae);
   } else {
-    aug_dae = aug_adj<MX>(aug_oracle, nadj, &rdae);
+    aug_dae = aug_adj<MX>(this_dae, this_rdae, nadj, &aug_rdae);
   }
   aug_opts["derivative_of"] = self();
   aug_opts["nfwd"] = 0;
-  if (!rdae.is_null()) aug_opts["rdae"] = rdae;
+  if (!aug_rdae.is_null()) aug_opts["rdae"] = aug_rdae;
   Function aug_int = integrator(aug_prefix + name_, plugin_name(),
     aug_dae, t0_, tout_, aug_opts);
 

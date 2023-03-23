@@ -276,7 +276,8 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
 
       \identifier{1mc} */
   template<typename MatType>
-  Function aug_adj(const Function& aug_oracle, casadi_int nadj, Function* rdae) const;
+  Function aug_adj(const Function& this_dae, const Function& this_rdae,
+    casadi_int nadj, Function* aug_rdae) const;
 
   /// Helper function, get augmented system Jacobian
   Sparsity sp_jac_aug(const Sparsity& J, const Sparsity& J1) const;
