@@ -2287,25 +2287,34 @@ void ImplicitFixedStepIntegrator::init(const Dict& opts) {
 template<typename XType>
 Function Integrator::map2oracle(const std::string& name,
     const std::map<std::string, XType>& d, Function *rdae) {
-  std::vector<XType> de_in(DYN_NUM_IN), de_out(DYN_NUM_OUT);
+  std::vector<XType> de_in(DYN_NUM_IN), de_out(DYN_NUM_OUT),
+    rde_in(BDYN_NUM_IN), rde_out(BDYN_NUM_OUT);
 
   for (auto&& i : d) {
     if (i.first=="t") {
       de_in[DYN_T]=i.second;
+      rde_in[BDYN_T]=i.second;
     } else if (i.first=="x") {
       de_in[DYN_X]=i.second;
+      rde_in[BDYN_X]=i.second;
     } else if (i.first=="z") {
       de_in[DYN_Z]=i.second;
+      rde_in[BDYN_Z]=i.second;
     } else if (i.first=="p") {
       de_in[DYN_P]=i.second;
+      rde_in[BDYN_P]=i.second;
     } else if (i.first=="u") {
       de_in[DYN_U]=i.second;
+      rde_in[BDYN_U]=i.second;
     } else if (i.first=="rx") {
       de_in[DYN_RX]=i.second;
+      rde_in[BDYN_RX]=i.second;
     } else if (i.first=="rz") {
       de_in[DYN_RZ]=i.second;
+      rde_in[BDYN_RZ]=i.second;
     } else if (i.first=="rp") {
       de_in[DYN_RP]=i.second;
+      rde_in[BDYN_RP]=i.second;
     } else if (i.first=="ode") {
       de_out[DYN_ODE]=i.second;
     } else if (i.first=="alg") {
@@ -2314,12 +2323,16 @@ Function Integrator::map2oracle(const std::string& name,
       de_out[DYN_QUAD]=i.second;
     } else if (i.first=="rode") {
       de_out[DYN_RODE]=i.second;
+      rde_out[BDYN_RODE]=i.second;
     } else if (i.first=="ralg") {
       de_out[DYN_RALG]=i.second;
+      rde_out[BDYN_RALG]=i.second;
     } else if (i.first=="rquad") {
       de_out[DYN_RQUAD]=i.second;
+      rde_out[BDYN_RQUAD]=i.second;
     } else if (i.first=="uquad") {
       de_out[DYN_UQUAD]=i.second;
+      rde_out[BDYN_UQUAD]=i.second;
     } else {
       casadi_error("No such field: " + i.first);
     }
@@ -2350,18 +2363,34 @@ Function Integrator::map2oracle(const std::string& name,
     de_out[i] = vec(densify(de_out[i]));
   }
 
+  // Consistency checks, input sparsities
+  for (casadi_int i = 0; i < BDYN_NUM_IN; ++i) {
+    const Sparsity& sp = rde_in[i].sparsity();
+    if (i == BDYN_T) {
+      casadi_assert(sp.is_empty() || sp.is_scalar(), "DAE time variable must be empty or scalar. "
+        "Got dimension " + str(sp.size()));
+    } else {
+      casadi_assert(sp.is_empty() || sp.is_vector(), "DAE inputs must be empty or vectors. "
+        + dyn_in(i) + " has dimension " + str(sp.size()) + ".");
+    }
+    casadi_assert(sp.is_dense(), "DAE inputs must be dense . "
+      + dyn_in(i) + " is sparse.");
+    // Convert row vectors to column vectors
+    rde_in[i] = vec(rde_in[i]);
+  }
+
+  // Consistency checks, output sparsities
+  for (casadi_int i = 0; i < BDYN_NUM_OUT; ++i) {
+    const Sparsity& sp = rde_out[i].sparsity();
+    casadi_assert(sp.is_empty() || sp.is_vector(), "DAE outputs must be empty or vectors. "
+      + dyn_out(i) + " has dimension " + str(sp.size()));
+    // Make sure dense and vector
+    rde_out[i] = vec(densify(rde_out[i]));
+  }
+
   // Backwards DAE, if any
-  if (rdae && de_in[DYN_RX].numel() > 0) {
-    // Sort expressions by name
-    std::map<std::string, XType> r;
-    for (casadi_int i = 0; i < DYN_NUM_IN; ++i) r[dyn_in(i)] = de_in[i];
-    for (casadi_int i = 0; i < DYN_NUM_OUT; ++i) r[dyn_out(i)] = de_out[i];
-    // Create new expressions corresponding to the rdae IO scheme
-    std::vector<XType> rdae_in, rdae_out;
-    for (auto& n : bdyn_in()) rdae_in.push_back(r.at(n));
-    for (auto& n : bdyn_out()) rdae_out.push_back(r.at(n));
-    // Form rdae instance
-    *rdae = Function("rdae", rdae_in, rdae_out, bdyn_in(), bdyn_out());
+  if (rdae && rde_in[BDYN_RX].numel() > 0) {
+    *rdae = Function("rdae", rde_in, rde_out, bdyn_in(), bdyn_out());
   }
 
   // Construct
