@@ -46895,10 +46895,10 @@ I: expression for invariants
 Extra doc: https://github.com/casadi/casadi/wiki/L_23h
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integration_tools.hpp#L1059
+https://github.com/casadi/casadi/blob/develop/casadi/core/integration_tools.hpp#L1056
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integration_tools.cpp#L1059-L1061
+https://github.com/casadi/casadi/blob/develop/casadi/core/integration_tools.cpp#L1056-L1058
 
 ";
 
@@ -46998,10 +46998,10 @@ I: expression for invariants
 Extra doc: https://github.com/casadi/casadi/wiki/L_23h
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integration_tools.hpp#L1063
+https://github.com/casadi/casadi/blob/develop/casadi/core/integration_tools.hpp#L1060
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integration_tools.cpp#L1063-L1065
+https://github.com/casadi/casadi/blob/develop/casadi/core/integration_tools.cpp#L1060-L1062
 
 ";
 
@@ -47046,10 +47046,10 @@ See:
 Extra doc: https://github.com/casadi/casadi/wiki/L_1su
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integration_tools.hpp#L1203
+https://github.com/casadi/casadi/blob/develop/casadi/core/integration_tools.hpp#L1200
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integration_tools.cpp#L1203-L1206
+https://github.com/casadi/casadi/blob/develop/casadi/core/integration_tools.cpp#L1200-L1203
 
 ";
 
@@ -47094,10 +47094,10 @@ See:
 Extra doc: https://github.com/casadi/casadi/wiki/L_1su
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integration_tools.hpp#L1208
+https://github.com/casadi/casadi/blob/develop/casadi/core/integration_tools.hpp#L1205
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integration_tools.cpp#L1208-L1211
+https://github.com/casadi/casadi/blob/develop/casadi/core/integration_tools.cpp#L1205-L1208
 
 ";
 
@@ -47161,10 +47161,10 @@ See:
 Extra doc: https://github.com/casadi/casadi/wiki/L_1sv
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integration_tools.hpp#L1213
+https://github.com/casadi/casadi/blob/develop/casadi/core/integration_tools.hpp#L1210
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integration_tools.cpp#L1213-L1216
+https://github.com/casadi/casadi/blob/develop/casadi/core/integration_tools.cpp#L1210-L1213
 
 ";
 
@@ -47228,10 +47228,10 @@ See:
 Extra doc: https://github.com/casadi/casadi/wiki/L_1sv
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integration_tools.hpp#L1218
+https://github.com/casadi/casadi/blob/develop/casadi/core/integration_tools.hpp#L1215
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integration_tools.cpp#L1218-L1221
+https://github.com/casadi/casadi/blob/develop/casadi/core/integration_tools.cpp#L1215-L1218
 
 ";
 
@@ -51706,7 +51706,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/integration_tools.hpp#L356
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integration_tools.cpp#L356-L398
+https://github.com/casadi/casadi/blob/develop/casadi/core/integration_tools.cpp#L356-L395
 
 ";
 

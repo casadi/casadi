@@ -29068,10 +29068,10 @@ I: expression for invariants
 Extra doc: https://github.com/casadi/casadi/wiki/L_23h
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integration_tools.hpp#L1063
+https://github.com/casadi/casadi/blob/develop/casadi/core/integration_tools.hpp#L1060
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integration_tools.cpp#L1063-L1065
+https://github.com/casadi/casadi/blob/develop/casadi/core/integration_tools.cpp#L1060-L1062
 
 >  SXDict casadi::dae_reduce_index(const SXDict &dae, Dict &stats, const Dict &opts)
 ------------------------------------------------------------------------
@@ -29168,10 +29168,10 @@ I: expression for invariants
 Extra doc: https://github.com/casadi/casadi/wiki/L_23h
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integration_tools.hpp#L1063
+https://github.com/casadi/casadi/blob/develop/casadi/core/integration_tools.hpp#L1060
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integration_tools.cpp#L1063-L1065
+https://github.com/casadi/casadi/blob/develop/casadi/core/integration_tools.cpp#L1060-L1062
 
 ";
 
@@ -29217,10 +29217,10 @@ See:
 Extra doc: https://github.com/casadi/casadi/wiki/L_1su
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integration_tools.hpp#L1208
+https://github.com/casadi/casadi/blob/develop/casadi/core/integration_tools.hpp#L1205
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integration_tools.cpp#L1208-L1211
+https://github.com/casadi/casadi/blob/develop/casadi/core/integration_tools.cpp#L1205-L1208
 
 >  SXDict casadi::dae_map_semi_expl(const SXDict &dae, const SXDict &dae_red, Function &state_to_orig, Function &phi)
 ------------------------------------------------------------------------
@@ -29261,10 +29261,10 @@ See:
 Extra doc: https://github.com/casadi/casadi/wiki/L_1su
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integration_tools.hpp#L1208
+https://github.com/casadi/casadi/blob/develop/casadi/core/integration_tools.hpp#L1205
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integration_tools.cpp#L1208-L1211
+https://github.com/casadi/casadi/blob/develop/casadi/core/integration_tools.cpp#L1205-L1208
 
 ";
 
@@ -29328,10 +29328,10 @@ See:
 Extra doc: https://github.com/casadi/casadi/wiki/L_1sv
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integration_tools.hpp#L1218
+https://github.com/casadi/casadi/blob/develop/casadi/core/integration_tools.hpp#L1215
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integration_tools.cpp#L1218-L1221
+https://github.com/casadi/casadi/blob/develop/casadi/core/integration_tools.cpp#L1215-L1218
 
 >  Function casadi::dae_init_gen(const SXDict &dae, const SXDict &dae_red, const std::string &init_solver, const DMDict &init_strength, const Dict &init_solver_options)
 ------------------------------------------------------------------------
@@ -29390,10 +29390,10 @@ See:
 Extra doc: https://github.com/casadi/casadi/wiki/L_1sv
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integration_tools.hpp#L1218
+https://github.com/casadi/casadi/blob/develop/casadi/core/integration_tools.hpp#L1215
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integration_tools.cpp#L1218-L1221
+https://github.com/casadi/casadi/blob/develop/casadi/core/integration_tools.cpp#L1215-L1218
 
 ";
 
@@ -33907,7 +33907,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/integration_tools.hpp#L356
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integration_tools.cpp#L356-L398
+https://github.com/casadi/casadi/blob/develop/casadi/core/integration_tools.cpp#L356-L395
 
 ";
 
