@@ -517,6 +517,13 @@ void Integrator::init(const Dict& opts) {
   nrq1_ = oracle_.numel_out(DYN_RQUAD);
   nuq1_ = oracle_.numel_out(DYN_UQUAD);
 
+  // Consistency checks
+  casadi_assert(nx1_ > 0, "Ill-posed ODE - no state");
+  casadi_assert(nx1_ == oracle_.numel_out(DYN_ODE), "Dimension mismatch for 'ode'");
+  casadi_assert(nz1_ == oracle_.numel_out(DYN_ALG), "Dimension mismatch for 'alg'");
+  casadi_assert(nrx1_ == oracle_.numel_out(DYN_RODE), "Dimension mismatch for 'rode'");
+  casadi_assert(nrz1_ == oracle_.numel_out(DYN_RALG), "Dimension mismatch for 'ralg'");
+
   // Get dimensions (including sensitivity equations)
   nx_ = nx1_ * (1 + nfwd_);
   nz_ = nz1_ * (1 + nfwd_);
@@ -2049,44 +2056,30 @@ Function Integrator::map2oracle(const std::string& name,
     }
   }
 
-  // Make sure x and ode exist
-  casadi_assert(!de_in[DYN_X].is_empty(), "Ill-posed ODE - no state");
-
-  // Number of right-hand-sides
-  casadi_int nrhs = de_in[DYN_X].size2();
-
-  // Make sure consistent number of right-hand-sides
-  for (bool b : {true, false}) {
-    for (auto&& e : b ? de_in : de_out) {
-      // Skip time
-      if (&e == &de_in[DYN_T]) continue;
-      // Number of rows
-      casadi_int nr = e.size1();
-      // Make sure no change in number of elements
-      casadi_assert(e.numel()==nr*nrhs, "Inconsistent number of rhs");
-      e = reshape(e, nr, nrhs);
+  // Consistency checks, input sparsities
+  for (casadi_int i = 0; i < DYN_NUM_IN; ++i) {
+    const Sparsity& sp = de_in[i].sparsity();
+    if (i == DYN_T) {
+      casadi_assert(sp.is_empty() || sp.is_scalar(), "DAE time variable must be empty or scalar. "
+        "Got dimension " + str(sp.size()));
+    } else {
+      casadi_assert(sp.is_empty() || sp.is_vector(), "DAE inputs must be empty or vectors. "
+        + dyn_in(i) + " has dimension " + str(sp.size()) + ".");
     }
+    casadi_assert(sp.is_dense(), "DAE inputs must be dense . "
+      + dyn_in(i) + " is sparse.");
+    // Convert row vectors to column vectors
+    de_in[i] = vec(de_in[i]);
   }
 
-  // Consistent sparsity for x
-  casadi_assert(de_in[DYN_X].size()==de_out[DYN_ODE].size(),
-    "Dimension mismatch for 'ode'");
-  de_out[DYN_ODE] = project(de_out[DYN_ODE], de_in[DYN_X].sparsity());
-
-  // Consistent sparsity for z
-  casadi_assert(de_in[DYN_Z].size()==de_out[DYN_ALG].size(),
-    "Dimension mismatch for 'alg'");
-  de_out[DYN_ALG] = project(de_out[DYN_ALG], de_in[DYN_Z].sparsity());
-
-  // Consistent sparsity for rx
-  casadi_assert(de_in[DYN_RX].size()==de_out[DYN_RODE].size(),
-    "Dimension mismatch for 'rode'");
-  de_out[DYN_RODE] = project(de_out[DYN_RODE], de_in[DYN_RX].sparsity());
-
-  // Consistent sparsity for rz
-  casadi_assert(de_in[DYN_RZ].size()==de_out[DYN_RALG].size(),
-    "Dimension mismatch for 'ralg'");
-  de_out[DYN_RALG] = project(de_out[DYN_RALG], de_in[DYN_RZ].sparsity());
+  // Consistency checks, output sparsities
+  for (casadi_int i = 0; i < DYN_NUM_OUT; ++i) {
+    const Sparsity& sp = de_out[i].sparsity();
+    casadi_assert(sp.is_empty() || sp.is_vector(), "DAE outputs must be empty or vectors. "
+      + dyn_out(i) + " has dimension " + str(sp.size()));
+    // Make sure dense and vector
+    de_out[i] = vec(densify(de_out[i]));
+  }
 
   // Construct
   return Function(name, de_in, de_out, dyn_in(), dyn_out(), opts);
