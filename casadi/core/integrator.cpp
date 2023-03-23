@@ -619,7 +619,7 @@ Function Integrator::augmented_dae() const {
   std::string aug_name = "fsens" + str(nfwd_) + "_" + oracle_.name();
   // Use function in cache, if available
   Function ret;
-  if (incache(aug_name, ret)) return ret;
+  // if (incache(aug_name, ret)) return ret;  // caching disabled while implementing #3047
   // Create new augmented oracle
   try {
     if (oracle_.is_a("SXFunction")) {
@@ -631,7 +631,7 @@ Function Integrator::augmented_dae() const {
     casadi_error("Failed to generate augmented DAE for " + name_ + ":\n" + e.what());
   }
   // Save to Function cache and return
-  tocache(ret);
+  // tocache(ret);  // caching disabled while implementing #3047
   return ret;
 }
 
