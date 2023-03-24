@@ -11,7 +11,7 @@ import subprocess
 import platform
 import sys
 import warnings
-from ..casadi_generator import generate_casadi_problem, generate_casadi_control_problem, SECOND_ORDER_SPEC
+from ..casadi_generator import generate_casadi_problem, generate_casadi_control_problem, SECOND_ORDER_SPEC, write_casadi_problem_data
 from ..cache import get_alpaqa_cache_dir
 
 # TODO: factor out caching logic
@@ -26,13 +26,20 @@ def _load_casadi_problem(sofile):
 def generate_and_compile_casadi_problem(
     f: cs.Function,
     g: cs.Function,
+    *,
+    C = None,
+    D = None,
+    param = None,
     second_order: SECOND_ORDER_SPEC = 'no',
     name: str = "alpaqa_problem",
 ) -> pa.CasADiProblem:
     """Compile the objective and constraint functions into a alpaqa Problem.
 
-    :param f:            Objective function.
-    :param g:            Constraint function.
+    :param f:            Objective function f(x).
+    :param g:            Constraint function g(x).
+    :param C:            Bound constraints on x.
+    :param D:            Bound constraints on g(x).
+    :param param:        Problem parameter values.
     :param second_order: Whether to generate functions for evaluating Hessians.
     :param name: Optional string description of the problem (used for filename).
 
@@ -51,6 +58,7 @@ def generate_and_compile_casadi_problem(
             uid, soname, dim = cache[key]
             probdir = join(cachedir, str(uid))
             sofile = join(probdir, soname)
+            write_casadi_problem_data(sofile, C, D, param)
             try:
                 return _load_casadi_problem(sofile)
             except:
@@ -102,6 +110,7 @@ def generate_and_compile_casadi_problem(
         soname = os.path.relpath(sofile, probdir)
         cache[key] = uid, soname, (n, m, p)
 
+        write_casadi_problem_data(sofile, C, D, param)
         return _load_casadi_problem(sofile)
 
 

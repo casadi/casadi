@@ -1,4 +1,6 @@
 import casadi as cs
+import numpy as np
+from os.path import splitext
 from typing import Tuple, Optional, Literal, get_args
 
 SECOND_ORDER_SPEC = Literal['no', 'full', 'prod', 'L', 'psi_prod', 'psi']
@@ -510,3 +512,19 @@ def generate_casadi_control_problem(
     ))
 
     return cg
+
+def write_casadi_problem_data(sofile, C, D, param):
+    if C is None and D is None and param is None:
+        return
+    C = C or ([], [])
+    D = D or ([], [])
+    param = param or []
+    with open(f"{splitext(sofile)[0]}.csv", "w") as f:
+        opt = dict(delimiter=",", newline="\n")
+        ravelrow = lambda x: np.reshape(x, (1, -1), order="A")
+        writerow = lambda x: np.savetxt(f, ravelrow(x), **opt)
+        writerow(getattr(C, "lowerbound", None) or C[0])
+        writerow(getattr(C, "upperbound", None) or C[1])
+        writerow(getattr(D, "lowerbound", None) or D[0])
+        writerow(getattr(D, "upperbound", None) or D[1])
+        writerow(param)
