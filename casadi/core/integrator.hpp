@@ -184,9 +184,6 @@ enum DynIn {
   DYN_Z,
   DYN_P,
   DYN_U,
-  DYN_RX,
-  DYN_RZ,
-  DYN_RP,
   DYN_NUM_IN};
 
 /// Inputs of the symbolic representation of the DAE
@@ -194,10 +191,6 @@ enum DynOut {
   DYN_ODE,
   DYN_ALG,
   DYN_QUAD,
-  DYN_RODE,
-  DYN_RALG,
-  DYN_RQUAD,
-  DYN_UQUAD,
   DYN_NUM_OUT};
 
 /// Input arguments of an integrator

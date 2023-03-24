@@ -93,7 +93,7 @@ namespace casadi {
 
   void Collocation::setup_step() {
     // Continuous-time dynamics, forward problem
-    Function f = get_function("dynF");
+    Function f = get_function("dae");
 
     // All collocation time points
     std::vector<double> tau_root = collocation_points(deg_, collocation_scheme_);
@@ -140,11 +140,11 @@ namespace casadi {
     }
 
     // Symbolic inputs
-    MX t0 = MX::sym("t0", f.sparsity_in(FDYN_T));
+    MX t0 = MX::sym("t0", f.sparsity_in(DYN_T));
     MX h = MX::sym("h");
-    MX x0 = MX::sym("x0", f.sparsity_in(FDYN_X));
-    MX p = MX::sym("p", f.sparsity_in(FDYN_P));
-    MX u = MX::sym("u", f.sparsity_in(FDYN_U));
+    MX x0 = MX::sym("x0", f.sparsity_in(DYN_X));
+    MX p = MX::sym("p", f.sparsity_in(DYN_P));
+    MX u = MX::sym("u", f.sparsity_in(DYN_U));
 
     // Implicitly defined variables (z and x)
     MX v = MX::sym("v", deg_ * (nx1_ + nz1_));
@@ -183,12 +183,12 @@ namespace casadi {
     for (casadi_int j = 1; j < deg_ + 1; ++j) {
 
       // Evaluate the DAE
-      std::vector<MX> f_arg(FDYN_NUM_IN);
-      f_arg[FDYN_T] = tt[j];
-      f_arg[FDYN_P] = p;
-      f_arg[FDYN_U] = u;
-      f_arg[FDYN_X] = x[j];
-      f_arg[FDYN_Z] = z[j];
+      std::vector<MX> f_arg(DYN_NUM_IN);
+      f_arg[DYN_T] = tt[j];
+      f_arg[DYN_P] = p;
+      f_arg[DYN_U] = u;
+      f_arg[DYN_X] = x[j];
+      f_arg[DYN_Z] = z[j];
       std::vector<MX> f_res = f(f_arg);
 
       // Get an expression for the state derivative at the collocation point
@@ -198,16 +198,16 @@ namespace casadi {
       }
 
       // Add collocation equation
-      eq.push_back(vec(h * f_res[FDYN_ODE] - xp_j));
+      eq.push_back(vec(h * f_res[DYN_ODE] - xp_j));
 
       // Add the algebraic conditions
-      eq.push_back(vec(f_res[FDYN_ALG]));
+      eq.push_back(vec(f_res[DYN_ALG]));
 
       // Add contribution to the final state
       xf += D[j] * x[j];
 
       // Add contribution to quadratures
-      qf += (B[j] * h) * f_res[FDYN_QUAD];
+      qf += (B[j] * h) * f_res[DYN_QUAD];
     }
 
     // Form forward discrete time dynamics
@@ -231,11 +231,11 @@ namespace casadi {
     // sensitivities whenever g is the reverse mode derivative of f.
     if (nrx1_ > 0) {
       // Continuous-time dynamics, backward problem
-      Function g = get_function("dynB");
+      Function g = get_function("rdae");
 
       // Symbolic inputs
-      MX rx0 = MX::sym("rx0", g.sparsity_in(BDYN_RX));
-      MX rp = MX::sym("rp", g.sparsity_in(BDYN_RP));
+      MX rx0 = MX::sym("rx0", g.sparsity_in(BDYN_ADJ_ODE));
+      MX rp = MX::sym("rp", g.sparsity_in(BDYN_ADJ_QUAD));
 
       // Implicitly defined variables (rz and rx)
       MX rv = MX::sym("v", deg_ * (nrx1_ + nrz1_));
@@ -275,9 +275,9 @@ namespace casadi {
         g_arg[BDYN_U] = u;
         g_arg[BDYN_X] = x[j];
         g_arg[BDYN_Z] = z[j];
-        g_arg[BDYN_RX] = rx[j];
-        g_arg[BDYN_RZ] = rz[j];
-        g_arg[BDYN_RP] = rp;
+        g_arg[BDYN_ADJ_ODE] = rx[j];
+        g_arg[BDYN_ADJ_ALG] = rz[j];
+        g_arg[BDYN_ADJ_QUAD] = rp;
         std::vector<MX> g_res = g(g_arg);
 
         // Get an expression for the state derivative at the collocation point
@@ -287,17 +287,17 @@ namespace casadi {
         }
 
         // Add collocation equation
-        eq.push_back(vec(h * B[j] * g_res[BDYN_RODE] - rxp_j));
+        eq.push_back(vec(h * B[j] * g_res[BDYN_ADJ_X] - rxp_j));
 
         // Add the algebraic conditions
-        eq.push_back(g_res[BDYN_RALG]);
+        eq.push_back(g_res[BDYN_ADJ_Z]);
 
         // Add contribution to the final state
         rxf += -B[j] * C[0][j] * rx[j];
 
         // Add contribution to quadratures
-        rqf += h * B[j] * g_res[BDYN_RQUAD];
-        uqf += h * B[j] * g_res[BDYN_UQUAD];
+        rqf += h * B[j] * g_res[BDYN_ADJ_P];
+        uqf += h * B[j] * g_res[BDYN_ADJ_U];
       }
 
       // Form backward discrete time dynamics

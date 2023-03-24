@@ -268,15 +268,20 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   /** \brief Generate the augmented DAE system
 
       \identifier{261} */
-  template<typename MatType> Function get_augmented_dae(const std::string& name) const;
-  Function augmented_dae() const;
+  template<typename MatType> Function get_forward_dae(const std::string& name) const;
+  template<typename MatType> Function get_forward_rdae(const std::string& name) const;
+  Function augmented_dae(Function* rdae) const;
   ///@}
 
-  /** \brief Generate a augmented DAE system with \a nadj adjoint sensitivities
-
-      \identifier{1mc} */
+  /** \brief Generate a augmented DAE system, forward problem */
   template<typename MatType>
-  std::map<std::string, MatType> aug_adj(const Function& aug_oracle, casadi_int nadj) const;
+  Function get_reverse_dae(const Function& this_dae, const Function& this_rdae,
+    casadi_int nadj) const;
+
+  /** \brief Generate a augmented DAE system, backward problem */
+  template<typename MatType>
+  Function get_reverse_rdae(const Function& this_dae, const Function& this_rdae,
+    casadi_int nadj) const;
 
   /// Helper function, get augmented system Jacobian
   Sparsity sp_jac_aug(const Sparsity& J, const Sparsity& J1) const;
@@ -297,21 +302,18 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   /** \brief IO conventions for continuous time dynamics
 
       \identifier{260} */
-  enum FDynIn { FDYN_T, FDYN_X, FDYN_Z, FDYN_P, FDYN_U, FDYN_NUM_IN};
-  static std::vector<std::string> fdyn_in() { return {"t", "x", "z", "p", "u"}; }
-  enum FDynOut { FDYN_ODE, FDYN_ALG, FDYN_QUAD, FDYN_NUM_OUT};
-  static std::vector<std::string> fdyn_out() { return {"ode", "alg", "quad"}; }
-  enum DaeFOut { FDAE_ODE, FDAE_ALG, FDAE_NUM_OUT};
-  static std::vector<std::string> fdae_out() { return {"ode", "alg"}; }
-  enum QuadFOut { FQUAD_QUAD, FQUAD_NUM_OUT};
-  static std::vector<std::string> fquad_out() { return {"quad"}; }
-  enum BDynIn { BDYN_T, BDYN_X, BDYN_Z, BDYN_P, BDYN_U, BDYN_RX, BDYN_RZ, BDYN_RP, BDYN_NUM_IN};
+  enum DaeOut { DAE_ODE, DAE_ALG, DAE_NUM_OUT};
+  static std::vector<std::string> dae_out() { return {"ode", "alg"}; }
+  enum QuadOut { QUAD_QUAD, QUAD_NUM_OUT};
+  static std::vector<std::string> quad_out() { return {"quad"}; }
+  enum BDynIn { BDYN_T, BDYN_X, BDYN_Z, BDYN_P, BDYN_U,
+    BDYN_ADJ_ODE, BDYN_ADJ_ALG, BDYN_ADJ_QUAD, BDYN_NUM_IN};
   static std::vector<std::string> bdyn_in() { return {"t", "x", "z", "p", "u", "rx", "rz", "rp"}; }
-  enum BDynOut { BDYN_RODE, BDYN_RALG, BDYN_RQUAD, BDYN_UQUAD, BDYN_NUM_OUT};
+  enum BDynOut { BDYN_ADJ_X, BDYN_ADJ_Z, BDYN_ADJ_P, BDYN_ADJ_U, BDYN_NUM_OUT};
   static std::vector<std::string> bdyn_out() { return {"rode", "ralg", "rquad", "uquad"}; }
-  enum DAEBOut { BDAE_RODE, BDAE_RALG, BDAE_NUM_OUT};
+  enum DAEBOut { BDAE_ADJ_X, BDAE_ADJ_Z, BDAE_NUM_OUT};
   static std::vector<std::string> bdae_out() { return {"rode", "ralg"}; }
-  enum QuadBOut { BQUAD_RQUAD, BQUAD_UQUAD, BQUAD_NUM_OUT};
+  enum QuadBOut { BQUAD_ADJ_P, BQUAD_ADJ_U, BQUAD_NUM_OUT};
   static std::vector<std::string> bquad_out() { return {"rquad", "uquad"}; }
   ///@}
 
@@ -323,6 +325,9 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
 
   /// Number of sensitivities
   casadi_int nfwd_;
+
+  /// Backwards DAE function
+  Function rdae_;
 
   /// Number of states for the forward integration
   casadi_int nx_, nz_, nq_, nx1_, nz1_, nq1_;
@@ -360,8 +365,8 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
 
   /// Convert dictionary to Problem
   template<typename XType>
-    static Function map2oracle(const std::string& name,
-      const std::map<std::string, XType>& d, const Dict& opts=Dict());
+    static Function map2oracle(const std::string& name, const std::map<std::string, XType>& d,
+      Function *rdae);
 
 
   /** \brief Serialize an object without type information

@@ -63,14 +63,14 @@ namespace casadi {
 
   void RungeKutta::setup_step() {
     // Continuous-time dynamics, forward problem
-    Function f = get_function("dynF");
+    Function f = get_function("dae");
 
     // Symbolic inputs
-    MX t0 = MX::sym("t0", f.sparsity_in(FDYN_T));
+    MX t0 = MX::sym("t0", f.sparsity_in(DYN_T));
     MX h = MX::sym("h");
-    MX x0 = MX::sym("x0", f.sparsity_in(FDYN_X));
-    MX p = MX::sym("p", f.sparsity_in(FDYN_P));
-    MX u = MX::sym("u", f.sparsity_in(FDYN_U));
+    MX x0 = MX::sym("x0", f.sparsity_in(DYN_X));
+    MX p = MX::sym("p", f.sparsity_in(DYN_P));
+    MX u = MX::sym("u", f.sparsity_in(DYN_U));
 
     // Intermediate variables (does not enter in F_, only in G_)
     MX v = MX::sym("v", x0.size1(), x0.size2() * 3);
@@ -89,38 +89,38 @@ namespace casadi {
     // Forward integration
     {
       // Arguments when calling f
-      std::vector<MX> f_arg(FDYN_NUM_IN);
+      std::vector<MX> f_arg(DYN_NUM_IN);
       std::vector<MX> f_res;
-      f_arg[FDYN_P] = p;
-      f_arg[FDYN_U] = u;
+      f_arg[DYN_P] = p;
+      f_arg[DYN_U] = u;
 
       // k1
-      f_arg[FDYN_T] = t0;
-      f_arg[FDYN_X] = x0;
+      f_arg[DYN_T] = t0;
+      f_arg[DYN_X] = x0;
       f_res = f(f_arg);
-      MX k1 = f_res[FDYN_ODE];
-      MX k1q = f_res[FDYN_QUAD];
+      MX k1 = f_res[DYN_ODE];
+      MX k1q = f_res[DYN_QUAD];
 
       // k2
-      tt[0] = f_arg[FDYN_T] = t0 + h_half;
-      x_def[0] = f_arg[FDYN_X] = x0 + h_half * k1;
+      tt[0] = f_arg[DYN_T] = t0 + h_half;
+      x_def[0] = f_arg[DYN_X] = x0 + h_half * k1;
       f_res = f(f_arg);
-      MX k2 = f_res[FDYN_ODE];
-      MX k2q = f_res[FDYN_QUAD];
+      MX k2 = f_res[DYN_ODE];
+      MX k2q = f_res[DYN_QUAD];
 
       // k3
       tt[1] = tt[0];
-      x_def[1] = f_arg[FDYN_X] = x0 + h_half * k2;
+      x_def[1] = f_arg[DYN_X] = x0 + h_half * k2;
       f_res = f(f_arg);
-      MX k3 = f_res[FDYN_ODE];
-      MX k3q = f_res[FDYN_QUAD];
+      MX k3 = f_res[DYN_ODE];
+      MX k3q = f_res[DYN_QUAD];
 
       // k4
-      tt[2] = f_arg[FDYN_T] = t0 + h;
-      x_def[2] = f_arg[FDYN_X] = x0 + h * k3;
+      tt[2] = f_arg[DYN_T] = t0 + h;
+      x_def[2] = f_arg[DYN_X] = x0 + h * k3;
       f_res = f(f_arg);
-      MX k4 = f_res[FDYN_ODE];
-      MX k4q = f_res[FDYN_QUAD];
+      MX k4 = f_res[DYN_ODE];
+      MX k4q = f_res[DYN_QUAD];
 
       // Take step
       MX xf = x0 + h_sixth * (k1 + 2*k2 + 2*k3 + k4);
@@ -147,11 +147,11 @@ namespace casadi {
     // Backward integration
     if (nrx1_ > 0) {
       // Continuous-time dynamics, backward problem
-      Function g = get_function("dynB");
+      Function g = get_function("rdae");
 
       // Symbolic inputs
-      MX rx0 = MX::sym("rx0", g.sparsity_in(BDYN_RX));
-      MX rp = MX::sym("rp", g.sparsity_in(BDYN_RP));
+      MX rx0 = MX::sym("rx0", g.sparsity_in(BDYN_ADJ_ODE));
+      MX rp = MX::sym("rp", g.sparsity_in(BDYN_ADJ_QUAD));
 
       // Intermediate variables (do not enter in G_)
       MX rv = MX::sym("rv", rx0.size1(), 3 * rx0.size2());
@@ -162,43 +162,43 @@ namespace casadi {
       std::vector<MX> g_res;
       g_arg[BDYN_P] = p;
       g_arg[BDYN_U] = u;
-      g_arg[BDYN_RP] = rp;
+      g_arg[BDYN_ADJ_QUAD] = rp;
 
       // k1
       g_arg[BDYN_T] = tt[2];
       g_arg[BDYN_X] = x[2];
-      g_arg[BDYN_RX] = rx0;
+      g_arg[BDYN_ADJ_ODE] = rx0;
       g_res = g(g_arg);
-      MX k1 = g_res[BDYN_RODE];
-      MX k1rq = g_res[BDYN_RQUAD];
-      MX k1uq = g_res[BDYN_UQUAD];
+      MX k1 = g_res[BDYN_ADJ_X];
+      MX k1rq = g_res[BDYN_ADJ_P];
+      MX k1uq = g_res[BDYN_ADJ_U];
 
       // k2
       g_arg[BDYN_T] = tt[1];
       g_arg[BDYN_X] = x[1];
-      g_arg[BDYN_RX] = rx_def[2] = rx0 + h_half * k1;
+      g_arg[BDYN_ADJ_ODE] = rx_def[2] = rx0 + h_half * k1;
       g_res = g(g_arg);
-      MX k2 = g_res[BDYN_RODE];
-      MX k2rq = g_res[BDYN_RQUAD];
-      MX k2uq = g_res[BDYN_UQUAD];
+      MX k2 = g_res[BDYN_ADJ_X];
+      MX k2rq = g_res[BDYN_ADJ_P];
+      MX k2uq = g_res[BDYN_ADJ_U];
 
       // k3
       g_arg[BDYN_T] = tt[0];
       g_arg[BDYN_X] = x[0];
-      g_arg[BDYN_RX] = rx_def[1] = rx0 + h_half * k2;
+      g_arg[BDYN_ADJ_ODE] = rx_def[1] = rx0 + h_half * k2;
       g_res = g(g_arg);
-      MX k3 = g_res[BDYN_RODE];
-      MX k3rq = g_res[BDYN_RQUAD];
-      MX k3uq = g_res[BDYN_UQUAD];
+      MX k3 = g_res[BDYN_ADJ_X];
+      MX k3rq = g_res[BDYN_ADJ_P];
+      MX k3uq = g_res[BDYN_ADJ_U];
 
       // k4
       g_arg[BDYN_T] = t0;
       g_arg[BDYN_X] = x0;
-      g_arg[BDYN_RX] = rx_def[0] = rx0 + h * k3;
+      g_arg[BDYN_ADJ_ODE] = rx_def[0] = rx0 + h * k3;
       g_res = g(g_arg);
-      MX k4 = g_res[BDYN_RODE];
-      MX k4rq = g_res[BDYN_RQUAD];
-      MX k4uq = g_res[BDYN_UQUAD];
+      MX k4 = g_res[BDYN_ADJ_X];
+      MX k4rq = g_res[BDYN_ADJ_P];
+      MX k4uq = g_res[BDYN_ADJ_U];
 
       // Take step
       MX rxf = rx0 + h_sixth * (k1 + 2*k2 + 2*k3 + k4);
