@@ -809,45 +809,40 @@ Function Integrator::get_reverse_dae(const Function& this_dae, const Function& t
   for (casadi_int i = 0; i < DYN_NUM_OUT; ++i) aug_out[i].push_back(res.at(i));
 
   // Reverse mode directional derivatives
-  std::vector<std::vector<MatType>> seed(nadj, std::vector<MatType>(DYN_NUM_OUT));
-  std::vector<std::vector<MatType>> rseed(nadj, std::vector<MatType>(BDYN_NUM_OUT));
-  for (casadi_int d = 0; d < nadj; ++d) {
-    std::string pref = "aug" + str(d) + "_";
-    for (casadi_int i = 0; i < DYN_NUM_OUT; ++i) {
-      seed[d][i] = MatType::sym(pref + dyn_out(i), this_dae.sparsity_out(i));
-    }
-    aug_in[DYN_RX].push_back(seed[d][DYN_ODE]);
-    aug_in[DYN_RZ].push_back(seed[d][DYN_ALG]);
-    aug_in[DYN_RP].push_back(seed[d][DYN_QUAD]);
-    for (casadi_int i : {DYN_RODE, DYN_RALG, DYN_RQUAD, DYN_UQUAD})
-      seed[d][i] = MatType::zeros(seed[d][i].sparsity());
+  std::vector<MatType> seed1(DYN_NUM_OUT);
+  std::vector<MatType> rseed1(BDYN_NUM_OUT);
+  for (casadi_int i = 0; i < DYN_NUM_OUT; ++i) {
+    seed1[i] = MatType::sym("aug_" + dyn_out(i), this_dae.numel_out(i), nadj);
+  }
+  aug_in[DYN_RX].push_back(vec(seed1[DYN_ODE]));
+  aug_in[DYN_RZ].push_back(vec(seed1[DYN_ALG]));
+  aug_in[DYN_RP].push_back(vec(seed1[DYN_QUAD]));
+  for (casadi_int i : {DYN_RODE, DYN_RALG, DYN_RQUAD, DYN_UQUAD})
+    seed1[i] = MatType::zeros(seed1[i].sparsity());
 
-    if (!this_rdae.is_null()) {
-      for (casadi_int i = 0; i < BDYN_NUM_OUT; ++i) {
-        rseed[d][i] = MatType::sym(pref + bdyn_out[i], this_rdae.sparsity_out(i));
-      }
-
-      aug_in[DYN_X].push_back(rseed[d][BDYN_RODE]);
-      aug_in[DYN_Z].push_back(rseed[d][BDYN_RALG]);
-      aug_in[DYN_P].push_back(rseed[d][BDYN_RQUAD]);
-      aug_in[DYN_U].push_back(rseed[d][BDYN_UQUAD]);
+  if (!this_rdae.is_null()) {
+    for (casadi_int i = 0; i < BDYN_NUM_OUT; ++i) {
+      rseed1[i] = MatType::sym("aug_" + bdyn_out[i], this_rdae.numel_out(i), nadj);
     }
+
+    aug_in[DYN_X].push_back(vec(rseed1[BDYN_RODE]));
+    aug_in[DYN_Z].push_back(vec(rseed1[BDYN_RALG]));
+    aug_in[DYN_P].push_back(vec(rseed1[BDYN_RQUAD]));
+    aug_in[DYN_U].push_back(vec(rseed1[BDYN_UQUAD]));
   }
 
   if (!this_rdae.is_null()) {
     // Calculate directional derivatives, rdae
-    std::vector<std::vector<MatType>> rsens;
-    bool always_inline = this_rdae.is_a("SXFunction") || this_rdae.is_a("MXFunction");
-    this_rdae->call_reverse(arg, rres, rseed, rsens, always_inline, false);
+    std::vector<MatType> v = arg;
+    v.insert(v.end(), rres.begin(), rres.end());
+    v.insert(v.end(), rseed1.begin(), rseed1.end());
+    std::vector<MatType> rsens1 = this_rdae.reverse(nadj)(v);
 
     // Collect sensitivity equations
-    casadi_assert_dev(rsens.size() == nadj);
-    for (casadi_int d = 0; d < nadj; ++d) {
-      casadi_assert_dev(rsens[d].size() == BDYN_NUM_IN);
-      aug_out[DYN_ODE].push_back(project(rsens[d][BDYN_RX], this_rdae.sparsity_in(BDYN_RX)));
-      aug_out[DYN_ALG].push_back(project(rsens[d][BDYN_RZ], this_rdae.sparsity_in(BDYN_RZ)));
-      aug_out[DYN_QUAD].push_back(project(rsens[d][BDYN_RP], this_rdae.sparsity_in(BDYN_RP)));
-    }
+    casadi_assert_dev(rsens1.size() == BDYN_NUM_IN);
+    aug_out[DYN_ODE].push_back(vec(rsens1[BDYN_RX]));
+    aug_out[DYN_ALG].push_back(vec(rsens1[BDYN_RZ]));
+    aug_out[DYN_QUAD].push_back(vec(rsens1[BDYN_RP]));
   }
 
   // Concatenate expressions
