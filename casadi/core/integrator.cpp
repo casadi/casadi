@@ -784,20 +784,29 @@ Function Integrator::get_reverse_dae(const Function& this_dae, const Function& t
   std::vector<std::string> bdyn_in = Integrator::bdyn_in();
   std::vector<std::string> bdyn_out = Integrator::bdyn_out();
 
-  // Get input and output expressions
-  std::vector<MatType> arg = MatType::get_input(this_dae);
-  std::vector<MatType> res = this_dae(arg);
-  std::vector<MatType> rres;
-  if (!this_rdae.is_null()) rres = this_rdae(arg);
-
   // Symbolic expression for augmented DAE
   std::vector<std::vector<MatType>> aug_in(DYN_NUM_IN);
-  for (casadi_int i = 0; i < DYN_NUM_IN; ++i) aug_in[i].push_back(arg.at(i));
   std::vector<std::vector<MatType>> aug_out(DYN_NUM_OUT);
-  for (casadi_int i = 0; i < DYN_NUM_OUT; ++i) aug_out[i].push_back(res.at(i));
 
-  // Zero of time dimension
-  MatType zero_t = MatType::zeros(this_dae.sparsity_in(DYN_T));
+  // Get input and output expressions
+  std::vector<MatType> arg, rarg, rres;
+  if (!this_rdae.is_null()) {
+    // Get input and output expressions from backward problem
+    rarg = MatType::get_input(this_rdae);
+    rres = this_rdae(rarg);
+    // Use the first DYN_NUM_IN entries in rarg as argument to calls to forward DAE
+    arg = rarg;
+    arg.resize(DYN_NUM_IN);
+  } else {
+    // Use input expressions from forward problem
+    arg = MatType::get_input(this_dae);
+  }
+
+  std::vector<MatType> res = this_dae(arg);
+
+  // Add forward problem to augmented DAE
+  for (casadi_int i = 0; i < DYN_NUM_IN; ++i) aug_in[i].push_back(arg.at(i));
+  for (casadi_int i = 0; i < DYN_NUM_OUT; ++i) aug_out[i].push_back(res.at(i));
 
   // Reverse mode directional derivatives
   std::vector<std::vector<MatType>> seed(nadj, std::vector<MatType>(DYN_NUM_OUT));
@@ -810,6 +819,8 @@ Function Integrator::get_reverse_dae(const Function& this_dae, const Function& t
     aug_in[DYN_RX].push_back(seed[d][DYN_ODE]);
     aug_in[DYN_RZ].push_back(seed[d][DYN_ALG]);
     aug_in[DYN_RP].push_back(seed[d][DYN_QUAD]);
+    for (casadi_int i : {DYN_RODE, DYN_RALG, DYN_RQUAD, DYN_UQUAD})
+      seed[d][i] = MatType::zeros(seed[d][i].sparsity());
 
     if (!this_rdae.is_null()) {
       for (casadi_int i = 0; i < BDYN_NUM_OUT; ++i) {
