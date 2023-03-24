@@ -33,9 +33,9 @@ std::vector<F> ALPAQA_EXPORT read_row_std_vector(std::istream &is,
 ALPAQA_READ_ROW_OVL(float)
 ALPAQA_READ_ROW_OVL(double)
 ALPAQA_READ_ROW_OVL(long double)
-#ifdef ALPAQA_WITH_QUAD_PRECISION
-ALPAQA_READ_ROW_OVL(__float128)
-#endif
+// #ifdef ALPAQA_WITH_QUAD_PRECISION
+// ALPAQA_READ_ROW_OVL(__float128)
+// #endif
 
 #undef ALPAQA_READ_ROW_OVL
 

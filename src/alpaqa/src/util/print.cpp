@@ -40,8 +40,8 @@ template ALPAQA_EXPORT ostream &print_python_impl(ostream &os, const Eigen::Ref<
 #ifdef ALPAQA_WITH_QUAD_PRECISION
 template ALPAQA_EXPORT std::string float_to_str(__float128 value, int precision);
 
-template ALPAQA_EXPORT ostream &print_csv_impl(ostream &os, const Eigen::Ref<const MatrixX<__float128>> &, std::string_view, std::string_view);
-template ALPAQA_EXPORT ostream &print_csv_impl(ostream &os, const Eigen::Ref<const MatrixX<complex<__float128>>> &, std::string_view, std::string_view);
+template ALPAQA_EXPORT ostream &print_csv_impl(ostream &os, const Eigen::Ref<const MatrixX<__float128>> &, std::string_view, std::string_view, std::string_view);
+template ALPAQA_EXPORT ostream &print_csv_impl(ostream &os, const Eigen::Ref<const MatrixX<complex<__float128>>> &, std::string_view, std::string_view, std::string_view);
 
 template ALPAQA_EXPORT ostream &print_matlab_impl(ostream &os, const Eigen::Ref<const MatrixX<__float128>> &, std::string_view);
 template ALPAQA_EXPORT ostream &print_matlab_impl(ostream &os, const Eigen::Ref<const MatrixX<complex<__float128>>> &, std::string_view);
