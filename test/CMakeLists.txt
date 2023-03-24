@@ -31,17 +31,28 @@ if (TARGET alpaqa::casadi-loader)
     target_sources(tests PUBLIC "outer/test-casadi.cpp")
     add_library(rosenbrock_functions_test MODULE
         "outer/rosenbrock_functions_test.c")
+    set_target_properties("rosenbrock_functions_test" PROPERTIES
+        PREFIX ""
+        RELEASE_POSTFIX ""
+        DEBUG_POSTFIX ""
+        RELWITHDEBINFO_POSTFIX ""
+        MINSIZEREL_POSTFIX ""
+        OUTPUT_NAME "rosenbrock_functions_test")
     target_compile_definitions(tests PRIVATE
         ROSENBROCK_FUNC_DLL=\"$<TARGET_FILE:rosenbrock_functions_test>\")
     add_dependencies(tests rosenbrock_functions_test)
     target_link_libraries(tests PRIVATE alpaqa::casadi-loader)
+    add_custom_command(TARGET rosenbrock_functions_test POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+                ${CMAKE_CURRENT_SOURCE_DIR}/outer/rosenbrock_functions_test.csv
+                $<TARGET_FILE_DIR:rosenbrock_functions_test>)
 endif()
 
 if (NOT CMAKE_CROSSCOMPILING)
     gtest_discover_tests(tests DISCOVERY_TIMEOUT 60)
 endif()
 add_executable(alpaqa::tests ALIAS tests)
-                                    
+
 if (${CMAKE_VERSION} VERSION_GREATER_EQUAL 3.21) 
     # Copy DLLs for test executable
     add_custom_command(TARGET tests PRE_LINK COMMAND

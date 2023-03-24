@@ -12,10 +12,13 @@ TEST(ALM, casadi) {
     alpaqa::CasADiProblem<config_t> problem{ROSENBROCK_FUNC_DLL};
 
     // Specify the bounds
-    problem.C.lowerbound = vec::Constant(2, 0.);
-    problem.C.upperbound = vec::Constant(2, 5.);
-    problem.D.upperbound = vec::Constant(1, 1.);
-    problem.D.lowerbound = vec::Constant(1, 0.);
+    EXPECT_THAT(problem.C.lowerbound, EigenEqual(vec::Constant(2, 0.)));
+    EXPECT_THAT(problem.C.upperbound, EigenEqual(vec::Constant(2, 5.)));
+    EXPECT_THAT(problem.D.upperbound, EigenEqual(vec::Constant(1, 1.)));
+    EXPECT_THAT(problem.D.lowerbound, EigenEqual(vec::Constant(1, 0.)));
+
+    // Parameter
+    EXPECT_THAT(problem.param, EigenEqual(vec::Constant(1, 2.)));
 
     // Define the solvers to use
     using Direction   = alpaqa::LBFGSDirection<config_t>;
@@ -49,9 +52,6 @@ TEST(ALM, casadi) {
     x << 2, 1;
     vec y(1);
     y << 1;
-
-    // Parameter
-    problem.param(0) = 2.;
 
     // Wrap the problem to count the function evaluations
     auto counted_problem = alpaqa::problem_with_counters_ref(problem);

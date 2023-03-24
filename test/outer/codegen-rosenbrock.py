@@ -17,10 +17,15 @@ p = cs.SX.sym("p")
 f = (1 - x)**2 + (y - x**2)**2
 g = x**2 + p * y**2
 
-cg, _, _, _ = cg.generate_casadi_problem(
+C = [0, 0], [5, 5]
+D = [0], [1]
+param = [2]
+
+cgen, _, _, _ = cg.generate_casadi_problem(
     cs.Function("f", [unknowns, p], [f]),
     cs.Function("g", [unknowns, p], [g]),
     second_order="full",
     name=argv[1],
 )
-cg.generate()
+cgen.generate()
+cg.write_casadi_problem_data(argv[1], C, D, param)
