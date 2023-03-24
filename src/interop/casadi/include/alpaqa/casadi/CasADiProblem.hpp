@@ -4,6 +4,7 @@
 #include <alpaqa/config/config.hpp>
 #include <alpaqa/problem/type-erased-problem.hpp>
 #include <alpaqa/util/copyable_unique_ptr.hpp>
+#include <filesystem>
 
 namespace alpaqa {
 namespace casadi_loader {
@@ -40,6 +41,19 @@ class CasADiProblem : public BoxConstrProblem<Conf> {
     CasADiProblem &operator=(const CasADiProblem &);
     CasADiProblem(CasADiProblem &&) noexcept;
     CasADiProblem &operator=(CasADiProblem &&) noexcept;
+
+    /// Load the numerical problem data (bounds and parameters) from a CSV file.
+    /// The file should contain 5 rows, with the following contents:
+    ///   1. @ref C lower bound [n]
+    ///   2. @ref C upper bound [n]
+    ///   3. @ref D lower bound [m]
+    ///   4. @ref D upper bound [m]
+    ///   5. @ref param [p]
+    ///
+    /// Line endings are encoded using a single line feed (`\n`), and the column
+    /// separator can be specified using the @p sep argument.
+    void load_numerical_data(const std::filesystem::path &filepath,
+                             char sep = ',');
 
     // clang-format off
     [[nodiscard]] real_t eval_f(crvec x) const;

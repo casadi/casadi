@@ -2,18 +2,23 @@
 
 #include <alpaqa/casadi/CasADiFunctionWrapper.hpp>
 #include <alpaqa/casadi/CasADiProblem.hpp>
+#include <alpaqa/util/io/csv.hpp>
 #include <alpaqa/util/not-implemented.hpp>
 #include "CasADiLoader-util.hpp"
 
 #include <casadi/core/external.hpp>
 
 #include <algorithm>
+#include <filesystem>
+#include <fstream>
 #include <memory>
 #include <optional>
 #include <stdexcept>
 #include <type_traits>
 
 namespace alpaqa {
+
+namespace fs = std::filesystem;
 
 namespace casadi_loader {
 
@@ -130,6 +135,36 @@ CasADiProblem<Conf>::CasADiProblem(const std::string &so_name)
         so_name, "hess_psi", dims(n, p, m, m, 1, m, m), dims(dim(n, n)));
     impl->jac_g       = try_load<CasADiFunctionEvaluator<Conf, 2, 1>>( //
         so_name, "jacobian_g", dims(n, p), dims(dim(m, n)));
+
+    auto bounds_filepath = fs::path{so_name}.replace_extension("csv");
+    if (fs::exists(bounds_filepath))
+        load_numerical_data(bounds_filepath);
+}
+
+template <Config Conf>
+void CasADiProblem<Conf>::load_numerical_data(
+    const std::filesystem::path &filepath, char sep) {
+    std::ifstream data_file{filepath};
+    if (!data_file)
+        throw std::runtime_error("Unable to open bounds file \"" +
+                                 filepath.string() + '"');
+    index_t line          = 0;
+    auto wrap_bounds_load = [&](std::string_view name, auto &v) {
+        try {
+            ++line;
+            csv::read_row(data_file, v, sep);
+        } catch (csv::read_error &e) {
+            throw std::runtime_error("Unable to read " + std::string(name) +
+                                     " from bounds file \"" +
+                                     filepath.string() + ':' +
+                                     std::to_string(line) + "\": " + e.what());
+        }
+    };
+    wrap_bounds_load("C.lowerbound", this->C.lowerbound);
+    wrap_bounds_load("C.upperbound", this->C.upperbound);
+    wrap_bounds_load("D.lowerbound", this->D.lowerbound);
+    wrap_bounds_load("D.upperbound", this->D.upperbound);
+    wrap_bounds_load("param", this->param);
 }
 
 template <Config Conf>
