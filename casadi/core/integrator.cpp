@@ -35,9 +35,6 @@ std::string to_string(DynIn v) {
   case DYN_Z: return "z";
   case DYN_P: return "p";
   case DYN_U: return "u";
-  case DYN_RX: return "rx";
-  case DYN_RZ: return "rz";
-  case DYN_RP: return "rp";
   default: break;
   }
   return "";
@@ -48,10 +45,6 @@ std::string to_string(DynOut v) {
   case DYN_ODE: return "ode";
   case DYN_ALG: return "alg";
   case DYN_QUAD: return "quad";
-  case DYN_RODE: return "rode";
-  case DYN_RALG: return "ralg";
-  case DYN_RQUAD: return "rquad";
-  case DYN_UQUAD: return "uquad";
   default: break;
   }
   return "";
@@ -788,38 +781,27 @@ Function Integrator::get_reverse_dae(const Function& this_dae, const Function& t
   std::vector<std::vector<MatType>> aug_in(DYN_NUM_IN);
   std::vector<std::vector<MatType>> aug_out(DYN_NUM_OUT);
 
-  // Get input and output expressions
-  std::vector<MatType> arg, rarg, rres;
-  if (!this_rdae.is_null()) {
-    // Get input and output expressions from backward problem
-    rarg = MatType::get_input(this_rdae);
-    rres = this_rdae(rarg);
-    // Use the first DYN_NUM_IN entries in rarg as argument to calls to forward DAE
-    arg = rarg;
-    arg.resize(DYN_NUM_IN);
-  } else {
-    // Use input expressions from forward problem
-    arg = MatType::get_input(this_dae);
-  }
-
+  // Input and output expressions for the forward problem
+  std::vector<MatType> arg = MatType::get_input(this_dae);
   std::vector<MatType> res = this_dae(arg);
 
   // Add forward problem to augmented DAE
   for (casadi_int i = 0; i < DYN_NUM_IN; ++i) aug_in[i].push_back(arg.at(i));
   for (casadi_int i = 0; i < DYN_NUM_OUT; ++i) aug_out[i].push_back(res.at(i));
 
-  // Reverse mode directional derivatives
-  std::vector<MatType> seed1(DYN_NUM_OUT);
-  std::vector<MatType> rseed1(BDYN_NUM_OUT);
-  for (casadi_int i = 0; i < DYN_NUM_OUT; ++i) {
-    seed1[i] = MatType::sym("aug_" + dyn_out(i), this_dae.numel_out(i), nadj);
+  // Input and output expressions for the backward problem
+  std::vector<MatType> rarg, rres;
+  if (!this_rdae.is_null()) {
+    // Get input and output expressions from backward problem
+    rarg = arg;
+    for (casadi_int i = DYN_NUM_IN; i < BDYN_NUM_IN; ++i) {
+      rarg.push_back(MatType::zeros(this_rdae.sparsity_in(i)));
+    }
+    rres = this_rdae(rarg);
   }
-  aug_in[DYN_RX].push_back(vec(seed1[DYN_ODE]));
-  aug_in[DYN_RZ].push_back(vec(seed1[DYN_ALG]));
-  aug_in[DYN_RP].push_back(vec(seed1[DYN_QUAD]));
-  for (casadi_int i : {DYN_RODE, DYN_RALG, DYN_RQUAD, DYN_UQUAD})
-    seed1[i] = MatType::zeros(seed1[i].sparsity());
 
+  // Reverse mode directional derivatives
+  std::vector<MatType> rseed1(BDYN_NUM_OUT);
   if (!this_rdae.is_null()) {
     for (casadi_int i = 0; i < BDYN_NUM_OUT; ++i) {
       rseed1[i] = MatType::sym("aug_" + bdyn_out[i], this_rdae.numel_out(i), nadj);
@@ -833,7 +815,7 @@ Function Integrator::get_reverse_dae(const Function& this_dae, const Function& t
 
   if (!this_rdae.is_null()) {
     // Calculate directional derivatives, rdae
-    std::vector<MatType> v = arg;
+    std::vector<MatType> v = rarg;
     v.insert(v.end(), rres.begin(), rres.end());
     v.insert(v.end(), rseed1.begin(), rseed1.end());
     std::vector<MatType> rsens1 = this_rdae.reverse(nadj)(v);
@@ -848,10 +830,6 @@ Function Integrator::get_reverse_dae(const Function& this_dae, const Function& t
   // Concatenate expressions
   for (casadi_int i = 0; i < DYN_NUM_IN; ++i) arg.at(i) = vertcat(aug_in[i]);
   for (casadi_int i = 0; i < DYN_NUM_OUT; ++i) res.at(i) = vertcat(aug_out[i]);
-  res[DYN_RODE] = MatType::zeros(nrx_ + nadj * nx_);
-  res[DYN_RALG] = MatType::zeros(nrz_ + nadj * nz_);
-  res[DYN_RQUAD] = MatType::zeros(nrq_ + nadj * np_);
-  res[DYN_UQUAD] = MatType::zeros(nuq_ + nadj * nu_);
 
   // Convert to oracle function and return
   std::string aug_prefix = "asens" + str(nadj) + "_";
@@ -932,8 +910,6 @@ Function Integrator::get_reverse_rdae(const Function& this_dae, const Function& 
     aug_in[BDYN_RX].push_back(seed[d][DYN_ODE]);
     aug_in[BDYN_RZ].push_back(seed[d][DYN_ALG]);
     aug_in[BDYN_RP].push_back(seed[d][DYN_QUAD]);
-    for (casadi_int i : {DYN_RODE, DYN_RALG, DYN_RQUAD, DYN_UQUAD})
-      seed[d][i] = MatType::zeros(seed[d][i].sparsity());
   }
 
   // Calculate directional derivatives
@@ -2276,13 +2252,10 @@ Function Integrator::map2oracle(const std::string& name,
       de_in[DYN_U]=i.second;
       rde_in[BDYN_U]=i.second;
     } else if (i.first=="rx") {
-      de_in[DYN_RX]=i.second;
       rde_in[BDYN_RX]=i.second;
     } else if (i.first=="rz") {
-      de_in[DYN_RZ]=i.second;
       rde_in[BDYN_RZ]=i.second;
     } else if (i.first=="rp") {
-      de_in[DYN_RP]=i.second;
       rde_in[BDYN_RP]=i.second;
     } else if (i.first=="ode") {
       de_out[DYN_ODE]=i.second;
@@ -2291,16 +2264,12 @@ Function Integrator::map2oracle(const std::string& name,
     } else if (i.first=="quad") {
       de_out[DYN_QUAD]=i.second;
     } else if (i.first=="rode") {
-      de_out[DYN_RODE]=i.second;
       rde_out[BDYN_RODE]=i.second;
     } else if (i.first=="ralg") {
-      de_out[DYN_RALG]=i.second;
       rde_out[BDYN_RALG]=i.second;
     } else if (i.first=="rquad") {
-      de_out[DYN_RQUAD]=i.second;
       rde_out[BDYN_RQUAD]=i.second;
     } else if (i.first=="uquad") {
-      de_out[DYN_UQUAD]=i.second;
       rde_out[BDYN_UQUAD]=i.second;
     } else {
       casadi_error("No such field: " + i.first);
