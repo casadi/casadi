@@ -17,7 +17,7 @@ MATCHER_P(EigenEqual, expect, "") {
         alpaqa::print_matlab(*os, expect);
         *os << "with difference = ...\n";
         alpaqa::print_matlab(*os, (arg - expect));
-        *os << "which has infinity norm                       = " << diffnorm;
+        *os << "which has infinity norm " << diffnorm;
     }
     return diffnorm == 0;
 }
@@ -31,8 +31,8 @@ MATCHER_P2(EigenAlmostEqual, expect, atol, "") {
         alpaqa::print_matlab(*os, expect);
         *os << "with difference = ...\n";
         alpaqa::print_matlab(*os, (arg - expect));
-        *os << "which has infinity norm                      = " << diffnorm;
-        *os << ",\nwhich is greater than the absolute tolerance = " << atol;
+        *os << "which has infinity norm                      " << diffnorm;
+        *os << ",\nwhich is greater than the absolute tolerance " << atol;
     }
     return diffnorm <= atol;
 }
@@ -47,8 +47,8 @@ MATCHER_P2(EigenAlmostEqualRel, expect, rtol, "") {
         alpaqa::print_matlab(*os, expect);
         *os << "with difference = ...\n";
         alpaqa::print_matlab(*os, (arg - expect));
-        *os << "which has relative infinity norm              = " << diffnorm;
-        *os << ",\nwhich is greater than the relative tolerance = " << rtol;
+        *os << "which has relative infinity norm             " << diffnorm;
+        *os << ",\nwhich is greater than the relative tolerance " << rtol;
     }
     return diffnorm <= rtol;
 }
