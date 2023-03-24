@@ -17,6 +17,7 @@ add_library(alpaqa
     "alpaqa/src/util/type-erasure.cpp"
     "alpaqa/src/util/demangled-typename.cpp"
     "alpaqa/src/util/print.cpp"
+    "alpaqa/src/util/io/csv.cpp"
     "alpaqa/src/accelerators/lbfgs.cpp"
     "alpaqa/src/problem/problem-counters.cpp"
     "alpaqa/src/problem/ocproblem-counters.cpp"

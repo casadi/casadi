@@ -69,81 +69,80 @@ std::string float_to_str(F value, int precision) {
 }
 
 template <std::floating_point F>
-void print_elem_matlab(auto &buf, F value, std::ostream &os) {
+void print_elem(auto &buf, F value, std::ostream &os) {
     os << float_to_str_vw(buf, value);
 }
 
 template <std::floating_point F>
-void print_elem_matlab(auto &buf, std::complex<F> value, std::ostream &os) {
-    os << float_to_str_vw(buf, value.real()) << " + "
-       << float_to_str_vw(buf, value.imag()) << 'i';
-}
-
-template <float_or_complex_float F>
-std::ostream &print_matlab(std::ostream &os, const Eigen::MatrixX<F> &M) {
-    os << '[';
-    std::array<char, 64> buf;
-    for (decltype(M.rows()) r{}; r < M.rows(); ++r) {
-        for (decltype(M.cols()) c{}; c < M.cols(); ++c) {
-            print_elem_matlab(buf, M(r, c), os);
-            os << ' ';
-        }
-        if (r != M.rows() - 1)
-            os << ";\n ";
-    }
-    return os << "];\n";
-}
-
-template <float_or_complex_float F>
-std::ostream &print_matlab(std::ostream &os, const Eigen::VectorX<F> &M) {
-    os << '[';
-    std::array<char, 64> buf{};
-    for (decltype(M.rows()) r{}; r < M.rows(); ++r) {
-        print_elem_matlab(buf, M(r), os);
-        if (r != M.rows() - 1)
-            os << "; ";
-    }
-    return os << "];\n";
-}
-
-template <std::floating_point F>
-void print_elem_python(auto &buf, F value, std::ostream &os) {
-    os << float_to_str_vw(buf, value);
-}
-
-template <std::floating_point F>
-void print_elem_python(auto &buf, std::complex<F> value, std::ostream &os) {
+void print_elem(auto &buf, std::complex<F> value, std::ostream &os) {
     os << float_to_str_vw(buf, value.real()) << " + "
        << float_to_str_vw(buf, value.imag()) << 'j';
 }
 
-template <float_or_complex_float F>
-std::ostream &print_python(std::ostream &os, const Eigen::MatrixX<F> &M,
-                           std::string_view end) {
-    os << "[[";
+template <class T>
+std::ostream &print_csv_impl(std::ostream &os, const T &M, std::string_view sep,
+                             std::string_view begin, std::string_view end) {
     std::array<char, 64> buf;
-    for (decltype(M.rows()) r{}; r < M.rows(); ++r) {
-        for (decltype(M.cols()) c{}; c < M.cols(); ++c) {
-            print_elem_python(buf, M(r, c), os);
-            os << ", ";
+    if (M.cols() == 1) {
+        os << begin;
+        for (decltype(M.rows()) r{}; r < M.rows(); ++r) {
+            print_elem(buf, M(r, 0), os);
+            if (r != M.rows() - 1)
+                os << sep;
         }
-        if (r != M.rows() - 1)
-            os << "],\n [";
+        return os << end;
+    } else {
+        for (decltype(M.rows()) r{}; r < M.rows(); ++r) {
+            os << begin;
+            for (decltype(M.cols()) c{}; c < M.cols(); ++c) {
+                print_elem(buf, M(r, c), os);
+                if (c != M.cols() - 1)
+                    os << sep;
+            }
+            os << end;
+        }
+        return os;
     }
-    return os << "]]" << end;
 }
 
-template <float_or_complex_float F>
-std::ostream &print_python(std::ostream &os, const Eigen::VectorX<F> &M,
-                           std::string_view end) {
-    os << '[';
-    std::array<char, 64> buf{};
-    for (decltype(M.rows()) r{}; r < M.rows(); ++r) {
-        print_elem_python(buf, M(r), os);
-        if (r != M.rows() - 1)
-            os << ", ";
+template <class T>
+std::ostream &print_matlab_impl(std::ostream &os, const T &M,
+                                std::string_view end) {
+    if (M.cols() == 1) {
+        return print_csv_impl<T>(os, M, " ", "[", "]") << end;
+    } else {
+        os << '[';
+        std::array<char, 64> buf;
+        for (decltype(M.rows()) r{}; r < M.rows(); ++r) {
+            for (decltype(M.cols()) c{}; c < M.cols(); ++c) {
+                print_elem(buf, M(r, c), os);
+                os << ' ';
+            }
+            if (r != M.rows() - 1)
+                os << ";\n ";
+        }
+        return os << ']' << end;
     }
-    return os << "]" << end;
+}
+
+template <class T>
+std::ostream &print_python_impl(std::ostream &os, const T &M,
+                                std::string_view end) {
+    if (M.cols() == 1) {
+        return print_csv_impl<T>(os, M, ", ", "[", "]") << end;
+    } else {
+        os << "[[";
+        std::array<char, 64> buf;
+        for (decltype(M.rows()) r{}; r < M.rows(); ++r) {
+            for (decltype(M.cols()) c{}; c < M.cols(); ++c) {
+                print_elem(buf, M(r, c), os);
+                os << ", ";
+            }
+            if (r != M.rows() - 1)
+                os << "],\n [";
+        }
+        return os << "]]" << end;
+    }
 }
 
 } // namespace alpaqa
