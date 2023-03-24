@@ -41,6 +41,23 @@ void functional_setter_out(FuncProb &p, std::optional<py::object> o) {
     }
 };
 
+template <class T, class A>
+auto vector_getter(A T::*attr) {
+    return py::cpp_function([attr](T &self) -> typename T::rvec { return self.*attr; },
+                            py::return_value_policy::reference_internal);
+}
+
+template <class T, class A>
+auto vector_setter(A T::*attr, std::string_view name) {
+    return py::cpp_function([attr, name](T &self, typename T::crvec value) {
+        if (value.size() != (self.*attr).size())
+            throw std::invalid_argument("Invalid dimension for '" + std::string(name) + "': got " +
+                                        std::to_string(value.size()) + ", should be " +
+                                        std::to_string((self.*attr).size()) + ".");
+        self.*attr = value;
+    });
+}
+
 template <alpaqa::Config Conf>
 void register_problems(py::module_ &m) {
     USING_ALPAQA_CONFIG(Conf);
@@ -70,8 +87,10 @@ void register_problems(py::module_ &m) {
                  return Box::from_lower_upper(std::move(lower), std::move(upper));
              }),
              py::kw_only(), "lower"_a, "upper"_a, "Create a box with the given bounds.")
-        .def_readwrite("lowerbound", &Box::lowerbound)
-        .def_readwrite("upperbound", &Box::upperbound);
+        .def_property("lowerbound", vector_getter(&Box::lowerbound),
+                      vector_setter(&Box::lowerbound, "lowerbound"))
+        .def_property("upperbound", vector_getter(&Box::upperbound),
+                      vector_setter(&Box::upperbound, "upperbound"));
 
     using BoxConstrProblem = alpaqa::BoxConstrProblem<config_t>;
     py::class_<BoxConstrProblem>(m, "BoxConstrProblem",
