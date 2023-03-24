@@ -418,7 +418,7 @@ class TypeErasedProblem : public util::TypeErased<ProblemVTable<Conf>, Allocator
     ///
     /// Required for second-order solvers only.
     void eval_hess_L(crvec x, crvec y, real_t scale, rindexvec inner_idx, rindexvec outer_ptr,
-                     rvec H_Values) const;
+                     rvec H_values) const;
     /// **[Optional]**
     /// Function that gets the number of nonzeros of the Hessian of the
     /// Lagrangian.

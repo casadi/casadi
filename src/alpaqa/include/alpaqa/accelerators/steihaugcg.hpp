@@ -9,7 +9,7 @@ template <Config Conf>
 struct SteihaugCGParams {
     USING_ALPAQA_CONFIG(Conf);
     real_t tol_scale       = 1;
-    real_t tol_scale_root  = 0.5;
+    real_t tol_scale_root  = real_t(0.5);
     real_t tol_max         = inf<config_t>;
     real_t max_iter_factor = 1;
 };
@@ -43,7 +43,8 @@ struct SteihaugCG {
         // get the norm of jacobian and define the origin
         auto v = [n](auto &v) { return v.topRows(n); };
         auto z = v(this->z), r = v(this->r), d = v(this->d), Bd = v(this->Bd);
-        auto g = v(grad), s = v(step);
+        auto g = v(grad);
+        auto s = v(step);
         // init the state for the first iteration
         z.setZero();
         r               = g;

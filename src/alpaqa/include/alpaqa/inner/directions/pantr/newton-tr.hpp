@@ -16,7 +16,7 @@ template <Config Conf>
 struct NewtonTRDirectionParams {
     USING_ALPAQA_CONFIG(Conf);
     bool rescale_when_γ_changes = false;
-    real_t hessian_vec_factor   = 0.5;
+    real_t hessian_vec_factor   = real_t(0.5);
 };
 
 /// @ingroup grp_DirectionProviders
