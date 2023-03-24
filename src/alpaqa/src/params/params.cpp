@@ -107,8 +107,11 @@ void set_param(std::chrono::duration<Rep, Period> &t, ParamString s) {
                                     "' in '" + std::string(s.full_key) + "'");
 }
 
+template void ALPAQA_EXPORT set_param(std::chrono::nanoseconds &t,
+                                      ParamString s);
+
 template <>
-void set_param(LBFGSStepSize &t, ParamString s) {
+void ALPAQA_EXPORT set_param(LBFGSStepSize &t, ParamString s) {
     using enum LBFGSStepSize;
     if (s.value == "BasedOnExternalStepSize")
         t = BasedOnExternalStepSize;
@@ -121,7 +124,7 @@ void set_param(LBFGSStepSize &t, ParamString s) {
 }
 
 template <>
-void set_param(PANOCStopCrit &t, ParamString s) {
+void ALPAQA_EXPORT set_param(PANOCStopCrit &t, ParamString s) {
     using enum PANOCStopCrit;
     if (s.value == "ApproxKKT")
         t = ApproxKKT;
