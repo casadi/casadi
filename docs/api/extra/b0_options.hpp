@@ -797,6 +797,7 @@
 <tr><td>number_of_finite_elements</td><td>OT_INT</td><td>Target number of finite elements. The actual number may be higher to accommodate all output times</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>output_t0</td><td>OT_BOOL</td><td>[DEPRECATED] Output the state at the initial time</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
+<tr><td>rdae</td><td>OT_FUNCTION</td><td>Function for evaluating the backwards DAE (transitional option - to be removed)</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>rootfinder</td><td>OT_STRING</td><td>An implicit function solver</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>rootfinder_options</td><td>OT_DICT</td><td>Options to be passed to the NLP Solver</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>simplify</td><td>OT_BOOL</td><td>Implement as MX Function (codegeneratable/serializable) default: false</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
@@ -821,6 +822,7 @@
 <tr><td>number_of_finite_elements</td><td>OT_INT</td><td>Target number of finite elements. The actual number may be higher to accommodate all output times</td></tr>
 <tr><td>output_t0</td><td>OT_BOOL</td><td>[DEPRECATED] Output the state at the initial time</td></tr>
 <tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td></tr>
+<tr><td>rdae</td><td>OT_FUNCTION</td><td>Function for evaluating the backwards DAE (transitional option - to be removed)</td></tr>
 <tr><td>rootfinder</td><td>OT_STRING</td><td>An implicit function solver</td></tr>
 <tr><td>rootfinder_options</td><td>OT_DICT</td><td>Options to be passed to the NLP Solver</td></tr>
 <tr><td>simplify</td><td>OT_BOOL</td><td>Implement as MX Function (codegeneratable/serializable) default: false</td></tr>
@@ -844,6 +846,7 @@
 <tr><td>number_of_finite_elements</td><td>OT_INT</td><td>Target number of finite elements. The actual number may be higher to accommodate all output times</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>output_t0</td><td>OT_BOOL</td><td>[DEPRECATED] Output the state at the initial time</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
+<tr><td>rdae</td><td>OT_FUNCTION</td><td>Function for evaluating the backwards DAE (transitional option - to be removed)</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>rootfinder</td><td>OT_STRING</td><td>An implicit function solver</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>rootfinder_options</td><td>OT_DICT</td><td>Options to be passed to the NLP Solver</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>simplify</td><td>OT_BOOL</td><td>Implement as MX Function (codegeneratable/serializable) default: false</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
@@ -1805,6 +1808,7 @@
 <tr><td>number_of_finite_elements</td><td>OT_INT</td><td>Target number of finite elements. The actual number may be higher to accommodate all output times</td><td>casadi::FixedStepIntegrator</td></tr>
 <tr><td>output_t0</td><td>OT_BOOL</td><td>[DEPRECATED] Output the state at the initial time</td><td>casadi::FixedStepIntegrator</td></tr>
 <tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::FixedStepIntegrator</td></tr>
+<tr><td>rdae</td><td>OT_FUNCTION</td><td>Function for evaluating the backwards DAE (transitional option - to be removed)</td><td>casadi::FixedStepIntegrator</td></tr>
 <tr><td>rootfinder</td><td>OT_STRING</td><td>An implicit function solver</td><td>casadi::FixedStepIntegrator</td></tr>
 <tr><td>rootfinder_options</td><td>OT_DICT</td><td>Options to be passed to the NLP Solver</td><td>casadi::FixedStepIntegrator</td></tr>
 <tr><td>show_eval_warnings</td><td>OT_BOOL</td><td>Show warnings generated from function evaluations [true]</td><td>casadi::OracleFunction</td></tr>
@@ -1831,6 +1835,7 @@
 <tr><td>number_of_finite_elements</td><td>OT_INT</td><td>Target number of finite elements. The actual number may be higher to accommodate all output times</td><td>casadi::FixedStepIntegrator</td></tr>
 <tr><td>output_t0</td><td>OT_BOOL</td><td>[DEPRECATED] Output the state at the initial time</td><td>casadi::FixedStepIntegrator</td></tr>
 <tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::FixedStepIntegrator</td></tr>
+<tr><td>rdae</td><td>OT_FUNCTION</td><td>Function for evaluating the backwards DAE (transitional option - to be removed)</td><td>casadi::FixedStepIntegrator</td></tr>
 <tr><td>rootfinder</td><td>OT_STRING</td><td>An implicit function solver</td><td>casadi::FixedStepIntegrator</td></tr>
 <tr><td>rootfinder_options</td><td>OT_DICT</td><td>Options to be passed to the NLP Solver</td><td>casadi::FixedStepIntegrator</td></tr>
 <tr><td>show_eval_warnings</td><td>OT_BOOL</td><td>Show warnings generated from function evaluations [true]</td><td>casadi::OracleFunction</td></tr>
@@ -2338,6 +2343,7 @@
 <tr><td>number_of_finite_elements</td><td>OT_INT</td><td>Target number of finite elements. The actual number may be higher to accommodate all output times</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>output_t0</td><td>OT_BOOL</td><td>[DEPRECATED] Output the state at the initial time</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
+<tr><td>rdae</td><td>OT_FUNCTION</td><td>Function for evaluating the backwards DAE (transitional option - to be removed)</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>rootfinder</td><td>OT_STRING</td><td>An implicit function solver</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>rootfinder_options</td><td>OT_DICT</td><td>Options to be passed to the NLP Solver</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>show_eval_warnings</td><td>OT_BOOL</td><td>Show warnings generated from function evaluations [true]</td><td>casadi::OracleFunction</td></tr>
@@ -2364,6 +2370,7 @@
 <tr><td>number_of_finite_elements</td><td>OT_INT</td><td>Target number of finite elements. The actual number may be higher to accommodate all output times</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>output_t0</td><td>OT_BOOL</td><td>[DEPRECATED] Output the state at the initial time</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
+<tr><td>rdae</td><td>OT_FUNCTION</td><td>Function for evaluating the backwards DAE (transitional option - to be removed)</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>rootfinder</td><td>OT_STRING</td><td>An implicit function solver</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>rootfinder_options</td><td>OT_DICT</td><td>Options to be passed to the NLP Solver</td><td>casadi::ImplicitFixedStepIntegrator</td></tr>
 <tr><td>show_eval_warnings</td><td>OT_BOOL</td><td>Show warnings generated from function evaluations [true]</td><td>casadi::OracleFunction</td></tr>
@@ -2454,6 +2461,7 @@
 <tr><td>number_of_finite_elements</td><td>OT_INT</td><td>Target number of finite elements. The actual number may be higher to accommodate all output times</td><td>casadi::Integrator</td></tr>
 <tr><td>output_t0</td><td>OT_BOOL</td><td>[DEPRECATED] Output the state at the initial time</td><td>casadi::Integrator</td></tr>
 <tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::Integrator</td></tr>
+<tr><td>rdae</td><td>OT_FUNCTION</td><td>Function for evaluating the backwards DAE (transitional option - to be removed)</td><td>casadi::Integrator</td></tr>
 <tr><td>rootfinder</td><td>OT_STRING</td><td>An implicit function solver</td><td>casadi::Integrator</td></tr>
 <tr><td>rootfinder_options</td><td>OT_DICT</td><td>Options to be passed to the NLP Solver</td><td>casadi::Integrator</td></tr>
 <tr><td>show_eval_warnings</td><td>OT_BOOL</td><td>Show warnings generated from function evaluations [true]</td><td>casadi::OracleFunction</td></tr>
@@ -2480,6 +2488,7 @@
 <tr><td>number_of_finite_elements</td><td>OT_INT</td><td>Target number of finite elements. The actual number may be higher to accommodate all output times</td><td>casadi::Integrator</td></tr>
 <tr><td>output_t0</td><td>OT_BOOL</td><td>[DEPRECATED] Output the state at the initial time</td><td>casadi::Integrator</td></tr>
 <tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::Integrator</td></tr>
+<tr><td>rdae</td><td>OT_FUNCTION</td><td>Function for evaluating the backwards DAE (transitional option - to be removed)</td><td>casadi::Integrator</td></tr>
 <tr><td>rootfinder</td><td>OT_STRING</td><td>An implicit function solver</td><td>casadi::Integrator</td></tr>
 <tr><td>rootfinder_options</td><td>OT_DICT</td><td>Options to be passed to the NLP Solver</td><td>casadi::Integrator</td></tr>
 <tr><td>show_eval_warnings</td><td>OT_BOOL</td><td>Show warnings generated from function evaluations [true]</td><td>casadi::OracleFunction</td></tr>
@@ -5077,6 +5086,7 @@
 <tr><td>output_t0</td><td>OT_BOOL</td><td>[DEPRECATED] Output the state at the initial time</td><td>casadi::Integrator</td></tr>
 <tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::Integrator</td></tr>
 <tr><td>quad_err_con</td><td>OT_BOOL</td><td>Should the quadratures affect the step size control</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>rdae</td><td>OT_FUNCTION</td><td>Function for evaluating the backwards DAE (transitional option - to be removed)</td><td>casadi::Integrator</td></tr>
 <tr><td>reltol</td><td>OT_DOUBLE</td><td>Relative tolerence for the IVP solution</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>rootfinder</td><td>OT_STRING</td><td>An implicit function solver</td><td>casadi::Integrator</td></tr>
 <tr><td>rootfinder_options</td><td>OT_DICT</td><td>Options to be passed to the NLP Solver</td><td>casadi::Integrator</td></tr>
@@ -5120,6 +5130,7 @@
 <tr><td>output_t0</td><td>OT_BOOL</td><td>[DEPRECATED] Output the state at the initial time</td><td>casadi::Integrator</td></tr>
 <tr><td>print_stats</td><td>OT_BOOL</td><td>Print out statistics after integration</td><td>casadi::Integrator</td></tr>
 <tr><td>quad_err_con</td><td>OT_BOOL</td><td>Should the quadratures affect the step size control</td><td>casadi::SundialsInterface</td></tr>
+<tr><td>rdae</td><td>OT_FUNCTION</td><td>Function for evaluating the backwards DAE (transitional option - to be removed)</td><td>casadi::Integrator</td></tr>
 <tr><td>reltol</td><td>OT_DOUBLE</td><td>Relative tolerence for the IVP solution</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>rootfinder</td><td>OT_STRING</td><td>An implicit function solver</td><td>casadi::Integrator</td></tr>
 <tr><td>rootfinder_options</td><td>OT_DICT</td><td>Options to be passed to the NLP Solver</td><td>casadi::Integrator</td></tr>

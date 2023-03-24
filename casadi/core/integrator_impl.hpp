@@ -273,12 +273,16 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   Function augmented_dae(Function* rdae) const;
   ///@}
 
-  /** \brief Generate a augmented DAE system, forward problem */
+  /** \brief Generate a augmented DAE system, forward problem
+
+      \identifier{262} */
   template<typename MatType>
   Function get_reverse_dae(const Function& this_dae, const Function& this_rdae,
     casadi_int nadj) const;
 
-  /** \brief Generate a augmented DAE system, backward problem */
+  /** \brief Generate a augmented DAE system, backward problem
+
+      \identifier{263} */
   template<typename MatType>
   Function get_reverse_rdae(const Function& this_dae, const Function& this_rdae,
     casadi_int nadj) const;

@@ -29405,10 +29405,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/integration_tools.cpp#
 Convert to string
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L46
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L43
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L46-L58
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L43-L51
 
 >  std::string casadi::to_string(DynOut v)
 ------------------------------------------------------------------------
@@ -29416,10 +29416,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L46-L58
 Convert to string
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L46
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L43
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L46-L58
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L43-L51
 
 ";
 
@@ -33917,10 +33917,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/integration_tools.cpp#
 Check if a particular plugin is available.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L60
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L53
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L60-L62
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L53-L55
 
 ";
 
@@ -33930,10 +33930,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L60-L62
 Explicitly load a plugin dynamically.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L64
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L57
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L64-L66
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L57-L59
 
 ";
 
@@ -33943,10 +33943,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L64-L66
 Get the documentation string for a plugin.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L68
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L61
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L68-L70
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L61-L63
 
 ";
 
@@ -33983,10 +33983,10 @@ Get integrator input scheme name by index.
 Extra doc: https://github.com/casadi/casadi/wiki/L_7d
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L134
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L147
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L134-L146
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L147-L159
 
 >  std::string casadi::integrator_in(casadi_int ind)
 ------------------------------------------------------------------------
@@ -33996,10 +33996,10 @@ Get integrator input scheme name by index.
 Extra doc: https://github.com/casadi/casadi/wiki/L_7d
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L134
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L147
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L134-L146
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L147-L159
 
 ";
 
@@ -34013,10 +34013,10 @@ Get output scheme name by index.
 Extra doc: https://github.com/casadi/casadi/wiki/L_7e
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L148
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L161
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L148-L160
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L161-L173
 
 >  std::string casadi::integrator_out(casadi_int ind)
 ------------------------------------------------------------------------
@@ -34026,10 +34026,10 @@ Get output scheme name by index.
 Extra doc: https://github.com/casadi/casadi/wiki/L_7e
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L148
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L161
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L148-L160
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L161-L173
 
 ";
 
@@ -34043,10 +34043,10 @@ Get the number of integrator inputs.
 Extra doc: https://github.com/casadi/casadi/wiki/L_7f
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L162
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L175
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L162-L164
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L175-L177
 
 ";
 
@@ -34058,10 +34058,10 @@ Get the number of integrator outputs.
 Extra doc: https://github.com/casadi/casadi/wiki/L_7g
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L166
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L179
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L166-L168
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L179-L181
 
 ";
 
@@ -34073,10 +34073,10 @@ Get simulator input scheme name by index.
 Extra doc: https://github.com/casadi/casadi/wiki/L_25r
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L178
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L191
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L178-L180
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L191-L193
 
 >  std::string casadi::dyn_in(casadi_int ind)
 ------------------------------------------------------------------------
@@ -34086,10 +34086,10 @@ Get simulator input scheme name by index.
 Extra doc: https://github.com/casadi/casadi/wiki/L_25r
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L178
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L191
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L178-L180
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L191-L193
 
 ";
 
@@ -34103,10 +34103,10 @@ Get output scheme name by index.
 Extra doc: https://github.com/casadi/casadi/wiki/L_25s
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L182
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L195
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L182-L184
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L195-L197
 
 >  std::string casadi::dyn_out(casadi_int ind)
 ------------------------------------------------------------------------
@@ -34116,10 +34116,10 @@ Get output scheme name by index.
 Extra doc: https://github.com/casadi/casadi/wiki/L_25s
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L182
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L195
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L182-L184
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L195-L197
 
 ";
 
@@ -34133,10 +34133,10 @@ Get the number of simulator inputs.
 Extra doc: https://github.com/casadi/casadi/wiki/L_25t
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L186
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L199
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L186-L188
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L199-L201
 
 ";
 
@@ -34148,10 +34148,10 @@ Get the number of simulator outputs.
 Extra doc: https://github.com/casadi/casadi/wiki/L_25u
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L190
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L203
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L190-L192
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L203-L205
 
 ";
 
