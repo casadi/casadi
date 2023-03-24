@@ -328,6 +328,18 @@ int SundialsInterface::init_mem(void* mem) const {
   m->mem_linsolF = linsolF_.checkout();
   if (!linsolB_.is_null()) m->mem_linsolB = linsolB_.checkout();
 
+  // Reset stats, forward problem
+  m->nsteps = m->nfevals = m->nlinsetups = m->netfails = 0;
+  m->qlast = m->qcur = -1;
+  m->hinused = m->hlast = m->hcur = m->tcur = casadi::nan;
+  m->nniters = m->nncfails = 0;
+
+  // Reset stats, backward problem
+  m->nstepsB = m->nfevalsB = m->nlinsetupsB = m->netfailsB = 0;
+  m->qlastB = m->qcurB = -1;
+  m->hinusedB = m->hlastB = m->hcurB = m->tcurB = casadi::nan;
+  m->nnitersB = m->nncfailsB = 0;
+
   return 0;
 }
 
