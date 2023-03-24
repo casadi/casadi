@@ -780,6 +780,10 @@ Function Integrator::get_reverse_dae(const Function& this_dae, const Function& t
     casadi_int nadj) const {
   if (verbose_) casadi_message(name_ + "::get_reverse_dae");
 
+  // Backwards DAE IO scheme
+  std::vector<std::string> bdyn_in = Integrator::bdyn_in();
+  std::vector<std::string> bdyn_out = Integrator::bdyn_out();
+
   // Get input and output expressions
   std::vector<MatType> arg = MatType::get_input(this_dae);
   std::vector<MatType> res = this_dae(arg);
@@ -806,95 +810,42 @@ Function Integrator::get_reverse_dae(const Function& this_dae, const Function& t
     aug_in[DYN_RX].push_back(seed[d][DYN_ODE]);
     aug_in[DYN_RZ].push_back(seed[d][DYN_ALG]);
     aug_in[DYN_RP].push_back(seed[d][DYN_QUAD]);
-    aug_in[DYN_X].push_back(seed[d][DYN_RODE]);
-    aug_in[DYN_Z].push_back(seed[d][DYN_RALG]);
-    aug_in[DYN_P].push_back(seed[d][DYN_RQUAD]);
-    aug_in[DYN_U].push_back(seed[d][DYN_UQUAD]);
 
-    for (casadi_int i = 0; i < DYN_NUM_OUT; ++i) {
-      if (i == DYN_RODE) {
-        rseed[d][BDYN_RODE] = seed[d][i];
-        seed[d][i] = MatType::zeros(seed[d][i].sparsity());
-      } else if (i == DYN_RALG) {
-        rseed[d][BDYN_RALG] = seed[d][i];
-        seed[d][i] = MatType::zeros(seed[d][i].sparsity());
-      } else if (i == DYN_RQUAD) {
-        rseed[d][BDYN_RQUAD] = seed[d][i];
-        seed[d][i] = MatType::zeros(seed[d][i].sparsity());
-      } else if (i == DYN_UQUAD) {
-        rseed[d][BDYN_UQUAD] = seed[d][i];
-        seed[d][i] = MatType::zeros(seed[d][i].sparsity());
+    if (!this_rdae.is_null()) {
+      for (casadi_int i = 0; i < BDYN_NUM_OUT; ++i) {
+        rseed[d][i] = MatType::sym(pref + bdyn_out[i], this_rdae.sparsity_out(i));
       }
+
+      aug_in[DYN_X].push_back(rseed[d][BDYN_RODE]);
+      aug_in[DYN_Z].push_back(rseed[d][BDYN_RALG]);
+      aug_in[DYN_P].push_back(rseed[d][BDYN_RQUAD]);
+      aug_in[DYN_U].push_back(rseed[d][BDYN_UQUAD]);
     }
   }
 
-  // Calculate directional derivatives
-  std::vector<std::vector<MatType>> sens;
-  bool always_inline = this_dae.is_a("SXFunction") || this_dae.is_a("MXFunction");
-  this_dae->call_reverse(arg, res, seed, sens, always_inline, false);
-
-  if (this_rdae.is_null()) {
-    // Collect sensitivity equations
-    casadi_assert_dev(sens.size() == nadj);
-    for (casadi_int d = 0; d < nadj; ++d) {
-      casadi_assert_dev(sens[d].size() == DYN_NUM_IN);
-      aug_out[DYN_RODE].push_back(project(sens[d][DYN_X], this_dae.sparsity_in(DYN_X)));
-      aug_out[DYN_RALG].push_back(project(sens[d][DYN_Z], this_dae.sparsity_in(DYN_Z)));
-      aug_out[DYN_RQUAD].push_back(project(sens[d][DYN_P], this_dae.sparsity_in(DYN_P)));
-      aug_out[DYN_UQUAD].push_back(project(sens[d][DYN_U], this_dae.sparsity_in(DYN_U)));
-      aug_out[DYN_ODE].push_back(project(sens[d][DYN_RX], this_dae.sparsity_in(DYN_RX)));
-      aug_out[DYN_ALG].push_back(project(sens[d][DYN_RZ], this_dae.sparsity_in(DYN_RZ)));
-      aug_out[DYN_QUAD].push_back(project(sens[d][DYN_RP], this_dae.sparsity_in(DYN_RP)));
-    }
-  } else {
+  if (!this_rdae.is_null()) {
     // Calculate directional derivatives, rdae
     std::vector<std::vector<MatType>> rsens;
-    always_inline = this_rdae.is_a("SXFunction") || this_rdae.is_a("MXFunction");
+    bool always_inline = this_rdae.is_a("SXFunction") || this_rdae.is_a("MXFunction");
     this_rdae->call_reverse(arg, rres, rseed, rsens, always_inline, false);
 
     // Collect sensitivity equations
-    casadi_assert_dev(sens.size() == nadj);
+    casadi_assert_dev(rsens.size() == nadj);
     for (casadi_int d = 0; d < nadj; ++d) {
-      casadi_assert_dev(sens[d].size() == DYN_NUM_IN);
-      aug_out[DYN_RODE].push_back(project(sens[d][DYN_X] + rsens[d][BDYN_X],
-        this_dae.sparsity_in(DYN_X)));
-      aug_out[DYN_RALG].push_back(project(sens[d][DYN_Z] + rsens[d][BDYN_Z],
-        this_dae.sparsity_in(DYN_Z)));
-      aug_out[DYN_RQUAD].push_back(project(sens[d][DYN_P] + rsens[d][BDYN_P],
-        this_dae.sparsity_in(DYN_P)));
-      aug_out[DYN_UQUAD].push_back(project(sens[d][DYN_U] + rsens[d][BDYN_U],
-        this_dae.sparsity_in(DYN_U)));
-      aug_out[DYN_ODE].push_back(project(sens[d][DYN_RX] + rsens[d][BDYN_RX],
-        this_dae.sparsity_in(DYN_RX)));
-      aug_out[DYN_ALG].push_back(project(sens[d][DYN_RZ] + rsens[d][BDYN_RZ],
-        this_dae.sparsity_in(DYN_RZ)));
-      aug_out[DYN_QUAD].push_back(project(sens[d][DYN_RP] + rsens[d][BDYN_RP],
-        this_dae.sparsity_in(DYN_RP)));
+      casadi_assert_dev(rsens[d].size() == BDYN_NUM_IN);
+      aug_out[DYN_ODE].push_back(project(rsens[d][BDYN_RX], this_dae.sparsity_in(DYN_RX)));
+      aug_out[DYN_ALG].push_back(project(rsens[d][BDYN_RZ], this_dae.sparsity_in(DYN_RZ)));
+      aug_out[DYN_QUAD].push_back(project(rsens[d][BDYN_RP], this_dae.sparsity_in(DYN_RP)));
     }
   }
 
   // Concatenate expressions
   for (casadi_int i = 0; i < DYN_NUM_IN; ++i) arg.at(i) = vertcat(aug_in[i]);
   for (casadi_int i = 0; i < DYN_NUM_OUT; ++i) res.at(i) = vertcat(aug_out[i]);
-
-  // Hack: Make sure that forward problem does not depend on backward states
-  // Should become unnecessary once #3047 is complete
-  std::map<std::string, MatType> r;
-  for (casadi_int i = 0; i < DYN_NUM_IN; ++i) r[dyn_in(i)] = arg[i];
-  for (casadi_int i = 0; i < DYN_NUM_OUT; ++i) r[dyn_out(i)] = res[i];
-  Function f("f", {r["t"], r["x"], r["z"], r["p"], r["u"]},
-                  {r["ode"], r["alg"], r["quad"]}, {{"allow_free", true}});
-  if (f.has_free()) {
-    // Replace dependencies of rx, rz and rp with zeros
-    f = Function("f", {r["t"], r["x"], r["z"], r["p"], r["u"],
-                        r["rx"], r["rz"], r["rp"]},
-                      {r["ode"], r["alg"], r["quad"]});
-    std::vector<MatType> v = {r["t"], r["x"], r["z"], r["p"], r["u"], 0, 0, 0};
-    v = f(v);
-    res[DYN_ODE] = v.at(0);
-    res[DYN_ALG] = v.at(1);
-    res[DYN_QUAD] = v.at(2);
-  }
+  res[DYN_RODE] = MatType::zeros(nrx_ + nadj * nx_);
+  res[DYN_RALG] = MatType::zeros(nrz_ + nadj * nz_);
+  res[DYN_RQUAD] = MatType::zeros(nrq_ + nadj * np_);
+  res[DYN_UQUAD] = MatType::zeros(nuq_ + nadj * nu_);
 
   // Convert to oracle function and return
   std::string aug_prefix = "asens" + str(nadj) + "_";
@@ -910,14 +861,16 @@ Function Integrator::get_reverse_rdae(const Function& this_dae, const Function& 
   // Get input and output expressions
   std::vector<MatType> arg = MatType::get_input(this_dae);
   std::vector<MatType> res = this_dae(arg);
-  std::vector<MatType> rres;
+  std::vector<MatType> rres();
   if (!this_rdae.is_null()) rres = this_rdae(arg);
 
-  // Symbolic expression for augmented DAE
+  // Symbolic expression for augmented DAE`
   std::vector<std::vector<MatType>> aug_in(DYN_NUM_IN);
   for (casadi_int i = 0; i < DYN_NUM_IN; ++i) aug_in[i].push_back(arg.at(i));
-  std::vector<std::vector<MatType>> aug_out(DYN_NUM_OUT);
-  for (casadi_int i = 0; i < DYN_NUM_OUT; ++i) aug_out[i].push_back(res.at(i));
+  std::vector<std::vector<MatType>> aug_out(BDYN_NUM_OUT);
+  if (!this_rdae.is_null()) {
+    for (casadi_int i = 0; i < BDYN_NUM_OUT; ++i) aug_out[i].push_back(rres.at(i));
+  }
 
   // Zero of time dimension
   MatType zero_t = MatType::zeros(this_dae.sparsity_in(DYN_T));
@@ -965,10 +918,10 @@ Function Integrator::get_reverse_rdae(const Function& this_dae, const Function& 
     casadi_assert_dev(sens.size()==nadj);
     for (casadi_int d = 0; d < nadj; ++d) {
       casadi_assert_dev(sens[d].size() == DYN_NUM_IN);
-      aug_out[DYN_RODE].push_back(project(sens[d][DYN_X], this_dae.sparsity_in(DYN_X)));
-      aug_out[DYN_RALG].push_back(project(sens[d][DYN_Z], this_dae.sparsity_in(DYN_Z)));
-      aug_out[DYN_RQUAD].push_back(project(sens[d][DYN_P], this_dae.sparsity_in(DYN_P)));
-      aug_out[DYN_UQUAD].push_back(project(sens[d][DYN_U], this_dae.sparsity_in(DYN_U)));
+      aug_out[BDYN_RODE].push_back(project(sens[d][DYN_X], this_dae.sparsity_in(DYN_X)));
+      aug_out[BDYN_RALG].push_back(project(sens[d][DYN_Z], this_dae.sparsity_in(DYN_Z)));
+      aug_out[BDYN_RQUAD].push_back(project(sens[d][DYN_P], this_dae.sparsity_in(DYN_P)));
+      aug_out[BDYN_UQUAD].push_back(project(sens[d][DYN_U], this_dae.sparsity_in(DYN_U)));
     }
   } else {
     // Calculate directional derivatives, rdae
@@ -980,31 +933,29 @@ Function Integrator::get_reverse_rdae(const Function& this_dae, const Function& 
     casadi_assert_dev(sens.size()==nadj);
     for (casadi_int d = 0; d < nadj; ++d) {
       casadi_assert_dev(sens[d].size() == DYN_NUM_IN);
-      aug_out[DYN_RODE].push_back(project(sens[d][DYN_X] + rsens[d][BDYN_X],
+      aug_out[BDYN_RODE].push_back(project(sens[d][DYN_X] + rsens[d][BDYN_X],
         this_dae.sparsity_in(DYN_X)));
-      aug_out[DYN_RALG].push_back(project(sens[d][DYN_Z] + rsens[d][BDYN_Z],
+      aug_out[BDYN_RALG].push_back(project(sens[d][DYN_Z] + rsens[d][BDYN_Z],
         this_dae.sparsity_in(DYN_Z)));
-      aug_out[DYN_RQUAD].push_back(project(sens[d][DYN_P] + rsens[d][BDYN_P],
+      aug_out[BDYN_RQUAD].push_back(project(sens[d][DYN_P] + rsens[d][BDYN_P],
         this_dae.sparsity_in(DYN_P)));
-      aug_out[DYN_UQUAD].push_back(project(sens[d][DYN_U] + rsens[d][BDYN_U],
+      aug_out[BDYN_UQUAD].push_back(project(sens[d][DYN_U] + rsens[d][BDYN_U],
         this_dae.sparsity_in(DYN_U)));
     }
   }
 
   // Concatenate expressions
   for (casadi_int i = 0; i < DYN_NUM_IN; ++i) arg.at(i) = vertcat(aug_in[i]);
-  for (casadi_int i = 0; i < DYN_NUM_OUT; ++i) res.at(i) = vertcat(aug_out[i]);
+  for (casadi_int i = 0; i < BDYN_NUM_OUT; ++i) rres.at(i) = vertcat(aug_out[i]);
 
   // Order expressions by name
   std::map<std::string, MatType> r;
   for (casadi_int i = 0; i < DYN_NUM_IN; ++i) r[dyn_in(i)] = arg[i];
-  for (casadi_int i = 0; i < DYN_NUM_OUT; ++i) r[dyn_out(i)] = res[i];
 
   // Create backwards DAE and return
-  std::vector<MatType> rdae_in, rdae_out;
+  std::vector<MatType> rdae_in;
   for (auto& n : bdyn_in()) rdae_in.push_back(r.at(n));
-  for (auto& n : bdyn_out()) rdae_out.push_back(r.at(n));
-  return Function("rdae", rdae_in, rdae_out, bdyn_in(), bdyn_out());
+  return Function("rdae", rdae_in, rres, bdyn_in(), bdyn_out());
 }
 
 int Integrator::fdae_sp_forward(SpForwardMem* m, const bvec_t* x,
