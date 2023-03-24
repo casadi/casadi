@@ -240,8 +240,9 @@ void SundialsInterface::init(const Dict& opts) {
     Sparsity jacB_sp;
     if (d == 0) {
       // New Jacobian function
-      jacB = create_function(rdae_, "jacB", {"t", "x", "z", "p", "u", "rx", "rz", "rp"},
-        {"jac:rode:rx", "jac:ralg:rx", "jac:rode:rz", "jac:ralg:rz"});
+      jacB = create_function(rdae_, "jacB",
+        {"t", "x", "z", "p", "u", "adj_ode", "adj_alg", "adj_quad"},
+        {"jac:rode:adj_ode", "jac:ralg:adj_ode", "jac:rode:adj_alg", "jac:ralg:adj_alg"});
       jacB_sp = jacB.sparsity_out(JACB_RODE_RX) + Sparsity::diag(nrx1_);
       if (nrz1_ > 0) {
         jacB_sp = horzcat(vertcat(jacB_sp, jacB.sparsity_out(JACB_RALG_RX)),
@@ -287,7 +288,7 @@ void SundialsInterface::init(const Dict& opts) {
     }
     if (nrx_ > 0) {
       create_function(rdae_, "jtimesB",
-        {"t", "x", "z", "p", "u", "rx", "rz", "rp", "fwd:rx", "fwd:rz"},
+        {"t", "x", "z", "p", "u", "adj_ode", "adj_alg", "adj_quad", "fwd:adj_ode", "fwd:adj_alg"},
         {"fwd:rode", "fwd:ralg"});
       if (nfwd_ > 0) {
         create_forward("jtimesB", nfwd_);

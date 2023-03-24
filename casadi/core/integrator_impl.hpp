@@ -312,7 +312,8 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   static std::vector<std::string> quad_out() { return {"quad"}; }
   enum BDynIn { BDYN_T, BDYN_X, BDYN_Z, BDYN_P, BDYN_U,
     BDYN_ADJ_ODE, BDYN_ADJ_ALG, BDYN_ADJ_QUAD, BDYN_NUM_IN};
-  static std::vector<std::string> bdyn_in() { return {"t", "x", "z", "p", "u", "rx", "rz", "rp"}; }
+  static std::vector<std::string> bdyn_in() { return {"t", "x", "z", "p", "u",
+    "adj_ode", "adj_alg", "adj_quad"}; }
   enum BDynOut { BDYN_ADJ_X, BDYN_ADJ_Z, BDYN_ADJ_P, BDYN_ADJ_U, BDYN_NUM_OUT};
   static std::vector<std::string> bdyn_out() { return {"rode", "ralg", "rquad", "uquad"}; }
   enum DAEBOut { BDAE_ADJ_X, BDAE_ADJ_Z, BDAE_NUM_OUT};
