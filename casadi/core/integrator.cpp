@@ -833,9 +833,9 @@ Function Integrator::get_reverse_dae(const Function& this_dae, const Function& t
     casadi_assert_dev(rsens.size() == nadj);
     for (casadi_int d = 0; d < nadj; ++d) {
       casadi_assert_dev(rsens[d].size() == BDYN_NUM_IN);
-      aug_out[DYN_ODE].push_back(project(rsens[d][BDYN_RX], this_dae.sparsity_in(DYN_RX)));
-      aug_out[DYN_ALG].push_back(project(rsens[d][BDYN_RZ], this_dae.sparsity_in(DYN_RZ)));
-      aug_out[DYN_QUAD].push_back(project(rsens[d][BDYN_RP], this_dae.sparsity_in(DYN_RP)));
+      aug_out[DYN_ODE].push_back(project(rsens[d][BDYN_RX], this_rdae.sparsity_in(BDYN_RX)));
+      aug_out[DYN_ALG].push_back(project(rsens[d][BDYN_RZ], this_rdae.sparsity_in(BDYN_RZ)));
+      aug_out[DYN_QUAD].push_back(project(rsens[d][BDYN_RP], this_rdae.sparsity_in(BDYN_RP)));
     }
   }
 
@@ -858,10 +858,14 @@ Function Integrator::get_reverse_rdae(const Function& this_dae, const Function& 
     casadi_int nadj) const {
   if (verbose_) casadi_message(name_ + "::get_reverse_rdae");
 
+  // Backwards DAE IO scheme
+  std::vector<std::string> bdyn_in = Integrator::bdyn_in();
+  std::vector<std::string> bdyn_out = Integrator::bdyn_out();
+
   // Get input and output expressions
   std::vector<MatType> arg = MatType::get_input(this_dae);
   std::vector<MatType> res = this_dae(arg);
-  std::vector<MatType> rres();
+  std::vector<MatType> rres(BDYN_NUM_OUT);
   if (!this_rdae.is_null()) rres = this_rdae(arg);
 
   // Symbolic expression for augmented DAE`
@@ -886,25 +890,16 @@ Function Integrator::get_reverse_rdae(const Function& this_dae, const Function& 
     aug_in[DYN_RX].push_back(seed[d][DYN_ODE]);
     aug_in[DYN_RZ].push_back(seed[d][DYN_ALG]);
     aug_in[DYN_RP].push_back(seed[d][DYN_QUAD]);
-    aug_in[DYN_X].push_back(seed[d][DYN_RODE]);
-    aug_in[DYN_Z].push_back(seed[d][DYN_RALG]);
-    aug_in[DYN_P].push_back(seed[d][DYN_RQUAD]);
-    aug_in[DYN_U].push_back(seed[d][DYN_UQUAD]);
 
-    for (casadi_int i = 0; i < DYN_NUM_OUT; ++i) {
-      if (i == DYN_RODE) {
-        rseed[d][BDYN_RODE] = seed[d][i];
-        seed[d][i] = MatType::zeros(seed[d][i].sparsity());
-      } else if (i == DYN_RALG) {
-        rseed[d][BDYN_RALG] = seed[d][i];
-        seed[d][i] = MatType::zeros(seed[d][i].sparsity());
-      } else if (i == DYN_RQUAD) {
-        rseed[d][BDYN_RQUAD] = seed[d][i];
-        seed[d][i] = MatType::zeros(seed[d][i].sparsity());
-      } else if (i == DYN_UQUAD) {
-        rseed[d][BDYN_UQUAD] = seed[d][i];
-        seed[d][i] = MatType::zeros(seed[d][i].sparsity());
+    if (!this_rdae.is_null()) {
+      for (casadi_int i = 0; i < BDYN_NUM_OUT; ++i) {
+        rseed[d][i] = MatType::sym(pref + bdyn_out[i], this_rdae.sparsity_out(i));
       }
+
+      aug_in[DYN_X].push_back(rseed[d][BDYN_RODE]);
+      aug_in[DYN_Z].push_back(rseed[d][BDYN_RALG]);
+      aug_in[DYN_P].push_back(rseed[d][BDYN_RQUAD]);
+      aug_in[DYN_U].push_back(rseed[d][BDYN_UQUAD]);
     }
   }
 
@@ -954,8 +949,8 @@ Function Integrator::get_reverse_rdae(const Function& this_dae, const Function& 
 
   // Create backwards DAE and return
   std::vector<MatType> rdae_in;
-  for (auto& n : bdyn_in()) rdae_in.push_back(r.at(n));
-  return Function("rdae", rdae_in, rres, bdyn_in(), bdyn_out());
+  for (auto& n : bdyn_in) rdae_in.push_back(r.at(n));
+  return Function("rdae", rdae_in, rres, bdyn_in, bdyn_out);
 }
 
 int Integrator::fdae_sp_forward(SpForwardMem* m, const bvec_t* x,
