@@ -51716,10 +51716,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/integration_tools.cpp#
 Check if a particular plugin is available.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L53
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L94
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L53-L55
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L94-L96
 
 ";
 
@@ -51729,10 +51729,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L53-L55
 Explicitly load a plugin dynamically.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L57
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L98
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L57-L59
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L98-L100
 
 ";
 
@@ -51742,10 +51742,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L57-L59
 Get the documentation string for a plugin.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L61
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L102
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L61-L63
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L102-L104
 
 ";
 
@@ -51895,51 +51895,52 @@ General information
 
 >Input scheme: casadi::IntegratorInput (INTEGRATOR_NUM_IN = 7)
 
-+----------------+-------+-------------------------------------------------+
-|   Full name    | Short |                   Description                   |
-+================+=======+=================================================+
-| INTEGRATOR_X0  | x0    | Differential state at the initial time.         |
-+----------------+-------+-------------------------------------------------+
-| INTEGRATOR_P   | p     | Parameters.                                     |
-+----------------+-------+-------------------------------------------------+
-| INTEGRATOR_U   | u     | Piecewise constant control, a new control       |
-|                |       | interval starts at each output time.            |
-+----------------+-------+-------------------------------------------------+
-| INTEGRATOR_Z0  | z0    | Initial guess for the algebraic variable at the |
-|                |       | initial time.                                   |
-+----------------+-------+-------------------------------------------------+
-| INTEGRATOR_RX0 | rx0   | Backward differential state impulse at each     |
-|                |       | output time.                                    |
-+----------------+-------+-------------------------------------------------+
-| INTEGRATOR_RP  | rp    | Backward parameter vector impulse at each       |
-|                |       | output time.                                    |
-+----------------+-------+-------------------------------------------------+
-| INTEGRATOR_RZ0 | rz0   | Initial guess for the backwards algebraic       |
-|                |       | variable at each output time.                   |
-+----------------+-------+-------------------------------------------------+
++-------------------+--------+---------------------------------------------+
+|     Full name     | Short  |                 Description                 |
++===================+========+=============================================+
+| INTEGRATOR_X0     | x0     | Differential state at the initial time.     |
++-------------------+--------+---------------------------------------------+
+| INTEGRATOR_P      | p      | Parameters.                                 |
++-------------------+--------+---------------------------------------------+
+| INTEGRATOR_U      | u      | Piecewise constant control, a new control   |
+|                   |        | interval starts at each output time.        |
++-------------------+--------+---------------------------------------------+
+| INTEGRATOR_Z0     | z0     | Initial guess for the algebraic variable at |
+|                   |        | the initial time.                           |
++-------------------+--------+---------------------------------------------+
+| INTEGRATOR_ADJ_XF | adj_xf | Adjoint seeds corresponding to the states   |
+|                   |        | at the output times.                        |
++-------------------+--------+---------------------------------------------+
+| INTEGRATOR_ADJ_QF | adj_qf | Adjoint seeds corresponding to the          |
+|                   |        | quadrature at the output times.             |
++-------------------+--------+---------------------------------------------+
+| INTEGRATOR_ADJ_ZF | adj_zf | Adjoint seeds corresponding to the          |
+|                   |        | algebraic variables at the output times.    |
++-------------------+--------+---------------------------------------------+
 
 >Output scheme: casadi::IntegratorOutput (INTEGRATOR_NUM_OUT = 7)
 
-+----------------+-------+-------------------------------------------------+
-|   Full name    | Short |                   Description                   |
-+================+=======+=================================================+
-| INTEGRATOR_XF  | xf    | Differential state at all output times.         |
-+----------------+-------+-------------------------------------------------+
-| INTEGRATOR_QF  | qf    | Quadrature state at all output times.           |
-+----------------+-------+-------------------------------------------------+
-| INTEGRATOR_ZF  | zf    | Algebraic variable at all output times.         |
-+----------------+-------+-------------------------------------------------+
-| INTEGRATOR_RXF | rxf   | Backward differential state at the initial      |
-|                |       | time.                                           |
-+----------------+-------+-------------------------------------------------+
-| INTEGRATOR_RQF | rqf   | Backward quadrature state at the initial time.  |
-+----------------+-------+-------------------------------------------------+
-| INTEGRATOR_RZF | rzf   | Backward algebraic variable at the initial      |
-|                |       | time.                                           |
-+----------------+-------+-------------------------------------------------+
-| INTEGRATOR_UQF | uqf   | Backward gridded quadrature for each control    |
-|                |       | interval.                                       |
-+----------------+-------+-------------------------------------------------+
++-------------------+--------+---------------------------------------------+
+|     Full name     | Short  |                 Description                 |
++===================+========+=============================================+
+| INTEGRATOR_XF     | xf     | Differential state at all output times.     |
++-------------------+--------+---------------------------------------------+
+| INTEGRATOR_QF     | qf     | Quadrature state at all output times.       |
++-------------------+--------+---------------------------------------------+
+| INTEGRATOR_ZF     | zf     | Algebraic variable at all output times.     |
++-------------------+--------+---------------------------------------------+
+| INTEGRATOR_ADJ_X0 | adj_x0 | Adjoint sensitivities corresponding to the  |
+|                   |        | initial state.                              |
++-------------------+--------+---------------------------------------------+
+| INTEGRATOR_ADJ_P  | adj_p  | Adjoint sensitivities corresponding to the  |
+|                   |        | parameter vector.                           |
++-------------------+--------+---------------------------------------------+
+| INTEGRATOR_ADJ_Z0 | adj_z0 | Adjoint sensitivities corresponding to the  |
+|                   |        | algebraic variable guess.                   |
++-------------------+--------+---------------------------------------------+
+| INTEGRATOR_ADJ_U  | adj_u  | Adjoint sensitivities corresponding to the  |
+|                   |        | control vector.                             |
++-------------------+--------+---------------------------------------------+
 
 List of plugins
 - cvodes
@@ -52285,10 +52286,10 @@ Joel Andersson
 Extra doc: https://github.com/casadi/casadi/wiki/L_21k
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L65
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L106
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L65-L68
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L106-L109
 
 ";
 
@@ -52346,10 +52347,10 @@ Get input scheme of integrators.
 Extra doc: https://github.com/casadi/casadi/wiki/L_7b
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L135
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L176
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L135-L139
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L176-L180
 
 ";
 
@@ -52361,10 +52362,10 @@ Get integrator input scheme name by index.
 Extra doc: https://github.com/casadi/casadi/wiki/L_7d
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L147
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L188
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L147-L159
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L188-L200
 
 ";
 
@@ -52376,10 +52377,10 @@ Get integrator output scheme of integrators.
 Extra doc: https://github.com/casadi/casadi/wiki/L_7c
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L141
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L182
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L141-L145
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L182-L186
 
 ";
 
@@ -52391,10 +52392,10 @@ Get output scheme name by index.
 Extra doc: https://github.com/casadi/casadi/wiki/L_7e
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L161
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L202
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L161-L173
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L202-L214
 
 ";
 
@@ -52406,10 +52407,10 @@ Get the number of integrator inputs.
 Extra doc: https://github.com/casadi/casadi/wiki/L_7f
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L175
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L216
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L175-L177
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L216-L218
 
 ";
 
@@ -52421,10 +52422,10 @@ Get the number of integrator outputs.
 Extra doc: https://github.com/casadi/casadi/wiki/L_7g
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L179
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L220
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L179-L181
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L220-L222
 
 ";
 
@@ -52436,10 +52437,10 @@ Get input scheme of simulators.
 Extra doc: https://github.com/casadi/casadi/wiki/L_25p
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L183
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L224
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L183-L185
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L224-L226
 
 ";
 
@@ -52451,10 +52452,10 @@ Get simulator input scheme name by index.
 Extra doc: https://github.com/casadi/casadi/wiki/L_25r
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L191
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L232
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L191-L193
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L232-L234
 
 ";
 
@@ -52466,10 +52467,10 @@ Get simulator output scheme of simulators.
 Extra doc: https://github.com/casadi/casadi/wiki/L_25q
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L187
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L228
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L187-L189
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L228-L230
 
 ";
 
@@ -52481,10 +52482,10 @@ Get output scheme name by index.
 Extra doc: https://github.com/casadi/casadi/wiki/L_25s
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L195
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L236
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L195-L197
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L236-L238
 
 ";
 
@@ -52496,10 +52497,10 @@ Get the number of simulator inputs.
 Extra doc: https://github.com/casadi/casadi/wiki/L_25t
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L199
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L240
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L199-L201
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L240-L242
 
 ";
 
@@ -52511,10 +52512,10 @@ Get the number of simulator outputs.
 Extra doc: https://github.com/casadi/casadi/wiki/L_25u
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L203
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.hpp#L244
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L203-L205
+https://github.com/casadi/casadi/blob/develop/casadi/core/integrator.cpp#L244-L246
 
 ";
 
