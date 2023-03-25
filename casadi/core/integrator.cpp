@@ -191,9 +191,9 @@ std::string integrator_in(casadi_int ind) {
   case INTEGRATOR_P:   return "p";
   case INTEGRATOR_U:   return "u";
   case INTEGRATOR_Z0:  return "z0";
-  case INTEGRATOR_ADJ_XF: return "rx0";
-  case INTEGRATOR_ADJ_QF:  return "rp";
-  case INTEGRATOR_ADJ_ZF: return "rz0";
+  case INTEGRATOR_ADJ_XF: return "adj_xf";
+  case INTEGRATOR_ADJ_QF:  return "adj_qf";
+  case INTEGRATOR_ADJ_ZF: return "adj_zf";
   case INTEGRATOR_NUM_IN: break;
   }
   return std::string();
@@ -204,10 +204,10 @@ std::string integrator_out(casadi_int ind) {
   case INTEGRATOR_XF:  return "xf";
   case INTEGRATOR_QF:  return "qf";
   case INTEGRATOR_ZF:  return "zf";
-  case INTEGRATOR_ADJ_X0: return "rxf";
-  case INTEGRATOR_ADJ_P: return "rqf";
-  case INTEGRATOR_ADJ_Z0: return "rzf";
-  case INTEGRATOR_ADJ_U: return "uqf";
+  case INTEGRATOR_ADJ_X0: return "adj_x0";
+  case INTEGRATOR_ADJ_P: return "adj_p";
+  case INTEGRATOR_ADJ_Z0: return "adj_z0";
+  case INTEGRATOR_ADJ_U: return "adj_u";
   case INTEGRATOR_NUM_OUT: break;
   }
   return std::string();
