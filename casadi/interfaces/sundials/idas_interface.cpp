@@ -159,10 +159,10 @@ void IdasInterface::init(const Dict& opts) {
   alloc_w(nx_ + nz_); // casadi_copy_block
   if (nrx_ > 0) {
     const Function& jacB = get_function("jacB");
-    alloc_w(jacB.nnz_out(JACB_RODE_RX), true);  // jac_rode_rx
-    alloc_w(jacB.nnz_out(JACB_RALG_RX), true);  // jac_ralg_rx
-    alloc_w(jacB.nnz_out(JACB_RODE_RZ), true);  // jac_rode_rz
-    alloc_w(jacB.nnz_out(JACB_RALG_RZ), true);  // jac_ralg_rz
+    alloc_w(jacB.nnz_out(JACB_RODE_RX), true);  // jac_adj_x_rx
+    alloc_w(jacB.nnz_out(JACB_RALG_RX), true);  // jac_adj_z_rx
+    alloc_w(jacB.nnz_out(JACB_RODE_RZ), true);  // jac_adj_x_rz
+    alloc_w(jacB.nnz_out(JACB_RALG_RZ), true);  // jac_adj_z_rz
     alloc_w(nrx_ + nrz_); // casadi_copy_block
   }
 }
@@ -182,10 +182,10 @@ void IdasInterface::set_work(void* mem, const double**& arg, double**& res,
   m->jac_alg_z = w; w += jacF.nnz_out(JACF_ALG_Z);
   if (nrx_ > 0) {
     const Function& jacB = get_function("jacB");
-    m->jac_rode_rx = w; w += jacB.nnz_out(JACB_RODE_RX);
-    m->jac_ralg_rx = w; w += jacB.nnz_out(JACB_RALG_RX);
-    m->jac_rode_rz = w; w += jacB.nnz_out(JACB_RODE_RZ);
-    m->jac_ralg_rz = w; w += jacB.nnz_out(JACB_RALG_RZ);
+    m->jac_adj_x_rx = w; w += jacB.nnz_out(JACB_RODE_RX);
+    m->jac_adj_z_rx = w; w += jacB.nnz_out(JACB_RALG_RX);
+    m->jac_adj_x_rz = w; w += jacB.nnz_out(JACB_RODE_RZ);
+    m->jac_adj_z_rz = w; w += jacB.nnz_out(JACB_RALG_RZ);
   }
 }
 
@@ -882,10 +882,10 @@ int IdasInterface::psetupB(double t, N_Vector xz, N_Vector xzdot, N_Vector rxz, 
 
     // Sparsity patterns
     const Function& jacB = s.get_function("jacB");
-    const Sparsity& sp_jac_rode_rx = jacB.sparsity_out(JACB_RODE_RX);
-    const Sparsity& sp_jac_ralg_rx = jacB.sparsity_out(JACB_RALG_RX);
-    const Sparsity& sp_jac_rode_rz = jacB.sparsity_out(JACB_RODE_RZ);
-    const Sparsity& sp_jac_ralg_rz = jacB.sparsity_out(JACB_RALG_RZ);
+    const Sparsity& sp_jac_adj_x_rx = jacB.sparsity_out(JACB_RODE_RX);
+    const Sparsity& sp_jac_adj_z_rx = jacB.sparsity_out(JACB_RALG_RX);
+    const Sparsity& sp_jac_adj_x_rz = jacB.sparsity_out(JACB_RODE_RZ);
+    const Sparsity& sp_jac_adj_z_rz = jacB.sparsity_out(JACB_RALG_RZ);
     const Sparsity& sp_jacB = s.linsolB_.sparsity();
 
     // Calculate Jacobian blocks
@@ -897,20 +897,20 @@ int IdasInterface::psetupB(double t, N_Vector xz, N_Vector xzdot, N_Vector rxz, 
     m->arg[5] = NV_DATA_S(rxz);
     m->arg[6] = NV_DATA_S(rxz) + s.nrx_;
     m->arg[7] = m->rp;
-    m->res[0] = m->jac_rode_rx;
-    m->res[1] = m->jac_ralg_rx;
-    m->res[2] = m->jac_rode_rz;
-    m->res[3] = m->jac_ralg_rz;
+    m->res[0] = m->jac_adj_x_rx;
+    m->res[1] = m->jac_adj_z_rx;
+    m->res[2] = m->jac_adj_x_rz;
+    m->res[3] = m->jac_adj_z_rz;
     if (s.calc_function(m, "jacB")) casadi_error("'jacB' calculation failed");
 
     // Copy to jacF structure
-    casadi_int nx_jac = sp_jac_rode_rx.size1();  // excludes sensitivity equations
-    casadi_copy_block(m->jac_rode_rx, sp_jac_rode_rx, m->jacB, sp_jacB, 0, 0, m->w);
-    casadi_copy_block(m->jac_ralg_rx, sp_jac_ralg_rx, m->jacB, sp_jacB, nx_jac, 0, m->w);
-    casadi_copy_block(m->jac_rode_rz, sp_jac_rode_rz, m->jacB, sp_jacB, 0, nx_jac, m->w);
-    casadi_copy_block(m->jac_ralg_rz, sp_jac_ralg_rz, m->jacB, sp_jacB, nx_jac, nx_jac, m->w);
+    casadi_int nx_jac = sp_jac_adj_x_rx.size1();  // excludes sensitivity equations
+    casadi_copy_block(m->jac_adj_x_rx, sp_jac_adj_x_rx, m->jacB, sp_jacB, 0, 0, m->w);
+    casadi_copy_block(m->jac_adj_z_rx, sp_jac_adj_z_rx, m->jacB, sp_jacB, nx_jac, 0, m->w);
+    casadi_copy_block(m->jac_adj_x_rz, sp_jac_adj_x_rz, m->jacB, sp_jacB, 0, nx_jac, m->w);
+    casadi_copy_block(m->jac_adj_z_rz, sp_jac_adj_z_rz, m->jacB, sp_jacB, nx_jac, nx_jac, m->w);
 
-    // Shift diagonal corresponding to jac_rode_rx
+    // Shift diagonal corresponding to jac_adj_x_rx
     const casadi_int *colind = sp_jacB.colind(), *row = sp_jacB.row();
     for (casadi_int c = 0; c < nx_jac; ++c) {
       for (casadi_int k = colind[c]; k < colind[c + 1]; ++k) {

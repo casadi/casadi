@@ -123,7 +123,7 @@ namespace casadi {
 
     // DAE right-hand-side, forward problem
     void calc_daeB(SundialsMemory* m, double t, const double* x, const double* z,
-      const double* rx, const double* rz, double* rode, double* ralg) const;
+      const double* rx, const double* rz, double* adj_x, double* adj_z) const;
 
     // Quadrature right-hand-side, forward problem
     void calc_quadF(SundialsMemory* m, double t, const double* x, const double* z,
@@ -131,7 +131,7 @@ namespace casadi {
 
     // Quadrature right-hand-side, backward problem
     void calc_quadB(SundialsMemory* m, double t, const double* x, const double* z,
-      const double* rx, const double* rz, double* rquad, double* uquad) const;
+      const double* rx, const double* rz, double* adj_p, double* adj_u) const;
 
     // Jacobian of DAE-times-vector function, forward problem
     void calc_jtimesF(SundialsMemory* m, double t, const double* x, const double* z,
@@ -140,7 +140,7 @@ namespace casadi {
     // Jacobian of DAE-times-vector function, backward problem
     void calc_jtimesB(SundialsMemory* m, double t, const double* x, const double* z,
       const double* rx, const double* rz, const double* fwd_rx, const double* fwd_rz,
-      double* fwd_rode, double* fwd_ralg) const;
+      double* fwd_adj_x, double* fwd_adj_z) const;
 
     // Jacobian of DAE right-hand-side function, forward problem
     void calc_jacF(SundialsMemory* m, double t, const double* x, const double* z,
@@ -149,7 +149,7 @@ namespace casadi {
     // Jacobian of DAE right-hand-side function, backward problem
     void calc_jacB(SundialsMemory* m, double t, const double* x, const double* z,
       const double* rx, const double* rz,
-      double* jac_rode_rx, double* jac_ralg_rx, double* jac_rode_rz, double* jac_ralg_rz) const;
+      double* jac_adj_x_rx, double* jac_adj_z_rx, double* jac_adj_x_rz, double* jac_adj_z_rz) const;
 
     /// Get all statistics
     Dict get_stats(void* mem) const override;

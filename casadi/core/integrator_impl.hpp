@@ -195,12 +195,12 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   /// Forward sparsity pattern propagation through DAE, backward problem
   int bdae_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t* z,
     const bvec_t* p, const bvec_t* u, const bvec_t* rx, const bvec_t* rp,
-    bvec_t* rode, bvec_t* ralg) const;
+    bvec_t* adj_x, bvec_t* adj_z) const;
 
   /// Forward sparsity pattern propagation through quadratures, backward problem
   int bquad_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t* z,
     const bvec_t* p, const bvec_t* u, const bvec_t* rx, const bvec_t* rz, const bvec_t* rp,
-    bvec_t* rquad, bvec_t* uquad) const;
+    bvec_t* adj_p, bvec_t* adj_u) const;
 
   /** \brief  Propagate sparsity forward
 
@@ -219,12 +219,12 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   /// Reverse sparsity pattern propagation through DAE, backward problem
   int bdae_sp_reverse(SpReverseMem* m, bvec_t* x, bvec_t* z,
     bvec_t* p, bvec_t* u, bvec_t* rx, bvec_t* rp,
-    bvec_t* rode, bvec_t* ralg) const;
+    bvec_t* adj_x, bvec_t* adj_z) const;
 
   /// Reverse sparsity pattern propagation through quadratures, backward problem
   int bquad_sp_reverse(SpReverseMem* m, bvec_t* x, bvec_t* z,
     bvec_t* p, bvec_t* u, bvec_t* rx, bvec_t* rz, bvec_t* rp,
-    bvec_t* rquad, bvec_t* uquad) const;
+    bvec_t* adj_p, bvec_t* adj_u) const;
 
   /** \brief  Propagate sparsity backwards
 
@@ -315,11 +315,11 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   static std::vector<std::string> bdyn_in() { return {"t", "x", "z", "p", "u",
     "adj_ode", "adj_alg", "adj_quad"}; }
   enum BDynOut { BDYN_ADJ_X, BDYN_ADJ_Z, BDYN_ADJ_P, BDYN_ADJ_U, BDYN_NUM_OUT};
-  static std::vector<std::string> bdyn_out() { return {"rode", "ralg", "rquad", "uquad"}; }
+  static std::vector<std::string> bdyn_out() { return {"adj_x", "adj_z", "adj_p", "adj_u"}; }
   enum DAEBOut { BDAE_ADJ_X, BDAE_ADJ_Z, BDAE_NUM_OUT};
-  static std::vector<std::string> bdae_out() { return {"rode", "ralg"}; }
+  static std::vector<std::string> bdae_out() { return {"adj_x", "adj_z"}; }
   enum QuadBOut { BQUAD_ADJ_P, BQUAD_ADJ_U, BQUAD_NUM_OUT};
-  static std::vector<std::string> bquad_out() { return {"rquad", "uquad"}; }
+  static std::vector<std::string> bquad_out() { return {"adj_p", "adj_u"}; }
   ///@}
 
   /// Initial time

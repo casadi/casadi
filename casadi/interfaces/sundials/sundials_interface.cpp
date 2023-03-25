@@ -242,7 +242,7 @@ void SundialsInterface::init(const Dict& opts) {
       // New Jacobian function
       jacB = create_function(rdae_, "jacB",
         {"t", "x", "z", "p", "u", "adj_ode", "adj_alg", "adj_quad"},
-        {"jac:rode:adj_ode", "jac:ralg:adj_ode", "jac:rode:adj_alg", "jac:ralg:adj_alg"});
+        {"jac:adj_x:adj_ode", "jac:adj_z:adj_ode", "jac:adj_x:adj_alg", "jac:adj_z:adj_alg"});
       jacB_sp = jacB.sparsity_out(JACB_RODE_RX) + Sparsity::diag(nrx1_);
       if (nrz1_ > 0) {
         jacB_sp = horzcat(vertcat(jacB_sp, jacB.sparsity_out(JACB_RALG_RX)),
@@ -289,7 +289,7 @@ void SundialsInterface::init(const Dict& opts) {
     if (nrx_ > 0) {
       create_function(rdae_, "jtimesB",
         {"t", "x", "z", "p", "u", "adj_ode", "adj_alg", "adj_quad", "fwd:adj_ode", "fwd:adj_alg"},
-        {"fwd:rode", "fwd:ralg"});
+        {"fwd:adj_x", "fwd:adj_z"});
       if (nfwd_ > 0) {
         create_forward("jtimesB", nfwd_);
       }
@@ -568,7 +568,7 @@ void SundialsInterface::calc_daeF(SundialsMemory* m, double t, const double* x, 
 }
 
 void SundialsInterface::calc_daeB(SundialsMemory* m, double t, const double* x, const double* z,
-    const double* rx, const double* rz, double* rode, double* ralg) const {
+    const double* rx, const double* rz, double* adj_x, double* adj_z) const {
   // Evaluate nondifferentiated
   m->arg[BDYN_T] = &t;  // t
   m->arg[BDYN_X] = x;  // x
@@ -578,13 +578,13 @@ void SundialsInterface::calc_daeB(SundialsMemory* m, double t, const double* x, 
   m->arg[BDYN_ADJ_ODE] = rx;  // rx
   m->arg[BDYN_ADJ_ALG] = rz;  // rz
   m->arg[BDYN_ADJ_QUAD] = m->rp;  // rp
-  m->res[BDAE_ADJ_X] = rode;  // rode
-  m->res[BDAE_ADJ_Z] = ralg;  // ralg
+  m->res[BDAE_ADJ_X] = adj_x;  // adj_x
+  m->res[BDAE_ADJ_Z] = adj_z;  // adj_z
   calc_function(m, "daeB");
   // Evaluate sensitivities
   if (nfwd_ > 0) {
-    m->arg[BDYN_NUM_IN + BDAE_ADJ_X] = rode;  // out:rode
-    m->arg[BDYN_NUM_IN + BDAE_ADJ_Z] = ralg;  // out:ralg
+    m->arg[BDYN_NUM_IN + BDAE_ADJ_X] = adj_x;  // out:adj_x
+    m->arg[BDYN_NUM_IN + BDAE_ADJ_Z] = adj_z;  // out:adj_z
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_T] = 0;  // fwd:t
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_X] = x ? x + nx1_ : x;  // fwd:x
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_Z] = z ? z + nz1_ : z;  // fwd:z
@@ -593,8 +593,8 @@ void SundialsInterface::calc_daeB(SundialsMemory* m, double t, const double* x, 
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_ADJ_ODE] = rx ? rx + nrx1_ : 0;  // fwd:rx
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_ADJ_ALG] = rz ? rz + nrz1_ : 0;  // fwd:rz
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_ADJ_QUAD] = m->rp + nrp1_;  // fwd:rp
-    m->res[BDAE_ADJ_X] = rode ? rode + nrx1_ : 0;  // fwd:rode
-    m->res[BDAE_ADJ_Z] = ralg ? ralg + nrz1_ : 0;  // fwd:ralg
+    m->res[BDAE_ADJ_X] = adj_x ? adj_x + nrx1_ : 0;  // fwd:adj_x
+    m->res[BDAE_ADJ_Z] = adj_z ? adj_z + nrz1_ : 0;  // fwd:adj_z
     calc_function(m, forward_name("daeB", nfwd_));
   }
 }
@@ -622,7 +622,7 @@ void SundialsInterface::calc_quadF(SundialsMemory* m, double t, const double* x,
 }
 
 void SundialsInterface::calc_quadB(SundialsMemory* m, double t, const double* x, const double* z,
-    const double* rx, const double* rz, double* rquad, double* uquad) const {
+    const double* rx, const double* rz, double* adj_p, double* adj_u) const {
   // Evaluate nondifferentiated
   m->arg[BDYN_T] = &t;  // t
   m->arg[BDYN_X] = x;  // x
@@ -632,13 +632,13 @@ void SundialsInterface::calc_quadB(SundialsMemory* m, double t, const double* x,
   m->arg[BDYN_ADJ_ODE] = rx;  // rx
   m->arg[BDYN_ADJ_ALG] = rz;  // rz
   m->arg[BDYN_ADJ_QUAD] = m->rp;  // rp
-  m->res[BQUAD_ADJ_P] = rquad;  // rquad
-  m->res[BQUAD_ADJ_U] = uquad;  // uquad
+  m->res[BQUAD_ADJ_P] = adj_p;  // adj_p
+  m->res[BQUAD_ADJ_U] = adj_u;  // adj_u
   calc_function(m, "quadB");
   // Evaluate sensitivities
   if (nfwd_ > 0) {
-    m->arg[BDYN_NUM_IN + BQUAD_ADJ_P] = rquad;  // out:rquad
-    m->arg[BDYN_NUM_IN + BQUAD_ADJ_U] = uquad;  // out:uquad
+    m->arg[BDYN_NUM_IN + BQUAD_ADJ_P] = adj_p;  // out:adj_p
+    m->arg[BDYN_NUM_IN + BQUAD_ADJ_U] = adj_u;  // out:adj_u
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_T] = 0;  // fwd:t
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_X] = x ? x + nx1_ : 0;  // fwd:x
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_Z] = z ? z + nz1_ : 0;  // fwd:z
@@ -647,8 +647,8 @@ void SundialsInterface::calc_quadB(SundialsMemory* m, double t, const double* x,
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_ADJ_ODE] = rx ? rx + nrx1_ : 0;  // fwd:rx
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_ADJ_ALG] = rz ? rz + nrz1_ : 0;  // fwd:rz
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_ADJ_QUAD] = m->rp + nrp1_;  // fwd:rp
-    m->res[BQUAD_ADJ_P] = rquad + nrq1_;  // fwd:rquad
-    m->res[BQUAD_ADJ_U] = uquad + nuq1_;  // fwd:uquad
+    m->res[BQUAD_ADJ_P] = adj_p + nrq1_;  // fwd:adj_p
+    m->res[BQUAD_ADJ_U] = adj_u + nuq1_;  // fwd:adj_u
     calc_function(m, forward_name("quadB", nfwd_));
   }
 }
@@ -685,7 +685,7 @@ void SundialsInterface::calc_jtimesF(SundialsMemory* m, double t, const double* 
 
 void SundialsInterface::calc_jtimesB(SundialsMemory* m, double t, const double* x, const double* z,
     const double* rx, const double* rz, const double* fwd_rx, const double* fwd_rz,
-    double* fwd_rode, double* fwd_ralg) const {
+    double* fwd_adj_x, double* fwd_adj_z) const {
   // Evaluate nondifferentiated
   m->arg[JTIMESB_T] = &t;  // t
   m->arg[JTIMESB_X] = x;  // x
@@ -697,13 +697,13 @@ void SundialsInterface::calc_jtimesB(SundialsMemory* m, double t, const double* 
   m->arg[JTIMESB_RP] = m->rp;  // rp
   m->arg[JTIMESB_FWD_RX] = fwd_rx;  // fwd:rx
   m->arg[JTIMESB_FWD_RZ] = fwd_rz;  // fwd:rz
-  m->res[JTIMESB_FWD_RODE] = fwd_rode;  // fwd:rode
-  m->res[JTIMESB_FWD_RALG] = fwd_ralg;  // fwd:ralg
+  m->res[JTIMESB_FWD_RODE] = fwd_adj_x;  // fwd:adj_x
+  m->res[JTIMESB_FWD_RALG] = fwd_adj_z;  // fwd:adj_z
   calc_function(m, "jtimesB");
   // Evaluate sensitivities
   if (nfwd_ > 0) {
-    m->arg[JTIMESB_NUM_IN + JTIMESB_FWD_RODE] = fwd_rode;  // out:fwd:rode
-    m->arg[JTIMESB_NUM_IN + JTIMESB_FWD_RALG] = fwd_ralg;  // out:fwd:ralg
+    m->arg[JTIMESB_NUM_IN + JTIMESB_FWD_RODE] = fwd_adj_x;  // out:fwd:adj_x
+    m->arg[JTIMESB_NUM_IN + JTIMESB_FWD_RALG] = fwd_adj_z;  // out:fwd:adj_z
     m->arg[JTIMESB_NUM_IN + JTIMESB_NUM_OUT + JTIMESB_T] = 0;  // fwd:t
     m->arg[JTIMESB_NUM_IN + JTIMESB_NUM_OUT + JTIMESB_X] = x + nx1_;  // fwd:x
     m->arg[JTIMESB_NUM_IN + JTIMESB_NUM_OUT + JTIMESB_Z] = z + nz1_;  // fwd:z
@@ -714,8 +714,8 @@ void SundialsInterface::calc_jtimesB(SundialsMemory* m, double t, const double* 
     m->arg[JTIMESB_NUM_IN + JTIMESB_NUM_OUT + JTIMESB_RP] = m->rp + nrp1_;  // fwd:rp
     m->arg[JTIMESB_NUM_IN + JTIMESB_NUM_OUT + JTIMESB_FWD_RX] = fwd_rx + nrx1_;  // fwd:fwd:rx
     m->arg[JTIMESB_NUM_IN + JTIMESB_NUM_OUT + JTIMESB_FWD_RZ] = fwd_rz + nrz1_;  // fwd:fwd:rz
-    m->res[JTIMESB_FWD_RODE] = fwd_rode + nrx1_;  // fwd:fwd:rode
-    m->res[JTIMESB_FWD_RALG] = fwd_ralg + nrz1_;  // fwd:fwd:ralg
+    m->res[JTIMESB_FWD_RODE] = fwd_adj_x + nrx1_;  // fwd:fwd:adj_x
+    m->res[JTIMESB_FWD_RALG] = fwd_adj_z + nrz1_;  // fwd:fwd:adj_z
     calc_function(m, forward_name("jtimesB", nfwd_));
  }
 }
@@ -737,7 +737,7 @@ void SundialsInterface::calc_jacF(SundialsMemory* m, double t, const double* x, 
 
 void SundialsInterface::calc_jacB(SundialsMemory* m, double t, const double* x, const double* z,
     const double* rx, const double* rz,
-    double* jac_rode_rx, double* jac_ralg_rx, double* jac_rode_rz, double* jac_ralg_rz) const {
+    double* jac_adj_x_rx, double* jac_adj_z_rx, double* jac_adj_x_rz, double* jac_adj_z_rz) const {
   m->arg[BDYN_T] = &t;
   m->arg[BDYN_X] = x;
   m->arg[BDYN_Z] = z;
@@ -746,10 +746,10 @@ void SundialsInterface::calc_jacB(SundialsMemory* m, double t, const double* x, 
   m->arg[BDYN_ADJ_ODE] = rx;
   m->arg[BDYN_ADJ_ALG] = rz;
   m->arg[BDYN_ADJ_QUAD] = m->rp;
-  m->res[JACB_RODE_RX] = jac_rode_rx;
-  m->res[JACB_RALG_RX] = jac_ralg_rx;
-  m->res[JACB_RODE_RZ] = jac_rode_rz;
-  m->res[JACB_RALG_RZ] = jac_ralg_rz;
+  m->res[JACB_RODE_RX] = jac_adj_x_rx;
+  m->res[JACB_RALG_RX] = jac_adj_z_rx;
+  m->res[JACB_RODE_RZ] = jac_adj_x_rz;
+  m->res[JACB_RALG_RZ] = jac_adj_z_rz;
   if (calc_function(m, "jacB")) casadi_error("'jacB' calculation failed");
 }
 
