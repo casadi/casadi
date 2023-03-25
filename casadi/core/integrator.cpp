@@ -191,9 +191,9 @@ std::string integrator_in(casadi_int ind) {
   case INTEGRATOR_P:   return "p";
   case INTEGRATOR_U:   return "u";
   case INTEGRATOR_Z0:  return "z0";
-  case INTEGRATOR_RX0: return "rx0";
-  case INTEGRATOR_RP:  return "rp";
-  case INTEGRATOR_RZ0: return "rz0";
+  case INTEGRATOR_ADJ_XF: return "rx0";
+  case INTEGRATOR_ADJ_QF:  return "rp";
+  case INTEGRATOR_ADJ_ZF: return "rz0";
   case INTEGRATOR_NUM_IN: break;
   }
   return std::string();
@@ -204,10 +204,10 @@ std::string integrator_out(casadi_int ind) {
   case INTEGRATOR_XF:  return "xf";
   case INTEGRATOR_QF:  return "qf";
   case INTEGRATOR_ZF:  return "zf";
-  case INTEGRATOR_RXF: return "rxf";
-  case INTEGRATOR_RQF: return "rqf";
-  case INTEGRATOR_RZF: return "rzf";
-  case INTEGRATOR_UQF: return "uqf";
+  case INTEGRATOR_ADJ_X0: return "rxf";
+  case INTEGRATOR_ADJ_P: return "rqf";
+  case INTEGRATOR_ADJ_Z0: return "rzf";
+  case INTEGRATOR_ADJ_U: return "uqf";
   case INTEGRATOR_NUM_OUT: break;
   }
   return std::string();
@@ -266,9 +266,9 @@ Sparsity Integrator::get_sparsity_in(casadi_int i) {
   case INTEGRATOR_P: return Sparsity::dense(np1_, 1 + nfwd_);
   case INTEGRATOR_U: return Sparsity::dense(nu1_, nt() * (1 + nfwd_));
   case INTEGRATOR_Z0: return Sparsity::dense(nz1_, 1 + nfwd_);
-  case INTEGRATOR_RX0: return Sparsity::dense(nrx1_, nt() * (1 + nfwd_));
-  case INTEGRATOR_RP: return Sparsity::dense(nrp1_, nt() * (1 + nfwd_));
-  case INTEGRATOR_RZ0: return Sparsity::dense(nrz1_, nt() * (1 + nfwd_));
+  case INTEGRATOR_ADJ_XF: return Sparsity::dense(nrx1_, nt() * (1 + nfwd_));
+  case INTEGRATOR_ADJ_QF: return Sparsity::dense(nrp1_, nt() * (1 + nfwd_));
+  case INTEGRATOR_ADJ_ZF: return Sparsity::dense(nrz1_, nt() * (1 + nfwd_));
   case INTEGRATOR_NUM_IN: break;
   }
   return Sparsity();
@@ -279,10 +279,10 @@ Sparsity Integrator::get_sparsity_out(casadi_int i) {
   case INTEGRATOR_XF: return Sparsity::dense(nx1_, nt() * (1 + nfwd_));
   case INTEGRATOR_QF: return Sparsity::dense(nq1_, nt() * (1 + nfwd_));
   case INTEGRATOR_ZF: return Sparsity::dense(nz1_, nt() * (1 + nfwd_));
-  case INTEGRATOR_RXF: return Sparsity::dense(nrx1_, 1 + nfwd_);
-  case INTEGRATOR_RQF: return Sparsity::dense(nrq1_, 1 + nfwd_);
-  case INTEGRATOR_RZF: return Sparsity::dense(nrz1_, 1 + nfwd_);
-  case INTEGRATOR_UQF: return Sparsity::dense(nuq1_, nt() * (1 + nfwd_));
+  case INTEGRATOR_ADJ_X0: return Sparsity::dense(nrx1_, 1 + nfwd_);
+  case INTEGRATOR_ADJ_P: return Sparsity::dense(nrq1_, 1 + nfwd_);
+  case INTEGRATOR_ADJ_Z0: return Sparsity::dense(nrz1_, 1 + nfwd_);
+  case INTEGRATOR_ADJ_U: return Sparsity::dense(nuq1_, nt() * (1 + nfwd_));
   case INTEGRATOR_NUM_OUT: break;
   }
   return Sparsity();
@@ -291,9 +291,9 @@ Sparsity Integrator::get_sparsity_out(casadi_int i) {
 bool Integrator::grid_in(casadi_int i) {
   switch (static_cast<IntegratorInput>(i)) {
     case INTEGRATOR_U:
-    case INTEGRATOR_RX0:
-    case INTEGRATOR_RP:
-    case INTEGRATOR_RZ0:
+    case INTEGRATOR_ADJ_XF:
+    case INTEGRATOR_ADJ_QF:
+    case INTEGRATOR_ADJ_ZF:
       return true;
     default: break;
   }
@@ -305,7 +305,7 @@ bool Integrator::grid_out(casadi_int i) {
     case INTEGRATOR_XF:
     case INTEGRATOR_QF:
     case INTEGRATOR_ZF:
-    case INTEGRATOR_UQF:
+    case INTEGRATOR_ADJ_U:
       return true;
     default: break;
   }
@@ -314,13 +314,13 @@ bool Integrator::grid_out(casadi_int i) {
 
 casadi_int Integrator::adjmap_in(casadi_int i) {
   switch (static_cast<IntegratorOutput>(i)) {
-    case INTEGRATOR_XF: return INTEGRATOR_RX0;
-    case INTEGRATOR_QF: return INTEGRATOR_RP;
-    case INTEGRATOR_ZF: return INTEGRATOR_RZ0;
-    case INTEGRATOR_RXF: return INTEGRATOR_X0;
-    case INTEGRATOR_RQF: return INTEGRATOR_P;
-    case INTEGRATOR_RZF: return INTEGRATOR_Z0;
-    case INTEGRATOR_UQF: return INTEGRATOR_U;
+    case INTEGRATOR_XF: return INTEGRATOR_ADJ_XF;
+    case INTEGRATOR_QF: return INTEGRATOR_ADJ_QF;
+    case INTEGRATOR_ZF: return INTEGRATOR_ADJ_ZF;
+    case INTEGRATOR_ADJ_X0: return INTEGRATOR_X0;
+    case INTEGRATOR_ADJ_P: return INTEGRATOR_P;
+    case INTEGRATOR_ADJ_Z0: return INTEGRATOR_Z0;
+    case INTEGRATOR_ADJ_U: return INTEGRATOR_U;
     default: break;
   }
   return -1;
@@ -328,13 +328,13 @@ casadi_int Integrator::adjmap_in(casadi_int i) {
 
 casadi_int Integrator::adjmap_out(casadi_int i) {
   switch (static_cast<IntegratorInput>(i)) {
-    case INTEGRATOR_X0: return INTEGRATOR_RXF;
-    case INTEGRATOR_P: return INTEGRATOR_RQF;
-    case INTEGRATOR_U: return INTEGRATOR_UQF;
-    case INTEGRATOR_Z0: return INTEGRATOR_RZF;
-    case INTEGRATOR_RX0: return INTEGRATOR_XF;
-    case INTEGRATOR_RP: return INTEGRATOR_QF;
-    case INTEGRATOR_RZ0: return INTEGRATOR_ZF;
+    case INTEGRATOR_X0: return INTEGRATOR_ADJ_X0;
+    case INTEGRATOR_P: return INTEGRATOR_ADJ_P;
+    case INTEGRATOR_U: return INTEGRATOR_ADJ_U;
+    case INTEGRATOR_Z0: return INTEGRATOR_ADJ_Z0;
+    case INTEGRATOR_ADJ_XF: return INTEGRATOR_XF;
+    case INTEGRATOR_ADJ_QF: return INTEGRATOR_QF;
+    case INTEGRATOR_ADJ_ZF: return INTEGRATOR_ZF;
     default: break;
   }
   return -1;
@@ -356,19 +356,19 @@ int Integrator::eval(const double** arg, double** res,
   const double* z0 = arg[INTEGRATOR_Z0];
   const double* p = arg[INTEGRATOR_P];
   const double* u = arg[INTEGRATOR_U];
-  const double* rx0 = arg[INTEGRATOR_RX0];
-  const double* rz0 = arg[INTEGRATOR_RZ0];
-  const double* rp = arg[INTEGRATOR_RP];
+  const double* rx0 = arg[INTEGRATOR_ADJ_XF];
+  const double* rz0 = arg[INTEGRATOR_ADJ_ZF];
+  const double* rp = arg[INTEGRATOR_ADJ_QF];
   arg += INTEGRATOR_NUM_IN;
 
   // Read outputs
   double* x = res[INTEGRATOR_XF];
   double* z = res[INTEGRATOR_ZF];
   double* q = res[INTEGRATOR_QF];
-  double* rx = res[INTEGRATOR_RXF];
-  double* rz = res[INTEGRATOR_RZF];
-  double* rq = res[INTEGRATOR_RQF];
-  double* uq = res[INTEGRATOR_UQF];
+  double* rx = res[INTEGRATOR_ADJ_X0];
+  double* rz = res[INTEGRATOR_ADJ_Z0];
+  double* rq = res[INTEGRATOR_ADJ_P];
+  double* uq = res[INTEGRATOR_ADJ_U];
   res += INTEGRATOR_NUM_OUT;
 
   // Setup memory object
@@ -1110,18 +1110,18 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
   const bvec_t* x0 = arg[INTEGRATOR_X0];
   const bvec_t* p = arg[INTEGRATOR_P];
   const bvec_t* u = arg[INTEGRATOR_U];
-  const bvec_t* rx0 = arg[INTEGRATOR_RX0];
-  const bvec_t* rp = arg[INTEGRATOR_RP];
+  const bvec_t* rx0 = arg[INTEGRATOR_ADJ_XF];
+  const bvec_t* rp = arg[INTEGRATOR_ADJ_QF];
   arg += n_in_;
 
   // Outputs
   bvec_t* xf = res[INTEGRATOR_XF];
   bvec_t* zf = res[INTEGRATOR_ZF];
   bvec_t* qf = res[INTEGRATOR_QF];
-  bvec_t* rxf = res[INTEGRATOR_RXF];
-  bvec_t* rzf = res[INTEGRATOR_RZF];
-  bvec_t* rqf = res[INTEGRATOR_RQF];
-  bvec_t* uqf = res[INTEGRATOR_UQF];
+  bvec_t* rxf = res[INTEGRATOR_ADJ_X0];
+  bvec_t* rzf = res[INTEGRATOR_ADJ_Z0];
+  bvec_t* rqf = res[INTEGRATOR_ADJ_P];
+  bvec_t* uqf = res[INTEGRATOR_ADJ_U];
   res += n_out_;
 
   // Work vectors
@@ -1351,18 +1351,18 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
   bvec_t* x0 = arg[INTEGRATOR_X0];
   bvec_t* p = arg[INTEGRATOR_P];
   bvec_t* u = arg[INTEGRATOR_U];
-  bvec_t* rx0 = arg[INTEGRATOR_RX0];
-  bvec_t* rp = arg[INTEGRATOR_RP];
+  bvec_t* rx0 = arg[INTEGRATOR_ADJ_XF];
+  bvec_t* rp = arg[INTEGRATOR_ADJ_QF];
   arg += n_in_;
 
   // Outputs
   bvec_t* xf = res[INTEGRATOR_XF];
   bvec_t* zf = res[INTEGRATOR_ZF];
   bvec_t* qf = res[INTEGRATOR_QF];
-  bvec_t* rxf = res[INTEGRATOR_RXF];
-  bvec_t* rzf = res[INTEGRATOR_RZF];
-  bvec_t* rqf = res[INTEGRATOR_RQF];
-  bvec_t* uqf = res[INTEGRATOR_UQF];
+  bvec_t* rxf = res[INTEGRATOR_ADJ_X0];
+  bvec_t* rzf = res[INTEGRATOR_ADJ_Z0];
+  bvec_t* rqf = res[INTEGRATOR_ADJ_P];
+  bvec_t* uqf = res[INTEGRATOR_ADJ_U];
   res += n_out_;
 
   // Work vectors

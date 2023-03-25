@@ -203,12 +203,12 @@ enum IntegratorInput {
   INTEGRATOR_U,
   /// Initial guess for the algebraic variable at the initial time
   INTEGRATOR_Z0,
-  /// Backward differential state impulse at each output time
-  INTEGRATOR_RX0,
-  /// Backward parameter vector impulse at each output time
-  INTEGRATOR_RP,
-  /// Initial guess for the backwards algebraic variable at each output time
-  INTEGRATOR_RZ0,
+  /// Adjoint seeds corresponding to the states at the output times
+  INTEGRATOR_ADJ_XF,
+  /// Adjoint seeds corresponding to the quadrature at the output times
+  INTEGRATOR_ADJ_QF,
+  /// Adjoint seeds corresponding to the algebraic variables at the output times
+  INTEGRATOR_ADJ_ZF,
   /// Number of input arguments of an integrator
   INTEGRATOR_NUM_IN
 };
@@ -221,14 +221,14 @@ enum IntegratorOutput {
   INTEGRATOR_QF,
   /// Algebraic variable at all output times
   INTEGRATOR_ZF,
-  /// Backward differential state at the initial time
-  INTEGRATOR_RXF,
-  /// Backward quadrature state at the initial time
-  INTEGRATOR_RQF,
-  /// Backward algebraic variable at the initial time
-  INTEGRATOR_RZF,
-  /// Backward gridded quadrature for each control interval
-  INTEGRATOR_UQF,
+  /// Adjoint sensitivities corresponding to the initial state
+  INTEGRATOR_ADJ_X0,
+  /// Adjoint sensitivities corresponding to the parameter vector
+  INTEGRATOR_ADJ_P,
+  /// Adjoint sensitivities corresponding to the algebraic variable guess
+  INTEGRATOR_ADJ_Z0,
+  /// Adjoint sensitivities corresponding to the control vector
+  INTEGRATOR_ADJ_U,
   /// Number of output arguments of an integrator
   INTEGRATOR_NUM_OUT
 };
