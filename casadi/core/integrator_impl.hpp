@@ -331,7 +331,7 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   std::vector<double> tout_;
 
   /// Number of sensitivities
-  casadi_int nfwd_;
+  casadi_int nfwd_, nadj_;
 
   /// Backwards DAE function
   Function rdae_;

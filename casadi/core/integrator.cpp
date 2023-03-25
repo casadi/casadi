@@ -257,6 +257,7 @@ Integrator::Integrator(const std::string& name, const Function& oracle,
 
   // Default options
   nfwd_ = 0;
+  nadj_ = 0;
   print_stats_ = false;
 }
 
@@ -464,6 +465,9 @@ const Options Integrator::options_
     {"nfwd",
      {OT_INT,
       "Number of forward sensitivities to be calculated [0]"}},
+    {"nadj",
+     {OT_INT,
+      "Number of adjoint sensitivities to be calculated [0]"}},
     {"rdae",
       {OT_FUNCTION,
       "Function for evaluating the backwards DAE (transitional option - to be removed)"}},
@@ -487,7 +491,7 @@ const Options Integrator::options_
 
 void Integrator::init(const Dict& opts) {
   // Default (temporary) options
-  double t0=0, tf=1;
+  double t0 = 0, tf = 1;
   bool expand = false;
   bool output_t0 = false;
   std::vector<double> grid;
@@ -504,6 +508,8 @@ void Integrator::init(const Dict& opts) {
       print_stats_ = op.second;
     } else if (op.first=="nfwd") {
       nfwd_ = op.second;
+    } else if (op.first=="nadj") {
+      nadj_ = op.second;
     } else if (op.first=="rdae") {
       rdae_ = op.second;
     } else if (op.first=="grid") {
@@ -541,6 +547,10 @@ void Integrator::init(const Dict& opts) {
     if (!output_t0) tout_.erase(tout_.begin());
   }
 
+  // Consistency checks: Sensitivities
+  casadi_assert(nfwd_ >= 0, "Number of forward sensitivities must be non-negative");
+  casadi_assert(nadj_ >= 0, "Number of adjoint sensitivities must be non-negative");
+
   // Consistency check: Valid oracle
   casadi_assert(oracle_.n_in() == DYN_NUM_IN, "DAE has wrong number of inputs");
   casadi_assert(oracle_.n_out() == DYN_NUM_OUT, "DAE has wrong number of outputs");
@@ -568,8 +578,18 @@ void Integrator::init(const Dict& opts) {
       + dyn_out(i) + " is sparse.");
   }
 
-  // Check backward problem
-  if (!rdae_.is_null()) {
+  // Get backward problem
+  if (nadj_ > 0 || !rdae_.is_null()) {
+    // Create rdae_
+    if (nadj_ > 0) {
+      // The "nadj" option will replace "rdae" completely when #3047 is done
+      casadi_assert_dev(rdae_.is_null());
+      // Code is not yet able to handle multiple right-hand-sides in rdae_
+      casadi_assert(nadj_ <= 1, "Not implemented");
+      // Generate backward DAE
+      rdae_ = oracle_.reverse(nadj_);
+    }
+
     // Consistency checks
     casadi_assert(rdae_.n_in() == BDYN_NUM_IN, "Backward DAE has wrong number of inputs");
     casadi_assert(rdae_.n_out() == BDYN_NUM_OUT, "Backward DAE has wrong number of outputs");
@@ -2363,6 +2383,7 @@ void Integrator::serialize_body(SerializingStream &s) const {
   s.pack("Integrator::t0", t0_);
   s.pack("Integrator::tout", tout_);
   s.pack("Integrator::nfwd", nfwd_);
+  s.pack("Integrator::nadj", nadj_);
   s.pack("Integrator::rdae", rdae_);
 
   s.pack("Integrator::nx", nx_);
@@ -2411,6 +2432,7 @@ Integrator::Integrator(DeserializingStream & s) : OracleFunction(s) {
   s.unpack("Integrator::t0", t0_);
   s.unpack("Integrator::tout", tout_);
   s.unpack("Integrator::nfwd", nfwd_);
+  s.unpack("Integrator::nadj", nadj_);
   s.unpack("Integrator::rdae", rdae_);
 
   s.unpack("Integrator::nx", nx_);
