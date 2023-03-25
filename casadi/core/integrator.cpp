@@ -57,6 +57,9 @@ std::string Integrator::bdyn_in(casadi_int i) {
     case BDYN_Z: return "z";
     case BDYN_P: return "p";
     case BDYN_U: return "u";
+    case BDYN_OUT_ODE: return "out_ode";
+    case BDYN_OUT_ALG: return "out_alg";
+    case BDYN_OUT_QUAD: return "out_quad";
     case BDYN_ADJ_ODE: return "adj_ode";
     case BDYN_ADJ_ALG: return "adj_alg";
     case BDYN_ADJ_QUAD: return "adj_quad";
@@ -538,6 +541,9 @@ void Integrator::init(const Dict& opts) {
     if (!output_t0) tout_.erase(tout_.begin());
   }
 
+  // Consistency check: Valid oracle
+  casadi_assert(oracle_.n_in() == DYN_NUM_IN, "DAE has wrong number of inputs");
+  casadi_assert(oracle_.n_out() == DYN_NUM_OUT, "DAE has wrong number of outputs");
 
   // Consistency checks, input sparsities
   for (casadi_int i = 0; i < DYN_NUM_IN; ++i) {
@@ -560,6 +566,13 @@ void Integrator::init(const Dict& opts) {
       + dyn_out(i) + " has dimension " + str(sp.size()));
     casadi_assert(sp.is_dense(), "DAE outputs must be dense . "
       + dyn_out(i) + " is sparse.");
+  }
+
+  // Check backward problem
+  if (!rdae_.is_null()) {
+    // Consistency checks
+    casadi_assert(rdae_.n_in() == BDYN_NUM_IN, "Backward DAE has wrong number of inputs");
+    casadi_assert(rdae_.n_out() == BDYN_NUM_OUT, "Backward DAE has wrong number of outputs");
   }
 
   // Get dimensions (excluding sensitivity equations), forward problem
@@ -1043,9 +1056,12 @@ int Integrator::bdae_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t* 
   m->arg[BDYN_Z] = z;  // z
   m->arg[BDYN_P] = p;  // p
   m->arg[BDYN_U] = u;  // u
-  m->arg[BDYN_ADJ_ODE] = rx;  // rx
-  m->arg[BDYN_ADJ_ALG] = nullptr;  // rz
-  m->arg[BDYN_ADJ_QUAD] = rp;  // rp
+  m->arg[BDYN_OUT_ODE] = nullptr;  // out_ode
+  m->arg[BDYN_OUT_ALG] = nullptr;  // out_alg
+  m->arg[BDYN_OUT_QUAD] = nullptr;  // out_quad
+  m->arg[BDYN_ADJ_ODE] = rx;  // adj_ode
+  m->arg[BDYN_ADJ_ALG] = nullptr;  // adj_alg
+  m->arg[BDYN_ADJ_QUAD] = rp;  // adj_quad
   m->res[BDAE_ADJ_X] = adj_x;  // adj_x
   m->res[BDAE_ADJ_Z] = adj_z;  // adj_z
   if (calc_sp_forward("daeB", m->arg, m->res, m->iw, m->w)) return 1;
@@ -1058,9 +1074,12 @@ int Integrator::bdae_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t* 
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_Z] = z + (i + 1) * nz1_;  // fwd:z
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_P] = p + (i + 1) * np1_;  // fwd:p
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_U] = u + (i + 1) * nu1_;  // fwd:u
-    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_ADJ_ODE] = rx + (i + 1) * nrx1_;  // fwd:rx
-    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_ADJ_ALG] = nullptr;  // fwd:rz
-    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_ADJ_QUAD] = rp + (i + 1) * nrz1_;  // fwd:rp
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_OUT_ODE] = nullptr;  // fwd:out_ode
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_OUT_ALG] = nullptr;  // fwd:out_alg
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_OUT_QUAD] = nullptr;  // fwd:out_quad
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_ADJ_ODE] = rx + (i + 1) * nrx1_;  // fwd:adj_ode
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_ADJ_ALG] = nullptr;  // fwd:adj_alg
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_ADJ_QUAD] = rp + (i + 1) * nrz1_;  // fwd:adj_quad
     m->res[BDAE_ADJ_X] = adj_x + (i + 1) * nrx1_;  // fwd:adj_x
     m->res[BDAE_ADJ_Z] = adj_z + (i + 1) * nrz1_;  // fwd:adj_z
     if (calc_sp_forward(forward_name("daeB", 1), m->arg, m->res, m->iw, m->w)) return 1;
@@ -1077,9 +1096,12 @@ int Integrator::bquad_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t*
   m->arg[BDYN_Z] = z;  // z
   m->arg[BDYN_P] = p;  // p
   m->arg[BDYN_U] = u;  // u
-  m->arg[BDYN_ADJ_ODE] = rx;  // rx
-  m->arg[BDYN_ADJ_ALG] = rz;  // rz
-  m->arg[BDYN_ADJ_QUAD] = rp;  // rp
+  m->arg[BDYN_OUT_ODE] = nullptr;  // out_ode
+  m->arg[BDYN_OUT_ALG] = nullptr;  // out_alg
+  m->arg[BDYN_OUT_QUAD] = nullptr;  // out_quad
+  m->arg[BDYN_ADJ_ODE] = rx;  // adj_ode
+  m->arg[BDYN_ADJ_ALG] = rz;  // adj_alg
+  m->arg[BDYN_ADJ_QUAD] = rp;  // adj_quad
   m->res[BQUAD_ADJ_P] = adj_p;  // adj_p
   m->res[BQUAD_ADJ_U] = adj_u;  // adj_u
   if (calc_sp_forward("quadB", m->arg, m->res, m->iw, m->w)) return 1;
@@ -1092,9 +1114,12 @@ int Integrator::bquad_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t*
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_Z] = z + (i + 1) * nz1_;  // fwd:z
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_P] = p + (i + 1) * np1_;  // fwd:p
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_U] = u + (i + 1) * nu1_;  // fwd:u
-    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_ADJ_ODE] = rx + (i + 1) * nrx1_;  // fwd:rx
-    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_ADJ_ALG] = rz + (i + 1) * nrz1_;  // fwd:rz
-    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_ADJ_QUAD] = rp + (i + 1) * nrp1_;  // fwd:rp
+    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_OUT_ODE] = nullptr;  // fwd:out_ode
+    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_OUT_ALG] = nullptr;  // fwd:out_alg
+    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_OUT_QUAD] = nullptr;  // fwd:out_quad
+    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_ADJ_ODE] = rx + (i + 1) * nrx1_;  // fwd:adj_ode
+    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_ADJ_ALG] = rz + (i + 1) * nrz1_;  // fwd:adj_alg
+    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_ADJ_QUAD] = rp + (i + 1) * nrp1_;  // fwd:adj_quad
     m->res[BQUAD_ADJ_P] = adj_p ? adj_p + (i + 1) * nrq1_ : 0;  // fwd:adj_p
     m->res[BQUAD_ADJ_U] = adj_u ? adj_u + (i + 1) * nuq1_ : 0;  // fwd:adj_u
     if (calc_sp_forward(forward_name("quadB", 1), m->arg, m->res, m->iw, m->w)) return 1;
@@ -1282,9 +1307,12 @@ int Integrator::bdae_sp_reverse(SpReverseMem* m, bvec_t* x, bvec_t* z,
   m->arg[BDYN_Z] = z;  // z
   m->arg[BDYN_P] = p;  // p
   m->arg[BDYN_U] = u;  // u
-  m->arg[BDYN_ADJ_ODE] = rx;  // rx
-  m->arg[BDYN_ADJ_ALG] = nullptr;  // rz
-  m->arg[BDYN_ADJ_QUAD] = rp;  // rp
+  m->arg[BDYN_OUT_ODE] = nullptr;  // out_ode
+  m->arg[BDYN_OUT_ALG] = nullptr;  // out_alg
+  m->arg[BDYN_OUT_QUAD] = nullptr;  // out_quad
+  m->arg[BDYN_ADJ_ODE] = rx;  // adj_ode
+  m->arg[BDYN_ADJ_ALG] = nullptr;  // adj_alg
+  m->arg[BDYN_ADJ_QUAD] = rp;  // adj_quad
   // Propagate through sensitivities
   for (casadi_int i = 0; i < nfwd_; ++i) {
     m->res[BDAE_ADJ_X] = adj_x + (i + 1) * nrx1_;  // fwd:adj_x
@@ -1296,9 +1324,12 @@ int Integrator::bdae_sp_reverse(SpReverseMem* m, bvec_t* x, bvec_t* z,
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_Z] = z + (i + 1) * nz1_;  // fwd:z
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_P] = p + (i + 1) * np1_;  // fwd:p
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_U] = u + (i + 1) * nu1_;  // fwd:u
-    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_ADJ_ODE] = rx + (i + 1) * nrx1_;  // fwd:rx
-    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_ADJ_ALG] = nullptr;  // fwd:rz
-    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_ADJ_QUAD] = rp + (i + 1) * nrz1_;  // fwd:rp
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_OUT_ODE] = nullptr;  // fwd:out_ode
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_OUT_ALG] = nullptr;  // fwd:out_alg
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_OUT_QUAD] = nullptr;  // fwd:out_quad
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_ADJ_ODE] = rx + (i + 1) * nrx1_;  // fwd:adj_ode
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_ADJ_ALG] = nullptr;  // fwd:adj_alg
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_ADJ_QUAD] = rp + (i + 1) * nrz1_;  // fwd:adj_quad
     if (calc_sp_reverse(forward_name("daeB", 1), m->arg, m->res, m->iw, m->w)) return 1;
   }
   // Propagate through nondifferentiated
@@ -1317,9 +1348,12 @@ int Integrator::bquad_sp_reverse(SpReverseMem* m, bvec_t* x, bvec_t* z,
   m->arg[BDYN_Z] = z;  // z
   m->arg[BDYN_P] = p;  // p
   m->arg[BDYN_U] = u;  // u
-  m->arg[BDYN_ADJ_ODE] = rx;  // rx
-  m->arg[BDYN_ADJ_ALG] = rz;  // rz
-  m->arg[BDYN_ADJ_QUAD] = rp;  // rp
+  m->arg[BDYN_OUT_ODE] = rx;  // out_ode
+  m->arg[BDYN_OUT_ALG] = rz;  // out_alg
+  m->arg[BDYN_OUT_QUAD] = rp;  // out_quad
+  m->arg[BDYN_ADJ_ODE] = rx;  // adj_ode
+  m->arg[BDYN_ADJ_ALG] = rz;  // adj_alg
+  m->arg[BDYN_ADJ_QUAD] = rp;  // adj_quad
   // Propagate through sensitivities
   for (casadi_int i = 0; i < nfwd_; ++i) {
     m->res[BQUAD_ADJ_P] = adj_p ? adj_p + (i + 1) * nrq1_ : 0;  // fwd:adj_p
@@ -1331,9 +1365,12 @@ int Integrator::bquad_sp_reverse(SpReverseMem* m, bvec_t* x, bvec_t* z,
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_Z] = z + (i + 1) * nz1_;  // fwd:z
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_P] = p + (i + 1) * np1_;  // fwd:p
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_U] = u + (i + 1) * nu1_;  // fwd:u
-    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_ADJ_ODE] = rx + (i + 1) * nrx1_;  // fwd:rx
-    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_ADJ_ALG] = rz + (i + 1) * nrz1_;  // fwd:rz
-    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_ADJ_QUAD] = rp + (i + 1) * nrp1_;  // fwd:rp
+    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_OUT_ODE] = nullptr;  // fwd:out_ode
+    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_OUT_ALG] = nullptr;  // fwd:out_alg
+    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_OUT_QUAD] = nullptr;  // fwd:out_quad
+    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_ADJ_ODE] = rx + (i + 1) * nrx1_;  // fwd:adj_ode
+    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_ADJ_ALG] = rz + (i + 1) * nrz1_;  // fwd:adj_alg
+    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_ADJ_QUAD] = rp + (i + 1) * nrp1_;  // fwd:adj_quad
     if (calc_sp_reverse(forward_name("quadB", 1), m->arg, m->res, m->iw, m->w)) return 1;
   }
   // Propagate through nondifferentiated
