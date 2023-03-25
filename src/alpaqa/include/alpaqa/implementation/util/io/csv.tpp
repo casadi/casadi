@@ -1,16 +1,22 @@
 #include <alpaqa/util/io/csv.hpp>
 
 #include <algorithm>
+#include <cassert>
 #include <charconv>
 #include <ios>
 #include <iostream>
+
+#if !__cpp_lib_to_chars
+#include <cerrno>
+#include <cstdlib> // strtod
+#endif
 
 namespace alpaqa::csv {
 
 template <std::floating_point F>
 struct CSVReader {
     static constexpr std::streamsize bufmaxsize = 64;
-    std::array<char, bufmaxsize> s;
+    std::array<char, bufmaxsize + 1> s;
     std::streamsize bufidx    = 0;
     bool keep_reading         = true;
     static constexpr char end = '\n';
@@ -25,28 +31,60 @@ struct CSVReader {
                                  std::to_string(is.eof()));
             bufidx += is.gcount();
             keep_reading = is.peek() != end && !is.eof();
+            assert(bufidx < bufmaxsize);
         }
         // Parse a number
         F v;
-        const char *bufend   = s.data() + bufidx;
-        const auto [ptr, ec] = std::from_chars(s.data(), bufend, v);
-        const auto bufvw     = std::string_view(s.data(), bufend);
-        if (ec != std::errc{})
-            throw read_error("csv::read_row conversion failed '" +
-                             std::string(bufvw) + "'");
+        char *bufend    = s.data() + bufidx;
+        const char *ptr = read_single(s.data(), bufend, v);
         // Check separator
         if (ptr != bufend && *ptr != sep)
             throw read_error("csv::read_row unexpected character '" +
                              std::string{*ptr} + "'");
         // Shift the buffer over
         if (ptr != bufend) {
-            std::copy(ptr + 1, bufend, s.data());
+            std::copy(ptr + 1, static_cast<const char *>(bufend), s.data());
             bufidx -= ptr + 1 - s.data();
         } else {
             bufidx = 0;
         }
         return v;
     }
+
+#if __cpp_lib_to_chars
+    static const char *read_single(const char *bufbegin, const char *bufend,
+                                   F &v) {
+        const auto [ptr, ec] = std::from_chars(bufbegin, bufend, v);
+        const auto bufvw     = std::string_view(bufbegin, bufend);
+        if (ec != std::errc{})
+            throw read_error("csv::read_row conversion failed '" +
+                             std::string(bufvw) +
+                             "': " + std::make_error_code(ec).message());
+        return ptr;
+    }
+#else
+    static void strtod_ovl(const char *str, char **str_end, float &v) {
+        v = std::strtof(str, str_end);
+    }
+    static void strtod_ovl(const char *str, char **str_end, double &v) {
+        v = std::strtod(str, str_end);
+    }
+    static void strtod_ovl(const char *str, char **str_end, long double &v) {
+        v = std::strtold(str, str_end);
+    }
+    static const char *read_single(const char *bufbegin, char *bufend, F &v) {
+        *bufend          = '\0';
+        const auto bufvw = std::string_view(bufbegin, bufend);
+        char *ptr;
+        errno = 0;
+        strtod_ovl(bufbegin, &ptr, v);
+        if (errno || ptr == bufbegin)
+            throw read_error("csv::read_row conversion failed '" +
+                             std::string(bufvw) +
+                             "': " + std::to_string(errno));
+        return ptr;
+    }
+#endif
 
     void check_end(std::istream &is) const {
         if (bufidx > 0 || (is.get() != end && is))

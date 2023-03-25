@@ -4,6 +4,7 @@
 #include <alpaqa/export.h>
 #include <iosfwd>
 #include <stdexcept>
+#include <vector>
 
 namespace alpaqa::csv {
 
