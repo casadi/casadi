@@ -83,11 +83,6 @@ if (ALPAQA_WITH_EXAMPLES)
     add_subdirectory(examples)
 endif()
 
-# Examples
-if (ALPAQA_WITH_DRIVERS)
-    add_subdirectory(applications)
-endif()
-
 # Packaging
 include(InstallRequiredSystemLibraries)
 set(CPACK_PACKAGE_VERSION_MAJOR "${PROJECT_VERSION_MAJOR}")

@@ -249,5 +249,33 @@ if (ALPAQA_WITH_LBFGSB)
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/export>)
 endif()
 
+# Drivers
+if (ALPAQA_WITH_DRIVERS)
+    add_executable(driver "alpaqa/src/driver/alpaqa-driver.cpp")
+    set_target_properties(driver PROPERTIES
+        OUTPUT_NAME "alpaqa-driver"
+        RELEASE_POSTFIX ""
+        DEBUG_POSTFIX "${CMAKE_DEBUG_POSTFIX}"
+        RELWITHDEBINFO_POSTFIX ""
+        MINSIZEREL_POSTFIX ""
+    )
+    target_link_libraries(driver
+        PRIVATE alpaqa::alpaqa alpaqa::casadi-loader
+                alpaqa::warnings alpaqa::dl-loader)
+    add_executable(alpaqa::driver ALIAS driver)
+    list(APPEND ALPAQA_INSTALL_EXE driver)
+    if (ALPAQA_WITH_OCP)
+        target_link_libraries(driver PUBLIC alpaqa::casadi-ocp-loader)
+    endif()
+    if (TARGET alpaqa::ipopt-adapter)
+        target_link_libraries(driver PUBLIC alpaqa::ipopt-adapter)
+        target_compile_definitions(driver PUBLIC WITH_IPOPT)
+    endif()
+    if (TARGET alpaqa::lbfgsb-adapter)
+        target_link_libraries(driver PUBLIC alpaqa::lbfgsb-adapter)
+        target_compile_definitions(driver PUBLIC WITH_LBFGSB)
+    endif()
+endif()
+
 # Installation
 include(cmake/Install.cmake)
