@@ -95,8 +95,8 @@ if(SWIG_EXPORT)
   set(CMAKE_SWIG_WRAP_OUTDIR ${CMAKE_CURRENT_SOURCE_DIR}/target${PYTHONFLAG}/source/dummy)
   
   configure_file(setup.py.in "${PROJECT_SOURCE_DIR}/setup.py" @ONLY)
-  file(COPY requirements.txt DESTINATION ${PROJECT_SOURCE_DIR}/requirements.txt)
-  file(COPY MANIFEST.in DESTINATION ${PROJECT_SOURCE_DIR}/MANIFEST.in)
+  file(COPY requirements.txt DESTINATION ${PROJECT_SOURCE_DIR})
+  file(COPY MANIFEST.in DESTINATION ${PROJECT_SOURCE_DIR})
 endif()
 
 if(SWIG_IMPORT)
