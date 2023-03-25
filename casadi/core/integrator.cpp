@@ -756,7 +756,11 @@ Function Integrator::get_forward_rdae(const std::string& name) const {
   for (casadi_int d = 0; d < nfwd_; ++d) {
     casadi_assert_dev(sens[d].size() == BDYN_NUM_OUT);
     for (casadi_int i = 0; i < BDYN_NUM_OUT; ++i) {
-      aug_out[i].push_back(project(sens[d][i], rdae_.sparsity_out(i)));
+      if (i == BDYN_ADJ_T) {
+        aug_out[i].push_back(MatType(zero_t.size()));
+      } else {
+        aug_out[i].push_back(project(sens[d][i], rdae_.sparsity_out(i)));
+      }
     }
   }
 
@@ -862,7 +866,11 @@ Function Integrator::get_reverse_rdae(const Function& this_dae, const Function& 
     for (casadi_int d = 0; d < nadj; ++d) {
       std::string pref = "aug" + str(d) + "_";
       for (casadi_int i = 0; i < BDYN_NUM_OUT; ++i) {
-        rseed[d][i] = MatType::sym(pref + bdyn_out[i], this_rdae.sparsity_out(i));
+        if (i == BDYN_ADJ_T) {
+          rseed[d][i] = MatType::zeros(this_rdae.sparsity_out(i));
+        } else {
+          rseed[d][i] = MatType::sym(pref + bdyn_out[i], this_rdae.sparsity_out(i));
+        }
       }
     }
 
