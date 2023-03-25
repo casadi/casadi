@@ -73,14 +73,13 @@ struct CSVReader {
         v = std::strtold(str, str_end);
     }
     static const char *read_single(const char *bufbegin, char *bufend, F &v) {
-        *bufend          = '\0';
-        const auto bufvw = std::string_view(bufbegin, bufend);
+        *bufend = '\0';
         char *ptr;
         errno = 0;
         strtod_ovl(bufbegin, &ptr, v);
         if (errno || ptr == bufbegin)
             throw read_error("csv::read_row conversion failed '" +
-                             std::string(bufvw) +
+                             std::string(bufbegin) +
                              "': " + std::to_string(errno));
         return ptr;
     }
