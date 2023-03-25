@@ -61,6 +61,8 @@ else()
   
   CasadiGetPythonVersionMajor(PYTHON_VERSION_MAJOR "${PYTHON_INCLUDE_PATH}")
   include_directories(${PYTHON_INCLUDE_PATH})
+  
+  
 endif()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
@@ -91,6 +93,10 @@ message("PYTHONFLAGS: ${CMAKE_SWIG_FLAGS} ${PYTHONFLAG}")
 if(SWIG_EXPORT)
   set(CMAKE_SWIG_OUTDIR ${CMAKE_CURRENT_SOURCE_DIR}/target${PYTHONFLAG}/extra)
   set(CMAKE_SWIG_WRAP_OUTDIR ${CMAKE_CURRENT_SOURCE_DIR}/target${PYTHONFLAG}/source/dummy)
+  
+  configure_file(setup.py.in "${PROJECT_SOURCE_DIR}/setup.py" @ONLY)
+  file(COPY requirements.txt DESTINATION ${PROJECT_SOURCE_DIR}/requirements.txt)
+  file(COPY MANIFEST.in DESTINATION ${PROJECT_SOURCE_DIR}/MANIFEST.in)
 endif()
 
 if(SWIG_IMPORT)
