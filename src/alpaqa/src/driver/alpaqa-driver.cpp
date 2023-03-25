@@ -153,18 +153,23 @@ do_experiment_impl(auto &problem, Solver &solver,
         final_γ = stats.inner.final_γ;
     decltype(BenchmarkResults::extra) extra{};
     if constexpr (requires { stats.inner.linesearch_failures; })
-        extra.emplace_back("linesearch_failures",
-                           stats.inner.linesearch_failures);
+        extra.emplace_back(
+            "linesearch_failures",
+            static_cast<index_t>(stats.inner.linesearch_failures));
     if constexpr (requires { stats.inner.linesearch_backtracks; })
-        extra.emplace_back("linesearch_backtracks",
-                           stats.inner.linesearch_backtracks);
+        extra.emplace_back(
+            "linesearch_backtracks",
+            static_cast<index_t>(stats.inner.linesearch_backtracks));
     if constexpr (requires { stats.inner.stepsize_backtracks; })
-        extra.emplace_back("stepsize_backtracks",
-                           stats.inner.stepsize_backtracks);
+        extra.emplace_back(
+            "stepsize_backtracks",
+            static_cast<index_t>(stats.inner.stepsize_backtracks));
     if constexpr (requires { stats.inner.lbfgs_failures; })
-        extra.emplace_back("lbfgs_failures", stats.inner.lbfgs_failures);
+        extra.emplace_back("lbfgs_failures",
+                           static_cast<index_t>(stats.inner.lbfgs_failures));
     if constexpr (requires { stats.inner.lbfgs_rejected; })
-        extra.emplace_back("lbfgs_rejected", stats.inner.lbfgs_rejected);
+        extra.emplace_back("lbfgs_rejected",
+                           static_cast<index_t>(stats.inner.lbfgs_rejected));
     return BenchmarkResults{
         .problem          = problem,
         .evals            = *evals,
@@ -182,8 +187,8 @@ do_experiment_impl(auto &problem, Solver &solver,
         .complementarity  = kkt_err.complementarity,
         .solution         = x,
         .multipliers      = y,
-        .outer_iter       = stats.outer_iterations,
-        .inner_iter       = stats.inner.iterations,
+        .outer_iter       = static_cast<index_t>(stats.outer_iterations),
+        .inner_iter       = static_cast<index_t>(stats.inner.iterations),
         .extra            = std::move(extra),
         .options          = extra_opts,
         .timestamp        = now_ms.count(),
