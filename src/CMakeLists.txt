@@ -216,7 +216,7 @@ option(ALPAQA_WITH_LBFGSB
 
 if (ALPAQA_WITH_LBFGSB)
     message(STATUS "Compiling L-BFGS-B solver adapter")
-    add_library(lbfgsb-fortran
+    add_library(lbfgsb-fortran STATIC
         "thirdparty/lbfgsb/Lbfgsb.3.0/lbfgsb.f"
         "thirdparty/lbfgsb/Lbfgsb.3.0/lbfgsb_c.f90"
         "thirdparty/lbfgsb/Lbfgsb.3.0/timer.f"
