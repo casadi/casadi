@@ -7,8 +7,9 @@ set -ex
 download_url="https://github.com/tttapa/cross-python/releases/download/0.0.11"
 tools_dir="$PWD/toolchains"
 triple="x86_64-centos7-linux-gnu"
+pfx="$tools_dir/$triple"
 mkdir -p "$tools_dir"
-if [ ! -d "$tools_dir/$triple" ]; then
+if [ ! -d "$pfx" ]; then
     wget "$download_url/full-$triple.tar.xz" -O- | \
         tar xJ -C "$tools_dir"
 fi
@@ -23,11 +24,11 @@ export FCFLAGS="-march=native -fdiagnostics-color"
 
 # Configure
 cmake -S. -Bbuild-local \
-    --toolchain "$tools_dir/$triple/cmake/$triple.toolchain.cmake" \
-    -DEigen3_DIR="$tools_dir/$triple/eigen-master/usr/local/share/eigen3/cmake" \
-    -Dcasadi_DIR="$tools_dir/$triple/casadi/usr/local/lib/cmake/casadi" \
-    -DGTest_DIR="$tools_dir/$triple/googletest/usr/local/lib/cmake/GTest" \
+    --toolchain "$pfx/cmake/$triple.toolchain.cmake" \
+    -DCMAKE_FIND_ROOT_PATH="$pfx/eigen;$pfx/casadi;$pfx/openblas;$pfx/mumps;$pfx/ipopt" \
     -DCMAKE_POSITION_INDEPENDENT_CODE=On \
+    -DBUILD_SHARED_LIBS=On \
+    -DALPAQA_WITH_DRIVERS=On \
     -DALPAQA_WITH_EXAMPLES=Off \
     -DALPAQA_WITH_TESTS=Off \
     -DALPAQA_WITH_PYTHON=Off \
@@ -45,24 +46,23 @@ cpack -G 'TGZ;DEB' -C "RelWithDebInfo;Debug"
 popd
 
 # Build Python package
-staging="$tools_dir/$triple"
 config="$triple.py-build-cmake.config.toml"
 cat <<- EOF > "$config"
 [cmake]
 config = ["Debug", "Release"]
 generator = "Ninja Multi-Config"
 [cmake.options]
-CMAKE_FIND_ROOT_PATH = "$staging/pybind11;$staging/casadi;$staging/eigen-master"
+CMAKE_FIND_ROOT_PATH = "$pfx/pybind11;$pfx/casadi;$pfx/eigen-master"
 USE_GLOBAL_PYBIND11 = "On"
 EOF
 . ./py-venv/bin/activate
 LDFLAGS='-static-libgcc -static-libstdc++' \
 python -m build -w "." -o staging \
-    -C--cross="$staging/cmake/$triple.py-build-cmake.cross.toml" \
+    -C--cross="$pfx/cmake/$triple.py-build-cmake.cross.toml" \
     -C--local="$PWD/$config"
 LDFLAGS='-static-libgcc -static-libstdc++' \
 python -m build -w "python/alpaqa-debug" -o staging \
-    -C--cross="$staging/cmake/$triple.py-build-cmake.cross.toml" \
+    -C--cross="$pfx/cmake/$triple.py-build-cmake.cross.toml" \
     -C--local="$PWD/$config"
 pip install -f staging --force-reinstall --no-deps \
     "alpaqa==1.0.0a7" "alpaqa-debug==1.0.0a7"
