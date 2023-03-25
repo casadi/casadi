@@ -23,7 +23,7 @@ install(TARGETS ${ALPAQA_INSTALL_TARGETS} warnings
         COMPONENT dev)
 # Executables
 install(TARGETS ${ALPAQA_INSTALL_EXE}
-    # EXPORT alpaqaTargets
+    EXPORT alpaqaTargets
     RUNTIME DESTINATION "${ALPAQA_INSTALL_BINDIR}"
         COMPONENT bin)
 
