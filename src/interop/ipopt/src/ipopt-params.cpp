@@ -20,61 +20,55 @@ static auto possible_keys(const T &tbl) {
 }
 
 template <>
-void IPOPT_ADAPTER_EXPORT set_params(Ipopt::IpoptApplication &app,
-                                     std::string_view prefix,
-                                     std::span<const std::string_view> options,
-                                     std::optional<std::span<bool>> used) {
-    const auto ipopt_opts = app.RegOptions()->RegisteredOptionsList();
+void IPOPT_ADAPTER_EXPORT set_param(Ipopt::IpoptApplication &app,
+                                    ParamString s) {
 
-    size_t index = 0;
-    for (const auto &kv : options) {
-        auto [key, value]     = split_key(kv, '=');
-        auto [pfx, remainder] = split_key(key);
-        auto curr_index       = index++;
-        if (pfx != prefix)
-            continue;
-        if (used)
-            (*used)[curr_index] = true;
+    // Split the key to get the option name (val_key is expected to be empty)
+    auto [opt_name, val_key] = split_key(s.key);
+    ParamString val_param{
+        .full_key = s.full_key,
+        .key      = val_key,
+        .value    = s.value,
+    };
 
-        auto [opt_key, val_key] = split_key(remainder);
-        ParamString val_param{.full_key = kv, .key = val_key, .value = value};
+    // Search the option name in the list of Ipopt options
+    const auto &ipopt_opts = app.RegOptions()->RegisteredOptionsList();
+    const auto regops_it   = ipopt_opts.find(std::string(opt_name));
+    if (regops_it == ipopt_opts.end())
+        throw std::invalid_argument(
+            "Invalid key '" + std::string(opt_name) + "' for type '" +
+            "IpoptApplication" + "' in '" + std::string(s.full_key) +
+            "',\n  possible keys are: " + possible_keys(ipopt_opts));
 
-        const auto regops_it = ipopt_opts.find(std::string(opt_key));
-        if (regops_it == ipopt_opts.end())
-            throw std::invalid_argument(
-                "Invalid key '" + std::string(key) + "' for type '" +
-                "IpoptApplication" + "' in '" + std::string(kv) +
-                "',\n  possible keys are: " + possible_keys(ipopt_opts));
-
-        bool success    = false;
-        const auto type = regops_it->second->Type();
-        switch (type) {
-            case Ipopt::OT_Number: {
-                double value;
-                set_param(value, val_param);
-                success = app.Options()->SetNumericValue(std::string(opt_key),
-                                                         value, false);
-            } break;
-            case Ipopt::OT_Integer: {
-                Ipopt::Index value;
-                set_param(value, val_param);
-                success = app.Options()->SetIntegerValue(std::string(opt_key),
-                                                         value, false);
-            } break;
-            case Ipopt::OT_String: {
-                success = app.Options()->SetStringValue(
-                    std::string(opt_key), std::string(val_param.value), false);
-            } break;
-            case Ipopt::OT_Unknown:
-            default: {
-                throw std::invalid_argument("Unknown type in '" +
-                                            std::string(kv) + "'");
-            }
+    // Depending on the type, set the value of the option
+    bool success    = false;
+    const auto type = regops_it->second->Type();
+    switch (type) {
+        case Ipopt::OT_Number: {
+            double value;
+            set_param(value, val_param);
+            success = app.Options()->SetNumericValue(std::string(opt_name),
+                                                     value, false);
+        } break;
+        case Ipopt::OT_Integer: {
+            Ipopt::Index value;
+            set_param(value, val_param);
+            success = app.Options()->SetIntegerValue(std::string(opt_name),
+                                                     value, false);
+        } break;
+        case Ipopt::OT_String: {
+            success = app.Options()->SetStringValue(
+                std::string(opt_name), std::string(val_param.value), false);
+        } break;
+        case Ipopt::OT_Unknown:
+        default: {
+            throw std::invalid_argument("Unknown type in '" +
+                                        std::string(s.full_key) + "'");
         }
-        if (!success)
-            throw std::invalid_argument("Invalid option in '" +
-                                        std::string(kv) + "'");
     }
+    if (!success)
+        throw std::invalid_argument("Invalid option in '" +
+                                    std::string(s.full_key) + "'");
 }
 
 } // namespace alpaqa::params

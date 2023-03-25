@@ -28,22 +28,6 @@ void assert_key_empty(ParamString s) {
                             std::string(s.full_key) + "'");
 }
 
-/// Split the string @p full on the first occurrence of @p tok.
-/// Returns (s, "") if tok was not found.
-inline auto split_key(std::string_view full, char tok = '.') {
-    auto tok_pos = full.find(tok);
-    if (tok_pos == full.npos)
-        return std::make_tuple(full, std::string_view{});
-    std::string_view key{full.begin(), full.begin() + tok_pos};
-    std::string_view rem{full.begin() + tok_pos + 1, full.end()};
-    return std::make_tuple(key, rem);
-}
-
-/// Update/overwrite the first argument based on the option in @p s.
-template <class T>
-void set_param(T &,
-               [[maybe_unused]] ParamString s); // deliberately undefined
-
 /// Throw a meaningful error to indicate that parameters of type @p T are not
 /// supported or implemented.
 template <class T>
@@ -54,24 +38,23 @@ void unsupported_type(T &, [[maybe_unused]] ParamString s) {
 }
 
 template <>
-void ALPAQA_EXPORT set_param(bool &b, ParamString s);
+void set_param(bool &b, ParamString s);
 
 template <>
-void ALPAQA_EXPORT set_param(std::string_view &v, ParamString s);
+void set_param(std::string_view &v, ParamString s);
 
 template <>
-void ALPAQA_EXPORT set_param(std::string &v, ParamString s);
+void set_param(std::string &v, ParamString s);
 
 template <class T>
     requires((std::floating_point<T> || std::integral<T>) && !std::is_enum_v<T>)
-void ALPAQA_EXPORT set_param(T &f, ParamString s);
+void set_param(T &f, ParamString s);
 
 template <>
-void ALPAQA_EXPORT set_param(vec<config_t> &v, ParamString s);
+void set_param(vec<config_t> &v, ParamString s);
 
 template <class Rep, class Period>
-void ALPAQA_EXPORT set_param(std::chrono::duration<Rep, Period> &t,
-                             ParamString s);
+void set_param(std::chrono::duration<Rep, Period> &t, ParamString s);
 
 /// Return a function that applies @ref set_param to the given attribute of a
 /// value of type @p T.
@@ -120,7 +103,7 @@ auto possible_keys() {
 /// given by @p s.key.
 template <class T>
     requires requires { dict_to_struct_table<T>::table; }
-void ALPAQA_EXPORT set_param(T &t, ParamString s) {
+void set_param(T &t, ParamString s) {
     const auto &m         = dict_to_struct_table<T>::table;
     auto [key, remainder] = split_key(s.key);
     auto it               = m.find(key);
@@ -146,22 +129,5 @@ void ALPAQA_EXPORT set_param(T &t, ParamString s) {
     {                                                                          \
 #name, &type::name                                                     \
     }
-
-template <class T>
-void ALPAQA_EXPORT set_params(T &t, std::string_view prefix,
-                              std::span<const std::string_view> options,
-                              std::optional<std::span<bool>> used) {
-    size_t index = 0;
-    for (const auto &kv : options) {
-        auto [key, value]     = split_key(kv, '=');
-        auto [pfx, remainder] = split_key(key);
-        auto curr_index       = index++;
-        if (pfx != prefix)
-            continue;
-        if (used)
-            (*used)[curr_index] = true;
-        set_param(t, {.full_key = kv, .key = remainder, .value = value});
-    }
-}
 
 } // namespace alpaqa::params

@@ -17,7 +17,7 @@
 namespace alpaqa::params {
 
 template <>
-void set_param(bool &b, ParamString s) {
+void ALPAQA_EXPORT set_param(bool &b, ParamString s) {
     assert_key_empty<bool>(s);
     if (s.value == "0" || s.value == "false")
         b = false;
@@ -32,13 +32,13 @@ void set_param(bool &b, ParamString s) {
 }
 
 template <>
-void set_param(std::string_view &v, ParamString s) {
+void ALPAQA_EXPORT set_param(std::string_view &v, ParamString s) {
     assert_key_empty<bool>(s);
     v = s.value;
 }
 
 template <>
-void set_param(std::string &v, ParamString s) {
+void ALPAQA_EXPORT set_param(std::string &v, ParamString s) {
     assert_key_empty<bool>(s);
     v = s.value;
 }
@@ -61,13 +61,8 @@ void set_param(T &f, ParamString s) {
                                     std::string(s.full_key) + "'");
 }
 
-template void ALPAQA_EXPORT set_param(real_t<config_t> &, ParamString);
-template void ALPAQA_EXPORT set_param(index_t<config_t> &, ParamString);
-template void ALPAQA_EXPORT set_param(int &, ParamString);
-template void ALPAQA_EXPORT set_param(unsigned &, ParamString);
-
 template <>
-void set_param(alpaqa::vec<config_t> &v, ParamString s) {
+void ALPAQA_EXPORT set_param(alpaqa::vec<config_t> &v, ParamString s) {
     v.resize(std::count(s.value.begin(), s.value.end(), ',') + 1);
     std::string_view value, remainder = s.value;
     for (auto &e : v) {
@@ -106,9 +101,6 @@ void set_param(std::chrono::duration<Rep, Period> &t, ParamString s) {
         throw std::invalid_argument("Invalid units '" + std::string(units) +
                                     "' in '" + std::string(s.full_key) + "'");
 }
-
-template void ALPAQA_EXPORT set_param(std::chrono::nanoseconds &t,
-                                      ParamString s);
 
 template <>
 void ALPAQA_EXPORT set_param(LBFGSStepSize &t, ParamString s) {
@@ -322,72 +314,93 @@ PARAMS_TABLE(PANOCOCPParams<config_t>,
 );
 #endif
 
-template void ALPAQA_EXPORT set_params(PANOCParams<config_t> &,
-                                       std::string_view,
-                                       std::span<const std::string_view>,
-                                       std::optional<std::span<bool>>);
-template void ALPAQA_EXPORT set_params(ZeroFPRParams<config_t> &,
-                                       std::string_view,
-                                       std::span<const std::string_view>,
-                                       std::optional<std::span<bool>>);
-template void ALPAQA_EXPORT set_params(PANTRParams<config_t> &,
-                                       std::string_view,
-                                       std::span<const std::string_view>,
-                                       std::optional<std::span<bool>>);
-template void ALPAQA_EXPORT set_params(LBFGSParams<config_t> &,
-                                       std::string_view,
-                                       std::span<const std::string_view>,
-                                       std::optional<std::span<bool>>);
-template void ALPAQA_EXPORT set_params(LBFGSDirectionParams<config_t> &,
-                                       std::string_view,
-                                       std::span<const std::string_view>,
-                                       std::optional<std::span<bool>>);
-template void ALPAQA_EXPORT
-set_params(StructuredLBFGSDirectionParams<config_t> &, std::string_view,
-           std::span<const std::string_view>, std::optional<std::span<bool>>);
-template void ALPAQA_EXPORT set_params(NewtonTRDirectionParams<config_t> &,
-                                       std::string_view,
-                                       std::span<const std::string_view>,
-                                       std::optional<std::span<bool>>);
-template void ALPAQA_EXPORT set_params(SteihaugCGParams<config_t> &,
-                                       std::string_view,
-                                       std::span<const std::string_view>,
-                                       std::optional<std::span<bool>>);
-template void ALPAQA_EXPORT
-set_params(StructuredNewtonRegularizationParams<config_t> &, std::string_view,
-           std::span<const std::string_view>, std::optional<std::span<bool>>);
-template void ALPAQA_EXPORT
-set_params(StructuredNewtonDirectionParams<config_t> &, std::string_view,
-           std::span<const std::string_view>, std::optional<std::span<bool>>);
-template void ALPAQA_EXPORT set_params(ALMParams<config_t> &, std::string_view,
-                                       std::span<const std::string_view>,
-                                       std::optional<std::span<bool>>);
-template void ALPAQA_EXPORT set_params(length_t<config_t> &, std::string_view,
-                                       std::span<const std::string_view>,
-                                       std::optional<std::span<bool>>);
-template void ALPAQA_EXPORT set_params(int &, std::string_view,
-                                       std::span<const std::string_view>,
-                                       std::optional<std::span<bool>>);
-template void ALPAQA_EXPORT set_params(unsigned &, std::string_view,
-                                       std::span<const std::string_view>,
-                                       std::optional<std::span<bool>>);
-template void ALPAQA_EXPORT set_params(std::string_view &, std::string_view,
-                                       std::span<const std::string_view>,
-                                       std::optional<std::span<bool>>);
-template void ALPAQA_EXPORT set_params(std::string &, std::string_view,
-                                       std::span<const std::string_view>,
-                                       std::optional<std::span<bool>>);
-template void ALPAQA_EXPORT set_params(bool &, std::string_view,
-                                       std::span<const std::string_view>,
-                                       std::optional<std::span<bool>>);
-template void ALPAQA_EXPORT set_params(vec<config_t> &, std::string_view,
-                                       std::span<const std::string_view>,
-                                       std::optional<std::span<bool>>);
+namespace detail {
+
+/// Check if @p A is equal to any of @p Bs.
+template <class A, class... Bs>
+constexpr bool any_is_same() {
+    return (std::is_same_v<A, Bs> || ...);
+}
+
+/// Unused unique type tag for template specializations that were rejected
+/// because some types were not distinct.
+template <class...>
+struct _dummy;
+
+/// If @p NewAlias is not the same type as any of @p PossibleAliases, the result
+/// is @p NewAlias. If @p NewAlias is not distinct from @p PossibleAliases, the
+/// result is a dummy type, uniquely determined by @p NewAlias and
+/// @p PossibleAliases.
+template <class NewAlias, class... PossibleAliases>
+using possible_alias_t =
+    std::conditional_t<any_is_same<NewAlias, PossibleAliases...>(),
+                       _dummy<NewAlias, PossibleAliases...>, NewAlias>;
+
+} // namespace detail
+
+template <class... Ts>
+void set_param(detail::_dummy<Ts...> &, ParamString) {}
+
+#define ALPAQA_SET_PARAM_INST(...)                                             \
+    template void ALPAQA_EXPORT set_param(                                     \
+        detail::possible_alias_t<__VA_ARGS__> &, ParamString)
+
+ALPAQA_SET_PARAM_INST(float);
+ALPAQA_SET_PARAM_INST(double, float);
+ALPAQA_SET_PARAM_INST(long double, double, float);
+
+ALPAQA_SET_PARAM_INST(int8_t);
+ALPAQA_SET_PARAM_INST(uint8_t);
+ALPAQA_SET_PARAM_INST(int16_t);
+ALPAQA_SET_PARAM_INST(uint16_t);
+ALPAQA_SET_PARAM_INST(int32_t);
+ALPAQA_SET_PARAM_INST(int64_t);
+ALPAQA_SET_PARAM_INST(uint32_t);
+ALPAQA_SET_PARAM_INST(uint64_t);
+
+// Here, we would like to instantiate alpaqa::params::set_param for all standard
+// integer types, but the issue is that they might not be distinct types:
+// For example, on some platforms, int32_t might be a weak alias to int, whereas
+// on other platforms, it could be a distinct type.
+// To resolve this issue, we use some metaprogramming to ensure distinct
+// instantiations with unique dummy types.
+#define ALPAQA_SET_PARAM_INST_INT(...)                                         \
+    ALPAQA_SET_PARAM_INST(__VA_ARGS__, int8_t, uint8_t, int16_t, uint16_t,     \
+                          int32_t, int64_t, uint32_t, uint64_t)
+
+ALPAQA_SET_PARAM_INST_INT(short);
+ALPAQA_SET_PARAM_INST_INT(int, short);
+ALPAQA_SET_PARAM_INST_INT(long, int, short);
+ALPAQA_SET_PARAM_INST_INT(long long, long, int, short);
+ALPAQA_SET_PARAM_INST_INT(ptrdiff_t, long long, long, int, short);
+ALPAQA_SET_PARAM_INST_INT(unsigned short);
+ALPAQA_SET_PARAM_INST_INT(unsigned int, unsigned short);
+ALPAQA_SET_PARAM_INST_INT(unsigned long, unsigned int, unsigned short);
+ALPAQA_SET_PARAM_INST_INT(unsigned long long, unsigned long, unsigned int,
+                          unsigned short);
+ALPAQA_SET_PARAM_INST_INT(size_t, unsigned long long, unsigned long,
+                          unsigned int, unsigned short);
+
+ALPAQA_SET_PARAM_INST(std::chrono::nanoseconds);
+ALPAQA_SET_PARAM_INST(std::chrono::microseconds);
+ALPAQA_SET_PARAM_INST(std::chrono::milliseconds);
+ALPAQA_SET_PARAM_INST(std::chrono::seconds);
+ALPAQA_SET_PARAM_INST(std::chrono::minutes);
+ALPAQA_SET_PARAM_INST(std::chrono::hours);
+
+ALPAQA_SET_PARAM_INST(PANOCParams<config_t>);
+ALPAQA_SET_PARAM_INST(ZeroFPRParams<config_t>);
+ALPAQA_SET_PARAM_INST(PANTRParams<config_t>);
+ALPAQA_SET_PARAM_INST(LBFGSParams<config_t>);
+ALPAQA_SET_PARAM_INST(LBFGSDirectionParams<config_t>);
+ALPAQA_SET_PARAM_INST(StructuredLBFGSDirectionParams<config_t>);
+ALPAQA_SET_PARAM_INST(NewtonTRDirectionParams<config_t>);
+ALPAQA_SET_PARAM_INST(SteihaugCGParams<config_t>);
+ALPAQA_SET_PARAM_INST(StructuredNewtonRegularizationParams<config_t>);
+ALPAQA_SET_PARAM_INST(StructuredNewtonDirectionParams<config_t>);
+ALPAQA_SET_PARAM_INST(ALMParams<config_t>);
 #if ALPAQA_WITH_OCP
-template void ALPAQA_EXPORT set_params(PANOCOCPParams<config_t> &,
-                                       std::string_view,
-                                       std::span<const std::string_view>,
-                                       std::optional<std::span<bool>>);
+ALPAQA_SET_PARAM_INST(PANOCOCPParams<config_t>);
 #endif
 
 } // namespace alpaqa::params

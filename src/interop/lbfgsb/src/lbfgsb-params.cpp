@@ -13,8 +13,7 @@ PARAMS_TABLE(lbfgsb::LBFGSBSolver::Params,   //
              PARAMS_MEMBER(print_precision), //
 );
 
-template void LBFGSB_ADAPTER_EXPORT
-set_params(lbfgsb::LBFGSBSolver::Params &, std::string_view,
-           std::span<const std::string_view>, std::optional<std::span<bool>>);
+template void LBFGSB_ADAPTER_EXPORT set_param(lbfgsb::LBFGSBSolver::Params &,
+                                              ParamString);
 
 } // namespace alpaqa::params
