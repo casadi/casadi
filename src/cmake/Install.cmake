@@ -11,29 +11,36 @@ set(ALPAQA_INSTALL_INCLUDEDIR "${CMAKE_INSTALL_INCLUDEDIR}"
     CACHE STRING "Installation directory for headers")
 
 # Add the alpaqa library to the "export-set", install the library files
+message(STATUS "Targets to install: ${ALPAQA_INSTALL_TARGETS};${ALPAQA_INSTALL_EXE}")
 install(TARGETS ${ALPAQA_INSTALL_TARGETS} warnings
     EXPORT alpaqaTargets
     RUNTIME DESTINATION "${ALPAQA_INSTALL_BINDIR}"
         COMPONENT shlib
     LIBRARY DESTINATION "${ALPAQA_INSTALL_LIBDIR}"
         COMPONENT shlib
+        NAMELINK_COMPONENT dev
     ARCHIVE DESTINATION "${ALPAQA_INSTALL_LIBDIR}" 
-        COMPONENT lib)
+        COMPONENT dev)
+# Executables
+install(TARGETS ${ALPAQA_INSTALL_EXE}
+    # EXPORT alpaqaTargets
+    RUNTIME DESTINATION "${ALPAQA_INSTALL_BINDIR}"
+        COMPONENT bin)
 
 # Install the header files
-install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/alpaqa/include/"
+install(DIRECTORY "${PROJECT_SOURCE_DIR}/src/alpaqa/include/"
     DESTINATION "${ALPAQA_INSTALL_INCLUDEDIR}"
         COMPONENT dev
     FILES_MATCHING REGEX "/.*\.(h|[hti]pp)$")
-install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/interop/casadi/include/"
+install(DIRECTORY "${PROJECT_SOURCE_DIR}/src/interop/casadi/include/"
     DESTINATION "${ALPAQA_INSTALL_INCLUDEDIR}"
         COMPONENT dev
     FILES_MATCHING REGEX "/.*\.(h|[hti]pp)$")
-install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/interop/dl/include/"
+install(DIRECTORY "${PROJECT_SOURCE_DIR}/src/interop/dl/include/"
     DESTINATION "${ALPAQA_INSTALL_INCLUDEDIR}"
         COMPONENT dev
     FILES_MATCHING REGEX "/.*\.(h|[hti]pp)$")
-install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/interop/dl-api/include/"
+install(DIRECTORY "${PROJECT_SOURCE_DIR}/src/interop/dl-api/include/"
     DESTINATION "${ALPAQA_INSTALL_INCLUDEDIR}"
         COMPONENT dl_dev
     FILES_MATCHING REGEX "/.*\.(h|[hti]pp)$")
@@ -43,11 +50,15 @@ install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/export/alpaqa"
     FILES_MATCHING REGEX "/.*\.(h|[hti]pp)$")
 
 # Install the debug files
-foreach(target IN LISTS ALPAQA_INSTALL_TARGETS)
+foreach(target IN LISTS ALPAQA_INSTALL_TARGETS ALPAQA_INSTALL_EXE)
     get_target_property(target_type ${target} TYPE)
     if (${target_type} STREQUAL "SHARED_LIBRARY")
         alpaqa_install_debug_syms(${target} debug
                                   ${ALPAQA_INSTALL_LIBDIR}
+                                  ${ALPAQA_INSTALL_BINDIR})
+    elseif (${target_type} STREQUAL "EXECUTABLE")
+        alpaqa_install_debug_syms(${target} debug
+                                  ${ALPAQA_INSTALL_BINDIR}
                                   ${ALPAQA_INSTALL_BINDIR})
     endif()
 endforeach()
