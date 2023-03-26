@@ -295,6 +295,13 @@ void SundialsInterface::init(const Dict& opts) {
       }
     }
   }
+
+
+  // For Jacobian calculation
+  alloc_w(jacF.nnz_out(JACF_ODE_X), true);  // jac_ode_x
+  alloc_w(jacF.nnz_out(JACF_ALG_X), true);  // jac_alg_x
+  alloc_w(jacF.nnz_out(JACF_ODE_Z), true);  // jac_ode_z
+  alloc_w(jacF.nnz_out(JACF_ALG_Z), true);  // jac_alg_z
 }
 
 void SundialsInterface::set_work(void* mem, const double**& arg, double**& res,
@@ -314,6 +321,13 @@ void SundialsInterface::set_work(void* mem, const double**& arg, double**& res,
   if (nrx_>0) {
     m->jacB = w; w += linsolB_.sparsity().nnz();
   }
+
+  // Work vectors
+  const Function& jacF = get_function("jacF");
+  m->jac_ode_x = w; w += jacF.nnz_out(JACF_ODE_X);
+  m->jac_alg_x = w; w += jacF.nnz_out(JACF_ALG_X);
+  m->jac_ode_z = w; w += jacF.nnz_out(JACF_ODE_Z);
+  m->jac_alg_z = w; w += jacF.nnz_out(JACF_ALG_Z);
 }
 
 int SundialsInterface::init_mem(void* mem) const {

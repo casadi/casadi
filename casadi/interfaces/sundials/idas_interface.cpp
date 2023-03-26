@@ -151,11 +151,6 @@ void IdasInterface::init(const Dict& opts) {
     + str(y_c_.size()) + " and nx+nz = " + str(nx_+nz_) + ".");
 
   // For Jacobian calculation
-  const Function& jacF = get_function("jacF");
-  alloc_w(jacF.nnz_out(JACF_ODE_X), true);  // jac_ode_x
-  alloc_w(jacF.nnz_out(JACF_ALG_X), true);  // jac_alg_x
-  alloc_w(jacF.nnz_out(JACF_ODE_Z), true);  // jac_ode_z
-  alloc_w(jacF.nnz_out(JACF_ALG_Z), true);  // jac_alg_z
   alloc_w(nx_ + nz_); // casadi_copy_block
   if (nrx_ > 0) {
     const Function& jacB = get_function("jacB");
@@ -175,11 +170,6 @@ void IdasInterface::set_work(void* mem, const double**& arg, double**& res,
   SundialsInterface::set_work(mem, arg, res, iw, w);
 
   // Work vectors
-  const Function& jacF = get_function("jacF");
-  m->jac_ode_x = w; w += jacF.nnz_out(JACF_ODE_X);
-  m->jac_alg_x = w; w += jacF.nnz_out(JACF_ALG_X);
-  m->jac_ode_z = w; w += jacF.nnz_out(JACF_ODE_Z);
-  m->jac_alg_z = w; w += jacF.nnz_out(JACF_ALG_Z);
   if (nrx_ > 0) {
     const Function& jacB = get_function("jacB");
     m->jac_adj_x_rx = w; w += jacB.nnz_out(JACB_RODE_RX);

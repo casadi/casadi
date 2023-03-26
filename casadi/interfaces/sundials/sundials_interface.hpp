@@ -56,6 +56,9 @@ namespace casadi {
     // Controls
     double *u;
 
+    /// Jacobian memory blocks
+    double *jac_ode_x, *jac_alg_x, *jac_ode_z, *jac_alg_z;
+
     // Jacobian
     double *jacF, *jacB;
 
