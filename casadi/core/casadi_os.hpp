@@ -85,7 +85,8 @@ CASADI_EXPORT handle_t open_shared_library(const std::string& lib, const std::ve
 
 /** \brief Close shared library 
  * \return 0 if successful
- */
+
+    \identifier{264} */
 CASADI_EXPORT int close_shared_library(handle_t handle);
 
 #endif // WITH_DL
