@@ -69,7 +69,7 @@ if "SKIP_KNITRO_TESTS" not in os.environ and has_nlpsol("knitro"):
   solvers.append(("knitro",{"knitro":{"feastol":1e-9,"opttol":1e-9,"ftol":1e-20}},set()))
 
 if "SKIP_SNOPT_TESTS" not in os.environ and has_nlpsol("snopt"):
-  solvers.append(("snopt",{"snopt": {"Verify_level": 3,"Major_optimality_tolerance":1e-12,"Minor_feasibility_tolerance":1e-12,"Major_feasibility_tolerance":1e-12}}))
+  solvers.append(("snopt",{"snopt": {"Verify_level": 3,"Major_optimality_tolerance":1e-12,"Minor_feasibility_tolerance":1e-12,"Major_feasibility_tolerance":1e-12}},set()))
 
 
 print(solvers)
