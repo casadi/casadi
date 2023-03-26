@@ -59,7 +59,7 @@ def test_alm_threaded():
         run(bad_experiment1)
     print(e.value)
     with pytest.raises(
-        RuntimeError, match=r"^Same instance of type alpaqa::TypeErasedProblem"
+        RuntimeError, match=r"^Same instance of type (class )?alpaqa::TypeErasedProblem"
     ) as e:
         run(bad_experiment2)
     print(e.value)
