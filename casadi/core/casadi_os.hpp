@@ -28,16 +28,6 @@
 
 /// \cond INTERNAL
 
-namespace casadi {
-
-std::vector<std::string> get_search_paths();
-
-/* \brief Get the file separator (: or ;)
- */
-char pathsep();
-/* \brief Get the file separator (/ or \)
- */
-std::string filesep();
 
 // For dynamic loading
 #ifdef WITH_DL
@@ -63,7 +53,21 @@ std::string filesep();
 #ifndef SHARED_LIBRARY_SUFFIX
 #define SHARED_LIBRARY_SUFFIX CASADI_SHARED_LIBRARY_SUFFIX
 #endif // SHARED_LIBRARY_SUFFIX
+#endif // WITH_DL
 
+namespace casadi {
+
+std::vector<std::string> get_search_paths();
+
+/* \brief Get the file separator (: or ;)
+ */
+char pathsep();
+/* \brief Get the file separator (/ or \)
+ */
+std::string filesep();
+
+// For dynamic loading
+#ifdef WITH_DL
 
 #ifdef _WIN32
     typedef HINSTANCE handle_t;
