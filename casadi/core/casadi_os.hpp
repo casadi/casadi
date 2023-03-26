@@ -76,11 +76,13 @@ CASADI_EXPORT std::string filesep();
     typedef void* handle_t;
 #endif
 
-CASADI_EXPORT handle_t open_shared_library(const std::string& lib, const std::vector<std::string> &search_paths,
+CASADI_EXPORT handle_t open_shared_library(const std::string& lib,
+    const std::vector<std::string> &search_paths,
     std::string &resultpath,
     const std::string& caller, bool global=false);
 
-CASADI_EXPORT handle_t open_shared_library(const std::string& lib, const std::vector<std::string> &search_paths,
+CASADI_EXPORT handle_t open_shared_library(const std::string& lib,
+    const std::vector<std::string> &search_paths,
     const std::string& caller, bool global=false);
 
 /** \brief Close shared library 
