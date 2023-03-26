@@ -8,5 +8,6 @@ recursive-include test *
 recursive-include experimental *
 include requirements.txt
 include CMakeLists.txt
+include LICENSE.txt
 include *.cmake.in
 include README.md
