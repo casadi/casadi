@@ -23,6 +23,7 @@
 #ifndef CASADI_CASADI_OS_HPP
 #define CASADI_CASADI_OS_HPP
 
+#include <casadi/core/casadi_export.h>
 #include <vector>
 #include <string>
 
