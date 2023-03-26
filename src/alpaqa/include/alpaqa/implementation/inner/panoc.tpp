@@ -126,7 +126,7 @@ auto PANOCSolver<DirectionProviderT>::operator()(
             << ", ‖∇ψ‖ = " << print_real(grad_ψ.norm())
             << ", ‖p‖ = " << print_real(std::sqrt(pᵀp))
             << ", γ = " << print_real(γ) << ", ε = " << print_real(ε);
-        if (k > 0)
+        if (k > static_cast<unsigned>(!direction.has_initial_direction()))
             *os << ", τ = " << print_real3(τ)
                 << ", ‖q‖ = " << print_real(q.norm());
         *os << std::endl; // Flush for Python buffering
