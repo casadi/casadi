@@ -110,9 +110,9 @@ handle_t open_shared_library(const std::string& lib, const std::vector<std::stri
     #ifndef _WIN32
         int flag;
         if (global) {
-        flag = RTLD_NOW | RTLD_GLOBAL;
+            flag = RTLD_NOW | RTLD_GLOBAL;
         } else {
-        flag = RTLD_LAZY | RTLD_LOCAL;
+            flag = RTLD_LAZY | RTLD_LOCAL;
         }
     #ifdef WITH_DEEPBIND
     #ifndef __APPLE__

@@ -221,9 +221,9 @@ namespace casadi {
 
   void DllLibrary::init_handle() {
 
-    std::vector<std::string> search_paths = {};
+    std::vector<std::string> search_paths = get_search_paths();
 #ifdef WITH_DL
-    handle_ = open_shared_library(name_, search_paths, "ImporterInternal::init_handle");
+    handle_ = open_shared_library(name_, search_paths, "DllLibrary::init_handle");
 #else // WITH_DL
     casadi_error("CommonExternal: WITH_DL  not activated");
 #endif // WITH_DL
@@ -235,7 +235,7 @@ namespace casadi {
 
   DllLibrary::~DllLibrary() {
 #ifdef WITH_DL
-  close_shared_library(handle_);
+  if (handle_) close_shared_library(handle_);
 #endif // WITH_DL
   }
 

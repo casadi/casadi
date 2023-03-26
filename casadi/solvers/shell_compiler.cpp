@@ -60,7 +60,7 @@ namespace casadi {
   }
 
   ShellCompiler::~ShellCompiler() {
-    close_shared_library(handle_);
+    if (handle_) close_shared_library(handle_);
 
     if (cleanup_) {
       if (remove(bin_name_.c_str())) casadi_warning("Failed to remove " + bin_name_);
@@ -250,7 +250,7 @@ namespace casadi {
       casadi_error("Linking failed. Tried \"" + ldcmd.str() + "\"");
     }
 
-    std::vector<std::string> search_paths = {};
+    std::vector<std::string> search_paths = get_search_paths();
     handle_ = open_shared_library(bin_name_, search_paths, "ShellCompiler::init");
 
   }
