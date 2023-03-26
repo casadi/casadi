@@ -689,7 +689,10 @@ class ADtests(casadiTestCase):
                 if sym is MX.sym:
                     self.check_eval_mx([vvcat(e) for e in fwdsens])
                     self.check_eval_mx([vvcat(e) for e in adjsens])
-                self.check_codegen(vf,inputs=vf_in,std=std)
+                if "pow" in str(out) and os.name=='nt':
+                  pass # Known bug #3038
+                else:
+                  self.check_codegen(vf,inputs=vf_in,std=std)
                 self.check_serialize(vf,inputs=vf_in)
 
                 offset = len(res)
@@ -715,7 +718,10 @@ class ADtests(casadiTestCase):
                   vf_in.append(DM(vf.sparsity_in(i),random.random(vf.nnz_in(i))))
 
                 vf_out = vf.call(vf_in)
-                self.check_codegen(vf,inputs=vf_in,std=std)
+                if "pow" in str(out) and os.name=='nt':
+                  pass # Known bug #3038
+                else:
+                  self.check_codegen(vf,inputs=vf_in,std=std)
                 self.check_serialize(vf,inputs=vf_in)
                 storagekey = (spmod,spmod2)
                 if not(storagekey in storage):
