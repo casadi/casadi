@@ -66,7 +66,6 @@ py::dict stats_to_dict(const InnerStatsAccumulator<PANOCStats<Conf>> &s) {
     };
 }
 
-
 #if ALPAQA_WITH_OCP
 
 template <Config Conf>
@@ -150,7 +149,7 @@ py::dict stats_to_dict(const typename ALMSolver<Inner>::Stats &s) {
         "δ"_a                          = s.δ,
         "norm_penalty"_a               = s.norm_penalty,
         "status"_a                     = s.status,
-        "inner"_a                      = s.inner.as_dict,
+        "inner"_a                      = *s.inner.as_dict,
     };
 }
 

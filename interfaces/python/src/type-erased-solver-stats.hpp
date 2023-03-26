@@ -23,16 +23,22 @@ template <Config Conf>
 struct TypeErasedInnerSolverStats;
 
 namespace detail {
-py::dict make_dict_threadsafe() {
+auto make_dict_threadsafe() {
+    struct deleter {
+        void operator()(py::dict *self) const {
+            py::gil_scoped_acquire gil;
+            delete self;
+        }
+    };
     py::gil_scoped_acquire gil;
-    return {};
+    return std::unique_ptr<py::dict, deleter>{new py::dict};
 }
 } // namespace detail
 
 template <Config Conf>
 struct InnerStatsAccumulator<TypeErasedInnerSolverStats<Conf>> {
     std::any accumulator;
-    py::dict as_dict = detail::make_dict_threadsafe();
+    decltype(detail::make_dict_threadsafe()) as_dict = detail::make_dict_threadsafe();
 };
 
 template <Config Conf, class Stats>
@@ -46,8 +52,8 @@ operator+=(InnerStatsAccumulator<TypeErasedInnerSolverStats<Conf>> &acc, const S
         throw std::logic_error("Cannot combine different types of solver stats");
     *act_acc += stats;
     {
-        py::gil_scoped_acquire gil{};
-        acc.as_dict = conv::stats_to_dict(*act_acc);
+        py::gil_scoped_acquire gil;
+        *acc.as_dict = conv::stats_to_dict(*act_acc);
     }
     return acc;
 }
