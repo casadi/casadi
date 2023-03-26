@@ -57,13 +57,14 @@ jobs:
         tag: nightly-${{ env.GITHUB_REF_SLUG }}
         file: casadi-${{ env.GITHUB_REF_SLUG }}-source.zip
         prerelease: true
-    - run: python setup.py sdist
+    - run: python setup.py sdist && ls && ls dist
     - name: Upload files to a GitHub release
       uses: svenstaro/upload-release-action@2.4.0
       with:
         overwrite: true
         tag: nightly-${{ env.GITHUB_REF_SLUG }}
         file: dist/*.tar.gz
+        file_glob: true
         prerelease: true
 
     - uses: actions/upload-artifact@v3.1.2
