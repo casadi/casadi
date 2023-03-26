@@ -5,6 +5,7 @@ recursive-include external_packages *
 recursive-include misc *
 recursive-include swig *
 recursive-include test *
+recursive-include experimental *
 include requirements.txt
 include CMakeLists.txt
 include *.cmake.in
