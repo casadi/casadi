@@ -24,6 +24,7 @@
 
 
 #include "clang_compiler.hpp"
+#include "casadi/core/casadi_os.hpp"
 #include "casadi/core/casadi_misc.hpp"
 #include "casadi/core/casadi_meta.hpp"
 #include <fstream>
@@ -109,7 +110,7 @@ namespace casadi {
     void *addr = reinterpret_cast<void*>(&casadi_register_importer_clang);
 
     // Get runtime include path
-    std::string jit_include, filesep;
+    std::string jit_include;
 #ifdef _WIN32
     char buffer[MAX_PATH];
     HMODULE hm = NULL;
@@ -121,7 +122,6 @@ namespace casadi {
     GetModuleFileNameA(hm, buffer, sizeof(buffer));
     PathRemoveFileSpecA(buffer);
     jit_include = buffer;
-    filesep = "\\";
 #else // _WIN32
     Dl_info dl_info;
     if (!dladdr(addr, &dl_info)) {
@@ -129,9 +129,8 @@ namespace casadi {
     }
     jit_include = dl_info.dli_fname;
     jit_include = jit_include.substr(0, jit_include.find_last_of('/'));
-    filesep = "/";
 #endif // _WIN32
-    jit_include += filesep + "casadi" + filesep + "jit";
+    jit_include += filesep() + "casadi" + filesep() + "jit";
 
 #if 0
     // Initialize target info with the default triple for our platform.
@@ -171,7 +170,7 @@ namespace casadi {
       casadi_error("Cannot create diagnostics");
 
     // Set resource directory
-    std::string resourcedir = jit_include + filesep + "clang" + filesep + CLANG_VERSION_STRING;
+    std::string resourcedir = jit_include + filesep() + "clang" + filesep() + CLANG_VERSION_STRING;
     compInst.getHeaderSearchOpts().ResourceDir = resourcedir;
 
     // Read the system includes (C or C++)
@@ -196,17 +195,11 @@ namespace casadi {
                                              clang::frontend::CXXSystem, i->second, false);
     }
 
-#ifdef _WIN32
-    char pathsep = ';';
-#else
-    char pathsep = ':';
-#endif
-
     // Search path
     std::stringstream paths;
-    paths << include_path_ << pathsep;
+    paths << include_path_ << pathsep();
     std::string path;
-    while (std::getline(paths, path, pathsep)) {
+    while (std::getline(paths, path, pathsep())) {
       compInst.getHeaderSearchOpts().AddPath(path, clang::frontend::System, false, false);
     }
 

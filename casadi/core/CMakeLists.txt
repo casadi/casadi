@@ -163,6 +163,7 @@ set(CASADI_INTERNAL
   oracle_function.hpp     oracle_function.cpp     # Specialization of FunctionInternal to hold an oracle
   callback.cpp            # Interface for user-defined function classes (public API)
   callback_internal.cpp   callback_internal.hpp   # Interface for user-defined function classes (internal API)
+  casadi_os.cpp           casadi_os.hpp           # Abstractions aroung operating system
   plugin_interface.hpp                                     # Plugin interface for Function
   factory.hpp                                              # Helper class for derivative function generation
   x_function.hpp                                           # Base class for SXFunction and MXFunction
