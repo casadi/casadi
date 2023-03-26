@@ -302,6 +302,12 @@ void SundialsInterface::init(const Dict& opts) {
   alloc_w(jacF.nnz_out(JACF_ALG_X), true);  // jac_alg_x
   alloc_w(jacF.nnz_out(JACF_ODE_Z), true);  // jac_ode_z
   alloc_w(jacF.nnz_out(JACF_ALG_Z), true);  // jac_alg_z
+
+  // Transposing the Jacobian (for calculating jacB)
+  // This will be unnecessary once linsolF_ is used for both forward and adjoint
+  // cf. #3047
+  alloc_w(nx_ + nz_); // casadi_trans
+  alloc_iw(nx_ + nz_); // casadi_trans
 }
 
 void SundialsInterface::set_work(void* mem, const double**& arg, double**& res,
@@ -764,19 +770,53 @@ void SundialsInterface::calc_jacF(SundialsMemory* m, double t, const double* x, 
 void SundialsInterface::calc_jacB(SundialsMemory* m, double t, const double* x, const double* z,
     const double* rx, const double* rz,
     double* jac_adj_x_rx, double* jac_adj_z_rx, double* jac_adj_x_rz, double* jac_adj_z_rz) const {
-  m->arg[BDYN_T] = &t;
-  m->arg[BDYN_X] = x;
-  m->arg[BDYN_Z] = z;
-  m->arg[BDYN_P] = m->p;
-  m->arg[BDYN_U] = m->u;
-  m->arg[BDYN_ADJ_ODE] = rx;
-  m->arg[BDYN_ADJ_ALG] = rz;
-  m->arg[BDYN_ADJ_QUAD] = m->rp;
-  m->res[JACB_RODE_RX] = jac_adj_x_rx;
-  m->res[JACB_RALG_RX] = jac_adj_z_rx;
-  m->res[JACB_RODE_RZ] = jac_adj_x_rz;
-  m->res[JACB_RALG_RZ] = jac_adj_z_rz;
-  if (calc_function(m, "jacB")) casadi_error("'jacB' calculation failed");
+  // With the adjoint refactoring (issue #3047), calculating the adjoint Jacobian is no longer
+  // needed.
+  if (nadj_ > 0) {
+    // New implementation
+    calc_jacF(m, t, x, z, m->jac_ode_x, m->jac_alg_x, m->jac_ode_z, m->jac_alg_z);
+    // Copy to jacB
+    const Function& jacF = get_function("jacF");
+    const Function& jacB = get_function("jacB");
+    for (casadi_int d = 0; d < nadj_; ++d) {
+      // Copy transposed blocks
+      if (jac_adj_x_rx) {
+        casadi_trans(m->jac_ode_x, jacF.sparsity_out(JACF_ODE_X),
+          jac_adj_x_rx, jacB.sparsity_out(JACB_RODE_RX), m->iw);
+        jac_adj_x_rx += jacF.nnz_out(JACF_ODE_X);
+      }
+      if (jac_adj_z_rx) {
+        casadi_trans(m->jac_alg_x, jacF.sparsity_out(JACF_ALG_X),
+          jac_adj_z_rx, jacB.sparsity_out(JACB_RALG_RX), m->iw);
+        jac_adj_z_rx += jacF.nnz_out(JACF_ALG_X);
+      }
+      if (jac_adj_x_rz) {
+        casadi_trans(m->jac_ode_z, jacF.sparsity_out(JACF_ODE_Z),
+          jac_adj_x_rz, jacB.sparsity_out(JACB_RODE_RZ), m->iw);
+        jac_adj_x_rz += jacF.nnz_out(JACF_ODE_Z);
+      }
+      if (jac_adj_z_rz) {
+        casadi_trans(m->jac_alg_z, jacF.sparsity_out(JACF_ALG_Z),
+          jac_adj_z_rz, jacB.sparsity_out(JACB_RALG_RZ), m->iw);
+        jac_adj_z_rz += jacF.nnz_out(JACF_ALG_Z);
+      }
+    }
+  } else {
+    // Old implementation
+    m->arg[BDYN_T] = &t;
+    m->arg[BDYN_X] = x;
+    m->arg[BDYN_Z] = z;
+    m->arg[BDYN_P] = m->p;
+    m->arg[BDYN_U] = m->u;
+    m->arg[BDYN_ADJ_ODE] = rx;
+    m->arg[BDYN_ADJ_ALG] = rz;
+    m->arg[BDYN_ADJ_QUAD] = m->rp;
+    m->res[JACB_RODE_RX] = jac_adj_x_rx;
+    m->res[JACB_RALG_RX] = jac_adj_z_rx;
+    m->res[JACB_RODE_RZ] = jac_adj_x_rz;
+    m->res[JACB_RALG_RZ] = jac_adj_z_rz;
+    if (calc_function(m, "jacB")) casadi_error("'jacB' calculation failed");
+  }
 }
 
 } // namespace casadi
