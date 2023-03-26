@@ -57,14 +57,14 @@
 
 namespace casadi {
 
-std::vector<std::string> get_search_paths();
+CASADI_EXPORT std::vector<std::string> get_search_paths();
 
 /* \brief Get the file separator (: or ;)
  */
-char pathsep();
+CASADI_EXPORT char pathsep();
 /* \brief Get the file separator (/ or \)
  */
-std::string filesep();
+CASADI_EXPORT std::string filesep();
 
 // For dynamic loading
 #ifdef WITH_DL
@@ -75,17 +75,17 @@ std::string filesep();
     typedef void* handle_t;
 #endif
 
-handle_t open_shared_library(const std::string& lib, const std::vector<std::string> &search_paths,
+CASADI_EXPORT handle_t open_shared_library(const std::string& lib, const std::vector<std::string> &search_paths,
     std::string &resultpath,
     const std::string& caller, bool global=false);
 
-handle_t open_shared_library(const std::string& lib, const std::vector<std::string> &search_paths,
+CASADI_EXPORT handle_t open_shared_library(const std::string& lib, const std::vector<std::string> &search_paths,
     const std::string& caller, bool global=false);
 
 /** \brief Close shared library 
  * \return 0 if successful
  */
-int close_shared_library(handle_t handle);
+CASADI_EXPORT int close_shared_library(handle_t handle);
 
 #endif // WITH_DL
 
