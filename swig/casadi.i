@@ -3088,6 +3088,10 @@ DECL M casadi_bilin(const M& A, const M& x, const M& y) {
   return bilin(A, x, y);
 }
 
+DECL M casadi_bilin(const M& A, const M& x) {
+  return bilin(A, x);
+}
+
 DECL M casadi_rank1(const M& A, const M& alpha, const M& x, const M& y) {
   return rank1(A, alpha, x, y);
 }
