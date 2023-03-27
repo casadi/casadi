@@ -1570,7 +1570,10 @@ Function Integrator::get_forward(casadi_int nfwd, const std::string& name,
   std::string aug_prefix = "fsens" + str(nfwd) + "_";
   aug_opts["derivative_of"] = self();
   aug_opts["nfwd"] = nfwd;
-  if (!this_rdae.is_null()) aug_opts["rdae"] = this_rdae;
+  if (!this_rdae.is_null()) {
+    aug_opts["rdae"] = this_rdae;
+    aug_opts["nadj"] = 0;
+  }
   Function aug_int = integrator(aug_prefix + name_, plugin_name(),
     this_dae, t0_, tout_, aug_opts);
 
@@ -1686,7 +1689,10 @@ Function Integrator::get_reverse(casadi_int nadj, const std::string& name,
   }
   aug_opts["derivative_of"] = self();
   aug_opts["nfwd"] = 0;
-  if (!aug_rdae.is_null()) aug_opts["rdae"] = aug_rdae;
+  if (!aug_rdae.is_null()) {
+    aug_opts["rdae"] = aug_rdae;
+    aug_opts["nadj"] = 0;
+  }
   Function aug_int = integrator(aug_prefix + name_, plugin_name(),
     aug_dae, t0_, tout_, aug_opts);
 
