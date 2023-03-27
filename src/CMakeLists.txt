@@ -33,7 +33,6 @@ add_library(alpaqa
     "alpaqa/src/structured-zerofpr-alm.cpp"
     "alpaqa/src/zerofpr-alm.cpp"
     "alpaqa/src/newton-tr-pantr-alm.cpp"
-    "alpaqa/src/params/params.cpp"
     "alpaqa/src/inner/internal/solverstatus.cpp"
     "alpaqa/src/inner/directions/panoc/structured-lbfgs.cpp"
     "alpaqa/src/inner/directions/panoc/structured-newton.cpp"
@@ -41,6 +40,9 @@ add_library(alpaqa
 )
 if (ALPAQA_WITH_OCP)
     target_sources(alpaqa PRIVATE "alpaqa/src/inner/panoc-ocp.cpp")
+endif()
+if (ALPAQA_WITH_DRIVERS)
+    target_sources(alpaqa PRIVATE "alpaqa/src/params/params.cpp")
 endif()
 target_compile_features(alpaqa PUBLIC cxx_std_20)
 target_include_directories(alpaqa PUBLIC
