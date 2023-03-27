@@ -86,6 +86,7 @@ CASADI_EXPORT handle_t open_shared_library(const std::string& lib,
     const std::string& caller, bool global=false);
 
 /** \brief Close shared library 
+
  * \return 0 if successful
 
     \identifier{264} */
