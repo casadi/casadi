@@ -95,7 +95,9 @@ jobs:
           activate-environment: 3.8
           auto-update-conda: true
       - run: pip install casadi-*.tar.gz
+        shell: bash -el {0}
       - run: cd test/python && python implicitfunction.py
+        shell: bash -el {0}
 
   matrix-arch-mac:
     runs-on: ubuntu-20.04
