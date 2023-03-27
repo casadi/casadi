@@ -89,6 +89,11 @@ jobs:
           version: tags/nightly-${{ env.GITHUB_REF_SLUG }}
           regex: true
           file: "casadi-.*\\.tar\\.gz"
+      - uses: conda-incubator/setup-miniconda@v2.2.0
+        with:
+          python-version: 3.8
+          activate-environment: 3.8
+          auto-update-conda: true
       - run: pip install casadi-*.tar.gz
       - run: cd test/python && python implicitfunction.py
 
