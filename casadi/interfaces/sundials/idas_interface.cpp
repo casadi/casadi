@@ -153,20 +153,10 @@ void IdasInterface::init(const Dict& opts) {
   // For Jacobian calculation
   alloc_w(nx_ + nz_); // casadi_copy_block
   if (nrx_ > 0) {
-    if (nadj_ > 0) {
-      // New implementation
-      alloc_w(sp_jac_ode_xB_.nnz(), true);  // jac_adj_x_rx
-      alloc_w(sp_jac_alg_xB_.nnz(), true);  // jac_adj_z_rx
-      alloc_w(sp_jac_ode_zB_.nnz(), true);  // jac_adj_x_rz
-      alloc_w(sp_jac_alg_zB_.nnz(), true);  // jac_adj_z_rz
-    } else {
-      // Old implementation
-      const Function& jacB = get_function("jacB");
-      alloc_w(jacB.nnz_out(JACB_RODE_RX), true);  // jac_adj_x_rx
-      alloc_w(jacB.nnz_out(JACB_RALG_RX), true);  // jac_adj_z_rx
-      alloc_w(jacB.nnz_out(JACB_RODE_RZ), true);  // jac_adj_x_rz
-      alloc_w(jacB.nnz_out(JACB_RALG_RZ), true);  // jac_adj_z_rz
-    }
+    alloc_w(sp_jac_ode_xB_.nnz(), true);  // jac_adj_x_rx
+    alloc_w(sp_jac_alg_xB_.nnz(), true);  // jac_adj_z_rx
+    alloc_w(sp_jac_ode_zB_.nnz(), true);  // jac_adj_x_rz
+    alloc_w(sp_jac_alg_zB_.nnz(), true);  // jac_adj_z_rz
     alloc_w(nrx_ + nrz_); // casadi_copy_block
   }
 }
@@ -180,20 +170,10 @@ void IdasInterface::set_work(void* mem, const double**& arg, double**& res,
 
   // Work vectors
   if (nrx_ > 0) {
-    if (nadj_ > 0) {
-      // New implementation
-      m->jac_adj_x_rx = w; w += sp_jac_ode_xB_.nnz();
-      m->jac_adj_z_rx = w; w += sp_jac_alg_xB_.nnz();
-      m->jac_adj_x_rz = w; w += sp_jac_ode_zB_.nnz();
-      m->jac_adj_z_rz = w; w += sp_jac_alg_zB_.nnz();
-    } else {
-      // Old implementation
-      const Function& jacB = get_function("jacB");
-      m->jac_adj_x_rx = w; w += jacB.nnz_out(JACB_RODE_RX);
-      m->jac_adj_z_rx = w; w += jacB.nnz_out(JACB_RALG_RX);
-      m->jac_adj_x_rz = w; w += jacB.nnz_out(JACB_RODE_RZ);
-      m->jac_adj_z_rz = w; w += jacB.nnz_out(JACB_RALG_RZ);
-    }
+    m->jac_adj_x_rx = w; w += sp_jac_ode_xB_.nnz();
+    m->jac_adj_z_rx = w; w += sp_jac_alg_xB_.nnz();
+    m->jac_adj_x_rz = w; w += sp_jac_ode_zB_.nnz();
+    m->jac_adj_z_rz = w; w += sp_jac_alg_zB_.nnz();
   }
 }
 
@@ -890,20 +870,10 @@ int IdasInterface::psetupB(double t, N_Vector xz, N_Vector xzdot, N_Vector rxz, 
 
     // Sparsity patterns
     const Sparsity *sp_jac_ode_xB, *sp_jac_ode_zB, *sp_jac_alg_xB, *sp_jac_alg_zB;
-    if (s.nadj_ > 0) {
-      // New implementaiton
-      sp_jac_ode_xB = &s.sp_jac_ode_xB_;
-      sp_jac_ode_zB = &s.sp_jac_alg_xB_;
-      sp_jac_alg_xB = &s.sp_jac_ode_zB_;
-      sp_jac_alg_zB = &s.sp_jac_alg_zB_;
-    } else {
-      // Old implementation
-      const Function& jacB = s.get_function("jacB");
-      sp_jac_ode_xB = &jacB.sparsity_out(JACB_RODE_RX);
-      sp_jac_ode_zB = &jacB.sparsity_out(JACB_RALG_RX);
-      sp_jac_alg_xB = &jacB.sparsity_out(JACB_RODE_RZ);
-      sp_jac_alg_zB = &jacB.sparsity_out(JACB_RALG_RZ);
-    }
+    sp_jac_ode_xB = &s.sp_jac_ode_xB_;
+    sp_jac_ode_zB = &s.sp_jac_alg_xB_;
+    sp_jac_alg_xB = &s.sp_jac_ode_zB_;
+    sp_jac_alg_zB = &s.sp_jac_alg_zB_;
     const Sparsity& sp_jacB = s.linsolB_.sparsity();
 
     // Calculate Jacobian blocks
