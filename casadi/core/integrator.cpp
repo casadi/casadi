@@ -250,9 +250,9 @@ Sparsity Integrator::get_sparsity_in(casadi_int i) {
   case INTEGRATOR_P: return Sparsity::dense(np1_, 1 + nfwd_);
   case INTEGRATOR_U: return Sparsity::dense(nu1_, nt() * (1 + nfwd_));
   case INTEGRATOR_Z0: return Sparsity::dense(nz1_, 1 + nfwd_);
-  case INTEGRATOR_ADJ_XF: return Sparsity::dense(nrx1_ * nadj_, nt() * (1 + nfwd_));
-  case INTEGRATOR_ADJ_QF: return Sparsity::dense(nrp1_ * nadj_, nt() * (1 + nfwd_));
-  case INTEGRATOR_ADJ_ZF: return Sparsity::dense(nrz1_ * nadj_, nt() * (1 + nfwd_));
+  case INTEGRATOR_ADJ_XF: return Sparsity::dense(nrx1_, nadj_ * (1 + nfwd_) * nt());
+  case INTEGRATOR_ADJ_QF: return Sparsity::dense(nrp1_, nadj_ * (1 + nfwd_) * nt());
+  case INTEGRATOR_ADJ_ZF: return Sparsity::dense(nrz1_, nadj_ * (1 + nfwd_) * nt());
   case INTEGRATOR_NUM_IN: break;
   }
   return Sparsity();
@@ -263,10 +263,10 @@ Sparsity Integrator::get_sparsity_out(casadi_int i) {
   case INTEGRATOR_XF: return Sparsity::dense(nx1_, nt() * (1 + nfwd_));
   case INTEGRATOR_QF: return Sparsity::dense(nq1_, nt() * (1 + nfwd_));
   case INTEGRATOR_ZF: return Sparsity::dense(nz1_, nt() * (1 + nfwd_));
-  case INTEGRATOR_ADJ_X0: return Sparsity::dense(nrx1_ * nadj_, 1 + nfwd_);
-  case INTEGRATOR_ADJ_P: return Sparsity::dense(nrq1_ * nadj_, 1 + nfwd_);
-  case INTEGRATOR_ADJ_Z0: return Sparsity::dense(nrz1_ * nadj_, 1 + nfwd_);
-  case INTEGRATOR_ADJ_U: return Sparsity::dense(nuq1_ * nadj_, nt() * (1 + nfwd_));
+  case INTEGRATOR_ADJ_X0: return Sparsity::dense(nrx1_, nadj_ * (1 + nfwd_));
+  case INTEGRATOR_ADJ_P: return Sparsity::dense(nrq1_, nadj_ * (1 + nfwd_));
+  case INTEGRATOR_ADJ_Z0: return Sparsity::dense(nrz1_, nadj_ * (1 + nfwd_));
+  case INTEGRATOR_ADJ_U: return Sparsity::dense(nuq1_, nadj_ * (1 + nfwd_) * nt());
   case INTEGRATOR_NUM_OUT: break;
   }
   return Sparsity();
