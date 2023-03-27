@@ -92,7 +92,7 @@ void register_panoc_directions(py::module_ &m) {
         "C++ documentation: :cpp:class:`alpaqa::StructuredNewtonDirection::DirectionParams`");
     struc_newton //
         .def(py::init([](params_or_dict<StrucNewtonDirParams> direction_params) {
-                 return StructuredNewtonDir{var_kwargs_to_struct(direction_params)};
+                 return StructuredNewtonDir{{.direction = var_kwargs_to_struct(direction_params)}};
              }),
              "direction_params"_a = py::dict{})
         .def_property_readonly("params",
