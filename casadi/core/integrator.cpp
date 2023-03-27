@@ -584,8 +584,6 @@ void Integrator::init(const Dict& opts) {
     if (nadj_ > 0) {
       // The "nadj" option will replace "rdae" completely when #3047 is done
       casadi_assert_dev(rdae_.is_null());
-      // Code is not yet able to handle multiple right-hand-sides in rdae_
-      casadi_assert(nadj_ <= 1, "Not implemented");
       // Generate backward DAE
       rdae_ = oracle_.reverse(nadj_);
     }
@@ -1579,8 +1577,14 @@ Function Integrator::get_forward(casadi_int nfwd, const std::string& name,
   aug_opts["derivative_of"] = self();
   aug_opts["nfwd"] = nfwd;
   if (!this_rdae.is_null()) {
-    aug_opts["rdae"] = this_rdae;
-    aug_opts["nadj"] = 0;
+    if (nadj_ > 0) {
+      // New implementation
+      aug_opts["nadj"] = nadj_;
+    } else {
+      // Old implementation
+      aug_opts["nadj"] = 0;
+      aug_opts["rdae"] = this_rdae;
+    }
   }
   Function aug_int = integrator(aug_prefix + name_, plugin_name(),
     this_dae, t0_, tout_, aug_opts);
@@ -1698,8 +1702,14 @@ Function Integrator::get_reverse(casadi_int nadj, const std::string& name,
   aug_opts["derivative_of"] = self();
   aug_opts["nfwd"] = 0;
   if (!aug_rdae.is_null()) {
-    aug_opts["rdae"] = aug_rdae;
-    aug_opts["nadj"] = 0;
+    if (nrx_ == 0) {
+      // New implementation not implemented for reverse-over-reverse
+      aug_opts["nadj"] = nadj;
+    } else {
+      // Fall back to old implementation for reverse-over-reverse
+      aug_opts["rdae"] = aug_rdae;
+      aug_opts["nadj"] = 0;
+    }
   }
   Function aug_int = integrator(aug_prefix + name_, plugin_name(),
     aug_dae, t0_, tout_, aug_opts);
