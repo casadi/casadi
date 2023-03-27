@@ -73,8 +73,12 @@ jobs:
         path: casadi_source.zip
 
   test-python-source-package:
-    runs-on: [ubuntu-20.04,windows-2022,macos-11]
+    runs-on: ${{matrix.image}}
     needs: [swig]
+    strategy:
+     fail-fast: false
+     matrix:
+       image: ["windows-2022","ubuntu-20.04","macos-11"]
     steps:
       - uses: actions/checkout@v3.3.0
       - run: python --version
