@@ -1705,7 +1705,13 @@ Function Integrator::get_reverse(casadi_int nadj, const std::string& name,
     if (nrx_ == 0) {
       // New implementation not implemented for reverse-over-reverse
       aug_opts["nadj"] = nadj;
+    } else if (nadj_ > 0) {
+      // Reformulate as forward-over-reverse
+      aug_opts["nadj"] = nadj_;
+      aug_opts["nfwd"] = nadj;
+      aug_dae = this_dae;
     } else {
+      casadi_error("should not be possible");
       // Fall back to old implementation for reverse-over-reverse
       aug_opts["rdae"] = aug_rdae;
       aug_opts["nadj"] = 0;
@@ -1775,7 +1781,7 @@ Function Integrator::get_reverse(casadi_int nadj, const std::string& name,
         v.push_back(aug_in_split[d].at(k));
       }
     }
-    integrator_in[i] = reshape(vertcat(v), -1, n_grid);
+    integrator_in[i] = reshape(vertcat(v), aug_int.size_in(i));
   }
   std::vector<MX> integrator_out = aug_int(integrator_in);
 
