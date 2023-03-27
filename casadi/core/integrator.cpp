@@ -171,12 +171,12 @@ std::vector<std::string> integrator_out() {
 std::string integrator_in(casadi_int ind) {
   switch (static_cast<IntegratorInput>(ind)) {
   case INTEGRATOR_X0:  return "x0";
+  case INTEGRATOR_Z0:  return "z0";
   case INTEGRATOR_P:   return "p";
   case INTEGRATOR_U:   return "u";
-  case INTEGRATOR_Z0:  return "z0";
   case INTEGRATOR_ADJ_XF: return "adj_xf";
-  case INTEGRATOR_ADJ_QF:  return "adj_qf";
   case INTEGRATOR_ADJ_ZF: return "adj_zf";
+  case INTEGRATOR_ADJ_QF:  return "adj_qf";
   case INTEGRATOR_NUM_IN: break;
   }
   return std::string();
@@ -247,12 +247,12 @@ Integrator::~Integrator() {
 Sparsity Integrator::get_sparsity_in(casadi_int i) {
   switch (static_cast<IntegratorInput>(i)) {
   case INTEGRATOR_X0: return Sparsity::dense(nx1_, 1 + nfwd_);
+  case INTEGRATOR_Z0: return Sparsity::dense(nz1_, 1 + nfwd_);
   case INTEGRATOR_P: return Sparsity::dense(np1_, 1 + nfwd_);
   case INTEGRATOR_U: return Sparsity::dense(nu1_, nt() * (1 + nfwd_));
-  case INTEGRATOR_Z0: return Sparsity::dense(nz1_, 1 + nfwd_);
   case INTEGRATOR_ADJ_XF: return Sparsity::dense(nrx1_, nadj_ * (1 + nfwd_) * nt());
-  case INTEGRATOR_ADJ_QF: return Sparsity::dense(nrp1_, nadj_ * (1 + nfwd_) * nt());
   case INTEGRATOR_ADJ_ZF: return Sparsity::dense(nrz1_, nadj_ * (1 + nfwd_) * nt());
+  case INTEGRATOR_ADJ_QF: return Sparsity::dense(nrp1_, nadj_ * (1 + nfwd_) * nt());
   case INTEGRATOR_NUM_IN: break;
   }
   return Sparsity();
@@ -313,12 +313,12 @@ casadi_int Integrator::adjmap_in(casadi_int i) {
 casadi_int Integrator::adjmap_out(casadi_int i) {
   switch (static_cast<IntegratorInput>(i)) {
     case INTEGRATOR_X0: return INTEGRATOR_ADJ_X0;
+    case INTEGRATOR_Z0: return INTEGRATOR_ADJ_Z0;
     case INTEGRATOR_P: return INTEGRATOR_ADJ_P;
     case INTEGRATOR_U: return INTEGRATOR_ADJ_U;
-    case INTEGRATOR_Z0: return INTEGRATOR_ADJ_Z0;
     case INTEGRATOR_ADJ_XF: return INTEGRATOR_XF;
-    case INTEGRATOR_ADJ_QF: return INTEGRATOR_QF;
     case INTEGRATOR_ADJ_ZF: return INTEGRATOR_ZF;
+    case INTEGRATOR_ADJ_QF: return INTEGRATOR_QF;
     default: break;
   }
   return -1;
@@ -1624,9 +1624,9 @@ Function FixedStepIntegrator::create_advanced(const Dict& opts) {
     // Prepare return Function inputs
     std::vector<MX> intg_in(INTEGRATOR_NUM_IN);
     intg_in[INTEGRATOR_X0] = F_in[FSTEP_X0];
+    intg_in[INTEGRATOR_Z0] = z0;
     intg_in[INTEGRATOR_P] = F_in[FSTEP_P];
     intg_in[INTEGRATOR_U] = F_in[FSTEP_U];
-    intg_in[INTEGRATOR_Z0] = z0;
     F_in[FSTEP_V0] = algebraic_state_init(intg_in[INTEGRATOR_X0], z0);
 
     // Number of finite elements and time steps

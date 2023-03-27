@@ -197,18 +197,18 @@ enum DynOut {
 enum IntegratorInput {
   /// Differential state at the initial time
   INTEGRATOR_X0,
+  /// Initial guess for the algebraic variable at the initial time
+  INTEGRATOR_Z0,
   /// Parameters
   INTEGRATOR_P,
   /// Piecewise constant control, a new control interval starts at each output time
   INTEGRATOR_U,
-  /// Initial guess for the algebraic variable at the initial time
-  INTEGRATOR_Z0,
   /// Adjoint seeds corresponding to the states at the output times
   INTEGRATOR_ADJ_XF,
-  /// Adjoint seeds corresponding to the quadrature at the output times
-  INTEGRATOR_ADJ_QF,
   /// Adjoint seeds corresponding to the algebraic variables at the output times
   INTEGRATOR_ADJ_ZF,
+  /// Adjoint seeds corresponding to the quadratures at the output times
+  INTEGRATOR_ADJ_QF,
   /// Number of input arguments of an integrator
   INTEGRATOR_NUM_IN
 };
