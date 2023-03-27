@@ -73,7 +73,7 @@ jobs:
         path: casadi_source.zip
 
   test-python-source-package:
-    runs-on: ubuntu-20.04
+    runs-on: [ubuntu-20.04,windows-2022,macos-11]
     needs: [swig]
     steps:
       - uses: actions/checkout@v3.3.0
@@ -85,9 +85,8 @@ jobs:
           version: tags/nightly-${{ env.GITHUB_REF_SLUG }}
           regex: true
           file: "casadi-.*\\.tar\\.gz"
-      - run: sudo apt install coinor-libipopt-dev -y
       - run: pip install casadi-*.tar.gz
-      - run: cd test/python && python nlp.py
+      - run: cd test/python && python implicitfunction.py
 
   matrix-arch-mac:
     runs-on: ubuntu-20.04

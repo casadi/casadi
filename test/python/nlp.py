@@ -1846,6 +1846,7 @@ class NLPtests(casadiTestCase):
 
 
   @memory_heavy()
+  @requires_nlpsol("ipopt")
   def test_simple_bounds_detect2(self):
     x = MX.sym("x",5)
     p = MX.sym("p",5)
