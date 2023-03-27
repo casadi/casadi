@@ -145,7 +145,7 @@ namespace casadi {
     }
 
     // Backward integration
-    if (nrx1_ > 0) {
+    if (nadj_ > 0) {
       // Continuous-time dynamics, backward problem
       Function g = get_function("rdae");
 

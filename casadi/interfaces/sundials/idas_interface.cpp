@@ -367,7 +367,7 @@ int IdasInterface::init_mem(void* mem) const {
   if (verbose_) casadi_message("Attached linear solver");
 
   // Adjoint sensitivity problem
-  if (nrx1_ > 0) {
+  if (nadj_ > 0) {
     m->rxzdot = N_VNew_Serial(nrx_+nrz_);
     N_VConst(0.0, m->rxz);
     N_VConst(0.0, m->rxzdot);
@@ -375,7 +375,7 @@ int IdasInterface::init_mem(void* mem) const {
   if (verbose_) casadi_message("Initialized adjoint sensitivities");
 
   // Initialize adjoint sensitivities
-  if (nrx1_ > 0) {
+  if (nadj_ > 0) {
     int interpType = interp_==SD_HERMITE ? IDA_HERMITE : IDA_POLYNOMIAL;
     THROWING(IDAAdjInit, m->mem, steps_per_checkpoint_, interpType);
   }
@@ -408,7 +408,7 @@ void IdasInterface::reset(IntegratorMemory* mem,
   }
 
   // Re-initialize backward integration
-  if (nrx1_ > 0) THROWING(IDAAdjReInit, m->mem);
+  if (nadj_ > 0) THROWING(IDAAdjReInit, m->mem);
 }
 
 void IdasInterface::advance(IntegratorMemory* mem,
@@ -724,11 +724,11 @@ int IdasInterface::psolveB(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB,
     double* vx = NV_DATA_S(rvecB);
     double* vz = vx + s.nrx_;
     double* v_it = m->v1;
-    for (int d=0; d<=s.nfwd_; ++d) {
-      casadi_copy(vx + d*s.nrx1_, s.nrx1_, v_it);
-      v_it += s.nrx1_;
-      casadi_copy(vz + d*s.nrz1_, s.nrz1_, v_it);
-      v_it += s.nrz1_;
+    for (int d = 0; d <= s.nfwd_; ++d) {
+      casadi_copy(vx + d * s.nrx2_ * s.nadj_, s.nrx2_ * s.nadj_, v_it);
+      v_it += s.nrx2_ * s.nadj_;
+      casadi_copy(vz + d * s.nrz2_ * s.nadj_, s.nrz2_ * s.nadj_, v_it);
+      v_it += s.nrz2_ * s.nadj_;
     }
 
     // Solve for undifferentiated right-hand-side, save to output
@@ -736,16 +736,16 @@ int IdasInterface::psolveB(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB,
       casadi_error("'jacB' solve failed");
     vx = NV_DATA_S(zvecB); // possibly different from rvecB
     vz = vx + s.nrx_;
-    casadi_copy(m->v1, s.nrx1_, vx);
-    casadi_copy(m->v1 + s.nrx1_, s.nrz1_, vz);
+    casadi_copy(m->v1, s.nrx2_ * s.nadj_, vx);
+    casadi_copy(m->v1 + s.nrx2_ * s.nadj_, s.nrz2_ * s.nadj_, vz);
 
     // Sensitivity equations
     if (s.nfwd_ > 0) {
       // Second order correction
       if (s.second_order_correction_) {
         // The outputs will double as seeds for jtimesB
-        casadi_clear(vx + s.nrx1_, s.nrx_ - s.nrx1_);
-        casadi_clear(vz + s.nrz1_, s.nrz_ - s.nrz1_);
+        casadi_clear(vx + s.nrx2_ * s.nadj_, s.nrx_ - s.nrx2_ * s.nadj_);
+        casadi_clear(vz + s.nrz2_ * s.nadj_, s.nrz_ - s.nrz2_ * s.nadj_);
 
         // Get second-order-correction, save to m->v2
         s.calc_jtimesB(m, t, NV_DATA_S(xz), NV_DATA_S(xz) + s.nx_,
@@ -753,27 +753,28 @@ int IdasInterface::psolveB(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB,
           vx, vz, m->v2, m->v2 + s.nrx_);
 
         // Subtract m->v2 (reordered) from m->v1
-        v_it = m->v1 + s.nrx1_ + s.nrz1_;
-        for (int d=1; d<=s.nfwd_; ++d) {
-          casadi_axpy(s.nrx1_, -1., m->v2 + d*s.nrx1_, v_it);
-          v_it += s.nrx1_;
-          casadi_axpy(s.nrz1_, -1., m->v2 + s.nrx_ + d*s.nrz1_, v_it);
-          v_it += s.nrz1_;
+        v_it = m->v1 + (s.nrx2_ + s.nrz2_) * s.nadj_;
+        for (int d = 1; d <= s.nfwd_; ++d) {
+          casadi_axpy(s.nrx2_ * s.nadj_, -1., m->v2 + d * s.nrx2_ * s.nadj_, v_it);
+          v_it += s.nrx2_ * s.nadj_;
+          casadi_axpy(s.nrz2_ * s.nadj_, -1., m->v2 + s.nrx_ + d * s.nrz2_ * s.nadj_, v_it);
+          v_it += s.nrz2_ * s.nadj_;
         }
       }
 
       // Solve for sensitivity right-hand-sides
-      if (s.linsolB_.solve(m->jacB, m->v1 + s.nrx1_ + s.nrz1_, s.nfwd_, false, m->mem_linsolB)) {
+      if (s.linsolB_.solve(m->jacB, m->v1 + s.nrx2_ * s.nadj_ + s.nrz2_ * s.nadj_,
+          s.nfwd_, false, m->mem_linsolB)) {
         casadi_error("'jacB' solve failed");
       }
 
       // Save to output, reordered
-      v_it = m->v1 + s.nrx1_ + s.nrz1_;
+      v_it = m->v1 + s.nrx2_ * s.nadj_ + s.nrz2_ * s.nadj_;
       for (int d = 1; d <= s.nfwd_; ++d) {
-        casadi_copy(v_it, s.nrx1_, vx + d*s.nrx1_);
-        v_it += s.nrx1_;
-        casadi_copy(v_it, s.nrz1_, vz + d*s.nrz1_);
-        v_it += s.nrz1_;
+        casadi_copy(v_it, s.nrx2_ * s.nadj_, vx + d * s.nrx2_ * s.nadj_);
+        v_it += s.nrx2_ * s.nadj_;
+        casadi_copy(v_it, s.nrz2_ * s.nadj_, vz + d * s.nrz2_ * s.nadj_);
+        v_it += s.nrz2_ * s.nadj_;
       }
     }
 

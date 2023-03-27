@@ -234,7 +234,7 @@ void SundialsInterface::init(const Dict& opts) {
   }
 
   // Initialize backward problem
-  if (nrx_ > 0) {
+  if (nadj_ > 0) {
     // Get Jacobian function, backward problem
     Sparsity jacB_sp;
     if (d == 0) {
@@ -262,20 +262,20 @@ void SundialsInterface::init(const Dict& opts) {
   if (nfwd_ > 0) {
     create_forward("daeF", nfwd_);
     create_forward("quadF", nfwd_);
-    if (nrx_ > 0) {
+    if (nadj_ > 0) {
       create_forward("daeB", nfwd_);
       create_forward("quadB", nfwd_);
     }
   }
 
   // Attach functions for jacobian information, foward problem
-  if (newton_scheme_!=SD_DIRECT || (nfwd_ > 0 && second_order_correction_)) {
+  if (newton_scheme_ != SD_DIRECT || (nfwd_ > 0 && second_order_correction_)) {
     create_function("jtimesF", {"t", "x", "z", "p", "u", "fwd:x", "fwd:z"},
       {"fwd:ode", "fwd:alg"});
     if (nfwd_ > 0) {
       create_forward("jtimesF", nfwd_);
     }
-    if (nrx_ > 0) {
+    if (nadj_ > 0) {
       create_function(rdae_, "jtimesB",
         {"t", "x", "z", "p", "u", "adj_ode", "adj_alg", "adj_quad", "fwd:adj_ode", "fwd:adj_alg"},
         {"fwd:adj_x", "fwd:adj_z"});
@@ -639,11 +639,13 @@ void SundialsInterface::calc_daeB(SundialsMemory* m, double t, const double* x, 
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_OUT_ODE] = nullptr;  // fwd:out_ode
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_OUT_ALG] = nullptr;  // fwd:out_alg
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_OUT_QUAD] = nullptr;  // fwd:out_quad
-    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_ADJ_ODE] = rx ? rx + nrx1_ : 0;  // fwd:adj_ode
-    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_ADJ_ALG] = rz ? rz + nrz1_ : 0;  // fwd:adj_alg
-    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_ADJ_QUAD] = m->rp + nrp1_;  // fwd:adj_quad
-    m->res[BDAE_ADJ_X] = adj_x ? adj_x + nrx1_ : 0;  // fwd:adj_x
-    m->res[BDAE_ADJ_Z] = adj_z ? adj_z + nrz1_ : 0;  // fwd:adj_z
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_ADJ_ODE] =
+      rx ? rx + nrx2_ * nadj_ : 0;  // fwd:adj_ode
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_ADJ_ALG] =
+      rz ? rz + nrz2_ * nadj_ : 0;  // fwd:adj_alg
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_ADJ_QUAD] = m->rp + nrp2_ * nadj_;  // fwd:adj_quad
+    m->res[BDAE_ADJ_X] = adj_x ? adj_x + nrx2_ * nadj_ : 0;  // fwd:adj_x
+    m->res[BDAE_ADJ_Z] = adj_z ? adj_z + nrz2_ * nadj_ : 0;  // fwd:adj_z
     calc_function(m, forward_name("daeB", nfwd_));
   }
 }
@@ -699,11 +701,13 @@ void SundialsInterface::calc_quadB(SundialsMemory* m, double t, const double* x,
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_OUT_ODE] = nullptr;  // fwd:out_ode
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_OUT_ALG] = nullptr;  // fwd:out_alg
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_OUT_QUAD] = nullptr;  // fwd:out_quad
-    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_ADJ_ODE] = rx ? rx + nrx1_ : 0;  // fwd:adj_ode
-    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_ADJ_ALG] = rz ? rz + nrz1_ : 0;  // fwd:adj_alg
-    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_ADJ_QUAD] = m->rp + nrp1_;  // fwd:adj_quad
-    m->res[BQUAD_ADJ_P] = adj_p + nrq1_;  // fwd:adj_p
-    m->res[BQUAD_ADJ_U] = adj_u + nuq1_;  // fwd:adj_u
+    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_ADJ_ODE] =
+      rx ? rx + nrx2_ * nadj_ : 0;  // fwd:adj_ode
+    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_ADJ_ALG] =
+      rz ? rz + nrz2_ * nadj_ : 0;  // fwd:adj_alg
+    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_ADJ_QUAD] = m->rp + nrp2_ * nadj_;  // fwd:adj_quad
+    m->res[BQUAD_ADJ_P] = adj_p + nrq2_ * nadj_;  // fwd:adj_p
+    m->res[BQUAD_ADJ_U] = adj_u + nuq2_ * nadj_;  // fwd:adj_u
     calc_function(m, forward_name("quadB", nfwd_));
   }
 }
@@ -764,13 +768,18 @@ void SundialsInterface::calc_jtimesB(SundialsMemory* m, double t, const double* 
     m->arg[JTIMESB_NUM_IN + JTIMESB_NUM_OUT + JTIMESB_Z] = z + nz1_;  // fwd:z
     m->arg[JTIMESB_NUM_IN + JTIMESB_NUM_OUT + JTIMESB_P] = m->p + np1_;  // fwd:p
     m->arg[JTIMESB_NUM_IN + JTIMESB_NUM_OUT + JTIMESB_U] = m->u + nu1_;  // fwd:u
-    m->arg[JTIMESB_NUM_IN + JTIMESB_NUM_OUT + JTIMESB_RX] = rx + nrx1_;  // fwd:rx
-    m->arg[JTIMESB_NUM_IN + JTIMESB_NUM_OUT + JTIMESB_RZ] = rz + nrz1_;  // fwd:rz
-    m->arg[JTIMESB_NUM_IN + JTIMESB_NUM_OUT + JTIMESB_RP] = m->rp + nrp1_;  // fwd:rp
-    m->arg[JTIMESB_NUM_IN + JTIMESB_NUM_OUT + JTIMESB_FWD_RX] = fwd_rx + nrx1_;  // fwd:fwd:rx
-    m->arg[JTIMESB_NUM_IN + JTIMESB_NUM_OUT + JTIMESB_FWD_RZ] = fwd_rz + nrz1_;  // fwd:fwd:rz
-    m->res[JTIMESB_FWD_RODE] = fwd_adj_x + nrx1_;  // fwd:fwd:adj_x
-    m->res[JTIMESB_FWD_RALG] = fwd_adj_z + nrz1_;  // fwd:fwd:adj_z
+    m->arg[JTIMESB_NUM_IN + JTIMESB_NUM_OUT + JTIMESB_RX] =
+      rx + nrx2_ * nadj_;  // fwd:rx
+    m->arg[JTIMESB_NUM_IN + JTIMESB_NUM_OUT + JTIMESB_RZ] =
+      rz + nrz2_ * nadj_;  // fwd:rz
+    m->arg[JTIMESB_NUM_IN + JTIMESB_NUM_OUT + JTIMESB_RP] =
+      m->rp + nrp2_ * nadj_;  // fwd:rp
+    m->arg[JTIMESB_NUM_IN + JTIMESB_NUM_OUT + JTIMESB_FWD_RX] =
+      fwd_rx + nrx2_ * nadj_;  // fwd:fwd:rx
+    m->arg[JTIMESB_NUM_IN + JTIMESB_NUM_OUT + JTIMESB_FWD_RZ] =
+      fwd_rz + nrz2_ * nadj_;  // fwd:fwd:rz
+    m->res[JTIMESB_FWD_RODE] = fwd_adj_x + nrx2_ * nadj_;  // fwd:fwd:adj_x
+    m->res[JTIMESB_FWD_RALG] = fwd_adj_z + nrz2_ * nadj_;  // fwd:fwd:adj_z
     calc_function(m, forward_name("jtimesB", nfwd_));
  }
 }
