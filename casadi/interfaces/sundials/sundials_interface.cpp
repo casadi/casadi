@@ -640,12 +640,12 @@ void SundialsInterface::calc_daeB(SundialsMemory* m, double t, const double* x, 
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_OUT_ALG] = nullptr;  // fwd:out_alg
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_OUT_QUAD] = nullptr;  // fwd:out_quad
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_ADJ_ODE] =
-      rx ? rx + nrx2_ * nadj_ : 0;  // fwd:adj_ode
+      rx ? rx + nrx1_ * nadj_ : 0;  // fwd:adj_ode
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_ADJ_ALG] =
-      rz ? rz + nrz2_ * nadj_ : 0;  // fwd:adj_alg
-    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_ADJ_QUAD] = m->rp + nrp2_ * nadj_;  // fwd:adj_quad
-    m->res[BDAE_ADJ_X] = adj_x ? adj_x + nrx2_ * nadj_ : 0;  // fwd:adj_x
-    m->res[BDAE_ADJ_Z] = adj_z ? adj_z + nrz2_ * nadj_ : 0;  // fwd:adj_z
+      rz ? rz + nrz1_ * nadj_ : 0;  // fwd:adj_alg
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_ADJ_QUAD] = m->rp + nrp1_ * nadj_;  // fwd:adj_quad
+    m->res[BDAE_ADJ_X] = adj_x ? adj_x + nrx1_ * nadj_ : 0;  // fwd:adj_x
+    m->res[BDAE_ADJ_Z] = adj_z ? adj_z + nrz1_ * nadj_ : 0;  // fwd:adj_z
     calc_function(m, forward_name("daeB", nfwd_));
   }
 }
@@ -702,12 +702,12 @@ void SundialsInterface::calc_quadB(SundialsMemory* m, double t, const double* x,
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_OUT_ALG] = nullptr;  // fwd:out_alg
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_OUT_QUAD] = nullptr;  // fwd:out_quad
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_ADJ_ODE] =
-      rx ? rx + nrx2_ * nadj_ : 0;  // fwd:adj_ode
+      rx ? rx + nrx1_ * nadj_ : 0;  // fwd:adj_ode
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_ADJ_ALG] =
-      rz ? rz + nrz2_ * nadj_ : 0;  // fwd:adj_alg
-    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_ADJ_QUAD] = m->rp + nrp2_ * nadj_;  // fwd:adj_quad
-    m->res[BQUAD_ADJ_P] = adj_p + nrq2_ * nadj_;  // fwd:adj_p
-    m->res[BQUAD_ADJ_U] = adj_u + nuq2_ * nadj_;  // fwd:adj_u
+      rz ? rz + nrz1_ * nadj_ : 0;  // fwd:adj_alg
+    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_ADJ_QUAD] = m->rp + nrp1_ * nadj_;  // fwd:adj_quad
+    m->res[BQUAD_ADJ_P] = adj_p + nrq1_ * nadj_;  // fwd:adj_p
+    m->res[BQUAD_ADJ_U] = adj_u + nuq1_ * nadj_;  // fwd:adj_u
     calc_function(m, forward_name("quadB", nfwd_));
   }
 }
@@ -769,17 +769,17 @@ void SundialsInterface::calc_jtimesB(SundialsMemory* m, double t, const double* 
     m->arg[JTIMESB_NUM_IN + JTIMESB_NUM_OUT + JTIMESB_P] = m->p + np1_;  // fwd:p
     m->arg[JTIMESB_NUM_IN + JTIMESB_NUM_OUT + JTIMESB_U] = m->u + nu1_;  // fwd:u
     m->arg[JTIMESB_NUM_IN + JTIMESB_NUM_OUT + JTIMESB_RX] =
-      rx + nrx2_ * nadj_;  // fwd:rx
+      rx + nrx1_ * nadj_;  // fwd:rx
     m->arg[JTIMESB_NUM_IN + JTIMESB_NUM_OUT + JTIMESB_RZ] =
-      rz + nrz2_ * nadj_;  // fwd:rz
+      rz + nrz1_ * nadj_;  // fwd:rz
     m->arg[JTIMESB_NUM_IN + JTIMESB_NUM_OUT + JTIMESB_RP] =
-      m->rp + nrp2_ * nadj_;  // fwd:rp
+      m->rp + nrp1_ * nadj_;  // fwd:rp
     m->arg[JTIMESB_NUM_IN + JTIMESB_NUM_OUT + JTIMESB_FWD_RX] =
-      fwd_rx + nrx2_ * nadj_;  // fwd:fwd:rx
+      fwd_rx + nrx1_ * nadj_;  // fwd:fwd:rx
     m->arg[JTIMESB_NUM_IN + JTIMESB_NUM_OUT + JTIMESB_FWD_RZ] =
-      fwd_rz + nrz2_ * nadj_;  // fwd:fwd:rz
-    m->res[JTIMESB_FWD_RODE] = fwd_adj_x + nrx2_ * nadj_;  // fwd:fwd:adj_x
-    m->res[JTIMESB_FWD_RALG] = fwd_adj_z + nrz2_ * nadj_;  // fwd:fwd:adj_z
+      fwd_rz + nrz1_ * nadj_;  // fwd:fwd:rz
+    m->res[JTIMESB_FWD_RODE] = fwd_adj_x + nrx1_ * nadj_;  // fwd:fwd:adj_x
+    m->res[JTIMESB_FWD_RALG] = fwd_adj_z + nrz1_ * nadj_;  // fwd:fwd:adj_z
     calc_function(m, forward_name("jtimesB", nfwd_));
  }
 }

@@ -325,10 +325,10 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   casadi_int nx_, nz_, nq_, nx1_, nz1_, nq1_;
 
   /// Number of states for the backward integration
-  casadi_int nrx_, nrz_, nrq_, nuq_, nrx2_, nrz2_, nrq2_, nuq2_;
+  casadi_int nrx_, nrz_, nrq_, nuq_, nrx1_, nrz1_, nrq1_, nuq1_;
 
   /// Number of forward and backward parameters
-  casadi_int np_, nrp_, np1_, nrp2_;
+  casadi_int np_, nrp_, np1_, nrp1_;
 
   /// Number of controls
   casadi_int nu_, nu1_;

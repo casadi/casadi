@@ -238,11 +238,11 @@ namespace casadi {
       MX rp = MX::sym("rp", g.sparsity_in(BDYN_ADJ_QUAD));
 
       // Implicitly defined variables (rz and rx)
-      MX rv = MX::sym("v", deg_ * (nrx2_ + nrz2_) * nadj_);
+      MX rv = MX::sym("v", deg_ * (nrx1_ + nrz1_) * nadj_);
       std::vector<casadi_int> rv_offset(1, 0);
       for (casadi_int d = 0; d < deg_; ++d) {
-        rv_offset.push_back(rv_offset.back() + nrx2_ * nadj_);
-        rv_offset.push_back(rv_offset.back() + nrz2_ * nadj_);
+        rv_offset.push_back(rv_offset.back() + nrx1_ * nadj_);
+        rv_offset.push_back(rv_offset.back() + nrz1_ * nadj_);
       }
       std::vector<MX> rvv = vertsplit(rv, rv_offset);
       std::vector<MX>::const_iterator rvv_it = rvv.begin();
@@ -259,8 +259,8 @@ namespace casadi {
       eq.clear();
 
       // Quadratures
-      MX rqf = MX::zeros(nrq2_ * nadj_);
-      MX uqf = MX::zeros(nuq2_ * nadj_);
+      MX rqf = MX::zeros(nrq1_ * nadj_);
+      MX uqf = MX::zeros(nuq1_ * nadj_);
 
       // End state
       MX rxf = D[0] * rx0;

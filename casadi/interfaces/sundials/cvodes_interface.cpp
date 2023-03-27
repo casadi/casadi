@@ -545,20 +545,20 @@ int CvodesInterface::psolveB(double t, N_Vector x, N_Vector xB, N_Vector xdotB, 
     if (s.linsolB_.solve(m->jacB, m->v1, 1, false, m->mem_linsolB))
       casadi_error("Linear solve failed");
     v = NV_DATA_S(zvecB); // possibly different from rvecB
-    casadi_copy(m->v1, s.nrx2_ * s.nadj_, v);
+    casadi_copy(m->v1, s.nrx1_ * s.nadj_, v);
 
     // Sensitivity equations
     if (s.nfwd_ > 0) {
       // Second order correction
       if (s.second_order_correction_) {
         // The outputs will double as seeds for jtimesB
-        casadi_clear(v + s.nrx2_ * s.nadj_, s.nrx_ - s.nrx2_ * s.nadj_);
+        casadi_clear(v + s.nrx1_ * s.nadj_, s.nrx_ - s.nrx1_ * s.nadj_);
         s.calc_jtimesB(m, t, NV_DATA_S(x), nullptr, NV_DATA_S(xB),
           nullptr, v, nullptr, m->v2, nullptr);
 
         // Subtract m->v2 from m->v1, scaled with gammaB
-        casadi_axpy(s.nrx_ - s.nrx2_ * s.nadj_, -m->gammaB, m->v2 + s.nrx2_ * s.nadj_,
-          m->v1 + s.nrx2_ * s.nadj_);
+        casadi_axpy(s.nrx_ - s.nrx1_ * s.nadj_, -m->gammaB, m->v2 + s.nrx1_ * s.nadj_,
+          m->v1 + s.nrx1_ * s.nadj_);
       }
 
       // Solve for sensitivity right-hand-sides
