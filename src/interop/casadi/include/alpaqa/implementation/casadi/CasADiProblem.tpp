@@ -118,12 +118,13 @@ CasADiProblem<Conf>::CasADiProblem(const std::string &so_name)
         });
 
     if (g)
-        impl->constr.emplace(
+        impl->constr = {
             std::move(*g),
             wrapped_load<CasADiFunctionEvaluator<Conf, 3, 1>>( //
                 so_name, "grad_L", dims(n, p, m), dims(n)),
             wrapped_load<CasADiFunctionEvaluator<Conf, 6, 2>>( //
-                so_name, "psi", dims(n, p, m, m, m, m), dims(1, m)));
+                so_name, "psi", dims(n, p, m, m, m, m), dims(1, m)),
+        };
 
     impl->hess_L_prod = try_load<CasADiFunctionEvaluator<Conf, 5, 1>>( //
         so_name, "hess_L_prod", dims(n, p, m, 1, n), dims(n));
