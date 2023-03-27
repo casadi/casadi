@@ -448,9 +448,6 @@ const Options Integrator::options_
     {"nadj",
      {OT_INT,
       "Number of adjoint sensitivities to be calculated [0]"}},
-    {"rdae",
-      {OT_FUNCTION,
-      "Function for evaluating the backwards DAE (transitional option - to be removed)"}},
     {"t0",
       {OT_DOUBLE,
       "[DEPRECATED] Beginning of the time horizon"}},
@@ -490,8 +487,6 @@ void Integrator::init(const Dict& opts) {
       nfwd_ = op.second;
     } else if (op.first=="nadj") {
       nadj_ = op.second;
-    } else if (op.first=="rdae") {
-      rdae_ = op.second;
     } else if (op.first=="grid") {
       grid = op.second;
       uses_legacy_options = true;
@@ -559,15 +554,9 @@ void Integrator::init(const Dict& opts) {
   }
 
   // Get backward problem
-  if (nadj_ > 0 || !rdae_.is_null()) {
-    // Create rdae_
-    if (nadj_ > 0) {
-      // The "nadj" option will replace "rdae" completely when #3047 is done
-      casadi_assert_dev(rdae_.is_null());
-      // Generate backward DAE
-      rdae_ = oracle_.reverse(nadj_);
-    }
-
+  if (nadj_ > 0) {
+    // Generate backward DAE
+    rdae_ = oracle_.reverse(nadj_);
     // Consistency checks
     casadi_assert(rdae_.n_in() == BDYN_NUM_IN, "Backward DAE has wrong number of inputs");
     casadi_assert(rdae_.n_out() == BDYN_NUM_OUT, "Backward DAE has wrong number of outputs");
