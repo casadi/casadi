@@ -81,7 +81,6 @@ generator = "Ninja Multi-Config"
 [tool.py-build-cmake.mac.cmake]
 config = ["Debug", "Release"]
 generator = "Ninja Multi-Config"
-build_tool_args = ["-k0"]
 [tool.py-build-cmake.windows.cmake]
 config = ["Release"]
 
