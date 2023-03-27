@@ -553,15 +553,6 @@ void Integrator::init(const Dict& opts) {
       + dyn_out(i) + " is sparse.");
   }
 
-  // Get backward problem
-  if (nadj_ > 0) {
-    // Generate backward DAE
-    rdae_ = oracle_.reverse(nadj_);
-    // Consistency checks
-    casadi_assert(rdae_.n_in() == BDYN_NUM_IN, "Backward DAE has wrong number of inputs");
-    casadi_assert(rdae_.n_out() == BDYN_NUM_OUT, "Backward DAE has wrong number of outputs");
-  }
-
   // Get dimensions (excluding sensitivity equations), forward problem
   nx1_ = oracle_.numel_in(DYN_X);
   nz1_ = oracle_.numel_in(DYN_Z);
@@ -569,15 +560,29 @@ void Integrator::init(const Dict& opts) {
   np1_ = oracle_.numel_in(DYN_P);
   nu1_ = oracle_.numel_in(DYN_U);
 
+  // Get backward problem
+  if (nadj_ > 0) {
+    // Generate backward DAE
+    rdae_ = oracle_.reverse(nadj_);
+    // Consistency checks
+    casadi_assert(rdae_.n_in() == BDYN_NUM_IN, "Backward DAE has wrong number of inputs");
+    casadi_assert(rdae_.n_out() == BDYN_NUM_OUT, "Backward DAE has wrong number of outputs");
+    casadi_assert(rdae_.numel_in(BDYN_ADJ_ODE) == nx1_ * nadj_, "Inconsistent dimensions");
+    casadi_assert(rdae_.numel_in(BDYN_ADJ_ALG) == nz1_ * nadj_, "Inconsistent dimensions");
+    casadi_assert(rdae_.numel_in(BDYN_ADJ_QUAD) == nq1_ * nadj_, "Inconsistent dimensions");
+    casadi_assert(rdae_.numel_out(BDYN_ADJ_P) == np1_ * nadj_, "Inconsistent dimensions");
+    casadi_assert(rdae_.numel_out(BDYN_ADJ_U) == nu1_ * nadj_, "Inconsistent dimensions");
+  }
+
   // Get dimensions (excluding sensitivity equations), backward problem
   if (rdae_.is_null()) {
     nrx1_ = nrz1_ = nrp1_ = nrq1_ = nuq1_ = 0;
   } else {
-    nrx1_ = rdae_.numel_in(BDYN_ADJ_ODE);
-    nrz1_ = rdae_.numel_in(BDYN_ADJ_ALG);
-    nrp1_ = rdae_.numel_in(BDYN_ADJ_QUAD);
-    nrq1_ = rdae_.numel_out(BDYN_ADJ_P);
-    nuq1_ = rdae_.numel_out(BDYN_ADJ_U);
+    nrx1_ = nx1_ * nadj_;
+    nrz1_ = nz1_ * nadj_;
+    nrp1_ = nq1_ * nadj_;
+    nrq1_ = np1_ * nadj_;
+    nuq1_ = nu1_ * nadj_;
   }
 
   // Get dimensions (including sensitivity equations)
