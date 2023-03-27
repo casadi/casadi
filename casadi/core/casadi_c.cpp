@@ -219,6 +219,8 @@ const char* casadi_c_name() {
 }
 const char* casadi_c_name_id(int id) {
   if (sanitize_id(id)) return "";
+  static std::string name;
+  name = casadi_c_loaded_functions.at(id).name();
   return casadi_c_loaded_functions.at(id).name().c_str();
 }
 
