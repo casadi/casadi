@@ -357,9 +357,7 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
 
   /// Convert dictionary to Problem
   template<typename XType>
-    static Function map2oracle(const std::string& name, const std::map<std::string, XType>& d,
-      Function *rdae);
-
+  static Function map2oracle(const std::string& name, const std::map<std::string, XType>& d);
 
   /** \brief Serialize an object without type information
 

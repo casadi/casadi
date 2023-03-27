@@ -123,32 +123,12 @@ Function integrator(const std::string& name, const std::string& solver,
 
 Function integrator(const std::string& name, const std::string& solver,
     const SXDict& dae, double t0, const std::vector<double>& tout, const Dict& opts) {
-  // Create function oracle and backwards DAE, if any
-  Function oracle, rdae;
-  oracle = Integrator::map2oracle("dae", dae, &rdae);
-  // Create integrator instance
-  if (rdae.is_null()) {
-    return integrator(name, solver, oracle, t0, tout, opts);
-  } else {
-    Dict opts2 = opts;
-    opts2["rdae"] = rdae;
-    return integrator(name, solver, oracle, t0, tout, opts2);
-  }
+  return integrator(name, solver, Integrator::map2oracle("dae", dae), t0, tout, opts);
 }
 
 Function integrator(const std::string& name, const std::string& solver,
     const MXDict& dae, double t0, const std::vector<double>& tout, const Dict& opts) {
-  // Create function oracle and backwards DAE, if any
-  Function oracle, rdae;
-  oracle = Integrator::map2oracle("dae", dae, &rdae);
-  // Create integrator instance
-  if (rdae.is_null()) {
-    return integrator(name, solver, oracle, t0, tout, opts);
-  } else {
-    Dict opts2 = opts;
-    opts2["rdae"] = rdae;
-    return integrator(name, solver, oracle, t0, tout, opts2);
-  }
+  return integrator(name, solver, Integrator::map2oracle("dae", dae), t0, tout, opts);
 }
 
 Function integrator(const std::string& name, const std::string& solver,
@@ -2072,7 +2052,7 @@ void ImplicitFixedStepIntegrator::init(const Dict& opts) {
 
 template<typename XType>
 Function Integrator::map2oracle(const std::string& name,
-    const std::map<std::string, XType>& d, Function *rdae) {
+    const std::map<std::string, XType>& d) {
   std::vector<XType> de_in(DYN_NUM_IN), de_out(DYN_NUM_OUT);
   for (auto&& i : d) {
     if (i.first=="t") {
