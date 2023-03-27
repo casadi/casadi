@@ -185,11 +185,11 @@ std::string integrator_in(casadi_int ind) {
 std::string integrator_out(casadi_int ind) {
   switch (static_cast<IntegratorOutput>(ind)) {
   case INTEGRATOR_XF:  return "xf";
-  case INTEGRATOR_QF:  return "qf";
   case INTEGRATOR_ZF:  return "zf";
+  case INTEGRATOR_QF:  return "qf";
   case INTEGRATOR_ADJ_X0: return "adj_x0";
-  case INTEGRATOR_ADJ_P: return "adj_p";
   case INTEGRATOR_ADJ_Z0: return "adj_z0";
+  case INTEGRATOR_ADJ_P: return "adj_p";
   case INTEGRATOR_ADJ_U: return "adj_u";
   case INTEGRATOR_NUM_OUT: break;
   }
@@ -261,11 +261,11 @@ Sparsity Integrator::get_sparsity_in(casadi_int i) {
 Sparsity Integrator::get_sparsity_out(casadi_int i) {
   switch (static_cast<IntegratorOutput>(i)) {
   case INTEGRATOR_XF: return Sparsity::dense(nx1_, nt() * (1 + nfwd_));
-  case INTEGRATOR_QF: return Sparsity::dense(nq1_, nt() * (1 + nfwd_));
   case INTEGRATOR_ZF: return Sparsity::dense(nz1_, nt() * (1 + nfwd_));
+  case INTEGRATOR_QF: return Sparsity::dense(nq1_, nt() * (1 + nfwd_));
   case INTEGRATOR_ADJ_X0: return Sparsity::dense(nrx1_, nadj_ * (1 + nfwd_));
-  case INTEGRATOR_ADJ_P: return Sparsity::dense(nrq1_, nadj_ * (1 + nfwd_));
   case INTEGRATOR_ADJ_Z0: return Sparsity::dense(nrz1_, nadj_ * (1 + nfwd_));
+  case INTEGRATOR_ADJ_P: return Sparsity::dense(nrq1_, nadj_ * (1 + nfwd_));
   case INTEGRATOR_ADJ_U: return Sparsity::dense(nuq1_, nadj_ * (1 + nfwd_) * nt());
   case INTEGRATOR_NUM_OUT: break;
   }
@@ -276,8 +276,8 @@ bool Integrator::grid_in(casadi_int i) {
   switch (static_cast<IntegratorInput>(i)) {
     case INTEGRATOR_U:
     case INTEGRATOR_ADJ_XF:
-    case INTEGRATOR_ADJ_QF:
     case INTEGRATOR_ADJ_ZF:
+    case INTEGRATOR_ADJ_QF:
       return true;
     default: break;
   }
@@ -287,27 +287,13 @@ bool Integrator::grid_in(casadi_int i) {
 bool Integrator::grid_out(casadi_int i) {
   switch (static_cast<IntegratorOutput>(i)) {
     case INTEGRATOR_XF:
-    case INTEGRATOR_QF:
     case INTEGRATOR_ZF:
+    case INTEGRATOR_QF:
     case INTEGRATOR_ADJ_U:
       return true;
     default: break;
   }
   return false;
-}
-
-casadi_int Integrator::adjmap_in(casadi_int i) {
-  switch (static_cast<IntegratorOutput>(i)) {
-    case INTEGRATOR_XF: return INTEGRATOR_ADJ_XF;
-    case INTEGRATOR_QF: return INTEGRATOR_ADJ_QF;
-    case INTEGRATOR_ZF: return INTEGRATOR_ADJ_ZF;
-    case INTEGRATOR_ADJ_X0: return INTEGRATOR_X0;
-    case INTEGRATOR_ADJ_P: return INTEGRATOR_P;
-    case INTEGRATOR_ADJ_Z0: return INTEGRATOR_Z0;
-    case INTEGRATOR_ADJ_U: return INTEGRATOR_U;
-    default: break;
-  }
-  return -1;
 }
 
 casadi_int Integrator::adjmap_out(casadi_int i) {
@@ -322,10 +308,7 @@ casadi_int Integrator::adjmap_out(casadi_int i) {
     default: break;
   }
   return -1;
-
 }
-
-
 
 Function Integrator::create_advanced(const Dict& opts) {
   return Function::create(this, opts);

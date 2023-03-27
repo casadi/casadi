@@ -217,16 +217,16 @@ enum IntegratorInput {
 enum IntegratorOutput {
   /// Differential state at all output times
   INTEGRATOR_XF,
-  /// Quadrature state at all output times
-  INTEGRATOR_QF,
   /// Algebraic variable at all output times
   INTEGRATOR_ZF,
+  /// Quadrature state at all output times
+  INTEGRATOR_QF,
   /// Adjoint sensitivities corresponding to the initial state
   INTEGRATOR_ADJ_X0,
-  /// Adjoint sensitivities corresponding to the parameter vector
-  INTEGRATOR_ADJ_P,
   /// Adjoint sensitivities corresponding to the algebraic variable guess
   INTEGRATOR_ADJ_Z0,
+  /// Adjoint sensitivities corresponding to the parameter vector
+  INTEGRATOR_ADJ_P,
   /// Adjoint sensitivities corresponding to the control vector
   INTEGRATOR_ADJ_U,
   /// Number of output arguments of an integrator

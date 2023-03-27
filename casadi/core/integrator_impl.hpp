@@ -384,9 +384,6 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   /// Is an output repeated for each grid point?
   static bool grid_out(casadi_int i);
 
-  /// Which input is used to calculate a given output in adjoint sensitivity analysis
-  static casadi_int adjmap_in(casadi_int i);
-
   /// Which output is used to calculate a given input in adjoint sensitivity analysis
   static casadi_int adjmap_out(casadi_int i);
 
