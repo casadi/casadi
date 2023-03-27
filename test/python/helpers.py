@@ -596,14 +596,16 @@ class casadiTestCase(unittest.TestCase):
   def check_sparsity(self, a,b):
     self.assertTrue(a==b, msg=str(a) + " <-> " + str(b))
 
-  def check_codegen(self,F,inputs=None, opts=None,std="c89",extralibs="",check_serialize=False,extra_options=None,main=False,definitions=None):
+  def check_codegen(self,F,inputs=None, opts=None,std="c89",extralibs="",check_serialize=False,extra_options=None,main=False,definitions=None,with_jac_sparsity=False,external_opts=None):
 
     if args.run_slow:
       import hashlib
       name = "codegen_%s" % (hashlib.md5(("%f" % np.random.random()+str(F)+str(time.time())).encode()).hexdigest())
       if opts is None: opts = {}
       if main: opts["main"] = True
-      F.generate(name, opts)
+      cg = CodeGenerator(name,opts)
+      cg.add(F,with_jac_sparsity)
+      cg.generate()
       import subprocess
 
       libdir = GlobalOptions.getCasadiPath()
@@ -657,7 +659,8 @@ class casadiTestCase(unittest.TestCase):
 
       print("compile library",commands)
       p = subprocess.Popen(commands,shell=True).wait()
-      F2 = external(F.name(), libname)
+      if external_opts is None: external_opts = {}
+      F2 = external(F.name(), libname,external_opts)
 
       if main:
         [commands, exename] = get_commands(shared=False)

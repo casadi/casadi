@@ -1778,6 +1778,30 @@ class Functiontests(casadiTestCase):
     code= c.dump()
 
     self.assertTrue("ffff_acc4_acc4_acc4" in code)
+    
+    
+  def test_codegen_with_jac_sparsity(self):
+  
+    if not args.run_slow: return
+    x = MX.sym("x",3)
+    y = MX.sym("y",3,3)
+    f = Function("f",[x,y],[x**3,y @ x])
+    c = CodeGenerator('me')
+    c.add(f, True)
+    
+    fJ = f.jacobian()
+    
+    DM.rng(0)
+    x0 = DM.rand(x.sparsity())
+    y0 = DM.rand(y.sparsity())
+    [F,_] = self.check_codegen(f,inputs=[x0,y0],with_jac_sparsity=True,external_opts={"enable_fd":True})
+    FJ = F.jacobian()
+    for i in range(fJ.n_out()):
+        self.assertEqual(fJ.sparsity_out(i),FJ.sparsity_out(i))
+    [F,_] = self.check_codegen(f,inputs=[x0,y0],with_jac_sparsity=False,external_opts={"enable_fd":True})
+    FJ = F.jacobian()
+    for i in range(fJ.n_out()):
+        self.assertTrue(FJ.sparsity_out(i).is_dense())
 
   def test_2d_linear_multiout(self):
     np.random.seed(0)
