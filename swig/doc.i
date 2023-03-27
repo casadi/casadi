@@ -171,7 +171,7 @@ elements.
 Extra doc: https://github.com/casadi/casadi/wiki/L_oh
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/callback.hpp#L168
+https://github.com/casadi/casadi/blob/develop/casadi/core/callback.hpp#L175
 
 Implementation: 
 https://github.com/casadi/casadi/blob/develop/casadi/core/callback.cpp#L92-L94
@@ -190,7 +190,7 @@ elements.
 Extra doc: https://github.com/casadi/casadi/wiki/L_oh
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/callback.hpp#L169
+https://github.com/casadi/casadi/blob/develop/casadi/core/callback.hpp#L176
 
 Implementation: 
 https://github.com/casadi/casadi/blob/develop/casadi/core/callback.cpp#L97-L102
@@ -209,7 +209,7 @@ get_forward(casadi_int nfwd) if no cached version is available.
 Extra doc: https://github.com/casadi/casadi/wiki/L_oi
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/callback.hpp#L183
+https://github.com/casadi/casadi/blob/develop/casadi/core/callback.hpp#L190
 
 Implementation: 
 https://github.com/casadi/casadi/blob/develop/casadi/core/callback.cpp#L112-L114
@@ -229,7 +229,7 @@ get_forward(casadi_int nfwd) if no cached version is available.
 Extra doc: https://github.com/casadi/casadi/wiki/L_oi
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/callback.hpp#L184
+https://github.com/casadi/casadi/blob/develop/casadi/core/callback.hpp#L191
 
 Implementation: 
 https://github.com/casadi/casadi/blob/develop/casadi/core/callback.cpp#L105-L110
@@ -248,7 +248,7 @@ get_reverse(casadi_int nadj) if no cached version is available.
 Extra doc: https://github.com/casadi/casadi/wiki/L_oj
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/callback.hpp#L198
+https://github.com/casadi/casadi/blob/develop/casadi/core/callback.hpp#L205
 
 Implementation: 
 https://github.com/casadi/casadi/blob/develop/casadi/core/callback.cpp#L124-L126
@@ -268,7 +268,7 @@ get_reverse(casadi_int nadj) if no cached version is available.
 Extra doc: https://github.com/casadi/casadi/wiki/L_oj
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/callback.hpp#L199
+https://github.com/casadi/casadi/blob/develop/casadi/core/callback.hpp#L206
 
 Implementation: 
 https://github.com/casadi/casadi/blob/develop/casadi/core/callback.cpp#L117-L122
@@ -286,10 +286,10 @@ with respect to all output elements
 Extra doc: https://github.com/casadi/casadi/wiki/L_ok
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/callback.hpp#L211
+https://github.com/casadi/casadi/blob/develop/casadi/core/callback.hpp#L218
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/callback.hpp#L211-L211
+https://github.com/casadi/casadi/blob/develop/casadi/core/callback.hpp#L218-L218
 
 ";
 
@@ -304,10 +304,10 @@ with respect to all output elements
 Extra doc: https://github.com/casadi/casadi/wiki/L_ok
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/callback.hpp#L212
+https://github.com/casadi/casadi/blob/develop/casadi/core/callback.hpp#L219
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/callback.hpp#L212-L213
+https://github.com/casadi/casadi/blob/develop/casadi/core/callback.hpp#L219-L220
 
 ";
 
@@ -2842,12 +2842,18 @@ const std::vector< casadi_int > &sizes_arg, double **res, const std::vector<
 [INTERNAL] 
 A copy-free low level interface.
 
-In Python, you will be passed two tuples of memoryview objects
+In Python, you will be passed two tuples of memoryview objects Note 
+that 
+only the structural nonzeros are present in the memoryview 
+objects/buffers.
+
+Make sure to override  has_eval_buffer() to indicate support for this 
+method.
 
 Extra doc: https://github.com/casadi/casadi/wiki/L_o9
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/callback.hpp#L113
+https://github.com/casadi/casadi/blob/develop/casadi/core/callback.hpp#L116
 
 Implementation: 
 https://github.com/casadi/casadi/blob/develop/casadi/core/callback.cpp#L53-L56
@@ -2856,7 +2862,19 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/callback.cpp#L53-L56
 
 %feature("docstring")  casadi::Callback::has_eval_buffer() const "
 
-[INTERNAL] ";
+[INTERNAL] 
+Does the  Callback class support a copy-free low level interface
+ ?
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_265
+
+Doc source: 
+https://github.com/casadi/casadi/blob/develop/casadi/core/callback.hpp#L122
+
+Implementation: 
+https://github.com/casadi/casadi/blob/develop/casadi/core/callback.cpp#L57-L59
+
+";
 
 %feature("docstring")  casadi::Callback::get_n_in() "
 
@@ -2868,7 +2886,7 @@ This function is called during construction.
 Extra doc: https://github.com/casadi/casadi/wiki/L_oa
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/callback.hpp#L122
+https://github.com/casadi/casadi/blob/develop/casadi/core/callback.hpp#L129
 
 Implementation: 
 https://github.com/casadi/casadi/blob/develop/casadi/core/callback.cpp#L64-L66
@@ -2885,7 +2903,7 @@ This function is called during construction.
 Extra doc: https://github.com/casadi/casadi/wiki/L_ob
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/callback.hpp#L129
+https://github.com/casadi/casadi/blob/develop/casadi/core/callback.hpp#L136
 
 Implementation: 
 https://github.com/casadi/casadi/blob/develop/casadi/core/callback.cpp#L68-L70
@@ -2902,7 +2920,7 @@ This function is called during construction.
 Extra doc: https://github.com/casadi/casadi/wiki/L_oc
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/callback.hpp#L136
+https://github.com/casadi/casadi/blob/develop/casadi/core/callback.hpp#L143
 
 Implementation: 
 https://github.com/casadi/casadi/blob/develop/casadi/core/callback.cpp#L72-L74
@@ -2919,7 +2937,7 @@ This function is called during construction.
 Extra doc: https://github.com/casadi/casadi/wiki/L_od
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/callback.hpp#L143
+https://github.com/casadi/casadi/blob/develop/casadi/core/callback.hpp#L150
 
 Implementation: 
 https://github.com/casadi/casadi/blob/develop/casadi/core/callback.cpp#L76-L78
@@ -2936,7 +2954,7 @@ This function is called during construction.
 Extra doc: https://github.com/casadi/casadi/wiki/L_oe
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/callback.hpp#L150
+https://github.com/casadi/casadi/blob/develop/casadi/core/callback.hpp#L157
 
 Implementation: 
 https://github.com/casadi/casadi/blob/develop/casadi/core/callback.cpp#L80-L82
@@ -2953,7 +2971,7 @@ This function is called during construction.
 Extra doc: https://github.com/casadi/casadi/wiki/L_of
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/callback.hpp#L157
+https://github.com/casadi/casadi/blob/develop/casadi/core/callback.hpp#L164
 
 Implementation: 
 https://github.com/casadi/casadi/blob/develop/casadi/core/callback.cpp#L84-L86
@@ -2968,7 +2986,7 @@ Do the derivative functions need nondifferentiated outputs?
 Extra doc: https://github.com/casadi/casadi/wiki/L_og
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/callback.hpp#L162
+https://github.com/casadi/casadi/blob/develop/casadi/core/callback.hpp#L169
 
 Implementation: 
 https://github.com/casadi/casadi/blob/develop/casadi/core/callback.cpp#L88-L90
@@ -51899,22 +51917,22 @@ General information
 +===================+========+=============================================+
 | INTEGRATOR_X0     | x0     | Differential state at the initial time.     |
 +-------------------+--------+---------------------------------------------+
+| INTEGRATOR_Z0     | z0     | Initial guess for the algebraic variable at |
+|                   |        | the initial time.                           |
++-------------------+--------+---------------------------------------------+
 | INTEGRATOR_P      | p      | Parameters.                                 |
 +-------------------+--------+---------------------------------------------+
 | INTEGRATOR_U      | u      | Piecewise constant control, a new control   |
 |                   |        | interval starts at each output time.        |
 +-------------------+--------+---------------------------------------------+
-| INTEGRATOR_Z0     | z0     | Initial guess for the algebraic variable at |
-|                   |        | the initial time.                           |
-+-------------------+--------+---------------------------------------------+
 | INTEGRATOR_ADJ_XF | adj_xf | Adjoint seeds corresponding to the states   |
 |                   |        | at the output times.                        |
 +-------------------+--------+---------------------------------------------+
-| INTEGRATOR_ADJ_QF | adj_qf | Adjoint seeds corresponding to the          |
-|                   |        | quadrature at the output times.             |
-+-------------------+--------+---------------------------------------------+
 | INTEGRATOR_ADJ_ZF | adj_zf | Adjoint seeds corresponding to the          |
 |                   |        | algebraic variables at the output times.    |
++-------------------+--------+---------------------------------------------+
+| INTEGRATOR_ADJ_QF | adj_qf | Adjoint seeds corresponding to the          |
+|                   |        | quadratures at the output times.            |
 +-------------------+--------+---------------------------------------------+
 
 >Output scheme: casadi::IntegratorOutput (INTEGRATOR_NUM_OUT = 7)
@@ -51924,18 +51942,18 @@ General information
 +===================+========+=============================================+
 | INTEGRATOR_XF     | xf     | Differential state at all output times.     |
 +-------------------+--------+---------------------------------------------+
-| INTEGRATOR_QF     | qf     | Quadrature state at all output times.       |
-+-------------------+--------+---------------------------------------------+
 | INTEGRATOR_ZF     | zf     | Algebraic variable at all output times.     |
++-------------------+--------+---------------------------------------------+
+| INTEGRATOR_QF     | qf     | Quadrature state at all output times.       |
 +-------------------+--------+---------------------------------------------+
 | INTEGRATOR_ADJ_X0 | adj_x0 | Adjoint sensitivities corresponding to the  |
 |                   |        | initial state.                              |
 +-------------------+--------+---------------------------------------------+
-| INTEGRATOR_ADJ_P  | adj_p  | Adjoint sensitivities corresponding to the  |
-|                   |        | parameter vector.                           |
-+-------------------+--------+---------------------------------------------+
 | INTEGRATOR_ADJ_Z0 | adj_z0 | Adjoint sensitivities corresponding to the  |
 |                   |        | algebraic variable guess.                   |
++-------------------+--------+---------------------------------------------+
+| INTEGRATOR_ADJ_P  | adj_p  | Adjoint sensitivities corresponding to the  |
+|                   |        | parameter vector.                           |
 +-------------------+--------+---------------------------------------------+
 | INTEGRATOR_ADJ_U  | adj_u  | Adjoint sensitivities corresponding to the  |
 |                   |        | control vector.                             |

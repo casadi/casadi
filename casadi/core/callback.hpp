@@ -117,7 +117,8 @@ namespace casadi {
                               double **res, const std::vector<casadi_int>& sizes_res) const;
     /** \brief Does the Callback class support a copy-free low level interface ?
      *
-    */
+
+        \identifier{265} */
     virtual bool has_eval_buffer() const;
 
     /** \brief Get the number of inputs

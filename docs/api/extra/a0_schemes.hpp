@@ -46,12 +46,12 @@
 <caption>Input scheme: casadi::IntegratorInput  (INTEGRATOR_NUM_IN = 7)</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
 <tr><td>INTEGRATOR_X0</td><td>x0</td><td>Differential state at the initial time.</td></tr>
+<tr><td>INTEGRATOR_Z0</td><td>z0</td><td>Initial guess for the algebraic variable at the initial time.</td></tr>
 <tr><td>INTEGRATOR_P</td><td>p</td><td>Parameters.</td></tr>
 <tr><td>INTEGRATOR_U</td><td>u</td><td>Piecewise constant control, a new control interval starts at each output time.</td></tr>
-<tr><td>INTEGRATOR_Z0</td><td>z0</td><td>Initial guess for the algebraic variable at the initial time.</td></tr>
 <tr><td>INTEGRATOR_ADJ_XF</td><td>adj_xf</td><td>Adjoint seeds corresponding to the states at the output times.</td></tr>
-<tr><td>INTEGRATOR_ADJ_QF</td><td>adj_qf</td><td>Adjoint seeds corresponding to the quadrature at the output times.</td></tr>
 <tr><td>INTEGRATOR_ADJ_ZF</td><td>adj_zf</td><td>Adjoint seeds corresponding to the algebraic variables at the output times.</td></tr>
+<tr><td>INTEGRATOR_ADJ_QF</td><td>adj_qf</td><td>Adjoint seeds corresponding to the quadratures at the output times.</td></tr>
 </table>
 */
 /** \defgroup scheme_IntegratorOutput
@@ -59,11 +59,11 @@
 <caption>Output scheme: casadi::IntegratorOutput  (INTEGRATOR_NUM_OUT = 7)</caption>
 <tr><th>Full name</th><th>Short</th><th>Description</th></tr>
 <tr><td>INTEGRATOR_XF</td><td>xf</td><td>Differential state at all output times.</td></tr>
-<tr><td>INTEGRATOR_QF</td><td>qf</td><td>Quadrature state at all output times.</td></tr>
 <tr><td>INTEGRATOR_ZF</td><td>zf</td><td>Algebraic variable at all output times.</td></tr>
+<tr><td>INTEGRATOR_QF</td><td>qf</td><td>Quadrature state at all output times.</td></tr>
 <tr><td>INTEGRATOR_ADJ_X0</td><td>adj_x0</td><td>Adjoint sensitivities corresponding to the initial state.</td></tr>
-<tr><td>INTEGRATOR_ADJ_P</td><td>adj_p</td><td>Adjoint sensitivities corresponding to the parameter vector.</td></tr>
 <tr><td>INTEGRATOR_ADJ_Z0</td><td>adj_z0</td><td>Adjoint sensitivities corresponding to the algebraic variable guess.</td></tr>
+<tr><td>INTEGRATOR_ADJ_P</td><td>adj_p</td><td>Adjoint sensitivities corresponding to the parameter vector.</td></tr>
 <tr><td>INTEGRATOR_ADJ_U</td><td>adj_u</td><td>Adjoint sensitivities corresponding to the control vector.</td></tr>
 </table>
 */
