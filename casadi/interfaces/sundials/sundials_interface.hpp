@@ -213,6 +213,7 @@ namespace casadi {
     ///@}
 
     /// Backward problem Jacobian sparsity
+    Sparsity sp_jac_ode_xB1_, sp_jac_alg_xB1_, sp_jac_ode_zB1_, sp_jac_alg_zB1_;
     Sparsity sp_jac_ode_xB_, sp_jac_alg_xB_, sp_jac_ode_zB_, sp_jac_alg_zB_;
 
     /// Linear solver
