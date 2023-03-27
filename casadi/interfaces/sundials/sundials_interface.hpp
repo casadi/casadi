@@ -56,6 +56,9 @@ namespace casadi {
     // Controls
     double *u;
 
+    /// Jacobian memory blocks
+    double *jac_ode_x, *jac_alg_x, *jac_ode_z, *jac_alg_z;
+
     // Jacobian
     double *jacF, *jacB;
 
@@ -186,7 +189,6 @@ namespace casadi {
       JTIMESB_FWD_RX, JTIMESB_FWD_RZ, JTIMESB_NUM_IN};
     enum JtimesBOut { JTIMESB_FWD_RODE, JTIMESB_FWD_RALG, JTIMESB_NUM_OUT};
     enum JacFOut {JACF_ODE_X, JACF_ALG_X, JACF_ODE_Z, JACF_ALG_Z, JACF_NUM_OUT};
-    enum JacBOut {JACB_RODE_RX, JACB_RALG_RX, JACB_RODE_RZ, JACB_RALG_RZ, JACB_NUM_OUT};
     ///@}
 
     ///@{
@@ -208,6 +210,10 @@ namespace casadi {
     double nonlin_conv_coeff_;
     casadi_int max_order_;
     ///@}
+
+    /// Backward problem Jacobian sparsity
+    Sparsity sp_jac_ode_xB1_, sp_jac_alg_xB1_, sp_jac_ode_zB1_, sp_jac_alg_zB1_;
+    Sparsity sp_jac_ode_xB_, sp_jac_alg_xB_, sp_jac_ode_zB_, sp_jac_alg_zB_;
 
     /// Linear solver
     Linsol linsolF_, linsolB_;

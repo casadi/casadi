@@ -123,32 +123,12 @@ Function integrator(const std::string& name, const std::string& solver,
 
 Function integrator(const std::string& name, const std::string& solver,
     const SXDict& dae, double t0, const std::vector<double>& tout, const Dict& opts) {
-  // Create function oracle and backwards DAE, if any
-  Function oracle, rdae;
-  oracle = Integrator::map2oracle("dae", dae, &rdae);
-  // Create integrator instance
-  if (rdae.is_null()) {
-    return integrator(name, solver, oracle, t0, tout, opts);
-  } else {
-    Dict opts2 = opts;
-    opts2["rdae"] = rdae;
-    return integrator(name, solver, oracle, t0, tout, opts2);
-  }
+  return integrator(name, solver, Integrator::map2oracle("dae", dae), t0, tout, opts);
 }
 
 Function integrator(const std::string& name, const std::string& solver,
     const MXDict& dae, double t0, const std::vector<double>& tout, const Dict& opts) {
-  // Create function oracle and backwards DAE, if any
-  Function oracle, rdae;
-  oracle = Integrator::map2oracle("dae", dae, &rdae);
-  // Create integrator instance
-  if (rdae.is_null()) {
-    return integrator(name, solver, oracle, t0, tout, opts);
-  } else {
-    Dict opts2 = opts;
-    opts2["rdae"] = rdae;
-    return integrator(name, solver, oracle, t0, tout, opts2);
-  }
+  return integrator(name, solver, Integrator::map2oracle("dae", dae), t0, tout, opts);
 }
 
 Function integrator(const std::string& name, const std::string& solver,
@@ -468,9 +448,6 @@ const Options Integrator::options_
     {"nadj",
      {OT_INT,
       "Number of adjoint sensitivities to be calculated [0]"}},
-    {"rdae",
-      {OT_FUNCTION,
-      "Function for evaluating the backwards DAE (transitional option - to be removed)"}},
     {"t0",
       {OT_DOUBLE,
       "[DEPRECATED] Beginning of the time horizon"}},
@@ -510,8 +487,6 @@ void Integrator::init(const Dict& opts) {
       nfwd_ = op.second;
     } else if (op.first=="nadj") {
       nadj_ = op.second;
-    } else if (op.first=="rdae") {
-      rdae_ = op.second;
     } else if (op.first=="grid") {
       grid = op.second;
       uses_legacy_options = true;
@@ -579,17 +554,9 @@ void Integrator::init(const Dict& opts) {
   }
 
   // Get backward problem
-  if (nadj_ > 0 || !rdae_.is_null()) {
-    // Create rdae_
-    if (nadj_ > 0) {
-      // The "nadj" option will replace "rdae" completely when #3047 is done
-      casadi_assert_dev(rdae_.is_null());
-      // Code is not yet able to handle multiple right-hand-sides in rdae_
-      casadi_assert(nadj_ <= 1, "Not implemented");
-      // Generate backward DAE
-      rdae_ = oracle_.reverse(nadj_);
-    }
-
+  if (nadj_ > 0) {
+    // Generate backward DAE
+    rdae_ = oracle_.reverse(nadj_);
     // Consistency checks
     casadi_assert(rdae_.n_in() == BDYN_NUM_IN, "Backward DAE has wrong number of inputs");
     casadi_assert(rdae_.n_out() == BDYN_NUM_OUT, "Backward DAE has wrong number of outputs");
@@ -693,12 +660,9 @@ int Integrator::init_mem(void* mem) const {
   return 0;
 }
 
-Function Integrator::augmented_dae(Function* rdae) const {
+Function Integrator::augmented_dae() const {
   // If no sensitivities, augmented oracle is the oracle itself
-  if (nfwd_ == 0) {
-    if (rdae) *rdae = rdae_;
-    return oracle_;
-  }
+  if (nfwd_ == 0) return oracle_;
   // Name of augmented DAE
   std::string aug_name = "fsens" + str(nfwd_) + "_" + oracle_.name();
   // Use function in cache, if available
@@ -708,10 +672,8 @@ Function Integrator::augmented_dae(Function* rdae) const {
   try {
     if (oracle_.is_a("SXFunction")) {
       ret = get_forward_dae<SX>(aug_name);
-      if (rdae) *rdae = get_forward_rdae<SX>("dae");
     } else {
       ret = get_forward_dae<MX>(aug_name);
-      if (rdae) *rdae = get_forward_rdae<MX>("dae");
     }
   } catch (std::exception& e) {
     casadi_error("Failed to generate augmented DAE for " + name_ + ":\n" + e.what());
@@ -776,244 +738,6 @@ Function Integrator::get_forward_dae(const std::string& name) const {
 
   // Convert to oracle function and return
   return Function(name, arg, res, dyn_in(), dyn_out());
-}
-
-template<typename MatType>
-Function Integrator::get_forward_rdae(const std::string& name) const {
-  if (verbose_) casadi_message(name_ + "::get_forward_rdae");
-
-  // Quick return if no backwards DAE
-  if (nrx1_ == 0) return Function();
-
-  // Get input and output expressions
-  std::vector<MatType> arg = MatType::get_input(rdae_);
-  std::vector<MatType> res = rdae_(arg);
-
-  // Symbolic expression for augmented DAE
-  std::vector<std::vector<MatType>> aug_in(BDYN_NUM_IN);
-  for (casadi_int i = 0; i < BDYN_NUM_IN; ++i) aug_in[i].push_back(arg.at(i));
-  std::vector<std::vector<MatType>> aug_out(BDYN_NUM_OUT);
-  for (casadi_int i = 0; i < BDYN_NUM_OUT; ++i) aug_out[i].push_back(res.at(i));
-
-  // Zero of time dimension
-  MatType zero_t = MatType::zeros(rdae_.sparsity_in(BDYN_T));
-
-  // Augment aug_in with forward sensitivity seeds
-  std::vector<std::vector<MatType>> seed(nfwd_, std::vector<MatType>(BDYN_NUM_IN));
-  for (casadi_int d = 0; d < nfwd_; ++d) {
-    // Create expressions for augmented states
-    std::string pref = "aug" + str(d) + "_";
-    for (casadi_int i = 0; i < BDYN_NUM_IN; ++i) {
-      if (i == BDYN_T) {
-        seed[d][i] = zero_t;
-      } else {
-        seed[d][i] = MatType::sym(pref + bdyn_in(i), rdae_.sparsity_in(i));
-      }
-    }
-    // Save to augmented function inputs
-    for (casadi_int i = 0; i < BDYN_NUM_IN; ++i) {
-      if (i != BDYN_T) aug_in[i].push_back(seed[d][i]);
-    }
-  }
-
-  // Calculate directional derivatives
-  std::vector<std::vector<MatType>> sens;
-  bool always_inline = rdae_.is_a("SXFunction") || rdae_.is_a("MXFunction");
-  rdae_->call_forward(arg, res, seed, sens, always_inline, false);
-
-  // Augment aug_out with forward sensitivity equations
-  casadi_assert_dev(sens.size() == nfwd_);
-  for (casadi_int d = 0; d < nfwd_; ++d) {
-    casadi_assert_dev(sens[d].size() == BDYN_NUM_OUT);
-    for (casadi_int i = 0; i < BDYN_NUM_OUT; ++i) {
-      if (i == BDYN_ADJ_T) {
-        aug_out[i].push_back(MatType(zero_t.size()));
-      } else {
-        aug_out[i].push_back(project(sens[d][i], rdae_.sparsity_out(i)));
-      }
-    }
-  }
-
-  // Convert to oracle function and return
-  for (casadi_int i = 0; i < BDYN_NUM_IN; ++i) arg.at(i) = vertcat(aug_in[i]);
-  for (casadi_int i = 0; i < BDYN_NUM_OUT; ++i) res.at(i) = vertcat(aug_out[i]);
-
-  // Convert to oracle function and return
-  return Function(name, arg, res, bdyn_in(), bdyn_out());
-}
-
-template<typename MatType>
-Function Integrator::get_reverse_dae(const Function& this_dae, const Function& this_rdae,
-    casadi_int nadj) const {
-  if (verbose_) casadi_message(name_ + "::get_reverse_dae");
-
-  // Quick return if no backwards states to be added to the forward problem
-  if (this_rdae.is_null()) return this_dae;
-
-  // Symbolic expression for augmented DAE
-  std::vector<std::vector<MatType>> aug_in(DYN_NUM_IN);
-  std::vector<std::vector<MatType>> aug_out(DYN_NUM_OUT);
-
-  // Input and output expressions for the forward problem
-  std::vector<MatType> arg = MatType::get_input(this_dae);
-  std::vector<MatType> res = this_dae(arg);
-
-  // Add forward problem to augmented DAE
-  for (casadi_int i = 0; i < DYN_NUM_IN; ++i) aug_in[i].push_back(arg.at(i));
-  for (casadi_int i = 0; i < DYN_NUM_OUT; ++i) aug_out[i].push_back(res.at(i));
-
-  // Get input and output expressions from backward problem
-  std::vector<MatType> rarg = arg;
-  for (casadi_int i = DYN_NUM_IN; i < BDYN_NUM_IN; ++i) {
-    rarg.push_back(MatType::zeros(this_rdae.sparsity_in(i)));
-  }
-  std::vector<MatType> rres = this_rdae(rarg);
-
-  // Reverse mode directional derivatives
-  std::vector<MatType> rseed1(BDYN_NUM_OUT);
-  for (casadi_int i = 0; i < BDYN_NUM_OUT; ++i) {
-    rseed1[i] = MatType::sym("aug_" + bdyn_out(i), this_rdae.numel_out(i), nadj);
-  }
-
-  aug_in[DYN_X].push_back(vec(rseed1[BDYN_ADJ_X]));
-  aug_in[DYN_Z].push_back(vec(rseed1[BDYN_ADJ_Z]));
-  aug_in[DYN_P].push_back(vec(rseed1[BDYN_ADJ_P]));
-  aug_in[DYN_U].push_back(vec(rseed1[BDYN_ADJ_U]));
-
-  // Calculate directional derivatives, rdae
-  std::vector<MatType> v = rarg;
-  v.insert(v.end(), rres.begin(), rres.end());
-  v.insert(v.end(), rseed1.begin(), rseed1.end());
-  std::vector<MatType> rsens1 = this_rdae.reverse(nadj)(v);
-
-  // Collect sensitivity equations
-  casadi_assert_dev(rsens1.size() == BDYN_NUM_IN);
-  aug_out[DYN_ODE].push_back(vec(rsens1[BDYN_ADJ_ODE]));
-  aug_out[DYN_ALG].push_back(vec(rsens1[BDYN_ADJ_ALG]));
-  aug_out[DYN_QUAD].push_back(vec(rsens1[BDYN_ADJ_QUAD]));
-
-  // Concatenate expressions
-  for (casadi_int i = 0; i < DYN_NUM_IN; ++i) arg.at(i) = vertcat(aug_in[i]);
-  for (casadi_int i = 0; i < DYN_NUM_OUT; ++i) res.at(i) = vertcat(aug_out[i]);
-
-  // Convert to oracle function and return
-  std::string aug_prefix = "asens" + str(nadj) + "_";
-  std::string dae_name = aug_prefix + this_dae.name();
-  return Function(dae_name, arg, res, dyn_in(), dyn_out());
-}
-
-template<typename MatType>
-Function Integrator::get_reverse_rdae(const Function& this_dae, const Function& this_rdae,
-    casadi_int nadj) const {
-  if (verbose_) casadi_message(name_ + "::get_reverse_rdae");
-
-  // Symbolic expression for augmented DAE`
-  std::vector<std::vector<MatType>> aug_in(BDYN_NUM_IN);
-  std::vector<std::vector<MatType>> aug_out(BDYN_NUM_OUT);
-
-  // Input and output expressions
-  std::vector<MatType> arg;
-  std::vector<MatType> rres(BDYN_NUM_OUT);
-
-  // Seeds and sensitivities for the backward problem
-  std::vector<std::vector<MatType>> rseed(nadj, std::vector<MatType>(BDYN_NUM_OUT));
-  std::vector<std::vector<MatType>> rsens;
-
-  if (!this_rdae.is_null()) {
-    // Get input and output expressions from backward problem
-    arg = MatType::get_input(this_rdae);
-    rres = this_rdae(arg);
-
-    // Seeds for the backward problem
-    for (casadi_int d = 0; d < nadj; ++d) {
-      std::string pref = "aug" + str(d) + "_";
-      for (casadi_int i = 0; i < BDYN_NUM_OUT; ++i) {
-        if (i == BDYN_ADJ_T) {
-          rseed[d][i] = MatType::zeros(this_rdae.sparsity_out(i));
-        } else {
-          rseed[d][i] = MatType::sym(pref + bdyn_out(i), this_rdae.sparsity_out(i));
-        }
-      }
-    }
-
-    // Calculate directional derivatives, rdae
-    bool always_inline = this_rdae.is_a("SXFunction") || this_rdae.is_a("MXFunction");
-    this_rdae->call_reverse(arg, rres, rseed, rsens, always_inline, false);
-
-    // Collect augmented problem expressions
-    for (casadi_int i = 0; i < BDYN_NUM_IN; ++i) aug_in[i].push_back(arg.at(i));
-    for (casadi_int i = 0; i < BDYN_NUM_OUT; ++i) aug_out[i].push_back(rres.at(i));
-    for (casadi_int d = 0; d < nadj; ++d) {
-      aug_in[BDYN_X].push_back(rseed[d][BDYN_ADJ_X]);
-      aug_in[BDYN_Z].push_back(rseed[d][BDYN_ADJ_Z]);
-      aug_in[BDYN_P].push_back(rseed[d][BDYN_ADJ_P]);
-      aug_in[BDYN_U].push_back(rseed[d][BDYN_ADJ_U]);
-    }
-
-    // Discregard additional entries in arg
-    arg.resize(DYN_NUM_IN);
-  } else {
-    // Get input expressions from forward problem
-    arg = MatType::get_input(this_dae);
-
-    // Collect input expressions
-    for (casadi_int i = 0; i < DYN_NUM_IN; ++i) aug_in[i].push_back(arg.at(i));
-  }
-
-  // Get input and output expressions
-  std::vector<MatType> res = this_dae(arg);
-
-  // Seeds and sensitivities for the forward problem
-  std::vector<std::vector<MatType>> seed(nadj, std::vector<MatType>(DYN_NUM_OUT));
-  std::vector<std::vector<MatType>> sens;
-
-  for (casadi_int d = 0; d < nadj; ++d) {
-    std::string pref = "aug" + str(d) + "_";
-    for (casadi_int i = 0; i < DYN_NUM_OUT; ++i) {
-      seed[d][i] = MatType::sym(pref + dyn_out(i), this_dae.sparsity_out(i));
-    }
-    aug_in[BDYN_ADJ_ODE].push_back(seed[d][DYN_ODE]);
-    aug_in[BDYN_ADJ_ALG].push_back(seed[d][DYN_ALG]);
-    aug_in[BDYN_ADJ_QUAD].push_back(seed[d][DYN_QUAD]);
-  }
-
-  // Calculate directional derivatives
-  bool always_inline = this_dae.is_a("SXFunction") || this_dae.is_a("MXFunction");
-  this_dae->call_reverse(arg, res, seed, sens, always_inline, false);
-
-  if (this_rdae.is_null()) {
-    // Collect sensitivity equations
-    casadi_assert_dev(sens.size()==nadj);
-    for (casadi_int d = 0; d < nadj; ++d) {
-      casadi_assert_dev(sens[d].size() == DYN_NUM_IN);
-      aug_out[BDYN_ADJ_X].push_back(project(sens[d][DYN_X], this_dae.sparsity_in(DYN_X)));
-      aug_out[BDYN_ADJ_Z].push_back(project(sens[d][DYN_Z], this_dae.sparsity_in(DYN_Z)));
-      aug_out[BDYN_ADJ_P].push_back(project(sens[d][DYN_P], this_dae.sparsity_in(DYN_P)));
-      aug_out[BDYN_ADJ_U].push_back(project(sens[d][DYN_U], this_dae.sparsity_in(DYN_U)));
-    }
-  } else {
-    // Collect sensitivity equations
-    casadi_assert_dev(sens.size()==nadj);
-    for (casadi_int d = 0; d < nadj; ++d) {
-      casadi_assert_dev(sens[d].size() == DYN_NUM_IN);
-      aug_out[BDYN_ADJ_X].push_back(project(sens[d][DYN_X] + rsens[d][BDYN_X],
-        this_dae.sparsity_in(DYN_X)));
-      aug_out[BDYN_ADJ_Z].push_back(project(sens[d][DYN_Z] + rsens[d][BDYN_Z],
-        this_dae.sparsity_in(DYN_Z)));
-      aug_out[BDYN_ADJ_P].push_back(project(sens[d][DYN_P] + rsens[d][BDYN_P],
-        this_dae.sparsity_in(DYN_P)));
-      aug_out[BDYN_ADJ_U].push_back(project(sens[d][DYN_U] + rsens[d][BDYN_U],
-        this_dae.sparsity_in(DYN_U)));
-    }
-  }
-
-  // Concatenate expressions
-  arg.resize(BDYN_NUM_IN);
-  for (casadi_int i = 0; i < BDYN_NUM_IN; ++i) arg.at(i) = vertcat(aug_in[i]);
-  for (casadi_int i = 0; i < BDYN_NUM_OUT; ++i) rres.at(i) = vertcat(aug_out[i]);
-
-  // Create backwards DAE and return
-  return Function("rdae", arg, rres, bdyn_in(), bdyn_out());
 }
 
 int Integrator::fdae_sp_forward(SpForwardMem* m, const bvec_t* x,
@@ -1563,14 +1287,13 @@ Function Integrator::get_forward(casadi_int nfwd, const std::string& name,
   }
 
   // Get current DAE, with any existing sensitivity equations augmented
-  Function this_dae, this_rdae;
-  this_dae = augmented_dae(&this_rdae);
+  Function this_dae = augmented_dae();
 
   // Create integrator for augmented DAE
   std::string aug_prefix = "fsens" + str(nfwd) + "_";
   aug_opts["derivative_of"] = self();
   aug_opts["nfwd"] = nfwd;
-  if (!this_rdae.is_null()) aug_opts["rdae"] = this_rdae;
+  aug_opts["nadj"] = nadj_;
   Function aug_int = integrator(aug_prefix + name_, plugin_name(),
     this_dae, t0_, tout_, aug_opts);
 
@@ -1670,25 +1393,23 @@ Function Integrator::get_reverse(casadi_int nadj, const std::string& name,
     aug_opts[i.first] = i.second;
   }
 
-  // Get the current oracle, augmented with forward sensitivity equations if any
-  Function this_dae, this_rdae;
-  this_dae = augmented_dae(&this_rdae);
+  // Get the current oracle, augmented with any existing forward sensitivity equations
+  Function this_dae = augmented_dae();
 
   // Create integrator for augmented DAE
-  Function aug_dae, aug_rdae;
   std::string aug_prefix = "asens" + str(nadj) + "_";
-  if (this_dae.is_a("SXFunction")) {
-    aug_dae = get_reverse_dae<SX>(this_dae, this_rdae, nadj);
-    aug_rdae = get_reverse_rdae<SX>(this_dae, this_rdae, nadj);
-  } else {
-    aug_dae = get_reverse_dae<MX>(this_dae, this_rdae, nadj);
-    aug_rdae = get_reverse_rdae<MX>(this_dae, this_rdae, nadj);
-  }
   aug_opts["derivative_of"] = self();
-  aug_opts["nfwd"] = 0;
-  if (!aug_rdae.is_null()) aug_opts["rdae"] = aug_rdae;
+  if (nrx_ == 0) {
+    // Add backward problem
+    aug_opts["nadj"] = nadj;
+    aug_opts["nfwd"] = 0;
+  } else {
+    // Reformulate as forward-over-reverse
+    aug_opts["nfwd"] = nadj;
+    aug_opts["nadj"] = nadj_;
+  }
   Function aug_int = integrator(aug_prefix + name_, plugin_name(),
-    aug_dae, t0_, tout_, aug_opts);
+    this_dae, t0_, tout_, aug_opts);
 
   // All inputs of the return function
   std::vector<MX> ret_in;
@@ -1751,7 +1472,7 @@ Function Integrator::get_reverse(casadi_int nadj, const std::string& name,
         v.push_back(aug_in_split[d].at(k));
       }
     }
-    integrator_in[i] = reshape(vertcat(v), -1, n_grid);
+    integrator_in[i] = reshape(vertcat(v), aug_int.size_in(i));
   }
   std::vector<MX> integrator_out = aug_int(integrator_in);
 
@@ -2320,7 +2041,7 @@ void ImplicitFixedStepIntegrator::init(const Dict& opts) {
 
 template<typename XType>
 Function Integrator::map2oracle(const std::string& name,
-    const std::map<std::string, XType>& d, Function *rdae) {
+    const std::map<std::string, XType>& d) {
   std::vector<XType> de_in(DYN_NUM_IN), de_out(DYN_NUM_OUT);
   for (auto&& i : d) {
     if (i.first=="t") {

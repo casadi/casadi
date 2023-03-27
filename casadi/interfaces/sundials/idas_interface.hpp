@@ -64,9 +64,6 @@ struct CASADI_INTEGRATOR_IDAS_EXPORT IdasMemory : public SundialsMemory {
   /// Ids of backward problem
   int whichB;
 
-  /// Jacobian memory blocks, forward problem
-  double *jac_ode_x, *jac_alg_x, *jac_ode_z, *jac_alg_z;
-
   /// Jacobian memory blocks, backward problem
   double *jac_adj_x_rx, *jac_adj_z_rx, *jac_adj_x_rz, *jac_adj_z_rz;
 

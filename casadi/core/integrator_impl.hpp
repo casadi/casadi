@@ -269,23 +269,8 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
 
       \identifier{261} */
   template<typename MatType> Function get_forward_dae(const std::string& name) const;
-  template<typename MatType> Function get_forward_rdae(const std::string& name) const;
-  Function augmented_dae(Function* rdae) const;
+  Function augmented_dae() const;
   ///@}
-
-  /** \brief Generate a augmented DAE system, forward problem
-
-      \identifier{262} */
-  template<typename MatType>
-  Function get_reverse_dae(const Function& this_dae, const Function& this_rdae,
-    casadi_int nadj) const;
-
-  /** \brief Generate a augmented DAE system, backward problem
-
-      \identifier{263} */
-  template<typename MatType>
-  Function get_reverse_rdae(const Function& this_dae, const Function& this_rdae,
-    casadi_int nadj) const;
 
   /// Helper function, get augmented system Jacobian
   Sparsity sp_jac_aug(const Sparsity& J, const Sparsity& J1) const;
@@ -372,9 +357,7 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
 
   /// Convert dictionary to Problem
   template<typename XType>
-    static Function map2oracle(const std::string& name, const std::map<std::string, XType>& d,
-      Function *rdae);
-
+  static Function map2oracle(const std::string& name, const std::map<std::string, XType>& d);
 
   /** \brief Serialize an object without type information
 
