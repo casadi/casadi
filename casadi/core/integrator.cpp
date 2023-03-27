@@ -859,8 +859,8 @@ Function Integrator::get_reverse_dae(const Function& this_dae, const Function& t
   std::vector<MatType> res = this_dae(arg);
 
   // Add forward problem to augmented DAE
-  for (casadi_int i = 0; i < DYN_NUM_IN; ++i) aug_in[i].push_back(arg.at(i));
-  for (casadi_int i = 0; i < DYN_NUM_OUT; ++i) aug_out[i].push_back(res.at(i));
+  for (casadi_int i = 0; i < DYN_NUM_IN; ++i) aug_in[i].push_back(vec(arg.at(i)));
+  for (casadi_int i = 0; i < DYN_NUM_OUT; ++i) aug_out[i].push_back(vec(res.at(i)));
 
   // Get input and output expressions from backward problem
   std::vector<MatType> rarg = arg;
@@ -869,10 +869,18 @@ Function Integrator::get_reverse_dae(const Function& this_dae, const Function& t
   }
   std::vector<MatType> rres = this_rdae(rarg);
 
+  // Adjoint of backwards DAE
+  Function adj_rdae = this_rdae.reverse(nadj);
+
   // Reverse mode directional derivatives
   std::vector<MatType> rseed1(BDYN_NUM_OUT);
   for (casadi_int i = 0; i < BDYN_NUM_OUT; ++i) {
-    rseed1[i] = MatType::sym("aug_" + bdyn_out(i), this_rdae.numel_out(i), nadj);
+    const Sparsity& sp = adj_rdae.sparsity_in(BDYN_NUM_IN + BDYN_NUM_OUT + i);
+    if (i == BDYN_T) {
+      rseed1[i] = MatType(sp.size());
+    } else {
+      rseed1[i] = MatType::sym("aug_" + bdyn_out(i), sp);
+    }
   }
 
   aug_in[DYN_X].push_back(vec(rseed1[BDYN_ADJ_X]));
@@ -884,7 +892,7 @@ Function Integrator::get_reverse_dae(const Function& this_dae, const Function& t
   std::vector<MatType> v = rarg;
   v.insert(v.end(), rres.begin(), rres.end());
   v.insert(v.end(), rseed1.begin(), rseed1.end());
-  std::vector<MatType> rsens1 = this_rdae.reverse(nadj)(v);
+  std::vector<MatType> rsens1 = adj_rdae(v);
 
   // Collect sensitivity equations
   casadi_assert_dev(rsens1.size() == BDYN_NUM_IN);
@@ -941,13 +949,13 @@ Function Integrator::get_reverse_rdae(const Function& this_dae, const Function& 
     this_rdae->call_reverse(arg, rres, rseed, rsens, always_inline, false);
 
     // Collect augmented problem expressions
-    for (casadi_int i = 0; i < BDYN_NUM_IN; ++i) aug_in[i].push_back(arg.at(i));
-    for (casadi_int i = 0; i < BDYN_NUM_OUT; ++i) aug_out[i].push_back(rres.at(i));
+    for (casadi_int i = 0; i < BDYN_NUM_IN; ++i) aug_in[i].push_back(vec(arg.at(i)));
+    for (casadi_int i = 0; i < BDYN_NUM_OUT; ++i) aug_out[i].push_back(vec(rres.at(i)));
     for (casadi_int d = 0; d < nadj; ++d) {
-      aug_in[BDYN_X].push_back(rseed[d][BDYN_ADJ_X]);
-      aug_in[BDYN_Z].push_back(rseed[d][BDYN_ADJ_Z]);
-      aug_in[BDYN_P].push_back(rseed[d][BDYN_ADJ_P]);
-      aug_in[BDYN_U].push_back(rseed[d][BDYN_ADJ_U]);
+      aug_in[BDYN_X].push_back(vec(rseed[d][BDYN_ADJ_X]));
+      aug_in[BDYN_Z].push_back(vec(rseed[d][BDYN_ADJ_Z]));
+      aug_in[BDYN_P].push_back(vec(rseed[d][BDYN_ADJ_P]));
+      aug_in[BDYN_U].push_back(vec(rseed[d][BDYN_ADJ_U]));
     }
 
     // Discregard additional entries in arg
@@ -957,7 +965,7 @@ Function Integrator::get_reverse_rdae(const Function& this_dae, const Function& 
     arg = MatType::get_input(this_dae);
 
     // Collect input expressions
-    for (casadi_int i = 0; i < DYN_NUM_IN; ++i) aug_in[i].push_back(arg.at(i));
+    for (casadi_int i = 0; i < DYN_NUM_IN; ++i) aug_in[i].push_back(vec(arg.at(i)));
   }
 
   // Get input and output expressions
@@ -972,9 +980,9 @@ Function Integrator::get_reverse_rdae(const Function& this_dae, const Function& 
     for (casadi_int i = 0; i < DYN_NUM_OUT; ++i) {
       seed[d][i] = MatType::sym(pref + dyn_out(i), this_dae.sparsity_out(i));
     }
-    aug_in[BDYN_ADJ_ODE].push_back(seed[d][DYN_ODE]);
-    aug_in[BDYN_ADJ_ALG].push_back(seed[d][DYN_ALG]);
-    aug_in[BDYN_ADJ_QUAD].push_back(seed[d][DYN_QUAD]);
+    aug_in[BDYN_ADJ_ODE].push_back(vec(seed[d][DYN_ODE]));
+    aug_in[BDYN_ADJ_ALG].push_back(vec(seed[d][DYN_ALG]));
+    aug_in[BDYN_ADJ_QUAD].push_back(vec(seed[d][DYN_QUAD]));
   }
 
   // Calculate directional derivatives
@@ -986,24 +994,24 @@ Function Integrator::get_reverse_rdae(const Function& this_dae, const Function& 
     casadi_assert_dev(sens.size()==nadj);
     for (casadi_int d = 0; d < nadj; ++d) {
       casadi_assert_dev(sens[d].size() == DYN_NUM_IN);
-      aug_out[BDYN_ADJ_X].push_back(project(sens[d][DYN_X], this_dae.sparsity_in(DYN_X)));
-      aug_out[BDYN_ADJ_Z].push_back(project(sens[d][DYN_Z], this_dae.sparsity_in(DYN_Z)));
-      aug_out[BDYN_ADJ_P].push_back(project(sens[d][DYN_P], this_dae.sparsity_in(DYN_P)));
-      aug_out[BDYN_ADJ_U].push_back(project(sens[d][DYN_U], this_dae.sparsity_in(DYN_U)));
+      aug_out[BDYN_ADJ_X].push_back(vec(project(sens[d][DYN_X], this_dae.sparsity_in(DYN_X))));
+      aug_out[BDYN_ADJ_Z].push_back(vec(project(sens[d][DYN_Z], this_dae.sparsity_in(DYN_Z))));
+      aug_out[BDYN_ADJ_P].push_back(vec(project(sens[d][DYN_P], this_dae.sparsity_in(DYN_P))));
+      aug_out[BDYN_ADJ_U].push_back(vec(project(sens[d][DYN_U], this_dae.sparsity_in(DYN_U))));
     }
   } else {
     // Collect sensitivity equations
     casadi_assert_dev(sens.size()==nadj);
     for (casadi_int d = 0; d < nadj; ++d) {
       casadi_assert_dev(sens[d].size() == DYN_NUM_IN);
-      aug_out[BDYN_ADJ_X].push_back(project(sens[d][DYN_X] + rsens[d][BDYN_X],
-        this_dae.sparsity_in(DYN_X)));
-      aug_out[BDYN_ADJ_Z].push_back(project(sens[d][DYN_Z] + rsens[d][BDYN_Z],
-        this_dae.sparsity_in(DYN_Z)));
-      aug_out[BDYN_ADJ_P].push_back(project(sens[d][DYN_P] + rsens[d][BDYN_P],
-        this_dae.sparsity_in(DYN_P)));
-      aug_out[BDYN_ADJ_U].push_back(project(sens[d][DYN_U] + rsens[d][BDYN_U],
-        this_dae.sparsity_in(DYN_U)));
+      aug_out[BDYN_ADJ_X].push_back(vec(project(sens[d][DYN_X] + rsens[d][BDYN_X],
+        this_dae.sparsity_in(DYN_X))));
+      aug_out[BDYN_ADJ_Z].push_back(vec(project(sens[d][DYN_Z] + rsens[d][BDYN_Z],
+        this_dae.sparsity_in(DYN_Z))));
+      aug_out[BDYN_ADJ_P].push_back(vec(project(sens[d][DYN_P] + rsens[d][BDYN_P],
+        this_dae.sparsity_in(DYN_P))));
+      aug_out[BDYN_ADJ_U].push_back(vec(project(sens[d][DYN_U] + rsens[d][BDYN_U],
+        this_dae.sparsity_in(DYN_U))));
     }
   }
 
