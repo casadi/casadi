@@ -220,7 +220,6 @@ if (ALPAQA_WITH_LBFGSB)
     message(STATUS "Compiling L-BFGS-B solver adapter")
     add_library(lbfgsb-fortran STATIC
         "thirdparty/lbfgsb/Lbfgsb.3.0/lbfgsb.f"
-        "thirdparty/lbfgsb/Lbfgsb.3.0/lbfgsb_c.f90"
         "thirdparty/lbfgsb/Lbfgsb.3.0/timer.f"
         "thirdparty/lbfgsb/Lbfgsb.3.0/blas.f"
         "thirdparty/lbfgsb/Lbfgsb.3.0/linpack.f"
@@ -233,6 +232,7 @@ if (ALPAQA_WITH_LBFGSB)
     add_library(lbfgsb-adapter
         "interop/lbfgsb/src/lbfgsb-adapter.cpp"
         "interop/lbfgsb/src/lbfgsb-params.cpp"
+        "interop/lbfgsb/src/lbfgsb_c.f90"
     )
     target_link_libraries(lbfgsb-adapter 
         PUBLIC lbfgsb-fortran alpaqa::alpaqa PRIVATE alpaqa::warnings)

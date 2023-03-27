@@ -5,10 +5,10 @@
 #include <stdexcept>
 
 extern "C" {
-void setulb_c(int n, int m, double *x, const double *l, const double *u,
-              const int *nbd, double &f, double *g, double factr, double pgtol,
-              double *wa, int *iwa, char *task, int iprint, char *csave,
-              bool *lsave, int *isave, double *dsave);
+void alpaqa_setulb_c(int n, int m, double *x, const double *l, const double *u,
+                     const int *nbd, double &f, double *g, double factr,
+                     double pgtol, double *wa, int *iwa, char *task, int iprint,
+                     char *csave, bool *lsave, int *isave, double *dsave);
 }
 
 namespace alpaqa::lbfgsb {
@@ -122,11 +122,11 @@ auto LBFGSBSolver::operator()(
 
     while (true) {
         // Invoke solver
-        setulb_c(static_cast<int>(n), static_cast<int>(mem), x_solve.data(),
-                 C.lowerbound.data(), C.upperbound.data(), nbd.data(), ψ,
-                 grad_ψ.data(), factr, pgtol, wa.data(), iwa.data(),
-                 task.data(), print, csave.data(), lsave.data(), isave.data(),
-                 dsave.data());
+        alpaqa_setulb_c(static_cast<int>(n), static_cast<int>(mem),
+                        x_solve.data(), C.lowerbound.data(),
+                        C.upperbound.data(), nbd.data(), ψ, grad_ψ.data(),
+                        factr, pgtol, wa.data(), iwa.data(), task.data(), print,
+                        csave.data(), lsave.data(), isave.data(), dsave.data());
 
         // New evaluation
         if (task_sv.starts_with("FG")) {

@@ -5,7 +5,7 @@ module lbfgsb_c
    interface
       subroutine setulb(n, m, x, l, u, nbd, f, g, factr, pgtol, &
          wa, iwa, task, iprint, csave, lsave, isave, dsave)
-         character*60     task, csave
+         character(60)    task, csave
          logical          lsave(4)
          integer          n, m, iprint, nbd(n), iwa(3*n), isave(44)
          double precision f, factr, pgtol, x(n), l(n), u(n), g(n), &
@@ -16,7 +16,7 @@ module lbfgsb_c
 contains
 
    subroutine setulb_c(n, m, x, l, u, nbd, f, g, factr, pgtol, &
-      wa, iwa, task, iprint, csave, lsave, isave, dsave) bind(C, name="setulb_c")
+      wa, iwa, task, iprint, csave, lsave, isave, dsave) bind(C, name="alpaqa_setulb_c")
       integer(c_int), intent(in), value :: n, m
       real(c_double), intent(inout) :: x(n)
       real(c_double), intent(in) :: l(n), u(n)

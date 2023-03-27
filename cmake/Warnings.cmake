@@ -8,13 +8,13 @@ function(add_warnings_target tgt_name warnings_as_errors)
         -pedantic
         -Wpedantic
         -pedantic-errors
-        -Wdouble-promotion
-        -Wswitch-default
-        -Wswitch-enum
+        $<$<COMPILE_LANGUAGE:CXX>:-Wdouble-promotion>
+        $<$<COMPILE_LANGUAGE:CXX>:-Wswitch-default>
+        $<$<COMPILE_LANGUAGE:CXX>:-Wswitch-enum>
+        $<$<COMPILE_LANGUAGE:CXX>:-Wno-missing-braces>
+        $<$<COMPILE_LANGUAGE:CXX>:-Wno-psabi>
         -Wimplicit-fallthrough
         -Wuninitialized
-        -Wno-missing-braces
-        -Wno-psabi
         -Wconversion
     )
     # GCC
