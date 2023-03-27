@@ -637,7 +637,8 @@ int CvodesInterface::psetupB(double t, N_Vector x, N_Vector rx, N_Vector rxdot,
     m->gammaB = gammaB;
 
     // Sparsity patterns
-    const Sparsity& sp_jac_adj_x_rx = s.get_function("jacB").sparsity_out(0);
+    const Sparsity& sp_jac_adj_x_rx = s.nadj_ > 0 ? s.sp_jac_ode_xB_
+      : s.get_function("jacB").sparsity_out(JACB_RODE_RX);
     const Sparsity& sp_jacB = s.linsolB_.sparsity();
 
     // Offset for storing the sparser Jacobian, to allow overwriting entries

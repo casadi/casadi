@@ -239,19 +239,26 @@ void SundialsInterface::init(const Dict& opts) {
     Function jacB;
     Sparsity jacB_sp;
     if (d == 0) {
-      // New Jacobian function
-      jacB = create_function(rdae_, "jacB",
-        {"t", "x", "z", "p", "u", "adj_ode", "adj_alg", "adj_quad"},
-        {"jac:adj_x:adj_ode", "jac:adj_z:adj_ode", "jac:adj_x:adj_alg", "jac:adj_z:adj_alg"});
-      jacB_sp = jacB.sparsity_out(JACB_RODE_RX) + Sparsity::diag(nrx1_);
-      if (nrz1_ > 0) {
-        jacB_sp = horzcat(vertcat(jacB_sp, jacB.sparsity_out(JACB_RALG_RX)),
-          vertcat(jacB.sparsity_out(JACB_RODE_RZ), jacB.sparsity_out(JACB_RALG_RZ)));
+      if (nadj_ > 0) {
+        // New implementation: jacB constructed from jacF
+        jacB_sp = diagcat(std::vector<Sparsity>(nadj_, jacF_sp.T()));
+      } else {
+        // New Jacobian function
+        jacB = create_function(rdae_, "jacB",
+          {"t", "x", "z", "p", "u", "adj_ode", "adj_alg", "adj_quad"},
+          {"jac:adj_x:adj_ode", "jac:adj_z:adj_ode", "jac:adj_x:adj_alg", "jac:adj_z:adj_alg"});
+        jacB_sp = jacB.sparsity_out(JACB_RODE_RX) + Sparsity::diag(nrx1_);
+        if (nrz1_ > 0) {
+          jacB_sp = horzcat(vertcat(jacB_sp, jacB.sparsity_out(JACB_RALG_RX)),
+            vertcat(jacB.sparsity_out(JACB_RODE_RZ), jacB.sparsity_out(JACB_RALG_RZ)));
+        }
       }
     } else {
       // Reuse existing Jacobian function
-      jacB = d->get_function("jacB");
-      set_function(jacB, jacB.name(), true);
+      if (d->has_function("jacB")) {
+        jacB = d->get_function("jacB");
+        set_function(jacB, jacB.name(), true);
+      }
       linsolB_ = d->linsolB_;
       jacB_sp = linsolB_.sparsity();
     }
@@ -308,6 +315,15 @@ void SundialsInterface::init(const Dict& opts) {
   // cf. #3047
   alloc_w(nx_ + nz_); // casadi_trans
   alloc_iw(nx_ + nz_); // casadi_trans
+
+  // Backward problem Jacobian sparsity
+  // Temporary addition (Issue #3047)
+  if (nadj_ > 0) {
+    sp_jac_ode_xB_ = diagcat(std::vector<Sparsity>(nadj_, jacF.sparsity_out(JACF_ODE_X).T()));
+    sp_jac_alg_xB_ = diagcat(std::vector<Sparsity>(nadj_, jacF.sparsity_out(JACF_ALG_X).T()));
+    sp_jac_ode_zB_ = diagcat(std::vector<Sparsity>(nadj_, jacF.sparsity_out(JACF_ODE_Z).T()));
+    sp_jac_alg_zB_ = diagcat(std::vector<Sparsity>(nadj_, jacF.sparsity_out(JACF_ALG_Z).T()));
+  }
 }
 
 void SundialsInterface::set_work(void* mem, const double**& arg, double**& res,
@@ -517,6 +533,12 @@ SundialsInterface::SundialsInterface(DeserializingStream& s) : Integrator(s) {
   s.unpack("SundialsInterface::nonlin_conv_coeff", nonlin_conv_coeff_);
   s.unpack("SundialsInterface::max_order", max_order_);
 
+  // Temporary addition (Issue #3047)
+  s.unpack("SundialsInterface::sp_jac_ode_xB", sp_jac_ode_xB_);
+  s.unpack("SundialsInterface::sp_jac_alg_xB", sp_jac_alg_xB_);
+  s.unpack("SundialsInterface::sp_jac_ode_zB", sp_jac_ode_zB_);
+  s.unpack("SundialsInterface::sp_jac_alg_zB", sp_jac_alg_zB_);
+
   s.unpack("SundialsInterface::linsolF", linsolF_);
   s.unpack("SundialsInterface::linsolB", linsolB_);
 
@@ -553,6 +575,12 @@ void SundialsInterface::serialize_body(SerializingStream &s) const {
 
   s.pack("SundialsInterface::nonlin_conv_coeff", nonlin_conv_coeff_);
   s.pack("SundialsInterface::max_order", max_order_);
+
+  // Temporary addition (Issue #3047)
+  s.pack("SundialsInterface::sp_jac_ode_xB", sp_jac_ode_xB_);
+  s.pack("SundialsInterface::sp_jac_alg_xB", sp_jac_alg_xB_);
+  s.pack("SundialsInterface::sp_jac_ode_zB", sp_jac_ode_zB_);
+  s.pack("SundialsInterface::sp_jac_alg_zB", sp_jac_alg_zB_);
 
   s.pack("SundialsInterface::linsolF", linsolF_);
   s.pack("SundialsInterface::linsolB", linsolB_);
@@ -777,27 +805,26 @@ void SundialsInterface::calc_jacB(SundialsMemory* m, double t, const double* x, 
     calc_jacF(m, t, x, z, m->jac_ode_x, m->jac_alg_x, m->jac_ode_z, m->jac_alg_z);
     // Copy to jacB
     const Function& jacF = get_function("jacF");
-    const Function& jacB = get_function("jacB");
     for (casadi_int d = 0; d < nadj_; ++d) {
       // Copy transposed blocks
       if (jac_adj_x_rx) {
         casadi_trans(m->jac_ode_x, jacF.sparsity_out(JACF_ODE_X),
-          jac_adj_x_rx, jacB.sparsity_out(JACB_RODE_RX), m->iw);
+          jac_adj_x_rx, sp_jac_ode_xB_, m->iw);
         jac_adj_x_rx += jacF.nnz_out(JACF_ODE_X);
       }
       if (jac_adj_z_rx) {
         casadi_trans(m->jac_alg_x, jacF.sparsity_out(JACF_ALG_X),
-          jac_adj_z_rx, jacB.sparsity_out(JACB_RALG_RX), m->iw);
+          jac_adj_z_rx, sp_jac_alg_xB_, m->iw);
         jac_adj_z_rx += jacF.nnz_out(JACF_ALG_X);
       }
       if (jac_adj_x_rz) {
         casadi_trans(m->jac_ode_z, jacF.sparsity_out(JACF_ODE_Z),
-          jac_adj_x_rz, jacB.sparsity_out(JACB_RODE_RZ), m->iw);
+          jac_adj_x_rz, sp_jac_ode_zB_, m->iw);
         jac_adj_x_rz += jacF.nnz_out(JACF_ODE_Z);
       }
       if (jac_adj_z_rz) {
         casadi_trans(m->jac_alg_z, jacF.sparsity_out(JACF_ALG_Z),
-          jac_adj_z_rz, jacB.sparsity_out(JACB_RALG_RZ), m->iw);
+          jac_adj_z_rz, sp_jac_alg_zB_, m->iw);
         jac_adj_z_rz += jacF.nnz_out(JACF_ALG_Z);
       }
     }

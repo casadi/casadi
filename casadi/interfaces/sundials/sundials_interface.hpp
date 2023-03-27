@@ -212,6 +212,9 @@ namespace casadi {
     casadi_int max_order_;
     ///@}
 
+    /// Backward problem Jacobian sparsity
+    Sparsity sp_jac_ode_xB_, sp_jac_alg_xB_, sp_jac_ode_zB_, sp_jac_alg_zB_;
+
     /// Linear solver
     Linsol linsolF_, linsolB_;
 
