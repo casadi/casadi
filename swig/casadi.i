@@ -4508,19 +4508,27 @@ make_property(casadi::Opti, casadi_solver);
       def parameter(self,*args):
         import sys
         import os
-        frame = sys._getframe(1)
-        meta = {"stacktrace": {"file":os.path.abspath(frame.f_code.co_filename),"line":frame.f_lineno,"name":frame.f_code.co_name}}
+        try:
+            frame = sys._getframe(1)
+        except:
+            frame = {}
+        meta = {} if frame is None else {"stacktrace": {"file":os.path.abspath(frame.f_code.co_filename),"line":frame.f_lineno,"name":frame.f_code.co_name}}
         ret = self._parameter(*args)
-        self.update_user_dict(ret, meta)
+        if len(meta)>0:
+            self.update_user_dict(ret, meta)
         return ret
 
       def variable(self,*args):
         import sys
         import os
-        frame = sys._getframe(1)
-        meta = {"stacktrace": {"file":os.path.abspath(frame.f_code.co_filename),"line":frame.f_lineno,"name":frame.f_code.co_name}}
+        try:
+            frame = sys._getframe(1)
+        except:
+            frame = {}
+        meta = {} if frame is None else {"stacktrace": {"file":os.path.abspath(frame.f_code.co_filename),"line":frame.f_lineno,"name":frame.f_code.co_name}}
         ret = self._variable(*args)
-        self.update_user_dict(ret, meta)
+        if len(meta)>0:
+            self.update_user_dict(ret, meta)
         return ret
 
       def subject_to(self,*args):
@@ -4528,10 +4536,14 @@ make_property(casadi::Opti, casadi_solver);
           return self._subject_to()
         import sys
         import os
-        frame = sys._getframe(1)
-        meta = {"stacktrace": {"file":os.path.abspath(frame.f_code.co_filename),"line":frame.f_lineno,"name":frame.f_code.co_name}}
+        try:
+            frame = sys._getframe(1)
+        except:
+            frame = {}
+        meta = {} if frame is None else {"stacktrace": {"file":os.path.abspath(frame.f_code.co_filename),"line":frame.f_lineno,"name":frame.f_code.co_name}}
         ret = self._subject_to(*args)
-        self.update_user_dict(args[0], meta)
+        if len(meta)>0:
+            self.update_user_dict(args[0], meta)
         return ret
     %}
   }
