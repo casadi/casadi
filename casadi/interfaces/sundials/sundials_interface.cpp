@@ -753,7 +753,7 @@ void SundialsInterface::calc_jtimesB(SundialsMemory* m, double t, const double* 
   m->arg[JTIMESB_U] = m->u;  // u
   m->arg[JTIMESB_ADJ_ODE] = rx;  // adj_ode
   m->arg[JTIMESB_ADJ_ALG] = rz;  // adj_alg
-  m->arg[JTIMESB_ADJ_QUAD] = m->rp;  // adj_quad
+  m->arg[JTIMESB_ADJ_QUAD] = nullptr;  // adj_quad
   m->arg[JTIMESB_FWD_ADJ_ODE] = fwd_rx;  // fwd:adj_ode
   m->arg[JTIMESB_FWD_ADJ_ALG] = fwd_rz;  // fwd:adj_alg
   m->res[JTIMESB_FWD_ADJ_X] = fwd_adj_x;  // fwd:adj_x
@@ -773,7 +773,7 @@ void SundialsInterface::calc_jtimesB(SundialsMemory* m, double t, const double* 
     m->arg[JTIMESB_NUM_IN + JTIMESB_NUM_OUT + JTIMESB_ADJ_ALG] =
       rz + nrz1_ * nadj_;  // fwd:adj_alg
     m->arg[JTIMESB_NUM_IN + JTIMESB_NUM_OUT + JTIMESB_ADJ_QUAD] =
-      m->rp + nrp1_ * nadj_;  // fwd:adj_quad
+      nullptr;  // fwd:adj_quad
     m->arg[JTIMESB_NUM_IN + JTIMESB_NUM_OUT + JTIMESB_FWD_ADJ_ODE] =
       fwd_rx + nrx1_ * nadj_;  // fwd:fwd:adj_ode
     m->arg[JTIMESB_NUM_IN + JTIMESB_NUM_OUT + JTIMESB_FWD_ADJ_ALG] =
