@@ -745,43 +745,22 @@ void SundialsInterface::calc_jtimesF(SundialsMemory* m, double t, const double* 
 void SundialsInterface::calc_jtimesB(SundialsMemory* m, double t, const double* x, const double* z,
     const double* rx, const double* rz, const double* fwd_rx, const double* fwd_rz,
     double* fwd_adj_x, double* fwd_adj_z) const {
-  // Evaluate nondifferentiated
-  m->arg[JTIMESB_T] = &t;  // t
-  m->arg[JTIMESB_X] = x;  // x
-  m->arg[JTIMESB_Z] = z;  // z
-  m->arg[JTIMESB_P] = m->p;  // p
-  m->arg[JTIMESB_U] = m->u;  // u
-  m->arg[JTIMESB_ADJ_ODE] = rx;  // adj_ode
-  m->arg[JTIMESB_ADJ_ALG] = rz;  // adj_alg
-  m->arg[JTIMESB_ADJ_QUAD] = nullptr;  // adj_quad
-  m->arg[JTIMESB_FWD_ADJ_ODE] = fwd_rx;  // fwd:adj_ode
-  m->arg[JTIMESB_FWD_ADJ_ALG] = fwd_rz;  // fwd:adj_alg
-  m->res[JTIMESB_FWD_ADJ_X] = fwd_adj_x;  // fwd:adj_x
-  m->res[JTIMESB_FWD_ADJ_Z] = fwd_adj_z;  // fwd:adj_z
-  calc_function(m, "jtimesB");
-  // Evaluate sensitivities
-  if (nfwd_ > 0) {
-    m->arg[JTIMESB_NUM_IN + JTIMESB_FWD_ADJ_X] = fwd_adj_x;  // out:fwd:adj_x
-    m->arg[JTIMESB_NUM_IN + JTIMESB_FWD_ADJ_Z] = fwd_adj_z;  // out:fwd:adj_z
-    m->arg[JTIMESB_NUM_IN + JTIMESB_NUM_OUT + JTIMESB_T] = 0;  // fwd:t
-    m->arg[JTIMESB_NUM_IN + JTIMESB_NUM_OUT + JTIMESB_X] = x + nx1_;  // fwd:x
-    m->arg[JTIMESB_NUM_IN + JTIMESB_NUM_OUT + JTIMESB_Z] = z + nz1_;  // fwd:z
-    m->arg[JTIMESB_NUM_IN + JTIMESB_NUM_OUT + JTIMESB_P] = m->p + np1_;  // fwd:p
-    m->arg[JTIMESB_NUM_IN + JTIMESB_NUM_OUT + JTIMESB_U] = m->u + nu1_;  // fwd:u
-    m->arg[JTIMESB_NUM_IN + JTIMESB_NUM_OUT + JTIMESB_ADJ_ODE] =
-      rx + nrx1_ * nadj_;  // fwd:adj_ode
-    m->arg[JTIMESB_NUM_IN + JTIMESB_NUM_OUT + JTIMESB_ADJ_ALG] =
-      rz + nrz1_ * nadj_;  // fwd:adj_alg
-    m->arg[JTIMESB_NUM_IN + JTIMESB_NUM_OUT + JTIMESB_ADJ_QUAD] =
-      nullptr;  // fwd:adj_quad
-    m->arg[JTIMESB_NUM_IN + JTIMESB_NUM_OUT + JTIMESB_FWD_ADJ_ODE] =
-      fwd_rx + nrx1_ * nadj_;  // fwd:fwd:adj_ode
-    m->arg[JTIMESB_NUM_IN + JTIMESB_NUM_OUT + JTIMESB_FWD_ADJ_ALG] =
-      fwd_rz + nrz1_ * nadj_;  // fwd:fwd:adj_alg
-    m->res[JTIMESB_FWD_ADJ_X] = fwd_adj_x + nrx1_ * nadj_;  // fwd:fwd:adj_x
-    m->res[JTIMESB_FWD_ADJ_Z] = fwd_adj_z + nrz1_ * nadj_;  // fwd:fwd:adj_z
-    calc_function(m, forward_name("jtimesB", nfwd_));
- }
+  // Evaluate nondifferentiated and sensitivities
+  for (casadi_int d = 0; d <= nfwd_; ++d) {
+    m->arg[JTIMESB_T] = &t;  // t
+    m->arg[JTIMESB_X] = x;  // x
+    m->arg[JTIMESB_Z] = z;  // z
+    m->arg[JTIMESB_P] = m->p;  // p
+    m->arg[JTIMESB_U] = m->u;  // u
+    m->arg[JTIMESB_ADJ_ODE] = rx + d * nx1_;  // adj_ode
+    m->arg[JTIMESB_ADJ_ALG] = rz + d * nz1_;  // adj_alg
+    m->arg[JTIMESB_ADJ_QUAD] = nullptr;  // adj_quad
+    m->arg[JTIMESB_FWD_ADJ_ODE] = fwd_rx + d * nrx1_ * nadj_;  // fwd:adj_ode
+    m->arg[JTIMESB_FWD_ADJ_ALG] = fwd_rz + d * nrz1_ * nadj_;  // fwd:adj_alg
+    m->res[JTIMESB_FWD_ADJ_X] = fwd_adj_x + d * nrx1_ * nadj_;  // fwd:adj_x
+    m->res[JTIMESB_FWD_ADJ_Z] = fwd_adj_z + d * nrz1_ * nadj_;  // fwd:adj_z
+    calc_function(m, "jtimesB");
+  }
 }
 
 void SundialsInterface::calc_jacF(SundialsMemory* m, double t, const double* x, const double* z,
