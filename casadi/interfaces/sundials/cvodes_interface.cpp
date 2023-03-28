@@ -528,7 +528,7 @@ int CvodesInterface::psolveB(double t, N_Vector x, N_Vector xB, N_Vector xdotB, 
     casadi_copy(v, s.nrx_, m->v1);
 
     // Solve for undifferentiated right-hand-side, save to output
-    if (s.linsolB_.solve(m->jacB, m->v1, s.nadj_, false, m->mem_linsolB)) return 1;
+    if (s.linsolF_.solve(m->jacF, m->v1, s.nadj_, true, m->mem_linsolF)) return 1;
     v = NV_DATA_S(zvecB); // possibly different from rvecB
     casadi_copy(m->v1, s.nrx1_ * s.nadj_, v);
 
@@ -547,7 +547,7 @@ int CvodesInterface::psolveB(double t, N_Vector x, N_Vector xB, N_Vector xdotB, 
       }
 
       // Solve for sensitivity right-hand-sides
-      if (s.linsolB_.solve(m->jacB, m->v1 + s.nx1_, s.nadj_ * s.nfwd_, false, m->mem_linsolB)) return 1;
+      if (s.linsolF_.solve(m->jacF, m->v1 + s.nx1_, s.nadj_ * s.nfwd_, true, m->mem_linsolF)) return 1;
 
       // Save to output, reordered
       casadi_copy(m->v1 + s.nx1_, s.nx_ - s.nx1_, v + s.nx1_);
@@ -596,7 +596,7 @@ int CvodesInterface::psetupF(double t, N_Vector x, N_Vector xdot, booleantype jo
     }
 
     // Jacobian is now current
-    *jcurPtr = 1;
+    if (jcurPtr) *jcurPtr = 1;
 
     // Prepare the solution of the linear system (e.g. factorize)
     if (s.linsolF_.nfact(m->jacF, m->mem_linsolF)) return 1;
@@ -613,43 +613,11 @@ int CvodesInterface::psetupB(double t, N_Vector x, N_Vector rx, N_Vector rxdot,
     void *user_data, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) {
   try {
     auto m = to_mem(user_data);
-    auto& s = m->self;
     // Store gamma for later
     m->gammaB = gammaB;
+    // We use the same linear solver for the forward problem as for the backward problem
+    return psetupF(t, x, nullptr, jokB, jcurPtrB, -gammaB, user_data, tmp1B, tmp2B, tmp3B);
 
-    // Sparsity patterns
-    const Sparsity& sp_jac_adj_x_rx = s.sp_jac_ode_xB_;
-    const Sparsity& sp_jacB = s.linsolB_.sparsity();
-
-    // Offset for storing the sparser Jacobian, to allow overwriting entries
-    casadi_int jac_offset = sp_jacB.nnz() - sp_jac_adj_x_rx.nnz();
-
-    // Calculate Jacobian
-    if (s.calc_jacB(m, t, NV_DATA_S(x), nullptr, NV_DATA_S(rx), nullptr,
-      m->jacB + jac_offset, nullptr, nullptr, nullptr)) return 1;
-
-    // Project to expected sparsity pattern (with diagonal)
-    casadi_project(m->jacB + jac_offset, sp_jac_adj_x_rx, m->jacB, sp_jacB, m->w);
-
-    // Scale and shift diagonal
-    const casadi_int *colind = sp_jacB.colind(), *row = sp_jacB.row();
-    for (casadi_int c = 0; c < sp_jacB.size2(); ++c) {
-      for (casadi_int k = colind[c]; k < colind[c + 1]; ++k) {
-        casadi_int r = row[k];
-        // Scale Jacobian
-        m->jacB[k] *= gammaB;
-        // Add contribution to diagonal
-        if (r == c) m->jacB[k] += 1;
-      }
-    }
-
-    // Jacobian is now current
-    *jcurPtrB = 1;
-
-    // Prepare the solution of the linear system (e.g. factorize)
-    if (s.linsolB_.nfact(m->jacB, m->mem_linsolB)) return 1;
-
-    return 0;
   } catch(std::exception& e) { // non-recoverable error
     uerr() << "psetupB failed: " << e.what() << std::endl;
     return -1;
