@@ -18,13 +18,18 @@ Most alpaqa solvers deal with problems in the following form:
 \end{equation}
 @f]
 
-At a minimum, the solver needs to be able to evaluate the following functions and derivatives:
+The solver needs to be able to evaluate the following required functions and
+derivatives:
   - @ref alpaqa::TypeErasedProblem::eval_f "eval_f"                     @f$ : \Rn \to \R : x \mapsto f(x) @f$
   - @ref alpaqa::TypeErasedProblem::eval_grad_f "eval_grad_f"           @f$ : \Rn \to \Rn : x \mapsto \nabla f(x) @f$
   - @ref alpaqa::TypeErasedProblem::eval_g "eval_g"                     @f$ : \Rn \to \Rm : x \mapsto g(x) @f$
   - @ref alpaqa::TypeErasedProblem::eval_grad_g_prod "eval_grad_g_prod" @f$ : \Rn \times \Rm \to \Rn : (x, y) \mapsto \nabla g(x)\, y @f$
 
-Additionally, it needs to be able to project onto the rectangular sets
+Usually, [automatic differentiation](https://en.wikipedia.org/wiki/Automatic_differentiation)
+(AD) is used to evaluate the gradients and gradient-vector products. Many AD
+software packages are available, see e.g. <https://autodiff.org/> for an overview.
+
+Additionally, the solver needs to be able to project onto the rectangular sets
 @f[
 \begin{equation}
     \begin{aligned}
@@ -46,9 +51,9 @@ The alpaqa solvers access the problem functions through the API outlined in
 @ref alpaqa::TypeErasedProblem.  
 Usually, problems are defined using C++ structs, providing the evaluations
 described above as public member functions. These problem structs are
-structurally typed, which means that they only need to provide member functions
-with the correct names and signatures. Inheriting from a common base class is
-not required.
+[structurally typed](https://en.wikipedia.org/wiki/Structural_type_system),
+which means that they only need to provide member functions with the correct
+names and signatures. Inheriting from a common base class is not required.
 
 As an example, the following struct defines a problem that can be passed to the
 alpaqa solvers. Detailed descriptions of each function can be found in the
@@ -100,40 +105,15 @@ examples.
   - @ref C++/CustomCppProblem/main.cpp
   - @ref C++/SimpleUnconstrProblem/main.cpp
 
-It is highly recommended to study @ref C++/CustomCppProblem/main.cpp now to see
-how optimization problems can be formulated in practice, before we continue with
-some more specialized use cases.
-
-### Specialized combined evaluations
-
-In practice, the solvers do not evaluate the functions @f$ f(x) @f$ and
-@f$ g @f$ directly. Instead, they evaluate the Lagrangian and augmented
-Lagrangian functions of the problem. In many applications, such as
-single-shooting optimal control problems, some computations are common to the
-evaluation of both @f$ f(x) @f$ and @f$ g(x) @f$, and significant speedups can
-be achieved by providing implementations of functions that evaluate both at the
-same time, or even compute the (augmented) Lagrangian directly. Similarly, when
-using automatic differentiation, evaluation of the gradient @f$ \nabla f(x) @f$
-produces the function value @f$ f(x) @f$ as a byproduct, motivating the
-simultaneous evaluation of these quantities as well.
-
-The full list of these combined evaluations can be found in the @ref alpaqa::TypeErasedProblem "TypeErasedProblem"
-documentation:
-  - @ref alpaqa::TypeErasedProblem::eval_f_grad_f "eval_f_grad_f"
-  - @ref alpaqa::TypeErasedProblem::eval_f_g "eval_f_g"
-  - @ref alpaqa::TypeErasedProblem::eval_f_grad_f_g "eval_f_grad_f_g"
-  - @ref alpaqa::TypeErasedProblem::eval_grad_f_grad_g_prod "eval_grad_f_grad_g_prod"
-  - @ref alpaqa::TypeErasedProblem::eval_grad_L "eval_grad_L"
-  - @ref alpaqa::TypeErasedProblem::eval_ψ "eval_ψ"
-  - @ref alpaqa::TypeErasedProblem::eval_grad_ψ_from_ŷ "eval_grad_ψ_from_ŷ"
-  - @ref alpaqa::TypeErasedProblem::eval_grad_ψ "eval_grad_ψ"
-  - @ref alpaqa::TypeErasedProblem::eval_ψ_grad_ψ "eval_ψ_grad_ψ"
+It is highly recommended to study the @ref C++/CustomCppProblem/main.cpp example
+now to see how optimization problems can be formulated in practice, before we
+continue with some more specialized use cases.
 
 ### Second-order derivatives
 
-Some solvers can exploit information about the Hessians of the (augmented)
+Some solvers can exploit information about the Hessian of the (augmented)
 Lagrangian of the problem. To use these solvers, some of the following functions
-are required:
+are required, they should be added as member functions to your problem struct.
   - @ref alpaqa::TypeErasedProblem::eval_jac_g "eval_jac_g"
   - @ref alpaqa::TypeErasedProblem::get_jac_g_num_nonzeros "get_jac_g_num_nonzeros"
   - @ref alpaqa::TypeErasedProblem::eval_grad_gi "eval_grad_gi"
@@ -144,16 +124,59 @@ are required:
   - @ref alpaqa::TypeErasedProblem::eval_hess_ψ "eval_hess_ψ"
   - @ref alpaqa::TypeErasedProblem::get_hess_ψ_num_nonzeros "get_hess_ψ_num_nonzeros"
 
-Sparse matrices are encoded in compressed-column format. For symmetric Hessian
-matrices, only the upper triangle is stored. Upon initialization, the number of
-nonzeros is queried by the solver using the `get_xyz_num_nonzeros()` function,
-and storage is allocated for the arrays of column/row indices and for the
-nonzero values. Then the `eval_xyz()` function is called once with an empty
-`values` argument, indicating that the column/row indices representing the
-sparsity should be initialized. Subsequent calls to `eval_xyz()` then pass a
-non-empty `values` argument, in addition to the initialized column/row indices,
-and the user should then overwrite the nonzero values of the matrix.
+Sparse matrices are stored in [compressed column storage](https://www.eigen.tuxfamily.org/dox/group__TutorialSparse.html#TutorialSparseIntro)
+(CCS) format. For symmetric Hessian matrices, only the upper triangle is stored.
+Upon initialization, the number of nonzeros is queried by the solver using the
+`get_xyz_num_nonzeros()` function, and storage is allocated for the arrays of
+column/row indices and for the nonzero values. Then the `eval_xyz()` function is
+called once with an empty `values` argument (`values.size() == 0`), indicating
+that the column/row indices representing the sparsity should be initialized.
+Subsequent calls to `eval_xyz()` then pass a non-empty `values` argument, in
+addition to the initialized column/row indices, and the user should then
+overwrite the nonzero values of the matrix.
 
 If the matrix is dense, `get_xyz_num_nonzeros()` should return zero, the
 column/row indices are not used, and the `values` argument to `eval_xyz()`
 provides storage for a dense column-major matrix.
+
+@note   Currently, symmetric dense matrices should store the full matrix, not
+just the upper triangular part. This is different from the sparse case, and we
+might want to change this in the future.
+
+Some solvers do not require the full Hessian matrices, but use Hessian-vector
+products only, for example when using Newton-CG. These products can often be
+computed efficiently using automatic differentiation, at a computational cost
+that's not much higher than a gradient evaluation.
+
+The @ref alpaqa::TypeErasedProblem "TypeErasedProblem" class provides functions
+to query which optional problem functions are available. For example,
+@ref alpaqa::TypeErasedProblem::provides_eval_jac_g "provides_eval_jac_g"
+returns true if the problem provides an implementation for
+@ref alpaqa::TypeErasedProblem::eval_jac_g "eval_jac_g". Calling an optional
+function that is not provided results in an @ref alpaqa::not_implemented_error
+exception being thrown.
+
+### Specialized combined evaluations
+
+In practice, the solvers do not always evaluate the functions @f$ f(x) @f$ and
+@f$ g(x) @f$ directly. Instead, they evaluate the Lagrangian and augmented
+Lagrangian functions of the problem. In many applications, such as
+single-shooting optimal control problems, some computations are common to the
+evaluation of both @f$ f(x) @f$ and @f$ g(x) @f$, and significant speedups can
+be achieved by providing implementations that evaluate both at the same time,
+or even compute the (augmented) Lagrangian directly. Similarly, when using
+automatic differentiation, evaluation of the gradient @f$ \nabla f(x) @f$
+produces the function value @f$ f(x) @f$ as a byproduct, motivating the
+simultaneous evaluation of these quantities as well.
+
+The full list of these combined evaluations can be found in the @ref alpaqa::TypeErasedProblem "TypeErasedProblem"
+documentation. They can be provided in the same fashion as `eval_f` above.
+  - @ref alpaqa::TypeErasedProblem::eval_f_grad_f "eval_f_grad_f"
+  - @ref alpaqa::TypeErasedProblem::eval_f_g "eval_f_g"
+  - @ref alpaqa::TypeErasedProblem::eval_f_grad_f_g "eval_f_grad_f_g"
+  - @ref alpaqa::TypeErasedProblem::eval_grad_f_grad_g_prod "eval_grad_f_grad_g_prod"
+  - @ref alpaqa::TypeErasedProblem::eval_grad_L "eval_grad_L"
+  - @ref alpaqa::TypeErasedProblem::eval_ψ "eval_ψ"
+  - @ref alpaqa::TypeErasedProblem::eval_grad_ψ_from_ŷ "eval_grad_ψ_from_ŷ"
+  - @ref alpaqa::TypeErasedProblem::eval_grad_ψ "eval_grad_ψ"
+  - @ref alpaqa::TypeErasedProblem::eval_ψ_grad_ψ "eval_ψ_grad_ψ"

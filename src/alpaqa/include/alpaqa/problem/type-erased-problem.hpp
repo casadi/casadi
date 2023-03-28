@@ -302,7 +302,7 @@ class TypeErasedProblem : public util::TypeErased<ProblemVTable<Conf>, Allocator
     ///         See @ref ALMParams::penalty_alm_split.
     void eval_proj_multipliers(rvec y, real_t M, index_t penalty_alm_split) const;
     /// **[Required]**
-    /// Function that evaluates a proximal gradient step.
+    /// Function that computes a proximal gradient step.
     /// @param  [in] γ
     ///         Step size, @f$ \gamma \in \R_{>0} @f$
     /// @param  [in] x
@@ -486,19 +486,24 @@ class TypeErasedProblem : public util::TypeErased<ProblemVTable<Conf>, Allocator
 
     /// **[Optional]**
     /// Evaluate both @f$ f(x) @f$ and its gradient, @f$ \nabla f(x) @f$.
+    /// @default_impl   ProblemVTable::default_eval_f_grad_f
     real_t eval_f_grad_f(crvec x, rvec grad_fx) const;
     /// **[Optional]**
     /// Evaluate both @f$ f(x) @f$ and @f$ g(x) @f$.
+    /// @default_impl   ProblemVTable::default_eval_f_g
     real_t eval_f_g(crvec x, rvec g) const;
     /// **[Optional]**
     /// Evaluate @f$ f(x) @f$, its gradient @f$ \nabla f(x) @f$ and @f$ g(x) @f$.
+    /// @default_impl   ProblemVTable::default_eval_f_grad_f_g
     real_t eval_f_grad_f_g(crvec x, rvec grad_fx, rvec g) const;
     /// **[Optional]**
     /// Evaluate both @f$ \nabla f(x) @f$ and @f$ \nabla g(x)\,y @f$.
+    /// @default_impl   ProblemVTable::default_eval_grad_f_grad_g_prod
     void eval_grad_f_grad_g_prod(crvec x, crvec y, rvec grad_f, rvec grad_gxy) const;
     /// **[Optional]**
     /// Evaluate the gradient of the Lagrangian
     /// @f$ \nabla_x L(x, y) = \nabla f(x) + \nabla g(x)\,y @f$
+    /// @default_impl   ProblemVTable::default_eval_grad_L
     void eval_grad_L(crvec x, crvec y, rvec grad_L, rvec work_n) const;
 
     /// @}
@@ -513,6 +518,7 @@ class TypeErasedProblem : public util::TypeErased<ProblemVTable<Conf>, Allocator
     ///   \text{dist}_\Sigma^2\left(g(x) + \Sigma^{-1}y,\;D\right) @f]
     /// @f[ \hat y = \Sigma\, \left(g(x) + \Sigma^{-1}y - \Pi_D\left(g(x)
     ///   + \Sigma^{-1}y\right)\right) @f]
+    /// @default_impl   ProblemVTable::default_eval_ψ
     real_t eval_ψ(crvec x, ///< [in]  Decision variable @f$ x @f$
                   crvec y, ///< [in]  Lagrange multipliers @f$ y @f$
                   crvec Σ, ///< [in]  Penalty weights @f$ \Sigma @f$
@@ -520,6 +526,7 @@ class TypeErasedProblem : public util::TypeErased<ProblemVTable<Conf>, Allocator
     ) const;
     /// **[Optional]**
     /// Calculate ∇ψ(x) using ŷ.
+    /// @default_impl   ProblemVTable::default_eval_grad_ψ_from_ŷ
     void eval_grad_ψ_from_ŷ(crvec x,     ///< [in]  Decision variable @f$ x @f$
                             crvec ŷ,     ///< [in]  @f$ \hat y @f$
                             rvec grad_ψ, ///< [out] @f$ \nabla \psi(x) @f$
@@ -528,6 +535,7 @@ class TypeErasedProblem : public util::TypeErased<ProblemVTable<Conf>, Allocator
     /// **[Optional]**
     /// Calculate the gradient ∇ψ(x).
     /// @f[ \nabla \psi(x) = \nabla f(x) + \nabla g(x)\,\hat y(x) @f]
+    /// @default_impl   ProblemVTable::default_eval_grad_ψ
     void eval_grad_ψ(crvec x,     ///< [in]  Decision variable @f$ x @f$
                      crvec y,     ///< [in]  Lagrange multipliers @f$ y @f$
                      crvec Σ,     ///< [in]  Penalty weights @f$ \Sigma @f$
@@ -540,6 +548,7 @@ class TypeErasedProblem : public util::TypeErased<ProblemVTable<Conf>, Allocator
     /// @f[ \psi(x) = f(x) + \tfrac{1}{2}
     /// \text{dist}_\Sigma^2\left(g(x) + \Sigma^{-1}y,\;D\right) @f]
     /// @f[ \nabla \psi(x) = \nabla f(x) + \nabla g(x)\,\hat y(x) @f]
+    /// @default_impl   ProblemVTable::default_eval_ψ_grad_ψ
     real_t eval_ψ_grad_ψ(crvec x,     ///< [in]  Decision variable @f$ x @f$
                          crvec y,     ///< [in]  Lagrange multipliers @f$ y @f$
                          crvec Σ,     ///< [in]  Penalty weights @f$ \Sigma @f$

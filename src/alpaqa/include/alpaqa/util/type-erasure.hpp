@@ -102,7 +102,7 @@ struct BasicVTable {
     required_function_t<void(void *storage)> move = nullptr;
     /// Destruct the given instance.
     required_function_t<void()> destroy = nullptr;
-    /// The original type of the stored object (available in debug mode only).
+    /// The original type of the stored object.
     const std::type_info *type = &typeid(void);
 
     BasicVTable() = default;
