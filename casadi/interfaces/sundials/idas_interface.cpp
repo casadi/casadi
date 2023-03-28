@@ -725,10 +725,14 @@ int IdasInterface::psolveB(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB,
     double* vz = vx + s.nrx_;
     double* v_it = m->v1;
     for (int d = 0; d <= s.nfwd_; ++d) {
-      casadi_copy(vx + d * s.nrx1_ * s.nadj_, s.nrx1_ * s.nadj_, v_it);
-      v_it += s.nrx1_ * s.nadj_;
-      casadi_copy(vz + d * s.nrz1_ * s.nadj_, s.nrz1_ * s.nadj_, v_it);
-      v_it += s.nrz1_ * s.nadj_;
+      for (int a = 0; a < s.nadj_; ++a) {
+        casadi_copy(vx + (d * s.nadj_ + a) * s.nrx1_, s.nrx1_, v_it);
+        v_it += s.nrx1_;
+      }
+      for (int a = 0; a < s.nadj_; ++a) {
+        casadi_copy(vz + (d * s.nadj_ + a) * s.nrz1_, s.nrz1_, v_it);
+        v_it += s.nrz1_;
+      }
     }
 
     // Solve for undifferentiated right-hand-side, save to output
@@ -736,8 +740,10 @@ int IdasInterface::psolveB(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB,
       casadi_error("'jacB' solve failed");
     vx = NV_DATA_S(zvecB); // possibly different from rvecB
     vz = vx + s.nrx_;
-    casadi_copy(m->v1, s.nrx1_ * s.nadj_, vx);
-    casadi_copy(m->v1 + s.nrx1_ * s.nadj_, s.nrz1_ * s.nadj_, vz);
+    for (int a = 0; a < s.nadj_; ++a) {
+      casadi_copy(m->v1 + a * s.nrx1_, s.nrx1_, vx + a * s.nrx1_);
+      casadi_copy(m->v1 + s.nrx1_ * s.nadj_ + a * s.nrz1_, s.nrz1_, vz + a * s.nrz1_);
+    }
 
     // Sensitivity equations
     if (s.nfwd_ > 0) {
@@ -755,10 +761,14 @@ int IdasInterface::psolveB(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB,
         // Subtract m->v2 (reordered) from m->v1
         v_it = m->v1 + (s.nrx1_ + s.nrz1_) * s.nadj_;
         for (int d = 1; d <= s.nfwd_; ++d) {
-          casadi_axpy(s.nrx1_ * s.nadj_, -1., m->v2 + d * s.nrx1_ * s.nadj_, v_it);
-          v_it += s.nrx1_ * s.nadj_;
-          casadi_axpy(s.nrz1_ * s.nadj_, -1., m->v2 + s.nrx_ + d * s.nrz1_ * s.nadj_, v_it);
-          v_it += s.nrz1_ * s.nadj_;
+          for (int a = 0; a < s.nadj_; ++a) {
+            casadi_axpy(s.nrx1_, -1., m->v2 + s.nrx1_ * (d * s.nadj_ + a), v_it);
+            v_it += s.nrx1_;
+          }
+          for (int a = 0; a < s.nadj_; ++a) {
+            casadi_axpy(s.nrz1_, -1., m->v2 + s.nrx_ + s.nrz1_ * (d * s.nadj_ + a), v_it);
+            v_it += s.nrz1_;
+          }
         }
       }
 
@@ -771,10 +781,14 @@ int IdasInterface::psolveB(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB,
       // Save to output, reordered
       v_it = m->v1 + s.nrx1_ * s.nadj_ + s.nrz1_ * s.nadj_;
       for (int d = 1; d <= s.nfwd_; ++d) {
-        casadi_copy(v_it, s.nrx1_ * s.nadj_, vx + d * s.nrx1_ * s.nadj_);
-        v_it += s.nrx1_ * s.nadj_;
-        casadi_copy(v_it, s.nrz1_ * s.nadj_, vz + d * s.nrz1_ * s.nadj_);
-        v_it += s.nrz1_ * s.nadj_;
+        for (int a = 0; a < s.nadj_; ++a) {
+          casadi_copy(v_it, s.nrx1_, vx + s.nrx1_ * (d * s.nadj_ + a));
+          v_it += s.nrx1_;
+        }
+        for (int a = 0; a < s.nadj_; ++a) {
+          casadi_copy(v_it, s.nrz1_, vz + s.nrz1_ * (d * s.nadj_ + a));
+          v_it += s.nrz1_;
+        }
       }
     }
 
