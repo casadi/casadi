@@ -171,11 +171,11 @@ simultaneous evaluation of these quantities as well.
 
 The full list of these combined evaluations can be found in the @ref alpaqa::TypeErasedProblem "TypeErasedProblem"
 documentation. They can be provided in the same fashion as `eval_f` above.
-  - @ref alpaqa::TypeErasedProblem::eval_f_grad_f "eval_f_grad_f"
-  - @ref alpaqa::TypeErasedProblem::eval_f_g "eval_f_g"
-  - @ref alpaqa::TypeErasedProblem::eval_grad_f_grad_g_prod "eval_grad_f_grad_g_prod"
-  - @ref alpaqa::TypeErasedProblem::eval_grad_L "eval_grad_L"
-  - @ref alpaqa::TypeErasedProblem::eval_ψ "eval_ψ"
-  - @ref alpaqa::TypeErasedProblem::eval_grad_ψ_from_ŷ "eval_grad_ψ_from_ŷ"
-  - @ref alpaqa::TypeErasedProblem::eval_grad_ψ "eval_grad_ψ"
-  - @ref alpaqa::TypeErasedProblem::eval_ψ_grad_ψ "eval_ψ_grad_ψ"
+  - @ref alpaqa::TypeErasedProblem::eval_f_grad_f "eval_f_grad_f": @f$ f(x) @f$ and @f$ \nabla f(x) @f$
+  - @ref alpaqa::TypeErasedProblem::eval_f_g "eval_f_g": @f$ f(x) @f$ and @f$ g(x) @f$
+  - @ref alpaqa::TypeErasedProblem::eval_grad_f_grad_g_prod "eval_grad_f_grad_g_prod": @f$ \nabla f(x) @f$ and @f$ \nabla g(x)\,y @f$
+  - @ref alpaqa::TypeErasedProblem::eval_grad_L "eval_grad_L": gradient of Lagrangian: @f$ \nabla L(x, y) = \nabla f(x) + \nabla g(x)\,y @f$
+  - @ref alpaqa::TypeErasedProblem::eval_ψ "eval_ψ": augmented Lagrangian: @f$ \psi(x) @f$
+  - @ref alpaqa::TypeErasedProblem::eval_grad_ψ_from_ŷ "eval_grad_ψ_from_ŷ": gradient of augmented Lagrangian: @f$ \nabla \psi(x) @f$
+  - @ref alpaqa::TypeErasedProblem::eval_grad_ψ "eval_grad_ψ": gradient of augmented Lagrangian: @f$ \nabla \psi(x) @f$
+  - @ref alpaqa::TypeErasedProblem::eval_ψ_grad_ψ "eval_ψ_grad_ψ": augmented Lagrangian and gradient: @f$ \psi(x) @f$ and @f$ \nabla \psi(x) @f$
