@@ -39,7 +39,7 @@ struct TestReqProblem {
     TestReqProblem(TestReqProblem &&) { throw std::logic_error("move"); }
 
     // clang-format off
-    MOCK_METHOD(void, eval_proj_diff_g, (crvec g, rvec p), (const));
+    MOCK_METHOD(void, eval_proj_diff_g, (crvec g, rvec e), (const));
     MOCK_METHOD(void, eval_proj_multipliers, (rvec y, real_t M, index_t penalty_alm_split), (const));
     MOCK_METHOD(real_t, eval_prox_grad_step, (real_t γ, crvec x, crvec grad_ψ, rvec x̂, rvec p), (const));
     MOCK_METHOD(real_t, eval_f, (crvec x), (const));

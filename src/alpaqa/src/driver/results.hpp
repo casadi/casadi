@@ -214,7 +214,7 @@ KKTError compute_kkt_error(
 
     USING_ALPAQA_CONFIG(alpaqa::DefaultConfig);
     const auto n = x.size(), m = y.size();
-    vec z(n), grad_Lx(n), work(n), g(m), v(m);
+    vec z(n), grad_Lx(n), work(n), g(m), e(m);
     // Gradient of Lagrangian, ∇ℒ(x,y) = ∇f(x) + ∇g(x) y
     problem.eval_grad_L(x, y, grad_Lx, work);
     // Eliminate normal cone of bound constraints, z = Π(x - ∇ℒ(x,y)) - x
@@ -223,13 +223,13 @@ KKTError compute_kkt_error(
     auto stationarity = alpaqa::vec_util::norm_inf(z);
     // Constraints, g(x)
     problem.eval_g(x, g);
-    // Distance to feasible set, v = g(x) - Π(g(x))
-    problem.eval_proj_diff_g(g, v);
+    // Distance to feasible set, e = g(x) - Π(g(x))
+    problem.eval_proj_diff_g(g, e);
     // Constraint violation, ‖g(x) - Π(g(x))‖
-    auto constr_violation = alpaqa::vec_util::norm_inf(v);
+    auto constr_violation = alpaqa::vec_util::norm_inf(e);
     // Complementary slackness
     real_t complementarity = std::inner_product(
-        y.begin(), y.end(), v.begin(), real_t(0),
+        y.begin(), y.end(), e.begin(), real_t(0),
         [](real_t acc, real_t yv) { return std::fmax(acc, std::abs(yv)); },
         std::multiplies<>{});
     return {.stationarity     = stationarity,

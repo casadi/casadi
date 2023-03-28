@@ -121,7 +121,7 @@ void register_problems(py::module_ &m) {
                        "Number of general constraints, dimension of :math:`g(x)`")
         .def_readwrite("C", &BoxConstrProblem::C, "Box constraints on :math:`x`")
         .def_readwrite("D", &BoxConstrProblem::D, "Box constraints on :math:`g(x)`")
-        .def("eval_proj_diff_g", &BoxConstrProblem::eval_proj_diff_g, "z"_a, "p"_a)
+        .def("eval_proj_diff_g", &BoxConstrProblem::eval_proj_diff_g, "z"_a, "e"_a)
         .def("eval_proj_multipliers", &BoxConstrProblem::eval_proj_multipliers, "y"_a, "M"_a,
              "penalty_alm_split"_a)
         .def("eval_prox_grad_step", &BoxConstrProblem::eval_prox_grad_step, "γ"_a, "x"_a,
@@ -129,9 +129,9 @@ void register_problems(py::module_ &m) {
         .def(
             "eval_proj_diff_g",
             [](const BoxConstrProblem &prob, crvec z) {
-                vec p(prob.get_m());
-                prob.eval_proj_diff_g(z, p);
-                return p;
+                vec e(prob.get_m());
+                prob.eval_proj_diff_g(z, e);
+                return e;
             },
             "z"_a)
         .def(
@@ -153,7 +153,7 @@ void register_problems(py::module_ &m) {
         PyProblem(py::object o) : o{std::move(o)} {}
 
         // clang-format off
-        void eval_proj_diff_g(crvec z, rvec p) const { py::gil_scoped_acquire gil; o.attr("eval_proj_diff_g")(z, p); }
+        void eval_proj_diff_g(crvec z, rvec e) const { py::gil_scoped_acquire gil; o.attr("eval_proj_diff_g")(z, e); }
         void eval_proj_multipliers(rvec y, real_t M, index_t penalty_alm_split) const { py::gil_scoped_acquire gil; o.attr("eval_proj_multipliers")(y, M, penalty_alm_split); }
         real_t eval_prox_grad_step(real_t γ, crvec x, crvec grad_ψ, rvec x̂, rvec p) const { py::gil_scoped_acquire gil; return py::cast<real_t>(o.attr("eval_prox_grad_step")(γ, x, grad_ψ, x̂, p)); }
         real_t eval_f(crvec x) const { py::gil_scoped_acquire gil; return py::cast<real_t>(o.attr("eval_f")(x)); }
@@ -214,7 +214,7 @@ void register_problems(py::module_ &m) {
             "__deepcopy__", [](const TEProblem &self, py::dict) { return TEProblem{self}; },
             "memo"_a)
         // clang-format off
-        .def("eval_proj_diff_g", &TEProblem::eval_proj_diff_g, "z"_a, "p"_a)
+        .def("eval_proj_diff_g", &TEProblem::eval_proj_diff_g, "z"_a, "e"_a)
         .def("eval_proj_multipliers", &TEProblem::eval_proj_multipliers, "y"_a, "M"_a, "penalty_alm_split"_a)
         .def("eval_prox_grad_step", &TEProblem::eval_prox_grad_step, "γ"_a, "x"_a, "grad_ψ"_a, "x̂"_a, "p"_a)
         .def("eval_f", &TEProblem::eval_f, "x"_a)
@@ -258,9 +258,9 @@ void register_problems(py::module_ &m) {
         .def(
             "eval_proj_diff_g",
             [](const TEProblem &prob, crvec z) {
-                vec p(prob.get_m());
-                prob.eval_proj_diff_g(z, p);
-                return p;
+                vec e(prob.get_m());
+                prob.eval_proj_diff_g(z, e);
+                return e;
             },
             "z"_a)
         .def(

@@ -80,11 +80,11 @@ class CasADiControlProblem {
     [[nodiscard]] length_t get_nc_N() const { return nc_N; }
 
     /// @see @ref TypeErasedControlProblem::eval_proj_diff_g
-    void eval_proj_diff_g(crvec z, rvec p) const {
+    void eval_proj_diff_g(crvec z, rvec e) const {
         for (index_t t = 0; t < N; ++t)
-            p.segment(t * nc, nc) =
+            e.segment(t * nc, nc) =
                 alpaqa::projecting_difference(z.segment(t * nc, nc), D);
-        p.segment(N * nc, nc_N) =
+        e.segment(N * nc, nc_N) =
             alpaqa::projecting_difference(z.segment(N * nc, nc_N), D_N);
     }
     /// @see @ref TypeErasedControlProblem::eval_proj_multipliers

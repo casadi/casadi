@@ -215,4 +215,7 @@ auto ProblemVTable<Conf>::default_get_box_D(const void *, const ProblemVTable &)
     throw not_implemented_error("get_box_D");
 }
 
+template <Config Conf>
+void ProblemVTable<Conf>::default_check(const void *, const ProblemVTable &) {}
+
 } // namespace alpaqa

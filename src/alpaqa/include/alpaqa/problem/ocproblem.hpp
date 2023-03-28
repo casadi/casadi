@@ -35,7 +35,7 @@ struct ControlProblemVTable : util::BasicVTable {
         util::BasicVTable::optional_const_function_t<F, ControlProblemVTable>;
 
     // clang-format off
-    required_const_function_t<void(crvec z, rvec p)>
+    required_const_function_t<void(crvec z, rvec e)>
         eval_proj_diff_g;
     required_const_function_t<void(rvec y, real_t M, index_t penalty_alm_split)>
         eval_proj_multipliers;
@@ -301,11 +301,11 @@ class TypeErasedControlProblem : public util::TypeErased<ControlProblemVTable<Co
     /// and its projection onto the constraint set @f$ D @f$.
     /// @param  [in] z
     ///         Slack variable, @f$ z \in \R^m @f$
-    /// @param  [out] p
+    /// @param  [out] e
     ///         The difference relative to its projection,
-    ///         @f$ p = z - \Pi_D(z) \in \R^m @f$
-    /// @note   @p z and @p p can refer to the same vector.
-    void eval_proj_diff_g(crvec z, rvec p) const;
+    ///         @f$ e = z - \Pi_D(z) \in \R^m @f$
+    /// @note   @p z and @p e can refer to the same vector.
+    void eval_proj_diff_g(crvec z, rvec e) const;
     /// **[Required]**
     /// Function that projects the Lagrange multipliers for ALM.
     /// @param  [inout] y
@@ -474,7 +474,7 @@ class TypeErasedControlProblem : public util::TypeErased<ControlProblemVTable<Co
 // clang-format off
 #ifdef NDEBUG
 [[gnu::always_inline]] inline void check_finiteness(auto &&, auto &&) {}
-template <Config Conf, class Allocator> [[gnu::always_inline]] inline void TypeErasedControlProblem<Conf, Allocator>::eval_proj_diff_g(crvec z, rvec p) const { return call(vtable.eval_proj_diff_g, z, p); }
+template <Config Conf, class Allocator> [[gnu::always_inline]] inline void TypeErasedControlProblem<Conf, Allocator>::eval_proj_diff_g(crvec z, rvec e) const { return call(vtable.eval_proj_diff_g, z, e); }
 template <Config Conf, class Allocator> [[gnu::always_inline]] inline void TypeErasedControlProblem<Conf, Allocator>::eval_proj_multipliers(rvec y, real_t M, index_t penalty_alm_split) const { return call(vtable.eval_proj_multipliers, y, M, penalty_alm_split); }
 template <Config Conf, class Allocator> [[gnu::always_inline]] inline void TypeErasedControlProblem<Conf, Allocator>::get_U(Box &U) const { return call(vtable.get_U, U); }
 template <Config Conf, class Allocator> [[gnu::always_inline]] inline void TypeErasedControlProblem<Conf, Allocator>::get_D(Box &D) const { return call(vtable.get_D, D); }
@@ -521,7 +521,7 @@ inline void check_finiteness(const std::floating_point auto &v, std::string_view
         throw std::runtime_error(std::string(msg));
     }
 }
-template <Config Conf, class Allocator> [[gnu::always_inline]] inline void TypeErasedControlProblem<Conf, Allocator>::eval_proj_diff_g(crvec z, rvec p) const { return call(vtable.eval_proj_diff_g, z, p); }
+template <Config Conf, class Allocator> [[gnu::always_inline]] inline void TypeErasedControlProblem<Conf, Allocator>::eval_proj_diff_g(crvec z, rvec e) const { return call(vtable.eval_proj_diff_g, z, e); }
 template <Config Conf, class Allocator> [[gnu::always_inline]] inline void TypeErasedControlProblem<Conf, Allocator>::eval_proj_multipliers(rvec y, real_t M, index_t penalty_alm_split) const { return call(vtable.eval_proj_multipliers, y, M, penalty_alm_split); }
 template <Config Conf, class Allocator> [[gnu::always_inline]] inline void TypeErasedControlProblem<Conf, Allocator>::get_U(Box &U) const { return call(vtable.get_U, U); }
 template <Config Conf, class Allocator> [[gnu::always_inline]] inline void TypeErasedControlProblem<Conf, Allocator>::get_D(Box &D) const { return call(vtable.get_D, D); }
@@ -568,7 +568,7 @@ struct ControlProblemWithCounters {
     [[nodiscard, gnu::always_inline]] length_t get_nc_N() const { return problem.get_nc_N(); }
 
     // clang-format off
-    [[gnu::always_inline]] void eval_proj_diff_g(crvec z, rvec p) const { return problem.eval_proj_diff_g(z, p); }
+    [[gnu::always_inline]] void eval_proj_diff_g(crvec z, rvec e) const { return problem.eval_proj_diff_g(z, e); }
     [[gnu::always_inline]] void eval_proj_multipliers(rvec y, real_t M, index_t penalty_alm_split) const { return problem.eval_proj_multipliers(y, M, penalty_alm_split); }
     [[gnu::always_inline]] void get_x_init(rvec x_init) const { return problem.get_x_init(x_init); }
     [[nodiscard, gnu::always_inline]] length_t get_R_work_size() const requires requires { &std::remove_cvref_t<Problem>::get_R_work_size; } { return problem.get_R_work_size(); }

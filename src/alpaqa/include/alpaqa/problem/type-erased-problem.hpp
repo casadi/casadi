@@ -30,7 +30,7 @@ struct ProblemVTable : util::BasicVTable {
     // clang-format off
 
     // Required
-    required_const_function_t<void(crvec z, rvec p)>
+    required_const_function_t<void(crvec z, rvec e)>
         eval_proj_diff_g;
     required_const_function_t<void(rvec y, real_t M, index_t penalty_alm_split)>
         eval_proj_multipliers;
@@ -94,8 +94,8 @@ struct ProblemVTable : util::BasicVTable {
         get_box_D = default_get_box_D;
 
     // Check
-    required_const_function_t<void()>
-        check;
+    optional_const_function_t<void()>
+        check = default_check;
 
     // clang-format on
 
@@ -146,6 +146,7 @@ struct ProblemVTable : util::BasicVTable {
                                                       const ProblemVTable &vtable);
     ALPAQA_EXPORT static const Box &default_get_box_C(const void *, const ProblemVTable &);
     ALPAQA_EXPORT static const Box &default_get_box_D(const void *, const ProblemVTable &);
+    ALPAQA_EXPORT static void default_check(const void *, const ProblemVTable &);
 
     length_t n, m;
 
@@ -189,7 +190,7 @@ struct ProblemVTable : util::BasicVTable {
         ALPAQA_TE_OPTIONAL_METHOD(vtable, P, get_box_C, t.t);
         ALPAQA_TE_OPTIONAL_METHOD(vtable, P, get_box_D, t.t);
         // Check
-        ALPAQA_TE_REQUIRED_METHOD(vtable, P, check);
+        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, check, t.t);
 
         // Dimensions
         vtable.n = t.t->get_n();
@@ -286,11 +287,11 @@ class TypeErasedProblem : public util::TypeErased<ProblemVTable<Conf>, Allocator
     /// and its projection onto the constraint set @f$ D @f$.
     /// @param  [in] z
     ///         Slack variable, @f$ z \in \R^m @f$
-    /// @param  [out] p
+    /// @param  [out] e
     ///         The difference relative to its projection,
-    ///         @f$ p = z - \Pi_D(z) \in \R^m @f$
-    /// @note   @p z and @p p can refer to the same vector.
-    void eval_proj_diff_g(crvec z, rvec p) const;
+    ///         @f$ e = z - \Pi_D(z) \in \R^m @f$
+    /// @note   @p z and @p e can refer to the same vector.
+    void eval_proj_diff_g(crvec z, rvec e) const;
     /// **[Required]**
     /// Function that projects the Lagrange multipliers for ALM.
     /// @param  [inout] y
@@ -552,7 +553,7 @@ class TypeErasedProblem : public util::TypeErased<ProblemVTable<Conf>, Allocator
     /// @name Checks
     /// @{
 
-    /// **[Required]**
+    /// **[Optional]**
     /// Check that the problem formulation is well-defined, the dimensions match,
     /// etc. Throws an exception if this is not the case.
     void check() const;
@@ -644,6 +645,8 @@ class TypeErasedProblem : public util::TypeErased<ProblemVTable<Conf>, Allocator
     /// Returns true if the problem provides an implementation of
     /// @ref get_box_D.
     bool provides_get_box_D() const { return vtable.get_box_D != vtable.default_get_box_D; }
+    /// Returns true if the problem provides an implementation of @ref check.
+    bool provides_check() const { return vtable.check != vtable.default_check; }
 
     /// @}
 
@@ -696,8 +699,8 @@ auto TypeErasedProblem<Conf, Allocator>::get_m() const -> length_t {
 }
 
 template <Config Conf, class Allocator>
-void TypeErasedProblem<Conf, Allocator>::eval_proj_diff_g(crvec z, rvec p) const {
-    return call(vtable.eval_proj_diff_g, z, p);
+void TypeErasedProblem<Conf, Allocator>::eval_proj_diff_g(crvec z, rvec e) const {
+    return call(vtable.eval_proj_diff_g, z, e);
 }
 template <Config Conf, class Allocator>
 void TypeErasedProblem<Conf, Allocator>::eval_proj_multipliers(rvec y, real_t M,
@@ -844,7 +847,7 @@ struct ProblemWithCounters {
     using Box = typename TypeErasedProblem<config_t>::Box;
 
     // clang-format off
-    void eval_proj_diff_g(crvec z, rvec p) const { ++evaluations->proj_diff_g; return timed(evaluations->time.proj_diff_g, std::bind(&std::remove_cvref_t<Problem>::eval_proj_diff_g, &problem, z, p)); }
+    void eval_proj_diff_g(crvec z, rvec e) const { ++evaluations->proj_diff_g; return timed(evaluations->time.proj_diff_g, std::bind(&std::remove_cvref_t<Problem>::eval_proj_diff_g, &problem, z, e)); }
     void eval_proj_multipliers(rvec y, real_t M, index_t penalty_alm_split) const { ++evaluations->proj_multipliers; return timed(evaluations->time.proj_multipliers, std::bind(&std::remove_cvref_t<Problem>::eval_proj_multipliers, &problem, y, M, penalty_alm_split)); }
     real_t eval_prox_grad_step(real_t γ, crvec x, crvec grad_ψ, rvec x̂, rvec p) const { ++evaluations->prox_grad_step; return timed(evaluations->time.prox_grad_step, std::bind(&std::remove_cvref_t<Problem>::eval_prox_grad_step, &problem, γ, x, grad_ψ, x̂, p)); }
     real_t eval_f(crvec x) const { ++evaluations->f; return timed(evaluations->time.f, std::bind(&std::remove_cvref_t<Problem>::eval_f, &problem, x)); }
@@ -871,7 +874,7 @@ struct ProblemWithCounters {
     real_t eval_ψ_grad_ψ(crvec x, crvec y, crvec Σ, rvec grad_ψ, rvec work_n, rvec work_m) const requires requires { &std::remove_cvref_t<Problem>::eval_ψ_grad_ψ; } { ++evaluations->ψ_grad_ψ; return timed(evaluations->time.ψ_grad_ψ, std::bind(&std::remove_cvref_t<Problem>::eval_ψ_grad_ψ, &problem, x, y, Σ, grad_ψ, work_n, work_m)); }
     const Box &get_box_C() const requires requires { &std::remove_cvref_t<Problem>::get_box_C; } { return problem.get_box_C(); }
     const Box &get_box_D() const requires requires { &std::remove_cvref_t<Problem>::get_box_D; } { return problem.get_box_D(); }
-    void check() const { problem.check(); }
+    void check() const requires requires { &std::remove_cvref_t<Problem>::check; } { return problem.check(); }
 
     [[nodiscard]] bool provides_eval_grad_gi() const requires requires (Problem p) { { p.provides_eval_grad_gi() } -> std::convertible_to<bool>; } { return problem.provides_eval_grad_gi(); }
     [[nodiscard]] bool provides_eval_jac_g() const requires requires (Problem p) { { p.provides_eval_jac_g() } -> std::convertible_to<bool>; } { return problem.provides_eval_jac_g(); }
@@ -893,6 +896,7 @@ struct ProblemWithCounters {
     [[nodiscard]] bool provides_eval_ψ_grad_ψ() const requires requires (Problem p) { { p.provides_eval_ψ_grad_ψ() } -> std::convertible_to<bool>; } { return problem.provides_eval_ψ_grad_ψ(); }
     [[nodiscard]] bool provides_get_box_C() const requires requires (Problem p) { { p.provides_get_box_C() } -> std::convertible_to<bool>; } { return problem.provides_get_box_C(); }
     [[nodiscard]] bool provides_get_box_D() const requires requires (Problem p) { { p.provides_get_box_D() } -> std::convertible_to<bool>; } { return problem.provides_get_box_D(); }
+    [[nodiscard]] bool provides_check() const requires requires (Problem p) { { p.provides_check() } -> std::convertible_to<bool>; } { return problem.provides_check(); }
     // clang-format on
 
     [[nodiscard]] length_t get_n() const { return problem.get_n(); }
@@ -1051,6 +1055,32 @@ class BoxConstrProblem {
     }
 };
 
+template <Config Conf>
+class UnconstrProblem {
+  public:
+    USING_ALPAQA_CONFIG(Conf);
+    /// Number of constraints
+    length_t get_m() const { return 0; }
+
+    void eval_g(crvec, rvec) const {}
+    void eval_grad_g_prod(crvec, crvec, rvec grad) const { grad.setZero(); }
+    void eval_jac_g(crvec, rindexvec, rindexvec, rvec) const {}
+    void eval_grad_gi(crvec, index_t, rvec grad_gi) const { grad_gi.setZero(); }
+
+    /// @see @ref TypeErasedProblem::eval_prox_grad_step
+    real_t eval_prox_grad_step(real_t γ, crvec x, crvec grad_ψ, rvec x̂, rvec p) const {
+        p = -γ * grad_ψ;
+        x̂ = x + p;
+        return 0;
+    }
+
+    /// @see @ref TypeErasedProblem::eval_proj_diff_g
+    void eval_proj_diff_g(crvec, rvec) const {}
+
+    /// @see @ref TypeErasedProblem::eval_proj_multipliers
+    void eval_proj_multipliers(rvec, real_t, index_t) const {}
+};
+
 /// Problem class that allows specifying the basic functions as C++
 /// `std::function`s.
 /// @ingroup grp_Problems
@@ -1134,7 +1164,8 @@ void print_provided_functions(std::ostream &os, const TypeErasedProblem<Conf> &p
        << "            eval_grad_ψ: " << problem.provides_eval_grad_ψ() << '\n'
        << "          eval_ψ_grad_ψ: " << problem.provides_eval_ψ_grad_ψ() << '\n'
        << "              get_box_C: " << problem.provides_get_box_C() << '\n'
-       << "              get_box_D: " << problem.provides_get_box_D() << '\n';
+       << "              get_box_D: " << problem.provides_get_box_D() << '\n'
+       << "                  check: " << problem.provides_check() << '\n';
 }
 
 /// @}
