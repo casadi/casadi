@@ -23,7 +23,8 @@ class CasADiFunctionEvaluator {
 
     /// @throws std::invalid_argument
     CasADiFunctionEvaluator(casadi::Function &&f)
-        : fun(std::move(f)), iwork(fun.sz_iw()), dwork(fun.sz_w()) {
+        : fun(std::move(f)), iwork(fun.sz_iw()), dwork(fun.sz_w()),
+          arg_work(fun.sz_arg()), res_work(fun.sz_res()) {
         using namespace std::literals::string_literals;
         if (N_in != fun.n_in())
             throw std::invalid_argument(
@@ -79,8 +80,9 @@ class CasADiFunctionEvaluator {
 
   protected:
     void operator()(const double *const *in, double *const *out) const {
-        fun(const_cast<const double **>(in), const_cast<double **>(out),
-            iwork.data(), dwork.data(), 0);
+        std::copy_n(in, N_in, arg_work.begin());
+        std::copy_n(out, N_out, res_work.begin());
+        fun(arg_work.data(), res_work.data(), iwork.data(), dwork.data(), 0);
     }
 
   public:
@@ -95,6 +97,8 @@ class CasADiFunctionEvaluator {
   private:
     mutable std::vector<casadi_int> iwork;
     mutable std::vector<double> dwork;
+    mutable std::vector<const double *> arg_work;
+    mutable std::vector<double *> res_work;
 };
 
 } // namespace alpaqa::casadi_loader
