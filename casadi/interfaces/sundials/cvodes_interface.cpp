@@ -528,7 +528,7 @@ int CvodesInterface::psolveB(double t, N_Vector x, N_Vector xB, N_Vector xdotB, 
     casadi_copy(v, s.nrx_, m->v1);
 
     // Solve for undifferentiated right-hand-side, save to output
-    if (s.linsolB_.solve(m->jacB, m->v1, 1, false, m->mem_linsolB)) return 1;
+    if (s.linsolB_.solve(m->jacB, m->v1, s.nadj_, false, m->mem_linsolB)) return 1;
     v = NV_DATA_S(zvecB); // possibly different from rvecB
     casadi_copy(m->v1, s.nrx1_ * s.nadj_, v);
 
@@ -547,7 +547,7 @@ int CvodesInterface::psolveB(double t, N_Vector x, N_Vector xB, N_Vector xdotB, 
       }
 
       // Solve for sensitivity right-hand-sides
-      if (s.linsolB_.solve(m->jacB, m->v1 + s.nx1_, s.nfwd_, false, m->mem_linsolB)) return 1;
+      if (s.linsolB_.solve(m->jacB, m->v1 + s.nx1_, s.nadj_ * s.nfwd_, false, m->mem_linsolB)) return 1;
 
       // Save to output, reordered
       casadi_copy(m->v1 + s.nx1_, s.nx_ - s.nx1_, v + s.nx1_);

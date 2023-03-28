@@ -238,7 +238,7 @@ void SundialsInterface::init(const Dict& opts) {
     // Get Jacobian function, backward problem
     Sparsity jacB_sp;
     if (d == 0) {
-      jacB_sp = diagcat(std::vector<Sparsity>(nadj_, jacF_sp.T()));
+      jacB_sp = jacF_sp.T();
     } else {
       // Reuse existing linear solver
       linsolB_ = d->linsolB_;
@@ -306,10 +306,10 @@ void SundialsInterface::init(const Dict& opts) {
     sp_jac_ode_zB1_ = jacF.sparsity_out(JACF_ODE_Z).T();
     sp_jac_alg_zB1_ = jacF.sparsity_out(JACF_ALG_Z).T();
 
-    sp_jac_ode_xB_ = diagcat(std::vector<Sparsity>(nadj_, jacF.sparsity_out(JACF_ODE_X).T()));
-    sp_jac_alg_xB_ = diagcat(std::vector<Sparsity>(nadj_, jacF.sparsity_out(JACF_ALG_X).T()));
-    sp_jac_ode_zB_ = diagcat(std::vector<Sparsity>(nadj_, jacF.sparsity_out(JACF_ODE_Z).T()));
-    sp_jac_alg_zB_ = diagcat(std::vector<Sparsity>(nadj_, jacF.sparsity_out(JACF_ALG_Z).T()));
+    sp_jac_ode_xB_ = sp_jac_ode_xB1_;
+    sp_jac_alg_xB_ = sp_jac_alg_xB1_;
+    sp_jac_ode_zB_ = sp_jac_ode_zB1_;
+    sp_jac_alg_zB_ = sp_jac_alg_zB1_;
   }
 }
 
@@ -791,28 +791,26 @@ int SundialsInterface::calc_jacB(SundialsMemory* m, double t, const double* x, c
   if (calc_jacF(m, t, x, z, m->jac_ode_x, m->jac_alg_x, m->jac_ode_z, m->jac_alg_z)) return 1;
   // Copy to jacB
   const Function& jacF = get_function("jacF");
-  for (casadi_int d = 0; d < nadj_; ++d) {
-    // Copy transposed blocks
-    if (jac_adj_x_rx) {
-      casadi_trans(m->jac_ode_x, jacF.sparsity_out(JACF_ODE_X),
-        jac_adj_x_rx, sp_jac_ode_xB1_, m->iw);
-      jac_adj_x_rx += jacF.nnz_out(JACF_ODE_X);
-    }
-    if (jac_adj_z_rx) {
-      casadi_trans(m->jac_alg_x, jacF.sparsity_out(JACF_ALG_X),
-        jac_adj_z_rx, sp_jac_alg_xB1_, m->iw);
-      jac_adj_z_rx += jacF.nnz_out(JACF_ALG_X);
-    }
-    if (jac_adj_x_rz) {
-      casadi_trans(m->jac_ode_z, jacF.sparsity_out(JACF_ODE_Z),
-        jac_adj_x_rz, sp_jac_ode_zB1_, m->iw);
-      jac_adj_x_rz += jacF.nnz_out(JACF_ODE_Z);
-    }
-    if (jac_adj_z_rz) {
-      casadi_trans(m->jac_alg_z, jacF.sparsity_out(JACF_ALG_Z),
-        jac_adj_z_rz, sp_jac_alg_zB1_, m->iw);
-      jac_adj_z_rz += jacF.nnz_out(JACF_ALG_Z);
-    }
+  // Copy transposed blocks
+  if (jac_adj_x_rx) {
+    casadi_trans(m->jac_ode_x, jacF.sparsity_out(JACF_ODE_X),
+      jac_adj_x_rx, sp_jac_ode_xB1_, m->iw);
+    jac_adj_x_rx += jacF.nnz_out(JACF_ODE_X);
+  }
+  if (jac_adj_z_rx) {
+    casadi_trans(m->jac_alg_x, jacF.sparsity_out(JACF_ALG_X),
+      jac_adj_z_rx, sp_jac_alg_xB1_, m->iw);
+    jac_adj_z_rx += jacF.nnz_out(JACF_ALG_X);
+  }
+  if (jac_adj_x_rz) {
+    casadi_trans(m->jac_ode_z, jacF.sparsity_out(JACF_ODE_Z),
+      jac_adj_x_rz, sp_jac_ode_zB1_, m->iw);
+    jac_adj_x_rz += jacF.nnz_out(JACF_ODE_Z);
+  }
+  if (jac_adj_z_rz) {
+    casadi_trans(m->jac_alg_z, jacF.sparsity_out(JACF_ALG_Z),
+      jac_adj_z_rz, sp_jac_alg_zB1_, m->iw);
+    jac_adj_z_rz += jacF.nnz_out(JACF_ALG_Z);
   }
   return 0;
 }
