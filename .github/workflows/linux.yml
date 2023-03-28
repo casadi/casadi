@@ -129,6 +129,7 @@ jobs:
           retention-days: 1
           path: |
             build-examples/C++/CustomCppProblem/RelWithDebInfo/custom-cpp-problem-example
+            build-examples/C++/SimpleUnconstrProblem/RelWithDebInfo/simple-unconstr-cpp-problem-example
             build-examples/C++/FortranProblem/RelWithDebInfo/fortran-problem-example
             build-examples/C++/DLProblem/RelWithDebInfo/dl-problem-example
             build-examples/C++/DLProblem/RelWithDebInfo/test-matmul
@@ -147,6 +148,7 @@ jobs:
           retention-days: 1
           path: |
             build-examples/C++/CustomCppProblem/Debug/custom-cpp-problem-example
+            build-examples/C++/SimpleUnconstrProblem/Debug/simple-unconstr-cpp-problem-example
             build-examples/C++/FortranProblem/Debug/fortran-problem-example
             build-examples/C++/DLProblem/Debug/dl-problem-example
             build-examples/C++/DLProblem/Debug/test-matmul
@@ -155,12 +157,14 @@ jobs:
       - name: Run examples (RelWithDebInfo)
         run: |
           ./build-examples/C++/CustomCppProblem/RelWithDebInfo/custom-cpp-problem-example
+          ./build-examples/C++/SimpleUnconstrProblem/RelWithDebInfo/simple-unconstr-cpp-problem-example
           ./build-examples/C++/FortranProblem/RelWithDebInfo/fortran-problem-example
           ./build-examples/C++/DLProblem/RelWithDebInfo/dl-problem-example
           ./build-examples/C++/DLProblem/RelWithDebInfo/test-matmul
       - name: Run examples (Debug)
         run: |
           ./build-examples/C++/CustomCppProblem/Debug/custom-cpp-problem-example
+          ./build-examples/C++/SimpleUnconstrProblem/Debug/simple-unconstr-cpp-problem-example
           ./build-examples/C++/FortranProblem/Debug/fortran-problem-example
           ./build-examples/C++/DLProblem/Debug/dl-problem-example
           ./build-examples/C++/DLProblem/Debug/test-matmul
