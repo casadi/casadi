@@ -32,7 +32,7 @@ struct ProblemVTable : util::BasicVTable {
     // Required
     required_const_function_t<void(crvec z, rvec e)>
         eval_proj_diff_g;
-    required_const_function_t<void(rvec y, real_t M, index_t penalty_alm_split)>
+    required_const_function_t<void(rvec y, real_t M)>
         eval_proj_multipliers;
     required_const_function_t<real_t(real_t γ, crvec x, crvec grad_ψ, rvec x̂, rvec p)>
         eval_prox_grad_step;
@@ -298,9 +298,7 @@ class TypeErasedProblem : public util::TypeErased<ProblemVTable<Conf>, Allocator
     ///         Multipliers, @f$ y \leftarrow \Pi_Y(y) \in \R^m @f$
     /// @param  [in] M
     ///         The radius/size of the set @f$ Y @f$. See @ref ALMParams::M.
-    /// @param  [in] penalty_alm_split
-    ///         See @ref ALMParams::penalty_alm_split.
-    void eval_proj_multipliers(rvec y, real_t M, index_t penalty_alm_split) const;
+    void eval_proj_multipliers(rvec y, real_t M) const;
     /// **[Required]**
     /// Function that computes a proximal gradient step.
     /// @param  [in] γ
@@ -712,9 +710,8 @@ void TypeErasedProblem<Conf, Allocator>::eval_proj_diff_g(crvec z, rvec e) const
     return call(vtable.eval_proj_diff_g, z, e);
 }
 template <Config Conf, class Allocator>
-void TypeErasedProblem<Conf, Allocator>::eval_proj_multipliers(rvec y, real_t M,
-                                                               index_t penalty_alm_split) const {
-    return call(vtable.eval_proj_multipliers, y, M, penalty_alm_split);
+void TypeErasedProblem<Conf, Allocator>::eval_proj_multipliers(rvec y, real_t M) const {
+    return call(vtable.eval_proj_multipliers, y, M);
 }
 template <Config Conf, class Allocator>
 auto TypeErasedProblem<Conf, Allocator>::eval_prox_grad_step(real_t γ, crvec x, crvec grad_ψ,
@@ -857,7 +854,7 @@ struct ProblemWithCounters {
 
     // clang-format off
     void eval_proj_diff_g(crvec z, rvec e) const { ++evaluations->proj_diff_g; return timed(evaluations->time.proj_diff_g, std::bind(&std::remove_cvref_t<Problem>::eval_proj_diff_g, &problem, z, e)); }
-    void eval_proj_multipliers(rvec y, real_t M, index_t penalty_alm_split) const { ++evaluations->proj_multipliers; return timed(evaluations->time.proj_multipliers, std::bind(&std::remove_cvref_t<Problem>::eval_proj_multipliers, &problem, y, M, penalty_alm_split)); }
+    void eval_proj_multipliers(rvec y, real_t M) const { ++evaluations->proj_multipliers; return timed(evaluations->time.proj_multipliers, std::bind(&std::remove_cvref_t<Problem>::eval_proj_multipliers, &problem, y, M)); }
     real_t eval_prox_grad_step(real_t γ, crvec x, crvec grad_ψ, rvec x̂, rvec p) const { ++evaluations->prox_grad_step; return timed(evaluations->time.prox_grad_step, std::bind(&std::remove_cvref_t<Problem>::eval_prox_grad_step, &problem, γ, x, grad_ψ, x̂, p)); }
     real_t eval_f(crvec x) const { ++evaluations->f; return timed(evaluations->time.f, std::bind(&std::remove_cvref_t<Problem>::eval_f, &problem, x)); }
     void eval_grad_f(crvec x, rvec grad_fx) const { ++evaluations->grad_f; return timed(evaluations->time.grad_f, std::bind(&std::remove_cvref_t<Problem>::eval_grad_f, &problem, x, grad_fx)); }
@@ -976,6 +973,13 @@ class BoxConstrProblem {
     /// Number of constraints, dimension of g(x) and z
     length_t m;
 
+    /// Components of the constraint function with indices below this number are
+    /// handled using a quadratic penalty method rather than using an
+    /// augmented Lagrangian method. Specifically, the Lagrange multipliers for
+    /// these components (which determine the shifts in ALM) are kept at zero.
+    /// @todo change name
+    index_t penalty_alm_split = 0;
+
     BoxConstrProblem(length_t n, ///< Number of decision variables
                      length_t m) ///< Number of constraints
         : n{n}, m{m} {}
@@ -1038,7 +1042,7 @@ class BoxConstrProblem {
     }
 
     /// @see @ref TypeErasedProblem::eval_proj_multipliers
-    void eval_proj_multipliers(rvec y, real_t M, index_t penalty_alm_split) const {
+    void eval_proj_multipliers(rvec y, real_t M) const {
         eval_proj_multipliers_box(D, y, M, penalty_alm_split);
     }
 
@@ -1061,6 +1065,8 @@ class BoxConstrProblem {
         util::check_dim_msg<config_t>(
             D.upperbound, m,
             "Length of problem.D.upperbound does not match problem size problem.m");
+        if (penalty_alm_split < 0 || penalty_alm_split > m)
+            throw std::invalid_argument("Invalid penalty_alm_split");
     }
 };
 
@@ -1087,7 +1093,7 @@ class UnconstrProblem {
     void eval_proj_diff_g(crvec, rvec) const {}
 
     /// @see @ref TypeErasedProblem::eval_proj_multipliers
-    void eval_proj_multipliers(rvec, real_t, index_t) const {}
+    void eval_proj_multipliers(rvec, real_t) const {}
 };
 
 /// Problem class that allows specifying the basic functions as C++

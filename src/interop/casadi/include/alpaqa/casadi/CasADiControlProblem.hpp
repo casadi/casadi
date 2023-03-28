@@ -3,6 +3,7 @@
 #include <alpaqa/casadi-ocp-loader-export.hpp>
 #include <alpaqa/config/config.hpp>
 #include <alpaqa/problem/box.hpp>
+#include <alpaqa/util/check-dim.hpp>
 #include <alpaqa/util/copyable_unique_ptr.hpp>
 
 namespace alpaqa {
@@ -22,6 +23,15 @@ class CasADiControlProblem {
     vec param;
     Box U, D, D_N;
     mutable vec work;
+
+    /// Components of the constraint function with indices below this number are
+    /// handled using a quadratic penalty method rather than using an
+    /// augmented Lagrangian method. Specifically, the Lagrange multipliers for
+    /// these components (which determine the shifts in ALM) are kept at zero.
+    /// @todo change name
+    index_t penalty_alm_split = 0;
+    /// Same as @ref penalty_alm_split, but for the terminal constraint.
+    index_t penalty_alm_split_N = 0;
 
     CasADiControlProblem(const std::string &so_name, length_t N);
     ~CasADiControlProblem();
@@ -69,7 +79,30 @@ class CasADiControlProblem {
     void eval_grad_constr_prod_N(crvec x, crvec p, rvec grad_cx_p) const;
     void eval_add_gn_hess_constr_N(crvec x, crvec M, rmat out) const;
 
-    void check() const {} // TODO
+    void check() const {
+        util::check_dim_msg<config_t>(U.lowerbound, nu,
+                                      "Length of problem.U.lowerbound does not "
+                                      "match problem size problem.nu");
+        util::check_dim_msg<config_t>(U.upperbound, nu,
+                                      "Length of problem.U.upperbound does not "
+                                      "match problem size problem.nu");
+        util::check_dim_msg<config_t>(D.lowerbound, nc,
+                                      "Length of problem.D.lowerbound does not "
+                                      "match problem size problem.nc");
+        util::check_dim_msg<config_t>(D.upperbound, nc,
+                                      "Length of problem.D.upperbound does not "
+                                      "match problem size problem.nc");
+        util::check_dim_msg<config_t>(D_N.lowerbound, nc_N,
+                                      "Length of problem.D_N.lowerbound does "
+                                      "not match problem size problem.nc_N");
+        util::check_dim_msg<config_t>(D_N.upperbound, nc_N,
+                                      "Length of problem.D_N.upperbound does "
+                                      "not match problem size problem.nc_N");
+        if (penalty_alm_split < 0 || penalty_alm_split > nc)
+            throw std::invalid_argument("Invalid penalty_alm_split");
+        if (penalty_alm_split_N < 0 || penalty_alm_split > nc_N)
+            throw std::invalid_argument("Invalid penalty_alm_split_N");
+    }
 
     [[nodiscard]] length_t get_N() const { return N; }
     [[nodiscard]] length_t get_nx() const { return nx; }
@@ -88,8 +121,7 @@ class CasADiControlProblem {
             alpaqa::projecting_difference(z.segment(N * nc, nc_N), D_N);
     }
     /// @see @ref TypeErasedControlProblem::eval_proj_multipliers
-    void eval_proj_multipliers(rvec y, real_t M,
-                               index_t penalty_alm_split) const {
+    void eval_proj_multipliers(rvec y, real_t M) const {
         // If there's no lower bound, the multipliers can only be positive
         auto max_lb = [M](real_t y, real_t z_lb) {
             real_t y_lb = z_lb == -alpaqa::inf<config_t> ? 0 : -M;
@@ -113,8 +145,8 @@ class CasADiControlProblem {
         }
         {
             auto &&yt       = y.segment(N * nc, nc_N);
-            auto num_alm    = nc_N - penalty_alm_split;
-            auto &&y_qpm    = yt.topRows(penalty_alm_split);
+            auto num_alm    = nc_N - penalty_alm_split_N;
+            auto &&y_qpm    = yt.topRows(penalty_alm_split_N);
             auto &&y_alm    = yt.bottomRows(num_alm);
             auto &&z_alm_lb = D.lowerbound.bottomRows(num_alm);
             auto &&z_alm_ub = D.upperbound.bottomRows(num_alm);

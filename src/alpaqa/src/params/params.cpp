@@ -276,7 +276,6 @@ PARAMS_TABLE(ALMParams<config_t>,                    //
              PARAMS_MEMBER(ρ_max),                   //
              PARAMS_MEMBER(θ),                       //
              PARAMS_MEMBER(M),                       //
-             PARAMS_MEMBER(penalty_alm_split),       //
              PARAMS_MEMBER(Σ_max),                   //
              PARAMS_MEMBER(Σ_min),                   //
              PARAMS_MEMBER(max_iter),                //

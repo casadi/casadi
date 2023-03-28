@@ -26,10 +26,6 @@ ALMSolver<InnerSolverT>::operator()(const Problem &p, rvec x, rvec y) {
     // Check the problem dimensions etc.
     p.check();
 
-    // Lagrange multipliers corresponding to penalty constraints are always 0.
-    auto &&y_penalty = y.topRows(params.penalty_alm_split);
-    y_penalty.setZero();
-
     auto m = p.get_m();
     if (m == 0) { // No general constraints, only box constraints
         Stats s;
@@ -88,7 +84,7 @@ ALMSolver<InnerSolverT>::operator()(const Problem &p, rvec x, rvec y) {
     for (unsigned int i = 0; i < params.max_iter; ++i) {
         // TODO: this is unnecessary when the previous iteration lowered the
         // penalty update factor.
-        p.eval_proj_multipliers(y, params.M, params.penalty_alm_split);
+        p.eval_proj_multipliers(y, params.M);
         // Check if we're allowed to lower the penalty factor even further.
         bool out_of_penalty_factor_updates =
             (num_successful_iters == 0
@@ -115,8 +111,6 @@ ALMSolver<InnerSolverT>::operator()(const Problem &p, rvec x, rvec y) {
         // Call the inner solver to minimize the augmented lagrangian for fixed
         // Lagrange multipliers y.
         auto ps = inner_solver(p, opts, x, y, Σ, error_2);
-        // Reset the Lagrange multipliers for the penalty constraints to 0 again.
-        y_penalty.setZero();
         // Check if the inner solver converged
         bool inner_converged = ps.status == SolverStatus::Converged;
         // Accumulate the inner solver statistics
@@ -130,9 +124,9 @@ ALMSolver<InnerSolverT>::operator()(const Problem &p, rvec x, rvec y) {
 
         // Print statistics of current iteration
         if (params.print_interval != 0 && i % params.print_interval == 0) {
-            real_t δ       = backtrack ? NaN : vec_util::norm_inf(error_2);
-            auto color     = inner_converged ? "\x1b[0;32m" : "\x1b[0;31m";
-            auto color_end = "\x1b[0m";
+            real_t δ          = backtrack ? NaN : vec_util::norm_inf(error_2);
+            const char *color = inner_converged ? "\x1b[0;32m" : "\x1b[0;31m";
+            const char *color_end = "\x1b[0m";
             *os << "[\x1b[0;34mALM\x1b[0m]   " << std::setw(5) << i
                 << ": ‖Σ‖ = " << print_real(Σ.norm())
                 << ", ‖y‖ = " << print_real(y.norm())

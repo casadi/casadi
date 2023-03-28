@@ -40,7 +40,7 @@ struct TestReqProblem {
 
     // clang-format off
     MOCK_METHOD(void, eval_proj_diff_g, (crvec g, rvec e), (const));
-    MOCK_METHOD(void, eval_proj_multipliers, (rvec y, real_t M, index_t penalty_alm_split), (const));
+    MOCK_METHOD(void, eval_proj_multipliers, (rvec y, real_t M), (const));
     MOCK_METHOD(real_t, eval_prox_grad_step, (real_t γ, crvec x, crvec grad_ψ, rvec x̂, rvec p), (const));
     MOCK_METHOD(real_t, eval_f, (crvec x), (const));
     MOCK_METHOD(void, eval_grad_f, (crvec x, rvec grad_fx), (const));
@@ -63,7 +63,7 @@ TEST(TypeErasedProblem, RequiredProblem) {
     testing::Mock::VerifyAndClearExpectations(&te_prob.as<TestReqProblem>());
 
     EXPECT_CALL(te_prob.as<TestReqProblem>(), eval_proj_multipliers);
-    te_prob.vtable.eval_proj_multipliers(te_prob.self, x, 0, 0);
+    te_prob.vtable.eval_proj_multipliers(te_prob.self, x, 0);
     testing::Mock::VerifyAndClearExpectations(&te_prob.as<TestReqProblem>());
 
     EXPECT_CALL(te_prob.as<TestReqProblem>(), eval_prox_grad_step);
@@ -147,7 +147,7 @@ TEST(TypeErasedProblem, OptionalProblem) {
 
     ASSERT_NE(te_prob.vtable.eval_proj_multipliers, nullptr);
     EXPECT_CALL(te_prob.as<TestOptProblem>(), eval_proj_multipliers);
-    te_prob.vtable.eval_proj_multipliers(te_prob.self, x, 0, 0);
+    te_prob.vtable.eval_proj_multipliers(te_prob.self, x, 0);
     testing::Mock::VerifyAndClearExpectations(&te_prob.as<TestOptProblem>());
 
     ASSERT_NE(te_prob.vtable.eval_prox_grad_step, nullptr);
@@ -258,7 +258,7 @@ TEST(TypeErasedProblem, CountedOptionalProblem) {
     EXPECT_EQ(evals.proj_multipliers, 0);
     ASSERT_NE(te_prob.vtable.eval_proj_multipliers, nullptr);
     EXPECT_CALL(prob, eval_proj_multipliers);
-    te_prob.vtable.eval_proj_multipliers(te_prob.self, x, 0, 0);
+    te_prob.vtable.eval_proj_multipliers(te_prob.self, x, 0);
     testing::Mock::VerifyAndClearExpectations(&prob);
     EXPECT_EQ(evals.proj_multipliers, 1);
 
@@ -441,7 +441,7 @@ TEST(TypeErasedProblem, TEOptionalProblem) {
     testing::Mock::VerifyAndClearExpectations(&te_prob.as<TestOptProblem>());
 
     EXPECT_CALL(te_prob.as<TestOptProblem>(), eval_proj_multipliers);
-    te_prob.eval_proj_multipliers(x, 0, 0);
+    te_prob.eval_proj_multipliers(x, 0);
     testing::Mock::VerifyAndClearExpectations(&te_prob.as<TestOptProblem>());
 
     EXPECT_CALL(te_prob.as<TestOptProblem>(), eval_prox_grad_step);

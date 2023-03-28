@@ -122,8 +122,7 @@ void register_problems(py::module_ &m) {
         .def_readwrite("C", &BoxConstrProblem::C, "Box constraints on :math:`x`")
         .def_readwrite("D", &BoxConstrProblem::D, "Box constraints on :math:`g(x)`")
         .def("eval_proj_diff_g", &BoxConstrProblem::eval_proj_diff_g, "z"_a, "e"_a)
-        .def("eval_proj_multipliers", &BoxConstrProblem::eval_proj_multipliers, "y"_a, "M"_a,
-             "penalty_alm_split"_a)
+        .def("eval_proj_multipliers", &BoxConstrProblem::eval_proj_multipliers, "y"_a, "M"_a)
         .def("eval_prox_grad_step", &BoxConstrProblem::eval_prox_grad_step, "γ"_a, "x"_a,
              "grad_ψ"_a, "x̂"_a, "p"_a)
         .def(
@@ -154,7 +153,7 @@ void register_problems(py::module_ &m) {
 
         // clang-format off
         void eval_proj_diff_g(crvec z, rvec e) const { py::gil_scoped_acquire gil; o.attr("eval_proj_diff_g")(z, e); }
-        void eval_proj_multipliers(rvec y, real_t M, index_t penalty_alm_split) const { py::gil_scoped_acquire gil; o.attr("eval_proj_multipliers")(y, M, penalty_alm_split); }
+        void eval_proj_multipliers(rvec y, real_t M) const { py::gil_scoped_acquire gil; o.attr("eval_proj_multipliers")(y, M); }
         real_t eval_prox_grad_step(real_t γ, crvec x, crvec grad_ψ, rvec x̂, rvec p) const { py::gil_scoped_acquire gil; return py::cast<real_t>(o.attr("eval_prox_grad_step")(γ, x, grad_ψ, x̂, p)); }
         real_t eval_f(crvec x) const { py::gil_scoped_acquire gil; return py::cast<real_t>(o.attr("eval_f")(x)); }
         void eval_grad_f(crvec x, rvec grad_fx) const { py::gil_scoped_acquire gil; o.attr("eval_grad_f")(x, grad_fx); }
@@ -215,7 +214,7 @@ void register_problems(py::module_ &m) {
             "memo"_a)
         // clang-format off
         .def("eval_proj_diff_g", &TEProblem::eval_proj_diff_g, "z"_a, "e"_a)
-        .def("eval_proj_multipliers", &TEProblem::eval_proj_multipliers, "y"_a, "M"_a, "penalty_alm_split"_a)
+        .def("eval_proj_multipliers", &TEProblem::eval_proj_multipliers, "y"_a, "M"_a)
         .def("eval_prox_grad_step", &TEProblem::eval_prox_grad_step, "γ"_a, "x"_a, "grad_ψ"_a, "x̂"_a, "p"_a)
         .def("eval_f", &TEProblem::eval_f, "x"_a)
         .def("eval_grad_f", &TEProblem::eval_grad_f, "x"_a, "grad_fx"_a)

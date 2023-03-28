@@ -48,7 +48,6 @@ struct dict_to_struct_table<alpaqa::ALMParams<Conf>> {
         {"ρ_max", &alpaqa::ALMParams<Conf>::ρ_max},
         {"θ", &alpaqa::ALMParams<Conf>::θ},
         {"M", &alpaqa::ALMParams<Conf>::M},
-        {"penalty_alm_split", &alpaqa::ALMParams<Conf>::penalty_alm_split},
         {"Σ_max", &alpaqa::ALMParams<Conf>::Σ_max},
         {"Σ_min", &alpaqa::ALMParams<Conf>::Σ_min},
         {"max_iter", &alpaqa::ALMParams<Conf>::max_iter},
@@ -91,9 +90,6 @@ void register_alm(py::module_ &m) {
         else
             alpaqa::util::check_dim_msg<config_t>(
                 *y, p.get_m(), "Length of y does not match problem size problem.m");
-        auto penalty_alm_split = solver.get_params().penalty_alm_split;
-        if (penalty_alm_split < 0 || penalty_alm_split > p.get_m())
-            throw std::invalid_argument("invalid penalty_alm_split");
 
         auto invoke_solver = [&] { return solver(p, *x, *y); };
         if (!async) {
