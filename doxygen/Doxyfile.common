@@ -916,6 +916,7 @@ INPUT                  = ../src/ \
                          pages/Installation.md \
                          pages/Math.md \
                          pages/External-Resources.md \
+                         pages/Problem-formulations.md \
                          index.md
 
 # This tag can be used to specify the character encoding of the source files
@@ -963,7 +964,9 @@ FILE_PATTERNS          = *.cpp \
                          *.ipp \
                          *.md \
                          *.dox \
-                         *.py
+                         *.py \
+                         *.f \
+                         *.f90
 
 # The RECURSIVE tag can be used to specify whether or not subdirectories should
 # be searched for input files as well.
@@ -978,7 +981,7 @@ RECURSIVE              = YES
 # Note that relative paths are relative to the directory from which doxygen is
 # run.
 
-EXCLUDE                =
+EXCLUDE                = ../src/thirdparty
 
 # The EXCLUDE_SYMLINKS tag can be used to select whether or not files or
 # directories that are symbolic links (a Unix file system feature) are excluded
