@@ -34,6 +34,10 @@ namespace casadi {
 
 OracleFunction::OracleFunction(const std::string& name, const Function& oracle)
 : FunctionInternal(name), oracle_(oracle) {
+  if (dynamic_cast<OracleFunction*>(oracle_.get())) {
+    // Already an OracleFunction
+    *this = *static_cast<OracleFunction*>(oracle_.get());
+  }
 }
 
 OracleFunction::~OracleFunction() {
