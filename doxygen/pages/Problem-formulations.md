@@ -173,7 +173,6 @@ The full list of these combined evaluations can be found in the @ref alpaqa::Typ
 documentation. They can be provided in the same fashion as `eval_f` above.
   - @ref alpaqa::TypeErasedProblem::eval_f_grad_f "eval_f_grad_f"
   - @ref alpaqa::TypeErasedProblem::eval_f_g "eval_f_g"
-  - @ref alpaqa::TypeErasedProblem::eval_f_grad_f_g "eval_f_grad_f_g"
   - @ref alpaqa::TypeErasedProblem::eval_grad_f_grad_g_prod "eval_grad_f_grad_g_prod"
   - @ref alpaqa::TypeErasedProblem::eval_grad_L "eval_grad_L"
   - @ref alpaqa::TypeErasedProblem::eval_ψ "eval_ψ"

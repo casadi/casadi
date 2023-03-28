@@ -143,7 +143,6 @@ class DLProblem : private DLLoader, public BoxConstrProblem<DefaultConfig> {
     length_t get_hess_ψ_num_nonzeros() const;
     real_t eval_f_grad_f(crvec x, rvec grad_fx) const;
     real_t eval_f_g(crvec x, rvec g) const;
-    real_t eval_f_grad_f_g(crvec x, rvec grad_fx, rvec g) const;
     void eval_grad_f_grad_g_prod(crvec x, crvec y, rvec grad_f, rvec grad_gxy) const;
     void eval_grad_L(crvec x, crvec y, rvec grad_L, rvec work_n) const;
     real_t eval_ψ(crvec x, crvec y, crvec Σ, rvec ŷ) const;
@@ -166,7 +165,6 @@ class DLProblem : private DLLoader, public BoxConstrProblem<DefaultConfig> {
     [[nodiscard]] bool provides_get_hess_ψ_num_nonzeros() const;
     [[nodiscard]] bool provides_eval_f_grad_f() const;
     [[nodiscard]] bool provides_eval_f_g() const;
-    [[nodiscard]] bool provides_eval_f_grad_f_g() const;
     [[nodiscard]] bool provides_eval_grad_f_grad_g_prod() const;
     [[nodiscard]] bool provides_eval_grad_L() const;
     [[nodiscard]] bool provides_eval_ψ() const;

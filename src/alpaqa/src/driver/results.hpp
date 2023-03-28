@@ -71,7 +71,6 @@ void write_evaluations(std::ostream &os, const alpaqa::EvalCounter &evals) {
     EVAL(grad_f);
     EVAL(f_grad_f);
     EVAL(f_g);
-    EVAL(f_grad_f_g);
     EVAL(grad_f_grad_g_prod);
     EVAL(g);
     EVAL(grad_g_prod);

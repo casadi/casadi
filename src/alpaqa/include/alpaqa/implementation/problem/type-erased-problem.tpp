@@ -113,16 +113,6 @@ auto ProblemVTable<Conf>::default_eval_f_g(const void *self, crvec x, rvec g,
 }
 /* [ProblemVTable<Conf>::default_eval_f_g] */
 
-/** @implementation{ProblemVTable<Conf>::default_eval_f_grad_f_g} */
-template <Config Conf>
-/* [ProblemVTable<Conf>::default_eval_f_grad_f_g] */
-auto ProblemVTable<Conf>::default_eval_f_grad_f_g(const void *self, crvec x, rvec grad_fx, rvec g,
-                                                  const ProblemVTable &vtable) -> real_t {
-    vtable.eval_g(self, x, g);
-    return vtable.eval_f_grad_f(self, x, grad_fx, vtable);
-}
-/* [ProblemVTable<Conf>::default_eval_f_grad_f_g] */
-
 /** @implementation{ProblemVTable<Conf>::default_eval_grad_f_grad_g_prod} */
 template <Config Conf>
 /* [ProblemVTable<Conf>::default_eval_grad_f_grad_g_prod] */

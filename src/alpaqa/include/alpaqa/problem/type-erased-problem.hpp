@@ -70,8 +70,6 @@ struct ProblemVTable : util::BasicVTable {
         eval_f_grad_f = default_eval_f_grad_f;
     optional_const_function_t<real_t(crvec x, rvec g)>
         eval_f_g = default_eval_f_g;
-    optional_const_function_t<real_t(crvec x, rvec grad_fx, rvec g)>
-        eval_f_grad_f_g = default_eval_f_grad_f_g;
     optional_const_function_t<void(crvec x, crvec y, rvec grad_f, rvec grad_gxy)>
         eval_grad_f_grad_g_prod = default_eval_grad_f_grad_g_prod;
 
@@ -126,8 +124,6 @@ struct ProblemVTable : util::BasicVTable {
                                                       const ProblemVTable &vtable);
     ALPAQA_EXPORT static real_t default_eval_f_g(const void *self, crvec x, rvec g,
                                                  const ProblemVTable &vtable);
-    ALPAQA_EXPORT static real_t default_eval_f_grad_f_g(const void *self, crvec x, rvec grad_fx,
-                                                        rvec g, const ProblemVTable &vtable);
     ALPAQA_EXPORT static void default_eval_grad_f_grad_g_prod(const void *self, crvec x, crvec y,
                                                               rvec grad_f, rvec grad_gxy,
                                                               const ProblemVTable &vtable);
@@ -178,7 +174,6 @@ struct ProblemVTable : util::BasicVTable {
         // Combined evaluations
         ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_f_grad_f, t.t);
         ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_f_g, t.t);
-        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_f_grad_f_g, t.t);
         ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_grad_f_grad_g_prod, t.t);
         // Lagrangian and augmented lagrangian evaluations
         ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_grad_L, t.t);
@@ -491,10 +486,6 @@ class TypeErasedProblem : public util::TypeErased<ProblemVTable<Conf>, Allocator
     /// @default_impl   ProblemVTable::default_eval_f_g
     real_t eval_f_g(crvec x, rvec g) const;
     /// **[Optional]**
-    /// Evaluate @f$ f(x) @f$, its gradient @f$ \nabla f(x) @f$ and @f$ g(x) @f$.
-    /// @default_impl   ProblemVTable::default_eval_f_grad_f_g
-    real_t eval_f_grad_f_g(crvec x, rvec grad_fx, rvec g) const;
-    /// **[Optional]**
     /// Evaluate both @f$ \nabla f(x) @f$ and @f$ \nabla g(x)\,y @f$.
     /// @default_impl   ProblemVTable::default_eval_grad_f_grad_g_prod
     void eval_grad_f_grad_g_prod(crvec x, crvec y, rvec grad_f, rvec grad_gxy) const;
@@ -617,11 +608,6 @@ class TypeErasedProblem : public util::TypeErased<ProblemVTable<Conf>, Allocator
     /// Returns true if the problem provides a specialized implementation of
     /// @ref eval_f_g, false if it uses the default implementation.
     bool provides_eval_f_g() const { return vtable.eval_f_g != vtable.default_eval_f_g; }
-    /// Returns true if the problem provides a specialized implementation of
-    /// @ref eval_f_grad_f_g, false if it uses the default implementation.
-    bool provides_eval_f_grad_f_g() const {
-        return vtable.eval_f_grad_f_g != vtable.default_eval_f_grad_f_g;
-    }
     /// Returns true if the problem provides a specialized implementation of
     /// @ref eval_grad_f_grad_g_prod, false if it uses the default implementation.
     bool provides_eval_grad_f_grad_g_prod() const {
@@ -786,11 +772,6 @@ auto TypeErasedProblem<Conf, Allocator>::eval_f_g(crvec x, rvec g) const -> real
     return call(vtable.eval_f_g, x, g);
 }
 template <Config Conf, class Allocator>
-auto TypeErasedProblem<Conf, Allocator>::eval_f_grad_f_g(crvec x, rvec grad_fx, rvec g) const
-    -> real_t {
-    return call(vtable.eval_f_grad_f_g, x, grad_fx, g);
-}
-template <Config Conf, class Allocator>
 void TypeErasedProblem<Conf, Allocator>::eval_grad_f_grad_g_prod(crvec x, crvec y, rvec grad_f,
                                                                  rvec grad_gxy) const {
     return call(vtable.eval_grad_f_grad_g_prod, x, y, grad_f, grad_gxy);
@@ -871,7 +852,6 @@ struct ProblemWithCounters {
     length_t get_hess_ψ_num_nonzeros() const requires requires { &std::remove_cvref_t<Problem>::get_hess_ψ_num_nonzeros; } { return problem.get_hess_ψ_num_nonzeros(); }
     real_t eval_f_grad_f(crvec x, rvec grad_fx) const requires requires { &std::remove_cvref_t<Problem>::eval_f_grad_f; } { ++evaluations->f_grad_f; return timed(evaluations->time.f_grad_f, std::bind(&std::remove_cvref_t<Problem>::eval_f_grad_f, &problem, x, grad_fx)); }
     real_t eval_f_g(crvec x, rvec g) const requires requires { &std::remove_cvref_t<Problem>::eval_f_g; } { ++evaluations->f_g; return timed(evaluations->time.f_g, std::bind(&std::remove_cvref_t<Problem>::eval_f_g, &problem, x, g)); }
-    real_t eval_f_grad_f_g(crvec x, rvec grad_fx, rvec g) const requires requires { &std::remove_cvref_t<Problem>::eval_f_grad_f_g; } { ++evaluations->f_grad_f_g; return timed(evaluations->time.f_grad_f_g, std::bind(&std::remove_cvref_t<Problem>::eval_f_grad_f_g, &problem, x, grad_fx, g)); }
     void eval_grad_f_grad_g_prod(crvec x, crvec y, rvec grad_f, rvec grad_gxy) const requires requires { &std::remove_cvref_t<Problem>::eval_grad_f_grad_g_prod; } { ++evaluations->grad_f_grad_g_prod; return timed(evaluations->time.grad_f_grad_g_prod, std::bind(&std::remove_cvref_t<Problem>::eval_grad_f_grad_g_prod, &problem, x, y, grad_f, grad_gxy)); }
     void eval_grad_L(crvec x, crvec y, rvec grad_L, rvec work_n) const requires requires { &std::remove_cvref_t<Problem>::eval_grad_L; } { ++evaluations->grad_L; return timed(evaluations->time.grad_L, std::bind(&std::remove_cvref_t<Problem>::eval_grad_L, &problem, x, y, grad_L, work_n)); }
     real_t eval_ψ(crvec x, crvec y, crvec Σ, rvec ŷ) const requires requires { &std::remove_cvref_t<Problem>::eval_ψ; } { ++evaluations->ψ; return timed(evaluations->time.ψ, std::bind(&std::remove_cvref_t<Problem>::eval_ψ, &problem, x, y, Σ, ŷ)); }
@@ -893,7 +873,6 @@ struct ProblemWithCounters {
     [[nodiscard]] bool provides_get_hess_ψ_num_nonzeros() const requires requires (Problem p) { { p.provides_get_hess_ψ_num_nonzeros() } -> std::convertible_to<bool>; } { return problem.provides_get_hess_ψ_num_nonzeros(); }
     [[nodiscard]] bool provides_eval_f_grad_f() const requires requires (Problem p) { { p.provides_eval_f_grad_f() } -> std::convertible_to<bool>; } { return problem.provides_eval_f_grad_f(); }
     [[nodiscard]] bool provides_eval_f_g() const requires requires (Problem p) { { p.provides_eval_f_g() } -> std::convertible_to<bool>; } { return problem.provides_eval_f_g(); }
-    [[nodiscard]] bool provides_eval_f_grad_f_g() const requires requires (Problem p) { { p.provides_eval_f_grad_f_g() } -> std::convertible_to<bool>; } { return problem.provides_eval_f_grad_f_g(); }
     [[nodiscard]] bool provides_eval_grad_f_grad_g_prod() const requires requires (Problem p) { { p.provides_eval_grad_f_grad_g_prod() } -> std::convertible_to<bool>; } { return problem.provides_eval_grad_f_grad_g_prod(); }
     [[nodiscard]] bool provides_eval_grad_L() const requires requires (Problem p) { { p.provides_eval_grad_L() } -> std::convertible_to<bool>; } { return problem.provides_eval_grad_L(); }
     [[nodiscard]] bool provides_eval_ψ() const requires requires (Problem p) { { p.provides_eval_ψ() } -> std::convertible_to<bool>; } { return problem.provides_eval_ψ(); }
@@ -1171,7 +1150,6 @@ void print_provided_functions(std::ostream &os, const TypeErasedProblem<Conf> &p
        << "            eval_hess_ψ: " << problem.provides_eval_hess_ψ() << '\n'
        << "          eval_f_grad_f: " << problem.provides_eval_f_grad_f() << '\n'
        << "               eval_f_g: " << problem.provides_eval_f_g() << '\n'
-       << "        eval_f_grad_f_g: " << problem.provides_eval_f_grad_f_g() << '\n'
        << "eval_grad_f_grad_g_prod: " << problem.provides_eval_grad_f_grad_g_prod() << '\n'
        << "            eval_grad_L: " << problem.provides_eval_grad_L() << '\n'
        << "                 eval_ψ: " << problem.provides_eval_ψ() << '\n'

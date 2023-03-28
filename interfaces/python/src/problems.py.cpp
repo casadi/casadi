@@ -166,7 +166,6 @@ void register_problems(py::module_ &m) {
         // void eval_hess_ψ(crvec x, crvec y, crvec Σ, rmat H) const { py::gil_scoped_acquire gil; o.attr("eval_hess_ψ")(x, y, Σ, H); } // TODO
         real_t eval_f_grad_f(crvec x, rvec grad_fx) const { py::gil_scoped_acquire gil; return py::cast<real_t>(o.attr("eval_f_grad_f")(x, grad_fx)); }
         real_t eval_f_g(crvec x, rvec g) const { py::gil_scoped_acquire gil; return py::cast<real_t>(o.attr("eval_f_g")(x, g)); }
-        real_t eval_f_grad_f_g(crvec x, rvec grad_fx, rvec g) const { py::gil_scoped_acquire gil; return py::cast<real_t>(o.attr("eval_f_grad_f_g")(x, grad_fx, g)); }
         void eval_grad_f_grad_g_prod(crvec x, crvec y, rvec grad_f, rvec grad_gxy) const { py::gil_scoped_acquire gil; o.attr("eval_grad_f_grad_g_prod")(x, y, grad_f, grad_gxy); }
         void eval_grad_L(crvec x, crvec y, rvec grad_L, rvec work_n) const { py::gil_scoped_acquire gil; o.attr("eval_grad_L")(x, y, grad_L, work_n); }
         real_t eval_ψ(crvec x, crvec y, crvec Σ, rvec ŷ) const { py::gil_scoped_acquire gil; return py::cast<real_t>(o.attr("eval_ψ")(x, y, Σ, ŷ)); }
@@ -184,7 +183,6 @@ void register_problems(py::module_ &m) {
         // bool provides_eval_hess_ψ() const { py::gil_scoped_acquire gil; return py::hasattr(o, "eval_hess_ψ"); }
         bool provides_eval_f_grad_f() const { py::gil_scoped_acquire gil; return py::hasattr(o, "eval_f_grad_f"); }
         bool provides_eval_f_g() const { py::gil_scoped_acquire gil; return py::hasattr(o, "eval_f_g"); }
-        bool provides_eval_f_grad_f_g() const { py::gil_scoped_acquire gil; return py::hasattr(o, "eval_f_grad_f_g"); }
         bool provides_eval_grad_f_grad_g_prod() const { py::gil_scoped_acquire gil; return py::hasattr(o, "eval_grad_f_grad_g_prod"); }
         bool provides_eval_grad_L() const { py::gil_scoped_acquire gil; return py::hasattr(o, "eval_grad_L"); }
         bool provides_eval_ψ() const { py::gil_scoped_acquire gil; return py::hasattr(o, "eval_ψ"); }
@@ -227,7 +225,6 @@ void register_problems(py::module_ &m) {
         // .def("eval_hess_ψ", &TEProblem::eval_hess_ψ, "x"_a, "y"_a, "Σ"_a, "H"_a) // TODO
         .def("eval_f_grad_f", &TEProblem::eval_f_grad_f, "x"_a, "grad_fx"_a)
         .def("eval_f_g", &TEProblem::eval_f_g, "x"_a, "g"_a)
-        .def("eval_f_grad_f_g", &TEProblem::eval_f_grad_f_g, "x"_a, "grad_fx"_a, "g"_a)
         .def("eval_grad_f_grad_g_prod", &TEProblem::eval_grad_f_grad_g_prod, "x"_a, "y"_a, "grad_f"_a, "grad_gxy"_a)
         .def("eval_grad_L", &TEProblem::eval_grad_L, "x"_a, "y"_a, "grad_L"_a, "work_n"_a)
         .def("eval_ψ", &TEProblem::eval_ψ, "x"_a, "y"_a, "Σ"_a, "ŷ"_a)
@@ -244,7 +241,6 @@ void register_problems(py::module_ &m) {
         // .def("provides_eval_hess_ψ", &TEProblem::provides_eval_hess_ψ) // TODO
         .def("provides_eval_f_grad_f", &TEProblem::provides_eval_f_grad_f)
         .def("provides_eval_f_g", &TEProblem::provides_eval_f_g)
-        .def("provides_eval_f_grad_f_g", &TEProblem::provides_eval_f_grad_f_g)
         .def("provides_eval_grad_f_grad_g_prod", &TEProblem::provides_eval_grad_f_grad_g_prod)
         .def("provides_eval_grad_L", &TEProblem::provides_eval_grad_L)
         .def("provides_eval_ψ", &TEProblem::provides_eval_ψ)

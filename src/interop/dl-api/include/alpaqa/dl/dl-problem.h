@@ -92,11 +92,6 @@ typedef struct {
         void *instance,
         const alpaqa_real_t *x,
         alpaqa_real_t *g);
-    alpaqa_real_t (*eval_f_grad_f_g)(
-        void *instance,
-        const alpaqa_real_t *x,
-        alpaqa_real_t *grad_fx,
-        alpaqa_real_t *g);
     void (*eval_grad_f_grad_g_prod)(
         void *instance,
         const alpaqa_real_t *x,

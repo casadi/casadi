@@ -15,7 +15,6 @@ struct EvalCounter {
     unsigned grad_f{};
     unsigned f_grad_f{};
     unsigned f_g{};
-    unsigned f_grad_f_g{};
     unsigned grad_f_grad_g_prod{};
     unsigned g{};
     unsigned grad_g_prod{};
@@ -39,7 +38,6 @@ struct EvalCounter {
         std::chrono::nanoseconds grad_f{};
         std::chrono::nanoseconds f_grad_f{};
         std::chrono::nanoseconds f_g{};
-        std::chrono::nanoseconds f_grad_f_g{};
         std::chrono::nanoseconds grad_f_grad_g_prod{};
         std::chrono::nanoseconds g{};
         std::chrono::nanoseconds grad_g_prod{};
@@ -70,7 +68,6 @@ inline EvalCounter::EvalTimer &operator+=(EvalCounter::EvalTimer &a,
     a.grad_f += b.grad_f;
     a.f_grad_f += b.f_grad_f;
     a.f_g += b.f_g;
-    a.f_grad_f_g += b.f_grad_f_g;
     a.grad_f_grad_g_prod += b.grad_f_grad_g_prod;
     a.g += b.g;
     a.grad_g_prod += b.grad_g_prod;
@@ -96,7 +93,6 @@ inline EvalCounter &operator+=(EvalCounter &a, const EvalCounter &b) {
     a.grad_f += b.grad_f;
     a.f_grad_f += b.f_grad_f;
     a.f_g += b.f_g;
-    a.f_grad_f_g += b.f_grad_f_g;
     a.grad_f_grad_g_prod += b.grad_f_grad_g_prod;
     a.g += b.g;
     a.grad_g_prod += b.grad_g_prod;

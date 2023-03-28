@@ -96,8 +96,6 @@ TEST(TypeErasedProblem, RequiredProblem) {
     EXPECT_EQ(te_prob.vtable.eval_f_grad_f,
               te_prob.vtable.default_eval_f_grad_f);
     EXPECT_EQ(te_prob.vtable.eval_f_g, te_prob.vtable.default_eval_f_g);
-    EXPECT_EQ(te_prob.vtable.eval_f_grad_f_g,
-              te_prob.vtable.default_eval_f_grad_f_g);
     EXPECT_EQ(te_prob.vtable.eval_grad_f_grad_g_prod,
               te_prob.vtable.default_eval_grad_f_grad_g_prod);
 
@@ -124,7 +122,6 @@ struct TestOptProblem : TestReqProblem {
     MOCK_METHOD(void, eval_hess_L, (crvec x, crvec y, real_t scale, rindexvec inner_idx, rindexvec outer_ptr, rvec H_values), (const));
     MOCK_METHOD(real_t, eval_f_grad_f, (crvec x, rvec grad_fx), (const));
     MOCK_METHOD(real_t, eval_f_g, (crvec x, rvec g), (const));
-    MOCK_METHOD(real_t, eval_f_grad_f_g, (crvec x, rvec grad_fx, rvec g), (const));
     MOCK_METHOD(void, eval_grad_f_grad_g_prod, (crvec x, crvec y, rvec grad_f, rvec grad_gxy), (const));
     MOCK_METHOD(void, eval_grad_L, (crvec x, crvec y, rvec grad_L, rvec work_n), (const));
     MOCK_METHOD(real_t, eval_ψ, (crvec x, crvec y, crvec Σ, rvec ŷ), (const));
@@ -199,11 +196,6 @@ TEST(TypeErasedProblem, OptionalProblem) {
     ASSERT_NE(te_prob.vtable.eval_f_g, nullptr);
     EXPECT_CALL(te_prob.as<TestOptProblem>(), eval_f_g);
     te_prob.vtable.eval_f_g(te_prob.self, x, x, te_prob.vtable);
-    testing::Mock::VerifyAndClearExpectations(&te_prob.as<TestOptProblem>());
-
-    ASSERT_NE(te_prob.vtable.eval_f_grad_f_g, nullptr);
-    EXPECT_CALL(te_prob.as<TestOptProblem>(), eval_f_grad_f_g);
-    te_prob.vtable.eval_f_grad_f_g(te_prob.self, x, x, x, te_prob.vtable);
     testing::Mock::VerifyAndClearExpectations(&te_prob.as<TestOptProblem>());
 
     ASSERT_NE(te_prob.vtable.eval_grad_f_grad_g_prod, nullptr);
@@ -332,13 +324,6 @@ TEST(TypeErasedProblem, CountedOptionalProblem) {
     te_prob.vtable.eval_f_g(te_prob.self, x, x, te_prob.vtable);
     testing::Mock::VerifyAndClearExpectations(&prob);
     EXPECT_EQ(evals.f_g, 1);
-
-    EXPECT_EQ(evals.f_grad_f_g, 0);
-    ASSERT_NE(te_prob.vtable.eval_f_grad_f_g, nullptr);
-    EXPECT_CALL(prob, eval_f_grad_f_g);
-    te_prob.vtable.eval_f_grad_f_g(te_prob.self, x, x, x, te_prob.vtable);
-    testing::Mock::VerifyAndClearExpectations(&prob);
-    EXPECT_EQ(evals.f_grad_f_g, 1);
 
     EXPECT_EQ(evals.grad_f_grad_g_prod, 0);
     ASSERT_NE(te_prob.vtable.eval_grad_f_grad_g_prod, nullptr);
@@ -482,10 +467,6 @@ TEST(TypeErasedProblem, TEOptionalProblem) {
 
     EXPECT_CALL(te_prob.as<TestOptProblem>(), eval_f_g);
     te_prob.eval_f_g(x, x);
-    testing::Mock::VerifyAndClearExpectations(&te_prob.as<TestOptProblem>());
-
-    EXPECT_CALL(te_prob.as<TestOptProblem>(), eval_f_grad_f_g);
-    te_prob.eval_f_grad_f_g(x, x, x);
     testing::Mock::VerifyAndClearExpectations(&te_prob.as<TestOptProblem>());
 
     EXPECT_CALL(te_prob.as<TestOptProblem>(), eval_grad_f_grad_g_prod);

@@ -80,7 +80,6 @@ auto DLProblem::eval_hess_ψ(crvec x, crvec y, crvec Σ, real_t scale, rindexvec
 auto DLProblem::get_hess_ψ_num_nonzeros() const -> length_t { return functions->get_hess_ψ_num_nonzeros(instance.get()); }
 auto DLProblem::eval_f_grad_f(crvec x, rvec grad_fx) const -> real_t { return functions->eval_f_grad_f(instance.get(), x.data(), grad_fx.data()); }
 auto DLProblem::eval_f_g(crvec x, rvec g) const -> real_t { return functions->eval_f_g(instance.get(), x.data(), g.data()); }
-auto DLProblem::eval_f_grad_f_g(crvec x, rvec grad_fx, rvec g) const -> real_t { return functions->eval_f_grad_f_g(instance.get(), x.data(), grad_fx.data(), g.data()); }
 auto DLProblem::eval_grad_f_grad_g_prod(crvec x, crvec y, rvec grad_f, rvec grad_gxy) const -> void { return functions->eval_grad_f_grad_g_prod(instance.get(), x.data(), y.data(), grad_f.data(), grad_gxy.data()); }
 auto DLProblem::eval_grad_L(crvec x, crvec y, rvec grad_L, rvec work_n) const -> void { return functions->eval_grad_L(instance.get(), x.data(), y.data(), grad_L.data(), work_n.data()); }
 auto DLProblem::eval_ψ(crvec x, crvec y, crvec Σ, rvec ŷ) const -> real_t { return functions->eval_ψ(instance.get(), x.data(), y.data(), Σ.data(), D.lowerbound.data(), D.upperbound.data(), ŷ.data()); }
@@ -103,7 +102,6 @@ bool DLProblem::provides_eval_hess_ψ() const { return functions->eval_hess_ψ !
 bool DLProblem::provides_get_hess_ψ_num_nonzeros() const { return functions->get_hess_ψ_num_nonzeros != nullptr; }
 bool DLProblem::provides_eval_f_grad_f() const { return functions->eval_f_grad_f != nullptr; }
 bool DLProblem::provides_eval_f_g() const { return functions->eval_f_g != nullptr; }
-bool DLProblem::provides_eval_f_grad_f_g() const { return functions->eval_f_grad_f_g != nullptr; }
 bool DLProblem::provides_eval_grad_f_grad_g_prod() const { return functions->eval_grad_f_grad_g_prod != nullptr; }
 bool DLProblem::provides_eval_grad_L() const { return functions->eval_grad_L != nullptr; }
 bool DLProblem::provides_eval_ψ() const { return functions->eval_ψ != nullptr; }
