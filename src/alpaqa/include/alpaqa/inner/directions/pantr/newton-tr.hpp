@@ -1,7 +1,6 @@
 #pragma once
 
 #include <alpaqa/accelerators/steihaugcg.hpp>
-#include <alpaqa/inner/directions/panoc-direction-update.hpp>
 #include <alpaqa/problem/type-erased-problem.hpp>
 #include <alpaqa/util/alloc-check.hpp>
 #include <cmath>
@@ -40,7 +39,7 @@ struct NewtonTRDirection {
                       const DirectionParams &directionparams = {})
         : steihaug(params), direction_params(directionparams) {}
 
-    /// @see @ref PANNewtonTRDirection::initialize
+    /// @see @ref PANTRDirection::initialize
     void initialize(const Problem &problem, [[maybe_unused]] crvec y,
                     [[maybe_unused]] crvec Σ, [[maybe_unused]] real_t γ_0,
                     [[maybe_unused]] crvec x_0, [[maybe_unused]] crvec x̂_0,
@@ -66,10 +65,10 @@ struct NewtonTRDirection {
         steihaug.resize(n);
     }
 
-    /// @see @ref PANNewtonTRDirection::has_initial_direction
+    /// @see @ref PANTRDirection::has_initial_direction
     bool has_initial_direction() const { return true; }
 
-    /// @see @ref PANNewtonTRDirection::update
+    /// @see @ref PANTRDirection::update
     bool update([[maybe_unused]] real_t γₖ, [[maybe_unused]] real_t γₙₑₓₜ,
                 [[maybe_unused]] crvec xₖ, [[maybe_unused]] crvec xₙₑₓₜ,
                 [[maybe_unused]] crvec pₖ, [[maybe_unused]] crvec pₙₑₓₜ,
@@ -78,7 +77,7 @@ struct NewtonTRDirection {
         return true;
     }
 
-    /// @see @ref PANNewtonTRDirection::apply
+    /// @see @ref PANTRDirection::apply
     real_t apply([[maybe_unused]] real_t γₖ, [[maybe_unused]] crvec xₖ,
                  [[maybe_unused]] crvec x̂ₖ, crvec pₖ,
                  [[maybe_unused]] crvec grad_ψxₖ, real_t radius,
@@ -133,17 +132,17 @@ struct NewtonTRDirection {
         return qJ_model - norm_qK_sq / (2 * γₖ);
     }
 
-    /// @see @ref PANNewtonTRDirection::changed_γ
+    /// @see @ref PANTRDirection::changed_γ
     void changed_γ([[maybe_unused]] real_t γₖ, [[maybe_unused]] real_t old_γₖ) {
         if (direction_params.rescale_when_γ_changes)
             throw std::invalid_argument(
                 "NewtonTRDirection does not support rescale_when_γ_changes");
     }
 
-    /// @see @ref PANNewtonTRDirection::reset
+    /// @see @ref PANTRDirection::reset
     void reset() {}
 
-    /// @see @ref PANNewtonTRDirection::get_name
+    /// @see @ref PANTRDirection::get_name
     std::string get_name() const {
         return "NewtonTRDirection<" + std::string(config_t::get_name()) + '>';
     }

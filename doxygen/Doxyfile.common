@@ -2322,7 +2322,10 @@ SEARCH_INCLUDES        = YES
 INCLUDE_PATH           = ../src/alpaqa/include \
                          ../src/interop/casadi/include \
                          ../src/interop/dl-api/include \
-                         ../src/interop/dl/include
+                         ../src/interop/dl/include \
+                         ../src/interop/ipopt/include \
+                         ../src/interop/lbfgspp/include \
+                         ../src/interop/lbfgsb/include
 
 # You can use the INCLUDE_FILE_PATTERNS tag to specify one or more wildcard
 # patterns (like *.h and *.hpp) to filter out the header-files in the
@@ -2344,6 +2347,7 @@ INCLUDE_FILE_PATTERNS  = *.h \
 PREDEFINED             = DOXYGEN \
                          "ALPAQA_EXPORT=" \
                          "CASADI_LOADER_EXPORT=" \
+                         ALPAQA_WITH_OCP \
                          __cplusplus=202002L
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this

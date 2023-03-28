@@ -116,7 +116,7 @@ void set_param(T &t, ParamString s) {
     it->second.set(t, s);
 }
 
-/// Helper macro to easily specialize @ref dict_to_struct_table.
+/// Helper macro to easily specialize @ref alpaqa::params::dict_to_struct_table.
 #define PARAMS_TABLE(type_, ...)                                               \
     template <>                                                                \
     struct dict_to_struct_table<type_> {                                       \
@@ -124,7 +124,8 @@ void set_param(T &t, ParamString s) {
         inline static const dict_to_struct_table_t<type> table{__VA_ARGS__};   \
     }
 
-/// Helper macro to easily initialize a @ref dict_to_struct_table_t.
+/// Helper macro to easily initialize a
+/// @ref alpaqa::params::dict_to_struct_table_t.
 #define PARAMS_MEMBER(name)                                                    \
     {                                                                          \
 #name, &type::name                                                     \

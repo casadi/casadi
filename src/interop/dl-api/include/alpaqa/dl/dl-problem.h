@@ -361,8 +361,8 @@ using problem_functions_t         = alpaqa_problem_functions_t;
 using control_problem_functions_t = alpaqa_control_problem_functions_t;
 
 /// Make the given function available to alpaqa.
-/// @see @ref DLProblem::call_extra_func
-/// @see @ref DLControlProblem::call_extra_func
+/// @see @ref alpaqa::dl::DLProblem::call_extra_func
+/// @see @ref alpaqa::dl::DLControlProblem::call_extra_func
 template <class Func>
 void register_function(function_dict_t *&extra_functions, std::string name,
                        Func &&func) {
