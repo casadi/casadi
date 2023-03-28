@@ -487,8 +487,7 @@ int CvodesInterface::psolveF(double t, N_Vector x, N_Vector xdot, N_Vector r,
     casadi_copy(v, s.nx_, m->v1);
 
     // Solve for undifferentiated right-hand-side, save to output
-    if (s.linsolF_.solve(m->jacF, m->v1, 1, false, m->mem_linsolF))
-      casadi_error("Linear system solve failed");
+    if (s.linsolF_.solve(m->jacF, m->v1, 1, false, m->mem_linsolF)) return 1;
     v = NV_DATA_S(z); // possibly different from r
     casadi_copy(m->v1, s.nx1_, v);
 
@@ -505,8 +504,7 @@ int CvodesInterface::psolveF(double t, N_Vector x, N_Vector xdot, N_Vector r,
       }
 
       // Solve for sensitivity right-hand-sides
-      if (s.linsolF_.solve(m->jacF, m->v1 + s.nx1_, s.nfwd_, false, m->mem_linsolF))
-        casadi_error("Linear solve failed");
+      if (s.linsolF_.solve(m->jacF, m->v1 + s.nx1_, s.nfwd_, false, m->mem_linsolF)) return 1;
 
       // Save to output, reordered
       casadi_copy(m->v1 + s.nx1_, s.nx_ - s.nx1_, v + s.nx1_);
@@ -532,8 +530,7 @@ int CvodesInterface::psolveB(double t, N_Vector x, N_Vector xB, N_Vector xdotB, 
     casadi_copy(v, s.nrx_, m->v1);
 
     // Solve for undifferentiated right-hand-side, save to output
-    if (s.linsolB_.solve(m->jacB, m->v1, 1, false, m->mem_linsolB))
-      casadi_error("Linear solve failed");
+    if (s.linsolB_.solve(m->jacB, m->v1, 1, false, m->mem_linsolB)) return 1;
     v = NV_DATA_S(zvecB); // possibly different from rvecB
     casadi_copy(m->v1, s.nrx1_ * s.nadj_, v);
 
@@ -552,9 +549,7 @@ int CvodesInterface::psolveB(double t, N_Vector x, N_Vector xB, N_Vector xdotB, 
       }
 
       // Solve for sensitivity right-hand-sides
-      if (s.linsolB_.solve(m->jacB, m->v1 + s.nx1_, s.nfwd_, false, m->mem_linsolB)) {
-        casadi_error("Linear solve failed");
-      }
+      if (s.linsolB_.solve(m->jacB, m->v1 + s.nx1_, s.nfwd_, false, m->mem_linsolB)) return 1;
 
       // Save to output, reordered
       casadi_copy(m->v1 + s.nx1_, s.nx_ - s.nx1_, v + s.nx1_);
@@ -608,7 +603,7 @@ int CvodesInterface::psetupF(double t, N_Vector x, N_Vector xdot, booleantype jo
     *jcurPtr = 1;
 
     // Prepare the solution of the linear system (e.g. factorize)
-    if (s.linsolF_.nfact(m->jacF, m->mem_linsolF)) casadi_error("'jacF' factorization failed");
+    if (s.linsolF_.nfact(m->jacF, m->mem_linsolF)) return 1;
 
     return 0;
   } catch(int flag) { // recoverable error
@@ -658,7 +653,7 @@ int CvodesInterface::psetupB(double t, N_Vector x, N_Vector rx, N_Vector rxdot,
     *jcurPtrB = 1;
 
     // Prepare the solution of the linear system (e.g. factorize)
-    if (s.linsolB_.nfact(m->jacB, m->mem_linsolB)) casadi_error("'jacB' factorization failed");
+    if (s.linsolB_.nfact(m->jacB, m->mem_linsolB)) return 1;
 
     return 0;
   } catch(int flag) { // recoverable error

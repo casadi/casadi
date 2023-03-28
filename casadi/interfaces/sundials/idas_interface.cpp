@@ -653,7 +653,7 @@ int IdasInterface::psolveF(double t, N_Vector xz, N_Vector xzdot, N_Vector rr,
 
     // Solve for undifferentiated right-hand-side, save to output
     if (s.linsolF_.solve(m->jacF, m->v1, 1, false, m->mem_linsolF))
-      casadi_error("'jac' solve failed");
+      return 1;
     vx = NV_DATA_S(zvec); // possibly different from rvec
     vz = vx + s.nx_;
     casadi_copy(m->v1, s.nx1_, vx);
@@ -680,9 +680,8 @@ int IdasInterface::psolveF(double t, N_Vector xz, N_Vector xzdot, N_Vector rr,
       }
 
       // Solve for sensitivity right-hand-sides
-      if (s.linsolF_.solve(m->jacF, m->v1 + s.nx1_ + s.nz1_, s.nfwd_, false, m->mem_linsolF)) {
-        casadi_error("'jac' solve failed");
-      }
+      if (s.linsolF_.solve(m->jacF, m->v1 + s.nx1_ + s.nz1_, s.nfwd_,
+        false, m->mem_linsolF)) return 1;
 
       // Save to output, reordered
       v_it = m->v1 + s.nx1_ + s.nz1_;
@@ -725,8 +724,7 @@ int IdasInterface::psolveB(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB,
     }
 
     // Solve for undifferentiated right-hand-side, save to output
-    if (s.linsolB_.solve(m->jacB, m->v1, 1, false, m->mem_linsolB))
-      casadi_error("'jacB' solve failed");
+    if (s.linsolB_.solve(m->jacB, m->v1, 1, false, m->mem_linsolB)) return 1;
     vx = NV_DATA_S(zvecB); // possibly different from rvecB
     vz = vx + s.nrx_;
     for (int a = 0; a < s.nadj_; ++a) {
@@ -763,9 +761,7 @@ int IdasInterface::psolveB(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB,
 
       // Solve for sensitivity right-hand-sides
       if (s.linsolB_.solve(m->jacB, m->v1 + s.nrx1_ * s.nadj_ + s.nrz1_ * s.nadj_,
-          s.nfwd_, false, m->mem_linsolB)) {
-        casadi_error("'jacB' solve failed");
-      }
+          s.nfwd_, false, m->mem_linsolB)) return 1;
 
       // Save to output, reordered
       v_it = m->v1 + s.nrx1_ * s.nadj_ + s.nrz1_ * s.nadj_;
@@ -853,7 +849,7 @@ int IdasInterface::psetupF(double t, N_Vector xz, N_Vector xzdot, N_Vector rr,
     }
 
     // Factorize the linear system
-    if (s.linsolF_.nfact(m->jacF, m->mem_linsolF)) casadi_error("Linear solve failed");
+    if (s.linsolF_.nfact(m->jacF, m->mem_linsolF)) return 1;
 
     return 0;
   } catch(std::exception& e) { // non-recoverable error
@@ -897,7 +893,7 @@ int IdasInterface::psetupB(double t, N_Vector xz, N_Vector xzdot, N_Vector rxz, 
     }
 
     // Factorize the linear system
-    if (s.linsolB_.nfact(m->jacB, m->mem_linsolB)) casadi_error("'jacB' factorization failed");
+    if (s.linsolB_.nfact(m->jacB, m->mem_linsolB)) return 1;
 
     return 0;
   } catch(std::exception& e) { // non-recoverable error
