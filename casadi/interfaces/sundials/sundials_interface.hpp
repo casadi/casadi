@@ -121,36 +121,36 @@ namespace casadi {
     double get_abstol() const override { return abstol_;}
 
     // DAE right-hand-side, forward problem
-    void calc_daeF(SundialsMemory* m, double t, const double* x, const double* z,
+    int calc_daeF(SundialsMemory* m, double t, const double* x, const double* z,
       double* ode, double* alg) const;
 
     // DAE right-hand-side, forward problem
-    void calc_daeB(SundialsMemory* m, double t, const double* x, const double* z,
+    int calc_daeB(SundialsMemory* m, double t, const double* x, const double* z,
       const double* rx, const double* rz, double* adj_x, double* adj_z) const;
 
     // Quadrature right-hand-side, forward problem
-    void calc_quadF(SundialsMemory* m, double t, const double* x, const double* z,
+    int calc_quadF(SundialsMemory* m, double t, const double* x, const double* z,
       double* quad) const;
 
     // Quadrature right-hand-side, backward problem
-    void calc_quadB(SundialsMemory* m, double t, const double* x, const double* z,
+    int calc_quadB(SundialsMemory* m, double t, const double* x, const double* z,
       const double* rx, const double* rz, double* adj_p, double* adj_u) const;
 
     // Jacobian of DAE-times-vector function, forward problem
-    void calc_jtimesF(SundialsMemory* m, double t, const double* x, const double* z,
+    int calc_jtimesF(SundialsMemory* m, double t, const double* x, const double* z,
       const double* fwd_x, const double* fwd_z, double* fwd_ode, double* fwd_alg) const;
 
     // Jacobian of DAE-times-vector function, backward problem
-    void calc_jtimesB(SundialsMemory* m, double t, const double* x, const double* z,
+    int calc_jtimesB(SundialsMemory* m, double t, const double* x, const double* z,
       const double* rx, const double* rz, const double* fwd_rx, const double* fwd_rz,
       double* fwd_adj_x, double* fwd_adj_z) const;
 
     // Jacobian of DAE right-hand-side function, forward problem
-    void calc_jacF(SundialsMemory* m, double t, const double* x, const double* z,
+    int calc_jacF(SundialsMemory* m, double t, const double* x, const double* z,
       double* jac_ode_x, double* jac_alg_x, double* jac_ode_z, double* jac_alg_z) const;
 
     // Jacobian of DAE right-hand-side function, backward problem
-    void calc_jacB(SundialsMemory* m, double t, const double* x, const double* z,
+    int calc_jacB(SundialsMemory* m, double t, const double* x, const double* z,
       const double* rx, const double* rz,
       double* jac_adj_x_rx, double* jac_adj_z_rx, double* jac_adj_x_rz, double* jac_adj_z_rz) const;
 

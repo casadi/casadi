@@ -181,7 +181,8 @@ int IdasInterface::resF(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, void
   try {
     auto m = to_mem(user_data);
     auto& s = m->self;
-    s.calc_daeF(m, t, NV_DATA_S(xz), NV_DATA_S(xz) + s.nx_, NV_DATA_S(rr), NV_DATA_S(rr) + s.nx_);
+    if (s.calc_daeF(m, t, NV_DATA_S(xz), NV_DATA_S(xz) + s.nx_,
+      NV_DATA_S(rr), NV_DATA_S(rr) + s.nx_)) return 1;
 
     // Subtract state derivative to get residual
     casadi_axpy(s.nx_, -1., NV_DATA_S(xzdot), NV_DATA_S(rr));
@@ -208,8 +209,9 @@ int IdasInterface::jtimesF(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, N
   try {
     auto m = to_mem(user_data);
     auto& s = m->self;
-    s.calc_jtimesF(m, t, NV_DATA_S(xz), NV_DATA_S(xz) + s.nx_, NV_DATA_S(v), NV_DATA_S(v) + s.nx_,
-      NV_DATA_S(Jv), NV_DATA_S(Jv) + s.nx_);
+    if (s.calc_jtimesF(m, t, NV_DATA_S(xz), NV_DATA_S(xz) + s.nx_,
+      NV_DATA_S(v), NV_DATA_S(v) + s.nx_,
+      NV_DATA_S(Jv), NV_DATA_S(Jv) + s.nx_)) return 1;
 
     // Subtract state derivative to get residual
     casadi_axpy(s.nx_, -cj, NV_DATA_S(v), NV_DATA_S(Jv));
@@ -227,10 +229,10 @@ int IdasInterface::jtimesB(double t, N_Vector xz, N_Vector xzdot, N_Vector rxz,
   try {
     auto m = to_mem(user_data);
     auto& s = m->self;
-    s.calc_jtimesB(m, t, NV_DATA_S(xz), NV_DATA_S(xz) + s.nx_,
+    if (s.calc_jtimesB(m, t, NV_DATA_S(xz), NV_DATA_S(xz) + s.nx_,
       NV_DATA_S(rxz), NV_DATA_S(rxz) + s.nrx_,
       NV_DATA_S(v), NV_DATA_S(v) + s.nrx_,
-      NV_DATA_S(Jv), NV_DATA_S(Jv) + s.nrx_);
+      NV_DATA_S(Jv), NV_DATA_S(Jv) + s.nrx_)) return 1;
 
     // Subtract state derivative to get residual
     casadi_axpy(s.nrx_, cjB, NV_DATA_S(v), NV_DATA_S(Jv));
@@ -585,7 +587,7 @@ int IdasInterface::rhsQF(double t, N_Vector xz, N_Vector xzdot, N_Vector qdot, v
   try {
     auto m = to_mem(user_data);
     auto& s = m->self;
-    s.calc_quadF(m, t, NV_DATA_S(xz), NV_DATA_S(xz) + s.nx_, NV_DATA_S(qdot));
+    if (s.calc_quadF(m, t, NV_DATA_S(xz), NV_DATA_S(xz) + s.nx_, NV_DATA_S(qdot))) return 1;
 
     return 0;
   } catch(std::exception& e) { // non-recoverable error
@@ -599,8 +601,9 @@ int IdasInterface::resB(double t, N_Vector xz, N_Vector xzdot, N_Vector rxz,
   try {
     auto m = to_mem(user_data);
     auto& s = m->self;
-    s.calc_daeB(m, t, NV_DATA_S(xz), NV_DATA_S(xz) + s.nx_, NV_DATA_S(rxz), NV_DATA_S(rxz) + s.nrx_,
-      NV_DATA_S(rr), NV_DATA_S(rr) + s.nrx_);
+    if (s.calc_daeB(m, t, NV_DATA_S(xz), NV_DATA_S(xz) + s.nx_,
+      NV_DATA_S(rxz), NV_DATA_S(rxz) + s.nrx_,
+      NV_DATA_S(rr), NV_DATA_S(rr) + s.nrx_)) return 1;
 
     // Subtract state derivative to get residual
     casadi_axpy(s.nrx_, 1., NV_DATA_S(rxzdot), NV_DATA_S(rr));
@@ -617,9 +620,9 @@ int IdasInterface::rhsQB(double t, N_Vector xz, N_Vector xzdot, N_Vector rxz,
   try {
     auto m = to_mem(user_data);
     auto& s = m->self;
-    s.calc_quadB(m, t, NV_DATA_S(xz), NV_DATA_S(xz) + s.nx_,
+    if (s.calc_quadB(m, t, NV_DATA_S(xz), NV_DATA_S(xz) + s.nx_,
       NV_DATA_S(rxz), NV_DATA_S(rxz) + s.nrx_,
-      NV_DATA_S(ruqdot), NV_DATA_S(ruqdot) + s.nrq_);
+      NV_DATA_S(ruqdot), NV_DATA_S(ruqdot) + s.nrq_)) return 1;
 
     // Negate (note definition of g)
     casadi_scal(s.nrq_ + s.nuq_, -1., NV_DATA_S(ruqdot));
@@ -663,8 +666,8 @@ int IdasInterface::psolveF(double t, N_Vector xz, N_Vector xzdot, N_Vector rr,
         // The outputs will double as seeds for jtimesF
         casadi_clear(vx + s.nx1_, s.nx_ - s.nx1_);
         casadi_clear(vz + s.nz1_, s.nz_ - s.nz1_);
-        s.calc_jtimesF(m, t, NV_DATA_S(xz), NV_DATA_S(xz) + s.nx_,
-          vx, vz, m->v2, m->v2 + s.nx_);
+        if (s.calc_jtimesF(m, t, NV_DATA_S(xz), NV_DATA_S(xz) + s.nx_,
+          vx, vz, m->v2, m->v2 + s.nx_)) return 1;
 
         // Subtract m->v2 (reordered) from m->v1
         v_it = m->v1 + s.nx1_ + s.nz1_;
@@ -740,9 +743,9 @@ int IdasInterface::psolveB(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB,
         casadi_clear(vz + s.nrz1_ * s.nadj_, s.nrz_ - s.nrz1_ * s.nadj_);
 
         // Get second-order-correction, save to m->v2
-        s.calc_jtimesB(m, t, NV_DATA_S(xz), NV_DATA_S(xz) + s.nx_,
+        if (s.calc_jtimesB(m, t, NV_DATA_S(xz), NV_DATA_S(xz) + s.nx_,
           NV_DATA_S(xzB), NV_DATA_S(xzB) + s.nrx_,
-          vx, vz, m->v2, m->v2 + s.nrx_);
+          vx, vz, m->v2, m->v2 + s.nrx_)) return 1;
 
         // Subtract m->v2 (reordered) from m->v1
         v_it = m->v1 + (s.nrx1_ + s.nrz1_) * s.nadj_;
@@ -831,8 +834,8 @@ int IdasInterface::psetupF(double t, N_Vector xz, N_Vector xzdot, N_Vector rr,
     const Sparsity& sp_jacF = s.linsolF_.sparsity();
 
     // Calculate Jacobian blocks
-    s.calc_jacF(m, t, NV_DATA_S(xz), NV_DATA_S(xz) + s.nx_,
-      m->jac_ode_x, m->jac_alg_x, m->jac_ode_z, m->jac_alg_z);
+    if (s.calc_jacF(m, t, NV_DATA_S(xz), NV_DATA_S(xz) + s.nx_,
+      m->jac_ode_x, m->jac_alg_x, m->jac_ode_z, m->jac_alg_z)) return 1;
 
     // Copy to jacF structure
     casadi_int nx_jac = sp_jac_ode_x.size1();  // excludes sensitivity equations
@@ -874,9 +877,9 @@ int IdasInterface::psetupB(double t, N_Vector xz, N_Vector xzdot, N_Vector rxz, 
     const Sparsity& sp_jacB = s.linsolB_.sparsity();
 
     // Calculate Jacobian blocks
-    s.calc_jacB(m, t, NV_DATA_S(xz), NV_DATA_S(xz) + s.nx_,
+    if (s.calc_jacB(m, t, NV_DATA_S(xz), NV_DATA_S(xz) + s.nx_,
       NV_DATA_S(rxz), NV_DATA_S(rxz) + s.nrx_,
-      m->jac_adj_x_rx, m->jac_adj_z_rx, m->jac_adj_x_rz, m->jac_adj_z_rz);
+      m->jac_adj_x_rx, m->jac_adj_z_rx, m->jac_adj_x_rz, m->jac_adj_z_rz)) return 1;
 
     // Copy to jacB structure
     casadi_int nx_jac = sp_jac_ode_xB->size1();  // excludes sensitivity equations

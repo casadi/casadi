@@ -210,7 +210,7 @@ int CvodesInterface::rhsF(double t, N_Vector x, N_Vector xdot, void *user_data) 
     casadi_assert_dev(user_data);
     auto m = to_mem(user_data);
     auto& s = m->self;
-    s.calc_daeF(m, t, NV_DATA_S(x), nullptr, NV_DATA_S(xdot), nullptr);
+    if (s.calc_daeF(m, t, NV_DATA_S(x), nullptr, NV_DATA_S(xdot), nullptr)) return 1;
     return 0;
   } catch(std::exception& e) { // non-recoverable error
     uerr() << "rhs failed: " << e.what() << std::endl;
@@ -405,7 +405,7 @@ int CvodesInterface::rhsQF(double t, N_Vector x, N_Vector qdot, void *user_data)
   try {
     auto m = to_mem(user_data);
     auto& s = m->self;
-    s.calc_quadF(m, t, NV_DATA_S(x), nullptr, NV_DATA_S(qdot));
+    if (s.calc_quadF(m, t, NV_DATA_S(x), nullptr, NV_DATA_S(qdot))) return 1;
 
     return 0;
   } catch(std::exception& e) { // non-recoverable error
@@ -419,7 +419,8 @@ int CvodesInterface::rhsB(double t, N_Vector x, N_Vector rx, N_Vector rxdot, voi
     casadi_assert_dev(user_data);
     auto m = to_mem(user_data);
     auto& s = m->self;
-    s.calc_daeB(m, t, NV_DATA_S(x), nullptr, NV_DATA_S(rx), nullptr, NV_DATA_S(rxdot), nullptr);
+    if (s.calc_daeB(m, t, NV_DATA_S(x), nullptr, NV_DATA_S(rx), nullptr,
+      NV_DATA_S(rxdot), nullptr)) return 1;
     // Negate (note definition of g)
     casadi_scal(s.nrx_, -1., NV_DATA_S(rxdot));
     return 0;
@@ -434,8 +435,8 @@ int CvodesInterface::rhsQB(double t, N_Vector x, N_Vector rx, N_Vector ruqdot, v
     casadi_assert_dev(user_data);
     auto m = to_mem(user_data);
     auto& s = m->self;
-    s.calc_quadB(m, t, NV_DATA_S(x), nullptr, NV_DATA_S(rx), nullptr,
-      NV_DATA_S(ruqdot), NV_DATA_S(ruqdot) + s.nrq_);
+    if (s.calc_quadB(m, t, NV_DATA_S(x), nullptr, NV_DATA_S(rx), nullptr,
+      NV_DATA_S(ruqdot), NV_DATA_S(ruqdot) + s.nrq_)) return 1;
 
     // Negate (note definition of g)
     casadi_scal((s.nrq_ + s.nuq_), -1., NV_DATA_S(ruqdot));
@@ -452,7 +453,8 @@ int CvodesInterface::jtimesF(N_Vector v, N_Vector Jv, double t, N_Vector x,
   try {
     auto m = to_mem(user_data);
     auto& s = m->self;
-    s.calc_jtimesF(m, t, NV_DATA_S(x), nullptr, NV_DATA_S(v), nullptr, NV_DATA_S(Jv), nullptr);
+    if (s.calc_jtimesF(m, t, NV_DATA_S(x), nullptr, NV_DATA_S(v), nullptr,
+      NV_DATA_S(Jv), nullptr)) return 1;
     return 0;
   } catch(std::exception& e) { // non-recoverable error
     uerr() << "jtimesF failed: " << e.what() << std::endl;
@@ -465,11 +467,9 @@ int CvodesInterface::jtimesB(N_Vector v, N_Vector Jv, double t, N_Vector x,
   try {
     auto m = to_mem(user_data);
     auto& s = m->self;
-    s.calc_jtimesB(m, t, NV_DATA_S(x), nullptr, NV_DATA_S(rx), nullptr,
-      NV_DATA_S(v), nullptr, NV_DATA_S(Jv), nullptr);
+    if (s.calc_jtimesB(m, t, NV_DATA_S(x), nullptr, NV_DATA_S(rx), nullptr,
+      NV_DATA_S(v), nullptr, NV_DATA_S(Jv), nullptr)) return 1;
     return 0;
-  } catch(int flag) { // recoverable error
-    return flag;
   } catch(std::exception& e) { // non-recoverable error
     uerr() << "jtimesB failed: " << e.what() << std::endl;
     return -1;
@@ -498,7 +498,7 @@ int CvodesInterface::psolveF(double t, N_Vector x, N_Vector xdot, N_Vector r,
       if (s.second_order_correction_) {
         // The outputs will double as seeds for jtimesF
         casadi_clear(v + s.nx1_, s.nx_ - s.nx1_);
-        s.calc_jtimesF(m, t, NV_DATA_S(x), nullptr, v, nullptr, m->v2, nullptr);
+        if (s.calc_jtimesF(m, t, NV_DATA_S(x), nullptr, v, nullptr, m->v2, nullptr)) return 1;
 
         // Subtract m->v2 from m->v1, scaled with -gamma
         casadi_axpy(s.nx_ - s.nx1_, m->gamma, m->v2 + s.nx1_, m->v1 + s.nx1_);
@@ -543,8 +543,8 @@ int CvodesInterface::psolveB(double t, N_Vector x, N_Vector xB, N_Vector xdotB, 
       if (s.second_order_correction_) {
         // The outputs will double as seeds for jtimesB
         casadi_clear(v + s.nrx1_ * s.nadj_, s.nrx_ - s.nrx1_ * s.nadj_);
-        s.calc_jtimesB(m, t, NV_DATA_S(x), nullptr, NV_DATA_S(xB),
-          nullptr, v, nullptr, m->v2, nullptr);
+        if (s.calc_jtimesB(m, t, NV_DATA_S(x), nullptr, NV_DATA_S(xB),
+          nullptr, v, nullptr, m->v2, nullptr)) return 1;
 
         // Subtract m->v2 from m->v1, scaled with gammaB
         casadi_axpy(s.nrx_ - s.nrx1_ * s.nadj_, -m->gammaB, m->v2 + s.nrx1_ * s.nadj_,
@@ -586,7 +586,8 @@ int CvodesInterface::psetupF(double t, N_Vector x, N_Vector xdot, booleantype jo
     casadi_int jac_offset = sp_jacF.nnz() - sp_jac_ode_x.nnz();
 
     // Calculate Jacobian
-    s.calc_jacF(m, t, NV_DATA_S(x), nullptr, m->jacF + jac_offset, nullptr, nullptr, nullptr);
+    if (s.calc_jacF(m, t, NV_DATA_S(x), nullptr,
+      m->jacF + jac_offset, nullptr, nullptr, nullptr)) return 1;
 
     // Project to expected sparsity pattern (with diagonal)
     casadi_project(m->jacF + jac_offset, sp_jac_ode_x, m->jacF, sp_jacF, m->w);
@@ -635,8 +636,8 @@ int CvodesInterface::psetupB(double t, N_Vector x, N_Vector rx, N_Vector rxdot,
     casadi_int jac_offset = sp_jacB.nnz() - sp_jac_adj_x_rx.nnz();
 
     // Calculate Jacobian
-    s.calc_jacB(m, t, NV_DATA_S(x), nullptr, NV_DATA_S(rx), nullptr,
-      m->jacB + jac_offset, nullptr, nullptr, nullptr);
+    if (s.calc_jacB(m, t, NV_DATA_S(x), nullptr, NV_DATA_S(rx), nullptr,
+      m->jacB + jac_offset, nullptr, nullptr, nullptr)) return 1;
 
     // Project to expected sparsity pattern (with diagonal)
     casadi_project(m->jacB + jac_offset, sp_jac_adj_x_rx, m->jacB, sp_jacB, m->w);
