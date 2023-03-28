@@ -186,8 +186,6 @@ int IdasInterface::resF(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, void
     // Subtract state derivative to get residual
     casadi_axpy(s.nx_, -1., NV_DATA_S(xzdot), NV_DATA_S(rr));
     return 0;
-  } catch(int flag) { // recoverable error
-    return flag;
   } catch(std::exception& e) { // non-recoverable error
     uerr() << "res failed: " << e.what() << std::endl;
     return -1;
@@ -217,8 +215,6 @@ int IdasInterface::jtimesF(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, N
     casadi_axpy(s.nx_, -cj, NV_DATA_S(v), NV_DATA_S(Jv));
 
     return 0;
-  } catch(int flag) { // recoverable error
-    return flag;
   } catch(std::exception& e) { // non-recoverable error
     uerr() << "jtimesF failed: " << e.what() << std::endl;
     return -1;
@@ -240,8 +236,6 @@ int IdasInterface::jtimesB(double t, N_Vector xz, N_Vector xzdot, N_Vector rxz,
     casadi_axpy(s.nrx_, cjB, NV_DATA_S(v), NV_DATA_S(Jv));
 
     return 0;
-  } catch(int flag) { // recoverable error
-    return flag;
   } catch(std::exception& e) { // non-recoverable error
     uerr() << "jtimesB failed: " << e.what() << std::endl;
     return -1;
@@ -594,8 +588,6 @@ int IdasInterface::rhsQF(double t, N_Vector xz, N_Vector xzdot, N_Vector qdot, v
     s.calc_quadF(m, t, NV_DATA_S(xz), NV_DATA_S(xz) + s.nx_, NV_DATA_S(qdot));
 
     return 0;
-  } catch(int flag) { // recoverable error
-    return flag;
   } catch(std::exception& e) { // non-recoverable error
     uerr() << "rhsQ failed: " << e.what() << std::endl;
     return -1;
@@ -614,8 +606,6 @@ int IdasInterface::resB(double t, N_Vector xz, N_Vector xzdot, N_Vector rxz,
     casadi_axpy(s.nrx_, 1., NV_DATA_S(rxzdot), NV_DATA_S(rr));
 
     return 0;
-  } catch(int flag) { // recoverable error
-    return flag;
   } catch(std::exception& e) { // non-recoverable error
     uerr() << "resB failed: " << e.what() << std::endl;
     return -1;
@@ -635,8 +625,6 @@ int IdasInterface::rhsQB(double t, N_Vector xz, N_Vector xzdot, N_Vector rxz,
     casadi_scal(s.nrq_ + s.nuq_, -1., NV_DATA_S(ruqdot));
 
     return 0;
-  } catch(int flag) { // recoverable error
-    return flag;
   } catch(std::exception& e) { // non-recoverable error
     uerr() << "resQB failed: " << e.what() << std::endl;
     return -1;
@@ -704,8 +692,6 @@ int IdasInterface::psolveF(double t, N_Vector xz, N_Vector xzdot, N_Vector rr,
     }
 
     return 0;
-  } catch(int flag) { // recoverable error
-    return flag;
   } catch(std::exception& e) { // non-recoverable error
     uerr() << "psolve failed: " << e.what() << std::endl;
     return -1;
@@ -793,8 +779,6 @@ int IdasInterface::psolveB(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB,
     }
 
     return 0;
-  } catch(int flag) { // recoverable error
-    return flag;
   } catch(std::exception& e) { // non-recoverable error
     uerr() << "psolveB failed: " << e.what() << std::endl;
     return -1;
@@ -869,8 +853,6 @@ int IdasInterface::psetupF(double t, N_Vector xz, N_Vector xzdot, N_Vector rr,
     if (s.linsolF_.nfact(m->jacF, m->mem_linsolF)) casadi_error("Linear solve failed");
 
     return 0;
-  } catch(int flag) { // recoverable error
-    return flag;
   } catch(std::exception& e) { // non-recoverable error
     uerr() << "psetup failed: " << e.what() << std::endl;
     return -1;
@@ -915,8 +897,6 @@ int IdasInterface::psetupB(double t, N_Vector xz, N_Vector xzdot, N_Vector rxz, 
     if (s.linsolB_.nfact(m->jacB, m->mem_linsolB)) casadi_error("'jacB' factorization failed");
 
     return 0;
-  } catch(int flag) { // recoverable error
-    return flag;
   } catch(std::exception& e) { // non-recoverable error
     uerr() << "psetupB failed: " << e.what() << std::endl;
     return -1;
@@ -967,8 +947,6 @@ int IdasInterface::lsetupB(IDAMem IDA_mem, N_Vector xzB, N_Vector xzdotB, N_Vect
       xzB, xzdotB, nullptr, cj, static_cast<void*>(m), vtemp1B, vtemp1B, vtemp3B)) return 1;
 
     return 0;
-  } catch(int flag) { // recoverable error
-    return flag;
   } catch(std::exception& e) { // non-recoverable error
     uerr() << "lsetupB failed: " << e.what() << std::endl;
     return -1;
@@ -1001,8 +979,6 @@ int IdasInterface::lsolveF(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector
     }
 
     return 0;
-  } catch(int flag) { // recoverable error
-    return flag;
   } catch(std::exception& e) { // non-recoverable error
     uerr() << "lsolve failed: " << e.what() << std::endl;
     return -1;
@@ -1048,8 +1024,6 @@ int IdasInterface::lsolveB(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector
       if (cjratio != 1.0) N_VScale(2.0/(1.0 + cjratio), b, b);
     }
     return 0;
-  } catch(int flag) { // recoverable error
-    return flag;
   } catch(std::exception& e) { // non-recoverable error
     uerr() << "lsolveB failed: " << e.what() << std::endl;
     return -1;

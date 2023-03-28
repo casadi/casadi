@@ -197,7 +197,7 @@ int CvodesInterface::init_mem(void* mem) const {
 
   // Initialize adjoint sensitivities
   if (nrx_>0) {
-    casadi_int interpType = interp_==SD_HERMITE ? CV_HERMITE : CV_POLYNOMIAL;
+    casadi_int interpType = interp_ == SD_HERMITE ? CV_HERMITE : CV_POLYNOMIAL;
     THROWING(CVodeAdjInit, m->mem, steps_per_checkpoint_, interpType);
   }
 
@@ -212,8 +212,6 @@ int CvodesInterface::rhsF(double t, N_Vector x, N_Vector xdot, void *user_data) 
     auto& s = m->self;
     s.calc_daeF(m, t, NV_DATA_S(x), nullptr, NV_DATA_S(xdot), nullptr);
     return 0;
-  } catch(int flag) { // recoverable error
-    return flag;
   } catch(std::exception& e) { // non-recoverable error
     uerr() << "rhs failed: " << e.what() << std::endl;
     return -1;
@@ -410,8 +408,6 @@ int CvodesInterface::rhsQF(double t, N_Vector x, N_Vector qdot, void *user_data)
     s.calc_quadF(m, t, NV_DATA_S(x), nullptr, NV_DATA_S(qdot));
 
     return 0;
-  } catch(int flag) { // recoverable error
-    return flag;
   } catch(std::exception& e) { // non-recoverable error
     uerr() << "rhsQ failed: " << e.what() << std::endl;
     return -1;
@@ -427,8 +423,6 @@ int CvodesInterface::rhsB(double t, N_Vector x, N_Vector rx, N_Vector rxdot, voi
     // Negate (note definition of g)
     casadi_scal(s.nrx_, -1., NV_DATA_S(rxdot));
     return 0;
-  } catch(int flag) { // recoverable error
-    return flag;
   } catch(std::exception& e) { // non-recoverable error
     uerr() << "rhsB failed: " << e.what() << std::endl;
     return -1;
@@ -447,8 +441,6 @@ int CvodesInterface::rhsQB(double t, N_Vector x, N_Vector rx, N_Vector ruqdot, v
     casadi_scal((s.nrq_ + s.nuq_), -1., NV_DATA_S(ruqdot));
 
     return 0;
-  } catch(int flag) { // recoverable error
-    return flag;
   } catch(std::exception& e) { // non-recoverable error
     uerr() << "rhsQB failed: " << e.what() << std::endl;
     return -1;
@@ -462,8 +454,6 @@ int CvodesInterface::jtimesF(N_Vector v, N_Vector Jv, double t, N_Vector x,
     auto& s = m->self;
     s.calc_jtimesF(m, t, NV_DATA_S(x), nullptr, NV_DATA_S(v), nullptr, NV_DATA_S(Jv), nullptr);
     return 0;
-  } catch(casadi_int flag) { // recoverable error
-    return flag;
   } catch(std::exception& e) { // non-recoverable error
     uerr() << "jtimesF failed: " << e.what() << std::endl;
     return -1;
@@ -703,28 +693,22 @@ int CvodesInterface::lsetupB(CVodeMem cv_mem, int convfail, N_Vector x, N_Vector
     CVadjMem ca_mem;
     //CVodeBMem cvB_mem;
 
-    int flag;
-
     // Current time
     double t = cv_mem->cv_tn; // TODO(Joel): is this correct?
     double gamma = cv_mem->cv_gamma;
 
     cv_mem = static_cast<CVodeMem>(cv_mem->cv_user_data);
-
     ca_mem = cv_mem->cv_adj_mem;
     //cvB_mem = ca_mem->ca_bckpbCrt;
 
     // Get FORWARD solution from interpolation.
-    flag = ca_mem->ca_IMget(cv_mem, t, ca_mem->ca_ytmp, nullptr);
+    int flag = ca_mem->ca_IMget(cv_mem, t, ca_mem->ca_ytmp, nullptr);
     if (flag != CV_SUCCESS) casadi_error("Could not interpolate forward states");
 
     // Call the preconditioner setup function (which sets up the linear solver)
-    if (psetupB(t, ca_mem->ca_ytmp, x, xdot, FALSE, jcurPtr,
-                gamma, static_cast<void*>(m), vtemp1, vtemp2, vtemp3)) return 1;
+    return psetupB(t, ca_mem->ca_ytmp, x, xdot, FALSE, jcurPtr,
+      gamma, static_cast<void*>(m), vtemp1, vtemp2, vtemp3);
 
-    return 0;
-  } catch(int flag) { // recoverable error
-    return flag;
   } catch(std::exception& e) { // non-recoverable error
     uerr() << "lsetupB failed: " << e.what() << std::endl;
     return -1;
@@ -750,11 +734,8 @@ int CvodesInterface::lsolveF(CVodeMem cv_mem, N_Vector b, N_Vector weight,
     casadi_int lr = 1;
 
     // Call the preconditioner solve function (which solves the linear system)
-    if (psolveF(t, x, xdot, b, b, gamma, delta, lr, static_cast<void*>(m), nullptr)) return 1;
+    return psolveF(t, x, xdot, b, b, gamma, delta, lr, static_cast<void*>(m), nullptr);
 
-    return 0;
-  } catch(int flag) { // recoverable error
-    return flag;
   } catch(std::exception& e) { // non-recoverable error
     uerr() << "lsolveF failed: " << e.what() << std::endl;
     return -1;
@@ -768,8 +749,6 @@ int CvodesInterface::lsolveB(CVodeMem cv_mem, N_Vector b, N_Vector weight,
     CVadjMem ca_mem;
     //CVodeBMem cvB_mem;
 
-    int flag;
-
     // Current time
     double t = cv_mem->cv_tn; // TODO(Joel): is this correct?
     double gamma = cv_mem->cv_gamma;
@@ -780,10 +759,8 @@ int CvodesInterface::lsolveB(CVodeMem cv_mem, N_Vector b, N_Vector weight,
     //cvB_mem = ca_mem->ca_bckpbCrt;
 
     // Get FORWARD solution from interpolation.
-    flag = ca_mem->ca_IMget(cv_mem, t, ca_mem->ca_ytmp, nullptr);
+    int flag = ca_mem->ca_IMget(cv_mem, t, ca_mem->ca_ytmp, nullptr);
     if (flag != CV_SUCCESS) casadi_error("Could not interpolate forward states");
-
-
 
     // Accuracy
     double delta = 0.0;
@@ -792,12 +769,9 @@ int CvodesInterface::lsolveB(CVodeMem cv_mem, N_Vector b, N_Vector weight,
     int lr = 1;
 
     // Call the preconditioner solve function (which solves the linear system)
-    if (psolveB(t, ca_mem->ca_ytmp, x, xdot, b, b, gamma, delta, lr,
-                static_cast<void*>(m), nullptr)) return 1;
+    return psolveB(t, ca_mem->ca_ytmp, x, xdot, b, b, gamma, delta, lr,
+      static_cast<void*>(m), nullptr);
 
-    return 0;
-  } catch(int flag) { // recoverable error
-    return flag;
   } catch(std::exception& e) { // non-recoverable error
     uerr() << "lsolveB failed: " << e.what() << std::endl;
     return -1;
