@@ -88,7 +88,7 @@ jobs:
         with:
           version: tags/nightly-${{ env.GITHUB_REF_SLUG }}
           regex: true
-          file: "casadi-.*\\.tar\\.gz"
+          file: "casadi-.*\\.tar.gz"
       - uses: conda-incubator/setup-miniconda@v2.2.0
         with:
           python-version: 3.8
