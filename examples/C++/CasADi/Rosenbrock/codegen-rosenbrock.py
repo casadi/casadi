@@ -21,7 +21,7 @@ p = cs.SX.sym("p")
 f = x**2 + p * z**2
 g = z + (1 - x)**2 - y
 
-cg, _, _, _ = casadi_generator.generate_casadi_problem(
+cg = casadi_generator.generate_casadi_problem(
     cs.Function("f", [unknowns, p], [f]),
     cs.Function("g", [unknowns, p], [g]),
     second_order="full",

@@ -1,7 +1,7 @@
 import casadi as cs
 import numpy as np
 from os.path import splitext
-from typing import Tuple, Optional, Literal, get_args
+from typing import Tuple, Optional, Literal, get_args, Callable
 
 SECOND_ORDER_SPEC = Literal['no', 'full', 'prod', 'L', 'psi_prod', 'psi']
 
@@ -10,7 +10,8 @@ def generate_casadi_problem(
     g: Optional[cs.Function],
     second_order: SECOND_ORDER_SPEC = 'no',
     name: str = "alpaqa_problem",
-) -> Tuple[cs.CodeGenerator, int, int, int]:
+    sym: Callable = cs.SX.sym,
+) -> cs.CodeGenerator:
     """Convert the objective and constraint functions into a CasADi code
     generator.
 
@@ -19,40 +20,46 @@ def generate_casadi_problem(
     :param second_order: Whether to generate functions for evaluating Hessians.
     :param name: Optional string description of the problem (used for filename).
 
-    :return:   * Code generator that generates the functions and derivatives
-                 used by the solvers.
-               * Dimensions of the decision variables (primal dimension).
-               * Number of nonlinear constraints (dual dimension).
-               * Number of parameters.
+    :return: Code generator that generates the functions and derivatives used
+             by the solvers.
     """
 
     assert second_order in get_args(SECOND_ORDER_SPEC)
 
     assert f.n_in() in [1, 2]
     assert f.n_out() == 1
+    assert f.size1_out(0) == 1
+    assert f.size2_out(0) == 1
     n = f.size1_in(0)
+    assert f.size2_in(0) == 1
+    with_param = f.n_in() == 2
+    if with_param:
+        assert f.size2_in(1) == 1
     if g is not None:
         assert f.n_in() == g.n_in()
         assert f.size1_in(0) == g.size1_in(0)
-        if f.n_in() == 2:
+        if with_param:
             assert f.size1_in(1) == g.size1_in(1)
+            assert g.size2_in(1) == 1
         assert g.n_out() <= 1
         m = g.size1_out(0) if g.n_out() == 1 else 0
+        if g.n_out() == 1:
+            assert g.size2_out(0) == 1
     else:
         m = 0
-    p = f.size1_in(1) if f.n_in() == 2 else 0
-    xp = (f.sx_in(0), f.sx_in(1)) if f.n_in() == 2 else (f.sx_in(0), )
-    xp_def = (f.sx_in(0), f.sx_in(1)) if f.n_in() == 2 \
-        else (f.sx_in(0), cs.SX.sym("p", 0))
-    xp_names = (f.name_in(0), f.name_in(1)) if f.n_in() == 2 \
+    x = sym("x", n)
+    p = sym("p", f.size1_in(1) if with_param else 0)
+    xp = (x, p) if with_param else (x, )
+    xp_def = (x, p)
+    xp_names = (f.name_in(0), f.name_in(1)) if with_param \
           else (f.name_in(0), "p")
     x = xp[0]
-    y = cs.SX.sym("y", m)
-    s = cs.SX.sym("s")
-    v = cs.SX.sym("v", n)
-    Σ = cs.SX.sym("Σ", m)
-    zl = cs.SX.sym("zl", m)
-    zu = cs.SX.sym("zu", m)
+    y = sym("y", m)
+    s = sym("s")
+    v = sym("v", n)
+    Σ = sym("Σ", m)
+    zl = sym("zl", m)
+    zu = sym("zu", m)
 
     if m > 0:
         sL = s * f(*xp) + cs.dot(y, g(*xp))
@@ -180,7 +187,7 @@ def generate_casadi_problem(
                 [*xp_names, "y", "Σ", "s", "zl", "zu", "v"],
                 ["hess_psi_prod"],
             ))
-    return cg, n, m, p
+    return cg
 
 def _add_parameter(f: cs.Function, expected_inputs: int) -> Tuple[cs.Function, cs.SX, str]:
     if f.n_in() == expected_inputs + 1:

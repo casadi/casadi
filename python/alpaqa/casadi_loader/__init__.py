@@ -32,6 +32,7 @@ def generate_and_compile_casadi_problem(
     param = None,
     second_order: SECOND_ORDER_SPEC = 'no',
     name: str = "alpaqa_problem",
+    **kwargs,
 ) -> pa.CasADiProblem:
     """Compile the objective and constraint functions into a alpaqa Problem.
 
@@ -42,24 +43,26 @@ def generate_and_compile_casadi_problem(
     :param param:        Problem parameter values.
     :param second_order: Whether to generate functions for evaluating Hessians.
     :param name: Optional string description of the problem (used for filename).
+    :param kwargs:       Parameters passed to 
+                         :py:func:`..casadi_generator.generate_casadi_problem`.
 
-    :return:   * Problem specification that can be passed to the solvers.
+    :return: Problem specification that can be passed to the solvers.
     """
 
     cachedir = get_alpaqa_cache_dir()
     cachefile = join(cachedir, 'problems')
 
     key = base64.b64encode(pickle.dumps(
-        (f, g, second_order, name))).decode('ascii')
+        (f, g, second_order, name, kwargs))).decode('ascii')
 
     os.makedirs(cachedir, exist_ok=True)
     with shelve.open(cachefile) as cache:
         if key in cache:
-            uid, soname, dim = cache[key]
-            probdir = join(cachedir, str(uid))
-            sofile = join(probdir, soname)
-            write_casadi_problem_data(sofile, C, D, param)
             try:
+                uid, soname = cache[key]
+                probdir = join(cachedir, str(uid))
+                sofile = join(probdir, soname)
+                write_casadi_problem_data(sofile, C, D, param)
                 return _load_casadi_problem(sofile)
             except:
                 del cache[key]
@@ -71,7 +74,7 @@ def generate_and_compile_casadi_problem(
         builddir = join(projdir, "build")
         os.makedirs(builddir, exist_ok=True)
         probdir = join(cachedir, str(uid))
-        cgen, n, m, p = generate_casadi_problem(f, g, second_order, name)
+        cgen = generate_casadi_problem(f, g, second_order, name, **kwargs)
         cfile = cgen.generate(join(projdir, ""))
         with open(join(projdir, 'CMakeLists.txt'), 'w') as f:
             f.write(f"""
@@ -108,7 +111,7 @@ def generate_and_compile_casadi_problem(
             )
         sofile = sofile[0]
         soname = os.path.relpath(sofile, probdir)
-        cache[key] = uid, soname, (n, m, p)
+        cache[key] = uid, soname
 
         write_casadi_problem_data(sofile, C, D, param)
         return _load_casadi_problem(sofile)
