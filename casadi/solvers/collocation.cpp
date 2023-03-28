@@ -234,8 +234,8 @@ namespace casadi {
       Function g = get_function("rdae");
 
       // Symbolic inputs
-      MX rx0 = MX::sym("rx0", g.sparsity_in(BDYN_ADJ_ODE));
-      MX rp = MX::sym("rp", g.sparsity_in(BDYN_ADJ_QUAD));
+      MX rx0 = MX::sym("rx0", g.numel_in(BDYN_ADJ_ODE));
+      MX rp = MX::sym("rp", g.numel_in(BDYN_ADJ_QUAD));
 
       // Implicitly defined variables (rz and rx)
       MX rv = MX::sym("v", deg_ * (nrx1_ + nrz1_) * nadj_);
@@ -275,9 +275,9 @@ namespace casadi {
         g_arg[BDYN_U] = u;
         g_arg[BDYN_X] = x[j];
         g_arg[BDYN_Z] = z[j];
-        g_arg[BDYN_ADJ_ODE] = rx[j];
-        g_arg[BDYN_ADJ_ALG] = rz[j];
-        g_arg[BDYN_ADJ_QUAD] = rp;
+        g_arg[BDYN_ADJ_ODE] = reshape(rx[j], g.size_in(BDYN_ADJ_ODE));
+        g_arg[BDYN_ADJ_ALG] = reshape(rz[j], g.size_in(BDYN_ADJ_ALG));
+        g_arg[BDYN_ADJ_QUAD] = reshape(rp, g.size_in(BDYN_ADJ_QUAD));
         std::vector<MX> g_res = g(g_arg);
 
         // Get an expression for the state derivative at the collocation point
@@ -287,17 +287,17 @@ namespace casadi {
         }
 
         // Add collocation equation
-        eq.push_back(vec(h * B[j] * g_res[BDYN_ADJ_X] - rxp_j));
+        eq.push_back(h * B[j] * vec(g_res[BDYN_ADJ_X]) - rxp_j);
 
         // Add the algebraic conditions
-        eq.push_back(g_res[BDYN_ADJ_Z]);
+        eq.push_back(vec(g_res[BDYN_ADJ_Z]));
 
         // Add contribution to the final state
         rxf += -B[j] * C[0][j] * rx[j];
 
         // Add contribution to quadratures
-        rqf += h * B[j] * g_res[BDYN_ADJ_P];
-        uqf += h * B[j] * g_res[BDYN_ADJ_U];
+        rqf += h * B[j] * vec(g_res[BDYN_ADJ_P]);
+        uqf += h * B[j] * vec(g_res[BDYN_ADJ_U]);
       }
 
       // Form backward discrete time dynamics
