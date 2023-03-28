@@ -722,7 +722,7 @@ int IdasInterface::psolveB(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB,
     }
 
     // Solve for undifferentiated right-hand-side, save to output
-    if (s.linsolB_.solve(m->jacB, m->v1, s.nadj_, false, m->mem_linsolB)) return 1;
+    if (s.linsolF_.solve(m->jacF, m->v1, s.nadj_, true, m->mem_linsolF)) return 1;
     vx = NV_DATA_S(zvecB); // possibly different from rvecB
     vz = vx + s.nrx_;
     for (int a = 0; a < s.nadj_; ++a) {
@@ -756,8 +756,8 @@ int IdasInterface::psolveB(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB,
       }
 
       // Solve for sensitivity right-hand-sides
-      if (s.linsolB_.solve(m->jacB, m->v1 + s.nrx1_ * s.nadj_ + s.nrz1_ * s.nadj_,
-        s.nadj_ * s.nfwd_, false, m->mem_linsolB)) return 1;
+      if (s.linsolF_.solve(m->jacF, m->v1 + s.nrx1_ * s.nadj_ + s.nrz1_ * s.nadj_,
+        s.nadj_ * s.nfwd_, true, m->mem_linsolF)) return 1;
 
       // Save to output, reordered
       v_it = m->v1 + (s.nrx1_ + s.nrz1_) * s.nadj_;
@@ -855,41 +855,9 @@ int IdasInterface::psetupF(double t, N_Vector xz, N_Vector xzdot, N_Vector rr,
 int IdasInterface::psetupB(double t, N_Vector xz, N_Vector xzdot, N_Vector rxz, N_Vector rxzdot,
     N_Vector rresval, double cj, void *user_data, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) {
   try {
-    auto m = to_mem(user_data);
-    auto& s = m->self;
+    // We use the same linear solver for the forward problem as for the backward problem
+    return psetupF(t, xz, nullptr, nullptr, -cj, user_data, tmp1B, tmp2B, tmp3B);
 
-    // Sparsity patterns
-    const Sparsity *sp_jac_ode_xB, *sp_jac_ode_zB, *sp_jac_alg_xB, *sp_jac_alg_zB;
-    sp_jac_ode_xB = &s.sp_jac_ode_xB_;
-    sp_jac_alg_xB = &s.sp_jac_alg_xB_;
-    sp_jac_ode_zB = &s.sp_jac_ode_zB_;
-    sp_jac_alg_zB = &s.sp_jac_alg_zB_;
-    const Sparsity& sp_jacB = s.linsolB_.sparsity();
-
-    // Calculate Jacobian blocks
-    if (s.calc_jacB(m, t, NV_DATA_S(xz), NV_DATA_S(xz) + s.nx_,
-      NV_DATA_S(rxz), NV_DATA_S(rxz) + s.nrx_,
-      m->jac_adj_x_rx, m->jac_adj_z_rx, m->jac_adj_x_rz, m->jac_adj_z_rz)) return 1;
-
-    // Copy to jacB structure
-    casadi_int nx_jac = sp_jac_ode_xB->size1();  // excludes sensitivity equations
-    casadi_copy_block(m->jac_adj_x_rx, *sp_jac_ode_xB, m->jacB, sp_jacB, 0, 0, m->w);
-    casadi_copy_block(m->jac_adj_x_rz, *sp_jac_alg_xB, m->jacB, sp_jacB, 0, nx_jac, m->w);
-    casadi_copy_block(m->jac_adj_z_rx, *sp_jac_ode_zB, m->jacB, sp_jacB, nx_jac, 0, m->w);
-    casadi_copy_block(m->jac_adj_z_rz, *sp_jac_alg_zB, m->jacB, sp_jacB, nx_jac, nx_jac, m->w);
-
-    // Shift diagonal corresponding to jac_adj_x_rx
-    const casadi_int *colind = sp_jacB.colind(), *row = sp_jacB.row();
-    for (casadi_int c = 0; c < nx_jac; ++c) {
-      for (casadi_int k = colind[c]; k < colind[c + 1]; ++k) {
-        if (row[k] == c) m->jacB[k] += cj;
-      }
-    }
-
-    // Factorize the linear system
-    if (s.linsolB_.nfact(m->jacB, m->mem_linsolB)) return 1;
-
-    return 0;
   } catch(std::exception& e) { // non-recoverable error
     uerr() << "psetupB failed: " << e.what() << std::endl;
     return -1;
@@ -998,7 +966,7 @@ int IdasInterface::lsolveB(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector
     // Get FORWARD solution from interpolation.
     if (IDAADJ_mem->ia_noInterp==FALSE) {
       flag = IDAADJ_mem->ia_getY(IDA_mem, t, IDAADJ_mem->ia_yyTmp, IDAADJ_mem->ia_ypTmp,
-                                  nullptr, nullptr);
+        nullptr, nullptr);
       if (flag != IDA_SUCCESS) casadi_error("Could not interpolate forward states");
     }
 
