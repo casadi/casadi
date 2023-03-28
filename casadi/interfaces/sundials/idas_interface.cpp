@@ -872,8 +872,8 @@ int IdasInterface::psetupB(double t, N_Vector xz, N_Vector xzdot, N_Vector rxz, 
     // Sparsity patterns
     const Sparsity *sp_jac_ode_xB, *sp_jac_ode_zB, *sp_jac_alg_xB, *sp_jac_alg_zB;
     sp_jac_ode_xB = &s.sp_jac_ode_xB_;
-    sp_jac_ode_zB = &s.sp_jac_alg_xB_;
-    sp_jac_alg_xB = &s.sp_jac_ode_zB_;
+    sp_jac_alg_xB = &s.sp_jac_alg_xB_;
+    sp_jac_ode_zB = &s.sp_jac_ode_zB_;
     sp_jac_alg_zB = &s.sp_jac_alg_zB_;
     const Sparsity& sp_jacB = s.linsolB_.sparsity();
 
@@ -882,11 +882,11 @@ int IdasInterface::psetupB(double t, N_Vector xz, N_Vector xzdot, N_Vector rxz, 
       NV_DATA_S(rxz), NV_DATA_S(rxz) + s.nrx_,
       m->jac_adj_x_rx, m->jac_adj_z_rx, m->jac_adj_x_rz, m->jac_adj_z_rz);
 
-    // Copy to jacF structure
+    // Copy to jacB structure
     casadi_int nx_jac = sp_jac_ode_xB->size1();  // excludes sensitivity equations
     casadi_copy_block(m->jac_adj_x_rx, *sp_jac_ode_xB, m->jacB, sp_jacB, 0, 0, m->w);
-    casadi_copy_block(m->jac_adj_z_rx, *sp_jac_ode_zB, m->jacB, sp_jacB, nx_jac, 0, m->w);
     casadi_copy_block(m->jac_adj_x_rz, *sp_jac_alg_xB, m->jacB, sp_jacB, 0, nx_jac, m->w);
+    casadi_copy_block(m->jac_adj_z_rx, *sp_jac_ode_zB, m->jacB, sp_jacB, nx_jac, 0, m->w);
     casadi_copy_block(m->jac_adj_z_rz, *sp_jac_alg_zB, m->jacB, sp_jacB, nx_jac, nx_jac, m->w);
 
     // Shift diagonal corresponding to jac_adj_x_rx
