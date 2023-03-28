@@ -27,7 +27,6 @@ struct EvalCounter {
     unsigned hess_ψ{};
     unsigned ψ{};
     unsigned grad_ψ{};
-    unsigned grad_ψ_from_ŷ{};
     unsigned ψ_grad_ψ{};
 
     struct EvalTimer {
@@ -50,7 +49,6 @@ struct EvalCounter {
         std::chrono::nanoseconds hess_ψ{};
         std::chrono::nanoseconds ψ{};
         std::chrono::nanoseconds grad_ψ{};
-        std::chrono::nanoseconds grad_ψ_from_ŷ{};
         std::chrono::nanoseconds ψ_grad_ψ{};
     } time;
 
@@ -80,7 +78,6 @@ inline EvalCounter::EvalTimer &operator+=(EvalCounter::EvalTimer &a,
     a.hess_ψ += b.hess_ψ;
     a.ψ += b.ψ;
     a.grad_ψ += b.grad_ψ;
-    a.grad_ψ_from_ŷ += b.grad_ψ_from_ŷ;
     a.ψ_grad_ψ += b.ψ_grad_ψ;
     return a;
 }
@@ -105,7 +102,6 @@ inline EvalCounter &operator+=(EvalCounter &a, const EvalCounter &b) {
     a.hess_ψ += b.hess_ψ;
     a.ψ += b.ψ;
     a.grad_ψ += b.grad_ψ;
-    a.grad_ψ_from_ŷ += b.grad_ψ_from_ŷ;
     a.ψ_grad_ψ += b.ψ_grad_ψ;
     a.time += b.time;
     return a;

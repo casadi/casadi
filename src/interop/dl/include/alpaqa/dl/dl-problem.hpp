@@ -146,7 +146,6 @@ class DLProblem : private DLLoader, public BoxConstrProblem<DefaultConfig> {
     void eval_grad_f_grad_g_prod(crvec x, crvec y, rvec grad_f, rvec grad_gxy) const;
     void eval_grad_L(crvec x, crvec y, rvec grad_L, rvec work_n) const;
     real_t eval_ψ(crvec x, crvec y, crvec Σ, rvec ŷ) const;
-    void eval_grad_ψ_from_ŷ(crvec x, crvec ŷ, rvec grad_ψ, rvec work_n) const;
     void eval_grad_ψ(crvec x, crvec y, crvec Σ, rvec grad_ψ, rvec work_n, rvec work_m) const;
     real_t eval_ψ_grad_ψ(crvec x, crvec y, crvec Σ, rvec grad_ψ, rvec work_n, rvec work_m) const;
 
@@ -168,7 +167,6 @@ class DLProblem : private DLLoader, public BoxConstrProblem<DefaultConfig> {
     [[nodiscard]] bool provides_eval_grad_f_grad_g_prod() const;
     [[nodiscard]] bool provides_eval_grad_L() const;
     [[nodiscard]] bool provides_eval_ψ() const;
-    [[nodiscard]] bool provides_eval_grad_ψ_from_ŷ() const;
     [[nodiscard]] bool provides_eval_grad_ψ() const;
     [[nodiscard]] bool provides_eval_ψ_grad_ψ() const;
     [[nodiscard]] bool provides_get_box_C() const;

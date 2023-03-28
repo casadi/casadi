@@ -106,7 +106,7 @@ auto PANOCSolver<DirectionProviderT>::operator()(
         i.ψx̂ = problem.eval_ψ(i.x̂, y, Σ, i.ŷx̂);
     };
     auto eval_grad_ψx̂ = [&problem, &work_n](Iterate &i, rvec grad_ψx̂) {
-        problem.eval_grad_ψ_from_ŷ(i.x̂, i.ŷx̂, grad_ψx̂, work_n);
+        problem.eval_grad_L(i.x̂, i.ŷx̂, grad_ψx̂, work_n);
     };
 
     // Printing ----------------------------------------------------------------

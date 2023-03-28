@@ -78,8 +78,6 @@ struct ProblemVTable : util::BasicVTable {
         eval_grad_L = default_eval_grad_L;
     optional_const_function_t<real_t(crvec x, crvec y, crvec Σ, rvec ŷ)>
         eval_ψ = default_eval_ψ;
-    optional_const_function_t<void(crvec x, crvec ŷ, rvec grad_ψ, rvec work_n)>
-        eval_grad_ψ_from_ŷ = default_eval_grad_ψ_from_ŷ;
     optional_const_function_t<void(crvec x, crvec y, crvec Σ, rvec grad_ψ, rvec work_n, rvec work_m)>
         eval_grad_ψ = default_eval_grad_ψ;
     optional_const_function_t<real_t(crvec x, crvec y, crvec Σ, rvec grad_ψ, rvec work_n, rvec work_m)>
@@ -131,9 +129,6 @@ struct ProblemVTable : util::BasicVTable {
                                                   rvec work_n, const ProblemVTable &vtable);
     ALPAQA_EXPORT static real_t default_eval_ψ(const void *self, crvec x, crvec y, crvec Σ, rvec ŷ,
                                                const ProblemVTable &vtable);
-    ALPAQA_EXPORT static void default_eval_grad_ψ_from_ŷ(const void *self, crvec x, crvec ŷ,
-                                                         rvec grad_ψ, rvec work_n,
-                                                         const ProblemVTable &vtable);
     ALPAQA_EXPORT static void default_eval_grad_ψ(const void *self, crvec x, crvec y, crvec Σ,
                                                   rvec grad_ψ, rvec work_n, rvec work_m,
                                                   const ProblemVTable &vtable);
@@ -178,7 +173,6 @@ struct ProblemVTable : util::BasicVTable {
         // Lagrangian and augmented lagrangian evaluations
         ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_grad_L, t.t);
         ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_ψ, t.t);
-        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_grad_ψ_from_ŷ, t.t);
         ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_grad_ψ, t.t);
         ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_ψ_grad_ψ, t.t);
         // Constraint set
@@ -514,14 +508,6 @@ class TypeErasedProblem : public util::TypeErased<ProblemVTable<Conf>, Allocator
                   rvec ŷ   ///< [out] @f$ \hat y @f$
     ) const;
     /// **[Optional]**
-    /// Calculate ∇ψ(x) using ŷ.
-    /// @default_impl   ProblemVTable::default_eval_grad_ψ_from_ŷ
-    void eval_grad_ψ_from_ŷ(crvec x,     ///< [in]  Decision variable @f$ x @f$
-                            crvec ŷ,     ///< [in]  @f$ \hat y @f$
-                            rvec grad_ψ, ///< [out] @f$ \nabla \psi(x) @f$
-                            rvec work_n  ///<       Dimension @f$ n @f$
-    ) const;
-    /// **[Optional]**
     /// Calculate the gradient ∇ψ(x).
     /// @f[ \nabla \psi(x) = \nabla f(x) + \nabla g(x)\,\hat y(x) @f]
     /// @default_impl   ProblemVTable::default_eval_grad_ψ
@@ -619,11 +605,6 @@ class TypeErasedProblem : public util::TypeErased<ProblemVTable<Conf>, Allocator
     /// Returns true if the problem provides a specialized implementation of
     /// @ref eval_ψ, false if it uses the default implementation.
     bool provides_eval_ψ() const { return vtable.eval_ψ != vtable.default_eval_ψ; }
-    /// Returns true if the problem provides a specialized implementation of
-    /// @ref eval_grad_ψ_from_ŷ, false if it uses the default implementation.
-    bool provides_eval_grad_ψ_from_ŷ() const {
-        return vtable.eval_grad_ψ_from_ŷ != vtable.default_eval_grad_ψ_from_ŷ;
-    }
     /// Returns true if the problem provides a specialized implementation of
     /// @ref eval_grad_ψ, false if it uses the default implementation.
     bool provides_eval_grad_ψ() const { return vtable.eval_grad_ψ != vtable.default_eval_grad_ψ; }
@@ -786,11 +767,6 @@ auto TypeErasedProblem<Conf, Allocator>::eval_ψ(crvec x, crvec y, crvec Σ, rve
     return call(vtable.eval_ψ, x, y, Σ, ŷ);
 }
 template <Config Conf, class Allocator>
-void TypeErasedProblem<Conf, Allocator>::eval_grad_ψ_from_ŷ(crvec x, crvec ŷ, rvec grad_ψ,
-                                                            rvec work_n) const {
-    return call(vtable.eval_grad_ψ_from_ŷ, x, ŷ, grad_ψ, work_n);
-}
-template <Config Conf, class Allocator>
 void TypeErasedProblem<Conf, Allocator>::eval_grad_ψ(crvec x, crvec y, crvec Σ, rvec grad_ψ,
                                                      rvec work_n, rvec work_m) const {
     return call(vtable.eval_grad_ψ, x, y, Σ, grad_ψ, work_n, work_m);
@@ -855,7 +831,6 @@ struct ProblemWithCounters {
     void eval_grad_f_grad_g_prod(crvec x, crvec y, rvec grad_f, rvec grad_gxy) const requires requires { &std::remove_cvref_t<Problem>::eval_grad_f_grad_g_prod; } { ++evaluations->grad_f_grad_g_prod; return timed(evaluations->time.grad_f_grad_g_prod, std::bind(&std::remove_cvref_t<Problem>::eval_grad_f_grad_g_prod, &problem, x, y, grad_f, grad_gxy)); }
     void eval_grad_L(crvec x, crvec y, rvec grad_L, rvec work_n) const requires requires { &std::remove_cvref_t<Problem>::eval_grad_L; } { ++evaluations->grad_L; return timed(evaluations->time.grad_L, std::bind(&std::remove_cvref_t<Problem>::eval_grad_L, &problem, x, y, grad_L, work_n)); }
     real_t eval_ψ(crvec x, crvec y, crvec Σ, rvec ŷ) const requires requires { &std::remove_cvref_t<Problem>::eval_ψ; } { ++evaluations->ψ; return timed(evaluations->time.ψ, std::bind(&std::remove_cvref_t<Problem>::eval_ψ, &problem, x, y, Σ, ŷ)); }
-    void eval_grad_ψ_from_ŷ(crvec x, crvec ŷ, rvec grad_ψ, rvec work_n) const requires requires { &std::remove_cvref_t<Problem>::eval_grad_ψ_from_ŷ; } { ++evaluations->grad_ψ_from_ŷ; return timed(evaluations->time.grad_ψ_from_ŷ, std::bind(&std::remove_cvref_t<Problem>::eval_grad_ψ_from_ŷ, &problem, x, ŷ, grad_ψ, work_n)); }
     void eval_grad_ψ(crvec x, crvec y, crvec Σ, rvec grad_ψ, rvec work_n, rvec work_m) const requires requires { &std::remove_cvref_t<Problem>::eval_grad_ψ; } { ++evaluations->grad_ψ; return timed(evaluations->time.grad_ψ, std::bind(&std::remove_cvref_t<Problem>::eval_grad_ψ, &problem, x, y, Σ, grad_ψ, work_n, work_m)); }
     real_t eval_ψ_grad_ψ(crvec x, crvec y, crvec Σ, rvec grad_ψ, rvec work_n, rvec work_m) const requires requires { &std::remove_cvref_t<Problem>::eval_ψ_grad_ψ; } { ++evaluations->ψ_grad_ψ; return timed(evaluations->time.ψ_grad_ψ, std::bind(&std::remove_cvref_t<Problem>::eval_ψ_grad_ψ, &problem, x, y, Σ, grad_ψ, work_n, work_m)); }
     const Box &get_box_C() const requires requires { &std::remove_cvref_t<Problem>::get_box_C; } { return problem.get_box_C(); }
@@ -876,7 +851,6 @@ struct ProblemWithCounters {
     [[nodiscard]] bool provides_eval_grad_f_grad_g_prod() const requires requires (Problem p) { { p.provides_eval_grad_f_grad_g_prod() } -> std::convertible_to<bool>; } { return problem.provides_eval_grad_f_grad_g_prod(); }
     [[nodiscard]] bool provides_eval_grad_L() const requires requires (Problem p) { { p.provides_eval_grad_L() } -> std::convertible_to<bool>; } { return problem.provides_eval_grad_L(); }
     [[nodiscard]] bool provides_eval_ψ() const requires requires (Problem p) { { p.provides_eval_ψ() } -> std::convertible_to<bool>; } { return problem.provides_eval_ψ(); }
-    [[nodiscard]] bool provides_eval_grad_ψ_from_ŷ() const requires requires (Problem p) { { p.provides_eval_grad_ψ_from_ŷ() } -> std::convertible_to<bool>; } { return problem.provides_eval_grad_ψ_from_ŷ(); }
     [[nodiscard]] bool provides_eval_grad_ψ() const requires requires (Problem p) { { p.provides_eval_grad_ψ() } -> std::convertible_to<bool>; } { return problem.provides_eval_grad_ψ(); }
     [[nodiscard]] bool provides_eval_ψ_grad_ψ() const requires requires (Problem p) { { p.provides_eval_ψ_grad_ψ() } -> std::convertible_to<bool>; } { return problem.provides_eval_ψ_grad_ψ(); }
     [[nodiscard]] bool provides_get_box_C() const requires requires (Problem p) { { p.provides_get_box_C() } -> std::convertible_to<bool>; } { return problem.provides_get_box_C(); }
@@ -1153,7 +1127,6 @@ void print_provided_functions(std::ostream &os, const TypeErasedProblem<Conf> &p
        << "eval_grad_f_grad_g_prod: " << problem.provides_eval_grad_f_grad_g_prod() << '\n'
        << "            eval_grad_L: " << problem.provides_eval_grad_L() << '\n'
        << "                 eval_ψ: " << problem.provides_eval_ψ() << '\n'
-       << "     eval_grad_ψ_from_ŷ: " << problem.provides_eval_grad_ψ_from_ŷ() << '\n'
        << "            eval_grad_ψ: " << problem.provides_eval_grad_ψ() << '\n'
        << "          eval_ψ_grad_ψ: " << problem.provides_eval_ψ_grad_ψ() << '\n'
        << "              get_box_C: " << problem.provides_get_box_C() << '\n'

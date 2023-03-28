@@ -117,7 +117,7 @@ auto ZeroFPRSolver<DirectionProviderT>::operator()(
         i.ψx̂ = problem.eval_ψ(i.x̂, y, Σ, i.ŷx̂);
     };
     auto eval_grad_in_prox = [&problem, &prox, &work_n](const Iterate &i) {
-        problem.eval_grad_ψ_from_ŷ(i.x̂, i.ŷx̂, prox->grad_ψ, work_n);
+        problem.eval_grad_L(i.x̂, i.ŷx̂, prox->grad_ψ, work_n);
     };
     auto eval_prox_grad_step_in_prox = [&problem, &prox](const Iterate &i) {
         prox->hx̂ = problem.eval_prox_grad_step(i.γ, i.x̂, prox->grad_ψ, prox->x̂,

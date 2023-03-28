@@ -265,20 +265,6 @@ CasADiProblem<Conf>::eval_ψ(crvec x, crvec y, crvec Σ, rvec ŷ) const {
 }
 
 template <Config Conf>
-void CasADiProblem<Conf>::eval_grad_ψ_from_ŷ(crvec x, crvec ŷ, rvec grad_ψ,
-                                             rvec) const {
-    if (impl->constr) {
-        impl->constr->grad_L({x.data(), param.data(), ŷ.data()},
-                             {grad_ψ.data()});
-    } else {
-        real_t ψ;
-        impl->ψ_grad_ψ(
-            {x.data(), param.data(), nullptr, nullptr, nullptr, nullptr},
-            {&ψ, grad_ψ.data()});
-    }
-}
-
-template <Config Conf>
 void CasADiProblem<Conf>::eval_grad_gi(crvec, index_t, rvec) const {
     throw not_implemented_error("CasADiProblem::eval_grad_gi"); // TODO
 }

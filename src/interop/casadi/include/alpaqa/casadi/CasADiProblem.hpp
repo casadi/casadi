@@ -65,7 +65,6 @@ class CasADiProblem : public BoxConstrProblem<Conf> {
     real_t eval_ψ_grad_ψ(crvec x, crvec y, crvec Σ, rvec grad_ψ, rvec work_n, rvec work_m) const; // NOLINT(*nodiscard)
     void eval_grad_L(crvec x, crvec y, rvec grad_L, rvec work_n) const;
     [[nodiscard]] real_t eval_ψ(crvec x, crvec y, crvec Σ, rvec ŷ) const;
-    void eval_grad_ψ_from_ŷ(crvec x, crvec ŷ, rvec grad_ψ, rvec work_n) const;
     void eval_grad_gi(crvec x, index_t i, rvec grad_i) const;
     [[nodiscard]] length_t get_jac_g_num_nonzeros() const;
     void eval_jac_g(crvec x, rindexvec inner_idx, rindexvec outer_ptr, rvec J_values) const;

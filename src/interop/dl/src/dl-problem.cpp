@@ -83,7 +83,6 @@ auto DLProblem::eval_f_g(crvec x, rvec g) const -> real_t { return functions->ev
 auto DLProblem::eval_grad_f_grad_g_prod(crvec x, crvec y, rvec grad_f, rvec grad_gxy) const -> void { return functions->eval_grad_f_grad_g_prod(instance.get(), x.data(), y.data(), grad_f.data(), grad_gxy.data()); }
 auto DLProblem::eval_grad_L(crvec x, crvec y, rvec grad_L, rvec work_n) const -> void { return functions->eval_grad_L(instance.get(), x.data(), y.data(), grad_L.data(), work_n.data()); }
 auto DLProblem::eval_ψ(crvec x, crvec y, crvec Σ, rvec ŷ) const -> real_t { return functions->eval_ψ(instance.get(), x.data(), y.data(), Σ.data(), D.lowerbound.data(), D.upperbound.data(), ŷ.data()); }
-auto DLProblem::eval_grad_ψ_from_ŷ(crvec x, crvec ŷ, rvec grad_ψ, rvec work_n) const -> void { return functions->eval_grad_ψ_from_ŷ(instance.get(), x.data(), ŷ.data(), grad_ψ.data(), work_n.data()); }
 auto DLProblem::eval_grad_ψ(crvec x, crvec y, crvec Σ, rvec grad_ψ, rvec work_n, rvec work_m) const -> void { return functions->eval_grad_ψ(instance.get(), x.data(), y.data(), Σ.data(), D.lowerbound.data(), D.upperbound.data(), grad_ψ.data(), work_n.data(), work_m.data()); }
 auto DLProblem::eval_ψ_grad_ψ(crvec x, crvec y, crvec Σ, rvec grad_ψ, rvec work_n, rvec work_m) const -> real_t { return functions->eval_ψ_grad_ψ(instance.get(), x.data(), y.data(), Σ.data(), D.lowerbound.data(), D.upperbound.data(), grad_ψ.data(), work_n.data(), work_m.data()); }
 
@@ -105,7 +104,6 @@ bool DLProblem::provides_eval_f_g() const { return functions->eval_f_g != nullpt
 bool DLProblem::provides_eval_grad_f_grad_g_prod() const { return functions->eval_grad_f_grad_g_prod != nullptr; }
 bool DLProblem::provides_eval_grad_L() const { return functions->eval_grad_L != nullptr; }
 bool DLProblem::provides_eval_ψ() const { return functions->eval_ψ != nullptr; }
-bool DLProblem::provides_eval_grad_ψ_from_ŷ() const { return functions->eval_grad_ψ_from_ŷ != nullptr; }
 bool DLProblem::provides_eval_grad_ψ() const { return functions->eval_grad_ψ != nullptr; }
 bool DLProblem::provides_eval_ψ_grad_ψ() const { return functions->eval_ψ_grad_ψ != nullptr; }
 bool DLProblem::provides_get_box_C() const { return functions->eval_prox_grad_step == nullptr; }

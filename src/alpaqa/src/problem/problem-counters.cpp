@@ -68,8 +68,6 @@ std::ostream &operator<<(std::ostream &os, const EvalCounter &c) {
        << CountResult{c.ψ, c.time.ψ};
     os << "             grad_ψ:" //
        << CountResult{c.grad_ψ, c.time.grad_ψ};
-    os << "      grad_ψ_from_ŷ:" //
-       << CountResult{c.grad_ψ_from_ŷ, c.time.grad_ψ_from_ŷ};
     os << "           ψ_grad_ψ:" //
        << CountResult{c.ψ_grad_ψ, c.time.ψ_grad_ψ};
     return os;

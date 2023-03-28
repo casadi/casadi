@@ -124,7 +124,7 @@ TEST(PANOC, calc_ψ_grad_ψ) {
 
     // calc_grad_ψ_from_ŷ
     grad_ψ_res.setZero();
-    p.eval_grad_ψ_from_ŷ(x, work_m, grad_ψ_res, work_n);
+    p.eval_grad_L(x, work_m, grad_ψ_res, work_n);
     EXPECT_THAT(grad_ψ_res, EigenAlmostEqual(grad_ψ, 1e-10));
 
     // calc_grad_ψ
@@ -303,7 +303,7 @@ TEST(PANOC, hessian) {
 
     // calc_grad_ψ_from_ŷ
     grad_ψ_res.setZero();
-    p.eval_grad_ψ_from_ŷ(x, work_m, grad_ψ_res, work_n);
+    p.eval_grad_L(x, work_m, grad_ψ_res, work_n);
     EXPECT_THAT(grad_ψ_res, EigenAlmostEqual(grad_ψ, 1e-10));
 
     // calc_grad_ψ

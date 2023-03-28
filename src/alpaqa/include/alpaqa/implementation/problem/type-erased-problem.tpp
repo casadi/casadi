@@ -150,19 +150,6 @@ auto ProblemVTable<Conf>::default_eval_ψ(const void *self, crvec x, crvec y, cr
 }
 /* [ProblemVTable<Conf>::default_eval_ψ] */
 
-/** @implementation{ProblemVTable<Conf>::default_eval_grad_ψ_from_ŷ} */
-template <Config Conf>
-/* [ProblemVTable<Conf>::default_eval_grad_ψ_from_ŷ] */
-void ProblemVTable<Conf>::default_eval_grad_ψ_from_ŷ(const void *self, crvec x, crvec ŷ,
-                                                     rvec grad_ψ, rvec work_n,
-                                                     const ProblemVTable &vtable) {
-    if (ŷ.size() == 0) /* [[unlikely]] */
-        vtable.eval_grad_f(self, x, grad_ψ);
-    else
-        vtable.eval_grad_L(self, x, ŷ, grad_ψ, work_n, vtable);
-}
-/* [ProblemVTable<Conf>::default_eval_grad_ψ_from_ŷ] */
-
 /** @implementation{ProblemVTable<Conf>::default_eval_grad_ψ} */
 template <Config Conf>
 /* [ProblemVTable<Conf>::default_eval_grad_ψ] */
@@ -174,7 +161,7 @@ void ProblemVTable<Conf>::default_eval_grad_ψ(const void *self, crvec x, crvec 
     } else {
         vtable.eval_g(self, x, work_m);
         (void)calc_ŷ_dᵀŷ(self, work_m, y, Σ, vtable);
-        vtable.eval_grad_ψ_from_ŷ(self, x, work_m, grad_ψ, work_n, vtable);
+        vtable.eval_grad_L(self, x, work_m, grad_ψ, work_n, vtable);
     }
 }
 /* [ProblemVTable<Conf>::default_eval_grad_ψ] */

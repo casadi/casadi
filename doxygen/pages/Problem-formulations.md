@@ -176,6 +176,5 @@ documentation. They can be provided in the same fashion as `eval_f` above.
   - @ref alpaqa::TypeErasedProblem::eval_grad_f_grad_g_prod "eval_grad_f_grad_g_prod": @f$ \nabla f(x) @f$ and @f$ \nabla g(x)\,y @f$
   - @ref alpaqa::TypeErasedProblem::eval_grad_L "eval_grad_L": gradient of Lagrangian: @f$ \nabla L(x, y) = \nabla f(x) + \nabla g(x)\,y @f$
   - @ref alpaqa::TypeErasedProblem::eval_ψ "eval_ψ": augmented Lagrangian: @f$ \psi(x) @f$
-  - @ref alpaqa::TypeErasedProblem::eval_grad_ψ_from_ŷ "eval_grad_ψ_from_ŷ": gradient of augmented Lagrangian: @f$ \nabla \psi(x) @f$
   - @ref alpaqa::TypeErasedProblem::eval_grad_ψ "eval_grad_ψ": gradient of augmented Lagrangian: @f$ \nabla \psi(x) @f$
   - @ref alpaqa::TypeErasedProblem::eval_ψ_grad_ψ "eval_ψ_grad_ψ": augmented Lagrangian and gradient: @f$ \psi(x) @f$ and @f$ \nabla \psi(x) @f$

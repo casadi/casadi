@@ -169,7 +169,6 @@ void register_problems(py::module_ &m) {
         void eval_grad_f_grad_g_prod(crvec x, crvec y, rvec grad_f, rvec grad_gxy) const { py::gil_scoped_acquire gil; o.attr("eval_grad_f_grad_g_prod")(x, y, grad_f, grad_gxy); }
         void eval_grad_L(crvec x, crvec y, rvec grad_L, rvec work_n) const { py::gil_scoped_acquire gil; o.attr("eval_grad_L")(x, y, grad_L, work_n); }
         real_t eval_ψ(crvec x, crvec y, crvec Σ, rvec ŷ) const { py::gil_scoped_acquire gil; return py::cast<real_t>(o.attr("eval_ψ")(x, y, Σ, ŷ)); }
-        void eval_grad_ψ_from_ŷ(crvec x, crvec ŷ, rvec grad_ψ, rvec work_n) const { py::gil_scoped_acquire gil; o.attr("eval_grad_ψ_from_ŷ")(x, ŷ, grad_ψ, work_n); }
         void eval_grad_ψ(crvec x, crvec y, crvec Σ, rvec grad_ψ, rvec work_n, rvec work_m) const { py::gil_scoped_acquire gil; o.attr("eval_grad_ψ")(x, y, Σ, grad_ψ, work_n, work_m); }
         real_t eval_ψ_grad_ψ(crvec x, crvec y, crvec Σ, rvec grad_ψ, rvec work_n, rvec work_m) const { py::gil_scoped_acquire gil; return py::cast<real_t>(o.attr("eval_ψ_grad_ψ")(x, y, Σ, grad_ψ, work_n, work_m)); }
         void check() const { py::gil_scoped_acquire gil; if (auto ch = py::getattr(o, "check", py::none()); !ch.is_none()) ch(); }
@@ -186,7 +185,6 @@ void register_problems(py::module_ &m) {
         bool provides_eval_grad_f_grad_g_prod() const { py::gil_scoped_acquire gil; return py::hasattr(o, "eval_grad_f_grad_g_prod"); }
         bool provides_eval_grad_L() const { py::gil_scoped_acquire gil; return py::hasattr(o, "eval_grad_L"); }
         bool provides_eval_ψ() const { py::gil_scoped_acquire gil; return py::hasattr(o, "eval_ψ"); }
-        bool provides_eval_grad_ψ_from_ŷ() const { py::gil_scoped_acquire gil; return py::hasattr(o, "eval_grad_ψ_from_ŷ"); }
         bool provides_eval_grad_ψ() const { py::gil_scoped_acquire gil; return py::hasattr(o, "eval_grad_ψ"); }
         bool provides_eval_ψ_grad_ψ() const { py::gil_scoped_acquire gil; return py::hasattr(o, "eval_ψ_grad_ψ"); }
         bool provides_get_box_C() const { py::gil_scoped_acquire gil; return py::hasattr(o, "get_box_C"); }
@@ -228,7 +226,6 @@ void register_problems(py::module_ &m) {
         .def("eval_grad_f_grad_g_prod", &TEProblem::eval_grad_f_grad_g_prod, "x"_a, "y"_a, "grad_f"_a, "grad_gxy"_a)
         .def("eval_grad_L", &TEProblem::eval_grad_L, "x"_a, "y"_a, "grad_L"_a, "work_n"_a)
         .def("eval_ψ", &TEProblem::eval_ψ, "x"_a, "y"_a, "Σ"_a, "ŷ"_a)
-        .def("eval_grad_ψ_from_ŷ", &TEProblem::eval_grad_ψ_from_ŷ, "x"_a, "ŷ"_a, "grad_ψ"_a, "work_n"_a)
         .def("eval_grad_ψ", &TEProblem::eval_grad_ψ, "x"_a, "y"_a, "Σ"_a, "grad_ψ"_a, "work_n"_a, "work_m"_a)
         .def("eval_ψ_grad_ψ", &TEProblem::eval_ψ_grad_ψ, "x"_a, "y"_a, "Σ"_a, "grad_ψ"_a, "work_n"_a, "work_m"_a)
         .def("get_box_C", &TEProblem::get_box_C)
@@ -244,7 +241,6 @@ void register_problems(py::module_ &m) {
         .def("provides_eval_grad_f_grad_g_prod", &TEProblem::provides_eval_grad_f_grad_g_prod)
         .def("provides_eval_grad_L", &TEProblem::provides_eval_grad_L)
         .def("provides_eval_ψ", &TEProblem::provides_eval_ψ)
-        .def("provides_eval_grad_ψ_from_ŷ", &TEProblem::provides_eval_grad_ψ_from_ŷ)
         .def("provides_eval_grad_ψ", &TEProblem::provides_eval_grad_ψ)
         .def("provides_eval_ψ_grad_ψ", &TEProblem::provides_eval_ψ_grad_ψ)
         .def("provides_get_box_C", &TEProblem::provides_get_box_C)
@@ -299,14 +295,6 @@ void register_problems(py::module_ &m) {
                 return std::make_tuple(std::move(ψ), std::move(ŷ));
             },
             "x"_a, "y"_a, "Σ"_a)
-        .def(
-            "eval_grad_ψ_from_ŷ",
-            [](const TEProblem &p, crvec x, crvec ŷ) {
-                vec grad_ψ(p.get_n()), work(p.get_n());
-                p.eval_grad_ψ_from_ŷ(x, ŷ, grad_ψ, work);
-                return grad_ψ;
-            },
-            "x"_a, "ŷ"_a)
         .def(
             "eval_grad_ψ",
             [](const TEProblem &p, crvec x, crvec y, crvec Σ) {
@@ -366,7 +354,6 @@ void register_problems(py::module_ &m) {
             // .def("eval_hess_ψ", &CasADiProblem::eval_hess_ψ, "x"_a, "y"_a, "Σ"_a, "H"_a) // TODO
             .def("eval_grad_L", &CasADiProblem::eval_grad_L, "x"_a, "y"_a, "grad_L"_a, "work_n"_a)
             .def("eval_ψ", &CasADiProblem::eval_ψ, "x"_a, "y"_a, "Σ"_a, "ŷ"_a)
-            .def("eval_grad_ψ_from_ŷ", &CasADiProblem::eval_grad_ψ_from_ŷ, "x"_a, "ŷ"_a, "grad_ψ"_a, "work_n"_a)
             .def("eval_grad_ψ", &CasADiProblem::eval_grad_ψ, "x"_a, "y"_a, "Σ"_a, "grad_ψ"_a, "work_n"_a, "work_m"_a)
             .def("eval_ψ_grad_ψ", &CasADiProblem::eval_ψ_grad_ψ, "x"_a, "y"_a, "Σ"_a, "grad_ψ"_a, "work_n"_a, "work_m"_a)
             // clang-format on
@@ -402,14 +389,6 @@ void register_problems(py::module_ &m) {
                     return std::make_tuple(std::move(ψ), std::move(ŷ));
                 },
                 "x"_a, "y"_a, "Σ"_a)
-            .def(
-                "eval_grad_ψ_from_ŷ",
-                [](const CasADiProblem &p, crvec x, crvec ŷ) {
-                    vec grad_ψ(p.get_n()), work(p.get_n());
-                    p.eval_grad_ψ_from_ŷ(x, ŷ, grad_ψ, work);
-                    return grad_ψ;
-                },
-                "x"_a, "ŷ"_a)
             .def(
                 "eval_grad_ψ",
                 [](const CasADiProblem &p, crvec x, crvec y, crvec Σ) {

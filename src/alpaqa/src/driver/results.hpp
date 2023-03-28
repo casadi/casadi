@@ -82,7 +82,6 @@ void write_evaluations(std::ostream &os, const alpaqa::EvalCounter &evals) {
     EVAL(hess_ψ);
     EVAL(ψ);
     EVAL(grad_ψ);
-    EVAL(grad_ψ_from_ŷ);
     EVAL(ψ_grad_ψ);
 #undef EVAL
     os << "},\n";

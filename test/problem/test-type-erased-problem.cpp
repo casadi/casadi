@@ -102,8 +102,6 @@ TEST(TypeErasedProblem, RequiredProblem) {
     // Defaults for Lagrangians
     EXPECT_EQ(te_prob.vtable.eval_grad_L, te_prob.vtable.default_eval_grad_L);
     EXPECT_EQ(te_prob.vtable.eval_ψ, te_prob.vtable.default_eval_ψ);
-    EXPECT_EQ(te_prob.vtable.eval_grad_ψ_from_ŷ,
-              te_prob.vtable.default_eval_grad_ψ_from_ŷ);
     EXPECT_EQ(te_prob.vtable.eval_grad_ψ, te_prob.vtable.default_eval_grad_ψ);
     EXPECT_EQ(te_prob.vtable.eval_ψ_grad_ψ,
               te_prob.vtable.default_eval_ψ_grad_ψ);
@@ -125,7 +123,6 @@ struct TestOptProblem : TestReqProblem {
     MOCK_METHOD(void, eval_grad_f_grad_g_prod, (crvec x, crvec y, rvec grad_f, rvec grad_gxy), (const));
     MOCK_METHOD(void, eval_grad_L, (crvec x, crvec y, rvec grad_L, rvec work_n), (const));
     MOCK_METHOD(real_t, eval_ψ, (crvec x, crvec y, crvec Σ, rvec ŷ), (const));
-    MOCK_METHOD(void, eval_grad_ψ_from_ŷ, (crvec x, crvec ŷ, rvec grad_ψ, rvec work_n), (const));
     MOCK_METHOD(void, eval_grad_ψ, (crvec x, crvec y, crvec Σ, rvec grad_ψ, rvec work_n, rvec work_m), (const));
     MOCK_METHOD(real_t, eval_ψ_grad_ψ, (crvec x, crvec y, crvec Σ, rvec grad_ψ, rvec work_n, rvec work_m), (const));
     // clang-format on
@@ -212,11 +209,6 @@ TEST(TypeErasedProblem, OptionalProblem) {
     ASSERT_NE(te_prob.vtable.eval_ψ, nullptr);
     EXPECT_CALL(te_prob.as<TestOptProblem>(), eval_ψ);
     te_prob.vtable.eval_ψ(te_prob.self, x, x, x, x, te_prob.vtable);
-    testing::Mock::VerifyAndClearExpectations(&te_prob.as<TestOptProblem>());
-
-    ASSERT_NE(te_prob.vtable.eval_grad_ψ_from_ŷ, nullptr);
-    EXPECT_CALL(te_prob.as<TestOptProblem>(), eval_grad_ψ_from_ŷ);
-    te_prob.vtable.eval_grad_ψ_from_ŷ(te_prob.self, x, x, x, x, te_prob.vtable);
     testing::Mock::VerifyAndClearExpectations(&te_prob.as<TestOptProblem>());
 
     ASSERT_NE(te_prob.vtable.eval_grad_ψ, nullptr);
@@ -347,13 +339,6 @@ TEST(TypeErasedProblem, CountedOptionalProblem) {
     testing::Mock::VerifyAndClearExpectations(&prob);
     EXPECT_EQ(evals.ψ, 1);
 
-    EXPECT_EQ(evals.grad_ψ_from_ŷ, 0);
-    ASSERT_NE(te_prob.vtable.eval_grad_ψ_from_ŷ, nullptr);
-    EXPECT_CALL(prob, eval_grad_ψ_from_ŷ);
-    te_prob.vtable.eval_grad_ψ_from_ŷ(te_prob.self, x, x, x, x, te_prob.vtable);
-    testing::Mock::VerifyAndClearExpectations(&prob);
-    EXPECT_EQ(evals.grad_ψ_from_ŷ, 1);
-
     EXPECT_EQ(evals.grad_ψ, 0);
     ASSERT_NE(te_prob.vtable.eval_grad_ψ, nullptr);
     EXPECT_CALL(prob, eval_grad_ψ);
@@ -479,10 +464,6 @@ TEST(TypeErasedProblem, TEOptionalProblem) {
 
     EXPECT_CALL(te_prob.as<TestOptProblem>(), eval_ψ);
     te_prob.eval_ψ(x, x, x, x);
-    testing::Mock::VerifyAndClearExpectations(&te_prob.as<TestOptProblem>());
-
-    EXPECT_CALL(te_prob.as<TestOptProblem>(), eval_grad_ψ_from_ŷ);
-    te_prob.eval_grad_ψ_from_ŷ(x, x, x, x);
     testing::Mock::VerifyAndClearExpectations(&te_prob.as<TestOptProblem>());
 
     EXPECT_CALL(te_prob.as<TestOptProblem>(), eval_grad_ψ);
