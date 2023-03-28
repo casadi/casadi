@@ -911,10 +911,8 @@ int IdasInterface::lsetupF(IDAMem IDA_mem, N_Vector xz, N_Vector xzdot, N_Vector
   double cj = IDA_mem->ida_cj;
 
   // Call the preconditioner setup function (which sets up the linear solver)
-  if (psetupF(t, xz, xzdot, nullptr, cj, IDA_mem->ida_lmem,
-    vtemp1, vtemp1, vtemp3)) return 1;
-
-  return 0;
+  return psetupF(t, xz, xzdot, nullptr, cj, IDA_mem->ida_lmem,
+    vtemp1, vtemp1, vtemp3);
 }
 
 int IdasInterface::lsetupB(IDAMem IDA_mem, N_Vector xzB, N_Vector xzdotB, N_Vector respB,
@@ -942,10 +940,9 @@ int IdasInterface::lsetupB(IDAMem IDA_mem, N_Vector xzB, N_Vector xzdotB, N_Vect
       if (flag != IDA_SUCCESS) casadi_error("Could not interpolate forward states");
     }
     // Call the preconditioner setup function (which sets up the linear solver)
-    if (psetupB(t, IDAADJ_mem->ia_yyTmp, IDAADJ_mem->ia_ypTmp,
-      xzB, xzdotB, nullptr, cj, static_cast<void*>(m), vtemp1B, vtemp1B, vtemp3B)) return 1;
+    return psetupB(t, IDAADJ_mem->ia_yyTmp, IDAADJ_mem->ia_ypTmp,
+      xzB, xzdotB, nullptr, cj, static_cast<void*>(m), vtemp1B, vtemp1B, vtemp3B);
 
-    return 0;
   } catch(std::exception& e) { // non-recoverable error
     uerr() << "lsetupB failed: " << e.what() << std::endl;
     return -1;
@@ -968,8 +965,9 @@ int IdasInterface::lsolveF(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector
     double delta = 0.0;
 
     // Call the preconditioner solve function (which solves the linear system)
-    if (psolveF(t, xz, xzdot, rr, b, b, cj,
-      delta, static_cast<void*>(m), nullptr)) return 1;
+    int flag = psolveF(t, xz, xzdot, rr, b, b, cj,
+      delta, static_cast<void*>(m), nullptr);
+    if (flag) return flag;
 
     // Scale the correction to account for change in cj
     if (s.cj_scaling_) {
@@ -1000,7 +998,6 @@ int IdasInterface::lsolveB(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector
     double cjratio = IDA_mem->ida_cjratio;
 
     IDA_mem = (IDAMem) IDA_mem->ida_user_data;
-
     IDAADJ_mem = IDA_mem->ida_adj_mem;
     //IDAB_mem = IDAADJ_mem->ia_bckpbCrt;
 
@@ -1015,8 +1012,9 @@ int IdasInterface::lsolveB(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector
     double delta = 0.0;
 
     // Call the preconditioner solve function (which solves the linear system)
-    if (psolveB(t, IDAADJ_mem->ia_yyTmp, IDAADJ_mem->ia_ypTmp, xzB, xzdotB,
-      rrB, b, b, cj, delta, static_cast<void*>(m), nullptr)) return 1;
+    flag = psolveB(t, IDAADJ_mem->ia_yyTmp, IDAADJ_mem->ia_ypTmp, xzB, xzdotB,
+      rrB, b, b, cj, delta, static_cast<void*>(m), nullptr);
+    if (flag) return flag;
 
     // Scale the correction to account for change in cj
     if (s.cj_scaling_) {

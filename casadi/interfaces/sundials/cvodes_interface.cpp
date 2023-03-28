@@ -511,8 +511,6 @@ int CvodesInterface::psolveF(double t, N_Vector x, N_Vector xdot, N_Vector r,
     }
 
     return 0;
-  } catch(int flag) { // recoverable error
-    return flag;
   } catch(std::exception& e) { // non-recoverable error
     uerr() << "psolve failed: " << e.what() << std::endl;
     return -1;
@@ -556,8 +554,6 @@ int CvodesInterface::psolveB(double t, N_Vector x, N_Vector xB, N_Vector xdotB, 
     }
 
     return 0;
-  } catch(int flag) { // recoverable error
-    return flag;
   } catch(std::exception& e) { // non-recoverable error
     uerr() << "psolveB failed: " << e.what() << std::endl;
     return -1;
@@ -606,8 +602,6 @@ int CvodesInterface::psetupF(double t, N_Vector x, N_Vector xdot, booleantype jo
     if (s.linsolF_.nfact(m->jacF, m->mem_linsolF)) return 1;
 
     return 0;
-  } catch(int flag) { // recoverable error
-    return flag;
   } catch(std::exception& e) { // non-recoverable error
     uerr() << "psetup failed: " << e.what() << std::endl;
     return -1;
@@ -656,8 +650,6 @@ int CvodesInterface::psetupB(double t, N_Vector x, N_Vector rx, N_Vector rxdot,
     if (s.linsolB_.nfact(m->jacB, m->mem_linsolB)) return 1;
 
     return 0;
-  } catch(int flag) { // recoverable error
-    return flag;
   } catch(std::exception& e) { // non-recoverable error
     uerr() << "psetupB failed: " << e.what() << std::endl;
     return -1;
@@ -670,12 +662,9 @@ int CvodesInterface::lsetupF(CVodeMem cv_mem, int convfail, N_Vector x, N_Vector
     auto m = to_mem(cv_mem->cv_lmem);
 
     // Call the preconditioner setup function (which sets up the linear solver)
-    if (psetupF(cv_mem->cv_tn, x, xdot, FALSE, jcurPtr,
-      cv_mem->cv_gamma, static_cast<void*>(m), vtemp1, vtemp2, vtemp3)) return 1;
+    return psetupF(cv_mem->cv_tn, x, xdot, FALSE, jcurPtr,
+      cv_mem->cv_gamma, static_cast<void*>(m), vtemp1, vtemp2, vtemp3);
 
-    return 0;
-  } catch(int flag) { // recoverable error
-    return flag;
   } catch(std::exception& e) { // non-recoverable error
     uerr() << "lsetup failed: " << e.what() << std::endl;
     return -1;
