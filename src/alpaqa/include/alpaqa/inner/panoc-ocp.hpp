@@ -152,6 +152,14 @@ class PANOCOCPSolver {
         return operator()(Problem::template make<P>(problem), opts, u, y, μ, e);
     }
 
+    template <class P>
+    Stats operator()(const P &problem, const SolveOptions &opts, rvec u) {
+        if (problem.get_m() != 0)
+            throw std::invalid_argument("Missing arguments y, Σ, e");
+        mvec y{nullptr, 0}, Σ{nullptr, 0}, e{nullptr, 0};
+        return operator()(problem, opts, u, y, Σ, e);
+    }
+
     /// Specify a callable that is invoked with some intermediate results on
     /// each iteration of the algorithm.
     /// @see @ref ProgressInfo

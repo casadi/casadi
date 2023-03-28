@@ -139,9 +139,17 @@ class ZeroFPRSolver {
                      rvec err_z);              // out
 
     template <class P>
-    Stats operator()(const P &problem, const SolveOptions &opts, rvec u, rvec y,
+    Stats operator()(const P &problem, const SolveOptions &opts, rvec x, rvec y,
                      crvec Σ, rvec e) {
-        return operator()(Problem::template make<P>(problem), opts, u, y, Σ, e);
+        return operator()(Problem::template make<P>(problem), opts, x, y, Σ, e);
+    }
+
+    template <class P>
+    Stats operator()(const P &problem, const SolveOptions &opts, rvec x) {
+        if (problem.get_m() != 0)
+            throw std::invalid_argument("Missing arguments y, Σ, e");
+        mvec y{nullptr, 0}, Σ{nullptr, 0}, e{nullptr, 0};
+        return operator()(problem, opts, x, y, Σ, e);
     }
 
     /// Specify a callable that is invoked with some intermediate results on
