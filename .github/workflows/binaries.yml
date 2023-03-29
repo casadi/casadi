@@ -21,31 +21,15 @@ jobs:
         uses: rlespinasse/github-slug-action@v4.4.0
       - run: |
           echo "CMAKE_VERSION=$(python misc/get_version.py)" >> $GITHUB_ENV
-        if: runner.os != 'Windows'
-      - run: |
-          echo "CMAKE_VERSION=$(python misc/get_version.py)" >> $env:GITHUB_ENV
-        if: runner.os == 'Windows'
-        shell: pwsh
-
       - run: |
           echo "CASADI_VERSION=${{ env.GITHUB_REF_SLUG }}" >> $GITHUB_ENV
           echo "WHEEL_VERSION=${{ env.CMAKE_VERSION}}.dev+${{ env.GITHUB_REF_SLUG }}" >> $GITHUB_ENV
-        if: runner.os != 'Windows' && !contains( env.GITHUB_REF_NAME , 'release-' )
+        if: "!contains( env.GITHUB_REF_NAME , 'release-' )"
       - run: |
-          echo "CASADI_VERSION=${{ env.GITHUB_REF_SLUG }}" >> $env:GITHUB_ENV
-          echo "WHEEL_VERSION=${{ env.CMAKE_VERSION}}.dev+${{ env.GITHUB_REF_SLUG }}" >> $env:GITHUB_ENV
-        if: runner.os == 'Windows' && !contains( env.GITHUB_REF_NAME , 'release-' )
-        shell: pwsh
-
-      - run: |
-          python -c "import sys;sys.stdout.write('CASADI_VERSION='+'${{ env.GITHUB_REF_SLUG }}'.split('-')[1])" >> $GITHUB_ENV
-          python -c "import sys;sys.stdout.write('WHEEL_VERSION='+'${{ env.GITHUB_REF_SLUG }}'.split('-')[1])" >> $GITHUB_ENV
-        if: runner.os != 'Windows' && contains( env.GITHUB_REF_NAME , 'release-' )
-      - run: |
-          python -c "import sys;sys.stdout.write('CASADI_VERSION='+'${{ env.GITHUB_REF_SLUG }}'.split('-')[1])" >> $env:GITHUB_ENV
-          python -c "import sys;sys.stdout.write('WHEEL_VERSION='+'${{ env.GITHUB_REF_SLUG }}'.split('-')[1])" >> $env:GITHUB_ENV
-        if: runner.os == 'Windows' && contains( env.GITHUB_REF_NAME , 'release-' )
-        shell: pwsh
+          python -c "print('CASADI_VERSION='+'${{ env.GITHUB_REF_SLUG }}'.split('-')[1])" >> $GITHUB_ENV
+          python -c "print('WHEEL_VERSION='+'${{ env.GITHUB_REF_SLUG }}'.split('-')[1])" >> $GITHUB_ENV
+        if: contains( env.GITHUB_REF_NAME , 'release-' )
+      - run: echo "CMAKE_VERSION=${{ env.CMAKE_VERSION }}, CASADI_VERSION=${{ env.CASADI_VERSION }}, WHEEL_VERSION=${{ env.WHEEL_VERSION }}"
     outputs:
       casadi: ${{ env.CASADI_VERSION }}
       wheel: ${{ env.WHEEL_VERSION }}
