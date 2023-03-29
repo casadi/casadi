@@ -36,7 +36,7 @@ bare_toc:
 	make singlehtml SPHINXOPTS="-D html_theme=bare_body -D 'html_theme_options.mode=toc'"
 	sed -i 's/index\.html//g' build/singlehtml/index.html
 	mkdir -p ../../web/themes/casadi-theme/layouts/partials/
-	cat addendum.html build/singlehtml/index.html > ../../web/themes/casadi-theme/layouts/partials/docs-sidebar.html
+	cp build/singlehtml/index.html ../../web/themes/casadi-theme/layouts/partials/docs-sidebar.html
 
 users_guide.pdf:
 	make latexpdf
