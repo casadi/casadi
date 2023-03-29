@@ -1785,7 +1785,7 @@ class Functiontests(casadiTestCase):
     if not args.run_slow: return
     x = MX.sym("x",3)
     y = MX.sym("y",3,3)
-    f = Function("f",[x,y],[x**3,y @ x])
+    f = Function("f",[x,y],[x**3,mtimes(y,x)])
     c = CodeGenerator('me')
     c.add(f, True)
     
