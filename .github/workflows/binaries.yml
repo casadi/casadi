@@ -848,7 +848,7 @@ jobs:
           overwrite: true
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
           file: docs/users_guide/users_guide.pdf
-          asset_name: casadi-users_guide-v${{ needs.version.outputs.casadi }}.zip
+          asset_name: casadi-users_guide-v${{ needs.version.outputs.casadi }}.pdf
           prerelease: true
       - uses: svenstaro/upload-release-action@2.4.0
         with:
