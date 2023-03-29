@@ -36,6 +36,14 @@ install(DIRECTORY "${PROJECT_SOURCE_DIR}/src/interop/casadi/include/"
     DESTINATION "${ALPAQA_INSTALL_INCLUDEDIR}"
         COMPONENT dev
     FILES_MATCHING REGEX "/.*\.(h|[hti]pp)$")
+install(DIRECTORY "${PROJECT_SOURCE_DIR}/src/interop/ipopt/include/"
+    DESTINATION "${ALPAQA_INSTALL_INCLUDEDIR}"
+        COMPONENT dev
+    FILES_MATCHING REGEX "/.*\.(h|[hti]pp)$")
+install(DIRECTORY "${PROJECT_SOURCE_DIR}/src/interop/lbfgsb/include/"
+    DESTINATION "${ALPAQA_INSTALL_INCLUDEDIR}"
+        COMPONENT dev
+    FILES_MATCHING REGEX "/.*\.(h|[hti]pp)$")
 install(DIRECTORY "${PROJECT_SOURCE_DIR}/src/interop/dl/include/"
     DESTINATION "${ALPAQA_INSTALL_INCLUDEDIR}"
         COMPONENT dev
