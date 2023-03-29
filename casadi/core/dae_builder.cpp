@@ -40,7 +40,6 @@
 #include "xml_file.hpp"
 #include "external.hpp"
 #include "integrator.hpp"
-#include "simulator.hpp"
 
 namespace casadi {
 
