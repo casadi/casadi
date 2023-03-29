@@ -547,7 +547,8 @@ int CvodesInterface::psolveB(double t, N_Vector x, N_Vector xB, N_Vector xdotB, 
       }
 
       // Solve for sensitivity right-hand-sides
-      if (s.linsolF_.solve(m->jacF, m->v1 + s.nx1_, s.nadj_ * s.nfwd_, true, m->mem_linsolF)) return 1;
+      if (s.linsolF_.solve(m->jacF, m->v1 + s.nx1_, s.nadj_ * s.nfwd_,
+        true, m->mem_linsolF)) return 1;
 
       // Save to output, reordered
       casadi_copy(m->v1 + s.nx1_, s.nx_ - s.nx1_, v + s.nx1_);
@@ -740,7 +741,6 @@ CvodesMemory::CvodesMemory(const CvodesInterface& s) : self(s) {
 
 CvodesMemory::~CvodesMemory() {
   if (this->mem_linsolF >= 0) self.linsolF_.release(this->mem_linsolF);
-  if (this->mem_linsolB >= 0) self.linsolB_.release(this->mem_linsolB);
   if (this->mem) CVodeFree(&this->mem);
 }
 

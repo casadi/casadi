@@ -146,35 +146,12 @@ void IdasInterface::init(const Dict& opts) {
   }
 
   // Constraints
-  casadi_assert(y_c_.size()==nx_+nz_ || y_c_.empty(),
+  casadi_assert(y_c_.size() == nx_+nz_ || y_c_.empty(),
     "Constraint vector if supplied, must be of length nx+nz, but got "
     + str(y_c_.size()) + " and nx+nz = " + str(nx_+nz_) + ".");
 
   // For Jacobian calculation
   alloc_w(nx_ + nz_); // casadi_copy_block
-  if (nrx_ > 0) {
-    alloc_w(sp_jac_ode_xB_.nnz(), true);  // jac_adj_x_rx
-    alloc_w(sp_jac_alg_xB_.nnz(), true);  // jac_adj_z_rx
-    alloc_w(sp_jac_ode_zB_.nnz(), true);  // jac_adj_x_rz
-    alloc_w(sp_jac_alg_zB_.nnz(), true);  // jac_adj_z_rz
-    alloc_w(nrx_ + nrz_); // casadi_copy_block
-  }
-}
-
-void IdasInterface::set_work(void* mem, const double**& arg, double**& res,
-    casadi_int*& iw, double*& w) const {
-  auto m = to_mem(mem);
-
-  // Set work in base classes
-  SundialsInterface::set_work(mem, arg, res, iw, w);
-
-  // Work vectors
-  if (nrx_ > 0) {
-    m->jac_adj_x_rx = w; w += sp_jac_ode_xB_.nnz();
-    m->jac_adj_z_rx = w; w += sp_jac_alg_xB_.nnz();
-    m->jac_adj_x_rz = w; w += sp_jac_ode_zB_.nnz();
-    m->jac_adj_z_rz = w; w += sp_jac_alg_zB_.nnz();
-  }
 }
 
 int IdasInterface::resF(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, void *user_data) {
@@ -1003,7 +980,6 @@ IdasMemory::~IdasMemory() {
   if (this->xzdot) N_VDestroy_Serial(this->xzdot);
   if (this->rxzdot) N_VDestroy_Serial(this->rxzdot);
   if (this->mem_linsolF >= 0) self.linsolF_.release(this->mem_linsolF);
-  if (this->mem_linsolB >= 0) self.linsolB_.release(this->mem_linsolB);
 }
 
 IdasInterface::IdasInterface(DeserializingStream& s) : SundialsInterface(s) {

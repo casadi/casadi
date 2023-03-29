@@ -64,9 +64,6 @@ struct CASADI_INTEGRATOR_IDAS_EXPORT IdasMemory : public SundialsMemory {
   /// Ids of backward problem
   int whichB;
 
-  /// Jacobian memory blocks, backward problem
-  double *jac_adj_x_rx, *jac_adj_z_rx, *jac_adj_x_rz, *jac_adj_z_rz;
-
   /// Constructor
   IdasMemory(const IdasInterface& s);
 
@@ -112,10 +109,6 @@ class CASADI_INTEGRATOR_IDAS_EXPORT IdasInterface : public SundialsInterface {
 
   /** \brief  Initialize */
   void init(const Dict& opts) override;
-
-  /** \brief Set the (persistent) work vectors */
-  void set_work(void* mem, const double**& arg, double**& res,
-    casadi_int*& iw, double*& w) const override;
 
   /** \brief Create memory block */
   void* alloc_mem() const override { return new IdasMemory(*this);}

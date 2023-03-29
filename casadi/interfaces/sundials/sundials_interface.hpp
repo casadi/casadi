@@ -60,7 +60,7 @@ namespace casadi {
     double *jac_ode_x, *jac_alg_x, *jac_ode_z, *jac_alg_z;
 
     // Jacobian
-    double *jacF, *jacB;
+    double *jacF;
 
     /// Stats
     long nsteps, nfevals, nlinsetups, netfails;
@@ -80,7 +80,7 @@ namespace casadi {
     int ncheck;
 
     /// Linear solver memory objects
-    int mem_linsolF, mem_linsolB;
+    int mem_linsolF;
 
     /// Constructor
     SundialsMemory();
@@ -149,11 +149,6 @@ namespace casadi {
     int calc_jacF(SundialsMemory* m, double t, const double* x, const double* z,
       double* jac_ode_x, double* jac_alg_x, double* jac_ode_z, double* jac_alg_z) const;
 
-    // Jacobian of DAE right-hand-side function, backward problem
-    int calc_jacB(SundialsMemory* m, double t, const double* x, const double* z,
-      const double* rx, const double* rz,
-      double* jac_adj_x_rx, double* jac_adj_z_rx, double* jac_adj_x_rz, double* jac_adj_z_rz) const;
-
     /// Get all statistics
     Dict get_stats(void* mem) const override;
 
@@ -211,12 +206,8 @@ namespace casadi {
     casadi_int max_order_;
     ///@}
 
-    /// Backward problem Jacobian sparsity
-    Sparsity sp_jac_ode_xB1_, sp_jac_alg_xB1_, sp_jac_ode_zB1_, sp_jac_alg_zB1_;
-    Sparsity sp_jac_ode_xB_, sp_jac_alg_xB_, sp_jac_ode_zB_, sp_jac_alg_zB_;
-
     /// Linear solver
-    Linsol linsolF_, linsolB_;
+    Linsol linsolF_;
 
     /// Supported iterative solvers in Sundials
     enum NewtonScheme {SD_DIRECT, SD_GMRES, SD_BCGSTAB, SD_TFQMR} newton_scheme_;
