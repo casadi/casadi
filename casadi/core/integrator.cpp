@@ -264,7 +264,7 @@ Sparsity Integrator::get_sparsity_out(casadi_int i) {
   case INTEGRATOR_ZF: return Sparsity::dense(nz1_, nt() * (1 + nfwd_));
   case INTEGRATOR_QF: return Sparsity::dense(nq1_, nt() * (1 + nfwd_));
   case INTEGRATOR_ADJ_X0: return Sparsity::dense(nrx1_, nadj_ * (1 + nfwd_));
-  case INTEGRATOR_ADJ_Z0: return Sparsity::dense(nrz1_, nadj_ * (1 + nfwd_));
+  case INTEGRATOR_ADJ_Z0: return Sparsity(nrz1_, nadj_ * (1 + nfwd_));  // always zero
   case INTEGRATOR_ADJ_P: return Sparsity::dense(nrq1_, nadj_ * (1 + nfwd_));
   case INTEGRATOR_ADJ_U: return Sparsity::dense(nuq1_, nadj_ * (1 + nfwd_) * nt());
   case INTEGRATOR_NUM_OUT: break;
@@ -333,7 +333,6 @@ int Integrator::eval(const double** arg, double** res,
   double* z = res[INTEGRATOR_ZF];
   double* q = res[INTEGRATOR_QF];
   double* rx = res[INTEGRATOR_ADJ_X0];
-  double* rz = res[INTEGRATOR_ADJ_Z0];
   double* rq = res[INTEGRATOR_ADJ_P];
   double* uq = res[INTEGRATOR_ADJ_U];
   res += INTEGRATOR_NUM_OUT;
@@ -400,7 +399,7 @@ int Integrator::eval(const double** arg, double** res,
       if (m->k > 0) {
         retreat(m, u, 0, 0, 0, uq);
       } else {
-        retreat(m, u, rx, rz, rq, uq);
+        retreat(m, u, rx, 0, rq, uq);
       }
     }
     // uq should contain the contribution from the grid point, not cumulative
@@ -875,7 +874,6 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
   bvec_t* zf = res[INTEGRATOR_ZF];
   bvec_t* qf = res[INTEGRATOR_QF];
   bvec_t* rxf = res[INTEGRATOR_ADJ_X0];
-  bvec_t* rzf = res[INTEGRATOR_ADJ_Z0];
   bvec_t* rqf = res[INTEGRATOR_ADJ_P];
   bvec_t* uqf = res[INTEGRATOR_ADJ_U];
   res += n_out_;
@@ -969,9 +967,8 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
       std::copy_n(rx, nx_, rx_prev);
     }
 
-    // Get rxf and rzf at initial time
+    // Get rxf at initial time
     if (rxf) std::copy_n(rx, nrx_, rxf);
-    if (rzf) std::copy_n(rz, nrz_, rzf);
   }
   return 0;
 }
@@ -1133,7 +1130,6 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
   bvec_t* zf = res[INTEGRATOR_ZF];
   bvec_t* qf = res[INTEGRATOR_QF];
   bvec_t* rxf = res[INTEGRATOR_ADJ_X0];
-  bvec_t* rzf = res[INTEGRATOR_ADJ_Z0];
   bvec_t* rqf = res[INTEGRATOR_ADJ_P];
   bvec_t* uqf = res[INTEGRATOR_ADJ_U];
   res += n_out_;
@@ -1155,19 +1151,15 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
   std::fill_n(z, nz_, 0);
 
   if (nrx_ > 0) {
-    // Propagate from rxf and rzf at initial time
+    // Propagate from rxf initial time
     if (rxf) {
       std::copy_n(rxf, nrx_, rx);
       std::fill_n(rxf, nrx_, 0);
     } else {
       std::fill_n(rx, nrx_, 0);
     }
-    if (rzf) {
-      std::copy_n(rzf, nrz_, rz);
-      std::fill_n(rzf, nrz_, 0);
-    } else {
-      std::fill_n(rz, nrz_, 0);
-    }
+    // Reset rz
+    std::fill_n(rz, nrz_, 0);
 
     // Save rqf: See note below
     if (rqf) std::copy_n(rqf, nrq_, rq);
