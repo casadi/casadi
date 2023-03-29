@@ -48,7 +48,7 @@ jobs:
         shell: pwsh
     outputs:
       casadi: ${{ env.CASADI_VERSION }}
-      wheel: ${{ env.CASADI_WHEEL_VERSION }}
+      wheel: ${{ env.WHEEL_VERSION }}
 
   swig:
     runs-on: ubuntu-20.04
