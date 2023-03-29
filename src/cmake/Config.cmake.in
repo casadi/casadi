@@ -2,6 +2,9 @@
 
 include(CMakeFindDependencyMacro)
 find_dependency(Eigen3 REQUIRED CONFIG)
+if (@ALPAQA_WITH_CASADI@)
+    find_package(casadi CONFIG)
+endif()
 
 include("${CMAKE_CURRENT_LIST_DIR}/alpaqaTargets.cmake")
 
