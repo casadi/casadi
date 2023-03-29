@@ -113,7 +113,7 @@ cmake_dependent_option(ALPAQA_WITH_CASADI_OCP
     ${ALPAQA_WITH_CASADI_OCP_SUPPORTED} "ALPAQA_WITH_CASADI" OFF)
 
 # Optimal control problems
-if (ALPAQA_WITH_CASADI_OCP)
+if (ALPAQA_WITH_OCP AND ALPAQA_WITH_CASADI_OCP)
     add_library(casadi-ocp-loader "interop/casadi/src/CasADiControlProblem.cpp")
     target_include_directories(casadi-ocp-loader PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/interop/casadi/include>
