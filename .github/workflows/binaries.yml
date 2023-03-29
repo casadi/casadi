@@ -20,12 +20,10 @@ jobs:
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.4.0
       - run: |
-          echo "CMAKE_VERSION=" >> $GITHUB_ENV
-          python misc/get_version.py >> $GITHUB_ENV
+          echo "CMAKE_VERSION=$(python misc/get_version.py)" >> $GITHUB_ENV
         if: runner.os != 'Windows'
       - run: |
-          echo "CMAKE_VERSION=" >> $env:GITHUB_ENV
-          python misc/get_version.py >> $env:GITHUB_ENV
+          echo "CMAKE_VERSION=$(python misc/get_version.py)" >> $env:GITHUB_ENV
         if: runner.os == 'Windows'
         shell: pwsh
 
@@ -295,7 +293,7 @@ jobs:
       matrix: ${{ steps.build-matrix.outputs.matrix }}
            
   python-osx:
-    needs: [core-osx,matrix-arch-py2-mac,swig]
+    needs: [core-osx,matrix-arch-py2-mac,swig,version]
     runs-on: ${{matrix.image == 'macos-m1' && 'self-hosted' || matrix.image }}
     strategy:
       fail-fast: false
@@ -446,7 +444,7 @@ jobs:
       matrix: ${{ steps.build-matrix.outputs.matrix }}
 
   matlab-osx:
-    needs: [core-osx,matrix-arch-matlab-mac,swig]
+    needs: [core-osx,matrix-arch-matlab-mac,swig,version]
     runs-on: ${{matrix.image == 'macos-m1' && 'self-hosted' || matrix.image }}
     strategy:
       fail-fast: false
@@ -529,7 +527,7 @@ jobs:
           retention-days: 5
                   
   matlab-dockcross:
-    needs: [core-dockcross,swig]
+    needs: [core-dockcross,swig,version]
     runs-on: ubuntu-20.04
     strategy:
       fail-fast: false
@@ -621,7 +619,7 @@ jobs:
           retention-days: 5
       
   python-dockcross:
-    needs: [core-dockcross,matrix-arch-py2,swig]
+    needs: [core-dockcross,matrix-arch-py2,swig,version]
     runs-on: ubuntu-20.04
     strategy:
       fail-fast: false
@@ -849,7 +847,7 @@ jobs:
 
   docs:
     runs-on: ubuntu-22.04
-    needs: [python-dockcross,matlab-dockcross]
+    needs: [python-dockcross,matlab-dockcross,version]
     steps:
       - uses: actions/checkout@v3.3.0
       - uses: actions/download-artifact@v3.0.2
