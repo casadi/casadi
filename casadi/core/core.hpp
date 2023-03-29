@@ -48,6 +48,7 @@
 #include "importer.hpp"
 #include "callback.hpp"
 #include "integrator.hpp"
+#include "simulator.hpp"
 #include "conic.hpp"
 #include "nlpsol.hpp"
 #include "rootfinder.hpp"

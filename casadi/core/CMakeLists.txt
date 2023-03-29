@@ -60,6 +60,7 @@ set(CASADI_PUBLIC
   linsol.hpp
   rootfinder.hpp
   integrator.hpp
+  simulator.hpp
   nlpsol.hpp
   conic.hpp
   dple.hpp
@@ -174,6 +175,7 @@ set(CASADI_INTERNAL
   linsol.cpp              linsol_internal.hpp  linsol_internal.cpp
   rootfinder_impl.hpp     rootfinder.cpp
   integrator_impl.hpp     integrator.cpp
+  simulator_impl.hpp      simulator.cpp
   nlpsol.hpp              nlpsol_impl.hpp        nlpsol.cpp
   conic_impl.hpp          conic.cpp
   dple_impl.hpp           dple.cpp
