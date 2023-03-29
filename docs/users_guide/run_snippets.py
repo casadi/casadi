@@ -27,6 +27,17 @@ for lang in langs:
          out = p.stdout
          # Filter out Ipopt copyright notice
          out = re.sub(r'\*{5,}.*Ipopt.*\*{5,}','',out,flags=re.MULTILINE|re.DOTALL)
+         # Filter out qpOASES copyright notice
+         out = re.sub(r"""qpOASES -- An Implementation of the Online Active Set Strategy.
+Copyright \(C\) 2007-2015 by Hans Joachim Ferreau, Andreas Potschka,
+Christian Kirches et al. All rights reserved.
+
+qpOASES is distributed under the terms of the 
+GNU Lesser General Public License 2.1 in the hope that it will be 
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty 
+of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+See the GNU Lesser General Public License for more details.""",'',out,flags=re.MULTILINE|re.DOTALL)
+
          # remove leading empty lines
          out_split = out.split("\n")
          for i,line in enumerate(out_split):
