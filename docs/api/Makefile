@@ -74,6 +74,7 @@ doxexport:
 	sh extra/doc2swig.sh
 
 full: 
+	cd sphinx && make bare_body bare_toc
 	cd examples && make
 	cd ../documents && make
 	cd ../users_guide && make
@@ -82,6 +83,11 @@ full:
 	python extra/fetch_examples_pdf.py
 	make doxpublish
 	cd ../example_pack && make
+	mkdir -p ../../web/content/api
+	cp -R ../tutorials ../../web/content/
+	cp -R html ../../web/content/api
+	cp -R internal ../../web/content/api
+	
 
 fulllocal: 
 	cd examples && make

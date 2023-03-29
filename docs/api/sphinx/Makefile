@@ -21,7 +21,16 @@ help:
 
 
 bare_body:
+	rm -rf build && rm -f *.in
 	make singlehtml SPHINXOPTS="-D html_theme=bare_body "
+	sed -i 's/{{</{\&lbrace;</g' build/singlehtml/index.html
+	sed -i 's/>}}/>}\&rbrace;/g' build/singlehtml/index.html
+	mkdir -p ../../../web/content/python-api
+	echo "---\n---\n" > ../../../web/content/python-api/_index.html
+	cat build/singlehtml/index.html >> ../../../web/content/python-api/_index.html
 
 bare_toc:
 	make singlehtml SPHINXOPTS="-D html_theme=bare_body -D 'html_theme_options.mode=toc'"
+	sed -i 's/index\.html//g' build/singlehtml/index.html
+	mkdir -p ../../../web/themes/casadi-theme/layouts/partials/
+	cat build/singlehtml/index.html > ../../../web/themes/casadi-theme/layouts/partials/python-api-sidebar.html

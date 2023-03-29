@@ -807,7 +807,7 @@ jobs:
       - run: octave --no-gui --no-window-system --eval "addpath('${{ github.workspace }}/casadi');cd test/matlab;asorted_tests"
         if: "!contains(env.os, 'windows')"
       - run: cd test && python internal/test_octave.py octave && python internal/test_octave.py matlab -skipfiles="callback.m nlp_callback.m"
-
+example_pack
   docs:
     runs-on: ubuntu-22.04
     needs: [python-dockcross,matlab-dockcross]
@@ -823,7 +823,7 @@ jobs:
           name: casadi-linux64-octave7.3.0
       - name: Unpack source
         run: unzip casadi-linux64-octave7.3.0.zip -d casadi_octave
-      - run: chmod -R a+w . && docker run --rm -v`pwd`:/local -v${{ github.workspace }}/casadi_python:/casadi_python:ro -v${{ github.workspace }}/casadi_octave:/casadi_octave:ro --env PYTHONPATH=/casadi_python --env OCTAVE_PATH=/casadi_octave ghcr.io/casadi/ci-doc:latest /bin/bash -c "cd misc && python add_identifiers.py && cd .. && cd docs/users_guide && rm -rf build && rm -f snippets/* && make users_guide.pdf && cd ../../test && make user_guide_snippets_py user_guide_snippets_oct && cd .. && rm -rf docs/users_guide/build && cd docs/users_guide && make users_guide.pdf bare_toc bare_body && cd ../.. && cd docs/api && make full doxexport doxpublish"
+      - run: chmod -R a+w . && docker run --rm -v`pwd`:/local -v${{ github.workspace }}/casadi_python:/casadi_python:ro -v${{ github.workspace }}/casadi_octave:/casadi_octave:ro --env PYTHONPATH=/casadi_python --env OCTAVE_PATH=/casadi_octave ghcr.io/casadi/ci-doc:latest /bin/bash -c "cd misc && python add_identifiers.py && cd .. && cd docs/users_guide && rm -rf build && rm -f snippets/* && make users_guide.pdf && cd ../../test && make user_guide_snippets_py user_guide_snippets_oct && cd .. && rm -rf docs/users_guide/build && cd docs/users_guide && make users_guide.pdf bare_toc bare_body && cd ../.. && cd docs/api && make full doxexport"
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.4.0
       - uses: svenstaro/upload-release-action@2.4.0
@@ -831,8 +831,23 @@ jobs:
           overwrite: true
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
           file: docs/users_guide/users_guide.pdf
+          asset_name: casadi-users_guide-v${{ env.GITHUB_REF_SLUG }}.zip
           prerelease: true
-      - run: zip -rjq website_assets.zip docs/users_guide/build/_index.html docs/users_guide/build/docs-sidebar.html
+      - uses: svenstaro/upload-release-action@2.4.0
+        with:
+          overwrite: true
+          tag: nightly-${{ env.GITHUB_REF_SLUG }}
+          file: docs/example_pack/example_pack.zip
+          asset_name: casadi-example_pack-v${{ env.GITHUB_REF_SLUG }}.zip
+          prerelease: true
+      - uses: svenstaro/upload-release-action@2.4.0
+        with:
+          overwrite: true
+          tag: nightly-${{ env.GITHUB_REF_SLUG }}
+          file: docs/cheatsheet/python.pdf
+          asset_name: casadi-cheatsheet_python-v${{ env.GITHUB_REF_SLUG }}.pdf
+          prerelease: true
+      - run: zip -rq website_assets.zip web
       - uses: svenstaro/upload-release-action@2.4.0
         with:
           overwrite: true
