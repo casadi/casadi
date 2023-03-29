@@ -321,7 +321,11 @@ namespace casadi {
       for (casadi_int d=0; d<nfwd; ++d) v[d] = fsens[d][i];
       res.push_back(horzcat(v));
     }
-    return Function(name, arg, res, inames, onames, opts);
+
+    Dict options = opts;
+    options["allow_duplicate_io_names"] = true;
+
+    return Function(name, arg, res, inames, onames, options);
   }
 
   Function Rootfinder
@@ -349,7 +353,10 @@ namespace casadi {
       for (casadi_int d=0; d<nadj; ++d) v[d] = asens[d][i];
       res.push_back(horzcat(v));
     }
-    return Function(name, arg, res, inames, onames, opts);
+
+    Dict options = opts;
+    options["allow_duplicate_io_names"] = true;
+    return Function(name, arg, res, inames, onames, options);
   }
 
   int Rootfinder::

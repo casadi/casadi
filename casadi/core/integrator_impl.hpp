@@ -49,6 +49,22 @@ struct CASADI_EXPORT IntegratorMemory : public OracleMemory {
   double t_stop;
 };
 
+/// Memory struct, forward sparsity pattern propagation
+struct CASADI_EXPORT SpForwardMem {
+  const bvec_t** arg;
+  bvec_t** res;
+  casadi_int* iw;
+  bvec_t* w;
+};
+
+/// Memory struct, backward sparsity pattern propagation
+struct CASADI_EXPORT SpReverseMem {
+  bvec_t** arg;
+  bvec_t** res;
+  casadi_int* iw;
+  bvec_t* w;
+};
+
 /** \brief Internal storage for integrator related data
 
 
@@ -168,11 +184,47 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
       \identifier{1m4} */
   virtual void print_stats(IntegratorMemory* mem) const {}
 
+  /// Forward sparsity pattern propagation through DAE, forward problem
+  int fdae_sp_forward(SpForwardMem* m, const bvec_t* x,
+    const bvec_t* p, const bvec_t* u, bvec_t* ode, bvec_t* alg) const;
+
+  /// Forward sparsity pattern propagation through quadratures, forward problem
+  int fquad_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t* z,
+    const bvec_t* p, const bvec_t* u, bvec_t* quad) const;
+
+  /// Forward sparsity pattern propagation through DAE, backward problem
+  int bdae_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t* z,
+    const bvec_t* p, const bvec_t* u, const bvec_t* rx, const bvec_t* rp,
+    bvec_t* adj_x, bvec_t* adj_z) const;
+
+  /// Forward sparsity pattern propagation through quadratures, backward problem
+  int bquad_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t* z,
+    const bvec_t* p, const bvec_t* u, const bvec_t* rx, const bvec_t* rz, const bvec_t* rp,
+    bvec_t* adj_p, bvec_t* adj_u) const;
+
   /** \brief  Propagate sparsity forward
 
       \identifier{1m5} */
   int sp_forward(const bvec_t** arg, bvec_t** res,
     casadi_int* iw, bvec_t* w, void* mem) const override;
+
+  /// Reverse sparsity pattern propagation through DAE, forward problem
+  int fdae_sp_reverse(SpReverseMem* m, bvec_t* x,
+    bvec_t* p, bvec_t* u, bvec_t* ode, bvec_t* alg) const;
+
+  /// Reverse sparsity pattern propagation through quadratures, forward problem
+  int fquad_sp_reverse(SpReverseMem* m, bvec_t* x, bvec_t* z,
+    bvec_t* p, bvec_t* u, bvec_t* quad) const;
+
+  /// Reverse sparsity pattern propagation through DAE, backward problem
+  int bdae_sp_reverse(SpReverseMem* m, bvec_t* x, bvec_t* z,
+    bvec_t* p, bvec_t* u, bvec_t* rx, bvec_t* rp,
+    bvec_t* adj_x, bvec_t* adj_z) const;
+
+  /// Reverse sparsity pattern propagation through quadratures, backward problem
+  int bquad_sp_reverse(SpReverseMem* m, bvec_t* x, bvec_t* z,
+    bvec_t* p, bvec_t* u, bvec_t* rx, bvec_t* rz, bvec_t* rp,
+    bvec_t* adj_p, bvec_t* adj_u) const;
 
   /** \brief  Propagate sparsity backwards
 
@@ -212,15 +264,16 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
       \identifier{1ma} */
   virtual Dict getDerivativeOptions(bool fwd) const;
 
-  /** \brief Generate a augmented DAE system with \a nfwd forward sensitivities
+  ///@{
+  /** \brief Generate the augmented DAE system
 
-      \identifier{1mb} */
-  template<typename MatType> std::map<std::string, MatType> aug_fwd(casadi_int nfwd) const;
+      \identifier{261} */
+  template<typename MatType> Function get_forward_dae(const std::string& name) const;
+  Function augmented_dae() const;
+  ///@}
 
-  /** \brief Generate a augmented DAE system with \a nadj adjoint sensitivities
-
-      \identifier{1mc} */
-  template<typename MatType> std::map<std::string, MatType> aug_adj(casadi_int nadj) const;
+  /// Helper function, get augmented system Jacobian
+  Sparsity sp_jac_aug(const Sparsity& J, const Sparsity& J1) const;
 
   /// Create sparsity pattern of the extended Jacobian (forward problem)
   Sparsity sp_jac_dae();
@@ -228,30 +281,45 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   /// Create sparsity pattern of the extended Jacobian (backward problem)
   Sparsity sp_jac_rdae();
 
-  // Sparsity pattern of the extended Jacobians
+  /// Sparsity pattern of the extended Jacobians
   Sparsity sp_jac_dae_, sp_jac_rdae_;
 
-  ///@{
-  // Shorthands
-  const Sparsity&  t() const { return oracle_.sparsity_in(DYN_T);}
-  const Sparsity&  x() const { return oracle_.sparsity_in(DYN_X);}
-  const Sparsity&  z() const { return oracle_.sparsity_in(DYN_Z);}
-  const Sparsity&  p() const { return oracle_.sparsity_in(DYN_P);}
-  const Sparsity&  u() const { return oracle_.sparsity_in(DYN_U);}
-  const Sparsity&  q() const { return oracle_.sparsity_out(DYN_QUAD);}
-  const Sparsity& rx() const { return oracle_.sparsity_in(DYN_RX);}
-  const Sparsity& rz() const { return oracle_.sparsity_in(DYN_RZ);}
-  const Sparsity& rp() const { return oracle_.sparsity_in(DYN_RP);}
-  const Sparsity& rq() const { return oracle_.sparsity_out(DYN_RQUAD);}
-  const Sparsity& uq() const { return oracle_.sparsity_out(DYN_UQUAD);}
+  /// Number of output times
   inline casadi_int nt() const { return tout_.size();}
+
+  ///@{
+  /** \brief IO conventions for continuous time dynamics
+
+      \identifier{260} */
+  enum DaeOut { DAE_ODE, DAE_ALG, DAE_NUM_OUT};
+  static std::vector<std::string> dae_out() { return {"ode", "alg"}; }
+  enum QuadOut { QUAD_QUAD, QUAD_NUM_OUT};
+  static std::vector<std::string> quad_out() { return {"quad"}; }
+  enum BDynIn { BDYN_T, BDYN_X, BDYN_Z, BDYN_P, BDYN_U,
+    BDYN_OUT_ODE, BDYN_OUT_ALG, BDYN_OUT_QUAD,
+    BDYN_ADJ_ODE, BDYN_ADJ_ALG, BDYN_ADJ_QUAD, BDYN_NUM_IN};
+  static std::string bdyn_in(casadi_int i);
+  static std::vector<std::string> bdyn_in();
+  enum BDynOut { BDYN_ADJ_T, BDYN_ADJ_X, BDYN_ADJ_Z, BDYN_ADJ_P, BDYN_ADJ_U, BDYN_NUM_OUT};
+  static std::string bdyn_out(casadi_int i);
+  static std::vector<std::string> bdyn_out();
+  enum DAEBOut { BDAE_ADJ_X, BDAE_ADJ_Z, BDAE_NUM_OUT};
+  static std::vector<std::string> bdae_out() { return {"adj_x", "adj_z"}; }
+  enum QuadBOut { BQUAD_ADJ_P, BQUAD_ADJ_U, BQUAD_NUM_OUT};
+  static std::vector<std::string> bquad_out() { return {"adj_p", "adj_u"}; }
   ///@}
 
-  // Initial time
+  /// Initial time
   double t0_;
 
-  // Output time grid
+  /// Output time grid
   std::vector<double> tout_;
+
+  /// Number of sensitivities
+  casadi_int nfwd_, nadj_;
+
+  /// Backwards DAE function
+  Function rdae_;
 
   /// Number of states for the forward integration
   casadi_int nx_, nz_, nq_, nx1_, nz1_, nq1_;
@@ -265,13 +333,10 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   /// Number of controls
   casadi_int nu_, nu1_;
 
-  /// Number of sensitivities
-  casadi_int ns_;
-
-  // Augmented user option
+  /// Augmented user option
   Dict augmented_options_;
 
-  // Copy of the options
+  /// Copy of the options
   Dict opts_;
 
   /// Options
@@ -292,9 +357,7 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
 
   /// Convert dictionary to Problem
   template<typename XType>
-    static Function map2oracle(const std::string& name,
-      const std::map<std::string, XType>& d, const Dict& opts=Dict());
-
+  static Function map2oracle(const std::string& name, const std::map<std::string, XType>& d);
 
   /** \brief Serialize an object without type information
 
@@ -321,9 +384,6 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   /// Is an output repeated for each grid point?
   static bool grid_out(casadi_int i);
 
-  /// Which input is used to calculate a given output in adjoint sensitivity analysis
-  static casadi_int adjmap_in(casadi_int i);
-
   /// Which output is used to calculate a given input in adjoint sensitivity analysis
   static casadi_int adjmap_out(casadi_int i);
 
@@ -337,7 +397,7 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
 /// Input arguments of a forward stepping function
 enum FStepIn {
   /// Current time
-  FSTEP_T0,
+  FSTEP_T,
   /// Step size
   FSTEP_H,
   /// State vector
@@ -367,7 +427,7 @@ enum FStepOut {
 /// Input arguments of a backward stepping function
 enum BStepIn {
   /// Current time
-  BSTEP_T0,
+  BSTEP_T,
   /// Step size
   BSTEP_H,
   /// State vector for backward problem
@@ -461,8 +521,8 @@ class CASADI_EXPORT FixedStepIntegrator : public Integrator {
       \identifier{1ml} */
   void free_mem(void *mem) const override { delete static_cast<FixedStepMemory*>(mem);}
 
-  /// Setup F and G
-  virtual void setupFG() = 0;
+  /// Setup step functions
+  virtual void setup_step() = 0;
 
   /** \brief Reset the forward problem
 
@@ -490,14 +550,14 @@ class CASADI_EXPORT FixedStepIntegrator : public Integrator {
   void retreat(IntegratorMemory* mem, const double* u,
     double* rx, double* rz, double* rq, double* uq) const override;
 
-  /// Get explicit dynamics
-  virtual const Function& getExplicit() const { return F_;}
+  /// Take integrator step forward
+  void stepF(FixedStepMemory* m, double t, double h,
+    const double* x0, const double* v0, double* xf, double* vf, double* qf) const;
 
-  /// Get explicit dynamics (backward problem)
-  virtual const Function& getExplicitB() const { return G_;}
-
-  // Discrete time dynamics
-  Function F_, G_;
+  /// Take integrator step backward
+  void stepB(FixedStepMemory* m, double t, double h,
+    const double* x, const double* v, const double* rx0, const double* rv0,
+    double* rxf, double* rvf, double* rqf, double* uqf) const;
 
   // Target number of finite elements
   casadi_int nk_target_;
@@ -506,7 +566,7 @@ class CASADI_EXPORT FixedStepIntegrator : public Integrator {
   std::vector<casadi_int> disc_;
 
   /// Number of dependent variables in the discrete time integration
-  casadi_int nv_, nrv_;
+  casadi_int nv_, nv1_, nrv_, nrv1_;
 
   /** \brief Serialize an object without type information
 
@@ -540,15 +600,6 @@ class CASADI_EXPORT ImplicitFixedStepIntegrator : public FixedStepIntegrator {
 
   /// Initialize stage
   void init(const Dict& opts) override;
-
-  /// Get explicit dynamics
-  const Function& getExplicit() const override { return rootfinder_;}
-
-  /// Get explicit dynamics (backward problem)
-  const Function& getExplicitB() const override { return backward_rootfinder_;}
-
-  // Implicit function solver
-  Function rootfinder_, backward_rootfinder_;
 
   /** \brief Serialize an object without type information
 

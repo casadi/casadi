@@ -60,12 +60,7 @@ namespace casadi {
   }
 
   ShellCompiler::~ShellCompiler() {
-    // Unload
-#ifdef _WIN32
-    if (handle_) FreeLibrary(handle_);
-#else // _WIN32
-    if (handle_) dlclose(handle_);
-#endif // _WIN32
+    if (handle_) close_shared_library(handle_);
 
     if (cleanup_) {
       if (remove(bin_name_.c_str())) casadi_warning("Failed to remove " + bin_name_);
@@ -255,22 +250,9 @@ namespace casadi {
       casadi_error("Linking failed. Tried \"" + ldcmd.str() + "\"");
     }
 
-#ifdef _WIN32
-    handle_ = LoadLibrary(TEXT(bin_name_.c_str()));
-    SetDllDirectory(NULL);
-#else // _WIN32
-    handle_ = dlopen(bin_name_.c_str(), RTLD_LAZY);
-#endif // _WIN32
+    std::vector<std::string> search_paths = get_search_paths();
+    handle_ = open_shared_library(bin_name_, search_paths, "ShellCompiler::init");
 
-#ifdef _WIN32
-    casadi_assert(handle_!=0,
-      "CommonExternal: Cannot open function: " + bin_name_ + ". error code: " +
-      STRING(GetLastError()));
-#else // _WIN32
-    casadi_assert(handle_!=nullptr,
-      "CommonExternal: Cannot open function: " + bin_name_ + ". error code: " +
-      str(dlerror()));
-#endif // _WIN32
   }
 
   std::string ShellCompiler::library() const {

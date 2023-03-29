@@ -68,7 +68,10 @@ namespace casadi {
         "Perform common subexpression elimination (complexity is N*log(N) in graph size)"}},
       {"allow_free",
        {OT_BOOL,
-        "Allow construction with free variables (Default: false)"}}
+        "Allow construction with free variables (Default: false)"}},
+      {"allow_duplicate_io_names",
+       {OT_BOOL,
+        "Allow construction with duplicate io names (Default: false)"}}
      }
   };
 
@@ -401,7 +404,7 @@ namespace casadi {
 
     if (!allow_free && has_free()) {
       casadi_error(name_ + "::init: Initialization failed since variables [" +
-      join(get_free(), "") + "] are free. These symbols occur in the output expressions "
+      join(get_free(), ", ") + "] are free. These symbols occur in the output expressions "
       "but you forgot to declare these as inputs. "
       "Set option 'allow_free' to allow free variables.");
     }

@@ -3,19 +3,56 @@ name: binaries
 on: push
 
 env:
-  cache-suffix: v3
-  build_flags: "-DWITH_COMMON=OFF -DWITH_BUILD_REQUIRED=ON -DWITH_BUILD_BONMIN=ON -DWITH_BONMIN=ON -DWITH_IPOPT=ON -DWITH_BUILD_IPOPT=ON -DWITH_BUILD_LAPACK=ON -DWITH_LAPACK=ON -DWITH_MUMPS=ON -DWITH_CLP=ON -DWITH_BUILD_CLP=ON -DWITH_CBC=ON -DWITH_BUILD_CBC=ON -DWITH_THREAD=ON -DWITH_QPOASES=ON -DWITH_HPIPM=ON -DWITH_BLASFEO=ON -DWITH_BUILD_HPIPM=ON -DWITH_BUILD_BLASFEO=ON -DWITH_HIGHS=ON -DWITH_BUILD_HIGHS=ON -DWITH_BUILD_SPRAL=ON -DWITH_SPRAL=ON -DWITH_PROXQP=ON -DWITH_OSQP=ON -DWITH_SUPERSCS=ON -DWITH_KNITRO=ON -DWITH_MOCKUP_KNITRO=ON -DWITH_CPLEX=ON -DWITH_MOCKUP_CPLEX=ON -DWITH_GUROBI=ON -DWITH_MOCKUP_GUROBI=ON -DWITH_HSL=ON -DWITH_MOCKUP_HSL=ON -DWITH_WORHP=ON -DWITH_MOCKUP_WORHP=ON -DWITH_BUILD_SUNDIALS=ON -DWITH_BUILD_CSPARSE=ON -DWITH_BUILD_METIS=ON -DWITH_BUILD_BLASFEO=ON -DWITH_BUILD_SUPERSCS=ON -DWITH_BUILD_OSQP=ON -DWITH_BUILD_EIGEN3=ON -DWITH_BUILD_SIMDE=ON -DWITH_BUILD_PROXQP=ON"
+  cache-suffix: v6
+  build_flags: "-DWITH_COMMON=OFF -DWITH_BUILD_REQUIRED=ON -DWITH_BUILD_BONMIN=ON -DWITH_BONMIN=ON -DWITH_IPOPT=ON -DWITH_BUILD_IPOPT=ON -DWITH_BUILD_LAPACK=ON -DWITH_LAPACK=ON -DWITH_MUMPS=ON -DWITH_CLP=ON -DWITH_BUILD_CLP=ON -DWITH_CBC=ON -DWITH_BUILD_CBC=ON -DWITH_THREAD=ON -DWITH_QPOASES=ON -DWITH_HPIPM=ON -DWITH_BLASFEO=ON -DWITH_BUILD_HPIPM=ON -DWITH_BUILD_BLASFEO=ON -DWITH_HIGHS=ON -DWITH_BUILD_HIGHS=ON -DWITH_BUILD_SPRAL=ON -DWITH_SPRAL=ON -DWITH_PROXQP=ON -DWITH_OSQP=ON -DWITH_SUPERSCS=ON -DWITH_KNITRO=ON -DWITH_MOCKUP_KNITRO=ON -DWITH_CPLEX=ON -DWITH_MOCKUP_CPLEX=ON -DWITH_GUROBI=ON -DWITH_MOCKUP_GUROBI=ON -DWITH_HSL=ON -DWITH_MOCKUP_HSL=ON -DWITH_WORHP=ON -DWITH_MOCKUP_WORHP=ON -DWITH_SUNDIALS=ON -DWITH_BUILD_SUNDIALS=ON -DWITH_BUILD_CSPARSE=ON -DWITH_BUILD_METIS=ON -DWITH_BUILD_BLASFEO=ON -DWITH_BUILD_SUPERSCS=ON -DWITH_BUILD_OSQP=ON -DWITH_BUILD_EIGEN3=ON -DWITH_BUILD_SIMDE=ON -DWITH_BUILD_PROXQP=ON"
   build_flags_32bit: "-DWITH_HPIPM=OFF -DWITH_BLASFEO=OFF -DWITH_BUILD_HPIPM=OFF -DWITH_BUILD_BLASFEO=OFF -DWITH_CPLEX=OFF"
   build_flags_manylinux1: "-DWITH_HIGHS=OFF -DWITH_BUILD_HIGHS=OFF -DWITH_BUILD_SPRAL=OFF -DWITH_SPRAL=OFF -DWITH_PROXQP=OFF -DWITH_BUILD_PROXQP=OFF -DWITH_BUILD_EIGEN3=OFF -DWITH_BUILD_SIMDE=OFF"
   build_flags_windows: ""
-  build_flags_mac: "-DWITH_SPRAL=OFF -DWITH_BUILD_SPRAL=OFF -DWITH_BUILD_LAPACK=OFF"
+  build_flags_mac: "-DWITH_SPRAL=OFF -DWITH_BUILD_SPRAL=OFF -DWITH_BUILD_LAPACK=OFF -DWITH_WORHP=OFF -DWITH_MOCKUP_WORHP=OFF"
   build_flags_mac_intel: "-DWITH_PROXQP=OFF -DWITH_BUILD_PROXQP=OFF -DWITH_BUILD_EIGEN3=OFF -DWITH_BUILD_SIMDE=OFF"
   build_flags_mac_m1: "-DALLOW_DOCKER=ON -DWITH_HPIPM=OFF -DWITH_BUILD_HPIPM=OFF"
 
 jobs:
+  version:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3.3.0
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v4.4.0
+      - run: |
+          echo "CMAKE_VERSION=$(python misc/get_version.py)" >> $GITHUB_ENV
+        if: runner.os != 'Windows'
+      - run: |
+          echo "CMAKE_VERSION=$(python misc/get_version.py)" >> $env:GITHUB_ENV
+        if: runner.os == 'Windows'
+        shell: pwsh
+
+      - run: |
+          echo "CASADI_VERSION=${{ env.GITHUB_REF_SLUG }}" >> $GITHUB_ENV
+          echo "WHEEL_VERSION=${{ env.CMAKE_VERSION}}.dev+${{ env.GITHUB_REF_SLUG }}" >> $GITHUB_ENV
+        if: runner.os != 'Windows' && !contains( env.GITHUB_REF_NAME , 'release-' )
+      - run: |
+          echo "CASADI_VERSION=${{ env.GITHUB_REF_SLUG }}" >> $env:GITHUB_ENV
+          echo "WHEEL_VERSION=${{ env.CMAKE_VERSION}}.dev+${{ env.GITHUB_REF_SLUG }}" >> $env:GITHUB_ENV
+        if: runner.os == 'Windows' && !contains( env.GITHUB_REF_NAME , 'release-' )
+        shell: pwsh
+
+      - run: |
+          python -c "import sys;sys.stdout.write('CASADI_VERSION='+'${{ env.GITHUB_REF_SLUG }}'.split('-')[1])" >> $GITHUB_ENV
+          python -c "import sys;sys.stdout.write('WHEEL_VERSION='+'${{ env.GITHUB_REF_SLUG }}'.split('-')[1])" >> $GITHUB_ENV
+        if: runner.os != 'Windows' && contains( env.GITHUB_REF_NAME , 'release-' )
+      - run: |
+          python -c "import sys;sys.stdout.write('CASADI_VERSION='+'${{ env.GITHUB_REF_SLUG }}'.split('-')[1])" >> $env:GITHUB_ENV
+          python -c "import sys;sys.stdout.write('WHEEL_VERSION='+'${{ env.GITHUB_REF_SLUG }}'.split('-')[1])" >> $env:GITHUB_ENV
+        if: runner.os == 'Windows' && contains( env.GITHUB_REF_NAME , 'release-' )
+        shell: pwsh
+    outputs:
+      casadi: ${{ env.CASADI_VERSION }}
+      wheel: ${{ env.CASADI_WHEEL_VERSION }}
+
   swig:
     runs-on: ubuntu-20.04
-
+    needs: [version]
     steps:
 
     - uses: actions/checkout@v3.3.0
@@ -49,19 +86,57 @@ jobs:
     
     - name: Inject slug/short variables
       uses: rlespinasse/github-slug-action@v4.4.0
-    - run: cp casadi_source.zip casadi-${{ env.GITHUB_REF_SLUG }}-source.zip
     - name: Upload files to a GitHub release
       uses: svenstaro/upload-release-action@2.4.0
       with:
         overwrite: true
         tag: nightly-${{ env.GITHUB_REF_SLUG }}
-        file: casadi-${{ env.GITHUB_REF_SLUG }}-source.zip
+        file: casadi_source.zip
+        asset_name: casadi-source-v${{ needs.version.outputs.casadi }}.zip
+        prerelease: true
+    - run: python setup.py sdist && ls && ls dist
+    - name: Upload files to a GitHub release
+      uses: svenstaro/upload-release-action@2.4.0
+      with:
+        overwrite: true
+        tag: nightly-${{ env.GITHUB_REF_SLUG }}
+        file: dist/*.tar.gz
+        file_glob: true
         prerelease: true
 
     - uses: actions/upload-artifact@v3.1.2
       with:
         name: casadi_source_wrapper
         path: casadi_source.zip
+
+  test-python-source-package:
+    runs-on: ${{matrix.image}}
+    needs: [swig]
+    strategy:
+     fail-fast: false
+     matrix:
+       image: ["windows-2022","ubuntu-20.04","macos-11"]
+    steps:
+      - uses: actions/checkout@v3.3.0
+      - run: python --version
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v4.4.0
+      - uses: dsaltares/fetch-gh-release-asset@1.1.0
+        with:
+          version: tags/nightly-${{ env.GITHUB_REF_SLUG }}
+          regex: true
+          target: "./"
+          file: "casadi-.*.tar.gz"
+      - uses: conda-incubator/setup-miniconda@v2.2.0
+        with:
+          python-version: 3.8
+          activate-environment: 3.8
+          auto-update-conda: true
+      - run: pip install casadi-*.tar.gz
+        shell: bash -el {0}
+      - run: cd test/python && python implicitfunction.py
+        shell: bash -el {0}
+
 
   matrix-arch-mac:
     runs-on: ubuntu-20.04
@@ -214,7 +289,7 @@ jobs:
       matrix: ${{ steps.build-matrix.outputs.matrix }}
            
   python-osx:
-    needs: [core-osx,matrix-arch-py2-mac,swig]
+    needs: [core-osx,matrix-arch-py2-mac,swig,version]
     runs-on: ${{matrix.image == 'macos-m1' && 'self-hosted' || matrix.image }}
     strategy:
       fail-fast: false
@@ -286,7 +361,7 @@ jobs:
           retention-days: 5
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.4.0
-      - run: cp casadi-${{env.deploy_arch}}-py${{matrix.py2}}.zip casadi-${{ env.GITHUB_REF_SLUG }}-${{env.deploy_arch}}-py${{matrix.py2}}.zip
+      - run: cp casadi-${{env.deploy_arch}}-py${{matrix.py2}}.zip casadi-${{ needs.version.outputs.casadi }}-${{env.deploy_arch}}-py${{matrix.py2}}.zip
       - name: Delete old release assets
         uses: mknejp/delete-release-assets@v1
         with:
@@ -300,13 +375,11 @@ jobs:
         with:
           overwrite: true
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
-          file: casadi-${{ env.GITHUB_REF_SLUG }}-${{env.deploy_arch}}-py${{matrix.py2}}.zip
+          file: casadi-${{ needs.version.outputs.casadi }}-${{env.deploy_arch}}-py${{matrix.py2}}.zip
           prerelease: true
 
       - run: |
-          version=$(python misc/get_version.py)
-          echo "<$version>"
-          wheel=$(python misc/create_wheel_local.py $version.dev+${{ env.GITHUB_REF_SLUG }} ${{matrix.py2}} osx 64 ${{matrix.image == 'macos-m1' && 'osx-m1' || 'osx'}} install/)
+          wheel=$(python misc/create_wheel_local.py ${{ needs.version.outputs.wheel }} ${{matrix.py2}} osx 64 ${{matrix.image == 'macos-m1' && 'osx-m1' || 'osx'}} install/)
           echo "<$wheel>"
           echo "wheel=$wheel" >> $GITHUB_OUTPUT
           wheel_wildcard=$(echo $wheel | sed -e 's/casadi-[^-]*-/casadi-\*-/')
@@ -332,25 +405,46 @@ jobs:
           file: ${{ steps.wheel.outputs.wheel }}
           prerelease: true
 
+  matrix-arch-matlab-mac:
+    runs-on: ubuntu-20.04
+    steps:
+      - id: build-matrix
+        uses: jgillis/setup-build-matrix@v1.2.0-if
+        with:
+          config: |
+            matrix:
+              image: [macos-11]
+              host: ["matlab"]
+              version: ["2018b"]
+            operations:
+              - type: append
+                matrix:
+                  image: [macos-11]
+                  host: ["octave"]
+                  version: ["7.3.0"]
+              - type: append
+                if: ${{ vars.BLESSED_REPO == 'yes' }}
+                matrix:
+                  image: [macos-m1]
+                  host: ["matlab"]
+                  version: ["2018b"]
+              - type: append
+                if: ${{ vars.BLESSED_REPO == 'yes' }}
+                matrix:
+                  image: [macos-m1]
+                  host: ["octave"]
+                  version: ["7.3.0"]
+
+
+    outputs:
+      matrix: ${{ steps.build-matrix.outputs.matrix }}
+
   matlab-osx:
-    needs: [core-osx,swig]
+    needs: [core-osx,matrix-arch-matlab-mac,swig,version]
     runs-on: ${{matrix.image == 'macos-m1' && 'self-hosted' || matrix.image }}
     strategy:
       fail-fast: false
-      matrix:
-        include:
-         - image: macos-11
-           host: "matlab"
-           version: "2018b"
-         - image: macos-11
-           host: "octave"
-           version: "7.3.0"
-         - image: macos-m1
-           host: "matlab"
-           version: "2018b"
-         - image: macos-m1
-           host: "octave"
-           version: "7.3.0"
+      matrix: ${{ fromJson(needs.matrix-arch-matlab-mac.outputs.matrix) }}
     env:
       DEVELOPMENT_CERTIFICATE_DATA_AVAILABLE: ${{ secrets.DEVELOPMENT_CERTIFICATE_DATA != '' }}
     steps:
@@ -405,7 +499,7 @@ jobs:
              zip -rq ../../casadi-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip .
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.4.0
-      - run: cp casadi-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip casadi-${{ env.GITHUB_REF_SLUG }}-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip
+      - run: cp casadi-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip casadi-${{ needs.version.outputs.casadi }}-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip
       - name: Delete old release assets
         uses: mknejp/delete-release-assets@v1
         with:
@@ -419,7 +513,7 @@ jobs:
         with:
           overwrite: true
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
-          file: casadi-${{ env.GITHUB_REF_SLUG }}-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip
+          file: casadi-${{ needs.version.outputs.casadi }}-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip
           prerelease: true
 
       - uses: actions/upload-artifact@v3.1.2
@@ -429,7 +523,7 @@ jobs:
           retention-days: 5
                   
   matlab-dockcross:
-    needs: [core-dockcross,swig]
+    needs: [core-dockcross,swig,version]
     runs-on: ubuntu-20.04
     strategy:
       fail-fast: false
@@ -497,7 +591,7 @@ jobs:
              zip -rq ../../casadi-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip .
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.4.0
-      - run: cp casadi-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip casadi-${{ env.GITHUB_REF_SLUG }}-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip
+      - run: cp casadi-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip casadi-${{ needs.version.outputs.casadi }}-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip
       - name: Delete old release assets
         uses: mknejp/delete-release-assets@v1
         with:
@@ -511,7 +605,7 @@ jobs:
         with:
           overwrite: true
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
-          file: casadi-${{ env.GITHUB_REF_SLUG }}-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip
+          file: casadi-${{ needs.version.outputs.casadi }}-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip
           prerelease: true
 
       - uses: actions/upload-artifact@v3.1.2
@@ -521,7 +615,7 @@ jobs:
           retention-days: 5
       
   python-dockcross:
-    needs: [core-dockcross,matrix-arch-py2,swig]
+    needs: [core-dockcross,matrix-arch-py2,swig,version]
     runs-on: ubuntu-20.04
     strategy:
       fail-fast: false
@@ -595,7 +689,7 @@ jobs:
              zip -rq ../casadi-${{env.os}}${{env.bitness}}-py${{matrix.py2}}.zip .
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.4.0
-      - run: cp casadi-${{env.os}}${{env.bitness}}-py${{matrix.py2}}.zip casadi-${{ env.GITHUB_REF_SLUG }}-${{env.os}}${{env.bitness}}-py${{matrix.py2}}.zip
+      - run: cp casadi-${{env.os}}${{env.bitness}}-py${{matrix.py2}}.zip casadi-${{ needs.version.outputs.casadi }}-${{env.os}}${{env.bitness}}-py${{matrix.py2}}.zip
       - name: Delete old release assets
         uses: mknejp/delete-release-assets@v1
         with:
@@ -609,7 +703,7 @@ jobs:
         with:
           overwrite: true
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
-          file: casadi-${{ env.GITHUB_REF_SLUG }}-${{env.os}}${{env.bitness}}-py${{matrix.py2}}.zip
+          file: casadi-${{ needs.version.outputs.casadi }}-${{env.os}}${{env.bitness}}-py${{matrix.py2}}.zip
           prerelease: true
 
       - uses: actions/upload-artifact@v3.1.2
@@ -619,10 +713,8 @@ jobs:
           retention-days: 5
       
       - run: |
-          version=$(python misc/get_version.py)
-          echo "<$version>"
           pip install wheel==0.31.1
-          wheel=$(python misc/create_wheel_local.py $version.dev+${{ env.GITHUB_REF_SLUG }} ${{matrix.py2}} ${{env.os}} ${{env.bitness}} ${{matrix.arch}} install/)
+          wheel=$(python misc/create_wheel_local.py ${{ needs.version.outputs.wheel }} ${{matrix.py2}} ${{env.os}} ${{env.bitness}} ${{matrix.arch}} install/)
           echo "<$wheel>"
           echo "wheel=$wheel" >> $GITHUB_OUTPUT
           wheel_wildcard=$(echo $wheel | sed -e 's/casadi-[^-]*-/casadi-\*-/')
@@ -664,6 +756,9 @@ jobs:
           bit: 32
     steps:
       - uses: actions/checkout@v3.3.0
+      # Make cl.exe available on Windows
+      - uses: ilammy/msvc-dev-cmd@v1.12.1
+        if: contains(matrix.image, 'windows')
       - uses: kanga333/variable-mapper@v0.3.0
         with:
           key: "${{matrix.image}}"
@@ -680,18 +775,20 @@ jobs:
       - run: ls
       - name: Unpack source
         run: unzip casadi-${{env.os}}${{matrix.bit}}-matlab${{matrix.matlab}}.zip -d casadi
-      - run: ls
-      # Make cl.exe available on Windows
-      - uses: TheMrMilchmann/setup-msvc-dev@v2.0.0
-        with:
-          arch: x64
-        if: contains(matrix.image, 'windows')
+      - run: echo "MATLABPATH=${{ github.workspace }}/casadi" >> $GITHUB_ENV
+        if: "!contains(env.os, 'windows')"
+      - run: echo "MATLABPATH=${{ github.workspace }}\casadi" >> $env:GITHUB_ENV
+        if: "contains(env.os, 'windows')"
       - name: Set up MATLAB
         uses: matlab-actions/setup-matlab@v1.2.4
+      - uses: casadi/commercial_solvers@master
+        with:
+          token: ${{ secrets.JGILLIS_RESTRICTED }}
       - name: Run script
         uses: matlab-actions/run-command@v1.1.2
         with:
           command: addpath('${{ github.workspace }}/casadi');cd test/matlab;asorted_tests
+      - run: cd test && python internal/test_matlab.py matlab
 
   test-octave:
     runs-on: ${{matrix.image}}
@@ -727,16 +824,26 @@ jobs:
       - run: |
                C:\msys64\usr\bin\wget.exe https://ftpmirror.gnu.org/octave/windows/octave-7.3.0-w64.zip
                unzip octave-7.3.0-w64.zip
-               echo "${{ github.workspace }}/octave-7.3.0-w64/mingw64/bin/"  >> $GITHUB_PATH
         if: "contains(env.os, 'windows')"
-      - run: octave-7.3.0-w64/mingw64/bin/octave.exe --no-gui --no-window-system --eval "addpath('${{ github.workspace }}/casadi');cd test/matlab;asorted_tests"
+      - run: |
+               echo "PATH=${{ github.workspace }}\octave-7.3.0-w64\mingw64\bin;$env:PATH" >> $env:GITHUB_ENV
+               echo "MATLABPATH=${{ github.workspace }}\casadi" >> $env:GITHUB_ENV
+        if: "contains(env.os, 'windows')"
+        shell: pwsh
+      - uses: casadi/commercial_solvers@master
+        with:
+          token: ${{ secrets.JGILLIS_RESTRICTED }}
+      - run: echo "MATLABPATH=${{ github.workspace }}/casadi" >> $GITHUB_ENV
+        if: "!contains(env.os, 'windows')"
+      - run: octave --no-gui --no-window-system --eval "addpath('${{ github.workspace }}/casadi');cd test/matlab;asorted_tests"
         if: "contains(env.os, 'windows')"
       - run: octave --no-gui --no-window-system --eval "addpath('${{ github.workspace }}/casadi');cd test/matlab;asorted_tests"
         if: "!contains(env.os, 'windows')"
-  
+      - run: cd test && python internal/test_octave.py octave && python internal/test_octave.py matlab -skipfiles="callback.m nlp_callback.m"
+
   docs:
     runs-on: ubuntu-22.04
-    needs: [python-dockcross,matlab-dockcross]
+    needs: [python-dockcross,matlab-dockcross,version]
     steps:
       - uses: actions/checkout@v3.3.0
       - uses: actions/download-artifact@v3.0.2
@@ -749,7 +856,7 @@ jobs:
           name: casadi-linux64-octave7.3.0
       - name: Unpack source
         run: unzip casadi-linux64-octave7.3.0.zip -d casadi_octave
-      - run: chmod -R a+w . && docker run --rm -v`pwd`:/local -v${{ github.workspace }}/casadi_python:/casadi_python:ro -v${{ github.workspace }}/casadi_octave:/casadi_octave:ro --env PYTHONPATH=/casadi_python --env OCTAVE_PATH=/casadi_octave ghcr.io/casadi/ci-doc:latest /bin/bash -c "cd misc && python add_identifiers.py && cd .. && cd docs/users_guide && rm -rf build && rm -f snippets/* && make && cd ../../test && make user_guide_snippets_py user_guide_snippets_oct && cd .. && rm -rf docs/users_guide/build && cd docs/api && make full doxexport doxpublish"
+      - run: chmod -R a+w . && docker run --rm -v`pwd`:/local -v${{ github.workspace }}/casadi_python:/casadi_python:ro -v${{ github.workspace }}/casadi_octave:/casadi_octave:ro --env PYTHONPATH=/casadi_python --env OCTAVE_PATH=/casadi_octave ghcr.io/casadi/ci-doc:latest /bin/bash -c "cd misc && python add_identifiers.py && cd .. && cd docs/users_guide && rm -rf build && rm -f snippets/* && make users_guide.pdf && cd ../../test && make user_guide_snippets_py user_guide_snippets_oct && cd .. && rm -rf docs/users_guide/build && cd docs/users_guide && make users_guide.pdf bare_toc bare_body && cd ../.. && cd docs/api && make full doxexport"
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.4.0
       - uses: svenstaro/upload-release-action@2.4.0
@@ -757,7 +864,28 @@ jobs:
           overwrite: true
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
           file: docs/users_guide/users_guide.pdf
+          asset_name: casadi-users_guide-v${{ needs.version.outputs.casadi }}.zip
           prerelease: true
+      - uses: svenstaro/upload-release-action@2.4.0
+        with:
+          overwrite: true
+          tag: nightly-${{ env.GITHUB_REF_SLUG }}
+          file: docs/example_pack/example_pack.zip
+          asset_name: casadi-example_pack-v${{ needs.version.outputs.casadi }}.zip
+          prerelease: true
+      - uses: svenstaro/upload-release-action@2.4.0
+        with:
+          overwrite: true
+          tag: nightly-${{ env.GITHUB_REF_SLUG }}
+          file: docs/cheatsheet/python.pdf
+          asset_name: casadi-cheatsheet_python-v${{ needs.version.outputs.casadi }}.pdf
+          prerelease: true
+      - run: cd web && zip -rq ../website_assets.zip *
+      - uses: svenstaro/upload-release-action@2.4.0
+        with:
+          overwrite: true
+          tag: nightly-${{ env.GITHUB_REF_SLUG }}
+          file: website_assets.zip
       - run: git status
       - run: |
           git stash
@@ -782,7 +910,7 @@ jobs:
      fail-fast: false
      matrix:
        py2: ["27","35","36","37","38","39","310","311"]
-       image: ["windows-2022","ubuntu-20.04","macos-m1","macos-11"]
+       image: ["windows-2022","ubuntu-20.04","macos-11"]
        bit: [64]
        exclude:
         # No Windows 32bit builds currently
@@ -798,6 +926,79 @@ jobs:
           py2: "37"
     steps:
       - uses: actions/checkout@v3.3.0
+      # Make cl.exe available on Windows
+      - uses: ilammy/msvc-dev-cmd@v1.12.1
+        if: contains(matrix.image, 'windows')
+      - uses: kanga333/variable-mapper@v0.3.0
+        with:
+          key: "${{matrix.image}}"
+          map: |
+           {
+              "windows-2022": {"os": "windows"},
+              "ubuntu-20.04": {"os": "linux"},
+              "macos-11": {"os": "osx"},
+              "macos-m1": {"os": "osx_arm"}
+           }
+          export_to: env
+      - uses: actions/download-artifact@v3.0.2
+        with:
+          name: casadi-${{env.os}}${{matrix.bit}}-py${{matrix.py2}}
+      - run: ls
+      - name: Unpack source
+        run: unzip casadi-${{env.os}}${{matrix.bit}}-py${{matrix.py2}}.zip -d casadi
+      - id: get-id
+        uses: actions/github-script@v6.3.3
+        env:
+          py2: "${{ matrix.py2 }}"
+        with:
+          result-encoding: string
+          script: |
+            const { py2 } = process.env;
+            const major = py2.substr(0,1);
+            const minor = py2.substr(1);
+            core.setOutput('pydot2', major+"."+minor)
+      - uses: conda-incubator/setup-miniconda@v2.2.0
+        with:
+          python-version: ${{steps.get-id.outputs.pydot2}}
+          activate-environment: py${{steps.get-id.outputs.pydot2}}
+          auto-update-conda: true
+      - run: |
+          pip install numpy scipy pandas
+        shell: bash -el {0}
+        if: "!contains(matrix.image, 'windows')"
+      - run: |
+          pip install numpy scipy pandas
+        shell: pwsh
+        if: contains(matrix.image, 'windows')
+      - env:
+          PYTHONPATH: ${{ github.workspace }}/casadi
+        run: |
+          cd test/python
+          python alltests.py
+        shell: bash -el {0}
+        if: "!contains(matrix.image, 'windows')"
+      - env:
+          PYTHONPATH: ${{ github.workspace }}/casadi
+        run: |
+          cd test/python
+          python alltests.py
+        shell: pwsh
+        if: contains(matrix.image, 'windows')
+
+  test-python-long:
+    runs-on: ${{matrix.image == 'macos-m1' && 'self-hosted' || matrix.image }}
+    needs: [python-osx,python-dockcross]
+    strategy:
+     fail-fast: false
+     matrix:
+       py2: ["310"]
+       image: ["windows-2022","ubuntu-20.04","macos-11"]
+       bit: [64]
+    steps:
+      - uses: actions/checkout@v3.3.0
+      # Make cl.exe available on Windows
+      - uses: ilammy/msvc-dev-cmd@v1.12.1
+        if: contains(matrix.image, 'windows')
       - uses: kanga333/variable-mapper@v0.3.0
         with:
           key: "${{matrix.image}}"
@@ -818,11 +1019,6 @@ jobs:
       - uses: casadi/commercial_solvers@master
         with:
           token: ${{ secrets.JGILLIS_RESTRICTED }}
-      # Make cl.exe available on Windows
-      - uses: TheMrMilchmann/setup-msvc-dev@v2.0.0
-        with:
-          arch: x64
-        if: contains(matrix.image, 'windows')
       - id: get-id
         uses: actions/github-script@v6.3.3
         env:
@@ -866,18 +1062,18 @@ jobs:
           wget https://github.com/casadi/testbot/releases/download/perpetual/serialize_3.5.5.zip
           unzip serialize_3.5.5.zip
         shell: bash -el {0}
-        if: "!contains(matrix.image, 'windows') && matrix.image == '38'"
+        if: "!contains(matrix.image, 'windows')"
       - env:
           PYTHONPATH: ${{ github.workspace }}/casadi
         run: |
           cd test/python
-          python alltests.py ${{matrix.image == '38' && '--run_slow' || '' }}
+          python alltests.py --run_slow
         shell: bash -el {0}
         if: "!contains(matrix.image, 'windows')"
       - env:
           PYTHONPATH: ${{ github.workspace }}/casadi
         run: |
           cd test/python
-          python alltests.py ${{matrix.image == '38' && '--run_slow' || '' }}
+          python alltests.py --run_slow
         shell: pwsh
         if: contains(matrix.image, 'windows')

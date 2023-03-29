@@ -2053,6 +2053,9 @@
 %exception  casadi::GenericExpression< SXElem  >::times(const SXElem &x, const SXElem &y) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::GenericMatrix::bilin(const MatType &A, const MatType &x) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::GenericMatrix::conditional(const MatType &ind, const std::vector< MatType > &x, const MatType &x_default, bool short_circuit=false) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }

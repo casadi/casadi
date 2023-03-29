@@ -35,9 +35,6 @@ std::string to_string(DynIn v) {
   case DYN_Z: return "z";
   case DYN_P: return "p";
   case DYN_U: return "u";
-  case DYN_RX: return "rx";
-  case DYN_RZ: return "rz";
-  case DYN_RP: return "rp";
   default: break;
   }
   return "";
@@ -48,13 +45,53 @@ std::string to_string(DynOut v) {
   case DYN_ODE: return "ode";
   case DYN_ALG: return "alg";
   case DYN_QUAD: return "quad";
-  case DYN_RODE: return "rode";
-  case DYN_RALG: return "ralg";
-  case DYN_RQUAD: return "rquad";
-  case DYN_UQUAD: return "uquad";
   default: break;
   }
   return "";
+}
+
+std::string Integrator::bdyn_in(casadi_int i) {
+  switch (i) {
+    case BDYN_T: return "t";
+    case BDYN_X: return "x";
+    case BDYN_Z: return "z";
+    case BDYN_P: return "p";
+    case BDYN_U: return "u";
+    case BDYN_OUT_ODE: return "out_ode";
+    case BDYN_OUT_ALG: return "out_alg";
+    case BDYN_OUT_QUAD: return "out_quad";
+    case BDYN_ADJ_ODE: return "adj_ode";
+    case BDYN_ADJ_ALG: return "adj_alg";
+    case BDYN_ADJ_QUAD: return "adj_quad";
+  default: break;
+  }
+  return "";
+}
+
+std::vector<std::string> Integrator::bdyn_in() {
+  std::vector<std::string> ret(BDYN_NUM_IN);
+  for (casadi_int i = 0; i < BDYN_NUM_IN; ++i)
+    ret[i] = bdyn_in(i);
+  return ret;
+}
+
+std::string Integrator::bdyn_out(casadi_int i) {
+  switch (i) {
+    case BDYN_ADJ_T: return "adj_t";
+    case BDYN_ADJ_X: return "adj_x";
+    case BDYN_ADJ_Z: return "adj_z";
+    case BDYN_ADJ_P: return "adj_p";
+    case BDYN_ADJ_U: return "adj_u";
+  default: break;
+  }
+  return "";
+}
+
+std::vector<std::string> Integrator::bdyn_out() {
+  std::vector<std::string> ret(BDYN_NUM_OUT);
+  for (casadi_int i = 0; i < BDYN_NUM_OUT; ++i)
+    ret[i] = bdyn_out(i);
+  return ret;
 }
 
 bool has_integrator(const std::string& name) {
@@ -134,12 +171,12 @@ std::vector<std::string> integrator_out() {
 std::string integrator_in(casadi_int ind) {
   switch (static_cast<IntegratorInput>(ind)) {
   case INTEGRATOR_X0:  return "x0";
+  case INTEGRATOR_Z0:  return "z0";
   case INTEGRATOR_P:   return "p";
   case INTEGRATOR_U:   return "u";
-  case INTEGRATOR_Z0:  return "z0";
-  case INTEGRATOR_RX0: return "rx0";
-  case INTEGRATOR_RP:  return "rp";
-  case INTEGRATOR_RZ0: return "rz0";
+  case INTEGRATOR_ADJ_XF: return "adj_xf";
+  case INTEGRATOR_ADJ_ZF: return "adj_zf";
+  case INTEGRATOR_ADJ_QF:  return "adj_qf";
   case INTEGRATOR_NUM_IN: break;
   }
   return std::string();
@@ -148,12 +185,12 @@ std::string integrator_in(casadi_int ind) {
 std::string integrator_out(casadi_int ind) {
   switch (static_cast<IntegratorOutput>(ind)) {
   case INTEGRATOR_XF:  return "xf";
-  case INTEGRATOR_QF:  return "qf";
   case INTEGRATOR_ZF:  return "zf";
-  case INTEGRATOR_RXF: return "rxf";
-  case INTEGRATOR_RQF: return "rqf";
-  case INTEGRATOR_RZF: return "rzf";
-  case INTEGRATOR_UQF: return "uqf";
+  case INTEGRATOR_QF:  return "qf";
+  case INTEGRATOR_ADJ_X0: return "adj_x0";
+  case INTEGRATOR_ADJ_Z0: return "adj_z0";
+  case INTEGRATOR_ADJ_P: return "adj_p";
+  case INTEGRATOR_ADJ_U: return "adj_u";
   case INTEGRATOR_NUM_OUT: break;
   }
   return std::string();
@@ -199,6 +236,8 @@ Integrator::Integrator(const std::string& name, const Function& oracle,
   np_ = -1;
 
   // Default options
+  nfwd_ = 0;
+  nadj_ = 0;
   print_stats_ = false;
 }
 
@@ -207,13 +246,13 @@ Integrator::~Integrator() {
 
 Sparsity Integrator::get_sparsity_in(casadi_int i) {
   switch (static_cast<IntegratorInput>(i)) {
-  case INTEGRATOR_X0: return x();
-  case INTEGRATOR_P: return p();
-  case INTEGRATOR_U: return repmat(u(), 1, nt());
-  case INTEGRATOR_Z0: return z();
-  case INTEGRATOR_RX0: return repmat(rx(), 1, nt());
-  case INTEGRATOR_RP: return repmat(rp(), 1, nt());
-  case INTEGRATOR_RZ0: return repmat(rz(), 1, nt());
+  case INTEGRATOR_X0: return Sparsity::dense(nx1_, 1 + nfwd_);
+  case INTEGRATOR_Z0: return Sparsity::dense(nz1_, 1 + nfwd_);
+  case INTEGRATOR_P: return Sparsity::dense(np1_, 1 + nfwd_);
+  case INTEGRATOR_U: return Sparsity::dense(nu1_, nt() * (1 + nfwd_));
+  case INTEGRATOR_ADJ_XF: return Sparsity::dense(nrx1_, nadj_ * (1 + nfwd_) * nt());
+  case INTEGRATOR_ADJ_ZF: return Sparsity::dense(nrz1_, nadj_ * (1 + nfwd_) * nt());
+  case INTEGRATOR_ADJ_QF: return Sparsity::dense(nrp1_, nadj_ * (1 + nfwd_) * nt());
   case INTEGRATOR_NUM_IN: break;
   }
   return Sparsity();
@@ -221,13 +260,13 @@ Sparsity Integrator::get_sparsity_in(casadi_int i) {
 
 Sparsity Integrator::get_sparsity_out(casadi_int i) {
   switch (static_cast<IntegratorOutput>(i)) {
-  case INTEGRATOR_XF: return repmat(x(), 1, nt());
-  case INTEGRATOR_QF: return repmat(q(), 1, nt());
-  case INTEGRATOR_ZF: return repmat(z(), 1, nt());
-  case INTEGRATOR_RXF: return rx();
-  case INTEGRATOR_RQF: return rq();
-  case INTEGRATOR_RZF: return rz();
-  case INTEGRATOR_UQF: return repmat(uq(), 1, nt());
+  case INTEGRATOR_XF: return Sparsity::dense(nx1_, nt() * (1 + nfwd_));
+  case INTEGRATOR_ZF: return Sparsity::dense(nz1_, nt() * (1 + nfwd_));
+  case INTEGRATOR_QF: return Sparsity::dense(nq1_, nt() * (1 + nfwd_));
+  case INTEGRATOR_ADJ_X0: return Sparsity::dense(nrx1_, nadj_ * (1 + nfwd_));
+  case INTEGRATOR_ADJ_Z0: return Sparsity::dense(nrz1_, nadj_ * (1 + nfwd_));
+  case INTEGRATOR_ADJ_P: return Sparsity::dense(nrq1_, nadj_ * (1 + nfwd_));
+  case INTEGRATOR_ADJ_U: return Sparsity::dense(nuq1_, nadj_ * (1 + nfwd_) * nt());
   case INTEGRATOR_NUM_OUT: break;
   }
   return Sparsity();
@@ -236,9 +275,9 @@ Sparsity Integrator::get_sparsity_out(casadi_int i) {
 bool Integrator::grid_in(casadi_int i) {
   switch (static_cast<IntegratorInput>(i)) {
     case INTEGRATOR_U:
-    case INTEGRATOR_RX0:
-    case INTEGRATOR_RP:
-    case INTEGRATOR_RZ0:
+    case INTEGRATOR_ADJ_XF:
+    case INTEGRATOR_ADJ_ZF:
+    case INTEGRATOR_ADJ_QF:
       return true;
     default: break;
   }
@@ -248,45 +287,28 @@ bool Integrator::grid_in(casadi_int i) {
 bool Integrator::grid_out(casadi_int i) {
   switch (static_cast<IntegratorOutput>(i)) {
     case INTEGRATOR_XF:
-    case INTEGRATOR_QF:
     case INTEGRATOR_ZF:
-    case INTEGRATOR_UQF:
+    case INTEGRATOR_QF:
+    case INTEGRATOR_ADJ_U:
       return true;
     default: break;
   }
   return false;
 }
 
-casadi_int Integrator::adjmap_in(casadi_int i) {
-  switch (static_cast<IntegratorOutput>(i)) {
-    case INTEGRATOR_XF: return INTEGRATOR_RX0;
-    case INTEGRATOR_QF: return INTEGRATOR_RP;
-    case INTEGRATOR_ZF: return INTEGRATOR_RZ0;
-    case INTEGRATOR_RXF: return INTEGRATOR_X0;
-    case INTEGRATOR_RQF: return INTEGRATOR_P;
-    case INTEGRATOR_RZF: return INTEGRATOR_Z0;
-    case INTEGRATOR_UQF: return INTEGRATOR_U;
-    default: break;
-  }
-  return -1;
-}
-
 casadi_int Integrator::adjmap_out(casadi_int i) {
   switch (static_cast<IntegratorInput>(i)) {
-    case INTEGRATOR_X0: return INTEGRATOR_RXF;
-    case INTEGRATOR_P: return INTEGRATOR_RQF;
-    case INTEGRATOR_U: return INTEGRATOR_UQF;
-    case INTEGRATOR_Z0: return INTEGRATOR_RZF;
-    case INTEGRATOR_RX0: return INTEGRATOR_XF;
-    case INTEGRATOR_RP: return INTEGRATOR_QF;
-    case INTEGRATOR_RZ0: return INTEGRATOR_ZF;
+    case INTEGRATOR_X0: return INTEGRATOR_ADJ_X0;
+    case INTEGRATOR_Z0: return INTEGRATOR_ADJ_Z0;
+    case INTEGRATOR_P: return INTEGRATOR_ADJ_P;
+    case INTEGRATOR_U: return INTEGRATOR_ADJ_U;
+    case INTEGRATOR_ADJ_XF: return INTEGRATOR_XF;
+    case INTEGRATOR_ADJ_ZF: return INTEGRATOR_ZF;
+    case INTEGRATOR_ADJ_QF: return INTEGRATOR_QF;
     default: break;
   }
   return -1;
-
 }
-
-
 
 Function Integrator::create_advanced(const Dict& opts) {
   return Function::create(this, opts);
@@ -301,19 +323,19 @@ int Integrator::eval(const double** arg, double** res,
   const double* z0 = arg[INTEGRATOR_Z0];
   const double* p = arg[INTEGRATOR_P];
   const double* u = arg[INTEGRATOR_U];
-  const double* rx0 = arg[INTEGRATOR_RX0];
-  const double* rz0 = arg[INTEGRATOR_RZ0];
-  const double* rp = arg[INTEGRATOR_RP];
+  const double* rx0 = arg[INTEGRATOR_ADJ_XF];
+  const double* rz0 = arg[INTEGRATOR_ADJ_ZF];
+  const double* rp = arg[INTEGRATOR_ADJ_QF];
   arg += INTEGRATOR_NUM_IN;
 
   // Read outputs
   double* x = res[INTEGRATOR_XF];
   double* z = res[INTEGRATOR_ZF];
   double* q = res[INTEGRATOR_QF];
-  double* rx = res[INTEGRATOR_RXF];
-  double* rz = res[INTEGRATOR_RZF];
-  double* rq = res[INTEGRATOR_RQF];
-  double* uq = res[INTEGRATOR_UQF];
+  double* rx = res[INTEGRATOR_ADJ_X0];
+  double* rz = res[INTEGRATOR_ADJ_Z0];
+  double* rq = res[INTEGRATOR_ADJ_P];
+  double* uq = res[INTEGRATOR_ADJ_U];
   res += INTEGRATOR_NUM_OUT;
 
   // Setup memory object
@@ -403,6 +425,12 @@ const Options Integrator::options_
     {"print_stats",
       {OT_BOOL,
       "Print out statistics after integration"}},
+    {"nfwd",
+     {OT_INT,
+      "Number of forward sensitivities to be calculated [0]"}},
+    {"nadj",
+     {OT_INT,
+      "Number of adjoint sensitivities to be calculated [0]"}},
     {"t0",
       {OT_DOUBLE,
       "[DEPRECATED] Beginning of the time horizon"}},
@@ -423,7 +451,7 @@ const Options Integrator::options_
 
 void Integrator::init(const Dict& opts) {
   // Default (temporary) options
-  double t0=0, tf=1;
+  double t0 = 0, tf = 1;
   bool expand = false;
   bool output_t0 = false;
   std::vector<double> grid;
@@ -438,6 +466,10 @@ void Integrator::init(const Dict& opts) {
       uses_legacy_options = true;
     } else if (op.first=="print_stats") {
       print_stats_ = op.second;
+    } else if (op.first=="nfwd") {
+      nfwd_ = op.second;
+    } else if (op.first=="nadj") {
+      nadj_ = op.second;
     } else if (op.first=="grid") {
       grid = op.second;
       uses_legacy_options = true;
@@ -465,9 +497,7 @@ void Integrator::init(const Dict& opts) {
       "Set the time grid by proving additional argument to the 'integrator' call instead.");
 
     // If grid unset, default to [t0, tf]
-    if (grid.empty()) {
-      grid = {t0, tf};
-    }
+    if (grid.empty()) grid = {t0, tf};
 
     // Construct t0 and tout from grid and output_t0
     t0_ = grid.front();
@@ -475,59 +505,122 @@ void Integrator::init(const Dict& opts) {
     if (!output_t0) tout_.erase(tout_.begin());
   }
 
+  // Consistency checks: Sensitivities
+  casadi_assert(nfwd_ >= 0, "Number of forward sensitivities must be non-negative");
+  casadi_assert(nadj_ >= 0, "Number of adjoint sensitivities must be non-negative");
+
+  // Consistency check: Valid oracle
+  casadi_assert(oracle_.n_in() == DYN_NUM_IN, "DAE has wrong number of inputs");
+  casadi_assert(oracle_.n_out() == DYN_NUM_OUT, "DAE has wrong number of outputs");
+
+  // Consistency checks, input sparsities
+  for (casadi_int i = 0; i < DYN_NUM_IN; ++i) {
+    const Sparsity& sp = oracle_.sparsity_in(i);
+    if (i == DYN_T) {
+      casadi_assert(sp.is_empty() || sp.is_scalar(), "DAE time variable must be empty or scalar. "
+        "Got dimension " + str(sp.size()));
+    } else {
+      casadi_assert(sp.is_vector(), "DAE inputs must be vectors. "
+        + dyn_in(i) + " has dimension " + str(sp.size()) + ".");
+    }
+    casadi_assert(sp.is_dense(), "DAE inputs must be dense . "
+      + dyn_in(i) + " is sparse.");
+  }
+
+  // Consistency checks, output sparsities
+  for (casadi_int i = 0; i < DYN_NUM_OUT; ++i) {
+    const Sparsity& sp = oracle_.sparsity_out(i);
+    casadi_assert(sp.is_vector(), "DAE outputs must be vectors. "
+      + dyn_out(i) + " has dimension " + str(sp.size()));
+    casadi_assert(sp.is_dense(), "DAE outputs must be dense . "
+      + dyn_out(i) + " is sparse.");
+  }
+
+  // Get dimensions (excluding sensitivity equations), forward problem
+  nx1_ = oracle_.numel_in(DYN_X);
+  nz1_ = oracle_.numel_in(DYN_Z);
+  nq1_ = oracle_.numel_out(DYN_QUAD);
+  np1_ = oracle_.numel_in(DYN_P);
+  nu1_ = oracle_.numel_in(DYN_U);
+
+  // Consistency checks
+  casadi_assert(nx1_ > 0, "Ill-posed ODE - no state");
+  casadi_assert(nx1_ == oracle_.numel_out(DYN_ODE), "Dimension mismatch for 'ode'");
+  casadi_assert(nz1_ == oracle_.numel_out(DYN_ALG), "Dimension mismatch for 'alg'");
+
+  // Backward problem, if any
+  if (nadj_ > 0) {
+    // Generate backward DAE
+    rdae_ = oracle_.reverse(nadj_);
+    // Consistency checks
+    casadi_assert(rdae_.n_in() == BDYN_NUM_IN, "Backward DAE has wrong number of inputs");
+    casadi_assert(rdae_.n_out() == BDYN_NUM_OUT, "Backward DAE has wrong number of outputs");
+    casadi_assert(rdae_.numel_in(BDYN_X) == nx1_, "Dimension mismatch");
+    casadi_assert(rdae_.numel_in(BDYN_Z) == nz1_, "Dimension mismatch");
+    casadi_assert(rdae_.numel_in(BDYN_P) == np1_, "Dimension mismatch");
+    casadi_assert(rdae_.numel_in(BDYN_U) == nu1_, "Dimension mismatch");
+    casadi_assert(rdae_.numel_in(BDYN_ADJ_ODE) == nx1_ * nadj_, "Inconsistent dimensions");
+    casadi_assert(rdae_.numel_in(BDYN_ADJ_ALG) == nz1_ * nadj_, "Inconsistent dimensions");
+    casadi_assert(rdae_.numel_in(BDYN_ADJ_QUAD) == nq1_ * nadj_, "Inconsistent dimensions");
+    casadi_assert(rdae_.numel_out(BDYN_ADJ_P) == np1_ * nadj_, "Inconsistent dimensions");
+    casadi_assert(rdae_.numel_out(BDYN_ADJ_U) == nu1_ * nadj_, "Inconsistent dimensions");
+
+    // Dimensions (excluding sensitivity equations), backward problem
+    nrx1_ = nx1_;
+    nrz1_ = nz1_;
+    nrp1_ = nq1_;
+    nrq1_ = np1_;
+    nuq1_ = nu1_;
+  } else {
+    // No backward problem
+    nrx1_ = nrz1_ = nrp1_ = nrq1_ = nuq1_ = 0;
+  }
+
+  // Get dimensions (including sensitivity equations)
+  nx_ = nx1_ * (1 + nfwd_);
+  nz_ = nz1_ * (1 + nfwd_);
+  nq_ = nq1_ * (1 + nfwd_);
+  np_ = np1_ * (1 + nfwd_);
+  nu_ = nu1_ * (1 + nfwd_);
+  nrx_ = nrx1_ * nadj_ * (1 + nfwd_);
+  nrz_ = nrz1_ * nadj_ * (1 + nfwd_);
+  nrp_ = nrp1_ * nadj_ * (1 + nfwd_);
+  nrq_ = nrq1_ * nadj_ * (1 + nfwd_);
+  nuq_ = nuq1_ * nadj_ * (1 + nfwd_);
+
   // Call the base class method
   OracleFunction::init(opts);
 
-  // For sparsity pattern propagation
-  alloc(oracle_);
+  // Create problem functions, forward problem
+  create_function("daeF", dyn_in(), dae_out());
+  create_function("quadF", dyn_in(), quad_out());
+  if (nfwd_ > 0) {
+    // one direction to conserve memory, symbolic processing time
+    create_forward("daeF", 1);
+    create_forward("quadF", 1);
+  }
 
-  // Error if sparse input
-  casadi_assert(x().is_dense(), "Sparse DAE not supported");
-  casadi_assert(z().is_dense(), "Sparse DAE not supported");
-  casadi_assert(p().is_dense(), "Sparse DAE not supported");
-  casadi_assert(rx().is_dense(), "Sparse DAE not supported");
-  casadi_assert(rz().is_dense(), "Sparse DAE not supported");
-  casadi_assert(rp().is_dense(), "Sparse DAE not supported");
-
-  // Get dimensions (excluding sensitivity equations)
-  nx1_ = x().size1();
-  nz1_ = z().size1();
-  nq1_ = q().size1();
-  np1_  = p().size1();
-  nu1_  = u().size1();
-  nrx1_ = rx().size1();
-  nrz1_ = rz().size1();
-  nrp1_ = rp().size1();
-  nrq1_ = rq().size1();
-  nuq1_ = uq().size1();
-
-  // Get dimensions (including sensitivity equations)
-  nx_ = x().nnz();
-  nz_ = z().nnz();
-  nq_ = q().nnz();
-  np_  = p().nnz();
-  nu_  = u().nnz();
-  nrx_ = rx().nnz();
-  nrz_ = rz().nnz();
-  nrp_ = rp().nnz();
-  nrq_ = rq().nnz();
-  nuq_ = uq().nnz();
-
-  // Number of sensitivities
-  ns_ = x().size2()-1;
+  // Create problem functions, backward problem
+  if (nadj_ > 0) {
+    create_function(rdae_, "daeB", bdyn_in(), bdae_out());
+    create_function(rdae_, "quadB", bdyn_in(), bquad_out());
+    if (nfwd_ > 0) {
+      // one direction to conserve memory, symbolic processing time
+      create_forward("daeB", 1);
+      create_forward("quadB", 1);
+    }
+  }
 
   // Get the sparsities of the forward and reverse DAE
   sp_jac_dae_ = sp_jac_dae();
   casadi_assert(!sp_jac_dae_.is_singular(),
-                        "Jacobian of the forward problem is structurally rank-deficient. "
-                        "sprank(J)=" + str(sprank(sp_jac_dae_)) + "<"
-                        + str(nx_+nz_));
-  if (nrx_>0) {
+    "Jacobian of the forward problem is structurally rank-deficient. "
+    "sprank(J)=" + str(sprank(sp_jac_dae_)) + "<" + str(nx_+nz_));
+  if (nadj_ > 0) {
     sp_jac_rdae_ = sp_jac_rdae();
     casadi_assert(!sp_jac_rdae_.is_singular(),
-                          "Jacobian of the backward problem is structurally rank-deficient. "
-                          "sprank(J)=" + str(sprank(sp_jac_rdae_)) + "<"
-                          + str(nrx_+nrz_));
+      "Jacobian of the backward problem is structurally rank-deficient. "
+      "sprank(J)=" + str(sprank(sp_jac_rdae_)) + "<" + str(nrx_+nrz_));
   }
 
   // Work vectors for sparsity pattern propagation: Can be reused in derived classes
@@ -549,48 +642,62 @@ int Integrator::init_mem(void* mem) const {
   return 0;
 }
 
+Function Integrator::augmented_dae() const {
+  // If no sensitivities, augmented oracle is the oracle itself
+  if (nfwd_ == 0) return oracle_;
+  // Name of augmented DAE
+  std::string aug_name = "fsens" + str(nfwd_) + "_" + oracle_.name();
+  // Use function in cache, if available
+  Function ret;
+  // if (incache(aug_name, ret)) return ret;  // caching disabled while implementing #3047
+  // Create new augmented oracle
+  try {
+    if (oracle_.is_a("SXFunction")) {
+      ret = get_forward_dae<SX>(aug_name);
+    } else {
+      ret = get_forward_dae<MX>(aug_name);
+    }
+  } catch (std::exception& e) {
+    casadi_error("Failed to generate augmented DAE for " + name_ + ":\n" + e.what());
+  }
+  // Save to Function cache and return
+  // tocache(ret);  // caching disabled while implementing #3047
+  return ret;
+}
+
 template<typename MatType>
-std::map<std::string, MatType> Integrator::aug_fwd(casadi_int nfwd) const {
-  if (verbose_) casadi_message(name_ + "::aug_fwd");
+Function Integrator::get_forward_dae(const std::string& name) const {
+  if (verbose_) casadi_message(name_ + "::get_forward_dae");
 
-  // Get input expressions
+  // Get input and output expressions
   std::vector<MatType> arg = MatType::get_input(oracle_);
-  std::vector<MatType> aug_x, aug_z, aug_p, aug_u, aug_rx, aug_rz, aug_rp;
-  MatType aug_t = arg.at(DYN_T);
-  aug_x.push_back(vec(arg.at(DYN_X)));
-  aug_z.push_back(vec(arg.at(DYN_Z)));
-  aug_p.push_back(vec(arg.at(DYN_P)));
-  aug_u.push_back(vec(arg.at(DYN_U)));
-  aug_rx.push_back(vec(arg.at(DYN_RX)));
-  aug_rz.push_back(vec(arg.at(DYN_RZ)));
-  aug_rp.push_back(vec(arg.at(DYN_RP)));
-
-  // Get output expressions
   std::vector<MatType> res = oracle_(arg);
-  std::vector<MatType> aug_ode, aug_alg, aug_quad, aug_rode, aug_ralg, aug_rquad, aug_uquad;
-  aug_ode.push_back(vec(res.at(DYN_ODE)));
-  aug_alg.push_back(vec(res.at(DYN_ALG)));
-  aug_quad.push_back(vec(res.at(DYN_QUAD)));
-  aug_rode.push_back(vec(res.at(DYN_RODE)));
-  aug_ralg.push_back(vec(res.at(DYN_RALG)));
-  aug_rquad.push_back(vec(res.at(DYN_RQUAD)));
-  aug_uquad.push_back(vec(res.at(DYN_UQUAD)));
+
+  // Symbolic expression for augmented DAE
+  std::vector<std::vector<MatType>> aug_in(DYN_NUM_IN);
+  for (casadi_int i = 0; i < DYN_NUM_IN; ++i) aug_in[i].push_back(arg.at(i));
+  std::vector<std::vector<MatType>> aug_out(DYN_NUM_OUT);
+  for (casadi_int i = 0; i < DYN_NUM_OUT; ++i) aug_out[i].push_back(res.at(i));
 
   // Zero of time dimension
-  MatType zero_t = MatType::zeros(t());
+  MatType zero_t = MatType::zeros(oracle_.sparsity_in(DYN_T));
 
-  // Forward directional derivatives
-  std::vector<std::vector<MatType>> seed(nfwd, std::vector<MatType>(DYN_NUM_IN));
-  for (casadi_int d=0; d<nfwd; ++d) {
-    seed[d][DYN_T] = zero_t;
+  // Augment aug_in with forward sensitivity seeds
+  std::vector<std::vector<MatType>> seed(nfwd_, std::vector<MatType>(DYN_NUM_IN));
+  for (casadi_int d = 0; d < nfwd_; ++d) {
+    // Create expressions for augmented states
     std::string pref = "aug" + str(d) + "_";
-    aug_x.push_back(vec(seed[d][DYN_X] = MatType::sym(pref + "x", x())));
-    aug_z.push_back(vec(seed[d][DYN_Z] = MatType::sym(pref + "z", z())));
-    aug_p.push_back(vec(seed[d][DYN_P] = MatType::sym(pref + "p", p())));
-    aug_u.push_back(vec(seed[d][DYN_U] = MatType::sym(pref + "u", u())));
-    aug_rx.push_back(vec(seed[d][DYN_RX] = MatType::sym(pref + "rx", rx())));
-    aug_rz.push_back(vec(seed[d][DYN_RZ] = MatType::sym(pref + "rz", rz())));
-    aug_rp.push_back(vec(seed[d][DYN_RP] = MatType::sym(pref + "rp", rp())));
+    for (casadi_int i = 0; i < DYN_NUM_IN; ++i) {
+      if (i == DYN_T) {
+        seed[d][i] = zero_t;
+      } else {
+        seed[d][i] = MatType::sym(pref + dyn_in(i), oracle_.sparsity_in(i));
+      }
+    }
+    // Save to augmented function inputs
+    for (casadi_int i = 0; i < DYN_NUM_IN; ++i) {
+      if (i != DYN_T) aug_in[i].push_back(seed[d][i]);
+    }
   }
 
   // Calculate directional derivatives
@@ -598,135 +705,157 @@ std::map<std::string, MatType> Integrator::aug_fwd(casadi_int nfwd) const {
   bool always_inline = oracle_.is_a("SXFunction") || oracle_.is_a("MXFunction");
   oracle_->call_forward(arg, res, seed, sens, always_inline, false);
 
-  // Collect sensitivity equations
-  casadi_assert_dev(sens.size()==nfwd);
-  for (casadi_int d=0; d<nfwd; ++d) {
-    casadi_assert_dev(sens[d].size()==DYN_NUM_OUT);
-    aug_ode.push_back(vec(project(sens[d][DYN_ODE], x())));
-    aug_alg.push_back(vec(project(sens[d][DYN_ALG], z())));
-    aug_quad.push_back(vec(project(sens[d][DYN_QUAD], q())));
-    aug_rode.push_back(vec(project(sens[d][DYN_RODE], rx())));
-    aug_ralg.push_back(vec(project(sens[d][DYN_RALG], rz())));
-    aug_rquad.push_back(vec(project(sens[d][DYN_RQUAD], rq())));
-    aug_uquad.push_back(vec(project(sens[d][DYN_UQUAD], uq())));
+  // Augment aug_out with forward sensitivity equations
+  casadi_assert_dev(sens.size() == nfwd_);
+  for (casadi_int d = 0; d < nfwd_; ++d) {
+    casadi_assert_dev(sens[d].size() == DYN_NUM_OUT);
+    for (casadi_int i = 0; i < DYN_NUM_OUT; ++i) {
+      aug_out[i].push_back(project(sens[d][i], oracle_.sparsity_out(i)));
+    }
   }
 
-  // Construct return object
-  std::map<std::string, MatType> ret;
-  ret["t"] = aug_t;
-  ret["x"] = horzcat(aug_x);
-  ret["z"] = horzcat(aug_z);
-  ret["p"] = horzcat(aug_p);
-  ret["u"] = horzcat(aug_u);
-  ret["ode"] = horzcat(aug_ode);
-  ret["alg"] = horzcat(aug_alg);
-  ret["quad"] = horzcat(aug_quad);
-  ret["rx"] = horzcat(aug_rx);
-  ret["rz"] = horzcat(aug_rz);
-  ret["rp"] = horzcat(aug_rp);
-  ret["rode"] = horzcat(aug_rode);
-  ret["ralg"] = horzcat(aug_ralg);
-  ret["rquad"] = horzcat(aug_rquad);
-  ret["uquad"] = horzcat(aug_uquad);
+  // Concatenate arrays
+  for (casadi_int i = 0; i < DYN_NUM_IN; ++i) arg.at(i) = vertcat(aug_in[i]);
+  for (casadi_int i = 0; i < DYN_NUM_OUT; ++i) res.at(i) = vertcat(aug_out[i]);
 
-  return ret;
+  // Convert to oracle function and return
+  return Function(name, arg, res, dyn_in(), dyn_out());
 }
 
-template<typename MatType>
-std::map<std::string, MatType> Integrator::aug_adj(casadi_int nadj) const {
-  if (verbose_) casadi_message(name_ + "::aug_adj");
-
-  // Get input expressions
-  std::vector<MatType> arg = MatType::get_input(oracle_);
-  std::vector<MatType> aug_x, aug_z, aug_p, aug_u, aug_rx, aug_rz, aug_rp;
-  MatType aug_t = arg.at(DYN_T);
-  aug_x.push_back(vec(arg.at(DYN_X)));
-  aug_z.push_back(vec(arg.at(DYN_Z)));
-  aug_p.push_back(vec(arg.at(DYN_P)));
-  aug_u.push_back(vec(arg.at(DYN_U)));
-  aug_rx.push_back(vec(arg.at(DYN_RX)));
-  aug_rz.push_back(vec(arg.at(DYN_RZ)));
-  aug_rp.push_back(vec(arg.at(DYN_RP)));
-
-  // Get output expressions
-  std::vector<MatType> res = oracle_(arg);
-  std::vector<MatType> aug_ode, aug_alg, aug_quad, aug_rode, aug_ralg, aug_rquad, aug_uquad;
-  aug_ode.push_back(vec(res.at(DYN_ODE)));
-  aug_alg.push_back(vec(res.at(DYN_ALG)));
-  aug_quad.push_back(vec(res.at(DYN_QUAD)));
-  aug_rode.push_back(vec(res.at(DYN_RODE)));
-  aug_ralg.push_back(vec(res.at(DYN_RALG)));
-  aug_rquad.push_back(vec(res.at(DYN_RQUAD)));
-  aug_uquad.push_back(vec(res.at(DYN_UQUAD)));
-
-  // Zero of time dimension
-  MatType zero_t = MatType::zeros(t());
-
-  // Reverse mode directional derivatives
-  std::vector<std::vector<MatType>> seed(nadj, std::vector<MatType>(DYN_NUM_OUT));
-  for (casadi_int d=0; d<nadj; ++d) {
-    std::string pref = "aug" + str(d) + "_";
-    aug_rx.push_back(vec(seed[d][DYN_ODE] = MatType::sym(pref + "ode", x())));
-    aug_rz.push_back(vec(seed[d][DYN_ALG] = MatType::sym(pref + "alg", z())));
-    aug_rp.push_back(vec(seed[d][DYN_QUAD] = MatType::sym(pref + "quad", q())));
-    aug_x.push_back(vec(seed[d][DYN_RODE] = MatType::sym(pref + "rode", rx())));
-    aug_z.push_back(vec(seed[d][DYN_RALG] = MatType::sym(pref + "ralg", rz())));
-    aug_p.push_back(vec(seed[d][DYN_RQUAD] = MatType::sym(pref + "rquad", rq())));
-    aug_u.push_back(vec(seed[d][DYN_UQUAD] = MatType::sym(pref + "uquad", uq())));
+int Integrator::fdae_sp_forward(SpForwardMem* m, const bvec_t* x,
+    const bvec_t* p, const bvec_t* u, bvec_t* ode, bvec_t* alg) const {
+  // Evaluate nondifferentiated
+  m->arg[DYN_T] = nullptr;  // t
+  m->arg[DYN_X] = x;  // x
+  m->arg[DYN_Z] = nullptr;  // z
+  m->arg[DYN_P] = p;  // p
+  m->arg[DYN_U] = u;  // u
+  m->res[DAE_ODE] = ode;  // ode
+  m->res[DAE_ALG] = alg;  // alg
+  if (calc_sp_forward("daeF", m->arg, m->res, m->iw, m->w)) return 1;
+  // Evaluate sensitivities
+  for (casadi_int i = 0; i < nfwd_; ++i) {
+    m->arg[DYN_NUM_IN + DAE_ODE] = ode;  // out:ode
+    m->arg[DYN_NUM_IN + DAE_ALG] = alg;  // out:alg
+    m->arg[DYN_NUM_IN + DAE_NUM_OUT + DYN_T] = nullptr;  // fwd:t
+    m->arg[DYN_NUM_IN + DAE_NUM_OUT + DYN_X] = x + (i + 1) * nx1_;  // fwd:x
+    m->arg[DYN_NUM_IN + DAE_NUM_OUT + DYN_Z] = nullptr;  // fwd:z
+    m->arg[DYN_NUM_IN + DAE_NUM_OUT + DYN_P] = p + (i + 1) * np1_;  // fwd:p
+    m->arg[DYN_NUM_IN + DAE_NUM_OUT + DYN_U] = u + (i + 1) * nu1_;  // fwd:u
+    m->res[DAE_ODE] = ode + (i + 1) * nx1_;  // fwd:ode
+    m->res[DAE_ALG] = alg + (i + 1) * nz1_;  // fwd:alg
+    if (calc_sp_forward(forward_name("daeF", 1), m->arg, m->res, m->iw, m->w)) return 1;
   }
+  return 0;
+}
 
-  // Calculate directional derivatives
-  std::vector<std::vector<MatType>> sens;
-  bool always_inline = oracle_.is_a("SXFunction") || oracle_.is_a("MXFunction");
-  oracle_->call_reverse(arg, res, seed, sens, always_inline, false);
-
-  // Collect sensitivity equations
-  casadi_assert_dev(sens.size()==nadj);
-  for (casadi_int d=0; d<nadj; ++d) {
-    casadi_assert_dev(sens[d].size()==DYN_NUM_IN);
-    aug_rode.push_back(vec(project(sens[d][DYN_X], x())));
-    aug_ralg.push_back(vec(project(sens[d][DYN_Z], z())));
-    aug_rquad.push_back(vec(project(sens[d][DYN_P], p())));
-    aug_uquad.push_back(vec(project(sens[d][DYN_U], u())));
-    aug_ode.push_back(vec(project(sens[d][DYN_RX], rx())));
-    aug_alg.push_back(vec(project(sens[d][DYN_RZ], rz())));
-    aug_quad.push_back(vec(project(sens[d][DYN_RP], rp())));
+int Integrator::fquad_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t* z,
+    const bvec_t* p, const bvec_t* u, bvec_t* quad) const {
+  // Evaluate nondifferentiated
+  m->arg[DYN_T] = nullptr;  // t
+  m->arg[DYN_X] = x;  // x
+  m->arg[DYN_Z] = z;  // z
+  m->arg[DYN_P] = p;  // p
+  m->arg[DYN_U] = u;  // u
+  m->res[QUAD_QUAD] = quad;  // quad
+  if (calc_sp_forward("quadF", m->arg, m->res, m->iw, m->w)) return 1;
+  // Evaluate sensitivities
+  for (casadi_int i = 0; i < nfwd_; ++i) {
+    m->arg[DYN_NUM_IN + QUAD_QUAD] = quad;  // out:quad
+    m->arg[DYN_NUM_IN + QUAD_NUM_OUT + DYN_T] = nullptr;  // fwd:t
+    m->arg[DYN_NUM_IN + QUAD_NUM_OUT + DYN_X] = x + (i + 1) * nx1_;  // fwd:x
+    m->arg[DYN_NUM_IN + QUAD_NUM_OUT + DYN_Z] = z + (i + 1) * nz1_;  // fwd:z
+    m->arg[DYN_NUM_IN + QUAD_NUM_OUT + DYN_P] = p + (i + 1) * np1_;  // fwd:p
+    m->arg[DYN_NUM_IN + QUAD_NUM_OUT + DYN_U] = u + (i + 1) * nu1_;  // fwd:u
+    m->res[QUAD_QUAD] = quad + (i + 1) * nq1_;  // fwd:quad
+    if (calc_sp_forward(forward_name("quadF", 1), m->arg, m->res, m->iw, m->w)) return 1;
   }
+  return 0;
+}
 
-  // Construct return object
-  std::map<std::string, MatType> ret;
-  ret["t"] = aug_t;
-  ret["x"] = vertcat(aug_x);
-  ret["z"] = vertcat(aug_z);
-  ret["p"] = vertcat(aug_p);
-  ret["u"] = vertcat(aug_u);
-  ret["ode"] = vertcat(aug_ode);
-  ret["alg"] = vertcat(aug_alg);
-  ret["quad"] = vertcat(aug_quad);
-  ret["rx"] = vertcat(aug_rx);
-  ret["rz"] = vertcat(aug_rz);
-  ret["rp"] = vertcat(aug_rp);
-  ret["rode"] = vertcat(aug_rode);
-  ret["ralg"] = vertcat(aug_ralg);
-  ret["rquad"] = vertcat(aug_rquad);
-  ret["uquad"] =  vertcat(aug_uquad);
-
-  // Make sure that forward problem does not depend on backward states
-  Function f("f", {ret["t"], ret["x"], ret["z"], ret["p"], ret["u"]},
-                  {ret["ode"], ret["alg"], ret["quad"]}, {{"allow_free", true}});
-  if (f.has_free()) {
-    // Replace dependencies of rx, rz and rp with zeros
-    f = Function("f", {ret["t"], ret["x"], ret["z"], ret["p"], ret["u"],
-                        ret["rx"], ret["rz"], ret["rp"]},
-                      {ret["ode"], ret["alg"], ret["quad"]});
-    std::vector<MatType> v = {ret["t"], ret["x"], ret["z"], ret["p"], ret["u"], 0, 0, 0};
-    v = f(v);
-    ret["ode"] = v.at(0);
-    ret["alg"] = v.at(1);
-    ret["quad"] = v.at(2);
+int Integrator::bdae_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t* z,
+    const bvec_t* p, const bvec_t* u, const bvec_t* rx, const bvec_t* rp,
+    bvec_t* adj_x, bvec_t* adj_z) const {
+  // Evaluate nondifferentiated
+  m->arg[BDYN_T] = nullptr;  // t
+  m->arg[BDYN_X] = x;  // x
+  m->arg[BDYN_Z] = z;  // z
+  m->arg[BDYN_P] = p;  // p
+  m->arg[BDYN_U] = u;  // u
+  m->arg[BDYN_OUT_ODE] = nullptr;  // out_ode
+  m->arg[BDYN_OUT_ALG] = nullptr;  // out_alg
+  m->arg[BDYN_OUT_QUAD] = nullptr;  // out_quad
+  m->arg[BDYN_ADJ_ODE] = rx;  // adj_ode
+  m->arg[BDYN_ADJ_ALG] = nullptr;  // adj_alg
+  m->arg[BDYN_ADJ_QUAD] = rp;  // adj_quad
+  m->res[BDAE_ADJ_X] = adj_x;  // adj_x
+  m->res[BDAE_ADJ_Z] = adj_z;  // adj_z
+  if (calc_sp_forward("daeB", m->arg, m->res, m->iw, m->w)) return 1;
+  // Evaluate sensitivities
+  for (casadi_int i = 0; i < nfwd_; ++i) {
+    m->arg[BDYN_NUM_IN + BDAE_ADJ_X] = adj_x;  // out:adj_x
+    m->arg[BDYN_NUM_IN + BDAE_ADJ_Z] = adj_z;  // out:adj_z
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_T] = nullptr;  // fwd:t
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_X] = x + (i + 1) * nx1_;  // fwd:x
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_Z] = z + (i + 1) * nz1_;  // fwd:z
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_P] = p + (i + 1) * np1_;  // fwd:p
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_U] = u + (i + 1) * nu1_;  // fwd:u
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_OUT_ODE] = nullptr;  // fwd:out_ode
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_OUT_ALG] = nullptr;  // fwd:out_alg
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_OUT_QUAD] = nullptr;  // fwd:out_quad
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_ADJ_ODE]
+      = rx + (i + 1) * nrx1_ * nadj_;  // fwd:adj_ode
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_ADJ_ALG] = nullptr;  // fwd:adj_alg
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_ADJ_QUAD]
+      = rp + (i + 1) * nrz1_ * nadj_;  // fwd:adj_quad
+    m->res[BDAE_ADJ_X] = adj_x + (i + 1) * nrx1_ * nadj_;  // fwd:adj_x
+    m->res[BDAE_ADJ_Z] = adj_z + (i + 1) * nrz1_ * nadj_;  // fwd:adj_z
+    if (calc_sp_forward(forward_name("daeB", 1), m->arg, m->res, m->iw, m->w)) return 1;
   }
+  return 0;
+}
 
-  return ret;
+int Integrator::bquad_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t* z,
+    const bvec_t* p, const bvec_t* u, const bvec_t* rx, const bvec_t* rz, const bvec_t* rp,
+    bvec_t* adj_p, bvec_t* adj_u) const {
+  // Evaluate nondifferentiated
+  m->arg[BDYN_T] = nullptr;  // t
+  m->arg[BDYN_X] = x;  // x
+  m->arg[BDYN_Z] = z;  // z
+  m->arg[BDYN_P] = p;  // p
+  m->arg[BDYN_U] = u;  // u
+  m->arg[BDYN_OUT_ODE] = nullptr;  // out_ode
+  m->arg[BDYN_OUT_ALG] = nullptr;  // out_alg
+  m->arg[BDYN_OUT_QUAD] = nullptr;  // out_quad
+  m->arg[BDYN_ADJ_ODE] = rx;  // adj_ode
+  m->arg[BDYN_ADJ_ALG] = rz;  // adj_alg
+  m->arg[BDYN_ADJ_QUAD] = rp;  // adj_quad
+  m->res[BQUAD_ADJ_P] = adj_p;  // adj_p
+  m->res[BQUAD_ADJ_U] = adj_u;  // adj_u
+  if (calc_sp_forward("quadB", m->arg, m->res, m->iw, m->w)) return 1;
+  // Evaluate sensitivities
+  for (casadi_int i = 0; i < nfwd_; ++i) {
+    m->arg[BDYN_NUM_IN + BQUAD_ADJ_P] = adj_p;  // out:adj_p
+    m->arg[BDYN_NUM_IN + BQUAD_ADJ_U] = adj_u;  // out:adj_u
+    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_T] = nullptr;  // fwd:t
+    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_X] = x + (i + 1) * nx1_;  // fwd:x
+    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_Z] = z + (i + 1) * nz1_;  // fwd:z
+    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_P] = p + (i + 1) * np1_;  // fwd:p
+    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_U] = u + (i + 1) * nu1_;  // fwd:u
+    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_OUT_ODE] = nullptr;  // fwd:out_ode
+    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_OUT_ALG] = nullptr;  // fwd:out_alg
+    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_OUT_QUAD] = nullptr;  // fwd:out_quad
+    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_ADJ_ODE] =
+      rx + (i + 1) * nrx1_ * nadj_;  // fwd:adj_ode
+    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_ADJ_ALG] =
+      rz + (i + 1) * nrz1_ * nadj_;  // fwd:adj_alg
+    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_ADJ_QUAD] =
+      rp + (i + 1) * nrp1_ * nadj_;  // fwd:adj_quad
+    m->res[BQUAD_ADJ_P] = adj_p ? adj_p + (i + 1) * nrq1_ * nadj_ : 0;  // fwd:adj_p
+    m->res[BQUAD_ADJ_U] = adj_u ? adj_u + (i + 1) * nuq1_ * nadj_: 0;  // fwd:adj_u
+    if (calc_sp_forward(forward_name("quadB", 1), m->arg, m->res, m->iw, m->w)) return 1;
+  }
+  return 0;
 }
 
 int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
@@ -737,18 +866,18 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
   const bvec_t* x0 = arg[INTEGRATOR_X0];
   const bvec_t* p = arg[INTEGRATOR_P];
   const bvec_t* u = arg[INTEGRATOR_U];
-  const bvec_t* rx0 = arg[INTEGRATOR_RX0];
-  const bvec_t* rp = arg[INTEGRATOR_RP];
+  const bvec_t* rx0 = arg[INTEGRATOR_ADJ_XF];
+  const bvec_t* rp = arg[INTEGRATOR_ADJ_QF];
   arg += n_in_;
 
   // Outputs
   bvec_t* xf = res[INTEGRATOR_XF];
   bvec_t* zf = res[INTEGRATOR_ZF];
   bvec_t* qf = res[INTEGRATOR_QF];
-  bvec_t* rxf = res[INTEGRATOR_RXF];
-  bvec_t* rzf = res[INTEGRATOR_RZF];
-  bvec_t* rqf = res[INTEGRATOR_RQF];
-  bvec_t* uqf = res[INTEGRATOR_UQF];
+  bvec_t* rxf = res[INTEGRATOR_ADJ_X0];
+  bvec_t* rzf = res[INTEGRATOR_ADJ_Z0];
+  bvec_t* rqf = res[INTEGRATOR_ADJ_P];
+  bvec_t* uqf = res[INTEGRATOR_ADJ_U];
   res += n_out_;
 
   // Work vectors
@@ -760,24 +889,21 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
   bvec_t *rx_prev = w; w += nrx_;
   bvec_t *rq = w; w += nrq_;
 
+  // Memory struct for function calls below
+  SpForwardMem m = {arg, res, iw, w};
+
   // Copy initial guess to x_prev
   std::copy_n(x0, nx_, x_prev);
 
   // Propagate forward
   for (casadi_int k = 0; k < nt(); ++k) {
     // Propagate through DAE function
-    std::fill(arg, arg + DYN_NUM_IN, nullptr);
-    arg[DYN_X] = x_prev;
-    arg[DYN_P] = p;
-    arg[DYN_U] = u;
-    std::fill(res, res + DYN_NUM_OUT, nullptr);
-    res[DYN_ODE] = x;
-    res[DYN_ALG] = z;
-    oracle_(arg, res, iw, w, 0);
+    if (fdae_sp_forward(&m, x_prev, p, u, x, z)) return 1;
     for (casadi_int i = 0; i < nx_; ++i) x[i] |= x_prev[i];
 
     // "Solve" in order to resolve interdependencies (cf. Rootfinder)
-    std::copy_n(x, nx_ + nz_, w);
+    std::copy_n(x, nx_, w);
+    std::copy_n(z, nz_, w + nx_);
     std::fill_n(x, nx_ + nz_, 0);
     sp_jac_dae_.spsolve(x, w, false);
 
@@ -787,11 +913,7 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
 
     // Propagate to quadratures
     if (nq_ > 0 && qf) {
-      arg[DYN_X] = x;
-      arg[DYN_Z] = z;
-      res[DYN_ODE] = res[DYN_ALG] = nullptr;
-      res[DYN_QUAD] = qf;
-      if (oracle_(arg, res, iw, w, 0)) return 1;
+      if (fquad_sp_forward(&m, x, z, p, u, qf)) return 1;
     }
 
     // Shift time
@@ -805,7 +927,7 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
   if (nrx_ > 0) {
     // Clear rx_prev, rqf
     std::fill_n(rx_prev, nrx_, 0);
-    std::fill_n(rqf, nrq_, 0);
+    if (rqf) std::fill_n(rqf, nrq_, 0);
 
     // Take rx0, rp, uqf past the last grid point
     if (rx0) rx0 += nrx_ * nt();
@@ -826,17 +948,7 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
       }
 
       // Propagate through DAE function
-      std::fill(arg, arg + DYN_NUM_IN, nullptr);
-      arg[DYN_X] = x;
-      arg[DYN_P] = p;
-      arg[DYN_U] = u;
-      arg[DYN_Z] = z;
-      arg[DYN_RX] = rx_prev;
-      arg[DYN_RP] = rp;
-      std::fill(res, res + DYN_NUM_OUT, nullptr);
-      res[DYN_RODE] = rx;
-      res[DYN_RALG] = rz;
-      oracle_(arg, res, iw, w, 0);
+      if (bdae_sp_forward(&m, x, z, p, u, rx_prev, rp, rx, rz)) return 1;
       for (casadi_int i = 0; i < nrx_; ++i) rx[i] |= rx_prev[i];
 
       // "Solve" in order to resolve interdependencies (cf. Rootfinder)
@@ -846,12 +958,7 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
 
       // Propagate to quadratures
       if ((nrq_ > 0 && rqf) || (nuq_ > 0 && uqf)) {
-        arg[DYN_RX] = rx;
-        arg[DYN_RZ] = rz;
-        res[DYN_RODE] = res[DYN_RALG] = nullptr;
-        res[DYN_RQUAD] = rq;
-        res[DYN_UQUAD] = uqf;
-        if (oracle_(arg, res, iw, w, 0)) return 1;
+        if (bquad_sp_forward(&m, x, z, p, u, rx, rz, rp, rq, uqf)) return 1;
         // Sum contributions to rqf
         if (rqf) {
           for (casadi_int i = 0; i < nrq_; ++i) rqf[i] |= rq[i];
@@ -869,6 +976,146 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
   return 0;
 }
 
+int Integrator::fdae_sp_reverse(SpReverseMem* m, bvec_t* x,
+    bvec_t* p, bvec_t* u, bvec_t* ode, bvec_t* alg) const {
+  // Nondifferentiated inputs
+  m->arg[DYN_T] = nullptr;  // t
+  m->arg[DYN_X] = x;  // x
+  m->arg[DYN_Z] = nullptr;  // z
+  m->arg[DYN_P] = p;  // p
+  m->arg[DYN_U] = u;  // u
+  // Propagate through sensitivities
+  for (casadi_int i = 0; i < nfwd_; ++i) {
+    m->res[DAE_ODE] = ode + (i + 1) * nx1_;  // fwd:ode
+    m->res[DAE_ALG] = alg + (i + 1) * nz1_;  // fwd:alg
+    m->arg[DYN_NUM_IN + DAE_ODE] = ode;  // out:ode
+    m->arg[DYN_NUM_IN + DAE_ALG] = alg;  // out:alg
+    m->arg[DYN_NUM_IN + DAE_NUM_OUT + DYN_T] = nullptr;  // fwd:t
+    m->arg[DYN_NUM_IN + DAE_NUM_OUT + DYN_X] = x + (i + 1) * nx1_;  // fwd:x
+    m->arg[DYN_NUM_IN + DAE_NUM_OUT + DYN_Z] = nullptr;  // fwd:z
+    m->arg[DYN_NUM_IN + DAE_NUM_OUT + DYN_P] = p + (i + 1) * np1_;  // fwd:p
+    m->arg[DYN_NUM_IN + DAE_NUM_OUT + DYN_U] = u + (i + 1) * nu1_;  // fwd:u
+    if (calc_sp_reverse(forward_name("daeF", 1), m->arg, m->res, m->iw, m->w)) return 1;
+  }
+  // Propagate through nondifferentiated
+  m->res[DAE_ODE] = ode;  // ode
+  m->res[DAE_ALG] = alg;  // alg
+  if (calc_sp_reverse("daeF", m->arg, m->res, m->iw, m->w)) return 1;
+  return 0;
+}
+
+int Integrator::fquad_sp_reverse(SpReverseMem* m, bvec_t* x, bvec_t* z,
+    bvec_t* p, bvec_t* u, bvec_t* quad) const {
+  // Nondifferentiated inputs
+  m->arg[DYN_T] = nullptr;  // t
+  m->arg[DYN_X] = x;  // x
+  m->arg[DYN_Z] = z;  // z
+  m->arg[DYN_P] = p;  // p
+  m->arg[DYN_U] = u;  // u
+  // Propagate through sensitivities
+  for (casadi_int i = 0; i < nfwd_; ++i) {
+    m->res[QUAD_QUAD] = quad + (i + 1) * nq1_;  // fwd:quad
+    m->arg[DYN_NUM_IN + QUAD_QUAD] = quad;  // out:quad
+    m->arg[DYN_NUM_IN + QUAD_NUM_OUT + DYN_T] = nullptr;  // fwd:t
+    m->arg[DYN_NUM_IN + QUAD_NUM_OUT + DYN_X] = x + (i + 1) * nx1_;  // fwd:x
+    m->arg[DYN_NUM_IN + QUAD_NUM_OUT + DYN_Z] = z + (i + 1) * nz1_;  // fwd:z
+    m->arg[DYN_NUM_IN + QUAD_NUM_OUT + DYN_P] = p + (i + 1) * np1_;  // fwd:p
+    m->arg[DYN_NUM_IN + QUAD_NUM_OUT + DYN_U] = u + (i + 1) * nu1_;  // fwd:u
+    if (calc_sp_reverse(forward_name("quadF", 1), m->arg, m->res, m->iw, m->w)) return 1;
+  }
+  // Propagate through nondifferentiated
+  m->res[QUAD_QUAD] = quad;  // quad
+  if (calc_sp_reverse("quadF", m->arg, m->res, m->iw, m->w)) return 1;
+  return 0;
+}
+
+int Integrator::bdae_sp_reverse(SpReverseMem* m, bvec_t* x, bvec_t* z,
+    bvec_t* p, bvec_t* u, bvec_t* rx, bvec_t* rp,
+    bvec_t* adj_x, bvec_t* adj_z) const {
+  // Nondifferentiated inputs
+  m->arg[BDYN_T] = nullptr;  // t
+  m->arg[BDYN_X] = x;  // x
+  m->arg[BDYN_Z] = z;  // z
+  m->arg[BDYN_P] = p;  // p
+  m->arg[BDYN_U] = u;  // u
+  m->arg[BDYN_OUT_ODE] = nullptr;  // out_ode
+  m->arg[BDYN_OUT_ALG] = nullptr;  // out_alg
+  m->arg[BDYN_OUT_QUAD] = nullptr;  // out_quad
+  m->arg[BDYN_ADJ_ODE] = rx;  // adj_ode
+  m->arg[BDYN_ADJ_ALG] = nullptr;  // adj_alg
+  m->arg[BDYN_ADJ_QUAD] = rp;  // adj_quad
+  // Propagate through sensitivities
+  for (casadi_int i = 0; i < nfwd_; ++i) {
+    m->res[BDAE_ADJ_X] = adj_x + (i + 1) * nrx1_ * nadj_;  // fwd:adj_x
+    m->res[BDAE_ADJ_Z] = adj_z + (i + 1) * nrz1_ * nadj_;  // fwd:adj_z
+    m->arg[BDYN_NUM_IN + BDAE_ADJ_X] = adj_x;  // out:adj_x
+    m->arg[BDYN_NUM_IN + BDAE_ADJ_Z] = adj_z;  // out:adj_z
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_T] = nullptr;  // fwd:t
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_X] = x + (i + 1) * nx1_;  // fwd:x
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_Z] = z + (i + 1) * nz1_;  // fwd:z
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_P] = p + (i + 1) * np1_;  // fwd:p
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_U] = u + (i + 1) * nu1_;  // fwd:u
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_OUT_ODE] = nullptr;  // fwd:out_ode
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_OUT_ALG] = nullptr;  // fwd:out_alg
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_OUT_QUAD] = nullptr;  // fwd:out_quad
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_ADJ_ODE] =
+      rx + (i + 1) * nrx1_ * nadj_;  // fwd:adj_ode
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_ADJ_ALG] = nullptr;  // fwd:adj_alg
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_ADJ_QUAD] =
+      rp + (i + 1) * nrz1_ * nadj_;  // fwd:adj_quad
+    if (calc_sp_reverse(forward_name("daeB", 1), m->arg, m->res, m->iw, m->w)) return 1;
+  }
+  // Propagate through nondifferentiated
+  m->res[BDAE_ADJ_X] = adj_x;  // adj_x
+  m->res[BDAE_ADJ_Z] = adj_z;  // adj_z
+  if (calc_sp_reverse("daeB", m->arg, m->res, m->iw, m->w)) return 1;
+  return 0;
+}
+
+int Integrator::bquad_sp_reverse(SpReverseMem* m, bvec_t* x, bvec_t* z,
+    bvec_t* p, bvec_t* u, bvec_t* rx, bvec_t* rz, bvec_t* rp,
+    bvec_t* adj_p, bvec_t* adj_u) const {
+  // Nondifferentiated inputs
+  m->arg[BDYN_T] = nullptr;  // t
+  m->arg[BDYN_X] = x;  // x
+  m->arg[BDYN_Z] = z;  // z
+  m->arg[BDYN_P] = p;  // p
+  m->arg[BDYN_U] = u;  // u
+  m->arg[BDYN_OUT_ODE] = rx;  // out_ode
+  m->arg[BDYN_OUT_ALG] = rz;  // out_alg
+  m->arg[BDYN_OUT_QUAD] = rp;  // out_quad
+  m->arg[BDYN_ADJ_ODE] = rx;  // adj_ode
+  m->arg[BDYN_ADJ_ALG] = rz;  // adj_alg
+  m->arg[BDYN_ADJ_QUAD] = rp;  // adj_quad
+  // Propagate through sensitivities
+  for (casadi_int i = 0; i < nfwd_; ++i) {
+    m->res[BQUAD_ADJ_P] = adj_p ? adj_p + (i + 1) * nrq1_ * nadj_ : 0;  // fwd:adj_p
+    m->res[BQUAD_ADJ_U] = adj_u ? adj_u + (i + 1) * nuq1_ * nadj_ : 0;  // fwd:adj_u
+    m->arg[BDYN_NUM_IN + BQUAD_ADJ_P] = adj_p;  // out:adj_p
+    m->arg[BDYN_NUM_IN + BQUAD_ADJ_U] = adj_u;  // out:adj_u
+    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_T] = nullptr;  // fwd:t
+    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_X] = x + (i + 1) * nx1_;  // fwd:x
+    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_Z] = z + (i + 1) * nz1_;  // fwd:z
+    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_P] = p + (i + 1) * np1_;  // fwd:p
+    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_U] = u + (i + 1) * nu1_;  // fwd:u
+    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_OUT_ODE] = nullptr;  // fwd:out_ode
+    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_OUT_ALG] = nullptr;  // fwd:out_alg
+    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_OUT_QUAD] = nullptr;  // fwd:out_quad
+    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_ADJ_ODE] =
+      rx + (i + 1) * nrx1_ * nadj_;  // fwd:adj_ode
+    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_ADJ_ALG] =
+      rz + (i + 1) * nrz1_ * nadj_;  // fwd:adj_alg
+    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_ADJ_QUAD] =
+      rp + (i + 1) * nrp1_ * nadj_;  // fwd:adj_quad
+    if (calc_sp_reverse(forward_name("quadB", 1), m->arg, m->res, m->iw, m->w)) return 1;
+  }
+  // Propagate through nondifferentiated
+  m->res[BQUAD_ADJ_P] = adj_p;  // adj_p
+  m->res[BQUAD_ADJ_U] = adj_u;  // adj_u
+  if (calc_sp_reverse("quadB", m->arg, m->res, m->iw, m->w)) return 1;
+  return 0;
+}
+
 int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
     casadi_int* iw, bvec_t* w, void* mem) const {
   if (verbose_) casadi_message(name_ + "::sp_reverse");
@@ -877,18 +1124,18 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
   bvec_t* x0 = arg[INTEGRATOR_X0];
   bvec_t* p = arg[INTEGRATOR_P];
   bvec_t* u = arg[INTEGRATOR_U];
-  bvec_t* rx0 = arg[INTEGRATOR_RX0];
-  bvec_t* rp = arg[INTEGRATOR_RP];
+  bvec_t* rx0 = arg[INTEGRATOR_ADJ_XF];
+  bvec_t* rp = arg[INTEGRATOR_ADJ_QF];
   arg += n_in_;
 
   // Outputs
   bvec_t* xf = res[INTEGRATOR_XF];
   bvec_t* zf = res[INTEGRATOR_ZF];
   bvec_t* qf = res[INTEGRATOR_QF];
-  bvec_t* rxf = res[INTEGRATOR_RXF];
-  bvec_t* rzf = res[INTEGRATOR_RZF];
-  bvec_t* rqf = res[INTEGRATOR_RQF];
-  bvec_t* uqf = res[INTEGRATOR_UQF];
+  bvec_t* rxf = res[INTEGRATOR_ADJ_X0];
+  bvec_t* rzf = res[INTEGRATOR_ADJ_Z0];
+  bvec_t* rqf = res[INTEGRATOR_ADJ_P];
+  bvec_t* uqf = res[INTEGRATOR_ADJ_U];
   res += n_out_;
 
   // Work vectors
@@ -899,6 +1146,9 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
   bvec_t *rz = w; w += nrz_;
   bvec_t *rx_prev = w; w += nrx_;
   bvec_t *rq = w; w += nrq_;
+
+  // Memory struct for function calls below
+  SpReverseMem m = {arg, res, iw, w};
 
   // Clear state vector
   std::fill_n(x, nx_, 0);
@@ -920,12 +1170,12 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
     }
 
     // Save rqf: See note below
-    std::copy_n(rqf, nrq_, rq);
+    if (rqf) std::copy_n(rqf, nrq_, rq);
 
     // Step backwards through backward problem
     for (casadi_int k = 0; k < nt(); ++k) {
       // Restore rqf: See note below
-      std::copy_n(rq, nrq_, rqf);
+      if (rqf) std::copy_n(rq, nrq_, rqf);
 
       // Add impulse from rx0
       if (rx0) {
@@ -934,19 +1184,8 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
       }
 
       // Get dependencies from backward quadratures
-      std::fill(res, res + DYN_NUM_OUT, nullptr);
-      res[DYN_RQUAD] = rqf;  // Note: will set rqf to zero, hence the restoration step above
-      res[DYN_UQUAD] = uqf;
-      std::fill(arg, res + DYN_NUM_IN, nullptr);
-      arg[DYN_X] = x;
-      arg[DYN_Z] = z;
-      arg[DYN_P] = p;
-      arg[DYN_U] = u;
-      arg[DYN_RX] = rx;
-      arg[DYN_RZ] = rz;
-      arg[DYN_RP] = rp;
       if ((nrq_ > 0 && rqf) || (nuq_ > 0 && uqf)) {
-        if (oracle_.rev(arg, res, iw, w, 0)) return 1;
+        if (bquad_sp_reverse(&m, x, z, p, u, rx, rz, rp, rqf, uqf)) return 1;
       }
 
       // Propagate interdependencies
@@ -958,13 +1197,7 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
       std::copy_n(rx, nrx_, rx_prev);
 
       // Indirect dependency via g
-      res[DYN_RODE] = rx;
-      res[DYN_RALG] = rz;
-      res[DYN_RQUAD] = nullptr;
-      res[DYN_UQUAD] = nullptr;
-      arg[DYN_RX] = rx_prev;
-      arg[DYN_RZ] = nullptr; // INTEGRATOR_RZ0 is a guess, not a dependency
-      if (oracle_.rev(arg, res, iw, w, 0)) return 1;
+      if (bdae_sp_reverse(&m, x, z, p, u, rx_prev, rp, rx, rz)) return 1;
 
       // Update rx, rz
       std::copy_n(rx_prev, nrx_, rx);
@@ -1005,15 +1238,8 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
     }
 
     // Get dependencies from forward quadratures, if any
-    std::fill(res, res + DYN_NUM_OUT, nullptr);
-    res[DYN_QUAD] = qf;
-    std::fill(arg, arg + DYN_NUM_IN, nullptr);
-    arg[DYN_X] = x;
-    arg[DYN_Z] = z;
-    arg[DYN_P] = p;
-    arg[DYN_U] = u;
     if (nq_ > 0 && qf) {
-      if (oracle_.rev(arg, res, iw, w, 0)) return 1;
+      if (fquad_sp_reverse(&m, x, z, p, u, qf)) return 1;
     }
 
     // Propagate interdependencies
@@ -1025,12 +1251,7 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
     std::copy_n(x, nx_, x_prev);
 
     // Indirect dependency through f
-    res[DYN_ODE] = x;
-    res[DYN_ALG] = z;
-    res[DYN_QUAD] = nullptr;
-    arg[DYN_X] = x_prev;
-    arg[DYN_Z] = nullptr; // INTEGRATOR_Z0 is a guess, no dependency
-    if (oracle_.rev(arg, res, iw, w, 0)) return 1;
+    if (fdae_sp_reverse(&m, x_prev, p, u, x, z)) return 1;
 
     // Update x, z
     std::copy_n(x_prev, nx_, x);
@@ -1045,11 +1266,10 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
   return 0;
 }
 
-Function Integrator::
-get_forward(casadi_int nfwd, const std::string& name,
-            const std::vector<std::string>& inames,
-            const std::vector<std::string>& onames,
-            const Dict& opts) const {
+Function Integrator::get_forward(casadi_int nfwd, const std::string& name,
+    const std::vector<std::string>& inames,
+    const std::vector<std::string>& onames,
+    const Dict& opts) const {
   if (verbose_) casadi_message(name_ + "::get_forward");
 
   // Integrator options
@@ -1058,19 +1278,16 @@ get_forward(casadi_int nfwd, const std::string& name,
     aug_opts[i.first] = i.second;
   }
 
+  // Get current DAE, with any existing sensitivity equations augmented
+  Function this_dae = augmented_dae();
+
   // Create integrator for augmented DAE
-  Function aug_dae;
   std::string aug_prefix = "fsens" + str(nfwd) + "_";
-  std::string dae_name = aug_prefix + oracle_.name();
-  Dict dae_opts = {{"derivative_of", oracle_}};
-  if (oracle_.is_a("SXFunction")) {
-    aug_dae = map2oracle(dae_name, aug_fwd<SX>(nfwd));
-  } else {
-    aug_dae = map2oracle(dae_name, aug_fwd<MX>(nfwd));
-  }
   aug_opts["derivative_of"] = self();
+  aug_opts["nfwd"] = nfwd;
+  aug_opts["nadj"] = nadj_;
   Function aug_int = integrator(aug_prefix + name_, plugin_name(),
-    aug_dae, t0_, tout_, aug_opts);
+    this_dae, t0_, tout_, aug_opts);
 
   // All inputs of the return function
   std::vector<MX> ret_in;
@@ -1116,13 +1333,14 @@ get_forward(casadi_int nfwd, const std::string& name,
           v.push_back(aug_in_split[d].at(k));
         }
       }
-      integrator_in[i] = horzcat(v);
     } else {
       // No reordering necessary
       v = aug_in[i];
       v.insert(v.begin(), ret_in[i]);
-      integrator_in[i] = horzcat(v);
     }
+    // Flatten all elements
+    for (MX& e : v) e = vec(e);
+    integrator_in[i] = horzcat(v);
   }
   std::vector<MX> integrator_out = aug_int(integrator_in);
 
@@ -1138,7 +1356,8 @@ get_forward(casadi_int nfwd, const std::string& name,
         offset.push_back(offset.back() + size2_out(i) / n_grid);
       }
     }
-    std::vector<MX> integrator_out_split = horzsplit(integrator_out[i], offset);
+    std::vector<MX> integrator_out_split = horzsplit(
+      reshape(integrator_out[i], size1_out(i), offset.back()), offset);
     // Collect sensitivity blocks in the right order
     std::vector<MX> ret_out_split;
     ret_out_split.reserve(n_grid * nfwd);
@@ -1150,15 +1369,17 @@ get_forward(casadi_int nfwd, const std::string& name,
     ret_out.push_back(horzcat(ret_out_split));
   }
 
+  Dict options = opts;
+  options["allow_duplicate_io_names"] = true;
+
   // Create derivative function and return
-  return Function(name, ret_in, ret_out, inames, onames, opts);
+  return Function(name, ret_in, ret_out, inames, onames, options);
 }
 
-Function Integrator::
-get_reverse(casadi_int nadj, const std::string& name,
-            const std::vector<std::string>& inames,
-            const std::vector<std::string>& onames,
-            const Dict& opts) const {
+Function Integrator::get_reverse(casadi_int nadj, const std::string& name,
+    const std::vector<std::string>& inames,
+    const std::vector<std::string>& onames,
+    const Dict& opts) const {
   if (verbose_) casadi_message(name_ + "::get_reverse");
 
   // Integrator options
@@ -1167,18 +1388,23 @@ get_reverse(casadi_int nadj, const std::string& name,
     aug_opts[i.first] = i.second;
   }
 
+  // Get the current oracle, augmented with any existing forward sensitivity equations
+  Function this_dae = augmented_dae();
+
   // Create integrator for augmented DAE
-  Function aug_dae;
   std::string aug_prefix = "asens" + str(nadj) + "_";
-  std::string dae_name = aug_prefix + oracle_.name();
-  if (oracle_.is_a("SXFunction")) {
-    aug_dae = map2oracle(dae_name, aug_adj<SX>(nadj));
-  } else {
-    aug_dae = map2oracle(dae_name, aug_adj<MX>(nadj));
-  }
   aug_opts["derivative_of"] = self();
+  if (nrx_ == 0) {
+    // Add backward problem
+    aug_opts["nadj"] = nadj;
+    aug_opts["nfwd"] = 0;
+  } else {
+    // Reformulate as forward-over-reverse
+    aug_opts["nfwd"] = nadj;
+    aug_opts["nadj"] = nadj_;
+  }
   Function aug_int = integrator(aug_prefix + name_, plugin_name(),
-    aug_dae, t0_, tout_, aug_opts);
+    this_dae, t0_, tout_, aug_opts);
 
   // All inputs of the return function
   std::vector<MX> ret_in;
@@ -1241,7 +1467,7 @@ get_reverse(casadi_int nadj, const std::string& name,
         v.push_back(aug_in_split[d].at(k));
       }
     }
-    integrator_in[i] = reshape(vertcat(v), -1, n_grid);
+    integrator_in[i] = reshape(vertcat(v), aug_int.size_in(i));
   }
   std::vector<MX> integrator_out = aug_int(integrator_in);
 
@@ -1254,9 +1480,9 @@ get_reverse(casadi_int nadj, const std::string& name,
     casadi_int n_grid = grid_out(j) ? nt() : 1;
     std::vector<casadi_int> offset = {0};
     for (casadi_int k = 0; k < n_grid; ++k) {
-      offset.push_back(offset.back() + size1_out(j));
+      offset.push_back(offset.back() + numel_out(j) / n_grid);
       for (casadi_int d = 0; d < nadj; ++d) {
-        offset.push_back(offset.back() + size1_in(i));
+        offset.push_back(offset.back() + numel_in(i) / n_grid);
       }
     }
     std::vector<MX> integrator_out_split = vertsplit(vec(integrator_out[j]), offset);
@@ -1272,8 +1498,11 @@ get_reverse(casadi_int nadj, const std::string& name,
     ret_out.push_back(horzcat(ret_out_split));
   }
 
+  Dict options = opts;
+  options["allow_duplicate_io_names"] = true;
+
   // Create derivative function and return
-  return Function(name, ret_in, ret_out, inames, onames, opts);
+  return Function(name, ret_in, ret_out, inames, onames, options);
 }
 
 Dict Integrator::getDerivativeOptions(bool fwd) const {
@@ -1281,40 +1510,56 @@ Dict Integrator::getDerivativeOptions(bool fwd) const {
   return opts_;
 }
 
+Sparsity Integrator::sp_jac_aug(const Sparsity& J, const Sparsity& J1) const {
+  // Row 1, column 2 in the augmented Jacobian
+  Sparsity J12(J.size1(), nfwd_ * J.size2());
+  // Row 2, column 1 in the augmented Jacobian
+  Sparsity J21 = vertcat(std::vector<Sparsity>(nfwd_, J1));
+  // Row 2, column 2 in the augmented Jacobian
+  Sparsity J22 = diagcat(std::vector<Sparsity>(nfwd_, J));
+  // Form block matrix
+  return blockcat(J, J12, J21, J22);
+}
+
+
 Sparsity Integrator::sp_jac_dae() {
-  // Start with the sparsity pattern of the ODE part
-  Sparsity jac_ode_x = oracle_.jac_sparsity(DYN_ODE, DYN_X);
-
-  // Add diagonal to get interdependencies
-  jac_ode_x = jac_ode_x + Sparsity::diag(nx_);
-
-  // Quick return if no algebraic variables
-  if (nz_==0) return jac_ode_x;
-
-  // Add contribution from algebraic variables and equations
-  Sparsity jac_ode_z = oracle_.jac_sparsity(DYN_ODE, DYN_Z);
-  Sparsity jac_alg_x = oracle_.jac_sparsity(DYN_ALG, DYN_X);
-  Sparsity jac_alg_z = oracle_.jac_sparsity(DYN_ALG, DYN_Z);
-  return blockcat(jac_ode_x, jac_ode_z,
-                  jac_alg_x, jac_alg_z);
+  // Get the functions
+  const Function& F = get_function("daeF");
+  // Sparsity pattern for nonaugmented system
+  Sparsity J_xx = F.jac_sparsity(DAE_ODE, DYN_X) + Sparsity::diag(nx1_);
+  Sparsity J_xz = F.jac_sparsity(DAE_ODE, DYN_Z);
+  Sparsity J_zx = F.jac_sparsity(DAE_ALG, DYN_X);
+  Sparsity J_zz = F.jac_sparsity(DAE_ALG, DYN_Z);
+  // Augment with sensitivity equations
+  if (nfwd_ > 0) {
+    const Function& fwd_F = get_function(forward_name("daeF", 1));
+    J_xx = sp_jac_aug(J_xx, fwd_F.jac_sparsity(DAE_ODE, DYN_X));
+    J_xz = sp_jac_aug(J_xz, fwd_F.jac_sparsity(DAE_ODE, DYN_Z));
+    J_zx = sp_jac_aug(J_zx, fwd_F.jac_sparsity(DAE_ALG, DYN_X));
+    J_zz = sp_jac_aug(J_zz, fwd_F.jac_sparsity(DAE_ALG, DYN_Z));
+  }
+  // Assemble the block matrix
+  return blockcat(J_xx, J_xz, J_zx, J_zz);
 }
 
 Sparsity Integrator::sp_jac_rdae() {
-  // Start with the sparsity pattern of the ODE part
-  Sparsity jac_ode_x = oracle_.jac_sparsity(DYN_RODE, DYN_RX);
-
-  // Add diagonal to get interdependencies
-  jac_ode_x = jac_ode_x + Sparsity::diag(nrx_);
-
-  // Quick return if no algebraic variables
-  if (nrz_==0) return jac_ode_x;
-
-  // Add contribution from algebraic variables and equations
-  Sparsity jac_ode_z = oracle_.jac_sparsity(DYN_RODE, DYN_RZ);
-  Sparsity jac_alg_x = oracle_.jac_sparsity(DYN_RALG, DYN_RX);
-  Sparsity jac_alg_z = oracle_.jac_sparsity(DYN_RALG, DYN_RZ);
-  return blockcat(jac_ode_x, jac_ode_z,
-                  jac_alg_x, jac_alg_z);
+  // Get the functions
+  const Function& G = get_function("daeB");
+  // Sparsity pattern for nonaugmented system
+  Sparsity J_xx = G.jac_sparsity(BDAE_ADJ_X, BDYN_ADJ_ODE) + Sparsity::diag(nrx1_ * nadj_);
+  Sparsity J_xz = G.jac_sparsity(BDAE_ADJ_X, BDYN_ADJ_ALG);
+  Sparsity J_zx = G.jac_sparsity(BDAE_ADJ_Z, BDYN_ADJ_ODE);
+  Sparsity J_zz = G.jac_sparsity(BDAE_ADJ_Z, BDYN_ADJ_ALG);
+  // Augment with sensitivity equations
+  if (nfwd_ > 0) {
+    const Function& fwd_G = get_function(forward_name("daeB", 1));
+    J_xx = sp_jac_aug(J_xx, fwd_G.jac_sparsity(BDAE_ADJ_X, BDYN_ADJ_ODE));
+    J_xz = sp_jac_aug(J_xz, fwd_G.jac_sparsity(BDAE_ADJ_X, BDYN_ADJ_ALG));
+    J_zx = sp_jac_aug(J_zx, fwd_G.jac_sparsity(BDAE_ADJ_Z, BDYN_ADJ_ODE));
+    J_zz = sp_jac_aug(J_zz, fwd_G.jac_sparsity(BDAE_ADJ_Z, BDYN_ADJ_ALG));
+  }
+  // Assemble the block matrix
+  return blockcat(J_xx, J_xz, J_zx, J_zz);
 }
 
 std::map<std::string, Integrator::Plugin> Integrator::solvers_;
@@ -1358,7 +1603,7 @@ Function FixedStepIntegrator::create_advanced(const Dict& opts) {
 
   if (simplify && nrx_==0 && nt()==1) {
     // Retrieve explicit simulation step (one finite element)
-    Function F = getExplicit();
+    Function F = get_function("stepF");
 
     MX z0 = MX::sym("z0", sparsity_in(INTEGRATOR_Z0));
 
@@ -1368,9 +1613,9 @@ Function FixedStepIntegrator::create_advanced(const Dict& opts) {
     // Prepare return Function inputs
     std::vector<MX> intg_in(INTEGRATOR_NUM_IN);
     intg_in[INTEGRATOR_X0] = F_in[FSTEP_X0];
+    intg_in[INTEGRATOR_Z0] = z0;
     intg_in[INTEGRATOR_P] = F_in[FSTEP_P];
     intg_in[INTEGRATOR_U] = F_in[FSTEP_U];
-    intg_in[INTEGRATOR_Z0] = z0;
     F_in[FSTEP_V0] = algebraic_state_init(intg_in[INTEGRATOR_X0], z0);
 
     // Number of finite elements and time steps
@@ -1378,7 +1623,7 @@ Function FixedStepIntegrator::create_advanced(const Dict& opts) {
 
     // Prepare return Function outputs
     std::vector<MX> intg_out(INTEGRATOR_NUM_OUT);
-    F_in[FSTEP_T0] = t0_;
+    F_in[FSTEP_T] = t0_;
     F_in[FSTEP_H] = h;
 
     std::vector<MX> F_out;
@@ -1389,7 +1634,7 @@ Function FixedStepIntegrator::create_advanced(const Dict& opts) {
       F_in[FSTEP_X0] = F_out[FSTEP_XF];
       F_in[FSTEP_V0] = F_out[FSTEP_VF];
       intg_out[INTEGRATOR_QF] = k==0? F_out[FSTEP_QF] : intg_out[INTEGRATOR_QF]+F_out[FSTEP_QF];
-      F_in[FSTEP_T0] += h;
+      F_in[FSTEP_T] += h;
     }
 
     intg_out[INTEGRATOR_XF] = F_out[FSTEP_XF];
@@ -1415,6 +1660,10 @@ void FixedStepIntegrator::init(const Dict& opts) {
   // Call the base class init
   Integrator::init(opts);
 
+  // Instantiate functions, forward and backward problem
+  set_function(oracle_, "dae");
+  if (nadj_ > 0) set_function(rdae_, "rdae");
+
   // Read options
   for (auto&& op : opts) {
     if (op.first=="number_of_finite_elements") {
@@ -1438,11 +1687,19 @@ void FixedStepIntegrator::init(const Dict& opts) {
   }
 
   // Setup discrete time dynamics
-  setupFG();
+  setup_step();
 
   // Get discrete time dimensions
-  nv_ = F_.nnz_in(FSTEP_V0);
-  nrv_ =  G_.is_null() ? 0 : G_.nnz_in(BSTEP_RV0);
+  const Function& F = get_function(has_function("stepF") ? "stepF" : "implicit_stepF");
+  nv1_ = F.nnz_in(FSTEP_V0);
+  if (nadj_ > 0) {
+    const Function& G = get_function(has_function("stepB") ? "stepB" : "implicit_stepB");
+    nrv1_ = G.nnz_in(BSTEP_RV0);
+  } else {
+    nrv1_ = 0;
+  }
+  nv_ = nv1_ * (1 + nfwd_);
+  nrv_ = nrv1_ * (1 + nfwd_);
 
   // Work vectors, forward problem
   alloc_w(nv_, true); // v
@@ -1477,9 +1734,9 @@ void FixedStepIntegrator::set_work(void* mem, const double**& arg, double**& res
   // Work vectors, allocated in base class
   m->x = w; w += nx_;
   m->z = w; w += nz_;
+  m->x_prev = w; w += nx_;
   m->rx = w; w += nrx_;
   m->rz = w; w += nrz_;
-  m->x_prev = w; w += nx_;
   m->rx_prev = w; w += nrx_;
   m->rq = w; w += nrq_;
 
@@ -1513,7 +1770,6 @@ int FixedStepIntegrator::init_mem(void* mem) const {
   return 0;
 }
 
-
 void FixedStepIntegrator::advance(IntegratorMemory* mem,
     const double* u, double* x, double* z, double* q) const {
   auto m = static_cast<FixedStepMemory*>(mem);
@@ -1521,35 +1777,14 @@ void FixedStepIntegrator::advance(IntegratorMemory* mem,
   // Set controls
   casadi_copy(u, nu_, m->u);
 
-  // Explicit discrete time dynamics
-  const Function& F = getExplicit();
-
   // Number of finite elements and time steps
   casadi_int nj = disc_[m->k + 1] - disc_[m->k];
   double h = (m->t_next - m->t) / nj;
 
-  // Current time
-  double t;
-
-  // Discrete dynamics function inputs ...
-  std::fill_n(m->arg, F.n_in(), nullptr);
-  m->arg[FSTEP_T0] = &t;
-  m->arg[FSTEP_H] = &h;
-  m->arg[FSTEP_X0] = m->x_prev;
-  m->arg[FSTEP_V0] = m->v_prev;
-  m->arg[FSTEP_P] = m->p;
-  m->arg[FSTEP_U] = m->u;
-
-  // ... and outputs
-  std::fill_n(m->res, F.n_out(), nullptr);
-  m->res[FSTEP_XF] = m->x;
-  m->res[FSTEP_VF] = m->v;
-  m->res[FSTEP_QF] = m->q;
-
   // Take steps
   for (casadi_int j = 0; j < nj; ++j) {
-    // Update time
-    t = m->t + j * h;
+    // Current time
+    double t = m->t + j * h;
 
     // Update the previous step
     casadi_copy(m->x, nx_, m->x_prev);
@@ -1557,7 +1792,7 @@ void FixedStepIntegrator::advance(IntegratorMemory* mem,
     casadi_copy(m->q, nq_, m->q_prev);
 
     // Take step
-    F(m->arg, m->res, m->iw, m->w);
+    stepF(m, t, h, m->x_prev, m->v_prev, m->x, m->v, m->q);
     casadi_axpy(nq_, 1., m->q_prev, m->q);
 
     // Save state, if needed
@@ -1581,37 +1816,14 @@ void FixedStepIntegrator::retreat(IntegratorMemory* mem, const double* u,
   // Set controls
   casadi_copy(u, nu_, m->u);
 
-  // Explicit discrete time dynamics
-  const Function& G = getExplicitB();
-
   // Number of finite elements and time steps
   casadi_int nj = disc_[m->k + 1] - disc_[m->k];
   double h = (m->t - m->t_next) / nj;
 
-  // Current time
-  double t;
-
-  // Discrete dynamics function inputs ...
-  std::fill_n(m->arg, G.n_in(), nullptr);
-  m->arg[BSTEP_T0] = &t;
-  m->arg[BSTEP_H] = &h;
-  m->arg[BSTEP_P] = m->p;
-  m->arg[BSTEP_U] = m->u;
-  m->arg[BSTEP_RX0] = m->rx_prev;
-  m->arg[BSTEP_RV0] = m->rv_prev;
-  m->arg[BSTEP_RP] = m->rp;
-
-  // ... and outputs
-  std::fill_n(m->res, G.n_out(), nullptr);
-  m->res[BSTEP_RXF] = m->rx;
-  m->res[BSTEP_RVF] = m->rv;
-  m->res[BSTEP_RQF] = m->rq;
-  m->res[BSTEP_UQF] = m->uq;
-
   // Take steps
   for (casadi_int j = nj; j-- > 0; ) {
-    // Update time
-    t = m->t_next + j * h;
+    // Current time
+    double t = m->t_next + j * h;
 
     // Update the previous step
     casadi_copy(m->rx, nrx_, m->rx_prev);
@@ -1621,9 +1833,8 @@ void FixedStepIntegrator::retreat(IntegratorMemory* mem, const double* u,
 
     // Take step
     casadi_int tapeind = disc_[m->k] + j;
-    m->arg[BSTEP_X] = m->x_tape + nx_ * tapeind;
-    m->arg[BSTEP_V] = m->v_tape + nv_ * tapeind;
-    G(m->arg, m->res, m->iw, m->w);
+    stepB(m, t, h, m->x_tape + nx_ * tapeind, m->v_tape + nv_ * tapeind,
+      m->rx_prev, m->rv_prev, m->rx, m->rv, m->rq, m->uq);
     casadi_axpy(nrq_, 1., m->rq_prev, m->rq);
     casadi_axpy(nuq_, 1., m->uq_prev, m->uq);
   }
@@ -1635,9 +1846,84 @@ void FixedStepIntegrator::retreat(IntegratorMemory* mem, const double* u,
   casadi_copy(m->uq, nuq_, uq);
 }
 
-void FixedStepIntegrator::
-reset(IntegratorMemory* mem,
-      const double* x, const double* z, const double* p) const {
+void FixedStepIntegrator::stepF(FixedStepMemory* m, double t, double h,
+    const double* x0, const double* v0, double* xf, double* vf, double* qf) const {
+  // Evaluate nondifferentiated
+  std::fill(m->arg, m->arg + FSTEP_NUM_IN, nullptr);
+  m->arg[FSTEP_T] = &t;  // t
+  m->arg[FSTEP_H] = &h;  // h
+  m->arg[FSTEP_X0] = x0;  // x0
+  m->arg[FSTEP_V0] = v0;  // v0
+  m->arg[FSTEP_P] = m->p;  // p
+  m->arg[FSTEP_U] = m->u;  // u
+  std::fill(m->res, m->res + FSTEP_NUM_OUT, nullptr);
+  m->res[FSTEP_XF] = xf;  // xf
+  m->res[FSTEP_VF] = vf;  // vf
+  m->res[FSTEP_QF] = qf;  // qf
+  calc_function(m, "stepF");
+  // Evaluate sensitivities
+  if (nfwd_ > 0) {
+    m->arg[FSTEP_NUM_IN + FSTEP_XF] = xf;  // out:xf
+    m->arg[FSTEP_NUM_IN + FSTEP_VF] = vf;  // out:vf
+    m->arg[FSTEP_NUM_IN + FSTEP_QF] = qf;  // out:qf
+    m->arg[FSTEP_NUM_IN + FSTEP_NUM_OUT + FSTEP_T] = nullptr;  // fwd:t
+    m->arg[FSTEP_NUM_IN + FSTEP_NUM_OUT + FSTEP_H] = nullptr;  // fwd:h
+    m->arg[FSTEP_NUM_IN + FSTEP_NUM_OUT + FSTEP_X0] = x0 + nx1_;  // fwd:x0
+    m->arg[FSTEP_NUM_IN + FSTEP_NUM_OUT + FSTEP_V0] = v0 + nv1_;  // fwd:v0
+    m->arg[FSTEP_NUM_IN + FSTEP_NUM_OUT + FSTEP_P] = m->p + np1_;  // fwd:p
+    m->arg[FSTEP_NUM_IN + FSTEP_NUM_OUT + FSTEP_U] = m->u + nu1_;  // fwd:u
+    m->res[FSTEP_XF] = xf + nx1_;  // fwd:xf
+    m->res[FSTEP_VF] = vf + nv1_;  // fwd:vf
+    m->res[FSTEP_QF] = qf + nq1_;  // fwd:qf
+    calc_function(m, forward_name("stepF", nfwd_));
+  }
+}
+
+void FixedStepIntegrator::stepB(FixedStepMemory* m, double t, double h,
+    const double* x, const double* v, const double* rx0, const double* rv0,
+    double* rxf, double* rvf, double* rqf, double* uqf) const {
+  // Evaluate nondifferentiated
+  std::fill(m->arg, m->arg + BSTEP_NUM_IN, nullptr);
+  m->arg[BSTEP_T] = &t;  // t
+  m->arg[BSTEP_H] = &h;  // h
+  m->arg[BSTEP_RX0] = rx0;  // rx0
+  m->arg[BSTEP_RV0] = rv0;  // rv0
+  m->arg[BSTEP_RP] = m->rp;  // rp
+  m->arg[BSTEP_X] = x;  // x
+  m->arg[BSTEP_V] = v;  // v
+  m->arg[BSTEP_P] = m->p;  // p
+  m->arg[BSTEP_U] = m->u;  // u
+  std::fill(m->res, m->res + BSTEP_NUM_OUT, nullptr);
+  m->res[BSTEP_RXF] = rxf;  // rxf
+  m->res[BSTEP_RVF] = rvf;  // rvf
+  m->res[BSTEP_RQF] = rqf;  // rqf
+  m->res[BSTEP_UQF] = uqf;  // uqf
+  calc_function(m, "stepB");
+  // Evaluate sensitivities
+  if (nfwd_ > 0) {
+    m->arg[BSTEP_NUM_IN + BSTEP_RXF] = rxf;  // out:rxf
+    m->arg[BSTEP_NUM_IN + BSTEP_RVF] = rvf;  // out:rvf
+    m->arg[BSTEP_NUM_IN + BSTEP_RQF] = rqf;  // out:rqf
+    m->arg[BSTEP_NUM_IN + BSTEP_UQF] = uqf;  // out:uqf
+    m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_T] = nullptr;  // fwd:t
+    m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_H] = nullptr;  // fwd:h
+    m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_RX0] = rx0 + nrx1_ * nadj_;  // fwd:rx0
+    m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_RV0] = rv0 + nrv1_;  // fwd:rv0
+    m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_RP] = m->rp + nrp1_ * nadj_;  // fwd:rp
+    m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_X] = x + nx1_;  // fwd:x
+    m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_V] = v + nv1_;  // fwd:v
+    m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_P] = m->p + np1_;  // fwd:p
+    m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_U] = m->u + nu1_;  // fwd:u
+    m->res[BSTEP_RXF] = rxf + nrx1_ * nadj_;  // fwd:rxf
+    m->res[BSTEP_RVF] = rvf + nrv1_;  // fwd:rvf
+    m->res[BSTEP_RQF] = rqf + nrq1_ * nadj_;  // fwd:rqf
+    m->res[BSTEP_UQF] = uqf + nuq1_ * nadj_;  // fwd:uqf
+    calc_function(m, forward_name("stepB", nfwd_));
+  }
+}
+
+void FixedStepIntegrator::reset(IntegratorMemory* mem, const double* x, const double* z,
+    const double* p) const {
   auto m = static_cast<FixedStepMemory*>(mem);
 
   // Set parameters
@@ -1730,12 +2016,13 @@ void ImplicitFixedStepIntegrator::init(const Dict& opts) {
   rootfinder_options["implicit_output"] = FSTEP_VF;
 
   // Allocate a solver
-  rootfinder_ = rootfinder(name_ + "_rootfinder", implicit_function_name,
-    F_, rootfinder_options);
-  alloc(rootfinder_);
+  Function rf = rootfinder("stepF", implicit_function_name,
+    get_function("implicit_stepF"), rootfinder_options);
+  set_function(rf);
+  if (nfwd_ > 0) set_function(rf.forward(nfwd_));
 
   // Allocate a root-finding solver for the backward problem
-  if (nrv_>0) {
+  if (nrv1_ > 0) {
     // Options
     Dict backward_rootfinder_options = rootfinder_options;
     backward_rootfinder_options["implicit_input"] = BSTEP_RV0;
@@ -1743,19 +2030,17 @@ void ImplicitFixedStepIntegrator::init(const Dict& opts) {
     std::string backward_implicit_function_name = implicit_function_name;
 
     // Allocate a Newton solver
-    backward_rootfinder_ =
-      rootfinder(name_+ "_backward_rootfinder",
-                  backward_implicit_function_name,
-                  G_, backward_rootfinder_options);
-    alloc(backward_rootfinder_);
+    Function brf = rootfinder("stepB", backward_implicit_function_name,
+      get_function("implicit_stepB"), backward_rootfinder_options);
+    set_function(brf);
+    if (nfwd_ > 0) set_function(brf.forward(nfwd_));
   }
 }
 
 template<typename XType>
 Function Integrator::map2oracle(const std::string& name,
-  const std::map<std::string, XType>& d, const Dict& opts) {
+    const std::map<std::string, XType>& d) {
   std::vector<XType> de_in(DYN_NUM_IN), de_out(DYN_NUM_OUT);
-
   for (auto&& i : d) {
     if (i.first=="t") {
       de_in[DYN_T]=i.second;
@@ -1767,86 +2052,66 @@ Function Integrator::map2oracle(const std::string& name,
       de_in[DYN_P]=i.second;
     } else if (i.first=="u") {
       de_in[DYN_U]=i.second;
-    } else if (i.first=="rx") {
-      de_in[DYN_RX]=i.second;
-    } else if (i.first=="rz") {
-      de_in[DYN_RZ]=i.second;
-    } else if (i.first=="rp") {
-      de_in[DYN_RP]=i.second;
     } else if (i.first=="ode") {
       de_out[DYN_ODE]=i.second;
     } else if (i.first=="alg") {
       de_out[DYN_ALG]=i.second;
     } else if (i.first=="quad") {
       de_out[DYN_QUAD]=i.second;
-    } else if (i.first=="rode") {
-      de_out[DYN_RODE]=i.second;
-    } else if (i.first=="ralg") {
-      de_out[DYN_RALG]=i.second;
-    } else if (i.first=="rquad") {
-      de_out[DYN_RQUAD]=i.second;
-    } else if (i.first=="uquad") {
-      de_out[DYN_UQUAD]=i.second;
     } else {
       casadi_error("No such field: " + i.first);
     }
   }
 
-  // Make sure x and ode exist
-  casadi_assert(!de_in[DYN_X].is_empty(), "Ill-posed ODE - no state");
-
-  // Number of right-hand-sides
-  casadi_int nrhs = de_in[DYN_X].size2();
-
-  // Make sure consistent number of right-hand-sides
-  for (bool b : {true, false}) {
-    for (auto&& e : b ? de_in : de_out) {
-      // Skip time
-      if (&e == &de_in[DYN_T]) continue;
-      // Number of rows
-      casadi_int nr = e.size1();
-      // Make sure no change in number of elements
-      casadi_assert(e.numel()==nr*nrhs, "Inconsistent number of rhs");
-      e = reshape(e, nr, nrhs);
+  // Consistency checks, input sparsities
+  for (casadi_int i = 0; i < DYN_NUM_IN; ++i) {
+    const Sparsity& sp = de_in[i].sparsity();
+    if (i == DYN_T) {
+      casadi_assert(sp.is_empty() || sp.is_scalar(), "DAE time variable must be empty or scalar. "
+        "Got dimension " + str(sp.size()));
+    } else {
+      casadi_assert(sp.is_empty() || sp.is_vector(), "DAE inputs must be empty or vectors. "
+        + dyn_in(i) + " has dimension " + str(sp.size()) + ".");
     }
+    casadi_assert(sp.is_dense(), "DAE inputs must be dense . "
+      + dyn_in(i) + " is sparse.");
+    // Convert row vectors to column vectors
+    de_in[i] = vec(de_in[i]);
   }
 
-  // Consistent sparsity for x
-  casadi_assert(de_in[DYN_X].size()==de_out[DYN_ODE].size(),
-    "Dimension mismatch for 'ode'");
-  de_out[DYN_ODE] = project(de_out[DYN_ODE], de_in[DYN_X].sparsity());
-
-  // Consistent sparsity for z
-  casadi_assert(de_in[DYN_Z].size()==de_out[DYN_ALG].size(),
-    "Dimension mismatch for 'alg'");
-  de_out[DYN_ALG] = project(de_out[DYN_ALG], de_in[DYN_Z].sparsity());
-
-  // Consistent sparsity for rx
-  casadi_assert(de_in[DYN_RX].size()==de_out[DYN_RODE].size(),
-    "Dimension mismatch for 'rode'");
-  de_out[DYN_RODE] = project(de_out[DYN_RODE], de_in[DYN_RX].sparsity());
-
-  // Consistent sparsity for rz
-  casadi_assert(de_in[DYN_RZ].size()==de_out[DYN_RALG].size(),
-    "Dimension mismatch for 'ralg'");
-  de_out[DYN_RALG] = project(de_out[DYN_RALG], de_in[DYN_RZ].sparsity());
+  // Consistency checks, output sparsities
+  for (casadi_int i = 0; i < DYN_NUM_OUT; ++i) {
+    const Sparsity& sp = de_out[i].sparsity();
+    casadi_assert(sp.is_empty() || sp.is_vector(), "DAE outputs must be empty or vectors. "
+      + dyn_out(i) + " has dimension " + str(sp.size()));
+    // Make sure dense and vector
+    de_out[i] = vec(densify(de_out[i]));
+  }
 
   // Construct
-  return Function(name, de_in, de_out, dyn_in(), dyn_out(), opts);
+  return Function(name, de_in, de_out, dyn_in(), dyn_out());
 }
 
 void Integrator::serialize_body(SerializingStream &s) const {
   OracleFunction::serialize_body(s);
 
   s.version("Integrator", 2);
+
   s.pack("Integrator::sp_jac_dae", sp_jac_dae_);
   s.pack("Integrator::sp_jac_rdae", sp_jac_rdae_);
+  s.pack("Integrator::t0", t0_);
+  s.pack("Integrator::tout", tout_);
+  s.pack("Integrator::nfwd", nfwd_);
+  s.pack("Integrator::nadj", nadj_);
+  s.pack("Integrator::rdae", rdae_);
+
   s.pack("Integrator::nx", nx_);
   s.pack("Integrator::nz", nz_);
   s.pack("Integrator::nq", nq_);
   s.pack("Integrator::nx1", nx1_);
   s.pack("Integrator::nz1", nz1_);
   s.pack("Integrator::nq1", nq1_);
+
   s.pack("Integrator::nrx", nrx_);
   s.pack("Integrator::nrz", nrz_);
   s.pack("Integrator::nrq", nrq_);
@@ -1855,18 +2120,18 @@ void Integrator::serialize_body(SerializingStream &s) const {
   s.pack("Integrator::nrz1", nrz1_);
   s.pack("Integrator::nrq1", nrq1_);
   s.pack("Integrator::nuq1", nuq1_);
+
   s.pack("Integrator::np", np_);
-  s.pack("Integrator::nu", nu_);
   s.pack("Integrator::nrp", nrp_);
   s.pack("Integrator::np1", np1_);
-  s.pack("Integrator::nu1", nu1_);
   s.pack("Integrator::nrp1", nrp1_);
-  s.pack("Integrator::ns", ns_);
+
+  s.pack("Integrator::nu", nu_);
+  s.pack("Integrator::nu1", nu1_);
+
   s.pack("Integrator::augmented_options", augmented_options_);
   s.pack("Integrator::opts", opts_);
   s.pack("Integrator::print_stats", print_stats_);
-  s.pack("Integrator::t0", t0_);
-  s.pack("Integrator::tout", tout_);
 }
 
 void Integrator::serialize_type(SerializingStream &s) const {
@@ -1879,87 +2144,76 @@ ProtoFunction* Integrator::deserialize(DeserializingStream& s) {
 }
 
 Integrator::Integrator(DeserializingStream & s) : OracleFunction(s) {
-  int version = s.version("Integrator", 1, 2);
+  s.version("Integrator", 2);
+
   s.unpack("Integrator::sp_jac_dae", sp_jac_dae_);
   s.unpack("Integrator::sp_jac_rdae", sp_jac_rdae_);
+  s.unpack("Integrator::t0", t0_);
+  s.unpack("Integrator::tout", tout_);
+  s.unpack("Integrator::nfwd", nfwd_);
+  s.unpack("Integrator::nadj", nadj_);
+  s.unpack("Integrator::rdae", rdae_);
+
   s.unpack("Integrator::nx", nx_);
   s.unpack("Integrator::nz", nz_);
   s.unpack("Integrator::nq", nq_);
   s.unpack("Integrator::nx1", nx1_);
   s.unpack("Integrator::nz1", nz1_);
   s.unpack("Integrator::nq1", nq1_);
+
   s.unpack("Integrator::nrx", nrx_);
   s.unpack("Integrator::nrz", nrz_);
   s.unpack("Integrator::nrq", nrq_);
+  s.unpack("Integrator::nuq", nuq_);
   s.unpack("Integrator::nrx1", nrx1_);
   s.unpack("Integrator::nrz1", nrz1_);
   s.unpack("Integrator::nrq1", nrq1_);
+  s.unpack("Integrator::nuq1", nuq1_);
+
   s.unpack("Integrator::np", np_);
   s.unpack("Integrator::nrp", nrp_);
   s.unpack("Integrator::np1", np1_);
   s.unpack("Integrator::nrp1", nrp1_);
-  s.unpack("Integrator::ns", ns_);
+
+  s.unpack("Integrator::nu", nu_);
+  s.unpack("Integrator::nu1", nu1_);
+
   s.unpack("Integrator::augmented_options", augmented_options_);
   s.unpack("Integrator::opts", opts_);
   s.unpack("Integrator::print_stats", print_stats_);
-  if (version >= 2) {
-    s.unpack("Integrator::t0", t0_);
-    s.unpack("Integrator::tout", tout_);
-    s.unpack("Integrator::nu", nu_);
-    s.unpack("Integrator::nu1", nu1_);
-    s.unpack("Integrator::nuq", nuq_);
-    s.unpack("Integrator::nuq1", nuq1_);
-  } else {
-    // Time grid
-    std::vector<double> grid;
-    s.unpack("Integrator::grid", grid);
-    // Is the first time point in output?
-    bool output_t0;
-    s.unpack("Integrator::output_t0", output_t0);
-    // Construct t0 and tout from grid and output_t0
-    t0_ = grid.front();
-    tout_ = grid;
-    if (!output_t0) tout_.erase(tout_.begin());
-    // Controls did not exist in version 1
-    nu_ = nu1_ = nuq_ = nuq1_ = 0;
-  }
 }
 
 void FixedStepIntegrator::serialize_body(SerializingStream &s) const {
   Integrator::serialize_body(s);
 
-  s.version("FixedStepIntegrator", 1);
-  s.pack("FixedStepIntegrator::F", F_);
-  s.pack("FixedStepIntegrator::G", G_);
-  //s.pack("FixedStepIntegrator::nk", nk_);
-  //s.pack("FixedStepIntegrator::h", h_);
-  s.pack("FixedStepIntegrator::nZ", nv_);
-  s.pack("FixedStepIntegrator::nRZ", nrv_);
+  s.version("FixedStepIntegrator", 2);
+  s.pack("FixedStepIntegrator::nk_target", nk_target_);
+  s.pack("FixedStepIntegrator::disc", disc_);
+  s.pack("FixedStepIntegrator::nv", nv_);
+  s.pack("FixedStepIntegrator::nv1", nv1_);
+  s.pack("FixedStepIntegrator::nrv", nrv_);
+  s.pack("FixedStepIntegrator::nrv1", nrv1_);
 }
 
 FixedStepIntegrator::FixedStepIntegrator(DeserializingStream & s) : Integrator(s) {
-  s.version("FixedStepIntegrator", 1);
-  s.unpack("FixedStepIntegrator::F", F_);
-  s.unpack("FixedStepIntegrator::G", G_);
-  //s.unpack("FixedStepIntegrator::nk", nk_);
-  //s.unpack("FixedStepIntegrator::h", h_);
-  s.unpack("FixedStepIntegrator::nZ", nv_);
-  s.unpack("FixedStepIntegrator::nRZ", nrv_);
+  s.version("FixedStepIntegrator", 2);
+  s.unpack("FixedStepIntegrator::nk_target", nk_target_);
+  s.unpack("FixedStepIntegrator::disc", disc_);
+  s.unpack("FixedStepIntegrator::nv", nv_);
+  s.unpack("FixedStepIntegrator::nv1", nv1_);
+  s.unpack("FixedStepIntegrator::nrv", nrv_);
+  s.unpack("FixedStepIntegrator::nrv1", nrv1_);
 }
 
 void ImplicitFixedStepIntegrator::serialize_body(SerializingStream &s) const {
   FixedStepIntegrator::serialize_body(s);
 
-  s.version("ImplicitFixedStepIntegrator", 1);
-  s.pack("ImplicitFixedStepIntegrator::rootfinder", rootfinder_);
-  s.pack("ImplicitFixedStepIntegrator::backward_rootfinder", backward_rootfinder_);
+  s.version("ImplicitFixedStepIntegrator", 2);
 }
 
 ImplicitFixedStepIntegrator::ImplicitFixedStepIntegrator(DeserializingStream & s) :
     FixedStepIntegrator(s) {
-  s.version("ImplicitFixedStepIntegrator", 1);
-  s.unpack("ImplicitFixedStepIntegrator::rootfinder", rootfinder_);
-  s.unpack("ImplicitFixedStepIntegrator::backward_rootfinder", backward_rootfinder_);
+  s.version("ImplicitFixedStepIntegrator", 2);
 }
 
 casadi_int Integrator::next_stop(casadi_int k, const double* u) const {

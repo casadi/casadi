@@ -247,7 +247,7 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     set(WHOLE_ARCHIVE_ON "-Wl,-all_load ")
     set(WHOLE_ARCHIVE_OFF "-Wl,-noall_load")
   endif()
-elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
   set(WHOLE_ARCHIVE_ON "-Wl,-force_load, ")
   set(WHOLE_ARCHIVE_OFF "")
   if(APPLE)
@@ -435,7 +435,7 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     set(EXTRA_CASADI_C_FLAGS "${EXTRA_CASADI_C_FLAGS} -Werror")
   endif()
 
-elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
   if(WITH_EXTRA_WARNINGS)
     set(EXTRA_CASADI_CXX_FLAGS "-Wall -Wextra -Wno-unused-parameter -Wno-sign-compare -Wno-mismatched-tags -Wno-tautological-compare")
     set(EXTRA_CASADI_C_FLAGS "-Wall -Wextra -Wformat-security -Wno-unused-parameter -Wno-unused-function -Wno-unused-value")
@@ -495,7 +495,7 @@ if(MINGW)
 endif()
 
 # Tentative fix for https://github.com/casadi/casadi/issues/1665
-if(MINGW OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU") OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang") OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel"))
+if(MINGW OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU") OR ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang") OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel"))
   #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fkeep-inline-functions")
 endif()
 
@@ -686,7 +686,7 @@ set(BUILD_IPOPT_DEPENDENCIES MUMPS)
 
 option(WITH_MOCKUP_REQUIRED ON)
 set(BUILD_MOCKUPS_GIT_REPO https://github.com/casadi/mockups.git CACHE STRING "Git repo used together with BUILD_MOCKUPS_VERSION")
-set(BUILD_MOCKUPS_VERSION v53 CACHE STRING "Tag/branch/hash to be used for BUILD_MOCKUPS_GIT_REPO")
+set(BUILD_MOCKUPS_VERSION v59 CACHE STRING "Tag/branch/hash to be used for BUILD_MOCKUPS_GIT_REPO")
 
 # Knitro: An NLP solver
 option(WITH_KNITRO "Compile the interface to KNITRO" OFF)
@@ -798,6 +798,49 @@ function(libraries2flags libraries out)
   endforeach()
 endfunction()
 
+macro(create_import_library TARGET) 
+  if(CMAKE_CROSS_COMPILING AND MINGW)
+    # Get target in lowercase
+    string(TOLOWER ${TARGET} TARGET_LOWER)
+    set(TARGET_LIB "${CMAKE_CURRENT_BINARY_DIR}/${TARGET_LOWER}.lib")
+    get_target_property(IMPORTED_LOCATION ${TARGET} IMPORTED_LOCATION)
+    add_custom_command(OUTPUT "${TARGET_LIB}" DEPENDS ${TARGET}
+      COMMAND gendef "${IMPORTED_LOCATION}" - > lib${TARGET_LOWER}.def
+      COMMAND $ENV{DLLTOOL} --dllname "${IMPORTED_LOCATION}" --def lib${TARGET_LOWER}.def --output-lib ${TARGET_LOWER}.lib
+    )
+    add_custom_target(create_import_library_${TARGET_LOWER} ALL
+    DEPENDS "${TARGET_LIB}"
+    )
+    set("TARGET_LIB: ${TARGET_LIB}")
+    install(FILES "${TARGET_LIB}"
+      DESTINATION ${DEF_LIB_PREFIX}
+    )
+  endif()
+endmacro()
+
+macro(eager_update DEP_NAME)
+    set(VERSION "VERSION:${BUILD_${DEP_NAME}_VERSION}\nREPO:${BUILD_${DEP_NAME}_GIT_REPO}")
+    set(VERSION_FILE "${CMAKE_BINARY_DIR}/external_projects/versions/${DEP_NAME}_version.txt")
+    # Get lowercase version of DEP_NAME
+    string(TOLOWER "${DEP_NAME}" DEP_NAME_LOWERCASE)
+
+    if(NOT EXISTS ${VERSION_FILE})
+      file(WRITE ${VERSION_FILE} "${VERSION}")
+    endif()
+
+
+    # Read the version file
+    file(READ ${VERSION_FILE} VERSION_FILE_CONTENTS)
+    if(NOT VERSION STREQUAL VERSION_FILE_CONTENTS)
+      message("${DEP_NAME} is out of date. Removing old version.")
+      file(WRITE ${VERSION_FILE} "${VERSION}")
+      file(GLOB TO_REMOVE LIST_DIRECTORIES true "${CMAKE_BINARY_DIR}/external_projects/src/${DEP_NAME_LOWERCASE}-*")
+      if(TO_REMOVE)
+       file(REMOVE_RECURSE ${TO_REMOVE})
+      endif()
+    endif()
+endmacro()
+
 set(WITH_BUILD_MOCKUPS OFF)
 # Packages must be sorted from high to low in the dependency graph
 foreach(PKG CPLEX KNITRO GUROBI WORHP HSL)
@@ -825,6 +868,7 @@ foreach(PKG CPLEX KNITRO GUROBI WORHP HSL)
       endforeach()
       set(${PKG}_FOUND ON)
       set(WITH_BUILD_MOCKUPS ON)
+      eager_update(MOCKUPS)
     endif()
     if(NOT ${PKG}_FOUND)
       message(FATAL_ERROR "${PKG} not found on your system yet required. Set WITH_MOCKUP_${PKG} or WITH_MOCKUP_REQUIRED ON to build a mockup version such that the CasADi build can proceed.")
@@ -858,6 +902,7 @@ foreach(PKG HIGHS PROXQP OSQP SUPERSCS BONMIN IPOPT CBC CLP MUMPS SPRAL HSL METI
         set(WITH_${DEP} ON)
       endforeach()
       set(${PKG}_FOUND ON)
+      eager_update(${PKG})
     endif()
     if(NOT ${PKG}_FOUND)
       message(FATAL_ERROR "${PKG} not found on your system yet required. Set WITH_BUILD_${PKG} or WITH_BUILD_REQUIRED ON to build this required package from source.")
@@ -867,8 +912,10 @@ endforeach()
 
 set(SHARED_LIBRARY_RELDIR lib)
 set(SHARED_LIBRARY64_RELDIR lib64)
+set(CMAKE_SHARED_LIBRARY_PREFIX_SHORT ${CMAKE_SHARED_LIBRARY_PREFIX})
 if (WIN32)
     set(SHARED_LIBRARY_RELDIR bin)
+    set(CMAKE_SHARED_LIBRARY_PREFIX_SHORT "")
 else()
     if (CMAKE_SIZEOF_VOID_P EQUAL 4)
         set(SHARED_LIBRARY64_RELDIR lib)
@@ -926,8 +973,8 @@ if(WITH_KNITRO AND WITH_MOCKUP_KNITRO)
   file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/mockups/knitro/include")
   set_target_properties(knitro::knitro PROPERTIES
     INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/mockups/knitro/include"
-    IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/mockups/knitro/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}knitro${CMAKE_SHARED_LIBRARY_SUFFIX}"
-    IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/mockups/knitro/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}knitro${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+    IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/mockups/knitro/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX_SHORT}knitro${CMAKE_SHARED_LIBRARY_SUFFIX}"
+    IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/mockups/knitro/lib/${CMAKE_SHARED_LIBRARY_PREFIX_SHORT}knitro${CMAKE_IMPORT_LIBRARY_SUFFIX}"
   )
 endif()
 add_feature_info(knitro-interface WITH_KNITRO "Interface to the NLP solver KNITRO.")
@@ -938,8 +985,8 @@ if(WITH_WORHP AND WITH_MOCKUP_WORHP)
   file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/mockups/worhp/include")
   set_target_properties(worhp::worhp PROPERTIES
     INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/mockups/worhp/include"
-    IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/mockups/worhp/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}worhp${CMAKE_SHARED_LIBRARY_SUFFIX}"
-    IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/mockups/worhp/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}worhp${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+    IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/mockups/worhp/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX_SHORT}worhp${CMAKE_SHARED_LIBRARY_SUFFIX}"
+    IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/mockups/worhp/lib/${CMAKE_SHARED_LIBRARY_PREFIX_SHORT}worhp${CMAKE_IMPORT_LIBRARY_SUFFIX}"
   )
 endif()
 add_feature_info(worhp-interface WITH_WORHP "Interface to the NLP solver Worhp (requires gfortran, gomp).")
@@ -964,6 +1011,7 @@ if(WITH_LAPACK)
       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}${CASADI_TP_SHARED_PREFIX}openblas${CMAKE_SHARED_LIBRARY_SUFFIX}"
       IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}${CASADI_TP_SHARED_PREFIX}openblas${CMAKE_IMPORT_LIBRARY_SUFFIX}"
     )
+    create_import_library(lapack)
   else()
     add_library(lapack INTERFACE)
     target_link_libraries(lapack INTERFACE ${LAPACK_LIBRARIES})
@@ -997,6 +1045,7 @@ if(WITH_BLASFEO)
       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}blasfeo${CMAKE_SHARED_LIBRARY_SUFFIX}"
       IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}blasfeo${CMAKE_IMPORT_LIBRARY_SUFFIX}"
     )
+    create_import_library(blasfeo)
     file(GLOB BLASFEO_HEADERS "${CMAKE_BINARY_DIR}/external_projects/include/blasfeo*")
     install(FILES
       ${BLASFEO_HEADERS}
@@ -1017,7 +1066,7 @@ if(WITH_HPIPM)
       PREFIX "${CMAKE_BINARY_DIR}/external_projects"
       UPDATE_COMMAND ""
       CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
-      CMAKE_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DHPIPM_TESTING=OFF -DBUILD_SHARED_LIBS=ON -DBLASFEO_PATH=${BLASFEO_PATH} -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
+      CMAKE_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DCMAKE_INSTALL_RPATH=${CMAKE_INSTALL_RPATH} -DHPIPM_TESTING=OFF -DBUILD_SHARED_LIBS=ON -DBLASFEO_PATH=${BLASFEO_PATH} -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
     add_library(hpipm SHARED IMPORTED)
     add_dependencies(hpipm hpipm-external)
     target_link_libraries(hpipm INTERFACE blasfeo)
@@ -1025,6 +1074,7 @@ if(WITH_HPIPM)
        IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}hpipm${CMAKE_SHARED_LIBRARY_SUFFIX}"
        IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}hpipm${CMAKE_IMPORT_LIBRARY_SUFFIX}"
     )
+    create_import_library(hpipm)
     file(GLOB HPIPM_HEADERS "${CMAKE_BINARY_DIR}/external_projects/include/hpipm*")
     install(FILES
       ${HPIPM_HEADERS}
@@ -1153,7 +1203,6 @@ if(WITH_SPRAL)
     set(SPRAL_DEPENDS_TARGET spral-external)
     set(SPRAL_FLAGS "--with-spral-cflags=-I${CMAKE_BINARY_DIR}/external_projects/include"
         "--with-spral-lflags=-L${CMAKE_BINARY_DIR}/external_projects/lib -lspral -lgfortran -lm -lcoinmetis ${LAPACK_LFLAGS}")
-    install(FILES ${CMAKE_BINARY_DIR}/external_projects/src/spral-external/LICENCE DESTINATION ${INCLUDE_PREFIX}/licenses RENAME spral.txt)
   endif()
 endif()
 add_feature_info(spral-interface WITH_SPRAL "Interface to SPRAL.")
@@ -1358,9 +1407,10 @@ if(WITH_HIGHS)
     add_dependencies(highs highs-external)
     set_target_properties(highs PROPERTIES
        INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include/highs"
-       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}highs${CMAKE_SHARED_LIBRARY_SUFFIX}"
+       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}highs${CMAKE_SHARED_LIBRARY_SUFFIX}"
        IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}highs${CMAKE_IMPORT_LIBRARY_SUFFIX}"
     )
+    create_import_library(highs)
     install(DIRECTORY
       "${CMAKE_BINARY_DIR}/external_projects/include/highs"
       DESTINATION "${INCLUDE_PREFIX}")
@@ -1437,12 +1487,13 @@ if(WITH_OSQP)
     add_dependencies(osqp osqp-external)
     set_target_properties(osqp PROPERTIES
        INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include/osqp"
-       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}osqp${CMAKE_SHARED_LIBRARY_SUFFIX}"
+       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}osqp${CMAKE_SHARED_LIBRARY_SUFFIX}"
        IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}osqp${CMAKE_IMPORT_LIBRARY_SUFFIX}"
     )
     install(DIRECTORY
       "${CMAKE_BINARY_DIR}/external_projects/include/osqp"
       DESTINATION "${INCLUDE_PREFIX}")
+      create_import_library(osqp)
   endif()
 endif()
 add_feature_info(osqp-interface WITH_OSQP "Interface to QP solver OSQP.")
@@ -1531,6 +1582,22 @@ if(WITH_SLICOT)
   find_package(SLICOT REQUIRED)
 endif()
 add_feature_info(slicot-interface WITH_SLICOT "Interface to the controls library SLICOT.")
+
+if(WITH_SELFCONTAINED)
+  # Loop over prescribed folders
+  foreach(DIR "${CMAKE_BINARY_DIR}/external_projects/src" "${PROJECT_SOURCE_DIR}/external_packages")
+    # Find all LICENSE files
+    file(GLOB_RECURSE LICENSE_FILES_A RELATIVE "${DIR}" "${DIR}/**/LICENSE*")
+    # Loop over files
+    foreach(LICENSE_FILE ${LICENSE_FILES_A})
+      # Extract directory from LICENSE_FILE
+      get_filename_component(LICENSE_DIR ${LICENSE_FILE} DIRECTORY)
+      install(FILES "${DIR}/${LICENSE_FILE}" DESTINATION "${INCLUDE_PREFIX}/licenses/${LICENSE_DIR}")
+    endforeach()
+  endforeach()
+  install(FILES "${PROJECT_SOURCE_DIR}/LICENSE.txt" DESTINATION "${INCLUDE_PREFIX}/licenses/casadi/LICENSE")
+endif()
+
 
 ######################################################
 ##################### paths ##########################

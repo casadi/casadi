@@ -1778,6 +1778,30 @@ class Functiontests(casadiTestCase):
     code= c.dump()
 
     self.assertTrue("ffff_acc4_acc4_acc4" in code)
+    
+    
+  def test_codegen_with_jac_sparsity(self):
+  
+    if not args.run_slow: return
+    x = MX.sym("x",3)
+    y = MX.sym("y",3,3)
+    f = Function("f",[x,y],[x**3,y @ x])
+    c = CodeGenerator('me')
+    c.add(f, True)
+    
+    fJ = f.jacobian()
+    
+    DM.rng(0)
+    x0 = DM.rand(x.sparsity())
+    y0 = DM.rand(y.sparsity())
+    [F,_] = self.check_codegen(f,inputs=[x0,y0],with_jac_sparsity=True,external_opts={"enable_fd":True})
+    FJ = F.jacobian()
+    for i in range(fJ.n_out()):
+        self.assertEqual(fJ.sparsity_out(i),FJ.sparsity_out(i))
+    [F,_] = self.check_codegen(f,inputs=[x0,y0],with_jac_sparsity=False,external_opts={"enable_fd":True})
+    FJ = F.jacobian()
+    for i in range(fJ.n_out()):
+        self.assertTrue(FJ.sparsity_out(i).is_dense())
 
   def test_2d_linear_multiout(self):
     np.random.seed(0)
@@ -2159,7 +2183,7 @@ class Functiontests(casadiTestCase):
     x = MX.sym("x")
     p = MX.sym("p")
     J = Function("jac_Q", [x, p, MX(1,1), MX(1,1)], [x*pi, 1, 1, 1],
-        ['x', 'p', 'out_r', 'out_s'], ['jac_r_x', 'jac_r_p', 'jac_r_s', 'jac_r_s'])
+        ['x', 'p', 'out_r', 'out_s'], ['jac_r_x', 'jac_r_p', 'jac_s_x', 'jac_s_p'])
 
     f = Function('Q', [x, p], [x**2, 2*x*p], ['x', 'p'], ['r', 's'],
             dict(custom_jacobian = J, jac_penalty = 0))
@@ -2647,8 +2671,8 @@ class Functiontests(casadiTestCase):
   def test_codegen_with_mem(self):
     x = MX.sym("x")
     f = Function("F",[x],[3*x])
-    self.check_codegen(f,inputs=[1],main=True,opts={"with_mem":True},definitions=["inline=''"])
-    self.check_codegen(f,inputs=[1],main=True,opts={"with_mem":True,"with_header":True},definitions=["inline=''"])
+    self.check_codegen(f,inputs=[1],main=True,opts={"with_mem":True},definitions=["inline=\"\""])
+    self.check_codegen(f,inputs=[1],main=True,opts={"with_mem":True,"with_header":True},definitions=["inline=\"\""])
 
   def test_codegen_scalars_bug(self):
     x = MX.sym("x")
@@ -2721,8 +2745,9 @@ class Functiontests(casadiTestCase):
 
       f = None
       g = None
-      with self.assertInException("No such file"):
-        g = Function.load('f.casadi')
+      if os.name!='nt': # Workaround for known bug #3039
+        with self.assertInException("No such file"):
+          g = Function.load('f.casadi')
 
 
     for case in test_cases("embed"):
@@ -2784,7 +2809,11 @@ class Functiontests(casadiTestCase):
     c = conic("conic","osqp",{"a":Sparsity.dense(1,2),"h":Sparsity.dense(2,2)},{"print_problem":True,"osqp.verbose":False})
     inputs = {"h": DM([[1,0.2],[0.2,1]]),"g":vertcat(1,2),"a":horzcat(1,1),"lba":-1,"uba":1}
     inputs = c.convert_in(inputs)
-    self.check_codegen(c,inputs=inputs,main=True,std="c99",extra_options=["-Wno-endif-labels","-Wno-unused-variable"],extralibs=["osqp"])
+    extra_options = ["-Wno-endif-labels","-Wno-unused-variable"]
+    # No extra options on windows
+    if os.name == 'nt':
+      extra_options = []
+    self.check_codegen(c,inputs=inputs,main=True,std="c99",extra_options=extra_options,extralibs=["osqp"])
 
   @requires_conic('osqp')
   def test_memful_external(self):
@@ -2792,7 +2821,11 @@ class Functiontests(casadiTestCase):
     c = conic("conic","osqp",{"a":Sparsity.dense(1,2),"h":Sparsity.dense(2,2)},{"print_problem":True,"osqp.verbose":False})
     inputs = {"h": DM([[1,0.2],[0.2,1]]),"g":vertcat(1,2),"a":horzcat(1,1),"lba":-1,"uba":1}
     inputs = c.convert_in(inputs)
-    F,lib = self.check_codegen(c,inputs=inputs,std="c99",extra_options=["-Wno-endif-labels","-Wno-unused-variable"],extralibs=["osqp"])
+    extra_options = ["-Wno-endif-labels","-Wno-unused-variable"]
+    # No extra options on windows
+    if os.name == 'nt':
+      extra_options = []
+    F,lib = self.check_codegen(c,inputs=inputs,std="c99",extra_options=extra_options,extralibs=["osqp"])
     F = F.wrap()
     print("memful_external")
     self.check_codegen(F,inputs=inputs,main=True,extralibs=[lib])

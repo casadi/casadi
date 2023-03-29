@@ -1055,7 +1055,10 @@ namespace casadi {
     arg.insert(arg.end(), fseed.begin(), fseed.end());
     res = fsens;
 
-    return Function(name, arg, res, inames, onames, opts);
+    Dict options = opts;
+    options["allow_duplicate_io_names"] = true;
+
+    return Function(name, arg, res, inames, onames, options);
   }
 
   Function Nlpsol::
@@ -1174,7 +1177,10 @@ namespace casadi {
     arg.insert(arg.end(), aseed.begin(), aseed.end());
     res = asens;
 
-    return Function(name, arg, res, inames, onames, opts);
+    Dict options = opts;
+    options["allow_duplicate_io_names"] = true;
+
+    return Function(name, arg, res, inames, onames, options);
   }
 
   int Nlpsol::callback(NlpsolMemory* m) const {

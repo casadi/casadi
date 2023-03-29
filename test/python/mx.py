@@ -2637,6 +2637,21 @@ class MXtests(casadiTestCase):
       self.checkfunction(f,fref,inputs=[x0,y0,z0])
       self.checkfunction(f_sx,fref,inputs=[x0,y0,z0])
       self.check_codegen(f,inputs=[x0,y0,z0])
+      
+  def test_bilin_short(self):
+    for X in [SX,MX]:
+        x = X.sym("x",3,3)
+        y = X.sym("y",3,1)
+
+        import numpy
+        numpy.random.seed(42)
+        x0 = numpy.random.random((3,3))
+        y0 = numpy.random.random((3,1))
+        
+        f = Function("f",[x,y],[bilin(x,y)])
+        fref = Function("f",[x,y],[bilin(x,y,y)])
+        
+        self.checkfunction(f,fref,inputs=[x0,y0])
 
   def test_det_shape(self):
     X = MX.sym("x",2,3)

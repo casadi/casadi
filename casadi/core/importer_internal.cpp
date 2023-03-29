@@ -220,20 +220,10 @@ namespace casadi {
   }
 
   void DllLibrary::init_handle() {
+
+    std::vector<std::string> search_paths = get_search_paths();
 #ifdef WITH_DL
-#ifdef _WIN32
-    handle_ = LoadLibrary(TEXT(name_.c_str()));
-    casadi_assert(handle_!=0,
-      "CommonExternal: Cannot open \"" + name_ + "\". "
-      "Error code (WIN32): " + str(GetLastError()));
-#else // _WIN32
-    handle_ = dlopen(name_.c_str(), RTLD_LAZY);
-    casadi_assert(handle_!=nullptr,
-      "CommonExternal: Cannot open \"" + name_ + "\". "
-      "Error code: " + str(dlerror()));
-    // reset error
-    dlerror();
-#endif // _WIN32
+    handle_ = open_shared_library(name_, search_paths, "DllLibrary::init_handle");
 #else // WITH_DL
     casadi_error("CommonExternal: WITH_DL  not activated");
 #endif // WITH_DL
@@ -245,12 +235,7 @@ namespace casadi {
 
   DllLibrary::~DllLibrary() {
 #ifdef WITH_DL
-    // close the dll
-#ifdef _WIN32
-    if (handle_) FreeLibrary(handle_);
-#else // _WIN32
-    if (handle_) dlclose(handle_);
-#endif // _WIN32
+  if (handle_) close_shared_library(handle_);
 #endif // WITH_DL
   }
 

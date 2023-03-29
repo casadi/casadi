@@ -395,11 +395,16 @@ namespace casadi {
     }
 
     ///@{
-    /** \brief Calculate bilinear form x^T A y
+    /** \brief Calculate bilinear/quadratic form x^T A y
+     *
+     * \param[in] y can be omitted, in which case x^T A x is calculated
 
         \identifier{1bo} */
     inline friend MatType bilin(const MatType &A, const MatType &x, const MatType &y) {
       return MatType::bilin(A, x, y);
+    }
+    inline friend MatType bilin(const MatType &A, const MatType &x) {
+      return MatType::bilin(A, x, x);
     }
     static MatType bilin(const MatType& A, const MatType& x, const MatType& y);
     ///@}

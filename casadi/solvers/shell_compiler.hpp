@@ -104,7 +104,6 @@ namespace casadi {
     bool cleanup_;
 
     // Shared library handle
-    typedef DL_HANDLE_TYPE handle_t;
     handle_t handle_;
   };
 

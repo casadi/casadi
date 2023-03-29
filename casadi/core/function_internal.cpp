@@ -736,44 +736,29 @@ namespace casadi {
   }
 
   void FunctionInternal::dump_in(casadi_int id, const double** arg) const {
-    #ifdef _WIN32
-    const std::string filesep("\\");
-    #else
-    const std::string filesep("/");
-    #endif
     std::stringstream ss;
     ss << std::setfill('0') << std::setw(6) << id;
     std::string count = ss.str();
     for (casadi_int i=0;i<n_in_;++i) {
-      DM::to_file(dump_dir_+ filesep + name_ + "." + count + ".in." + name_in_[i] + "." +
+      DM::to_file(dump_dir_+ filesep() + name_ + "." + count + ".in." + name_in_[i] + "." +
         dump_format_, sparsity_in_[i], arg[i]);
     }
-    generate_in(dump_dir_+ filesep + name_ + "." + count + ".in.txt", arg);
+    generate_in(dump_dir_+ filesep() + name_ + "." + count + ".in.txt", arg);
   }
 
   void FunctionInternal::dump_out(casadi_int id, double** res) const {
-    #ifdef _WIN32
-    const std::string filesep("\\");
-    #else
-    const std::string filesep("/");
-    #endif
     std::stringstream ss;
     ss << std::setfill('0') << std::setw(6) << id;
     std::string count = ss.str();
     for (casadi_int i=0;i<n_out_;++i) {
-      DM::to_file(dump_dir_+ filesep + name_ + "." + count + ".out." + name_out_[i] + "." +
+      DM::to_file(dump_dir_+ filesep() + name_ + "." + count + ".out." + name_out_[i] + "." +
         dump_format_, sparsity_out_[i], res[i]);
     }
-    generate_out(dump_dir_+ filesep + name_ + "." + count + ".out.txt", res);
+    generate_out(dump_dir_+ filesep() + name_ + "." + count + ".out.txt", res);
   }
 
   void FunctionInternal::dump() const {
-    #ifdef _WIN32
-    const std::string filesep("\\");
-    #else
-    const std::string filesep("/");
-    #endif
-    shared_from_this<Function>().save(dump_dir_+ filesep + name_ + ".casadi");
+    shared_from_this<Function>().save(dump_dir_+ filesep() + name_ + ".casadi");
   }
 
   casadi_int FunctionInternal::get_dump_id() const {
@@ -1989,7 +1974,7 @@ namespace casadi {
     }
     // Retrieve/generate cached
     Function f;
-    std::string fname = "fwd" + str(nfwd) + "_" + name_;
+    std::string fname = forward_name(name_, nfwd);
     if (!incache(fname, f)) {
       casadi_int i;
       // Names of inputs
@@ -2048,7 +2033,7 @@ namespace casadi {
     }
     // Retrieve/generate cached
     Function f;
-    std::string fname = "adj" + str(nadj) + "_" + name_;
+    std::string fname = reverse_name(name_, nadj);
     if (!incache(fname, f)) {
       casadi_int i;
       // Names of inputs

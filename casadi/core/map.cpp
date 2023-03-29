@@ -253,8 +253,11 @@ namespace casadi {
       *it = (*it)(Slice(), ind); // NOLINT
     }
 
+    Dict options = opts;
+    options["allow_duplicate_io_names"] = true;
+
     // Construct return function
-    return Function(name, arg, res, inames, onames, opts);
+    return Function(name, arg, res, inames, onames, options);
   }
 
   Function Map
@@ -304,8 +307,11 @@ namespace casadi {
       *it = (*it)(Slice(), ind); // NOLINT
     }
 
+    Dict options = opts;
+    options["allow_duplicate_io_names"] = true;
+
     // Construct return function
-    return Function(name, arg, res, inames, onames, opts);
+    return Function(name, arg, res, inames, onames, options);
   }
 
   int Map::eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {

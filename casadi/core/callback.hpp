@@ -108,10 +108,17 @@ namespace casadi {
     /** \brief A copy-free low level interface
      *
      * In Python, you will be passed two tuples of memoryview objects
+     * Note that only the structural nonzeros are present in the memoryview objects/buffers.
+     *
+     * Make sure to override has_eval_buffer() to indicate support for this method.
 
         \identifier{o9} */
     virtual int eval_buffer(const double **arg, const std::vector<casadi_int>& sizes_arg,
                               double **res, const std::vector<casadi_int>& sizes_res) const;
+    /** \brief Does the Callback class support a copy-free low level interface ?
+     *
+
+        \identifier{265} */
     virtual bool has_eval_buffer() const;
 
     /** \brief Get the number of inputs

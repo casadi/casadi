@@ -77,14 +77,11 @@ namespace casadi {
     /// Initialize stage
     void init(const Dict& opts) override;
 
-    /// Setup F and G
-    void setupFG() override;
+    /// Setup step functions
+    void setup_step() override;
 
     /// A documentation string
     static const std::string meta_doc;
-
-    /// Continuous time dynamics
-    Function f_, g_;
 
     /** \brief Serialize an object without type information */
     void serialize_body(SerializingStream &s) const override;
@@ -93,14 +90,6 @@ namespace casadi {
     static ProtoFunction* deserialize(DeserializingStream& s) { return new RungeKutta(s); }
 
    protected:
-
-    ///@{
-    /** \brief IO conventions for continuous time dynamics */
-    enum OdeIn { ODE_T, ODE_X, ODE_P, ODE_U, ODE_NUM_IN};
-    enum OdeOut { ODE_ODE, ODE_QUAD, ODE_NUM_OUT};
-    enum ROdeIn { RODE_T, RODE_X, RODE_P, RODE_U, RODE_RX, RODE_RP, RODE_NUM_IN};
-    enum ROdeOut { RODE_RODE, RODE_RQUAD, RODE_UQUAD, RODE_NUM_OUT};
-    ///@}
 
     /** \brief Deserializing constructor */
     explicit RungeKutta(DeserializingStream& s);

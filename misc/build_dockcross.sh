@@ -3,9 +3,9 @@
 set -o pipefail
 set -e
 
-export TARGET=manylinux2014-x64
+#export TARGET=manylinux2014-x64
 #export TARGET=manylinux1-x64
-#export TARGET=windows-shared-x64-posix
+export TARGET=windows-shared-x64-posix
 #docker run --rm dockcross/$TARGET:latest > dockcross.$TARGET
 #chmod +x dockcross.$TARGET
 
@@ -41,7 +41,7 @@ echo "INT_TARGET: $INT_TARGET"
 
 case $INT_TARGET in
   python)
-    export PYTHON_INCLUDE_DIR=/opt/python/cp38-cp38/include/python3.8/
+    export PYTHON_INCLUDE_DIR=/opt/python/cp38-cp38/include/python3.8
     if [[ "$PYTHON_INCLUDE_DIR" == *py2* ]]; then
         docker run --rm -v`pwd`:/local ghcr.io/casadi/ci-swig:latest /bin/bash -c "mkdir -p build-temp && cd build-temp && cmake -DWITH_SELFCONTAINED=ON -DWITH_PYTHON=ON -DSWIG_EXPORT=ON -DWITH_COMMON=OFF .. && make python_source && cd .. && rm -rf build-temp"
     else

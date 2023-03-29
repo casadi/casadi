@@ -56,8 +56,11 @@ namespace casadi {
     // Controls
     double *u;
 
+    /// Jacobian memory blocks
+    double *jac_ode_x, *jac_alg_x, *jac_ode_z, *jac_alg_z;
+
     // Jacobian
-    double *jacF, *jacB;
+    double *jacF;
 
     /// Stats
     long nsteps, nfevals, nlinsetups, netfails;
@@ -77,7 +80,7 @@ namespace casadi {
     int ncheck;
 
     /// Linear solver memory objects
-    int mem_linsolF, mem_linsolB;
+    int mem_linsolF;
 
     /// Constructor
     SundialsMemory();
@@ -117,11 +120,34 @@ namespace casadi {
     /** \brief Get absolute tolerance */
     double get_abstol() const override { return abstol_;}
 
-    // Get system Jacobian, forward problem
-    virtual Function get_jacF(Sparsity* sp) const = 0;
+    // DAE right-hand-side, forward problem
+    int calc_daeF(SundialsMemory* m, double t, const double* x, const double* z,
+      double* ode, double* alg) const;
 
-    // Get system Jacobian, backward problem
-    virtual Function get_jacB(Sparsity* sp) const = 0;
+    // DAE right-hand-side, forward problem
+    int calc_daeB(SundialsMemory* m, double t, const double* x, const double* z,
+      const double* rx, const double* rz, double* adj_x, double* adj_z) const;
+
+    // Quadrature right-hand-side, forward problem
+    int calc_quadF(SundialsMemory* m, double t, const double* x, const double* z,
+      double* quad) const;
+
+    // Quadrature right-hand-side, backward problem
+    int calc_quadB(SundialsMemory* m, double t, const double* x, const double* z,
+      const double* rx, const double* rz, double* adj_p, double* adj_u) const;
+
+    // Jacobian of DAE-times-vector function, forward problem
+    int calc_jtimesF(SundialsMemory* m, double t, const double* x, const double* z,
+      const double* fwd_x, const double* fwd_z, double* fwd_ode, double* fwd_alg) const;
+
+    // Jacobian of DAE-times-vector function, backward problem
+    int calc_jtimesB(SundialsMemory* m, double t, const double* x, const double* z,
+      const double* rx, const double* rz, const double* fwd_rx, const double* fwd_rz,
+      double* fwd_adj_x, double* fwd_adj_z) const;
+
+    // Jacobian of DAE right-hand-side function, forward problem
+    int calc_jacF(SundialsMemory* m, double t, const double* x, const double* z,
+      double* jac_ode_x, double* jac_alg_x, double* jac_ode_z, double* jac_alg_z) const;
 
     /// Get all statistics
     Dict get_stats(void* mem) const override;
@@ -149,6 +175,18 @@ namespace casadi {
     }
 
     ///@{
+    /** \brief IO conventions for continuous time dynamics */
+    enum JtimesFIn { JTIMESF_T, JTIMESF_X, JTIMESF_Z, JTIMESF_P, JTIMESF_U, JTIMESF_FWD_X,
+      JTIMESF_FWD_Z, JTIMESF_NUM_IN};
+    enum JtimesFOut { JTIMESF_FWD_ODE, JTIMESF_FWD_ALG, JTIMESF_NUM_OUT};
+    enum JtimesBIn { JTIMESB_T, JTIMESB_X, JTIMESB_Z, JTIMESB_P, JTIMESB_U,
+      JTIMESB_ADJ_ODE, JTIMESB_ADJ_ALG, JTIMESB_ADJ_QUAD,
+      JTIMESB_FWD_ADJ_ODE, JTIMESB_FWD_ADJ_ALG, JTIMESB_NUM_IN};
+    enum JtimesBOut { JTIMESB_FWD_ADJ_X, JTIMESB_FWD_ADJ_Z, JTIMESB_NUM_OUT};
+    enum JacFOut {JACF_ODE_X, JACF_ALG_X, JACF_ODE_Z, JACF_ALG_Z, JACF_NUM_OUT};
+    ///@}
+
+    ///@{
     /// Options
     double abstol_, reltol_;
     casadi_int max_num_steps_;
@@ -169,7 +207,7 @@ namespace casadi {
     ///@}
 
     /// Linear solver
-    Linsol linsolF_, linsolB_;
+    Linsol linsolF_;
 
     /// Supported iterative solvers in Sundials
     enum NewtonScheme {SD_DIRECT, SD_GMRES, SD_BCGSTAB, SD_TFQMR} newton_scheme_;

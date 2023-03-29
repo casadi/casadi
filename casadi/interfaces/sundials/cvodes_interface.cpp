@@ -95,12 +95,6 @@ void CvodesInterface::init(const Dict& opts) {
     }
   }
 
-  // Create function
-  create_function("odeF", {"x", "p", "u", "t"}, {"ode"});
-  create_function("quadF", {"x", "p", "u", "t"}, {"quad"});
-  create_function("odeB", {"rx", "rp", "x", "p", "u", "t"}, {"rode"});
-  create_function("quadB", {"rx", "rp", "x", "p", "u", "t"}, {"rquad", "uquad"});
-
   // Algebraic variables not supported
   casadi_assert(nz_==0 && nrz_==0,
     "CVODES does not support algebraic variables");
@@ -119,15 +113,6 @@ void CvodesInterface::init(const Dict& opts) {
     iter_ = CV_FUNCTIONAL;
   } else {
     casadi_error("Unknown nonlinear solver iteration: " + nonlinear_solver_iteration);
-  }
-
-  // Attach functions for jacobian information
-  if (newton_scheme_!=SD_DIRECT || (ns_>0 && second_order_correction_)) {
-    create_function("jtimesF", {"t", "x", "p", "u", "fwd:x"}, {"fwd:ode"});
-    if (nrx_>0) {
-      create_function("jtimesB",
-                      {"t", "x", "p", "u", "rx", "rp", "fwd:rx"}, {"fwd:rode"});
-    }
   }
 
   // Misc
@@ -151,7 +136,7 @@ int CvodesInterface::init_mem(void* mem) const {
 
   // Initialize CVodes
   double t0 = 0;
-  THROWING(CVodeInit, m->mem, rhs, t0, m->xz);
+  THROWING(CVodeInit, m->mem, rhsF, t0, m->xz);
 
   // Set tolerances
   THROWING(CVodeSStolerances, m->mem, reltol_, abstol_);
@@ -179,8 +164,8 @@ int CvodesInterface::init_mem(void* mem) const {
     // Direct scheme
     CVodeMem cv_mem = static_cast<CVodeMem>(m->mem);
     cv_mem->cv_lmem   = m;
-    cv_mem->cv_lsetup = lsetup;
-    cv_mem->cv_lsolve = lsolve;
+    cv_mem->cv_lsetup = lsetupF;
+    cv_mem->cv_lsolve = lsolveF;
     cv_mem->cv_setupNonNull = TRUE;
   } else {
     // Iterative scheme
@@ -191,14 +176,14 @@ int CvodesInterface::init_mem(void* mem) const {
     case SD_BCGSTAB: THROWING(CVSpbcg, m->mem, pretype, max_krylov_); break;
     case SD_TFQMR: THROWING(CVSptfqmr, m->mem, pretype, max_krylov_); break;
     }
-    THROWING(CVSpilsSetJacTimesVecFn, m->mem, jtimes);
-    if (use_precon_) THROWING(CVSpilsSetPreconditioner, m->mem, psetup, psolve);
+    THROWING(CVSpilsSetJacTimesVecFn, m->mem, jtimesF);
+    if (use_precon_) THROWING(CVSpilsSetPreconditioner, m->mem, psetupF, psolveF);
   }
 
   // Quadrature equations
   if (nq_>0) {
     // Initialize quadratures in CVodes
-    THROWING(CVodeQuadInit, m->mem, rhsQ, m->q);
+    THROWING(CVodeQuadInit, m->mem, rhsQF, m->q);
 
     // Should the quadrature errors be used for step size control?
     if (quad_err_con_) {
@@ -212,7 +197,7 @@ int CvodesInterface::init_mem(void* mem) const {
 
   // Initialize adjoint sensitivities
   if (nrx_>0) {
-    casadi_int interpType = interp_==SD_HERMITE ? CV_HERMITE : CV_POLYNOMIAL;
+    casadi_int interpType = interp_ == SD_HERMITE ? CV_HERMITE : CV_POLYNOMIAL;
     THROWING(CVodeAdjInit, m->mem, steps_per_checkpoint_, interpType);
   }
 
@@ -220,20 +205,13 @@ int CvodesInterface::init_mem(void* mem) const {
   return 0;
 }
 
-int CvodesInterface::rhs(double t, N_Vector x, N_Vector xdot, void *user_data) {
+int CvodesInterface::rhsF(double t, N_Vector x, N_Vector xdot, void *user_data) {
   try {
     casadi_assert_dev(user_data);
     auto m = to_mem(user_data);
     auto& s = m->self;
-    m->arg[0] = NV_DATA_S(x);
-    m->arg[1] = m->p;
-    m->arg[2] = m->u;
-    m->arg[3] = &t;
-    m->res[0] = NV_DATA_S(xdot);
-    s.calc_function(m, "odeF");
+    if (s.calc_daeF(m, t, NV_DATA_S(x), nullptr, NV_DATA_S(xdot), nullptr)) return 1;
     return 0;
-  } catch(int flag) { // recoverable error
-    return flag;
   } catch(std::exception& e) { // non-recoverable error
     uerr() << "rhs failed: " << e.what() << std::endl;
     return -1;
@@ -423,19 +401,13 @@ void CvodesInterface::ehfun(int error_code, const char *module, const char *func
   }
 }
 
-int CvodesInterface::rhsQ(double t, N_Vector x, N_Vector qdot, void *user_data) {
+int CvodesInterface::rhsQF(double t, N_Vector x, N_Vector qdot, void *user_data) {
   try {
     auto m = to_mem(user_data);
     auto& s = m->self;
-    m->arg[0] = NV_DATA_S(x);
-    m->arg[1] = m->p;
-    m->arg[2] = m->u;
-    m->arg[3] = &t;
-    m->res[0] = NV_DATA_S(qdot);
-    s.calc_function(m, "quadF");
+    if (s.calc_quadF(m, t, NV_DATA_S(x), nullptr, NV_DATA_S(qdot))) return 1;
+
     return 0;
-  } catch(int flag) { // recoverable error
-    return flag;
   } catch(std::exception& e) { // non-recoverable error
     uerr() << "rhsQ failed: " << e.what() << std::endl;
     return -1;
@@ -447,21 +419,11 @@ int CvodesInterface::rhsB(double t, N_Vector x, N_Vector rx, N_Vector rxdot, voi
     casadi_assert_dev(user_data);
     auto m = to_mem(user_data);
     auto& s = m->self;
-    m->arg[0] = NV_DATA_S(rx);
-    m->arg[1] = m->rp;
-    m->arg[2] = NV_DATA_S(x);
-    m->arg[3] = m->p;
-    m->arg[4] = m->u;
-    m->arg[5] = &t;
-    m->res[0] = NV_DATA_S(rxdot);
-    s.calc_function(m, "odeB");
-
+    if (s.calc_daeB(m, t, NV_DATA_S(x), nullptr, NV_DATA_S(rx), nullptr,
+      NV_DATA_S(rxdot), nullptr)) return 1;
     // Negate (note definition of g)
     casadi_scal(s.nrx_, -1., NV_DATA_S(rxdot));
-
     return 0;
-  } catch(int flag) { // recoverable error
-    return flag;
   } catch(std::exception& e) { // non-recoverable error
     uerr() << "rhsB failed: " << e.what() << std::endl;
     return -1;
@@ -473,45 +435,29 @@ int CvodesInterface::rhsQB(double t, N_Vector x, N_Vector rx, N_Vector ruqdot, v
     casadi_assert_dev(user_data);
     auto m = to_mem(user_data);
     auto& s = m->self;
-    m->arg[0] = NV_DATA_S(rx);
-    m->arg[1] = m->rp;
-    m->arg[2] = NV_DATA_S(x);
-    m->arg[3] = m->p;
-    m->arg[4] = m->u;
-    m->arg[5] = &t;
-    m->res[0] = NV_DATA_S(ruqdot);
-    m->res[1] = NV_DATA_S(ruqdot) + s.nrq_;
-    s.calc_function(m, "quadB");
+    if (s.calc_quadB(m, t, NV_DATA_S(x), nullptr, NV_DATA_S(rx), nullptr,
+      NV_DATA_S(ruqdot), NV_DATA_S(ruqdot) + s.nrq_)) return 1;
 
     // Negate (note definition of g)
-    casadi_scal(s.nrq_ + s.nuq_, -1., NV_DATA_S(ruqdot));
+    casadi_scal((s.nrq_ + s.nuq_), -1., NV_DATA_S(ruqdot));
 
     return 0;
-  } catch(int flag) { // recoverable error
-    return flag;
   } catch(std::exception& e) { // non-recoverable error
     uerr() << "rhsQB failed: " << e.what() << std::endl;
     return -1;
   }
 }
 
-int CvodesInterface::jtimes(N_Vector v, N_Vector Jv, double t, N_Vector x,
+int CvodesInterface::jtimesF(N_Vector v, N_Vector Jv, double t, N_Vector x,
     N_Vector xdot, void *user_data, N_Vector tmp) {
   try {
     auto m = to_mem(user_data);
     auto& s = m->self;
-    m->arg[0] = &t;
-    m->arg[1] = NV_DATA_S(x);
-    m->arg[2] = m->p;
-    m->arg[3] = m->u;
-    m->arg[4] = NV_DATA_S(v);
-    m->res[0] = NV_DATA_S(Jv);
-    s.calc_function(m, "jtimesF");
+    if (s.calc_jtimesF(m, t, NV_DATA_S(x), nullptr, NV_DATA_S(v), nullptr,
+      NV_DATA_S(Jv), nullptr)) return 1;
     return 0;
-  } catch(casadi_int flag) { // recoverable error
-    return flag;
   } catch(std::exception& e) { // non-recoverable error
-    uerr() << "jtimes failed: " << e.what() << std::endl;
+    uerr() << "jtimesF failed: " << e.what() << std::endl;
     return -1;
   }
 }
@@ -521,25 +467,16 @@ int CvodesInterface::jtimesB(N_Vector v, N_Vector Jv, double t, N_Vector x,
   try {
     auto m = to_mem(user_data);
     auto& s = m->self;
-    m->arg[0] = &t;
-    m->arg[1] = NV_DATA_S(x);
-    m->arg[2] = m->p;
-    m->arg[3] = m->u;
-    m->arg[4] = NV_DATA_S(rx);
-    m->arg[5] = m->rp;
-    m->arg[6] = NV_DATA_S(v);
-    m->res[0] = NV_DATA_S(Jv);
-    s.calc_function(m, "jtimesB");
+    if (s.calc_jtimesB(m, t, NV_DATA_S(x), nullptr, NV_DATA_S(rx), nullptr,
+      NV_DATA_S(v), nullptr, NV_DATA_S(Jv), nullptr)) return 1;
     return 0;
-  } catch(int flag) { // recoverable error
-    return flag;
   } catch(std::exception& e) { // non-recoverable error
-    uerr() << "jtimes failed: " << e.what() << std::endl;
+    uerr() << "jtimesB failed: " << e.what() << std::endl;
     return -1;
   }
 }
 
-int CvodesInterface::psolve(double t, N_Vector x, N_Vector xdot, N_Vector r,
+int CvodesInterface::psolveF(double t, N_Vector x, N_Vector xdot, N_Vector r,
     N_Vector z, double gamma, double delta, int lr, void *user_data, N_Vector tmp) {
   try {
     auto m = to_mem(user_data);
@@ -550,40 +487,30 @@ int CvodesInterface::psolve(double t, N_Vector x, N_Vector xdot, N_Vector r,
     casadi_copy(v, s.nx_, m->v1);
 
     // Solve for undifferentiated right-hand-side, save to output
-    if (s.linsolF_.solve(m->jacF, m->v1, 1, false, m->mem_linsolF))
-      casadi_error("Linear system solve failed");
+    if (s.linsolF_.solve(m->jacF, m->v1, 1, false, m->mem_linsolF)) return 1;
     v = NV_DATA_S(z); // possibly different from r
     casadi_copy(m->v1, s.nx1_, v);
 
     // Sensitivity equations
-    if (s.ns_>0) {
+    if (s.nfwd_ > 0) {
       // Second order correction
       if (s.second_order_correction_) {
         // The outputs will double as seeds for jtimesF
         casadi_clear(v + s.nx1_, s.nx_ - s.nx1_);
-        m->arg[0] = &t; // t
-        m->arg[1] = NV_DATA_S(x); // x
-        m->arg[2] = m->p; // p
-        m->arg[3] = m->u; // u
-        m->arg[4] = v; // fwd:x
-        m->res[0] = m->v2; // fwd:ode
-        s.calc_function(m, "jtimesF");
+        if (s.calc_jtimesF(m, t, NV_DATA_S(x), nullptr, v, nullptr, m->v2, nullptr)) return 1;
 
         // Subtract m->v2 from m->v1, scaled with -gamma
         casadi_axpy(s.nx_ - s.nx1_, m->gamma, m->v2 + s.nx1_, m->v1 + s.nx1_);
       }
 
       // Solve for sensitivity right-hand-sides
-      if (s.linsolF_.solve(m->jacF, m->v1 + s.nx1_, s.ns_, false, m->mem_linsolF))
-        casadi_error("Linear solve failed");
+      if (s.linsolF_.solve(m->jacF, m->v1 + s.nx1_, s.nfwd_, false, m->mem_linsolF)) return 1;
 
       // Save to output, reordered
-      casadi_copy(m->v1 + s.nx1_, s.nx_-s.nx1_, v+s.nx1_);
+      casadi_copy(m->v1 + s.nx1_, s.nx_ - s.nx1_, v + s.nx1_);
     }
 
     return 0;
-  } catch(int flag) { // recoverable error
-    return flag;
   } catch(std::exception& e) { // non-recoverable error
     uerr() << "psolve failed: " << e.what() << std::endl;
     return -1;
@@ -601,50 +528,40 @@ int CvodesInterface::psolveB(double t, N_Vector x, N_Vector xB, N_Vector xdotB, 
     casadi_copy(v, s.nrx_, m->v1);
 
     // Solve for undifferentiated right-hand-side, save to output
-    if (s.linsolB_.solve(m->jacB, m->v1, 1, false, m->mem_linsolB))
-      casadi_error("Linear solve failed");
+    if (s.linsolF_.solve(m->jacF, m->v1, s.nadj_, true, m->mem_linsolF)) return 1;
     v = NV_DATA_S(zvecB); // possibly different from rvecB
-    casadi_copy(m->v1, s.nrx1_, v);
+    casadi_copy(m->v1, s.nrx1_ * s.nadj_, v);
 
     // Sensitivity equations
-    if (s.ns_>0) {
+    if (s.nfwd_ > 0) {
       // Second order correction
       if (s.second_order_correction_) {
-        // The outputs will double as seeds for jtimesF
-        casadi_clear(v + s.nrx1_, s.nrx_ - s.nrx1_);
-        m->arg[0] = &t; // t
-        m->arg[1] = NV_DATA_S(x); // x
-        m->arg[2] = m->p; // p
-        m->arg[3] = m->u; // u
-        m->arg[4] = NV_DATA_S(xB); // rx
-        m->arg[5] = m->rp; // rp
-        m->arg[6] = v; // fwd:rx
-        m->res[0] = m->v2; // fwd:rode
-        s.calc_function(m, "jtimesB");
+        // The outputs will double as seeds for jtimesB
+        casadi_clear(v + s.nrx1_ * s.nadj_, s.nrx_ - s.nrx1_ * s.nadj_);
+        if (s.calc_jtimesB(m, t, NV_DATA_S(x), nullptr, NV_DATA_S(xB),
+          nullptr, v, nullptr, m->v2, nullptr)) return 1;
 
         // Subtract m->v2 from m->v1, scaled with gammaB
-        casadi_axpy(s.nrx_-s.nrx1_, -m->gammaB, m->v2 + s.nrx1_, m->v1 + s.nrx1_);
+        casadi_axpy(s.nrx_ - s.nrx1_ * s.nadj_, -m->gammaB, m->v2 + s.nrx1_ * s.nadj_,
+          m->v1 + s.nrx1_ * s.nadj_);
       }
 
       // Solve for sensitivity right-hand-sides
-      if (s.linsolB_.solve(m->jacB, m->v1 + s.nx1_, s.ns_, false, m->mem_linsolB)) {
-        casadi_error("Linear solve failed");
-      }
+      if (s.linsolF_.solve(m->jacF, m->v1 + s.nx1_, s.nadj_ * s.nfwd_,
+        true, m->mem_linsolF)) return 1;
 
       // Save to output, reordered
-      casadi_copy(m->v1 + s.nx1_, s.nx_-s.nx1_, v+s.nx1_);
+      casadi_copy(m->v1 + s.nx1_, s.nx_ - s.nx1_, v + s.nx1_);
     }
 
     return 0;
-  } catch(int flag) { // recoverable error
-    return flag;
   } catch(std::exception& e) { // non-recoverable error
     uerr() << "psolveB failed: " << e.what() << std::endl;
     return -1;
   }
 }
 
-int CvodesInterface::psetup(double t, N_Vector x, N_Vector xdot, booleantype jok,
+int CvodesInterface::psetupF(double t, N_Vector x, N_Vector xdot, booleantype jok,
     booleantype *jcurPtr, double gamma, void *user_data,
     N_Vector tmp1, N_Vector tmp2, N_Vector tmp3) {
   try {
@@ -661,12 +578,8 @@ int CvodesInterface::psetup(double t, N_Vector x, N_Vector xdot, booleantype jok
     casadi_int jac_offset = sp_jacF.nnz() - sp_jac_ode_x.nnz();
 
     // Calculate Jacobian
-    m->arg[0] = &t;
-    m->arg[1] = NV_DATA_S(x);
-    m->arg[2] = m->p;
-    m->arg[3] = m->u;
-    m->res[0] = m->jacF + jac_offset;
-    if (s.calc_function(m, "jacF")) casadi_error("'jacF' calculation failed");
+    if (s.calc_jacF(m, t, NV_DATA_S(x), nullptr,
+      m->jacF + jac_offset, nullptr, nullptr, nullptr)) return 1;
 
     // Project to expected sparsity pattern (with diagonal)
     casadi_project(m->jacF + jac_offset, sp_jac_ode_x, m->jacF, sp_jacF, m->w);
@@ -684,14 +597,12 @@ int CvodesInterface::psetup(double t, N_Vector x, N_Vector xdot, booleantype jok
     }
 
     // Jacobian is now current
-    *jcurPtr = 1;
+    if (jcurPtr) *jcurPtr = 1;
 
     // Prepare the solution of the linear system (e.g. factorize)
-    if (s.linsolF_.nfact(m->jacF, m->mem_linsolF)) casadi_error("'jacF' factorization failed");
+    if (s.linsolF_.nfact(m->jacF, m->mem_linsolF)) return 1;
 
     return 0;
-  } catch(int flag) { // recoverable error
-    return flag;
   } catch(std::exception& e) { // non-recoverable error
     uerr() << "psetup failed: " << e.what() << std::endl;
     return -1;
@@ -703,77 +614,26 @@ int CvodesInterface::psetupB(double t, N_Vector x, N_Vector rx, N_Vector rxdot,
     void *user_data, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) {
   try {
     auto m = to_mem(user_data);
-    auto& s = m->self;
     // Store gamma for later
     m->gammaB = gammaB;
+    // We use the same linear solver for the forward problem as for the backward problem
+    return psetupF(t, x, nullptr, jokB, jcurPtrB, -gammaB, user_data, tmp1B, tmp2B, tmp3B);
 
-    // Sparsity patterns
-    const Sparsity& sp_jac_rode_rx = s.get_function("jacB").sparsity_out(0);
-    const Sparsity& sp_jacB = s.linsolB_.sparsity();
-
-    // Offset for storing the sparser Jacobian, to allow overwriting entries
-    casadi_int jac_offset = sp_jacB.nnz() - sp_jac_rode_rx.nnz();
-
-    // Calculate Jacobian
-    m->arg[0] = &t;
-    m->arg[1] = NV_DATA_S(x);
-    m->arg[2] = m->p;
-    m->arg[3] = m->u;
-    m->arg[4] = NV_DATA_S(rx);
-    m->arg[5] = m->rp;
-    m->res[0] = m->jacB + jac_offset;
-    if (s.calc_function(m, "jacB")) casadi_error("'jacB' calculation failed");
-
-    // Project to expected sparsity pattern (with diagonal)
-    casadi_project(m->jacB + jac_offset, sp_jac_rode_rx, m->jacB, sp_jacB, m->w);
-
-    // Scale and shift diagonal
-    const casadi_int *colind = sp_jacB.colind(), *row = sp_jacB.row();
-    for (casadi_int c = 0; c < sp_jacB.size2(); ++c) {
-      for (casadi_int k = colind[c]; k < colind[c + 1]; ++k) {
-        casadi_int r = row[k];
-        // Scale Jacobian
-        m->jacB[k] *= gammaB;
-        // Add contribution to diagonal
-        if (r == c) m->jacB[k] += 1;
-      }
-    }
-
-    // Jacobian is now current
-    *jcurPtrB = 1;
-
-    // Prepare the solution of the linear system (e.g. factorize)
-    if (s.linsolB_.nfact(m->jacB, m->mem_linsolB)) casadi_error("'jacB' factorization failed");
-
-    return 0;
-  } catch(int flag) { // recoverable error
-    return flag;
   } catch(std::exception& e) { // non-recoverable error
     uerr() << "psetupB failed: " << e.what() << std::endl;
     return -1;
   }
 }
 
-int CvodesInterface::lsetup(CVodeMem cv_mem, int convfail, N_Vector x, N_Vector xdot,
-                            booleantype *jcurPtr,
-                            N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3) {
+int CvodesInterface::lsetupF(CVodeMem cv_mem, int convfail, N_Vector x, N_Vector xdot,
+    booleantype *jcurPtr, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3) {
   try {
     auto m = to_mem(cv_mem->cv_lmem);
-    //auto& s = m->self;
-
-    // Current time
-    double t = cv_mem->cv_tn;
-
-    // Scaling factor before J
-    double gamma = cv_mem->cv_gamma;
 
     // Call the preconditioner setup function (which sets up the linear solver)
-    if (psetup(t, x, xdot, FALSE, jcurPtr,
-                gamma, static_cast<void*>(m), vtemp1, vtemp2, vtemp3)) return 1;
+    return psetupF(cv_mem->cv_tn, x, xdot, FALSE, jcurPtr,
+      cv_mem->cv_gamma, static_cast<void*>(m), vtemp1, vtemp2, vtemp3);
 
-    return 0;
-  } catch(int flag) { // recoverable error
-    return flag;
   } catch(std::exception& e) { // non-recoverable error
     uerr() << "lsetup failed: " << e.what() << std::endl;
     return -1;
@@ -781,43 +641,36 @@ int CvodesInterface::lsetup(CVodeMem cv_mem, int convfail, N_Vector x, N_Vector 
 }
 
 int CvodesInterface::lsetupB(CVodeMem cv_mem, int convfail, N_Vector x, N_Vector xdot,
-                              booleantype *jcurPtr,
-                              N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3) {
+    booleantype *jcurPtr, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3) {
   try {
     auto m = to_mem(cv_mem->cv_lmem);
     CVadjMem ca_mem;
     //CVodeBMem cvB_mem;
-
-    int flag;
 
     // Current time
     double t = cv_mem->cv_tn; // TODO(Joel): is this correct?
     double gamma = cv_mem->cv_gamma;
 
     cv_mem = static_cast<CVodeMem>(cv_mem->cv_user_data);
-
     ca_mem = cv_mem->cv_adj_mem;
     //cvB_mem = ca_mem->ca_bckpbCrt;
 
     // Get FORWARD solution from interpolation.
-    flag = ca_mem->ca_IMget(cv_mem, t, ca_mem->ca_ytmp, nullptr);
+    int flag = ca_mem->ca_IMget(cv_mem, t, ca_mem->ca_ytmp, nullptr);
     if (flag != CV_SUCCESS) casadi_error("Could not interpolate forward states");
 
     // Call the preconditioner setup function (which sets up the linear solver)
-    if (psetupB(t, ca_mem->ca_ytmp, x, xdot, FALSE, jcurPtr,
-                gamma, static_cast<void*>(m), vtemp1, vtemp2, vtemp3)) return 1;
+    return psetupB(t, ca_mem->ca_ytmp, x, xdot, FALSE, jcurPtr,
+      gamma, static_cast<void*>(m), vtemp1, vtemp2, vtemp3);
 
-    return 0;
-  } catch(int flag) { // recoverable error
-    return flag;
   } catch(std::exception& e) { // non-recoverable error
     uerr() << "lsetupB failed: " << e.what() << std::endl;
     return -1;
   }
 }
 
-int CvodesInterface::lsolve(CVodeMem cv_mem, N_Vector b, N_Vector weight,
-                            N_Vector x, N_Vector xdot) {
+int CvodesInterface::lsolveF(CVodeMem cv_mem, N_Vector b, N_Vector weight,
+    N_Vector x, N_Vector xdot) {
   try {
     auto m = to_mem(cv_mem->cv_lmem);
     //auto& s = m->self;
@@ -835,26 +688,20 @@ int CvodesInterface::lsolve(CVodeMem cv_mem, N_Vector b, N_Vector weight,
     casadi_int lr = 1;
 
     // Call the preconditioner solve function (which solves the linear system)
-    if (psolve(t, x, xdot, b, b, gamma, delta,
-                lr, static_cast<void*>(m), nullptr)) return 1;
+    return psolveF(t, x, xdot, b, b, gamma, delta, lr, static_cast<void*>(m), nullptr);
 
-    return 0;
-  } catch(int flag) { // recoverable error
-    return flag;
   } catch(std::exception& e) { // non-recoverable error
-    uerr() << "lsolve failed: " << e.what() << std::endl;
+    uerr() << "lsolveF failed: " << e.what() << std::endl;
     return -1;
   }
 }
 
 int CvodesInterface::lsolveB(CVodeMem cv_mem, N_Vector b, N_Vector weight,
-                              N_Vector x, N_Vector xdot) {
+    N_Vector x, N_Vector xdot) {
   try {
     auto m = to_mem(cv_mem->cv_lmem);
     CVadjMem ca_mem;
     //CVodeBMem cvB_mem;
-
-    int flag;
 
     // Current time
     double t = cv_mem->cv_tn; // TODO(Joel): is this correct?
@@ -866,10 +713,8 @@ int CvodesInterface::lsolveB(CVodeMem cv_mem, N_Vector b, N_Vector weight,
     //cvB_mem = ca_mem->ca_bckpbCrt;
 
     // Get FORWARD solution from interpolation.
-    flag = ca_mem->ca_IMget(cv_mem, t, ca_mem->ca_ytmp, nullptr);
+    int flag = ca_mem->ca_IMget(cv_mem, t, ca_mem->ca_ytmp, nullptr);
     if (flag != CV_SUCCESS) casadi_error("Could not interpolate forward states");
-
-
 
     // Accuracy
     double delta = 0.0;
@@ -878,28 +723,13 @@ int CvodesInterface::lsolveB(CVodeMem cv_mem, N_Vector b, N_Vector weight,
     int lr = 1;
 
     // Call the preconditioner solve function (which solves the linear system)
-    if (psolveB(t, ca_mem->ca_ytmp, x, xdot, b, b, gamma, delta, lr,
-                static_cast<void*>(m), nullptr)) return 1;
+    return psolveB(t, ca_mem->ca_ytmp, x, xdot, b, b, gamma, delta, lr,
+      static_cast<void*>(m), nullptr);
 
-    return 0;
-  } catch(int flag) { // recoverable error
-    return flag;
   } catch(std::exception& e) { // non-recoverable error
     uerr() << "lsolveB failed: " << e.what() << std::endl;
     return -1;
   }
-}
-
-Function CvodesInterface::get_jacF(Sparsity* sp) const {
-  Function J = oracle_.factory("jacF", {"t", "x", "p", "u"}, {"jac:ode:x"});
-  if (sp) *sp = J.sparsity_out(0) + Sparsity::diag(nx_);
-  return J;
-}
-
-Function CvodesInterface::get_jacB(Sparsity* sp) const {
-  Function J = oracle_.factory("jacB", {"t", "x", "p", "u", "rx", "rp"}, {"jac:rode:rx"});
-  if (sp) *sp = J.sparsity_out(0) + Sparsity::diag(nrx_);
-  return J;
 }
 
 CvodesMemory::CvodesMemory(const CvodesInterface& s) : self(s) {
@@ -911,7 +741,6 @@ CvodesMemory::CvodesMemory(const CvodesInterface& s) : self(s) {
 
 CvodesMemory::~CvodesMemory() {
   if (this->mem_linsolF >= 0) self.linsolF_.release(this->mem_linsolF);
-  if (this->mem_linsolB >= 0) self.linsolB_.release(this->mem_linsolB);
   if (this->mem) CVodeFree(&this->mem);
 }
 

@@ -1382,8 +1382,8 @@ INCLUDE_FILE_PATTERNS  =
 # undefined via #undef or recursively expanded use the := operator 
 # instead of the = operator.
 
-PREDEFINED             = DOXYGENPROC = \
-                         "SWIG_OUTPUT(myarg) = myarg"
+PREDEFINED             = DOXYGENPROC
+PREDEFINED+=             "SWIG_OUTPUT(myarg) = myarg"
 PREDEFINED+=             "SWIG_CONSTREF(myarg) = myarg"
 PREDEFINED+=             "SWIG_INOUT(myarg) = myarg"
 PREDEFINED+=             "CASADI_PREFIX(myarg) = casadi_ ## myarg"

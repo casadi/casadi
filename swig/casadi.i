@@ -298,8 +298,7 @@ def SX_from_array(m, check_only=True):
   if isinstance(m, np.ndarray):
     if len(m.shape)>2:
       return False
-    np_object=np.object if hasattr(np,'object') else object
-    if m.dtype!=np_object: return None
+    if m.dtype!=object: return None
     shape = m.shape + (1, 1)
     nrow, ncol = shape[0], shape[1]
     return (nrow,ncol,m.flat)
@@ -3089,6 +3088,10 @@ DECL M casadi_bilin(const M& A, const M& x, const M& y) {
   return bilin(A, x, y);
 }
 
+DECL M casadi_bilin(const M& A, const M& x) {
+  return bilin(A, x);
+}
+
 DECL M casadi_rank1(const M& A, const M& alpha, const M& x, const M& y) {
   return rank1(A, alpha, x, y);
 }
@@ -4505,19 +4508,27 @@ make_property(casadi::Opti, casadi_solver);
       def parameter(self,*args):
         import sys
         import os
-        frame = sys._getframe(1)
-        meta = {"stacktrace": {"file":os.path.abspath(frame.f_code.co_filename),"line":frame.f_lineno,"name":frame.f_code.co_name}}
+        try:
+            frame = sys._getframe(1)
+        except:
+            frame = {}
+        meta = {} if frame is None else {"stacktrace": {"file":os.path.abspath(frame.f_code.co_filename),"line":frame.f_lineno,"name":frame.f_code.co_name}}
         ret = self._parameter(*args)
-        self.update_user_dict(ret, meta)
+        if len(meta)>0:
+            self.update_user_dict(ret, meta)
         return ret
 
       def variable(self,*args):
         import sys
         import os
-        frame = sys._getframe(1)
-        meta = {"stacktrace": {"file":os.path.abspath(frame.f_code.co_filename),"line":frame.f_lineno,"name":frame.f_code.co_name}}
+        try:
+            frame = sys._getframe(1)
+        except:
+            frame = {}
+        meta = {} if frame is None else {"stacktrace": {"file":os.path.abspath(frame.f_code.co_filename),"line":frame.f_lineno,"name":frame.f_code.co_name}}
         ret = self._variable(*args)
-        self.update_user_dict(ret, meta)
+        if len(meta)>0:
+            self.update_user_dict(ret, meta)
         return ret
 
       def subject_to(self,*args):
@@ -4525,10 +4536,14 @@ make_property(casadi::Opti, casadi_solver);
           return self._subject_to()
         import sys
         import os
-        frame = sys._getframe(1)
-        meta = {"stacktrace": {"file":os.path.abspath(frame.f_code.co_filename),"line":frame.f_lineno,"name":frame.f_code.co_name}}
+        try:
+            frame = sys._getframe(1)
+        except:
+            frame = {}
+        meta = {} if frame is None else {"stacktrace": {"file":os.path.abspath(frame.f_code.co_filename),"line":frame.f_lineno,"name":frame.f_code.co_name}}
         ret = self._subject_to(*args)
-        self.update_user_dict(args[0], meta)
+        if len(meta)>0:
+            self.update_user_dict(args[0], meta)
         return ret
     %}
   }

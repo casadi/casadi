@@ -184,9 +184,6 @@ enum DynIn {
   DYN_Z,
   DYN_P,
   DYN_U,
-  DYN_RX,
-  DYN_RZ,
-  DYN_RP,
   DYN_NUM_IN};
 
 /// Inputs of the symbolic representation of the DAE
@@ -194,28 +191,24 @@ enum DynOut {
   DYN_ODE,
   DYN_ALG,
   DYN_QUAD,
-  DYN_RODE,
-  DYN_RALG,
-  DYN_RQUAD,
-  DYN_UQUAD,
   DYN_NUM_OUT};
 
 /// Input arguments of an integrator
 enum IntegratorInput {
   /// Differential state at the initial time
   INTEGRATOR_X0,
+  /// Initial guess for the algebraic variable at the initial time
+  INTEGRATOR_Z0,
   /// Parameters
   INTEGRATOR_P,
   /// Piecewise constant control, a new control interval starts at each output time
   INTEGRATOR_U,
-  /// Initial guess for the algebraic variable at the initial time
-  INTEGRATOR_Z0,
-  /// Backward differential state impulse at each output time
-  INTEGRATOR_RX0,
-  /// Backward parameter vector impulse at each output time
-  INTEGRATOR_RP,
-  /// Initial guess for the backwards algebraic variable at each output time
-  INTEGRATOR_RZ0,
+  /// Adjoint seeds corresponding to the states at the output times
+  INTEGRATOR_ADJ_XF,
+  /// Adjoint seeds corresponding to the algebraic variables at the output times
+  INTEGRATOR_ADJ_ZF,
+  /// Adjoint seeds corresponding to the quadratures at the output times
+  INTEGRATOR_ADJ_QF,
   /// Number of input arguments of an integrator
   INTEGRATOR_NUM_IN
 };
@@ -224,18 +217,18 @@ enum IntegratorInput {
 enum IntegratorOutput {
   /// Differential state at all output times
   INTEGRATOR_XF,
-  /// Quadrature state at all output times
-  INTEGRATOR_QF,
   /// Algebraic variable at all output times
   INTEGRATOR_ZF,
-  /// Backward differential state at the initial time
-  INTEGRATOR_RXF,
-  /// Backward quadrature state at the initial time
-  INTEGRATOR_RQF,
-  /// Backward algebraic variable at the initial time
-  INTEGRATOR_RZF,
-  /// Backward gridded quadrature for each control interval
-  INTEGRATOR_UQF,
+  /// Quadrature state at all output times
+  INTEGRATOR_QF,
+  /// Adjoint sensitivities corresponding to the initial state
+  INTEGRATOR_ADJ_X0,
+  /// Adjoint sensitivities corresponding to the algebraic variable guess
+  INTEGRATOR_ADJ_Z0,
+  /// Adjoint sensitivities corresponding to the parameter vector
+  INTEGRATOR_ADJ_P,
+  /// Adjoint sensitivities corresponding to the control vector
+  INTEGRATOR_ADJ_U,
   /// Number of output arguments of an integrator
   INTEGRATOR_NUM_OUT
 };

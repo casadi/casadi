@@ -38,6 +38,14 @@ namespace casadi {
     plugin->version = CASADI_VERSION;
     plugin->options = &GurobiInterface::options_;
     plugin->deserialize = &GurobiInterface::deserialize;
+    #ifdef GUROBI_ADAPTOR
+      char buffer[400];
+      int ret = gurobi_adaptor_load(buffer, sizeof(buffer));
+      if (ret!=0) {
+        casadi_warning("Failed to load Gurobi adaptor: " + std::string(buffer) + ".");
+        return 1;
+      }
+    #endif
     return 0;
   }
 
@@ -49,18 +57,10 @@ namespace casadi {
   GurobiInterface::GurobiInterface(const std::string& name,
                                    const std::map<std::string, Sparsity>& st)
     : Conic(name, st) {
-    #ifdef GUROBI_ADAPTOR
-      char buffer[200];
-      int ret = gurobi_adaptor_load(buffer, sizeof(buffer));
-      casadi_assert(ret==0, "Failed to load Gurobi adaptor: " + std::string(buffer) + ".");
-    #endif
   }
 
   GurobiInterface::~GurobiInterface() {
     clear_mem();
-    #ifdef GUROBI_ADAPTOR
-      gurobi_adaptor_unload();
-    #endif
   }
 
   const Options GurobiInterface::options_
@@ -517,11 +517,6 @@ namespace casadi {
   }
 
   GurobiInterface::GurobiInterface(DeserializingStream& s) : Conic(s) {
-    #ifdef GUROBI_ADAPTOR
-      char buffer[200];
-      int ret = gurobi_adaptor_load(buffer, sizeof(buffer));
-      casadi_assert(ret==0, "Failed to load Gurobi adaptor: " + std::string(buffer) + ".");
-    #endif
     s.version("GurobiInterface", 1);
     s.unpack("GurobiInterface::vtype", vtype_);
     s.unpack("GurobiInterface::opts", opts_);

@@ -52,9 +52,7 @@ class Simulatortests(casadiTestCase):
     opts['abstol'] = 1e-15
     opts['fsens_err_con'] = True
     #opts['verbose'] = True
-    opts['t0'] = 0
-    opts['tf'] = 2.3
-    integrator = casadi.integrator('integrator', 'cvodes', f, opts)
+    integrator = casadi.integrator('integrator', 'cvodes', f, 0, 2.3, opts)
     q0   = MX.sym('q0')
     par  = MX.sym('p')
     qend = integrator.call({'x0':q0,'p':par})['xf']
@@ -85,9 +83,7 @@ class Simulatortests(casadiTestCase):
     opts['abstol'] = 1e-15
     opts['fsens_err_con'] = True
     #opts['verbose'] = True
-    opts['grid'] = tc
-    opts['output_t0'] = True
-    integrator = casadi.integrator('integrator', 'cvodes', f, opts)
+    integrator = casadi.integrator('integrator', 'cvodes', f, tc[0], tc, opts)
 
     solution = Function('solution', {'x0':q, 'p':p, 'xf':horzcat(*[q*exp(t**3/(3*p)) for t in tc])},
                         casadi.integrator_in(), casadi.integrator_out())
@@ -106,12 +102,12 @@ class Simulatortests(casadiTestCase):
     opts['reltol'] = 1e-15
     opts['abstol'] = 1e-15
     opts['fsens_err_con'] = True
-    opts['grid'] = t
-    opts['output_t0'] = True
-    integrator = casadi.integrator('integrator', 'cvodes', self.dae, opts)
+    integrator = casadi.integrator('integrator', 'cvodes', self.dae, t[0], t, opts)
 
-    integrator_in = [0]*integrator.n_in();integrator_in[0]=[num['q0']]
-    integrator_in[1]=[num['p']]
+    x0_ind = casadi.integrator_in().index('x0')
+    integrator_in = [0]*integrator.n_in();integrator_in[x0_ind]=[num['q0']]
+    p_ind = casadi.integrator_in().index('p')
+    integrator_in[p_ind]=[num['p']]
     integrator_out = integrator.call(integrator_in)
 
     tend=num['tend']

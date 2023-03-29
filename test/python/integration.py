@@ -82,9 +82,7 @@ class Integrationtests(casadiTestCase):
     opts["abstol"] = 1e-15
     opts["fsens_err_con"] = True
     #opts["verbose"] = True
-    opts["t0"] = 0
-    opts["tf"] = 2.3
-    integrator = casadi.integrator("integrator", "cvodes", dae, opts)
+    integrator = casadi.integrator("integrator", "cvodes", dae, 0, 2.3, opts)
     tf = 2.3
 
     solution = Function("solution", {'x0':q, 'p':p, 'xf':q*exp(tf**3/(3*p))},
@@ -155,52 +153,42 @@ class Integrationtests(casadiTestCase):
               ("cvodes",["ode"],{"abstol": 1e-5,"reltol":1e-5,"fsens_err_con": False,"quad_err_con": False})
               ]
 
-    def variations(p_features, din, dout, rdin, rdout, *args):
+    def variations(p_features, din, dout, *args):
       if "ode" in p_features:
         p_features_ = copy.copy(p_features)
         p_features_[p_features.index("ode")] = "dae"
         din_ = copy.copy(din)
         dout_ = copy.copy(dout)
-        rdin_ = copy.copy(rdin)
-        rdout_ = copy.copy(rdout)
         z = SX.sym("x", din_["x"].shape)
         din_["z"] = z
         dout_["ode"] = z
         dout_["alg"] = ( dout["ode"] - z) * (-0.8)
-        if len(rdin_)>0:
-          rz = SX.sym("rx", rdin_["rx"].shape)
-          rdin_["rz"] = rz
-          rdin_["z"] = z
-          rdout_["ode"] = rz
-          rdout_["alg"] = ( rdout["ode"] - rz) * (-0.7)
 
-        yield (p_features, din, dout, rdin, rdout) + tuple(args)
-        yield (p_features_, din_, dout_, rdin_, rdout_) + tuple(args)
+        yield (p_features, din, dout) + tuple(args)
+        yield (p_features_, din_, dout_) + tuple(args)
       else:
-        yield (p_features, din, dout, rdin, rdout) + tuple(args)
+        yield (p_features, din, dout) + tuple(args)
 
     def checks():
       Ns = 1
 
       x  = SX.sym("x")
-      rx = SX.sym("rx")
       t = SX.sym("t")
 
       ti = (0,0.9995)
-      pointA = {'x0': 1, 'rx0': 1}
+      pointA = {'x0': 1}
 
-      si = {'x0':x, 'rx0': rx}
+      si = {'x0':x}
 
-      #sol = {'rxf': 1.0/(1-tend)}
-      sol = {'rxf': rx*exp(tend), 'xf': x*exp(tend)}
+      sol = {'xf': x*exp(tend)}
 
-      yield (["ode"],{'x':x,'t':t},{'ode':x},{'x':x,'rx':rx,'t':t},{'ode': rx},si,sol,pointA,ti)
+      yield (["ode"],{'x':x,'t':t},{'ode':x},si,sol,pointA,ti)
 
 
     refXF = refRXF = None
 
     for tt in checks():
-      for p_features, din, dout, rdin, rdout,  solutionin, solution, point, (tstart_, tend_) in variations(*tt):
+      for p_features, din, dout, solutionin, solution, point, (tstart_, tend_) in variations(*tt):
         for Integrator, features, options in integrators:
           self.message(Integrator)
           x = SX.sym("x")
@@ -209,8 +197,6 @@ class Integrationtests(casadiTestCase):
 
             dae = din.copy()
             dae.update(dout)
-            dae.update(rdin)
-            for k, v in rdout.items(): dae['r'+k] = v
 
             for k in list(solution.keys()):
               solution[k] = substitute(solution[k],vertcat(*[tstart,tend]),vertcat(*[tstart_,tend_]))
@@ -229,12 +215,10 @@ class Integrationtests(casadiTestCase):
                 message = "f_options: %s" % str(f_options)
                 print(message)
                 opts = {}
-                opts["t0"] = tstart_
-                opts["tf"] = tend_
                 for op in (options, f_options):
                   for (k,v) in list(op.items()):
                     opts[k] = v
-                integrator = casadi.integrator("integrator", Integrator, dae, opts)
+                integrator = casadi.integrator("integrator", Integrator, dae, tstart_, tend_, opts)
                 integrator_in = {}
                 for k,v in list(point.items()):
                   if not fs.sparsity_in(k).is_empty():
@@ -243,14 +227,17 @@ class Integrationtests(casadiTestCase):
                 integrator_out = integrator(**integrator_in)
                 fs_out = fs(**integrator_in)
                 print("res=",integrator_out["xf"]-fs_out["xf"], fs_out["xf"])
-                print("Rres=",integrator_out["rxf"]-fs_out["rxf"], fs_out["rxf"])
-                # self.checkarray(integrator_out["rxf"],fs_out["rxf"],digits=4)
                 stats = integrator.stats()
 
                 print(stats)
+
+                self.assertTrue(stats["nstepsB"]<2500)
+
+
                 self.assertTrue(stats["nsteps"]<1500)
                 self.assertTrue(stats["nstepsB"]<2500)
                 self.assertTrue(stats["nlinsetups"]<100)
+
                 self.assertTrue(stats["nlinsetupsB"]<250)
 
     DM.set_precision(6)
@@ -270,21 +257,17 @@ class Integrationtests(casadiTestCase):
     def checks():
       t=SX.sym("t")
       x=SX.sym("x")
-      rx=SX.sym("rx")
       p=SX.sym("p")
       dp=SX.sym("dp")
 
       z=SX.sym("z")
-      rz=SX.sym("rz")
-      rp=SX.sym("rp")
-      solutionin = {'x0':x, 'p': p, 'rx0': rx,'rp' : rp}
-      pointA = {'x0':7.1,'p': 2, 'rx0': 0.13, 'rp': 0.127}
+      solutionin = {'x0':x, 'p': p}
+      pointA = {'x0':7.1,'p': 2}
       ti = (0.2,2.3)
-      yield (["dae"],{'x': x, 'z': z},{'alg': x-z, 'ode': z},{'x': x, 'z': z, 'rx': rx, 'rz': rz},{'alg': x-rz, 'ode': rz},solutionin,{'rxf': rx+x*(exp(tend-tstart)-1), 'xf':x*exp(tend-tstart)},pointA,ti)
+      yield (["dae"],{'x': x, 'z': z},{'alg': x-z, 'ode': z},solutionin,{'xf':x*exp(tend-tstart)},pointA,ti)
       if not(args.run_slow): return
-      yield (["dae"],{'x': x, 'z': z},{'alg': x-z, 'ode': z},{'x': x, 'z': z, 'rx': rx, 'rz': rz},{'alg': rx-rz, 'ode': rz},solutionin,{'rxf': rx*exp(tend-tstart), 'xf':x*exp(tend-tstart)},pointA,ti)
-      yield (["ode"],{'x': x},{'ode': x},{'x': x,'rx': rx},{'ode': x},solutionin,{'rxf': rx+x*(exp(tend-tstart)-1), 'xf':x*exp(tend-tstart)},pointA,ti)
-      yield (["ode"],{'x': x},{'ode': x},{'x': x,'rx': rx},{'ode': rx},solutionin,{'rxf': rx*exp(tend-tstart), 'xf':x*exp(tend-tstart)},pointA,ti)
+      yield (["dae"],{'x': x, 'z': z},{'alg': x-z, 'ode': z},solutionin,{'xf':x*exp(tend-tstart)},pointA,ti)
+      yield (["ode"],{'x': x},{'ode': x},solutionin,{'xf':x*exp(tend-tstart)},pointA,ti)
 
       A=array([1,0.1])
       p0 = 1.13
@@ -296,9 +279,9 @@ class Integrationtests(casadiTestCase):
 
       s1=(2*y0-log(yc0**2/p+1))/2-log(cos(arctan(yc0/sqrt(p))+sqrt(p)*(tend-tstart)))
       s2=sqrt(p)*tan(arctan(yc0/sqrt(p))+sqrt(p)*(tend-tstart))
-      yield (["ode"],{'x':q,'p':p},{'ode': vertcat(*[q[1],p[0]+q[1]**2 ])},{},{},{'x0':q, 'p': p} ,{'xf': vertcat(*[s1,s2])},{'x0': A, 'p': p0},(0,0.4) )
+      yield (["ode"],{'x':q,'p':p},{'ode': vertcat(*[q[1],p[0]+q[1]**2 ])},{'x0':q, 'p': p} ,{'xf': vertcat(*[s1,s2])},{'x0': A, 'p': p0},(0,0.4) )
 
-    for p_features, din, dout, rdin, rdout, solutionin, solution, point, (tstart_, tend_) in checks():
+    for p_features, din, dout, solutionin, solution, point, (tstart_, tend_) in checks():
 
       for Integrator, features, options in integrators:
         self.message(Integrator)
@@ -308,8 +291,6 @@ class Integrationtests(casadiTestCase):
 
           dae = din.copy()
           dae.update(dout)
-          dae.update(rdin)
-          for k, v in rdout.items(): dae['r'+k] = v
 
           for k in list(solution.keys()):
             solution[k] = substitute(solution[k],vertcat(*[tstart,tend]),vertcat(*[tstart_,tend_]))
@@ -329,12 +310,10 @@ class Integrationtests(casadiTestCase):
               print(message)
 
               opts = {}
-              opts["t0"] = tstart_
-              opts["tf"] = tend_
               for op in (options, f_options):
                  for (k,v) in list(op.items()):
                     opts[k] = v
-              integrator = casadi.integrator("integrator", Integrator, dae, opts)
+              integrator = casadi.integrator("integrator", Integrator, dae, tstart_, tend_, opts)
               integrator_in = {}
 
               for k,v in list(point.items()):
@@ -358,84 +337,51 @@ class Integrationtests(casadiTestCase):
       self.message(Integrator)
 
 
-      def variations(p_features, din, dout, rdin, rdout, *args):
+      def variations(p_features, din, dout, *args):
         if "ode" in p_features:
           p_features_ = copy.copy(p_features)
           p_features_[p_features.index("ode")] = "dae"
           din_ = copy.copy(din)
           dout_ = copy.copy(dout)
-          rdin_ = copy.copy(rdin)
-          rdout_ = copy.copy(rdout)
           z = SX.sym("z", din_["x"].shape)
           din_["z"] = z
           dout_["ode"] = z
           dout_["alg"] = ( dout["ode"] - z) * (-0.8)
-          if len(rdin_)>0:
-            rz = SX.sym("rz", rdin_["rx"].shape)
-            rdin_["rz"] = rz
-            rdin_["z"] = z
-            rdout_["ode"] = rz
-            rdout_["alg"] = ( rdout["ode"] - rz) * (-0.7)
 
-          yield (p_features, din, dout, rdin, rdout) + tuple(args)
-          yield (p_features_, din_, dout_, rdin_, rdout_) + tuple(args)
+          yield (p_features, din, dout) + tuple(args)
+          yield (p_features_, din_, dout_) + tuple(args)
         else:
-          yield (p_features, din, dout, rdin, rdout) + tuple(args)
+          yield (p_features, din, dout) + tuple(args)
 
       def checks():
         x0=num['q0']
         p_=num['p']
-        rx0_= 0.13
         t=SX.sym("t")
         x=SX.sym("x")
-        rx=SX.sym("rx")
         p=SX.sym("p")
         dp=SX.sym("dp")
 
         z=SX.sym("z")
-        rz=SX.sym("rz")
-        rp=SX.sym("rp")
 
-        si = {'x0':x, 'p': p, 'rx0': rx,'rp' : rp}
-        pointA = {'x0':x0,'p': p_, 'rx0': rx0_, 'rp': 0.127}
+        si = {'x0':x, 'p': p}
+        pointA = {'x0':x0,'p': p_}
 
         ti = (0.2,num['tend'])
-        yield (["ode"],{'x':x},{'ode': 0},{},{},si,{'xf':x},pointA,ti)
-        yield (["ode"],{'x':x},{'ode': 1},{},{},si,{'xf':x+(tend-tstart)},pointA,ti)
-        yield (["ode"],{'x':x},{'ode': x},{},{},si,{'xf':x*exp(tend-tstart)},pointA,ti)
-        yield (["ode"],{'x':x,'t':t},{'ode': t},{},{},si,{'xf':x+(tend**2/2-tstart**2/2)},pointA,ti)
-        yield (["ode"],{'x':x,'t':t},{'ode': x*t},{},{},si,{'xf':x*exp(tend**2/2-tstart**2/2)},pointA,ti)
-        yield (["ode"],{'x':x,'p':p},{'ode': x/p},{},{},si,{'xf':x*exp((tend-tstart)/p)},pointA,ti)
+        yield (["ode"],{'x':x},{'ode': 0},si,{'xf':x},pointA,ti)
+        yield (["ode"],{'x':x},{'ode': 1},si,{'xf':x+(tend-tstart)},pointA,ti)
+        yield (["ode"],{'x':x},{'ode': x},si,{'xf':x*exp(tend-tstart)},pointA,ti)
+        yield (["ode"],{'x':x,'t':t},{'ode': t},si,{'xf':x+(tend**2/2-tstart**2/2)},pointA,ti)
+        yield (["ode"],{'x':x,'t':t},{'ode': x*t},si,{'xf':x*exp(tend**2/2-tstart**2/2)},pointA,ti)
+        yield (["ode"],{'x':x,'p':p},{'ode': x/p},si,{'xf':x*exp((tend-tstart)/p)},pointA,ti)
         if not(args.run_slow): return
-        yield (["ode"],{'x':x},{'ode': x,'quad':0},{},{},si,{'qf':0},pointA,ti)
-        yield (["ode"],{'x':x},{'ode': x,'quad':1},{},{},si,{'qf':(tend-tstart)},pointA,ti)
-        yield (["ode"],{'x':x},{'ode': 0,'quad':x},{},{},si,{'qf':x*(tend-tstart)},pointA,ti)
-        #yield ({'x':x},{'ode': 1,'quad':x},{'qf':(x-tstart)*(tend-tstart)+(tend**2/2-tstart**2/2)}), # bug in cvodes quad_err_con
-        yield (["ode"],{'x':x},{'ode': x,'quad':x},{},{},si,{'qf':x*(exp(tend-tstart)-1)},pointA,ti)
-        yield (["ode"],{'x':x,'t':t},{'ode': x,'quad':t},{},{},si,{'qf':(tend**2/2-tstart**2/2)},pointA,ti)
-        yield (["ode"],{'x':x,'t':t},{'ode': x,'quad':x*t},{},{},si,{'qf':x*(exp(tend-tstart)*(tend-1)-(tstart-1))},pointA,ti)
-        yield (["ode"],{'x':x,'p':p},{'ode': x,'quad':x/p},{},{},si,{'qf':x*(exp((tend-tstart))-1)/p},pointA,ti)
-        yield (["ode"],{'x':x},{'ode':x},{'x':x,'rx':rx},{'ode':SX(0)},si,{'rxf': rx},pointA,ti)
-        yield (["ode"],{'x':x},{'ode':x},{'x':x,'rx':rx},{'ode':SX(1)},si,{'rxf': rx+tend-tstart},pointA,ti)
-        yield (["ode"],{'x':x,'t':t},{'ode':x},{'x':x,'rx':rx,'t':t},{'ode':t},si,{'rxf': rx+tend**2/2-tstart**2/2},pointA,ti)
-        yield (["ode"],{'x':x},{'ode':x},{'x':x,'rx':rx},{'ode':rx},si,{'rxf': rx*exp(tend-tstart)},pointA,ti)
-        yield (["ode"],{'x':x},{'ode':x},{'x':x,'rx':rx},{'ode':x},si,{'rxf': rx+x*(exp(tend-tstart)-1)},pointA,ti)
-        yield (["ode"],{'x':x,'t':t},{'ode':x},{'x':x,'rx':rx,'t':t},{'ode':x*t},si,{'rxf': rx+x*(exp(tend-tstart)*(tend-1)-(tstart-1))},pointA,ti)
-        yield (["ode"],{'x':x,'t':t},{'ode':x},{'x':x,'rx':rx,'t':t},{'ode':rx*t},si,{'rxf': rx*exp(tend**2/2-tstart**2/2)},pointA,ti)
-        yield (["ode"],{'x':x},{'ode':x},{'x':x,'rx':rx},{'ode':rx, 'quad': 0},si,{'rqf': 0},pointA,ti)
-        yield (["ode"],{'x':x},{'ode':x},{'x':x,'rx':rx},{'ode':rx, 'quad': 1},si,{'rqf': (tend-tstart)},pointA,ti)
-        yield (["ode"],{'x':x},{'ode':x},{'x':x,'rx':rx},{'ode':rx, 'quad': rx},si,{'rqf': rx*(exp(tend-tstart)-1)},pointA,ti)
-        yield (["ode"],{'x':x},{'ode':x},{'x':x,'rx':rx},{'ode':rx, 'quad': x},si,{'rqf': x*(exp(tend-tstart)-1)},pointA,ti)
-        yield (["ode"],{'x':x,'t':t},{'ode':x},{'x':x,'rx':rx,'t':t},{'ode':rx, 'quad': t},si,{'rqf': (tend**2/2-tstart**2/2)},pointA,ti)
-        yield (["ode"],{'x':x,'t':t},{'ode':x},{'x':x,'rx':rx,'t':t},{'ode':rx, 'quad': x*t},si,{'rqf': x*(exp(tend-tstart)*(tend-1)-(tstart-1))},pointA,ti)
-        yield (["ode"],{'x':x,'t':t},{'ode':x},{'x':x,'rx':rx,'t':t},{'ode':rx, 'quad': rx*t},si,{'rqf': rx*(exp(tend-tstart)*(tstart+1)-(tend+1))},pointA,ti) # this one is special: integrate(t*rx*exp(tf-t),t,t0,tf)
-        yield (["ode"],{'x':x,'p':p},{'ode':x},{'x':x,'rx':rx,'p':p},{'ode':rx, 'quad': p},si,{'rqf': p*(tend-tstart)},pointA,ti)
-        yield (["ode"],{'x':x,'p':p},{'ode':x},{'x':x,'rx':rx,'p':p,'rp':rp},{'ode':rx, 'quad': rp},si,{'rqf': rp*(tend-tstart)},pointA,ti)
-        yield (["ode"],{'x':x,'t':t},{'ode':x},{'x':x,'rx':rx,'t':t},{'ode':rx*t},si,{'rxf': rx*exp(tend**2/2-tstart**2/2)},pointA,ti)
-        yield (["ode"],{'x':x,'t':t},{'ode':x},{'x':x,'rx':rx,'t':t},{'ode':x*t},si,{'rxf': rx+x*(exp(tend-tstart)*(tend-1)-(tstart-1))},pointA,ti)
-        yield (["dae"],{'x':x,'z':z},{'ode':z,'alg': -0.8*(z-x),'quad': z},{},{},si,{'qf':x*(exp(tend-tstart)-1)},pointA,ti)
-        yield (["dae"],{'x':x,'z':z},{'ode':z,'alg': -0.8*(z-x)},{'x':x,'rx':rx,'rz': rz,'z':z},{'ode':rz, 'alg': -0.7*(rz-rx), 'quad': rz},si,{'rqf': rx*(exp(tend-tstart)-1)},pointA,ti)
-        yield (["dae"],{'x':x,'z':z},{'ode':z,'alg': -0.8*(z-x)},{'x':x,'rx':rx,'rz': rz,'z':z},{'ode':rz, 'alg': -0.7*(rz-rx), 'quad': z},si,{'rqf': x*(exp(tend-tstart)-1)},pointA,ti)
+        yield (["ode"],{'x':x},{'ode': x,'quad':0},si,{'qf':0},pointA,ti)
+        yield (["ode"],{'x':x},{'ode': x,'quad':1},si,{'qf':(tend-tstart)},pointA,ti)
+        yield (["ode"],{'x':x},{'ode': 0,'quad':x},si,{'qf':x*(tend-tstart)},pointA,ti)
+        yield (["ode"],{'x':x},{'ode': x,'quad':x},si,{'qf':x*(exp(tend-tstart)-1)},pointA,ti)
+        yield (["ode"],{'x':x,'t':t},{'ode': x,'quad':t},si,{'qf':(tend**2/2-tstart**2/2)},pointA,ti)
+        yield (["ode"],{'x':x,'t':t},{'ode': x,'quad':x*t},si,{'qf':x*(exp(tend-tstart)*(tend-1)-(tstart-1))},pointA,ti)
+        yield (["ode"],{'x':x,'p':p},{'ode': x,'quad':x/p},si,{'qf':x*(exp((tend-tstart))-1)/p},pointA,ti)
+        yield (["dae"],{'x':x,'z':z},{'ode':z,'alg': -0.8*(z-x),'quad': z},si,{'qf':x*(exp(tend-tstart)-1)},pointA,ti)
 
 
         A=array([1,0.1])
@@ -448,19 +394,17 @@ class Integrationtests(casadiTestCase):
 
         s1=(2*y0-log(yc0**2/p+1))/2-log(cos(arctan(yc0/sqrt(p))+sqrt(p)*(tend-tstart)))
         s2=sqrt(p)*tan(arctan(yc0/sqrt(p))+sqrt(p)*(tend-tstart))
-        yield (["ode"],{'x':q,'p':p},{'ode': vertcat(*[q[1],p[0]+q[1]**2 ])},{},{},{'x0':q, 'p': p} ,{'xf': vertcat(*[s1,s2])},{'x0': A, 'p': p0},(0,0.4) )
+        yield (["ode"],{'x':q,'p':p},{'ode': vertcat(*[q[1],p[0]+q[1]**2 ])},{'x0':q, 'p': p} ,{'xf': vertcat(*[s1,s2])},{'x0': A, 'p': p0},(0,0.4) )
 
       for tt in checks():
         print(tt)
-        for p_features, din, dout, rdin, rdout, solutionin, solution, point, (tstart_, tend_) in variations(*tt):
+        for p_features, din, dout, solutionin, solution, point, (tstart_, tend_) in variations(*tt):
           if p_features[0] in features:
-            message = "%s: %s => %s, %s => %s, explicit (%s) tstart = %f" % (Integrator,str(din),str(dout),str(rdin),str(rdout),str(solution),tstart_)
+            message = "%s: %s => %s, explicit (%s) tstart = %f" % (Integrator,str(din),str(dout),str(solution),tstart_)
             print(message)
 
             dae = din.copy()
             dae.update(dout)
-            dae.update(rdin)
-            for k, v in rdout.items(): dae['r'+k] = v
 
             for k in list(solution.keys()):
               solution[k] = substitute(solution[k],vertcat(*[tstart,tend]),vertcat(*[tstart_,tend_]))
@@ -470,16 +414,14 @@ class Integrationtests(casadiTestCase):
             fs = Function("fs", sol, casadi.integrator_in(), casadi.integrator_out())
 
             opts = dict(options)
-            opts["t0"] = tstart_
             if Integrator in ('cvodes', 'idas'):
               opts["abstol"] = 1e-9
               opts["reltol"] = 1e-9
-            opts["tf"] = tend_
             if Integrator=='idas':
               opts["init_xdot"] = DM(point["x0"]).nonzeros()
               opts["calc_icB"] = True
               opts["augmented_options"] = {"init_xdot":None, "abstol":1e-9,"reltol":1e-9}
-            integrator = casadi.integrator("integrator", Integrator, dae, opts)
+            integrator = casadi.integrator("integrator", Integrator, dae, tstart_, tend_, opts)
             integrator_in = {}
 
             for k,v in list(point.items()):
@@ -503,9 +445,7 @@ class Integrationtests(casadiTestCase):
     opts["abstol"] = 1e-15
     opts["fsens_err_con"] = True
     #opts["verbose"] = True
-    opts["t0"] = 0
-    opts["tf"] = 2.3
-    integrator = casadi.integrator("integrator", "cvodes", dae, opts)
+    integrator = casadi.integrator("integrator", "cvodes", dae, 0, 2.3, opts)
     q0   = MX.sym("q0")
     par  = MX.sym("p")
 
@@ -545,8 +485,6 @@ class Integrationtests(casadiTestCase):
     dae = {'t':t, 'x':vertcat(*[x,y]), 'ode':vertcat(*[x,(1+1e-9)*x])}
     opts = {}
     opts["fsens_err_con"] = True
-    opts["t0"] = 0
-    opts["tf"] = 1
     integrator = casadi.integrator("integrator", "cvodes", dae, opts)
     integrator_in = {}
 
@@ -570,8 +508,6 @@ class Integrationtests(casadiTestCase):
     opts = {}
     opts["fsens_err_con"] = True
     opts["reltol"] = 1e-12
-    opts["t0"] = 0
-    opts["tf"] = 1
     integrator = casadi.integrator("integrator", "cvodes", dae, opts)
 
     qend = integrator(x0=var)["xf"]
@@ -635,9 +571,7 @@ class Integrationtests(casadiTestCase):
     #opts["verbose"] = True
     opts["fsens_err_con"] = True
     opts["steps_per_checkpoint"] = 10000
-    opts["t0"] = 0
-    opts["tf"] = te
-    integrator = casadi.integrator("integrator", "cvodes", dae, opts)
+    integrator = casadi.integrator("integrator", "cvodes", dae, 0, te, opts)
 
     q0   = MX.sym("q0",3,1)
     par  = MX.sym("p",1,1)
@@ -656,9 +590,7 @@ class Integrationtests(casadiTestCase):
     #opts["verbose"] = True
     opts["fsens_err_con"] = True
     opts["steps_per_checkpoint"] = 10000
-    opts["t0"] = 0
-    opts["tf"] = te
-    integrator = casadi.integrator("integrator", "cvodes", dae, opts)
+    integrator = casadi.integrator("integrator", "cvodes", dae, 0, te, opts)
 
     q0   = MX.sym("q0",3,1)
     par  = MX.sym("p",1,1)
@@ -757,9 +689,7 @@ class Integrationtests(casadiTestCase):
     opts = {}
     opts["fsens_err_con"] = True
     opts["steps_per_checkpoint"] = 1000
-    opts["t0"] = 0
-    opts["tf"] = te
-    integrator = casadi.integrator("integrator", "cvodes", dae, opts)
+    integrator = casadi.integrator("integrator", "cvodes", dae, 0, te, opts)
     q0   = MX.sym("q0",3,1)
     par  = MX.sym("p",9,1)
     qend = integrator(x0=q0, p=par)["xf"]
@@ -787,9 +717,7 @@ class Integrationtests(casadiTestCase):
     opts["abstol"] = 1e-15
     #opts["verbose"] = True
     opts["steps_per_checkpoint"] = 10000
-    opts["t0"] = 0
-    opts["tf"] = te
-    integrator = casadi.integrator("integrator", "cvodes", dae, opts)
+    integrator = casadi.integrator("integrator", "cvodes", dae, 0, te, opts)
 
     q0   = MX.sym("q0",3,1)
     par  = MX.sym("p",9,1)
@@ -833,9 +761,7 @@ class Integrationtests(casadiTestCase):
     opts["abstol"] = 1e-15
     #opts["verbose"] = True
     opts["steps_per_checkpoint"] = 10000
-    opts["t0"] = 0
-    opts["tf"] = te
-    integrator = casadi.integrator("integrator", "cvodes", dae, opts)
+    integrator = casadi.integrator("integrator", "cvodes", dae, 0, te, opts)
 
     q0   = MX.sym("q0",2,1)
     par  = MX.sym("p",3,1)
@@ -874,9 +800,7 @@ class Integrationtests(casadiTestCase):
     #opts["verbose"] = True
     opts["steps_per_checkpoint"] = 10000
     opts["fsens_err_con"] = True
-    opts["t0"] = 0
-    opts["tf"] = te
-    integrator = casadi.integrator("integrator", "cvodes", dae, opts)
+    integrator = casadi.integrator("integrator", "cvodes", dae, 0, te, opts)
 
     t0   = MX(0)
     tend = MX(te)
@@ -976,32 +900,6 @@ class Integrationtests(casadiTestCase):
 
     H1 = H_out[0]
 
-  def test_issue535(self):
-    self.message("regression test for #535")
-    t=SX.sym("t")
-    x=SX.sym("x")
-    rx=SX.sym("rx")
-    p=SX.sym("p")
-    dp=SX.sym("dp")
-
-    z=SX.sym("z")
-    rz=SX.sym("rz")
-    rp=SX.sym("rp")
-    dae = {'x': x, 'z': z, 'rx': rx, 'rz': rz, 'alg': x-z, 'ode': z, 'ralg': x-rz, 'rode': rz}
-
-    integrator = casadi.integrator("integrator", "idas", dae, {'calc_ic': True, 'tf': 2.3, 'reltol': 1e-10, 'augmented_options': {'reltol': 1e-09, 'abstol': 1e-09 }, 'calc_icB': True, 'abstol': 1e-10, 't0': 0.2})
-    integrator_in = {}
-
-    integrator_in["x0"]=7.1
-    if not integrator.sparsity_in("p").is_empty():
-      integrator_in["p"]=2
-    if not integrator.sparsity_in("rx0").is_empty():
-      integrator_in["rx0"]=0.13
-    if not integrator.sparsity_in("rp").is_empty():
-      integrator_in["rp"]=0.127
-
-    integrator_out = integrator(**integrator_in)
-
   def test_collocationPoints(self):
     self.message("collocation points")
     with self.assertRaises(Exception):
@@ -1026,7 +924,6 @@ class Integrationtests(casadiTestCase):
   @memory_heavy()
   def test_thread_safety(self):
     x = MX.sym('x')
-    rx = MX.sym('rx')
     t = MX.sym('t')
     p = MX.sym('p')
     for Integrator, features, options in integrators:
@@ -1037,12 +934,11 @@ class Integrationtests(casadiTestCase):
       self.checkarray(norm_inf(res["xf"].T-exp(-1)*numpy.linspace(0, 10, 40)),0, digits=5)
 
 
-      intg = integrator("Integrator",Integrator,{"x":x,"rx":rx,"ode":-x,"rode": rx}, options)
+      intg = integrator("Integrator",Integrator,{"x":x,"ode":-x}, options)
 
       intg_par = intg.map(40, 'thread',2)
-      res = intg_par(rx0=numpy.linspace(0, 10, 40), x0=numpy.linspace(0, 10, 40))
+      res = intg_par(x0=numpy.linspace(0, 10, 40))
       self.checkarray(norm_inf(res["xf"].T-exp(-1)*numpy.linspace(0, 10, 40)),0, digits=5)
-      self.checkarray(norm_inf(res["rxf"].T-exp(1)*numpy.linspace(0, 10, 40)),0, digits=5)
 
   def test_simplify_zdim(self):
     x = MX.sym("x")
@@ -1056,12 +952,10 @@ class Integrationtests(casadiTestCase):
     opts = {
       "step0":    1e-4,
       "min_step_size": 1e-4,
-      "max_step_size": 1.1e-4,
-      "t0"      : 0.0,
-      "tf"      : 0.5
+      "max_step_size": 1.1e-4
     }
 
-    I = integrator("I","cvodes",{"x":x,"ode":sin((10*x)**2)}, opts)
+    I = integrator("I","cvodes",{"x":x,"ode":sin((10*x)**2)}, 0.0, 0.5, opts)
     I(x0=0)
     stats = I.stats()
 
@@ -1072,12 +966,10 @@ class Integrationtests(casadiTestCase):
     x = SX.sym("x")
     opts = {
       "step0":    1e-4,
-      "max_step_size": 1.1e-4,
-      "t0"      : 0.0,
-      "tf"      : 0.5
+      "max_step_size": 1.1e-4
     }
 
-    I = integrator("I","cvodes",{"x":x,"ode":sin((10*x)**2)}, opts)
+    I = integrator("I","cvodes",{"x":x,"ode":sin((10*x)**2)}, 0.0, 0.5, opts)
     I(x0=0)
     stats = I.stats()
 

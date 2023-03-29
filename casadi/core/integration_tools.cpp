@@ -379,11 +379,8 @@ Function simpleIntegrator(Function f, const std::string& plugin,
   // Form DAE function
   MXDict dae = {{"x", x}, {"p", u}, {"ode", xdot}};
 
-  // Create integrator function
-  Dict plugin_options2 = plugin_options;
-  plugin_options2["t0"] = 0; // Normalized time
-  plugin_options2["tf"] = 1; // Normalized time
-  Function ifcn = integrator("integrator", plugin, dae, plugin_options2);
+  // Create integrator function with normalized time from 0 to 1
+  Function ifcn = integrator("integrator", plugin, dae, plugin_options);
 
   // Inputs of constructed function
   MX x0 = MX::sym("x0", x_sp);

@@ -91,5 +91,5 @@ jobs:
       - uses: actions/checkout@v2.4.0
       - name : Build
         run: |
-            cmake -Bbuild -G "MinGW Makefiles" -DWITH_SELFCONTAINED=ON -DCMAKE_INSTALL_PREFIX=install
+            cmake -Bbuild -G "MinGW Makefiles" -DWITH_SELFCONTAINED=ON -DCMAKE_INSTALL_PREFIX=install ${{env.build_flags}}
             cmake --build build --target install --config Release -v

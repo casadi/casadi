@@ -133,7 +133,7 @@ namespace casadi {
     Function gf_jg_fcn = create_function("nlp_gf_jg", {"x", "p"}, {"grad:f:x", "jac:g:x"});
     jacg_sp_ = gf_jg_fcn.sparsity_out(1);
     Function hess_l_fcn = create_function("nlp_hess_l", {"x", "p", "lam:f", "lam:g"},
-                                  {"hess:gamma:x:x"},
+                                  {"triu:hess:gamma:x:x"},
                                   {{"gamma", {"f", "g"}}});
     hesslag_sp_ = hess_l_fcn.sparsity_out(0);
 

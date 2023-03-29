@@ -232,7 +232,9 @@ class TestSuite:
     print(("%02d. " % self.stats['numtests']) + fn)
     t0 = time.time()
 
-    p=Popen(self.command(dir,fn,self.passoptions),cwd=self.workingdir(dir),stdout=PIPE, stderr=PIPE, stdin=PIPE)
+    cmd = self.command(dir,fn,self.passoptions)
+    print(cmd)
+    p=Popen(cmd,cwd=self.workingdir(dir),stdout=PIPE, stderr=PIPE, stdin=PIPE)
 
     inp = None
     if callable(self.inputs):
@@ -242,8 +244,10 @@ class TestSuite:
     if fn in inputs:
       inp = inputs[fn]
 
+    if inp is not None:
+      inp = inp.encode("ascii")
 
-    alarm(60*60) # 1 hour
+    alarm(15*60) # 15 mins
     try:
       stdoutdata, stderrdata = p.communicate(inp)
     except TimeoutEvent:
