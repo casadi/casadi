@@ -86,16 +86,12 @@ jobs:
     
     - name: Inject slug/short variables
       uses: rlespinasse/github-slug-action@v4.4.0
-    - run: echo "CASADI_VERSION=${{ needs.version.outputs.casadi }}" >> $env:GITHUB_ENV
-      if: runner.os != 'Windows'
-    - run: echo "CASADI_VERSION=${{ needs.version.outputs.casadi }}" >> $env:GITHUB_ENV
-      if: runner.os == 'Windows'
     - name: Upload files to a GitHub release
       uses: svenstaro/upload-release-action@2.4.0
       with:
         overwrite: true
         tag: nightly-${{ env.GITHUB_REF_SLUG }}
-        file: casadi-source.zip
+        file: casadi_source.zip
         asset_name: casadi-source-v${{ needs.version.outputs.casadi }}.zip
         prerelease: true
     - run: python setup.py sdist && ls && ls dist
