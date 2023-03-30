@@ -241,10 +241,10 @@ public:
       \identifier{1g} */
   std::string return_status() const;
 
-  /// get assignment expressions for initial values
+  /** \brief get assignment expressions for initial values */
   std::vector<MX> initial() const;
 
-  /// get assignment expressions for latest values
+  /** \brief get assignment expressions for latest values */
   std::vector<MX> value_variables() const;
   std::vector<MX> value_parameters() const;
 
@@ -257,28 +257,28 @@ public:
       \identifier{1h} */
   MX dual(const MX& m) const;
 
-  /// Number of (scalarised) decision variables
+  /** \brief Number of (scalarised) decision variables */
   casadi_int nx() const;
 
-  /// Number of (scalarised) parameters
+  /** \brief Number of (scalarised) parameters */
   casadi_int np() const;
 
-  /// Number of (scalarised) constraints
+  /** \brief Number of (scalarised) constraints */
   casadi_int ng() const;
 
-  /// Get all (scalarised) decision variables as a symbolic column vector
+  /** \brief Get all (scalarised) decision variables as a symbolic column vector */
   MX x() const;
 
-  /// Get all (scalarised) parameters as a symbolic column vector
+  /** \brief Get all (scalarised) parameters as a symbolic column vector */
   MX p() const;
 
-  /// Get all (scalarised) constraint expressions as a column vector
+  /** \brief Get all (scalarised) constraint expressions as a column vector */
   MX g() const;
 
-  /// Get objective expression
+  /** \brief Get objective expression */
   MX f() const;
 
-  /// Get all (scalarised) bounds on constraints as a column vector
+  /** \brief Get all (scalarised) bounds on constraints as a column vector */
   MX lbg() const;
   MX ubg() const;
 
@@ -293,7 +293,14 @@ public:
       \identifier{1i} */
   MX lam_g() const;
 
+  /// @{
   /** \brief Create a CasADi Function from the Opti solver
+   * 
+   * \param[in] name Name of the resulting CasADi Function
+   * \param[in] args List of parameters and decision/dual variables
+   *                (which can be given an initial guess) with the resulting Function
+   * \param[in] res List of expressions that will get evaluated at the optimal solution
+   * \param[in] opts Standard CasADi Funcion options
 
       \identifier{1j} */
   Function to_function(const std::string& name,
@@ -311,6 +318,7 @@ public:
       const std::vector<std::string>& name_in,
       const std::vector<std::string>& name_out,
       const Dict& opts = Dict());
+  /// @}
 
   #ifndef SWIGMATLAB
   /** \brief Construct a double inequality
