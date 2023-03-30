@@ -241,10 +241,14 @@ public:
       \identifier{1g} */
   std::string return_status() const;
 
-  /** \brief get assignment expressions for initial values */
+  /** \brief get assignment expressions for initial values
+
+      \identifier{266} */
   std::vector<MX> initial() const;
 
-  /** \brief get assignment expressions for latest values */
+  /** \brief get assignment expressions for latest values
+
+      \identifier{267} */
   std::vector<MX> value_variables() const;
   std::vector<MX> value_parameters() const;
 
@@ -257,28 +261,44 @@ public:
       \identifier{1h} */
   MX dual(const MX& m) const;
 
-  /** \brief Number of (scalarised) decision variables */
+  /** \brief Number of (scalarised) decision variables
+
+      \identifier{268} */
   casadi_int nx() const;
 
-  /** \brief Number of (scalarised) parameters */
+  /** \brief Number of (scalarised) parameters
+
+      \identifier{269} */
   casadi_int np() const;
 
-  /** \brief Number of (scalarised) constraints */
+  /** \brief Number of (scalarised) constraints
+
+      \identifier{26a} */
   casadi_int ng() const;
 
-  /** \brief Get all (scalarised) decision variables as a symbolic column vector */
+  /** \brief Get all (scalarised) decision variables as a symbolic column vector
+
+      \identifier{26b} */
   MX x() const;
 
-  /** \brief Get all (scalarised) parameters as a symbolic column vector */
+  /** \brief Get all (scalarised) parameters as a symbolic column vector
+
+      \identifier{26c} */
   MX p() const;
 
-  /** \brief Get all (scalarised) constraint expressions as a column vector */
+  /** \brief Get all (scalarised) constraint expressions as a column vector
+
+      \identifier{26d} */
   MX g() const;
 
-  /** \brief Get objective expression */
+  /** \brief Get objective expression
+
+      \identifier{26e} */
   MX f() const;
 
-  /** \brief Get all (scalarised) bounds on constraints as a column vector */
+  /** \brief Get all (scalarised) bounds on constraints as a column vector
+
+      \identifier{26f} */
   MX lbg() const;
   MX ubg() const;
 

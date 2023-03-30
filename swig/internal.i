@@ -1621,7 +1621,7 @@
 %exception  casadi::GenericExpression::atan(const ExType &x) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::GenericExpression::atan2(const ExType &x, const ExType &y) {
+%exception  casadi::GenericExpression::atan2(const ExType &y, const ExType &x) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::GenericExpression::atanh(const ExType &x) {
@@ -1777,7 +1777,7 @@
 %exception  casadi::GenericExpression< ExType >::atan(const ExType &x) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::GenericExpression< ExType >::atan2(const ExType &x, const ExType &y) {
+%exception  casadi::GenericExpression< ExType >::atan2(const ExType &y, const ExType &x) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::GenericExpression< ExType >::atanh(const ExType &x) {
@@ -1927,7 +1927,7 @@
 %exception  casadi::GenericExpression< SXElem  >::atan(const SXElem &x) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::GenericExpression< SXElem  >::atan2(const SXElem &x, const SXElem &y) {
+%exception  casadi::GenericExpression< SXElem  >::atan2(const SXElem &y, const SXElem &x) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::GenericExpression< SXElem  >::atanh(const SXElem &x) {
