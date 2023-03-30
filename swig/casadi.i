@@ -2598,6 +2598,10 @@ if (!$1) {
 %rename(rem) casadi_mod;
 #endif // SWIGMATLAB
 
+#ifdef SWIGPYTHON
+%ignore casadi_mod;
+#endif // SWIGPYTHON
+
 #ifdef WITH_PYTHON3
 %rename(__bool__) __nonzero__;
 #endif

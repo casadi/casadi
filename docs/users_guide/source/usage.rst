@@ -353,14 +353,14 @@ each operation. Further information is available in the API documentation.
    * - Modulus after division
      - .. code-block:: python
 
-            fmod(x, y)
+            fmod(x, y), remainder(x,y)
      - .. code-block:: cpp
 
-            fmod(x, y)
+            fmod(x, y), remainder(x,y)
      - .. code-block:: octave
 
-            mod(x, y)
-   * - Modulus after division
+            rem(x, y), remainder(x,y)
+   * - Absolute value
      - .. code-block:: python
 
             fabs(x)
