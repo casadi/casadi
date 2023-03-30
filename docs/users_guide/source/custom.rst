@@ -250,7 +250,7 @@ In C++, the syntax is as follows:
       casadi_int get_n_out() override { return 1;}
 
       // Initialize the object
-      void init override() {
+      void init() override() {
         std::cout << "initializing object" << std::endl;
       }
 
