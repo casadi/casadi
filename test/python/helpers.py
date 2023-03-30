@@ -507,8 +507,8 @@ class casadiTestCase(unittest.TestCase):
         else:
           return ret.sparsity()
 
-      #spmods = [lambda x: x , remove_first, remove_last]
-      spmods = [lambda x: x]
+      spmods = [lambda x: x , remove_first, remove_last]
+      #spmods = [lambda x: x]
       #spmods = [lambda x: x , remove_first]
 
       sym = MX.sym
