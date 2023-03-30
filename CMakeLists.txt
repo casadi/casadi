@@ -188,30 +188,12 @@ if(APPLE)
   set(CMAKE_LIBRARY_PATH /opt/local/lib ${CMAKE_LIBRARY_PATH})
 endif()
 
-############################################################
-################# WITH_COMMON option #######################
-############################################################
-option(WITH_COMMON "Build common, stable interfaces, if found" OFF)
-if(WITH_COMMON)
-  # Look for LAPACK
-  find_package(LAPACK QUIET)
-  set(WITH_LAPACK_DEF ${LAPACK_FOUND})
-  message("WITH_LAPACK_DEF: ${LAPACK_FOUND}")
-  # qpOASES and blockSQP built if LAPACK available
-  set(WITH_QPOASES_DEF ${LAPACK_FOUND})
-  set(WITH_BLOCKSQP_DEF ${LAPACK_FOUND})
-  set(WITH_SUPERSCS_DEF ${LAPACK_FOUND})
-  # Look for IPOPT
-  find_package(IPOPT QUIET)
-  set(WITH_IPOPT_DEF ${IPOPT_FOUND})
-else()
-  # Disabled by default
-  set(WITH_LAPACK_DEF OFF)
-  set(WITH_QPOASES_DEF OFF)
-  set(WITH_BLOCKSQP_DEF OFF)
-  set(WITH_IPOPT_DEF OFF)
-  set(WITH_SUPERSCS_DEF OFF)
-endif()
+# Disabled by default
+set(WITH_LAPACK_DEF OFF)
+set(WITH_QPOASES_DEF OFF)
+set(WITH_BLOCKSQP_DEF OFF)
+set(WITH_IPOPT_DEF OFF)
+set(WITH_SUPERSCS_DEF OFF)
 
 set(DEPENDENT_LIBRARIES)
 
