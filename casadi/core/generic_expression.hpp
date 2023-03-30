@@ -589,7 +589,19 @@ class GenericExpression : public GenericExpressionCommon {
     ///@}
 
     ///@{
-    /** \brief Remainder after division: (x,y) -> mod(x,y)
+    /** \brief Remainder after division: (x,y) -> fmod(x,y)
+
+    This Function follows the convention of https://en.cppreference.com/w/c/numeric/math/fmod
+
+    Notably:
+      - fmod(5,3)   -> 2
+      - fmod(5,-3)  -> 2
+      - fmod(-5,3)  -> -2
+      - fmod(-5,-3) -> -2
+
+    This is equivalent to Python's numpy.fmod and Matlab's rem.
+
+    \seealso remainder
 
         \identifier{pq} */
     static ExType mod(const ExType& x, const ExType& y) {
@@ -605,6 +617,18 @@ class GenericExpression : public GenericExpressionCommon {
 
     ///@{
     /** \brief Remainder after division: (x,y) -> remainder(x,y)
+
+    This Function follows the convention of https://en.cppreference.com/w/c/numeric/math/remainder
+
+    Notably:
+      - remainder(5,3)   -> -1
+      - remainder(5,-3)  -> -1
+      - remainder(-5,3)  -> 1
+      - remainder(-5,-3) -> 1
+
+    This is equivalent to Python's math.remainder. There is no equivalence in Matlab.
+
+    \seealso fmod
 
         \identifier{24x} */
     static ExType remainder(const ExType& x, const ExType& y) {

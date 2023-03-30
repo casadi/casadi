@@ -2594,6 +2594,8 @@ if (!$1) {
 // Workarounds, pending proper fix
 %rename(nonzero) __nonzero__;
 %rename(hash) __hash__;
+
+%rename(rem) casadi_mod;
 #endif // SWIGMATLAB
 
 #ifdef WITH_PYTHON3
