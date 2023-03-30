@@ -262,13 +262,13 @@ each operation. Further information is available in the API documentation.
    * - Two argument arctangent
      - .. code-block:: python
 
-            atan2(x, y)
+            atan2(y, x)
      - .. code-block:: cpp
 
-            atan2(x, y)
+            atan2(y, x)
      - .. code-block:: octave
 
-            atan2(x, y)
+            atan2(y, x)
    * - Hyperbolic functions
      - .. code-block:: python
 

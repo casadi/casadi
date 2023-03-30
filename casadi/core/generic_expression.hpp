@@ -616,14 +616,16 @@ class GenericExpression : public GenericExpressionCommon {
     ///@}
 
     ///@{
-    /** \brief Two argument arc tangent: (x,y) -> atan2(x,y)
+    /** \brief Two argument arc tangent: (y,x) -> atan2(y,x)
+     *
+     * theta = atan2(y,x) corresponds to x = r cos(theta), y = r sin(theta)
 
         \identifier{pr} */
-    static ExType atan2(const ExType& x, const ExType& y) {
-      return ExType::binary(OP_ATAN2, x, y);
+    static ExType atan2(const ExType& y, const ExType& x) {
+      return ExType::binary(OP_ATAN2, y, x);
     }
-    friend inline ExType atan2(const ExType& x, const ExType& y) {
-      return ExType::atan2(x, y);
+    friend inline ExType atan2(const ExType& y, const ExType& x) {
+      return ExType::atan2(y, x);
     }
     ///@}
 
