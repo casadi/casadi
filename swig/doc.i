@@ -18693,43 +18693,106 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp
  const ExType &y) "
 
 [INTERNAL] 
-Remainder after division: (x,y) -> mod(x,y)
+Remainder after division: (x,y) -> fmod(x,y)
 
-Extra doc: https://github.com/casadi/casadi/wiki/L_pq
+This  Function follows the convention of 
+https://en.cppreference.com/w/c/numeric/math/fmod
+
+Notably:
+fmod(5,3) -> 2
+
+fmod(5,-3) -> 2
+
+fmod(-5,3) -> -2
+
+fmod(-5,-3) -> -2
+
+This is equivalent to Python's numpy.fmod and Matlab's rem.
+
+\\\\seealso remainder
+
+::
+
+  Extra doc: https://github.com/casadi/casadi/wiki/L_pq 
+  
+
+
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L595
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L607
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L595-L597
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L607-L609
 
 ";
 
 %feature("docstring") casadi::casadi_mod "
 
-Remainder after division: (x,y) -> mod(x,y)
+Remainder after division: (x,y) -> fmod(x,y)
 
-Extra doc: https://github.com/casadi/casadi/wiki/L_pq
+This  Function follows the convention of 
+https://en.cppreference.com/w/c/numeric/math/fmod
+
+Notably:
+fmod(5,3) -> 2
+
+fmod(5,-3) -> 2
+
+fmod(-5,3) -> -2
+
+fmod(-5,-3) -> -2
+
+This is equivalent to Python's numpy.fmod and Matlab's rem.
+
+\\\\seealso remainder
+
+::
+
+  Extra doc: https://github.com/casadi/casadi/wiki/L_pq 
+  
+
+
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L595
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L607
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L595-L597
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L607-L609
 
 ";
 
 %feature("docstring")  casadi::GenericExpressionCommon::casadi_mod "
 
-Remainder after division: (x,y) -> mod(x,y)
+Remainder after division: (x,y) -> fmod(x,y)
 
-Extra doc: https://github.com/casadi/casadi/wiki/L_pq
+This  Function follows the convention of 
+https://en.cppreference.com/w/c/numeric/math/fmod
+
+Notably:
+fmod(5,3) -> 2
+
+fmod(5,-3) -> 2
+
+fmod(-5,3) -> -2
+
+fmod(-5,-3) -> -2
+
+This is equivalent to Python's numpy.fmod and Matlab's rem.
+
+\\\\seealso remainder
+
+::
+
+  Extra doc: https://github.com/casadi/casadi/wiki/L_pq 
+  
+
+
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L595
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L607
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L595-L597
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L607-L609
 
 ";
 
@@ -18737,43 +18800,106 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp
  const ExType &y) "
 
 [INTERNAL] 
-Remainder after division: (x,y) -> mod(x,y)
+Remainder after division: (x,y) -> fmod(x,y)
 
-Extra doc: https://github.com/casadi/casadi/wiki/L_pq
+This  Function follows the convention of 
+https://en.cppreference.com/w/c/numeric/math/fmod
+
+Notably:
+fmod(5,3) -> 2
+
+fmod(5,-3) -> 2
+
+fmod(-5,3) -> -2
+
+fmod(-5,-3) -> -2
+
+This is equivalent to Python's numpy.fmod and Matlab's rem.
+
+\\\\seealso remainder
+
+::
+
+  Extra doc: https://github.com/casadi/casadi/wiki/L_pq 
+  
+
+
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L598
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L610
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L598-L600
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L610-L612
 
 ";
 
 %feature("docstring") casadi::casadi_mod "
 
-Remainder after division: (x,y) -> mod(x,y)
+Remainder after division: (x,y) -> fmod(x,y)
 
-Extra doc: https://github.com/casadi/casadi/wiki/L_pq
+This  Function follows the convention of 
+https://en.cppreference.com/w/c/numeric/math/fmod
+
+Notably:
+fmod(5,3) -> 2
+
+fmod(5,-3) -> 2
+
+fmod(-5,3) -> -2
+
+fmod(-5,-3) -> -2
+
+This is equivalent to Python's numpy.fmod and Matlab's rem.
+
+\\\\seealso remainder
+
+::
+
+  Extra doc: https://github.com/casadi/casadi/wiki/L_pq 
+  
+
+
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L598
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L610
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L598-L600
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L610-L612
 
 ";
 
 %feature("docstring")  casadi::GenericExpressionCommon::casadi_mod "
 
-Remainder after division: (x,y) -> mod(x,y)
+Remainder after division: (x,y) -> fmod(x,y)
 
-Extra doc: https://github.com/casadi/casadi/wiki/L_pq
+This  Function follows the convention of 
+https://en.cppreference.com/w/c/numeric/math/fmod
+
+Notably:
+fmod(5,3) -> 2
+
+fmod(5,-3) -> 2
+
+fmod(-5,3) -> -2
+
+fmod(-5,-3) -> -2
+
+This is equivalent to Python's numpy.fmod and Matlab's rem.
+
+\\\\seealso remainder
+
+::
+
+  Extra doc: https://github.com/casadi/casadi/wiki/L_pq 
+  
+
+
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L598
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L610
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L598-L600
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L610-L612
 
 ";
 
@@ -18781,43 +18907,106 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp
 &x, const ExType &y) "
 
 [INTERNAL] 
-Remainder after division: (x,y) -> mod(x,y)
+Remainder after division: (x,y) -> fmod(x,y)
 
-Extra doc: https://github.com/casadi/casadi/wiki/L_pq
+This  Function follows the convention of 
+https://en.cppreference.com/w/c/numeric/math/fmod
+
+Notably:
+fmod(5,3) -> 2
+
+fmod(5,-3) -> 2
+
+fmod(-5,3) -> -2
+
+fmod(-5,-3) -> -2
+
+This is equivalent to Python's numpy.fmod and Matlab's rem.
+
+\\\\seealso remainder
+
+::
+
+  Extra doc: https://github.com/casadi/casadi/wiki/L_pq 
+  
+
+
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L601
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L613
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L601-L603
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L613-L615
 
 ";
 
 %feature("docstring") casadi::casadi_fmod "
 
-Remainder after division: (x,y) -> mod(x,y)
+Remainder after division: (x,y) -> fmod(x,y)
 
-Extra doc: https://github.com/casadi/casadi/wiki/L_pq
+This  Function follows the convention of 
+https://en.cppreference.com/w/c/numeric/math/fmod
+
+Notably:
+fmod(5,3) -> 2
+
+fmod(5,-3) -> 2
+
+fmod(-5,3) -> -2
+
+fmod(-5,-3) -> -2
+
+This is equivalent to Python's numpy.fmod and Matlab's rem.
+
+\\\\seealso remainder
+
+::
+
+  Extra doc: https://github.com/casadi/casadi/wiki/L_pq 
+  
+
+
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L601
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L613
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L601-L603
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L613-L615
 
 ";
 
 %feature("docstring")  casadi::GenericExpressionCommon::casadi_fmod "
 
-Remainder after division: (x,y) -> mod(x,y)
+Remainder after division: (x,y) -> fmod(x,y)
 
-Extra doc: https://github.com/casadi/casadi/wiki/L_pq
+This  Function follows the convention of 
+https://en.cppreference.com/w/c/numeric/math/fmod
+
+Notably:
+fmod(5,3) -> 2
+
+fmod(5,-3) -> 2
+
+fmod(-5,3) -> -2
+
+fmod(-5,-3) -> -2
+
+This is equivalent to Python's numpy.fmod and Matlab's rem.
+
+\\\\seealso remainder
+
+::
+
+  Extra doc: https://github.com/casadi/casadi/wiki/L_pq 
+  
+
+
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L601
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L613
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L601-L603
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L613-L615
 
 ";
 
@@ -18827,13 +19016,36 @@ ExType &x, const ExType &y) "
 [INTERNAL] 
 Remainder after division: (x,y) -> remainder(x,y)
 
-Extra doc: https://github.com/casadi/casadi/wiki/L_24x
+This  Function follows the convention of 
+https://en.cppreference.com/w/c/numeric/math/remainder
+
+Notably:
+remainder(5,3) -> -1
+
+remainder(5,-3) -> -1
+
+remainder(-5,3) -> 1
+
+remainder(-5,-3) -> 1
+
+This is equivalent to Python's math.remainder. There is no equivalence
+ in 
+Matlab.
+
+\\\\seealso fmod
+
+::
+
+  Extra doc: https://github.com/casadi/casadi/wiki/L_24x 
+  
+
+
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L610
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L634
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L610-L612
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L634-L636
 
 ";
 
@@ -18841,13 +19053,36 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp
 
 Remainder after division: (x,y) -> remainder(x,y)
 
-Extra doc: https://github.com/casadi/casadi/wiki/L_24x
+This  Function follows the convention of 
+https://en.cppreference.com/w/c/numeric/math/remainder
+
+Notably:
+remainder(5,3) -> -1
+
+remainder(5,-3) -> -1
+
+remainder(-5,3) -> 1
+
+remainder(-5,-3) -> 1
+
+This is equivalent to Python's math.remainder. There is no equivalence
+ in 
+Matlab.
+
+\\\\seealso fmod
+
+::
+
+  Extra doc: https://github.com/casadi/casadi/wiki/L_24x 
+  
+
+
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L610
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L634
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L610-L612
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L634-L636
 
 ";
 
@@ -18855,13 +19090,36 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp
 
 Remainder after division: (x,y) -> remainder(x,y)
 
-Extra doc: https://github.com/casadi/casadi/wiki/L_24x
+This  Function follows the convention of 
+https://en.cppreference.com/w/c/numeric/math/remainder
+
+Notably:
+remainder(5,3) -> -1
+
+remainder(5,-3) -> -1
+
+remainder(-5,3) -> 1
+
+remainder(-5,-3) -> 1
+
+This is equivalent to Python's math.remainder. There is no equivalence
+ in 
+Matlab.
+
+\\\\seealso fmod
+
+::
+
+  Extra doc: https://github.com/casadi/casadi/wiki/L_24x 
+  
+
+
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L610
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L634
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L610-L612
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L634-L636
 
 ";
 
@@ -18871,13 +19129,36 @@ ExType &x, const ExType &y) "
 [INTERNAL] 
 Remainder after division: (x,y) -> remainder(x,y)
 
-Extra doc: https://github.com/casadi/casadi/wiki/L_24x
+This  Function follows the convention of 
+https://en.cppreference.com/w/c/numeric/math/remainder
+
+Notably:
+remainder(5,3) -> -1
+
+remainder(5,-3) -> -1
+
+remainder(-5,3) -> 1
+
+remainder(-5,-3) -> 1
+
+This is equivalent to Python's math.remainder. There is no equivalence
+ in 
+Matlab.
+
+\\\\seealso fmod
+
+::
+
+  Extra doc: https://github.com/casadi/casadi/wiki/L_24x 
+  
+
+
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L613
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L637
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L613-L615
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L637-L639
 
 ";
 
@@ -18885,13 +19166,36 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp
 
 Remainder after division: (x,y) -> remainder(x,y)
 
-Extra doc: https://github.com/casadi/casadi/wiki/L_24x
+This  Function follows the convention of 
+https://en.cppreference.com/w/c/numeric/math/remainder
+
+Notably:
+remainder(5,3) -> -1
+
+remainder(5,-3) -> -1
+
+remainder(-5,3) -> 1
+
+remainder(-5,-3) -> 1
+
+This is equivalent to Python's math.remainder. There is no equivalence
+ in 
+Matlab.
+
+\\\\seealso fmod
+
+::
+
+  Extra doc: https://github.com/casadi/casadi/wiki/L_24x 
+  
+
+
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L613
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L637
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L613-L615
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L637-L639
 
 ";
 
@@ -18899,13 +19203,36 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp
 
 Remainder after division: (x,y) -> remainder(x,y)
 
-Extra doc: https://github.com/casadi/casadi/wiki/L_24x
+This  Function follows the convention of 
+https://en.cppreference.com/w/c/numeric/math/remainder
+
+Notably:
+remainder(5,3) -> -1
+
+remainder(5,-3) -> -1
+
+remainder(-5,3) -> 1
+
+remainder(-5,-3) -> 1
+
+This is equivalent to Python's math.remainder. There is no equivalence
+ in 
+Matlab.
+
+\\\\seealso fmod
+
+::
+
+  Extra doc: https://github.com/casadi/casadi/wiki/L_24x 
+  
+
+
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L613
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L637
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L613-L615
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L637-L639
 
 ";
 
@@ -18920,10 +19247,10 @@ theta = atan2(y,x) corresponds to x = r cos(theta), y = r sin(theta)
 Extra doc: https://github.com/casadi/casadi/wiki/L_pr
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L624
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L648
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L624-L626
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L648-L650
 
 ";
 
@@ -18936,10 +19263,10 @@ theta = atan2(y,x) corresponds to x = r cos(theta), y = r sin(theta)
 Extra doc: https://github.com/casadi/casadi/wiki/L_pr
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L624
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L648
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L624-L626
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L648-L650
 
 ";
 
@@ -18952,10 +19279,10 @@ theta = atan2(y,x) corresponds to x = r cos(theta), y = r sin(theta)
 Extra doc: https://github.com/casadi/casadi/wiki/L_pr
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L624
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L648
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L624-L626
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L648-L650
 
 ";
 
@@ -18970,10 +19297,10 @@ theta = atan2(y,x) corresponds to x = r cos(theta), y = r sin(theta)
 Extra doc: https://github.com/casadi/casadi/wiki/L_pr
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L627
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L651
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L627-L629
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L651-L653
 
 ";
 
@@ -18986,10 +19313,10 @@ theta = atan2(y,x) corresponds to x = r cos(theta), y = r sin(theta)
 Extra doc: https://github.com/casadi/casadi/wiki/L_pr
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L627
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L651
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L627-L629
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L651-L653
 
 ";
 
@@ -19002,10 +19329,10 @@ theta = atan2(y,x) corresponds to x = r cos(theta), y = r sin(theta)
 Extra doc: https://github.com/casadi/casadi/wiki/L_pr
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L627
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L651
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L627-L629
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L651-L653
 
 ";
 
@@ -19018,10 +19345,10 @@ Conditional assignment: (x,y) -> x ? y : 0.
 Extra doc: https://github.com/casadi/casadi/wiki/L_ps
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L636
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L660
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L636-L638
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L660-L662
 
 ";
 
@@ -19034,10 +19361,10 @@ Conditional assignment: (x,y) -> x ? y : 0.
 Extra doc: https://github.com/casadi/casadi/wiki/L_ps
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L639
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L663
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L639-L641
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L663-L665
 
 ";
 
@@ -19050,10 +19377,10 @@ Smallest of two values: (x,y) -> min(x,y)
 Extra doc: https://github.com/casadi/casadi/wiki/L_pt
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L648
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L672
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L648-L650
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L672-L674
 
 ";
 
@@ -19064,10 +19391,10 @@ Smallest of two values: (x,y) -> min(x,y)
 Extra doc: https://github.com/casadi/casadi/wiki/L_pt
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L648
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L672
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L648-L650
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L672-L674
 
 ";
 
@@ -19078,10 +19405,10 @@ Smallest of two values: (x,y) -> min(x,y)
 Extra doc: https://github.com/casadi/casadi/wiki/L_pt
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L648
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L672
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L648-L650
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L672-L674
 
 ";
 
@@ -19094,10 +19421,10 @@ Smallest of two values: (x,y) -> min(x,y)
 Extra doc: https://github.com/casadi/casadi/wiki/L_pt
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L651
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L675
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L651-L653
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L675-L677
 
 ";
 
@@ -19108,10 +19435,10 @@ Smallest of two values: (x,y) -> min(x,y)
 Extra doc: https://github.com/casadi/casadi/wiki/L_pt
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L651
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L675
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L651-L653
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L675-L677
 
 ";
 
@@ -19122,10 +19449,10 @@ Smallest of two values: (x,y) -> min(x,y)
 Extra doc: https://github.com/casadi/casadi/wiki/L_pt
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L651
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L675
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L651-L653
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L675-L677
 
 ";
 
@@ -19138,10 +19465,10 @@ Largest of two values: (x,y) -> max(x,y)
 Extra doc: https://github.com/casadi/casadi/wiki/L_pu
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L660
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L684
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L660-L662
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L684-L686
 
 ";
 
@@ -19152,10 +19479,10 @@ Largest of two values: (x,y) -> max(x,y)
 Extra doc: https://github.com/casadi/casadi/wiki/L_pu
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L660
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L684
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L660-L662
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L684-L686
 
 ";
 
@@ -19166,10 +19493,10 @@ Largest of two values: (x,y) -> max(x,y)
 Extra doc: https://github.com/casadi/casadi/wiki/L_pu
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L660
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L684
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L660-L662
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L684-L686
 
 ";
 
@@ -19182,10 +19509,10 @@ Largest of two values: (x,y) -> max(x,y)
 Extra doc: https://github.com/casadi/casadi/wiki/L_pu
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L663
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L687
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L663-L665
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L687-L689
 
 ";
 
@@ -19196,10 +19523,10 @@ Largest of two values: (x,y) -> max(x,y)
 Extra doc: https://github.com/casadi/casadi/wiki/L_pu
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L663
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L687
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L663-L665
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L687-L689
 
 ";
 
@@ -19210,10 +19537,10 @@ Largest of two values: (x,y) -> max(x,y)
 Extra doc: https://github.com/casadi/casadi/wiki/L_pu
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L663
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L687
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L663-L665
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L687-L689
 
 ";
 
@@ -19224,10 +19551,10 @@ ExType &x, const ExType &y) "
 Copy sign
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L686
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L710
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L686-L688
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L710-L712
 
 ";
 
@@ -19236,10 +19563,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp
 Copy sign
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L686
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L710
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L686-L688
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L710-L712
 
 ";
 
@@ -19248,10 +19575,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp
 Copy sign
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L686
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L710
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L686-L688
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L710-L712
 
 ";
 
@@ -19262,10 +19589,10 @@ ExType &x, const ExType &y) "
 Copy sign
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L689
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L713
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L689-L691
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L713-L715
 
 ";
 
@@ -19274,10 +19601,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp
 Copy sign
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L689
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L713
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L689-L691
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L713-L715
 
 ";
 
@@ -19286,10 +19613,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp
 Copy sign
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L689
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L713
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L689-L691
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L713-L715
 
 ";
 
@@ -19300,10 +19627,10 @@ ExType &x, const ExType &y) "
 Elementwise power with const power
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L696
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L720
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L696-L698
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L720-L722
 
 ";
 
@@ -19312,10 +19639,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp
 Elementwise power with const power
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L696
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L720
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L696-L698
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L720-L722
 
 ";
 
@@ -19324,10 +19651,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp
 Elementwise power with const power
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L696
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L720
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L696-L698
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L720-L722
 
 ";
 
@@ -19338,10 +19665,10 @@ ExType &x, const ExType &y) "
 Elementwise power with const power
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L699
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L723
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L699-L701
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L723-L725
 
 ";
 
@@ -19350,10 +19677,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp
 Elementwise power with const power
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L699
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L723
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L699-L701
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L723-L725
 
 ";
 
@@ -19362,10 +19689,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp
 Elementwise power with const power
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L699
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L723
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L699-L701
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L723-L725
 
 ";
 
@@ -19376,10 +19703,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp
 Debug printing
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L706
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L730
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L706-L708
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L730-L732
 
 ";
 
@@ -19390,10 +19717,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp
 Debug printing
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L709
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L733
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L709-L711
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L733-L735
 
 ";
 
@@ -19406,10 +19733,10 @@ Precision variant for 2 norm: (x,y) -> sqrt(x^2+y^2)
 Extra doc: https://github.com/casadi/casadi/wiki/L_pw
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L718
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L742
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L718-L720
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L742-L744
 
 ";
 
@@ -19420,10 +19747,10 @@ Precision variant for 2 norm: (x,y) -> sqrt(x^2+y^2)
 Extra doc: https://github.com/casadi/casadi/wiki/L_pw
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L718
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L742
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L718-L720
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L742-L744
 
 ";
 
@@ -19434,10 +19761,10 @@ Precision variant for 2 norm: (x,y) -> sqrt(x^2+y^2)
 Extra doc: https://github.com/casadi/casadi/wiki/L_pw
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L718
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L742
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L718-L720
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L742-L744
 
 ";
 
@@ -19450,10 +19777,10 @@ Precision variant for 2 norm: (x,y) -> sqrt(x^2+y^2)
 Extra doc: https://github.com/casadi/casadi/wiki/L_pw
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L721
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L745
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L721-L723
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L745-L747
 
 ";
 
@@ -19464,10 +19791,10 @@ Precision variant for 2 norm: (x,y) -> sqrt(x^2+y^2)
 Extra doc: https://github.com/casadi/casadi/wiki/L_pw
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L721
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L745
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L721-L723
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L745-L747
 
 ";
 
@@ -19478,10 +19805,10 @@ Precision variant for 2 norm: (x,y) -> sqrt(x^2+y^2)
 Extra doc: https://github.com/casadi/casadi/wiki/L_pw
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L721
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L745
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L721-L723
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L745-L747
 
 ";
 
@@ -19503,10 +19830,10 @@ true
 Extra doc: https://github.com/casadi/casadi/wiki/L_pv
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L679
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L703
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L679-L681
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L703-L705
 
 ";
 
@@ -19526,10 +19853,10 @@ true
 Extra doc: https://github.com/casadi/casadi/wiki/L_pv
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L679
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L703
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L679-L681
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L703-L705
 
 ";
 
@@ -19549,10 +19876,10 @@ true
 Extra doc: https://github.com/casadi/casadi/wiki/L_pv
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L679
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L703
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L679-L681
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L703-L705
 
 ";
 
@@ -31165,10 +31492,10 @@ MatrixCommon &x, const MatrixCommon &y) "
 Debug printing
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L706
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L730
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L706-L708
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L730-L732
 
 ";
 
@@ -35648,10 +35975,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L20
 Debug printing
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L706
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L730
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L706-L708
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L730-L732
 
 ";
 
@@ -46027,43 +46354,106 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp
  const SXElem &y) "
 
 [INTERNAL] 
-Remainder after division: (x,y) -> mod(x,y)
+Remainder after division: (x,y) -> fmod(x,y)
 
-Extra doc: https://github.com/casadi/casadi/wiki/L_pq
+This Function follows the convention of 
+https://en.cppreference.com/w/c/numeric/math/fmod
+
+Notably:
+fmod(5,3) -> 2
+
+fmod(5,-3) -> 2
+
+fmod(-5,3) -> -2
+
+fmod(-5,-3) -> -2
+
+This is equivalent to Python's numpy.fmod and Matlab's rem.
+
+\\\\seealso remainder
+
+::
+
+  Extra doc: https://github.com/casadi/casadi/wiki/L_pq 
+  
+
+
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L595
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L607
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L595-L597
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L607-L609
 
 ";
 
 %feature("docstring") casadi::casadi_mod "
 
-Remainder after division: (x,y) -> mod(x,y)
+Remainder after division: (x,y) -> fmod(x,y)
 
-Extra doc: https://github.com/casadi/casadi/wiki/L_pq
+This Function follows the convention of 
+https://en.cppreference.com/w/c/numeric/math/fmod
+
+Notably:
+fmod(5,3) -> 2
+
+fmod(5,-3) -> 2
+
+fmod(-5,3) -> -2
+
+fmod(-5,-3) -> -2
+
+This is equivalent to Python's numpy.fmod and Matlab's rem.
+
+\\\\seealso remainder
+
+::
+
+  Extra doc: https://github.com/casadi/casadi/wiki/L_pq 
+  
+
+
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L595
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L607
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L595-L597
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L607-L609
 
 ";
 
 %feature("docstring")  casadi::GenericExpressionCommon::casadi_mod "
 
-Remainder after division: (x,y) -> mod(x,y)
+Remainder after division: (x,y) -> fmod(x,y)
 
-Extra doc: https://github.com/casadi/casadi/wiki/L_pq
+This Function follows the convention of 
+https://en.cppreference.com/w/c/numeric/math/fmod
+
+Notably:
+fmod(5,3) -> 2
+
+fmod(5,-3) -> 2
+
+fmod(-5,3) -> -2
+
+fmod(-5,-3) -> -2
+
+This is equivalent to Python's numpy.fmod and Matlab's rem.
+
+\\\\seealso remainder
+
+::
+
+  Extra doc: https://github.com/casadi/casadi/wiki/L_pq 
+  
+
+
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L595
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L607
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L595-L597
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L607-L609
 
 ";
 
@@ -46073,13 +46463,36 @@ SXElem &x, const SXElem &y) "
 [INTERNAL] 
 Remainder after division: (x,y) -> remainder(x,y)
 
-Extra doc: https://github.com/casadi/casadi/wiki/L_24x
+This Function follows the convention of 
+https://en.cppreference.com/w/c/numeric/math/remainder
+
+Notably:
+remainder(5,3) -> -1
+
+remainder(5,-3) -> -1
+
+remainder(-5,3) -> 1
+
+remainder(-5,-3) -> 1
+
+This is equivalent to Python's math.remainder. There is no equivalence
+ in 
+Matlab.
+
+\\\\seealso fmod
+
+::
+
+  Extra doc: https://github.com/casadi/casadi/wiki/L_24x 
+  
+
+
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L610
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L634
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L610-L612
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L634-L636
 
 ";
 
@@ -46087,13 +46500,36 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp
 
 Remainder after division: (x,y) -> remainder(x,y)
 
-Extra doc: https://github.com/casadi/casadi/wiki/L_24x
+This Function follows the convention of 
+https://en.cppreference.com/w/c/numeric/math/remainder
+
+Notably:
+remainder(5,3) -> -1
+
+remainder(5,-3) -> -1
+
+remainder(-5,3) -> 1
+
+remainder(-5,-3) -> 1
+
+This is equivalent to Python's math.remainder. There is no equivalence
+ in 
+Matlab.
+
+\\\\seealso fmod
+
+::
+
+  Extra doc: https://github.com/casadi/casadi/wiki/L_24x 
+  
+
+
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L610
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L634
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L610-L612
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L634-L636
 
 ";
 
@@ -46101,13 +46537,36 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp
 
 Remainder after division: (x,y) -> remainder(x,y)
 
-Extra doc: https://github.com/casadi/casadi/wiki/L_24x
+This Function follows the convention of 
+https://en.cppreference.com/w/c/numeric/math/remainder
+
+Notably:
+remainder(5,3) -> -1
+
+remainder(5,-3) -> -1
+
+remainder(-5,3) -> 1
+
+remainder(-5,-3) -> 1
+
+This is equivalent to Python's math.remainder. There is no equivalence
+ in 
+Matlab.
+
+\\\\seealso fmod
+
+::
+
+  Extra doc: https://github.com/casadi/casadi/wiki/L_24x 
+  
+
+
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L610
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L634
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L610-L612
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L634-L636
 
 ";
 
@@ -46122,10 +46581,10 @@ theta = atan2(y,x) corresponds to x = r cos(theta), y = r sin(theta)
 Extra doc: https://github.com/casadi/casadi/wiki/L_pr
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L624
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L648
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L624-L626
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L648-L650
 
 ";
 
@@ -46138,10 +46597,10 @@ theta = atan2(y,x) corresponds to x = r cos(theta), y = r sin(theta)
 Extra doc: https://github.com/casadi/casadi/wiki/L_pr
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L624
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L648
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L624-L626
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L648-L650
 
 ";
 
@@ -46154,10 +46613,10 @@ theta = atan2(y,x) corresponds to x = r cos(theta), y = r sin(theta)
 Extra doc: https://github.com/casadi/casadi/wiki/L_pr
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L624
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L648
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L624-L626
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L648-L650
 
 ";
 
@@ -46170,10 +46629,10 @@ Conditional assignment: (x,y) -> x ? y : 0.
 Extra doc: https://github.com/casadi/casadi/wiki/L_ps
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L636
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L660
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L636-L638
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L660-L662
 
 ";
 
@@ -46186,10 +46645,10 @@ Smallest of two values: (x,y) -> min(x,y)
 Extra doc: https://github.com/casadi/casadi/wiki/L_pt
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L648
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L672
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L648-L650
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L672-L674
 
 ";
 
@@ -46200,10 +46659,10 @@ Smallest of two values: (x,y) -> min(x,y)
 Extra doc: https://github.com/casadi/casadi/wiki/L_pt
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L648
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L672
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L648-L650
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L672-L674
 
 ";
 
@@ -46214,10 +46673,10 @@ Smallest of two values: (x,y) -> min(x,y)
 Extra doc: https://github.com/casadi/casadi/wiki/L_pt
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L648
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L672
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L648-L650
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L672-L674
 
 ";
 
@@ -46230,10 +46689,10 @@ Largest of two values: (x,y) -> max(x,y)
 Extra doc: https://github.com/casadi/casadi/wiki/L_pu
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L660
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L684
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L660-L662
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L684-L686
 
 ";
 
@@ -46244,10 +46703,10 @@ Largest of two values: (x,y) -> max(x,y)
 Extra doc: https://github.com/casadi/casadi/wiki/L_pu
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L660
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L684
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L660-L662
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L684-L686
 
 ";
 
@@ -46258,10 +46717,10 @@ Largest of two values: (x,y) -> max(x,y)
 Extra doc: https://github.com/casadi/casadi/wiki/L_pu
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L660
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L684
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L660-L662
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L684-L686
 
 ";
 
@@ -46272,10 +46731,10 @@ SXElem &x, const SXElem &y) "
 Copy sign
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L686
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L710
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L686-L688
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L710-L712
 
 ";
 
@@ -46284,10 +46743,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp
 Copy sign
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L686
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L710
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L686-L688
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L710-L712
 
 ";
 
@@ -46296,10 +46755,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp
 Copy sign
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L686
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L710
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L686-L688
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L710-L712
 
 ";
 
@@ -46310,10 +46769,10 @@ SXElem &x, const SXElem &y) "
 Elementwise power with const power
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L696
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L720
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L696-L698
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L720-L722
 
 ";
 
@@ -46322,10 +46781,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp
 Elementwise power with const power
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L696
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L720
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L696-L698
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L720-L722
 
 ";
 
@@ -46334,10 +46793,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp
 Elementwise power with const power
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L696
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L720
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L696-L698
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L720-L722
 
 ";
 
@@ -46348,10 +46807,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp
 Debug printing
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L706
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L730
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L706-L708
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L730-L732
 
 ";
 
@@ -46364,10 +46823,10 @@ Precision variant for 2 norm: (x,y) -> sqrt(x^2+y^2)
 Extra doc: https://github.com/casadi/casadi/wiki/L_pw
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L718
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L742
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L718-L720
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L742-L744
 
 ";
 
@@ -46378,10 +46837,10 @@ Precision variant for 2 norm: (x,y) -> sqrt(x^2+y^2)
 Extra doc: https://github.com/casadi/casadi/wiki/L_pw
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L718
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L742
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L718-L720
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L742-L744
 
 ";
 
@@ -46392,10 +46851,10 @@ Precision variant for 2 norm: (x,y) -> sqrt(x^2+y^2)
 Extra doc: https://github.com/casadi/casadi/wiki/L_pw
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L718
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L742
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L718-L720
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp#L742-L744
 
 ";
 
