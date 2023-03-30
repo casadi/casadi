@@ -174,7 +174,7 @@ When the number of inputs to a function object is large or changing, an alternat
 
 Converting |MX| to |SX|
 -----------------------
-A function object defined by an |MX| graph that only contains built-in operations (e.g. element-wise operations such as addition, square root, matrix multiplications and calls to |SX| functions, can be converted into a function defined purely by an |SX| graph using the syntax:
+A function object defined by an |MX| graph that only contains built-in operations (e.g. element-wise operations such as addition, square root, matrix multiplications and calls to |SX| functions), can be converted into a function defined purely by an |SX| graph using the syntax:
 
 .. code-block:: python
 
