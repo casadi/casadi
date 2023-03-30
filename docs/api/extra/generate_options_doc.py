@@ -232,6 +232,9 @@ for name,meta in metadata.items():
           linec+=1
         stop = linec
         
+        target = lines[start-1]
+        if name.split("::")[1] not in target:
+            continue
         optionsdict = "".join(lines[start:stop])
 
         try:
@@ -341,14 +344,27 @@ for name,meta in sorted(metadata.items()):
   if not('options' in meta):
     meta['options'] = {}
 
-  optionproviders = [meta['options']]
-  for a in meta['optionproviders']:
+  # Recursive retrieve all options from optionproviders
+  optionproviders_todo = set([name])
+  optionproviders = []
+  
+  while optionproviders_todo:
+      for e in optionproviders_todo:
+        optionproviders.append(e)
+        additions = set()
+        if e in metadata:
+            additions = additions | set(metadata[e]["optionproviders"])
+      optionproviders_todo = optionproviders_todo | additions
+      optionproviders_todo = optionproviders_todo - set(optionproviders)
+  
+  optionset = []
+  for a in optionproviders:
     if a in metadata and 'options' in metadata[a]:
-      optionproviders.append(metadata[a]['options'])
+      optionset.append(metadata[a]['options'])
   
   alloptions = {}
   
-  for optionprovider in reversed(optionproviders):
+  for optionprovider in reversed(optionset):
       update_overwrite(alloptions,optionprovider)
       
   myoptionskeys = alloptions.keys()
@@ -396,7 +412,6 @@ for name,meta in sorted(metadata.items()):
       f.write( "*/\n")
     
     t = name
-    print("test", name, myoptionskeys)
     f.write("/** \\addtogroup general_%s\n\\n\n\\par\n" % t.replace("casadi::","") )
     f.write("<a name='options'></a><table>\n")
     f.write("<caption>List of available options</caption>\n")

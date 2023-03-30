@@ -316,6 +316,11 @@ class Misctests(casadiTestCase):
       print(str(e))
       self.assertTrue("x must be larger than 3" in str(e))
 
+  def test_doc(self):
+    self.assertTrue("jac_penalty" in nlpsol.__doc__) # FunctionInternal
+    self.assertTrue("print_time" in nlpsol.__doc__)  # ProtoFunction
+    self.assertTrue( nlpsol.__doc__.count("print_time")==1)  # ProtoFunction
+
   @requires_nlpsol("ipopt")
   def test_output(self):
     with capture_stdout() as result:
