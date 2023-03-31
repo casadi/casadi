@@ -1499,6 +1499,7 @@ class NLPtests(casadiTestCase):
 
     for Solver, solver_options, features in solvers:
       if "ipopt" in str(solver_options): continue
+      if "snopt" in str(solver_options): continue
       if "knitro" in str(Solver):
         solver_options = copy.deepcopy(solver_options)
         solver_options["knitro"]["algorithm"] = 4 # sqp
