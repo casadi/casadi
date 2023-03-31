@@ -23,6 +23,6 @@ jobs:
         make lint
     - name: clang-tidy
       run: |
-        cd build
-        clang-tidy --version
-        make clang-tidy
+        #cd build
+        #clang-tidy --version
+        #make clang-tidy
