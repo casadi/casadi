@@ -864,6 +864,9 @@ struct ProblemWithCounters {
     std::shared_ptr<EvalCounter> evaluations = std::make_shared<EvalCounter>();
     Problem problem;
 
+    ProblemWithCounters()
+        requires std::is_default_constructible_v<Problem>
+    = default;
     template <class P>
     explicit ProblemWithCounters(P &&problem)
         requires std::is_same_v<std::remove_cvref_t<P>, std::remove_cvref_t<Problem>>
@@ -930,7 +933,6 @@ class BoxConstrProblem {
     /// handled using a quadratic penalty method rather than using an
     /// augmented Lagrangian method. Specifically, the Lagrange multipliers for
     /// these components (which determine the shifts in ALM) are kept at zero.
-    /// @todo change name
     index_t penalty_alm_split = 0;
 
     BoxConstrProblem(length_t n, ///< Number of decision variables

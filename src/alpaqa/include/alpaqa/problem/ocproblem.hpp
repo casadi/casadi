@@ -10,6 +10,7 @@
 #include <array>
 #include <concepts>
 #include <stdexcept>
+#include <type_traits>
 
 #ifndef NDEBUG
 #include <iostream>
@@ -615,6 +616,9 @@ struct ControlProblemWithCounters {
     std::shared_ptr<OCPEvalCounter> evaluations = std::make_shared<OCPEvalCounter>();
     Problem problem;
 
+    ControlProblemWithCounters()
+        requires std::is_default_constructible_v<Problem>
+    = default;
     template <class P>
     explicit ControlProblemWithCounters(P &&problem)
         requires std::is_same_v<std::remove_cvref_t<P>, std::remove_cvref_t<Problem>>
