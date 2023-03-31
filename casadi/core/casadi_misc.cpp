@@ -331,6 +331,7 @@ int simple_mkstemps_fd(const std::string& prefix, const std::string& suffix, std
       if (fd != -1) return fd;
       if (fd == -1 && errno != EEXIST) return -1;
     }
+    return 0;
   }
 std::string simple_mkstemps(const std::string& prefix, const std::string& suffix) {
   std::string ret;
