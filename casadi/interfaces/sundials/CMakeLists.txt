@@ -11,23 +11,12 @@ endif()
 casadi_library(casadi_sundials_common sundials_interface.hpp sundials_interface.cpp)
 target_link_libraries(casadi_sundials_common ${SUNDIALS_LIBRARIES})
 
-# SUNDIALS commons (new)
-casadi_library(casadi_sundials_simulator sundials_simulator.hpp sundials_simulator.cpp)
-target_link_libraries(casadi_sundials_simulator ${SUNDIALS_LIBRARIES})
-
 # CVODES
 casadi_plugin(Integrator cvodes
   cvodes_interface.hpp    cvodes_interface.cpp
   cvodes_interface_meta.cpp
   )
 casadi_plugin_link_libraries(Integrator cvodes casadi_sundials_common)
-
-# CVODES (new)
-casadi_plugin(Simulator cvodes
-  cvodes_simulator.hpp    cvodes_simulator.cpp
-  cvodes_simulator_meta.cpp
-  )
-casadi_plugin_link_libraries(Simulator cvodes casadi_sundials_simulator)
 
 # IDAS
 casadi_plugin(Integrator idas

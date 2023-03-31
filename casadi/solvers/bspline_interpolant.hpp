@@ -297,6 +297,7 @@ namespace casadi {
       default:
         casadi_assert_dev(false);
       }
+      return MX();  // Cannot happen
     }
 
 } // namespace casadi
