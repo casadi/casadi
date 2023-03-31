@@ -1,16 +1,12 @@
 #include "params.hpp"
 
-template <alpaqa::Config Conf>
-const dict_to_struct_table_t<alpaqa::LBFGSDirectionParams<Conf>>
-    dict_to_struct_table<alpaqa::LBFGSDirectionParams<Conf>>::table{
-        // clang-format off
-        {"rescale_when_γ_changes", &alpaqa::LBFGSDirectionParams<Conf>::rescale_when_γ_changes},
-        // clang-format on
-    };
+PARAMS_TABLE_DEF(alpaqa::LBFGSDirectionParams<Conf>,    //
+                 PARAMS_MEMBER(rescale_when_γ_changes), //
+);
 
-template struct dict_to_struct_table<alpaqa::LBFGSDirectionParams<alpaqa::EigenConfigf>>;
-template struct dict_to_struct_table<alpaqa::LBFGSDirectionParams<alpaqa::EigenConfigd>>;
-template struct dict_to_struct_table<alpaqa::LBFGSDirectionParams<alpaqa::EigenConfigl>>;
+PARAMS_TABLE_INST(alpaqa::LBFGSDirectionParams<alpaqa::EigenConfigf>);
+PARAMS_TABLE_INST(alpaqa::LBFGSDirectionParams<alpaqa::EigenConfigd>);
+PARAMS_TABLE_INST(alpaqa::LBFGSDirectionParams<alpaqa::EigenConfigl>);
 #ifdef ALPAQA_WITH_QUAD_PRECISION
-template struct dict_to_struct_table<alpaqa::LBFGSDirectionParams<alpaqa::EigenConfigq>>;
+PARAMS_TABLE_INST(alpaqa::LBFGSDirectionParams<alpaqa::EigenConfigq>);
 #endif

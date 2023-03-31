@@ -127,6 +127,31 @@ T var_kwargs_to_struct(const params_or_dict<T> &p) {
                                         : kwargs_to_struct<T>(std::get<py::dict>(p));
 }
 
+/// Helper macro to easily specialize @ref dict_to_struct_table.
+#define PARAMS_TABLE_DECL(type_)                                                                   \
+    template <alpaqa::Config Conf>                                                                 \
+    struct dict_to_struct_table<type_> {                                                           \
+        using type = type_;                                                                        \
+        static const dict_to_struct_table_t<type> table;                                           \
+    }
+
+/// Helper macro to easily initialize a
+/// @ref dict_to_struct_table_t.
+#define PARAMS_MEMBER(name)                                                                        \
+    {                                                                                              \
+#name, &type::name                                                                         \
+    }
+
+/// Helper macro to easily define a specialization @ref dict_to_struct_table.
+#define PARAMS_TABLE_DEF(type_, ...)                                                               \
+    template <alpaqa::Config Conf>                                                                 \
+    const dict_to_struct_table_t<type_> dict_to_struct_table<type_>::table {                       \
+        __VA_ARGS__                                                                                \
+    }
+
+/// Helper macro to easily instantiate a @ref dict_to_struct_table.
+#define PARAMS_TABLE_INST(type_) template struct dict_to_struct_table<type_>
+
 #if 0
 #include <alpaqa/inner/pga.hpp>
 

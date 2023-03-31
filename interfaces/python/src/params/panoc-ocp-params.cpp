@@ -1,36 +1,32 @@
 #include "panoc-ocp-params.hpp"
 #include "lbfgs-params.hpp"
 
-template <alpaqa::Config Conf>
-const dict_to_struct_table_t<alpaqa::PANOCOCPParams<Conf>>
-    dict_to_struct_table<alpaqa::PANOCOCPParams<Conf>>::table{
-        // clang-format off
-        {"Lipschitz", &alpaqa::PANOCOCPParams<Conf>::Lipschitz},
-        {"max_iter", &alpaqa::PANOCOCPParams<Conf>::max_iter},
-        {"max_time", &alpaqa::PANOCOCPParams<Conf>::max_time},
-        {"τ_min", &alpaqa::PANOCOCPParams<Conf>::τ_min},
-        {"β", &alpaqa::PANOCOCPParams<Conf>::β},
-        {"L_min", &alpaqa::PANOCOCPParams<Conf>::L_min},
-        {"L_max", &alpaqa::PANOCOCPParams<Conf>::L_max},
-        {"L_max_inc", &alpaqa::PANOCOCPParams<Conf>::L_max_inc},
-        {"stop_crit", &alpaqa::PANOCOCPParams<Conf>::stop_crit},
-        {"max_no_progress", &alpaqa::PANOCOCPParams<Conf>::max_no_progress},
-        {"gn_interval", &alpaqa::PANOCOCPParams<Conf>::gn_interval},
-        {"gn_sticky", &alpaqa::PANOCOCPParams<Conf>::gn_sticky},
-        {"reset_lbfgs_on_gn_step", &alpaqa::PANOCOCPParams<Conf>::reset_lbfgs_on_gn_step},
-        {"lqr_factor_cholesky", &alpaqa::PANOCOCPParams<Conf>::lqr_factor_cholesky},
-        {"lbfgs_params", &alpaqa::PANOCOCPParams<Conf>::lbfgs_params},
-        {"print_interval", &alpaqa::PANOCOCPParams<Conf>::print_interval},
-        {"print_precision", &alpaqa::PANOCOCPParams<Conf>::print_precision},
-        {"quadratic_upperbound_tolerance_factor", &alpaqa::PANOCOCPParams<Conf>::quadratic_upperbound_tolerance_factor},
-        {"linesearch_tolerance_factor", &alpaqa::PANOCOCPParams<Conf>::linesearch_tolerance_factor},
-        {"disable_acceleration", &alpaqa::PANOCOCPParams<Conf>::disable_acceleration},
-        // clang-format on
-    };
+PARAMS_TABLE_DEF(alpaqa::PANOCOCPParams<Conf>,
+                 PARAMS_MEMBER(Lipschitz),                             //
+                 PARAMS_MEMBER(max_iter),                              //
+                 PARAMS_MEMBER(max_time),                              //
+                 PARAMS_MEMBER(τ_min),                                 //
+                 PARAMS_MEMBER(β),                                     //
+                 PARAMS_MEMBER(L_min),                                 //
+                 PARAMS_MEMBER(L_max),                                 //
+                 PARAMS_MEMBER(L_max_inc),                             //
+                 PARAMS_MEMBER(stop_crit),                             //
+                 PARAMS_MEMBER(max_no_progress),                       //
+                 PARAMS_MEMBER(gn_interval),                           //
+                 PARAMS_MEMBER(gn_sticky),                             //
+                 PARAMS_MEMBER(reset_lbfgs_on_gn_step),                //
+                 PARAMS_MEMBER(lqr_factor_cholesky),                   //
+                 PARAMS_MEMBER(lbfgs_params),                          //
+                 PARAMS_MEMBER(print_interval),                        //
+                 PARAMS_MEMBER(print_precision),                       //
+                 PARAMS_MEMBER(quadratic_upperbound_tolerance_factor), //
+                 PARAMS_MEMBER(linesearch_tolerance_factor),           //
+                 PARAMS_MEMBER(disable_acceleration),                  //
+);
 
-template struct dict_to_struct_table<alpaqa::PANOCOCPParams<alpaqa::EigenConfigf>>;
-template struct dict_to_struct_table<alpaqa::PANOCOCPParams<alpaqa::EigenConfigd>>;
-template struct dict_to_struct_table<alpaqa::PANOCOCPParams<alpaqa::EigenConfigl>>;
+PARAMS_TABLE_INST(alpaqa::PANOCOCPParams<alpaqa::EigenConfigf>);
+PARAMS_TABLE_INST(alpaqa::PANOCOCPParams<alpaqa::EigenConfigd>);
+PARAMS_TABLE_INST(alpaqa::PANOCOCPParams<alpaqa::EigenConfigl>);
 #ifdef ALPAQA_WITH_QUAD_PRECISION
-template struct dict_to_struct_table<alpaqa::PANOCOCPParams<alpaqa::EigenConfigq>>;
+PARAMS_TABLE_INST(alpaqa::PANOCOCPParams<alpaqa::EigenConfigq>);
 #endif
