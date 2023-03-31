@@ -156,10 +156,10 @@ message("COMPILE_FLAGS: ${COMPILE_FLAGS}")
 set_target_properties(_casadi PROPERTIES COMPILE_FLAGS "${COMPILE_FLAGS}")
 
 if(WIN32) # dlls don't allow missing symbols
-  if(NOT PYTHON_LIBRARIES)
+  if(NOT PYTHON_LIBRARY)
     message(SEND_ERROR "Python libraries not found, but required." )
   endif()
-  target_link_libraries(_casadi ${PYTHON_LIBRARIES})
+  target_link_libraries(_casadi ${PYTHON_LIBRARY})
 endif()
 target_link_libraries(_casadi casadi)
 
