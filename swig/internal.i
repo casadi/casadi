@@ -5140,9 +5140,6 @@
 %exception  casadi::doc_rootfinder(const std::string &name) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::doc_simulator(const std::string &name) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::dot(const std::vector< T > &a, const std::vector< T > &b) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -5276,9 +5273,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::has_rootfinder(const std::string &name) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::has_simulator(const std::string &name) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::in_range(const std::vector< T > &v, casadi_int lower, casadi_int upper) {
@@ -5429,9 +5423,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::load_rootfinder(const std::string &name) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::load_simulator(const std::string &name) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::lookupvector(const std::vector< casadi_int > &v) {
@@ -5606,33 +5597,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::simpleRK(Function f, casadi_int N=10, casadi_int order=4) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::simulator(const std::string &name, const std::string &solver, const Function &dae, const std::vector< double > &grid, const Dict &opts) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::simulator(const std::string &name, const std::string &solver, const MXDict &dae, const std::vector< double > &grid, const Dict &opts) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::simulator(const std::string &name, const std::string &solver, const SXDict &dae, const std::vector< double > &grid, const Dict &opts=Dict()) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::simulator_in() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::simulator_in(casadi_int ind) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::simulator_n_in() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::simulator_n_out() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::simulator_out() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::simulator_out(casadi_int ind) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::sort(const std::vector< T > &values, std::vector< T > &sorted_values, std::vector< casadi_int > &indices, bool invert_indices=false) {

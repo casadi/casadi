@@ -4799,19 +4799,6 @@ C++ includes: e0_diagram.hpp
 ";
 
 
-// File: classcasadi_1_1CvodesSimulator.xml
-%feature("docstring") casadi::CvodesSimulator "
-
-[INTERNAL] 
-Diagrams
---------
-
-
-
-C++ includes: e0_diagram.hpp
-";
-
-
 // File: classcasadi_1_1DaeBuilder.xml
 
 
@@ -4925,7 +4912,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L93
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L64-L66
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L63-L65
 
 ";
 
@@ -4940,7 +4927,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L98
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L68-L70
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L67-L69
 
 ";
 
@@ -4955,7 +4942,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L103
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L72-L74
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L71-L73
 
 ";
 
@@ -4970,7 +4957,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L108
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L76-L78
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L75-L77
 
 ";
 
@@ -4985,7 +4972,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L113
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L80-L82
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L79-L81
 
 ";
 
@@ -5000,7 +4987,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L118
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L84-L86
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L83-L85
 
 ";
 
@@ -5015,7 +5002,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L123
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L88-L90
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L87-L89
 
 ";
 
@@ -5030,7 +5017,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L128
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L92-L94
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L91-L93
 
 ";
 
@@ -5045,7 +5032,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L133
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L96-L98
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L95-L97
 
 ";
 
@@ -5060,7 +5047,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L138
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L100-L102
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L99-L101
 
 ";
 
@@ -5075,7 +5062,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L143
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L104-L106
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L103-L105
 
 ";
 
@@ -5090,7 +5077,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L148
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L108-L110
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L107-L109
 
 ";
 
@@ -5105,7 +5092,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L153
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L112-L114
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L111-L113
 
 ";
 
@@ -5120,7 +5107,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L158
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L116-L118
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L115-L117
 
 ";
 
@@ -5137,7 +5124,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L165
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L120-L122
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L119-L121
 
 ";
 
@@ -5152,7 +5139,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L170
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L124-L126
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L123-L125
 
 ";
 
@@ -5169,7 +5156,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L177
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L128-L130
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L127-L129
 
 ";
 
@@ -5184,7 +5171,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L182
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L132-L134
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L131-L133
 
 ";
 
@@ -5199,7 +5186,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L187
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L136-L138
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L135-L137
 
 ";
 
@@ -5214,7 +5201,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L192
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L140-L142
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L139-L141
 
 ";
 
@@ -5229,7 +5216,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L197
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L144-L146
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L143-L145
 
 ";
 
@@ -5244,7 +5231,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L202
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L148-L150
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L147-L149
 
 ";
 
@@ -5259,7 +5246,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L207
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L152-L154
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L151-L153
 
 ";
 
@@ -5274,7 +5261,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L231
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L183-L185
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L182-L184
 
 ";
 
@@ -5289,7 +5276,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L236
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L187-L189
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L186-L188
 
 ";
 
@@ -5304,7 +5291,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L241
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L191-L193
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L190-L192
 
 ";
 
@@ -5319,7 +5306,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L246
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L195-L197
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L194-L196
 
 ";
 
@@ -5334,7 +5321,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L251
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L199-L201
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L198-L200
 
 ";
 
@@ -5349,7 +5336,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L256
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L203-L205
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L202-L204
 
 ";
 
@@ -5364,7 +5351,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L261
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L207-L209
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L206-L208
 
 ";
 
@@ -5379,7 +5366,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L266
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L211-L213
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L210-L212
 
 ";
 
@@ -5394,7 +5381,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L271
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L215-L217
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L214-L216
 
 ";
 
@@ -5409,7 +5396,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L276
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L219-L221
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L218-L220
 
 ";
 
@@ -5422,7 +5409,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L284
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L421-L426
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L420-L425
 
 ";
 
@@ -5435,7 +5422,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L287
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L428-L435
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L427-L434
 
 ";
 
@@ -5448,7 +5435,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L290
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L437-L444
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L436-L443
 
 ";
 
@@ -5461,7 +5448,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L293
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L446-L453
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L445-L452
 
 ";
 
@@ -5474,7 +5461,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L296
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L455-L462
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L454-L461
 
 ";
 
@@ -5487,7 +5474,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L299
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L464-L471
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L463-L470
 
 ";
 
@@ -5500,7 +5487,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L302
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L473-L480
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L472-L479
 
 ";
 
@@ -5513,7 +5500,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L305
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L482-L489
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L481-L488
 
 ";
 
@@ -5526,7 +5513,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L308
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L491-L498
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L490-L497
 
 ";
 
@@ -5539,7 +5526,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L311
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L500-L507
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L499-L506
 
 ";
 
@@ -5552,7 +5539,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L314
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L526-L532
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L525-L531
 
 ";
 
@@ -5565,7 +5552,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L317
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L534-L540
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L533-L539
 
 ";
 
@@ -5578,7 +5565,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L320
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L509-L513
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L508-L512
 
 ";
 
@@ -5591,7 +5578,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L323
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L515-L518
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L514-L517
 
 ";
 
@@ -5604,7 +5591,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L326
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L520-L524
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L519-L523
 
 ";
 
@@ -5617,7 +5604,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L329
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L542-L548
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L541-L547
 
 ";
 
@@ -5702,7 +5689,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L375
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L602-L608
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L601-L607
 
 ";
 
@@ -5715,7 +5702,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L378
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L610-L616
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L609-L615
 
 ";
 
@@ -5728,7 +5715,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L381
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L239-L245
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L238-L244
 
 ";
 
@@ -5741,7 +5728,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L384
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L247-L253
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L246-L252
 
 ";
 
@@ -5754,7 +5741,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L387
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L255-L261
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L254-L260
 
 ";
 
@@ -5767,7 +5754,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L390
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L263-L269
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L262-L268
 
 ";
 
@@ -5780,7 +5767,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L393
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L271-L277
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L270-L276
 
 ";
 
@@ -5795,7 +5782,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L396
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L279-L285
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L278-L284
 
 ";
 
@@ -5808,7 +5795,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L413
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L761-L764
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L760-L763
 
 >  Function casadi::DaeBuilder::add_fun(const std::string &name, const Importer &compiler, const Dict &opts=Dict())
 ------------------------------------------------------------------------
@@ -5819,7 +5806,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L413
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L761-L764
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L760-L763
 
 ";
 
@@ -5834,7 +5821,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L417
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L766-L773
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L765-L772
 
 ";
 
@@ -5847,7 +5834,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L423
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L805-L807
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L804-L806
 
 >  std::vector< Function > casadi::DaeBuilder::fun() const
 ------------------------------------------------------------------------
@@ -5858,7 +5845,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L423
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L805-L807
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L804-L806
 
 ";
 
@@ -5873,7 +5860,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L426
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L784-L803
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L783-L802
 
 ";
 
@@ -5899,7 +5886,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L436
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L223-L229
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L222-L228
 
 ";
 
@@ -5912,7 +5899,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L439
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L231-L237
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L230-L236
 
 ";
 
@@ -5925,7 +5912,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L442
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L702-L709
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L701-L708
 
 ";
 
@@ -5951,7 +5938,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L469
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L733-L740
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L732-L739
 
 >  Function casadi::DaeBuilder::create(const std::string &name, const Dict &opts=Dict()) const
 ------------------------------------------------------------------------
@@ -5974,7 +5961,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L469
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L733-L740
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L732-L739
 
 ";
 
@@ -5989,7 +5976,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L697
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L883-L890
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L882-L889
 
 >  std::vector< MX > casadi::DaeBuilder::var(const std::vector< size_t > &ind) const
 ------------------------------------------------------------------------
@@ -6000,7 +5987,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L697
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L883-L890
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L882-L889
 
 ";
 
@@ -6015,7 +6002,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L487
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L585-L592
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L584-L591
 
 ";
 
@@ -6028,7 +6015,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L488
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L594-L600
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L593-L599
 
 ";
 
@@ -6041,7 +6028,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L493
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L618-L620
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L617-L619
 
 ";
 
@@ -6054,7 +6041,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L494
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L622-L624
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L621-L623
 
 ";
 
@@ -6067,7 +6054,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L499
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L626-L628
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L625-L627
 
 ";
 
@@ -6080,7 +6067,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L500
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L630-L632
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L629-L631
 
 ";
 
@@ -6093,7 +6080,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L505
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L634-L643
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L633-L642
 
 ";
 
@@ -6106,7 +6093,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L506
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L645-L652
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L644-L651
 
 ";
 
@@ -6119,7 +6106,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L511
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L654-L656
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L653-L655
 
 ";
 
@@ -6132,7 +6119,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L512
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L658-L660
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L657-L659
 
 ";
 
@@ -6145,7 +6132,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L517
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L662-L664
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L661-L663
 
 ";
 
@@ -6158,7 +6145,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L518
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L666-L668
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L665-L667
 
 ";
 
@@ -6171,7 +6158,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L523
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L670-L672
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L669-L671
 
 ";
 
@@ -6184,7 +6171,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L524
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L674-L676
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L673-L675
 
 ";
 
@@ -6197,7 +6184,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L529
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L678-L680
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L677-L679
 
 ";
 
@@ -6210,7 +6197,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L530
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L682-L684
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L681-L683
 
 ";
 
@@ -6223,7 +6210,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L535
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L686-L688
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L685-L687
 
 ";
 
@@ -6236,7 +6223,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L536
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L690-L692
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L689-L691
 
 ";
 
@@ -6249,7 +6236,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L681
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L853-L859
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L852-L858
 
 >  const Variable & casadi::DaeBuilder::variable(size_t ind) const
 ------------------------------------------------------------------------
@@ -6260,7 +6247,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L681
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L853-L859
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L852-L858
 
 ";
 
@@ -6288,7 +6275,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L80
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L55-L58
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L54-L57
 
 >  casadi::DaeBuilder::DaeBuilder(const std::string &name, const std::string &path=\"\", const Dict &opts=Dict())
 ------------------------------------------------------------------------
@@ -6299,7 +6286,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L80
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L55-L58
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L54-L57
 
 ";
 
@@ -6316,7 +6303,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L713
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L920-L929
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L919-L928
 
 >  std::vector< std::string > casadi::DaeBuilder::name(const std::vector< size_t > &ind) const
 ------------------------------------------------------------------------
@@ -6329,7 +6316,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L713
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L920-L929
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L919-L928
 
 ";
 
@@ -6346,7 +6333,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L213
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L156-L163
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L155-L162
 
 ";
 
@@ -6361,7 +6348,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L218
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L165-L172
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L164-L171
 
 ";
 
@@ -6376,7 +6363,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L223
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L174-L181
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L173-L180
 
 ";
 
@@ -6389,7 +6376,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L333
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L405-L411
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L404-L410
 
 ";
 
@@ -6402,7 +6389,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L336
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L413-L419
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L412-L418
 
 ";
 
@@ -6415,7 +6402,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L472
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L818-L827
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L817-L826
 
 ";
 
@@ -6428,7 +6415,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L549
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L559-L572
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L558-L571
 
 >  std::string casadi::DaeBuilder::der(const std::string &name) const
 ------------------------------------------------------------------------
@@ -6439,7 +6426,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L549
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L559-L572
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L558-L571
 
 ";
 
@@ -6454,7 +6441,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L540
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L694-L696
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L693-L695
 
 ";
 
@@ -6467,7 +6454,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L543
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L698-L700
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L697-L699
 
 ";
 
@@ -6480,7 +6467,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L596
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L940-L948
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L939-L947
 
 >  std::vector< double > casadi::DaeBuilder::attribute(const std::string &a, const std::vector< std::string > &name) const
 ------------------------------------------------------------------------
@@ -6491,7 +6478,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L596
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L940-L948
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L939-L947
 
 ";
 
@@ -6506,7 +6493,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L599
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L958-L965
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L957-L964
 
 >  void casadi::DaeBuilder::set_attribute(const std::string &a, const std::vector< std::string > &name, const std::vector< double > &val)
 ------------------------------------------------------------------------
@@ -6517,7 +6504,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L599
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L958-L965
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L957-L964
 
 ";
 
@@ -6532,7 +6519,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L603
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L976-L983
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L975-L982
 
 >  std::vector< double > casadi::DaeBuilder::min(const std::vector< std::string > &name) const
 ------------------------------------------------------------------------
@@ -6543,7 +6530,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L603
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L976-L983
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L975-L982
 
 ";
 
@@ -6558,7 +6545,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L606
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L993-L999
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L992-L998
 
 >  void casadi::DaeBuilder::set_min(const std::vector< std::string > &name, const std::vector< double > &val)
 ------------------------------------------------------------------------
@@ -6569,7 +6556,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L606
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L993-L999
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L992-L998
 
 ";
 
@@ -6584,7 +6571,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L609
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L1010-L1017
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L1009-L1016
 
 >  std::vector< double > casadi::DaeBuilder::max(const std::vector< std::string > &name) const
 ------------------------------------------------------------------------
@@ -6595,7 +6582,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L609
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L1010-L1017
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L1009-L1016
 
 ";
 
@@ -6610,7 +6597,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L612
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L1027-L1033
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L1026-L1032
 
 >  void casadi::DaeBuilder::set_max(const std::vector< std::string > &name, const std::vector< double > &val)
 ------------------------------------------------------------------------
@@ -6621,7 +6608,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L612
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L1027-L1033
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L1026-L1032
 
 ";
 
@@ -6636,7 +6623,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L615
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L1044-L1051
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L1043-L1050
 
 >  std::vector< double > casadi::DaeBuilder::nominal(const std::vector< std::string > &name) const
 ------------------------------------------------------------------------
@@ -6647,7 +6634,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L615
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L1044-L1051
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L1043-L1050
 
 ";
 
@@ -6662,7 +6649,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L618
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L1061-L1067
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L1060-L1066
 
 >  void casadi::DaeBuilder::set_nominal(const std::vector< std::string > &name, const std::vector< double > &val)
 ------------------------------------------------------------------------
@@ -6673,7 +6660,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L618
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L1061-L1067
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L1060-L1066
 
 ";
 
@@ -6688,7 +6675,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L621
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L1079-L1086
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L1078-L1085
 
 >  std::vector< double > casadi::DaeBuilder::start(const std::vector< std::string > &name) const
 ------------------------------------------------------------------------
@@ -6699,7 +6686,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L621
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L1079-L1086
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L1078-L1085
 
 ";
 
@@ -6714,7 +6701,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L624
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L1096-L1102
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L1095-L1101
 
 >  void casadi::DaeBuilder::set_start(const std::vector< std::string > &name, const std::vector< double > &val)
 ------------------------------------------------------------------------
@@ -6725,7 +6712,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L624
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L1096-L1102
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L1095-L1101
 
 ";
 
@@ -6744,7 +6731,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L630
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L1136-L1143
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L1135-L1142
 
 >  void casadi::DaeBuilder::set(const std::vector< std::string > &name, const std::vector< std::string > &val)
 ------------------------------------------------------------------------
@@ -6755,7 +6742,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L630
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L1136-L1143
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L1135-L1142
 
 ";
 
@@ -6770,7 +6757,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L633
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L1149-L1164
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L1148-L1163
 
 >  std::vector< GenericType > casadi::DaeBuilder::get(const std::vector< std::string > &name) const
 ------------------------------------------------------------------------
@@ -6781,7 +6768,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L633
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L1149-L1164
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L1148-L1163
 
 ";
 
@@ -6796,7 +6783,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L642
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L323-L326
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L322-L325
 
 >  void casadi::DaeBuilder::add_variable(const MX &new_v)
 ------------------------------------------------------------------------
@@ -6807,7 +6794,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L642
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L323-L326
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L322-L325
 
 ";
 
@@ -6822,7 +6809,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L651
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L338-L342
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L337-L341
 
 >  size_t casadi::DaeBuilder::add_variable_new(const MX &new_v)
 ------------------------------------------------------------------------
@@ -6833,7 +6820,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L651
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L338-L342
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L337-L341
 
 ";
 
@@ -6848,7 +6835,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L654
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L287-L294
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L286-L293
 
 ";
 
@@ -6861,7 +6848,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L657
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L296-L303
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L295-L302
 
 ";
 
@@ -6874,7 +6861,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L660
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L809-L816
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L808-L815
 
 ";
 
@@ -6889,7 +6876,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L665
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L1166-L1174
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L1165-L1173
 
 ";
 
@@ -6902,7 +6889,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L670
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L305-L311
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L304-L310
 
 ";
 
@@ -6915,7 +6902,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L703
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L901-L908
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L900-L907
 
 >  std::vector< size_t > casadi::DaeBuilder::find(const std::vector< std::string > &name) const
 ------------------------------------------------------------------------
@@ -6926,7 +6913,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.hpp#L703
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L901-L908
+https://github.com/casadi/casadi/blob/develop/casadi/core/dae_builder.cpp#L900-L907
 
 ";
 
@@ -26529,19 +26516,6 @@ C++ includes: e0_diagram.hpp
 ";
 
 
-// File: classcasadi_1_1Simulator.xml
-%feature("docstring") casadi::Simulator "
-
-[INTERNAL] 
-Diagrams
---------
-
-
-
-C++ includes: e0_diagram.hpp
-";
-
-
 // File: classcasadi_1_1Slice.xml
 %feature("docstring") casadi::Slice "
 
@@ -27874,19 +27848,6 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/submatrix.hpp#L53
 
 ";
 
-";
-
-
-// File: classcasadi_1_1SundialsSimulator.xml
-%feature("docstring") casadi::SundialsSimulator "
-
-[INTERNAL] 
-Diagrams
---------
-
-
-
-C++ includes: e0_diagram.hpp
 ";
 
 
@@ -29252,7 +29213,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L129
 ";
 
 
-// File: namespace_0d362.xml
+// File: namespace_0d359.xml
 
 
 // File: namespacecasadi.xml
@@ -30142,10 +30103,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/casadi_misc.cpp#L288-L
 Invert all entries.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/casadi_misc.hpp#L370
+https://github.com/casadi/casadi/blob/develop/casadi/core/casadi_misc.hpp#L371
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/casadi_misc.cpp#L370-L375
+https://github.com/casadi/casadi/blob/develop/casadi/core/casadi_misc.cpp#L371-L376
 
 ";
 
@@ -30155,10 +30116,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/casadi_misc.cpp#L370-L
 And operation on boolean vector.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/casadi_misc.hpp#L377
+https://github.com/casadi/casadi/blob/develop/casadi/core/casadi_misc.hpp#L378
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/casadi_misc.cpp#L377-L383
+https://github.com/casadi/casadi/blob/develop/casadi/core/casadi_misc.cpp#L378-L384
 
 ";
 
@@ -30168,10 +30129,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/casadi_misc.cpp#L377-L
 Or operation on boolean vector.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/casadi_misc.hpp#L385
+https://github.com/casadi/casadi/blob/develop/casadi/core/casadi_misc.hpp#L386
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/casadi_misc.cpp#L385-L391
+https://github.com/casadi/casadi/blob/develop/casadi/core/casadi_misc.cpp#L386-L392
 
 ";
 
@@ -35163,1339 +35124,6 @@ Implementation:
 https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L259-L262
 
 ";
-
-";
-
-%feature("docstring") casadi::IndexRecution::has_simulator "
-
-[INTERNAL] 
-Check if a particular plugin is available.
-
-Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/simulator.hpp#L31
-
-Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/simulator.cpp#L31-L33
-
-";
-
-%feature("docstring") casadi::IndexRecution::load_simulator "
-
-[INTERNAL] 
-Explicitly load a plugin dynamically.
-
-Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/simulator.hpp#L35
-
-Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/simulator.cpp#L35-L37
-
-";
-
-%feature("docstring") casadi::IndexRecution::doc_simulator "
-
-[INTERNAL] 
-Get the documentation string for a plugin.
-
-Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/simulator.hpp#L39
-
-Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/simulator.cpp#L39-L41
-
-";
-
-%feature("docstring") casadi::IndexRecution::simulator "
-
-[INTERNAL]
-
-Create an ODE/DAE simulator Solves an initial value problem (IVP) 
-with the 
-differential equation given as an implicit ODE coupled to an 
-algebraic 
-equation and a set of output equations:
-
-
-
-::
-
-  Time grid: [t0, t1, ..., tN]
-  
-  Initial conditions for forward integration
-  x(t0)  = x0
-  
-  Sequential forward integration from t=tk to t=t{k+1}
-  der(x) = fx(t, x, z, p, uk)         ODE
-  0 = fz(t, x, z, p, uk)              Algebraic equations
-  yk = fy(t, x, z, p, uk)             Output equations
-  
-  where we assume that the problem is index-1 (i.e. dfz/dz, is invertible) and furthermore that
-
-General information
-
->List of available options
-
-+------------------+-----------------+------------------+------------------+
-|        Id        |      Type       |   Description    |     Used in      |
-+==================+=================+==================+==================+
-| ad_weight        | OT_DOUBLE       | Weighting factor | casadi::Function |
-|                  |                 | for derivative   | Internal         |
-|                  |                 | calculation.When |                  |
-|                  |                 | there is an      |                  |
-|                  |                 | option of either |                  |
-|                  |                 | using forward or |                  |
-|                  |                 | reverse mode     |                  |
-|                  |                 | directional      |                  |
-|                  |                 | derivatives, the |                  |
-|                  |                 | condition ad_wei |                  |
-|                  |                 | ght*nf<=(1-      |                  |
-|                  |                 | ad_weight)*na is |                  |
-|                  |                 | used where nf    |                  |
-|                  |                 | and na are       |                  |
-|                  |                 | estimates of the |                  |
-|                  |                 | number of        |                  |
-|                  |                 | forward/reverse  |                  |
-|                  |                 | mode directional |                  |
-|                  |                 | derivatives      |                  |
-|                  |                 | needed. By       |                  |
-|                  |                 | default,         |                  |
-|                  |                 | ad_weight is     |                  |
-|                  |                 | calculated       |                  |
-|                  |                 | automatically,   |                  |
-|                  |                 | but this can be  |                  |
-|                  |                 | overridden by    |                  |
-|                  |                 | setting this     |                  |
-|                  |                 | option. In       |                  |
-|                  |                 | particular, 0    |                  |
-|                  |                 | means forcing    |                  |
-|                  |                 | forward mode and |                  |
-|                  |                 | 1 forcing        |                  |
-|                  |                 | reverse mode.    |                  |
-|                  |                 | Leave unset for  |                  |
-|                  |                 | (class specific) |                  |
-|                  |                 | heuristics.      |                  |
-+------------------+-----------------+------------------+------------------+
-| ad_weight_sp     | OT_DOUBLE       | Weighting factor | casadi::Function |
-|                  |                 | for sparsity     | Internal         |
-|                  |                 | pattern          |                  |
-|                  |                 | calculation calc |                  |
-|                  |                 | ulation.Override |                  |
-|                  |                 | s default        |                  |
-|                  |                 | behavior. Set to |                  |
-|                  |                 | 0 and 1 to force |                  |
-|                  |                 | forward and      |                  |
-|                  |                 | reverse mode     |                  |
-|                  |                 | respectively.    |                  |
-|                  |                 | Cf. option       |                  |
-|                  |                 | \"ad_weight\".     |                  |
-|                  |                 | When set to -1,  |                  |
-|                  |                 | sparsity is      |                  |
-|                  |                 | completely       |                  |
-|                  |                 | ignored and      |                  |
-|                  |                 | dense matrices   |                  |
-|                  |                 | are used.        |                  |
-+------------------+-----------------+------------------+------------------+
-| always_inline    | OT_BOOL         | Force inlining.  | casadi::Function |
-|                  |                 |                  | Internal         |
-+------------------+-----------------+------------------+------------------+
-| common_options   | OT_DICT         | Options for      | casadi::OracleFu |
-|                  |                 | auto-generated   | nction           |
-|                  |                 | functions        |                  |
-+------------------+-----------------+------------------+------------------+
-| compiler         | OT_STRING       | Just-in-time     | casadi::Function |
-|                  |                 | compiler plugin  | Internal         |
-|                  |                 | to be used.      |                  |
-+------------------+-----------------+------------------+------------------+
-| custom_jacobian  | OT_FUNCTION     | Override         | casadi::Function |
-|                  |                 | CasADi's AD. Use | Internal         |
-|                  |                 | together with    |                  |
-|                  |                 | 'jac_penalty':   |                  |
-|                  |                 | 0. Note: Highly  |                  |
-|                  |                 | experimental.    |                  |
-|                  |                 | Syntax may break |                  |
-|                  |                 | often.           |                  |
-+------------------+-----------------+------------------+------------------+
-| der_options      | OT_DICT         | Default options  | casadi::Function |
-|                  |                 | to be used to    | Internal         |
-|                  |                 | populate         |                  |
-|                  |                 | forward_options, |                  |
-|                  |                 | reverse_options, |                  |
-|                  |                 | and              |                  |
-|                  |                 | jacobian_options |                  |
-|                  |                 | before those     |                  |
-|                  |                 | options are      |                  |
-|                  |                 | merged in.       |                  |
-+------------------+-----------------+------------------+------------------+
-| derivative_of    | OT_FUNCTION     | The function is  | casadi::Function |
-|                  |                 | a derivative of  | Internal         |
-|                  |                 | another          |                  |
-|                  |                 | function. The    |                  |
-|                  |                 | type of          |                  |
-|                  |                 | derivative       |                  |
-|                  |                 | (directional     |                  |
-|                  |                 | derivative,      |                  |
-|                  |                 | Jacobian) is     |                  |
-|                  |                 | inferred from    |                  |
-|                  |                 | the function     |                  |
-|                  |                 | name.            |                  |
-+------------------+-----------------+------------------+------------------+
-| dump             | OT_BOOL         | Dump function to | casadi::Function |
-|                  |                 | file upon first  | Internal         |
-|                  |                 | evaluation.      |                  |
-|                  |                 | [false]          |                  |
-+------------------+-----------------+------------------+------------------+
-| dump_dir         | OT_STRING       | Directory to     | casadi::Function |
-|                  |                 | dump             | Internal         |
-|                  |                 | inputs/outputs   |                  |
-|                  |                 | to. Make sure    |                  |
-|                  |                 | the directory    |                  |
-|                  |                 | exists [.]       |                  |
-+------------------+-----------------+------------------+------------------+
-| dump_format      | OT_STRING       | Choose file      | casadi::Function |
-|                  |                 | format to dump   | Internal         |
-|                  |                 | matrices. See    |                  |
-|                  |                 | DM.from_file     |                  |
-|                  |                 | [mtx]            |                  |
-+------------------+-----------------+------------------+------------------+
-| dump_in          | OT_BOOL         | Dump numerical   | casadi::Function |
-|                  |                 | values of inputs | Internal         |
-|                  |                 | to file          |                  |
-|                  |                 | (readable with   |                  |
-|                  |                 | DM.from_file )   |                  |
-|                  |                 | [default: false] |                  |
-+------------------+-----------------+------------------+------------------+
-| dump_out         | OT_BOOL         | Dump numerical   | casadi::Function |
-|                  |                 | values of        | Internal         |
-|                  |                 | outputs to file  |                  |
-|                  |                 | (readable with   |                  |
-|                  |                 | DM.from_file )   |                  |
-|                  |                 | [default: false] |                  |
-+------------------+-----------------+------------------+------------------+
-| enable_fd        | OT_BOOL         | Enable           | casadi::Function |
-|                  |                 | derivative       | Internal         |
-|                  |                 | calculation by   |                  |
-|                  |                 | finite           |                  |
-|                  |                 | differencing.    |                  |
-|                  |                 | [default:        |                  |
-|                  |                 | false]]          |                  |
-+------------------+-----------------+------------------+------------------+
-| enable_forward   | OT_BOOL         | Enable           | casadi::Function |
-|                  |                 | derivative       | Internal         |
-|                  |                 | calculation      |                  |
-|                  |                 | using generated  |                  |
-|                  |                 | functions for    |                  |
-|                  |                 | Jacobian-times-  |                  |
-|                  |                 | vector products  |                  |
-|                  |                 | - typically      |                  |
-|                  |                 | using forward    |                  |
-|                  |                 | mode AD - if     |                  |
-|                  |                 | available.       |                  |
-|                  |                 | [default: true]  |                  |
-+------------------+-----------------+------------------+------------------+
-| enable_jacobian  | OT_BOOL         | Enable           | casadi::Function |
-|                  |                 | derivative       | Internal         |
-|                  |                 | calculation      |                  |
-|                  |                 | using generated  |                  |
-|                  |                 | functions for    |                  |
-|                  |                 | Jacobians of all |                  |
-|                  |                 | differentiable   |                  |
-|                  |                 | outputs with     |                  |
-|                  |                 | respect to all   |                  |
-|                  |                 | differentiable   |                  |
-|                  |                 | inputs - if      |                  |
-|                  |                 | available.       |                  |
-|                  |                 | [default: true]  |                  |
-+------------------+-----------------+------------------+------------------+
-| enable_reverse   | OT_BOOL         | Enable           | casadi::Function |
-|                  |                 | derivative       | Internal         |
-|                  |                 | calculation      |                  |
-|                  |                 | using generated  |                  |
-|                  |                 | functions for    |                  |
-|                  |                 | transposed       |                  |
-|                  |                 | Jacobian-times-  |                  |
-|                  |                 | vector products  |                  |
-|                  |                 | - typically      |                  |
-|                  |                 | using reverse    |                  |
-|                  |                 | mode AD - if     |                  |
-|                  |                 | available.       |                  |
-|                  |                 | [default: true]  |                  |
-+------------------+-----------------+------------------+------------------+
-| error_on_fail    | OT_BOOL         | Throw exceptions | casadi::ProtoFun |
-|                  |                 | when function    | ction            |
-|                  |                 | evaluation fails |                  |
-|                  |                 | (default true).  |                  |
-+------------------+-----------------+------------------+------------------+
-| expand           | OT_BOOL         | Replace MX with  | casadi::OracleFu |
-|                  |                 | SX expressions   | nction           |
-|                  |                 | in problem       |                  |
-|                  |                 | formulation      |                  |
-|                  |                 | [false]          |                  |
-+------------------+-----------------+------------------+------------------+
-| fd_method        | OT_STRING       | Method for       | casadi::Function |
-|                  |                 | finite           | Internal         |
-|                  |                 | differencing     |                  |
-|                  |                 | [default         |                  |
-|                  |                 | 'central']       |                  |
-+------------------+-----------------+------------------+------------------+
-| fd_options       | OT_DICT         | Options to be    | casadi::Function |
-|                  |                 | passed to the    | Internal         |
-|                  |                 | finite           |                  |
-|                  |                 | difference       |                  |
-|                  |                 | instance         |                  |
-+------------------+-----------------+------------------+------------------+
-| forward_options  | OT_DICT         | Options to be    | casadi::Function |
-|                  |                 | passed to a      | Internal         |
-|                  |                 | forward mode     |                  |
-|                  |                 | constructor      |                  |
-+------------------+-----------------+------------------+------------------+
-| gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
-|                  |                 | option           | Internal         |
-|                  |                 | (ignored):       |                  |
-|                  |                 | Statistics are   |                  |
-|                  |                 | now always       |                  |
-|                  |                 | collected.       |                  |
-+------------------+-----------------+------------------+------------------+
-| input_scheme     | OT_STRINGVECTOR | Deprecated       | casadi::Function |
-|                  |                 | option (ignored) | Internal         |
-+------------------+-----------------+------------------+------------------+
-| inputs_check     | OT_BOOL         | Throw exceptions | casadi::Function |
-|                  |                 | when the         | Internal         |
-|                  |                 | numerical values |                  |
-|                  |                 | of the inputs    |                  |
-|                  |                 | don't make sense |                  |
-+------------------+-----------------+------------------+------------------+
-| is_diff_in       | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
-|                  |                 | each input if it | Internal         |
-|                  |                 | should be        |                  |
-|                  |                 | differentiable.  |                  |
-+------------------+-----------------+------------------+------------------+
-| is_diff_out      | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
-|                  |                 | each output if   | Internal         |
-|                  |                 | it should be     |                  |
-|                  |                 | differentiable.  |                  |
-+------------------+-----------------+------------------+------------------+
-| jac_penalty      | OT_DOUBLE       | When requested   | casadi::Function |
-|                  |                 | for a number of  | Internal         |
-|                  |                 | forward/reverse  |                  |
-|                  |                 | directions, it   |                  |
-|                  |                 | may be cheaper   |                  |
-|                  |                 | to compute first |                  |
-|                  |                 | the full         |                  |
-|                  |                 | jacobian and     |                  |
-|                  |                 | then multiply    |                  |
-|                  |                 | with seeds,      |                  |
-|                  |                 | rather than      |                  |
-|                  |                 | obtain the       |                  |
-|                  |                 | requested        |                  |
-|                  |                 | directions in a  |                  |
-|                  |                 | straightforward  |                  |
-|                  |                 | manner. Casadi   |                  |
-|                  |                 | uses a heuristic |                  |
-|                  |                 | to decide which  |                  |
-|                  |                 | is cheaper. A    |                  |
-|                  |                 | high value of    |                  |
-|                  |                 | 'jac_penalty'    |                  |
-|                  |                 | makes it less    |                  |
-|                  |                 | likely for the   |                  |
-|                  |                 | heurstic to      |                  |
-|                  |                 | chose the full   |                  |
-|                  |                 | Jacobian         |                  |
-|                  |                 | strategy. The    |                  |
-|                  |                 | special value -1 |                  |
-|                  |                 | indicates never  |                  |
-|                  |                 | to use the full  |                  |
-|                  |                 | Jacobian         |                  |
-|                  |                 | strategy         |                  |
-+------------------+-----------------+------------------+------------------+
-| jacobian_options | OT_DICT         | Options to be    | casadi::Function |
-|                  |                 | passed to a      | Internal         |
-|                  |                 | Jacobian         |                  |
-|                  |                 | constructor      |                  |
-+------------------+-----------------+------------------+------------------+
-| jit              | OT_BOOL         | Use just-in-time | casadi::Function |
-|                  |                 | compiler to      | Internal         |
-|                  |                 | speed up the     |                  |
-|                  |                 | evaluation       |                  |
-+------------------+-----------------+------------------+------------------+
-| jit_cleanup      | OT_BOOL         | Cleanup up the   | casadi::Function |
-|                  |                 | temporary source | Internal         |
-|                  |                 | file that jit    |                  |
-|                  |                 | creates.         |                  |
-|                  |                 | Default: true    |                  |
-+------------------+-----------------+------------------+------------------+
-| jit_name         | OT_STRING       | The file name    | casadi::Function |
-|                  |                 | used to write    | Internal         |
-|                  |                 | out code. The    |                  |
-|                  |                 | actual file      |                  |
-|                  |                 | names used       |                  |
-|                  |                 | depend on 'jit_t |                  |
-|                  |                 | emp_suffix' and  |                  |
-|                  |                 | include          |                  |
-|                  |                 | extensions.      |                  |
-|                  |                 | Default:         |                  |
-|                  |                 | 'jit_tmp'        |                  |
-+------------------+-----------------+------------------+------------------+
-| jit_options      | OT_DICT         | Options to be    | casadi::Function |
-|                  |                 | passed to the    | Internal         |
-|                  |                 | jit compiler.    |                  |
-+------------------+-----------------+------------------+------------------+
-| jit_serialize    | OT_STRING       | Specify          | casadi::Function |
-|                  |                 | behaviour when   | Internal         |
-|                  |                 | serializing a    |                  |
-|                  |                 | jitted function: |                  |
-|                  |                 | SOURCE|link|embe |                  |
-|                  |                 | d.               |                  |
-+------------------+-----------------+------------------+------------------+
-| jit_temp_suffix  | OT_BOOL         | Use a temporary  | casadi::Function |
-|                  |                 | (seemingly       | Internal         |
-|                  |                 | random) filename |                  |
-|                  |                 | suffix for       |                  |
-|                  |                 | generated code   |                  |
-|                  |                 | and libraries.   |                  |
-|                  |                 | This is desired  |                  |
-|                  |                 | for thread-      |                  |
-|                  |                 | safety. This     |                  |
-|                  |                 | behaviour may    |                  |
-|                  |                 | defeat caching   |                  |
-|                  |                 | compiler         |                  |
-|                  |                 | wrappers.        |                  |
-|                  |                 | Default: true    |                  |
-+------------------+-----------------+------------------+------------------+
-| max_io           | OT_INT          | Acceptable       | casadi::Function |
-|                  |                 | number of inputs | Internal         |
-|                  |                 | and outputs.     |                  |
-|                  |                 | Warn if          |                  |
-|                  |                 | exceeded.        |                  |
-+------------------+-----------------+------------------+------------------+
-| max_num_dir      | OT_INT          | Specify the      | casadi::Function |
-|                  |                 | maximum number   | Internal         |
-|                  |                 | of directions    |                  |
-|                  |                 | for derivative   |                  |
-|                  |                 | functions.       |                  |
-|                  |                 | Overrules the    |                  |
-|                  |                 | builtin optimize |                  |
-|                  |                 | d_num_dir.       |                  |
-+------------------+-----------------+------------------+------------------+
-| monitor          | OT_STRINGVECTOR | Set of user      | casadi::OracleFu |
-|                  |                 | problem          | nction           |
-|                  |                 | functions to be  |                  |
-|                  |                 | monitored        |                  |
-+------------------+-----------------+------------------+------------------+
-| never_inline     | OT_BOOL         | Forbid inlining. | casadi::Function |
-|                  |                 |                  | Internal         |
-+------------------+-----------------+------------------+------------------+
-| nfwd             | OT_INT          | Number of        | casadi::Simulato |
-|                  |                 | forward          | r                |
-|                  |                 | sensitivities    |                  |
-+------------------+-----------------+------------------+------------------+
-| nondiff          | OT_BOOL         | Output nondiffer | casadi::Simulato |
-|                  |                 | entiated         | r                |
-+------------------+-----------------+------------------+------------------+
-| output_scheme    | OT_STRINGVECTOR | Deprecated       | casadi::Function |
-|                  |                 | option (ignored) | Internal         |
-+------------------+-----------------+------------------+------------------+
-| post_expand      | OT_BOOL         | After            | casadi::Function |
-|                  |                 | construction,    | Internal         |
-|                  |                 | expand this      |                  |
-|                  |                 | Function .       |                  |
-|                  |                 | Default: False   |                  |
-+------------------+-----------------+------------------+------------------+
-| post_expand_opti | OT_DICT         | Options to be    | casadi::Function |
-| ons              |                 | passed to post-  | Internal         |
-|                  |                 | construction     |                  |
-|                  |                 | expansion.       |                  |
-|                  |                 | Default: empty   |                  |
-+------------------+-----------------+------------------+------------------+
-| print_in         | OT_BOOL         | Print numerical  | casadi::Function |
-|                  |                 | values of inputs | Internal         |
-|                  |                 | [default: false] |                  |
-+------------------+-----------------+------------------+------------------+
-| print_out        | OT_BOOL         | Print numerical  | casadi::Function |
-|                  |                 | values of        | Internal         |
-|                  |                 | outputs          |                  |
-|                  |                 | [default: false] |                  |
-+------------------+-----------------+------------------+------------------+
-| print_stats      | OT_BOOL         | Print out        | casadi::Simulato |
-|                  |                 | statistics after | r                |
-|                  |                 | integration      |                  |
-+------------------+-----------------+------------------+------------------+
-| print_time       | OT_BOOL         | print            | casadi::ProtoFun |
-|                  |                 | information      | ction            |
-|                  |                 | about execution  |                  |
-|                  |                 | time. Implies    |                  |
-|                  |                 | record_time.     |                  |
-+------------------+-----------------+------------------+------------------+
-| record_time      | OT_BOOL         | record           | casadi::ProtoFun |
-|                  |                 | information      | ction            |
-|                  |                 | about execution  |                  |
-|                  |                 | time, for        |                  |
-|                  |                 | retrieval with   |                  |
-|                  |                 | stats().         |                  |
-+------------------+-----------------+------------------+------------------+
-| regularity_check | OT_BOOL         | Throw exceptions | casadi::ProtoFun |
-|                  |                 | when NaN or Inf  | ction            |
-|                  |                 | appears during   |                  |
-|                  |                 | evaluation       |                  |
-+------------------+-----------------+------------------+------------------+
-| reverse_options  | OT_DICT         | Options to be    | casadi::Function |
-|                  |                 | passed to a      | Internal         |
-|                  |                 | reverse mode     |                  |
-|                  |                 | constructor      |                  |
-+------------------+-----------------+------------------+------------------+
-| show_eval_warnin | OT_BOOL         | Show warnings    | casadi::OracleFu |
-| gs               |                 | generated from   | nction           |
-|                  |                 | function         |                  |
-|                  |                 | evaluations      |                  |
-|                  |                 | [true]           |                  |
-+------------------+-----------------+------------------+------------------+
-| specific_options | OT_DICT         | Options for      | casadi::OracleFu |
-|                  |                 | specific auto-   | nction           |
-|                  |                 | generated        |                  |
-|                  |                 | functions,       |                  |
-|                  |                 | overwriting the  |                  |
-|                  |                 | defaults from    |                  |
-|                  |                 | common_options.  |                  |
-|                  |                 | Nested           |                  |
-|                  |                 | dictionary.      |                  |
-+------------------+-----------------+------------------+------------------+
-| user_data        | OT_VOIDPTR      | A user-defined   | casadi::Function |
-|                  |                 | field that can   | Internal         |
-|                  |                 | be used to       |                  |
-|                  |                 | identify the     |                  |
-|                  |                 | function or pass |                  |
-|                  |                 | additional       |                  |
-|                  |                 | information      |                  |
-+------------------+-----------------+------------------+------------------+
-| verbose          | OT_BOOL         | Verbose          | casadi::ProtoFun |
-|                  |                 | evaluation  for  | ction            |
-|                  |                 | debugging        |                  |
-+------------------+-----------------+------------------+------------------+
-
->Input scheme: casadi::SimulatorInput (SIMULATOR_NUM_IN = 4)
-
-+--------------+-------+---------------------------------------------------+
-|  Full name   | Short |                    Description                    |
-+==============+=======+===================================================+
-| SIMULATOR_X0 | x0    | Differential state at the initial time.           |
-+--------------+-------+---------------------------------------------------+
-| SIMULATOR_U  | u     | Controls.                                         |
-+--------------+-------+---------------------------------------------------+
-| SIMULATOR_Z0 | z0    | Initial guess for the algebraic variable at the   |
-|              |       | initial time.                                     |
-+--------------+-------+---------------------------------------------------+
-| SIMULATOR_P  | p     | Parameters.                                       |
-+--------------+-------+---------------------------------------------------+
-
->Output scheme: casadi::SimulatorOutput (SIMULATOR_NUM_OUT = 2)
-
-+-------------+-------+---------------------+
-|  Full name  | Short |     Description     |
-+=============+=======+=====================+
-| SIMULATOR_X | x     | Differential state. |
-+-------------+-------+---------------------+
-| SIMULATOR_Z | z     | Algebraic variable. |
-+-------------+-------+---------------------+
-
-List of plugins
-- cvodes
-
-Note: some of the plugins in this list might not be available on your 
-
-system.  Also, there might be extra plugins available to you that are 
-not 
-listed here. You can obtain their documentation with  
-Simulator.doc(\"myextraplugin\")
-
-
-
---------------------------------------------------------------------------------
-
-cvodes
-------
-
-
-
-Interface to CVodes from the Sundials suite.
-
-Extra doc: https://github.com/casadi/casadi/wiki/L_227
-
->List of available options
-
-+----------------------------+-----------+---------------------------------+
-|             Id             |   Type    |           Description           |
-+============================+===========+=================================+
-| abstol                     | OT_DOUBLE | Absolute tolerence for the IVP  |
-|                            |           | solution                        |
-+----------------------------+-----------+---------------------------------+
-| disable_internal_warnings  | OT_BOOL   | Disable SUNDIALS internal       |
-|                            |           | warning messages                |
-+----------------------------+-----------+---------------------------------+
-| fsens_err_con              | OT_BOOL   | include the forward             |
-|                            |           | sensitivities in all error      |
-|                            |           | controls                        |
-+----------------------------+-----------+---------------------------------+
-| interpolation_type         | OT_STRING | Type of interpolation for the   |
-|                            |           | adjoint sensitivities           |
-+----------------------------+-----------+---------------------------------+
-| linear_multistep_method    | OT_STRING | Simulator scheme: BDF|adams     |
-+----------------------------+-----------+---------------------------------+
-| linear_solver              | OT_STRING | A custom linear solver creator  |
-|                            |           | function [default: qr]          |
-+----------------------------+-----------+---------------------------------+
-| linear_solver_options      | OT_DICT   | Options to be passed to the     |
-|                            |           | linear solver                   |
-+----------------------------+-----------+---------------------------------+
-| max_krylov                 | OT_INT    | Maximum Krylov subspace size    |
-+----------------------------+-----------+---------------------------------+
-| max_multistep_order        | OT_INT    | Maximum order for the           |
-|                            |           | (variable-order) multistep      |
-|                            |           | method                          |
-+----------------------------+-----------+---------------------------------+
-| max_num_steps              | OT_INT    | Maximum number of simulator     |
-|                            |           | steps                           |
-+----------------------------+-----------+---------------------------------+
-| max_order                  | OT_DOUBLE | Maximum order                   |
-+----------------------------+-----------+---------------------------------+
-| max_step_size              | OT_DOUBLE | Max step size [default: 0/inf]  |
-+----------------------------+-----------+---------------------------------+
-| min_step_size              | OT_DOUBLE | Min step size [default: 0/0.0]  |
-+----------------------------+-----------+---------------------------------+
-| newton_scheme              | OT_STRING | Linear solver scheme in the     |
-|                            |           | Newton method:                  |
-|                            |           | DIRECT|gmres|bcgstab|tfqmr      |
-+----------------------------+-----------+---------------------------------+
-| nonlin_conv_coeff          | OT_DOUBLE | Coefficient in the nonlinear    |
-|                            |           | convergence test                |
-+----------------------------+-----------+---------------------------------+
-| nonlinear_solver_iteration | OT_STRING | Nonlinear solver type:          |
-|                            |           | NEWTON|functional               |
-+----------------------------+-----------+---------------------------------+
-| quad_err_con               | OT_BOOL   | Should the quadratures affect   |
-|                            |           | the step size control           |
-+----------------------------+-----------+---------------------------------+
-| reltol                     | OT_DOUBLE | Relative tolerence for the IVP  |
-|                            |           | solution                        |
-+----------------------------+-----------+---------------------------------+
-| scale_abstol               | OT_BOOL   | Scale absolute tolerance by     |
-|                            |           | nominal value                   |
-+----------------------------+-----------+---------------------------------+
-| sensitivity_method         | OT_STRING | Sensitivity method:             |
-|                            |           | SIMULTANEOUS|staggered          |
-+----------------------------+-----------+---------------------------------+
-| step0                      | OT_DOUBLE | initial step size [default:     |
-|                            |           | 0/estimated]                    |
-+----------------------------+-----------+---------------------------------+
-| steps_per_checkpoint       | OT_INT    | Number of steps between two     |
-|                            |           | consecutive checkpoints         |
-+----------------------------+-----------+---------------------------------+
-| stop_at_end                | OT_BOOL   | Stop the simulator at the end   |
-|                            |           | of the interval                 |
-+----------------------------+-----------+---------------------------------+
-| use_preconditioner         | OT_BOOL   | Precondition the iterative      |
-|                            |           | solver [default: true]          |
-+----------------------------+-----------+---------------------------------+
-
-Joel Andersson
-
-Extra doc: https://github.com/casadi/casadi/wiki/L_21m
-
-Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/simulator.hpp#L53
-
-Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/simulator.cpp#L53-L56
-
->  Function casadi::simulator(const std::string &name, const std::string &solver, const SXDict &dae, const std::vector< double > &grid, const Dict &opts=Dict())
-------------------------------------------------------------------------
-[INTERNAL]
-
-Create an ODE/DAE simulator Solves an initial value problem (IVP) 
-with the 
-differential equation given as an implicit ODE coupled to an 
-algebraic 
-equation and a set of output equations:
-
-
-
-::
-
-  Time grid: [t0, t1, ..., tN]
-  
-  Initial conditions for forward integration
-  x(t0)  = x0
-  
-  Sequential forward integration from t=tk to t=t{k+1}
-  der(x) = fx(t, x, z, p, uk)         ODE
-  0 = fz(t, x, z, p, uk)              Algebraic equations
-  yk = fy(t, x, z, p, uk)             Output equations
-  
-  where we assume that the problem is index-1 (i.e. dfz/dz, is invertible) and furthermore that
-
-General information
-
->List of available options
-
-+------------------+-----------------+------------------+------------------+
-|        Id        |      Type       |   Description    |     Used in      |
-+==================+=================+==================+==================+
-| ad_weight        | OT_DOUBLE       | Weighting factor | casadi::Function |
-|                  |                 | for derivative   | Internal         |
-|                  |                 | calculation.When |                  |
-|                  |                 | there is an      |                  |
-|                  |                 | option of either |                  |
-|                  |                 | using forward or |                  |
-|                  |                 | reverse mode     |                  |
-|                  |                 | directional      |                  |
-|                  |                 | derivatives, the |                  |
-|                  |                 | condition ad_wei |                  |
-|                  |                 | ght*nf<=(1-      |                  |
-|                  |                 | ad_weight)*na is |                  |
-|                  |                 | used where nf    |                  |
-|                  |                 | and na are       |                  |
-|                  |                 | estimates of the |                  |
-|                  |                 | number of        |                  |
-|                  |                 | forward/reverse  |                  |
-|                  |                 | mode directional |                  |
-|                  |                 | derivatives      |                  |
-|                  |                 | needed. By       |                  |
-|                  |                 | default,         |                  |
-|                  |                 | ad_weight is     |                  |
-|                  |                 | calculated       |                  |
-|                  |                 | automatically,   |                  |
-|                  |                 | but this can be  |                  |
-|                  |                 | overridden by    |                  |
-|                  |                 | setting this     |                  |
-|                  |                 | option. In       |                  |
-|                  |                 | particular, 0    |                  |
-|                  |                 | means forcing    |                  |
-|                  |                 | forward mode and |                  |
-|                  |                 | 1 forcing        |                  |
-|                  |                 | reverse mode.    |                  |
-|                  |                 | Leave unset for  |                  |
-|                  |                 | (class specific) |                  |
-|                  |                 | heuristics.      |                  |
-+------------------+-----------------+------------------+------------------+
-| ad_weight_sp     | OT_DOUBLE       | Weighting factor | casadi::Function |
-|                  |                 | for sparsity     | Internal         |
-|                  |                 | pattern          |                  |
-|                  |                 | calculation calc |                  |
-|                  |                 | ulation.Override |                  |
-|                  |                 | s default        |                  |
-|                  |                 | behavior. Set to |                  |
-|                  |                 | 0 and 1 to force |                  |
-|                  |                 | forward and      |                  |
-|                  |                 | reverse mode     |                  |
-|                  |                 | respectively.    |                  |
-|                  |                 | Cf. option       |                  |
-|                  |                 | \"ad_weight\".     |                  |
-|                  |                 | When set to -1,  |                  |
-|                  |                 | sparsity is      |                  |
-|                  |                 | completely       |                  |
-|                  |                 | ignored and      |                  |
-|                  |                 | dense matrices   |                  |
-|                  |                 | are used.        |                  |
-+------------------+-----------------+------------------+------------------+
-| always_inline    | OT_BOOL         | Force inlining.  | casadi::Function |
-|                  |                 |                  | Internal         |
-+------------------+-----------------+------------------+------------------+
-| common_options   | OT_DICT         | Options for      | casadi::OracleFu |
-|                  |                 | auto-generated   | nction           |
-|                  |                 | functions        |                  |
-+------------------+-----------------+------------------+------------------+
-| compiler         | OT_STRING       | Just-in-time     | casadi::Function |
-|                  |                 | compiler plugin  | Internal         |
-|                  |                 | to be used.      |                  |
-+------------------+-----------------+------------------+------------------+
-| custom_jacobian  | OT_FUNCTION     | Override         | casadi::Function |
-|                  |                 | CasADi's AD. Use | Internal         |
-|                  |                 | together with    |                  |
-|                  |                 | 'jac_penalty':   |                  |
-|                  |                 | 0. Note: Highly  |                  |
-|                  |                 | experimental.    |                  |
-|                  |                 | Syntax may break |                  |
-|                  |                 | often.           |                  |
-+------------------+-----------------+------------------+------------------+
-| der_options      | OT_DICT         | Default options  | casadi::Function |
-|                  |                 | to be used to    | Internal         |
-|                  |                 | populate         |                  |
-|                  |                 | forward_options, |                  |
-|                  |                 | reverse_options, |                  |
-|                  |                 | and              |                  |
-|                  |                 | jacobian_options |                  |
-|                  |                 | before those     |                  |
-|                  |                 | options are      |                  |
-|                  |                 | merged in.       |                  |
-+------------------+-----------------+------------------+------------------+
-| derivative_of    | OT_FUNCTION     | The function is  | casadi::Function |
-|                  |                 | a derivative of  | Internal         |
-|                  |                 | another          |                  |
-|                  |                 | function. The    |                  |
-|                  |                 | type of          |                  |
-|                  |                 | derivative       |                  |
-|                  |                 | (directional     |                  |
-|                  |                 | derivative,      |                  |
-|                  |                 | Jacobian) is     |                  |
-|                  |                 | inferred from    |                  |
-|                  |                 | the function     |                  |
-|                  |                 | name.            |                  |
-+------------------+-----------------+------------------+------------------+
-| dump             | OT_BOOL         | Dump function to | casadi::Function |
-|                  |                 | file upon first  | Internal         |
-|                  |                 | evaluation.      |                  |
-|                  |                 | [false]          |                  |
-+------------------+-----------------+------------------+------------------+
-| dump_dir         | OT_STRING       | Directory to     | casadi::Function |
-|                  |                 | dump             | Internal         |
-|                  |                 | inputs/outputs   |                  |
-|                  |                 | to. Make sure    |                  |
-|                  |                 | the directory    |                  |
-|                  |                 | exists [.]       |                  |
-+------------------+-----------------+------------------+------------------+
-| dump_format      | OT_STRING       | Choose file      | casadi::Function |
-|                  |                 | format to dump   | Internal         |
-|                  |                 | matrices. See    |                  |
-|                  |                 | DM.from_file     |                  |
-|                  |                 | [mtx]            |                  |
-+------------------+-----------------+------------------+------------------+
-| dump_in          | OT_BOOL         | Dump numerical   | casadi::Function |
-|                  |                 | values of inputs | Internal         |
-|                  |                 | to file          |                  |
-|                  |                 | (readable with   |                  |
-|                  |                 | DM.from_file )   |                  |
-|                  |                 | [default: false] |                  |
-+------------------+-----------------+------------------+------------------+
-| dump_out         | OT_BOOL         | Dump numerical   | casadi::Function |
-|                  |                 | values of        | Internal         |
-|                  |                 | outputs to file  |                  |
-|                  |                 | (readable with   |                  |
-|                  |                 | DM.from_file )   |                  |
-|                  |                 | [default: false] |                  |
-+------------------+-----------------+------------------+------------------+
-| enable_fd        | OT_BOOL         | Enable           | casadi::Function |
-|                  |                 | derivative       | Internal         |
-|                  |                 | calculation by   |                  |
-|                  |                 | finite           |                  |
-|                  |                 | differencing.    |                  |
-|                  |                 | [default:        |                  |
-|                  |                 | false]]          |                  |
-+------------------+-----------------+------------------+------------------+
-| enable_forward   | OT_BOOL         | Enable           | casadi::Function |
-|                  |                 | derivative       | Internal         |
-|                  |                 | calculation      |                  |
-|                  |                 | using generated  |                  |
-|                  |                 | functions for    |                  |
-|                  |                 | Jacobian-times-  |                  |
-|                  |                 | vector products  |                  |
-|                  |                 | - typically      |                  |
-|                  |                 | using forward    |                  |
-|                  |                 | mode AD - if     |                  |
-|                  |                 | available.       |                  |
-|                  |                 | [default: true]  |                  |
-+------------------+-----------------+------------------+------------------+
-| enable_jacobian  | OT_BOOL         | Enable           | casadi::Function |
-|                  |                 | derivative       | Internal         |
-|                  |                 | calculation      |                  |
-|                  |                 | using generated  |                  |
-|                  |                 | functions for    |                  |
-|                  |                 | Jacobians of all |                  |
-|                  |                 | differentiable   |                  |
-|                  |                 | outputs with     |                  |
-|                  |                 | respect to all   |                  |
-|                  |                 | differentiable   |                  |
-|                  |                 | inputs - if      |                  |
-|                  |                 | available.       |                  |
-|                  |                 | [default: true]  |                  |
-+------------------+-----------------+------------------+------------------+
-| enable_reverse   | OT_BOOL         | Enable           | casadi::Function |
-|                  |                 | derivative       | Internal         |
-|                  |                 | calculation      |                  |
-|                  |                 | using generated  |                  |
-|                  |                 | functions for    |                  |
-|                  |                 | transposed       |                  |
-|                  |                 | Jacobian-times-  |                  |
-|                  |                 | vector products  |                  |
-|                  |                 | - typically      |                  |
-|                  |                 | using reverse    |                  |
-|                  |                 | mode AD - if     |                  |
-|                  |                 | available.       |                  |
-|                  |                 | [default: true]  |                  |
-+------------------+-----------------+------------------+------------------+
-| error_on_fail    | OT_BOOL         | Throw exceptions | casadi::ProtoFun |
-|                  |                 | when function    | ction            |
-|                  |                 | evaluation fails |                  |
-|                  |                 | (default true).  |                  |
-+------------------+-----------------+------------------+------------------+
-| expand           | OT_BOOL         | Replace MX with  | casadi::OracleFu |
-|                  |                 | SX expressions   | nction           |
-|                  |                 | in problem       |                  |
-|                  |                 | formulation      |                  |
-|                  |                 | [false]          |                  |
-+------------------+-----------------+------------------+------------------+
-| fd_method        | OT_STRING       | Method for       | casadi::Function |
-|                  |                 | finite           | Internal         |
-|                  |                 | differencing     |                  |
-|                  |                 | [default         |                  |
-|                  |                 | 'central']       |                  |
-+------------------+-----------------+------------------+------------------+
-| fd_options       | OT_DICT         | Options to be    | casadi::Function |
-|                  |                 | passed to the    | Internal         |
-|                  |                 | finite           |                  |
-|                  |                 | difference       |                  |
-|                  |                 | instance         |                  |
-+------------------+-----------------+------------------+------------------+
-| forward_options  | OT_DICT         | Options to be    | casadi::Function |
-|                  |                 | passed to a      | Internal         |
-|                  |                 | forward mode     |                  |
-|                  |                 | constructor      |                  |
-+------------------+-----------------+------------------+------------------+
-| gather_stats     | OT_BOOL         | Deprecated       | casadi::Function |
-|                  |                 | option           | Internal         |
-|                  |                 | (ignored):       |                  |
-|                  |                 | Statistics are   |                  |
-|                  |                 | now always       |                  |
-|                  |                 | collected.       |                  |
-+------------------+-----------------+------------------+------------------+
-| input_scheme     | OT_STRINGVECTOR | Deprecated       | casadi::Function |
-|                  |                 | option (ignored) | Internal         |
-+------------------+-----------------+------------------+------------------+
-| inputs_check     | OT_BOOL         | Throw exceptions | casadi::Function |
-|                  |                 | when the         | Internal         |
-|                  |                 | numerical values |                  |
-|                  |                 | of the inputs    |                  |
-|                  |                 | don't make sense |                  |
-+------------------+-----------------+------------------+------------------+
-| is_diff_in       | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
-|                  |                 | each input if it | Internal         |
-|                  |                 | should be        |                  |
-|                  |                 | differentiable.  |                  |
-+------------------+-----------------+------------------+------------------+
-| is_diff_out      | OT_BOOLVECTOR   | Indicate for     | casadi::Function |
-|                  |                 | each output if   | Internal         |
-|                  |                 | it should be     |                  |
-|                  |                 | differentiable.  |                  |
-+------------------+-----------------+------------------+------------------+
-| jac_penalty      | OT_DOUBLE       | When requested   | casadi::Function |
-|                  |                 | for a number of  | Internal         |
-|                  |                 | forward/reverse  |                  |
-|                  |                 | directions, it   |                  |
-|                  |                 | may be cheaper   |                  |
-|                  |                 | to compute first |                  |
-|                  |                 | the full         |                  |
-|                  |                 | jacobian and     |                  |
-|                  |                 | then multiply    |                  |
-|                  |                 | with seeds,      |                  |
-|                  |                 | rather than      |                  |
-|                  |                 | obtain the       |                  |
-|                  |                 | requested        |                  |
-|                  |                 | directions in a  |                  |
-|                  |                 | straightforward  |                  |
-|                  |                 | manner. Casadi   |                  |
-|                  |                 | uses a heuristic |                  |
-|                  |                 | to decide which  |                  |
-|                  |                 | is cheaper. A    |                  |
-|                  |                 | high value of    |                  |
-|                  |                 | 'jac_penalty'    |                  |
-|                  |                 | makes it less    |                  |
-|                  |                 | likely for the   |                  |
-|                  |                 | heurstic to      |                  |
-|                  |                 | chose the full   |                  |
-|                  |                 | Jacobian         |                  |
-|                  |                 | strategy. The    |                  |
-|                  |                 | special value -1 |                  |
-|                  |                 | indicates never  |                  |
-|                  |                 | to use the full  |                  |
-|                  |                 | Jacobian         |                  |
-|                  |                 | strategy         |                  |
-+------------------+-----------------+------------------+------------------+
-| jacobian_options | OT_DICT         | Options to be    | casadi::Function |
-|                  |                 | passed to a      | Internal         |
-|                  |                 | Jacobian         |                  |
-|                  |                 | constructor      |                  |
-+------------------+-----------------+------------------+------------------+
-| jit              | OT_BOOL         | Use just-in-time | casadi::Function |
-|                  |                 | compiler to      | Internal         |
-|                  |                 | speed up the     |                  |
-|                  |                 | evaluation       |                  |
-+------------------+-----------------+------------------+------------------+
-| jit_cleanup      | OT_BOOL         | Cleanup up the   | casadi::Function |
-|                  |                 | temporary source | Internal         |
-|                  |                 | file that jit    |                  |
-|                  |                 | creates.         |                  |
-|                  |                 | Default: true    |                  |
-+------------------+-----------------+------------------+------------------+
-| jit_name         | OT_STRING       | The file name    | casadi::Function |
-|                  |                 | used to write    | Internal         |
-|                  |                 | out code. The    |                  |
-|                  |                 | actual file      |                  |
-|                  |                 | names used       |                  |
-|                  |                 | depend on 'jit_t |                  |
-|                  |                 | emp_suffix' and  |                  |
-|                  |                 | include          |                  |
-|                  |                 | extensions.      |                  |
-|                  |                 | Default:         |                  |
-|                  |                 | 'jit_tmp'        |                  |
-+------------------+-----------------+------------------+------------------+
-| jit_options      | OT_DICT         | Options to be    | casadi::Function |
-|                  |                 | passed to the    | Internal         |
-|                  |                 | jit compiler.    |                  |
-+------------------+-----------------+------------------+------------------+
-| jit_serialize    | OT_STRING       | Specify          | casadi::Function |
-|                  |                 | behaviour when   | Internal         |
-|                  |                 | serializing a    |                  |
-|                  |                 | jitted function: |                  |
-|                  |                 | SOURCE|link|embe |                  |
-|                  |                 | d.               |                  |
-+------------------+-----------------+------------------+------------------+
-| jit_temp_suffix  | OT_BOOL         | Use a temporary  | casadi::Function |
-|                  |                 | (seemingly       | Internal         |
-|                  |                 | random) filename |                  |
-|                  |                 | suffix for       |                  |
-|                  |                 | generated code   |                  |
-|                  |                 | and libraries.   |                  |
-|                  |                 | This is desired  |                  |
-|                  |                 | for thread-      |                  |
-|                  |                 | safety. This     |                  |
-|                  |                 | behaviour may    |                  |
-|                  |                 | defeat caching   |                  |
-|                  |                 | compiler         |                  |
-|                  |                 | wrappers.        |                  |
-|                  |                 | Default: true    |                  |
-+------------------+-----------------+------------------+------------------+
-| max_io           | OT_INT          | Acceptable       | casadi::Function |
-|                  |                 | number of inputs | Internal         |
-|                  |                 | and outputs.     |                  |
-|                  |                 | Warn if          |                  |
-|                  |                 | exceeded.        |                  |
-+------------------+-----------------+------------------+------------------+
-| max_num_dir      | OT_INT          | Specify the      | casadi::Function |
-|                  |                 | maximum number   | Internal         |
-|                  |                 | of directions    |                  |
-|                  |                 | for derivative   |                  |
-|                  |                 | functions.       |                  |
-|                  |                 | Overrules the    |                  |
-|                  |                 | builtin optimize |                  |
-|                  |                 | d_num_dir.       |                  |
-+------------------+-----------------+------------------+------------------+
-| monitor          | OT_STRINGVECTOR | Set of user      | casadi::OracleFu |
-|                  |                 | problem          | nction           |
-|                  |                 | functions to be  |                  |
-|                  |                 | monitored        |                  |
-+------------------+-----------------+------------------+------------------+
-| never_inline     | OT_BOOL         | Forbid inlining. | casadi::Function |
-|                  |                 |                  | Internal         |
-+------------------+-----------------+------------------+------------------+
-| nfwd             | OT_INT          | Number of        | casadi::Simulato |
-|                  |                 | forward          | r                |
-|                  |                 | sensitivities    |                  |
-+------------------+-----------------+------------------+------------------+
-| nondiff          | OT_BOOL         | Output nondiffer | casadi::Simulato |
-|                  |                 | entiated         | r                |
-+------------------+-----------------+------------------+------------------+
-| output_scheme    | OT_STRINGVECTOR | Deprecated       | casadi::Function |
-|                  |                 | option (ignored) | Internal         |
-+------------------+-----------------+------------------+------------------+
-| post_expand      | OT_BOOL         | After            | casadi::Function |
-|                  |                 | construction,    | Internal         |
-|                  |                 | expand this      |                  |
-|                  |                 | Function .       |                  |
-|                  |                 | Default: False   |                  |
-+------------------+-----------------+------------------+------------------+
-| post_expand_opti | OT_DICT         | Options to be    | casadi::Function |
-| ons              |                 | passed to post-  | Internal         |
-|                  |                 | construction     |                  |
-|                  |                 | expansion.       |                  |
-|                  |                 | Default: empty   |                  |
-+------------------+-----------------+------------------+------------------+
-| print_in         | OT_BOOL         | Print numerical  | casadi::Function |
-|                  |                 | values of inputs | Internal         |
-|                  |                 | [default: false] |                  |
-+------------------+-----------------+------------------+------------------+
-| print_out        | OT_BOOL         | Print numerical  | casadi::Function |
-|                  |                 | values of        | Internal         |
-|                  |                 | outputs          |                  |
-|                  |                 | [default: false] |                  |
-+------------------+-----------------+------------------+------------------+
-| print_stats      | OT_BOOL         | Print out        | casadi::Simulato |
-|                  |                 | statistics after | r                |
-|                  |                 | integration      |                  |
-+------------------+-----------------+------------------+------------------+
-| print_time       | OT_BOOL         | print            | casadi::ProtoFun |
-|                  |                 | information      | ction            |
-|                  |                 | about execution  |                  |
-|                  |                 | time. Implies    |                  |
-|                  |                 | record_time.     |                  |
-+------------------+-----------------+------------------+------------------+
-| record_time      | OT_BOOL         | record           | casadi::ProtoFun |
-|                  |                 | information      | ction            |
-|                  |                 | about execution  |                  |
-|                  |                 | time, for        |                  |
-|                  |                 | retrieval with   |                  |
-|                  |                 | stats().         |                  |
-+------------------+-----------------+------------------+------------------+
-| regularity_check | OT_BOOL         | Throw exceptions | casadi::ProtoFun |
-|                  |                 | when NaN or Inf  | ction            |
-|                  |                 | appears during   |                  |
-|                  |                 | evaluation       |                  |
-+------------------+-----------------+------------------+------------------+
-| reverse_options  | OT_DICT         | Options to be    | casadi::Function |
-|                  |                 | passed to a      | Internal         |
-|                  |                 | reverse mode     |                  |
-|                  |                 | constructor      |                  |
-+------------------+-----------------+------------------+------------------+
-| show_eval_warnin | OT_BOOL         | Show warnings    | casadi::OracleFu |
-| gs               |                 | generated from   | nction           |
-|                  |                 | function         |                  |
-|                  |                 | evaluations      |                  |
-|                  |                 | [true]           |                  |
-+------------------+-----------------+------------------+------------------+
-| specific_options | OT_DICT         | Options for      | casadi::OracleFu |
-|                  |                 | specific auto-   | nction           |
-|                  |                 | generated        |                  |
-|                  |                 | functions,       |                  |
-|                  |                 | overwriting the  |                  |
-|                  |                 | defaults from    |                  |
-|                  |                 | common_options.  |                  |
-|                  |                 | Nested           |                  |
-|                  |                 | dictionary.      |                  |
-+------------------+-----------------+------------------+------------------+
-| user_data        | OT_VOIDPTR      | A user-defined   | casadi::Function |
-|                  |                 | field that can   | Internal         |
-|                  |                 | be used to       |                  |
-|                  |                 | identify the     |                  |
-|                  |                 | function or pass |                  |
-|                  |                 | additional       |                  |
-|                  |                 | information      |                  |
-+------------------+-----------------+------------------+------------------+
-| verbose          | OT_BOOL         | Verbose          | casadi::ProtoFun |
-|                  |                 | evaluation  for  | ction            |
-|                  |                 | debugging        |                  |
-+------------------+-----------------+------------------+------------------+
-
->Input scheme: casadi::SimulatorInput (SIMULATOR_NUM_IN = 4)
-
-+--------------+-------+---------------------------------------------------+
-|  Full name   | Short |                    Description                    |
-+==============+=======+===================================================+
-| SIMULATOR_X0 | x0    | Differential state at the initial time.           |
-+--------------+-------+---------------------------------------------------+
-| SIMULATOR_U  | u     | Controls.                                         |
-+--------------+-------+---------------------------------------------------+
-| SIMULATOR_Z0 | z0    | Initial guess for the algebraic variable at the   |
-|              |       | initial time.                                     |
-+--------------+-------+---------------------------------------------------+
-| SIMULATOR_P  | p     | Parameters.                                       |
-+--------------+-------+---------------------------------------------------+
-
->Output scheme: casadi::SimulatorOutput (SIMULATOR_NUM_OUT = 2)
-
-+-------------+-------+---------------------+
-|  Full name  | Short |     Description     |
-+=============+=======+=====================+
-| SIMULATOR_X | x     | Differential state. |
-+-------------+-------+---------------------+
-| SIMULATOR_Z | z     | Algebraic variable. |
-+-------------+-------+---------------------+
-
-List of plugins
-- cvodes
-
-Note: some of the plugins in this list might not be available on your 
-
-system.  Also, there might be extra plugins available to you that are 
-not 
-listed here. You can obtain their documentation with  
-Simulator.doc(\"myextraplugin\")
-
-
-
---------------------------------------------------------------------------------
-
-cvodes
-------
-
-
-
-Interface to CVodes from the Sundials suite.
-
-Extra doc: https://github.com/casadi/casadi/wiki/L_227
-
->List of available options
-
-+----------------------------+-----------+---------------------------------+
-|             Id             |   Type    |           Description           |
-+============================+===========+=================================+
-| abstol                     | OT_DOUBLE | Absolute tolerence for the IVP  |
-|                            |           | solution                        |
-+----------------------------+-----------+---------------------------------+
-| disable_internal_warnings  | OT_BOOL   | Disable SUNDIALS internal       |
-|                            |           | warning messages                |
-+----------------------------+-----------+---------------------------------+
-| fsens_err_con              | OT_BOOL   | include the forward             |
-|                            |           | sensitivities in all error      |
-|                            |           | controls                        |
-+----------------------------+-----------+---------------------------------+
-| interpolation_type         | OT_STRING | Type of interpolation for the   |
-|                            |           | adjoint sensitivities           |
-+----------------------------+-----------+---------------------------------+
-| linear_multistep_method    | OT_STRING | Simulator scheme: BDF|adams     |
-+----------------------------+-----------+---------------------------------+
-| linear_solver              | OT_STRING | A custom linear solver creator  |
-|                            |           | function [default: qr]          |
-+----------------------------+-----------+---------------------------------+
-| linear_solver_options      | OT_DICT   | Options to be passed to the     |
-|                            |           | linear solver                   |
-+----------------------------+-----------+---------------------------------+
-| max_krylov                 | OT_INT    | Maximum Krylov subspace size    |
-+----------------------------+-----------+---------------------------------+
-| max_multistep_order        | OT_INT    | Maximum order for the           |
-|                            |           | (variable-order) multistep      |
-|                            |           | method                          |
-+----------------------------+-----------+---------------------------------+
-| max_num_steps              | OT_INT    | Maximum number of simulator     |
-|                            |           | steps                           |
-+----------------------------+-----------+---------------------------------+
-| max_order                  | OT_DOUBLE | Maximum order                   |
-+----------------------------+-----------+---------------------------------+
-| max_step_size              | OT_DOUBLE | Max step size [default: 0/inf]  |
-+----------------------------+-----------+---------------------------------+
-| min_step_size              | OT_DOUBLE | Min step size [default: 0/0.0]  |
-+----------------------------+-----------+---------------------------------+
-| newton_scheme              | OT_STRING | Linear solver scheme in the     |
-|                            |           | Newton method:                  |
-|                            |           | DIRECT|gmres|bcgstab|tfqmr      |
-+----------------------------+-----------+---------------------------------+
-| nonlin_conv_coeff          | OT_DOUBLE | Coefficient in the nonlinear    |
-|                            |           | convergence test                |
-+----------------------------+-----------+---------------------------------+
-| nonlinear_solver_iteration | OT_STRING | Nonlinear solver type:          |
-|                            |           | NEWTON|functional               |
-+----------------------------+-----------+---------------------------------+
-| quad_err_con               | OT_BOOL   | Should the quadratures affect   |
-|                            |           | the step size control           |
-+----------------------------+-----------+---------------------------------+
-| reltol                     | OT_DOUBLE | Relative tolerence for the IVP  |
-|                            |           | solution                        |
-+----------------------------+-----------+---------------------------------+
-| scale_abstol               | OT_BOOL   | Scale absolute tolerance by     |
-|                            |           | nominal value                   |
-+----------------------------+-----------+---------------------------------+
-| sensitivity_method         | OT_STRING | Sensitivity method:             |
-|                            |           | SIMULTANEOUS|staggered          |
-+----------------------------+-----------+---------------------------------+
-| step0                      | OT_DOUBLE | initial step size [default:     |
-|                            |           | 0/estimated]                    |
-+----------------------------+-----------+---------------------------------+
-| steps_per_checkpoint       | OT_INT    | Number of steps between two     |
-|                            |           | consecutive checkpoints         |
-+----------------------------+-----------+---------------------------------+
-| stop_at_end                | OT_BOOL   | Stop the simulator at the end   |
-|                            |           | of the interval                 |
-+----------------------------+-----------+---------------------------------+
-| use_preconditioner         | OT_BOOL   | Precondition the iterative      |
-|                            |           | solver [default: true]          |
-+----------------------------+-----------+---------------------------------+
-
-Joel Andersson
-
-Extra doc: https://github.com/casadi/casadi/wiki/L_21m
-
-Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/simulator.hpp#L53
-
-Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/simulator.cpp#L53-L56
-
-";
-
-";
-
-%feature("docstring") casadi::IndexRecution::simulator_in "
-
-[INTERNAL] 
-Get simulator input scheme name by index.
-
-Extra doc: https://github.com/casadi/casadi/wiki/L_x5
-
-Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/simulator.hpp#L75
-
-Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/simulator.cpp#L75-L84
-
->  std::string casadi::simulator_in(casadi_int ind)
-------------------------------------------------------------------------
-[INTERNAL] 
-Get simulator input scheme name by index.
-
-Extra doc: https://github.com/casadi/casadi/wiki/L_x5
-
-Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/simulator.hpp#L75
-
-Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/simulator.cpp#L75-L84
-
-";
-
-";
-
-%feature("docstring") casadi::IndexRecution::simulator_out "
-
-[INTERNAL] 
-Get output scheme name by index.
-
-Extra doc: https://github.com/casadi/casadi/wiki/L_x6
-
-Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/simulator.hpp#L86
-
-Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/simulator.cpp#L86-L93
-
->  std::string casadi::simulator_out(casadi_int ind)
-------------------------------------------------------------------------
-[INTERNAL] 
-Get output scheme name by index.
-
-Extra doc: https://github.com/casadi/casadi/wiki/L_x6
-
-Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/simulator.hpp#L86
-
-Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/simulator.cpp#L86-L93
-
-";
-
-";
-
-%feature("docstring") casadi::IndexRecution::simulator_n_in "
-
-[INTERNAL] 
-Get the number of simulator inputs.
-
-Extra doc: https://github.com/casadi/casadi/wiki/L_x7
-
-Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/simulator.hpp#L140
-
-Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/simulator.hpp#L140-L140
-
-";
-
-%feature("docstring") casadi::IndexRecution::simulator_n_out "
-
-[INTERNAL] 
-Get the number of simulator outputs.
-
-Extra doc: https://github.com/casadi/casadi/wiki/L_x8
-
-Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/simulator.hpp#L145
-
-Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/simulator.hpp#L145-L145
 
 ";
 
