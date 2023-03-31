@@ -10,7 +10,7 @@ struct Problem {
     USING_ALPAQA_CONFIG(alpaqa::DefaultConfig);
     using Box = alpaqa::Box<config_t>;
 
-    length_t N = 2,       // Horizon length
+    length_t N = 32,      // Horizon length
         nu     = 1,       // Number of inputs
         nx     = 2,       // Number of states
         nh     = nu + nx, // Number of stage outputs
@@ -21,8 +21,8 @@ struct Problem {
     mat A, B;
 
     Problem() : A(nx, nx), B(nx, nu) {
-        A.setRandom();
-        B.setRandom();
+        A.setIdentity();
+        B.setIdentity();
     }
 
     // Horizon length
