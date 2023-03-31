@@ -6,6 +6,8 @@ if (@ALPAQA_WITH_CASADI@)
     find_package(casadi CONFIG)
 endif()
 
+set(ALPAQA_WITH_OCP @ALPAQA_WITH_OCP@ CACHE INTERNAL "")
+
 include("${CMAKE_CURRENT_LIST_DIR}/alpaqaTargets.cmake")
 
 if(NOT _@PROJECT_NAME@_PRINTED)
