@@ -1,0 +1,61 @@
+{
+    "version": 3,
+    "cmakeMinimumRequired": {
+      "major": 3,
+      "minor": 22,
+      "patch": 0
+      },
+    "configurePresets": [
+        {
+            "name": "core",
+            "hidden": true,
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/out/build/${presetName}",
+            "installDir": "${sourceDir}/out/install/${presetName}"
+        },
+        {
+            "name": "common",
+            "hidden": true,
+            "cacheVariables": {
+                "WITH_IPOPT": "ON",
+                "WITH_OPENMP": "ON",
+                "WITH_QPOASES": "ON",
+                "WITH_LAPACK": "ON"
+            }
+        },
+        {
+            "name": "devel",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "WITH_LINT": "ON",
+                "WITH_EXTRA_WARNINGS": "ON"
+            }
+        },
+        {
+            "name": "release",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        },
+        {
+            "name": "python",
+            "hidden": true,
+            "cacheVariables": {
+                "WITH_PYTHON": "ON",
+                "PYTHON_PREFIX": "${sourceDir}/out/install/${presetName}/python"
+            }
+        },
+        {
+            "name": "windevel",
+            "displayName": "Windows developer (MinGW)",
+            "inherits": [
+                "common",
+                "core",
+                "devel",
+                "python"
+            ]
+        }
+      ]
+}
