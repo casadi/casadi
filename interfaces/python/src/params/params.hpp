@@ -1,5 +1,6 @@
 #pragma once
 
+#include "alm-params.hpp"
 #include "anderson-direction-params.hpp"
 #include "anderson-params.hpp"
 #include "inner-solve-options.hpp"

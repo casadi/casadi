@@ -24,41 +24,11 @@ using namespace std::chrono_literals;
 #include <alpaqa/outer/alm.hpp>
 #include <alpaqa/util/check-dim.hpp>
 
+#include "async.hpp"
 #include "kwargs-to-struct.hpp"
-#include "stream-replacer.hpp"
-#include "thread-checker.hpp"
+#include "params/alm-params.hpp"
 #include "type-erased-inner-solver.hpp"
 #include "type-erased-panoc-direction.hpp"
-
-template <alpaqa::Config Conf>
-struct dict_to_struct_table<alpaqa::ALMParams<Conf>> {
-    inline static const dict_to_struct_table_t<alpaqa::ALMParams<Conf>> table{
-        {"ε", &alpaqa::ALMParams<Conf>::ε},
-        {"δ", &alpaqa::ALMParams<Conf>::δ},
-        {"Δ", &alpaqa::ALMParams<Conf>::Δ},
-        {"Δ_lower", &alpaqa::ALMParams<Conf>::Δ_lower},
-        {"Δ_min", &alpaqa::ALMParams<Conf>::Δ_min},
-        {"Σ_0", &alpaqa::ALMParams<Conf>::Σ_0},
-        {"σ_0", &alpaqa::ALMParams<Conf>::σ_0},
-        {"Σ_0_lower", &alpaqa::ALMParams<Conf>::Σ_0_lower},
-        {"ε_0", &alpaqa::ALMParams<Conf>::ε_0},
-        {"ε_0_increase", &alpaqa::ALMParams<Conf>::ε_0_increase},
-        {"ρ", &alpaqa::ALMParams<Conf>::ρ},
-        {"ρ_increase", &alpaqa::ALMParams<Conf>::ρ_increase},
-        {"ρ_max", &alpaqa::ALMParams<Conf>::ρ_max},
-        {"θ", &alpaqa::ALMParams<Conf>::θ},
-        {"M", &alpaqa::ALMParams<Conf>::M},
-        {"Σ_max", &alpaqa::ALMParams<Conf>::Σ_max},
-        {"Σ_min", &alpaqa::ALMParams<Conf>::Σ_min},
-        {"max_iter", &alpaqa::ALMParams<Conf>::max_iter},
-        {"max_time", &alpaqa::ALMParams<Conf>::max_time},
-        {"max_num_initial_retries", &alpaqa::ALMParams<Conf>::max_num_initial_retries},
-        {"max_num_retries", &alpaqa::ALMParams<Conf>::max_num_retries},
-        {"max_total_num_retries", &alpaqa::ALMParams<Conf>::max_total_num_retries},
-        {"print_interval", &alpaqa::ALMParams<Conf>::print_interval},
-        {"single_penalty_factor", &alpaqa::ALMParams<Conf>::single_penalty_factor},
-    };
-};
 
 template <alpaqa::Config Conf>
 void register_alm(py::module_ &m) {
@@ -92,47 +62,9 @@ void register_alm(py::module_ &m) {
                 *y, p.get_m(), "Length of y does not match problem size problem.m");
 
         auto invoke_solver = [&] { return solver(p, *x, *y); };
-        if (!async) {
-            // Replace the output stream
-            StreamReplacer stream{&solver};
-            // Invoke the solver synchronously
-            auto stats = invoke_solver();
-            return std::make_tuple(std::move(*x), std::move(*y),
-                                   alpaqa::conv::stats_to_dict<InnerSolver>(stats));
-        } else {
-            // Check that the user doesn't use the same solver/problem in multiple threads
-            ThreadChecker solver_checker{&solver};
-            ThreadChecker problem_checker{&p};
-            // Replace the output stream
-            StreamReplacer stream{&solver};
-            // Invoke the solver asynchronously
-            auto stats = std::async(std::launch::async, invoke_solver);
-            {
-                py::gil_scoped_release gil{};
-                while (stats.wait_for(50ms) != std::future_status::ready) {
-                    py::gil_scoped_acquire gil{};
-                    // Check if Python received a signal (e.g. Ctrl+C)
-                    if (PyErr_CheckSignals() != 0) {
-                        // Nicely ask the solver to stop
-                        solver.stop();
-                        // It should return a result soon
-                        if (py::gil_scoped_release gil{};
-                            stats.wait_for(15s) != std::future_status::ready) {
-                            // If it doesn't, we terminate the entire program,
-                            // because the solver uses variables local to this
-                            // function, so we cannot safely return without
-                            // waiting for the solver to finish.
-                            std::terminate();
-                        }
-                        if (PyErr_Occurred())
-                            throw py::error_already_set();
-                        break;
-                    }
-                }
-            }
-            return std::make_tuple(std::move(*x), std::move(*y),
-                                   alpaqa::conv::stats_to_dict<InnerSolver>(stats.get()));
-        }
+        auto stats         = async_solve(async, solver, invoke_solver, p);
+        return std::make_tuple(std::move(*x), std::move(*y),
+                               alpaqa::conv::stats_to_dict<InnerSolver>(std::move(stats)));
     };
 
     py::class_<ALMSolver>(m, "ALMSolver",
