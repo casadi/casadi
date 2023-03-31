@@ -106,7 +106,7 @@ inline std::ostream& message_prefix(std::ostream &stream) {
   // Get current time
   auto now = std::chrono::system_clock::now();
   std::time_t tt = std::chrono::system_clock::to_time_t(now);
-  auto local_tm = *std::localtime(&tt);
+  auto local_tm = *std::localtime(&tt);  // NOLINT(runtime/threadsafe_fn)
   // Convert to YYYY-MM-DD HH:MM:SS format
   stream << local_tm.tm_year + 1900 << '-';  // YYYY-
   stream << std::setfill('0') << std::setw(2) << local_tm.tm_mon + 1 << '-';  // MM-

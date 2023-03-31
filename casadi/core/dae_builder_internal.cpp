@@ -2862,7 +2862,7 @@ std::string DaeBuilderInternal::iso_8601_time() {
   // Get current time
   auto now = std::chrono::system_clock::now();
   std::time_t tt = std::chrono::system_clock::to_time_t(now);
-  auto local_tm = *std::localtime(&tt);
+  auto local_tm = *std::localtime(&tt);  // NOLINT(runtime/threadsafe_fn)
   // Convert to ISO 8601 (YYYY-MM-DDThh:mm:ssZ) format and return
   std::stringstream ss;
   ss << local_tm.tm_year + 1900 << '-';  // YYYY-
