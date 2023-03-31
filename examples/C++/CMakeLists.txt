@@ -16,3 +16,7 @@ endif()
 if (TARGET alpaqa::dl-loader)
     add_subdirectory(DLProblem)
 endif()
+
+if (ALPAQA_WITH_OCP)
+    add_subdirectory(CustomControlCppProblem)
+endif()

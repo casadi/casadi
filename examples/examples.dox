@@ -134,6 +134,12 @@
  */
 
 /**
+ * @example{lineno} C++/CustomControlCppProblem/main.cpp
+ * Bare-bones example demonstrating how to define optimal control problems for
+ * @ref alpaqa::PANOCOCPSolver.
+ */
+
+/**
  * @example Python/simple_optimization/getting-started.py
  * This is a minimal example of an optimization problem that can be built and
  * solved using the `alpaqa` Python interface.  
