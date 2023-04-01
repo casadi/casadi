@@ -105,10 +105,9 @@ namespace casadi {
     copy_vector(H_.row(), rowh_);
     if (!discrete_.empty()) {
       integrality_.resize(nx_);
-      assign_vector(discrete_, integrality_);
+      copy_vector(discrete_, integrality_);
     }
   }
-
 
   void codegen_local(CodeGenerator& g, const std::string& name, const std::vector<int>& v) {
     std::string n = name + "[]";
@@ -199,6 +198,14 @@ namespace casadi {
     casadi_highs_init(&m->d, &arg, &res, &iw, &w);
 
     for (auto&& op : opts_) {
+      // HiGHS only accepts time_limit as double
+      if (op.first=="time_limit") {
+        casadi_assert(kHighsStatusOk ==
+          Highs_setDoubleOptionValue(m->d.highs, op.first.c_str(), op.second.to_double()),
+          "Error setting option '" + op.first + "'.");
+        continue;
+      }
+
       auto it = std::find(param_bool.begin(), param_bool.end(), op.first);
       if (it != param_bool.end() || op.second.getType() == OT_BOOL) {
         casadi_assert(kHighsStatusOk ==
@@ -257,7 +264,6 @@ namespace casadi {
     g.add_include("interfaces/highs_c_api.h");
 
     g.auxiliaries << g.sanitize_source(highs_runtime_str, {"casadi_real"});
-
 
     g.local("d", "struct casadi_highs_data*");
     g.init_local("d", "&" + codegen_mem(g));
