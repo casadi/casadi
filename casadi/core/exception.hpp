@@ -38,6 +38,22 @@
 
 #include <casadi/core/casadi_export.h>
 
+// Disable some Visual studio warnings
+#ifdef _MSC_VER
+
+// warning C4251: Need a dll interface?
+#pragma warning(disable:4251)
+
+// warning C4275: non dll-interface class 'std::exception' used as base for dll-interface
+// class 'casadi::CasadiException'
+#pragma warning(disable:4275)
+
+// warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s
+// instead
+#pragma warning(disable:4996)
+
+#endif // _MSC_VER
+
 namespace casadi {
 
 /** \brief  Casadi exception class

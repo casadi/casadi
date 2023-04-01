@@ -94,8 +94,12 @@ namespace casadi {
 // warning C4244: Potential loss of data converting double to int
 #pragma warning(disable:4244)
 
-// warinng C4251: Need a dll interface?
+// warning C4251: Need a dll interface?
 #pragma warning(disable:4251)
+
+// warning C4275: non dll-interface class 'std::exception' used as base for dll-interface
+// class 'casadi::CasadiException'
+#pragma warning(disable:4275)
 
 // warning C4715: Not all control paths return a value
 #pragma warning(disable:4715)
@@ -106,7 +110,8 @@ namespace casadi {
 // warning C4910: __declspec(dllexport) and extern incompatible on an explicit instantiation
 #pragma warning(disable:4910)
 
-// ?
+// warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s
+// instead
 #pragma warning(disable:4996)
 
 #endif // _MSC_VER

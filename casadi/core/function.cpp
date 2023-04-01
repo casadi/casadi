@@ -1469,6 +1469,7 @@ namespace casadi {
 #endif // WITH_EXTRA_CHECKS
       return ret;
     } catch (KeyboardInterruptException& e) {
+      (void)e;  // unused
 #ifdef WITH_EXTRA_CHECKS
       call_depth_--;
 #endif // WITH_EXTRA_CHECKS

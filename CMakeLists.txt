@@ -281,7 +281,7 @@ option(ENABLE_EXPORT_ALL "Export all symbols to a shared library" OFF)
 option(ENABLE_STATIC "Compile static libraries (.a on Linux)" OFF)
 option(ENABLE_SHARED "Compile shared libraries (.so on Linux)" ON)
 option(SWIG_EXPORT "Export SWIG" OFF)
-option(SWIG_IMPORT "Export SWIG" OFF)
+option(SWIG_IMPORT "Import SWIG" OFF)
 
 # enabling OpenMP support if requested
 option(WITH_OPENMP "Compile with parallelization support using OpenMP" OFF)

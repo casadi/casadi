@@ -48,6 +48,27 @@
             }
         },
         {
+            "name": "clang-cl",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "clang-cl",
+                "CMAKE_CXX_COMPILER": "clang-cl"
+            },
+            "vendor": {
+                "microsoft.com/VisualStudioSettings/CMake/1.0": {
+                  "intelliSenseMode": "windows-clang-x64"
+                }
+            }
+        },
+        {
+            "name": "cl",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "cl",
+                "CMAKE_CXX_COMPILER": "cl"
+            }
+        },
+        {
             "name": "windevel",
             "displayName": "Windows developer (MinGW)",
             "inherits": [
@@ -55,6 +76,15 @@
                 "core",
                 "devel",
                 "python"
+            ]
+        },
+        {
+            "name": "windevel_cl",
+            "displayName": "Windows developer (Visual C++)",
+            "inherits": [
+                "cl",
+                "core",
+                "devel"
             ]
         }
       ]
