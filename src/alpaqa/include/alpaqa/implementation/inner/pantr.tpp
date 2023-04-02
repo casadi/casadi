@@ -256,8 +256,8 @@ auto PANTRSolver<DirectionProviderT>::operator()(
                          .ε          = εₖ,
                          .Σ          = Σ,
                          .y          = y,
-                         .problem    = problem,
-                         .params     = params});
+                         .problem    = &problem,
+                         .params     = &params});
         }
 
         // Return solution -----------------------------------------------------

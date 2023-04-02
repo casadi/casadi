@@ -21,16 +21,16 @@ struct ALMParams {
     USING_ALPAQA_CONFIG(Conf);
 
     /// Primal tolerance.
-    real_t ε = 1e-5;
+    real_t ε = real_t(1e-5);
     /// Dual tolerance.
-    real_t δ = 1e-5;
+    real_t δ = real_t(1e-5);
     /// Factor used in updating the penalty parameters.
     real_t Δ = 10;
     /// Factor to reduce @ref Δ when inner convergence fails.
-    real_t Δ_lower = 0.8;
+    real_t Δ_lower = real_t(0.8);
     /// Minimum value for @ref Δ after reduction because of inner convergence
     /// failure.
-    real_t Δ_min = 1.1;
+    real_t Δ_min = real_t(1.1);
     /// Initial penalty parameter. When set to zero (which is the default),
     /// it is computed automatically, based on the constraint violation in the
     /// starting point and the parameter @ref σ_0.
@@ -41,28 +41,28 @@ struct ALMParams {
     real_t σ_0 = 20;
     /// Factor to reduce the initial penalty factor by if convergence fails in
     /// in the first iteration.
-    real_t Σ_0_lower = 0.6;
+    real_t Σ_0_lower = real_t(0.6);
     /// Initial primal tolerance.
     real_t ε_0 = 1;
     /// Factor to increase the initial primal tolerance if convergence fails in
     /// the first iteration.
-    real_t ε_0_increase = 1.1;
+    real_t ε_0_increase = real_t(1.1);
     /// Update factor for primal tolerance.
-    real_t ρ = 1e-1;
+    real_t ρ = real_t(1e-1);
     /// Factor to increase the primal tolerance update factor by if convergence
     /// fails.
-    real_t ρ_increase = 2;
+    real_t ρ_increase = real_t(2);
     /// Maximum value of @ref ρ after increase because of inner convergence
     /// failure.
-    real_t ρ_max = 0.5;
+    real_t ρ_max = real_t(0.5);
     /// Error tolerance for penalty increase
-    real_t θ = 0.1;
+    real_t θ = real_t(0.1);
     /// Lagrange multiplier bound.
-    real_t M = 1e9;
+    real_t M = real_t(1e9);
     /// Maximum penalty factor.
-    real_t Σ_max = 1e9;
+    real_t Σ_max = real_t(1e9);
     /// Minimum penalty factor (used during initialization).
-    real_t Σ_min = 1e-9;
+    real_t Σ_min = real_t(1e-9);
     /// Maximum number of outer ALM iterations.
     unsigned int max_iter = 100;
     /// Maximum duration.

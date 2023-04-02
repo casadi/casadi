@@ -114,8 +114,8 @@ struct PANTRProgressInfo {
     real_t ε;
     crvec Σ;
     crvec y;
-    const TypeErasedProblem<config_t> &problem;
-    const PANTRParams<config_t> &params;
+    const TypeErasedProblem<config_t> *problem;
+    const PANTRParams<config_t> *params;
 };
 
 /// PANTR solver for ALM.

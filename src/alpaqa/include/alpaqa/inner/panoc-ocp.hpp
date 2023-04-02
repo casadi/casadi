@@ -24,14 +24,14 @@ struct PANOCOCPParams {
     std::chrono::nanoseconds max_time = std::chrono::minutes(5);
     /// Minimum weight factor between Newton step and projected gradient step,
     /// line search parameter.
-    real_t τ_min = 1. / 256;
+    real_t τ_min = real_t(1. / 256);
     /// Parameter β used in the line search (see Algorithm 2 in
     /// @cite de_marchi_proximal_2022). @f$ 0 < \beta < 1 @f$
-    real_t β = 0.95;
+    real_t β = real_t(0.95);
     /// Minimum Lipschitz constant estimate.
-    real_t L_min = 1e-5;
+    real_t L_min = real_t(1e-5);
     /// Maximum Lipschitz constant estimate.
-    real_t L_max = 1e20;
+    real_t L_max = real_t(1e20);
     /// Maximum number of times to double the Lipschitz constant estimate per
     /// iteration.
     unsigned L_max_inc = 16;
@@ -55,9 +55,9 @@ struct PANOCOCPParams {
     int print_precision = std::numeric_limits<real_t>::max_digits10 / 2;
 
     real_t quadratic_upperbound_tolerance_factor =
-        1e2 * std::numeric_limits<real_t>::epsilon();
+        real_t(1e2) * std::numeric_limits<real_t>::epsilon();
     real_t linesearch_tolerance_factor =
-        1e2 * std::numeric_limits<real_t>::epsilon();
+        real_t(1e2) * std::numeric_limits<real_t>::epsilon();
 
     bool disable_acceleration = false;
 };
@@ -83,8 +83,8 @@ struct PANOCOCPProgressInfo {
     real_t γ;
     real_t τ;
     real_t ε;
-    const TypeErasedControlProblem<config_t> &problem;
-    const PANOCOCPParams<config_t> &params;
+    const TypeErasedControlProblem<config_t> *problem;
+    const PANOCOCPParams<config_t> *params;
 
     [[nodiscard]] vec u() const;
     [[nodiscard]] vec û() const;

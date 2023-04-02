@@ -18,22 +18,22 @@ namespace alpaqa {
 
 template <Config Conf>
 auto PANOCOCPProgressInfo<Conf>::u() const -> vec {
-    return detail::extract_u(problem, xu);
+    return detail::extract_u(*problem, xu);
 }
 
 template <Config Conf>
 auto PANOCOCPProgressInfo<Conf>::x() const -> vec {
-    return detail::extract_x(problem, xu);
+    return detail::extract_x(*problem, xu);
 }
 
 template <Config Conf>
 auto PANOCOCPProgressInfo<Conf>::û() const -> vec {
-    return detail::extract_u(problem, x̂u);
+    return detail::extract_u(*problem, x̂u);
 }
 
 template <Config Conf>
 auto PANOCOCPProgressInfo<Conf>::x̂() const -> vec {
-    return detail::extract_x(problem, x̂u);
+    return detail::extract_x(*problem, x̂u);
 }
 
 template <Config Conf>
@@ -508,8 +508,8 @@ auto PANOCOCPSolver<Conf>::operator()(
                          .γ             = curr->γ,
                          .τ             = τ,
                          .ε             = εₖ,
-                         .problem       = problem,
-                         .params        = params});
+                         .problem       = &problem,
+                         .params        = &params});
         }
 
         // Return solution -----------------------------------------------------

@@ -52,7 +52,7 @@ class LimitedMemoryQR {
 
         // If ‖q‖ is significantly smaller than ‖v‖, perform
         // reorthogonalization
-        real_t η = 0.7;
+        auto η = real_t(0.7);
         while (norm_q < η * norm_v) {
             ++reorth_count;
             for (index_t i = 0; i < q_idx; ++i) {

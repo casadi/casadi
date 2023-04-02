@@ -20,7 +20,7 @@ struct AndersonAccelParams {
     length_t memory = 10;
     /// Minimum divisor when solving close to singular systems,
     /// scaled by the maximum eigenvalue of R.
-    real_t min_div_fac = 1e2 * std::numeric_limits<real_t>::epsilon();
+    real_t min_div_fac = real_t(1e2) * std::numeric_limits<real_t>::epsilon();
 };
 
 /**
