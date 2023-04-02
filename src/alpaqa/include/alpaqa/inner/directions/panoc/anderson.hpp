@@ -25,8 +25,8 @@ struct AndersonDirection {
     mutable AndersonAccel anderson;
 
     struct Params {
-        AcceleratorParams accelerator;
-        DirectionParams direction;
+        AcceleratorParams accelerator = {};
+        DirectionParams direction     = {};
     };
 
     AndersonDirection() = default;

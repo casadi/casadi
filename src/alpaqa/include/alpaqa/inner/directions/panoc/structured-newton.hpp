@@ -49,8 +49,8 @@ struct StructuredNewtonDirection {
     using AcceleratorParams = StructuredNewtonRegularizationParams<config_t>;
 
     struct Params {
-        AcceleratorParams accelerator;
-        DirectionParams direction;
+        AcceleratorParams accelerator = {};
+        DirectionParams direction     = {};
     };
 
     StructuredNewtonDirection() = default;

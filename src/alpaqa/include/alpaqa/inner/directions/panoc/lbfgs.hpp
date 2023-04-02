@@ -25,8 +25,8 @@ struct LBFGSDirection {
     LBFGS lbfgs;
 
     struct Params {
-        AcceleratorParams accelerator;
-        DirectionParams direction;
+        AcceleratorParams accelerator = {};
+        DirectionParams direction     = {};
     };
 
     LBFGSDirection() = default;

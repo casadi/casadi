@@ -51,8 +51,8 @@ struct StructuredLBFGSDirection {
     using DirectionParams   = StructuredLBFGSDirectionParams<config_t>;
 
     struct Params {
-        AcceleratorParams accelerator;
-        DirectionParams direction;
+        AcceleratorParams accelerator = {};
+        DirectionParams direction     = {};
     };
 
     StructuredLBFGSDirection() = default;

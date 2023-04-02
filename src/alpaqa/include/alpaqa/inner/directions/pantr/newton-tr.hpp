@@ -28,8 +28,8 @@ struct NewtonTRDirection {
     using DirectionParams   = NewtonTRDirectionParams<config_t>;
 
     struct Params {
-        AcceleratorParams accelerator;
-        DirectionParams direction;
+        AcceleratorParams accelerator = {};
+        DirectionParams direction     = {};
     };
 
     NewtonTRDirection() = default;
