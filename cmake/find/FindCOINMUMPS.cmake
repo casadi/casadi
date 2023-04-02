@@ -99,9 +99,7 @@ if(COINMUMPS_FOUND AND NOT TARGET COIN::MUMPS)
         enable_language(Fortran)
     endif()
     set_target_properties(COIN::MUMPS PROPERTIES LINKER_LANGUAGE Fortran)
-    if (CMAKE_Fortran_COMPILER_ID STREQUAL GNU)
-        target_link_libraries(COIN::MUMPS INTERFACE gfortran)
-    endif()
+    target_link_options(COIN::MUMPS INTERFACE ${PC_MUMPS_LDFLAGS})
 endif()
 
 mark_as_advanced(
