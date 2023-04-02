@@ -17,7 +17,6 @@ void register_ocp(py::module_ &m) {
 
     struct OCPEvaluator {
         using Problem = alpaqa::TypeErasedControlProblem<config_t>;
-        using OCPVars = alpaqa::OCPVariables<config_t>;
         alpaqa::util::copyable_unique_ptr<Problem> problem;
         alpaqa::OCPEvaluator<config_t> eval;
         alpaqa::Box<Conf> U{alpaqa::Box<Conf>::NaN(eval.vars.nu())};
@@ -31,7 +30,6 @@ void register_ocp(py::module_ &m) {
 
         auto prepare_y_μ(std::optional<vec> &&y, std::optional<vec> &&μ) const {
             auto N    = eval.vars.N;
-            auto nu   = eval.vars.nu();
             auto nc   = eval.vars.nc();
             auto nc_N = eval.vars.nc_N();
             if (y)
@@ -50,10 +48,6 @@ void register_ocp(py::module_ &m) {
         }
 
         auto prepare_storage(crvec u) const {
-            auto N      = eval.vars.N;
-            auto nu     = eval.vars.nu();
-            auto nc     = eval.vars.nc();
-            auto nc_N   = eval.vars.nc_N();
             vec storage = eval.vars.create();
             alpaqa::detail::assign_interleave_xu(eval.vars, u, storage);
             eval.problem->get_x_init(eval.vars.xk(storage, 0));
@@ -194,23 +188,28 @@ void register_ocp(py::module_ &m) {
             auto uk_eq        = [&](index_t k) -> crvec { return q.segment(k * nu, nu); };
             auto Jk           = [&](index_t k) -> crindexvec { return J.indices(k); };
             auto Kk           = [&](index_t k) -> crindexvec { return J.compl_indices(k); };
-            auto Qk = [&](index_t k) { return [&, k](rmat out) { out += py::cast<crmat>(Q[k]); }; };
+            auto Qk           = [&](index_t k) {
+                return [&, k](rmat out) { out += py::cast<crmat>(Q[static_cast<size_t>(k)]); };
+            };
             auto Rk = [&](index_t k) {
-                return
-                    [&, k](crindexvec mask, rmat out) { out += py::cast<crmat>(R[k])(mask, mask); };
+                return [&, k](crindexvec mask, rmat out) {
+                    out += py::cast<crmat>(R[static_cast<size_t>(k)])(mask, mask);
+                };
             };
             auto Sk = [&](index_t k) {
-                return
-                    [&, k](crindexvec mask, rmat out) { out += py::cast<crmat>(S[k])(mask, all); };
+                return [&, k](crindexvec mask, rmat out) {
+                    out += py::cast<crmat>(S[static_cast<size_t>(k)])(mask, all);
+                };
             };
             auto Rk_prod = [&](index_t k) {
                 return [&, k](crindexvec mask_J, crindexvec mask_K, crvec v, rvec out) {
-                    out += py::cast<crmat>(R[k])(mask_J, mask_K) * v(mask_K);
+                    out += py::cast<crmat>(R[static_cast<size_t>(k)])(mask_J, mask_K) * v(mask_K);
                 };
             };
             auto Sk_prod = [&](index_t k) {
                 return [&, k](crindexvec mask_K, crvec v, rvec out) {
-                    out += py::cast<crmat>(S[k])(mask_K, all).transpose() * v(mask_K);
+                    out += py::cast<crmat>(S[static_cast<size_t>(k)])(mask_K, all).transpose() *
+                           v(mask_K);
                 };
             };
             lqr.factor_masked(vars.AB(jacs), Qk, Rk, Sk, Rk_prod, Sk_prod, vars.q(qr), vars.r(qr),

@@ -130,7 +130,7 @@ py::object to_dict_tup(const std::tuple<Ps...> tup) {
         return std::make_tuple(to_dict_tup(std::get<Is>(tup))...);
     }(std::make_index_sequence<sizeof...(Ps)>()));
 }
-inline py::object to_dict_tup(py::object o) { return std::move(o); }
+inline py::object to_dict_tup(py::object o) { return o; }
 } // namespace detail
 
 template <class T, class... Args>

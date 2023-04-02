@@ -16,7 +16,7 @@ namespace py = pybind11;
 namespace alpaqa {
 
 template <class Inner>
-struct ALMSolver;
+class ALMSolver;
 
 } // namespace alpaqa
 
