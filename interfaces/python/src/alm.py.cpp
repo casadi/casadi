@@ -9,7 +9,6 @@
 
 namespace py = pybind11;
 using namespace py::literals;
-constexpr auto ret_ref_internal = py::return_value_policy::reference_internal;
 
 #include <chrono>
 #include <exception>
@@ -25,7 +24,9 @@ using namespace std::chrono_literals;
 #include <alpaqa/util/check-dim.hpp>
 
 #include "async.hpp"
+#include "copy.hpp"
 #include "kwargs-to-struct.hpp"
+#include "member.hpp"
 #include "params/alm-params.hpp"
 #include "type-erased-inner-solver.hpp"
 #include "type-erased-panoc-direction.hpp"
@@ -50,26 +51,20 @@ void register_alm(py::module_ &m) {
 
     auto safe_alm_call = [](ALMSolver &solver, const TypeErasedProblem &p, std::optional<vec> x,
                             std::optional<vec> y, bool async) -> std::tuple<vec, vec, py::dict> {
-        if (!x)
-            x = vec::Zero(p.get_n());
-        else
-            alpaqa::util::check_dim_msg<config_t>(
-                *x, p.get_n(), "Length of x does not match problem size problem.n");
-        if (!y)
-            y = vec::Zero(p.get_m());
-        else
-            alpaqa::util::check_dim_msg<config_t>(
-                *y, p.get_m(), "Length of y does not match problem size problem.m");
-
+        alpaqa::util::check_dim_msg<config_t>(x, p.get_n(),
+                                              "Length of x does not match problem size problem.n");
+        alpaqa::util::check_dim_msg<config_t>(y, p.get_m(),
+                                              "Length of y does not match problem size problem.m");
         auto invoke_solver = [&] { return solver(p, *x, *y); };
         auto stats         = async_solve(async, solver, invoke_solver, p);
         return std::make_tuple(std::move(*x), std::move(*y),
                                alpaqa::conv::stats_to_dict<InnerSolver>(std::move(stats)));
     };
 
-    py::class_<ALMSolver>(m, "ALMSolver",
-                          "Main augmented Lagrangian solver.\n\n"
-                          "C++ documentation: :cpp:class:`alpaqa::ALMSolver`")
+    py::class_<ALMSolver> almsolver(m, "ALMSolver",
+                                    "Main augmented Lagrangian solver.\n\n"
+                                    "C++ documentation: :cpp:class:`alpaqa::ALMSolver`");
+    almsolver
         // Default constructor
         .def(py::init([] {
                  return std::make_unique<ALMSolver>(ALMParams{},
@@ -88,16 +83,8 @@ void register_alm(py::module_ &m) {
                                                     InnerSolver{inner});
              }),
              "alm_params"_a, "inner_solver"_a, "Build an ALM solver using PANOC as inner solver.")
-        // Copy
-        .def("__copy__", [](const ALMSolver &self) { return ALMSolver{self}; })
-        .def(
-            "__deepcopy__", [](const ALMSolver &self, py::dict) { return ALMSolver{self}; },
-            "memo"_a)
         // Other functions and properties
-        .def_property_readonly(
-            "inner_solver",
-            py::cpp_function([](ALMSolver &self) -> InnerSolver & { return self.inner_solver; },
-                             ret_ref_internal))
+        .def_property_readonly("inner_solver", member_ref<&ALMSolver::inner_solver>())
         .def("__call__", safe_alm_call, "problem"_a, "x"_a = std::nullopt, "y"_a = std::nullopt,
              "asynchronous"_a = true,
              "Solve.\n\n"
@@ -110,6 +97,7 @@ void register_alm(py::module_ &m) {
              "         * Statistics\n\n")
         .def("__str__", &ALMSolver::get_name)
         .def_property_readonly("params", &ALMSolver::get_params);
+    default_copy_methods(almsolver);
 }
 
 template void register_alm<alpaqa::EigenConfigd>(py::module_ &);

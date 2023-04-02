@@ -1,6 +1,7 @@
 #pragma once
 
 #include <alpaqa/config/config.hpp>
+#include <optional>
 #include <stdexcept>
 #include <string>
 
@@ -19,9 +20,23 @@ void check_dim_msg(crvec<Conf> v, auto sz, std::string msg) {
 }
 
 template <Config Conf>
-void check_dim(std::string name, crvec<Conf> v, auto sz) {
+void check_dim_msg(std::optional<vec<Conf>> &v, auto sz, std::string msg) {
+    if (!v) {
+        v = vec<Conf>::Zero(sz);
+    } else if (v->size() != sz) {
+        msg += "\n(should be ";
+        msg += std::to_string(sz);
+        msg += ", got ";
+        msg += std::to_string(v->size());
+        msg += ")";
+        throw std::invalid_argument(msg);
+    }
+}
+
+template <Config Conf, class V>
+void check_dim(std::string name, V &&v, auto sz) {
     name += ": dimension mismatch";
-    check_dim_msg<Conf>(v, sz, name);
+    check_dim_msg<Conf>(std::forward<V>(v), sz, name);
 }
 
 template <Config Conf>

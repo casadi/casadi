@@ -1,4 +1,5 @@
 #include <alpaqa/config/config.hpp>
+#include "copy.hpp"
 #include <pybind11/eigen.h>
 #include <pybind11/functional.h>
 #include <pybind11/pybind11.h>
@@ -22,24 +23,17 @@ void register_control_problems(py::module_ &m) {
     using ControlProblem = alpaqa::TypeErasedControlProblem<config_t>;
     py::class_<ControlProblem> te_problem(
         m, "ControlProblem", "C++ documentation: :cpp:class:`alpaqa::TypeErasedControlProblem`");
-    te_problem //
-        .def(py::init<const ControlProblem &>())
-        .def("__copy__", [](const ControlProblem &self) { return ControlProblem{self}; })
-        .def(
-            "__deepcopy__",
-            [](const ControlProblem &self, py::dict) { return ControlProblem{self}; }, "memo"_a)
-        // TODO
-        ;
+    default_copy_methods(te_problem);
 
     // ProblemWithCounters
-    static constexpr auto te_pwc = []<class P>(P &&p) {
-        using PwC = alpaqa::ControlProblemWithCounters<std::remove_cvref_t<P>>;
-        auto te_p = ControlProblem::template make<PwC>(std::forward<P>(p));
-        auto eval = te_p.template as<PwC>().evaluations;
-        return std::make_tuple(std::move(te_p), std::move(eval));
-    };
-
     if constexpr (std::is_same_v<typename Conf::real_t, double>) {
+        static constexpr auto te_pwc = []<class P>(P &&p) {
+            using PwC = alpaqa::ControlProblemWithCounters<std::remove_cvref_t<P>>;
+            auto te_p = ControlProblem::template make<PwC>(std::forward<P>(p));
+            auto eval = te_p.template as<PwC>().evaluations;
+            return std::make_tuple(std::move(te_p), std::move(eval));
+        };
+
 #if ALPAQA_HAVE_CASADI_OCP
         using CasADiControlProblem       = alpaqa::CasADiControlProblem<config_t>;
         auto load_CasADi_control_problem = [](const char *so_name, unsigned N) {
@@ -54,19 +48,13 @@ void register_control_problems(py::module_ &m) {
         };
 #endif
 
-        py::class_<CasADiControlProblem>(
+        py::class_<CasADiControlProblem> casadi_ctrl_prblm(
             m, "CasADiControlProblem",
             "C++ documentation: :cpp:class:`alpaqa::CasADiControlProblem`\n\n"
-            "See :py:class:`alpaqa._alpaqa.float64.TEControlProblem` for the full documentation.")
-            .def("__copy__",
-                 [](const CasADiControlProblem &self) { return CasADiControlProblem{self}; })
-            .def(
-                "__deepcopy__",
-                [](const CasADiControlProblem &self, py::dict) {
-                    return CasADiControlProblem{self};
-                },
-                "memo"_a)
+            "See :py:class:`alpaqa._alpaqa.float64.TEControlProblem` for the full documentation.");
+        default_copy_methods(casadi_ctrl_prblm);
 #if ALPAQA_HAVE_CASADI_OCP
+        casadi_ctrl_prblm //
             .def_readonly("N", &CasADiControlProblem::N)
             .def_readonly("nx", &CasADiControlProblem::nx)
             .def_readonly("nu", &CasADiControlProblem::nu)
@@ -96,10 +84,8 @@ void register_control_problems(py::module_ &m) {
                                                     std::to_string(p.param.size()) + ".");
                     p.param = param;
                 },
-                "Parameter vector :math:`p` of the problem")
-#endif
-            ;
-#if ALPAQA_HAVE_CASADI_OCP
+                "Parameter vector :math:`p` of the problem");
+
         te_problem.def(py::init<const CasADiControlProblem &>());
         py::implicitly_convertible<CasADiControlProblem, ControlProblem>();
 #endif

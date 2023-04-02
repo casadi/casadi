@@ -21,9 +21,8 @@ void register_anderson(py::module_ &m) {
     py::class_<Anderson> anderson(m, "AndersonAccel",
                                   "C++ documentation :cpp:class:`alpaqa::AndersonAccel`");
     using AndersonParams = typename Anderson::Params;
-    py::class_<AndersonParams> andersonparams(
+    register_dataclass<AndersonParams>(
         anderson, "Params", "C++ documentation :cpp:class:`alpaqa::AndersonAccelParams`");
-    make_dataclass(andersonparams);
 
     anderson //
         .def(py::init([](params_or_dict<AndersonParams> params) {

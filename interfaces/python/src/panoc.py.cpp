@@ -16,6 +16,7 @@ using namespace py::literals;
 #include <alpaqa/util/check-dim.hpp>
 
 #include "async.hpp"
+#include "member.hpp"
 #include "params/params.hpp"
 #include "stats-to-dict.hpp"
 #include "type-erased-panoc-direction.hpp"
@@ -67,8 +68,8 @@ void register_panoc(py::module_ &m) {
         .def_readonly("ε", &PANOCProgressInfo::ε, "Tolerance reached :math:`\\varepsilon_k`")
         .def_readonly("Σ", &PANOCProgressInfo::Σ, "Penalty factor :math:`\\Sigma`")
         .def_readonly("y", &PANOCProgressInfo::y, "Lagrange multipliers :math:`y`")
-        .def_property_readonly("problem", [](const PANOCProgressInfo &p) -> auto & { return p.problem; }, "Problem being solved")
-        .def_property_readonly("params", [](const PANOCProgressInfo &p) -> auto & { return p.params; }, "Solver parameters")
+        .def_property_readonly("problem", member_ptr<&PANOCProgressInfo::problem>(), "Problem being solved")
+        .def_property_readonly("params", member_ptr<&PANOCProgressInfo::params>(), "Solver parameters")
         // clang-format on
         .def_property_readonly(
             "fpr", [](const PANOCProgressInfo &p) { return std::sqrt(p.norm_sq_p) / p.γ; },
