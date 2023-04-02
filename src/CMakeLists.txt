@@ -185,7 +185,7 @@ if (TARGET COIN::Ipopt)
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/export>)
 endif()
 
-find_package(lbfgspp)
+find_package(lbfgspp QUIET)
 if (TARGET lbfgspp)
     message(STATUS "Compiling LBFGS++ solver adapter")
     add_library(lbfgspp-adapter "interop/lbfgspp/src/lbfgsb-adapter.cpp")
@@ -206,15 +206,8 @@ if (TARGET lbfgspp)
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/export>)
 endif()
 
-set(ALPAQA_HAVE_FORTRAN Off)
-include(CheckLanguage)
-check_language(Fortran)
-if (CMAKE_Fortran_COMPILER)
-    set(ALPAQA_HAVE_FORTRAN On)
-    enable_language(Fortran)
-endif()
-option(ALPAQA_WITH_LBFGSB
-    "Include the L-BFGS-B solver" ${ALPAQA_HAVE_FORTRAN})
+cmake_dependent_option(ALPAQA_WITH_LBFGSB
+    "Include the L-BFGS-B solver" ON ALPAQA_HAVE_FORTRAN OFF)
 
 if (ALPAQA_WITH_LBFGSB)
     message(STATUS "Compiling L-BFGS-B solver adapter")
@@ -225,9 +218,6 @@ if (ALPAQA_WITH_LBFGSB)
         "thirdparty/lbfgsb/Lbfgsb.3.0/linpack.f"
     )
     set_target_properties(lbfgsb-fortran PROPERTIES LINKER_LANGUAGE Fortran)
-    if (CMAKE_Fortran_COMPILER_ID STREQUAL GNU)
-        target_link_libraries(lbfgsb-fortran INTERFACE gfortran)
-    endif()
     list(APPEND ALPAQA_INSTALL_TARGETS lbfgsb-fortran)
     add_library(lbfgsb-adapter
         "interop/lbfgsb/src/lbfgsb-adapter.cpp"
