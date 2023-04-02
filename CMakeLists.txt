@@ -2,6 +2,21 @@ cmake_minimum_required(VERSION 3.24)
 project(alpaqa VERSION 1.0.0 LANGUAGES CXX)
 set(PY_VERSION_SUFFIX "a7")
 
+# Look for a C and Fortran compiler (optional)
+include(CheckLanguage)
+set(ALPAQA_HAVE_FORTRAN Off)
+check_language(Fortran)
+if (CMAKE_Fortran_COMPILER)
+    set(ALPAQA_HAVE_FORTRAN On)
+    enable_language(Fortran)
+endif()
+set(ALPAQA_HAVE_C Off)
+check_language(C)
+if (CMAKE_C_COMPILER)
+    set(ALPAQA_HAVE_C On)
+    enable_language(C)
+endif()
+
 # Options
 option(ALPAQA_WITH_QUAD_PRECISION
     "Support quad-precision floating point types" Off)
