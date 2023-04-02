@@ -57,6 +57,11 @@ set_target_properties(_alpaqa PROPERTIES
     RELWITHDEBINFO_POSTFIX ""
     MINSIZEREL_POSTFIX ""
 )
+if (ALPAQA_RELWITHDEBINFO_IS_DEBUG)
+    set_target_properties(_alpaqa PROPERTIES
+        RELWITHDEBINFO_POSTFIX "_d"
+        PDB_NAME_RELWITHDEBINFO "_alpaqa_d")
+endif()
 if (CMAKE_SYSTEM_NAME MATCHES "Linux")
     target_link_options(_alpaqa PRIVATE "LINKER:--exclude-libs,ALL")
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")

@@ -16,9 +16,10 @@ description = "Debug symbols for the alpaqa package."
 "Bug Tracker" = "https://github.com/kul-optec/alpaqa/issues"
 
 [build-system]
-requires = ["py-build-cmake~=0.1.1", "pybind11", "pybind11-stubgen"]
+requires = ["py-build-cmake~=0.1.4", "pybind11", "pybind11-stubgen"]
 build-backend = "py_build_cmake.build_component"
 
 [tool.py-build-cmake.component]
 main_project = "../.."
 install_components = ["python_modules_debug"]
+install_only = true
