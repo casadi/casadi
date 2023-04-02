@@ -224,11 +224,8 @@ def generate_casadi_control_problem(
     :param f:            Dynamics.
     :param name: Optional string description of the problem (used for filename).
 
-    :return:   * Code generator that generates the functions and derivatives
-                 used by the solvers.
-               * Number of states.
-               * Number of inputs.
-               * Number of parameters.
+    :return: Code generator that generates the functions and derivatives used by
+             the solvers.
     """
 
     cgname = f"{name}.c"
@@ -530,8 +527,33 @@ def write_casadi_problem_data(sofile, C, D, param):
         opt = dict(delimiter=",", newline="\n")
         ravelrow = lambda x: np.reshape(x, (1, -1), order="A")
         writerow = lambda x: np.savetxt(f, ravelrow(x), **opt)
-        writerow(getattr(C, "lowerbound", None) or C[0])
-        writerow(getattr(C, "upperbound", None) or C[1])
-        writerow(getattr(D, "lowerbound", None) or D[0])
-        writerow(getattr(D, "upperbound", None) or D[1])
+        try_lb = lambda x: x.lowerbound if hasattr(x, "lowerbound") else x[0]
+        try_ub = lambda x: x.upperbound if hasattr(x, "upperbound") else x[1]
+        writerow(try_lb(C))
+        writerow(try_ub(C))
+        writerow(try_lb(D))
+        writerow(try_ub(D))
+        writerow(param)
+
+def write_casadi_control_problem_data(sofile, U, D, D_N, x_init, param):
+    if U is None and D is None and D_N is None and x_init is None and param is None:
+        return
+    U = ([], []) if U is None else U
+    D = ([], []) if D is None else D
+    D_N = ([], []) if D_N is None else D_N
+    x_init = [] if x_init is None else x_init
+    param = [] if param is None else param
+    with open(f"{splitext(sofile)[0]}.csv", "w") as f:
+        opt = dict(delimiter=",", newline="\n")
+        ravelrow = lambda x: np.reshape(x, (1, -1), order="A")
+        writerow = lambda x: np.savetxt(f, ravelrow(x), **opt)
+        try_lb = lambda x: x.lowerbound if hasattr(x, "lowerbound") else x[0]
+        try_ub = lambda x: x.upperbound if hasattr(x, "upperbound") else x[1]
+        writerow(try_lb(U))
+        writerow(try_ub(U))
+        writerow(try_lb(D))
+        writerow(try_ub(D))
+        writerow(try_lb(D_N))
+        writerow(try_ub(D_N))
+        writerow(x_init)
         writerow(param)

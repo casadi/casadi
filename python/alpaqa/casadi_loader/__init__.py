@@ -11,7 +11,7 @@ import subprocess
 import platform
 import sys
 import warnings
-from ..casadi_generator import generate_casadi_problem, generate_casadi_control_problem, SECOND_ORDER_SPEC, write_casadi_problem_data
+from ..casadi_generator import generate_casadi_problem, generate_casadi_control_problem, SECOND_ORDER_SPEC, write_casadi_problem_data, write_casadi_control_problem_data
 from ..cache import get_alpaqa_cache_dir
 
 # TODO: factor out caching logic
@@ -117,12 +117,6 @@ def generate_and_compile_casadi_problem(
         return _load_casadi_problem(sofile)
 
 
-def _load_casadi_control_problem(sofile, N, nx, nu, p):
-    print("-- Loading:", sofile)
-    prob = pa.load_casadi_control_problem(sofile, N=N, nx=nx, nu=nu, p=p)
-    return prob
-
-
 def _load_casadi_control_problem(sofile, N):
     print("-- Loading:", sofile)
     prob = pa.load_casadi_control_problem(sofile, N=N)
@@ -138,29 +132,43 @@ def generate_and_compile_casadi_control_problem(
     h_N: cs.Function = None,
     c: cs.Function = None,
     c_N: cs.Function = None,
+    *,
+    U = None,
+    D = None,
+    D_N = None,
+    x_init = None,
+    param = None,
     name: str = "alpaqa_control_problem",
+    **kwargs,
 ) -> pa.CasADiControlProblem:
     """Compile the dynamics and cost functions into an alpaqa ControlProblem.
 
     :param N:    Horizon length.
+    :param C:            Bound constraints on u.
+    :param D:            Bound constraints on c(x).
+    :param D_N:          Bound constraints on c_N(x).
+    :param param:        Problem parameter values.
     :param name: Optional string description of the problem (used for filename).
+    :param kwargs: Parameters passed to 
+                   :py:func:`..casadi_generator.generate_casadi_control_problem`.
 
-    :return:   * Problem specification that can be passed to the solvers.
+    :return: Problem specification that can be passed to the solvers.
     """
 
     cachedir = get_alpaqa_cache_dir()
     cachefile = join(cachedir, 'problems')
 
     key = base64.b64encode(pickle.dumps(
-        (f, l, l_N, h, h_N, c, c_N, name))).decode('ascii')
+        (f, l, l_N, h, h_N, c, c_N, name, kwargs))).decode('ascii')
 
     os.makedirs(cachedir, exist_ok=True)
     with shelve.open(cachefile) as cache:
         if key in cache:
-            uid, soname = cache[key]
-            probdir = join(cachedir, str(uid))
-            sofile = join(probdir, soname)
             try:
+                uid, soname = cache[key]
+                probdir = join(cachedir, str(uid))
+                sofile = join(probdir, soname)
+                write_casadi_control_problem_data(sofile, U, D, D_N, x_init, param)
                 return _load_casadi_control_problem(sofile, N)
             except:
                 del cache[key]
@@ -211,4 +219,5 @@ def generate_and_compile_casadi_control_problem(
         soname = os.path.relpath(sofile, probdir)
         cache[key] = uid, soname
 
+        write_casadi_control_problem_data(sofile, U, D, D_N, x_init, param)
         return _load_casadi_control_problem(sofile, N)

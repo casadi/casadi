@@ -5,6 +5,7 @@
 #include <alpaqa/problem/box.hpp>
 #include <alpaqa/util/check-dim.hpp>
 #include <alpaqa/util/copyable_unique_ptr.hpp>
+#include <filesystem>
 
 namespace alpaqa {
 
@@ -28,7 +29,6 @@ class CasADiControlProblem {
     /// handled using a quadratic penalty method rather than using an
     /// augmented Lagrangian method. Specifically, the Lagrange multipliers for
     /// these components (which determine the shifts in ALM) are kept at zero.
-    /// @todo change name
     index_t penalty_alm_split = 0;
     /// Same as @ref penalty_alm_split, but for the terminal constraint.
     index_t penalty_alm_split_N = 0;
@@ -40,6 +40,22 @@ class CasADiControlProblem {
     CasADiControlProblem &operator=(const CasADiControlProblem &);
     CasADiControlProblem(CasADiControlProblem &&) noexcept;
     CasADiControlProblem &operator=(CasADiControlProblem &&) noexcept;
+
+    /// Load the numerical problem data (bounds and parameters) from a CSV file.
+    /// The file should contain 8 rows, with the following contents:
+    ///   1. @ref U lower bound [nu]
+    ///   2. @ref U upper bound [nu]
+    ///   3. @ref D lower bound [nc]
+    ///   4. @ref D upper bound [nc]
+    ///   5. @ref D_N lower bound [nc_N]
+    ///   6. @ref D_N upper bound [nc_N]
+    ///   7. @ref x_init [nx]
+    ///   8. @ref param [p]
+    ///
+    /// Line endings are encoded using a single line feed (`\n`), and the column
+    /// separator can be specified using the @p sep argument.
+    void load_numerical_data(const std::filesystem::path &filepath,
+                             char sep = ',');
 
     void get_U(Box &U) const { U = this->U; }
     void get_D(Box &D) const { D = this->D; }
