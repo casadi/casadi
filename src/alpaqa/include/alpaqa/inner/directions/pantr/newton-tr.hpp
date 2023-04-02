@@ -16,6 +16,9 @@ struct NewtonTRDirectionParams {
     USING_ALPAQA_CONFIG(Conf);
     bool rescale_when_γ_changes = false;
     real_t hessian_vec_factor   = real_t(0.5);
+    bool finite_diff            = false;
+    real_t finite_diff_stepsize =
+        std::sqrt(std::numeric_limits<real_t>::epsilon());
 };
 
 /// @ingroup grp_DirectionProviders
@@ -45,9 +48,10 @@ struct NewtonTRDirection {
                     [[maybe_unused]] crvec x_0, [[maybe_unused]] crvec x̂_0,
                     [[maybe_unused]] crvec p_0,
                     [[maybe_unused]] crvec grad_ψx_0) {
-        if (!problem.provides_eval_hess_ψ_prod())
-            throw std::invalid_argument("NewtonTR requires "
-                                        "Problem::eval_hess_ψ_prod()");
+        if (!direction_params.finite_diff &&
+            !problem.provides_eval_hess_ψ_prod())
+            throw std::invalid_argument("NewtonTR without finite differences "
+                                        "requires Problem::eval_hess_ψ_prod()");
         if (!problem.provides_get_box_C())
             throw std::invalid_argument("NewtonTR requires "
                                         "Problem::get_box_C()");
@@ -56,13 +60,17 @@ struct NewtonTRDirection {
         this->y.emplace(y);
         this->Σ.emplace(Σ);
         // Resize workspaces
-        const auto n = problem.get_n();
+        const auto n = problem.get_n(), m = problem.get_m();
         JK_sto.resize(n);
         rJ_sto.resize(n);
         qJ_sto.resize(n);
         work.resize(n);
         work_2.resize(n);
         steihaug.resize(n);
+        if (direction_params.finite_diff) {
+            work_n_fd.resize(n);
+            work_m_fd.resize(m);
+        }
     }
 
     /// @see @ref PANTRDirection::has_initial_direction
@@ -114,16 +122,36 @@ struct NewtonTRDirection {
 
         // Hessian-vector term
         if (direction_params.hessian_vec_factor != 0) {
-            problem->eval_hess_ψ_prod(xₖ, *y, *Σ, 1, qₖ, work);
-            rJ.noalias() += work(J) * direction_params.hessian_vec_factor;
+            if (direction_params.finite_diff) {
+                real_t ε = (1 + grad_ψxₖ.norm()) *
+                           direction_params.finite_diff_stepsize;
+                work = xₖ + ε * qₖ;
+                problem->eval_grad_ψ(work, *y, *Σ, work_2, work_n_fd,
+                                     work_m_fd);
+                rJ.noalias() += (work_2 - grad_ψxₖ)(J) *
+                                (direction_params.hessian_vec_factor / ε);
+            } else {
+                problem->eval_hess_ψ_prod(xₖ, *y, *Σ, 1, qₖ, work);
+                rJ.noalias() += work(J) * direction_params.hessian_vec_factor;
+            }
         }
 
         // Hessian-vector product on subset J
         auto hess_vec_mult = [&](crvec p, rvec Bp) {
-            work.setZero();
-            work(J) = p;
-            problem->eval_hess_ψ_prod(xₖ, *y, *Σ, 1, work, work_2);
-            Bp.topRows(nJ) = work_2(J);
+            if (direction_params.finite_diff) {
+                real_t ε = (1 + grad_ψxₖ.norm()) *
+                           direction_params.finite_diff_stepsize;
+                work = xₖ;
+                work(J) += ε * p;
+                problem->eval_grad_ψ(work, *y, *Σ, work_2, work_n_fd,
+                                     work_m_fd);
+                Bp.topRows(nJ) = (work_2 - grad_ψxₖ)(J) / ε;
+            } else {
+                work.setZero();
+                work(J) = p;
+                problem->eval_hess_ψ_prod(xₖ, *y, *Σ, 1, work, work_2);
+                Bp.topRows(nJ) = work_2(J);
+            }
         };
 
         // Steihaug conjugate gradients
@@ -164,7 +192,7 @@ struct NewtonTRDirection {
     mutable indexvec JK_sto;
     mutable vec rJ_sto;
     mutable vec qJ_sto;
-    mutable vec work, work_2;
+    mutable vec work, work_2, work_n_fd, work_m_fd;
 };
 
 } // namespace alpaqa

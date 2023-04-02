@@ -242,6 +242,8 @@ PARAMS_TABLE(StructuredLBFGSDirectionParams<config_t>,      //
 PARAMS_TABLE(NewtonTRDirectionParams<config_t>,     //
              PARAMS_MEMBER(rescale_when_γ_changes), //
              PARAMS_MEMBER(hessian_vec_factor),     //
+             PARAMS_MEMBER(finite_diff),            //
+             PARAMS_MEMBER(finite_diff_stepsize),   //
 );
 
 PARAMS_TABLE(SteihaugCGParams<config_t>,     //
