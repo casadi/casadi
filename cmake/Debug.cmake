@@ -3,7 +3,6 @@ function(alpaqa_install_debug_syms target component dest_lib dest_bin)
     if (MSVC)
         install(FILES "$<TARGET_PDB_FILE:${target}>"
             DESTINATION ${dest_bin}
-            RENAME "$<PATH:REPLACE_EXTENSION,LAST_ONLY,$<TARGET_FILE_NAME:${target}>,pdb>"
             CONFIGURATIONS Debug RelWithDebInfo
             COMPONENT ${component} 
             OPTIONAL EXCLUDE_FROM_ALL)
