@@ -21,7 +21,7 @@ C = [0, 0], [5, 5]
 D = [0], [1]
 param = [2]
 
-cgen, _, _, _ = cg.generate_casadi_problem(
+cgen = cg.generate_casadi_problem(
     cs.Function("f", [unknowns, p], [f]),
     cs.Function("g", [unknowns, p], [g]),
     second_order="full",
