@@ -16,6 +16,7 @@ python-cross-staging
 python/alpaqa/_alpaqa*
 /install
 /staging
+/package
 /build-local
 /toolchains
 
