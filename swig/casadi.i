@@ -339,7 +339,7 @@ def DM_from_csc(m, check_only=True):
   %feature("customdoc:proto:constructor", "$name($in)");
   %feature("customdoc:proto:single_out", "$name($in) -> $out");
   %feature("customdoc:proto:normal", "$name($in) -> ($out)");
-  %feature("customdoc:main", "  $brief\n\n$overview\n$main");
+  %feature("customdoc:main", "  $brief\n\n::\n\n$overview\n$main");
 #endif
 
 %feature("customdoc:arg:normal:style_error", "$type");
