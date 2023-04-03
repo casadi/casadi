@@ -36,18 +36,19 @@ y_sim = np.hstack((y_dist, y_sim))  # (including disturbed and initial states)
 
 N_horiz = 12  # MPC horizon length (number of time steps)
 
-y_init = cs.SX.sym("y_init", *y_null.shape)  # Initial state
-U = cs.SX.sym("U", dim * N_horiz)  # Control signals over horizon
+y_init = cs.MX.sym("y_init", *y_null.shape)  # Initial state
+model_params = cs.MX.sym("params", *model.params.shape)  # Parameters
+U = cs.MX.sym("U", dim * N_horiz)  # Control signals over horizon
 U_mat = model.input_to_matrix(U)  # Input as dim by N_horiz matrix
-constr_param = cs.SX.sym("c", 3)  # Coefficients of cubic constraint function
-mpc_param = cs.vertcat(y_init, model.params, constr_param)  # All parameters
+constr_param = cs.MX.sym("c", 3)  # Coefficients of cubic constraint function
+mpc_param = cs.vertcat(y_init, model_params, constr_param)  # All parameters
 
 # Cost
 
 # Stage costs for states and input
 stage_y_cost, stage_u_cost = model.generate_cost_funcs()
 # Simulate the model with the input over the horizon
-mpc_sim = model.simulate(N_horiz, y_init, U_mat, model.params)
+mpc_sim = model.simulate(N_horiz, y_init, U_mat, model_params)
 # Accumulate the cost of the outputs and inputs
 mpc_y_cost = cs.sum2(stage_y_cost.map(N_horiz)(mpc_sim))
 mpc_u_cost = cs.sum2(stage_u_cost.map(N_horiz)(U_mat))
@@ -58,16 +59,16 @@ mpc_cost_fun = cs.Function('f_mpc', [U, mpc_param], [mpc_y_cost + mpc_u_cost])
 # Cubic constraint function for a single ball in one dimension
 g_constr = lambda c, x: c[0] * x**3 + c[1] * x**2 + c[2] * x
 # Constraint function for one stage (N balls)
-y_c = cs.SX.sym("y_c", y_dist.shape[0])
+y_c = cs.MX.sym("y_c", y_dist.shape[0])
 constr = []
 for i in range(N):  # for each ball in the stage except the last,
     yx_n = y_c[dim * i]  # constrain the x, y position of the ball
     yy_n = y_c[dim * i + dim - 1]
     constr += [yy_n - g_constr(constr_param, yx_n)]
 constr += [y_c[-1] - g_constr(constr_param, y_c[-dim])]  # Ball N+1
-constr_fun = cs.Function("c", [y_c], [cs.vertcat(*constr)])
+constr_fun = cs.Function("c", [y_c, constr_param], [cs.vertcat(*constr)])
 # Constraint function for all stages in the horizon
-mpc_constr = constr_fun.map(N_horiz)(mpc_sim)
+mpc_constr = constr_fun.map(N_horiz)(mpc_sim, constr_param)
 mpc_constr_fun = cs.Function("g_mpc", [U, mpc_param], [cs.vec(mpc_constr)])
 # Fill in the constraint coefficients c(x-a)³ + d(x-a) + b
 a, b, c, d = 0.6, -1.4, 5, 2.2
@@ -80,7 +81,11 @@ import alpaqa.casadi_loader as cl
 
 # Generate C code for the cost and constraint function, compile them, and load
 # them as an alpaqa problem description:
-problem = cl.generate_and_compile_casadi_problem(mpc_cost_fun, mpc_constr_fun)
+problem = cl.generate_and_compile_casadi_problem(
+    f=mpc_cost_fun,
+    g=mpc_constr_fun,
+    sym=cs.MX.sym,
+)
 # Box constraints on actuator:
 problem.C.lowerbound = -1 * np.ones((dim * N_horiz, ))
 problem.C.upperbound = +1 * np.ones((dim * N_horiz, ))

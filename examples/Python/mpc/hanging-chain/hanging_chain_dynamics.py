@@ -84,9 +84,9 @@ class HangingChain:
         else:
             return u.reshape((self.dim, u.shape[0] // self.dim))
 
-    def simulate(self, N_sim: int, y_0: np.ndarray, u: Union[np.ndarray, list,
-                                                             cs.SX.sym],
-                 p: Union[np.ndarray, list, cs.SX.sym]):
+    def simulate(self, N_sim: int, y_0: np.ndarray,
+                 u: Union[np.ndarray, list, cs.SX.sym, cs.MX.sym],
+                 p: Union[np.ndarray, list, cs.SX.sym, cs.MX.sym]):
         if isinstance(u, list):
             u = np.array(u)
         if isinstance(u, np.ndarray):
