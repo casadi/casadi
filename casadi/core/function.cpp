@@ -1784,7 +1784,7 @@ namespace casadi {
     }
   }
 
-  std::vector<Function> Function::find(casadi_int max_depth) const {
+  std::vector<Function> Function::find_functions(casadi_int max_depth) const {
     try {
       // If negative, make largest positive number
       if (max_depth < 0) max_depth = std::numeric_limits<casadi_int>::max();
@@ -1802,7 +1802,7 @@ namespace casadi {
     }
   }
 
-  Function Function::find(casadi_int max_depth, const std::string &name) const {
+  Function Function::find_function(const std::string &name, casadi_int max_depth) const {
     try {
       // If negative, make largest positive number
       if (max_depth < 0) max_depth = std::numeric_limits<casadi_int>::max();
