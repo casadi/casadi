@@ -93,6 +93,7 @@ try:
 except:
   pass
 
+
 nsolvers = []
 
 def nullspacewrapper(name, sp, options):
