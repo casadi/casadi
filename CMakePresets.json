@@ -43,8 +43,24 @@
             "name": "python",
             "hidden": true,
             "cacheVariables": {
-                "WITH_PYTHON": "ON",
-                "PYTHON_PREFIX": "${sourceDir}/out/install/${presetName}/python"
+                "WITH_PYTHON": "ON"
+            }
+        },
+        {
+            "name": "mingw",
+            "hidden": true,
+            "cacheVariables": {
+                "WITH_THREAD_MINGW": "ON",
+                "CMAKE_C_COMPILER": "gcc",
+                "CMAKE_CXX_COMPILER": "g++"
+            }
+        },
+        {
+            "name": "cl",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "cl",
+                "CMAKE_CXX_COMPILER": "cl"
             }
         },
         {
@@ -61,18 +77,11 @@
             }
         },
         {
-            "name": "cl",
-            "hidden": true,
-            "cacheVariables": {
-                "CMAKE_C_COMPILER": "cl",
-                "CMAKE_CXX_COMPILER": "cl"
-            }
-        },
-        {
             "name": "windevel",
             "displayName": "Windows developer (MinGW)",
             "inherits": [
                 "common",
+                "mingw",
                 "core",
                 "devel",
                 "python"
