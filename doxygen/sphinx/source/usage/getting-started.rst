@@ -3,7 +3,7 @@
 Getting started
 ===================================
 
-The solver in this library can solve minimization problems of the following form:
+Most solvers in this library solve minimization problems of the following form:
 
 .. math::
     \newcommand\mymathbb[1]
@@ -53,11 +53,15 @@ Rosenbrock function (parametrized by :math:`p`) as the cost function:
     \begin{aligned}
         & \underset{x_1,x_2}{\text{minimize}}
         & & (1 - x_1)^2 + p\,(x_2 - x_1^2)^2 \\
-        & \text{subject to}
-        & & -0.25 \le x_1 \le 1.5 \\
-        &&& -0.5 \le x_2 \le 2.5 \\
-        &&& (x_1 - 0.5)^3 - x_2 + 1 \;\le 0 \\
-        &&& x_1 + x_2 - 1.5 \;\le 0 \\
+        &\text{subject to}
+        & & \begin{aligned}[t]
+            -0.25 &\le x_1 \le 1.5 \\
+            -0.5  &\le x_2 \le 2.5 \\
+        \end{aligned} \\
+        &&& \begin{aligned}[t]
+            (x_1 - 0.5)^3 - x_2 + 1 &\le 0 \\
+            x_1 + x_2 - 1.5 &\le 0 \\
+        \end{aligned}
     \end{aligned}
 
 In other words,
@@ -65,11 +69,11 @@ In other words,
 .. math::
     \begin{aligned}
         f(x) &= (1 - x_1)^2 + p\,(x_2 - x_1^2)^2 \\
+        C &= [-0.25, 1.5] \times [-0.5, 2.5] \\
         g(x) &= \begin{pmatrix}
             (x_1 - 0.5)^3 - x_2 + 1 \\
             x_1 + x_2 - 1.5
         \end{pmatrix} \\
-        C &= [-0.25, 1.5] \times [-0.5, 2.5] \\
         D &= [-\infty, 0] \times [-\infty, 0]
     \end{aligned}
 
@@ -85,9 +89,12 @@ decision variables and an optional parameter vector.
 
     # %% Build the problem (CasADi code, independent of alpaqa)
     import casadi as cs
+    import numpy as np
 
     # Make symbolic decision variables
     x1, x2 = cs.SX.sym("x1"), cs.SX.sym("x2")
+    # Collect decision variables into one vector
+    x = cs.vertcat(x1, x2)
     # Make a parameter symbol
     p = cs.SX.sym("p")
 
@@ -98,11 +105,15 @@ decision variables and an optional parameter vector.
         x1 + x2 - 1.5,
     )
 
-    # Collect decision variables into one vector
-    x = cs.vertcat(x1, x2)
     # Convert the symbolic expressions to CasADi functions
     f = cs.Function("f", [x, p], [f_expr])
     g = cs.Function("g", [x, p], [g_expr])
+
+    # Set the bounds
+    C = [-0.25, -0.5], [1.5, 2.5]  # -0.25 <= x1 <= 1.5, -0.5 <= x2 <= 2.5
+    D = [-np.inf, -np.inf], [0, 0]  #         g1 <= 0,           g2 <= 0
+    # Set the problem parameter
+    param = [10.0]
 
 Next, the gradients of the functions are computed using CasADi, and they are 
 compiled as efficient C functions. All of this happens inside of the 
@@ -116,7 +127,13 @@ function, which returns an instance of
     import alpaqa.casadi_loader as cl
 
     # Compile and load the problem
-    prob = cl.generate_and_compile_casadi_problem(f, g)
+    prob = cl.generate_and_compile_casadi_problem(
+        f=f,  # minimize    f(x; param)
+        C=C,  # subject to  x ∊ C
+        g=g,  # subject to  g(x; param) ∊ D
+        D=D,
+        param=param,
+    )
 
 .. testoutput::
     :options: +ELLIPSIS
@@ -124,24 +141,14 @@ function, which returns an instance of
 
     ...
 
-The bounds for the constraints can be initialized using lists or NumPy arrays:
+Numerical values of the problem (like the bounds and the parameters) can be
+specified when generating the problem, or can be modified after loading it:
 
 .. testcode::
 
-    # Set the bounds
-    import numpy as np
-    prob.C.lowerbound = [-0.25, -0.5]       # -0.25 <= x1 <= 1.5
-    prob.C.upperbound = [1.5, 2.5]          # -0.5  <= x2 <= 2.5
-    prob.D.lowerbound = [-np.inf, -np.inf]  # g1 <= 0
-    prob.D.upperbound = [0, 0]              # g2 <= 0
-
-Finally, the parameter :math:`p` is given a value, completing the problem 
-definition. This value can be changed later.
-
-.. testcode::
-
-    # Set parameter to some value
-    prob.param = [100.]
+    # You can change the bounds and parameters after loading the problem
+    prob.param = [100.0]
+    prob.D.lowerbound[1] = -1e20
 
 Selecting a solver
 ^^^^^^^^^^^^^^^^^^
@@ -209,8 +216,8 @@ initial values for :code:`x0` and :code:`y0` are zero.
     # %% Compute a solution
 
     # Set initial guesses at arbitrary values
-    x0 = np.array([0.1, 1.8]) # decision variables
-    y0 = np.zeros((prob.m,))  # Lagrange multipliers for g(x)
+    x0 = [0.1, 1.8]  # decision variables
+    y0 = [0.0, 0.0]  # Lagrange multipliers for g(x)
 
     # Solve the problem
     x_sol, y_sol, stats = solver(prob, x0, y0)
