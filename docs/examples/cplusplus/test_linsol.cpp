@@ -3,7 +3,7 @@
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
  *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -25,7 +25,7 @@
 
 /**
 File superlu.c from the CSparse example collection
-Joel Andersson, K.U. Leuven, 2010
+Joel Andersson, KU Leuven, 2010
 */
 
 #include "casadi/casadi.hpp"

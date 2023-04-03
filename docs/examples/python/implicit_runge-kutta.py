@@ -3,7 +3,7 @@
 #
 #     CasADi -- A symbolic framework for dynamic optimization.
 #     Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
-#                             K.U. Leuven. All rights reserved.
+#                             KU Leuven. All rights reserved.
 #     Copyright (C) 2011-2014 Greg Horn
 #
 #     CasADi is free software; you can redistribute it and/or
@@ -28,7 +28,7 @@ import matplotlib.pyplot as plt
 
 '''
 Demonstration on how to construct a fixed-step implicit Runge-Kutta integrator
-@author: Joel Andersson, K.U. Leuven 2013
+@author: Joel Andersson, KU Leuven 2013
 '''
 
 # End time

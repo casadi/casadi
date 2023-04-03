@@ -3,7 +3,7 @@
 #
 #     CasADi -- A symbolic framework for dynamic optimization.
 #     Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
-#                             K.U. Leuven. All rights reserved.
+#                             KU Leuven. All rights reserved.
 #     Copyright (C) 2011-2014 Greg Horn
 #
 #     CasADi is free software; you can redistribute it and/or
@@ -23,7 +23,7 @@
 #
 # -*- coding: utf-8 -*-
 """
-@author: Mario Zanon and Sebastien Gross, K.U. Leuven 2012
+@author: Mario Zanon and Sebastien Gross, KU Leuven 2012
 """
 
 from casadi import *
