@@ -67,7 +67,6 @@ build_args = ["-j"]
 install_components = ["python_modules", "python_stubs"]
 [tool.py-build-cmake.cmake.options]
 "ALPAQA_WITH_PYTHON:BOOL" = "On"
-"ALPAQA_WITH_PY_STUBS:BOOL" = "On"
 "ALPAQA_WITH_TESTS:BOOL" = "Off"
 "ALPAQA_WITH_EXAMPLES:BOOL" = "Off"
 "ALPAQA_WITH_DRIVERS:BOOL" = "Off"
