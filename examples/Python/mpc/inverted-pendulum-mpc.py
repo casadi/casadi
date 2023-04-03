@@ -46,24 +46,24 @@ f_d = cs.Function("f", [state, F], [f_d_expr])
 # %% Model predictive control
 
 # MPC inputs and states
-mpc_x0 = cs.SX.sym("x0", nx)  # Initial state
-mpc_u = cs.SX.sym("u", (1, N_horiz))  # Inputs
+mpc_x0 = cs.MX.sym("x0", nx)  # Initial state
+mpc_u = cs.MX.sym("u", (1, N_horiz))  # Inputs
 mpc_x = f_d.mapaccum(N_horiz)(mpc_x0, mpc_u)  # Simulated states
 
 # MPC cost
-Q = cs.SX.sym("Q", nx)  # Stage state cost
-Qf = cs.SX.sym("Qf", nx)  # Terminal state cost
-R = cs.SX.sym("R", nu)  # Stage input cost
-s, u = cs.SX.sym("s", nx), cs.SX.sym("u", nu)
+Q = cs.MX.sym("Q", nx)  # Stage state cost
+Qf = cs.MX.sym("Qf", nx)  # Terminal state cost
+R = cs.MX.sym("R", nu)  # Stage input cost
+s, u = cs.MX.sym("s", nx), cs.MX.sym("u", nu)
 sin_s = cs.vertcat(cs.sin(s[0] / 2), s[1:])  # Penalize sin(θ/2), not θ
-stage_cost_x = cs.Function("lx", [s], [cs.dot(sin_s, cs.diag(Q) @ sin_s)])
-terminal_cost_x = cs.Function("lf", [s], [cs.dot(sin_s, cs.diag(Qf) @ sin_s)])
-stage_cost_u = cs.Function("lu", [u], [cs.dot(u, cs.diag(R) @ u)])
+stage_cost_x = cs.Function("lx", [s, Q], [cs.dot(sin_s, cs.diag(Q) @ sin_s)])
+terminal_cost_x = cs.Function("lf", [s, Qf], [cs.dot(sin_s, cs.diag(Qf) @ sin_s)])
+stage_cost_u = cs.Function("lu", [u, R], [cs.dot(u, cs.diag(R) @ u)])
 
 mpc_param = cs.vertcat(mpc_x0, Q, Qf, R)
-mpc_y_cost = cs.sum2(stage_cost_x.map(N_horiz - 1)(mpc_x[:, :-1]))
-mpc_u_cost = cs.sum2(stage_cost_u.map(N_horiz)(mpc_u))
-mpc_terminal_cost = terminal_cost_x(mpc_x[:, -1])
+mpc_y_cost = cs.sum2(stage_cost_x.map(N_horiz - 1)(mpc_x[:, :-1], Q))
+mpc_u_cost = cs.sum2(stage_cost_u.map(N_horiz)(mpc_u, R))
+mpc_terminal_cost = terminal_cost_x(mpc_x[:, -1], Qf)
 mpc_cost_fun = cs.Function('f_mpc', [cs.vec(mpc_u), mpc_param],
                            [mpc_y_cost + mpc_u_cost + mpc_terminal_cost])
 
@@ -72,7 +72,11 @@ from alpaqa import casadi_loader as cl
 
 # Generate C code for the cost function, compile it, and load it as an
 # alpaqa problem description:
-problem = cl.generate_and_compile_casadi_problem(f=mpc_cost_fun, g=None)
+problem = cl.generate_and_compile_casadi_problem(
+    f=mpc_cost_fun,
+    g=None,
+    sym=cs.MX.sym,
+)
 # Box constraints on the actuator force:
 problem.C.lowerbound = -F_max * np.ones((N_horiz, ))
 problem.C.upperbound = +F_max * np.ones((N_horiz, ))
@@ -89,7 +93,7 @@ inner_solver = Solver(
         'stop_crit': pa.PANOCStopCrit.ProjGradUnitNorm2,
     },
     direction=pa.StructuredLBFGSDirection(
-        lbfgs_params={'memory': N_horiz},
+        lbfgs_params={'memory': 15},
         direction_params={'hessian_vec': False},
     ),
 )
