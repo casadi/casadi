@@ -97,7 +97,7 @@ namespace casadi {
     copy_vector(H_.row(), rowh_);
     if (!discrete_.empty()) {
       integrality_.resize(nx_);
-      assign_vector(discrete_, integrality_);
+      copy_vector(discrete_, integrality_);
     }
   }
 
