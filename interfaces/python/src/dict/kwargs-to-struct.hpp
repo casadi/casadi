@@ -151,9 +151,7 @@ T var_kwargs_to_struct(const params_or_dict<T> &p) {
 /// Helper macro to easily initialize a
 /// @ref dict_to_struct_table_t.
 #define PARAMS_MEMBER(name)                                                                        \
-    {                                                                                              \
-#name, &type::name                                                                         \
-    }
+    { #name, &type::name }
 
 /// Helper macro to easily define a specialization @ref dict_to_struct_table.
 #define PARAMS_TABLE_DEF(type_, ...)                                                               \

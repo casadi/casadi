@@ -5,10 +5,10 @@
 namespace py = pybind11;
 using namespace py::literals;
 
-#include "copy.hpp"
-#include "inner-solve.hpp"
-#include "member.hpp"
-#include "type-erased-inner-solver.hpp"
+#include <inner/inner-solve.hpp>
+#include <inner/type-erased-inner-solver.hpp>
+#include <util/copy.hpp>
+#include <util/member.hpp>
 
 template <alpaqa::Config Conf>
 void register_inner_solver(py::module_ &m) {

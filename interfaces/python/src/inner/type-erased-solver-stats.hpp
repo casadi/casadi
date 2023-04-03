@@ -8,7 +8,7 @@
 #include <stdexcept>
 #include <type_traits>
 
-#include "stats-to-dict.hpp"
+#include "../dict/stats-to-dict.hpp"
 
 #include <pybind11/gil.h>
 #include <pybind11/pybind11.h>

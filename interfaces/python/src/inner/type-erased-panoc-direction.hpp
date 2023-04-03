@@ -5,7 +5,7 @@
 #include <alpaqa/inner/directions/panoc/lbfgs.hpp>
 #include <alpaqa/util/type-erasure.hpp>
 
-#include "kwargs-to-struct.hpp"
+#include <dict/kwargs-to-struct.hpp>
 
 #include <new>
 #include <string>

@@ -10,8 +10,8 @@ using namespace py::literals;
 #include <alpaqa/accelerators/lbfgs.hpp>
 #include <alpaqa/util/check-dim.hpp>
 
-#include "params/params.hpp"
-#include "stats-to-dict.hpp"
+#include <dict/stats-to-dict.hpp>
+#include <params/params.hpp>
 
 template <alpaqa::Config Conf>
 void register_lbfgs(py::module_ &m) {

@@ -11,8 +11,8 @@ using namespace py::literals;
 #include <alpaqa/inner/inner-solve-options.hpp>
 #include <alpaqa/util/check-dim.hpp>
 
-#include "stats-to-dict.hpp"
-#include "type-erased-inner-solver.hpp"
+#include <dict/stats-to-dict.hpp>
+#include <inner/type-erased-inner-solver.hpp>
 
 /// Python interface to the inner solvers, checks the argument sizes and
 /// presence, and returns a Python tuple.

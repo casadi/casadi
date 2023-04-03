@@ -23,13 +23,13 @@ using namespace std::chrono_literals;
 #include <alpaqa/outer/alm.hpp>
 #include <alpaqa/util/check-dim.hpp>
 
-#include "async.hpp"
-#include "copy.hpp"
-#include "kwargs-to-struct.hpp"
-#include "member.hpp"
 #include "params/alm-params.hpp"
 #include "type-erased-alm-solver.hpp"
-#include "type-erased-inner-solver.hpp"
+#include <dict/kwargs-to-struct.hpp>
+#include <inner/type-erased-inner-solver.hpp>
+#include <util/async.hpp>
+#include <util/copy.hpp>
+#include <util/member.hpp>
 
 template <alpaqa::Config Conf>
 void register_alm(py::module_ &m) {

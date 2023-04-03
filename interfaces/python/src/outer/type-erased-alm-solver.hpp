@@ -9,10 +9,10 @@
 #include <stdexcept>
 #include <variant>
 
-#include "async.hpp"
-#include "stats-to-dict.hpp"
-#include "type-erased-inner-solver.hpp"
-#include "type-erased-solver-stats.hpp"
+#include <dict/stats-to-dict.hpp>
+#include <inner/type-erased-inner-solver.hpp>
+#include <inner/type-erased-solver-stats.hpp>
+#include <util/async.hpp>
 
 #include <pybind11/pytypes.h>
 #include <pybind11/stl.h>

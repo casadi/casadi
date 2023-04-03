@@ -16,17 +16,17 @@ find_pybind11_python_first()
 
 # Compile the example Python module
 pybind11_add_module(_alpaqa MODULE
-    "src/alm.py.cpp"
     "src/alpaqa.py.cpp"
-    "src/anderson.py.cpp"
+    "src/accel/anderson.py.cpp"
+    "src/accel/lbfgs.py.cpp"
+    "src/outer/alm.py.cpp"
     "src/counters.py.cpp"
     "src/enums.py.cpp"
-    "src/lbfgs.py.cpp"
-    "src/panoc.py.cpp"
-    "src/panoc-directions.py.cpp"
-    "src/problems.py.cpp"
-    "src/inner-solver.py.cpp"
-    "src/control-problems.py.cpp"
+    "src/inner/panoc.py.cpp"
+    "src/inner/panoc-directions.py.cpp"
+    "src/inner/inner-solver.py.cpp"
+    "src/problem/problems.py.cpp"
+    "src/problem/control-problems.py.cpp"
     "src/params/alm-params.cpp"
     "src/params/anderson-direction-params.cpp"
     "src/params/anderson-params.cpp"
@@ -40,8 +40,8 @@ pybind11_add_module(_alpaqa MODULE
 )
 if (ALPAQA_WITH_OCP)
     target_sources(_alpaqa PRIVATE
-        "src/panoc-ocp.py.cpp"
-        "src/ocp.py.cpp"
+        "src/inner/panoc-ocp.py.cpp"
+        "src/inner/ocp.py.cpp"
         "src/params/panoc-ocp-params.cpp"
     )
 endif()

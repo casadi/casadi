@@ -16,8 +16,8 @@ using namespace py::literals;
 #include <alpaqa/casadi/CasADiProblem.hpp>
 #endif
 
-#include "copy.hpp"
-#include "member.hpp"
+#include <util/copy.hpp>
+#include <util/member.hpp>
 
 template <class FuncProb, auto py_f, auto f, class Ret, class... Args>
 void functional_setter_ret(FuncProb &p, std::optional<py::object> o) {
@@ -53,7 +53,7 @@ void register_problems(py::module_ &m) {
     using Box = alpaqa::Box<config_t>;
     py::class_<Box> box(m, "Box", "C++ documentation: :cpp:class:`alpaqa::Box`");
     default_copy_methods(box);
-    box //
+    box                        //
         .def(py::pickle(
             [](const Box &b) { // __getstate__
                 return py::make_tuple(b.upperbound, b.lowerbound);

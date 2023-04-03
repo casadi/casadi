@@ -13,9 +13,9 @@ using namespace py::literals;
 #include <alpaqa/inner/directions/panoc/structured-lbfgs.hpp>
 #include <alpaqa/inner/directions/panoc/structured-newton.hpp>
 
-#include "params/params.hpp"
-#include "stats-to-dict.hpp"
-#include "type-erased-panoc-direction.hpp"
+#include <dict/stats-to-dict.hpp>
+#include <inner/type-erased-panoc-direction.hpp>
+#include <params/params.hpp>
 
 template <alpaqa::Config Conf>
 void register_panoc_directions(py::module_ &m) {

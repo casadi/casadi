@@ -12,13 +12,13 @@ using namespace py::literals;
 #include <alpaqa/inner/panoc-ocp.hpp>
 #include <alpaqa/util/check-dim.hpp>
 
-#include "async.hpp"
-#include "copy.hpp"
-#include "inner-solve.hpp"
-#include "member.hpp"
-#include "params/params.hpp"
-#include "stats-to-dict.hpp"
-#include "type-erased-inner-solver.hpp"
+#include <dict/stats-to-dict.hpp>
+#include <inner/inner-solve.hpp>
+#include <inner/type-erased-inner-solver.hpp>
+#include <params/params.hpp>
+#include <util/async.hpp>
+#include <util/copy.hpp>
+#include <util/member.hpp>
 
 template <alpaqa::Config Conf>
 void register_panoc_ocp(py::module_ &m) {

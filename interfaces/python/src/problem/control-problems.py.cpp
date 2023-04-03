@@ -15,7 +15,7 @@ using namespace py::literals;
 #include <alpaqa/casadi/CasADiControlProblem.hpp>
 #endif
 
-#include "copy.hpp"
+#include <util/copy.hpp>
 
 template <alpaqa::Config Conf>
 void register_control_problems(py::module_ &m) {
