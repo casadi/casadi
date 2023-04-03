@@ -59,6 +59,11 @@ namespace casadi {
     record_time_ = false;
     regularity_check_ = false;
     error_on_fail_ = true;
+    dump_in_ = false;
+    dump_out_ = false;
+    dump_dir_ = ".";
+    dump_format_ = "mtx";
+    dump_ = false;
   }
 
   FunctionInternal::FunctionInternal(const std::string& name) : ProtoFunction(name) {
@@ -98,11 +103,6 @@ namespace casadi {
     print_in_ = false;
     print_out_ = false;
     max_io_ = 10000;
-    dump_in_ = false;
-    dump_out_ = false;
-    dump_dir_ = ".";
-    dump_format_ = "mtx";
-    dump_ = false;
     sz_arg_tmp_ = 0;
     sz_res_tmp_ = 0;
     sz_iw_tmp_ = 0;
@@ -171,7 +171,22 @@ namespace casadi {
         "Throw exceptions when NaN or Inf appears during evaluation"}},
       {"error_on_fail",
        {OT_BOOL,
-        "Throw exceptions when function evaluation fails (default true)."}}
+        "Throw exceptions when function evaluation fails (default true)."}},
+      {"dump_in",
+       {OT_BOOL,
+        "Dump numerical values of inputs to file (readable with DM.from_file) [default: false]"}},
+      {"dump_out",
+       {OT_BOOL,
+        "Dump numerical values of outputs to file (readable with DM.from_file) [default: false]"}},
+      {"dump",
+       {OT_BOOL,
+        "Dump function to file upon first evaluation. [false]"}},
+      {"dump_dir",
+       {OT_STRING,
+        "Directory to dump inputs/outputs to. Make sure the directory exists [.]"}},
+      {"dump_format",
+       {OT_STRING,
+        "Choose file format to dump matrices. See DM.from_file [mtx]"}}
       }
   };
 
@@ -293,21 +308,6 @@ namespace casadi {
       {"max_io",
        {OT_INT,
         "Acceptable number of inputs and outputs. Warn if exceeded."}},
-      {"dump_in",
-       {OT_BOOL,
-        "Dump numerical values of inputs to file (readable with DM.from_file) [default: false]"}},
-      {"dump_out",
-       {OT_BOOL,
-        "Dump numerical values of outputs to file (readable with DM.from_file) [default: false]"}},
-      {"dump",
-       {OT_BOOL,
-        "Dump function to file upon first evaluation. [false]"}},
-      {"dump_dir",
-       {OT_STRING,
-        "Directory to dump inputs/outputs to. Make sure the directory exists [.]"}},
-      {"dump_format",
-       {OT_STRING,
-        "Choose file format to dump matrices. See DM.from_file [mtx]"}},
       {"forward_options",
        {OT_DICT,
         "Options to be passed to a forward mode constructor"}},
@@ -353,6 +353,16 @@ namespace casadi {
         regularity_check_ = op.second;
       } else if (op.first=="error_on_fail") {
         error_on_fail_ = op.second;
+      } else if (op.first=="dump_in") {
+        dump_in_ = op.second;
+      } else if (op.first=="dump_out") {
+        dump_out_ = op.second;
+      } else if (op.first=="dump") {
+        dump_ = op.second;
+      } else if (op.first=="dump_dir") {
+        dump_dir_ = op.second.to_string();
+      } else if (op.first=="dump_format") {
+        dump_format_ = op.second.to_string();
       }
     }
   }
@@ -364,6 +374,11 @@ namespace casadi {
     opts["record_time"] = record_time_;
     opts["regularity_check"] = regularity_check_;
     opts["error_on_fail"] = error_on_fail_;
+    opts["dump_in"] = dump_in_;
+    opts["dump_out"] = dump_out_;
+    opts["dump_dir"] = dump_dir_;
+    opts["dump_format"] = dump_format_;
+    opts["dump"] = dump_;
     return opts;
   }
 
@@ -400,11 +415,6 @@ namespace casadi {
     opts["print_in"] = print_in_;
     opts["print_out"] = print_out_;
     opts["max_io"] = max_io_;
-    opts["dump_in"] = dump_in_;
-    opts["dump_out"] = dump_out_;
-    opts["dump_dir"] = dump_dir_;
-    opts["dump_format"] = dump_format_;
-    opts["dump"] = dump_;
     return opts;
   }
 
@@ -418,16 +428,6 @@ namespace casadi {
       ad_weight_ = option_value;
     } else if (option_name=="ad_weight_sp") {
       ad_weight_sp_ = option_value;
-    } else if (option_name=="dump") {
-      dump_ = option_value;
-    } else if (option_name=="dump_in") {
-      dump_in_ = option_value;
-    } else if (option_name=="dump_out") {
-      dump_out_ = option_value;
-    } else if (option_name=="dump_dir") {
-      dump_dir_ = option_value.to_string();
-    } else if (option_name=="dump_format") {
-      dump_format_ = option_value.to_string();
     } else {
       // Option not found - continue to base classes
       ProtoFunction::change_option(option_name, option_value);
@@ -497,16 +497,6 @@ namespace casadi {
         print_out_ = op.second;
       } else if (op.first=="max_io") {
         max_io_ = op.second;
-      } else if (op.first=="dump_in") {
-        dump_in_ = op.second;
-      } else if (op.first=="dump_out") {
-        dump_out_ = op.second;
-      } else if (op.first=="dump") {
-        dump_ = op.second;
-      } else if (op.first=="dump_dir") {
-        dump_dir_ = op.second.to_string();
-      } else if (op.first=="dump_format") {
-        dump_format_ = op.second.to_string();
       } else if (op.first=="forward_options") {
         forward_options_ = op.second;
       } else if (op.first=="reverse_options") {
@@ -761,7 +751,7 @@ namespace casadi {
     shared_from_this<Function>().save(dump_dir_+ filesep() + name_ + ".casadi");
   }
 
-  casadi_int FunctionInternal::get_dump_id() const {
+  casadi_int ProtoFunction::get_dump_id() const {
 #ifdef CASADI_WITH_THREAD
     std::lock_guard<std::mutex> lock(dump_count_mtx_);
 #endif // CASADI_WITH_THREAD
@@ -891,6 +881,16 @@ namespace casadi {
       verbose_ = option_value;
     } else if (option_name == "regularity_check") {
       regularity_check_ = option_value;
+    } else if (option_name=="dump") {
+      dump_ = option_value;
+    } else if (option_name=="dump_in") {
+      dump_in_ = option_value;
+    } else if (option_name=="dump_out") {
+      dump_out_ = option_value;
+    } else if (option_name=="dump_dir") {
+      dump_dir_ = option_value.to_string();
+    } else if (option_name=="dump_format") {
+      dump_format_ = option_value.to_string();
     } else {
       // Failure
       casadi_error("Option '" + option_name + "' cannot be changed");
@@ -3704,6 +3704,10 @@ namespace casadi {
     s.pack("ProtoFunction::record_time", record_time_);
     s.pack("ProtoFunction::regularity_check", regularity_check_);
     s.pack("ProtoFunction::error_on_fail", error_on_fail_);
+    s.pack("ProtoFunction::dump_in", dump_in_);
+    s.pack("ProtoFunction::dump_out", dump_out_);
+    s.pack("ProtoFunction::dump_dir", dump_dir_);
+    s.pack("ProtoFunction::dump_format", dump_format_);
   }
 
   ProtoFunction::ProtoFunction(DeserializingStream& s) {
@@ -3714,6 +3718,14 @@ namespace casadi {
     s.unpack("ProtoFunction::record_time", record_time_);
     if (version >= 2) s.unpack("ProtoFunction::regularity_check", regularity_check_);
     if (version >= 2) s.unpack("ProtoFunction::error_on_fail", error_on_fail_);
+    if (version>=2) {
+      s.unpack("ProtoFunction::dump_in", dump_in_);
+      s.unpack("ProtoFunction::dump_out", dump_out_);
+      s.unpack("ProtoFunction::dump_dir", dump_dir_);
+      s.unpack("ProtoFunction::dump_format", dump_format_);
+      // Makes no sense to dump a Function that is being deserialized
+      dump_ = false;
+    }
   }
 
   void FunctionInternal::serialize_type(SerializingStream &s) const {
@@ -3775,10 +3787,6 @@ namespace casadi {
     s.pack("FunctionInternal::print_in", print_in_);
     s.pack("FunctionInternal::print_out", print_out_);
     s.pack("FunctionInternal::max_io", max_io_);
-    s.pack("FunctionInternal::dump_in", dump_in_);
-    s.pack("FunctionInternal::dump_out", dump_out_);
-    s.pack("FunctionInternal::dump_dir", dump_dir_);
-    s.pack("FunctionInternal::dump_format", dump_format_);
     s.pack("FunctionInternal::forward_options", forward_options_);
     s.pack("FunctionInternal::reverse_options", reverse_options_);
     s.pack("FunctionInternal::jacobian_options", jacobian_options_);
@@ -3868,12 +3876,14 @@ namespace casadi {
     } else {
       max_io_ = 10000;
     }
-    s.unpack("FunctionInternal::dump_in", dump_in_);
-    s.unpack("FunctionInternal::dump_out", dump_out_);
-    s.unpack("FunctionInternal::dump_dir", dump_dir_);
-    s.unpack("FunctionInternal::dump_format", dump_format_);
-    // Makes no sense to dump a Function that is being deserialized
-    dump_ = false;
+    if (version<5) {
+      s.unpack("FunctionInternal::dump_in", dump_in_);
+      s.unpack("FunctionInternal::dump_out", dump_out_);
+      s.unpack("FunctionInternal::dump_dir", dump_dir_);
+      s.unpack("FunctionInternal::dump_format", dump_format_);
+      // Makes no sense to dump a Function that is being deserialized
+      dump_ = false;
+    }
     s.unpack("FunctionInternal::forward_options", forward_options_);
     s.unpack("FunctionInternal::reverse_options", reverse_options_);
     if (version>=5) {

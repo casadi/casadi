@@ -248,6 +248,21 @@ namespace casadi {
     /// Throw an exception on failure?
     bool error_on_fail_;
 
+    // Dump input/output
+    bool dump_in_, dump_out_, dump_;
+
+    // Directory to dump to
+    std::string dump_dir_;
+
+    // Format to dump with
+    std::string dump_format_;
+
+    // Counter for unique names for dumping inputs and output
+    mutable casadi_int dump_count_ = 0;
+#ifdef CASADI_WITH_THREAD
+    mutable std::mutex dump_count_mtx_;
+#endif // CASADI_WITH_THREAD
+
   protected:
     /** \brief Deserializing constructor
 
@@ -259,12 +274,18 @@ namespace casadi {
     mutable std::mutex mtx_;
 #endif // CASADI_WITH_THREAD
 
+    // @{
+    /// Dumping functionality
+    casadi_int get_dump_id() const;
+    // @}
+
   private:
     /// Memory objects
     mutable std::vector<void*> mem_;
 
     /// Unused memory objects
     mutable std::stack<int> unused_;
+
   };
 
   /** \brief Internal class for Function
@@ -1307,26 +1328,11 @@ namespace casadi {
     // Warn when number of inputs or outputs exceed this value
     casadi_int max_io_;
 
-    // Dump input/output
-    bool dump_in_, dump_out_, dump_;
-
-    // Directory to dump to
-    std::string dump_dir_;
-
-    // Format to dump with
-    std::string dump_format_;
-
     // Forward/reverse/Jacobian options
     Dict forward_options_, reverse_options_, jacobian_options_, der_options_;
 
     // Store a reference to a custom Jacobian
     Function custom_jacobian_;
-
-    // Counter for unique names for dumping inputs and output
-    mutable casadi_int dump_count_ = 0;
-#ifdef CASADI_WITH_THREAD
-    mutable std::mutex dump_count_mtx_;
-#endif // CASADI_WITH_THREAD
 
     /** \brief Check if the function is of a particular type
 
@@ -1382,14 +1388,14 @@ namespace casadi {
         \identifier{nx} */
     void set_jac_sparsity(casadi_int oind, casadi_int iind, const Sparsity& sp);
 
-  private:
     // @{
     /// Dumping functionality
-    casadi_int get_dump_id() const;
     void dump_in(casadi_int id, const double** arg) const;
     void dump_out(casadi_int id, double** res) const;
     void dump() const;
     // @}
+
+  private:
 
     /** \brief Memory that is persistent during a call (but not between calls)
 
