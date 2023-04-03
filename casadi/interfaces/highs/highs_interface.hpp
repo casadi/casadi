@@ -64,7 +64,7 @@ namespace casadi {
       @copydoc plugin_Conic_highs
 
 
-      \author Felix Lenders, Attila Kozma, Joel Andersson
+      \author Felix Lenders, Ruud Kassing, Joris Gillis
       \date 2021
   */
   class CASADI_CONIC_HIGHS_EXPORT HighsInterface : public Conic {
