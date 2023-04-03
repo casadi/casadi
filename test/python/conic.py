@@ -20,14 +20,15 @@
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #
-from casadi import *
-import casadi as c
-import numpy
-import unittest
-from types import *
-from helpers import *
 import os
 import platform
+import unittest
+from types import *
+
+from helpers import *
+
+import casadi as c
+from casadi import *
 
 conics = []
 
@@ -47,10 +48,8 @@ if "SKIP_WORHP_TESTS" not in os.environ and has_nlpsol("worhp"):
 if "SKIP_OOQP_TESTS" not in os.environ and has_conic("ooqp"):
   conics.append(("ooqp",{},{"less_digits":1,"quadratic": True, "dual": True, "soc": False, "codegen": False, "discrete": False, "sos":False}))
 
-
 if "SKIP_QPOASES_TESTS" not in os.environ and has_conic("qpoases"):
   conics.append(("qpoases",{"printLevel":"low"},{"quadratic": True, "dual": True, "soc": False, "codegen": False,"discrete": False, "sos":False}))
-
 
 if "SKIP_CPLEX_TESTS" not in os.environ and has_conic("cplex"):
   conics.append(("cplex",{"cplex": {"CPX_PARAM_BARQCPEPCOMP": 1e-10,"CPX_PARAM_BAREPCOMP":1e-10}},{"quadratic": True, "dual": True, "soc": True, "codegen": False, "discrete": True, "sos": True}))
@@ -93,9 +92,7 @@ if "SKIP_QPALM_TESTS" not in os.environ and has_conic("qpalm"):
 
 if "SKIP_HIGHS_TESTS" not in os.environ and has_conic("highs"):
     codegen = {"extralibs": ["highs"], "std": "c99"}
-    conics.append(("highs",{"highs": {"primal_feasibility_tolerance":1e-7,"solver":"choose","output_flag":False,"ipm_iteration_limit":50000}},{"quadratic": True, "dual": True, "soc": False, "codegen": codegen, "discrete": False, "sos":False}))
-
-
+    conics.append(("highs",{"highs": {"primal_feasibility_tolerance":1e-7,"solver":"choose","output_flag":False,"ipm_iteration_limit":50000}},{"quadratic": True, "dual": True, "soc": False, "codegen": codegen, "discrete": True, "sos":False}))
 
 print(conics)
 

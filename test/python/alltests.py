@@ -21,25 +21,25 @@
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #
-from mx import *
-from sx import *
-from typemaps import *
-from integration import *
-from ocp import *
-from nlp import *
-from implicitfunction import *
 from ad import *
-from sparsity import *
+from conic import *
+from feasiblesqpmethod import *
+from function import *
+from implicitfunction import *
+from integration import *
 from linearsolver import *
 from matrix import *
-from conic import *
 from misc import *
-from function import *
-from tools import *
-from simulator import *
-from vectortools import *
+from mx import *
+from nlp import *
+from ocp import *
 from optistack import *
-from feasiblesqpmethod import *
+from simulator import *
+from sparsity import *
+from sx import *
+from tools import *
+from typemaps import *
+from vectortools import *
 
 if __name__ == '__main__':
     unittest.main()

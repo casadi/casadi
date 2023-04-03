@@ -1,17 +1,57 @@
-build*
-.vscode
-*install*
-obj-x86_64-linux-gnu
-*.edited
-*.pyc
-*~
+# C extensions
 *.so
-*.orig
-*.swp
 
+# Distribution / packaging
+*install*
+*build*
+lib/
+*.whl
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# PyBuilder
+.pybuilder/
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# Visual studio code
+.vscode/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Test folder
 test/python/*.c
+test/python/*.dat
+test/htmlcov
+test/matlab/*.c
+test/matlab/ON
+test/matlab/OFF
 
-# documentation
+# Files leaking from test folder to root folder
+/*.c
+/*.dat
+
+# Documentation
 docs/api/html
 docs/api/export
 docs/api/internal
@@ -31,15 +71,31 @@ docs/examples/_temp*
 documentation/examples/ctemplate/compiler.sh
 documentation/examples/ctemplate/linker.sh
 
-test/htmlcov
-test/matlab/*.c
-test/matlab/ON
-test/matlab/OFF
+# Doc types
+*.txt
+*.pdf
+*.docx
+*.doc
+*.tex
+
+# Logger
+*.log
+
+# Mac
+.DS_Store
+
 # joel
 experimental/joel/cuter/cuter_source
 experimental/joel/cuter/orfe.princeton.edu
 experimental/joel/cuter/cuter_selected
 external_packages/ColPack
+
+# Miscellaneous
+obj-x86_64-linux-gnu
+*.edited
+*~
+*.orig
+*.swp
 
 swig/*/target*
 
@@ -58,8 +114,6 @@ codegen_*
 *.bak
 *.sancov
 *.prof
-*.pdf
-*.log
 *.run
 *.dot
 *.o
@@ -67,16 +121,9 @@ codegen_*
 *.mat
 CMakeFiles
 *.mex*
-log*.txt
-*.in.txt
-*.out.txt
-*_in.txt
-*_out.txt
 *.mod
 mockups*
-*build*
 *coinhsl*
-*.whl
 *.zip
 dockcross*
 *debug*

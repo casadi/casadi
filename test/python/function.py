@@ -3056,6 +3056,7 @@ class Functiontests(casadiTestCase):
                 f,f_normal,f_ref = [fe.factory('f',in_labels,out_labels) for fe in [f,f_normal,f_ref]]
             
         
+  @requires_conic("qpoases")
   def test_no_hess2(self):
     y = MX.sym("y",2)
 

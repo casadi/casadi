@@ -1844,9 +1844,8 @@ class NLPtests(casadiTestCase):
       self.checkarray(b[1],G[i,:])
       self.checkarray(b[1],c[1])
 
-
-  @memory_heavy()
   @requires_nlpsol("ipopt")
+  @memory_heavy()
   def test_simple_bounds_detect2(self):
     x = MX.sym("x",5)
     p = MX.sym("p",5)
