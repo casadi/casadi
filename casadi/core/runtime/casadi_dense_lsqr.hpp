@@ -4,7 +4,7 @@
 //
 //    MIT No Attribution
 //
-//    Copyright 2023 Joel Andersson, Joris Gillis, Moritz Diehl, KU Leuven.
+//    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl, KU Leuven.
 //
 //    Permission is hereby granted, free of charge, to any person obtaining a copy of this
 //    software and associated documentation files (the "Software"), to deal in the Software
@@ -48,7 +48,7 @@ void casadi_dense_lsqr_sym_ortho(T1 a, T1 b, T1* cs, T1* sn, T1* rho) {
 //
 //    MIT No Attribution
 //
-//    Copyright 2023 Joel Andersson, Joris Gillis, Moritz Diehl, KU Leuven.
+//    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl, KU Leuven.
 //
 //    Permission is hereby granted, free of charge, to any person obtaining a copy of this
 //    software and associated documentation files (the "Software"), to deal in the Software
@@ -218,7 +218,7 @@ int casadi_dense_lsqr_single_solve(const T1* A, T1* x, casadi_int tr, const casa
 //
 //    MIT No Attribution
 //
-//    Copyright 2023 Joel Andersson, Joris Gillis, Moritz Diehl, KU Leuven.
+//    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl, KU Leuven.
 //
 //    Permission is hereby granted, free of charge, to any person obtaining a copy of this
 //    software and associated documentation files (the "Software"), to deal in the Software
