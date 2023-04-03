@@ -61,16 +61,14 @@ template <class T>
 struct dict_to_struct_table {};
 
 template <class T>
-auto possible_dict_keys() {
+auto possible_dict_keys(const std::string &input) {
     const auto &tbl = dict_to_struct_table<T>::table;
-    if (tbl.empty())
-        return std::string{};
-    auto penult       = std::prev(tbl.end());
-    auto quote_concat = [](std::string &&a, auto b) {
-        return a + "'" + std::string(b.first) + "', ";
-    };
-    return std::accumulate(tbl.begin(), penult, std::string{}, quote_concat) + "'" +
-           std::string(penult->first) + "'";
+    py::list keys;
+    for (const auto &[k, v] : tbl)
+        keys.append(py::str(k));
+    auto dl     = py::module::import("difflib");
+    auto sorted = dl.attr("get_close_matches")(input, keys, keys.size(), 0.);
+    return py::cast<std::string>(py::str(sorted));
 }
 
 template <class T>
@@ -82,7 +80,7 @@ void dict_to_struct_helper(T &t, const py::dict &kwargs) {
         auto it   = m.find(skey);
         if (it == m.end())
             throw py::key_error("Unknown parameter '" + skey +
-                                "',\npossible keys are: " + possible_dict_keys<T>());
+                                "', possible keys are: " + possible_dict_keys<T>(skey));
         try {
             it->second.set(t, val);
         } catch (const cast_error_with_types &e) {
@@ -151,7 +149,9 @@ T var_kwargs_to_struct(const params_or_dict<T> &p) {
 /// Helper macro to easily initialize a
 /// @ref dict_to_struct_table_t.
 #define PARAMS_MEMBER(name)                                                                        \
-    { #name, &type::name }
+    {                                                                                              \
+#name, &type::name                                                                         \
+    }
 
 /// Helper macro to easily define a specialization @ref dict_to_struct_table.
 #define PARAMS_TABLE_DEF(type_, ...)                                                               \
