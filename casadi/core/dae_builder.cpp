@@ -785,7 +785,7 @@ void DaeBuilder::gather_fun(casadi_int max_depth) {
     // Get a function corresponding to all equations (no inputs)
     Function all_eq = (*this)->gather_eq();
     // Gather all functions
-    std::vector<Function> allfun = all_eq.find(max_depth);
+    std::vector<Function> allfun = all_eq.find_functions(max_depth);
     // Add to list of functions
     for (const Function& f : allfun) {
       if (has_fun(f.name())) {

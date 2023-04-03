@@ -132,13 +132,10 @@ if(APPLE AND ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang" OR "${CMAKE_CXX_COMPILE
   set_target_properties(_casadi PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
 endif()
 
-set(COMPILE_FLAGS "-Wno-dynamic-class-memaccess -Wno-self-assign ${MAYBE_WERROR}")
-
-
 if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
-  # Null
+  set(COMPILE_FLAGS "-Wno-dynamic-class-memaccess -Wno-self-assign ${MAYBE_WERROR}")
 elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-  set(COMPILE_FLAGS "${COMPILE_FLAGS} -Wno-maybe-uninitialized")
+  set(COMPILE_FLAGS "-Wno-dynamic-class-memaccess -Wno-self-assign ${MAYBE_WERROR} -Wno-maybe-uninitialized")
   if(WIN32)
     # Fix for error: '_hypot' has not been declared in 'std'
     # cfr https://github.com/tudat-team/tudatpy/commit/ea9ef90a462825a65741f89ac1776413868f52cb
@@ -149,6 +146,8 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
       set(COMPILE_FLAGS "${COMPILE_FLAGS} -DMS_WIN64")
     endif()
   endif()
+else()
+  set(COMPILE_FLAGS)
 endif()
 
 message("COMPILE_FLAGS: ${COMPILE_FLAGS}")

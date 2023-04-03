@@ -94,8 +94,12 @@ namespace casadi {
 // warning C4244: Potential loss of data converting double to int
 #pragma warning(disable:4244)
 
-// warinng C4251: Need a dll interface?
+// warning C4251: Need a dll interface?
 #pragma warning(disable:4251)
+
+// warning C4275: non dll-interface class 'std::exception' used as base for dll-interface
+// class 'casadi::CasadiException'
+#pragma warning(disable:4275)
 
 // warning C4715: Not all control paths return a value
 #pragma warning(disable:4715)
@@ -106,7 +110,8 @@ namespace casadi {
 // warning C4910: __declspec(dllexport) and extern incompatible on an explicit instantiation
 #pragma warning(disable:4910)
 
-// ?
+// warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s
+// instead
 #pragma warning(disable:4996)
 
 #endif // _MSC_VER
@@ -116,13 +121,8 @@ namespace casadi {
 #undef minor
 
   // Type with a size corresponding to that of double (or smaller) that can be used to hold a set
-  // of booleans. If the compiler supports C99 or has defined __SIZEOF_LONG_LONG__,
-  // we shall use the long long datatype, which is 64 bits, otherwise long
-  #if (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L || defined(__SIZEOF_LONG_LONG__))
+  // of booleans
   typedef unsigned long long bvec_t;
-  #else
-  typedef unsigned long bvec_t;
-  #endif
 
   // Number of directions we can deal with at a time
   // the size of bvec_t in bits (CHAR_BIT is the number of bits per byte, usually 8)

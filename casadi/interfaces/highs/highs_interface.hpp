@@ -64,7 +64,7 @@ namespace casadi {
       @copydoc plugin_Conic_highs
 
 
-      \author Felix Lenders, Attila Kozma, Joel Andersson
+      \author Felix Lenders, Ruud Kassing, Joris Gillis
       \date 2021
   */
   class CASADI_CONIC_HIGHS_EXPORT HighsInterface : public Conic {
@@ -157,8 +157,6 @@ namespace casadi {
 
     // Memory structure
     casadi_highs_prob<double> p_;
-
-    static std::list<std::string> param_bool;
 
     std::vector<int> colinda_, rowa_;
     std::vector<int> colindh_, rowh_;

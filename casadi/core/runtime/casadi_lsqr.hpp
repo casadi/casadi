@@ -91,6 +91,11 @@ int casadi_lsqr_single_solve(const T1* A, T1* x, casadi_int tr, const casadi_int
     rnorm = beta;
     arnorm = alpha * beta;
 
+    if (arnorm==0.0) {
+      casadi_clear(x, m);
+      return 0;
+    }
+
     while (itn<iter_lim) {
       itn++;
       for (i=0;i<m;++i) u[i]*=-alpha;
