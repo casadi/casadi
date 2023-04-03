@@ -13,6 +13,19 @@
 #define CS_DATE "Nov 30, 2009"     /* CSparse release date */
 #define CS_COPYRIGHT "Copyright (c) Timothy A. Davis, 2006-2009"
 
+/* Disable some Visual studio warnings */
+#ifdef _MSC_VER
+
+/* warning C4244: '=': conversion from 'double' to 'long',
+  possible loss of data */
+#pragma warning(disable:4244)
+
+/* warning C4996: 'sprintf': This function or variable may be unsafe.
+  Consider using sprintf_s instead */
+#pragma warning(disable:4996)
+
+#endif // _MSC_VER
+
 /* --- primary CSparse routines and data structures ------------------------- */
 typedef struct cs_sparse    /* matrix in compressed-column or triplet form */
 {
