@@ -1,7 +1,25 @@
 // C-REPLACE "fabs" "casadi_fabs"
 // C-REPLACE "sign" "casadi_sign"
 
-// NOLINT(legal/copyright)
+//
+//    MIT No Attribution
+//
+//    Copyright 2023 Joel Andersson, Joris Gillis, Moritz Diehl, KU Leuven.
+//
+//    Permission is hereby granted, free of charge, to any person obtaining a copy of this
+//    software and associated documentation files (the "Software"), to deal in the Software
+//    without restriction, including without limitation the rights to use, copy, modify,
+//    merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
+//    permit persons to whom the Software is furnished to do so.
+//
+//    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+//    INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+//    PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+//    HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+//    OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+//    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+//
+
 // SYMBOL "lsqr_sym_ortho"
 template<typename T1>
 void casadi_dense_lsqr_sym_ortho(T1 a, T1 b, T1* cs, T1* sn, T1* rho) {
@@ -27,7 +45,25 @@ void casadi_dense_lsqr_sym_ortho(T1 a, T1 b, T1* cs, T1* sn, T1* rho) {
     }
 }
 
-// NOLINT(legal/copyright)
+//
+//    MIT No Attribution
+//
+//    Copyright 2023 Joel Andersson, Joris Gillis, Moritz Diehl, KU Leuven.
+//
+//    Permission is hereby granted, free of charge, to any person obtaining a copy of this
+//    software and associated documentation files (the "Software"), to deal in the Software
+//    without restriction, including without limitation the rights to use, copy, modify,
+//    merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
+//    permit persons to whom the Software is furnished to do so.
+//
+//    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+//    INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+//    PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+//    HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+//    OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+//    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+//
+
 // SYMBOL "lsqr_single_solve"
 // Ref: scipy
 template<typename T1>
@@ -179,7 +215,25 @@ int casadi_dense_lsqr_single_solve(const T1* A, T1* x, casadi_int tr, const casa
     return 0;
 }
 
-// NOLINT(legal/copyright)
+//
+//    MIT No Attribution
+//
+//    Copyright 2023 Joel Andersson, Joris Gillis, Moritz Diehl, KU Leuven.
+//
+//    Permission is hereby granted, free of charge, to any person obtaining a copy of this
+//    software and associated documentation files (the "Software"), to deal in the Software
+//    without restriction, including without limitation the rights to use, copy, modify,
+//    merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
+//    permit persons to whom the Software is furnished to do so.
+//
+//    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+//    INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+//    PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+//    HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+//    OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+//    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+//
+
 // SYMBOL "lsqr_solve"
 template<typename T1>
 int casadi_dense_lsqr_solve(const T1* A, T1* x, casadi_int nrhs, casadi_int tr,
