@@ -158,8 +158,6 @@ namespace casadi {
     // Memory structure
     casadi_highs_prob<double> p_;
 
-    static std::list<std::string> param_bool;
-
     std::vector<int> colinda_, rowa_;
     std::vector<int> colindh_, rowh_;
     std::vector<int> integrality_;

@@ -60,14 +60,6 @@ namespace casadi {
      }
    };
 
-  // Options with description https://www.maths.ed.ac.uk/hall/HiGHS/HighsOptions.html
-  std::list<std::string> HighsInterface::param_bool = {
-    "output_flag",
-    "log_to_console",
-    "write_solution_to_file",
-    "mip_detect_symmetry"
-  };
-
   void HighsInterface::init(const Dict& opts) {
     // Call the init method of the base class
     Conic::init(opts);
@@ -199,29 +191,24 @@ namespace casadi {
     casadi_highs_init(&m->d, &arg, &res, &iw, &w);
 
     for (auto&& op : opts_) {
-      auto it = std::find(param_bool.begin(), param_bool.end(), op.first);
-      if (it != param_bool.end() || op.second.getType() == OT_BOOL) {
-        casadi_assert(kHighsStatusOk ==
-          Highs_setBoolOptionValue(m->d.highs, op.first.c_str(), op.second.to_bool()),
-          "Error setting option '" + op.first + "'.");
-      } else if (op.second.getType() == OT_INT) {
-        casadi_assert(kHighsStatusOk ==
-          Highs_setIntOptionValue(m->d.highs, op.first.c_str(), op.second.to_int()),
-          "Error setting option '" + op.first + "'.");
-      } else if (op.second.getType() == OT_DOUBLE) {
-        casadi_assert(kHighsStatusOk ==
-          Highs_setDoubleOptionValue(m->d.highs, op.first.c_str(), op.second.to_double()),
-          "Error setting option '" + op.first + "'.");
-      } else if (op.second.getType() == OT_STRING) {
+      HighsInt type;
+      casadi_assert(kHighsStatusOk == Highs_getOptionType(m->d.highs, op.first.c_str(), &type),
+        "Error getting option type for '" + op.first + "'.");
+      HighsInt status;
+      if (type == kHighsOptionTypeBool) {
+        status = Highs_setBoolOptionValue(m->d.highs, op.first.c_str(), op.second.to_bool());
+      } else if (type == kHighsOptionTypeInt) {
+        status = Highs_setIntOptionValue(m->d.highs, op.first.c_str(), op.second.to_int());
+      } else if (type == kHighsOptionTypeDouble) {
+        status = Highs_setDoubleOptionValue(m->d.highs, op.first.c_str(), op.second.to_double());
+      } else if (type == kHighsOptionTypeString) {
         std::string v = op.second.to_string();
-        casadi_assert(kHighsStatusOk ==
-          Highs_setStringOptionValue(m->d.highs, op.first.c_str(), v.c_str()),
-          "Error setting option '" + op.first + "'.");
+        status = Highs_setStringOptionValue(m->d.highs, op.first.c_str(), v.c_str());
       } else {
-        casadi_assert(false, "Option type for '" + op.first + "'not supported!");
+        casadi_error("Unknown option type for '" + op.first + "'.");
       }
+      casadi_assert(kHighsStatusOk == status, "Error setting option '" + op.first + "'.");
     }
-
   }
 
   int HighsInterface::
@@ -269,24 +256,29 @@ namespace casadi {
     g << "d->qp = &d_qp;\n";
     g << "casadi_highs_init(d, &arg, &res, &iw, &w);\n";
 
+
+    void* h = Highs_create();
     for (auto&& op : opts_) {
-      auto it = std::find(param_bool.begin(), param_bool.end(), op.first);
-      if (it != param_bool.end() || op.second.getType() == OT_BOOL) {
+      HighsInt type;
+      casadi_assert(kHighsStatusOk == Highs_getOptionType(h, op.first.c_str(), &type),
+        "Error getting option type for '" + op.first + "'.");
+      if (type==kHighsOptionTypeBool) {
         g << "Highs_setBoolOptionValue(d->highs, " << g.constant(op.first) << ", "
           << static_cast<int>(op.second.to_bool()) << ");\n";
-      } else if (op.second.getType() == OT_INT) {
+      } else if (type==kHighsOptionTypeInt) {
         g << "Highs_setIntOptionValue(d->highs, " << g.constant(op.first) << ", "
           << static_cast<int>(op.second.to_int()) << ");\n";
-      } else if (op.second.getType() == OT_DOUBLE) {
+      } else if (type==kHighsOptionTypeDouble) {
         g << "Highs_setDoubleOptionValue(d->highs, " << g.constant(op.first) << ", "
-          << g.constant(op.second.to_int()) << ");\n";
-      } else if (op.second.getType() == OT_STRING) {
+          << op.second.to_double() << ");\n";
+      } else if (type==kHighsOptionTypeString) {
         g << "Highs_setStringOptionValue(d->highs, " << g.constant(op.first) << ", "
           << g.constant(op.second.to_string()) << ");\n";
       } else {
-        casadi_assert(false, "Option type for '" + op.first + "'not supported!");
+        casadi_error("Unknown option type for '" + op.first + "'.");
       }
     }
+    Highs_destroy(h);
 
     g << "casadi_highs_solve(d, arg, res, iw, w);\n";
 
