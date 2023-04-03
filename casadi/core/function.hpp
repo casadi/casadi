@@ -1222,15 +1222,15 @@ namespace casadi {
       * \param[in] max_depth  Maximum depth - a negative number indicates no maximum
 
         \identifier{1y6} */
-    std::vector<Function> find(casadi_int max_depth = -1) const;
+    std::vector<Function> find_functions(casadi_int max_depth = -1) const;
 
     /** \brief  Get a specific function embedded in the expression graphs
 
-      * \param[in] max_depth  Maximum depth - a negative number indicates no maximum
       * \param[in] name  Name of function needed
+      * \param[in] max_depth  Maximum depth - a negative number indicates no maximum
 
         \identifier{1y7} */
-    Function find(casadi_int max_depth, const std::string &name) const;
+    Function find_function(const std::string &name, casadi_int max_depth=-1) const;
 
     /** Obtain information about function */
     Dict info() const;
