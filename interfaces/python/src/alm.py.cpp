@@ -28,65 +28,65 @@ using namespace std::chrono_literals;
 #include "kwargs-to-struct.hpp"
 #include "member.hpp"
 #include "params/alm-params.hpp"
+#include "type-erased-alm-solver.hpp"
 #include "type-erased-inner-solver.hpp"
-#include "type-erased-panoc-direction.hpp"
 
 template <alpaqa::Config Conf>
 void register_alm(py::module_ &m) {
     USING_ALPAQA_CONFIG(Conf);
 
-    using TypeErasedPANOCDirection = alpaqa::TypeErasedPANOCDirection<config_t>;
-    using PANOCSolver              = alpaqa::PANOCSolver<TypeErasedPANOCDirection>;
-    using TypeErasedProblem        = alpaqa::TypeErasedProblem<config_t>;
-    using InnerSolver              = alpaqa::TypeErasedInnerSolver<config_t>;
+    using TEProblem          = alpaqa::TypeErasedProblem<config_t>;
+    using TEOCProblem        = alpaqa::TypeErasedControlProblem<config_t>;
+    using InnerSolver        = alpaqa::TypeErasedInnerSolver<config_t, TEProblem>;
+    using InnerOCPSolver     = alpaqa::TypeErasedInnerSolver<config_t, TEOCProblem>;
     using DefaultInnerSolver = alpaqa::PANOCSolver<alpaqa::StructuredLBFGSDirection<config_t>>;
-    py::class_<InnerSolver>(m, "InnerSolver")
-        .def(py::init<PANOCSolver>())
-        .def_property_readonly("name", &InnerSolver::template get_name<>);
 
-    using ALMSolver = alpaqa::ALMSolver<InnerSolver>;
-    using ALMParams = typename ALMSolver::Params;
+    using ALMSolver    = alpaqa::ALMSolver<InnerSolver>;
+    using ALMOCPSolver = alpaqa::ALMSolver<InnerOCPSolver>;
+    using ALMParams    = alpaqa::ALMParams<config_t>;
+    using TEALMSolver  = alpaqa::TypeErasedALMSolver<config_t>;
     register_dataclass<ALMParams>(m, "ALMParams",
                                   "C++ documentation: :cpp:class:`alpaqa::ALMParams`");
 
-    auto safe_alm_call = [](ALMSolver &solver, const TypeErasedProblem &p, std::optional<vec> x,
-                            std::optional<vec> y, bool async) -> std::tuple<vec, vec, py::dict> {
-        alpaqa::util::check_dim_msg<config_t>(x, p.get_n(),
-                                              "Length of x does not match problem size problem.n");
-        alpaqa::util::check_dim_msg<config_t>(y, p.get_m(),
-                                              "Length of y does not match problem size problem.m");
-        auto invoke_solver = [&] { return solver(p, *x, *y); };
-        auto stats         = async_solve(async, solver, invoke_solver, p);
-        return std::make_tuple(std::move(*x), std::move(*y),
-                               alpaqa::conv::stats_to_dict<InnerSolver>(std::move(stats)));
-    };
-
-    py::class_<ALMSolver> almsolver(m, "ALMSolver",
-                                    "Main augmented Lagrangian solver.\n\n"
-                                    "C++ documentation: :cpp:class:`alpaqa::ALMSolver`");
+    py::class_<TEALMSolver> almsolver(m, "ALMSolver",
+                                      "Main augmented Lagrangian solver.\n\n"
+                                      "C++ documentation: :cpp:class:`alpaqa::ALMSolver`");
+    default_copy_methods(almsolver);
     almsolver
         // Default constructor
         .def(py::init([] {
-                 return std::make_unique<ALMSolver>(ALMParams{},
-                                                    InnerSolver::template make<DefaultInnerSolver>(
-                                                        alpaqa::PANOCParams<config_t>{}));
+                 return std::make_unique<TEALMSolver>(
+                     alpaqa::util::te_in_place<ALMSolver>, ALMParams{},
+                     InnerSolver::template make<DefaultInnerSolver>(
+                         alpaqa::PANOCParams<config_t>{}));
              }),
              "Build an ALM solver using Structured PANOC as inner solver.")
         // Solver only
-        .def(py::init([](const PANOCSolver &inner) {
-                 return std::make_unique<ALMSolver>(ALMParams{}, InnerSolver{inner});
+        .def(py::init([](const InnerSolver &inner) {
+                 return std::make_unique<TEALMSolver>(alpaqa::util::te_in_place<ALMSolver>,
+                                                      ALMParams{}, inner);
              }),
-             "inner_solver"_a, "Build an ALM solver using PANOC as inner solver.")
+             "inner_solver"_a, "Build an ALM solver using the given inner solver.")
+        .def(py::init([](const InnerOCPSolver &inner) {
+                 return std::make_unique<TEALMSolver>(alpaqa::util::te_in_place<ALMOCPSolver>,
+                                                      ALMParams{}, inner);
+             }),
+             "inner_solver"_a, "Build an ALM solver using the given inner solver.")
         // Params and solver
-        .def(py::init([](params_or_dict<ALMParams> params, const PANOCSolver &inner) {
-                 return std::make_unique<ALMSolver>(var_kwargs_to_struct(params),
-                                                    InnerSolver{inner});
+        .def(py::init([](params_or_dict<ALMParams> params, const InnerSolver &inner) {
+                 return std::make_unique<TEALMSolver>(alpaqa::util::te_in_place<ALMSolver>,
+                                                      var_kwargs_to_struct(params), inner);
              }),
-             "alm_params"_a, "inner_solver"_a, "Build an ALM solver using PANOC as inner solver.")
+             "alm_params"_a, "inner_solver"_a, "Build an ALM solver using the given inner solver.")
+        .def(py::init([](params_or_dict<ALMParams> params, const InnerOCPSolver &inner) {
+                 return std::make_unique<TEALMSolver>(alpaqa::util::te_in_place<ALMOCPSolver>,
+                                                      var_kwargs_to_struct(params), inner);
+             }),
+             "alm_params"_a, "inner_solver"_a, "Build an ALM solver using the given inner solver.")
         // Other functions and properties
-        .def_property_readonly("inner_solver", member_ref<&ALMSolver::inner_solver>())
-        .def("__call__", safe_alm_call, "problem"_a, "x"_a = std::nullopt, "y"_a = std::nullopt,
-             "asynchronous"_a = true,
+        .def_property_readonly("inner_solver", &TEALMSolver::get_inner_solver)
+        .def("__call__", &TEALMSolver::operator(), "problem"_a, "x"_a = std::nullopt,
+             "y"_a = std::nullopt, "asynchronous"_a = true,
              "Solve.\n\n"
              ":param problem: Problem to solve.\n"
              ":param x: Initial guess for decision variables :math:`x`\n\n"
@@ -95,9 +95,10 @@ void register_alm(py::module_ &m) {
              ":return: * Solution :math:`x`\n"
              "         * Lagrange multipliers :math:`y` at the solution\n"
              "         * Statistics\n\n")
-        .def("__str__", &ALMSolver::get_name)
-        .def_property_readonly("params", &ALMSolver::get_params);
-    default_copy_methods(almsolver);
+        .def("stop", &TEALMSolver::stop)
+        .def_property_readonly("name", &TEALMSolver::get_name)
+        .def("__str__", &TEALMSolver::get_name)
+        .def_property_readonly("params", &TEALMSolver::get_params);
 }
 
 template void register_alm<alpaqa::EigenConfigd>(py::module_ &);

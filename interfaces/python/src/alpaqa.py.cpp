@@ -15,6 +15,9 @@ template <alpaqa::Config Conf>
 void register_control_problems(py::module_ &m);
 
 template <alpaqa::Config Conf>
+void register_inner_solver(py::module_ &m);
+
+template <alpaqa::Config Conf>
 void register_lbfgs(py::module_ &m);
 
 template <alpaqa::Config Conf>
@@ -47,6 +50,7 @@ template <alpaqa::Config Conf>
 void register_classes_for(py::module_ &m) {
     register_problems<Conf>(m);
     register_control_problems<Conf>(m);
+    register_inner_solver<Conf>(m);
     register_lbfgs<Conf>(m);
     register_anderson<Conf>(m);
     register_panoc_directions<Conf>(m);

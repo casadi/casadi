@@ -25,6 +25,7 @@ pybind11_add_module(_alpaqa MODULE
     "src/panoc.py.cpp"
     "src/panoc-directions.py.cpp"
     "src/problems.py.cpp"
+    "src/inner-solver.py.cpp"
     "src/control-problems.py.cpp"
     "src/params/alm-params.cpp"
     "src/params/anderson-direction-params.cpp"
@@ -54,14 +55,18 @@ set_target_properties(_alpaqa PROPERTIES
     CXX_VISIBILITY_PRESET "hidden"
     VISIBILITY_INLINES_HIDDEN true
     RELEASE_POSTFIX ""
-    DEBUG_POSTFIX "_d"
+    DEBUG_POSTFIX ""
     RELWITHDEBINFO_POSTFIX ""
     MINSIZEREL_POSTFIX ""
 )
-if (ALPAQA_RELWITHDEBINFO_IS_DEBUG)
+set(ALPAQA_PYTHON_DEBUG_CONFIG "Debug" CACHE STRING "")
+set_property(CACHE ALPAQA_PYTHON_DEBUG_CONFIG PROPERTY STRINGS
+    ${CMAKE_CONFIGURATION_TYPES})
+if (ALPAQA_PYTHON_DEBUG_CONFIG)
+    string(TOUPPER ${ALPAQA_PYTHON_DEBUG_CONFIG} ALPAQA_PYTHON_DEBUG_CONFIG_UP)
     set_target_properties(_alpaqa PROPERTIES
-        RELWITHDEBINFO_POSTFIX "_d"
-        PDB_NAME_RELWITHDEBINFO "_alpaqa_d")
+        ${ALPAQA_PYTHON_DEBUG_CONFIG_UP}_POSTFIX "_d"
+        PDB_NAME_${ALPAQA_PYTHON_DEBUG_CONFIG_UP} "_alpaqa_d")
 endif()
 if (CMAKE_SYSTEM_NAME MATCHES "Linux")
     target_link_options(_alpaqa PRIVATE "LINKER:--exclude-libs,ALL")
@@ -98,9 +103,15 @@ alpaqa_install_debug_syms(_alpaqa python_modules_debug
     ${PY_BUILD_CMAKE_MODULE_NAME} ${PY_BUILD_CMAKE_MODULE_NAME})
 
 # Generate stubs for the Python module
+if (NOT CMAKE_CROSSCOMPILING)
+    set(ALPAQA_WITH_PY_STUBS_DEFAULT On)
+else()
+    set(ALPAQA_WITH_PY_STUBS_DEFAULT Off)
+endif()
 option(ALPAQA_WITH_PY_STUBS
-    "Generate Python stub files (.pyi) for the Python module." On)
-if (ALPAQA_WITH_PY_STUBS AND NOT CMAKE_CROSSCOMPILING)
+    "Generate Python stub files (.pyi) for the Python module."
+    ${ALPAQA_WITH_PY_STUBS_DEFAULT})
+if (ALPAQA_WITH_PY_STUBS)
     include(cmake/Pybind11Stubgen.cmake)
     pybind11_stubgen(_alpaqa)
     pybind11_stubgen_install(_alpaqa ${PY_BUILD_CMAKE_MODULE_NAME})

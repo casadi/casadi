@@ -2,15 +2,20 @@
 
 #include <alpaqa/inner/inner-solve-options.hpp>
 #include <alpaqa/problem/type-erased-problem.hpp>
+#include <optional>
+
+#include <pybind11/pybind11.h>
+namespace py = pybind11;
+
 #include "type-erased-solver-stats.hpp"
 
 namespace alpaqa {
 
-template <Config Conf>
+template <Config Conf, class ProblemT>
 struct InnerSolverVTable : util::BasicVTable {
     USING_ALPAQA_CONFIG(Conf);
     using Stats        = TypeErasedInnerSolverStats<Conf>;
-    using Problem      = TypeErasedProblem<Conf>;
+    using Problem      = ProblemT;
     using SolveOptions = InnerSolveOptions<config_t>;
 
     // clang-format off
@@ -34,11 +39,12 @@ struct InnerSolverVTable : util::BasicVTable {
     InnerSolverVTable() = default;
 };
 
-template <Config Conf = DefaultConfig, class Allocator = std::allocator<std::byte>>
-class TypeErasedInnerSolver : public util::TypeErased<InnerSolverVTable<Conf>, Allocator> {
+template <Config Conf, class ProblemT, class Allocator = std::allocator<std::byte>>
+class TypeErasedInnerSolver
+    : public util::TypeErased<InnerSolverVTable<Conf, ProblemT>, Allocator> {
   public:
     USING_ALPAQA_CONFIG(Conf);
-    using VTable         = InnerSolverVTable<Conf>;
+    using VTable         = InnerSolverVTable<Conf, ProblemT>;
     using allocator_type = Allocator;
     using TypeErased     = util::TypeErased<VTable, allocator_type>;
     using Stats          = typename VTable::Stats;
@@ -60,14 +66,29 @@ class TypeErasedInnerSolver : public util::TypeErased<InnerSolverVTable<Conf>, A
     decltype(auto) operator()(Args &&...args) {
         return call(vtable.call, std::forward<Args>(args)...);
     }
-    template <class... Args>
-    decltype(auto) stop(Args &&...args) {
-        return call(vtable.stop, std::forward<Args>(args)...);
-    }
-    template <class... Args>
-    decltype(auto) get_name(Args &&...args) const {
-        return call(vtable.get_name, std::forward<Args>(args)...);
-    }
+    decltype(auto) stop() { return call(vtable.stop); }
+    decltype(auto) get_name() const { return call(vtable.get_name); }
 };
 
 } // namespace alpaqa
+
+template <class InnerSolverT>
+struct InnerSolverConversion {
+    using InnerSolver = InnerSolverT;
+    std::optional<py::class_<InnerSolver>> cls;
+    void initialize(py::class_<InnerSolver> &&cls) {
+        assert(!this->cls);
+        this->cls.emplace(std::move(cls));
+    }
+    template <class T>
+    void implicitly_convertible_to() {
+        assert(this->cls);
+        cls->def(py::init([](const T &t) { return std::make_unique<InnerSolver>(t); }));
+        py::implicitly_convertible<T, InnerSolver>();
+    }
+};
+
+/// Global instance of the py::class_<InnerSolverT> binding, for registering
+/// converting constructors from concrete inner solvers later.
+template <class InnerSolverT>
+inline InnerSolverConversion<InnerSolverT> inner_solver_class;

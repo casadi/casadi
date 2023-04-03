@@ -1,5 +1,5 @@
 #include <alpaqa/config/config.hpp>
-#include "copy.hpp"
+#include <pybind11/attr.h>
 #include <pybind11/eigen.h>
 #include <pybind11/functional.h>
 #include <pybind11/pybind11.h>
@@ -15,6 +15,8 @@ using namespace py::literals;
 #include <alpaqa/casadi/CasADiControlProblem.hpp>
 #endif
 
+#include "copy.hpp"
+
 template <alpaqa::Config Conf>
 void register_control_problems(py::module_ &m) {
     USING_ALPAQA_CONFIG(Conf);
@@ -26,12 +28,19 @@ void register_control_problems(py::module_ &m) {
     default_copy_methods(te_problem);
 
     // ProblemWithCounters
+    struct ControlProblemWithCounters {
+        ControlProblem problem;
+        std::shared_ptr<alpaqa::OCPEvalCounter> evaluations;
+    };
+    py::class_<ControlProblemWithCounters>(m, "ControlProblemWithCounters")
+        .def_readonly("problem", &ControlProblemWithCounters::problem)
+        .def_readonly("evaluations", &ControlProblemWithCounters::evaluations);
     if constexpr (std::is_same_v<typename Conf::real_t, double>) {
-        static constexpr auto te_pwc = []<class P>(P &&p) {
-            using PwC = alpaqa::ControlProblemWithCounters<std::remove_cvref_t<P>>;
+        static constexpr auto te_pwc = []<class P>(P &&p) -> ControlProblemWithCounters {
+            using PwC = alpaqa::ControlProblemWithCounters<P>;
             auto te_p = ControlProblem::template make<PwC>(std::forward<P>(p));
             auto eval = te_p.template as<PwC>().evaluations;
-            return std::make_tuple(std::move(te_p), std::move(eval));
+            return {std::move(te_p), std::move(eval)};
         };
 
 #if ALPAQA_HAVE_CASADI_OCP
@@ -94,8 +103,8 @@ void register_control_problems(py::module_ &m) {
 
 #if ALPAQA_HAVE_CASADI_OCP
         m.def(
-            "control_problem_with_counters",
-            [](const CasADiControlProblem &p) { return te_pwc(p); }, "problem"_a,
+            "control_problem_with_counters", [](CasADiControlProblem &p) { return te_pwc(p); },
+            py::keep_alive<0, 1>(), "problem"_a,
             "Wrap the problem to count all function evaluations.\n\n"
             ":param problem: The original problem to wrap. Copied.\n"
             ":return: * Wrapped problem.\n"

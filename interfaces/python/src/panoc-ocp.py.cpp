@@ -18,10 +18,14 @@ using namespace py::literals;
 #include "member.hpp"
 #include "params/params.hpp"
 #include "stats-to-dict.hpp"
+#include "type-erased-inner-solver.hpp"
 
 template <alpaqa::Config Conf>
 void register_panoc_ocp(py::module_ &m) {
     USING_ALPAQA_CONFIG(Conf);
+
+    using TEOCProblem    = alpaqa::TypeErasedControlProblem<config_t>;
+    using InnerOCPSolver = alpaqa::TypeErasedInnerSolver<config_t, TEOCProblem>;
 
     // ----------------------------------------------------------------------------------------- //
     using PANOCOCPParams = alpaqa::PANOCOCPParams<config_t>;
@@ -72,26 +76,8 @@ void register_panoc_ocp(py::module_ &m) {
         .def(py::init([](params_or_dict<PANOCOCPParams> params) {
                  return PANOCOCPSolver{var_kwargs_to_struct(params)};
              }),
-             "panoc_params"_a, "Create a PANOC solver.")
-        // Call
-        .def("__call__", checked_inner_solve<PANOCOCPSolver, ControlProblem>(), "problem"_a,
-             "opts"_a = py::dict(), "u"_a = py::none(), "y"_a = py::none(), "Σ"_a = py::none(),
-             "asynchronous"_a = true,
-             "Solve.\n\n"
-             ":param problem: Problem to solve\n"
-             ":param opts: Options\n"
-             ":param u: Initial guess\n"
-             ":param y: Lagrange multipliers\n"
-             ":param Σ: Penalty factors\n"
-             ":param asynchronous: Release the GIL and run the solver on a separate thread\n"
-             ":return: * Solution :math:`u`\n"
-             "         * Updated Lagrange multipliers (only if parameter ``y`` was not ``None``)\n"
-             "         * Constraint violation (only if parameter ``y`` was not ``None``)\n"
-             "         * Statistics\n\n")
-        .def("__str__", &PANOCOCPSolver::get_name)
-        .def("set_progress_callback", &PANOCOCPSolver::set_progress_callback, "callback"_a,
-             "Specify a callable that is invoked with some intermediate results on each iteration "
-             "of the algorithm.");
+             "panoc_params"_a, "Create a PANOC solver.");
+    register_inner_solver_methods<PANOCOCPSolver, ControlProblem, InnerOCPSolver>(panoc_ocp_solver);
 }
 
 template void register_panoc_ocp<alpaqa::EigenConfigd>(py::module_ &);

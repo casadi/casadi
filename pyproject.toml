@@ -86,7 +86,7 @@ config = ["RelWithDebInfo", "Release"]
 [tool.py-build-cmake.windows.cmake.options]
 CMAKE_CXX_FLAGS_RELWITHDEBINFO = "/Zi /Ob0 /Od /RTC1"
 CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO = "/INCREMENTAL:NO /DEBUG:FULL /OPT:REF"
-"ALPAQA_RELWITHDEBINFO_IS_DEBUG:BOOL" = "On"
+ALPAQA_PYTHON_DEBUG_CONFIG = "RelWithDebInfo"
 
 [tool.py-build-cmake.stubgen]
 args = ["-v"]

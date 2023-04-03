@@ -16,15 +16,20 @@ using namespace py::literals;
 #include <alpaqa/util/check-dim.hpp>
 
 #include "async.hpp"
+#include "copy.hpp"
+#include "inner-solve.hpp"
 #include "member.hpp"
 #include "params/params.hpp"
 #include "stats-to-dict.hpp"
+#include "type-erased-inner-solver.hpp"
 #include "type-erased-panoc-direction.hpp"
 
 template <alpaqa::Config Conf>
 void register_panoc(py::module_ &m) {
     USING_ALPAQA_CONFIG(Conf);
 
+    using TEProblem         = alpaqa::TypeErasedProblem<config_t>;
+    using InnerSolver       = alpaqa::TypeErasedInnerSolver<config_t, TEProblem>;
     using InnerSolveOptions = alpaqa::InnerSolveOptions<config_t>;
     register_dataclass<InnerSolveOptions>(m, "InnerSolveOptions");
     py::implicitly_convertible<py::dict, InnerSolveOptions>();
@@ -76,39 +81,13 @@ void register_panoc(py::module_ &m) {
             "Fixed-point residual :math:`\\left\\|p\\right\\| / \\gamma`");
 
     // Solve without ALM
-    using PANOCSolver            = alpaqa::PANOCSolver<TypeErasedPANOCDirection>;
-    using Problem                = typename PANOCSolver::Problem;
-    auto panoc_independent_solve = [](PANOCSolver &solver, const Problem &problem,
-                                      const InnerSolveOptions &opt, std::optional<vec> x,
-                                      std::optional<vec> y, std::optional<vec> Σ, bool async) {
-        auto n     = problem.get_n();
-        auto m     = problem.get_m();
-        bool ret_y = y.has_value();
-        if (x)
-            alpaqa::util::check_dim<config_t>("x", *x, n);
-        else
-            x = vec::Zero(n);
-        if (y)
-            alpaqa::util::check_dim<config_t>("y", *y, m);
-        else
-            y = vec::Zero(m);
-        if (Σ)
-            alpaqa::util::check_dim<config_t>("Σ", *Σ, m);
-        else if (m == 0)
-            Σ = vec{};
-        else
-            throw std::invalid_argument("Missing argument Σ");
-        vec err_z          = vec::Zero(m);
-        auto invoke_solver = [&] { return solver(problem, opt, *x, *y, *Σ, err_z); };
-        auto &&stats       = async_solve(async, solver, invoke_solver, problem);
-        if (ret_y)
-            return py::make_tuple(std::move(*x), std::move(*y), std::move(err_z),
-                                  alpaqa::conv::stats_to_dict(stats));
-        else
-            return py::make_tuple(std::move(*x), alpaqa::conv::stats_to_dict(stats));
-    };
+    using PANOCSolver = alpaqa::PANOCSolver<TypeErasedPANOCDirection>;
+    using Problem     = typename PANOCSolver::Problem;
 
-    py::class_<PANOCSolver>(m, "PANOCSolver", "C++ documentation: :cpp:class:`alpaqa::PANOCSolver`")
+    py::class_<PANOCSolver> panoc_solver(m, "PANOCSolver",
+                                         "C++ documentation: :cpp:class:`alpaqa::PANOCSolver`");
+    default_copy_methods(panoc_solver);
+    panoc_solver
         // Constructors
         .def(py::init([](params_or_dict<PANOCParams> params,
                          params_or_dict<LBFGSParams> lbfgs_params,
@@ -127,37 +106,8 @@ void register_panoc(py::module_ &m) {
                                         typename PANOCSolver::Direction{direction}};
                  }),
              "panoc_params"_a, "direction"_a, "Create a PANOC solver using a custom direction.")
-        // Copy
-        .def("__copy__", [](const PANOCSolver &self) { return PANOCSolver{self}; })
-        .def(
-            "__deepcopy__", [](const PANOCSolver &self, py::dict) { return PANOCSolver{self}; },
-            "memo"_a)
-        // Call
-        .def("__call__", panoc_independent_solve, "problem"_a, "opts"_a = py::dict(),
-             "x"_a = py::none(), "y"_a = py::none(), "Σ"_a = py::none(), "asynchronous"_a = true, //
-             "Solve.\n\n"
-             ":param problem: Problem to solve\n"
-             ":param opts: Solve options\n"
-             ":param x: Initial guess\n"
-             ":param y: Initial Lagrange multipliers\n\n"
-             ":param Σ: Penalty factor\n"
-             ":param asynchronous: Release the GIL and run the solver on a separate thread\n"
-             ":return: * Solution :math:`x`\n"
-             "         * (Optional) Updated Lagrange multipliers :math:`y`\n"
-             "         * (Optional) Slack variable error :math:`g(x) - z`\n"
-             "         * Statistics\n\n"
-             "The updated multipliers and slack variable error are only returned if ``y`` is not "
-             "``None``\n\n")
-        .def("__str__", &PANOCSolver::get_name)
-        .def("set_progress_callback", &PANOCSolver::set_progress_callback, "callback"_a,
-             "Specify a callable that is invoked with some intermediate results on each iteration "
-             "of the algorithm.")
-        .def_property_readonly("direction",
-                               py::cpp_function(
-                                   [](const PANOCSolver &s) -> const TypeErasedPANOCDirection & {
-                                       return s.direction;
-                                   },
-                                   py::return_value_policy::reference_internal));
+        .def_property_readonly("direction", member_ref<&PANOCSolver::direction>());
+    register_inner_solver_methods<PANOCSolver, Problem, InnerSolver>(panoc_solver);
 }
 
 template void register_panoc<alpaqa::EigenConfigd>(py::module_ &);

@@ -3,6 +3,7 @@
 #include <pybind11/functional.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+#include <memory>
 #include <sstream>
 #include <variant>
 
@@ -14,6 +15,9 @@ using namespace py::literals;
 #if ALPAQA_HAVE_CASADI
 #include <alpaqa/casadi/CasADiProblem.hpp>
 #endif
+
+#include "copy.hpp"
+#include "member.hpp"
 
 template <class FuncProb, auto py_f, auto f, class Ret, class... Args>
 void functional_setter_ret(FuncProb &p, std::optional<py::object> o) {
@@ -41,33 +45,15 @@ void functional_setter_out(FuncProb &p, std::optional<py::object> o) {
     }
 };
 
-template <class T, class A>
-auto vector_getter(A T::*attr) {
-    return py::cpp_function([attr](T &self) -> typename T::rvec { return self.*attr; },
-                            py::return_value_policy::reference_internal);
-}
-
-template <class T, class A>
-auto vector_setter(A T::*attr, std::string_view name) {
-    return py::cpp_function([attr, name](T &self, typename T::crvec value) {
-        if (value.size() != (self.*attr).size())
-            throw std::invalid_argument("Invalid dimension for '" + std::string(name) + "': got " +
-                                        std::to_string(value.size()) + ", should be " +
-                                        std::to_string((self.*attr).size()) + ".");
-        self.*attr = value;
-    });
-}
-
 template <alpaqa::Config Conf>
 void register_problems(py::module_ &m) {
     USING_ALPAQA_CONFIG(Conf);
     using alpaqa::util::check_dim;
 
     using Box = alpaqa::Box<config_t>;
-    py::class_<Box>(m, "Box", "C++ documentation: :cpp:class:`alpaqa::Box`")
-        .def("__copy__", [](const Box &self) { return Box{self}; })
-        .def(
-            "__deepcopy__", [](const Box &self, py::dict) { return Box{self}; }, "memo"_a)
+    py::class_<Box> box(m, "Box", "C++ documentation: :cpp:class:`alpaqa::Box`");
+    default_copy_methods(box);
+    box //
         .def(py::pickle(
             [](const Box &b) { // __getstate__
                 return py::make_tuple(b.upperbound, b.lowerbound);
@@ -87,21 +73,19 @@ void register_problems(py::module_ &m) {
                  return Box::from_lower_upper(std::move(lower), std::move(upper));
              }),
              py::kw_only(), "lower"_a, "upper"_a, "Create a box with the given bounds.")
-        .def_property("lowerbound", vector_getter(&Box::lowerbound),
-                      vector_setter(&Box::lowerbound, "lowerbound"))
-        .def_property("upperbound", vector_getter(&Box::upperbound),
-                      vector_setter(&Box::upperbound, "upperbound"));
+        .def_property("lowerbound", vector_getter<&Box::lowerbound>(),
+                      vector_setter<&Box::lowerbound>("lowerbound"))
+        .def_property("upperbound", vector_getter<&Box::upperbound>(),
+                      vector_setter<&Box::upperbound>("upperbound"));
 
     using BoxConstrProblem = alpaqa::BoxConstrProblem<config_t>;
-    py::class_<BoxConstrProblem>(m, "BoxConstrProblem",
-                                 "C++ documentation: :cpp:class:`alpaqa::BoxConstrProblem`")
+    py::class_<BoxConstrProblem> box_constr_problem(
+        m, "BoxConstrProblem", "C++ documentation: :cpp:class:`alpaqa::BoxConstrProblem`");
+    default_copy_methods(box_constr_problem);
+    box_constr_problem //
         .def(py::init<length_t, length_t>(), "n"_a, "m"_a,
              ":param n: Number of unknowns\n"
              ":param m: Number of constraints")
-        .def("__copy__", [](const BoxConstrProblem &self) { return BoxConstrProblem{self}; })
-        .def(
-            "__deepcopy__",
-            [](const BoxConstrProblem &self, py::dict) { return BoxConstrProblem{self}; }, "memo"_a)
         .def(py::pickle(
             [](const BoxConstrProblem &self) { // __getstate__
                 self.check();
@@ -202,12 +186,8 @@ void register_problems(py::module_ &m) {
     using TEProblem = alpaqa::TypeErasedProblem<config_t>;
     py::class_<TEProblem> te_problem(m, "Problem",
                                      "C++ documentation: :cpp:class:`alpaqa::TypeErasedProblem`");
+    default_copy_methods(te_problem);
     te_problem //
-        .def(py::init<const TEProblem &>())
-        .def("__copy__", [](const TEProblem &self) { return TEProblem{self}; })
-        .def(
-            "__deepcopy__", [](const TEProblem &self, py::dict) { return TEProblem{self}; },
-            "memo"_a)
         // clang-format off
         .def("eval_proj_diff_g", &TEProblem::eval_proj_diff_g, "z"_a, "e"_a)
         .def("eval_proj_multipliers", &TEProblem::eval_proj_multipliers, "y"_a, "M"_a)
@@ -313,11 +293,18 @@ void register_problems(py::module_ &m) {
             "x"_a, "y"_a, "Σ"_a);
 
     // ProblemWithCounters
-    static constexpr auto te_pwc = []<class P>(P &&p) {
-        using PwC = alpaqa::ProblemWithCounters<std::remove_cvref_t<P>>;
+    struct ProblemWithCounters {
+        TEProblem problem;
+        std::shared_ptr<alpaqa::EvalCounter> evaluations;
+    };
+    py::class_<ProblemWithCounters>(m, "ProblemWithCounters")
+        .def_readonly("problem", &ProblemWithCounters::problem)
+        .def_readonly("evaluations", &ProblemWithCounters::evaluations);
+    static constexpr auto te_pwc = []<class P>(P &&p) -> ProblemWithCounters {
+        using PwC = alpaqa::ProblemWithCounters<P>;
         auto te_p = TEProblem::template make<PwC>(std::forward<P>(p));
         auto eval = te_p.template as<PwC>().evaluations;
-        return std::make_tuple(std::move(te_p), std::move(eval));
+        return {std::move(te_p), std::move(eval)};
     };
 
     if constexpr (std::is_same_v<typename Conf::real_t, double>) {
@@ -333,14 +320,12 @@ void register_problems(py::module_ &m) {
         };
 #endif
 
-        py::class_<CasADiProblem, BoxConstrProblem>(
+        py::class_<CasADiProblem, BoxConstrProblem> casadi_problem(
             m, "CasADiProblem",
             "C++ documentation: :cpp:class:`alpaqa::CasADiProblem`\n\n"
-            "See :py:class:`alpaqa._alpaqa.float64.Problem` for the full documentation.")
-            .def("__copy__", [](const CasADiProblem &self) { return CasADiProblem{self}; })
-            .def(
-                "__deepcopy__",
-                [](const CasADiProblem &self, py::dict) { return CasADiProblem{self}; }, "memo"_a)
+            "See :py:class:`alpaqa._alpaqa.float64.Problem` for the full documentation.");
+        default_copy_methods(casadi_problem);
+        casadi_problem
 #if ALPAQA_HAVE_CASADI
             // clang-format off
             .def("eval_f", &CasADiProblem::eval_f, "x"_a)
@@ -427,7 +412,8 @@ void register_problems(py::module_ &m) {
 
 #if ALPAQA_HAVE_CASADI
         m.def(
-            "problem_with_counters", [](const CasADiProblem &p) { return te_pwc(p); }, "problem"_a,
+            "problem_with_counters", [](CasADiProblem &p) { return te_pwc(p); },
+            py::keep_alive<0, 1>(), "problem"_a,
             "Wrap the problem to count all function evaluations.\n\n"
             ":param problem: The original problem to wrap. Copied.\n"
             ":return: * Wrapped problem.\n"
@@ -436,7 +422,7 @@ void register_problems(py::module_ &m) {
     }
     m.def(
         "problem_with_counters", [](py::object p) { return te_pwc(PyProblem{std::move(p)}); },
-        "problem"_a);
+        py::keep_alive<0, 1>(), "problem"_a);
 
     m.def("provided_functions", [](const TEProblem &problem) {
         std::ostringstream os;

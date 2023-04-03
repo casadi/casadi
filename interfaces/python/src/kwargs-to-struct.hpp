@@ -13,7 +13,6 @@
 #include <variant>
 
 #include <pybind11/chrono.h>
-#include <pybind11/detail/typeid.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 namespace py = pybind11;
@@ -62,6 +61,19 @@ template <class T>
 struct dict_to_struct_table {};
 
 template <class T>
+auto possible_dict_keys() {
+    const auto &tbl = dict_to_struct_table<T>::table;
+    if (tbl.empty())
+        return std::string{};
+    auto penult       = std::prev(tbl.end());
+    auto quote_concat = [](std::string &&a, auto b) {
+        return a + "'" + std::string(b.first) + "', ";
+    };
+    return std::accumulate(tbl.begin(), penult, std::string{}, quote_concat) + "'" +
+           std::string(penult->first) + "'";
+}
+
+template <class T>
     requires requires { dict_to_struct_table<T>::table; }
 void dict_to_struct_helper(T &t, const py::dict &kwargs) {
     const auto &m = dict_to_struct_table<T>::table;
@@ -69,7 +81,8 @@ void dict_to_struct_helper(T &t, const py::dict &kwargs) {
         auto skey = key.template cast<std::string>();
         auto it   = m.find(skey);
         if (it == m.end())
-            throw py::key_error("Unknown parameter " + skey);
+            throw py::key_error("Unknown parameter '" + skey +
+                                "',\npossible keys are: " + possible_dict_keys<T>());
         try {
             it->second.set(t, val);
         } catch (const cast_error_with_types &e) {

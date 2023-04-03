@@ -23,7 +23,7 @@ template <Config Conf>
 struct TypeErasedInnerSolverStats;
 
 namespace detail {
-auto make_dict_threadsafe() {
+inline auto make_dict_threadsafe() {
     struct deleter {
         void operator()(py::dict *self) const {
             py::gil_scoped_acquire gil;
