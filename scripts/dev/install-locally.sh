@@ -3,10 +3,17 @@ cd "$( dirname "${BASH_SOURCE[0]}" )"/../..
 
 set -ex
 
+# Determine architecture
+case $(uname -m) in
+    x86_64) triple="x86_64-centos7-linux-gnu" ;;
+    armv6l) triple="armv6-rpi-linux-gnueabihf" ;;
+    armv7l) triple="armv7-neon-linux-gnueabihf" ;;
+    aarch64) triple="aarch64-rpi3-linux-gnu" ;;
+esac
+
 # Download compiler
-download_url="https://github.com/tttapa/cross-python/releases/download/0.0.11"
+download_url="https://github.com/tttapa/cross-python/releases/download/0.0.12"
 tools_dir="$PWD/toolchains"
-triple="x86_64-centos7-linux-gnu"
 pfx="$tools_dir/$triple"
 mkdir -p "$tools_dir"
 if [ ! -d "$pfx" ]; then
@@ -54,6 +61,8 @@ generator = "Ninja Multi-Config"
 [cmake.options]
 CMAKE_FIND_ROOT_PATH = "$pfx/pybind11;$pfx/casadi;$pfx/eigen-master"
 USE_GLOBAL_PYBIND11 = "On"
+ALPAQA_PYTHON_DEBUG_CONFIG = "Debug"
+ALPAQA_WITH_PY_STUBS = "On"
 EOF
 . ./py-venv/bin/activate
 LDFLAGS='-static-libgcc -static-libstdc++' \
