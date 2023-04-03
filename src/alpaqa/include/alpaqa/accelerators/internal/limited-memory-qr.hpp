@@ -81,15 +81,16 @@ class LimitedMemoryQR {
     void remove_column() {
         assert(num_columns() > 0);
 
-        // After removing the first colomn of the upper triangular matrix R,
+        // After removing the first column of the upper triangular matrix R,
         // it becomes upper Hessenberg. Givens rotations are used to make it
         // triangular again.
         Eigen::JacobiRotation<real_t> G;
         index_t r = 0;                   // row index of R
         index_t c = r_succ(r_idx_start); // column index of R in storage
+        // Loop over the diagonal elements of R:
         while (r < q_idx - 1) {
             // Compute the Givens rotation that makes the subdiagonal element
-            // of column c or R zero.
+            // of column c of R zero.
             G.makeGivens(R(r, c), R(r + 1, c), &R(r, c));
             // Apply it to the remaining columns of R.
             // Not the current column, because the diagonal element was updated
