@@ -180,6 +180,13 @@ inline constexpr size_t required_te_buffer_size_for() {
     return *std::max_element(std::begin(sizes), std::end(sizes));
 }
 
+/// Similar to `std::in_place_t`.
+template <class T>
+struct te_in_place_t {};
+/// Convenience instance of @ref te_in_place_t.
+template <class T>
+inline constexpr te_in_place_t<T> te_in_place;
+
 /// Class for polymorphism through type erasure. Saves the entire vtable, and
 /// uses small buffer optimization.
 ///
@@ -349,6 +356,14 @@ class TypeErased {
         : allocator{alloc} {
         construct_inplace<std::remove_cvref_t<T>>(std::forward<T>(d));
     }
+    /// Main constructor that type-erases the object constructed from the given
+    /// argument.
+    template <class T, class Alloc, class... Args>
+    explicit TypeErased(std::allocator_arg_t, const Alloc &alloc,
+                        te_in_place_t<T>, Args &&...args)
+        : allocator{alloc} {
+        construct_inplace<std::remove_cvref_t<T>>(std::forward<Args>(args)...);
+    }
     /// @copydoc TypeErased(std::allocator_arg_t, const Alloc &, T &&)
     /// Requirement prevents this constructor from taking precedence over the
     /// copy and move constructors.
@@ -356,6 +371,12 @@ class TypeErased {
         requires no_child_of_ours<T>
     explicit TypeErased(T &&d) {
         construct_inplace<std::remove_cvref_t<T>>(std::forward<T>(d));
+    }
+    /// Main constructor that type-erases the object constructed from the given
+    /// argument.
+    template <class T, class... Args>
+    explicit TypeErased(te_in_place_t<T>, Args &&...args) {
+        construct_inplace<std::remove_cvref_t<T>>(std::forward<Args>(args)...);
     }
 
     /// Construct a type-erased wrapper of type Ret for an object of type T,
