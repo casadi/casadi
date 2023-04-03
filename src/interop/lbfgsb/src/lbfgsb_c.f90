@@ -3,6 +3,7 @@ module lbfgsb_c
    implicit none (type,external)
 
    interface
+      !> Main function from the original L-BFGS-B Fortran API.
       subroutine setulb(n, m, x, l, u, nbd, f, g, factr, pgtol, &
          wa, iwa, task, iprint, csave, lsave, isave, dsave)
          character(60)    task, csave
@@ -15,7 +16,8 @@ module lbfgsb_c
 
 contains
 
-   subroutine setulb_c(n, m, x, l, u, nbd, f, g, factr, pgtol, &
+   !> C interface to @ref setulb.
+   subroutine alpaqa_setulb_c(n, m, x, l, u, nbd, f, g, factr, pgtol, &
       wa, iwa, task, iprint, csave, lsave, isave, dsave) bind(C, name="alpaqa_setulb_c")
       integer(c_int), intent(in), value :: n, m
       real(c_double), intent(inout) :: x(n)
