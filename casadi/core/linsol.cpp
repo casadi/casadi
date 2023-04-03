@@ -25,6 +25,7 @@
 
 #include "linsol_internal.hpp"
 #include "mx_node.hpp"
+#include "serializer.hpp"
 
 namespace casadi {
 
@@ -216,6 +217,21 @@ namespace casadi {
 
   Dict Linsol::stats(int mem) const {
     return (*this)->get_stats((*this)->memory(mem));
+  }
+
+  Linsol Linsol::load(const std::string& filename) {
+    FileDeserializer fs(filename);
+    auto t = fs.pop_type();
+    if (t==SerializerBase::SerializationType::SERIALIZED_LINSOL) {
+      return fs.blind_unpack_linsol();
+    } else {
+      casadi_error("File is not loadable with 'load'. Use 'FileDeserializer' instead.");
+    }
+  }
+
+  void Linsol::save(const std::string &fname, const Dict& opts) const {
+    FileSerializer fs(fname, opts);
+    fs.pack(*this);
   }
 
   void Linsol::serialize(SerializingStream &s) const {

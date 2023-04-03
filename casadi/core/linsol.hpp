@@ -128,6 +128,12 @@ namespace casadi {
    /// Get all statistics obtained at the end of the last evaluate call
     Dict stats(int mem=1) const;
 
+    /** \brief Save Linear solver to a file */
+    void save(const std::string &fname, const Dict& opts=Dict()) const;
+
+    /** \brief Build linear solver from serialization */
+    static Linsol load(const std::string& filename);
+
     #ifndef SWIG
     ///@{
     /// Low-level API
