@@ -811,7 +811,7 @@ The first input and output are used for accumulating, while the remainder inputs
 The ``map``/``mapaccum`` operation exhibits a graph size and initialization time that scales logarithmically with :math:`n`.
 
 Conditional evaluation
-^^^^
+^^^^^^^^^^^^^^^^^^^^^^
 
 It is possible to include conditional evaluation of expressions in CasADi expression graphs by constucting ``conditional`` function instances. This function takes a number of existing ``Function`` instances,  :math:`f_1`, :math:`f_2`, :math:`f_n` as well as a "default" function :math:`f_{def}`. All these functions must have the same input and output signatures, i.e. the same number of inputs and outputs with the same dimensions:
 
@@ -823,7 +823,7 @@ It is possible to include conditional evaluation of expressions in CasADi expres
         f1 = Function("f1",[x],[cos(x)])
         f2 = Function("f2",[x],[tan(x)])
         f_cond = Function.conditional('f_cond', [f0, f1], f2)
-        print(cond_f)
+        print(f_cond)
 
     .. exec-block:: octave
 
@@ -832,7 +832,7 @@ It is possible to include conditional evaluation of expressions in CasADi expres
         f1 = Function('f1',{x},{cos(x)});
         f2 = Function('f2',{x},{tan(x)});
         f_cond = Function.conditional('f_cond', {f0, f1}, f2);
-        disp(F);
+        disp(f_cond);
 
 The result is a new function instance with the same input/output signature, but with one additional input corresponding to an index. Its evaluation corresponds to:
 

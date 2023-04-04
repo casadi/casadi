@@ -185,7 +185,7 @@ list of functions, see the C++ API documentation for |DaeBuilder|.
 .. _sec-modelica:
 
 Symbolic import of OCPs from Modelica
-----------------------------
+-------------------------------------
 
 Note: JModelica.org is no longer offered by Modelon. Its closed-source successor code, OCT,
 does retain CasADi interoperability however. Details of how to use OCT to generate CasADi
@@ -193,7 +193,7 @@ expressions is best described in OCT's user guide. The text in the following ref
 legacy Modelica interoperability support.
 
 Legacy symbolic import from XML files
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 An alternative to model directly in |casadi|, as above, is to use an advanced
 physical modeling language such as Modelica to specify the model. For this,
