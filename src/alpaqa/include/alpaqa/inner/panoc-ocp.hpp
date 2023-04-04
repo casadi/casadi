@@ -24,10 +24,10 @@ struct PANOCOCPParams {
     std::chrono::nanoseconds max_time = std::chrono::minutes(5);
     /// Minimum weight factor between Newton step and projected gradient step,
     /// line search parameter.
-    real_t τ_min = real_t(1. / 256);
+    real_t min_linesearch_coefficient = real_t(1. / 256);
     /// Parameter β used in the line search (see Algorithm 2 in
     /// @cite de_marchi_proximal_2022). @f$ 0 < \beta < 1 @f$
-    real_t β = real_t(0.95);
+    real_t linesearch_strictness_factor = real_t(0.95);
     /// Minimum Lipschitz constant estimate.
     real_t L_min = real_t(1e-5);
     /// Maximum Lipschitz constant estimate.

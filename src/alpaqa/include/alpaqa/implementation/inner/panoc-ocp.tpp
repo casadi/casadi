@@ -338,7 +338,8 @@ auto PANOCOCPSolver<Conf>::operator()(
 
     auto linesearch_violated = [this](const Iterate &curr,
                                       const Iterate &next) {
-        real_t σ  = params.β * (1 - curr.γ * curr.L) / (2 * curr.γ);
+        real_t β  = params.linesearch_strictness_factor;
+        real_t σ  = β * (1 - curr.γ * curr.L) / (2 * curr.γ);
         real_t φγ = curr.fbe();
         real_t margin = (1 + std::abs(φγ)) * params.linesearch_tolerance_factor;
         return next.fbe() > φγ - σ * curr.pᵀp + margin;
@@ -718,7 +719,7 @@ auto PANOCOCPSolver<Conf>::operator()(
             // Line search condition
             if (τ > 0 && linesearch_violated(*curr, *next)) {
                 τ /= 2;
-                if (τ < params.τ_min)
+                if (τ < params.min_linesearch_coefficient)
                     τ = 0;
                 ++s.linesearch_backtracks;
                 continue;

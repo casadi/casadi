@@ -4,9 +4,9 @@ PARAMS_TABLE_DEF(alpaqa::PANOCParams<Conf>,                                 //
                  PARAMS_MEMBER(Lipschitz),                                  //
                  PARAMS_MEMBER(max_iter),                                   //
                  PARAMS_MEMBER(max_time),                                   //
-                 PARAMS_MEMBER(τ_min),                                      //
+                 PARAMS_MEMBER(min_linesearch_coefficient),                 //
                  PARAMS_MEMBER(force_linesearch),                           //
-                 PARAMS_MEMBER(β),                                          //
+                 PARAMS_MEMBER(linesearch_strictness_factor),               //
                  PARAMS_MEMBER(L_min),                                      //
                  PARAMS_MEMBER(L_max),                                      //
                  PARAMS_MEMBER(stop_crit),                                  //
