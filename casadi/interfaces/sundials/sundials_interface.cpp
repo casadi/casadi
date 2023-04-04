@@ -104,7 +104,10 @@ const Options SundialsInterface::options_
       "Maximum order"}},
     {"nonlin_conv_coeff",
       {OT_DOUBLE,
-      "Coefficient in the nonlinear convergence test"}}
+      "Coefficient in the nonlinear convergence test"}},
+    {"scale_abstol",
+     {OT_BOOL,
+      "Scale absolute tolerance by nominal value"}}
     }
 };
 
@@ -131,6 +134,7 @@ void SundialsInterface::init(const Dict& opts) {
   max_step_size_ = 0;
   max_order_ = 0;
   nonlin_conv_coeff_ = 0;
+  scale_abstol_ = false;
 
   // Read options
   for (auto&& op : opts) {
@@ -175,6 +179,8 @@ void SundialsInterface::init(const Dict& opts) {
       max_order_ = op.second;
     } else if (op.first=="nonlin_conv_coeff") {
       nonlin_conv_coeff_ = op.second;
+    } else if (op.first=="scale_abstol") {
+      scale_abstol_ = op.second;
     }
   }
 
@@ -307,11 +313,31 @@ int SundialsInterface::init_mem(void* mem) const {
   if (Integrator::init_mem(mem)) return 1;
   auto m = static_cast<SundialsMemory*>(mem);
 
-  // Allocate n-vectors
+  // Allocate NVectors
   m->xz = N_VNew_Serial(nx_ + nz_);
   m->q = N_VNew_Serial(nq_);
   m->rxz = N_VNew_Serial(nrx_ + nrz_);
   m->ruq = N_VNew_Serial(nrq_ + nuq_);
+
+  // Absolute tolerances as NVector
+  if (scale_abstol_) {
+    // Allocate NVector
+    m->abstolv = N_VNew_Serial(nx_ + nz_);
+    // Get pointer to data
+    double* abstolv = NV_DATA_S(m->abstolv);
+    // States
+    for (casadi_int d = 0; d <= nfwd_; ++d) {
+      for (casadi_int i = 0; i < nx1_; ++i) *abstolv++ = abstol_ * nom_x_[i];
+    }
+    // Algebraic variables
+    for (casadi_int d = 0; d <= nfwd_; ++d) {
+      for (casadi_int i = 0; i < nz1_; ++i) *abstolv++ = abstol_ * nom_z_[i];
+    }
+    // Consistency check
+    casadi_assert_dev(abstolv == NV_DATA_S(m->abstolv) + nx_ + nz_);
+  } else {
+    m->abstolv = nullptr;
+  }
 
   m->mem_linsolF = linsolF_.checkout();
 
@@ -378,6 +404,7 @@ SundialsMemory::SundialsMemory() {
   this->rxz = nullptr;
   this->ruq = nullptr;
   this->first_callB = true;
+  this->abstolv = nullptr;
   this->mem_linsolF = -1;
 }
 
@@ -386,6 +413,7 @@ SundialsMemory::~SundialsMemory() {
   if (this->q) N_VDestroy_Serial(this->q);
   if (this->rxz) N_VDestroy_Serial(this->rxz);
   if (this->ruq) N_VDestroy_Serial(this->ruq);
+  if (this->abstolv) N_VDestroy_Serial(this->abstolv);
 }
 
 Dict SundialsInterface::get_stats(void* mem) const {
@@ -481,6 +509,7 @@ SundialsInterface::SundialsInterface(DeserializingStream& s) : Integrator(s) {
 
   s.unpack("SundialsInterface::nonlin_conv_coeff", nonlin_conv_coeff_);
   s.unpack("SundialsInterface::max_order", max_order_);
+  s.unpack("SundialsInterface::scale_abstol", scale_abstol_);
 
   s.unpack("SundialsInterface::linsolF", linsolF_);
 
@@ -517,6 +546,7 @@ void SundialsInterface::serialize_body(SerializingStream &s) const {
 
   s.pack("SundialsInterface::nonlin_conv_coeff", nonlin_conv_coeff_);
   s.pack("SundialsInterface::max_order", max_order_);
+  s.pack("SundialsInterface::scale_abstol", scale_abstol_);
 
   s.pack("SundialsInterface::linsolF", linsolF_);
 

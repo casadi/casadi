@@ -333,6 +333,9 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   /// Number of controls
   casadi_int nu_, nu1_;
 
+  // Nominal values for states
+  std::vector<double> nom_x_, nom_z_;
+
   /// Augmented user option
   Dict augmented_options_;
 
