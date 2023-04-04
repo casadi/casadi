@@ -52,6 +52,11 @@ class CMakeBuild(build_ext):
             '-DWITH_SELFCONTAINED=ON',
             '-DWITH_DEEPBIND=ON'
         ]
+        if os.name=='nt':
+            lib_name = "python%d%d.lib" % (sys.version_info.major,sys.version_info.minor)
+            lib_path = os.path.join(sys.exec_prefix, "libs", lib_name)
+            if os.path.exists(lib_path):
+                cmake_args.append('-DPYTHON_LIBRARY=' + lib_path)
         if sys.version_info[0] == 3:
           cmake_args.append('-DWITH_PYTHON3=ON')
 
