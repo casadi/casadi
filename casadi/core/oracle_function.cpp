@@ -169,20 +169,31 @@ Function OracleFunction::create_function(const Function& oracle, const std::stri
     casadi_message(name_ + "::create_function " + fname + ":" + str(s_in) + "->" + str(s_out));
   }
 
-  // Retrieve specific set of options if available
-  Dict specific_options;
-  auto it = specific_options_.find(fname);
-  if (it!=specific_options_.end()) specific_options = it->second;
+  // Check if function is already in cache
+  Function ret;
+  if (incache(fname, ret)) {
+    // Consistency checks
+    casadi_assert(ret.n_in() == s_in.size(), fname + " has wrong number of inputs");
+    casadi_assert(ret.n_out() == s_out.size(), fname + " has wrong number of outputs");
+  } else {
+    // Retrieve specific set of options if available
+    Dict specific_options;
+    auto it = specific_options_.find(fname);
+    if (it!=specific_options_.end()) specific_options = it->second;
 
-  // Combine specific and common options
-  Dict opt = combine(specific_options, common_options_);
+    // Combine specific and common options
+    Dict opt = combine(specific_options, common_options_);
 
-  // Generate the function
-  Function ret = oracle.factory(fname, s_in, s_out, aux, opt);
+    // Generate the function
+    ret = oracle.factory(fname, s_in, s_out, aux, opt);
 
-  // Make sure that it's sound
-  if (ret.has_free()) {
-    casadi_error("Cannot create '" + fname + "' since " + str(ret.get_free()) + " are free.");
+    // Make sure that it's sound
+    if (ret.has_free()) {
+      casadi_error("Cannot create '" + fname + "' since " + str(ret.get_free()) + " are free.");
+    }
+
+    // Add to cache
+    tocache(ret);
   }
 
   // Save and return
