@@ -242,9 +242,9 @@ namespace casadi {
   signal_t DllLibrary::get_function(const std::string& sym) {
 #ifdef WITH_DL
 #ifdef _WIN32
-    return (signal_t)GetProcAddress(handle_, TEXT(sym.c_str()));
+    return reinterpret_cast<signal_t>(GetProcAddress(handle_, TEXT(sym.c_str())));
 #else // _WIN32
-    signal_t fcnPtr = (signal_t)dlsym(handle_, sym.c_str());
+    signal_t fcnPtr = reinterpret_cast<signal_t>(dlsym(handle_, sym.c_str()));
     if (dlerror()) {
       fcnPtr=nullptr;
       dlerror(); // Reset error flags
