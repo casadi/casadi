@@ -918,6 +918,7 @@ INPUT                  = ../src/ \
                          pages/Math.md \
                          pages/External-Resources.md \
                          pages/Problem-formulations.md \
+                         pages/Inner-solvers.md \
                          index.md
 
 # This tag can be used to specify the character encoding of the source files
