@@ -263,13 +263,14 @@ calc_function(OracleMemory* m, const std::string& fcn,
 
   // Evaluate memory-less
   try {
-    f(ml->arg, ml->res, ml->iw, ml->w);
-  } catch(std::exception& ex) {
-    // Fatal error
-    if (show_eval_warnings_) {
-      casadi_warning(name_ + ":" + fcn + " failed:" + std::string(ex.what()));
+    if (f(ml->arg, ml->res, ml->iw, ml->w)) {
+      // Recoverable error
+      if (monitored) casadi_message(name_ + ":" + fcn + " failed");
+      return 1;
     }
-    return 1;
+  } catch(std::exception& ex) {
+    // Fatal error: Generate stack trace
+    casadi_error("Error in " + name_ + ":" + fcn + ":" + std::string(ex.what()));
   }
 
   // Print output nonzeros

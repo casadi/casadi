@@ -79,6 +79,9 @@ namespace casadi {
     /// number of checkpoints stored so far
     int ncheck;
 
+    // Absolute tolerance
+    N_Vector abstolv;
+
     /// Linear solver memory objects
     int mem_linsolF;
 
@@ -204,6 +207,7 @@ namespace casadi {
     double max_step_size_;
     double nonlin_conv_coeff_;
     casadi_int max_order_;
+    bool scale_abstol_;
     ///@}
 
     /// Linear solver

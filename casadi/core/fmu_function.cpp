@@ -31,6 +31,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <algorithm>
 
 #ifdef WITH_OPENMP
 #include <omp.h>
@@ -2364,6 +2365,35 @@ bool FmuFunction::all_vectors() const {
   }
   // OK if reached this point
   return true;
+}
+
+Function FmuFunction::factory(const std::string& name,
+    const std::vector<std::string>& s_in,
+    const std::vector<std::string>& s_out,
+    const Function::AuxOut& aux,
+    const Dict& opts) const {
+  // Assume we can call constructor directly
+  try {
+    // Hack: Inherit parallelization, verbosity option
+    Dict opts1 = opts;
+    opts1["parallelization"] = to_string(parallelization_);
+    opts1["verbose"] = verbose_;
+    opts1["print_progress"] = print_progress_;
+    // Replace ':' with '_' in s_in and s_out
+    std::vector<std::string> s_in_mod = s_in, s_out_mod = s_out;
+    for (std::string& s : s_in_mod) std::replace(s.begin(), s.end(), ':', '_');
+    for (std::string& s : s_out_mod) std::replace(s.begin(), s.end(), ':', '_');
+    // New instance of the same class, using the same Fmu instance
+    Function ret;
+    ret.own(new FmuFunction(name, fmu_, s_in_mod, s_out_mod));
+    ret->construct(opts1);
+    return ret;
+  } catch (std::exception& e) {
+    casadi_warning("FmuFunction::factory call for constructing " + name + " from " + name_
+      + " failed:\n" + std::string(e.what()) + "\nFalling back to base class implementation");
+  }
+  // Fall back to base class
+  return FunctionInternal::factory(name, s_in, s_out, aux, opts);
 }
 
 bool FmuFunction::has_jacobian() const {
