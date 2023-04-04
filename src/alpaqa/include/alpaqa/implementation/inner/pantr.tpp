@@ -225,10 +225,10 @@ auto PANTRSolver<DirectionProviderT>::operator()(
     // Keep track of how many successive iterations didn't update the iterate
     unsigned no_progress = 0;
     // Trust radius
-    real_t Δ = params.Δ_0;
+    real_t Δ = params.initial_radius;
     if (!std::isfinite(Δ) || Δ == 0)
         Δ = real_t(0.1) * curr->grad_ψ.norm();
-    Δ = std::fmax(Δ, params.Δ_min);
+    Δ = std::fmax(Δ, params.min_radius);
     // Reduction ratio
     real_t ρ = NaN<config_t>;
 
@@ -333,7 +333,7 @@ auto PANTRSolver<DirectionProviderT>::operator()(
             eval_prox_grad_step(*cand);
 
             // Quadratic upper bound in candidate point
-            if (params.compute_ratio_using_new_γ) {
+            if (params.compute_ratio_using_new_stepsize) {
                 eval_ψx̂(*cand);
                 backtrack_qub(*cand);
             }
@@ -350,14 +350,14 @@ auto PANTRSolver<DirectionProviderT>::operator()(
         // update trust radius accordingly
         auto compute_updated_radius = [this](crvec q, real_t ρ, real_t old_Δ) {
             // Very successful TR step
-            if (ρ >= params.μ2)
-                return std::max(params.c3 * q.norm(), old_Δ);
+            if (ρ >= params.ratio_threshold_good)
+                return std::max(params.radius_factor_good * q.norm(), old_Δ);
             // Successful TR step
-            else if (ρ >= params.μ1)
-                return old_Δ * params.c2;
+            else if (ρ >= params.ratio_threshold_acceptable)
+                return old_Δ * params.radius_factor_acceptable;
             // Unsuccessful TR step
             else
-                return params.c1 * q.norm();
+                return params.radius_factor_rejected * q.norm();
         };
 
         // Compute trust region direction from x̂ₖ
@@ -391,8 +391,9 @@ auto PANTRSolver<DirectionProviderT>::operator()(
             if (auto q_model = compute_trust_region_step(q, Δ); q_model < 0) {
                 compute_candidate_fbe(q);
                 ρ                = compute_candidate_ratio(q_model);
-                accept_candidate = ρ >= params.μ1;
-                Δ = std::fmax(compute_updated_radius(q, ρ, Δ), params.Δ_min);
+                accept_candidate = ρ >= params.ratio_threshold_acceptable;
+                Δ                = std::fmax(compute_updated_radius(q, ρ, Δ),
+                                             params.min_radius);
             }
         }
 
@@ -402,7 +403,7 @@ auto PANTRSolver<DirectionProviderT>::operator()(
         // Accept TR step
         if (accept_candidate) {
             // Quadratic upper bound in next iterate
-            if (!params.compute_ratio_using_new_γ) {
+            if (!params.compute_ratio_using_new_stepsize) {
                 eval_ψx̂(*cand);
                 backtrack_qub(*cand);
             }

@@ -177,14 +177,14 @@ PARAMS_TABLE(PANTRParams<config_t>,                                         //
              PARAMS_MEMBER(print_precision),                                //
              PARAMS_MEMBER(quadratic_upperbound_tolerance_factor),          //
              PARAMS_MEMBER(TR_tolerance_factor),                            //
-             PARAMS_MEMBER(μ1),                                             //
-             PARAMS_MEMBER(μ2),                                             //
-             PARAMS_MEMBER(c1),                                             //
-             PARAMS_MEMBER(c2),                                             //
-             PARAMS_MEMBER(c3),                                             //
-             PARAMS_MEMBER(Δ_0),                                            //
-             PARAMS_MEMBER(Δ_min),                                          //
-             PARAMS_MEMBER(compute_ratio_using_new_γ),                      //
+             PARAMS_MEMBER(ratio_threshold_acceptable),                     //
+             PARAMS_MEMBER(ratio_threshold_good),                           //
+             PARAMS_MEMBER(radius_factor_rejected),                         //
+             PARAMS_MEMBER(radius_factor_acceptable),                       //
+             PARAMS_MEMBER(radius_factor_good),                             //
+             PARAMS_MEMBER(initial_radius),                                 //
+             PARAMS_MEMBER(min_radius),                                     //
+             PARAMS_MEMBER(compute_ratio_using_new_stepsize),               //
              PARAMS_MEMBER(update_direction_on_prox_step),                  //
              PARAMS_MEMBER(recompute_last_prox_step_after_direction_reset), //
              PARAMS_MEMBER(disable_acceleration),                           //

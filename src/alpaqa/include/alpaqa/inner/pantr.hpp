@@ -48,25 +48,25 @@ struct PANTRParams {
     real_t TR_tolerance_factor = 10 * std::numeric_limits<real_t>::epsilon();
 
     /// Minimal TR ratio to be accepted (successful).
-    real_t μ1 = real_t(0.2);
+    real_t ratio_threshold_acceptable = real_t(0.2);
     /// Minimal TR ratio to increase radius (very successful).
-    real_t μ2 = real_t(0.8);
+    real_t ratio_threshold_good = real_t(0.8);
 
     /// TR radius decrease coefficient when unsuccessful.
-    real_t c1 = real_t(0.35);
+    real_t radius_factor_rejected = real_t(0.35);
     /// TR radius decrease coefficient when successful.
-    real_t c2 = real_t(0.999);
+    real_t radius_factor_acceptable = real_t(0.999);
     /// TR radius increase coefficient when very successful.
-    real_t c3 = real_t(2.5);
+    real_t radius_factor_good = real_t(2.5);
 
     /// Initial trust radius.
-    real_t Δ_0 = NaN<config_t>;
+    real_t initial_radius = NaN<config_t>;
     /// Minimum trust radius.
-    real_t Δ_min = 100 * std::numeric_limits<real_t>::epsilon();
+    real_t min_radius = 100 * std::numeric_limits<real_t>::epsilon();
 
     /// Check the quadratic upperbound and update γ before computing the
     /// reduction of the TR step.
-    bool compute_ratio_using_new_γ = false;
+    bool compute_ratio_using_new_stepsize = false;
 
     bool update_direction_on_prox_step                  = true;
     bool recompute_last_prox_step_after_direction_reset = false;
