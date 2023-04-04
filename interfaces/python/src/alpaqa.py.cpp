@@ -33,6 +33,9 @@ template <alpaqa::Config Conf>
 void register_panoc(py::module_ &m);
 
 template <alpaqa::Config Conf>
+void register_zerofpr(py::module_ &m);
+
+template <alpaqa::Config Conf>
 void register_pantr(py::module_ &m);
 
 template <alpaqa::Config Conf>
@@ -63,6 +66,7 @@ void register_classes_for(py::module_ &m) {
     register_pantr_directions<Conf>(m);
     register_panoc<Conf>(m);
     register_panoc_ocp<Conf>(m);
+    register_zerofpr<Conf>(m);
     register_pantr<Conf>(m);
     register_ocp<Conf>(m);
     register_alm<Conf>(m);

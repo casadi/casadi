@@ -23,8 +23,9 @@ pybind11_add_module(_alpaqa MODULE
     "src/counters.py.cpp"
     "src/enums.py.cpp"
     "src/inner/panoc.py.cpp"
+    "src/inner/zerofpr.py.cpp"
     "src/inner/pantr.py.cpp"
-    "src/inner/pantr-directions.py.cpp" # TODO
+    "src/inner/pantr-directions.py.cpp"
     "src/inner/panoc-directions.py.cpp"
     "src/inner/inner-solver.py.cpp"
     "src/problem/problems.py.cpp"
@@ -36,6 +37,7 @@ pybind11_add_module(_alpaqa MODULE
     "src/params/lbfgs-direction-params.cpp"
     "src/params/lbfgs-params.cpp"
     "src/params/panoc-params.cpp"
+    "src/params/zerofpr-params.cpp"
     "src/params/structured-lbfgs-direction-params.cpp"
     "src/params/structured-newton-direction-params.cpp"
     "src/params/newton-tr-direction-params.cpp"

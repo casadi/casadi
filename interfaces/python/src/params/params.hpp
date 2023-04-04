@@ -12,6 +12,7 @@
 #include "steihaug-params.hpp"
 #include "structured-lbfgs-direction-params.hpp"
 #include "structured-newton-direction-params.hpp"
+#include "zerofpr-params.hpp"
 #if ALPAQA_WITH_OCP
 #include "panoc-ocp-params.hpp"
 #endif

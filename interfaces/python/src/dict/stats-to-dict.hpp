@@ -8,7 +8,8 @@
 
 #include <alpaqa/inner/panoc-ocp.hpp>
 #include <alpaqa/inner/panoc.hpp>
-#include "alpaqa/inner/pantr.hpp"
+#include <alpaqa/inner/pantr.hpp>
+#include <alpaqa/inner/zerofpr.hpp>
 
 #include <pybind11/chrono.h>
 #include <pybind11/pybind11.h>
@@ -136,6 +137,50 @@ py::dict stats_to_dict(const InnerStatsAccumulator<PANOCOCPStats<Conf>> &s) {
 }
 
 #endif
+
+template <Config Conf>
+py::dict stats_to_dict(const ZeroFPRStats<Conf> &s) {
+    using namespace py::literals;
+    return py::dict{
+        "status"_a                = s.status,
+        "ε"_a                     = s.ε,
+        "elapsed_time"_a          = s.elapsed_time,
+        "iterations"_a            = s.iterations,
+        "linesearch_failures"_a   = s.linesearch_failures,
+        "linesearch_backtracks"_a = s.linesearch_backtracks,
+        "stepsize_backtracks"_a   = s.stepsize_backtracks,
+        "lbfgs_failures"_a        = s.lbfgs_failures,
+        "lbfgs_rejected"_a        = s.lbfgs_rejected,
+        "τ_1_accepted"_a          = s.τ_1_accepted,
+        "count_τ"_a               = s.count_τ,
+        "sum_τ"_a                 = s.sum_τ,
+        "final_γ"_a               = s.final_γ,
+        "final_ψ"_a               = s.final_ψ,
+        "final_h"_a               = s.final_h,
+        "final_φγ"_a              = s.final_φγ,
+    };
+}
+
+template <Config Conf>
+py::dict stats_to_dict(const InnerStatsAccumulator<ZeroFPRStats<Conf>> &s) {
+    using namespace py::literals;
+    return py::dict{
+        "elapsed_time"_a          = s.elapsed_time,
+        "iterations"_a            = s.iterations,
+        "linesearch_failures"_a   = s.linesearch_failures,
+        "linesearch_backtracks"_a = s.linesearch_backtracks,
+        "stepsize_backtracks"_a   = s.stepsize_backtracks,
+        "lbfgs_failures"_a        = s.lbfgs_failures,
+        "lbfgs_rejected"_a        = s.lbfgs_rejected,
+        "τ_1_accepted"_a          = s.τ_1_accepted,
+        "count_τ"_a               = s.count_τ,
+        "sum_τ"_a                 = s.sum_τ,
+        "final_γ"_a               = s.final_γ,
+        "final_ψ"_a               = s.final_ψ,
+        "final_h"_a               = s.final_h,
+        "final_φγ"_a              = s.final_φγ,
+    };
+}
 
 template <Config Conf>
 py::dict stats_to_dict(const PANTRStats<Conf> &s) {
