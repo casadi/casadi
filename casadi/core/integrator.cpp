@@ -52,11 +52,11 @@ std::string to_string(DynOut v) {
 
 std::string Integrator::bdyn_in(casadi_int i) {
   switch (i) {
-    case BDYN_T: return "t";
-    case BDYN_X: return "x";
-    case BDYN_Z: return "z";
-    case BDYN_P: return "p";
-    case BDYN_U: return "u";
+    case BDYN_T: return "in_t";
+    case BDYN_X: return "in_x";
+    case BDYN_Z: return "in_z";
+    case BDYN_P: return "in_p";
+    case BDYN_U: return "in_u";
     case BDYN_OUT_ODE: return "out_ode";
     case BDYN_OUT_ALG: return "out_alg";
     case BDYN_OUT_QUAD: return "out_quad";

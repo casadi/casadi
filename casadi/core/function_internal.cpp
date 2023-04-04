@@ -336,7 +336,10 @@ namespace casadi {
         "After construction, expand this Function. Default: False"}},
       {"post_expand_options",
        {OT_DICT,
-        "Options to be passed to post-construction expansion. Default: empty"}}
+        "Options to be passed to post-construction expansion. Default: empty"}},
+      {"cache",
+       {OT_DICT,
+        "Prepopulate the function cache. Default: empty"}}
      }
   };
 
@@ -528,6 +531,8 @@ namespace casadi {
         is_diff_in_ = op.second;
       } else if (op.first=="is_diff_out") {
         is_diff_out_ = op.second;
+      } else if (op.first=="cache") {
+        cache_init_ = op.second;
       }
     }
 
@@ -605,6 +610,17 @@ namespace casadi {
     } else {
       casadi_assert(name_out_.size()==n_out_, "Function " + name_ + " has " + str(n_out_)
         + " outputs, but name_out has length " + str(name_out_.size()) + ".");
+    }
+
+    // Prepopulate function cache
+    for (auto&& c : cache_init_) {
+      const Function& f = c.second;
+      if (c.first != f.name() + ":") {
+        casadi_warning("Cannot add '" + c.first + "' a.k.a. '" + f.name()
+          + "' to cache. Mismatching names not implemented.");
+      } else {
+        tocache(f);
+      }
     }
 
     // Allocate memory for function inputs and outputs
@@ -931,9 +947,21 @@ namespace casadi {
     }
   }
 
+  Dict FunctionInternal::cache() const {
+    // Return value
+    Dict ret;
+    // Add all Function instances that haven't been deleted
+    for (auto&& cf : cache_) {
+      if (cf.second.alive()) {
+        ret[cf.first] = shared_cast<Function>(cf.second.shared());
+      }
+    }
+    return ret;
+  }
+
   bool FunctionInternal::incache(const std::string& fname, Function& f,
       const std::string& suffix) const {
-    auto it = cache_.find(fname+":"+suffix);
+    auto it = cache_.find(fname + ":" + suffix);
     if (it!=cache_.end() && it->second.alive()) {
       f = shared_cast<Function>(it->second.shared());
       return true;
@@ -944,7 +972,7 @@ namespace casadi {
 
   void FunctionInternal::tocache(const Function& f, const std::string& suffix) const {
     // Add to cache
-    cache_.insert(std::make_pair(f.name()+":"+suffix, f));
+    cache_.insert(std::make_pair(f.name() + ":" + suffix, f));
     // Remove a lost reference, if any, to prevent uncontrolled growth
     for (auto it = cache_.begin(); it!=cache_.end(); ++it) {
       if (!it->second.alive()) {
@@ -3722,7 +3750,7 @@ namespace casadi {
 
   void FunctionInternal::serialize_body(SerializingStream& s) const {
     ProtoFunction::serialize_body(s);
-    s.version("FunctionInternal", 5);
+    s.version("FunctionInternal", 6);
     s.pack("FunctionInternal::is_diff_in", is_diff_in_);
     s.pack("FunctionInternal::is_diff_out", is_diff_out_);
     s.pack("FunctionInternal::sp_in", sparsity_in_);
@@ -3746,6 +3774,8 @@ namespace casadi {
     s.pack("FunctionInternal::jit_options", jit_options_);
     s.pack("FunctionInternal::compiler_plugin", compiler_plugin_);
     s.pack("FunctionInternal::has_refcount", has_refcount_);
+
+    s.pack("FunctionInternal::cache_init", cache_init_);
 
     s.pack("FunctionInternal::derivative_of", derivative_of_);
 
@@ -3796,7 +3826,7 @@ namespace casadi {
   }
 
   FunctionInternal::FunctionInternal(DeserializingStream& s) : ProtoFunction(s) {
-    int version = s.version("FunctionInternal", 1, 5);
+    int version = s.version("FunctionInternal", 1, 6);
     s.unpack("FunctionInternal::is_diff_in", is_diff_in_);
     s.unpack("FunctionInternal::is_diff_out", is_diff_out_);
     s.unpack("FunctionInternal::sp_in", sparsity_in_);
@@ -3833,6 +3863,10 @@ namespace casadi {
     s.unpack("FunctionInternal::jit_options", jit_options_);
     s.unpack("FunctionInternal::compiler_plugin", compiler_plugin_);
     s.unpack("FunctionInternal::has_refcount", has_refcount_);
+
+    if (version >= 6) {
+      s.unpack("FunctionInternal::cache_init", cache_init_);
+    }
 
     s.unpack("FunctionInternal::derivative_of", derivative_of_);
 

@@ -755,6 +755,9 @@ namespace casadi {
         \identifier{lj} */
     Function wrap_as_needed(const Dict& opts) const;
 
+    /** \brief Get all functions in the cache */
+    Dict cache() const;
+
     /** \brief Get function in cache
 
         \identifier{lk} */
@@ -1257,6 +1260,9 @@ namespace casadi {
 
         \identifier{no} */
     bool has_refcount_;
+
+    /** \brief Values to prepopulate the function cache with */
+    Dict cache_init_;
 
     /// Function cache
     mutable std::map<std::string, WeakRef> cache_;
