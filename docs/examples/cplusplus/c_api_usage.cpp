@@ -160,7 +160,7 @@ int main(){
 
   // More simple functions
   Function g("g", {x, y}, {sqrt(y)-1, sin(x)-y});
-  Function h("h", {x}, {y*y});
+  Function h("h", {y}, {y*y});
 
   // Mode 2: FileSerializer (allows packing a list of Functions)
   {

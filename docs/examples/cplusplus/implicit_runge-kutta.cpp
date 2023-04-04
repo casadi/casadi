@@ -162,8 +162,7 @@ int main(int argc, char *argv[]) {
                           integrator_in(), integrator_out());
 
   // Create a conventional integrator for reference
-  Function ref_integrator = integrator("ref_integrator",
-                                       "cvodes", dae, {{"tf", tf}});
+  Function ref_integrator = integrator("ref_integrator", "cvodes", dae, 0, tf);
 
   // Test values
   std::vector<double> x0_val = {0, 1, 0};
