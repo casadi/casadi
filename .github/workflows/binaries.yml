@@ -61,7 +61,7 @@ jobs:
     
     - name: set CMAKE default options
       run: |
-         sed -i 's/option(SWIG_IMPORT "Export SWIG" OFF)/option(SWIG_IMPORT "Import SWIG" ON)/g' CMakeLists.txt
+         sed -i 's/option(SWIG_IMPORT "Import SWIG" OFF)/option(SWIG_IMPORT "Import SWIG" ON)/g' CMakeLists.txt
 
     - name: build archives
       run: |
