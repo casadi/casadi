@@ -6,7 +6,10 @@
 #include "inner-solve-options.hpp"
 #include "lbfgs-direction-params.hpp"
 #include "lbfgs-params.hpp"
+#include "newton-tr-direction-params.hpp"
 #include "panoc-params.hpp"
+#include "pantr-params.hpp"
+#include "steihaug-params.hpp"
 #include "structured-lbfgs-direction-params.hpp"
 #include "structured-newton-direction-params.hpp"
 #if ALPAQA_WITH_OCP

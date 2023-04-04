@@ -1,8 +1,8 @@
 #pragma once
 
 #include <alpaqa/config/config.hpp>
-#include <alpaqa/inner/directions/panoc-direction-update.hpp>
-#include <alpaqa/inner/directions/panoc/lbfgs.hpp>
+#include <alpaqa/inner/directions/pantr/newton-tr.hpp>
+#include <alpaqa/problem/type-erased-problem.hpp>
 #include <alpaqa/util/type-erasure.hpp>
 
 #include <dict/dict-tup.hpp>
@@ -18,7 +18,7 @@ namespace py = pybind11;
 namespace alpaqa {
 
 template <Config Conf>
-struct PANOCDirectionVTable : util::BasicVTable {
+struct TRDirectionVTable : util::BasicVTable {
     USING_ALPAQA_CONFIG(Conf);
     using Problem = TypeErasedProblem<config_t>;
 
@@ -29,7 +29,7 @@ struct PANOCDirectionVTable : util::BasicVTable {
         update = nullptr;
     required_const_function_t<bool()>
         has_initial_direction = nullptr;
-    required_const_function_t<bool(real_t γₖ, crvec xₖ, crvec x̂ₖ, crvec pₖ, crvec grad_ψxₖ, rvec qₖ)>
+    required_const_function_t<real_t(real_t γₖ, crvec xₖ, crvec x̂ₖ, crvec pₖ, crvec grad_ψxₖ, real_t radius, rvec qₖ)>
         apply = nullptr;
     required_function_t<void(real_t γₖ, real_t old_γₖ)>
         changed_γ = nullptr;
@@ -42,7 +42,7 @@ struct PANOCDirectionVTable : util::BasicVTable {
     // clang-format on
 
     template <class T>
-    PANOCDirectionVTable(util::VTableTypeTag<T> t) : util::BasicVTable{t} {
+    TRDirectionVTable(util::VTableTypeTag<T> t) : util::BasicVTable{t} {
         initialize            = util::type_erased_wrapped<&T::initialize>();
         update                = util::type_erased_wrapped<&T::update>();
         has_initial_direction = util::type_erased_wrapped<&T::has_initial_direction>();
@@ -52,18 +52,18 @@ struct PANOCDirectionVTable : util::BasicVTable {
         get_params            = util::type_erased_wrapped<&T::get_params>();
         get_name              = util::type_erased_wrapped<&T::get_name>();
     }
-    PANOCDirectionVTable() = default;
+    TRDirectionVTable() = default;
 };
 
 template <Config Conf>
-constexpr size_t te_pd_buff_size = util::required_te_buffer_size_for<LBFGSDirection<Conf>>();
+constexpr size_t te_pd_buff_size = util::required_te_buffer_size_for<NewtonTRDirection<Conf>>();
 
 template <Config Conf = DefaultConfig, class Allocator = std::allocator<std::byte>>
-class TypeErasedPANOCDirection
-    : public util::TypeErased<PANOCDirectionVTable<Conf>, Allocator, te_pd_buff_size<Conf>> {
+class TypeErasedTRDirection
+    : public util::TypeErased<TRDirectionVTable<Conf>, Allocator, te_pd_buff_size<Conf>> {
   public:
     USING_ALPAQA_CONFIG(Conf);
-    using VTable         = PANOCDirectionVTable<Conf>;
+    using VTable         = TRDirectionVTable<Conf>;
     using allocator_type = Allocator;
     using TypeErased     = util::TypeErased<VTable, allocator_type, te_pd_buff_size<Conf>>;
     using TypeErased::TypeErased;
@@ -76,8 +76,8 @@ class TypeErasedPANOCDirection
 
   public:
     template <class T, class... Args>
-    static TypeErasedPANOCDirection make(Args &&...args) {
-        return TypeErased::template make<TypeErasedPANOCDirection, T>(std::forward<Args>(args)...);
+    static TypeErasedTRDirection make(Args &&...args) {
+        return TypeErased::template make<TypeErasedTRDirection, T>(std::forward<Args>(args)...);
     }
 
     template <class... Args>
@@ -115,14 +115,14 @@ class TypeErasedPANOCDirection
 };
 
 template <class T, class... Args>
-auto erase_direction_with_params_dict(Args &&...args) {
+auto erase_tr_direction_with_params_dict(Args &&...args) {
     struct DirectionWrapper : T {
         DirectionWrapper(const T &d) : T{d} {}
         DirectionWrapper(T &&d) : T{std::move(d)} {}
         using T::T;
         py::object get_params() const { return to_dict_tup(T::get_params()); }
     };
-    return TypeErasedPANOCDirection<typename T::config_t>::template make<DirectionWrapper>(
+    return TypeErasedTRDirection<typename T::config_t>::template make<DirectionWrapper>(
         std::forward<Args>(args)...);
 }
 

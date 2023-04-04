@@ -23,6 +23,8 @@ pybind11_add_module(_alpaqa MODULE
     "src/counters.py.cpp"
     "src/enums.py.cpp"
     "src/inner/panoc.py.cpp"
+    "src/inner/pantr.py.cpp"
+    "src/inner/pantr-directions.py.cpp" # TODO
     "src/inner/panoc-directions.py.cpp"
     "src/inner/inner-solver.py.cpp"
     "src/problem/problems.py.cpp"
@@ -36,6 +38,9 @@ pybind11_add_module(_alpaqa MODULE
     "src/params/panoc-params.cpp"
     "src/params/structured-lbfgs-direction-params.cpp"
     "src/params/structured-newton-direction-params.cpp"
+    "src/params/newton-tr-direction-params.cpp"
+    "src/params/pantr-params.cpp"
+    "src/params/steihaug-params.cpp"
     # NO_EXTRAS # Prevent pybind11 from stripping the binary
 )
 if (ALPAQA_WITH_OCP)
