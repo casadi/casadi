@@ -216,7 +216,16 @@ namespace casadi {
       false);
 
 #ifdef _WIN32
+
+#if __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-function-type"
+#endif
     reg = reinterpret_cast<RegFcn>(GetProcAddress(handle, TEXT(regName.c_str())));
+#if __GNUC__
+#pragma GCC diagnostic pop
+#endif
+
 #else // _WIN32
     // Reset error
     dlerror();

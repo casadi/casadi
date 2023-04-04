@@ -242,7 +242,14 @@ namespace casadi {
   signal_t DllLibrary::get_function(const std::string& sym) {
 #ifdef WITH_DL
 #ifdef _WIN32
+#if __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-function-type"
+#endif
     return reinterpret_cast<signal_t>(GetProcAddress(handle_, TEXT(sym.c_str())));
+#if __GNUC__
+#pragma GCC diagnostic pop
+#endif
 #else // _WIN32
     signal_t fcnPtr = reinterpret_cast<signal_t>(dlsym(handle_, sym.c_str()));
     if (dlerror()) {
