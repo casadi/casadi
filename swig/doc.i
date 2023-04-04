@@ -52630,6 +52630,9 @@ Extra doc: https://github.com/casadi/casadi/wiki/L_228
 | reltol                     | OT_DOUBLE | Relative tolerence for the IVP  |
 |                            |           | solution                        |
 +----------------------------+-----------+---------------------------------+
+| scale_abstol               | OT_BOOL   | Scale absolute tolerance by     |
+|                            |           | nominal value                   |
++----------------------------+-----------+---------------------------------+
 | second_order_correction    | OT_BOOL   | Second order correction in the  |
 |                            |           | augmented system Jacobian       |
 |                            |           | [true]                          |
@@ -52746,6 +52749,9 @@ Extra doc: https://github.com/casadi/casadi/wiki/L_225
 +---------------------------+-----------------+----------------------------+
 | reltol                    | OT_DOUBLE       | Relative tolerence for the |
 |                           |                 | IVP solution               |
++---------------------------+-----------------+----------------------------+
+| scale_abstol              | OT_BOOL         | Scale absolute tolerance   |
+|                           |                 | by nominal value           |
 +---------------------------+-----------------+----------------------------+
 | second_order_correction   | OT_BOOL         | Second order correction in |
 |                           |                 | the augmented system       |
