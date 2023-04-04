@@ -1261,6 +1261,9 @@ namespace casadi {
         \identifier{no} */
     bool has_refcount_;
 
+    /** \brief Values to prepopulate the function cache with */
+    Dict cache_init_;
+
     /// Function cache
     mutable std::map<std::string, WeakRef> cache_;
 
