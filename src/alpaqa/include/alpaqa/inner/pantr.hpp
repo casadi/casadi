@@ -227,7 +227,6 @@ template <Config Conf>
 InnerStatsAccumulator<PANTRStats<Conf>> &
 operator+=(InnerStatsAccumulator<PANTRStats<Conf>> &acc,
            const PANTRStats<Conf> &s) {
-    acc.iterations += s.iterations;
     acc.elapsed_time += s.elapsed_time;
     acc.time_progress_callback += s.time_progress_callback;
     acc.iterations += s.iterations;
