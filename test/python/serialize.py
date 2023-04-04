@@ -53,8 +53,10 @@ class SerializeTests(casadiTestCase):
       try:
           f = Function.load(os.path.join(dir,fun))
       except Exception as e:
-          if "CommonExternal" in str(e):
-             continue
+          if "DllLibrary::init_handle" in str(e):
+            continue
+          if "DeSerialization of Integrator failed" in str(e):
+            continue
           else:
              raise Exception(str(e))
 

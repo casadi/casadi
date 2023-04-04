@@ -40,6 +40,7 @@ from simulator import *
 from vectortools import *
 from optistack import *
 from feasiblesqpmethod import *
+from serialize import *
 
 if __name__ == '__main__':
     unittest.main()
