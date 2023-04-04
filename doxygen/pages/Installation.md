@@ -15,7 +15,7 @@ install the `venv` module to create virtual environments).
 sudo apt install g++ gcc git python3-venv python3-dev
 ```
 The alpaqa package requires a relatively recent compiler
-(tested using GCC 10-11, Clang 10-14).
+(tested using GCC 10-12, Clang 14-16).
 
 To install GCC 11 on older versions of Ubuntu, you can use
 ```sh
@@ -63,8 +63,9 @@ bash ./scripts/install-eigen.sh "$VIRTUAL_ENV" Release
 ```
 
 CasADi is built as a static library because it is later statically linked into
-the final alpaqa libraries for better portability, especially when creating the
-Python package.
+the final alpaqa libraries for better portability, this especially useful when
+creating the Python package. If you need to link against CasADi dynamically, you
+can use the `install-casadi.sh` script instead.
 
 ### Build and install
 
@@ -119,7 +120,7 @@ the dependencies, you can use the Powershell scripts instead of the Bash scripts
 
 The instructions for macOS are the same as the ones for Linux, with the caveat
 that the default AppleClang compiler might not be supported. Instead, it is
-recommended to use a mainline Clang compiler (version 10 or higher).  
+recommended to use a mainline Clang compiler (version 14 or higher).  
 You can select the compiler to use by setting the `CC` and `CXX` environment
 variables, for example:
 ```sh
