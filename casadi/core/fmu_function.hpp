@@ -740,6 +740,13 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   // Are all inputs/outputs vectors (i.e. not Jacobian or Hessian blocks)?
   bool all_vectors() const;
 
+  // Factory
+  Function factory(const std::string& name,
+    const std::vector<std::string>& s_in,
+    const std::vector<std::string>& s_out,
+    const Function::AuxOut& aux,
+    const Dict& opts) const override;
+
   ///@{
   /** \brief Full Jacobian
 
