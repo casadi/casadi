@@ -113,7 +113,7 @@ decision variables and an optional parameter vector.
     C = [-0.25, -0.5], [1.5, 2.5]  # -0.25 <= x1 <= 1.5, -0.5 <= x2 <= 2.5
     D = [-np.inf, -np.inf], [0, 0]  #         g1 <= 0,           g2 <= 0
     # Set the problem parameter
-    param = [10.0]
+    param = [1.0]
 
 Next, the gradients of the functions are computed using CasADi, and they are 
 compiled as efficient C functions. All of this happens inside of the 
@@ -147,7 +147,7 @@ specified when generating the problem, or can be modified after loading it:
 .. testcode::
 
     # You can change the bounds and parameters after loading the problem
-    prob.param = [100.0]
+    prob.param = [10.0]
     prob.D.lowerbound[1] = -1e20
 
 Selecting a solver
@@ -163,8 +163,8 @@ Solvers can be composed easily, for instance:
     # %% Build a solver with the default parameters
     import alpaqa as pa
 
-    innersolver = pa.PANOCSolver()
-    solver = pa.ALMSolver(innersolver)
+    inner_solver = pa.PANOCSolver()
+    solver = pa.ALMSolver(inner_solver)
 
 Each solver has its own set of optional parameters that can be specified using 
 keyword arguments or dictionaries, for example:
@@ -186,9 +186,8 @@ keyword arguments or dictionaries, for example:
         alm_params={
             'ε': 1e-10,
             'δ': 1e-10,
-            'Σ_0': 0,
-            'σ_0': 2,
-            'Δ': 10,
+            'Σ_0': 50,
+            'Δ': 20,
         },
         inner_solver=inner_solver
     )
@@ -233,9 +232,9 @@ This will print something similar to:
 .. testoutput::
 
     SolverStatus.Converged
-    Solution:      [-0.25     0.57812]
-    Multipliers:   [103.125   0.   ]
-    Cost:          28.14941
+    Solution:      [-0.25     0.57813]
+    Multipliers:   [10.3125  0.    ]
+    Cost:          4.22119
 
 The :code:`stats` variable contains some other solver statistics as well, for 
 both the outer and the inner solver. You can find a full overview in the
