@@ -83,7 +83,7 @@ int main(){
   SXDict dae = {{"x", x}, {"p", u}, {"ode", ode}, {"quad", quad}};
 
   // Create an integrator (CVodes)
-  Function F = integrator("integrator", "cvodes", dae, {{"t0", 0}, {"tf", tf/ns}});
+  Function F = integrator("integrator", "cvodes", dae, 0, tf/ns);
 
   // Total number of NLP variables
   int NV = nx*(ns+1) + nu*ns;
