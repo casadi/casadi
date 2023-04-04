@@ -2108,7 +2108,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L407
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1825-L1831
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1835-L1841
 
 ";
 
@@ -2123,7 +2123,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L412
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1833-L1835
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1843-L1845
 
 ";
 
@@ -2138,7 +2138,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L417
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1837-L1839
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1847-L1849
 
 ";
 
@@ -2958,6 +2958,21 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1719-L17
 
 ";
 
+%feature("docstring") casadi::Callback::cache "
+
+[INTERNAL] 
+Get all functions in the cache.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_26i
+
+Doc source: 
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1208
+
+Implementation: 
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1762-L1769
+
+";
+
 %feature("docstring") casadi::Callback::get_function "
 
 [INTERNAL] 
@@ -2966,10 +2981,10 @@ Get a dependency function.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1y4
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1213
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1218
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1770-L1776
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1780-L1786
 
 >  Function casadi::Function::get_function(const std::string &name) const
 ------------------------------------------------------------------------
@@ -2979,10 +2994,10 @@ Get a dependency function.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1y4
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1213
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1218
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1770-L1776
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1780-L1786
 
 ";
 
@@ -2996,10 +3011,10 @@ Check if a particular dependency exists.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1y5
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1218
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1223
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1778-L1785
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1788-L1795
 
 ";
 
@@ -3017,10 +3032,10 @@ Maximum depth - a negative number indicates no maximum
 Extra doc: https://github.com/casadi/casadi/wiki/L_1y6
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1225
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1230
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1787-L1803
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1797-L1813
 
 ";
 
@@ -3041,10 +3056,10 @@ Maximum depth - a negative number indicates no maximum
 Extra doc: https://github.com/casadi/casadi/wiki/L_1y7
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1233
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1238
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1805-L1822
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1815-L1832
 
 ";
 
@@ -3054,10 +3069,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1805-L18
 Obtain information about function
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1236
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1241
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1851-L1853
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1861-L1863
 
 ";
 
@@ -7659,6 +7674,10 @@ Extra doc: https://github.com/casadi/casadi/wiki/L_1uw
 | always_inline    | OT_BOOL         | Force inlining.  | casadi::Function |
 |                  |                 |                  | Internal         |
 +------------------+-----------------+------------------+------------------+
+| cache            | OT_DICT         | Prepopulate the  | casadi::Function |
+|                  |                 | function cache.  | Internal         |
+|                  |                 | Default: empty   |                  |
++------------------+-----------------+------------------+------------------+
 | compiler         | OT_STRING       | Just-in-time     | casadi::Function |
 |                  |                 | compiler plugin  | Internal         |
 |                  |                 | to be used.      |                  |
@@ -9659,7 +9678,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L407
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1825-L1831
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1835-L1841
 
 ";
 
@@ -9674,7 +9693,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L412
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1833-L1835
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1843-L1845
 
 ";
 
@@ -9689,7 +9708,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L417
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1837-L1839
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1847-L1849
 
 ";
 
@@ -10524,6 +10543,21 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1719-L17
 
 ";
 
+%feature("docstring") casadi::Function::cache "
+
+[INTERNAL] 
+Get all functions in the cache.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_26i
+
+Doc source: 
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1208
+
+Implementation: 
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1762-L1769
+
+";
+
 %feature("docstring") casadi::Function::get_function "
 
 [INTERNAL] 
@@ -10532,10 +10566,10 @@ Get a dependency function.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1y4
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1213
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1218
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1770-L1776
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1780-L1786
 
 >  Function casadi::Function::get_function(const std::string &name) const
 ------------------------------------------------------------------------
@@ -10545,10 +10579,10 @@ Get a dependency function.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1y4
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1213
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1218
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1770-L1776
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1780-L1786
 
 ";
 
@@ -10562,10 +10596,10 @@ Check if a particular dependency exists.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1y5
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1218
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1223
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1778-L1785
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1788-L1795
 
 ";
 
@@ -10583,10 +10617,10 @@ Maximum depth - a negative number indicates no maximum
 Extra doc: https://github.com/casadi/casadi/wiki/L_1y6
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1225
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1230
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1787-L1803
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1797-L1813
 
 ";
 
@@ -10607,10 +10641,10 @@ Maximum depth - a negative number indicates no maximum
 Extra doc: https://github.com/casadi/casadi/wiki/L_1y7
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1233
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1238
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1805-L1822
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1815-L1832
 
 ";
 
@@ -10620,10 +10654,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1805-L18
 Obtain information about function
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1236
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1241
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1851-L1853
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1861-L1863
 
 ";
 
@@ -10737,10 +10771,10 @@ Note that CasADi uses 'fortran' order: column-by-column
 Extra doc: https://github.com/casadi/casadi/wiki/L_1yb
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1314
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1319
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1891-L1896
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1901-L1906
 
 ";
 
@@ -10756,10 +10790,10 @@ Note that CasADi uses 'fortran' order: column-by-column
 Extra doc: https://github.com/casadi/casadi/wiki/L_1yc
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1323
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1328
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1897-L1902
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1907-L1912
 
 ";
 
@@ -10769,10 +10803,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1897-L19
 Get last return value.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1325
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.hpp#L1330
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1910-L1912
+https://github.com/casadi/casadi/blob/develop/casadi/core/function.cpp#L1920-L1922
 
 ";
 
@@ -30758,6 +30792,10 @@ General information
 | always_inline    | OT_BOOL         | Force inlining.  | casadi::Function |
 |                  |                 |                  | Internal         |
 +------------------+-----------------+------------------+------------------+
+| cache            | OT_DICT         | Prepopulate the  | casadi::Function |
+|                  |                 | function cache.  | Internal         |
+|                  |                 | Default: empty   |                  |
++------------------+-----------------+------------------+------------------+
 | compiler         | OT_STRING       | Just-in-time     | casadi::Function |
 |                  |                 | compiler plugin  | Internal         |
 |                  |                 | to be used.      |                  |
@@ -32187,6 +32225,10 @@ General information
 | always_inline    | OT_BOOL         | Force inlining.  | casadi::Function |
 |                  |                 |                  | Internal         |
 +------------------+-----------------+------------------+------------------+
+| cache            | OT_DICT         | Prepopulate the  | casadi::Function |
+|                  |                 | function cache.  | Internal         |
+|                  |                 | Default: empty   |                  |
++------------------+-----------------+------------------+------------------+
 | compiler         | OT_STRING       | Just-in-time     | casadi::Function |
 |                  |                 | compiler plugin  | Internal         |
 |                  |                 | to be used.      |                  |
@@ -32711,6 +32753,10 @@ General information
 +------------------+-----------------+------------------+------------------+
 | always_inline    | OT_BOOL         | Force inlining.  | casadi::Function |
 |                  |                 |                  | Internal         |
++------------------+-----------------+------------------+------------------+
+| cache            | OT_DICT         | Prepopulate the  | casadi::Function |
+|                  |                 | function cache.  | Internal         |
+|                  |                 | Default: empty   |                  |
 +------------------+-----------------+------------------+------------------+
 | compiler         | OT_STRING       | Just-in-time     | casadi::Function |
 |                  |                 | compiler plugin  | Internal         |
@@ -33361,6 +33407,10 @@ General information
 +------------------+-----------------+------------------+------------------+
 | always_inline    | OT_BOOL         | Force inlining.  | casadi::Function |
 |                  |                 |                  | Internal         |
++------------------+-----------------+------------------+------------------+
+| cache            | OT_DICT         | Prepopulate the  | casadi::Function |
+|                  |                 | function cache.  | Internal         |
+|                  |                 | Default: empty   |                  |
 +------------------+-----------------+------------------+------------------+
 | compiler         | OT_STRING       | Just-in-time     | casadi::Function |
 |                  |                 | compiler plugin  | Internal         |

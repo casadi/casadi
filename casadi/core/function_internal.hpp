@@ -755,7 +755,9 @@ namespace casadi {
         \identifier{lj} */
     Function wrap_as_needed(const Dict& opts) const;
 
-    /** \brief Get all functions in the cache */
+    /** \brief Get all functions in the cache
+
+        \identifier{26g} */
     Dict cache() const;
 
     /** \brief Get function in cache
@@ -1261,7 +1263,9 @@ namespace casadi {
         \identifier{no} */
     bool has_refcount_;
 
-    /** \brief Values to prepopulate the function cache with */
+    /** \brief Values to prepopulate the function cache with
+
+        \identifier{26h} */
     Dict cache_init_;
 
     /// Function cache

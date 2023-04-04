@@ -1202,7 +1202,9 @@ namespace casadi {
     void* memory(int ind) const;
 #endif // SWIG
 
-    /** \brief Get all functions in the cache */
+    /** \brief Get all functions in the cache
+
+        \identifier{26i} */
     Dict cache() const;
 
     /** \brief Get a list of all functions

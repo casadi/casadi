@@ -1123,6 +1123,9 @@
 %exception  casadi::Function::buf_out(VecRes res) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Function::cache() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Function::call(const DMDict &arg, DMDict &res, bool always_inline=false, bool never_inline=false) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
