@@ -81,6 +81,7 @@ struct PANTRStats {
     SolverStatus status = SolverStatus::Busy;
     real_t ε            = inf<config_t>;
     std::chrono::nanoseconds elapsed_time{};
+    std::chrono::nanoseconds time_progress_callback{};
     unsigned iterations                = 0;
     unsigned accelerated_step_rejected = 0;
     unsigned stepsize_backtracks       = 0;
@@ -97,6 +98,7 @@ struct PANTRProgressInfo {
     USING_ALPAQA_CONFIG(Conf);
 
     unsigned k;
+    SolverStatus status;
     crvec x;
     crvec p;
     real_t norm_sq_p;
@@ -114,6 +116,7 @@ struct PANTRProgressInfo {
     real_t ε;
     crvec Σ;
     crvec y;
+    unsigned outer_iter;
     const TypeErasedProblem<config_t> *problem;
     const PANTRParams<config_t> *params;
 };
@@ -196,6 +199,8 @@ struct InnerStatsAccumulator<PANTRStats<Conf>> {
 
     /// Total elapsed time in the inner solver.
     std::chrono::nanoseconds elapsed_time{};
+    /// Total time spent in the user-provided progress callback.
+    std::chrono::nanoseconds time_progress_callback{};
     /// Total number of inner PANTR iterations.
     unsigned iterations = 0;
     /// Total number of PANTR rejected accelerated steps.
@@ -224,6 +229,7 @@ operator+=(InnerStatsAccumulator<PANTRStats<Conf>> &acc,
            const PANTRStats<Conf> &s) {
     acc.iterations += s.iterations;
     acc.elapsed_time += s.elapsed_time;
+    acc.time_progress_callback += s.time_progress_callback;
     acc.iterations += s.iterations;
     acc.accelerated_step_rejected += s.accelerated_step_rejected;
     acc.stepsize_backtracks += s.stepsize_backtracks;

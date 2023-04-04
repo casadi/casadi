@@ -138,6 +138,10 @@ struct is_config<EigenConfigd> : std::true_type {};
 template <>
 struct is_config<EigenConfigl> : std::true_type {};
 
+/// Global empty vector for convenience.
+template <Config Conf>
+inline const rvec<Conf> null_vec = mvec<Conf>{nullptr, 0};
+
 namespace vec_util {
 
 /// Get the maximum or infinity-norm of the given vector.

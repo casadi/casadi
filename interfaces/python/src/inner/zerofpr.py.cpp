@@ -44,6 +44,7 @@ void register_zerofpr(py::module_ &m) {
                                     "C++ documentation: :cpp:class:`alpaqa::ZeroFPRProgressInfo`")
         // clang-format off
         .def_readonly("k", &ZeroFPRProgressInfo::k, "Iteration")
+        .def_readonly("status", &ZeroFPRProgressInfo::status, "Current solver status")
         .def_readonly("x", &ZeroFPRProgressInfo::x, "Decision variable :math:`x`")
         .def_readonly("p", &ZeroFPRProgressInfo::p, "Projected gradient step :math:`p`")
         .def_readonly("norm_sq_p", &ZeroFPRProgressInfo::norm_sq_p, ":math:`\\left\\|p\\right\\|^2`")

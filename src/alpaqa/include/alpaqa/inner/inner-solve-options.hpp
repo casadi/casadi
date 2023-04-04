@@ -21,6 +21,8 @@ struct InnerSolveOptions {
     real_t tolerance = 0;
     /// Output stream to print to.
     std::ostream *os = nullptr;
+    /// The current iteration of the outer solver.
+    unsigned outer_iter = 0;
 };
 
 } // namespace alpaqa

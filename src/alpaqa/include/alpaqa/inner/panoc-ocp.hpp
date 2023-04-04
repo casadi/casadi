@@ -67,6 +67,7 @@ struct PANOCOCPProgressInfo {
     USING_ALPAQA_CONFIG(Conf);
 
     unsigned k;
+    SolverStatus status;
     crvec xu;
     crvec p;
     real_t norm_sq_p;
@@ -83,6 +84,7 @@ struct PANOCOCPProgressInfo {
     real_t γ;
     real_t τ;
     real_t ε;
+    unsigned outer_iter;
     const TypeErasedControlProblem<config_t> *problem;
     const PANOCOCPParams<config_t> *params;
 

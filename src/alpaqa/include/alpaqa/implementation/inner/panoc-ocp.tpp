@@ -399,7 +399,7 @@ auto PANOCOCPSolver<Conf>::operator()(
     auto print_progress_1 = [&](unsigned k, real_t φₖ, real_t ψₖ, crvec grad_ψₖ,
                                 real_t pₖᵀpₖ, real_t γₖ, real_t εₖ) {
         if (k == 0)
-            *os << "┌─[PANOC]\n";
+            *os << "┌─[PANOCOCP]\n";
         else
             *os << "├─ " << std::setw(6) << k << '\n';
         *os << "│   φγ = " << print_real(φₖ)               //
@@ -421,6 +421,40 @@ auto PANOCOCPSolver<Conf>::operator()(
     auto print_progress_n = [&](SolverStatus status) {
         *os << "└─ " << status << " ──"
             << std::endl; // Flush for Python buffering
+    };
+
+    auto do_progress_cb = [this, &s, &problem, &lqr,
+                           &opts](unsigned k, Iterate &curr, crvec q, real_t τ,
+                                  real_t εₖ, bool did_gn, index_t nJ,
+                                  SolverStatus status) {
+        using enum SolverStatus;
+        if (!progress_cb)
+            return;
+        ScopedMallocAllower ma;
+        alpaqa::detail::Timed t{s.time_progress_callback};
+        progress_cb({
+            .k             = k,
+            .status        = status,
+            .xu            = curr.xu,
+            .p             = curr.p,
+            .norm_sq_p     = curr.pᵀp,
+            .x̂u            = curr.xû,
+            .φγ            = curr.fbe(),
+            .ψ             = curr.ψu,
+            .grad_ψ        = curr.grad_ψ,
+            .ψ_hat         = curr.ψû,
+            .q             = q,
+            .gn            = did_gn,
+            .nJ            = nJ,
+            .lqr_min_rcond = lqr.min_rcond,
+            .L             = curr.L,
+            .γ             = curr.γ,
+            .τ             = status == Busy ? τ : NaN<config_t>,
+            .ε             = εₖ,
+            .outer_iter    = opts.outer_iter,
+            .problem       = &problem,
+            .params        = &params,
+        });
     };
 
     // Initialize inputs and initial state (do not simulate states yet) --------
@@ -488,29 +522,6 @@ auto PANOCOCPSolver<Conf>::operator()(
         if (do_print)
             print_progress_1(k, curr->fbe(), curr->ψu, curr->grad_ψ, curr->pᵀp,
                              curr->γ, εₖ);
-        if (progress_cb) {
-            ScopedMallocAllower ma;
-            alpaqa::detail::Timed t{s.time_progress_callback};
-            progress_cb({.k             = k,
-                         .xu            = curr->xu,
-                         .p             = curr->p,
-                         .norm_sq_p     = curr->pᵀp,
-                         .x̂u            = curr->xû,
-                         .φγ            = curr->fbe(),
-                         .ψ             = curr->ψu,
-                         .grad_ψ        = curr->grad_ψ,
-                         .ψ_hat         = curr->ψû,
-                         .q             = q,
-                         .gn            = did_gn,
-                         .nJ            = did_gn ? J.sizes().sum() : nJ,
-                         .lqr_min_rcond = lqr.min_rcond,
-                         .L             = curr->L,
-                         .γ             = curr->γ,
-                         .τ             = τ,
-                         .ε             = εₖ,
-                         .problem       = &problem,
-                         .params        = &params});
-        }
 
         // Return solution -----------------------------------------------------
 
@@ -518,6 +529,8 @@ auto PANOCOCPSolver<Conf>::operator()(
         auto stop_status =
             check_all_stop_conditions(time_elapsed, k, εₖ, no_progress);
         if (stop_status != SolverStatus::Busy) {
+            do_progress_cb(k, *curr, null_vec<config_t>, -1, εₖ, false, 0,
+                           stop_status);
             bool do_final_print = params.print_interval != 0;
             if (!do_print && do_final_print)
                 print_progress_1(k, curr->fbe(), curr->ψu, curr->grad_ψ,
@@ -568,6 +581,7 @@ auto PANOCOCPSolver<Conf>::operator()(
             { // Find active indices J
                 alpaqa::detail::Timed t{s.time_indices};
                 J.update(is_constr_inactive);
+                nJ = J.sizes().sum();
             }
             { // evaluate the Jacobians
                 alpaqa::detail::Timed t{s.time_jacobians};
@@ -742,9 +756,9 @@ auto PANOCOCPSolver<Conf>::operator()(
         }
 
         // Print ---------------------------------------------------------------
+        do_progress_cb(k, *curr, q, τ, εₖ, did_gn, nJ, SolverStatus::Busy);
         if (do_print && (k != 0 || did_gn))
-            print_progress_2(q, τ, did_gn, did_gn ? J.sizes().sum() : nJ,
-                             lqr.min_rcond);
+            print_progress_2(q, τ, did_gn, nJ, lqr.min_rcond);
 
         // Advance step --------------------------------------------------------
         std::swap(curr, next);

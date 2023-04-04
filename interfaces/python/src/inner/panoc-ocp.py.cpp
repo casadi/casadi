@@ -38,6 +38,7 @@ void register_panoc_ocp(py::module_ &m) {
                                      "C++ documentation: :cpp:class:`alpaqa::PANOCOCPProgressInfo`")
         // clang-format off
         .def_readonly("k", &PANOCOCPProgressInfo::k, "Iteration")
+        .def_readonly("status", &PANOCOCPProgressInfo::status, "Current solver status")
         .def_readonly("xu", &PANOCOCPProgressInfo::xu, "States :math:`x` and inputs :math:`u`")
         .def_readonly("p", &PANOCOCPProgressInfo::p, "Projected gradient step :math:`p`")
         .def_readonly("norm_sq_p", &PANOCOCPProgressInfo::norm_sq_p, ":math:`\\left\\|p\\right\\|^2`")

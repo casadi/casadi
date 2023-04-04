@@ -135,18 +135,62 @@ auto ZeroFPRSolver<DirectionProviderT>::operator()(
     auto print_real3 = [&print_buf](real_t x) {
         return float_to_str_vw(print_buf, x, 3);
     };
-    auto print_progress = [&](unsigned k, real_t φγ, real_t ψ, crvec grad_ψ,
-                              real_t pᵀp, crvec q, real_t γ, real_t τ,
-                              real_t ε) {
-        *os << "[ZeroFPR] " << std::setw(6) << k << ": φγ = " << print_real(φγ)
-            << ", ψ = " << print_real(ψ)
-            << ", ‖∇ψ‖ = " << print_real(grad_ψ.norm())
-            << ", ‖p‖ = " << print_real(std::sqrt(pᵀp))
-            << ", γ = " << print_real(γ) << ", ε = " << print_real(ε);
-        if (k > 0)
-            *os << ", τ = " << print_real3(τ)
-                << ", ‖q‖ = " << print_real(q.norm());
-        *os << std::endl; // Flush for Python buffering
+    auto print_progress_1 = [&print_real, os](unsigned k, real_t φₖ, real_t ψₖ,
+                                              crvec grad_ψₖ, real_t pₖᵀpₖ,
+                                              real_t γₖ, real_t εₖ) {
+        if (k == 0)
+            *os << "┌─[ZeroFPR]\n";
+        else
+            *os << "├─ " << std::setw(6) << k << '\n';
+        *os << "│   φγ = " << print_real(φₖ)               //
+            << ",    ψ = " << print_real(ψₖ)               //
+            << ", ‖∇ψ‖ = " << print_real(grad_ψₖ.norm())   //
+            << ",  ‖p‖ = " << print_real(std::sqrt(pₖᵀpₖ)) //
+            << ",    γ = " << print_real(γₖ)               //
+            << ",    ε = " << print_real(εₖ) << '\n';
+    };
+    auto print_progress_2 = [&print_real, &print_real3, os](crvec qₖ,
+                                                            real_t τₖ) {
+        *os << "│  ‖q‖ = " << print_real(qₖ.norm()) //
+            << ",    τ = " << print_real3(τₖ)       //
+            << std::endl; // Flush for Python buffering
+    };
+    auto print_progress_n = [&](SolverStatus status) {
+        *os << "└─ " << status << " ──"
+            << std::endl; // Flush for Python buffering
+    };
+
+    auto do_progress_cb = [this, &s, &problem, &Σ, &y, &opts](
+                              unsigned k, Iterate &it, crvec q, crvec grad_ψx̂,
+                              real_t τ, real_t εₖ, SolverStatus status) {
+        using enum SolverStatus;
+        if (!progress_cb)
+            return;
+        ScopedMallocAllower ma;
+        alpaqa::detail::Timed t{s.time_progress_callback};
+        progress_cb(ProgressInfo{
+            .k          = k,
+            .status     = status,
+            .x          = it.x,
+            .p          = it.p,
+            .norm_sq_p  = it.pᵀp,
+            .x̂          = it.x̂,
+            .φγ         = it.fbe(),
+            .ψ          = it.ψx,
+            .grad_ψ     = it.grad_ψ,
+            .ψ_hat      = it.ψx̂,
+            .grad_ψ_hat = grad_ψx̂,
+            .q          = q,
+            .L          = it.L,
+            .γ          = it.γ,
+            .τ          = τ,
+            .ε          = εₖ,
+            .Σ          = Σ,
+            .y          = y,
+            .outer_iter = opts.outer_iter,
+            .problem    = &problem,
+            .params     = &params,
+        });
     };
 
     // Initialization ----------------------------------------------------------
@@ -213,32 +257,11 @@ auto ZeroFPRSolver<DirectionProviderT>::operator()(
             curr->ŷx̂, curr->grad_ψ, prox->grad_ψ, work_n, next->p);
 
         // Print progress ------------------------------------------------------
-
-        if (params.print_interval != 0 && k % params.print_interval == 0)
-            print_progress(k, curr->fbe(), curr->ψx, curr->grad_ψ, curr->pᵀp, q,
-                           curr->γ, τ, εₖ);
-        if (progress_cb) {
-            ScopedMallocAllower ma;
-            progress_cb({.k          = k,
-                         .x          = curr->x,
-                         .p          = curr->p,
-                         .norm_sq_p  = curr->pᵀp,
-                         .x̂          = curr->x̂,
-                         .φγ         = curr->fbe(),
-                         .ψ          = curr->ψx,
-                         .grad_ψ     = curr->grad_ψ,
-                         .ψ_hat      = curr->ψx̂,
-                         .grad_ψ_hat = prox->grad_ψ,
-                         .q          = q,
-                         .L          = curr->L,
-                         .γ          = curr->γ,
-                         .τ          = τ,
-                         .ε          = εₖ,
-                         .Σ          = Σ,
-                         .y          = y,
-                         .problem    = &problem,
-                         .params     = &params});
-        }
+        bool do_print =
+            params.print_interval != 0 && k % params.print_interval == 0;
+        if (do_print)
+            print_progress_1(k, curr->fbe(), curr->ψx, curr->grad_ψ, curr->pᵀp,
+                             curr->γ, εₖ);
 
         // Return solution -----------------------------------------------------
 
@@ -246,7 +269,14 @@ auto ZeroFPRSolver<DirectionProviderT>::operator()(
         auto stop_status  = Helpers::check_all_stop_conditions(
             params, opts, time_elapsed, k, stop_signal, εₖ, no_progress);
         if (stop_status != SolverStatus::Busy) {
-            // TODO: move the computation of ẑ and g(x) to ALM?
+            do_progress_cb(k, *curr, null_vec<config_t>, prox->grad_ψ, -1, εₖ,
+                           stop_status);
+            bool do_final_print = params.print_interval != 0;
+            if (!do_print && do_final_print)
+                print_progress_1(k, curr->fbe(), curr->ψx, curr->grad_ψ,
+                                 curr->pᵀp, curr->γ, εₖ);
+            if (do_print || do_final_print)
+                print_progress_n(stop_status);
             if (stop_status == SolverStatus::Converged ||
                 stop_status == SolverStatus::Interrupted ||
                 opts.always_overwrite_results) {
@@ -406,6 +436,11 @@ auto ZeroFPRSolver<DirectionProviderT>::operator()(
                     curr->grad_ψ, next->grad_ψ);
             }
         }
+
+        // Print ---------------------------------------------------------------
+        do_progress_cb(k, *curr, q, prox->grad_ψ, τ, εₖ, SolverStatus::Busy);
+        if (do_print && (k != 0 || direction.has_initial_direction()))
+            print_progress_2(q, τ);
 
         // Advance step --------------------------------------------------------
         std::swap(curr, next);

@@ -57,6 +57,7 @@ void register_panoc(py::module_ &m) {
                                   "C++ documentation: :cpp:class:`alpaqa::PANOCProgressInfo`")
         // clang-format off
         .def_readonly("k", &PANOCProgressInfo::k, "Iteration")
+        .def_readonly("status", &PANOCProgressInfo::status, "Current solver status")
         .def_readonly("x", &PANOCProgressInfo::x, "Decision variable :math:`x`")
         .def_readonly("p", &PANOCProgressInfo::p, "Projected gradient step :math:`p`")
         .def_readonly("norm_sq_p", &PANOCProgressInfo::norm_sq_p, ":math:`\\left\\|p\\right\\|^2`")

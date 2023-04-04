@@ -119,20 +119,6 @@ auto PANTRSolver<DirectionProviderT>::operator()(
     auto print_real3 = [&print_buf](real_t x) {
         return float_to_str_vw(print_buf, x, 3);
     };
-    [[maybe_unused]] auto print_progress =
-        [&](unsigned k, real_t φγ, real_t ψ, crvec grad_ψ, real_t pᵀp, crvec q,
-            real_t γ, real_t ε, real_t Δ, real_t ρ) {
-            *os << "[PANTR] " << std::setw(6) << k
-                << ": φγ = " << print_real(φγ) << ", ψ = " << print_real(ψ)
-                << ", ‖∇ψ‖ = " << print_real(grad_ψ.norm())
-                << ", ‖p‖ = " << print_real(std::sqrt(pᵀp))
-                << ", γ = " << print_real(γ) << ", ε = " << print_real(ε)
-                << ", Δ = " << print_real3(Δ);
-            if (k > 0)
-                *os << ", ρ = " << print_real3(ρ)
-                    << ", ‖q‖ = " << print_real(q.norm());
-            *os << std::endl; // Flush for Python buffering
-        };
 
     auto print_progress_1 = [&](unsigned k, real_t φₖ, real_t ψₖ, crvec grad_ψₖ,
                                 real_t pₖᵀpₖ, real_t γₖ, real_t εₖ, real_t Δₖ) {
@@ -164,6 +150,40 @@ auto PANTRSolver<DirectionProviderT>::operator()(
     auto print_progress_n = [&](SolverStatus status) {
         *os << "└─ " << status << " ──"
             << std::endl; // Flush for Python buffering
+    };
+    auto do_progress_cb = [this, &s, &problem, &Σ, &y,
+                           &opts](unsigned k, Iterate &it, crvec q,
+                                  crvec grad_ψx̂, real_t Δ, real_t ρ, real_t εₖ,
+                                  SolverStatus status) {
+        using enum SolverStatus;
+        if (!progress_cb)
+            return;
+        ScopedMallocAllower ma;
+        alpaqa::detail::Timed t{s.time_progress_callback};
+        progress_cb(ProgressInfo{
+            .k          = k,
+            .status     = status,
+            .x          = it.x,
+            .p          = it.p,
+            .norm_sq_p  = it.pᵀp,
+            .x̂          = it.x̂,
+            .φγ         = it.fbe(),
+            .ψ          = it.ψx,
+            .grad_ψ     = it.grad_ψ,
+            .ψ_hat      = it.ψx̂,
+            .grad_ψ_hat = grad_ψx̂,
+            .q          = q,
+            .L          = it.L,
+            .γ          = it.γ,
+            .Δ          = Δ,
+            .ρ          = ρ,
+            .ε          = εₖ,
+            .Σ          = Σ,
+            .y          = y,
+            .outer_iter = opts.outer_iter,
+            .problem    = &problem,
+            .params     = &params,
+        });
     };
 
     // Initialization ----------------------------------------------------------
@@ -236,29 +256,6 @@ auto PANTRSolver<DirectionProviderT>::operator()(
         if (do_print)
             print_progress_1(k, curr->fbe(), curr->ψx, curr->grad_ψ, curr->pᵀp,
                              curr->γ, εₖ, Δ);
-        if (progress_cb) {
-            ScopedMallocAllower ma;
-            progress_cb({.k          = k,
-                         .x          = curr->x,
-                         .p          = curr->p,
-                         .norm_sq_p  = curr->pᵀp,
-                         .x̂          = curr->x̂,
-                         .φγ         = curr->fbe(),
-                         .ψ          = curr->ψx,
-                         .grad_ψ     = curr->grad_ψ,
-                         .ψ_hat      = curr->ψx̂,
-                         .grad_ψ_hat = grad_ψx̂,
-                         .q          = q,
-                         .L          = curr->L,
-                         .γ          = curr->γ,
-                         .Δ          = Δ,
-                         .ρ          = ρ,
-                         .ε          = εₖ,
-                         .Σ          = Σ,
-                         .y          = y,
-                         .problem    = &problem,
-                         .params     = &params});
-        }
 
         // Return solution -----------------------------------------------------
 
@@ -266,6 +263,8 @@ auto PANTRSolver<DirectionProviderT>::operator()(
         auto stop_status  = Helpers::check_all_stop_conditions(
             params, opts, time_elapsed, k, stop_signal, εₖ, no_progress);
         if (stop_status != SolverStatus::Busy) {
+            do_progress_cb(k, *curr, null_vec<config_t>, grad_ψx̂, NaN<config_t>,
+                           NaN<config_t>, εₖ, stop_status);
             bool do_final_print = params.print_interval != 0;
             if (!do_print && do_final_print)
                 print_progress_1(k, curr->fbe(), curr->ψx, curr->grad_ψ,
@@ -396,6 +395,9 @@ auto PANTRSolver<DirectionProviderT>::operator()(
                 Δ = std::fmax(compute_updated_radius(q, ρ, Δ), params.Δ_min);
             }
         }
+
+        // Progress callback
+        do_progress_cb(k, *curr, q, grad_ψx̂, Δ, ρ, εₖ, SolverStatus::Busy);
 
         // Accept TR step
         if (accept_candidate) {

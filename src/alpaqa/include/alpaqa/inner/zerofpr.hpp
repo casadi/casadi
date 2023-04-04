@@ -69,6 +69,7 @@ struct ZeroFPRStats {
     SolverStatus status = SolverStatus::Busy;
     real_t ε            = inf<config_t>;
     std::chrono::nanoseconds elapsed_time{};
+    std::chrono::nanoseconds time_progress_callback{};
     unsigned iterations            = 0;
     unsigned linesearch_failures   = 0;
     unsigned linesearch_backtracks = 0;
@@ -89,6 +90,7 @@ struct ZeroFPRProgressInfo {
     USING_ALPAQA_CONFIG(Conf);
 
     unsigned k;
+    SolverStatus status;
     crvec x;
     crvec p;
     real_t norm_sq_p;
@@ -105,6 +107,7 @@ struct ZeroFPRProgressInfo {
     real_t ε;
     crvec Σ;
     crvec y;
+    unsigned outer_iter;
     const TypeErasedProblem<config_t> *problem;
     const ZeroFPRParams<config_t> *params;
 };
@@ -187,6 +190,8 @@ struct InnerStatsAccumulator<ZeroFPRStats<Conf>> {
 
     /// Total elapsed time in the inner solver.
     std::chrono::nanoseconds elapsed_time{};
+    /// Total time spent in the user-provided progress callback.
+    std::chrono::nanoseconds time_progress_callback{};
     /// Total number of inner ZeroFPR iterations.
     unsigned iterations = 0;
     /// Total number of ZeroFPR line search failures.
@@ -226,6 +231,7 @@ operator+=(InnerStatsAccumulator<ZeroFPRStats<Conf>> &acc,
            const ZeroFPRStats<Conf> &s) {
     acc.iterations += s.iterations;
     acc.elapsed_time += s.elapsed_time;
+    acc.time_progress_callback += s.time_progress_callback;
     acc.linesearch_failures += s.linesearch_failures;
     acc.linesearch_backtracks += s.linesearch_backtracks;
     acc.stepsize_backtracks += s.stepsize_backtracks;

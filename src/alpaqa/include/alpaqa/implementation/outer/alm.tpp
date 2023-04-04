@@ -81,7 +81,7 @@ ALMSolver<InnerSolverT>::operator()(const Problem &p, rvec x, rvec y) {
 
     unsigned num_successful_iters = 0;
 
-    for (unsigned int i = 0; i < params.max_iter; ++i) {
+    for (unsigned i = 0; i < params.max_iter; ++i) {
         // TODO: this is unnecessary when the previous iteration lowered the
         // penalty update factor.
         p.eval_proj_multipliers(y, params.M);
@@ -107,6 +107,7 @@ ALMSolver<InnerSolverT>::operator()(const Problem &p, rvec x, rvec y) {
             .max_time                 = params.max_time - time_elapsed,
             .tolerance                = ε,
             .os                       = os,
+            .outer_iter               = i,
         };
         // Call the inner solver to minimize the augmented lagrangian for fixed
         // Lagrange multipliers y.

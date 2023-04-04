@@ -47,6 +47,7 @@ void register_pantr(py::module_ &m) {
                                   "C++ documentation: :cpp:class:`alpaqa::PANTRProgressInfo`")
         // clang-format off
         .def_readonly("k", &PANTRProgressInfo::k, "Iteration")
+        .def_readonly("status", &PANTRProgressInfo::status, "Current solver status")
         .def_readonly("x", &PANTRProgressInfo::x, "Decision variable :math:`x`")
         .def_readonly("p", &PANTRProgressInfo::p, "Projected gradient step :math:`p`")
         .def_readonly("norm_sq_p", &PANTRProgressInfo::norm_sq_p, ":math:`\\left\\|p\\right\\|^2`")
