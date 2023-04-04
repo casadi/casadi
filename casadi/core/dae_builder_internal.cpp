@@ -2860,13 +2860,18 @@ Sparsity DaeBuilderInternal::hess_sparsity(const std::vector<size_t>& oind,
 
 std::string DaeBuilderInternal::iso_8601_time() {
   // Get current time
-  std::time_t now = std::time({});
-  // Convert to ISO 8601 format and return
-  std::string format = "YYYY-MM-DDThh:mm:ssZ";
-  std::vector<char> buf(format.size());
-  std::strftime(&buf.front(), buf.size(), "%FT%TZ",
-    std::gmtime(&now));  // NOLINT(runtime/threadsafe_fn)
-  return &buf.front();
+  auto now = std::chrono::system_clock::now();
+  std::time_t tt = std::chrono::system_clock::to_time_t(now);
+  auto local_tm = *std::localtime(&tt);  // NOLINT(runtime/threadsafe_fn)
+  // Convert to ISO 8601 (YYYY-MM-DDThh:mm:ssZ) format and return
+  std::stringstream ss;
+  ss << local_tm.tm_year + 1900 << '-';  // YYYY-
+  ss << std::setfill('0') << std::setw(2) << local_tm.tm_mon + 1 << '-';  // MM-
+  ss << std::setfill('0') << std::setw(2) << local_tm.tm_mday << 'T';  // DDT
+  ss << std::setfill('0') << std::setw(2) << local_tm.tm_hour << ':';  // hh:
+  ss << std::setfill('0') << std::setw(2) << local_tm.tm_min << ':';  // mm:
+  ss << std::setfill('0') << std::setw(2) << local_tm.tm_sec << 'Z'; // ssZ
+  return ss.str();
 }
 
 std::string DaeBuilderInternal::generate_guid() {

@@ -127,23 +127,40 @@ void casadi_cvx_tri(T1* A, casadi_int n, T1* beta, T1* p) {
 
 
 // SYMBOL "cvx_givens"
-// Ref: Golub & Van Loan Alg. 5.1.3
+// Continuous algorithm for generating real plane rotations
+// Ref: Anderson Alg. 4, Discontinuous Plane Rotations
+// and the Symmetric Eigenvalue Problem
 template<typename T1>
 void casadi_cvx_givens(T1 a, T1 b, T1* c, T1* s) {
   T1 r;
   if (b==0) {
     *c = 1;
-    *s = 0;
-  } else {
-    if (fabs(b)>fabs(a)) {
-      r = -a/b;
-      *s = 1/sqrt(1+r*r);
-      *c = (*s)*r;
-    } else {
-      r = -b/a;
-      *c = 1/sqrt(1+r*r);
-      *s = (*c)*r;
+    if (a<0) {
+      *c = -1;
     }
+    *s = 0;
+  } else if (a==0) {
+    *c = 0;
+    *s = 1;
+    if (b<0) {
+      *s = -1;
+    }
+  } else if (fabs(a)>fabs(b)) {
+    r = b/a;
+    if (a>0) {
+      *c = 1/sqrt(1+r*r);
+    } else {
+      *c = -1/sqrt(1+r*r);
+    }
+    *s = (*c)*r;
+  } else {
+    r = a/b;
+    if (b>0) {
+      *s = 1/sqrt(1+r*r);
+    } else {
+      *s = -1/sqrt(1+r*r);
+    }
+    *c = (*s)*r;
   }
 }
 

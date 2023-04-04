@@ -35,7 +35,7 @@
 namespace casadi {
 
 // Forward declarations
-class XmlNode;
+struct XmlNode;
 
 /// Variable type (FMI 2)
 enum class TypeFmi2 {REAL, INTEGER, BOOLEAN, STRING, ENUM, NUMEL};
@@ -165,7 +165,7 @@ struct CASADI_EXPORT Variable {
 /// Internal class for DaeBuilder, see comments on the public class.
 class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   friend class DaeBuilder;
-  friend class Fmu;
+  friend struct Fmu;
   friend class FmuFunction;
 
  public:
