@@ -109,11 +109,9 @@ int main(){
     opts["interpolation_order"] = 1;
     opts["number_of_finite_elements"] = 1000;
   }
-  opts["t0"] = t0;
-  opts["tf"] = tf;
 
   // Create integrator
-  Function F = integrator("integrator", plugin, dae, opts);
+  Function F = integrator("integrator", plugin, dae, t0, tf, opts);
 
   // control for all segments
   MX U = MX::sym("U",nu);

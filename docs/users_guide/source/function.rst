@@ -257,14 +257,14 @@ is a DAE of semi-explicit form with quadratures:
 .. math::
 
     \begin{aligned}
-     \dot{x} &= f_{\text{ode}}(t,x,z,p), \qquad x(0) = x_0 \\
-          0  &= f_{\text{alg}}(t,x,z,p) \\
-     \dot{q} &= f_{\text{quad}}(t,x,z,p), \qquad q(0) = 0
+     \dot{x} &= f_{\text{ode}}(t,x,z,p,u), \qquad x(0) = x_0 \\
+          0  &= f_{\text{alg}}(t,x,z,p,u) \\
+     \dot{q} &= f_{\text{quad}}(t,x,z,p,u), \qquad q(0) = 0
     \end{aligned}
 
 For solvers of *ordinary* differential equations, the second equation and the algebraic variables :math:`z` must be absent.
 
-An integrator in |casadi| is a function that takes the state at the initial time ``x0``, a set of parameters ``p``, and a guess for the algebraic variables (only for DAEs) ``z0`` and returns the state vector ``xf``, algebraic variables ``zf`` and the quadrature state ``qf``, all at the final time.
+An integrator in |casadi| is a function that takes the state at the initial time ``x0``, a set of parameters ``p`` and controls ``u``, and a guess for the algebraic variables (only for DAEs) ``z0`` and returns the state vector ``xf``, algebraic variables ``zf`` and the quadrature state ``qf`` at a number of output times. The control vector ``u`` is assumed to be piecewise constant and has the same grid discretization as the output grid.
 
 The freely available `SUNDIALS suite <https://computation.llnl.gov/casc/sundials/description/description.html>`_ (distributed along with |casadi|) contains the two popular integrators CVodes and IDAS for ODEs and DAEs respectively. These integrators have support for forward and adjoint sensitivity analysis and when used via |casadi|'s Sundials interface, |casadi| will automatically formulate the Jacobian information, which is needed by the backward differentiation formula (BDF) that CVodes and IDAS use. Also automatically formulated will be the forward and adjoint sensitivity equations.
 
@@ -298,9 +298,9 @@ An integrator, using the "idas" plugin, can be created using the syntax:
     F = integrator('F', 'idas', dae);
     disp(F)
 
-
-Integrating this DAE from 0 to 1 with :math:`x(0)=0`, :math:`p=0.1` and using the guess :math:`z(0)=0`, can
-be done by evaluating the created function object:
+This will result in an integration from :math:`t_0=0` until :math:`t_f=1`, i.e. a single output time.
+We can evaluate the function object using the initial condition :math:`x(0)=0`, parameter :math:`p=0.1`
+and the guess for the algebraic variable at the initial time :math:`z(0)=0` as follows:
 
 .. side-by-side::
     .. exec-block:: python
@@ -322,7 +322,7 @@ be done by evaluating the created function object:
         r = F('x0',0,'z0',0,'p',0.1);
         disp(r.xf)
 
-The time horizon is assumed to be fixed [#f1]_ and can be changed from its default [0, 1] by setting the options "t0" and "tf".
+Note that the time horizon is always fixed. It can be changed to its default values :math:`t_0=0` and :math:`t_f=1` by adding two additional argument to the constructor, after the DAE. :math:`t_f` can either be a single value or a vector of values. It may include the initial time.
 
 Sensitivity analysis
 ^^^^^^^^^^^^^^^^^^^^
@@ -809,6 +809,64 @@ The ``fold``/``mapaccum`` operation supports primitive functions :math:`f` with 
 The first input and output are used for accumulating, while the remainder inputs are read column-wise over the iterations.
 
 The ``map``/``mapaccum`` operation exhibits a graph size and initialization time that scales logarithmically with :math:`n`.
+
+Conditional evaluation
+^^^^
+
+It is possible to include conditional evaluation of expressions in CasADi expression graphs by constucting ``conditional`` function instances. This function takes a number of existing ``Function`` instances,  :math:`f_1`, :math:`f_2`, :math:`f_n` as well as a "default" function :math:`f_{def}`. All these functions must have the same input and output signatures, i.e. the same number of inputs and outputs with the same dimensions:
+
+.. side-by-side::
+    .. exec-block:: python
+
+        x = SX.sym("x")
+        f0 = Function("f0",[x],[sin(x)])
+        f1 = Function("f1",[x],[cos(x)])
+        f2 = Function("f2",[x],[tan(x)])
+        f_cond = Function.conditional('f_cond', [f0, f1], f2)
+        print(cond_f)
+
+    .. exec-block:: octave
+
+        x = SX.sym('x');
+        f0 = Function('f0',{x},{sin(x)});
+        f1 = Function('f1',{x},{cos(x)});
+        f2 = Function('f2',{x},{tan(x)});
+        f_cond = Function.conditional('f_cond', {f0, f1}, f2);
+        disp(F);
+
+The result is a new function instance with the same input/output signature, but with one additional input corresponding to an index. Its evaluation corresponds to:
+
+.. math::
+    f_{\text{cond}}(c, x_1, x_2, \ldots, x_m) = \left\{
+    \begin{array}{ll}
+    f_0(x_1, x_2, \ldots, x_m) & \text{if $c = 0$,} \\
+    f_1(x_1, x_2, \ldots, x_m) & \text{if $c = 1$,} \\
+    f_2(x_1, x_2, \ldots, x_m) & \text{otherwise}
+    \end{array}
+    \right.
+
+A function above can be missing (i.e. be a null pointer ``Function()``), in which case all outputs will be evaluated to NaN. Note that the evaluation is "short-circuiting", i.e. only the relevant function is evaluated. This also applies to any derivative calculation.
+
+A common special case is when there is only a single case in addition to the default case. This is equivalent to an if-then-else statement, which can be written with the shorthand:
+
+.. side-by-side::
+    .. exec-block:: python
+
+        x = SX.sym("x")
+        f_true = Function("f_true",[x],[cos(x)])
+        f_false = Function("f_false",[x],[sin(x)])
+        f_cond = Function.if_else('f_cond', f_true, f_false)
+        print(f_cond)
+
+    .. exec-block:: octave
+
+        x = SX.sym('x');
+        f_true = Function('f_true',{x},{cos(x)});
+        f_false = Function('f_false',{x},{sin(x)});
+        f_cond = Function.if_else('f_cond', f_true, f_false);
+        disp(f_cond);
+
+Note that conditional expressions such as these can result in non-smooth expressions that may not converge if used if used in a gradient-based optimization algorithm.
 
 .. rubric:: Footnotes
 
