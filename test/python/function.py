@@ -2520,7 +2520,7 @@ class Functiontests(casadiTestCase):
 
       for ff in [F.forward(1).forward(1),F.forward(1).reverse(1),F.reverse(1).forward(1),F.reverse(1).reverse(1)]:
         s = str(ff)
-        self.assertTrue("y" not in s.replace("_y[2x2,0nz]","foo")[len("fwd1_adj1_F:(x[2x2],y[2x2]"):])
+        self.assertTrue("y" not in s.replace("_y[2x2,0nz]","foo")[len("fwd1_adj1_F:(in_in_x[2x2],in_in_y[2x2]"):])
 
 
       ye = X(2,2);
