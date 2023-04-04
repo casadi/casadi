@@ -1207,10 +1207,10 @@
 %exception  casadi::Function::factory(const std::string &name, const std::vector< std::string > &s_in, const std::vector< std::string > &s_out, const AuxOut &aux=AuxOut(), const Dict &opts=Dict()) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Function::find(casadi_int max_depth, const std::string &name) const {
+%exception  casadi::Function::find_function(const std::string &name, casadi_int max_depth=-1) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Function::find(casadi_int max_depth=-1) const {
+%exception  casadi::Function::find_functions(casadi_int max_depth=-1) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Function::fold(casadi_int N, const Dict &opts=Dict()) const {
