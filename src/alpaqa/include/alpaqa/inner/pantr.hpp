@@ -29,9 +29,9 @@ struct PANTRParams {
     /// Maximum duration.
     std::chrono::nanoseconds max_time = std::chrono::minutes(5);
     /// Minimum Lipschitz constant estimate.
-    real_t L_min = 1e-5;
+    real_t L_min = real_t(1e-5);
     /// Maximum Lipschitz constant estimate.
-    real_t L_max = 1e20;
+    real_t L_max = real_t(1e20);
     /// What stopping criterion to use.
     PANOCStopCrit stop_crit = PANOCStopCrit::ApproxKKT;
     /// Maximum number of iterations without any progress before giving up.
@@ -48,16 +48,16 @@ struct PANTRParams {
     real_t TR_tolerance_factor = 10 * std::numeric_limits<real_t>::epsilon();
 
     /// Minimal TR ratio to be accepted (successful).
-    real_t μ1 = 0.2;
+    real_t μ1 = real_t(0.2);
     /// Minimal TR ratio to increase radius (very successful).
-    real_t μ2 = 0.8;
+    real_t μ2 = real_t(0.8);
 
     /// TR radius decrease coefficient when unsuccessful.
-    real_t c1 = 0.35;
+    real_t c1 = real_t(0.35);
     /// TR radius decrease coefficient when successful.
-    real_t c2 = 0.999;
+    real_t c2 = real_t(0.999);
     /// TR radius increase coefficient when very successful.
-    real_t c3 = 2.5;
+    real_t c3 = real_t(2.5);
 
     /// Initial trust radius.
     real_t Δ_0 = NaN<config_t>;
