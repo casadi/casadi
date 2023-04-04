@@ -33,7 +33,7 @@ ALMSolver<InnerSolverT>::operator()(const Problem &p, rvec x, rvec y) {
         InnerSolveOptions<config_t> opts{
             .always_overwrite_results = true,
             .max_time                 = params.max_time,
-            .tolerance                = params.ε,
+            .tolerance                = params.tolerance,
             .os                       = os,
         };
         auto ps              = inner_solver(p, opts, x, y, Σ, error);
@@ -66,25 +66,25 @@ ALMSolver<InnerSolverT>::operator()(const Problem &p, rvec x, rvec y) {
     Stats s;
 
     // Initialize the penalty weights
-    if (params.Σ_0 > 0) {
-        Σ.fill(params.Σ_0);
+    if (params.initial_penalty > 0) {
+        Σ.fill(params.initial_penalty);
     }
     // Initial penalty weights from problem
     else {
         Helpers::initialize_penalty(p, params, x, Σ);
     }
 
-    real_t ε                      = params.ε_0;
+    real_t ε                      = params.initial_tolerance;
     [[maybe_unused]] real_t ε_old = NaN;
-    real_t Δ                      = params.Δ;
-    real_t ρ                      = params.ρ;
+    real_t Δ                      = params.penalty_update_factor;
+    real_t ρ                      = params.tolerance_update_factor;
 
     unsigned num_successful_iters = 0;
 
     for (unsigned i = 0; i < params.max_iter; ++i) {
         // TODO: this is unnecessary when the previous iteration lowered the
         // penalty update factor.
-        p.eval_proj_multipliers(y, params.M);
+        p.eval_proj_multipliers(y, params.max_multiplier);
         // Check if we're allowed to lower the penalty factor even further.
         bool out_of_penalty_factor_updates =
             (num_successful_iters == 0
@@ -166,19 +166,20 @@ ALMSolver<InnerSolverT>::operator()(const Problem &p, rvec x, rvec y) {
             if (num_successful_iters > 0) {
                 // We have a previous Σ and error
                 // Recompute penalty with smaller Δ
-                Δ = std::fmax(params.Δ_min, Δ * params.Δ_lower);
+                Δ = std::fmax(params.min_penalty_update_factor,
+                              Δ * params.penalty_update_factor_lower);
                 Helpers::update_penalty_weights(params, Δ, false, error_1,
                                                 error_2, norm_e_1, norm_e_2,
                                                 Σ_old, Σ, true);
                 // Recompute the primal tolerance with larger ρ
                 ρ = std::fmin(params.ρ_max, ρ * params.ρ_increase);
-                ε = std::fmax(ρ * ε_old, params.ε);
+                ε = std::fmax(ρ * ε_old, params.tolerance);
                 ++s.penalty_reduced;
             } else {
                 // We don't have a previous Σ, simply lower the current Σ and
                 // increase ε
-                Σ *= params.Σ_0_lower;
-                ε *= params.ε_0_increase;
+                Σ *= params.initial_penalty_lower;
+                ε *= params.initial_tolerance_increase;
                 ++s.initial_penalty_reduced;
             }
         }
@@ -192,8 +193,8 @@ ALMSolver<InnerSolverT>::operator()(const Problem &p, rvec x, rvec y) {
             norm_e_2 = std::exchange(norm_e_1, vec_util::norm_inf(error_1));
 
             // Check the termination criteria
-            bool alm_converged =
-                ps.ε <= params.ε && inner_converged && norm_e_1 <= params.δ;
+            bool alm_converged = ps.ε <= params.tolerance && inner_converged &&
+                                 norm_e_1 <= params.dual_tolerance;
             bool exit = alm_converged || out_of_iter || out_of_time;
             if (exit) {
                 s.ε                = ps.ε;
@@ -215,7 +216,7 @@ ALMSolver<InnerSolverT>::operator()(const Problem &p, rvec x, rvec y) {
                 params, Δ, num_successful_iters == 0, error_1, error_2,
                 norm_e_1, norm_e_2, Σ_old, Σ, true);
             // Lower the primal tolerance for the inner solver.
-            ε_old = std::exchange(ε, std::fmax(ρ * ε, params.ε));
+            ε_old = std::exchange(ε, std::fmax(ρ * ε, params.tolerance));
             ++num_successful_iters;
         }
     }

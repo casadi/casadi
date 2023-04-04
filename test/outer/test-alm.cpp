@@ -49,16 +49,16 @@ TEST(ALM, singleshooting1D) {
     using ALMSolver   = alpaqa::ALMSolver<PANOCSolver>;
 
     ALMSolver::Params almparam;
-    almparam.ε        = 1e-4;
-    almparam.δ        = 1e-4;
-    almparam.Δ        = 100;
-    almparam.Σ_0      = 20;
-    almparam.ε_0      = 1;
-    almparam.θ        = 0.25;
-    almparam.ρ        = 1e-1;
-    almparam.M        = 1e9;
-    almparam.Σ_max    = 1e9;
-    almparam.max_iter = 10;
+    almparam.tolerance                      = 1e-4;
+    almparam.dual_tolerance                 = 1e-4;
+    almparam.penalty_update_factor          = 100;
+    almparam.initial_penalty                = 20;
+    almparam.initial_tolerance              = 1;
+    almparam.rel_penalty_increase_threshold = 0.25;
+    almparam.tolerance_update_factor        = 1e-1;
+    almparam.max_multiplier                 = 1e9;
+    almparam.max_penalty                    = 1e9;
+    almparam.max_iter                       = 10;
 
     PANOCSolver::Params panocparam;
     panocparam.Lipschitz.ε = 1e-6;
@@ -137,16 +137,16 @@ TEST(ALM, multipleshooting1D) {
     using ALMSolver   = alpaqa::ALMSolver<PANOCSolver>;
 
     ALMSolver::Params almparam;
-    almparam.ε        = 1e-4;
-    almparam.δ        = 1e-4;
-    almparam.Δ        = 5; ///< Factor used in updating the penalty parameters
-    almparam.Σ_0      = 1; ///< Initial penalty parameter
-    almparam.ε_0      = 1e-4; ///< Initial tolerance on x
-    almparam.θ        = 0.25;
-    almparam.ρ        = 1e-1;
-    almparam.M        = 1e9;
-    almparam.Σ_max    = 1e9;
-    almparam.max_iter = 10;
+    almparam.tolerance                      = 1e-4;
+    almparam.dual_tolerance                 = 1e-4;
+    almparam.penalty_update_factor          = 5;
+    almparam.initial_penalty                = 1;
+    almparam.initial_tolerance              = 1e-4;
+    almparam.rel_penalty_increase_threshold = 0.25;
+    almparam.tolerance_update_factor        = 1e-1;
+    almparam.max_multiplier                 = 1e9;
+    almparam.max_penalty                    = 1e9;
+    almparam.max_iter                       = 10;
 
     PANOCSolver::Params panocparam;
     panocparam.Lipschitz.ε = 1e-6;
@@ -240,16 +240,16 @@ TEST(ALM, multipleshooting8D) {
     using ALMSolver   = alpaqa::ALMSolver<PANOCSolver>;
 
     ALMSolver::Params almparam;
-    almparam.ε        = 1e-4;
-    almparam.δ        = 1e-4;
-    almparam.Δ        = 5; ///< Factor used in updating the penalty parameters
-    almparam.Σ_0      = 1; ///< Initial penalty parameter
-    almparam.ε_0      = 1e-4; ///< Initial tolerance on x
-    almparam.θ        = 0.25;
-    almparam.ρ        = 1e-1;
-    almparam.M        = 1e9;
-    almparam.Σ_max    = 1e9;
-    almparam.max_iter = 20;
+    almparam.tolerance                      = 1e-4;
+    almparam.dual_tolerance                 = 1e-4;
+    almparam.penalty_update_factor          = 5;
+    almparam.initial_penalty                = 1;
+    almparam.initial_tolerance              = 1e-4;
+    almparam.rel_penalty_increase_threshold = 0.25;
+    almparam.tolerance_update_factor        = 1e-1;
+    almparam.max_multiplier                 = 1e9;
+    almparam.max_penalty                    = 1e9;
+    almparam.max_iter                       = 20;
 
     PANOCSolver::Params panocparam;
     panocparam.Lipschitz.ε = 1e-6;
@@ -365,16 +365,16 @@ TEST(ALM, multipleshooting8Dstructured) {
     using ALMSolver   = alpaqa::ALMSolver<InnerSolver>;
 
     ALMSolver::Params almparam;
-    almparam.ε        = 1e-4;
-    almparam.δ        = 1e-4;
-    almparam.Δ        = 5; ///< Factor used in updating the penalty parameters
-    almparam.Σ_0      = 1; ///< Initial penalty parameter
-    almparam.ε_0      = 1e-4; ///< Initial tolerance on x
-    almparam.θ        = 0.25;
-    almparam.ρ        = 1e-1;
-    almparam.M        = 1e9;
-    almparam.Σ_max    = 1e9;
-    almparam.max_iter = 20;
+    almparam.tolerance                      = 1e-4;
+    almparam.dual_tolerance                 = 1e-4;
+    almparam.penalty_update_factor          = 5;
+    almparam.initial_penalty                = 1;
+    almparam.initial_tolerance              = 1e-4;
+    almparam.rel_penalty_increase_threshold = 0.25;
+    almparam.tolerance_update_factor        = 1e-1;
+    almparam.max_multiplier                 = 1e9;
+    almparam.max_penalty                    = 1e9;
+    almparam.max_iter                       = 20;
 
     InnerSolver::Params panocparam;
     panocparam.Lipschitz.ε = 1e-6;

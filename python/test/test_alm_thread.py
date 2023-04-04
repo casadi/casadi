@@ -12,7 +12,7 @@ def test_alm_threaded():
     pp = pa.PANOCParams(max_no_progress=100, max_iter=100)
     lbfgs = pa.LBFGSDirection()
     panoc = pa.PANOCSolver(pp, lbfgs)
-    alm_params = pa.ALMParams(ε=1e-200, δ=1e-200, max_iter=200, print_interval=0)
+    alm_params = pa.ALMParams(tolerance=1e-200, dual_tolerance=1e-200, max_iter=200, print_interval=0)
     solver = pa.ALMSolver(alm_params, panoc)
 
     import casadi as cs

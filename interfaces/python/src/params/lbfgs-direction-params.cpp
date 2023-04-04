@@ -1,7 +1,7 @@
 #include "params.hpp"
 
 PARAMS_TABLE_DEF(alpaqa::LBFGSDirectionParams<Conf>,    //
-                 PARAMS_MEMBER(rescale_when_γ_changes), //
+                 PARAMS_MEMBER(rescale_on_step_size_changes), //
 );
 
 PARAMS_TABLE_INST(alpaqa::LBFGSDirectionParams<alpaqa::EigenConfigf>);

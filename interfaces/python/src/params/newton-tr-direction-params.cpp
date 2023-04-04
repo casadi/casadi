@@ -1,10 +1,10 @@
 #include "newton-tr-direction-params.hpp"
 
-PARAMS_TABLE_DEF(alpaqa::NewtonTRDirectionParams<Conf>, //
-                 PARAMS_MEMBER(rescale_when_γ_changes), //
-                 PARAMS_MEMBER(hessian_vec_factor),     //
-                 PARAMS_MEMBER(finite_diff),            //
-                 PARAMS_MEMBER(finite_diff_stepsize),   //
+PARAMS_TABLE_DEF(alpaqa::NewtonTRDirectionParams<Conf>,       //
+                 PARAMS_MEMBER(rescale_on_step_size_changes), //
+                 PARAMS_MEMBER(hessian_vec_factor),           //
+                 PARAMS_MEMBER(finite_diff),                  //
+                 PARAMS_MEMBER(finite_diff_stepsize),         //
 );
 
 PARAMS_TABLE_INST(alpaqa::NewtonTRDirectionParams<alpaqa::EigenConfigf>);

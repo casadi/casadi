@@ -9,7 +9,7 @@ namespace alpaqa {
 /// Parameters for the @ref AndersonDirection class.
 template <Config Conf>
 struct AndersonDirectionParams {
-    bool rescale_when_γ_changes = false;
+    bool rescale_on_step_size_changes = false;
 };
 
 /// @ingroup grp_DirectionProviders
@@ -75,7 +75,7 @@ struct AndersonDirection {
 
     /// @see @ref PANOCDirection::changed_γ
     void changed_γ(real_t γₖ, real_t old_γₖ) {
-        if (direction_params.rescale_when_γ_changes)
+        if (direction_params.rescale_on_step_size_changes)
             anderson.scale_R(γₖ / old_γₖ);
         else
             anderson.reset();

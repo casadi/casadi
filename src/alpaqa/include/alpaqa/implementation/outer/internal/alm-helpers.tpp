@@ -18,22 +18,22 @@ struct ALMHelpers {
                                        rvec old_e, real_t norm_e,
                                        real_t old_norm_e, crvec Σ_old, rvec Σ,
                                        bool monotone) {
-        if (norm_e <= params.δ) {
+        const real_t θ = params.rel_penalty_increase_threshold;
+        if (norm_e <= params.dual_tolerance) {
             Σ = Σ_old;
             return;
         }
         if (params.single_penalty_factor) {
-            if (first_iter || norm_e > params.θ * old_norm_e) {
-                real_t new_Σ = std::fmin(params.Σ_max, Δ * Σ_old(0));
+            if (first_iter || norm_e > θ * old_norm_e) {
+                real_t new_Σ = std::fmin(params.max_penalty, Δ * Σ_old(0));
                 Σ.setConstant(new_Σ);
             } else {
                 Σ = Σ_old;
             }
         } else {
             for (index_t i = 0; i < e.rows(); ++i) {
-                if (first_iter ||
-                    std::abs(e(i)) > params.θ * std::abs(old_e(i))) {
-                    Σ(i) = std::fmin(params.Σ_max,
+                if (first_iter || std::abs(e(i)) > θ * std::abs(old_e(i))) {
+                    Σ(i) = std::fmin(params.max_penalty,
                                      std::fmax(Δ * std::abs(e(i)) / norm_e,
                                                real_t(1) * monotone) *
                                          Σ_old(i));
@@ -51,10 +51,10 @@ struct ALMHelpers {
         vec g0(p.get_m());
         p.eval_g(x0, g0);
         // TODO: reuse evaluations of f ang g in PANOC?
-        real_t σ = params.σ_0 * std::max(real_t(1), std::abs(f0)) /
+        real_t σ = params.initial_penalty_factor *
+                   std::max(real_t(1), std::abs(f0)) /
                    std::max(real_t(1), real_t(0.5) * g0.squaredNorm());
-        σ = std::max(σ, params.Σ_min);
-        σ = std::min(σ, params.Σ_max);
+        σ = std::clamp(σ, params.min_penalty, params.max_penalty);
         Σ.fill(σ);
     }
 
@@ -63,8 +63,7 @@ struct ALMHelpers {
         [[maybe_unused]] const TypeErasedControlProblem<config_t> &p,
         const ALMParams<config_t> &params, [[maybe_unused]] crvec x0, rvec Σ) {
         real_t σ = 1;
-        σ        = std::max(σ, params.Σ_min);
-        σ        = std::min(σ, params.Σ_max);
+        σ        = std::clamp(σ, params.min_penalty, params.max_penalty);
         Σ.fill(σ);
     }
 #endif

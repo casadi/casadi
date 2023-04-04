@@ -9,7 +9,7 @@ namespace alpaqa {
 /// Parameters for the @ref LBFGSDirection class.
 template <Config Conf>
 struct LBFGSDirectionParams {
-    bool rescale_when_γ_changes = false;
+    bool rescale_on_step_size_changes = false;
 };
 
 /// @ingroup grp_DirectionProviders
@@ -71,7 +71,7 @@ struct LBFGSDirection {
 
     /// @see @ref PANOCDirection::changed_γ
     void changed_γ(real_t γₖ, real_t old_γₖ) {
-        if (direction_params.rescale_when_γ_changes)
+        if (direction_params.rescale_on_step_size_changes)
             lbfgs.scale_y(γₖ / old_γₖ);
         else
             lbfgs.reset();

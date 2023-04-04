@@ -98,7 +98,7 @@ inner_solver = Solver(
     ),
 )
 alm_params={
-    'ε': 1e-4,'ε_0': 1e-4,
+    'tolerance': 1e-4,'initial_tolerance': 1e-4,
 }
 solver = pa.ALMSolver(
     alm_params=alm_params,

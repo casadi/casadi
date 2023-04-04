@@ -40,7 +40,7 @@ def test_alm():
         pa.PANOCParams(max_iter=200, print_interval=1),
         pa.LBFGSDirection(pa.LBFGS.Params(memory=5)),
     )
-    almparams = pa.ALMParams(max_iter=20, print_interval=1, ε=1e-12, δ=1e-12)
+    almparams = pa.ALMParams(max_iter=20, print_interval=1, tolerance=1e-12, dual_tolerance=1e-12)
     almsolver = pa.ALMSolver(almparams, solver)
     cnt = pa.problem_with_counters(p)
     x0 = np.array([3, 3])
@@ -91,7 +91,7 @@ def test_alm_inherit():
         pa.PANOCParams(max_iter=200, print_interval=1),
         pa.LBFGSDirection(pa.LBFGS.Params(memory=5)),
     )
-    almparams = pa.ALMParams(max_iter=20, print_interval=1, ε=1e-12, δ=1e-12)
+    almparams = pa.ALMParams(max_iter=20, print_interval=1, tolerance=1e-12, dual_tolerance=1e-12)
     almsolver = pa.ALMSolver(almparams, solver)
     cnt = pa.problem_with_counters(p)
     x0 = np.array([3, 3])
@@ -116,7 +116,7 @@ def test_alm_structured_inherit():
         pa.StructuredLBFGSDirection(pa.LBFGS.Params(memory=5)),
     )
     pprint(solver.direction.params)
-    almparams = pa.ALMParams(max_iter=20, print_interval=1, ε=1e-12, δ=1e-12)
+    almparams = pa.ALMParams(max_iter=20, print_interval=1, tolerance=1e-12, dual_tolerance=1e-12)
     almsolver = pa.ALMSolver(almparams, solver)
     cnt = pa.problem_with_counters(p)
     x0 = np.array([3, 3])

@@ -14,9 +14,9 @@ namespace alpaqa {
 template <Config Conf>
 struct NewtonTRDirectionParams {
     USING_ALPAQA_CONFIG(Conf);
-    bool rescale_when_γ_changes = false;
-    real_t hessian_vec_factor   = real_t(0.5);
-    bool finite_diff            = false;
+    bool rescale_on_step_size_changes = false;
+    real_t hessian_vec_factor         = real_t(0.5);
+    bool finite_diff                  = false;
     real_t finite_diff_stepsize =
         std::sqrt(std::numeric_limits<real_t>::epsilon());
 };
@@ -162,9 +162,9 @@ struct NewtonTRDirection {
 
     /// @see @ref PANTRDirection::changed_γ
     void changed_γ([[maybe_unused]] real_t γₖ, [[maybe_unused]] real_t old_γₖ) {
-        if (direction_params.rescale_when_γ_changes)
-            throw std::invalid_argument(
-                "NewtonTRDirection does not support rescale_when_γ_changes");
+        if (direction_params.rescale_on_step_size_changes)
+            throw std::invalid_argument("NewtonTRDirection does not support "
+                                        "rescale_on_step_size_changes");
     }
 
     /// @see @ref PANTRDirection::reset

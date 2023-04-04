@@ -62,10 +62,10 @@ inner_solver = pa.PANOCSolver(
 
 solver = pa.ALMSolver(
     alm_params={
-        'ε': 1e-10,
-        'δ': 1e-10,
-        'Σ_0': 50,
-        'Δ': 20,
+        'tolerance': 1e-10,
+        'dual_tolerance': 1e-10,
+        'initial_penalty': 50,
+        'penalty_update_factor': 20,
         'print_interval': 1,
     },
     inner_solver=inner_solver

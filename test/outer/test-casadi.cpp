@@ -27,11 +27,11 @@ TEST(ALM, casadi) {
 
     // Settings for the outer augmented Lagrangian method
     OuterSolver::Params almparam;
-    almparam.ε              = 1e-10; // tolerance
-    almparam.δ              = 1e-10;
-    almparam.Δ              = 10;
-    almparam.max_iter       = 20;
-    almparam.print_interval = 1;
+    almparam.tolerance             = 1e-10;
+    almparam.dual_tolerance        = 1e-10;
+    almparam.penalty_update_factor = 10;
+    almparam.max_iter              = 20;
+    almparam.print_interval        = 1;
 
     // Settings for the inner PANOC solver
     InnerSolver::Params panocparam;

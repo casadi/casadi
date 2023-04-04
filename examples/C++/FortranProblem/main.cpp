@@ -50,11 +50,11 @@ int main() {
 
     // Settings for the outer augmented Lagrangian method
     OuterSolver::Params almparam;
-    almparam.ε              = 1e-8; // tolerance
-    almparam.δ              = 1e-8;
-    almparam.Δ              = 10; // penalty update factor
-    almparam.max_iter       = 20;
-    almparam.print_interval = 1;
+    almparam.tolerance             = 1e-8; // tolerance
+    almparam.dual_tolerance        = 1e-8;
+    almparam.penalty_update_factor = 10; // penalty update factor
+    almparam.max_iter              = 20;
+    almparam.print_interval        = 1;
 
     // Settings for the inner PANOC solver
     InnerSolver::Params panocparam;

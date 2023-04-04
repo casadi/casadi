@@ -100,9 +100,9 @@ from datetime import timedelta
 # Configure an alpaqa solver:
 solver = pa.ALMSolver(
     alm_params={
-        'ε': 1e-4,
-        'δ': 1e-4,
-        'Σ_0': 1e4,
+        'tolerance': 1e-4,
+        'dual_tolerance': 1e-4,
+        'initial_penalty': 1e4,
         'max_iter': 100,
         'max_time': timedelta(seconds=0.2),
         'max_total_num_retries': 0,

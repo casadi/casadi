@@ -229,8 +229,8 @@ PARAMS_TABLE(ZeroFPRParams<config_t>,                                   //
              PARAMS_MEMBER(update_direction_from_prox_step),            //
 );
 
-PARAMS_TABLE(LBFGSDirectionParams<config_t>,        //
-             PARAMS_MEMBER(rescale_when_γ_changes), //
+PARAMS_TABLE(LBFGSDirectionParams<config_t>,              //
+             PARAMS_MEMBER(rescale_on_step_size_changes), //
 );
 
 PARAMS_TABLE(StructuredLBFGSDirectionParams<config_t>,      //
@@ -239,11 +239,11 @@ PARAMS_TABLE(StructuredLBFGSDirectionParams<config_t>,      //
              PARAMS_MEMBER(full_augmented_hessian),         //
 );
 
-PARAMS_TABLE(NewtonTRDirectionParams<config_t>,     //
-             PARAMS_MEMBER(rescale_when_γ_changes), //
-             PARAMS_MEMBER(hessian_vec_factor),     //
-             PARAMS_MEMBER(finite_diff),            //
-             PARAMS_MEMBER(finite_diff_stepsize),   //
+PARAMS_TABLE(NewtonTRDirectionParams<config_t>,           //
+             PARAMS_MEMBER(rescale_on_step_size_changes), //
+             PARAMS_MEMBER(hessian_vec_factor),           //
+             PARAMS_MEMBER(finite_diff),                  //
+             PARAMS_MEMBER(finite_diff_stepsize),         //
 );
 
 PARAMS_TABLE(SteihaugCGParams<config_t>,     //
@@ -262,32 +262,32 @@ PARAMS_TABLE(StructuredNewtonDirectionParams<config_t>, //
              PARAMS_MEMBER(hessian_vec),                //
 );
 
-PARAMS_TABLE(ALMParams<config_t>,                    //
-             PARAMS_MEMBER(ε),                       //
-             PARAMS_MEMBER(δ),                       //
-             PARAMS_MEMBER(Δ),                       //
-             PARAMS_MEMBER(Δ_lower),                 //
-             PARAMS_MEMBER(Δ_min),                   //
-             PARAMS_MEMBER(Σ_0),                     //
-             PARAMS_MEMBER(σ_0),                     //
-             PARAMS_MEMBER(Σ_0_lower),               //
-             PARAMS_MEMBER(ε_0),                     //
-             PARAMS_MEMBER(ε_0_increase),            //
-             PARAMS_MEMBER(ρ),                       //
-             PARAMS_MEMBER(ρ_increase),              //
-             PARAMS_MEMBER(ρ_max),                   //
-             PARAMS_MEMBER(θ),                       //
-             PARAMS_MEMBER(M),                       //
-             PARAMS_MEMBER(Σ_max),                   //
-             PARAMS_MEMBER(Σ_min),                   //
-             PARAMS_MEMBER(max_iter),                //
-             PARAMS_MEMBER(max_time),                //
-             PARAMS_MEMBER(max_num_initial_retries), //
-             PARAMS_MEMBER(max_num_retries),         //
-             PARAMS_MEMBER(max_total_num_retries),   //
-             PARAMS_MEMBER(print_interval),          //
-             PARAMS_MEMBER(print_precision),         //
-             PARAMS_MEMBER(single_penalty_factor),   //
+PARAMS_TABLE(ALMParams<config_t>,                           //
+             PARAMS_MEMBER(tolerance),                      //
+             PARAMS_MEMBER(dual_tolerance),                 //
+             PARAMS_MEMBER(penalty_update_factor),          //
+             PARAMS_MEMBER(penalty_update_factor_lower),    //
+             PARAMS_MEMBER(min_penalty_update_factor),      //
+             PARAMS_MEMBER(initial_penalty),                //
+             PARAMS_MEMBER(initial_penalty_factor),         //
+             PARAMS_MEMBER(initial_penalty_lower),          //
+             PARAMS_MEMBER(initial_tolerance),              //
+             PARAMS_MEMBER(initial_tolerance_increase),     //
+             PARAMS_MEMBER(tolerance_update_factor),        //
+             PARAMS_MEMBER(ρ_increase),                     //
+             PARAMS_MEMBER(ρ_max),                          //
+             PARAMS_MEMBER(rel_penalty_increase_threshold), //
+             PARAMS_MEMBER(max_multiplier),                 //
+             PARAMS_MEMBER(max_penalty),                    //
+             PARAMS_MEMBER(min_penalty),                    //
+             PARAMS_MEMBER(max_iter),                       //
+             PARAMS_MEMBER(max_time),                       //
+             PARAMS_MEMBER(max_num_initial_retries),        //
+             PARAMS_MEMBER(max_num_retries),                //
+             PARAMS_MEMBER(max_total_num_retries),          //
+             PARAMS_MEMBER(print_interval),                 //
+             PARAMS_MEMBER(print_precision),                //
+             PARAMS_MEMBER(single_penalty_factor),          //
 );
 
 #if ALPAQA_WITH_OCP
