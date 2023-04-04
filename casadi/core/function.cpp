@@ -1759,11 +1759,21 @@ namespace casadi {
     }
   }
 
+  Dict Function::cache() const {
+    try {
+      return (*this)->cache();
+    } catch(std::exception& e) {
+      THROW_ERROR("cache", e.what());
+      return {};
+    }
+  }
+
   std::vector<std::string> Function::get_function() const {
     try {
       return (*this)->get_function();
     } catch(std::exception& e) {
       THROW_ERROR("get_function", e.what());
+      return {};
     }
   }
 

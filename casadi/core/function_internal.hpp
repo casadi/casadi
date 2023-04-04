@@ -755,6 +755,9 @@ namespace casadi {
         \identifier{lj} */
     Function wrap_as_needed(const Dict& opts) const;
 
+    /** \brief Get all functions in the cache */
+    Dict cache() const;
+
     /** \brief Get function in cache
 
         \identifier{lk} */

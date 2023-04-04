@@ -931,6 +931,18 @@ namespace casadi {
     }
   }
 
+  Dict FunctionInternal::cache() const {
+    // Return value
+    Dict ret;
+    // Add all Function instances that haven't been deleted
+    for (auto&& cf : cache_) {
+      if (cf.second.alive()) {
+        ret[cf.first] = shared_cast<Function>(cf.second.shared());
+      }
+    }
+    return ret;
+  }
+
   bool FunctionInternal::incache(const std::string& fname, Function& f,
       const std::string& suffix) const {
     auto it = cache_.find(fname+":"+suffix);
