@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -26,18 +26,17 @@
 #include "dple_impl.hpp"
 #include <typeinfo>
 
-using namespace std;
 namespace casadi {
 
-  bool has_dple(const string& name) {
+  bool has_dple(const std::string& name) {
     return Dple::has_plugin(name);
   }
 
-  void load_dple(const string& name) {
+  void load_dple(const std::string& name) {
     Dple::load_plugin(name);
   }
 
-  string doc_dple(const string& name) {
+  std::string doc_dple(const std::string& name) {
     return Dple::getPlugin(name).doc;
   }
 
@@ -95,38 +94,38 @@ namespace casadi {
       return diagsplit(f_out["p"], f_out["p"].size1()/A.size());
   }
 
-  Function dplesol(const string& name, const string& solver,
+  Function dplesol(const std::string& name, const std::string& solver,
                 const SpDict& st, const Dict& opts) {
     return Function::create(Dple::instantiate(name, solver, st), opts);
   }
 
-  vector<string> dple_in() {
-    vector<string> ret(dple_n_in());
+  std::vector<std::string> dple_in() {
+    std::vector<std::string> ret(dple_n_in());
     for (size_t i=0; i<ret.size(); ++i) ret[i]=dple_in(i);
     return ret;
   }
 
-  vector<string> dple_out() {
-    vector<string> ret(dple_n_out());
+  std::vector<std::string> dple_out() {
+    std::vector<std::string> ret(dple_n_out());
     for (size_t i=0; i<ret.size(); ++i) ret[i]=dple_out(i);
     return ret;
   }
 
-  string dple_in(casadi_int ind) {
+  std::string dple_in(casadi_int ind) {
     switch (static_cast<DpleInput>(ind)) {
     case DPLE_A:      return "a";
     case DPLE_V:      return "v";
     case DPLE_NUM_IN: break;
     }
-    return string();
+    return std::string();
   }
 
-  string dple_out(casadi_int ind) {
+  std::string dple_out(casadi_int ind) {
     switch (static_cast<DpleOutput>(ind)) {
       case DPLE_P:      return "p";
       case DPLE_NUM_OUT: break;
     }
-    return string();
+    return std::string();
   }
 
   casadi_int dple_n_in() {
@@ -263,7 +262,10 @@ namespace casadi {
          .map("map", "serial", nfwd, {0, 1}, std::vector<casadi_int>{})({A, P, Adot, Vdot})[0];
     MX Pdot = dplesol(A, Qdot, plugin_name(), opts);
     MX V = MX::sym("V", Sparsity(size_in(DPLE_V))); // We dont need V
-    return Function(name, {A, V, P, Adot, Vdot}, {Pdot}, inames, onames);
+
+    Dict options;
+    options["allow_duplicate_io_names"] = true;
+    return Function(name, {A, V, P, Adot, Vdot}, {Pdot}, inames, onames, options);
 
   }
 
@@ -320,8 +322,11 @@ namespace casadi {
                     map("map", "serial", nadj, {0, 1}, std::vector<casadi_int>{})(
                       {P, A_rev, Vbar_rev})[0];
 
+    Dict options;
+    options["allow_duplicate_io_names"] = true;
+
     MX V = MX::sym("V", Sparsity(size_in(DPLE_V))); // We dont need V
-    return Function(name, {A, V, P, Pbar}, {Abar, Vbar}, inames, onames);
+    return Function(name, {A, V, P, Pbar}, {Abar, Vbar}, inames, onames, options);
   }
 
   Dple::~Dple() {

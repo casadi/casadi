@@ -2,8 +2,8 @@
 #     This file is part of CasADi.
 #
 #     CasADi -- A symbolic framework for dynamic optimization.
-#     Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
-#                             K.U. Leuven. All rights reserved.
+#     Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+#                             KU Leuven. All rights reserved.
 #     Copyright (C) 2011-2014 Greg Horn
 #
 #     CasADi is free software; you can redistribute it and/or
@@ -20,30 +20,36 @@
 #     License along with CasADi; if not, write to the Free Software
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
-#
-#! Code generation
-#!======================
+
+# Code generation
+# ======================
 from casadi import *
 
-#! Let's build a trivial symbolic SX graph
+# Let's build a trivial symbolic SX graph
+
 x = SX.sym("x")
 y = SX.sym("y")
 z = x*y+2*y
 z += 4*z
 
-#! A Function is needed to inspect the graph
+# A Function is needed to inspect the graph
+
 f = Function("f", [x,y],[z])
 
-#! The default representation is just the name of the function
+# The default representation is just the name of the function
+
 print(f.__repr__())
 
-#! A print statement will call __str__()
-#! The result will look like a node-by-node tree evaluation
+# A print statement will call __str__()
+# The result will look like a node-by-node tree evaluation
+
 print(f)
 
-#! The generate method will insert this node-by-node evaluation in exported C code
+# The generate method will insert this node-by-node evaluation in exported C code
+
 f.generate("f_generated")
 
-#! This is how the exported code looks like:
+# This is how the exported code looks like:
+
 print(open('f_generated.c').read())
 

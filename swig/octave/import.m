@@ -16,6 +16,7 @@ function import1(pkgname)
   end
   % Get path for package
  pkgpath = locatepkg(pkgname_parts{1});
+  warning('off','Octave:addpath-pkg');
   % Add to path
   addpath(pkgpath);
 end

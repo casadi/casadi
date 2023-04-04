@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -37,16 +37,20 @@ namespace casadi {
   class XmlFileInternal;
 
   /** \brief XML parser
+
       Can be used for parsing XML files into CasADi data structures.
 
       \author Joel Andersson
       \date 2014
-   */
+
+      \identifier{7k} */
   class CASADI_EXPORT XmlFile
     : public SharedObject,
       public SWIG_IF_ELSE(PrintableCommon, Printable<XmlFile>) {
   public:
-    /** \brief Get type name */
+    /** \brief Get type name
+
+        \identifier{7l} */
     static std::string type_name() {return "XmlFile";}
 
     // Default constructor
@@ -65,14 +69,22 @@ namespace casadi {
     static std::string doc(const std::string& name);
 
 #ifndef SWIG
-    /** \brief  Access functions of the node */
+    /** \brief  Access functions of the node
+
+        \identifier{7m} */
     XmlFileInternal* operator->();
 
-    /** \brief  Const access functions of the node */
+    /** \brief  Const access functions of the node
+
+        \identifier{7n} */
     const XmlFileInternal* operator->() const;
 
     // Parse an XML file
     XmlNode parse(const std::string& filename);
+
+    // Save an XML file to disk
+    void dump(const std::string& filename, const XmlNode& node);
+
 #endif // SWIG
   };
 

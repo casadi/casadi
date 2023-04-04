@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -405,7 +405,7 @@ std::map<int, std::string> SnoptInterface::secondary_status_ =
                                     get_ptr(m->valJ), get_ptr(m->indJ), get_ptr(m->locJ),
                                     get_ptr(m->bl), get_ptr(m->bu), get_ptr(m->hs),
                                     get_ptr(m->xx), get_ptr(m->pi), get_ptr(m->rc),
-                                    &d_nlp->f, &nS, &nInf, &sInf);
+                                    &d_nlp->objective, &nS, &nInf, &sInf);
     m->success = info<10;
     m->return_status = info;
     casadi_assert(99 != info, "snopt problem set up improperly");

@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -26,7 +26,6 @@
 #include "csparse_interface.hpp"
 #include "casadi/core/global_options.hpp"
 
-using namespace std;
 namespace casadi {
 
   extern "C"
@@ -115,9 +114,9 @@ namespace casadi {
     }
 
     if (verbose_) {
-      uout() << "CsparseInterface::prepare: numeric factorization" << endl;
-      uout() << "linear system to be factorized = " << endl;
-      DM(sp_, vector<double>(A, A+nnz())).print_sparse(uout());
+      uout() << "CsparseInterface::prepare: numeric factorization" << std::endl;
+      uout() << "linear system to be factorized = " << std::endl;
+      DM(sp_, std::vector<double>(A, A+nnz())).print_sparse(uout());
     }
 
     double tol = 1e-8;
@@ -125,26 +124,26 @@ namespace casadi {
     if (m->N) cs_nfree(m->N);
     m->N = cs_lu(&m->A, m->S, tol) ;                 // numeric LU factorization
     if (m->N==nullptr) {
-      DM temp(sp_, vector<double>(A, A+nnz()));
+      DM temp(sp_, std::vector<double>(A, A+nnz()));
       temp = sparsify(temp);
       if (temp.sparsity().is_singular()) {
-        stringstream ss;
+        std::stringstream ss;
         ss << "CsparseInterface::prepare: factorization failed due to matrix"
           " being singular. Matrix contains numerical zeros which are "
             "structurally non-zero. Promoting these zeros to be structural "
             "zeros, the matrix was found to be structurally rank deficient."
-            " sprank: " << sprank(temp.sparsity()) << " <-> " << temp.size2() << endl;
+            " sprank: " << sprank(temp.sparsity()) << " <-> " << temp.size2() << std::endl;
         if (verbose_) {
-          ss << "Sparsity of the linear system: " << endl;
+          ss << "Sparsity of the linear system: " << std::endl;
           sp_.disp(ss, true); // print detailed
         }
         throw CasadiException(ss.str());
       } else {
-        stringstream ss;
+        std::stringstream ss;
         ss << "CsparseInterface::prepare: factorization failed, check if Jacobian is singular"
-           << endl;
+           << std::endl;
         if (verbose_) {
-          ss << "Sparsity of the linear system: " << endl;
+          ss << "Sparsity of the linear system: " << std::endl;
           sp_.disp(ss, true); // print detailed
         }
         throw CasadiException(ss.str());

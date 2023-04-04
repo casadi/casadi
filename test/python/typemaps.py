@@ -2,8 +2,8 @@
 #     This file is part of CasADi.
 #
 #     CasADi -- A symbolic framework for dynamic optimization.
-#     Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
-#                             K.U. Leuven. All rights reserved.
+#     Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+#                             KU Leuven. All rights reserved.
 #     Copyright (C) 2011-2014 Greg Horn
 #
 #     CasADi is free software; you can redistribute it and/or
@@ -747,7 +747,7 @@ class typemaptests(casadiTestCase):
     if scipy_available:
       Ds+=[
           csc_matrix(([1.0,3.0,2.0,4.0],[0,1,0,1],[0,2,4]),shape=(2,2),dtype=numpy.double),
-          csc_matrix(([1,3,2,4],[0,1,0,1],[0,2,4]),shape=(2,2),dtype=numpy.int),
+          csc_matrix(([1,3,2,4],[0,1,0,1],[0,2,4]),shape=(2,2),dtype=numpy.intc),
           DM([[1,2],[3,4]]).sparse()
       ]
 
@@ -803,6 +803,16 @@ class typemaptests(casadiTestCase):
 
     jacobian(x/1.458151064450277e-12,x)
 
+  def test_issue273(self):
+    state = SX.sym('H_body_world', 6, 6)
+
+    H_body_world = np.array([[cos(state[2, 0])*cos(state[1, 0]), -sin(state[2, 0])*cos(state[1, 0]), sin(state[1, 0]), state[3, 0]],
+                             [sin(state[0, 0])*sin(state[1, 0])*cos(state[2, 0]) + sin(state[2, 0])*cos(state[0, 0]), -sin(state[0, 0])*sin(state[2, 0])*sin(state[1, 0]) + cos(state[0, 0])*cos(state[2, 0]), -sin(state[0, 0])*cos(state[1, 0]), state[4, 0]], 
+                             [sin(state[0, 0])*sin(state[2, 0]) - sin(state[1, 0])*cos(state[0, 0])*cos(state[2, 0]), sin(state[0, 0])*cos(state[2, 0]) + sin(state[2, 0])*sin(state[1, 0])*cos(state[0, 0]), cos(state[0, 0])*cos(state[1, 0]), state[5, 0]],
+                             [0, 0, 0, 1]])
+
+    print(H_body_world)
+    print(SX(H_body_world))
 
   def test_issue_2625(self):
     # This is obviously a bug

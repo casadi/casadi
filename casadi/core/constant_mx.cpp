@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -28,8 +28,6 @@
 #include <algorithm>
 #include "casadi_misc.hpp"
 #include "serializing_stream.hpp"
-
-using namespace std;
 
 namespace casadi {
 
@@ -66,7 +64,7 @@ namespace casadi {
 
   MX ConstantMX::join_primitives(std::vector<MX>::const_iterator& it) const {
     if (nnz()==0) {
-      return MX(sparsity());
+      return shared_from_this<MX>();
     } else {
       return MXNode::join_primitives(it);
     }
@@ -89,12 +87,12 @@ namespace casadi {
   }
 
   int ConstantMX::sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
-    fill_n(res[0], nnz(), 0);
+    std::fill_n(res[0], nnz(), 0);
     return 0;
   }
 
   int ConstantMX::sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
-    fill_n(res[0], nnz(), 0);
+    std::fill_n(res[0], nnz(), 0);
     return 0;
   }
 
@@ -102,7 +100,7 @@ namespace casadi {
                             const std::vector<casadi_int>& arg,
                             const std::vector<casadi_int>& res) const {
     // Print the constant
-    string ind = g.constant(x_.nonzeros());
+    std::string ind = g.constant(x_.nonzeros());
 
     // Copy the constant to the work vector
     g << g.copy(ind, nnz(), g.work(res[0], nnz())) << '\n';
@@ -147,7 +145,7 @@ namespace casadi {
       return create(val.sparsity(), val.scalar());
     } else {
       // Check if all values are the same
-      const vector<double> vdata = val.nonzeros();
+      const std::vector<double> vdata = val.nonzeros();
       double v = vdata[0];
       for (auto&& i : vdata) {
         if (i!=v) {

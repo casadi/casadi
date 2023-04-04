@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -29,12 +29,15 @@
 #include "casadi/core/conic_impl.hpp"
 #include <casadi/interfaces/ooqp/casadi_conic_ooqp_export.h>
 
-/** \defgroup plugin_Conic_ooqp
+/** \defgroup plugin_Conic_ooqp Title
+    \par
+
  Interface to the OOQP Solver for quadratic programming
   The current implementation assumes that OOQP is configured with the MA27 sparse linear solver.
 
   NOTE: when doing multiple calls to evaluate(), check if you need to reInit();
-*/
+
+    \identifier{222} */
 
 /** \pluginsection{Conic,ooqp} */
 

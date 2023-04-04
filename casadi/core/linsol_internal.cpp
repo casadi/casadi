@@ -3,7 +3,7 @@
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
  *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -25,7 +25,6 @@
 
 #include "linsol_internal.hpp"
 
-using namespace std;
 namespace casadi {
 
   LinsolInternal::LinsolInternal(const std::string& name, const Sparsity& sp)
@@ -41,10 +40,10 @@ namespace casadi {
 
   }
 
-  void LinsolInternal::disp(ostream &stream, bool more) const {
+  void LinsolInternal::disp(std::ostream &stream, bool more) const {
     stream << "Linear solver " << class_name();
     if (more) {
-      stream << endl;
+      stream << std::endl;
       disp_more(stream);
     }
   }

@@ -1,24 +1,20 @@
 /*
- *    This file is part of CasADi.
+ *    MIT No Attribution
  *
- *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
- *    Copyright (C) 2011-2014 Greg Horn
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl, KU Leuven.
  *
- *    CasADi is free software; you can redistribute it and/or
- *    modify it under the terms of the GNU Lesser General Public
- *    License as published by the Free Software Foundation; either
- *    version 3 of the License, or (at your option) any later version.
+ *    Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ *    software and associated documentation files (the "Software"), to deal in the Software
+ *    without restriction, including without limitation the rights to use, copy, modify,
+ *    merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
+ *    permit persons to whom the Software is furnished to do so.
  *
- *    CasADi is distributed in the hope that it will be useful,
- *    but WITHOUT ANY WARRANTY; without even the implied warranty of
- *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *    Lesser General Public License for more details.
- *
- *    You should have received a copy of the GNU Lesser General Public
- *    License along with CasADi; if not, write to the Free Software
- *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ *    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+ *    INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+ *    PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *    HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ *    OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+ *    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  */
 
@@ -29,10 +25,9 @@
 #include <casadi/casadi.hpp>
 
 using namespace casadi;
-using namespace std;
 
 int main(){
-  cout << "program started" << endl;
+  std::cout << "program started" << std::endl;
 
   // Dimensions
   int nu = 20;  // Number of control segments
@@ -50,7 +45,7 @@ int main(){
   SX beta = 0.1; // fuel consumption rate
 
   // Trajectory
-  vector<SX> s_k, v_k, m_k;
+  std::vector<SX> s_k, v_k, m_k;
 
   // Integrate over the interval with Euler forward
   SX s = s_0, v = v_0, m = m_0;
@@ -79,9 +74,9 @@ int main(){
   Function solver = nlpsol("solver", "ipopt", nlp);
 
   // Bounds on g
-  vector<double> gmin = {10, 0};
-  vector<double> gmax = {10, 0};
-  gmin.resize(2+nu, -numeric_limits<double>::infinity());
+  std::vector<double> gmin = {10, 0};
+  std::vector<double> gmax = {10, 0};
+  gmin.resize(2+nu, -std::numeric_limits<double>::infinity());
   gmax.resize(2+nu, 1.1);
 
   // Solve the problem
@@ -94,68 +89,68 @@ int main(){
 
   // Print the optimal cost
   double cost(res.at("f"));
-  cout << "optimal cost: " << cost << endl;
+  std::cout << "optimal cost: " << cost << std::endl;
 
   // Print the optimal solution
-  vector<double> uopt(res.at("x"));
-  cout << "optimal control: " << uopt << endl;
+  std::vector<double> uopt(res.at("x"));
+  std::cout << "optimal control: " << uopt << std::endl;
 
   // Get the state trajectory
   Function xfcn("xfcn", {u}, {s_all, v_all, m_all});
-  vector<double> sopt, vopt, mopt;
+  std::vector<double> sopt, vopt, mopt;
   xfcn({uopt}, {&sopt, &vopt, &mopt});
-  cout << "position: " << sopt << endl;
-  cout << "velocity: " << vopt << endl;
-  cout << "mass:     " << mopt << endl;
+  std::cout << "position: " << sopt << std::endl;
+  std::cout << "velocity: " << vopt << std::endl;
+  std::cout << "mass:     " << mopt << std::endl;
 
   // Create Matlab script to plot the solution
-  ofstream file;
-  string filename = "rocket_ipopt_results.m";
+  std::ofstream file;
+  std::string filename = "rocket_ipopt_results.m";
   file.open(filename.c_str());
-  file << "% Results file from " __FILE__ << endl;
-  file << "% Generated " __DATE__ " at " __TIME__ << endl;
-  file << endl;
-  file << "cost = " << cost << ";" << endl;
-  file << "u = " << uopt << ";" << endl;
+  file << "% Results file from " __FILE__ << std::endl;
+  file << "% Generated " __DATE__ " at " __TIME__ << std::endl;
+  file << std::endl;
+  file << "cost = " << cost << ";" << std::endl;
+  file << "u = " << uopt << ";" << std::endl;
 
   // Save results to file
-  file << "t = linspace(0,10.0," << nu << ");"<< endl;
-  file << "s = " << sopt << ";" << endl;
-  file << "v = " << vopt << ";" << endl;
-  file << "m = " << mopt << ";" << endl;
+  file << "t = linspace(0,10.0," << nu << ");"<< std::endl;
+  file << "s = " << sopt << ";" << std::endl;
+  file << "v = " << vopt << ";" << std::endl;
+  file << "m = " << mopt << ";" << std::endl;
 
   // Finalize the results file
-  file << endl;
-  file << "% Plot the results" << endl;
-  file << "figure(1);" << endl;
-  file << "clf;" << endl << endl;
+  file << std::endl;
+  file << "% Plot the results" << std::endl;
+  file << "figure(1);" << std::endl;
+  file << "clf;" << std::endl << std::endl;
 
-  file << "subplot(2,2,1);" << endl;
-  file << "plot(t,s);" << endl;
-  file << "grid on;" << endl;
-  file << "xlabel('time [s]');" << endl;
-  file << "ylabel('position [m]');" << endl << endl;
+  file << "subplot(2,2,1);" << std::endl;
+  file << "plot(t,s);" << std::endl;
+  file << "grid on;" << std::endl;
+  file << "xlabel('time [s]');" << std::endl;
+  file << "ylabel('position [m]');" << std::endl << std::endl;
 
-  file << "subplot(2,2,2);" << endl;
-  file << "plot(t,v);" << endl;
-  file << "grid on;" << endl;
-  file << "xlabel('time [s]');" << endl;
-  file << "ylabel('velocity [m/s]');" << endl << endl;
+  file << "subplot(2,2,2);" << std::endl;
+  file << "plot(t,v);" << std::endl;
+  file << "grid on;" << std::endl;
+  file << "xlabel('time [s]');" << std::endl;
+  file << "ylabel('velocity [m/s]');" << std::endl << std::endl;
 
-  file << "subplot(2,2,3);" << endl;
-  file << "plot(t,m);" << endl;
-  file << "grid on;" << endl;
-  file << "xlabel('time [s]');" << endl;
-  file << "ylabel('mass [kg]');" << endl << endl;
+  file << "subplot(2,2,3);" << std::endl;
+  file << "plot(t,m);" << std::endl;
+  file << "grid on;" << std::endl;
+  file << "xlabel('time [s]');" << std::endl;
+  file << "ylabel('mass [kg]');" << std::endl << std::endl;
 
-  file << "subplot(2,2,4);" << endl;
-  file << "plot(t,u);" << endl;
-  file << "grid on;" << endl;
-  file << "xlabel('time [s]');" << endl;
-  file << "ylabel('Thrust [kg m/s^2]');" << endl << endl;
+  file << "subplot(2,2,4);" << std::endl;
+  file << "plot(t,u);" << std::endl;
+  file << "grid on;" << std::endl;
+  file << "xlabel('time [s]');" << std::endl;
+  file << "ylabel('Thrust [kg m/s^2]');" << std::endl << std::endl;
 
   file.close();
-  cout << "Results saved to \"" << filename << "\"" << endl;
+  std::cout << "Results saved to \"" << filename << "\"" << std::endl;
 
   return 0;
 }

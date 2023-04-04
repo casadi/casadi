@@ -1,0 +1,6 @@
+FROM dockcross/windows-shared-x64-posix:20230108-c9273a2
+
+RUN sudo apt-get update && sudo apt install mingw-w64-tools binutils-mingw-w64-x86-64 -y
+
+ENV DEFAULT_DOCKCROSS_IMAGE=ghcr.io/jgillis/windows-shared-x64-posix:production
+ENV DLLTOOL=/usr/x86_64-w64-mingw32/bin/dlltool

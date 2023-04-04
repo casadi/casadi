@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -26,7 +26,6 @@
 #include "lapack_qr.hpp"
 #include "../../core/casadi_misc.hpp"
 
-using namespace std;
 namespace casadi {
 
   extern "C"
@@ -81,7 +80,7 @@ namespace casadi {
     auto m = static_cast<LapackQrMemory*>(mem);
     m->mat.resize(ncol() * ncol());
     m->tau.resize(ncol());
-    m->work.resize(max(max_nrhs_, ncol())*10);
+    m->work.resize(std::max(max_nrhs_, ncol())*10);
     return 0;
   }
 
@@ -113,7 +112,7 @@ namespace casadi {
     // Solve up to max_nrhs rhs at a time
     casadi_int offset = 0;
     while (nrhs>0) {
-      if (solve_batch(m, A, x+offset, min(max_nrhs_, nrhs), tr)) return 1;
+      if (solve_batch(m, A, x+offset, std::min(max_nrhs_, nrhs), tr)) return 1;
       nrhs-= max_nrhs_;
       offset+= max_nrhs_*nrow();
     }

@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -45,158 +45,276 @@
 
 /// \cond INTERNAL
 
-
 namespace casadi {
 
-  class CASADI_EXPORT External : public FunctionInternal {
-  protected:
-    /** \brief Information about the library */
-    Importer li_;
+class CASADI_EXPORT External : public FunctionInternal {
+ protected:
+  /** \brief Information about the library
 
-    /** \brief Increase/decrease reference counter */
-    signal_t incref_, decref_;
+      \identifier{1z2} */
+  Importer li_;
 
-    /** \brief Number of inputs and outputs */
-    getint_t get_n_in_, get_n_out_;
+  /** \brief Increase/decrease reference counter
 
-    /** \brief Names of inputs and outputs */
-    name_t get_name_in_, get_name_out_;
+      \identifier{1z3} */
+  signal_t incref_, decref_;
 
-    /** \brief Get default inputs */
-    default_t get_default_in_;
+  /** \brief Number of inputs and outputs
 
-    /** \brief Work vector sizes */
-    work_t work_;
+      \identifier{1z4} */
+  getint_t get_n_in_, get_n_out_;
 
-    ///@{
-    /** \brief Data vectors */
-    std::vector<casadi_int> int_data_;
-    std::vector<double> real_data_;
-    std::string string_data_;
-    ///@}
-  public:
+  /** \brief Names of inputs and outputs
 
-    /** \brief Constructor */
-    External(const std::string& name, const Importer& li);
+      \identifier{1z5} */
+  name_t get_name_in_, get_name_out_;
 
-    /** \brief Destructor */
-    ~External() override = 0;
+  /** \brief Get default inputs
 
-    /** \brief Any symbol found? */
-    virtual bool any_symbol_found() const;
+      \identifier{1z6} */
+  default_t get_default_in_;
 
-    // Factory
-    Function factory(const std::string& name,
-                             const std::vector<std::string>& s_in,
-                             const std::vector<std::string>& s_out,
-                             const Function::AuxOut& aux,
-                             const Dict& opts) const override;
+  /** \brief Work vector sizes
 
-    /** \brief Get type name */
-    std::string class_name() const override { return "External";}
+      \identifier{1z7} */
+  work_t work_;
 
-    /** \brief Initialize members that are unique */
-    virtual void init_external();
+  ///@{
+  /** \brief Data vectors
 
-    /// Initialize
-    void init(const Dict& opts) override;
+      \identifier{1z8} */
+  std::vector<casadi_int> int_data_;
+  std::vector<double> real_data_;
+  std::string string_data_;
+  ///@}
+ public:
 
-    /** \brief Generate code for the declarations of the C function */
-    void codegen_declarations(CodeGenerator& g) const override;
+  /** \brief Constructor
 
-    /** \brief Generate code for the body of the C function */
-    void codegen_body(CodeGenerator& g) const override;
+      \identifier{1z9} */
+  External(const std::string& name, const Importer& li);
 
-    ///@{
-    /** \brief Number of function inputs and outputs */
-    size_t get_n_in() override;
-    size_t get_n_out() override;
-    ///@}
+  /** \brief Destructor
 
-    /** \brief Default inputs */
-    double get_default_in(casadi_int i) const override;
+      \identifier{1za} */
+  ~External() override = 0;
 
-    ///@{
-    /** \brief Names of function input and outputs */
-    std::string get_name_in(casadi_int i) override;
-    std::string get_name_out(casadi_int i) override;
-    /// @}
+  /** \brief Any symbol found?
 
-    ///@{
-    /** \brief Forward mode derivatives */
-    Function get_forward(casadi_int nfwd, const std::string& name,
-                                 const std::vector<std::string>& inames,
-                                 const std::vector<std::string>& onames,
-                                 const Dict& opts) const override;
-    bool has_forward(casadi_int nfwd) const override;
-    ///@}
+      \identifier{1zb} */
+  virtual bool any_symbol_found() const;
 
-    ///@{
-    /** \brief Reverse mode derivatives */
-    Function get_reverse(casadi_int nadj, const std::string& name,
-                                 const std::vector<std::string>& inames,
-                                 const std::vector<std::string>& onames,
-                                 const Dict& opts) const override;
-    bool has_reverse(casadi_int nadj) const override;
-    ///@}
+  // Factory
+  Function factory(const std::string& name,
+                           const std::vector<std::string>& s_in,
+                           const std::vector<std::string>& s_out,
+                           const Function::AuxOut& aux,
+                           const Dict& opts) const override;
 
-    ///@{
-    /** \brief Full Jacobian */
-    bool has_jacobian() const override;
-    Function get_jacobian(const std::string& name,
-                                     const std::vector<std::string>& inames,
-                                     const std::vector<std::string>& onames,
-                                     const Dict& opts) const override;
-    ///@}
+  /** \brief Get type name
 
-    /** \brief Serialize an object without type information */
-    void serialize_body(SerializingStream &s) const override;
+      \identifier{1zc} */
+  std::string class_name() const override { return "External";}
 
-    /** \brief Deserialize into MX */
-    static ProtoFunction* deserialize(DeserializingStream& s);
+  /** \brief Initialize members that are unique
 
-    /** \brief String used to identify the immediate FunctionInternal subclass */
-    std::string serialize_base_function() const override { return "External"; }
+      \identifier{1zd} */
+  virtual void init_external();
 
-  protected:
-    /** \brief Deserializing constructor */
-    explicit External(DeserializingStream& s);
-  };
+  /// Initialize
+  void init(const Dict& opts) override;
 
-  class CASADI_EXPORT GenericExternal : public External {
-    // Sparsities
-    sparsity_t get_sparsity_in_, get_sparsity_out_;
+  /** \brief Generate code for the declarations of the C function
 
-  public:
-    /** \brief Constructor */
-    GenericExternal(const std::string& name, const Importer& li);
+      \identifier{1ze} */
+  void codegen_declarations(CodeGenerator& g) const override;
 
-    /** \brief  Destructor */
-    ~GenericExternal() override { this->clear_mem();}
+  /** \brief Generate code for the body of the C function
 
-    /** \brief Any symbol found? */
-    bool any_symbol_found() const override;
+      \identifier{1zf} */
+  void codegen_body(CodeGenerator& g) const override;
 
-    /** \brief Initialize members that are unique */
-    void init_external() override;
+  /** \brief Thread-local memory object type
 
-    /// Initialize
-    void init(const Dict& opts) override;
+      \identifier{1zg} */
+  std::string codegen_mem_type() const override;
 
-    /// @{
-    /** \brief Retreive sparsities */
-    Sparsity get_sparsity_in(casadi_int i) override;
-    Sparsity get_sparsity_out(casadi_int i) override;
-    /// @}
+  /** \brief Codegen incref for dependencies
 
-    /** \brief Serialize type information */
-    void serialize_type(SerializingStream &s) const override;
+      \identifier{1zh} */
+  void codegen_incref(CodeGenerator& g) const override;
 
-    /** \brief Deserializing constructor */
-    explicit GenericExternal(DeserializingStream& s);
+  /** \brief Codegen decref for dependencies
 
-  };
+      \identifier{1zi} */
+  void codegen_decref(CodeGenerator& g) const override;
 
+  /** \brief Codegen for checkout
+
+      \identifier{1zj} */
+  void codegen_checkout(CodeGenerator& g) const override;
+
+  /** \brief Codegen for release
+
+      \identifier{1zk} */
+  void codegen_release(CodeGenerator& g) const override;
+
+  /** \brief Codegen decref for alloc_mem
+
+      \identifier{1zl} */
+  void codegen_alloc_mem(CodeGenerator& g) const override;
+
+  /** \brief Codegen decref for init_mem
+
+      \identifier{1zm} */
+  void codegen_init_mem(CodeGenerator& g) const override;
+
+  /** \brief Codegen for free_mem
+
+      \identifier{1zn} */
+  void codegen_free_mem(CodeGenerator& g) const override;
+
+  ///@{
+  /** \brief Number of function inputs and outputs
+
+      \identifier{1zo} */
+  size_t get_n_in() override;
+  size_t get_n_out() override;
+  ///@}
+
+  /** \brief Default inputs
+
+      \identifier{1zp} */
+  double get_default_in(casadi_int i) const override;
+
+  ///@{
+  /** \brief Names of function input and outputs
+
+      \identifier{1zq} */
+  std::string get_name_in(casadi_int i) override;
+  std::string get_name_out(casadi_int i) override;
+  /// @}
+
+  ///@{
+  /** \brief Forward mode derivatives
+
+      \identifier{1zr} */
+  Function get_forward(casadi_int nfwd, const std::string& name,
+                               const std::vector<std::string>& inames,
+                               const std::vector<std::string>& onames,
+                               const Dict& opts) const override;
+  bool has_forward(casadi_int nfwd) const override;
+  ///@}
+
+  ///@{
+  /** \brief Reverse mode derivatives
+
+      \identifier{1zs} */
+  Function get_reverse(casadi_int nadj, const std::string& name,
+                               const std::vector<std::string>& inames,
+                               const std::vector<std::string>& onames,
+                               const Dict& opts) const override;
+  bool has_reverse(casadi_int nadj) const override;
+  ///@}
+
+  ///@{
+  /** \brief Full Jacobian
+
+      \identifier{1zt} */
+  bool has_jacobian() const override;
+  Function get_jacobian(const std::string& name,
+                                   const std::vector<std::string>& inames,
+                                   const std::vector<std::string>& onames,
+                                   const Dict& opts) const override;
+  ///@}
+
+  /** \brief Serialize an object without type information
+
+      \identifier{1zu} */
+  void serialize_body(SerializingStream &s) const override;
+
+  /** \brief Deserialize into MX
+
+      \identifier{1zv} */
+  static ProtoFunction* deserialize(DeserializingStream& s);
+
+  /** \brief String used to identify the immediate FunctionInternal subclass
+
+      \identifier{1zw} */
+  std::string serialize_base_function() const override { return "External"; }
+
+ protected:
+  /** \brief Deserializing constructor
+
+      \identifier{1zx} */
+  explicit External(DeserializingStream& s);
+};
+
+class CASADI_EXPORT GenericExternal : public External {
+  // Sparsities
+  sparsity_t get_sparsity_in_, get_sparsity_out_, get_jac_sparsity_;
+  // Differentiability
+  diff_t get_diff_in_, get_diff_out_;
+
+ public:
+  /** \brief Constructor
+
+      \identifier{1zy} */
+  GenericExternal(const std::string& name, const Importer& li);
+
+  /** \brief  Destructor
+
+      \identifier{1zz} */
+  ~GenericExternal() override { this->clear_mem();}
+
+  /** \brief Any symbol found?
+
+      \identifier{200} */
+  bool any_symbol_found() const override;
+
+  /** \brief Initialize members that are unique
+
+      \identifier{201} */
+  void init_external() override;
+
+  /// Initialize
+  void init(const Dict& opts) override;
+
+  /// @{
+  /** \brief Retreive sparsities
+
+      \identifier{202} */
+  Sparsity get_sparsity_in(casadi_int i) override;
+  Sparsity get_sparsity_out(casadi_int i) override;
+  /// @}
+
+  ///@{
+  /** \brief Return sparsity of Jacobian of an output respect to an input
+
+      \identifier{203} */
+  bool has_jac_sparsity(casadi_int oind, casadi_int iind) const override;
+  Sparsity get_jac_sparsity(casadi_int oind, casadi_int iind, bool symmetric) const override;
+  ///@}
+
+  /// @{
+  /** \brief Retreive differentiability
+
+      \identifier{204} */
+  bool get_diff_in(casadi_int i) override;
+  bool get_diff_out(casadi_int i) override;
+  /// @}
+
+  /** \brief Serialize type information
+
+      \identifier{205} */
+  void serialize_type(SerializingStream &s) const override;
+
+  /** \brief Deserializing constructor
+
+      \identifier{206} */
+  explicit GenericExternal(DeserializingStream& s);
+
+};
 
 } // namespace casadi
 /// \endcond

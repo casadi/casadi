@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -27,7 +27,6 @@
 #include "casadi/core/casadi_misc.hpp"
 #include "casadi/core/nlp_tools.hpp"
 
-using namespace std;
 namespace casadi {
 
   extern "C"
@@ -39,6 +38,14 @@ namespace casadi {
     plugin->version = CASADI_VERSION;
     plugin->options = &GurobiInterface::options_;
     plugin->deserialize = &GurobiInterface::deserialize;
+    #ifdef GUROBI_ADAPTOR
+      char buffer[400];
+      int ret = gurobi_adaptor_load(buffer, sizeof(buffer));
+      if (ret!=0) {
+        casadi_warning("Failed to load Gurobi adaptor: " + std::string(buffer) + ".");
+        return 1;
+      }
+    #endif
     return 0;
   }
 
@@ -461,10 +468,10 @@ namespace casadi {
         " (" << optimstatus <<")" << std::endl;
 
       m->return_status = optimstatus;
-      m->success = optimstatus==GRB_OPTIMAL;
+      m->d_qp.success = optimstatus==GRB_OPTIMAL;
       if (optimstatus==GRB_ITERATION_LIMIT || optimstatus==GRB_TIME_LIMIT
           || optimstatus==GRB_NODE_LIMIT || optimstatus==GRB_SOLUTION_LIMIT)
-        m->unified_return_status = SOLVER_RET_LIMITED;
+        m->d_qp.unified_return_status = SOLVER_RET_LIMITED;
 
       // Get the objective value, if requested
       if (cost) {
@@ -475,11 +482,11 @@ namespace casadi {
       // Get the optimal solution, if requested
       if (x) {
         flag = GRBgetdblattrarray(model, GRB_DBL_ATTR_X, 0, nx_, x);
-        if (flag) fill_n(x, nx_, casadi::nan);
+        if (flag) std::fill_n(x, nx_, casadi::nan);
       }
 
-      if (lam_x) fill_n(lam_x, nx_, casadi::nan);
-      if (lam_a) fill_n(lam_a, na_, casadi::nan);
+      if (lam_x) std::fill_n(lam_x, nx_, casadi::nan);
+      if (lam_a) std::fill_n(lam_a, na_, casadi::nan);
 
       // Free memory
       GRBfreemodel(model);

@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -26,124 +26,146 @@
 #include "xml_node.hpp"
 #include "casadi_misc.hpp"
 
-using namespace std;
 namespace casadi {
 
-  XmlNode::XmlNode() {
+bool XmlNode::has_attribute(const std::string& att_name) const {
+  return this->attributes.find(att_name) != this->attributes.end();
+}
+
+bool XmlNode::has_child(const std::string& childname) const {
+  // Linear search over the elements
+  for (auto& c : this->children) {
+    if (c.name == childname) return true;
+  }
+  // Not found
+  return false;
+}
+
+XmlNode& XmlNode::operator[](const std::string& childname) {
+  // Linear search over the elements
+  auto it = this->children.begin();
+  for (; it != this->children.end(); ++it) {
+    if (it->name == childname) break;
+  }
+  // Check that the child was indeed found
+  casadi_assert(it != this->children.end(), "Could not find " + childname);
+  // Return a reference to the child
+  return *it;
+}
+
+const XmlNode& XmlNode::operator[](const std::string& childname) const {
+  return const_cast<XmlNode*>(this)->operator[](childname); // NOLINT
+}
+
+void XmlNode::set_attribute(const std::string& attribute_name, const std::string& attribute) {
+  this->attributes[attribute_name] = attribute;
+}
+
+void XmlNode::set_attribute(const std::string& att_name, const std::vector<casadi_int>& att) {
+  std::stringstream ss;
+  if (!att.empty()) {
+    ss << att.at(0);
+    for (size_t i = 1; i < att.size(); ++i) ss << " " << att.at(i);
+  }
+  return set_attribute(att_name, ss.str());
+}
+
+void XmlNode::set_attribute(const std::string& att_name, double att) {
+  std::stringstream ss;
+  ss << std::scientific << std::setprecision(std::numeric_limits<double>::digits10 + 1) << att;
+  set_attribute(att_name, ss.str());
+}
+
+std::ostream& operator<<(std::ostream &stream, const XmlNode& node) {
+  node.dump(stream);
+  return stream;
+}
+
+void XmlNode::dump(std::ostream &stream, casadi_int indent) const {
+  // Print name
+  stream << std::string(indent, ' ') << "Node: " << this->name << std::endl;
+
+  // Print comment
+  if (!this->comment.empty()) {
+    stream << std::string(indent, ' ') << "----- comment starts ----- "  << std::endl;
+    stream << this->comment << std::endl;
+    stream << std::string(indent, ' ') << "----- comment ends ----- "  << std::endl;
   }
 
-  XmlNode::~XmlNode() {
+  // Print text
+  if (!this->text.empty())
+    stream << std::string(indent+2, ' ') << "Text: " << this->text << std::endl;
+
+  // Print attributes
+  for (auto it = this->attributes.begin(); it != this->attributes.end(); ++it)
+    stream << std::string(indent+2, ' ') << "attribute " << it->first
+      << " = " << it->second << std::endl;
+
+  // Print Children
+  for (casadi_int i=0; i < size(); ++i) {
+    stream << std::string(indent, ' ') << "Child " << i << ":" << std::endl;
+    (*this)[i].dump(stream, indent+2);
   }
+}
 
-  bool XmlNode::hasAttribute(const string& attribute_name) const {
-    auto it = attributes_.find(attribute_name);
-    return it!=attributes_.end();
+void XmlNode::read(const std::string& str, std::string* val) {
+  *val = str;
+}
+
+void XmlNode::read(const std::string& str, bool* val) {
+  if (str == "true") {
+    *val = true;
+  } else if (str == "false") {
+    *val = false;
+  } else {
+    casadi_error("XML argument not 'true' or 'false'");
   }
+}
 
-  XmlNode& XmlNode::operator[](casadi_int i) {
-    casadi_assert(i>=0 && i < size(),
-      "index out of bounds for element " + str(i) + " of node " + name());
-    return children_.at(i);
+void XmlNode::read(const std::string& str, casadi_int* val) {
+  std::istringstream buffer(str);
+  buffer >> *val;
+}
+
+void XmlNode::read(const std::string& str, double* val) {
+  std::istringstream buffer(str);
+  buffer >> *val;
+}
+
+void XmlNode::read(const std::string& str, std::vector<casadi_int>* val) {
+  val->clear();
+  std::istringstream buffer(str);
+  while (true) {
+    casadi_int v;
+    buffer >> v;
+    if (buffer.fail()) break;
+    val->push_back(v);
   }
+}
 
-  const XmlNode& XmlNode::operator[](casadi_int i) const {
-    return const_cast<XmlNode*>(this)->operator[](i); // NOLINT
+void XmlNode::read(const std::string& str, std::vector<std::string>* val) {
+  val->clear();
+  std::istringstream buffer(str);
+  while (true) {
+    std::string v;
+    buffer >> v;
+    if (buffer.fail()) break;
+    val->push_back(v);
   }
+}
 
-  bool XmlNode::hasChild(const string& childname) const {
-    auto it = child_indices_.find(childname);
-    return it!=child_indices_.end();
-  }
+std::vector<std::string> XmlNode::child_names() const {
+  std::vector<std::string> ret;
+  ret.reserve(this->children.size());
+  for (auto& c : this->children) ret.push_back(c.name);
+  return ret;
+}
 
-  XmlNode& XmlNode::operator[](const string& childname) {
-    // Find the child
-    auto it = child_indices_.find(childname);
-
-    // check that the child was indeed found
-    if (it == child_indices_.end()) {
-      casadi_error("could not find " + childname);
-    }
-
-    // Return an index to the child
-    return children_[it->second];
-  }
-
-  const XmlNode& XmlNode::operator[](const string& childname) const {
-    return const_cast<XmlNode*>(this)->operator[](childname); // NOLINT
-  }
-
-  void XmlNode::set_attribute(const string& attribute_name, const string& attribute) {
-    attributes_[attribute_name] = attribute;
-  }
-
-  ostream& operator<<(ostream &stream, const XmlNode& node) {
-    node.dump(stream);
-    return stream;
-  }
-
-  casadi_int XmlNode::size() const {
-    return children_.size();
-  }
-
-  const string& XmlNode::name() const {
-    return name_;
-  }
-
-  void XmlNode::setName(const string& name) {
-    name_ = name;
-  }
-
-  void XmlNode::dump(ostream &stream, casadi_int indent) const {
-    // Print name
-    stream << string(indent, ' ') << "Node: " << name_ << endl;
-
-    // Print comment
-    if (!comment_.empty()) {
-      stream << string(indent, ' ') << "----- comment starts ----- "  << endl;
-      stream << comment_ << endl;
-      stream << string(indent, ' ') << "----- comment ends ----- "  << endl;
-    }
-
-    // Print text
-    if (!text_.empty())
-      stream << string(indent+2, ' ') << "Text: " << text_ << endl;
-
-    // Print attributes
-    for (auto it=attributes_.begin(); it != attributes_.end(); ++it)
-      stream << string(indent+2, ' ') << "attribute " << it->first << " = " << it->second << endl;
-
-    // Print Children
-    for (casadi_int i=0; i<size(); ++i) {
-      stream << string(indent, ' ') << "Child " << i << ":" << endl;
-      (*this)[i].dump(stream, indent+2);
-    }
-  }
-
-  bool XmlNode::checkName(const string& str) const {
-    return name_ == str;
-  }
-
-  void XmlNode::readString(const std::string& str, std::string& val) {
-    val = str;
-  }
-
-  void XmlNode::readString(const std::string& str, bool& val) {
-    if (str=="true")
-      val = true;
-    else if (str=="false")
-      val = false;
-    else
-      throw CasadiException("XML argument not true or false");
-  }
-
-  void XmlNode::readString(const std::string& str, casadi_int& val) {
-    std::istringstream buffer(str);
-    buffer >> val;
-  }
-
-  void XmlNode::readString(const std::string& str, double& val) {
-    std::istringstream buffer(str);
-    buffer >> val;
-  }
+std::vector<std::string> XmlNode::attribute_names() const {
+  std::vector<std::string> ret;
+  ret.reserve(this->attributes.size());
+  for (auto& a : this->attributes) ret.push_back(a.first);
+  return ret;
+}
 
 } // namespace casadi

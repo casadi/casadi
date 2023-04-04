@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -37,7 +37,9 @@ namespace casadi {
   class DeserializingStream;
 #if !(defined(SWIG) && !defined(SWIGXML))
 
-  /** \brief  Types of options */
+  /** \brief  Types of options
+
+      \identifier{17m} */
   enum TypeID {
     OT_NULL,
     OT_BOOL,
@@ -57,10 +59,12 @@ namespace casadi {
     OT_UNKNOWN};
 #endif // SWIG
 
-  /** \brief Generic data type, can hold different types such as bool, casadi_int, string etc.
+  /** \brief Generic data type, can hold different types such as bool, casadi_int, std::string etc.
+
       \author Joel Andersson
       \date 2010
-  */
+
+      \identifier{17n} */
   class CASADI_EXPORT GenericType
     : public SWIG_IF_ELSE(PrintableCommon, Printable<GenericType>)
 #if !(defined(SWIG) && !defined(SWIGXML))
@@ -105,7 +109,9 @@ namespace casadi {
 
     /// \cond INTERNAL
 #ifndef SWIG
-    /** \brief  Create from node */
+    /** \brief  Create from node
+
+        \identifier{17o} */
     static GenericType create(SharedObjectInternal* node);
 #endif // SWIG
     /// \endcond
@@ -149,7 +155,9 @@ namespace casadi {
 #endif
 
     ///@{
-    /** \brief Check if a particular type */
+    /** \brief Check if a particular type
+
+        \identifier{17p} */
     bool is_bool() const;
     bool is_int() const;
     bool is_double() const;
@@ -168,7 +176,9 @@ namespace casadi {
     ///@}
 
     ///@{
-    /** \brief Cast to the internal type */
+    /** \brief Cast to the internal type
+
+        \identifier{17q} */
     const bool& as_bool() const;
     const casadi_int& as_int() const;
     const double& as_double() const;
@@ -209,10 +219,14 @@ namespace casadi {
     bool operator!=(const GenericType& op2) const;
 #endif // SWIG
 
-    /** \brief Serialize an object */
+    /** \brief Serialize an object
+
+        \identifier{17r} */
     void serialize(SerializingStream& s) const;
 
-    /** \brief Deserialize with type disambiguation */
+    /** \brief Deserialize with type disambiguation
+
+        \identifier{17s} */
     static GenericType deserialize(DeserializingStream& s);
   };
 
@@ -220,6 +234,14 @@ namespace casadi {
   typedef GenericType::Dict Dict;
 
 #ifndef SWIG
+  template<class T>
+  T get_from_dict(const std::map<std::string, T>& d,
+      const std::string& key, const T& default_value) {
+    auto it = d.find(key);
+    if (it==d.end()) return default_value;
+    return it->second;
+  }
+
   template<class T>
   T get_from_dict(const Dict& d, const std::string& key, const T& default_value) {
     auto it = d.find(key);
@@ -249,11 +271,13 @@ namespace casadi {
 
   /** \brief Combine two dicts. First has priority 
    * 
-   * 
-   */
+   *
+      \identifier{17t} */
   CASADI_EXPORT Dict combine(const Dict& first, const Dict& second, bool recurse=false);
 
-  /** \brief Update the target dictorionary in place with source elements */
+  /** \brief Update the target dictionary in place with source elements
+
+      \identifier{17u} */
   CASADI_EXPORT void update_dict(Dict& target, const Dict& source, bool recurse=false);
 #endif
 

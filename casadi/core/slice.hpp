@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -42,7 +42,8 @@ namespace casadi {
    *
    * Note that Python or Octave do not need to use this class.
    * They can just use slicing utility from the host language ( M[0:6]  in Python, M(1:7) )
-   */
+
+      \identifier{13} */
   class CASADI_EXPORT Slice
     : public SWIG_IF_ELSE(PrintableCommon, Printable<Slice>) {
   public:
@@ -120,10 +121,14 @@ namespace casadi {
       return {{"start", start}, {"stop", stop}, {"step", step}};
     }
 
-    /** \brief Serialize an object */
+    /** \brief Serialize an object
+
+        \identifier{14} */
     void serialize(SerializingStream& s) const;
 
-    /** \brief Deserialize without type information */
+    /** \brief Deserialize without type information
+
+        \identifier{15} */
     static Slice deserialize(DeserializingStream& s);
   };
 

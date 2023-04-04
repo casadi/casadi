@@ -20,13 +20,19 @@
 # -- Project information -----------------------------------------------------
 
 project = 'CasADi'
-copyright = '2018, Joel Andersson, Joris Gillis, Greg Horn'
+
+from datetime import date
+
+copyright = str(date.today().year) + ', Joel Andersson, Joris Gillis, Greg Horn'
 author = 'Joel Andersson, Joris Gillis, Greg Horn'
 
 # The short X.Y version
 version = ''
 # The full version, including alpha/beta/rc tags
-release = '3.4.4'
+
+import casadi
+
+release = casadi.__version__
 
 
 # -- General configuration ---------------------------------------------------
@@ -70,7 +76,7 @@ master_doc = 'index'
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = "en"
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.

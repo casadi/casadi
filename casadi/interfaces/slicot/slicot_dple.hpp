@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -30,7 +30,8 @@
 #include "../../core/linsol.hpp"
 #include <casadi/interfaces/slicot/casadi_dple_slicot_export.h>
 
-/** \defgroup plugin_Dple_slicot
+/** \defgroup plugin_Dple_slicot Title
+    \par
  *
  * An efficient solver for Discrete Periodic Lyapunov Equations using SLICOT
 
@@ -42,7 +43,8 @@
  *   J. Gillis
  *   Practical Methods for Approximate Robust Periodic Optimal Control ofNonlinear Mechanical Systems,
  *   PhD Thesis, KULeuven, 2015
-*/
+
+    \identifier{22j} */
 
 /** \pluginsection{Dple,slicot} */
 

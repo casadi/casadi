@@ -1,0 +1,117 @@
+{
+    "version": 3,
+    "cmakeMinimumRequired": {
+      "major": 3,
+      "minor": 22,
+      "patch": 0
+      },
+    "configurePresets": [
+        {
+            "name": "core",
+            "hidden": true,
+            "binaryDir": "${sourceDir}/out/build/${presetName}",
+            "installDir": "${sourceDir}/out/install/${presetName}"
+        },
+        {
+            "name": "debug",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "WITH_LINT": "ON",
+                "WITH_EXTRA_WARNINGS": "ON"
+            }
+        },
+        {
+            "name": "release",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        },
+        {
+            "name": "mingw",
+            "hidden": true,
+            "generator": "Ninja",
+            "cacheVariables": {
+                "WITH_THREAD_MINGW": "ON",
+                "CMAKE_C_COMPILER": "gcc",
+                "CMAKE_CXX_COMPILER": "g++"
+            }
+        },
+        {
+            "name": "cl",
+            "hidden": true,
+            "generator": "Ninja",
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "cl",
+                "CMAKE_CXX_COMPILER": "cl"
+            }
+        },
+        {
+            "name": "clang-cl",
+            "hidden": true,
+            "generator": "Ninja",
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "clang-cl",
+                "CMAKE_CXX_COMPILER": "clang-cl"
+            },
+            "vendor": {
+                "microsoft.com/VisualStudioSettings/CMake/1.0": {
+                  "intelliSenseMode": "windows-clang-x64"
+                }
+            }
+        },
+        {
+            "name": "python",
+            "hidden": true,
+            "cacheVariables": {
+                "WITH_PYTHON": "ON"
+            }
+        },
+        {
+            "name": "common",
+            "hidden": true,
+            "cacheVariables": {
+                "WITH_IPOPT": "ON",
+                "WITH_OPENMP": "ON",
+                "WITH_QPOASES": "ON",
+                "WITH_LAPACK": "ON"
+            }
+        },
+        {
+            "name": "devel",
+            "displayName": "Linux developer",
+            "inherits": [
+                "debug",
+                "python",
+                "core",
+                "common"
+            ],
+            "cacheVariables": {
+                "PYTHON_PREFIX": "${sourceDir}/out/install/${presetName}/python",
+                "WITH_CLANG": "ON",
+                "WITH_BUILD_REQUIRED": "ON"
+            }
+        },
+        {
+            "name": "windevel",
+            "displayName": "Windows developer (MinGW)",
+            "inherits": [
+                "common",
+                "mingw",
+                "core",
+                "debug",
+                "python"
+            ]
+        },
+        {
+            "name": "windevel_cl",
+            "displayName": "Windows developer (Visual C++)",
+            "inherits": [
+                "cl",
+                "core",
+                "debug"
+            ]
+        }
+      ]
+}

@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl, Kobe Bergmans
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -32,9 +32,6 @@
 #include <vector>
 
 namespace casadi {
-
-  using namespace std;
-
   extern "C"
   int CASADI_CONIC_CPLEX_EXPORT
   casadi_register_conic_cplex(Conic::Plugin* plugin) {
@@ -44,6 +41,14 @@ namespace casadi {
     plugin->version = CASADI_VERSION;
     plugin->options = &CplexInterface::options_;
     plugin->deserialize = &CplexInterface::deserialize;
+    #ifdef CPLEX_ADAPTOR
+      char buffer[400];
+      int ret = cplex_adaptor_load(buffer, sizeof(buffer));
+      if (ret!=0) {
+        casadi_warning("Failed to load CPLEX adaptor: " + std::string(buffer) + ".");
+        return 1;
+      }
+    #endif
     return 0;
   }
 
@@ -91,7 +96,12 @@ namespace casadi {
         "Weights corresponding to SOS entries."}},
       {"sos_types",
        {OT_INTVECTOR,
-        "Specify 1 or 2 for each SOS group."}}
+        "Specify 1 or 2 for each SOS group."}},
+      {"version_suffix",
+       {OT_STRING,
+        "Specify version of cplex to load. "
+        "We will attempt to load libcplex<version_suffix>.[so|dll|dylib]. "
+        "Default value is taken from CPLEX_VERSION env variable."}}
      }
   };
 
@@ -152,7 +162,7 @@ namespace casadi {
 
     // Are we solving a mixed-integer problem?
     mip_ = !discrete_.empty()
-      && find(discrete_.begin(), discrete_.end(), true)!=discrete_.end();
+      && std::find(discrete_.begin(), discrete_.end(), true)!=discrete_.end();
 
     // Type of variable
     if (mip_) {
@@ -178,6 +188,14 @@ namespace casadi {
     alloc_w(na_, true); // lam_a
   }
 
+  int param_by_name(CPXENVptr env, const std::string &name) {
+    int whichparam;
+    if (CPXXgetparamnum(env, name.c_str(), &whichparam)) {
+      casadi_error("No such CPLEX parameter: " + name);
+    }
+    return whichparam;
+  }
+
   int CplexInterface::init_mem(void* mem) const {
     if (Conic::init_mem(mem)) return 1;
     if (!mem) return 1;
@@ -190,7 +208,7 @@ namespace casadi {
     if (m->env==nullptr) {
       char errmsg[CPXMESSAGEBUFSIZE];
       CPXXgeterrorstring(m->env, status, errmsg);
-      casadi_error(string("Cannot initialize CPLEX environment: ") + errmsg);
+      casadi_error(std::string("Cannot initialize CPLEX environment: ") + errmsg);
     }
 
     // Set parameters to their default values
@@ -199,33 +217,40 @@ namespace casadi {
     }
 
     // Enable output by default
-    if (CPXXsetintparam(m->env, CPX_PARAM_SCRIND, CPX_ON)) {
+    int screen_output = 0;
+    try {
+      screen_output = param_by_name(m->env, "CPXPARAM_ScreenOutput");
+    } catch (std::exception& e) {
+      screen_output = param_by_name(m->env, "CPX_PARAM_SCRIND");
+    }
+    if (CPXXsetintparam(m->env, screen_output, CPX_ON)) {
       casadi_error("Failure setting CPX_PARAM_SCRIND");
     }
 
     // Optimality tolerance
-    if (CPXXsetdblparam(m->env, CPX_PARAM_EPOPT, tol_)) {
+    if (CPXXsetdblparam(m->env, param_by_name(m->env, "CPX_PARAM_EPOPT"), tol_)) {
       casadi_error("Failure setting CPX_PARAM_EPOPT");
     }
 
     // Feasibility tolerance
-    if (CPXXsetdblparam(m->env, CPX_PARAM_EPRHS, tol_)) {
+    if (CPXXsetdblparam(m->env, param_by_name(m->env, "CPX_PARAM_EPRHS"), tol_)) {
       casadi_error("Failure setting CPX_PARAM_EPRHS");
     }
 
     // We start with barrier if crossover was chosen.
-    if (CPXXsetintparam(m->env, CPX_PARAM_QPMETHOD, qp_method_ == 7 ? 4 : qp_method_)) {
+    if (CPXXsetintparam(m->env, param_by_name(m->env, "CPX_PARAM_QPMETHOD"),
+        qp_method_ == 7 ? 4 : qp_method_)) {
       casadi_error("Failure setting CPX_PARAM_QPMETHOD");
     }
 
     // Setting dependency check option
-    if (CPXXsetintparam(m->env, CPX_PARAM_DEPIND, dep_check_)) {
+    if (CPXXsetintparam(m->env, param_by_name(m->env, "CPX_PARAM_DEPIND"), dep_check_)) {
       casadi_error("Failure setting CPX_PARAM_DEPIND");
     }
 
     // Setting crossover algorithm
     if (qp_method_ == 7) {
-      if (CPXXsetintparam(m->env, CPX_PARAM_BARCROSSALG, 1)) {
+      if (CPXXsetintparam(m->env, param_by_name(m->env, "CPX_PARAM_BARCROSSALG"), 1)) {
         casadi_error("Failure setting CPX_PARAM_BARCROSSALG");
       }
     }
@@ -257,7 +282,7 @@ namespace casadi {
         break;
       case CPX_PARAMTYPE_STRING:
         status = CPXXsetstrparam(m->env, whichparam,
-                                static_cast<string>(op.second).c_str());
+                                static_cast<std::string>(op.second).c_str());
         break;
       case CPX_PARAMTYPE_LONG:
         status = CPXXsetlongparam(m->env, whichparam,
@@ -367,7 +392,7 @@ namespace casadi {
 
     // We change method in crossover
     if (m->is_warm && qp_method_ == 7) {
-      (void)CPXXsetintparam(m->env, CPX_PARAM_QPMETHOD, 1);
+      (void)CPXXsetintparam(m->env, param_by_name(m->env, "CPX_PARAM_QPMETHOD"), 1);
     }
 
     for (casadi_int i = 0; i < na_; ++i) {
@@ -560,6 +585,11 @@ namespace casadi {
       m->fstats.at("solver").toc();
       m->fstats.at("postprocessing").tic();
 
+      int stat = CPXXgetstat(m->env, m->lp);
+      if (stat == CPX_STAT_INFEASIBLE) {
+        m->d_qp.unified_return_status = SOLVER_RET_INFEASIBLE;
+      }
+
       // Get objective value
       if (CPXXgetobjval(m->env, m->lp, &f)) {
         casadi_error("CPXXgetobjval failed");
@@ -594,6 +624,12 @@ namespace casadi {
       if (CPXXqpopt(m->env, m->lp)) {
         casadi_error("CPXXqpopt failed");
       }
+
+      int stat = CPXXgetstat(m->env, m->lp);
+      if (stat == CPX_STAT_INFEASIBLE) {
+        m->d_qp.unified_return_status = SOLVER_RET_INFEASIBLE;
+      }
+
       m->fstats.at("solver").toc();
       m->fstats.at("postprocessing").tic();
 
@@ -621,8 +657,17 @@ namespace casadi {
       } else {
 
           // Retrieving solution
-          if (CPXXsolution(m->env, m->lp, &solstat, &f, x, lam_a, get_ptr(slack), lam_x)) {
-            casadi_error("CPXXsolution failed");
+          int sol_ret = CPXXsolution(m->env, m->lp, &solstat, &f, x, lam_a, get_ptr(slack), lam_x);
+          if (sol_ret == CPXERR_NO_SOLN) {
+            m->d_qp.unified_return_status = SOLVER_RET_INFEASIBLE;
+          }
+
+          if (sol_ret) {
+            if (error_on_fail_) {
+              casadi_error("CPXXsolution failed");
+            } else {
+              m->d_qp.success = false;
+            }
           }
       }
     }
@@ -637,15 +682,15 @@ namespace casadi {
     casadi_scal(nx_, -1., lam_x);
 
     m->return_status = CPXXgetstat(m->env, m->lp);
-    m->success  = m->return_status==CPX_STAT_OPTIMAL;
-    m->success |= m->return_status==CPX_STAT_FIRSTORDER;
-    m->success |= m->return_status==CPXMIP_OPTIMAL;
-    m->success |= m->return_status==CPXMIP_OPTIMAL_TOL;
+    m->d_qp.success  = m->return_status==CPX_STAT_OPTIMAL;
+    m->d_qp.success |= m->return_status==CPX_STAT_FIRSTORDER;
+    m->d_qp.success |= m->return_status==CPXMIP_OPTIMAL;
+    m->d_qp.success |= m->return_status==CPXMIP_OPTIMAL_TOL;
 
     if (verbose_) {
       char status_string[CPXMESSAGEBUFSIZE];
       CPXXgetstatstring(m->env, m->return_status, status_string);
-      casadi_message(string("CPLEX return status: ") + status_string);
+      casadi_message(std::string("CPLEX return status: ") + status_string);
     }
 
     // Next time we warm start

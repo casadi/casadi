@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -34,8 +34,6 @@
 #include "expm.hpp"
 #include "serializing_stream.hpp"
 
-using namespace std;
-
 namespace casadi {
   template<typename Scalar>
   void Matrix<Scalar>::set_precision(casadi_int precision) { stream_precision_ = precision; }
@@ -61,6 +59,11 @@ namespace casadi {
   template<typename Scalar>
   void Matrix<Scalar>::rng(casadi_int seed) {
     rng_.seed(seed);
+  }
+
+  template<typename Scalar>
+  bool Matrix<Scalar>::has_nz(casadi_int rr, casadi_int cc) const {
+    return sparsity().has_nz(rr, cc);
   }
 
   template<typename Scalar>
@@ -590,6 +593,16 @@ namespace casadi {
   }
 
   template<typename Scalar>
+  std::vector<Scalar>* Matrix<Scalar>::operator->() {
+    return &nonzeros_;
+  }
+
+  template<typename Scalar>
+  const std::vector<Scalar>* Matrix<Scalar>::operator->() const {
+    return &nonzeros_;
+  }
+
+  template<typename Scalar>
   std::string Matrix<Scalar>::type_name() { return matrixName<Scalar>(); }
 
   template<typename Scalar>
@@ -621,11 +634,17 @@ namespace casadi {
 
   template<typename Scalar>
   void Matrix<Scalar>::print_vector(std::ostream &stream, bool truncate) const {
-    casadi_assert(is_column(), "Not a vector");
+    print_vector(stream, sparsity(), ptr(), truncate);
+  }
+
+  template<typename Scalar>
+  void Matrix<Scalar>::print_vector(std::ostream &stream, const Sparsity& sp,
+      const Scalar* nonzeros, bool truncate) {
+    casadi_assert(sp.is_column(), "Not a vector");
 
     // Get components
     std::vector<std::string> nz, inter;
-    print_split(nz, inter);
+    print_split(sp.nnz(), nonzeros, nz, inter);
 
     // Print intermediate expressions
     for (casadi_int i=0; i<inter.size(); ++i)
@@ -633,9 +652,9 @@ namespace casadi {
     inter.clear();
 
     // Access data structures
-    const casadi_int* row = this->row();
-    casadi_int nnz = this->nnz();
-    casadi_int size1 = this->size1();
+    const casadi_int* row = sp.row();
+    casadi_int nnz = sp.nnz();
+    casadi_int size1 = sp.size1();
 
     // No need to truncate if less than 1000 entries
     const casadi_int max_numel = 1000;
@@ -678,6 +697,28 @@ namespace casadi {
                                     std::vector<std::string>& inter) const {
 
     print_split(nnz(), ptr(), nz, inter);
+  }
+
+  template<typename Scalar>
+  void Matrix<Scalar>::print_default(std::ostream &stream, const Sparsity& sp,
+      const Scalar* nonzeros, bool truncate) {
+    if (sp.is_empty()) {
+      stream << sp.size1() << "x" << sp.size2();
+    } else if (sp.numel()==1) {
+      if (sp.nnz()==0) {
+        stream << "00";
+      } else {
+        print_scalar(stream, *nonzeros);
+      }
+    } else if (sp.is_column()) {
+      print_vector(stream, sp, nonzeros, truncate);
+    } else if (std::max(sp.size1(), sp.size2())<=10 ||
+        static_cast<double>(sp.nnz())/static_cast<double>(sp.numel())>=0.5) {
+      // if "small" or "dense"
+      print_dense(stream, sp, nonzeros, truncate);
+    } else {
+      print_sparse(stream, sp, nonzeros, truncate);
+    }
   }
 
   template<typename Scalar>
@@ -860,19 +901,7 @@ namespace casadi {
 
   template<typename Scalar>
   void Matrix<Scalar>::disp(std::ostream& stream, bool more) const {
-    if (is_empty()) {
-      stream << "[]";
-    } else if (numel()==1) {
-      print_scalar(stream);
-    } else if (is_column()) {
-      print_vector(stream);
-    } else if (std::max(size1(), size2())<=10 ||
-        static_cast<double>(nnz())/static_cast<double>(numel())>=0.5) {
-      // if "small" or "dense"
-      print_dense(stream);
-    } else {
-      print_sparse(stream);
-    }
+    print_default(stream, sparsity(), ptr());
   }
 
   template<typename Scalar>
@@ -1088,6 +1117,36 @@ namespace casadi {
   }
 
   template<typename Scalar>
+  const Sparsity& Matrix<Scalar>::sparsity() const {
+    return sparsity_;
+  }
+
+  template<typename Scalar>
+  std::vector<Scalar>& Matrix<Scalar>::nonzeros() {
+    return nonzeros_;
+  }
+
+  template<typename Scalar>
+  const std::vector<Scalar>& Matrix<Scalar>::nonzeros() const {
+    return nonzeros_;
+  }
+
+  template<typename Scalar>
+  Scalar* Matrix<Scalar>::ptr() {
+    return nonzeros_.empty() ? nullptr : &nonzeros_.front();
+  }
+
+  template<typename Scalar>
+  const Scalar* Matrix<Scalar>::ptr() const {
+    return nonzeros_.empty() ? nullptr : &nonzeros_.front();
+  }
+
+  template<typename Scalar>
+  Sparsity Matrix<Scalar>::get_sparsity() const {
+    return sparsity();
+  }
+
+  template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::mtimes(const Matrix<Scalar> &x, const Matrix<Scalar> &y) {
     if (x.is_scalar() || y.is_scalar()) {
       // Use element-wise multiplication if at least one factor scalar
@@ -1151,6 +1210,14 @@ namespace casadi {
     Matrix<Scalar> ret = A;
     casadi_rank1(ret.ptr(), ret.sparsity(), *alpha.ptr(), x.ptr(), y.ptr());
     return ret;
+  }
+
+
+  template<typename Scalar>
+  Matrix<Scalar> Matrix<Scalar>::
+  _logsumexp(const Matrix<Scalar>& x) {
+    Matrix<Scalar> mx = mmax(x);
+    return log(sum1(exp(x-mx)));
   }
 
   template<typename Scalar>
@@ -1277,6 +1344,14 @@ namespace casadi {
           return matrix_matrix(op, x, repmat(y, 1, x.size2() / y.size2()));
         } else if (y.size1() == x.size1() && y.size2() % x.size2() == 0) {
           return matrix_matrix(op, repmat(x, 1, y.size2() / x.size2()), y);
+        }
+      }
+      // x and y are empty horizontal multiples of each other?
+      if (x.size1()==0 && y.size1()==0 && x.size2()>0 && y.size2()>0) {
+        if (x.size2() % y.size2() == 0) {
+          return Matrix<Scalar>(0, x.size2());
+        } else if (y.size2() % x.size2() == 0) {
+          return Matrix<Scalar>(0, y.size2());
         }
       }
       // Dimension mismatch
@@ -1577,6 +1652,16 @@ namespace casadi {
   }
 
   template<typename Scalar>
+  std::vector<Scalar> Matrix<Scalar>::get_nonzeros() const {
+    return nonzeros_;
+  }
+
+  template<typename Scalar>
+  std::vector<Scalar> Matrix<Scalar>::get_elements() const {
+    return static_cast< std::vector<Scalar>>(*this);
+  }
+
+  template<typename Scalar>
   std::string Matrix<Scalar>::name() const {
     casadi_error("'name' not defined for " + type_name());
   }
@@ -1589,6 +1674,19 @@ namespace casadi {
   template<typename Scalar>
   casadi_int Matrix<Scalar>::n_dep() const {
     casadi_error("'n_dep' not defined for " + type_name());
+  }
+
+  template<typename Scalar>
+  Matrix<Scalar> Matrix<Scalar>::rand(  // NOLINT(runtime/threadsafe_fn)
+      casadi_int nrow,
+      casadi_int ncol) {
+    return rand(Sparsity::dense(nrow, ncol));  // NOLINT(runtime/threadsafe_fn)
+  }
+
+  template<typename Scalar>
+   Matrix<Scalar> Matrix<Scalar>::rand( // NOLINT(runtime/threadsafe_fn)
+        const std::pair<casadi_int, casadi_int>& rc) {
+      return rand(rc.first, rc.second); // NOLINT(runtime/threadsafe_fn)
   }
 
   template<typename Scalar>
@@ -1777,6 +1875,16 @@ namespace casadi {
   }
 
   template<typename Scalar>
+  Matrix<Scalar> Matrix<Scalar>::sparsity_cast(const Matrix<Scalar>& x, const Sparsity& sp) {
+    // quick return if already the right shape
+    if (sp==x.sparsity()) return x;
+
+    casadi_assert_dev(sp.nnz()==x.nnz());
+
+    return Matrix<Scalar>(sp, x.nonzeros(), false);
+  }
+
+  template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::trace(const Matrix<Scalar>& x) {
     casadi_assert(x.is_square(), "trace: must be square");
     Scalar res=0;
@@ -1960,7 +2068,7 @@ namespace casadi {
     V = nan(spV);
     R = nan(spR);
     beta = nan(ncol, 1);
-    vector<Scalar> w(nrow_ext);
+    std::vector<Scalar> w(nrow_ext);
     casadi_qr(A.sparsity(), A.ptr(), get_ptr(w), spV, V.ptr(),
               spR, R.ptr(), beta.ptr(),
               get_ptr(prinv), get_ptr(pc));
@@ -2037,7 +2145,7 @@ namespace casadi {
     casadi_int n=A.size1();
 
     // Calculate entries in L and D
-    vector<Scalar> D_nz(n), L_nz(Lt_sp.nnz()), w(n);
+    std::vector<Scalar> D_nz(n), L_nz(Lt_sp.nnz()), w(n);
     casadi_ldl(A.sparsity(), get_ptr(A.nonzeros()), Lt_sp,
               get_ptr(L_nz), get_ptr(D_nz), get_ptr(p), get_ptr(w));
 
@@ -2286,7 +2394,9 @@ namespace casadi {
     return ret;
   }
 
-  /** \brief   Construct a matrix with given block on the diagonal */
+  /** \brief   Construct a matrix with given block on the diagonal
+
+      \identifier{1nb} */
   template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::diagcat(const std::vector< Matrix<Scalar> > &A) {
     std::vector<Scalar> data;
@@ -2475,6 +2585,13 @@ namespace casadi {
   }
 
   template<typename Scalar>
+  std::vector< Matrix<Scalar> > Matrix<Scalar>::cse(const std::vector< Matrix<Scalar> >& e) {
+    casadi_error("'cse' not defined for " + type_name());
+    return {};
+  }
+
+
+  template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::
   jacobian(const Matrix<Scalar> &f, const Matrix<Scalar> &x, const Dict& opts) {
     casadi_error("'jacobian' not defined for " + type_name());
@@ -2527,6 +2644,13 @@ namespace casadi {
   }
 
   template<typename Scalar>
+  Sparsity
+  Matrix<Scalar>::jacobian_sparsity(const Matrix<Scalar> &f, const Matrix<Scalar> &x) {
+    casadi_error("'jacobian_sparsity' not defined for " + type_name());
+    return Sparsity();
+  }
+
+  template<typename Scalar>
   Matrix<Scalar> Matrix<Scalar>::taylor(const Matrix<Scalar>& f,
                                             const Matrix<Scalar>& x,
                                             const Matrix<Scalar>& a, casadi_int order) {
@@ -2569,6 +2693,12 @@ namespace casadi {
   std::vector<Matrix<Scalar> > Matrix<Scalar>::symvar(const Matrix<Scalar>& x) {
     casadi_error("'symvar' not defined for " + type_name());
     return std::vector<Matrix<Scalar> >();
+  }
+
+  template<typename Scalar>
+  void Matrix<Scalar>::extract(std::vector<Matrix<Scalar>>& ex, std::vector<Matrix<Scalar>>& v,
+      std::vector<Matrix<Scalar>>& vdef, const Dict& opts) {
+    casadi_error("'extract' not defined for " + type_name());
   }
 
   template<typename Scalar>

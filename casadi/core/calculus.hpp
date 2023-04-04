@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -150,7 +150,7 @@ namespace casadi {
     // Nonzero reference
     OP_GETNONZEROS,
 
-    // Parameteric nonzero reference
+    // Parametric nonzero reference
     OP_GETNONZEROS_PARAM,
 
     // Nonzero addition
@@ -195,15 +195,31 @@ namespace casadi {
     OP_BSPLINE,
 
     OP_CONVEXIFY,
+
+    // Sparsity cast
+    OP_SPARSITY_CAST,
+
+    OP_LOG1P,
+
+    OP_EXPM1,
+
+    OP_HYPOT,
+
+    OP_LOGSUMEXP,
+
+    OP_REMAINDER
+
   };
-  #define NUM_BUILT_IN_OPS (OP_CONVEXIFY+1)
+  #define NUM_BUILT_IN_OPS (OP_REMAINDER+1)
 
   #define OP_
 
 #ifndef SWIG
 
   ///@{
-  /** \brief Enable using elementary numerical operations without std:: prefix */
+  /** \brief Enable using elementary numerical operations without std:: prefix
+
+      \identifier{1g4} */
   using std::isfinite;
   using std::sqrt;
   using std::sin;
@@ -224,6 +240,7 @@ namespace casadi {
   using std::ceil;
   using std::pow;
   using std::fmod;
+  using std::remainder;
   using std::atan2;
   using std::erf;
   using std::fmin;
@@ -234,6 +251,10 @@ namespace casadi {
   using std::acosh;
   using std::isnan;
   using std::isinf;
+  using std::log1p;
+  using std::expm1;
+  using std::hypot;
+  using std::copysign;
   ///@}
 
   ///@{
@@ -246,7 +267,7 @@ namespace casadi {
   ///@}
 
   ///@{
-  /** \brief  CasADi additions */
+  /** CasADi additions */
   inline double simplify(double x) { return x;}
   inline double constpow(double x, double y) { return pow(x, y);}
   inline double printme(double x, double y) {
@@ -259,12 +280,6 @@ namespace casadi {
   }
   inline bool is_equal(double x, double y, casadi_int depth=0) { return x==y;}
 
-  #ifdef HAS_COPYSIGN
-  using std::copysign;
-  #else
-  /// copysign function
-  inline double copysign(double x, double y) { return y>=0 ? fabs(x) : -fabs(x);}
-  #endif //HAS_COPYSIGN
 
   // Integer maximum and minimum
   inline casadi_int casadi_max(casadi_int x, casadi_int y) { return std::max(x, y);}
@@ -349,7 +364,7 @@ namespace casadi {
 
   /// Calculate function and derivative
   template<casadi_int I>
-  struct DerBinaryOpertion {
+  struct DerBinaryOperation {
     /// Perform the operation
     template<typename T> static inline void derf(const T& x, const T& y, T& f, T* d) {
 
@@ -450,6 +465,7 @@ namespace casadi {
   template<>      struct SmoothChecker<OP_FLOOR>{ static const bool check=false;};
   template<>      struct SmoothChecker<OP_CEIL>{ static const bool check=false;};
   template<>      struct SmoothChecker<OP_FMOD>{ static const bool check=false;};
+  template<>      struct SmoothChecker<OP_REMAINDER>{ static const bool check=false;};
   template<>      struct SmoothChecker<OP_EQ>{ static const bool check=false;};
   template<>      struct SmoothChecker<OP_NE>{ static const bool check=false;};
   template<>      struct SmoothChecker<OP_SIGN>{ static const bool check=false;};
@@ -479,6 +495,7 @@ namespace casadi {
   template<>      struct F0XChecker<OP_FLOOR>{ static const bool check=true;};
   template<>      struct F0XChecker<OP_CEIL>{ static const bool check=true;};
   template<>      struct F0XChecker<OP_FMOD>{ static const bool check=true;};
+  template<>      struct F0XChecker<OP_REMAINDER>{ static const bool check=true;};
   template<>      struct F0XChecker<OP_FABS>{ static const bool check=true;};
   template<>      struct F0XChecker<OP_SIGN>{ static const bool check=true;};
   template<>      struct F0XChecker<OP_COPYSIGN>{ static const bool check=true;};
@@ -490,6 +507,8 @@ namespace casadi {
   template<>      struct F0XChecker<OP_ERFINV>{ static const bool check=true;};
   template<>      struct F0XChecker<OP_AND>{ static const bool check=true;};
   template<>      struct F0XChecker<OP_IF_ELSE_ZERO>{ static const bool check=true;};
+  template<>      struct F0XChecker<OP_LOG1P>{ static const bool check=true;};
+  template<>      struct F0XChecker<OP_EXPM1>{ static const bool check=true;};
   ///@}
 
   ///@{
@@ -513,6 +532,7 @@ namespace casadi {
   template<>      struct F00Checker<OP_OR>{ static const bool check=true;};
   template<>      struct F00Checker<OP_COPYSIGN>{ static const bool check=true;};
   template<>      struct F00Checker<OP_LT>{ static const bool check=true;};
+  template<>      struct F00Checker<OP_HYPOT>{ static const bool check=true;};
   ///@}
 
   ///@{
@@ -524,6 +544,7 @@ namespace casadi {
   template<>      struct CommChecker<OP_NE>{ static const bool check=true;};
   template<>      struct CommChecker<OP_AND>{ static const bool check=true;};
   template<>      struct CommChecker<OP_OR>{ static const bool check=true;};
+  template<>      struct CommChecker<OP_HYPOT>{ static const bool check=true;};
   ///@}
 
   ///@{
@@ -539,6 +560,7 @@ namespace casadi {
   template<>      struct NonnegativeChecker<OP_NOT>{ static const bool check=true;};
   template<>      struct NonnegativeChecker<OP_AND>{ static const bool check=true;};
   template<>      struct NonnegativeChecker<OP_OR>{ static const bool check=true;};
+  template<>      struct NonnegativeChecker<OP_HYPOT>{ static const bool check=true;};
   ///@}
 
   ///@{
@@ -560,10 +582,12 @@ namespace casadi {
   template<>      struct NargChecker<OP_ATAN2>{ static const casadi_int check=2;};
   template<>      struct NargChecker<OP_IF_ELSE_ZERO>{ static const casadi_int check=2;};
   template<>      struct NargChecker<OP_FMOD>{ static const casadi_int check=2;};
+  template<>      struct NargChecker<OP_REMAINDER>{ static const casadi_int check=2;};
   template<>      struct NargChecker<OP_COPYSIGN>{ static const casadi_int check=2;};
   template<>      struct NargChecker<OP_CONST>{ static const casadi_int check=0;};
   template<>      struct NargChecker<OP_PARAMETER>{ static const casadi_int check=0;};
   template<>      struct NargChecker<OP_INPUT>{ static const casadi_int check=0;};
+  template<>      struct NargChecker<OP_HYPOT>{ static const casadi_int check=2;};
   ///@}
 
   /// Simple assignment
@@ -768,6 +792,15 @@ namespace casadi {
       d[0]=1; d[1]=(f-x)/y;}
   };
 
+  /// Remainder of division
+  template<>
+  struct BinaryOperation<OP_REMAINDER>{
+    template<typename T> static inline void fcn(const T& x, const T& y, T& f) {
+      f = remainder(x, y);}
+    template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d) {
+      d[0]=1; d[1]=(f-x)/y;}
+  };
+
   /// Equal to
   template<>
   struct BinaryOperation<OP_EQ>{
@@ -844,7 +877,10 @@ namespace casadi {
   struct BinaryOperation<OP_FMIN>{
     template<typename T> static inline void fcn(const T& x, const T& y, T& f) { f = fmin(x, y);}
     template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d) {
-        d[0]=x<=y; d[1]=!d[0];}
+      T a = x<=y;
+      T b = y<=x;
+      T c = a+b;
+      d[0]=a/c; d[1]=b/c;}
   };
 
   /// Maximum
@@ -852,10 +888,13 @@ namespace casadi {
   struct BinaryOperation<OP_FMAX>{
     template<typename T> static inline void fcn(const T& x, const T& y, T& f) { f = fmax(x, y);}
     template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d) {
-        d[0]=x>=y; d[1]=!d[0];}
+      T a = y<=x;
+      T b = x<=y;
+      T c = a+b;
+      d[0]=a/c; d[1]=b/c;}
   };
 
-  /// Elementwise inverse
+  /// Element-wise inverse
   template<>
   struct UnaryOperation<OP_INV>{
     template<typename T> static inline void fcn(const T& x, T& f) { f = 1./x;}
@@ -914,6 +953,22 @@ namespace casadi {
         d[0] = (sqrt(pi)/2)*exp(f*f); }
   };
 
+  /// log1p(x) = log(1+x)
+  template<>
+  struct UnaryOperation<OP_LOG1P>{
+    template<typename T> static inline void fcn(const T& x, T& f) { f = log1p(x);}
+    template<typename T> static inline void der(const T& x, const T& f, T* d) {
+        d[0] = 1/(1+x);}
+  };
+
+  /// expm1(x) = exp(x)-1
+  template<>
+  struct UnaryOperation<OP_EXPM1>{
+    template<typename T> static inline void fcn(const T& x, T& f) { f = expm1(x);}
+    template<typename T> static inline void der(const T& x, const T& f, T* d) {
+        d[0] = exp(x); }
+  };
+
   /// Identity operator with the side effect of printing
   template<>
   struct BinaryOperation<OP_PRINTME>{
@@ -938,7 +993,7 @@ namespace casadi {
     template<typename T> static inline void fcn(const T& x, const T& y, T& f) {
         f = if_else_zero(x, y);}
     template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d) {
-        d[0]=0; d[1]=if_else_zero(x, T(1));}
+        d[0]=0; d[1]=x;}
   };
 
   /// Inverse of error function
@@ -947,6 +1002,14 @@ namespace casadi {
     template<typename T> static inline void fcn(const T& x, const T& y, T& f) { f = x;}
     template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d) {
         d[0] = 1; d[1] = 0; }
+  };
+
+  /// hypot(x,y) = sqrt(x^2+y^2)
+  template<>
+  struct BinaryOperation<OP_HYPOT>{
+    template<typename T> static inline void fcn(const T& x, const T& y, T& f) { f = hypot(x, y);}
+    template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d) {
+        d[0] = x/f; d[1] = y/f; }
   };
 
   template<template<casadi_int> class F, typename T>
@@ -981,6 +1044,7 @@ namespace casadi {
     case OP_FLOOR:         return F<OP_FLOOR>::check;
     case OP_CEIL:          return F<OP_CEIL>::check;
     case OP_FMOD:          return F<OP_FMOD>::check;
+    case OP_REMAINDER:     return F<OP_REMAINDER>::check;
     case OP_FABS:          return F<OP_FABS>::check;
     case OP_SIGN:          return F<OP_SIGN>::check;
     case OP_COPYSIGN:      return F<OP_COPYSIGN>::check;
@@ -1019,6 +1083,7 @@ namespace casadi {
     case OP_VERTSPLIT:     return F<OP_VERTSPLIT>::check;
     case OP_DIAGSPLIT:     return F<OP_DIAGSPLIT>::check;
     case OP_RESHAPE:       return F<OP_RESHAPE>::check;
+    case OP_SPARSITY_CAST: return F<OP_SPARSITY_CAST>::check;
     case OP_SUBREF:        return F<OP_SUBREF>::check;
     case OP_SUBASSIGN:     return F<OP_SUBASSIGN>::check;
     case OP_GETNONZEROS:   return F<OP_GETNONZEROS>::check;
@@ -1044,6 +1109,10 @@ namespace casadi {
     case OP_EINSTEIN:      return F<OP_EINSTEIN>::check;
     case OP_BSPLINE:       return F<OP_BSPLINE>::check;
     case OP_CONVEXIFY:     return F<OP_CONVEXIFY>::check;
+    case OP_LOG1P:         return F<OP_LOG1P>::check;
+    case OP_EXPM1:         return F<OP_EXPM1>::check;
+    case OP_HYPOT:         return F<OP_HYPOT>::check;
+    case OP_LOGSUMEXP:     return F<OP_LOGSUMEXP>::check;
     }
     return T();
   }
@@ -1057,34 +1126,54 @@ namespace casadi {
   template<typename T>
   struct casadi_math {
 
-    /** \brief Evaluate a built in function (scalar-scalar) */
+    /** \brief Evaluate a built in function (scalar-scalar)
+
+        \identifier{1g6} */
     static inline void fun(unsigned char op, const T& x, const T& y, T& f);
 
-    /** \brief Evaluate a built in function (vector-vector) */
+    /** \brief Evaluate a built in function (vector-vector)
+
+        \identifier{1g7} */
     static inline void fun(unsigned char op, const T* x, const T* y, T* f, casadi_int n);
 
-    /** \brief Evaluate a built in function (vector-scalar) */
+    /** \brief Evaluate a built in function (vector-scalar)
+
+        \identifier{1g8} */
     static inline void fun(unsigned char op, const T* x, const T& y, T* f, casadi_int n);
 
-    /** \brief Evaluate a built in function (scalar-vector) */
+    /** \brief Evaluate a built in function (scalar-vector)
+
+        \identifier{1g9} */
     static inline void fun(unsigned char op, const T& x, const T* y, T* f, casadi_int n);
 
-    /** \brief Evaluate a built in derivative function */
+    /** \brief Evaluate a built in derivative function
+
+        \identifier{1ga} */
     static inline void der(unsigned char op, const T& x, const T& y, const T& f, T* d);
 
-    /** \brief Evaluate the function and the derivative function */
+    /** \brief Evaluate the function and the derivative function
+
+        \identifier{1gb} */
     static inline void derF(unsigned char op, const T& x, const T& y, T& f, T* d);
 
-    /** \brief Is binary operation? */
+    /** \brief Is binary operation?
+
+        \identifier{1gc} */
     static inline bool is_binary(unsigned char op);
 
-    /** \brief Is unary operation? */
+    /** \brief Is unary operation?
+
+        \identifier{1gd} */
     static inline bool is_unary(unsigned char op);
 
-    /** \brief Number of dependencies */
+    /** \brief Number of dependencies
+
+        \identifier{1ge} */
     static inline casadi_int ndeps(unsigned char op);
 
-    /** \brief Print */
+    /** \brief Print
+
+        \identifier{1gf} */
     static inline std::string print(unsigned char op, const std::string& x,
                              const std::string& y);
     static inline std::string print(unsigned char op, const std::string& x);
@@ -1098,7 +1187,9 @@ namespace casadi {
   template<>
   struct casadi_math<casadi_int>{
 
-    /** \brief Evaluate a built in function */
+    /** \brief Evaluate a built in function
+
+        \identifier{1gg} */
     static inline void fun(unsigned char op, const casadi_int& x,
         const casadi_int& y, casadi_int& f) {
       double ff(0);
@@ -1133,7 +1224,9 @@ namespace casadi {
       }
     }
 
-    /** \brief Evaluate a built in derivative function */
+    /** \brief Evaluate a built in derivative function
+
+        \identifier{1gh} */
     static inline void der(unsigned char op, const casadi_int& x, const casadi_int& y,
         const casadi_int& f, casadi_int* d) {
       double d_real[2] = {static_cast<double>(d[0]), static_cast<double>(d[1])};
@@ -1143,7 +1236,9 @@ namespace casadi {
       d[1] = static_cast<casadi_int>(d_real[1]);
     }
 
-    /** \brief Evaluate the function and the derivative function */
+    /** \brief Evaluate the function and the derivative function
+
+        \identifier{1gi} */
     static inline void derF(unsigned char op, const casadi_int& x, const casadi_int& y,
         casadi_int& f, casadi_int* d) {
       double d_real[2] = {static_cast<double>(d[0]), static_cast<double>(d[1])};
@@ -1154,12 +1249,16 @@ namespace casadi {
       d[1] = static_cast<casadi_int>(d_real[1]);
     }
 
-    /** \brief Number of dependencies */
+    /** \brief Number of dependencies
+
+        \identifier{1gj} */
     static inline casadi_int ndeps(unsigned char op) {
       return casadi_math<double>::ndeps(op);
     }
 
-    /** \brief Print */
+    /** \brief Print
+
+        \identifier{1gk} */
     static inline std::string print(unsigned char op, const std::string& x,
                                     const std::string& y) {
       return casadi_math<double>::print(op, x, y);
@@ -1218,6 +1317,7 @@ namespace casadi {
   case OP_FLOOR:     CNAME<OP_FLOOR>::fcn(X, Y, F, N);         break;   \
   case OP_CEIL:      CNAME<OP_CEIL>::fcn(X, Y, F, N);          break;   \
   case OP_FMOD:      CNAME<OP_FMOD>::fcn(X, Y, F, N);          break;   \
+  case OP_REMAINDER: CNAME<OP_REMAINDER>::fcn(X, Y, F, N);     break;   \
   case OP_FABS:      CNAME<OP_FABS>::fcn(X, Y, F, N);          break;   \
   case OP_SIGN:      CNAME<OP_SIGN>::fcn(X, Y, F, N);          break;   \
   case OP_COPYSIGN:  CNAME<OP_COPYSIGN>::fcn(X, Y, F, N);      break;   \
@@ -1234,7 +1334,10 @@ namespace casadi {
   case OP_ATAN2:     CNAME<OP_ATAN2>::fcn(X, Y, F, N);         break;   \
   case OP_ERFINV:    CNAME<OP_ERFINV>::fcn(X, Y, F, N);        break;   \
   case OP_LIFT:      CNAME<OP_LIFT>::fcn(X, Y, F, N);          break;   \
-  case OP_PRINTME:   CNAME<OP_PRINTME>::fcn(X, Y, F, N);       break;
+  case OP_PRINTME:   CNAME<OP_PRINTME>::fcn(X, Y, F, N);       break;   \
+  case OP_LOG1P:     CNAME<OP_LOG1P>::fcn(X, Y, F, N);       break;   \
+  case OP_EXPM1:     CNAME<OP_EXPM1>::fcn(X, Y, F, N);       break;   \
+  case OP_HYPOT:     CNAME<OP_HYPOT>::fcn(X, Y, F, N);       break;
 
 #define CASADI_MATH_FUN_BUILTIN(X, Y, F) CASADI_MATH_FUN_BUILTIN_GEN(BinaryOperationSS, X, Y, F, 1)
 
@@ -1300,6 +1403,7 @@ namespace casadi {
   case OP_FLOOR:     BinaryOperation<OP_FLOOR>::der(X, Y, F, D);      break; \
   case OP_CEIL:      BinaryOperation<OP_CEIL>::der(X, Y, F, D);       break; \
   case OP_FMOD:      BinaryOperation<OP_FMOD>::der(X, Y, F, D);       break; \
+  case OP_REMAINDER: BinaryOperation<OP_REMAINDER>::der(X, Y, F, D);  break; \
   case OP_FABS:      BinaryOperation<OP_FABS>::der(X, Y, F, D);       break; \
   case OP_SIGN:      BinaryOperation<OP_SIGN>::der(X, Y, F, D);       break; \
   case OP_COPYSIGN:  BinaryOperation<OP_COPYSIGN>::der(X, Y, F, D);   break; \
@@ -1316,8 +1420,10 @@ namespace casadi {
   case OP_ATAN2:     BinaryOperation<OP_ATAN2>::der(X, Y, F, D);      break; \
   case OP_ERFINV:    BinaryOperation<OP_ERFINV>::der(X, Y, F, D);     break; \
   case OP_LIFT:      BinaryOperation<OP_LIFT>::der(X, Y, F, D);       break; \
-  case OP_PRINTME:   BinaryOperation<OP_PRINTME>::der(X, Y, F, D);    break;
-
+  case OP_PRINTME:   BinaryOperation<OP_PRINTME>::der(X, Y, F, D);    break; \
+  case OP_LOG1P:     BinaryOperation<OP_LOG1P>::der(X, Y, F, D);      break; \
+  case OP_EXPM1:     BinaryOperation<OP_EXPM1>::der(X, Y, F, D);      break; \
+  case OP_HYPOT:     BinaryOperation<OP_HYPOT>::der(X, Y, F, D);      break;
     switch (op) {
     CASADI_MATH_DER_BUILTIN(x, y, f, d)
       }
@@ -1329,54 +1435,57 @@ namespace casadi {
     // NOTE: We define the implementation in a preprocessor macro to be able to force inlining,
     // and to allow extensions in the VM
 #define CASADI_MATH_DERF_BUILTIN(X, Y, F, D)                            \
-    case OP_ASSIGN:    DerBinaryOpertion<OP_ASSIGN>::derf(X, Y, F, D);        break; \
-  case OP_ADD:       DerBinaryOpertion<OP_ADD>::derf(X, Y, F, D);        break; \
-  case OP_SUB:       DerBinaryOpertion<OP_SUB>::derf(X, Y, F, D);        break; \
-  case OP_MUL:       DerBinaryOpertion<OP_MUL>::derf(X, Y, F, D);        break; \
-  case OP_DIV:       DerBinaryOpertion<OP_DIV>::derf(X, Y, F, D);        break; \
-  case OP_NEG:       DerBinaryOpertion<OP_NEG>::derf(X, Y, F, D);        break; \
-  case OP_EXP:       DerBinaryOpertion<OP_EXP>::derf(X, Y, F, D);        break; \
-  case OP_LOG:       DerBinaryOpertion<OP_LOG>::derf(X, Y, F, D);        break; \
-  case OP_POW:       DerBinaryOpertion<OP_POW>::derf(X, Y, F, D);        break; \
-  case OP_CONSTPOW:  DerBinaryOpertion<OP_CONSTPOW>::derf(X, Y, F, D);   break; \
-  case OP_SQRT:      DerBinaryOpertion<OP_SQRT>::derf(X, Y, F, D);       break; \
-  case OP_SQ:        DerBinaryOpertion<OP_SQ>::derf(X, Y, F, D);         break; \
-  case OP_TWICE:     DerBinaryOpertion<OP_TWICE>::derf(X, Y, F, D);      break; \
-  case OP_SIN:       DerBinaryOpertion<OP_SIN>::derf(X, Y, F, D);        break; \
-  case OP_COS:       DerBinaryOpertion<OP_COS>::derf(X, Y, F, D);        break; \
-  case OP_TAN:       DerBinaryOpertion<OP_TAN>::derf(X, Y, F, D);        break; \
-  case OP_ASIN:      DerBinaryOpertion<OP_ASIN>::derf(X, Y, F, D);       break; \
-  case OP_ACOS:      DerBinaryOpertion<OP_ACOS>::derf(X, Y, F, D);       break; \
-  case OP_ATAN:      DerBinaryOpertion<OP_ATAN>::derf(X, Y, F, D);       break; \
-  case OP_LT:        DerBinaryOpertion<OP_LT>::derf(X, Y, F, D);         break; \
-  case OP_LE:        DerBinaryOpertion<OP_LE>::derf(X, Y, F, D);         break; \
-  case OP_EQ:        DerBinaryOpertion<OP_EQ>::derf(X, Y, F, D);         break; \
-  case OP_NE:        DerBinaryOpertion<OP_NE>::derf(X, Y, F, D);         break; \
-  case OP_NOT:       DerBinaryOpertion<OP_NOT>::derf(X, Y, F, D);        break; \
-  case OP_AND:       DerBinaryOpertion<OP_AND>::derf(X, Y, F, D);        break; \
-  case OP_OR:        DerBinaryOpertion<OP_OR>::derf(X, Y, F, D);         break; \
-  case OP_IF_ELSE_ZERO: DerBinaryOpertion<OP_IF_ELSE_ZERO>::derf(X, Y, F, D);         break; \
-  case OP_FLOOR:     DerBinaryOpertion<OP_FLOOR>::derf(X, Y, F, D);      break; \
-  case OP_CEIL:      DerBinaryOpertion<OP_CEIL>::derf(X, Y, F, D);       break; \
-  case OP_FMOD:      DerBinaryOpertion<OP_FMOD>::derf(X, Y, F, D);       break; \
-  case OP_FABS:      DerBinaryOpertion<OP_FABS>::derf(X, Y, F, D);       break; \
-  case OP_SIGN:      DerBinaryOpertion<OP_SIGN>::derf(X, Y, F, D);       break; \
-  case OP_COPYSIGN:  DerBinaryOpertion<OP_COPYSIGN>::derf(X, Y, F, D);   break; \
-  case OP_ERF:       DerBinaryOpertion<OP_ERF>::derf(X, Y, F, D);        break; \
-  case OP_FMIN:      DerBinaryOpertion<OP_FMIN>::derf(X, Y, F, D);       break; \
-  case OP_FMAX:      DerBinaryOpertion<OP_FMAX>::derf(X, Y, F, D);       break; \
-  case OP_INV:       DerBinaryOpertion<OP_INV>::derf(X, Y, F, D);        break; \
-  case OP_SINH:      DerBinaryOpertion<OP_SINH>::derf(X, Y, F, D);       break; \
-  case OP_COSH:      DerBinaryOpertion<OP_COSH>::derf(X, Y, F, D);       break; \
-  case OP_TANH:      DerBinaryOpertion<OP_TANH>::derf(X, Y, F, D);       break; \
-  case OP_ASINH:     DerBinaryOpertion<OP_ASINH>::derf(X, Y, F, D);      break; \
-  case OP_ACOSH:     DerBinaryOpertion<OP_ACOSH>::derf(X, Y, F, D);      break; \
-  case OP_ATANH:     DerBinaryOpertion<OP_ATANH>::derf(X, Y, F, D);      break; \
-  case OP_ATAN2:     DerBinaryOpertion<OP_ATAN2>::derf(X, Y, F, D);      break; \
-  case OP_ERFINV:    DerBinaryOpertion<OP_ERFINV>::derf(X, Y, F, D);     break; \
-  case OP_LIFT:      DerBinaryOpertion<OP_LIFT>::derf(X, Y, F, D);       break; \
-  case OP_PRINTME:   DerBinaryOpertion<OP_PRINTME>::derf(X, Y, F, D);    break;
-
+case OP_ASSIGN:    DerBinaryOperation<OP_ASSIGN>::derf(X, Y, F, D);        break; \
+case OP_ADD:       DerBinaryOperation<OP_ADD>::derf(X, Y, F, D);        break; \
+case OP_SUB:       DerBinaryOperation<OP_SUB>::derf(X, Y, F, D);        break; \
+case OP_MUL:       DerBinaryOperation<OP_MUL>::derf(X, Y, F, D);        break; \
+case OP_DIV:       DerBinaryOperation<OP_DIV>::derf(X, Y, F, D);        break; \
+case OP_NEG:       DerBinaryOperation<OP_NEG>::derf(X, Y, F, D);        break; \
+case OP_EXP:       DerBinaryOperation<OP_EXP>::derf(X, Y, F, D);        break; \
+case OP_LOG:       DerBinaryOperation<OP_LOG>::derf(X, Y, F, D);        break; \
+case OP_POW:       DerBinaryOperation<OP_POW>::derf(X, Y, F, D);        break; \
+case OP_CONSTPOW:  DerBinaryOperation<OP_CONSTPOW>::derf(X, Y, F, D);   break; \
+case OP_SQRT:      DerBinaryOperation<OP_SQRT>::derf(X, Y, F, D);       break; \
+case OP_SQ:        DerBinaryOperation<OP_SQ>::derf(X, Y, F, D);         break; \
+case OP_TWICE:     DerBinaryOperation<OP_TWICE>::derf(X, Y, F, D);      break; \
+case OP_SIN:       DerBinaryOperation<OP_SIN>::derf(X, Y, F, D);        break; \
+case OP_COS:       DerBinaryOperation<OP_COS>::derf(X, Y, F, D);        break; \
+case OP_TAN:       DerBinaryOperation<OP_TAN>::derf(X, Y, F, D);        break; \
+case OP_ASIN:      DerBinaryOperation<OP_ASIN>::derf(X, Y, F, D);       break; \
+case OP_ACOS:      DerBinaryOperation<OP_ACOS>::derf(X, Y, F, D);       break; \
+case OP_ATAN:      DerBinaryOperation<OP_ATAN>::derf(X, Y, F, D);       break; \
+case OP_LT:        DerBinaryOperation<OP_LT>::derf(X, Y, F, D);         break; \
+case OP_LE:        DerBinaryOperation<OP_LE>::derf(X, Y, F, D);         break; \
+case OP_EQ:        DerBinaryOperation<OP_EQ>::derf(X, Y, F, D);         break; \
+case OP_NE:        DerBinaryOperation<OP_NE>::derf(X, Y, F, D);         break; \
+case OP_NOT:       DerBinaryOperation<OP_NOT>::derf(X, Y, F, D);        break; \
+case OP_AND:       DerBinaryOperation<OP_AND>::derf(X, Y, F, D);        break; \
+case OP_OR:        DerBinaryOperation<OP_OR>::derf(X, Y, F, D);         break; \
+case OP_IF_ELSE_ZERO: DerBinaryOperation<OP_IF_ELSE_ZERO>::derf(X, Y, F, D);         break; \
+case OP_FLOOR:     DerBinaryOperation<OP_FLOOR>::derf(X, Y, F, D);      break; \
+case OP_CEIL:      DerBinaryOperation<OP_CEIL>::derf(X, Y, F, D);       break; \
+case OP_FMOD:      DerBinaryOperation<OP_FMOD>::derf(X, Y, F, D);       break; \
+case OP_REMAINDER: DerBinaryOperation<OP_REMAINDER>::derf(X, Y, F, D);   break; \
+case OP_FABS:      DerBinaryOperation<OP_FABS>::derf(X, Y, F, D);       break; \
+case OP_SIGN:      DerBinaryOperation<OP_SIGN>::derf(X, Y, F, D);       break; \
+case OP_COPYSIGN:  DerBinaryOperation<OP_COPYSIGN>::derf(X, Y, F, D);   break; \
+case OP_ERF:       DerBinaryOperation<OP_ERF>::derf(X, Y, F, D);        break; \
+case OP_FMIN:      DerBinaryOperation<OP_FMIN>::derf(X, Y, F, D);       break; \
+case OP_FMAX:      DerBinaryOperation<OP_FMAX>::derf(X, Y, F, D);       break; \
+case OP_INV:       DerBinaryOperation<OP_INV>::derf(X, Y, F, D);        break; \
+case OP_SINH:      DerBinaryOperation<OP_SINH>::derf(X, Y, F, D);       break; \
+case OP_COSH:      DerBinaryOperation<OP_COSH>::derf(X, Y, F, D);       break; \
+case OP_TANH:      DerBinaryOperation<OP_TANH>::derf(X, Y, F, D);       break; \
+case OP_ASINH:     DerBinaryOperation<OP_ASINH>::derf(X, Y, F, D);      break; \
+case OP_ACOSH:     DerBinaryOperation<OP_ACOSH>::derf(X, Y, F, D);      break; \
+case OP_ATANH:     DerBinaryOperation<OP_ATANH>::derf(X, Y, F, D);      break; \
+case OP_ATAN2:     DerBinaryOperation<OP_ATAN2>::derf(X, Y, F, D);      break; \
+case OP_ERFINV:    DerBinaryOperation<OP_ERFINV>::derf(X, Y, F, D);     break; \
+case OP_LIFT:      DerBinaryOperation<OP_LIFT>::derf(X, Y, F, D);       break; \
+case OP_PRINTME:   DerBinaryOperation<OP_PRINTME>::derf(X, Y, F, D);    break; \
+case OP_LOG1P:     DerBinaryOperation<OP_LOG1P>::derf(X, Y, F, D);      break; \
+case OP_EXPM1:     DerBinaryOperation<OP_EXPM1>::derf(X, Y, F, D);      break; \
+case OP_HYPOT:     DerBinaryOperation<OP_HYPOT>::derf(X, Y, F, D);      break;
     switch (op) {
       CASADI_MATH_DERF_BUILTIN(x, y, f, d)
         }
@@ -1395,14 +1504,15 @@ namespace casadi {
     case OP_NE:                                   \
     case OP_AND:                                  \
     case OP_OR:                                   \
-    case OP_IF_ELSE_ZERO:                         \
     case OP_COPYSIGN:                             \
     case OP_FMOD:                                 \
+    case OP_REMAINDER:                            \
     case OP_FMIN:                                 \
     case OP_FMAX:                                 \
     case OP_ATAN2:                                \
     case OP_PRINTME:                              \
-    case OP_LIFT:
+    case OP_LIFT:                                 \
+    case OP_HYPOT:
 
   #define CASADI_MATH_UNARY_BUILTIN              \
     case OP_ASSIGN:                              \
@@ -1431,15 +1541,18 @@ namespace casadi {
     case OP_ASINH:                               \
     case OP_ACOSH:                               \
     case OP_ATANH:                               \
-    case OP_ERFINV:
+    case OP_ERFINV:                              \
+    case OP_LOG1P:                               \
+    case OP_EXPM1:
 
   template<typename T>
   bool casadi_math<T>::is_binary(unsigned char op) {
     switch (op) {
       CASADI_MATH_BINARY_BUILTIN
-      return true;
-    default:
-      return false;
+      case OP_IF_ELSE_ZERO:
+        return true;
+      default:
+        return false;
     }
   }
 
@@ -1460,8 +1573,9 @@ namespace casadi {
       case OP_PARAMETER:
       case OP_INPUT:
         return 0;
-        CASADI_MATH_BINARY_BUILTIN
-          return 2;
+      CASADI_MATH_BINARY_BUILTIN
+      case OP_IF_ELSE_ZERO:
+        return 2;
       default:
         return 1;
     }
@@ -1514,6 +1628,7 @@ namespace casadi {
     case OP_FLOOR:          return "floor";
     case OP_CEIL:           return "ceil";
     case OP_FMOD:           return "fmod";
+    case OP_REMAINDER:      return "remainder";
     case OP_FABS:           return "fabs";
     case OP_SIGN:           return "sign";
     case OP_COPYSIGN:       return "copysign";
@@ -1547,6 +1662,7 @@ namespace casadi {
     case OP_VERTSPLIT:      return "vertsplit";
     case OP_DIAGSPLIT:      return "diagsplit";
     case OP_RESHAPE:        return "reshape";
+    case OP_SPARSITY_CAST:  return "sparsity_cast";
     case OP_SUBREF:         return "subref";
     case OP_SUBASSIGN:      return "subassign";
     case OP_GETNONZEROS:    return "getnonzeros";
@@ -1567,6 +1683,10 @@ namespace casadi {
     case OP_EINSTEIN:       return "einstein";
     case OP_BSPLINE:        return "bspline";
     case OP_CONVEXIFY:      return "convexify";
+    case OP_LOG1P:          return "log1p";
+    case OP_EXPM1:          return "expm1";
+    case OP_HYPOT:          return "hypot";
+    case OP_LOGSUMEXP:      return "logsumexp";
     }
     return nullptr;
   }

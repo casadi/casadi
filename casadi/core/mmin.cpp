@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -25,7 +25,6 @@
 
 #include "mmin.hpp"
 
-using namespace std;
 namespace casadi {
 
   MMin::MMin(const MX& x) {
@@ -79,6 +78,58 @@ namespace casadi {
 
   void MMax::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
     res[0] = mmax(arg[0]);
+  }
+
+  void MMin::generate(CodeGenerator& g,
+                      const std::vector<casadi_int>& arg,
+                      const std::vector<casadi_int>& res) const {
+    g << g.workel(res[0]) << " = "
+      << g.mmin(g.work(arg[0], dep(0).nnz()), dep(0).nnz(), dep(0).is_dense())
+      << ";\n";
+  }
+
+  void MMax::generate(CodeGenerator& g,
+                      const std::vector<casadi_int>& arg,
+                      const std::vector<casadi_int>& res) const {
+    g << g.workel(res[0]) << " = "
+      << g.mmax(g.work(arg[0], dep(0).nnz()), dep(0).nnz(), dep(0).is_dense())
+      << ";\n";
+  }
+
+  void MMin::ad_forward(const std::vector<std::vector<MX> >& fseed,
+                     std::vector<std::vector<MX> >& fsens) const {
+    MX m = shared_from_this<MX>()==dep(0);
+    MX N = sum2(sum1(m));
+    for (casadi_int d=0; d<fsens.size(); ++d) {
+      fsens[d][0] = dot(fseed[d][0], m) / N;
+    }
+  }
+
+  void MMin::ad_reverse(const std::vector<std::vector<MX> >& aseed,
+                     std::vector<std::vector<MX> >& asens) const {
+    MX m = shared_from_this<MX>()==dep(0);
+    MX N = sum2(sum1(m));
+    for (casadi_int d=0; d<aseed.size(); ++d) {
+      asens[d][0] += (aseed[d][0]/N)*m;
+    }
+  }
+
+  void MMax::ad_forward(const std::vector<std::vector<MX> >& fseed,
+                     std::vector<std::vector<MX> >& fsens) const {
+    MX m = shared_from_this<MX>()==dep(0);
+    MX N = sum2(sum1(m));
+    for (casadi_int d=0; d<fsens.size(); ++d) {
+      fsens[d][0] = dot(fseed[d][0], m) / N;
+    }
+  }
+
+  void MMax::ad_reverse(const std::vector<std::vector<MX> >& aseed,
+                     std::vector<std::vector<MX> >& asens) const {
+    MX m = shared_from_this<MX>()==dep(0);
+    MX N = sum2(sum1(m));
+    for (casadi_int d=0; d<aseed.size(); ++d) {
+      asens[d][0] += (aseed[d][0]/N)*m;
+    }
   }
 
 } // namespace casadi

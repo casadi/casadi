@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -45,48 +45,74 @@ namespace casadi {
     friend class OutputNode;
   public:
 
-    /** \brief  Constructor */
+    /** \brief  Constructor
+
+        \identifier{1pm} */
     MultipleOutput();
 
-    /** \brief  Destructor */
+    /** \brief  Destructor
+
+        \identifier{1pn} */
     ~MultipleOutput() override;
 
-    /** \brief  Number of outputs */
+    /** \brief  Number of outputs
+
+        \identifier{1po} */
     casadi_int nout() const override=0;
 
-    /** \brief  Get an output */
+    /** \brief  Get an output
+
+        \identifier{1pp} */
     MX get_output(casadi_int oind) const override;
 
-    /** \brief  Get the sparsity of output oind */
+    /** \brief  Get the sparsity of output oind
+
+        \identifier{1pq} */
     const Sparsity& sparsity(casadi_int oind) const override=0;
 
-    /** \brief  Check if a multiple output node */
+    /** \brief  Check if a multiple output node
+
+        \identifier{1pr} */
     bool has_output() const override {return true;}
 
   protected:
-    /** \brief Deserializing constructor */
+    /** \brief Deserializing constructor
+
+        \identifier{1ps} */
     explicit MultipleOutput(DeserializingStream& s) : MXNode(s) {}
   };
 
   class CASADI_EXPORT OutputNode : public MXNode {
   public:
 
-    /** \brief  Constructor */
+    /** \brief  Constructor
+
+        \identifier{1pt} */
     OutputNode(const MX& parent, casadi_int oind);
 
-    /** \brief  Destructor */
+    /** \brief  Destructor
+
+        \identifier{1pu} */
     ~OutputNode() override;
 
-    /** \brief  Print expression */
+    /** \brief  Print expression
+
+        \identifier{1pv} */
     std::string disp(const std::vector<std::string>& arg) const override;
 
-    /** \brief  Check if evaluation output */
+    /** \brief  Check if evaluation output
+
+        \identifier{1pw} */
     bool is_output() const override {return true;}
 
-    /** \brief  Get function output */
+    /** \brief  Get function output
+
+        \identifier{1px} */
     casadi_int which_output() const override { return oind_;}
 
-    /** \brief Get the operation */
+    /** \brief Get the operation
+
+        \identifier{1py} */
     casadi_int op() const override { return -1;}
 
     /// Create a horizontal concatenation node
@@ -98,17 +124,25 @@ namespace casadi {
     /** Obtain information about node */
     Dict info() const override { return {{"oind", oind_}}; }
 
-    /** \brief  Output index */
+    /** \brief  Output index
+
+        \identifier{1pz} */
     casadi_int oind_;
 
-    /** \brief Serialize an object without type information */
+    /** \brief Serialize an object without type information
+
+        \identifier{1q0} */
     void serialize_body(SerializingStream& s) const override;
 
-    /** \brief Deserialize without type information */
+    /** \brief Deserialize without type information
+
+        \identifier{1q1} */
     static MXNode* deserialize(DeserializingStream& s) { return new OutputNode(s); }
 
   protected:
-    /** \brief Deserializing constructor */
+    /** \brief Deserializing constructor
+
+        \identifier{1q2} */
     explicit OutputNode(DeserializingStream& s);
   };
 

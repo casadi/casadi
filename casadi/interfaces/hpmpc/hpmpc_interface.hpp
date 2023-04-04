@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -30,7 +30,9 @@
 #include "casadi/core/linsol.hpp"
 #include <casadi/interfaces/hpmpc/casadi_conic_hpmpc_export.h>
 
-/** \defgroup plugin_Conic_hpmpc
+/** \defgroup plugin_Conic_hpmpc Title
+    \par
+
 Interface to HMPC Solver
 
 
@@ -53,8 +55,7 @@ In order to use this interface, you must:
    where I must be a diagonal sparse matrix
  - Either supply all of N, nx, ng, nu options or rely on automatic detection
 
-
-*/
+    \identifier{22p} */
 
 #ifndef HPMPC_DLOPEN
 #include <target.h>

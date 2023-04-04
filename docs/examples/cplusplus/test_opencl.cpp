@@ -1,24 +1,20 @@
 /*
- *    This file is part of CasADi.
+ *    MIT No Attribution
  *
- *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
- *    Copyright (C) 2011-2014 Greg Horn
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl, KU Leuven.
  *
- *    CasADi is free software; you can redistribute it and/or
- *    modify it under the terms of the GNU Lesser General Public
- *    License as published by the Free Software Foundation; either
- *    version 3 of the License, or (at your option) any later version.
+ *    Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ *    software and associated documentation files (the "Software"), to deal in the Software
+ *    without restriction, including without limitation the rights to use, copy, modify,
+ *    merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
+ *    permit persons to whom the Software is furnished to do so.
  *
- *    CasADi is distributed in the hope that it will be useful,
- *    but WITHOUT ANY WARRANTY; without even the implied warranty of
- *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *    Lesser General Public License for more details.
- *
- *    You should have received a copy of the GNU Lesser General Public
- *    License along with CasADi; if not, write to the Free Software
- *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ *    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+ *    INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+ *    PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *    HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ *    OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+ *    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  */
 
@@ -34,8 +30,6 @@
 const int max_num_platforms = 10;
 const int max_num_devices = 10;
 
-using namespace std;
-
 int main(int, char**) {  
   cl_uint ret;
   size_t ret_size;
@@ -46,29 +40,29 @@ int main(int, char**) {
   if(ret != CL_SUCCESS) return 1;
 
   for(int i=0; i<ret_num_platforms && i<max_num_platforms; ++i){
-    cout << "Platform " << i << " of " << ret_num_platforms << ":" << endl;
+    std::cout << "Platform " << i << " of " << ret_num_platforms << ":" << std::endl;
     cl_device_id device_id[max_num_devices];
     cl_uint ret_num_devices = 0;
     ret = clGetDeviceIDs(platform_id[i], CL_DEVICE_TYPE_DEFAULT, max_num_devices, device_id, &ret_num_devices);
     if(ret != CL_SUCCESS) return 1;
     
     for(int j=0; j<ret_num_devices && j<max_num_devices ; ++j){
-      cout << "Device " << j << " of " << ret_num_devices << ":" << endl;
+      std::cout << "Device " << j << " of " << ret_num_devices << ":" << std::endl;
       
       // Separator
-      cout << ">>>>>>>>>>>" << endl;
+      std::cout << ">>>>>>>>>>>" << std::endl;
     
       // Device name
       char name[256];
       ret = clGetDeviceInfo(device_id[j],CL_DEVICE_NAME,sizeof(name),&name,&ret_size);
       if(ret != CL_SUCCESS) return 1;
-      cout << "Name " << name << endl; 
+      std::cout << "Name " << name << std::endl; 
 
       // Print type
       cl_device_type type;
       ret = clGetDeviceInfo(device_id[j],CL_DEVICE_TYPE,sizeof(type),&type,&ret_size);
       if(ret != CL_SUCCESS) return 1;
-      cout << "Device type: ";
+      std::cout << "Device type: ";
       switch(type){
         case CL_DEVICE_TYPE_CPU: cout << "CPU"; break;
         case CL_DEVICE_TYPE_GPU: cout << "GPU"; break;
@@ -76,10 +70,10 @@ int main(int, char**) {
         case CL_DEVICE_TYPE_DEFAULT: cout << "DEFAULT"; break;
         default: return 1;
       }
-      cout << endl;
+      std::cout << std::endl;
       
       // Separator
-      cout << "<<<<<<<<<<<" << endl;
+      std::cout << "<<<<<<<<<<<" << std::endl;
     }
   }
   return 0;

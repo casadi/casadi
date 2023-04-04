@@ -42,6 +42,10 @@ if(WITH_CLANG)
   add_subdirectory(clang)
 endif()
 
+if(WITH_HIGHS)
+  add_subdirectory(highs)
+endif()
+
 if(WITH_HSL)
   add_subdirectory(hsl)
 endif()
@@ -82,6 +86,9 @@ if(WITH_HPMPC)
   add_subdirectory(hpmpc)
 endif()
 
+if(WITH_HPIPM)
+  add_subdirectory(hpipm)
+endif()
 if(WITH_SUPERSCS)
   add_subdirectory(superscs)
 endif()
@@ -92,6 +99,10 @@ endif()
 
 if(WITH_AMPL)
   add_subdirectory(ampl)
+endif()
+
+if(WITH_PROXQP)
+  add_subdirectory(proxqp)
 endif()
 
 if(WITH_OSQP)

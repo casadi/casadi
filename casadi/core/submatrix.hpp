@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -48,6 +48,9 @@ namespace casadi {
     SubMatrix(M& mat, const I& i, const J& j) : mat_(mat), i_(i), j_(j) {
       mat.get(*this, false, i, j);
     }
+
+    /// Default copy constructor
+    SubMatrix(const SubMatrix<M, I, J> &y) = default;
 
     ///@{
     /// Methods that modify a part of the parent object (A(i, j) = ?, A(i, j) += ?, etc.)
@@ -105,6 +108,9 @@ namespace casadi {
     SubIndex(M& mat, const I& i) : mat_(mat), i_(i) {
       mat.get(*this, false, i);
     }
+
+    /// Default copy constructor
+    SubIndex(const SubIndex<M, I> &y) = default;
 
     ///@{
     /// Methods that modify a part of the parent object (A(i) = ?, A(i) += ?, etc.)

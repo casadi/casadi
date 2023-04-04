@@ -123,7 +123,7 @@ class Doxy2SWIG:
         if m and len(m.group()) == len(txt):
             pass
         else:
-            self.add_text(textwrap.fill(txt, break_long_words=False))
+            self.add_text(textwrap.fill(txt, break_long_words=False,drop_whitespace=False,replace_whitespace=False))
 
     def parse_Element(self, node):
         """Parse an `ELEMENT_NODE`.  This calls specific
@@ -150,7 +150,7 @@ class Doxy2SWIG:
 
     def add_text(self, value):
         """Adds text corresponding to `value` into `self.pieces`."""
-        if type(value) in (types.ListType, types.TupleType):
+        if type(value) in (list, tuple):
             self.pieces.extend(value)
         else:
             self.pieces.append(value)
@@ -210,13 +210,13 @@ class Doxy2SWIG:
         kind = node.attributes['kind'].value
         if kind in ('class', 'struct'):
             prot = node.attributes['prot'].value
-            if prot <> 'public':
+            if prot != 'public':
                 return
             names = ('compoundname', 'briefdescription',
                      'detaileddescription', 'includes')
             first = self.get_specific_nodes(node, names)
             for n in names:
-                if first.has_key(n):
+                if n in first:
                     self.parse(first[n])
             self.add_text(['";','\n'])
             for n in node.childNodes:
@@ -245,6 +245,11 @@ class Doxy2SWIG:
     def do_para(self, node):
         self.add_text('\n')
         self.generic_parse(node, pad=1)
+        
+    def do_ulink(self, node):
+        for n in node.childNodes:
+            self.parse(n)
+        self.add_text(' ')
 
     def do_parametername(self, node):
         self.add_text('\n')
@@ -280,7 +285,7 @@ class Doxy2SWIG:
             if name[:8] == 'operator': # Don't handle operators yet.
                 return
 
-            if not first.has_key('definition') or \
+            if not ('definition' in first) or \
                    kind in ['variable', 'typedef']:
                 return
 
@@ -372,7 +377,7 @@ class Doxy2SWIG:
             if not os.path.exists(fname):
                 fname = os.path.join(self.my_dir,  fname)
             if not self.quiet:
-                print "parsing file: %s"%fname
+                print("parsing file: %s"%fname)
             p = Doxy2SWIG(fname, self.include_function_definition, self.quiet)
             p.generate()
             self.pieces.extend(self.clean_pieces(p.pieces))
@@ -415,7 +420,7 @@ class Doxy2SWIG:
             elif i.find('// File:') > -1: # leave comments alone.
                 ret.extend([i, '\n'])
             else:
-                _tmp = textwrap.fill(i.strip(), break_long_words=False)
+                _tmp = textwrap.fill(i.strip(), break_long_words=False,drop_whitespace=False,replace_whitespace=False)
                 _tmp = self.lead_spc.sub(r'\1"\2', _tmp)
                 ret.extend([_tmp, '\n\n'])
         return ret

@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -30,14 +30,15 @@
 #include "casadi/core/integration_tools.hpp"
 #include <casadi/solvers/casadi_integrator_collocation_export.h>
 
-/** \defgroup plugin_Integrator_collocation
+/** \defgroup plugin_Integrator_collocation Title
+    \par
 
      Fixed-step implicit Runge-Kutta integrator
      ODE/DAE integrator based on collocation schemes
 
      The method is still under development
 
-*/
+    \identifier{234} */
 
 /** \pluginsection{Integrator,collocation} */
 
@@ -47,22 +48,23 @@ namespace casadi {
   /**
      \brief \pluginbrief{Integrator,collocation}
 
-     @copydoc DAE_doc
+ 
      @copydoc plugin_Integrator_collocation
 
      \author Joel Andersson
      \date 2014
   */
-  class CASADI_INTEGRATOR_COLLOCATION_EXPORT Collocation :
-        public ImplicitFixedStepIntegrator {
-  public:
+  class CASADI_INTEGRATOR_COLLOCATION_EXPORT Collocation : public ImplicitFixedStepIntegrator {
+   public:
 
     /// Constructor
-    explicit Collocation(const std::string& name, const Function& dae);
+    Collocation(const std::string& name, const Function& dae,
+      double t0, const std::vector<double>& tout);
 
     /** \brief  Create a new integrator */
-    static Integrator* creator(const std::string& name, const Function& dae) {
-      return new Collocation(name, dae);
+    static Integrator* creator(const std::string& name, const Function& dae,
+        double t0, const std::vector<double>& tout) {
+      return new Collocation(name, dae, t0, tout);
     }
 
     /// Destructor
@@ -83,19 +85,19 @@ namespace casadi {
     /// Initialize stage
     void init(const Dict& opts) override;
 
-    /// Setup F and G
-    void setupFG() override;
+    /// Setup step functions
+    void setup_step() override;
 
     // Return zero if smaller than machine epsilon
     static double zeroIfSmall(double x);
 
     /** \brief Reset the forward problem */
-    void reset(IntegratorMemory* mem, double t, const double* x,
-                       const double* z, const double* p) const override;
+    void reset(IntegratorMemory* mem,
+      const double* x, const double* z, const double* p) const override;
 
     /// Reset the backward problem and take time to tf
-    void resetB(IntegratorMemory* mem, double t, const double* rx,
-                        const double* rz, const double* rp) const override;
+    void resetB(IntegratorMemory* mem,
+      const double* rx, const double* rz, const double* rp) const override;
 
     MX algebraic_state_init(const MX& x0, const MX& z0) const override;
     MX algebraic_state_output(const MX& Z) const override;
@@ -109,15 +111,14 @@ namespace casadi {
     /// A documentation string
     static const std::string meta_doc;
 
-    /// Continuous time dynamics
-    Function f_, g_;
-
     /** \brief Serialize an object without type information */
     void serialize_body(SerializingStream &s) const override;
 
     /** \brief Deserialize into MX */
     static ProtoFunction* deserialize(DeserializingStream& s) { return new Collocation(s); }
-  protected:
+
+   protected:
+
     /** \brief Deserializing constructor */
     explicit Collocation(DeserializingStream& s);
   };

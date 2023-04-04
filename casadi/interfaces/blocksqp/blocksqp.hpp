@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -31,12 +31,15 @@
 #include "casadi/core/nlpsol_impl.hpp"
 #include "../qpoases/qpoases_interface.hpp"
 
-/** \defgroup plugin_Nlpsol_blocksqp
+/** \defgroup plugin_Nlpsol_blocksqp Title
+    \par
+
   * This is a modified version of blockSQP by Janka et al.
   *
   * \author Dennis Janka, Joel Andersson
   * \date 2012-2015, 2016
-*/
+
+    \identifier{224} */
 
 /** \pluginsection{Nlpsol,blocksqp} */
 

@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -30,18 +30,19 @@
 #include <string>
 
 namespace casadi {
-  /**
-  * \brief Collects global CasADi meta information
+  /** \brief Collects global CasADi meta information
   *
   *  \author Joris Gillis
   *  \date 2012
-  */
+
+      \identifier{23k} */
   class CASADI_EXPORT CasadiMeta {
     private:
       /// No instances are allowed
       CasadiMeta();
     public:
     /** \brief Obtain the version number of CasADi
+
     *  The format is 'x.y.z' or 'x.y.z+'
     *
     *  The variant without + indicates that the version is an official release
@@ -50,40 +51,54 @@ namespace casadi {
     *     and might be more recent than 'x.y.w'  with w>z.
     *
     *  \see getGitRevision getGitDescribe
-    */
+
+        \identifier{iz} */
     static const char* version();
     /** \brief Obtain the git hash of this build
+
     *      (only available if built from a git repo)
-    */
+
+        \identifier{j0} */
     static const char* git_revision();
     /** \brief Obtain the git description of this build
+
     *      (only available if built from a git repo)
-    */
+
+        \identifier{j1} */
     static const char* git_describe();
     /** \brief Obtain list of features that were compiled into this build
-    */
+
+        \identifier{j2} */
     static const char* feature_list();
     /** \brief Obtain build type: RELEASE/Debug
-    */
+
+        \identifier{j3} */
     static const char* build_type();
     /** \brief Obtain compiler identification
+
     * Provided by http://www.cmake.org/cmake/help/v2.8.10/cmake.html#variable:CMAKE_LANG_COMPILER_ID
-    */
+
+        \identifier{j4} */
     static const char* compiler_id();
     /** \brief Obtain compiler
-    */
+
+        \identifier{j5} */
     static const char* compiler();
     /** \brief Obtain compiler flags
-    */
+
+        \identifier{j6} */
     static const char* compiler_flags();
     /** \brief Obtain modules list
-    */
+
+        \identifier{j7} */
     static const char* modules();
     /** \brief Obtain plugins list
-    */
+
+        \identifier{j8} */
     static const char* plugins();
     /** \brief Obtain install prefix
-    */
+
+        \identifier{j9} */
     static const char* install_prefix();
   };
 

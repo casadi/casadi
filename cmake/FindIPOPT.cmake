@@ -1,5 +1,6 @@
 find_package(Ipopt CONFIG)
 
+
 if(Ipopt_FOUND)
     set(IPOPT_LIBRARIES ${Ipopt_LIBRARIES})
     set(IPOPT_INCLUDEDIR ${Ipopt_INCLUDE_DIR})
@@ -41,3 +42,20 @@ else()
     include(FindPackageHandleStandardArgs)
     find_package_handle_standard_args(IPOPT DEFAULT_MSG IPOPT_LIBRARIES IPOPT_INCLUDE_DIRS)
 endif()
+
+if(IPOPT_FOUND)
+  add_library(ipopt INTERFACE)
+
+  foreach(LIB ${IPOPT_LIBRARIES})
+    find_library(LIB_FULL_${LIB} NAMES ${LIB} PATHS ${IPOPT_LIBRARY_DIRS})
+    target_link_libraries(ipopt INTERFACE ${LIB_FULL_${LIB}})
+  endforeach()
+  target_include_directories(ipopt INTERFACE ${IPOPT_INCLUDE_DIRS})
+  if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+  else()
+    target_compile_definitions(ipopt INTERFACE HAVE_CSTDDEF)
+  endif()
+  target_compile_definitions(ipopt INTERFACE ${IPOPT_CFLAGS_OTHER})
+endif()
+
+

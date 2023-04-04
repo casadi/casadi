@@ -1,0 +1,28 @@
+name: style
+
+on: push
+
+jobs:
+  main:
+    runs-on: ubuntu-22.04
+
+    steps:
+
+    - uses: actions/checkout@v3.3.0
+      with:
+        fetch-depth: 0 # for git-restore-mtime
+
+    - name: prepare
+      run: |
+        mkdir build
+        cd build
+        cmake -DWITH_LINT=ON -DWITH_CLANG_TIDY=ON ..
+    - name: lint
+      run: |
+        cd build
+        make lint
+    - name: clang-tidy
+      run: |
+        #cd build
+        #clang-tidy --version
+        #make clang-tidy

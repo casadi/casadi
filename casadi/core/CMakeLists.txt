@@ -1,7 +1,13 @@
-cmake_minimum_required(VERSION 2.8.6)
+cmake_minimum_required(VERSION 3.10.2)
 
 # Create runtime
 add_subdirectory(runtime)
+
+# FMU headers
+if(WITH_FMU)
+  # FMU C API
+  include_directories(${FMU_INCLUDE_DIR})
+endif()
 
 set(CASADI_PUBLIC
   # MISC
@@ -11,6 +17,7 @@ set(CASADI_PUBLIC
   casadi_logger.hpp
   casadi_interrupt.hpp
   exception.hpp
+  casadi_enum.hpp
   calculus.hpp
   global_options.hpp
   casadi_meta.hpp
@@ -67,7 +74,6 @@ set(CASADI_PUBLIC
   nlp_builder.hpp
   xml_node.hpp
   xml_file.hpp
-  variable.hpp
   dae_builder.hpp
   optistack.hpp
   serializer.hpp
@@ -99,7 +105,6 @@ set(CASADI_INTERNAL
   dm_instantiator.cpp
   im_instantiator.cpp
 
-  sparse_storage.hpp   sparse_storage_impl.hpp
   sparsity.cpp  sparsity_internal.hpp   sparsity_internal.cpp
   slice.cpp generic_matrix.cpp
 
@@ -131,6 +136,7 @@ set(CASADI_INTERNAL
   concat.hpp              concat.cpp              # Concatenation
   split.hpp               split.cpp               # Split (inverse of concatenation)
   reshape.hpp             reshape.cpp             # Reshape
+  sparsity_cast.hpp       sparsity_cast.cpp       # Sparsity cast
   subref.hpp              subref.cpp              # Submatrix reference
   subassign.hpp           subassign.cpp           # Submatrix assignment
   getnonzeros.hpp         getnonzeros.cpp         # Get the nonzeros of matrix
@@ -148,6 +154,7 @@ set(CASADI_INTERNAL
   monitor.hpp             monitor.cpp             # Monitor
   repmat.hpp              repmat.cpp              # RepMat
   convexify.hpp           convexify.cpp           # Convexify
+  logsumexp.hpp           logsumexp.cpp           # Logsumexp
 
   # A dynamically created function with AD capabilities
   function.cpp
@@ -155,12 +162,14 @@ set(CASADI_INTERNAL
   oracle_function.hpp     oracle_function.cpp     # Specialization of FunctionInternal to hold an oracle
   callback.cpp            # Interface for user-defined function classes (public API)
   callback_internal.cpp   callback_internal.hpp   # Interface for user-defined function classes (internal API)
+  casadi_os.cpp           casadi_os.hpp           # Abstractions aroung operating system
   plugin_interface.hpp                                     # Plugin interface for Function
   factory.hpp                                              # Helper class for derivative function generation
   x_function.hpp                                           # Base class for SXFunction and MXFunction
   sx_function.hpp         sx_function.cpp
   mx_function.hpp         mx_function.cpp
   external_impl.hpp       external.cpp
+  fmu_function.hpp        fmu_function.cpp
   jit_function.hpp        jit_function.cpp
   linsol.cpp              linsol_internal.hpp  linsol_internal.cpp
   rootfinder_impl.hpp     rootfinder.cpp
@@ -184,8 +193,7 @@ set(CASADI_INTERNAL
   nlp_builder.cpp
   xml_node.cpp
   xml_file.cpp                xml_file_internal.hpp                xml_file_internal.cpp
-  variable.cpp
-  dae_builder.cpp
+  dae_builder.cpp             dae_builder_internal.hpp             dae_builder_internal.cpp
   optistack.cpp               optistack_internal.cpp               optistack_internal.hpp
   serializer.cpp              serializing_stream.cpp
   casadi_c.cpp
@@ -194,10 +202,31 @@ set(CASADI_INTERNAL
   runtime/casadi_runtime.hpp
 )
 
+add_executable(casadi-cli casadi_cli.cpp)
+target_link_libraries(casadi-cli casadi)
+file(RELATIVE_PATH TREL_BIN_PREFIX "${CMAKE_INSTALL_PREFIX}" "${BIN_PREFIX}")
+install(TARGETS casadi-cli
+  RUNTIME DESTINATION ${TREL_BIN_PREFIX}
+)
+
 # Add the runtime sources to internal (installed separately)
+set(RUNTIME_SRC)
 foreach(FILE ${CASADI_RUNTIME_SRC})
   set(CASADI_INTERNAL ${CASADI_INTERNAL} runtime/${FILE})
+  set(RUNTIME_SRC ${RUNTIME_SRC} runtime/${FILE})
 endforeach()
+set(RUNTIME_SRC ${RUNTIME_SRC} runtime/casadi_to_mex.hpp runtime/casadi_from_mex.hpp runtime/casadi_fmu.hpp)
+
+string (REPLACE ";" "$<SEMICOLON>" ESCAPED_RUNTIME_SRC "${RUNTIME_SRC}")
+
+add_custom_command(
+  OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/runtime/casadi_runtime_str.h"
+  COMMAND  ${CMAKE_COMMAND} -D OUTPUT="${CMAKE_CURRENT_BINARY_DIR}/runtime/casadi_runtime_str.h" -D SOURCES="${ESCAPED_RUNTIME_SRC}" -P "${CMAKE_CURRENT_SOURCE_DIR}/../generate_runtime.cmake"
+  DEPENDS ${RUNTIME_SRC}
+  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+set(CASADI_INTERNAL ${CASADI_INTERNAL} "${CMAKE_CURRENT_BINARY_DIR}/runtime/casadi_runtime_str.h")
 
 # Build static and/or shared
 casadi_library(casadi ${CASADI_PUBLIC} ${CASADI_INTERNAL})
@@ -226,6 +255,15 @@ endif()
 if(RT)
   # Realtime library
   target_link_libraries(casadi ${RT})
+endif()
+
+if(CMAKE_CROSS_COMPILING AND MINGW)
+  add_custom_command(TARGET casadi POST_BUILD
+    COMMAND $ENV{DLLTOOL} --dllname $<TARGET_FILE:casadi> --def "${CMAKE_CURRENT_SOURCE_DIR}/casadi.def" --output-lib casadi.lib
+  )
+  install(FILES "${CMAKE_CURRENT_BINARY_DIR}/casadi.lib"
+    DESTINATION ${DEF_LIB_PREFIX}
+  )
 endif()
 
 install(FILES ${CASADI_PUBLIC} ${CMAKE_CURRENT_BINARY_DIR}/casadi_export.h

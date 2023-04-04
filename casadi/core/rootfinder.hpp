@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -31,7 +31,9 @@
 
 namespace casadi {
 
-  /** \defgroup main_rootfinder
+  /** \defgroup main_rootfinder Title
+      \par
+
    * Create a solver for rootfinding problems
    * Takes a function where one of the inputs is unknown and one of the outputs
    * is a residual function that is always zero, defines a new function where
@@ -53,10 +55,11 @@ namespace casadi {
    *
    * \author Joel Andersson
    * \date 2011-2015
-   */
+
+      \identifier{21r} */
 
 
-  /** \defgroup rootfinder
+  /** \defgroup rootfinder Title
   * @copydoc main_rootfinder
   *  @{
   */
@@ -76,31 +79,49 @@ namespace casadi {
                                const Function& f, const Dict& opts=Dict());
   ///@}
 
-  /** \brief Get rootfinder input scheme */
+  /** \brief Get rootfinder input scheme
+
+      \identifier{1ty} */
   CASADI_EXPORT std::vector<std::string> rootfinder_in();
 
-  /** \brief Get rootfinder output scheme */
+  /** \brief Get rootfinder output scheme
+
+      \identifier{1tz} */
   CASADI_EXPORT std::vector<std::string> rootfinder_out();
 
-  /** \brief Get rootfinder input scheme name by index */
+  /** \brief Get rootfinder input scheme name by index
+
+      \identifier{1u0} */
   CASADI_EXPORT std::string rootfinder_in(casadi_int ind);
 
-  /** \brief Get rootfinder output scheme name by index */
+  /** \brief Get rootfinder output scheme name by index
+
+      \identifier{1u1} */
   CASADI_EXPORT std::string rootfinder_out(casadi_int ind);
 
-  /** \brief Number of rootfinder inputs */
+  /** \brief Number of rootfinder inputs
+
+      \identifier{1u2} */
   CASADI_EXPORT casadi_int rootfinder_n_in();
 
-  /** \brief Number of rootfinder outputs */
+  /** \brief Number of rootfinder outputs
+
+      \identifier{1u3} */
   CASADI_EXPORT casadi_int rootfinder_n_out();
 
-  /** \brief Get all options for a plugin */
+  /** \brief Get all options for a plugin
+
+      \identifier{1u4} */
   CASADI_EXPORT std::vector<std::string> rootfinder_options(const std::string& name);
 
-  /** \brief Get type info for a particular option */
+  /** \brief Get type info for a particular option
+
+      \identifier{1u5} */
   CASADI_EXPORT std::string rootfinder_option_type(const std::string& name, const std::string& op);
 
-  /** \brief Get documentation for a particular option */
+  /** \brief Get documentation for a particular option
+
+      \identifier{1u6} */
   CASADI_EXPORT std::string rootfinder_option_info(const std::string& name, const std::string& op);
 
   /// Check if a particular plugin is available

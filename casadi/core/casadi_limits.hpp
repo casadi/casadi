@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -29,17 +29,20 @@
 #include <cmath>
 #include <limits>
 
-/** \brief The casadi namespace */
+/** \brief The casadi namespace
+
+    \identifier{1aj} */
 namespace casadi {
 
   /** \brief casadi_limits class
 
-  The following class, which acts as a complements to the standard numeric_limits class, allows
+  The following class, which acts as a complements to the standard std::numeric_limits class, allows
   specifying certain properties of scalar objects. The template can be specialized for
   e.g. symbolic scalars
   \author Joel Andersson
   \date 2011
-  */
+
+      \identifier{1ak} */
 
   template<class T>
   class CASADI_EXPORT casadi_limits {

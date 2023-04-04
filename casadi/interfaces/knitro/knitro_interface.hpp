@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -30,9 +30,12 @@
 #include <knitro.h>
 #include "casadi/core/nlpsol_impl.hpp"
 
-/** \defgroup plugin_Nlpsol_knitro
+/** \defgroup plugin_Nlpsol_knitro Title
+    \par
+
   KNITRO interface
-*/
+
+    \identifier{22c} */
 
 /** \pluginsection{Nlpsol,knitro} */
 
@@ -46,7 +49,10 @@ namespace casadi {
     const KnitroInterface& self;
 
     // KNITRO context pointer
-    KTR_context_ptr kc;
+    KN_context *kc;
+
+    // KNITRO callback pointer
+    CB_context *cb;
 
     // Inputs
     double *wlbx, *wubx, *wlbg, *wubg;
@@ -113,12 +119,11 @@ namespace casadi {
     bool integer_support() const override { return true;}
 
     // KNITRO callback wrapper
-    static int callback(const int evalRequestCode, // NOLINT
-                        const int n, const int m, const int nnzJ, // NOLINT
-                        const int nnzH, const double * const x, const double * const lambda, // NOLINT
-                        double * const obj, double * const c, double * const objGrad, // NOLINT
-                        double * const jac, double * const hessian, // NOLINT
-                        double * const hessVector, void *userParams); // NOLINT
+    static int callback(KN_context_ptr        kc,
+                   CB_context_ptr             cb,
+                   KN_eval_request_ptr const  evalRequest,
+                   KN_eval_result_ptr  const  evalResult,
+                   void             *  const  userParams);
 
     // KNITRO return codes
     static const char* return_codes(int flag);
@@ -133,7 +138,7 @@ namespace casadi {
     std::vector<int> contype_;
 
     // Type of complementarity constraints
-    //std::vector<int> comp_type_;
+    std::vector<int> comp_type_;
 
     // Index pair for complementarity constraints
     std::vector<int> comp_i1_;

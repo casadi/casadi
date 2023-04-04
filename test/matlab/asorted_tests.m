@@ -110,7 +110,7 @@ ode = struct('x', x, 'ode', x)
 opts = struct
 opts.verbose = true
 
-intg = casadi.integrator('integrator', 'rk', ode, opts);
+intg = casadi.integrator('integrator', 'rk', ode, 0, 1, opts);
 intg.call(struct);
 diary off
 
@@ -397,8 +397,10 @@ if ~is_octave
   assert(data.x.isnull)
 end
 
-if isunix
-  compile_flags = 'CFLAGS=$CFLAGS -pedantic -std=c89 -fPIC -shared -Wall -Werror -Wextra -Wno-unknown-pragmas -Wno-long-long -Wno-unused-parameter'
+if ismac
+  compile_flags = 'CFLAGS=$CFLAGS -pedantic -std=c99 -fPIC -Wall -Werror -Wextra -Wno-unknown-pragmas -Wno-long-long -Wno-unused-parameter'
+elseif isunix
+  compile_flags = 'CFLAGS=$CFLAGS -pedantic -std=c89 -fPIC -Wall -Werror -Wextra -Wno-unknown-pragmas -Wno-long-long -Wno-unused-parameter'
 else
   compile_flags = '';
 end
@@ -772,4 +774,22 @@ A0 = DM([1 2 3])';
 A = MX.sym('A',1,3);
 f = Function('f',{A,x},{A(x)});assert(full(norm(f(A0,xi)-A0(xi)))==0)
 
+
+for a=[5,-5]
+    for b=[3,-3]
+        assert(rem(a,b)==full(rem(DM(a),DM(b))))
+    end
+end
+
+flag = false;
+try
+  mod(DM(5),DM(3))
+catch
+  flag = true;
+end
+
+assert(flag);
+
+
+disp('success')
 

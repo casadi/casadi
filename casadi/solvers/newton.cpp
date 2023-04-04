@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -26,7 +26,6 @@
 #include "newton.hpp"
 #include <iomanip>
 
-using namespace std;
 namespace casadi {
 
   extern "C"
@@ -153,18 +152,18 @@ namespace casadi {
       m->iter++;
 
       // Use x to evaluate g and J
-      copy_n(m->iarg, n_in_, m->arg);
+      std::copy_n(m->iarg, n_in_, m->arg);
       m->arg[iin_] = m->x;
       m->res[0] = m->jac;
-      copy_n(m->ires, n_out_, m->res+1);
+      std::copy_n(m->ires, n_out_, m->res+1);
       m->res[1+iout_] = m->f;
       calc_function(m, "jac_f_z");
 
       // Check convergence
       double abstol = 0;
-      if (abstol_ != numeric_limits<double>::infinity()) {
+      if (abstol_ != std::numeric_limits<double>::infinity()) {
         for (casadi_int i=0; i<n_; ++i) {
-          abstol = max(abstol, fabs(m->f[i]));
+          abstol = std::max(abstol, fabs(m->f[i]));
         }
         if (abstol <= abstol_) {
           if (verbose_) casadi_message("Converged to acceptable tolerance: " + str(abstol_));
@@ -178,9 +177,9 @@ namespace casadi {
 
       // Check convergence again
       double abstolStep=0;
-      if (numeric_limits<double>::infinity() != abstolStep_) {
+      if (std::numeric_limits<double>::infinity() != abstolStep_) {
         for (casadi_int i=0; i<n_; ++i) {
-          abstolStep = max(abstolStep, fabs(m->f[i]));
+          abstolStep = std::max(abstolStep, fabs(m->f[i]));
         }
         if (abstolStep <= abstolStep_) {
           if (verbose_) casadi_message("Minimal step size reached: " + str(abstolStep_));
@@ -190,19 +189,19 @@ namespace casadi {
 
       double alpha = 1;
       if (line_search_) {
-        copy_n(m->iarg, n_in_, m->arg);
+        std::copy_n(m->iarg, n_in_, m->arg);
         m->arg[iin_] = m->x_trial;
-        copy_n(m->ires, n_out_, m->res);
+        std::copy_n(m->ires, n_out_, m->res);
         m->res[iout_] = m->f_trial;
         while (1) {
           // Xtrial = Xk - alpha*J^(-1) F
-          copy_n(m->x, n_, m->x_trial);
+          std::copy_n(m->x, n_, m->x_trial);
           casadi_axpy(n_, -alpha, m->f, m->x_trial);
           calc_function(m, "g");
 
           double abstol_trial = casadi_norm_inf(n_, m->f_trial);
           if (abstol_trial<=(1-alpha/2)*abstol) {
-            copy_n(m->x_trial, n_, m->x);
+            std::copy_n(m->x_trial, n_, m->x);
             break;
           }
           if (alpha*abstolStep <= abstolStep_) {
@@ -244,10 +243,10 @@ namespace casadi {
   }
 
   void Newton::printIteration(std::ostream &stream) const {
-    stream << setw(5) << "iter";
-    stream << setw(10) << "res";
-    stream << setw(10) << "step";
-    if (line_search_) stream << setw(10) << "alpha";
+    stream << std::setw(5) << "iter";
+    stream << std::setw(10) << "res";
+    stream << std::setw(10) << "step";
+    if (line_search_) stream << std::setw(10) << "alpha";
     stream << std::endl;
     stream.unsetf(std::ios::floatfield);
   }
@@ -256,12 +255,12 @@ namespace casadi {
                               double abstol, double abstolStep, double alpha) const {
 
     std::ios_base::fmtflags f = stream.flags();
-    stream << setw(5) << iter;
-    stream << setw(10) << scientific << setprecision(2) << abstol;
-    stream << setw(10) << scientific << setprecision(2) << abstolStep;
-    if (line_search_) stream << setw(10) << scientific << setprecision(2) << alpha;
+    stream << std::setw(5) << iter;
+    stream << std::setw(10) << std::scientific << std::setprecision(2) << abstol;
+    stream << std::setw(10) << std::scientific << std::setprecision(2) << abstolStep;
+    if (line_search_) stream << std::setw(10) << std::scientific << std::setprecision(2) << alpha;
 
-    stream << fixed;
+    stream << std::fixed;
     stream << std::endl;
     stream.flags(f);
   }

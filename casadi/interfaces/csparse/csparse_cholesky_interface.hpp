@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -26,9 +26,12 @@
 #ifndef CASADI_CSPARSE_CHOLESKY_INTERFACE_HPP
 #define CASADI_CSPARSE_CHOLESKY_INTERFACE_HPP
 
-/** \defgroup plugin_Linsol_csparsecholesky
+/** \defgroup plugin_Linsol_csparsecholesky Title
+    \par
+
    * Linsol with CSparseCholesky Interface
-*/
+
+    \identifier{21u} */
 
 /** \pluginsection{Linsol,csparsecholesky} */
 

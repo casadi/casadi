@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -34,9 +34,12 @@ extern "C" {
 #include "osqp.h" // NOLINT(build/include)
 }
 
-/** \defgroup plugin_Conic_osqp
+/** \defgroup plugin_Conic_osqp Title
+    \par
+
     Interface to the OSQP Solver for quadratic programming
-*/
+
+    \identifier{220} */
 
 /** \pluginsection{Conic,osqp} */
 
@@ -132,7 +135,7 @@ namespace casadi {
     void codegen_free_mem(CodeGenerator& g) const override;
 
     /** \brief Thread-local memory object type */
-    std::string codegen_mem_type() const override { return "OSQPWorkspace"; }
+    std::string codegen_mem_type() const override { return "OSQPWorkspace*"; }
 
     void serialize_body(SerializingStream &s) const override;
 

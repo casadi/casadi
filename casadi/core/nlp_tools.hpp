@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -46,7 +46,8 @@ namespace casadi {
    *
    * \param[out] lam_forward (lam_g,p)->(lam_sg,lam_x)
    * \param[out] lam_backward (lam_sg,lam_x,p)->(lam_g)
-   * */
+   *
+      \identifier{1sw} */
   CASADI_EXPORT void detect_simple_bounds(const SX& xX, const SX& p,
       const SX& g, const SX& lbg, const SX& ubg,
       std::vector<casadi_int>& SWIG_OUTPUT(gi),
@@ -72,7 +73,8 @@ namespace casadi {
 
 
   /** \brief Check sos structure and generate defaults
-   */
+
+      \identifier{1sx} */
   template <class T>
   void check_sos(casadi_int nx, const std::vector< std::vector<T> >& groups,
                   std::vector< std::vector<double> >& weights,

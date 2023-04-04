@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -28,8 +28,6 @@
 #include "casadi_misc.hpp"
 #include "serializing_stream.hpp"
 
-using namespace std;
-
 namespace casadi {
 
   MultipleOutput::MultipleOutput() {
@@ -40,6 +38,8 @@ namespace casadi {
 
   MX MultipleOutput::get_output(casadi_int oind) const {
     MX this_ = shared_from_this<MX>();
+    // No need for an OutputNode if sparsity is fully sparse
+    if (this_->sparsity(oind).nnz()==0) return MX(this_->sparsity(oind));
     return MX::create(new OutputNode(this_, oind));
   }
 

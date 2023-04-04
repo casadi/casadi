@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -30,9 +30,12 @@
 #include <casadi/solvers/casadi_importer_shell_export.h>
 #include "casadi/core/plugin_interface.hpp"
 
-/** \defgroup plugin_Importer_shell
+/** \defgroup plugin_Importer_shell Title
+    \par
+
       Interface to the JIT compiler SHELL
-*/
+
+    \identifier{22w} */
 
 /** \pluginsection{Importer,shell} */
 
@@ -101,7 +104,6 @@ namespace casadi {
     bool cleanup_;
 
     // Shared library handle
-    typedef DL_HANDLE_TYPE handle_t;
     handle_t handle_;
   };
 

@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -37,7 +37,8 @@
 #include <cvodes/cvodes_impl.h> /* Needed for the provided linear solver */
 #include <ctime>
 
-/** \defgroup plugin_Integrator_cvodes
+/** \defgroup plugin_Integrator_cvodes Title
+    \par
 
       Interface to CVodes from the Sundials suite.
 
@@ -45,170 +46,165 @@
 
       You can retrieve the entire state trajectory as follows, after the evaluate call:
       Call reset. Then call integrate(t_i) and getOuput for a series of times t_i.
-*/
+
+    \identifier{228} */
 
 /** \pluginsection{Integrator,cvodes} */
 
 /// \cond INTERNAL
 namespace casadi {
-  // Forward declaration
-  class CvodesInterface;
 
-  // CvodesMemory
-  struct CASADI_INTEGRATOR_CVODES_EXPORT CvodesMemory : public SundialsMemory {
-    /// Function object
-    const CvodesInterface& self;
+// Forward declaration
+class CvodesInterface;
 
-    // CVodes memory block
-    void* mem;
+// CvodesMemory
+struct CASADI_INTEGRATOR_CVODES_EXPORT CvodesMemory : public SundialsMemory {
+  /// Function object
+  const CvodesInterface& self;
 
-    // Ids of backward problem
-    int whichB;
+  // CVodes memory block
+  void* mem;
 
-    // Remember the gamma and gammaB from last factorization
-    double gamma, gammaB;
+  // Ids of backward problem
+  int whichB;
 
-    /// Constructor
-    CvodesMemory(const CvodesInterface& s);
+  // Remember the gamma and gammaB from last factorization
+  double gamma, gammaB;
 
-    /// Destructor
-    ~CvodesMemory();
-  };
+  /// Constructor
+  CvodesMemory(const CvodesInterface& s);
 
-  /** \brief \pluginbrief{Integrator,cvodes}
+  /// Destructor
+  ~CvodesMemory();
+};
 
-      @copydoc DAE_doc
-      @copydoc plugin_Integrator_cvodes
-
-  */
-  class CASADI_INTEGRATOR_CVODES_EXPORT CvodesInterface : public SundialsInterface {
-  public:
-    /** \brief  Constructor */
-    explicit CvodesInterface(const std::string& name, const Function& dae);
-
-    /** \brief  Create a new integrator */
-    static Integrator* creator(const std::string& name, const Function& dae) {
-      return new CvodesInterface(name, dae);
-    }
-
-    /** \brief  Destructor */
-    ~CvodesInterface() override;
-
-    // Get name of the plugin
-    const char* plugin_name() const override { return "cvodes";}
-
-    // Get name of the class
-    std::string class_name() const override { return "CvodesInterface";}
-
-    ///@{
-    /** \brief Options */
-    static const Options options_;
-    const Options& get_options() const override { return options_;}
-    double min_step_size_;
-    ///@}
+/** \brief \pluginbrief{Integrator,cvodes}
 
 
-    /** \brief  Initialize stage */
-    void init(const Dict& opts) override;
+    @copydoc plugin_Integrator_cvodes
 
-    /** \brief Create memory block */
-    void* alloc_mem() const override { return new CvodesMemory(*this);}
+*/
+class CASADI_INTEGRATOR_CVODES_EXPORT CvodesInterface : public SundialsInterface {
+ public:
+  /** \brief  Constructor */
+  CvodesInterface(const std::string& name, const Function& dae, double t0,
+    const std::vector<double>& tout);
 
-    /** \brief Initalize memory block */
-    int init_mem(void* mem) const override;
+  /** \brief  Create a new integrator */
+  static Integrator* creator(const std::string& name, const Function& dae,
+      double t0, const std::vector<double>& tout) {
+    return new CvodesInterface(name, dae, t0, tout);
+  }
 
-    /** \brief Free memory block */
-    void free_mem(void *mem) const override { delete static_cast<CvodesMemory*>(mem);}
+  /** \brief  Destructor */
+  ~CvodesInterface() override;
 
-    /** \brief  Reset the forward problem and bring the time back to t0 */
-    void reset(IntegratorMemory* mem, double t, const double* x,
-                       const double* z, const double* p) const override;
+  // Get name of the plugin
+  const char* plugin_name() const override { return "cvodes";}
 
-    /** \brief  Advance solution in time */
-    void advance(IntegratorMemory* mem, double t, double* x,
-                         double* z, double* q) const override;
+  // Get name of the class
+  std::string class_name() const override { return "CvodesInterface";}
 
-    /** \brief  Reset the backward problem and take time to tf */
-    void resetB(IntegratorMemory* mem, double t,
-                        const double* rx, const double* rz, const double* rp) const override;
-
-    /** \brief  Retreat solution in time */
-    void retreat(IntegratorMemory* mem, double t, double* rx,
-                         double* rz, double* rq) const override;
-
-    /** \brief  Set the stop time of the forward integration */
-    void setStopTime(IntegratorMemory* mem, double tf) const override;
-
-    /** \brief Cast to memory object */
-    static CvodesMemory* to_mem(void *mem) {
-      CvodesMemory* m = static_cast<CvodesMemory*>(mem);
-      casadi_assert_dev(m);
-      return m;
-    }
-
-    ///@{
-    // Get system Jacobian
-    Function getJ(bool backward) const override;
-    template<typename MatType> Function getJ(bool backward) const;
-    ///@}
-
-    /// A documentation string
-    static const std::string meta_doc;
-
-  protected:
-
-    // Sundials callback functions
-    static int rhs(double t, N_Vector x, N_Vector xdot, void *user_data);
-    static void ehfun(int error_code, const char *module, const char *function, char *msg,
-                      void *user_data);
-    static int rhsQ(double t, N_Vector x, N_Vector qdot, void *user_data);
-    static int rhsB(double t, N_Vector x, N_Vector xB, N_Vector xdotB, void *user_data);
-    static int rhsQB(double t, N_Vector x, N_Vector xB, N_Vector qdotB, void *user_data);
-    static int jtimes(N_Vector v, N_Vector Jv, double t, N_Vector x, N_Vector xdot,
-                      void *user_data, N_Vector tmp);
-    static int jtimesB(N_Vector vB, N_Vector JvB, double t, N_Vector x, N_Vector xB,
-                       N_Vector xdotB, void *user_data , N_Vector tmpB);
-    static int psolve(double t, N_Vector x, N_Vector xdot, N_Vector r, N_Vector z,
-                      double gamma, double delta, int lr, void *user_data, N_Vector tmp);
-    static int psolveB(double t, N_Vector x, N_Vector xB, N_Vector xdotB, N_Vector rvecB,
-                       N_Vector zvecB, double gammaB, double deltaB,
-                       int lr, void *user_data, N_Vector tmpB);
-    static int psetup(double t, N_Vector x, N_Vector xdot, booleantype jok,
-                      booleantype *jcurPtr, double gamma, void *user_data,
-                      N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
-    static int psetupB(double t, N_Vector x, N_Vector xB, N_Vector xdotB,
-                       booleantype jokB, booleantype *jcurPtrB, double gammaB,
-                       void *user_data, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
-    static int lsetup(CVodeMem cv_mem, int convfail, N_Vector x, N_Vector xdot,
-                      booleantype *jcurPtr,
-                      N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
-    static int lsolve(CVodeMem cv_mem, N_Vector b, N_Vector weight, N_Vector x,
-                      N_Vector xdot);
-    static int lsetupB(CVodeMem cv_mem, int convfail, N_Vector x, N_Vector xdot,
-                       booleantype *jcurPtr,
-                       N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
-    static int lsolveB(CVodeMem cv_mem, N_Vector b, N_Vector weight,
-                       N_Vector x, N_Vector xdot);
-
-    // Throw error
-    static void cvodes_error(const char* module, int flag);
-
-    casadi_int lmm_; // linear multistep method
-    casadi_int iter_; // nonlinear solver iteration
+  ///@{
+  /** \brief Options */
+  static const Options options_;
+  const Options& get_options() const override { return options_;}
+  double min_step_size_;
+  ///@}
 
 
-  public:
+  /** \brief  Initialize stage */
+  void init(const Dict& opts) override;
 
-    /** \brief Serialize an object without type information */
-    void serialize_body(SerializingStream &s) const override;
+  /** \brief Create memory block */
+  void* alloc_mem() const override { return new CvodesMemory(*this);}
 
-    /** \brief Deserialize into MX */
-    static ProtoFunction* deserialize(DeserializingStream& s) { return new CvodesInterface(s); }
+  /** \brief Initalize memory block */
+  int init_mem(void* mem) const override;
 
-  protected:
-    /** \brief Deserializing constructor */
-    explicit CvodesInterface(DeserializingStream& s);
-  };
+  /** \brief Free memory block */
+  void free_mem(void *mem) const override { delete static_cast<CvodesMemory*>(mem);}
+
+  /** \brief  Reset the forward problem and bring the time back to t0 */
+  void reset(IntegratorMemory* mem,
+    const double* x, const double* z, const double* p) const override;
+
+  /** \brief  Advance solution in time */
+  void advance(IntegratorMemory* mem,
+    const double* u, double* x, double* z, double* q) const override;
+
+  /** \brief  Reset the backward problem and take time to tf */
+  void resetB(IntegratorMemory* mem,
+    const double* rx, const double* rz, const double* rp) const override;
+
+  /** \brief Introduce an impulse into the backwards integration at the current time */
+  void impulseB(IntegratorMemory* mem,
+    const double* rx, const double* rz, const double* rp) const override;
+
+  /** \brief  Retreat solution in time */
+  void retreat(IntegratorMemory* mem, const double* u,
+    double* rx, double* rz, double* rq, double* uq) const override;
+
+  /** \brief Cast to memory object */
+  static CvodesMemory* to_mem(void *mem) {
+    CvodesMemory* m = static_cast<CvodesMemory*>(mem);
+    casadi_assert_dev(m);
+    return m;
+  }
+
+  /// A documentation string
+  static const std::string meta_doc;
+
+ protected:
+
+  // Sundials callback functions
+  static void ehfun(int error_code, const char *module, const char *function, char *msg,
+    void *user_data);
+  static int rhsF(double t, N_Vector x, N_Vector xdot, void *user_data);
+  static int rhsB(double t, N_Vector x, N_Vector xB, N_Vector xdotB, void *user_data);
+  static int rhsQF(double t, N_Vector x, N_Vector qdot, void *user_data);
+  static int rhsQB(double t, N_Vector x, N_Vector rx, N_Vector ruqdot, void *user_data);
+  static int jtimesF(N_Vector v, N_Vector Jv, double t, N_Vector x, N_Vector xdot,
+    void *user_data, N_Vector tmp);
+  static int jtimesB(N_Vector vB, N_Vector JvB, double t, N_Vector x, N_Vector xB,
+    N_Vector xdotB, void *user_data , N_Vector tmpB);
+  static int psolveF(double t, N_Vector x, N_Vector xdot, N_Vector r, N_Vector z,
+    double gamma, double delta, int lr, void *user_data, N_Vector tmp);
+  static int psolveB(double t, N_Vector x, N_Vector xB, N_Vector xdotB, N_Vector rvecB,
+    N_Vector zvecB, double gammaB, double deltaB,
+    int lr, void *user_data, N_Vector tmpB);
+  static int psetupF(double t, N_Vector x, N_Vector xdot, booleantype jok,
+    booleantype *jcurPtr, double gamma, void *user_data,
+    N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
+  static int psetupB(double t, N_Vector x, N_Vector xB, N_Vector xdotB,
+    booleantype jokB, booleantype *jcurPtrB, double gammaB,
+    void *user_data, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
+  static int lsetupF(CVodeMem cv_mem, int convfail, N_Vector x, N_Vector xdot,
+    booleantype *jcurPtr, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
+  static int lsolveF(CVodeMem cv_mem, N_Vector b, N_Vector weight, N_Vector x, N_Vector xdot);
+  static int lsetupB(CVodeMem cv_mem, int convfail, N_Vector x, N_Vector xdot,
+    booleantype *jcurPtr, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
+  static int lsolveB(CVodeMem cv_mem, N_Vector b, N_Vector weight, N_Vector x, N_Vector xdot);
+
+  // Throw error
+  static void cvodes_error(const char* module, int flag);
+
+  casadi_int lmm_; // linear multistep method
+  casadi_int iter_; // nonlinear solver iteration
+
+ public:
+
+  /** \brief Serialize an object without type information */
+  void serialize_body(SerializingStream &s) const override;
+
+  /** \brief Deserialize into MX */
+  static ProtoFunction* deserialize(DeserializingStream& s) { return new CvodesInterface(s); }
+
+ protected:
+
+  /** \brief Deserializing constructor */
+  explicit CvodesInterface(DeserializingStream& s);
+};
 
 } // namespace casadi
 

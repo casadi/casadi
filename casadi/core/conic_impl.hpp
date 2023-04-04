@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -35,19 +35,16 @@
 namespace casadi {
 
   struct CASADI_EXPORT ConicMemory : public FunctionMemory {
-    // Success?
-    bool success;
+    // Problem data structure
+    casadi_qp_data<double> d_qp;
 
-    // Return status
-    FunctionInternal::UnifiedReturnStatus unified_return_status;
-
-    // Number of iterations performed
-    casadi_int iter_count;
   };
 
   /// Internal class
   class CASADI_EXPORT Conic : public FunctionInternal, public PluginInterface<Conic> {
   public:
+    // Memory structure
+    casadi_qp_prob<double> p_qp_;
 
     // Constructor
     Conic(const std::string& name, const std::map<std::string, Sparsity> &st);
@@ -56,25 +53,33 @@ namespace casadi {
     ~Conic() override = 0;
 
     ///@{
-    /** \brief Number of function inputs and outputs */
+    /** \brief Number of function inputs and outputs
+
+        \identifier{1j6} */
     size_t get_n_in() override { return CONIC_NUM_IN;}
     size_t get_n_out() override { return CONIC_NUM_OUT;}
     ///@}
 
     /// @{
-    /** \brief Sparsities of function inputs and outputs */
+    /** \brief Sparsities of function inputs and outputs
+
+        \identifier{1j7} */
     Sparsity get_sparsity_in(casadi_int i) override;
     Sparsity get_sparsity_out(casadi_int i) override;
     /// @}
 
     ///@{
-    /** \brief Names of function input and outputs */
+    /** \brief Names of function input and outputs
+
+        \identifier{1j8} */
     std::string get_name_in(casadi_int i) override { return conic_in(i);}
     std::string get_name_out(casadi_int i) override { return conic_out(i);}
     /// @}
 
     ///@{
-    /** \brief Options */
+    /** \brief Options
+
+        \identifier{1j9} */
     static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
@@ -89,10 +94,14 @@ namespace casadi {
     // Initialize
     void init(const Dict& opts) override;
 
-    /** \brief Initalize memory block */
+    /** \brief Initalize memory block
+
+        \identifier{1ja} */
     int init_mem(void* mem) const override;
 
-    /** \brief Set the (persistent) work vectors */
+    /** \brief Set the (persistent) work vectors
+
+        \identifier{1jb} */
     void set_work(void* mem, const double**& arg, double**& res,
                           casadi_int*& iw, double*& w) const override;
 
@@ -119,10 +128,14 @@ namespace casadi {
     /// Short name
     static std::string shortname() { return "conic";}
 
-    /** \brief Check if the function is of a particular type */
+    /** \brief Check if the function is of a particular type
+
+        \identifier{1jc} */
     bool is_a(const std::string& type, bool recursive) const override;
 
-    /** \brief Get default input value */
+    /** \brief Get default input value
+
+        \identifier{1jd} */
     double get_default_in(casadi_int ind) const override;
 
     /// Can discrete variables be treated
@@ -133,6 +146,12 @@ namespace casadi {
 
     /// Get all statistics
     Dict get_stats(void* mem) const override;
+
+    /** \brief Generate code for the function body
+
+        \identifier{24y} */
+    void qp_codegen_body(CodeGenerator& g) const;
+
   protected:
     /// Options
     std::vector<bool> discrete_;
@@ -169,9 +188,6 @@ namespace casadi {
       casadi_int indval_size;
     };
 
-    /// Throw an exception on failure?
-    bool error_on_fail_;
-
     /// SDP to SOCP conversion initialization
     void sdp_to_socp_init(SDPToSOCPMem& mem) const;
 
@@ -179,20 +195,32 @@ namespace casadi {
     void deserialize(DeserializingStream &s, SDPToSOCPMem& m);
 
   public:
-      /** \brief Serialize an object without type information */
+      /** \brief Serialize an object without type information
+
+          \identifier{1je} */
     void serialize_body(SerializingStream &s) const override;
-    /** \brief Serialize type information */
+    /** \brief Serialize type information
+
+        \identifier{1jf} */
     void serialize_type(SerializingStream &s) const override;
 
-    /** \brief String used to identify the immediate FunctionInternal subclass */
+    /** \brief String used to identify the immediate FunctionInternal subclass
+
+        \identifier{1jg} */
     std::string serialize_base_function() const override { return "Conic"; }
-    /** \brief Deserialize with type disambiguation */
+    /** \brief Deserialize with type disambiguation
+
+        \identifier{1jh} */
     static ProtoFunction* deserialize(DeserializingStream& s);
 
   protected:
 
-    /** \brief Deserializing constructor */
+    /** \brief Deserializing constructor
+
+        \identifier{1ji} */
     explicit Conic(DeserializingStream& s);
+  private:
+    void set_qp_prob();
   };
 
 

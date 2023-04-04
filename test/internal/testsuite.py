@@ -2,8 +2,8 @@
 #     This file is part of CasADi.
 #
 #     CasADi -- A symbolic framework for dynamic optimization.
-#     Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
-#                             K.U. Leuven. All rights reserved.
+#     Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+#                             KU Leuven. All rights reserved.
 #     Copyright (C) 2011-2014 Greg Horn
 #
 #     CasADi is free software; you can redistribute it and/or
@@ -115,7 +115,7 @@ deprecated = re.compile(r"\b[dD]epr[ei]c[ie]?at[ei]")
 warning = re.compile("warning")
 
 class TestSuite:
-  def __init__(self,suffix=None,dirname=None,preRun=None,postRun=None,command=None,skipdirs=[],skipfiles=[],inputs={},workingdir = lambda x: x,allowable_returncodes=[],args=[],stderr_trigger=[],stdout_trigger=[],stdout_must_have=[],check_depreciation=True,check_warning=False,custom_stdout=None,default_fail=False):
+  def __init__(self,suffix=None,dirname=None,preRun=None,postRun=None,command=None,skipdirs=["hock_schittkowski"],skipfiles=[],inputs={},workingdir = lambda x: x,allowable_returncodes=[],args=[],stderr_trigger=[],stdout_trigger=[],stdout_must_have=[],check_depreciation=True,check_warning=False,custom_stdout=None,default_fail=False):
     """
 
     dirname: The directory that should be crawled for test problems.
@@ -232,7 +232,9 @@ class TestSuite:
     print(("%02d. " % self.stats['numtests']) + fn)
     t0 = time.time()
 
-    p=Popen(self.command(dir,fn,self.passoptions),cwd=self.workingdir(dir),stdout=PIPE, stderr=PIPE, stdin=PIPE)
+    cmd = self.command(dir,fn,self.passoptions)
+    print(cmd)
+    p=Popen(cmd,cwd=self.workingdir(dir),stdout=PIPE, stderr=PIPE, stdin=PIPE)
 
     inp = None
     if callable(self.inputs):
@@ -242,8 +244,10 @@ class TestSuite:
     if fn in inputs:
       inp = inputs[fn]
 
+    if inp is not None:
+      inp = inp.encode("ascii")
 
-    alarm(60*60) # 1 hour
+    alarm(15*60) # 15 mins
     try:
       stdoutdata, stderrdata = p.communicate(inp)
     except TimeoutEvent:
@@ -325,7 +329,17 @@ class TestSuite:
       alarm(60*60) # 1 hour
       try:
         stdoutdata, stderrdata = f.communicate()
-        stdoutdata = stdoutfile.read() + "\n"+ stdoutdata
+        try:
+            stdoutdata = stdoutdata.decode("ascii")
+            stderrdata = stderrdata.decode("ascii")
+        except:
+            pass
+        s = stdoutfile.read()
+        try:
+            s = s.decode("ascii")
+        except:
+            pass
+        stdoutdata = s + "\n"+ stdoutdata
       except TimeoutEvent:
         killProcess(p.pid)
         killProcess(f.pid)

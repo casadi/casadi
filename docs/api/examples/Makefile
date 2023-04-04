@@ -5,9 +5,8 @@ LOG=$(CPP:.cc=.log)
 PDF=$(PY:.py=.pdf)
 BUILDDIR=../../../build
 
-CASADI_OBJECT=$(BUILDDIR)/lib/_casadi.so
 OCTAVE_PATH=$(BUILDDIR)/lib
-all: python cpp cpprun
+all: cpp cpprun python
 
 .PHONY = python cpp cpprun
 
@@ -18,23 +17,17 @@ cpprun: $(LOG)
 clean: 
 	rm -f _temp.* $(PDF) $(EXE)
 
-$(PDF): %.pdf : %.py $(CASADI_OBJECT)
+$(PDF): %.pdf : %.py
 	rm -rf pylab.py pylab.pyc matplotlibrc
-	grep -v "^#[^\!]" $< > _temp.py
-	pyreport -v -d -l _temp.py -o _temp.pdf
-	ls -al
-	rm _temp.py
-	mv _temp.pdf $@
+	jupytext --to notebook $<
+	jupyter nbconvert --to pdf --execute $(<:.py=.ipynb)
+	#rm $(<:.py=.ipynb)
 	
-$(EXE): %.run : %.cc $(BUILDDIR)/bin/ctemplate ctemplate/compiler.sh ctemplate/linker.sh
-	cp $< _temp.cc
-	ctemplate/compiler.sh _temp
-	ctemplate/linker.sh _temp
-	rm _temp.cc _temp.o
-	mv _temp.run $@
+$(EXE): %.run : %.cc ctemplate/compiler.sh
+	ctemplate/compiler.sh $< $@
 	
 $(LOG): %.log : %.run
 	$< > $@ 2>&1
 	
-ctemplate/compiler.sh ctemplate/linker.sh: $(BUILDDIR)/docs/api/examples/ctemplate/CMakeFiles/ctemplate.dir/link.txt  $(BUILDDIR)/docs/api/examples/ctemplate/CMakeFiles/ctemplate.dir/flags.make ctemplate/ctemplate.py
-	cd ctemplate && python ctemplate.py && chmod +x compiler.sh linker.sh && cd ..
+ctemplate/compiler.sh: ctemplate/ctemplate.py
+	cd ctemplate && python ctemplate.py && chmod +x compiler.sh && cd ..

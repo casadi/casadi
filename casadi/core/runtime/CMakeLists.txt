@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.6)
+cmake_minimum_required(VERSION 3.10.2)
 
 # C runtime sources
 set(RUNTIME_SRC
@@ -9,7 +9,10 @@ set(RUNTIME_SRC
   casadi_de_boor.hpp
   casadi_densify.hpp
   casadi_dot.hpp
+  casadi_feasiblesqpmethod.hpp
   casadi_clear.hpp
+  casadi_clip_min.hpp
+  casadi_clip_max.hpp
   casadi_fill.hpp
   casadi_flip.hpp
   casadi_file_slurp.hpp
@@ -22,17 +25,23 @@ set(RUNTIME_SRC
   casadi_kron.hpp
   casadi_low.hpp
   casadi_max_viol.hpp
-  casadi_minmax.hpp
+  casadi_mmin.hpp
+  casadi_mmax.hpp
   casadi_mtimes.hpp
   casadi_vfmin.hpp
   casadi_vfmax.hpp
+  casadi_vector_fmin.hpp
+  casadi_vector_fmax.hpp
   casadi_mv.hpp
+  casadi_trilsolve.hpp
+  casadi_triusolve.hpp
   casadi_mv_dense.hpp
   casadi_nd_boor_eval.hpp
-  casadi_nd_boor_dual_eval.hpp  
+  casadi_nd_boor_dual_eval.hpp
   casadi_norm_1.hpp
   casadi_norm_2.hpp
   casadi_norm_inf.hpp
+  casadi_masked_norm_inf.hpp
   casadi_norm_inf_mul.hpp
   casadi_polyval.hpp
   casadi_project.hpp
@@ -41,30 +50,31 @@ set(RUNTIME_SRC
   casadi_scal.hpp
   casadi_sparsify.hpp
   casadi_sum_viol.hpp
+  casadi_sum.hpp
   casadi_swap.hpp
   casadi_trans.hpp
   casadi_finite_diff.hpp
   casadi_ldl.hpp
   casadi_qr.hpp
   casadi_qp.hpp
+  casadi_qrqp.hpp
+  casadi_kkt.hpp
+  casadi_ipqp.hpp
   casadi_nlp.hpp
   casadi_sqpmethod.hpp
   casadi_bfgs.hpp
   casadi_regularize.hpp
   casadi_newton.hpp
-  casadi_bound_consistency.hpp 
-  casadi_lsqr.hpp 
-  casadi_cache.hpp 
-  casadi_convexify.hpp 
+  casadi_bound_consistency.hpp
+  casadi_lsqr.hpp
+  casadi_dense_lsqr.hpp
+  casadi_cache.hpp
+  casadi_convexify.hpp
+  casadi_logsumexp.hpp
+  casadi_sparsity.hpp
+  casadi_jac.hpp
 )
 set(CASADI_RUNTIME_SRC "${RUNTIME_SRC}" PARENT_SCOPE)
-
-# Stringify C runtime
-CASADI_STRINGIFY("${CMAKE_CURRENT_BINARY_DIR}/casadi_runtime_str.h"
-  ${RUNTIME_SRC}
-  casadi_to_mex.hpp
-  casadi_from_mex.hpp
-)
 
 set(EXTRA_CASADI_CXX_FLAGS "${EXTRA_CASADI_CXX_FLAGS} -Wno-conversion")
 

@@ -1,0 +1,95 @@
+name: compilers
+
+on: push
+
+env:
+  cache-suffix: v11
+  build_flags: "-DWITH_COMMON=OFF -DWITH_THREAD=ON -DWITH_WERROR=ON -DWITH_EXTRA_WARNINGS=ON"
+
+
+jobs:
+  linux-22_04:
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler: ['9','10','11','12']
+    steps:
+      - uses: actions/checkout@v2.4.0
+      - name: Build
+        run: |
+          CC=gcc-${{ matrix.compiler }} FC=gfortran-${{ matrix.compiler }} CXX=g++-${{ matrix.compiler }} cmake -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} -H.
+          cmake --build build -v
+
+  linux-latest:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v2.4.0
+      - name: Build
+        run: |
+          cmake -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} -H.
+          cmake --build build -v
+
+  macos-latest:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2.4.0
+      - name: Build
+        run: |
+          cmake -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} -H.
+          cmake --build build -v
+
+  macos-12:
+    runs-on: macos-12
+    steps:
+      - uses: actions/checkout@v2.4.0
+      - name: Build
+        run: |
+          cmake -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} -H.
+          cmake --build build -v
+
+  macos-12-clang15:
+    runs-on: macos-12
+    steps:
+      - uses: actions/checkout@v2.4.0
+      - name: Build
+        run: |
+          CC=$(brew --prefix llvm@15)/bin/clang FC=gfortran-11 CXX=$(brew --prefix llvm@15)/bin/clang++ cmake -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} -H.
+          cmake --build build -v
+
+  windows-2019:
+    runs-on: windows-2019
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [x64,Win32]
+    steps:
+      - uses: actions/checkout@v2.4.0
+      - name : Build
+        run: |
+            cmake -Bbuild -G "Visual Studio 16 2019" -A ${{ matrix.arch }} -DWITH_SELFCONTAINED=ON -DCMAKE_INSTALL_PREFIX=install
+            cmake --build build --target install --config Release -v
+
+  windows-2022:
+    runs-on: windows-2022
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [x64,Win32]
+    steps:
+      - uses: actions/checkout@v2.4.0
+      - name : Build
+        run: |
+            cmake -Bbuild -G "Visual Studio 17 2022" -A ${{ matrix.arch }} -DWITH_SELFCONTAINED=ON -DCMAKE_INSTALL_PREFIX=install
+            cmake --build build --target install --config Release -v
+            
+  windows-latest-mingw:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v2.4.0
+      - name : Build
+        run: |
+            cmake -Bbuild -G "MinGW Makefiles" -DWITH_SELFCONTAINED=ON -DCMAKE_INSTALL_PREFIX=install ${{env.build_flags}}
+            cmake --build build --target install --config Release -v

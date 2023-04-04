@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -29,348 +29,592 @@
 #include "integrator.hpp"
 #include "oracle_function.hpp"
 #include "plugin_interface.hpp"
+#include "casadi_enum.hpp"
 
 /// \cond INTERNAL
 
 namespace casadi {
 
-  /** \brief Integrator memory */
-  struct CASADI_EXPORT IntegratorMemory : public OracleMemory {
-  };
-
-  /** \brief Internal storage for integrator related data
-
-      @copydoc DAE_doc
-      \author Joel Andersson
-      \date 2010
-  */
-  class CASADI_EXPORT
-  Integrator : public OracleFunction, public PluginInterface<Integrator> {
-  public:
-    /** \brief  Constructor */
-    Integrator(const std::string& name, const Function& oracle);
-
-    /** \brief  Destructor */
-    ~Integrator() override=0;
-
-    ///@{
-    /** \brief Number of function inputs and outputs */
-    size_t get_n_in() override { return INTEGRATOR_NUM_IN;}
-    size_t get_n_out() override { return INTEGRATOR_NUM_OUT;}
-    ///@}
-
-   /// @{
-    /** \brief Sparsities of function inputs and outputs */
-    Sparsity get_sparsity_in(casadi_int i) override;
-    Sparsity get_sparsity_out(casadi_int i) override;
-    /// @}
-
-    ///@{
-    /** \brief Names of function input and outputs */
-    std::string get_name_in(casadi_int i) override { return integrator_in(i);}
-    std::string get_name_out(casadi_int i) override { return integrator_out(i);}
-    /// @}
-
-    /** \brief Initalize memory block */
-    int init_mem(void* mem) const override;
-
-    ///@{
-    /** \brief Options */
-    static const Options options_;
-    const Options& get_options() const override { return options_;}
-    ///@}
-
-    /** \brief  Initialize */
-    void init(const Dict& opts) override;
-
-    /** Helper for a more powerful 'integrator' factory */
-    virtual Function create_advanced(const Dict& opts);
-
-    virtual MX algebraic_state_init(const MX& x0, const MX& z0) const { return z0; }
-    virtual MX algebraic_state_output(const MX& Z) const { return Z; }
-
-    /** \brief Reset the forward problem */
-    virtual void reset(IntegratorMemory* mem, double t,
-                       const double* x, const double* z, const double* p) const = 0;
-
-    /** \brief  Advance solution in time */
-    virtual void advance(IntegratorMemory* mem, double t,
-                         double* x, double* z, double* q) const = 0;
-
-    /** \brief Reset the backward problem */
-    virtual void resetB(IntegratorMemory* mem, double t,
-                        const double* rx, const double* rz, const double* rp) const = 0;
-
-    /** \brief  Retreat solution in time */
-    virtual void retreat(IntegratorMemory* mem, double t,
-                         double* rx, double* rz, double* rq) const = 0;
-
-    /** \brief  evaluate */
-    int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
-
-    /** \brief  Print solver statistics */
-    virtual void print_stats(IntegratorMemory* mem) const {}
-
-    /** \brief  Propagate sparsity forward */
-    int sp_forward(const bvec_t** arg, bvec_t** res,
-      casadi_int* iw, bvec_t* w, void* mem) const override;
-
-    /** \brief  Propagate sparsity backwards */
-    int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, void* mem) const override;
-
-    ///@{
-    /// Is the class able to propagate seeds through the algorithm?
-    bool has_spfwd() const override { return true;}
-    bool has_sprev() const override { return true;}
-    ///@}
-
-    ///@{
-    /** \brief Generate a function that calculates \a nfwd forward derivatives */
-    Function get_forward(casadi_int nfwd, const std::string& name,
-                         const std::vector<std::string>& inames,
-                         const std::vector<std::string>& onames,
-                         const Dict& opts) const override;
-    bool has_forward(casadi_int nfwd) const override { return true;}
-    ///@}
-
-    ///@{
-    /** \brief Generate a function that calculates \a nadj adjoint derivatives */
-    Function get_reverse(casadi_int nadj, const std::string& name,
-                         const std::vector<std::string>& inames,
-                         const std::vector<std::string>& onames,
-                         const Dict& opts) const override;
-    bool has_reverse(casadi_int nadj) const override { return true;}
-    ///@}
+/** \brief Integrator memory
 
-    /** \brief  Set stop time for the integration */
-    virtual void setStopTime(IntegratorMemory* mem, double tf) const;
+    \identifier{1lp} */
+struct CASADI_EXPORT IntegratorMemory : public OracleMemory {
+  // Current control interval
+  casadi_int k;
+  // Current time
+  double t;
+  // Next time to be visited by the integrator
+  double t_next;
+  // Next stop time due to step change in input, continuous
+  double t_stop;
+};
 
-    /** \brief Set solver specific options to generated augmented integrators */
-    virtual Dict getDerivativeOptions(bool fwd) const;
+/// Memory struct, forward sparsity pattern propagation
+struct CASADI_EXPORT SpForwardMem {
+  const bvec_t** arg;
+  bvec_t** res;
+  casadi_int* iw;
+  bvec_t* w;
+};
 
-    /** \brief Generate a augmented DAE system with \a nfwd forward sensitivities */
-    template<typename MatType> std::map<std::string, MatType> aug_fwd(casadi_int nfwd) const;
+/// Memory struct, backward sparsity pattern propagation
+struct CASADI_EXPORT SpReverseMem {
+  bvec_t** arg;
+  bvec_t** res;
+  casadi_int* iw;
+  bvec_t* w;
+};
 
-    /** \brief Generate a augmented DAE system with \a nadj adjoint sensitivities */
-    template<typename MatType> std::map<std::string, MatType> aug_adj(casadi_int nadj) const;
+/** \brief Internal storage for integrator related data
 
-    /// Create sparsity pattern of the extended Jacobian (forward problem)
-    Sparsity sp_jac_dae();
 
-    /// Create sparsity pattern of the extended Jacobian (backward problem)
-    Sparsity sp_jac_rdae();
+    \author Joel Andersson
+    \date 2010
 
-    // Sparsity pattern of the extended Jacobians
-    Sparsity sp_jac_dae_, sp_jac_rdae_;
+    \identifier{1lq} */
+class CASADI_EXPORT
+Integrator : public OracleFunction, public PluginInterface<Integrator> {
+ public:
+  /** \brief  Constructor
 
-    ///@{
-    // Shorthands
-    const Sparsity&  t() const { return oracle_.sparsity_in(DE_T);}
-    const Sparsity&  x() const { return oracle_.sparsity_in(DE_X);}
-    const Sparsity&  z() const { return oracle_.sparsity_in(DE_Z);}
-    const Sparsity&  p() const { return oracle_.sparsity_in(DE_P);}
-    const Sparsity&  q() const { return oracle_.sparsity_out(DE_QUAD);}
-    const Sparsity& rx() const { return oracle_.sparsity_in(DE_RX);}
-    const Sparsity& rz() const { return oracle_.sparsity_in(DE_RZ);}
-    const Sparsity& rp() const { return oracle_.sparsity_in(DE_RP);}
-    const Sparsity& rq() const { return oracle_.sparsity_out(DE_RQUAD);}
-    ///@}
+      \identifier{1lr} */
+  Integrator(const std::string& name, const Function& oracle,
+    double t0, const std::vector<double>& tout);
 
-    /// Number of states for the forward integration
-    casadi_int nx_, nz_, nq_, nx1_, nz1_, nq1_;
+  /** \brief  Destructor
 
-    /// Number of states for the backward integration
-    casadi_int nrx_, nrz_, nrq_, nrx1_, nrz1_, nrq1_;
+      \identifier{1ls} */
+  ~Integrator() override=0;
 
-    /// Number of forward and backward parameters
-    casadi_int np_, nrp_, np1_, nrp1_;
+  ///@{
+  /** \brief Number of function inputs and outputs
 
-    /// Number of sensitivities
-    casadi_int ns_;
+      \identifier{1lt} */
+  size_t get_n_in() override { return INTEGRATOR_NUM_IN;}
+  size_t get_n_out() override { return INTEGRATOR_NUM_OUT;}
+  ///@}
 
-    // Time grid
-    std::vector<double> grid_;
-    casadi_int ngrid_;
+  /// @{
+  /** \brief Sparsities of function inputs and outputs
 
-    // Augmented user option
-    Dict augmented_options_;
+      \identifier{1lu} */
+  Sparsity get_sparsity_in(casadi_int i) override;
+  Sparsity get_sparsity_out(casadi_int i) override;
+  /// @}
 
-    // Copy of the options
-    Dict opts_;
+  ///@{
+  /** \brief Names of function input and outputs
 
-    /// One step
-    Function onestep_;
+      \identifier{1lv} */
+  std::string get_name_in(casadi_int i) override { return integrator_in(i);}
+  std::string get_name_out(casadi_int i) override { return integrator_out(i);}
+  /// @}
 
-    /// Options
-    bool print_stats_;
+  /** \brief Initalize memory block
 
-    /// Output the state at the initial time
-    bool output_t0_;
-    casadi_int ntout_;
+      \identifier{1lw} */
+  int init_mem(void* mem) const override;
 
-    // Creator function for internal class
-    typedef Integrator* (*Creator)(const std::string& name, const Function& oracle);
+  ///@{
+  /** \brief Options
 
-    // No static functions exposed
-    struct Exposed{ };
+      \identifier{1lx} */
+  static const Options options_;
+  const Options& get_options() const override { return options_;}
+  ///@}
 
-    /// Collection of solvers
-    static std::map<std::string, Plugin> solvers_;
+  /** \brief  Initialize
 
-    /// Infix
-    static const std::string infix_;
+      \identifier{1ly} */
+  void init(const Dict& opts) override;
 
-    /// Convert dictionary to Problem
-    template<typename XType>
-      static Function map2oracle(const std::string& name,
-        const std::map<std::string, XType>& d, const Dict& opts=Dict());
+  /** Helper for a more powerful 'integrator' factory */
+  virtual Function create_advanced(const Dict& opts);
 
+  virtual MX algebraic_state_init(const MX& x0, const MX& z0) const { return z0; }
+  virtual MX algebraic_state_output(const MX& Z) const { return Z; }
 
-    /** \brief Serialize an object without type information */
-    void serialize_body(SerializingStream &s) const override;
-    /** \brief Serialize type information */
-    void serialize_type(SerializingStream &s) const override;
+  /** \brief Reset the forward problem
 
-    /** \brief Deserialize into MX */
-    static ProtoFunction* deserialize(DeserializingStream& s);
+      \identifier{25a} */
+  virtual void reset(IntegratorMemory* mem,
+    const double* x, const double* z, const double* p) const = 0;
 
-    /** \brief String used to identify the immediate FunctionInternal subclass */
-    std::string serialize_base_function() const override { return "Integrator"; }
+  /** \brief  Find next stop time
 
-  protected:
-    /** \brief Deserializing constructor */
-    explicit Integrator(DeserializingStream& s);
-  };
+      \identifier{25b} */
+  casadi_int next_stop(casadi_int k, const double* u) const;
 
-  struct CASADI_EXPORT FixedStepMemory : public IntegratorMemory {
-    // Current time
-    double t;
+  /** \brief  Advance solution in time
 
-    // Discrete time
-    casadi_int k;
+      \identifier{25c} */
+  virtual void advance(IntegratorMemory* mem,
+    const double* u, double* x, double* z, double* q) const = 0;
 
-    // Current state
-    std::vector<double> x, z, p, q, rx, rz, rp, rq;
+  /** \brief Reset the backward problem
 
-    // Previous state
-    std::vector<double> x_prev, Z_prev, q_prev, rx_prev, RZ_prev, rq_prev;
+      \identifier{25d} */
+  virtual void resetB(IntegratorMemory* mem,
+    const double* rx, const double* rz, const double* rp) const = 0;
 
-    /// Algebraic variables for the discrete time integration
-    std::vector<double> Z, RZ;
+  /** \brief  Find next stop time
 
-    // Tape
-    std::vector<std::vector<double> > x_tape, Z_tape;
-  };
+      \identifier{25e} */
+  casadi_int next_stopB(casadi_int k, const double* u) const;
 
-  class CASADI_EXPORT FixedStepIntegrator : public Integrator {
-  public:
+  /** \brief Introduce an impulse into the backwards integration at the current time
 
-    /// Constructor
-    explicit FixedStepIntegrator(const std::string& name, const Function& dae);
+      \identifier{25f} */
+  virtual void impulseB(IntegratorMemory* mem,
+    const double* rx, const double* rz, const double* rp) const = 0;
 
-    /// Destructor
-    ~FixedStepIntegrator() override;
+  /** \brief  Retreat solution in time
 
-    ///@{
-    /** \brief Options */
-    static const Options options_;
-    const Options& get_options() const override { return options_;}
-    ///@}
+      \identifier{25g} */
+  virtual void retreat(IntegratorMemory* mem, const double* u,
+    double* rx, double* rz, double* rq, double* uq) const = 0;
 
-    /// Initialize stage
-    void init(const Dict& opts) override;
+  /** \brief  evaluate
 
-    /** Helper for a more powerful 'integrator' factory */
-    Function create_advanced(const Dict& opts) override;
+      \identifier{1m3} */
+  int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const override;
 
-    /** \brief Create memory block */
-    void* alloc_mem() const override { return new FixedStepMemory();}
+  /** \brief  Print solver statistics
 
-    /** \brief Initalize memory block */
-    int init_mem(void* mem) const override;
+      \identifier{1m4} */
+  virtual void print_stats(IntegratorMemory* mem) const {}
 
-    /** \brief Free memory block */
-    void free_mem(void *mem) const override { delete static_cast<FixedStepMemory*>(mem);}
+  /// Forward sparsity pattern propagation through DAE, forward problem
+  int fdae_sp_forward(SpForwardMem* m, const bvec_t* x,
+    const bvec_t* p, const bvec_t* u, bvec_t* ode, bvec_t* alg) const;
 
-    /// Setup F and G
-    virtual void setupFG() = 0;
+  /// Forward sparsity pattern propagation through quadratures, forward problem
+  int fquad_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t* z,
+    const bvec_t* p, const bvec_t* u, bvec_t* quad) const;
 
-    /** \brief Reset the forward problem */
-    void reset(IntegratorMemory* mem, double t,
-                       const double* x, const double* z, const double* p) const override;
+  /// Forward sparsity pattern propagation through DAE, backward problem
+  int bdae_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t* z,
+    const bvec_t* p, const bvec_t* u, const bvec_t* rx, const bvec_t* rp,
+    bvec_t* adj_x, bvec_t* adj_z) const;
 
-    /** \brief  Advance solution in time */
-    void advance(IntegratorMemory* mem, double t,
-                         double* x, double* z, double* q) const override;
+  /// Forward sparsity pattern propagation through quadratures, backward problem
+  int bquad_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t* z,
+    const bvec_t* p, const bvec_t* u, const bvec_t* rx, const bvec_t* rz, const bvec_t* rp,
+    bvec_t* adj_p, bvec_t* adj_u) const;
 
-    /// Reset the backward problem and take time to tf
-    void resetB(IntegratorMemory* mem, double t,
-                        const double* rx, const double* rz, const double* rp) const override;
+  /** \brief  Propagate sparsity forward
 
-    /** \brief  Retreat solution in time */
-    void retreat(IntegratorMemory* mem, double t,
-                         double* rx, double* rz, double* rq) const override;
+      \identifier{1m5} */
+  int sp_forward(const bvec_t** arg, bvec_t** res,
+    casadi_int* iw, bvec_t* w, void* mem) const override;
 
-    /// Get explicit dynamics
-    virtual const Function& getExplicit() const { return F_;}
+  /// Reverse sparsity pattern propagation through DAE, forward problem
+  int fdae_sp_reverse(SpReverseMem* m, bvec_t* x,
+    bvec_t* p, bvec_t* u, bvec_t* ode, bvec_t* alg) const;
 
-    /// Get explicit dynamics (backward problem)
-    virtual const Function& getExplicitB() const { return G_;}
+  /// Reverse sparsity pattern propagation through quadratures, forward problem
+  int fquad_sp_reverse(SpReverseMem* m, bvec_t* x, bvec_t* z,
+    bvec_t* p, bvec_t* u, bvec_t* quad) const;
 
-    // Discrete time dynamics
-    Function F_, G_;
+  /// Reverse sparsity pattern propagation through DAE, backward problem
+  int bdae_sp_reverse(SpReverseMem* m, bvec_t* x, bvec_t* z,
+    bvec_t* p, bvec_t* u, bvec_t* rx, bvec_t* rp,
+    bvec_t* adj_x, bvec_t* adj_z) const;
 
-    // Number of finite elements
-    casadi_int nk_;
+  /// Reverse sparsity pattern propagation through quadratures, backward problem
+  int bquad_sp_reverse(SpReverseMem* m, bvec_t* x, bvec_t* z,
+    bvec_t* p, bvec_t* u, bvec_t* rx, bvec_t* rz, bvec_t* rp,
+    bvec_t* adj_p, bvec_t* adj_u) const;
 
-    // Time step size
-    double h_;
+  /** \brief  Propagate sparsity backwards
 
-    /// Number of algebraic variables for the discrete time integration
-    casadi_int nZ_, nRZ_;
+      \identifier{1m6} */
+  int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, void* mem) const override;
 
-    /** \brief Serialize an object without type information */
-    void serialize_body(SerializingStream &s) const override;
+  ///@{
+  /// Is the class able to propagate seeds through the algorithm?
+  bool has_spfwd() const override { return true;}
+  bool has_sprev() const override { return true;}
+  ///@}
 
-  protected:
-    /** \brief Deserializing constructor */
-    explicit FixedStepIntegrator(DeserializingStream& s);
-  };
+  ///@{
+  /** \brief Generate a function that calculates \a nfwd forward derivatives
 
-  class CASADI_EXPORT ImplicitFixedStepIntegrator : public FixedStepIntegrator {
-  public:
+      \identifier{1m7} */
+  Function get_forward(casadi_int nfwd, const std::string& name,
+                        const std::vector<std::string>& inames,
+                        const std::vector<std::string>& onames,
+                        const Dict& opts) const override;
+  bool has_forward(casadi_int nfwd) const override { return true;}
+  ///@}
 
-    /// Constructor
-    explicit ImplicitFixedStepIntegrator(const std::string& name, const Function& dae);
+  ///@{
+  /** \brief Generate a function that calculates \a nadj adjoint derivatives
 
-    /// Destructor
-    ~ImplicitFixedStepIntegrator() override;
+      \identifier{1m8} */
+  Function get_reverse(casadi_int nadj, const std::string& name,
+                        const std::vector<std::string>& inames,
+                        const std::vector<std::string>& onames,
+                        const Dict& opts) const override;
+  bool has_reverse(casadi_int nadj) const override { return true;}
+  ///@}
 
-    ///@{
-    /** \brief Options */
-    static const Options options_;
-    const Options& get_options() const override { return options_;}
-    ///@}
+  /** \brief Set solver specific options to generated augmented integrators
 
-    /// Initialize stage
-    void init(const Dict& opts) override;
+      \identifier{1ma} */
+  virtual Dict getDerivativeOptions(bool fwd) const;
 
-    /// Get explicit dynamics
-    const Function& getExplicit() const override { return rootfinder_;}
+  ///@{
+  /** \brief Generate the augmented DAE system
 
-    /// Get explicit dynamics (backward problem)
-    const Function& getExplicitB() const override { return backward_rootfinder_;}
+      \identifier{261} */
+  template<typename MatType> Function get_forward_dae(const std::string& name) const;
+  Function augmented_dae() const;
+  ///@}
 
-    // Implicit function solver
-    Function rootfinder_, backward_rootfinder_;
+  /// Helper function, get augmented system Jacobian
+  Sparsity sp_jac_aug(const Sparsity& J, const Sparsity& J1) const;
 
-    /** \brief Serialize an object without type information */
-    void serialize_body(SerializingStream &s) const override;
+  /// Create sparsity pattern of the extended Jacobian (forward problem)
+  Sparsity sp_jac_dae();
 
-  protected:
-    /** \brief Deserializing constructor */
-    explicit ImplicitFixedStepIntegrator(DeserializingStream& s);
-  };
+  /// Create sparsity pattern of the extended Jacobian (backward problem)
+  Sparsity sp_jac_rdae();
+
+  /// Sparsity pattern of the extended Jacobians
+  Sparsity sp_jac_dae_, sp_jac_rdae_;
+
+  /// Number of output times
+  inline casadi_int nt() const { return tout_.size();}
+
+  ///@{
+  /** \brief IO conventions for continuous time dynamics
+
+      \identifier{260} */
+  enum DaeOut { DAE_ODE, DAE_ALG, DAE_NUM_OUT};
+  static std::vector<std::string> dae_out() { return {"ode", "alg"}; }
+  enum QuadOut { QUAD_QUAD, QUAD_NUM_OUT};
+  static std::vector<std::string> quad_out() { return {"quad"}; }
+  enum BDynIn { BDYN_T, BDYN_X, BDYN_Z, BDYN_P, BDYN_U,
+    BDYN_OUT_ODE, BDYN_OUT_ALG, BDYN_OUT_QUAD,
+    BDYN_ADJ_ODE, BDYN_ADJ_ALG, BDYN_ADJ_QUAD, BDYN_NUM_IN};
+  static std::string bdyn_in(casadi_int i);
+  static std::vector<std::string> bdyn_in();
+  enum BDynOut { BDYN_ADJ_T, BDYN_ADJ_X, BDYN_ADJ_Z, BDYN_ADJ_P, BDYN_ADJ_U, BDYN_NUM_OUT};
+  static std::string bdyn_out(casadi_int i);
+  static std::vector<std::string> bdyn_out();
+  enum DAEBOut { BDAE_ADJ_X, BDAE_ADJ_Z, BDAE_NUM_OUT};
+  static std::vector<std::string> bdae_out() { return {"adj_x", "adj_z"}; }
+  enum QuadBOut { BQUAD_ADJ_P, BQUAD_ADJ_U, BQUAD_NUM_OUT};
+  static std::vector<std::string> bquad_out() { return {"adj_p", "adj_u"}; }
+  ///@}
+
+  /// Initial time
+  double t0_;
+
+  /// Output time grid
+  std::vector<double> tout_;
+
+  /// Number of sensitivities
+  casadi_int nfwd_, nadj_;
+
+  /// Backwards DAE function
+  Function rdae_;
+
+  /// Number of states for the forward integration
+  casadi_int nx_, nz_, nq_, nx1_, nz1_, nq1_;
+
+  /// Number of states for the backward integration
+  casadi_int nrx_, nrz_, nrq_, nuq_, nrx1_, nrz1_, nrq1_, nuq1_;
+
+  /// Number of forward and backward parameters
+  casadi_int np_, nrp_, np1_, nrp1_;
+
+  /// Number of controls
+  casadi_int nu_, nu1_;
+
+  // Nominal values for states
+  std::vector<double> nom_x_, nom_z_;
+
+  /// Augmented user option
+  Dict augmented_options_;
+
+  /// Copy of the options
+  Dict opts_;
+
+  /// Options
+  bool print_stats_;
+
+  // Creator function for internal class
+  typedef Integrator* (*Creator)(const std::string& name, const Function& oracle,
+    double t0, const std::vector<double>& tout);
+
+  // No static functions exposed
+  struct Exposed{ };
+
+  /// Collection of solvers
+  static std::map<std::string, Plugin> solvers_;
+
+  /// Infix
+  static const std::string infix_;
+
+  /// Convert dictionary to Problem
+  template<typename XType>
+  static Function map2oracle(const std::string& name, const std::map<std::string, XType>& d);
+
+  /** \brief Serialize an object without type information
+
+      \identifier{1md} */
+  void serialize_body(SerializingStream &s) const override;
+  /** \brief Serialize type information
+
+      \identifier{1me} */
+  void serialize_type(SerializingStream &s) const override;
+
+  /** \brief Deserialize into MX
+
+      \identifier{1mf} */
+  static ProtoFunction* deserialize(DeserializingStream& s);
+
+  /** \brief String used to identify the immediate FunctionInternal subclass
+
+      \identifier{1mg} */
+  std::string serialize_base_function() const override { return "Integrator"; }
+
+  /// Is an input repeated for each grid point?
+  static bool grid_in(casadi_int i);
+
+  /// Is an output repeated for each grid point?
+  static bool grid_out(casadi_int i);
+
+  /// Which output is used to calculate a given input in adjoint sensitivity analysis
+  static casadi_int adjmap_out(casadi_int i);
+
+ protected:
+  /** \brief Deserializing constructor
+
+      \identifier{1mh} */
+  explicit Integrator(DeserializingStream& s);
+};
+
+/// Input arguments of a forward stepping function
+enum FStepIn {
+  /// Current time
+  FSTEP_T,
+  /// Step size
+  FSTEP_H,
+  /// State vector
+  FSTEP_X0,
+  /// Dependent variables
+  FSTEP_V0,
+  /// Parameter
+  FSTEP_P,
+  /// Controls
+  FSTEP_U,
+  /// Number of arguments
+  FSTEP_NUM_IN
+};
+
+/// Output arguments of a forward stepping function
+enum FStepOut {
+  /// State vector at next time
+  FSTEP_XF,
+  /// Dependent variables at next time
+  FSTEP_VF,
+  /// Quadrature state contribution
+  FSTEP_QF,
+  /// Number of arguments
+  FSTEP_NUM_OUT
+};
+
+/// Input arguments of a backward stepping function
+enum BStepIn {
+  /// Current time
+  BSTEP_T,
+  /// Step size
+  BSTEP_H,
+  /// State vector for backward problem
+  BSTEP_RX0,
+  /// Dependent variables for backward problem
+  BSTEP_RV0,
+  /// Parameter vector for backward problem
+  BSTEP_RP,
+  /// State vector for forward problem
+  BSTEP_X,
+  /// Dependent variables for forward problem
+  BSTEP_V,
+  /// Parameter vector for forward problem
+  BSTEP_P,
+  /// Controls
+  BSTEP_U,
+  /// Number of arguments
+  BSTEP_NUM_IN
+};
+
+/// Output arguments of a backward stepping function
+enum BStepOut {
+  /// State vector for backward problem at the next time
+  BSTEP_RXF,
+  /// Dependent variables for backward problem at the next time
+  BSTEP_RVF,
+  /// Quadrature state contribution for backward problem, summing
+  BSTEP_RQF,
+  /// Quadrature state contribution for backward problem, non-summing
+  BSTEP_UQF,
+  /// Number of arguments
+  BSTEP_NUM_OUT
+};
+
+struct CASADI_EXPORT FixedStepMemory : public IntegratorMemory {
+  // Work vectors, allocated in base class
+  double *x, *z, *rx, *rz, *rq, *x_prev, *rx_prev;
+
+  /// Work vectors, forward problem
+  double *v, *p, *u, *q, *v_prev, *q_prev;
+
+  /// Work vectors, backward problem
+  double *rv, *rp, *uq, *rv_prev, *rq_prev, *uq_prev;
+
+  /// State and dependent variables at all times
+  double *x_tape, *v_tape;
+};
+
+class CASADI_EXPORT FixedStepIntegrator : public Integrator {
+ public:
+
+  /// Constructor
+  explicit FixedStepIntegrator(const std::string& name, const Function& dae,
+    double t0, const std::vector<double>& tout);
+
+  /// Destructor
+  ~FixedStepIntegrator() override;
+
+  ///@{
+  /** \brief Options
+
+      \identifier{1mi} */
+  static const Options options_;
+  const Options& get_options() const override { return options_;}
+  ///@}
+
+  /// Initialize stage
+  void init(const Dict& opts) override;
+
+  /** \brief Set the (persistent) work vectors
+
+      \identifier{25h} */
+  void set_work(void* mem, const double**& arg, double**& res,
+    casadi_int*& iw, double*& w) const override;
+
+  /** Helper for a more powerful 'integrator' factory */
+  Function create_advanced(const Dict& opts) override;
+
+  /** \brief Create memory block
+
+      \identifier{1mj} */
+  void* alloc_mem() const override { return new FixedStepMemory();}
+
+  /** \brief Initalize memory block
+
+      \identifier{1mk} */
+  int init_mem(void* mem) const override;
+
+  /** \brief Free memory block
+
+      \identifier{1ml} */
+  void free_mem(void *mem) const override { delete static_cast<FixedStepMemory*>(mem);}
+
+  /// Setup step functions
+  virtual void setup_step() = 0;
+
+  /** \brief Reset the forward problem
+
+      \identifier{25i} */
+  void reset(IntegratorMemory* mem,
+    const double* x, const double* z, const double* p) const override;
+
+  /** \brief  Advance solution in time
+
+      \identifier{25j} */
+  void advance(IntegratorMemory* mem,
+    const double* u, double* x, double* z, double* q) const override;
+
+  /// Reset the backward problem and take time to tf
+  void resetB(IntegratorMemory* mem,
+    const double* rx, const double* rz, const double* rp) const override;
+
+  /// Introduce an impulse into the backwards integration at the current time
+  void impulseB(IntegratorMemory* mem,
+    const double* rx, const double* rz, const double* rp) const override;
+
+  /** \brief Retreat solution in time
+
+      \identifier{25k} */
+  void retreat(IntegratorMemory* mem, const double* u,
+    double* rx, double* rz, double* rq, double* uq) const override;
+
+  /// Take integrator step forward
+  void stepF(FixedStepMemory* m, double t, double h,
+    const double* x0, const double* v0, double* xf, double* vf, double* qf) const;
+
+  /// Take integrator step backward
+  void stepB(FixedStepMemory* m, double t, double h,
+    const double* x, const double* v, const double* rx0, const double* rv0,
+    double* rxf, double* rvf, double* rqf, double* uqf) const;
+
+  // Target number of finite elements
+  casadi_int nk_target_;
+
+  // Number of steps per control interval
+  std::vector<casadi_int> disc_;
+
+  /// Number of dependent variables in the discrete time integration
+  casadi_int nv_, nv1_, nrv_, nrv1_;
+
+  /** \brief Serialize an object without type information
+
+      \identifier{1mp} */
+  void serialize_body(SerializingStream &s) const override;
+
+protected:
+  /** \brief Deserializing constructor
+
+      \identifier{1mq} */
+  explicit FixedStepIntegrator(DeserializingStream& s);
+};
+
+class CASADI_EXPORT ImplicitFixedStepIntegrator : public FixedStepIntegrator {
+ public:
+
+  /// Constructor
+  explicit ImplicitFixedStepIntegrator(const std::string& name, const Function& dae,
+    double t0, const std::vector<double>& tout);
+
+  /// Destructor
+  ~ImplicitFixedStepIntegrator() override;
+
+  ///@{
+  /** \brief Options
+
+      \identifier{1mr} */
+  static const Options options_;
+  const Options& get_options() const override { return options_;}
+  ///@}
+
+  /// Initialize stage
+  void init(const Dict& opts) override;
+
+  /** \brief Serialize an object without type information
+
+      \identifier{1ms} */
+  void serialize_body(SerializingStream &s) const override;
+
+protected:
+  /** \brief Deserializing constructor
+
+      \identifier{1mt} */
+  explicit ImplicitFixedStepIntegrator(DeserializingStream& s);
+};
 
 } // namespace casadi
 /// \endcond
