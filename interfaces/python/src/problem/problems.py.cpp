@@ -12,6 +12,7 @@ using namespace py::literals;
 
 #include <alpaqa/problem/problem-with-counters.hpp>
 #include <alpaqa/problem/type-erased-problem.hpp>
+#include <alpaqa/util/check-dim.hpp>
 #if ALPAQA_HAVE_CASADI
 #include <alpaqa/casadi/CasADiProblem.hpp>
 #endif
@@ -44,6 +45,136 @@ void functional_setter_out(FuncProb &p, std::optional<py::object> o) {
         };
     }
 };
+
+template <class T, class... Args>
+void problem_methods(py::class_<T, Args...> &cls) {
+    USING_ALPAQA_CONFIG_TEMPLATE(T::config_t);
+    // clang-format off
+    cls.def("eval_proj_diff_g", &T::eval_proj_diff_g, "z"_a, "e"_a);
+    cls.def("eval_proj_multipliers", &T::eval_proj_multipliers, "y"_a, "M"_a);
+    cls.def("eval_prox_grad_step", &T::eval_prox_grad_step, "γ"_a, "x"_a, "grad_ψ"_a, "x̂"_a, "p"_a);
+    cls.def("eval_inactive_indices_res_lna", &T::eval_inactive_indices_res_lna, "γ"_a, "x"_a, "grad_ψ"_a, "J"_a);
+    cls.def("eval_f", &T::eval_f, "x"_a);
+    cls.def("eval_grad_f", &T::eval_grad_f, "x"_a, "grad_fx"_a);
+    cls.def("eval_g", &T::eval_g, "x"_a, "gx"_a);
+    cls.def("eval_grad_g_prod", &T::eval_grad_g_prod, "x"_a, "y"_a, "grad_gxy"_a);
+    cls.def("eval_grad_gi", &T::eval_grad_gi, "x"_a, "i"_a, "grad_gi"_a);
+    cls.def("eval_hess_L_prod", &T::eval_hess_L_prod, "x"_a, "y"_a, "scale"_a, "v"_a, "Hv"_a);
+    // cls.def("eval_hess_L", &T::eval_hess_L, "x"_a, "y"_a, "H"_a); // TODO
+    cls.def("eval_hess_ψ_prod", &T::eval_hess_ψ_prod, "x"_a, "y"_a, "Σ"_a, "scale"_a, "v"_a, "Hv"_a);
+    // cls.def("eval_hess_ψ", &T::eval_hess_ψ, "x"_a, "y"_a, "Σ"_a, "H"_a); // TODO
+    cls.def("eval_f_grad_f", &T::eval_f_grad_f, "x"_a, "grad_fx"_a);
+    if constexpr (requires { &T::eval_f_g; })
+        cls.def("eval_f_g", &T::eval_f_g, "x"_a, "g"_a);
+    if constexpr (requires { &T::eval_grad_f_grad_g_prod; })
+        cls.def("eval_grad_f_grad_g_prod", &T::eval_grad_f_grad_g_prod, "x"_a, "y"_a, "grad_f"_a, "grad_gxy"_a);
+    cls.def("eval_grad_L", &T::eval_grad_L, "x"_a, "y"_a, "grad_L"_a, "work_n"_a);
+    cls.def("eval_ψ", &T::eval_ψ, "x"_a, "y"_a, "Σ"_a, "ŷ"_a);
+    cls.def("eval_grad_ψ", &T::eval_grad_ψ, "x"_a, "y"_a, "Σ"_a, "grad_ψ"_a, "work_n"_a, "work_m"_a);
+    cls.def("eval_ψ_grad_ψ", &T::eval_ψ_grad_ψ, "x"_a, "y"_a, "Σ"_a, "grad_ψ"_a, "work_n"_a, "work_m"_a);
+    cls.def("get_box_C", &T::get_box_C);
+    cls.def("get_box_D", &T::get_box_D);
+
+    if constexpr (requires { &T::provides_eval_inactive_indices_res_lna; })
+        cls.def("provides_eval_inactive_indices_res_lna", &T::provides_eval_inactive_indices_res_lna);
+    cls.def("provides_eval_grad_gi", &T::provides_eval_grad_gi);
+    cls.def("provides_eval_hess_L_prod", &T::provides_eval_hess_L_prod);
+    // cls.def("provides_eval_hess_L", &T::provides_eval_hess_L); // TODO
+    cls.def("provides_eval_hess_ψ_prod", &T::provides_eval_hess_ψ_prod);
+    // cls.def("provides_eval_hess_ψ", &T::provides_eval_hess_ψ); // TODO
+    if constexpr (requires { &T::provides_eval_f_grad_f; })
+        cls.def("provides_eval_f_grad_f", &T::provides_eval_f_grad_f);
+    if constexpr (requires { &T::provides_eval_f_g; })
+        cls.def("provides_eval_f_g", &T::provides_eval_f_g);
+    if constexpr (requires { &T::provides_eval_grad_f_grad_g_prod; })
+        cls.def("provides_eval_grad_f_grad_g_prod", &T::provides_eval_grad_f_grad_g_prod);
+    if constexpr (requires { &T::provides_eval_grad_L; })
+        cls.def("provides_eval_grad_L", &T::provides_eval_grad_L);
+    if constexpr (requires { &T::provides_eval_ψ; })
+        cls.def("provides_eval_ψ", &T::provides_eval_ψ);
+    if constexpr (requires { &T::provides_eval_grad_ψ; })
+        cls.def("provides_eval_grad_ψ", &T::provides_eval_grad_ψ);
+    if constexpr (requires { &T::provides_eval_ψ_grad_ψ; })
+        cls.def("provides_eval_ψ_grad_ψ", &T::provides_eval_ψ_grad_ψ);
+    if constexpr (requires { &T::provides_get_box_C; })
+        cls.def("provides_get_box_C", &T::provides_get_box_C);
+    if constexpr (requires { &T::provides_get_box_D; })
+        cls.def("provides_get_box_D", &T::provides_get_box_D);
+    // clang-format on
+    cls.def(
+           "eval_proj_diff_g",
+           [](const T &prob, crvec z) {
+               vec e(prob.get_m());
+               prob.eval_proj_diff_g(z, e);
+               return e;
+           },
+           "z"_a)
+        .def(
+            "eval_prox_grad_step",
+            [](const T &prob, real_t γ, crvec x, crvec grad_ψ) {
+                vec x̂(prob.get_n());
+                vec p(prob.get_n());
+                real_t hx̂ = prob.eval_prox_grad_step(γ, x, grad_ψ, x̂, p);
+                return std::make_tuple(std::move(x̂), std::move(p), hx̂);
+            },
+            "γ"_a, "x"_a, "grad_ψ"_a)
+        .def(
+            "eval_inactive_indices_res_lna",
+            [](const T &prob, real_t γ, crvec x, crvec grad_ψ) {
+                indexvec J_sto(prob.get_n());
+                index_t nJ = prob.eval_inactive_indices_res_lna(γ, x, grad_ψ, J_sto);
+                return indexvec{J_sto.topRows(nJ)};
+            },
+            "γ"_a, "x"_a, "grad_ψ"_a)
+        .def(
+            "eval_grad_f",
+            [](const T &p, crvec x) {
+                vec g(p.get_n());
+                p.eval_grad_f(x, g);
+                return g;
+            },
+            "x"_a)
+        .def(
+            "eval_g",
+            [](const T &p, crvec x) {
+                vec g(p.get_m());
+                p.eval_g(x, g);
+                return g;
+            },
+            "x"_a)
+        .def(
+            "eval_grad_g_prod",
+            [](const T &p, crvec x, crvec y) {
+                vec g(p.get_n());
+                p.eval_grad_g_prod(x, y, g);
+                return g;
+            },
+            "x"_a, "y"_a)
+        .def(
+            "eval_ψ",
+            [](const T &p, crvec x, crvec y, crvec Σ) {
+                vec ŷ(p.get_m());
+                auto ψ = p.eval_ψ(x, y, Σ, ŷ);
+                return std::make_tuple(std::move(ψ), std::move(ŷ));
+            },
+            "x"_a, "y"_a, "Σ"_a)
+        .def(
+            "eval_grad_ψ",
+            [](const T &p, crvec x, crvec y, crvec Σ) {
+                vec grad_ψ(p.get_n()), work_n(p.get_n()), work_m(p.get_m());
+                p.eval_grad_ψ(x, y, Σ, grad_ψ, work_n, work_m);
+                return grad_ψ;
+            },
+            "x"_a, "y"_a, "Σ"_a)
+        .def(
+            "eval_ψ_grad_ψ",
+            [](const T &p, crvec x, crvec y, crvec Σ) {
+                vec grad_ψ(p.get_n()), work_n(p.get_n()), work_m(p.get_m());
+                auto ψ = p.eval_ψ_grad_ψ(x, y, Σ, grad_ψ, work_n, work_m);
+                return std::make_tuple(std::move(ψ), std::move(grad_ψ));
+            },
+            "x"_a, "y"_a, "Σ"_a);
+}
 
 template <alpaqa::Config Conf>
 void register_problems(py::module_ &m) {
@@ -112,6 +243,8 @@ void register_problems(py::module_ &m) {
         .def("eval_proj_multipliers", &BoxConstrProblem::eval_proj_multipliers, "y"_a, "M"_a)
         .def("eval_prox_grad_step", &BoxConstrProblem::eval_prox_grad_step, "γ"_a, "x"_a,
              "grad_ψ"_a, "x̂"_a, "p"_a)
+        .def("eval_inactive_indices_res_lna", &BoxConstrProblem::eval_inactive_indices_res_lna,
+             "γ"_a, "x"_a, "grad_ψ"_a, "J"_a)
         .def(
             "eval_proj_diff_g",
             [](const BoxConstrProblem &prob, crvec z) {
@@ -129,6 +262,14 @@ void register_problems(py::module_ &m) {
                 return std::make_tuple(std::move(x̂), std::move(p), hx̂);
             },
             "γ"_a, "x"_a, "grad_ψ"_a)
+        .def(
+            "eval_inactive_indices_res_lna",
+            [](const BoxConstrProblem &prob, real_t γ, crvec x, crvec grad_ψ) {
+                indexvec J_sto(prob.get_n());
+                index_t nJ = prob.eval_inactive_indices_res_lna(γ, x, grad_ψ, J_sto);
+                return indexvec{J_sto.topRows(nJ)};
+            },
+            "γ"_a, "x"_a, "grad_ψ"_a)
         .def("get_box_C", &BoxConstrProblem::get_box_C)
         .def("get_box_D", &BoxConstrProblem::get_box_D);
 
@@ -142,6 +283,7 @@ void register_problems(py::module_ &m) {
         void eval_proj_diff_g(crvec z, rvec e) const { py::gil_scoped_acquire gil; o.attr("eval_proj_diff_g")(z, e); }
         void eval_proj_multipliers(rvec y, real_t M) const { py::gil_scoped_acquire gil; o.attr("eval_proj_multipliers")(y, M); }
         real_t eval_prox_grad_step(real_t γ, crvec x, crvec grad_ψ, rvec x̂, rvec p) const { py::gil_scoped_acquire gil; return py::cast<real_t>(o.attr("eval_prox_grad_step")(γ, x, grad_ψ, x̂, p)); }
+        index_t eval_inactive_indices_res_lna(real_t γ, crvec x, crvec grad_ψ, rindexvec J) const { py::gil_scoped_acquire gil; return py::cast<index_t>(o.attr("eval_inactive_indices_res_lna")(γ, x, grad_ψ, J)); }
         real_t eval_f(crvec x) const { py::gil_scoped_acquire gil; return py::cast<real_t>(o.attr("eval_f")(x)); }
         void eval_grad_f(crvec x, rvec grad_fx) const { py::gil_scoped_acquire gil; o.attr("eval_grad_f")(x, grad_fx); }
         void eval_g(crvec x, rvec gx) const { py::gil_scoped_acquire gil; o.attr("eval_g")(x, gx); }
@@ -162,6 +304,7 @@ void register_problems(py::module_ &m) {
         const Box &get_box_C() const { py::gil_scoped_acquire gil; alpaqa::ScopedMallocAllower ma; C = py::cast<Box>(o.attr("get_box_C")()); return C; }
         const Box &get_box_D() const { py::gil_scoped_acquire gil; alpaqa::ScopedMallocAllower ma; D = py::cast<Box>(o.attr("get_box_D")()); return D; }
 
+        bool provides_eval_inactive_indices_res_lna() const { py::gil_scoped_acquire gil; return py::hasattr(o, "eval_inactive_indices_res_lna"); }
         bool provides_eval_grad_gi() const { py::gil_scoped_acquire gil; return py::hasattr(o, "eval_grad_gi"); }
         bool provides_eval_hess_L_prod() const { py::gil_scoped_acquire gil; return py::hasattr(o, "eval_hess_L_prod"); }
         // bool provides_eval_hess_L() const { py::gil_scoped_acquire gil; return py::hasattr(o, "eval_hess_L"); }
@@ -190,110 +333,7 @@ void register_problems(py::module_ &m) {
     py::class_<TEProblem> te_problem(m, "Problem",
                                      "C++ documentation: :cpp:class:`alpaqa::TypeErasedProblem`");
     default_copy_methods(te_problem);
-    te_problem //
-        // clang-format off
-        .def("eval_proj_diff_g", &TEProblem::eval_proj_diff_g, "z"_a, "e"_a)
-        .def("eval_proj_multipliers", &TEProblem::eval_proj_multipliers, "y"_a, "M"_a)
-        .def("eval_prox_grad_step", &TEProblem::eval_prox_grad_step, "γ"_a, "x"_a, "grad_ψ"_a, "x̂"_a, "p"_a)
-        .def("eval_f", &TEProblem::eval_f, "x"_a)
-        .def("eval_grad_f", &TEProblem::eval_grad_f, "x"_a, "grad_fx"_a)
-        .def("eval_g", &TEProblem::eval_g, "x"_a, "gx"_a)
-        .def("eval_grad_g_prod", &TEProblem::eval_grad_g_prod, "x"_a, "y"_a, "grad_gxy"_a)
-        .def("eval_grad_gi", &TEProblem::eval_grad_gi, "x"_a, "i"_a, "grad_gi"_a)
-        .def("eval_hess_L_prod", &TEProblem::eval_hess_L_prod, "x"_a, "y"_a, "scale"_a, "v"_a, "Hv"_a)
-        // .def("eval_hess_L", &TEProblem::eval_hess_L, "x"_a, "y"_a, "H"_a) // TODO
-        .def("eval_hess_ψ_prod", &TEProblem::eval_hess_ψ_prod, "x"_a, "y"_a, "Σ"_a, "scale"_a, "v"_a, "Hv"_a)
-        // .def("eval_hess_ψ", &TEProblem::eval_hess_ψ, "x"_a, "y"_a, "Σ"_a, "H"_a) // TODO
-        .def("eval_f_grad_f", &TEProblem::eval_f_grad_f, "x"_a, "grad_fx"_a)
-        .def("eval_f_g", &TEProblem::eval_f_g, "x"_a, "g"_a)
-        .def("eval_grad_f_grad_g_prod", &TEProblem::eval_grad_f_grad_g_prod, "x"_a, "y"_a, "grad_f"_a, "grad_gxy"_a)
-        .def("eval_grad_L", &TEProblem::eval_grad_L, "x"_a, "y"_a, "grad_L"_a, "work_n"_a)
-        .def("eval_ψ", &TEProblem::eval_ψ, "x"_a, "y"_a, "Σ"_a, "ŷ"_a)
-        .def("eval_grad_ψ", &TEProblem::eval_grad_ψ, "x"_a, "y"_a, "Σ"_a, "grad_ψ"_a, "work_n"_a, "work_m"_a)
-        .def("eval_ψ_grad_ψ", &TEProblem::eval_ψ_grad_ψ, "x"_a, "y"_a, "Σ"_a, "grad_ψ"_a, "work_n"_a, "work_m"_a)
-        .def("get_box_C", &TEProblem::get_box_C)
-        .def("get_box_D", &TEProblem::get_box_D)
-
-        .def("provides_eval_grad_gi", &TEProblem::provides_eval_grad_gi)
-        .def("provides_eval_hess_L_prod", &TEProblem::provides_eval_hess_L_prod)
-        // .def("provides_eval_hess_L", &TEProblem::provides_eval_hess_L) // TODO
-        .def("provides_eval_hess_ψ_prod", &TEProblem::provides_eval_hess_ψ_prod)
-        // .def("provides_eval_hess_ψ", &TEProblem::provides_eval_hess_ψ) // TODO
-        .def("provides_eval_f_grad_f", &TEProblem::provides_eval_f_grad_f)
-        .def("provides_eval_f_g", &TEProblem::provides_eval_f_g)
-        .def("provides_eval_grad_f_grad_g_prod", &TEProblem::provides_eval_grad_f_grad_g_prod)
-        .def("provides_eval_grad_L", &TEProblem::provides_eval_grad_L)
-        .def("provides_eval_ψ", &TEProblem::provides_eval_ψ)
-        .def("provides_eval_grad_ψ", &TEProblem::provides_eval_grad_ψ)
-        .def("provides_eval_ψ_grad_ψ", &TEProblem::provides_eval_ψ_grad_ψ)
-        .def("provides_get_box_C", &TEProblem::provides_get_box_C)
-        .def("provides_get_box_D", &TEProblem::provides_get_box_D)
-        // clang-format on
-        .def(
-            "eval_proj_diff_g",
-            [](const TEProblem &prob, crvec z) {
-                vec e(prob.get_m());
-                prob.eval_proj_diff_g(z, e);
-                return e;
-            },
-            "z"_a)
-        .def(
-            "eval_prox_grad_step",
-            [](const TEProblem &prob, real_t γ, crvec x, crvec grad_ψ) {
-                vec x̂(prob.get_n());
-                vec p(prob.get_n());
-                real_t hx̂ = prob.eval_prox_grad_step(γ, x, grad_ψ, x̂, p);
-                return std::make_tuple(std::move(x̂), std::move(p), hx̂);
-            },
-            "γ"_a, "x"_a, "grad_ψ"_a)
-        .def(
-            "eval_grad_f",
-            [](const TEProblem &p, crvec x) {
-                vec g(p.get_n());
-                p.eval_grad_f(x, g);
-                return g;
-            },
-            "x"_a)
-        .def(
-            "eval_g",
-            [](const TEProblem &p, crvec x) {
-                vec g(p.get_m());
-                p.eval_g(x, g);
-                return g;
-            },
-            "x"_a)
-        .def(
-            "eval_grad_g_prod",
-            [](const TEProblem &p, crvec x, crvec y) {
-                vec g(p.get_n());
-                p.eval_grad_g_prod(x, y, g);
-                return g;
-            },
-            "x"_a, "y"_a)
-        .def(
-            "eval_ψ",
-            [](const TEProblem &p, crvec x, crvec y, crvec Σ) {
-                vec ŷ(p.get_m());
-                auto ψ = p.eval_ψ(x, y, Σ, ŷ);
-                return std::make_tuple(std::move(ψ), std::move(ŷ));
-            },
-            "x"_a, "y"_a, "Σ"_a)
-        .def(
-            "eval_grad_ψ",
-            [](const TEProblem &p, crvec x, crvec y, crvec Σ) {
-                vec grad_ψ(p.get_n()), work_n(p.get_n()), work_m(p.get_m());
-                p.eval_grad_ψ(x, y, Σ, grad_ψ, work_n, work_m);
-                return grad_ψ;
-            },
-            "x"_a, "y"_a, "Σ"_a)
-        .def(
-            "eval_ψ_grad_ψ",
-            [](const TEProblem &p, crvec x, crvec y, crvec Σ) {
-                vec grad_ψ(p.get_n()), work_n(p.get_n()), work_m(p.get_m());
-                auto ψ = p.eval_ψ_grad_ψ(x, y, Σ, grad_ψ, work_n, work_m);
-                return std::make_tuple(std::move(ψ), std::move(grad_ψ));
-            },
-            "x"_a, "y"_a, "Σ"_a);
+    problem_methods(te_problem);
 
     // ProblemWithCounters
     struct ProblemWithCounters {
@@ -328,83 +368,17 @@ void register_problems(py::module_ &m) {
             "C++ documentation: :cpp:class:`alpaqa::CasADiProblem`\n\n"
             "See :py:class:`alpaqa._alpaqa.float64.Problem` for the full documentation.");
         default_copy_methods(casadi_problem);
-        casadi_problem
 #if ALPAQA_HAVE_CASADI
-            // clang-format off
-            .def("eval_f", &CasADiProblem::eval_f, "x"_a)
-            .def("eval_grad_f", &CasADiProblem::eval_grad_f, "x"_a, "grad_fx"_a)
-            .def("eval_g", &CasADiProblem::eval_g, "x"_a, "gx"_a)
-            .def("eval_grad_g_prod", &CasADiProblem::eval_grad_g_prod, "x"_a, "y"_a, "grad_gxy"_a)
-            .def("eval_grad_gi", &CasADiProblem::eval_grad_gi, "x"_a, "i"_a, "grad_gi"_a)
-            .def("eval_hess_L_prod", &CasADiProblem::eval_hess_L_prod, "x"_a, "y"_a, "scale"_a, "v"_a, "Hv"_a)
-            // .def("eval_hess_L", &CasADiProblem::eval_hess_L, "x"_a, "y"_a, "H"_a) // TODO
-            .def("eval_hess_ψ_prod", &CasADiProblem::eval_hess_ψ_prod, "x"_a, "y"_a, "Σ"_a, "scale"_a, "v"_a, "Hv"_a)
-            // .def("eval_hess_ψ", &CasADiProblem::eval_hess_ψ, "x"_a, "y"_a, "Σ"_a, "H"_a) // TODO
-            .def("eval_grad_L", &CasADiProblem::eval_grad_L, "x"_a, "y"_a, "grad_L"_a, "work_n"_a)
-            .def("eval_ψ", &CasADiProblem::eval_ψ, "x"_a, "y"_a, "Σ"_a, "ŷ"_a)
-            .def("eval_grad_ψ", &CasADiProblem::eval_grad_ψ, "x"_a, "y"_a, "Σ"_a, "grad_ψ"_a, "work_n"_a, "work_m"_a)
-            .def("eval_ψ_grad_ψ", &CasADiProblem::eval_ψ_grad_ψ, "x"_a, "y"_a, "Σ"_a, "grad_ψ"_a, "work_n"_a, "work_m"_a)
-            // clang-format on
-            .def(
-                "eval_grad_f",
-                [](const CasADiProblem &p, crvec x) {
-                    vec g(p.get_n());
-                    p.eval_grad_f(x, g);
-                    return g;
-                },
-                "x"_a)
-            .def(
-                "eval_g",
-                [](const CasADiProblem &p, crvec x) {
-                    vec g(p.get_m());
-                    p.eval_g(x, g);
-                    return g;
-                },
-                "x"_a)
-            .def(
-                "eval_grad_g_prod",
-                [](const CasADiProblem &p, crvec x, crvec y) {
-                    vec g(p.get_n());
-                    p.eval_grad_g_prod(x, y, g);
-                    return g;
-                },
-                "x"_a, "y"_a)
-            .def(
-                "eval_ψ",
-                [](const CasADiProblem &p, crvec x, crvec y, crvec Σ) {
-                    vec ŷ(p.get_m());
-                    auto ψ = p.eval_ψ(x, y, Σ, ŷ);
-                    return std::make_tuple(std::move(ψ), std::move(ŷ));
-                },
-                "x"_a, "y"_a, "Σ"_a)
-            .def(
-                "eval_grad_ψ",
-                [](const CasADiProblem &p, crvec x, crvec y, crvec Σ) {
-                    vec grad_ψ(p.get_n()), work_n(p.get_n()), work_m(p.get_m());
-                    p.eval_grad_ψ(x, y, Σ, grad_ψ, work_n, work_m);
-                    return grad_ψ;
-                },
-                "x"_a, "y"_a, "Σ"_a)
-            .def(
-                "eval_ψ_grad_ψ",
-                [](const CasADiProblem &p, crvec x, crvec y, crvec Σ) {
-                    vec grad_ψ(p.get_n()), work_n(p.get_n()), work_m(p.get_m());
-                    auto ψ = p.eval_ψ_grad_ψ(x, y, Σ, grad_ψ, work_n, work_m);
-                    return std::make_tuple(std::move(ψ), std::move(grad_ψ));
-                },
-                "x"_a, "y"_a, "Σ"_a)
-            .def_property(
-                "param", [](CasADiProblem &p) -> rvec { return p.param; },
-                [](CasADiProblem &p, crvec param) {
-                    if (param.size() != p.param.size())
-                        throw std::invalid_argument("Invalid parameter dimension: got " +
-                                                    std::to_string(param.size()) + ", should be " +
-                                                    std::to_string(p.param.size()) + ".");
-                    p.param = param;
-                },
-                "Parameter vector :math:`p` of the problem");
+        problem_methods(casadi_problem);
+        casadi_problem.def_property(
+            "param", [](CasADiProblem &p) -> rvec { return p.param; },
+            [](CasADiProblem &p, crvec param) {
+                alpaqa::util::check_dim_msg<config_t>(param, p.param.size(),
+                                                      "Invalid parameter size");
+                p.param = param;
+            },
+            "Parameter vector :math:`p` of the problem");
 #endif
-        ;
 #if ALPAQA_HAVE_CASADI
         te_problem.def(py::init<const CasADiProblem &>());
         py::implicitly_convertible<CasADiProblem, TEProblem>();
