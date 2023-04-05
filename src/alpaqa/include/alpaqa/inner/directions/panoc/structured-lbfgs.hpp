@@ -108,8 +108,7 @@ struct StructuredLBFGSDirection {
     }
 
   private:
-    using indexstdvec = std::vector<index_t>;
-    using Helpers     = detail::PANOCHelpers<config_t>;
+    using Helpers = detail::PANOCHelpers<config_t>;
 
     const Problem *problem = nullptr;
 #ifndef _WIN32
@@ -121,14 +120,14 @@ struct StructuredLBFGSDirection {
 #endif
 
     LBFGS lbfgs;
-    mutable indexstdvec J;
+    mutable indexvec J_sto;
     mutable vec HqK;
     mutable vec work_n;
     mutable vec work_n2;
     mutable vec work_m;
 
     void approximate_hessian_vec_term(crvec xₖ, crvec grad_ψxₖ, rvec qₖ,
-                                      const Box<config_t> &D) const;
+                                      crindexvec J) const;
 
   public:
     DirectionParams direction_params;

@@ -145,6 +145,43 @@ class BoxConstrProblem {
     /// @see @ref TypeErasedProblem::get_box_D
     const Box &get_box_D() const { return D; }
 
+    /// @see @ref TypeErasedProblem::eval_inactive_indices_res_lna
+    index_t eval_inactive_indices_res_lna(real_t γ, crvec x, crvec grad_ψ, rindexvec J) const {
+        index_t nJ = 0;
+        // Helper that adds i to index set J if x ∊ C
+        const auto add_to_J_if_in_box_interior = [&](real_t x_fw, index_t i) {
+            if (C.lowerbound(i) < x_fw && x_fw < C.upperbound(i))
+                J(nJ++) = i;
+        };
+        // Update the index set J for the general box + l1 case
+        const auto update_J_general = [&](real_t λ, real_t x_fw, index_t i) {
+            if (λ == 0) {
+                add_to_J_if_in_box_interior(x_fw, i);
+            } else {
+                if (x_fw > γ * λ)
+                    add_to_J_if_in_box_interior(x_fw - γ * λ, i);
+                else if (x_fw < -γ * λ)
+                    add_to_J_if_in_box_interior(x_fw + γ * λ, i);
+            }
+        };
+        const auto nλ     = l1_reg.size();
+        const bool λ_is_0 = nλ == 0 || (nλ == 1 && l1_reg(0) == 0);
+        // Only box constraints
+        if (λ_is_0)
+            for (index_t i = 0; i < n; ++i) {
+                real_t x_fw = x(i) - γ * grad_ψ(i);
+                add_to_J_if_in_box_interior(x_fw, i);
+            }
+        // Box constraints and l1
+        else
+            for (index_t i = 0; i < n; ++i) {
+                real_t λi   = nλ == 0 ? 0 : nλ == 1 ? l1_reg(0) : l1_reg(i);
+                real_t x_fw = x(i) - γ * grad_ψ(i);
+                update_J_general(λi, x_fw, i);
+            }
+        return nJ;
+    }
+
     /// @see @ref TypeErasedProblem::check
     void check() const {
         util::check_dim_msg<config_t>(

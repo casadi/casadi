@@ -32,6 +32,13 @@ auto ProblemVTable<Conf>::calc_ŷ_dᵀŷ(const void *self, rvec g_ŷ, crvec y, c
 }
 
 template <Config Conf>
+auto ProblemVTable<Conf>::default_eval_inactive_indices_res_lna(const void *, real_t, crvec, crvec,
+                                                                rindexvec, const ProblemVTable &)
+    -> index_t {
+    throw not_implemented_error("eval_inactive_indices_res_lna");
+}
+
+template <Config Conf>
 void ProblemVTable<Conf>::default_eval_jac_g(const void *, crvec, rindexvec, rindexvec, rvec,
                                              const ProblemVTable &vtable) {
     if (vtable.m != 0)

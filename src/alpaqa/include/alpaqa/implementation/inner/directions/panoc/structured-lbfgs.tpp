@@ -10,9 +10,35 @@ void StructuredLBFGSDirection<Conf>::initialize(
     const Problem &problem, crvec y, crvec Σ, [[maybe_unused]] real_t γ_0,
     [[maybe_unused]] crvec x_0, [[maybe_unused]] crvec x̂_0,
     [[maybe_unused]] crvec p_0, [[maybe_unused]] crvec grad_ψx_0) {
-    if (!(problem.provides_get_box_C() && problem.provides_get_box_D()))
+    if (!problem.provides_eval_inactive_indices_res_lna())
         throw std::invalid_argument(
-            "Structured PANOC only supports box-constrained problems");
+            "Structured L-BFGS requires eval_inactive_indices_res_lna()");
+    if (direction_params.hessian_vec &&
+        !direction_params.hessian_vec_finite_differences &&
+        !direction_params.full_augmented_hessian &&
+        !problem.provides_eval_hess_L_prod())
+        throw std::invalid_argument(
+            "Structured L-BFGS requires eval_hess_L_prod(). Alternatively, set "
+            "hessian_vec = false or hessian_vec_finite_differences = true.");
+    if (direction_params.hessian_vec &&
+        !direction_params.hessian_vec_finite_differences &&
+        direction_params.full_augmented_hessian &&
+        !(problem.provides_eval_hess_L_prod() ||
+          problem.provides_eval_hess_ψ_prod()))
+        throw std::invalid_argument(
+            "Structured L-BFGS requires _eval_hess_ψ_prod() or "
+            "eval_hess_L_prod(). Alternatively, set "
+            "hessian_vec = false or hessian_vec_finite_differences = true.");
+    if (direction_params.hessian_vec &&
+        !direction_params.hessian_vec_finite_differences &&
+        direction_params.full_augmented_hessian &&
+        !problem.provides_eval_hess_ψ_prod() &&
+        !(problem.provides_get_box_D() && problem.provides_eval_grad_gi()))
+        throw std::invalid_argument(
+            "Structured L-BFGS requires either eval_hess_ψ_prod() or "
+            "get_box_D() and eval_grad_gi(). Alternatively, set hessian_vec = "
+            "false, hessian_vec_finite_differences = true, or "
+            "full_augmented_hessian = false.");
     // Store references to problem and ALM variables
     this->problem = &problem;
     this->y.emplace(y);
@@ -21,7 +47,7 @@ void StructuredLBFGSDirection<Conf>::initialize(
     const auto n = problem.get_n();
     const auto m = problem.get_m();
     lbfgs.resize(n);
-    J.reserve(static_cast<size_t>(n));
+    J_sto.resize(n);
     HqK.resize(n);
     if (direction_params.hessian_vec_finite_differences) {
         work_n.resize(n);
@@ -37,41 +63,33 @@ template <Config Conf>
 bool StructuredLBFGSDirection<Conf>::apply(real_t γₖ, crvec xₖ,
                                            [[maybe_unused]] crvec x̂ₖ, crvec pₖ,
                                            crvec grad_ψxₖ, rvec qₖ) const {
-    const auto n  = problem->get_n();
-    const auto un = static_cast<std::make_unsigned_t<decltype(n)>>(n);
-    const auto &C = problem->get_box_C();
-    const auto &D = problem->get_box_D();
+    const auto n = problem->get_n();
 
     // Find inactive indices J
-    J.clear();
-    for (index_t i = 0; i < n; ++i) {
-        real_t gd = xₖ(i) - γₖ * grad_ψxₖ(i);
-        if (gd <= C.lowerbound(i)) {        // i ∊ J̲ ⊆ K
-            qₖ(i) = pₖ(i);                  //
-        } else if (C.upperbound(i) <= gd) { // i ∊ J̅ ⊆ K
-            qₖ(i) = pₖ(i);                  //
-        } else {                            // i ∊ J
-            J.push_back(i);
-            qₖ(i) = direction_params.hessian_vec ? 0 : -grad_ψxₖ(i);
-        }
-    }
+    auto nJ = problem->eval_inactive_indices_res_lna(γₖ, xₖ, grad_ψxₖ, J_sto);
+    auto J = J_sto.topRows(nJ);
 
     // There are no inactive indices J
-    if (J.empty()) {
+    if (nJ == 0) {
         // No free variables, no Newton step possible
         return false; // Simply use the projection step
     }
     // There are inactive indices J
-    if (J.size() == un) { // There are no active indices K
+    if (J.size() == n) { // There are no active indices K
         // If all indices are free, we can use standard L-BFGS,
-        qₖ = -grad_ψxₖ;
+        qₖ = (real_t(1) / γₖ) * pₖ;
         return lbfgs.apply(qₖ, γₖ);
     }
     // There are active indices K
+    qₖ = pₖ;
+    if (direction_params.hessian_vec)
+        qₖ(J).setZero();
+    else
+        qₖ(J) = (real_t(1) / γₖ) * pₖ(J);
     if (direction_params.hessian_vec) {
-        approximate_hessian_vec_term(xₖ, grad_ψxₖ, qₖ, D);
+        approximate_hessian_vec_term(xₖ, grad_ψxₖ, qₖ, J);
         // Compute right-hand side of 6.1c
-        qₖ(J) = -grad_ψxₖ(J) - HqK(J);
+        qₖ(J) = (real_t(1) / γₖ) * pₖ(J) - HqK(J);
     }
 
     // If there are active indices, we need the specialized version
@@ -87,7 +105,7 @@ bool StructuredLBFGSDirection<Conf>::apply(real_t γₖ, crvec xₖ,
     switch (direction_params.failure_policy) {
         case DirectionParams::FallbackToProjectedGradient: return success;
         case DirectionParams::UseScaledLBFGSInput:
-            if (J.size() == un)
+            if (nJ == n)
                 qₖ *= γₖ;
             else
                 qₖ(J) *= γₖ;
@@ -98,7 +116,7 @@ bool StructuredLBFGSDirection<Conf>::apply(real_t γₖ, crvec xₖ,
 
 template <Config Conf>
 void StructuredLBFGSDirection<Conf>::approximate_hessian_vec_term(
-    crvec xₖ, crvec grad_ψxₖ, rvec qₖ, const Box<config_t> &D) const {
+    crvec xₖ, crvec grad_ψxₖ, rvec qₖ, crindexvec J) const {
     const auto m = problem->get_m();
     // Either compute the Hessian-vector product using finite differences
     if (direction_params.hessian_vec_finite_differences) {
@@ -122,7 +140,8 @@ void StructuredLBFGSDirection<Conf>::approximate_hessian_vec_term(
                 // Hessian of the full augmented Lagrangian (if required)
                 if (direction_params.full_augmented_hessian) {
                     assert(m == 0 || problem->provides_eval_grad_gi());
-                    auto &g = work_m;
+                    const auto &D = problem->get_box_D();
+                    auto &g       = work_m;
                     problem->eval_g(xₖ, g);
                     for (index_t i = 0; i < m; ++i) {
                         real_t ζ = g(i) + (*y)(i) / (*Σ)(i);

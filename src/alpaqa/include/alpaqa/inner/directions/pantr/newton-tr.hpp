@@ -3,6 +3,7 @@
 #include <alpaqa/accelerators/steihaugcg.hpp>
 #include <alpaqa/problem/type-erased-problem.hpp>
 #include <alpaqa/util/alloc-check.hpp>
+#include <alpaqa/util/index-set.hpp>
 #include <cmath>
 #include <limits>
 #include <optional>
@@ -52,9 +53,10 @@ struct NewtonTRDirection {
             !problem.provides_eval_hess_ψ_prod())
             throw std::invalid_argument("NewtonTR without finite differences "
                                         "requires Problem::eval_hess_ψ_prod()");
-        if (!problem.provides_get_box_C())
-            throw std::invalid_argument("NewtonTR requires "
-                                        "Problem::get_box_C()");
+        if (!problem.provides_eval_inactive_indices_res_lna())
+            throw std::invalid_argument(
+                "NewtonTR requires "
+                "Problem::eval_inactive_indices_res_lna()");
         // Store references to problem and ALM variables
         this->problem = &problem;
         this->y.emplace(y);
@@ -97,28 +99,20 @@ struct NewtonTRDirection {
             throw std::logic_error("Trust radius too small");
 
         // Newton with exact Hessian
-        const auto n      = problem->get_n();
-        const auto &C     = problem->get_box_C();
-        real_t norm_qK_sq = 0;
-        index_t nJ        = 0;
-        // Find inactive constraints
-        for (index_t i = 0; i < n; ++i) {
-            real_t gd = xₖ(i) - γₖ * grad_ψxₖ(i);
-            // i ∊ K
-            if (gd <= C.lowerbound(i) || C.upperbound(i) <= gd) {
-                qₖ(i) = pₖ(i);
-                norm_qK_sq += qₖ(i) * qₖ(i);
-            }
-            // i ∊ J
-            else {
-                qₖ(i)        = 0;
-                rJ_sto(nJ)   = grad_ψxₖ(i);
-                JK_sto(nJ++) = i;
-            }
-        }
-        auto J  = JK_sto.topRows(nJ);
+
+        // Find inactive and active constraints
+        const auto n = problem->get_n();
+        index_t nJ =
+            problem->eval_inactive_indices_res_lna(γₖ, xₖ, grad_ψxₖ, JK_sto);
+        auto J = JK_sto.topRows(nJ);
+        auto K = JK_sto.bottomRows(n - nJ);
+        detail::IndexSet<config_t>::compute_complement(J, K, n);
         auto rJ = rJ_sto.topRows(nJ);
         auto qJ = qJ_sto.topRows(nJ);
+        rJ      = (-real_t(1) / γₖ) * pₖ(J);
+        qₖ(K)   = pₖ(K);
+        qₖ(J).setZero();
+        real_t norm_qK_sq = pₖ(K).squaredNorm();
 
         // Hessian-vector term
         if (direction_params.hessian_vec_factor != 0) {

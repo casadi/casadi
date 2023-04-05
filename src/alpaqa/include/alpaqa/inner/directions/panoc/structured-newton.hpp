@@ -68,6 +68,7 @@ struct StructuredNewtonDirection {
         if (!(problem.provides_get_box_C() && problem.provides_get_box_D()))
             throw std::invalid_argument(
                 "Structured Newton only supports box-constrained problems");
+        // TODO: support eval_inactive_indices_res_lna
         if (!problem.provides_eval_hess_ψ())
             throw std::invalid_argument("Structured Newton requires hess_ψ");
         // Store references to problem and ALM variables

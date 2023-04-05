@@ -29,6 +29,7 @@ struct ProblemWithCounters {
     void eval_proj_diff_g(crvec z, rvec e) const { ++evaluations->proj_diff_g; return timed(evaluations->time.proj_diff_g, std::bind(&std::remove_cvref_t<Problem>::eval_proj_diff_g, &problem, z, e)); }
     void eval_proj_multipliers(rvec y, real_t M) const { ++evaluations->proj_multipliers; return timed(evaluations->time.proj_multipliers, std::bind(&std::remove_cvref_t<Problem>::eval_proj_multipliers, &problem, y, M)); }
     real_t eval_prox_grad_step(real_t γ, crvec x, crvec grad_ψ, rvec x̂, rvec p) const { ++evaluations->prox_grad_step; return timed(evaluations->time.prox_grad_step, std::bind(&std::remove_cvref_t<Problem>::eval_prox_grad_step, &problem, γ, x, grad_ψ, x̂, p)); }
+    index_t eval_inactive_indices_res_lna(real_t γ, crvec x, crvec grad_ψ, rindexvec J) const requires requires { &std::remove_cvref_t<Problem>::eval_inactive_indices_res_lna; } { ++evaluations->inactive_indices_res_lna; return timed(evaluations->time.inactive_indices_res_lna, std::bind(&std::remove_cvref_t<Problem>::eval_inactive_indices_res_lna, &problem, γ, x, grad_ψ, J)); }
     real_t eval_f(crvec x) const { ++evaluations->f; return timed(evaluations->time.f, std::bind(&std::remove_cvref_t<Problem>::eval_f, &problem, x)); }
     void eval_grad_f(crvec x, rvec grad_fx) const { ++evaluations->grad_f; return timed(evaluations->time.grad_f, std::bind(&std::remove_cvref_t<Problem>::eval_grad_f, &problem, x, grad_fx)); }
     void eval_g(crvec x, rvec gx) const { ++evaluations->g; return timed(evaluations->time.g, std::bind(&std::remove_cvref_t<Problem>::eval_g, &problem, x, gx)); }
@@ -54,6 +55,7 @@ struct ProblemWithCounters {
     void check() const requires requires { &std::remove_cvref_t<Problem>::check; } { return problem.check(); }
 
     [[nodiscard]] bool provides_eval_grad_gi() const requires requires (Problem p) { { p.provides_eval_grad_gi() } -> std::convertible_to<bool>; } { return problem.provides_eval_grad_gi(); }
+    [[nodiscard]] bool provides_eval_inactive_indices_res_lna() const requires requires (Problem p) { { p.provides_eval_inactive_indices_res_lna() } -> std::convertible_to<bool>; } { return problem.provides_eval_inactive_indices_res_lna(); }
     [[nodiscard]] bool provides_eval_jac_g() const requires requires (Problem p) { { p.provides_eval_jac_g() } -> std::convertible_to<bool>; } { return problem.provides_eval_jac_g(); }
     [[nodiscard]] bool provides_get_jac_g_num_nonzeros() const requires requires (Problem p) { { p.provides_get_jac_g_num_nonzeros() } -> std::convertible_to<bool>; } { return problem.provides_get_jac_g_num_nonzeros(); }
     [[nodiscard]] bool provides_eval_hess_L_prod() const requires requires (Problem p) { { p.provides_eval_hess_L_prod() } -> std::convertible_to<bool>; } { return problem.provides_eval_hess_L_prod(); }

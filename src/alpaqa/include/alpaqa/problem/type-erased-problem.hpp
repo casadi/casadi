@@ -43,6 +43,8 @@ struct ProblemVTable : util::BasicVTable {
         eval_g;
     required_const_function_t<void(crvec x, crvec y, rvec grad_gxy)>
         eval_grad_g_prod;
+    optional_const_function_t<index_t(real_t γ, crvec x, crvec grad_ψ, rindexvec J)>
+        eval_inactive_indices_res_lna = default_eval_inactive_indices_res_lna;
 
     // Second order
     optional_const_function_t<void(crvec x, rindexvec inner_idx, rindexvec outer_ptr, rvec J_values)>
@@ -96,6 +98,9 @@ struct ProblemVTable : util::BasicVTable {
 
     ALPAQA_EXPORT static real_t calc_ŷ_dᵀŷ(const void *self, rvec g_ŷ, crvec y, crvec Σ,
                                            const ProblemVTable &vtable);
+    ALPAQA_EXPORT static index_t default_eval_inactive_indices_res_lna(const void *, real_t, crvec,
+                                                                       crvec, rindexvec,
+                                                                       const ProblemVTable &);
     ALPAQA_EXPORT static void default_eval_jac_g(const void *, crvec, rindexvec, rindexvec, rvec,
                                                  const ProblemVTable &);
     ALPAQA_EXPORT static length_t default_get_jac_g_num_nonzeros(const void *,
@@ -155,6 +160,7 @@ struct ProblemVTable : util::BasicVTable {
         ALPAQA_TE_REQUIRED_METHOD(vtable, P, eval_grad_f);
         ALPAQA_TE_REQUIRED_METHOD(vtable, P, eval_g);
         ALPAQA_TE_REQUIRED_METHOD(vtable, P, eval_grad_g_prod);
+        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_inactive_indices_res_lna, t.t);
         // Second order
         ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_jac_g, t.t);
         ALPAQA_TE_OPTIONAL_METHOD(vtable, P, get_jac_g_num_nonzeros, t.t);
@@ -307,6 +313,25 @@ class TypeErasedProblem : public util::TypeErased<ProblemVTable<Conf>, Allocator
     /// @note   The vector @f$ p @f$ is often used in stopping criteria, so its
     ///         numerical accuracy is more important than that of @f$ \hat x @f$.
     real_t eval_prox_grad_step(real_t γ, crvec x, crvec grad_ψ, rvec x̂, rvec p) const;
+    /// **[Optional]**
+    /// Function that computes the inactive indices @f$ \mathcal J(x) @f$ for
+    /// the evaluation of the linear Newton approximation of the residual, as in
+    /// @cite pas2022alpaqa.
+    /// @param  [in] γ
+    ///         Step size, @f$ \gamma \in \R_{>0} @f$
+    /// @param  [in] x
+    ///         Decision variable @f$ x \in \R^n @f$
+    /// @param  [in] grad_ψ
+    ///         Gradient of the subproblem cost, @f$ \nabla\psi(x) \in \R^n @f$
+    /// @param  [out] J
+    ///         The indices of the components of @f$ x @f$ that are in the
+    ///         index set @f$ \mathcal J(x) @f$. In ascending order, at most n.
+    /// @return The number of inactive constraints, @f$ \# \mathcal J(x) @f$.
+    ///
+    /// For example, in the case of box constraints, we have
+    /// @f[ \mathcal J(x) \defeq \defset{i \in \N_{[0, n-1]}}{\underline x_i
+    /// \lt x_i - \gamma\nabla_{\!x_i}\psi(x) \lt \overline x_i}. @f]
+    index_t eval_inactive_indices_res_lna(real_t γ, crvec x, crvec grad_ψ, rindexvec J) const;
 
     /// @}
 
@@ -548,6 +573,11 @@ class TypeErasedProblem : public util::TypeErased<ProblemVTable<Conf>, Allocator
     /// @{
 
     /// Returns true if the problem provides an implementation of
+    /// @ref eval_inactive_indices_res_lna.
+    bool provides_eval_inactive_indices_res_lna() const {
+        return vtable.eval_inactive_indices_res_lna != vtable.default_eval_inactive_indices_res_lna;
+    }
+    /// Returns true if the problem provides an implementation of
     /// @ref eval_jac_g.
     bool provides_eval_jac_g() const { return vtable.eval_jac_g != vtable.default_eval_jac_g; }
     /// Returns true if the problem provides an implementation of
@@ -686,6 +716,13 @@ auto TypeErasedProblem<Conf, Allocator>::eval_prox_grad_step(real_t γ, crvec x,
     return call(vtable.eval_prox_grad_step, γ, x, grad_ψ, x̂, p);
 }
 template <Config Conf, class Allocator>
+auto TypeErasedProblem<Conf, Allocator>::eval_inactive_indices_res_lna(real_t γ, crvec x,
+                                                                       crvec grad_ψ,
+                                                                       rindexvec J) const
+    -> index_t {
+    return call(vtable.eval_inactive_indices_res_lna, γ, x, grad_ψ, J);
+}
+template <Config Conf, class Allocator>
 auto TypeErasedProblem<Conf, Allocator>::eval_f(crvec x) const -> real_t {
     return call(vtable.eval_f, x);
 }
@@ -798,22 +835,23 @@ void TypeErasedProblem<Conf, Allocator>::check() const {
 
 template <Config Conf>
 void print_provided_functions(std::ostream &os, const TypeErasedProblem<Conf> &problem) {
-    os << "           eval_grad_gi: " << problem.provides_eval_grad_gi() << '\n'
-       << "                  jac_g: " << problem.provides_eval_jac_g() << '\n'
-       << "       eval_hess_L_prod: " << problem.provides_eval_hess_L_prod() << '\n'
-       << "            eval_hess_L: " << problem.provides_eval_hess_L() << '\n'
-       << "       eval_hess_ψ_prod: " << problem.provides_eval_hess_ψ_prod() << '\n'
-       << "            eval_hess_ψ: " << problem.provides_eval_hess_ψ() << '\n'
-       << "          eval_f_grad_f: " << problem.provides_eval_f_grad_f() << '\n'
-       << "               eval_f_g: " << problem.provides_eval_f_g() << '\n'
-       << "eval_grad_f_grad_g_prod: " << problem.provides_eval_grad_f_grad_g_prod() << '\n'
-       << "            eval_grad_L: " << problem.provides_eval_grad_L() << '\n'
-       << "                 eval_ψ: " << problem.provides_eval_ψ() << '\n'
-       << "            eval_grad_ψ: " << problem.provides_eval_grad_ψ() << '\n'
-       << "          eval_ψ_grad_ψ: " << problem.provides_eval_ψ_grad_ψ() << '\n'
-       << "              get_box_C: " << problem.provides_get_box_C() << '\n'
-       << "              get_box_D: " << problem.provides_get_box_D() << '\n'
-       << "                  check: " << problem.provides_check() << '\n';
+    os << "inactive_indices_res_lna: " << problem.provides_eval_inactive_indices_res_lna() << '\n'
+       << "                 grad_gi: " << problem.provides_eval_grad_gi() << '\n'
+       << "                   jac_g: " << problem.provides_eval_jac_g() << '\n'
+       << "             hess_L_prod: " << problem.provides_eval_hess_L_prod() << '\n'
+       << "                  hess_L: " << problem.provides_eval_hess_L() << '\n'
+       << "             hess_ψ_prod: " << problem.provides_eval_hess_ψ_prod() << '\n'
+       << "                  hess_ψ: " << problem.provides_eval_hess_ψ() << '\n'
+       << "                f_grad_f: " << problem.provides_eval_f_grad_f() << '\n'
+       << "                     f_g: " << problem.provides_eval_f_g() << '\n'
+       << "      grad_f_grad_g_prod: " << problem.provides_eval_grad_f_grad_g_prod() << '\n'
+       << "                  grad_L: " << problem.provides_eval_grad_L() << '\n'
+       << "                       ψ: " << problem.provides_eval_ψ() << '\n'
+       << "                  grad_ψ: " << problem.provides_eval_grad_ψ() << '\n'
+       << "                ψ_grad_ψ: " << problem.provides_eval_ψ_grad_ψ() << '\n'
+       << "               get_box_C: " << problem.provides_get_box_C() << '\n'
+       << "               get_box_D: " << problem.provides_get_box_D() << '\n'
+       << "                   check: " << problem.provides_check() << '\n';
 }
 
 /// @}
