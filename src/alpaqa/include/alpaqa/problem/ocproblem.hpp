@@ -313,7 +313,8 @@ class TypeErasedControlProblem : public util::TypeErased<ControlProblemVTable<Co
     /// @param  [inout] y
     ///         Multipliers, @f$ y \leftarrow \Pi_Y(y) \in \R^m @f$
     /// @param  [in] M
-    ///         The radius/size of the set @f$ Y @f$. See @ref ALMParams::M.
+    ///         The radius/size of the set @f$ Y @f$.
+    ///         See @ref ALMParams::max_multiplier.
     void eval_proj_multipliers(rvec y, real_t M) const;
 
     /// @}
