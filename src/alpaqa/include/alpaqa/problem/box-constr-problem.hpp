@@ -51,8 +51,11 @@ class BoxConstrProblem {
     /// Number of constraints, @ref m
     length_t get_m() const { return m; }
 
-    /// @f$ \hat x = \Pi_C(x - \gamma\nabla\psi(x)) @f$
-    /// @f$ p = \hat x - x @f$
+    /** Projected gradient step for rectangular box C.
+      * @f[ \begin{aligned} \hat x &= \Pi_C(x - \gamma\nabla\psi(x)) \\
+      * p &= \hat x - x \\
+      * &= \max(\underline x - x, \;\min(-\gamma\nabla\psi(x), \overline x - x)
+      * \end{aligned} @f] */
     static real_t eval_proj_grad_step_box(const Box &C, real_t γ, crvec x, crvec grad_ψ, rvec x̂,
                                           rvec p) {
         p = (-γ * grad_ψ).cwiseMax(C.lowerbound - x).cwiseMin(C.upperbound - x);
@@ -60,9 +63,23 @@ class BoxConstrProblem {
         return real_t(0);
     }
 
-    /// @f$ \hat x = \Pi_C(x - \gamma\nabla\psi(x)) @f$
-    /// @f$ p = \hat x - x @f$
-    static void eval_proj_grad_step_box_l1_impl(const Box &C, const auto &λ, real_t γ, crvec x,
+    /** Proximal gradient step for rectangular box C with ℓ₁-regularization.
+      * @f[ \begin{aligned} h(x) &= \|x\|_1 + \delta_C(x) \\
+      * \hat x &= \prox_{\gamma h}(x - \gamma\nabla\psi(x)) \\
+      * &= -\max\big(
+      *         x - \overline x,
+      *         \;\min\big(
+      *             x - \underline x,
+      *             \;\min\big(
+      *                 \gamma(\nabla\psi(x) + \lambda),
+      *                 \;\max\big(
+      *                     \gamma(\nabla\psi(x) - \lambda),
+      *                     x
+      *                 \big)
+      *             \big)
+      *         \big)
+      *     \big) \end{aligned} @f] */
+    static void eval_prox_grad_step_box_l1_impl(const Box &C, const auto &λ, real_t γ, crvec x,
                                                 crvec grad_ψ, rvec x̂, rvec p) {
         p = -x.cwiseMax(γ * (grad_ψ - λ))
                  .cwiseMin(γ * (grad_ψ + λ))
@@ -70,21 +87,19 @@ class BoxConstrProblem {
                  .cwiseMax(x - C.upperbound);
         x̂ = x + p;
     }
-    /// @f$ \hat x = \Pi_C(x - \gamma\nabla\psi(x)) @f$
-    /// @f$ p = \hat x - x @f$
-    static real_t eval_proj_grad_step_box_l1(const Box &C, const auto &λ, real_t γ, crvec x,
+    /// @copydoc eval_prox_grad_step_box_l1_impl
+    static real_t eval_prox_grad_step_box_l1(const Box &C, const auto &λ, real_t γ, crvec x,
                                              crvec grad_ψ, rvec x̂, rvec p) {
-        eval_proj_grad_step_box_l1_impl(C, λ, γ, x, grad_ψ, x̂, p);
+        eval_prox_grad_step_box_l1_impl(C, λ, γ, x, grad_ψ, x̂, p);
         return vec_util::norm_1(x̂.cwiseProduct(λ));
     }
 
-    /// @f$ \hat x = \Pi_C(x - \gamma\nabla\psi(x)) @f$
-    /// @f$ p = \hat x - x @f$
-    static real_t eval_proj_grad_step_box_l1_scal(const Box &C, real_t λ, real_t γ, crvec x,
+    /// @copydoc eval_prox_grad_step_box_l1_impl
+    static real_t eval_prox_grad_step_box_l1_scal(const Box &C, real_t λ, real_t γ, crvec x,
                                                   crvec grad_ψ, rvec x̂, rvec p) {
         auto n     = x.size();
         auto λ_vec = vec::Constant(n, λ);
-        eval_proj_grad_step_box_l1_impl(C, λ_vec, γ, x, grad_ψ, x̂, p);
+        eval_prox_grad_step_box_l1_impl(C, λ_vec, γ, x, grad_ψ, x̂, p);
         return λ * vec_util ::norm_1(x̂);
     }
 
@@ -93,9 +108,9 @@ class BoxConstrProblem {
         if (l1_reg.size() == 0)
             return eval_proj_grad_step_box(C, γ, x, grad_ψ, x̂, p);
         else if (l1_reg.size() == 1)
-            return eval_proj_grad_step_box_l1_scal(C, l1_reg(0), γ, x, grad_ψ, x̂, p);
+            return eval_prox_grad_step_box_l1_scal(C, l1_reg(0), γ, x, grad_ψ, x̂, p);
         else
-            return eval_proj_grad_step_box_l1(C, l1_reg, γ, x, grad_ψ, x̂, p);
+            return eval_prox_grad_step_box_l1(C, l1_reg, γ, x, grad_ψ, x̂, p);
     }
 
     /// @see @ref TypeErasedProblem::eval_proj_diff_g
