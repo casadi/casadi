@@ -39,7 +39,7 @@ The package can be easily installed using:
 
    install/*
    usage/*
-   examples/examples_landing_page
+   examples/index.rst
    reference/python-api.rst
    reference/cpp-api.rst
    contribution/*

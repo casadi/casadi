@@ -7,6 +7,6 @@ Examples
    :caption: Examples
 
    ./*
-   ./mpc/mpc_landing_page.rst
+   ./mpc/index.rst
 
 

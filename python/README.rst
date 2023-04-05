@@ -23,7 +23,7 @@ Documentation
 -------------
 
 - `Sphinx documentation <https://kul-optec.github.io/alpaqa/develop/Sphinx/index.html>`_
-- `Python examples <https://kul-optec.github.io/alpaqa/develop/Sphinx/examples/examples_landing_page.html>`_
+- `Python examples <https://kul-optec.github.io/alpaqa/develop/Sphinx/examples/index.html>`_
 - `Doxygen documentation <https://kul-optec.github.io/alpaqa/develop/Doxygen/index.html>`_
 - `C++ examples <https://kul-optec.github.io/alpaqa/develop/Doxygen/examples.html>`_
 

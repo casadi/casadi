@@ -27,7 +27,7 @@ page).
 
 ## Examples
 
-[**Python examples**](https://kul-optec.github.io/alpaqa/Sphinx/examples/examples_landing_page.html)  
+[**Python examples**](https://kul-optec.github.io/alpaqa/Sphinx/examples/index.html)  
 [**C++ examples**](https://kul-optec.github.io/alpaqa/Doxygen/examples.html)  
 
 To get started using the C++ API, see the @ref C++/CustomCppProblem/main.cpp

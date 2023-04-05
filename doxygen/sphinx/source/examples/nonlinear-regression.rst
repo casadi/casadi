@@ -1,7 +1,7 @@
-.. _nonlinear regression problem:
+.. _nonlinear regression example:
 
-Nonlinear regression problem 
-===============================
+Nonlinear regression
+====================
 
 In this example, we use the PANTR solver to fit a nonlinear model to some noisy
 data. The model is given by :math:`y = p_1\ \sin(p_2 x) + p_3`, and the goal is
