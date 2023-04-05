@@ -1,5 +1,5 @@
 #include <alpaqa/panoc-alm.hpp>
-#include <alpaqa/problem/type-erased-problem.hpp>
+#include <alpaqa/problem/functional-problem.hpp>
 #include <alpaqa/structured-panoc-alm.hpp>
 
 #include <test-util/eigen-matchers.hpp>

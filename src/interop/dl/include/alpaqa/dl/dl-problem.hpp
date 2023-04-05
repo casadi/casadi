@@ -2,7 +2,7 @@
 
 #include <alpaqa/config/config.hpp>
 #include <alpaqa/dl/dl-problem.h>
-#include <alpaqa/problem/type-erased-problem.hpp>
+#include <alpaqa/problem/box-constr-problem.hpp>
 #include <alpaqa/util/demangled-typename.hpp>
 
 #include <memory>

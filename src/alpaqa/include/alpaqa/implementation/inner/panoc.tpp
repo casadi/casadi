@@ -13,6 +13,7 @@
 #include <alpaqa/implementation/util/print.tpp>
 #include <alpaqa/util/alloc-check.hpp>
 #include <alpaqa/util/quadmath/quadmath-print.hpp>
+#include <alpaqa/util/timed.hpp>
 
 namespace alpaqa {
 
@@ -151,7 +152,7 @@ auto PANOCSolver<DirectionProviderT>::operator()(
         if (!progress_cb)
             return;
         ScopedMallocAllower ma;
-        alpaqa::detail::Timed t{s.time_progress_callback};
+        alpaqa::util::Timed t{s.time_progress_callback};
         progress_cb(ProgressInfo{
             .k          = k,
             .status     = status,

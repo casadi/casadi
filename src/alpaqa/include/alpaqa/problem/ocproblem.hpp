@@ -6,6 +6,7 @@
 #include <alpaqa/problem/problem-counters.hpp>
 #include <alpaqa/util/not-implemented.hpp>
 #include <alpaqa/util/required-method.hpp>
+#include <alpaqa/util/timed.hpp>
 #include <alpaqa/util/type-erasure.hpp>
 #include <array>
 #include <concepts>
@@ -640,7 +641,7 @@ struct ControlProblemWithCounters {
   private:
     template <class TimeT, class FunT>
     [[gnu::always_inline]] static decltype(auto) timed(TimeT &time, FunT &&f) {
-        alpaqa::detail::Timed timed{time};
+        alpaqa::util::Timed timed{time};
         return std::forward<FunT>(f)();
     }
 };

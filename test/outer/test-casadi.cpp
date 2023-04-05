@@ -1,5 +1,6 @@
 #include <alpaqa/casadi/CasADiProblem.hpp>
 #include <alpaqa/panoc-alm.hpp>
+#include <alpaqa/problem/problem-with-counters.hpp>
 #include <alpaqa/structured-panoc-alm.hpp>
 
 #include <test-util/eigen-matchers.hpp>

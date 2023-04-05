@@ -3,8 +3,9 @@
 #include <alpaqa/casadi/CasADiProblem.hpp>
 #include <alpaqa/config/config.hpp>
 #include <alpaqa/dl/dl-problem.hpp>
+#include <alpaqa/params/params.hpp>
+#include <alpaqa/problem/problem-with-counters.hpp>
 #include <alpaqa/problem/type-erased-problem.hpp>
-#include "alpaqa/params/params.hpp"
 
 #include <filesystem>
 #include <iostream>

@@ -1,4 +1,5 @@
 #include <alpaqa/config/config.hpp>
+#include <alpaqa/problem/problem-with-counters.hpp>
 #include <alpaqa/problem/type-erased-problem.hpp>
 #include <alpaqa/util/not-implemented.hpp>
 #include <gmock/gmock.h>

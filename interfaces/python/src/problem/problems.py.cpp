@@ -10,7 +10,7 @@
 namespace py = pybind11;
 using namespace py::literals;
 
-#include <alpaqa/problem/problem-counters.hpp>
+#include <alpaqa/problem/problem-with-counters.hpp>
 #include <alpaqa/problem/type-erased-problem.hpp>
 #if ALPAQA_HAVE_CASADI
 #include <alpaqa/casadi/CasADiProblem.hpp>
@@ -53,7 +53,7 @@ void register_problems(py::module_ &m) {
     using Box = alpaqa::Box<config_t>;
     py::class_<Box> box(m, "Box", "C++ documentation: :cpp:class:`alpaqa::Box`");
     default_copy_methods(box);
-    box                        //
+    box //
         .def(py::pickle(
             [](const Box &b) { // __getstate__
                 return py::make_tuple(b.upperbound, b.lowerbound);

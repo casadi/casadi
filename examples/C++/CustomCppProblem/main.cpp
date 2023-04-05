@@ -1,5 +1,6 @@
 #include <alpaqa/panoc-alm.hpp>
-#include <alpaqa/problem/type-erased-problem.hpp>
+#include <alpaqa/problem/box-constr-problem.hpp>
+#include <alpaqa/problem/problem-with-counters.hpp>
 
 #include <iostream>
 

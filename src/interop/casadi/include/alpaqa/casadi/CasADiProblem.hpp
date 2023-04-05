@@ -2,7 +2,7 @@
 
 #include <alpaqa/casadi-loader-export.hpp>
 #include <alpaqa/config/config.hpp>
-#include <alpaqa/problem/type-erased-problem.hpp>
+#include <alpaqa/problem/box-constr-problem.hpp>
 #include <alpaqa/util/copyable_unique_ptr.hpp>
 #include <filesystem>
 
