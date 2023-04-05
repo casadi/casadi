@@ -1,6 +1,7 @@
 #include <alpaqa/dl/dl-problem.hpp>
 
 #include <dlfcn.h>
+#include <cassert>
 #include <memory>
 #include <stdexcept>
 
