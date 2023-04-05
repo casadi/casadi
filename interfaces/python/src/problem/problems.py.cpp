@@ -105,6 +105,9 @@ void register_problems(py::module_ &m) {
                        "Number of general constraints, dimension of :math:`g(x)`")
         .def_readwrite("C", &BoxConstrProblem::C, "Box constraints on :math:`x`")
         .def_readwrite("D", &BoxConstrProblem::D, "Box constraints on :math:`g(x)`")
+        .def_readwrite("l1_reg", &BoxConstrProblem::l1_reg,
+                       py::return_value_policy::reference_internal,
+                       ":math:`\\ell_1` regularization on :math:`x`")
         .def("eval_proj_diff_g", &BoxConstrProblem::eval_proj_diff_g, "z"_a, "e"_a)
         .def("eval_proj_multipliers", &BoxConstrProblem::eval_proj_multipliers, "y"_a, "M"_a)
         .def("eval_prox_grad_step", &BoxConstrProblem::eval_prox_grad_step, "γ"_a, "x"_a,

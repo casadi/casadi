@@ -27,8 +27,9 @@ class BoxConstrProblem {
                      length_t m) ///< Number of constraints
         : n{n}, m{m} {}
 
-    BoxConstrProblem(Box C, Box D)
-        : n{C.lowerbound.size()}, m{D.lowerbound.size()}, C{std::move(C)}, D{std::move(D)} {}
+    BoxConstrProblem(Box C, Box D, vec l1_reg = vec(0))
+        : n{C.lowerbound.size()}, m{D.lowerbound.size()}, C{std::move(C)}, D{std::move(D)},
+          l1_reg{std::move(l1_reg)} {}
 
     BoxConstrProblem(const BoxConstrProblem &)                = default;
     BoxConstrProblem &operator=(const BoxConstrProblem &)     = default;
@@ -39,6 +40,11 @@ class BoxConstrProblem {
     Box C{this->n};
     /// Other constraints, @f$ g(x) \in D @f$
     Box D{this->m};
+    /// @f$ \ell_1 @f$ (1-norm) regularization parameter.
+    /// Possible dimensions are: @f$ 0 @f$ (no regularization), @f$ 1 @f$ (a
+    /// single scalar factor), or @f$ n @f$ (a different factor for each
+    /// variable).
+    vec l1_reg{};
 
     /// Number of decision variables, @ref n
     length_t get_n() const { return n; }
@@ -49,17 +55,47 @@ class BoxConstrProblem {
     /// @f$ p = \hat x - x @f$
     static real_t eval_proj_grad_step_box(const Box &C, real_t γ, crvec x, crvec grad_ψ, rvec x̂,
                                           rvec p) {
-        using binary_real_f = real_t (*)(real_t, real_t);
-        p                   = (-γ * grad_ψ)
-                .binaryExpr(C.lowerbound - x, binary_real_f(std::fmax))
-                .binaryExpr(C.upperbound - x, binary_real_f(std::fmin));
+        p = (-γ * grad_ψ).cwiseMax(C.lowerbound - x).cwiseMin(C.upperbound - x);
         x̂ = x + p;
         return real_t(0);
     }
 
+    /// @f$ \hat x = \Pi_C(x - \gamma\nabla\psi(x)) @f$
+    /// @f$ p = \hat x - x @f$
+    static void eval_proj_grad_step_box_l1_impl(const Box &C, const auto &λ, real_t γ, crvec x,
+                                                crvec grad_ψ, rvec x̂, rvec p) {
+        p = -x.cwiseMax(γ * (grad_ψ - λ))
+                 .cwiseMin(γ * (grad_ψ + λ))
+                 .cwiseMin(x - C.lowerbound)
+                 .cwiseMax(x - C.upperbound);
+        x̂ = x + p;
+    }
+    /// @f$ \hat x = \Pi_C(x - \gamma\nabla\psi(x)) @f$
+    /// @f$ p = \hat x - x @f$
+    static real_t eval_proj_grad_step_box_l1(const Box &C, const auto &λ, real_t γ, crvec x,
+                                             crvec grad_ψ, rvec x̂, rvec p) {
+        eval_proj_grad_step_box_l1_impl(C, λ, γ, x, grad_ψ, x̂, p);
+        return vec_util::norm_1(x̂.cwiseProduct(λ));
+    }
+
+    /// @f$ \hat x = \Pi_C(x - \gamma\nabla\psi(x)) @f$
+    /// @f$ p = \hat x - x @f$
+    static real_t eval_proj_grad_step_box_l1_scal(const Box &C, real_t λ, real_t γ, crvec x,
+                                                  crvec grad_ψ, rvec x̂, rvec p) {
+        auto n     = x.size();
+        auto λ_vec = vec::Constant(n, λ);
+        eval_proj_grad_step_box_l1_impl(C, λ_vec, γ, x, grad_ψ, x̂, p);
+        return λ * vec_util ::norm_1(x̂);
+    }
+
     /// @see @ref TypeErasedProblem::eval_prox_grad_step
     real_t eval_prox_grad_step(real_t γ, crvec x, crvec grad_ψ, rvec x̂, rvec p) const {
-        return eval_proj_grad_step_box(C, γ, x, grad_ψ, x̂, p);
+        if (l1_reg.size() == 0)
+            return eval_proj_grad_step_box(C, γ, x, grad_ψ, x̂, p);
+        else if (l1_reg.size() == 1)
+            return eval_proj_grad_step_box_l1_scal(C, l1_reg(0), γ, x, grad_ψ, x̂, p);
+        else
+            return eval_proj_grad_step_box_l1(C, l1_reg, γ, x, grad_ψ, x̂, p);
     }
 
     /// @see @ref TypeErasedProblem::eval_proj_diff_g
@@ -108,6 +144,10 @@ class BoxConstrProblem {
         util::check_dim_msg<config_t>(
             D.upperbound, m,
             "Length of problem.D.upperbound does not match problem size problem.m");
+        if (l1_reg.size() > 1)
+            util::check_dim_msg<config_t>(
+                l1_reg, n,
+                "Length of problem.l1_reg does not match problem size problem.n, 1 or 0");
         if (penalty_alm_split < 0 || penalty_alm_split > m)
             throw std::invalid_argument("Invalid penalty_alm_split");
     }
