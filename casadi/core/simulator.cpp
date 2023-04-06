@@ -315,6 +315,7 @@ int Simulator::eval(const double** arg, double** res, casadi_int* iw, double* w,
     if (m->z) m->z += nz_;
   }
   // Print stats
+  join_results(m);
   if (print_stats_) print_stats(m);
   return 0;
 }
