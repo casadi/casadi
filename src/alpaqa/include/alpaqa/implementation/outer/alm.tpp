@@ -35,6 +35,7 @@ ALMSolver<InnerSolverT>::operator()(const Problem &p, rvec x, rvec y) {
             .max_time                 = params.max_time,
             .tolerance                = params.tolerance,
             .os                       = os,
+            .check                    = false,
         };
         auto ps              = inner_solver(p, opts, x, y, Σ, error);
         bool inner_converged = ps.status == SolverStatus::Converged;
@@ -108,6 +109,7 @@ ALMSolver<InnerSolverT>::operator()(const Problem &p, rvec x, rvec y) {
             .tolerance                = ε,
             .os                       = os,
             .outer_iter               = i,
+            .check                    = false,
         };
         // Call the inner solver to minimize the augmented lagrangian for fixed
         // Lagrange multipliers y.

@@ -37,6 +37,9 @@ auto PANOCSolver<DirectionProviderT>::operator()(
     /// [out]   Slack variable error @f$ g(x) - \Pi_D(g(x) + \Sigma^{-1} y) @f$
     rvec err_z) -> Stats {
 
+    if (opts.check)
+        problem.check();
+
     using std::chrono::nanoseconds;
     auto os         = opts.os ? opts.os : this->os;
     auto start_time = std::chrono::steady_clock::now();

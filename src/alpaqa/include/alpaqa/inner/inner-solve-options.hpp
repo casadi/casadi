@@ -23,6 +23,8 @@ struct InnerSolveOptions {
     std::ostream *os = nullptr;
     /// The current iteration of the outer solver.
     unsigned outer_iter = 0;
+    /// Call @ref TypeErasedProblem::check() before starting to solve.
+    bool check = true;
 };
 
 } // namespace alpaqa

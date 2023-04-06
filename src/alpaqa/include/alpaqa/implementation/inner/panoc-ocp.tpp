@@ -57,6 +57,9 @@ auto PANOCOCPSolver<Conf>::operator()(
     /// [out]   Slack variable error @f$ c(x) - \Pi_D(c(x) + \mu^{-1} y) @f$
     rvec err_z) -> Stats {
 
+    if (opts.check)
+        problem.check();
+
     using std::chrono::nanoseconds;
     auto os         = opts.os ? opts.os : this->os;
     auto start_time = std::chrono::steady_clock::now();

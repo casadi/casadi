@@ -28,6 +28,9 @@ auto LBFGSBSolver::operator()(
     /// [out]   Slack variable error @f$ g(x) - \Pi_D(g(x) + \Sigma^{-1} y) @f$
     rvec err_z) -> Stats {
 
+    if (opts.check)
+        problem.check();
+
     using std::chrono::nanoseconds;
     using clock     = std::chrono::steady_clock;
     auto start_time = clock::now();
