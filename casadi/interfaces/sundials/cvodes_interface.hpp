@@ -110,6 +110,7 @@ class CASADI_INTEGRATOR_CVODES_EXPORT CvodesInterface : public SundialsInterface
   static const Options options_;
   const Options& get_options() const override { return options_;}
   double min_step_size_;
+  bool always_recalculate_jacobian_;
   ///@}
 
 
