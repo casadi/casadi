@@ -3,8 +3,8 @@ name: binaries
 on: push
 
 env:
-  cache-suffix: v6
-  build_flags: "-DWITH_COMMON=OFF -DWITH_BUILD_REQUIRED=ON -DWITH_BUILD_BONMIN=ON -DWITH_BONMIN=ON -DWITH_IPOPT=ON -DWITH_BUILD_IPOPT=ON -DWITH_BUILD_LAPACK=ON -DWITH_LAPACK=ON -DWITH_MUMPS=ON -DWITH_CLP=ON -DWITH_BUILD_CLP=ON -DWITH_CBC=ON -DWITH_BUILD_CBC=ON -DWITH_THREAD=ON -DWITH_QPOASES=ON -DWITH_HPIPM=ON -DWITH_BLASFEO=ON -DWITH_BUILD_HPIPM=ON -DWITH_BUILD_BLASFEO=ON -DWITH_HIGHS=ON -DWITH_BUILD_HIGHS=ON -DWITH_BUILD_SPRAL=ON -DWITH_SPRAL=ON -DWITH_PROXQP=ON -DWITH_OSQP=ON -DWITH_SUPERSCS=ON -DWITH_KNITRO=ON -DWITH_MOCKUP_KNITRO=ON -DWITH_CPLEX=ON -DWITH_MOCKUP_CPLEX=ON -DWITH_GUROBI=ON -DWITH_MOCKUP_GUROBI=ON -DWITH_HSL=ON -DWITH_MOCKUP_HSL=ON -DWITH_WORHP=ON -DWITH_MOCKUP_WORHP=ON -DWITH_SUNDIALS=ON -DWITH_BUILD_SUNDIALS=ON -DWITH_BUILD_CSPARSE=ON -DWITH_BUILD_METIS=ON -DWITH_BUILD_BLASFEO=ON -DWITH_BUILD_SUPERSCS=ON -DWITH_BUILD_OSQP=ON -DWITH_BUILD_EIGEN3=ON -DWITH_BUILD_SIMDE=ON -DWITH_BUILD_PROXQP=ON"
+  cache-suffix: v7
+  build_flags: "-DWITH_COMMON=OFF -DWITH_BUILD_REQUIRED=ON -DWITH_BUILD_BONMIN=ON -DWITH_BONMIN=ON -DWITH_IPOPT=ON -DWITH_BUILD_IPOPT=ON -DWITH_BUILD_LAPACK=ON -DWITH_LAPACK=ON -DWITH_MUMPS=ON -DWITH_CLP=ON -DWITH_BUILD_CLP=ON -DWITH_CBC=ON -DWITH_BUILD_CBC=ON -DWITH_THREAD=ON -DWITH_QPOASES=ON -DWITH_HPIPM=ON -DWITH_BLASFEO=ON -DWITH_BUILD_HPIPM=ON -DWITH_BUILD_BLASFEO=ON -DWITH_HIGHS=ON -DWITH_BUILD_HIGHS=ON -DWITH_BUILD_SPRAL=ON -DWITH_SPRAL=ON -DWITH_PROXQP=ON -DWITH_OSQP=ON -DWITH_SUPERSCS=ON -DWITH_KNITRO=ON -DWITH_MOCKUP_KNITRO=ON -DWITH_CPLEX=ON -DWITH_MOCKUP_CPLEX=ON -DWITH_GUROBI=ON -DWITH_MOCKUP_GUROBI=ON -DWITH_HSL=ON -DWITH_MOCKUP_HSL=ON -DWITH_WORHP=ON -DWITH_MOCKUP_WORHP=ON -DWITH_SUNDIALS=ON -DWITH_BUILD_SUNDIALS=ON -DWITH_BUILD_CSPARSE=ON -DWITH_BUILD_METIS=ON -DWITH_BUILD_BLASFEO=ON -DWITH_BUILD_SUPERSCS=ON -DWITH_BUILD_OSQP=ON -DWITH_BUILD_EIGEN3=ON -DWITH_BUILD_SIMDE=ON -DWITH_BUILD_PROXQP=ON -DWITH_SNOPT=ON -DWITH_MOCKUP_SNOPT=ON -DWITH_AMPL=ON -DWITH_BLOCKSQP=ON"
   build_flags_32bit: "-DWITH_HPIPM=OFF -DWITH_BLASFEO=OFF -DWITH_BUILD_HPIPM=OFF -DWITH_BUILD_BLASFEO=OFF -DWITH_CPLEX=OFF"
   build_flags_manylinux1: "-DWITH_HIGHS=OFF -DWITH_BUILD_HIGHS=OFF -DWITH_BUILD_SPRAL=OFF -DWITH_SPRAL=OFF -DWITH_PROXQP=OFF -DWITH_BUILD_PROXQP=OFF -DWITH_BUILD_EIGEN3=OFF -DWITH_BUILD_SIMDE=OFF"
   build_flags_windows: ""
@@ -21,31 +21,15 @@ jobs:
         uses: rlespinasse/github-slug-action@v4.4.0
       - run: |
           echo "CMAKE_VERSION=$(python misc/get_version.py)" >> $GITHUB_ENV
-        if: runner.os != 'Windows'
-      - run: |
-          echo "CMAKE_VERSION=$(python misc/get_version.py)" >> $env:GITHUB_ENV
-        if: runner.os == 'Windows'
-        shell: pwsh
-
       - run: |
           echo "CASADI_VERSION=${{ env.GITHUB_REF_SLUG }}" >> $GITHUB_ENV
           echo "WHEEL_VERSION=${{ env.CMAKE_VERSION}}.dev+${{ env.GITHUB_REF_SLUG }}" >> $GITHUB_ENV
-        if: runner.os != 'Windows' && !contains( env.GITHUB_REF_NAME , 'release-' )
+        if: "!contains( env.GITHUB_REF_NAME , 'release-' )"
       - run: |
-          echo "CASADI_VERSION=${{ env.GITHUB_REF_SLUG }}" >> $env:GITHUB_ENV
-          echo "WHEEL_VERSION=${{ env.CMAKE_VERSION}}.dev+${{ env.GITHUB_REF_SLUG }}" >> $env:GITHUB_ENV
-        if: runner.os == 'Windows' && !contains( env.GITHUB_REF_NAME , 'release-' )
-        shell: pwsh
-
-      - run: |
-          python -c "import sys;sys.stdout.write('CASADI_VERSION='+'${{ env.GITHUB_REF_SLUG }}'.split('-')[1])" >> $GITHUB_ENV
-          python -c "import sys;sys.stdout.write('WHEEL_VERSION='+'${{ env.GITHUB_REF_SLUG }}'.split('-')[1])" >> $GITHUB_ENV
-        if: runner.os != 'Windows' && contains( env.GITHUB_REF_NAME , 'release-' )
-      - run: |
-          python -c "import sys;sys.stdout.write('CASADI_VERSION='+'${{ env.GITHUB_REF_SLUG }}'.split('-')[1])" >> $env:GITHUB_ENV
-          python -c "import sys;sys.stdout.write('WHEEL_VERSION='+'${{ env.GITHUB_REF_SLUG }}'.split('-')[1])" >> $env:GITHUB_ENV
-        if: runner.os == 'Windows' && contains( env.GITHUB_REF_NAME , 'release-' )
-        shell: pwsh
+          python -c "print('CASADI_VERSION='+'${{ env.GITHUB_REF_SLUG }}'.split('-')[1])" >> $GITHUB_ENV
+          python -c "print('WHEEL_VERSION='+'${{ env.GITHUB_REF_SLUG }}'.split('-')[1])" >> $GITHUB_ENV
+        if: contains( env.GITHUB_REF_NAME , 'release-' )
+      - run: echo "CMAKE_VERSION=${{ env.CMAKE_VERSION }}, CASADI_VERSION=${{ env.CASADI_VERSION }}, WHEEL_VERSION=${{ env.WHEEL_VERSION }}"
     outputs:
       casadi: ${{ env.CASADI_VERSION }}
       wheel: ${{ env.WHEEL_VERSION }}
@@ -77,7 +61,7 @@ jobs:
     
     - name: set CMAKE default options
       run: |
-         sed -i 's/option(SWIG_IMPORT "Export SWIG" OFF)/option(SWIG_IMPORT "Import SWIG" ON)/g' CMakeLists.txt
+         sed -i 's/option(SWIG_IMPORT "Import SWIG" OFF)/option(SWIG_IMPORT "Import SWIG" ON)/g' CMakeLists.txt
 
     - name: build archives
       run: |
@@ -115,7 +99,7 @@ jobs:
     strategy:
      fail-fast: false
      matrix:
-       image: ["windows-2022","ubuntu-20.04","macos-11"]
+       image: ["windows-2022","ubuntu-20.04","macos-11","macos-m1"]
     steps:
       - uses: actions/checkout@v3.3.0
       - run: python --version
@@ -652,11 +636,11 @@ jobs:
           pwd
           tree python
           echo "PYTHON_INCLUDE_DIR=/work/python/include" >> $GITHUB_ENV
-          echo "PYTHON_LIBRARIES=/work/python/libs/python${{ matrix.py2 }}.lib" >> $GITHUB_ENV
+          echo "PYTHON_LIBRARY=/work/python/libs/python${{ matrix.py2 }}.lib" >> $GITHUB_ENV
       - run: rm -rf install
       - name: Build
         run: |
-          ./dockcross cmake -Bbuild -DWITH_PYTHON=ON -DPYTHON_LIBRARIES=${{ env.PYTHON_LIBRARIES}} -DPYTHON_INCLUDE_DIR=${{ env.PYTHON_INCLUDE_DIR }} -USWIG_IMPORT  -DCMAKE_INSTALL_PREFIX=/work/install -DSKIP_CONFIG_H_GENERATION=ON
+          ./dockcross cmake -Bbuild -DWITH_PYTHON=ON -DPYTHON_LIBRARY=${{ env.PYTHON_LIBRARY}} -DPYTHON_INCLUDE_DIR=${{ env.PYTHON_INCLUDE_DIR }} -USWIG_IMPORT  -DCMAKE_INSTALL_PREFIX=/work/install -DSKIP_CONFIG_H_GENERATION=ON
           ./dockcross cmake --build build --target install -v
       - uses: dsaltares/fetch-gh-release-asset@1.1.0
         with:
@@ -748,7 +732,7 @@ jobs:
      fail-fast: false
      matrix:
        matlab: ["2018b"]
-       image: ["windows-2022","ubuntu-20.04","macos-11"]
+       image: ["windows-2022","ubuntu-20.04","macos-11","macos-m1"]
        bit: [64]
        exclude:
         # No Windows 32bit builds currently
@@ -864,7 +848,7 @@ jobs:
           overwrite: true
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
           file: docs/users_guide/users_guide.pdf
-          asset_name: casadi-users_guide-v${{ needs.version.outputs.casadi }}.zip
+          asset_name: casadi-users_guide-v${{ needs.version.outputs.casadi }}.pdf
           prerelease: true
       - uses: svenstaro/upload-release-action@2.4.0
         with:

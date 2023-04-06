@@ -3,7 +3,7 @@
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
  *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -755,6 +755,11 @@ namespace casadi {
         \identifier{lj} */
     Function wrap_as_needed(const Dict& opts) const;
 
+    /** \brief Get all functions in the cache
+
+        \identifier{26g} */
+    Dict cache() const;
+
     /** \brief Get function in cache
 
         \identifier{lk} */
@@ -1257,6 +1262,11 @@ namespace casadi {
 
         \identifier{no} */
     bool has_refcount_;
+
+    /** \brief Values to prepopulate the function cache with
+
+        \identifier{26h} */
+    Dict cache_init_;
 
     /// Function cache
     mutable std::map<std::string, WeakRef> cache_;

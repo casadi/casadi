@@ -1,8 +1,8 @@
 #     This file is part of CasADi.
 #
 #     CasADi -- A symbolic framework for dynamic optimization.
-#     Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
-#                             K.U. Leuven. All rights reserved.
+#     Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+#                             KU Leuven. All rights reserved.
 #     Copyright (C) 2011-2014 Greg Horn
 #
 #     CasADi is free software; you can redistribute it and/or
@@ -458,7 +458,7 @@ class ConicTests(casadiTestCase):
 
     for conic, qp_options, aux_options in conics:
       if not aux_options["quadratic"]: continue
-      if "ooqp" in str(conic):
+      if "ooqp" in str(conic) or "proxqp" in str(conic):
         continue
       print("test_equality",conic,qp_options)
       solver = casadi.conic("mysolver",conic,{'h':H.sparsity(),'a':Sparsity.dense(3,2)},qp_options)

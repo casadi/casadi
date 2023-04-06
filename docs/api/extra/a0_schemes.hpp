@@ -124,24 +124,6 @@
 <tr><td>ROOTFINDER_X</td><td>x</td><td>Solution to the system of equations.</td></tr>
 </table>
 */
-/** \defgroup scheme_SimulatorInput
-<a name='schemes'></a><table>
-<caption>Input scheme: casadi::SimulatorInput  (SIMULATOR_NUM_IN = 4)</caption>
-<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>SIMULATOR_X0</td><td>x0</td><td>Differential state at the initial time.</td></tr>
-<tr><td>SIMULATOR_U</td><td>u</td><td>Controls.</td></tr>
-<tr><td>SIMULATOR_Z0</td><td>z0</td><td>Initial guess for the algebraic variable at the initial time.</td></tr>
-<tr><td>SIMULATOR_P</td><td>p</td><td>Parameters.</td></tr>
-</table>
-*/
-/** \defgroup scheme_SimulatorOutput
-<a name='schemes'></a><table>
-<caption>Output scheme: casadi::SimulatorOutput  (SIMULATOR_NUM_OUT = 2)</caption>
-<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
-<tr><td>SIMULATOR_X</td><td>x</td><td>Differential state.</td></tr>
-<tr><td>SIMULATOR_Z</td><td>z</td><td>Algebraic variable.</td></tr>
-</table>
-*/
 /// \cond INTERNAL
 /** \class casadi::CvodesInterface
 \n
@@ -149,15 +131,6 @@
 @copydoc scheme_IntegratorInput
 <br/>
 @copydoc scheme_IntegratorOutput
-*/
-/// \endcond
-/// \cond INTERNAL
-/** \class casadi::CvodesSimulator
-\n
-\par
-@copydoc scheme_SimulatorInput
-<br/>
-@copydoc scheme_SimulatorOutput
 */
 /// \endcond
 /// \cond INTERNAL
@@ -176,14 +149,5 @@
 @copydoc scheme_IntegratorInput
 <br/>
 @copydoc scheme_IntegratorOutput
-*/
-/// \endcond
-/// \cond INTERNAL
-/** \class casadi::SundialsSimulator
-\n
-\par
-@copydoc scheme_SimulatorInput
-<br/>
-@copydoc scheme_SimulatorOutput
 */
 /// \endcond

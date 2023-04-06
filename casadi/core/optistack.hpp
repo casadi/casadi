@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -241,10 +241,14 @@ public:
       \identifier{1g} */
   std::string return_status() const;
 
-  /// get assignment expressions for initial values
+  /** \brief get assignment expressions for initial values
+
+      \identifier{266} */
   std::vector<MX> initial() const;
 
-  /// get assignment expressions for latest values
+  /** \brief get assignment expressions for latest values
+
+      \identifier{267} */
   std::vector<MX> value_variables() const;
   std::vector<MX> value_parameters() const;
 
@@ -257,28 +261,44 @@ public:
       \identifier{1h} */
   MX dual(const MX& m) const;
 
-  /// Number of (scalarised) decision variables
+  /** \brief Number of (scalarised) decision variables
+
+      \identifier{268} */
   casadi_int nx() const;
 
-  /// Number of (scalarised) parameters
+  /** \brief Number of (scalarised) parameters
+
+      \identifier{269} */
   casadi_int np() const;
 
-  /// Number of (scalarised) constraints
+  /** \brief Number of (scalarised) constraints
+
+      \identifier{26a} */
   casadi_int ng() const;
 
-  /// Get all (scalarised) decision variables as a symbolic column vector
+  /** \brief Get all (scalarised) decision variables as a symbolic column vector
+
+      \identifier{26b} */
   MX x() const;
 
-  /// Get all (scalarised) parameters as a symbolic column vector
+  /** \brief Get all (scalarised) parameters as a symbolic column vector
+
+      \identifier{26c} */
   MX p() const;
 
-  /// Get all (scalarised) constraint expressions as a column vector
+  /** \brief Get all (scalarised) constraint expressions as a column vector
+
+      \identifier{26d} */
   MX g() const;
 
-  /// Get objective expression
+  /** \brief Get objective expression
+
+      \identifier{26e} */
   MX f() const;
 
-  /// Get all (scalarised) bounds on constraints as a column vector
+  /** \brief Get all (scalarised) bounds on constraints as a column vector
+
+      \identifier{26f} */
   MX lbg() const;
   MX ubg() const;
 
@@ -293,7 +313,14 @@ public:
       \identifier{1i} */
   MX lam_g() const;
 
+  /// @{
   /** \brief Create a CasADi Function from the Opti solver
+   * 
+   * \param[in] name Name of the resulting CasADi Function
+   * \param[in] args List of parameters and decision/dual variables
+   *                (which can be given an initial guess) with the resulting Function
+   * \param[in] res List of expressions that will get evaluated at the optimal solution
+   * \param[in] opts Standard CasADi Funcion options
 
       \identifier{1j} */
   Function to_function(const std::string& name,
@@ -311,6 +338,7 @@ public:
       const std::vector<std::string>& name_in,
       const std::vector<std::string>& name_out,
       const Dict& opts = Dict());
+  /// @}
 
   #ifndef SWIGMATLAB
   /** \brief Construct a double inequality

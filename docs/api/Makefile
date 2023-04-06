@@ -84,7 +84,6 @@ full:
 	make doxpublish
 	cd ../example_pack && make
 	mkdir -p ../../web/content/api
-	cp -R ../tutorials ../../web/content/
 	cp -R html ../../web/content/api
 	cp -R internal ../../web/content/api
 	

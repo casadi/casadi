@@ -774,5 +774,22 @@ A0 = DM([1 2 3])';
 A = MX.sym('A',1,3);
 f = Function('f',{A,x},{A(x)});assert(full(norm(f(A0,xi)-A0(xi)))==0)
 
+
+for a=[5,-5]
+    for b=[3,-3]
+        assert(rem(a,b)==full(rem(DM(a),DM(b))))
+    end
+end
+
+flag = false;
+try
+  mod(DM(5),DM(3))
+catch
+  flag = true;
+end
+
+assert(flag);
+
+
 disp('success')
 

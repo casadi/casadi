@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -52,11 +52,11 @@ std::string to_string(DynOut v) {
 
 std::string Integrator::bdyn_in(casadi_int i) {
   switch (i) {
-    case BDYN_T: return "t";
-    case BDYN_X: return "x";
-    case BDYN_Z: return "z";
-    case BDYN_P: return "p";
-    case BDYN_U: return "u";
+    case BDYN_T: return "in_t";
+    case BDYN_X: return "in_x";
+    case BDYN_Z: return "in_z";
+    case BDYN_P: return "in_p";
+    case BDYN_U: return "in_u";
     case BDYN_OUT_ODE: return "out_ode";
     case BDYN_OUT_ALG: return "out_alg";
     case BDYN_OUT_QUAD: return "out_quad";

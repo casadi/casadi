@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -339,7 +339,7 @@ def DM_from_csc(m, check_only=True):
   %feature("customdoc:proto:constructor", "$name($in)");
   %feature("customdoc:proto:single_out", "$name($in) -> $out");
   %feature("customdoc:proto:normal", "$name($in) -> ($out)");
-  %feature("customdoc:main", "  $brief\n\n$overview\n$main");
+  %feature("customdoc:main", "  $brief\n\n::\n\n$overview\n$main");
 #endif
 
 %feature("customdoc:arg:normal:style_error", "$type");
@@ -2594,7 +2594,13 @@ if (!$1) {
 // Workarounds, pending proper fix
 %rename(nonzero) __nonzero__;
 %rename(hash) __hash__;
+
+%rename(rem) casadi_mod;
 #endif // SWIGMATLAB
+
+#ifdef SWIGPYTHON
+%ignore casadi_mod;
+#endif // SWIGPYTHON
 
 #ifdef WITH_PYTHON3
 %rename(__bool__) __nonzero__;

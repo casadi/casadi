@@ -1,9 +1,10 @@
 cmake_minimum_required(VERSION 3.10.2)
 project(casadi C CXX)
 
+
 set(CASADI_MAJOR_VERSION 3)
-set(CASADI_MINOR_VERSION 5)
-set(CASADI_PATCH_VERSION 5)
+set(CASADI_MINOR_VERSION 6)
+set(CASADI_PATCH_VERSION 0)
 set(CASADI_IS_RELEASE 0)
 
 set(CASADI_VERSION ${CASADI_MAJOR_VERSION}.${CASADI_MINOR_VERSION}.${CASADI_PATCH_VERSION})
@@ -13,7 +14,7 @@ endif()
 set(CASADI_VERSION "${CASADI_VERSION}")
 set(PACKAGE_NAME "CasADi")
 set(PACKAGE_VERSION ${CASADI_VERSION})
-set(PACKAGE_SO_VERSION "3.6")
+set(PACKAGE_SO_VERSION "3.7")
 set(PACKAGE_DESCRIPTION "CasADi is a symbolic framework for automatic differentation and numeric optimization")
 set(PACKAGE_AUTHOR "Joel Andersson and Joris Gillis")
 set(PACKAGE_MAINTAINER "Joel Andersson and Joris Gillis")
@@ -188,30 +189,12 @@ if(APPLE)
   set(CMAKE_LIBRARY_PATH /opt/local/lib ${CMAKE_LIBRARY_PATH})
 endif()
 
-############################################################
-################# WITH_COMMON option #######################
-############################################################
-option(WITH_COMMON "Build common, stable interfaces, if found" OFF)
-if(WITH_COMMON)
-  # Look for LAPACK
-  find_package(LAPACK QUIET)
-  set(WITH_LAPACK_DEF ${LAPACK_FOUND})
-  message("WITH_LAPACK_DEF: ${LAPACK_FOUND}")
-  # qpOASES and blockSQP built if LAPACK available
-  set(WITH_QPOASES_DEF ${LAPACK_FOUND})
-  set(WITH_BLOCKSQP_DEF ${LAPACK_FOUND})
-  set(WITH_SUPERSCS_DEF ${LAPACK_FOUND})
-  # Look for IPOPT
-  find_package(IPOPT QUIET)
-  set(WITH_IPOPT_DEF ${IPOPT_FOUND})
-else()
-  # Disabled by default
-  set(WITH_LAPACK_DEF OFF)
-  set(WITH_QPOASES_DEF OFF)
-  set(WITH_BLOCKSQP_DEF OFF)
-  set(WITH_IPOPT_DEF OFF)
-  set(WITH_SUPERSCS_DEF OFF)
-endif()
+# Disabled by default
+set(WITH_LAPACK_DEF OFF)
+set(WITH_QPOASES_DEF OFF)
+set(WITH_BLOCKSQP_DEF OFF)
+set(WITH_IPOPT_DEF OFF)
+set(WITH_SUPERSCS_DEF OFF)
 
 set(DEPENDENT_LIBRARIES)
 
@@ -686,12 +669,15 @@ set(BUILD_IPOPT_DEPENDENCIES MUMPS)
 
 option(WITH_MOCKUP_REQUIRED ON)
 set(BUILD_MOCKUPS_GIT_REPO https://github.com/casadi/mockups.git CACHE STRING "Git repo used together with BUILD_MOCKUPS_VERSION")
-set(BUILD_MOCKUPS_VERSION v59 CACHE STRING "Tag/branch/hash to be used for BUILD_MOCKUPS_GIT_REPO")
+set(BUILD_MOCKUPS_VERSION v60 CACHE STRING "Tag/branch/hash to be used for BUILD_MOCKUPS_GIT_REPO")
 
 # Knitro: An NLP solver
 option(WITH_KNITRO "Compile the interface to KNITRO" OFF)
 option(WITH_MOCKUP_KNITRO "Use mockup KNITRO (BUILD_MOCKUPS_VERSION=${BUILD_MOCKUPS_VERSION}) from downloaded source (BUILD_MOCKUPS_GIT_REPO=${BUILD_MOCKUPS_GIT_REPO})." OFF)
 
+# SNOPT: An SQP solver
+option(WITH_SNOPT "Compile the interface to SNOPT" OFF)
+option(WITH_MOCKUP_SNOPT "Use mockup SNOPT (BUILD_MOCKUPS_VERSION=${BUILD_MOCKUPS_VERSION}) from downloaded source (BUILD_MOCKUPS_GIT_REPO=${BUILD_MOCKUPS_GIT_REPO})." OFF)
 
 # Worhp: A sparse SQP method
 option(WITH_WORHP "Compile the WORHP interface" OFF)
@@ -843,7 +829,7 @@ endmacro()
 
 set(WITH_BUILD_MOCKUPS OFF)
 # Packages must be sorted from high to low in the dependency graph
-foreach(PKG CPLEX KNITRO GUROBI WORHP HSL)
+foreach(PKG CPLEX SNOPT KNITRO GUROBI WORHP HSL)
   string(TOLOWER ${PKG} PKG_LOWER)
   if(WITH_${PKG} AND NOT WITH_BUILD_${PKG})
     if(NOT WITH_MOCKUP_${PKG})
@@ -978,6 +964,18 @@ if(WITH_KNITRO AND WITH_MOCKUP_KNITRO)
   )
 endif()
 add_feature_info(knitro-interface WITH_KNITRO "Interface to the NLP solver KNITRO.")
+
+if(WITH_SNOPT AND WITH_MOCKUP_SNOPT)
+  add_library(snopt::snopt SHARED IMPORTED)
+  add_dependencies(snopt::snopt mockups-external)
+  file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/mockups/snopt/include")
+  set_target_properties(snopt::snopt PROPERTIES
+    INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/mockups/snopt/include"
+    IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/mockups/snopt/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX_SHORT}snopt7${CMAKE_SHARED_LIBRARY_SUFFIX}"
+    IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/mockups/snopt/lib/${CMAKE_SHARED_LIBRARY_PREFIX_SHORT}snopt7${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+  )
+endif()
+add_feature_info(snopt-interface WITH_KNITRO "Interface to the NLP solver KNITRO.")
 
 if(WITH_WORHP AND WITH_MOCKUP_WORHP)
   add_library(worhp::worhp SHARED IMPORTED)
@@ -1531,23 +1529,6 @@ if(WITH_SUPERSCS)
   endif()
 endif()
 add_feature_info(superscs-interface WITH_SUPERSCS "Interface to QP solver SUPERSCS.")
-
-# SNOPT: An SQP method
-option(WITH_SNOPT "Compile the SNOPT interface if SNOPT libraries can be found" OFF)
-option(WITH_SNOPT_FORCE_DUMMY "Compile the SNOPT interface against a dummy library (for Debian distribution; breaks normal SNOPT build)" OFF)
-option(WITH_BUILD_SNOPT_INTERFACE "Use the SNOPT C-interface shipped with casadi" ON)
-if(WITH_SNOPT)
-  if(NOT WITH_SNOPT_FORCE_DUMMY)
-    find_package(SNOPT REQUIRED)
-  endif()
-  if(WITH_BUILD_SNOPT_INTERFACE)
-    set(SNOPT_INTERFACE_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/external_packages/snopt-interface/include)
-    set(SNOPT_INTERFACE_LIBRARIES casadi_snopt_interface)
-  else()
-    find_package(SNOPT_INTERFACE REQUIRED)
-  endif()
-endif()
-add_feature_info(snopt-interface WITH_SNOPT "Interface to the NLP solver SNOPT.")
 
 # OOQP: A sparse interior point QP solver
 option(WITH_OOQP "Enable OOQP interface" OFF)

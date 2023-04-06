@@ -2,8 +2,8 @@
 #     This file is part of CasADi.
 #
 #     CasADi -- A symbolic framework for dynamic optimization.
-#     Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
-#                             K.U. Leuven. All rights reserved.
+#     Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+#                             KU Leuven. All rights reserved.
 #     Copyright (C) 2011-2014 Greg Horn
 #
 #     CasADi is free software; you can redistribute it and/or
@@ -1785,7 +1785,7 @@ class Functiontests(casadiTestCase):
     if not args.run_slow: return
     x = MX.sym("x",3)
     y = MX.sym("y",3,3)
-    f = Function("f",[x,y],[x**3,y @ x])
+    f = Function("f",[x,y],[x**3,mtimes(y,x)])
     c = CodeGenerator('me')
     c.add(f, True)
     
@@ -2520,7 +2520,7 @@ class Functiontests(casadiTestCase):
 
       for ff in [F.forward(1).forward(1),F.forward(1).reverse(1),F.reverse(1).forward(1),F.reverse(1).reverse(1)]:
         s = str(ff)
-        self.assertTrue("y" not in s.replace("_y[2x2,0nz]","foo")[len("fwd1_adj1_F:(x[2x2],y[2x2]"):])
+        self.assertTrue("y" not in s.replace("_y[2x2,0nz]","foo")[len("fwd1_adj1_F:(in_in_x[2x2],in_in_y[2x2]"):])
 
 
       ye = X(2,2);

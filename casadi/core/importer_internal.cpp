@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -242,9 +242,16 @@ namespace casadi {
   signal_t DllLibrary::get_function(const std::string& sym) {
 #ifdef WITH_DL
 #ifdef _WIN32
-    return (signal_t)GetProcAddress(handle_, TEXT(sym.c_str()));
+#if __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-function-type"
+#endif
+    return reinterpret_cast<signal_t>(GetProcAddress(handle_, TEXT(sym.c_str())));
+#if __GNUC__
+#pragma GCC diagnostic pop
+#endif
 #else // _WIN32
-    signal_t fcnPtr = (signal_t)dlsym(handle_, sym.c_str());
+    signal_t fcnPtr = reinterpret_cast<signal_t>(dlsym(handle_, sym.c_str()));
     if (dlerror()) {
       fcnPtr=nullptr;
       dlerror(); // Reset error flags

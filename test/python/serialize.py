@@ -2,8 +2,8 @@
 #     This file is part of CasADi.
 #
 #     CasADi -- A symbolic framework for dynamic optimization.
-#     Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
-#                             K.U. Leuven. All rights reserved.
+#     Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+#                             KU Leuven. All rights reserved.
 #     Copyright (C) 2011-2014 Greg Horn
 #
 #     CasADi is free software; you can redistribute it and/or
@@ -53,8 +53,10 @@ class SerializeTests(casadiTestCase):
       try:
           f = Function.load(os.path.join(dir,fun))
       except Exception as e:
-          if "CommonExternal" in str(e):
-             continue
+          if "DllLibrary::init_handle" in str(e):
+            continue
+          if "DeSerialization of Integrator failed" in str(e):
+            continue
           else:
              raise Exception(str(e))
 

@@ -216,13 +216,22 @@ namespace casadi {
       false);
 
 #ifdef _WIN32
-    reg = (RegFcn)GetProcAddress(handle, TEXT(regName.c_str()));
+
+#if __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-function-type"
+#endif
+    reg = reinterpret_cast<RegFcn>(GetProcAddress(handle, TEXT(regName.c_str())));
+#if __GNUC__
+#pragma GCC diagnostic pop
+#endif
+
 #else // _WIN32
     // Reset error
     dlerror();
 
     // Load creator
-    reg = (RegFcn)dlsym(handle, regName.c_str());
+    reg = reinterpret_cast<RegFcn>(dlsym(handle, regName.c_str()));
 #endif // _WIN32
     casadi_assert(reg!=nullptr,
       "PluginInterface::load_plugin: no \"" + regName + "\" found in " + searchpath + ".");

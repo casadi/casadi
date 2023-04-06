@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -589,7 +589,19 @@ class GenericExpression : public GenericExpressionCommon {
     ///@}
 
     ///@{
-    /** \brief Remainder after division: (x,y) -> mod(x,y)
+    /** \brief Remainder after division: (x,y) -> fmod(x,y)
+
+    This Function follows the convention of https://en.cppreference.com/w/c/numeric/math/fmod
+
+    Notably:
+      - fmod(5,3)   -> 2
+      - fmod(5,-3)  -> 2
+      - fmod(-5,3)  -> -2
+      - fmod(-5,-3) -> -2
+
+    This is equivalent to Python's numpy.fmod and Matlab's rem.
+
+    \seealso remainder
 
         \identifier{pq} */
     static ExType mod(const ExType& x, const ExType& y) {
@@ -606,6 +618,18 @@ class GenericExpression : public GenericExpressionCommon {
     ///@{
     /** \brief Remainder after division: (x,y) -> remainder(x,y)
 
+    This Function follows the convention of https://en.cppreference.com/w/c/numeric/math/remainder
+
+    Notably:
+      - remainder(5,3)   -> -1
+      - remainder(5,-3)  -> -1
+      - remainder(-5,3)  -> 1
+      - remainder(-5,-3) -> 1
+
+    This is equivalent to Python's math.remainder. There is no equivalence in Matlab.
+
+    \seealso fmod
+
         \identifier{24x} */
     static ExType remainder(const ExType& x, const ExType& y) {
       return ExType::binary(OP_REMAINDER, x, y);
@@ -616,14 +640,16 @@ class GenericExpression : public GenericExpressionCommon {
     ///@}
 
     ///@{
-    /** \brief Two argument arc tangent: (x,y) -> atan2(x,y)
+    /** \brief Two argument arc tangent: (y,x) -> atan2(y,x)
+     *
+     * theta = atan2(y,x) corresponds to x = r cos(theta), y = r sin(theta)
 
         \identifier{pr} */
-    static ExType atan2(const ExType& x, const ExType& y) {
-      return ExType::binary(OP_ATAN2, x, y);
+    static ExType atan2(const ExType& y, const ExType& x) {
+      return ExType::binary(OP_ATAN2, y, x);
     }
-    friend inline ExType atan2(const ExType& x, const ExType& y) {
-      return ExType::atan2(x, y);
+    friend inline ExType atan2(const ExType& y, const ExType& x) {
+      return ExType::atan2(y, x);
     }
     ///@}
 

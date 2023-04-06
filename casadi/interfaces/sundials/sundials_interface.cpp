@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -264,7 +264,7 @@ void SundialsInterface::init(const Dict& opts) {
     }
     if (nadj_ > 0) {
       create_function(rdae_, "jtimesB",
-        {"t", "x", "z", "p", "u", "adj_ode", "adj_alg", "adj_quad", "fwd:adj_ode", "fwd:adj_alg"},
+        {"in_t", "in_x", "in_z", "in_p", "in_u", "adj_ode", "adj_alg", "adj_quad", "fwd:adj_ode", "fwd:adj_alg"},
         {"fwd:adj_x", "fwd:adj_z"});
       if (nfwd_ > 0) {
         create_forward("jtimesB", nfwd_);

@@ -1,4 +1,22 @@
-// NOLINT(legal/copyright)
+//
+//    MIT No Attribution
+//
+//    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl, KU Leuven.
+//
+//    Permission is hereby granted, free of charge, to any person obtaining a copy of this
+//    software and associated documentation files (the "Software"), to deal in the Software
+//    without restriction, including without limitation the rights to use, copy, modify,
+//    merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
+//    permit persons to whom the Software is furnished to do so.
+//
+//    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+//    INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+//    PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+//    HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+//    OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+//    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+//
+
 // C-REPLACE "fmax" "casadi_fmax"
 // C-REPLACE "nullptr" "0"
 
@@ -127,40 +145,23 @@ void casadi_cvx_tri(T1* A, casadi_int n, T1* beta, T1* p) {
 
 
 // SYMBOL "cvx_givens"
-// Continuous algorithm for generating real plane rotations
-// Ref: Anderson Alg. 4, Discontinuous Plane Rotations
-// and the Symmetric Eigenvalue Problem
+// Ref: Golub & Van Loan Alg. 5.1.3
 template<typename T1>
 void casadi_cvx_givens(T1 a, T1 b, T1* c, T1* s) {
   T1 r;
   if (b==0) {
     *c = 1;
-    if (a<0) {
-      *c = -1;
-    }
     *s = 0;
-  } else if (a==0) {
-    *c = 0;
-    *s = 1;
-    if (b<0) {
-      *s = -1;
-    }
-  } else if (fabs(a)>fabs(b)) {
-    r = b/a;
-    if (a>0) {
-      *c = 1/sqrt(1+r*r);
-    } else {
-      *c = -1/sqrt(1+r*r);
-    }
-    *s = (*c)*r;
   } else {
-    r = a/b;
-    if (b>0) {
+    if (fabs(b)>fabs(a)) {
+      r = -a/b;
       *s = 1/sqrt(1+r*r);
+      *c = (*s)*r;
     } else {
-      *s = -1/sqrt(1+r*r);
+      r = -b/a;
+      *c = 1/sqrt(1+r*r);
+      *s = (*c)*r;
     }
-    *c = (*s)*r;
   }
 }
 

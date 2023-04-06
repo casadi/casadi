@@ -1,3 +1,0 @@
-[submodule "external_packages/snopt-interface/snopt-interface"]
-	path = external_packages/snopt-interface/snopt-interface
-	url = https://github.com/snopt/snopt-interface.git

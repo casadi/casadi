@@ -1,6 +1,6 @@
 # This is a alternative version of the original CMakeLists.txt
 # Joris Gillis
-# K.U. Leuven 2012
+# KU Leuven 2012
 
 cmake_minimum_required(VERSION 3.10.2)
 

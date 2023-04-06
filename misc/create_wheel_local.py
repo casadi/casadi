@@ -40,6 +40,8 @@ if os_name=="linux":
     arch = "manylinux2010_x86_64"
   elif arch=="manylinux2014-x64":
     arch = "manylinux2014_x86_64"
+  elif arch=="manylinux2014-x86":
+    arch = "manylinux2014_i686"
   tag = "cp%s-none-%s" % (pyversion,arch.replace("-","_"))
 elif os_name=="osx":
   if arch=="osx":

@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -1627,6 +1627,11 @@ InputStruct InputStruct::parse(const std::string& n, const Fmu* fmu,
       s.type = InputType::ADJ;
       s.ind = fmu ? fmu->index_out(rem) : 0;
       if (name_out) name_out->push_back(rem);
+    } else if (pref == "in") {
+      // Regular input in derivative function
+      s.type = InputType::REG;
+      s.ind = fmu ? fmu->index_in(rem) : 0;
+      if (name_in) name_in->push_back(rem);
     } else {
       // No such prefix
       casadi_error("No such prefix: " + pref);
@@ -1676,6 +1681,13 @@ OutputStruct OutputStruct::parse(const std::string& n, const Fmu* fmu,
             if (name_in) name_in->push_back(sens);
             s.wrt = fmu ? fmu->index_out(rem) : -1;
             if (name_in) name_out->push_back(rem);
+          } else if (pref == "in") {
+            // Hessian output
+            s.type = OutputType::HESS;
+            s.ind = fmu ? fmu->index_in(sens) : -1;
+            if (name_in) name_in->push_back(sens);
+            s.wrt = fmu ? fmu->index_in(rem) : -1;
+            if (name_in) name_in->push_back(rem);
           } else {
             casadi_error("No such prefix: " + pref);
           }

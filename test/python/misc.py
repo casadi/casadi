@@ -2,8 +2,8 @@
 #     This file is part of CasADi.
 #
 #     CasADi -- A symbolic framework for dynamic optimization.
-#     Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
-#                             K.U. Leuven. All rights reserved.
+#     Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+#                             KU Leuven. All rights reserved.
 #     Copyright (C) 2011-2014 Greg Horn
 #
 #     CasADi is free software; you can redistribute it and/or
@@ -315,6 +315,11 @@ class Misctests(casadiTestCase):
     except Exception as e:
       print(str(e))
       self.assertTrue("x must be larger than 3" in str(e))
+
+  def test_doc(self):
+    self.assertTrue("jac_penalty" in nlpsol.__doc__) # FunctionInternal
+    self.assertTrue("print_time" in nlpsol.__doc__)  # ProtoFunction
+    self.assertTrue( nlpsol.__doc__.count("print_time")==1)  # ProtoFunction
 
   @requires_nlpsol("ipopt")
   def test_output(self):

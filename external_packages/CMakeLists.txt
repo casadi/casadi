@@ -10,10 +10,6 @@ if(WITH_SUNDIALS AND WITH_BUILD_SUNDIALS)
   add_subdirectory(casadi-sundials)
 endif()
 
-if(WITH_SNOPT)
-  add_subdirectory(snopt-interface)
-endif()
-
 if(WITH_QPOASES)
   add_subdirectory(qpOASES)
 endif()
