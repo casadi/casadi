@@ -1482,6 +1482,9 @@ if(WITH_OSQP)
         CMAKE_ARGS -DCMAKE_C_STANDARD_REQUIRED=TRUE -DCMAKE_C_STANDARD=99 -DENABLE_MKL_PARDISO=OFF -DPROFILING=OFF -DCMAKE_INSTALL_LIBDIR=lib -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/osqp")
     add_library(osqp SHARED IMPORTED)
+    # This is similar to ALIAS but works fine on imported targets with CMake 3.10
+    add_library(osqp::osqp INTERFACE IMPORTED)
+    set_target_properties(osqp::osqp PROPERTIES INTERFACE_LINK_LIBRARIES osqp)
     add_dependencies(osqp osqp-external)
     set_target_properties(osqp PROPERTIES
        INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include/osqp"
