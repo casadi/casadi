@@ -53,6 +53,10 @@ macro(_eigen3_check_version)
   endif(NOT EIGEN3_VERSION_OK)
 endmacro(_eigen3_check_version)
 
+# If Eigen3Config.cmake is installed, this defines
+# EIGEN3_INCLUDE_DIR
+find_package(Eigen3 NO_MODULE QUIET)
+
 if(EIGEN3_INCLUDE_DIR)
 
   # in cache already
