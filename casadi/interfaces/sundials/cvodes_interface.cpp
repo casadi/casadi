@@ -578,15 +578,12 @@ int CvodesInterface::psetupF(double t, N_Vector x, N_Vector xdot, booleantype jo
     const Sparsity& sp_jac_ode_x = s.get_function("jacF").sparsity_out(0);
     const Sparsity& sp_jacF = s.linsolF_.sparsity();
 
-    // Offset for storing the sparser Jacobian, to allow overwriting entries
-    casadi_int jac_offset = sp_jacF.nnz() - sp_jac_ode_x.nnz();
-
     // Calculate Jacobian
     if (s.calc_jacF(m, t, NV_DATA_S(x), nullptr,
-      m->jacF + jac_offset, nullptr, nullptr, nullptr)) return 1;
+      m->jac_ode_x, nullptr, nullptr, nullptr)) return 1;
 
     // Project to expected sparsity pattern (with diagonal)
-    casadi_project(m->jacF + jac_offset, sp_jac_ode_x, m->jacF, sp_jacF, m->w);
+    casadi_project(m->jac_ode_x, sp_jac_ode_x, m->jacF, sp_jacF, m->w);
 
     // Scale and shift diagonal
     const casadi_int *colind = sp_jacF.colind(), *row = sp_jacF.row();
