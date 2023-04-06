@@ -1,7 +1,6 @@
 name: Python Wheels
 
 on:
-  push:
   workflow_dispatch:
   release:
     types: ['released', 'prereleased']
