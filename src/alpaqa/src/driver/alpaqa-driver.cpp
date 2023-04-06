@@ -14,6 +14,8 @@
 
 #include "output.hpp"
 #include "results.hpp"
+#include <atomic>
+#include <type_traits>
 
 #if WITH_IPOPT
 #include <alpaqa/ipopt/ipopt-adapter.hpp>
@@ -31,6 +33,7 @@
 
 #include <algorithm>
 #include <chrono>
+#include <csignal>
 #include <filesystem>
 #include <fstream>
 #include <functional>
@@ -289,8 +292,38 @@ do_experiment_impl(auto &problem,
 
 #endif
 
+template <auto &solver_to_stop>
+auto attach_cancellation(auto &solver) {
+    if constexpr (requires { solver.stop(); }) {
+        auto *old = solver_to_stop.exchange(&solver, std::memory_order_release);
+        if (old)
+            throw std::runtime_error(
+                "alpaqa-driver:do_experiment is not reentrant");
+        struct sigaction action;
+        action.sa_handler = [](int) {
+            if (auto *s = solver_to_stop.load(std::memory_order::acquire))
+                s->stop();
+        };
+        sigemptyset(&action.sa_mask);
+        action.sa_flags = 0;
+        sigaction(SIGINT, &action, nullptr);
+        sigaction(SIGTERM, &action, nullptr);
+    }
+    using solver_to_stop_t = std::remove_reference_t<decltype(solver_to_stop)>;
+    auto detach_solver     = [](solver_to_stop_t *p) {
+        p->store(nullptr, std::memory_order_relaxed);
+    };
+    return std::unique_ptr<solver_to_stop_t, decltype(detach_solver)>{
+        &solver_to_stop};
+}
+
 void do_experiment(auto &problem, auto &solver,
                    std::span<const std::string_view> extra_opts) {
+    // Try stopping gracefully when SIGINT (Ctrl+C) or SIGTERM is received.
+    using stop_solver_t = std::atomic<decltype(&solver)>;
+    static stop_solver_t solver_to_stop{nullptr};
+    auto cancellation = attach_cancellation<solver_to_stop>(solver);
+
     // Run experiment
     BenchmarkResults results = do_experiment_impl(problem, solver, extra_opts);
 
