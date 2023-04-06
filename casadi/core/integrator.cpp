@@ -411,6 +411,10 @@ int Integrator::eval(const double** arg, double** res,
     }
   }
 
+  // Collect oracle statistics
+  join_results(m);
+
+  // Print integrator statistics
   if (print_stats_) print_stats(m);
 
   return 0;
