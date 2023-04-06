@@ -25,6 +25,18 @@ struct LoadedProblem {
     std::shared_ptr<alpaqa::EvalCounter> evaluations = nullptr;
 };
 
+inline std::string
+get_prefix_option(std::span<const std::string_view> prob_opts) {
+    std::string prefix          = "benchmark_problem";
+    std::string_view prefix_key = "prefix=";
+    auto prefix_it              = std::find_if(
+        prob_opts.begin(), prob_opts.end(),
+        [&](std::string_view opt) { return opt.starts_with(prefix_key); });
+    if (prefix_it != prob_opts.end())
+        prefix = prefix_it->substr(prefix_key.size());
+    return prefix;
+}
+
 inline LoadedProblem
 load_problem(std::string_view type, const fs::path &dir, const fs::path &file,
              std::span<const std::string_view> extra_opts) {
@@ -64,14 +76,15 @@ load_problem(std::string_view type, const fs::path &dir, const fs::path &file,
                 std::to_string(cs_problem.param.size()) + ", should be " +
                 std::to_string(param_size));
         return problem;
-    } else if (type == "dl") {
+    } else if (type == "dl" || type.empty()) {
         using TEProblem  = alpaqa::TypeErasedProblem<config_t>;
         using DLProblem  = alpaqa::dl::DLProblem;
         using CntProblem = alpaqa::ProblemWithCounters<DLProblem>;
+        auto prefix      = get_prefix_option(prob_opts);
         std::any dl_opt  = std::span{prob_opts};
         LoadedProblem problem{
             .problem = TEProblem::make<CntProblem>(
-                std::in_place, full_path.c_str(), "benchmark_problem", &dl_opt),
+                std::in_place, full_path.c_str(), prefix, &dl_opt),
             .abs_path = fs::absolute(full_path),
             .path     = full_path,
         };

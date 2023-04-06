@@ -374,7 +374,6 @@ int main(int argc, char *argv[]) try {
     fs::path prob_path{prob_path_s};
     if (rel_to_exe)
         prob_path = fs::canonical(fs::path(argv[0])).parent_path() / prob_path;
-    std::cout << prob_path << std::endl;
 
     std::vector<std::string_view> extra_opts;
     std::copy(argv + 2, argv + argc, std::back_inserter(extra_opts));
