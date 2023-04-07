@@ -7,3 +7,5 @@ from .alpaqa import *
 from .alpaqa import __c_version__
 
 assert __version__ == __c_version__
+
+from .pyapi import *
