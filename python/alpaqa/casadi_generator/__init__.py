@@ -517,12 +517,14 @@ def generate_casadi_control_problem(
 
     return cg
 
-def write_casadi_problem_data(sofile, C, D, param):
-    if C is None and D is None and param is None:
+def write_casadi_problem_data(sofile, C, D, param, l1_reg, penalty_alm_split):
+    if all(i is None for i in (C, D, param, l1_reg, penalty_alm_split)):
         return
     C = ([], []) if C is None else C
     D = ([], []) if D is None else D
     param = [] if param is None else param
+    l1_reg = [] if l1_reg is None else l1_reg
+    penalty_alm_split = 0 if penalty_alm_split is None else penalty_alm_split
     with open(f"{splitext(sofile)[0]}.csv", "w") as f:
         opt = dict(delimiter=",", newline="\n")
         ravelrow = lambda x: np.reshape(x, (1, -1), order="A")
@@ -534,6 +536,8 @@ def write_casadi_problem_data(sofile, C, D, param):
         writerow(try_lb(D))
         writerow(try_ub(D))
         writerow(param)
+        writerow(l1_reg)
+        f.write(str(penalty_alm_split))
 
 def write_casadi_control_problem_data(sofile, U, D, D_N, x_init, param):
     if U is None and D is None and D_N is None and x_init is None and param is None:

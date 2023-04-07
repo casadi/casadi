@@ -30,6 +30,8 @@ def generate_and_compile_casadi_problem(
     C = None,
     D = None,
     param = None,
+    l1_reg = None,
+    penalty_alm_split = None,
     second_order: SECOND_ORDER_SPEC = 'no',
     name: str = "alpaqa_problem",
     **kwargs,
@@ -41,6 +43,10 @@ def generate_and_compile_casadi_problem(
     :param C:            Bound constraints on x.
     :param D:            Bound constraints on g(x).
     :param param:        Problem parameter values.
+    :param l1_reg:       L1-regularization on x.
+    :param penalty_alm_split: This many components at the beginning of g(x) are
+                              handled using a quadratic penalty method rather
+                              than an augmented Lagrangian method.
     :param second_order: Whether to generate functions for evaluating Hessians.
     :param name: Optional string description of the problem (used for filename).
     :param kwargs:       Parameters passed to 
@@ -62,7 +68,7 @@ def generate_and_compile_casadi_problem(
                 uid, soname = cache[key]
                 probdir = join(cachedir, str(uid))
                 sofile = join(probdir, soname)
-                write_casadi_problem_data(sofile, C, D, param)
+                write_casadi_problem_data(sofile, C, D, param, l1_reg, penalty_alm_split)
                 return _load_casadi_problem(sofile)
             except:
                 del cache[key]
@@ -113,7 +119,7 @@ def generate_and_compile_casadi_problem(
         soname = os.path.relpath(sofile, probdir)
         cache[key] = uid, soname
 
-        write_casadi_problem_data(sofile, C, D, param)
+        write_casadi_problem_data(sofile, C, D, param, l1_reg, penalty_alm_split)
         return _load_casadi_problem(sofile)
 
 
