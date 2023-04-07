@@ -1,6 +1,5 @@
 # Search for tinyxml2 via find_package(tinyxml2)
-include(CMakeFindDependencyMacro)
-find_dependency(tinyxml2 NO_MODULE)
+find_package(tinyxml2 QUIET NO_MODULE)
 
 # If this does not work, search for tinyxml2 via pkg-config
 if(NOT tinyxml2_FOUND OR NOT TARGET tinyxml2::tinyxml2)
