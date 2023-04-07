@@ -129,10 +129,12 @@ class BoxConstrProblem {
             return std::min(y, y_ub);
         };
         auto num_alm    = y.size() - penalty_alm_split;
+        auto &&y_qpm    = y.topRows(penalty_alm_split);
         auto &&y_alm    = y.bottomRows(num_alm);
         auto &&z_alm_lb = D.lowerbound.bottomRows(num_alm);
         auto &&z_alm_ub = D.upperbound.bottomRows(num_alm);
-        y_alm           = y_alm.binaryExpr(z_alm_lb, max_lb).binaryExpr(z_alm_ub, min_ub);
+        y_qpm.setZero();
+        y_alm = y_alm.binaryExpr(z_alm_lb, max_lb).binaryExpr(z_alm_ub, min_ub);
     }
 
     /// @see @ref TypeErasedProblem::eval_proj_multipliers
