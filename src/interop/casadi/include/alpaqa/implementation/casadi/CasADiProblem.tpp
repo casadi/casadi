@@ -137,35 +137,58 @@ CasADiProblem<Conf>::CasADiProblem(const std::string &so_name)
     impl->jac_g       = try_load<CasADiFunctionEvaluator<Conf, 2, 1>>( //
         so_name, "jacobian_g", dims(n, p), dims(dim(m, n)));
 
-    auto bounds_filepath = fs::path{so_name}.replace_extension("csv");
-    if (fs::exists(bounds_filepath))
-        load_numerical_data(bounds_filepath);
+    auto data_filepath = fs::path{so_name}.replace_extension("csv");
+    if (fs::exists(data_filepath))
+        load_numerical_data(data_filepath);
 }
 
 template <Config Conf>
 void CasADiProblem<Conf>::load_numerical_data(
     const std::filesystem::path &filepath, char sep) {
+    // Open data file
     std::ifstream data_file{filepath};
     if (!data_file)
-        throw std::runtime_error("Unable to open bounds file \"" +
+        throw std::runtime_error("Unable to open data file \"" +
                                  filepath.string() + '"');
-    index_t line          = 0;
-    auto wrap_bounds_load = [&](std::string_view name, auto &v) {
+
+    // Helper function for reading single line of (float) data
+    index_t line        = 0;
+    auto wrap_data_load = [&](std::string_view name, auto &v, bool fixed_size) {
         try {
             ++line;
-            csv::read_row(data_file, v, sep);
+            if (data_file.peek() == '\n') // Ignore empty lines
+                return static_cast<void>(data_file.get());
+            if (fixed_size) {
+                csv::read_row(data_file, v, sep);
+            } else { // Dynamic size
+                auto s = csv::read_row_std_vector<real_t>(data_file, sep);
+                v      = cmvec{s.data(), static_cast<index_t>(s.size())};
+            }
         } catch (csv::read_error &e) {
+            // Transform any errors in something more readable
             throw std::runtime_error("Unable to read " + std::string(name) +
-                                     " from bounds file \"" +
+                                     " from data file \"" +
                                      filepath.string() + ':' +
                                      std::to_string(line) + "\": " + e.what());
         }
     };
-    wrap_bounds_load("C.lowerbound", this->C.lowerbound);
-    wrap_bounds_load("C.upperbound", this->C.upperbound);
-    wrap_bounds_load("D.lowerbound", this->D.lowerbound);
-    wrap_bounds_load("D.upperbound", this->D.upperbound);
-    wrap_bounds_load("param", this->param);
+    // Helper function for reading a single value
+    auto read_single = [&](std::string_view name, auto &v) {
+        data_file >> v;
+        if (!data_file)
+            throw std::runtime_error(
+                "Unable to read " + std::string(name) + " from data file \"" +
+                filepath.string() + ':' + std::to_string(line) + '"');
+    };
+    // Read the bounds, parameter value, and regularization
+    wrap_data_load("C.lowerbound", this->C.lowerbound, true);
+    wrap_data_load("C.upperbound", this->C.upperbound, true);
+    wrap_data_load("D.lowerbound", this->D.lowerbound, true);
+    wrap_data_load("D.upperbound", this->D.upperbound, true);
+    wrap_data_load("param", this->param, true);
+    wrap_data_load("l1_reg", this->l1_reg, false);
+    // Penalty/ALM split is a single integer
+    read_single("penalty_alm_split", this->penalty_alm_split);
 }
 
 template <Config Conf>

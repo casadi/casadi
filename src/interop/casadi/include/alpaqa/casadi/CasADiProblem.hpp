@@ -43,12 +43,14 @@ class CasADiProblem : public BoxConstrProblem<Conf> {
     CasADiProblem &operator=(CasADiProblem &&) noexcept;
 
     /// Load the numerical problem data (bounds and parameters) from a CSV file.
-    /// The file should contain 5 rows, with the following contents:
+    /// The file should contain 7 rows, with the following contents:
     ///   1. @ref C lower bound [n]
     ///   2. @ref C upper bound [n]
     ///   3. @ref D lower bound [m]
     ///   4. @ref D upper bound [m]
     ///   5. @ref param [p]
+    ///   6. @ref l1_reg [0, 1 or n]
+    ///   7. @ref penalty_alm_split [1]
     ///
     /// Line endings are encoded using a single line feed (`\n`), and the column
     /// separator can be specified using the @p sep argument.
