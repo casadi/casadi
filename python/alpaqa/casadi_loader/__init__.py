@@ -1,7 +1,6 @@
 import casadi as cs
 import os
 from os.path import join, basename
-import alpaqa as pa
 import shelve
 import uuid
 import pickle
@@ -11,6 +10,7 @@ import subprocess
 import platform
 import sys
 import warnings
+from .. import alpaqa as pa
 from ..casadi_generator import generate_casadi_problem, generate_casadi_control_problem, SECOND_ORDER_SPEC, write_casadi_problem_data, write_casadi_control_problem_data
 from ..cache import get_alpaqa_cache_dir
 
