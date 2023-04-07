@@ -239,6 +239,9 @@ void register_problems(py::module_ &m) {
         .def_readwrite("l1_reg", &BoxConstrProblem::l1_reg,
                        py::return_value_policy::reference_internal,
                        ":math:`\\ell_1` regularization on :math:`x`")
+        .def_readwrite("penalty_alm_split", &BoxConstrProblem::penalty_alm_split,
+                       py::return_value_policy::reference_internal,
+                       "Index between quadratic penalty and augmented Lagrangian constraints")
         .def("eval_proj_diff_g", &BoxConstrProblem::eval_proj_diff_g, "z"_a, "e"_a)
         .def("eval_proj_multipliers", &BoxConstrProblem::eval_proj_multipliers, "y"_a, "M"_a)
         .def("eval_prox_grad_step", &BoxConstrProblem::eval_prox_grad_step, "γ"_a, "x"_a,
