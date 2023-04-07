@@ -1,5 +1,6 @@
 #include <alpaqa/config/config.hpp>
 #include <alpaqa/util/not-implemented.hpp>
+#include <alpaqa-version.h>
 
 #include <pybind11/pybind11.h>
 namespace py = pybind11;
@@ -74,8 +75,8 @@ void register_classes_for(py::module_ &m) {
 
 PYBIND11_MODULE(MODULE_NAME, m) {
     m.doc()               = "Python interface to alpaqa's C++ implementation.";
-    m.attr("__version__") = VERSION_INFO;
-    m.attr("build_time")  = __DATE__ " - " __TIME__;
+    m.attr("__version__") = ALPAQA_VERSION_FULL;
+    m.attr("build_time")  = __DATE__ ", " __TIME__;
 #if ALPAQA_HAVE_CASADI
     m.attr("with_casadi") = true;
 #else

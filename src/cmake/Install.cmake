@@ -28,6 +28,9 @@ install(TARGETS ${ALPAQA_INSTALL_EXE}
         COMPONENT bin)
 
 # Install the header files
+install(FILES "${PROJECT_BINARY_DIR}/include/alpaqa-version.h"
+    DESTINATION "${ALPAQA_INSTALL_INCLUDEDIR}"
+        COMPONENT dev)
 install(DIRECTORY "${PROJECT_SOURCE_DIR}/src/alpaqa/include/"
     DESTINATION "${ALPAQA_INSTALL_INCLUDEDIR}"
         COMPONENT dev

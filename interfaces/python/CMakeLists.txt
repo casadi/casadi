@@ -56,8 +56,7 @@ target_include_directories(_alpaqa PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 target_link_libraries(_alpaqa PRIVATE pybind11::pybind11 alpaqa::alpaqa)
 target_link_libraries(_alpaqa PRIVATE alpaqa::warnings)
 target_compile_definitions(_alpaqa PRIVATE
-    MODULE_NAME=$<TARGET_FILE_BASE_NAME:_alpaqa>
-    VERSION_INFO="${PY_FULL_VERSION}")
+    MODULE_NAME=$<TARGET_FILE_BASE_NAME:_alpaqa>)
 set_target_properties(_alpaqa PROPERTIES
     CXX_VISIBILITY_PRESET "hidden"
     VISIBILITY_INLINES_HIDDEN true

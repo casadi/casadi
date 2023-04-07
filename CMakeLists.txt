@@ -56,6 +56,10 @@ set(CMAKE_DEBUG_POSTFIX "_d")
 set(CMAKE_RELWITHDEBINFO_POSTFIX "_rd")
 set(CMAKE_MINSIZEREL_POSTFIX "_rs")
 
+configure_file(cmake/alpaqa-version.h.in
+    ${PROJECT_BINARY_DIR}/include/alpaqa-version.h @ONLY)
+include_directories(${PROJECT_BINARY_DIR}/include)
+
 # Sanitizers
 include(cmake/Sanitizers.cmake)
 
