@@ -33,7 +33,7 @@ class MinimizationProblemDescription:
 
     def subject_to_box(self, C: Tuple[np.ndarray, np.ndarray]):
         """
-        Add box constraints :math:`x \in C` on the problem variables.
+        Add box constraints :math:`x \\in C` on the problem variables.
         """
         self._assert_not_set_before(self.bounds)
         ret = copy(self)
@@ -46,7 +46,7 @@ class MinimizationProblemDescription:
         D: Optional[Union[np.ndarray, Tuple[np.ndarray, np.ndarray]]] = None,
     ):
         """
-        Add general constraints :math:`g(x) \in D`, handled using an augmented
+        Add general constraints :math:`g(x) \\in D`, handled using an augmented
         Lagrangian method.
         """
         self._assert_not_set_before(self.constraints_expr)
@@ -64,7 +64,7 @@ class MinimizationProblemDescription:
         D: Optional[Union[np.ndarray, Tuple[np.ndarray, np.ndarray]]] = None,
     ):
         """
-        Add general constraints :math:`g(x) \in D`, handled using a quadratic
+        Add general constraints :math:`g(x) \\in D`, handled using a quadratic
         penalty method.
         """
         self._assert_not_set_before(self.penalty_constraints_expr)
@@ -78,7 +78,7 @@ class MinimizationProblemDescription:
 
     def with_l1_regularizer(self, λ: Union[float, np.ndarray]):
         """
-        Add an :math:`\ell_1`-regularization term :math:`\|\lambda x\|_1`
+        Add an :math:`\\ell_1`-regularization term :math:`\\|\\lambda x\\|_1`
         to the objective.
         """
         self._assert_not_set_before(self.regularizer)
