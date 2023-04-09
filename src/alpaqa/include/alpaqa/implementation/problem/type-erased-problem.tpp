@@ -136,6 +136,8 @@ template <Config Conf>
 /* [ProblemVTable<Conf>::default_eval_grad_L] */
 void ProblemVTable<Conf>::default_eval_grad_L(const void *self, crvec x, crvec y, rvec grad_L,
                                               rvec work_n, const ProblemVTable &vtable) {
+    if (y.size() == 0) /* [[unlikely]] */
+        return vtable.eval_grad_f(self, x, grad_L);
     vtable.eval_grad_f_grad_g_prod(self, x, y, grad_L, work_n, vtable);
     grad_L += work_n;
 }
