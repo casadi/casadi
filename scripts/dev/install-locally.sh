@@ -12,7 +12,7 @@ case $(uname -m) in
 esac
 
 # Download compiler
-download_url="https://github.com/tttapa/cross-python/releases/download/0.0.12"
+download_url="https://github.com/tttapa/cross-python/releases/download/0.0.13"
 tools_dir="$PWD/toolchains"
 pfx="$tools_dir/$triple"
 mkdir -p "$tools_dir"
@@ -65,16 +65,24 @@ ALPAQA_PYTHON_DEBUG_CONFIG = "Debug"
 ALPAQA_WITH_PY_STUBS = "On"
 EOF
 . ./py-venv/bin/activate
-LDFLAGS='-static-libgcc -static-libstdc++' \
-python -m build -w "." -o staging \
-    -C--cross="$pfx/cmake/$triple.py-build-cmake.cross.toml" \
-    -C--local="$PWD/$config"
-LDFLAGS='-static-libgcc -static-libstdc++' \
-python -m build -w "python/alpaqa-debug" -o staging \
-    -C--cross="$pfx/cmake/$triple.py-build-cmake.cross.toml" \
-    -C--local="$PWD/$config"
-pip install -f staging --force-reinstall --no-deps \
-    "alpaqa==1.0.0a7" "alpaqa-debug==1.0.0a7"
-pip install -f staging \
-    "alpaqa[test]==1.0.0a7" "alpaqa-debug==1.0.0a7"
+develop=true
+if $develop; then
+    LDFLAGS='-static-libgcc -static-libstdc++' \
+    pip install -e "." -v \
+        --config-settings=--cross="$pfx/cmake/$triple.py-build-cmake.cross.toml" \
+        --config-settings=--local="$PWD/$config"
+else
+    LDFLAGS='-static-libgcc -static-libstdc++' \
+    python -m build -w "." -o staging \
+        -C--cross="$pfx/cmake/$triple.py-build-cmake.cross.toml" \
+        -C--local="$PWD/$config"
+    LDFLAGS='-static-libgcc -static-libstdc++' \
+    python -m build -w "python/alpaqa-debug" -o staging \
+        -C--cross="$pfx/cmake/$triple.py-build-cmake.cross.toml" \
+        -C--local="$PWD/$config"
+    pip install -f staging --force-reinstall --no-deps \
+        "alpaqa==1.0.0a7" "alpaqa-debug==1.0.0a7"
+    pip install -f staging \
+        "alpaqa[test]==1.0.0a7" "alpaqa-debug==1.0.0a7"
+fi
 pytest
