@@ -18,7 +18,7 @@ classifiers = [
     "Operating System :: Microsoft :: Windows",
     "Operating System :: MacOS",
 ]
-dependencies = ["numpy", "casadi"]
+dependencies = ["numpy", "casadi~=3.6.0"]
 dynamic = ["version", "description"]
 
 [project.optional-dependencies]
@@ -36,7 +36,7 @@ alpaqa = "alpaqa.__main__:main"
 
 [build-system]
 requires = [
-    "py-build-cmake~=0.1.4",
+    "py-build-cmake~=0.1.5",
     "pybind11>=2.10.1,!=2.10.2,!=2.10.3,!=2.10.4",
     "pybind11-stubgen",
 ]
@@ -90,17 +90,12 @@ ALPAQA_PYTHON_DEBUG_CONFIG = "RelWithDebInfo"
 [tool.py-build-cmake.stubgen]
 args = ["-v"]
 
+[tool.py-build-cmake.editable]
+mode = "symlink"
+
 [tool.pytest.ini_options]
 minversion = "6.0"
 testpaths = ["python/test"]
 
 [tool.mypy]
 plugins = ["numpy.typing.mypy_plugin"]
-
-[tool.pyright]
-# Pyright stops looking after the first match, which is usually in the 
-# site-packages folder. When doing an editable install, it should look in both
-# site-packages and the source folder. To get the search order correct, 
-# explicitly point it to the source folder first (it will still look for the C++ 
-# extension module stubs in site-packages).
-extraPaths = ["python"]
