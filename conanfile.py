@@ -48,6 +48,8 @@ class AlpaqaRecipe(ConanFile):
         "README.md",
     )
 
+    generators = ("CMakeDeps", )
+
     def requirements(self):
         self.requires("eigen/3.4.0")
         self.test_requires("gtest/1.11.0")
