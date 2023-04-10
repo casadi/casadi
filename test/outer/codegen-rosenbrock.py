@@ -28,4 +28,4 @@ cgen = cg.generate_casadi_problem(
     name=argv[1],
 )
 cgen.generate()
-cg.write_casadi_problem_data(argv[1], C, D, param)
+cg.write_casadi_problem_data(argv[1], C, D, param, [], 0)
