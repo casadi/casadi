@@ -1,11 +1,13 @@
 #pragma once
 
-#include <alpaqa/casadi/CasADiProblem.hpp>
 #include <alpaqa/config/config.hpp>
 #include <alpaqa/dl/dl-problem.hpp>
 #include <alpaqa/params/params.hpp>
 #include <alpaqa/problem/problem-with-counters.hpp>
 #include <alpaqa/problem/type-erased-problem.hpp>
+#if ALPAQA_HAVE_CASADI
+#include <alpaqa/casadi/CasADiProblem.hpp>
+#endif
 
 #include <filesystem>
 #include <iostream>
@@ -53,6 +55,7 @@ load_problem(std::string_view type, const fs::path &dir, const fs::path &file,
     // Load problem
     auto full_path = dir / file;
     if (type == "cs") {
+#if ALPAQA_HAVE_CASADI
         static std::mutex mtx;
         std::unique_lock lck{mtx};
         using TEProblem  = alpaqa::TypeErasedProblem<config_t>;
@@ -76,6 +79,10 @@ load_problem(std::string_view type, const fs::path &dir, const fs::path &file,
                 std::to_string(cs_problem.param.size()) + ", should be " +
                 std::to_string(param_size));
         return problem;
+#else
+        throw std::logic_error(
+            "This version of alpaqa was compiled without CasADi support");
+#endif
     } else if (type == "dl" || type.empty()) {
         using TEProblem  = alpaqa::TypeErasedProblem<config_t>;
         using DLProblem  = alpaqa::dl::DLProblem;

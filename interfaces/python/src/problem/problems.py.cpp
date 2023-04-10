@@ -10,6 +10,7 @@
 namespace py = pybind11;
 using namespace py::literals;
 
+#include <alpaqa/problem/box-constr-problem.hpp>
 #include <alpaqa/problem/problem-with-counters.hpp>
 #include <alpaqa/problem/type-erased-problem.hpp>
 #include <alpaqa/util/check-dim.hpp>

@@ -36,22 +36,22 @@ void register_control_problems(py::module_ &m) {
         .def_readonly("problem", &ControlProblemWithCounters::problem)
         .def_readonly("evaluations", &ControlProblemWithCounters::evaluations);
     if constexpr (std::is_same_v<typename Conf::real_t, double>) {
+
+#if ALPAQA_HAVE_CASADI_OCP
         static constexpr auto te_pwc = []<class P>(P &&p) -> ControlProblemWithCounters {
             using PwC = alpaqa::ControlProblemWithCounters<P>;
             auto te_p = ControlProblem::template make<PwC>(std::forward<P>(p));
             auto eval = te_p.template as<PwC>().evaluations;
             return {std::move(te_p), std::move(eval)};
         };
-
-#if ALPAQA_HAVE_CASADI_OCP
         using CasADiControlProblem       = alpaqa::CasADiControlProblem<config_t>;
         auto load_CasADi_control_problem = [](const char *so_name, unsigned N) {
             return std::make_unique<CasADiControlProblem>(so_name, N);
         };
 #else
         struct CasADiControlProblem {};
-        auto load_CasADi_control_problem = [](const char *so_name,
-                                              unsigned N) -> std::unique_ptr<CasADiControlProblem> {
+        auto load_CasADi_control_problem = [](const char *,
+                                              unsigned) -> std::unique_ptr<CasADiControlProblem> {
             throw std::runtime_error(
                 "This version of alpaqa was compiled without CasADi optimal control support");
         };

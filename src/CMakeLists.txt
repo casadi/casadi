@@ -254,10 +254,13 @@ if (ALPAQA_WITH_DRIVERS)
         MINSIZEREL_POSTFIX ""
     )
     target_link_libraries(driver
-        PRIVATE alpaqa::alpaqa alpaqa::casadi-loader
-                alpaqa::warnings alpaqa::dl-loader)
+        PRIVATE alpaqa::alpaqa alpaqa::warnings alpaqa::dl-loader)
     add_executable(alpaqa::driver ALIAS driver)
     list(APPEND ALPAQA_INSTALL_EXE driver)
+    if (TARGET alpaqa::casadi-loader)
+        target_link_libraries(driver PUBLIC alpaqa::casadi-loader)
+        target_compile_definitions(driver PUBLIC ALPAQA_HAVE_CASADI)
+    endif()
     if (TARGET alpaqa::casadi-ocp-loader)
         target_link_libraries(driver PUBLIC alpaqa::casadi-ocp-loader)
     endif()
