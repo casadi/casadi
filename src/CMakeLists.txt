@@ -226,6 +226,8 @@ if (ALPAQA_WITH_LBFGSB)
         "interop/lbfgsb/src/lbfgsb-params.cpp"
         "interop/lbfgsb/src/lbfgsb_c.f90"
     )
+    set_property(SOURCE "interop/lbfgsb/src/lbfgsb_c.f90"
+                 PROPERTY Fortran_PREPROCESS On)
     target_link_libraries(lbfgsb-adapter 
         PUBLIC lbfgsb-fortran alpaqa::alpaqa PRIVATE alpaqa::warnings)
     target_include_directories(lbfgsb-adapter PUBLIC
