@@ -100,6 +100,7 @@ if(COINMUMPS_FOUND AND NOT TARGET COIN::MUMPS)
     endif()
     set_target_properties(COIN::MUMPS PROPERTIES LINKER_LANGUAGE Fortran)
     target_link_options(COIN::MUMPS INTERFACE ${PC_MUMPS_LDFLAGS})
+    target_link_libraries(COIN::MUMPS INTERFACE ${PC_MUMPS_LIBRARIES})
 endif()
 
 mark_as_advanced(

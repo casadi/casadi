@@ -89,8 +89,8 @@ if(Ipopt_FOUND AND NOT TARGET COIN::Ipopt)
         IMPORTED_LOCATION "${Ipopt_LIBRARY}"
         INTERFACE_INCLUDE_DIRECTORIES "${Ipopt_INCLUDE_DIR}"
     )
-    find_package(COINMUMPS REQUIRED)
-    target_link_libraries(COIN::Ipopt INTERFACE COIN::MUMPS ${CMAKE_DL_LIBS})
+    target_link_options(COIN::Ipopt INTERFACE ${PC_Ipopt_LDFLAGS})
+    target_link_libraries(COIN::Ipopt INTERFACE ${PC_Ipopt_LIBRARIES})
 endif()
 
 mark_as_advanced(
