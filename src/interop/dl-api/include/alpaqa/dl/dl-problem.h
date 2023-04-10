@@ -330,7 +330,7 @@ typedef struct {
 }
 #endif
 
-#if __cplusplus > 201703L
+#if defined(__cplusplus) && __cplusplus > 201703L
 
 #include <any>
 #include <functional>
