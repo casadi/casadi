@@ -1800,11 +1800,6 @@ namespace casadi {
           sp = get_jac_sparsity_gen<false>(oind, iind);
         }
       }
-      // There may be false positives here that are not present
-      // in the reverse mode that precedes it.
-      // This can lead to an assymetrical result
-      //  cf. #1522
-      if (symmetric) sp=sp*sp.T();
       return sp;
     } else {
       // Not calculated
@@ -1876,7 +1871,15 @@ namespace casadi {
           jsp = sp;
         } else {
           jsp_other = sp;
-          jsp = compact ? to_compact(oind, iind, sp) : from_compact(oind, iind, sp);
+          if (compact) {
+            // We have the non-compact sparsity pattern, get the compact one
+            jsp = to_compact(oind, iind, sp);
+          } else {
+            // We have the compact sparsity pattern, get the non-compact one
+            jsp = from_compact(oind, iind, sp);
+            // Make sure the non-compact Jacobian is symmetric, cf. #1522, #3074
+            if (symmetric) jsp = jsp * jsp.T();
+          }
         }
       }
     }

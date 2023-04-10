@@ -263,8 +263,8 @@ void SundialsInterface::init(const Dict& opts) {
       create_forward("jtimesF", nfwd_);
     }
     if (nadj_ > 0) {
-      create_function(rdae_, "jtimesB",
-        {"in_t", "in_x", "in_z", "in_p", "in_u", "adj_ode", "adj_alg", "adj_quad", "fwd:adj_ode", "fwd:adj_alg"},
+      create_function(rdae_, "jtimesB", {"in_t", "in_x", "in_z", "in_p", "in_u",
+        "adj_ode", "adj_alg", "adj_quad", "fwd:adj_ode", "fwd:adj_alg"},
         {"fwd:adj_x", "fwd:adj_z"});
       if (nfwd_ > 0) {
         create_forward("jtimesB", nfwd_);
