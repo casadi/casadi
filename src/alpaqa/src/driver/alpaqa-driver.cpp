@@ -5,12 +5,13 @@
 #include <alpaqa/util/print.hpp>
 
 #include <alpaqa/implementation/outer/alm.tpp>
-#include <alpaqa/inner/directions/panoc/structured-newton.hpp>
 #include <alpaqa/newton-tr-pantr-alm.hpp>
 #include <alpaqa/panoc-alm.hpp>
+#include <alpaqa/panoc-anderson-alm.hpp>
 #include <alpaqa/structured-panoc-alm.hpp>
 #include <alpaqa/structured-zerofpr-alm.hpp>
 #include <alpaqa/zerofpr-alm.hpp>
+#include <alpaqa/zerofpr-anderson-alm.hpp>
 
 #include "output.hpp"
 #include "results.hpp"
@@ -122,7 +123,7 @@ auto make_solver(const auto &extra_opts) {
 
 template <class Solver>
 BenchmarkResults
-do_experiment_impl(auto &problem, Solver &solver,
+do_experiment_impl(LoadedProblem &problem, Solver &solver, std::ostream &os,
                    std::span<const std::string_view> extra_opts) {
     auto evals = problem.evaluations;
 
@@ -138,13 +139,13 @@ do_experiment_impl(auto &problem, Solver &solver,
     auto avg_duration = stats.elapsed_time;
     unsigned N_exp    = 0;
     alpaqa::params::set_params(N_exp, "num_exp", extra_opts);
-    std::cout.setstate(std::ios_base::badbit);
+    os.setstate(std::ios_base::badbit);
     for (unsigned i = 0; i < N_exp; ++i) {
         x.setZero();
         y.setZero();
         avg_duration += solver(problem.problem, x, y).elapsed_time;
     }
-    std::cout.clear();
+    os.clear();
     avg_duration /= (N_exp + 1);
 
     // Results
@@ -226,10 +227,9 @@ auto make_ipopt_solver(std::span<const std::string_view> extra_opts) {
     return app;
 }
 
-BenchmarkResults
-do_experiment_impl(auto &problem,
-                   Ipopt::SmartPtr<Ipopt::IpoptApplication> &solver,
-                   std::span<const std::string_view> extra_opts) {
+BenchmarkResults do_experiment_impl(
+    LoadedProblem &problem, Ipopt::SmartPtr<Ipopt::IpoptApplication> &solver,
+    std::ostream &os, std::span<const std::string_view> extra_opts) {
     // Ipopt problem adapter
     using Problem                    = alpaqa::IpoptAdapter;
     Ipopt::SmartPtr<Ipopt::TNLP> nlp = new Problem(problem.problem);
@@ -249,14 +249,14 @@ do_experiment_impl(auto &problem,
     auto avg_duration = duration_cast<ns>(t1 - t0);
     unsigned N_exp    = 0;
     alpaqa::params::set_params(N_exp, "num_exp", extra_opts);
-    std::cout.setstate(std::ios_base::badbit);
+    os.setstate(std::ios_base::badbit);
     for (unsigned i = 0; i < N_exp; ++i) {
         auto t0 = std::chrono::steady_clock::now();
         solver->OptimizeTNLP(nlp);
         auto t1 = std::chrono::steady_clock::now();
         avg_duration += duration_cast<ns>(t1 - t0);
     }
-    std::cout.clear();
+    os.clear();
     avg_duration /= (N_exp + 1);
 
     // Results
@@ -317,27 +317,112 @@ auto attach_cancellation(auto &solver) {
         &solver_to_stop};
 }
 
-void do_experiment(auto &problem, auto &solver,
+void do_experiment(LoadedProblem &problem, auto &&solver, std::ostream &os,
                    std::span<const std::string_view> extra_opts) {
     // Try stopping gracefully when SIGINT (Ctrl+C) or SIGTERM is received.
     using stop_solver_t = std::atomic<decltype(&solver)>;
     static stop_solver_t solver_to_stop{nullptr};
     auto cancellation = attach_cancellation<solver_to_stop>(solver);
+    if constexpr (requires { solver.os; })
+        solver.os = &os;
 
     // Run experiment
-    BenchmarkResults results = do_experiment_impl(problem, solver, extra_opts);
+    BenchmarkResults results =
+        do_experiment_impl(problem, solver, os, extra_opts);
 
     // Print results to output
-    print_results(std::cout, results);
+    print_results(os, results);
 
     // Write results to file
     auto timestamp_str = std::to_string(results.timestamp);
     auto rnd_str       = random_hex_string(std::random_device());
     auto suffix        = timestamp_str + '_' + rnd_str;
     auto results_name  = "results_" + suffix;
-    std::cout << "results: " << suffix << std::endl;
+    os << "results: " << suffix << std::endl;
     std::ofstream res_file{results_name + ".py"};
     write_results(res_file, results);
+}
+
+std::string format_string_list(
+    const auto &container,
+    const auto &proj = [](const auto &x) -> decltype(auto) { return x; }) {
+    if (container.empty())
+        return std::string{};
+    auto penult       = std::prev(container.end());
+    auto quote_concat = [&](std::string &&a, const auto &b) {
+        return a + "'" + std::string(proj(b)) + "', ";
+    };
+    return std::accumulate(container.begin(), penult, std::string{},
+                           quote_concat) +
+           "'" + std::string(proj(*penult)) + "'";
+}
+
+template <template <class> class Solver>
+void do_experiment_with_direction(
+    std::string_view direction, LoadedProblem &problem, std::ostream &os,
+    std::span<const std::string_view> extra_opts) {
+    if (direction.empty())
+        direction = "lbfgs";
+    // Available solvers
+    std::map<std::string_view, std::function<void()>> directions{
+        {"lbfgs",
+         [&] {
+             using InnerSolver = Solver<alpaqa::LBFGSDirection<config_t>>;
+             do_experiment(problem, make_solver<InnerSolver>(extra_opts), os,
+                           extra_opts);
+         }},
+        {"struclbfgs",
+         [&] {
+             using InnerSolver =
+                 Solver<alpaqa::StructuredLBFGSDirection<config_t>>;
+             do_experiment(problem, make_solver<InnerSolver>(extra_opts), os,
+                           extra_opts);
+         }},
+        {"anderson",
+         [&] {
+             using InnerSolver = Solver<alpaqa::AndersonDirection<config_t>>;
+             do_experiment(problem, make_solver<InnerSolver>(extra_opts), os,
+                           extra_opts);
+         }},
+    };
+    // Run experiment
+    auto dir_it = directions.find(direction);
+    if (dir_it != directions.end())
+        dir_it->second();
+    else
+        throw std::invalid_argument(
+            "Unknown direction '" + std::string(direction) + "'\n" +
+            "  Available directions: " +
+            format_string_list(directions,
+                               [](const auto &x) { return x.first; }));
+}
+
+template <>
+void do_experiment_with_direction<alpaqa::PANTRSolver>(
+    std::string_view direction, LoadedProblem &problem, std::ostream &os,
+    std::span<const std::string_view> extra_opts) {
+    if (direction.empty())
+        direction = "newtontr";
+    // Available solvers
+    std::map<std::string_view, std::function<void()>> directions{
+        {"newtontr",
+         [&] {
+             using InnerSolver =
+                 alpaqa::PANTRSolver<alpaqa::NewtonTRDirection<config_t>>;
+             do_experiment(problem, make_solver<InnerSolver>(extra_opts), os,
+                           extra_opts);
+         }},
+    };
+    // Run experiment
+    auto dir_it = directions.find(direction);
+    if (dir_it != directions.end())
+        dir_it->second();
+    else
+        throw std::invalid_argument(
+            "Unknown direction '" + std::string(direction) + "'\n" +
+            "  Available directions: " +
+            format_string_list(directions,
+                               [](const auto &x) { return x.first; }));
 }
 
 void print_usage(const char *a0) {
@@ -378,82 +463,74 @@ int main(int argc, char *argv[]) try {
     std::vector<std::string_view> extra_opts;
     std::copy(argv + 2, argv + argc, std::back_inserter(extra_opts));
 
+    // Check which solver to use
+    std::string_view solver_name = "panoc", direction_name;
+    alpaqa::params::set_params(solver_name, "method", extra_opts);
+    std::tie(solver_name, direction_name) =
+        alpaqa::params::split_key(solver_name, '.');
+
+    std::string out_path = "-";
+    alpaqa::params::set_params(out_path, "out", extra_opts);
+    std::ofstream out_fstream;
+    if (out_path != "-")
+        if (out_fstream.open(out_path); !out_fstream)
+            throw std::runtime_error("Unable to open '" + out_path + "'");
+    std::ostream &os = out_fstream.is_open() ? out_fstream : std::cout;
+
     // Load the problem
     auto problem = load_problem(prob_type, prob_path.parent_path(),
                                 prob_path.filename(), extra_opts);
-    std::cout << "Loaded problem " << problem.path.stem().c_str() << " from "
-              << problem.path << "\nProvided functions:\n";
-    alpaqa::print_provided_functions(std::cout, problem.problem);
-    std::cout << std::endl;
-
-    // Check which solver to use
-    std::string_view solver_name = "pantr";
-    alpaqa::params::set_params(solver_name, "method", extra_opts);
+    os << "Loaded problem " << problem.path.stem().c_str() << " from "
+       << problem.path << "\nProvided functions:\n";
+    alpaqa::print_provided_functions(os, problem.problem);
+    os << std::endl;
 
     // Available solvers
-    std::map<std::string_view, std::function<void()>> solvers {
+    std::map<std::string_view, std::function<void(std::string_view)>> solvers {
         {"pantr",
-         [&] {
-             using Direction   = alpaqa::NewtonTRDirection<config_t>;
-             using InnerSolver = alpaqa::PANTRSolver<Direction>;
-             auto solver       = make_solver<InnerSolver>(extra_opts);
-             do_experiment(problem, solver, extra_opts);
+         [&](std::string_view direction) {
+             do_experiment_with_direction<alpaqa::PANTRSolver>(
+                 direction, problem, os, extra_opts);
          }},
-            {"strucpanoc",
-             [&] {
-                 using Direction   = alpaqa::StructuredLBFGSDirection<config_t>;
-                 using InnerSolver = alpaqa::PANOCSolver<Direction>;
-                 auto solver       = make_solver<InnerSolver>(extra_opts);
-                 do_experiment(problem, solver, extra_opts);
-             }},
-            {"newtpanoc",
-             [&] {
-                 using Direction = alpaqa::StructuredNewtonDirection<config_t>;
-                 using InnerSolver = alpaqa::PANOCSolver<Direction>;
-                 auto solver       = make_solver<InnerSolver>(extra_opts);
-                 do_experiment(problem, solver, extra_opts);
-             }},
             {"panoc",
-             [&] {
-                 using Direction   = alpaqa::LBFGSDirection<config_t>;
-                 using InnerSolver = alpaqa::PANOCSolver<Direction>;
-                 auto solver       = make_solver<InnerSolver>(extra_opts);
-                 do_experiment(problem, solver, extra_opts);
+             [&](std::string_view direction) {
+                 do_experiment_with_direction<alpaqa::PANOCSolver>(
+                     direction, problem, os, extra_opts);
              }},
-            {"struczfpr",
-             [&] {
-                 using Direction   = alpaqa::StructuredLBFGSDirection<config_t>;
-                 using InnerSolver = alpaqa::ZeroFPRSolver<Direction>;
-                 auto solver       = make_solver<InnerSolver>(extra_opts);
-                 do_experiment(problem, solver, extra_opts);
-             }},
-            {"zfpr",
-             [&] {
-                 using Direction   = alpaqa::LBFGSDirection<config_t>;
-                 using InnerSolver = alpaqa::ZeroFPRSolver<Direction>;
-                 auto solver       = make_solver<InnerSolver>(extra_opts);
-                 do_experiment(problem, solver, extra_opts);
+            {"zerofpr",
+             [&](std::string_view direction) {
+                 do_experiment_with_direction<alpaqa::ZeroFPRSolver>(
+                     direction, problem, os, extra_opts);
              }},
 #if WITH_IPOPT
             {"ipopt",
-             [&] {
+             [&](std::string_view direction) {
+                 if (!direction.empty())
+                     throw std::runtime_error(
+                         "Ipopt does not support directions.");
                  auto solver = make_ipopt_solver(extra_opts);
-                 do_experiment(problem, solver, extra_opts);
+                 do_experiment(problem, solver, os, extra_opts);
              }},
 #endif
 #if WITH_LBFGSPP
-            {"lbfgspp",
-             [&] {
+            {"lbfgsbpp",
+             [&](std::string_view direction) {
+                 if (!direction.empty())
+                     throw std::runtime_error(
+                         "LBFGSB++ does not support directions.");
                  using InnerSolver = InnerLBFGSppSolver;
                  auto solver       = make_solver<InnerSolver>(extra_opts);
-                 do_experiment(problem, solver, extra_opts);
+                 do_experiment(problem, solver, os, extra_opts);
              }},
 #endif
 #if WITH_LBFGSB
-            {"lbfgsb", [&] {
+            {"lbfgsb", [&](std::string_view direction) {
+                 if (!direction.empty())
+                     throw std::runtime_error(
+                         "Ipopt does not support directions.");
                  using InnerSolver = InnerLBFGSBSolver;
                  auto solver       = make_solver<InnerSolver>(extra_opts);
-                 do_experiment(problem, solver, extra_opts);
+                 do_experiment(problem, solver, os, extra_opts);
              }},
 #endif
     };
@@ -461,21 +538,13 @@ int main(int argc, char *argv[]) try {
     // Run experiment
     auto solver_it = solvers.find(solver_name);
     if (solver_it != solvers.end())
-        solver_it->second();
+        solver_it->second(direction_name);
     else
         throw std::invalid_argument(
             "Unknown solver '" + std::string(solver_name) + "'\n" +
-            "  Available solvers: " + [&] {
-                if (solvers.empty())
-                    return std::string{};
-                auto penult       = std::prev(solvers.end());
-                auto quote_concat = [](std::string &&a, auto b) {
-                    return a + "'" + std::string(b.first) + "', ";
-                };
-                return std::accumulate(solvers.begin(), penult, std::string{},
-                                       quote_concat) +
-                       "'" + std::string(penult->first) + "'";
-            }());
+            "  Available solvers: " +
+            format_string_list(solvers, [](const auto &x) { return x.first; }));
+
 } catch (std::exception &e) {
     std::cerr << "Error: " << demangled_typename(typeid(e)) << ":\n  "
               << e.what() << std::endl;
