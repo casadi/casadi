@@ -15,6 +15,14 @@
 # Copyright (c) 2009 Benoit Jacob <jacob.benoit.1@gmail.com>
 # Redistribution and use is allowed according to the terms of the 2-clause BSD license.
 
+# If Eigen3Config.cmake is installed, this defines
+# EIGEN3_INCLUDE_DIR
+# It is important that this is called before Eigen3_FIND_VERSION_***
+# variables are defined as in some CMake version this variables
+# interfere with the correct finding of Eigen3 module, complaining
+# that the found version is not compatible with 2.91.0
+find_package(Eigen3 NO_MODULE QUIET)
+
 if(NOT Eigen3_FIND_VERSION)
   if(NOT Eigen3_FIND_VERSION_MAJOR)
     set(Eigen3_FIND_VERSION_MAJOR 2)
@@ -52,10 +60,6 @@ macro(_eigen3_check_version)
                    "but at least version ${Eigen3_FIND_VERSION} is required")
   endif(NOT EIGEN3_VERSION_OK)
 endmacro(_eigen3_check_version)
-
-# If Eigen3Config.cmake is installed, this defines
-# EIGEN3_INCLUDE_DIR
-find_package(Eigen3 NO_MODULE QUIET)
 
 if(EIGEN3_INCLUDE_DIR)
 
