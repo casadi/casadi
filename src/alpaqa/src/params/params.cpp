@@ -1,3 +1,4 @@
+#include <alpaqa/inner/directions/panoc/anderson.hpp>
 #include <alpaqa/inner/directions/panoc/lbfgs.hpp>
 #include <alpaqa/inner/directions/panoc/structured-lbfgs.hpp>
 #include <alpaqa/inner/directions/panoc/structured-newton.hpp>
@@ -153,6 +154,11 @@ PARAMS_TABLE(LBFGSParams<config_t>,        //
              PARAMS_MEMBER(stepsize),      //
 );
 
+PARAMS_TABLE(AndersonAccelParams<config_t>, //
+             PARAMS_MEMBER(memory),         //
+             PARAMS_MEMBER(min_div_fac),    //
+);
+
 PARAMS_TABLE(CBFGSParams<config_t>, //
              PARAMS_MEMBER(α),      //
              PARAMS_MEMBER(ϵ),      //
@@ -230,6 +236,10 @@ PARAMS_TABLE(ZeroFPRParams<config_t>,                                   //
 );
 
 PARAMS_TABLE(LBFGSDirectionParams<config_t>,              //
+             PARAMS_MEMBER(rescale_on_step_size_changes), //
+);
+
+PARAMS_TABLE(AndersonDirectionParams<config_t>,           //
              PARAMS_MEMBER(rescale_on_step_size_changes), //
 );
 
@@ -393,7 +403,9 @@ ALPAQA_SET_PARAM_INST(PANOCParams<config_t>);
 ALPAQA_SET_PARAM_INST(ZeroFPRParams<config_t>);
 ALPAQA_SET_PARAM_INST(PANTRParams<config_t>);
 ALPAQA_SET_PARAM_INST(LBFGSParams<config_t>);
+ALPAQA_SET_PARAM_INST(AndersonAccelParams<config_t>);
 ALPAQA_SET_PARAM_INST(LBFGSDirectionParams<config_t>);
+ALPAQA_SET_PARAM_INST(AndersonDirectionParams<config_t>);
 ALPAQA_SET_PARAM_INST(StructuredLBFGSDirectionParams<config_t>);
 ALPAQA_SET_PARAM_INST(NewtonTRDirectionParams<config_t>);
 ALPAQA_SET_PARAM_INST(SteihaugCGParams<config_t>);
