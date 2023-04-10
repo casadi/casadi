@@ -1,0 +1,5 @@
+sources:
+  "3.6.0":
+    url: "https://github.com/casadi/casadi/archive/refs/tags/3.6.0.zip"
+    sha256: "c69b9751d4d920020f5534547b0bc014e069ed064dc65b92391ff120a472bad4"
+    strip_root: true
