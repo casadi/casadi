@@ -1,3 +1,7 @@
+# Local files
+CMakeUserPresets.json
+py-build-cmake.local.toml
+
 # Temporary build and cache folders
 build
 .*cache

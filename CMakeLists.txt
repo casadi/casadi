@@ -24,8 +24,10 @@ option(ALPAQA_WITH_PYTHON
     "Build the Python bindings" Off)
 option(ALPAQA_WARNINGS_AS_ERRORS
     "Enable -Werror or /WX" Off)
+option(BUILD_TESTING
+    "Build tests (for Conan integration)" On)
 option(ALPAQA_WITH_TESTS
-    "Build the tests" On)
+    "Build the tests" ${BUILD_TESTING})
 option(ALPAQA_WITH_EXAMPLES
     "Build the examples" On)
 option(ALPAQA_WITH_DRIVERS
