@@ -22,6 +22,7 @@ function(add_warnings_target tgt_name warnings_as_errors)
         -Wall
         -Wextra
         -Wpedantic
+        -fimplicit-none
     )
     set(COMMON_WARNINGS_C
         -fdiagnostics-show-option
@@ -53,6 +54,10 @@ function(add_warnings_target tgt_name warnings_as_errors)
         -Wunreachable-code-return
         -Wunreachable-code-aggressive
         -Wno-error=self-assign-overloaded
+    )
+    # Flang
+    set(FLANG_WARNINGS_Fortran
+        -fimplicit-none
     )
     # MSVC (Microsoft)
     set(MSVC_WARNINGS_CXX

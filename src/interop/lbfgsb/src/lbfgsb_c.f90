@@ -1,6 +1,11 @@
 module lbfgsb_c
    use iso_c_binding
+
+#ifdef __flang__
+   implicit none (type)
+#else
    implicit none (type,external)
+#endif
 
    interface
       !> Main function from the original L-BFGS-B Fortran API.
