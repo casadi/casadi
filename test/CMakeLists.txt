@@ -4,9 +4,9 @@ enable_testing()
 include(GoogleTest)
 
 # Dependencies
-find_package(GTest REQUIRED CONFIG)
+find_package(GTest REQUIRED)
 if (NOT TARGET alpaqa::alpaqa)
-    find_package(alpaqa REQUIRED CONFIG)
+    find_package(alpaqa REQUIRED)
 endif()
 
 add_executable(tests
