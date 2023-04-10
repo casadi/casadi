@@ -14,7 +14,7 @@
         },
         {
             "name": "debug",
-            "hidden": true,
+            "displayName": "Minimal development version",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
                 "WITH_LINT": "ON",
@@ -89,8 +89,7 @@
             ],
             "cacheVariables": {
                 "PYTHON_PREFIX": "${sourceDir}/out/install/${presetName}/python",
-                "WITH_CLANG": "ON",
-                "WITH_BUILD_REQUIRED": "ON"
+                "WITH_CLANG": "ON"
             }
         },
         {
