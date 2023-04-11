@@ -36,7 +36,7 @@ runs:
       run: |
         apt -y update
         apt -y install --no-install-recommends \
-          wget bzip2 xz-utils ccache ninja-build ca-certificates
+          wget bzip2 xz-utils ccache ninja-build pkg-config ca-certificates
     # Cache
     - name: Cache tools
       id: cache-tools
