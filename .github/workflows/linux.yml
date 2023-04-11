@@ -64,6 +64,7 @@ jobs:
             -D ALPAQA_WITH_QUAD_PRECISION=$quadmath \
             -D ALPAQA_WITH_CASADI=On \
             -D CMAKE_TOOLCHAIN_FILE="$staging/cmake/$host.toolchain.cmake" \
+            -D CMAKE_PREFIX_PATH="$staging/mumps/usr/local;$staging/ipopt/usr/local" \
             -D CMAKE_FIND_ROOT_PATH="$staging/eigen;$staging/casadi;$staging/openblas;$staging/mumps;$staging/ipopt"
         env:
           CXXFLAGS: '-static-libstdc++'

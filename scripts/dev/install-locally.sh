@@ -32,6 +32,7 @@ export FCFLAGS="-march=native -fdiagnostics-color"
 # Configure
 cmake -S. -Bbuild-local \
     --toolchain "$pfx/cmake/$triple.toolchain.cmake" \
+    -DCMAKE_PREFIX_PATH="$pfx/mumps/usr/local;$pfx/ipopt/usr/local" \
     -DCMAKE_FIND_ROOT_PATH="$pfx/eigen;$pfx/casadi;$pfx/openblas;$pfx/mumps;$pfx/ipopt" \
     -DCMAKE_POSITION_INDEPENDENT_CODE=On \
     -DBUILD_SHARED_LIBS=On \
