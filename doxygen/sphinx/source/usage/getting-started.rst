@@ -93,47 +93,41 @@ decision variables and an optional parameter vector.
 
     # Make symbolic decision variables
     x1, x2 = cs.SX.sym("x1"), cs.SX.sym("x2")
-    # Collect decision variables into one vector
-    x = cs.vertcat(x1, x2)
+    x = cs.vertcat(x1, x2)  # Collect decision variables into one vector
     # Make a parameter symbol
     p = cs.SX.sym("p")
 
-    # Expressions for the objective function f and the constraints g
-    f_expr = (1 - x1) ** 2 + p * (x2 - x1 ** 2) ** 2
-    g_expr = cs.vertcat(
+    # Objective function f and the constraints function g
+    f = (1 - x1) ** 2 + p * (x2 - x1**2) ** 2
+    g = cs.vertcat(
         (x1 - 0.5) ** 3 - x2 + 1,
         x1 + x2 - 1.5,
     )
 
-    # Convert the symbolic expressions to CasADi functions
-    f = cs.Function("f", [x, p], [f_expr])
-    g = cs.Function("g", [x, p], [g_expr])
-
-    # Set the bounds
+    # Define the bounds
     C = [-0.25, -0.5], [1.5, 2.5]  # -0.25 <= x1 <= 1.5, -0.5 <= x2 <= 2.5
     D = [-np.inf, -np.inf], [0, 0]  #         g1 <= 0,           g2 <= 0
-    # Set the problem parameter
-    param = [1.0]
 
-Next, the gradients of the functions are computed using CasADi, and they are 
-compiled as efficient C functions. All of this happens inside of the 
-:py:func:`alpaqa.casadi_loader.generate_and_compile_casadi_problem`
+Next, we compose the alpaqa-specific minimization problem, using the
+:py:func:`alpaqa.pyapi.minimize.minimize` function.
+The gradients of the problem functions are computed using CasADi, and they are
+compiled as efficient C functions. All of this happens inside of the
+:py:meth:`alpaqa.pyapi.minimize.MinimizationProblemDescription.compile`
 function, which returns an instance of
-:py:class:`alpaqa._alpaqa.float64.CasADiProblem`.
+:py:class:`alpaqa._alpaqa.float64.CasADiProblem` that can later be passed to a
+solver.
 
 .. testcode::
 
     # %% Generate and compile C-code for the objective and constraints using alpaqa
-    import alpaqa.casadi_loader as cl
+    from alpaqa import minimize
 
-    # Compile and load the problem
-    prob = cl.generate_and_compile_casadi_problem(
-        f=f,  # minimize    f(x; param)
-        C=C,  # subject to  x ∊ C
-        g=g,  # subject to  g(x; param) ∊ D
-        D=D,
-        param=param,
-    )
+    problem = (
+        minimize(f, x)  #       Objective function f(x)
+        .subject_to_box(C)  #   Box constraints x ∊ C
+        .subject_to(g, D)  #    General ALM constraints g(x) ∊ D
+        .with_param(p, [1])  #  Parameter with default value (can be changed later)
+    ).compile()
 
 .. testoutput::
     :options: +ELLIPSIS
@@ -147,8 +141,8 @@ specified when generating the problem, or can be modified after loading it:
 .. testcode::
 
     # You can change the bounds and parameters after loading the problem
-    prob.param = [10.0]
-    prob.D.lowerbound[1] = -1e20
+    problem.param = [10.0]
+    problem.D.lowerbound[1] = -1e20
 
 Selecting a solver
 ^^^^^^^^^^^^^^^^^^
@@ -219,13 +213,13 @@ initial values for :code:`x0` and :code:`y0` are zero.
     y0 = [0.0, 0.0]  # Lagrange multipliers for g(x)
 
     # Solve the problem
-    x_sol, y_sol, stats = solver(prob, x0, y0)
+    x_sol, y_sol, stats = solver(problem, x0, y0)
 
     # Print the results
     print(stats["status"])
     print(f"Solution:      {x_sol}")
     print(f"Multipliers:   {y_sol}")
-    print(f"Cost:          {prob.eval_f(x_sol):.5f}")
+    print(f"Cost:          {problem.eval_f(x_sol):.5f}")
 
 This will print something similar to:
 

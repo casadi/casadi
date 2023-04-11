@@ -1,8 +1,39 @@
 Python API Reference 
 ====================
 
-Inner PANOC solver
-------------------
+High-level problem formulation
+
+.. autofunction:: alpaqa.pyapi.minimize.minimize
+    :noindex:
+
+.. autoclass:: alpaqa.pyapi.minimize.MinimizationProblemDescription
+    :noindex:
+    :no-members:
+    :no-special-members:
+
+    .. automethod:: alpaqa.pyapi.minimize.MinimizationProblemDescription.subject_to_box
+        :noindex:
+
+    .. automethod:: alpaqa.pyapi.minimize.MinimizationProblemDescription.subject_to
+        :noindex:
+
+    .. automethod:: alpaqa.pyapi.minimize.MinimizationProblemDescription.subject_to_penalty
+        :noindex:
+
+    .. automethod:: alpaqa.pyapi.minimize.MinimizationProblemDescription.with_l1_regularizer
+        :noindex:
+
+    .. automethod:: alpaqa.pyapi.minimize.MinimizationProblemDescription.with_param
+        :noindex:
+
+    .. automethod:: alpaqa.pyapi.minimize.MinimizationProblemDescription.with_param_value
+        :noindex:
+
+    .. automethod:: alpaqa.pyapi.minimize.MinimizationProblemDescription.compile
+        :noindex:
+
+Inner PANOC and ZeroFPR Solvers
+-------------------------------
 
 .. autoclass:: alpaqa._alpaqa.float64.PANOCSolver
     :noindex:
@@ -10,7 +41,13 @@ Inner PANOC solver
 .. autoclass:: alpaqa._alpaqa.float64.PANOCParams
     :noindex:
 
-PANOC accelerators
+.. autoclass:: alpaqa._alpaqa.float64.ZeroFPRSolver
+    :noindex:
+
+.. autoclass:: alpaqa._alpaqa.float64.ZeroFPRParams
+    :noindex:
+
+Accelerators
 ^^^^^^^^^^^^^^^^^^
 
 .. autoclass:: alpaqa._alpaqa.float64.LBFGSDirection
@@ -22,7 +59,34 @@ PANOC accelerators
 .. autoclass:: alpaqa._alpaqa.float64.LBFGS.Params
     :noindex:
 
-Outer ALM solver
+.. autoclass:: alpaqa._alpaqa.float64.AndersonDirection
+    :noindex:
+
+.. autoclass:: alpaqa._alpaqa.float64.AndersonAccel.Params
+    :noindex:
+
+Inner PANTR Solver
+------------------
+
+.. autoclass:: alpaqa._alpaqa.float64.PANTRSolver
+    :noindex:
+
+.. autoclass:: alpaqa._alpaqa.float64.PANTRParams
+    :noindex:
+
+Accelerators
+^^^^^^^^^^^^
+
+.. autoclass:: alpaqa._alpaqa.float64.NewtonTRDirection
+    :noindex:
+
+.. autoclass:: alpaqa._alpaqa.float64.SteihaugCGParams
+    :noindex:
+
+.. autoclass:: alpaqa._alpaqa.float64.NewtonTRDirectionParams
+    :noindex:
+
+Outer ALM Solver
 ----------------
 
 .. autoclass:: alpaqa._alpaqa.float64.ALMSolver
@@ -67,3 +131,5 @@ All
 .. automodule:: alpaqa.casadi_generator
 
 .. automodule:: alpaqa.casadi_loader
+
+.. automodule:: alpaqa.pyapi.minimize
