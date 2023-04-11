@@ -12,7 +12,7 @@ case $(uname -m) in
 esac
 
 # Download compiler
-download_url="https://github.com/tttapa/cross-python/releases/download/0.0.13"
+download_url="https://github.com/tttapa/cross-python/releases/download/0.0.14"
 tools_dir="$PWD/toolchains"
 pfx="$tools_dir/$triple"
 mkdir -p "$tools_dir"
