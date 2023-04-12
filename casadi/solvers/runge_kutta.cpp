@@ -209,21 +209,21 @@ namespace casadi {
       g_arg.resize(BSTEP_NUM_IN);
       g_arg[BSTEP_T] = t0;
       g_arg[BSTEP_H] = h;
-      g_arg[BSTEP_X] = x0;
+      g_arg[BSTEP_X0] = x0;
+      g_arg[BSTEP_V0] = v;
       g_arg[BSTEP_P] = p;
       g_arg[BSTEP_U] = u;
-      g_arg[BSTEP_V] = v;
-      g_arg[BSTEP_RX0] = rx0;
-      g_arg[BSTEP_RP] = rp;
-      g_arg[BSTEP_RV0] = rv;
+      g_arg[BSTEP_ADJ_XF] = rx0;
+      g_arg[BSTEP_ADJ_QF] = rp;
+      g_arg[BSTEP_ADJ_VF] = rv;
       g_res.resize(BSTEP_NUM_OUT);
-      g_res[BSTEP_RXF] = rxf;
-      g_res[BSTEP_RVF] = horzcat(rx_def);
-      g_res[BSTEP_RQF] = rqf;
-      g_res[BSTEP_UQF] = uqf;
+      g_res[BSTEP_ADJ_X0] = rxf;
+      g_res[BSTEP_ADJ_V0] = horzcat(rx_def);
+      g_res[BSTEP_ADJ_P] = rqf;
+      g_res[BSTEP_ADJ_U] = uqf;
       Function G("stepB", g_arg, g_res,
-        {"t", "h", "rx0", "rv0", "rp", "x", "v", "p", "u"},
-        {"rxf", "rvf", "rqf", "uqf"});
+        {"t", "h", "x0", "v0", "p", "u", "adj_xf", "adj_qf", "adj_vf"},
+        {"adj_x0", "adj_v0", "adj_p", "adj_u"});
       set_function(G, G.name(), true);
       if (nfwd_ > 0) create_forward("stepB", nfwd_);
     }

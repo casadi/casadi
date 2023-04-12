@@ -304,21 +304,21 @@ namespace casadi {
       std::vector<MX> G_in(BSTEP_NUM_IN);
       G_in[BSTEP_T] = t0;
       G_in[BSTEP_H] = h;
-      G_in[BSTEP_X] = x0;
+      G_in[BSTEP_X0] = x0;
+      G_in[BSTEP_V0] = v;
       G_in[BSTEP_P] = p;
       G_in[BSTEP_U] = u;
-      G_in[BSTEP_V] = v;
-      G_in[BSTEP_RX0] = rx0;
-      G_in[BSTEP_RP] = rp;
-      G_in[BSTEP_RV0] = rv;
+      G_in[BSTEP_ADJ_XF] = rx0;
+      G_in[BSTEP_ADJ_QF] = rp;
+      G_in[BSTEP_ADJ_VF] = rv;
       std::vector<MX> G_out(BSTEP_NUM_OUT);
-      G_out[BSTEP_RXF] = rxf;
-      G_out[BSTEP_RVF] = vertcat(eq);
-      G_out[BSTEP_RQF] = rqf;
-      G_out[BSTEP_UQF] = uqf;
+      G_out[BSTEP_ADJ_X0] = rxf;
+      G_out[BSTEP_ADJ_V0] = vertcat(eq);
+      G_out[BSTEP_ADJ_P] = rqf;
+      G_out[BSTEP_ADJ_U] = uqf;
       Function G("implicit_stepB", G_in, G_out,
-        {"t", "h", "rx0", "rv0", "rp", "x", "v", "p", "u"},
-        {"rxf", "rvf", "rqf", "uqf"});
+        {"t", "h", "x0", "v0", "p", "u", "adj_xf", "adj_qf", "adj_vf"},
+        {"adj_x0", "adj_v0", "adj_p", "adj_u"});
       set_function(G, G.name(), true);
     }
   }
