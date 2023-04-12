@@ -1890,9 +1890,12 @@ void FixedStepIntegrator::stepB(FixedStepMemory* m, double t, double h,
   m->arg[BSTEP_V0] = v;  // v
   m->arg[BSTEP_P] = m->p;  // p
   m->arg[BSTEP_U] = m->u;  // u
-  m->arg[BSTEP_ADJ_XF] = rx0;  // rx0
-  m->arg[BSTEP_ADJ_VF] = rv0;  // rv0
-  m->arg[BSTEP_ADJ_QF] = m->rp;  // rp
+  m->arg[BSTEP_OUT_XF] = rx0;  // out:xf
+  m->arg[BSTEP_OUT_VF] = rv0;  // out:vf
+  m->arg[BSTEP_OUT_QF] = m->rp;  // out:qf
+  m->arg[BSTEP_ADJ_XF] = rx0;  // adj:xf
+  m->arg[BSTEP_ADJ_VF] = rv0;  // adj:vf
+  m->arg[BSTEP_ADJ_QF] = m->rp;  // adj:qf
   std::fill(m->res, m->res + BSTEP_NUM_OUT, nullptr);
   m->res[BSTEP_ADJ_T] = nullptr;  // adj:t
   m->res[BSTEP_ADJ_H] = nullptr;  // adj:h
@@ -1905,19 +1908,22 @@ void FixedStepIntegrator::stepB(FixedStepMemory* m, double t, double h,
   if (nfwd_ > 0) {
     m->arg[BSTEP_NUM_IN + BSTEP_ADJ_T] = nullptr;  // out:adj:t
     m->arg[BSTEP_NUM_IN + BSTEP_ADJ_H] = nullptr;  // out:adj:h
-    m->arg[BSTEP_NUM_IN + BSTEP_ADJ_X0] = rxf;  // out:rxf
-    m->arg[BSTEP_NUM_IN + BSTEP_ADJ_V0] = rvf;  // out:rvf
-    m->arg[BSTEP_NUM_IN + BSTEP_ADJ_P] = rqf;  // out:rqf
-    m->arg[BSTEP_NUM_IN + BSTEP_ADJ_U] = uqf;  // out:uqf
+    m->arg[BSTEP_NUM_IN + BSTEP_ADJ_X0] = rxf;  // out:adj:x0
+    m->arg[BSTEP_NUM_IN + BSTEP_ADJ_V0] = rvf;  // out:adj:v0
+    m->arg[BSTEP_NUM_IN + BSTEP_ADJ_P] = rqf;  // out:adj:p
+    m->arg[BSTEP_NUM_IN + BSTEP_ADJ_U] = uqf;  // out:adj:u
     m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_T] = nullptr;  // fwd:t
     m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_H] = nullptr;  // fwd:h
     m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_X0] = x + nx1_;  // fwd:x
     m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_V0] = v + nv1_;  // fwd:v
     m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_P] = m->p + np1_;  // fwd:p
     m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_U] = m->u + nu1_;  // fwd:u
-    m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_ADJ_XF] = rx0 + nrx1_ * nadj_;  // fwd:rx0
-    m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_ADJ_VF] = rv0 + nrv1_;  // fwd:rv0
-    m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_ADJ_QF] = m->rp + nrp1_ * nadj_;  // fwd:rp
+    m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_OUT_XF] = nullptr;  // fwd:out:xf
+    m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_OUT_VF] = nullptr;  // fwd:out:vf
+    m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_OUT_QF] = nullptr;  // fwd:out:qf
+    m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_ADJ_XF] = rx0 + nrx1_ * nadj_;  // fwd:adj:xf
+    m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_ADJ_VF] = rv0 + nrv1_;  // fwd:adj:vf
+    m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_ADJ_QF] = m->rp + nrp1_ * nadj_;  // fwd:adj:qf
     m->res[BSTEP_ADJ_T] = nullptr;  // fwd:adj:t
     m->res[BSTEP_ADJ_H] = nullptr;  // fwd:adj:h
     m->res[BSTEP_ADJ_X0] = rxf + nrx1_ * nadj_;  // fwd:rxf
