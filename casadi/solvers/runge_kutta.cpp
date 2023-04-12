@@ -127,17 +127,17 @@ namespace casadi {
       MX qf = h_sixth * (k1q + 2*k2q + 2*k3q + k4q);
 
       // Define discrete time dynamics
-      f_arg.resize(FSTEP_NUM_IN);
-      f_arg[FSTEP_T] = t0;
-      f_arg[FSTEP_H] = h;
-      f_arg[FSTEP_X0] = x0;
-      f_arg[FSTEP_V0] = v;
-      f_arg[FSTEP_P] = p;
-      f_arg[FSTEP_U] = u;
-      f_res.resize(FSTEP_NUM_OUT);
-      f_res[FSTEP_XF] = xf;
-      f_res[FSTEP_QF] = qf;
-      f_res[FSTEP_VF] = horzcat(x_def);
+      f_arg.resize(STEP_NUM_IN);
+      f_arg[STEP_T] = t0;
+      f_arg[STEP_H] = h;
+      f_arg[STEP_X0] = x0;
+      f_arg[STEP_V0] = v;
+      f_arg[STEP_P] = p;
+      f_arg[STEP_U] = u;
+      f_res.resize(STEP_NUM_OUT);
+      f_res[STEP_XF] = xf;
+      f_res[STEP_QF] = qf;
+      f_res[STEP_VF] = horzcat(x_def);
       Function F("stepF", f_arg, f_res,
         {"t", "h", "x0", "v0", "p", "u"}, {"xf", "vf", "qf"});
       set_function(F, F.name(), true);

@@ -211,17 +211,17 @@ namespace casadi {
     }
 
     // Form forward discrete time dynamics
-    std::vector<MX> F_in(FSTEP_NUM_IN);
-    F_in[FSTEP_T] = t0;
-    F_in[FSTEP_H] = h;
-    F_in[FSTEP_X0] = x0;
-    F_in[FSTEP_P] = p;
-    F_in[FSTEP_U] = u;
-    F_in[FSTEP_V0] = v;
-    std::vector<MX> F_out(FSTEP_NUM_OUT);
-    F_out[FSTEP_XF] = xf;
-    F_out[FSTEP_VF] = vertcat(eq);
-    F_out[FSTEP_QF] = qf;
+    std::vector<MX> F_in(STEP_NUM_IN);
+    F_in[STEP_T] = t0;
+    F_in[STEP_H] = h;
+    F_in[STEP_X0] = x0;
+    F_in[STEP_P] = p;
+    F_in[STEP_U] = u;
+    F_in[STEP_V0] = v;
+    std::vector<MX> F_out(STEP_NUM_OUT);
+    F_out[STEP_XF] = xf;
+    F_out[STEP_VF] = vertcat(eq);
+    F_out[STEP_QF] = qf;
     Function F("implicit_stepF", F_in, F_out,
       {"t", "h", "x0", "v0", "p", "u"}, {"xf", "vf", "qf"});
     set_function(F, F.name(), true);

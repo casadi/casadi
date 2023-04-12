@@ -1612,36 +1612,36 @@ Function FixedStepIntegrator::create_advanced(const Dict& opts) {
 
     // Prepare return Function inputs
     std::vector<MX> intg_in(INTEGRATOR_NUM_IN);
-    intg_in[INTEGRATOR_X0] = F_in[FSTEP_X0];
+    intg_in[INTEGRATOR_X0] = F_in[STEP_X0];
     intg_in[INTEGRATOR_Z0] = z0;
-    intg_in[INTEGRATOR_P] = F_in[FSTEP_P];
-    intg_in[INTEGRATOR_U] = F_in[FSTEP_U];
-    F_in[FSTEP_V0] = algebraic_state_init(intg_in[INTEGRATOR_X0], z0);
+    intg_in[INTEGRATOR_P] = F_in[STEP_P];
+    intg_in[INTEGRATOR_U] = F_in[STEP_U];
+    F_in[STEP_V0] = algebraic_state_init(intg_in[INTEGRATOR_X0], z0);
 
     // Number of finite elements and time steps
     double h = (tout_.back() - t0_)/static_cast<double>(disc_.back());
 
     // Prepare return Function outputs
     std::vector<MX> intg_out(INTEGRATOR_NUM_OUT);
-    F_in[FSTEP_T] = t0_;
-    F_in[FSTEP_H] = h;
+    F_in[STEP_T] = t0_;
+    F_in[STEP_H] = h;
 
     std::vector<MX> F_out;
     // Loop over finite elements
     for (casadi_int k=0; k<disc_.back(); ++k) {
       F_out = F(F_in);
 
-      F_in[FSTEP_X0] = F_out[FSTEP_XF];
-      F_in[FSTEP_V0] = F_out[FSTEP_VF];
-      intg_out[INTEGRATOR_QF] = k==0? F_out[FSTEP_QF] : intg_out[INTEGRATOR_QF]+F_out[FSTEP_QF];
-      F_in[FSTEP_T] += h;
+      F_in[STEP_X0] = F_out[STEP_XF];
+      F_in[STEP_V0] = F_out[STEP_VF];
+      intg_out[INTEGRATOR_QF] = k==0? F_out[STEP_QF] : intg_out[INTEGRATOR_QF]+F_out[STEP_QF];
+      F_in[STEP_T] += h;
     }
 
-    intg_out[INTEGRATOR_XF] = F_out[FSTEP_XF];
+    intg_out[INTEGRATOR_XF] = F_out[STEP_XF];
 
-    // If-clause needed because rk abuses FSTEP_VF output for intermediate state output
+    // If-clause needed because rk abuses STEP_VF output for intermediate state output
     if (nz_) {
-      intg_out[INTEGRATOR_ZF] = algebraic_state_output(F_out[FSTEP_VF]);
+      intg_out[INTEGRATOR_ZF] = algebraic_state_output(F_out[STEP_VF]);
     }
 
     // Extract options for Function constructor
@@ -1691,7 +1691,7 @@ void FixedStepIntegrator::init(const Dict& opts) {
 
   // Get discrete time dimensions
   const Function& F = get_function(has_function("stepF") ? "stepF" : "implicit_stepF");
-  nv1_ = F.nnz_in(FSTEP_V0);
+  nv1_ = F.nnz_in(STEP_V0);
   if (nadj_ > 0) {
     const Function& G = get_function(has_function("stepB") ? "stepB" : "implicit_stepB");
     nrv1_ = G.nnz_in(BSTEP_RV0);
@@ -1849,32 +1849,32 @@ void FixedStepIntegrator::retreat(IntegratorMemory* mem, const double* u,
 void FixedStepIntegrator::stepF(FixedStepMemory* m, double t, double h,
     const double* x0, const double* v0, double* xf, double* vf, double* qf) const {
   // Evaluate nondifferentiated
-  std::fill(m->arg, m->arg + FSTEP_NUM_IN, nullptr);
-  m->arg[FSTEP_T] = &t;  // t
-  m->arg[FSTEP_H] = &h;  // h
-  m->arg[FSTEP_X0] = x0;  // x0
-  m->arg[FSTEP_V0] = v0;  // v0
-  m->arg[FSTEP_P] = m->p;  // p
-  m->arg[FSTEP_U] = m->u;  // u
-  std::fill(m->res, m->res + FSTEP_NUM_OUT, nullptr);
-  m->res[FSTEP_XF] = xf;  // xf
-  m->res[FSTEP_VF] = vf;  // vf
-  m->res[FSTEP_QF] = qf;  // qf
+  std::fill(m->arg, m->arg + STEP_NUM_IN, nullptr);
+  m->arg[STEP_T] = &t;  // t
+  m->arg[STEP_H] = &h;  // h
+  m->arg[STEP_X0] = x0;  // x0
+  m->arg[STEP_V0] = v0;  // v0
+  m->arg[STEP_P] = m->p;  // p
+  m->arg[STEP_U] = m->u;  // u
+  std::fill(m->res, m->res + STEP_NUM_OUT, nullptr);
+  m->res[STEP_XF] = xf;  // xf
+  m->res[STEP_VF] = vf;  // vf
+  m->res[STEP_QF] = qf;  // qf
   calc_function(m, "stepF");
   // Evaluate sensitivities
   if (nfwd_ > 0) {
-    m->arg[FSTEP_NUM_IN + FSTEP_XF] = xf;  // out:xf
-    m->arg[FSTEP_NUM_IN + FSTEP_VF] = vf;  // out:vf
-    m->arg[FSTEP_NUM_IN + FSTEP_QF] = qf;  // out:qf
-    m->arg[FSTEP_NUM_IN + FSTEP_NUM_OUT + FSTEP_T] = nullptr;  // fwd:t
-    m->arg[FSTEP_NUM_IN + FSTEP_NUM_OUT + FSTEP_H] = nullptr;  // fwd:h
-    m->arg[FSTEP_NUM_IN + FSTEP_NUM_OUT + FSTEP_X0] = x0 + nx1_;  // fwd:x0
-    m->arg[FSTEP_NUM_IN + FSTEP_NUM_OUT + FSTEP_V0] = v0 + nv1_;  // fwd:v0
-    m->arg[FSTEP_NUM_IN + FSTEP_NUM_OUT + FSTEP_P] = m->p + np1_;  // fwd:p
-    m->arg[FSTEP_NUM_IN + FSTEP_NUM_OUT + FSTEP_U] = m->u + nu1_;  // fwd:u
-    m->res[FSTEP_XF] = xf + nx1_;  // fwd:xf
-    m->res[FSTEP_VF] = vf + nv1_;  // fwd:vf
-    m->res[FSTEP_QF] = qf + nq1_;  // fwd:qf
+    m->arg[STEP_NUM_IN + STEP_XF] = xf;  // out:xf
+    m->arg[STEP_NUM_IN + STEP_VF] = vf;  // out:vf
+    m->arg[STEP_NUM_IN + STEP_QF] = qf;  // out:qf
+    m->arg[STEP_NUM_IN + STEP_NUM_OUT + STEP_T] = nullptr;  // fwd:t
+    m->arg[STEP_NUM_IN + STEP_NUM_OUT + STEP_H] = nullptr;  // fwd:h
+    m->arg[STEP_NUM_IN + STEP_NUM_OUT + STEP_X0] = x0 + nx1_;  // fwd:x0
+    m->arg[STEP_NUM_IN + STEP_NUM_OUT + STEP_V0] = v0 + nv1_;  // fwd:v0
+    m->arg[STEP_NUM_IN + STEP_NUM_OUT + STEP_P] = m->p + np1_;  // fwd:p
+    m->arg[STEP_NUM_IN + STEP_NUM_OUT + STEP_U] = m->u + nu1_;  // fwd:u
+    m->res[STEP_XF] = xf + nx1_;  // fwd:xf
+    m->res[STEP_VF] = vf + nv1_;  // fwd:vf
+    m->res[STEP_QF] = qf + nq1_;  // fwd:qf
     calc_function(m, forward_name("stepF", nfwd_));
   }
 }
@@ -2014,8 +2014,8 @@ void ImplicitFixedStepIntegrator::init(const Dict& opts) {
   }
 
   // Complete rootfinder dictionary
-  rootfinder_options["implicit_input"] = FSTEP_V0;
-  rootfinder_options["implicit_output"] = FSTEP_VF;
+  rootfinder_options["implicit_input"] = STEP_V0;
+  rootfinder_options["implicit_output"] = STEP_VF;
 
   // Allocate a solver
   Function rf = rootfinder("stepF", implicit_function_name,

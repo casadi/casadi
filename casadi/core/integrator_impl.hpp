@@ -398,33 +398,33 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
 };
 
 /// Input arguments of a forward stepping function
-enum FStepIn {
+enum StepIn {
   /// Current time
-  FSTEP_T,
+  STEP_T,
   /// Step size
-  FSTEP_H,
+  STEP_H,
   /// State vector
-  FSTEP_X0,
+  STEP_X0,
   /// Dependent variables
-  FSTEP_V0,
+  STEP_V0,
   /// Parameter
-  FSTEP_P,
+  STEP_P,
   /// Controls
-  FSTEP_U,
+  STEP_U,
   /// Number of arguments
-  FSTEP_NUM_IN
+  STEP_NUM_IN
 };
 
 /// Output arguments of a forward stepping function
-enum FStepOut {
+enum StepOut {
   /// State vector at next time
-  FSTEP_XF,
+  STEP_XF,
   /// Dependent variables at next time
-  FSTEP_VF,
+  STEP_VF,
   /// Quadrature state contribution
-  FSTEP_QF,
+  STEP_QF,
   /// Number of arguments
-  FSTEP_NUM_OUT
+  STEP_NUM_OUT
 };
 
 /// Input arguments of a backward stepping function
