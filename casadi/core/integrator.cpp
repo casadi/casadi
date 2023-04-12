@@ -1894,6 +1894,8 @@ void FixedStepIntegrator::stepB(FixedStepMemory* m, double t, double h,
   m->arg[BSTEP_ADJ_VF] = rv0;  // rv0
   m->arg[BSTEP_ADJ_QF] = m->rp;  // rp
   std::fill(m->res, m->res + BSTEP_NUM_OUT, nullptr);
+  m->res[BSTEP_ADJ_T] = nullptr;  // adj:t
+  m->res[BSTEP_ADJ_H] = nullptr;  // adj:h
   m->res[BSTEP_ADJ_X0] = rxf;  // rxf
   m->res[BSTEP_ADJ_V0] = rvf;  // rvf
   m->res[BSTEP_ADJ_P] = rqf;  // rqf
@@ -1901,6 +1903,8 @@ void FixedStepIntegrator::stepB(FixedStepMemory* m, double t, double h,
   calc_function(m, "stepB");
   // Evaluate sensitivities
   if (nfwd_ > 0) {
+    m->arg[BSTEP_NUM_IN + BSTEP_ADJ_T] = nullptr;  // out:adj:t
+    m->arg[BSTEP_NUM_IN + BSTEP_ADJ_H] = nullptr;  // out:adj:h
     m->arg[BSTEP_NUM_IN + BSTEP_ADJ_X0] = rxf;  // out:rxf
     m->arg[BSTEP_NUM_IN + BSTEP_ADJ_V0] = rvf;  // out:rvf
     m->arg[BSTEP_NUM_IN + BSTEP_ADJ_P] = rqf;  // out:rqf
@@ -1914,6 +1918,8 @@ void FixedStepIntegrator::stepB(FixedStepMemory* m, double t, double h,
     m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_ADJ_XF] = rx0 + nrx1_ * nadj_;  // fwd:rx0
     m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_ADJ_VF] = rv0 + nrv1_;  // fwd:rv0
     m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_ADJ_QF] = m->rp + nrp1_ * nadj_;  // fwd:rp
+    m->res[BSTEP_ADJ_T] = nullptr;  // fwd:adj:t
+    m->res[BSTEP_ADJ_H] = nullptr;  // fwd:adj:h
     m->res[BSTEP_ADJ_X0] = rxf + nrx1_ * nadj_;  // fwd:rxf
     m->res[BSTEP_ADJ_V0] = rvf + nrv1_;  // fwd:rvf
     m->res[BSTEP_ADJ_P] = rqf + nrq1_ * nadj_;  // fwd:rqf

@@ -312,13 +312,15 @@ namespace casadi {
       G_in[BSTEP_ADJ_QF] = rp;
       G_in[BSTEP_ADJ_VF] = rv;
       std::vector<MX> G_out(BSTEP_NUM_OUT);
+      G_out[BSTEP_ADJ_T] = MX::zeros(t0.sparsity());
+      G_out[BSTEP_ADJ_H] = MX::zeros(h.sparsity());
       G_out[BSTEP_ADJ_X0] = rxf;
       G_out[BSTEP_ADJ_V0] = vertcat(eq);
       G_out[BSTEP_ADJ_P] = rqf;
       G_out[BSTEP_ADJ_U] = uqf;
       Function G("implicit_stepB", G_in, G_out,
         {"t", "h", "x0", "v0", "p", "u", "adj_xf", "adj_qf", "adj_vf"},
-        {"adj_x0", "adj_v0", "adj_p", "adj_u"});
+        {"adj_t", "adj_h", "adj_x0", "adj_v0", "adj_p", "adj_u"});
       set_function(G, G.name(), true);
     }
   }

@@ -429,39 +429,26 @@ enum StepOut {
 
 /// Input arguments of a backward stepping function
 enum BStepIn {
-  /// Current time
   BSTEP_T,
-  /// Step size
   BSTEP_H,
-  /// State vector for forward problem
   BSTEP_X0,
-  /// Dependent variables for forward problem
   BSTEP_V0,
-  /// Parameter vector for forward problem
   BSTEP_P,
-  /// Controls
   BSTEP_U,
-  /// State vector for backward problem
   BSTEP_ADJ_XF,
-  /// Dependent variables for backward problem
   BSTEP_ADJ_VF,
-  /// Parameter vector for backward problem
   BSTEP_ADJ_QF,
-  /// Number of arguments
   BSTEP_NUM_IN
 };
 
 /// Output arguments of a backward stepping function
 enum BStepOut {
-  /// State vector for backward problem at the next time
+  BSTEP_ADJ_T,
+  BSTEP_ADJ_H,
   BSTEP_ADJ_X0,
-  /// Dependent variables for backward problem at the next time
   BSTEP_ADJ_V0,
-  /// Quadrature state contribution for backward problem, summing
   BSTEP_ADJ_P,
-  /// Quadrature state contribution for backward problem, non-summing
   BSTEP_ADJ_U,
-  /// Number of arguments
   BSTEP_NUM_OUT
 };
 
