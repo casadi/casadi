@@ -1954,14 +1954,14 @@ void FixedStepIntegrator::resetB(IntegratorMemory* mem,
 
   // Update the state
   casadi_copy(rx, nrx_, m->rx);
-  casadi_copy(rz, nrz_, m->rz);
 
   // Reset summation states
   casadi_clear(m->rq, nrq_);
   casadi_clear(m->uq, nuq_);
 
-  // Get consistent initial conditions
-  casadi_fill(m->rv, nrv_, std::numeric_limits<double>::quiet_NaN());
+  // Update backwards dependent variables
+  casadi_clear(m->rv, nrv_);
+  casadi_copy(rz, nrz_, m->rv + nrv_ - nrz_);
 }
 
 void FixedStepIntegrator::impulseB(IntegratorMemory* mem,
@@ -1972,7 +1972,9 @@ void FixedStepIntegrator::impulseB(IntegratorMemory* mem,
 
   // Add impulse to state
   casadi_axpy(nrx_, 1., rx, m->rx);
-  casadi_axpy(nrz_, 1., rz, m->rz);
+
+  // Add impulse to backwards dependent variables
+  casadi_axpy(nrz_, 1., rz, m->rv + nrv_ - nrz_);
 }
 
 ImplicitFixedStepIntegrator::ImplicitFixedStepIntegrator(
