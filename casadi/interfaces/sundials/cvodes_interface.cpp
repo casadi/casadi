@@ -291,12 +291,12 @@ void CvodesInterface::advance(IntegratorMemory* mem,
   THROWING(CVodeGetNonlinSolvStats, m->mem, &m->nniters, &m->nncfails);
 }
 
-void CvodesInterface::resetB(IntegratorMemory* mem,
+void CvodesInterface::impulseB(IntegratorMemory* mem,
     const double* rx, const double* rz, const double* rp) const {
   auto m = to_mem(mem);
 
-  // Reset the base classes
-  SundialsInterface::resetB(mem, rx, rz, rp);
+  // Call method in base class
+  SundialsInterface::impulseB(mem, rx, rz, rp);
 
   if (m->first_callB) {
     // Create backward problem
@@ -337,21 +337,10 @@ void CvodesInterface::resetB(IntegratorMemory* mem,
     // Mark initialized
     m->first_callB = false;
   } else {
+    // Reinitialize solver
     THROWING(CVodeReInitB, m->mem, m->whichB, m->t, m->rxz);
     THROWING(CVodeQuadReInitB, m->mem, m->whichB, m->ruq);
   }
-}
-
-void CvodesInterface::impulseB(IntegratorMemory* mem,
-    const double* rx, const double* rz, const double* rp) const {
-  auto m = to_mem(mem);
-
-  // Call method in base class
-  SundialsInterface::impulseB(mem, rx, rz, rp);
-
-  // Reinitialize solver
-  THROWING(CVodeReInitB, m->mem, m->whichB, m->t, m->rxz);
-  THROWING(CVodeQuadReInitB, m->mem, m->whichB, m->ruq);
 }
 
 void CvodesInterface::retreat(IntegratorMemory* mem, const double* u,

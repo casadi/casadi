@@ -371,16 +371,12 @@ void SundialsInterface::reset(IntegratorMemory* mem, const double* x,
   N_VConst(0., m->q);
 }
 
-void SundialsInterface::resetB(IntegratorMemory* mem,
-    const double* rx, const double* rz, const double* rp) const {
+void SundialsInterface::resetB(IntegratorMemory* mem) const {
   auto m = static_cast<SundialsMemory*>(mem);
 
-  // Set parameters
-  casadi_copy(rp, nrp_, m->rp);
-
-  // Set the backward state
-  casadi_copy(rx, nrx_, NV_DATA_S(m->rxz));
-  casadi_copy(rz, nrz_, NV_DATA_S(m->rxz) + nrx_);
+  // Clear seeds
+  casadi_clear(m->rp, nrp_);
+  casadi_clear(NV_DATA_S(m->rxz), nrx_ + nrz_);
 
   // Reset summation states
   N_VConst(0., m->ruq);

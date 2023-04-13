@@ -424,8 +424,7 @@ void IdasInterface::advance(IntegratorMemory* mem,
 
 }
 
-void IdasInterface::resetB(IntegratorMemory* mem,
-    const double* rx, const double* rz, const double* rp) const {
+void IdasInterface::resetB(IntegratorMemory* mem) const {
   if (verbose_) casadi_message(name_ + "::resetB");
   auto m = to_mem(mem);
 
@@ -433,10 +432,18 @@ void IdasInterface::resetB(IntegratorMemory* mem,
   N_VConst(0.0, m->rxz);
 
   // Reset the base classes
-  SundialsInterface::resetB(mem, rx, rz, rp);
+  SundialsInterface::resetB(mem);
 
   // Reset initial guess
   N_VConst(0.0, m->rxzdot);
+}
+
+void IdasInterface::impulseB(IntegratorMemory* mem,
+    const double* rx, const double* rz, const double* rp) const {
+  auto m = to_mem(mem);
+
+  // Call method in base class
+  SundialsInterface::impulseB(mem, rx, rz, rp);
 
   if (m->first_callB) {
     // Create backward problem
@@ -497,26 +504,9 @@ void IdasInterface::resetB(IntegratorMemory* mem,
   }
 
   // Correct initial values for the integration if necessary
-  if (calc_icB_) {
+  if (calc_icB_ && m->k == nt() - 1) {
     THROWING(IDACalcICB, m->mem, m->whichB, t0_, m->xz, m->xzdot);
     THROWING(IDAGetConsistentICB, m->mem, m->whichB, m->rxz, m->rxzdot);
-  }
-}
-
-void IdasInterface::impulseB(IntegratorMemory* mem,
-    const double* rx, const double* rz, const double* rp) const {
-  auto m = to_mem(mem);
-
-  // Call method in base class
-  SundialsInterface::impulseB(mem, rx, rz, rp);
-
-  // Re-initialize
-  THROWING(IDAReInitB, m->mem, m->whichB, m->t, m->rxz, m->rxzdot);
-  if (nrq_ > 0 || nuq_ > 0) {
-    // Workaround (bug in SUNDIALS)
-    // THROWING(IDAQuadReInitB, m->mem, m->whichB[dir], m->rq[dir]);
-    void* memB = IDAGetAdjIDABmem(m->mem, m->whichB);
-    THROWING(IDAQuadReInit, memB, m->ruq);
   }
 }
 

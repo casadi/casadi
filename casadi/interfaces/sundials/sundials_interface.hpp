@@ -163,8 +163,7 @@ namespace casadi {
       const double* z, const double* p) const override;
 
     /** \brief  Reset the backward problem and take time to tf */
-    void resetB(IntegratorMemory* mem, const double* rx,
-      const double* rz, const double* rp) const override;
+    void resetB(IntegratorMemory* mem) const override;
 
     /** \brief Introduce an impulse into the backwards integration at the current time */
     void impulseB(IntegratorMemory* mem,

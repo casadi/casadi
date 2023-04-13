@@ -154,8 +154,7 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   /** \brief Reset the backward problem
 
       \identifier{25d} */
-  virtual void resetB(IntegratorMemory* mem,
-    const double* rx, const double* rz, const double* rp) const = 0;
+  virtual void resetB(IntegratorMemory* mem) const = 0;
 
   /** \brief  Find next stop time
 
@@ -530,8 +529,7 @@ class CASADI_EXPORT FixedStepIntegrator : public Integrator {
     const double* u, double* x, double* z, double* q) const override;
 
   /// Reset the backward problem and take time to tf
-  void resetB(IntegratorMemory* mem,
-    const double* rx, const double* rz, const double* rp) const override;
+  void resetB(IntegratorMemory* mem) const override;
 
   /// Introduce an impulse into the backwards integration at the current time
   void impulseB(IntegratorMemory* mem,

@@ -373,20 +373,18 @@ int Integrator::eval(const double** arg, double** res,
     if (uq) uq += nuq_ * nt();
     // Next stop time due to step change in input
     k_stop = nt();
+    // Reset the solver
+    resetB(m);
     // Integrate backward
     for (m->k = nt(); m->k-- > 0; ) {
       m->t = tout_[m->k];
-      // Reset the solver, add impulse to backwards integration
+      // Add impulse to backwards integration
       if (rx0) rx0 -= nrx_;
       if (rz0) rz0 -= nrz_;
       if (rp) rp -= nrp_;
       if (uq) uq -= nuq_;
       if (u) u -= nu_;
-      if (m->k == nt() - 1) {
-        resetB(m, rx0, rz0, rp);
-      } else {
-        impulseB(m, rx0, rz0, rp);
-      }
+      impulseB(m, rx0, rz0, rp);
       // Next output time, or beginning
       casadi_int k_next = m->k - 1;
       m->t_next = k_next < 0 ? t0_ : tout_[k_next];
@@ -1952,15 +1950,12 @@ void FixedStepIntegrator::reset(IntegratorMemory* mem, const double* x, const do
   }
 }
 
-void FixedStepIntegrator::resetB(IntegratorMemory* mem,
-    const double* rx, const double* rz, const double* rp) const {
+void FixedStepIntegrator::resetB(IntegratorMemory* mem) const {
   auto m = static_cast<FixedStepMemory*>(mem);
 
-  // Set parameters
-  casadi_copy(rp, nrp_, m->rp);
-
-  // Update the state
-  casadi_copy(rx, nrx_, m->rx);
+  // Clear adjoint seeds
+  casadi_clear(m->rp, nrp_);
+  casadi_clear(m->rx, nrx_);
 
   // Reset summation states
   casadi_clear(m->rq, nrq_);
@@ -1968,7 +1963,6 @@ void FixedStepIntegrator::resetB(IntegratorMemory* mem,
 
   // Update backwards dependent variables
   casadi_clear(m->rv, nrv_);
-  casadi_copy(rz, nrz_, m->rv + nrv_ - nrz_);
 }
 
 void FixedStepIntegrator::impulseB(IntegratorMemory* mem,
