@@ -248,10 +248,10 @@ void SundialsInterface::init(const Dict& opts) {
   // Attach functions to calculate DAE and quadrature RHS all-at-once
   if (nfwd_ > 0) {
     create_forward("daeF", nfwd_);
-    create_forward("quadF", nfwd_);
+    if (nq_ > 0) create_forward("quadF", nfwd_);
     if (nadj_ > 0) {
       create_forward("daeB", nfwd_);
-      create_forward("quadB", nfwd_);
+      if (nrq_ > 0 || nuq_ > 0) create_forward("quadB", nfwd_);
     }
   }
 
