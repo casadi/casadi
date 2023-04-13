@@ -578,7 +578,7 @@ int SundialsInterface::calc_daeF(SundialsMemory* m, double t, const double* x, c
 }
 
 int SundialsInterface::calc_daeB(SundialsMemory* m, double t, const double* x, const double* z,
-    const double* rx, const double* rz, double* adj_x, double* adj_z) const {
+    const double* rx, const double* rz, const double* rp, double* adj_x, double* adj_z) const {
   // Evaluate nondifferentiated
   m->arg[BDYN_T] = &t;  // t
   m->arg[BDYN_X] = x;  // x
@@ -590,7 +590,7 @@ int SundialsInterface::calc_daeB(SundialsMemory* m, double t, const double* x, c
   m->arg[BDYN_OUT_QUAD] = nullptr;  // out_quad
   m->arg[BDYN_ADJ_ODE] = rx;  // adj_ode
   m->arg[BDYN_ADJ_ALG] = rz;  // adj_alg
-  m->arg[BDYN_ADJ_QUAD] = m->rp;  // adj_quad
+  m->arg[BDYN_ADJ_QUAD] = rp;  // adj_quad
   m->res[BDAE_ADJ_X] = adj_x;  // adj_x
   m->res[BDAE_ADJ_Z] = adj_z;  // adj_z
   if (calc_function(m, "daeB")) return 1;
@@ -610,7 +610,8 @@ int SundialsInterface::calc_daeB(SundialsMemory* m, double t, const double* x, c
       rx ? rx + nrx1_ * nadj_ : 0;  // fwd:adj_ode
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_ADJ_ALG] =
       rz ? rz + nrz1_ * nadj_ : 0;  // fwd:adj_alg
-    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_ADJ_QUAD] = m->rp + nrp1_ * nadj_;  // fwd:adj_quad
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_ADJ_QUAD] =
+      rp ? rp + nrp1_ * nadj_ : 0;  // fwd:adj_quad
     m->res[BDAE_ADJ_X] = adj_x ? adj_x + nrx1_ * nadj_ : 0;  // fwd:adj_x
     m->res[BDAE_ADJ_Z] = adj_z ? adj_z + nrz1_ * nadj_ : 0;  // fwd:adj_z
     if (calc_function(m, forward_name("daeB", nfwd_))) return 1;
