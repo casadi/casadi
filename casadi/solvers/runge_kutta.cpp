@@ -210,11 +210,11 @@ namespace casadi {
       g_arg[BSTEP_T] = t0;
       g_arg[BSTEP_H] = h;
       g_arg[BSTEP_X0] = x0;
-      g_arg[BSTEP_V0] = v;
+      g_arg[BSTEP_V0] = MX(rv.size());
       g_arg[BSTEP_P] = p;
       g_arg[BSTEP_U] = u;
       g_arg[BSTEP_OUT_XF] = MX(rx0.size());
-      g_arg[BSTEP_OUT_VF] = MX(rv.size());
+      g_arg[BSTEP_OUT_VF] = v;
       g_arg[BSTEP_OUT_QF] = MX(rp.size());
       g_arg[BSTEP_ADJ_XF] = rx0;
       g_arg[BSTEP_ADJ_VF] = rv;

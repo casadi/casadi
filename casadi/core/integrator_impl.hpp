@@ -549,7 +549,7 @@ class CASADI_EXPORT FixedStepIntegrator : public Integrator {
 
   /// Take integrator step backward
   void stepB(FixedStepMemory* m, double t, double h,
-    const double* x0, const double* v0, const double* xf,
+    const double* x0, const double* xf, const double* vf,
     const double* rx0, const double* rv0,
     double* rxf, double* rvf, double* rqf, double* uqf) const;
 

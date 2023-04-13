@@ -305,11 +305,11 @@ namespace casadi {
       G_in[BSTEP_T] = t0;
       G_in[BSTEP_H] = h;
       G_in[BSTEP_X0] = x0;
-      G_in[BSTEP_V0] = v;
+      G_in[BSTEP_V0] = MX(rv.size());
       G_in[BSTEP_P] = p;
       G_in[BSTEP_U] = u;
       G_in[BSTEP_OUT_XF] = MX(rx0.size());
-      G_in[BSTEP_OUT_VF] = MX(rv.size());
+      G_in[BSTEP_OUT_VF] = v;
       G_in[BSTEP_OUT_QF] = MX(rp.size());
       G_in[BSTEP_ADJ_XF] = rx0;
       G_in[BSTEP_ADJ_VF] = rv;
