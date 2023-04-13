@@ -172,7 +172,7 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
 
       \identifier{25g} */
   virtual void retreat(IntegratorMemory* mem, const double* u,
-    double* rx, double* rz, double* rq, double* uq) const = 0;
+    double* rx, double* rq, double* uq) const = 0;
 
   /** \brief  evaluate
 
@@ -463,7 +463,7 @@ struct CASADI_EXPORT FixedStepMemory : public IntegratorMemory {
   double *v, *p, *u, *q, *v_prev, *q_prev;
 
   /// Work vectors, backward problem
-  double *rv, *rp, *uq, *rv_prev, *rq_prev, *uq_prev;
+  double *rv, *rp, *uq, *rq_prev, *uq_prev;
 
   /// State and dependent variables at all times
   double *x_tape, *v_tape;
@@ -541,7 +541,7 @@ class CASADI_EXPORT FixedStepIntegrator : public Integrator {
 
       \identifier{25k} */
   void retreat(IntegratorMemory* mem, const double* u,
-    double* rx, double* rz, double* rq, double* uq) const override;
+    double* rx, double* rq, double* uq) const override;
 
   /// Take integrator step forward
   void stepF(FixedStepMemory* m, double t, double h,
@@ -551,7 +551,7 @@ class CASADI_EXPORT FixedStepIntegrator : public Integrator {
   void stepB(FixedStepMemory* m, double t, double h,
     const double* x0, const double* xf, const double* vf,
     const double* rx0, const double* rv0,
-    double* rxf, double* rvf, double* rqf, double* uqf) const;
+    double* rxf, double* rqf, double* uqf) const;
 
   // Target number of finite elements
   casadi_int nk_target_;

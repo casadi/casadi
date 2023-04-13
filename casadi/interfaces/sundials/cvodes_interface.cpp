@@ -355,7 +355,7 @@ void CvodesInterface::impulseB(IntegratorMemory* mem,
 }
 
 void CvodesInterface::retreat(IntegratorMemory* mem, const double* u,
-    double* rx, double* rz, double* rq, double* uq) const {
+    double* rx, double* rq, double* uq) const {
   auto m = to_mem(mem);
 
   // Set controls

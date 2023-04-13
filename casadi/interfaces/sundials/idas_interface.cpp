@@ -521,7 +521,7 @@ void IdasInterface::impulseB(IntegratorMemory* mem,
 }
 
 void IdasInterface::retreat(IntegratorMemory* mem, const double* u,
-    double* rx, double* rz, double* rq, double* uq) const {
+    double* rx, double* rq, double* uq) const {
   auto m = to_mem(mem);
 
   // Set controls
@@ -539,7 +539,6 @@ void IdasInterface::retreat(IntegratorMemory* mem, const double* u,
 
   // Save outputs
   casadi_copy(NV_DATA_S(m->rxz), nrx_, rx);
-  casadi_copy(NV_DATA_S(m->rxz) + nrx_, nrz_, rz);
   casadi_copy(NV_DATA_S(m->ruq), nrq_, rq);
   casadi_copy(NV_DATA_S(m->ruq) + nrq_, nuq_, uq);
 

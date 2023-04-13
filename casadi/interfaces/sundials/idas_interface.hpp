@@ -137,7 +137,7 @@ class CASADI_INTEGRATOR_IDAS_EXPORT IdasInterface : public SundialsInterface {
 
   /** \brief  Retreat solution in time */
   void retreat(IntegratorMemory* mem, const double* u,
-    double* rx, double* rz, double* rq, double* uq) const override;
+    double* rx, double* rq, double* uq) const override;
 
   /** \brief Cast to memory object */
   static IdasMemory* to_mem(void *mem) {

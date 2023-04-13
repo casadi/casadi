@@ -397,9 +397,9 @@ int Integrator::eval(const double** arg, double** res,
       if (verbose_) casadi_message("Integrating backward from output time " + str(m->k)
         + ": t_next = " + str(m->t_next) + ", t_stop = " + str(m->t_stop));
       if (m->k > 0) {
-        retreat(m, u, 0, 0, 0, uq);
+        retreat(m, u, 0, 0, uq);
       } else {
-        retreat(m, u, rx, 0, rq, uq);
+        retreat(m, u, rx, rq, uq);
       }
     }
     // uq should contain the contribution from the grid point, not cumulative
@@ -1690,7 +1690,7 @@ void FixedStepIntegrator::init(const Dict& opts) {
   setup_step();
 
   // Get discrete time dimensions
-  const Function& F = get_function(has_function("step") ? "step" : "implicit_stepF");
+  const Function& F = get_function(has_function("step") ? "step" : "implicit_step");
   nv1_ = F.nnz_out(STEP_VF);
   nrv1_ = nv1_ * nadj_;
   nv_ = nv1_ * (1 + nfwd_);
@@ -1708,7 +1708,6 @@ void FixedStepIntegrator::init(const Dict& opts) {
   alloc_w(nrv_, true); // rv
   alloc_w(nrp_, true); // rp
   alloc_w(nuq_, true); // uq
-  alloc_w(nrv_, true); // rv_prev
   alloc_w(nrq_, true); // rq_prev
   alloc_w(nuq_, true); // uq_prev
 
@@ -1747,7 +1746,6 @@ void FixedStepIntegrator::set_work(void* mem, const double**& arg, double**& res
   m->rv = w; w += nrv_;
   m->rp = w; w += nrp_;
   m->uq = w; w += nuq_;
-  m->rv_prev = w; w += nrv_;
   m->rq_prev = w; w += nrq_;
   m->uq_prev = w; w += nuq_;
 
@@ -1805,7 +1803,7 @@ void FixedStepIntegrator::advance(IntegratorMemory* mem,
 }
 
 void FixedStepIntegrator::retreat(IntegratorMemory* mem, const double* u,
-    double* rx, double* rz, double* rq, double* uq) const {
+    double* rx, double* rq, double* uq) const {
   auto m = static_cast<FixedStepMemory*>(mem);
 
   // Set controls
@@ -1822,7 +1820,6 @@ void FixedStepIntegrator::retreat(IntegratorMemory* mem, const double* u,
 
     // Update the previous step
     casadi_copy(m->rx, nrx_, m->rx_prev);
-    casadi_copy(m->rv, nrv_, m->rv_prev);
     casadi_copy(m->rq, nrq_, m->rq_prev);
     casadi_copy(m->uq, nuq_, m->uq_prev);
 
@@ -1831,14 +1828,14 @@ void FixedStepIntegrator::retreat(IntegratorMemory* mem, const double* u,
     stepB(m, t, h,
       m->x_tape + nx_ * tapeind, m->x_tape + nx_ * (tapeind + 1),
       m->v_tape + nv_ * tapeind,
-      m->rx_prev, m->rv_prev, m->rx, m->rv, m->rq, m->uq);
+      m->rx_prev, m->rv, m->rx, m->rq, m->uq);
+    casadi_clear(m->rv, nrv_);
     casadi_axpy(nrq_, 1., m->rq_prev, m->rq);
     casadi_axpy(nuq_, 1., m->uq_prev, m->uq);
   }
 
   // Return to user
   casadi_copy(m->rx, nrx_, rx);
-  casadi_copy(m->rv + nrv_ - nrz_, nrz_, rz);
   casadi_copy(m->rq, nrq_, rq);
   casadi_copy(m->uq, nuq_, uq);
 }
@@ -1879,7 +1876,7 @@ void FixedStepIntegrator::stepF(FixedStepMemory* m, double t, double h,
 void FixedStepIntegrator::stepB(FixedStepMemory* m, double t, double h,
     const double* x0, const double* xf, const double* vf,
     const double* rx0, const double* rv0,
-    double* rxf, double* rvf, double* rqf, double* uqf) const {
+    double* rxf, double* rqf, double* uqf) const {
   // Evaluate nondifferentiated
   std::fill(m->arg, m->arg + BSTEP_NUM_IN, nullptr);
   m->arg[BSTEP_T] = &t;  // t
@@ -1898,7 +1895,7 @@ void FixedStepIntegrator::stepB(FixedStepMemory* m, double t, double h,
   m->res[BSTEP_ADJ_T] = nullptr;  // adj:t
   m->res[BSTEP_ADJ_H] = nullptr;  // adj:h
   m->res[BSTEP_ADJ_X0] = rxf;  // adj:x0
-  m->res[BSTEP_ADJ_V0] = rvf;  // adj:v0
+  m->res[BSTEP_ADJ_V0] = nullptr;  // adj:v0
   m->res[BSTEP_ADJ_P] = rqf;  // adj:p
   m->res[BSTEP_ADJ_U] = uqf;  // adj:u
   calc_function(m, reverse_name("step", nadj_));
@@ -1907,7 +1904,7 @@ void FixedStepIntegrator::stepB(FixedStepMemory* m, double t, double h,
     m->arg[BSTEP_NUM_IN + BSTEP_ADJ_T] = nullptr;  // out:adj:t
     m->arg[BSTEP_NUM_IN + BSTEP_ADJ_H] = nullptr;  // out:adj:h
     m->arg[BSTEP_NUM_IN + BSTEP_ADJ_X0] = rxf;  // out:adj:x0
-    m->arg[BSTEP_NUM_IN + BSTEP_ADJ_V0] = rvf;  // out:adj:v0
+    m->arg[BSTEP_NUM_IN + BSTEP_ADJ_V0] = nullptr;  // out:adj:v0
     m->arg[BSTEP_NUM_IN + BSTEP_ADJ_P] = rqf;  // out:adj:p
     m->arg[BSTEP_NUM_IN + BSTEP_ADJ_U] = uqf;  // out:adj:u
     m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_T] = nullptr;  // fwd:t
@@ -1925,7 +1922,7 @@ void FixedStepIntegrator::stepB(FixedStepMemory* m, double t, double h,
     m->res[BSTEP_ADJ_T] = nullptr;  // fwd:adj:t
     m->res[BSTEP_ADJ_H] = nullptr;  // fwd:adj:h
     m->res[BSTEP_ADJ_X0] = rxf + nrx1_ * nadj_;  // fwd:rxf
-    m->res[BSTEP_ADJ_V0] = rvf + nrv1_;  // fwd:rvf
+    m->res[BSTEP_ADJ_V0] = nullptr;  // fwd:adj:v0
     m->res[BSTEP_ADJ_P] = rqf + nrq1_ * nadj_;  // fwd:rqf
     m->res[BSTEP_ADJ_U] = uqf + nuq1_ * nadj_;  // fwd:uqf
     calc_function(m, forward_name(reverse_name("step", nadj_), nfwd_));
@@ -2029,23 +2026,17 @@ void ImplicitFixedStepIntegrator::init(const Dict& opts) {
 
   // Allocate a solver
   Function rf = rootfinder("step", implicit_function_name,
-    get_function("implicit_stepF"), rootfinder_options);
+    get_function("implicit_step"), rootfinder_options);
   set_function(rf);
   if (nfwd_ > 0) set_function(rf.forward(nfwd_));
 
-  // Allocate a root-finding solver for the backward problem
-  if (nrv1_ > 0) {
-    // Options
-    Dict backward_rootfinder_options = rootfinder_options;
-    backward_rootfinder_options["implicit_input"] = BSTEP_ADJ_VF;
-    backward_rootfinder_options["implicit_output"] = BSTEP_ADJ_V0;
-    std::string backward_implicit_function_name = implicit_function_name;
-
-    // Allocate a Newton solver
-    Function brf = rootfinder(reverse_name("step", nadj_), backward_implicit_function_name,
-      get_function("implicit_stepB"), backward_rootfinder_options);
-    set_function(brf);
-    if (nfwd_ > 0) set_function(brf.forward(nfwd_));
+  // Backward integration
+  if (nadj_ > 0) {
+    Function adj_F = rf.reverse(nadj_);
+    set_function(adj_F, adj_F.name(), true);
+    if (nfwd_ > 0) {
+      create_forward(adj_F.name(), nfwd_);
+    }
   }
 }
 

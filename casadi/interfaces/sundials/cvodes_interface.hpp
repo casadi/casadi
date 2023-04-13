@@ -144,7 +144,7 @@ class CASADI_INTEGRATOR_CVODES_EXPORT CvodesInterface : public SundialsInterface
 
   /** \brief  Retreat solution in time */
   void retreat(IntegratorMemory* mem, const double* u,
-    double* rx, double* rz, double* rq, double* uq) const override;
+    double* rx, double* rq, double* uq) const override;
 
   /** \brief Cast to memory object */
   static CvodesMemory* to_mem(void *mem) {
