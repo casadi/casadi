@@ -322,7 +322,8 @@ namespace casadi {
       G_out[BSTEP_ADJ_P] = rqf;
       G_out[BSTEP_ADJ_U] = uqf;
       Function G("implicit_stepB", G_in, G_out,
-        {"t", "h", "x0", "v0", "p", "u", "out_xf", "out_vf", "out_qf",
+        {"in_t", "in_h", "in_x0", "in_v0", "in_p", "in_u",
+          "out_xf", "out_vf", "out_qf",
           "adj_xf", "adj_vf", "adj_qf"},
         {"adj_t", "adj_h", "adj_x0", "adj_v0", "adj_p", "adj_u"});
       set_function(G, G.name(), true);

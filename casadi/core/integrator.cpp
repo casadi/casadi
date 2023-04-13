@@ -1603,7 +1603,7 @@ Function FixedStepIntegrator::create_advanced(const Dict& opts) {
 
   if (simplify && nrx_==0 && nt()==1) {
     // Retrieve explicit simulation step (one finite element)
-    Function F = get_function("stepF");
+    Function F = get_function("step");
 
     MX z0 = MX::sym("z0", sparsity_in(INTEGRATOR_Z0));
 
@@ -1690,10 +1690,12 @@ void FixedStepIntegrator::init(const Dict& opts) {
   setup_step();
 
   // Get discrete time dimensions
-  const Function& F = get_function(has_function("stepF") ? "stepF" : "implicit_stepF");
+  const Function& F = get_function(has_function("step") ? "step" : "implicit_stepF");
   nv1_ = F.nnz_in(STEP_V0);
   if (nadj_ > 0) {
-    const Function& G = get_function(has_function("stepB") ? "stepB" : "implicit_stepB");
+    std::string gname = reverse_name("step", nadj_);
+    if (!has_function(gname)) gname = "implicit_stepB";
+    const Function& G = get_function(gname);
     nrv1_ = G.nnz_in(BSTEP_ADJ_VF);
   } else {
     nrv1_ = 0;
@@ -1862,7 +1864,7 @@ void FixedStepIntegrator::stepF(FixedStepMemory* m, double t, double h,
   m->res[STEP_XF] = xf;  // xf
   m->res[STEP_VF] = vf;  // vf
   m->res[STEP_QF] = qf;  // qf
-  calc_function(m, "stepF");
+  calc_function(m, "step");
   // Evaluate sensitivities
   if (nfwd_ > 0) {
     m->arg[STEP_NUM_IN + STEP_XF] = xf;  // out:xf
@@ -1877,7 +1879,7 @@ void FixedStepIntegrator::stepF(FixedStepMemory* m, double t, double h,
     m->res[STEP_XF] = xf + nx1_;  // fwd:xf
     m->res[STEP_VF] = vf + nv1_;  // fwd:vf
     m->res[STEP_QF] = qf + nq1_;  // fwd:qf
-    calc_function(m, forward_name("stepF", nfwd_));
+    calc_function(m, forward_name("step", nfwd_));
   }
 }
 
@@ -1906,7 +1908,7 @@ void FixedStepIntegrator::stepB(FixedStepMemory* m, double t, double h,
   m->res[BSTEP_ADJ_V0] = rvf;  // adj:v0
   m->res[BSTEP_ADJ_P] = rqf;  // adj:p
   m->res[BSTEP_ADJ_U] = uqf;  // adj:u
-  calc_function(m, "stepB");
+  calc_function(m, reverse_name("step", nadj_));
   // Evaluate sensitivities
   if (nfwd_ > 0) {
     m->arg[BSTEP_NUM_IN + BSTEP_ADJ_T] = nullptr;  // out:adj:t
@@ -1933,7 +1935,7 @@ void FixedStepIntegrator::stepB(FixedStepMemory* m, double t, double h,
     m->res[BSTEP_ADJ_V0] = rvf + nrv1_;  // fwd:rvf
     m->res[BSTEP_ADJ_P] = rqf + nrq1_ * nadj_;  // fwd:rqf
     m->res[BSTEP_ADJ_U] = uqf + nuq1_ * nadj_;  // fwd:uqf
-    calc_function(m, forward_name("stepB", nfwd_));
+    calc_function(m, forward_name(reverse_name("step", nadj_), nfwd_));
   }
 }
 
@@ -2033,7 +2035,7 @@ void ImplicitFixedStepIntegrator::init(const Dict& opts) {
   rootfinder_options["implicit_output"] = STEP_VF;
 
   // Allocate a solver
-  Function rf = rootfinder("stepF", implicit_function_name,
+  Function rf = rootfinder("step", implicit_function_name,
     get_function("implicit_stepF"), rootfinder_options);
   set_function(rf);
   if (nfwd_ > 0) set_function(rf.forward(nfwd_));
@@ -2047,7 +2049,7 @@ void ImplicitFixedStepIntegrator::init(const Dict& opts) {
     std::string backward_implicit_function_name = implicit_function_name;
 
     // Allocate a Newton solver
-    Function brf = rootfinder("stepB", backward_implicit_function_name,
+    Function brf = rootfinder(reverse_name("step", nadj_), backward_implicit_function_name,
       get_function("implicit_stepB"), backward_rootfinder_options);
     set_function(brf);
     if (nfwd_ > 0) set_function(brf.forward(nfwd_));

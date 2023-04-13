@@ -138,10 +138,10 @@ namespace casadi {
       f_res[STEP_XF] = xf;
       f_res[STEP_QF] = qf;
       f_res[STEP_VF] = horzcat(x_def);
-      Function F("stepF", f_arg, f_res,
+      Function F("step", f_arg, f_res,
         {"t", "h", "x0", "v0", "p", "u"}, {"xf", "vf", "qf"});
       set_function(F, F.name(), true);
-      if (nfwd_ > 0) create_forward("stepF", nfwd_);
+      if (nfwd_ > 0) create_forward("step", nfwd_);
     }
 
     // Backward integration
@@ -226,12 +226,13 @@ namespace casadi {
       g_res[BSTEP_ADJ_V0] = horzcat(rx_def);
       g_res[BSTEP_ADJ_P] = rqf;
       g_res[BSTEP_ADJ_U] = uqf;
-      Function G("stepB", g_arg, g_res,
-        {"t", "h", "x0", "v0", "p", "u", "out_xf", "out_vf", "out_qf",
+      Function G(reverse_name("step", nadj_), g_arg, g_res,
+        {"in_t", "in_h", "in_x0", "in_v0", "in_p", "in_u",
+          "out_xf", "out_vf", "out_qf",
           "adj_xf", "adj_vf", "adj_qf"},
         {"adj_t", "adj_h", "adj_x0", "adj_v0", "adj_p", "adj_u"});
       set_function(G, G.name(), true);
-      if (nfwd_ > 0) create_forward("stepB", nfwd_);
+      if (nfwd_ > 0) create_forward(reverse_name("step", nadj_), nfwd_);
     }
   }
 
