@@ -72,167 +72,70 @@ namespace casadi {
     MX p = MX::sym("p", f.sparsity_in(DYN_P));
     MX u = MX::sym("u", f.sparsity_in(DYN_U));
 
-    // Intermediate variables (does not enter in F_, only in G_)
-    MX v = MX::sym("v", x0.size1(), x0.size2() * 3);
-    std::vector<MX> x = horzsplit(v, x0.size2());
-    casadi_assert_dev(x.size() == 3);
-
-    // Definitions of x
-    std::vector<MX> x_def(3);
-
-    // Time points
-    std::vector<MX> tt(3);
-
     // Half a step, 6-th of a step
     MX h_half = h / 2, h_sixth = h / 6;
 
-    // Forward integration
-    {
-      // Arguments when calling f
-      std::vector<MX> f_arg(DYN_NUM_IN);
-      std::vector<MX> f_res;
-      f_arg[DYN_P] = p;
-      f_arg[DYN_U] = u;
+    // Arguments when calling f
+    std::vector<MX> f_arg(DYN_NUM_IN);
+    std::vector<MX> f_res;
+    f_arg[DYN_P] = p;
+    f_arg[DYN_U] = u;
 
-      // k1
-      f_arg[DYN_T] = t0;
-      f_arg[DYN_X] = x0;
-      f_res = f(f_arg);
-      MX k1 = f_res[DYN_ODE];
-      MX k1q = f_res[DYN_QUAD];
+    // k1
+    f_arg[DYN_T] = t0;
+    f_arg[DYN_X] = x0;
+    f_res = f(f_arg);
+    MX k1 = f_res[DYN_ODE];
+    MX k1q = f_res[DYN_QUAD];
 
-      // k2
-      tt[0] = f_arg[DYN_T] = t0 + h_half;
-      x_def[0] = f_arg[DYN_X] = x0 + h_half * k1;
-      f_res = f(f_arg);
-      MX k2 = f_res[DYN_ODE];
-      MX k2q = f_res[DYN_QUAD];
+    // k2
+    f_arg[DYN_T] = t0 + h_half;
+    f_arg[DYN_X] = x0 + h_half * k1;
+    f_res = f(f_arg);
+    MX k2 = f_res[DYN_ODE];
+    MX k2q = f_res[DYN_QUAD];
 
-      // k3
-      tt[1] = tt[0];
-      x_def[1] = f_arg[DYN_X] = x0 + h_half * k2;
-      f_res = f(f_arg);
-      MX k3 = f_res[DYN_ODE];
-      MX k3q = f_res[DYN_QUAD];
+    // k3
+    f_arg[DYN_X] = x0 + h_half * k2;
+    f_res = f(f_arg);
+    MX k3 = f_res[DYN_ODE];
+    MX k3q = f_res[DYN_QUAD];
 
-      // k4
-      tt[2] = f_arg[DYN_T] = t0 + h;
-      x_def[2] = f_arg[DYN_X] = x0 + h * k3;
-      f_res = f(f_arg);
-      MX k4 = f_res[DYN_ODE];
-      MX k4q = f_res[DYN_QUAD];
+    // k4
+    f_arg[DYN_T] = t0 + h;
+    f_arg[DYN_X] = x0 + h * k3;
+    f_res = f(f_arg);
+    MX k4 = f_res[DYN_ODE];
+    MX k4q = f_res[DYN_QUAD];
 
-      // Take step
-      MX xf = x0 + h_sixth * (k1 + 2*k2 + 2*k3 + k4);
-      MX qf = h_sixth * (k1q + 2*k2q + 2*k3q + k4q);
+    // Take step
+    MX xf = x0 + h_sixth * (k1 + 2*k2 + 2*k3 + k4);
+    MX qf = h_sixth * (k1q + 2*k2q + 2*k3q + k4q);
 
-      // Define discrete time dynamics
-      f_arg.resize(STEP_NUM_IN);
-      f_arg[STEP_T] = t0;
-      f_arg[STEP_H] = h;
-      f_arg[STEP_X0] = x0;
-      f_arg[STEP_V0] = v;
-      f_arg[STEP_P] = p;
-      f_arg[STEP_U] = u;
-      f_res.resize(STEP_NUM_OUT);
-      f_res[STEP_XF] = xf;
-      f_res[STEP_QF] = qf;
-      f_res[STEP_VF] = horzcat(x_def);
-      Function F("step", f_arg, f_res,
-        {"t", "h", "x0", "v0", "p", "u"}, {"xf", "vf", "qf"});
-      set_function(F, F.name(), true);
-      if (nfwd_ > 0) create_forward("step", nfwd_);
-    }
+    // Define discrete time dynamics
+    f_arg.resize(STEP_NUM_IN);
+    f_arg[STEP_T] = t0;
+    f_arg[STEP_H] = h;
+    f_arg[STEP_X0] = x0;
+    f_arg[STEP_V0] = MX(0, 1);
+    f_arg[STEP_P] = p;
+    f_arg[STEP_U] = u;
+    f_res.resize(STEP_NUM_OUT);
+    f_res[STEP_XF] = xf;
+    f_res[STEP_QF] = qf;
+    f_res[STEP_VF] = MX(0, 1);
+    Function F("step", f_arg, f_res,
+      {"t", "h", "x0", "v0", "p", "u"}, {"xf", "vf", "qf"});
+    set_function(F, F.name(), true);
+    if (nfwd_ > 0) create_forward("step", nfwd_);
 
     // Backward integration
     if (nadj_ > 0) {
-      // Continuous-time dynamics, backward problem
-      Function g = get_function("rdae");
-
-      // Symbolic inputs
-      MX rx0 = MX::sym("rx0", g.sparsity_in(BDYN_ADJ_ODE));
-      MX rp = MX::sym("rp", g.sparsity_in(BDYN_ADJ_QUAD));
-
-      // Intermediate variables (do not enter in G_)
-      MX rv = MX::sym("rv", rx0.size1(), 3 * rx0.size2());
-      std::vector<MX> rx_def(3);
-
-      // Arguments when calling g
-      std::vector<MX> g_arg(BDYN_NUM_IN);
-      std::vector<MX> g_res;
-      g_arg[BDYN_P] = p;
-      g_arg[BDYN_U] = u;
-      g_arg[BDYN_ADJ_QUAD] = rp;
-
-      // k1
-      g_arg[BDYN_T] = tt[2];
-      g_arg[BDYN_X] = x[2];
-      g_arg[BDYN_ADJ_ODE] = rx0;
-      g_res = g(g_arg);
-      MX k1 = g_res[BDYN_ADJ_X];
-      MX k1rq = g_res[BDYN_ADJ_P];
-      MX k1uq = g_res[BDYN_ADJ_U];
-
-      // k2
-      g_arg[BDYN_T] = tt[1];
-      g_arg[BDYN_X] = x[1];
-      g_arg[BDYN_ADJ_ODE] = rx_def[2] = rx0 + h_half * k1;
-      g_res = g(g_arg);
-      MX k2 = g_res[BDYN_ADJ_X];
-      MX k2rq = g_res[BDYN_ADJ_P];
-      MX k2uq = g_res[BDYN_ADJ_U];
-
-      // k3
-      g_arg[BDYN_T] = tt[0];
-      g_arg[BDYN_X] = x[0];
-      g_arg[BDYN_ADJ_ODE] = rx_def[1] = rx0 + h_half * k2;
-      g_res = g(g_arg);
-      MX k3 = g_res[BDYN_ADJ_X];
-      MX k3rq = g_res[BDYN_ADJ_P];
-      MX k3uq = g_res[BDYN_ADJ_U];
-
-      // k4
-      g_arg[BDYN_T] = t0;
-      g_arg[BDYN_X] = x0;
-      g_arg[BDYN_ADJ_ODE] = rx_def[0] = rx0 + h * k3;
-      g_res = g(g_arg);
-      MX k4 = g_res[BDYN_ADJ_X];
-      MX k4rq = g_res[BDYN_ADJ_P];
-      MX k4uq = g_res[BDYN_ADJ_U];
-
-      // Take step
-      MX rxf = rx0 + h_sixth * (k1 + 2*k2 + 2*k3 + k4);
-      MX rqf = h_sixth * (k1rq + 2*k2rq + 2*k3rq + k4rq);
-      MX uqf = h_sixth * (k1uq + 2*k2uq + 2*k3uq + k4uq);
-
-      // Define discrete time dynamics
-      g_arg.resize(BSTEP_NUM_IN);
-      g_arg[BSTEP_T] = t0;
-      g_arg[BSTEP_H] = h;
-      g_arg[BSTEP_X0] = x0;
-      g_arg[BSTEP_V0] = MX(rv.size());
-      g_arg[BSTEP_P] = p;
-      g_arg[BSTEP_U] = u;
-      g_arg[BSTEP_OUT_XF] = MX(rx0.size());
-      g_arg[BSTEP_OUT_VF] = v;
-      g_arg[BSTEP_OUT_QF] = MX(rp.size());
-      g_arg[BSTEP_ADJ_XF] = rx0;
-      g_arg[BSTEP_ADJ_VF] = rv;
-      g_arg[BSTEP_ADJ_QF] = rp;
-      g_res.resize(BSTEP_NUM_OUT);
-      g_res[BSTEP_ADJ_T] = MX::zeros(t0.sparsity());
-      g_res[BSTEP_ADJ_H] = MX::zeros(h.sparsity());
-      g_res[BSTEP_ADJ_X0] = rxf;
-      g_res[BSTEP_ADJ_V0] = horzcat(rx_def);
-      g_res[BSTEP_ADJ_P] = rqf;
-      g_res[BSTEP_ADJ_U] = uqf;
-      Function G(reverse_name("step", nadj_), g_arg, g_res,
-        {"in_t", "in_h", "in_x0", "in_v0", "in_p", "in_u",
-          "out_xf", "out_vf", "out_qf",
-          "adj_xf", "adj_vf", "adj_qf"},
-        {"adj_t", "adj_h", "adj_x0", "adj_v0", "adj_p", "adj_u"});
-      set_function(G, G.name(), true);
-      if (nfwd_ > 0) create_forward(reverse_name("step", nadj_), nfwd_);
+      Function adj_F = F.reverse(nadj_);
+      set_function(adj_F, adj_F.name(), true);
+      if (nfwd_ > 0) {
+        create_forward(adj_F.name(), nfwd_);
+      }
     }
   }
 
