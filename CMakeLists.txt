@@ -597,11 +597,7 @@ set(BUILD_PROXQP_DEPENDENCIES EIGEN3 SIMDE)
 option(WITH_BUILD_TINYXML "Compile the included TinyXML source code" ON)
 option(WITH_TINYXML "Compile the interface to TinyXML" ON)
 if(WITH_TINYXML)
-  if(WITH_BUILD_TINYXML)
-    # build the included tinyxml
-    set(TINYXML_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/external_packages/tinyxml-2.6.2)
-    set(TINYXML_LIBRARIES casadi_tinyxml)
-  else()
+  if(NOT WITH_BUILD_TINYXML)
     # try to find system tinyxml
     find_package(TINYXML REQUIRED)
   endif()
