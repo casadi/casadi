@@ -1422,6 +1422,7 @@ if(WITH_BUILD_EIGEN3)
       CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
   add_library(eigen3 INTERFACE)
   add_dependencies(eigen3 eigen3-external)
+  file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/eigen3")
   target_include_directories(eigen3 INTERFACE "${CMAKE_BINARY_DIR}/external_projects/include/eigen3")
   install(DIRECTORY
     "${CMAKE_BINARY_DIR}/external_projects/include/eigen3"
@@ -1461,6 +1462,7 @@ if(WITH_PROXQP)
     add_library(proxsuite::proxsuite INTERFACE IMPORTED)
     set_target_properties(proxsuite::proxsuite PROPERTIES INTERFACE_LINK_LIBRARIES proxqp)
     add_dependencies(proxqp proxqp-external)
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include")
     target_include_directories(proxqp INTERFACE "${CMAKE_BINARY_DIR}/external_projects/include")
     target_link_libraries(proxqp INTERFACE eigen3)
     install(DIRECTORY
