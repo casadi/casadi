@@ -1691,15 +1691,8 @@ void FixedStepIntegrator::init(const Dict& opts) {
 
   // Get discrete time dimensions
   const Function& F = get_function(has_function("step") ? "step" : "implicit_stepF");
-  nv1_ = F.nnz_in(STEP_V0);
-  if (nadj_ > 0) {
-    std::string gname = reverse_name("step", nadj_);
-    if (!has_function(gname)) gname = "implicit_stepB";
-    const Function& G = get_function(gname);
-    nrv1_ = G.nnz_in(BSTEP_ADJ_VF);
-  } else {
-    nrv1_ = 0;
-  }
+  nv1_ = F.nnz_out(STEP_VF);
+  nrv1_ = nv1_ * nadj_;
   nv_ = nv1_ * (1 + nfwd_);
   nrv_ = nrv1_ * (1 + nfwd_);
 
