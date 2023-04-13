@@ -125,13 +125,13 @@ class MinimizationProblemDescription:
         g = [] if g.shape == (0, 0) else [g]
         # Problem dimensions
         n = cs.vec(x).shape[0]
-        p = cs.vec(param).shape[0]
+        p = cs.vec(param).shape[0] if param is not None else 0
         m_qpm = g_qpm.shape[0] if g_qpm is not None else 0
         m_alm = g_alm.shape[0] if g_alm is not None else 0
         # Bound constraints
         C = self.bounds
         if C is None:
-            C = (-np.inf * np.ones(n), +np.inf * np.zeros(n))
+            C = (-np.inf * np.ones(n), +np.inf * np.ones(n))
         # General quadratic penalty method constraint set
         D_qpm = self.penalty_constraints_bounds
         if D_qpm is None:
