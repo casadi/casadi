@@ -214,11 +214,11 @@ namespace casadi {
       g_arg[BSTEP_P] = p;
       g_arg[BSTEP_U] = u;
       g_arg[BSTEP_OUT_XF] = MX(rx0.size());
-      g_arg[BSTEP_OUT_QF] = MX(rp.size());
       g_arg[BSTEP_OUT_VF] = MX(rv.size());
+      g_arg[BSTEP_OUT_QF] = MX(rp.size());
       g_arg[BSTEP_ADJ_XF] = rx0;
-      g_arg[BSTEP_ADJ_QF] = rp;
       g_arg[BSTEP_ADJ_VF] = rv;
+      g_arg[BSTEP_ADJ_QF] = rp;
       g_res.resize(BSTEP_NUM_OUT);
       g_res[BSTEP_ADJ_T] = MX::zeros(t0.sparsity());
       g_res[BSTEP_ADJ_H] = MX::zeros(h.sparsity());
@@ -227,8 +227,8 @@ namespace casadi {
       g_res[BSTEP_ADJ_P] = rqf;
       g_res[BSTEP_ADJ_U] = uqf;
       Function G("stepB", g_arg, g_res,
-        {"t", "h", "x0", "v0", "p", "u", "out_xf", "out_qf", "out_vf",
-          "adj_xf", "adj_qf", "adj_vf"},
+        {"t", "h", "x0", "v0", "p", "u", "out_xf", "out_vf", "out_qf",
+          "adj_xf", "adj_vf", "adj_qf"},
         {"adj_t", "adj_h", "adj_x0", "adj_v0", "adj_p", "adj_u"});
       set_function(G, G.name(), true);
       if (nfwd_ > 0) create_forward("stepB", nfwd_);
