@@ -1833,7 +1833,9 @@ void FixedStepIntegrator::retreat(IntegratorMemory* mem, const double* u,
 
     // Take step
     casadi_int tapeind = disc_[m->k] + j;
-    stepB(m, t, h, m->x_tape + nx_ * tapeind, m->v_tape + nv_ * tapeind,
+    stepB(m, t, h,
+      m->x_tape + nx_ * tapeind, m->v_tape + nv_ * tapeind,
+      m->x_tape + nx_ * (tapeind + 1),
       m->rx_prev, m->rv_prev, m->rx, m->rv, m->rq, m->uq);
     casadi_axpy(nrq_, 1., m->rq_prev, m->rq);
     casadi_axpy(nuq_, 1., m->uq_prev, m->uq);
@@ -1880,17 +1882,18 @@ void FixedStepIntegrator::stepF(FixedStepMemory* m, double t, double h,
 }
 
 void FixedStepIntegrator::stepB(FixedStepMemory* m, double t, double h,
-    const double* x, const double* v, const double* rx0, const double* rv0,
+    const double* x0, const double* v0, const double* xf,
+    const double* rx0, const double* rv0,
     double* rxf, double* rvf, double* rqf, double* uqf) const {
   // Evaluate nondifferentiated
   std::fill(m->arg, m->arg + BSTEP_NUM_IN, nullptr);
   m->arg[BSTEP_T] = &t;  // t
   m->arg[BSTEP_H] = &h;  // h
-  m->arg[BSTEP_X0] = x;  // x
-  m->arg[BSTEP_V0] = v;  // v
+  m->arg[BSTEP_X0] = x0;  // x0
+  m->arg[BSTEP_V0] = v0;  // v0
   m->arg[BSTEP_P] = m->p;  // p
   m->arg[BSTEP_U] = m->u;  // u
-  m->arg[BSTEP_OUT_XF] = nullptr;  // out:xf
+  m->arg[BSTEP_OUT_XF] = xf;  // out:xf
   m->arg[BSTEP_OUT_VF] = nullptr;  // out:vf
   m->arg[BSTEP_OUT_QF] = nullptr;  // out:qf
   m->arg[BSTEP_ADJ_XF] = rx0;  // adj:xf
@@ -1914,11 +1917,11 @@ void FixedStepIntegrator::stepB(FixedStepMemory* m, double t, double h,
     m->arg[BSTEP_NUM_IN + BSTEP_ADJ_U] = uqf;  // out:adj:u
     m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_T] = nullptr;  // fwd:t
     m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_H] = nullptr;  // fwd:h
-    m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_X0] = x + nx1_;  // fwd:x
-    m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_V0] = v + nv1_;  // fwd:v
+    m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_X0] = x0 + nx1_;  // fwd:x0
+    m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_V0] = v0 + nv1_;  // fwd:v0
     m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_P] = m->p + np1_;  // fwd:p
     m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_U] = m->u + nu1_;  // fwd:u
-    m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_OUT_XF] = nullptr;  // fwd:out:xf
+    m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_OUT_XF] = xf + nx1_;  // fwd:out:xf
     m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_OUT_VF] = nullptr;  // fwd:out:vf
     m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_OUT_QF] = nullptr;  // fwd:out:qf
     m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_ADJ_XF] = rx0 + nrx1_ * nadj_;  // fwd:adj:xf
