@@ -597,11 +597,7 @@ set(BUILD_PROXQP_DEPENDENCIES EIGEN3 SIMDE)
 option(WITH_BUILD_TINYXML "Compile the included TinyXML source code" ON)
 option(WITH_TINYXML "Compile the interface to TinyXML" ON)
 if(WITH_TINYXML)
-  if(WITH_BUILD_TINYXML)
-    # build the included tinyxml
-    set(TINYXML_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/external_packages/tinyxml-2.6.2)
-    set(TINYXML_LIBRARIES casadi_tinyxml)
-  else()
+  if(NOT WITH_BUILD_TINYXML)
     # try to find system tinyxml
     find_package(TINYXML REQUIRED)
   endif()
@@ -1461,6 +1457,9 @@ if(WITH_PROXQP)
         CMAKE_ARGS --debug-find -DCMAKE_FIND_ROOT_PATH_MODE_PACKAGE=BOTH -DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=BOTH -DSimde_DIR=${CMAKE_BINARY_DIR}/external_projects/share/eigen3/cmake -DEigen3_DIR=${CMAKE_BINARY_DIR}/external_projects/share/eigen3/cmake -DCMAKE_PREFIX_PATH=${CMAKE_BINARY_DIR}/external_projects/include/ -DCMAKE_INCLUDE_PATH=${CMAKE_BINARY_DIR}/external_projects/include/ -DBUILD_TESTING=OFF -DBUILD_PYTHON_INTERFACE=OFF -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
         # --debug-find
     add_library(proxqp INTERFACE)
+    # This is similar to ALIAS but works fine on imported targets with CMake 3.10
+    add_library(proxsuite::proxsuite INTERFACE IMPORTED)
+    set_target_properties(proxsuite::proxsuite PROPERTIES INTERFACE_LINK_LIBRARIES proxqp)
     add_dependencies(proxqp proxqp-external)
     target_include_directories(proxqp INTERFACE "${CMAKE_BINARY_DIR}/external_projects/include")
     target_link_libraries(proxqp INTERFACE eigen3)

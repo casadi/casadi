@@ -564,7 +564,7 @@ namespace casadi {
   }
 
   MX MXNode::get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz) const {
-    if (sparsity().is_dense() && is_range(nz, 0, nnz()+1)) {
+    if (sparsity().is_dense() && is_range(nz, 0, nnz())) {
       return sparsity_cast(shared_from_this<MX>(), sp);
     }
     return GetNonzeros::create(sp, shared_from_this<MX>(), nz);
