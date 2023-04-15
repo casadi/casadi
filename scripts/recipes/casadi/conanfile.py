@@ -211,20 +211,6 @@ class CasADiRecipe(ConanFile):
         "with_doc": False,
     }
 
-    # Sources are located in the same place as this recipe, copy them to the recipe
-    exports_sources = (
-        "CMakeLists.txt",
-        "LICENSE.txt",
-        "README.md",
-        "casadi/*",
-        "cmake/*",
-        "docs/*",
-        "external_packages/*",
-        "misc/*",
-        "swig/*",
-        "test/*",
-    )
-
     def source(self):
         get(self, **self.conan_data["sources"][self.version])
 
