@@ -42,7 +42,7 @@ The following cache variables may also be set:
 #]=======================================================================]
 
 find_package(PkgConfig)
-pkg_check_modules(PC_Ipopt QUIET ipopt)
+pkg_check_modules(PC_Ipopt ipopt)
 
 find_path(Ipopt_INCLUDE_DIR
     NAMES IpoptConfig.h
@@ -89,8 +89,13 @@ if(Ipopt_FOUND AND NOT TARGET COIN::Ipopt)
         IMPORTED_LOCATION "${Ipopt_LIBRARY}"
         INTERFACE_INCLUDE_DIRECTORIES "${Ipopt_INCLUDE_DIR}"
     )
-    target_link_options(COIN::Ipopt INTERFACE ${PC_Ipopt_LDFLAGS})
+    # target_link_options(COIN::Ipopt INTERFACE ${PC_Ipopt_LDFLAGS})
+    target_link_directories(COIN::Ipopt INTERFACE ${PC_Ipopt_LIBRARY_DIRS})
     target_link_libraries(COIN::Ipopt INTERFACE ${PC_Ipopt_LIBRARIES})
+    find_package(Threads)
+    if (TARGET Threads::Threads)
+        target_link_libraries(COIN::Ipopt INTERFACE Threads::Threads)
+    endif()
 endif()
 
 mark_as_advanced(
