@@ -7,14 +7,14 @@
 TEST(csv, read) {
     USING_ALPAQA_CONFIG(alpaqa::DefaultConfig);
     std::istringstream is{"1.00000000000000000,"
-                          "2.00000000000000000,"
-                          "3.00000000000000000,"
+                          "+2.00000000000000000,"
+                          "-3.00000000000000000,"
                           "4.00000000000000000,"
                           "5.00000000000000000\n"};
     vec v(5);
     alpaqa::csv::read_row(is, rvec{v});
     vec expected(5);
-    expected << 1, 2, 3, 4, 5;
+    expected << 1, +2, -3, 4, 5;
     EXPECT_THAT(v, EigenEqual(expected));
 }
 
@@ -91,15 +91,16 @@ TEST(csv, readShort) {
 TEST(csv, readNaNInf) {
     USING_ALPAQA_CONFIG(alpaqa::DefaultConfig);
     std::istringstream is{"inf,"
+                          "+inf,"
                           "-inf,"
                           "nan,"
                           "-nan"};
-    vec v(4);
+    vec v(5);
     alpaqa::csv::read_row(is, rvec{v});
-    vec expected(4);
-    expected << alpaqa::inf<config_t>, -alpaqa::inf<config_t>,
-        alpaqa::NaN<config_t>, -alpaqa::NaN<config_t>;
-    EXPECT_EQ(std::memcmp(v.data(), expected.data(), 4 * sizeof(*v.data())), 0);
+    vec expected(5);
+    expected << alpaqa::inf<config_t>, +alpaqa::inf<config_t>,
+        -alpaqa::inf<config_t>, alpaqa::NaN<config_t>, -alpaqa::NaN<config_t>;
+    EXPECT_EQ(std::memcmp(v.data(), expected.data(), 5 * sizeof(*v.data())), 0);
 }
 
 TEST(csv, readEmpty) {

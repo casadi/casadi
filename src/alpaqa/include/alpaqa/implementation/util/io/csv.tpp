@@ -54,6 +54,8 @@ struct CSVReader {
 #if __cpp_lib_to_chars
     static const char *read_single(const char *bufbegin, const char *bufend,
                                    F &v) {
+        if (bufbegin != bufend && *bufbegin == '+')
+            ++bufbegin;
         const auto [ptr, ec] = std::from_chars(bufbegin, bufend, v);
         const auto bufvw     = std::string_view(bufbegin, bufend);
         if (ec != std::errc{})
