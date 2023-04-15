@@ -525,6 +525,8 @@ void IdasInterface::retreat(IntegratorMemory* mem, const double* u,
     if (nrq_ > 0 || nuq_ > 0) {
       THROWING(IDAGetQuadB, m->mem, m->whichB, &tret, m->ruq);
     }
+    // Interpolate to get current state
+    THROWING(IDAGetAdjY, m->mem, m->t_next, m->xz, m->xzdot);
   }
 
   // Save outputs
