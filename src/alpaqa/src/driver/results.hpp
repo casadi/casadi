@@ -1,9 +1,11 @@
 #pragma once
 
 #include <alpaqa/config/config.hpp>
+#include <alpaqa/problem/kkt-error.hpp>
 #include <alpaqa/problem/ocproblem-counters.hpp>
 #include <alpaqa/problem/problem-counters.hpp>
 #include <alpaqa/util/print.hpp>
+
 #include <bit>
 #include <charconv>
 #include <chrono>
@@ -13,32 +15,40 @@
 #include <string_view>
 #include <variant>
 
-#include "output.hpp"
 #include "problem.hpp"
+
+struct SolverResults {
+    USING_ALPAQA_CONFIG(alpaqa::DefaultConfig);
+    static constexpr real_t NaN = alpaqa::NaN<config_t>;
+
+    std::string_view status;
+    bool success = false;
+    alpaqa::EvalCounter evals;
+    std::chrono::nanoseconds duration{};
+    std::string solver;
+    real_t h = NaN, δ = NaN, ε = NaN, γ = NaN, Σ = NaN;
+    vec solution{};
+    vec multipliers{};
+    vec multipliers_bounds{};
+    index_t outer_iter = -1, inner_iter = -1;
+    using any_stat_t = std::variant<index_t, real_t, std::string, bool, vec,
+                                    std::vector<real_t>>;
+    std::vector<std::pair<std::string, any_stat_t>> extra{};
+};
 
 struct BenchmarkResults {
     USING_ALPAQA_CONFIG(alpaqa::DefaultConfig);
     static constexpr real_t NaN = alpaqa::NaN<config_t>;
 
     LoadedProblem &problem;
-    alpaqa::EvalCounter evals;
-    std::chrono::nanoseconds duration{};
-    std::string_view status;
-    bool success = false;
-    std::string solver;
-    real_t f = NaN, δ = NaN, ε = NaN, γ = NaN, Σ = NaN;
-    real_t stationarity = NaN, constr_violation = NaN, complementarity = NaN;
-    vec solution;
-    vec multipliers;
-    index_t outer_iter = -1, inner_iter = -1;
-    using any_stat_t = std::variant<index_t, real_t, std::string, bool, vec,
-                                    std::vector<real_t>>;
-    std::vector<std::pair<std::string, any_stat_t>> extra;
+    SolverResults solver_results;
+    real_t objective = NaN, smooth_objective = NaN;
+    alpaqa::KKTError<config_t> error{};
     std::span<const std::string_view> options;
     int64_t timestamp = 0;
 };
 
-std::string random_hex_string(auto &&rng) {
+inline std::string random_hex_string(auto &&rng) {
     auto rnd     = std::uniform_int_distribution<uint32_t>()(rng);
     auto rnd_str = std::string(8, '0');
     std::to_chars(rnd_str.data() + std::countl_zero(rnd) / 4,
@@ -54,16 +64,12 @@ auto timestamp_ms() {
     return now_ms;
 }
 
-template <class... A>
-void dict_elem(std::ostream &os, std::string_view k, A &&...a) {
-    os << "    " << std::quoted(k) << ": ";
-    python_literal(os, std::forward<A>(a)...);
-    os << ",\n";
-};
-
-void write_evaluations(std::ostream &os, const alpaqa::EvalCounter &evals) {
-    os << std::quoted("evaluations") << ": {\n";
-#define EVAL(name) dict_elem(os, #name, evals.name)
+inline void write_evaluations(std::ostream &os,
+                              const alpaqa::EvalCounter &evals) {
+    auto dict_elem = [&os](std::string_view name, const auto &value) {
+        os << name << ": " << value << '\n';
+    };
+#define EVAL(name) dict_elem(#name, evals.name)
     EVAL(proj_diff_g);
     EVAL(proj_multipliers);
     EVAL(prox_grad_step);
@@ -84,12 +90,14 @@ void write_evaluations(std::ostream &os, const alpaqa::EvalCounter &evals) {
     EVAL(grad_ψ);
     EVAL(ψ_grad_ψ);
 #undef EVAL
-    os << "},\n";
 }
 
-void write_evaluations(std::ostream &os, const alpaqa::OCPEvalCounter &evals) {
-    os << std::quoted("evaluations") << ": {\n";
-#define EVAL(name) dict_elem(os, #name, evals.name)
+inline void write_evaluations(std::ostream &os,
+                              const alpaqa::OCPEvalCounter &evals) {
+    auto dict_elem = [&os](std::string_view name, const auto &value) {
+        os << name << ": " << value << '\n';
+    };
+#define EVAL(name) dict_elem(#name, evals.name)
     EVAL(f);
     EVAL(jac_f);
     EVAL(grad_f_prod);
@@ -112,7 +120,6 @@ void write_evaluations(std::ostream &os, const alpaqa::OCPEvalCounter &evals) {
     EVAL(add_gn_hess_constr);
     EVAL(add_gn_hess_constr_N);
 #undef EVAL
-    os << "},\n";
 }
 
 namespace detail {
@@ -124,32 +131,36 @@ template <class... Ts>
 overloaded(Ts...) -> overloaded<Ts...>;
 } // namespace detail
 
-void print_results(std::ostream &os, const BenchmarkResults &results) {
+inline void print_results(std::ostream &os, const BenchmarkResults &results) {
     USING_ALPAQA_CONFIG(BenchmarkResults::config_t);
     using alpaqa::float_to_str;
-    auto time_s = std::chrono::duration<double>(results.duration);
+    const auto &solstats = results.solver_results;
+    const auto &kkterr   = results.error;
+    auto time_s          = std::chrono::duration<double>(solstats.duration);
     os << '\n'
-       << results.evals << '\n'
-       << "solver:  " << results.solver << '\n'
+       << solstats.evals << '\n'
+       << "solver:  " << solstats.solver << '\n'
        << "problem: " << results.problem.path.filename().c_str() << " (from "
        << results.problem.path.parent_path() << ")" << '\n'
-       << "status:  " << (results.success ? "\033[0;32m" : "\033[0;31m")
-       << results.status << "\033[0m" << '\n'
+       << "status:  " << (solstats.success ? "\033[0;32m" : "\033[0;31m")
+       << solstats.status << "\033[0m" << '\n'
        << "num var: " << results.problem.problem.get_n() << '\n'
        << "num con: " << results.problem.problem.get_m() << '\n'
-       << "f = " << float_to_str(results.f) << '\n'
-       << "ε = " << float_to_str(results.ε) << '\n'
-       << "δ = " << float_to_str(results.δ) << '\n'
-       << "γ = " << float_to_str(results.γ) << '\n'
-       << "Σ = " << float_to_str(results.Σ) << '\n'
-       << "stationarity    = " << float_to_str(results.stationarity) << '\n'
-       << "violation       = " << float_to_str(results.constr_violation) << '\n'
-       << "complementarity = " << float_to_str(results.complementarity) << '\n'
+       << "ε = " << float_to_str(solstats.ε) << '\n'
+       << "δ = " << float_to_str(solstats.δ) << '\n'
+       << "final step size  = " << float_to_str(solstats.γ) << '\n'
+       << "penalty norm     = " << float_to_str(solstats.Σ) << '\n'
+       << "nonsmooth objective = " << float_to_str(solstats.h) << '\n'
+       << "smooth objective    = " << float_to_str(results.objective) << '\n'
+       << "objective           = " << float_to_str(results.objective) << '\n'
+       << "stationarity    = " << float_to_str(kkterr.stationarity) << '\n'
+       << "violation       = " << float_to_str(kkterr.constr_violation) << '\n'
+       << "complementarity = " << float_to_str(kkterr.complementarity) << '\n'
        << "time: " << float_to_str(time_s.count(), 3) << " s\n"
-       << "outer iter: " << std::setw(6) << results.outer_iter << '\n'
-       << "iter:       " << std::setw(6) << results.inner_iter << '\n'
+       << "outer iter: " << std::setw(6) << solstats.outer_iter << '\n'
+       << "iter:       " << std::setw(6) << solstats.inner_iter << '\n'
        << std::endl;
-    for (const auto &[key, value] : results.extra) {
+    for (const auto &[key, value] : solstats.extra) {
         auto print_key = [&os, k{key}](const auto &v) {
             os << k << ": " << v << '\n';
         };
@@ -165,72 +176,8 @@ void print_results(std::ostream &os, const BenchmarkResults &results) {
     os << std::endl;
 }
 
-void write_results(std::ostream &os, const BenchmarkResults &results) {
-    os << "from numpy import nan, inf\n"
-          "import numpy as np\n"
-          "__all__ = ['results']\n"
-          "results = {\n";
-    dict_elem(os, "opts", results.options);
-    dict_elem(os, "time_utc_ms", results.timestamp);
-    dict_elem(os, "runtime", results.duration.count());
-    dict_elem(os, "iter", results.inner_iter);
-    dict_elem(os, "outer_iter", results.outer_iter);
-    dict_elem(os, "status", results.status);
-    dict_elem(os, "success", results.success);
-    dict_elem(os, "solver", results.solver);
-    dict_elem(os, "solution", results.solution);
-    dict_elem(os, "multipliers", results.multipliers);
-    dict_elem(os, "f", results.f);
-    dict_elem(os, "δ", results.δ);
-    dict_elem(os, "ε", results.ε);
-    dict_elem(os, "γ", results.γ);
-    dict_elem(os, "Σ", results.Σ);
-    dict_elem(os, "stationarity", results.stationarity);
-    dict_elem(os, "constr_violation", results.constr_violation);
-    dict_elem(os, "complementarity", results.complementarity);
-    write_evaluations(os, results.evals);
-    for (const auto &[key, value] : results.extra)
-        std::visit([&, k{std::string_view{key}}](
-                       const auto &v) { dict_elem(os, k, v); },
-                   value);
-    dict_elem(os, "nvar", results.problem.problem.get_n());
-    dict_elem(os, "ncon", results.problem.problem.get_m());
-    dict_elem(os, "path", results.problem.path);
-    dict_elem(os, "abs_path", results.problem.abs_path);
-    os << "}\n";
-}
-
-struct KKTError {
-    USING_ALPAQA_CONFIG(alpaqa::DefaultConfig);
-    real_t stationarity, constr_violation, complementarity;
-};
-
-KKTError compute_kkt_error(
-    const alpaqa::TypeErasedProblem<alpaqa::DefaultConfig> &problem,
-    alpaqa::crvec<alpaqa::DefaultConfig> x,
-    alpaqa::crvec<alpaqa::DefaultConfig> y) {
-
-    USING_ALPAQA_CONFIG(alpaqa::DefaultConfig);
-    const auto n = x.size(), m = y.size();
-    vec z(n), grad_Lx(n), work(n), g(m), e(m);
-    // Gradient of Lagrangian, ∇ℒ(x,y) = ∇f(x) + ∇g(x) y
-    problem.eval_grad_L(x, y, grad_Lx, work);
-    // Eliminate normal cone of bound constraints, z = Π(x - ∇ℒ(x,y)) - x
-    problem.eval_prox_grad_step(1, x, grad_Lx, work, z);
-    // Stationarity, ‖Π(x - ∇ℒ(x,y)) - x‖
-    auto stationarity = alpaqa::vec_util::norm_inf(z);
-    // Constraints, g(x)
-    problem.eval_g(x, g);
-    // Distance to feasible set, e = g(x) - Π(g(x))
-    problem.eval_proj_diff_g(g, e);
-    // Constraint violation, ‖g(x) - Π(g(x))‖
-    auto constr_violation = alpaqa::vec_util::norm_inf(e);
-    // Complementary slackness
-    real_t complementarity = std::inner_product(
-        y.begin(), y.end(), e.begin(), real_t(0),
-        [](real_t acc, real_t yv) { return std::fmax(acc, std::abs(yv)); },
-        std::multiplies<>{});
-    return {.stationarity     = stationarity,
-            .constr_violation = constr_violation,
-            .complementarity  = complementarity};
+inline void write_results(std::ostream &os, const BenchmarkResults &results) {
+    // TODO
+    (void)os;
+    (void)results;
 }

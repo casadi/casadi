@@ -247,7 +247,12 @@ endif()
 
 # Drivers
 if (ALPAQA_WITH_DRIVERS)
-    add_executable(driver "alpaqa/src/driver/alpaqa-driver.cpp")
+    add_executable(driver
+        "alpaqa/src/driver/alpaqa-driver.cpp"
+        "alpaqa/src/driver/panoc-driver.cpp"
+        "alpaqa/src/driver/pantr-driver.cpp"
+        "alpaqa/src/driver/problem.cpp"
+    )
     set_target_properties(driver PROPERTIES
         OUTPUT_NAME "alpaqa-driver"
         RELEASE_POSTFIX ""
@@ -268,48 +273,15 @@ if (ALPAQA_WITH_DRIVERS)
     endif()
     if (TARGET alpaqa::ipopt-adapter)
         target_link_libraries(driver PUBLIC alpaqa::ipopt-adapter)
+        target_sources(driver PRIVATE 
+            "alpaqa/src/driver/ipopt-driver.cpp")
         target_compile_definitions(driver PUBLIC WITH_IPOPT)
     endif()
     if (TARGET alpaqa::lbfgsb-adapter)
         target_link_libraries(driver PUBLIC alpaqa::lbfgsb-adapter)
+        target_sources(driver PRIVATE 
+            "alpaqa/src/driver/lbfgsb-driver.cpp")
         target_compile_definitions(driver PUBLIC WITH_LBFGSB)
-    endif()
-
-    add_executable(new-driver
-        "alpaqa/src/new-driver/alpaqa-driver.cpp"
-        "alpaqa/src/new-driver/panoc-driver.cpp"
-        "alpaqa/src/new-driver/pantr-driver.cpp"
-        "alpaqa/src/new-driver/problem.cpp"
-    )
-    set_target_properties(new-driver PROPERTIES
-        OUTPUT_NAME "alpaqa-new-driver"
-        RELEASE_POSTFIX ""
-        DEBUG_POSTFIX "${CMAKE_DEBUG_POSTFIX}"
-        RELWITHDEBINFO_POSTFIX ""
-        MINSIZEREL_POSTFIX ""
-    )
-    target_link_libraries(new-driver
-        PRIVATE alpaqa::alpaqa alpaqa::warnings alpaqa::dl-loader)
-    add_executable(alpaqa::new-driver ALIAS new-driver)
-    list(APPEND ALPAQA_INSTALL_EXE new-driver)
-    if (TARGET alpaqa::casadi-loader)
-        target_link_libraries(new-driver PUBLIC alpaqa::casadi-loader)
-        target_compile_definitions(new-driver PUBLIC ALPAQA_HAVE_CASADI)
-    endif()
-    if (TARGET alpaqa::casadi-ocp-loader)
-        target_link_libraries(new-driver PUBLIC alpaqa::casadi-ocp-loader)
-    endif()
-    if (TARGET alpaqa::ipopt-adapter)
-        target_link_libraries(new-driver PUBLIC alpaqa::ipopt-adapter)
-        target_sources(new-driver PRIVATE 
-            "alpaqa/src/new-driver/ipopt-driver.cpp")
-        target_compile_definitions(new-driver PUBLIC WITH_IPOPT)
-    endif()
-    if (TARGET alpaqa::lbfgsb-adapter)
-        target_link_libraries(new-driver PUBLIC alpaqa::lbfgsb-adapter)
-        target_sources(new-driver PRIVATE 
-            "alpaqa/src/new-driver/lbfgsb-driver.cpp")
-        target_compile_definitions(new-driver PUBLIC WITH_LBFGSB)
     endif()
 endif()
 
