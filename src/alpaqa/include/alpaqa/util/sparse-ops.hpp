@@ -2,6 +2,7 @@
 
 #include <alpaqa/config/config.hpp>
 #include <alpaqa/util/demangled-typename.hpp>
+#include <alpaqa/util/enumerate.hpp>
 #include <alpaqa/util/iter-adapter.hpp>
 #include <alpaqa/util/set-intersection.hpp>
 
