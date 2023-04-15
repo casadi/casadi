@@ -77,7 +77,7 @@ SolverResults run_alm_solver(LoadedProblem &problem, Solver &solver,
     avg_duration /= (N_exp + 1);
 
     // Results
-    real_t final_γ = 0, final_h;
+    real_t final_γ = 0, final_h = 0;
     if constexpr (requires { stats.inner.final_γ; })
         final_γ = stats.inner.final_γ;
     if constexpr (requires { stats.inner.final_h; })

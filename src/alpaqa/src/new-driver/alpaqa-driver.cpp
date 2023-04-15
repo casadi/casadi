@@ -4,6 +4,7 @@
 #include <alpaqa/util/print.hpp>
 
 #include "ipopt-driver.hpp"
+#include "lbfgsb-driver.hpp"
 #include "options.hpp"
 #include "panoc-driver.hpp"
 #include "pantr-driver.hpp"
@@ -75,9 +76,11 @@ auto get_solver_builder(Options &opts) {
     std::tie(method, direction) = alpaqa::params::split_key(method, '.');
     // Dictionary of available solver builders
     std::map<std::string_view, solver_builder_func_t> solvers{
-        {"panoc", make_panoc_driver},
-        {"zerofpr", make_zerofpr_driver},
+        {"panoc", make_panoc_driver},   {"zerofpr", make_zerofpr_driver},
         {"pantr", make_pantr_driver},
+#ifdef WITH_LBFGSB
+        {"lbfgsb", make_lbfgsb_driver},
+#endif
 #ifdef WITH_IPOPT
         {"ipopt", make_ipopt_driver},
 #endif

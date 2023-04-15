@@ -307,6 +307,8 @@ if (ALPAQA_WITH_DRIVERS)
     endif()
     if (TARGET alpaqa::lbfgsb-adapter)
         target_link_libraries(new-driver PUBLIC alpaqa::lbfgsb-adapter)
+        target_sources(new-driver PRIVATE 
+            "alpaqa/src/new-driver/lbfgsb-driver.cpp")
         target_compile_definitions(new-driver PUBLIC WITH_LBFGSB)
     endif()
 endif()
