@@ -29,7 +29,7 @@ solver_func_t make_panoc_like_driver(std::string_view direction,
                     N_exp](LoadedProblem &problem,
                            std::ostream &os) mutable -> SolverResults {
                 static std::atomic<decltype(solver) *> solver_to_stop;
-                attach_cancellation<solver_to_stop>(solver);
+                auto cancel = attach_cancellation<solver_to_stop>(solver);
                 return run_alm_solver(problem, solver, os, N_exp);
             };
         };

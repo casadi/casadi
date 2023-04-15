@@ -16,7 +16,7 @@
  * @return  A RAII object that detaches the handler when destroyed.
  */
 template <auto &solver_to_stop>
-auto attach_cancellation(auto &solver) {
+[[nodiscard]] auto attach_cancellation(auto &solver) {
     if constexpr (requires { solver.stop(); }) {
         auto *old = solver_to_stop.exchange(&solver, std::memory_order_release);
         if (old) {
