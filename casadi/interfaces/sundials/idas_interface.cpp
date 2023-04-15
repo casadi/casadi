@@ -814,6 +814,7 @@ int IdasInterface::psetupF(double t, N_Vector xz, N_Vector xzdot, N_Vector rr,
 
     // Factorize the linear system
     if (s.linsolF_.nfact(m->jacF, m->mem_linsolF)) return 1;
+    m->cj_last = cj;
 
     return 0;
   } catch(std::exception& e) { // non-recoverable error
@@ -963,6 +964,7 @@ IdasMemory::IdasMemory(const IdasInterface& s) : self(s) {
   this->mem = nullptr;
   this->xzdot = nullptr;
   this->rxzdot = nullptr;
+  this->cj_last = nan;
 
   // Reset checkpoints counter
   this->ncheck = 0;
