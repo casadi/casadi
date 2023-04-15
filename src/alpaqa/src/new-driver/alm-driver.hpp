@@ -69,9 +69,16 @@ SolverResults run_alm_solver(LoadedProblem &problem, Solver &solver,
     auto avg_duration = stats.elapsed_time;
     os.setstate(std::ios_base::badbit); // suppress output
     for (unsigned i = 0; i < N_exp; ++i) {
-        x = problem.initial_guess_x;
-        y = problem.initial_guess_y;
-        avg_duration += solver(problem.problem, x, y).elapsed_time;
+        x      = problem.initial_guess_x;
+        y      = problem.initial_guess_y;
+        auto s = solver(problem.problem, x, y);
+        if (s.status == alpaqa::SolverStatus::Interrupted) {
+            os.clear();
+            os << "\rInterrupted after " << i << " runs" << std::endl;
+            N_exp = i;
+            break;
+        }
+        avg_duration += s.elapsed_time;
     }
     os.clear();
     avg_duration /= (N_exp + 1);
