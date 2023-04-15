@@ -64,6 +64,9 @@ struct CASADI_INTEGRATOR_IDAS_EXPORT IdasMemory : public SundialsMemory {
   /// Ids of backward problem
   int whichB;
 
+  /// cj used in the last factorization
+  double cj_last;
+
   /// Constructor
   IdasMemory(const IdasInterface& s);
 
