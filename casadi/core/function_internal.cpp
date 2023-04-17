@@ -615,7 +615,7 @@ namespace casadi {
     // Prepopulate function cache
     for (auto&& c : cache_init_) {
       const Function& f = c.second;
-      if (c.first != f.name() + ":") {
+      if (c.first != f.name()) {
         casadi_warning("Cannot add '" + c.first + "' a.k.a. '" + f.name()
           + "' to cache. Mismatching names not implemented.");
       } else {
@@ -953,7 +953,15 @@ namespace casadi {
     // Add all Function instances that haven't been deleted
     for (auto&& cf : cache_) {
       if (cf.second.alive()) {
-        ret[cf.first] = shared_cast<Function>(cf.second.shared());
+        // Get the name of the key
+        std::string s = cf.first;
+        casadi_assert_dev(s.size() > 0);
+        // Replace ':' with '_'
+        std::replace(s.begin(), s.end(), ':', '_');
+        // Remove trailing underscore, if any
+        if (s.back() == '_') s.resize(s.size() - 1);
+        // Add entry to function return
+        ret[s] = shared_cast<Function>(cf.second.shared());
       }
     }
     return ret;
