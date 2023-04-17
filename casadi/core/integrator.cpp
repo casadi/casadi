@@ -2198,7 +2198,7 @@ Integrator::Integrator(DeserializingStream & s) : OracleFunction(s) {
 void FixedStepIntegrator::serialize_body(SerializingStream &s) const {
   Integrator::serialize_body(s);
 
-  s.version("FixedStepIntegrator", 2);
+  s.version("FixedStepIntegrator", 3);
   s.pack("FixedStepIntegrator::nk_target", nk_target_);
   s.pack("FixedStepIntegrator::disc", disc_);
   s.pack("FixedStepIntegrator::nv", nv_);
@@ -2208,7 +2208,7 @@ void FixedStepIntegrator::serialize_body(SerializingStream &s) const {
 }
 
 FixedStepIntegrator::FixedStepIntegrator(DeserializingStream & s) : Integrator(s) {
-  s.version("FixedStepIntegrator", 2);
+  s.version("FixedStepIntegrator", 3);
   s.unpack("FixedStepIntegrator::nk_target", nk_target_);
   s.unpack("FixedStepIntegrator::disc", disc_);
   s.unpack("FixedStepIntegrator::nv", nv_);
