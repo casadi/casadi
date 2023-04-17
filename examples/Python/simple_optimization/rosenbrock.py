@@ -15,7 +15,7 @@ g = cs.vertcat(
     x1 + x2 - 1.5,
 )
 
-# Set the bounds
+# Define the bounds
 C = [-0.25, -0.5], [1.5, 2.5]  # -0.25 <= x1 <= 1.5, -0.5 <= x2 <= 2.5
 D = [-np.inf, -np.inf], [0, 0]  #         g1 <= 0,           g2 <= 0
 

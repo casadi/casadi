@@ -22,16 +22,16 @@ model = cs.Function("model", [x, p], [p[0] * cs.sin(p[1] * x) + p[2]])
 sample_error = cs.Function("err", [x, y, p], [y - model(x, p)])
 sum_sq_error = cs.sumsqr(sample_error.map(N_data)(data_x.T, data_y.T, p))
 
-# Convert the symbolic expression to a CasADi function
-f = cs.Function("f", [p, cs.vec(data)], [sum_sq_error])
-
 # %% Generate and compile C-code for the objective and constraints using alpaqa
 
 # Compile and load the problem (without general constraints)
-prob = cl.generate_and_compile_casadi_problem(f, None, second_order="psi_prod")
+problem = (
+    pa.minimize(sum_sq_error, p)
+    .with_param(cs.vec(data))
+).compile(second_order="psi_prod", sym=cs.SX.sym)
 # Optionally, add constraints on the parameters
-prob.C.lowerbound[1] = 3
-prob.C.upperbound[1] = 7
+problem.C.lowerbound[1] = 3
+problem.C.upperbound[1] = 7
 
 # %% Generate some data
 
@@ -42,13 +42,13 @@ data_x = np.linspace(-1, +1, N_data, endpoint=True)
 data_y = true_model(data_x) + rng.standard_normal(N_data)
 
 # Add data to the problem
-prob.param = np.concatenate((data_x, data_y))
+problem.param = np.concatenate((data_x, data_y))
 
 # %% Solve the problem using alpaqa's PANTR solver
 
 solver = pa.PANTRSolver({"print_interval": 1})
 # Add evaluation counters to the problem
-cnt = pa.problem_with_counters(prob)
+cnt = pa.problem_with_counters(problem)
 sol_params, stats = solver(cnt.problem, {"tolerance": 1e-10})
 
 # %% Print the results
