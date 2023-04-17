@@ -744,6 +744,9 @@ namespace casadi {
         const std::string& loc, casadi_int stride, casadi_int sz, casadi_int key_sz,
         const std::string& val);
 
+    /// Current CasADi version as string
+    static std::string casadi_version();
+
     /// Print file header
     static void file_open(std::ofstream& f, const std::string& name, bool cpp);
 
