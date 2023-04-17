@@ -68,7 +68,7 @@ if "SKIP_SUPERSCS_TESTS" not in os.environ and has_conic("superscs"):
 # No solution for licensing on travis
 
 if "SKIP_GUROBI_TESTS" not in os.environ and has_conic("gurobi"):
-  conics.append(("gurobi",{"gurobi": {"BarQCPConvTol":1e-9}},{"quadratic": True, "dual": False, "soc": True, "codegen": False,"discrete":True,"sos":True}))
+  conics.append(("gurobi",{"gurobi": {"BarQCPConvTol":1e-9}},{"quadratic": True, "less_digits": True, "dual": True, "soc": True, "codegen": False,"discrete":True,"sos":True}))
 
 # if has_conic("sqic"):
 #   conics.append(("sqic",{},{}))
