@@ -55,6 +55,7 @@ auto make_inner_solver(Options &opts) {
 template <class Solver>
 SolverResults run_alm_solver(LoadedProblem &problem, Solver &solver,
                              std::ostream &os, unsigned N_exp) {
+    solver.os = &os;
 
     // Initial guess
     vec x = problem.initial_guess_x, y = problem.initial_guess_y;
@@ -82,6 +83,8 @@ SolverResults run_alm_solver(LoadedProblem &problem, Solver &solver,
     }
     os.clear();
     avg_duration /= (N_exp + 1);
+
+    solver.os = &std::cout;
 
     // Results
     real_t final_γ = 0, final_h = 0;
