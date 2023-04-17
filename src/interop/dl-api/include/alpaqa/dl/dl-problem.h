@@ -139,14 +139,18 @@ typedef struct {
         const alpaqa_real_t *grad_ψ,
         alpaqa_real_t *x̂,
         alpaqa_real_t *p);
-    void (*get_C)(
+    void (*initialize_box_C)(
         void *instance,
         alpaqa_real_t *lb,
         alpaqa_real_t *ub);
-    void (*get_D)(
+    void (*initialize_box_D)(
         void *instance,
         alpaqa_real_t *lb,
         alpaqa_real_t *ub);
+    void (*initialize_l1_reg)(
+        void *instance,
+        alpaqa_real_t *lambda,
+        alpaqa_length_t *size);
     // clang-format on
 } alpaqa_problem_functions_t;
 

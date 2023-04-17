@@ -48,12 +48,21 @@ DLProblem::DLProblem(std::string so_filename, std::string symbol_prefix,
     this->m   = r.functions->m;
     this->C   = Box{this->n};
     this->D   = Box{this->m};
-    if (functions->get_C)
-        functions->get_C(instance.get(), this->C.lowerbound.data(),
-                         this->C.upperbound.data());
-    if (functions->get_D)
-        functions->get_D(instance.get(), this->D.lowerbound.data(),
-                         this->D.upperbound.data());
+    if (functions->initialize_box_C)
+        functions->initialize_box_C(instance.get(), this->C.lowerbound.data(),
+                                    this->C.upperbound.data());
+    if (functions->initialize_box_D)
+        functions->initialize_box_D(instance.get(), this->D.lowerbound.data(),
+                                    this->D.upperbound.data());
+    if (functions->initialize_l1_reg) {
+        length_t nλ = 0;
+        functions->initialize_l1_reg(instance.get(), nullptr, &nλ);
+        if (nλ > 0) {
+            this->l1_reg.resize(nλ);
+            functions->initialize_l1_reg(instance.get(), this->l1_reg.data(),
+                                         &nλ);
+        }
+    }
     extra_functions = std::shared_ptr<function_dict_t>{std::move(unique_extra)};
 }
 
