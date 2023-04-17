@@ -274,3 +274,5 @@ if(INSTALL_INTERNAL_HEADERS)
     DESTINATION ${INCLUDE_PREFIX}/casadi/core
   )
 endif()
+
+target_compile_definitions(casadi PUBLIC CASADI_SNPRINTF=snprintf)

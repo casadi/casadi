@@ -70,6 +70,9 @@ namespace casadi {
      {{"knitro",
        {OT_DICT,
         "Options to be passed to KNITRO"}},
+      {"options_file",
+       {OT_STRING,
+        "Read options from file (solver specific)"}},
       {"detect_linear_constraints",
        {OT_BOOL,
         "Detect type of constraints"}},
@@ -88,11 +91,14 @@ namespace casadi {
     Nlpsol::init(opts);
     bool detect_linear_constraints = true;
     std::vector< std::vector<casadi_int> > complem_variables;
+    options_file_ = "";
 
     // Read user options
     for (auto&& op : opts) {
       if (op.first=="knitro") {
         opts_ = op.second;
+      } else if (op.first=="options_file") {
+        options_file_ = op.second.to_string();
       } else if (op.first=="contype") {
         contype_ = op.second;
       } else if (op.first=="detect_linear_constraints") {
@@ -219,6 +225,11 @@ namespace casadi {
     if (!jacg_sp_.is_null()) {
       assign_vector(jacg_sp_.get_col(), Jcol);
       assign_vector(jacg_sp_.get_row(), Jrow);
+    }
+
+    if (!options_file_.empty()) {
+      status = KN_load_param_file(m->kc, options_file_.c_str());
+      casadi_assert(status==0, "KN_load_param_file failed");
     }
 
     // Hessian sparsity
@@ -515,7 +526,7 @@ namespace casadi {
   }
 
   KnitroInterface::KnitroInterface(DeserializingStream& s) : Nlpsol(s) {
-    s.version("KnitroInterface", 1);
+    int version = s.version("KnitroInterface", 1, 2);
     s.unpack("KnitroInterface::contype", contype_);
     s.unpack("KnitroInterface::comp_type", comp_type_);
     s.unpack("KnitroInterface::comp_i1", comp_i1_);
@@ -523,11 +534,16 @@ namespace casadi {
     s.unpack("KnitroInterface::opts", opts_);
     s.unpack("KnitroInterface::jacg_sp", jacg_sp_);
     s.unpack("KnitroInterface::hesslag_sp", hesslag_sp_);
+    if (version>=2) {
+      s.unpack("KnitroInterface::options_file", options_file_);
+    } else {
+      options_file_ = "";
+    }
   }
 
   void KnitroInterface::serialize_body(SerializingStream &s) const {
     Nlpsol::serialize_body(s);
-    s.version("KnitroInterface", 1);
+    s.version("KnitroInterface", 2);
     s.pack("KnitroInterface::contype", contype_);
     s.pack("KnitroInterface::comp_type", comp_type_);
     s.pack("KnitroInterface::comp_i1", comp_i1_);
@@ -535,6 +551,7 @@ namespace casadi {
     s.pack("KnitroInterface::opts", opts_);
     s.pack("KnitroInterface::jacg_sp", jacg_sp_);
     s.pack("KnitroInterface::hesslag_sp", hesslag_sp_);
+    s.pack("KnitroInterface::options_file", options_file_);
   }
 
   KnitroMemory::KnitroMemory(const KnitroInterface& self) : self(self) {
