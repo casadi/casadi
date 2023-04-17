@@ -570,6 +570,11 @@ jobs:
           destination_path: install/casadi
           dockcross: ${{ matrix.arch }}
           bitness: ${{env.bitness}}
+      - uses: dsaltares/fetch-gh-release-asset@1.1.0
+        with:
+          repo: casadi/commercial_solvers
+          file:  libgfortran.so.3
+          target: install/casadi/libgfortran.so.3
       - run: |
              cd install/casadi
              zip -rq ../../casadi-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip .
@@ -642,12 +647,6 @@ jobs:
         run: |
           ./dockcross cmake -Bbuild -DWITH_PYTHON=ON -DPYTHON_LIBRARY=${{ env.PYTHON_LIBRARY}} -DPYTHON_INCLUDE_DIR=${{ env.PYTHON_INCLUDE_DIR }} -USWIG_IMPORT  -DCMAKE_INSTALL_PREFIX=/work/install -DSKIP_CONFIG_H_GENERATION=ON
           ./dockcross cmake --build build --target install -v
-      - uses: dsaltares/fetch-gh-release-asset@1.1.0
-        with:
-          repo: casadi/commercial_solvers
-          file:  libgfortran.so.3
-          target: install/casadi/libgfortran.so.3
-        if: contains(matrix.arch, 'linux')
       - uses: kanga333/variable-mapper@v0.3.0
         with:
           key: "${{matrix.arch}}"
@@ -667,6 +666,12 @@ jobs:
           destination_path: install/casadi
           dockcross: ${{ matrix.arch }}
           bitness: ${{env.bitness}}
+      - uses: dsaltares/fetch-gh-release-asset@1.1.0
+        with:
+          repo: casadi/commercial_solvers
+          file:  libgfortran.so.3
+          target: install/casadi/libgfortran.so.3
+        if: contains(matrix.arch, 'linux')
       - run: |
              cd install
              echo "This file (and the casadi directory) should end up in a folder called 'casadi-${{env.os}}${{env.bitness}}-py${{matrix.py2}}'" > dummy.txt
