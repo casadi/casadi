@@ -211,116 +211,20 @@ namespace casadi {
     }
 
     // Form forward discrete time dynamics
-    std::vector<MX> F_in(FSTEP_NUM_IN);
-    F_in[FSTEP_T] = t0;
-    F_in[FSTEP_H] = h;
-    F_in[FSTEP_X0] = x0;
-    F_in[FSTEP_P] = p;
-    F_in[FSTEP_U] = u;
-    F_in[FSTEP_V0] = v;
-    std::vector<MX> F_out(FSTEP_NUM_OUT);
-    F_out[FSTEP_XF] = xf;
-    F_out[FSTEP_VF] = vertcat(eq);
-    F_out[FSTEP_QF] = qf;
-    Function F("implicit_stepF", F_in, F_out,
+    std::vector<MX> F_in(STEP_NUM_IN);
+    F_in[STEP_T] = t0;
+    F_in[STEP_H] = h;
+    F_in[STEP_X0] = x0;
+    F_in[STEP_P] = p;
+    F_in[STEP_U] = u;
+    F_in[STEP_V0] = v;
+    std::vector<MX> F_out(STEP_NUM_OUT);
+    F_out[STEP_XF] = xf;
+    F_out[STEP_VF] = vertcat(eq);
+    F_out[STEP_QF] = qf;
+    Function F("implicit_step", F_in, F_out,
       {"t", "h", "x0", "v0", "p", "u"}, {"xf", "vf", "qf"});
     set_function(F, F.name(), true);
-
-    // Backwards dynamics
-    // NOTE: The following is derived so that it will give the exact adjoint
-    // sensitivities whenever g is the reverse mode derivative of f.
-    if (nadj_ > 0) {
-      // Continuous-time dynamics, backward problem
-      Function g = get_function("rdae");
-
-      // Symbolic inputs
-      MX rx0 = MX::sym("rx0", g.numel_in(BDYN_ADJ_ODE));
-      MX rp = MX::sym("rp", g.numel_in(BDYN_ADJ_QUAD));
-
-      // Implicitly defined variables (rz and rx)
-      MX rv = MX::sym("v", deg_ * (nrx1_ + nrz1_) * nadj_);
-      std::vector<casadi_int> rv_offset(1, 0);
-      for (casadi_int d = 0; d < deg_; ++d) {
-        rv_offset.push_back(rv_offset.back() + nrx1_ * nadj_);
-        rv_offset.push_back(rv_offset.back() + nrz1_ * nadj_);
-      }
-      std::vector<MX> rvv = vertsplit(rv, rv_offset);
-      std::vector<MX>::const_iterator rvv_it = rvv.begin();
-
-      // Collocated states
-      std::vector<MX> rx(deg_ + 1), rz(deg_ + 1);
-      for (casadi_int d = 1; d <= deg_; ++d) {
-        rx[d] = *rvv_it++;
-        rz[d] = *rvv_it++;
-      }
-      casadi_assert_dev(rvv_it == rvv.end());
-
-      // Equations that implicitly define v
-      eq.clear();
-
-      // Quadratures
-      MX rqf = MX::zeros(nrq1_ * nadj_);
-      MX uqf = MX::zeros(nuq1_ * nadj_);
-
-      // End state
-      MX rxf = D[0] * rx0;
-
-      // For all collocation points
-      for (casadi_int j = 1; j < deg_ + 1; ++j) {
-
-        // Evaluate the backward DAE
-        std::vector<MX> g_arg(BDYN_NUM_IN);
-        g_arg[BDYN_T] = tt[j];
-        g_arg[BDYN_P] = p;
-        g_arg[BDYN_U] = u;
-        g_arg[BDYN_X] = x[j];
-        g_arg[BDYN_Z] = z[j];
-        g_arg[BDYN_ADJ_ODE] = reshape(rx[j], g.size_in(BDYN_ADJ_ODE));
-        g_arg[BDYN_ADJ_ALG] = reshape(rz[j], g.size_in(BDYN_ADJ_ALG));
-        g_arg[BDYN_ADJ_QUAD] = reshape(rp, g.size_in(BDYN_ADJ_QUAD));
-        std::vector<MX> g_res = g(g_arg);
-
-        // Get an expression for the state derivative at the collocation point
-        MX rxp_j = -D[j] * rx0;
-        for (casadi_int r = 1; r < deg_ + 1; ++r) {
-          rxp_j += (B[r]*C[j][r]) * rx[r];
-        }
-
-        // Add collocation equation
-        eq.push_back(h * B[j] * vec(g_res[BDYN_ADJ_X]) - rxp_j);
-
-        // Add the algebraic conditions
-        eq.push_back(vec(g_res[BDYN_ADJ_Z]));
-
-        // Add contribution to the final state
-        rxf += -B[j] * C[0][j] * rx[j];
-
-        // Add contribution to quadratures
-        rqf += h * B[j] * vec(g_res[BDYN_ADJ_P]);
-        uqf += h * B[j] * vec(g_res[BDYN_ADJ_U]);
-      }
-
-      // Form backward discrete time dynamics
-      std::vector<MX> G_in(BSTEP_NUM_IN);
-      G_in[BSTEP_T] = t0;
-      G_in[BSTEP_H] = h;
-      G_in[BSTEP_X] = x0;
-      G_in[BSTEP_P] = p;
-      G_in[BSTEP_U] = u;
-      G_in[BSTEP_V] = v;
-      G_in[BSTEP_RX0] = rx0;
-      G_in[BSTEP_RP] = rp;
-      G_in[BSTEP_RV0] = rv;
-      std::vector<MX> G_out(BSTEP_NUM_OUT);
-      G_out[BSTEP_RXF] = rxf;
-      G_out[BSTEP_RVF] = vertcat(eq);
-      G_out[BSTEP_RQF] = rqf;
-      G_out[BSTEP_UQF] = uqf;
-      Function G("implicit_stepB", G_in, G_out,
-        {"t", "h", "rx0", "rv0", "rp", "x", "v", "p", "u"},
-        {"rxf", "rvf", "rqf", "uqf"});
-      set_function(G, G.name(), true);
-    }
   }
 
   void Collocation::reset(IntegratorMemory* mem,
@@ -337,23 +241,6 @@ namespace casadi {
       v += nx1_;
       casadi_copy(z, nz1_, v);
       v += nz1_;
-    }
-  }
-
-  void Collocation::resetB(IntegratorMemory* mem,
-      const double* rx, const double* rz, const double* rp) const {
-    auto m = static_cast<FixedStepMemory*>(mem);
-
-    // Reset the base classes
-    ImplicitFixedStepIntegrator::resetB(mem, rx, rz, rp);
-
-    // Initial guess for rv
-    double* rv = m->rv;
-    for (casadi_int d = 0; d < deg_; ++d) {
-      casadi_copy(rx, nrx_, rv);
-      rv += nrx_;
-      casadi_copy(rz, nrz_, rv);
-      rv += nrz_;
     }
   }
 

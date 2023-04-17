@@ -371,16 +371,12 @@ void SundialsInterface::reset(IntegratorMemory* mem, const double* x,
   N_VConst(0., m->q);
 }
 
-void SundialsInterface::resetB(IntegratorMemory* mem,
-    const double* rx, const double* rz, const double* rp) const {
+void SundialsInterface::resetB(IntegratorMemory* mem) const {
   auto m = static_cast<SundialsMemory*>(mem);
 
-  // Set parameters
-  casadi_copy(rp, nrp_, m->rp);
-
-  // Set the backward state
-  casadi_copy(rx, nrx_, NV_DATA_S(m->rxz));
-  casadi_copy(rz, nrz_, NV_DATA_S(m->rxz) + nrx_);
+  // Clear seeds
+  casadi_clear(m->rp, nrp_);
+  casadi_clear(NV_DATA_S(m->rxz), nrx_ + nrz_);
 
   // Reset summation states
   N_VConst(0., m->ruq);
@@ -393,8 +389,12 @@ void SundialsInterface::impulseB(IntegratorMemory* mem,
   // Add impulse to backward parameters
   casadi_axpy(nrp_, 1., rp, m->rp);
 
-  // Add impulse to state
+  // Add impulse to backward state
   casadi_axpy(nrx_, 1., rx, NV_DATA_S(m->rxz));
+
+  // Add impulse to algebraic variables:
+  // If nonzero, this has to be propagated to an impulse in backward state
+  // casadi_copy(rz, nrz_, NV_DATA_S(m->rxz) + nrx_);
   casadi_axpy(nrz_, 1., rz, NV_DATA_S(m->rxz) + nrx_);
 }
 
@@ -582,7 +582,7 @@ int SundialsInterface::calc_daeF(SundialsMemory* m, double t, const double* x, c
 }
 
 int SundialsInterface::calc_daeB(SundialsMemory* m, double t, const double* x, const double* z,
-    const double* rx, const double* rz, double* adj_x, double* adj_z) const {
+    const double* rx, const double* rz, const double* rp, double* adj_x, double* adj_z) const {
   // Evaluate nondifferentiated
   m->arg[BDYN_T] = &t;  // t
   m->arg[BDYN_X] = x;  // x
@@ -594,7 +594,7 @@ int SundialsInterface::calc_daeB(SundialsMemory* m, double t, const double* x, c
   m->arg[BDYN_OUT_QUAD] = nullptr;  // out_quad
   m->arg[BDYN_ADJ_ODE] = rx;  // adj_ode
   m->arg[BDYN_ADJ_ALG] = rz;  // adj_alg
-  m->arg[BDYN_ADJ_QUAD] = m->rp;  // adj_quad
+  m->arg[BDYN_ADJ_QUAD] = rp;  // adj_quad
   m->res[BDAE_ADJ_X] = adj_x;  // adj_x
   m->res[BDAE_ADJ_Z] = adj_z;  // adj_z
   if (calc_function(m, "daeB")) return 1;
@@ -614,7 +614,8 @@ int SundialsInterface::calc_daeB(SundialsMemory* m, double t, const double* x, c
       rx ? rx + nrx1_ * nadj_ : 0;  // fwd:adj_ode
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_ADJ_ALG] =
       rz ? rz + nrz1_ * nadj_ : 0;  // fwd:adj_alg
-    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_ADJ_QUAD] = m->rp + nrp1_ * nadj_;  // fwd:adj_quad
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_ADJ_QUAD] =
+      rp ? rp + nrp1_ * nadj_ : 0;  // fwd:adj_quad
     m->res[BDAE_ADJ_X] = adj_x ? adj_x + nrx1_ * nadj_ : 0;  // fwd:adj_x
     m->res[BDAE_ADJ_Z] = adj_z ? adj_z + nrz1_ * nadj_ : 0;  // fwd:adj_z
     if (calc_function(m, forward_name("daeB", nfwd_))) return 1;

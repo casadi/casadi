@@ -144,6 +144,7 @@ namespace casadi {
     // Includes needed
     if (this->include_math) add_include("math.h");
     if (this->main) add_include("stdio.h");
+    if (this->verbose_runtime) add_auxiliary(AUX_PRINTF);
 
     // Mex and main need string.h
     if (this->mex || this->main) {
@@ -1204,7 +1205,11 @@ namespace casadi {
                           << "  #define CASADI_PRINTF printf\n"
                           << "#endif\n";
       } else {
+        add_include("stdio.h");
         this->auxiliaries << "#define CASADI_PRINTF printf\n";
+        this->auxiliaries << "#ifndef CASADI_SNPRINTF\n";
+        this->auxiliaries << "#define CASADI_SNPRINTF snprintf\n";
+        this->auxiliaries << "#endif\n\n";
       }
       this->auxiliaries << "#endif\n\n";
       break;
@@ -1597,7 +1602,6 @@ namespace casadi {
   }
 
   std::string CodeGenerator::printf(const std::string& str, const std::vector<std::string>& arg) {
-    add_include("stdio.h");
     add_auxiliary(AUX_PRINTF);
     std::stringstream s;
     s << "CASADI_PRINTF(\"" << str << "\"";

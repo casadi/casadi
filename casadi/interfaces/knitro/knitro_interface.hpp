@@ -144,6 +144,9 @@ namespace casadi {
     std::vector<int> comp_i1_;
     std::vector<int> comp_i2_;
 
+    // KNITRO options file
+    std::string options_file_;
+
     /// A documentation string
     static const std::string meta_doc;
 

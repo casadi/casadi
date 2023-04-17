@@ -68,7 +68,7 @@ if "SKIP_SUPERSCS_TESTS" not in os.environ and has_conic("superscs"):
 # No solution for licensing on travis
 
 if "SKIP_GUROBI_TESTS" not in os.environ and has_conic("gurobi"):
-  conics.append(("gurobi",{"gurobi": {"BarQCPConvTol":1e-9}},{"quadratic": True, "dual": False, "soc": True, "codegen": False,"discrete":True,"sos":True}))
+  conics.append(("gurobi",{"gurobi": {"BarQCPConvTol":1e-9}},{"quadratic": True, "less_digits": True, "dual": True, "soc": True, "codegen": False,"discrete":True,"sos":True}))
 
 # if has_conic("sqic"):
 #   conics.append(("sqic",{},{}))
@@ -924,6 +924,23 @@ class ConicTests(casadiTestCase):
 
       if aux_options["codegen"]:
         self.check_codegen(solver,solver_in,**aux_options["codegen"])
+
+  @requires_conic("qrqp")
+  def test_qrqp_prints(self):
+    x = MX.sym("x")
+    qp = {"x":x,"f":(x-1)**2}
+    solver = qpsol("solver","qrqp",qp)
+    with self.assertOutput(["last_tau","Converged"],[]):
+        solver()
+    if args.run_slow:
+        F,_ = self.check_codegen(solver,{},std="c99",opts={})
+        with self.assertOutput([],["last_tau","Converged"]): # By default, don't print
+            F()
+        F,_ = self.check_codegen(solver,{},std="c99",opts={"verbose_runtime":True})
+        #with self.assertOutput(["last_tau","Converged"],[]): # Printing, but not captured by python stdout
+        #    F()
+    
+    
 
   @requires_conic("hpipm")
   @requires_conic("qpoases")

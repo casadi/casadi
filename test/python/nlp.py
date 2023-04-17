@@ -495,6 +495,18 @@ class NLPtests(casadiTestCase):
       if "codegen" in features:
         self.check_codegen(solver,solver_in,std="c99")
 
+  @requires_nlpsol("knitro")
+  def test_knitro_options_file(self):
+    x = MX.sym("x")
+    
+    nlp = {"x": x, "f":x**2}
+    with open("my_knitro.opt","w") as f:
+        f.write("maxit            42\n")
+    
+    solver = nlpsol("solver","knitro",nlp,{"options_file":"my_knitro.opt"})
+    with self.assertOutput(["maxit:","42"],[]):
+        solver()
+ 
   @requires_nlpsol("ipopt")
   def test_ipopt_solver(self):
 
