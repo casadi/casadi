@@ -389,8 +389,12 @@ void SundialsInterface::impulseB(IntegratorMemory* mem,
   // Add impulse to backward parameters
   casadi_axpy(nrp_, 1., rp, m->rp);
 
-  // Add impulse to state
+  // Add impulse to backward state
   casadi_axpy(nrx_, 1., rx, NV_DATA_S(m->rxz));
+
+  // Add impulse to algebraic variables:
+  // If nonzero, this has to be propagated to an impulse in backward state
+  // casadi_copy(rz, nrz_, NV_DATA_S(m->rxz) + nrx_);
   casadi_axpy(nrz_, 1., rz, NV_DATA_S(m->rxz) + nrx_);
 }
 
