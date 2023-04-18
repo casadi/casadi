@@ -345,17 +345,16 @@ for name,meta in sorted(metadata.items()):
     meta['options'] = {}
 
   # Recursive retrieve all options from optionproviders
-  optionproviders_todo = set([name])
+  optionproviders_todo = [name]
   optionproviders = []
-  
+
   while optionproviders_todo:
-      for e in optionproviders_todo:
-        optionproviders.append(e)
-        additions = set()
-        if e in metadata:
-            additions = additions | set(metadata[e]["optionproviders"])
-      optionproviders_todo = optionproviders_todo | additions
-      optionproviders_todo = optionproviders_todo - set(optionproviders)
+      e = optionproviders_todo.pop(0)
+      optionproviders.append(e)
+
+      if e in metadata:
+          additions = [x for x in metadata[e]["optionproviders"] if x not in optionproviders and x not in optionproviders_todo]
+          optionproviders_todo.extend(additions)
   
   optionset = []
   for a in optionproviders:
