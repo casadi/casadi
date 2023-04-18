@@ -4734,6 +4734,7 @@
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>Set of user problem functions to be monitored</td><td>casadi::OracleFunction</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>no_nlp_grad</td><td>OT_BOOL</td><td>Prevent the creation of the 'nlp_grad' function</td><td>casadi::Nlpsol</td></tr>
+<tr><td>options_file</td><td>OT_STRING</td><td>Read options from file (solver specific)</td><td>casadi::KnitroInterface</td></tr>
 <tr><td>oracle_options</td><td>OT_DICT</td><td>Options to be passed to the oracle function</td><td>casadi::Nlpsol</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
@@ -4765,6 +4766,7 @@
 <tr><td>contype</td><td>OT_INTVECTOR</td><td>Type of constraint</td></tr>
 <tr><td>detect_linear_constraints</td><td>OT_BOOL</td><td>Detect type of constraints</td></tr>
 <tr><td>knitro</td><td>OT_DICT</td><td>Options to be passed to KNITRO</td></tr>
+<tr><td>options_file</td><td>OT_STRING</td><td>Read options from file (solver specific)</td></tr>
 </table>
 */
 /** \addtogroup general_KnitroInterface
@@ -4835,6 +4837,7 @@
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>Set of user problem functions to be monitored</td><td>casadi::OracleFunction</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>no_nlp_grad</td><td>OT_BOOL</td><td>Prevent the creation of the 'nlp_grad' function</td><td>casadi::Nlpsol</td></tr>
+<tr><td>options_file</td><td>OT_STRING</td><td>Read options from file (solver specific)</td><td>casadi::KnitroInterface</td></tr>
 <tr><td>oracle_options</td><td>OT_DICT</td><td>Options to be passed to the oracle function</td><td>casadi::Nlpsol</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
