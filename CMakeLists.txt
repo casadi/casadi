@@ -482,6 +482,12 @@ if(MINGW OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU") OR ("${CMAKE_CXX_COMPILE
   #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fkeep-inline-functions")
 endif()
 
+# Make CasADi version available to the compiler
+add_definitions("-DCASADI_MAJOR_VERSION=${CASADI_MAJOR_VERSION}")
+add_definitions("-DCASADI_MINOR_VERSION=${CASADI_MINOR_VERSION}")
+add_definitions("-DCASADI_PATCH_VERSION=${CASADI_PATCH_VERSION}")
+add_definitions("-DCASADI_IS_RELEASE=${CASADI_IS_RELEASE}")
+
 # Plugin version
 add_definitions(-DCASADI_VERSION=31)
 

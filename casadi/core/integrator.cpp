@@ -493,9 +493,18 @@ void Integrator::init(const Dict& opts) {
 
   // Construct t0_ and tout_ gbased on legacy options
   if (uses_legacy_options) {
+    static bool first_encounter = true;
+    if (first_encounter) {
     // Deprecation warning
-    casadi_warning("The options 't0', 'tf', 'grid' and 'output_t0' have been deprecated. "
-      "Set the time grid by proving additional argument to the 'integrator' call instead.");
+    casadi_warning("The options 't0', 'tf', 'grid' and 'output_t0' have been deprecated.\n"
+      "The same functionality is provided by providing additional input arguments to "
+      "the 'integrator' function, in particular:\n"
+      " * Call integrator(..., t0, tf, options) for a single output time, or\n"
+      " * Call integrator(..., t0, grid, options) for multiple grid points.\n"
+      "The legacy 'output_t0' option can be emulated by including or excluding 't0' in 'grid'.\n"
+      "Backwards compatibility is provided in this release only.");
+      first_encounter = false;
+    }
 
     // If grid unset, default to [t0, tf]
     if (grid.empty()) grid = {t0, tf};
@@ -2189,7 +2198,7 @@ Integrator::Integrator(DeserializingStream & s) : OracleFunction(s) {
 void FixedStepIntegrator::serialize_body(SerializingStream &s) const {
   Integrator::serialize_body(s);
 
-  s.version("FixedStepIntegrator", 2);
+  s.version("FixedStepIntegrator", 3);
   s.pack("FixedStepIntegrator::nk_target", nk_target_);
   s.pack("FixedStepIntegrator::disc", disc_);
   s.pack("FixedStepIntegrator::nv", nv_);
@@ -2199,7 +2208,7 @@ void FixedStepIntegrator::serialize_body(SerializingStream &s) const {
 }
 
 FixedStepIntegrator::FixedStepIntegrator(DeserializingStream & s) : Integrator(s) {
-  s.version("FixedStepIntegrator", 2);
+  s.version("FixedStepIntegrator", 3);
   s.unpack("FixedStepIntegrator::nk_target", nk_target_);
   s.unpack("FixedStepIntegrator::disc", disc_);
   s.unpack("FixedStepIntegrator::nv", nv_);
