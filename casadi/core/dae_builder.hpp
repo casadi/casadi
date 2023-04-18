@@ -432,6 +432,9 @@ class CASADI_EXPORT DaeBuilder
   /// Import existing problem from FMI/XML
   void parse_fmi(const std::string& filename) {load_fmi_description(filename); }
 
+  /// Does the FMU provide support for analytic derivatives
+  bool provides_directional_derivative() const;
+
   /// Import problem description from FMI or XML
   void load_fmi_description(const std::string& filename);
 

@@ -227,6 +227,16 @@ void DaeBuilder::load_fmi_description(const std::string& filename) {
   }
 }
 
+bool DaeBuilder::provides_directional_derivative() const {
+  try {
+    casadi_assert(!(*this)->symbolic_, "Functionality only applies to imported standard FMUs");
+    return (*this)->provides_directional_derivative_;
+  } catch (std::exception& e) {
+    THROW_ERROR("provides_directional_derivative", e.what());
+    return false;
+  }
+}
+
 std::vector<std::string> DaeBuilder::export_fmu(const Dict& opts) {
   try {
     return (*this)->export_fmu(opts);

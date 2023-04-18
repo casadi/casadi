@@ -204,7 +204,8 @@ Function OracleFunction::create_function(const Function& oracle, const std::stri
 Function OracleFunction::create_forward(const std::string& fname, casadi_int nfwd) {
   // Create derivative
   Function ret = get_function(fname).forward(nfwd);
-  if (!has_function(ret.name())) set_function(ret, ret.name(), true);
+  std::string fwd_name = forward_name(fname, nfwd);  // may be different from ret.name()
+  if (!has_function(fwd_name)) set_function(ret, fwd_name, true);
   return ret;
 }
 
