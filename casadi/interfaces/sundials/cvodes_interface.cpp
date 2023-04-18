@@ -69,7 +69,10 @@ const Options CvodesInterface::options_
       "Min step size [default: 0/0.0]"}},
     {"fsens_all_at_once",
       {OT_BOOL,
-      "Calculate all right hand sides of the sensitivity equations at once"}}
+      "Calculate all right hand sides of the sensitivity equations at once"}},
+    {"always_recalculate_jacobian",
+     {OT_BOOL,
+      "Recalculate Jacobian before factorizations, even if Jacobian is current [default: true]"}}
     }
 };
 
@@ -83,6 +86,7 @@ void CvodesInterface::init(const Dict& opts) {
   std::string linear_multistep_method = "bdf";
   std::string nonlinear_solver_iteration = "newton";
   min_step_size_ = 0;
+  always_recalculate_jacobian_ = true;
 
   // Read options
   for (auto&& op : opts) {
@@ -92,6 +96,8 @@ void CvodesInterface::init(const Dict& opts) {
       min_step_size_ = op.second;
     } else if (op.first=="nonlinear_solver_iteration") {
       nonlinear_solver_iteration = op.second.to_string();
+    } else if (op.first=="always_recalculate_jacobian") {
+      always_recalculate_jacobian_ = op.second;
     }
   }
 
@@ -285,12 +291,12 @@ void CvodesInterface::advance(IntegratorMemory* mem,
   THROWING(CVodeGetNonlinSolvStats, m->mem, &m->nniters, &m->nncfails);
 }
 
-void CvodesInterface::resetB(IntegratorMemory* mem,
+void CvodesInterface::impulseB(IntegratorMemory* mem,
     const double* rx, const double* rz, const double* rp) const {
   auto m = to_mem(mem);
 
-  // Reset the base classes
-  SundialsInterface::resetB(mem, rx, rz, rp);
+  // Call method in base class
+  SundialsInterface::impulseB(mem, rx, rz, rp);
 
   if (m->first_callB) {
     // Create backward problem
@@ -331,25 +337,14 @@ void CvodesInterface::resetB(IntegratorMemory* mem,
     // Mark initialized
     m->first_callB = false;
   } else {
+    // Reinitialize solver
     THROWING(CVodeReInitB, m->mem, m->whichB, m->t, m->rxz);
     THROWING(CVodeQuadReInitB, m->mem, m->whichB, m->ruq);
   }
 }
 
-void CvodesInterface::impulseB(IntegratorMemory* mem,
-    const double* rx, const double* rz, const double* rp) const {
-  auto m = to_mem(mem);
-
-  // Call method in base class
-  SundialsInterface::impulseB(mem, rx, rz, rp);
-
-  // Reinitialize solver
-  THROWING(CVodeReInitB, m->mem, m->whichB, m->t, m->rxz);
-  THROWING(CVodeQuadReInitB, m->mem, m->whichB, m->ruq);
-}
-
 void CvodesInterface::retreat(IntegratorMemory* mem, const double* u,
-    double* rx, double* rz, double* rq, double* uq) const {
+    double* rx, double* rq, double* uq) const {
   auto m = to_mem(mem);
 
   // Set controls
@@ -423,7 +418,7 @@ int CvodesInterface::rhsB(double t, N_Vector x, N_Vector rx, N_Vector rxdot, voi
     casadi_assert_dev(user_data);
     auto m = to_mem(user_data);
     auto& s = m->self;
-    if (s.calc_daeB(m, t, NV_DATA_S(x), nullptr, NV_DATA_S(rx), nullptr,
+    if (s.calc_daeB(m, t, NV_DATA_S(x), nullptr, NV_DATA_S(rx), nullptr, m->rp,
       NV_DATA_S(rxdot), nullptr)) return 1;
     // Negate (note definition of g)
     casadi_scal(s.nrx_, -1., NV_DATA_S(rxdot));
@@ -578,15 +573,18 @@ int CvodesInterface::psetupF(double t, N_Vector x, N_Vector xdot, booleantype jo
     const Sparsity& sp_jac_ode_x = s.get_function("jacF").sparsity_out(0);
     const Sparsity& sp_jacF = s.linsolF_.sparsity();
 
-    // Offset for storing the sparser Jacobian, to allow overwriting entries
-    casadi_int jac_offset = sp_jacF.nnz() - sp_jac_ode_x.nnz();
+    // Calculate Jacobian, if necessary
+    if (s.always_recalculate_jacobian_ || !jcurPtr || *jcurPtr == 0) {
+      // Re(calculate) Jacobian
+      if (s.calc_jacF(m, t, NV_DATA_S(x), nullptr,
+        m->jac_ode_x, nullptr, nullptr, nullptr)) return 1;
 
-    // Calculate Jacobian
-    if (s.calc_jacF(m, t, NV_DATA_S(x), nullptr,
-      m->jacF + jac_offset, nullptr, nullptr, nullptr)) return 1;
+      // Jacobian is now current
+      if (jcurPtr) *jcurPtr = 1;
+    }
 
     // Project to expected sparsity pattern (with diagonal)
-    casadi_project(m->jacF + jac_offset, sp_jac_ode_x, m->jacF, sp_jacF, m->w);
+    casadi_project(m->jac_ode_x, sp_jac_ode_x, m->jacF, sp_jacF, m->w);
 
     // Scale and shift diagonal
     const casadi_int *colind = sp_jacF.colind(), *row = sp_jacF.row();
@@ -599,9 +597,6 @@ int CvodesInterface::psetupF(double t, N_Vector x, N_Vector xdot, booleantype jo
         if (r == c) m->jacF[k] += 1;
       }
     }
-
-    // Jacobian is now current
-    if (jcurPtr) *jcurPtr = 1;
 
     // Prepare the solution of the linear system (e.g. factorize)
     if (s.linsolF_.nfact(m->jacF, m->mem_linsolF)) return 1;
@@ -749,7 +744,7 @@ CvodesMemory::~CvodesMemory() {
 }
 
 CvodesInterface::CvodesInterface(DeserializingStream& s) : SundialsInterface(s) {
-  int version = s.version("CvodesInterface", 1, 2);
+  int version = s.version("CvodesInterface", 1, 3);
   s.unpack("CvodesInterface::lmm", lmm_);
   s.unpack("CvodesInterface::iter", iter_);
 
@@ -758,15 +753,20 @@ CvodesInterface::CvodesInterface(DeserializingStream& s) : SundialsInterface(s) 
   } else {
     min_step_size_ = 0;
   }
+
+  if (version >= 3) {
+    s.unpack("CvodesInterface::always_recalculate_jacobian", always_recalculate_jacobian_);
+  }
 }
 
 void CvodesInterface::serialize_body(SerializingStream &s) const {
   SundialsInterface::serialize_body(s);
-  s.version("CvodesInterface", 2);
+  s.version("CvodesInterface", 3);
 
   s.pack("CvodesInterface::lmm", lmm_);
   s.pack("CvodesInterface::iter", iter_);
   s.pack("CvodesInterface::min_step_size", min_step_size_);
+  s.pack("CvodesInterface::always_recalculate_jacobian", always_recalculate_jacobian_);
 }
 
 } // namespace casadi

@@ -129,7 +129,7 @@ namespace casadi {
 
     // DAE right-hand-side, forward problem
     int calc_daeB(SundialsMemory* m, double t, const double* x, const double* z,
-      const double* rx, const double* rz, double* adj_x, double* adj_z) const;
+      const double* rx, const double* rz, const double* rp, double* adj_x, double* adj_z) const;
 
     // Quadrature right-hand-side, forward problem
     int calc_quadF(SundialsMemory* m, double t, const double* x, const double* z,
@@ -163,8 +163,7 @@ namespace casadi {
       const double* z, const double* p) const override;
 
     /** \brief  Reset the backward problem and take time to tf */
-    void resetB(IntegratorMemory* mem, const double* rx,
-      const double* rz, const double* rp) const override;
+    void resetB(IntegratorMemory* mem) const override;
 
     /** \brief Introduce an impulse into the backwards integration at the current time */
     void impulseB(IntegratorMemory* mem,

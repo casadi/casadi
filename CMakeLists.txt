@@ -1,10 +1,9 @@
 cmake_minimum_required(VERSION 3.10.2)
 project(casadi C CXX)
 
-
 set(CASADI_MAJOR_VERSION 3)
 set(CASADI_MINOR_VERSION 6)
-set(CASADI_PATCH_VERSION 0)
+set(CASADI_PATCH_VERSION 1)
 set(CASADI_IS_RELEASE 1)
 
 set(CASADI_VERSION ${CASADI_MAJOR_VERSION}.${CASADI_MINOR_VERSION}.${CASADI_PATCH_VERSION})
@@ -21,6 +20,7 @@ set(PACKAGE_MAINTAINER "Joel Andersson and Joris Gillis")
 set(PACKAGE_URL "http://casadi.org")
 
 set(CASADI_TP_SHARED_PREFIX casadi-tp-)
+
 
 ############################################################
 ####################### Policies ###########################
@@ -482,6 +482,12 @@ if(MINGW OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU") OR ("${CMAKE_CXX_COMPILE
   #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fkeep-inline-functions")
 endif()
 
+# Make CasADi version available to the compiler
+add_definitions("-DCASADI_MAJOR_VERSION=${CASADI_MAJOR_VERSION}")
+add_definitions("-DCASADI_MINOR_VERSION=${CASADI_MINOR_VERSION}")
+add_definitions("-DCASADI_PATCH_VERSION=${CASADI_PATCH_VERSION}")
+add_definitions("-DCASADI_IS_RELEASE=${CASADI_IS_RELEASE}")
+
 # Plugin version
 add_definitions(-DCASADI_VERSION=31)
 
@@ -597,11 +603,7 @@ set(BUILD_PROXQP_DEPENDENCIES EIGEN3 SIMDE)
 option(WITH_BUILD_TINYXML "Compile the included TinyXML source code" ON)
 option(WITH_TINYXML "Compile the interface to TinyXML" ON)
 if(WITH_TINYXML)
-  if(WITH_BUILD_TINYXML)
-    # build the included tinyxml
-    set(TINYXML_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/external_packages/tinyxml-2.6.2)
-    set(TINYXML_LIBRARIES casadi_tinyxml)
-  else()
+  if(NOT WITH_BUILD_TINYXML)
     # try to find system tinyxml
     find_package(TINYXML REQUIRED)
   endif()
@@ -669,7 +671,7 @@ set(BUILD_IPOPT_DEPENDENCIES MUMPS)
 
 option(WITH_MOCKUP_REQUIRED ON)
 set(BUILD_MOCKUPS_GIT_REPO https://github.com/casadi/mockups.git CACHE STRING "Git repo used together with BUILD_MOCKUPS_VERSION")
-set(BUILD_MOCKUPS_VERSION v60 CACHE STRING "Tag/branch/hash to be used for BUILD_MOCKUPS_GIT_REPO")
+set(BUILD_MOCKUPS_VERSION v61 CACHE STRING "Tag/branch/hash to be used for BUILD_MOCKUPS_GIT_REPO")
 
 # Knitro: An NLP solver
 option(WITH_KNITRO "Compile the interface to KNITRO" OFF)
@@ -1426,6 +1428,7 @@ if(WITH_BUILD_EIGEN3)
       CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
   add_library(eigen3 INTERFACE)
   add_dependencies(eigen3 eigen3-external)
+  file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/eigen3")
   target_include_directories(eigen3 INTERFACE "${CMAKE_BINARY_DIR}/external_projects/include/eigen3")
   install(DIRECTORY
     "${CMAKE_BINARY_DIR}/external_projects/include/eigen3"
@@ -1461,7 +1464,11 @@ if(WITH_PROXQP)
         CMAKE_ARGS --debug-find -DCMAKE_FIND_ROOT_PATH_MODE_PACKAGE=BOTH -DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=BOTH -DSimde_DIR=${CMAKE_BINARY_DIR}/external_projects/share/eigen3/cmake -DEigen3_DIR=${CMAKE_BINARY_DIR}/external_projects/share/eigen3/cmake -DCMAKE_PREFIX_PATH=${CMAKE_BINARY_DIR}/external_projects/include/ -DCMAKE_INCLUDE_PATH=${CMAKE_BINARY_DIR}/external_projects/include/ -DBUILD_TESTING=OFF -DBUILD_PYTHON_INTERFACE=OFF -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
         # --debug-find
     add_library(proxqp INTERFACE)
+    # This is similar to ALIAS but works fine on imported targets with CMake 3.10
+    add_library(proxsuite::proxsuite INTERFACE IMPORTED)
+    set_target_properties(proxsuite::proxsuite PROPERTIES INTERFACE_LINK_LIBRARIES proxqp)
     add_dependencies(proxqp proxqp-external)
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include")
     target_include_directories(proxqp INTERFACE "${CMAKE_BINARY_DIR}/external_projects/include")
     target_link_libraries(proxqp INTERFACE eigen3)
     install(DIRECTORY

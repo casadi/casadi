@@ -667,6 +667,9 @@
 %exception  casadi::DaeBuilder::parse_fmi(const std::string &filename) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::DaeBuilder::provides_directional_derivative() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::DaeBuilder::prune(bool prune_p=true, bool prune_u=true) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }

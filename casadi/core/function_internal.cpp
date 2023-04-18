@@ -615,7 +615,7 @@ namespace casadi {
     // Prepopulate function cache
     for (auto&& c : cache_init_) {
       const Function& f = c.second;
-      if (c.first != f.name() + ":") {
+      if (c.first != f.name()) {
         casadi_warning("Cannot add '" + c.first + "' a.k.a. '" + f.name()
           + "' to cache. Mismatching names not implemented.");
       } else {
@@ -953,7 +953,15 @@ namespace casadi {
     // Add all Function instances that haven't been deleted
     for (auto&& cf : cache_) {
       if (cf.second.alive()) {
-        ret[cf.first] = shared_cast<Function>(cf.second.shared());
+        // Get the name of the key
+        std::string s = cf.first;
+        casadi_assert_dev(s.size() > 0);
+        // Replace ':' with '_'
+        std::replace(s.begin(), s.end(), ':', '_');
+        // Remove trailing underscore, if any
+        if (s.back() == '_') s.resize(s.size() - 1);
+        // Add entry to function return
+        ret[s] = shared_cast<Function>(cf.second.shared());
       }
     }
     return ret;
@@ -1800,11 +1808,6 @@ namespace casadi {
           sp = get_jac_sparsity_gen<false>(oind, iind);
         }
       }
-      // There may be false positives here that are not present
-      // in the reverse mode that precedes it.
-      // This can lead to an assymetrical result
-      //  cf. #1522
-      if (symmetric) sp=sp*sp.T();
       return sp;
     } else {
       // Not calculated
@@ -1876,7 +1879,15 @@ namespace casadi {
           jsp = sp;
         } else {
           jsp_other = sp;
-          jsp = compact ? to_compact(oind, iind, sp) : from_compact(oind, iind, sp);
+          if (compact) {
+            // We have the non-compact sparsity pattern, get the compact one
+            jsp = to_compact(oind, iind, sp);
+          } else {
+            // We have the compact sparsity pattern, get the non-compact one
+            jsp = from_compact(oind, iind, sp);
+            // Make sure the non-compact Jacobian is symmetric, cf. #1522, #3074
+            if (symmetric) jsp = jsp * jsp.T();
+          }
         }
       }
     }

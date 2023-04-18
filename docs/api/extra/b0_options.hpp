@@ -1664,6 +1664,7 @@
 <tr><td>ad_weight</td><td>OT_DOUBLE</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>ad_weight_sp</td><td>OT_DOUBLE</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\". When set to -1, sparsity is completely ignored and dense matrices are used.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>always_inline</td><td>OT_BOOL</td><td>Force inlining.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>always_recalculate_jacobian</td><td>OT_BOOL</td><td>Recalculate Jacobian before factorizations, even if Jacobian is current [default: true]</td><td>casadi::CvodesInterface</td></tr>
 <tr><td>augmented_options</td><td>OT_DICT</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>casadi::Integrator</td></tr>
 <tr><td>cache</td><td>OT_DICT</td><td>Prepopulate the function cache. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>common_options</td><td>OT_DICT</td><td>Options for auto-generated functions</td><td>casadi::OracleFunction</td></tr>
@@ -1762,6 +1763,7 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Description</th></tr>
 <tr><td>abstol</td><td>OT_DOUBLE</td><td>Absolute tolerence for the IVP solution</td></tr>
+<tr><td>always_recalculate_jacobian</td><td>OT_BOOL</td><td>Recalculate Jacobian before factorizations, even if Jacobian is current [default: true]</td></tr>
 <tr><td>disable_internal_warnings</td><td>OT_BOOL</td><td>Disable SUNDIALS internal warning messages</td></tr>
 <tr><td>fsens_all_at_once</td><td>OT_BOOL</td><td>Calculate all right hand sides of the sensitivity equations at once</td></tr>
 <tr><td>fsens_err_con</td><td>OT_BOOL</td><td>include the forward sensitivities in all error controls</td></tr>
@@ -1799,6 +1801,7 @@
 <tr><td>ad_weight</td><td>OT_DOUBLE</td><td>Weighting factor for derivative calculation.When there is an option of either using forward or reverse mode directional derivatives, the condition ad_weight*nf&lt;=(1-ad_weight)*na is used where nf and na are estimates of the number of forward/reverse mode directional derivatives needed. By default, ad_weight is calculated automatically, but this can be overridden by setting this option. In particular, 0 means forcing forward mode and 1 forcing reverse mode. Leave unset for (class specific) heuristics.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>ad_weight_sp</td><td>OT_DOUBLE</td><td>Weighting factor for sparsity pattern calculation calculation.Overrides default behavior. Set to 0 and 1 to force forward and reverse mode respectively. Cf. option \"ad_weight\". When set to -1, sparsity is completely ignored and dense matrices are used.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>always_inline</td><td>OT_BOOL</td><td>Force inlining.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>always_recalculate_jacobian</td><td>OT_BOOL</td><td>Recalculate Jacobian before factorizations, even if Jacobian is current [default: true]</td><td>casadi::CvodesInterface</td></tr>
 <tr><td>augmented_options</td><td>OT_DICT</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>casadi::Integrator</td></tr>
 <tr><td>cache</td><td>OT_DICT</td><td>Prepopulate the function cache. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>common_options</td><td>OT_DICT</td><td>Options for auto-generated functions</td><td>casadi::OracleFunction</td></tr>
@@ -5019,6 +5022,7 @@
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>Set of user problem functions to be monitored</td><td>casadi::OracleFunction</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>no_nlp_grad</td><td>OT_BOOL</td><td>Prevent the creation of the 'nlp_grad' function</td><td>casadi::Nlpsol</td></tr>
+<tr><td>options_file</td><td>OT_STRING</td><td>Read options from file (solver specific)</td><td>casadi::KnitroInterface</td></tr>
 <tr><td>oracle_options</td><td>OT_DICT</td><td>Options to be passed to the oracle function</td><td>casadi::Nlpsol</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
@@ -5050,6 +5054,7 @@
 <tr><td>contype</td><td>OT_INTVECTOR</td><td>Type of constraint</td></tr>
 <tr><td>detect_linear_constraints</td><td>OT_BOOL</td><td>Detect type of constraints</td></tr>
 <tr><td>knitro</td><td>OT_DICT</td><td>Options to be passed to KNITRO</td></tr>
+<tr><td>options_file</td><td>OT_STRING</td><td>Read options from file (solver specific)</td></tr>
 </table>
 */
 /** \addtogroup general_KnitroInterface
@@ -5120,6 +5125,7 @@
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>Set of user problem functions to be monitored</td><td>casadi::OracleFunction</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>no_nlp_grad</td><td>OT_BOOL</td><td>Prevent the creation of the 'nlp_grad' function</td><td>casadi::Nlpsol</td></tr>
+<tr><td>options_file</td><td>OT_STRING</td><td>Read options from file (solver specific)</td><td>casadi::KnitroInterface</td></tr>
 <tr><td>oracle_options</td><td>OT_DICT</td><td>Options to be passed to the oracle function</td><td>casadi::Nlpsol</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>

@@ -424,8 +424,7 @@ void IdasInterface::advance(IntegratorMemory* mem,
 
 }
 
-void IdasInterface::resetB(IntegratorMemory* mem,
-    const double* rx, const double* rz, const double* rp) const {
+void IdasInterface::resetB(IntegratorMemory* mem) const {
   if (verbose_) casadi_message(name_ + "::resetB");
   auto m = to_mem(mem);
 
@@ -433,10 +432,67 @@ void IdasInterface::resetB(IntegratorMemory* mem,
   N_VConst(0.0, m->rxz);
 
   // Reset the base classes
-  SundialsInterface::resetB(mem, rx, rz, rp);
+  SundialsInterface::resetB(mem);
 
   // Reset initial guess
   N_VConst(0.0, m->rxzdot);
+}
+
+bool IdasInterface::all_zero(const double* v, casadi_int n) {
+  // Quick return if trivially zero
+  if (v == 0 || n == 0) return true;
+  // Loop over entries
+  for (casadi_int i = 0; i < n; ++i) {
+    if (v[i] != 0.) return false;
+  }
+  // All zero if reached here
+  return true;
+}
+
+void IdasInterface::z_impulseB(IdasMemory* m, const double* rz) const {
+  // Quick return if nothing to propagate
+  if (all_zero(rz, nrz_)) return;
+  // We have the following solved nonlinear system of equations:
+  //   f_alg(x, z) == 0,
+  // which implicitly defines z as a function of x
+  // Linearize w.r.t. x:
+  //   df_alg/dz * dz/dx + df_alg/dx == 0 <=> dz/dx = -inv(df_alg/dz)*df_alg/dx
+  // Want to calculate:
+  //   adj_x = (dz/dx)^T * adj_z = -(df_alg/dx)^T * inv((df_alg/dz)^T) * adj_z
+  //   = -(df_alg/dx)^T * w,
+  // where
+  //   (df_alg/dz)^T * w = adj_z
+  // Augment linear system to get the system we are able to factorize
+  //   [(df_ode/dx)^T - cj*I, (df_alg/dx)^T; (df_ode/dz)^T, (df_alg/dz)^T] * [v; w] = [0; adj_z]
+  // (Re)factorize linear system
+  if (psetupF(m->t, m->xz, m->xzdot, nullptr, m->cj_last, m, nullptr, nullptr, nullptr))
+    casadi_error("Linear system factorization for backwards initial conditions failed");
+  // Right-hand-side for linear system in m->v2
+  casadi_clear(m->v2, nrx_);
+  casadi_copy(rz, nrz_, m->v2 + nrx_);
+  // Solve transposed linear system of equations (Note: m->v2 not used since rxz null)
+  if (solve_transposed(m, m->t, NV_DATA_S(m->xz), nullptr, m->v2, m->v2)) {
+    casadi_error("Linear system solve for backwards initial conditions failed");
+  }
+  // Calculate: -adj_x = (df_alg/dx)^T * w
+  casadi_clear(m->v2, nrx_);
+  if (calc_daeB(m, m->t, NV_DATA_S(m->xz), NV_DATA_S(m->xz) + nx_,
+      m->v2, m->v2 + nrx_, nullptr, m->v1, m->v1 + nrx_)) {
+    casadi_error("Adjoint seed propagation for backwards initial conditions failed");
+  }
+  // Add contribution to backward state
+  casadi_axpy(nrx_, -1., m->v1, NV_DATA_S(m->rxz));
+}
+
+void IdasInterface::impulseB(IntegratorMemory* mem,
+    const double* rx, const double* rz, const double* rp) const {
+  auto m = to_mem(mem);
+
+  // Call method in base class
+  SundialsInterface::impulseB(mem, rx, rz, rp);
+
+  // Propagate impulse from rz to rx
+  z_impulseB(m, rz);
 
   if (m->first_callB) {
     // Create backward problem
@@ -445,6 +501,7 @@ void IdasInterface::resetB(IntegratorMemory* mem,
     THROWING(IDASStolerancesB, m->mem, m->whichB, reltol_, abstol_);
     THROWING(IDASetUserDataB, m->mem, m->whichB, m);
     THROWING(IDASetMaxNumStepsB, m->mem, m->whichB, max_num_steps_);
+
 
     // Set algebraic components
     N_Vector id = N_VNew_Serial(nrx_+nrz_);
@@ -497,31 +554,14 @@ void IdasInterface::resetB(IntegratorMemory* mem,
   }
 
   // Correct initial values for the integration if necessary
-  if (calc_icB_) {
+  if (calc_icB_ && m->k == nt() - 1) {
     THROWING(IDACalcICB, m->mem, m->whichB, t0_, m->xz, m->xzdot);
     THROWING(IDAGetConsistentICB, m->mem, m->whichB, m->rxz, m->rxzdot);
   }
 }
 
-void IdasInterface::impulseB(IntegratorMemory* mem,
-    const double* rx, const double* rz, const double* rp) const {
-  auto m = to_mem(mem);
-
-  // Call method in base class
-  SundialsInterface::impulseB(mem, rx, rz, rp);
-
-  // Re-initialize
-  THROWING(IDAReInitB, m->mem, m->whichB, m->t, m->rxz, m->rxzdot);
-  if (nrq_ > 0 || nuq_ > 0) {
-    // Workaround (bug in SUNDIALS)
-    // THROWING(IDAQuadReInitB, m->mem, m->whichB[dir], m->rq[dir]);
-    void* memB = IDAGetAdjIDABmem(m->mem, m->whichB);
-    THROWING(IDAQuadReInit, memB, m->ruq);
-  }
-}
-
 void IdasInterface::retreat(IntegratorMemory* mem, const double* u,
-    double* rx, double* rz, double* rq, double* uq) const {
+    double* rx, double* rq, double* uq) const {
   auto m = to_mem(mem);
 
   // Set controls
@@ -535,11 +575,12 @@ void IdasInterface::retreat(IntegratorMemory* mem, const double* u,
     if (nrq_ > 0 || nuq_ > 0) {
       THROWING(IDAGetQuadB, m->mem, m->whichB, &tret, m->ruq);
     }
+    // Interpolate to get current state
+    THROWING(IDAGetAdjY, m->mem, m->t_next, m->xz, m->xzdot);
   }
 
   // Save outputs
   casadi_copy(NV_DATA_S(m->rxz), nrx_, rx);
-  casadi_copy(NV_DATA_S(m->rxz) + nrx_, nrz_, rz);
   casadi_copy(NV_DATA_S(m->ruq), nrq_, rq);
   casadi_copy(NV_DATA_S(m->ruq) + nrq_, nuq_, uq);
 
@@ -583,7 +624,7 @@ int IdasInterface::resB(double t, N_Vector xz, N_Vector xzdot, N_Vector rxz,
     auto m = to_mem(user_data);
     auto& s = m->self;
     if (s.calc_daeB(m, t, NV_DATA_S(xz), NV_DATA_S(xz) + s.nx_,
-      NV_DATA_S(rxz), NV_DATA_S(rxz) + s.nrx_,
+      NV_DATA_S(rxz), NV_DATA_S(rxz) + s.nrx_, m->rp,
       NV_DATA_S(rr), NV_DATA_S(rr) + s.nrx_)) return 1;
 
     // Subtract state derivative to get residual
@@ -681,6 +722,69 @@ int IdasInterface::psolveF(double t, N_Vector xz, N_Vector xzdot, N_Vector rr,
   }
 }
 
+int IdasInterface::solve_transposed(IdasMemory* m, double t, const double* xz, const double* rxz,
+    const double* rhs, double* sol) const {
+  // Get right-hand sides in m->v1, ordered by sensitivity directions
+  double* v_it = m->v1;
+  for (int d = 0; d <= nfwd_; ++d) {
+    for (int a = 0; a < nadj_; ++a) {
+      casadi_copy(rhs + (d * nadj_ + a) * nrx1_, nrx1_, v_it);
+      v_it += nrx1_;
+      casadi_copy(rhs + nrx_ + (d * nadj_ + a) * nrz1_, nrz1_, v_it);
+      v_it += nrz1_;
+    }
+  }
+
+  // Solve for undifferentiated right-hand-side, save to output
+  if (linsolF_.solve(m->jacF, m->v1, nadj_, true, m->mem_linsolF)) return 1;
+  for (int a = 0; a < nadj_; ++a) {
+    casadi_copy(m->v1 + a * (nrx1_ + nrz1_), nrx1_, sol + a * nrx1_);
+    casadi_copy(m->v1 + a * (nrx1_ + nrz1_) + nrx1_, nrz1_, sol + nrx_ + a * nrz1_);
+  }
+
+  // Sensitivity equations
+  if (nfwd_ > 0) {
+    // Second order correction
+    if (second_order_correction_ && rxz) {
+      // The outputs will double as seeds for jtimesB
+      casadi_clear(sol + nrx1_ * nadj_, nrx_ - nrx1_ * nadj_);
+      casadi_clear(sol + nrx_ + nrz1_ * nadj_, nrz_ - nrz1_ * nadj_);
+
+      // Get second-order-correction, save to m->v2
+      if (calc_jtimesB(m, t, xz, xz + nx_, rxz, rxz + nrx_,
+        sol, sol + nrx_, m->v2, m->v2 + nrx_)) return 1;
+
+      // Subtract m->v2 (reordered) from m->v1
+      v_it = m->v1 + (nrx1_ + nrz1_) * nadj_;
+      for (int d = 1; d <= nfwd_; ++d) {
+        for (int a = 0; a < nadj_; ++a) {
+          casadi_axpy(nrx1_, -1., m->v2 + nrx1_ * (d * nadj_ + a), v_it);
+          v_it += nrx1_;
+          casadi_axpy(nrz1_, -1., m->v2 + nrx_ + nrz1_ * (d * nadj_ + a), v_it);
+          v_it += nrz1_;
+        }
+      }
+    }
+
+    // Solve for sensitivity right-hand-sides
+    if (linsolF_.solve(m->jacF, m->v1 + nrx1_ * nadj_ + nrz1_ * nadj_,
+      nadj_ * nfwd_, true, m->mem_linsolF)) return 1;
+
+    // Save to output, reordered
+    v_it = m->v1 + (nrx1_ + nrz1_) * nadj_;
+    for (int d = 1; d <= nfwd_; ++d) {
+      for (int a = 0; a < nadj_; ++a) {
+        casadi_copy(v_it, nrx1_, sol + nrx1_ * (d * nadj_ + a));
+        v_it += nrx1_;
+        casadi_axpy(nrz1_, -1., m->v2 + nrx_ + nrz1_ * (d * nadj_ + a), v_it);
+        v_it += nrz1_;
+      }
+    }
+  }
+
+  return 0;
+}
+
 int IdasInterface::psolveB(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB,
     N_Vector xzdotB, N_Vector resvalB, N_Vector rvecB,
     N_Vector zvecB, double cjB, double deltaB,
@@ -688,71 +792,9 @@ int IdasInterface::psolveB(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB,
   try {
     auto m = to_mem(user_data);
     auto& s = m->self;
+    return s.solve_transposed(m, t, NV_DATA_S(xz), NV_DATA_S(xzB),
+      NV_DATA_S(rvecB), NV_DATA_S(zvecB));
 
-    // Get right-hand sides in m->v1, ordered by sensitivity directions
-    double* vx = NV_DATA_S(rvecB);
-    double* vz = vx + s.nrx_;
-    double* v_it = m->v1;
-    for (int d = 0; d <= s.nfwd_; ++d) {
-      for (int a = 0; a < s.nadj_; ++a) {
-        casadi_copy(vx + (d * s.nadj_ + a) * s.nrx1_, s.nrx1_, v_it);
-        v_it += s.nrx1_;
-        casadi_copy(vz + (d * s.nadj_ + a) * s.nrz1_, s.nrz1_, v_it);
-        v_it += s.nrz1_;
-      }
-    }
-
-    // Solve for undifferentiated right-hand-side, save to output
-    if (s.linsolF_.solve(m->jacF, m->v1, s.nadj_, true, m->mem_linsolF)) return 1;
-    vx = NV_DATA_S(zvecB); // possibly different from rvecB
-    vz = vx + s.nrx_;
-    for (int a = 0; a < s.nadj_; ++a) {
-      casadi_copy(m->v1 + a * (s.nrx1_ + s.nrz1_), s.nrx1_, vx + a * s.nrx1_);
-      casadi_copy(m->v1 + a * (s.nrx1_ + s.nrz1_) + s.nrx1_, s.nrz1_, vz + a * s.nrz1_);
-    }
-
-    // Sensitivity equations
-    if (s.nfwd_ > 0) {
-      // Second order correction
-      if (s.second_order_correction_) {
-        // The outputs will double as seeds for jtimesB
-        casadi_clear(vx + s.nrx1_ * s.nadj_, s.nrx_ - s.nrx1_ * s.nadj_);
-        casadi_clear(vz + s.nrz1_ * s.nadj_, s.nrz_ - s.nrz1_ * s.nadj_);
-
-        // Get second-order-correction, save to m->v2
-        if (s.calc_jtimesB(m, t, NV_DATA_S(xz), NV_DATA_S(xz) + s.nx_,
-          NV_DATA_S(xzB), NV_DATA_S(xzB) + s.nrx_,
-          vx, vz, m->v2, m->v2 + s.nrx_)) return 1;
-
-        // Subtract m->v2 (reordered) from m->v1
-        v_it = m->v1 + (s.nrx1_ + s.nrz1_) * s.nadj_;
-        for (int d = 1; d <= s.nfwd_; ++d) {
-          for (int a = 0; a < s.nadj_; ++a) {
-            casadi_axpy(s.nrx1_, -1., m->v2 + s.nrx1_ * (d * s.nadj_ + a), v_it);
-            v_it += s.nrx1_;
-            casadi_axpy(s.nrz1_, -1., m->v2 + s.nrx_ + s.nrz1_ * (d * s.nadj_ + a), v_it);
-            v_it += s.nrz1_;
-          }
-        }
-      }
-
-      // Solve for sensitivity right-hand-sides
-      if (s.linsolF_.solve(m->jacF, m->v1 + s.nrx1_ * s.nadj_ + s.nrz1_ * s.nadj_,
-        s.nadj_ * s.nfwd_, true, m->mem_linsolF)) return 1;
-
-      // Save to output, reordered
-      v_it = m->v1 + (s.nrx1_ + s.nrz1_) * s.nadj_;
-      for (int d = 1; d <= s.nfwd_; ++d) {
-        for (int a = 0; a < s.nadj_; ++a) {
-          casadi_copy(v_it, s.nrx1_, vx + s.nrx1_ * (d * s.nadj_ + a));
-          v_it += s.nrx1_;
-          casadi_axpy(s.nrz1_, -1., m->v2 + s.nrx_ + s.nrz1_ * (d * s.nadj_ + a), v_it);
-          v_it += s.nrz1_;
-        }
-      }
-    }
-
-    return 0;
   } catch(std::exception& e) { // non-recoverable error
     uerr() << "psolveB failed: " << e.what() << std::endl;
     return -1;
@@ -825,6 +867,7 @@ int IdasInterface::psetupF(double t, N_Vector xz, N_Vector xzdot, N_Vector rr,
 
     // Factorize the linear system
     if (s.linsolF_.nfact(m->jacF, m->mem_linsolF)) return 1;
+    m->cj_last = cj;
 
     return 0;
   } catch(std::exception& e) { // non-recoverable error
@@ -974,6 +1017,7 @@ IdasMemory::IdasMemory(const IdasInterface& s) : self(s) {
   this->mem = nullptr;
   this->xzdot = nullptr;
   this->rxzdot = nullptr;
+  this->cj_last = nan;
 
   // Reset checkpoints counter
   this->ncheck = 0;

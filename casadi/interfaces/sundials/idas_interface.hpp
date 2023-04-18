@@ -64,6 +64,9 @@ struct CASADI_INTEGRATOR_IDAS_EXPORT IdasMemory : public SundialsMemory {
   /// Ids of backward problem
   int whichB;
 
+  /// cj used in the last factorization
+  double cj_last;
+
   /// Constructor
   IdasMemory(const IdasInterface& s);
 
@@ -128,8 +131,17 @@ class CASADI_INTEGRATOR_IDAS_EXPORT IdasInterface : public SundialsInterface {
     const double* u, double* x, double* z, double* q) const override;
 
   /** \brief  Reset the backward problem and take time to tf */
-  void resetB(IntegratorMemory* mem,
-    const double* rx, const double* rz, const double* rp) const override;
+  void resetB(IntegratorMemory* mem) const override;
+
+  /** \brief Helper function: Vector has only zeros? */
+  static bool all_zero(const double* v, casadi_int n);
+
+  /** \brief Propagate impulse from rz to rx */
+  void z_impulseB(IdasMemory* m, const double* rz) const;
+
+  /** \brief Solve transposed linear system */
+  int solve_transposed(IdasMemory* m, double t, const double* xz, const double* rxz,
+    const double* rhs, double* sol) const;
 
   /** \brief Introduce an impulse into the backwards integration at the current time */
   void impulseB(IntegratorMemory* mem,
@@ -137,7 +149,7 @@ class CASADI_INTEGRATOR_IDAS_EXPORT IdasInterface : public SundialsInterface {
 
   /** \brief  Retreat solution in time */
   void retreat(IntegratorMemory* mem, const double* u,
-    double* rx, double* rz, double* rq, double* uq) const override;
+    double* rx, double* rq, double* uq) const override;
 
   /** \brief Cast to memory object */
   static IdasMemory* to_mem(void *mem) {

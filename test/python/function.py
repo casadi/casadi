@@ -2596,6 +2596,9 @@ class Functiontests(casadiTestCase):
     self.checkfunction(J,J_ref,inputs=inputs,digits=8,digits_sens=1,evals=1)
 
 
+  def test_issue3079(self):  
+    interp1d([1,2,3], MX([4,5,6]), [1.1], 'linear')
+
   def test_functionbuffer(self):
     A_ = np.random.random((4,4))
     B_ = np.zeros((4,4))

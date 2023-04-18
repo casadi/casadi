@@ -373,20 +373,18 @@ int Integrator::eval(const double** arg, double** res,
     if (uq) uq += nuq_ * nt();
     // Next stop time due to step change in input
     k_stop = nt();
+    // Reset the solver
+    resetB(m);
     // Integrate backward
     for (m->k = nt(); m->k-- > 0; ) {
       m->t = tout_[m->k];
-      // Reset the solver, add impulse to backwards integration
+      // Add impulse to backwards integration
       if (rx0) rx0 -= nrx_;
       if (rz0) rz0 -= nrz_;
       if (rp) rp -= nrp_;
       if (uq) uq -= nuq_;
       if (u) u -= nu_;
-      if (m->k == nt() - 1) {
-        resetB(m, rx0, rz0, rp);
-      } else {
-        impulseB(m, rx0, rz0, rp);
-      }
+      impulseB(m, rx0, rz0, rp);
       // Next output time, or beginning
       casadi_int k_next = m->k - 1;
       m->t_next = k_next < 0 ? t0_ : tout_[k_next];
@@ -397,9 +395,9 @@ int Integrator::eval(const double** arg, double** res,
       if (verbose_) casadi_message("Integrating backward from output time " + str(m->k)
         + ": t_next = " + str(m->t_next) + ", t_stop = " + str(m->t_stop));
       if (m->k > 0) {
-        retreat(m, u, 0, 0, 0, uq);
+        retreat(m, u, 0, 0, uq);
       } else {
-        retreat(m, u, rx, 0, rq, uq);
+        retreat(m, u, rx, rq, uq);
       }
     }
     // uq should contain the contribution from the grid point, not cumulative
@@ -411,6 +409,10 @@ int Integrator::eval(const double** arg, double** res,
     }
   }
 
+  // Collect oracle statistics
+  join_results(m);
+
+  // Print integrator statistics
   if (print_stats_) print_stats(m);
 
   return 0;
@@ -491,9 +493,18 @@ void Integrator::init(const Dict& opts) {
 
   // Construct t0_ and tout_ gbased on legacy options
   if (uses_legacy_options) {
+    static bool first_encounter = true;
+    if (first_encounter) {
     // Deprecation warning
-    casadi_warning("The options 't0', 'tf', 'grid' and 'output_t0' have been deprecated. "
-      "Set the time grid by proving additional argument to the 'integrator' call instead.");
+    casadi_warning("The options 't0', 'tf', 'grid' and 'output_t0' have been deprecated.\n"
+      "The same functionality is provided by providing additional input arguments to "
+      "the 'integrator' function, in particular:\n"
+      " * Call integrator(..., t0, tf, options) for a single output time, or\n"
+      " * Call integrator(..., t0, grid, options) for multiple grid points.\n"
+      "The legacy 'output_t0' option can be emulated by including or excluding 't0' in 'grid'.\n"
+      "Backwards compatibility is provided in this release only.");
+      first_encounter = false;
+    }
 
     // If grid unset, default to [t0, tf]
     if (grid.empty()) grid = {t0, tf};
@@ -592,21 +603,21 @@ void Integrator::init(const Dict& opts) {
 
   // Create problem functions, forward problem
   create_function("daeF", dyn_in(), dae_out());
-  create_function("quadF", dyn_in(), quad_out());
+  if (nq_ > 0) create_function("quadF", dyn_in(), quad_out());
   if (nfwd_ > 0) {
     // one direction to conserve memory, symbolic processing time
     create_forward("daeF", 1);
-    create_forward("quadF", 1);
+    if (nq_ > 0) create_forward("quadF", 1);
   }
 
   // Create problem functions, backward problem
   if (nadj_ > 0) {
     create_function(rdae_, "daeB", bdyn_in(), bdae_out());
-    create_function(rdae_, "quadB", bdyn_in(), bquad_out());
+    if (nrq_ > 0 || nuq_ > 0) create_function(rdae_, "quadB", bdyn_in(), bquad_out());
     if (nfwd_ > 0) {
       // one direction to conserve memory, symbolic processing time
       create_forward("daeB", 1);
-      create_forward("quadB", 1);
+      if (nrq_ > 0 || nuq_ > 0) create_forward("quadB", 1);
     }
   }
 
@@ -1599,7 +1610,7 @@ Function FixedStepIntegrator::create_advanced(const Dict& opts) {
 
   if (simplify && nrx_==0 && nt()==1) {
     // Retrieve explicit simulation step (one finite element)
-    Function F = get_function("stepF");
+    Function F = get_function("step");
 
     MX z0 = MX::sym("z0", sparsity_in(INTEGRATOR_Z0));
 
@@ -1608,36 +1619,36 @@ Function FixedStepIntegrator::create_advanced(const Dict& opts) {
 
     // Prepare return Function inputs
     std::vector<MX> intg_in(INTEGRATOR_NUM_IN);
-    intg_in[INTEGRATOR_X0] = F_in[FSTEP_X0];
+    intg_in[INTEGRATOR_X0] = F_in[STEP_X0];
     intg_in[INTEGRATOR_Z0] = z0;
-    intg_in[INTEGRATOR_P] = F_in[FSTEP_P];
-    intg_in[INTEGRATOR_U] = F_in[FSTEP_U];
-    F_in[FSTEP_V0] = algebraic_state_init(intg_in[INTEGRATOR_X0], z0);
+    intg_in[INTEGRATOR_P] = F_in[STEP_P];
+    intg_in[INTEGRATOR_U] = F_in[STEP_U];
+    F_in[STEP_V0] = algebraic_state_init(intg_in[INTEGRATOR_X0], z0);
 
     // Number of finite elements and time steps
     double h = (tout_.back() - t0_)/static_cast<double>(disc_.back());
 
     // Prepare return Function outputs
     std::vector<MX> intg_out(INTEGRATOR_NUM_OUT);
-    F_in[FSTEP_T] = t0_;
-    F_in[FSTEP_H] = h;
+    F_in[STEP_T] = t0_;
+    F_in[STEP_H] = h;
 
     std::vector<MX> F_out;
     // Loop over finite elements
     for (casadi_int k=0; k<disc_.back(); ++k) {
       F_out = F(F_in);
 
-      F_in[FSTEP_X0] = F_out[FSTEP_XF];
-      F_in[FSTEP_V0] = F_out[FSTEP_VF];
-      intg_out[INTEGRATOR_QF] = k==0? F_out[FSTEP_QF] : intg_out[INTEGRATOR_QF]+F_out[FSTEP_QF];
-      F_in[FSTEP_T] += h;
+      F_in[STEP_X0] = F_out[STEP_XF];
+      F_in[STEP_V0] = F_out[STEP_VF];
+      intg_out[INTEGRATOR_QF] = k==0? F_out[STEP_QF] : intg_out[INTEGRATOR_QF]+F_out[STEP_QF];
+      F_in[STEP_T] += h;
     }
 
-    intg_out[INTEGRATOR_XF] = F_out[FSTEP_XF];
+    intg_out[INTEGRATOR_XF] = F_out[STEP_XF];
 
-    // If-clause needed because rk abuses FSTEP_VF output for intermediate state output
+    // If-clause needed because rk abuses STEP_VF output for intermediate state output
     if (nz_) {
-      intg_out[INTEGRATOR_ZF] = algebraic_state_output(F_out[FSTEP_VF]);
+      intg_out[INTEGRATOR_ZF] = algebraic_state_output(F_out[STEP_VF]);
     }
 
     // Extract options for Function constructor
@@ -1686,14 +1697,9 @@ void FixedStepIntegrator::init(const Dict& opts) {
   setup_step();
 
   // Get discrete time dimensions
-  const Function& F = get_function(has_function("stepF") ? "stepF" : "implicit_stepF");
-  nv1_ = F.nnz_in(FSTEP_V0);
-  if (nadj_ > 0) {
-    const Function& G = get_function(has_function("stepB") ? "stepB" : "implicit_stepB");
-    nrv1_ = G.nnz_in(BSTEP_RV0);
-  } else {
-    nrv1_ = 0;
-  }
+  const Function& F = get_function(has_function("step") ? "step" : "implicit_step");
+  nv1_ = F.nnz_out(STEP_VF);
+  nrv1_ = nv1_ * nadj_;
   nv_ = nv1_ * (1 + nfwd_);
   nrv_ = nrv1_ * (1 + nfwd_);
 
@@ -1709,7 +1715,6 @@ void FixedStepIntegrator::init(const Dict& opts) {
   alloc_w(nrv_, true); // rv
   alloc_w(nrp_, true); // rp
   alloc_w(nuq_, true); // uq
-  alloc_w(nrv_, true); // rv_prev
   alloc_w(nrq_, true); // rq_prev
   alloc_w(nuq_, true); // uq_prev
 
@@ -1748,7 +1753,6 @@ void FixedStepIntegrator::set_work(void* mem, const double**& arg, double**& res
   m->rv = w; w += nrv_;
   m->rp = w; w += nrp_;
   m->uq = w; w += nuq_;
-  m->rv_prev = w; w += nrv_;
   m->rq_prev = w; w += nrq_;
   m->uq_prev = w; w += nuq_;
 
@@ -1806,7 +1810,7 @@ void FixedStepIntegrator::advance(IntegratorMemory* mem,
 }
 
 void FixedStepIntegrator::retreat(IntegratorMemory* mem, const double* u,
-    double* rx, double* rz, double* rq, double* uq) const {
+    double* rx, double* rq, double* uq) const {
   auto m = static_cast<FixedStepMemory*>(mem);
 
   // Set controls
@@ -1823,21 +1827,22 @@ void FixedStepIntegrator::retreat(IntegratorMemory* mem, const double* u,
 
     // Update the previous step
     casadi_copy(m->rx, nrx_, m->rx_prev);
-    casadi_copy(m->rv, nrv_, m->rv_prev);
     casadi_copy(m->rq, nrq_, m->rq_prev);
     casadi_copy(m->uq, nuq_, m->uq_prev);
 
     // Take step
     casadi_int tapeind = disc_[m->k] + j;
-    stepB(m, t, h, m->x_tape + nx_ * tapeind, m->v_tape + nv_ * tapeind,
-      m->rx_prev, m->rv_prev, m->rx, m->rv, m->rq, m->uq);
+    stepB(m, t, h,
+      m->x_tape + nx_ * tapeind, m->x_tape + nx_ * (tapeind + 1),
+      m->v_tape + nv_ * tapeind,
+      m->rx_prev, m->rv, m->rx, m->rq, m->uq);
+    casadi_clear(m->rv, nrv_);
     casadi_axpy(nrq_, 1., m->rq_prev, m->rq);
     casadi_axpy(nuq_, 1., m->uq_prev, m->uq);
   }
 
   // Return to user
   casadi_copy(m->rx, nrx_, rx);
-  casadi_copy(m->rv + nrv_ - nrz_, nrz_, rz);
   casadi_copy(m->rq, nrq_, rq);
   casadi_copy(m->uq, nuq_, uq);
 }
@@ -1845,76 +1850,89 @@ void FixedStepIntegrator::retreat(IntegratorMemory* mem, const double* u,
 void FixedStepIntegrator::stepF(FixedStepMemory* m, double t, double h,
     const double* x0, const double* v0, double* xf, double* vf, double* qf) const {
   // Evaluate nondifferentiated
-  std::fill(m->arg, m->arg + FSTEP_NUM_IN, nullptr);
-  m->arg[FSTEP_T] = &t;  // t
-  m->arg[FSTEP_H] = &h;  // h
-  m->arg[FSTEP_X0] = x0;  // x0
-  m->arg[FSTEP_V0] = v0;  // v0
-  m->arg[FSTEP_P] = m->p;  // p
-  m->arg[FSTEP_U] = m->u;  // u
-  std::fill(m->res, m->res + FSTEP_NUM_OUT, nullptr);
-  m->res[FSTEP_XF] = xf;  // xf
-  m->res[FSTEP_VF] = vf;  // vf
-  m->res[FSTEP_QF] = qf;  // qf
-  calc_function(m, "stepF");
+  std::fill(m->arg, m->arg + STEP_NUM_IN, nullptr);
+  m->arg[STEP_T] = &t;  // t
+  m->arg[STEP_H] = &h;  // h
+  m->arg[STEP_X0] = x0;  // x0
+  m->arg[STEP_V0] = v0;  // v0
+  m->arg[STEP_P] = m->p;  // p
+  m->arg[STEP_U] = m->u;  // u
+  std::fill(m->res, m->res + STEP_NUM_OUT, nullptr);
+  m->res[STEP_XF] = xf;  // xf
+  m->res[STEP_VF] = vf;  // vf
+  m->res[STEP_QF] = qf;  // qf
+  calc_function(m, "step");
   // Evaluate sensitivities
   if (nfwd_ > 0) {
-    m->arg[FSTEP_NUM_IN + FSTEP_XF] = xf;  // out:xf
-    m->arg[FSTEP_NUM_IN + FSTEP_VF] = vf;  // out:vf
-    m->arg[FSTEP_NUM_IN + FSTEP_QF] = qf;  // out:qf
-    m->arg[FSTEP_NUM_IN + FSTEP_NUM_OUT + FSTEP_T] = nullptr;  // fwd:t
-    m->arg[FSTEP_NUM_IN + FSTEP_NUM_OUT + FSTEP_H] = nullptr;  // fwd:h
-    m->arg[FSTEP_NUM_IN + FSTEP_NUM_OUT + FSTEP_X0] = x0 + nx1_;  // fwd:x0
-    m->arg[FSTEP_NUM_IN + FSTEP_NUM_OUT + FSTEP_V0] = v0 + nv1_;  // fwd:v0
-    m->arg[FSTEP_NUM_IN + FSTEP_NUM_OUT + FSTEP_P] = m->p + np1_;  // fwd:p
-    m->arg[FSTEP_NUM_IN + FSTEP_NUM_OUT + FSTEP_U] = m->u + nu1_;  // fwd:u
-    m->res[FSTEP_XF] = xf + nx1_;  // fwd:xf
-    m->res[FSTEP_VF] = vf + nv1_;  // fwd:vf
-    m->res[FSTEP_QF] = qf + nq1_;  // fwd:qf
-    calc_function(m, forward_name("stepF", nfwd_));
+    m->arg[STEP_NUM_IN + STEP_XF] = xf;  // out:xf
+    m->arg[STEP_NUM_IN + STEP_VF] = vf;  // out:vf
+    m->arg[STEP_NUM_IN + STEP_QF] = qf;  // out:qf
+    m->arg[STEP_NUM_IN + STEP_NUM_OUT + STEP_T] = nullptr;  // fwd:t
+    m->arg[STEP_NUM_IN + STEP_NUM_OUT + STEP_H] = nullptr;  // fwd:h
+    m->arg[STEP_NUM_IN + STEP_NUM_OUT + STEP_X0] = x0 + nx1_;  // fwd:x0
+    m->arg[STEP_NUM_IN + STEP_NUM_OUT + STEP_V0] = v0 + nv1_;  // fwd:v0
+    m->arg[STEP_NUM_IN + STEP_NUM_OUT + STEP_P] = m->p + np1_;  // fwd:p
+    m->arg[STEP_NUM_IN + STEP_NUM_OUT + STEP_U] = m->u + nu1_;  // fwd:u
+    m->res[STEP_XF] = xf + nx1_;  // fwd:xf
+    m->res[STEP_VF] = vf + nv1_;  // fwd:vf
+    m->res[STEP_QF] = qf + nq1_;  // fwd:qf
+    calc_function(m, forward_name("step", nfwd_));
   }
 }
 
 void FixedStepIntegrator::stepB(FixedStepMemory* m, double t, double h,
-    const double* x, const double* v, const double* rx0, const double* rv0,
-    double* rxf, double* rvf, double* rqf, double* uqf) const {
+    const double* x0, const double* xf, const double* vf,
+    const double* rx0, const double* rv0,
+    double* rxf, double* rqf, double* uqf) const {
   // Evaluate nondifferentiated
   std::fill(m->arg, m->arg + BSTEP_NUM_IN, nullptr);
   m->arg[BSTEP_T] = &t;  // t
   m->arg[BSTEP_H] = &h;  // h
-  m->arg[BSTEP_RX0] = rx0;  // rx0
-  m->arg[BSTEP_RV0] = rv0;  // rv0
-  m->arg[BSTEP_RP] = m->rp;  // rp
-  m->arg[BSTEP_X] = x;  // x
-  m->arg[BSTEP_V] = v;  // v
+  m->arg[BSTEP_X0] = x0;  // x0
+  m->arg[BSTEP_V0] = nullptr;  // v0
   m->arg[BSTEP_P] = m->p;  // p
   m->arg[BSTEP_U] = m->u;  // u
+  m->arg[BSTEP_OUT_XF] = xf;  // out:xf
+  m->arg[BSTEP_OUT_VF] = vf;  // out:vf
+  m->arg[BSTEP_OUT_QF] = nullptr;  // out:qf
+  m->arg[BSTEP_ADJ_XF] = rx0;  // adj:xf
+  m->arg[BSTEP_ADJ_VF] = rv0;  // adj:vf
+  m->arg[BSTEP_ADJ_QF] = m->rp;  // adj:qf
   std::fill(m->res, m->res + BSTEP_NUM_OUT, nullptr);
-  m->res[BSTEP_RXF] = rxf;  // rxf
-  m->res[BSTEP_RVF] = rvf;  // rvf
-  m->res[BSTEP_RQF] = rqf;  // rqf
-  m->res[BSTEP_UQF] = uqf;  // uqf
-  calc_function(m, "stepB");
+  m->res[BSTEP_ADJ_T] = nullptr;  // adj:t
+  m->res[BSTEP_ADJ_H] = nullptr;  // adj:h
+  m->res[BSTEP_ADJ_X0] = rxf;  // adj:x0
+  m->res[BSTEP_ADJ_V0] = nullptr;  // adj:v0
+  m->res[BSTEP_ADJ_P] = rqf;  // adj:p
+  m->res[BSTEP_ADJ_U] = uqf;  // adj:u
+  calc_function(m, reverse_name("step", nadj_));
   // Evaluate sensitivities
   if (nfwd_ > 0) {
-    m->arg[BSTEP_NUM_IN + BSTEP_RXF] = rxf;  // out:rxf
-    m->arg[BSTEP_NUM_IN + BSTEP_RVF] = rvf;  // out:rvf
-    m->arg[BSTEP_NUM_IN + BSTEP_RQF] = rqf;  // out:rqf
-    m->arg[BSTEP_NUM_IN + BSTEP_UQF] = uqf;  // out:uqf
+    m->arg[BSTEP_NUM_IN + BSTEP_ADJ_T] = nullptr;  // out:adj:t
+    m->arg[BSTEP_NUM_IN + BSTEP_ADJ_H] = nullptr;  // out:adj:h
+    m->arg[BSTEP_NUM_IN + BSTEP_ADJ_X0] = rxf;  // out:adj:x0
+    m->arg[BSTEP_NUM_IN + BSTEP_ADJ_V0] = nullptr;  // out:adj:v0
+    m->arg[BSTEP_NUM_IN + BSTEP_ADJ_P] = rqf;  // out:adj:p
+    m->arg[BSTEP_NUM_IN + BSTEP_ADJ_U] = uqf;  // out:adj:u
     m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_T] = nullptr;  // fwd:t
     m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_H] = nullptr;  // fwd:h
-    m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_RX0] = rx0 + nrx1_ * nadj_;  // fwd:rx0
-    m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_RV0] = rv0 + nrv1_;  // fwd:rv0
-    m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_RP] = m->rp + nrp1_ * nadj_;  // fwd:rp
-    m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_X] = x + nx1_;  // fwd:x
-    m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_V] = v + nv1_;  // fwd:v
+    m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_X0] = x0 + nx1_;  // fwd:x0
+    m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_V0] = nullptr;  // fwd:v0
     m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_P] = m->p + np1_;  // fwd:p
     m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_U] = m->u + nu1_;  // fwd:u
-    m->res[BSTEP_RXF] = rxf + nrx1_ * nadj_;  // fwd:rxf
-    m->res[BSTEP_RVF] = rvf + nrv1_;  // fwd:rvf
-    m->res[BSTEP_RQF] = rqf + nrq1_ * nadj_;  // fwd:rqf
-    m->res[BSTEP_UQF] = uqf + nuq1_ * nadj_;  // fwd:uqf
-    calc_function(m, forward_name("stepB", nfwd_));
+    m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_OUT_XF] = xf + nx1_;  // fwd:out:xf
+    m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_OUT_VF] = vf + nv1_;  // fwd:out:vf
+    m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_OUT_QF] = nullptr;  // fwd:out:qf
+    m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_ADJ_XF] = rx0 + nrx1_ * nadj_;  // fwd:adj:xf
+    m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_ADJ_VF] = rv0 + nrv1_;  // fwd:adj:vf
+    m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_ADJ_QF] = m->rp + nrp1_ * nadj_;  // fwd:adj:qf
+    m->res[BSTEP_ADJ_T] = nullptr;  // fwd:adj:t
+    m->res[BSTEP_ADJ_H] = nullptr;  // fwd:adj:h
+    m->res[BSTEP_ADJ_X0] = rxf + nrx1_ * nadj_;  // fwd:rxf
+    m->res[BSTEP_ADJ_V0] = nullptr;  // fwd:adj:v0
+    m->res[BSTEP_ADJ_P] = rqf + nrq1_ * nadj_;  // fwd:rqf
+    m->res[BSTEP_ADJ_U] = uqf + nuq1_ * nadj_;  // fwd:uqf
+    calc_function(m, forward_name(reverse_name("step", nadj_), nfwd_));
   }
 }
 
@@ -1941,23 +1959,19 @@ void FixedStepIntegrator::reset(IntegratorMemory* mem, const double* x, const do
   }
 }
 
-void FixedStepIntegrator::resetB(IntegratorMemory* mem,
-    const double* rx, const double* rz, const double* rp) const {
+void FixedStepIntegrator::resetB(IntegratorMemory* mem) const {
   auto m = static_cast<FixedStepMemory*>(mem);
 
-  // Set parameters
-  casadi_copy(rp, nrp_, m->rp);
-
-  // Update the state
-  casadi_copy(rx, nrx_, m->rx);
-  casadi_copy(rz, nrz_, m->rz);
+  // Clear adjoint seeds
+  casadi_clear(m->rp, nrp_);
+  casadi_clear(m->rx, nrx_);
 
   // Reset summation states
   casadi_clear(m->rq, nrq_);
   casadi_clear(m->uq, nuq_);
 
-  // Get consistent initial conditions
-  casadi_fill(m->rv, nrv_, std::numeric_limits<double>::quiet_NaN());
+  // Update backwards dependent variables
+  casadi_clear(m->rv, nrv_);
 }
 
 void FixedStepIntegrator::impulseB(IntegratorMemory* mem,
@@ -1968,7 +1982,9 @@ void FixedStepIntegrator::impulseB(IntegratorMemory* mem,
 
   // Add impulse to state
   casadi_axpy(nrx_, 1., rx, m->rx);
-  casadi_axpy(nrz_, 1., rz, m->rz);
+
+  // Add impulse to backwards dependent variables
+  casadi_axpy(nrz_, 1., rz, m->rv + nrv_ - nrz_);
 }
 
 ImplicitFixedStepIntegrator::ImplicitFixedStepIntegrator(
@@ -2008,28 +2024,22 @@ void ImplicitFixedStepIntegrator::init(const Dict& opts) {
   }
 
   // Complete rootfinder dictionary
-  rootfinder_options["implicit_input"] = FSTEP_V0;
-  rootfinder_options["implicit_output"] = FSTEP_VF;
+  rootfinder_options["implicit_input"] = STEP_V0;
+  rootfinder_options["implicit_output"] = STEP_VF;
 
   // Allocate a solver
-  Function rf = rootfinder("stepF", implicit_function_name,
-    get_function("implicit_stepF"), rootfinder_options);
+  Function rf = rootfinder("step", implicit_function_name,
+    get_function("implicit_step"), rootfinder_options);
   set_function(rf);
   if (nfwd_ > 0) set_function(rf.forward(nfwd_));
 
-  // Allocate a root-finding solver for the backward problem
-  if (nrv1_ > 0) {
-    // Options
-    Dict backward_rootfinder_options = rootfinder_options;
-    backward_rootfinder_options["implicit_input"] = BSTEP_RV0;
-    backward_rootfinder_options["implicit_output"] = BSTEP_RVF;
-    std::string backward_implicit_function_name = implicit_function_name;
-
-    // Allocate a Newton solver
-    Function brf = rootfinder("stepB", backward_implicit_function_name,
-      get_function("implicit_stepB"), backward_rootfinder_options);
-    set_function(brf);
-    if (nfwd_ > 0) set_function(brf.forward(nfwd_));
+  // Backward integration
+  if (nadj_ > 0) {
+    Function adj_F = rf.reverse(nadj_);
+    set_function(adj_F, adj_F.name(), true);
+    if (nfwd_ > 0) {
+      create_forward(adj_F.name(), nfwd_);
+    }
   }
 }
 
@@ -2188,7 +2198,7 @@ Integrator::Integrator(DeserializingStream & s) : OracleFunction(s) {
 void FixedStepIntegrator::serialize_body(SerializingStream &s) const {
   Integrator::serialize_body(s);
 
-  s.version("FixedStepIntegrator", 2);
+  s.version("FixedStepIntegrator", 3);
   s.pack("FixedStepIntegrator::nk_target", nk_target_);
   s.pack("FixedStepIntegrator::disc", disc_);
   s.pack("FixedStepIntegrator::nv", nv_);
@@ -2198,7 +2208,7 @@ void FixedStepIntegrator::serialize_body(SerializingStream &s) const {
 }
 
 FixedStepIntegrator::FixedStepIntegrator(DeserializingStream & s) : Integrator(s) {
-  s.version("FixedStepIntegrator", 2);
+  s.version("FixedStepIntegrator", 3);
   s.unpack("FixedStepIntegrator::nk_target", nk_target_);
   s.unpack("FixedStepIntegrator::disc", disc_);
   s.unpack("FixedStepIntegrator::nv", nv_);

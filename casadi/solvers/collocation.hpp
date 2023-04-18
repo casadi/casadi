@@ -95,10 +95,6 @@ namespace casadi {
     void reset(IntegratorMemory* mem,
       const double* x, const double* z, const double* p) const override;
 
-    /// Reset the backward problem and take time to tf
-    void resetB(IntegratorMemory* mem,
-      const double* rx, const double* rz, const double* rp) const override;
-
     MX algebraic_state_init(const MX& x0, const MX& z0) const override;
     MX algebraic_state_output(const MX& Z) const override;
 

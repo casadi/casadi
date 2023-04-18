@@ -154,8 +154,7 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   /** \brief Reset the backward problem
 
       \identifier{25d} */
-  virtual void resetB(IntegratorMemory* mem,
-    const double* rx, const double* rz, const double* rp) const = 0;
+  virtual void resetB(IntegratorMemory* mem) const = 0;
 
   /** \brief  Find next stop time
 
@@ -172,7 +171,7 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
 
       \identifier{25g} */
   virtual void retreat(IntegratorMemory* mem, const double* u,
-    double* rx, double* rz, double* rq, double* uq) const = 0;
+    double* rx, double* rq, double* uq) const = 0;
 
   /** \brief  evaluate
 
@@ -398,70 +397,60 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
 };
 
 /// Input arguments of a forward stepping function
-enum FStepIn {
+enum StepIn {
   /// Current time
-  FSTEP_T,
+  STEP_T,
   /// Step size
-  FSTEP_H,
+  STEP_H,
   /// State vector
-  FSTEP_X0,
+  STEP_X0,
   /// Dependent variables
-  FSTEP_V0,
+  STEP_V0,
   /// Parameter
-  FSTEP_P,
+  STEP_P,
   /// Controls
-  FSTEP_U,
+  STEP_U,
   /// Number of arguments
-  FSTEP_NUM_IN
+  STEP_NUM_IN
 };
 
 /// Output arguments of a forward stepping function
-enum FStepOut {
+enum StepOut {
   /// State vector at next time
-  FSTEP_XF,
+  STEP_XF,
   /// Dependent variables at next time
-  FSTEP_VF,
+  STEP_VF,
   /// Quadrature state contribution
-  FSTEP_QF,
+  STEP_QF,
   /// Number of arguments
-  FSTEP_NUM_OUT
+  STEP_NUM_OUT
 };
 
 /// Input arguments of a backward stepping function
 enum BStepIn {
-  /// Current time
   BSTEP_T,
-  /// Step size
   BSTEP_H,
-  /// State vector for backward problem
-  BSTEP_RX0,
-  /// Dependent variables for backward problem
-  BSTEP_RV0,
-  /// Parameter vector for backward problem
-  BSTEP_RP,
-  /// State vector for forward problem
-  BSTEP_X,
-  /// Dependent variables for forward problem
-  BSTEP_V,
-  /// Parameter vector for forward problem
+  BSTEP_X0,
+  BSTEP_V0,
   BSTEP_P,
-  /// Controls
   BSTEP_U,
-  /// Number of arguments
+  BSTEP_OUT_XF,
+  BSTEP_OUT_VF,
+  BSTEP_OUT_QF,
+  BSTEP_ADJ_XF,
+  BSTEP_ADJ_VF,
+  BSTEP_ADJ_QF,
   BSTEP_NUM_IN
 };
 
 /// Output arguments of a backward stepping function
 enum BStepOut {
-  /// State vector for backward problem at the next time
-  BSTEP_RXF,
-  /// Dependent variables for backward problem at the next time
-  BSTEP_RVF,
-  /// Quadrature state contribution for backward problem, summing
-  BSTEP_RQF,
-  /// Quadrature state contribution for backward problem, non-summing
-  BSTEP_UQF,
-  /// Number of arguments
+  BSTEP_ADJ_T,
+  BSTEP_ADJ_H,
+  BSTEP_ADJ_X0,
+  BSTEP_ADJ_V0,
+  BSTEP_ADJ_P,
+  BSTEP_ADJ_U,
   BSTEP_NUM_OUT
 };
 
@@ -473,7 +462,7 @@ struct CASADI_EXPORT FixedStepMemory : public IntegratorMemory {
   double *v, *p, *u, *q, *v_prev, *q_prev;
 
   /// Work vectors, backward problem
-  double *rv, *rp, *uq, *rv_prev, *rq_prev, *uq_prev;
+  double *rv, *rp, *uq, *rq_prev, *uq_prev;
 
   /// State and dependent variables at all times
   double *x_tape, *v_tape;
@@ -540,8 +529,7 @@ class CASADI_EXPORT FixedStepIntegrator : public Integrator {
     const double* u, double* x, double* z, double* q) const override;
 
   /// Reset the backward problem and take time to tf
-  void resetB(IntegratorMemory* mem,
-    const double* rx, const double* rz, const double* rp) const override;
+  void resetB(IntegratorMemory* mem) const override;
 
   /// Introduce an impulse into the backwards integration at the current time
   void impulseB(IntegratorMemory* mem,
@@ -551,7 +539,7 @@ class CASADI_EXPORT FixedStepIntegrator : public Integrator {
 
       \identifier{25k} */
   void retreat(IntegratorMemory* mem, const double* u,
-    double* rx, double* rz, double* rq, double* uq) const override;
+    double* rx, double* rq, double* uq) const override;
 
   /// Take integrator step forward
   void stepF(FixedStepMemory* m, double t, double h,
@@ -559,8 +547,9 @@ class CASADI_EXPORT FixedStepIntegrator : public Integrator {
 
   /// Take integrator step backward
   void stepB(FixedStepMemory* m, double t, double h,
-    const double* x, const double* v, const double* rx0, const double* rv0,
-    double* rxf, double* rvf, double* rqf, double* uqf) const;
+    const double* x0, const double* xf, const double* vf,
+    const double* rx0, const double* rv0,
+    double* rxf, double* rqf, double* uqf) const;
 
   // Target number of finite elements
   casadi_int nk_target_;

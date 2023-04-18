@@ -110,6 +110,7 @@ class CASADI_INTEGRATOR_CVODES_EXPORT CvodesInterface : public SundialsInterface
   static const Options options_;
   const Options& get_options() const override { return options_;}
   double min_step_size_;
+  bool always_recalculate_jacobian_;
   ///@}
 
 
@@ -133,17 +134,13 @@ class CASADI_INTEGRATOR_CVODES_EXPORT CvodesInterface : public SundialsInterface
   void advance(IntegratorMemory* mem,
     const double* u, double* x, double* z, double* q) const override;
 
-  /** \brief  Reset the backward problem and take time to tf */
-  void resetB(IntegratorMemory* mem,
-    const double* rx, const double* rz, const double* rp) const override;
-
   /** \brief Introduce an impulse into the backwards integration at the current time */
   void impulseB(IntegratorMemory* mem,
     const double* rx, const double* rz, const double* rp) const override;
 
   /** \brief  Retreat solution in time */
   void retreat(IntegratorMemory* mem, const double* u,
-    double* rx, double* rz, double* rq, double* uq) const override;
+    double* rx, double* rq, double* uq) const override;
 
   /** \brief Cast to memory object */
   static CvodesMemory* to_mem(void *mem) {

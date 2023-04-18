@@ -1124,15 +1124,13 @@ int casadi_qrqp_iterate(casadi_qrqp_data<T1>* d) {
   return 0;
 }
 
-// The following routines require stdio
-#ifndef CASADI_PRINTF
-
 // SYMBOL "qrqp_print_header"
 template<typename T1>
 int casadi_qrqp_print_header(casadi_qrqp_data<T1>* d, char* buf, size_t buf_sz) {
+#ifdef CASADI_SNPRINTF
   int flag;
   // Print to string
-  flag = snprintf(buf, buf_sz, "%5s %5s %9s %9s %5s %9s %5s %9s %5s %9s  %4s",
+  flag = CASADI_SNPRINTF(buf, buf_sz, "%5s %5s %9s %9s %5s %9s %5s %9s %5s %9s  %4s",
           "Iter", "Sing", "fk", "|pr|", "con", "|du|", "var",
           "min_R", "con", "last_tau", "Note");
   // Check if error
@@ -1140,6 +1138,9 @@ int casadi_qrqp_print_header(casadi_qrqp_data<T1>* d, char* buf, size_t buf_sz) 
     d->status = QP_PRINTING_ERROR;
     return 1;
   }
+#else
+  if (buf_sz) buf[0] = '\0';
+#endif
   // Successful return
   return 0;
 }
@@ -1147,6 +1148,7 @@ int casadi_qrqp_print_header(casadi_qrqp_data<T1>* d, char* buf, size_t buf_sz) 
 // SYMBOL "qrqp_print_colcomb"
 template<typename T1>
 int casadi_qrqp_print_colcomb(casadi_qrqp_data<T1>* d, char* buf, size_t buf_sz, casadi_int j) {
+#ifdef CASADI_SNPRINTF
   casadi_int num_size, n_print, i, k, buf_offset, val;
   size_t b;
   const casadi_qrqp_prob<T1>* p = d->prob;
@@ -1181,7 +1183,7 @@ int casadi_qrqp_print_colcomb(casadi_qrqp_data<T1>* d, char* buf, size_t buf_sz,
         return 1;
       }
       n_print--;
-      snprintf(buf+buf_offset, num_size, "%d", static_cast<int>(i));
+      CASADI_SNPRINTF(buf+buf_offset, num_size, "%d", static_cast<int>(i));
       // Clear null chars
       for (k=0;k<num_size;++k) {
         if (buf[buf_offset+k]=='\0') buf[buf_offset+k] = ' ';
@@ -1190,7 +1192,9 @@ int casadi_qrqp_print_colcomb(casadi_qrqp_data<T1>* d, char* buf, size_t buf_sz,
     }
   }
   buf[buf_sz-1] = '\0';
-
+#else
+  if (buf_sz) buf[0] = '\0';
+#endif
   // Successful return
   return 0;
 }
@@ -1198,9 +1202,10 @@ int casadi_qrqp_print_colcomb(casadi_qrqp_data<T1>* d, char* buf, size_t buf_sz,
 // SYMBOL "qrqp_print_iteration"
 template<typename T1>
 int casadi_qrqp_print_iteration(casadi_qrqp_data<T1>* d, char* buf, int buf_sz) {
+#ifdef CASADI_SNPRINTF
   int flag;
   // Print iteration data without note to string
-  flag = snprintf(buf, buf_sz,
+  flag = CASADI_SNPRINTF(buf, buf_sz,
     "%5d %5d %9.2g %9.2g %5d %9.2g %5d %9.2g %5d %9.2g  ",
     static_cast<int>(d->iter), static_cast<int>(d->sing), d->f, d->pr,
     static_cast<int>(d->ipr), d->du, static_cast<int>(d->idu),
@@ -1216,9 +1221,9 @@ int casadi_qrqp_print_iteration(casadi_qrqp_data<T1>* d, char* buf, int buf_sz) 
   // Print iteration note, if any
   if (d->msg) {
     if (d->msg_ind > -2) {
-      flag = snprintf(buf, buf_sz, "%s, i=%d", d->msg, static_cast<int>(d->msg_ind));
+      flag = CASADI_SNPRINTF(buf, buf_sz, "%s, i=%d", d->msg, static_cast<int>(d->msg_ind));
     } else {
-      flag = snprintf(buf, buf_sz, "%s", d->msg);
+      flag = CASADI_SNPRINTF(buf, buf_sz, "%s", d->msg);
     }
     // Check if error
     if (flag < 0) {
@@ -1226,8 +1231,9 @@ int casadi_qrqp_print_iteration(casadi_qrqp_data<T1>* d, char* buf, int buf_sz) 
       return 1;
     }
   }
+#else
+  if (buf_sz) buf[0] = '\0';
+#endif
   // Successful return
   return 0;
 }
-
-#endif  // CASADI_PRINTF

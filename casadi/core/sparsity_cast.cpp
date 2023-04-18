@@ -114,8 +114,8 @@ namespace casadi {
 
   MX SparsityCast::get_transpose() const {
     // For vectors, reshape is also a transpose
-    if (dep().is_vector() && sparsity().is_vector()) {
-      return dep();
+    if (sparsity().is_vector()) {
+      return dep()->get_sparsity_cast(sparsity().T());
     } else {
       return MXNode::get_transpose();
     }
