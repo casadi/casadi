@@ -2,6 +2,7 @@
 #include <alpaqa/problem/kkt-error.hpp>
 #include <alpaqa/util/demangled-typename.hpp>
 #include <alpaqa/util/print.hpp>
+#include <alpaqa-version.h>
 
 #include "ipopt-driver.hpp"
 #include "lbfgsb-driver.hpp"
@@ -28,9 +29,79 @@ namespace fs = std::filesystem;
 USING_ALPAQA_CONFIG(alpaqa::DefaultConfig);
 
 void print_usage(const char *a0) {
-    std::cout << "Usage: " << a0
-              << " [<problem-type>:][<path>/]<name> [method=<solver>] "
-                 "[<key>=<value>...]\n";
+    const auto *opts = " [<problem-type>:][<path>/]<name> [method=<solver>] "
+                       "[<key>=<value>...]\n";
+    const auto *docs = R"==(
+    problem types:
+        dl: Dynamically loaded problem using the DLProblem class.
+            Specify the prefix of the registration function using the
+            problem.prefix option, e.g. problem.prefix=alpaqa_problem will look
+            for a registration function with the name alpaqa_problem_register.
+            Further options can be passed to the problem using
+            problem.<key>[=<value>].
+        cs: Load a CasADi problem using the CasADiProblem class.
+            If a .tsv file with the same name as the shared library file exists,
+            the bounds and parameters will be loaded from that file. See
+            CasADiProblem::load_numerical_data for more details.
+            The problem parameter can be set using the problem.param option.
+
+    methods:
+        panoc[.<direction>]:
+            PANOC solver with the given direction.
+            Directions include: lbfgs, struclbfgs, anderson.
+        zerofpr[.<direction>]:
+            ZeroFPR solver, supports the same directions as PANOC.
+        pantr:
+            PANTR solver. Requires products with the Hessian of the augmented
+            Lagrangian (unless dir.finite_diff=true).
+        ipopt:
+            Ipopt interior point solver. Requires Jacobian of the constraints
+            and Hessian of the Lagrangian (unless finite memory is enabled).
+
+    options:
+        Solver-specific options can be specified as key-value pairs, where the
+        keys use periods to access struct members. For example,
+        solver.Lipschitz.L_0=1e3.
+
+        solver:  Parameters for the main (inner) solver.
+        alm:     Parameters for the outer ALM solver (if applicable).
+        dir:     Parameters for solver's direction provider (if applicable).
+        accel:   Parameters for direction's accelerator (if applicable).
+        out:     File to write output to (default: -, i.e. standard output).
+        sol:     Folder to write the solutions to.
+        num_exp: Repeat the experiment this many times for more accurate timings.
+        x0:      Initial guess for the solution.
+        mul_g0:  Initial guess for the multipliers of the general constraints.
+        mul_x0:  Initial guess for the multipliers of the bound constraints on x.
+
+        The prefix @ can be added to the values of x0, mul_g0 and mul_x0 to read
+        the values from the given CSV file.
+
+    examples:
+        alpaqa-driver problem.so \
+            problem.prefix=alpaqa_problem \
+            problem.custom_arg=foo \
+            method=panoc.struclbfgs \
+            accel.memory=50 \
+            alm.{tolerance,dual_tolerance}=1e-8 \
+            solver.print_interval=50 \
+            x0=@/some/file.csv
+
+        alpaqa-driver cs:build/casadi_problem.so \
+            problem.param=1,2,3 \
+            method=ipopt \
+            solver.tol=1e-8 solver.constr_viol_tol=1e-8 \
+            solver.warm_start_init_point=yes \
+            x0=@/some/file.csv \
+            mul_g0=@/some/other/file.csv \
+            mul_x0=@/yet/another/file.csv
+    )==";
+    std::cout << "alpaqa-driver (" ALPAQA_VERSION_FULL ")\n\n"
+                 "    Command-line interface to the alpaqa solvers.\n"
+                 "    https://github.com/kul-optec/alpaqa"
+                 "\n\n"
+                 "    Usage: "
+              << a0 << opts << docs << std::endl;
 }
 
 /// Split the string @p s on the first occurrence of @p tok.
