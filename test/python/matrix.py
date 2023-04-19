@@ -821,20 +821,30 @@ class Matrixtests(casadiTestCase):
 
       random.seed(1)
       a = DM(sA,[random.random() for i in range(sA.nnz())])
+      a_symmetric = mtimes(a.T, a)
       A = SX.sym("a",a.sparsity())
+      A_symmetric = SX.sym("a_symmetric", a_symmetric.sparsity())
+
       for sB in [ Sparsity.dense(a.size1(),1), vertcat(Sparsity.dense(1,1),Sparsity(a.size1()-1,1)),Sparsity.lower(a.size1()),Sparsity.lower(a.size1()).T]:
 
         b = DM(sB,[random.random() for i in range(sB.nnz())])
         B = SX.sym("B",b.sparsity())
         C = solve(A,B)
+        C_qr = solve(A, B, 'qr')
+        C_ldl = solve(A_symmetric, B, 'ldl')
 
         f = Function("f", [A,B],[C])
-
+        f_qr = Function("f", [A, B], [C_qr])
+        f_ldl = Function("f", [A_symmetric, B], [C_ldl])
 
         c = f(a,b)
+        c_qr = f_qr(a, b)
+        c_ldl = f_ldl(a_symmetric, b)
 
         c_ref = DM(linalg.solve(a,b))
         c_ref = sparsify(c_ref)
+        c_ldl_ref = DM(linalg.solve(a_symmetric, b))
+        c_ldl_ref = sparsify(c_ldl_ref)
 
         print(sA.dim(), sB.dim())
 
@@ -843,6 +853,8 @@ class Matrixtests(casadiTestCase):
         #try:
         print("foo",c,c_ref)
         self.checkarray(c,c_ref)
+        self.checkarray(c_qr, c_ref)
+        self.checkarray(c_ldl, c_ldl_ref, digits=7) # fails if digits > 7
         #self.assertTrue(min((IM.ones(c_ref.sparsity())-IM.ones(c.sparsity())).nonzeros())==0)
         #except Exception as e:
         #  c.print_dense()

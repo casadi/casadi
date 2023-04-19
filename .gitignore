@@ -8,6 +8,7 @@ obj-x86_64-linux-gnu
 *.so
 *.orig
 *.swp
+.cache
 
 test/python/*.c
 
