@@ -25,7 +25,7 @@ namespace {
 USING_ALPAQA_CONFIG(alpaqa::DefaultConfig);
 
 std::string get_prefix_option(std::span<const std::string_view> prob_opts) {
-    std::string prefix          = "benchmark_problem";
+    std::string prefix          = "alpaqa_problem";
     std::string_view prefix_key = "prefix=";
     auto prefix_it              = std::find_if(
         prob_opts.rbegin(), prob_opts.rend(),
