@@ -35,53 +35,11 @@ std::string get_prefix_option(std::span<const std::string_view> prob_opts) {
     return prefix;
 }
 
-struct FileVec {
-    length_t expected_size;
-    std::optional<vec> value = std::nullopt;
-};
-
-void load_file_vec_opt(FileVec &v, alpaqa::params::ParamString s) {
-    if (s.value.starts_with('@')) {
-        fs::path fpath = s.value.substr(1);
-        std::ifstream f(fpath);
-        if (!f)
-            throw std::invalid_argument("Unable to open file '" +
-                                        fpath.string() + "' in '" +
-                                        std::string(s.full_key) + '\'');
-        try {
-            alpaqa::csv::read_row(f, v.value.emplace(v.expected_size));
-        } catch (alpaqa::csv::read_error &e) {
-            throw std::invalid_argument(
-                "Unable to read from file '" + fpath.string() + "' in '" +
-                std::string(s.full_key) + "': " + e.what());
-        }
-    } else {
-        alpaqa::params::set_param(v.value.emplace(), s);
-        if (v.value->size() != v.expected_size) {
-            throw std::invalid_argument(
-                "Incorrect size in '" + std::string(s.full_key) + "' (got " +
-                std::to_string(v.value->size()) + ", expected " +
-                std::to_string(v.expected_size) + ')');
-        }
-    }
-}
-
 } // namespace
-
-namespace alpaqa::params {
-template <>
-void set_param(FileVec &v, ParamString s) {
-    if (!s.key.empty())
-        throw invalid_param("Invalid option indexing in '" +
-                            std::string(s.full_key) + "'");
-    load_file_vec_opt(v, s);
-}
-} // namespace alpaqa::params
-
 namespace {
 void load_initial_guess(Options &opts, LoadedProblem &problem) {
     const auto n = problem.problem.get_n(), m = problem.problem.get_m();
-    FileVec x0{n}, y0{m}, w0{2 * n};
+    alpaqa::params::vec_from_file<config_t> x0{n}, y0{m}, w0{2 * n};
     set_params(x0, "x0", opts);
     if (x0.value)
         problem.initial_guess_x = std::move(*x0.value);

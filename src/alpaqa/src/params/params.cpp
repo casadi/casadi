@@ -9,11 +9,14 @@
 #include <alpaqa/inner/pantr.hpp>
 #include <alpaqa/inner/zerofpr.hpp>
 #include <alpaqa/outer/alm.hpp>
+#include <alpaqa/util/io/csv.hpp>
 #if ALPAQA_WITH_OCP
 #include <alpaqa/inner/panoc-ocp.hpp>
 #endif
 
 #include <alpaqa/implementation/params/params.tpp>
+
+#include <fstream>
 
 namespace alpaqa::params {
 
@@ -69,6 +72,41 @@ void ALPAQA_EXPORT set_param(alpaqa::vec<config_t> &v, ParamString s) {
     for (auto &e : v) {
         std::tie(value, remainder) = split_key(remainder, ',');
         set_param(e, {.full_key = s.full_key, .key = "", .value = value});
+    }
+}
+
+template <>
+void ALPAQA_EXPORT set_param(vec_from_file<config_t> &v, ParamString s) {
+    assert_key_empty<vec_from_file<config_t>>(s);
+    if (s.value.starts_with('@')) {
+        std::string fpath{s.value.substr(1)};
+        std::ifstream f(fpath);
+        if (!f)
+            throw std::invalid_argument("Unable to open file '" + fpath +
+                                        "' in '" + std::string(s.full_key) +
+                                        '\'');
+        try {
+            auto r      = alpaqa::csv::read_row_std_vector<real_t<config_t>>(f);
+            auto r_size = static_cast<length_t<config_t>>(r.size());
+            if (v.expected_size >= 0 && r_size != v.expected_size)
+                throw std::invalid_argument(
+                    "Incorrect size in '" + std::string(s.full_key) +
+                    "' (got " + std::to_string(r.size()) + ", expected " +
+                    std::to_string(v.expected_size) + ')');
+            v.value.emplace(cmvec<config_t>{r.data(), r_size});
+        } catch (alpaqa::csv::read_error &e) {
+            throw std::invalid_argument(
+                "Unable to read from file '" + fpath + "' in '" +
+                std::string(s.full_key) +
+                "': alpaqa::csv::read_error: " + e.what());
+        }
+    } else {
+        alpaqa::params::set_param(v.value.emplace(), s);
+        if (v.expected_size >= 0 && v.value->size() != v.expected_size)
+            throw std::invalid_argument(
+                "Incorrect size in '" + std::string(s.full_key) + "' (got " +
+                std::to_string(v.value->size()) + ", expected " +
+                std::to_string(v.expected_size) + ')');
     }
 }
 

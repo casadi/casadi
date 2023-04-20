@@ -53,6 +53,9 @@ void set_param(T &f, ParamString s);
 template <>
 void set_param(vec<config_t> &v, ParamString s);
 
+template <>
+void set_param(vec_from_file<config_t> &v, ParamString s);
+
 template <class Rep, class Period>
 void set_param(std::chrono::duration<Rep, Period> &t, ParamString s);
 

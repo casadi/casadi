@@ -1,5 +1,6 @@
 #pragma once
 
+#include <alpaqa/config/config.hpp>
 #include <alpaqa/export.hpp>
 
 #include <optional>
@@ -61,5 +62,12 @@ void ALPAQA_EXPORT set_params(
         set_param(t, {.full_key = kv, .key = remainder, .value = value});
     }
 }
+
+template <Config Conf>
+struct ALPAQA_EXPORT vec_from_file {
+    USING_ALPAQA_CONFIG(Conf);
+    length_t expected_size;
+    std::optional<vec> value = std::nullopt;
+};
 
 } // namespace alpaqa::params
