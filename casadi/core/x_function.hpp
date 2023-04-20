@@ -835,10 +835,12 @@ namespace casadi {
       std::vector<MatType> ret_out(onames.size());
       for (casadi_int i=0; i<n_out_; ++i) {
         if (is_diff_out_[i]) {
+          // Concatenate sensitivities, correct sparsity pattern if needed
           for (casadi_int d=0; d<nfwd; ++d) v[d] = fsens[d][i];
-          ret_out.at(i) = horzcat(v);
+          ret_out.at(i) = ensure_stacked(horzcat(v), sparsity_out(i), nfwd);
         } else {
-          ret_out.at(i) = MatType(size1_out(i), size2_out(i)*nfwd);
+          // Output is non-differentable
+          ret_out.at(i) = MatType(size1_out(i), size2_out(i) * nfwd);
         }
       }
 
