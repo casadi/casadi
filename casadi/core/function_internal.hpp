@@ -643,6 +643,10 @@ namespace casadi {
                                  const Dict& opts) const;
     ///@}
 
+    /** \brief Ensure that a matrix's sparsity is a horizontal multiple of another, or empty */
+    template<typename MatType>
+    static MatType ensure_stacked(const MatType& v, const Sparsity& sp, casadi_int n);
+
     /** \brief returns a new function with a selection of inputs/outputs of the original
 
         \identifier{l2} */
@@ -1781,6 +1785,23 @@ namespace casadi {
       res_v.at(index_out(e.first)) = a;
     }
     return res_v;
+  }
+
+  template<typename MatType>
+  MatType FunctionInternal::ensure_stacked(const MatType& v, const Sparsity& sp, casadi_int n) {
+    // Check dimensions
+    if (v.size1() == sp.size1() && v.size2() == n * sp.size2()) {
+      // Ensure that sparsity is a horizontal multiple of original input, or has no entries
+      if (v.nnz() != 0 && !v.sparsity().is_stacked(sp, n)) {
+        return project(v, repmat(sp, 1, n));
+      }
+    } else {
+      // Correct empty sparsity
+      casadi_assert_dev(v.is_empty());
+      return MatType(sp.size1(), sp.size2() * n);
+    }
+    // No correction needed
+    return v;
   }
 
 } // namespace casadi
