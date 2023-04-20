@@ -43,14 +43,14 @@ struct PANOCDirectionVTable : util::BasicVTable {
 
     template <class T>
     PANOCDirectionVTable(util::VTableTypeTag<T> t) : util::BasicVTable{t} {
-        initialize            = util::type_erased_wrapped<&T::initialize>();
-        update                = util::type_erased_wrapped<&T::update>();
-        has_initial_direction = util::type_erased_wrapped<&T::has_initial_direction>();
-        apply                 = util::type_erased_wrapped<&T::apply>();
-        changed_γ             = util::type_erased_wrapped<&T::changed_γ>();
-        reset                 = util::type_erased_wrapped<&T::reset>();
-        get_params            = util::type_erased_wrapped<&T::get_params>();
-        get_name              = util::type_erased_wrapped<&T::get_name>();
+        initialize            = util::type_erased_wrapped<T, &T::initialize>();
+        update                = util::type_erased_wrapped<T, &T::update>();
+        has_initial_direction = util::type_erased_wrapped<T, &T::has_initial_direction>();
+        apply                 = util::type_erased_wrapped<T, &T::apply>();
+        changed_γ             = util::type_erased_wrapped<T, &T::changed_γ>();
+        reset                 = util::type_erased_wrapped<T, &T::reset>();
+        get_params            = util::type_erased_wrapped<T, &T::get_params>();
+        get_name              = util::type_erased_wrapped<T, &T::get_name>();
     }
     PANOCDirectionVTable() = default;
 };

@@ -125,24 +125,26 @@ struct BasicVTable {
 };
 
 namespace detail {
-template <class... ExtraArgs>
+template <class Class, class... ExtraArgs>
 struct Launderer {
   private:
-    template <auto M, class V, class T, class R, class... Args>
+    template <auto M, class V, class C, class R, class... Args>
     [[gnu::always_inline]] static constexpr auto
     do_invoke(V *self, Args... args, ExtraArgs...) -> R {
-        return std::invoke(M, *std::launder(reinterpret_cast<T *>(self)),
+        return std::invoke(M, *std::launder(reinterpret_cast<C *>(self)),
                            std::forward<Args>(args)...);
     }
     template <auto M, class T, class R, class... Args>
+        requires std::is_base_of_v<T, Class>
     [[gnu::always_inline]] static constexpr auto invoker_ovl(R (T::*)(Args...)
                                                                  const) {
-        return do_invoke<M, const void, const T, R, Args...>;
+        return do_invoke<M, const void, const Class, R, Args...>;
     }
     template <auto M, class T, class R, class... Args>
+        requires std::is_base_of_v<T, Class>
     [[gnu::always_inline]] static constexpr auto
     invoker_ovl(R (T::*)(Args...)) {
-        return do_invoke<M, void, T, R, Args...>;
+        return do_invoke<M, void, Class, R, Args...>;
     }
 
   public:
@@ -158,9 +160,9 @@ struct Launderer {
 } // namespace detail
 
 /// @copydoc detail::Launderer::invoker
-template <auto Method, class... ExtraArgs>
+template <class Class, auto Method, class... ExtraArgs>
 [[gnu::always_inline]] constexpr auto type_erased_wrapped() {
-    return detail::Launderer<ExtraArgs...>::template invoker<Method>();
+    return detail::Launderer<Class, ExtraArgs...>::template invoker<Method>();
 }
 
 template <class VTable, class Allocator>

@@ -29,8 +29,8 @@ struct InnerSolverVTable : util::BasicVTable {
 
     template <class T>
     InnerSolverVTable(util::VTableTypeTag<T> t) : util::BasicVTable{t} {
-        stop     = util::type_erased_wrapped<&T::stop>();
-        get_name = util::type_erased_wrapped<&T::get_name>();
+        stop     = util::type_erased_wrapped<T, &T::stop>();
+        get_name = util::type_erased_wrapped<T, &T::get_name>();
         call     = []<class... Args>(void *self_, const Problem &p, Args... args) {
             auto &self = *std::launder(reinterpret_cast<T *>(self_));
             return Stats{self(p, std::forward<Args>(args)...)};

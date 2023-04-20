@@ -51,8 +51,8 @@ struct ALMSolverVTable : util::BasicVTable {
 
     template <class T>
     ALMSolverVTable(util::VTableTypeTag<T> t) : util::BasicVTable{t} {
-        stop       = util::type_erased_wrapped<&T::stop>();
-        get_name   = util::type_erased_wrapped<&T::get_name>();
+        stop       = util::type_erased_wrapped<T, &T::stop>();
+        get_name   = util::type_erased_wrapped<T, &T::get_name>();
         get_params = [](const void *self_) -> py::object {
             auto &self = *std::launder(reinterpret_cast<const T *>(self_));
             return py::cast(self.get_params());
