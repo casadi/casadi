@@ -319,7 +319,7 @@ namespace casadi {
     res.clear();
     for (casadi_int i=0; i<n_out_; ++i) {
       for (casadi_int d=0; d<nfwd; ++d) v[d] = fsens[d][i];
-      res.push_back(horzcat(v));
+      res.push_back(ensure_stacked(horzcat(v), sparsity_out(i), nfwd));
     }
 
     Dict options = opts;
@@ -351,7 +351,7 @@ namespace casadi {
     res.clear();
     for (casadi_int i=0; i<n_in_; ++i) {
       for (casadi_int d=0; d<nadj; ++d) v[d] = asens[d][i];
-      res.push_back(horzcat(v));
+      res.push_back(ensure_stacked(horzcat(v), sparsity_in(i), nadj));
     }
 
     Dict options = opts;

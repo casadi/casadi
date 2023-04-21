@@ -1735,6 +1735,17 @@ namespace casadi {
       + " but got " + str(size1_out(i)) +  "-by-" + str(size2_out(i)));
   }
 
+  void Function::assert_sparsity_out(casadi_int i, const Sparsity& sp,
+      casadi_int n, bool allow_all_zero_sparse) const {
+    // Assert shape
+    assert_size_out(i, sp.size1(), sp.size2() * n);
+    // Quick return if empty sparse
+    if (allow_all_zero_sparse && sparsity_out(i).nnz() == 0) return;
+    // Check sparsities
+    casadi_assert(sparsity_out(i).is_stacked(sp, n), "Mismatching sparsity "
+      "(but correct dimensions) for " + str(*this) + " output " + name_out(i));
+  }
+
   Function Function::
   factory(const std::string& name,
           const std::vector<std::string>& s_in,

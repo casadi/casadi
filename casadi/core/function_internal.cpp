@@ -2055,7 +2055,7 @@ namespace casadi {
       for (i=0; i<n_in_; ++i) f.assert_size_in(ind++, size1_in(i), nfwd*size2_in(i));
       // Consistency check for outputs
       casadi_assert_dev(f.n_out()==n_out_);
-      for (i=0; i<n_out_; ++i) f.assert_size_out(i, size1_out(i), nfwd*size2_out(i));
+      for (i=0; i<n_out_; ++i) f.assert_sparsity_out(i, sparsity_out(i), nfwd);
       // Save to cache
       tocache(f);
     }
@@ -2098,7 +2098,7 @@ namespace casadi {
       for (i=0; i<n_out_; ++i) f.assert_size_in(ind++, size1_out(i), nadj*size2_out(i));
       // Consistency check for outputs
       casadi_assert_dev(f.n_out()==n_in_);
-      for (i=0; i<n_in_; ++i) f.assert_size_out(i, size1_in(i), nadj*size2_in(i));
+      for (i=0; i<n_in_; ++i) f.assert_sparsity_out(i, sparsity_in(i), nadj);
       // Save to cache
       tocache(f);
     }

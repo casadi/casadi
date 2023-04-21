@@ -1191,6 +1191,10 @@ namespace casadi {
     /// Assert that an output dimension is equal so some given value
     void assert_size_out(casadi_int i, casadi_int nrow, casadi_int ncol) const;
 
+    /// Assert that an output sparsity is a multiple of some given sparsity
+    void assert_sparsity_out(casadi_int i, const Sparsity& sp,
+        casadi_int n = 1, bool allow_all_zero_sparse = true) const;
+
     /// Checkout a memory object
     casadi_int checkout() const;
 
