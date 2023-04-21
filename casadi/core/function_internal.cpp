@@ -1879,18 +1879,24 @@ namespace casadi {
           jsp = sp;
         } else {
           jsp_other = sp;
-          if (compact) {
-            // We have the non-compact sparsity pattern, get the compact one
-            jsp = to_compact(oind, iind, sp);
-          } else {
-            // We have the compact sparsity pattern, get the non-compact one
-            jsp = from_compact(oind, iind, sp);
-            // Make sure the non-compact Jacobian is symmetric, cf. #1522, #3074
-            if (symmetric) jsp = jsp * jsp.T();
-          }
+          jsp = compact ? to_compact(oind, iind, sp) : from_compact(oind, iind, sp);
         }
       }
     }
+
+    // Make sure the Jacobian is symmetric if requested, cf. #1522, #3074, #3134
+    if (symmetric) {
+      if (compact) {
+        Sparsity sp = from_compact(oind, iind, jsp);
+        if (!sp.is_symmetric()) {
+          sp = sp * sp.T();
+          jsp = to_compact(oind, iind, sp);
+        }
+      } else {
+        if (!jsp.is_symmetric()) jsp = jsp * jsp.T();
+      }
+    }
+
     // Return a reference to the block
     return jsp;
   }
