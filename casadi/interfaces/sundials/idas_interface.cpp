@@ -776,7 +776,7 @@ int IdasInterface::solve_transposed(IdasMemory* m, double t, const double* xz, c
       for (int a = 0; a < nadj_; ++a) {
         casadi_copy(v_it, nrx1_, sol + nrx1_ * (d * nadj_ + a));
         v_it += nrx1_;
-        casadi_axpy(nrz1_, -1., m->v2 + nrx_ + nrz1_ * (d * nadj_ + a), v_it);
+        casadi_copy(v_it, nrz1_, sol + nrx_ + nrz1_ * (d * nadj_ + a));
         v_it += nrz1_;
       }
     }
