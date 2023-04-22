@@ -2040,6 +2040,22 @@ class NLPtests(casadiTestCase):
 
 
     #results.to_csv('hock_schittkowski/results.csv',index=False)
+
+  def test_exception_in_oraclefunction(self):
+    x=MX.sym("x")
+    x_fail = x.attachAssert(x!=x,"Cuckoo")
+    nlp={'x':x, 'f':(x-1)**2, 'g':x_fail}
+        
+    for Solver, solver_options, features in solvers:
+      solver = nlpsol("mysolver", Solver, nlp, solver_options)
+      solver_in = {}
+
+      solver_in["lbx"]=[-10]
+      solver_in["ubx"]=[10]
+      solver_in["lbg"]=[-10]
+      solver_in["ubg"]=[10]
+      with self.assertInAnyOutput("Cuckoo"):
+        solver_out = solver(**solver_in)
             
 if __name__ == '__main__':
     unittest.main()

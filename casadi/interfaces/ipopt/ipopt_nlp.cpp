@@ -89,7 +89,14 @@ namespace casadi {
     mem_->arg[0] = x;
     mem_->arg[1] = mem_->d_nlp.p;
     mem_->res[0] = &obj_value;
-    return solver_.calc_function(mem_, "nlp_f")==0;
+    try {
+      return solver_.calc_function(mem_, "nlp_f")==0;
+    } catch (std::exception& ex) {
+      if (solver_.show_eval_warnings_) {
+        casadi_warning("IpoptUserClass::eval_f failed:" + std::string(ex.what()));
+      }
+      return false;
+    }
   }
 
   // return the gradient of the objective function grad_ {x} f(x)
@@ -98,7 +105,14 @@ namespace casadi {
     mem_->arg[1] = mem_->d_nlp.p;
     mem_->res[0] = nullptr;
     mem_->res[1] = grad_f;
-    return solver_.calc_function(mem_, "nlp_grad_f")==0;
+    try {
+      return solver_.calc_function(mem_, "nlp_grad_f")==0;
+    } catch (std::exception& ex) {
+      if (solver_.show_eval_warnings_) {
+        casadi_warning("IpoptUserClass::eval_grad_f failed:" + std::string(ex.what()));
+      }
+      return false;
+    }
   }
 
   // return the value of the constraints: g(x)
@@ -106,7 +120,14 @@ namespace casadi {
     mem_->arg[0] = x;
     mem_->arg[1] = mem_->d_nlp.p;
     mem_->res[0] = g;
-    return solver_.calc_function(mem_, "nlp_g")==0;
+    try {
+      return solver_.calc_function(mem_, "nlp_g")==0;
+    } catch (std::exception& ex) {
+      if (solver_.show_eval_warnings_) {
+        casadi_warning("IpoptUserClass::eval_g failed:" + std::string(ex.what()));
+      }
+      return false;
+    }
   }
 
   // return the structure or values of the jacobian
@@ -119,7 +140,14 @@ namespace casadi {
       mem_->arg[1] = mem_->d_nlp.p;
       mem_->res[0] = nullptr;
       mem_->res[1] = values;
-      return solver_.calc_function(mem_, "nlp_jac_g")==0;
+      try {
+        return solver_.calc_function(mem_, "nlp_jac_g")==0;
+      } catch (std::exception& ex) {
+        if (solver_.show_eval_warnings_) {
+          casadi_warning("IpoptUserClass::eval_jac_g failed:" + std::string(ex.what()));
+        }
+        return false;
+      }
     } else {
       // Get the sparsity pattern
       casadi_int ncol = solver_.jacg_sp_.size2();
@@ -150,7 +178,14 @@ namespace casadi {
       mem_->arg[2] = &obj_factor;
       mem_->arg[3] = lambda;
       mem_->res[0] = values;
-      if (solver_.calc_function(mem_, "nlp_hess_l")) return false;
+      try {
+        if (solver_.calc_function(mem_, "nlp_hess_l", nullptr, 0, true)) return false;
+      } catch (std::exception& ex) {
+        if (solver_.show_eval_warnings_) {
+          casadi_warning("IpoptUserClass::eval_h failed:" + std::string(ex.what()));
+        }
+        return false;
+      }
       if (solver_.convexify_) {
         ScopedTiming tic(mem_->fstats.at("convexify"));
         if (convexify_eval(&solver_.convexify_data_.config, values, values, mem_->iw, mem_->w)) {

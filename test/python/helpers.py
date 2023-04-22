@@ -167,6 +167,17 @@ class casadiTestCase(unittest.TestCase):
     print("STATUS_RAN_ALL_TESTS")
 
   @contextmanager
+  def assertInAnyOutput(self,s):
+    e = ""
+    with capture_stdout() as result:
+        try:
+          yield
+        except Exception as err:
+          e = str(err)
+    print(result[0])
+    self.assertTrue(s in e or s in result[0] or s in result[1])
+
+  @contextmanager
   def assertInException(self,s):
     e = None
     try:
