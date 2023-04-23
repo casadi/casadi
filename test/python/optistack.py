@@ -47,7 +47,6 @@ if has_nlpsol("ipopt"):
 
 class OptiStacktests(inherit_from):
 
-
     @requires_conic("qrqp")
     def test_conic(self):
       opti = Opti('conic')
@@ -62,7 +61,6 @@ class OptiStacktests(inherit_from):
 
       with self.assertInException("conic"):
         Opti('foo')
-
 
     def test_lookup(self):
       opti = Opti()
@@ -79,8 +77,6 @@ class OptiStacktests(inherit_from):
       self.assertEqual(str2,str3)
       
       self.assertFalse(str1==str2)
-     
-      
       
     def test_n(self):
       opti = Opti()
@@ -212,8 +208,6 @@ class OptiStacktests(inherit_from):
       opti.solver(nlpsolver,nlpsolver_options)
 
       sol = opti.solve()
-      
- 
 
     def test_sparse(self):
       opti = Opti()
@@ -251,7 +245,6 @@ class OptiStacktests(inherit_from):
       hess_lag = sol.value(hessian(opti.f+dot(opti.lam_g,opti.g),opti.x)[0])
       self.checkarray(sol.value(hess_lag),sol.value(tril2symm(sol.opti.debug.casadi_solver.get_function('nlp_hess_l')(opti.x,opti.p,1,opti.lam_g).T)))
 
-
     def test_warmstart(self):
       opti = Opti()
 
@@ -287,7 +280,6 @@ class OptiStacktests(inherit_from):
       opti.set_value(sol1.value_parameters())
       sol = opti.solve()
       self.checkarray(sol.value(x),sol1.value(x), digits=6)
-      
       
     def test_set_value_expr(self):
 
@@ -376,7 +368,6 @@ class OptiStacktests(inherit_from):
          
           with self.assertInException("!parametric[0]"):
             opti.subject_to(x<=y)
-
           
     def test_callback(self):
         
@@ -591,8 +582,6 @@ class OptiStacktests(inherit_from):
         sol.value(dual)
       with self.assertInException("optistack.py"):
         sol.value(dual)
-      
-        
         
     def test_simple(self):
       
@@ -880,7 +869,6 @@ class OptiStacktests(inherit_from):
         with self.assertInException("Constraint shape mismatch."):
           opti.subject_to(vertcat(1,2,3)==x[0])
 
-
     def test_value(self):
         opti = Opti()
         x = opti.variable()
@@ -986,6 +974,22 @@ class OptiStacktests(inherit_from):
 
       self.checkarray(res,DM([5-8/sqrt(5),7-4/sqrt(5)]),conic,digits=7)
       self.checkarray(sol.value(opti.f),10-16/sqrt(5)+7-4/sqrt(5),conic,digits=7)
+
+    def test_subject_to_symbols_clear(self):
+
+      opti = Opti()
+      x = opti.variable()
+      opti.subject_to(x>=1)
+      opti.minimize(x**2)
+
+      opti.subject_to()
+      opti.subject_to(x<=5)
+
+      opti.solver(nlpsolver,nlpsolver_options)
+      sol = opti.solve()
+
+      self.assertEqual(len(opti.debug.symvar()),2)
+      self.assertEqual(len(opti.initial()),2)
 
 if __name__ == '__main__':
     unittest.main()

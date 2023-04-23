@@ -27,8 +27,16 @@
 #include "conic.hpp"
 #include "function_internal.hpp"
 #include "global_options.hpp"
+#include <string>
 
 namespace casadi {
+
+casadi_int OptiNode::instance_count_ = 0;
+
+std::map<VariableType, std::string> OptiNode::VariableType2String_ =
+  {{OPTI_VAR, "decision variable"},
+   {OPTI_PAR, "parameter"},
+   {OPTI_DUAL_G, "dual variable"}};
 
 class InternalOptiCallback : public FunctionInternal {
   public:
@@ -92,9 +100,8 @@ class InternalOptiCallback : public FunctionInternal {
 };
 
 OptiNode* OptiNode::create(const std::string& problem_type) {
-return new OptiNode(problem_type);
+  return new OptiNode(problem_type);
 }
-
 
 void OptiNode::callback_class(OptiCallback* callback) {
   user_callback_ = callback;
@@ -513,8 +520,6 @@ void OptiNode::assert_has_con(const MX& m) const {
   casadi_assert(has_con(m), "Constraint not present in Opti stack.");
 }
 
-casadi_int OptiNode::instance_count_ = 0;
-
 bool OptiNode::parse_opti_name(const std::string& name, VariableType& vt) const {
   casadi_int i = name.find("opti");
   if (i!=0) return false;
@@ -542,10 +547,6 @@ std::string OptiNode::variable_type_to_string(VariableType vt) const {
   return it->second;
 
 }
-std::map<VariableType, std::string> OptiNode::VariableType2String_ =
-  {{OPTI_VAR, "decision variable"},
-   {OPTI_PAR, "parameter"},
-   {OPTI_DUAL_G, "dual variable"}};
 
 std::vector<MX> OptiNode::initial() const {
   std::vector<MX> ret;
@@ -579,8 +580,8 @@ void OptiNode::bake() {
     "You need to specify at least an objective (y calling 'minimize'), "
     "or a constraint (by calling 'subject_to').");
 
+  // Clear active symbols map
   symbol_active_.clear();
-  symbol_active_.resize(symbols_.size());
 
   // Gather all expressions
   MX total_expr = vertcat(f_, veccat(g_));
@@ -692,6 +693,15 @@ std::vector<MX> OptiNode::symvar() const {
 
 std::vector<MX> OptiNode::symvar(const MX& expr) const {
   return sort(MX::symvar(expr));
+}
+
+std::vector<MX> OptiNode::symvar(const MX& expr, VariableType type) const {
+  std::vector<MX> ret;
+  for (const auto& d : symvar(expr)) {
+    if (meta(d).type==type) ret.push_back(d);
+  }
+
+  return ret;
 }
 
 std::vector<MX> OptiNode::ineq_unchain(const MX& a, bool& flipped) {
@@ -913,18 +923,15 @@ void OptiNode::subject_to(const MX& g) {
 void OptiNode::subject_to() {
   mark_problem_dirty();
   g_.clear();
+
+  // Remove symbols associated_with existing constraints
+  for (casadi_int i=0; i<symbols_.size(); i++) {
+    if (get_meta(symbols_[i]).type == OPTI_DUAL_G) symbols_.erase(symbols_.begin()+i);
+  }
+
   store_initial_[OPTI_DUAL_G].clear();
   store_latest_[OPTI_DUAL_G].clear();
   count_dual_ = 0;
-}
-
-std::vector<MX> OptiNode::symvar(const MX& expr, VariableType type) const {
-  std::vector<MX> ret;
-  for (const auto& d : symvar(expr)) {
-    if (meta(d).type==type) ret.push_back(d);
-  }
-
-  return ret;
 }
 
 void OptiNode::res(const DMDict& res) {
@@ -1001,10 +1008,8 @@ OptiSol OptiNode::solve(bool accept_limit) {
 
   return copy();
 }
-
 // Solve the problem
 void OptiNode::solve_prepare() {
-
 
   // Verify the constraint types
   for (const auto& g : g_) {
@@ -1077,13 +1082,15 @@ DM OptiNode::value(const MX& expr, const std::vector<MX>& values) const {
   }
 
   bool undecided_vars = false;
+
   std::vector<DM> x_num;
   for (const auto& e : x) {
     casadi_int i = meta(e).i;
     x_num.push_back(store_latest_.at(OPTI_VAR).at(i));
     undecided_vars |= override_num(temp[OPTI_VAR], x_num, i);
+    // if numeric value x_var is overridden set undecided_vars true
   }
-
+  // lam
   std::vector<DM> lam_num;
   for (const auto& e : lam) {
     casadi_int i = meta(e).i;
@@ -1107,24 +1114,29 @@ DM OptiNode::value(const MX& expr, const std::vector<MX>& values) const {
   if (undecided_vars) {
     assert_solved();
     for (const auto& e : x)
-      casadi_assert(symbol_active_[meta(e).count],
-        "This expression has symbols that do not appear in the constraints and objective:\n" +
-        describe(e, 1));
+      assert_active_symbol_(e,
+        "This expression has symbols that do not appear in the constraints and objective:\n");
     for (const auto& e : lam)
-      casadi_assert(symbol_active_[meta(e).count],
-        "This expression has a dual for a constraint that is not given to Opti:\n" +
-        describe(e, 1));
+      assert_active_symbol_(e,
+        "This expression has a dual for a constraint that is not given to Opti:\n");
   }
 
   std::vector<DM> arg = helper(std::vector<DM>{veccat(x_num), veccat(p_num), veccat(lam_num)});
   return arg[0];
 }
 
-void OptiNode::assert_active_symbol(const MX& m) const {
+void OptiNode::assert_active_symbol_(const MX& m, const std::string& error_msg) const {
   assert_has(m);
   assert_baked();
-  casadi_assert(symbol_active_[meta(m).count], "Opti symbol is not used in Solver."
-    " It does not make sense to assign a value to it:\n" + describe(m, 1));
+
+  std::map<casadi_int, bool>::const_iterator it;
+  it = symbol_active_.find(meta(m).count);
+  casadi_assert(it != symbol_active_.end() && it->second, error_msg + describe(m, 1));
+}
+
+void OptiNode::assert_active_symbol(const MX& m) const {
+  assert_active_symbol_(m, "Opti symbol is not used in Solver."
+    " It does not make sense to assign a value to it:\n");
 }
 
 void OptiNode::set_initial(const std::vector<MX>& assignments) {
@@ -1250,7 +1262,8 @@ std::vector<MX> OptiNode::active_symvar(VariableType type) const {
   if (symbol_active_.empty()) return std::vector<MX>{};
   std::vector<MX> ret;
   for (const auto& s : symbols_) {
-    if (symbol_active_[meta(s).count] && meta(s).type==type)
+    std::map<casadi_int, bool>::const_iterator it = symbol_active_.find(meta(s).count);
+    if ( it != symbol_active_.end() && it->second && meta(s).type==type)
       ret.push_back(s);
   }
   return ret;
@@ -1260,7 +1273,8 @@ std::vector<DM> OptiNode::active_values(VariableType type) const {
   if (symbol_active_.empty()) return std::vector<DM>{};
   std::vector<DM> ret;
   for (const auto& s : symbols_) {
-    if (symbol_active_[meta(s).count] && meta(s).type==type) {
+    std::map<casadi_int, bool>::const_iterator it = symbol_active_.find(meta(s).count);
+    if (it != symbol_active_.end() && it->second && meta(s).type==type) {
       ret.push_back(store_initial_.at(meta(s).type)[meta(s).i]);
     }
   }
@@ -1292,7 +1306,12 @@ Function OptiNode::to_function(const std::string& name,
     casadi_assert(a.is_valid_input(), "Argument " + str(k) + " is not purely symbolic.");
     k++;
     for (const auto& prim : a.primitives()) {
-      if (!symbol_active_[meta(prim).count]) continue;
+
+      std::map<casadi_int, bool>::const_iterator it = symbol_active_.find(meta(prim).count);
+      if (it == symbol_active_.end() || !it->second) continue;
+
+      // if (!symbol_active_[meta(prim).count]) continue;
+
       casadi_int i = meta(prim).active_i;
       if (meta(prim).type==OPTI_VAR) {
         x0.at(i) = prim;
