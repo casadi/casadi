@@ -2009,6 +2009,42 @@ namespace casadi {
     casadi_error("'eval_sx' not defined for " + class_name());
   }
 
+  std::string FunctionInternal::diff_prefix(const std::string& prefix) const {
+    // Highest index found in current inputs and outputs
+    casadi_int highest_index = 0;
+    // Loop over both input names and output names
+    for (const std::vector<std::string>& name_io : {name_in_, name_out_}) {
+      for (const std::string& n : name_io) {
+        // Find end of prefix, skip if no prefix
+        size_t end = n.find('_');
+        if (end >= n.size()) continue;
+        // Skip if too short
+        if (end < prefix.size()) continue; 
+        // Skip if wrong prefix
+        if (n.compare(0, prefix.size(), prefix) != 0) continue;
+        // Beginning of index
+        size_t begin = prefix.size();
+        // Check if any index
+        casadi_int this_index;
+        if (begin == end) {
+          // No prefix, implicitly 1
+          this_index = 1;
+        } else {
+          // Read index from string
+          this_index = std::stoi(n.substr(begin, end - begin));
+        }
+        // Find the highest index
+        if (this_index > highest_index) highest_index = this_index;
+      }
+    }
+    // Return one higher index
+    if (highest_index == 0) {
+      return prefix + "_";
+    } else {
+      return prefix + std::to_string(highest_index + 1) + "_";
+    }
+  }
+
   Function FunctionInternal::forward(casadi_int nfwd) const {
     casadi_assert_dev(nfwd>=0);
     // Used wrapped function if forward not available
@@ -2022,14 +2058,16 @@ namespace casadi {
     std::string fname = forward_name(name_, nfwd);
     if (!incache(fname, f)) {
       casadi_int i;
+      // Prefix to be used for forward seeds, sensitivities
+      std::string pref = diff_prefix("fwd");
       // Names of inputs
       std::vector<std::string> inames;
       for (i=0; i<n_in_; ++i) inames.push_back(name_in_[i]);
       for (i=0; i<n_out_; ++i) inames.push_back("out_" + name_out_[i]);
-      for (i=0; i<n_in_; ++i) inames.push_back("fwd_" + name_in_[i]);
+      for (i=0; i<n_in_; ++i) inames.push_back(pref + name_in_[i]);
       // Names of outputs
       std::vector<std::string> onames;
-      for (i=0; i<n_out_; ++i) onames.push_back("fwd_" + name_out_[i]);
+      for (i=0; i<n_out_; ++i) onames.push_back(pref + name_out_[i]);
       // Options
       Dict opts = combine(forward_options_, der_options_);
       opts = combine(opts, generate_options("forward"));
@@ -2081,14 +2119,16 @@ namespace casadi {
     std::string fname = reverse_name(name_, nadj);
     if (!incache(fname, f)) {
       casadi_int i;
+      // Prefix to be used for adjoint seeds, sensitivities
+      std::string pref = diff_prefix("adj");
       // Names of inputs
       std::vector<std::string> inames;
       for (i=0; i<n_in_; ++i) inames.push_back(name_in_[i]);
       for (i=0; i<n_out_; ++i) inames.push_back("out_" + name_out_[i]);
-      for (i=0; i<n_out_; ++i) inames.push_back("adj_" + name_out_[i]);
+      for (i=0; i<n_out_; ++i) inames.push_back(pref + name_out_[i]);
       // Names of outputs
       std::vector<std::string> onames;
-      for (casadi_int i=0; i<n_in_; ++i) onames.push_back("adj_" + name_in_[i]);
+      for (casadi_int i=0; i<n_in_; ++i) onames.push_back(pref + name_in_[i]);
       // Options
       Dict opts = combine(reverse_options_, der_options_);
       opts = combine(opts, generate_options("reverse"));
