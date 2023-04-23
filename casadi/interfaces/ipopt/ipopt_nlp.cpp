@@ -179,7 +179,7 @@ namespace casadi {
       mem_->arg[3] = lambda;
       mem_->res[0] = values;
       try {
-        if (solver_.calc_function(mem_, "nlp_hess_l", nullptr, 0, true)) return false;
+        if (solver_.calc_function(mem_, "nlp_hess_l")) return false;
       } catch (std::exception& ex) {
         if (solver_.show_eval_warnings_) {
           casadi_warning("IpoptUserClass::eval_h failed:" + std::string(ex.what()));
