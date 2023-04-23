@@ -2019,7 +2019,7 @@ namespace casadi {
         size_t end = n.find('_');
         if (end >= n.size()) continue;
         // Skip if too short
-        if (end < prefix.size()) continue; 
+        if (end < prefix.size()) continue;
         // Skip if wrong prefix
         if (n.compare(0, prefix.size(), prefix) != 0) continue;
         // Beginning of index
