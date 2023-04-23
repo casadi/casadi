@@ -606,6 +606,9 @@ namespace casadi {
       return "fwd" + str(nfwd) + "_" + fcn;
     }
 
+    /// Determine prefix for differentiated functions
+    std::string diff_prefix(const std::string& prefix) const;
+
     ///@{
     /** \brief Return function that calculates forward derivatives
 
