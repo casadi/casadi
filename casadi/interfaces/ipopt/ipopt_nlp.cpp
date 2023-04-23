@@ -91,6 +91,9 @@ namespace casadi {
     mem_->res[0] = &obj_value;
     try {
       return solver_.calc_function(mem_, "nlp_f")==0;
+    } catch(KeyboardInterruptException& ex) {
+      casadi_warning("KeyboardInterruptException");
+      throw KeyboardInterruptException();
     } catch (std::exception& ex) {
       if (solver_.show_eval_warnings_) {
         casadi_warning("IpoptUserClass::eval_f failed:" + std::string(ex.what()));
@@ -107,7 +110,10 @@ namespace casadi {
     mem_->res[1] = grad_f;
     try {
       return solver_.calc_function(mem_, "nlp_grad_f")==0;
-    } catch (std::exception& ex) {
+    } catch(KeyboardInterruptException& ex) {
+      casadi_warning("KeyboardInterruptException");
+      throw KeyboardInterruptException();
+    }  catch (std::exception& ex) {
       if (solver_.show_eval_warnings_) {
         casadi_warning("IpoptUserClass::eval_grad_f failed:" + std::string(ex.what()));
       }
@@ -122,6 +128,9 @@ namespace casadi {
     mem_->res[0] = g;
     try {
       return solver_.calc_function(mem_, "nlp_g")==0;
+    } catch(KeyboardInterruptException& ex) {
+      casadi_warning("KeyboardInterruptException");
+      throw KeyboardInterruptException();
     } catch (std::exception& ex) {
       if (solver_.show_eval_warnings_) {
         casadi_warning("IpoptUserClass::eval_g failed:" + std::string(ex.what()));
@@ -142,6 +151,9 @@ namespace casadi {
       mem_->res[1] = values;
       try {
         return solver_.calc_function(mem_, "nlp_jac_g")==0;
+      } catch(KeyboardInterruptException& ex) {
+        casadi_warning("KeyboardInterruptException");
+        throw KeyboardInterruptException();
       } catch (std::exception& ex) {
         if (solver_.show_eval_warnings_) {
           casadi_warning("IpoptUserClass::eval_jac_g failed:" + std::string(ex.what()));
@@ -180,6 +192,9 @@ namespace casadi {
       mem_->res[0] = values;
       try {
         if (solver_.calc_function(mem_, "nlp_hess_l")) return false;
+      } catch(KeyboardInterruptException& ex) {
+        casadi_warning("KeyboardInterruptException");
+        throw KeyboardInterruptException();
       } catch (std::exception& ex) {
         if (solver_.show_eval_warnings_) {
           casadi_warning("IpoptUserClass::eval_h failed:" + std::string(ex.what()));

@@ -119,8 +119,35 @@ class NLPtests(casadiTestCase):
       self.assertFalse(solver.stats()["success"])
 
   def test_iteration_interrupt(self):
+  
+   #add test for keyboard interrupt in fun_eval, not just iteration_callback
+   
+   class mycallback(Callback):
+      def __init__(self, name):
+        Callback.__init__(self)
+        opts = {"enable_fd":True}
+        self.construct(name, opts)
+
+      def eval(self,argin):
+        raise KeyboardInterrupt()
+
+   interrupt = mycallback("interrupt")
+   x = MX.sym("x")
+   nlp = {"x":x,"f":interrupt(x),"g":x}
    for Solver, solver_options, features in solvers:
-      if Solver not in ["ipopt","sqpmethod"]: continue
+     solver_options = dict(solver_options)
+     solver_options["error_on_fail"] = True
+     solver = nlpsol("solver",Solver,nlp,solver_options)
+
+     with self.assertInAnyOutput("KeyboardInterrupt"):
+       solver(lbg=-5,ubg=5)
+
+     with self.assertRaises(Exception):
+         solver(lbg=-5,ubg=5)
+
+   for Solver, solver_options, features in solvers:
+      #if Solver not in ["ipopt","sqpmethod"]: continue
+      if Solver in ["worhp","blocksqp","knitro"]: continue
       print("test_iteration_interrupt",Solver,solver_options)
 
       opti = Opti()
