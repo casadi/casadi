@@ -158,6 +158,7 @@ class NLPtests(casadiTestCase):
         raise KeyboardInterrupt()
 
       opti.minimize((x-1)**4)
+      opti.subject_to(-5<=(x<=5))
 
 
       opts = dict(solver_options)
