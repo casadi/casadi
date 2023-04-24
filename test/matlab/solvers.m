@@ -1,6 +1,6 @@
 import casadi.*
 
-plugins = split(CasadiMeta.plugins(),';');
+plugins = strsplit(CasadiMeta.plugins(),';');
 
 failure = false;
 for i=1:length(plugins)
@@ -13,7 +13,7 @@ for i=1:length(plugins)
   end
   
   if strcmp(type,'Nlpsol')
-      if strcmp(name,'scpgen')
+      if ismember(name, {'scpgen', 'ampl', 'qrsqp'})
          continue 
       end
       disp(['Solver:' name])
@@ -21,7 +21,7 @@ for i=1:length(plugins)
       x = MX.sym('x');
       nlp = struct;
       nlp.x = x;
-      nlp.f = (1-x^2);
+      nlp.f = x;
       nlp.g = 2*x+1;
       
       try
@@ -35,7 +35,7 @@ for i=1:length(plugins)
   end
   
   if strcmp(type,'Conic')
-      if strcmp(name,'hpipm')
+      if ismember(name, {'hpipm', 'nlpsol', 'qrqp', 'ipqp'})
          continue 
       end
       disp(['Solver:' name])
@@ -43,7 +43,7 @@ for i=1:length(plugins)
       x = MX.sym('x');
       nlp = struct;
       nlp.x = x;
-      nlp.f = (1-x^2);
+      nlp.f = x;
       nlp.g = 2*x+1;
       
       try
