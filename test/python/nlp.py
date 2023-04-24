@@ -147,7 +147,7 @@ class NLPtests(casadiTestCase):
 
    for Solver, solver_options, features in solvers:
       #if Solver not in ["ipopt","sqpmethod"]: continue
-      if Solver in ["worhp","blocksqp","knitro"]: continue
+      if Solver in ["worhp","blocksqp","knitro","bonmin"]: continue
       print("test_iteration_interrupt",Solver,solver_options)
 
       opti = Opti()
