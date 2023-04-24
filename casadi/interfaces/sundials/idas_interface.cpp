@@ -206,11 +206,10 @@ int IdasInterface::jtimesB(double t, N_Vector xz, N_Vector xzdot, N_Vector rxz,
   try {
     auto m = to_mem(user_data);
     auto& s = m->self;
-    if (s.calc_jtimesB(m, t, NV_DATA_S(xz), NV_DATA_S(xz) + s.nx_,
-      NV_DATA_S(rxz), NV_DATA_S(rxz) + s.nrx_,
-      NV_DATA_S(v), NV_DATA_S(v) + s.nrx_,
+    // The function is linear so the Jacobian-times-vector function is the function itself
+    if (s.calc_daeB(m, t, NV_DATA_S(xz), NV_DATA_S(xz) + s.nx_,
+      NV_DATA_S(v), NV_DATA_S(v) + s.nrx_, nullptr,
       NV_DATA_S(Jv), NV_DATA_S(Jv) + s.nrx_)) return 1;
-
     // Subtract state derivative to get residual
     casadi_axpy(s.nrx_, cjB, NV_DATA_S(v), NV_DATA_S(Jv));
 
@@ -746,13 +745,13 @@ int IdasInterface::solve_transposed(IdasMemory* m, double t, const double* xz, c
   if (nfwd_ > 0) {
     // Second order correction
     if (second_order_correction_ && rxz) {
-      // The outputs will double as seeds for jtimesB
+      // The outputs will double as seeds for calc_daeB
       casadi_clear(sol + nrx1_ * nadj_, nrx_ - nrx1_ * nadj_);
       casadi_clear(sol + nrx_ + nrz1_ * nadj_, nrz_ - nrz1_ * nadj_);
 
       // Get second-order-correction, save to m->v2
-      if (calc_jtimesB(m, t, xz, xz + nx_, rxz, rxz + nrx_,
-        sol, sol + nrx_, m->v2, m->v2 + nrx_)) return 1;
+      if (calc_daeB(m, t, xz, xz + nx_, sol, sol + nrx_, nullptr,
+        m->v2, m->v2 + nrx_)) return 1;
 
       // Subtract m->v2 (reordered) from m->v1
       v_it = m->v1 + (nrx1_ + nrz1_) * nadj_;
