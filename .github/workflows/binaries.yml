@@ -879,7 +879,7 @@ jobs:
         with:
           branch: ${{ env.GITHUB_REF_SLUG }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
-        if: contains(github.ref, 'release') || contains(github.ref, 'develop') 
+        if: contains(github.ref, 'release') || contains(github.ref, 'main') 
 
   test-python:
     runs-on: ${{matrix.image == 'macos-m1' && 'self-hosted' || matrix.image }}
