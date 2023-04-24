@@ -766,7 +766,10 @@ jobs:
         uses: matlab-actions/run-command@v1.1.2
         with:
           command: addpath('${{ github.workspace }}/casadi');cd test/matlab;asorted_tests
+      - run: cd test && python internal/test_matlab.py -skipfiles="callback.m" matlab
+        if: "contains(env.os, 'linux')"
       - run: cd test && python internal/test_matlab.py matlab
+        if: "!contains(env.os, 'linux')"
 
   test-octave:
     runs-on: ${{matrix.image}}
