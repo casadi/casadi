@@ -606,6 +606,9 @@ namespace casadi {
       return "fwd" + str(nfwd) + "_" + fcn;
     }
 
+    /// Determine prefix for differentiated functions
+    std::string diff_prefix(const std::string& prefix) const;
+
     ///@{
     /** \brief Return function that calculates forward derivatives
 
@@ -643,7 +646,9 @@ namespace casadi {
                                  const Dict& opts) const;
     ///@}
 
-    /** \brief Ensure that a matrix's sparsity is a horizontal multiple of another, or empty */
+    /** \brief Ensure that a matrix's sparsity is a horizontal multiple of another, or empty
+
+        \identifier{26j} */
     template<typename MatType>
     static MatType ensure_stacked(const MatType& v, const Sparsity& sp, casadi_int n);
 

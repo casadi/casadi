@@ -262,14 +262,6 @@ void SundialsInterface::init(const Dict& opts) {
     if (nfwd_ > 0) {
       create_forward("jtimesF", nfwd_);
     }
-    if (nadj_ > 0) {
-      create_function(rdae_, "jtimesB", {"in_t", "in_x", "in_z", "in_p", "in_u",
-        "adj_ode", "adj_alg", "adj_quad", "fwd:adj_ode", "fwd:adj_alg"},
-        {"fwd:adj_x", "fwd:adj_z"});
-      if (nfwd_ > 0) {
-        create_forward("jtimesB", nfwd_);
-      }
-    }
   }
 
 
@@ -716,28 +708,6 @@ int SundialsInterface::calc_jtimesF(SundialsMemory* m, double t, const double* x
     if (calc_function(m, forward_name("jtimesF", nfwd_))) return 1;
   }
   // Successful return
-  return 0;
-}
-
-int SundialsInterface::calc_jtimesB(SundialsMemory* m, double t, const double* x, const double* z,
-    const double* rx, const double* rz, const double* fwd_rx, const double* fwd_rz,
-    double* fwd_adj_x, double* fwd_adj_z) const {
-  // Evaluate nondifferentiated and sensitivities
-  for (casadi_int d = 0; d <= nfwd_; ++d) {
-    m->arg[JTIMESB_T] = &t;  // t
-    m->arg[JTIMESB_X] = x;  // x
-    m->arg[JTIMESB_Z] = z;  // z
-    m->arg[JTIMESB_P] = m->p;  // p
-    m->arg[JTIMESB_U] = m->u;  // u
-    m->arg[JTIMESB_ADJ_ODE] = rx + d * nx1_;  // adj_ode
-    m->arg[JTIMESB_ADJ_ALG] = rz + d * nz1_;  // adj_alg
-    m->arg[JTIMESB_ADJ_QUAD] = nullptr;  // adj_quad
-    m->arg[JTIMESB_FWD_ADJ_ODE] = fwd_rx + d * nrx1_ * nadj_;  // fwd:adj_ode
-    m->arg[JTIMESB_FWD_ADJ_ALG] = fwd_rz + d * nrz1_ * nadj_;  // fwd:adj_alg
-    m->res[JTIMESB_FWD_ADJ_X] = fwd_adj_x + d * nrx1_ * nadj_;  // fwd:adj_x
-    m->res[JTIMESB_FWD_ADJ_Z] = fwd_adj_z + d * nrz1_ * nadj_;  // fwd:adj_z
-    if (calc_function(m, "jtimesB")) return 1;
-  }
   return 0;
 }
 

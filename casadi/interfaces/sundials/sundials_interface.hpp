@@ -143,11 +143,6 @@ namespace casadi {
     int calc_jtimesF(SundialsMemory* m, double t, const double* x, const double* z,
       const double* fwd_x, const double* fwd_z, double* fwd_ode, double* fwd_alg) const;
 
-    // Jacobian of DAE-times-vector function, backward problem
-    int calc_jtimesB(SundialsMemory* m, double t, const double* x, const double* z,
-      const double* rx, const double* rz, const double* fwd_rx, const double* fwd_rz,
-      double* fwd_adj_x, double* fwd_adj_z) const;
-
     // Jacobian of DAE right-hand-side function, forward problem
     int calc_jacF(SundialsMemory* m, double t, const double* x, const double* z,
       double* jac_ode_x, double* jac_alg_x, double* jac_ode_z, double* jac_alg_z) const;
@@ -181,10 +176,6 @@ namespace casadi {
     enum JtimesFIn { JTIMESF_T, JTIMESF_X, JTIMESF_Z, JTIMESF_P, JTIMESF_U, JTIMESF_FWD_X,
       JTIMESF_FWD_Z, JTIMESF_NUM_IN};
     enum JtimesFOut { JTIMESF_FWD_ODE, JTIMESF_FWD_ALG, JTIMESF_NUM_OUT};
-    enum JtimesBIn { JTIMESB_T, JTIMESB_X, JTIMESB_Z, JTIMESB_P, JTIMESB_U,
-      JTIMESB_ADJ_ODE, JTIMESB_ADJ_ALG, JTIMESB_ADJ_QUAD,
-      JTIMESB_FWD_ADJ_ODE, JTIMESB_FWD_ADJ_ALG, JTIMESB_NUM_IN};
-    enum JtimesBOut { JTIMESB_FWD_ADJ_X, JTIMESB_FWD_ADJ_Z, JTIMESB_NUM_OUT};
     enum JacFOut {JACF_ODE_X, JACF_ALG_X, JACF_ODE_Z, JACF_ALG_Z, JACF_NUM_OUT};
     ///@}
 

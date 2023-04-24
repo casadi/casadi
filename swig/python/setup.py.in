@@ -103,7 +103,7 @@ with open('./requirements.txt') as f:
 
 setup(
     name='casadi',
-    version='@CASADI_VERSION@',
+    version='@CASADI_VERSION_PYTHON@',
     author='Joel Andersson, Joris Gillis, Greg Horn',
     author_email='developer_first_name@casadi.org',
     maintainer='Joris Gillis',

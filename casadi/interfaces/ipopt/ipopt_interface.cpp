@@ -544,7 +544,7 @@ namespace casadi {
     } catch(KeyboardInterruptException& ex) {
       return 0;
     } catch(std::exception& ex) {
-      uerr() << "intermediate_callback: " << ex.what() << std::endl;
+      casadi_warning("intermediate_callback: " + std::string(ex.what()));
       if (iteration_callback_ignore_errors_) return 1;
       return 0;
     }

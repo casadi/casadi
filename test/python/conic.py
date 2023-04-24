@@ -102,6 +102,18 @@ print(conics)
 
 class ConicTests(casadiTestCase):
 
+  def test_opti(self):
+    for conic, qp_options, aux_options in conics:
+      if conic in ["qrqp"]: continue
+      opti = Opti('conic')
+      x = opti.variable()
+      opti.minimize(x)
+      opti.subject_to(-2<=(x<=2))
+      opti.solver(conic,qp_options)
+
+      sol = opti.solve()
+      self.checkarray(sol.value(x),-2,digits=5)
+
   def test_sos(self):
 
     H = DM(4,4)

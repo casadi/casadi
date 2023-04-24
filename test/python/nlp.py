@@ -119,8 +119,35 @@ class NLPtests(casadiTestCase):
       self.assertFalse(solver.stats()["success"])
 
   def test_iteration_interrupt(self):
+  
+   #add test for keyboard interrupt in fun_eval, not just iteration_callback
+   
+   class mycallback(Callback):
+      def __init__(self, name):
+        Callback.__init__(self)
+        opts = {"enable_fd":True}
+        self.construct(name, opts)
+
+      def eval(self,argin):
+        raise KeyboardInterrupt()
+
+   interrupt = mycallback("interrupt")
+   x = MX.sym("x")
+   nlp = {"x":x,"f":interrupt(x),"g":x}
    for Solver, solver_options, features in solvers:
-      if Solver not in ["ipopt","sqpmethod"]: continue
+     solver_options = dict(solver_options)
+     solver_options["error_on_fail"] = True
+     solver = nlpsol("solver",Solver,nlp,solver_options)
+
+     with self.assertInAnyOutput("KeyboardInterrupt"):
+       solver(lbg=-5,ubg=5)
+
+     with self.assertRaises(Exception):
+         solver(lbg=-5,ubg=5)
+
+   for Solver, solver_options, features in solvers:
+      #if Solver not in ["ipopt","sqpmethod"]: continue
+      if Solver in ["worhp","blocksqp","knitro","bonmin"]: continue
       print("test_iteration_interrupt",Solver,solver_options)
 
       opti = Opti()
@@ -131,6 +158,7 @@ class NLPtests(casadiTestCase):
         raise KeyboardInterrupt()
 
       opti.minimize((x-1)**4)
+      opti.subject_to(-5<=(x<=5))
 
 
       opts = dict(solver_options)
@@ -2040,6 +2068,23 @@ class NLPtests(casadiTestCase):
 
 
     #results.to_csv('hock_schittkowski/results.csv',index=False)
+
+  def test_exception_in_oraclefunction(self):
+    x=MX.sym("x")
+    x_fail = x.attachAssert(x!=x,"Cuckoo")
+    nlp={'x':x, 'f':(x-1)**2, 'g':x_fail}
+        
+    for Solver, solver_options, features in solvers:
+      print("test_exception_in_oraclefunction",Solver,solver_options)
+      solver = nlpsol("mysolver", Solver, nlp, solver_options)
+      solver_in = {}
+
+      solver_in["lbx"]=[-10]
+      solver_in["ubx"]=[10]
+      solver_in["lbg"]=[-10]
+      solver_in["ubg"]=[10]
+      with self.assertInAnyOutput("Cuckoo"):
+        solver_out = solver(**solver_in)
             
 if __name__ == '__main__':
     unittest.main()

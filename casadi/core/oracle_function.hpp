@@ -53,6 +53,7 @@ namespace casadi {
     double* w;
 
     std::vector<LocalOracleMemory*> thread_local_mem;
+    ~OracleMemory();
   };
 
   /** \brief Base class for functions that perform calculation with an oracle
@@ -205,15 +206,10 @@ namespace casadi {
         \identifier{n} */
     int init_mem(void* mem) const override;
 
-    /** \brief Free memory block
-
-        \identifier{o} */
-    void local_free_mem(void *mem) const { delete static_cast<LocalOracleMemory*>(mem);}
-
    /** \brief Free memory block
 
        \identifier{p} */
-    void free_mem(void *mem) const override;
+    void free_mem(void *mem) const override { delete static_cast<OracleMemory*>(mem);}
 
     /** \brief Set the work vectors
 

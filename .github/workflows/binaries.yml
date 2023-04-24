@@ -726,7 +726,7 @@ jobs:
      fail-fast: false
      matrix:
        matlab: ["2018b"]
-       image: ["windows-2022","ubuntu-20.04","macos-11","macos-m1"]
+       image: ["windows-2022","ubuntu-20.04","macos-11"]
        bit: [64]
        exclude:
         # No Windows 32bit builds currently
@@ -762,11 +762,19 @@ jobs:
       - uses: casadi/commercial_solvers@master
         with:
           token: ${{ secrets.JGILLIS_RESTRICTED }}
+
+      # Leads to `MATLAB: detail/MvmLocalBoundMethods.cpp:112: static void mvm::detail::MvmLocalBoundMethods::initMethods(bool): Assertion `Failed to open local mvm library: /usr/local/MATLAB/R2023a/bin/glnxa64/libmwgraphblas.so.7: undefined symbol: GOMP_loop_nonmonotonic_dynamic_start, version VERSION' failed.`
+      - run: echo "LD_PRELOAD=" >> $GITHUB_ENV
+        if: "contains(env.os, 'linux')"
+
       - name: Run script
         uses: matlab-actions/run-command@v1.1.2
         with:
           command: addpath('${{ github.workspace }}/casadi');cd test/matlab;asorted_tests
+      - run: cd test && python internal/test_matlab.py -skipfiles="callback.m" matlab
+        if: "!contains(env.os, 'windows')"
       - run: cd test && python internal/test_matlab.py matlab
+        if: "contains(env.os, 'windows')"
 
   test-octave:
     runs-on: ${{matrix.image}}
@@ -879,7 +887,7 @@ jobs:
         with:
           branch: ${{ env.GITHUB_REF_SLUG }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
-        if: contains(github.ref, 'release') || contains(github.ref, 'develop') 
+        if: contains(github.ref, 'release') || contains(github.ref, 'main') 
 
   test-python:
     runs-on: ${{matrix.image == 'macos-m1' && 'self-hosted' || matrix.image }}

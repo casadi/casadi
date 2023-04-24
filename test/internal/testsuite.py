@@ -64,7 +64,10 @@ def run(args, input=None, cwd = None, shell = False, kill_tree = True, timeout =
         pass
     def alarm_handler(signum, frame):
         raise Alarm
-    p = Popen(args, shell = shell, cwd = cwd, stdout = PIPE, stderr = PIPE, env = env)
+    my_env = os.environ.copy()
+    if env is not None:
+        my_env.update(env)
+    p = Popen(args, shell = shell, cwd = cwd, stdout = PIPE, stderr = PIPE, env = my_env)
     if timeout != -1:
         if alarm_available:
             signal(SIGALRM, alarm_handler)

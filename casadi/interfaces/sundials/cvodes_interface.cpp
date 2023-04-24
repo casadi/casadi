@@ -466,8 +466,9 @@ int CvodesInterface::jtimesB(N_Vector v, N_Vector Jv, double t, N_Vector x,
   try {
     auto m = to_mem(user_data);
     auto& s = m->self;
-    if (s.calc_jtimesB(m, t, NV_DATA_S(x), nullptr, NV_DATA_S(rx), nullptr,
-      NV_DATA_S(v), nullptr, NV_DATA_S(Jv), nullptr)) return 1;
+    // The function is linear so the Jacobian-times-vector function is the function itself
+    if (s.calc_daeB(m, t, NV_DATA_S(x), nullptr, NV_DATA_S(v), nullptr, nullptr,
+      NV_DATA_S(Jv), nullptr)) return 1;
     return 0;
   } catch(std::exception& e) { // non-recoverable error
     uerr() << "jtimesB failed: " << e.what() << std::endl;
@@ -535,11 +536,9 @@ int CvodesInterface::psolveB(double t, N_Vector x, N_Vector xB, N_Vector xdotB, 
     if (s.nfwd_ > 0) {
       // Second order correction
       if (s.second_order_correction_) {
-        // The outputs will double as seeds for jtimesB
+        // The outputs will double as seeds for calc_daeB
         casadi_clear(v + s.nrx1_ * s.nadj_, s.nrx_ - s.nrx1_ * s.nadj_);
-        if (s.calc_jtimesB(m, t, NV_DATA_S(x), nullptr, NV_DATA_S(xB),
-          nullptr, v, nullptr, m->v2, nullptr)) return 1;
-
+        if (s.calc_daeB(m, t, NV_DATA_S(x), nullptr, v, nullptr, nullptr, m->v2, nullptr)) return 1;
         // Subtract m->v2 from m->v1, scaled with gammaB
         casadi_axpy(s.nrx_ - s.nrx1_ * s.nadj_, -m->gammaB, m->v2 + s.nrx1_ * s.nadj_,
           m->v1 + s.nrx1_ * s.nadj_);

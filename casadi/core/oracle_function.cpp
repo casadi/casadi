@@ -414,14 +414,10 @@ int OracleFunction::init_mem(void* mem) const {
   return 0;
 }
 
-void OracleFunction::free_mem(void *mem) const {
-  auto m = static_cast<OracleMemory*>(mem);
-
-  for (int i = 0; i < max_num_threads_; ++i) {
-    local_free_mem(m->thread_local_mem[i]);
+OracleMemory::~OracleMemory() {
+  for (auto* ml : thread_local_mem) {
+     delete static_cast<LocalOracleMemory*>(ml);
   }
-
-  delete m;
 }
 
 void OracleFunction::set_temp(void* mem, const double** arg, double** res,

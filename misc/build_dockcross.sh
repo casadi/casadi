@@ -28,7 +28,7 @@ export FLAGS="-DWITH_COMMON=OFF -DWITH_BUILD_REQUIRED=ON -DWITH_BUILD_BONMIN=OFF
 
 BUILD_TYPE_MOCKUPS=Release
 
-curl -OL https://github.com/casadi/mockups/releases/download/v52/mockups_${TARGET}_${BUILD_TYPE_MOCKUPS}.zip
+curl -OL https://github.com/casadi/mockups/releases/download/v61/mockups_${TARGET}_${BUILD_TYPE_MOCKUPS}.zip
 
 rm -rf mockups-${TARGET}-${BUILD_TYPE_MOCKUPS}
 unzip mockups_${TARGET}_${BUILD_TYPE_MOCKUPS}.zip -d mockups-${TARGET}-${BUILD_TYPE_MOCKUPS}
