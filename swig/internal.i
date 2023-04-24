@@ -1108,6 +1108,9 @@
 %exception  casadi::Function::assert_size_out(casadi_int i, casadi_int nrow, casadi_int ncol) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Function::assert_sparsity_out(casadi_int i, const Sparsity &sp, casadi_int n=1, bool allow_all_zero_sparse=true) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Function::buf_in(MapArg arg) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }

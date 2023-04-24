@@ -646,7 +646,9 @@ namespace casadi {
                                  const Dict& opts) const;
     ///@}
 
-    /** \brief Ensure that a matrix's sparsity is a horizontal multiple of another, or empty */
+    /** \brief Ensure that a matrix's sparsity is a horizontal multiple of another, or empty
+
+        \identifier{26j} */
     template<typename MatType>
     static MatType ensure_stacked(const MatType& v, const Sparsity& sp, casadi_int n);
 
