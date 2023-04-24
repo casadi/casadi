@@ -726,7 +726,7 @@ jobs:
      fail-fast: false
      matrix:
        matlab: ["2018b"]
-       image: ["windows-2022","ubuntu-20.04","macos-11","macos-m1"]
+       image: ["windows-2022","ubuntu-20.04","macos-11"]
        bit: [64]
        exclude:
         # No Windows 32bit builds currently
