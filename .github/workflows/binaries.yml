@@ -762,6 +762,11 @@ jobs:
       - uses: casadi/commercial_solvers@master
         with:
           token: ${{ secrets.JGILLIS_RESTRICTED }}
+
+      # Leads to `MATLAB: detail/MvmLocalBoundMethods.cpp:112: static void mvm::detail::MvmLocalBoundMethods::initMethods(bool): Assertion `Failed to open local mvm library: /usr/local/MATLAB/R2023a/bin/glnxa64/libmwgraphblas.so.7: undefined symbol: GOMP_loop_nonmonotonic_dynamic_start, version VERSION' failed.`
+      - run: echo "LD_PRELOAD=" >> $GITHUB_ENV
+        if: "contains(env.os, 'linux')"
+
       - name: Run script
         uses: matlab-actions/run-command@v1.1.2
         with:
