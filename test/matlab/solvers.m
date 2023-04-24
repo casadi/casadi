@@ -5,7 +5,7 @@ plugins = strsplit(CasadiMeta.plugins(),';');
 failure = false;
 for i=1:length(plugins)
   plugin = plugins{i};
-  parts = split(plugin,'::');
+  parts = strsplit(plugin,'::');
   type = parts{1};
   name = parts{2};
   if ~isempty(getenv(['SKIP_' upper(name) '_TESTS']))
