@@ -767,9 +767,9 @@ jobs:
         with:
           command: addpath('${{ github.workspace }}/casadi');cd test/matlab;asorted_tests
       - run: cd test && python internal/test_matlab.py -skipfiles="callback.m" matlab
-        if: "contains(env.os, 'linux')"
+        if: "!contains(env.os, 'windows')"
       - run: cd test && python internal/test_matlab.py matlab
-        if: "!contains(env.os, 'linux')"
+        if: "contains(env.os, 'windows')"
 
   test-octave:
     runs-on: ${{matrix.image}}
