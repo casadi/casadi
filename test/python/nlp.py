@@ -2074,6 +2074,7 @@ class NLPtests(casadiTestCase):
     nlp={'x':x, 'f':(x-1)**2, 'g':x_fail}
         
     for Solver, solver_options, features in solvers:
+      print("test_exception_in_oraclefunction",Solver,solver_options)
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
       solver_in = {}
 
