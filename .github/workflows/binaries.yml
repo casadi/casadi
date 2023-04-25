@@ -102,7 +102,7 @@ jobs:
         path: casadi_source.zip
 
   test-python-source-package:
-    runs-on: ${{matrix.image}}
+    runs-on: ${{matrix.image == 'macos-m1' && 'self-hosted' || matrix.image }}
     needs: [swig]
     strategy:
      fail-fast: false
