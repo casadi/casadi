@@ -502,7 +502,10 @@ std::map<int, std::string> SnoptInterface::secondary_status_ =
           fCon[k] = m->gk[k];
         }
       }
-
+    } catch(KeyboardInterruptException& ex) {
+      casadi_warning("KeyboardInterruptException");
+      *mode = -2;
+      return;
     } catch(std::exception& ex) {
       uerr() << "eval_nlp failed: " << ex.what() << std::endl;
       *mode = -1;  // Reduce step size - we've got problems
