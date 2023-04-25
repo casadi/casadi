@@ -79,6 +79,14 @@ jobs:
         asset_name: casadi-source-v${{ needs.version.outputs.casadi }}.zip
         prerelease: true
     - run: python setup.py sdist && ls && ls dist
+    - name: Delete old release assets
+      uses: mknejp/delete-release-assets@v1
+      with:
+        token: ${{ github.token }}
+        tag: nightly-${{ env.GITHUB_REF_SLUG }}
+        assets: "*.tar.gz"
+        fail-if-no-release: false
+        fail-if-no-assets: false
     - name: Upload files to a GitHub release
       uses: svenstaro/upload-release-action@2.4.0
       with:
