@@ -1,6 +1,6 @@
 name: binaries
 
-on: push
+on: [push, pull_request]
 
 env:
   cache-suffix: v8
@@ -767,22 +767,28 @@ jobs:
         if: "contains(env.os, 'windows')"
       - name: Set up MATLAB
         uses: matlab-actions/setup-matlab@v1.2.4
-      - uses: casadi/commercial_solvers@master
-        with:
-          token: ${{ secrets.JGILLIS_RESTRICTED }}
 
       # Leads to `MATLAB: detail/MvmLocalBoundMethods.cpp:112: static void mvm::detail::MvmLocalBoundMethods::initMethods(bool): Assertion `Failed to open local mvm library: /usr/local/MATLAB/R2023a/bin/glnxa64/libmwgraphblas.so.7: undefined symbol: GOMP_loop_nonmonotonic_dynamic_start, version VERSION' failed.`
       - run: echo "LD_PRELOAD=" >> $GITHUB_ENV
         if: "contains(env.os, 'linux')"
 
+      - run: cd test && python internal/test_matlab.py -skipfiles="callback.m solvers.m" matlab
+        if: "!contains(env.os, 'windows')"
+      - run: cd test && python internal/test_matlab.py -skipfiles="solvers.m" matlab
+        if: "contains(env.os, 'windows')"
+      - uses: casadi/commercial_solvers@master
+        with:
+          token: ${{ secrets.JGILLIS_RESTRICTED }}
+        env:
+          JGILLIS_RESTRICTED: ${{ secrets.JGILLIS_RESTRICTED != '' }}
+        if: ${{ env.JGILLIS_RESTRICTED == 'true' }}
       - name: Run script
         uses: matlab-actions/run-command@v1.1.2
         with:
-          command: addpath('${{ github.workspace }}/casadi');cd test/matlab;asorted_tests
-      - run: cd test && python internal/test_matlab.py -skipfiles="callback.m" matlab
-        if: "!contains(env.os, 'windows')"
-      - run: cd test && python internal/test_matlab.py matlab
-        if: "contains(env.os, 'windows')"
+          command: addpath('${{ github.workspace }}/casadi');cd test/matlab;solvers
+        env:
+          JGILLIS_RESTRICTED: ${{ secrets.JGILLIS_RESTRICTED != '' }}
+        if: ${{ env.JGILLIS_RESTRICTED == 'true' }}
 
   test-octave:
     runs-on: ${{matrix.image}}
@@ -824,13 +830,19 @@ jobs:
                echo "MATLABPATH=${{ github.workspace }}\casadi" >> $env:GITHUB_ENV
         if: "contains(env.os, 'windows')"
         shell: pwsh
+      - run: echo "MATLABPATH=${{ github.workspace }}/casadi" >> $GITHUB_ENV
+        if: "!contains(env.os, 'windows')"
+      - run: cd test && python internal/test_octave.py octave && python internal/test_octave.py matlab -skipfiles="solvers.m callback.m nlp_callback.m"
       - uses: casadi/commercial_solvers@master
         with:
           token: ${{ secrets.JGILLIS_RESTRICTED }}
-      - run: echo "MATLABPATH=${{ github.workspace }}/casadi" >> $GITHUB_ENV
-        if: "!contains(env.os, 'windows')"
-      - run: octave --no-gui --no-window-system --eval "addpath('${{ github.workspace }}/casadi');cd test/matlab;asorted_tests"
-      - run: cd test && python internal/test_octave.py octave && python internal/test_octave.py matlab -skipfiles="callback.m nlp_callback.m"
+        env:
+          JGILLIS_RESTRICTED: ${{ secrets.JGILLIS_RESTRICTED != '' }}
+        if: ${{ env.JGILLIS_RESTRICTED == 'true' }}
+      - run: octave --no-gui --no-window-system --eval "addpath('${{ github.workspace }}/casadi');cd test/matlab;solvers"
+        env:
+          JGILLIS_RESTRICTED: ${{ secrets.JGILLIS_RESTRICTED != '' }}
+        if: ${{ env.JGILLIS_RESTRICTED == 'true' }}
 
   docs:
     runs-on: ubuntu-22.04
@@ -1010,6 +1022,9 @@ jobs:
       - uses: casadi/commercial_solvers@master
         with:
           token: ${{ secrets.JGILLIS_RESTRICTED }}
+        env:
+          JGILLIS_RESTRICTED: ${{ secrets.JGILLIS_RESTRICTED != '' }}
+        if: ${{ env.JGILLIS_RESTRICTED == 'true' }}
       - id: get-id
         uses: actions/github-script@v6.3.3
         env:
@@ -1036,18 +1051,20 @@ jobs:
         if: contains(matrix.image, 'windows')
       - env:
           PYTHONPATH: ${{ github.workspace }}/casadi
+          JGILLIS_RESTRICTED: ${{ secrets.JGILLIS_RESTRICTED != '' }}
         run: |
           cd test/python
           python -c "from casadi.tools import *;loadAllCompiledPlugins()"
         shell: bash -el {0}
-        if: "!contains(matrix.image, 'windows')"
+        if: "!contains(matrix.image, 'windows') && env.JGILLIS_RESTRICTED == 'true'"
       - env:
           PYTHONPATH: ${{ github.workspace }}/casadi
+          JGILLIS_RESTRICTED: ${{ secrets.JGILLIS_RESTRICTED != '' }}
         run: |
           cd test/python
           python -c "from casadi.tools import *;loadAllCompiledPlugins()"
         shell: pwsh
-        if: contains(matrix.image, 'windows')
+        if: "contains(matrix.image, 'windows') && env.JGILLIS_RESTRICTED == 'true'"
       - run: |
           cd test/python
           wget https://github.com/casadi/testbot/releases/download/perpetual/serialize_3.5.5.zip
