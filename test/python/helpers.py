@@ -670,6 +670,8 @@ class casadiTestCase(unittest.TestCase):
 
       print("compile library",commands)
       p = subprocess.Popen(commands,shell=True).wait()
+      if sys.platform=="darwin":
+        subprocess.run(["otool","-l",libname])
       if external_opts is None: external_opts = {}
       F2 = external(F.name(), libname,external_opts)
 

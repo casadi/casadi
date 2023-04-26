@@ -1026,6 +1026,11 @@ jobs:
         env:
           JGILLIS_RESTRICTED: ${{ secrets.JGILLIS_RESTRICTED != '' }}
         if: ${{ env.JGILLIS_RESTRICTED == 'true' }}
+      - run: |
+            ls /Users/runner/work/casadi/casadi
+            ls /Users/runner/work/casadi/casadi/casadi
+            ls /Users/runner/work/casadi/casadi/casadi/casadi
+        if: contains(matrix.image, 'macos')
       - id: get-id
         uses: actions/github-script@v6.3.3
         env:
