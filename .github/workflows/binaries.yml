@@ -768,10 +768,6 @@ jobs:
       - name: Set up MATLAB
         uses: matlab-actions/setup-matlab@v1.2.4
 
-      # Leads to `MATLAB: detail/MvmLocalBoundMethods.cpp:112: static void mvm::detail::MvmLocalBoundMethods::initMethods(bool): Assertion `Failed to open local mvm library: /usr/local/MATLAB/R2023a/bin/glnxa64/libmwgraphblas.so.7: undefined symbol: GOMP_loop_nonmonotonic_dynamic_start, version VERSION' failed.`
-      - run: echo "LD_PRELOAD=" >> $GITHUB_ENV
-        if: "contains(env.os, 'linux')"
-
       - run: cd test && python internal/test_matlab.py -skipfiles="callback.m solvers.m" matlab
         if: "!contains(env.os, 'windows')"
       - run: cd test && python internal/test_matlab.py -skipfiles="solvers.m" matlab
@@ -782,6 +778,11 @@ jobs:
         env:
           JGILLIS_RESTRICTED: ${{ secrets.JGILLIS_RESTRICTED != '' }}
         if: ${{ env.JGILLIS_RESTRICTED == 'true' }}
+
+      # Leads to `MATLAB: detail/MvmLocalBoundMethods.cpp:112: static void mvm::detail::MvmLocalBoundMethods::initMethods(bool): Assertion `Failed to open local mvm library: /usr/local/MATLAB/R2023a/bin/glnxa64/libmwgraphblas.so.7: undefined symbol: GOMP_loop_nonmonotonic_dynamic_start, version VERSION' failed.`
+      - run: echo "LD_PRELOAD=" >> $GITHUB_ENV
+        if: "contains(env.os, 'linux')"
+
       - name: Run script
         uses: matlab-actions/run-command@v1.1.2
         with:
