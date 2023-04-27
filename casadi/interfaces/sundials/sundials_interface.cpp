@@ -333,6 +333,31 @@ int SundialsInterface::init_mem(void* mem) const {
 
   m->mem_linsolF = linsolF_.checkout();
 
+  // Reset stats
+  reset_stats(m);
+
+  return 0;
+}
+
+void SundialsInterface::reset(IntegratorMemory* mem, const double* x,
+    const double* z, const double* p) const {
+  auto m = static_cast<SundialsMemory*>(mem);
+
+  // Reset stats
+  reset_stats(m);
+
+  // Set parameters
+  casadi_copy(p, np_, m->p);
+
+  // Set the state
+  casadi_copy(x, nx_, NV_DATA_S(m->xz));
+  casadi_copy(z, nz_, NV_DATA_S(m->xz) + nx_);
+
+  // Reset summation states
+  N_VConst(0., m->q);
+}
+
+void SundialsInterface::reset_stats(SundialsMemory* m) const {
   // Reset stats, forward problem
   m->nsteps = m->nfevals = m->nlinsetups = m->netfails = 0;
   m->qlast = m->qcur = -1;
@@ -345,22 +370,29 @@ int SundialsInterface::init_mem(void* mem) const {
   m->hinusedB = m->hlastB = m->hcurB = m->tcurB = casadi::nan;
   m->nnitersB = m->nncfailsB = 0;
 
-  return 0;
+  // Set offsets to zero
+  save_offsets(m);
 }
 
-void SundialsInterface::reset(IntegratorMemory* mem, const double* x,
-    const double* z, const double* p) const {
-  auto m = static_cast<SundialsMemory*>(mem);
+void SundialsInterface::save_offsets(SundialsMemory* m) const {
+  // Retrieve stats offset, backward problem
+  m->nstepsB_off = m->nstepsB;
+  m->nfevalsB_off = m->nfevalsB;
+  m->nlinsetupsB_off = m->nlinsetupsB;
+  m->netfailsB_off = m->netfailsB;
+  m->nnitersB_off = m->nnitersB;
+  m->nncfailsB_off = m->nncfailsB;
+}
 
-  // Set parameters
-  casadi_copy(p, np_, m->p);
+void SundialsInterface::add_offsets(SundialsMemory* m) const {
+  // Add stats offsets, backward problem
+  m->nstepsB += m->nstepsB_off;
+  m->nfevalsB += m->nfevalsB_off;
+  m->nlinsetupsB += m->nlinsetupsB_off;
+  m->netfailsB += m->netfailsB_off;
+  m->nnitersB += m->nnitersB_off;
+  m->nncfailsB += m->nncfailsB_off;
 
-  // Set the state
-  casadi_copy(x, nx_, NV_DATA_S(m->xz));
-  casadi_copy(z, nz_, NV_DATA_S(m->xz) + nx_);
-
-  // Reset summation states
-  N_VConst(0., m->q);
 }
 
 void SundialsInterface::resetB(IntegratorMemory* mem) const {

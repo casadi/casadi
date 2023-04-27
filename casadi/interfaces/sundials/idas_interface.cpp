@@ -591,6 +591,9 @@ void IdasInterface::retreat(IntegratorMemory* mem, const double* u,
     &m->nlinsetupsB, &m->netfailsB, &m->qlastB, &m->qcurB, &m->hinusedB,
     &m->hlastB, &m->hcurB, &m->tcurB);
   THROWING(IDAGetNonlinSolvStats, IDAB_mem->IDA_mem, &m->nnitersB, &m->nncfailsB);
+
+  // Add offset corresponding to counters that were set to zero at reinitializations
+  add_offsets(m);
 }
 
 void IdasInterface::idas_error(const char* module, int flag) {

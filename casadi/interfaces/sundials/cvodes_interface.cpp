@@ -337,6 +337,9 @@ void CvodesInterface::impulseB(IntegratorMemory* mem,
     // Mark initialized
     m->first_callB = false;
   } else {
+    // Save solver stats offsets before reset
+    save_offsets(m);
+
     // Reinitialize solver
     THROWING(CVodeReInitB, m->mem, m->whichB, m->t, m->rxz);
     THROWING(CVodeQuadReInitB, m->mem, m->whichB, m->ruq);
@@ -373,6 +376,9 @@ void CvodesInterface::retreat(IntegratorMemory* mem, const double* u,
           &m->nfevalsB, &m->nlinsetupsB, &m->netfailsB, &m->qlastB,
           &m->qcurB, &m->hinusedB, &m->hlastB, &m->hcurB, &m->tcurB);
   THROWING(CVodeGetNonlinSolvStats, cvB_mem->cv_mem, &m->nnitersB, &m->nncfailsB);
+
+  // Add offset corresponding to counters that were set to zero at reinitializations
+  add_offsets(m);
 }
 
 void CvodesInterface::cvodes_error(const char* module, int flag) {

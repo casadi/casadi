@@ -62,16 +62,21 @@ namespace casadi {
     // Jacobian
     double *jacF;
 
-    /// Stats
+    /// Stats, forward integration
     long nsteps, nfevals, nlinsetups, netfails;
     int qlast, qcur;
     double hinused, hlast, hcur, tcur;
     long nniters, nncfails;
 
+    /// Stats, backward integration
     long nstepsB, nfevalsB, nlinsetupsB, netfailsB;
     int qlastB, qcurB;
     double hinusedB, hlastB, hcurB, tcurB;
     long nnitersB, nncfailsB;
+
+    /// Offsets for stats in backward integration
+    long nstepsB_off, nfevalsB_off, nlinsetupsB_off, netfailsB_off;
+    long nnitersB_off, nncfailsB_off;
 
     // Temporaries for [x;z] or [rx;rz]
     double *v1, *v2;
@@ -163,6 +168,15 @@ namespace casadi {
     /** \brief Introduce an impulse into the backwards integration at the current time */
     void impulseB(IntegratorMemory* mem,
       const double* rx, const double* rz, const double* rp) const override;
+
+    /** \brief Reset stats */
+    void reset_stats(SundialsMemory* m) const;
+
+    /** \brief Save stats offsets before reset */
+    void save_offsets(SundialsMemory* m) const;
+
+    /** \brief Add stats offsets to stats */
+    void add_offsets(SundialsMemory* m) const;
 
     /** \brief Cast to memory object */
     static SundialsMemory* to_mem(void *mem) {
