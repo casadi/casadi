@@ -189,7 +189,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target: [manylinux1-x64,manylinux1-x86,manylinux2014-x64,manylinux2014-x86,windows-shared-x64-posix]
+        target: [manylinux1-x64,manylinux1-x86,manylinux2014-x64,manylinux2014-x86,manylinux2014-aarch64,windows-shared-x64-posix]
     steps:
       - uses: actions/checkout@v3.3.0
         with:
@@ -648,11 +648,12 @@ jobs:
           key: "${{matrix.arch}}"
           map: |
            {
-              "manylinux1-x64": {"os": "linux", "bitness": "64"},
-              "manylinux1-x86": {"os": "linux", "bitness": "32"},
-              "manylinux2014-x64": {"os": "linux", "bitness": "64"},
-              "manylinux2014-x86": {"os": "linux", "bitness": "32"},
-              "windows-shared-x64-posix": {"os": "windows", "bitness": "64"}
+              "manylinux1-x64": {"os": "linux", "bitness": "64", "suffix":"64"},
+              "manylinux1-x86": {"os": "linux", "bitness": "32", "suffix":"32"},
+              "manylinux2014-x64": {"os": "linux", "bitness": "64", "suffix":"64"},
+              "manylinux2014-x86": {"os": "linux", "bitness": "32", "suffix":"32"},
+              "manylinux2014-aarch64": {"os": "linux", "bitness": "64", "suffix":"-aarch64"},
+              "windows-shared-x64-posix": {"os": "windows", "bitness": "64", "suffix":"64"}
            }
           export_to: env
       - uses: jgillis/universal_grafter@master
@@ -664,17 +665,17 @@ jobs:
           bitness: ${{env.bitness}}
       - run: |
              cd install
-             echo "This file (and the casadi directory) should end up in a folder called 'casadi-${{env.os}}${{env.bitness}}-py${{matrix.py2}}'" > dummy.txt
-             zip -rq ../casadi-${{env.os}}${{env.bitness}}-py${{matrix.py2}}.zip .
+             echo "This file (and the casadi directory) should end up in a folder called 'casadi-${{env.os}}${{env.suffix}}-py${{matrix.py2}}'" > dummy.txt
+             zip -rq ../casadi-${{env.os}}${{env.suffix}}-py${{matrix.py2}}.zip .
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.4.1
-      - run: cp casadi-${{env.os}}${{env.bitness}}-py${{matrix.py2}}.zip casadi-${{ needs.version.outputs.casadi }}-${{env.os}}${{env.bitness}}-py${{matrix.py2}}.zip
+      - run: cp casadi-${{env.os}}${{env.bitness}}-py${{matrix.py2}}.zip casadi-${{ needs.version.outputs.casadi }}-${{env.os}}${{env.suffix}}-py${{matrix.py2}}.zip
       - name: Delete old release assets
         uses: mknejp/delete-release-assets@v1
         with:
           token: ${{ github.token }}
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
-          assets: casadi-*-${{env.os}}${{env.bitness}}-py${{matrix.py2}}.zip
+          assets: casadi-*-${{env.os}}${{env.suffix}}-py${{matrix.py2}}.zip
           fail-if-no-release: false
           fail-if-no-assets: false
       - name: Upload files to a GitHub release
@@ -682,13 +683,13 @@ jobs:
         with:
           overwrite: true
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
-          file: casadi-${{ needs.version.outputs.casadi }}-${{env.os}}${{env.bitness}}-py${{matrix.py2}}.zip
+          file: casadi-${{ needs.version.outputs.casadi }}-${{env.os}}${{env.suffix}}-py${{matrix.py2}}.zip
           prerelease: true
 
       - uses: actions/upload-artifact@v3.1.2
         with:
-          name: casadi-${{env.os}}${{env.bitness}}-py${{matrix.py2}}
-          path: casadi-${{env.os}}${{env.bitness}}-py${{matrix.py2}}.zip
+          name: casadi-${{env.os}}${{env.suffix}}-py${{matrix.py2}}
+          path: casadi-${{env.os}}${{env.suffix}}-py${{matrix.py2}}.zip
           retention-days: 5
       
       - run: |
