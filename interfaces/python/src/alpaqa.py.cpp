@@ -13,9 +13,6 @@ template <alpaqa::Config Conf>
 void register_problems(py::module_ &m);
 
 template <alpaqa::Config Conf>
-void register_control_problems(py::module_ &m);
-
-template <alpaqa::Config Conf>
 void register_inner_solver(py::module_ &m);
 
 template <alpaqa::Config Conf>
@@ -44,11 +41,17 @@ void register_alm(py::module_ &m);
 
 #if ALPAQA_WITH_OCP
 template <alpaqa::Config Conf>
+void register_control_problems(py::module_ &m);
+
+template <alpaqa::Config Conf>
 void register_panoc_ocp(py::module_ &m);
 
 template <alpaqa::Config Conf>
 void register_ocp(py::module_ &m);
 #else
+template <alpaqa::Config Conf>
+void register_control_problems(py::module_ &) {}
+
 template <alpaqa::Config Conf>
 void register_panoc_ocp(py::module_ &) {}
 
