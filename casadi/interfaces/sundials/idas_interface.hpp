@@ -133,9 +133,6 @@ class CASADI_INTEGRATOR_IDAS_EXPORT IdasInterface : public SundialsInterface {
   /** \brief  Reset the backward problem and take time to tf */
   void resetB(IntegratorMemory* mem) const override;
 
-  /** \brief Helper function: Vector has only zeros? */
-  static bool all_zero(const double* v, casadi_int n);
-
   /** \brief Propagate impulse from rz to rx */
   void z_impulseB(IdasMemory* m, const double* rz) const;
 

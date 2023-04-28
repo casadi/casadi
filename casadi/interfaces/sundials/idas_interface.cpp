@@ -437,17 +437,6 @@ void IdasInterface::resetB(IntegratorMemory* mem) const {
   N_VConst(0.0, m->rxzdot);
 }
 
-bool IdasInterface::all_zero(const double* v, casadi_int n) {
-  // Quick return if trivially zero
-  if (v == 0 || n == 0) return true;
-  // Loop over entries
-  for (casadi_int i = 0; i < n; ++i) {
-    if (v[i] != 0.) return false;
-  }
-  // All zero if reached here
-  return true;
-}
-
 void IdasInterface::z_impulseB(IdasMemory* m, const double* rz) const {
   // Quick return if nothing to propagate
   if (all_zero(rz, nrz_)) return;

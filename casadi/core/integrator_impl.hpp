@@ -271,6 +271,9 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   Function augmented_dae() const;
   ///@}
 
+  /// Helper function: Vector has only zeros?
+  static bool all_zero(const double* v, casadi_int n);
+
   /// Helper function, get augmented system Jacobian
   Sparsity sp_jac_aug(const Sparsity& J, const Sparsity& J1) const;
 

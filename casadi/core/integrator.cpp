@@ -375,6 +375,8 @@ int Integrator::eval(const double** arg, double** res,
     k_stop = nt();
     // Reset the solver
     resetB(m);
+    // Any adjoint seed so far?
+    bool any_impulse = false;
     // Integrate backward
     for (m->k = nt(); m->k-- > 0; ) {
       m->t = tout_[m->k];
@@ -384,7 +386,11 @@ int Integrator::eval(const double** arg, double** res,
       if (rp) rp -= nrp_;
       if (uq) uq -= nuq_;
       if (u) u -= nu_;
-      impulseB(m, rx0, rz0, rp);
+      if (!all_zero(rx0, nrx_) || !all_zero(rz0, nrz_) || !all_zero(rp, nrp_)) {
+        if (verbose_) casadi_message("Impulse from adjoint seeds at output time " + str(m->k));
+        impulseB(m, rx0, rz0, rp);
+        any_impulse = true;
+      }
       // Next output time, or beginning
       casadi_int k_next = m->k - 1;
       m->t_next = k_next < 0 ? t0_ : tout_[k_next];
@@ -392,12 +398,22 @@ int Integrator::eval(const double** arg, double** res,
       if (k_next < k_stop) k_stop = next_stopB(m->k, u);
       m->t_stop = k_stop < 0 ? t0_ : tout_[k_stop];
       // Proceed to the previous time point or t0
-      if (verbose_) casadi_message("Integrating backward from output time " + str(m->k)
-        + ": t_next = " + str(m->t_next) + ", t_stop = " + str(m->t_stop));
-      if (m->k > 0) {
-        retreat(m, u, 0, 0, uq);
+      if (any_impulse) {
+        if (verbose_) casadi_message("Integrating backward from output time " + str(m->k)
+          + ": t_next = " + str(m->t_next) + ", t_stop = " + str(m->t_stop));
+        if (m->k > 0) {
+          retreat(m, u, 0, 0, uq);
+        } else {
+          retreat(m, u, rx, rq, uq);
+        }
       } else {
-        retreat(m, u, rx, rq, uq);
+        if (verbose_) casadi_message("No adjoint seeds from output time " + str(m->k)
+          + ": t_next = " + str(m->t_next) + ", t_stop = " + str(m->t_stop));
+        casadi_clear(uq, nuq_);
+        if (m->k == 0) {
+          casadi_clear(rx, nrx_);
+          casadi_clear(rq, nrq_);
+        }
       }
     }
     // uq should contain the contribution from the grid point, not cumulative
@@ -2264,6 +2280,17 @@ casadi_int Integrator::next_stopB(casadi_int k, const double* u) const {
   }
   // No step changes detected
   return k;
+}
+
+bool Integrator::all_zero(const double* v, casadi_int n) {
+  // Quick return if trivially zero
+  if (v == 0 || n == 0) return true;
+  // Loop over entries
+  for (casadi_int i = 0; i < n; ++i) {
+    if (v[i] != 0.) return false;
+  }
+  // All zero if reached here
+  return true;
 }
 
 
