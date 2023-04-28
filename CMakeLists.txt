@@ -214,6 +214,8 @@ if(CMAKE_CROSS_COMPILING OR DEFINED ENV{CROSS_TRIPLE})
   if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "aarch64")
     # See issue https://github.com/casadi/casadi/issues/2887
     set(CROSS_FLAGS_CONFIGURE ${CROSS_FLAGS_CONFIGURE} "ADD_CXXFLAGS=-Wl,--unresolved-symbols=ignore-all")
+    set(EXTRA_CASADI_CXX_FLAGS "-Wl,--unresolved-symbols=ignore-all")
+    set(EXTRA_CASADI_C_FLAGS "-Wl,--unresolved-symbols=ignore-all")
     #set(CROSS_FLAGS_CMAKE ${CROSS_FLAGS_CMAKE} "-DCMAKE_EXE_LINKER_FLAGS_INIT=--unresolved-symbols=ignore-all")
   endif()
   if("$ENV{CROSS_TRIPLE}" MATCHES "mingw32")
