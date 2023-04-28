@@ -25,7 +25,6 @@ add_library(alpaqa
     "alpaqa/src/outer/alm.cpp"
     "alpaqa/src/outer/internal/alm-helpers.cpp"
     "alpaqa/src/inner/panoc.cpp"
-    "alpaqa/src/inner/panoc-ocp.cpp"
     "alpaqa/src/inner/zerofpr.cpp"
     "alpaqa/src/inner/pantr.cpp"
     "alpaqa/src/panoc-alm.cpp"

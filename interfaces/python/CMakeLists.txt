@@ -29,7 +29,6 @@ pybind11_add_module(_alpaqa MODULE
     "src/inner/panoc-directions.py.cpp"
     "src/inner/inner-solver.py.cpp"
     "src/problem/problems.py.cpp"
-    "src/problem/control-problems.py.cpp"
     "src/params/alm-params.cpp"
     "src/params/anderson-direction-params.cpp"
     "src/params/anderson-params.cpp"
@@ -50,6 +49,7 @@ if (ALPAQA_WITH_OCP)
         "src/inner/panoc-ocp.py.cpp"
         "src/inner/ocp.py.cpp"
         "src/params/panoc-ocp-params.cpp"
+        "src/problem/control-problems.py.cpp"
     )
 endif()
 target_include_directories(_alpaqa PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)

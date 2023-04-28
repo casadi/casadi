@@ -13,6 +13,10 @@
 #include <stdexcept>
 #include <type_traits>
 
+#if !ALPAQA_WITH_OCP
+#error "OCP support disabled"
+#endif
+
 #ifndef NDEBUG
 #include <iostream>
 #endif

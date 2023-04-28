@@ -6,7 +6,9 @@
 
 #pragma once
 
+#if ALPAQA_WITH_OCP
 #include <alpaqa/inner/panoc-ocp.hpp>
+#endif
 #include <alpaqa/inner/panoc.hpp>
 #include <alpaqa/inner/pantr.hpp>
 #include <alpaqa/inner/zerofpr.hpp>

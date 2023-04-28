@@ -25,6 +25,7 @@ void register_inner_solver(py::module_ &m) {
              [](const InnerSolver &self) { return "InnerSolver<" + self.get_name() + ">"; });
     inner_solver_class<InnerSolver>.initialize(std::move(inner_solver));
 
+#if ALPAQA_WITH_OCP
     using TEOCProblem    = alpaqa::TypeErasedControlProblem<config_t>;
     using InnerOCPSolver = alpaqa::TypeErasedInnerSolver<config_t, TEOCProblem>;
     py::class_<InnerOCPSolver> inner_ocp_solver(m, "InnerOCPSolver");
@@ -35,6 +36,7 @@ void register_inner_solver(py::module_ &m) {
         return "InnerOCPSolver<" + self.get_name() + ">";
     });
     inner_solver_class<InnerOCPSolver>.initialize(std::move(inner_ocp_solver));
+#endif
 }
 
 template void register_inner_solver<alpaqa::EigenConfigd>(py::module_ &);

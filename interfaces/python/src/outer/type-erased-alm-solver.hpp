@@ -1,7 +1,9 @@
 #pragma once
 
 #include <alpaqa/inner/inner-solve-options.hpp>
+#if ALPAQA_WITH_OCP
 #include <alpaqa/problem/ocproblem.hpp>
+#endif
 #include <alpaqa/problem/type-erased-problem.hpp>
 #include <alpaqa/util/demangled-typename.hpp>
 #include <functional>
@@ -34,7 +36,11 @@ struct ALMSolverVTable : util::BasicVTable {
     USING_ALPAQA_CONFIG(Conf);
     using Stats = typename ALMSolver<TypeErasedInnerSolver<Conf, TypeErasedProblem<Conf>>>::Stats;
     using Problem =
+#if ALPAQA_WITH_OCP
         std::variant<const TypeErasedProblem<Conf> *, const TypeErasedControlProblem<Conf> *>;
+#else
+        std::variant<const TypeErasedProblem<Conf> *>;
+#endif
 
     // clang-format off
     required_function_t<py::tuple(const Problem &, std::optional<vec> x, std::optional<vec> y, bool async)>
