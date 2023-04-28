@@ -8,3 +8,5 @@ docker build -t ghcr.io/casadi/web:latest -f Dockerfile.web .
 
 docker build -t ghcr.io/jgillis/windows-shared-x64-posix:production -f Dockerfile.windows .
 docker push ghcr.io/jgillis/windows-shared-x64-posix:production
+
+docker tag dockcross/manylinux2014-aarch64:latest ghcr.io/jgillis/manylinux2014-aarch64:production
