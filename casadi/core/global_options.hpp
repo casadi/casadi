@@ -70,6 +70,20 @@ namespace casadi {
 
       static casadi_int start_index;
 
+      static std::string default_compiler;
+
+      static std::string default_linker;
+
+      static std::string default_compiler_setup;
+
+      static std::string default_linker_setup;
+
+      static std::string default_compiler_output_flag;
+
+      static std::string default_linker_output_flag;
+
+      static std::vector<std::string> default_compiler_extra_suffixes;
+
 #endif //SWIG
       // Setter and getter for simplification_on_the_fly
       static void setSimplificationOnTheFly(bool flag) { simplification_on_the_fly = flag; }
@@ -87,6 +101,27 @@ namespace casadi {
 
       static void setMaxNumDir(casadi_int ndir) { max_num_dir=ndir; }
       static casadi_int getMaxNumDir() { return max_num_dir; }
+
+      static void setDefaultCompiler(const std::string& s) { default_compiler = s; }
+      static std::string getDefaultCompiler() { return default_compiler; }
+
+      static void setDefaultLinker(const std::string& s) { default_linker = s; }
+      static std::string getDefaultLinker() { return default_linker; }
+
+      static void setDefaultCompilerSetup(const std::string& s) { default_compiler_setup = s; }
+      static std::string getDefaultCompilerSetup() { return default_compiler_setup; }
+
+      static void setDefaultLinkerSetup(const std::string& s) { default_linker_setup = s; }
+      static std::string getDefaultLinkerSetup() { return default_linker_setup; }
+
+      static void setDefaultCompilerOutputFlag(const std::string& s) { default_compiler_output_flag = s; }
+      static std::string getDefaultCompilerOutputFlag() { return default_compiler_output_flag; }
+
+      static void setDefaultLinkerOutputFlag(const std::string& s) { default_linker_output_flag = s; }
+      static std::string getDefaultLinkerOutputFlag() { return default_linker_output_flag; }
+
+      static void setDefaultCompilerExtraSuffixes(const std::vector<std::string>& s) { default_compiler_extra_suffixes = s; }
+      static std::vector<std::string> getDefaultCompilerExtraSuffixes() { return default_compiler_extra_suffixes; }
 
   };
 
