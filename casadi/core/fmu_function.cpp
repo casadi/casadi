@@ -412,20 +412,20 @@ void Fmu::free_instance(fmi2Component c) const {
 
 int Fmu::init_mem(FmuMemory* m) const {
   // Ensure not already instantiated
-  casadi_assert(m->c == 0, "Already instantiated");
+  casadi_assert(m->instance == 0, "Already instantiated");
   // Create instance
-  m->c = instantiate();
+  m->instance = instantiate();
   // Reset solver
-  setup_experiment(m->c);
+  setup_experiment(m->instance);
   // Set all values
-  if (set_values(m->c)) {
+  if (set_values(m->instance)) {
     casadi_warning("Fmu::set_values failed");
     return 1;
   }
   // Initialization mode begins
-  if (enter_initialization_mode(m->c)) return 1;
+  if (enter_initialization_mode(m->instance)) return 1;
   // Initialization mode ends
-  if (exit_initialization_mode(m->c)) return 1;
+  if (exit_initialization_mode(m->instance)) return 1;
   // Allocate/reset input buffer
   m->ibuf_.resize(iind_.size());
   std::fill(m->ibuf_.begin(), m->ibuf_.end(), casadi::nan);
@@ -485,17 +485,17 @@ void FmuFunction::free_mem(void *mem) const {
   for (FmuMemory*& s : m->slaves) {
     if (!s) continue;
     // Free FMU memory
-    if (s->c) {
-      fmu_->free_instance(s->c);
-      s->c = nullptr;
+    if (s->instance) {
+      fmu_->free_instance(s->instance);
+      s->instance = nullptr;
     }
     // Free the slave
     delete s;
   }
   // Free FMI memory
-  if (m->c) {
-    fmu_->free_instance(m->c);
-    m->c = nullptr;
+  if (m->instance) {
+    fmu_->free_instance(m->instance);
+    m->instance = nullptr;
   }
   // Free the memory object
   delete m;
@@ -707,7 +707,7 @@ int Fmu::eval(FmuMemory* m) const {
   // Fmi return flag
   fmi2Status status;
   // Set all variables
-  status = set_real_(m->c, get_ptr(m->vr_in_), n_set, get_ptr(m->v_in_));
+  status = set_real_(m->instance, get_ptr(m->vr_in_), n_set, get_ptr(m->v_in_));
   if (status != fmi2OK) {
     casadi_warning("fmi2SetReal failed");
     return 1;
@@ -716,7 +716,7 @@ int Fmu::eval(FmuMemory* m) const {
   if (n_out == 0) return 0;
   // Calculate all variables
   m->v_out_.resize(n_out);
-  status = get_real_(m->c, get_ptr(m->vr_out_), n_out, get_ptr(m->v_out_));
+  status = get_real_(m->instance, get_ptr(m->vr_out_), n_out, get_ptr(m->v_out_));
   if (status != fmi2OK) {
     casadi_warning("fmi2GetReal failed");
     return 1;
@@ -811,13 +811,13 @@ int Fmu::eval_ad(FmuMemory* m) const {
   // Quick return if nothing to be calculated
   if (n_unknown == 0) return 0;
   // Evalute (should not be necessary)
-  fmi2Status status = get_real_(m->c, get_ptr(m->vr_out_), n_unknown, get_ptr(m->v_out_));
+  fmi2Status status = get_real_(m->instance, get_ptr(m->vr_out_), n_unknown, get_ptr(m->v_out_));
   if (status != fmi2OK) {
     casadi_warning("fmi2GetReal failed");
     return 1;
   }
   // Evaluate directional derivatives
-  status = get_directional_derivative_(m->c, get_ptr(m->vr_out_), n_unknown,
+  status = get_directional_derivative_(m->instance, get_ptr(m->vr_out_), n_unknown,
     get_ptr(m->vr_in_), n_known, get_ptr(m->d_in_), get_ptr(m->d_out_));
   if (status != fmi2OK) {
     casadi_warning("fmi2GetDirectionalDerivative failed");
@@ -839,7 +839,7 @@ int Fmu::eval_fd(FmuMemory* m, bool independent_seeds) const {
   // Quick return if nothing to be calculated
   if (n_unknown == 0) return 0;
   // Evalute (should not be necessary)
-  fmi2Status status = get_real_(m->c, get_ptr(m->vr_out_), n_unknown, get_ptr(m->v_out_));
+  fmi2Status status = get_real_(m->instance, get_ptr(m->vr_out_), n_unknown, get_ptr(m->v_out_));
   if (status != fmi2OK) {
     casadi_warning("fmi2GetReal failed");
     return 1;
@@ -920,13 +920,13 @@ int Fmu::eval_fd(FmuMemory* m, bool independent_seeds) const {
       m->v_pert_[i] = m->in_bounds_[i] ? test : m->v_in_[i];
     }
     // Pass perturbed inputs to FMU
-    status = set_real_(m->c, get_ptr(m->vr_in_), n_known, get_ptr(m->v_pert_));
+    status = set_real_(m->instance, get_ptr(m->vr_in_), n_known, get_ptr(m->v_pert_));
     if (status != fmi2OK) {
       casadi_warning("fmi2SetReal failed");
       return 1;
     }
     // Evaluate perturbed FMU
-    status = get_real_(m->c, get_ptr(m->vr_out_), n_unknown, yk);
+    status = get_real_(m->instance, get_ptr(m->vr_out_), n_unknown, yk);
     if (status != fmi2OK) {
       casadi_warning("fmi2GetReal failed");
       return 1;
@@ -953,7 +953,7 @@ int Fmu::eval_fd(FmuMemory* m, bool independent_seeds) const {
     }
   }
   // Restore FMU inputs
-  status = set_real_(m->c, get_ptr(m->vr_in_), n_known, get_ptr(m->v_in_));
+  status = set_real_(m->instance, get_ptr(m->vr_in_), n_known, get_ptr(m->v_in_));
   if (status != fmi2OK) {
     casadi_warning("fmi2SetReal failed");
     return 1;

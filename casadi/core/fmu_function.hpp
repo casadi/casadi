@@ -61,8 +61,8 @@ struct CASADI_EXPORT FmuMemory : public FunctionMemory {
   double *aseed, *asens, *pert_asens;
   // Memory for Jacobian calculation
   casadi_jac_data<double> d;
-  // Component memory
-  fmi2Component c;
+  // Instance memory
+  void* instance;
   // Additional (slave) memory objects
   std::vector<FmuMemory*> slaves;
   // Input and output buffers
@@ -86,7 +86,7 @@ struct CASADI_EXPORT FmuMemory : public FunctionMemory {
   // Work vector (reals)
   std::vector<fmi2Real> v_in_, v_out_, d_in_, d_out_, fd_out_, v_pert_;
   // Constructor
-  explicit FmuMemory(const FmuFunction& self) : self(self), c(nullptr) {}
+  explicit FmuMemory(const FmuFunction& self) : self(self), instance(nullptr) {}
 };
 
 /// Variable type
