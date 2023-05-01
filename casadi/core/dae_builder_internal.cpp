@@ -297,7 +297,7 @@ XmlNode Variable::export_xml(const DaeBuilderInternal& self) const {
   // Name of variable
   r.set_attribute("name", name);
   // Value reference
-  r.set_attribute("valueReference", value_reference);
+  r.set_attribute("valueReference", static_cast<casadi_int>(value_reference));
   // Description, if any
   if (!description.empty()) r.set_attribute("description", description);
   // Causality
@@ -348,7 +348,8 @@ XmlNode Variable::export_xml(const DaeBuilderInternal& self) const {
   }
   // Derivative attribute, if any
   if (der_of >= 0) {
-      r.set_attribute("derivative", self.variable(der_of).value_reference);
+      r.set_attribute("derivative",
+        static_cast<casadi_int>(self.variable(der_of).value_reference));
   }
   // Return XML representation
   return r;
@@ -595,7 +596,7 @@ XmlNode DaeBuilderInternal::generate_model_structure() const {
     const Variable& y = variable(i);
     XmlNode c;
     c.name = "Output";
-    c.set_attribute("valueReference", y.value_reference);
+    c.set_attribute("valueReference", static_cast<casadi_int>(y.value_reference));
     c.set_attribute("dependencies", y.dependencies);
  r.children.push_back(c);
   }
@@ -604,7 +605,7 @@ XmlNode DaeBuilderInternal::generate_model_structure() const {
     const Variable& xdot = variable(variable(i).der);
     XmlNode c;
     c.name = "ContinuousStateDerivative";
-    c.set_attribute("valueReference", xdot.value_reference);
+    c.set_attribute("valueReference", static_cast<casadi_int>(xdot.value_reference));
     c.set_attribute("dependencies", xdot.dependencies);
     r.children.push_back(c);
   }
@@ -613,7 +614,7 @@ XmlNode DaeBuilderInternal::generate_model_structure() const {
     const Variable& y = variable(i);
     XmlNode c;
     c.name = "InitialUnknown";
-    c.set_attribute("valueReference", y.value_reference);
+    c.set_attribute("valueReference", static_cast<casadi_int>(y.value_reference));
     c.set_attribute("dependencies", y.dependencies);
     r.children.push_back(c);
   }
@@ -622,7 +623,7 @@ XmlNode DaeBuilderInternal::generate_model_structure() const {
     const Variable& xdot = variable(variable(i).der);
     XmlNode c;
     c.name = "InitialUnknown";
-    c.set_attribute("valueReference", xdot.value_reference);
+    c.set_attribute("valueReference", static_cast<casadi_int>(xdot.value_reference));
     c.set_attribute("dependencies", xdot.dependencies);
     r.children.push_back(c);
   }
@@ -2531,7 +2532,7 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
     var.v = MX::sym(name);
 
     // Read common attributes, cf. FMI 2.0.2 specification, 2.2.7
-    var.value_reference = vnode.attribute<casadi_int>("valueReference");
+    var.value_reference = static_cast<unsigned int>(vnode.attribute<casadi_int>("valueReference"));
     var.description = vnode.attribute<std::string>("description", "");
     std::string causality_str = vnode.attribute<std::string>("causality", "local");
     if (causality_str == "internal") causality_str = "local";  // FMI 1.0 -> FMI 2.0

@@ -85,7 +85,7 @@ struct CASADI_EXPORT Variable {
   /** Attributes common to all types of variables, cf. Table 17 in FMI specification */
   ///@{
   std::string name;
-  casadi_int value_reference;
+  unsigned int value_reference;
   std::string description;
   Type type;
   Causality causality;

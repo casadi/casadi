@@ -82,7 +82,7 @@ struct CASADI_EXPORT FmuMemory : public FunctionMemory {
   // Flip sign?
   std::vector<bool> flip_;
   // Value references
-  std::vector<fmi2ValueReference> vr_in_, vr_out_;
+  std::vector<unsigned int> vr_in_, vr_out_;
   // Work vector (reals)
   std::vector<fmi2Real> v_in_, v_out_, d_in_, d_out_, fd_out_, v_pert_;
   // Constructor
