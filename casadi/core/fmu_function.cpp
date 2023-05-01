@@ -462,7 +462,7 @@ int FmuFunction::init_mem(void* mem) const {
   for (casadi_int i = 0; i < n_mem; ++i) {
     // Initialize the memory object itself or a slave
     FmuMemory* m1 = i == 0 ? m : m->slaves.at(i - 1);
-    if (fmu_->init_mem(m1)) return 1;
+    if (get_fmu(fmu_)->init_mem(m1)) return 1;
   }
   return 0;
 }
@@ -486,7 +486,7 @@ void FmuFunction::free_mem(void *mem) const {
     if (!s) continue;
     // Free FMU memory
     if (s->instance) {
-      fmu_->free_instance(s->instance);
+      get_fmu(fmu_)->free_instance(s->instance);
       s->instance = nullptr;
     }
     // Free the slave
@@ -494,7 +494,7 @@ void FmuFunction::free_mem(void *mem) const {
   }
   // Free FMI memory
   if (m->instance) {
-    fmu_->free_instance(m->instance);
+    get_fmu(fmu_)->free_instance(m->instance);
     m->instance = nullptr;
   }
   // Free the memory object
@@ -1147,15 +1147,15 @@ size_t Fmu::index_out(const std::string& n) const {
   return -1;
 }
 
-FmuFunction::FmuFunction(const std::string& name, Fmu* fmu,
+FmuFunction::FmuFunction(const std::string& name, int fmu,
     const std::vector<std::string>& name_in,
     const std::vector<std::string>& name_out)
-    : FunctionInternal(name), fmu_(fmu) {
+    : FunctionInternal(name), fmu_(-1) {
   // Parse input IDs
   in_.resize(name_in.size());
   for (size_t k = 0; k < name_in.size(); ++k) {
     try {
-      in_[k] = InputStruct::parse(name_in[k], fmu);
+      in_[k] = InputStruct::parse(name_in[k], get_fmu(fmu));
     } catch (std::exception& e) {
       casadi_error("Cannot process input " + name_in[k] + ": " + std::string(e.what()));
     }
@@ -1164,7 +1164,7 @@ FmuFunction::FmuFunction(const std::string& name, Fmu* fmu,
   out_.resize(name_out.size());
   for (size_t k = 0; k < name_out.size(); ++k) {
     try {
-      out_[k] = OutputStruct::parse(name_out[k], fmu);
+      out_[k] = OutputStruct::parse(name_out[k], get_fmu(fmu));
     } catch (std::exception& e) {
       casadi_error("Cannot process output " + name_out[k] + ": " + std::string(e.what()));
     }
@@ -1173,7 +1173,7 @@ FmuFunction::FmuFunction(const std::string& name, Fmu* fmu,
   name_in_ = name_in;
   name_out_ = name_out;
   // Default options
-  enable_ad_ = fmu_->get_directional_derivative_ != 0;
+  enable_ad_ = get_fmu(fmu)->get_directional_derivative_ != 0;
   validate_ad_ = false;
   validate_ad_file_ = "";
   make_symmetric_ = true;
@@ -1191,14 +1191,15 @@ FmuFunction::FmuFunction(const std::string& name, Fmu* fmu,
   max_n_tasks_ = 1;
   max_jac_tasks_ = max_hess_tasks_ = 0;
   // Increase reference counter (at end in case exception is thrown)
-  fmu_->counter_++;
+  incref_fmu(fmu);
+  fmu_ = fmu;
 }
 
 FmuFunction::~FmuFunction() {
   // Free memory
   clear_mem();
   // Decrease reference pointer to Fmu instance
-  if (fmu_ && --fmu_->counter_ == 0) delete fmu_;
+  if (fmu_ >= 0) release_fmu(fmu_);
 }
 
 const Options FmuFunction::options_
@@ -1297,7 +1298,7 @@ void FmuFunction::init(const Dict& opts) {
   fd_ = to_enum<FdMode>(fd_method_, "forward");
 
   // Consistency checks
-  if (enable_ad_) casadi_assert(fmu_->get_directional_derivative_ != nullptr,
+  if (enable_ad_) casadi_assert(get_fmu(fmu_)->get_directional_derivative_ != nullptr,
     "FMU does not provide support for analytic derivatives");
   if (validate_ad_ && !enable_ad_) casadi_error("Inconsistent options");
 
@@ -1361,14 +1362,14 @@ void FmuFunction::init(const Dict& opts) {
   }
 
   // Collect all inputs in any Jacobian, Hessian or adjoint block
-  std::vector<size_t> in_jac(fmu_->iind_.size(), 0);
+  std::vector<size_t> in_jac(get_fmu(fmu_)->iind_.size(), 0);
   jac_in_.clear();
   jac_nom_in_.clear();
   for (auto&& i : out_) {
     if (i.type == OutputType::JAC || i.type == OutputType::JAC_TRANS
         || i.type == OutputType::ADJ || i.type == OutputType::HESS) {
       // Get input indices
-      const std::vector<size_t>& iind = fmu_->ired_.at(i.wrt);
+      const std::vector<size_t>& iind = get_fmu(fmu_)->ired_.at(i.wrt);
       // Skip if no entries
       if (iind.empty()) continue;
       // Consistency check
@@ -1378,7 +1379,7 @@ void FmuFunction::init(const Dict& opts) {
       if (!exists) {
         for (size_t j : iind) {
           jac_in_.push_back(j);
-          jac_nom_in_.push_back(fmu_->nominal_in_[j]);
+          jac_nom_in_.push_back(get_fmu(fmu_)->nominal_in_[j]);
           in_jac[j] = jac_in_.size();
         }
       }
@@ -1388,7 +1389,7 @@ void FmuFunction::init(const Dict& opts) {
       // Also rows for Hessian blocks
       if (i.type == OutputType::HESS) {
         // Get input indices
-        const std::vector<size_t>& iind = fmu_->ired_.at(i.ind);
+        const std::vector<size_t>& iind = get_fmu(fmu_)->ired_.at(i.ind);
         // Skip if no entries
         if (iind.empty()) continue;
         // Consistency check
@@ -1398,7 +1399,7 @@ void FmuFunction::init(const Dict& opts) {
         if (!exists) {
           for (size_t j : iind) {
             jac_in_.push_back(j);
-            jac_nom_in_.push_back(fmu_->nominal_in_[j]);
+            jac_nom_in_.push_back(get_fmu(fmu_)->nominal_in_[j]);
             in_jac[j] = jac_in_.size();
           }
         }
@@ -1414,14 +1415,14 @@ void FmuFunction::init(const Dict& opts) {
   sp_trans_.clear();
 
   // Collect all outputs in any Jacobian or adjoint block
-  in_jac.resize(fmu_->oind_.size());
+  in_jac.resize(get_fmu(fmu_)->oind_.size());
   std::fill(in_jac.begin(), in_jac.end(), 0);
   jac_out_.clear();
   for (size_t k = 0; k < out_.size(); ++k) {
     OutputStruct& i = out_[k];
     if (i.type == OutputType::JAC || i.type == OutputType::JAC_TRANS) {
       // Get output indices
-      const std::vector<size_t>& oind = fmu_->ored_.at(i.ind);
+      const std::vector<size_t>& oind = get_fmu(fmu_)->ored_.at(i.ind);
       // Skip if no entries
       if (oind.empty()) continue;
       // Consistency check
@@ -1453,7 +1454,7 @@ void FmuFunction::init(const Dict& opts) {
   for (auto&& i : in_) {
     if (i.type == InputType::ADJ) {
       // Get output indices
-      const std::vector<size_t>& oind = fmu_->ored_.at(i.ind);
+      const std::vector<size_t>& oind = get_fmu(fmu_)->ored_.at(i.ind);
       // Skip if no entries
       if (oind.empty()) continue;
       // Consistency check
@@ -1470,7 +1471,7 @@ void FmuFunction::init(const Dict& opts) {
   }
 
   // Get sparsity pattern for extended Jacobian
-  jac_sp_ = fmu_->jac_sparsity(jac_out_, jac_in_);
+  jac_sp_ = get_fmu(fmu_)->jac_sparsity(jac_out_, jac_in_);
 
   // Calculate graph coloring
   jac_colors_ = jac_sp_.uni_coloring();
@@ -1493,14 +1494,14 @@ void FmuFunction::init(const Dict& opts) {
 
   // Work vectors for adjoint derivative calculation, shared between threads
   if (has_adj_) {
-    alloc_w(fmu_->oind_.size(), true);  // aseed
-    alloc_w(fmu_->iind_.size(), true);  // asens
+    alloc_w(get_fmu(fmu_)->oind_.size(), true);  // aseed
+    alloc_w(get_fmu(fmu_)->iind_.size(), true);  // asens
   }
 
   // If Hessian calculation is needed
   if (has_hess_) {
     // Get sparsity pattern for extended Hessian
-    hess_sp_ = fmu_->hess_sparsity(jac_in_, jac_in_);
+    hess_sp_ = get_fmu(fmu_)->hess_sparsity(jac_in_, jac_in_);
     casadi_assert(hess_sp_.size1() == jac_in_.size(), "Inconsistent Hessian dimensions");
     casadi_assert(hess_sp_.size2() == jac_in_.size(), "Inconsistent Hessian dimensions");
     const casadi_int *hess_row = hess_sp_.row();
@@ -1539,10 +1540,10 @@ void FmuFunction::init(const Dict& opts) {
     alloc_w(hess_sp_.nnz(), true);  // hess_nz
 
     // Work vector for perturbed adjoint sensitivities
-    alloc_w(max_hess_tasks_ * fmu_->iind_.size(), true);  // pert_asens
+    alloc_w(max_hess_tasks_ * get_fmu(fmu_)->iind_.size(), true);  // pert_asens
 
     // Work vector for avoiding conflicting assignments for star coloring
-    alloc_iw(max_hess_tasks_ * fmu_->iind_.size(), true);  // star_iw
+    alloc_iw(max_hess_tasks_ * get_fmu(fmu_)->iind_.size(), true);  // star_iw
 
     // Work vector for making symmetric or checking symmetry
     alloc_iw(hess_sp_.size2());
@@ -1742,15 +1743,15 @@ OutputStruct OutputStruct::parse(const std::string& n, const Fmu* fmu,
 Sparsity FmuFunction::get_sparsity_in(casadi_int i) {
   switch (in_.at(i).type) {
     case InputType::REG:
-      return Sparsity::dense(fmu_->ired_.at(in_.at(i).ind).size(), 1);
+      return Sparsity::dense(get_fmu(fmu_)->ired_.at(in_.at(i).ind).size(), 1);
     case InputType::FWD:
-      return Sparsity::dense(fmu_->ired_.at(in_.at(i).ind).size(), 1);
+      return Sparsity::dense(get_fmu(fmu_)->ired_.at(in_.at(i).ind).size(), 1);
     case InputType::ADJ:
-      return Sparsity::dense(fmu_->ored_.at(in_.at(i).ind).size(), 1);
+      return Sparsity::dense(get_fmu(fmu_)->ored_.at(in_.at(i).ind).size(), 1);
     case InputType::OUT:
-      return Sparsity(fmu_->ored_.at(in_.at(i).ind).size(), 1);
+      return Sparsity(get_fmu(fmu_)->ored_.at(in_.at(i).ind).size(), 1);
     case InputType::ADJ_OUT:
-      return Sparsity(fmu_->ired_.at(in_.at(i).ind).size(), 1);
+      return Sparsity(get_fmu(fmu_)->ired_.at(in_.at(i).ind).size(), 1);
   }
   return Sparsity();
 }
@@ -1759,21 +1760,21 @@ Sparsity FmuFunction::get_sparsity_out(casadi_int i) {
   const OutputStruct& s = out_.at(i);
   switch (out_.at(i).type) {
     case OutputType::REG:
-      return Sparsity::dense(fmu_->ored_.at(s.ind).size(), 1);
+      return Sparsity::dense(get_fmu(fmu_)->ored_.at(s.ind).size(), 1);
     case OutputType::FWD:
-      return Sparsity::dense(fmu_->ored_.at(s.ind).size(), 1);
+      return Sparsity::dense(get_fmu(fmu_)->ored_.at(s.ind).size(), 1);
     case OutputType::ADJ:
-      return Sparsity::dense(fmu_->ired_.at(s.wrt).size(), 1);
+      return Sparsity::dense(get_fmu(fmu_)->ired_.at(s.wrt).size(), 1);
     case OutputType::JAC:
-      return fmu_->jac_sparsity(s.ind, s.wrt);
+      return get_fmu(fmu_)->jac_sparsity(s.ind, s.wrt);
     case OutputType::JAC_TRANS:
-      return fmu_->jac_sparsity(s.ind, s.wrt).T();
+      return get_fmu(fmu_)->jac_sparsity(s.ind, s.wrt).T();
     case OutputType::JAC_ADJ_OUT:
-      return Sparsity(fmu_->ired_.at(s.ind).size(), fmu_->ored_.at(s.wrt).size());
+      return Sparsity(get_fmu(fmu_)->ired_.at(s.ind).size(), get_fmu(fmu_)->ored_.at(s.wrt).size());
     case OutputType::JAC_REG_ADJ:
-      return Sparsity(fmu_->ored_.at(s.ind).size(), fmu_->ored_.at(s.wrt).size());
+      return Sparsity(get_fmu(fmu_)->ored_.at(s.ind).size(), get_fmu(fmu_)->ored_.at(s.wrt).size());
     case OutputType::HESS:
-      return fmu_->hess_sparsity(s.ind, s.wrt);
+      return get_fmu(fmu_)->hess_sparsity(s.ind, s.wrt);
   }
   return Sparsity();
 }
@@ -1781,13 +1782,13 @@ Sparsity FmuFunction::get_sparsity_out(casadi_int i) {
 std::vector<double> FmuFunction::get_nominal_in(casadi_int i) const {
   switch (in_.at(i).type) {
     case InputType::REG:
-      return fmu_->get_nominal_in(in_.at(i).ind);
+      return get_fmu(fmu_)->get_nominal_in(in_.at(i).ind);
     case InputType::FWD:
       break;
     case InputType::ADJ:
       break;
     case InputType::OUT:
-      return fmu_->get_nominal_out(in_.at(i).ind);
+      return get_fmu(fmu_)->get_nominal_out(in_.at(i).ind);
     case InputType::ADJ_OUT:
       break;
   }
@@ -1798,7 +1799,7 @@ std::vector<double> FmuFunction::get_nominal_in(casadi_int i) const {
 std::vector<double> FmuFunction::get_nominal_out(casadi_int i) const {
   switch (out_.at(i).type) {
     case OutputType::REG:
-      return fmu_->get_nominal_out(out_.at(i).ind);
+      return get_fmu(fmu_)->get_nominal_out(out_.at(i).ind);
     case OutputType::FWD:
       break;
     case OutputType::ADJ:
@@ -1858,15 +1859,15 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
   }
   if (need_adj) {
     // Set up vectors
-    aseed = w; w += fmu_->oind_.size();
-    asens = w; w += fmu_->iind_.size();
+    aseed = w; w += get_fmu(fmu_)->oind_.size();
+    asens = w; w += get_fmu(fmu_)->iind_.size();
     // Clear seed/sensitivity vectors
-    std::fill(aseed, aseed + fmu_->oind_.size(), 0);
-    std::fill(asens, asens + fmu_->iind_.size(), 0);
+    std::fill(aseed, aseed + get_fmu(fmu_)->oind_.size(), 0);
+    std::fill(asens, asens + get_fmu(fmu_)->iind_.size(), 0);
     // Copy adjoint seeds to aseed
     for (size_t i = 0; i < in_.size(); ++i) {
       if (arg[i] && in_[i].type == InputType::ADJ) {
-        const std::vector<size_t>& oind = fmu_->ored_[in_[i].ind];
+        const std::vector<size_t>& oind = get_fmu(fmu_)->ored_[in_[i].ind];
         for (size_t k = 0; k < oind.size(); ++k) aseed[oind[k]] = arg[i][k];
       }
     }
@@ -1891,10 +1892,10 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
     if (task < max_hess_tasks_) {
       // Perturbed adjoint sensitivities
       s->pert_asens = w;
-      w += fmu_->iind_.size();
+      w += get_fmu(fmu_)->iind_.size();
       // Work vector for avoiding assignment of illegal nonzeros
       s->star_iw = iw;
-      iw += fmu_->iind_.size();
+      iw += get_fmu(fmu_)->iind_.size();
     }
   }
   // Evaluate everything except Hessian, possibly in parallel
@@ -1926,7 +1927,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
         casadi_trans(w, sp_trans_[sp_trans_map_[k]], r, sparsity_out(k), iw);
         break;
       case OutputType::ADJ:
-        for (size_t id : fmu_->ired_[out_[k].wrt]) *r++ = asens[id];
+        for (size_t id : get_fmu(fmu_)->ired_[out_[k].wrt]) *r++ = asens[id];
         break;
       case OutputType::HESS:
         casadi_get_sub(r, hess_sp_, hess_nz,
@@ -2006,22 +2007,22 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
   // Pass all regular inputs
   for (size_t k = 0; k < in_.size(); ++k) {
     if (in_[k].type == InputType::REG) {
-      fmu_->set(m, in_[k].ind, m->arg[k]);
+      get_fmu(fmu_)->set(m, in_[k].ind, m->arg[k]);
     }
   }
   // Request all regular outputs to be evaluated
   for (size_t k = 0; k < out_.size(); ++k) {
     if (m->res[k] && out_[k].type == OutputType::REG) {
-      fmu_->request(m, out_[k].ind);
+      get_fmu(fmu_)->request(m, out_[k].ind);
     }
   }
   // Evaluate
-  if (fmu_->eval(m)) return 1;
+  if (get_fmu(fmu_)->eval(m)) return 1;
   // Get regular outputs (master thread only)
   if (need_nondiff) {
     for (size_t k = 0; k < out_.size(); ++k) {
       if (m->res[k] && out_[k].type == OutputType::REG) {
-        fmu_->get(m, out_[k].ind, m->res[k]);
+        get_fmu(fmu_)->get(m, out_[k].ind, m->res[k]);
       }
     }
   }
@@ -2038,10 +2039,10 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
       // Get derivative directions
       casadi_jac_pre(&p_, &m->d, c);
       // Calculate derivatives
-      fmu_->set_seed(m, m->d.nseed, m->d.iseed, m->d.seed);
-      fmu_->request_sens(m, m->d.nsens, m->d.isens, m->d.wrt);
-      if (fmu_->eval_derivative(m, true)) return 1;
-      fmu_->get_sens(m, m->d.nsens, m->d.isens, m->d.sens);
+      get_fmu(fmu_)->set_seed(m, m->d.nseed, m->d.iseed, m->d.seed);
+      get_fmu(fmu_)->request_sens(m, m->d.nsens, m->d.isens, m->d.wrt);
+      if (get_fmu(fmu_)->eval_derivative(m, true)) return 1;
+      get_fmu(fmu_)->get_sens(m, m->d.nsens, m->d.isens, m->d.sens);
       // Scale derivatives
       casadi_jac_scale(&p_, &m->d);
       // Collect Jacobian nonzeros
@@ -2088,15 +2089,16 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
         // Get unperturbed value
         x[v] = m->ibuf_.at(id);
         // Step size
-        h[v] = m->self.step_ * fmu_->nominal_in_.at(id);
+        h[v] = m->self.step_ * get_fmu(fmu_)->nominal_in_.at(id);
         // Make sure a a forward step remains in bounds
-        if (x[v] + h[v] > fmu_->max_in_.at(id)) {
+        if (x[v] + h[v] > get_fmu(fmu_)->max_in_.at(id)) {
           // Ensure a negative step is possible
-          if (m->ibuf_.at(id) - h[v] < fmu_->min_in_.at(id)) {
+          if (m->ibuf_.at(id) - h[v] < get_fmu(fmu_)->min_in_.at(id)) {
             std::stringstream ss;
-            ss << "Cannot perturb " << fmu_->vn_in_.at(id) << " at " << x[v] << " with step size "
-              << m->self.step_ << ", nominal " << fmu_->nominal_in_.at(id) << " min "
-              << fmu_->min_in_.at(id) << ", max " << fmu_->max_in_.at(id);
+            ss << "Cannot perturb " << get_fmu(fmu_)->vn_in_.at(id) << " at " << x[v]
+              << " with step size "
+              << m->self.step_ << ", nominal " << get_fmu(fmu_)->nominal_in_.at(id) << " min "
+              << get_fmu(fmu_)->min_in_.at(id) << ", max " << get_fmu(fmu_)->max_in_.at(id);
             casadi_warning(ss.str());
             return 1;
           }
@@ -2115,18 +2117,18 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
         m->wrt_.at(i) = -1;
       }
       // Calculate perturbed inputs
-      if (fmu_->eval(m)) return 1;
+      if (get_fmu(fmu_)->eval(m)) return 1;
       // Clear perturbed adjoint sensitivities
-      std::fill(m->pert_asens, m->pert_asens + fmu_->iind_.size(), 0);
+      std::fill(m->pert_asens, m->pert_asens + get_fmu(fmu_)->iind_.size(), 0);
       // Loop over colors of the Jacobian
       for (casadi_int c1 = 0; c1 < jac_colors_.size2(); ++c1) {
        // Get derivative directions
        casadi_jac_pre(&p_, &m->d, c1);
        // Calculate derivatives
-       fmu_->set_seed(m, m->d.nseed, m->d.iseed, m->d.seed);
-       fmu_->request_sens(m, m->d.nsens, m->d.isens, m->d.wrt);
-       if (fmu_->eval_derivative(m, true)) return 1;
-       fmu_->get_sens(m, m->d.nsens, m->d.isens, m->d.sens);
+       get_fmu(fmu_)->set_seed(m, m->d.nseed, m->d.iseed, m->d.seed);
+       get_fmu(fmu_)->request_sens(m, m->d.nsens, m->d.isens, m->d.wrt);
+       if (get_fmu(fmu_)->eval_derivative(m, true)) return 1;
+       get_fmu(fmu_)->get_sens(m, m->d.nsens, m->d.isens, m->d.sens);
        // Scale derivatives
        casadi_jac_scale(&p_, &m->d);
        // Propagate adjoint sensitivities
@@ -2134,7 +2136,7 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
          m->pert_asens[m->d.wrt[i]] += m->aseed[m->d.isens[i]] * m->d.sens[i];
       }
       // Count how many times each input is calculated
-      std::fill(m->star_iw, m->star_iw + fmu_->iind_.size(), 0);
+      std::fill(m->star_iw, m->star_iw + get_fmu(fmu_)->iind_.size(), 0);
       for (casadi_int v = 0; v < nv; ++v) {
         casadi_int ind1 = hc_row[v_begin + v];
         for (casadi_int k = hess_colind[ind1]; k < hess_colind[ind1 + 1]; ++k) {
@@ -2191,8 +2193,8 @@ void FmuFunction::check_hessian(FmuMemory* m, const double *hess_nz, casadi_int*
       // Check if entry is NaN of inf
       if (std::isnan(nz) || std::isinf(nz)) {
         std::stringstream ss;
-        ss << "Second derivative w.r.t. " << fmu_->desc_in(m, id_r) << " and "
-          << fmu_->desc_in(m, id_r) << " is " << nz;
+        ss << "Second derivative w.r.t. " << get_fmu(fmu_)->desc_in(m, id_r) << " and "
+          << get_fmu(fmu_)->desc_in(m, id_r) << " is " << nz;
         casadi_warning(ss.str());
         // Further checks not needed for entry
         continue;
@@ -2205,8 +2207,8 @@ void FmuFunction::check_hessian(FmuMemory* m, const double *hess_nz, casadi_int*
         if (nz_max > abstol_ && std::fabs(nz - nz_tr) > nz_max * reltol_) {
           std::stringstream ss;
           ss << "Hessian appears nonsymmetric. Got " << nz << " vs. " << nz_tr
-            << " for second derivative w.r.t. " << fmu_->desc_in(m, id_r) << " and "
-            << fmu_->desc_in(m, id_c) << ", hess_nz = " << k << "/" <<  k_tr;
+            << " for second derivative w.r.t. " << get_fmu(fmu_)->desc_in(m, id_r) << " and "
+            << get_fmu(fmu_)->desc_in(m, id_c) << ", hess_nz = " << k << "/" <<  k_tr;
           casadi_warning(ss.str());
         }
       }
@@ -2472,15 +2474,15 @@ Sparsity FmuFunction::get_jac_sparsity(casadi_int oind, casadi_int iind,
   // Available in the FMU meta information
   if (out_.at(oind).type == OutputType::REG) {
     if (in_.at(iind).type == InputType::REG) {
-      return fmu_->jac_sparsity(out_.at(oind).ind, in_.at(iind).ind);
+      return get_fmu(fmu_)->jac_sparsity(out_.at(oind).ind, in_.at(iind).ind);
     } else if (in_.at(iind).type == InputType::ADJ) {
       return Sparsity(nnz_out(oind), nnz_in(iind));
     }
   } else if (out_.at(oind).type == OutputType::ADJ) {
     if (in_.at(iind).type == InputType::REG) {
-      return fmu_->hess_sparsity(out_.at(oind).wrt, in_.at(iind).ind);
+      return get_fmu(fmu_)->hess_sparsity(out_.at(oind).wrt, in_.at(iind).ind);
     } else if (in_.at(iind).type == InputType::ADJ) {
-      return fmu_->jac_sparsity(in_.at(iind).ind, out_.at(oind).wrt).T();
+      return get_fmu(fmu_)->jac_sparsity(in_.at(iind).ind, out_.at(oind).wrt).T();
     }
   }
   // Not available
@@ -2494,9 +2496,74 @@ Dict FmuFunction::get_stats(void *mem) const {
   // Get memory object
   FmuMemory* m = static_cast<FmuMemory*>(mem);
   // Get auxilliary variables from Fmu
-  fmu_->get_stats(m, &stats, name_in_, get_ptr(in_));
+  get_fmu(fmu_)->get_stats(m, &stats, name_in_, get_ptr(in_));
   // Return stats
   return stats;
+}
+
+int FmuFunction::alloc_fmu(const DaeBuilderInternal* dae,
+    const std::vector<std::string>& scheme_in,
+    const std::vector<std::string>& scheme_out,
+    const std::map<std::string, std::vector<size_t>>& scheme,
+    const std::vector<std::string>& aux) {
+  // New FMU instance (to be shared between derivative functions)
+  Fmu* fmu = new Fmu(scheme_in, scheme_out, scheme, aux);
+  try {
+    // Initialize
+    fmu->init(dae);
+  } catch (std::exception& e) {
+    delete fmu;
+    casadi_error("Fmu::init() failed: " + std::string(e.what()));
+  }
+  // Save to memory bank, reuse memory location if possible
+  for (int mem = 0; mem < fmu_mem().size(); ++mem) {
+    if (fmu_mem().at(mem) == nullptr) {
+      fmu_mem().at(mem) = fmu;
+      return mem;
+    }
+  }
+  // New memory location
+  int mem = fmu_mem().size();
+  fmu_mem().push_back(fmu);
+  return mem;
+}
+
+Fmu* FmuFunction::get_fmu(int fmu) {
+  Fmu* ret = fmu_mem().at(fmu);
+  casadi_assert_dev(ret != nullptr);
+  return ret;
+}
+
+void FmuFunction::release_fmu(int fmu) {
+  // Get memory
+  std::vector<Fmu*>& mem = fmu_mem();
+  // Make sure it's a valid entry
+  if (fmu < 0 || fmu >= mem.size()) {
+    casadi_warning("FMU memory management corrupted");
+    return;
+  }
+  // Decrease counter
+  Fmu* m = mem[fmu];
+  if (m == nullptr) {
+    casadi_warning("FMU memory has already been freed");
+    return;
+  }
+  // Decrease counter
+  if (--m->counter_ == 0) {
+    // Last instance - free
+    mem[fmu] = 0;
+    delete m;
+  }
+}
+
+void FmuFunction::incref_fmu(int fmu) {
+  get_fmu(fmu)->counter_++;
+}
+
+std::vector<Fmu*>& FmuFunction::fmu_mem() {
+  // Singleton
+  static std::vector<Fmu*> fmu_mem_;
+  return fmu_mem_;
 }
 
 #endif  // WITH_FMU

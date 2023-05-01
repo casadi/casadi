@@ -2263,14 +2263,8 @@ Function DaeBuilderInternal::fmu_fun(const std::string& name,
     }
   }
   // New FMU instance (to be shared between derivative functions)
-  Fmu* fmu = new Fmu(scheme_in, scheme_out, scheme, aux);
-  try {
-    // Initialize
-    fmu->init(this);
-  } catch (std::exception& e) {
-    delete fmu;
-    casadi_error("Fmu::init() failed: " + std::string(e.what()));
-  }
+  int fmu = FmuFunction::alloc_fmu(this, scheme_in, scheme_out, scheme, aux);
+
   // Crete new function
   return Function::create(new FmuFunction(name, fmu, name_in, name_out), opts);
 #else  // WITH_FMU
