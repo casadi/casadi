@@ -892,10 +892,15 @@ int Fmu::eval_fd(FmuMemory* m, bool independent_seeds) const {
       }
     }
   }
+  // All perturbed outputs
+  const fmi2Real* yk_all[5] = {0};
+
   // Calculate all perturbed outputs
   for (casadi_int k = 0; k < n_points; ++k) {
     // Where to save the perturbed outputs
     double* yk = &m->fd_out_[n_unknown * k];
+    casadi_assert_dev(k < 5);
+    yk_all[k] = yk;
     // If unperturbed output, quick return
     if (k == offset) {
       casadi_copy(get_ptr(m->v_out_), n_unknown, yk);
@@ -957,7 +962,7 @@ int Fmu::eval_fd(FmuMemory* m, bool independent_seeds) const {
   double h = m->self.step_;
 
   // Calculate FD approximation
-  finite_diff(m->self.fd_, get_ptr(m->fd_out_), get_ptr(m->d_out_), h, n_unknown, eps);
+  finite_diff(m->self.fd_, yk_all, get_ptr(m->d_out_), h, n_unknown, eps);
 
   // Collect requested variables
   for (size_t ind = 0; ind < m->id_out_.size(); ++ind) {

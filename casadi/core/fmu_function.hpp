@@ -39,7 +39,7 @@
 namespace casadi {
 
 template<typename T1>
-void casadi_forward_diff_new(const T1* yk, T1* J, T1 h, casadi_int n_y) {
+void casadi_forward_diff_new(const T1** yk, T1* J, T1 h, casadi_int n_y) {
   // Local variables
   casadi_int i;
   const double *yf, *yc;
@@ -47,14 +47,14 @@ void casadi_forward_diff_new(const T1* yk, T1* J, T1 h, casadi_int n_y) {
   // Inverse of step size
   hinv = 1. / h;
   // Get stencil
-  yc = yk;
-  yf = yk + n_y;
+  yc = yk[0];
+  yf = yk[1];
   // Calculate FD approximation
   for (i = 0; i < n_y; ++i) J[i] = hinv * (yf[i] - yc[i]);
 }
 
 template<typename T1>
-void casadi_central_diff_new(const T1* yk, T1* J, T1 h, casadi_int n_y) {
+void casadi_central_diff_new(const T1** yk, T1* J, T1 h, casadi_int n_y) {
   // Local variables
   casadi_int i;
   const T1 *yf, *yc, *yb;
@@ -62,9 +62,9 @@ void casadi_central_diff_new(const T1* yk, T1* J, T1 h, casadi_int n_y) {
   // Inverse of step size
   hinv = 1. / h;
   // Get stencil
-  yb = yk;
-  yc = yk + n_y;
-  yf = yk + 2 * n_y;
+  yb = yk[0];
+  yc = yk[1];
+  yf = yk[2];
   // Set u and stencils to zero (also supresses warnings)
   for (i = 0; i < n_y; ++i) {
     if (isfinite(yb[i])) {
@@ -88,15 +88,15 @@ void casadi_central_diff_new(const T1* yk, T1* J, T1 h, casadi_int n_y) {
 }
 
 template<typename T1>
-T1 casadi_central_diff_err(const T1* yk, T1 h, casadi_int n_y, casadi_int i,
+T1 casadi_central_diff_err(const T1** yk, T1 h, casadi_int n_y, casadi_int i,
     T1 abstol, T1 reltol) {
   // Local variables
   const T1 *yf, *yc, *yb;
   T1 err_trunc, err_round;
   // Get stencil
-  yb = yk;
-  yc = yk + n_y;
-  yf = yk + 2 * n_y;
+  yb = yk[0];
+  yc = yk[1];
+  yf = yk[2];
   // Only consider points where both forward and backward allowed
   if (isfinite(yb[i]) && isfinite(yf[i])) {
     // Truncation error
@@ -139,7 +139,7 @@ T1 casadi_smoothing_diff_weights(casadi_int k, T1 yb, T1 yc, T1 yf, T1 *J) {
 }
 
 template<typename T1>
-void casadi_smoothing_diff_new(const T1* yk, T1* J, T1 h, casadi_int n_y, T1 smoothing) {
+void casadi_smoothing_diff_new(const T1** yk, T1* J, T1 h, casadi_int n_y, T1 smoothing) {
   // Stencil
   T1 yb, yc, yf;
   // Local variables
@@ -147,15 +147,15 @@ void casadi_smoothing_diff_new(const T1* yk, T1* J, T1 h, casadi_int n_y, T1 smo
   casadi_int i, k;
   // Set stencils to zero (also supresses warnings)
   yf = yc = yb = 0;
-  for (i=0; i<n_y; ++i) {
+  for (i = 0; i < n_y; ++i) {
     // Reset derivative estimate, sum of weights, error estimate
     J[i] = sw = ui = 0;
     // For backward shifted, central and forward shifted
     for (k = 0; k < 3; ++k) {
       // Get stencil
-      yb = yk[i + k * n_y];
-      yc = yk[i + (k + 1) * n_y];
-      yf = yk[i + (k + 2) * n_y];
+      yb = yk[k][i];
+      yc = yk[k + 1][i];
+      yf = yk[k + 2][i];
       // No contribuation if any value is infinite
       if (!isfinite(yb) || !isfinite(yc) || !isfinite(yf)) continue;
       // Calculate weights
@@ -181,7 +181,7 @@ void casadi_smoothing_diff_new(const T1* yk, T1* J, T1 h, casadi_int n_y, T1 smo
 }
 
 template<typename T1>
-T1 casadi_smoothing_diff_err(const T1* yk, T1 h, casadi_int n_y, casadi_int i,
+T1 casadi_smoothing_diff_err(const T1** yk, T1 h, casadi_int n_y, casadi_int i,
     T1 abstol, T1 reltol, T1 smoothing) {
   // Stencil
   T1 yb, yc, yf;
@@ -195,9 +195,9 @@ T1 casadi_smoothing_diff_err(const T1* yk, T1 h, casadi_int n_y, casadi_int i,
   // For backward shifted, central and forward shifted
   for (k = 0; k < 3; ++k) {
     // Get stencil
-    yb = yk[i + k * n_y];
-    yc = yk[i + (k + 1) * n_y];
-    yf = yk[i + (k + 2) * n_y];
+    yb = yk[k][i];
+    yc = yk[k + 1][i];
+    yf = yk[k + 2][i];
     // No contribuation if any value is infinite
     if (!isfinite(yb) || !isfinite(yc) || !isfinite(yf)) continue;
     // Calculate weights
@@ -289,7 +289,7 @@ CASADI_EXPORT casadi_int fd_offset(FdMode v);
 
 /// Calculate FD estimate
 template<typename T1>
-CASADI_EXPORT void finite_diff(FdMode v, const T1* yk, T1* J, T1 h, casadi_int n_y,
+CASADI_EXPORT void finite_diff(FdMode v, const T1** yk, T1* J, T1 h, casadi_int n_y,
     T1 smoothing) {
   switch (v) {
     case FdMode::FORWARD:
@@ -309,7 +309,7 @@ CASADI_EXPORT bool fd_has_err(FdMode v);
 
 /// Calculate FD error estimate
 template<typename T1>
-CASADI_EXPORT T1 finite_diff_err(FdMode v, const T1* yk, T1 h, casadi_int n_y, casadi_int i,
+CASADI_EXPORT T1 finite_diff_err(FdMode v, const T1** yk, T1 h, casadi_int n_y, casadi_int i,
     T1 abstol, T1 reltol, T1 smoothing) {
   switch (v) {
     case FdMode::CENTRAL:
