@@ -296,11 +296,11 @@ namespace casadi {
   }
 
   double ForwardDiff::calc_fd(double** yk, double* y0, double* J, double h) const {
-    return casadi_forward_diff(yk, y0, J, h, n_y_, &m_);
+    return casadi_forward_diff_old(yk, y0, J, h, n_y_, &m_);
   }
 
   double CentralDiff::calc_fd(double** yk, double* y0, double* J, double h) const {
-    return casadi_central_diff(yk, y0, J, h, n_y_, &m_);
+    return casadi_central_diff_old(yk, y0, J, h, n_y_, &m_);
   }
 
   void FiniteDiff::codegen_declarations(CodeGenerator& g) const {
@@ -443,7 +443,7 @@ namespace casadi {
   }
 
   double Smoothing::calc_fd(double** yk, double* y0, double* J, double h) const {
-    return casadi_smoothing_diff(yk, y0, J, h, n_y_, &m_);
+    return casadi_smoothing_diff_old(yk, y0, J, h, n_y_, &m_);
   }
 
   Function ForwardDiff::get_forward(casadi_int nfwd, const std::string& name,

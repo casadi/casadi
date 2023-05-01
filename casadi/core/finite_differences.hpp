@@ -190,7 +190,7 @@ namespace casadi {
     double calc_fd(double** yk, double* y0, double* J, double h) const override;
 
     // Codegen finite difference approximation
-    std::string calc_fd() const override {return "casadi_forward_diff";}
+    std::string calc_fd() const override {return "casadi_forward_diff_old";}
 
     // Is an error estimate available?
     casadi_int has_err() const override {return false;}
@@ -276,7 +276,7 @@ namespace casadi {
     double calc_fd(double** yk, double* y0, double* J, double h) const override;
 
     // Codegen finite difference approximation
-    std::string calc_fd() const override {return "casadi_central_diff";}
+    std::string calc_fd() const override {return "casadi_central_diff_old";}
 
     // Is an error estimate available?
     casadi_int has_err() const override {return true;}
@@ -333,7 +333,7 @@ namespace casadi {
     double calc_fd(double** yk, double* y0, double* J, double h) const override;
 
     // Codegen finite difference approximation
-    std::string calc_fd() const override {return "casadi_smoothing_diff";}
+    std::string calc_fd() const override {return "casadi_smoothing_diff_old";}
 
     // Is an error estimate available?
     casadi_int has_err() const override {return true;}

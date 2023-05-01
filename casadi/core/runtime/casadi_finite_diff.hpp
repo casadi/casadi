@@ -34,10 +34,10 @@ struct casadi_finite_diff_mem {
 // C-REPLACE "std::numeric_limits<T1>::quiet_NaN()" "NAN"
 // C-REPLACE "fmax" "casadi_fmax"
 
-// SYMBOL "forward_diff"
+// SYMBOL "forward_diff_old"
 template<typename T1>
-T1 casadi_forward_diff(T1** yk, T1* y0, T1* J,
-                       T1 h, casadi_int n_y, const casadi_finite_diff_mem<T1>* m) {
+T1 casadi_forward_diff_old(T1** yk, T1* y0, T1* J,
+    T1 h, casadi_int n_y, const casadi_finite_diff_mem<T1>* m) {
   casadi_int i;
   for (i=0; i<n_y; ++i) {
     J[i] = (yk[0][i]-y0[i])/h;
@@ -45,10 +45,10 @@ T1 casadi_forward_diff(T1** yk, T1* y0, T1* J,
   return -1;
 }
 
-// SYMBOL "central_diff"
+// SYMBOL "central_diff_old"
 template<typename T1>
-T1 casadi_central_diff(T1** yk, T1* y0, T1* J,
-                       T1 h, casadi_int n_y, const casadi_finite_diff_mem<T1>* m) {
+T1 casadi_central_diff_old(T1** yk, T1* y0, T1* J,
+    T1 h, casadi_int n_y, const casadi_finite_diff_mem<T1>* m) {
   // Return value
   T1 u;
   // Stencil
@@ -77,10 +77,10 @@ T1 casadi_central_diff(T1** yk, T1* y0, T1* J,
   return u;
 }
 
-// SYMBOL "smoothing_diff"
+// SYMBOL "smoothing_diff_old"
 template<typename T1>
-T1 casadi_smoothing_diff(T1** yk, T1* y0, T1* J,
-                         T1 h, casadi_int n_y, const casadi_finite_diff_mem<T1>* m) {
+T1 casadi_smoothing_diff_old(T1** yk, T1* y0, T1* J,
+    T1 h, casadi_int n_y, const casadi_finite_diff_mem<T1>* m) {
   // Return value
   T1 u;
   // Stencil
