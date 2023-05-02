@@ -29,7 +29,7 @@
 #ifdef WITH_FMU
 
 #include "function_internal.hpp"
-#include "fmu_interface.hpp"
+#include "fmu.hpp"
 #include "finite_differences.hpp"
 
 /// \cond INTERNAL
@@ -40,6 +40,7 @@ namespace casadi {
 class DaeBuilderInternal;
 class FmuFunction;
 struct InputStruct;
+class Fmu2;
 
 // Memory object
 struct CASADI_EXPORT FmuMemory : public FunctionMemory {
@@ -138,7 +139,7 @@ CASADI_EXPORT std::string pop_prefix(const std::string& s, std::string* rem = 0)
 class CASADI_EXPORT FmuFunction : public FunctionInternal {
  public:
   // FMU (shared between derivative expressions
-  int fmu_;
+  Fmu fmu_;
 
   // Information about function inputs
   std::vector<InputStruct> in_;
@@ -177,7 +178,7 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   /** \brief Constructor
 
       \identifier{yh} */
-  FmuFunction(const std::string& name, int fmu,
+  FmuFunction(const std::string& name, const Fmu& fmu,
       const std::vector<std::string>& name_in,
       const std::vector<std::string>& name_out);
 
@@ -329,25 +330,8 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   /// Get all statistics
   Dict get_stats(void* mem) const override;
 
-  /// Allocate an FMU
-  static int alloc_fmu(const DaeBuilderInternal* dae,
-    const std::vector<std::string>& scheme_in,
-    const std::vector<std::string>& scheme_out,
-    const std::map<std::string, std::vector<size_t>>& scheme,
-    const std::vector<std::string>& aux);
-
   /// Get a specific FMU instance
-  static Fmu2* get_fmu(int fmu);
-
-  /// Release, possibly free FMU
-  static void release_fmu(int fmu);
-
-  /// Copy FMU memory object
-  static void incref_fmu(int fmu);
-
-  private:
-    /// FMU memory objects
-    static std::vector<Fmu2*>& fmu_mem();
+  static Fmu2* get_fmu(const Fmu& fmu);
 };
 
 } // namespace casadi

@@ -27,6 +27,7 @@
 #include "casadi_misc.hpp"
 #include "serializing_stream.hpp"
 #include "dae_builder_internal.hpp"
+#include "fmu_impl.hpp"
 
 #include <fstream>
 #include <iostream>
@@ -100,10 +101,10 @@ void FmuFunction::free_mem(void *mem) const {
   delete m;
 }
 
-FmuFunction::FmuFunction(const std::string& name, int fmu,
+FmuFunction::FmuFunction(const std::string& name, const Fmu& fmu,
     const std::vector<std::string>& name_in,
     const std::vector<std::string>& name_out)
-    : FunctionInternal(name), fmu_(-1) {
+    : FunctionInternal(name), fmu_(fmu) {
   // Parse input IDs
   in_.resize(name_in.size());
   for (size_t k = 0; k < name_in.size(); ++k) {
@@ -143,16 +144,11 @@ FmuFunction::FmuFunction(const std::string& name, int fmu,
   // Number of parallel tasks, by default
   max_n_tasks_ = 1;
   max_jac_tasks_ = max_hess_tasks_ = 0;
-  // Increase reference counter (at end in case exception is thrown)
-  incref_fmu(fmu);
-  fmu_ = fmu;
 }
 
 FmuFunction::~FmuFunction() {
   // Free memory
   clear_mem();
-  // Decrease reference pointer to Fmu instance
-  if (fmu_ >= 0) release_fmu(fmu_);
 }
 
 const Options FmuFunction::options_
@@ -1410,69 +1406,8 @@ Dict FmuFunction::get_stats(void *mem) const {
   return stats;
 }
 
-int FmuFunction::alloc_fmu(const DaeBuilderInternal* dae,
-    const std::vector<std::string>& scheme_in,
-    const std::vector<std::string>& scheme_out,
-    const std::map<std::string, std::vector<size_t>>& scheme,
-    const std::vector<std::string>& aux) {
-  // New FMU instance (to be shared between derivative functions)
-  Fmu2* fmu = new Fmu2(scheme_in, scheme_out, scheme, aux);
-  try {
-    // Initialize
-    fmu->init(dae);
-  } catch (std::exception& e) {
-    delete fmu;
-    casadi_error("Fmu::init() failed: " + std::string(e.what()));
-  }
-  // Save to memory bank, reuse memory location if possible
-  for (int mem = 0; mem < fmu_mem().size(); ++mem) {
-    if (fmu_mem().at(mem) == nullptr) {
-      fmu_mem().at(mem) = fmu;
-      return mem;
-    }
-  }
-  // New memory location
-  int mem = fmu_mem().size();
-  fmu_mem().push_back(fmu);
-  return mem;
-}
-
-Fmu2* FmuFunction::get_fmu(int fmu) {
-  Fmu2* ret = fmu_mem().at(fmu);
-  casadi_assert_dev(ret != nullptr);
-  return ret;
-}
-
-void FmuFunction::release_fmu(int fmu) {
-  // Get memory
-  std::vector<Fmu2*>& mem = fmu_mem();
-  // Make sure it's a valid entry
-  if (fmu < 0 || fmu >= mem.size()) {
-    casadi_warning("FMU memory management corrupted");
-    return;
-  }
-  // Decrease counter
-  Fmu2* m = mem[fmu];
-  if (m == nullptr) {
-    casadi_warning("FMU memory has already been freed");
-    return;
-  }
-  // Decrease counter
-  if (--m->counter_ == 0) {
-    // Last instance - free
-    mem[fmu] = 0;
-    delete m;
-  }
-}
-
-void FmuFunction::incref_fmu(int fmu) {
-  get_fmu(fmu)->counter_++;
-}
-
-std::vector<Fmu2*>& FmuFunction::fmu_mem() {
-  // Singleton
-  static std::vector<Fmu2*> fmu_mem_;
-  return fmu_mem_;
+Fmu2* FmuFunction::get_fmu(const Fmu& fmu) {
+  return static_cast<Fmu2*>(fmu.get());
 }
 
 #endif  // WITH_FMU

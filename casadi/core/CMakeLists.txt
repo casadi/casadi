@@ -78,6 +78,7 @@ set(CASADI_PUBLIC
   optistack.hpp
   serializer.hpp
   serializing_stream.hpp
+  fmu.hpp
 
   # User include class with the most essential includes
   core.hpp
@@ -169,7 +170,7 @@ set(CASADI_INTERNAL
   sx_function.hpp         sx_function.cpp
   mx_function.hpp         mx_function.cpp
   external_impl.hpp       external.cpp
-  fmu_interface.hpp       fmu_interface.cpp
+  fmu_impl.hpp            fmu.cpp
   fmu_function.hpp        fmu_function.cpp
   jit_function.hpp        jit_function.cpp
   linsol.cpp              linsol_internal.hpp  linsol_internal.cpp

@@ -2263,7 +2263,7 @@ Function DaeBuilderInternal::fmu_fun(const std::string& name,
     }
   }
   // New FMU instance (to be shared between derivative functions)
-  int fmu = FmuFunction::alloc_fmu(this, scheme_in, scheme_out, scheme, aux);
+  Fmu fmu(name, FmuApi::FMI2, this, scheme_in, scheme_out, scheme, aux);
 
   // Crete new function
   return Function::create(new FmuFunction(name, fmu, name_in, name_out), opts);

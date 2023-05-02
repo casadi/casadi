@@ -23,13 +23,67 @@
  */
 
 
-#include "fmu_interface.hpp"
+#include "fmu_impl.hpp"
 #include "fmu_function.hpp"
 #include "dae_builder_internal.hpp"
 
 namespace casadi {
 
+// Throw informative error message
+#define THROW_ERROR(FNAME, WHAT) \
+throw CasadiException("Error in Fmu::" FNAME " for '" + this->name() + "' "\
+  "[" + this->class_name() + "] at " + CASADI_WHERE + ":\n"\
+  + std::string(WHAT));
+
 #ifdef WITH_FMU
+
+Fmu::Fmu(const std::string& name, FmuApi api, const DaeBuilderInternal* dae,
+    const std::vector<std::string>& scheme_in,
+    const std::vector<std::string>& scheme_out,
+    const std::map<std::string, std::vector<size_t>>& scheme,
+    const std::vector<std::string>& aux) {
+  // Create
+  own(new Fmu2(name, scheme_in, scheme_out, scheme, aux));
+  // Initialize
+  try {
+    (*this)->init(dae);
+  } catch(std::exception& e) {
+    THROW_ERROR("init", e.what());
+  }
+}
+
+Fmu2* Fmu::operator->() {
+  return static_cast<Fmu2*>(SharedObject::operator->());
+}
+
+const Fmu2* Fmu::operator->() const {
+  return static_cast<const Fmu2*>(SharedObject::operator->());
+}
+
+const std::string& Fmu::name() const {
+  if (is_null()) {
+    static std::string null = "null";
+    return null;
+  } else {
+    return (*this)->name_;
+  }
+}
+
+Fmu2::~Fmu2() {
+}
+
+void Fmu2::disp(std::ostream& stream, bool more) const {
+  (void)more;  // unused
+  stream << name_ << " " << class_name();
+}
+
+std::string to_string(FmuApi v) {
+  switch (v) {
+  case FmuApi::FMI2: return "fmi2";
+  default: break;
+  }
+  return "";
+}
 
 std::string Fmu2::desc_in(FmuMemory* m, size_t id) const {
   // Create description
@@ -1003,7 +1057,8 @@ int Fmu2::eval_derivative(FmuMemory* m, bool independent_seeds) const {
   return 0;
 }
 
-Sparsity Fmu2::jac_sparsity(const std::vector<size_t>& osub, const std::vector<size_t>& isub) const {
+Sparsity Fmu2::jac_sparsity(const std::vector<size_t>& osub,
+    const std::vector<size_t>& isub) const {
   // Convert to casadi_int type
   std::vector<casadi_int> osub1(osub.begin(), osub.end());
   std::vector<casadi_int> isub1(isub.begin(), isub.end());
@@ -1013,7 +1068,8 @@ Sparsity Fmu2::jac_sparsity(const std::vector<size_t>& osub, const std::vector<s
   return jac_sp_.sub(osub1, isub1, mapping);
 }
 
-Sparsity Fmu2::hess_sparsity(const std::vector<size_t>& r, const std::vector<size_t>& c) const {
+Sparsity Fmu2::hess_sparsity(const std::vector<size_t>& r,
+    const std::vector<size_t>& c) const {
   // Convert to casadi_int type
   std::vector<casadi_int> r1(r.begin(), r.end());
   std::vector<casadi_int> c1(c.begin(), c.end());
@@ -1039,12 +1095,12 @@ std::vector<double> Fmu2::get_nominal_out(casadi_int i) const {
   return n;
 }
 
-Fmu2::Fmu2(const std::vector<std::string>& scheme_in,
+Fmu2::Fmu2(const std::string& name,
+    const std::vector<std::string>& scheme_in,
     const std::vector<std::string>& scheme_out,
     const std::map<std::string, std::vector<size_t>>& scheme,
     const std::vector<std::string>& aux)
-    : scheme_in_(scheme_in), scheme_out_(scheme_out), scheme_(scheme), aux_(aux) {
-  counter_ = 0;
+    : name_(name), scheme_in_(scheme_in), scheme_out_(scheme_out), scheme_(scheme), aux_(aux) {
   instantiate_ = 0;
   free_instance_ = 0;
   reset_ = 0;

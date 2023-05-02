@@ -22,13 +22,14 @@
  *
  */
 
-
-#ifndef CASADI_FMU_INTERFACE_HPP
-#define CASADI_FMU_INTERFACE_HPP
+#ifndef CASADI_FMU_IMPL_HPP
+#define CASADI_FMU_IMPL_HPP
 
 #ifdef WITH_FMU
 
+#include "fmu.hpp"
 #include "importer.hpp"
+#include "shared_object_internal.hpp"
 
 #include <fmi2Functions.h>
 
@@ -41,17 +42,34 @@ class DaeBuilderInternal;
 struct FmuMemory;
 struct InputStruct;
 
-// Interface to binary FMU (shared between derivatives)
-struct CASADI_EXPORT Fmu2 {
+/** \brief Interface to binary FMU
+
+    Internal API.
+
+    \author Joel Andersson
+    \date 2023
+*/
+class CASADI_EXPORT Fmu2 : public SharedObjectInternal {
+ public:
   // Constructor
-  Fmu2(const std::vector<std::string>& scheme_in, const std::vector<std::string>& scheme_out,
+  Fmu2(const std::string& name,
+    const std::vector<std::string>& scheme_in, const std::vector<std::string>& scheme_out,
     const std::map<std::string, std::vector<size_t>>& scheme, const std::vector<std::string>& aux);
+
+  /// Destructor
+  ~Fmu2() override;
+
+  /** \brief Get type name */
+  std::string class_name() const override { return "Fmu2";}
+
+  /** \brief Print */
+  void disp(std::ostream& stream, bool more) const override;
 
   // Initialize
   void init(const DaeBuilderInternal* dae);
 
-  // Reference counter
-  int counter_;
+  /// Instance name
+  std::string name_;
 
   // DLL
   Importer li_;
@@ -270,4 +288,4 @@ struct CASADI_EXPORT Fmu2 {
 
 #endif  // WITH_FMU
 
-#endif // CASADI_FMU_INTERFACE_HPP
+#endif // CASADI_FMU_IMPL_HPP
