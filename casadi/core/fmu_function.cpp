@@ -27,7 +27,6 @@
 #include "casadi_misc.hpp"
 #include "serializing_stream.hpp"
 #include "dae_builder_internal.hpp"
-#include "fmu_impl.hpp"
 
 #include <fstream>
 #include <iostream>
@@ -1402,10 +1401,6 @@ Dict FmuFunction::get_stats(void *mem) const {
   fmu_.get_stats(m, &stats, name_in_, get_ptr(in_));
   // Return stats
   return stats;
-}
-
-Fmu2* FmuFunction::get_fmu(const Fmu& fmu) {
-  return static_cast<Fmu2*>(fmu.get());
 }
 
 #endif  // WITH_FMU

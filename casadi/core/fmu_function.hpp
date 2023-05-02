@@ -40,7 +40,6 @@ namespace casadi {
 class DaeBuilderInternal;
 class FmuFunction;
 struct InputStruct;
-class Fmu2;
 
 // Memory object
 struct CASADI_EXPORT FmuMemory : public FunctionMemory {
@@ -329,9 +328,6 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
 
   /// Get all statistics
   Dict get_stats(void* mem) const override;
-
-  /// Get a specific FMU instance
-  static Fmu2* get_fmu(const Fmu& fmu);
 };
 
 } // namespace casadi
