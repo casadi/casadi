@@ -79,6 +79,21 @@ class CASADI_EXPORT Fmu
   /// Access functions of the node
   Fmu2* operator->();
   const Fmu2* operator->() const;
+
+  // Index lookup for input
+  size_t index_in(const std::string& n) const;
+
+  // Index lookup for output
+  size_t index_out(const std::string& n) const;
+
+  /// Does the interface support analytic derivatives?
+  bool has_ad() const;
+
+  /** \brief Initalize memory block */
+  int init_mem(FmuMemory* m) const;
+
+  // Free FMU instance
+  void free_instance(void* c) const;
 };
 
 } // namespace casadi

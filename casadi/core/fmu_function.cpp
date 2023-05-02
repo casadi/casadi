@@ -62,7 +62,7 @@ int FmuFunction::init_mem(void* mem) const {
   for (casadi_int i = 0; i < n_mem; ++i) {
     // Initialize the memory object itself or a slave
     FmuMemory* m1 = i == 0 ? m : m->slaves.at(i - 1);
-    if (get_fmu(fmu_)->init_mem(m1)) return 1;
+    if (fmu_.init_mem(m1)) return 1;
   }
   return 0;
 }
@@ -86,7 +86,7 @@ void FmuFunction::free_mem(void *mem) const {
     if (!s) continue;
     // Free FMU memory
     if (s->instance) {
-      get_fmu(fmu_)->free_instance(s->instance);
+      fmu_.free_instance(s->instance);
       s->instance = nullptr;
     }
     // Free the slave
@@ -94,7 +94,7 @@ void FmuFunction::free_mem(void *mem) const {
   }
   // Free FMI memory
   if (m->instance) {
-    get_fmu(fmu_)->free_instance(m->instance);
+    fmu_.free_instance(m->instance);
     m->instance = nullptr;
   }
   // Free the memory object
@@ -109,7 +109,7 @@ FmuFunction::FmuFunction(const std::string& name, const Fmu& fmu,
   in_.resize(name_in.size());
   for (size_t k = 0; k < name_in.size(); ++k) {
     try {
-      in_[k] = InputStruct::parse(name_in[k], get_fmu(fmu));
+      in_[k] = InputStruct::parse(name_in[k], &fmu);
     } catch (std::exception& e) {
       casadi_error("Cannot process input " + name_in[k] + ": " + std::string(e.what()));
     }
@@ -118,7 +118,7 @@ FmuFunction::FmuFunction(const std::string& name, const Fmu& fmu,
   out_.resize(name_out.size());
   for (size_t k = 0; k < name_out.size(); ++k) {
     try {
-      out_[k] = OutputStruct::parse(name_out[k], get_fmu(fmu));
+      out_[k] = OutputStruct::parse(name_out[k], &fmu);
     } catch (std::exception& e) {
       casadi_error("Cannot process output " + name_out[k] + ": " + std::string(e.what()));
     }
@@ -127,12 +127,12 @@ FmuFunction::FmuFunction(const std::string& name, const Fmu& fmu,
   name_in_ = name_in;
   name_out_ = name_out;
   // Default options
-  enable_ad_ = get_fmu(fmu)->get_directional_derivative_ != 0;
+  enable_ad_ = fmu.has_ad();
   validate_ad_ = false;
   validate_ad_file_ = "";
   make_symmetric_ = true;
   check_hessian_ = false;
-  enable_fd_op_ = enable_ad_ && !all_regular();  // Use FD for second and higher order derivatives
+  enable_fd_op_ = fmu.has_ad() && !all_regular();  // Use FD for second and higher order derivatives
   step_ = 1e-6;
   abstol_ = 1e-3;
   reltol_ = 1e-3;
@@ -247,7 +247,7 @@ void FmuFunction::init(const Dict& opts) {
   fd_ = to_enum<FdMode>(fd_method_, "forward");
 
   // Consistency checks
-  if (enable_ad_) casadi_assert(get_fmu(fmu_)->get_directional_derivative_ != nullptr,
+  if (enable_ad_) casadi_assert(fmu_.has_ad(),
     "FMU does not provide support for analytic derivatives");
   if (validate_ad_ && !enable_ad_) casadi_error("Inconsistent options");
 
@@ -546,7 +546,7 @@ void FmuFunction::identify_io(
   }
 }
 
-InputStruct InputStruct::parse(const std::string& n, const Fmu2* fmu,
+InputStruct InputStruct::parse(const std::string& n, const Fmu* fmu,
     std::vector<std::string>* name_in, std::vector<std::string>* name_out) {
   // Return value
   InputStruct s;
@@ -596,7 +596,7 @@ InputStruct InputStruct::parse(const std::string& n, const Fmu2* fmu,
   return s;
 }
 
-OutputStruct OutputStruct::parse(const std::string& n, const Fmu2* fmu,
+OutputStruct OutputStruct::parse(const std::string& n, const Fmu* fmu,
     std::vector<std::string>* name_in, std::vector<std::string>* name_out) {
   // Return value
   OutputStruct s;

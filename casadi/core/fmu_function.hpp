@@ -104,7 +104,7 @@ struct CASADI_EXPORT InputStruct {
   // Corresponding index in Fmu
   size_t ind;
   // Parse an input string
-  static InputStruct parse(const std::string& n, const Fmu2* fmu,
+  static InputStruct parse(const std::string& n, const Fmu* fmu,
     std::vector<std::string>* name_in = 0,
     std::vector<std::string>* name_out = 0);
 };
@@ -123,7 +123,7 @@ struct CASADI_EXPORT OutputStruct {
   // Selection
   size_t rbegin, rend, cbegin, cend;
   // Parse an output string
-  static OutputStruct parse(const std::string& n, const Fmu2* fmu,
+  static OutputStruct parse(const std::string& n, const Fmu* fmu,
     std::vector<std::string>* name_in = 0,
     std::vector<std::string>* name_out = 0);
   // Constructor

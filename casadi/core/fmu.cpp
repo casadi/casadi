@@ -69,6 +69,50 @@ const std::string& Fmu::name() const {
   }
 }
 
+size_t Fmu::index_in(const std::string& n) const {
+  try {
+    return (*this)->index_in(n);
+  } catch(std::exception& e) {
+    THROW_ERROR("index_in", e.what());
+    return -1;
+  }
+}
+
+size_t Fmu::index_out(const std::string& n) const {
+  try {
+    return (*this)->index_out(n);
+  } catch(std::exception& e) {
+    THROW_ERROR("index_out", e.what());
+    return -1;
+  }
+}
+
+bool Fmu::has_ad() const {
+  try {
+    return (*this)->has_ad();
+  } catch(std::exception& e) {
+    THROW_ERROR("has_ad", e.what());
+    return false;
+  }
+}
+
+int Fmu::init_mem(FmuMemory* m) const {
+  try {
+    return (*this)->init_mem(m);
+  } catch(std::exception& e) {
+    THROW_ERROR("init_mem", e.what());
+    return 1;
+  }
+}
+
+void Fmu::free_instance(void* c) const {
+  try {
+    return (*this)->free_instance(c);
+  } catch(std::exception& e) {
+    THROW_ERROR("free_instance", e.what());
+  }
+}
+
 Fmu2::~Fmu2() {
 }
 
@@ -438,9 +482,9 @@ fmi2Component Fmu2::instantiate() const {
   return c;
 }
 
-void Fmu2::free_instance(fmi2Component c) const {
+void Fmu2::free_instance(void* c) const {
   if (free_instance_) {
-    free_instance_(c);
+    free_instance_(static_cast<fmi2Component>(c));
   } else {
     casadi_warning("No free_instance function pointer available");
   }

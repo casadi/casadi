@@ -162,6 +162,9 @@ class CASADI_EXPORT Fmu2 : public SharedObjectInternal {
   // Index lookup for output
   size_t index_out(const std::string& n) const;
 
+  // Does the FMU support analytic derivatives?
+  bool has_ad() const { return get_directional_derivative_ != nullptr; }
+
   // Load an FMI function
   template<typename T>
   T* load_function(const std::string& symname);
@@ -170,7 +173,7 @@ class CASADI_EXPORT Fmu2 : public SharedObjectInternal {
   fmi2Component instantiate() const;
 
   // Free FMU instance
-  void free_instance(fmi2Component c) const;
+  void free_instance(void* c) const;
 
   // Reset solver
   int reset(fmi2Component c);
@@ -193,15 +196,11 @@ class CASADI_EXPORT Fmu2 : public SharedObjectInternal {
   // Retrieve auxilliary variables from FMU
   int get_aux(fmi2Component c, Value* v) const;
 
-  /** \brief Get stats
-
-      \identifier{ye} */
+  /** \brief Get stats */
   void get_stats(FmuMemory* m, Dict* stats,
     const std::vector<std::string>& name_in, const InputStruct* in) const;
 
-  /** \brief Initalize memory block
-
-      \identifier{yf} */
+  /** \brief Initalize memory block */
   int init_mem(FmuMemory* m) const;
 
   // Set value
@@ -258,9 +257,7 @@ class CASADI_EXPORT Fmu2 : public SharedObjectInternal {
   }
 
   /// @{
-  /** \brief Retreive nominal values
-
-      \identifier{yg} */
+  /** \brief Retreive nominal values */
   std::vector<double> get_nominal_in(casadi_int i) const;
   std::vector<double> get_nominal_out(casadi_int i) const;
   /// @}
