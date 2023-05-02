@@ -80,11 +80,35 @@ class CASADI_EXPORT Fmu
   Fmu2* operator->();
   const Fmu2* operator->() const;
 
+  /** \brief Get the number of scheme inputs */
+  size_t n_in() const;
+
+  /** \brief Get the number of scheme outputs */
+  size_t n_out() const;
+
   // Index lookup for input
   size_t index_in(const std::string& n) const;
 
   // Index lookup for output
   size_t index_out(const std::string& n) const;
+
+  // Get all reduced space indices for an input
+  const std::vector<size_t>& ired(size_t ind) const;
+
+  // Get all reduced space indices for an output
+  const std::vector<size_t>& ored(size_t ind) const;
+
+  // Get nominal value for reduced-space input
+  double nominal_in(size_t ind) const;
+
+  // Get nominal value for reduced-space output
+  double nominal_out(size_t ind) const;
+
+  // Get all nominal values for an input
+  std::vector<double> all_nominal_in(size_t ind) const;
+
+  // Get all nominal values for an output
+  std::vector<double> all_nominal_out(size_t ind) const;
 
   /// Does the interface support analytic derivatives?
   bool has_ad() const;

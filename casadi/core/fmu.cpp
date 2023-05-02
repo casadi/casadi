@@ -69,12 +69,27 @@ const std::string& Fmu::name() const {
   }
 }
 
+size_t Fmu::n_in() const {
+  try {
+    return (*this)->n_in();
+  } catch(std::exception& e) {
+    THROW_ERROR("n_in", e.what());
+  }
+}
+
+size_t Fmu::n_out() const {
+  try {
+    return (*this)->n_out();
+  } catch(std::exception& e) {
+    THROW_ERROR("n_out", e.what());
+  }
+}
+
 size_t Fmu::index_in(const std::string& n) const {
   try {
     return (*this)->index_in(n);
   } catch(std::exception& e) {
     THROW_ERROR("index_in", e.what());
-    return -1;
   }
 }
 
@@ -83,7 +98,54 @@ size_t Fmu::index_out(const std::string& n) const {
     return (*this)->index_out(n);
   } catch(std::exception& e) {
     THROW_ERROR("index_out", e.what());
-    return -1;
+  }
+}
+
+const std::vector<size_t>& Fmu::ired(size_t ind) const {
+  try {
+    return (*this)->ired_.at(ind);
+  } catch(std::exception& e) {
+    THROW_ERROR("ired", e.what());
+  }
+}
+
+const std::vector<size_t>& Fmu::ored(size_t ind) const {
+  try {
+    return (*this)->ored_.at(ind);
+  } catch(std::exception& e) {
+    THROW_ERROR("ored", e.what());
+  }
+}
+
+double Fmu::nominal_in(size_t ind) const {
+  try {
+    return (*this)->nominal_in_.at(ind);
+  } catch(std::exception& e) {
+    THROW_ERROR("nominal_in", e.what());
+  }
+}
+
+double Fmu::nominal_out(size_t ind) const {
+  try {
+    return (*this)->nominal_out_.at(ind);
+  } catch(std::exception& e) {
+    THROW_ERROR("nominal_out", e.what());
+  }
+}
+
+std::vector<double> Fmu::all_nominal_in(size_t ind) const {
+  try {
+    return (*this)->all_nominal_in(ind);
+  } catch(std::exception& e) {
+    THROW_ERROR("all_nominal_in", e.what());
+  }
+}
+
+std::vector<double> Fmu::all_nominal_out(size_t ind) const {
+  try {
+    return (*this)->all_nominal_out(ind);
+  } catch(std::exception& e) {
+    THROW_ERROR("all_nominal_out", e.what());
   }
 }
 
@@ -1123,7 +1185,7 @@ Sparsity Fmu2::hess_sparsity(const std::vector<size_t>& r,
   return hess_sp_.sub(r1, c1, mapping);
 }
 
-std::vector<double> Fmu2::get_nominal_in(casadi_int i) const {
+std::vector<double> Fmu2::all_nominal_in(size_t i) const {
   auto&& ind = ired_.at(i);
   std::vector<double> n;
   n.reserve(ind.size());
@@ -1131,7 +1193,7 @@ std::vector<double> Fmu2::get_nominal_in(casadi_int i) const {
   return n;
 }
 
-std::vector<double> Fmu2::get_nominal_out(casadi_int i) const {
+std::vector<double> Fmu2::all_nominal_out(size_t i) const {
   auto&& ind = ored_.at(i);
   std::vector<double> n;
   n.reserve(ind.size());

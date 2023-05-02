@@ -311,14 +311,14 @@ void FmuFunction::init(const Dict& opts) {
   }
 
   // Collect all inputs in any Jacobian, Hessian or adjoint block
-  std::vector<size_t> in_jac(get_fmu(fmu_)->iind_.size(), 0);
+  std::vector<size_t> in_jac(fmu_.n_in(), 0);
   jac_in_.clear();
   jac_nom_in_.clear();
   for (auto&& i : out_) {
     if (i.type == OutputType::JAC || i.type == OutputType::JAC_TRANS
         || i.type == OutputType::ADJ || i.type == OutputType::HESS) {
       // Get input indices
-      const std::vector<size_t>& iind = get_fmu(fmu_)->ired_.at(i.wrt);
+      const std::vector<size_t>& iind = fmu_.ired(i.wrt);
       // Skip if no entries
       if (iind.empty()) continue;
       // Consistency check
@@ -328,7 +328,7 @@ void FmuFunction::init(const Dict& opts) {
       if (!exists) {
         for (size_t j : iind) {
           jac_in_.push_back(j);
-          jac_nom_in_.push_back(get_fmu(fmu_)->nominal_in_[j]);
+          jac_nom_in_.push_back(fmu_.nominal_in(j));
           in_jac[j] = jac_in_.size();
         }
       }
@@ -338,7 +338,7 @@ void FmuFunction::init(const Dict& opts) {
       // Also rows for Hessian blocks
       if (i.type == OutputType::HESS) {
         // Get input indices
-        const std::vector<size_t>& iind = get_fmu(fmu_)->ired_.at(i.ind);
+        const std::vector<size_t>& iind = fmu_.ired(i.ind);
         // Skip if no entries
         if (iind.empty()) continue;
         // Consistency check
@@ -348,7 +348,7 @@ void FmuFunction::init(const Dict& opts) {
         if (!exists) {
           for (size_t j : iind) {
             jac_in_.push_back(j);
-            jac_nom_in_.push_back(get_fmu(fmu_)->nominal_in_[j]);
+            jac_nom_in_.push_back(fmu_.nominal_in(j));
             in_jac[j] = jac_in_.size();
           }
         }
@@ -364,14 +364,14 @@ void FmuFunction::init(const Dict& opts) {
   sp_trans_.clear();
 
   // Collect all outputs in any Jacobian or adjoint block
-  in_jac.resize(get_fmu(fmu_)->oind_.size());
+  in_jac.resize(fmu_.n_out());
   std::fill(in_jac.begin(), in_jac.end(), 0);
   jac_out_.clear();
   for (size_t k = 0; k < out_.size(); ++k) {
     OutputStruct& i = out_[k];
     if (i.type == OutputType::JAC || i.type == OutputType::JAC_TRANS) {
       // Get output indices
-      const std::vector<size_t>& oind = get_fmu(fmu_)->ored_.at(i.ind);
+      const std::vector<size_t>& oind = fmu_.ored(i.ind);
       // Skip if no entries
       if (oind.empty()) continue;
       // Consistency check
@@ -403,7 +403,7 @@ void FmuFunction::init(const Dict& opts) {
   for (auto&& i : in_) {
     if (i.type == InputType::ADJ) {
       // Get output indices
-      const std::vector<size_t>& oind = get_fmu(fmu_)->ored_.at(i.ind);
+      const std::vector<size_t>& oind = fmu_.ored(i.ind);
       // Skip if no entries
       if (oind.empty()) continue;
       // Consistency check
@@ -443,8 +443,8 @@ void FmuFunction::init(const Dict& opts) {
 
   // Work vectors for adjoint derivative calculation, shared between threads
   if (has_adj_) {
-    alloc_w(get_fmu(fmu_)->oind_.size(), true);  // aseed
-    alloc_w(get_fmu(fmu_)->iind_.size(), true);  // asens
+    alloc_w(fmu_.n_out(), true);  // aseed
+    alloc_w(fmu_.n_in(), true);  // asens
   }
 
   // If Hessian calculation is needed
@@ -489,10 +489,10 @@ void FmuFunction::init(const Dict& opts) {
     alloc_w(hess_sp_.nnz(), true);  // hess_nz
 
     // Work vector for perturbed adjoint sensitivities
-    alloc_w(max_hess_tasks_ * get_fmu(fmu_)->iind_.size(), true);  // pert_asens
+    alloc_w(max_hess_tasks_ * fmu_.n_in(), true);  // pert_asens
 
     // Work vector for avoiding conflicting assignments for star coloring
-    alloc_iw(max_hess_tasks_ * get_fmu(fmu_)->iind_.size(), true);  // star_iw
+    alloc_iw(max_hess_tasks_ * fmu_.n_in(), true);  // star_iw
 
     // Work vector for making symmetric or checking symmetry
     alloc_iw(hess_sp_.size2());
@@ -692,15 +692,15 @@ OutputStruct OutputStruct::parse(const std::string& n, const Fmu* fmu,
 Sparsity FmuFunction::get_sparsity_in(casadi_int i) {
   switch (in_.at(i).type) {
     case InputType::REG:
-      return Sparsity::dense(get_fmu(fmu_)->ired_.at(in_.at(i).ind).size(), 1);
+      return Sparsity::dense(fmu_.ired(in_.at(i).ind).size(), 1);
     case InputType::FWD:
-      return Sparsity::dense(get_fmu(fmu_)->ired_.at(in_.at(i).ind).size(), 1);
+      return Sparsity::dense(fmu_.ired(in_.at(i).ind).size(), 1);
     case InputType::ADJ:
-      return Sparsity::dense(get_fmu(fmu_)->ored_.at(in_.at(i).ind).size(), 1);
+      return Sparsity::dense(fmu_.ored(in_.at(i).ind).size(), 1);
     case InputType::OUT:
-      return Sparsity(get_fmu(fmu_)->ored_.at(in_.at(i).ind).size(), 1);
+      return Sparsity(fmu_.ored(in_.at(i).ind).size(), 1);
     case InputType::ADJ_OUT:
-      return Sparsity(get_fmu(fmu_)->ired_.at(in_.at(i).ind).size(), 1);
+      return Sparsity(fmu_.ired(in_.at(i).ind).size(), 1);
   }
   return Sparsity();
 }
@@ -709,19 +709,19 @@ Sparsity FmuFunction::get_sparsity_out(casadi_int i) {
   const OutputStruct& s = out_.at(i);
   switch (out_.at(i).type) {
     case OutputType::REG:
-      return Sparsity::dense(get_fmu(fmu_)->ored_.at(s.ind).size(), 1);
+      return Sparsity::dense(fmu_.ored(s.ind).size(), 1);
     case OutputType::FWD:
-      return Sparsity::dense(get_fmu(fmu_)->ored_.at(s.ind).size(), 1);
+      return Sparsity::dense(fmu_.ored(s.ind).size(), 1);
     case OutputType::ADJ:
-      return Sparsity::dense(get_fmu(fmu_)->ired_.at(s.wrt).size(), 1);
+      return Sparsity::dense(fmu_.ired(s.wrt).size(), 1);
     case OutputType::JAC:
       return get_fmu(fmu_)->jac_sparsity(s.ind, s.wrt);
     case OutputType::JAC_TRANS:
       return get_fmu(fmu_)->jac_sparsity(s.ind, s.wrt).T();
     case OutputType::JAC_ADJ_OUT:
-      return Sparsity(get_fmu(fmu_)->ired_.at(s.ind).size(), get_fmu(fmu_)->ored_.at(s.wrt).size());
+      return Sparsity(fmu_.ired(s.ind).size(), fmu_.ored(s.wrt).size());
     case OutputType::JAC_REG_ADJ:
-      return Sparsity(get_fmu(fmu_)->ored_.at(s.ind).size(), get_fmu(fmu_)->ored_.at(s.wrt).size());
+      return Sparsity(fmu_.ored(s.ind).size(), fmu_.ored(s.wrt).size());
     case OutputType::HESS:
       return get_fmu(fmu_)->hess_sparsity(s.ind, s.wrt);
   }
@@ -731,13 +731,13 @@ Sparsity FmuFunction::get_sparsity_out(casadi_int i) {
 std::vector<double> FmuFunction::get_nominal_in(casadi_int i) const {
   switch (in_.at(i).type) {
     case InputType::REG:
-      return get_fmu(fmu_)->get_nominal_in(in_.at(i).ind);
+      return fmu_.all_nominal_in(in_.at(i).ind);
     case InputType::FWD:
       break;
     case InputType::ADJ:
       break;
     case InputType::OUT:
-      return get_fmu(fmu_)->get_nominal_out(in_.at(i).ind);
+      return fmu_.all_nominal_out(in_.at(i).ind);
     case InputType::ADJ_OUT:
       break;
   }
@@ -748,7 +748,7 @@ std::vector<double> FmuFunction::get_nominal_in(casadi_int i) const {
 std::vector<double> FmuFunction::get_nominal_out(casadi_int i) const {
   switch (out_.at(i).type) {
     case OutputType::REG:
-      return get_fmu(fmu_)->get_nominal_out(out_.at(i).ind);
+      return fmu_.all_nominal_out(out_.at(i).ind);
     case OutputType::FWD:
       break;
     case OutputType::ADJ:
@@ -808,15 +808,15 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
   }
   if (need_adj) {
     // Set up vectors
-    aseed = w; w += get_fmu(fmu_)->oind_.size();
-    asens = w; w += get_fmu(fmu_)->iind_.size();
+    aseed = w; w += fmu_.n_out();
+    asens = w; w += fmu_.n_in();
     // Clear seed/sensitivity vectors
-    std::fill(aseed, aseed + get_fmu(fmu_)->oind_.size(), 0);
-    std::fill(asens, asens + get_fmu(fmu_)->iind_.size(), 0);
+    std::fill(aseed, aseed + fmu_.n_out(), 0);
+    std::fill(asens, asens + fmu_.n_in(), 0);
     // Copy adjoint seeds to aseed
     for (size_t i = 0; i < in_.size(); ++i) {
       if (arg[i] && in_[i].type == InputType::ADJ) {
-        const std::vector<size_t>& oind = get_fmu(fmu_)->ored_[in_[i].ind];
+        const std::vector<size_t>& oind = fmu_.ored(in_[i].ind);
         for (size_t k = 0; k < oind.size(); ++k) aseed[oind[k]] = arg[i][k];
       }
     }
@@ -841,10 +841,10 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
     if (task < max_hess_tasks_) {
       // Perturbed adjoint sensitivities
       s->pert_asens = w;
-      w += get_fmu(fmu_)->iind_.size();
+      w += fmu_.n_in();
       // Work vector for avoiding assignment of illegal nonzeros
       s->star_iw = iw;
-      iw += get_fmu(fmu_)->iind_.size();
+      iw += fmu_.n_in();
     }
   }
   // Evaluate everything except Hessian, possibly in parallel
@@ -876,7 +876,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
         casadi_trans(w, sp_trans_[sp_trans_map_[k]], r, sparsity_out(k), iw);
         break;
       case OutputType::ADJ:
-        for (size_t id : get_fmu(fmu_)->ired_[out_[k].wrt]) *r++ = asens[id];
+        for (size_t id : fmu_.ired(out_[k].wrt)) *r++ = asens[id];
         break;
       case OutputType::HESS:
         casadi_get_sub(r, hess_sp_, hess_nz,
@@ -1038,7 +1038,7 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
         // Get unperturbed value
         x[v] = m->ibuf_.at(id);
         // Step size
-        h[v] = m->self.step_ * get_fmu(fmu_)->nominal_in_.at(id);
+        h[v] = m->self.step_ * fmu_.nominal_in(id);
         // Make sure a a forward step remains in bounds
         if (x[v] + h[v] > get_fmu(fmu_)->max_in_.at(id)) {
           // Ensure a negative step is possible
@@ -1046,7 +1046,7 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
             std::stringstream ss;
             ss << "Cannot perturb " << get_fmu(fmu_)->vn_in_.at(id) << " at " << x[v]
               << " with step size "
-              << m->self.step_ << ", nominal " << get_fmu(fmu_)->nominal_in_.at(id) << " min "
+              << m->self.step_ << ", nominal " << fmu_.nominal_in(id) << " min "
               << get_fmu(fmu_)->min_in_.at(id) << ", max " << get_fmu(fmu_)->max_in_.at(id);
             casadi_warning(ss.str());
             return 1;
@@ -1068,7 +1068,7 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
       // Calculate perturbed inputs
       if (get_fmu(fmu_)->eval(m)) return 1;
       // Clear perturbed adjoint sensitivities
-      std::fill(m->pert_asens, m->pert_asens + get_fmu(fmu_)->iind_.size(), 0);
+      std::fill(m->pert_asens, m->pert_asens + fmu_.n_in(), 0);
       // Loop over colors of the Jacobian
       for (casadi_int c1 = 0; c1 < jac_colors_.size2(); ++c1) {
        // Get derivative directions
@@ -1085,7 +1085,7 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
          m->pert_asens[m->d.wrt[i]] += m->aseed[m->d.isens[i]] * m->d.sens[i];
       }
       // Count how many times each input is calculated
-      std::fill(m->star_iw, m->star_iw + get_fmu(fmu_)->iind_.size(), 0);
+      std::fill(m->star_iw, m->star_iw + fmu_.n_in(), 0);
       for (casadi_int v = 0; v < nv; ++v) {
         casadi_int ind1 = hc_row[v_begin + v];
         for (casadi_int k = hess_colind[ind1]; k < hess_colind[ind1 + 1]; ++k) {

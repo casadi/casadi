@@ -156,6 +156,12 @@ class CASADI_EXPORT Fmu2 : public SharedObjectInternal {
   // Sparsity pattern for extended Jacobian, Hessian
   Sparsity jac_sp_, hess_sp_;
 
+  /** \brief Get the number of scheme inputs */
+  size_t n_in() const { return iind_.size();}
+
+  /** \brief Get the number of scheme outputs */
+  size_t n_out() const { return oind_.size();}
+
   // Index lookup for input
   size_t index_in(const std::string& n) const;
 
@@ -258,8 +264,8 @@ class CASADI_EXPORT Fmu2 : public SharedObjectInternal {
 
   /// @{
   /** \brief Retreive nominal values */
-  std::vector<double> get_nominal_in(casadi_int i) const;
-  std::vector<double> get_nominal_out(casadi_int i) const;
+  std::vector<double> all_nominal_in(size_t i) const;
+  std::vector<double> all_nominal_out(size_t i) const;
   /// @}
 
   // Print description of an input
