@@ -30,7 +30,7 @@
 
 #include "function_internal.hpp"
 #include "fmu_interface.hpp"
-#include "casadi_enum.hpp"
+#include "finite_differences.hpp"
 
 /// \cond INTERNAL
 

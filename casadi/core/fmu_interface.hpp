@@ -41,35 +41,6 @@ class DaeBuilderInternal;
 struct FmuMemory;
 struct InputStruct;
 
-/// Variable type
-enum class FdMode {FORWARD, BACKWARD, CENTRAL, SMOOTHING, NUMEL};
-
-/// Convert to string
-CASADI_EXPORT std::string to_string(FdMode v);
-
-/// Length of FD stencil, including unperturbed input
-CASADI_EXPORT casadi_int n_fd_points(FdMode v);
-
-/// Offset for FD stencil, i.e. index of unperturbed input
-CASADI_EXPORT casadi_int fd_offset(FdMode v);
-
-/// Calculate FD estimate
-template<typename T1>
-CASADI_EXPORT void finite_diff(FdMode v, const T1** yk, T1* J, T1 h, casadi_int n_y,
-    T1 smoothing) {
-  switch (v) {
-    case FdMode::FORWARD:
-    case FdMode::BACKWARD:
-      return casadi_forward_diff(yk, J, h, n_y);
-    case FdMode::CENTRAL:
-      return casadi_central_diff(yk, J, h, n_y);
-    case FdMode::SMOOTHING:
-      return casadi_smoothing_diff(yk, J, h, n_y, eps);
-    default:
-      casadi_error("FD mode " + to_string(v) + " not implemented");
-  }
-}
-
 // Interface to binary FMU (shared between derivatives)
 struct CASADI_EXPORT Fmu {
   // Constructor

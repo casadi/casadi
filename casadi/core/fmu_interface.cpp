@@ -31,39 +31,6 @@ namespace casadi {
 
 #ifdef WITH_FMU
 
-std::string to_string(FdMode v) {
-  switch (v) {
-  case FdMode::FORWARD: return "forward";
-  case FdMode::BACKWARD: return "backward";
-  case FdMode::CENTRAL: return "central";
-  case FdMode::SMOOTHING: return "smoothing";
-  default: break;
-  }
-  return "";
-}
-
-casadi_int n_fd_points(FdMode v) {
-  switch (v) {
-    case FdMode::FORWARD: return 2;
-    case FdMode::BACKWARD: return 2;
-    case FdMode::CENTRAL: return 3;
-    case FdMode::SMOOTHING: return 5;
-    default: break;
-  }
-  return -1;
-}
-
-casadi_int fd_offset(FdMode v) {
-  switch (v) {
-    case FdMode::FORWARD: return 0;
-    case FdMode::BACKWARD: return 1;
-    case FdMode::CENTRAL: return 1;
-    case FdMode::SMOOTHING: return 2;
-    default: break;
-  }
-  return -1;
-}
-
 std::string Fmu::desc_in(FmuMemory* m, size_t id) const {
   // Create description
   std::stringstream ss;
