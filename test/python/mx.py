@@ -2,8 +2,8 @@
 #     This file is part of CasADi.
 #
 #     CasADi -- A symbolic framework for dynamic optimization.
-#     Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
-#                             K.U. Leuven. All rights reserved.
+#     Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+#                             KU Leuven. All rights reserved.
 #     Copyright (C) 2011-2014 Greg Horn
 #
 #     CasADi is free software; you can redistribute it and/or
@@ -412,6 +412,39 @@ class MXtests(casadiTestCase):
     for i in range(len(L)):
       self.assertAlmostEqual(L[i], zt[0,i],10)
 
+  def test_sparsity_cast(self):
+    sp_source = sparsify(DM([[1, 0, 1],[0, 0, 1],[1, 0,0]])).sparsity()
+    x   = MX.sym("x",sp_source)
+    xsx = SX.sym("x",sp_source)
+
+
+
+    sp = sparsify(DM([[1, 0, 1],[1, 0,1]])).sparsity()
+
+    with self.assertInException("mismatch"):
+      reshape(x,sp)
+
+    with self.assertInException("Mismatching"):
+      sparsity_cast(x,horzcat(sp,sp))
+
+    y = sparsity_cast(x,sp)
+    ysx = sparsity_cast(xsx,sp)
+
+    fsx = Function("fsx",[xsx],[ysx])
+    f = Function("f",[x],[y])
+
+    inp = DM([[1, 0, 2],[0, 0, 3],[4, 0, 0]])
+    self.checkfunction(f,fsx,inputs=[inp])
+    y = fsx(inp)
+    self.checkarray(y,DM([[1, 0, 2],[4, 0, 3]]))
+    
+    x = MX.sym("x",2)
+    sp = sparsify(blockcat([[1,0],[0,1]])).sparsity()
+    y = sparsity_cast(MX.sym("y",2),sp)
+
+    vec(y)
+
+
   def test_MXcompose(self):
     self.message("compositions of vec, trans, reshape with vertcat")
     checkMXoperations(self,lambda x: x,lambda x: x,'vertcat')
@@ -541,8 +574,7 @@ class MXtests(casadiTestCase):
     x0=array([[0.738]])
 
     def fmod(f,x):
-      J=f.jacobian_old(0, 0)
-      return J
+      return jacobian_old(f, 0, 0)
 
     self.numpyEvaluationCheckPool(self.Jpool,[x],x0,name="MX unary operations, jacobian",fmod=fmod)
 
@@ -553,8 +585,7 @@ class MXtests(casadiTestCase):
       x0=array([0.738,0.9,0.3])
 
       def fmod(f,x):
-        J=f.jacobian_old(0, 0)
-        return J
+        return jacobian_old(f, 0, 0)
 
       self.numpyEvaluationCheckPool(self.Jpool,[x],x0,name="MX unary operations, jacobian",fmod=fmod)
 
@@ -761,7 +792,7 @@ class MXtests(casadiTestCase):
 
     for w in [0, 1]:
       f = Function("f", [x,A,b,C,D,e], [a], {"ad_weight":w, "ad_weight_sp":w})
-      J = f.jacobian_old(0, 0)
+      J = jacobian_old(f, 0, 0)
       J_in = [0]*J.n_in();J_in[0]=x_
       J_in[1]=A_
       J_in[2]=b_
@@ -831,7 +862,7 @@ class MXtests(casadiTestCase):
     for w in [0, 1]:
       f = Function("f", [x,A,b,C,D,e], [a], {"ad_weight":w, "ad_weight_sp":w})
 
-      J = f.jacobian_old(0, 0)
+      J = jacobian_old(f, 0, 0)
       J_in = [0]*J.n_in();J_in[0]=x_
       J_in[1]=A_
       J_in[2]=b_
@@ -904,7 +935,7 @@ class MXtests(casadiTestCase):
 
     for w in [0, 1]:
       f = Function("f", [x,A,b,C,D,e], [a], {"ad_weight":w, "ad_weight_sp":w})
-      J = f.jacobian_old(0, 0)
+      J = jacobian_old(f, 0, 0)
       J_in = [0]*J.n_in();J_in[0]=x_
       J_in[1]=A_
       J_in[2]=b_
@@ -921,7 +952,7 @@ class MXtests(casadiTestCase):
     x=SX.sym("x")
     y=x**3
     f=Function("f", [x],[y])
-    J=f.jacobian_old(0, 0)
+    J = jacobian_old(f, 0, 0)
 
     X=MX.sym("X")
     F=Function("F", [X], J(X))
@@ -1134,6 +1165,27 @@ class MXtests(casadiTestCase):
         T2 = t2!=0
         f_out = f([t1,t2])
         self.checkarray(f_out,DM([T1 and T2,T1 or T2,not T1]),"bool(%d,%d): %s" % (t1,t2,str(f_out)))
+  
+  def test_short_circuiting_codegen(self):
+    x = MX.sym('x', 5)
+
+    y = if_else(x > 0, 0, x)
+
+    f = Function('f', [x], [y], ['x'], ['y'])
+    
+    self.check_codegen(f,inputs=[vertcat(-200, 200, -100, 100, 0)])
+
+    x = MX.sym('x', 8)
+    y = MX.sym('y', 8)
+    
+    z = logic_and(x,y)
+    z2 = logic_or(x,y)
+
+    f = Function('f', [x,y], [z,z2])
+    
+    self.check_codegen(f,inputs=[vertcat(0, 1, 0, 1, 0, 1, 0, 1),vertcat(0, 0, 1, 1, 0, 0, 1, 1)])
+
+
 
   def test_MXineq(self):
     self.message("SX ineq")
@@ -1193,7 +1245,7 @@ class MXtests(casadiTestCase):
         gfcn = Function("gfcn", [U], [G]).expand("e_gfcn", {"ad_weight":1})
       else:
         gfcn = Function("gfcn", [U],[G], {"ad_weight":1})
-      J = gfcn.jacobian_old(0, 0)
+      J = jacobian_old(gfcn, 0, 0)
       J_in = [0]*J.n_in();J_in[0]=1
       J_out = J.call(J_in)
       self.assertAlmostEqual(J_out[0],1,9)
@@ -2227,7 +2279,7 @@ class MXtests(casadiTestCase):
 
     f = Function("f", [x],[y])
 
-    H = f.hessian_old(0, 0)
+    H = hessian_old(f, 0, 0)
 
   def test_bug_1042(self):
 
@@ -2281,10 +2333,10 @@ class MXtests(casadiTestCase):
   def test_expand_free(self):
     x = MX.sym("x")
     y = MX.sym("y")
-    f = Function('f',[x],[x+y])
     with self.assertInException("free"):
-      f.expand()
+      f = Function('f',[x],[x+y])
 
+    f = Function('f',[x],[x+y],{"allow_free": True})
     g = Function('g',[x,y],[f(x)])
     ge = g.expand()
     self.checkfunction(g,g,inputs=[1,2])
@@ -2305,7 +2357,7 @@ class MXtests(casadiTestCase):
 
       x2 = vertcat(*[c.zeros(0,0)] + x1s + [c.zeros(0,0)])
       self.checkarray(x2.shape,(10,0))
-      
+
       x0 = c.zeros(0,1)
       x2 = vertcat(x0,c.zeros(0,0),x0)
       self.checkarray(x2.shape,(0,1))
@@ -2458,8 +2510,8 @@ class MXtests(casadiTestCase):
           self.checkfunction(fsx, f_sx, inputs=[A_,B_,C_])
 
           for i in range(3):
-            self.check_sparsity(f.sparsity_jac(i, 0), fsx.sparsity_jac(i, 0))
-            self.check_sparsity(frev.sparsity_jac(i, 0), fsx.sparsity_jac(i, 0))
+            self.check_sparsity(f.jac_sparsity(0, i), fsx.jac_sparsity(0, i))
+            self.check_sparsity(frev.jac_sparsity(0, i), fsx.jac_sparsity(0, i))
 
 
         def my_einstein(A, B, C, dim_a, dim_b, dim_c, ind_a, ind_b, ind_c):
@@ -2538,7 +2590,7 @@ class MXtests(casadiTestCase):
      out = f(Av)
      for o in out:
        self.checkarray(o, np.linalg.inv(np.array(Av)))
-    
+
 
   def test_interp1d(self):
     v = [7,3,4,-3]
@@ -2566,25 +2618,40 @@ class MXtests(casadiTestCase):
     F = Function("f",[vs],[interp1d(x,vs,xq,"linear",True)])
 
     self.checkarray(F(v),np.interp(xq,x,v))
-    
+
   def test_bilin_etc(self):
     x = MX.sym("x",3,3)
     y = MX.sym("y",3,1)
     z = MX.sym("z",3,1)
-    
+
     import numpy
     numpy.random.seed(42)
     x0 = numpy.random.random((3,3))
     y0 = numpy.random.random((3,1))
     z0 = numpy.random.random((3,1))
-    
+
     for e in [(bilin(x,y,z),mtimes(mtimes(y.T,x),z)),(rank1(x,0.3,y,z),x+0.3*mtimes(y,z.T))]:
       f = Function('f',[x,y,z],[e[0]])
       fref = Function('fref',[x,y,z],[e[1]])
-      f_sx = f.expand()    
+      f_sx = f.expand()
       self.checkfunction(f,fref,inputs=[x0,y0,z0])
       self.checkfunction(f_sx,fref,inputs=[x0,y0,z0])
       self.check_codegen(f,inputs=[x0,y0,z0])
+      
+  def test_bilin_short(self):
+    for X in [SX,MX]:
+        x = X.sym("x",3,3)
+        y = X.sym("y",3,1)
+
+        import numpy
+        numpy.random.seed(42)
+        x0 = numpy.random.random((3,3))
+        y0 = numpy.random.random((3,1))
+        
+        f = Function("f",[x,y],[bilin(x,y)])
+        fref = Function("f",[x,y],[bilin(x,y,y)])
+        
+        self.checkfunction(f,fref,inputs=[x0,y0])
 
   def test_det_shape(self):
     X = MX.sym("x",2,3)
@@ -2592,8 +2659,8 @@ class MXtests(casadiTestCase):
       det(X)
     X = MX.sym("x",3,3)
     det(X)
-    
-    
+
+
   @known_bug()
   def test_det(self):
     X = MX.sym("x",3,3)
@@ -2602,7 +2669,7 @@ class MXtests(casadiTestCase):
     import numpy
     numpy.random.seed(42)
     x0 = numpy.random.random((3,3))
-    
+
     f = Function('f',[x],[det(x)])
     F = Function('F',[X],[det(X)])
     self.checkfunction(f,F,inputs=[x0])
@@ -2610,7 +2677,7 @@ class MXtests(casadiTestCase):
   def test_mtimes_mismatch_segfault(self):
     with self.assertInException("incompatible dimensions"):
       mtimes(DM(Sparsity.lower(5)),MX.sym('x',100))
-    
+
   def test_monitor(self):
     x = MX.sym("x")
     y = sqrt(x.monitor("hey"))
@@ -2635,13 +2702,13 @@ class MXtests(casadiTestCase):
       self.check_codegen(f,inputs=[1,-2])
 
 
-  @memory_heavy()    
+  @memory_heavy()
   def test_getsetnonzeros(self):
     import numpy
     numpy.random.seed(42)
     for S in [Sparsity.lower(5),Sparsity.dense(5,5)]:
       M = MX.sym("X",S.nnz())
-      
+
       m = sin(MX(S,M))
       for i in [0,2]:
         for ind in [(i,i),(1,i),(i,1),(slice(None),i),(i,slice(None)),(slice(i,i+2),slice(i,i+2)),(slice(i,i+2),slice(None)),([i,i],[0,0]),([],[])]:
@@ -2650,17 +2717,18 @@ class MXtests(casadiTestCase):
           e = dot(e,e)
           f = Function('f',[M],[e])
           self.checkfunction(f,f.expand(),inputs=[ numpy.random.random((S.nnz(),1))])
-        
+
           mc = m+0
-          
+
           Y = MX.sym("y",E.nnz())
           y = MX(E.sparsity(),Y)
           mc.__setitem__(ind,y)
           e = cos(mc)
           e = dot(e,e)
-          
+
           f = Function('f',[M,Y],[e])
           self.checkfunction(f,f.expand(),inputs=[ numpy.random.random((S.nnz(),1)), numpy.random.random((E.nnz(),1))])
+          self.check_serialize(f,inputs=[ numpy.random.random((S.nnz(),1)), numpy.random.random((E.nnz(),1))])
 
   def test_evalf(self):
     x = MX.sym("x")
@@ -2730,6 +2798,19 @@ class MXtests(casadiTestCase):
         self.assertTrue(mmin_res.is_empty())
         self.assertTrue(mmax_res.is_empty())
 
+    for m in [mmin,mmax]:
+      x = MX.sym("X",2)
+      f = Function("f",[x],[m(x)])
+      #self.checkfunction(f,f.expand(),inputs=[[0.2,0.3]])
+
+      #J = f.jacobian()
+      #print(J([2,2],0))
+      f.expand().disp(True)
+      J = f.expand().jacobian()
+      f.expand().jacobian().disp(True)
+      print(J([2,2],0))
+      self.checkfunction(f,f.expand(),inputs=[[2,2]])
+
   def test_doc_expression_tools(self):
     self.assertTrue("Given a repeated matrix, computes the sum of repeated parts." in repsum.__doc__)
 
@@ -2789,11 +2870,11 @@ class MXtests(casadiTestCase):
 
     with self.assertInException("Not defined for ConstantFile"):
       x.to_DM()
-  
+
   def test_nonzeros_param(self):
     x = MX.sym("x",2)
     y = MX.sym("y")
-  
+
     for ad_weight_sp in [0,1]:
       opts = {"helper_options":{"ad_weight_sp":ad_weight_sp}}
       z = x.nz[y]
@@ -2855,7 +2936,7 @@ class MXtests(casadiTestCase):
       strides.append(strides[-1]*N)
 
     F = interpolant('F', 'linear', grid, d)
-    
+
     ref = vcat([F(x).T for x in x0r])
 
     x = [MX.sym("x%d" % i,1,N) for i in range(n_dim)]
@@ -2939,6 +3020,71 @@ class MXtests(casadiTestCase):
 
         self.check_codegen(f,inputs=[A])
 
-    
+  def test_convexify_bugs(self):
+    for eps in [0,1e-100,1]:
+      q = 4
+      Q = 10
+      for s in [-4,0.1,0,0.1,4]:
+        for trans in [lambda e: e, lambda e: sparsify(e)]:
+          A = trans(blockcat([[q,s,0+eps],[s,Q,0],[0+eps,0,2]]))
+          print(A)
+          self.assertTrue(np.all(np.linalg.eig(A)[0]>0))
+          Ac = evalf(convexify(A,{"strategy":"eigen-reflect"}))
+          self.checkarray(A,Ac,digits=8)
+
+
+  def test_logsumexp(self):
+    x = MX.sym("x",3)
+
+    f_ref = Function("f_ref",[x],[log(exp(x[0])+exp(x[1])+exp(x[2]))])
+    f = Function("f",[x],[logsumexp(x)])
+
+    self.checkfunction(f,f_ref,inputs=[vertcat(1.1,1.3,1.7)])
+    self.check_codegen(f,inputs=[vertcat(1.1,1.3,1.7)])
+    self.checkfunction(f,f_ref,inputs=[vertcat(1.1,1.3,1.3)])
+    self.checkfunction(f,f_ref,inputs=[vertcat(1.3,1.3,1.3)])
+
+    # Avoid overflow
+    res = f(vertcat(100,1000,10000))
+    self.checkarray(res,10000)
+
+  def test_empty_broadcast(self):
+    for nc in [0,2]:
+      res = atan2(MX.sym("c",nc,1),MX.sym("t",nc,3))
+
+      self.assertEqual(res.shape[0],nc)
+      self.assertEqual(res.shape[1],3)
+  
+      with self.assertInException("Dimension mismatch"):
+        res = atan2(MX.sym("c",nc,2),MX.sym("t",nc,3))
+
+      res = atan2(MX.sym("c",nc,2),MX.sym("t",nc,4))
+      self.assertEqual(res.shape[0],nc)
+      self.assertEqual(res.shape[1],4)
+
+      res = atan2(MX.sym("c",nc,4),MX.sym("t",nc,2))
+      self.assertEqual(res.shape[0],nc)
+      self.assertEqual(res.shape[1],4)
+
+  def test_horzcat_sparsity(self):
+    x = MX.sym("x",2,2)
+
+    for y in [MX.sym("y",Sparsity(2,2)), MX.sym("y",Sparsity.lower(2))]:
+
+      z = sin(horzcat(x,sin(y),x))
+      z_alt = sin(sparsity_cast(vertcat(vec(x),vec(sin(y)),vec(x)),z.sparsity()))
+
+      f = Function('f',[x,y],[z])
+      f_alt = Function('f_alt',[x,y],[z])
+
+      for F in [f,f_alt]:
+        self.assertEqual(F.call([x,y],True,False)[0].nnz(), z.nnz())
+        self.assertEqual(F.call([x,y],False,True)[0].nnz(), z.nnz())
+        self.assertEqual(F.call([x,x**2],True,False)[0].nnz(), z.nnz())
+        self.assertEqual(F.call([x,x**2],False,True)[0].nnz(), z.nnz())
+
+    self.checkfunction(f,f.expand(),inputs=[DM([[1,2],[3,4]]),DM([[5,6],[7,8]])])
+    self.checkfunction(f,f_alt,inputs=[DM([[1,2],[3,4]]),DM([[5,6],[7,8]])])
+
 if __name__ == '__main__':
     unittest.main()

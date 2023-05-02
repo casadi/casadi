@@ -1325,8 +1325,92 @@ fun:PyParser_ASTFromFile
    fun:call_init.part.0
 }
 
+{
+   py38
+   Memcheck:Addr4
+   fun:address_in_range
+   fun:pymalloc_free.isra.0
+}
 
+{
+   py38.1
+   Memcheck:Addr4
+   fun:address_in_range
+   fun:pymalloc_realloc
+}
 
+{
+   py38.2
+   Memcheck:Cond
+   fun:address_in_range
+   fun:pymalloc_realloc
+   fun:_PyObject_Realloc
+}
 
+{
+   py38.3
+   Memcheck:Value8
+   fun:address_in_range
+   fun:pymalloc_realloc
+}
 
+{
+   py38.4
+   Memcheck:Cond
+   fun:address_in_range
+   fun:pymalloc_realloc
+}
+
+{
+   py38.5
+   Memcheck:Cond
+   fun:address_in_range
+   fun:pymalloc_free.isra.0
+}
+
+{
+   py38.6
+   Memcheck:Value8
+   fun:address_in_range
+   fun:pymalloc_free.isra.0
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   fun:resize_scopes
+   fun:dl_open_worker
+   fun:_dl_catch_exception
+   fun:_dl_open
+   fun:dlopen_doit
+   fun:_dl_catch_exception
+   fun:_dl_catch_error
+   fun:_dlerror_run
+   fun:dlopen@@GLIBC_2.2.5
+   fun:_PyImport_FindSharedFuncptr
+   fun:_PyImport_LoadDynamicModuleWithSpec
+   fun:_imp_create_dynamic_impl.isra.21
+   fun:_imp_create_dynamic
+   fun:cfunction_vectorcall_FASTCALL
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Param
+   sched_setaffinity(mask)
+   fun:syscall
+   fun:__kmp_affinity_determine_capable
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   fun:_PyMem_RawWcsdup
+   fun:_PyCoreConfig_Copy.cold.547
+   fun:_Py_InitializeCore
+}
 

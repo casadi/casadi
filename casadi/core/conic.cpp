@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -26,28 +26,27 @@
 #include "conic_impl.hpp"
 #include "nlpsol_impl.hpp"
 
-using namespace std;
 namespace casadi {
 
-  bool has_conic(const string& name) {
+  bool has_conic(const std::string& name) {
     return Conic::has_plugin(name);
   }
 
-  void load_conic(const string& name) {
+  void load_conic(const std::string& name) {
     Conic::load_plugin(name);
   }
 
-  string doc_conic(const string& name) {
+  std::string doc_conic(const std::string& name) {
     return Conic::getPlugin(name).doc;
   }
 
-  Function conic(const string& name, const string& solver,
+  Function conic(const std::string& name, const std::string& solver,
                 const SpDict& qp, const Dict& opts) {
     return Function::create(Conic::instantiate(name, solver, qp), opts);
   }
 
   void conic_debug(const Function& f, const std::string &filename) {
-    ofstream file;
+    std::ofstream file;
     file.open(filename.c_str());
     conic_debug(f, file);
   }
@@ -58,19 +57,19 @@ namespace casadi {
     return n->generateNativeCode(file);
   }
 
-  vector<string> conic_in() {
-    vector<string> ret(conic_n_in());
+  std::vector<std::string> conic_in() {
+    std::vector<std::string> ret(conic_n_in());
     for (size_t i=0; i<ret.size(); ++i) ret[i]=conic_in(i);
     return ret;
   }
 
-  vector<string> conic_out() {
-    vector<string> ret(conic_n_out());
+  std::vector<std::string> conic_out() {
+    std::vector<std::string> ret(conic_n_out());
     for (size_t i=0; i<ret.size(); ++i) ret[i]=conic_out(i);
     return ret;
   }
 
-  string conic_in(casadi_int ind) {
+  std::string conic_in(casadi_int ind) {
     switch (static_cast<ConicInput>(ind)) {
     case CONIC_H:      return "h";
     case CONIC_G:      return "g";
@@ -86,10 +85,10 @@ namespace casadi {
     case CONIC_LAM_A0: return "lam_a0";
     case CONIC_NUM_IN: break;
     }
-    return string();
+    return std::string();
   }
 
-  string conic_out(casadi_int ind) {
+  std::string conic_out(casadi_int ind) {
     switch (static_cast<ConicOutput>(ind)) {
     case CONIC_X:     return "x";
     case CONIC_COST:  return "cost";
@@ -97,7 +96,7 @@ namespace casadi {
     case CONIC_LAM_X: return "lam_x";
     case CONIC_NUM_OUT: break;
     }
-    return string();
+    return std::string();
   }
 
   casadi_int conic_n_in() {
@@ -120,6 +119,7 @@ namespace casadi {
     Dict opt = opts;
     auto it = opt.find("expand");
     bool expand = false;
+    bool error_on_fail = get_from_dict(opts, "error_on_fail", true);
     if (it!=opt.end()) {
       expand = it->second;
       opt.erase(it);
@@ -206,7 +206,7 @@ namespace casadi {
                               {"p", P.sparsity()}, {"q", Q.sparsity()}}, opt);
 
     // Create an MXFunction with the right signature
-    vector<MX> ret_in(NLPSOL_NUM_IN);
+    std::vector<MX> ret_in(NLPSOL_NUM_IN);
     ret_in[NLPSOL_X0] = MX::sym("x0", x.sparsity());
     ret_in[NLPSOL_P] = MX::sym("p", p.sparsity());
     ret_in[NLPSOL_LBX] = MX::sym("lbx", x.sparsity());
@@ -215,10 +215,10 @@ namespace casadi {
     ret_in[NLPSOL_UBG] = MX::sym("ubg", g.sparsity());
     ret_in[NLPSOL_LAM_X0] = MX::sym("lam_x0", x.sparsity());
     ret_in[NLPSOL_LAM_G0] = MX::sym("lam_g0", g.sparsity());
-    vector<MX> ret_out(NLPSOL_NUM_OUT);
+    std::vector<MX> ret_out(NLPSOL_NUM_OUT);
 
 
-    vector<MX> v(NL_NUM_IN);
+    std::vector<MX> v(NL_NUM_IN);
     v[NL_X] = ret_in[NLPSOL_X0];
     v[NL_P] = ret_in[NLPSOL_P];
     // Evaluate constant part of objective
@@ -227,7 +227,7 @@ namespace casadi {
     v = prob(v);
 
     // Call the QP solver
-    vector<MX> w(CONIC_NUM_IN);
+    std::vector<MX> w(CONIC_NUM_IN);
     w[CONIC_H] = v.at(0);
     w[CONIC_G] = v.at(1);
     w[CONIC_A] = v.at(2);
@@ -250,8 +250,11 @@ namespace casadi {
     ret_out[NLPSOL_LAM_G] = reshape(w[CONIC_LAM_A], g.size());
     ret_out[NLPSOL_LAM_P] = MX::nan(p.sparsity());
 
-    return Function(name, ret_in, ret_out, nlpsol_in(), nlpsol_out(),
-                    {{"default_in", nlpsol_default_in()}});
+    Dict fun_opts;
+    fun_opts["default_in"] = nlpsol_default_in();
+    fun_opts["error_on_fail"] = error_on_fail;
+
+    return Function(name, ret_in, ret_out, nlpsol_in(), nlpsol_out(), fun_opts);
   }
 
   Function qpsol(const std::string& name, const std::string& solver,
@@ -267,6 +270,9 @@ namespace casadi {
   // Constructor
   Conic::Conic(const std::string& name, const std::map<std::string, Sparsity> &st)
     : FunctionInternal(name) {
+
+    // Set default options
+    error_on_fail_ = true;
 
     P_ = Sparsity(0, 0);
     for (auto i=st.begin(); i!=st.end(); ++i) {
@@ -391,10 +397,7 @@ namespace casadi {
         "Indicates which of the variables are discrete, i.e. integer-valued"}},
       {"print_problem",
        {OT_BOOL,
-        "Print a numeric description of the problem"}},
-      {"error_on_fail",
-       {OT_BOOL,
-        "When the numerical process returns unsuccessfully, raise an error (default false)."}}
+        "Print a numeric description of the problem"}}
      }
   };
 
@@ -403,7 +406,6 @@ namespace casadi {
     FunctionInternal::init(opts);
 
     print_problem_ = false;
-    error_on_fail_ = true;
 
     // Read options
     for (auto&& op : opts) {
@@ -411,8 +413,6 @@ namespace casadi {
         discrete_ = op.second;
       } else if (op.first=="print_problem") {
         print_problem_ = op.second;
-      } else if (op.first=="error_on_fail") {
-        error_on_fail_ = op.second;
       }
     }
 
@@ -428,18 +428,12 @@ namespace casadi {
     casadi_assert(np_==0 || psd_support(),
       "Selected solver does not support psd constraints.");
 
+    set_qp_prob();
   }
 
   /** \brief Initalize memory block */
   int Conic::init_mem(void* mem) const {
     if (ProtoFunction::init_mem(mem)) return 1;
-
-    auto m = static_cast<ConicMemory*>(mem);
-
-    // Problem has not been solved at this point
-    m->success = false;
-    m->unified_return_status = SOLVER_RET_UNKNOWN;
-    m->iter_count = -1;
 
     return 0;
   }
@@ -450,10 +444,26 @@ namespace casadi {
 
     auto m = static_cast<ConicMemory*>(mem);
 
+    casadi_qp_data<double>& d_qp = m->d_qp;
+    d_qp.h = arg[CONIC_H];
+    d_qp.g = arg[CONIC_G];
+    d_qp.a = arg[CONIC_A];
+    d_qp.lbx = arg[CONIC_LBX];
+    d_qp.ubx = arg[CONIC_UBX];
+    d_qp.uba = arg[CONIC_UBA];
+    d_qp.lba = arg[CONIC_LBA];
+    d_qp.x0 = arg[CONIC_X0];
+    d_qp.lam_x0 = arg[CONIC_LAM_X0];
+    d_qp.lam_a0 = arg[CONIC_LAM_A0];
+    d_qp.x = res[CONIC_X];
+    d_qp.lam_x = res[CONIC_LAM_X];
+    d_qp.lam_a = res[CONIC_LAM_A];
+    d_qp.f = res[CONIC_COST];
+
     // Problem has not been solved at this point
-    m->success = false;
-    m->unified_return_status = SOLVER_RET_UNKNOWN;
-    m->iter_count = -1;
+    d_qp.success = false;
+    d_qp.unified_return_status = SOLVER_RET_UNKNOWN;
+    d_qp.iter_count = -1;
   }
 
   Conic::~Conic() {
@@ -518,9 +528,12 @@ namespace casadi {
     if (inputs_check_) {
       check_inputs(arg[CONIC_LBX], arg[CONIC_UBX], arg[CONIC_LBA], arg[CONIC_UBA]);
     }
+
+    setup(mem, arg, res, iw, w);
+
     int ret = solve(arg, res, iw, w, mem);
 
-    if (error_on_fail_ && !m->success)
+    if (error_on_fail_ && !m->d_qp.success)
       casadi_error("conic process failed. "
                    "Set 'error_on_fail' option to false to ignore this error.");
     return ret;
@@ -677,9 +690,9 @@ namespace casadi {
     Dict stats = FunctionInternal::get_stats(mem);
     auto m = static_cast<ConicMemory*>(mem);
 
-    stats["success"] = m->success;
-    stats["unified_return_status"] = string_from_UnifiedReturnStatus(m->unified_return_status);
-    stats["iter_count"] = m->iter_count;
+    stats["success"] = m->d_qp.success;
+    stats["unified_return_status"] = string_from_UnifiedReturnStatus(m->d_qp.unified_return_status);
+    stats["iter_count"] = m->d_qp.iter_count;
     return stats;
   }
 
@@ -703,10 +716,9 @@ namespace casadi {
   void Conic::serialize_body(SerializingStream &s) const {
     FunctionInternal::serialize_body(s);
 
-    s.version("Conic", 1);
+    s.version("Conic", 2);
     s.pack("Conic::discrete", discrete_);
     s.pack("Conic::print_problem", print_problem_);
-    s.pack("Conic::error_on_fail", error_on_fail_);
     s.pack("Conic::H", H_);
     s.pack("Conic::A", A_);
     s.pack("Conic::Q", Q_);
@@ -726,17 +738,55 @@ namespace casadi {
   }
 
   Conic::Conic(DeserializingStream & s) : FunctionInternal(s) {
-    s.version("Conic", 1);
+    int version = s.version("Conic", 1, 2);
     s.unpack("Conic::discrete", discrete_);
     s.unpack("Conic::print_problem", print_problem_);
-    s.unpack("Conic::error_on_fail", error_on_fail_);
+    if (version==1) {
+      s.unpack("Conic::error_on_fail", error_on_fail_);
+    }
     s.unpack("Conic::H", H_);
     s.unpack("Conic::A", A_);
+    set_qp_prob();
     s.unpack("Conic::Q", Q_);
     s.unpack("Conic::P", P_);
     s.unpack("Conic::nx", nx_);
     s.unpack("Conic::na", na_);
     s.unpack("Conic::np", np_);
+  }
+
+  void Conic::set_qp_prob() {
+    p_qp_.sp_a = A_;
+    p_qp_.sp_h = H_;
+    casadi_qp_setup(&p_qp_);
+  }
+
+  void Conic::qp_codegen_body(CodeGenerator& g) const {
+    g.add_auxiliary(CodeGenerator::AUX_QP);
+    g.local("d_qp", "struct casadi_qp_data");
+    g.local("p_qp", "struct casadi_qp_prob");
+
+    g << "d_qp.prob = &p_qp;\n";
+    g << "p_qp.sp_a = " << g.sparsity(A_) << ";\n";
+    g << "p_qp.sp_h = " << g.sparsity(H_) << ";\n";
+    g << "casadi_qp_setup(&p_qp);\n";
+    g << "casadi_qp_init(&d_qp, &iw, &w);\n";
+
+
+    g << "d_qp.h = arg[" << CONIC_H << "];\n";
+    g << "d_qp.g = arg[" << CONIC_G << "];\n";
+    g << "d_qp.a = arg[" << CONIC_A << "];\n";
+    g << "d_qp.lbx = arg[" << CONIC_LBX << "];\n";
+    g << "d_qp.ubx = arg[" << CONIC_UBX << "];\n";
+    g << "d_qp.lba = arg[" << CONIC_LBA << "];\n";
+    g << "d_qp.uba = arg[" << CONIC_UBA << "];\n";
+    g << "d_qp.x0 = arg[" << CONIC_X0 << "];\n";
+    g << "d_qp.lam_x0 = arg[" << CONIC_LAM_X0 << "];\n";
+    g << "d_qp.lam_a0 = arg[" << CONIC_LAM_A0 << "];\n";
+
+    g << "d_qp.f = res[" << CONIC_COST << "];\n";
+    g << "d_qp.x = res[" << CONIC_X << "];\n";
+    g << "d_qp.lam_x = res[" << CONIC_LAM_X << "];\n";
+    g << "d_qp.lam_a = res[" << CONIC_LAM_A << "];\n";
   }
 
 } // namespace casadi

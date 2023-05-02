@@ -1,24 +1,20 @@
 /*
- *    This file is part of CasADi.
+ *    MIT No Attribution
  *
- *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
- *    Copyright (C) 2011-2014 Greg Horn
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl, KU Leuven.
  *
- *    CasADi is free software; you can redistribute it and/or
- *    modify it under the terms of the GNU Lesser General Public
- *    License as published by the Free Software Foundation; either
- *    version 3 of the License, or (at your option) any later version.
+ *    Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ *    software and associated documentation files (the "Software"), to deal in the Software
+ *    without restriction, including without limitation the rights to use, copy, modify,
+ *    merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
+ *    permit persons to whom the Software is furnished to do so.
  *
- *    CasADi is distributed in the hope that it will be useful,
- *    but WITHOUT ANY WARRANTY; without even the implied warranty of
- *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *    Lesser General Public License for more details.
- *
- *    You should have received a copy of the GNU Lesser General Public
- *    License along with CasADi; if not, write to the Free Software
- *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ *    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+ *    INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+ *    PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *    HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ *    OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+ *    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  */
 
@@ -36,20 +32,19 @@
 #include "casadi/casadi.hpp"
 
 using namespace casadi;
-using namespace std;
 
 // Print a (typically 64-bit) unsigned integer
 void print_binary(bvec_t v){
   for(int k=0; k<bvec_size; ++k){
-    if(k%4==0) cout << " ";
-    if(k%16==0) cout << " ";
+    if(k%4==0) std::cout << " ";
+    if(k%16==0) std::cout << " ";
     if(v & (bvec_t(1)<<k)){
-      cout << 1;
+      std::cout << 1;
     } else {
-      cout << 0;
+      std::cout << 0;
     }
   }
-  cout << endl;
+  std::cout << std::endl;
 }
 
 int main(){
@@ -59,23 +54,23 @@ int main(){
     // Create a simple function
     Function f;
     if(test==0){
-      cout << "SX:" << endl;
+      std::cout << "SX:" << std::endl;
       SX x = SX::sym("x",3);
       SX z = x(0)*x(0)+x(2) + 3;
       f = Function("f", {x}, {z});
     } else {
-      cout << "MX:" << endl;
+      std::cout << "MX:" << std::endl;
       MX x = MX::sym("x",3);
       MX z = x(0)*x(0)+x(2) + 3;
       f = Function("f", {x}, {z});
     }
 
     // Memory for inputs and outputs
-    vector<bvec_t> f_in(f.nnz_in(0), 0);
-    vector<bvec_t> f_out(f.nnz_out(0), 0);
+    std::vector<bvec_t> f_in(f.nnz_in(0), 0);
+    std::vector<bvec_t> f_out(f.nnz_out(0), 0);
 
     // Propagate from input to output (forward mode)
-    cout << "forward mode" << endl;
+    std::cout << "forward mode" << std::endl;
 
     // Make sure that the class is able to support the dependency propagation
     casadi_assert(f.has_spfwd(), "Forward sparsity propagation not supported");
@@ -95,7 +90,7 @@ int main(){
     print_binary(f_out[0]);
 
     // Propagate from output to input (adjoint/reverse/backward mode)
-    cout << "backward mode" << endl;
+    std::cout << "backward mode" << std::endl;
 
     // Make sure that the class is able to support the dependency propagation
     casadi_assert(f.has_sprev(), "Backward sparsity propagation not supported");

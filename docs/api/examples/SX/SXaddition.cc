@@ -1,12 +1,12 @@
 #include "casadi/casadi.hpp"
+#include <iostream>
 
 using namespace casadi;
-using namespace std;
 
 int main(int argc, char *argv[])
 {
   SX x = SX::sym("x");
   SX y = SX::sym("y");
   
-  cout << x+y << endl;
+  std::cout << x+y << std::endl;
 }

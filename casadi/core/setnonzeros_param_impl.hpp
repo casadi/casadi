@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -31,8 +31,6 @@
 #include "serializing_stream.hpp"
 
 /// \cond INTERNAL
-
-using namespace std;
 
 namespace casadi {
 
@@ -130,7 +128,7 @@ namespace casadi {
     MX arg0 = project(arg[0], this->dep(0).sparsity());
     MX arg1 = project(arg[1], this->dep(1).sparsity());
     MX inner = arg[2];
-    MX outer = arg[2];
+    MX outer = arg[3];
     if (Add) {
       res[0] = arg1->get_nzadd(arg0, inner, outer);
     } else {
@@ -313,7 +311,7 @@ namespace casadi {
     casadi_int nnz = this->dep(2).nnz();
     casadi_int max_ind = this->dep(0).nnz();
     if (idata0 != odata) {
-      copy(idata0, idata0+this->dep(0).nnz(), odata);
+      std::copy(idata0, idata0+this->dep(0).nnz(), odata);
     }
     for (casadi_int k=0; k<nnz; ++k) {
       // Get index
@@ -339,7 +337,7 @@ namespace casadi {
     casadi_int nnz = this->dep(2).nnz();
     casadi_int max_ind = this->dep(0).nnz();
     if (idata0 != odata) {
-      copy(idata0, idata0+this->dep(0).nnz(), odata);
+      std::copy(idata0, idata0+this->dep(0).nnz(), odata);
     }
 
     casadi_int* inner = iw; iw += nnz;
@@ -373,7 +371,7 @@ namespace casadi {
     casadi_int nnz = this->dep(2).nnz();
     casadi_int max_ind = this->dep(0).nnz();
     if (idata0 != odata) {
-      copy(idata0, idata0+this->dep(0).nnz(), odata);
+      std::copy(idata0, idata0+this->dep(0).nnz(), odata);
     }
     for (casadi_int k=0; k<nnz; ++k) {
       // Get index
@@ -404,7 +402,7 @@ namespace casadi {
     casadi_int nnz2 = this->dep(3).nnz();
     casadi_int max_ind = this->dep(0).nnz();
     if (idata0 != odata) {
-      copy(idata0, idata0+this->dep(0).nnz(), odata);
+      std::copy(idata0, idata0+this->dep(0).nnz(), odata);
     }
 
     casadi_int* inner = iw; iw += nnz;
@@ -473,7 +471,7 @@ namespace casadi {
 
   template<bool Add>
   std::string SetNonzerosParamVector<Add>::disp(const std::vector<std::string>& arg) const {
-    stringstream ss;
+    std::stringstream ss;
     ss << "(" << arg.at(0) << "[" << arg.at(2) << "]";
     ss << (Add ? " += " : " = ") << arg.at(1) << ")";
     return ss.str();
@@ -481,7 +479,7 @@ namespace casadi {
 
   template<bool Add>
   std::string SetNonzerosParamSlice<Add>::disp(const std::vector<std::string>& arg) const {
-    stringstream ss;
+    std::stringstream ss;
     ss << "(" << arg.at(0) << "[(" << arg.at(2) << ";" << outer_ << ")]";
     ss << (Add ? " += " : " = ") << arg.at(1) << ")";
     return ss.str();
@@ -489,7 +487,7 @@ namespace casadi {
 
   template<bool Add>
   std::string SetNonzerosSliceParam<Add>::disp(const std::vector<std::string>& arg) const {
-    stringstream ss;
+    std::stringstream ss;
     ss << "(" << arg.at(0) << "[(" << inner_ << ";" << arg.at(2) << ")]";
     ss << (Add ? " += " : " = ") << arg.at(1) << ")";
     return ss.str();
@@ -497,7 +495,7 @@ namespace casadi {
 
   template<bool Add>
   std::string SetNonzerosParamParam<Add>::disp(const std::vector<std::string>& arg) const {
-    stringstream ss;
+    std::stringstream ss;
     ss << "(" << arg.at(0) << "[(" << arg.at(2) << ";" << arg.at(3) << ")]";
     ss << (Add ? " += " : " = ") << arg.at(1) << ")";
     return ss.str();

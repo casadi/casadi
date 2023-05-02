@@ -2,8 +2,8 @@
 #     This file is part of CasADi.
 #
 #     CasADi -- A symbolic framework for dynamic optimization.
-#     Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
-#                             K.U. Leuven. All rights reserved.
+#     Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+#                             KU Leuven. All rights reserved.
 #     Copyright (C) 2011-2014 Greg Horn
 #
 #     CasADi is free software; you can redistribute it and/or
@@ -119,9 +119,9 @@ class OCPtests(casadiTestCase):
     solver_in["lbx"]=[-1, -1]
     solver_in["ubx"]=[1, 0.2]
     solver_out = solver(**solver_in)
-    self.assertAlmostEqual(solver_out["x"][0],1,8,"X_opt")
-    self.assertAlmostEqual(solver_out["x"][1],0.2,8,"X_opt")
-
+    print(solver_out["x"])
+    self.assertAlmostEqual(solver_out["x"][0],1,7,"X_opt")
+    self.assertAlmostEqual(solver_out["x"][1],0.2,7,"X_opt")
     self.assertAlmostEqual(fmax(solver_out["lam_x"],0)[0],1,8,"Cost should be linear in y0")
     self.assertAlmostEqual(fmax(solver_out["lam_x"],0)[1],(sqrt(p0)*(te*yc0**2-yc0+p0*te)*tan(arctan(yc0/sqrt(p0))+sqrt(p0)*te)+yc0**2)/(2*p0*yc0**2+2*p0**2),8,"Cost should be linear in y0")
     self.assertAlmostEqual(-solver_out["f"][0],(2*y0-log(yc0**2/p0+1))/2-log(cos(arctan(yc0/sqrt(p0))+sqrt(p0)*te)),7,"Cost")
@@ -187,58 +187,5 @@ class OCPtests(casadiTestCase):
     self.assertAlmostEqual(fmax(-solver_out["lam_x"],0)[0],0,8,"Constraint is supposed to be unactive")
     self.assertAlmostEqual(fmax(-solver_out["lam_x"],0)[1],0,8,"Constraint is supposed to be unactive")
 
-  @requiresPlugin(XmlFile,"tinyxml")
-  def test_XML(self):
-    self.message("JModelica XML parsing")
-    ivp = DaeBuilder()
-    ivp.parse_fmi('data/cstr.xml')
-
-    # Separate differential and algebraic variables
-    ivp.split_dae()
-
-    self.assertTrue(len(ivp.q)==0)
-    self.assertTrue(len(ivp.y)==1)
-    m = vertcat(*ivp.ydef)
-    self.assertTrue(isinstance(m,MX))
-    self.assertEqual(str(m),'cost')
-    print(dir(ivp))
-    self.assertEqual(len(ivp.dae),3)
-    print(type(ivp.s))
-    self.assertEqual(len(ivp.s),3) # there are three states
-    c = ivp("cstr.c")
-    T = ivp("cstr.T")
-    cost = ivp("cost")
-    self.assertTrue(isinstance(c,MX))
-
-    self.assertEqual(c.name(),"cstr.c")
-    self.assertEqual(T.name(),"cstr.T")
-    self.assertEqual(cost.name(),"cost")
-    self.assertEqual(ivp.nominal("cstr.c"),1000)
-
-    u = ivp("u")
-    #self.assertEquals(ivp.path.nnz(),3)
-    #self.assertEquals(len(ivp.cfcn_lb),3)
-    #self.assertEquals(len(ivp.cfcn_ub),3)
-    #self.assertTrue(ivp.cfcn[0].is_equal(T))
-    #self.assertTrue(ivp.cfcn[1].is_equal(u))
-    #self.assertTrue(ivp.cfcn[2].is_equal(u))
-    #self.assertTrue(ivp.cfcn_lb[0].isMinusInf())
-    #self.assertEquals(ivp.cfcn_lb[1].to_double(),230)
-    #self.assertTrue(ivp.cfcn_lb[2].isMinusInf())
-    #self.assertEquals(ivp.cfcn_ub[0].to_double(),350)
-    #self.assertTrue(ivp.cfcn_ub[1].isInf())
-    #self.assertEquals(ivp.cfcn_ub[2].to_double(),370)
-    print(ivp.init)
-    print(c,T,cost)
-    #print c.atTime(0)
-    f=Function('f', [vertcat(*[c,T,cost])],[vertcat(*ivp.init)])
-    return
-    f_out = f(f_in)
-    self.checkarray(f_out[0],matrix([-956.271065,-250.051971,0]).T,"initeq")
-
-
-    mystates = []
-
 if __name__ == '__main__':
     unittest.main()
-

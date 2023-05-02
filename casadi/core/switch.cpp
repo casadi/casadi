@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -25,8 +25,6 @@
 
 #include "switch.hpp"
 #include "serializing_stream.hpp"
-
-using namespace std;
 
 namespace casadi {
 
@@ -145,7 +143,7 @@ namespace casadi {
       }
 
       // Only need the largest of these work vectors
-      sz_buf = max(sz_buf, sz_buf_k);
+      sz_buf = std::max(sz_buf, sz_buf_k);
     }
 
     // Memory for the work vectors
@@ -217,7 +215,7 @@ namespace casadi {
                 const std::vector<std::string>& onames,
                 const Dict& opts) const {
     // Derivative of each case
-    vector<Function> der(f_.size());
+    std::vector<Function> der(f_.size());
     for (casadi_int k=0; k<f_.size(); ++k) {
       if (!f_[k].is_null()) der[k] = f_[k].forward(nfwd);
     }
@@ -230,14 +228,16 @@ namespace casadi {
     Function sw = Function::conditional("switch_" + name, der, der_def);
 
     // Get expressions for the derivative switch
-    vector<MX> arg = sw.mx_in();
-    vector<MX> res = sw(arg);
+    std::vector<MX> arg = sw.mx_in();
+    std::vector<MX> res = sw(arg);
 
     // Ignore seed for ind
     arg.insert(arg.begin() + n_in_ + n_out_, MX(1, nfwd));
 
+    Dict options = opts;
+    options["allow_duplicate_io_names"] = true;
     // Create wrapper
-    return Function(name, arg, res, inames, onames, opts);
+    return Function(name, arg, res, inames, onames, options);
   }
 
   Function Switch
@@ -246,7 +246,7 @@ namespace casadi {
                 const std::vector<std::string>& onames,
                 const Dict& opts) const {
     // Derivative of each case
-    vector<Function> der(f_.size());
+    std::vector<Function> der(f_.size());
     for (casadi_int k=0; k<f_.size(); ++k) {
       if (!f_[k].is_null()) der[k] = f_[k].reverse(nadj);
     }
@@ -259,17 +259,20 @@ namespace casadi {
     Function sw = Function::conditional("switch_" + name, der, der_def);
 
     // Get expressions for the derivative switch
-    vector<MX> arg = sw.mx_in();
-    vector<MX> res = sw(arg);
+    std::vector<MX> arg = sw.mx_in();
+    std::vector<MX> res = sw(arg);
 
     // No derivatives with respect to index
     res.insert(res.begin(), MX(1, nadj));
 
+    Dict options = opts;
+    options["allow_duplicate_io_names"] = true;
+
     // Create wrapper
-    return Function(name, arg, res, inames, onames, opts);
+    return Function(name, arg, res, inames, onames, options);
   }
 
-  void Switch::disp_more(ostream &stream) const {
+  void Switch::disp_more(std::ostream &stream) const {
     // Print more
     if (f_.size()==1) {
       // Print as if-then-else
@@ -313,7 +316,7 @@ namespace casadi {
 
       if (k==0) {
         // For the default case, redirect the temporary results to res
-        copy_n(res, n_out_, res_temp);
+        std::copy_n(res, n_out_, res_temp);
       } else {
         // For the other cases, store the temporary results
         for (casadi_int i=0; i<n_out_; ++i) {
@@ -322,8 +325,8 @@ namespace casadi {
         }
       }
 
-      copy_n(arg+1, n_in_-1, arg1);
-      copy_n(res_temp, n_out_, res1);
+      std::copy_n(arg+1, n_in_-1, arg1);
+      std::copy_n(res_temp, n_out_, res1);
 
       const Function& fk = k==0 ? f_def_ : f_[k-1];
 
@@ -481,6 +484,14 @@ namespace casadi {
   Dict Switch::info() const {
     return {{"project_in", project_in_}, {"project_out", project_out_},
             {"f_def", f_def_}, {"f", f_}};
+  }
+
+  void Switch::find(std::map<FunctionInternal*, Function>& all_fun,
+      casadi_int max_depth) const {
+    for (const Function& f_k : f_) {
+      if (!f_k.is_null()) add_embedded(all_fun, f_k, max_depth);
+    }
+    if (!f_def_.is_null()) add_embedded(all_fun, f_def_, max_depth);
   }
 
 } // namespace casadi

@@ -1,24 +1,20 @@
 /*
- *    This file is part of CasADi.
+ *    MIT No Attribution
  *
- *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
- *    Copyright (C) 2011-2014 Greg Horn
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl, KU Leuven.
  *
- *    CasADi is free software; you can redistribute it and/or
- *    modify it under the terms of the GNU Lesser General Public
- *    License as published by the Free Software Foundation; either
- *    version 3 of the License, or (at your option) any later version.
+ *    Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ *    software and associated documentation files (the "Software"), to deal in the Software
+ *    without restriction, including without limitation the rights to use, copy, modify,
+ *    merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
+ *    permit persons to whom the Software is furnished to do so.
  *
- *    CasADi is distributed in the hope that it will be useful,
- *    but WITHOUT ANY WARRANTY; without even the implied warranty of
- *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *    Lesser General Public License for more details.
- *
- *    You should have received a copy of the GNU Lesser General Public
- *    License along with CasADi; if not, write to the Free Software
- *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ *    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+ *    INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+ *    PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *    HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ *    OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+ *    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  */
 
@@ -29,7 +25,6 @@
 #include <casadi/casadi.hpp>
 
 using namespace casadi;
-using namespace std;
 
 // dx/dt = f(x,u)
 MX f(const MX& x, const MX& u) {
@@ -93,27 +88,27 @@ int main(){
   auto sol = opti.solve();   // actual solve
 
   // Create Matlab script to plot the solution
-  ofstream file;
-  string filename = "race_car_results.m";
+  std::ofstream file;
+  std::string filename = "race_car_results.m";
   file.open(filename.c_str());
-  file << "% Results file from " __FILE__ << endl;
-  file << "% Generated " __DATE__ " at " __TIME__ << endl;
-  file << endl;
+  file << "% Results file from " __FILE__ << std::endl;
+  file << "% Generated " __DATE__ " at " __TIME__ << std::endl;
+  file << std::endl;
   
   // Save results to file
-  file << "t = linspace(0," << sol.value(T) << "," << N << "+1);"<< endl;
-  file << "speed = " << std::vector<double>(sol.value(speed)) << ";" << endl;
-  file << "pos = " << std::vector<double>(sol.value(pos)) << ";" << endl;
-  file << "U = " << std::vector<double>(sol.value(U)) << ";" << endl;
+  file << "t = linspace(0," << sol.value(T) << "," << N << "+1);"<< std::endl;
+  file << "speed = " << std::vector<double>(sol.value(speed)) << ";" << std::endl;
+  file << "pos = " << std::vector<double>(sol.value(pos)) << ";" << std::endl;
+  file << "U = " << std::vector<double>(sol.value(U)) << ";" << std::endl;
 
-  file << "figure;" << endl;
-  file << "hold on;" << endl;
-  file << "plot(t,speed);" << endl;
-  file << "plot(t,pos);" << endl;
-  file << "plot(t,1-sin(2*pi*pos)/2,'r--');" << endl;
-  file << "stairs(t(1:end-1),U,'k');" << endl;
-  file << "xlabel('Time [s]');" << endl;
-  file << "legend('speed','pos','speed limit','throttle','Location','northwest');" << endl;
+  file << "figure;" << std::endl;
+  file << "hold on;" << std::endl;
+  file << "plot(t,speed);" << std::endl;
+  file << "plot(t,pos);" << std::endl;
+  file << "plot(t,1-sin(2*pi*pos)/2,'r--');" << std::endl;
+  file << "stairs(t(1:end-1),U,'k');" << std::endl;
+  file << "xlabel('Time [s]');" << std::endl;
+  file << "legend('speed','pos','speed limit','throttle','Location','northwest');" << std::endl;
 
   // Have a look at the constraint Jacobian
   jacobian(opti.g(), opti.x()).sparsity().spy_matlab("race_car_jac_g.m");

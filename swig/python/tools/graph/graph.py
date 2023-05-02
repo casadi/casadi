@@ -2,8 +2,8 @@
 #     This file is part of CasADi.
 #
 #     CasADi -- A symbolic framework for dynamic optimization.
-#     Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
-#                             K.U. Leuven. All rights reserved.
+#     Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+#                             KU Leuven. All rights reserved.
 #     Copyright (C) 2011-2014 Greg Horn
 #
 #     CasADi is free software; you can redistribute it and/or
@@ -33,6 +33,18 @@ except:
     raise Exception("To use the functionality of casadi.tools.graph, you need to have pydot Installed. Try `easy_install pydot`.")
 
 #import ipdb
+
+
+def print_operator_escaped(expr, strs):
+  # replace <f> with {f} to get rid of < or >
+  strs = [ si.replace('<', '{').replace('>', '}') for si in strs ]
+  s = print_operator(expr, strs)
+  # escape < or >
+  s = s.replace('<', '\<').replace('>', '\>')
+  # replace {f} with <f>
+  s = s.replace('{', '<').replace('}', '>')
+  return s
+
 
 def hashcompare(self,other):
   return cmp(hash(self),hash(other))
@@ -294,7 +306,7 @@ class MXGenericArtist(DotArtist):
     if len(dep)>1:
       # Non-commutative operators are represented by 'record' shapes.
       # The dependencies have different 'ports' where arrows should arrive.
-      s = print_operator(self.s,["| <f%d> | " %i for i in range(len(dep))])
+      s = print_operator_escaped(self.s,["| <f%d> | " %i for i in range(len(dep))])
       if s.startswith("(|") and s.endswith("|)"):
         s=s[2:-2]
 
@@ -302,7 +314,7 @@ class MXGenericArtist(DotArtist):
       for i,n in enumerate(dep):
         graph.add_edge(pydot.Edge(str(n.__hash__()),op + str(k.__hash__())+":f%d" % i))
     else:
-      s = print_operator(k,["."])
+      s = print_operator_escaped(k,["."])
       self.graph.add_node(pydot.Node(op + str(k.__hash__()),label=s,shape='oval'))
       for i,n in enumerate(dep):
         self.graph.add_edge(pydot.Edge(str(n.__hash__()),op + str(k.__hash__())))
@@ -451,7 +463,7 @@ class MXOperationArtist(DotArtist):
     if not(k.is_commutative()):
       # Non-commutative operators are represented by 'record' shapes.
       # The dependencies have different 'ports' where arrows should arrive.
-      s = print_operator(self.s,["| <f0> | ", " | <f1> |"])
+      s = print_operator_escaped(self.s,["| <f0> | ", " | <f1> |"])
       if s.startswith("(|") and s.endswith("|)"):
         s=s[2:-2]
 
@@ -460,7 +472,7 @@ class MXOperationArtist(DotArtist):
         graph.add_edge(pydot.Edge(str(n.__hash__()),op + str(k.__hash__())+":f%d" % i))
     else:
      # Commutative operators can be represented more compactly as 'oval' shapes.
-      s = print_operator(k,[".", "."])
+      s = print_operator_escaped(k,[".", "."])
       if s.startswith("(.") and s.endswith(".)"):
         s=s[2:-2]
       if s.startswith("(") and s.endswith(")"):
@@ -497,7 +509,7 @@ class MXNormArtist(DotArtist):
     k = self.s
     graph = self.graph
     dep = getDeps(k)
-    s = print_operator(k,[".", "."])
+    s = print_operator_escaped(k,[".", "."])
     self.graph.add_node(pydot.Node(str(k.__hash__()),label=s,shape='oval'))
     self.graph.add_edge(pydot.Edge(str(dep[0].__hash__()),str(k.__hash__())))
 
@@ -572,9 +584,9 @@ class SXNonLeafArtist(DotArtist):
       # Non-commutative operators are represented by 'record' shapes.
       # The dependencies have different 'ports' where arrows should arrive.
       if len(dep)==2:
-        s = print_operator(self.s,["| <f0> | ", " | <f1> |"])
+        s = print_operator_escaped(self.s,["| <f0> | ", " | <f1> |"])
       else:
-        s = print_operator(self.s,["| <f0> | "])
+        s = print_operator_escaped(self.s,["| <f0> | "])
       if s.startswith("(|") and s.endswith("|)"):
         s=s[2:-2]
 
@@ -583,7 +595,7 @@ class SXNonLeafArtist(DotArtist):
         graph.add_edge(pydot.Edge(str(n.__hash__()),str(k.__hash__())+":f%d" % i))
     else:
      # Commutative operators can be represented more compactly as 'oval' shapes.
-      s = print_operator(k,[".", "."])
+      s = print_operator_escaped(k,[".", "."])
       if s.startswith("(.") and s.endswith(".)"):
         s=s[2:-2]
       if s.startswith("(") and s.endswith(")"):

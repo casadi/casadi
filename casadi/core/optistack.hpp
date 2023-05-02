@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -83,7 +83,8 @@ class OptiCallback;
 
       \date 2017
       \author Joris Gillis, Erik Lambrechts, Joel Andersson
-*/
+
+    \identifier{16} */
 class CASADI_EXPORT Opti
   : public SWIG_IF_ELSE(PrintableCommon, Printable<Opti>),
   public SharedObject {
@@ -93,7 +94,8 @@ public:
   /** \brief Create Opti Context
    * 
    * \param[in] problem_type of optimization 'nlp' or 'conic' (default nlp)
-  */
+
+      \identifier{17} */
   Opti(const std::string& problem_type="nlp");
 
   /** \brief Create a decision variable (symbol)
@@ -105,7 +107,8 @@ public:
   * \param[in] n number of rows (default 1)
   * \param[in] m number of columnss (default 1)
   * \param[in] attribute: 'full' (default) or 'symmetric'
-  */
+
+      \identifier{18} */
   MX variable(casadi_int n=1, casadi_int m=1, const std::string& attribute="full");
 
   /** \brief Create a parameter (symbol); fixed during optimization
@@ -117,14 +120,16 @@ public:
   * \param[in] n number of rows (default 1)
   * \param[in] m number of columnss (default 1)
   * \param[in] attribute: 'full' (default) or 'symmetric'
-  */
+
+      \identifier{19} */
   MX parameter(casadi_int n=1, casadi_int m=1, const std::string& attribute="full");
 
   /** \brief Set objective
   *
   * Objective must be a scalar. Default objective: 0
   * When method is called multiple times, the last call takes effect
-  */
+
+      \identifier{1a} */
   void minimize(const MX& f);
 
   /// @{
@@ -152,7 +157,7 @@ public:
   *  - opti.lbg,opti.g,opti.ubg represent the vector of flattened constraints
   *  - opti.debug.show_infeasibilities() may be used to inspect which constraints are violated
   *
-  */
+      \identifier{1b} */
   void subject_to(const MX& g);
   void subject_to(const std::vector<MX>& g);
   /// @}
@@ -168,7 +173,8 @@ public:
   *            No stability can be guaranteed about this part of the API
   * \param[in] options to be passed to nlpsol solver
   *            No stability can be guaranteed about this part of the API
-  */
+
+      \identifier{1c} */
   void solver(const std::string& solver,
               const Dict& plugin_options=Dict(),
               const Dict& solver_options=Dict());
@@ -188,7 +194,8 @@ public:
   /** \brief Set value of parameter
   *
   * Each parameter must be given a value before 'solve' can be called
-  */
+
+      \identifier{1d} */
   void set_value(const MX& x, const DM& v);
   void set_value(const std::vector<MX>& assignments);
   /// @}
@@ -200,7 +207,8 @@ public:
    * 
    * Allows the solver to return without error when
    * an iteration or time limit is reached
-   */
+
+      \identifier{1e} */
   OptiSol solve_limited();
 
   /// @{
@@ -221,19 +229,26 @@ public:
   *
   * nlpsol stats are passed as-is.
   * No stability can be guaranteed about this part of the API
-  */
+
+      \identifier{1f} */
   Dict stats() const;
 
   /** \brief Get return status of solver
+
   *          passed as-is from nlpsol
   * No stability can be guaranteed about this part of the API
-  */
+
+      \identifier{1g} */
   std::string return_status() const;
 
-  /// get assignment expressions for initial values
+  /** \brief get assignment expressions for initial values
+
+      \identifier{266} */
   std::vector<MX> initial() const;
 
-  /// get assignment expressions for latest values
+  /** \brief get assignment expressions for latest values
+
+      \identifier{267} */
   std::vector<MX> value_variables() const;
   std::vector<MX> value_parameters() const;
 
@@ -242,31 +257,48 @@ public:
   * m must be a constraint expression.
   * The returned value is still a symbolic expression.
   * Use `value` on it to obtain the numerical value.
-  */
+
+      \identifier{1h} */
   MX dual(const MX& m) const;
 
-  /// Number of (scalarised) decision variables
+  /** \brief Number of (scalarised) decision variables
+
+      \identifier{268} */
   casadi_int nx() const;
 
-  /// Number of (scalarised) parameters
+  /** \brief Number of (scalarised) parameters
+
+      \identifier{269} */
   casadi_int np() const;
 
-  /// Number of (scalarised) constraints
+  /** \brief Number of (scalarised) constraints
+
+      \identifier{26a} */
   casadi_int ng() const;
 
-  /// Get all (scalarised) decision variables as a symbolic column vector
+  /** \brief Get all (scalarised) decision variables as a symbolic column vector
+
+      \identifier{26b} */
   MX x() const;
 
-  /// Get all (scalarised) parameters as a symbolic column vector
+  /** \brief Get all (scalarised) parameters as a symbolic column vector
+
+      \identifier{26c} */
   MX p() const;
 
-  /// Get all (scalarised) constraint expressions as a column vector
+  /** \brief Get all (scalarised) constraint expressions as a column vector
+
+      \identifier{26d} */
   MX g() const;
 
-  /// Get objective expression
+  /** \brief Get objective expression
+
+      \identifier{26e} */
   MX f() const;
 
-  /// Get all (scalarised) bounds on constraints as a column vector
+  /** \brief Get all (scalarised) bounds on constraints as a column vector
+
+      \identifier{26f} */
   MX lbg() const;
   MX ubg() const;
 
@@ -277,11 +309,20 @@ public:
   * sol.value(hessian(opti.f+opti.lam_g'*opti.g,opti.x)) % MATLAB
   * sol.value(hessian(opti.f+dot(opti.lam_g,opti.g),opti.x)[0]) # Python
   * \endverbatim
-  */
+
+      \identifier{1i} */
   MX lam_g() const;
 
+  /// @{
   /** \brief Create a CasADi Function from the Opti solver
-  */
+   * 
+   * \param[in] name Name of the resulting CasADi Function
+   * \param[in] args List of parameters and decision/dual variables
+   *                (which can be given an initial guess) with the resulting Function
+   * \param[in] res List of expressions that will get evaluated at the optimal solution
+   * \param[in] opts Standard CasADi Funcion options
+
+      \identifier{1j} */
   Function to_function(const std::string& name,
       const std::vector<MX>& args, const std::vector<MX>& res,
       const Dict& opts = Dict());
@@ -297,6 +338,7 @@ public:
       const std::vector<std::string>& name_in,
       const std::vector<std::string>& name_out,
       const Dict& opts = Dict());
+  /// @}
 
   #ifndef SWIGMATLAB
   /** \brief Construct a double inequality
@@ -304,7 +346,8 @@ public:
   * Constructs:  lb(p) <= g(x,p) <= ub(p)
   *
   * Python prohibits such syntax directly
-  */
+
+      \identifier{1k} */
   static MX bounded(const MX& lb, const MX& expr, const MX& ub) { return (lb<=expr)<= ub; }
   #endif
 
@@ -314,7 +357,8 @@ public:
    *
    * The copy is effectively a deep copy:
    * Updating the state of the copy does not update the original.
-   * */
+   *
+      \identifier{1l} */
   OptiAdvanced debug() const;
 
   /** \brief Get a copy with advanced functionality
@@ -323,20 +367,24 @@ public:
    *
    * The copy is effectively a deep copy:
    * Updating the state of the copy does not update the original.
-   * */
+   *
+      \identifier{1m} */
   OptiAdvanced advanced() const;
 
   /** \brief Get a copy of the
    *
    * The copy is effectively a deep copy:
    * Updating the state of the copy does not update the original.
-   * */
+   *
+      \identifier{1n} */
   Opti copy() const;
 
   /** \brief add user data
+
   * Add arbitrary data in the form of a dictionary to symbols
   * or constraints
-  */
+
+      \identifier{1o} */
   void update_user_dict(const MX& m, const Dict& meta);
   void update_user_dict(const std::vector<MX>& m, const Dict& meta);
   /// Get user data
@@ -355,7 +403,8 @@ public:
   /** \brief Helper methods for callback()
    *
    * Do not use directly.
-   */
+
+      \identifier{1p} */
   void callback_class(OptiCallback* callback);
   void callback_class();
   ///@}
@@ -363,16 +412,22 @@ public:
 #ifndef SWIG
   Opti(const Opti& x);
 
-  /** \brief Destructor */
+  /** \brief Destructor
+
+      \identifier{1q} */
   ~Opti() {}
 
   static Opti create(OptiNode* node);
   /// \cond INTERNAL
   ///@{
-  /** \brief  Access a member of the node */
+  /** \brief  Access a member of the node
+
+      \identifier{1r} */
   OptiNode* operator->();
 
-  /** \brief  Const access a member of the node */
+  /** \brief  Const access a member of the node
+
+      \identifier{1s} */
   const OptiNode* operator->() const;
   ///@}
   /// \endcond
@@ -446,7 +501,9 @@ public:
 
   OptiAdvanced(const Opti& x);
 
-  /** \brief Destructor */
+  /** \brief Destructor
+
+      \identifier{1t} */
   ~OptiAdvanced() {}
 
 
@@ -461,7 +518,8 @@ public:
   *
   *  Returned vector is ordered according to the order of
   *  variable()/parameter() calls used to create the variables
-  */
+
+      \identifier{1u} */
   std::vector<MX> symvar() const;
   std::vector<MX> symvar(const MX& expr) const;
   std::vector<MX> symvar(const MX& expr, VariableType type) const;
@@ -542,7 +600,8 @@ protected:
 
       \date 2017
       \author Joris Gillis, Erik Lambrechts
-*/
+
+    \identifier{1v} */
 class CASADI_EXPORT OptiSol : public SWIG_IF_ELSE(PrintableCommon, Printable<OptiAdvanced>) {
   friend class OptiNode;
   public:
@@ -571,7 +630,8 @@ class CASADI_EXPORT OptiSol : public SWIG_IF_ELSE(PrintableCommon, Printable<Opt
     *
     * nlpsol stats are passed as-is.
     * No stability can be guaranteed about this part of the API
-    */
+
+        \identifier{1w} */
     Dict stats() const;
 
     Opti opti() const { return optistack_; } // NOLINT(cppcoreguidelines-slicing)

@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -30,8 +30,10 @@
 
 namespace casadi {
   /** \brief Empty Base
+
       This class is extended in SWIG.
-   */
+
+      \identifier{3c} */
   struct CASADI_EXPORT SparsityInterfaceCommon {};
 
 #ifndef SWIG
@@ -43,7 +45,8 @@ namespace casadi {
 
       \author Joel Andersson
       \date 2014
-  */
+
+      \identifier{3d} */
   template<typename MatType>
   class SparsityInterface : public SparsityInterfaceCommon {
   protected:
@@ -79,65 +82,77 @@ namespace casadi {
 *
 */
 /**
-\ingroup expression_tools
+\addtogroup expression_tools
 @{
 */
     /** \brief Concatenate a list of matrices horizontally
+
      * Alternative terminology: horizontal stack, hstack, horizontal append, [a b]
      *
      *   horzcat(horzsplit(x, ...)) = x
-     */
+
+        \identifier{3e} */
     inline friend MatType horzcat(const std::vector<MatType> &v) {
       return MatType::horzcat(v);
     }
 
     /** \brief Concatenate a list of matrices vertically
+
      * Alternative terminology: vertical stack, vstack, vertical append, [a;b]
      *
      *   vertcat(vertsplit(x, ...)) = x
-     */
+
+        \identifier{3f} */
     inline friend MatType vertcat(const std::vector<MatType> &v) {
       return MatType::vertcat(v);
     }
 
     /** \brief  split horizontally, retaining groups of columns
+
      * \param offset List of all start columns for each group
      *      the last column group will run to the end.
      *
      *   horzcat(horzsplit(x, ...)) = x
-     */
+
+        \identifier{3g} */
     inline friend std::vector<MatType >
       horzsplit(const MatType &x, const std::vector<casadi_int>& offset) {
       return MatType::horzsplit(x, offset);
     }
 
     /** \brief  split horizontally, retaining fixed-sized groups of columns
+
      * \param incr Size of each group of columns
      *
      *   horzcat(horzsplit(x, ...)) = x
-     */
+
+        \identifier{3h} */
     inline friend std::vector<MatType > horzsplit(const MatType& x, casadi_int incr=1) {
       return MatType::horzsplit(x, incr);
     }
 
-    /** * \brief  split vertically, retaining groups of rows
+    /** \brief  split vertically, retaining groups of rows
+
      * \param output_offset List of all start rows for each group
      *      the last row group will run to the end.
      *
      *   vertcat(vertsplit(x, ...)) = x
-     */
+
+          \identifier{3i} */
     inline friend std::vector<MatType >
       vertsplit(const MatType& x, const std::vector<casadi_int>& offset) {
       return MatType::vertsplit(x, offset);
     }
 
     /** \brief Helper function, get offsets corresponding to a vector of matrices
-     */
+
+        \identifier{3j} */
     inline friend std::vector<casadi_int > offset(const std::vector<MatType> &v, bool vert=true) {
       return MatType::offset(v, vert);
     }
 
     /** \brief  split vertically, retaining fixed-sized groups of rows
+
      * \param incr Size of each group of rows
      *
      *   vertcat(vertsplit(x, ...)) = x
@@ -163,30 +178,34 @@ namespace casadi {
      [DM([0, 1]), DM([2, 3]), DM(4)]
      \enddoctest
      *
-     */
+        \identifier{3k} */
     inline friend std::vector<MatType > vertsplit(const MatType &x, casadi_int incr=1) {
       return MatType::vertsplit(x, incr);
     }
 
     /** \brief Construct a matrix from a list of list of blocks.
-     */
+
+        \identifier{3l} */
     inline friend MatType blockcat(const std::vector< std::vector<MatType > > &v) {
       return MatType::blockcat(v);
     }
 
     /** \brief Construct a matrix from 4 blocks
-     */
+
+        \identifier{3m} */
     inline friend MatType
       blockcat(const MatType &A, const MatType &B, const MatType &C, const MatType &D) {
       return vertcat(horzcat(A, B), horzcat(C, D));
     }
 
     /** \brief  chop up into blocks
+
      * \param vert_offset Defines the boundaries of the block rows
      * \param horz_offset Defines the boundaries of the block columns
      *
      *   blockcat(blocksplit(x,..., ...)) = x
-     */
+
+        \identifier{3n} */
     inline friend std::vector< std::vector< MatType > >
       blocksplit(const MatType& x,
                  const std::vector<casadi_int>& vert_offset,
@@ -195,30 +214,35 @@ namespace casadi {
     }
 
     /** \brief  chop up into blocks
+
      * \param vert_incr Defines the increment for block boundaries in row dimension
      * \param horz_incr Defines the increment for block boundaries in column dimension
      *
      *   blockcat(blocksplit(x,..., ...)) = x
-     */
+
+        \identifier{3o} */
     inline friend std::vector< std::vector< MatType > >
       blocksplit(const MatType& x, casadi_int vert_incr=1, casadi_int horz_incr=1) {
       return MatType::blocksplit(x, vert_incr, horz_incr);
     }
 
     /** \brief Construct a matrix with given block on the diagonal
-     */
+
+        \identifier{3p} */
     inline friend MatType diagcat(const std::vector<MatType> &A) {
       return MatType::diagcat(A);
     }
 
     /** \brief  split diagonally, retaining square matrices
+
      * \param output_offset1 List of all start locations (row) for each group
      *      the last matrix will run to the end.
      * \param output_offset2 List of all start locations (row) for each group
      *      the last matrix will run to the end.
      *
      *   diagcat(diagsplit(x, ...)) = x
-     */
+
+        \identifier{3q} */
     friend std::vector< MatType >
       diagsplit(const MatType& x,
                 const std::vector<casadi_int>& output_offset1,
@@ -227,73 +251,86 @@ namespace casadi {
     }
 
     /** \brief  split diagonally, retaining square matrices
+
      * \param output_offset List of all start locations for each group
      *      the last matrix will run to the end.
      *
      *   diagcat(diagsplit(x, ...)) = x
-     */
+
+        \identifier{3r} */
     inline friend std::vector< MatType >
       diagsplit(const MatType& x, const std::vector<casadi_int>& output_offset) {
       return MatType::diagsplit(x, output_offset);
     }
 
     /** \brief  split diagonally, retaining groups of square matrices
+
      * \param incr Size of each matrix
      *
      *  diagsplit(diagsplit(x, ...)) = x
-     */
+
+        \identifier{3s} */
     inline friend std::vector< MatType >
       diagsplit(const MatType& x, casadi_int incr=1) {
       return MatType::diagsplit(x, incr);
     }
 
     /** \brief  split diagonally, retaining fixed-sized matrices
+
      * \param incr1 Row dimension of each matrix
      * \param incr2 Column dimension of each matrix
      *
      *  diagsplit(diagsplit(x, ...)) = x
-     */
+
+        \identifier{3t} */
     inline friend std::vector< MatType >
       diagsplit(const MatType& x, casadi_int incr1, casadi_int incr2) {
       return MatType::diagsplit(x, incr1, incr2);
     }
 
     /** \brief  concatenate vertically while vectorizing all arguments with vec
-     */
+
+        \identifier{3u} */
     inline friend MatType veccat(const std::vector< MatType >& x) {
       return MatType::veccat(x);
     }
 
     /** \brief Matrix product of two matrices
-    */
+
+        \identifier{3v} */
     inline friend MatType mtimes(const MatType &x, const MatType &y) {
       return MatType::mtimes(x, y);
     }
 
     /** \brief Matrix product of n matrices
-     */
+
+        \identifier{3w} */
     inline friend MatType mtimes(const std::vector<MatType> &args) {
       return MatType::mtimes(args);
     }
 
     /** \brief Multiply-accumulate operation
+
         Matrix product of two matrices (x and y), adding the result to
         a third matrix z. The result has the same sparsity pattern as
         C meaning that other entries of (x*y) are ignored.
         The operation is equivalent to: z+mtimes(x,y).project(z.sparsity()).
-    */
+
+        \identifier{3x} */
     inline friend MatType
       mac(const MatType &x, const MatType &y, const MatType &z) {
       return MatType::mac(x, y, z);
     }
 
     /** \brief Transpose
-     */
+
+        \identifier{3y} */
     inline friend MatType transpose(const MatType& X) {
       return X.T();
     }
 
     /** \brief  make a vector
+
         Reshapes/vectorizes the matrix such that the shape becomes (expr.numel(), 1).
         Columns are stacked on top of each other.
         Same as reshape(expr, expr.numel(), 1)
@@ -307,49 +344,64 @@ namespace casadi {
         b \n
         c \n
         d \n
-    */
+
+        \identifier{3z} */
     inline friend MatType vec(const MatType& x) {
       return MatType::vec(x);
     }
 
     /** \brief Returns a reshaped version of the matrix
-     */
+
+        \identifier{40} */
     inline friend MatType reshape(const MatType& x, casadi_int nrow, casadi_int ncol) {
       return MatType::reshape(x, nrow, ncol);
     }
 
     /** \brief Returns a reshaped version of the matrix, dimensions as a vector
-    */
+
+        \identifier{41} */
     inline friend MatType reshape(const MatType& x, std::pair<casadi_int, casadi_int> rc) {
       return MatType::reshape(x, rc.first, rc.second);
     }
 
     /** \brief Reshape the matrix
-    */
+
+        \identifier{42} */
     inline friend MatType reshape(const MatType& x, const Sparsity& sp) {
       return MatType::reshape(x, sp);
     }
 
+    /** \brief Cast matrix nonzeros to different Sparsity
+
+        \identifier{24z} */
+    inline friend MatType sparsity_cast(const MatType& x, const Sparsity& sp) {
+      return MatType::sparsity_cast(x, sp);
+    }
+
     /** \brief Obtain the structural rank of a sparsity-pattern
-    */
+
+        \identifier{43} */
     inline friend casadi_int sprank(const MatType& x) {
       return MatType::sprank(x);
     }
 
     /** \brief 0-norm (nonzero count) of a Matrix-matrix product
-    */
+
+        \identifier{44} */
     inline friend casadi_int norm_0_mul(const MatType &x, const MatType &y) {
       return MatType::norm_0_mul(x, y);
     }
 
     /** \brief Get the upper triangular part of a matrix
-    */
+
+        \identifier{45} */
     inline friend MatType triu(const MatType& x, bool includeDiagonal=true) {
       return MatType::triu(x, includeDiagonal);
     }
 
     /** \brief Get the lower triangular part of a matrix
-    */
+
+        \identifier{46} */
     inline friend MatType tril(const MatType& x, bool includeDiagonal=true) {
       return MatType::tril(x, includeDiagonal);
     }
@@ -357,75 +409,148 @@ namespace casadi {
     /** \brief Kronecker tensor product
      *
      * Creates a block matrix in which each element (i, j) is a_ij*b
-     */
+
+        \identifier{47} */
     inline friend MatType kron(const MatType& a, const MatType& b) {
       return MatType::kron(a, b);
     }
 
     /** \brief Repeat matrix A n times vertically and m times horizontally
-     */
+
+        \identifier{48} */
     inline friend MatType repmat(const MatType &A, casadi_int n, casadi_int m=1) {
       return MatType::repmat(A, n, m);
     }
 
     /** \brief Repeat matrix A n times vertically and m times horizontally
-     */
+
+        \identifier{49} */
     inline friend MatType repmat(const MatType &A, const std::pair<casadi_int, casadi_int>& rc) {
       return MatType::repmat(A, rc);
     }
 
-    /** \brief Concatenate horizontally, two matrices */
+    /** \brief Concatenate horizontally, two matrices
+
+        \identifier{4a} */
     inline friend MatType horzcat(const MatType &x, const MatType &y) {
       return horzcat(std::vector<MatType>{x, y});
     }
 
-    /** \brief Concatenate horizontally, three matrices */
+    /** \brief Concatenate horizontally, three matrices
+
+        \identifier{4b} */
     inline friend MatType horzcat(const MatType &x, const MatType &y, const MatType &z) {
       return horzcat(std::vector<MatType>{x, y, z});
     }
 
-    /** \brief Concatenate horizontally, four matrices */
+    /** \brief Concatenate horizontally, four matrices
+
+        \identifier{4c} */
     inline friend MatType horzcat(const MatType &x, const MatType &y, const MatType &z,
                                   const MatType &w) {
       return horzcat(std::vector<MatType>{x, y, z, w});
     }
 
-    /** \brief Concatenate vertically, two matrices */
+    /** \brief Concatenate horizontally, five matrices
+
+        \identifier{4d} */
+    inline friend MatType horzcat(const MatType &x, const MatType &y, const MatType &z,
+                                  const MatType &w, const MatType &v) {
+      return horzcat(std::vector<MatType>{x, y, z, w, v});
+    }
+
+    /** \brief Concatenate horizontally, six matrices
+
+        \identifier{4e} */
+    inline friend MatType horzcat(const MatType &x, const MatType &y, const MatType &z,
+                                  const MatType &w, const MatType &v, const MatType &u) {
+      return horzcat(std::vector<MatType>{x, y, z, w, v, u});
+    }
+
+    /** \brief Concatenate vertically, two matrices
+
+        \identifier{4f} */
     inline friend MatType vertcat(const MatType &x, const MatType &y) {
       return vertcat(std::vector<MatType>{x, y});
     }
 
-    /** \brief Concatenate vertically, three matrices */
+    /** \brief Concatenate vertically, three matrices
+
+        \identifier{4g} */
     inline friend MatType vertcat(const MatType &x, const MatType &y, const MatType &z) {
       return vertcat(std::vector<MatType>{x, y, z});
     }
 
-    /** \brief Concatenate vertically, four matrices */
+    /** \brief Concatenate vertically, four matrices
+
+        \identifier{4h} */
     inline friend MatType vertcat(const MatType &x, const MatType &y, const MatType &z,
                                   const MatType &w) {
       return vertcat(std::vector<MatType>{x, y, z, w});
     }
 
-    /** \brief Concatenate along diagonal, two matrices */
+    /** \brief Concatenate vertically, five matrices
+
+        \identifier{4i} */
+    inline friend MatType vertcat(const MatType &x, const MatType &y, const MatType &z,
+                                  const MatType &w, const MatType &v) {
+      return vertcat(std::vector<MatType>{x, y, z, w, v});
+    }
+
+    /** \brief Concatenate vertically, six matrices
+
+        \identifier{4j} */
+    inline friend MatType vertcat(const MatType &x, const MatType &y, const MatType &z,
+                                  const MatType &w, const MatType &v, const MatType &u) {
+      return vertcat(std::vector<MatType>{x, y, z, w, v, u});
+    }
+
+    /** \brief Concatenate along diagonal, two matrices
+
+        \identifier{4k} */
     inline friend MatType diagcat(const MatType &x, const MatType &y) {
       return diagcat(std::vector<MatType>{x, y});
     }
 
-    /** \brief Concatenate along diagonal, three matrices */
+    /** \brief Concatenate along diagonal, three matrices
+
+        \identifier{4l} */
     inline friend MatType diagcat(const MatType &x, const MatType &y, const MatType &z) {
       return diagcat(std::vector<MatType>{x, y, z});
     }
 
-    /** \brief Concatenate along diagonal, four matrices */
+    /** \brief Concatenate along diagonal, four matrices
+
+        \identifier{4m} */
     inline friend MatType diagcat(const MatType &x, const MatType &y, const MatType &z,
                                   const MatType &w) {
       return diagcat(std::vector<MatType>{x, y, z, w});
     }
 
-    /** \brief Return a row-wise summation of elements */
+    /** \brief Concatenate along diagonal, five matrices
+
+        \identifier{4n} */
+    inline friend MatType diagcat(const MatType &x, const MatType &y, const MatType &z,
+                                  const MatType &w, const MatType &v) {
+      return diagcat(std::vector<MatType>{x, y, z, w, v});
+    }
+
+    /** \brief Concatenate along diagonal, six matrices
+
+        \identifier{4o} */
+    inline friend MatType diagcat(const MatType &x, const MatType &y, const MatType &z,
+                                  const MatType &w, const MatType &v, const MatType &u) {
+      return diagcat(std::vector<MatType>{x, y, z, w, v, u});
+    }
+
+    /** \brief Return a row-wise summation of elements
+
+        \identifier{4p} */
     inline friend MatType sum1(const MatType &x) { return MatType::sum1(x);}
 
-    /** \brief Return a column-wise summation of elements  */
+    /** \brief Return a column-wise summation of elements
+
+        \identifier{4q} */
     inline friend MatType sum2(const MatType &x) { return MatType::sum2(x);}
 
 /** \@} */

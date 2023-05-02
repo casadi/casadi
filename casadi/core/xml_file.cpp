@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -25,37 +25,40 @@
 
 #include "xml_file_internal.hpp"
 
-using namespace std;
 namespace casadi {
 
-  XmlFile::XmlFile() {
-  }
+XmlFile::XmlFile() {
+}
 
-  XmlFile::XmlFile(const std::string& name) {
-    own(XmlFileInternal::getPlugin(name).creator());
-  }
+XmlFile::XmlFile(const std::string& name) {
+  own(XmlFileInternal::getPlugin(name).creator());
+}
 
-  XmlFile::~XmlFile() {
-  }
+XmlFile::~XmlFile() {
+}
 
-  const XmlFileInternal* XmlFile::operator->() const {
-    return static_cast<const XmlFileInternal*>(SharedObject::operator->());
-  }
+const XmlFileInternal* XmlFile::operator->() const {
+  return static_cast<const XmlFileInternal*>(SharedObject::operator->());
+}
 
-  XmlFileInternal* XmlFile::operator->() {
-    return static_cast<XmlFileInternal*>(SharedObject::operator->());
-  }
+XmlFileInternal* XmlFile::operator->() {
+  return static_cast<XmlFileInternal*>(SharedObject::operator->());
+}
 
-  XmlNode XmlFile::parse(const std::string& filename) {
-    return (*this)->parse(filename);
-  }
+XmlNode XmlFile::parse(const std::string& filename) {
+  return (*this)->parse(filename);
+}
 
-  void XmlFile::load_plugin(const std::string& name) {
-    XmlFileInternal::load_plugin(name);
-  }
+void XmlFile::dump(const std::string& filename, const XmlNode& node) {
+  return (*this)->dump(filename, node);
+}
 
-  std::string XmlFile::doc(const std::string& name) {
-    return XmlFileInternal::getPlugin(name).doc;
-  }
+void XmlFile::load_plugin(const std::string& name) {
+  XmlFileInternal::load_plugin(name);
+}
+
+std::string XmlFile::doc(const std::string& name) {
+  return XmlFileInternal::getPlugin(name).doc;
+}
 
 } // namespace casadi

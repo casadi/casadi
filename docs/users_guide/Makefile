@@ -22,12 +22,25 @@ help:
 
 .DEFAULT_GOAL := users_guide.pdf
 
+all: users_guide.pdf bare_toc bare_body
+
 bare_body:
 	make singlehtml SPHINXOPTS="-D html_theme=bare_body "
+	sed -i 's/{{</{\&lbrace;</g' build/singlehtml/index.html
+	sed -i 's/>}}/>}\&rbrace;/g' build/singlehtml/index.html
+	mkdir -p ../../web/content/docs
+	echo "---\n---\n" > ../../web/content/docs/_index.html
+	cat build/singlehtml/index.html >> ../../web/content/docs/_index.html
 
 bare_toc:
 	make singlehtml SPHINXOPTS="-D html_theme=bare_body -D 'html_theme_options.mode=toc'"
+	sed -i 's/index\.html//g' build/singlehtml/index.html
+	mkdir -p ../../web/themes/casadi-theme/layouts/partials/
+	cp build/singlehtml/index.html ../../web/themes/casadi-theme/layouts/partials/docs-sidebar.html
 
 users_guide.pdf:
 	make latexpdf
 	cp $(BUILDDIR)/latex/CasADi.pdf $@
+	mkdir -p ../../web/content/docs
+	cp $@ ../../web/content/docs
+

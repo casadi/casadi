@@ -1,9 +1,12 @@
-cmake_minimum_required(VERSION 2.8.6)
+cmake_minimum_required(VERSION 3.10.2)
 
 casadi_plugin(Conic nlpsol qp_to_nlp.hpp qp_to_nlp.cpp qp_to_nlp_meta.cpp)
 
 # Active-set QP solver
 casadi_plugin(Conic qrqp qrqp.hpp qrqp.cpp qrqp_meta.cpp)
+
+# Interior-point QP Method
+casadi_plugin(Conic ipqp ipqp.hpp ipqp.cpp ipqp_meta.cpp)
 
 # Active-set SQP method
 casadi_plugin(Nlpsol qrsqp qrsqp.hpp qrsqp.cpp qrsqp_meta.cpp)
@@ -63,6 +66,10 @@ casadi_plugin(Linsol lsqr
 # SQPMethod -  A basic SQP method
 casadi_plugin(Nlpsol sqpmethod
   sqpmethod.hpp sqpmethod.cpp sqpmethod_meta.cpp)
+
+# FeasibleSQPMethod -  An implementation of FP-SQP
+casadi_plugin(Nlpsol feasiblesqpmethod
+  feasiblesqpmethod.hpp feasiblesqpmethod.cpp feasiblesqpmethod_meta.cpp)
 
 # SCPgen -  An implementation of Lifted Newton SQP
 casadi_plugin(Nlpsol scpgen

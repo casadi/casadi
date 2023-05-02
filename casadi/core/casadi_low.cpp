@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -25,8 +25,6 @@
 
 #include "casadi_low.hpp"
 
-using namespace std;
-
 namespace casadi {
 
   Low::Low(const MX& v, const MX& p, const Dict& opts) {
@@ -40,7 +38,7 @@ namespace casadi {
       if (e.first=="lookup_mode") {
         lookup_mode = e.second.to_string();
       } else {
-        casadi_error("Unrecongnized option: " + str(e.first));
+        casadi_error("Unrecognized option: " + str(e.first));
       }
     }
 
@@ -103,12 +101,12 @@ namespace casadi {
   }
 
   int Low::sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
-    fill_n(res[0], nnz(), 0);
+    std::fill_n(res[0], nnz(), 0);
     return 0;
   }
 
   int Low::sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
-    fill_n(res[0], nnz(), 0);
+    std::fill_n(res[0], nnz(), 0);
     return 0;
   }
 

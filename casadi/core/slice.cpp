@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -27,7 +27,6 @@
 #include "casadi_misc.hpp"
 #include "serializing_stream.hpp"
 
-using namespace std;
 namespace casadi {
 
   Slice::Slice() : start(0), stop(std::numeric_limits<casadi_int>::max()), step(1) {
@@ -262,7 +261,7 @@ namespace casadi {
       inner = to_slice(v);
       outer.start = 0;
       outer.step = outer.stop = inner.stop;
-      return make_pair(inner, outer);
+      return std::make_pair(inner, outer);
     }
 
     // Get the slices
@@ -286,7 +285,7 @@ namespace casadi {
       if (outer.step>0) outer.stop++;
       else              outer.stop--;
     } while (outer.stop % outer.step!=0);
-    return make_pair(inner, outer);
+    return std::make_pair(inner, outer);
   }
 
 

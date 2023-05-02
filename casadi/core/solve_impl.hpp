@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -29,13 +29,10 @@
 #include "solve.hpp"
 #include "linsol_internal.hpp"
 
-using namespace std;
-
 namespace casadi {
 
   template<bool Tr>
-  Solve<Tr>::Solve(const MX& r, const MX& A, const Linsol& linear_solver) :
-      linsol_(linear_solver) {
+  Solve<Tr>::Solve(const MX& r, const MX& A) {
     casadi_assert(r.size1() == A.size2(),
       "Solve::Solve: dimension mismatch. Got r " + r.dim() + " and A " + A.dim());
     set_dep(r, A);
@@ -45,15 +42,20 @@ namespace casadi {
   template<bool Tr>
   std::string Solve<Tr>::disp(const std::vector<std::string>& arg) const {
     std::stringstream ss;
-    ss << "(" << arg.at(1);
+    ss << "(" << mod_prefix() << arg.at(1) << mod_suffix();
     if (Tr) ss << "'";
     ss << "\\" << arg.at(0) << ")";
     return ss.str();
   }
 
   template<bool Tr>
-  int Solve<Tr>::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
-    if (arg[0]!=res[0]) copy(arg[0], arg[0]+dep(0).nnz(), res[0]);
+  LinsolCall<Tr>::LinsolCall(const MX& r, const MX& A, const Linsol& linear_solver) :
+      Solve<Tr>(r, A), linsol_(linear_solver) {
+  }
+
+  template<bool Tr>
+  int LinsolCall<Tr>::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
+    if (arg[0] != res[0]) std::copy(arg[0], arg[0] + this->dep(0).nnz(), res[0]);
     scoped_checkout<Linsol> mem(linsol_);
 
     auto m = static_cast<LinsolMemory*>(linsol_->memory(mem));
@@ -63,7 +65,7 @@ namespace casadi {
 
     if (linsol_.sfact(arg[1], mem)) return 1;
     if (linsol_.nfact(arg[1], mem)) return 1;
-    if (linsol_.solve(arg[1], res[0], dep(0).size2(), Tr, mem)) return 1;
+    if (linsol_.solve(arg[1], res[0], this->dep(0).size2(), Tr, mem)) return 1;
 
     linsol_->print_time(m->fstats);
 
@@ -71,8 +73,8 @@ namespace casadi {
   }
 
   template<bool Tr>
-  int Solve<Tr>::eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const {
-    linsol_->linsol_eval_sx(arg, res, iw, w, linsol_->memory(0), Tr, dep(0).size2());
+  int LinsolCall<Tr>::eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const {
+    linsol_->linsol_eval_sx(arg, res, iw, w, linsol_->memory(0), Tr, this->dep(0).size2());
     return 0;
   }
 
@@ -81,7 +83,7 @@ namespace casadi {
     if (arg[0].is_zero()) {
       res[0] = MX(arg[0].size());
     } else {
-      res[0] = linsol_.solve(arg[1], arg[0], Tr);
+      res[0] = solve(arg[1], arg[0], Tr);
     }
   }
 
@@ -89,10 +91,10 @@ namespace casadi {
   void Solve<Tr>::ad_forward(const std::vector<std::vector<MX> >& fseed,
                           std::vector<std::vector<MX> >& fsens) const {
     // Nondifferentiated inputs and outputs
-    vector<MX> arg(n_dep());
-    for (casadi_int i=0; i<arg.size(); ++i) arg[i] = dep(i);
-    vector<MX> res(nout());
-    for (casadi_int i=0; i<res.size(); ++i) res[i] = get_output(i);
+    std::vector<MX> arg(this->n_dep());
+    for (casadi_int i=0; i<arg.size(); ++i) arg[i] = this->dep(i);
+    std::vector<MX> res(this->nout());
+    for (casadi_int i=0; i<res.size(); ++i) res[i] = this->get_output(i);
 
     // Number of derivatives
     casadi_int nfwd = fseed.size();
@@ -108,7 +110,7 @@ namespace casadi {
       rhs[d] = Tr ? B_hat - mtimes(A_hat.T(), X) : B_hat - mtimes(A_hat, X);
       col_offset[d+1] = col_offset[d] + rhs[d].size2();
     }
-    rhs = horzsplit(linsol_.solve(A, horzcat(rhs), Tr), col_offset);
+    rhs = horzsplit(solve(A, horzcat(rhs), Tr), col_offset);
 
     // Fetch result
     fsens.resize(nfwd);
@@ -122,10 +124,10 @@ namespace casadi {
   void Solve<Tr>::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                           std::vector<std::vector<MX> >& asens) const {
     // Nondifferentiated inputs and outputs
-    vector<MX> arg(n_dep());
-    for (casadi_int i=0; i<arg.size(); ++i) arg[i] = dep(i);
-    vector<MX> res(nout());
-    for (casadi_int i=0; i<res.size(); ++i) res[i] = get_output(i);
+    std::vector<MX> arg(this->n_dep());
+    for (casadi_int i=0; i<arg.size(); ++i) arg[i] = this->dep(i);
+    std::vector<MX> res(this->nout());
+    for (casadi_int i=0; i<res.size(); ++i) res[i] = this->get_output(i);
 
     // Number of derivatives
     casadi_int nadj = aseed.size();
@@ -139,7 +141,7 @@ namespace casadi {
       rhs[d] = aseed[d][0];
       col_offset[d+1] = col_offset[d] + rhs[d].size2();
     }
-    rhs = horzsplit(linsol_.solve(A, horzcat(rhs), !Tr), col_offset);
+    rhs = horzsplit(solve(A, horzcat(rhs), !Tr), col_offset);
 
     // Collect sensitivities
     asens.resize(nadj);
@@ -174,7 +176,7 @@ namespace casadi {
     casadi_int nrhs = dep(0).size2();
 
     // Sparsities
-    const Sparsity& A_sp = dep(1).sparsity();
+    const Sparsity& A_sp = this->A_sp();
     const casadi_int* A_colind = A_sp.colind();
     const casadi_int* A_row = A_sp.row();
     casadi_int n = A_sp.size1();
@@ -187,7 +189,7 @@ namespace casadi {
     // For all right-hand-sides
     for (casadi_int r=0; r<nrhs; ++r) {
       // Copy B to a temporary vector
-      copy(B, B+n, tmp);
+      std::copy(B, B+n, tmp);
 
       // Add A_hat contribution to tmp
       for (casadi_int cc=0; cc<n; ++cc) {
@@ -214,7 +216,7 @@ namespace casadi {
     casadi_int nrhs = dep(0).size2();
 
     // Sparsities
-    const Sparsity& A_sp = dep(1).sparsity();
+    const Sparsity& A_sp = this->A_sp();
     const casadi_int* A_colind = A_sp.colind();
     const casadi_int* A_row = A_sp.row();
     casadi_int n = A_sp.size1();
@@ -251,28 +253,28 @@ namespace casadi {
   }
 
   template<bool Tr>
-  size_t Solve<Tr>::sz_w() const {
-    return sparsity().size1();
+  size_t LinsolCall<Tr>::sz_w() const {
+    return this->sparsity().size1();
   }
 
   template<bool Tr>
-  void Solve<Tr>::generate(CodeGenerator& g,
+  void LinsolCall<Tr>::generate(CodeGenerator& g,
                             const std::vector<casadi_int>& arg,
                             const std::vector<casadi_int>& res) const {
     // Number of right-hand-sides
-    casadi_int nrhs = dep(0).size2();
+    casadi_int nrhs = this->dep(0).size2();
 
     // Array for x
     g.local("rr", "casadi_real", "*");
-    g << "rr = " << g.work(res[0], nnz()) << ";\n";
+    g << "rr = " << g.work(res[0], this->nnz()) << ";\n";
 
     // Array for A
     g.local("ss", "casadi_real", "*");
-    g << "ss = " << g.work(arg[1], dep(1).nnz()) << ";\n";
+    g << "ss = " << g.work(arg[1], this->dep(1).nnz()) << ";\n";
 
     // Copy b to x if not inplace
     if (arg[0]!=res[0]) {
-      g << g.copy(g.work(arg[0], nnz()), nnz(), "rr") << '\n';
+      g << g.copy(g.work(arg[0], this->nnz()), this->nnz(), "rr") << '\n';
     }
     // Solver specific codegen
     linsol_->generate(g, "ss", "rr", nrhs, Tr);
@@ -281,7 +283,6 @@ namespace casadi {
   template<bool Tr>
   void Solve<Tr>::serialize_body(SerializingStream& s) const {
     MXNode::serialize_body(s);
-    s.pack("Solve::Linsol", linsol_);
   }
 
   template<bool Tr>
@@ -292,19 +293,188 @@ namespace casadi {
 
   template<bool Tr>
   Solve<Tr>::Solve(DeserializingStream& s) : MXNode(s) {
-    s.unpack("Solve::Linsol", linsol_);
   }
 
   template<bool Tr>
   MXNode* Solve<Tr>::deserialize(DeserializingStream& s) {
     bool tr;
     s.unpack("Solve::Tr", tr);
+    casadi_error("Not implemented");
+  }
+
+  template<bool Tr>
+  void LinsolCall<Tr>::serialize_body(SerializingStream& s) const {
+    Solve<Tr>::serialize_body(s);
+    s.pack("Solve::Linsol", linsol_);
+  }
+
+  template<bool Tr>
+  void LinsolCall<Tr>::serialize_type(SerializingStream& s) const {
+    Solve<Tr>::serialize_type(s);
+  }
+
+  template<bool Tr>
+  LinsolCall<Tr>::LinsolCall(DeserializingStream& s) : Solve<Tr>(s) {
+    s.unpack("Solve::Linsol", linsol_);
+  }
+
+  template<bool Tr>
+  MXNode* LinsolCall<Tr>::deserialize(DeserializingStream& s) {
+    bool tr;
+    s.unpack("Solve::Tr", tr);
 
     if (tr) {
-      return new Solve<true>(s);
+      return new LinsolCall<true>(s);
     } else {
-      return new Solve<false>(s);
+      return new LinsolCall<false>(s);
     }
+  }
+
+  template<bool Tr>
+  TriuSolve<Tr>::TriuSolve(const MX& r, const MX& A) : Solve<Tr>(r, A) {
+  }
+
+  template<bool Tr>
+  int TriuSolve<Tr>::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
+    if (arg[0] != res[0]) std::copy(arg[0], arg[0] + this->dep(0).nnz(), res[0]);
+    casadi_triusolve(this->dep(1).sparsity(), arg[1], res[0], Tr, false, this->dep(0).size2());
+    return 0;
+  }
+
+  template<bool Tr>
+  int TriuSolve<Tr>::eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const {
+    if (arg[0] != res[0]) std::copy(arg[0], arg[0] + this->dep(0).nnz(), res[0]);
+    casadi_triusolve(this->dep(1).sparsity(), arg[1], res[0], Tr, false, this->dep(0).size2());
+    return 0;
+  }
+
+  template<bool Tr>
+  TrilSolve<Tr>::TrilSolve(const MX& r, const MX& A) : Solve<Tr>(r, A) {
+  }
+
+  template<bool Tr>
+  int TrilSolve<Tr>::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
+    if (arg[0] != res[0]) std::copy(arg[0], arg[0] + this->dep(0).nnz(), res[0]);
+    casadi_trilsolve(this->dep(1).sparsity(), arg[1], res[0], Tr, false, this->dep(0).size2());
+    return 0;
+  }
+
+  template<bool Tr>
+  int TrilSolve<Tr>::eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const {
+    if (arg[0] != res[0]) std::copy(arg[0], arg[0] + this->dep(0).nnz(), res[0]);
+    casadi_trilsolve(this->dep(1).sparsity(), arg[1], res[0], Tr, false, this->dep(0).size2());
+    return 0;
+  }
+
+  template<bool Tr>
+  SolveUnity<Tr>::SolveUnity(const MX& r, const MX& A) : Solve<Tr>(r, A) {
+  }
+
+  template<bool Tr>
+  const Sparsity& SolveUnity<Tr>::A_sp() const {
+    // Create on first call
+    if (A_sp_.is_null()) {
+      const Sparsity& no_diag = this->dep(1).sparsity();
+      A_sp_ = no_diag + Sparsity::diag(no_diag.size1());
+    }
+    // Return reference
+    return A_sp_;
+  }
+
+  template<bool Tr>
+  TriuSolveUnity<Tr>::TriuSolveUnity(const MX& r, const MX& A)
+    : SolveUnity<Tr>(r, A) {
+  }
+
+  template<bool Tr>
+  int TriuSolveUnity<Tr>::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
+    if (arg[0] != res[0]) std::copy(arg[0], arg[0] + this->dep(0).nnz(), res[0]);
+    casadi_triusolve(this->dep(1).sparsity(), arg[1], res[0], Tr, true, this->dep(0).size2());
+    return 0;
+  }
+
+  template<bool Tr>
+  int TriuSolveUnity<Tr>::eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw,
+      SXElem* w) const {
+    if (arg[0] != res[0]) std::copy(arg[0], arg[0] + this->dep(0).nnz(), res[0]);
+    casadi_triusolve(this->dep(1).sparsity(), arg[1], res[0], Tr, true, this->dep(0).size2());
+    return 0;
+  }
+
+  template<bool Tr>
+  TrilSolveUnity<Tr>::TrilSolveUnity(const MX& r, const MX& A)
+    : SolveUnity<Tr>(r, A) {
+  }
+
+  template<bool Tr>
+  int TrilSolveUnity<Tr>::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
+    if (arg[0] != res[0]) std::copy(arg[0], arg[0] + this->dep(0).nnz(), res[0]);
+    casadi_trilsolve(this->dep(1).sparsity(), arg[1], res[0], Tr, true, this->dep(0).size2());
+    return 0;
+  }
+
+  template<bool Tr>
+  int TrilSolveUnity<Tr>::eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw,
+      SXElem* w) const {
+    if (arg[0] != res[0]) std::copy(arg[0], arg[0] + this->dep(0).nnz(), res[0]);
+    casadi_trilsolve(this->dep(1).sparsity(), arg[1], res[0], Tr, true, this->dep(0).size2());
+    return 0;
+  }
+
+  template<bool Tr>
+  void TriuSolve<Tr>::generate(CodeGenerator& g, const std::vector<casadi_int>& arg,
+      const std::vector<casadi_int>& res) const {
+    // Number of right-hand-sides
+    casadi_int nrhs = this->dep(0).size2();
+    // Copy first argument if not inplace
+    if (arg[0]!=res[0]) {
+      g << g.copy(g.work(arg[0], this->nnz()), this->nnz(), g.work(res[0], this->nnz())) << '\n';
+    }
+    // Perform sparse matrix multiplication
+    g << g.triusolve(this->dep(1).sparsity(), g.work(arg[1], this->dep(1).nnz()),
+      g.work(arg[1], this->dep(1).nnz()), Tr, false, nrhs) << '\n';
+  }
+
+  template<bool Tr>
+  void TrilSolve<Tr>::generate(CodeGenerator& g, const std::vector<casadi_int>& arg,
+      const std::vector<casadi_int>& res) const {
+    // Number of right-hand-sides
+    casadi_int nrhs = this->dep(0).size2();
+    // Copy first argument if not inplace
+    if (arg[0]!=res[0]) {
+      g << g.copy(g.work(arg[0], this->nnz()), this->nnz(), g.work(res[0], this->nnz())) << '\n';
+    }
+    // Perform sparse matrix multiplication
+    g << g.trilsolve(this->dep(1).sparsity(), g.work(arg[1], this->dep(1).nnz()),
+      g.work(arg[1], this->dep(1).nnz()), Tr, false, nrhs) << '\n';
+  }
+
+  template<bool Tr>
+  void TriuSolveUnity<Tr>::generate(CodeGenerator& g, const std::vector<casadi_int>& arg,
+      const std::vector<casadi_int>& res) const {
+    // Number of right-hand-sides
+    casadi_int nrhs = this->dep(0).size2();
+    // Copy first argument if not inplace
+    if (arg[0]!=res[0]) {
+      g << g.copy(g.work(arg[0], this->nnz()), this->nnz(), g.work(res[0], this->nnz())) << '\n';
+    }
+    // Perform sparse matrix multiplication
+    g << g.triusolve(this->dep(1).sparsity(), g.work(arg[1], this->dep(1).nnz()),
+      g.work(arg[1], this->dep(1).nnz()), Tr, true, nrhs) << '\n';
+  }
+
+  template<bool Tr>
+  void TrilSolveUnity<Tr>::generate(CodeGenerator& g, const std::vector<casadi_int>& arg,
+      const std::vector<casadi_int>& res) const {
+    // Number of right-hand-sides
+    casadi_int nrhs = this->dep(0).size2();
+    // Copy first argument if not inplace
+    if (arg[0]!=res[0]) {
+      g << g.copy(g.work(arg[0], this->nnz()), this->nnz(), g.work(res[0], this->nnz())) << '\n';
+    }
+    // Perform sparse matrix multiplication
+    g << g.trilsolve(this->dep(1).sparsity(), g.work(arg[1], this->dep(1).nnz()),
+      g.work(arg[1], this->dep(1).nnz()), Tr, true, nrhs) << '\n';
   }
 
 } // namespace casadi

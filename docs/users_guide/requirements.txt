@@ -1,6 +1,6 @@
-git+git://github.com/jgillis/side-by-side@master#egg=sidebyside
-git+git://github.com/jgillis/exec-block@master#egg=exec-block
-git+git://github.com/jgillis/bare_body@master#egg=bare_body
+git+https://github.com/jgillis/side-by-side@master#egg=sidebyside
+git+https://github.com/jgillis/exec-block@master#egg=exec-block
+git+https://github.com/jgillis/bare_body@master#egg=bare_body
 sphinx
 recommonmark
 

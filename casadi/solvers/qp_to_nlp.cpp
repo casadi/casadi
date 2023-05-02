@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -27,7 +27,6 @@
 #include "casadi/core/nlpsol.hpp"
 #include "casadi/core/nlpsol_impl.hpp"
 
-using namespace std;
 namespace casadi {
 
   extern "C"
@@ -85,7 +84,7 @@ namespace casadi {
     Conic::init(opts);
 
     // Default options
-    string nlpsol_plugin;
+    std::string nlpsol_plugin;
     Dict nlpsol_options;
 
     // Read user options
@@ -151,8 +150,8 @@ namespace casadi {
     // Buffers for calling the NLP solver
     const double** arg1 = arg + n_in_;
     double** res1 = res + n_out_;
-    fill_n(arg1, static_cast<casadi_int>(NLPSOL_NUM_IN), nullptr);
-    fill_n(res1, static_cast<casadi_int>(NLPSOL_NUM_OUT), nullptr);
+    std::fill_n(arg1, static_cast<casadi_int>(NLPSOL_NUM_IN), nullptr);
+    std::fill_n(res1, static_cast<casadi_int>(NLPSOL_NUM_OUT), nullptr);
 
     // NLP inputs
     arg1[NLPSOL_X0] = x0_;
@@ -167,27 +166,27 @@ namespace casadi {
     // Quadratic term
     casadi_int nh = nnz_in(CONIC_H);
     if (h_) {
-      copy_n(h_, nh, w);
+      std::copy_n(h_, nh, w);
     } else {
-      fill_n(w, nh, 0);
+      std::fill_n(w, nh, 0);
     }
     w += nh;
 
     // Linear objective term
     casadi_int ng = nnz_in(CONIC_G);
     if (g_) {
-      copy_n(g_, ng, w);
+      std::copy_n(g_, ng, w);
     } else {
-      fill_n(w, ng, 0);
+      std::fill_n(w, ng, 0);
     }
     w += ng;
 
     // Linear constraints
     casadi_int na = nnz_in(CONIC_A);
     if (a_) {
-      copy_n(a_, na, w);
+      std::copy_n(a_, na, w);
     } else {
-      fill_n(w, na, 0);
+      std::fill_n(w, na, 0);
     }
     w += na;
 
@@ -202,8 +201,8 @@ namespace casadi {
     int ret = solver_(arg1, res1, iw, w, m->nlp_mem);
     auto nlp_m = static_cast<NlpsolMemory*>(solver_.memory(m->nlp_mem));
 
-    m->success = nlp_m->success;
-    m->unified_return_status = nlp_m->unified_return_status;
+    m->d_qp.success = nlp_m->success;
+    m->d_qp.unified_return_status = nlp_m->unified_return_status;
     return ret;
   }
 

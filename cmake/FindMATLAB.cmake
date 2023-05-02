@@ -46,6 +46,12 @@
 # (To distribute this file outside of CMake, substitute the full
 #  License text for the above reference.)
 
+message("MATLAB: find via CONFIG")
+find_package(MATLAB CONFIG NO_CMAKE_FIND_ROOT_PATH)
+message("MATLAB: ${MATLAB_FOUND}")
+
+if(NOT MATLAB_FOUND)
+
 # If MATLAB_ROOT was defined in the environment, use it.
 if (NOT MATLAB_ROOT AND NOT $ENV{MATLAB_ROOT} STREQUAL "")
   set(MATLAB_ROOT $ENV{MATLAB_ROOT} CACHE PATH "set this if CMake does not find it automatically")
@@ -143,6 +149,13 @@ IF (NOT MATLAB_LIBRARIES)
       # If the compiler is Visual Studio, but not any of the specific
       # versions above, we try our luck with the microsoft directory
       set(MATLAB_LIBRARIES_DIR "${MATLAB_ROOT}/extern/lib/${WINDIR}/microsoft/")
+    elseif(${CMAKE_GENERATOR} MATCHES "MSYS Makefiles")
+      set(MATLAB_LIBRARIES_DIR "${MATLAB_ROOT}/extern/lib/${WINDIR}/mingw64/")
+      if(CMAKE_SIZEOF_VOID_P MATCHES "4")
+        set(MATLAB_MEX_EXT "mexw32")
+      elseif(CMAKE_SIZEOF_VOID_P MATCHES "8")
+        set(MATLAB_MEX_EXT "mexw64")
+      endif()
     endif()
 
   else(WIN32)
@@ -220,11 +233,13 @@ find_program( MATLAB_MEXEXT_PATH mexext${BATEXT}
             )
 
 # find mex extension
+if (NOT MATLAB_MEX_EXT)
 execute_process(
     COMMAND ${MATLAB_MEXEXT_PATH}
     OUTPUT_STRIP_TRAILING_WHITESPACE
     OUTPUT_VARIABLE MATLAB_MEX_EXT
     )
+endif()
 
 set(MATLAB_LIBRARIES
   ${MATLAB_MEX_LIBRARY} ${MATLAB_MX_LIBRARY} ${MATLAB_ENG_LIBRARY} ${MATLAB_UT_LIBRARY}
@@ -338,3 +353,17 @@ mark_as_advanced(
   MATLAB_CXXLIBS
   MATLAB_FLIBS
 )
+
+if(MATLAB_FOUND)
+  add_library(matlab::matlab INTERFACE IMPORTED)
+  
+  set(MEX_VERSION_FILE "")
+  if (EXISTS ${MATLAB_INCLUDE_DIR}/../version/c_mexapi_version.cpp)
+    set(MEX_VERSION_FILE "${MATLAB_INCLUDE_DIR}/../version/c_mexapi_version.cpp")
+  endif()
+
+  target_link_libraries(matlab::matlab INTERFACE ${MATLAB_LIBRARIES})
+  target_include_directories(matlab::matlab INTERFACE ${MATLAB_INCLUDE_DIR})
+endif()
+
+endif()

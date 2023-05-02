@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -27,8 +27,6 @@
 
 #include "sx_function.hpp"
 
-using namespace std;
-
 namespace casadi {
 
   template<>
@@ -50,23 +48,23 @@ namespace casadi {
   }
 
   template<>
-  SX CASADI_EXPORT SX::_sym(const string& name, const Sparsity& sp) {
+  SX CASADI_EXPORT SX::_sym(const std::string& name, const Sparsity& sp) {
     // Create a dense n-by-m matrix
-    vector<SXElem> retv;
+    std::vector<SXElem> retv;
 
     // Check if individial names have been provided
     if (name[0]=='[') {
 
       // Make a copy of the string and modify it as to remove the special characters
-      string modname = name;
-      for (string::iterator it=modname.begin(); it!=modname.end(); ++it) {
+      std::string modname = name;
+      for (std::string::iterator it=modname.begin(); it!=modname.end(); ++it) {
         switch (*it) {
         case '(': case ')': case '[': case ']': case '{': case '}': case ',': case ';': *it = ' ';
         }
       }
 
-      istringstream iss(modname);
-      string varname;
+      std::istringstream iss(modname);
+      std::string varname;
 
       // Loop over elements
       while (!iss.fail()) {
@@ -81,7 +79,7 @@ namespace casadi {
       retv.push_back(SXElem::sym(name));
     } else {
       // Scalar
-      stringstream ss;
+      std::stringstream ss;
       for (casadi_int k=0; k<sp.nnz(); ++k) {
         ss.str("");
         ss << name << "_" << k;
@@ -116,7 +114,7 @@ namespace casadi {
   template<>
   bool CASADI_EXPORT SX::is_smooth() const {
     // Make a function
-    Function temp("temp", {SX()}, {*this});
+    Function temp("tmp_is_smooth", {SX()}, {*this}, Dict{{"max_io", 0}, {"allow_free", true}});
 
     // Run the function on the temporary variable
     SXFunction* t = temp.get<SXFunction>();
@@ -186,7 +184,7 @@ namespace casadi {
   }
 
   template<>
-  string CASADI_EXPORT SX::name() const {
+  std::string CASADI_EXPORT SX::name() const {
     return scalar().name();
   }
 
@@ -206,12 +204,12 @@ namespace casadi {
     SXElem ex = ex2.scalar();
 
     // Terms, weights and indices of the nodes that are already expanded
-    vector<vector<SXNode*> > terms;
-    vector<vector<double> > weights;
+    std::vector<std::vector<SXNode*> > terms;
+    std::vector<std::vector<double> > weights;
     std::map<SXNode*, casadi_int> indices;
 
     // Stack of nodes that are not yet expanded
-    stack<SXNode*> to_be_expanded;
+    std::stack<SXNode*> to_be_expanded;
     to_be_expanded.push(ex.get());
 
     while (!to_be_expanded.empty()) { // as long as there are nodes to be expanded
@@ -224,8 +222,8 @@ namespace casadi {
       }
 
       // Weights and terms
-      vector<double> w; // weights
-      vector<SXNode*> f; // terms
+      std::vector<double> w; // weights
+      std::vector<SXNode*> f; // terms
 
       if (to_be_expanded.top()->is_constant()) { // constant nodes are seen as multiples of one
         w.push_back(to_be_expanded.top()->to_double());
@@ -284,8 +282,8 @@ namespace casadi {
               for (casadi_int i=0; i<weights[ind2].size(); ++i) w.push_back(-weights[ind2][i]);
             }
             // Eliminate multiple elements
-            vector<double> w_new; w_new.reserve(w.size());   // weights
-            vector<SXNode*> f_new;  f_new.reserve(f.size());   // terms
+            std::vector<double> w_new; w_new.reserve(w.size());   // weights
+            std::vector<SXNode*> f_new;  f_new.reserve(f.size());   // terms
             std::map<SXNode*, casadi_int> f_ind; // index in f_new
 
             for (casadi_int i=0; i<w.size(); i++) {
@@ -323,7 +321,7 @@ namespace casadi {
     casadi_int thisind = indices[ex.get()];
     ww = SX(weights[thisind]);
 
-    vector<SXElem> termsv(terms[thisind].size());
+    std::vector<SXElem> termsv(terms[thisind].size());
     for (casadi_int i=0; i<termsv.size(); ++i)
       termsv[i] = SXElem::create(terms[thisind][i]);
     tt = SX(termsv);
@@ -383,7 +381,7 @@ namespace casadi {
     }
 
     // Gauss points
-    vector<double> xi;
+    std::vector<double> xi;
     xi.push_back(-std::sqrt(5 + 2*std::sqrt(10.0/7))/3);
     xi.push_back(-std::sqrt(5 - 2*std::sqrt(10.0/7))/3);
     xi.push_back(0);
@@ -391,7 +389,7 @@ namespace casadi {
     xi.push_back(std::sqrt(5 + 2*std::sqrt(10.0/7))/3);
 
     // Gauss weights
-    vector<double> wi;
+    std::vector<double> wi;
     wi.push_back((322-13*std::sqrt(70.0))/900.0);
     wi.push_back((322+13*std::sqrt(70.0))/900.0);
     wi.push_back(128/225.0);
@@ -400,7 +398,7 @@ namespace casadi {
 
     // Evaluate at the Gauss points
     Function fcn("gauss_quadrature", {x}, {f});
-    vector<SXElem> f_val(5);
+    std::vector<SXElem> f_val(5);
     for (casadi_int i=0; i<5; ++i)
       f_val[i] = fcn(SX(xi[i])).at(0).scalar();
 
@@ -427,8 +425,8 @@ namespace casadi {
   }
 
   template<>
-  vector<SX> CASADI_EXPORT
-  SX::substitute(const vector<SX>& ex, const vector<SX>& v, const vector<SX>& vdef) {
+  std::vector<SX> CASADI_EXPORT
+  SX::substitute(const std::vector<SX>& ex, const std::vector<SX>& v, const std::vector<SX>& vdef) {
 
     // Assert consistent dimensions
     if (v.size()!=vdef.size()) {
@@ -452,7 +450,7 @@ namespace casadi {
       if (v[k].sparsity()!=vdef[k].sparsity()) {
         // Expand vdef to sparsity of v if vdef is scalar
         if (vdef[k].is_scalar() && vdef[k].nnz()==1) {
-          vector<SX> vdef_mod = vdef;
+          std::vector<SX> vdef_mod = vdef;
           vdef_mod[k] = SX(v[k].sparsity(), vdef[k]->at(0), false);
           return substitute(ex, v, vdef_mod);
         } else {
@@ -464,18 +462,18 @@ namespace casadi {
 
 
     // Otherwise, evaluate symbolically
-    Function F("tmp", v, ex);
+    Function F("tmp_substitute", v, ex, Dict{{"max_io", 0}, {"allow_free", true}});
     return F(vdef);
   }
 
   template<>
   SX CASADI_EXPORT SX::substitute(const SX& ex, const SX& v, const SX& vdef) {
-    return substitute(vector<SX>{ex}, vector<SX>{v}, vector<SX>{vdef}).front();
+    return substitute(std::vector<SX>{ex}, std::vector<SX>{v}, std::vector<SX>{vdef}).front();
   }
 
   template<>
-  void CASADI_EXPORT SX::substitute_inplace(const vector<SX >& v, vector<SX >& vdef,
-                             vector<SX >& ex, bool reverse) {
+  void CASADI_EXPORT SX::substitute_inplace(const std::vector<SX >& v, std::vector<SX >& vdef,
+                             std::vector<SX >& ex, bool reverse) {
     // Assert correctness
     casadi_assert_dev(v.size()==vdef.size());
     for (casadi_int i=0; i<v.size(); ++i) {
@@ -488,32 +486,32 @@ namespace casadi {
     if (v.empty()) return;
 
     // Function inputs
-    vector<SX> f_in;
+    std::vector<SX> f_in;
     if (!reverse) f_in.insert(f_in.end(), v.begin(), v.end());
 
     // Function outputs
-    vector<SX> f_out = vdef;
+    std::vector<SX> f_out = vdef;
     f_out.insert(f_out.end(), ex.begin(), ex.end());
 
     // Write the mapping function
-    Function f("tmp", f_in, f_out);
+    Function f("tmp_substitute_inplace", f_in, f_out, Dict{{"max_io", 0}, {"allow_free", true}});
 
     // Get references to the internal data structures
     SXFunction *ff = f.get<SXFunction>();
-    const vector<ScalarAtomic>& algorithm = ff->algorithm_;
-    vector<SXElem> work(f.sz_w());
+    const std::vector<ScalarAtomic>& algorithm = ff->algorithm_;
+    std::vector<SXElem> work(f.sz_w());
 
     // Iterator to the binary operations
-    vector<SXElem>::const_iterator b_it=ff->operations_.begin();
+    std::vector<SXElem>::const_iterator b_it=ff->operations_.begin();
 
     // Iterator to stack of constants
-    vector<SXElem>::const_iterator c_it = ff->constants_.begin();
+    std::vector<SXElem>::const_iterator c_it = ff->constants_.begin();
 
     // Iterator to free variables
-    vector<SXElem>::const_iterator p_it = ff->free_vars_.begin();
+    std::vector<SXElem>::const_iterator p_it = ff->free_vars_.begin();
 
     // Evaluate the algorithm
-    for (vector<ScalarAtomic>::const_iterator it=algorithm.begin(); it<algorithm.end(); ++it) {
+    for (std::vector<ScalarAtomic>::const_iterator it=algorithm.begin(); it<algorithm.end(); ++it) {
       switch (it->op) {
       case OP_INPUT:
         // reverse is false, substitute out
@@ -527,7 +525,7 @@ namespace casadi {
             work[it->i1] = v.at(it->i0)->at(it->i2);
           }
         } else {
-          // Auxillary output
+          // Auxiliary output
           ex.at(it->i0 - v.size())->at(it->i2) = work[it->i1];
         }
         break;
@@ -552,10 +550,10 @@ namespace casadi {
     if (x.nnz()==0) return false;
 
     // Construct a temporary algorithm
-    Function temp("temp", {arg}, {x});
+    Function temp("tmp_depends_on", {arg}, {x}, Dict{{"max_io", 0}, {"allow_free", true}});
 
     // Perform a single dependency sweep
-    vector<bvec_t> t_in(arg.nnz(), 1), t_out(x.nnz());
+    std::vector<bvec_t> t_in(arg.nnz(), 1), t_out(x.nnz());
     temp({get_ptr(t_in)}, {get_ptr(t_out)});
 
     // Loop over results
@@ -566,13 +564,121 @@ namespace casadi {
     return false;
   }
 
+  class IncrementalSerializer {
+    public:
+
+    IncrementalSerializer() : serializer(ss) {
+    }
+
+    std::string pack(const SXElem& a) {
+      serializer.pack(a);
+      // Serialization goes wrong if serialized SXNodes get destroyed
+      ref.push_back(a);
+      std::string ret = ss.str();
+      ss.str("");
+      ss.clear();
+      //uout() << a << ":" << ret << std::endl;
+      return ret;
+    }
+
+    private:
+      std::stringstream ss;
+      // List of references to keep alive
+      std::vector<SXElem> ref;
+      SerializingStream serializer;
+  };
+
+
+  template<>
+  std::vector<SX> CASADI_EXPORT SX::cse(const std::vector<SX>& e) {
+
+    SX c = veccat(e);
+    //std::vector<SX> args = symvar(c);
+    Function f("f", std::vector<SX>{}, e, {{"live_variables", false},
+      {"max_io", 0}, {"cse", false}, {"allow_free", true}});
+    SXFunction *ff = f.get<SXFunction>();
+
+    std::vector<SX> ret;
+    for (casadi_int i=0;i<e.size();++i) {
+      ret.push_back(SX::zeros(e.at(i).sparsity()));
+    }
+
+    // Symbolic work, non-differentiated
+    std::vector<SXElem> w(ff->worksize_);
+
+    std::vector<const SXElem*> arg(f.sz_arg());
+    /*for (casadi_int i=0;i<args.size();++i) {
+      arg[i] = get_ptr(args.at(i).nonzeros());
+    }*/
+
+    std::vector<SXElem*> res(f.sz_res());
+    for (casadi_int i=0;i<e.size();++i) {
+      res[i] = get_ptr(ret.at(i).nonzeros());
+    }
+
+    std::unordered_map<std::string, SXElem > cache;
+    IncrementalSerializer s;
+
+    // Iterator to stack of constants
+    std::vector<SXElem>::const_iterator c_it = ff->constants_.begin();
+
+    // Iterator to free variables
+    std::vector<SXElem>::const_iterator p_it = ff->free_vars_.begin();
+
+    // Evaluate algorithm
+    for (auto&& a : ff->algorithm_) {
+      switch (a.op) {
+      case OP_INPUT:
+        w[a.i0] = arg[a.i1]==nullptr ? 0 : arg[a.i1][a.i2];
+        if (arg[a.i1]!=nullptr) cache[s.pack(w[a.i0])] = w[a.i0];
+        break;
+      case OP_OUTPUT:
+        if (res[a.i0]!=nullptr) res[a.i0][a.i2] = w[a.i1];
+        break;
+      case OP_CONST:
+        w[a.i0] = *c_it++;
+        cache[s.pack(w[a.i0])] = w[a.i0];
+        break;
+      case OP_PARAMETER:
+        w[a.i0] = *p_it++;
+        cache[s.pack(w[a.i0])] = w[a.i0];
+        break;
+      default:
+        {
+
+          // Evaluate the function to a temporary value
+          // (as it might overwrite the children in the work vector)
+          SXElem f;
+          // Missing simplifications like [x+y]->[twice]
+          switch (a.op) {
+            CASADI_MATH_FUN_BUILTIN(w[a.i1], w[a.i2], f)
+          }
+
+          std::string key = s.pack(f);
+
+          auto itk = cache.find(key);
+          if (itk==cache.end()) {
+            cache[key] = f;
+          } else {
+            f = itk->second;
+          }
+
+          // Finally save the function value
+          w[a.i0] = f;
+        }
+      }
+    }
+    return ret;
+  }
+
   template<>
   SX CASADI_EXPORT SX::jacobian(const SX &f, const SX &x, const Dict& opts) {
     // Propagate verbose option to helper function
     Dict h_opts;
     Dict opts_remainder = extract_from_dict(opts, "helper_options", h_opts);
+    h_opts["allow_free"] = true;
     Function h("jac_helper", {x}, {f}, h_opts);
-    return h.get<SXFunction>()->jac(0, 0, opts_remainder);
+    return h.get<SXFunction>()->jac(opts_remainder).at(0);
   }
 
   template<>
@@ -596,6 +702,7 @@ namespace casadi {
 
     Dict h_opts;
     Dict opts_remainder = extract_from_dict(opts, "helper_options", h_opts);
+    h_opts["allow_free"] = true;
     // Read options
     bool always_inline = false;
     bool never_inline = false;
@@ -605,7 +712,7 @@ namespace casadi {
       } else if (op.first=="never_inline") {
         never_inline = op.second;
       } else {
-        casadi_error("No such option: " + string(op.first));
+        casadi_error("No such option: " + std::string(op.first));
       }
     }
     // Call internal function on a temporary object
@@ -622,7 +729,7 @@ namespace casadi {
 
     Dict h_opts;
     Dict opts_remainder = extract_from_dict(opts, "helper_options", h_opts);
-
+    h_opts["allow_free"] = true;
     // Read options
     bool always_inline = false;
     bool never_inline = false;
@@ -632,7 +739,7 @@ namespace casadi {
       } else if (op.first=="never_inline") {
         never_inline = op.second;
       } else {
-        casadi_error("No such option: " + string(op.first));
+        casadi_error("No such option: " + std::string(op.first));
       }
     }
     // Call internal function on a temporary object
@@ -646,6 +753,11 @@ namespace casadi {
   std::vector<bool> CASADI_EXPORT SX::which_depends(const SX &expr,
       const SX &var, casadi_int order, bool tr) {
     return _which_depends(expr, var, order, tr);
+  }
+
+  template<>
+  Sparsity CASADI_EXPORT SX::jacobian_sparsity(const SX &f, const SX &x) {
+    return _jacobian_sparsity(f, x);
   }
 
   template<>
@@ -670,7 +782,7 @@ namespace casadi {
   }
 
   SX mtaylor_recursive(const SX& ex, const SX& x, const SX& a, casadi_int order,
-                       const vector<casadi_int>&order_contributions,
+                       const std::vector<casadi_int>&order_contributions,
                        const SXElem & current_dx=casadi_limits<SXElem>::one,
                        double current_denom=1, casadi_int current_order=1) {
     SX result = substitute(ex, x, a)*current_dx/current_denom;
@@ -690,7 +802,7 @@ namespace casadi {
 
   template<>
   SX CASADI_EXPORT SX::mtaylor(const SX& f, const SX& x, const SX& a, casadi_int order,
-                 const vector<casadi_int>& order_contributions) {
+                 const std::vector<casadi_int>& order_contributions) {
     casadi_assert(f.nnz()==f.numel() && x.nnz()==x.numel(),
                           "mtaylor: not implemented for sparse matrices");
 
@@ -706,18 +818,19 @@ namespace casadi {
 
   template<>
   SX CASADI_EXPORT SX::mtaylor(const SX& f, const SX& x, const SX& a, casadi_int order) {
-    return mtaylor(f, x, a, order, vector<casadi_int>(x.nnz(), 1));
+    return mtaylor(f, x, a, order, std::vector<casadi_int>(x.nnz(), 1));
   }
 
   template<>
   casadi_int CASADI_EXPORT SX::n_nodes(const SX& x) {
-    Function f("tmp", {SX()}, {x});
+    Dict opts{{"max_io", 0}, {"cse", false}, {"allow_free", true}};
+    Function f("tmp_n_nodes", {SX()}, {x}, opts);
     return f.n_nodes();
   }
 
   template<>
-  string CASADI_EXPORT
-  SX::print_operator(const SX& X, const vector<string>& args) {
+  std::string CASADI_EXPORT
+  SX::print_operator(const SX& X, const std::vector<std::string>& args) {
     SXElem x = X.scalar();
     casadi_int ndeps = casadi_math<double>::ndeps(x.op());
     casadi_assert(ndeps==1 || ndeps==2, "Not a unary or binary operator");
@@ -730,55 +843,69 @@ namespace casadi {
   }
 
   template<>
-  vector<SX> CASADI_EXPORT SX::symvar(const SX& x) {
-    Function f("tmp", vector<SX>{}, {x});
+  std::vector<SX> CASADI_EXPORT SX::symvar(const SX& x) {
+    Dict opts{{"max_io", 0}, {"cse", false}, {"allow_free", true}};
+    Function f("tmp_symvar", std::vector<SX>{}, {x}, opts);
     return f.free_sx();
   }
 
   template<>
-  void CASADI_EXPORT SX::shared(vector<SX >& ex,
-                         vector<SX >& v_sx,
-                         vector<SX >& vdef_sx,
-                         const string& v_prefix,
-                         const string& v_suffix) {
-
+  void CASADI_EXPORT SX::extract(std::vector<SX>& ex, std::vector<SX>& v_sx,
+      std::vector<SX>& vdef_sx, const Dict& opts) {
+    // Read options
+    std::string v_prefix = "v_", v_suffix = "";
+    bool lift_shared = true, lift_calls = false;
+    casadi_int v_ind = 0;
+    for (auto&& op : opts) {
+      if (op.first == "prefix") {
+        v_prefix = std::string(op.second);
+      } else if (op.first == "suffix") {
+        v_suffix = std::string(op.second);
+      } else if (op.first == "lift_shared") {
+        lift_shared = op.second;
+      } else if (op.first == "lift_calls") {
+        lift_calls = op.second;
+      } else if (op.first == "offset") {
+        v_ind = op.second;
+      } else {
+        casadi_error("No such option: " + std::string(op.first));
+      }
+    }
+    // Partially implemented
+    casadi_assert(lift_shared, "Not implemented");
+    casadi_assert(!lift_calls, "Not implemented");
     // Sort the expression
-    Function f("tmp", vector<SX>(), ex);
+    Function f("tmp_extract", std::vector<SX>(), ex, Dict{{"max_io", 0}, {"allow_free", true}});
     SXFunction *ff = f.get<SXFunction>();
-
     // Get references to the internal data structures
-    const vector<ScalarAtomic>& algorithm = ff->algorithm_;
-    vector<SXElem> work(f.sz_w());
-    vector<SXElem> work2 = work;
-
+    const std::vector<ScalarAtomic>& algorithm = ff->algorithm_;
+    std::vector<SXElem> work(f.sz_w());
+    std::vector<SXElem> work2 = work;
     // Iterator to the binary operations
-    vector<SXElem>::const_iterator b_it=ff->operations_.begin();
-
+    std::vector<SXElem>::const_iterator b_it=ff->operations_.begin();
     // Iterator to stack of constants
-    vector<SXElem>::const_iterator c_it = ff->constants_.begin();
-
+    std::vector<SXElem>::const_iterator c_it = ff->constants_.begin();
     // Iterator to free variables
-    vector<SXElem>::const_iterator p_it = ff->free_vars_.begin();
-
+    std::vector<SXElem>::const_iterator p_it = ff->free_vars_.begin();
     // Count how many times an expression has been used
-    vector<casadi_int> usecount(work.size(), 0);
-
+    std::vector<casadi_int> usecount(work.size(), 0);
     // Evaluate the algorithm
-    vector<SXElem> v, vdef;
-    for (vector<ScalarAtomic>::const_iterator it=algorithm.begin(); it<algorithm.end(); ++it) {
+    std::vector<SXElem> v, vdef;
+    for (std::vector<ScalarAtomic>::const_iterator it=algorithm.begin(); it<algorithm.end(); ++it) {
       // Increase usage counters
       switch (it->op) {
       case OP_CONST:
       case OP_PARAMETER:
         break;
-        CASADI_MATH_BINARY_BUILTIN // Binary operation
-          if (usecount[it->i2]==0) {
-            usecount[it->i2]=1;
-          } else if (usecount[it->i2]==1) {
-            // Get a suitable name
-            vdef.push_back(work[it->i2]);
-            usecount[it->i2]=-1; // Extracted, do not extract again
-          }
+      CASADI_MATH_BINARY_BUILTIN // Binary operation
+      case OP_IF_ELSE_ZERO:
+        if (usecount[it->i2]==0) {
+          usecount[it->i2]=1;
+        } else if (usecount[it->i2]==1) {
+          // Get a suitable name
+          vdef.push_back(work[it->i2]);
+          usecount[it->i2]=-1; // Extracted, do not extract again
+        }
         // fall-through
       case OP_OUTPUT:
       default: // Unary operation, binary operation or output
@@ -789,7 +916,6 @@ namespace casadi {
           usecount[it->i1]=-1; // Extracted, do not extract again
         }
       }
-
       // Perform the operation
       switch (it->op) {
       case OP_OUTPUT:
@@ -804,30 +930,25 @@ namespace casadi {
         break;
       }
     }
-
     // Create intermediate variables
-    stringstream v_name;
+    std::stringstream v_name;
     for (casadi_int i=0; i<vdef.size(); ++i) {
-      v_name.str(string());
-      v_name << v_prefix << i << v_suffix;
+      v_name.str(std::string());
+      v_name << v_prefix << (v_ind++) << v_suffix;
       v.push_back(SXElem::sym(v_name.str()));
     }
-
-    casadi_assert(vdef.size()<numeric_limits<int>::max(), "Integer overflow");
-
+    // Consistency check
+    casadi_assert(vdef.size() < std::numeric_limits<int>::max(), "Integer overflow");
     // Mark the above expressions
     for (casadi_int i=0; i<vdef.size(); ++i) {
       vdef[i].set_temp(static_cast<int>(i)+1);
     }
-
     // Save the marked nodes for later cleanup
-    vector<SXElem> marked = vdef;
-
+    std::vector<SXElem> marked = vdef;
     // Reset iterator
     b_it=ff->operations_.begin();
-
     // Evaluate the algorithm
-    for (vector<ScalarAtomic>::const_iterator it=algorithm.begin(); it<algorithm.end(); ++it) {
+    for (std::vector<ScalarAtomic>::const_iterator it=algorithm.begin(); it<algorithm.end(); ++it) {
       switch (it->op) {
       case OP_OUTPUT:     ex.at(it->i0)->at(it->i2) = work[it->i1];      break;
       case OP_CONST:      work2[it->i0] = work[it->i0] = *c_it++; break;
@@ -838,7 +959,6 @@ namespace casadi {
             CASADI_MATH_FUN_BUILTIN(work[it->i1], work[it->i2], work[it->i0])
               }
           work2[it->i0] = *b_it++;
-
           // Replace with intermediate variables
           casadi_int ind = work2[it->i0].get_temp()-1;
           if (ind>=0) {
@@ -848,17 +968,26 @@ namespace casadi {
         }
       }
     }
-
     // Unmark the expressions
-    for (vector<SXElem>::iterator it=marked.begin(); it!=marked.end(); ++it) {
+    for (std::vector<SXElem>::iterator it=marked.begin(); it!=marked.end(); ++it) {
       it->set_temp(0);
     }
-
     // Save v, vdef
     v_sx.resize(v.size());
-    copy(v.begin(), v.end(), v_sx.begin());
+    std::copy(v.begin(), v.end(), v_sx.begin());
     vdef_sx.resize(vdef.size());
-    copy(vdef.begin(), vdef.end(), vdef_sx.begin());
+    std::copy(vdef.begin(), vdef.end(), vdef_sx.begin());
+  }
+
+  template<>
+  void CASADI_EXPORT SX::shared(std::vector<SX >& ex,
+                         std::vector<SX >& v,
+                         std::vector<SX >& vdef,
+                         const std::string& v_prefix,
+                         const std::string& v_suffix) {
+     // Call new, more generic function
+     return extract(ex, v, vdef, Dict{{"lift_shared", true}, {"lift_calls", false},
+       {"prefix", v_prefix}, {"suffix", v_suffix}});
   }
 
   template<>
@@ -867,7 +996,7 @@ namespace casadi {
     casadi_assert_dev(x.is_scalar());
     casadi_assert_dev(x.is_symbolic());
 
-    vector<SXElem> r;
+    std::vector<SXElem> r;
 
     SX j = ex;
     casadi_int mult = 1;
@@ -974,11 +1103,11 @@ namespace casadi {
   SX CASADI_EXPORT SX::eig_symbolic(const SX& m) {
     casadi_assert(m.size1()==m.size2(), "eig(): supplied matrix must be square");
 
-    vector<SX> ret;
+    std::vector<SX> ret;
 
     /// Bring m in block diagonal form, calculating eigenvalues of each block separately
-    vector<casadi_int> offset;
-    vector<casadi_int> index;
+    std::vector<casadi_int> offset;
+    std::vector<casadi_int> index;
     casadi_int nb = m.sparsity().scc(offset, index);
 
     SX m_perm = m(offset, offset);
@@ -986,7 +1115,7 @@ namespace casadi {
     SX l = SX::sym("l");
 
     for (casadi_int k=0; k<nb; ++k) {
-      vector<casadi_int> r = range(index.at(k), index.at(k+1));
+      std::vector<casadi_int> r = range(index.at(k), index.at(k+1));
       // det(lambda*I-m) = 0
       ret.push_back(poly_roots(poly_coeff(det(SX::eye(r.size())*l-m_perm(r, r)), l)));
     }
@@ -995,8 +1124,9 @@ namespace casadi {
   }
 
   template<>
-  void CASADI_EXPORT SX::print_split(casadi_int nnz, const SXElem* nonzeros, vector<string>& nz,
-                      vector<string>& inter) {
+  void CASADI_EXPORT SX::print_split(casadi_int nnz, const SXElem* nonzeros,
+      std::vector<std::string>& nz,
+      std::vector<std::string>& inter) {
     // Find out which noded can be inlined
     std::map<const SXNode*, casadi_int> nodeind;
     for (casadi_int i=0; i<nnz; ++i) nonzeros[i]->can_inline(nodeind);
@@ -1008,11 +1138,11 @@ namespace casadi {
     for (casadi_int i=0; i<nnz; ++i) nz.push_back(nonzeros[i]->print_compact(nodeind, inter));
   }
 
-  template<> vector<SX> CASADI_EXPORT SX::get_input(const Function& f) {
+  template<> std::vector<SX> CASADI_EXPORT SX::get_input(const Function& f) {
     return f.sx_in();
   }
 
-  template<> vector<SX> CASADI_EXPORT SX::get_free(const Function& f) {
+  template<> std::vector<SX> CASADI_EXPORT SX::get_free(const Function& f) {
     return f.free_sx();
   }
 

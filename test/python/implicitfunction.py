@@ -2,8 +2,8 @@
 #     This file is part of CasADi.
 #
 #     CasADi -- A symbolic framework for dynamic optimization.
-#     Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
-#                             K.U. Leuven. All rights reserved.
+#     Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+#                             KU Leuven. All rights reserved.
 #     Copyright (C) 2011-2014 Greg Horn
 #
 #     CasADi is free software; you can redistribute it and/or
@@ -104,7 +104,7 @@ class ImplicitFunctiontests(casadiTestCase):
       self.message(Solver)
       x=SX.sym("x")
       p=SX.sym("p")
-      f=Function("f", [x], [sin(x+p)])
+      f=Function("f", [x], [sin(x+p)],{"allow_free":True})
       with self.assertInException("[p] are free"):
         rootfinder("solver", Solver, f, options)
 
@@ -260,7 +260,7 @@ class ImplicitFunctiontests(casadiTestCase):
     # Test values
     x0_val  = 1
 
-    J = F.jacobian_old(0, 0)
+    J = jacobian_old(F, 0, 0)
     J_out = J(x0_val)
     print(J_out[0])
     print(J)

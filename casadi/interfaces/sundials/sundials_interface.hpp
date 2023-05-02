@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -41,14 +41,11 @@ namespace casadi {
 
   // IdasMemory
   struct CASADI_SUNDIALS_COMMON_EXPORT SundialsMemory : public IntegratorMemory {
-    // Current time
-    double t;
-
     // N-vectors for the forward integration
     N_Vector xz, xzdot, q;
 
     // N-vectors for the backward integration
-    N_Vector rxz, rxzdot, rq;
+    N_Vector rxz, rxzdot, ruq;
 
     // Initialize or reinitialize?
     bool first_callB;
@@ -56,19 +53,30 @@ namespace casadi {
     // Parameters
     double *p, *rp;
 
-    // Jacobian
-    double *jac, *jacB;
+    // Controls
+    double *u;
 
-    /// Stats
+    /// Jacobian memory blocks
+    double *jac_ode_x, *jac_alg_x, *jac_ode_z, *jac_alg_z;
+
+    // Jacobian
+    double *jacF;
+
+    /// Stats, forward integration
     long nsteps, nfevals, nlinsetups, netfails;
     int qlast, qcur;
     double hinused, hlast, hcur, tcur;
     long nniters, nncfails;
 
+    /// Stats, backward integration
     long nstepsB, nfevalsB, nlinsetupsB, netfailsB;
     int qlastB, qcurB;
     double hinusedB, hlastB, hcurB, tcurB;
     long nnitersB, nncfailsB;
+
+    /// Offsets for stats in backward integration
+    long nstepsB_off, nfevalsB_off, nlinsetupsB_off, netfailsB_off;
+    long nnitersB_off, nncfailsB_off;
 
     // Temporaries for [x;z] or [rx;rz]
     double *v1, *v2;
@@ -76,8 +84,11 @@ namespace casadi {
     /// number of checkpoints stored so far
     int ncheck;
 
+    // Absolute tolerance
+    N_Vector abstolv;
+
     /// Linear solver memory objects
-    int mem_linsolF, mem_linsolB;
+    int mem_linsolF;
 
     /// Constructor
     SundialsMemory();
@@ -89,7 +100,8 @@ namespace casadi {
   class CASADI_SUNDIALS_COMMON_EXPORT SundialsInterface : public Integrator {
   public:
     /** \brief  Constructor */
-    SundialsInterface(const std::string& name, const Function& dae);
+    SundialsInterface(const std::string& name, const Function& dae,
+      double t0, const std::vector<double>& tout);
 
     /** \brief  Destructor */
     ~SundialsInterface() override=0;
@@ -103,11 +115,12 @@ namespace casadi {
     /** \brief  Initialize */
     void init(const Dict& opts) override;
 
+    /** \brief Set the (persistent) work vectors */
+    void set_work(void* mem, const double**& arg, double**& res,
+      casadi_int*& iw, double*& w) const override;
+
     /** \brief Initalize memory block */
     int init_mem(void* mem) const override;
-
-    /** \brief Free memory block */
-    void free_mem(void *mem) const override;
 
     /** \brief Get relative tolerance */
     double get_reltol() const override { return reltol_;}
@@ -115,8 +128,29 @@ namespace casadi {
     /** \brief Get absolute tolerance */
     double get_abstol() const override { return abstol_;}
 
-    // Get system Jacobian
-    virtual Function getJ(bool backward) const = 0;
+    // DAE right-hand-side, forward problem
+    int calc_daeF(SundialsMemory* m, double t, const double* x, const double* z,
+      double* ode, double* alg) const;
+
+    // DAE right-hand-side, forward problem
+    int calc_daeB(SundialsMemory* m, double t, const double* x, const double* z,
+      const double* rx, const double* rz, const double* rp, double* adj_x, double* adj_z) const;
+
+    // Quadrature right-hand-side, forward problem
+    int calc_quadF(SundialsMemory* m, double t, const double* x, const double* z,
+      double* quad) const;
+
+    // Quadrature right-hand-side, backward problem
+    int calc_quadB(SundialsMemory* m, double t, const double* x, const double* z,
+      const double* rx, const double* rz, double* adj_p, double* adj_u) const;
+
+    // Jacobian of DAE-times-vector function, forward problem
+    int calc_jtimesF(SundialsMemory* m, double t, const double* x, const double* z,
+      const double* fwd_x, const double* fwd_z, double* fwd_ode, double* fwd_alg) const;
+
+    // Jacobian of DAE right-hand-side function, forward problem
+    int calc_jacF(SundialsMemory* m, double t, const double* x, const double* z,
+      double* jac_ode_x, double* jac_alg_x, double* jac_ode_z, double* jac_alg_z) const;
 
     /// Get all statistics
     Dict get_stats(void* mem) const override;
@@ -125,12 +159,24 @@ namespace casadi {
     void print_stats(IntegratorMemory* mem) const override;
 
     /** \brief  Reset the forward problem and bring the time back to t0 */
-    void reset(IntegratorMemory* mem, double t, const double* x,
-                       const double* z, const double* p) const override;
+    void reset(IntegratorMemory* mem, const double* x,
+      const double* z, const double* p) const override;
 
     /** \brief  Reset the backward problem and take time to tf */
-    void resetB(IntegratorMemory* mem, double t, const double* rx,
-                        const double* rz, const double* rp) const override;
+    void resetB(IntegratorMemory* mem) const override;
+
+    /** \brief Introduce an impulse into the backwards integration at the current time */
+    void impulseB(IntegratorMemory* mem,
+      const double* rx, const double* rz, const double* rp) const override;
+
+    /** \brief Reset stats */
+    void reset_stats(SundialsMemory* m) const;
+
+    /** \brief Save stats offsets before reset */
+    void save_offsets(SundialsMemory* m) const;
+
+    /** \brief Add stats offsets to stats */
+    void add_offsets(SundialsMemory* m) const;
 
     /** \brief Cast to memory object */
     static SundialsMemory* to_mem(void *mem) {
@@ -138,6 +184,14 @@ namespace casadi {
       casadi_assert_dev(m);
       return m;
     }
+
+    ///@{
+    /** \brief IO conventions for continuous time dynamics */
+    enum JtimesFIn { JTIMESF_T, JTIMESF_X, JTIMESF_Z, JTIMESF_P, JTIMESF_U, JTIMESF_FWD_X,
+      JTIMESF_FWD_Z, JTIMESF_NUM_IN};
+    enum JtimesFOut { JTIMESF_FWD_ODE, JTIMESF_FWD_ALG, JTIMESF_NUM_OUT};
+    enum JacFOut {JACF_ODE_X, JACF_ALG_X, JACF_ODE_Z, JACF_ALG_Z, JACF_NUM_OUT};
+    ///@}
 
     ///@{
     /// Options
@@ -157,10 +211,11 @@ namespace casadi {
     double max_step_size_;
     double nonlin_conv_coeff_;
     casadi_int max_order_;
+    bool scale_abstol_;
     ///@}
 
     /// Linear solver
-    Linsol linsolF_, linsolB_;
+    Linsol linsolF_;
 
     /// Supported iterative solvers in Sundials
     enum NewtonScheme {SD_DIRECT, SD_GMRES, SD_BCGSTAB, SD_TFQMR} newton_scheme_;
@@ -170,10 +225,6 @@ namespace casadi {
 
     /// Linear solver data (dense) -- what is this?
     struct LinSolDataDense {};
-
-    /** \brief Set the (persistent) work vectors */
-    void set_work(void* mem, const double**& arg, double**& res,
-                          casadi_int*& iw, double*& w) const override;
 
     // Print a variable
     static void printvar(const std::string& id, double v) {

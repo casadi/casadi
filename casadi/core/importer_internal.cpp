@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -25,7 +25,6 @@
 
 #include "importer_internal.hpp"
 
-using namespace std;
 namespace casadi {
 
   ImporterInternal::ImporterInternal(const std::string& name) : name_(name) {
@@ -35,7 +34,7 @@ namespace casadi {
   ImporterInternal::~ImporterInternal() {
   }
 
-  void ImporterInternal::disp(ostream &stream, bool more) const {
+  void ImporterInternal::disp(std::ostream &stream, bool more) const {
   }
 
   std::map<std::string, ImporterInternal::Plugin> ImporterInternal::solvers_;
@@ -71,16 +70,16 @@ namespace casadi {
     // Read meta information from file
     if (can_have_meta()) {
       casadi_int offset = 0;
-      ifstream file(name_);
+      std::ifstream file(name_);
       std::string line;
       while (getline(file, line)) {
         // Update offset
         offset++;
 
         // Try to find a /*CASADIMETA delimiter
-        string cmd = "/*CASADIMETA";
+        std::string cmd = "/*CASADIMETA";
         size_t pos = line.find(cmd);
-        if (pos != string::npos) {
+        if (pos != std::string::npos) {
           read_meta(file, offset);
           continue;
         }
@@ -88,10 +87,10 @@ namespace casadi {
         // Try to find a /*CASADIEXTERNAL delimiter
         cmd = "/*CASADIEXTERNAL";
         pos = line.find(cmd);
-        if (pos != string::npos) {
-          istringstream ss(line.substr(pos+cmd.size()));
+        if (pos != std::string::npos) {
+          std::istringstream ss(line.substr(pos+cmd.size()));
           // Read name
-          string sym;
+          std::string sym;
           ss >> sym;
           casadi_assert_dev(ss.good());
           // Default attributes
@@ -99,8 +98,8 @@ namespace casadi {
 
           // Read attributes: FIXME(@jaeandersson): Hacky
           size_t eqpos = line.find('=', pos+cmd.size());
-          if (eqpos != string::npos) {
-            string attr = "inline";
+          if (eqpos != std::string::npos) {
+            std::string attr = "inline";
             if (line.compare(eqpos-attr.size(), attr.size(), attr)==0) {
               casadi_assert_dev(line.size()>eqpos+1);
               if (line.at(eqpos+1)=='1') {
@@ -125,14 +124,14 @@ namespace casadi {
     }
   }
 
-  void ImporterInternal::read_meta(istream& file, casadi_int& offset) {
+  void ImporterInternal::read_meta(std::istream& file, casadi_int& offset) {
     // Loop over the lines
     std::string line;
     while (getline(file, line)) {
       offset++;
 
       // End of meta found?
-      if (line.find("*/") != string::npos) return;
+      if (line.find("*/") != std::string::npos) return;
 
       // If comment or empty line, skip
       if (line.empty() || line.at(0)=='#') continue;
@@ -140,10 +139,10 @@ namespace casadi {
       // Get command string
       casadi_assert(line.at(0)==':',
                             "Syntax error: " + line + " is not a command string");
-      string cmd = line.substr(1, line.find(' ')-1);
+      std::string cmd = line.substr(1, line.find(' ')-1);
 
       // New entry
-      stringstream ss;
+      std::stringstream ss;
 
       // Collect the meta data
       line = line.substr(cmd.size()+2);
@@ -155,7 +154,7 @@ namespace casadi {
         ss << line.substr(0, stop);
 
         // Break if not multiline
-        if (stop == string::npos) break;
+        if (stop == std::string::npos) break;
 
         // Read another line
         ss << std::endl;
@@ -166,16 +165,16 @@ namespace casadi {
       }
 
       // Insert new element in map
-      auto new_el = meta_.insert(make_pair(cmd, make_pair(offset, ss.str())));
+      auto new_el = meta_.insert(std::make_pair(cmd, std::make_pair(offset, ss.str())));
       casadi_assert(new_el.second, "Duplicate entry: \"" + cmd + "\"");
     }
     casadi_error("End-of-file reached while searching for \"*/\"");
   }
 
   void ImporterInternal::
-  read_external(const string& sym, bool inlined, istream& file, casadi_int& offset) {
+  read_external(const std::string& sym, bool inlined, std::istream& file, casadi_int& offset) {
     // New entry
-    stringstream ss;
+    std::stringstream ss;
 
     // Are we still in the function declaration
     bool in_declaration = true;
@@ -188,20 +187,20 @@ namespace casadi {
       // Skip line if still in declaration
       if (in_declaration) {
         size_t stop = line.find('{');
-        if (stop != string::npos) in_declaration = false;
+        if (stop != std::string::npos) in_declaration = false;
         continue;
       }
 
       // End of declaration found?
-      if (line.find("/*CASADIEXTERNAL") != string::npos) {
-        auto new_el = external_.insert(make_pair(sym, make_pair(inlined, ss.str())));
+      if (line.find("/*CASADIEXTERNAL") != std::string::npos) {
+        auto new_el = external_.insert(std::make_pair(sym, std::make_pair(inlined, ss.str())));
         casadi_assert(new_el.second, "Duplicate symbol: \"" + sym + "\"");
         return;
       }
 
       // Add to entry
       if (inlined) {
-        ss << line << endl;
+        ss << line << std::endl;
       }
     }
     casadi_error("End-of-file reached while searching for \"/*CASADIEXTERNAL\"");
@@ -221,20 +220,10 @@ namespace casadi {
   }
 
   void DllLibrary::init_handle() {
+
+    std::vector<std::string> search_paths = get_search_paths();
 #ifdef WITH_DL
-#ifdef _WIN32
-    handle_ = LoadLibrary(TEXT(name_.c_str()));
-    casadi_assert(handle_!=0,
-      "CommonExternal: Cannot open \"" + name_ + "\". "
-      "Error code (WIN32): " + str(GetLastError()));
-#else // _WIN32
-    handle_ = dlopen(name_.c_str(), RTLD_LAZY);
-    casadi_assert(handle_!=nullptr,
-      "CommonExternal: Cannot open \"" + name_ + "\". "
-      "Error code: " + str(dlerror()));
-    // reset error
-    dlerror();
-#endif // _WIN32
+    handle_ = open_shared_library(name_, search_paths, "DllLibrary::init_handle");
 #else // WITH_DL
     casadi_error("CommonExternal: WITH_DL  not activated");
 #endif // WITH_DL
@@ -246,21 +235,23 @@ namespace casadi {
 
   DllLibrary::~DllLibrary() {
 #ifdef WITH_DL
-    // close the dll
-#ifdef _WIN32
-    if (handle_) FreeLibrary(handle_);
-#else // _WIN32
-    if (handle_) dlclose(handle_);
-#endif // _WIN32
+  if (handle_) close_shared_library(handle_);
 #endif // WITH_DL
   }
 
   signal_t DllLibrary::get_function(const std::string& sym) {
 #ifdef WITH_DL
 #ifdef _WIN32
-    return (signal_t)GetProcAddress(handle_, TEXT(sym.c_str()));
+#if __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-function-type"
+#endif
+    return reinterpret_cast<signal_t>(GetProcAddress(handle_, TEXT(sym.c_str())));
+#if __GNUC__
+#pragma GCC diagnostic pop
+#endif
 #else // _WIN32
-    signal_t fcnPtr = (signal_t)dlsym(handle_, sym.c_str());
+    signal_t fcnPtr = reinterpret_cast<signal_t>(dlsym(handle_, sym.c_str()));
     if (dlerror()) {
       fcnPtr=nullptr;
       dlerror(); // Reset error flags

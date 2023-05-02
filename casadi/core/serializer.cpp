@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -32,7 +32,6 @@
 #include "generic_type.hpp"
 #include <iomanip>
 
-using namespace std;
 namespace casadi {
 
     StringSerializer::StringSerializer(const Dict& opts) :
@@ -42,7 +41,7 @@ namespace casadi {
     FileSerializer::FileSerializer(const std::string& fname, const Dict& opts) :
         SerializerBase(
           std::unique_ptr<std::ostream>(
-            new std::ofstream(fname, ios_base::binary | std::ios::out)),
+            new std::ofstream(fname, std::ios_base::binary | std::ios::out)),
           opts) {
       if ((sstream_->rdstate() & std::ifstream::failbit) != 0) {
         casadi_error("Could not open file '" + fname + "' for writing.");
@@ -90,7 +89,7 @@ namespace casadi {
       return ret;
     }
     void StringDeserializer::decode(const std::string& string) {
-      casadi_assert(dstream_->peek()==char_traits<char>::eof(),
+      casadi_assert(dstream_->peek() == std::char_traits<char>::eof(),
         "StringDeserializer::decode does not apply: current string not fully consumed yet.");
       static_cast<std::stringstream*>(dstream_.get())->str(string);
       dstream_->clear(); // reset error flags
@@ -106,7 +105,7 @@ namespace casadi {
 
     FileDeserializer::FileDeserializer(const std::string& fname) :
         DeserializerBase(std::unique_ptr<std::istream>(
-          new std::ifstream(fname, ios_base::binary | std::ios::in))) {
+          new std::ifstream(fname, std::ios_base::binary | std::ios::in))) {
       if ((dstream_->rdstate() & std::ifstream::failbit) != 0) {
         casadi_error("Could not open file '" + fname + "' for reading.");
       }
@@ -126,7 +125,7 @@ namespace casadi {
     }
 
     DeserializingStream& DeserializerBase::deserializer() {
-      casadi_assert(dstream_->peek()!=char_traits<char>::eof(),
+      casadi_assert(dstream_->peek() != std::char_traits<char>::eof(),
         "Deserializer reached end of stream. Nothing left to unpack.");
       return *deserializer_;
     }
@@ -140,7 +139,8 @@ namespace casadi {
 #define SERIALIZEX(TYPE, BaseType, Type, type, arg) \
     void SerializerBase::pack(const Type& e) { \
       serializer().pack(static_cast<char>(SERIALIZED_ ## TYPE));\
-      serializer().pack(Function("temp", std::vector< BaseType >{}, arg)); \
+      serializer().pack(Function("tmp_serializer", std::vector< BaseType >{}, arg, \
+        Dict{{"max_io", 0}, {"cse", false}, {"allow_free", true}})); \
       serializer().pack(e); \
     } \
     \

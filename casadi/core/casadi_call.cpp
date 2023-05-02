@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -32,8 +32,6 @@
 throw CasadiException("Error in Call::" FNAME " for '" + fcn_.name() + "' "\
   "[" + fcn_.class_name() + "] at " + CASADI_WHERE + ":\n" + std::string(WHAT));
 
-using namespace std;
-
 namespace casadi {
 
   MX Call::projectArg(const MX& x, const Sparsity& sp, casadi_int i) {
@@ -60,7 +58,7 @@ namespace casadi {
     }
   }
 
-  Call::Call(const Function& fcn, const vector<MX>& arg) : fcn_(fcn) {
+  Call::Call(const Function& fcn, const std::vector<MX>& arg) : fcn_(fcn) {
 
     // Number inputs and outputs
     casadi_int num_in = fcn.n_in();
@@ -69,7 +67,7 @@ namespace casadi {
                           + ") for function " + fcn.name());
 
     // Create arguments of the right dimensions and sparsity
-    vector<MX> arg1(num_in);
+    std::vector<MX> arg1(num_in);
     for (casadi_int i=0; i<num_in; ++i) {
       arg1[i] = projectArg(arg[i], fcn_.sparsity_in(i), i);
     }
@@ -78,7 +76,7 @@ namespace casadi {
   }
 
   std::string Call::disp(const std::vector<std::string>& arg) const {
-    stringstream ss;
+    std::stringstream ss;
     ss << fcn_.name() << "(";
     for (casadi_int i=0; i<n_dep(); ++i) {
       if (i!=0) ss << ", ";
@@ -108,13 +106,13 @@ namespace casadi {
     res = create(fcn_, arg);
   }
 
-  void Call::ad_forward(const vector<vector<MX> >& fseed,
-                     vector<vector<MX> >& fsens) const {
+  void Call::ad_forward(const std::vector<std::vector<MX>>& fseed,
+      std::vector<std::vector<MX>>& fsens) const {
     try {
       // Nondifferentiated inputs and outputs
-      vector<MX> arg(n_dep());
+      std::vector<MX> arg(n_dep());
       for (casadi_int i=0; i<arg.size(); ++i) arg[i] = dep(i);
-      vector<MX> res(nout());
+      std::vector<MX> res(nout());
       for (casadi_int i=0; i<res.size(); ++i) res[i] = get_output(i);
 
       // Call the cached functions
@@ -124,23 +122,27 @@ namespace casadi {
     }
   }
 
-  void Call::ad_reverse(const vector<vector<MX> >& aseed,
-                     vector<vector<MX> >& asens) const {
+  void Call::ad_reverse(const std::vector<std::vector<MX>>& aseed,
+      std::vector<std::vector<MX>>& asens) const {
     try {
+      // Find a common conditional argument among the seeds, if any
+      MX cond = common_cond(aseed);
       // Nondifferentiated inputs and outputs
-      vector<MX> arg(n_dep());
+      std::vector<MX> arg(n_dep());
       for (casadi_int i=0; i<arg.size(); ++i) arg[i] = dep(i);
-      vector<MX> res(nout());
+      std::vector<MX> res(nout());
       for (casadi_int i=0; i<res.size(); ++i) res[i] = get_output(i);
-
       // Call the cached functions
-      vector<vector<MX> > v;
+      std::vector<std::vector<MX>> v;
       fcn_->call_reverse(arg, res, aseed, v, false, false);
       for (casadi_int i=0; i<v.size(); ++i) {
         for (casadi_int j=0; j<v[i].size(); ++j) {
-          if (!v[i][j].is_empty()) { // TODO(@jaeandersson): Hack
-            asens[i][j] += v[i][j];
-          }
+          // Skip structurally zero contributions (necessary?)
+          if (v[i][j].is_empty()) continue;
+          // Prevent propagation of NaNs through if/else
+          if (!cond.is_empty()) v[i][j] = if_else(cond, v[i][j], 0);
+          // Add seeds
+          asens[i][j] += v[i][j];
         }
       }
     } catch (std::exception& e) {
@@ -164,8 +166,8 @@ namespace casadi {
     return fcn_->has_refcount_;
   }
 
-  void Call::generate(CodeGenerator& g,
-                      const vector<casadi_int>& arg, const vector<casadi_int>& res) const {
+  void Call::generate(CodeGenerator& g, const std::vector<casadi_int>& arg,
+      const std::vector<casadi_int>& res) const {
     // Collect input arguments
     g.local("arg1", "const casadi_real", "**");
     for (casadi_int i=0; i<arg.size(); ++i) {
@@ -228,6 +230,30 @@ namespace casadi {
 
   Call::Call(DeserializingStream& s) : MultipleOutput(s) {
     s.unpack("Call::fcn", fcn_);
+  }
+
+  MX Call::common_cond(const std::vector<std::vector<MX> >& seed) {
+    // Check if all seeds are conditional with the same seed
+    MX c;
+    for (const std::vector<MX>& seed_dir : seed) {
+      for (const MX& s : seed_dir) {
+        // Skip zero seeds
+        if (s.is_zero()) continue;
+        // If not a conditional, no common condition
+        if (!s.is_op(OP_IF_ELSE_ZERO)) return MX();
+        // Get conditional
+        MX c1 = s.dep(0);
+        // Has c already been set
+        if (c.is_empty(true)) {
+          // First time encountered
+          c = c1;
+        } else if (!MX::is_equal(c, c1)) {
+          // Different conditionals
+          return MX();
+        }
+      }
+    }
+    return c;
   }
 
 } // namespace casadi

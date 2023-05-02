@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -25,7 +25,6 @@
 
 #include "bspline_impl.hpp"
 
-using namespace std;
 namespace casadi {
 
   MXNode* BSplineCommon::deserialize(DeserializingStream& s) {
@@ -272,6 +271,11 @@ namespace casadi {
           casadi_int m,
           const Dict& opts) {
 
+    casadi_assert(x.is_vector(), "x argument must be a vector, got " + x.dim() + " instead.");
+    casadi_assert(x.numel()==knots.size(), "x argument length (" + str(x.numel()) + ") must match "
+                                           "number knot list length (" + str(knots.size()) + ").");
+    casadi_assert(degree.size()==knots.size(), "Degree list length (" + str(degree.size()) + ") "
+                  "must match knot list length (" + str(knots.size()) + ").");
 
     bool do_inline_flag = false;
     std::vector<std::string> lookup_mode;
@@ -305,6 +309,11 @@ namespace casadi {
           casadi_int m,
           const Dict& opts) {
 
+    casadi_assert(x.is_vector(), "x argument must be a vector, got " + x.dim() + " instead.");
+    casadi_assert(x.numel()==knots.size(), "x argument length (" + str(x.numel()) + ") must match "
+                                           "knot list length (" + str(knots.size()) + ").");
+    casadi_assert(degree.size()==knots.size(), "Degree list length (" + str(degree.size()) + ") "
+                  "must match knot list length (" + str(knots.size()) + ").");
     bool do_inline_flag = false;
     std::vector<std::string> lookup_mode;
 
@@ -342,7 +351,7 @@ namespace casadi {
   }
 
   void BSplineParametric::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
-    res[0] = arg[0]->get_bspline(arg[0], knots_, offset_, degree_, m_, lookup_mode_);
+    res[0] = arg[0]->get_bspline(arg[1], knots_, offset_, degree_, m_, lookup_mode_);
   }
 
   MX BSpline::jac_cached() const {

@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -41,9 +41,12 @@
 #include <kinsol/kinsol_spils_impl.h> /* Needed for the provided linear solver */
 #include <ctime>
 
-/** \defgroup plugin_Rootfinder_kinsol
+/** \defgroup plugin_Rootfinder_kinsol Title
+    \par
+
  KINSOL interface from the Sundials suite
-*/
+
+    \identifier{226} */
 /** \pluginsection{Rootfinder,kinsol} */
 
 /// \cond INTERNAL
@@ -119,6 +122,9 @@ namespace casadi {
 
     // Maximum number of iterations
     casadi_int max_iter_;
+
+    // Print information about iterations
+    casadi_int print_level_;
 
     // Use exact Jacobian?
     bool exact_jac_;
@@ -203,7 +209,8 @@ namespace casadi {
     static int lsetup(KINMem kin_mem);
     static int lsolve(KINMem kin_mem, N_Vector x, N_Vector b, double *sJpnorm, double *sFdotJp);
     static void ehfun(int error_code, const char *module, const char *function,
-                      char *msg, void *eh_data);
+      char *msg, void *eh_data);
+    static void ihfun(const char *module, const char *function, char *msg, void *ih_data);
   };
 
 } // namespace casadi

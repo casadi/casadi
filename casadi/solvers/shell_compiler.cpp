@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -31,12 +31,11 @@
 
 // Set default object file suffix
 #ifndef OBJECT_FILE_SUFFIX
-#define OBJECT_FILE_SUFFIX ".o"
+#define OBJECT_FILE_SUFFIX CASADI_OBJECT_FILE_SUFFIX
 #endif // OBJECT_FILE_SUFFIX
 
 #include <cstdlib>
 
-using namespace std;
 namespace casadi {
 
   extern "C"
@@ -61,12 +60,7 @@ namespace casadi {
   }
 
   ShellCompiler::~ShellCompiler() {
-    // Unload
-#ifdef _WIN32
-    if (handle_) FreeLibrary(handle_);
-#else // _WIN32
-    if (handle_) dlclose(handle_);
-#endif // _WIN32
+    if (handle_) close_shared_library(handle_);
 
     if (cleanup_) {
       if (remove(bin_name_.c_str())) casadi_warning("Failed to remove " + bin_name_);
@@ -86,9 +80,9 @@ namespace casadi {
       {"linker",
        {OT_STRING,
         "Linker command"}},
-      {"folder",
+      {"directory",
        {OT_STRING,
-        "Folder to put temporary objects in."}},
+        "Directory to put temporary objects in. Must end with a file separator."}},
       {"compiler_setup",
        {OT_STRING,
         "Compiler setup command. Intended to be fixed."
@@ -143,24 +137,25 @@ namespace casadi {
     cleanup_ = true;
     bool temp_suffix = true;
     std::string bare_name = "tmp_casadi_compiler_shell";
+    std::string directory = "";
 
-    vector<string> compiler_flags;
-    vector<string> linker_flags;
-    string suffix = OBJECT_FILE_SUFFIX;
+    std::vector<std::string> compiler_flags;
+    std::vector<std::string> linker_flags;
+    std::string suffix = OBJECT_FILE_SUFFIX;
 
 #ifdef _WIN32
-    string compiler = "cl.exe";
-    string linker = "link.exe";
-    string compiler_setup = "/c";
-    string linker_setup = "/DLL";
+    std::string compiler = "cl.exe";
+    std::string linker = "link.exe";
+    std::string compiler_setup = "/c";
+    std::string linker_setup = "/DLL";
     std::string compiler_output_flag = "/Fo";
     std::string linker_output_flag = "/out:";
     extra_suffixes_ = {".exp", ".lib"};
 #else
-    string compiler = "gcc";
-    string linker = "gcc";
-    string compiler_setup = "-fPIC -c";
-    string linker_setup = "-shared";
+    std::string compiler = "gcc";
+    std::string linker = "gcc";
+    std::string compiler_setup = "-fPIC -c";
+    std::string linker_setup = "-shared";
     std::string compiler_output_flag = "-o ";
     std::string linker_output_flag = "-o ";
 #endif
@@ -171,6 +166,8 @@ namespace casadi {
         compiler = op.second.to_string();
       } else if (op.first=="linker") {
         linker = op.second.to_string();
+      } else if (op.first=="directory") {
+        directory = op.second.to_string();
       } else if (op.first=="compiler_setup") {
         compiler_setup = op.second.to_string();
       } else if (op.first=="cleanup") {
@@ -196,9 +193,9 @@ namespace casadi {
 
     // Name of temporary file
     if (temp_suffix) {
-      obj_name_ = temporary_file(bare_name, suffix);
+      obj_name_ = temporary_file(directory + bare_name, suffix);
     } else {
-      obj_name_ = bare_name + suffix;
+      obj_name_ = directory + bare_name + suffix;
     }
     base_name_ = std::string(obj_name_.begin(), obj_name_.begin()+obj_name_.size()-suffix.size());
     bin_name_ = base_name_+SHARED_LIBRARY_SUFFIX;
@@ -215,9 +212,9 @@ namespace casadi {
 #endif // _WIN32
 
     // Construct the compiler command
-    stringstream cccmd;
+    std::stringstream cccmd;
     cccmd << compiler;
-    for (vector<string>::const_iterator i=compiler_flags.begin(); i!=compiler_flags.end(); ++i) {
+    for (auto i=compiler_flags.begin(); i!=compiler_flags.end(); ++i) {
       cccmd << " " << *i;
     }
     cccmd << " " << compiler_setup;
@@ -235,14 +232,14 @@ namespace casadi {
     }
 
     // Link step
-    stringstream ldcmd;
+    std::stringstream ldcmd;
     ldcmd << linker;
 
     // Temporary file
     ldcmd << " " << obj_name_ << " " + linker_output_flag + bin_name_;
 
     // Add flags
-    for (vector<string>::const_iterator i=linker_flags.begin(); i!=linker_flags.end(); ++i) {
+    for (auto i=linker_flags.begin(); i!=linker_flags.end(); ++i) {
       ldcmd << " " << *i;
     }
     ldcmd << " " << linker_setup;
@@ -253,22 +250,9 @@ namespace casadi {
       casadi_error("Linking failed. Tried \"" + ldcmd.str() + "\"");
     }
 
-#ifdef _WIN32
-    handle_ = LoadLibrary(TEXT(bin_name_.c_str()));
-    SetDllDirectory(NULL);
-#else // _WIN32
-    handle_ = dlopen(bin_name_.c_str(), RTLD_LAZY);
-#endif // _WIN32
+    std::vector<std::string> search_paths = get_search_paths();
+    handle_ = open_shared_library(bin_name_, search_paths, "ShellCompiler::init");
 
-#ifdef _WIN32
-    casadi_assert(handle_!=0,
-      "CommonExternal: Cannot open function: " + bin_name_ + ". error code: " +
-      STRING(GetLastError()));
-#else // _WIN32
-    casadi_assert(handle_!=nullptr,
-      "CommonExternal: Cannot open function: " + bin_name_ + ". error code: " +
-      str(dlerror()));
-#endif // _WIN32
   }
 
   std::string ShellCompiler::library() const {

@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -49,5 +49,17 @@ typedef unsigned CASADI_INT_TYPE casadi_uint;
 #define CASADI_INT_TYPE_STR CASADI_STR(CASADI_INT_TYPE)
 
 typedef casadi_int casadi_index;
+
+namespace casadi {
+    /** Unified return status for solvers */
+    enum UnifiedReturnStatus {
+        SOLVER_RET_SUCCESS,
+        SOLVER_RET_UNKNOWN,
+        SOLVER_RET_LIMITED, // Out of time
+        SOLVER_RET_NAN,
+        SOLVER_RET_INFEASIBLE
+    };
+}
+
 
 #endif // CASADI_TYPES_HPP

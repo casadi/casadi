@@ -85,3 +85,16 @@
  * Windows), the SUNDIALS_EXPORT macro is empty
  */
 #define SUNDIALS_EXPORT
+
+/* Disable some Visual studio warnings */
+#ifdef _MSC_VER
+
+/* warning C4244: '=': conversion from 'double' to 'long',
+  possible loss of data */
+#pragma warning(disable:4244)
+
+/* warning C4996: 'sprintf': This function or variable may be unsafe.
+  Consider using sprintf_s instead */
+#pragma warning(disable:4996)
+
+#endif // _MSC_VER

@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -89,7 +89,17 @@ namespace casadi {
     mem_->arg[0] = x;
     mem_->arg[1] = mem_->d_nlp.p;
     mem_->res[0] = &obj_value;
-    return solver_.calc_function(mem_, "nlp_f")==0;
+    try {
+      return solver_.calc_function(mem_, "nlp_f")==0;
+    } catch(KeyboardInterruptException& ex) {
+      casadi_warning("KeyboardInterruptException");
+      throw KeyboardInterruptException();
+    } catch (std::exception& ex) {
+      if (solver_.show_eval_warnings_) {
+        casadi_warning("IpoptUserClass::eval_f failed:" + std::string(ex.what()));
+      }
+      return false;
+    }
   }
 
   // return the gradient of the objective function grad_ {x} f(x)
@@ -98,7 +108,17 @@ namespace casadi {
     mem_->arg[1] = mem_->d_nlp.p;
     mem_->res[0] = nullptr;
     mem_->res[1] = grad_f;
-    return solver_.calc_function(mem_, "nlp_grad_f")==0;
+    try {
+      return solver_.calc_function(mem_, "nlp_grad_f")==0;
+    } catch(KeyboardInterruptException& ex) {
+      casadi_warning("KeyboardInterruptException");
+      throw KeyboardInterruptException();
+    }  catch (std::exception& ex) {
+      if (solver_.show_eval_warnings_) {
+        casadi_warning("IpoptUserClass::eval_grad_f failed:" + std::string(ex.what()));
+      }
+      return false;
+    }
   }
 
   // return the value of the constraints: g(x)
@@ -106,7 +126,17 @@ namespace casadi {
     mem_->arg[0] = x;
     mem_->arg[1] = mem_->d_nlp.p;
     mem_->res[0] = g;
-    return solver_.calc_function(mem_, "nlp_g")==0;
+    try {
+      return solver_.calc_function(mem_, "nlp_g")==0;
+    } catch(KeyboardInterruptException& ex) {
+      casadi_warning("KeyboardInterruptException");
+      throw KeyboardInterruptException();
+    } catch (std::exception& ex) {
+      if (solver_.show_eval_warnings_) {
+        casadi_warning("IpoptUserClass::eval_g failed:" + std::string(ex.what()));
+      }
+      return false;
+    }
   }
 
   // return the structure or values of the jacobian
@@ -119,7 +149,17 @@ namespace casadi {
       mem_->arg[1] = mem_->d_nlp.p;
       mem_->res[0] = nullptr;
       mem_->res[1] = values;
-      return solver_.calc_function(mem_, "nlp_jac_g")==0;
+      try {
+        return solver_.calc_function(mem_, "nlp_jac_g")==0;
+      } catch(KeyboardInterruptException& ex) {
+        casadi_warning("KeyboardInterruptException");
+        throw KeyboardInterruptException();
+      } catch (std::exception& ex) {
+        if (solver_.show_eval_warnings_) {
+          casadi_warning("IpoptUserClass::eval_jac_g failed:" + std::string(ex.what()));
+        }
+        return false;
+      }
     } else {
       // Get the sparsity pattern
       casadi_int ncol = solver_.jacg_sp_.size2();
@@ -150,7 +190,17 @@ namespace casadi {
       mem_->arg[2] = &obj_factor;
       mem_->arg[3] = lambda;
       mem_->res[0] = values;
-      if (solver_.calc_function(mem_, "nlp_hess_l")) return false;
+      try {
+        if (solver_.calc_function(mem_, "nlp_hess_l")) return false;
+      } catch(KeyboardInterruptException& ex) {
+        casadi_warning("KeyboardInterruptException");
+        throw KeyboardInterruptException();
+      } catch (std::exception& ex) {
+        if (solver_.show_eval_warnings_) {
+          casadi_warning("IpoptUserClass::eval_h failed:" + std::string(ex.what()));
+        }
+        return false;
+      }
       if (solver_.convexify_) {
         ScopedTiming tic(mem_->fstats.at("convexify"));
         if (convexify_eval(&solver_.convexify_data_.config, values, values, mem_->iw, mem_->w)) {
@@ -236,7 +286,11 @@ namespace casadi {
       g_[c_pos[i]] += tnlp_adapter->c_rhs_[i];
     }
 
+#if (IPOPT_VERSION_MAJOR > 3) || (IPOPT_VERSION_MAJOR == 3 && IPOPT_VERSION_MAJOR >= 14)
+    tnlp_adapter->ResortBounds(z_L, z_L_, z_U, z_U_);
+#else
     tnlp_adapter->ResortBnds(z_L, z_L_, z_U, z_U_);
+#endif
     // Copied from Ipopt source: Hopefully the following is correct to recover the bound
     // multipliers for fixed variables (sign ok?)
     if (tnlp_adapter->fixed_variable_treatment_==TNLPAdapter::MAKE_CONSTRAINT &&

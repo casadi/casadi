@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -24,8 +24,6 @@
 
 
 #include "finite_differences.hpp"
-
-using namespace std;
 
 namespace casadi {
 
@@ -188,7 +186,7 @@ namespace casadi {
     // The second order derivative is calculated as the backwards derivative
     // of the forward derivative, which is equivalent to central differences
     // of second order
-    string f_name = "fd_" + name;
+    std::string f_name = "fd_" + name;
     Dict f_opts = {{"derivative_of", derivative_of_}};
     Function f = Function::create(new ForwardDiff(f_name, n_, h_), f_opts);
     // Calculate backwards derivative of f
@@ -262,7 +260,6 @@ namespace casadi {
           for (casadi_int j=0; j<n_in; ++j) {
             casadi_int nnz = derivative_of_.nnz_in(j);
             casadi_copy(x0[j], nnz, z + off);
-            //cout << "k = " << k << ": pert(k, h) = " << pert(k, h) << endl;
             if (seed[j]) casadi_axpy(nnz, pert(k, h), seed[j] + i*nnz, z + off);
             off += nnz;
           }
@@ -299,11 +296,11 @@ namespace casadi {
   }
 
   double ForwardDiff::calc_fd(double** yk, double* y0, double* J, double h) const {
-    return casadi_forward_diff(yk, y0, J, h, n_y_, &m_);
+    return casadi_forward_diff_old(yk, y0, J, h, n_y_, &m_);
   }
 
   double CentralDiff::calc_fd(double** yk, double* y0, double* J, double h) const {
-    return casadi_central_diff(yk, y0, J, h, n_y_, &m_);
+    return casadi_central_diff_old(yk, y0, J, h, n_y_, &m_);
   }
 
   void FiniteDiff::codegen_declarations(CodeGenerator& g) const {
@@ -380,7 +377,7 @@ namespace casadi {
     casadi_int off=0;
     for (casadi_int j=0; j<n_in; ++j) {
       casadi_int nnz = derivative_of_.nnz_in(j);
-      string s = "seed[" + str(j) + "]";
+      std::string s = "seed[" + str(j) + "]";
       g << g.copy("x0[" + str(j) + "]", nnz, "z+" + str(off)) << "\n"
         << "if ("+s+") " << g.axpy(nnz, pert("k"),
                                    s+"+i*"+str(nnz), "z+" + str(off)) << "\n";
@@ -414,7 +411,7 @@ namespace casadi {
     g << "}\n";
     // Make sure h stays in the range [h_min_,h_max_]
     if (h_min_>0 || isfinite(h_max_)) {
-      string h = "h";
+      std::string h = "h";
       if (h_min_>0) h = "fmax(" + h + ", " + str(h_min_) + ")";
       if (isfinite(h_max_)) h = "fmin(" + h + ", " + str(h_max_) + ")";
       g << "h = " << h << ";\n";
@@ -426,7 +423,7 @@ namespace casadi {
     off = 0;
     for (casadi_int j=0; j<n_out; ++j) {
       casadi_int nnz = derivative_of_.nnz_out(j);
-      string s = "sens[" + str(j) + "]";
+      std::string s = "sens[" + str(j) + "]";
       g << "if (" << s << ") " << g.copy("J+" + str(off), nnz, s + "+i*" + str(nnz)) << "\n";
       off += nnz;
     }
@@ -434,8 +431,8 @@ namespace casadi {
   }
 
   std::string Smoothing::pert(const std::string& k) const {
-    string sign = "(2*(" + k + "/2)-1)";
-    string len = "(" + k + "%%2+1)";
+    std::string sign = "(2*(" + k + "/2)-1)";
+    std::string len = "(" + k + "%%2+1)";
     return len + "*" + sign + "*" + str(h_);
   }
 
@@ -446,7 +443,7 @@ namespace casadi {
   }
 
   double Smoothing::calc_fd(double** yk, double* y0, double* J, double h) const {
-    return casadi_smoothing_diff(yk, y0, J, h, n_y_, &m_);
+    return casadi_smoothing_diff_old(yk, y0, J, h, n_y_, &m_);
   }
 
   Function ForwardDiff::get_forward(casadi_int nfwd, const std::string& name,

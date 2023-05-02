@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -34,9 +34,11 @@
 
 namespace casadi {
   /** \brief Calculate quadratic form
+
       \author Joel Andersson
       \date 2015
-  */
+
+      \identifier{8z} */
   class CASADI_EXPORT Bilin : public MXNode {
   public:
 
@@ -56,39 +58,59 @@ namespace casadi {
     /// Evaluate the function symbolically (SX)
     int eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const override;
 
-    /** \brief  Propagate sparsity forward */
+    /** \brief  Propagate sparsity forward
+
+        \identifier{90} */
     int sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
-    /** \brief  Propagate sparsity backwards */
+    /** \brief  Propagate sparsity backwards
+
+        \identifier{91} */
     int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
-    /** \brief  Evaluate symbolically (MX) */
+    /** \brief  Evaluate symbolically (MX)
+
+        \identifier{92} */
     void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
 
-    /** \brief Calculate forward mode directional derivatives */
+    /** \brief Calculate forward mode directional derivatives
+
+        \identifier{93} */
     void ad_forward(const std::vector<std::vector<MX> >& fseed,
                          std::vector<std::vector<MX> >& fsens) const override;
 
-    /** \brief Calculate reverse mode directional derivatives */
+    /** \brief Calculate reverse mode directional derivatives
+
+        \identifier{94} */
     void ad_reverse(const std::vector<std::vector<MX> >& aseed,
                          std::vector<std::vector<MX> >& asens) const override;
 
-    /** \brief Generate code for the operation */
+    /** \brief Generate code for the operation
+
+        \identifier{95} */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
                   const std::vector<casadi_int>& res) const override;
 
-    /** \brief  Print expression */
+    /** \brief  Print expression
+
+        \identifier{96} */
     std::string disp(const std::vector<std::string>& arg) const override;
 
-    /** \brief Get the operation */
+    /** \brief Get the operation
+
+        \identifier{97} */
     casadi_int op() const override { return OP_BILIN;}
 
-    /** \brief Deserialize without type information */
+    /** \brief Deserialize without type information
+
+        \identifier{98} */
     static MXNode* deserialize(DeserializingStream& s) { return new Bilin(s); }
 
   protected:
-    /** \brief Deserializing constructor */
+    /** \brief Deserializing constructor
+
+        \identifier{99} */
     explicit Bilin(DeserializingStream& s) : MXNode(s) {}
   };
 

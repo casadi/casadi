@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -59,10 +59,15 @@
   namespace casadi {
     // Redirect printout
     static void pythonlogger(const char* s, std::streamsize num, bool error) {
-      if (error) {
-        PySys_WriteStderr("%.*s", static_cast<int>(num), s);
-      } else {
-        PySys_WriteStdout("%.*s", static_cast<int>(num), s);
+      int n = num;
+      while (n>0) {
+        if (error) {
+          PySys_WriteStderr("%.*s", std::min(n, 1000), s);
+        } else {
+          PySys_WriteStdout("%.*s", std::min(n, 1000), s);
+        }
+        n -= 1000;
+        s += 1000;
       }
     }
 
@@ -293,7 +298,7 @@ def SX_from_array(m, check_only=True):
   if isinstance(m, np.ndarray):
     if len(m.shape)>2:
       return False
-    if m.dtype!=np.object: return None
+    if m.dtype!=object: return None
     shape = m.shape + (1, 1)
     nrow, ncol = shape[0], shape[1]
     return (nrow,ncol,m.flat)
@@ -334,7 +339,7 @@ def DM_from_csc(m, check_only=True):
   %feature("customdoc:proto:constructor", "$name($in)");
   %feature("customdoc:proto:single_out", "$name($in) -> $out");
   %feature("customdoc:proto:normal", "$name($in) -> ($out)");
-  %feature("customdoc:main", "  $brief\n\n$overview\n$main");
+  %feature("customdoc:main", "  $brief\n\n::\n\n$overview\n$main");
 #endif
 
 %feature("customdoc:arg:normal:style_error", "$type");
@@ -2272,7 +2277,7 @@ namespace std {
 %typemap(directorin, noblock=1, fragment="casadi_all") (const double** arg, const std::vector<casadi_int>& sizes_arg) (PyObject* my_tuple) {
   PyObject * arg_tuple = PyTuple_New($2.size());
   for (casadi_int i=0;i<$2.size();++i) {
-    
+
 #ifdef WITH_PYTHON3
     PyObject* buf = $1[i] ? PyMemoryView_FromMemory(reinterpret_cast<char*>(const_cast<double*>($1[i])), $2[i]*sizeof(double), PyBUF_READ) : SWIG_Py_Void();
 #else
@@ -2307,6 +2312,7 @@ namespace std {
 
 %casadi_typemaps(L_STR, PREC_STRING, std::string)
 %casadi_template(LL L_STR LR, PREC_VECTOR, std::vector<std::string>)
+%casadi_template(LL LL L_STR LR LR, PREC_VECTOR, std::vector<std::vector<std::string> >)
 %casadi_typemaps("Sparsity", PREC_SPARSITY, casadi::Sparsity)
 %casadi_template(LL "Sparsity" LR, PREC_SPARSITY, std::vector< casadi::Sparsity>)
 %casadi_template(LL LL "Sparsity"  LR  LR, PREC_SPARSITY, std::vector<std::vector< casadi::Sparsity> >)
@@ -2490,14 +2496,62 @@ arccosh = lambda x: _casadi.acosh(x)
 %rename(_horzcat) casadi_horzcat;
 %rename(_diagcat) casadi_diagcat;
 %pythoncode %{
-def veccat(*args): return _veccat(args)
-def vertcat(*args): return _vertcat(args)
-def horzcat(*args): return _horzcat(args)
-def diagcat(*args): return _diagcat(args)
-def vvcat(args): return _veccat(args)
-def vcat(args): return _vertcat(args)
-def hcat(args): return _horzcat(args)
-def dcat(args): return _diagcat(args)
+def veccat(*args):
+    try:
+        if len(args)==0:
+            return DM(0,1)
+    except:
+        pass
+    return _veccat(args)
+def vertcat(*args):
+    try:
+        if len(args)==0:
+            return DM(0,1)
+    except:
+        pass
+    return _vertcat(args)
+def horzcat(*args):
+    try:
+        if len(args)==0:
+            return DM(1,0)
+    except:
+        pass
+    return _horzcat(args)
+def diagcat(*args):
+    try:
+        if len(args)==0:
+            return DM(0,0)
+    except:
+        pass
+    return _diagcat(args)
+def vvcat(args):
+    try:
+        if len(args)==0:
+            return DM(0,1)
+    except:
+        pass
+    return _veccat(args)
+def vcat(args):
+    try:
+        if len(args)==0:
+            return DM(0,1)
+    except:
+        pass
+    return _vertcat(args)
+def hcat(args):
+    try:
+        if len(args)==0:
+            return DM(1,0)
+    except:
+        pass
+    return _horzcat(args)
+def dcat(args):
+    try:
+        if len(args)==0:
+            return DM(0,0)
+    except:
+        pass
+    return _diagcat(args)
 %}
 
 // Non-fatal errors (returning NotImplemented singleton)
@@ -2540,7 +2594,13 @@ if (!$1) {
 // Workarounds, pending proper fix
 %rename(nonzero) __nonzero__;
 %rename(hash) __hash__;
+
+%rename(rem) casadi_mod;
 #endif // SWIGMATLAB
+
+#ifdef SWIGPYTHON
+%ignore casadi_mod;
+#endif // SWIGPYTHON
 
 #ifdef WITH_PYTHON3
 %rename(__bool__) __nonzero__;
@@ -2681,9 +2741,15 @@ class NZproxy:
         try:
           return self.full()
         except:
-          raise Exception("Implicit conversion of symbolic CasADi type to numeric matrix not supported.\n"
-                     + "This may occur when you pass a CasADi object to a numpy function.\n"
-                     + "Use an equivalent CasADi function instead of that numpy function.")
+          if self.is_scalar(True):
+            # Needed for #2743
+            E=n.empty((),dtype=object)
+            E[()] = self
+            return E
+          else:
+            raise Exception("Implicit conversion of symbolic CasADi type to numeric matrix not supported.\n"
+                      + "This may occur when you pass a CasADi object to a numpy function.\n"
+                      + "Use an equivalent CasADi function instead of that numpy function.")
 
 %}
 %enddef
@@ -2951,6 +3017,9 @@ namespace casadi{
  DECL M casadi_reshape(const M& a, const Sparsity& sp) {
  return reshape(a, sp);
  }
+ DECL M casadi_sparsity_cast(const M& a, const Sparsity& sp) {
+ return sparsity_cast(a, sp);
+ }
  DECL casadi_int casadi_sprank(const M& A) {
  return sprank(A);
  }
@@ -3025,6 +3094,10 @@ DECL M casadi_bilin(const M& A, const M& x, const M& y) {
   return bilin(A, x, y);
 }
 
+DECL M casadi_bilin(const M& A, const M& x) {
+  return bilin(A, x);
+}
+
 DECL M casadi_rank1(const M& A, const M& alpha, const M& x, const M& y) {
   return rank1(A, alpha, x, y);
 }
@@ -3035,6 +3108,14 @@ DECL M casadi_sumsqr(const M& X) {
 
 DECL M casadi_linspace(const M& a, const M& b, casadi_int nsteps) {
   return linspace(a, b, nsteps);
+}
+
+DECL M casadi_logsumexp(const M& a) {
+  return logsumexp(a);
+}
+
+DECL M casadi_logsumexp(const M& a, const M& margin) {
+  return logsumexp(a, margin);
 }
 
 DECL M casadi_interp1d(const std::vector<double>& x, const M&v,
@@ -3189,6 +3270,10 @@ DECL std::vector<bool> casadi_which_depends(const M& expr, const M& var,
   return which_depends(expr, var, order, tr);
 }
 
+DECL Sparsity casadi_jacobian_sparsity(const M& f, const M& x) {
+  return jacobian_sparsity(f, x);
+}
+
 DECL bool casadi_is_linear(const M& expr, const M& var) {
   return is_linear(expr, var);
 }
@@ -3205,8 +3290,8 @@ DECL M casadi_tangent(const M &ex, const M &arg) {
   return tangent(ex, arg);
 }
 
-DECL M casadi_hessian(const M& ex, const M& arg, M& OUTPUT1) {
-  return hessian(ex, arg, OUTPUT1);
+DECL M casadi_hessian(const M& ex, const M& arg, M& OUTPUT1, const casadi::Dict& opts = casadi::Dict()) {
+  return hessian(ex, arg, OUTPUT1, opts);
 }
 
 DECL void casadi_quadratic_coeff(const M& ex, const M& arg, M& OUTPUT1, M& OUTPUT2, M& OUTPUT3, bool check=true) {
@@ -3249,6 +3334,13 @@ DECL M casadi_mmax(const M& x) { return mmax(x); }
 DECL casadi::DM casadi_evalf(const M& x) {
   return evalf(x);
 }
+DECL std::vector<M> casadi_cse(const std::vector<M>& e) {
+  return cse(e);
+}
+DECL M casadi_cse(const M& e) {
+  return cse(e);
+}
+
 #endif // FLAG & IS_MEMBER
 
 #if FLAG & IS_GLOBAL
@@ -3283,14 +3375,25 @@ DECL void casadi_substitute_inplace(const std::vector< M >& v,
   return substitute_inplace(v, INOUT1, INOUT2, reverse);
 }
 
+DECL void casadi_extract(const std::vector< M >& ex,
+    std::vector< M >& OUTPUT1,
+    std::vector< M >& OUTPUT2,
+    std::vector< M >& OUTPUT3,
+    const Dict& opts = Dict()) {
+  OUTPUT1 = ex;
+  extract(OUTPUT1, OUTPUT2, OUTPUT3, opts);
+}
+
 DECL void casadi_shared(const std::vector< M >& ex,
                                std::vector< M >& OUTPUT1,
                                std::vector< M >& OUTPUT2,
                                std::vector< M >& OUTPUT3,
                                const std::string& v_prefix="v_",
                                const std::string& v_suffix="") {
-  shared(ex, OUTPUT1, OUTPUT2, OUTPUT3, v_prefix, v_suffix);
+  OUTPUT1 = ex;
+  shared(OUTPUT1, OUTPUT2, OUTPUT3, v_prefix, v_suffix);
 }
+
 DECL M casadi_blockcat(const std::vector< std::vector< M > > &v) {
  return blockcat(v);
 }
@@ -3336,6 +3439,8 @@ DECL M casadi_acosh(const M& x) { return acosh(x); }
 DECL M casadi_exp(const M& x) { return exp(x); }
 DECL M casadi_log(const M& x) { return log(x); }
 DECL M casadi_log10(const M& x) { return log10(x); }
+DECL M casadi_log1p(const M& x) { return log1p(x); }
+DECL M casadi_expm1(const M& x) { return expm1(x); }
 DECL M casadi_floor(const M& x) { return floor(x); }
 DECL M casadi_ceil(const M& x) { return ceil(x); }
 DECL M casadi_erf(const M& x) { return erf(x); }
@@ -3344,9 +3449,11 @@ DECL M casadi_sign(const M& x) { using casadi::sign; return sign(x); }
 DECL M casadi_power(const M& x, const M& n) { return pow(x, n); }
 DECL M casadi_mod(const M& x, const M& y) { return fmod(x, y); }
 DECL M casadi_fmod(const M& x, const M& y) { return fmod(x, y); }
+DECL M casadi_remainder(const M& x, const M& y) { return remainder(x, y); }
 DECL M casadi_atan2(const M& x, const M& y) { return atan2(x, y); }
 DECL M casadi_fmin(const M& x, const M& y) { return fmin(x, y); }
 DECL M casadi_fmax(const M& x, const M& y) { return fmax(x, y); }
+DECL M casadi_hypot(const M& x, const M& y) { return hypot(x, y); }
 DECL M casadi_simplify(const M& x) { using casadi::simplify; return simplify(x); }
 DECL bool casadi_is_equal(const M& x, const M& y, casadi_int depth=0) { using casadi::is_equal; return is_equal(x, y, depth); }
 DECL M casadi_copysign(const M& x, const M& y) { return copysign(x, y); }
@@ -3549,6 +3656,18 @@ DECL M casadi_bspline(const M& x,
 DECL M casadi_convexify(const M& H,
         const Dict& opts = Dict()) {
   return convexify(H, opts);
+}
+DECL M casadi_stop_diff(const M& expr, casadi_int order) {
+  return stop_diff(expr, order);
+}
+DECL M casadi_stop_diff(const M& expr, const M& var, casadi_int order) {
+  return stop_diff(expr, var, order);
+}
+DECL M casadi_no_hess(const M& expr) {
+  return no_hess(expr);
+}
+DECL M casadi_no_grad(const M& expr) {
+  return no_grad(expr);
 }
 
 #endif
@@ -4242,11 +4361,15 @@ namespace casadi {
       def exp(x): return _casadi.exp(x)
       def log(x): return _casadi.log(x)
       def log10(x): return _casadi.log10(x)
+      def log1p(x): return _casadi.log1p(x)
+      def expm1(x): return _casadi.expm1(x)
       def floor(x): return _casadi.floor(x)
       def ceil(x): return _casadi.ceil(x)
       def erf(x): return _casadi.erf(x)
       def sign(x): return _casadi.sign(x)
       def fmod(x, y): return _casadi.mod(x, y)
+      def hypot(x, y): return _casadi.hypot(x, y)
+      def remainder(x, y): return _casadi.remainder(x, y)
       def __copysign__(x, y): return _casadi.copysign(x, y)
       def __rcopysign__(y, x): return _casadi.copysign(x, y)
       def copysign(x, y): return _casadi.copysign(x, y)
@@ -4281,7 +4404,6 @@ namespace casadi {
 %include <casadi/core/integration_tools.hpp>
 %include <casadi/core/nlp_tools.hpp>
 %include <casadi/core/nlp_builder.hpp>
-%include <casadi/core/variable.hpp>
 %include <casadi/core/dae_builder.hpp>
 %include <casadi/core/xml_file.hpp>
 
@@ -4391,19 +4513,27 @@ make_property(casadi::Opti, casadi_solver);
       def parameter(self,*args):
         import sys
         import os
-        frame = sys._getframe(1)
-        meta = {"stacktrace": {"file":os.path.abspath(frame.f_code.co_filename),"line":frame.f_lineno,"name":frame.f_code.co_name}}
+        try:
+            frame = sys._getframe(1)
+        except:
+            frame = {}
+        meta = {} if frame is None else {"stacktrace": {"file":os.path.abspath(frame.f_code.co_filename),"line":frame.f_lineno,"name":frame.f_code.co_name}}
         ret = self._parameter(*args)
-        self.update_user_dict(ret, meta)
+        if len(meta)>0:
+            self.update_user_dict(ret, meta)
         return ret
 
       def variable(self,*args):
         import sys
         import os
-        frame = sys._getframe(1)
-        meta = {"stacktrace": {"file":os.path.abspath(frame.f_code.co_filename),"line":frame.f_lineno,"name":frame.f_code.co_name}}
+        try:
+            frame = sys._getframe(1)
+        except:
+            frame = {}
+        meta = {} if frame is None else {"stacktrace": {"file":os.path.abspath(frame.f_code.co_filename),"line":frame.f_lineno,"name":frame.f_code.co_name}}
         ret = self._variable(*args)
-        self.update_user_dict(ret, meta)
+        if len(meta)>0:
+            self.update_user_dict(ret, meta)
         return ret
 
       def subject_to(self,*args):
@@ -4411,10 +4541,14 @@ make_property(casadi::Opti, casadi_solver);
           return self._subject_to()
         import sys
         import os
-        frame = sys._getframe(1)
-        meta = {"stacktrace": {"file":os.path.abspath(frame.f_code.co_filename),"line":frame.f_lineno,"name":frame.f_code.co_name}}
+        try:
+            frame = sys._getframe(1)
+        except:
+            frame = {}
+        meta = {} if frame is None else {"stacktrace": {"file":os.path.abspath(frame.f_code.co_filename),"line":frame.f_lineno,"name":frame.f_code.co_name}}
         ret = self._subject_to(*args)
-        self.update_user_dict(args[0], meta)
+        if len(meta)>0:
+            self.update_user_dict(args[0], meta)
         return ret
     %}
   }

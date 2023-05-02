@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -25,25 +25,28 @@
 
 #include "xml_file_internal.hpp"
 
-using namespace std;
 namespace casadi {
 
-  XmlFileInternal::XmlFileInternal() {
-  }
+XmlFileInternal::XmlFileInternal() {
+}
 
-  XmlFileInternal::~XmlFileInternal() {
-  }
+XmlFileInternal::~XmlFileInternal() {
+}
 
-  std::map<std::string, XmlFileInternal::Plugin> XmlFileInternal::solvers_;
+std::map<std::string, XmlFileInternal::Plugin> XmlFileInternal::solvers_;
 
-  const std::string XmlFileInternal::infix_ = "xmlfile";
+const std::string XmlFileInternal::infix_ = "xmlfile";
 
-  void XmlFileInternal::disp(ostream &stream, bool more) const {
-  }
+void XmlFileInternal::disp(std::ostream &stream, bool more) const {
+}
 
-  XmlNode XmlFileInternal::parse(const std::string& filename) {
-    casadi_error("parse not defined for " + class_name());
-    return XmlNode();
-  }
+XmlNode XmlFileInternal::parse(const std::string& filename) {
+  casadi_error("parse not defined for " + class_name());
+  return XmlNode();
+}
+
+void XmlFileInternal::dump(const std::string& filename, const XmlNode& node) {
+  casadi_error("dump not defined for " + class_name());
+}
 
 } // namespace casadi

@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl, Kobe Bergmans
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -29,7 +29,6 @@
 #define ALLOW_QPROBLEMB true
 #define ALLOW_ALL_OPTIONS
 
-using namespace std;
 namespace casadi {
 
   extern "C"
@@ -210,7 +209,7 @@ namespace casadi {
       } else if (op.first=="schur") {
         schur_=  op.second;
       } else if (op.first=="hessian_type") {
-        string h = op.second;
+        std::string h = op.second;
         if (h=="unknown") {
           hess_ = qpOASES::HessianType::HST_UNKNOWN;
         } else if (h=="posdef") {
@@ -229,7 +228,7 @@ namespace casadi {
       } else if (op.first=="max_schur") {
         max_schur_ = op.second;
       } else if (op.first=="linsol_plugin") {
-        linsol_plugin_ = string(op.second);
+        linsol_plugin_ = std::string(op.second);
       } else if (op.first=="nWSR") {
         max_nWSR_ = op.second;
       } else if (op.first=="CPUtime") {
@@ -450,13 +449,23 @@ namespace casadi {
     m->fstats.at("postprocessing").tic();
 
     m->return_status = flag;
-    m->success = flag==qpOASES::SUCCESSFUL_RETURN;
-    if (m->success) m->unified_return_status = SOLVER_RET_SUCCESS;
-    if (flag==qpOASES::RET_MAX_NWSR_REACHED) {
-      m->unified_return_status = SOLVER_RET_LIMITED;
+    m->d_qp.success = flag==qpOASES::SUCCESSFUL_RETURN;
+    if (m->d_qp.success) m->d_qp.unified_return_status = SOLVER_RET_SUCCESS;
+    if (flag == qpOASES::RET_MAX_NWSR_REACHED) {
+      m->d_qp.unified_return_status = SOLVER_RET_LIMITED;
     }
 
-    m->iter_count = nWSR;
+    if (flag==qpOASES::RET_INIT_FAILED_INFEASIBILITY
+        || flag == qpOASES::RET_QP_INFEASIBLE
+        || flag == qpOASES::RET_HOTSTART_STOPPED_INFEASIBILITY
+        || flag == qpOASES::RET_ADDCONSTRAINT_FAILED_INFEASIBILITY
+        || flag == qpOASES::RET_ADDBOUND_FAILED_INFEASIBILITY
+        || flag == qpOASES::RET_ENSURELI_FAILED_NOINDEX
+        || flag == qpOASES::RET_ENSURELI_FAILED_CYCLING) {
+      m->d_qp.unified_return_status = SOLVER_RET_INFEASIBLE;
+    }
+
+    m->d_qp.iter_count = nWSR;
 
     if (verbose_) casadi_message("qpOASES return status: " + getErrorMessage(m->return_status));
 
@@ -477,7 +486,7 @@ namespace casadi {
 
     m->fstats.at("postprocessing").toc();
 
-    return 0;
+    return m->d_qp.unified_return_status;
   }
 
   std::string QpoasesInterface::getErrorMessage(casadi_int flag) {
@@ -756,7 +765,7 @@ namespace casadi {
     }
 
     // Default error message
-    stringstream ss;
+    std::stringstream ss;
     ss << "Unknown error flag: " << flag << ". Consult qpOASES documentation.";
     return ss.str();
   }

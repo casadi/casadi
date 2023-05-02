@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -39,7 +39,8 @@ namespace casadi {
   @copydoc Importer_doc
   \author Joel Andersson
   \date 2010-2013
-*/
+
+    \identifier{218} */
   class CASADI_EXPORT
   ImporterInternal : public SharedObjectInternal,
                      public PluginInterface<ImporterInternal> {
@@ -51,27 +52,37 @@ namespace casadi {
     /// Destructor
     ~ImporterInternal() override;
 
-    /** \brief Get type name */
+    /** \brief Get type name
+
+        \identifier{219} */
     std::string class_name() const override { return "ImporterInternal";}
 
-    /** \brief Print */
+    /** \brief Print
+
+        \identifier{21a} */
     void disp(std::ostream& stream, bool more) const override;
 
     // Creator function for internal class
     typedef ImporterInternal* (*Creator)(const std::string& name);
 
     /** \brief Construct
+
         Prepares the function for evaluation
-     */
+
+        \identifier{21b} */
     void construct(const Dict& opts);
 
     ///@{
-    /** \brief Options */
+    /** \brief Options
+
+        \identifier{21c} */
     static const Options options_;
     virtual const Options& get_options() const { return options_;}
     ///@}
 
-    /** \brief Initialize */
+    /** \brief Initialize
+
+        \identifier{21d} */
     virtual void init(const Dict& opts);
 
     virtual void finalize() {}
@@ -97,10 +108,14 @@ namespace casadi {
     /// Get a function pointer for numerical evaluation
     bool has_function(const std::string& symname) const;
 
-    /** \brief Does an entry exist? */
+    /** \brief Does an entry exist?
+
+        \identifier{21e} */
     bool has_meta(const std::string& cmd, casadi_int ind=-1) const;
 
-    /** \brief Get entry as a text */
+    /** \brief Get entry as a text
+
+        \identifier{21f} */
     std::string get_meta(const std::string& cmd, casadi_int ind=-1) const;
 
     /// Get meta information
@@ -122,7 +137,9 @@ namespace casadi {
     /// Can meta information be read?
     virtual bool can_have_meta() const { return true;}
 
-    /** \brief Get entry as a text */
+    /** \brief Get entry as a text
+
+        \identifier{21g} */
     std::string to_text(const std::string& cmd, casadi_int ind=-1) const;
 
     /** Convert indexed command */
@@ -141,7 +158,9 @@ namespace casadi {
     /// External functions
     std::map<std::string, std::pair<bool, std::string> > external_;
 
-    /** \brief  Verbose -- for debugging purposes */
+    /** \brief  Verbose -- for debugging purposes
+
+        \identifier{21h} */
     bool verbose_;
 
     void serialize(SerializingStream& s) const;
@@ -156,9 +175,11 @@ namespace casadi {
   };
 
   /** \brief Dynamically linked library
+
       \author Joel Andersson
       \date 2016
-  */
+
+      \identifier{21i} */
   class CASADI_EXPORT
   DllLibrary : public ImporterInternal {
   private:
@@ -180,7 +201,9 @@ namespace casadi {
     // Destructor
     ~DllLibrary() override;
 
-    /** \brief Get type name */
+    /** \brief Get type name
+
+        \identifier{21j} */
     std::string class_name() const override { return "DllLibrary";}
 
     // Dummy type

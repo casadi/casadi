@@ -1,0 +1,6 @@
+FROM ubuntu:22.04
+
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt install sudo -y
+
+RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
+

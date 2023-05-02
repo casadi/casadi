@@ -2,8 +2,8 @@
 #     This file is part of CasADi.
 #
 #     CasADi -- A symbolic framework for dynamic optimization.
-#     Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
-#                             K.U. Leuven. All rights reserved.
+#     Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+#                             KU Leuven. All rights reserved.
 #     Copyright (C) 2011-2014 Greg Horn
 #
 #     CasADi is free software; you can redistribute it and/or
@@ -30,23 +30,27 @@ from testsuite import TestSuite
 
 iswindows = os.name=="nt"
 
+MATLABPATH = ""
+if "MATLABPATH" in os.environ:
+    MATLABPATH = "addpath('"+os.environ["MATLABPATH"]+"');"
+
 if iswindows:
   t = TestSuite(dirname=src,
     suffix="m",
-    command = lambda dir,fn, opt:  ["matlab","-nodisplay","-nosplash","-nodesktop","-logfile",fn + ".log","-wait","-r","try," + fn[:-2]+", disp('MATLABOKAY') , catch E , disp(getReport(E)), disp('MATLABERROR'), end;quit"] + opt,
+    command = lambda dir,fn, opt:  ["matlab","-logfile",fn + ".log","-batch",MATLABPATH+"try," + fn[:-2]+", disp('MATLABOKAY') , catch E , disp(getReport(E)), disp('MATLABERROR'), end;quit"] + opt,
     skipdirs=[".svn","ctemplate","defs"],
-     inputs = lambda dir,fn : {fn: file(dir + "/" + fn,"r").read()},
+     inputs = lambda dir,fn : {fn: open(dir + "/" + fn,"r").read()},
       args=sys.argv[2:],
      stdout_trigger=["MATLABOKAY"],
-     custom_stdout=lambda dir,fn : file(dir + "/" + fn + ".log","r").read(),
+     custom_stdout=lambda dir,fn : open(dir + "/" + fn + ".log","r").read(),
      default_fail=True
      )
 else:
   t = TestSuite(dirname=src,
     suffix="m",
-    command = lambda dir,fn, opt:  ["matlab","-nodisplay","-nosplash","-nodesktop","-r",fn[:-2]+";clear"] + opt,
+    command = lambda dir,fn, opt:  ["matlab","-batch",MATLABPATH+fn[:-2]+";clear"] + opt,
     skipdirs=[".svn","ctemplate","defs"],
-     #inputs = lambda dir,fn : {fn: file(dir + "/" + fn,"r").read()},
+     #inputs = lambda dir,fn : {fn: open(dir + "/" + fn,"r").read()},
       args=sys.argv[2:],
      stderr_trigger=["^(?!(Reference counting|Warning|$))"],
      check_depreciation=True

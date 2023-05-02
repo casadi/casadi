@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -32,24 +32,32 @@
 
 namespace casadi {
   /** \brief Represents a symbolic MX
+
       \author Joel Andersson
       \date 2010
       A regular user is not supposed to work with this Node class.
       This user can call MX(name, n, m) directly.
-  */
+
+      \identifier{1i0} */
   class CASADI_EXPORT SymbolicMX : public MXNode {
   public:
 
-    /** \brief  Constructors */
+    /** \brief  Constructors
+
+        \identifier{1i1} */
     explicit SymbolicMX(const std::string& name, casadi_int nrow=1, casadi_int ncol=1);
 
-    /** \brief  Constructors */
+    /** \brief  Constructors
+
+        \identifier{1i2} */
     explicit SymbolicMX(const std::string& name, const Sparsity & sp);
 
     /// Destructor
     ~SymbolicMX() override {}
 
-    /** \brief  Print expression */
+    /** \brief  Print expression
+
+        \identifier{1i3} */
     std::string disp(const std::vector<std::string>& arg) const override;
 
     /// Evaluate the function numerically
@@ -58,46 +66,72 @@ namespace casadi {
     /// Evaluate the function symbolically (SX)
     int eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const override;
 
-    /** \brief  Evaluate symbolically (MX) */
+    /** \brief  Evaluate symbolically (MX)
+
+        \identifier{1i4} */
     void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
 
-    /** \brief Calculate forward mode directional derivatives */
+    /** \brief Calculate forward mode directional derivatives
+
+        \identifier{1i5} */
     void ad_forward(const std::vector<std::vector<MX> >& fseed,
                          std::vector<std::vector<MX> >& fsens) const override;
 
-    /** \brief Calculate reverse mode directional derivatives */
+    /** \brief Calculate reverse mode directional derivatives
+
+        \identifier{1i6} */
     void ad_reverse(const std::vector<std::vector<MX> >& aseed,
                          std::vector<std::vector<MX> >& asens) const override;
 
-    /** \brief  Propagate sparsity forward */
+    /** \brief  Propagate sparsity forward
+
+        \identifier{1i7} */
     int sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
-    /** \brief  Propagate sparsity backwards */
+    /** \brief  Propagate sparsity backwards
+
+        \identifier{1i8} */
     int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
-    /** \brief  Get the name */
+    /** \brief  Get the name
+
+        \identifier{1i9} */
     const std::string& name() const override;
 
-    /** \brief Get the operation */
+    /** \brief Get the operation
+
+        \identifier{1ia} */
     casadi_int op() const override { return OP_PARAMETER;}
 
-    /** \brief  Check if valid function input */
+    /** \brief  Check if valid function input
+
+        \identifier{1ib} */
     bool is_valid_input() const override { return true;}
 
-    /** \brief Detect duplicate symbolic expressions */
+    /** \brief Detect duplicate symbolic expressions
+
+        \identifier{1ic} */
     bool has_duplicates() const override;
 
-    /** \brief Reset the marker for an input expression */
+    /** \brief Reset the marker for an input expression
+
+        \identifier{1id} */
     void reset_input() const override;
 
-    /** \brief Serialize an object without type information */
+    /** \brief Serialize an object without type information
+
+        \identifier{1ie} */
     void serialize_body(SerializingStream& s) const override;
 
-    /** \brief Deserialize without type information */
+    /** \brief Deserialize without type information
+
+        \identifier{1if} */
     static MXNode* deserialize(DeserializingStream& s) { return new SymbolicMX(s); }
 
   protected:
-    /** \brief Deserializing constructor */
+    /** \brief Deserializing constructor
+
+        \identifier{1ig} */
     explicit SymbolicMX(DeserializingStream& s);
 
     // Name of the variable

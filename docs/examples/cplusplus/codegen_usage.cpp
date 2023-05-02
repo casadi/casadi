@@ -1,27 +1,22 @@
 /*
- *    This file is part of CasADi.
+ *    MIT No Attribution
  *
- *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
- *    Copyright (C) 2011-2014 Greg Horn
+ *    Copyright 2023 Joel Andersson, Joris Gillis, Moritz Diehl, KU Leuven.
  *
- *    CasADi is free software; you can redistribute it and/or
- *    modify it under the terms of the GNU Lesser General Public
- *    License as published by the Free Software Foundation; either
- *    version 3 of the License, or (at your option) any later version.
+ *    Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ *    software and associated documentation files (the "Software"), to deal in the Software
+ *    without restriction, including without limitation the rights to use, copy, modify,
+ *    merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
+ *    permit persons to whom the Software is furnished to do so.
  *
- *    CasADi is distributed in the hope that it will be useful,
- *    but WITHOUT ANY WARRANTY; without even the implied warranty of
- *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *    Lesser General Public License for more details.
- *
- *    You should have received a copy of the GNU Lesser General Public
- *    License along with CasADi; if not, write to the Free Software
- *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ *    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+ *    INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+ *    PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *    HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ *    OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+ *    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  */
-
 
 /**
  *  Example program demonstrating the usage of C-code generated from CasADi
@@ -199,23 +194,22 @@ int usage_c(){
 // C++ (and CasADi) from here on
 #include <casadi/casadi.hpp>
 using namespace casadi;
-using namespace std;
 
 void usage_cplusplus(){
-  cout << "---" << endl;
-  cout << "Usage from CasADi C++:" << endl;
-  cout << endl;
+  std::cout << "---" << std::endl;
+  std::cout << "Usage from CasADi C++:" << std::endl;
+  std::cout << std::endl;
 
   // Use CasADi's "external" to load the compiled function
   Function f = external("f");
 
   // Use like any other CasADi function
-  vector<double> x = {1, 2, 3, 4};
-  vector<DM> arg = {reshape(DM(x), 2, 2), 5};
-  vector<DM> res = f(arg);
+  std::vector<double> x = {1, 2, 3, 4};
+  std::vector<DM> arg = {reshape(DM(x), 2, 2), 5};
+  std::vector<DM> res = f(arg);
 
-  cout << "result (0): " << res.at(0) << endl;
-  cout << "result (1): " << res.at(1) << endl;
+  std::cout << "result (0): " << res.at(0) << std::endl;
+  std::cout << "result (1): " << res.at(1) << std::endl;
 }
 
 
@@ -288,7 +282,7 @@ int main(){
   f.generate("f");
 
   // Compile the C-code to a shared library
-  string compile_command = "gcc -fPIC -shared -O3 f.c -o f.so";
+  std::string compile_command = "gcc -fPIC -shared -O3 f.c -o f.so";
   int flag = system(compile_command.c_str());
   casadi_assert(flag==0, "Compilation failed");
 

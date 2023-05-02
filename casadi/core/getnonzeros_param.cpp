@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -26,8 +26,6 @@
 #include "getnonzeros_param.hpp"
 #include "casadi_misc.hpp"
 #include "serializing_stream.hpp"
-
-using namespace std;
 
 namespace casadi {
 
@@ -194,25 +192,25 @@ namespace casadi {
   }
 
   std::string GetNonzerosParamVector::disp(const std::vector<std::string>& arg) const {
-    stringstream ss;
+    std::stringstream ss;
     ss << arg.at(0) << "[" << arg.at(1) << "]";
     return ss.str();
   }
 
   std::string GetNonzerosParamSlice::disp(const std::vector<std::string>& arg) const {
-    stringstream ss;
+    std::stringstream ss;
     ss << arg.at(0) << "[(" << arg.at(1) << ";" << outer_ << ")]";
     return ss.str();
   }
 
   std::string GetNonzerosSliceParam::disp(const std::vector<std::string>& arg) const {
-    stringstream ss;
+    std::stringstream ss;
     ss << arg.at(0) << "[(" << inner_ << ";" << arg.at(1) << ")]";
     return ss.str();
   }
 
   std::string GetNonzerosParamParam::disp(const std::vector<std::string>& arg) const {
-    stringstream ss;
+    std::stringstream ss;
     ss << arg.at(0) << "[(" << arg.at(1) << ";" << arg.at(2) << ")]";
     return ss.str();
   }

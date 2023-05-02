@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -26,11 +26,9 @@
 #include "concat.hpp"
 #include "casadi_misc.hpp"
 
-using namespace std;
-
 namespace casadi {
 
-  Concat::Concat(const vector<MX>& x) {
+  Concat::Concat(const std::vector<MX>& x) {
     set_dep(x);
   }
 
@@ -50,7 +48,7 @@ namespace casadi {
     T* r = res[0];
     for (casadi_int i=0; i<n_dep(); ++i) {
       casadi_int n = dep(i).nnz();
-      copy(arg[i], arg[i]+n, r);
+      std::copy(arg[i], arg[i]+n, r);
       r += n;
     }
     return 0;
@@ -61,7 +59,7 @@ namespace casadi {
     for (casadi_int i=0; i<n_dep(); ++i) {
       casadi_int n_i = dep(i).nnz();
       const bvec_t *arg_i_ptr = arg[i];
-      copy(arg_i_ptr, arg_i_ptr+n_i, res_ptr);
+      std::copy(arg_i_ptr, arg_i_ptr+n_i, res_ptr);
       res_ptr += n_i;
     }
     return 0;
@@ -133,7 +131,7 @@ namespace casadi {
     if (begin==0) {
       return dep(i)->get_nzref(sp, nz);
     } else {
-      vector<casadi_int> nz_new(nz);
+      std::vector<casadi_int> nz_new(nz);
       for (auto&& j : nz_new) if (j>=0) j -= begin;
       return dep(i)->get_nzref(sp, nz_new);
     }
@@ -148,7 +146,7 @@ namespace casadi {
   }
 
   std::string Diagcat::disp(const std::vector<std::string>& arg) const {
-    stringstream ss;
+    std::stringstream ss;
     ss << "diagcat(" << arg.at(0);
     for (casadi_int i=1; i<n_dep(); ++i) ss << ", " << arg.at(i);
     ss << ")";
@@ -166,15 +164,15 @@ namespace casadi {
   }
 
   std::pair<std::vector<casadi_int>, std::vector<casadi_int> > Diagcat::off() const {
-    vector<casadi_int> offset1(n_dep()+1, 0);
-    vector<casadi_int> offset2(n_dep()+1, 0);
+    std::vector<casadi_int> offset1(n_dep()+1, 0);
+    std::vector<casadi_int> offset2(n_dep()+1, 0);
     for (casadi_int i=0; i<n_dep(); ++i) {
       casadi_int ncol = dep(i).sparsity().size2();
       casadi_int nrow = dep(i).sparsity().size1();
       offset2[i+1] = offset2[i] + ncol;
       offset1[i+1] = offset1[i] + nrow;
     }
-    return make_pair(offset1, offset2);
+    return std::make_pair(offset1, offset2);
   }
 
   void Diagcat::ad_reverse(const std::vector<std::vector<MX> >& aseed,
@@ -185,7 +183,7 @@ namespace casadi {
     // Adjoint sensitivities
     casadi_int nadj = aseed.size();
     for (casadi_int d=0; d<nadj; ++d) {
-      vector<MX> s = diagsplit(aseed[d][0], off.first, off.second);
+      std::vector<MX> s = diagsplit(aseed[d][0], off.first, off.second);
       for (casadi_int i=0; i<n_dep(); ++i) {
         asens[d][i] += s[i];
       }
@@ -201,7 +199,7 @@ namespace casadi {
   }
 
   std::string Horzcat::disp(const std::vector<std::string>& arg) const {
-    stringstream ss;
+    std::stringstream ss;
     ss << "horzcat(" << arg.at(0);
     for (casadi_int i=1; i<n_dep(); ++i) ss << ", " << arg.at(i);
     ss << ")";
@@ -221,7 +219,7 @@ namespace casadi {
   }
 
   std::vector<casadi_int> Horzcat::off() const {
-    vector<casadi_int> col_offset(n_dep()+1, 0);
+    std::vector<casadi_int> col_offset(n_dep()+1, 0);
     for (casadi_int i=0; i<n_dep(); ++i) {
       casadi_int ncol = dep(i).sparsity().size2();
       col_offset[i+1] = col_offset[i] + ncol;
@@ -232,12 +230,12 @@ namespace casadi {
   void Horzcat::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                         std::vector<std::vector<MX> >& asens) const {
     // Get offsets for each column
-    vector<casadi_int> col_offset = off();
+    std::vector<casadi_int> col_offset = off();
 
     // Adjoint sensitivities
     casadi_int nadj = aseed.size();
     for (casadi_int d=0; d<nadj; ++d) {
-      vector<MX> s = horzsplit(aseed[d][0], col_offset);
+      std::vector<MX> s = horzsplit(aseed[d][0], col_offset);
       for (casadi_int i=0; i<n_dep(); ++i) {
         asens[d][i] += s[i];
       }
@@ -252,7 +250,7 @@ namespace casadi {
   }
 
   std::string Vertcat::disp(const std::vector<std::string>& arg) const {
-    stringstream ss;
+    std::stringstream ss;
     ss << "vertcat(" << arg.at(0);
     for (casadi_int i=1; i<n_dep(); ++i) ss << ", " << arg.at(i);
     ss << ")";
@@ -272,7 +270,7 @@ namespace casadi {
   }
 
   std::vector<casadi_int> Vertcat::off() const {
-    vector<casadi_int> row_offset(n_dep()+1, 0);
+    std::vector<casadi_int> row_offset(n_dep()+1, 0);
     for (casadi_int i=0; i<n_dep(); ++i) {
       casadi_int nrow = dep(i).sparsity().size1();
       row_offset[i+1] = row_offset[i] + nrow;
@@ -283,12 +281,12 @@ namespace casadi {
   void Vertcat::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                         std::vector<std::vector<MX> >& asens) const {
     // Get offsets for each row
-    vector<casadi_int> row_offset = off();
+    std::vector<casadi_int> row_offset = off();
 
     // Adjoint sensitivities
     casadi_int nadj = aseed.size();
     for (casadi_int d=0; d<nadj; ++d) {
-      vector<MX> s = vertsplit(aseed[d][0], row_offset);
+      std::vector<MX> s = vertsplit(aseed[d][0], row_offset);
       for (casadi_int i=0; i<n_dep(); ++i) {
         asens[d][i] += s[i];
       }
@@ -311,14 +309,14 @@ namespace casadi {
   }
 
   void Horzcat::split_primitives(const MX& x, std::vector<MX>::iterator& it) const {
-    vector<MX> s = horzsplit(x, off());
+    std::vector<MX> s = horzsplit(x, off());
     for (casadi_int i=0; i<s.size(); ++i) {
       dep(i)->split_primitives(s[i], it);
     }
   }
 
   MX Horzcat::join_primitives(std::vector<MX>::const_iterator& it) const {
-    vector<MX> s(n_dep());
+    std::vector<MX> s(n_dep());
     for (casadi_int i=0; i<s.size(); ++i) {
       s[i] = dep(i)->join_primitives(it);
     }
@@ -326,14 +324,14 @@ namespace casadi {
   }
 
   void Vertcat::split_primitives(const MX& x, std::vector<MX>::iterator& it) const {
-    vector<MX> s = vertsplit(x, off());
+    std::vector<MX> s = vertsplit(x, off());
     for (casadi_int i=0; i<s.size(); ++i) {
       dep(i)->split_primitives(s[i], it);
     }
   }
 
   MX Vertcat::join_primitives(std::vector<MX>::const_iterator& it) const {
-    vector<MX> s(n_dep());
+    std::vector<MX> s(n_dep());
     for (casadi_int i=0; i<s.size(); ++i) {
       s[i] = dep(i)->join_primitives(it);
     }
@@ -342,14 +340,14 @@ namespace casadi {
 
   void Diagcat::split_primitives(const MX& x, std::vector<MX>::iterator& it) const {
     std::pair<std::vector<casadi_int>, std::vector<casadi_int> > off = this->off();
-    vector<MX> s = diagsplit(x, off.first, off.second);
+    std::vector<MX> s = diagsplit(x, off.first, off.second);
     for (casadi_int i=0; i<s.size(); ++i) {
       dep(i)->split_primitives(s[i], it);
     }
   }
 
   MX Diagcat::join_primitives(std::vector<MX>::const_iterator& it) const {
-    vector<MX> s(n_dep());
+    std::vector<MX> s(n_dep());
     for (casadi_int i=0; i<s.size(); ++i) {
       s[i] = dep(i)->join_primitives(it);
     }

@@ -2,8 +2,8 @@
 #     This file is part of CasADi.
 #
 #     CasADi -- A symbolic framework for dynamic optimization.
-#     Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
-#                             K.U. Leuven. All rights reserved.
+#     Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+#                             KU Leuven. All rights reserved.
 #     Copyright (C) 2011-2014 Greg Horn
 #
 #     CasADi is free software; you can redistribute it and/or
@@ -19,10 +19,11 @@
 #     You should have received a copy of the GNU Lesser General Public
 #     License along with CasADi; if not, write to the Free Software
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+
 #
-#
-#! Function constructors
-#! =======================
+# Function constructors
+# =======================
+
 from casadi import *
 
 x = SX.sym("x")     # A scalar (1-by-1 matrix) symbolic primitive
@@ -36,13 +37,14 @@ print(outs)
 
 f = Function("f", ins, outs)
 
-#! f now has two inputs and a 4 outputs:
+# f now has two inputs and a 4 outputs:
+
 print(f.n_in())
 print(f.n_out())
 
-#! The outputs has the following string representation.
-#! Note how all elements of out have been converted to SX by
-#! automatic typecasting functionality
+# The outputs has the following string representation.
+# Note how all elements of out have been converted to SX by
+# automatic typecasting functionality
 
 f_out = f(*f.sx_in())
 for i in range(3):

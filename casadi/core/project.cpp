@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -27,8 +27,6 @@
 #include "casadi_misc.hpp"
 #include <sstream>
 #include <vector>
-
-using namespace std;
 
 namespace casadi {
 
@@ -86,7 +84,7 @@ namespace casadi {
 
   int Project::sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
     dep().sparsity().bor(arg[0], res[0], sparsity());
-    fill(res[0], res[0]+nnz(), 0);
+    std::fill(res[0], res[0]+nnz(), 0);
     return 0;
   }
 

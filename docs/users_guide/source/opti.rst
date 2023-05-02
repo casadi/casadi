@@ -77,6 +77,9 @@ The main characteristics of the Opti stack are:
 * Indexing/bookkeeping of decision variables is hidden.
 * Closer mapping of numerical data-type to the host language: no encounter with |DM|.
 
+By default, Opti will assume a nonlinear program. To solve quadratic programs, supply the string 'conic' as argument to the Opti constructor.
+
+
 Problem specification
 ---------------------
 
@@ -618,4 +621,42 @@ To plot the progress of the solver, you may access the non-converged solution th
 
 The callback may be cleared from the Opti stack by calling the |Callback| function without arguments.
 
+You may construct a regular CasADi Function out of an Opti object, by calling the ``to_function`` function.
+The supplied list of input arguments may contain parameters, decision variables and dual variables.
+Inputs corresponding to variables are taken as initial guesses.
+If you desire this Function to throw a runtime error when the solver fails, you may pass the ``error_on_fail`` as solver option.
 
+.. exec-block:: python
+
+    opti = casadi.Opti() [hidden]
+
+    x = opti.variable() [hidden]
+    y = opti.variable() [hidden]
+
+    opti.minimize(  (y-x**2)**2   ) [hidden]
+    opti.subject_to( x**2+y**2==1 ) [hidden]
+    opti.subject_to(       x+y>=1 ) [hidden]
+
+    opti.solver("ipopt",dict(print_time=False),dict(print_level=False)) [hidden]
+
+    f = opti.to_function("f",[x,y],[x**2+y])
+    print(f(0, 0))
+
+.. exec-block:: octave
+
+    opti = casadi.Opti(); [hidden]
+
+    x = opti.variable(); [hidden]
+    y = opti.variable(); [hidden]
+
+    opti.minimize(  (y-x^2)^2   ); [hidden]
+    opti.subject_to( x^2+y^2==1 ); [hidden]
+    opti.subject_to(     x+y>=1 ); [hidden]
+
+    options = struct('print_time',false); [hidden]
+    ipopt_options = struct('print_level',1); [hidden]
+
+    opti.solver('ipopt',options,ipopt_options); [hidden]
+
+    f = opti.to_function('f',{x,y},{x^2+y});
+    disp(f(0, 0))

@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -29,10 +29,13 @@
 #include "function.hpp"
 #include "linsol.hpp"
 #include "rootfinder.hpp"
+#include "casadi_enum.hpp"
 
 namespace casadi {
 
-  /** \defgroup main_integrator
+  /** \defgroup main_integrator Title
+      \par
+
       Create an ODE/DAE integrator
       Solves an initial value problem (IVP) coupled to a terminal value problem
       with differential equation given as an implicit ODE coupled to an algebraic
@@ -68,8 +71,9 @@ namespace casadi {
 
       \author Joel Andersson
       \date 2011-2015
-  */
-  /** \defgroup integrator
+
+      \identifier{21k} */
+  /** \defgroup integrator Title
   * @copydoc main_integrator
   *  @{
   */
@@ -80,13 +84,25 @@ namespace casadi {
   */
   ///@{
   CASADI_EXPORT Function integrator(const std::string& name, const std::string& solver,
-                                    const SXDict& dae, const Dict& opts=Dict());
+    const SXDict& dae, const Dict& opts=Dict());
   CASADI_EXPORT Function integrator(const std::string& name, const std::string& solver,
-                                    const MXDict& dae, const Dict& opts=Dict());
-#ifndef SWIG
+    const MXDict& dae, const Dict& opts=Dict());
   CASADI_EXPORT Function integrator(const std::string& name, const std::string& solver,
-                                    const Function& dae, const Dict& opts=Dict());
-#endif // SWIG
+    const Function& dae, const Dict& opts=Dict());
+  CASADI_EXPORT Function integrator(const std::string& name, const std::string& solver,
+    const SXDict& dae, double t0, const std::vector<double>& tout, const Dict& opts=Dict());
+  CASADI_EXPORT Function integrator(const std::string& name, const std::string& solver,
+    const MXDict& dae, double t0, const std::vector<double>& tout, const Dict& opts=Dict());
+  CASADI_EXPORT Function integrator(const std::string& name, const std::string& solver,
+    const Function& dae, double t0, const std::vector<double>& tout, const Dict& opts=Dict());
+#ifndef SWIGMATLAB
+  CASADI_EXPORT Function integrator(const std::string& name, const std::string& solver,
+    const SXDict& dae, double t0, double tf, const Dict& opts=Dict());
+  CASADI_EXPORT Function integrator(const std::string& name, const std::string& solver,
+    const MXDict& dae, double t0, double tf, const Dict& opts=Dict());
+  CASADI_EXPORT Function integrator(const std::string& name, const std::string& solver,
+    const Function& dae, double t0, double tf, const Dict& opts=Dict());
+#endif // SWIGMATLAB
   ///@}
 
   /// Check if a particular plugin is available
@@ -98,146 +114,141 @@ namespace casadi {
   /// Get the documentation string for a plugin
   CASADI_EXPORT std::string doc_integrator(const std::string& name);
 
-  /** \brief Get input scheme of integrators */
+  /** \brief Get input scheme of integrators
+
+      \identifier{7b} */
   CASADI_EXPORT std::vector<std::string> integrator_in();
 
-  /** \brief Get integrator output scheme of integrators */
+  /** \brief Get integrator output scheme of integrators
+
+      \identifier{7c} */
   CASADI_EXPORT std::vector<std::string> integrator_out();
 
-  /** \brief Get integrator input scheme name by index */
+  /** \brief Get integrator input scheme name by index
+
+      \identifier{7d} */
   CASADI_EXPORT std::string integrator_in(casadi_int ind);
 
-  /** \brief Get output scheme name by index */
+  /** \brief Get output scheme name by index
+
+      \identifier{7e} */
   CASADI_EXPORT std::string integrator_out(casadi_int ind);
 
-  /** \brief Get the number of integrator inputs */
+  /** \brief Get the number of integrator inputs
+
+      \identifier{7f} */
   CASADI_EXPORT casadi_int integrator_n_in();
 
-  /** \brief Get the number of integrator outputs */
+  /** \brief Get the number of integrator outputs
+
+      \identifier{7g} */
   CASADI_EXPORT casadi_int integrator_n_out();
+
+  /** \brief Get input scheme of simulators
+
+      \identifier{25p} */
+  CASADI_EXPORT std::vector<std::string> dyn_in();
+
+  /** \brief Get simulator output scheme of simulators
+
+      \identifier{25q} */
+  CASADI_EXPORT std::vector<std::string> dyn_out();
+
+  /** \brief Get simulator input scheme name by index
+
+      \identifier{25r} */
+  CASADI_EXPORT std::string dyn_in(casadi_int ind);
+
+  /** \brief Get output scheme name by index
+
+      \identifier{25s} */
+  CASADI_EXPORT std::string dyn_out(casadi_int ind);
+
+  /** \brief Get the number of simulator inputs
+
+      \identifier{25t} */
+  CASADI_EXPORT casadi_int dyn_n_in();
+
+  /** \brief Get the number of simulator outputs
+
+      \identifier{25u} */
+  CASADI_EXPORT casadi_int dyn_n_out();
+
   /** @} */
 
 #ifndef SWIG
 /// Inputs of the symbolic representation of the DAE
-enum DeIn {
-  DE_T,
-  DE_X,
-  DE_Z,
-  DE_P,
-  DE_RX,
-  DE_RZ,
-  DE_RP,
-  DE_NUM_IN};
-
-/// Shortnames for DAE symbolic representation inputs
-const std::vector<std::string> DE_INPUTS = {"t", "x", "z", "p", "rx", "rz", "rp"};
+enum DynIn {
+  DYN_T,
+  DYN_X,
+  DYN_Z,
+  DYN_P,
+  DYN_U,
+  DYN_NUM_IN};
 
 /// Inputs of the symbolic representation of the DAE
-enum DeOut {
-  DE_ODE,
-  DE_ALG,
-  DE_QUAD,
-  DE_RODE,
-  DE_RALG,
-  DE_RQUAD,
-  DE_NUM_OUT};
-
-/// Shortnames for DAE symbolic representation outputs
-const std::vector<std::string> DE_OUTPUTS = {"ode", "alg", "quad", "rode", "ralg", "rquad"};
-
-/// Input arguments of an ODE/DAE function
-enum DAEInput {
-  /// Differential state
-  DAE_X,
-  /// Algebraic state
-  DAE_Z,
-  /// Parameter
-  DAE_P,
-  /// Explicit time dependence
-  DAE_T,
-  /// Number of arguments
-  DAE_NUM_IN
-};
-
-/// Output arguments of an DAE function
-enum DAEOutput {
-  /// Right hand side of the implicit ODE
-  DAE_ODE,
-  /// Right hand side of algebraic equations
-  DAE_ALG,
-  /// Right hand side of quadratures equations
-  DAE_QUAD,
-  /// Number of arguments
-  DAE_NUM_OUT
-};
-
-/// Input arguments of an ODE/DAE backward integration function
-enum RDAEInput {
-  /// Backward differential state
-  RDAE_RX,
-  /// Backward algebraic state
-  RDAE_RZ,
-  /// Backward  parameter vector
-  RDAE_RP,
-  /// Forward differential state
-  RDAE_X,
-  /// Forward algebraic state
-  RDAE_Z,
-  /// Parameter vector
-  RDAE_P,
-  /// Explicit time dependence
-  RDAE_T,
-  /// Number of arguments
-  RDAE_NUM_IN
-};
-
-/// Output arguments of an ODE/DAE backward integration function
-enum RDAEOutput {
-  /// Right hand side of ODE
-  RDAE_ODE,
-  /// Right hand side of algebraic equations
-  RDAE_ALG,
-  /// Right hand side of quadratures
-  RDAE_QUAD,
-  /// Number of arguments
-  RDAE_NUM_OUT
-};
+enum DynOut {
+  DYN_ODE,
+  DYN_ALG,
+  DYN_QUAD,
+  DYN_NUM_OUT};
 
 /// Input arguments of an integrator
 enum IntegratorInput {
   /// Differential state at the initial time
   INTEGRATOR_X0,
+  /// Initial guess for the algebraic variable at the initial time
+  INTEGRATOR_Z0,
   /// Parameters
   INTEGRATOR_P,
-  /// Initial guess for the algebraic variable
-  INTEGRATOR_Z0,
-  /// Backward differential state at the final time
-  INTEGRATOR_RX0,
-  /// Backward parameter vector
-  INTEGRATOR_RP,
-  /// Initial guess for the backwards algebraic variable
-  INTEGRATOR_RZ0,
+  /// Piecewise constant control, a new control interval starts at each output time
+  INTEGRATOR_U,
+  /// Adjoint seeds corresponding to the states at the output times
+  INTEGRATOR_ADJ_XF,
+  /// Adjoint seeds corresponding to the algebraic variables at the output times
+  INTEGRATOR_ADJ_ZF,
+  /// Adjoint seeds corresponding to the quadratures at the output times
+  INTEGRATOR_ADJ_QF,
   /// Number of input arguments of an integrator
   INTEGRATOR_NUM_IN
 };
 
 /// Output arguments of an integrator
 enum IntegratorOutput {
-  /// Differential state at the final time
+  /// Differential state at all output times
   INTEGRATOR_XF,
-  /// Quadrature state at the final time
-  INTEGRATOR_QF,
-  /// Algebraic variable at the final time
+  /// Algebraic variable at all output times
   INTEGRATOR_ZF,
-  /// Backward differential state at the initial time
-  INTEGRATOR_RXF,
-  /// Backward quadrature state at the initial time
-  INTEGRATOR_RQF,
-  /// Backward algebraic variable at the initial time
-  INTEGRATOR_RZF,
+  /// Quadrature state at all output times
+  INTEGRATOR_QF,
+  /// Adjoint sensitivities corresponding to the initial state
+  INTEGRATOR_ADJ_X0,
+  /// Adjoint sensitivities corresponding to the algebraic variable guess
+  INTEGRATOR_ADJ_Z0,
+  /// Adjoint sensitivities corresponding to the parameter vector
+  INTEGRATOR_ADJ_P,
+  /// Adjoint sensitivities corresponding to the control vector
+  INTEGRATOR_ADJ_U,
   /// Number of output arguments of an integrator
   INTEGRATOR_NUM_OUT
 };
+
+///@{
+/// Number of entries in enums
+template<> struct enum_traits<DynIn> {
+  static const size_t n_enum = DYN_NUM_IN;
+};
+template<> struct enum_traits<DynOut> {
+  static const size_t n_enum = DYN_NUM_OUT;
+};
+///@}
+
+///@{
+/// Convert to string
+CASADI_EXPORT std::string to_string(DynIn v);
+CASADI_EXPORT std::string to_string(DynOut v);
+///@}
+
 #endif // SWIG
 
 } // namespace casadi

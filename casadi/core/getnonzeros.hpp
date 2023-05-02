@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -34,9 +34,11 @@
 
 namespace casadi {
   /** \brief Get nonzeros of a matrix
+
       \author Joel Andersson
       \date 2013
-  */
+
+      \identifier{i3} */
   class CASADI_EXPORT GetNonzeros : public MXNode {
   public:
 
@@ -53,14 +55,20 @@ namespace casadi {
     /// Destructor
     ~GetNonzeros() override {}
 
-    /** \brief  Evaluate symbolically (MX) */
+    /** \brief  Evaluate symbolically (MX)
+
+        \identifier{i4} */
     void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
 
-    /** \brief Calculate forward mode directional derivatives */
+    /** \brief Calculate forward mode directional derivatives
+
+        \identifier{i5} */
     void ad_forward(const std::vector<std::vector<MX> >& fseed,
                          std::vector<std::vector<MX> >& fsens) const override;
 
-    /** \brief Calculate reverse mode directional derivatives */
+    /** \brief Calculate reverse mode directional derivatives
+
+        \identifier{i6} */
     void ad_reverse(const std::vector<std::vector<MX> >& aseed,
                          std::vector<std::vector<MX> >& asens) const override;
 
@@ -70,17 +78,23 @@ namespace casadi {
     /// Get all the nonzeros
     virtual std::vector<casadi_int> all() const = 0;
 
-    /** \brief Get the operation */
+    /** \brief Get the operation
+
+        \identifier{i7} */
     casadi_int op() const override { return OP_GETNONZEROS;}
 
     /// Get the nonzeros of matrix
     MX get_nzref(const Sparsity& sp, const std::vector<casadi_int>& nz) const override;
 
-    /** \brief Deserialize without type information */
+    /** \brief Deserialize without type information
+
+        \identifier{i8} */
     static MXNode* deserialize(DeserializingStream& s);
 
   protected:
-    /** \brief Deserializing constructor */
+    /** \brief Deserializing constructor
+
+        \identifier{i9} */
     explicit GetNonzeros(DeserializingStream& s) : MXNode(s) {}
   };
 
@@ -96,11 +110,20 @@ namespace casadi {
     /// Get all the nonzeros
     std::vector<casadi_int> all() const override { return nz_;}
 
-    /** \brief  Propagate sparsity forward */
+    /** \brief  Propagate sparsity forward
+
+        \identifier{ia} */
     int sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
-    /** \brief  Propagate sparsity backwards */
+    /** \brief  Propagate sparsity backwards
+
+        \identifier{ib} */
     int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
+
+    /** \brief  Evaluate symbolically (MX)
+
+        \identifier{ic} */
+    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
 
     /// Evaluate the function (template)
     template<typename T>
@@ -112,15 +135,21 @@ namespace casadi {
     /// Evaluate the function symbolically (SX)
     int eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const override;
 
-    /** \brief  Print expression */
+    /** \brief  Print expression
+
+        \identifier{id} */
     std::string disp(const std::vector<std::string>& arg) const override;
 
-    /** \brief Generate code for the operation */
+    /** \brief Generate code for the operation
+
+        \identifier{ie} */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
                   const std::vector<casadi_int>& res) const override;
 
-    /** \brief Check if two nodes are equivalent up to a given depth */
+    /** \brief Check if two nodes are equivalent up to a given depth
+
+        \identifier{if} */
     bool is_equal(const MXNode* node, casadi_int depth) const override;
 
     /** Obtain information about node */
@@ -129,12 +158,18 @@ namespace casadi {
     /// Operation sequence
     std::vector<casadi_int> nz_;
 
-    /** \brief Serialize an object without type information */
+    /** \brief Serialize an object without type information
+
+        \identifier{ig} */
     void serialize_body(SerializingStream& s) const override;
-    /** \brief Serialize type information */
+    /** \brief Serialize type information
+
+        \identifier{ih} */
     void serialize_type(SerializingStream& s) const override;
 
-    /** \brief Deserializing constructor */
+    /** \brief Deserializing constructor
+
+        \identifier{ii} */
     explicit GetNonzerosVector(DeserializingStream& s);
   };
 
@@ -151,10 +186,14 @@ namespace casadi {
     /// Get all the nonzeros
     std::vector<casadi_int> all() const override { return s_.all(s_.stop);}
 
-    /** \brief  Propagate sparsity forward */
+    /** \brief  Propagate sparsity forward
+
+        \identifier{ij} */
     int sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
-    /** \brief  Propagate sparsity backwards */
+    /** \brief  Propagate sparsity backwards
+
+        \identifier{ik} */
     int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
     /// Evaluate the function (template)
@@ -167,15 +206,21 @@ namespace casadi {
     /// Evaluate the function symbolically (SX)
     int eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const override;
 
-    /** \brief  Print expression */
+    /** \brief  Print expression
+
+        \identifier{il} */
     std::string disp(const std::vector<std::string>& arg) const override;
 
-    /** \brief Generate code for the operation */
+    /** \brief Generate code for the operation
+
+        \identifier{im} */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
                   const std::vector<casadi_int>& res) const override;
 
-    /** \brief Check if two nodes are equivalent up to a given depth */
+    /** \brief Check if two nodes are equivalent up to a given depth
+
+        \identifier{in} */
     bool is_equal(const MXNode* node, casadi_int depth) const override;
 
     /** Obtain information about node */
@@ -184,12 +229,18 @@ namespace casadi {
     // Data member
     Slice s_;
 
-    /** \brief Serialize an object without type information */
+    /** \brief Serialize an object without type information
+
+        \identifier{io} */
     void serialize_body(SerializingStream& s) const override;
-    /** \brief Serialize type information */
+    /** \brief Serialize type information
+
+        \identifier{ip} */
     void serialize_type(SerializingStream& s) const override;
 
-    /** \brief Deserializing constructor */
+    /** \brief Deserializing constructor
+
+        \identifier{iq} */
     explicit GetNonzerosSlice(DeserializingStream& s);
   };
 
@@ -207,10 +258,14 @@ namespace casadi {
     /// Get all the nonzeros
     std::vector<casadi_int> all() const override { return inner_.all(outer_, outer_.stop);}
 
-    /** \brief  Propagate sparsity forward */
+    /** \brief  Propagate sparsity forward
+
+        \identifier{ir} */
     int sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
-    /** \brief  Propagate sparsity backwards */
+    /** \brief  Propagate sparsity backwards
+
+        \identifier{is} */
     int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
     /// Evaluate the function (template)
@@ -223,15 +278,21 @@ namespace casadi {
     /// Evaluate the function symbolically (SX)
     int eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const override;
 
-    /** \brief  Print expression */
+    /** \brief  Print expression
+
+        \identifier{it} */
     std::string disp(const std::vector<std::string>& arg) const override;
 
-    /** \brief Generate code for the operation */
+    /** \brief Generate code for the operation
+
+        \identifier{iu} */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
                   const std::vector<casadi_int>& res) const override;
 
-    /** \brief Check if two nodes are equivalent up to a given depth */
+    /** \brief Check if two nodes are equivalent up to a given depth
+
+        \identifier{iv} */
     bool is_equal(const MXNode* node, casadi_int depth) const override;
 
     /** Obtain information about node */
@@ -240,12 +301,18 @@ namespace casadi {
     // Data members
     Slice inner_, outer_;
 
-    /** \brief Serialize an object without type information */
+    /** \brief Serialize an object without type information
+
+        \identifier{iw} */
     void serialize_body(SerializingStream& s) const override;
-    /** \brief Serialize type information */
+    /** \brief Serialize type information
+
+        \identifier{ix} */
     void serialize_type(SerializingStream& s) const override;
 
-    /** \brief Deserializing constructor */
+    /** \brief Deserializing constructor
+
+        \identifier{iy} */
     explicit GetNonzerosSlice2(DeserializingStream& s);
   };
 

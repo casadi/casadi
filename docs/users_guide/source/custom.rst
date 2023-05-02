@@ -250,7 +250,7 @@ In C++, the syntax is as follows:
       casadi_int get_n_out() override { return 1;}
 
       // Initialize the object
-      void init override() {
+      void init() override() {
         std::cout << "initializing object" << std::endl;
       }
 
@@ -359,7 +359,8 @@ where the user simply specifies the source code as a C language string.
         '}'
 
         f = Function.jit('f',body,\
-              ['x','s'],['r'])
+              ['x','s'],['r'],\
+              {"compiler":"shell"})
         print(f)
     &&
 
@@ -372,7 +373,8 @@ where the user simply specifies the source code as a C language string.
         '}'];
 
         f = Function.jit('f',body,...
-              {'x','s'},{'r'});
+              {'x','s'},{'r'},...
+              struct('compiler','shell'));
         disp(f)
 
 
@@ -396,7 +398,8 @@ of the sparsity patterns:
         sp = Sparsity.scalar()
         f = Function.jit('f',body,\
              ['x','s'], ['r'],\
-             [sp,sp], [sp])
+             [sp,sp], [sp],\
+             {"compiler":"shell"})
         print(f)
     &&
 
@@ -411,7 +414,8 @@ of the sparsity patterns:
         sp = Sparsity.scalar();
         f = Function.jit('f',body,...
              {'x','s'}, {'r'},...
-             {sp,sp}, {sp});
+             {sp,sp}, {sp},...
+             struct('compiler','shell'));
         disp(f)
 
 

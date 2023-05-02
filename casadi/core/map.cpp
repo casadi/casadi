@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -34,13 +34,11 @@
 #endif // CASADI_WITH_THREAD_MINGW
 #endif // CASADI_WITH_THREAD
 
-using namespace std;
-
 namespace casadi {
 
   Function Map::create(const std::string& parallelization, const Function& f, casadi_int n) {
     // Create instance of the right class
-    string suffix = str(n) + "_" + f.name();
+    std::string suffix = str(n) + "_" + f.name();
     if (parallelization == "serial") {
       return Function::create(new Map("map" + suffix, f, n), Dict());
     } else if (parallelization== "openmp") {
@@ -136,9 +134,9 @@ namespace casadi {
   template<typename T>
   int Map::eval_gen(const T** arg, T** res, casadi_int* iw, T* w, int mem) const {
     const T** arg1 = arg+n_in_;
-    copy_n(arg, n_in_, arg1);
+    std::copy_n(arg, n_in_, arg1);
     T** res1 = res+n_out_;
-    copy_n(res, n_out_, res1);
+    std::copy_n(res, n_out_, res1);
     for (casadi_int i=0; i<n_; ++i) {
       if (f_(arg1, res1, iw, w, mem)) return 1;
       for (casadi_int j=0; j<n_in_; ++j) {
@@ -162,9 +160,9 @@ namespace casadi {
 
   int Map::sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, void* mem) const {
     bvec_t** arg1 = arg+n_in_;
-    copy_n(arg, n_in_, arg1);
+    std::copy_n(arg, n_in_, arg1);
     bvec_t** res1 = res+n_out_;
-    copy_n(res, n_out_, res1);
+    std::copy_n(res, n_out_, res1);
     for (casadi_int i=0; i<n_; ++i) {
       if (f_.rev(arg1, res1, iw, w)) return 1;
       for (casadi_int j=0; j<n_in_; ++j) {
@@ -218,12 +216,12 @@ namespace casadi {
     Function dm = df.map(n_, parallelization());
 
     // Input expressions
-    vector<MX> arg = dm.mx_in();
+    std::vector<MX> arg = dm.mx_in();
 
     // Need to reorder sensitivity inputs
-    vector<MX> res = arg;
-    vector<MX>::iterator it=res.begin()+n_in_+n_out_;
-    vector<casadi_int> ind;
+    std::vector<MX> res = arg;
+    std::vector<MX>::iterator it=res.begin()+n_in_+n_out_;
+    std::vector<casadi_int> ind;
     for (casadi_int i=0; i<n_in_; ++i, ++it) {
       casadi_int sz = f_.size2_in(i);
       ind.clear();
@@ -255,8 +253,11 @@ namespace casadi {
       *it = (*it)(Slice(), ind); // NOLINT
     }
 
+    Dict options = opts;
+    options["allow_duplicate_io_names"] = true;
+
     // Construct return function
-    return Function(name, arg, res, inames, onames, opts);
+    return Function(name, arg, res, inames, onames, options);
   }
 
   Function Map
@@ -269,12 +270,12 @@ namespace casadi {
     Function dm = df.map(n_, parallelization());
 
     // Input expressions
-    vector<MX> arg = dm.mx_in();
+    std::vector<MX> arg = dm.mx_in();
 
     // Need to reorder sensitivity inputs
-    vector<MX> res = arg;
-    vector<MX>::iterator it=res.begin()+n_in_+n_out_;
-    vector<casadi_int> ind;
+    std::vector<MX> res = arg;
+    std::vector<MX>::iterator it=res.begin()+n_in_+n_out_;
+    std::vector<casadi_int> ind;
     for (casadi_int i=0; i<n_out_; ++i, ++it) {
       casadi_int sz = f_.size2_out(i);
       ind.clear();
@@ -306,8 +307,11 @@ namespace casadi {
       *it = (*it)(Slice(), ind); // NOLINT
     }
 
+    Dict options = opts;
+    options["allow_duplicate_io_names"] = true;
+
     // Construct return function
-    return Function(name, arg, res, inames, onames, opts);
+    return Function(name, arg, res, inames, onames, options);
   }
 
   int Map::eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
@@ -395,10 +399,10 @@ namespace casadi {
   }
 
   void OmpMap::init(const Dict& opts) {
-#ifndef CASADI_WITH_THREAD
-    casadi_warning("CasADi was not compiled with WITH_THREAD=ON. "
+#ifndef WITH_OPENMP
+    casadi_warning("CasADi was not compiled with WITH_OPENMP=ON. "
                    "Falling back to serial evaluation.");
-#endif // CASADI_WITH_THREAD
+#endif // WITH_OPENMP
     // Call the initialization method of the base class
     Map::init(opts);
 
