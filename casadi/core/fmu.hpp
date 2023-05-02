@@ -77,9 +77,12 @@ class CASADI_EXPORT Fmu
   /** \brief Name of the instance */
   const std::string& name() const;
 
+  ///@{
   /// Access functions of the node
   Fmu2* operator->();
   const Fmu2* operator->() const;
+  Fmu2* get() const;
+  ///@}
 
   /** \brief Get the number of scheme inputs */
   size_t n_in() const;
@@ -141,6 +144,31 @@ class CASADI_EXPORT Fmu
 
   // Free FMU instance
   void free_instance(void* c) const;
+
+  // Set value
+  void set(FmuMemory* m, size_t ind, const double* value) const;
+
+  // Request the calculation of a variable
+  void request(FmuMemory* m, size_t ind) const;
+
+  // Calculate all requested variables
+  int eval(FmuMemory* m) const;
+
+  // Get a calculated variable
+  void get(FmuMemory* m, size_t id, double* value) const;
+
+  // Set seed
+  void set_seed(FmuMemory* m, casadi_int nseed, const casadi_int* id, const double* v) const;
+
+  // Request the calculation of a sensitivity
+  void request_sens(FmuMemory* m, casadi_int nsens, const casadi_int* id,
+    const casadi_int* wrt_id) const;
+
+  // Calculate directional derivatives
+  int eval_derivative(FmuMemory* m, bool independent_seeds) const;
+
+  // Get calculated derivatives
+  void get_sens(FmuMemory* m, casadi_int nsens, const casadi_int* id, double* v) const;
 };
 
 } // namespace casadi

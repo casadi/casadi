@@ -956,22 +956,22 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
   // Pass all regular inputs
   for (size_t k = 0; k < in_.size(); ++k) {
     if (in_[k].type == InputType::REG) {
-      get_fmu(fmu_)->set(m, in_[k].ind, m->arg[k]);
+      fmu_.set(m, in_[k].ind, m->arg[k]);
     }
   }
   // Request all regular outputs to be evaluated
   for (size_t k = 0; k < out_.size(); ++k) {
     if (m->res[k] && out_[k].type == OutputType::REG) {
-      get_fmu(fmu_)->request(m, out_[k].ind);
+      fmu_.request(m, out_[k].ind);
     }
   }
   // Evaluate
-  if (get_fmu(fmu_)->eval(m)) return 1;
+  if (fmu_.eval(m)) return 1;
   // Get regular outputs (master thread only)
   if (need_nondiff) {
     for (size_t k = 0; k < out_.size(); ++k) {
       if (m->res[k] && out_[k].type == OutputType::REG) {
-        get_fmu(fmu_)->get(m, out_[k].ind, m->res[k]);
+        fmu_.get(m, out_[k].ind, m->res[k]);
       }
     }
   }
@@ -988,10 +988,10 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
       // Get derivative directions
       casadi_jac_pre(&p_, &m->d, c);
       // Calculate derivatives
-      get_fmu(fmu_)->set_seed(m, m->d.nseed, m->d.iseed, m->d.seed);
-      get_fmu(fmu_)->request_sens(m, m->d.nsens, m->d.isens, m->d.wrt);
-      if (get_fmu(fmu_)->eval_derivative(m, true)) return 1;
-      get_fmu(fmu_)->get_sens(m, m->d.nsens, m->d.isens, m->d.sens);
+      fmu_.set_seed(m, m->d.nseed, m->d.iseed, m->d.seed);
+      fmu_.request_sens(m, m->d.nsens, m->d.isens, m->d.wrt);
+      if (fmu_.eval_derivative(m, true)) return 1;
+      fmu_.get_sens(m, m->d.nsens, m->d.isens, m->d.sens);
       // Scale derivatives
       casadi_jac_scale(&p_, &m->d);
       // Collect Jacobian nonzeros
@@ -1074,10 +1074,10 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
        // Get derivative directions
        casadi_jac_pre(&p_, &m->d, c1);
        // Calculate derivatives
-       get_fmu(fmu_)->set_seed(m, m->d.nseed, m->d.iseed, m->d.seed);
-       get_fmu(fmu_)->request_sens(m, m->d.nsens, m->d.isens, m->d.wrt);
-       if (get_fmu(fmu_)->eval_derivative(m, true)) return 1;
-       get_fmu(fmu_)->get_sens(m, m->d.nsens, m->d.isens, m->d.sens);
+       fmu_.set_seed(m, m->d.nseed, m->d.iseed, m->d.seed);
+       fmu_.request_sens(m, m->d.nsens, m->d.isens, m->d.wrt);
+       if (fmu_.eval_derivative(m, true)) return 1;
+       fmu_.get_sens(m, m->d.nsens, m->d.isens, m->d.sens);
        // Scale derivatives
        casadi_jac_scale(&p_, &m->d);
        // Propagate adjoint sensitivities

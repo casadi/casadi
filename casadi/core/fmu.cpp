@@ -60,6 +60,10 @@ const Fmu2* Fmu::operator->() const {
   return static_cast<const Fmu2*>(SharedObject::operator->());
 }
 
+Fmu2* Fmu::get() const {
+  return static_cast<Fmu2*>(SharedObject::get());
+}
+
 const std::string& Fmu::name() const {
   if (is_null()) {
     static std::string null = "null";
@@ -204,6 +208,71 @@ void Fmu::free_instance(void* c) const {
     return (*this)->free_instance(c);
   } catch(std::exception& e) {
     THROW_ERROR("free_instance", e.what());
+  }
+}
+
+void Fmu::set(FmuMemory* m, size_t ind, const double* value) const {
+  try {
+    return (*this)->set(m, ind, value);
+  } catch(std::exception& e) {
+    THROW_ERROR("set", e.what());
+  }
+}
+
+void Fmu::request(FmuMemory* m, size_t ind) const {
+  try {
+    return (*this)->request(m, ind);
+  } catch(std::exception& e) {
+    THROW_ERROR("request", e.what());
+  }
+}
+
+int Fmu::eval(FmuMemory* m) const {
+  try {
+    return (*this)->eval(m);
+  } catch(std::exception& e) {
+    THROW_ERROR("eval", e.what());
+  }
+}
+
+void Fmu::get(FmuMemory* m, size_t id, double* value) const {
+  try {
+    return (*this)->get(m, id, value);
+  } catch(std::exception& e) {
+    THROW_ERROR("get", e.what());
+  }
+}
+
+void Fmu::set_seed(FmuMemory* m, casadi_int nseed, const casadi_int* id, const double* v) const {
+  try {
+    return (*this)->set_seed(m, nseed, id, v);
+  } catch(std::exception& e) {
+    THROW_ERROR("set_seed", e.what());
+  }
+}
+
+void Fmu::request_sens(FmuMemory* m, casadi_int nsens, const casadi_int* id,
+    const casadi_int* wrt_id) const {
+  try {
+    return (*this)->request_sens(m, nsens, id, wrt_id);
+  } catch(std::exception& e) {
+    THROW_ERROR("request_sens", e.what());
+  }
+}
+
+int Fmu::eval_derivative(FmuMemory* m, bool independent_seeds) const {
+  try {
+    return (*this)->eval_derivative(m, independent_seeds);
+  } catch(std::exception& e) {
+    THROW_ERROR("eval_derivative", e.what());
+  }
+}
+
+void Fmu::get_sens(FmuMemory* m, casadi_int nsens, const casadi_int* id, double* v) const {
+  try {
+    return (*this)->get_sens(m, nsens, id, v);
+  } catch(std::exception& e) {
+    THROW_ERROR("get_sens", e.what());
   }
 }
 
