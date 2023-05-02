@@ -259,7 +259,7 @@ class CASADI_EXPORT Fmu2 : public SharedObjectInternal {
   /// @}
 
   // Print description of an input
-  std::string desc_in(FmuMemory* m, size_t id) const;
+  std::string desc_in(FmuMemory* m, size_t id, bool more = true) const;
 
   // Name of system, per the FMI specification
   static std::string system_infix();

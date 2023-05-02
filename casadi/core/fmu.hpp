@@ -120,6 +120,9 @@ class CASADI_EXPORT Fmu
   // Get all nominal values for an output
   std::vector<double> all_nominal_out(size_t ind) const;
 
+  // Description of an input
+  std::string desc_in(FmuMemory* m, size_t id, bool more = true) const;
+
   /// Does the interface support analytic derivatives?
   bool has_ad() const;
 
@@ -169,6 +172,10 @@ class CASADI_EXPORT Fmu
 
   // Get calculated derivatives
   void get_sens(FmuMemory* m, casadi_int nsens, const casadi_int* id, double* v) const;
+
+  /** \brief Get stats */
+  void get_stats(FmuMemory* m, Dict* stats,
+    const std::vector<std::string>& name_in, const InputStruct* in) const;
 };
 
 } // namespace casadi

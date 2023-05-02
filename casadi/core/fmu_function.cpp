@@ -1044,10 +1044,8 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
           // Ensure a negative step is possible
           if (m->ibuf_.at(id) - h[v] < fmu_.min_in(id)) {
             std::stringstream ss;
-            ss << "Cannot perturb " << get_fmu(fmu_)->vn_in_.at(id) << " at " << x[v]
-              << " with step size "
-              << m->self.step_ << ", nominal " << fmu_.nominal_in(id) << " min "
-              << fmu_.min_in(id) << ", max " << fmu_.max_in(id);
+            ss << "Cannot perturb " << fmu_.desc_in(m, id) << " at " << x[v]
+              << " with step size " << m->self.step_;
             casadi_warning(ss.str());
             return 1;
           }
@@ -1066,7 +1064,7 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
         m->wrt_.at(i) = -1;
       }
       // Calculate perturbed inputs
-      if (get_fmu(fmu_)->eval(m)) return 1;
+      if (fmu_.eval(m)) return 1;
       // Clear perturbed adjoint sensitivities
       std::fill(m->pert_asens, m->pert_asens + fmu_.n_in(), 0);
       // Loop over colors of the Jacobian
@@ -1142,8 +1140,8 @@ void FmuFunction::check_hessian(FmuMemory* m, const double *hess_nz, casadi_int*
       // Check if entry is NaN of inf
       if (std::isnan(nz) || std::isinf(nz)) {
         std::stringstream ss;
-        ss << "Second derivative w.r.t. " << get_fmu(fmu_)->desc_in(m, id_r) << " and "
-          << get_fmu(fmu_)->desc_in(m, id_r) << " is " << nz;
+        ss << "Second derivative w.r.t. " << fmu_.desc_in(m, id_r) << " and "
+          << fmu_.desc_in(m, id_r) << " is " << nz;
         casadi_warning(ss.str());
         // Further checks not needed for entry
         continue;
@@ -1156,8 +1154,8 @@ void FmuFunction::check_hessian(FmuMemory* m, const double *hess_nz, casadi_int*
         if (nz_max > abstol_ && std::fabs(nz - nz_tr) > nz_max * reltol_) {
           std::stringstream ss;
           ss << "Hessian appears nonsymmetric. Got " << nz << " vs. " << nz_tr
-            << " for second derivative w.r.t. " << get_fmu(fmu_)->desc_in(m, id_r) << " and "
-            << get_fmu(fmu_)->desc_in(m, id_c) << ", hess_nz = " << k << "/" <<  k_tr;
+            << " for second derivative w.r.t. " << fmu_.desc_in(m, id_r) << " and "
+            << fmu_.desc_in(m, id_c) << ", hess_nz = " << k << "/" <<  k_tr;
           casadi_warning(ss.str());
         }
       }
@@ -1401,7 +1399,7 @@ Dict FmuFunction::get_stats(void *mem) const {
   // Get memory object
   FmuMemory* m = static_cast<FmuMemory*>(mem);
   // Get auxilliary variables from Fmu
-  get_fmu(fmu_)->get_stats(m, &stats, name_in_, get_ptr(in_));
+  fmu_.get_stats(m, &stats, name_in_, get_ptr(in_));
   // Return stats
   return stats;
 }

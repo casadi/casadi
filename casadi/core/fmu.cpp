@@ -169,6 +169,14 @@ std::vector<double> Fmu::all_nominal_out(size_t ind) const {
   }
 }
 
+std::string Fmu::desc_in(FmuMemory* m, size_t id, bool more) const {
+  try {
+    return (*this)->desc_in(m, id, more);
+  } catch(std::exception& e) {
+    THROW_ERROR("desc_in", e.what());
+  }
+}
+
 bool Fmu::has_ad() const {
   try {
     return (*this)->has_ad();
@@ -276,6 +284,15 @@ void Fmu::get_sens(FmuMemory* m, casadi_int nsens, const casadi_int* id, double*
   }
 }
 
+void Fmu::get_stats(FmuMemory* m, Dict* stats,
+    const std::vector<std::string>& name_in, const InputStruct* in) const {
+  try {
+    return (*this)->get_stats(m, stats, name_in, in);
+  } catch(std::exception& e) {
+    THROW_ERROR("get_stats", e.what());
+  }
+}
+
 Fmu2::~Fmu2() {
 }
 
@@ -292,12 +309,17 @@ std::string to_string(FmuApi v) {
   return "";
 }
 
-std::string Fmu2::desc_in(FmuMemory* m, size_t id) const {
+std::string Fmu2::desc_in(FmuMemory* m, size_t id, bool more) const {
   // Create description
-  std::stringstream ss;
-  ss << vn_in_[id] << " = " << m->ibuf_[id] << " (nominal " << nominal_in_[id]
-  << ", min " << min_in_[id] << ", max " << max_in_[id] << ")";
-  return ss.str();
+  if (more) {
+    // Detailed description
+    std::stringstream ss;
+    ss << vn_in_[id] << " = " << m->ibuf_[id] << " (nominal " << nominal_in_[id]
+    << ", min " << min_in_[id] << ", max " << max_in_[id] << ")";
+    return ss.str();
+  } else {
+    return vn_in_[id];
+  }
 }
 
 std::string Fmu2::system_infix() {
