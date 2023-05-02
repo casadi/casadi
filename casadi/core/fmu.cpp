@@ -133,6 +133,22 @@ double Fmu::nominal_out(size_t ind) const {
   }
 }
 
+double Fmu::min_in(size_t ind) const {
+  try {
+    return (*this)->min_in_.at(ind);
+  } catch(std::exception& e) {
+    THROW_ERROR("min_in", e.what());
+  }
+}
+
+double Fmu::max_in(size_t ind) const {
+  try {
+    return (*this)->max_in_.at(ind);
+  } catch(std::exception& e) {
+    THROW_ERROR("max_in", e.what());
+  }
+}
+
 std::vector<double> Fmu::all_nominal_in(size_t ind) const {
   try {
     return (*this)->all_nominal_in(ind);
@@ -154,7 +170,23 @@ bool Fmu::has_ad() const {
     return (*this)->has_ad();
   } catch(std::exception& e) {
     THROW_ERROR("has_ad", e.what());
-    return false;
+  }
+}
+
+Sparsity Fmu::jac_sparsity(const std::vector<size_t>& osub,
+    const std::vector<size_t>& isub) const {
+  try {
+    return (*this)->jac_sparsity(osub, isub);
+  } catch(std::exception& e) {
+    THROW_ERROR("jac_sparsity", e.what());
+  }
+}
+
+Sparsity Fmu::hess_sparsity(const std::vector<size_t>& r, const std::vector<size_t>& c) const {
+  try {
+    return (*this)->hess_sparsity(r, c);
+  } catch(std::exception& e) {
+    THROW_ERROR("hess_sparsity", e.what());
   }
 }
 

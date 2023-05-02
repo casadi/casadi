@@ -420,7 +420,7 @@ void FmuFunction::init(const Dict& opts) {
   }
 
   // Get sparsity pattern for extended Jacobian
-  jac_sp_ = get_fmu(fmu_)->jac_sparsity(jac_out_, jac_in_);
+  jac_sp_ = fmu_.jac_sparsity(jac_out_, jac_in_);
 
   // Calculate graph coloring
   jac_colors_ = jac_sp_.uni_coloring();
@@ -450,7 +450,7 @@ void FmuFunction::init(const Dict& opts) {
   // If Hessian calculation is needed
   if (has_hess_) {
     // Get sparsity pattern for extended Hessian
-    hess_sp_ = get_fmu(fmu_)->hess_sparsity(jac_in_, jac_in_);
+    hess_sp_ = fmu_.hess_sparsity(jac_in_, jac_in_);
     casadi_assert(hess_sp_.size1() == jac_in_.size(), "Inconsistent Hessian dimensions");
     casadi_assert(hess_sp_.size2() == jac_in_.size(), "Inconsistent Hessian dimensions");
     const casadi_int *hess_row = hess_sp_.row();
@@ -715,15 +715,15 @@ Sparsity FmuFunction::get_sparsity_out(casadi_int i) {
     case OutputType::ADJ:
       return Sparsity::dense(fmu_.ired(s.wrt).size(), 1);
     case OutputType::JAC:
-      return get_fmu(fmu_)->jac_sparsity(s.ind, s.wrt);
+      return fmu_.jac_sparsity(s.ind, s.wrt);
     case OutputType::JAC_TRANS:
-      return get_fmu(fmu_)->jac_sparsity(s.ind, s.wrt).T();
+      return fmu_.jac_sparsity(s.ind, s.wrt).T();
     case OutputType::JAC_ADJ_OUT:
       return Sparsity(fmu_.ired(s.ind).size(), fmu_.ored(s.wrt).size());
     case OutputType::JAC_REG_ADJ:
       return Sparsity(fmu_.ored(s.ind).size(), fmu_.ored(s.wrt).size());
     case OutputType::HESS:
-      return get_fmu(fmu_)->hess_sparsity(s.ind, s.wrt);
+      return fmu_.hess_sparsity(s.ind, s.wrt);
   }
   return Sparsity();
 }
@@ -1040,14 +1040,14 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
         // Step size
         h[v] = m->self.step_ * fmu_.nominal_in(id);
         // Make sure a a forward step remains in bounds
-        if (x[v] + h[v] > get_fmu(fmu_)->max_in_.at(id)) {
+        if (x[v] + h[v] > fmu_.max_in(id)) {
           // Ensure a negative step is possible
-          if (m->ibuf_.at(id) - h[v] < get_fmu(fmu_)->min_in_.at(id)) {
+          if (m->ibuf_.at(id) - h[v] < fmu_.min_in(id)) {
             std::stringstream ss;
             ss << "Cannot perturb " << get_fmu(fmu_)->vn_in_.at(id) << " at " << x[v]
               << " with step size "
               << m->self.step_ << ", nominal " << fmu_.nominal_in(id) << " min "
-              << get_fmu(fmu_)->min_in_.at(id) << ", max " << get_fmu(fmu_)->max_in_.at(id);
+              << fmu_.min_in(id) << ", max " << fmu_.max_in(id);
             casadi_warning(ss.str());
             return 1;
           }
@@ -1379,15 +1379,15 @@ Sparsity FmuFunction::get_jac_sparsity(casadi_int oind, casadi_int iind,
   // Available in the FMU meta information
   if (out_.at(oind).type == OutputType::REG) {
     if (in_.at(iind).type == InputType::REG) {
-      return get_fmu(fmu_)->jac_sparsity(out_.at(oind).ind, in_.at(iind).ind);
+      return fmu_.jac_sparsity(out_.at(oind).ind, in_.at(iind).ind);
     } else if (in_.at(iind).type == InputType::ADJ) {
       return Sparsity(nnz_out(oind), nnz_in(iind));
     }
   } else if (out_.at(oind).type == OutputType::ADJ) {
     if (in_.at(iind).type == InputType::REG) {
-      return get_fmu(fmu_)->hess_sparsity(out_.at(oind).wrt, in_.at(iind).ind);
+      return fmu_.hess_sparsity(out_.at(oind).wrt, in_.at(iind).ind);
     } else if (in_.at(iind).type == InputType::ADJ) {
-      return get_fmu(fmu_)->jac_sparsity(in_.at(iind).ind, out_.at(oind).wrt).T();
+      return fmu_.jac_sparsity(in_.at(iind).ind, out_.at(oind).wrt).T();
     }
   }
   // Not available

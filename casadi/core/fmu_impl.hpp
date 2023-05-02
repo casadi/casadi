@@ -249,18 +249,8 @@ class CASADI_EXPORT Fmu2 : public SharedObjectInternal {
   // Get Jacobian sparsity for a subset of inputs and outputs
   Sparsity jac_sparsity(const std::vector<size_t>& osub, const std::vector<size_t>& isub) const;
 
-  // Get Jacobian sparsity for an output/input pair
-  Sparsity jac_sparsity(size_t oind, size_t iind) const {
-    return jac_sparsity(ored_.at(oind), ired_.at(iind));
-  }
-
   // Get Hessian sparsity for a subset of inputs
   Sparsity hess_sparsity(const std::vector<size_t>& r, const std::vector<size_t>& c) const;
-
-  // Get Jacobian sparsity for an input/input pair
-  Sparsity hess_sparsity(size_t r, size_t c) const {
-    return hess_sparsity(ired_.at(r), ired_.at(c));
-  }
 
   /// @{
   /** \brief Retreive nominal values */

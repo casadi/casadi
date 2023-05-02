@@ -30,6 +30,7 @@
 
 #include "shared_object.hpp"
 #include "printable.hpp"
+#include "sparsity.hpp"
 
 /// \cond INTERNAL
 
@@ -104,6 +105,12 @@ class CASADI_EXPORT Fmu
   // Get nominal value for reduced-space output
   double nominal_out(size_t ind) const;
 
+  // Get minimum value for reduced-space input
+  double min_in(size_t ind) const;
+
+  // Get maximum value for reduced-space input
+  double max_in(size_t ind) const;
+
   // Get all nominal values for an input
   std::vector<double> all_nominal_in(size_t ind) const;
 
@@ -112,6 +119,22 @@ class CASADI_EXPORT Fmu
 
   /// Does the interface support analytic derivatives?
   bool has_ad() const;
+
+  // Get Jacobian sparsity for a subset of inputs and outputs
+  Sparsity jac_sparsity(const std::vector<size_t>& osub, const std::vector<size_t>& isub) const;
+
+  // Get Jacobian sparsity for an output/input pair
+  Sparsity jac_sparsity(size_t oind, size_t iind) const {
+    return jac_sparsity(ored(oind), ired(iind));
+  }
+
+  // Get Hessian sparsity for a subset of inputs
+  Sparsity hess_sparsity(const std::vector<size_t>& r, const std::vector<size_t>& c) const;
+
+  // Get Jacobian sparsity for an input/input pair
+  Sparsity hess_sparsity(size_t r, size_t c) const {
+    return hess_sparsity(ired(r), ired(c));
+  }
 
   /** \brief Initalize memory block */
   int init_mem(FmuMemory* m) const;
