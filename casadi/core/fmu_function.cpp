@@ -550,7 +550,7 @@ void FmuFunction::identify_io(
   }
 }
 
-InputStruct InputStruct::parse(const std::string& n, const Fmu* fmu,
+InputStruct InputStruct::parse(const std::string& n, const Fmu2* fmu,
     std::vector<std::string>* name_in, std::vector<std::string>* name_out) {
   // Return value
   InputStruct s;
@@ -600,7 +600,7 @@ InputStruct InputStruct::parse(const std::string& n, const Fmu* fmu,
   return s;
 }
 
-OutputStruct OutputStruct::parse(const std::string& n, const Fmu* fmu,
+OutputStruct OutputStruct::parse(const std::string& n, const Fmu2* fmu,
     std::vector<std::string>* name_in, std::vector<std::string>* name_out) {
   // Return value
   OutputStruct s;
@@ -1416,7 +1416,7 @@ int FmuFunction::alloc_fmu(const DaeBuilderInternal* dae,
     const std::map<std::string, std::vector<size_t>>& scheme,
     const std::vector<std::string>& aux) {
   // New FMU instance (to be shared between derivative functions)
-  Fmu* fmu = new Fmu(scheme_in, scheme_out, scheme, aux);
+  Fmu2* fmu = new Fmu2(scheme_in, scheme_out, scheme, aux);
   try {
     // Initialize
     fmu->init(dae);
@@ -1437,22 +1437,22 @@ int FmuFunction::alloc_fmu(const DaeBuilderInternal* dae,
   return mem;
 }
 
-Fmu* FmuFunction::get_fmu(int fmu) {
-  Fmu* ret = fmu_mem().at(fmu);
+Fmu2* FmuFunction::get_fmu(int fmu) {
+  Fmu2* ret = fmu_mem().at(fmu);
   casadi_assert_dev(ret != nullptr);
   return ret;
 }
 
 void FmuFunction::release_fmu(int fmu) {
   // Get memory
-  std::vector<Fmu*>& mem = fmu_mem();
+  std::vector<Fmu2*>& mem = fmu_mem();
   // Make sure it's a valid entry
   if (fmu < 0 || fmu >= mem.size()) {
     casadi_warning("FMU memory management corrupted");
     return;
   }
   // Decrease counter
-  Fmu* m = mem[fmu];
+  Fmu2* m = mem[fmu];
   if (m == nullptr) {
     casadi_warning("FMU memory has already been freed");
     return;
@@ -1469,9 +1469,9 @@ void FmuFunction::incref_fmu(int fmu) {
   get_fmu(fmu)->counter_++;
 }
 
-std::vector<Fmu*>& FmuFunction::fmu_mem() {
+std::vector<Fmu2*>& FmuFunction::fmu_mem() {
   // Singleton
-  static std::vector<Fmu*> fmu_mem_;
+  static std::vector<Fmu2*> fmu_mem_;
   return fmu_mem_;
 }
 

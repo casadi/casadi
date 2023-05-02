@@ -103,7 +103,7 @@ struct CASADI_EXPORT InputStruct {
   // Corresponding index in Fmu
   size_t ind;
   // Parse an input string
-  static InputStruct parse(const std::string& n, const Fmu* fmu,
+  static InputStruct parse(const std::string& n, const Fmu2* fmu,
     std::vector<std::string>* name_in = 0,
     std::vector<std::string>* name_out = 0);
 };
@@ -122,7 +122,7 @@ struct CASADI_EXPORT OutputStruct {
   // Selection
   size_t rbegin, rend, cbegin, cend;
   // Parse an output string
-  static OutputStruct parse(const std::string& n, const Fmu* fmu,
+  static OutputStruct parse(const std::string& n, const Fmu2* fmu,
     std::vector<std::string>* name_in = 0,
     std::vector<std::string>* name_out = 0);
   // Constructor
@@ -337,7 +337,7 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
     const std::vector<std::string>& aux);
 
   /// Get a specific FMU instance
-  static Fmu* get_fmu(int fmu);
+  static Fmu2* get_fmu(int fmu);
 
   /// Release, possibly free FMU
   static void release_fmu(int fmu);
@@ -347,7 +347,7 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
 
   private:
     /// FMU memory objects
-    static std::vector<Fmu*>& fmu_mem();
+    static std::vector<Fmu2*>& fmu_mem();
 };
 
 } // namespace casadi

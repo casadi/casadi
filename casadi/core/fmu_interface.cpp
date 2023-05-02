@@ -31,7 +31,7 @@ namespace casadi {
 
 #ifdef WITH_FMU
 
-std::string Fmu::desc_in(FmuMemory* m, size_t id) const {
+std::string Fmu2::desc_in(FmuMemory* m, size_t id) const {
   // Create description
   std::stringstream ss;
   ss << vn_in_[id] << " = " << m->ibuf_[id] << " (nominal " << nominal_in_[id]
@@ -39,7 +39,7 @@ std::string Fmu::desc_in(FmuMemory* m, size_t id) const {
   return ss.str();
 }
 
-std::string Fmu::system_infix() {
+std::string Fmu2::system_infix() {
 #if defined(_WIN32)
   // Windows system
 #ifdef _WIN64
@@ -56,7 +56,7 @@ std::string Fmu::system_infix() {
 #endif
 }
 
-std::string Fmu::dll_suffix() {
+std::string Fmu2::dll_suffix() {
 #if defined(_WIN32)
   // Windows system
   return ".dll";
@@ -69,7 +69,7 @@ std::string Fmu::dll_suffix() {
 #endif
 }
 
-void Fmu::init(const DaeBuilderInternal* dae) {
+void Fmu2::init(const DaeBuilderInternal* dae) {
   // Mark input indices
   size_t numel = 0;
   std::vector<bool> lookup(dae->n_variables(), false);
@@ -311,26 +311,26 @@ void Fmu::init(const DaeBuilderInternal* dae) {
   setup_experiment(c);
   // Set all values
   if (set_values(c)) {
-    casadi_error("Fmu::set_values failed");
+    casadi_error("Fmu2::set_values failed");
   }
   // Initialization mode begins
   if (enter_initialization_mode(c)) {
-    casadi_error("Fmu::enter_initialization_mode failed");
+    casadi_error("Fmu2::enter_initialization_mode failed");
   }
   // Get input values
   if (get_in(c, &value_in_)) {
-    casadi_error("Fmu::get_in failed");
+    casadi_error("Fmu2::get_in failed");
   }
   // Get auxilliary variables
   if (get_aux(c, &aux_value_)) {
-    casadi_error("Fmu::get_aux failed");
+    casadi_error("Fmu2::get_aux failed");
   }
   // Free memory
   free_instance(c);
 }
 
 template<typename T>
-T* Fmu::load_function(const std::string& symname) {
+T* Fmu2::load_function(const std::string& symname) {
   // Load the function
   signal_t f = li_.get_function(symname);
   // Ensure that it was found
@@ -339,7 +339,7 @@ T* Fmu::load_function(const std::string& symname) {
   return reinterpret_cast<T*>(f);
 }
 
-void Fmu::logger(fmi2ComponentEnvironment componentEnvironment,
+void Fmu2::logger(fmi2ComponentEnvironment componentEnvironment,
     fmi2String instanceName,
     fmi2Status status,
     fmi2String category,
@@ -371,7 +371,7 @@ void Fmu::logger(fmi2ComponentEnvironment componentEnvironment,
   casadi_assert(n>=0, "Print failure while processing '" + std::string(message) + "'");
 }
 
-fmi2Component Fmu::instantiate() const {
+fmi2Component Fmu2::instantiate() const {
   // Instantiate FMU
   fmi2String instanceName = instance_name_.c_str();
   fmi2Type fmuType = fmi2ModelExchange;
@@ -384,7 +384,7 @@ fmi2Component Fmu::instantiate() const {
   return c;
 }
 
-void Fmu::free_instance(fmi2Component c) const {
+void Fmu2::free_instance(fmi2Component c) const {
   if (free_instance_) {
     free_instance_(c);
   } else {
@@ -392,7 +392,7 @@ void Fmu::free_instance(fmi2Component c) const {
   }
 }
 
-int Fmu::init_mem(FmuMemory* m) const {
+int Fmu2::init_mem(FmuMemory* m) const {
   // Ensure not already instantiated
   casadi_assert(m->instance == 0, "Already instantiated");
   // Create instance
@@ -401,7 +401,7 @@ int Fmu::init_mem(FmuMemory* m) const {
   setup_experiment(m->instance);
   // Set all values
   if (set_values(m->instance)) {
-    casadi_warning("Fmu::set_values failed");
+    casadi_warning("Fmu2::set_values failed");
     return 1;
   }
   // Initialization mode begins
@@ -432,13 +432,13 @@ int Fmu::init_mem(FmuMemory* m) const {
   return 0;
 }
 
-void Fmu::setup_experiment(fmi2Component c) const {
+void Fmu2::setup_experiment(fmi2Component c) const {
   // Call fmi2SetupExperiment
   fmi2Status status = setup_experiment_(c, fmutol_ > 0, fmutol_, 0., fmi2True, 1.);
   casadi_assert(status == fmi2OK, "fmi2SetupExperiment failed");
 }
 
-int Fmu::reset(fmi2Component c) {
+int Fmu2::reset(fmi2Component c) {
   fmi2Status status = reset_(c);
   if (status != fmi2OK) {
     casadi_warning("fmi2Reset failed");
@@ -447,7 +447,7 @@ int Fmu::reset(fmi2Component c) {
   return 0;
 }
 
-int Fmu::enter_initialization_mode(fmi2Component c) const {
+int Fmu2::enter_initialization_mode(fmi2Component c) const {
   fmi2Status status = enter_initialization_mode_(c);
   if (status != fmi2OK) {
     casadi_warning("fmi2EnterInitializationMode failed: " + str(status));
@@ -456,7 +456,7 @@ int Fmu::enter_initialization_mode(fmi2Component c) const {
   return 0;
 }
 
-int Fmu::exit_initialization_mode(fmi2Component c) const {
+int Fmu2::exit_initialization_mode(fmi2Component c) const {
   fmi2Status status = exit_initialization_mode_(c);
   if (status != fmi2OK) {
     casadi_warning("fmi2ExitInitializationMode failed");
@@ -465,7 +465,7 @@ int Fmu::exit_initialization_mode(fmi2Component c) const {
   return 0;
 }
 
-int Fmu::set_values(fmi2Component c) const {
+int Fmu2::set_values(fmi2Component c) const {
   // Pass real values before initialization
   if (!vr_real_.empty()) {
     fmi2Status status = set_real_(c, get_ptr(vr_real_), vr_real_.size(), get_ptr(init_real_));
@@ -505,7 +505,7 @@ int Fmu::set_values(fmi2Component c) const {
   return 0;
 }
 
-int Fmu::get_in(fmi2Component c, std::vector<fmi2Real>* v) const {
+int Fmu2::get_in(fmi2Component c, std::vector<fmi2Real>* v) const {
   if (!vr_in_.empty()) {
     fmi2Status status = get_real_(c, get_ptr(vr_in_), vr_in_.size(), get_ptr(*v));
     if (status != fmi2OK) {
@@ -517,7 +517,7 @@ int Fmu::get_in(fmi2Component c, std::vector<fmi2Real>* v) const {
   return 0;
 }
 
-int Fmu::get_aux(fmi2Component c, Value* v) const {
+int Fmu2::get_aux(fmi2Component c, Value* v) const {
   // Get real auxilliary variables
   if (!vr_aux_real_.empty()) {
     fmi2Status status = get_real_(c, get_ptr(vr_aux_real_), vr_aux_real_.size(),
@@ -558,7 +558,7 @@ int Fmu::get_aux(fmi2Component c, Value* v) const {
   return 0;
 }
 
-void Fmu::get_stats(FmuMemory* m, Dict* stats,
+void Fmu2::get_stats(FmuMemory* m, Dict* stats,
     const std::vector<std::string>& name_in, const InputStruct* in) const {
   // To do: Use auxillary variables from last evaluation
   (void)m;  // unused
@@ -599,7 +599,7 @@ void Fmu::get_stats(FmuMemory* m, Dict* stats,
   }
 }
 
-void Fmu::set(FmuMemory* m, size_t ind, const double* value) const {
+void Fmu2::set(FmuMemory* m, size_t ind, const double* value) const {
   if (value) {
     // Argument is given
     for (size_t id : ired_[ind]) {
@@ -620,7 +620,7 @@ void Fmu::set(FmuMemory* m, size_t ind, const double* value) const {
   }
 }
 
-void Fmu::request(FmuMemory* m, size_t ind) const {
+void Fmu2::request(FmuMemory* m, size_t ind) const {
   for (size_t id : ored_[ind]) {
     // Mark as requested
     m->requested_.at(id) = true;
@@ -629,7 +629,7 @@ void Fmu::request(FmuMemory* m, size_t ind) const {
   }
 }
 
-int Fmu::eval(FmuMemory* m) const {
+int Fmu2::eval(FmuMemory* m) const {
   // Gather inputs and outputs
   gather_io(m);
   // Number of inputs and outputs
@@ -661,14 +661,14 @@ int Fmu::eval(FmuMemory* m) const {
   return 0;
 }
 
-void Fmu::get(FmuMemory* m, size_t ind, double* value) const {
+void Fmu2::get(FmuMemory* m, size_t ind, double* value) const {
   // Save to return
   for (size_t id : ored_[ind]) {
     *value++ = m->obuf_.at(id);
   }
 }
 
-void Fmu::set_seed(FmuMemory* m, casadi_int nseed, const casadi_int* id, const double* v) const {
+void Fmu2::set_seed(FmuMemory* m, casadi_int nseed, const casadi_int* id, const double* v) const {
   for (casadi_int i = 0; i < nseed; ++i) {
     m->seed_.at(*id) = *v++;
     m->changed_.at(*id) = true;
@@ -676,7 +676,7 @@ void Fmu::set_seed(FmuMemory* m, casadi_int nseed, const casadi_int* id, const d
   }
 }
 
-void Fmu::request_sens(FmuMemory* m, casadi_int nsens, const casadi_int* id,
+void Fmu2::request_sens(FmuMemory* m, casadi_int nsens, const casadi_int* id,
     const casadi_int* wrt_id) const {
   for (casadi_int i = 0; i < nsens; ++i) {
     m->requested_.at(*id) = true;
@@ -685,13 +685,13 @@ void Fmu::request_sens(FmuMemory* m, casadi_int nsens, const casadi_int* id,
   }
 }
 
-void Fmu::get_sens(FmuMemory* m, casadi_int nsens, const casadi_int* id, double* v) const {
+void Fmu2::get_sens(FmuMemory* m, casadi_int nsens, const casadi_int* id, double* v) const {
   for (casadi_int i = 0; i < nsens; ++i) {
     *v++ = m->sens_.at(*id++);
   }
 }
 
-void Fmu::gather_io(FmuMemory* m) const {
+void Fmu2::gather_io(FmuMemory* m) const {
   // Collect input indices and corresponding value references and values
   m->id_in_.clear();
   m->vr_in_.clear();
@@ -716,7 +716,7 @@ void Fmu::gather_io(FmuMemory* m) const {
   }
 }
 
-void Fmu::gather_sens(FmuMemory* m) const {
+void Fmu2::gather_sens(FmuMemory* m) const {
   // Gather input and output indices
   gather_io(m);
   // Number of inputs and outputs
@@ -735,7 +735,7 @@ void Fmu::gather_sens(FmuMemory* m) const {
   m->d_out_.resize(n_unknown);
 }
 
-int Fmu::eval_ad(FmuMemory* m) const {
+int Fmu2::eval_ad(FmuMemory* m) const {
   // Number of inputs and outputs
   size_t n_known = m->id_in_.size();
   size_t n_unknown = m->id_out_.size();
@@ -763,7 +763,7 @@ int Fmu::eval_ad(FmuMemory* m) const {
   return 0;
 }
 
-int Fmu::eval_fd(FmuMemory* m, bool independent_seeds) const {
+int Fmu2::eval_fd(FmuMemory* m, bool independent_seeds) const {
   // Number of inputs and outputs
   size_t n_known = m->id_in_.size();
   size_t n_unknown = m->id_out_.size();
@@ -987,7 +987,7 @@ int Fmu::eval_fd(FmuMemory* m, bool independent_seeds) const {
   return 0;
 }
 
-int Fmu::eval_derivative(FmuMemory* m, bool independent_seeds) const {
+int Fmu2::eval_derivative(FmuMemory* m, bool independent_seeds) const {
   // Gather input and output indices
   gather_sens(m);
   // Calculate derivatives using FMU directional derivative support
@@ -1003,7 +1003,7 @@ int Fmu::eval_derivative(FmuMemory* m, bool independent_seeds) const {
   return 0;
 }
 
-Sparsity Fmu::jac_sparsity(const std::vector<size_t>& osub, const std::vector<size_t>& isub) const {
+Sparsity Fmu2::jac_sparsity(const std::vector<size_t>& osub, const std::vector<size_t>& isub) const {
   // Convert to casadi_int type
   std::vector<casadi_int> osub1(osub.begin(), osub.end());
   std::vector<casadi_int> isub1(isub.begin(), isub.end());
@@ -1013,7 +1013,7 @@ Sparsity Fmu::jac_sparsity(const std::vector<size_t>& osub, const std::vector<si
   return jac_sp_.sub(osub1, isub1, mapping);
 }
 
-Sparsity Fmu::hess_sparsity(const std::vector<size_t>& r, const std::vector<size_t>& c) const {
+Sparsity Fmu2::hess_sparsity(const std::vector<size_t>& r, const std::vector<size_t>& c) const {
   // Convert to casadi_int type
   std::vector<casadi_int> r1(r.begin(), r.end());
   std::vector<casadi_int> c1(c.begin(), c.end());
@@ -1023,7 +1023,7 @@ Sparsity Fmu::hess_sparsity(const std::vector<size_t>& r, const std::vector<size
   return hess_sp_.sub(r1, c1, mapping);
 }
 
-std::vector<double> Fmu::get_nominal_in(casadi_int i) const {
+std::vector<double> Fmu2::get_nominal_in(casadi_int i) const {
   auto&& ind = ired_.at(i);
   std::vector<double> n;
   n.reserve(ind.size());
@@ -1031,7 +1031,7 @@ std::vector<double> Fmu::get_nominal_in(casadi_int i) const {
   return n;
 }
 
-std::vector<double> Fmu::get_nominal_out(casadi_int i) const {
+std::vector<double> Fmu2::get_nominal_out(casadi_int i) const {
   auto&& ind = ored_.at(i);
   std::vector<double> n;
   n.reserve(ind.size());
@@ -1039,7 +1039,7 @@ std::vector<double> Fmu::get_nominal_out(casadi_int i) const {
   return n;
 }
 
-Fmu::Fmu(const std::vector<std::string>& scheme_in,
+Fmu2::Fmu2(const std::vector<std::string>& scheme_in,
     const std::vector<std::string>& scheme_out,
     const std::map<std::string, std::vector<size_t>>& scheme,
     const std::vector<std::string>& aux)
@@ -1058,7 +1058,7 @@ Fmu::Fmu(const std::vector<std::string>& scheme_in,
   get_directional_derivative_ = 0;
 }
 
-size_t Fmu::index_in(const std::string& n) const {
+size_t Fmu2::index_in(const std::string& n) const {
   // Linear search for the input
   for (size_t i = 0; i < scheme_in_.size(); ++i) {
     if (scheme_in_[i] == n) return i;
@@ -1068,7 +1068,7 @@ size_t Fmu::index_in(const std::string& n) const {
   return -1;
 }
 
-size_t Fmu::index_out(const std::string& n) const {
+size_t Fmu2::index_out(const std::string& n) const {
   // Linear search for the input
   for (size_t i = 0; i < scheme_out_.size(); ++i) {
     if (scheme_out_[i] == n) return i;

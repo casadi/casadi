@@ -42,9 +42,9 @@ struct FmuMemory;
 struct InputStruct;
 
 // Interface to binary FMU (shared between derivatives)
-struct CASADI_EXPORT Fmu {
+struct CASADI_EXPORT Fmu2 {
   // Constructor
-  Fmu(const std::vector<std::string>& scheme_in, const std::vector<std::string>& scheme_out,
+  Fmu2(const std::vector<std::string>& scheme_in, const std::vector<std::string>& scheme_out,
     const std::map<std::string, std::vector<size_t>>& scheme, const std::vector<std::string>& aux);
 
   // Initialize
