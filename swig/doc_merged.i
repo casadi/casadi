@@ -29282,7 +29282,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L129
 ";
 
 
-// File: namespace_0d359.xml
+// File: namespace_0d362.xml
 
 
 // File: namespacecasadi.xml

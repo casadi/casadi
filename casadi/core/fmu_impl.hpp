@@ -48,7 +48,8 @@ struct InputStruct;
 
     \author Joel Andersson
     \date 2023
-*/
+
+    \identifier{26k} */
 class CASADI_EXPORT Fmu2 : public SharedObjectInternal {
  public:
   // Constructor
@@ -59,10 +60,14 @@ class CASADI_EXPORT Fmu2 : public SharedObjectInternal {
   /// Destructor
   ~Fmu2() override;
 
-  /** \brief Get type name */
+  /** \brief Get type name
+
+      \identifier{26l} */
   std::string class_name() const override { return "Fmu2";}
 
-  /** \brief Print */
+  /** \brief Print
+
+      \identifier{26m} */
   void disp(std::ostream& stream, bool more) const override;
 
   // Initialize
@@ -156,10 +161,14 @@ class CASADI_EXPORT Fmu2 : public SharedObjectInternal {
   // Sparsity pattern for extended Jacobian, Hessian
   Sparsity jac_sp_, hess_sp_;
 
-  /** \brief Get the number of scheme inputs */
+  /** \brief Get the number of scheme inputs
+
+      \identifier{26n} */
   size_t n_in() const { return iind_.size();}
 
-  /** \brief Get the number of scheme outputs */
+  /** \brief Get the number of scheme outputs
+
+      \identifier{26o} */
   size_t n_out() const { return oind_.size();}
 
   // Index lookup for input
@@ -202,11 +211,15 @@ class CASADI_EXPORT Fmu2 : public SharedObjectInternal {
   // Retrieve auxilliary variables from FMU
   int get_aux(fmi2Component c, Value* v) const;
 
-  /** \brief Get stats */
+  /** \brief Get stats
+
+      \identifier{26p} */
   void get_stats(FmuMemory* m, Dict* stats,
     const std::vector<std::string>& name_in, const InputStruct* in) const;
 
-  /** \brief Initalize memory block */
+  /** \brief Initalize memory block
+
+      \identifier{26q} */
   int init_mem(FmuMemory* m) const;
 
   // Set value
@@ -253,7 +266,9 @@ class CASADI_EXPORT Fmu2 : public SharedObjectInternal {
   Sparsity hess_sparsity(const std::vector<size_t>& r, const std::vector<size_t>& c) const;
 
   /// @{
-  /** \brief Retreive nominal values */
+  /** \brief Retreive nominal values
+
+      \identifier{26r} */
   std::vector<double> all_nominal_in(size_t i) const;
   std::vector<double> all_nominal_out(size_t i) const;
   /// @}
