@@ -2194,7 +2194,6 @@ Function DaeBuilderInternal::fmu_fun(const std::string& name,
     const std::vector<std::string>& name_in,
     const std::vector<std::string>& name_out,
     const Dict& opts) const {
-#ifdef WITH_FMU
   // Iterator for options lookup
   Dict::const_iterator it;
   // Scheme inputs
@@ -2267,10 +2266,6 @@ Function DaeBuilderInternal::fmu_fun(const std::string& name,
 
   // Crete new function
   return Function::create(new FmuFunction(name, fmu, name_in, name_out), opts);
-#else  // WITH_FMU
-  casadi_error("FMU support not enabled. Recompile CasADi with 'WITH_FMU=ON'");
-  return Function();
-#endif  // WITH_FMU
 }
 
 Function DaeBuilderInternal::gather_eq() const {

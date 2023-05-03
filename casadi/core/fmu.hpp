@@ -26,8 +26,6 @@
 #ifndef CASADI_FMU_HPP
 #define CASADI_FMU_HPP
 
-#ifdef WITH_FMU
-
 #include "shared_object.hpp"
 #include "printable.hpp"
 #include "sparsity.hpp"
@@ -181,7 +179,5 @@ class CASADI_EXPORT Fmu
 } // namespace casadi
 
 /// \endcond
-
-#endif  // WITH_FMU
 
 #endif // CASADI_FMU_HPP

@@ -3,10 +3,10 @@ cmake_minimum_required(VERSION 3.10.2)
 # Create runtime
 add_subdirectory(runtime)
 
-# FMU headers
-if(WITH_FMU)
-  # FMU C API
-  include_directories(${FMU_INCLUDE_DIR})
+if(WITH_FMI2)
+  # FMI C API, version 2
+  add_definitions(-DWITH_FMI2)
+  include_directories(${FMI2_INCLUDE_DIR})
 endif()
 
 set(CASADI_PUBLIC
@@ -170,7 +170,7 @@ set(CASADI_INTERNAL
   sx_function.hpp         sx_function.cpp
   mx_function.hpp         mx_function.cpp
   external_impl.hpp       external.cpp
-  fmu_impl.hpp            fmu.cpp
+  fmu_impl.hpp            fmu.cpp fmu2.hpp fmu2.cpp
   fmu_function.hpp        fmu_function.cpp
   jit_function.hpp        jit_function.cpp
   linsol.cpp              linsol_internal.hpp  linsol_internal.cpp

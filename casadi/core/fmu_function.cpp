@@ -47,8 +47,6 @@
 
 namespace casadi {
 
-#ifdef WITH_FMU
-
 int FmuFunction::init_mem(void* mem) const {
   casadi_assert(mem != 0, "Memory is null");
   // Instantiate base classes
@@ -1402,7 +1400,5 @@ Dict FmuFunction::get_stats(void *mem) const {
   // Return stats
   return stats;
 }
-
-#endif  // WITH_FMU
 
 } // namespace casadi

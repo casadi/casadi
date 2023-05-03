@@ -26,8 +26,6 @@
 #ifndef CASADI_FMU_FUNCTION_HPP
 #define CASADI_FMU_FUNCTION_HPP
 
-#ifdef WITH_FMU
-
 #include "function_internal.hpp"
 #include "fmu.hpp"
 #include "finite_differences.hpp"
@@ -332,7 +330,5 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
 
 } // namespace casadi
 /// \endcond
-
-#endif  // WITH_FMU
 
 #endif // CASADI_FMU_FUNCTION_HPP

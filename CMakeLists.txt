@@ -505,13 +505,12 @@ if(WITH_DL)
 endif()
 add_feature_info(dynamic-loading WITH_DL "Compile with support for dynamic loading of generated functions (needed for ExternalFunction)")
 
-# Dynamically loading FMU libraries
-option(WITH_FMU "Enable dynamic loading of functions" ON)
-if(WITH_FMU)
-  add_definitions(-DWITH_FMU)
-  set(FMU_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/external_packages/FMI-Standard-2.0.2/headers)
+# Support for import of FMI 2.0 binaries
+option(WITH_FMI2 "Compile with support for import of FMI 2.0 binaries" ON)
+if(WITH_FMI2)
+  set(FMI2_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/external_packages/FMI-Standard-2.0.2/headers)
 endif()
-add_feature_info(dynamic-loading WITH_FMU "Compile with support for dynamic loading of FMU libraries")
+add_feature_info(dynamic-loading WITH_FMI2 "Support for import of FMI 2.0 binaries")
 
 # Include support for deprecated features (to be removed in the next release)
 option(WITH_DEPRECATED_FEATURES "Compile with syntax that is scheduled to be deprecated" ON)
