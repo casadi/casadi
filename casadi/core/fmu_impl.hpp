@@ -44,7 +44,8 @@ struct InputStruct;
 
     \author Joel Andersson
     \date 2023
-*/
+
+    \identifier{26z} */
 class CASADI_EXPORT FmuInternal : public SharedObjectInternal {
   friend class Fmu;
  public:
@@ -64,7 +65,9 @@ class CASADI_EXPORT FmuInternal : public SharedObjectInternal {
       \identifier{26m} */
   void disp(std::ostream& stream, bool more) const override;
 
-  /** \brief Get the number of scheme inputs */
+  /** \brief Get the number of scheme inputs
+
+      \identifier{270} */
   size_t n_in() const { return iind_.size();}
 
   /** \brief Get the number of scheme outputs
@@ -102,7 +105,9 @@ class CASADI_EXPORT FmuInternal : public SharedObjectInternal {
   template<typename T>
   T* load_function(const std::string& symname);
 
-  /** \brief Initalize memory block */
+  /** \brief Initalize memory block
+
+      \identifier{271} */
   virtual int init_mem(FmuMemory* m) const = 0;
 
   // Free FMU instance
@@ -147,7 +152,9 @@ class CASADI_EXPORT FmuInternal : public SharedObjectInternal {
   // Gather user inputs and outputs
   void gather_io(FmuMemory* m) const;
 
-  /** \brief Get stats */
+  /** \brief Get stats
+
+      \identifier{272} */
   virtual void get_stats(FmuMemory* m, Dict* stats,
     const std::vector<std::string>& name_in, const InputStruct* in) const = 0;
 

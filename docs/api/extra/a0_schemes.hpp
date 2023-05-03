@@ -41,6 +41,18 @@
 <tr><td>DPLE_P</td><td>p</td><td>Lyapunov matrix (horzcat when const_dim, diagcat otherwise) (Cholesky of P if pos_def) [p].</td></tr>
 </table>
 */
+/** \defgroup scheme_InputType
+<a name='schemes'></a><table>
+<caption>Input scheme: casadi::InputType  ( = 4)</caption>
+<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
+</table>
+*/
+/** \defgroup scheme_OutputType
+<a name='schemes'></a><table>
+<caption>Output scheme: casadi::OutputType  ( = 7)</caption>
+<tr><th>Full name</th><th>Short</th><th>Description</th></tr>
+</table>
+*/
 /** \defgroup scheme_IntegratorInput
 <a name='schemes'></a><table>
 <caption>Input scheme: casadi::IntegratorInput  (INTEGRATOR_NUM_IN = 7)</caption>
