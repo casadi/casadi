@@ -49,7 +49,150 @@ struct InputStruct;
     \author Joel Andersson
     \date 2023
 */
-class CASADI_EXPORT Fmu2 : public SharedObjectInternal {
+class CASADI_EXPORT FmuInternal : public SharedObjectInternal {
+  friend class Fmu;
+ public:
+  // Constructor
+  FmuInternal(const std::string& name,
+    const std::vector<std::string>& scheme_in, const std::vector<std::string>& scheme_out,
+    const std::map<std::string, std::vector<size_t>>& scheme, const std::vector<std::string>& aux);
+
+  /// Destructor
+  ~FmuInternal() override;
+
+  // Initialize
+  virtual void init(const DaeBuilderInternal* dae) = 0;
+
+  /** \brief Print */
+  void disp(std::ostream& stream, bool more) const override;
+
+  /** \brief Get the number of scheme inputs */
+  size_t n_in() const { return iind_.size();}
+
+  /** \brief Get the number of scheme outputs */
+  size_t n_out() const { return oind_.size();}
+
+  // Index lookup for input
+  size_t index_in(const std::string& n) const;
+
+  // Index lookup for output
+  size_t index_out(const std::string& n) const;
+
+  // Does the FMU support analytic derivatives?
+  virtual bool has_ad() const = 0;
+
+  // Get Jacobian sparsity for a subset of inputs and outputs
+  Sparsity jac_sparsity(const std::vector<size_t>& osub, const std::vector<size_t>& isub) const;
+
+  // Get Hessian sparsity for a subset of inputs
+  Sparsity hess_sparsity(const std::vector<size_t>& r, const std::vector<size_t>& c) const;
+
+  /// @{
+  /** \brief Retreive nominal values */
+  std::vector<double> all_nominal_in(size_t i) const;
+  std::vector<double> all_nominal_out(size_t i) const;
+  /// @}
+
+  // Print description of an input
+  std::string desc_in(FmuMemory* m, size_t id, bool more = true) const;
+
+  // Load an FMI function
+  template<typename T>
+  T* load_function(const std::string& symname);
+
+  /** \brief Initalize memory block */
+  virtual int init_mem(FmuMemory* m) const = 0;
+
+  // Free FMU instance
+  virtual void free_instance(void* c) const = 0;
+
+  // Set value
+  virtual void set(FmuMemory* m, size_t ind, const double* value) const = 0;
+
+  // Request the calculation of a variable
+  virtual void request(FmuMemory* m, size_t ind) const = 0;
+
+  // Calculate all requested variables
+  virtual int eval(FmuMemory* m) const = 0;
+
+  // Get a calculated variable
+  virtual void get(FmuMemory* m, size_t id, double* value) const = 0;
+
+  // Set seed
+  virtual void set_seed(FmuMemory* m, casadi_int nseed,
+    const casadi_int* id, const double* v) const = 0;
+
+  // Request the calculation of a sensitivity
+  virtual void request_sens(FmuMemory* m, casadi_int nsens, const casadi_int* id,
+    const casadi_int* wrt_id) const = 0;
+
+  // Calculate directional derivatives
+  virtual int eval_derivative(FmuMemory* m, bool independent_seeds) const = 0;
+
+  // Get calculated derivatives
+  virtual void get_sens(FmuMemory* m, casadi_int nsens,
+    const casadi_int* id, double* v) const = 0;
+
+  // Gather user sensitivities
+  virtual void gather_sens(FmuMemory* m) const = 0;
+
+  /** \brief Get stats */
+  virtual void get_stats(FmuMemory* m, Dict* stats,
+    const std::vector<std::string>& name_in, const InputStruct* in) const = 0;
+
+ protected:
+
+  /// Instance name
+  std::string name_;
+
+  // IO scheme
+  std::vector<std::string> scheme_in_, scheme_out_;
+  std::map<std::string, std::vector<size_t>> scheme_;
+
+  // Auxilliary outputs
+  std::vector<std::string> aux_;
+
+  /// DLL
+  Importer li_;
+
+  // Mapping from scheme variable to and from FMU variable indices
+  std::vector<size_t> iind_, iind_map_, oind_, oind_map_;
+
+  // Meta information about the input/output variable subsets
+  std::vector<double> nominal_in_, nominal_out_;
+  std::vector<double> min_in_, min_out_;
+  std::vector<double> max_in_, max_out_;
+  std::vector<std::string> vn_in_, vn_out_;
+  std::vector<unsigned int> vr_in_, vr_out_;
+
+  // Numerical values for inputs
+  std::vector<double> value_in_;
+
+  // Reduced space indices for all inputs and outputs
+  std::vector<std::vector<size_t>> ired_, ored_;
+
+  // Sparsity pattern for extended Jacobian, Hessian
+  Sparsity jac_sp_, hess_sp_;
+};
+
+template<typename T>
+T* FmuInternal::load_function(const std::string& symname) {
+  // Load the function
+  signal_t f = li_.get_function(symname);
+  // Ensure that it was found
+  casadi_assert(f != 0, "Cannot retrieve '" + symname + "'");
+  // Return function with the right type
+  return reinterpret_cast<T*>(f);
+}
+
+/** \brief Interface to binary FMU
+
+    Internal API.
+
+    \author Joel Andersson
+    \date 2023
+*/
+class CASADI_EXPORT Fmu2 : public FmuInternal {
  public:
   // Constructor
   Fmu2(const std::string& name,
@@ -62,40 +205,8 @@ class CASADI_EXPORT Fmu2 : public SharedObjectInternal {
   /** \brief Get type name */
   std::string class_name() const override { return "Fmu2";}
 
-  /** \brief Print */
-  void disp(std::ostream& stream, bool more) const override;
-
   // Initialize
-  void init(const DaeBuilderInternal* dae);
-
-  /// Instance name
-  std::string name_;
-
-  // DLL
-  Importer li_;
-
-  // IO scheme
-  std::vector<std::string> scheme_in_, scheme_out_;
-  std::map<std::string, std::vector<size_t>> scheme_;
-
-  // Auxilliary outputs
-  std::vector<std::string> aux_;
-
-  // Mapping from scheme variable to and from FMU variable indices
-  std::vector<size_t> iind_, iind_map_, oind_, oind_map_;
-
-  // Meta information about the input/output variable subsets
-  std::vector<double> nominal_in_, nominal_out_;
-  std::vector<double> min_in_, min_out_;
-  std::vector<double> max_in_, max_out_;
-  std::vector<std::string> vn_in_, vn_out_;
-  std::vector<fmi2ValueReference> vr_in_, vr_out_;
-
-  // Numerical values for inputs
-  std::vector<fmi2Real> value_in_;
-
-  // Reduced space indices for all inputs and outputs
-  std::vector<std::vector<size_t>> ired_, ored_;
+  void init(const DaeBuilderInternal* dae) override;
 
   // FMU C API function prototypes. Cf. FMI specification 2.0.2
   fmi2InstantiateTYPE* instantiate_;
@@ -153,33 +264,14 @@ class CASADI_EXPORT Fmu2 : public SharedObjectInternal {
   std::vector<fmi2ValueReference> vr_aux_real_, vr_aux_integer_, vr_aux_boolean_, vr_aux_string_;
   Value aux_value_;
 
-  // Sparsity pattern for extended Jacobian, Hessian
-  Sparsity jac_sp_, hess_sp_;
-
-  /** \brief Get the number of scheme inputs */
-  size_t n_in() const { return iind_.size();}
-
-  /** \brief Get the number of scheme outputs */
-  size_t n_out() const { return oind_.size();}
-
-  // Index lookup for input
-  size_t index_in(const std::string& n) const;
-
-  // Index lookup for output
-  size_t index_out(const std::string& n) const;
-
   // Does the FMU support analytic derivatives?
-  bool has_ad() const { return get_directional_derivative_ != nullptr; }
-
-  // Load an FMI function
-  template<typename T>
-  T* load_function(const std::string& symname);
+  bool has_ad() const override { return get_directional_derivative_ != nullptr; }
 
   // New memory object
   fmi2Component instantiate() const;
 
   // Free FMU instance
-  void free_instance(void* c) const;
+  void free_instance(void* c) const override;
 
   // Reset solver
   int reset(fmi2Component c);
@@ -204,38 +296,37 @@ class CASADI_EXPORT Fmu2 : public SharedObjectInternal {
 
   /** \brief Get stats */
   void get_stats(FmuMemory* m, Dict* stats,
-    const std::vector<std::string>& name_in, const InputStruct* in) const;
+    const std::vector<std::string>& name_in, const InputStruct* in) const override;
 
   /** \brief Initalize memory block */
-  int init_mem(FmuMemory* m) const;
+  int init_mem(FmuMemory* m) const override;
 
   // Set value
-  void set(FmuMemory* m, size_t ind, const double* value) const;
+  void set(FmuMemory* m, size_t ind, const double* value) const override;
 
   // Request the calculation of a variable
-  void request(FmuMemory* m, size_t ind) const;
+  void request(FmuMemory* m, size_t ind) const override;
 
   // Gather user inputs and outputs
   void gather_io(FmuMemory* m) const;
 
   // Calculate all requested variables
-  int eval(FmuMemory* m) const;
+  int eval(FmuMemory* m) const override;
 
   // Get a calculated variable
-  void get(FmuMemory* m, size_t id, double* value) const;
+  void get(FmuMemory* m, size_t id, double* value) const override;
 
   // Set seed
-  void set_seed(FmuMemory* m, casadi_int nseed, const casadi_int* id, const double* v) const;
+  void set_seed(FmuMemory* m, casadi_int nseed,
+    const casadi_int* id, const double* v) const override;
 
   // Request the calculation of a sensitivity
   void request_sens(FmuMemory* m, casadi_int nsens, const casadi_int* id,
-    const casadi_int* wrt_id) const;
+    const casadi_int* wrt_id) const override;
 
   // Get calculated derivatives
-  void get_sens(FmuMemory* m, casadi_int nsens, const casadi_int* id, double* v) const;
-
-  // Gather user sensitivities
-  void gather_sens(FmuMemory* m) const;
+  void get_sens(FmuMemory* m, casadi_int nsens,
+    const casadi_int* id, double* v) const override;
 
   // Calculate directional derivatives using AD
   int eval_ad(FmuMemory* m) const;
@@ -244,22 +335,10 @@ class CASADI_EXPORT Fmu2 : public SharedObjectInternal {
   int eval_fd(FmuMemory* m, bool independent_seeds) const;
 
   // Calculate directional derivatives
-  int eval_derivative(FmuMemory* m, bool independent_seeds) const;
+  int eval_derivative(FmuMemory* m, bool independent_seeds) const override;
 
-  // Get Jacobian sparsity for a subset of inputs and outputs
-  Sparsity jac_sparsity(const std::vector<size_t>& osub, const std::vector<size_t>& isub) const;
-
-  // Get Hessian sparsity for a subset of inputs
-  Sparsity hess_sparsity(const std::vector<size_t>& r, const std::vector<size_t>& c) const;
-
-  /// @{
-  /** \brief Retreive nominal values */
-  std::vector<double> all_nominal_in(size_t i) const;
-  std::vector<double> all_nominal_out(size_t i) const;
-  /// @}
-
-  // Print description of an input
-  std::string desc_in(FmuMemory* m, size_t id, bool more = true) const;
+  // Gather user sensitivities
+  void gather_sens(FmuMemory* m) const override;
 
   // Name of system, per the FMI specification
   static std::string system_infix();

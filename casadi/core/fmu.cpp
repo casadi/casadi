@@ -52,16 +52,16 @@ Fmu::Fmu(const std::string& name, FmuApi api, const DaeBuilderInternal* dae,
   }
 }
 
-Fmu2* Fmu::operator->() {
-  return static_cast<Fmu2*>(SharedObject::operator->());
+FmuInternal* Fmu::operator->() {
+  return static_cast<FmuInternal*>(SharedObject::operator->());
 }
 
-const Fmu2* Fmu::operator->() const {
-  return static_cast<const Fmu2*>(SharedObject::operator->());
+const FmuInternal* Fmu::operator->() const {
+  return static_cast<const FmuInternal*>(SharedObject::operator->());
 }
 
-Fmu2* Fmu::get() const {
-  return static_cast<Fmu2*>(SharedObject::get());
+FmuInternal* Fmu::get() const {
+  return static_cast<FmuInternal*>(SharedObject::get());
 }
 
 const std::string& Fmu::name() const {
@@ -293,10 +293,18 @@ void Fmu::get_stats(FmuMemory* m, Dict* stats,
   }
 }
 
-Fmu2::~Fmu2() {
+FmuInternal::FmuInternal(const std::string& name,
+    const std::vector<std::string>& scheme_in,
+    const std::vector<std::string>& scheme_out,
+    const std::map<std::string, std::vector<size_t>>& scheme,
+    const std::vector<std::string>& aux)
+    : name_(name), scheme_in_(scheme_in), scheme_out_(scheme_out), scheme_(scheme), aux_(aux) {
 }
 
-void Fmu2::disp(std::ostream& stream, bool more) const {
+FmuInternal::~FmuInternal() {
+}
+
+void FmuInternal::disp(std::ostream& stream, bool more) const {
   (void)more;  // unused
   stream << name_ << " " << class_name();
 }
@@ -309,7 +317,65 @@ std::string to_string(FmuApi v) {
   return "";
 }
 
-std::string Fmu2::desc_in(FmuMemory* m, size_t id, bool more) const {
+size_t FmuInternal::index_in(const std::string& n) const {
+  // Linear search for the input
+  for (size_t i = 0; i < scheme_in_.size(); ++i) {
+    if (scheme_in_[i] == n) return i;
+  }
+  // Not found
+  casadi_error("No such input: " + n);
+  return -1;
+}
+
+size_t FmuInternal::index_out(const std::string& n) const {
+  // Linear search for the input
+  for (size_t i = 0; i < scheme_out_.size(); ++i) {
+    if (scheme_out_[i] == n) return i;
+  }
+  // Not found
+  casadi_error("No such output: " + n);
+  return -1;
+}
+
+Sparsity FmuInternal::jac_sparsity(const std::vector<size_t>& osub,
+    const std::vector<size_t>& isub) const {
+  // Convert to casadi_int type
+  std::vector<casadi_int> osub1(osub.begin(), osub.end());
+  std::vector<casadi_int> isub1(isub.begin(), isub.end());
+  // Index mapping (not used)
+  std::vector<casadi_int> mapping;
+  // Get selection
+  return jac_sp_.sub(osub1, isub1, mapping);
+}
+
+Sparsity FmuInternal::hess_sparsity(const std::vector<size_t>& r,
+    const std::vector<size_t>& c) const {
+  // Convert to casadi_int type
+  std::vector<casadi_int> r1(r.begin(), r.end());
+  std::vector<casadi_int> c1(c.begin(), c.end());
+  // Index mapping (not used)
+  std::vector<casadi_int> mapping;
+  // Get selection
+  return hess_sp_.sub(r1, c1, mapping);
+}
+
+std::vector<double> FmuInternal::all_nominal_in(size_t i) const {
+  auto&& ind = ired_.at(i);
+  std::vector<double> n;
+  n.reserve(ind.size());
+  for (size_t k : ind) n.push_back(nominal_in_.at(k));
+  return n;
+}
+
+std::vector<double> FmuInternal::all_nominal_out(size_t i) const {
+  auto&& ind = ored_.at(i);
+  std::vector<double> n;
+  n.reserve(ind.size());
+  for (size_t k : ind) n.push_back(nominal_out_.at(k));
+  return n;
+}
+
+std::string FmuInternal::desc_in(FmuMemory* m, size_t id, bool more) const {
   // Create description
   if (more) {
     // Detailed description
@@ -320,6 +386,9 @@ std::string Fmu2::desc_in(FmuMemory* m, size_t id, bool more) const {
   } else {
     return vn_in_[id];
   }
+}
+
+Fmu2::~Fmu2() {
 }
 
 std::string Fmu2::system_infix() {
@@ -610,16 +679,6 @@ void Fmu2::init(const DaeBuilderInternal* dae) {
   }
   // Free memory
   free_instance(c);
-}
-
-template<typename T>
-T* Fmu2::load_function(const std::string& symname) {
-  // Load the function
-  signal_t f = li_.get_function(symname);
-  // Ensure that it was found
-  casadi_assert(f != 0, "Cannot retrieve '" + symname + "'");
-  // Return function with the right type
-  return reinterpret_cast<T*>(f);
 }
 
 void Fmu2::logger(fmi2ComponentEnvironment componentEnvironment,
@@ -1286,50 +1345,12 @@ int Fmu2::eval_derivative(FmuMemory* m, bool independent_seeds) const {
   return 0;
 }
 
-Sparsity Fmu2::jac_sparsity(const std::vector<size_t>& osub,
-    const std::vector<size_t>& isub) const {
-  // Convert to casadi_int type
-  std::vector<casadi_int> osub1(osub.begin(), osub.end());
-  std::vector<casadi_int> isub1(isub.begin(), isub.end());
-  // Index mapping (not used)
-  std::vector<casadi_int> mapping;
-  // Get selection
-  return jac_sp_.sub(osub1, isub1, mapping);
-}
-
-Sparsity Fmu2::hess_sparsity(const std::vector<size_t>& r,
-    const std::vector<size_t>& c) const {
-  // Convert to casadi_int type
-  std::vector<casadi_int> r1(r.begin(), r.end());
-  std::vector<casadi_int> c1(c.begin(), c.end());
-  // Index mapping (not used)
-  std::vector<casadi_int> mapping;
-  // Get selection
-  return hess_sp_.sub(r1, c1, mapping);
-}
-
-std::vector<double> Fmu2::all_nominal_in(size_t i) const {
-  auto&& ind = ired_.at(i);
-  std::vector<double> n;
-  n.reserve(ind.size());
-  for (size_t k : ind) n.push_back(nominal_in_.at(k));
-  return n;
-}
-
-std::vector<double> Fmu2::all_nominal_out(size_t i) const {
-  auto&& ind = ored_.at(i);
-  std::vector<double> n;
-  n.reserve(ind.size());
-  for (size_t k : ind) n.push_back(nominal_out_.at(k));
-  return n;
-}
-
 Fmu2::Fmu2(const std::string& name,
     const std::vector<std::string>& scheme_in,
     const std::vector<std::string>& scheme_out,
     const std::map<std::string, std::vector<size_t>>& scheme,
     const std::vector<std::string>& aux)
-    : name_(name), scheme_in_(scheme_in), scheme_out_(scheme_out), scheme_(scheme), aux_(aux) {
+    : FmuInternal(name, scheme_in, scheme_out, scheme, aux) {
   instantiate_ = 0;
   free_instance_ = 0;
   reset_ = 0;
@@ -1341,26 +1362,6 @@ Fmu2::Fmu2(const std::string& name,
   set_boolean_ = 0;
   get_real_ = 0;
   get_directional_derivative_ = 0;
-}
-
-size_t Fmu2::index_in(const std::string& n) const {
-  // Linear search for the input
-  for (size_t i = 0; i < scheme_in_.size(); ++i) {
-    if (scheme_in_[i] == n) return i;
-  }
-  // Not found
-  casadi_error("No such input: " + n);
-  return -1;
-}
-
-size_t Fmu2::index_out(const std::string& n) const {
-  // Linear search for the input
-  for (size_t i = 0; i < scheme_out_.size(); ++i) {
-    if (scheme_out_[i] == n) return i;
-  }
-  // Not found
-  casadi_error("No such output: " + n);
-  return -1;
 }
 
 #endif  // WITH_FMU

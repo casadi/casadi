@@ -42,7 +42,7 @@ struct FmuMemory;
 struct InputStruct;
 
 // Forward declaration of internal class
-class Fmu2;
+class FmuInternal;
 
 /// Which C API
 enum class FmuApi {FMI2, NUMEL};
@@ -79,9 +79,9 @@ class CASADI_EXPORT Fmu
 
   ///@{
   /// Access functions of the node
-  Fmu2* operator->();
-  const Fmu2* operator->() const;
-  Fmu2* get() const;
+  FmuInternal* operator->();
+  const FmuInternal* operator->() const;
+  FmuInternal* get() const;
   ///@}
 
   /** \brief Get the number of scheme inputs */
