@@ -177,13 +177,10 @@ class CASADI_EXPORT Fmu2 : public FmuInternal {
     const casadi_int* id, double* v) const override;
 
   // Calculate directional derivatives using AD
-  int eval_ad(FmuMemory* m) const;
+  int eval_ad(FmuMemory* m) const override;
 
   // Calculate directional derivatives using FD
-  int eval_fd(FmuMemory* m, bool independent_seeds) const;
-
-  // Calculate directional derivatives
-  int eval_derivative(FmuMemory* m, bool independent_seeds) const override;
+  int eval_fd(FmuMemory* m, bool independent_seeds) const override;
 
   // Gather user sensitivities
   void gather_sens(FmuMemory* m) const override;

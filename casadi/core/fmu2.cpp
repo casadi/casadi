@@ -972,22 +972,6 @@ int Fmu2::eval_fd(FmuMemory* m, bool independent_seeds) const {
   return 0;
 }
 
-int Fmu2::eval_derivative(FmuMemory* m, bool independent_seeds) const {
-  // Gather input and output indices
-  gather_sens(m);
-  // Calculate derivatives using FMU directional derivative support
-  if (m->self.enable_ad_) {
-    // Evaluate using AD
-    if (eval_ad(m)) return 1;
-  }
-  // Calculate derivatives using finite differences
-  if (!m->self.enable_ad_ || m->self.validate_ad_) {
-    // Evaluate using FD
-    if (eval_fd(m, independent_seeds)) return 1;
-  }
-  return 0;
-}
-
 Fmu2::Fmu2(const std::string& name,
     const std::vector<std::string>& scheme_in,
     const std::vector<std::string>& scheme_out,
