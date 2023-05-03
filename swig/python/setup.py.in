@@ -61,9 +61,9 @@ class CMakeBuild(build_ext):
           cmake_args.append('-DWITH_PYTHON3=ON')
 
         if "CASADI_SETUP_CMAKE_ARGS" in os.environ:
-          cmake_args += os.environ["CASADI_SETUP_CMAKE_ARGS"].split("\n")
+          cmake_args += os.environ["CASADI_SETUP_CMAKE_ARGS"].split(";")
 
-        self.announce("cmake_args (append more with CASADI_SETUP_CMAKE_ARGS env var, newline-seperated): ", level=3)
+        self.announce("cmake_args (append more with CASADI_SETUP_CMAKE_ARGS env var, semicolon-seperated): ", level=3)
         for args in cmake_args:
           self.announce("  " + str(args), level=3)
 
