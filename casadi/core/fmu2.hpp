@@ -149,41 +149,14 @@ class CASADI_EXPORT Fmu2 : public FmuInternal {
   /** \brief Initalize memory block */
   int init_mem(FmuMemory* m) const override;
 
-  // Set value
-  void set(FmuMemory* m, size_t ind, const double* value) const override;
-
-  // Request the calculation of a variable
-  void request(FmuMemory* m, size_t ind) const override;
-
-  // Gather user inputs and outputs
-  void gather_io(FmuMemory* m) const;
-
   // Calculate all requested variables
   int eval(FmuMemory* m) const override;
-
-  // Get a calculated variable
-  void get(FmuMemory* m, size_t id, double* value) const override;
-
-  // Set seed
-  void set_seed(FmuMemory* m, casadi_int nseed,
-    const casadi_int* id, const double* v) const override;
-
-  // Request the calculation of a sensitivity
-  void request_sens(FmuMemory* m, casadi_int nsens, const casadi_int* id,
-    const casadi_int* wrt_id) const override;
-
-  // Get calculated derivatives
-  void get_sens(FmuMemory* m, casadi_int nsens,
-    const casadi_int* id, double* v) const override;
 
   // Calculate directional derivatives using AD
   int eval_ad(FmuMemory* m) const override;
 
   // Calculate directional derivatives using FD
   int eval_fd(FmuMemory* m, bool independent_seeds) const override;
-
-  // Gather user sensitivities
-  void gather_sens(FmuMemory* m) const override;
 
   // Name of system, per the FMI specification
   static std::string system_infix();

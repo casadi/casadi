@@ -416,4 +416,109 @@ int FmuInternal::eval_derivative(FmuMemory* m, bool independent_seeds) const {
   return 0;
 }
 
+void FmuInternal::set(FmuMemory* m, size_t ind, const double* value) const {
+  if (value) {
+    // Argument is given
+    for (size_t id : ired_[ind]) {
+      if (*value != m->ibuf_.at(id)) {
+        m->ibuf_.at(id) = *value;
+        m->changed_.at(id) = true;
+      }
+      value++;
+    }
+  } else {
+    // Argument is null - all zeros
+    for (size_t id : ired_[ind]) {
+      if (0 != m->ibuf_.at(id)) {
+        m->ibuf_.at(id) = 0;
+        m->changed_.at(id) = true;
+      }
+    }
+  }
+}
+
+void FmuInternal::request(FmuMemory* m, size_t ind) const {
+  for (size_t id : ored_[ind]) {
+    // Mark as requested
+    m->requested_.at(id) = true;
+    // Also log corresponding input index
+    m->wrt_.at(id) = -1;
+  }
+}
+
+void FmuInternal::get(FmuMemory* m, size_t ind, double* value) const {
+  // Save to return
+  for (size_t id : ored_[ind]) {
+    *value++ = m->obuf_.at(id);
+  }
+}
+
+void FmuInternal::set_seed(FmuMemory* m, casadi_int nseed,
+    const casadi_int* id, const double* v) const {
+  for (casadi_int i = 0; i < nseed; ++i) {
+    m->seed_.at(*id) = *v++;
+    m->changed_.at(*id) = true;
+    id++;
+  }
+}
+
+void FmuInternal::request_sens(FmuMemory* m, casadi_int nsens, const casadi_int* id,
+    const casadi_int* wrt_id) const {
+  for (casadi_int i = 0; i < nsens; ++i) {
+    m->requested_.at(*id) = true;
+    m->wrt_.at(*id) = *wrt_id++;
+    id++;
+  }
+}
+
+void FmuInternal::get_sens(FmuMemory* m, casadi_int nsens, const casadi_int* id, double* v) const {
+  for (casadi_int i = 0; i < nsens; ++i) {
+    *v++ = m->sens_.at(*id++);
+  }
+}
+
+void FmuInternal::gather_io(FmuMemory* m) const {
+  // Collect input indices and corresponding value references and values
+  m->id_in_.clear();
+  m->vr_in_.clear();
+  m->v_in_.clear();
+  for (size_t id = 0; id < m->changed_.size(); ++id) {
+    if (m->changed_[id]) {
+      m->id_in_.push_back(id);
+      m->vr_in_.push_back(vr_in_[id]);
+      m->v_in_.push_back(m->ibuf_[id]);
+      m->changed_[id] = false;
+    }
+  }
+  // Collect output indices, corresponding value references
+  m->id_out_.clear();
+  m->vr_out_.clear();
+  for (size_t id = 0; id < m->requested_.size(); ++id) {
+    if (m->requested_[id]) {
+      m->id_out_.push_back(id);
+      m->vr_out_.push_back(vr_out_[id]);
+      m->requested_[id] = false;
+    }
+  }
+}
+
+void FmuInternal::gather_sens(FmuMemory* m) const {
+  // Gather input and output indices
+  gather_io(m);
+  // Number of inputs and outputs
+  size_t n_known = m->id_in_.size();
+  size_t n_unknown = m->id_out_.size();
+  // Get/clear seeds
+  m->d_in_.clear();
+  for (size_t id : m->id_in_) {
+    m->d_in_.push_back(m->seed_[id]);
+    m->seed_[id] = 0;
+  }
+  // Ensure at least one seed
+  casadi_assert(n_known != 0, "No seeds");
+  // Allocate result vectors
+  m->v_out_.resize(n_unknown);
+  m->d_out_.resize(n_unknown);
+}
+
 } // namespace casadi

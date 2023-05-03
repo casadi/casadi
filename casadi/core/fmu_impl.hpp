@@ -103,24 +103,24 @@ class CASADI_EXPORT FmuInternal : public SharedObjectInternal {
   virtual void free_instance(void* c) const = 0;
 
   // Set value
-  virtual void set(FmuMemory* m, size_t ind, const double* value) const = 0;
+  void set(FmuMemory* m, size_t ind, const double* value) const;
 
   // Request the calculation of a variable
-  virtual void request(FmuMemory* m, size_t ind) const = 0;
+  void request(FmuMemory* m, size_t ind) const;
 
   // Calculate all requested variables
   virtual int eval(FmuMemory* m) const = 0;
 
   // Get a calculated variable
-  virtual void get(FmuMemory* m, size_t id, double* value) const = 0;
+  void get(FmuMemory* m, size_t id, double* value) const;
 
   // Set seed
-  virtual void set_seed(FmuMemory* m, casadi_int nseed,
-    const casadi_int* id, const double* v) const = 0;
+  void set_seed(FmuMemory* m, casadi_int nseed,
+    const casadi_int* id, const double* v) const;
 
   // Request the calculation of a sensitivity
-  virtual void request_sens(FmuMemory* m, casadi_int nsens, const casadi_int* id,
-    const casadi_int* wrt_id) const = 0;
+  void request_sens(FmuMemory* m, casadi_int nsens, const casadi_int* id,
+    const casadi_int* wrt_id) const;
 
   // Calculate directional derivatives
   int eval_derivative(FmuMemory* m, bool independent_seeds) const;
@@ -132,11 +132,14 @@ class CASADI_EXPORT FmuInternal : public SharedObjectInternal {
   virtual int eval_fd(FmuMemory* m, bool independent_seeds) const = 0;
 
   // Get calculated derivatives
-  virtual void get_sens(FmuMemory* m, casadi_int nsens,
-    const casadi_int* id, double* v) const = 0;
+  void get_sens(FmuMemory* m, casadi_int nsens,
+    const casadi_int* id, double* v) const;
 
   // Gather user sensitivities
-  virtual void gather_sens(FmuMemory* m) const = 0;
+  void gather_sens(FmuMemory* m) const;
+
+  // Gather user inputs and outputs
+  void gather_io(FmuMemory* m) const;
 
   /** \brief Get stats */
   virtual void get_stats(FmuMemory* m, Dict* stats,
