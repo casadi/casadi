@@ -59,13 +59,17 @@ class CASADI_EXPORT FmuInternal : public SharedObjectInternal {
   // Initialize
   virtual void init(const DaeBuilderInternal* dae) = 0;
 
-  /** \brief Print */
+  /** \brief Print
+
+      \identifier{26m} */
   void disp(std::ostream& stream, bool more) const override;
 
   /** \brief Get the number of scheme inputs */
   size_t n_in() const { return iind_.size();}
 
-  /** \brief Get the number of scheme outputs */
+  /** \brief Get the number of scheme outputs
+
+      \identifier{26o} */
   size_t n_out() const { return oind_.size();}
 
   // Index lookup for input
@@ -84,7 +88,9 @@ class CASADI_EXPORT FmuInternal : public SharedObjectInternal {
   Sparsity hess_sparsity(const std::vector<size_t>& r, const std::vector<size_t>& c) const;
 
   /// @{
-  /** \brief Retreive nominal values */
+  /** \brief Retreive nominal values
+
+      \identifier{26r} */
   std::vector<double> all_nominal_in(size_t i) const;
   std::vector<double> all_nominal_out(size_t i) const;
   /// @}

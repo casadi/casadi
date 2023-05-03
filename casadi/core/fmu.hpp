@@ -54,12 +54,15 @@ CASADI_EXPORT std::string to_string(FmuApi v);
 
     \author Joel Andersson
     \date 2023
-*/
+
+    \identifier{26s} */
 class CASADI_EXPORT Fmu
   : public SharedObject,
     public SWIG_IF_ELSE(PrintableCommon, Printable<Fmu>) {
  public:
-  /** \brief Get type name */
+  /** \brief Get type name
+
+      \identifier{26t} */
   static std::string type_name() {return "Fmu";}
 
   /// Default constructor
@@ -72,7 +75,9 @@ class CASADI_EXPORT Fmu
     const std::map<std::string, std::vector<size_t>>& scheme,
     const std::vector<std::string>& aux);
 
-  /** \brief Name of the instance */
+  /** \brief Name of the instance
+
+      \identifier{26u} */
   const std::string& name() const;
 
   ///@{
@@ -82,10 +87,14 @@ class CASADI_EXPORT Fmu
   FmuInternal* get() const;
   ///@}
 
-  /** \brief Get the number of scheme inputs */
+  /** \brief Get the number of scheme inputs
+
+      \identifier{26v} */
   size_t n_in() const;
 
-  /** \brief Get the number of scheme outputs */
+  /** \brief Get the number of scheme outputs
+
+      \identifier{26w} */
   size_t n_out() const;
 
   // Index lookup for input
@@ -140,7 +149,9 @@ class CASADI_EXPORT Fmu
     return hess_sparsity(ired(r), ired(c));
   }
 
-  /** \brief Initalize memory block */
+  /** \brief Initalize memory block
+
+      \identifier{26x} */
   int init_mem(FmuMemory* m) const;
 
   // Free FMU instance
@@ -171,7 +182,9 @@ class CASADI_EXPORT Fmu
   // Get calculated derivatives
   void get_sens(FmuMemory* m, casadi_int nsens, const casadi_int* id, double* v) const;
 
-  /** \brief Get stats */
+  /** \brief Get stats
+
+      \identifier{26y} */
   void get_stats(FmuMemory* m, Dict* stats,
     const std::vector<std::string>& name_in, const InputStruct* in) const;
 };
