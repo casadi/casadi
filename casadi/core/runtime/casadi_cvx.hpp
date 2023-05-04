@@ -154,40 +154,66 @@ void casadi_cvx_givens(T1 a, T1 b, T1* c, T1* s) {
 // Tri-diagonal n-by-n matrix
 // Diagonal: t_diag (length n)
 // Off-diagonal: t_off (length n-1)
-// cs: [c0 s0 c1 s1 ...] length 2*(n-1)
+// Givens rotations: cs [c0 s0 c1 s1 ...] length 2*(n-1)
 // Golub & Van Loan Alg. 8.3.2
 template<typename T1>
 void casadi_cvx_implicit_qr(casadi_int n, T1* t_diag, T1* t_off, T1* cs) {
   T1 d, mu, to2, x, z, c, s, t1, t2, d0, d1, o0, sd;
   casadi_int i;
+  // Compute Wilkinson shift mu
   d = 0.5*(t_diag[n-2]-t_diag[n-1]);
   to2 = t_off[n-2]*t_off[n-2];
   sd = 1;
   if (d<0) sd = -1;
   mu = t_diag[n-1]-to2/(d+sd*sqrt(d*d+to2));
+  // Start of implicit QR step with shift mu
   x = t_diag[0]-mu;
   z = t_off[0];
   for (i=0;i<n-1;++i) {
     // Compute Givens transformation
     casadi_cvx_givens(x, z, &c, &s);
     // T = G'TG (worked out with scalars)
+    // Current values for the central block
+    // t_(i,i)   t_(i+1,i)   = d0 o0
+    // t_(i,i+1) t_(i+1,i+1)   o0 d1
     d0 = t_diag[i];
     d1 = t_diag[i+1];
     o0 = t_off[i];
+    // Common subexpressions
     t1 = d0*c-o0*s;
     t2 = o0*c-d1*s;
+    // Update central block 
+    // t_(i,i)   t_(i+1,i)
+    // t_(i,i+1) t_(i+1,i+1)
     t_diag[i]   = c*t1-s*t2;
     t_off[i]    = s*t1+c*t2;
     t_diag[i+1] = d0*s*s+2*s*o0*c+d1*c*c;
+    // Update values outside of the central block.
     if (i>0) {
+      // Not run in first iteration where t_off[i-1] is outside
+      // of the tri-diagonal input matrix.
+      // z is the off-off-diagonal t_(i+2,i) matrix element
+      // which is correctly set after the first iteration.
+      // Update t_(i-1,i)
       t_off[i-1] = t_off[i-1]*c-z*s;
+      // t_(i-1,i-1) does not change by the Givens rotation.
+      // t_(i-1,i+1) is outside the triadiagonal and set to
+      // 0 by the Givens rotation.
     }
     if (i<n-2) {
+      // Not run in the last iteration where t_off[i+1] is outside
+      // of the tri-diagonal input matrix.
+      // Set x to t_(i+1,i)
       x = t_off[i];
+      // Set z to t_(i+2,i)
       z = -s*t_off[i+1];
+      // Update t_(i+2,i+1)
       t_off[i+1] *= c;
+      // t_(i+2,i+2) does not change by the givens rotation
+      // t_(i+2,i) is kept track of as z
     }
     if (cs) {
+      // Save the applied Givens rotation
       *cs++ = c;
       *cs++ = s;
     }
