@@ -200,7 +200,7 @@ void casadi_cvx_implicit_qr(casadi_int n, T1* t_diag, T1* t_off, T1* cs) {
     // Common subexpressions
     t1 = d0*c-o0*s;
     t2 = o0*c-d1*s;
-    // Update central block 
+    // Update central block
     // t_(i,i)   t_(i+1,i)
     // t_(i,i+1) t_(i+1,i+1)
     t_diag[i]   = c*t1-s*t2;
@@ -215,7 +215,7 @@ void casadi_cvx_implicit_qr(casadi_int n, T1* t_diag, T1* t_off, T1* cs) {
       // Update t_(i-1,i)
       t_off[i-1] = t_off[i-1]*c-z*s;
       // t_(i-1,i-1) does not change by the Givens rotation.
-      // t_(i-1,i+1) is outside the triadiagonal and set to
+      // t_(i-1,i+1) is outside the tri-diagonal and set to
       // 0 by the Givens rotation.
     }
     if (i<n-2) {
