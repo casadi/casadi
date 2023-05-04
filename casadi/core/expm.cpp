@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -27,22 +27,21 @@
 #include "sparsity_interface.hpp"
 #include <typeinfo>
 
-using namespace std;
 namespace casadi {
 
-  bool has_expm(const string& name) {
+  bool has_expm(const std::string& name) {
     return Expm::has_plugin(name);
   }
 
-  void load_expm(const string& name) {
+  void load_expm(const std::string& name) {
     Expm::load_plugin(name);
   }
 
-  string doc_expm(const string& name) {
+  std::string doc_expm(const std::string& name) {
     return Expm::getPlugin(name).doc;
   }
 
-  Function expmsol(const string& name, const string& solver,
+  Function expmsol(const std::string& name, const std::string& solver,
                 const Sparsity& A, const Dict& opts) {
     return Function::create(Expm::instantiate(name, solver, A), opts);
   }
@@ -163,11 +162,12 @@ namespace casadi {
       std::vector<casadi_int>{0, 1, 2}, std::vector<casadi_int>{});
   }
 
-  Sparsity Expm::getJacSparsity(casadi_int iind, casadi_int oind, bool symmetric) const {
-    if (const_A_ && iind==0) {
+  Sparsity Expm::get_jac_sparsity(casadi_int oind, casadi_int iind, bool symmetric) const {
+    if (const_A_ && iind == 0) {
       return Sparsity(nnz_out(oind), nnz_in(iind));
     }
-    return Sparsity::dense(nnz_out(oind), nnz_in(iind));
+    // Fallback to base class
+    return FunctionInternal::get_jac_sparsity(oind, iind, symmetric);
   }
 
   Expm::~Expm() {

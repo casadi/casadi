@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -31,34 +31,39 @@
 
 namespace casadi {
 
-  /** \brief  Load an external function from a shared library
-   * \param name Name as in the label assigned to a CasADi Function object:
-   *             Function(name,...,...)
-   *             Will be used to look up symbols/functions named eg. <name>_eval
-   *             Use `nm` (linux/osx) or `depends.exe` (win) to check which symbols are present
-   *             in your shared library
-   * 
-   * File name is assumed to be ./<name>.so
-   */
-  CASADI_EXPORT Function external(const std::string& name, const Dict& opts=Dict());
+/** \brief  Load an external function from a shared library
 
-  /** \brief  Load an external function from a shared library
-   *
-   * \param name Name as in the label assigned to a CasADi Function object:
-   *             Function(name,...,...)
-   *             Will be used to look up symbols/functions named eg. <name>_eval
-   *             Use `nm` (linux/osx) or `depends.exe` (win) to check which symbols are present
-   *             in your shared library
-   * \param bin_name File name of the shared library
-   */
-  CASADI_EXPORT Function external(const std::string& name, const std::string& bin_name,
-                                  const Dict& opts=Dict());
+ * \param name Name as in the label assigned to a CasADi Function object:
+ *             Function(name,...,...)
+ *             Will be used to look up symbols/functions named eg. <name>_eval
+ *             Use `nm` (linux/osx) or `depends.exe` (win) to check which symbols are present
+ *             in your shared library
+ *
+ * File name is assumed to be ./<name>.so
 
-  /** \brief  Load a just-in-time compiled external function
-   * File name given
-   */
-  CASADI_EXPORT Function external(const std::string& name, const Importer& li,
-                                  const Dict& opts=Dict());
+    \identifier{i0} */
+CASADI_EXPORT Function external(const std::string& name, const Dict& opts=Dict());
+
+/** \brief  Load an external function from a shared library
+ *
+ * \param name Name as in the label assigned to a CasADi Function object:
+ *             Function(name,...,...)
+ *             Will be used to look up symbols/functions named eg. <name>_eval
+ *             Use `nm` (linux/osx) or `depends.exe` (win) to check which symbols are present
+ *             in your shared library
+ * \param bin_name File name of the shared library
+
+    \identifier{i1} */
+CASADI_EXPORT Function external(const std::string& name, const std::string& bin_name,
+                                const Dict& opts=Dict());
+
+/** \brief  Load a just-in-time compiled external function
+
+ * File name given
+
+    \identifier{i2} */
+CASADI_EXPORT Function external(const std::string& name, const Importer& li,
+                                const Dict& opts=Dict());
 
 } // namespace casadi
 

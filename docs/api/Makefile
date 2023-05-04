@@ -1,5 +1,5 @@
 REVISION=$(shell git rev-parse HEAD)
-READABLEREVISION=$(shell python -c "import casadi;print casadi.__version__")
+READABLEREVISION=$(shell python -c "import casadi;print(casadi.__version__)")
 
 .PHONY: export
 
@@ -70,20 +70,11 @@ doxexport:
 	patch -u Doxyfile.in publish.patch -o - |  sed 's/ENABLED_SECTIONS       = /ENABLED_SECTIONS       = INTERNAL DEPRECATED CLUTTER UNSAFE SWIGINTERNAL/' |   sed 's/GENERATE_HTML          = YES/GENERATE_HTML          = NO/' | sed 's/                         \*\.dox/                         *.dox *.cpp/' | sed 's/XML_OUTPUT             = XML/XML_OUTPUT             = XML_internal/'  | sed 's/PREDEFINED+=             SWIG//' | doxygen -
 	python extra/generate_options_doc.py
 	rm -rf XML XML_internal XML_clutter
-	patch -u Doxyfile.in publish.patch -o - |  sed 's/ENABLED_SECTIONS       = /ENABLED_SECTIONS       = DEPRECATED CLUTTER UNSAFE SWIGINTERNAL/' |   sed 's/GENERATE_HTML          = YES/GENERATE_HTML          = NO/' | sed 's/                         \*\.dox/                         *.dox *.cpp/' | sed 's/XML_OUTPUT             = XML/XML_OUTPUT             = XML_cluttered /' | doxygen -
-	patch -u Doxyfile.in publish.patch -o - |  sed 's/ENABLED_SECTIONS       = /ENABLED_SECTIONS       = INTERNAL DEPRECATED CLUTTER UNSAFE SWIGINTERNAL/' |   sed 's/GENERATE_HTML          = YES/GENERATE_HTML          = NO/' | sed 's/                         \*\.dox/                         *.dox *.cpp/' | sed 's/XML_OUTPUT             = XML/XML_OUTPUT             = XML_internal/'  | sed 's/PREDEFINED+=             SWIG//' | doxygen -
-	sh extra/doc2swig.sh
-
-doxexport_old:
-	rm -rf XML XML_internal XML_clutter
-	patch -u Doxyfile.in publish.patch -o - |  sed 's/ENABLED_SECTIONS       = /ENABLED_SECTIONS       = INTERNAL DEPRECATED CLUTTER UNSAFE SWIGINTERNAL/' |   sed 's/GENERATE_HTML          = YES/GENERATE_HTML          = NO/' | sed 's/                         \*\.dox/                         *.dox *.cpp/' | sed 's/XML_OUTPUT             = XML/XML_OUTPUT             = XML_internal/' | sed 's/PREDEFINED+=             SWIG//' | doxygen -
-	python extra/generate_options_doc.py
-	rm -rf XML XML_internal XML_clutter
-	patch -u Doxyfile.in publish.patch -o - |  sed 's/ENABLED_SECTIONS       = /ENABLED_SECTIONS       = DEPRECATED CLUTTER UNSAFE SWIGINTERNAL EXPANDED/' |   sed 's/GENERATE_HTML          = YES/GENERATE_HTML          = NO/' | sed 's/XML_OUTPUT             = XML/XML_OUTPUT             = XML_cluttered /' | sed 's/PREDEFINED+=             WITH_DEPRECATED_FEATURES//' | sed 's/EXPAND_ONLY_PREDEF     = YES/EXPAND_ONLY_PREDEF     = NO/' | doxygen -
-	patch -u Doxyfile.in publish.patch -o - |  sed 's/ENABLED_SECTIONS       = /ENABLED_SECTIONS       = INTERNAL DEPRECATED CLUTTER UNSAFE SWIGINTERNAL EXPANDED/' |   sed 's/GENERATE_HTML          = YES/GENERATE_HTML          = NO/' | sed 's/XML_OUTPUT             = XML/XML_OUTPUT             = XML_internal/' |  sed 's/EXPAND_ONLY_PREDEF     = YES/EXPAND_ONLY_PREDEF     = NO/' | doxygen -
+	patch -u Doxyfile.in publish.patch -o - |  sed 's/ENABLED_SECTIONS       = /ENABLED_SECTIONS       = DEPRECATED CLUTTER UNSAFE SWIGINTERNAL EXPANDED/' |   sed 's/GENERATE_HTML          = YES/GENERATE_HTML          = NO/' | sed 's/                         \*\.dox/                         *.dox *.cpp/' | sed 's/XML_OUTPUT             = XML/XML_OUTPUT             = XML_internal/'  | sed 's/PREDEFINED+=             SWIG//' | doxygen -
 	sh extra/doc2swig.sh
 
 full: 
+	cd sphinx && make bare_body bare_toc
 	cd examples && make
 	cd ../documents && make
 	cd ../users_guide && make
@@ -92,6 +83,10 @@ full:
 	python extra/fetch_examples_pdf.py
 	make doxpublish
 	cd ../example_pack && make
+	mkdir -p ../../web/content/api
+	cp -R html ../../web/content/api
+	cp -R internal ../../web/content/api
+	
 
 fulllocal: 
 	cd examples && make

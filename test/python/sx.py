@@ -2,8 +2,8 @@
 #     This file is part of CasADi.
 #
 #     CasADi -- A symbolic framework for dynamic optimization.
-#     Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
-#                             K.U. Leuven. All rights reserved.
+#     Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+#                             KU Leuven. All rights reserved.
 #     Copyright (C) 2011-2014 Greg Horn
 #
 #     CasADi is free software; you can redistribute it and/or
@@ -57,6 +57,8 @@ class SXtests(casadiTestCase):
     self.pool.append(lambda x: x[0]**(0.3),lambda x : x**(0.3),"^0.3")
     self.pool.append(lambda x: floor(x[0]),floor,"floor")
     self.pool.append(lambda x: ceil(x[0]),ceil,"ceil")
+    self.pool.append(lambda x: log1p(x[0]),np.log1p,"log1p")
+    self.pool.append(lambda x: expm1(x[0]),np.expm1,"log1p")
     self.Jpool=FunctionPool()
     self.Jpool.append(lambda x: sqrt(x[0]),lambda x:diag(1/(2.0*sqrt(x))),"sqrt")
     self.Jpool.append(lambda x: sin(x[0]),lambda x:diag(cos(x)),"sin")
@@ -73,6 +75,8 @@ class SXtests(casadiTestCase):
     self.Jpool.append(lambda x: x[0]**1,lambda x : diag(ones(x.shape)),"^1")
     self.Jpool.append(lambda x: x[0]**(-2),lambda x : diag(-2.0/x**3),"^-2")
     self.Jpool.append(lambda x: x[0]**(0.3),lambda x :diag( 0.3/x**0.7),"^0.3")
+    self.Jpool.append(lambda x: log1p(x[0]),lambda x :diag( 1.0/(1+x)),"log1p")
+    self.Jpool.append(lambda x: expm1(x[0]),lambda x :diag( exp(x)),"log1p")
     self.matrixpool=FunctionPool()
     self.matrixpool.append(lambda x: norm_2(x[0]),linalg.norm,"norm_2")
     self.matrixbinarypool=FunctionPool()
@@ -81,10 +85,19 @@ class SXtests(casadiTestCase):
     self.matrixbinarypool.append(lambda a: a[0]*a[1],lambda a: a[0]*a[1],"Matrix*Matrix")
     self.matrixbinarypool.append(lambda a: fmax(a[0],a[1]),lambda a: fmax(a[0],a[1]),"fmin")
     self.matrixbinarypool.append(lambda a: fmin(a[0],a[1]),lambda a: fmin(a[0],a[1]),"fmax")
+    self.matrixbinarypool.append(lambda a: hypot(a[0],a[1]),lambda a: np.hypot(a[0],a[1]),"hypot")
     #self.matrixbinarypool.append(lambda a: dot(a[0],trans(a[1])),lambda a: dot(a[0].T,a[1]),name="dot(Matrix,Matrix)")
     self.matrixbinarypool.append(lambda a: mtimes(a[0],a[1].T),lambda a: np.dot(a[0],a[1].T),"dot(Matrix,Matrix.T)")
 
     #self.pool.append(lambda x: erf(x[0]),erf,"erf") # numpy has no erf
+
+  def test_equivalence(self):
+    x = SX.sym("x")
+    y = SX.sym("y")    
+    for expr,equiv in [(log1p(x),log(1+x)),(expm1(x),exp(x)-1),(hypot(x,y),sqrt(x**2+y**2))]:
+      f=Function("f",[x,y],[expr])
+      equiv_f = Function("equiv_f",[x,y],[equiv])
+      self.checkfunction(f,equiv_f,inputs=[1.3,1.7])
 
   def test_scalarSX(self):
       x=SX.sym("x")
@@ -134,8 +147,7 @@ class SXtests(casadiTestCase):
       x0=array([[0.738]])
 
       def fmod(f,x):
-        J=f.jacobian_old(0, 0)
-        return J
+        return jacobian_old(f, 0, 0)
 
       self.numpyEvaluationCheckPool(self.Jpool,[x],x0,name="SX unary operations, jacobian",fmod=fmod)
 
@@ -157,8 +169,7 @@ class SXtests(casadiTestCase):
       x0=array([0.738,0.9,0.3])
 
       def fmod(f,x):
-        J=f.jacobian_old(0, 0)
-        return J
+        return jacobian_old(f, 0, 0)
 
       self.numpyEvaluationCheckPool(self.Jpool,[x],x0,name="SX unary operations, jacobian",fmod=fmod)
 
@@ -169,8 +180,7 @@ class SXtests(casadiTestCase):
       x0=array([0.738,0.9,0.3])
 
       def fmod(f,x):
-        J=f.jacobian_old(0, 0)
-        return J
+        return jacobian_old(f, 0, 0)
 
       self.numpyEvaluationCheckPool(self.Jpool,[x],x0,name="SX unary operations, jacobian",fmod=fmod)
 
@@ -211,6 +221,37 @@ class SXtests(casadiTestCase):
       self.numpyEvaluationCheckPool(self.matrixbinarypool,[x,y],[x0,y0],name="SX")
       self.assertRaises(RuntimeError, lambda : mtimes(x,y))
 
+  def test_SXbinary_codegen(self):
+      self.message("SX binary operations")
+      x=SX.sym("x",4,2)
+      y=SX.sym("x",4,2)
+      x0=array([[0.738,0.2],[ 0.1,0.39 ],[0.99,0.999999],[1,2]])
+      y0=array([[1.738,0.6],[ 0.7,12 ],[0,-6],[1,2]])
+      for f in self.matrixbinarypool.casadioperators:
+        f = Function('f',[x,y],[f([x,y])])
+        self.check_codegen(f,inputs=[x0,y0],std="c99")
+        self.check_codegen(f,inputs=[x0,y0],std="c89")
+
+  def test_SXbinary_diff(self):
+      self.message("SX binary operations")
+      x=SX.sym("x",4,2)
+      y=SX.sym("x",4,2)
+      dx=SX.sym("x",4,2)
+      dy=SX.sym("x",4,2)
+      x0=array([[0.738,0.2],[ 0.1,0.39 ],[0.99,0.999999],[1,2]])
+      y0=array([[1.738,0.6],[ 0.7,12 ],[0,-6],[1,2]])
+      for f,name in zip(self.matrixbinarypool.casadioperators,self.matrixbinarypool.names):
+        f = Function('f',[x,y],[f([x,y])])
+        f.disp(True)
+        df = Function('f',[x,y,dx,dy],[jtimes(f(x,y),x,dx)+jtimes(f(x,y),y,dy)])
+        eps = 1e-7
+        DM.rng(0)
+        dx0 = DM.rand(x.sparsity())
+        dy0 = dx0 if name in ["fmin","fmax"] else DM.rand(y.sparsity())
+        dy0 = dx0 if name in ["fmin","fmax"] else DM.rand(y.sparsity())
+        df_experiment = (f(x0+eps*dx0,y0+eps*dy0)-f(x0,y0))/eps
+        print(df_experiment,df(x0,y0,dx0,dy0))
+        self.checkarray(df(x0,y0,dx0,dy0),df_experiment,digits=4)
 
   def test_DMbinary(self):
       self.message("SX binary operations")
@@ -313,7 +354,7 @@ class SXtests(casadiTestCase):
     for i in range(3):
       self.assertAlmostEqual(z[i], zr[i],10,'SXfunction output in correct')
     self.message("SXFunction jacobian evaluation")
-    J=f.jacobian_old(0, 0)
+    J = jacobian_old(f, 0, 0)
     J_in = [0]*J.n_in();J_in[0]=L
     J_out = J.call(J_in)
     Jr=np.array([[1,1],[3,2],[4,27]])
@@ -1057,7 +1098,7 @@ class SXtests(casadiTestCase):
     f = Function("f", [x],[mtimes([x.T,H,x])], {'verbose':True})
     H *= 2
 
-    h = f.hessian_old(0, 0)
+    h = hessian_old(f, 0, 0)
     h_out = h.call([0])
 
     self.assertTrue(h.sparsity_out(0)==H.sparsity())
@@ -1160,7 +1201,7 @@ class SXtests(casadiTestCase):
     f_out = f.call(f_in)
     self.checkarray(f_out[0],DM([2]))
 
-    J = f.jacobian_old(0, 0)
+    J = jacobian_old(f, 0, 0)
 
     J_in = [0]*J.n_in();J_in[0]=2
     J_in[1]=0.5
@@ -1187,7 +1228,7 @@ class SXtests(casadiTestCase):
     J_out = J.call(J_in)
     self.checkarray(J_out[0],DM([1]))
 
-    J = f.jacobian_old(1, 0)
+    J = jacobian_old(f, 1, 0)
 
     J_in = [0]*J.n_in();J_in[0]=2
     J_in[1]=0.5
@@ -1438,6 +1479,65 @@ class SXtests(casadiTestCase):
   def test_ufunc(self):
     y = np.sin(casadi.SX.sym('x'))
 
+  def test_mmin(self):
+      x = SX.sym("X",2)
+      f0 = Function("f",[x],[(x[0]+x[1])/2])
+      f1 = Function("f",[x],[mmin(x)])
+      f2 = Function("f",[x],[fmin(x[0],x[1])])
+      self.checkfunction(f1,f2,inputs=[[0.2,0.3]])
+      self.checkfunction(f1,f2,inputs=[[2,2]])
+      self.checkfunction(f1,f0,inputs=[[2,2]])
+      f1 = Function("f",[x],[mmax(x)])
+      f2 = Function("f",[x],[fmax(x[0],x[1])])
+      self.checkfunction(f1,f2,inputs=[[0.2,0.3]])
+      self.checkfunction(f1,f2,inputs=[[2,2]])
+      self.checkfunction(f1,f0,inputs=[[2,2]])
+
+      x = SX.sym("X")
+      f0 = Function("f",[x],[x])
+      f1 = Function("f",[x],[fmin(x,x)])
+      self.checkfunction(f1,f0,inputs=[[1]])
+      f1 = Function("f",[x],[fmax(x,x)])
+      self.checkfunction(f1,f0,inputs=[[1]])
+
+  def test_empty_broadcast(self):
+    for nc in [0,2]:
+      res = atan2(SX.sym("c",nc,1),SX.sym("t",nc,3))
+
+      self.assertEqual(res.shape[0],nc)
+      self.assertEqual(res.shape[1],3)
+  
+      with self.assertInException("Dimension mismatch"):
+        res = atan2(MX.sym("c",nc,2),MX.sym("t",nc,3))
+
+      res = atan2(MX.sym("c",nc,2),MX.sym("t",nc,4))
+      self.assertEqual(res.shape[0],nc)
+      self.assertEqual(res.shape[1],4)
+
+      res = atan2(MX.sym("c",nc,4),MX.sym("t",nc,2))
+      self.assertEqual(res.shape[0],nc)
+      self.assertEqual(res.shape[1],4)
+
+  def test_logsumexp(self):
+    x = MX.sym("x",3)
+
+    f_ref = Function("f_ref",[x],[log(exp(x[0])+exp(x[1])+exp(x[2]))])
+    f = Function("f",[x],[logsumexp(x)])
+
+    self.checkfunction(f,f_ref,inputs=[vertcat(1.1,1.3,1.7)])
+    self.check_codegen(f,inputs=[vertcat(1.1,1.3,1.7)])
+    self.checkfunction(f,f_ref,inputs=[vertcat(1.1,1.3,1.3)])
+    self.checkfunction(f,f_ref,inputs=[vertcat(1.3,1.3,1.3)])
+
+    self.checkarray(logsumexp(vertcat(1.3,1.3,1.3)),f_ref(vertcat(1.3,1.3,1.3)))
+    self.checkarray(logsumexp(vertcat(1.1,1.3,1.3)),f_ref(vertcat(1.1,1.3,1.3)))
+    self.checkarray(logsumexp(vertcat(1.1,1.3,1.7)),f_ref(vertcat(1.1,1.3,1.7)))
+
+    # Avoid overflow
+    res = f(vertcat(100,1000,10000))
+    self.checkarray(res,10000)
+
+    self.checkarray(logsumexp(vertcat(100,1000,10000)),f(vertcat(100,1000,10000)))
 
 
 if __name__ == '__main__':

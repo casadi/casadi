@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -29,12 +29,15 @@
 #include "casadi/core/integrator_impl.hpp"
 #include <casadi/solvers/casadi_integrator_rk_export.h>
 
-/** \defgroup plugin_Integrator_rk
+/** \defgroup plugin_Integrator_rk Title
+    \par
+
       Fixed-step explicit Runge-Kutta integrator for ODEs
       Currently implements RK4.
 
       The method is still under development
-*/
+
+    \identifier{23a} */
 /** \pluginsection{Integrator,rk} */
 
 /// \cond INTERNAL
@@ -43,21 +46,23 @@ namespace casadi {
   /** \brief \pluginbrief{Integrator,rk}
 
 
-      @copydoc DAE_doc
+  
       @copydoc plugin_Integrator_rk
 
       \author Joel Andersson
       \date 2011-2014
   */
   class CASADI_INTEGRATOR_RK_EXPORT RungeKutta : public FixedStepIntegrator {
-  public:
+   public:
 
     /// Constructor
-    explicit RungeKutta(const std::string& name, const Function& dae);
+    RungeKutta(const std::string& name, const Function& dae, double t0,
+      const std::vector<double>& tout);
 
     /** \brief  Create a new integrator */
-    static Integrator* creator(const std::string& name, const Function& dae) {
-      return new RungeKutta(name, dae);
+    static Integrator* creator(const std::string& name, const Function& dae,
+        double t0, const std::vector<double>& tout) {
+      return new RungeKutta(name, dae, t0, tout);
     }
 
     /// Destructor
@@ -72,21 +77,20 @@ namespace casadi {
     /// Initialize stage
     void init(const Dict& opts) override;
 
-    /// Setup F and G
-    void setupFG() override;
+    /// Setup step functions
+    void setup_step() override;
 
     /// A documentation string
     static const std::string meta_doc;
-
-    /// Continuous time dynamics
-    Function f_, g_;
 
     /** \brief Serialize an object without type information */
     void serialize_body(SerializingStream &s) const override;
 
     /** \brief Deserialize into MX */
     static ProtoFunction* deserialize(DeserializingStream& s) { return new RungeKutta(s); }
-  protected:
+
+   protected:
+
     /** \brief Deserializing constructor */
     explicit RungeKutta(DeserializingStream& s);
   };

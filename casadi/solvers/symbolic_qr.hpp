@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -29,11 +29,13 @@
 #include "casadi/core/linsol_internal.hpp"
 #include <casadi/solvers/casadi_linsol_symbolicqr_export.h>
 
-/** \defgroup plugin_Linsol_symbolicqr
+/** \defgroup plugin_Linsol_symbolicqr Title
+    \par
 
        Linsol based on QR factorization with sparsity pattern based reordering
       _without_ partial pivoting
-*/
+
+    \identifier{231} */
 
 /** \pluginsection{Linsol,symbolicqr} */
 

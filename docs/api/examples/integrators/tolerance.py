@@ -2,8 +2,8 @@
 #     This file is part of CasADi.
 #
 #     CasADi -- A symbolic framework for dynamic optimization.
-#     Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
-#                             K.U. Leuven. All rights reserved.
+#     Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+#                             KU Leuven. All rights reserved.
 #     Copyright (C) 2011-2014 Greg Horn
 #
 #     CasADi is free software; you can redistribute it and/or
@@ -19,10 +19,11 @@
 #     You should have received a copy of the GNU Lesser General Public
 #     License along with CasADi; if not, write to the Free Software
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+
 #
-#
-#! Integrator tolerances
-#! =====================
+# Integrator tolerances
+# =====================
+
 from casadi import *
 from numpy import *
 from pylab import *
@@ -44,9 +45,7 @@ for tol in tolerances:
   opts = {'reltol':10.0**tol, 'abstol':10.0**tol, 'grid':ts, 'output_t0':True}
   F = integrator('F', 'cvodes', dae, opts)
   res = F(x0=[1,0])
-
   plot(ts,array(res['xf'])[0,:].T,label='tol = 1e%d' % tol)
-
 legend( loc='upper left')
 xlabel('Time [s]')
 ylabel('State x [-]')
@@ -64,7 +63,9 @@ for tol in tolerances:
   F = integrator('F', 'cvodes', dae, opts)
   res = F(x0=[1,0])
   endresult.append(res['xf'][0])
-  
+
+endresult = vcat(endresult)
+
 figure()
 loglog(tolerances,(array(endresult)-1),'b',label='Positive error')
 loglog(tolerances,-(array(endresult)-1),'r',label='Negative error')

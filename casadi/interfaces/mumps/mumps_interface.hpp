@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -29,15 +29,18 @@
 #include "casadi/core/linsol_internal.hpp"
 #include <casadi/interfaces/mumps/casadi_linsol_mumps_export.h>
 
-#include <mumps_seq/mpi.h>
-#include <dmumps_c.h>
+#include <mumps/mumps_mpi.h>
+#include <mumps/dmumps_c.h>
 
-/** \defgroup plugin_Linsol_mumps
+/** \defgroup plugin_Linsol_mumps Title
+    \par
+
  * Interface to the sparse direct linear solver MUMPS
  * Works for symmetric indefinite systems
  * \author Joel Andersson
  * \date 2019
- */
+
+    \identifier{22t} */
 
 /** \pluginsection{Linsol,mumps} */
 /// \cond INTERNAL
@@ -110,6 +113,9 @@ namespace casadi {
     // Get name of the class
     std::string class_name() const override { return "MumpsInterface";}
 
+    /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream &s) const override;
+
     /** \brief Deserialize with type disambiguation */
     static ProtoFunction* deserialize(DeserializingStream& s) { return new MumpsInterface(s); }
 
@@ -120,7 +126,7 @@ namespace casadi {
 
   protected:
     /** \brief Deserializing constructor */
-    explicit MumpsInterface(DeserializingStream& s) : LinsolInternal(s) {}
+    explicit MumpsInterface(DeserializingStream& s);
   };
 
 } // namespace casadi

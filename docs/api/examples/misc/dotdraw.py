@@ -2,8 +2,8 @@
 #     This file is part of CasADi.
 #
 #     CasADi -- A symbolic framework for dynamic optimization.
-#     Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
-#                             K.U. Leuven. All rights reserved.
+#     Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+#                             KU Leuven. All rights reserved.
 #     Copyright (C) 2011-2014 Greg Horn
 #
 #     CasADi is free software; you can redistribute it and/or
@@ -20,11 +20,12 @@
 #     License along with CasADi; if not, write to the Free Software
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #
-#
+
 from casadi import *
 from casadi.tools import *
 
-#! An SX graph
+# An SX graph
+
 a = SX.sym("a")
 b = SX.sym("b")
 
@@ -35,13 +36,14 @@ print(c)
 
 dotdraw(c)
 
-#! An SX
+# An SX
 
 dotdraw(SX.sym("x",Sparsity.lower(3)))
 
 dotdraw(SX.sym("x",Sparsity.lower(3))**2)
 
-#! An MX graph
+# An MX graph
+
 x = MX.sym("x",Sparsity.lower(2))
 y = MX.sym("y",Sparsity.lower(2))
 
@@ -51,7 +53,7 @@ zz = x+y+6
 
 dotdraw(zz)
 
-f = Function("magic", [z,y],[z+x[0,0],x-y])
+f = Function("magic", [z,y],[z+x[0,0],x-y],{"allow_free":True})
 
 z,z2 = f(vertcat(x,y),zz.T)
 

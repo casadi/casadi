@@ -84,7 +84,7 @@ linsol = Linsol('solver', 'lapackqr', x.sparsity())
 r = linsol.solve(x,y,false)
 rt = linsol.solve(x,y,true)
 
-f_mx = Function('f_mx_exported',args,{inv_node(x), inv_node(y), det(x), det(y),x\y,r,rt});
+f_mx = Function('f_mx_exported',args,{inv_node(x), inv_node(y), det(x), det(y),x\y,r,rt},struct('allow_free',true));
 f_mx.disp(true)
 f_mx.export_code('matlab','f_mx_exported.m')
 clear f_mx_exported

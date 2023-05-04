@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -27,7 +27,6 @@
 #include "casadi_misc.hpp"
 #include <sstream>
 
-using namespace std;
 namespace casadi {
 
   Polynomial::Polynomial(double scalar) : p_(1, scalar) {
@@ -80,7 +79,7 @@ namespace casadi {
   }
 
   Polynomial Polynomial::operator*(const Polynomial& a) const {
-    vector<double> p_ret(p_.size() + a.p_.size() - 1, 0);
+    std::vector<double> p_ret(p_.size() + a.p_.size() - 1, 0);
     for (casadi_int d=0; d<p_.size(); ++d) {
       for (casadi_int d_a=0; d_a<a.p_.size(); ++d_a) {
         p_ret[d+d_a] += p_[d] * a.p_[d_a];
@@ -100,7 +99,7 @@ namespace casadi {
   }
 
   Polynomial& Polynomial::operator/=(double d) {
-    for (vector<double>::iterator it=p_.begin(); it!=p_.end(); ++it) {
+    for (std::vector<double>::iterator it=p_.begin(); it!=p_.end(); ++it) {
       *it /= d;
     }
     return *this;
@@ -112,7 +111,7 @@ namespace casadi {
   }
 
   Polynomial& Polynomial::operator+=(const Polynomial& b) {
-    p_.resize(max(p_.size(), b.p_.size()), 0);
+    p_.resize(std::max(p_.size(), b.p_.size()), 0);
     transform(b.p_.begin(), b.p_.end(), p_.begin(), p_.begin(), std::plus<double>());
     trim();
     return *this;
@@ -124,7 +123,7 @@ namespace casadi {
   }
 
   Polynomial& Polynomial::operator-=(const Polynomial& b) {
-    p_.resize(max(p_.size(), b.p_.size()), 0);
+    p_.resize(std::max(p_.size(), b.p_.size()), 0);
     transform(p_.begin(), p_.begin()+b.p_.size(),
               b.p_.begin(), p_.begin(), std::minus<double>());
     trim();
@@ -134,13 +133,13 @@ namespace casadi {
   void Polynomial::trim() {
     // Remove trailing zeros
     size_t new_size = p_.size();
-    vector<double>::const_reverse_iterator it=p_.rbegin();
+    std::vector<double>::const_reverse_iterator it=p_.rbegin();
     while (it!=p_.rend() && 0==*it++) new_size--;
     p_.resize(new_size);
   }
 
   Polynomial Polynomial::derivative() const {
-    vector<double> ret_p(p_.size()-1);
+    std::vector<double> ret_p(p_.size()-1);
     for (casadi_int k=1; k<p_.size(); ++k) {
       ret_p[k-1] = static_cast<double>(k)*p_[k];
     }
@@ -148,7 +147,7 @@ namespace casadi {
   }
 
   Polynomial Polynomial::anti_derivative() const {
-    vector<double> ret_p(p_.size()+1);
+    std::vector<double> ret_p(p_.size()+1);
     ret_p[0] = 0;
     for (casadi_int k=0; k<p_.size(); ++k) {
       ret_p[k+1] = p_[k]/static_cast<double>(k+1);

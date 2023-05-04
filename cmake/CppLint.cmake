@@ -65,30 +65,37 @@ function(add_style_check_target TARGET_NAME SOURCES_LIST0)# PROJECT)
   set(SOURCES_LIST)
   foreach(item ${SOURCES_LIST0})
     #string(REGEX MATCH ".*\\.hpp$" dummy ${item})
-    string(REGEX MATCH "runtime_embedded\\.hpp" dummy ${item})
+    string(REGEX MATCH ".*_runtime_str\\.h" dummy ${item})
     if(NOT dummy)
       string(REGEX MATCH ".*meta\\.cpp" dummy ${item})
-      if(NOT dummy)
-        list(APPEND SOURCES_LIST ${item})
-      endif()
+    endif()
+    if(NOT dummy)
+      list(APPEND SOURCES_LIST ${item})
     endif()
   endforeach()
-  #set(SOURCES_LIST ${SOURCES_LIST0}) # just use all files
 
-  # message("LALALA SOURCES_LIST: ${TARGET_NAME}: ${SOURCES_LIST}")
-  add_custom_target(lint_${TARGET_NAME}
-    COMMAND "${CMAKE_COMMAND}" -E chdir
-            "${CMAKE_CURRENT_SOURCE_DIR}"
-            "${PYTHON_EXECUTABLE}"
-            "${CMAKE_SOURCE_DIR}/misc/cpplint.py"
-            "--filter=${STYLE_FILTER}"
-            "--counting=detailed"
-            "--extensions=cpp,hpp,h"
-            "--linelength=100"
-#            "--project=${PROJECT}"
-            ${SOURCES_LIST}
-    DEPENDS ${SOURCES_LIST}
+  list(LENGTH SOURCES_LIST LISTCOUNT) 
+
+  if (LISTCOUNT)
+    add_custom_target(lint_${TARGET_NAME}
+      COMMAND "${CMAKE_COMMAND}" -E chdir
+              "${CMAKE_CURRENT_SOURCE_DIR}"
+              "${PYTHON_EXECUTABLE}"
+              "${CMAKE_SOURCE_DIR}/misc/cpplint.py"
+              "--filter=${STYLE_FILTER}"
+              "--counting=detailed"
+              "--extensions=cpp,hpp,h"
+              "--linelength=100"
+  #            "--project=${PROJECT}"
+              ${SOURCES_LIST}
+      DEPENDS ${SOURCES_LIST}
+      COMMENT "Linting ${TARGET_NAME}"
+      VERBATIM)
+  else()
+    add_custom_target(lint_${TARGET_NAME}
+    COMMAND echo "Nothing to do"
     COMMENT "Linting ${TARGET_NAME}"
     VERBATIM)
+  endif()
 
 endfunction()

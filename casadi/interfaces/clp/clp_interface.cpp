@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -25,8 +25,6 @@
 #include "clp_interface.hpp"
 
 namespace casadi {
-
-  using namespace std;
 
   extern "C"
   int CASADI_CONIC_CLP_EXPORT
@@ -428,9 +426,9 @@ namespace casadi {
 
     m->fstats.at("postprocessing").toc();
     m->return_status = model.status();
-    m->success = m->return_status==0;
+    m->d_qp.success = m->return_status==0;
     m->secondary_return_status = model.secondaryStatus();
-    if (m->return_status==3) m->unified_return_status = SOLVER_RET_LIMITED;
+    if (m->return_status==3) m->d_qp.unified_return_status = SOLVER_RET_LIMITED;
 
     if (verbose_) casadi_message("CLP return status: " + return_status_string(m->return_status));
     if (verbose_) casadi_message(

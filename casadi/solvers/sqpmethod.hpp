@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl, Kobe Bergmans
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -29,9 +29,12 @@
 #include "casadi/core/nlpsol_impl.hpp"
 #include <casadi/solvers/casadi_nlpsol_sqpmethod_export.h>
 
-/** \defgroup plugin_Nlpsol_sqpmethod
+/** \defgroup plugin_Nlpsol_sqpmethod Title
+    \par
+
  A textbook SQPMethod
-*/
+
+    \identifier{22x} */
 
 /** \pluginsection{Nlpsol,sqpmethod} */
 
@@ -109,6 +112,9 @@ namespace casadi {
     /// QP solver for the subproblems
     Function qpsol_;
 
+    /// QP solver for elastic mode subproblems
+    Function qpsol_ela_;
+
     /// Exact Hessian?
     bool exact_hessian_;
 
@@ -126,6 +132,15 @@ namespace casadi {
 
     /// Minimum step size allowed
     double min_step_size_;
+
+    /// Elastic mode
+    bool elastic_mode_;
+
+    /// Initial and maximum penalty parameter for elastic mode
+    double gamma_0_, gamma_max_, gamma_1_min_;
+
+    /// Initialize feasible qp's
+    bool init_feasible_;
 
     /// Linesearch parameters
     ///@{
@@ -150,6 +165,9 @@ namespace casadi {
     /// convexify?
     bool convexify_;
 
+    // Second order corrections
+    bool so_corr_;
+
     /** \brief Generate code for the function body */
     void codegen_body(CodeGenerator& g) const override;
 
@@ -164,19 +182,45 @@ namespace casadi {
 
     /// Print iteration
     void print_iteration(casadi_int iter, double obj, double pr_inf, double du_inf,
-                         double dx_norm, double rg, casadi_int ls_trials, bool ls_success) const;
+      double dx_norm, double rg, casadi_int ls_trials, bool ls_success,
+      bool so_succes, std::string info) const;
 
-    // Solve the QP subproblem
-    virtual void solve_QP(SqpmethodMemory* m, const double* H, const double* g,
-                          const double* lbdz, const double* ubdz,
-                          const double* A,
-                          double* x_opt, double* dlam) const;
+    // Solve the QP subproblem: mode 0 = normal, mode 1 = SOC
+    virtual int solve_QP(SqpmethodMemory* m, const double* H, const double* g,
+      const double* lbdz, const double* ubdz,
+      const double* A,
+      double* x_opt, double* dlam, int mode) const;
+
+    // Solve the QP subproblem for elastic mode
+    virtual int solve_ela_QP(SqpmethodMemory* m, const double* H, const double* g,
+      const double* lbdz, const double* ubdz, const double* A,
+      double* x_opt, double* dlam) const;
+
+    // Execute elastic mode: mode 0 = normal, mode 1 = SOC
+    virtual int solve_elastic_mode(SqpmethodMemory* m, casadi_int* ela_it, double gamma_1,
+      casadi_int ls_iter, bool ls_success, bool so_succes, double pr_inf,
+      double du_inf, double dx_norminf, std::string* info, int mode) const;
 
 
     // Solve the QP subproblem
     void codegen_qp_solve(CodeGenerator& cg, const std::string& H, const std::string& g,
-              const std::string& lbdz, const std::string& ubdz,
-              const std::string& A, const std::string& x_opt, const std::string& dlam) const;
+      const std::string& lbdz, const std::string& ubdz,
+      const std::string& A, const std::string& x_opt, const std::string& dlam, int mode) const;
+
+    // Solve the QP subproblem
+    void codegen_qp_ela_solve(CodeGenerator& cg, const std::string& H, const std::string& g,
+      const std::string& lbdz, const std::string& ubdz,
+      const std::string& A, const std::string& x_opt, const std::string& dlam) const;
+
+    // Execute elastic mode: mode 0 = normal, mode 1 = SOC
+    void codegen_solve_elastic_mode(CodeGenerator& cg, int mode) const;
+
+    // Codegen to calculate gama_1
+    void codegen_calc_gamma_1(CodeGenerator& cg) const;
+
+
+    // Calculate gamma_1
+    double calc_gamma_1(SqpmethodMemory* m) const;
 
     /// A documentation string
     static const std::string meta_doc;

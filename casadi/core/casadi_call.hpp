@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -39,31 +39,49 @@ namespace casadi {
   */
   class CASADI_EXPORT Call : public MultipleOutput {
   public:
-    /** \brief  Create function call node */
+    /** \brief  Create function call node
+
+        \identifier{6j} */
     static std::vector<MX> create(const Function& fcn, const std::vector<MX>& arg);
 
-    /** \brief  Destructor */
+    /** \brief  Destructor
+
+        \identifier{6k} */
     ~Call() override {}
 
-    /** \brief Project a function input to a particular sparsity */
+    /** \brief Project a function input to a particular sparsity
+
+        \identifier{6l} */
     static MX projectArg(const MX& x, const Sparsity& sp, casadi_int i);
 
-    /** \brief  Print expression */
+    /** \brief  Print expression
+
+        \identifier{6m} */
     std::string disp(const std::vector<std::string>& arg) const override;
 
-    /** \brief Add a dependent function */
+    /** \brief Add a dependent function
+
+        \identifier{6n} */
     void add_dependency(CodeGenerator& g) const override;
 
-    /** \brief Is reference counting needed in codegen? */
+    /** \brief Is reference counting needed in codegen?
+
+        \identifier{6o} */
     bool has_refcount() const override;
 
-    /** \brief Codegen incref */
+    /** \brief Codegen incref
+
+        \identifier{6p} */
     void codegen_incref(CodeGenerator& g, std::set<void*>& added) const override;
 
-    /** \brief Codegen decref */
+    /** \brief Codegen decref
+
+        \identifier{6q} */
     void codegen_decref(CodeGenerator& g, std::set<void*>& added) const override;
 
-    /** \brief Generate code for the operation */
+    /** \brief Generate code for the operation
+
+        \identifier{6r} */
     void generate(CodeGenerator& g,
                           const std::vector<casadi_int>& arg,
                           const std::vector<casadi_int>& res) const override;
@@ -74,62 +92,103 @@ namespace casadi {
     /// Evaluate the function symbolically (SX)
     int eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const override;
 
-    /** \brief  Evaluate symbolically (MX) */
+    /** \brief  Evaluate symbolically (MX)
+
+        \identifier{6s} */
     void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
 
-    /** \brief Calculate forward mode directional derivatives */
+    /** \brief Calculate forward mode directional derivatives
+
+        \identifier{6t} */
     void ad_forward(const std::vector<std::vector<MX> >& fseed,
                          std::vector<std::vector<MX> >& fsens) const override;
 
-    /** \brief Calculate reverse mode directional derivatives */
+    /** \brief Calculate reverse mode directional derivatives
+
+        \identifier{6u} */
     void ad_reverse(const std::vector<std::vector<MX> >& aseed,
                          std::vector<std::vector<MX> >& asens) const override;
 
-    /** \brief  Propagate sparsity forward */
+    /** \brief  Propagate sparsity forward
+
+        \identifier{6v} */
     int sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
-    /** \brief  Propagate sparsity backwards */
+    /** \brief  Propagate sparsity backwards
+
+        \identifier{6w} */
     int sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const override;
 
-    /** \brief  Get called function */
+    /** \brief  Get called function
+
+        \identifier{6x} */
     const Function& which_function() const override { return fcn_;}
 
-    /** \brief  Get function output */
+    /** \brief  Get function output
+
+        \identifier{6y} */
     casadi_int which_output() const override { return -1;}
 
-    /** \brief  Number of outputs */
+    /** \brief  Number of outputs
+
+        \identifier{6z} */
     casadi_int nout() const override;
 
-    /** \brief  Get the sparsity of output oind */
+    /** \brief  Get the sparsity of output oind
+
+        \identifier{70} */
     const Sparsity& sparsity(casadi_int oind) const override;
 
-    /** \brief Get the operation */
+    /** \brief Get the operation
+
+        \identifier{71} */
     casadi_int op() const override { return OP_CALL;}
 
-    /** \brief Get required length of arg field */
+    /** \brief Get required length of arg field
+
+        \identifier{72} */
     size_t sz_arg() const override;
 
-    /** \brief Get required length of res field */
+    /** \brief Get required length of res field
+
+        \identifier{73} */
     size_t sz_res() const override;
 
-    /** \brief Get required length of iw field */
+    /** \brief Get required length of iw field
+
+        \identifier{74} */
     size_t sz_iw() const override;
 
-    /** \brief Get required length of w field */
+    /** \brief Get required length of w field
+
+        \identifier{75} */
     size_t sz_w() const override;
 
-    /** \brief Serialize an object without type information */
+    /** \brief Serialize an object without type information
+
+        \identifier{76} */
     void serialize_body(SerializingStream& s) const override;
 
-    /** \brief Deserialize without type information */
+    /** \brief Deserialize without type information
+
+        \identifier{77} */
     static MXNode* deserialize(DeserializingStream& s) { return new Call(s); }
 
   protected:
-    /** \brief  Constructor (should not be used directly) */
+    /** \brief  Constructor (should not be used directly)
+
+        \identifier{78} */
     explicit Call(const Function& fcn, const std::vector<MX>& arg);
 
-    /** \brief Deserializing constructor */
+    /** \brief Deserializing constructor
+
+        \identifier{79} */
     explicit Call(DeserializingStream& s);
+
+    /** \brief Find a common conditional argument for all seeds
+
+        \identifier{7a} */
+    static MX common_cond(const std::vector<std::vector<MX>>& seed);
 
     // Function to be evaluated
     Function fcn_;

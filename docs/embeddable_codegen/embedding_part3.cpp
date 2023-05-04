@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -26,11 +26,10 @@
 #include <casadi/casadi.hpp>
 
 using namespace casadi;
-using namespace std;
 /**
  *  Solve an NLP using codegen  
  *  Part 2: solution
- *  Joel Andersson, K.U. Leuven 2013
+ *  Joel Andersson, KU Leuven 2013
  */
 
 int main(){
@@ -49,11 +48,11 @@ int main(){
   auto res = solver(arg);
 
   // Print solution
-  cout << "-----" << endl;
-  cout << "objective at solution = " << res.at("f") << endl;
-  cout << "primal solution = " << res.at("x") << endl;
-  cout << "dual solution (x) = " << res.at("lam_x") << endl;
-  cout << "dual solution (g) = " << res.at("lam_g") << endl;
+  std::cout << "-----" << std::endl;
+  std::cout << "objective at solution = " << res.at("f") << std::endl;
+  std::cout << "primal solution = " << res.at("x") << std::endl;
+  std::cout << "dual solution (x) = " << res.at("lam_x") << std::endl;
+  std::cout << "dual solution (g) = " << res.at("lam_g") << std::endl;
   
   return 0;
 }

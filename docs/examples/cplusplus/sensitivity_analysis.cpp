@@ -1,43 +1,37 @@
 /*
- *    This file is part of CasADi.
+ *    MIT No Attribution
  *
- *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
- *    Copyright (C) 2011-2014 Greg Horn
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl, KU Leuven.
  *
- *    CasADi is free software; you can redistribute it and/or
- *    modify it under the terms of the GNU Lesser General Public
- *    License as published by the Free Software Foundation; either
- *    version 3 of the License, or (at your option) any later version.
+ *    Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ *    software and associated documentation files (the "Software"), to deal in the Software
+ *    without restriction, including without limitation the rights to use, copy, modify,
+ *    merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
+ *    permit persons to whom the Software is furnished to do so.
  *
- *    CasADi is distributed in the hope that it will be useful,
- *    but WITHOUT ANY WARRANTY; without even the implied warranty of
- *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *    Lesser General Public License for more details.
- *
- *    You should have received a copy of the GNU Lesser General Public
- *    License along with CasADi; if not, write to the Free Software
- *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ *    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+ *    INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+ *    PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *    HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ *    OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+ *    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  */
-
 
 #include <casadi/casadi.hpp>
 
 #include <iostream>
 #include <iomanip>
 
-using namespace std;
 using namespace casadi;
 
 struct Test {
   SXDict dae;
   double tf;
-  vector<double> x0;
+  std::vector<double> x0;
   double u0;
   bool is_ode;
-  string name;
+  std::string name;
 };
 
 /** \brief Generate a simple ODE */
@@ -105,7 +99,7 @@ Test simpleDAE(){
 }
 
 struct Solver {
-  string plugin;
+  std::string plugin;
   bool ode_only;
   Dict opts;
 };
@@ -113,10 +107,10 @@ struct Solver {
 int main(){
 
   // Test problems
-  vector<Test> tests = {simpleODE(), simpleDAE()};
+  std::vector<Test> tests = {simpleODE(), simpleDAE()};
 
   // ODE/DAE integrators
-  vector<Solver> solvers;
+  std::vector<Solver> solvers;
   solvers.push_back({"cvodes", true, Dict()});
   solvers.push_back({"idas", false, Dict()});
   solvers.push_back({"rk", true, Dict()});
@@ -131,89 +125,98 @@ int main(){
   for (auto&& test : tests) {
     // Loop over all solvers
     for (auto&& solver : solvers) {
-      // Skip if problem cannot be handled
-      if (solver.ode_only && !test.is_ode) continue;
-      // Printout
-      cout << "Solving \"" << test.name << "\" using \"" << solver.plugin << "\"" << endl;
+      // Test with or without multiple output times
+      for (int ntout : {1, 3}) {
+        // Skip if problem cannot be handled
+        if (solver.ode_only && !test.is_ode) continue;
+        // Printout
+        std::cout << "Solving \"" << test.name << "\" using \"" << solver.plugin << "\", " << ntout << " output times" << std::endl;
+        // Output time grid
+        std::vector<double> tout;
+        if (ntout == 1) {
+          tout = {test.tf};
+        } else {
+          tout = {0, 0.5 * test.tf, test.tf};
+        }
+        // Create integrator instance
+        Function I = integrator("I", solver.plugin, test.dae, 0, tout, solver.opts);
 
-      // Get integrator
-      Dict opts = solver.opts;
-      opts["tf"] = test.tf;
-      Function I = integrator("I", solver.plugin, test.dae, opts);
+        // Buffers for evaluation
+        std::map<std::string, DM> arg, res;
 
-      // Buffers for evaluation
-      std::map<std::string, DM> arg, res;
+        // Integrate to get results
+        arg = decltype(arg){{"x0", test.x0},
+                            {"p", test.u0}};
+        res = I(arg);
+        DM xf(res.at("xf"));
+        DM qf(res.at("qf"));
+        std::cout << std::setw(50) << "Unperturbed solution: " << "xf  = " << xf.nonzeros() <<  ", qf  = " << qf.nonzeros() << std::endl;
 
-      // Integrate to get results
-      arg = decltype(arg){{"x0", test.x0},
-                          {"p", test.u0}};
-      res = I(arg);
-      vector<double> xf(res.at("xf"));
-      vector<double> qf(res.at("qf"));
-      cout << setw(50) << "Unperturbed solution: " << "xf  = " << xf <<  ", qf  = " << qf << endl;
+        // Perturb solution to get a finite difference approximation
+        double h = 0.001;
+        arg["p"] = test.u0+h;
+        res = I(arg);
+        DM fd_xf = (res.at("xf")-xf)/h;
+        DM fd_qf = (res.at("qf")-qf)/h;
+        std::cout << std::setw(50) << "Finite difference approximation: " << "d(xf)/d(p) = " << fd_xf.nonzeros() << ", d(qf)/d(p) = " << fd_qf.nonzeros() << std::endl;
 
-      // Perturb solution to get a finite difference approximation
-      double h = 0.001;
-      arg["p"] = test.u0+h;
-      res = I(arg);
-      vector<double> fd_xf((res.at("xf")-xf)/h);
-      vector<double> fd_qf((res.at("qf")-qf)/h);
-      cout << setw(50) << "Finite difference approximation: " << "d(xf)/d(p) = " << fd_xf << ", d(qf)/d(p) = " << fd_qf << endl;
+        // Calculate once, forward
+        Function I_fwd = I.factory("I_fwd", {"x0", "p", "fwd:x0", "fwd:p"},
+                                            {"fwd:xf", "fwd:qf"});
+        arg = decltype(arg){{"x0", test.x0},
+                            {"p", test.u0},
+                            {"fwd_x0", 0},
+                            {"fwd_p", 1}};
+        res = I_fwd(arg);
+        DM fwd_xf = res.at("fwd_xf");
+        DM fwd_qf = res.at("fwd_qf");
+        std::cout << std::setw(50) << "Forward sensitivities: " << "d(xf)/d(p) = " << fwd_xf.nonzeros() << ", d(qf)/d(p) = " << fwd_qf.nonzeros() << std::endl;
 
-      // Calculate once, forward
-      Function I_fwd = I.factory("I_fwd", {"x0", "p", "fwd:x0", "fwd:p"},
-                                          {"fwd:xf", "fwd:qf"});
-      arg = decltype(arg){{"x0", test.x0},
-                          {"p", test.u0},
-                          {"fwd_x0", 0},
-                          {"fwd_p", 1}};
-      res = I_fwd(arg);
-      vector<double> fwd_xf(res.at("fwd_xf"));
-      vector<double> fwd_qf(res.at("fwd_qf"));
-      cout << setw(50) << "Forward sensitivities: " << "d(xf)/d(p) = " << fwd_xf << ", d(qf)/d(p) = " << fwd_qf << endl;
+        // Calculate once, adjoint
+        std::vector<double> adj_qf(ntout, 0);
+        adj_qf.back() = 1;
+        Function I_adj = I.factory("I_adj", {"x0", "p", "adj:xf", "adj:qf"},
+                                            {"adj:p", "adj:x0"});
+        arg = decltype(arg){{"x0", test.x0}, {"p", test.u0}, {"adj_xf", 0}, {"adj_qf", adj_qf}};
+        res = I_adj(arg);
+        DM adj_x0 = res.at("adj_x0");
+        DM adj_p = res.at("adj_p");
+        std::cout << std::setw(50) << "Adjoint sensitivities: " << "d(qf)/d(x0) = " << adj_x0.nonzeros() << ", d(qf)/d(p) = " << adj_p.nonzeros() << std::endl;
 
-      // Calculate once, adjoint
-      Function I_adj = I.factory("I_adj", {"x0", "p", "adj:xf", "adj:qf"},
-                                          {"adj:p", "adj:x0"});
-      arg = decltype(arg){{"x0", test.x0}, {"p", test.u0}, {"adj_xf", 0}, {"adj_qf", 1}};
-      res = I_adj(arg);
-      vector<double> adj_x0(res.at("adj_x0"));
-      vector<double> adj_p(res.at("adj_p"));
-      cout << setw(50) << "Adjoint sensitivities: " << "d(qf)/d(x0) = " << adj_x0 << ", d(qf)/d(p) = " << adj_p << endl;
+        // Perturb adjoint solution to get a finite difference approximation of the second order sensitivities
+        arg["p"] = test.u0+h;
+        res = I_adj(arg);
+        DM fd_adj_x0 = (res.at("adj_x0")-adj_x0)/h;
+        DM fd_adj_p = (res.at("adj_p")-adj_p)/h;
+        std::cout << std::setw(50) << "FD of adjoint sensitivities: " << "d2(qf)/d(x0)d(p) = " << fd_adj_x0.nonzeros() << ", d2(qf)/d(p)d(p) = " << fd_adj_p.nonzeros() << std::endl;
 
-      // Perturb adjoint solution to get a finite difference approximation of the second order sensitivities
-      arg["p"] = test.u0+h;
-      res = I_adj(arg);
-      vector<double> fd_adj_x0((res.at("adj_x0")-adj_x0)/h);
-      vector<double> fd_adj_p((res.at("adj_p")-adj_p)/h);
-      cout << setw(50) << "FD of adjoint sensitivities: " << "d2(qf)/d(x0)d(p) = " << fd_adj_x0 << ", d2(qf)/d(p)d(p) = " << fd_adj_p << endl;
+        // Forward over adjoint to get the second order sensitivities
+        Function I_foa = I_adj.factory("I_foa",
+                                      {"x0", "p", "fwd:p", "adj_xf", "adj_qf"},
+                                      {"fwd:adj_x0", "fwd:adj_p"});
+        arg = decltype(arg){{"x0", test.x0},
+                            {"p", test.u0},
+                            {"fwd_p", 1},
+                            {"adj_xf", 0},
+                            {"adj_qf", adj_qf}};
+        res = I_foa(arg);
+        DM fwd_adj_x0 = res.at("fwd_adj_x0");
+        DM fwd_adj_p = res.at("fwd_adj_p");
+        std::cout << std::setw(50) << "Forward over adjoint sensitivities: " << "d2(qf)/d(x0)d(p) = " << fwd_adj_x0.nonzeros() << ", d2(qf)/d(p)d(p) = " << fwd_adj_p.nonzeros() << std::endl;
 
-      // Forward over adjoint to get the second order sensitivities
-      Function I_foa = I_adj.factory("I_foa",
-                                     {"x0", "p", "fwd:p", "adj_xf", "adj_qf"},
-                                     {"fwd:adj_x0", "fwd:adj_p"});
-      arg = decltype(arg){{"x0", test.x0},
-                          {"p", test.u0},
-                          {"fwd_p", 1},
-                          {"adj_xf", 0},
-                          {"adj_qf", 1}};
-      res = I_foa(arg);
-      vector<double> fwd_adj_x0(res.at("fwd_adj_x0"));
-      vector<double> fwd_adj_p(res.at("fwd_adj_p"));
-      cout << setw(50) << "Forward over adjoint sensitivities: " << "d2(qf)/d(x0)d(p) = " << fwd_adj_x0 << ", d2(qf)/d(p)d(p) = " << fwd_adj_p << endl;
-
-      // Adjoint over adjoint to get the second order sensitivities
-      Function I_aoa = I_adj.factory("I_aoa", {"x0", "p", "adj_xf", "adj_qf", "adj:adj_p"},
-                                              {"adj:x0", "adj:p"});
-      arg = decltype(arg){{"x0", test.x0},
-                          {"p", test.u0},
-                          {"adj_xf", 0},
-                          {"adj_qf", 1},
-                          {"adj_adj_p", 1}};
-      res = I_aoa(arg);
-      vector<double> adj_adj_x0(res.at("adj_x0"));
-      vector<double> adj_adj_p(res.at("adj_p"));
-      cout << setw(50) << "Adjoint over adjoint sensitivities: " << "d2(qf)/d(x0)d(p) = " << adj_adj_x0 << ", d2(qf)/d(p)d(p) = " << adj_adj_p << endl;
+        // Adjoint over adjoint to get the second order sensitivities
+        Function I_aoa = I_adj.factory("I_aoa", {"x0", "p", "adj_xf", "adj_qf", "adj:adj_p"},
+                                                {"adj:x0", "adj:p"});
+        arg = decltype(arg){{"x0", test.x0},
+                            {"p", test.u0},
+                            {"adj_xf", 0},
+                            {"adj_qf", adj_qf},
+                            {"adj_adj_p", 1}};
+        res = I_aoa(arg);
+        DM adj_adj_x0 = res.at("adj_x0");
+        DM adj_adj_p = res.at("adj_p");
+        std::cout << std::setw(50) << "Adjoint over adjoint sensitivities: " << "d2(qf)/d(x0)d(p) = " << adj_adj_x0.nonzeros() << ", d2(qf)/d(p)d(p) = " << adj_adj_p.nonzeros() << std::endl;
+      }
     }
   }
   return 0;

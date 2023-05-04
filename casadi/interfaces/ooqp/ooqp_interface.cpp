@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -35,7 +35,6 @@
 // This is the only possible way to access it using the C++ interface
 extern casadi_int gOoqpPrintLevel;
 
-using namespace std;
 namespace casadi {
 
   extern "C"
@@ -286,7 +285,7 @@ namespace casadi {
     casadi_int nA=0, nC=0, /*mz=0, */ nnzA=0, nnzC=0;
     for (casadi_int j=0; j<na_; ++j) {
       if (lba[j] == -numeric_limits<double>::infinity() &&
-          uba[j] ==  numeric_limits<double>::infinity()) {
+          uba[j] ==  std::numeric_limits<double>::infinity()) {
         // Redundant constraint
         c_index_[j] = 0;
       } else if (lba[j]==uba[j]) {
@@ -410,8 +409,8 @@ namespace casadi {
     }
 
     m->return_status = ierr;
-    m->success = ierr==SUCCESSFUL_TERMINATION;
-    if (ierr==MAX_ITS_EXCEEDED) m->unified_return_status = SOLVER_RET_LIMITED;
+    m->d_qp.success = ierr==SUCCESSFUL_TERMINATION;
+    if (ierr==MAX_ITS_EXCEEDED) m->d_qp.unified_return_status = SOLVER_RET_LIMITED;
     if (ierr>0) {
       casadi_warning("Unable to solve problem: " + str(errFlag(ierr)));
     } else if (ierr<0) {
@@ -496,7 +495,7 @@ namespace casadi {
 
   std::string OoqpInterface::printBounds(const std::vector<double>& b,
                                       const std::vector<char>& ib, casadi_int n, const char *sign) {
-    stringstream ss;
+    std::stringstream ss;
     ss << "[";
     for (casadi_int i=0; i<n; ++i) {
       if (i!=0) ss << ", ";

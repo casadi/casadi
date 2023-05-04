@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -110,6 +110,9 @@ template<> inline std::string matrixName<SXElem>() { return "SX"; }
                              std::vector<SX>& ex, bool reverse);
 
   template<>
+  std::vector<SX> SX::cse(const std::vector<SX>& e);
+
+  template<>
   bool SX::depends_on(const SX &x, const SX &arg);
 
   template<>
@@ -133,6 +136,9 @@ template<> inline std::string matrixName<SXElem>() { return "SX"; }
   std::vector<bool> SX::which_depends(const SX &expr, const SX &var, casadi_int order, bool tr);
 
   template<>
+  Sparsity SX::jacobian_sparsity(const SX &f, const SX &x);
+
+  template<>
   SX SX::taylor(const SX& f, const SX& x,
                 const SX& a, casadi_int order);
 
@@ -152,6 +158,10 @@ template<> inline std::string matrixName<SXElem>() { return "SX"; }
 
   template<>
   std::vector<SX> SX::symvar(const SX& x);
+
+  template<>
+  void SX::extract(std::vector<SX>& ex, std::vector<SX>& v_sx,
+      std::vector<SX>& vdef_sx, const Dict& opts);
 
   template<>
   void SX::shared(std::vector<SX>& ex,

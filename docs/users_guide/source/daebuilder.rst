@@ -7,104 +7,95 @@ The |DaeBuilder| class
 
 The |DaeBuilder| class in |casadi| is an auxiliary class intended to
 facilitate the modeling complex dynamical systems for later use with optimal
-control algorithms. This class can be seen as a low-level alternative to
+control algorithms. This class has lower level of abstraction than
 a physical modeling language such as Modelica (cf. :numref:`sec-modelica`),
 while still being higher level than working directly with |casadi| symbolic
-expressions. Another important usage it to provide an interface to
-physical modeling languages and software and be a building blocks for
-developing domain specific modeling environments.
+expressions. In particular, it can be used to interface physical models
+available in the Functional Mock-up Interface (FMI) format or be used
+as a building block for constructing a domain specific modeling environments.
 
-Using the |DaeBuilder| class consists of the following steps:
-
-* Step-by-step constructing a structured system of differential-algebraic equations (DAE) or, alternatively, importing an existing model from Modelica
-* Symbolically reformulate the DAE
-* Generate a chosen set of |casadi| functions to be used for e.g. optimal control or C code generation
-
-In the following sections, we describe the mathematical formulation of the class
-and its intended usage.
+There are in principle three different ways to use |DaeBuilder|:
+ * One can use the class to step-by-step construct a structured system of differential-algebraic equations (DAE), which can then be used to interface to simulation or optimization in CasADi. There is also experimental support for exporting the models in the FMI format for use in other tools.
+ * One can use the class to import existing models available in the FMI format. As of CasADi 3.6, we support import of standard FMUs, where the model equations are available only by calls to DLLs. The FMU import support has been tested for challenging FMUs, but is still under development as of this writing.
+ * One can use the class to import existing models in a symbolic XML format. This format was supported in the JModelica.org tool and has experimental support in OpenModelica. This format is not in active development due to the limited availability of tools to generate models in the format.
 
 .. _sec-daebuilder_io:
 
-Mathematical formulation
-------------------------
+.. Mathematical formulation
+.. ------------------------
 
-The |DaeBuilder| class uses a relatively rich problem formulation that
-consists of a set of input expressions and a set of output expressions, each
-defined by a string identifier. The choice of expressions was inspired by the
-*functional mock-up interface* (FMI) version 2.0
-[#f3]_
+.. The |DaeBuilder| class uses a relatively rich problem formulation that
+.. consists of a set of input expressions and a set of output expressions, each
+.. defined by a string identifier. The choice of expressions was inspired by the
+.. *functional mock-up interface* (FMI) version 2.0
+.. [#f3]_
 
-Input expressions
-^^^^^^^^^^^^^^^^^
+.. Input expressions
+.. ^^^^^^^^^^^^^^^^^
 
 
-'t'
-  Time :math:`t`
+.. 't'
+..   Time :math:`t`
 
-'c'
-  Named constants :math:`c`
+.. 'c'
+..   Named constants :math:`c`
 
-'p'
-  Independent parameters :math:`p`
+.. 'p'
+..   Independent parameters :math:`p`
 
-'d'
-  Dependent parameters :math:`d`, depends only on :math:`p` and :math:`c` and,
-  acyclically, on other :math:`d`
+.. 'v'
+..   Dependent variables :math:`v`, depends on other variables and, acyclically, on other :math:`v`
 
-'x'
-  Differential state :math:`x`, defined by an explicit ODE
+.. 'x'
+..   Differential state :math:`x`, defined by an explicit ODE
 
-'s'
-  Differential state :math:`s`, defined by an implicit ODE
+.. 's'
+..   Differential state :math:`s`, defined by an implicit ODE
 
-'sdot'
-  Time derivatives implicitly defined differential state :math:`\dot{s}`
+.. 'sdot'
+..   Time derivatives implicitly defined differential state :math:`\dot{s}`
 
-'z'
-  Algebraic variable, defined by an algebraic equation
+.. 'z'
+..   Algebraic variable, defined by an algebraic equation
 
-'q'
-  Quadrature state :math:`q`. A differential state that may not appear in
-  the right-hand-side and hence can be calculated by quadrature formulas.
+.. 'q'
+..   Quadrature state :math:`q`. A differential state that may not appear in
+..   the right-hand-side and hence can be calculated by quadrature formulas.
 
-'w'
-  Local variables :math:`w`. Calculated from time and time dependent
-  variables. They may also depend, acyclically, on other :math:`w`.
+.. 'y'
+..   Output variables :math:`y`
 
-'y'
-  Output variables :math:`y`
+.. 'u'
+..   Input variables :math:`u`
 
 
 
-Output expressions
-^^^^^^^^^^^^^^^^^^
+.. Output expressions
+.. ^^^^^^^^^^^^^^^^^^
 
-The above input expressions are used to define the following output expressions:
+.. The above input expressions are used to define the following output expressions:
 
-'ddef'
-  Explicit expression for calculating :math:`d`
+.. 'vdef'
+..   Explicit expression for calculating :math:`v`
 
-'wdef'
-  Explicit expression for calculating :math:`w`
+.. 'ode'
+..   The explicit ODE right-hand-side:
+..     :math:`\dot{x} = \text{ode}(t,v,x,s,z,u,p)`
 
-'ode'
-  The explicit ODE right-hand-side:
-    :math:`\dot{x} = \text{ode}(t,w,x,s,z,u,p,d)`
+.. 'dae'
+..   The implicit ODE right-hand-side:
+..   :math:`\text{dae}(t,v,x,s,z,u,p,\dot{s}) =0`
 
-'dae'
-  The implicit ODE right-hand-side:
-  :math:`\text{dae}(t,w,x,s,z,u,p,d,\dot{s}) =0`
+.. 'alg'
+..    The algebraic equations:
+..     :math:`\text{alg}(t,v,x,s,z,u,p) = 0`
 
-'alg'
-   The algebraic equations:
-    :math:`\text{alg}(t,w,x,s,z,u,p,d) = 0`
+.. 'quad'
+..   The quadrature equations:
+..   :math:`\dot{q} = \text{quad}(t,v,x,s,z,u,p)`
 
-'quad'
-  The quadrature equations:
-  :math:`\dot{q} = \text{quad}(t,w,x,s,z,u,p,d)`
-
-'ydef'
-  Explicit expressions for calculating :math:`y`
+.. 'ydef'
+..   Explicit expressions for calculating :math:`y`
 
 .. _sec-daebuilder_syntax:
 
@@ -131,10 +122,10 @@ as follows.
 
 .. side-by-side::
     .. exec-block:: python
-        
+
         g = 9.81 [hidden]
 
-        dae = DaeBuilder()
+        dae = DaeBuilder('rocket')
         # Add input expressions
         a = dae.add_p('a')
         b = dae.add_p('b')
@@ -146,9 +137,9 @@ as follows.
         hdot = v
         vdot = (u-a*v**2)/m-g
         mdot = -b*u**2
-        dae.add_ode('hdot', hdot)
-        dae.add_ode('vdot', vdot)
-        dae.add_ode('mdot', mdot)
+        dae.set_ode('h', hdot)
+        dae.set_ode('v', vdot)
+        dae.set_ode('m', mdot)
         # Specify initial conditions
         dae.set_start('h', 0)
         dae.set_start('v', 0)
@@ -164,7 +155,7 @@ as follows.
 
         g = 9.81; [hidden]
 
-        dae = DaeBuilder;
+        dae = DaeBuilder('rocket')
         % Add input expressions
         a = dae.add_p('a');
         b = dae.add_p('b');
@@ -176,9 +167,9 @@ as follows.
         hdot = v;
         vdot = (u-a*v^2)/m-g;
         mdot = -b*u^2;
-        dae.add_ode('hdot', hdot);
-        dae.add_ode('vdot', vdot);
-        dae.add_ode('mdot', mdot);
+        dae.set_ode('h', hdot);
+        dae.set_ode('v', vdot);
+        dae.set_ode('m', mdot);
         % Specify initial conditions
         dae.set_start('h', 0);
         dae.set_start('v', 0);
@@ -193,8 +184,16 @@ list of functions, see the C++ API documentation for |DaeBuilder|.
 
 .. _sec-modelica:
 
-Import of OCPs from Modelica
-----------------------------
+Symbolic import of OCPs from Modelica
+-------------------------------------
+
+Note: JModelica.org is no longer offered by Modelon. Its closed-source successor code, OCT,
+does retain CasADi interoperability however. Details of how to use OCT to generate CasADi
+expressions is best described in OCT's user guide. The text in the following refers to the
+legacy Modelica interoperability support.
+
+Legacy symbolic import from XML files
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 An alternative to model directly in |casadi|, as above, is to use an advanced
 physical modeling language such as Modelica to specify the model. For this,
@@ -238,39 +237,39 @@ using the ``parse_fmi`` command:
 
 .. code-block:: python
 
-    dae = DaeBuilder()
+    ocp = DaeBuilder()
     ocp.parse_fmi('modelDescription.xml')
 
 
-Symbolic reformulation
-----------------------
+.. Symbolic reformulation
+.. ----------------------
 
-One of the original purposes of the |DaeBuilder| class was to reformulate
-a *fully-implicit DAE*, typically coming from Modelica, to a semi-explicit
-DAE that can be used more readily in optimal control algorithms.
+.. One of the original purposes of the |DaeBuilder| class was to reformulate
+.. a *fully-implicit DAE*, typically coming from Modelica, to a semi-explicit
+.. DAE that can be used more readily in optimal control algorithms.
 
-This can be done by the \python{make_implicit} command:
+.. This can be done by the \python{make_implicit} command:
 
-.. side-by-side::
-    .. code-block:: python
+.. .. side-by-side::
+..     .. code-block:: python
 
-        ocp.make_explicit()
+..         ocp.make_explicit()
 
-    &&
+..     &&
 
-    .. code-block:: octave
+..     .. code-block:: octave
 
-        ocp.make_explicit();
+..         ocp.make_explicit();
 
 
-Other useful commands available for an instance ``ocp`` of |DaeBuilder| include:
+.. Other useful commands available for an instance ``ocp`` of |DaeBuilder| include:
 
-* ``print ocp`` Print the optimal optimal control problem to screen
-* ``ocp.scale_variables()`` Scale all variables using the *nominal* attribute for each variable
-* ``ocp.eliminate_d()`` Eliminate all independent parameters from the symbolic expressions
+.. * ``print ocp`` Print the optimal optimal control problem to screen
+.. * ``ocp.scale_variables()`` Scale all variables using the *nominal* attribute for each variable
+.. * ``ocp.eliminate_d()`` Eliminate all independent parameters from the symbolic expressions
 
-For a more detailed description of this class and its functionalities, we again
-refer to the API documentation.
+.. For a more detailed description of this class and its functionalities, we again
+.. refer to the API documentation.
 
 Function factory
 ----------------

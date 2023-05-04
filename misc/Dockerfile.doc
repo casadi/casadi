@@ -1,0 +1,37 @@
+FROM ubuntu:22.04
+
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt install sudo -y
+
+RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
+
+RUN addgroup docker_user --gid 121
+RUN adduser --uid 1001 --gid 121 --disabled-password --gecos '' developer
+RUN adduser developer sudo
+RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+
+USER developer
+
+
+RUN sudo apt-get update && sudo apt install octave liboctave-dev texlive-xetex latexmk graphviz texlive-science texlive-latex-base texlive-latex-recommended texlive-latex-extra doxygen python-is-python3 pandoc git python3-pip python3-numpy python3-scipy python3-matplotlib curl lsb-release -y
+
+RUN curl -fsSL http://build.openmodelica.org/apt/openmodelica.asc | sudo gpg --dearmor -o /usr/share/keyrings/openmodelica-keyring.gpg\
+    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/openmodelica-keyring.gpg] https://build.openmodelica.org/apt \
+    $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/openmodelica.list > /dev/null
+RUN sudo apt update && sudo apt install --no-install-recommends -y omc omlibrary
+
+ENV PATH="${PATH}:/home/developer/.local/bin"
+
+RUN pip install nbconvert ipython ipykernel jupytext pydot lxml ipdb texttable OMPython OMSimulator python-baseconv
+
+COPY doc_requirements.txt /tmp/requirements.txt
+RUN cd /tmp && pip install -r requirements.txt
+
+RUN ipython kernel install --name "python3" --user
+
+RUN sudo rm /lib/x86_64-linux-gnu/libblas.so.3 /lib/x86_64-linux-gnu/libblas.so
+RUN sudo ln -s /etc/alternatives/libopenblas.so.0-x86_64-linux-gnu /lib/x86_64-linux-gnu/libblas.so.3
+RUN sudo ln -s /etc/alternatives/libopenblas.so.0-x86_64-linux-gnu /lib/x86_64-linux-gnu/libblas.so
+
+ENV USER=developer
+
+WORKDIR /local

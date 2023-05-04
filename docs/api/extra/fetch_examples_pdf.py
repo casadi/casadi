@@ -2,8 +2,8 @@
 #     This file is part of CasADi.
 #
 #     CasADi -- A symbolic framework for dynamic optimization.
-#     Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
-#                             K.U. Leuven. All rights reserved.
+#     Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+#                             KU Leuven. All rights reserved.
 #     Copyright (C) 2011-2014 Greg Horn
 #
 #     CasADi is free software; you can redistribute it and/or
@@ -52,4 +52,4 @@ for example in examples:
       pass
     shutil.copyfile(src+m.group(1) + '.pdf','html/'+m.group(1) + '.pdf')
     shutil.copyfile(src+m.group(1) + '.py', 'html/'+m.group(1) + '.py')
-    print m.group(1) + '.pdf'
+    print(m.group(1) + '.pdf')

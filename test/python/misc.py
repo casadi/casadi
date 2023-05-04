@@ -2,8 +2,8 @@
 #     This file is part of CasADi.
 #
 #     CasADi -- A symbolic framework for dynamic optimization.
-#     Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
-#                             K.U. Leuven. All rights reserved.
+#     Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+#                             KU Leuven. All rights reserved.
 #     Copyright (C) 2011-2014 Greg Horn
 #
 #     CasADi is free software; you can redistribute it and/or
@@ -46,7 +46,7 @@ class Misctests(casadiTestCase):
     def calc_sparsity():
       x = casadi.SX.sym("x")
       f = casadi.Function('f', [x], [x ** 2])
-      return f.sparsity_jac(0, 0)
+      return f.jac_sparsity(0, 0)
 
     def print_sparsity():
         sparsity = calc_sparsity()
@@ -316,6 +316,11 @@ class Misctests(casadiTestCase):
       print(str(e))
       self.assertTrue("x must be larger than 3" in str(e))
 
+  def test_doc(self):
+    self.assertTrue("jac_penalty" in nlpsol.__doc__) # FunctionInternal
+    self.assertTrue("print_time" in nlpsol.__doc__)  # ProtoFunction
+    self.assertTrue( nlpsol.__doc__.count("print_time")==1)  # ProtoFunction
+
   @requires_nlpsol("ipopt")
   def test_output(self):
     with capture_stdout() as result:
@@ -428,7 +433,7 @@ class Misctests(casadiTestCase):
     f.save("foo.dat")
     si = FileDeserializer("foo.dat")
     print(si.unpack())
-  
+
   def test_print_time(self):
 
 
@@ -486,40 +491,43 @@ class Misctests(casadiTestCase):
         with self.assertOutput(included, excluded):
           solver.solve(A,vertcat(1,2,3))
 
+  @memory_heavy()
   def test_record_time(self):
 
 
     x = MX.sym("x")
     f = x**2
-
+    for i in range(10000):
+      f =sin(f)*f
+    f=f+x**2
 
     opts = {"record_time":True}
     ff = Function("f",[x],[f],opts)
     ff(3)
     self.assertTrue("t_proc_total" in ff.stats())
-    self.assertTrue(ff.stats()["t_proc_total"]>=0)
+    self.assertTrue(ff.stats()["t_wall_total"]>=0)
 
     if has_nlpsol("ipopt"):
       solver = nlpsol("nlpsol","ipopt",{"x":x,"f":f},opts)
       solver()
       self.assertTrue("t_proc_total" in solver.stats())
-      self.assertTrue(solver.stats()["t_proc_total"]>0)
+      self.assertTrue(solver.stats()["t_wall_total"]>0)
 
     if has_conic("qpoases"):
       solver = qpsol("qpsol","qpoases",{"x":x,"f":f},opts)
       solver()
       self.assertTrue("t_proc_total" in solver.stats())
-      self.assertTrue(solver.stats()["t_proc_total"]>0)
+      self.assertTrue(solver.stats()["t_wall_total"]>0)
 
     solver = rootfinder("rootfinder","newton",{"x":x,"g":x},opts)
     solver()
     self.assertTrue("t_proc_total" in solver.stats())
-    self.assertTrue(solver.stats()["t_proc_total"]>=0)
+    self.assertTrue(solver.stats()["t_wall_total"]>=0)
 
     solver = integrator("integrator","rk",{"x":x,"ode":f},opts)
     solver()
     self.assertTrue("t_proc_total" in solver.stats())
-    self.assertTrue(solver.stats()["t_proc_total"]>=0)
+    self.assertTrue(solver.stats()["t_wall_total"]>=0)
 
     integr_options = {}
     integr_options["simplify"] = True
@@ -527,14 +535,14 @@ class Misctests(casadiTestCase):
     solver = integrator("integrator","rk",{"x":x,"ode":f},integr_options)
     solver()
     self.assertTrue("t_proc_total" in solver.stats())
-    self.assertTrue(solver.stats()["t_proc_total"]>=0)
+    self.assertTrue(solver.stats()["t_wall_total"]>=0)
 
     A = DM.rand(3,3)
     if has_linsol("lapacklu"):
       solver = Linsol("linsol","lapacklu",A.sparsity(),opts)
       solver.solve(A,vertcat(1,2,3))
       self.assertTrue("t_proc_total" in solver.stats())
-      self.assertTrue(solver.stats()["t_proc_total"]>=0)
+      self.assertTrue(solver.stats()["t_wall_total"]>=0)
 
 if __name__ == '__main__':
     unittest.main()

@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -31,12 +31,15 @@
 
 #include <scs_parser.h>
 
-/** \defgroup plugin_Conic_superscs
+/** \defgroup plugin_Conic_superscs Title
+    \par
+
     Interface to the SuperSCS solver for conic programming
 
 
     Joris Gillis, 2019
-*/
+
+    \identifier{21z} */
 
 /** \pluginsection{Conic,superscs} */
 
@@ -46,7 +49,7 @@ namespace casadi {
   struct CASADI_CONIC_SUPERSCS_EXPORT SuperscsMemory : public ConicMemory {
 
     ScsSolution* sol;
-    ScsData data;;
+    ScsData data;
 
     ScsInfo * info;
     ScsCone cone;

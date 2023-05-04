@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -26,16 +26,25 @@
 #ifndef CASADI_TINYXML_INTERFACE_HPP
 #define CASADI_TINYXML_INTERFACE_HPP
 
-/** \defgroup plugin_XmlFile_tinyxml
+/** \defgroup plugin_XmlFile_tinyxml Title
+    \par
+
  * XmlFile using TinyXml
-*/
+
+    \identifier{22i} */
 
 /** \pluginsection{XmlFile,tinyxml} */
 
 /// \cond INTERNAL
-#include <tinyxml.h>
+#include <tinyxml2.h>
 #include "casadi/core/xml_file_internal.hpp"
 #include <casadi/interfaces/tinyxml/casadi_xmlfile_tinyxml_export.h>
+
+typedef tinyxml2::XMLNode TiXmlNode;
+typedef tinyxml2::XMLDocument TiXmlDocument;
+typedef tinyxml2::XMLElement TiXmlElement;
+typedef tinyxml2::XMLAttribute TiXmlAttribute;
+typedef tinyxml2::XMLError XMLError;
 
 namespace casadi {
 
@@ -62,8 +71,14 @@ namespace casadi {
     // Parse an XML file
     XmlNode parse(const std::string& filename) override;
 
-    // Parse an XML tree
-    XmlNode addNode(TiXmlNode* n);
+    // Save a parsed XML file to disk
+    void dump(const std::string& filename, const XmlNode& node) override;
+
+    // Read an XML tree
+    XmlNode import_node(TiXmlNode* n);
+
+    // Write an XML tree
+    void export_node(TiXmlNode* n, const XmlNode& node);
 
     // Destructor
     ~TinyXmlInterface() override;

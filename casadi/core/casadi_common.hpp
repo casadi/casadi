@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -94,8 +94,12 @@ namespace casadi {
 // warning C4244: Potential loss of data converting double to int
 #pragma warning(disable:4244)
 
-// warinng C4251: Need a dll interface?
+// warning C4251: Need a dll interface?
 #pragma warning(disable:4251)
+
+// warning C4275: non dll-interface class 'std::exception' used as base for dll-interface
+// class 'casadi::CasadiException'
+#pragma warning(disable:4275)
 
 // warning C4715: Not all control paths return a value
 #pragma warning(disable:4715)
@@ -106,7 +110,8 @@ namespace casadi {
 // warning C4910: __declspec(dllexport) and extern incompatible on an explicit instantiation
 #pragma warning(disable:4910)
 
-// ?
+// warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s
+// instead
 #pragma warning(disable:4996)
 
 #endif // _MSC_VER
@@ -116,13 +121,8 @@ namespace casadi {
 #undef minor
 
   // Type with a size corresponding to that of double (or smaller) that can be used to hold a set
-  // of booleans. If the compiler supports C99 or has defined __SIZEOF_LONG_LONG__,
-  // we shall use the long long datatype, which is 64 bits, otherwise long
-  #if (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L || defined(__SIZEOF_LONG_LONG__))
+  // of booleans
   typedef unsigned long long bvec_t;
-  #else
-  typedef unsigned long bvec_t;
-  #endif
 
   // Number of directions we can deal with at a time
   // the size of bvec_t in bits (CHAR_BIT is the number of bits per byte, usually 8)
@@ -132,12 +132,15 @@ namespace casadi {
   //assert(sizeof(bvec_t) <= sizeof(double)); // doesn't work - very strange
 
   ///@{
-  /** \brief  Function pointer types for the C API */
+  /** \brief  Function pointer types for the C API
+
+      \identifier{7j} */
   typedef void (*signal_t)(void);
   typedef casadi_int (*getint_t)(void);
   typedef double (*default_t)(casadi_int i);
   typedef const char* (*name_t)(casadi_int i);
   typedef const casadi_int* (*sparsity_t)(casadi_int i);
+  typedef int (*diff_t)(casadi_int i);
   typedef int (*casadi_checkout_t)(void);
   typedef void (*casadi_release_t)(int);
   typedef int (*work_t)(casadi_int* sz_arg, casadi_int* sz_res,
@@ -224,12 +227,12 @@ namespace casadi {
     return {str(t1), str(t2), str(t3), str(t4), str(t5), str(t6)};
   }
 
-  //! \brief Create a string from a formated string
+  //! \brief Create a string from a formatted string
   inline std::string fmtstr(const std::string& fmt, const std::vector<std::string>& args) {
     std::string s = fmt;
     for (auto&& e : args) {
       std::string::size_type n = s.find("%s");
-      if (n==std::string::npos) return "** Ill-formated string ** " + fmt;
+      if (n==std::string::npos) return "** Ill-formatted string ** " + fmt;
       s.replace(n, 2, e);
     }
     return s;

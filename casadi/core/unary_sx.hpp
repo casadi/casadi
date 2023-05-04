@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -34,18 +34,24 @@
 namespace casadi {
 
 /** \brief Represents a basic unary operation on an SXElem node
+
   \author Joel Andersson
   \date 2012
-*/
+
+    \identifier{dt} */
 class UnarySX : public SXNode {
   private:
 
-    /** \brief  Constructor is private, use "create" below */
+    /** \brief  Constructor is private, use "create" below
+
+        \identifier{du} */
     UnarySX(unsigned char op, const SXElem& dep) : op_(op), dep_(dep) {}
 
   public:
 
-    /** \brief  Create a unary expression */
+    /** \brief  Create a unary expression
+
+        \identifier{dv} */
     inline static SXElem create(unsigned char op, const SXElem& dep) {
       if (dep.is_constant()) {
         // Evaluate constant
@@ -59,7 +65,9 @@ class UnarySX : public SXNode {
       }
     }
 
-    /** \brief Destructor */
+    /** \brief Destructor
+
+        \identifier{dw} */
     ~UnarySX() override {
       safe_delete(dep_.assignNoDelete(casadi_limits<SXElem>::nan));
     }
@@ -71,31 +79,45 @@ class UnarySX : public SXNode {
 
     bool is_op(casadi_int op) const override { return op_==op; }
 
-    /** \brief Check if two nodes are equivalent up to a given depth */
+    /** \brief Check if two nodes are equivalent up to a given depth
+
+        \identifier{dx} */
     bool is_equal(const SXNode* node, casadi_int depth) const override {
       const UnarySX* n = dynamic_cast<const UnarySX*>(node);
       return n && n->op_ == op_ &&  SXElem::is_equal(n->dep_, dep_, depth-1);
     }
 
-    /** \brief  Number of dependencies */
+    /** \brief  Number of dependencies
+
+        \identifier{dy} */
     casadi_int n_dep() const override { return 1;}
 
-    /** \brief  get the reference of a dependency */
+    /** \brief  get the reference of a dependency
+
+        \identifier{dz} */
     const SXElem& dep(casadi_int i) const override { return dep_; }
     SXElem& dep(casadi_int i) override { return dep_; }
 
-    /** \brief  Get the operation */
+    /** \brief  Get the operation
+
+        \identifier{e0} */
     casadi_int op() const override { return op_;}
 
-    /** \brief  Print expression */
+    /** \brief  Print expression
+
+        \identifier{e1} */
     std::string print(const std::string& arg1, const std::string& arg2) const  override {
       return casadi_math<double>::print(op_, arg1);
     }
 
-    /** \brief  The binary operation as an 1 byte integer (allows 256 values) */
+    /** \brief  The binary operation as an 1 byte integer (allows 256 values)
+
+        \identifier{e2} */
     unsigned char op_;
 
-    /** \brief  The dependencies of the node */
+    /** \brief  The dependencies of the node
+
+        \identifier{e3} */
     SXElem dep_;
 
     void serialize_node(SerializingStream& s) const override {

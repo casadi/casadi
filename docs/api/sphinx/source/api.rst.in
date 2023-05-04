@@ -1,0 +1,108 @@
+
+
+
+
+.. currentmodule:: casadi
+
+.. _api-solvers-expression-tools:
+
+Expression tools
+=====================
+
+.. automodule:: casadi.casadi
+@@EXPRESSIONS@@
+
+.. _api-classes:
+
+
+Classes
+============
+
+.. _api-classes-DM:
+
+DM
+--
+
+.. autoclass:: DM
+  :members:
+
+.. _api-classes-SX:
+
+SX
+--
+
+.. autoclass:: SX
+  :members:
+
+.. _api-classes-MX:
+
+MX
+--
+
+.. autoclass:: MX
+  :members:
+
+.. _api-classes-Sparsity:
+
+Sparsity
+--------
+
+.. autoclass:: Sparsity
+  :members:
+
+.. _api-classes-Function:
+
+Function
+--------
+
+.. autoclass:: Function
+  :members:
+
+.. _api-solvers:
+
+Solvers
+============
+
+.. _api-solvers-nlp:
+
+NLP
+---
+.. autofunction:: nlpsol
+
+.. _api-solvers-qp:
+
+QP
+--
+
+High-level
+^^^^^^^^^^
+.. autofunction:: qpsol
+
+Low-level
+^^^^^^^^^
+.. autofunction:: conic
+
+.. _api-solvers-integrator:
+
+Integrator
+----------
+
+.. autofunction:: integrator
+
+.. _api-solvers-rootfinding:
+
+Rootfinding
+-----------
+.. autofunction:: rootfinder
+
+.. grep DECL casadi.i | grep -o -P "(?<=casadi_)\w*?(?=\()" | sort -u | paste -sd "," -
+.. python -c "import inspect;import casadi;print(','.join([k for k,v in casadi.__dict__.items() if inspect.isclass(v)]))"
+
+
+.. seealso:: `Docs on rootfinding <../docs/#nonlinear-root-finding-problems>`_
+
+Linear systems
+--------------
+.. autoclass:: Linsol
+  :members:
+

@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -25,29 +25,27 @@
 #define CASADI_DM_INSTANTIATOR_CPP
 #include "matrix_impl.hpp"
 
-using namespace std;
-
 namespace casadi {
 
 
   template<>
   DM CASADI_EXPORT DM::
   solve(const DM& A, const DM& b,
-        const string& lsolver, const Dict& dict) {
-    Linsol mysolver("tmp", lsolver, A.sparsity(), dict);
+        const std::string& lsolver, const Dict& dict) {
+    Linsol mysolver("tmp_solve", lsolver, A.sparsity(), dict);
     return mysolver.solve(A, b, false);
   }
 
   template<>
   DM CASADI_EXPORT DM::
   inv(const DM& A,
-        const string& lsolver, const Dict& dict) {
+        const std::string& lsolver, const Dict& dict) {
     return solve(A, DM::eye(A.size1()), lsolver, dict);
   }
 
   template<>
   DM CASADI_EXPORT DM::
-  pinv(const DM& A, const string& lsolver,
+  pinv(const DM& A, const std::string& lsolver,
        const Dict& dict) {
     if (A.size1()>=A.size2()) {
       return solve(mtimes(A.T(), A), A.T(), lsolver, dict);
@@ -79,6 +77,18 @@ namespace casadi {
   DM CASADI_EXPORT DM::
   expm_const(const DM& A, const DM& t) {
     return expm(A*t);
+  }
+
+  template<>
+  DM CASADI_EXPORT DM::
+  _logsumexp(const DM& A) {
+    return casadi_logsumexp(A.ptr(), A.numel());
+  }
+
+  template<>
+  std::vector<DM> CASADI_EXPORT DM::
+  cse(const std::vector<DM>& e) {
+    return e;
   }
 
   template<> void CASADI_EXPORT DM::export_code(const std::string& lang,
@@ -166,7 +176,7 @@ namespace casadi {
       // Special case for dense (for readibility of exported code)
       stream << indent << name << " = reshape(";
       stream << name << "_nz, ";
-      stream << size1() << ", " << size2() << ");" << endl;
+      stream << size1() << ", " << size2() << ");" << std::endl;
     } else {
       // For sparse matrices, export Sparsity and use sparse constructor
       Dict opts;
@@ -177,7 +187,7 @@ namespace casadi {
       sparsity().export_code(lang, stream, opts);
       stream << indent << name << " = sparse(" << name << "_i, " << name << "_j, ";
       stream << name << "_nz, ";
-      stream << size1() << ", " << size2() << ");" << endl;
+      stream << size1() << ", " << size2() << ");" << std::endl;
     }
   }
 
@@ -201,7 +211,7 @@ namespace casadi {
 
       for (casadi_int k=0;k<row.size();++k) {
         out << row[k]+1 << " " << col[k]+1 << " ";
-        normalized_out(out, nonzeros ? nonzeros[k]: 0);
+        normalized_out(out, nonzeros ? nonzeros[k]: casadi::nan);
         out << std::endl;
       }
     } else if (format=="txt") {
@@ -227,7 +237,7 @@ namespace casadi {
           if (cc<size2-1) out << std::setw(w);
           // String representation of element
           if (ind[cc]<colind[cc+1] && row[ind[cc]]==rr) {
-            normalized_out(out, nonzeros ? nonzeros[ind[cc]++]: 0);
+            normalized_out(out, nonzeros ? nonzeros[ind[cc]++]: casadi::nan);
           } else {
             out << std::setw(w) << "00";
           }
@@ -327,7 +337,6 @@ namespace casadi {
       std::vector<casadi_int> row, col;
       normalized_setup(stream);
 
-      casadi_int i=0;
       // Read line-by-line
       while (std::getline(in, line)) {
         // Ignore empty lines
@@ -359,7 +368,6 @@ namespace casadi {
           row.push_back(r-1);
           col.push_back(c-1);
           values.push_back(val);
-          i++;
         }
       }
       return DM::triplet(row, col, values, n_row, n_col);

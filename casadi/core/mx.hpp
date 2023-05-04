@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -36,7 +36,9 @@
 #include <vector>
 namespace casadi {
 
-  /** \brief  Forward declaration */
+  /** \brief  Forward declaration
+
+      \identifier{px} */
   class MXNode;
   class Function;
   class SerializingStream;
@@ -73,67 +75,93 @@ namespace casadi {
 
       \author Joel Andersson
       \date 2010-2011
-  */
+
+      \identifier{py} */
   class CASADI_EXPORT MX :
     public SWIG_IF_ELSE(GenericExpressionCommon, GenericExpression<MX>),
     public SWIG_IF_ELSE(PrintableCommon, Printable<MX>),
     public GenericMatrix<MX>,
     public SharedObject {
   public:
-    /** \brief Get type name */
+    /** \brief Get type name
+
+        \identifier{pz} */
     static std::string type_name() {return "MX";}
 
-    /** \brief  Default constructor */
+    /** \brief  Default constructor
+
+        \identifier{q0} */
     MX();
 
-    /** \brief Create a sparse matrix with all structural zeros */
+    /** \brief Create a sparse matrix with all structural zeros
+
+        \identifier{q1} */
     MX(casadi_int nrow, casadi_int ncol);
 
 #ifndef SWIG
-    /** \brief Create a sparse matrix with all structural zeros */
+    /** \brief Create a sparse matrix with all structural zeros
+
+        \identifier{q2} */
     explicit MX(const std::pair<casadi_int, casadi_int>& rc);
 #endif // SWIG
 
     /** \brief Create a sparse matrix from a sparsity pattern.
+
         Same as MX::ones(sparsity)
-     */
+
+        \identifier{q3} */
     explicit MX(const Sparsity& sp);
 
-    /** \brief Construct matrix with a given sparsity and nonzeros */
+    /** \brief Construct matrix with a given sparsity and nonzeros
+
+        \identifier{q4} */
     MX(const Sparsity& sp, const MX& val);
 
-    /** \brief Construct matrix with a given sparsity and a file with nonzeros */
+    /** \brief Construct matrix with a given sparsity and a file with nonzeros
+
+        \identifier{q5} */
     MX(const Sparsity& sp, const std::string& fname);
 
-    /** \brief  Create scalar constant (also implicit type conversion) */
+    /** \brief  Create scalar constant (also implicit type conversion)
+
+        \identifier{q6} */
     MX(double x);
 
-    /** \brief  Copy constructor */
-    MX(const MX& x);
-
 #ifndef SWIG
-    /** \brief  Create vector constant (also implicit type conversion) */
+    /** \brief  Create vector constant (also implicit type conversion)
+
+        \identifier{q7} */
     MX(const std::vector<double> &x);
 #endif
 
-    /** \brief  Create sparse matrix constant (also implicit type conversion) */
+    /** \brief  Create sparse matrix constant (also implicit type conversion)
+
+        \identifier{q8} */
     MX(const Matrix<double> &x);
 
 /// \cond INTERNAL
-    /** \brief  Destructor */
+    /** \brief  Destructor
+
+        \identifier{q9} */
     ~MX();
 /// \endcond
 
 #ifndef SWIG
 /// \cond INTERNAL
-    /** \brief  Create from node */
+    /** \brief  Create from node
+
+        \identifier{qa} */
     static MX create(MXNode* node);
 
-    /** \brief  Create from node (multiple-outputs) */
+    /** \brief  Create from node (multiple-outputs)
+
+        \identifier{qb} */
     static std::vector<MX> createMultipleOutput(MXNode* node);
 /// \endcond
 
-    /** \brief Get the sparsity pattern */
+    /** \brief Get the sparsity pattern
+
+        \identifier{qc} */
     const Sparsity& sparsity() const;
 
     /// \cond INTERNAL
@@ -155,20 +183,31 @@ namespace casadi {
     /// Returns the truth value of an MX expression
     bool __nonzero__() const;
 
-    /** \brief Get an owning reference to the sparsity pattern */
+    /** \brief Get an owning reference to the sparsity pattern
+
+        \identifier{qd} */
     Sparsity get_sparsity() const { return sparsity();}
 
     /** \brief Erase a submatrix (leaving structural zeros in its place)
-        Erase rows and/or columns of a matrix */
+
+        Erase rows and/or columns of a matrix
+
+        \identifier{qe} */
     void erase(const std::vector<casadi_int>& rr, const std::vector<casadi_int>& cc,
                 bool ind1=false);
 
     /** \brief Erase a submatrix (leaving structural zeros in its place)
-        Erase elements of a matrix */
+
+        Erase elements of a matrix
+
+        \identifier{qf} */
     void erase(const std::vector<casadi_int>& rr, bool ind1=false);
 
     /** \brief Enlarge matrix
-        Make the matrix larger by inserting empty rows and columns, keeping the existing non-zeros */
+
+        Make the matrix larger by inserting empty rows and columns, keeping the existing non-zeros
+
+        \identifier{qg} */
     void enlarge(casadi_int nrow, casadi_int ncol,
                   const std::vector<casadi_int>& rr, const std::vector<casadi_int>& cc,
                   bool ind1=false);
@@ -178,25 +217,37 @@ namespace casadi {
 #ifndef SWIG
     /// \cond INTERNAL
     ///@{
-    /** \brief  Access a member of the node */
+    /** \brief  Access a member of the node
+
+        \identifier{qh} */
     MXNode* operator->();
 
-    /** \brief  Const access a member of the node */
+    /** \brief  Const access a member of the node
+
+        \identifier{qi} */
     const MXNode* operator->() const;
     ///@}
     /// \endcond
 #endif // SWIG
 
-    /** \brief Get the nth dependency as MX */
+    /** \brief Get the nth dependency as MX
+
+        \identifier{qj} */
     MX dep(casadi_int ch=0) const;
 
-    /** \brief  Number of outputs */
+    /** \brief  Number of outputs
+
+        \identifier{qk} */
     casadi_int n_out() const;
 
-    /** \brief  Get an output */
+    /** \brief  Get an output
+
+        \identifier{ql} */
     MX get_output(casadi_int oind) const;
 
-    /** \brief Get the number of dependencies of a binary SXElem */
+    /** \brief Get the number of dependencies of a binary SXElem
+
+        \identifier{qm} */
     casadi_int n_dep() const;
 
     /// Get the name.
@@ -239,49 +290,72 @@ namespace casadi {
     bool is_norm() const;
 
     /** \brief Check if matrix can be used to define function inputs.
+
         Valid inputs for MXFunctions are combinations of Reshape, concatenations and SymbolicMX
-    */
+
+        \identifier{qn} */
     bool is_valid_input() const;
 
     /** \brief Get the number of primitives for MXFunction inputs/outputs
-    */
+
+        \identifier{qo} */
     casadi_int n_primitives() const;
 
-    /** \brief Get primitives */
+    /** \brief Get primitives
+
+        \identifier{qp} */
     std::vector<MX> primitives() const;
 
-    /** \brief Split up an expression along symbolic primitives */
+    /** \brief Split up an expression along symbolic primitives
+
+        \identifier{qq} */
     std::vector<MX> split_primitives(const MX& x) const;
 
-    /** \brief Join an expression along symbolic primitives */
+    /** \brief Join an expression along symbolic primitives
+
+        \identifier{qr} */
     MX join_primitives(const std::vector<MX>& v) const;
 
     /// \cond INTERNAL
     /** \brief Detect duplicate symbolic expressions
+
         If there are symbolic primitives appearing more than once, the function will return
         true and the names of the duplicate expressions will be passed to casadi_warning.
         Note: Will mark the node using MX::set_temp.
         Make sure to call reset_input() after usage.
-    */
+
+        \identifier{qs} */
     bool has_duplicates() const;
 
-    /** \brief Reset the marker for an input expression */
+    /** \brief Reset the marker for an input expression
+
+        \identifier{qt} */
     void reset_input() const;
   /// \endcond
 
-    /** \brief  check if identity */
+    /** \brief  check if identity
+
+        \identifier{qu} */
     bool is_eye() const;
 
-    /** \brief  check if zero (note that false negative answers are possible) */
+    /** \brief  check if zero (note that false negative answers are possible)
+
+        \identifier{qv} */
     bool is_zero() const;
 
-    /** \brief  check if zero (note that false negative answers are possible) */
+    /** \brief  check if zero (note that false negative answers are possible)
+
+        \identifier{qw} */
     bool is_one() const;
 
-    /** \brief  check if zero (note that false negative answers are possible) */
+    /** \brief  check if zero (note that false negative answers are possible)
+
+        \identifier{qx} */
     bool is_minus_one() const;
 
-    /** \brief  Is the expression a transpose? */
+    /** \brief  Is the expression a transpose?
+
+        \identifier{qy} */
     bool is_transpose() const;
 
     /// Checks if expression does not contain NaN or Inf
@@ -299,10 +373,14 @@ namespace casadi {
     /** Obtain information about node */
     Dict info() const;
 
-    /** \brief Serialize an object */
+    /** \brief Serialize an object
+
+        \identifier{qz} */
     void serialize(SerializingStream& s) const;
 
-    /** \brief Deserialize with type disambiguation */
+    /** \brief Deserialize with type disambiguation
+
+        \identifier{r0} */
     static MX deserialize(DeserializingStream& s);
 
     /// \cond INTERNAL
@@ -314,26 +392,34 @@ namespace casadi {
     /// \endcond
 
     ///@{
-    /** \brief  Create nodes by their ID */
+    /** \brief  Create nodes by their ID
+
+        \identifier{r1} */
     static MX binary(casadi_int op, const MX &x, const MX &y);
     static MX unary(casadi_int op, const MX &x);
     ///@}
 
     ///@{
-    /** \brief  create a matrix with all inf */
+    /** \brief  create a matrix with all inf
+
+        \identifier{r2} */
     static MX inf(const Sparsity& sp);
     static MX inf(casadi_int nrow=1, casadi_int ncol=1);
     static MX inf(const std::pair<casadi_int, casadi_int>& rc);
     ///@}
 
     ///@{
-    /** \brief  create a matrix with all nan */
+    /** \brief  create a matrix with all nan
+
+        \identifier{r3} */
     static MX nan(const Sparsity& sp);
     static MX nan(casadi_int nrow=1, casadi_int ncol=1);
     static MX nan(const std::pair<casadi_int, casadi_int>& rc);
     ///@}
 
-    /** \brief  Identity matrix */
+    /** \brief  Identity matrix
+
+        \identifier{r4} */
     static MX eye(casadi_int n);
 
 #ifndef SWIG
@@ -383,7 +469,6 @@ namespace casadi {
 
     ///@{
     /// Set a submatrix, two arguments
-    ///@}
     void set(const MX& m, bool ind1, const Slice& rr, const Slice& cc);
     void set(const MX& m, bool ind1, const Slice& rr, const Matrix<casadi_int>& cc);
     void set(const MX& m, bool ind1, const Matrix<casadi_int>& rr, const Slice& cc);
@@ -425,7 +510,7 @@ namespace casadi {
         For the above example, we would have:
         a {-1, -3} b {-3, -2} c {-1 -2}
 
-    */
+        \identifier{r5} */
     static MX einstein(const MX& A, const MX& B, const MX& C,
       const std::vector<casadi_int>& dim_a, const std::vector<casadi_int>& dim_b,
       const std::vector<casadi_int>& dim_c,
@@ -462,6 +547,7 @@ namespace casadi {
     static MX mac(const MX& x, const MX& y, const MX& z);
     static MX reshape(const MX& x, casadi_int nrow, casadi_int ncol);
     static MX reshape(const MX& x, const Sparsity& sp);
+    static MX sparsity_cast(const MX& x, const Sparsity& sp);
     static MX kron(const MX& x, const MX& b);
     static MX repmat(const MX& x, casadi_int n, casadi_int m=1);
     ///@}
@@ -483,6 +569,7 @@ namespace casadi {
             const Dict& opts = Dict());
     static std::vector<bool> which_depends(const MX &expr, const MX &var,
         casadi_int order=1, bool tr=false);
+    static Sparsity jacobian_sparsity(const MX& f, const MX& x);
     static MX substitute(const MX& ex, const MX& v, const MX& vdef);
     static std::vector<MX> substitute(const std::vector<MX> &ex,
                                          const std::vector<MX> &v,
@@ -490,7 +577,8 @@ namespace casadi {
     static void substitute_inplace(const std::vector<MX>& v,
                                   std::vector<MX>& vdef,
                                   std::vector<MX>& ex, bool reverse);
-    static MX solve(const MX& a, const MX& b, const std::string& lsolver="qr",
+    static MX solve(const MX& a, const MX& b);
+    static MX solve(const MX& a, const MX& b, const std::string& lsolver,
                     const Dict& dict = Dict());
     static MX inv_minor(const MX& A);
     static MX inv_node(const MX& A);
@@ -501,9 +589,10 @@ namespace casadi {
     static MX expm(const MX& A);
     static casadi_int n_nodes(const MX& x);
     static std::string print_operator(const MX& x, const std::vector<std::string>& args);
+    static void extract(std::vector<MX>& ex, std::vector<MX>& v,
+      std::vector<MX>& vdef, const Dict& opts = Dict());
     static void shared(std::vector<MX>& ex, std::vector<MX>& v,
-                              std::vector<MX>& vdef, const std::string& v_prefix,
-                              const std::string& v_suffix);
+      std::vector<MX>& vdef, const std::string& v_prefix, const std::string& v_suffix);
     static MX if_else(const MX& cond, const MX& if_true,
                       const MX& if_false, bool short_circuit=false);
     static MX conditional(const MX& ind, const std::vector<MX> &x, const MX& x_default,
@@ -532,6 +621,8 @@ namespace casadi {
     static MX _rank1(const MX& A, const MX& alpha, const MX& x, const MX& y);
     static MX project(const MX& x, const Sparsity& sp, bool intersect=false);
     static MX cumsum(const MX &x, casadi_int axis=-1);
+    static MX _logsumexp(const MX& x);
+    static std::vector<MX> cse(const std::vector<MX>& e);
     ///@}
 
     ///@{
@@ -562,6 +653,8 @@ namespace casadi {
             casadi_int m,
             const Dict& opts = Dict());
     static MX convexify(const MX& H, const Dict& opts = Dict());
+    static MX stop_diff(const MX& expr, casadi_int order);
+    static MX stop_diff(const MX& expr, const MX& var, casadi_int order);
     ///@}
     /// \endcond
 
@@ -577,7 +670,8 @@ namespace casadi {
      * Usually, you want to be using 'interpolant' instead.
      *
      * Accepts lookup_mode option.
-     */
+
+        \identifier{r6} */
     static MX interpn_linear(const std::vector<MX>& x, const MX& v, const std::vector<MX>& xq,
       const Dict& opts=Dict());
 
@@ -585,35 +679,43 @@ namespace casadi {
 
 #if !defined(SWIG) || defined(DOXYGEN)
 /**
-\ingroup expression_tools
+\addtogroup expression_tools
 @{
 */
-    /** \brief Find first nonzero
+    /** \brief Find first nonzero, returned as row index
+
      * If failed, returns the number of rows
-     */
+
+        \identifier{r7} */
     inline friend MX find(const MX& x) {
       return MX::find(x);
     }
 
     /** \brief Find first nonzero
+
      * If failed, returns the number of rows
-     */
+
+        \identifier{r8} */
     inline friend MX low(const MX& v, const MX& p, const Dict& options=Dict()) {
       return MX::low(v, p, options);
     }
 
     /** \brief Substitute single expression in graph
+
      * Substitute variable v with expression vdef in an expression ex, preserving nodes
-     */
+
+        \identifier{r9} */
     inline friend MX graph_substitute(const MX& ex, const std::vector<MX> &v,
                                       const std::vector<MX> &vdef) {
       return MX::graph_substitute(ex, v, vdef);
     }
 
     /** \brief Substitute multiple expressions in graph
+
      * Substitute variable var with expression expr in
      * multiple expressions, preserving nodes
-     */
+
+        \identifier{ra} */
     inline friend std::vector<MX>
       graph_substitute(const std::vector<MX> &ex,
                        const std::vector<MX> &v,
@@ -626,7 +728,7 @@ namespace casadi {
      *  Expand the given expression e, optionally
      *  supplying expressions contained in it at which expansion should stop.
      *
-     */
+        \identifier{rb} */
     inline friend MX
       matrix_expand(const MX& e, const std::vector<MX> &boundary = std::vector<MX>(),
         const Dict& options = Dict()) {
@@ -638,7 +740,7 @@ namespace casadi {
      *  Expand the given expression e, optionally
      *  supplying expressions contained in it at which expansion should stop.
      *
-     */
+        \identifier{rc} */
     inline friend std::vector<MX>
       matrix_expand(const std::vector<MX>& e,
                     const std::vector<MX> &boundary = std::vector<MX>(),
@@ -677,16 +779,17 @@ namespace casadi {
     }
 
     /** \brief Lift the expression
+
      * Experimental feature
      *
-     */
+        \identifier{rd} */
     inline friend MX lift(const MX& x, const MX& x_guess) {
       return MX::lift(x, x_guess);
     }
 
     /** \brief Inverse node
      *
-     */
+        \identifier{re} */
     inline friend MX inv_node(const MX& x) {
       return MX::inv_node(x);
     }
@@ -694,53 +797,110 @@ namespace casadi {
     /** \brief Evaluates the expression numerically
     *
     * An error is raised when the expression contains symbols
-    */
+
+        \identifier{rf} */
     inline friend DM evalf(const MX& expr) {
       return MX::evalf(expr);
     }
 
+    /** \brief Stop derivatives of an expression wrt to all its symbolic variables
+
+        \identifier{25l} */
+    inline friend MX stop_diff(const MX& expr, casadi_int order) {
+      return MX::stop_diff(expr, order);
+    }
+
+    /** \brief Stop first derivatives of an expression wrt to all its symbolic variables
+     * 
+     * \seealso stop_diff
+
+        \identifier{25m} */
+    inline friend MX no_grad(const MX& expr) {
+      return MX::stop_diff(expr, 1);
+    }
+
+    /** \brief Stop second derivatives of an expression wrt to all its symbolic variables
+     * 
+     * \seealso stop_diff
+
+        \identifier{25n} */
+    inline friend MX no_hess(const MX& expr) {
+      return MX::stop_diff(expr, 2);
+    }
+
+
+    /** \brief Stop derivatives of an expression wrt to a select set of symbolic variables
+
+        \identifier{25o} */
+    inline friend MX stop_diff(const MX& expr, const MX& var, casadi_int order) {
+      return MX::stop_diff(expr, var, order);
+    }
+
+
 /** @} */
 #endif // SWIG
+
+    /** \bried Return all elements of a that do not occur in b, preserving order */
+    friend std::vector<MX> difference(const std::vector<MX>& a, const std::vector<MX>& b);
 
     /** \brief returns itself, but with an assertion attached
     *
     *  If y does not evaluate to 1, a runtime error is raised
-    */
+
+        \identifier{rg} */
     MX attachAssert(const MX& y, const std::string& fail_message="") const;
 
     /** \brief Monitor an expression
+
     * Returns itself, but with the side effect of printing the nonzeros along with a comment
-    */
+
+        \identifier{rh} */
     MX monitor(const std::string& comment) const;
 
     /// Transpose the matrix
     MX T() const;
 
-    /** \brief Get an IM representation of a GetNonzeros or SetNonzeros node */
+    /** \brief Get an IM representation of a GetNonzeros or SetNonzeros node
+
+        \identifier{ri} */
     Matrix<casadi_int> mapping() const;
 
-    /** \brief Set or reset the depth to which equalities are being checked for simplifications */
+    /** \brief Set or reset the depth to which equalities are being checked for simplifications
+
+        \identifier{rj} */
     static void set_max_depth(casadi_int eq_depth=1);
 
-    /** \brief Get the depth to which equalities are being checked for simplifications */
+    /** \brief Get the depth to which equalities are being checked for simplifications
+
+        \identifier{rk} */
     static casadi_int get_max_depth();
 
     /// Check if a particular cast is allowed
     static bool test_cast(const SharedObjectInternal* ptr);
 
-    /** \brief Get function inputs */
+    /** \brief Get function inputs
+
+        \identifier{rl} */
     static std::vector<MX> get_input(const Function& f);
 
-    /** \brief Get free variables */
+    /** \brief Get free variables
+
+        \identifier{rm} */
     static std::vector<MX> get_free(const Function& f);
 
     /// Readability typedef
     typedef std::map<std::string, MX> MXDict;
 
+    /** \brief Evaluate the MX node with new symbolic dependencies
+
+        \identifier{rn} */
+    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& SWIG_OUTPUT(res)) const;
+
 #ifndef SWIG
     ///@{
-    /** \brief Called from MXFunction */
-    void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const;
+    /** \brief Called from MXFunction
+
+        \identifier{ro} */
     void ad_forward(const std::vector<std::vector<MX> >& fseed,
                     std::vector<std::vector<MX> >& fsens) const;
     void ad_reverse(const std::vector<std::vector<MX> >& aseed,

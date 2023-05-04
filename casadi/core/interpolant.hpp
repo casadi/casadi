@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -31,7 +31,9 @@
 namespace casadi {
 
 
-  /** \defgroup main_interpolant
+  /** \defgroup main_interpolant Title
+      \par
+
    * An interpolant function for lookup table data
    *
    * \param[in] name label for the resulting Function
@@ -83,9 +85,10 @@ namespace casadi {
    *  \pluginssection{Interpolant}
    * \author Joel Andersson
    * \date 2016
-   */
 
-  /** \defgroup interpolant
+      \identifier{21p} */
+
+  /** \defgroup interpolant Title
   * @copydoc main_interpolant
   *  @{
   */
@@ -107,8 +110,8 @@ namespace casadi {
    * By default, derivatives wrt the coefficients are not supported (zero).
    * Some interpolant plugins may support the `inline=true` which enables correct derivatives
    * 
-   * 
-  */
+   *
+      \identifier{1p3} */
   CASADI_EXPORT Function interpolant(const std::string& name,
                                      const std::string& solver,
                                      const std::vector<std::vector<double> >& grid,
@@ -122,8 +125,8 @@ namespace casadi {
    *
    * By default, derivatives wrt the coefficients are not supported (zero).
    * Some interpolant plugins may support the `inline=true` which enables correct derivatives
-   * 
-  */
+   *
+      \identifier{1p4} */
   CASADI_EXPORT Function interpolant(const std::string& name,
                                      const std::string& solver,
                                      const std::vector<casadi_int>& grid_dims,
@@ -136,13 +139,13 @@ namespace casadi {
    * 
    * By default, derivatives wrt the coefficients are not supported (zero).
    * Some interpolant plugins may support the `inline=true` which enables correct derivatives
-  */
+
+      \identifier{1p5} */
   CASADI_EXPORT Function interpolant(const std::string& name,
                                      const std::string& solver,
                                      const std::vector<casadi_int>& grid_dims,
                                      const std::vector<double>& values,
                                      const Dict& opts=Dict());
-  ///@}
 
   /// Check if a particular plugin is available
   CASADI_EXPORT bool has_interpolant(const std::string& name);

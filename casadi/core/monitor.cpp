@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -25,8 +25,6 @@
 
 #include "monitor.hpp"
 
-using namespace std;
-
 namespace casadi {
 
   Monitor::Monitor(const MX& x, const std::string& comment) : comment_(comment) {
@@ -46,7 +44,7 @@ namespace casadi {
   void Monitor::ad_forward(const std::vector<std::vector<MX> >& fseed,
                         std::vector<std::vector<MX> >& fsens) const {
     for (casadi_int d=0; d<fsens.size(); ++d) {
-      stringstream ss;
+      std::stringstream ss;
       ss << "fwd(" << d << ") of " << comment_;
       fsens[d][0] = fseed[d][0].monitor(ss.str());
     }
@@ -55,7 +53,7 @@ namespace casadi {
   void Monitor::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                         std::vector<std::vector<MX> >& asens) const {
     for (casadi_int d=0; d<aseed.size(); ++d) {
-      stringstream ss;
+      std::stringstream ss;
       ss << "adj(" << d << ") of " << comment_;
       asens[d][0] += aseed[d][0].monitor(ss.str());
     }
@@ -63,32 +61,32 @@ namespace casadi {
 
   int Monitor::eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const {
     if (arg[0]!=res[0]) {
-      copy(arg[0], arg[0]+nnz(), res[0]);
+      std::copy(arg[0], arg[0]+nnz(), res[0]);
     }
     return 0;
   }
 
   int Monitor::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
     // Print comment
-    uout() << comment_ << ":" << endl;
+    uout() << comment_ << ":" << std::endl;
     uout() << "[";
     casadi_int n = nnz();
     for (casadi_int i=0; i<n; ++i) {
       if (i!=0) uout() << ", ";
       uout() << arg[0][i];
     }
-    uout() << "]" << endl;
+    uout() << "]" << std::endl;
 
     // Perform operation
     if (arg[0]!=res[0]) {
-      copy(arg[0], arg[0]+n, res[0]);
+      std::copy(arg[0], arg[0]+n, res[0]);
     }
     return 0;
   }
 
   int Monitor::sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
     if (arg[0]!=res[0]) {
-      copy(arg[0], arg[0]+nnz(), res[0]);
+      std::copy(arg[0], arg[0]+nnz(), res[0]);
     }
     return 0;
   }

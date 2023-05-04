@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -26,7 +26,6 @@
 #include "lapack_lu.hpp"
 #include "../../core/casadi_misc.hpp"
 
-using namespace std;
 namespace casadi {
 
   extern "C"
@@ -119,12 +118,12 @@ namespace casadi {
               get_ptr(m->c), &colcnd, &rowcnd, &amax, &info);
       if (info < 0) return 1;
       if (info > 0) {
-        stringstream ss;
+        std::stringstream ss;
         ss << "LapackLu::prepare: ";
         if (info<=ncol)  ss << (info-1) << "-th row (zero-based) is exactly zero";
         else             ss << (info-1-ncol) << "-th col (zero-based) is exactly zero";
-        uout() << "Warning: " << ss.str() << endl;
-        if (allow_equilibration_failure_)  uout() << "Warning: " << ss.str() << endl;
+        uout() << "Warning: " << ss.str() << std::endl;
+        if (allow_equilibration_failure_)  uout() << "Warning: " << ss.str() << std::endl;
         else                              casadi_error(ss.str());
       }
 

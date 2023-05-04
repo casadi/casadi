@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -27,7 +27,6 @@
 #include "casadi/core/casadi_misc.hpp"
 #include "casadi/core/nlp_tools.hpp"
 
-using namespace std;
 namespace casadi {
 
   extern "C"
@@ -39,6 +38,14 @@ namespace casadi {
     plugin->version = CASADI_VERSION;
     plugin->options = &GurobiInterface::options_;
     plugin->deserialize = &GurobiInterface::deserialize;
+    #ifdef GUROBI_ADAPTOR
+      char buffer[400];
+      int ret = gurobi_adaptor_load(buffer, sizeof(buffer));
+      if (ret!=0) {
+        casadi_warning("Failed to load Gurobi adaptor: " + std::string(buffer) + ".");
+        return 1;
+      }
+    #endif
     return 0;
   }
 
@@ -323,6 +330,9 @@ namespace casadi {
         casadi_assert(!flag, GRBgeterrormsg(m->env));
       }
 
+      std::vector<char> constraint_type(na_); // For each a entry: 0 absent, 1 linear
+      casadi_int npi = 0;
+
       // Add constraints
       const casadi_int *AT_colind=sm.AT.colind(), *AT_row=sm.AT.row();
       for (casadi_int i=0; i<na_; ++i) {
@@ -340,31 +350,38 @@ namespace casadi {
           numnz++;
         }
 
+        constraint_type[i] = 1;
         // Pass to model
         if (isinf(lb)) {
           if (isinf(ub)) {
+            constraint_type[i] = 0;
             // Neither upper or lower bounds, skip
           } else {
             // Only upper bound
             flag = GRBaddconstr(model, numnz, ind, val, GRB_LESS_EQUAL, ub, nullptr);
             casadi_assert(!flag, GRBgeterrormsg(m->env));
+            npi++;
           }
         } else {
           if (isinf(ub)) {
             // Only lower bound
             flag = GRBaddconstr(model, numnz, ind, val, GRB_GREATER_EQUAL, lb, nullptr);
             casadi_assert(!flag, GRBgeterrormsg(m->env));
+            npi++;
           } else if (lb==ub) {
             // Upper and lower bounds equal
             flag = GRBaddconstr(model, numnz, ind, val, GRB_EQUAL, lb, nullptr);
             casadi_assert(!flag, GRBgeterrormsg(m->env));
+            npi++;
           } else {
             // Both upper and lower bounds
             flag = GRBaddrangeconstr(model, numnz, ind, val, lb, ub, nullptr);
             casadi_assert(!flag, GRBgeterrormsg(m->env));
+            npi++;
           }
         }
       }
+      std::vector<double> pi(npi);
 
       // Add SOS constraints when applicable
       if (!m->sos_ind.empty()) {
@@ -454,32 +471,49 @@ namespace casadi {
       m->fstats.at("postprocessing").tic();
 
       int optimstatus;
-      flag = GRBgetintattr(model, GRB_INT_ATTR_STATUS, &optimstatus);
+      flag = GRBgetintattr(model, "Status", &optimstatus);
       casadi_assert(!flag, GRBgeterrormsg(m->env));
 
       if (verbose_) uout() << "return status: " << return_status_string(optimstatus) <<
         " (" << optimstatus <<")" << std::endl;
 
       m->return_status = optimstatus;
-      m->success = optimstatus==GRB_OPTIMAL;
+      m->d_qp.success = optimstatus==GRB_OPTIMAL;
       if (optimstatus==GRB_ITERATION_LIMIT || optimstatus==GRB_TIME_LIMIT
           || optimstatus==GRB_NODE_LIMIT || optimstatus==GRB_SOLUTION_LIMIT)
-        m->unified_return_status = SOLVER_RET_LIMITED;
+        m->d_qp.unified_return_status = SOLVER_RET_LIMITED;
 
       // Get the objective value, if requested
       if (cost) {
-        flag = GRBgetdblattr(model, GRB_DBL_ATTR_OBJVAL, cost);
+        flag = GRBgetdblattr(model, "ObjVal", cost);
         if (flag) cost[0] = casadi::nan;
       }
 
       // Get the optimal solution, if requested
       if (x) {
-        flag = GRBgetdblattrarray(model, GRB_DBL_ATTR_X, 0, nx_, x);
-        if (flag) fill_n(x, nx_, casadi::nan);
+        flag = GRBgetdblattrarray(model, "X", 0, nx_, x);
+        if (flag) std::fill_n(x, nx_, casadi::nan);
       }
-
-      if (lam_x) fill_n(lam_x, nx_, casadi::nan);
-      if (lam_a) fill_n(lam_a, na_, casadi::nan);
+      if (lam_x) {
+        flag = GRBgetdblattrarray(model, "RC", 0, nx_, lam_x);
+        if (!flag) casadi_scal(nx_, -1.0, lam_x);
+        if (flag) std::fill_n(lam_x, nx_, casadi::nan);
+      }
+      if (lam_a) {
+        flag = GRBgetdblattrarray(model, "Pi", 0, npi, get_ptr(pi));
+        if (flag) {
+          std::fill_n(lam_a, na_, casadi::nan);
+        } else {
+          const double * p = get_ptr(pi);
+          for (casadi_int i=0;i<na_;++i) {
+            if (constraint_type[i]==0) {
+              lam_a[i] = 0;
+            } else if (constraint_type[i]==1) {
+              lam_a[i] = -(*p++);
+            }
+          }
+        }
+      }
 
       // Free memory
       GRBfreemodel(model);

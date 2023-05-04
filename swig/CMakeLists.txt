@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.6)
+cmake_minimum_required(VERSION 3.10.2)
 
 if (NOT SWIG_IMPORT)
   find_package(SWIG REQUIRED)
@@ -13,12 +13,11 @@ endif()
 
 # cmake_policy propagation rules
 if(POLICY CMP0011)
-cmake_policy(SET CMP0011 OLD)
+cmake_policy(SET CMP0011 NEW)
 endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../cmake)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/..)
-link_directories(${CMAKE_CURRENT_SOURCE_DIR}/../build/lib)
 
 if(WITH_WERROR)
   # This will make the swig command return an error so that "make" will fail,

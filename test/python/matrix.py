@@ -2,8 +2,8 @@
 #     This file is part of CasADi.
 #
 #     CasADi -- A symbolic framework for dynamic optimization.
-#     Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
-#                             K.U. Leuven. All rights reserved.
+#     Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+#                             KU Leuven. All rights reserved.
 #     Copyright (C) 2011-2014 Greg Horn
 #
 #     CasADi is free software; you can redistribute it and/or
@@ -873,7 +873,7 @@ class Matrixtests(casadiTestCase):
 
     f = Function("f", [vec(P.T),A,B],[vec(mtimes([A,P,B]).T)])
 
-    J = f.jacobian_old(0, 0)
+    J = jacobian_old(f, 0, 0)
     J_in = []
     J_in.append(numpy.random.rand(*vec(P.T).shape))
     J_in.append(numpy.random.rand(*A.shape))
@@ -1098,9 +1098,10 @@ class Matrixtests(casadiTestCase):
       self.checkarray(evalf(norm_2(M(a).T)),r)
 
   def test_ldl(self):
+    numpy.random.seed(1)
     H = diagcat(DM.rand(5,5),DM.rand(5,5))
     H = H+H.T+2*DM.eye(10)
-    
+
     p = np.random.permutation(10)
     H = H[p,p]
 
@@ -1117,6 +1118,157 @@ class Matrixtests(casadiTestCase):
     a = vertcat(1,2)
     self.assertTrue(isinstance(a,DM))
     self.checkarray(c.linspace(1,3,10),c.linspace(1.0,3.0,10))
+  
+  def test_permutation(self):
+    n = 10
+    numpy.random.seed(1)
+    p = np.random.permutation(n)
+    S = Sparsity.permutation(p)
+    self.checkarray(DM(p).T,S.permutation_vector())
+    self.assertTrue(S.is_permutation())
+    v = DM.rand(n)
+    self.checkarray(mtimes(S,v), v[p])
+    S = Sparsity.permutation(p, True)
+    self.checkarray((mtimes(S,v))[p], v)
 
+  def test_sparsity_orthonormality(self):
+    alltests = [('is_orthonormal_rows',True),('is_orthonormal_columns',True),('is_selection',True),('is_orthonormal_rows',False),('is_orthonormal_columns',False),('is_selection',False),('is_permutation',),('is_orthonormal',False),('is_orthonormal',True)]
+    
+    def check_properties(S,prop):
+      for p in prop:
+        assert p in alltests
+      for t in alltests:
+        quality = t in prop
+        method = getattr(S,t[0])
+        result = method(*t[1:])
+        self.assertEqual(quality,result,"Call %s expected to return %s" % (str(t),str(quality)))
+        
+    for S in [sparsify(DM([[0,0,0,0,0],
+                           [0,0,0,0,0],
+                           [0,0,0,0,0],
+                           [0,0,0,0,0]])),
+              sparsify(DM([[0,0,0,0,0],
+                           [0,1,0,0,0],
+                           [0,0,0,0,0],
+                           [0,0,0,0,0]])),
+              sparsify(DM([[0,0,0,0,0],
+                           [0,1,0,0,0],
+                           [0,0,0,1,0],
+                           [0,0,0,0,0]]))]:
+      check_properties(S.sparsity(), [('is_orthonormal_rows',True),('is_orthonormal_columns',True),('is_selection',True),('is_orthonormal',True)]) 
+
+    for S in [sparsify(DM([[0,0,0,0,0],
+                           [0,1,1,0,0],
+                           [0,0,0,0,0],
+                           [0,0,0,0,0]])),
+              sparsify(DM([[0,1,0,0],
+                           [1,0,0,0],
+                           [0,1,1,0],
+                           [0,0,0,0],
+                           [0,0,0,1]])),
+              sparsify(DM([[0,0,0,0,0],
+                           [0,1,0,0,0],
+                           [0,1,0,0,0],
+                           [0,0,0,0,0]]))]:
+      check_properties(S.sparsity(), []) 
+    
+    S = sparsify(DM([[0,1,0,0,0],
+                     [1,0,0,0,0],
+                     [0,0,1,0,0],
+                     [0,0,0,1,0]]))
+    check_properties(S.sparsity(), [('is_orthonormal_rows',True),('is_orthonormal_columns',True),('is_selection',True),('is_orthonormal_rows',False),('is_selection',False),('is_orthonormal',True)])
+    
+    S = sparsify(DM([[0,1,0,0],
+                     [1,0,0,0],
+                     [0,0,1,0],
+                     [0,0,0,1]]))
+    check_properties(S.sparsity(), [('is_orthonormal_rows',True),('is_orthonormal_columns',True),('is_selection',True),('is_orthonormal_rows',False),('is_orthonormal_columns',False),('is_selection',False),('is_permutation',),('is_orthonormal',True),('is_orthonormal',False)])
+
+    S = sparsify(DM([[0,1,0,0],
+                     [1,0,0,0],
+                     [0,0,1,0],
+                     [0,0,0,0],
+                     [0,0,0,1]]))
+    check_properties(S.sparsity(), [('is_orthonormal_rows',True),('is_orthonormal_columns',True),('is_selection',True),('is_orthonormal_columns',False),('is_orthonormal',True)])
+    
+  def test_permutation_solve(self):
+    n = 10
+    numpy.random.seed(1)
+    DM.rng(1)
+    p = np.random.permutation(n)
+    P = Sparsity.permutation(p)
+    fs = []
+    for X in [SX,MX]:
+      x = X.sym("x",P)
+      b = X.sym("b",n)
+      assert x.sparsity().is_orthonormal()
+      nz = sparsity_cast(x, Sparsity.dense(n))
+      f = Function("f",[x,b],[solve(x,b)])
+      f.generate('f.c')
+      fs.append(f)    
+    x0 = DM.rand(x.sparsity())
+    b0 = DM.rand(b.sparsity())
+    res0 = fs[0](x0,b0)
+    res1 = fs[1](x0,b0)
+    self.checkarray(res0,res1)
+
+  def test_permutation_inv(self):
+    n = 10
+    numpy.random.seed(1)
+    DM.rng(1)
+    p = np.random.permutation(n)
+    P = Sparsity.permutation(p)
+    fs = []
+    for X in [SX,MX]:
+      x = X.sym("x",P)
+      f = Function("f",[x],[solve(x,X.eye(n))])
+      f.generate('f.c')
+      fs.append(f)    
+    x0 = DM(P,DM.rand(n))
+    res0 = fs[0](x0)
+    res1 = fs[1](x0)
+    self.checkarray(res0,res1)
+
+    fs = []
+    for X in [SX,MX]:
+      x = X.sym("x",P)
+      f = Function("f",[x],[inv(x)])
+      f.disp(True)
+      fs.append(f)    
+    x0 = DM(P,DM.rand(n))
+    res0 = fs[0](x0)
+    res1 = fs[1](x0)
+    self.checkarray(res0,res1)
+
+    
+  def test_mac_simplify(self):
+    n = 10
+    numpy.random.seed(1)
+    DM.rng(1)
+    p = np.random.permutation(n)
+    P = Sparsity.permutation(p)
+    fs = []
+    for X in [SX,MX]:
+      b = X.sym("b",n)
+      x = X.sym("x",P)
+      f = Function("f",[x,b],[mtimes(x,b)])
+      f.generate('f.c')
+      fs.append(f)  
+    x0 = DM(P,DM.rand(n))
+    b0 = DM.rand(b.sparsity())
+    res0 = fs[0](x0,b0)
+    res1 = fs[1](x0,b0)
+    self.checkarray(res0,res1)
+    
+
+  def test_inplace(self):
+    n = 10
+    x = MX.sym("x",n)
+    y = MX(Sparsity.diag(n),x)
+    f = Function('f',[x],[y])
+    self.assertTrue(f.sz_w()==n)
+
+    
+    
 if __name__ == '__main__':
     unittest.main()

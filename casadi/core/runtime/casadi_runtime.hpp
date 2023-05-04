@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -93,6 +93,16 @@ namespace casadi {
   /// Sparse matrix-vector multiplication: z <- z + x*y
   template<typename T1>
   void casadi_mv(const T1* x, const casadi_int* sp_x, const T1* y, T1* z, casadi_int tr);
+
+  /// Linear solve, upper triangular matrix, optionally transposed or unity diagonal (1 - R)
+  template<typename T1>
+  void casadi_triusolve(const casadi_int* sp_a, const T1* nz_a, T1* x, int tr, int unity,
+      casadi_int nrhs);
+
+  /// Linear solve, lower triangular matrix, optionally transposed or unity diagonal (1 - L)
+  template<typename T1>
+  void casadi_trilsolve(const casadi_int* sp_a, const T1* nz_a, T1* x, int tr, int unity,
+      casadi_int nrhs);
 
   /// TRANS: y <- trans(x) , w work vector (length >= rows x)
   template<typename T1>
@@ -208,6 +218,10 @@ namespace casadi {
   void casadi_bound_consistency(casadi_int n, T1* x, T1* lam,
                                  const T1* lbx, const T1* ubx);
 
+  // Numerically accurate logsumexp
+  template<typename T1>
+  T1 casadi_logsumexp(const T1* x, casadi_int n);
+
   template <class T1>
   struct casadi_newton_mem;
 
@@ -236,18 +250,26 @@ namespace casadi {
   #include "casadi_dot.hpp"
   #include "casadi_kron.hpp"
   #include "casadi_clear.hpp"
+  #include "casadi_clip_max.hpp"
+  #include "casadi_clip_min.hpp"
   #include "casadi_fill.hpp"
   #include "casadi_max_viol.hpp"
-  #include "casadi_minmax.hpp"
+  #include "casadi_mmin.hpp"
+  #include "casadi_mmax.hpp"
   #include "casadi_vfmin.hpp"
   #include "casadi_vfmax.hpp"
+  #include "casadi_vector_fmin.hpp"
+  #include "casadi_vector_fmax.hpp"
   #include "casadi_sum_viol.hpp"
   #include "casadi_mtimes.hpp"
   #include "casadi_mv.hpp"
+  #include "casadi_trilsolve.hpp"
+  #include "casadi_triusolve.hpp"
   #include "casadi_trans.hpp"
   #include "casadi_norm_1.hpp"
   #include "casadi_norm_2.hpp"
   #include "casadi_norm_inf.hpp"
+  #include "casadi_masked_norm_inf.hpp"
   #include "casadi_norm_inf_mul.hpp"
   #include "casadi_bilin.hpp"
   #include "casadi_rank1.hpp"
@@ -267,15 +289,24 @@ namespace casadi {
   #include "casadi_ldl.hpp"
   #include "casadi_qr.hpp"
   #include "casadi_qp.hpp"
+  #include "casadi_qrqp.hpp"
+  #include "casadi_kkt.hpp"
+  #include "casadi_ipqp.hpp"
   #include "casadi_nlp.hpp"
   #include "casadi_sqpmethod.hpp"
+  #include "casadi_feasiblesqpmethod.hpp"
   #include "casadi_bfgs.hpp"
   #include "casadi_regularize.hpp"
   #include "casadi_newton.hpp"
   #include "casadi_bound_consistency.hpp"
   #include "casadi_lsqr.hpp"
+  #include "casadi_dense_lsqr.hpp"
   #include "casadi_cache.hpp"
   #include "casadi_convexify.hpp"
+  #include "casadi_logsumexp.hpp"
+  #include "casadi_sum.hpp"
+  #include "casadi_sparsity.hpp"
+  #include "casadi_jac.hpp"
 
 } // namespace casadi
 

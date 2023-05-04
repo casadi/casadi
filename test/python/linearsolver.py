@@ -2,8 +2,8 @@
 #     This file is part of CasADi.
 #
 #     CasADi -- A symbolic framework for dynamic optimization.
-#     Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
-#                             K.U. Leuven. All rights reserved.
+#     Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+#                             KU Leuven. All rights reserved.
 #     Copyright (C) 2011-2014 Greg Horn
 #
 #     CasADi is free software; you can redistribute it and/or
@@ -76,6 +76,12 @@ except:
   pass
 
 try:
+  load_linsol("mumps")
+  lsolvers.append(("mumps",{},{"symmetry"}))
+except:
+  pass
+
+try:
   load_linsol("qr")
   lsolvers.append(("qr",{},set()))
 except:
@@ -86,6 +92,7 @@ try:
   lsolvers.append(("ldl",{},{"posdef","symmetry"}))
 except:
   pass
+
 
 nsolvers = []
 
@@ -124,13 +131,13 @@ class LinearSolverTests(casadiTestCase):
         options["ad_weight_sp"] = 0
         solver = Solver("solver", A.T.sparsity(), options)
 
-        Jf = solver.jacobian_old(0, 0)
+        Jf = jacobian_old(solver, 0, 0)
 
         options["ad_weight"] = 1
         options["ad_weight_sp"] = 1
         solver = Solver("solver", A.T.sparsity(), options)
 
-        Jb = solver.jacobian_old(0, 0)
+        Jb = jacobian_old(solver, 0, 0)
 
         Jf_in = [0]*Jf.n_in();Jf_in[0]=A.T
         Jb_in = [0]*Jb.n_in();Jb_in[0]=A.T
@@ -509,6 +516,7 @@ class LinearSolverTests(casadiTestCase):
 
 
     for Solver, options, req in lsolvers:
+      if "mumps" in str(Solver): continue
       print(Solver)
       f = Function('f', [x, y], [x ** 2 - y])
       finv = rootfinder('finv', "newton", f, {"linear_solver": Solver, "linear_solver_options": options})
@@ -522,6 +530,20 @@ class LinearSolverTests(casadiTestCase):
       f_par = f.map(200, 'thread',4)
       res = f_par(numpy.linspace(10, 0, 200), numpy.linspace(0, 10, 200))
 
+
+  def test_issue2664(self):
+
+    bnum = DM.rand(3,3)
+
+    x = MX.sym('x',3,3)
+    for b in [MX.sym('b',3,3),MX.sym('b',Sparsity.lower(3)),MX.sym('b',Sparsity.upper(3))]:
+      f = Function('f',[x,b],[solve(x,b,'symbolicqr')])
+
+      for bn in [bnum,bnum[Sparsity.lower(3)],bnum[Sparsity.upper(3)]]:
+
+        A = evalf(f(diagcat(1,2,3),SX(bn)))
+        B = f(diagcat(1,2,3),bn)
+        self.checkarray(A,B)
 
 
 

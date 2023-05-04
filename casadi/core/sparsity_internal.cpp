@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *    Copyright (C) 2005-2013 Timothy A. Davis
  *
@@ -30,8 +30,6 @@
 #include <climits>
 #include <cstdlib>
 #include <cmath>
-
-using namespace std;
 
 namespace casadi {
   void SparsityInternal::etree(const casadi_int* sp, casadi_int* parent,
@@ -476,18 +474,18 @@ namespace casadi {
     return size1()*size2();
   }
 
-  void SparsityInternal::disp(ostream &stream, bool more) const {
+  void SparsityInternal::disp(std::ostream &stream, bool more) const {
     stream << dim(!is_dense());
     if (more) {
-      stream << endl;
-      stream << "colind: " << get_colind() << endl;
-      stream << "row:    " << get_row() << endl;
+      stream << std::endl;
+      stream << "colind: " << get_colind() << std::endl;
+      stream << "row:    " << get_row() << std::endl;
     }
   }
 
-  vector<casadi_int> SparsityInternal::get_col() const {
+  std::vector<casadi_int> SparsityInternal::get_col() const {
     const casadi_int* colind = this->colind();
-    vector<casadi_int> col(nnz());
+    std::vector<casadi_int> col(nnz());
     for (casadi_int r=0; r<size2(); ++r) {
       for (casadi_int el = colind[r]; el < colind[r+1]; ++el) {
         col[el] = r;
@@ -498,15 +496,16 @@ namespace casadi {
 
   Sparsity SparsityInternal::T() const {
     // Dummy mapping
-    vector<casadi_int> mapping;
+    std::vector<casadi_int> mapping;
 
     return transpose(mapping);
   }
 
-  Sparsity SparsityInternal::transpose(vector<casadi_int>& mapping, bool invert_mapping) const {
+  Sparsity SparsityInternal::transpose(
+      std::vector<casadi_int>& mapping, bool invert_mapping) const {
     // Get the sparsity of the transpose in sparse triplet form
-    vector<casadi_int> trans_col = get_row();
-    vector<casadi_int> trans_row = get_col();
+    std::vector<casadi_int> trans_col = get_row();
+    std::vector<casadi_int> trans_row = get_col();
 
     // Create the sparsity pattern
     return Sparsity::triplet(size2(), size1(), trans_row, trans_col, mapping, invert_mapping);
@@ -584,19 +583,19 @@ namespace casadi {
     Copyright(c) Timothy A. Davis, 2006-2009
     Licensed as a derivative work under the GNU LGPL
     */
-    vector<casadi_int> tmp;
+    std::vector<casadi_int> tmp;
 
     Sparsity AT = T();
 
-    vector<casadi_int> xi(2*size2()+1);
-    vector<casadi_int>& Blk = xi;
+    std::vector<casadi_int> xi(2*size2()+1);
+    std::vector<casadi_int>& Blk = xi;
 
-    vector<casadi_int> pstack(size2()+1);
+    std::vector<casadi_int> pstack(size2()+1);
 
     p.resize(size2());
     r.resize(size2()+6);
 
-    vector<bool> marked(size2(), false);
+    std::vector<bool> marked(size2(), false);
 
     casadi_int top = size2();
 
@@ -607,7 +606,7 @@ namespace casadi {
     }
 
     //restore A; unmark all nodes
-    fill(marked.begin(), marked.end(), false);
+    std::fill(marked.begin(), marked.end(), false);
 
     top = size2();
     casadi_int nb = size2();
@@ -663,8 +662,8 @@ namespace casadi {
     casadi_assert(is_symmetric(), "AMD requires a symmetric matrix");
     // Get sparsity
     casadi_int n=size2();
-    vector<casadi_int> colind = get_colind();
-    vector<casadi_int> row = get_row();
+    std::vector<casadi_int> colind = get_colind();
+    std::vector<casadi_int> row = get_row();
     // Drop diagonal entries
     casadi_int nnz = 0; // number of nonzeros after pruning
     casadi_int col_begin, col_end=0;
@@ -685,9 +684,9 @@ namespace casadi {
     dense = std::max(casadi_int(16), dense);
     dense = std::min(n-2, dense);
     // Allocate result
-    vector<casadi_int> P(n+1);
+    std::vector<casadi_int> P(n+1);
     // Work vectors
-    vector<casadi_int> len(n+1), nv(n+1), next(n+1), head(n+1), elen(n+1), degree(n+1),
+    std::vector<casadi_int> len(n+1), nv(n+1), next(n+1), head(n+1), elen(n+1), degree(n+1),
                 w(n+1), hhead(n+1);
     // Number of elements
     casadi_int nel = 0;
@@ -1070,7 +1069,7 @@ namespace casadi {
     Copyright(c) Timothy A. Davis, 2006-2009
     Licensed as a derivative work under the GNU LGPL
     */
-    vector<casadi_int> &rr = *static_cast<vector<casadi_int> *>(other);
+    std::vector<casadi_int> &rr = *static_cast<std::vector<casadi_int> *>(other);
     return (i >= rr[1] && i < rr[2]) ;
   }
 
@@ -1163,7 +1162,7 @@ namespace casadi {
     // allocate result
     jmatch.resize(size1());
     imatch.resize(size2());
-    vector<casadi_int> w(size1()+size2());
+    std::vector<casadi_int> w(size1()+size2());
 
     // count nonempty columns and rows
     casadi_int k=0;
@@ -1270,21 +1269,21 @@ namespace casadi {
 
     // coarse col decomposition
     coarse_rowblock.resize(5);
-    fill(coarse_rowblock.begin(), coarse_rowblock.end(), 0);
+    std::fill(coarse_rowblock.begin(), coarse_rowblock.end(), 0);
 
     // coarse row decomposition
     coarse_colblock.resize(5);
-    fill(coarse_colblock.begin(), coarse_colblock.end(), 0);
+    std::fill(coarse_colblock.begin(), coarse_colblock.end(), 0);
 
     // max transversal
-    vector<casadi_int> imatch, jmatch;
+    std::vector<casadi_int> imatch, jmatch;
     maxtrans(imatch, jmatch, trans, seed);
 
     // Coarse decomposition
 
     // use rowblock and colblock as workspace
-    vector<casadi_int>& wi = rowblock;
-    vector<casadi_int>& wj = colblock;
+    std::vector<casadi_int>& wi = rowblock;
+    std::vector<casadi_int>& wj = colblock;
 
     // unmark all rows for bfs
     for (casadi_int j=0; j<size2(); ++j)
@@ -1317,7 +1316,7 @@ namespace casadi {
 
     // --- Fine decomposition -----------------------------------------------
     // pinv=p'
-    vector<casadi_int> pinv = invertPermutation(rowperm);
+    std::vector<casadi_int> pinv = invertPermutation(rowperm);
 
     // C=A(p, q) (it will hold A(R2, C2))
     std::vector<casadi_int> colind_C, row_C;
@@ -1345,16 +1344,16 @@ namespace casadi {
     Sparsity C(nrow_C, ncol_C, colind_C, row_C, true);
 
     // find strongly connected components of C
-    vector<casadi_int> scc_p, scc_r;
+    std::vector<casadi_int> scc_p, scc_r;
     casadi_int scc_nb = C.scc(scc_p, scc_r);
 
     // --- Combine coarse and fine decompositions ---------------------------
 
     // C(ps, ps) is the permuted matrix
-    vector<casadi_int> ps = scc_p;
+    std::vector<casadi_int> ps = scc_p;
 
     // kth block is rs[k]..rs[k+1]-1
-    vector<casadi_int> rs = scc_r;
+    std::vector<casadi_int> rs = scc_r;
 
     // # of blocks of A(R2, C2)
     casadi_int nb1 = scc_nb;
@@ -1445,7 +1444,7 @@ namespace casadi {
   }
 
   std::vector<casadi_int> SparsityInternal::invertPermutation(const std::vector<casadi_int>& p) {
-    vector<casadi_int> pinv(p.size());
+    std::vector<casadi_int> pinv(p.size());
     for (casadi_int k=0; k<p.size(); ++k) pinv[p[k]] = k;
     return pinv;
   }
@@ -1585,10 +1584,10 @@ namespace casadi {
     casadi_int bnz = Bp[n];
 
     // get workspace
-    vector<casadi_int> w(m);
+    std::vector<casadi_int> w(m);
 
     // allocate result
-    vector<casadi_int> C_colind(n+1, 0), C_row;
+    std::vector<casadi_int> C_colind(n+1, 0), C_row;
 
     C_colind.resize(anz + bnz);
 
@@ -1625,7 +1624,7 @@ namespace casadi {
     if (is_vector()) {
       // Sparsity pattern
       casadi_int n = nrow * ncol;
-      vector<casadi_int> ret_colind(n+1, 0), ret_row;
+      std::vector<casadi_int> ret_colind(n+1, 0), ret_row;
 
       // Loop over all entries
       casadi_int ret_i=0;
@@ -1646,7 +1645,7 @@ namespace casadi {
     } else {
       // Sparsity pattern
       casadi_int n = std::min(nrow, ncol);
-      vector<casadi_int> ret_row, ret_colind(2, 0);
+      std::vector<casadi_int> ret_row, ret_colind(2, 0);
 
       // Loop over diagonal nonzeros
       for (casadi_int cc=0; cc<n; ++cc) {
@@ -1683,7 +1682,7 @@ namespace casadi {
     const casadi_int* colind = this->colind();
     const casadi_int* row = this->row();
     // Return sparsity
-    vector<casadi_int> ret_colind(ncol+1), ret_row;
+    std::vector<casadi_int> ret_colind(ncol+1), ret_row;
     ret_colind[0] = 0;
     ret_row.reserve(nnz());
     for (casadi_int c=0; c<ncol; ++c) {
@@ -1747,10 +1746,10 @@ namespace casadi {
     const casadi_int* y_colind = y.colind();
 
     // Sparsity pattern of the result
-    vector<casadi_int> row, col;
+    std::vector<casadi_int> row, col;
 
     // Temporary vector for avoiding duplicate nonzeros
-    vector<casadi_int> tmp(d1, -1);
+    std::vector<casadi_int> tmp(d1, -1);
 
     // Loop over the nonzeros of y
     for (casadi_int cc=0; cc<d2; ++cc) {
@@ -1833,6 +1832,50 @@ namespace casadi {
     return is_transpose(*this);
   }
 
+  bool SparsityInternal::is_permutation() const {
+    return is_orthonormal();
+  }
+
+  bool SparsityInternal::is_orthonormal(bool allow_empty) const {
+    if (!allow_empty) {
+      if (!is_square()) return false;
+      if (nnz()!=size1()) return false;
+    }
+
+    Sparsity sp = shared_from_this<Sparsity>();
+    if (sum2(sp).nnz()!=nnz()) return false;
+    if (sum1(sp).nnz()!=nnz()) return false;
+    return true;
+  }
+
+  bool SparsityInternal::is_orthonormal_rows(bool allow_empty) const {
+    if (!allow_empty) {
+      if (size1()>size2()) return false;
+      if (nnz()!=size1()) return false;
+    }
+
+    Sparsity sp = shared_from_this<Sparsity>();
+    if (sum2(sp).nnz()!=nnz()) return false;
+    if (sum1(sp).nnz()!=nnz()) return false;
+    return true;
+  }
+
+  bool SparsityInternal::is_orthonormal_columns(bool allow_empty) const {
+    if (!allow_empty) {
+      if (size2()>size1()) return false;
+      if (nnz()!=size2()) return false;
+    }
+
+    Sparsity sp = shared_from_this<Sparsity>();
+    if (sum2(sp).nnz()!=nnz()) return false;
+    if (sum1(sp).nnz()!=nnz()) return false;
+    return true;
+  }
+
+  bool SparsityInternal::is_selection(bool allow_empty) const {
+    return is_orthonormal_rows(allow_empty);
+  }
+
   casadi_int SparsityInternal::nnz_lower(bool strictly) const {
     const casadi_int* colind = this->colind();
     const casadi_int* row = this->row();
@@ -1873,7 +1916,7 @@ namespace casadi {
     return std::pair<casadi_int, casadi_int>(size1(), size2());
   }
 
-  Sparsity SparsityInternal::_erase(const vector<casadi_int>& rr, bool ind1,
+  Sparsity SparsityInternal::_erase(const std::vector<casadi_int>& rr, bool ind1,
                                       std::vector<casadi_int>& mapping) const {
     // Quick return if nothing to erase
     if (rr.empty()) {
@@ -1885,7 +1928,7 @@ namespace casadi {
     // Handle index-1, negative indices
     if (ind1 || has_negative(rr)) {
       std::vector<casadi_int> rr_mod = rr;
-      for (vector<casadi_int>::iterator i=rr_mod.begin(); i!=rr_mod.end(); ++i) {
+      for (std::vector<casadi_int>::iterator i=rr_mod.begin(); i!=rr_mod.end(); ++i) {
         if (ind1) (*i)--;
         if (*i<0) *i += numel();
       }
@@ -1912,10 +1955,10 @@ namespace casadi {
     casadi_int nz=0;
 
     // Elements to be erased
-    vector<casadi_int>::const_iterator next_rr = rr.begin();
+    std::vector<casadi_int>::const_iterator next_rr = rr.begin();
 
     // Return value
-    vector<casadi_int> ret_colind = get_colind(), ret_row = get_row();
+    std::vector<casadi_int> ret_colind = get_colind(), ret_row = get_row();
 
     // First and last index for the column (note colind_ is being overwritten)
     casadi_int k_first, k_last=0;
@@ -1960,8 +2003,9 @@ namespace casadi {
     return Sparsity(size1(), size2(), ret_colind, ret_row);
   }
 
-  Sparsity SparsityInternal::_erase(const vector<casadi_int>& rr, const vector<casadi_int>& cc,
-                                      bool ind1, std::vector<casadi_int>& mapping) const {
+  Sparsity SparsityInternal::_erase(
+      const std::vector<casadi_int>& rr, const std::vector<casadi_int>& cc,
+      bool ind1, std::vector<casadi_int>& mapping) const {
     casadi_assert_in_range(rr, -size1()+ind1, size1()+ind1);
     casadi_assert_in_range(cc, -size2()+ind1, size2()+ind1);
 
@@ -1970,7 +2014,7 @@ namespace casadi {
         || !is_nondecreasing(rr) || !is_nondecreasing(cc)) {
       // Create substitute rr
       std::vector<casadi_int> rr_mod = rr;
-      for (vector<casadi_int>::iterator i=rr_mod.begin(); i!=rr_mod.end(); ++i) {
+      for (std::vector<casadi_int>::iterator i=rr_mod.begin(); i!=rr_mod.end(); ++i) {
         if (ind1) (*i)--;
         if (*i<0) *i += size1();
       }
@@ -1978,7 +2022,7 @@ namespace casadi {
 
       // Create substitute cc
       std::vector<casadi_int> cc_mod = cc;
-      for (vector<casadi_int>::iterator i=cc_mod.begin(); i!=cc_mod.end(); ++i) {
+      for (std::vector<casadi_int>::iterator i=cc_mod.begin(); i!=cc_mod.end(); ++i) {
         if (ind1) (*i)--;
         if (*i<0) *i += size2();
       }
@@ -1998,13 +2042,13 @@ namespace casadi {
     mapping.reserve(nnz());
 
     // Return value
-    vector<casadi_int> ret_colind = get_colind(), ret_row = get_row();
+    std::vector<casadi_int> ret_colind = get_colind(), ret_row = get_row();
 
     // Number of non-zeros
     casadi_int nz=0;
 
     // Columns to be erased
-    vector<casadi_int>::const_iterator ie = cc.begin();
+    std::vector<casadi_int>::const_iterator ie = cc.begin();
 
     // First and last index for the col
     casadi_int el_first=0, el_last=0;
@@ -2021,7 +2065,7 @@ namespace casadi {
         ie++;
 
         // Rows to be erased
-        vector<casadi_int>::const_iterator je = rr.begin();
+        std::vector<casadi_int>::const_iterator je = rr.begin();
 
         // Loop over nonzero elements of the col
         for (casadi_int el=el_first; el<el_last; ++el) {
@@ -2067,8 +2111,8 @@ namespace casadi {
     return Sparsity(size1(), size2(), ret_colind, ret_row);
   }
 
-  vector<casadi_int> SparsityInternal::get_nz(const vector<casadi_int>& rr,
-      const vector<casadi_int>& cc) const {
+  std::vector<casadi_int> SparsityInternal::get_nz(const std::vector<casadi_int>& rr,
+      const std::vector<casadi_int>& cc) const {
     casadi_assert_bounded(rr, size1());
     casadi_assert_bounded(cc, size2());
 
@@ -2077,7 +2121,7 @@ namespace casadi {
 
     sort(rr, rr_sorted, rr_sorted_index);
 
-    vector<casadi_int> ret(cc.size()*rr.size());
+    std::vector<casadi_int> ret(cc.size()*rr.size());
 
     casadi_int stride = rr.size();
     const casadi_int* colind = this->colind();
@@ -2101,8 +2145,8 @@ namespace casadi {
     return ret;
   }
 
-  Sparsity SparsityInternal::sub(const vector<casadi_int>& rr, const SparsityInternal& sp,
-                                 vector<casadi_int>& mapping, bool ind1) const {
+  Sparsity SparsityInternal::sub(const std::vector<casadi_int>& rr, const SparsityInternal& sp,
+                                 std::vector<casadi_int>& mapping, bool ind1) const {
     casadi_assert_dev(rr.size()==sp.nnz());
 
     // Check bounds
@@ -2111,7 +2155,7 @@ namespace casadi {
     // Handle index-1, negative indices
     if (ind1 || has_negative(rr)) {
       std::vector<casadi_int> rr_mod = rr;
-      for (vector<casadi_int>::iterator i=rr_mod.begin(); i!=rr_mod.end(); ++i) {
+      for (std::vector<casadi_int>::iterator i=rr_mod.begin(); i!=rr_mod.end(); ++i) {
         casadi_assert(!(ind1 && (*i)<=0),
           "Matlab is 1-based, but requested index " + str(*i) +  ". "
           "Note that negative slices are disabled in the Matlab interface. "
@@ -2128,7 +2172,7 @@ namespace casadi {
     get_nz(mapping);
 
     // Construct new pattern of the corresponding elements
-    vector<casadi_int> ret_colind(sp.size2()+1), ret_row;
+    std::vector<casadi_int> ret_colind(sp.size2()+1), ret_row;
     ret_colind[0] = 0;
     const casadi_int* sp_colind = sp.colind();
     const casadi_int* sp_row = sp.row();
@@ -2145,14 +2189,15 @@ namespace casadi {
     return Sparsity(sp.size1(), sp.size2(), ret_colind, ret_row);
   }
 
-  Sparsity SparsityInternal::sub(const vector<casadi_int>& rr, const vector<casadi_int>& cc,
-                                 vector<casadi_int>& mapping, bool ind1) const {
+  Sparsity SparsityInternal::sub(
+      const std::vector<casadi_int>& rr, const std::vector<casadi_int>& cc,
+      std::vector<casadi_int>& mapping, bool ind1) const {
     casadi_assert_in_range(rr, -size1()+ind1, size1()+ind1);
     casadi_assert_in_range(cc, -size2()+ind1, size2()+ind1);
 
     // Handle index-1, negative indices in rr
     std::vector<casadi_int> tmp = rr;
-    for (vector<casadi_int>::iterator i=tmp.begin(); i!=tmp.end(); ++i) {
+    for (std::vector<casadi_int>::iterator i=tmp.begin(); i!=tmp.end(); ++i) {
       if (ind1) (*i)--;
       if (*i<0) *i += size1();
     }
@@ -2161,13 +2206,13 @@ namespace casadi {
 
     // Handle index-1, negative indices in cc
     tmp = cc;
-    for (vector<casadi_int>::iterator i=tmp.begin(); i!=tmp.end(); ++i) {
+    for (std::vector<casadi_int>::iterator i=tmp.begin(); i!=tmp.end(); ++i) {
       if (ind1) (*i)--;
       if (*i<0) *i += size2();
     }
     std::vector<casadi_int> cc_sorted, cc_sorted_index;
     sort(tmp, cc_sorted, cc_sorted_index, false);
-    vector<casadi_int> columns, rows;
+    std::vector<casadi_int> columns, rows;
 
     // With lookup vector
     bool with_lookup = static_cast<double>(cc.size())*static_cast<double>(rr.size()) > nnz();
@@ -2270,13 +2315,13 @@ namespace casadi {
 
   Sparsity SparsityInternal::combine(const Sparsity& y, bool f0x_is_zero,
                                             bool function0_is_zero) const {
-    static vector<unsigned char> mapping;
+    static std::vector<unsigned char> mapping;
     return combineGen1<false>(y, f0x_is_zero, function0_is_zero, mapping);
   }
 
   Sparsity SparsityInternal::combine(const Sparsity& y, bool f0x_is_zero,
                                             bool function0_is_zero,
-                                            vector<unsigned char>& mapping) const {
+                                            std::vector<unsigned char>& mapping) const {
     return combineGen1<true>(y, f0x_is_zero, function0_is_zero, mapping);
   }
 
@@ -2299,7 +2344,7 @@ namespace casadi {
     if (is_equal(y)) {
       if (with_mapping) {
         mapping.resize(y.nnz());
-        fill(mapping.begin(), mapping.end(), 1 | 2);
+        std::fill(mapping.begin(), mapping.end(), 1 | 2);
       }
       return y;
     }
@@ -2319,7 +2364,7 @@ namespace casadi {
 
   template<bool with_mapping, bool f0x_is_zero, bool function0_is_zero>
   Sparsity SparsityInternal::combineGen(const Sparsity& y,
-                                               vector<unsigned char>& mapping) const {
+                                               std::vector<unsigned char>& mapping) const {
 
     // Assert dimensions
     casadi_assert(size2()==y.size2() && size1()==y.size1(),
@@ -2332,8 +2377,8 @@ namespace casadi {
     const casadi_int* row = this->row();
 
     // Sparsity pattern of the result
-    vector<casadi_int> ret_colind(size2()+1, 0);
-    vector<casadi_int> ret_row;
+    std::vector<casadi_int> ret_colind(size2()+1, 0);
+    std::vector<casadi_int> ret_row;
 
     // Clear the mapping
     if (with_mapping) mapping.clear();
@@ -2495,10 +2540,10 @@ namespace casadi {
     if (nnz()==numel()) return true;
 
     // Check the number of non-zeros per col
-    if (!equal(colind, colind+size2()+1, y_colind)) return false;
+    if (!std::equal(colind, colind+size2()+1, y_colind)) return false;
 
     // Finally check the row indices
-    if (!equal(row, row+nz, y_row)) return false;
+    if (!std::equal(row, row+nz, y_row)) return false;
 
     // Equal if reached this point
     return true;
@@ -2513,14 +2558,14 @@ namespace casadi {
     casadi_int sz = nnz();
 
     // Add row indices
-    vector<casadi_int> new_row = get_row();
+    std::vector<casadi_int> new_row = get_row();
     const casadi_int* sp_row = sp.row();
     new_row.resize(sz + sp.nnz());
     for (casadi_int i=sz; i<new_row.size(); ++i)
       new_row[i] = sp_row[i-sz] + size1();
 
     // New column indices
-    vector<casadi_int> new_colind(2, 0);
+    std::vector<casadi_int> new_colind(2, 0);
     new_colind[1] = new_row.size();
     return Sparsity(size1()+sp.size1(), 1, new_colind, new_row);
   }
@@ -2531,12 +2576,12 @@ namespace casadi {
                           + " for lhs, and " + str(sp.size1()) + " for rhs.");
 
     // Append rows
-    vector<casadi_int> new_row = get_row();
+    std::vector<casadi_int> new_row = get_row();
     const casadi_int* sp_row = sp.row();
     new_row.insert(new_row.end(), sp_row, sp_row+sp.nnz());
 
     // Get column indices
-    vector<casadi_int> new_colind = get_colind();
+    std::vector<casadi_int> new_colind = get_colind();
     const casadi_int* sp_colind = sp.colind();
     new_colind.resize(size2() + sp.size2() + 1);
     for (casadi_int i = size2()+1; i<new_colind.size(); ++i)
@@ -2552,7 +2597,7 @@ namespace casadi {
     // Handle index-1, negative indices
     if (ind1 || has_negative(cc)) {
       std::vector<casadi_int> cc_mod = cc;
-      for (vector<casadi_int>::iterator i=cc_mod.begin(); i!=cc_mod.end(); ++i) {
+      for (std::vector<casadi_int>::iterator i=cc_mod.begin(); i!=cc_mod.end(); ++i) {
         if (ind1) (*i)--;
         if (*i<0) *i += ncol;
       }
@@ -2560,7 +2605,7 @@ namespace casadi {
     }
 
     // Sparsify the columns
-    vector<casadi_int> new_colind = get_colind();
+    std::vector<casadi_int> new_colind = get_colind();
     new_colind.resize(ncol+1, nnz());
 
     casadi_int ik=cc.back(); // need only to update from the last new index
@@ -2592,7 +2637,7 @@ namespace casadi {
     // Handle index-1, negative indices
     if (ind1 || has_negative(rr)) {
       std::vector<casadi_int> rr_mod = rr;
-      for (vector<casadi_int>::iterator i=rr_mod.begin(); i!=rr_mod.end(); ++i) {
+      for (std::vector<casadi_int>::iterator i=rr_mod.begin(); i!=rr_mod.end(); ++i) {
         if (ind1) (*i)--;
         if (*i<0) *i += nrow;
       }
@@ -2603,7 +2648,7 @@ namespace casadi {
     casadi_assert_dev(rr.size() == size1());
 
     // Begin by sparsify the rows
-    vector<casadi_int> new_row = get_row();
+    std::vector<casadi_int> new_row = get_row();
     for (casadi_int k=0; k<nnz(); ++k) {
       new_row[k] = rr[new_row[k]];
     }
@@ -2689,7 +2734,7 @@ namespace casadi {
 
   Sparsity SparsityInternal::_resize(casadi_int nrow, casadi_int ncol) const {
     // Col and row index of the new
-    vector<casadi_int> row_new, colind_new(ncol+1, 0);
+    std::vector<casadi_int> row_new, colind_new(ncol+1, 0);
     const casadi_int* colind = this->colind();
     const casadi_int* row = this->row();
 
@@ -2741,7 +2786,7 @@ namespace casadi {
     casadi_assert_dev(mapping.size()==nnz());
 
     // Return value (to be hashed)
-    vector<casadi_int> ret_colind = get_colind(), ret_row = get_row();
+    std::vector<casadi_int> ret_colind = get_colind(), ret_row = get_row();
 
     // Nonzero counter without duplicates
     casadi_int k_strict=0;
@@ -2789,7 +2834,7 @@ namespace casadi {
   }
 
   void SparsityInternal::find(std::vector<casadi_int>& loc, bool ind1) const {
-    casadi_assert(!mul_overflows(size1(), size2()), "Integer overflow detected");
+    casadi_assert(!std::mul_overflows(size1(), size2()), "Integer overflow detected");
     if (is_dense()) {
       loc = range(ind1, numel()+ind1);
       return;
@@ -2825,7 +2870,7 @@ namespace casadi {
 
     // Make a sanity check
     casadi_int last=-1;
-    for (vector<casadi_int>::iterator it=indices.begin(); it!=indices.end(); ++it) {
+    for (std::vector<casadi_int>::iterator it=indices.begin(); it!=indices.end(); ++it) {
       if (*it>=0) {
         casadi_int el = *it;
         if (el<last) {
@@ -2846,7 +2891,7 @@ namespace casadi {
     if (last<0) return;
 
     // Iterator to input/output
-    vector<casadi_int>::iterator it=indices.begin();
+    std::vector<casadi_int>::iterator it=indices.begin();
     while (*it<0) it++; // first non-ignored
 
     // Position in flattened matrix
@@ -2896,15 +2941,15 @@ namespace casadi {
     }
 
     // Add trailing elements not in pattern
-    fill(it, indices.end(), -1);
+    std::fill(it, indices.end(), -1);
   }
 
   Sparsity SparsityInternal::uni_coloring(const Sparsity& AT, casadi_int cutoff) const {
 
     // Allocate temporary vectors
-    vector<casadi_int> forbiddenColors;
+    std::vector<casadi_int> forbiddenColors;
     forbiddenColors.reserve(size2());
-    vector<casadi_int> color(size2(), 0);
+    std::vector<casadi_int> color(size2(), 0);
 
     // Access the sparsity of the transpose
     const casadi_int* AT_colind = AT.colind();
@@ -2959,7 +3004,7 @@ namespace casadi {
     }
 
     // Create return sparsity containing the coloring
-    vector<casadi_int> ret_colind(forbiddenColors.size()+1, 0), ret_row;
+    std::vector<casadi_int> ret_colind(forbiddenColors.size()+1, 0), ret_row;
 
     // Get the number of rows for each col
     for (casadi_int i=0; i<color.size(); ++i) {
@@ -3002,7 +3047,7 @@ namespace casadi {
       casadi_assert_dev(ordering==1);
 
       // Ordering
-      vector<casadi_int> ord = largest_first();
+      std::vector<casadi_int> ord = largest_first();
 
       // Create a new sparsity pattern
       Sparsity sp_permuted = pmult(ord, true, true, true);
@@ -3015,21 +3060,21 @@ namespace casadi {
     }
 
     // Allocate temporary vectors
-    vector<casadi_int> forbiddenColors;
+    std::vector<casadi_int> forbiddenColors;
     forbiddenColors.reserve(size2());
-    vector<casadi_int> color(size2(), -1);
+    std::vector<casadi_int> color(size2(), -1);
 
-    vector<casadi_int> firstNeighborP(size2(), -1);
-    vector<casadi_int> firstNeighborQ(size2(), -1);
-    vector<casadi_int> firstNeighborQ_el(size2(), -1);
+    std::vector<casadi_int> firstNeighborP(size2(), -1);
+    std::vector<casadi_int> firstNeighborQ(size2(), -1);
+    std::vector<casadi_int> firstNeighborQ_el(size2(), -1);
 
-    vector<casadi_int> treated(size2(), -1);
-    vector<casadi_int> hub(nnz_upper(), -1);
+    std::vector<casadi_int> treated(size2(), -1);
+    std::vector<casadi_int> hub(nnz_upper(), -1);
 
-    vector<casadi_int> Tmapping;
+    std::vector<casadi_int> Tmapping;
     transpose(Tmapping);
 
-    vector<casadi_int> star(nnz());
+    std::vector<casadi_int> star(nnz());
     casadi_int k = 0;
     for (casadi_int i=0; i<size2(); ++i) {
       for (casadi_int j_el=colind[i]; j_el<colind[i+1]; ++j_el) {
@@ -3213,7 +3258,7 @@ namespace casadi {
     }
 
     // Create return sparsity containing the coloring
-    vector<casadi_int> ret_colind(forbiddenColors.size()+1, 0), ret_row;
+    std::vector<casadi_int> ret_colind(forbiddenColors.size()+1, 0), ret_row;
 
     // Get the number of rows for each col
     for (casadi_int i=0; i<color.size(); ++i) {
@@ -3252,7 +3297,7 @@ namespace casadi {
       casadi_assert_dev(ordering==1);
 
       // Ordering
-      vector<casadi_int> ord = largest_first();
+      std::vector<casadi_int> ord = largest_first();
 
       // Create a new sparsity pattern
       Sparsity sp_permuted = pmult(ord, true, true, true);
@@ -3267,9 +3312,9 @@ namespace casadi {
     // Allocate temporary vectors
     const casadi_int* colind = this->colind();
     const casadi_int* row = this->row();
-    vector<casadi_int> forbiddenColors;
+    std::vector<casadi_int> forbiddenColors;
     forbiddenColors.reserve(size2());
-    vector<casadi_int> color(size2(), -1);
+    std::vector<casadi_int> color(size2(), -1);
 
     // 4: for i <- 1 to |V | do
     for (casadi_int i=0; i<size2(); ++i) {
@@ -3355,17 +3400,17 @@ namespace casadi {
   }
 
   std::vector<casadi_int> SparsityInternal::largest_first() const {
-    vector<casadi_int> degree = get_colind();
+    std::vector<casadi_int> degree = get_colind();
     casadi_int max_degree = 0;
     for (casadi_int k=0; k<size2(); ++k) {
       degree[k] = degree[k+1]-degree[k];
-      max_degree = max(max_degree, 1+degree[k]);
+      max_degree = std::max(max_degree, 1+degree[k]);
     }
     degree.resize(size2());
 
     // Vector for binary sort
-    vector<casadi_int> degree_count(max_degree+1, 0);
-    for (vector<casadi_int>::const_iterator it=degree.begin(); it!=degree.end(); ++it) {
+    std::vector<casadi_int> degree_count(max_degree+1, 0);
+    for (std::vector<casadi_int>::const_iterator it=degree.begin(); it!=degree.end(); ++it) {
       degree_count.at(*it+1)++;
     }
 
@@ -3375,15 +3420,15 @@ namespace casadi {
     }
 
     // Now a bucket sort
-    vector<casadi_int> ordering(size2());
+    std::vector<casadi_int> ordering(size2());
     for (casadi_int k=size2()-1; k>=0; --k) {
       ordering[degree_count[degree[k]]++] = k;
     }
 
     // Invert the ordering
-    vector<casadi_int>& reverse_ordering = degree_count; // reuse memory
+    std::vector<casadi_int>& reverse_ordering = degree_count; // reuse memory
     reverse_ordering.resize(ordering.size());
-    copy(ordering.begin(), ordering.end(), reverse_ordering.rbegin());
+    std::copy(ordering.begin(), ordering.end(), reverse_ordering.rbegin());
 
     // Return the ordering
     return reverse_ordering;
@@ -3392,23 +3437,23 @@ namespace casadi {
   Sparsity SparsityInternal::pmult(const std::vector<casadi_int>& p, bool permute_rows,
                                    bool permute_columns, bool invert_permutation) const {
     // Invert p, possibly
-    vector<casadi_int> p_inv;
+    std::vector<casadi_int> p_inv;
     if (invert_permutation) {
       p_inv.resize(p.size());
       for (casadi_int k=0; k<p.size(); ++k) {
         p_inv[p[k]] = k;
       }
     }
-    const vector<casadi_int>& pp = invert_permutation ? p_inv : p;
+    const std::vector<casadi_int>& pp = invert_permutation ? p_inv : p;
 
     // Get columns
-    vector<casadi_int> col = get_col();
+    std::vector<casadi_int> col = get_col();
 
     // Get rows
     const casadi_int* row = this->row();
 
     // Sparsity of the return matrix
-    vector<casadi_int> new_row(col.size()), new_col(col.size());
+    std::vector<casadi_int> new_row(col.size()), new_col(col.size());
 
     // Possibly permute columns
     if (permute_columns) {
@@ -3422,7 +3467,7 @@ namespace casadi {
 
     } else {
       // No permutation of columns
-      copy(col.begin(), col.end(), new_col.begin());
+      std::copy(col.begin(), col.end(), new_col.begin());
     }
 
     // Possibly permute rows
@@ -3437,7 +3482,7 @@ namespace casadi {
 
     } else {
       // No permutation of rows
-      copy(row, row+nnz(), new_row.begin());
+      std::copy(row, row+nnz(), new_row.begin());
     }
 
     // Return permuted matrix
@@ -3457,7 +3502,7 @@ namespace casadi {
     if (size1()>size2()) return y.is_transpose(*this);
 
     // Index counter for columns of the possible transpose
-    vector<casadi_int> y_col_count(y.size2(), 0);
+    std::vector<casadi_int> y_col_count(y.size2(), 0);
     const casadi_int* colind = this->colind();
     const casadi_int* row = this->row();
     const casadi_int* y_colind = y.colind();
@@ -3551,7 +3596,7 @@ namespace casadi {
       }
 
       // End of row
-      stream << endl;
+      stream << std::endl;
     }
   }
 
@@ -3564,6 +3609,7 @@ namespace casadi {
     std::string name = "sp";
     bool as_matrix = true;
     casadi_int indent_level = 0;
+    std::vector<std::string> nonzeros;
 
     // Read options
     for (auto&& op : options) {
@@ -3575,6 +3621,8 @@ namespace casadi {
         as_matrix = op.second;
       } else if (op.first=="indent_level") {
         indent_level = op.second;
+      } else if (op.first=="nonzeros") {
+        nonzeros = op.second;
       } else {
         casadi_error("Unknown option '" + op.first + "'.");
       }
@@ -3582,15 +3630,12 @@ namespace casadi {
 
     // Construct indent string
     std::string indent;
-    for (casadi_int i=0;i<indent_level;++i) {
-      indent += "  ";
-    }
-
+    for (casadi_int i=0; i < indent_level; ++i) indent += "  ";
     casadi_assert(!opt_inline, "Inline not supported for now.");
 
     // Export dimensions
-    stream << indent << name << "_m = " << size1() << ";" << endl;
-    stream << indent << name << "_n = " << size2() << ";" << endl;
+    stream << indent << name << "_m = " << size1() << ";\n";
+    stream << indent << name << "_n = " << size2() << ";\n";
 
     // Matlab indices are one-based
     const casadi_int index_offset = 1;
@@ -3607,7 +3652,7 @@ namespace casadi {
         first = false;
       }
     }
-    stream << "];" << endl;
+    stream << "];\n";
 
     // Print rows
     stream << indent << name << "_i = [";
@@ -3618,31 +3663,43 @@ namespace casadi {
       stream << (row[i]+index_offset);
       first = false;
     }
-    stream << "];" << endl;
+    stream << "];\n";
+
+    // Print nonzeros
+    stream << indent << name << "_v = ";
+    if (nonzeros.empty()) {
+      stream << "ones(size(" << name << "_i));\n";
+    } else {
+      stream << "[";
+      for (casadi_int i = 0; i < nonzeros.size(); ++i) {
+        if (i > 0) stream << ", ";
+        stream << nonzeros.at(i);
+      }
+      stream << "];\n";
+    }
 
     if (as_matrix) {
       // Generate matrix
       stream << indent << name << " = sparse(" << name << "_i, " << name << "_j, ";
-      stream << "ones(size(" << name << "_i)), ";
-      stream << name << "_m, " << name << "_n);" << endl;
+      stream << name << "_v, " << name << "_m, " << name << "_n);\n";
     }
 
   }
 
   void SparsityInternal::spy_matlab(const std::string& mfile_name) const {
     // Create the .m file
-    ofstream mfile;
+    std::ofstream mfile;
     mfile.open(mfile_name.c_str());
 
     // Header
-    mfile << "% This function was automatically generated by CasADi" << endl;
+    mfile << "% This function was automatically generated by CasADi" << std::endl;
 
     Dict opts;
     opts["name"] = "A";
     export_code("matlab", mfile, opts);
 
     // Issue spy command
-    mfile << "spy(A);" << endl;
+    mfile << "spy(A);" << std::endl;
 
     mfile.close();
   }
@@ -3651,34 +3708,32 @@ namespace casadi {
     return hash_sparsity(size1(), size2(), colind(), row());
   }
 
-  bool SparsityInternal::is_tril() const {
+  bool SparsityInternal::is_tril(bool strictly) const {
     const casadi_int* colind = this->colind();
     const casadi_int* row = this->row();
-    // loop over columns
+    // Loop over columns
     for (casadi_int i=0; i<size2(); ++i) {
       if (colind[i] != colind[i+1]) { // if there are any elements of the column
         // check row of the top-most element of the column
         casadi_int rr = row[colind[i]];
-
-        // not lower triangular if row>i
-        if (rr<i) return false;
+        // Not lower triangular if row > i
+        if (strictly ? rr <= i : rr < i) return false;
       }
     }
     // all columns ok
     return true;
   }
 
-  bool SparsityInternal::is_triu() const {
+  bool SparsityInternal::is_triu(bool strictly) const {
     const casadi_int* colind = this->colind();
     const casadi_int* row = this->row();
-    // loop over columns
+    // Loop over columns
     for (casadi_int i=0; i<size2(); ++i) {
       if (colind[i] != colind[i+1]) { // if there are any elements of the column
         // check row of the bottom-most element of the column
         casadi_int rr = row[colind[i+1]-1];
-
-        // not upper triangular if row>i
-        if (rr>i) return false;
+        // Not upper triangular if row>i
+        if (strictly ? rr >= i : rr > i) return false;
       }
     }
     // all columns ok
@@ -3688,7 +3743,7 @@ namespace casadi {
   Sparsity SparsityInternal::_tril(bool includeDiagonal) const {
     const casadi_int* colind = this->colind();
     const casadi_int* row = this->row();
-    vector<casadi_int> ret_colind, ret_row;
+    std::vector<casadi_int> ret_colind, ret_row;
     ret_colind.reserve(size2()+1);
     ret_colind.push_back(0);
     for (casadi_int cc=0; cc<size2(); ++cc) {
@@ -3706,7 +3761,7 @@ namespace casadi {
   Sparsity SparsityInternal::_triu(bool includeDiagonal) const {
     const casadi_int* colind = this->colind();
     const casadi_int* row = this->row();
-    vector<casadi_int> ret_colind, ret_row;
+    std::vector<casadi_int> ret_colind, ret_row;
     ret_colind.reserve(size2()+1);
     ret_colind.push_back(0);
     for (casadi_int cc=0; cc<size2(); ++cc) {
@@ -3724,7 +3779,7 @@ namespace casadi {
   std::vector<casadi_int> SparsityInternal::get_lower() const {
     const casadi_int* colind = this->colind();
     const casadi_int* row = this->row();
-    vector<casadi_int> ret;
+    std::vector<casadi_int> ret;
     for (casadi_int cc=0; cc<size2(); ++cc) {
       for (casadi_int el = colind[cc]; el<colind[cc+1]; ++el) {
         if (row[el]>=cc) {
@@ -3738,7 +3793,7 @@ namespace casadi {
   std::vector<casadi_int> SparsityInternal::get_upper() const {
     const casadi_int* colind = this->colind();
     const casadi_int* row = this->row();
-    vector<casadi_int> ret;
+    std::vector<casadi_int> ret;
     for (casadi_int cc=0; cc<size2(); ++cc) {
       for (casadi_int el = colind[cc]; el<colind[cc+1] && row[el]<=cc; ++el) {
         ret.push_back(el);
@@ -3773,14 +3828,14 @@ namespace casadi {
     return bw;
   }
 
-  vector<casadi_int> SparsityInternal::get_colind() const {
+  std::vector<casadi_int> SparsityInternal::get_colind() const {
     const casadi_int* colind = this->colind();
-    return vector<casadi_int>(colind, colind+size2()+1);
+    return std::vector<casadi_int>(colind, colind+size2()+1);
   }
 
-  vector<casadi_int> SparsityInternal::get_row() const {
+  std::vector<casadi_int> SparsityInternal::get_row() const {
     const casadi_int* row = this->row();
-    return vector<casadi_int>(row, row+nnz());
+    return std::vector<casadi_int>(row, row+nnz());
   }
 
   void SparsityInternal::

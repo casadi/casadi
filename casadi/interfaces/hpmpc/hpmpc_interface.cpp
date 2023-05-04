@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -25,7 +25,6 @@
 #include "hpmpc_interface.hpp"
 #include <numeric>
 
-using namespace std;
 namespace casadi {
 
   extern "C"
@@ -689,7 +688,7 @@ namespace casadi {
       uout() << "return status: " << m->return_status << std::endl;
       uout() << "residuals: " << m->res << std::endl;
     }
-    m->success = m->return_status==0;
+    m->d_qp.success = m->return_status==0;
 
     std::fill(res[CONIC_X], res[CONIC_X]+nx_, 0);
     dense_transfer(1.0, get_ptr(m->x), theirs_Xsp_, res[CONIC_X], xsp_, pv);

@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -49,8 +49,6 @@
 #endif
 
 #undef CASADI_NEED_UNISTD
-
-using namespace std;
 
 namespace casadi {
 
@@ -169,6 +167,22 @@ namespace casadi {
     return lookupvector(v, (*std::max_element(v.begin(), v.end()))+1);
   }
 
+  bool is_permutation(const std::vector<casadi_int> &order) {
+    std::set<casadi_int> order_set(order.begin(), order.end());
+    return (order_set.size()==order.size()) &&
+           (*order_set.begin()==0) &&
+           (*order_set.rbegin()==order.size()-1);
+  }
+
+  std::vector<casadi_int> invert_permutation(const std::vector<casadi_int> &a) {
+    casadi_assert(is_permutation(a), "Not a permutation");
+    std::vector<casadi_int> ret(a.size());
+    for (casadi_int i=0;i<a.size();++i) {
+      ret[a[i]] = i;
+    }
+    return ret;
+  }
+
   // Better have a bool return flag saying if we need reorer at all
   std::vector<casadi_int> tensor_permute_mapping(const std::vector<casadi_int>& dims,
       const std::vector<casadi_int>& order) {
@@ -179,7 +193,7 @@ namespace casadi {
      // Quick return if no elements
      if (N==0) return std::vector<casadi_int>();
 
-     // One dimesion => null-permutation
+     // One dimension => null-permutation
      if (n==1) return range(N);
 
      // Allocate space for resulting mapping
@@ -271,6 +285,17 @@ namespace casadi {
     return true;
   }
 
+  CASADI_EXPORT std::string replace(const std::string& s,
+      const std::string& p, const std::string& r) {
+    std::string ret = s;
+    std::string::size_type n = 0;
+    while ((n = ret.find(p, n)) != std::string::npos) {
+      ret.replace(n, p.size(), r);
+      n += r.size();
+    }
+    return ret;
+  }
+
 #ifdef HAVE_SIMPLE_MKSTEMPS
 int simple_mkstemps_fd(const std::string& prefix, const std::string& suffix, std::string &result) {
     // Characters available for inventing filenames
@@ -306,6 +331,7 @@ int simple_mkstemps_fd(const std::string& prefix, const std::string& suffix, std
       if (fd != -1) return fd;
       if (fd == -1 && errno != EEXIST) return -1;
     }
+    return 0;
   }
 std::string simple_mkstemps(const std::string& prefix, const std::string& suffix) {
   std::string ret;
@@ -326,7 +352,7 @@ std::string simple_mkstemps(const std::string& prefix, const std::string& suffix
   std::string temporary_file(const std::string& prefix, const std::string& suffix) {
     #ifdef HAVE_MKSTEMPS
     // Preferred solution
-    string ret = prefix + "XXXXXX" + suffix;
+    std::string ret = prefix + "XXXXXX" + suffix;
     if (mkstemps(&ret[0], static_cast<int>(suffix.size())) == -1) {
       casadi_error("Failed to create temporary file: '" + ret + "'");
     }
@@ -336,7 +362,7 @@ std::string simple_mkstemps(const std::string& prefix, const std::string& suffix
     return simple_mkstemps(prefix, suffix);
     #else // HAVE_SIMPLE_MKSTEMPS
     // Fallback, may result in deprecation warnings
-    return prefix + string(tmpnam(nullptr)) + suffix;
+    return prefix + std::string(tmpnam(nullptr)) + suffix;
     #endif // HAVE_SIMPLE_MKSTEMPS
     #endif // HAVE_MKSTEMPS
   }

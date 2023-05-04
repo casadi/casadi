@@ -1,0 +1,13 @@
+recursive-include casadi *
+recursive-include cmake *
+recursive-include docs *
+recursive-include external_packages *
+recursive-include misc *
+recursive-include swig *
+recursive-include test *
+recursive-include experimental *
+include requirements.txt
+include CMakeLists.txt
+include LICENSE.txt
+include *.cmake.in
+include README.md

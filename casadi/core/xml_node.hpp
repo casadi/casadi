@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -36,100 +36,170 @@
 
 namespace casadi {
 
-  class CASADI_EXPORT XmlNode {
-  public:
-    XmlNode();
-    ~XmlNode();
+struct CASADI_EXPORT XmlNode {
+  // All attributes
+  std::map<std::string, std::string> attributes;
 
-    /** \brief  Add an attribute */
-    void set_attribute(const std::string& attribute_name, const std::string& attribute);
+  // All children
+  std::vector<XmlNode> children;
 
-    /** \brief  Get an attribute by its name */
-    std::string getAttribute(const std::string& attribute_name) const {
-      std::string ret;
-      readAttribute(attribute_name, ret, true);
+  // Name of the node
+  std::string name;
+
+  // Comment
+  std::string comment;
+
+  // Line number
+  casadi_int line;
+
+  // Text
+  std::string text;
+
+  /** \brief  Check if an attribute is present
+
+      \identifier{vc} */
+  bool has_attribute(const std::string& att_name) const;
+
+  /** \brief  Add an attribute
+
+      \identifier{vd} */
+  void set_attribute(const std::string& att_name, const std::string& att);
+
+  /** \brief Add an integer attribute
+
+      \identifier{252} */
+  void set_attribute(const std::string& att_name, casadi_int att) {
+    set_attribute(att_name, std::to_string(att));
+  }
+
+  /** \brief Add an integer attribute
+
+      \identifier{253} */
+  void set_attribute(const std::string& att_name, double att);
+
+  /** \brief Add a vector attribute
+
+      \identifier{254} */
+  void set_attribute(const std::string& att_name, const std::vector<casadi_int>& att);
+
+  /** \brief  Names of children
+
+      \identifier{ve} */
+  std::vector<std::string> child_names() const;
+
+  /** \brief  Names of attributes
+
+      \identifier{vf} */
+  std::vector<std::string> attribute_names() const;
+
+  /** \brief  Get an attribute by its name
+
+      \identifier{vg} */
+  template<typename T>
+  T attribute(const std::string& att_name) const {
+    // Find the attribute, if any
+    auto it = this->attributes.find(att_name);
+    casadi_assert(it != this->attributes.end(), "Could not find attribute " + att_name);
+    // Attribute found, read it
+    T ret;
+    read(it->second, &ret);
+    return ret;
+  }
+
+  /** \brief  Get an attribute by its name, default value if not found
+
+      \identifier{vh} */
+  template<typename T>
+  T attribute(const std::string& att_name, const T& def_att) const {
+    // Find the attribute, if any
+    auto it = this->attributes.find(att_name);
+    if (it == this->attributes.end()) {
+      // No such attribute, return default value
+      return def_att;
+    } else {
+      // Attribute found, read it
+      T ret;
+      read(it->second, &ret);
       return ret;
     }
+  }
 
-    /** \brief  Read the value of an attribute */
-    template<typename T>
-      void readAttribute(const std::string& attribute_name, T& val,
-                         bool assert_existance=true) const {
-      // find the attribute
-      std::map<std::string, std::string>::const_iterator it = attributes_.find(attribute_name);
+  /** \brief  Get a reference to a child by its index
 
-      // check if the attribute exists
-      if (it == attributes_.end()) {
-        casadi_assert(!assert_existance,
-                              "Error in XmlNode::readAttribute: could not find " + attribute_name);
-      } else {
-        readString(it->second, val);
-      }
-    }
+      \identifier{vi} */
+  const XmlNode& operator[](size_t i) const { return this->children.at(i);}
 
-    /** \brief  Get a reference to a child by its index */
-    const XmlNode& operator[](casadi_int i) const;
+  /** \brief  Get a reference to a child by its index
 
-    /** \brief  Get a reference to a child by its index */
-    XmlNode& operator[](casadi_int i);
+      \identifier{vj} */
+  XmlNode& operator[](size_t i) { return this->children.at(i);}
 
-    /** \brief  Get a reference to a child by its name */
-    const XmlNode& operator[](const std::string& childname) const;
+  /** \brief  Get a reference to a child by its name
 
-    /** \brief  Get a reference to a child by its name */
-    XmlNode& operator[](const std::string& childname);
+      \identifier{vk} */
+  const XmlNode& operator[](const std::string& childname) const;
 
-    /** \brief  Check if a child is present */
-    bool hasChild(const std::string& childname) const;
+  /** \brief  Get a reference to a child by its name
 
-    /** \brief  Check if an attribute is present */
-    bool hasAttribute(const std::string& attribute_name) const;
+      \identifier{vl} */
+  XmlNode& operator[](const std::string& childname);
 
-    /** \brief  Get the number of children */
-    casadi_int size() const;
+  /** \brief  Check if a child is present
 
-    /** \brief  Get the name of the node */
-    const std::string& name() const;
+      \identifier{vm} */
+  bool has_child(const std::string& childname) const;
 
-    /** \brief  Set the name of the node */
-    void setName(const std::string& name);
+  /** \brief  Get the number of children
 
-    /** \brief  check if the name is equal to something */
-    bool checkName(const std::string& str) const;
+      \identifier{vn} */
+  size_t size() const { return this->children.size();}
 
-    /** \brief  Get the text field */
-    std::string getText() const { return text_; }
+  /** \brief  Get value of text field
 
-    /** \brief  Get value of text field */
-    template<typename T>
-      void getText(T& val) const { readString(text_, val);}
+      \identifier{vo} */
+  template<typename T>
+  void get(T* val) const { read(this->text, val);}
 
-    /** \brief  Read the string value of a string (i.e. copy) */
-    static void readString(const std::string& str, std::string& val);
+  /** \brief  Read the string value of a string (i.e. copy)
 
-    /** \brief  Read the boolean value of a string */
-    static void readString(const std::string& str, bool& val);
+      \identifier{vp} */
+  static void read(const std::string& str, std::string* val);
 
-    /** \brief  Read the integer value of a string */
-    static void readString(const std::string& str, casadi_int& val);
+  /** \brief  Read the boolean value of a string
 
-    /** \brief  Read the double value of a string */
-    static void readString(const std::string& str, double& val);
+      \identifier{vq} */
+  static void read(const std::string& str, bool* val);
 
-    CASADI_EXPORT friend std::ostream& operator<<(std::ostream &stream,
-                                                       const XmlNode& node);
+  /** \brief  Read the integer value of a string
 
-    void dump(std::ostream &stream, casadi_int indent=0) const;
+      \identifier{vr} */
+  static void read(const std::string& str, casadi_int* val);
 
-    std::map<std::string, std::string>  attributes_;
-    std::vector<XmlNode>                children_;
-    std::map<std::string, casadi_int>           child_indices_; // the index of the children
-    // sorted by their name
+  /** \brief  Read the double value of a string
 
-    std::string name_;
-    std::string comment_;
-    std::string text_;
-  };
+      \identifier{vs} */
+  static void read(const std::string& str, double* val);
+
+  /** \brief  Read a vector of integer values of a string
+
+      \identifier{vt} */
+  static void read(const std::string& str, std::vector<casadi_int>* val);
+
+  /** \brief  Read a vector of string values of a string
+
+      \identifier{vu} */
+  static void read(const std::string& str, std::vector<std::string>* val);
+
+  /** \brief Print to stream
+
+      \identifier{vv} */
+  CASADI_EXPORT friend std::ostream& operator<<(std::ostream &stream, const XmlNode& node);
+
+  /** \brief  Dump representation
+
+      \identifier{vw} */
+  void dump(std::ostream &stream, casadi_int indent = 0) const;
+};
 
 } // namespace casadi
 /// \endcond

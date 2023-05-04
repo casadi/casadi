@@ -2,8 +2,8 @@
 #     This file is part of CasADi.
 #
 #     CasADi -- A symbolic framework for dynamic optimization.
-#     Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
-#                             K.U. Leuven. All rights reserved.
+#     Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+#                             KU Leuven. All rights reserved.
 #     Copyright (C) 2011-2014 Greg Horn
 #
 #     CasADi is free software; you can redistribute it and/or
@@ -19,17 +19,19 @@
 #     You should have received a copy of the GNU Lesser General Public
 #     License along with CasADi; if not, write to the Free Software
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+
 #
-#
-#! Callback
-#! =====================
+# Callback
+# =====================
+
 from casadi import *
 from numpy import *
 
-#! In this example, we will demonstrate callback functionality for Ipopt.
-#! Note that you need the fix https://github.com/casadi/casadi/wiki/enableIpoptCallback before this works
-#!
-#! We start with constructing the rosenbrock problem
+# In this example, we will demonstrate callback functionality for Ipopt.
+# Note that you need the fix https://github.com/casadi/casadi/wiki/enableIpoptCallback before this works
+#
+# We start with constructing the rosenbrock problem
+
 x=SX.sym("x")
 y=SX.sym("y")
 
@@ -116,6 +118,7 @@ opts['ipopt.max_iter'] = 50
 solver = nlpsol('solver', 'ipopt', nlp, opts)
 sol = solver(lbx=-10, ubx=10, lbg=-10, ubg=10)
 
-#! By setting matplotlib interactivity off, we can inspect the figure at ease
+# By setting matplotlib interactivity off, we can inspect the figure at ease
+
 matplotlib.interactive(False)
 show()

@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *    Copyright (C) 2019 Jorn Baayen, KISTERS AG
  *
@@ -27,9 +27,12 @@
 #ifndef CASADI_LINSOL_TRIDIAG_HPP
 #define CASADI_LINSOL_TRIDIAG_HPP
 
-/** \defgroup plugin_Linsol_tridiag
+/** \defgroup plugin_Linsol_tridiag Title
+    \par
+
   * Linear solver for tridiagonal matrices
-*/
+
+    \identifier{22v} */
 
 /** \pluginsection{Linsol,tridiag} */
 

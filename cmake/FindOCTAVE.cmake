@@ -59,6 +59,12 @@
 # either expressed or implied, of the FreeBSD Project.
 #=============================================================================
 
+message("OCTAVE: find via CONFIG")
+find_package(OCTAVE CONFIG NO_CMAKE_FIND_ROOT_PATH)
+message("OCTAVE: ${OCTAVE_FOUND}")
+
+if(NOT OCTAVE_FOUND)
+
 find_program( OCTAVE_CONFIG_EXECUTABLE
               NAMES octave-config
             )
@@ -168,9 +174,9 @@ endmacro ()
 # handle REQUIRED and QUIET options
 include ( FindPackageHandleStandardArgs )
 if ( CMAKE_VERSION LESS 2.8.3 )
-  find_package_handle_standard_args ( Octave DEFAULT_MSG OCTAVE_EXECUTABLE OCTAVE_ROOT_DIR OCTAVE_INCLUDE_DIRS OCTAVE_LIBRARIES OCTAVE_VERSION_STRING )
+  find_package_handle_standard_args ( OCTAVE DEFAULT_MSG OCTAVE_EXECUTABLE OCTAVE_INCLUDE_DIRS OCTAVE_LIBRARIES OCTAVE_VERSION_STRING )
 else ()
-  find_package_handle_standard_args ( Octave REQUIRED_VARS OCTAVE_EXECUTABLE OCTAVE_ROOT_DIR OCTAVE_INCLUDE_DIRS OCTAVE_LIBRARIES VERSION_VAR OCTAVE_VERSION_STRING )
+  find_package_handle_standard_args ( OCTAVE REQUIRED_VARS OCTAVE_EXECUTABLE OCTAVE_INCLUDE_DIRS OCTAVE_LIBRARIES VERSION_VAR OCTAVE_VERSION_STRING )
 endif ()
 
 
@@ -188,3 +194,16 @@ mark_as_advanced (
   OCTAVE_MINOR_VERSION
   OCTAVE_PATCH_VERSION
 )
+
+if(OCTAVE_FOUND)
+  add_library(octave::octave INTERFACE IMPORTED)
+
+  if (WIN32)
+    target_link_libraries(octave::octave INTERFACE ${OCTAVE_LIBRARIES})
+  endif()
+  target_include_directories(octave::octave INTERFACE ${OCTAVE_INCLUDE_DIR})
+endif()
+
+set(OCTAVE_MEX_EXT "mex")
+
+endif()

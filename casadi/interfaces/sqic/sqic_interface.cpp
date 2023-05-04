@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -31,7 +31,6 @@
 #include "wsqic.hpp"
 #include "casadi/interfaces/sqic/resource_sqic.hpp"
 
-using namespace std;
 namespace casadi {
 
   extern "C"
@@ -166,11 +165,11 @@ namespace casadi {
 
   std::map<casadi_int, string> SqicInterface::flagmap = SqicInterface::calc_flagmap();
 
-  void SqicInterface::sqic_error(const string& module, casadi_int flag) {
+  void SqicInterface::sqic_error(const std::string& module, casadi_int flag) {
     // Find the error
     std::map<casadi_int, string>::const_iterator it = flagmap.find(flag);
 
-    stringstream ss;
+    std::stringstream ss;
     if (it == flagmap.end()) {
       ss << "Unknown error (" << flag << ") from module \"" << module << "\".";
     } else {

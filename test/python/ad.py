@@ -2,8 +2,8 @@
 #     This file is part of CasADi.
 #
 #     CasADi -- A symbolic framework for dynamic optimization.
-#     Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
-#                             K.U. Leuven. All rights reserved.
+#     Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+#                             KU Leuven. All rights reserved.
 #     Copyright (C) 2011-2014 Greg Horn
 #
 #     CasADi is free software; you can redistribute it and/or
@@ -302,7 +302,7 @@ class ADtests(casadiTestCase):
               opts["ad_weight"] = 0 if mode=='forward' else 1
               opts["ad_weight_sp"] = 0 if mode=='forward' else 1
               f=Function("f", self.sxinputs[inputshape][inputtype],self.sxoutputs[outputshape][outputtype], opts)
-              Jf=f.jacobian_old(0,0)
+              Jf = jacobian_old(f, 0, 0)
               J_in = DM(f.sparsity_in(0),n)
               Jout,_ = Jf(J_in)
               J = self.jacobians[inputtype][outputtype](*n)
@@ -338,7 +338,7 @@ class ADtests(casadiTestCase):
             self.message("jacsparsity on SX. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
             f=Function("f", self.sxinputs[inputshape][inputtype],self.sxoutputs[outputshape][outputtype])
             J = self.jacobians[inputtype][outputtype](*n)
-            self.checkarray(DM.ones(f.sparsity_jac(0, 0)),array(J!=0,int),"jacsparsity")
+            self.checkarray(DM.ones(f.jac_sparsity(0, 0)),array(J!=0,int),"jacsparsity")
 
   def test_JacobianMX(self):
     n=array([1.2,2.3,7,4.6])
@@ -352,7 +352,7 @@ class ADtests(casadiTestCase):
               opts["ad_weight"] = 0 if mode=='forward' else 1
               opts["ad_weight_sp"] = 0 if mode=='forward' else 1
               f=Function("f", self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]), opts)
-              Jf=f.jacobian_old(0,0)
+              Jf = jacobian_old(f, 0, 0)
               J_in = DM(f.sparsity_in(0),n)
               J_out,_ = Jf(J_in)
               J = self.jacobians[inputtype][outputtype](*n)
@@ -370,12 +370,12 @@ class ADtests(casadiTestCase):
               opts["ad_weight"] = 0 if mode=='forward' else 1
               opts["ad_weight_sp"] = 0 if mode=='forward' else 1
               f=Function("f", self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]), opts)
-              Jf=f.jacobian_old(0,0)
+              Jf = jacobian_old(f, 0, 0)
               J_in = DM(f.sparsity_in(0),n)
               J_out,_ = Jf(J_in)
               J = self.jacobians[inputtype][outputtype](*n)
               self.checkarray(array(J_out),J,"jacobian")
-              self.checkarray(array(DM.ones(f.sparsity_jac(0, 0))),array(J!=0,int),"jacsparsity")
+              self.checkarray(array(DM.ones(f.jac_sparsity(0, 0))),array(J!=0,int),"jacsparsity")
 
 
 
@@ -386,12 +386,12 @@ class ADtests(casadiTestCase):
     z=SX.sym("z")
     n=array([1.2,2.3,7])
     f=Function("f", [vertcat(*[x,y,z])],[vertcat(*[x+2*y**3+3*z**4])])
-    J=f.jacobian_old(0,0)
+    J = jacobian_old(f, 0, 0)
     m=MX.sym("m",3,1)
     JT,_ = J(m)
     JT = Function("JT", [m],[JT.T])
     JT(n)
-    H = JT.jacobian_old(0,0)
+    H = jacobian_old(JT, 0, 0)
     H(n)
     #H_out = H(H_in)
 
@@ -408,7 +408,7 @@ class ADtests(casadiTestCase):
     inp[3,0]=y
 
     f=Function("f", [inp],[vertcat(*[x+y,x,y])])
-    J=f.jacobian_old(0,0)
+    J = jacobian_old(f, 0, 0)
     J(DM(f.sparsity_in(0),[2,7]))
 
     self.assertEqual(f.size1_out(0),3,"Jacobian shape bug")
@@ -425,12 +425,12 @@ class ADtests(casadiTestCase):
     inp[3,0]=y
 
     f=Function("f", [inp],[vertcat(*[x+y,x,y])])
-    J=f.jacobian_old(0,0)
+    J = jacobian_old(f, 0, 0)
     J_in = DM(f.sparsity_in(0),[2,7])
     J_out,_ = J(J_in)
 
     f=Function("f", [inp],[vertcat(*[x+y,x,y])])
-    J=f.jacobian_old(0,0)
+    J = jacobian_old(f, 0, 0)
 
   @memory_heavy()
   def test_MX(self):
@@ -609,190 +609,218 @@ class ADtests(casadiTestCase):
           (in1,v1,x.nz[c.diag([1,0])]*y.nz[c.diag([0,2])],blockcat([[MX(1,1),y.nz[0]],[MX(1,1),MX(1,1)],[MX(1,1),MX(1,1)],[y.nz[2],MX(1,1)]]),True,"c89"),
 
      ]:
-      print(out)
-      fun = Function("fun", inputs,[out,jac])
+      fun = Function("fun", inputs,[out])
+      out_eval_mx = fun.call([e+1e-300 for e in inputs],True,False)[0] 
+      for out in [out,out_eval_mx]:
+          self.check_eval_mx(out)
+          fun = Function("fun", inputs,[out,jac])
 
-      fun_ad = [Function("fun", inputs,[out,jac], {'ad_weight':w, 'ad_weight_sp':w}) for w in [0,1]]
-
-
-      fun_out = fun.call(values)
-
-
-      if with_sx:
-        funsx = fun.expand("expand_fun")
-        funsx_ad = [f.expand('expand_'+f.name()) for f in fun_ad]
-        funsx_out = funsx.call(values)
-        self.checkarray(fun_out[0],funsx_out[0])
-        self.checkarray(fun_out[1],funsx_out[1])
-      else:
-        funsx_ad = None
-      self.check_codegen(fun,inputs=values,std=std)
-      self.check_serialize(fun,inputs=values)
-
-      J_ = fun_out[1]
-
-      def vec(l):
-        ret = []
-        for i in l:
-          ret.extend(i)
-        return ret
-
-      storage2 = {}
-      storage = {}
-
-      vf_mx = None
-
-      for f in [fun] + ([fun.expand('expand_'+fun.name())] if with_sx else []):
-        d1 = f.forward(ndir)
-        d2 = f.reverse(ndir)
-
-        num_in = f.n_in()
-        num_out = f.n_out()
-
-        # evalThings
-        for sym in [MX.sym, SX.sym]:
-          if f.is_a('MXFunction') and sym==SX.sym: continue
-          if f.is_a('SXFunction') and sym==MX.sym: continue
-
-          # dense
-          for spmod,spmod2 in itertools.product(spmods,repeat=2):
-            fseeds = [[sym("f",spmod(f.sparsity_in(i))) for i in range(f.n_in())]  for d in range(ndir)]
-            aseeds = [[sym("a",spmod2(f.sparsity_out(i)))  for i in range(f.n_out())] for d in range(ndir)]
-            inputss = [sym("i",f.sparsity_in(i)) for i in range(f.n_in())]
-
-            res = f.call(inputss,True)
-            fwdsens = forward(res,inputss,fseeds,dict(always_inline=True))
-            adjsens = reverse(res,inputss,aseeds,dict(always_inline=True))
-
-            fseed = [DM(fseeds[d][0].sparsity(),random.random(fseeds[d][0].nnz())) for d in range(ndir) ]
-            aseed = [DM(aseeds[d][0].sparsity(),random.random(aseeds[d][0].nnz())) for d in range(ndir) ]
-            vf = Function("vf", inputss+vec([fseeds[i]+aseeds[i] for i in range(ndir)]),list(res) + vec([list(fwdsens[i])+list(adjsens[i]) for i in range(ndir)]))
-
-            vf_in = list(values)
-            offset = len(inputss)
-
-            for d in range(ndir):
-              vf_in.append(fseed[d])
-              for i in range(len(values)-1):
-                vf_in.append(0)
-
-              vf_in.append(aseed[d])
-              vf_in.append(0)
-
-            vf_out = vf.call(vf_in)
-            self.check_codegen(vf,inputs=vf_in,std=std)
-            self.check_serialize(vf,inputs=vf_in)
-
-            offset = len(res)
-            for d in range(ndir):
-              seed = array(fseed[d].T).ravel()
-              sens = array(vf_out[offset+0].T).ravel()
-              offset+=len(inputss)
-              self.checkarray(sens,mtimes(J_,seed),"eval Fwd %d %s" % (d,str(type(f))+str(sym)))
-
-              seed = array(aseed[d].T).ravel()
-              sens = array(vf_out[offset+0].T).ravel()
-              offset+=len(inputss)
-
-              self.checkarray(sens,mtimes(J_.T,seed),"eval Adj %d %s" % (d,str([vf_out[i] for i in range(vf.n_out())])))
+          fun_ad = [Function("fun", inputs,[out,jac], {'ad_weight':w, 'ad_weight_sp':w}) for w in [0,1]]
 
 
-            assert(offset==vf.n_out())
+          fun_out = fun.call(values)
 
-            # Complete random seeding
-            random.seed(1)
-            vf_in = []
-            for i in range(vf.n_in()):
-              vf_in.append(DM(vf.sparsity_in(i),random.random(vf.nnz_in(i))))
 
-            vf_out = vf.call(vf_in)
-            self.check_codegen(vf,inputs=vf_in,std=std)
-            self.check_serialize(vf,inputs=vf_in)
-            storagekey = (spmod,spmod2)
-            if not(storagekey in storage):
-              storage[storagekey] = []
-            storage[storagekey].append(vf_out)
+          if with_sx:
+            funsx = fun.expand("expand_fun")
+            funsx_ad = [f.expand('expand_'+f.name()) for f in fun_ad]
+            funsx_out = funsx.call(values)
+            self.checkarray(fun_out[0],funsx_out[0])
+            self.checkarray(fun_out[1],funsx_out[1])
+          else:
+            funsx_ad = None
+          if "pow" in str(out) and os.name=='nt':
+            pass # Known bug #3038
+          else:
+            self.check_codegen(fun,inputs=values,std=std)
+          self.check_serialize(fun,inputs=values)
 
-            # Added to make sure that the same seeds are used for SX and MX
-            if sym is MX.sym:
-              vf_mx = vf
+          J_ = fun_out[1]
 
-          # Second order sensitivities
-          for sym2 in [MX.sym, SX.sym]:
+          def vec(l):
+            ret = []
+            for i in l:
+              ret.extend(i)
+            return ret
 
-            if vf.is_a('MXFunction') and sym2==SX.sym: continue
-            if vf.is_a('MXFunction') and sym2==MX.sym: continue
+          storage2 = {}
+          storage = {}
 
-            for spmod_2,spmod2_2 in itertools.product(spmods,repeat=2):
-              fseeds2 = [[sym2("f",vf_mx.sparsity_in(i)) for i in range(vf.n_in())] for d in range(ndir)]
-              aseeds2 = [[sym2("a",vf_mx.sparsity_out(i))  for i in range(vf.n_out()) ] for d in range(ndir)]
-              inputss2 = [sym2("i",vf_mx.sparsity_in(i)) for i in range(vf.n_in())]
+          vf_mx = None
 
-              res2 = vf.call(inputss2,True)
-              fwdsens2 = forward(res2,inputss2,fseeds2,dict(always_inline=True))
-              adjsens2 = reverse(res2,inputss2,aseeds2,dict(always_inline=True))
+          for f in [fun] + ([fun.expand('expand_'+fun.name())] if with_sx else []):
+            d1 = f.forward(ndir)
+            d2 = f.reverse(ndir)
 
-              vf2 = Function("vf2", inputss2+vec([fseeds2[i]+aseeds2[i] for i in range(ndir)]),list(res2) + vec([list(fwdsens2[i])+list(adjsens2[i]) for i in range(ndir)]))
+            num_in = f.n_in()
+            num_out = f.n_out()
 
-              random.seed(1)
-              vf2_in = []
-              for i in range(vf2.n_in()):
-                vf2_in.append(DM(vf2.sparsity_in(i),random.random(vf2.nnz_in(i))))
+            # evalThings
+            for sym in [MX.sym, SX.sym]:
+              if f.is_a('MXFunction') and sym==SX.sym: continue
+              if f.is_a('SXFunction') and sym==MX.sym: continue
 
-              vf2_out = vf2.call(vf2_in)
-              self.check_codegen(vf2,inputs=vf2_in,std=std)
-              self.check_serialize(vf2,inputs=vf2_in)
-              storagekey = (spmod,spmod2)
-              if not(storagekey in storage2):
-                storage2[storagekey] = []
-              storage2[storagekey].append(vf2_out)
+              # dense
+              for spmod,spmod2 in itertools.product(spmods,repeat=2):
+                fseeds = [[sym("f",spmod(f.sparsity_in(i))) for i in range(f.n_in())]  for d in range(ndir)]
+                aseeds = [[sym("a",spmod2(f.sparsity_out(i)))  for i in range(f.n_out())] for d in range(ndir)]
+                inputss = [sym("i",f.sparsity_in(i)) for i in range(f.n_in())]
 
-      # Remainder of eval testing
-      for store,order in [(storage,"first-order"),(storage2,"second-order")]:
-        for stk,st in list(store.items()):
-          for i in range(len(st)-1):
-            for k,(a,b) in enumerate(zip(st[0],st[i+1])):
-              if b.numel()==0 and sparsify(a).nnz()==0: continue
-              if a.numel()==0 and sparsify(b).nnz()==0: continue
-              self.checkarray(sparsify(a),sparsify(b),("%s, output(%d)" % (order,k)))
+                res = f.call(inputss,True)
+                fwdsens = forward(res,inputss,fseeds,dict(always_inline=True))
+                adjsens = reverse(res,inputss,aseeds,dict(always_inline=True))
 
-      for expand in [False] + ([True] if with_sx else []):
-        #  jacobian()
-        for mode in ["forward","reverse"]:
-          ind = 0 if mode=='forward' else 1
-          f = funsx_ad[ind] if expand else fun_ad[ind]
+                fseed = [DM(fseeds[d][0].sparsity(),random.random(fseeds[d][0].nnz())) for d in range(ndir) ]
+                aseed = [DM(aseeds[d][0].sparsity(),random.random(aseeds[d][0].nnz())) for d in range(ndir) ]
+                vf = Function("vf", inputss+vec([fseeds[i]+aseeds[i] for i in range(ndir)]),list(res) + vec([list(fwdsens[i])+list(adjsens[i]) for i in range(ndir)]))
 
-          Jf=f.jacobian_old(0,0)
-          Jf_out = Jf.call(values)
+                vf_in = list(values)
+                offset = len(inputss)
 
-          self.check_codegen(Jf,inputs=values,std=std)
-          self.check_serialize(Jf,inputs=values)
-          self.checkarray(Jf_out[0],J_)
-          self.checkarray(DM.ones(Jf.sparsity_out(0)),DM.ones(J_.sparsity()),str(out)+str(mode))
-          self.checkarray(DM.ones(f.sparsity_jac(0, 0)),DM.ones(J_.sparsity()))
+                for d in range(ndir):
+                  vf_in.append(fseed[d])
+                  for i in range(len(values)-1):
+                    vf_in.append(0)
 
-      # Scalarized
-      if out.is_empty(): continue
-      s_i  = out.sparsity().row()[0]
-      s_j  = out.sparsity().get_col()[0]
-      s_k = s_i*out.size2()+s_j
-      H_ = None
+                  vf_in.append(aseed[d])
+                  vf_in.append(0)
 
-      for expand in [False] + ([True] if with_sx else []):
-        for mode in ["forward","reverse"]:
-          w = 0 if mode=='forward' else 1
-          f = Function("fun", inputs,[out[s_i,s_j],jac[s_k,:].T], {'ad_weight':w, 'ad_weight_sp':w})
-          if expand: f=f.expand('expand_'+f.name())
-          f_out = f.call(values)
-          J_ = f_out[1]
+                vf_out = vf.call(vf_in)
+                if sym is MX.sym:
+                    self.check_eval_mx([vvcat(e) for e in fwdsens])
+                    self.check_eval_mx([vvcat(e) for e in adjsens])
+                if "pow" in str(out) and os.name=='nt':
+                  pass # Known bug #3038
+                else:
+                  self.check_codegen(vf,inputs=vf_in,std=std)
+                self.check_serialize(vf,inputs=vf_in)
 
-          Hf=f.hessian_old(0, 0)
-          Hf_out = Hf.call(values)
-          self.check_codegen(Hf,inputs=values,std=std)
-          self.check_serialize(Hf,inputs=values)
-          if H_ is None:
-            H_ = Hf_out[0]
-          self.checkarray(Hf_out[0],H_,failmessage=("mode: %s" % mode))
+                offset = len(res)
+                for d in range(ndir):
+                  seed = array(fseed[d].T).ravel()
+                  sens = array(vf_out[offset+0].T).ravel()
+                  offset+=len(inputss)
+                  self.checkarray(sens,mtimes(J_,seed),"eval Fwd %d %s" % (d,str(type(f))+str(sym)))
+
+                  seed = array(aseed[d].T).ravel()
+                  sens = array(vf_out[offset+0].T).ravel()
+                  offset+=len(inputss)
+
+                  self.checkarray(sens,mtimes(J_.T,seed),"eval Adj %d %s" % (d,str([vf_out[i] for i in range(vf.n_out())])))
+
+
+                assert(offset==vf.n_out())
+
+                # Complete random seeding
+                random.seed(1)
+                vf_in = []
+                for i in range(vf.n_in()):
+                  vf_in.append(DM(vf.sparsity_in(i),random.random(vf.nnz_in(i))))
+
+                vf_out = vf.call(vf_in)
+                if "pow" in str(out) and os.name=='nt':
+                  pass # Known bug #3038
+                else:
+                  self.check_codegen(vf,inputs=vf_in,std=std)
+                self.check_serialize(vf,inputs=vf_in)
+                storagekey = (spmod,spmod2)
+                if not(storagekey in storage):
+                  storage[storagekey] = []
+                storage[storagekey].append(vf_out)
+
+                # Added to make sure that the same seeds are used for SX and MX
+                if sym is MX.sym:
+                  vf_mx = vf
+
+              # Second order sensitivities
+              for sym2 in [MX.sym, SX.sym]:
+
+                if vf.is_a('MXFunction') and sym2==SX.sym: continue
+                if vf.is_a('MXFunction') and sym2==MX.sym: continue
+
+                for spmod_2,spmod2_2 in itertools.product(spmods,repeat=2):
+                  fseeds2 = [[sym2("f",vf_mx.sparsity_in(i)) for i in range(vf.n_in())] for d in range(ndir)]
+                  aseeds2 = [[sym2("a",vf_mx.sparsity_out(i))  for i in range(vf.n_out()) ] for d in range(ndir)]
+                  inputss2 = [sym2("i",vf_mx.sparsity_in(i)) for i in range(vf.n_in())]
+
+                  res2 = vf.call(inputss2,True)
+                  fwdsens2 = forward(res2,inputss2,fseeds2,dict(always_inline=True))
+                  adjsens2 = reverse(res2,inputss2,aseeds2,dict(always_inline=True))
+
+                  if sym2 is MX.sym:
+                      self.check_eval_mx([vvcat(e) for e in fwdsens2])
+                      self.check_eval_mx([vvcat(e) for e in adjsens2])
+
+                  vf2 = Function("vf2", inputss2+vec([fseeds2[i]+aseeds2[i] for i in range(ndir)]),list(res2) + vec([list(fwdsens2[i])+list(adjsens2[i]) for i in range(ndir)]))
+
+                  random.seed(1)
+                  vf2_in = []
+                  for i in range(vf2.n_in()):
+                    vf2_in.append(DM(vf2.sparsity_in(i),random.random(vf2.nnz_in(i))))
+
+                  vf2_out = vf2.call(vf2_in)
+                  if "pow" in str(out) and os.name=='nt':
+                    pass # Known bug #3038
+                  else:
+                    self.check_codegen(vf2,inputs=vf2_in,std=std)
+                  self.check_serialize(vf2,inputs=vf2_in)
+                  storagekey = (spmod,spmod2)
+                  if not(storagekey in storage2):
+                    storage2[storagekey] = []
+                  storage2[storagekey].append(vf2_out)
+
+          # Remainder of eval testing
+          for store,order in [(storage,"first-order"),(storage2,"second-order")]:
+            for stk,st in list(store.items()):
+              for i in range(len(st)-1):
+                for k,(a,b) in enumerate(zip(st[0],st[i+1])):
+                  if b.numel()==0 and sparsify(a).nnz()==0: continue
+                  if a.numel()==0 and sparsify(b).nnz()==0: continue
+                  self.checkarray(sparsify(a),sparsify(b),("%s, output(%d)" % (order,k)))
+
+          for expand in [False] + ([True] if with_sx else []):
+            #  jacobian()
+            for mode in ["forward","reverse"]:
+              ind = 0 if mode=='forward' else 1
+              f = funsx_ad[ind] if expand else fun_ad[ind]
+
+              Jf = jacobian_old(f, 0, 0)
+              Jf_out = Jf.call(values)
+
+              if "pow" in str(out) and os.name=='nt':
+                pass # Known bug #3038
+              else:
+                self.check_codegen(Jf,inputs=values,std=std)
+              self.check_serialize(Jf,inputs=values)
+              self.checkarray(Jf_out[0],J_)
+              self.checkarray(DM.ones(Jf.sparsity_out(0)),DM.ones(J_.sparsity()),str(out)+str(mode))
+              self.checkarray(DM.ones(f.jac_sparsity(0, 0)),DM.ones(J_.sparsity()))
+
+          # Scalarized
+          if out.is_empty(): continue
+          s_i  = out.sparsity().row()[0]
+          s_j  = out.sparsity().get_col()[0]
+          s_k = s_i*out.size2()+s_j
+          H_ = None
+
+          for expand in [False] + ([True] if with_sx else []):
+            for mode in ["forward","reverse"]:
+              w = 0 if mode=='forward' else 1
+              f = Function("fun", inputs,[out[s_i,s_j],jac[s_k,:].T], {'ad_weight':w, 'ad_weight_sp':w})
+              if expand: f=f.expand('expand_'+f.name())
+              f_out = f.call(values)
+              J_ = f_out[1]
+
+              Hf = hessian_old(f, 0, 0)
+              Hf_out = Hf.call(values)
+              if "pow" in str(out) and os.name=='nt':
+                pass # Known bug #3038
+              else:
+                self.check_codegen(Hf,inputs=values,std=std)
+              self.check_serialize(Hf,inputs=values)
+              if H_ is None:
+                H_ = Hf_out[0]
+              self.checkarray(Hf_out[0],H_,failmessage=("mode: %s" % mode))
 
 if __name__ == '__main__':
     unittest.main()

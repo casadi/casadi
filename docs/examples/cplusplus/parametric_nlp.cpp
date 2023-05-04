@@ -1,24 +1,20 @@
 /*
- *    This file is part of CasADi.
+ *    MIT No Attribution
  *
- *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
- *    Copyright (C) 2011-2014 Greg Horn
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl, KU Leuven.
  *
- *    CasADi is free software; you can redistribute it and/or
- *    modify it under the terms of the GNU Lesser General Public
- *    License as published by the Free Software Foundation; either
- *    version 3 of the License, or (at your option) any later version.
+ *    Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ *    software and associated documentation files (the "Software"), to deal in the Software
+ *    without restriction, including without limitation the rights to use, copy, modify,
+ *    merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
+ *    permit persons to whom the Software is furnished to do so.
  *
- *    CasADi is distributed in the hope that it will be useful,
- *    but WITHOUT ANY WARRANTY; without even the implied warranty of
- *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- *    Lesser General Public License for more details.
- *
- *    You should have received a copy of the GNU Lesser General Public
- *    License along with CasADi; if not, write to the Free Software
- *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ *    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+ *    INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+ *    PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *    HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ *    OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+ *    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  */
 
@@ -30,14 +26,13 @@
 #include <casadi/casadi.hpp>
 
 using namespace casadi;
-using namespace std;
 /**
  *  Example program demonstrating parametric NLPs in CasADi
  *  Note that there is currently no support for parametric sensitivities via this feature (although it would make a lot of sense).
  *  For parametric sensitivities, see the parametric_sensitivities.cpp example which calculates sensitivitied via the sIPOPT extension
  *  to IPOPT.
  *
- *  Joel Andersson, K.U. Leuven 2012
+ *  Joel Andersson, KU Leuven 2012
  */
 
 int main(){
@@ -66,16 +61,16 @@ int main(){
   );
 
   // Initial guess and bounds for the optimization variables
-  vector<double> x0  = {0.15, 0.15, 0.00};
-  vector<double> lbx = {0.00, 0.00, 0.00};
-  vector<double> ubx = { inf,  inf,  inf};
+  std::vector<double> x0  = {0.15, 0.15, 0.00};
+  std::vector<double> lbx = {0.00, 0.00, 0.00};
+  std::vector<double> ubx = { inf,  inf,  inf};
 
   // Nonlinear bounds
-  vector<double> lbg = {0.00, 0.00};
-  vector<double> ubg = {0.00, 0.00};
+  std::vector<double> lbg = {0.00, 0.00};
+  std::vector<double> ubg = {0.00, 0.00};
 
   // Original parameter values
-  vector<double> p0  = {5.00, 1.00};
+  std::vector<double> p0  = {5.00, 1.00};
 
   // NLP
   SXDict nlp = {{"x", x}, {"p", p}, {"f", f}, {"g", g}};
@@ -94,24 +89,24 @@ int main(){
   res = solver(arg);
 
   // Print the solution
-  cout << "-----" << endl;
-  cout << "Optimal solution for p = " << arg.at("p") << ":" << endl;
-  cout << setw(30) << "Objective: " << res.at("f") << endl;
-  cout << setw(30) << "Primal solution: " << res.at("x") << endl;
-  cout << setw(30) << "Dual solution (x): " << res.at("lam_x") << endl;
-  cout << setw(30) << "Dual solution (g): " << res.at("lam_g") << endl;
+  std::cout << "-----" << std::endl;
+  std::cout << "Optimal solution for p = " << arg.at("p") << ":" << std::endl;
+  std::cout << std::setw(30) << "Objective: " << res.at("f") << std::endl;
+  std::cout << std::setw(30) << "Primal solution: " << res.at("x") << std::endl;
+  std::cout << std::setw(30) << "Dual solution (x): " << res.at("lam_x") << std::endl;
+  std::cout << std::setw(30) << "Dual solution (g): " << res.at("lam_g") << std::endl;
 
   // Change the parameter and resolve
   arg["p"] = 4.5;
   res = solver(arg);
 
   // Print the new solution
-  cout << "-----" << endl;
-  cout << "Optimal solution for p = " << arg.at("p") << ":" << endl;
-  cout << setw(30) << "Objective: " << res.at("f") << endl;
-  cout << setw(30) << "Primal solution: " << res.at("x") << endl;
-  cout << setw(30) << "Dual solution (x): " << res.at("lam_x") << endl;
-  cout << setw(30) << "Dual solution (g): " << res.at("lam_g") << endl;
+  std::cout << "-----" << std::endl;
+  std::cout << "Optimal solution for p = " << arg.at("p") << ":" << std::endl;
+  std::cout << std::setw(30) << "Objective: " << res.at("f") << std::endl;
+  std::cout << std::setw(30) << "Primal solution: " << res.at("x") << std::endl;
+  std::cout << std::setw(30) << "Dual solution (x): " << res.at("lam_x") << std::endl;
+  std::cout << std::setw(30) << "Dual solution (g): " << res.at("lam_g") << std::endl;
 
   return 0;
 }

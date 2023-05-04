@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -35,7 +35,6 @@
 #include <cmath>
 #include <cfloat>
 
-using namespace std;
 namespace casadi {
 
   extern "C"
@@ -130,9 +129,9 @@ namespace casadi {
     tol_pr_ = 1e-6;
     tol_du_ = 1e-6;
     regularize_ = false;
-    string hessian_approximation = "exact";
+    std::string hessian_approximation = "exact";
     min_step_size_ = 1e-10;
-    string qpsol_plugin = "qrqp";
+    std::string qpsol_plugin = "qrqp";
     Dict qpsol_options;
     print_header_ = true;
     print_iteration_ = true;
@@ -186,7 +185,7 @@ namespace casadi {
 
     if (exact_hessian_) {
       Function hess_l_fcn = create_function("nlp_hess_l", {"x", "p", "lam:f", "lam:g"},
-                                           {"sym:hess:gamma:x:x"}, {{"gamma", {"f", "g"}}});
+                                           {"hess:gamma:x:x"}, {{"gamma", {"f", "g"}}});
       Hsp_ = hess_l_fcn.sparsity_out(0);
     } else {
       Hsp_ = Sparsity::dense(nx_, nx_);
@@ -314,7 +313,7 @@ namespace casadi {
       // Evaluate f, g and first order derivative information
       m->arg[0] = d_nlp->z;
       m->arg[1] = d_nlp->p;
-      m->res[0] = &d_nlp->f;
+      m->res[0] = &d_nlp->objective;
       m->res[1] = m->gf;
       m->res[2] = d_nlp->z + nx_;
       m->res[3] = m->Jk;
@@ -337,7 +336,7 @@ namespace casadi {
       // Printing information about the actual iterate
       if (print_iteration_) {
         if (m->iter_count % 10 == 0) print_iteration();
-        print_iteration(m->iter_count, d_nlp->f, pr_inf, du_inf, dx_norminf,
+        print_iteration(m->iter_count, d_nlp->objective, pr_inf, du_inf, dx_norminf,
                         m->reg, ls_iter, ls_success);
       }
 
@@ -428,7 +427,7 @@ namespace casadi {
       // Right-hand side of Armijo condition
       double F_sens = casadi_dot(nx_, m->dz, m->gf);
       double L1dir = F_sens - m->sigma * l1_infeas;
-      double L1merit = d_nlp->f + m->sigma * l1_infeas;
+      double L1merit = d_nlp->objective + m->sigma * l1_infeas;
 
       // Storing the actual merit function value in a list
       m->merit_mem[m->merit_ind] = L1merit;
@@ -539,7 +538,7 @@ namespace casadi {
                            const double* lbdz, const double* ubdz,
                            const double* A, double* x_opt, double* dlam) const {
     // Inputs
-    fill_n(m->arg, qpsol_.n_in(), nullptr);
+    std::fill_n(m->arg, qpsol_.n_in(), nullptr);
     m->arg[CONIC_H] = H;
     m->arg[CONIC_G] = g;
     m->arg[CONIC_X0] = x_opt;
@@ -552,7 +551,7 @@ namespace casadi {
     m->arg[CONIC_UBA] = ubdz + nx_;
 
     // Outputs
-    fill_n(m->res, qpsol_.n_out(), nullptr);
+    std::fill_n(m->res, qpsol_.n_out(), nullptr);
     m->res[CONIC_X] = x_opt;
     m->res[CONIC_LAM_X] = dlam;
     m->res[CONIC_LAM_A] = dlam + nx_;

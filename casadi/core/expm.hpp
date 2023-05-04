@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -30,7 +30,8 @@
 
 namespace casadi {
 
-  /** \defgroup main_expm
+  /** \defgroup main_expm Title
+      \par
 
       Performs a matrix exponentiation
       expm(A)
@@ -41,9 +42,10 @@ namespace casadi {
 
       \author Joris Gillis
       \date 2017
-  */
 
-  /** \defgroup expm
+      \identifier{21l} */
+
+  /** \defgroup expm Title
   * @copydoc main_expm
   *  @{
   */
@@ -57,10 +59,14 @@ namespace casadi {
                            const Sparsity& A, const Dict& opts=Dict());
   ///@}
 
-  /** \brief Get the number of expm solver inputs */
+  /** \brief Get the number of expm solver inputs
+
+      \identifier{rs} */
   CASADI_EXPORT casadi_int expm_n_in();
 
-  /** \brief Get the number of expm solver outputs */
+  /** \brief Get the number of expm solver outputs
+
+      \identifier{rt} */
   CASADI_EXPORT casadi_int expm_n_out();
 
   /// Check if a particular plugin is available

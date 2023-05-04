@@ -2,8 +2,8 @@
 #     This file is part of CasADi.
 #
 #     CasADi -- A symbolic framework for dynamic optimization.
-#     Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
-#                             K.U. Leuven. All rights reserved.
+#     Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+#                             KU Leuven. All rights reserved.
 #     Copyright (C) 2011-2014 Greg Horn
 #
 #     CasADi is free software; you can redistribute it and/or
@@ -28,12 +28,15 @@ import shutil
 
 from testsuite import TestSuite
 
+MATLABPATH = ""
+if "MATLABPATH" in os.environ:
+    MATLABPATH = "addpath('"+os.environ["MATLABPATH"]+"');"
 
 t = TestSuite(dirname=src,
   suffix="m",
   command = lambda dir,fn, opt:  ["octave","--no-gui","--no-window-system"] + opt,
   skipdirs=[".svn","ctemplate","defs"],
-   inputs = lambda dir,fn : {fn: "graphics_toolkit('gnuplot');"+file(dir + "/" + fn,"r").read()+"\ndisp('OCTAVEOKAY');"},
+   inputs = lambda dir,fn : {fn: MATLABPATH+open(dir + "/" + fn,"r").read()+"\ndisp('OCTAVEOKAY');"},
      stdout_trigger=["OCTAVEOKAY"],
     args=sys.argv[2:],
    #stderr_trigger=["^(?!(Reference counting|warning|$))"],

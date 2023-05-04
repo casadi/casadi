@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -28,7 +28,6 @@
 #include <cstdio>
 #include <cstdlib>
 #include <fstream>
-using namespace std;
 namespace casadi {
 
   extern "C"
@@ -81,8 +80,8 @@ namespace casadi {
     // Extract the expressions
     casadi_assert(oracle().is_a("SXFunction"),
                   "Only SX supported currently.");
-    vector<SX> xp = oracle().sx_in();
-    vector<SX> fg = oracle()(xp);
+    std::vector<SX> xp = oracle().sx_in();
+    std::vector<SX> fg = oracle()(xp);
 
     // Get x, p, f and g
     SX x = xp.at(NL_X);
@@ -92,7 +91,7 @@ namespace casadi {
     casadi_assert(p.is_empty(), "'p' currently not supported");
 
     // Names of the variables, constraints
-    vector<string> x_name, g_name;
+    std::vector<std::string> x_name, g_name;
     for (casadi_int i=0; i<nx_; ++i) x_name.push_back("x[" + str(i) + "]");
     for (casadi_int i=0; i<ng_; ++i) g_name.push_back("g[" + str(i) + "]");
     casadi_int max_x_name = x_name.back().size();
@@ -103,7 +102,7 @@ namespace casadi {
     Sparsity jac_f = SX::jacobian(f, x).sparsity();
 
     // Extract the shared subexpressions
-    vector<SX> ex = {f, g}, v, vdef;
+    std::vector<SX> ex = {f, g}, v, vdef;
     shared(ex, v, vdef);
     f = ex[0];
     g = ex[1];
@@ -164,7 +163,7 @@ namespace casadi {
               {"v", "x"}, {"vdef", "f", "g"});
 
     // Iterate over the algoritm
-    vector<string> work(F.sz_w());
+    std::vector<std::string> work(F.sz_w());
 
     // Loop over the algorithm
     for (casadi_int k=0; k<F.n_instructions(); ++k) {
@@ -280,7 +279,7 @@ namespace casadi {
 
     // Create .nl file and add preamble
     std::string nlname = temporary_file("casadi_ampl_tmp", ".nl");
-    ofstream nl(nlname, ofstream::out);
+    std::ofstream nl(nlname, std::ofstream::out);
     if (verbose_) casadi_message("Opened " + nlname);
     nl << nl_init_.str();
 
@@ -344,7 +343,7 @@ namespace casadi {
     // Temporary name for the solver output
     std::string outname = temporary_file("casadi_ampl_tmp", ".out");
     // Call executable
-    string system_cmd = solver_ + " -o" + solname + " " + nlname + " > " + outname;
+    std::string system_cmd = solver_ + " -o" + solname + " " + nlname + " > " + outname;
     int ret = system(system_cmd.c_str());
     casadi_assert_dev(ret==0);
 
@@ -355,9 +354,9 @@ namespace casadi {
     if (verbose_) casadi_message("Removed " + nlname);
 
     // Open .out file and dump to screen
-    ifstream out(outname, ifstream::in);
+    std::ifstream out(outname, std::ifstream::in);
     casadi_assert(out.is_open(), "Failed to open " + outname);
-    string line;
+    std::string line;
     while (!out.eof()) {
       getline(out, line);
       uout() << line << "\n";
@@ -371,12 +370,12 @@ namespace casadi {
     if (verbose_) casadi_message("Removed " + outname);
 
     // Open .sol file
-    ifstream sol(solname, ifstream::in);
+    std::ifstream sol(solname, std::ifstream::in);
     casadi_assert(sol.is_open(), "Failed to open " + solname);
     if (verbose_) casadi_message("Opened " + solname);
 
     // Get all the lines
-    vector<string> sol_lines;
+    std::vector<std::string> sol_lines;
     while (!sol.eof()) {
       getline(sol, line);
       sol_lines.push_back(line);
@@ -384,15 +383,20 @@ namespace casadi {
 
     // Get the primal solution
     for (casadi_int i=0; i<nx_; ++i) {
-      istringstream s(sol_lines.at(sol_lines.size()-nx_+i-1));
-      s >> d_nlp->z[i + nx_];
+      std::istringstream s(sol_lines.at(sol_lines.size() - nx_ + i - 1));
+      s >> d_nlp->z[i];
     }
 
-    // Get the dual solution
+    // Get the dual solution (x)
+    for (casadi_int i=0; i<nx_; ++i) {
+      d_nlp->lam[i] = casadi::nan;  // not implemented
+    }
+
+    // Get the dual solution (g)
     for (casadi_int i=0; i<ng_; ++i) {
-      istringstream s(sol_lines.at(sol_lines.size()-ng_-nx_+i-1));
-      s >> d_nlp->lam[i+nx_];
-      d_nlp->lam[i+nx_] *= -1;
+      std::istringstream s(sol_lines.at(sol_lines.size() - ng_ - nx_ + i - 1));
+      s >> d_nlp->lam[i + nx_];
+      d_nlp->lam[i + nx_] *= -1;
     }
 
     // Close and delete .sol file

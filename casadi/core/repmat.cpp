@@ -2,8 +2,8 @@
  *    This file is part of CasADi.
  *
  *    CasADi -- A symbolic framework for dynamic optimization.
- *    Copyright (C) 2010-2014 Joel Andersson, Joris Gillis, Moritz Diehl,
- *                            K.U. Leuven. All rights reserved.
+ *    Copyright (C) 2010-2023 Joel Andersson, Joris Gillis, Moritz Diehl,
+ *                            KU Leuven. All rights reserved.
  *    Copyright (C) 2011-2014 Greg Horn
  *
  *    CasADi is free software; you can redistribute it and/or
@@ -26,8 +26,6 @@
 #include "repmat.hpp"
 #include "casadi_misc.hpp"
 #include "serializing_stream.hpp"
-
-using namespace std;
 
 namespace casadi {
 
@@ -127,7 +125,7 @@ namespace casadi {
   int HorzRepsum::eval_gen(const T** arg, T** res, casadi_int* iw, T* w,
                            R reduction) const {
     casadi_int nnz = sparsity().nnz();
-    fill_n(res[0], nnz, 0);
+    std::fill_n(res[0], nnz, 0);
     for (casadi_int i=0;i<n_;++i) {
       std::transform(arg[0]+i*nnz, arg[0]+(i+1)*nnz, res[0], res[0], reduction);
     }
