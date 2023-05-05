@@ -510,9 +510,10 @@ namespace casadi {
          << "#endif\n";
   }
 
-  void CodeGenerator::generate_sfunction(const string& name, const string& sfunction) const {
+  void CodeGenerator::generate_sfunction(const std::string& name,
+      const std::string& sfunction) const {
     // Create c file
-    ofstream f;
+    std::ofstream f;
     f.open("sfun_"+ name + ".c");
 
     // Print header
@@ -535,7 +536,7 @@ namespace casadi {
   }
 
   std::string CodeGenerator::codegen_sfunction(const Function& f) const {
-    stringstream g;
+    std::stringstream g;
     
     // Initialize function
     g << "/* Function: mdlInitializeSizes ===========================================\n"
