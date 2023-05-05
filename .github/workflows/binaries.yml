@@ -78,6 +78,7 @@ jobs:
         file: casadi_source.zip
         asset_name: casadi-source-v${{ needs.version.outputs.casadi }}.zip
         prerelease: true
+      if: github.event_name != 'pull_request'
     - run: python setup.py sdist && ls && ls dist
     - name: Delete old release assets
       uses: mknejp/delete-release-assets@v1
@@ -87,6 +88,7 @@ jobs:
         assets: "*.tar.gz"
         fail-if-no-release: false
         fail-if-no-assets: false
+      if: github.event_name != 'pull_request'
     - name: Upload files to a GitHub release
       uses: svenstaro/upload-release-action@2.4.0
       with:
@@ -95,6 +97,7 @@ jobs:
         file: dist/*.tar.gz
         file_glob: true
         prerelease: true
+      if: github.event_name != 'pull_request'
 
     - uses: actions/upload-artifact@v3.1.2
       with:
@@ -362,6 +365,7 @@ jobs:
           assets: casadi-*-${{env.deploy_arch}}-py${{matrix.py2}}.zip
           fail-if-no-release: false
           fail-if-no-assets: false
+        if: github.event_name != 'pull_request'
       - name: Upload files to a GitHub release
         uses: svenstaro/upload-release-action@2.4.0
         with:
@@ -369,6 +373,7 @@ jobs:
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
           file: casadi-${{ needs.version.outputs.casadi }}-${{env.deploy_arch}}-py${{matrix.py2}}.zip
           prerelease: true
+        if: github.event_name != 'pull_request'
 
       - run: |
           wheel=$(python misc/create_wheel_local.py ${{ needs.version.outputs.wheel }} ${{matrix.py2}} osx 64 ${{matrix.image == 'macos-m1' && 'osx-m1' || 'osx'}} install/)
@@ -389,6 +394,7 @@ jobs:
           assets: ${{ steps.wheel.outputs.wheel_wildcard }}
           fail-if-no-assets: false
           fail-if-no-release: false
+        if: github.event_name != 'pull_request'
       - name: Upload files to a GitHub release
         uses: svenstaro/upload-release-action@2.4.0
         with:
@@ -396,6 +402,7 @@ jobs:
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
           file: ${{ steps.wheel.outputs.wheel }}
           prerelease: true
+        if: github.event_name != 'pull_request'
 
   matrix-arch-matlab-mac:
     runs-on: ubuntu-20.04
@@ -500,6 +507,7 @@ jobs:
           assets: casadi-*-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip
           fail-if-no-release: false
           fail-if-no-assets: false
+        if: github.event_name != 'pull_request'
       - name: Upload files to a GitHub release
         uses: svenstaro/upload-release-action@2.4.0
         with:
@@ -507,6 +515,7 @@ jobs:
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
           file: casadi-${{ needs.version.outputs.casadi }}-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip
           prerelease: true
+        if: github.event_name != 'pull_request'
 
       - uses: actions/upload-artifact@v3.1.2
         with:
@@ -592,6 +601,7 @@ jobs:
           assets: casadi-*-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip
           fail-if-no-release: false
           fail-if-no-assets: false
+        if: github.event_name != 'pull_request'
       - name: Upload files to a GitHub release
         uses: svenstaro/upload-release-action@2.4.0
         with:
@@ -599,7 +609,7 @@ jobs:
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
           file: casadi-${{ needs.version.outputs.casadi }}-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip
           prerelease: true
-
+        if: github.event_name != 'pull_request'
       - uses: actions/upload-artifact@v3.1.2
         with:
           name: casadi-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}
@@ -684,6 +694,7 @@ jobs:
           assets: casadi-*-${{env.os}}${{env.bitness}}-py${{matrix.py2}}.zip
           fail-if-no-release: false
           fail-if-no-assets: false
+        if: github.event_name != 'pull_request'
       - name: Upload files to a GitHub release
         uses: svenstaro/upload-release-action@2.4.0
         with:
@@ -691,7 +702,7 @@ jobs:
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
           file: casadi-${{ needs.version.outputs.casadi }}-${{env.os}}${{env.bitness}}-py${{matrix.py2}}.zip
           prerelease: true
-
+        if: github.event_name != 'pull_request'
       - uses: actions/upload-artifact@v3.1.2
         with:
           name: casadi-${{env.os}}${{env.bitness}}-py${{matrix.py2}}
@@ -717,6 +728,7 @@ jobs:
           assets: ${{ steps.wheel.outputs.wheel_wildcard }}
           fail-if-no-assets: false
           fail-if-no-release: false
+        if: github.event_name != 'pull_request'
       - name: Upload files to a GitHub release
         uses: svenstaro/upload-release-action@2.4.0
         with:
@@ -724,7 +736,7 @@ jobs:
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
           file: ${{ steps.wheel.outputs.wheel }}
           prerelease: true
-
+        if: github.event_name != 'pull_request'
 
 
   test-matlab:
@@ -870,6 +882,7 @@ jobs:
           file: docs/users_guide/users_guide.pdf
           asset_name: casadi-users_guide-v${{ needs.version.outputs.casadi }}.pdf
           prerelease: true
+        if: github.event_name != 'pull_request'
       - uses: svenstaro/upload-release-action@2.4.0
         with:
           overwrite: true
@@ -877,6 +890,7 @@ jobs:
           file: docs/example_pack/example_pack.zip
           asset_name: casadi-example_pack-v${{ needs.version.outputs.casadi }}.zip
           prerelease: true
+        if: github.event_name != 'pull_request'
       - uses: svenstaro/upload-release-action@2.4.0
         with:
           overwrite: true
@@ -884,12 +898,14 @@ jobs:
           file: docs/cheatsheet/python.pdf
           asset_name: casadi-cheatsheet_python-v${{ needs.version.outputs.casadi }}.pdf
           prerelease: true
+        if: github.event_name != 'pull_request'
       - run: cd web && zip -rq ../website_assets.zip *
       - uses: svenstaro/upload-release-action@2.4.0
         with:
           overwrite: true
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
           file: website_assets.zip
+        if: github.event_name != 'pull_request'
       - run: git status
       - run: |
           git stash
