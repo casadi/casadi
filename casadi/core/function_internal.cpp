@@ -3505,7 +3505,7 @@ namespace casadi {
       if (init_mem(m)) {
         casadi_error("Failed to create or initialize memory object");
       }
-      return mem_.size()-1;
+      return static_cast<int>(mem_.size()) - 1;
     } else {
       // Use an unused memory object
       int m = unused_.top();

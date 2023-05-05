@@ -184,10 +184,10 @@ namespace casadi {
 
     void SerializingStream::pack(const std::string& e) {
       decorate('s');
-      int s = e.size();
+      int s = static_cast<int>(e.size());
       pack(s);
       const char* c = e.c_str();
-      for (int j=0;j<s;++j) pack(c[j]);
+      for (int j = 0; j < s; ++j) pack(c[j]);
     }
 
     void DeserializingStream::unpack(std::string& e) {

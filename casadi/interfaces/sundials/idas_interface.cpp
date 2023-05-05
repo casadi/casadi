@@ -278,7 +278,7 @@ int IdasInterface::init_mem(void* mem) const {
   // Scaling
   if (!abstolv_.empty()) {
     // Vector absolute tolerances
-    N_Vector nv_abstol = N_VNew_Serial(abstolv_.size());
+    N_Vector nv_abstol = N_VNew_Serial(static_cast<long>(abstolv_.size()));
     std::copy(abstolv_.begin(), abstolv_.end(), NV_DATA_S(nv_abstol));
     THROWING(IDASVtolerances, m->mem, reltol_, nv_abstol);
     N_VDestroy_Serial(nv_abstol);
