@@ -433,7 +433,7 @@ namespace casadi {
 
     // Generate s-function
     if (this->with_sfunction) {
-      for( unsigned ii=0; ii<this->added_sfunctions.size(); ii++) {
+      for (unsigned ii=0; ii<this->added_sfunctions.size(); ii++) {
         std::string sfunction_code = this->added_sfunctions.at(ii);
         std::string sfunction_name = this->exposed_fname.at(ii);
         generate_sfunction(sfunction_name, sfunction_code);
@@ -537,7 +537,9 @@ namespace casadi {
 
   std::string CodeGenerator::codegen_sfunction(const Function& f) const {
     std::stringstream g;
-    
+    // TODO(@jaeandersson): These helper functions really should be moved
+    // to the runtime directory
+
     // Initialize function
     g << "/* Function: mdlInitializeSizes ===========================================\n"
       << "* Abstract:\n"
@@ -549,15 +551,18 @@ namespace casadi {
       << "  /* Declare auxilary variables */\n"
       << "  int_T ii;\n"
       << "  const int_T* sp;\n\n"
-      << "  /* Set number of simulink s-function block parameters (the ones which appear by double click on simulink block) */\n"
+      << "  /* Set number of simulink s-function block parameters "
+        "(the ones which appear by double click on simulink block) */\n"
       << "  ssSetNumSFcnParams(S, 0);\n\n"
       << "  /* Report if parameter mismatch occurs */\n"
       << "  if (ssGetNumSFcnParams(S) != ssGetSFcnParamsCount(S)) return;\n\n"
-      << "  /* Specify the number of states for which a block detects zero crossings that occur between sample points */\n"
+      << "  /* Specify the number of states for which a block detects "
+        "zero crossings that occur between sample points */\n"
       << "  ssSetNumNonsampledZCs(S, 0);\n\n"
       << "  /* Set number of simulink input ports */\n"
       << "  if (!ssSetNumInputPorts(S, " << f->n_in_ << ")) return;\n\n"
-      << "  /* Configure simulink input ports (inputs are assumed to be dense vectors or matrices) */\n"
+      << "  /* Configure simulink input ports (inputs are assumed to be dense "
+        "vectors or matrices) */\n"
       << "  for (ii=0; ii<" << f->n_in_ << "; ++ii) {\n"
       << "    sp = " << f.name() << "_sparsity_in(ii);\n"
       << "    if (sp[1]==1) {\n"
@@ -647,7 +652,8 @@ namespace casadi {
       << "  " << f.name() << "( arg, res, iw, w+offset, 0 );\n\n"
       << "  /* Assign results to Simulink output array */\n"
       << "  for (ii=0; ii<" << f->n_out_ << "; ++ii){\n\n"
-      << "    /* Get sparsity information of casadi function output (sp[0] - n_rows, sp[1] - n_cols, sp[2] - dense/sparse) */\n"
+      << "    /* Get sparsity information of casadi function output "
+        "(sp[0] - n_rows, sp[1] - n_cols, sp[2] - dense/sparse) */\n"
       << "    sp = " << f.name() << "_sparsity_out(ii);\n\n"
       << "    /* Check if output is dense (sp[2]=1) or sparse (sp[2]=0) */\n"
       << "    if (sp[2]==0) {\n"
@@ -655,7 +661,9 @@ namespace casadi {
       << "      ind_start_row_index = 2 + sp[1] + 1;\n\n"
       << "      /* Distribute nonzero elements column by column */\n"
       << "      for (col=0; col<sp[1]; col++) {\n\n"
-      << "        /* The cumulative sum of nonzero elements after each column starts at index 2, after last entry of CCS array col_ptr; number of nonzero elements in current column is obtained by the difference of two consecutive values */\n"
+      << "        /* The cumulative sum of nonzero elements after each column starts at index 2, "
+        "after last entry of CCS array col_ptr; number of nonzero elements in current column is "
+        "obtained by the difference of two consecutive values */\n"
       << "        nnz_col = sp[2+col+1] - sp[2+col];\n\n"
       << "        /* Distribute nonzero elements of current column to correct row position */\n"
       << "        for (jj=0; jj<nnz_col; jj++) {\n"
