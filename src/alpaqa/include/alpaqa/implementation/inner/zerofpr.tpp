@@ -154,10 +154,16 @@ auto ZeroFPRSolver<DirectionProviderT>::operator()(
             << ",    γ = " << print_real(γₖ)               //
             << ",    ε = " << print_real(εₖ) << '\n';
     };
-    auto print_progress_2 = [&print_real, &print_real3, os](crvec qₖ,
-                                                            real_t τₖ) {
-        *os << "│  ‖q‖ = " << print_real(qₖ.norm()) //
-            << ",    τ = " << print_real3(τₖ)       //
+    auto print_progress_2 = [&print_real, &print_real3, os](crvec qₖ, real_t τₖ,
+                                                            bool reject) {
+        const char *color = τₖ == 1  ? "\033[0;32m"
+                            : τₖ > 0 ? "\033[0;33m"
+                                     : "\033[0;35m";
+        *os << "│  ‖q‖ = " << print_real(qₖ.norm())                 //
+            << ",    τ = " << color << print_real3(τₖ) << "\033[0m" //
+            << ",    dir update "
+            << (reject ? "\033[0;35mrejected\033[0m"
+                       : "\033[0;32maccepted\033[0m") //
             << std::endl; // Flush for Python buffering
     };
     auto print_progress_n = [&](SolverStatus status) {
@@ -332,7 +338,8 @@ auto ZeroFPRSolver<DirectionProviderT>::operator()(
         τ                               = τ_init;
         real_t τ_prev                   = -1;
         bool update_lbfgs_in_linesearch = params.update_direction_in_candidate;
-        bool update_lbfgs_later         = !update_lbfgs_in_linesearch;
+        bool updated_lbfgs              = false;
+        bool dir_rejected               = true;
 
         // xₖ₊₁ = xₖ + pₖ
         auto take_safe_step = [&] {
@@ -360,11 +367,20 @@ auto ZeroFPRSolver<DirectionProviderT>::operator()(
                 τ_prev = τ;
             }
 
-            // If the cost is not finite, abandon the direction entirely, don't
-            // even bother backtracking.
-            if (τ > 0 && !std::isfinite(next->ψx)) {
+            // If the cost is not finite, or if the quadratic upper bound could
+            // not be satisfied, abandon the direction entirely, don't even
+            // bother backtracking.
+            bool fail = next->L >= params.L_max || !std::isfinite(next->ψx);
+            if (τ > 0 && fail) {
+                // Don't allow a bad accelerated step to destroy the FBS step
+                // size
+                next->L = curr->L;
+                next->γ = curr->γ;
+                // Line search failed
                 τ = 0;
                 direction.reset();
+                // Update the direction in the FB iterate later
+                update_lbfgs_in_linesearch = false;
                 continue;
             }
 
@@ -372,30 +388,32 @@ auto ZeroFPRSolver<DirectionProviderT>::operator()(
             eval_prox_grad_step(*next);
             eval_cost_in_prox(*next);
 
-            // Quadratic upper bound
+            // Quadratic upper bound step size condition
             if (next->L < params.L_max && qub_violated(*next)) {
                 next->γ /= 2;
                 next->L *= 2;
-                τ = τ_init;
+                if (τ > 0)
+                    τ = τ_init;
                 ++s.stepsize_backtracks;
+                // If the step size changes, we need extra care when updating
+                // the direction later
                 update_lbfgs_in_linesearch = false;
-                update_lbfgs_later         = true;
                 continue;
             }
 
             // Update L-BFGS
-            if (τ == 1 && update_lbfgs_in_linesearch) {
+            if (update_lbfgs_in_linesearch && !updated_lbfgs) {
                 if (params.update_direction_from_prox_step) {
-                    s.lbfgs_rejected += not direction.update(
+                    s.lbfgs_rejected += dir_rejected = not direction.update(
                         curr->γ, next->γ, curr->x̂, next->x, prox->p, next->p,
                         prox->grad_ψ, next->grad_ψ);
                 } else {
-                    s.lbfgs_rejected += not direction.update(
+                    s.lbfgs_rejected += dir_rejected = not direction.update(
                         curr->γ, next->γ, curr->x, next->x, curr->p, next->p,
                         curr->grad_ψ, next->grad_ψ);
                 }
                 update_lbfgs_in_linesearch = false;
-                update_lbfgs_later         = false;
+                updated_lbfgs              = true;
             }
 
             // Line search condition
@@ -407,13 +425,13 @@ auto ZeroFPRSolver<DirectionProviderT>::operator()(
                 continue;
             }
 
-            // QUB and line search satisfied
+            // QUB and line search satisfied (or τ is 0 and L > L_max)
             break;
         }
         // If τ < τ_min the line search failed and we accepted the prox step
         s.linesearch_failures += (τ == 0 && τ_init > 0);
         s.τ_1_accepted += τ == 1;
-        s.count_τ += 1;
+        s.count_τ += (τ_init > 0);
         s.sum_τ += τ;
 
         // Check if we made any progress
@@ -422,7 +440,7 @@ auto ZeroFPRSolver<DirectionProviderT>::operator()(
 
         // Update L-BFGS -------------------------------------------------------
 
-        if (τ_init < 1 || update_lbfgs_later) {
+        if (!updated_lbfgs) {
             if (curr->γ != next->γ) { // Flush L-BFGS if γ changed
                 direction.changed_γ(next->γ, curr->γ);
                 if (params.recompute_last_prox_step_after_lbfgs_flush) {
@@ -432,11 +450,11 @@ auto ZeroFPRSolver<DirectionProviderT>::operator()(
                 }
             }
             if (τ > 0 && params.update_direction_from_prox_step) {
-                s.lbfgs_rejected += not direction.update(
+                s.lbfgs_rejected += dir_rejected = not direction.update(
                     curr->γ, next->γ, curr->x̂, next->x, prox->p, next->p,
                     prox->grad_ψ, next->grad_ψ);
             } else {
-                s.lbfgs_rejected += not direction.update(
+                s.lbfgs_rejected += dir_rejected = not direction.update(
                     curr->γ, next->γ, curr->x, next->x, curr->p, next->p,
                     curr->grad_ψ, next->grad_ψ);
             }
@@ -445,7 +463,7 @@ auto ZeroFPRSolver<DirectionProviderT>::operator()(
         // Print ---------------------------------------------------------------
         do_progress_cb(k, *curr, q, prox->grad_ψ, τ, εₖ, SolverStatus::Busy);
         if (do_print && (k != 0 || direction.has_initial_direction()))
-            print_progress_2(q, τ);
+            print_progress_2(q, τ, dir_rejected);
 
         // Advance step --------------------------------------------------------
         std::swap(curr, next);

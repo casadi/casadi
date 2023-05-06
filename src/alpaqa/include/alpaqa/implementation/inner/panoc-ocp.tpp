@@ -415,12 +415,18 @@ auto PANOCOCPSolver<Conf>::operator()(
             << ",    ε = " << print_real(εₖ) << '\n';
     };
     auto print_progress_2 = [&](crvec qₖ, real_t τₖ, bool did_gn, length_t nJ,
-                                real_t min_rcond) {
+                                real_t min_rcond, bool reject) {
+        const char *color = τₖ == 1  ? "\033[0;32m"
+                            : τₖ > 0 ? "\033[0;33m"
+                                     : "\033[0;35m";
         *os << "│  ‖q‖ = " << print_real(qₖ.norm())                       //
             << ",   #J = " << std::setw(7 + params.print_precision) << nJ //
             << ", cond = " << print_real3(real_t(1) / min_rcond)          //
-            << ",    τ = " << print_real3(τₖ)                             //
+            << ",    τ = " << color << print_real3(τₖ) << "\033[0m"       //
             << ",    " << (did_gn ? "GN" : "L-BFGS")                      //
+            << ",    dir update "
+            << (reject ? "\033[0;35mrejected\033[0m"
+                       : "\033[0;32maccepted\033[0m") //
             << std::endl; // Flush for Python buffering
     };
     auto print_progress_n = [&](SolverStatus status) {
@@ -666,10 +672,11 @@ auto PANOCOCPSolver<Conf>::operator()(
 
         // Line search ---------------------------------------------------------
 
-        next->γ       = curr->γ;
-        next->L       = curr->L;
-        τ             = τ_init;
-        real_t τ_prev = -1;
+        next->γ           = curr->γ;
+        next->L           = curr->L;
+        τ                 = τ_init;
+        real_t τ_prev     = -1;
+        bool dir_rejected = true;
 
         // xₖ₊₁ = xₖ + pₖ
         auto take_safe_step = [&] {
@@ -707,15 +714,32 @@ auto PANOCOCPSolver<Conf>::operator()(
                 τ_prev = τ;
             }
 
+            // If the cost is not finite, or if the quadratic upper bound could
+            // not be satisfied, abandon the direction entirely, don't even
+            // bother backtracking.
+            bool fail = next->L >= params.L_max || !std::isfinite(next->ψu);
+            if (τ > 0 && fail) {
+                // Don't allow a bad accelerated step to destroy the FBS step
+                // size
+                next->L = curr->L;
+                next->γ = curr->γ;
+                // Line search failed
+                τ = 0;
+                if (enable_lbfgs)
+                    lbfgs.reset();
+                continue;
+            }
+
             // Calculate x̂ₖ₊₁, ψ(x̂ₖ₊₁)
             eval_prox(*next);
             eval_forward_hat(*next);
 
-            // Quadratic upper bound
+            // Quadratic upper bound step size condition
             if (next->L < params.L_max && qub_violated(*next)) {
                 next->γ /= 2;
                 next->L *= 2;
-                τ = τ_init;
+                if (τ > 0)
+                    τ = τ_init;
                 ++s.stepsize_backtracks;
                 continue;
             }
@@ -729,14 +753,14 @@ auto PANOCOCPSolver<Conf>::operator()(
                 continue;
             }
 
-            // QUB and line search satisfied
+            // QUB and line search satisfied (or τ is 0 and L > L_max)
             break;
         }
 
         // If τ < τ_min the line search failed and we accepted the prox step
         s.linesearch_failures += (τ == 0 && τ_init > 0);
         s.τ_1_accepted += τ == 1;
-        s.count_τ += 1;
+        s.count_τ += (τ_init > 0);
         s.sum_τ += τ;
 
         // Check if we made any progress
@@ -752,9 +776,9 @@ auto PANOCOCPSolver<Conf>::operator()(
             if (reset_because_gn || curr->γ != next->γ) {
                 lbfgs.reset();
             }
-            if (!reset_because_gn) {
+            if (!reset_because_gn) { // TODO: this may be too restrictive
                 alpaqa::util::Timed t{s.time_lbfgs_update};
-                s.lbfgs_rejected += not lbfgs.update(
+                s.lbfgs_rejected += dir_rejected = not lbfgs.update(
                     curr->u, next->u, curr->grad_ψ, next->grad_ψ,
                     LBFGS<config_t>::Sign::Positive, force);
             }
@@ -763,7 +787,7 @@ auto PANOCOCPSolver<Conf>::operator()(
         // Print ---------------------------------------------------------------
         do_progress_cb(k, *curr, q, τ, εₖ, did_gn, nJ, SolverStatus::Busy);
         if (do_print && (k != 0 || did_gn))
-            print_progress_2(q, τ, did_gn, nJ, lqr.min_rcond);
+            print_progress_2(q, τ, did_gn, nJ, lqr.min_rcond, dir_rejected);
 
         // Advance step --------------------------------------------------------
         std::swap(curr, next);
