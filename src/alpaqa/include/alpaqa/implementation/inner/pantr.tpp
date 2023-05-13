@@ -348,7 +348,10 @@ auto PANTRSolver<DirectionProviderT>::operator()(
             real_t ϕγ      = prox->fbe();
             real_t ϕγ_next = cand->fbe();
             real_t margin  = (1 + std::abs(ϕγ)) * params.TR_tolerance_factor;
-            return (ϕγ - ϕγ_next + margin) / (-q_model);
+            real_t ρ       = (ϕγ - ϕγ_next + margin) / (-q_model);
+            return params.ratio_approx_fbe_quadratic_model
+                       ? ρ / (1 - params.Lipschitz.Lγ_factor)
+                       : ρ;
         };
 
         // update trust radius accordingly

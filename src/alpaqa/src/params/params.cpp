@@ -232,6 +232,7 @@ PARAMS_TABLE(PANTRParams<config_t>,                                         //
              PARAMS_MEMBER(update_direction_on_prox_step),                  //
              PARAMS_MEMBER(recompute_last_prox_step_after_direction_reset), //
              PARAMS_MEMBER(disable_acceleration),                           //
+             PARAMS_MEMBER(ratio_approx_fbe_quadratic_model),               //
 );
 
 PARAMS_TABLE(PANOCParams<config_t>,                                     //

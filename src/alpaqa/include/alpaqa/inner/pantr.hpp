@@ -71,7 +71,23 @@ struct PANTRParams {
     bool update_direction_on_prox_step                  = true;
     bool recompute_last_prox_step_after_direction_reset = false;
 
+    /// Don't compute accelerated steps, fall back to forward-backward splitting.
+    /// For testing purposes.
     bool disable_acceleration = false;
+    /// Compute the trust-region ratio using an approximation of the quadratic
+    /// model of the FBE, rather than the quadratic model of the subproblem.
+    /// Specifically, when set to false, the quadratic model used is
+    /// @f[ q(d) = \tfrac12 \inprod{\mathcal R_\gamma(\hat x) d}{d} +
+    /// \inprod{R_\gamma(\hat x)}{d}. @f]
+    /// When set to true, the quadratic model used is
+    /// @f[ q_\mathrm{approx}(d) = \inv{(1-\alpha)} q(d), @f]
+    /// where @f$ \alpha = @f$ @ref LipschitzParams::Lγ_factor.
+    /// This is an approximation of the quadratic model of the FBE,
+    /// @f[ q_{\varphi_\gamma}(d) = \tfrac12 \inprod{\mathcal Q_\gamma(\hat x)
+    /// \mathcal R_\gamma(\hat x) d}{d} + \inprod{\mathcal Q_\gamma(\hat x)
+    /// R_\gamma(\hat x)}{d}, @f]
+    /// with @f$ \mathcal Q_\gamma(x) = \id - \gamma \nabla^2 \psi(x) @f$.
+    bool ratio_approx_fbe_quadratic_model = true;
 };
 
 template <Config Conf = DefaultConfig>

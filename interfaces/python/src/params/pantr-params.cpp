@@ -23,6 +23,7 @@ PARAMS_TABLE_DEF(alpaqa::PANTRParams<Conf>,                                     
                  PARAMS_MEMBER(update_direction_on_prox_step),                  //
                  PARAMS_MEMBER(recompute_last_prox_step_after_direction_reset), //
                  PARAMS_MEMBER(disable_acceleration),                           //
+                 PARAMS_MEMBER(ratio_approx_fbe_quadratic_model),               //
 );
 
 PARAMS_TABLE_INST(alpaqa::PANTRParams<alpaqa::EigenConfigf>);
