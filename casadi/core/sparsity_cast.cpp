@@ -83,9 +83,10 @@ namespace casadi {
   void SparsityCast::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                         std::vector<std::vector<MX> >& asens) const {
     for (casadi_int d=0; d<aseed.size(); ++d) {
-      casadi_assert_dev(aseed[d][0].sparsity().is_subset(sparsity()));
-      Sparsity sp = aseed[d][0].sparsity().sparsity_cast_mod(sparsity(), dep().sparsity());
-      asens[d][0] += sparsity_cast(aseed[d][0], sp);
+      MX seed = aseed[d][0];
+      if (!seed.sparsity().is_subset(sparsity())) seed = seed(sparsity());
+      Sparsity sp = seed.sparsity().sparsity_cast_mod(sparsity(), dep().sparsity());
+      asens[d][0] += sparsity_cast(seed, sp);
     }
   }
 

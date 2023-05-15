@@ -3086,5 +3086,18 @@ class MXtests(casadiTestCase):
     self.checkfunction(f,f.expand(),inputs=[DM([[1,2],[3,4]]),DM([[5,6],[7,8]])])
     self.checkfunction(f,f_alt,inputs=[DM([[1,2],[3,4]]),DM([[5,6],[7,8]])])
 
+  def test_sparsity_cast_ad(self):
+    #issue 3164
+
+    y = MX.sym("y",3)
+
+    xy = vertcat(y[0],y[1])
+    w = MX(sparsify(DM([1,1,0])).sparsity().T,xy) @ y
+    
+    f = Function('f',[y],[w])
+    self.checkfunction(f,f.expand(), inputs=[vertcat(1.1,1.3,1.7)])
+
+
+  
 if __name__ == '__main__':
     unittest.main()
