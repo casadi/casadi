@@ -1424,10 +1424,12 @@ namespace casadi {
       // Assert consistent input dimensions
       if (tr) {
         casadi_assert(v.size1() == ex.size1() && v.size2() % ex.size2() == 0,
-                      "'v' has inconsistent dimensions");
+                      "'v' has inconsistent dimensions: "
+                      " v " + v.dim(false) + ", ex " + ex.dim(false) + ".");
       } else {
         casadi_assert(v.size1() == arg.size1() && v.size2() % arg.size2() == 0,
-                      "'v' has inconsistent dimensions");
+                      "'v' has inconsistent dimensions: "
+                      " v " + v.dim(false) + ", arg " + arg.dim(false) + ".");
       }
 
       // Quick return if no seeds
