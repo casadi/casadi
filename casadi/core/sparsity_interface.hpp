@@ -145,7 +145,7 @@ namespace casadi {
      *
      * \seealso horzsplit
 
-    */
+        \identifier{277} */
     inline friend std::vector<MatType > horzsplit_n(const MatType& x, casadi_int n) {
       return MatType::horzsplit_n(x, n);
     }
@@ -215,7 +215,7 @@ namespace casadi {
      *
      * \seealso vertsplit
 
-    */
+        \identifier{278} */
     inline friend std::vector<MatType > vertsplit_n(const MatType& x, casadi_int n) {
       return MatType::vertsplit_n(x, n);
     }

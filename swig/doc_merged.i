@@ -26821,10 +26821,10 @@ Concatenate horizontally, six matrices.
 Extra doc: https://github.com/casadi/casadi/wiki/L_4e
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L465
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L502
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L465-L468
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L502-L505
 
 >  MatType casadi::SparsityInterface::horzcat(const MatType &x, const MatType &y, const MatType &z, const MatType &w, const MatType &v, const MatType &u)
 ------------------------------------------------------------------------
@@ -26834,10 +26834,10 @@ Concatenate horizontally, six matrices.
 Extra doc: https://github.com/casadi/casadi/wiki/L_4e
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L465
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L502
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L465-L468
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L502-L505
 
 ";
 
@@ -26851,10 +26851,10 @@ Concatenate vertically, six matrices.
 Extra doc: https://github.com/casadi/casadi/wiki/L_4j
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L503
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L540
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L503-L506
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L540-L543
 
 >  MatType casadi::SparsityInterface::vertcat(const MatType &x, const MatType &y, const MatType &z, const MatType &w, const MatType &v, const MatType &u)
 ------------------------------------------------------------------------
@@ -26864,10 +26864,10 @@ Concatenate vertically, six matrices.
 Extra doc: https://github.com/casadi/casadi/wiki/L_4j
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L503
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L540
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L503-L506
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L540-L543
 
 ";
 
@@ -26882,17 +26882,19 @@ Parameters:
 -----------
 
 incr: 
-Size of each group of columns
+Size (width) of each group of columns
 
 horzcat(horzsplit(x, ...)) = x
+
+\\\\seealso horzsplit_n
 
 Extra doc: https://github.com/casadi/casadi/wiki/L_3h
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L130
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L134
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L130-L132
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L134-L136
 
 >  std::vector<MatType > casadi::SparsityInterface::horzsplit(const MatType &x, casadi_int incr=1)
 ------------------------------------------------------------------------
@@ -26903,19 +26905,48 @@ Parameters:
 -----------
 
 incr: 
-Size of each group of columns
+Size (width) of each group of columns
 
 horzcat(horzsplit(x, ...)) = x
+
+\\\\seealso horzsplit_n
 
 Extra doc: https://github.com/casadi/casadi/wiki/L_3h
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L130
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L134
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L130-L132
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L134-L136
 
 ";
+
+";
+
+%feature("docstring") casadi::SparsityInterfaceCommon::horzsplit_n "
+
+[INTERNAL] 
+split horizontally, retaining fixed-sized groups of columns
+
+Parameters:
+-----------
+
+n: 
+Number of groups of columns
+
+Will error when the number of columns is not a multiple of n
+
+horzcat(horzsplit(x, ...)) = x
+
+\\\\seealso horzsplit
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_277
+
+Doc source: 
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L149
+
+Implementation: 
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L149-L151
 
 ";
 
@@ -26965,13 +26996,15 @@ will have a size smaller than  incr.
 
 
 
+\\\\seealso vertsplit_n
+
 Extra doc: https://github.com/casadi/casadi/wiki/L_3k
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L182
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L204
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L182-L184
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L204-L206
 
 >  std::vector<MatType > casadi::SparsityInterface::vertsplit(const MatType &x, casadi_int incr=1)
 ------------------------------------------------------------------------
@@ -27019,13 +27052,15 @@ will have a size smaller than  incr.
 
 
 
+\\\\seealso vertsplit_n
+
 Extra doc: https://github.com/casadi/casadi/wiki/L_3k
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L182
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L204
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L182-L184
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L204-L206
 
 ";
 
@@ -27040,10 +27075,37 @@ matrices.
 Extra doc: https://github.com/casadi/casadi/wiki/L_3j
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L150
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L169
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L150-L152
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L169-L171
+
+";
+
+%feature("docstring") casadi::SparsityInterfaceCommon::vertsplit_n "
+
+[INTERNAL] 
+split vertically, retaining fixed-sized groups of rows
+
+Parameters:
+-----------
+
+n: 
+Number of groups of rows
+
+Will error when the number of rows is not a multiple of n
+
+vertcat(vertsplit(x, ...)) = x
+
+\\\\seealso vertsplit
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_278
+
+Doc source: 
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L219
+
+Implementation: 
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L219-L221
 
 ";
 
@@ -27055,10 +27117,10 @@ Construct a matrix from 4 blocks.
 Extra doc: https://github.com/casadi/casadi/wiki/L_3m
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L197
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L234
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L197-L199
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L234-L236
 
 >  MatType casadi::SparsityInterface::blockcat(const MatType &A, const MatType &B, const MatType &C, const MatType &D)
 ------------------------------------------------------------------------
@@ -27068,10 +27130,10 @@ Construct a matrix from 4 blocks.
 Extra doc: https://github.com/casadi/casadi/wiki/L_3m
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L197
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L234
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L197-L199
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L234-L236
 
 ";
 
@@ -27096,10 +27158,10 @@ blockcat(blocksplit(x,..., ...)) = x
 Extra doc: https://github.com/casadi/casadi/wiki/L_3o
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L225
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L262
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L225-L227
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L262-L264
 
 >  std::vector< std::vector< MatType > > casadi::SparsityInterface::blocksplit(const MatType &x, casadi_int vert_incr=1, casadi_int horz_incr=1)
 ------------------------------------------------------------------------
@@ -27120,10 +27182,10 @@ blockcat(blocksplit(x,..., ...)) = x
 Extra doc: https://github.com/casadi/casadi/wiki/L_3o
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L225
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L262
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L225-L227
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L262-L264
 
 ";
 
@@ -27137,10 +27199,10 @@ Concatenate along diagonal, six matrices.
 Extra doc: https://github.com/casadi/casadi/wiki/L_4o
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L541
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L578
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L541-L544
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L578-L581
 
 >  MatType casadi::SparsityInterface::diagcat(const MatType &x, const MatType &y, const MatType &z, const MatType &w, const MatType &v, const MatType &u)
 ------------------------------------------------------------------------
@@ -27150,10 +27212,10 @@ Concatenate along diagonal, six matrices.
 Extra doc: https://github.com/casadi/casadi/wiki/L_4o
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L541
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L578
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L541-L544
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L578-L581
 
 ";
 
@@ -27178,10 +27240,10 @@ diagsplit(diagsplit(x, ...)) = x
 Extra doc: https://github.com/casadi/casadi/wiki/L_3t
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L287
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L324
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L287-L289
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L324-L326
 
 >  std::vector< MatType > casadi::SparsityInterface::diagsplit(const MatType &x, casadi_int incr1, casadi_int incr2)
 ------------------------------------------------------------------------
@@ -27202,10 +27264,10 @@ diagsplit(diagsplit(x, ...)) = x
 Extra doc: https://github.com/casadi/casadi/wiki/L_3t
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L287
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L324
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L287-L289
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L324-L326
 
 ";
 
@@ -27219,10 +27281,10 @@ concatenate vertically while vectorizing all arguments with vec
 Extra doc: https://github.com/casadi/casadi/wiki/L_3u
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L294
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L331
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L294-L296
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L331-L333
 
 ";
 
@@ -27234,10 +27296,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp
 Extra doc: https://github.com/casadi/casadi/wiki/L_3w
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L308
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L345
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L308-L310
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L345-L347
 
 >  MatType casadi::SparsityInterface::mtimes(const std::vector< MatType > &args)
 ------------------------------------------------------------------------
@@ -27247,10 +27309,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp
 Extra doc: https://github.com/casadi/casadi/wiki/L_3w
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L308
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L345
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L308-L310
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L345-L347
 
 ";
 
@@ -27272,10 +27334,10 @@ z+mtimes(x,y).project(z.sparsity()).
 Extra doc: https://github.com/casadi/casadi/wiki/L_3x
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L321
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L358
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L321-L323
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L358-L360
 
 ";
 
@@ -27287,10 +27349,10 @@ Transpose.
 Extra doc: https://github.com/casadi/casadi/wiki/L_3y
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L328
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L365
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L328-L330
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L365-L367
 
 ";
 
@@ -27316,10 +27378,10 @@ d
  Extra doc: https://github.com/casadi/casadi/wiki/L_3z
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L349
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L386
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L349-L351
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L386-L388
 
 ";
 
@@ -27331,10 +27393,10 @@ Reshape the matrix.
 Extra doc: https://github.com/casadi/casadi/wiki/L_42
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L370
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L407
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L370-L372
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L407-L409
 
 >  MatType casadi::SparsityInterface::reshape(const MatType &x, const Sparsity &sp)
 ------------------------------------------------------------------------
@@ -27344,10 +27406,10 @@ Reshape the matrix.
 Extra doc: https://github.com/casadi/casadi/wiki/L_42
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L370
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L407
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L370-L372
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L407-L409
 
 ";
 
@@ -27361,10 +27423,10 @@ Cast matrix nonzeros to different Sparsity.
 Extra doc: https://github.com/casadi/casadi/wiki/L_24z
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L377
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L414
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L377-L379
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L414-L416
 
 ";
 
@@ -27376,10 +27438,10 @@ Obtain the structural rank of a sparsity-pattern.
 Extra doc: https://github.com/casadi/casadi/wiki/L_43
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L384
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L421
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L384-L386
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L421-L423
 
 ";
 
@@ -27391,10 +27453,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp
 Extra doc: https://github.com/casadi/casadi/wiki/L_44
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L391
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L428
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L391-L393
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L428-L430
 
 ";
 
@@ -27406,10 +27468,10 @@ Get the upper triangular part of a matrix.
 Extra doc: https://github.com/casadi/casadi/wiki/L_45
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L398
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L435
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L398-L400
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L435-L437
 
 ";
 
@@ -27421,10 +27483,10 @@ Get the lower triangular part of a matrix.
 Extra doc: https://github.com/casadi/casadi/wiki/L_46
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L405
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L442
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L405-L407
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L442-L444
 
 ";
 
@@ -27438,10 +27500,10 @@ Creates a block matrix in which each element (i, j) is a_ij*b
 Extra doc: https://github.com/casadi/casadi/wiki/L_47
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L414
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L451
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L414-L416
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L451-L453
 
 ";
 
@@ -27453,10 +27515,10 @@ Repeat matrix A n times vertically and m times horizontally.
 Extra doc: https://github.com/casadi/casadi/wiki/L_49
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L428
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L465
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L428-L430
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L465-L467
 
 >  MatType casadi::SparsityInterface::repmat(const MatType &A, const std::pair< casadi_int, casadi_int > &rc)
 ------------------------------------------------------------------------
@@ -27466,10 +27528,10 @@ Repeat matrix A n times vertically and m times horizontally.
 Extra doc: https://github.com/casadi/casadi/wiki/L_49
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L428
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L465
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L428-L430
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L465-L467
 
 ";
 
@@ -27483,10 +27545,10 @@ Return a row-wise summation of elements.
 Extra doc: https://github.com/casadi/casadi/wiki/L_4p
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L549
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L586
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L549-L549
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L586-L586
 
 ";
 
@@ -27498,10 +27560,10 @@ Return a column-wise summation of elements.
 Extra doc: https://github.com/casadi/casadi/wiki/L_4q
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L554
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L591
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L554-L554
+https://github.com/casadi/casadi/blob/develop/casadi/core/sparsity_interface.hpp#L591-L591
 
 ";
 

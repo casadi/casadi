@@ -4909,6 +4909,9 @@
 %exception  casadi::SparsityInterface::horzsplit(const MatType &x, const std::vector< casadi_int > &offset) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::SparsityInterface::horzsplit_n(const MatType &x, casadi_int n) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::SparsityInterface::kron(const MatType &a, const MatType &b) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -4991,6 +4994,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SparsityInterface::vertsplit(const MatType &x, const std::vector< casadi_int > &offset) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SparsityInterface::vertsplit_n(const MatType &x, casadi_int n) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::StringDeserializer::decode(const std::string &string) {
