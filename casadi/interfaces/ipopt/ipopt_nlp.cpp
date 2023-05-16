@@ -286,7 +286,7 @@ namespace casadi {
       g_[c_pos[i]] += tnlp_adapter->c_rhs_[i];
     }
 
-#if (IPOPT_VERSION_MAJOR > 3) || (IPOPT_VERSION_MAJOR == 3 && IPOPT_VERSION_MAJOR >= 14)
+#if (IPOPT_VERSION_MAJOR > 3) || (IPOPT_VERSION_MAJOR == 3 && IPOPT_VERSION_MINOR >= 14)
     tnlp_adapter->ResortBounds(z_L, z_L_, z_U, z_U_);
 #else
     tnlp_adapter->ResortBnds(z_L, z_L_, z_U, z_U_);
