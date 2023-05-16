@@ -1696,6 +1696,11 @@ export(TARGETS casadi
 # (this registers the build-tree with a global CMake-registry)
 export(PACKAGE CasADi)
 
+set(OLD_GCC OFF)
+if("$ENV{DEFAULT_DOCKCROSS_IMAGE}" MATCHES "manylinux2014" OR "$ENV{DEFAULT_DOCKCROSS_IMAGE}" MATCHES "manylinux1")
+  set(OLD_GCC ON)
+endif()
+
 # Create casadi-config.cmake
 file(RELATIVE_PATH REL_LIB_PREFIX "${CMAKE_PREFIX}" "${LIB_PREFIX}")
 # ... for the build tree
