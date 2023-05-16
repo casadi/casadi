@@ -1109,9 +1109,9 @@ if(WITH_BUILD_METIS)
           # GKFree is not defined (variadic definition in utils.c); fails on MacOS target
           "CFLAGS=-Wno-implicit-function-declaration"
         PATCH_COMMAND COMMAND cd <SOURCE_DIR> && ./get.Metis)
-  add_library(metis INTERFACE IMPORTED)
-  add_dependencies(metis metis-external)
-  set_target_properties(metis PROPERTIES
+  add_library(metis::metis INTERFACE IMPORTED)
+  add_dependencies(metis::metis metis-external)
+  set_target_properties(metis::metis PROPERTIES
     INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include/coin-or/metis"
     IMPORTED_LIBNAME "coinmetis"
   )
@@ -1128,14 +1128,14 @@ if(WITH_HSL)
       )
   elseif(WITH_BUILD_HSL)
     add_feature_info(hsl-sourcebuild ON "Build CoinHSL from supplied source.")
-    get_target_property(METIS_INCLUDE_DIR metis INTERFACE_INCLUDE_DIRECTORIES)
-    get_target_property(METIS_LIB metis IMPORTED_LIBNAME)
+    get_target_property(METIS_INCLUDE_DIR metis::metis INTERFACE_INCLUDE_DIRECTORIES)
+    get_target_property(METIS_LIB metis::metis IMPORTED_LIBNAME)
     message("metis: ${METIS_LIB} ${METIS_INCLUDE_DIR}")
     # Copy source
 
     ExternalProject_Add(hsl-external
         SOURCE_DIR ${BUILD_HSL_SRC}
-        DEPENDS metis
+        DEPENDS metis::metis
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
         PATCH_COMMAND ${EXTERNAL_CMAKE_COMMAND} -DSRC=<SOURCE_DIR>  -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/patch_hsl.cmake
@@ -1154,12 +1154,12 @@ endif()
 
 if(WITH_MUMPS)
   if(WITH_BUILD_MUMPS)
-    get_target_property(METIS_INCLUDE_DIR metis INTERFACE_INCLUDE_DIRECTORIES)
-    get_target_property(METIS_LIB metis IMPORTED_LIBNAME)
+    get_target_property(METIS_INCLUDE_DIR metis::metis INTERFACE_INCLUDE_DIRECTORIES)
+    get_target_property(METIS_LIB metis::metis IMPORTED_LIBNAME)
     ExternalProject_Add(mumps-external
         GIT_REPOSITORY ${BUILD_MUMPS_TP_GIT_REPO}
         GIT_TAG ${BUILD_MUMPS_TP_VERSION}
-        DEPENDS ${LAPACK_DEPENDS_TARGET} metis
+        DEPENDS ${LAPACK_DEPENDS_TARGET} metis::metis
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
         CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS}  --prefix=<INSTALL_DIR> "--with-metis-cflags=-I${METIS_INCLUDE_DIR}" "--with-metis-lflags=-L${CMAKE_BINARY_DIR}/external_projects/lib -l${METIS_LIB} -lm" "--with-lapack-lflags=${LAPACK_LFLAGS}" ${CROSS_FLAGS_FORTRAN}
@@ -1193,12 +1193,12 @@ if(WITH_SPRAL)
     set(SPRAL_RECONFIG_CMD autoreconf -ivf -I /usr/share/aclocal <SOURCE_DIR> COMMAND)
   endif()
   if(WITH_BUILD_SPRAL)
-    get_target_property(METIS_INCLUDE_DIR metis INTERFACE_INCLUDE_DIRECTORIES)
-    get_target_property(METIS_LIB metis IMPORTED_LIBNAME)
+    get_target_property(METIS_INCLUDE_DIR metis::metis INTERFACE_INCLUDE_DIRECTORIES)
+    get_target_property(METIS_LIB metis::metis IMPORTED_LIBNAME)
     ExternalProject_Add(spral-external
         GIT_REPOSITORY ${BUILD_SPRAL_GIT_REPO}
         GIT_TAG ${BUILD_SPRAL_VERSION}
-        DEPENDS ${LAPACK_DEPENDS_TARGET} metis
+        DEPENDS ${LAPACK_DEPENDS_TARGET} metis::metis
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
         CONFIGURE_COMMAND ${SPRAL_RECONFIG_CMD} CFLAGS=-fPIC CXXFLAGS=-fPIC FFLAGS=-fPIC FCFLAGS=-fPIC <SOURCE_DIR>/configure ${CROSS_FLAGS} --disable-gpu --prefix=<INSTALL_DIR> --disable-openmp "--with-metis-inc-dir=${METIS_INCLUDE_DIR}" "--with-metis=-L${CMAKE_BINARY_DIR}/external_projects/lib -l${METIS_LIB} -lm" "--with-lapack=${LAPACK_LFLAGS}" "--with-blas=${LAPACK_LFLAGS}" ${CROSS_FLAGS_FORTRAN})
