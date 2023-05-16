@@ -429,10 +429,63 @@ class Integrationtests(casadiTestCase):
                 integrator_in[k]=v
 
             self.checkfunction(integrator,fs,inputs=integrator_in,gradient=False,hessian=False,sens_der=False,evals=False,digits=4,digits_sens=4,failmessage=message,verbose=False)
+            
+
+            
+            print(integratorA,integratorB,integratorI)
+            raise Exception()
 
             if "kinsol" not in str(opts):
               print(integrator)
               self.check_serialize(integrator,inputs=integrator_in)
+              
+  @memory_heavy()
+  def test_multipoint(self):
+  
+    for Integrator, features, options in integrators:
+      self.message(Integrator)
+      
+      if str(Integrator) in ["cvodes","idas","collocation"]: continue
+      
+      x = MX.sym("x")
+      p = MX.sym("p")
+      z = MX.sym("z")
+      u = MX.sym("u")
+      
+      if "dae" in features:
+          dae = { 'x':x, 'z':z, 'p':p, 'u': u, 'ode':z+p*u, 'alg':z*cos(z)-x, 'quad': x**2}
+      else:
+          dae = { 'x':x, 'p':p, 'u': u, 'ode':cos(x+p*u), 'quad': x**2}
+          
+      integratorA = casadi.integrator("integrator", Integrator, dae, 0, 0.1, options)
+      integratorB = casadi.integrator("integrator", Integrator, dae, 0.1, 0.2, options)
+   
+      integratorI = casadi.integrator("integrator", Integrator, dae, 0, [0.1,0.2], options)
+      
+      arg_test = {"x0":0,"p":0.15,"u":DM([1,1.1]).T}
+    
+      args = integratorI.convert_in(integratorI.mx_in())
+      u_split = horzsplit_n(args["u"],2)
+      
+      args1 = dict(args)
+      args2 = dict(args)
+      args1["u"] = u_split[0]
+      args2["u"] = u_split[1]
+      res1 = integratorA(**args1)
+      args2["x0"] = res1["xf"]
+      res2 = integratorB(**args2)
+      res2["qf"] = horzcat(res1["qf"],res1["qf"]+res2["qf"])
+      res2["xf"] = horzcat(res1["xf"],res2["xf"])
+      res2["zf"] = horzcat(res1["zf"],res2["zf"])
+      
+      res2.update(args)
+      I = Function("I",res2,integratorI.name_in(),integratorI.name_out())
+
+      I(**arg_test)      
+      integratorI(**arg_test)
+      
+      self.checkfunction(integratorI,I,inputs={"x0":0,"p":0.15,"u":DM([1,1.1]).T})
+            
 
   def setUp(self):
     # Reference solution is x0 e^((t^3-t0^3)/(3 p))
