@@ -1268,7 +1268,16 @@ class Matrixtests(casadiTestCase):
     f = Function('f',[x],[y])
     self.assertTrue(f.sz_w()==n)
 
-    
-    
+
+  def test_horzsplit_n(self):
+    self.assertTrue(len(horzsplit_n(DM.rand(1,6),2))==2)
+    self.assertTrue(len(vertsplit_n(DM.rand(6),2))==2)
+    self.assertTrue(len(horzsplit_n(DM(0,0),2))==2)
+    self.assertTrue(len(vertsplit_n(DM(0,0),2))==2)
+    with self.assertRaises(Exception):
+       horzsplit_n(DM.rand(1,5),2)
+    with self.assertRaises(Exception):
+       vertsplit_n(DM.rand(5),2)
+       
 if __name__ == '__main__':
     unittest.main()

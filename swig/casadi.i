@@ -2947,6 +2947,9 @@ namespace casadi{
  DECL std::vector< M > casadi_horzsplit(const M& v, casadi_int incr=1) {
  return horzsplit(v, incr);
  }
+ DECL std::vector< M > casadi_horzsplit_n(const M& v, casadi_int n) {
+ return horzsplit_n(v, n);
+ }
  DECL std::vector< M >
  casadi_vertsplit(const M& v, const std::vector<casadi_int>& offset) {
  return vertsplit(v, offset);
@@ -2958,6 +2961,10 @@ namespace casadi{
  DECL std::vector< M >
  casadi_vertsplit(const M& v, casadi_int incr=1) {
  return vertsplit(v, incr);
+ }
+ DECL std::vector< M >
+ casadi_vertsplit_n(const M& v, casadi_int n) {
+ return vertsplit_n(v, n);
  }
  DECL M casadi_blockcat(const M& A, const M& B, const M& C, const M& D) {
  return vertcat(horzcat(A, B), horzcat(C, D));

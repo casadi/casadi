@@ -72,6 +72,8 @@ namespace casadi {
     static MatType mtimes(const std::vector<MatType> &args);
     static std::vector<MatType > horzsplit(const MatType& x, casadi_int incr);
     static std::vector<MatType > vertsplit(const MatType& x, casadi_int incr);
+    static std::vector<MatType > horzsplit_n(const MatType& x, casadi_int n);
+    static std::vector<MatType > vertsplit_n(const MatType& x, casadi_int n);
     static MatType repmat(const MatType &A, const std::pair<casadi_int, casadi_int>& rc) {
       return MatType::repmat(A, rc.first, rc.second);
     }
@@ -122,13 +124,30 @@ namespace casadi {
 
     /** \brief  split horizontally, retaining fixed-sized groups of columns
 
-     * \param incr Size of each group of columns
+     * \param incr Size (width) of each group of columns
      *
      *   horzcat(horzsplit(x, ...)) = x
+     *
+     * \seealso horzsplit_n
 
         \identifier{3h} */
     inline friend std::vector<MatType > horzsplit(const MatType& x, casadi_int incr=1) {
       return MatType::horzsplit(x, incr);
+    }
+
+    /** \brief  split horizontally, retaining fixed-sized groups of columns
+
+     * \param n Number of groups of columns
+     *
+     * Will error when the number of columns is not a multiple of n
+     *
+     *   horzcat(horzsplit(x, ...)) = x
+     *
+     * \seealso horzsplit
+
+    */
+    inline friend std::vector<MatType > horzsplit_n(const MatType& x, casadi_int n) {
+      return MatType::horzsplit_n(x, n);
     }
 
     /** \brief  split vertically, retaining groups of rows
@@ -178,9 +197,27 @@ namespace casadi {
      [DM([0, 1]), DM([2, 3]), DM(4)]
      \enddoctest
      *
+
+     * \seealso vertsplit_n
+     
         \identifier{3k} */
     inline friend std::vector<MatType > vertsplit(const MatType &x, casadi_int incr=1) {
       return MatType::vertsplit(x, incr);
+    }
+
+    /** \brief  split vertically, retaining fixed-sized groups of rows
+
+     * \param n Number of groups of rows
+     *
+     * Will error when the number of rows is not a multiple of n
+     *
+     *   vertcat(vertsplit(x, ...)) = x
+     *
+     * \seealso vertsplit
+
+    */
+    inline friend std::vector<MatType > vertsplit_n(const MatType& x, casadi_int n) {
+      return MatType::vertsplit_n(x, n);
     }
 
     /** \brief Construct a matrix from a list of list of blocks.
@@ -684,6 +721,23 @@ namespace casadi {
     offset1.push_back(sz1);
     return MatType::vertsplit(x, offset1);
   }
+  template<typename MatType>
+  std::vector<MatType > SparsityInterface<MatType>::horzsplit_n(const MatType& x, casadi_int n) {
+    casadi_assert(n>=0, "horzsplit_n(x,n): n (" + str(n) + ") must be non-negative");
+    if (x.size2()==0) return std::vector<MatType>(n, x);
+    casadi_assert(x.size2() % n==0, "horzsplit_n(x,n): x.size2() (" + str(x.size2()) +
+                     ") must be a multiple of n (" + str(n) + ")");
+    return horzsplit(x, x.size2()/n);
+  }
+  template<typename MatType>
+  std::vector<MatType > SparsityInterface<MatType>::vertsplit_n(const MatType& x, casadi_int n) {
+    casadi_assert(n>=0, "vertsplit_n(x,n): n (" + str(n) + ") must be non-negative");
+    if (x.size1()==0) return std::vector<MatType>(n, x);
+    casadi_assert(x.size1() % n==0, "vertsplit(x,n): x.size1() (" + str(x.size1()) +
+                     ") must be a multiple of n (" + str(n) + ")");
+    return vertsplit(x, x.size1()/n);
+  }
+
 #endif // SWIG
 
 } // namespace casadi

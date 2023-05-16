@@ -1342,11 +1342,11 @@ Function Integrator::get_forward(casadi_int nfwd, const std::string& name,
   for (casadi_int i = 0; i < INTEGRATOR_NUM_IN; ++i) {
     if (size1_in(i) > 0 && grid_in(i) && nt() > 1) {
       // Split nondifferentiated input by grid point
-      std::vector<MX> ret_in_split = horzsplit(ret_in[i], ret_in[i].size2() / nt());
+      std::vector<MX> ret_in_split = horzsplit_n(ret_in[i], nt());
       // Split augmented input by grid point
       std::vector<std::vector<MX>> aug_in_split(nfwd);
       for (casadi_int d = 0; d < nfwd; ++d) {
-        aug_in_split[d] = horzsplit(aug_in[i][d], aug_in[i][d].size2() / nt());
+        aug_in_split[d] = horzsplit_n(aug_in[i][d], nt());
       }
       // Reorder columns
       v.clear();
@@ -1466,10 +1466,10 @@ Function Integrator::get_reverse(casadi_int nadj, const std::string& name,
     std::vector<std::vector<MX>> aug_in_split(nadj);
     if (size1_in(i) > 0 && grid_in(i) && n_grid > 1) {
       // Split nondifferentiated input by grid point
-      ret_in_split = horzsplit(ret_in[i], ret_in[i].size2() / nt());
+      ret_in_split = horzsplit_n(ret_in[i], nt());
       // Split augmented input by grid point
       for (casadi_int d = 0; d < nadj; ++d) {
-        aug_in_split[d] = horzsplit(aug_in[j][d], aug_in[j][d].size2() / nt());
+        aug_in_split[d] = horzsplit_n(aug_in[j][d], nt());
       }
     } else {
       // No reordering necessary
