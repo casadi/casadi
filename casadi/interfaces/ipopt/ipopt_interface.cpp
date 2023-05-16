@@ -409,7 +409,7 @@ namespace casadi {
       return "Maximum_CpuTime_Exceeded";
     case Feasible_Point_Found:
       return "Feasible_Point_Found";
-#if (IPOPT_VERSION_MAJOR > 3) || (IPOPT_VERSION_MAJOR == 3 && IPOPT_VERSION_MAJOR >= 14)
+#if (IPOPT_VERSION_MAJOR > 3) || (IPOPT_VERSION_MAJOR == 3 && IPOPT_VERSION_MINOR >= 14)
     case Maximum_WallTime_Exceeded:
       return "Maximum_WallTime_Exceeded";
 #endif
@@ -449,7 +449,7 @@ namespace casadi {
     if (status==Maximum_Iterations_Exceeded ||
         status==Maximum_CpuTime_Exceeded) m->unified_return_status = SOLVER_RET_LIMITED;
 
-#if (IPOPT_VERSION_MAJOR > 3) || (IPOPT_VERSION_MAJOR == 3 && IPOPT_VERSION_MAJOR >= 14)
+#if (IPOPT_VERSION_MAJOR > 3) || (IPOPT_VERSION_MAJOR == 3 && IPOPT_VERSION_MINOR >= 14)
     if (status==Maximum_WallTime_Exceeded) m->unified_return_status = SOLVER_RET_LIMITED;
 #endif
 
