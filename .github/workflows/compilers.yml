@@ -8,7 +8,7 @@ env:
 
 
 jobs:
-  linux-22_04:
+  linux-22_04-gcc:
     runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
@@ -21,6 +21,19 @@ jobs:
           CC=gcc-${{ matrix.compiler }} FC=gfortran-${{ matrix.compiler }} CXX=g++-${{ matrix.compiler }} cmake -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} -H.
           cmake --build build -v
 
+  linux-22_04-clang:
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler: ['12','13','14']
+    steps:
+      - uses: actions/checkout@v2.4.0
+      - name: Build
+        run: |
+          CC=clang-${{ matrix.compiler }} FC=gfortran-${{ matrix.compiler }} CXX=clang++-${{ matrix.compiler }} cmake -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} -H.
+          cmake --build build -v
+          
   linux-latest:
     runs-on: ubuntu-22.04
     steps:
