@@ -132,6 +132,8 @@ jobs:
         shell: bash -el {0}
       - run: cd test/python && python implicitfunction.py
         shell: bash -el {0}
+      - run: docker run --rm -it -v`pwd`:/local ubuntu:22.04 bash
+        if: matrix.image == 'ubuntu-20.04'
 
 
   matrix-arch-mac:
@@ -1009,7 +1011,7 @@ jobs:
 
   test-python-long:
     runs-on: ${{matrix.image == 'macos-m1' && 'self-hosted' || matrix.image }}
-    needs: [python-osx,python-dockcross]
+    needs: [python-osx,python-dockcross,version]
     strategy:
      fail-fast: false
      matrix:
@@ -1026,15 +1028,18 @@ jobs:
           key: "${{matrix.image}}"
           map: |
            {
-              "windows-2022": {"os": "windows"},
-              "ubuntu-20.04": {"os": "linux"},
-              "macos-11": {"os": "osx"},
-              "macos-m1": {"os": "osx_arm"}
+              "windows-2022": {"os": "windows","platform":"win_amd64"},
+              "ubuntu-20.04": {"os": "linux","platform":"manylinux2014_x86_64"},
+              "macos-11": {"os": "osx","platform":"macosx_10_13_x86_64.macosx_10_13_intel"},
+              "macos-m1": {"os": "osx_arm","platform":"macosx_11_0_arm64"}
            }
           export_to: env
       - uses: actions/download-artifact@v3.0.2
         with:
           name: casadi-${{env.os}}${{matrix.bit}}-py${{matrix.py2}}
+      - uses: actions/download-artifact@v3.0.2
+        with:
+          name: casadi-${{ needs.version.outputs.wheel }}-cp${{matrix.py2}}-none-${{env.platform}}.whl
       - run: ls
       - name: Unpack source
         run: unzip casadi-${{env.os}}${{matrix.bit}}-py${{matrix.py2}}.zip -d casadi
@@ -1109,3 +1114,7 @@ jobs:
           python alltests.py --run_slow
         shell: pwsh
         if: contains(matrix.image, 'windows')
+      - run: |
+          cd test/python
+          pip install casadi-${{ needs.version.outputs.wheel }}-cp${{matrix.py2}}-none-${{env.platform}}.whl
+          python function.py
