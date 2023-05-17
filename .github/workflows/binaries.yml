@@ -1035,9 +1035,6 @@ jobs:
       - uses: actions/download-artifact@v3.0.2
         with:
           name: casadi-${{env.os}}${{matrix.bit}}-py${{matrix.py2}}
-      - uses: actions/download-artifact@v3.0.2
-        with:
-          name: casadi-${{ needs.version.outputs.wheel }}-cp${{matrix.py2}}-none-${{env.platform}}.whl
       - run: ls
       - name: Unpack source
         run: unzip casadi-${{env.os}}${{matrix.bit}}-py${{matrix.py2}}.zip -d casadi
@@ -1112,6 +1109,12 @@ jobs:
           python alltests.py --run_slow
         shell: pwsh
         if: contains(matrix.image, 'windows')
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v4.4.1
+      - uses: dsaltares/fetch-gh-release-asset@1.1.0
+        with:
+          version: tags/nightly-${{ env.GITHUB_REF_SLUG }}
+          file: casadi-${{ needs.version.outputs.wheel }}-cp${{matrix.py2}}-none-${{env.platform}}.whl
       - run: |
           cd test/python
           pip install casadi-${{ needs.version.outputs.wheel }}-cp${{matrix.py2}}-none-${{env.platform}}.whl

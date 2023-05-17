@@ -431,10 +431,6 @@ class Integrationtests(casadiTestCase):
             self.checkfunction(integrator,fs,inputs=integrator_in,gradient=False,hessian=False,sens_der=False,evals=False,digits=4,digits_sens=4,failmessage=message,verbose=False)
             
 
-            
-            print(integratorA,integratorB,integratorI)
-            raise Exception()
-
             if "kinsol" not in str(opts):
               print(integrator)
               self.check_serialize(integrator,inputs=integrator_in)

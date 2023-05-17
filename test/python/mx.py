@@ -3092,7 +3092,7 @@ class MXtests(casadiTestCase):
     y = MX.sym("y",3)
 
     xy = vertcat(y[0],y[1])
-    w = MX(sparsify(DM([1,1,0])).sparsity().T,xy) @ y
+    w = mtimes(MX(sparsify(DM([1,1,0])).sparsity().T,xy),y)
     
     f = Function('f',[y],[w])
     self.checkfunction(f,f.expand(), inputs=[vertcat(1.1,1.3,1.7)])
