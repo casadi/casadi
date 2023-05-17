@@ -18,7 +18,11 @@ jobs:
       - uses: actions/checkout@v2.4.0
       - name: Build
         run: |
-          CC=gcc-${{ matrix.compiler }} FC=gfortran-${{ matrix.compiler }} CXX=g++-${{ matrix.compiler }} cmake -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} -H.
+          if [ "${{ matrix.compiler }}" = "12" ]; then
+            # see https://github.com/pytorch/pytorch/issues/77939
+            extra_build_flags="-DWITH_WERROR=OFF"
+          fi
+          CC=gcc-${{ matrix.compiler }} FC=gfortran-${{ matrix.compiler }} CXX=g++-${{ matrix.compiler }} cmake -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} $extra_build_flags -H.
           cmake --build build -v
 
   linux-22_04-clang:
