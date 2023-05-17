@@ -11,6 +11,7 @@ env:
   build_flags_mac: "-DWITH_SPRAL=OFF -DWITH_BUILD_SPRAL=OFF -DWITH_BUILD_LAPACK=OFF -DWITH_WORHP=OFF -DWITH_MOCKUP_WORHP=OFF"
   build_flags_mac_intel: "-DWITH_PROXQP=OFF -DWITH_BUILD_PROXQP=OFF -DWITH_BUILD_EIGEN3=OFF -DWITH_BUILD_SIMDE=OFF"
   build_flags_mac_m1: "-DALLOW_DOCKER=ON -DWITH_HPIPM=OFF -DWITH_BUILD_HPIPM=OFF"
+  build_flags_aarch64: "-DWITH_BONMIN=OFF DWITH_BUILD_BONMIN=OFF -DWITH_CLP=OFF -DWITH_BUILD_CLP=OFF -DWITH_CBC=OFF -DWITH_BUILD_CBC=OFF -DWITH_SPRAL=OFF -DWITH_BUILD_SPRAL=OFF -DWITH_HIGHS=OFF -DWITH_BUILD_HIGHS=OFF"
 
 jobs:
   version:
@@ -199,7 +200,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target: [manylinux1-x64,manylinux1-x86,manylinux2014-x64,manylinux2014-x86,windows-shared-x64-posix]
+        target: [manylinux1-x64,manylinux1-x86,manylinux2014-x64,manylinux2014-x86,manylinux2014-aarch64,windows-shared-x64-posix]
     steps:
       - uses: actions/checkout@v3.3.0
         with:
@@ -225,7 +226,7 @@ jobs:
       - name: Build
         run: |
           rm -f build/CMakeCache.txt
-          ./dockcross cmake -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} ${{ contains(matrix.target,'86') && env.build_flags_32bit || ''}} ${{ contains(matrix.target,'manylinux1') && env.build_flags_manylinux1 || ''}} ${{ contains(matrix.target,'windows') && env.build_flags_windows || ''}} -DCMAKE_PREFIX_PATH=/work/mockups/cmake -H.
+          ./dockcross cmake -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} ${{ contains(matrix.target,'86') && env.build_flags_32bit || ''}} ${{ contains(matrix.target,'manylinux1') && env.build_flags_manylinux1 || ''}} ${{ contains(matrix.target,'windows') && env.build_flags_windows || ''}} ${{ contains(matrix.target,'aarch64') && env.build_flags_aarch64 || ''}} -DCMAKE_PREFIX_PATH=/work/mockups/cmake -H.
 
           # In MXE land, (cross).pkg-config does not listen to PKG_CONFIG_PATH straight see https://mxe.cc/#tutorial-4
           # Needed to make CoinUtils work
@@ -256,10 +257,10 @@ jobs:
                 matrix:
                   arch: [windows-shared-x64-posix]
                   py2: ["27","35","36","37","38","39","310","311"]
-              #- type: append
-              #  matrix:
-              #    arch: [manylinux2014-aarch64]
-              #    py2: ["35","36","37","38","39"]
+              - type: append
+                matrix:
+                  arch: [manylinux2014-aarch64]
+                  py2: ["35","36","37","38","39","310","311"]
     outputs:
       matrix: ${{ steps.build-matrix.outputs.matrix }}
   
@@ -665,11 +666,12 @@ jobs:
           key: "${{matrix.arch}}"
           map: |
            {
-              "manylinux1-x64": {"os": "linux", "bitness": "64"},
-              "manylinux1-x86": {"os": "linux", "bitness": "32"},
-              "manylinux2014-x64": {"os": "linux", "bitness": "64"},
-              "manylinux2014-x86": {"os": "linux", "bitness": "32"},
-              "windows-shared-x64-posix": {"os": "windows", "bitness": "64"}
+              "manylinux1-x64": {"os": "linux", "bitness": "64", "suffix":"64"},
+              "manylinux1-x86": {"os": "linux", "bitness": "32", "suffix":"32"},
+              "manylinux2014-x64": {"os": "linux", "bitness": "64", "suffix":"64"},
+              "manylinux2014-x86": {"os": "linux", "bitness": "32", "suffix":"32"},
+              "manylinux2014-aarch64": {"os": "linux", "bitness": "64", "suffix":"-aarch64"},
+              "windows-shared-x64-posix": {"os": "windows", "bitness": "64", "suffix":"64"}
            }
           export_to: env
       - uses: jgillis/universal_grafter@master
@@ -681,17 +683,17 @@ jobs:
           bitness: ${{env.bitness}}
       - run: |
              cd install
-             echo "This file (and the casadi directory) should end up in a folder called 'casadi-${{env.os}}${{env.bitness}}-py${{matrix.py2}}'" > dummy.txt
-             zip -rq ../casadi-${{env.os}}${{env.bitness}}-py${{matrix.py2}}.zip .
+             echo "This file (and the casadi directory) should end up in a folder called 'casadi-${{env.os}}${{env.suffix}}-py${{matrix.py2}}'" > dummy.txt
+             zip -rq ../casadi-${{env.os}}${{env.suffix}}-py${{matrix.py2}}.zip .
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.4.1
-      - run: cp casadi-${{env.os}}${{env.bitness}}-py${{matrix.py2}}.zip casadi-${{ needs.version.outputs.casadi }}-${{env.os}}${{env.bitness}}-py${{matrix.py2}}.zip
+      - run: cp casadi-${{env.os}}${{env.bitness}}-py${{matrix.py2}}.zip casadi-${{ needs.version.outputs.casadi }}-${{env.os}}${{env.suffix}}-py${{matrix.py2}}.zip
       - name: Delete old release assets
         uses: mknejp/delete-release-assets@v1
         with:
           token: ${{ github.token }}
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
-          assets: casadi-*-${{env.os}}${{env.bitness}}-py${{matrix.py2}}.zip
+          assets: casadi-*-${{env.os}}${{env.suffix}}-py${{matrix.py2}}.zip
           fail-if-no-release: false
           fail-if-no-assets: false
         if: github.event_name != 'pull_request'
@@ -700,13 +702,13 @@ jobs:
         with:
           overwrite: true
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
-          file: casadi-${{ needs.version.outputs.casadi }}-${{env.os}}${{env.bitness}}-py${{matrix.py2}}.zip
+          file: casadi-${{ needs.version.outputs.casadi }}-${{env.os}}${{env.suffix}}-py${{matrix.py2}}.zip
           prerelease: true
         if: github.event_name != 'pull_request'
       - uses: actions/upload-artifact@v3.1.2
         with:
-          name: casadi-${{env.os}}${{env.bitness}}-py${{matrix.py2}}
-          path: casadi-${{env.os}}${{env.bitness}}-py${{matrix.py2}}.zip
+          name: casadi-${{env.os}}${{env.suffix}}-py${{matrix.py2}}
+          path: casadi-${{env.os}}${{env.suffix}}-py${{matrix.py2}}.zip
           retention-days: 5
       
       - run: |

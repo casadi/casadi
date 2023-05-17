@@ -1,5 +1,8 @@
 include_directories(../../)
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${EXTRA_CASADI_CXX_FLAGS}")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${EXTRA_CASADI_C_FLAGS}")
+
 # Add IPOPT link directories
 if(WITH_IPOPT)
   link_directories(${IPOPT_LIBRARY_DIRS})
