@@ -260,7 +260,7 @@ jobs:
               - type: append
                 matrix:
                   arch: [manylinux2014-aarch64]
-                  py2: ["35","36","37","38","39","310","311"]
+                  py2: ["36","37","38","39","310","311"]
     outputs:
       matrix: ${{ steps.build-matrix.outputs.matrix }}
   
