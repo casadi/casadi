@@ -132,8 +132,6 @@ jobs:
         shell: bash -el {0}
       - run: cd test/python && python implicitfunction.py
         shell: bash -el {0}
-      - run: docker run --rm -it -v`pwd`:/local ubuntu:22.04 bash
-        if: matrix.image == 'ubuntu-20.04'
 
 
   matrix-arch-mac:
