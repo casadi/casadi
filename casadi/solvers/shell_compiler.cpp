@@ -144,12 +144,12 @@ namespace casadi {
     std::vector<std::string> linker_flags;
     std::string suffix = OBJECT_FILE_SUFFIX;
 
-    string compiler = GlobalOptions::default_compiler;
-    string linker = GlobalOptions::default_linker;
-    string compiler_setup = GlobalOptions::default_compiler_setup;
-    string linker_setup = GlobalOptions::default_linker_setup;
-    string compiler_output_flag = GlobalOptions::default_compiler_output_flag;
-    string linker_output_flag = GlobalOptions::default_linker_output_flag;
+    std::string compiler = GlobalOptions::default_compiler;
+    std::string linker = GlobalOptions::default_linker;
+    std::string compiler_setup = GlobalOptions::default_compiler_setup;
+    std::string linker_setup = GlobalOptions::default_linker_setup;
+    std::string compiler_output_flag = GlobalOptions::default_compiler_output_flag;
+    std::string linker_output_flag = GlobalOptions::default_linker_output_flag;
     extra_suffixes_ = GlobalOptions::default_compiler_extra_suffixes;
   
     // Read options
