@@ -39,7 +39,7 @@
 #define CASADI_MODULES "${CASADI_MODULES}"  // NOLINT(whitespace/line_length)
 #define CASADI_PLUGINS "${CASADI_PLUGINS}"  // NOLINT(whitespace/line_length)
 #define CASADI_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}"  // NOLINT(whitespace/line_length)
-#define CASADI_SHARED_LIBRARY_PREFIX "${CMAKE_SHARED_LIBRARY_PREFIX}"  // NOLINT(whitespace/line_length)
+#define CASADI_SHARED_LIBRARY_PREFIX "${CMAKE_SHARED_LIBRARY_PREFIX}${CASADI_LIBRARY_PREFIX}"  // NOLINT(whitespace/line_length)
 #define CASADI_SHARED_LIBRARY_SUFFIX "${CMAKE_SHARED_LIBRARY_SUFFIX}"  // NOLINT(whitespace/line_length)
 #define CASADI_OBJECT_FILE_SUFFIX "${CMAKE_C_OUTPUT_EXTENSION}"  // NOLINT(whitespace/line_length)
 
