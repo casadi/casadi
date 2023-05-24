@@ -157,7 +157,6 @@ auto PANOCSolver<DirectionProviderT>::operator()(
     auto do_progress_cb = [this, &s, &problem, &Σ, &y, &opts](
                               unsigned k, Iterate &it, crvec q, crvec grad_ψx̂,
                               real_t τ, real_t εₖ, SolverStatus status) {
-        using enum SolverStatus;
         if (!progress_cb)
             return;
         ScopedMallocAllower ma;

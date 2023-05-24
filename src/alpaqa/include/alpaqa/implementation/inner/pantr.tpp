@@ -159,7 +159,6 @@ auto PANTRSolver<DirectionProviderT>::operator()(
                            &opts](unsigned k, Iterate &it, crvec q,
                                   crvec grad_ψx̂, real_t Δ, real_t ρ, real_t εₖ,
                                   SolverStatus status) {
-        using enum SolverStatus;
         if (!progress_cb)
             return;
         ScopedMallocAllower ma;

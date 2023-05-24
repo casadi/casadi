@@ -438,7 +438,6 @@ auto PANOCOCPSolver<Conf>::operator()(
                            &opts](unsigned k, Iterate &curr, crvec q, real_t τ,
                                   real_t εₖ, bool did_gn, index_t nJ,
                                   SolverStatus status) {
-        using enum SolverStatus;
         if (!progress_cb)
             return;
         ScopedMallocAllower ma;
@@ -460,7 +459,7 @@ auto PANOCOCPSolver<Conf>::operator()(
             .lqr_min_rcond = lqr.min_rcond,
             .L             = curr.L,
             .γ             = curr.γ,
-            .τ             = status == Busy ? τ : NaN<config_t>,
+            .τ             = status == SolverStatus::Busy ? τ : NaN<config_t>,
             .ε             = εₖ,
             .outer_iter    = opts.outer_iter,
             .problem       = &problem,
