@@ -113,6 +113,31 @@ class MinimizationProblemDescription:
     def compile(self, **kwargs) -> CasADiProblem:
         """
         Generate, compile and load the problem.
+
+        :param \**kwargs:
+            Arguments passed to :py:func:`alpaqa.casadi_loader.generate_and_compile_casadi_problem`.
+
+        :Keyword Arguments:
+            * **second_order**: ``str`` --
+              Whether to generate functions for evaluating second-order
+              derivatives:
+
+              * ``'no'``: only first-order derivatives (default).
+              * ``'full'``: Hessians and Hessian-vector products of the
+                Lagrangian and the augmented Lagrangian.
+              * ``'prod'``: Hessian-vector products of the
+                Lagrangian and the augmented Lagrangian.
+              * ``'L'``: Hessian of the Lagrangian.
+              * ``'L_prod'``: Hessian-vector product of the Lagrangian.
+              * ``'psi'``: Hessian of the augmented Lagrangian.
+              * ``'psi_prod'``: Hessian-vector product of the augmented
+                Lagrangian.
+            * **name**: ``str`` --
+              Optional string description of the problem (used for filenames).
+            * **sym**: ``Callable`` --
+              Symbolic variable constructor, usually either ``cs.SX.sym``
+              (default) or ``cs.MX.sym``.
+
         """
         # Function arguments (variables and parameters)
         x, param = self.variable, self.parameter

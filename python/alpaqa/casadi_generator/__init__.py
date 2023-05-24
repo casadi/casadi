@@ -3,7 +3,7 @@ import numpy as np
 from os.path import splitext
 from typing import Tuple, Optional, Literal, get_args, Callable
 
-SECOND_ORDER_SPEC = Literal['no', 'full', 'prod', 'L', 'psi_prod', 'psi']
+SECOND_ORDER_SPEC = Literal['no', 'full', 'prod', 'L', 'L_prod', 'psi', 'psi_prod']
 
 def generate_casadi_problem(
     f: cs.Function,
@@ -19,7 +19,8 @@ def generate_casadi_problem(
     :param g:            Constraint function.
     :param second_order: Whether to generate functions for evaluating Hessians.
     :param name: Optional string description of the problem (used for filename).
-
+    :param sym: Symbolic variable constructor, usually either ``casadi.SX.sym``
+        (default) or ``casadi.MX.sym``.
     :return: Code generator that generates the functions and derivatives used
              by the solvers.
     """
@@ -156,7 +157,7 @@ def generate_casadi_problem(
                 [*xp_names, "y", "s"],
                 ["hess_L"],
             ))
-    if second_order in ['full', 'prod', 'L']:
+    if second_order in ['full', 'prod', 'L_prod']:
         cg.add(
             cs.Function(
                 "hess_L_prod",
@@ -178,7 +179,7 @@ def generate_casadi_problem(
                 ["hess_psi"],
             )
         )
-    if second_order in ['full', 'prod', 'psi_prod', 'psi_prod']:
+    if second_order in ['full', 'prod', 'psi_prod']:
         cg.add(
             cs.Function(
                 "hess_psi_prod",
