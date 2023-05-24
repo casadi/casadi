@@ -424,8 +424,8 @@ auto PANOCOCPSolver<Conf>::operator()(
             << ", cond = " << print_real3(real_t(1) / min_rcond)          //
             << ",    τ = " << color << print_real3(τₖ) << "\033[0m"       //
             << ",    " << (did_gn ? "GN" : "L-BFGS")                      //
-            << ",    dir update "
-            << (reject ? "\033[0;35mrejected\033[0m"
+            << ",      dir update "
+            << (reject ? "\033[0;31mrejected\033[0m"
                        : "\033[0;32maccepted\033[0m") //
             << std::endl; // Flush for Python buffering
     };

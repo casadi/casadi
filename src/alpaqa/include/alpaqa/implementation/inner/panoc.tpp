@@ -144,8 +144,8 @@ auto PANOCSolver<DirectionProviderT>::operator()(
                                      : "\033[0;35m";
         *os << "│  ‖q‖ = " << print_real(qₖ.norm())                 //
             << ",    τ = " << color << print_real3(τₖ) << "\033[0m" //
-            << ",    dir update "
-            << (reject ? "\033[0;35mrejected\033[0m"
+            << ",      dir update "
+            << (reject ? "\033[0;31mrejected\033[0m"
                        : "\033[0;32maccepted\033[0m") //
             << std::endl; // Flush for Python buffering
     };
