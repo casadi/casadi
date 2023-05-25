@@ -10,7 +10,7 @@ $env:CMAKE_PREFIX_PATH = $env:VIRTUAL_ENV + ";" + $env:CMAKE_PREFIX_PATH
 pushd $env:Temp
 
 if ( -not ( Test-Path casadi) ) {
-    git clone --branch "3.5.5" --depth 1 --recursive `
+    git clone --branch "3.6.3" --depth 1 --recursive `
         https://github.com/casadi/casadi
 }
 pushd casadi

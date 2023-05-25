@@ -12,7 +12,7 @@ pushd /tmp
 # Casadi
 [ -d casadi ] || \
     git clone https://github.com/casadi/casadi \
-        --branch "3.5.5" --depth 1 --recursive
+        --branch "3.6.3" --depth 1 --recursive
 pushd casadi
 cmake -S. -Bbuild \
     -G "Ninja Multi-Config" \
