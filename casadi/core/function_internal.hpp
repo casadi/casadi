@@ -134,10 +134,19 @@ namespace casadi {
         \identifier{jj} */
     bool has_option(const std::string &option_name) const;
 
-    /** \brief Change option after object creation for debugging
+    /** \brief Change option after object creation
 
         \identifier{jk} */
     virtual void change_option(const std::string& option_name, const GenericType& option_value);
+
+    /** \brief Change options after object creation 
+
+        Internally changes the options of this function.
+
+        \identifier{jk} */
+    virtual void change_option(void* mem,
+                               const std::string& option_name,
+                               const GenericType& option_value);
 
     /** \brief Initialize
 
@@ -305,8 +314,9 @@ namespace casadi {
     /** \brief Change option after object creation for debugging
 
         \identifier{k5} */
-    void change_option(const std::string& option_name, const GenericType& option_value) override;
-
+    virtual void change_option(const std::string& option_name, const GenericType& option_value) override;
+    virtual void change_option(void* mem, const std::string& option_name,
+                       const GenericType& option_value) override;
     /** \brief Initialize
 
         \identifier{k6} */

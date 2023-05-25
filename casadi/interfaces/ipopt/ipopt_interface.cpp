@@ -483,6 +483,56 @@ namespace casadi {
     return 0;
   }
 
+  void IpoptInterface::
+  change_option(void* mem, const std::string& option_name, const GenericType& option_value) {
+    std::string option_name_ = option_name;
+    if (startswith(option_name_, "ipopt.")) {
+      option_name_ = option_name.substr(6);
+    } else {
+      return Nlpsol::change_option(mem, option_name, option_value);
+    }
+
+    auto m = static_cast<IpoptMemory*>(mem);
+	  Ipopt::SmartPtr<Ipopt::IpoptApplication> *app = static_cast<Ipopt::SmartPtr<Ipopt::IpoptApplication>*>(m->app);
+
+    auto regops = (*app)->RegOptions()->RegisteredOptionsList();
+
+    // There might be options with a resto prefix.
+    if (startswith(option_name_, "resto.")) {
+      option_name_ = option_name_.substr(6);
+    }
+
+    // Find the option
+    auto regops_it = regops.find(option_name_);
+    if (regops_it==regops.end()) {
+      casadi_error("No such IPOPT option: " + option_name_);
+    }
+
+    // Get the type
+    Ipopt::RegisteredOptionType ipopt_type = regops_it->second->Type();
+
+    // Pass to IPOPT
+    bool ret = true;
+    switch (ipopt_type) {
+      case Ipopt::OT_Number:
+        ret = (*app)->Options()->SetNumericValue(option_name_, option_value.to_double(), false);
+        break;
+      case Ipopt::OT_Integer:
+        ret = (*app)->Options()->SetIntegerValue(option_name_, option_value.to_int(), false);
+        break;
+      case Ipopt::OT_String:
+        ret = (*app)->Options()->SetStringValue(option_name_, option_value.to_string(), false);
+        break;
+      case Ipopt::OT_Unknown:
+      default:
+        casadi_error("Cannot handle option \"" + option_name + "\", ignored");
+    }
+
+    if (ret) {
+       casadi_error("Cannot handle option \"" + option_name + "\", ignored");
+    }
+  }
+
   bool IpoptInterface::
   intermediate_callback(IpoptMemory* m, const double* x, const double* z_L, const double* z_U,
                         const double* g, const double* lambda, double obj_value, int iter,

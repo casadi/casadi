@@ -247,6 +247,10 @@ namespace casadi {
                          const Dict& opts) const override;
     ///@}
 
+    // Change option after object creation
+    void change_option(void* mem, const std::string& option_name,
+                       const GenericType& option_value) override;
+
     // Call the callback function
     int callback(NlpsolMemory* m) const;
 

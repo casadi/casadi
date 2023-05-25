@@ -230,6 +230,9 @@ namespace casadi {
     /// Get all statistics
     Dict get_stats(void* mem) const override;
 
+    virtual void change_option(void* mem, const std::string& option_name,
+                               const GenericType& option_value) override;
+
     /** \brief Serialize an object without type information
 
         \identifier{r} */

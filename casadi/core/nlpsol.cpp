@@ -1183,6 +1183,12 @@ namespace casadi {
     return Function(name, arg, res, inames, onames, options);
   }
 
+  void Nlpsol::change_option(void* mem,
+                             const std::string& option_name,
+                             const GenericType& option_value) {
+    OracleFunction::change_option(mem, option_name, option_value);
+  }
+
   int Nlpsol::callback(NlpsolMemory* m) const {
     // Quick return if no callback function
     if (fcallback_.is_null()) return 0;

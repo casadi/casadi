@@ -431,6 +431,12 @@ Dict OracleFunction::get_stats(void *mem) const {
   return stats;
 }
 
+void OracleFunction::change_option(void* mem,
+                                   const std::string& option_name,
+                                   const GenericType& option_value) {
+  FunctionInternal::change_option(option_name, option_value);
+}
+
 int OracleFunction::local_init_mem(void* mem) const {
   if (ProtoFunction::init_mem(mem)) return 1;
   if (!mem) return 1;
