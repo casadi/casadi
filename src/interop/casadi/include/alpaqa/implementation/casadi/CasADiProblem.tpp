@@ -192,10 +192,10 @@ void CasADiProblem<Conf>::load_numerical_data(
 }
 
 template <Config Conf>
-CasADiProblem<Conf>::CasADiProblem(const CasADiProblem &o) = default;
+CasADiProblem<Conf>::CasADiProblem(const CasADiProblem &) = default;
 template <Config Conf>
 CasADiProblem<Conf> &
-CasADiProblem<Conf>::operator=(const CasADiProblem &o) = default;
+CasADiProblem<Conf>::operator=(const CasADiProblem &) = default;
 template <Config Conf>
 CasADiProblem<Conf>::CasADiProblem(CasADiProblem &&) noexcept = default;
 template <Config Conf>
