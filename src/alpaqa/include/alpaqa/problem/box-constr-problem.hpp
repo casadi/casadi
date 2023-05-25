@@ -5,6 +5,9 @@
 
 namespace alpaqa {
 
+/// Implements common problem functions for minimization problems with box
+/// constraints. Meant to be used as a base class for custom problem
+/// implementations.
 /// @ingroup grp_Problems
 template <Config Conf>
 class BoxConstrProblem {

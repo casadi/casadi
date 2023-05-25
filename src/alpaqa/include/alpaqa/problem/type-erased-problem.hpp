@@ -15,6 +15,10 @@
 
 namespace alpaqa {
 
+/// Struct containing function pointers to all problem functions (like the
+/// objective and constraint functions, with their derivatives, and more).
+/// Some default implementations are available.
+/// Internal struct, it is used by @ref TypeErasedProblem.
 template <Config Conf>
 struct ProblemVTable : util::BasicVTable {
     USING_ALPAQA_CONFIG(Conf);
@@ -204,6 +208,18 @@ ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, ProblemVTable, EigenConfigq);
 /// @addtogroup grp_Problems
 /// @{
 
+/// The main polymorphic minimization problem interface.
+///
+/// This class wraps the actual problem implementation class, filling in the
+/// missing member functions with sensible defaults, and providing a uniform
+/// interface that is used by the solvers.
+///
+/// The problem implementations do not inherit from an abstract base class.
+/// Instead, [structural typing](https://en.wikipedia.org/wiki/Structural_type_system)
+/// is used. The @ref ProblemVTable constructor uses reflection to discover
+/// which member functions are provided by the problem implementation. See
+/// @ref page_problem_formulations for more information, and
+/// @ref C++/CustomCppProblem/main.cpp for an example.
 template <Config Conf = DefaultConfig, class Allocator = std::allocator<std::byte>>
 class TypeErasedProblem : public util::TypeErased<ProblemVTable<Conf>, Allocator> {
   public:

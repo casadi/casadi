@@ -18,6 +18,9 @@ Most alpaqa solvers deal with problems in the following form:
 \end{equation}
 @f]
 
+@f$ f @f$ is called the cost or objective function, and @f$ g @f$ is the
+constraints function.
+
 The solver needs to be able to evaluate the following required functions and
 derivatives:
   - @ref alpaqa::TypeErasedProblem::eval_f "eval_f"                     @f$ : \Rn \to \R : x \mapsto f(x) @f$
