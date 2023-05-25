@@ -18,6 +18,8 @@
 
 #include <fstream>
 
+#include "from_chars-compat.ipp"
+
 namespace alpaqa::params {
 
 template <>
@@ -52,12 +54,7 @@ template <class T>
 void set_param(T &f, ParamString s) {
     assert_key_empty<T>(s);
     const auto *val_end = s.value.data() + s.value.size();
-    auto [ptr, ec]      = std::from_chars(s.value.data(), val_end, f);
-    if (ec != std::errc())
-        throw std::invalid_argument(
-            "Invalid value '" + std::string(s.value) + "' for type '" +
-            demangled_typename(typeid(T)) + "' in '" + std::string(s.full_key) +
-            "': " + std::make_error_code(ec).message());
+    const auto *ptr     = set_param_float_int(f, s);
     if (ptr != val_end)
         throw std::invalid_argument("Invalid suffix '" +
                                     std::string(ptr, val_end) + "' for type '" +
@@ -116,6 +113,7 @@ void set_param(std::chrono::duration<Rep, Period> &t, ParamString s) {
     assert_key_empty<Duration>(s);
     const auto *val_end = s.value.data() + s.value.size();
     double value;
+#if ALPAQA_USE_FROM_CHARS_FLOAT
     auto [ptr, ec] = std::from_chars(s.value.data(), val_end, value);
     if (ec != std::errc())
         throw std::invalid_argument("Invalid value '" +
@@ -123,6 +121,19 @@ void set_param(std::chrono::duration<Rep, Period> &t, ParamString s) {
                                     demangled_typename(typeid(Duration)) +
                                     "' in '" + std::string(s.full_key) +
                                     "': " + std::make_error_code(ec).message());
+#else
+#pragma message "Using std::stod as a fallback to replace std::from_chars"
+    size_t end_index;
+    try {
+        value = std::stod(std::string(s.value), &end_index);
+    } catch (std::exception &e) {
+        throw std::invalid_argument(
+            "Invalid value '" + std::string(s.value) + "' for type '" +
+            demangled_typename(typeid(Duration)) + "' in '" +
+            std::string(s.full_key) + "': " + e.what());
+    }
+    const char *ptr = s.value.data() + end_index;
+#endif
     std::string_view units{ptr, val_end};
     auto cast = [](auto t) { return std::chrono::duration_cast<Duration>(t); };
     if (units == "s" || units.empty())
@@ -143,11 +154,10 @@ void set_param(std::chrono::duration<Rep, Period> &t, ParamString s) {
 
 template <>
 void ALPAQA_EXPORT set_param(LBFGSStepSize &t, ParamString s) {
-    using enum LBFGSStepSize;
     if (s.value == "BasedOnExternalStepSize")
-        t = BasedOnExternalStepSize;
+        t = LBFGSStepSize::BasedOnExternalStepSize;
     else if (s.value == "BasedOnCurvature")
-        t = BasedOnCurvature;
+        t = LBFGSStepSize::BasedOnCurvature;
     else
         throw std::invalid_argument("Invalid value '" + std::string(s.value) +
                                     "' for type 'LBFGSStepSize' in '" +
@@ -156,27 +166,26 @@ void ALPAQA_EXPORT set_param(LBFGSStepSize &t, ParamString s) {
 
 template <>
 void ALPAQA_EXPORT set_param(PANOCStopCrit &t, ParamString s) {
-    using enum PANOCStopCrit;
     if (s.value == "ApproxKKT")
-        t = ApproxKKT;
+        t = PANOCStopCrit::ApproxKKT;
     else if (s.value == "ApproxKKT2")
-        t = ApproxKKT2;
+        t = PANOCStopCrit::ApproxKKT2;
     else if (s.value == "ProjGradNorm")
-        t = ProjGradNorm;
+        t = PANOCStopCrit::ProjGradNorm;
     else if (s.value == "ProjGradNorm2")
-        t = ProjGradNorm2;
+        t = PANOCStopCrit::ProjGradNorm2;
     else if (s.value == "ProjGradUnitNorm")
-        t = ProjGradUnitNorm;
+        t = PANOCStopCrit::ProjGradUnitNorm;
     else if (s.value == "ProjGradUnitNorm2")
-        t = ProjGradUnitNorm2;
+        t = PANOCStopCrit::ProjGradUnitNorm2;
     else if (s.value == "FPRNorm")
-        t = FPRNorm;
+        t = PANOCStopCrit::FPRNorm;
     else if (s.value == "FPRNorm2")
-        t = FPRNorm2;
+        t = PANOCStopCrit::FPRNorm2;
     else if (s.value == "Ipopt")
-        t = Ipopt;
+        t = PANOCStopCrit::Ipopt;
     else if (s.value == "LBFGSBpp")
-        t = LBFGSBpp;
+        t = PANOCStopCrit::LBFGSBpp;
     else
         throw std::invalid_argument("Invalid value '" + std::string(s.value) +
                                     "' for type 'PANOCStopCrit' in '" +
