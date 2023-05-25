@@ -1,4 +1,4 @@
-#if !defined(__clang_major__) || __clang_major__ > 15 || defined(__clangd__)
+#if ALPAQA_WITH_OCP
 
 #include <test-util/eigen-matchers.hpp>
 
