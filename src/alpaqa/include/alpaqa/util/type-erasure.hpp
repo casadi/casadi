@@ -18,11 +18,6 @@
 
 namespace alpaqa::util {
 
-template <class T>
-struct VTableTypeTag {
-    T *t = nullptr;
-};
-
 class ALPAQA_EXPORT bad_type_erased_type : public std::logic_error {
   public:
     bad_type_erased_type(const std::type_info &actual_type,
@@ -108,7 +103,7 @@ struct BasicVTable {
     BasicVTable() = default;
 
     template <class T>
-    BasicVTable(VTableTypeTag<T>) noexcept {
+    BasicVTable(std::in_place_t, T &) noexcept {
         copy = [](const void *self, void *storage) {
             new (storage) T(*std::launder(reinterpret_cast<const T *>(self)));
         };
@@ -507,7 +502,7 @@ class TypeErased {
         // Construct the stored object
         using destroyer = std::unique_ptr<T, noop_delete<T>>;
         destroyer object_guard{new (self) T{std::forward<Args>(args)...}};
-        vtable = VTable{VTableTypeTag<T>{object_guard.get()}};
+        vtable = VTable{std::in_place, static_cast<T &>(*object_guard.get())};
         object_guard.release();
         storage_guard.release();
     }

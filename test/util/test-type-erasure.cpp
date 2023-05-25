@@ -53,7 +53,7 @@ struct CustomVTable : alpaqa::util::BasicVTable {
     void (*set_msg)(void *, const char *) = nullptr;
     CustomVTable()                        = default;
     template <class T>
-    CustomVTable(alpaqa::util::VTableTypeTag<T> t) : BasicVTable{t} {
+    CustomVTable(std::in_place_t, T &t) : BasicVTable{std::in_place, t} {
         get_msg = [](const void *self) {
             return std::launder(reinterpret_cast<const T *>(self))->get_msg();
         };

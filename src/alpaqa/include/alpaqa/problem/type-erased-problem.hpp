@@ -150,9 +150,8 @@ struct ProblemVTable : util::BasicVTable {
     length_t n, m;
 
     template <class P>
-    ProblemVTable(util::VTableTypeTag<P> t) : util::BasicVTable{t} {
+    ProblemVTable(std::in_place_t, P &p) : util::BasicVTable{std::in_place, p} {
         auto &vtable = *this;
-        assert(t.t);
 
         // Initialize all methods
 
@@ -164,35 +163,35 @@ struct ProblemVTable : util::BasicVTable {
         ALPAQA_TE_REQUIRED_METHOD(vtable, P, eval_grad_f);
         ALPAQA_TE_REQUIRED_METHOD(vtable, P, eval_g);
         ALPAQA_TE_REQUIRED_METHOD(vtable, P, eval_grad_g_prod);
-        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_inactive_indices_res_lna, t.t);
+        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_inactive_indices_res_lna, p);
         // Second order
-        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_jac_g, t.t);
-        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, get_jac_g_num_nonzeros, t.t);
-        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_grad_gi, t.t);
-        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_hess_L_prod, t.t);
-        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_hess_L, t.t);
-        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, get_hess_L_num_nonzeros, t.t);
-        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_hess_ψ_prod, t.t);
-        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_hess_ψ, t.t);
-        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, get_hess_ψ_num_nonzeros, t.t);
+        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_jac_g, p);
+        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, get_jac_g_num_nonzeros, p);
+        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_grad_gi, p);
+        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_hess_L_prod, p);
+        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_hess_L, p);
+        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, get_hess_L_num_nonzeros, p);
+        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_hess_ψ_prod, p);
+        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_hess_ψ, p);
+        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, get_hess_ψ_num_nonzeros, p);
         // Combined evaluations
-        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_f_grad_f, t.t);
-        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_f_g, t.t);
-        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_grad_f_grad_g_prod, t.t);
+        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_f_grad_f, p);
+        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_f_g, p);
+        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_grad_f_grad_g_prod, p);
         // Lagrangian and augmented lagrangian evaluations
-        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_grad_L, t.t);
-        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_ψ, t.t);
-        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_grad_ψ, t.t);
-        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_ψ_grad_ψ, t.t);
+        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_grad_L, p);
+        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_ψ, p);
+        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_grad_ψ, p);
+        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, eval_ψ_grad_ψ, p);
         // Constraint set
-        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, get_box_C, t.t);
-        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, get_box_D, t.t);
+        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, get_box_C, p);
+        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, get_box_D, p);
         // Check
-        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, check, t.t);
+        ALPAQA_TE_OPTIONAL_METHOD(vtable, P, check, p);
 
         // Dimensions
-        vtable.n = t.t->get_n();
-        vtable.m = t.t->get_m();
+        vtable.n = p.get_n();
+        vtable.m = p.get_m();
     }
     ProblemVTable() = default;
 };

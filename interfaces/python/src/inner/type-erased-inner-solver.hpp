@@ -28,7 +28,7 @@ struct InnerSolverVTable : util::BasicVTable {
     // clang-format on
 
     template <class T>
-    InnerSolverVTable(util::VTableTypeTag<T> t) : util::BasicVTable{t} {
+    InnerSolverVTable(std::in_place_t, T &t) : util::BasicVTable{std::in_place, t} {
         stop     = util::type_erased_wrapped<T, &T::stop>();
         get_name = util::type_erased_wrapped<T, &T::get_name>();
         call     = []<class... Args>(void *self_, const Problem &p, Args... args) {

@@ -10,7 +10,7 @@
             "Missing required method '" #type "::" #member "'");               \
         (vtable).member = util::type_erased_wrapped<type, &type::member>();    \
     } while (0)
-#define ALPAQA_TE_OPTIONAL_METHOD(vtable, type, member, instance_p)            \
+#define ALPAQA_TE_OPTIONAL_METHOD(vtable, type, member, instance)              \
     do {                                                                       \
         if constexpr (requires { &type::member; }) {                           \
             using vtable_t     = std::remove_cvref_t<decltype(vtable)>;        \
@@ -20,7 +20,7 @@
                                               const vtable_t &>();             \
             };                                                                 \
             if constexpr (requires { &type::provides_##member; }) {            \
-                if (std::invoke(&type::provides_##member, instance_p))         \
+                if (std::invoke(&type::provides_##member, instance))           \
                     assign_vtable();                                           \
             } else {                                                           \
                 assign_vtable();                                               \

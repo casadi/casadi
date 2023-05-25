@@ -32,7 +32,7 @@ float_to_str_vw(auto &buf, F value,
     return std::string_view{buf.data(), end};
 }
 #else
-#pragma message "Using snprintf as a fallback to replace std::to_chars"
+#pragma message "Using std::snprintf as a fallback to replace std::to_chars"
 
 inline std::string_view
 float_to_str_vw(auto &buf, double value,

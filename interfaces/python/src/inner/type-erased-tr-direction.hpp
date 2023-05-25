@@ -42,7 +42,7 @@ struct TRDirectionVTable : util::BasicVTable {
     // clang-format on
 
     template <class T>
-    TRDirectionVTable(util::VTableTypeTag<T> t) : util::BasicVTable{t} {
+    TRDirectionVTable(std::in_place_t, T &t) : util::BasicVTable{std::in_place, t} {
         initialize            = util::type_erased_wrapped<T, &T::initialize>();
         update                = util::type_erased_wrapped<T, &T::update>();
         has_initial_direction = util::type_erased_wrapped<T, &T::has_initial_direction>();

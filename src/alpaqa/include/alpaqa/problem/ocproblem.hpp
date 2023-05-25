@@ -106,44 +106,44 @@ struct ControlProblemVTable : util::BasicVTable {
     length_t N, nu, nx, nh, nh_N, nc, nc_N;
 
     template <class P>
-    ControlProblemVTable(util::VTableTypeTag<P> t) : util::BasicVTable{t} {
+    ControlProblemVTable(std::in_place_t, P &p) : util::BasicVTable{std::in_place, p} {
         ALPAQA_TE_REQUIRED_METHOD(*this, P, eval_proj_diff_g);
         ALPAQA_TE_REQUIRED_METHOD(*this, P, eval_proj_multipliers);
         ALPAQA_TE_REQUIRED_METHOD(*this, P, get_U);
-        ALPAQA_TE_OPTIONAL_METHOD(*this, P, get_D, t.t);
-        ALPAQA_TE_OPTIONAL_METHOD(*this, P, get_D_N, t.t);
+        ALPAQA_TE_OPTIONAL_METHOD(*this, P, get_D, p);
+        ALPAQA_TE_OPTIONAL_METHOD(*this, P, get_D_N, p);
         ALPAQA_TE_REQUIRED_METHOD(*this, P, get_x_init);
         ALPAQA_TE_REQUIRED_METHOD(*this, P, eval_f);
         ALPAQA_TE_REQUIRED_METHOD(*this, P, eval_jac_f);
         ALPAQA_TE_REQUIRED_METHOD(*this, P, eval_grad_f_prod);
-        ALPAQA_TE_OPTIONAL_METHOD(*this, P, eval_h, t.t);
-        ALPAQA_TE_OPTIONAL_METHOD(*this, P, eval_h_N, t.t);
+        ALPAQA_TE_OPTIONAL_METHOD(*this, P, eval_h, p);
+        ALPAQA_TE_OPTIONAL_METHOD(*this, P, eval_h_N, p);
         ALPAQA_TE_REQUIRED_METHOD(*this, P, eval_l);
         ALPAQA_TE_REQUIRED_METHOD(*this, P, eval_l_N);
         ALPAQA_TE_REQUIRED_METHOD(*this, P, eval_qr);
         ALPAQA_TE_REQUIRED_METHOD(*this, P, eval_q_N);
         ALPAQA_TE_REQUIRED_METHOD(*this, P, eval_add_Q);
-        ALPAQA_TE_OPTIONAL_METHOD(*this, P, eval_add_Q_N, t.t);
+        ALPAQA_TE_OPTIONAL_METHOD(*this, P, eval_add_Q_N, p);
         ALPAQA_TE_REQUIRED_METHOD(*this, P, eval_add_R_masked);
         ALPAQA_TE_REQUIRED_METHOD(*this, P, eval_add_S_masked);
-        ALPAQA_TE_OPTIONAL_METHOD(*this, P, eval_add_R_prod_masked, t.t);
-        ALPAQA_TE_OPTIONAL_METHOD(*this, P, eval_add_S_prod_masked, t.t);
-        ALPAQA_TE_OPTIONAL_METHOD(*this, P, get_R_work_size, t.t);
-        ALPAQA_TE_OPTIONAL_METHOD(*this, P, get_S_work_size, t.t);
-        ALPAQA_TE_OPTIONAL_METHOD(*this, P, eval_constr, t.t);
-        ALPAQA_TE_OPTIONAL_METHOD(*this, P, eval_constr_N, t.t);
-        ALPAQA_TE_OPTIONAL_METHOD(*this, P, eval_grad_constr_prod, t.t);
-        ALPAQA_TE_OPTIONAL_METHOD(*this, P, eval_grad_constr_prod_N, t.t);
-        ALPAQA_TE_OPTIONAL_METHOD(*this, P, eval_add_gn_hess_constr, t.t);
-        ALPAQA_TE_OPTIONAL_METHOD(*this, P, eval_add_gn_hess_constr_N, t.t);
+        ALPAQA_TE_OPTIONAL_METHOD(*this, P, eval_add_R_prod_masked, p);
+        ALPAQA_TE_OPTIONAL_METHOD(*this, P, eval_add_S_prod_masked, p);
+        ALPAQA_TE_OPTIONAL_METHOD(*this, P, get_R_work_size, p);
+        ALPAQA_TE_OPTIONAL_METHOD(*this, P, get_S_work_size, p);
+        ALPAQA_TE_OPTIONAL_METHOD(*this, P, eval_constr, p);
+        ALPAQA_TE_OPTIONAL_METHOD(*this, P, eval_constr_N, p);
+        ALPAQA_TE_OPTIONAL_METHOD(*this, P, eval_grad_constr_prod, p);
+        ALPAQA_TE_OPTIONAL_METHOD(*this, P, eval_grad_constr_prod_N, p);
+        ALPAQA_TE_OPTIONAL_METHOD(*this, P, eval_add_gn_hess_constr, p);
+        ALPAQA_TE_OPTIONAL_METHOD(*this, P, eval_add_gn_hess_constr_N, p);
         ALPAQA_TE_REQUIRED_METHOD(*this, P, check);
-        N    = t.t->get_N();
-        nu   = t.t->get_nu();
-        nx   = t.t->get_nx();
-        nh   = t.t->get_nh();
-        nh_N = t.t->get_nh_N();
-        nc   = t.t->get_nc();
-        nc_N = t.t->get_nc_N();
+        N    = p.get_N();
+        nu   = p.get_nu();
+        nx   = p.get_nx();
+        nh   = p.get_nh();
+        nh_N = p.get_nh_N();
+        nc   = p.get_nc();
+        nc_N = p.get_nc_N();
         if (nc > 0 && get_D == nullptr)
             throw std::runtime_error("ControlProblem: missing 'get_D'");
         if (nc > 0 && eval_constr == nullptr)

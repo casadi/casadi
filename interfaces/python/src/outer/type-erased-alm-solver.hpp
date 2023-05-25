@@ -56,7 +56,7 @@ struct ALMSolverVTable : util::BasicVTable {
     // clang-format on
 
     template <class T>
-    ALMSolverVTable(util::VTableTypeTag<T> t) : util::BasicVTable{t} {
+    ALMSolverVTable(std::in_place_t, T &t) : util::BasicVTable{std::in_place, t} {
         stop       = util::type_erased_wrapped<T, &T::stop>();
         get_name   = util::type_erased_wrapped<T, &T::get_name>();
         get_params = [](const void *self_) -> py::object {
