@@ -36,7 +36,7 @@ runs:
       run: |
         apt -y update
         apt -y install --no-install-recommends \
-          wget bzip2 xz-utils ccache ninja-build pkg-config ca-certificates
+          wget bzip2 xz-utils ccache ninja-build pkg-config ca-certificates libquadmath0
     # Cache
     - name: Cache tools
       id: cache-tools
@@ -44,7 +44,7 @@ runs:
       with:
         path: /opt
         key: ${{ runner.os }}-${{ inputs.pypy }}${{ inputs.python-version }}-${{ inputs.host }}-tools-${{ inputs.tools-version }}-${{ inputs.cmake-version }}
-      # CMake
+    # CMake
     - name: Install CMake
       if: ${{ steps.cache-tools.outputs.cache-hit != 'true' }}
       shell: bash
