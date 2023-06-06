@@ -12,10 +12,10 @@ $$
     \begin{equation}
         \begin{aligned}
             & \underset{x}{\textbf{minimize}}
-            & & f(x) &&&& f : {{\rm I\mathchoice{\hspace{-2pt}}{\hspace{-2pt}}{\hspace{-1.75pt}}{\hspace{-1.7pt}}R}}^n \rightarrow {{\rm I\mathchoice{\hspace{-2pt}}{\hspace{-2pt}}{\hspace{-1.75pt}}{\hspace{-1.7pt}}R}} \\
+            & & f(x) &&&& f : {\rm I\\!R}^n \rightarrow {\rm I\\!R} \\
             & \textbf{subject to}
             & & \underline{x} \le x \le \overline{x} \\
-            &&& \underline{z} \le g(x) \le \overline{z} &&&& g : {{\rm I\mathchoice{\hspace{-2pt}}{\hspace{-2pt}}{\hspace{-1.75pt}}{\hspace{-1.7pt}}R}}^n \rightarrow {{\rm I\mathchoice{\hspace{-2pt}}{\hspace{-2pt}}{\hspace{-1.75pt}}{\hspace{-1.7pt}}R}}^m
+            &&& \underline{z} \le g(x) \le \overline{z} &&&& g : {\rm I\\!R}^n \rightarrow {\rm I\\!R}^m
         \end{aligned}
     \end{equation}
 $$
