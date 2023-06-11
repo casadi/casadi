@@ -1217,7 +1217,7 @@ namespace casadi {
   Matrix<Scalar> Matrix<Scalar>::
   _logsumexp(const Matrix<Scalar>& x) {
     Matrix<Scalar> mx = mmax(x);
-    return log(sum1(exp(x-mx)));
+    return mx+log(sum1(exp(x-mx)));
   }
 
   template<typename Scalar>

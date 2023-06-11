@@ -1519,7 +1519,7 @@ class SXtests(casadiTestCase):
       self.assertEqual(res.shape[1],4)
 
   def test_logsumexp(self):
-    x = MX.sym("x",3)
+    x = SX.sym("x",3)
 
     f_ref = Function("f_ref",[x],[log(exp(x[0])+exp(x[1])+exp(x[2]))])
     f = Function("f",[x],[logsumexp(x)])
