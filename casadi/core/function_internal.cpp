@@ -85,7 +85,7 @@ namespace casadi {
     jit_serialize_ = "source";
     jit_base_name_ = "jit_tmp";
     jit_temp_suffix_ = true;
-    compiler_plugin_ = "clang";
+    compiler_plugin_ = CASADI_STR(CASADI_DEFAULT_COMPILER_PLUGIN);
 
     eval_ = nullptr;
     checkout_ = nullptr;

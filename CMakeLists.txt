@@ -641,6 +641,9 @@ option(WITH_CLANG "Compile the interface to clang JIT" OFF)
 if(WITH_CLANG)
   # try to find system CLANG
   find_package(CLANG REQUIRED)
+  add_definitions("-DCASADI_DEFAULT_COMPILER_PLUGIN=clang")
+else()
+  add_definitions("-DCASADI_DEFAULT_COMPILER_PLUGIN=shell")
 endif()
 add_feature_info(clang-interface WITH_CLANG "Interface to the Clang JIT compiler.")
 
