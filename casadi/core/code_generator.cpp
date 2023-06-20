@@ -1339,9 +1339,11 @@ namespace casadi {
       this->auxiliaries << sanitize_source(casadi_sum_str, inst);
       break;
     case AUX_VFMIN:
+      add_auxiliary(AUX_FMIN);
       this->auxiliaries << sanitize_source(casadi_vfmin_str, inst);
       break;
     case AUX_VFMAX:
+      add_auxiliary(AUX_FMAX);
       this->auxiliaries << sanitize_source(casadi_vfmax_str, inst);
       break;
     case AUX_REGULARIZE:
