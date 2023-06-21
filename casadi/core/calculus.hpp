@@ -1688,7 +1688,7 @@ case OP_HYPOT:     DerBinaryOperation<OP_HYPOT>::derf(X, Y, F, D);      break;
     case OP_HYPOT:          return "hypot";
     case OP_LOGSUMEXP:      return "logsumexp";
     }
-    return nullptr;
+    return std::string{};
   }
 
   template<typename T>
