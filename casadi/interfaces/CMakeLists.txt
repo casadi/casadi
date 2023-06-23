@@ -6,6 +6,10 @@ if(WITH_SUNDIALS)
   add_subdirectory(sundials)
 endif()
 
+if(WITH_SLEQP)
+  add_subdirectory(sleqp)
+endif()
+
 if(WITH_IPOPT)
   add_subdirectory(ipopt)
 endif()
