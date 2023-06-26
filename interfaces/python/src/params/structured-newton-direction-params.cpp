@@ -4,8 +4,8 @@ PARAMS_TABLE_DEF(alpaqa::StructuredNewtonRegularizationParams<Conf>, //
                  PARAMS_MEMBER(min_eig),                             //
                  PARAMS_MEMBER(print_eig),                           //
 );
-PARAMS_TABLE_DEF(alpaqa::StructuredNewtonDirectionParams<Conf>,      //
-                 PARAMS_MEMBER(hessian_vec),                         //
+PARAMS_TABLE_DEF(alpaqa::StructuredNewtonDirectionParams<Conf>, //
+                 PARAMS_MEMBER(hessian_vec_factor),             //
 );
 
 PARAMS_TABLE_INST(alpaqa::StructuredNewtonRegularizationParams<alpaqa::EigenConfigf>);

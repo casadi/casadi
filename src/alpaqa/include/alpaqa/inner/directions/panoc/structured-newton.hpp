@@ -34,10 +34,11 @@ struct StructuredNewtonRegularizationParams {
 template <Config Conf>
 struct StructuredNewtonDirectionParams {
     USING_ALPAQA_CONFIG(Conf);
-    /// Set this option to true to include the Hessian-vector product
+    /// Set this option to a nonzero value to include the Hessian-vector product
     /// @f$ \nabla^2_{x_\mathcal{J}x_\mathcal{K}}\psi(x) q_\mathcal{K} @f$ from
-    /// equation 12b in @cite pas2022alpaqa, false to leave out that term.
-    bool hessian_vec = true;
+    /// equation 12b in @cite pas2022alpaqa, scaled by this parameter.
+    /// Set it to zero to leave out that term.
+    real_t hessian_vec_factor = 0;
 };
 
 /// @ingroup grp_DirectionProviders
@@ -167,8 +168,9 @@ struct StructuredNewtonDirection {
         detail::IndexSet<config_t>::compute_complement(J, K, n);
 
         // Compute right-hand side of 6.1c
-        if (direction_params.hessian_vec)
-            qₖ(J).noalias() -= H(J, K) * qₖ(K);
+        if (direction_params.hessian_vec_factor != 0)
+            qₖ(J).noalias() -=
+                direction_params.hessian_vec_factor * (H(J, K) * qₖ(K));
 
         // If there are active indices, we need to solve the Newton system with
         // just the inactive indices.

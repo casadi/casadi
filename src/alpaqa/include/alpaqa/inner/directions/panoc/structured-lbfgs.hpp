@@ -12,17 +12,19 @@ namespace alpaqa {
 /// Parameters for the @ref StructuredLBFGSDirection class.
 template <Config Conf>
 struct StructuredLBFGSDirectionParams {
-    /// Set this option to true to include the Hessian-vector product
+    USING_ALPAQA_CONFIG(Conf);
+    /// Set this option to a nonzero value to include the Hessian-vector product
     /// @f$ \nabla^2_{x_\mathcal{J}x_\mathcal{K}}\psi(x) q_\mathcal{K} @f$ from
-    /// equation 12b in @cite pas2022alpaqa, false to leave out that term.
-    bool hessian_vec = true;
-    /// If @ref hessian_vec is true, set this option to true to approximate that
-    /// term using finite differences instead of using AD.
+    /// equation 12b in @cite pas2022alpaqa, scaled by this parameter.
+    /// Set it to zero to leave out that term.
+    real_t hessian_vec_factor = 0;
+    /// If @ref hessian_vec_factor is nonzero, set this option to true to
+    /// approximate that term using finite differences instead of using AD.
     bool hessian_vec_finite_differences = true;
-    /// If both @ref hessian_vec and @ref hessian_vec_finite_differences are
-    /// true, set this option to true to compute the exact Hessian of the
-    /// augmented Lagrangian, false to approximate it using the Hessian of the
-    /// Lagrangian.
+    /// If @ref hessian_vec_factor is nonzero and
+    /// @ref hessian_vec_finite_differences is true, set this option to true to
+    /// compute the exact Hessian of the augmented Lagrangian, false to
+    /// approximate it using the Hessian of the Lagrangian.
     bool full_augmented_hessian = true;
     enum FailurePolicy {
         /// If L-BFGS fails, propagate the failure and tell PANOC that no

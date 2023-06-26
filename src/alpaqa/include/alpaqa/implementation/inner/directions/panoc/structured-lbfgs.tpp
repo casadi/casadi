@@ -13,14 +13,14 @@ void StructuredLBFGSDirection<Conf>::initialize(
     if (!problem.provides_eval_inactive_indices_res_lna())
         throw std::invalid_argument(
             "Structured L-BFGS requires eval_inactive_indices_res_lna()");
-    if (direction_params.hessian_vec &&
+    if (direction_params.hessian_vec_factor != 0 &&
         !direction_params.hessian_vec_finite_differences &&
         !direction_params.full_augmented_hessian &&
         !problem.provides_eval_hess_L_prod())
         throw std::invalid_argument(
             "Structured L-BFGS requires eval_hess_L_prod(). Alternatively, set "
-            "hessian_vec = false or hessian_vec_finite_differences = true.");
-    if (direction_params.hessian_vec &&
+            "hessian_vec_factor = 0 or hessian_vec_finite_differences = true.");
+    if (direction_params.hessian_vec_factor != 0 &&
         !direction_params.hessian_vec_finite_differences &&
         direction_params.full_augmented_hessian &&
         !(problem.provides_eval_hess_L_prod() ||
@@ -28,16 +28,16 @@ void StructuredLBFGSDirection<Conf>::initialize(
         throw std::invalid_argument(
             "Structured L-BFGS requires _eval_hess_ψ_prod() or "
             "eval_hess_L_prod(). Alternatively, set "
-            "hessian_vec = false or hessian_vec_finite_differences = true.");
-    if (direction_params.hessian_vec &&
+            "hessian_vec_factor = 0 or hessian_vec_finite_differences = true.");
+    if (direction_params.hessian_vec_factor != 0 &&
         !direction_params.hessian_vec_finite_differences &&
         direction_params.full_augmented_hessian &&
         !problem.provides_eval_hess_ψ_prod() &&
         !(problem.provides_get_box_D() && problem.provides_eval_grad_gi()))
         throw std::invalid_argument(
             "Structured L-BFGS requires either eval_hess_ψ_prod() or "
-            "get_box_D() and eval_grad_gi(). Alternatively, set hessian_vec = "
-            "false, hessian_vec_finite_differences = true, or "
+            "get_box_D() and eval_grad_gi(). Alternatively, set "
+            "hessian_vec_factor = 0, hessian_vec_finite_differences = true, or "
             "full_augmented_hessian = false.");
     // Store references to problem and ALM variables
     this->problem = &problem;
@@ -82,16 +82,15 @@ bool StructuredLBFGSDirection<Conf>::apply(real_t γₖ, crvec xₖ,
     }
     // There are active indices K
     qₖ = pₖ;
-    if (direction_params.hessian_vec)
+    if (direction_params.hessian_vec_factor != 0) {
         qₖ(J).setZero();
-    else
-        qₖ(J) = (real_t(1) / γₖ) * pₖ(J);
-    if (direction_params.hessian_vec) {
         approximate_hessian_vec_term(xₖ, grad_ψxₖ, qₖ, J);
         // Compute right-hand side of 6.1c
-        qₖ(J) = (real_t(1) / γₖ) * pₖ(J) - HqK(J);
+        qₖ(J) = (real_t(1) / γₖ) * pₖ(J) -
+                direction_params.hessian_vec_factor * HqK(J);
+    } else {
+        qₖ(J) = (real_t(1) / γₖ) * pₖ(J);
     }
-
     // If there are active indices, we need the specialized version
     // that only applies L-BFGS to the inactive indices
     bool success = lbfgs.apply_masked(qₖ, γₖ, J);

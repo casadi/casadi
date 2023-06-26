@@ -292,7 +292,7 @@ PARAMS_TABLE(AndersonDirectionParams<config_t>,           //
 );
 
 PARAMS_TABLE(StructuredLBFGSDirectionParams<config_t>,      //
-             PARAMS_MEMBER(hessian_vec),                    //
+             PARAMS_MEMBER(hessian_vec_factor),             //
              PARAMS_MEMBER(hessian_vec_finite_differences), //
              PARAMS_MEMBER(full_augmented_hessian),         //
 );
@@ -317,7 +317,7 @@ PARAMS_TABLE(StructuredNewtonRegularizationParams<config_t>, //
 );
 
 PARAMS_TABLE(StructuredNewtonDirectionParams<config_t>, //
-             PARAMS_MEMBER(hessian_vec),                //
+             PARAMS_MEMBER(hessian_vec_factor),         //
 );
 
 PARAMS_TABLE(ALMParams<config_t>,                           //
