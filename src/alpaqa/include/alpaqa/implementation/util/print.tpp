@@ -116,7 +116,8 @@ std::ostream &print_matlab_impl(std::ostream &os, const T &M,
         for (decltype(M.rows()) r{}; r < M.rows(); ++r) {
             for (decltype(M.cols()) c{}; c < M.cols(); ++c) {
                 print_elem(buf, M(r, c), os);
-                os << ' ';
+                if (c != M.cols() - 1)
+                    os << ' ';
             }
             if (r != M.rows() - 1)
                 os << ";\n ";
@@ -136,7 +137,8 @@ std::ostream &print_python_impl(std::ostream &os, const T &M,
         for (decltype(M.rows()) r{}; r < M.rows(); ++r) {
             for (decltype(M.cols()) c{}; c < M.cols(); ++c) {
                 print_elem(buf, M(r, c), os);
-                os << ", ";
+                if (c != M.cols() - 1)
+                    os << ", ";
             }
             if (r != M.rows() - 1)
                 os << "],\n [";

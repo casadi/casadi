@@ -6,6 +6,7 @@
 #include <iosfwd>
 #include <limits>
 #include <string>
+#include <string_view>
 
 #include <Eigen/Core>
 

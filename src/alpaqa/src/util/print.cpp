@@ -1,4 +1,3 @@
-
 #include <alpaqa/export.h>
 #include <alpaqa/implementation/util/print.tpp>
 
