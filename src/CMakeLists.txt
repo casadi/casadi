@@ -40,7 +40,10 @@ add_library(alpaqa
     "alpaqa/src/inner/internal/panoc-helpers.cpp"
 )
 if (ALPAQA_WITH_OCP)
-    target_sources(alpaqa PRIVATE "alpaqa/src/inner/panoc-ocp.cpp")
+    target_sources(alpaqa PRIVATE
+        "alpaqa/src/inner/panoc-ocp.cpp"
+        "alpaqa/src/problem/ocproblem.cpp"
+    )
 endif()
 if (ALPAQA_WITH_DRIVERS)
     target_sources(alpaqa PRIVATE "alpaqa/src/params/params.cpp")

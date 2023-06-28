@@ -157,43 +157,37 @@ struct ControlProblemVTable : util::BasicVTable {
     }
     ControlProblemVTable() = default;
 
-    static void default_get_D_N(const void *self, Box &D, const ControlProblemVTable &vtable) {
-        vtable.get_D(self, D, vtable);
-    }
-    static void default_eval_add_Q_N(const void *self, crvec x, crvec h, rmat Q,
-                                     const ControlProblemVTable &vtable) {
-        vtable.eval_add_Q(self, vtable.N, x, h, Q);
-    }
-    static void default_eval_add_R_prod_masked(const void *, index_t, crvec, crvec, crindexvec,
-                                               crindexvec, crvec, rvec, rvec,
-                                               const ControlProblemVTable &) {
-        throw not_implemented_error("default_eval_add_R_prod_masked");
-    }
-    static void default_eval_add_S_prod_masked(const void *, index_t, crvec, crvec, crindexvec,
-                                               crvec, rvec, rvec, const ControlProblemVTable &) {
-        throw not_implemented_error("default_eval_add_S_prod_masked");
-    }
-    [[nodiscard]] static length_t default_get_R_work_size(const void *,
-                                                          const ControlProblemVTable &) {
-        return 0;
-    }
-    [[nodiscard]] static length_t default_get_S_work_size(const void *,
-                                                          const ControlProblemVTable &) {
-        return 0;
-    }
-    static void default_eval_constr_N(const void *self, crvec x, rvec c,
-                                      const ControlProblemVTable &vtable) {
-        vtable.eval_constr(self, vtable.N, x, c, vtable);
-    }
-    static void default_eval_grad_constr_prod_N(const void *self, crvec x, crvec p, rvec grad_cx_p,
-                                                const ControlProblemVTable &vtable) {
-        vtable.eval_grad_constr_prod(self, vtable.N, x, p, grad_cx_p, vtable);
-    }
-    static void default_eval_add_gn_hess_constr_N(const void *self, crvec x, crvec M, rmat out,
-                                                  const ControlProblemVTable &vtable) {
-        vtable.eval_add_gn_hess_constr(self, vtable.N, x, M, out, vtable);
-    }
+    ALPAQA_EXPORT static void default_get_D_N(const void *self, Box &D,
+                                              const ControlProblemVTable &vtable);
+    ALPAQA_EXPORT static void default_eval_add_Q_N(const void *self, crvec x, crvec h, rmat Q,
+                                                   const ControlProblemVTable &vtable);
+    ALPAQA_EXPORT static void default_eval_add_R_prod_masked(const void *, index_t, crvec, crvec,
+                                                             crindexvec, crindexvec, crvec, rvec,
+                                                             rvec, const ControlProblemVTable &);
+    ALPAQA_EXPORT static void default_eval_add_S_prod_masked(const void *, index_t, crvec, crvec,
+                                                             crindexvec, crvec, rvec, rvec,
+                                                             const ControlProblemVTable &);
+    [[nodiscard]] ALPAQA_EXPORT static length_t
+    default_get_R_work_size(const void *, const ControlProblemVTable &);
+    [[nodiscard]] ALPAQA_EXPORT static length_t
+    default_get_S_work_size(const void *, const ControlProblemVTable &);
+    ALPAQA_EXPORT static void default_eval_constr_N(const void *self, crvec x, rvec c,
+                                                    const ControlProblemVTable &vtable);
+    ALPAQA_EXPORT static void default_eval_grad_constr_prod_N(const void *self, crvec x, crvec p,
+                                                              rvec grad_cx_p,
+                                                              const ControlProblemVTable &vtable);
+    ALPAQA_EXPORT static void default_eval_add_gn_hess_constr_N(const void *self, crvec x, crvec M,
+                                                                rmat out,
+                                                                const ControlProblemVTable &vtable);
 };
+
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, ControlProblemVTable, DefaultConfig);
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, ControlProblemVTable, EigenConfigf);
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, ControlProblemVTable, EigenConfigd);
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, ControlProblemVTable, EigenConfigl);
+#ifdef ALPAQA_WITH_QUAD_PRECISION
+ALPAQA_EXPORT_EXTERN_TEMPLATE(struct, ControlProblemVTable, EigenConfigq);
+#endif
 
 /**
  * Nonlinear optimal control problem with finite horizon @f$ N @f$.
