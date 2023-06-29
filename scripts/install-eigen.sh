@@ -18,7 +18,7 @@ set -ex
 export CMAKE_PREFIX_PATH="$prefix:$CMAKE_PREFIX_PATH"
 export PKG_CONFIG_PATH="$prefix/lib/pkgconfig:$PKG_CONFIG_PATH"
 
-pushd /tmp
+pushd "${TMPDIR:-/tmp}"
 
 # Eigen
 [ -d eigen ] \

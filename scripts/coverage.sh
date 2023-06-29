@@ -27,13 +27,13 @@ echo "Compiler: ${compiler}${version}"
 # If the compiler is Clang, use a wrapper around llvm-cov that emulates gcov
 # and use the right c++filt
 if [ "${compiler}" == "clang" ]; then
-    mkdir -p "/tmp/clang-cxxfilt-gcov"
+    mkdir -p "${TMPDIR:-/tmp}/clang-cxxfilt-gcov"
     echo -e "#!/usr/bin/env sh\nexec llvm-cov${version} gcov \"\$@\"" \
-        > "/tmp/clang-cxxfilt-gcov/llvm-cov"
-    chmod +x "/tmp/clang-cxxfilt-gcov/llvm-cov"
+        > "${TMPDIR:-/tmp}/clang-cxxfilt-gcov/llvm-cov"
+    chmod +x "${TMPDIR:-/tmp}/clang-cxxfilt-gcov/llvm-cov"
     # Replace the default c++filt program with LLVM/Clang's version
-    ln -sfn $(which llvm-cxxfilt${version}) /tmp/clang-cxxfilt-gcov/c++filt
-    export PATH="/tmp/clang-cxxfilt-gcov:$PATH"
+    ln -sfn $(which llvm-cxxfilt${version}) ${TMPDIR:-/tmp}/clang-cxxfilt-gcov/c++filt
+    export PATH="${TMPDIR:-/tmp}/clang-cxxfilt-gcov:$PATH"
     gcov_bin="llvm-cov"
 else
     gcov_bin="gcov${version}"
