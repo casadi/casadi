@@ -40,6 +40,9 @@ if "SKIP_WORHP_TESTS" not in os.environ and has_nlpsol("worhp")  and not args.ig
   #solvers.append(("worhp",{"TolOpti":1e-20,"TolFeas":1e-20,"UserHM": False}))
   pass
 
+if "SKIP_SLEQP_TESTS" not in os.environ and has_nlpsol("sleqp"):
+  solvers.append(("sleqp",{"print_time":False,"sleqp": {"tol": 1e-10, "derivative_test":"second-order","print_level":0}},set()))
+
 if "SKIP_IPOPT_TESTS" not in os.environ and has_nlpsol("ipopt"):
   solvers.append(("ipopt",{"print_time":False,"ipopt": {"tol": 1e-10, "derivative_test":"second-order","print_level":0}},set()))
   solvers.append(("ipopt",{"print_time":False,"ipopt": {"tol": 1e-10, "derivative_test":"first-order","hessian_approximation": "limited-memory","print_level":0}},set()))
