@@ -2,9 +2,6 @@
 
 #include <sleqp.h>
 
-#include "sleqp/pub_func.h"
-#include "sleqp/pub_types.h"
-#include "sleqp/sparse/pub_vec.h"
 #include "sleqp_interface.hpp"
 
 namespace casadi {
@@ -16,7 +13,6 @@ namespace casadi {
                                        void* func_data)
   {
     SLEQPMemory* m = static_cast<SLEQPMemory*>(func_data);
-
 
     SLEQP_CALL(sleqp_vec_to_raw(value, m->x));
 
@@ -51,7 +47,7 @@ namespace casadi {
       }
 
     } catch (std::exception& ex) {
-      std::cout << "Error: " << ex.what();
+      std::cout << "Error: " << ex.what() << std::endl;
     }
 
     return SLEQP_ERROR;
@@ -82,7 +78,7 @@ namespace casadi {
                                         0.));
 
     } catch (std::exception& ex) {
-      std::cout << "Error: " << ex.what();
+      std::cout << "Error: " << ex.what() << std::endl;
     }
 
     return SLEQP_OKAY;
@@ -96,12 +92,11 @@ namespace casadi {
 
     m->arg[0] = m->x;
     m->arg[1] = m->d_nlp.p;
-    m->res[0] = nullptr;
-    m->res[1] = m->gk;
+    m->res[0] = m->gk;
 
     try {
 
-      if(m->interface->calc_function(m, "nlp_grad_f") != 0) {
+      if(m->interface->calc_function(m, "nlp_g") != 0) {
         return SLEQP_ERROR;
       }
 
@@ -113,7 +108,7 @@ namespace casadi {
                                         0.));
 
     } catch (std::exception& ex) {
-      std::cout << "Error: " << ex.what();
+      std::cout << "Error: " << ex.what() << std::endl;
     }
 
     return SLEQP_OKAY;
@@ -124,6 +119,45 @@ namespace casadi {
                                             void* func_data)
   {
     SLEQPMemory* m = static_cast<SLEQPMemory*>(func_data);
+
+    m->arg[0] = m->x;
+    m->arg[1] = m->d_nlp.p;
+    m->res[0] = nullptr;
+    m->res[1] = m->jac_gk;
+
+    try {
+
+      if(m->interface->calc_function(m, "nlp_jac_g") != 0) {
+        return SLEQP_ERROR;
+      }
+
+    } catch (std::exception& ex) {
+      std::cout << "Error: " << ex.what() << std::endl;
+    }
+
+    casadi_int ncol = m->interface->jacg_sp_.size2();
+    const casadi_int* colind = m->interface->jacg_sp_.colind();
+    const casadi_int* row = m->interface->jacg_sp_.row();
+
+    const casadi_int nnz = colind[ncol];
+
+    SLEQP_CALL(sleqp_mat_reserve(cons_jac, nnz));
+
+    double* cons_jac_data = sleqp_mat_data(cons_jac);
+    int* cons_jac_rows = sleqp_mat_rows(cons_jac);
+    int* cons_jac_cols = sleqp_mat_cols(cons_jac);
+
+    for(int k = 0; k < nnz; ++k) {
+      cons_jac_data[k] = m->jac_gk[k];
+      cons_jac_rows[k] = row[k];
+    }
+
+    for(int k = 0; k <= ncol; ++k) {
+      cons_jac_cols[k] = colind[k];
+    }
+
+    SLEQP_CALL(sleqp_mat_set_nnz(cons_jac, nnz));
+
     return SLEQP_OKAY;
   }
 

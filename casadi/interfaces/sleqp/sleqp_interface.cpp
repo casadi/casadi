@@ -74,7 +74,7 @@ namespace casadi {
     plugin->deserialize = &SLEQPInterface::deserialize;
 
     sleqp_log_set_handler(casadi_log_output);
-    sleqp_log_set_level(SLEQP_LOG_INFO);
+    sleqp_log_set_level(SLEQP_LOG_DEBUG);
 
     return 0;
   }
@@ -113,6 +113,8 @@ namespace casadi {
       create_function("nlp_jac_g", {"x", "p"}, {"g", "jac:g:x"});
     }
 
+    jacg_sp_ = get_function("nlp_jac_g").sparsity_out(1);
+
     // TODO: Pass options
 
     // Setup NLP Hessian
@@ -140,9 +142,9 @@ namespace casadi {
   void SLEQPInterface::clear_mem(SLEQPMemory* m) const {
     std::cout << "SLEQPInterface::clear_mem" << std::endl;
 
-    SLEQP_CALL_EXC(sleqp_solver_release(&m->solver));
-    SLEQP_CALL_EXC(sleqp_problem_release(&m->problem));
-    SLEQP_CALL_EXC(sleqp_vec_free(&m->primal));
+    SLEQP_CALL_EXC(sleqp_solver_release(&m->internal.solver));
+    SLEQP_CALL_EXC(sleqp_problem_release(&m->internal.problem));
+    SLEQP_CALL_EXC(sleqp_vec_free(&m->internal.primal));
 
     delete[] m->x;
   }
@@ -157,11 +159,44 @@ namespace casadi {
     delete m;
   }
 
+  static std::string status_string(SLEQP_STATUS status)
+  {
+    switch (status) {
+    case SLEQP_STATUS_RUNNING:
+      return "running";
+    case SLEQP_STATUS_OPTIMAL:
+      return "optimal";
+    case SLEQP_STATUS_INFEASIBLE:
+      return "infeasible";
+    case SLEQP_STATUS_UNBOUNDED:
+      return "unbounded";
+    case SLEQP_STATUS_ABORT_DEADPOINT:
+      return "deadpoint";
+    case SLEQP_STATUS_ABORT_ITER:
+      return "iteration limit";
+    case SLEQP_STATUS_ABORT_MANUAL:
+      return "manual abort";
+    case SLEQP_STATUS_ABORT_TIME:
+      return "time limit";
+    default:
+      return "unknown";
+    }
+  }
+
   /// Get all statistics
   Dict SLEQPInterface::get_stats(void* mem) const {
     std::cout << "SLEQPInterface::get_stats" << std::endl;
-    Dict ret = Nlpsol::get_stats(mem);
-    return ret;
+
+    Dict stats = Nlpsol::get_stats(mem);
+
+    SLEQPMemory* m = static_cast<SLEQPMemory*>(mem);
+
+    SLEQP_STATUS status = sleqp_solver_status(m->internal.solver);
+
+    stats["return_status"] = status_string(status);
+    stats["iter_count"] = sleqp_solver_iterations(m->internal.solver);
+
+    return stats;
   }
 
   /** \brief Set the (persistent) work vectors */
@@ -199,9 +234,9 @@ namespace casadi {
                                           num_vars,
                                           0.));
 
-    SLEQP_CALL_EXC(sleqp_vec_create_full(&m->primal, num_vars));
+    SLEQP_CALL_EXC(sleqp_vec_create_full(&m->internal.primal, num_vars));
 
-    SLEQP_CALL_EXC(sleqp_vec_set_from_raw(m->primal,
+    SLEQP_CALL_EXC(sleqp_vec_set_from_raw(m->internal.primal,
                                           const_cast<double*>(d_nlp.x0),
                                           num_vars,
                                           0.));
@@ -230,22 +265,26 @@ namespace casadi {
                              num_cons,
                              m);
 
-    SLEQP_CALL_EXC(sleqp_settings_create(&m->settings));
+    SLEQP_CALL_EXC(sleqp_settings_create(&m->internal.settings));
 
-    SLEQP_CALL_EXC(sleqp_settings_set_enum_value(m->settings,
+    SLEQP_CALL_EXC(sleqp_settings_set_enum_value(m->internal.settings,
                                                  SLEQP_SETTINGS_ENUM_HESS_EVAL,
                                                  SLEQP_HESS_EVAL_DAMPED_BFGS));
 
-    SLEQP_CALL_EXC(sleqp_problem_create_simple(&m->problem,
+    SLEQP_CALL_EXC(sleqp_settings_set_enum_value(m->internal.settings,
+                                                 SLEQP_SETTINGS_ENUM_DERIV_CHECK,
+                                                 SLEQP_DERIV_CHECK_FIRST));
+
+    SLEQP_CALL_EXC(sleqp_problem_create_simple(&m->internal.problem,
                                                func,
                                                var_lb,
                                                var_ub,
                                                cons_lb,
                                                cons_ub,
-                                               m->settings));
+                                               m->internal.settings));
 
     // No scaling
-    SLEQP_CALL_EXC(sleqp_solver_create(&m->solver, m->problem, m->primal, nullptr));
+    SLEQP_CALL_EXC(sleqp_solver_create(&m->internal.solver, m->internal.problem, m->internal.primal, nullptr));
 
     auto jacg_sp_ = get_function("nlp_jac_g").sparsity_out(1);
 
@@ -274,11 +313,34 @@ namespace casadi {
     SLEQPMemory* m = static_cast<SLEQPMemory*>(mem);
 
     // TODO: Pass iteration and time limits
-    SLEQP_CALL_EXC(sleqp_solver_solve(m->solver, SLEQP_NONE, SLEQP_NONE));
-
-    //return calc_function(NULL, "nlp_f")==0;
+    SLEQP_CALL_EXC(sleqp_solver_solve(m->internal.solver, SLEQP_NONE, SLEQP_NONE));
 
     // TODO: pass result back
+
+    SleqpIterate* iterate;
+
+    SLEQP_CALL(sleqp_solver_solution(m->internal.solver, &iterate));
+
+    casadi_nlpsol_data<double>& d_nlp = m->d_nlp;
+
+    m->success = true;
+    m->unified_return_status = SOLVER_RET_SUCCESS;
+
+    SleqpVec* primal = sleqp_iterate_primal(iterate);
+    SLEQP_CALL_EXC(sleqp_vec_to_raw(primal, d_nlp.x));
+
+    SLEQP_CALL_EXC(sleqp_vec_to_raw(primal, d_nlp.z));
+
+    d_nlp.objective = sleqp_iterate_obj_val(iterate);
+    (*d_nlp.f) = sleqp_iterate_obj_val(iterate);
+
+    SleqpVec* var_dual = sleqp_iterate_vars_dual(iterate);
+    SLEQP_CALL_EXC(sleqp_vec_to_raw(var_dual, d_nlp.lam_x));
+
+    SleqpVec* cons_dual = sleqp_iterate_cons_dual(iterate);
+    SLEQP_CALL_EXC(sleqp_vec_to_raw(cons_dual, d_nlp.lam_g));
+
+    // TODO: What is lam_p?
 
     return 0;
   }

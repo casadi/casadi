@@ -21,11 +21,14 @@ namespace casadi {
   class SLEQPInterface;
 
   struct CASADI_NLPSOL_SLEQP_EXPORT SLEQPMemory : public NlpsolMemory {
-    SleqpProblem* problem;
-    SleqpSettings* settings;
 
-    SleqpVec* primal;
-    SleqpSolver* solver;
+    struct {
+      SleqpProblem* problem;
+      SleqpSettings* settings;
+
+      SleqpVec* primal;
+      SleqpSolver* solver;
+    } internal;
 
     double* x;
 
@@ -37,6 +40,7 @@ namespace casadi {
 
   class CASADI_NLPSOL_SLEQP_EXPORT SLEQPInterface : public Nlpsol {
   private:
+
     void clear_mem(SLEQPMemory* m) const;
 
   public:
@@ -80,5 +84,6 @@ namespace casadi {
     // Solve the NLP
     int solve(void* mem) const override;
 
+    Sparsity jacg_sp_;
   };
 };
