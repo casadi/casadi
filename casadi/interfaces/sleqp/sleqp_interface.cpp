@@ -27,14 +27,42 @@
 
 #include <cstddef>
 
-#include "sleqp/pub_settings.h"
-#include "sleqp/pub_types.h"
 #include "sleqp_func.hpp"
 
-// TOOD: Wire up logging functions
+// TODO: Pass options
 // TODO: Convert inf values
 
 namespace casadi {
+
+  std::string log_level_name(SLEQP_LOG_LEVEL level)
+  {
+    switch (level) {
+      case SLEQP_LOG_DEBUG:
+        return "  debug";
+      case SLEQP_LOG_INFO:
+        return "   info";
+      default:
+        return "unknown";
+    }
+  }
+
+  static void casadi_log_output(SLEQP_LOG_LEVEL level,
+                                time_t time,
+                                const char* message)
+  {
+    switch(level)
+    {
+    case SLEQP_LOG_WARN:
+      casadi_warning(message);
+      break;
+    case SLEQP_LOG_ERROR:
+      casadi_error(message);
+      break;
+    default:
+      uout() << "[" << log_level_name(level) << "] " << message << std::endl;
+    }
+  }
+
   extern "C"
   int CASADI_NLPSOL_SLEQP_EXPORT
   casadi_register_nlpsol_sleqp(Nlpsol::Plugin* plugin) {
@@ -44,6 +72,10 @@ namespace casadi {
     plugin->version = CASADI_VERSION;
     plugin->options = &SLEQPInterface::options_;
     plugin->deserialize = &SLEQPInterface::deserialize;
+
+    sleqp_log_set_handler(casadi_log_output);
+    sleqp_log_set_level(SLEQP_LOG_INFO);
+
     return 0;
   }
 
