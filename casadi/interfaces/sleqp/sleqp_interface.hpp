@@ -7,7 +7,18 @@
 #include "sleqp/pub_settings.h"
 #include "sleqp/pub_solver.h"
 
+// TODO: Use casadi exceptions / error reporting??
+#define SLEQP_CALL_EXC(x)                       \
+  do {                                          \
+    const SLEQP_RETCODE _status = (x);          \
+    if(_status != SLEQP_OKAY) {                 \
+      throw std::runtime_error("SLEQP error");  \
+    }                                           \
+  } while(false)
+
 namespace casadi {
+
+  class SLEQPInterface;
 
   struct CASADI_NLPSOL_SLEQP_EXPORT SLEQPMemory : public NlpsolMemory {
     SleqpProblem* problem;
@@ -15,6 +26,13 @@ namespace casadi {
 
     SleqpVec* primal;
     SleqpSolver* solver;
+
+    double* x;
+
+    // Current calculated quantities
+    double *gk, *grad_fk, *jac_gk, *hess_lk, *grad_lk;
+
+    const SLEQPInterface* interface;
   };
 
   class CASADI_NLPSOL_SLEQP_EXPORT SLEQPInterface : public Nlpsol {

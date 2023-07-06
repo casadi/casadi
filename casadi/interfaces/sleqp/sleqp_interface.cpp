@@ -24,24 +24,15 @@
 
 
 #include "sleqp_interface.hpp"
-#include "sleqp/pub_problem.h"
-#include "sleqp/pub_solver.h"
-#include "sleqp/pub_types.h"
-#include "sleqp/sparse/pub_vec.h"
+
 #include <cstddef>
+
+#include "sleqp/pub_settings.h"
+#include "sleqp/pub_types.h"
+#include "sleqp_func.hpp"
 
 // TOOD: Wire up logging functions
 // TODO: Convert inf values
-
-// TODO: Use casadi exceptions / error reporting??
-#define SLEQP_CALL_EXC(x) \
-  do {                                           \
-      const SLEQP_RETCODE _status = (x);         \
-      if(_status != SLEQP_OKAY) {                \
-        throw std::runtime_error("SLEQP error"); \
-      }                                          \
-  } while(false)
-
 
 namespace casadi {
   extern "C"
@@ -66,7 +57,6 @@ namespace casadi {
   }
 
   SLEQPInterface::~SLEQPInterface() {
-    clear_mem();
   }
 
   const Options SLEQPInterface::options_
@@ -105,22 +95,29 @@ namespace casadi {
   /** \brief Initalize memory block */
   int SLEQPInterface::init_mem(void* mem) const {
     std::cout << "SLEQPInterface::init_mem" << std::endl;
+
     if (Nlpsol::init_mem(mem)) return 1;
 
     SLEQPMemory* m = static_cast<SLEQPMemory*>(mem);
 
-    *m = SLEQPMemory{};
+    m->interface = this;
 
     return 0;
   }
 
   void SLEQPInterface::clear_mem(SLEQPMemory* m) const {
+    std::cout << "SLEQPInterface::clear_mem" << std::endl;
+
     SLEQP_CALL_EXC(sleqp_solver_release(&m->solver));
     SLEQP_CALL_EXC(sleqp_problem_release(&m->problem));
     SLEQP_CALL_EXC(sleqp_vec_free(&m->primal));
+
+    delete[] m->x;
   }
 
   void SLEQPInterface::free_mem(void *mem) const {
+    std::cout << "SLEQPInterface::free_mem" << std::endl;
+
     SLEQPMemory* m = static_cast<SLEQPMemory*>(mem);
 
     clear_mem(m);
@@ -145,12 +142,14 @@ namespace casadi {
 
     SLEQPMemory* m = static_cast<SLEQPMemory*>(mem);
 
-    clear_mem(m);
+    // clear_mem(m);
 
-    casadi_nlpsol_data<double> d_nlp = m->d_nlp;
+    casadi_nlpsol_data<double>& d_nlp = m->d_nlp;
 
     const int num_vars = nx_;
     const int num_cons = ng_;
+
+    m->x = new double[num_vars];
 
     SleqpVec* var_lb;
     SleqpVec* var_ub;
@@ -192,9 +191,18 @@ namespace casadi {
                                           num_cons,
                                           0.));
 
-    *m = SLEQPMemory{};
+    SleqpFunc* func = nullptr;
 
-    SleqpFunc* func = NULL;
+    casadi_sleqp_func_create(&func,
+                             num_vars,
+                             num_cons,
+                             m);
+
+    SLEQP_CALL_EXC(sleqp_settings_create(&m->settings));
+
+    SLEQP_CALL_EXC(sleqp_settings_set_enum_value(m->settings,
+                                                 SLEQP_SETTINGS_ENUM_HESS_EVAL,
+                                                 SLEQP_HESS_EVAL_DAMPED_BFGS));
 
     SLEQP_CALL_EXC(sleqp_problem_create_simple(&m->problem,
                                                func,
@@ -204,7 +212,25 @@ namespace casadi {
                                                cons_ub,
                                                m->settings));
 
-    SLEQP_CALL_EXC(sleqp_solver_create(&m->solver, m->problem, m->primal, NULL));
+    // No scaling
+    SLEQP_CALL_EXC(sleqp_solver_create(&m->solver, m->problem, m->primal, nullptr));
+
+    auto jacg_sp_ = get_function("nlp_jac_g").sparsity_out(1);
+
+    m->gk = w;
+    w += ng_;
+
+    m->grad_fk = w;
+    w += nx_;
+
+    m->jac_gk = w;
+    w += jacg_sp_.nnz();
+
+    /*
+    if (exact_hessian_) {
+      m->hess_lk = w; w += hesslag_sp_.nnz();
+    }
+    */
 
     return;
   }
