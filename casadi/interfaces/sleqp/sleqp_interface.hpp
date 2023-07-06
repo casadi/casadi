@@ -3,13 +3,23 @@
 #include <casadi/interfaces/sleqp/casadi_nlpsol_sleqp_export.h>
 #include "casadi/core/nlpsol_impl.hpp"
 #include "casadi/core/timing.hpp"
+#include "sleqp/pub_problem.h"
+#include "sleqp/pub_settings.h"
+#include "sleqp/pub_solver.h"
 
 namespace casadi {
 
   struct CASADI_NLPSOL_SLEQP_EXPORT SLEQPMemory : public NlpsolMemory {
+    SleqpProblem* problem;
+    SleqpSettings* settings;
+
+    SleqpVec* primal;
+    SleqpSolver* solver;
   };
 
   class CASADI_NLPSOL_SLEQP_EXPORT SLEQPInterface : public Nlpsol {
+  private:
+    void clear_mem(SLEQPMemory* m) const;
 
   public:
     explicit SLEQPInterface(const std::string& name, const Function& nlp);
@@ -40,7 +50,7 @@ namespace casadi {
     int init_mem(void* mem) const override;
 
     /** \brief Free memory block */
-    void free_mem(void *mem) const override { delete static_cast<SLEQPMemory*>(mem);}
+    void free_mem(void *mem) const override;
 
     /// Get all statistics
     Dict get_stats(void* mem) const override;
