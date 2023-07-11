@@ -59,6 +59,7 @@ Fmu::Fmu(const std::string& name, FmuApi api, const DaeBuilderInternal* dae,
   // Initialize
   try {
     (*this)->init(dae);
+    (*this)->finalize();
   } catch(std::exception& e) {
     THROW_ERROR("init", e.what());
   }

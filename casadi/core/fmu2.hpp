@@ -59,6 +59,37 @@ class CASADI_EXPORT Fmu2 : public FmuInternal {
   // Initialize
   void init(const DaeBuilderInternal* dae) override;
 
+  // Finalize
+  void finalize() override;
+
+  // Path to the FMU resource directory
+  std::string resource_loc_;
+
+  // Tolerance
+  double fmutol_;
+
+  // Instance name
+  std::string instance_name_;
+
+  // GUID
+  std::string guid_;
+
+  // Logging?
+  bool logging_on_;
+
+  // Variables used for initialization, by type
+  std::vector<fmi2ValueReference> vr_real_, vr_integer_, vr_boolean_, vr_string_;
+  std::vector<fmi2Real> init_real_;
+  std::vector<fmi2Integer> init_integer_;
+  std::vector<fmi2Boolean> init_boolean_;
+  std::vector<std::string> init_string_;
+
+  // Auxilliary variables, by type
+  std::vector<std::string> vn_aux_real_, vn_aux_integer_, vn_aux_boolean_, vn_aux_string_;
+  std::vector<fmi2ValueReference> vr_aux_real_, vr_aux_integer_, vr_aux_boolean_, vr_aux_string_;
+
+  // Following members set in finalize
+
   // FMU C API function prototypes. Cf. FMI specification 2.0.2
   fmi2InstantiateTYPE* instantiate_;
   fmi2FreeInstanceTYPE* free_instance_;
@@ -80,21 +111,6 @@ class CASADI_EXPORT Fmu2 : public FmuInternal {
   // Callback functions
   fmi2CallbackFunctions functions_;
 
-  // Path to the FMU resource directory
-  std::string resource_loc_;
-
-  // Tolerance
-  double fmutol_;
-
-  // Instance name
-  std::string instance_name_;
-
-  // GUID
-  std::string guid_;
-
-  // Logging?
-  bool logging_on_;
-
   // Collection of variable values, all types
   struct Value {
     std::vector<fmi2Real> v_real;
@@ -103,16 +119,6 @@ class CASADI_EXPORT Fmu2 : public FmuInternal {
     std::vector<std::string> v_string;
   };
 
-  // Variables used for initialization, by type
-  std::vector<fmi2ValueReference> vr_real_, vr_integer_, vr_boolean_, vr_string_;
-  std::vector<fmi2Real> init_real_;
-  std::vector<fmi2Integer> init_integer_;
-  std::vector<fmi2Boolean> init_boolean_;
-  std::vector<std::string> init_string_;
-
-  // Auxilliary variables, by type
-  std::vector<std::string> vn_aux_real_, vn_aux_integer_, vn_aux_boolean_, vn_aux_string_;
-  std::vector<fmi2ValueReference> vr_aux_real_, vr_aux_integer_, vr_aux_boolean_, vr_aux_string_;
   Value aux_value_;
 
   // Does the FMU support analytic derivatives?

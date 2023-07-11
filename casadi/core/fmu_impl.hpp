@@ -60,6 +60,9 @@ class CASADI_EXPORT FmuInternal : public SharedObjectInternal {
   // Initialize
   virtual void init(const DaeBuilderInternal* dae) = 0;
 
+  // Finalize
+  virtual void finalize() = 0;
+
   /** \brief Print
 
       \identifier{26m} */

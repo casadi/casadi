@@ -260,6 +260,22 @@ void Fmu2::init(const DaeBuilderInternal* dae) {
     + "/" + instance_name_no_dot + dll_suffix();
   li_ = Importer(dll_path, "dll");
 
+  if (dae->provides_directional_derivative_) {
+    get_directional_derivative_ = load_function<fmi2GetDirectionalDerivativeTYPE>(
+      "fmi2GetDirectionalDerivative");
+  }
+
+  // Path to resource directory
+  resource_loc_ = "file://" + dae->path_ + "/resources";
+
+  // Copy info from DaeBuilder
+  fmutol_ = dae->fmutol_;
+  instance_name_ = dae->model_identifier_;
+  guid_ = dae->guid_;
+  logging_on_ = dae->debug_;
+}
+
+void Fmu2::finalize() {
   // Get FMI C functions
   instantiate_ = load_function<fmi2InstantiateTYPE>("fmi2Instantiate");
   free_instance_ = load_function<fmi2FreeInstanceTYPE>("fmi2FreeInstance");
@@ -279,10 +295,6 @@ void Fmu2::init(const DaeBuilderInternal* dae) {
   set_boolean_ = load_function<fmi2SetBooleanTYPE>("fmi2SetBoolean");
   get_string_ = load_function<fmi2GetStringTYPE>("fmi2GetString");
   set_string_ = load_function<fmi2SetStringTYPE>("fmi2SetString");
-  if (dae->provides_directional_derivative_) {
-    get_directional_derivative_ = load_function<fmi2GetDirectionalDerivativeTYPE>(
-      "fmi2GetDirectionalDerivative");
-  }
 
   // Callback functions
   functions_.logger = logger;
@@ -290,15 +302,6 @@ void Fmu2::init(const DaeBuilderInternal* dae) {
   functions_.freeMemory = free;
   functions_.stepFinished = 0;
   functions_.componentEnvironment = 0;
-
-  // Path to resource directory
-  resource_loc_ = "file://" + dae->path_ + "/resources";
-
-  // Copy info from DaeBuilder
-  fmutol_ = dae->fmutol_;
-  instance_name_ = dae->model_identifier_;
-  guid_ = dae->guid_;
-  logging_on_ = dae->debug_;
 
   // Create a temporary instance
   fmi2Component c = instantiate();
