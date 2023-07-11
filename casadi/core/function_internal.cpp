@@ -41,6 +41,7 @@
 #include "conic_impl.hpp"
 #include "integrator_impl.hpp"
 #include "external_impl.hpp"
+#include "fmu_function.hpp"
 
 #include <cctype>
 #include <typeinfo>
@@ -4026,6 +4027,7 @@ namespace casadi {
     {"Integrator", Integrator::deserialize},
     {"External", External::deserialize},
     {"Conic", Conic::deserialize},
+    {"FmuFunction", FmuFunction::deserialize},
   };
 
 } // namespace casadi

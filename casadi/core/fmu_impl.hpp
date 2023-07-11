@@ -161,7 +161,15 @@ class CASADI_EXPORT FmuInternal : public SharedObjectInternal {
   virtual void get_stats(FmuMemory* m, Dict* stats,
     const std::vector<std::string>& name_in, const InputStruct* in) const = 0;
 
+  void serialize(SerializingStream& s) const;
+
+  virtual void serialize_type(SerializingStream& s) const;
+  virtual void serialize_body(SerializingStream& s) const;
+
+  static FmuInternal* deserialize(DeserializingStream& s);
+
  protected:
+  explicit FmuInternal(DeserializingStream& s);
 
   /// Instance name
   std::string name_;

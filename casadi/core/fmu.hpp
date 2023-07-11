@@ -187,6 +187,19 @@ class CASADI_EXPORT Fmu
       \identifier{26y} */
   void get_stats(FmuMemory* m, Dict* stats,
     const std::vector<std::string>& name_in, const InputStruct* in) const;
+
+  /// \cond INTERNAL
+#ifndef SWIG
+    /** \brief  Create from node */
+    static Fmu create(FmuInternal* node);
+#endif // SWIG
+  /// \endcond
+
+  /** \brief Serialize an object */
+  void serialize(SerializingStream &s) const;
+
+  /** \brief Deserialize with type disambiguation */
+  static Fmu deserialize(DeserializingStream& s);
 };
 
 } // namespace casadi

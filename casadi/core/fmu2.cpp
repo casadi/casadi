@@ -890,6 +890,82 @@ Fmu2::Fmu2(const std::string& name,
   get_directional_derivative_ = 0;
 }
 
+Fmu2* Fmu2::deserialize(DeserializingStream& s) {
+  Fmu2* ret = new Fmu2(s);
+  ret->finalize();
+  return ret;
+}
+
+Fmu2::Fmu2(DeserializingStream& s) : FmuInternal(s) {
+  instantiate_ = 0;
+  free_instance_ = 0;
+  reset_ = 0;
+  setup_experiment_ = 0;
+  enter_initialization_mode_ = 0;
+  exit_initialization_mode_ = 0;
+  enter_continuous_time_mode_ = 0;
+  set_real_ = 0;
+  set_boolean_ = 0;
+  get_real_ = 0;
+  get_directional_derivative_ = 0;
+
+  s.version("Fmu2", 1);
+  s.unpack("Fmu2::resource_loc", resource_loc_);
+  s.unpack("Fmu2::fmutol", fmutol_);
+  s.unpack("Fmu2::instance_name", instance_name_);
+  s.unpack("Fmu2::guid", guid_);
+  s.unpack("Fmu2::logging_on", logging_on_);
+
+  s.unpack("Fmu2::vr_real", vr_real_);
+  s.unpack("Fmu2::vr_integer", vr_integer_);
+  s.unpack("Fmu2::vr_boolean", vr_boolean_);
+  s.unpack("Fmu2::vr_string", vr_string_);
+  s.unpack("Fmu2::init_real", init_real_);
+  s.unpack("Fmu2::init_integer", init_integer_);
+  s.unpack("Fmu2::init_boolean", init_boolean_);
+  s.unpack("Fmu2::init_string", init_string_);
+
+  s.unpack("Fmu2::vn_aux_real_", vn_aux_real_);
+  s.unpack("Fmu2::vn_aux_integer_", vn_aux_integer_);
+  s.unpack("Fmu2::vn_aux_boolean_", vn_aux_boolean_);
+  s.unpack("Fmu2::vn_aux_string_", vn_aux_string_);
+  s.unpack("Fmu2::vr_aux_real_", vr_aux_real_);
+  s.unpack("Fmu2::vr_aux_integer_", vr_aux_integer_);
+  s.unpack("Fmu2::vr_aux_boolean_", vr_aux_boolean_);
+  s.unpack("Fmu2::vr_aux_string_", vr_aux_string_);
+
+}
+
+
+void Fmu2::serialize_body(SerializingStream &s) const {
+  FmuInternal::serialize_body(s);
+
+  s.version("Fmu2", 1);
+  s.pack("Fmu2::resource_loc", resource_loc_);
+  s.pack("Fmu2::fmutol", fmutol_);
+  s.pack("Fmu2::instance_name", instance_name_);
+  s.pack("Fmu2::guid", guid_);
+  s.pack("Fmu2::logging_on", logging_on_);
+
+  s.pack("Fmu2::vr_real", vr_real_);
+  s.pack("Fmu2::vr_integer", vr_integer_);
+  s.pack("Fmu2::vr_boolean", vr_boolean_);
+  s.pack("Fmu2::vr_string", vr_string_);
+  s.pack("Fmu2::init_real", init_real_);
+  s.pack("Fmu2::init_integer", init_integer_);
+  s.pack("Fmu2::init_boolean", init_boolean_);
+  s.pack("Fmu2::init_string", init_string_);
+
+  s.pack("Fmu2::vn_aux_real_", vn_aux_real_);
+  s.pack("Fmu2::vn_aux_integer_", vn_aux_integer_);
+  s.pack("Fmu2::vn_aux_boolean_", vn_aux_boolean_);
+  s.pack("Fmu2::vn_aux_string_", vn_aux_string_);
+  s.pack("Fmu2::vr_aux_real_", vr_aux_real_);
+  s.pack("Fmu2::vr_aux_integer_", vr_aux_integer_);
+  s.pack("Fmu2::vr_aux_boolean_", vr_aux_boolean_);
+  s.pack("Fmu2::vr_aux_string_", vr_aux_string_);
+}
+
 #endif  // WITH_FMI2
 
 } // namespace casadi

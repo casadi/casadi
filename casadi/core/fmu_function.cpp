@@ -1401,4 +1401,148 @@ Dict FmuFunction::get_stats(void *mem) const {
   return stats;
 }
 
+void FmuFunction::serialize_body(SerializingStream &s) const {
+  FunctionInternal::serialize_body(s);
+  s.version("FmuFunction", 1);
+
+  s.pack("FmuFunction::Fmu", fmu_);
+
+  casadi_assert_dev(in_.size()==n_in_);
+  for (const InputStruct& e : in_) {
+    s.pack("FmuFunction::in::type", static_cast<int>(e.type));
+    s.pack("FmuFunction::in::ind", e.ind);
+  }
+  casadi_assert_dev(out_.size()==n_out_);
+  for (const OutputStruct& e : out_) {
+    s.pack("FmuFunction::out::type", static_cast<int>(e.type));
+    s.pack("FmuFunction::out::ind", e.ind);
+    s.pack("FmuFunction::out::wrt", e.wrt);
+    s.pack("FmuFunction::out::rbegin", e.rbegin);
+    s.pack("FmuFunction::out::rend", e.rend);
+    s.pack("FmuFunction::out::cbegin", e.cbegin);
+    s.pack("FmuFunction::out::cend", e.cend);
+  }
+  s.pack("FmuFunction::jac_in", jac_in_);
+  s.pack("FmuFunction::jac_out", jac_out_);
+  s.pack("FmuFunction::jac_nom_in", jac_nom_in_);
+  s.pack("FmuFunction::sp_trans", sp_trans_);
+  s.pack("FmuFunction::sp_trans_map", sp_trans_map_);
+
+  s.pack("FmuFunction::has_jac", has_jac_);
+  s.pack("FmuFunction::has_fwd", has_fwd_);
+  s.pack("FmuFunction::has_adj", has_adj_);
+  s.pack("FmuFunction::has_hess", has_hess_);
+
+  s.pack("FmuFunction::enable_ad", enable_ad_);
+  s.pack("FmuFunction::validate_ad", validate_ad_);
+  s.pack("FmuFunction::make_symmetric", make_symmetric_);
+  s.pack("FmuFunction::check_hessian", check_hessian_);
+  s.pack("FmuFunction::step", step_);
+  s.pack("FmuFunction::abstol", abstol_);
+  s.pack("FmuFunction::reltol", reltol_);
+  s.pack("FmuFunction::print_progress", print_progress_);
+  s.pack("FmuFunction::new_jacobian", new_jacobian_);
+  s.pack("FmuFunction::new_hessian", new_hessian_);
+  s.pack("FmuFunction::hessian_coloring", hessian_coloring_);
+  s.pack("FmuFunction::validate_ad_file", validate_ad_file_);
+
+  s.pack("FmuFunction::fd", static_cast<int>(fd_));
+  s.pack("FmuFunction::parallelization", static_cast<int>(parallelization_));
+  s.pack("FmuFunction::init_stats", init_stats_);
+
+  s.pack("FmuFunction::jac_sp", jac_sp_);
+  s.pack("FmuFunction::hess_sp", hess_sp_);
+  s.pack("FmuFunction::jac_colors", jac_colors_);
+  s.pack("FmuFunction::hess_colors", hess_colors_);
+  s.pack("FmuFunction::nonlin", nonlin_);
+
+
+  s.pack("FmuFunction::max_jac_tasks", max_jac_tasks_);
+  s.pack("FmuFunction::max_hess_tasks", max_hess_tasks_);
+  s.pack("FmuFunction::max_n_tasks", max_n_tasks_);
+
+}
+
+FmuFunction::FmuFunction(DeserializingStream& s) : FunctionInternal(s) {
+  s.version("FmuFunction", 1);
+
+  s.unpack("FmuFunction::Fmu", fmu_);
+
+  in_.resize(n_in_);
+  for (InputStruct& e : in_) {
+    int t = 0;
+    s.unpack("FmuFunction::in::type", t);
+    e.type = static_cast<InputType>(t);
+    s.unpack("FmuFunction::in::ind", e.ind);
+  }
+  out_.resize(n_out_);
+  for (OutputStruct& e : out_) {
+    int t = 0;
+    s.unpack("FmuFunction::out::type", t);
+    e.type = static_cast<OutputType>(t);
+    s.unpack("FmuFunction::out::ind", e.ind);
+    s.unpack("FmuFunction::out::wrt", e.wrt);
+    s.unpack("FmuFunction::out::rbegin", e.rbegin);
+    s.unpack("FmuFunction::out::rend", e.rend);
+    s.unpack("FmuFunction::out::cbegin", e.cbegin);
+    s.unpack("FmuFunction::out::cend", e.cend);
+  }
+
+  s.unpack("FmuFunction::jac_in", jac_in_);
+  s.unpack("FmuFunction::jac_out", jac_out_);
+
+  s.unpack("FmuFunction::jac_nom_in", jac_nom_in_);
+  s.unpack("FmuFunction::sp_trans", sp_trans_);
+  s.unpack("FmuFunction::sp_trans_map", sp_trans_map_);
+
+  s.unpack("FmuFunction::has_jac", has_jac_);
+  s.unpack("FmuFunction::has_fwd", has_fwd_);
+  s.unpack("FmuFunction::has_adj", has_adj_);
+  s.unpack("FmuFunction::has_hess", has_hess_);
+
+  s.unpack("FmuFunction::enable_ad", enable_ad_);
+  s.unpack("FmuFunction::validate_ad", validate_ad_);
+  s.unpack("FmuFunction::make_symmetric", make_symmetric_);
+  s.unpack("FmuFunction::check_hessian", check_hessian_);
+  s.unpack("FmuFunction::step", step_);
+  s.unpack("FmuFunction::abstol", abstol_);
+  s.unpack("FmuFunction::reltol", reltol_);
+  s.unpack("FmuFunction::print_progress", print_progress_);
+  s.unpack("FmuFunction::new_jacobian", new_jacobian_);
+  s.unpack("FmuFunction::new_hessian", new_hessian_);
+  s.unpack("FmuFunction::hessian_coloring", hessian_coloring_);
+  s.unpack("FmuFunction::validate_ad_file", validate_ad_file_);
+
+  int fd = 0;
+  s.unpack("FmuFunction::fd", fd);
+  fd_ = static_cast<FdMode>(fd);
+  int parallelization = 0;
+  s.unpack("FmuFunction::parallelization", parallelization);
+  parallelization_ = static_cast<Parallelization>(parallelization);
+
+  s.unpack("FmuFunction::init_stats", init_stats_);
+
+  s.unpack("FmuFunction::jac_sp", jac_sp_);
+  s.unpack("FmuFunction::hess_sp", hess_sp_);
+  s.unpack("FmuFunction::jac_colors", jac_colors_);
+  s.unpack("FmuFunction::hess_colors", hess_colors_);
+  s.unpack("FmuFunction::nonlin", nonlin_);
+
+  s.unpack("FmuFunction::max_jac_tasks", max_jac_tasks_);
+  s.unpack("FmuFunction::max_hess_tasks", max_hess_tasks_);
+  s.unpack("FmuFunction::max_n_tasks", max_n_tasks_);
+
+  if (has_jac_) {
+    // Setup Jacobian memory
+    casadi_jac_setup(&p_, jac_sp_, jac_colors_);
+    p_.nom_in = get_ptr(jac_nom_in_);
+    p_.map_out = get_ptr(jac_out_);
+    p_.map_in = get_ptr(jac_in_);
+  }
+
+}
+
+//void pack(SerializingStream&s, );
+
+
 } // namespace casadi

@@ -183,6 +183,13 @@ class CASADI_EXPORT Fmu2 : public FmuInternal {
     fmi2Status status,
     fmi2String category,
     fmi2String message, ...);
+
+  void serialize_body(SerializingStream& s) const override;
+
+  static Fmu2* deserialize(DeserializingStream& s);
+
+  protected:
+    explicit Fmu2(DeserializingStream& s);
 };
 
 } // namespace casadi

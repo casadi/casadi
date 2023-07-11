@@ -28,12 +28,14 @@
 #include "slice.hpp"
 #include "linsol.hpp"
 #include "importer.hpp"
+#include "fmu.hpp"
 #include "generic_type.hpp"
 #include "shared_object_internal.hpp"
 #include "sx_node.hpp"
 #include "sparsity_internal.hpp"
 #include "mx_node.hpp"
 #include "function_internal.hpp"
+#include "fmu_impl.hpp" // Not sure why this is needed and importer_internal.hpp is not
 #include <iomanip>
 
 namespace casadi {
@@ -153,6 +155,22 @@ namespace casadi {
       for (int j=0;j<4;++j) pack(c[j]);
     }
 
+    void DeserializingStream::unpack(unsigned int& e) {
+      assert_decoration('u');
+      uint32_t n;
+      char* c = reinterpret_cast<char*>(&n);
+
+      for (int j=0;j<4;++j) unpack(c[j]);
+      e = n;
+    }
+
+    void SerializingStream::pack(unsigned int e) {
+      decorate('u');
+      uint32_t n = e;
+      const char* c = reinterpret_cast<const char*>(&n);
+      for (int j=0;j<4;++j) pack(c[j]);
+    }
+
     void DeserializingStream::unpack(bool& e) {
       assert_decoration('b');
       char n;
@@ -248,6 +266,16 @@ namespace casadi {
     void DeserializingStream::unpack(Importer& e) {
       assert_decoration('M');
       shared_unpack<Importer, ImporterInternal>(e);
+    }
+
+    void SerializingStream::pack(const Fmu& e) {
+      decorate('F');
+      shared_pack(e);
+    }
+
+    void DeserializingStream::unpack(Fmu& e) {
+      assert_decoration('F');
+      shared_unpack<Fmu, FmuInternal>(e);
     }
 
     void SerializingStream::pack(const Linsol& e) {

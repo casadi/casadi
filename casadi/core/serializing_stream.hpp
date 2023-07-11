@@ -39,6 +39,7 @@ namespace casadi {
   class SXElem;
   class GenericType;
   class Importer;
+  class Fmu;
   class SharedObject;
   class SharedObjectInternal;
   class SXNode;
@@ -90,10 +91,12 @@ namespace casadi {
     }
     void unpack(Function& e);
     void unpack(Importer& e);
+    void unpack(Fmu& e);
     void unpack(GenericType& e);
     void unpack(std::ostream& s);
     void unpack(Slice& e);
     void unpack(int& e);
+    void unpack(unsigned int& e);
     void unpack(bool& e);
     void unpack(casadi_int& e);
     void unpack(size_t& e);
@@ -223,10 +226,12 @@ namespace casadi {
     }
     void pack(const Function& e);
     void pack(const Importer& e);
+    void pack(const Fmu& e);
     void pack(const Slice& e);
     void pack(const GenericType& e);
     void pack(std::istream& s);
     void pack(int e);
+    void pack(unsigned int e);
     void pack(bool e);
     void pack(casadi_int e);
     void pack(size_t e);

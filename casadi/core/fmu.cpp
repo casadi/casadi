@@ -39,6 +39,10 @@ throw CasadiException("Error in Fmu::" FNAME " for '" + this->name() + "' "\
   "[" + this->class_name() + "] at " + CASADI_WHERE + ":\n"\
   + std::string(WHAT));
 
+
+  Fmu::Fmu() {
+
+  }
 Fmu::Fmu(const std::string& name, FmuApi api, const DaeBuilderInternal* dae,
     const std::vector<std::string>& scheme_in,
     const std::vector<std::string>& scheme_out,
@@ -520,6 +524,102 @@ void FmuInternal::gather_sens(FmuMemory* m) const {
   // Allocate result vectors
   m->v_out_.resize(n_unknown);
   m->d_out_.resize(n_unknown);
+}
+
+
+void Fmu::serialize(SerializingStream &s) const {
+  return (*this)->serialize(s);
+}
+
+Fmu Fmu::deserialize(DeserializingStream& s) {
+  return Fmu::create(FmuInternal::deserialize(s));
+}
+
+Fmu Fmu::create(FmuInternal* node) {
+  Fmu ret;
+  ret.own(node);
+  return ret;
+}
+
+void FmuInternal::serialize(SerializingStream& s) const {
+  serialize_type(s);
+  serialize_body(s);
+}
+
+void FmuInternal::serialize_type(SerializingStream& s) const {
+  s.pack("FmuInternal::type", class_name());
+}
+
+void FmuInternal::serialize_body(SerializingStream& s) const {
+  s.version("FmuInternal", 1);
+  s.pack("FmuInternal::name", name_);
+  s.pack("FmuInternal::scheme_in", scheme_in_);
+  s.pack("FmuInternal::scheme_out", scheme_out_);
+  s.pack("FmuInternal::scheme", scheme_);
+  s.pack("FmuInternal::aux", aux_);
+  s.pack("FmuInternal::li", li_);
+  s.pack("FmuInternal::iind", iind_);
+  s.pack("FmuInternal::iind_map", iind_map_);
+  s.pack("FmuInternal::oind", oind_);
+  s.pack("FmuInternal::oind_map", oind_map_);
+  s.pack("FmuInternal::nominal_in", nominal_in_);
+  s.pack("FmuInternal::nominal_out", nominal_out_);
+  s.pack("FmuInternal::min_in", min_in_);
+  s.pack("FmuInternal::min_out", min_out_);
+  s.pack("FmuInternal::max_in", max_in_);
+  s.pack("FmuInternal::max_out", max_out_);
+  s.pack("FmuInternal::vn_in", vn_in_);
+  s.pack("FmuInternal::vn_out", vn_out_);
+  s.pack("FmuInternal::vr_in", vr_in_);
+  s.pack("FmuInternal::vr_out", vr_out_);
+
+  s.pack("FmuInternal::value_in", value_in_);
+  s.pack("FmuInternal::ired", ired_);
+  s.pack("FmuInternal::ored", ored_);
+  s.pack("FmuInternal::jac_sp", jac_sp_);
+  s.pack("FmuInternal::hess_sp", hess_sp_);
+
+
+}
+
+FmuInternal::FmuInternal(DeserializingStream& s) {
+  s.version("FmuInternal", 1);
+  s.unpack("FmuInternal::name", name_);
+  s.unpack("FmuInternal::scheme_in", scheme_in_);
+  s.unpack("FmuInternal::scheme_out", scheme_out_);
+  s.unpack("FmuInternal::scheme", scheme_);
+  s.unpack("FmuInternal::aux", aux_);
+  s.unpack("FmuInternal::li", li_);
+  s.unpack("FmuInternal::iind", iind_);
+  s.unpack("FmuInternal::iind_map", iind_map_);
+  s.unpack("FmuInternal::oind", oind_);
+  s.unpack("FmuInternal::oind_map", oind_map_);
+  s.unpack("FmuInternal::nominal_in", nominal_in_);
+  s.unpack("FmuInternal::nominal_out", nominal_out_);
+  s.unpack("FmuInternal::min_in", min_in_);
+  s.unpack("FmuInternal::min_out", min_out_);
+  s.unpack("FmuInternal::max_in", max_in_);
+  s.unpack("FmuInternal::max_out", max_out_);
+  s.unpack("FmuInternal::vn_in", vn_in_);
+  s.unpack("FmuInternal::vn_out", vn_out_);
+  s.unpack("FmuInternal::vr_in", vr_in_);
+  s.unpack("FmuInternal::vr_out", vr_out_);
+
+  s.unpack("FmuInternal::value_in", value_in_);
+  s.unpack("FmuInternal::ired", ired_);
+  s.unpack("FmuInternal::ored", ored_);
+  s.unpack("FmuInternal::jac_sp", jac_sp_);
+  s.unpack("FmuInternal::hess_sp", hess_sp_);
+}
+
+FmuInternal* FmuInternal::deserialize(DeserializingStream& s) {
+  std::string class_name;
+  s.unpack("FmuInternal::type", class_name);
+  if (class_name=="Fmu2") {
+    return Fmu2::deserialize(s);
+  } else {
+    casadi_error("Cannot deserialize type '" + class_name + "'");
+  }
 }
 
 } // namespace casadi
