@@ -1532,7 +1532,7 @@ FmuFunction::FmuFunction(DeserializingStream& s) : FunctionInternal(s) {
   s.unpack("FmuFunction::max_hess_tasks", max_hess_tasks_);
   s.unpack("FmuFunction::max_n_tasks", max_n_tasks_);
 
-  if (has_jac_) {
+  if (has_jac_ || has_adj_ || has_hess_) {
     // Setup Jacobian memory
     casadi_jac_setup(&p_, jac_sp_, jac_colors_);
     p_.nom_in = get_ptr(jac_nom_in_);
