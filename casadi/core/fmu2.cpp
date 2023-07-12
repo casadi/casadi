@@ -260,9 +260,10 @@ void Fmu2::init(const DaeBuilderInternal* dae) {
     + "/" + instance_name_no_dot + dll_suffix();
   li_ = Importer(dll_path, "dll");
 
+  declared_ad_ = dae->provides_directional_derivative_;
+
   if (dae->provides_directional_derivative_) {
-    get_directional_derivative_ = load_function<fmi2GetDirectionalDerivativeTYPE>(
-      "fmi2GetDirectionalDerivative");
+
   }
 
   // Path to resource directory
@@ -295,6 +296,11 @@ void Fmu2::finalize() {
   set_boolean_ = load_function<fmi2SetBooleanTYPE>("fmi2SetBoolean");
   get_string_ = load_function<fmi2GetStringTYPE>("fmi2GetString");
   set_string_ = load_function<fmi2SetStringTYPE>("fmi2SetString");
+
+  if (declared_ad_) {
+    get_directional_derivative_ =
+      load_function<fmi2GetDirectionalDerivativeTYPE>("fmi2GetDirectionalDerivative");
+  }
 
   // Callback functions
   functions_.logger = logger;
@@ -925,14 +931,16 @@ Fmu2::Fmu2(DeserializingStream& s) : FmuInternal(s) {
   s.unpack("Fmu2::init_boolean", init_boolean_);
   s.unpack("Fmu2::init_string", init_string_);
 
-  s.unpack("Fmu2::vn_aux_real_", vn_aux_real_);
-  s.unpack("Fmu2::vn_aux_integer_", vn_aux_integer_);
-  s.unpack("Fmu2::vn_aux_boolean_", vn_aux_boolean_);
-  s.unpack("Fmu2::vn_aux_string_", vn_aux_string_);
-  s.unpack("Fmu2::vr_aux_real_", vr_aux_real_);
-  s.unpack("Fmu2::vr_aux_integer_", vr_aux_integer_);
-  s.unpack("Fmu2::vr_aux_boolean_", vr_aux_boolean_);
-  s.unpack("Fmu2::vr_aux_string_", vr_aux_string_);
+  s.unpack("Fmu2::vn_aux_real", vn_aux_real_);
+  s.unpack("Fmu2::vn_aux_integer", vn_aux_integer_);
+  s.unpack("Fmu2::vn_aux_boolean", vn_aux_boolean_);
+  s.unpack("Fmu2::vn_aux_string", vn_aux_string_);
+  s.unpack("Fmu2::vr_aux_real", vr_aux_real_);
+  s.unpack("Fmu2::vr_aux_integer", vr_aux_integer_);
+  s.unpack("Fmu2::vr_aux_boolean", vr_aux_boolean_);
+  s.unpack("Fmu2::vr_aux_string", vr_aux_string_);
+
+  s.unpack("Fmu2::declared_ad", declared_ad_);
 
 }
 
@@ -964,6 +972,8 @@ void Fmu2::serialize_body(SerializingStream &s) const {
   s.pack("Fmu2::vr_aux_integer_", vr_aux_integer_);
   s.pack("Fmu2::vr_aux_boolean_", vr_aux_boolean_);
   s.pack("Fmu2::vr_aux_string_", vr_aux_string_);
+
+  s.pack("Fmu2::declared_ad", declared_ad_);
 }
 
 #endif  // WITH_FMI2
