@@ -325,6 +325,27 @@ namespace casadi {
     return;
   }
 
+  UnifiedReturnStatus map_status(SLEQP_STATUS status)
+  {
+    switch (status) {
+    case SLEQP_STATUS_OPTIMAL:
+      return SOLVER_RET_SUCCESS;
+    case SLEQP_STATUS_INFEASIBLE:
+      return SOLVER_RET_INFEASIBLE;
+
+    case SLEQP_STATUS_ABORT_ITER:
+    case SLEQP_STATUS_ABORT_MANUAL:
+    case SLEQP_STATUS_ABORT_TIME:
+      return SOLVER_RET_LIMITED;
+    default:
+      // case SLEQP_STATUS_UNKNOWN:
+      // case SLEQP_STATUS_RUNNING:
+      // case SLEQP_STATUS_UNBOUNDED:
+      // case SLEQP_STATUS_ABORT_DEADPOINT:
+      return SOLVER_RET_UNKNOWN;
+    }
+  }
+
   // Solve the NLP
   int SLEQPInterface::solve(void* mem) const {
     std::cout << "SLEQPInterface::solve" << std::endl;
@@ -334,8 +355,6 @@ namespace casadi {
     // TODO: Pass iteration and time limits
     SLEQP_CALL_EXC(sleqp_solver_solve(m->internal.solver, SLEQP_NONE, SLEQP_NONE));
 
-    // TODO: pass result back
-
     SleqpIterate* iterate;
 
     SLEQP_CALL(sleqp_solver_solution(m->internal.solver, &iterate));
@@ -343,7 +362,7 @@ namespace casadi {
     casadi_nlpsol_data<double>& d_nlp = m->d_nlp;
 
     m->success = true;
-    m->unified_return_status = SOLVER_RET_SUCCESS;
+    m->unified_return_status = map_status(sleqp_solver_status(m->internal.solver));
 
     SleqpVec* primal = sleqp_iterate_primal(iterate);
     SLEQP_CALL_EXC(sleqp_vec_to_raw(primal, d_nlp.z));
