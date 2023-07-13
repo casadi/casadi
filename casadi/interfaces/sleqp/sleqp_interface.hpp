@@ -3,9 +3,8 @@
 #include <casadi/interfaces/sleqp/casadi_nlpsol_sleqp_export.h>
 #include "casadi/core/nlpsol_impl.hpp"
 #include "casadi/core/timing.hpp"
-#include "sleqp/pub_problem.h"
-#include "sleqp/pub_settings.h"
-#include "sleqp/pub_solver.h"
+
+#include "sleqp.h"
 
 // TODO: Use casadi exceptions / error reporting??
 #define SLEQP_CALL_EXC(x)                       \
@@ -30,9 +29,8 @@ namespace casadi {
       SleqpSolver* solver;
     } internal;
 
-    double* x;
-
     // Current calculated quantities
+    double* xk;
     double *gk, *grad_fk, *jac_gk, *hess_lk, *grad_lk;
 
     const SLEQPInterface* interface;
@@ -41,7 +39,7 @@ namespace casadi {
   class CASADI_NLPSOL_SLEQP_EXPORT SLEQPInterface : public Nlpsol {
   private:
 
-    void clear_mem(SLEQPMemory* m) const;
+    void clear_mem_at(SLEQPMemory* m) const;
 
   public:
     explicit SLEQPInterface(const std::string& name, const Function& nlp);

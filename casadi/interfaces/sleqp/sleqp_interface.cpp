@@ -89,6 +89,7 @@ namespace casadi {
   }
 
   SLEQPInterface::~SLEQPInterface() {
+    clear_mem();
   }
 
   const Options SLEQPInterface::options_
@@ -115,6 +116,12 @@ namespace casadi {
 
     jacg_sp_ = get_function("nlp_jac_g").sparsity_out(1);
 
+    // Allocate work vectors
+    alloc_w(nx_, true); // xk_
+    alloc_w(ng_, true); // gk_
+    alloc_w(nx_, true); // grad_fk_
+    alloc_w(jacg_sp_.nnz(), true); // jac_gk_
+
     // TODO: Pass options
 
     // Setup NLP Hessian
@@ -139,14 +146,13 @@ namespace casadi {
     return 0;
   }
 
-  void SLEQPInterface::clear_mem(SLEQPMemory* m) const {
+  void SLEQPInterface::clear_mem_at(SLEQPMemory* m) const {
     std::cout << "SLEQPInterface::clear_mem" << std::endl;
 
     SLEQP_CALL_EXC(sleqp_solver_release(&m->internal.solver));
     SLEQP_CALL_EXC(sleqp_problem_release(&m->internal.problem));
+    SLEQP_CALL_EXC(sleqp_settings_release(&m->internal.settings));
     SLEQP_CALL_EXC(sleqp_vec_free(&m->internal.primal));
-
-    delete[] m->x;
   }
 
   void SLEQPInterface::free_mem(void *mem) const {
@@ -154,7 +160,7 @@ namespace casadi {
 
     SLEQPMemory* m = static_cast<SLEQPMemory*>(mem);
 
-    clear_mem(m);
+    clear_mem_at(m);
 
     delete m;
   }
@@ -215,8 +221,6 @@ namespace casadi {
 
     const int num_vars = nx_;
     const int num_cons = ng_;
-
-    m->x = new double[num_vars];
 
     SleqpVec* var_lb;
     SleqpVec* var_ub;
@@ -283,10 +287,25 @@ namespace casadi {
                                                cons_ub,
                                                m->internal.settings));
 
+    SLEQP_CALL_EXC(sleqp_func_release(&func));
+
+    SLEQP_CALL_EXC(sleqp_vec_free(&cons_ub));
+    SLEQP_CALL_EXC(sleqp_vec_free(&cons_lb));
+
+    SLEQP_CALL_EXC(sleqp_vec_free(&var_ub));
+    SLEQP_CALL_EXC(sleqp_vec_free(&var_lb));
+
+
     // No scaling
-    SLEQP_CALL_EXC(sleqp_solver_create(&m->internal.solver, m->internal.problem, m->internal.primal, nullptr));
+    SLEQP_CALL_EXC(sleqp_solver_create(&m->internal.solver,
+                                       m->internal.problem,
+                                       m->internal.primal,
+                                       nullptr));
 
     auto jacg_sp_ = get_function("nlp_jac_g").sparsity_out(1);
+
+    m->xk = w;
+    w += nx_;
 
     m->gk = w;
     w += ng_;
@@ -327,18 +346,18 @@ namespace casadi {
     m->unified_return_status = SOLVER_RET_SUCCESS;
 
     SleqpVec* primal = sleqp_iterate_primal(iterate);
-    SLEQP_CALL_EXC(sleqp_vec_to_raw(primal, d_nlp.x));
-
     SLEQP_CALL_EXC(sleqp_vec_to_raw(primal, d_nlp.z));
 
     d_nlp.objective = sleqp_iterate_obj_val(iterate);
-    (*d_nlp.f) = sleqp_iterate_obj_val(iterate);
+
+    SleqpVec* cons_val = sleqp_iterate_cons_val(iterate);
+    SLEQP_CALL_EXC(sleqp_vec_to_raw(cons_val, d_nlp.z + nx_));
 
     SleqpVec* var_dual = sleqp_iterate_vars_dual(iterate);
-    SLEQP_CALL_EXC(sleqp_vec_to_raw(var_dual, d_nlp.lam_x));
+    SLEQP_CALL_EXC(sleqp_vec_to_raw(var_dual, d_nlp.lam));
 
     SleqpVec* cons_dual = sleqp_iterate_cons_dual(iterate);
-    SLEQP_CALL_EXC(sleqp_vec_to_raw(cons_dual, d_nlp.lam_g));
+    SLEQP_CALL_EXC(sleqp_vec_to_raw(cons_dual, d_nlp.lam + nx_));
 
     // TODO: What is lam_p?
 

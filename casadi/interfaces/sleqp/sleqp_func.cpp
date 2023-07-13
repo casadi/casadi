@@ -14,7 +14,7 @@ namespace casadi {
   {
     SLEQPMemory* m = static_cast<SLEQPMemory*>(func_data);
 
-    SLEQP_CALL(sleqp_vec_to_raw(value, m->x));
+    SLEQP_CALL(sleqp_vec_to_raw(value, m->xk));
 
     return SLEQP_OKAY;
   }
@@ -36,7 +36,7 @@ namespace casadi {
   {
     SLEQPMemory* m = static_cast<SLEQPMemory*>(func_data);
 
-    m->arg[0] = m->x;
+    m->arg[0] = m->xk;
     m->arg[1] = m->d_nlp.p;
     m->res[0] = obj_val;
 
@@ -59,7 +59,7 @@ namespace casadi {
   {
     SLEQPMemory* m = static_cast<SLEQPMemory*>(func_data);
 
-    m->arg[0] = m->x;
+    m->arg[0] = m->xk;
     m->arg[1] = m->d_nlp.p;
     m->res[0] = nullptr;
     m->res[1] = m->grad_fk;
@@ -90,7 +90,7 @@ namespace casadi {
   {
     SLEQPMemory* m = static_cast<SLEQPMemory*>(func_data);
 
-    m->arg[0] = m->x;
+    m->arg[0] = m->xk;
     m->arg[1] = m->d_nlp.p;
     m->res[0] = m->gk;
 
@@ -120,7 +120,7 @@ namespace casadi {
   {
     SLEQPMemory* m = static_cast<SLEQPMemory*>(func_data);
 
-    m->arg[0] = m->x;
+    m->arg[0] = m->xk;
     m->arg[1] = m->d_nlp.p;
     m->res[0] = nullptr;
     m->res[1] = m->jac_gk;
