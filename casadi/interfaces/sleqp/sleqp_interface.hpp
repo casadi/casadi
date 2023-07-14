@@ -33,6 +33,9 @@ namespace casadi {
     double* xk;
     double *gk, *grad_fk, *jac_gk, *hess_lk, *grad_lk;
 
+    // Additional callback data
+    double *cb_xk, *cb_lam_xk, *cb_lam_gk;
+
     const SLEQPInterface* interface;
   };
 

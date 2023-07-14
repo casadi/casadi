@@ -108,7 +108,12 @@ namespace casadi {
                                         0.));
 
     } catch (std::exception& ex) {
-      std::cout << "Error: " << ex.what() << std::endl;
+      uerr() << "Error \""
+             << ex.what()
+             << "\" evaluating constraint value"
+             << std::endl;
+
+      sleqp_raise(SLEQP_FUNC_EVAL_ERROR, "%s", ex.what());
     }
 
     return SLEQP_OKAY;
@@ -132,7 +137,12 @@ namespace casadi {
       }
 
     } catch (std::exception& ex) {
-      std::cout << "Error: " << ex.what() << std::endl;
+      uerr() << "Error \""
+             << ex.what()
+             << "\" evaluating constraint Jacobian"
+             << std::endl;
+
+      sleqp_raise(SLEQP_FUNC_EVAL_ERROR, "%s", ex.what());
     }
 
     casadi_int ncol = m->interface->jacg_sp_.size2();

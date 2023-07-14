@@ -24,13 +24,16 @@
 
 
 #include "sleqp_interface.hpp"
-
-#include <cstddef>
-
 #include "sleqp_func.hpp"
 
 // TODO: Pass options
-// TODO: Convert inf values
+// TODO: Add consistent error handling
+// TODO: Take care of exact / quasi Newton
+// TODO: Make Newton into product?
+// TODO: Pass iteration and time limits
+
+// TODO: Do we ever need the parameters??
+
 
 namespace casadi {
 
@@ -94,7 +97,7 @@ namespace casadi {
 
   const Options SLEQPInterface::options_
   = {
-
+    {&Nlpsol::options_}
   };
 
   const std::string SLEQPInterface::meta_doc = "";
@@ -122,11 +125,19 @@ namespace casadi {
     alloc_w(nx_, true); // grad_fk_
     alloc_w(jacg_sp_.nnz(), true); // jac_gk_
 
-    // TODO: Pass options
+    if(!fcallback_.is_null())
+    {
+      // callback xk
+      alloc_w(nx_, true);
+
+      // callback lam_xk
+      alloc_w(nx_, true);
+
+      // callback lam_gk
+      alloc_w(ng_, true);
+    }
 
     // Setup NLP Hessian
-    // TODO: Take care of quasi-Newton
-    // TODO: Make this a product function
     if (!has_function("nlp_hess_l")) {
       create_function("nlp_hess_l", {"x", "p", "lam:f", "lam:g"},
                       {"triu:hess:gamma:x:x"}, {{"gamma", {"f", "g"}}});
@@ -275,9 +286,11 @@ namespace casadi {
                                                  SLEQP_SETTINGS_ENUM_HESS_EVAL,
                                                  SLEQP_HESS_EVAL_DAMPED_BFGS));
 
+    /*
     SLEQP_CALL_EXC(sleqp_settings_set_enum_value(m->internal.settings,
                                                  SLEQP_SETTINGS_ENUM_DERIV_CHECK,
                                                  SLEQP_DERIV_CHECK_FIRST));
+    */
 
     SLEQP_CALL_EXC(sleqp_problem_create_simple(&m->internal.problem,
                                                func,
@@ -316,6 +329,18 @@ namespace casadi {
     m->jac_gk = w;
     w += jacg_sp_.nnz();
 
+    if(!fcallback_.is_null())
+    {
+      m->cb_xk = w;
+      w += nx_;
+
+      m->cb_lam_xk = w;
+      w += nx_;
+
+      m->cb_lam_gk = w;
+      w += ng_;
+    }
+
     /*
     if (exact_hessian_) {
       m->hess_lk = w; w += hesslag_sp_.nnz();
@@ -346,13 +371,66 @@ namespace casadi {
     }
   }
 
+  static SLEQP_RETCODE
+  accepted_iterate(SleqpSolver* solver, SleqpIterate* iterate, void* data)
+  {
+    SLEQPMemory* m = static_cast<SLEQPMemory*>(data);
+
+    const SLEQPInterface* interface = m->interface;
+    const Function& fcallback_ = interface->fcallback_;
+
+    std::fill_n(m->arg, fcallback_.n_in(), nullptr);
+
+    double ret_double;
+    m->res[0] = &ret_double;
+
+    casadi_nlpsol_data<double>& d_nlp = m->d_nlp;
+
+    double obj_val = sleqp_iterate_obj_val(iterate);
+
+    m->arg[NLPSOL_F] = &obj_val;
+
+    SleqpVec* primal = sleqp_iterate_primal(iterate);
+    SLEQP_CALL(sleqp_vec_to_raw(primal, m->cb_xk));
+    m->arg[NLPSOL_X] = m->cb_xk;
+
+    SleqpVec* cons_val = sleqp_iterate_cons_val(iterate);
+    SLEQP_CALL(sleqp_vec_to_raw(cons_val, m->gk));
+    m->arg[NLPSOL_G] = m->gk;
+
+    SleqpVec* vars_dual = sleqp_iterate_vars_dual(iterate);
+    SLEQP_CALL(sleqp_vec_to_raw(vars_dual, m->cb_lam_xk));
+    m->arg[NLPSOL_LAM_X] = m->cb_lam_xk;
+
+    SleqpVec* cons_dual = sleqp_iterate_cons_dual(iterate);
+    SLEQP_CALL(sleqp_vec_to_raw(cons_dual, m->cb_lam_gk));
+    m->arg[NLPSOL_LAM_G] = m->cb_lam_gk;
+
+    fcallback_(m->arg, m->res, m->iw, m->w, 0);
+
+    casadi_int ret = static_cast<casadi_int>(ret_double);
+
+    if(ret != 0)
+    {
+      sleqp_raise(SLEQP_CALLBACK_ERROR, "Error in callback...");
+    }
+
+    return SLEQP_OKAY;
+  }
+
   // Solve the NLP
   int SLEQPInterface::solve(void* mem) const {
     std::cout << "SLEQPInterface::solve" << std::endl;
 
     SLEQPMemory* m = static_cast<SLEQPMemory*>(mem);
 
-    // TODO: Pass iteration and time limits
+    if (!fcallback_.is_null()) {
+      SLEQP_CALL_EXC(sleqp_solver_add_callback(m->internal.solver,
+                                               SLEQP_SOLVER_EVENT_ACCEPTED_ITERATE,
+                                               (void*)accepted_iterate,
+                                               mem));
+    }
+
     SLEQP_CALL_EXC(sleqp_solver_solve(m->internal.solver, SLEQP_NONE, SLEQP_NONE));
 
     SleqpIterate* iterate;
@@ -378,7 +456,12 @@ namespace casadi {
     SleqpVec* cons_dual = sleqp_iterate_cons_dual(iterate);
     SLEQP_CALL_EXC(sleqp_vec_to_raw(cons_dual, d_nlp.lam + nx_));
 
-    // TODO: What is lam_p?
+    if (!fcallback_.is_null()) {
+      SLEQP_CALL_EXC(sleqp_solver_remove_callback(m->internal.solver,
+                                                  SLEQP_SOLVER_EVENT_ACCEPTED_ITERATE,
+                                                  (void*)accepted_iterate,
+                                                  mem));
+    }
 
     return 0;
   }
