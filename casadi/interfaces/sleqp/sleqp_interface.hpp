@@ -41,6 +41,8 @@ namespace casadi {
 
   class CASADI_NLPSOL_SLEQP_EXPORT SLEQPInterface : public Nlpsol {
   private:
+    int max_it;
+    double time_limit;
 
     void clear_mem_at(SLEQPMemory* m) const;
 

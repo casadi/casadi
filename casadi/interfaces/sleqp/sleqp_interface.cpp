@@ -29,8 +29,7 @@
 // TODO: Pass options
 // TODO: Add consistent error handling
 // TODO: Take care of exact / quasi Newton
-// TODO: Make Newton into product?
-// TODO: Pass iteration and time limits
+// TODO: Turn Hessian into products?
 
 // TODO: Do we ever need the parameters??
 
@@ -97,7 +96,10 @@ namespace casadi {
 
   const Options SLEQPInterface::options_
   = {
-    {&Nlpsol::options_}
+    {&Nlpsol::options_},
+    {{"sleqp",
+      {OT_DICT,
+       "Options to be passed to SLEQP"}}},
   };
 
   const std::string SLEQPInterface::meta_doc = "";
@@ -106,6 +108,39 @@ namespace casadi {
     Nlpsol::init(opts);
 
     std::cout << "SLEQPInterface::init" << std::endl;
+
+    max_it = SLEQP_NONE;
+    time_limit = SLEQP_NONE;
+
+    auto opt_it = opts.find("sleqp");
+
+    if(opt_it != std::end(opts))
+    {
+      const Dict& opts_ = opt_it->second;
+
+      for(const auto& opt : opts_)
+      {
+        if(opt.first == "max_iter")
+        {
+          max_it = opt.second;
+
+          if(max_it < 0)
+          {
+            casadi_error("Invalid iteration limit " + std::to_string(max_it));
+          }
+        }
+        else if(opt.first == "max_wall_time")
+        {
+          time_limit = opt.second;
+
+          if(time_limit < 0.)
+          {
+            casadi_error("Invalid time limit " + std::to_string(time_limit));
+          }
+        }
+      }
+
+    }
 
     // Setup NLP functions
     create_function("nlp_f", {"x", "p"}, {"f"});
@@ -431,7 +466,9 @@ namespace casadi {
                                                mem));
     }
 
-    SLEQP_CALL_EXC(sleqp_solver_solve(m->internal.solver, SLEQP_NONE, SLEQP_NONE));
+    SLEQP_CALL_EXC(sleqp_solver_solve(m->internal.solver,
+                                      max_it,
+                                      time_limit));
 
     SleqpIterate* iterate;
 
