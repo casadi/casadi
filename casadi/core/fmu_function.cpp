@@ -143,6 +143,16 @@ FmuFunction::FmuFunction(const std::string& name, const Fmu& fmu,
   max_jac_tasks_ = max_hess_tasks_ = 0;
 }
 
+void FmuFunction::change_option(const std::string& option_name,
+    const GenericType& option_value) {
+  if (option_name == "print_progress") {
+    print_progress_ = option_value;
+  } else {
+    // Option not found - continue to base classes
+    FunctionInternal::change_option(option_name, option_value);
+  }
+}
+
 FmuFunction::~FmuFunction() {
   // Free memory
   clear_mem();
