@@ -52,6 +52,6 @@ auto async_solve(bool async, Solver &solver, Invoker &invoke_solver, CheckedArgs
                 }
             }
         }
-        return std::move(stats.get());
+        return std::move(stats).get();
     }
 }
