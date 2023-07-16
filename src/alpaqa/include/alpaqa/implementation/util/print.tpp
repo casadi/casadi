@@ -2,6 +2,7 @@
 
 #include <alpaqa/util/print.hpp>
 
+#include <cassert>
 #include <charconv>
 #include <cmath>
 #include <limits>
