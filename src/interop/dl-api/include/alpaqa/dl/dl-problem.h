@@ -1,9 +1,16 @@
 #pragma once
 
 #include <stddef.h>
+#include <stdint.h>
+#include <string.h>
+
+#define ALPAQA_DL_ABI_VERSION 0xA1A000000001
 
 #ifdef __cplusplus
 extern "C" {
+#define ALPAQA_DL_ABI_VERSION_DEFAULT = ALPAQA_DL_ABI_VERSION
+#else
+#define ALPAQA_DL_ABI_VERSION_DEFAULT
 #endif
 
 typedef double alpaqa_real_t;
@@ -11,7 +18,7 @@ typedef ptrdiff_t alpaqa_length_t;
 typedef alpaqa_length_t alpaqa_index_t;
 
 typedef struct {
-    char version[16];
+    uint64_t abi_version ALPAQA_DL_ABI_VERSION_DEFAULT;
     alpaqa_length_t n, m;
 
     // clang-format off
@@ -169,7 +176,7 @@ typedef struct {
 } alpaqa_problem_register_t;
 
 typedef struct {
-    char version[16];
+    uint64_t abi_version ALPAQA_DL_ABI_VERSION_DEFAULT;
     alpaqa_length_t N, nx, nu, nh, nh_N, nc, nc_N;
 
     // clang-format off
@@ -334,6 +341,14 @@ typedef struct {
 }
 #endif
 
+#ifndef __cplusplus
+#define ALPAQA_PROBLEM_FUNCTIONS_INIT(self)                                    \
+    do {                                                                       \
+        memset((self), 0, sizeof(*(self)));                                    \
+        (self)->abi_version = ALPAQA_DL_ABI_VERSION;                           \
+    } while (0)
+#endif
+
 #if defined(__cplusplus) && __cplusplus > 201703L
 
 #include <any>
@@ -457,3 +472,5 @@ inline void unregister_functions(function_dict_t *&extra_functions) {
 } // namespace alpaqa
 
 #endif
+
+#undef ALPAQA_DL_ABI_VERSION_DEFAULT

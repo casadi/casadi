@@ -1,7 +1,9 @@
 #include <alpaqa/dl/dl-problem.hpp>
 
 #include <dlfcn.h>
+#include <algorithm>
 #include <cassert>
+#include <charconv>
 #include <memory>
 #include <stdexcept>
 
@@ -41,6 +43,25 @@ DLProblem::DLProblem(std::string so_filename, std::string symbol_prefix,
     // Avoid leaking if std::shared_ptr constructor throws
     std::unique_ptr<void, void (*)(void *)> unique_inst{r.instance, r.cleanup};
     std::unique_ptr<alpaqa_function_dict_t> unique_extra{r.extra_functions};
+    // Check the ABI version
+    static constexpr auto format_abi_version = [](uint64_t version) {
+        std::string s(16, '0');
+        auto begin = s.data(), end = begin + s.size();
+        auto [ptr, ec] = std::to_chars(begin, end, version, 16);
+        if (ec != std::errc())
+            throw std::logic_error(std::make_error_code(ec).message());
+        std::rotate(begin, ptr, end);
+        return s;
+    };
+    if (r.functions->abi_version != ALPAQA_DL_ABI_VERSION) {
+        auto prob_version   = format_abi_version(r.functions->abi_version);
+        auto alpaqa_version = format_abi_version(ALPAQA_DL_ABI_VERSION);
+        throw std::runtime_error(
+            "alpaqa::dl::DLProblem::DLProblem: "
+            "Incompatible problem definition (problem ABI version 0x" +
+            prob_version + ", this version of alpaqa supports 0x" +
+            alpaqa_version + ")");
+    }
     // Store data returned by plugin
     instance  = std::shared_ptr<void>{std::move(unique_inst)};
     functions = r.functions;

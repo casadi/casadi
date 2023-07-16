@@ -56,7 +56,7 @@ static void eval_grad_g_prod(void *instance, const real_t *x, const real_t *y,
 static struct ProblemData *create_problem(void *user_data) {
     (void)user_data;
     struct ProblemData *problem = malloc(sizeof(*problem));
-    memset(problem, 0, sizeof(*problem));
+    ALPAQA_PROBLEM_FUNCTIONS_INIT(&problem->functions);
     size_t n = 2, m = 1;
     problem->functions.n                = (length_t)n;
     problem->functions.m                = (length_t)m;
