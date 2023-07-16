@@ -84,8 +84,6 @@ jobs:
         host: [x86_64-centos7-linux-gnu, armv7-neon-linux-gnueabihf, armv6-rpi-linux-gnueabihf, aarch64-rpi3-linux-gnu]
         exclude:
           - pypy: pypy
-            python-version: '3.10'
-          - pypy: pypy
             python-version: '3.11'
           - pypy: pypy
             host: armv7-neon-linux-gnueabihf
@@ -409,6 +407,9 @@ jobs:
             pypy: 'pypy'
             container: 'pypy'
           - python-version: '3.9'
+            pypy: 'pypy'
+            container: 'pypy'
+          - python-version: '3.10'
             pypy: 'pypy'
             container: 'pypy'
     steps:
