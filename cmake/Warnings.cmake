@@ -40,6 +40,8 @@ function(add_warnings_target tgt_name warnings_as_errors)
         -Wno-error=unused-but-set-variable
         -Wsuggest-override
         -Wno-error=attributes
+        -ftemplate-backtrace-limit=99
+        -fconcepts-diagnostics-depth=99
     )
     # Clang, AppleClang
     set(CLANG_WARNINGS_CXX
