@@ -453,7 +453,7 @@ jobs:
         run: python -m pip install --no-deps --no-index --find-links=dist ${PACKAGE_NAME}==${PACKAGE_VERSION}
       - name: Check package version
         run: |
-          [ "${{ github.event.release.tag_name }}" == "$(python -c 'import ${{ env.MODULE_NAME }} as m; print(m.__version__)')" ]
+          [ "${{ github.event.release.tag_name }}" == "$(python -c 'from importlib.metadata import version as v; print(v(\"${{ env.MODULE_NAME }}\"))')" ]
         shell: bash
       - name: Upload Wheels to PyPI
         run: python -m twine upload -r ${{ env.TWINE_REPOSITORY }} dist/*.whl
