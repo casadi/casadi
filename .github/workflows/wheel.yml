@@ -80,11 +80,13 @@ jobs:
     strategy:
       matrix:
         pypy: ['', pypy]
-        python-version: ['3.8', '3.9', '3.10', '3.11']
+        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
         host: [x86_64-centos7-linux-gnu, armv7-neon-linux-gnueabihf, armv6-rpi-linux-gnueabihf, aarch64-rpi3-linux-gnu]
         exclude:
           - pypy: pypy
             python-version: '3.11'
+          - pypy: pypy
+            python-version: '3.12'
           - pypy: pypy
             host: armv7-neon-linux-gnueabihf
           - pypy: pypy
@@ -396,10 +398,11 @@ jobs:
     if: ${{ github.event.action == 'released' || github.event.action == 'prereleased' }}
     needs: [test-linux, build-linux-src, test-windows, test-macos]
     runs-on: ubuntu-latest
-    container: ${{ matrix.container }}:${{ matrix.python-version }}-bullseye
+    container: ${{ matrix.container }}:${{ matrix.python-version }}${{ matrix.python-version-suffix }}-bullseye
     strategy:
       matrix:
-        python-version: ['3.8', '3.9', '3.10', '3.11']
+        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
+        python-version-suffix: ['']
         pypy: ['']
         container: ['python']
         include:
@@ -412,6 +415,8 @@ jobs:
           - python-version: '3.10'
             pypy: 'pypy'
             container: 'pypy'
+          - python-version: '3.12'
+            python-version-suffix: '-rc'
     steps:
       - uses: actions/checkout@v3
       - uses: actions/download-artifact@v3
@@ -423,12 +428,12 @@ jobs:
           name: whl-${{ matrix.pypy }}${{ matrix.python-version }}-debug-linux
           path: dist
       - uses: actions/download-artifact@v3
-        if: ${{ !matrix.pypy }}
+        if: ${{ !matrix.pypy }} && ${{ matrix.python-version != '3.12' }}
         with:
           name: whl-${{ matrix.python-version }}-windows
           path: dist
       - uses: actions/download-artifact@v3
-        if: ${{ !matrix.pypy }}
+        if: ${{ !matrix.pypy }} && ${{ matrix.python-version != '3.12' }}
         with:
           name: whl-${{ matrix.python-version }}-macos
           path: dist
