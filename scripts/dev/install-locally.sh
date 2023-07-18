@@ -12,7 +12,7 @@ case $(uname -m) in
 esac
 
 # Download compiler
-download_url="https://github.com/tttapa/cross-python/releases/download/0.0.16"
+download_url="https://github.com/tttapa/cross-python/releases/download/0.0.19"
 tools_dir="$PWD/toolchains"
 pfx="$tools_dir/$triple"
 mkdir -p "$tools_dir"
@@ -65,7 +65,8 @@ USE_GLOBAL_PYBIND11 = "On"
 ALPAQA_PYTHON_DEBUG_CONFIG = "Debug"
 ALPAQA_WITH_PY_STUBS = "On"
 EOF
-. ./py-venv/bin/activate
+. ./.venv/bin/activate
+pip install -U pip build
 develop=true
 if $develop; then
     LDFLAGS='-static-libgcc -static-libstdc++' \
