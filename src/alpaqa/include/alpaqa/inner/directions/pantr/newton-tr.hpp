@@ -104,8 +104,8 @@ struct NewtonTRDirection {
         const auto n = problem->get_n();
         index_t nJ =
             problem->eval_inactive_indices_res_lna(γₖ, xₖ, grad_ψxₖ, JK_sto);
-        auto J = JK_sto.topRows(nJ);
-        auto K = JK_sto.bottomRows(n - nJ);
+        crindexvec J = JK_sto.topRows(nJ);
+        rindexvec K  = JK_sto.bottomRows(n - nJ);
         detail::IndexSet<config_t>::compute_complement(J, K, n);
         auto rJ = rJ_sto.topRows(nJ);
         auto qJ = qJ_sto.topRows(nJ);
