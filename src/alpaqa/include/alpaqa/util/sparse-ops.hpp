@@ -19,7 +19,7 @@ namespace detail {
 /// are also in @p mask.
 /// The range consists of the full Eigen InnerIterators (row, column, value).
 template <class SpMat, class MaskVec>
-auto select_rows_in_col(const SpMat &sp_mat, MaskVec mask, auto column) {
+auto select_rows_in_col(const SpMat &sp_mat, MaskVec &mask, auto column) {
     // Make a range that iterates over all matrix elements in the given column:
     using row_iter_t = typename SpMat::InnerIterator;
     util::iter_range_adapter<row_iter_t> col_range{{sp_mat, column}};
@@ -28,8 +28,9 @@ auto select_rows_in_col(const SpMat &sp_mat, MaskVec mask, auto column) {
         return static_cast<typename MaskVec::value_type>(it.row());
     };
     // Compute the intersection between the matrix elements and the mask:
-    auto intersection = util::iter_set_intersection(
-        std::move(col_range), std::move(mask), std::less{}, proj_row);
+    auto intersection = util::iter_set_intersection(std::move(col_range),
+                                                    std::ranges::ref_view{mask},
+                                                    std::less{}, proj_row);
     // Extract just the iterator to the matrix element (dropping the mask):
     auto extract_eigen_iter = []<class T>(T &&tup) -> decltype(auto) {
         return std::get<0>(std::forward<T>(tup));
@@ -40,7 +41,7 @@ auto select_rows_in_col(const SpMat &sp_mat, MaskVec mask, auto column) {
 /// Like @ref select_rows_in_col, but returns a range of tuples containing the
 /// Eigen InnerIterator and a linear index into the mask.
 template <class SpMat, class MaskVec>
-auto select_rows_in_col_iota(const SpMat &sp_mat, MaskVec mask, auto column) {
+auto select_rows_in_col_iota(const SpMat &sp_mat, MaskVec &mask, auto column) {
     // Make a range that iterates over all matrix elements in the given column:
     using row_iter_t = typename SpMat::InnerIterator;
     util::iter_range_adapter<row_iter_t> col_range{{sp_mat, column}};
@@ -49,7 +50,7 @@ auto select_rows_in_col_iota(const SpMat &sp_mat, MaskVec mask, auto column) {
         return static_cast<typename MaskVec::value_type>(it.row());
     };
     // Make a range of tuples of the index into the mask and the mask value:
-    auto iota_mask = util::enumerate(std::move(mask));
+    auto iota_mask = util::enumerate(std::ranges::ref_view{mask});
     // Projector that extracts the mask value from such a tuple:
     static constexpr auto proj_mask = [](const auto &tup) -> decltype(auto) {
         return std::get<1>(tup);

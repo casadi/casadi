@@ -24,17 +24,21 @@ TEST(IndexSet, simple) {
         std::cout << '[' << J.transpose() << "]\n";
         std::cout << '[' << K.transpose() << "]\n";
         ASSERT_EQ(J.size() + K.size(), n);
-        ASSERT_LT(J.end()[-1], n);
-        ASSERT_TRUE(std::is_sorted(J.begin(), J.end()));
-        EXPECT_EQ(std::adjacent_find(J.begin(), J.end()), J.end());
-        for (index_t j : J) {
-            EXPECT_TRUE(values(j, i));
+        if (J.size() > 0) {
+            ASSERT_LT(J.end()[-1], n);
+            ASSERT_TRUE(std::is_sorted(J.begin(), J.end()));
+            EXPECT_EQ(std::adjacent_find(J.begin(), J.end()), J.end());
+            for (index_t j : J) {
+                EXPECT_TRUE(values(j, i));
+            }
         }
-        ASSERT_LT(K.end()[-1], n);
-        ASSERT_TRUE(std::is_sorted(K.begin(), K.end()));
-        EXPECT_EQ(std::adjacent_find(K.begin(), K.end()), K.end());
-        for (index_t k : K) {
-            EXPECT_FALSE(values(k, i));
+        if (K.size() > 0) {
+            ASSERT_LT(K.end()[-1], n);
+            ASSERT_TRUE(std::is_sorted(K.begin(), K.end()));
+            EXPECT_EQ(std::adjacent_find(K.begin(), K.end()), K.end());
+            for (index_t k : K) {
+                EXPECT_FALSE(values(k, i));
+            }
         }
         std::cout << "---\n";
     }
