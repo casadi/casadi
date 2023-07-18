@@ -114,7 +114,7 @@ class MinimizationProblemDescription:
         """
         Generate, compile and load the problem.
 
-        :param \**kwargs:
+        :param \\**kwargs:
             Arguments passed to :py:func:`alpaqa.casadi_loader.generate_and_compile_casadi_problem`.
 
         :Keyword Arguments:
