@@ -438,12 +438,12 @@ jobs:
           name: whl-${{ matrix.pypy }}${{ matrix.python-version }}-debug-linux
           path: dist
       - uses: actions/download-artifact@v3
-        if: ${{ !matrix.pypy }} && ${{ matrix.python-version != '3.12' }}
+        if: ${{ matrix.python-version != '3.12' && !matrix.pypy }}
         with:
           name: whl-${{ matrix.python-version }}-windows
           path: dist
       - uses: actions/download-artifact@v3
-        if: ${{ !matrix.pypy }} && ${{ matrix.python-version != '3.12' }}
+        if: ${{ matrix.python-version != '3.12' && !matrix.pypy }}
         with:
           name: whl-${{ matrix.python-version }}-macos
           path: dist
