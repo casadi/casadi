@@ -409,7 +409,7 @@ jobs:
     container: ${{ matrix.container }}:${{ matrix.python-version }}${{ matrix.python-version-suffix }}-bullseye
     strategy:
       matrix:
-        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
+        python-version: ['3.8', '3.9', '3.10', '3.11']
         python-version-suffix: ['']
         pypy: ['']
         container: ['python']
@@ -425,6 +425,8 @@ jobs:
             container: 'pypy'
           - python-version: '3.12'
             python-version-suffix: '-rc'
+            pypy: ''
+            container: 'python'
     steps:
       - uses: actions/checkout@v3
       - uses: actions/download-artifact@v3
