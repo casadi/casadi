@@ -82,6 +82,13 @@ jobs:
         pypy: ['', pypy]
         python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
         host: [x86_64-centos7-linux-gnu, armv7-neon-linux-gnueabihf, armv6-rpi-linux-gnueabihf, aarch64-rpi3-linux-gnu]
+        include:
+          - python-version: '3.8'
+            pypy-version: '7.3.11'
+          - python-version: '3.9'
+            pypy-version: '7.3.12'
+          - python-version: '3.10'
+            pypy-version: '7.3.12'
         exclude:
           - pypy: pypy
             python-version: '3.11'
@@ -109,6 +116,7 @@ jobs:
           host: ${{ matrix.host }}
           python-version: ${{ matrix.python-version }}
           pypy: ${{ matrix.pypy }}
+          pypy-version: ${{ matrix.pypy-version }}
       # Ccache
       - name: Prepare ccache directory
         run: mkdir -p "${{ env.CCACHE_DIR }}"
