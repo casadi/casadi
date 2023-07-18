@@ -1,4 +1,4 @@
-sphinx @ git+https://github.com/tttapa/sphinx@5.x
+sphinx @ git+https://github.com/tttapa/sphinx@7.0.x
 matplotlib
 breathe
 furo
