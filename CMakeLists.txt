@@ -674,6 +674,14 @@ if(WITH_BLOCKSQP)
 endif()
 add_feature_info(blocksqp-interface WITH_BLOCKSQP "Interface to the NLP solver blockSQP.")
 
+# SLEQP: An active set-based NLP solver
+option(WITH_SLEQP "Compile the interface to SLEQP" ${WITH_SLEQP_DEF})
+set(BUILD_SLEQP_GIT_REPO "https://github.com/chrhansk/sleqp.git" CACHE STRING "Git repo used together with BUILD_IPOPT_VERSION")
+set(BUILD_SLEQP_VERSION "releases/1.0.0" CACHE STRING "Tag/branch/hash to be used for BUILD_IPOPT_GIT_REPO")
+option(WITH_BUILD_SLEQP "Build SLEQP (BUILD_SLEQP_VERSION=${BUILD_SLEQP_VERSION}) from downloaded source (BUILD_SLEQP_GIT_REPO=${BUILD_SLEQP_GIT_REPO})." OFF)
+# set(BUILD_SLEQP_DEPENDENCIES MUMPS)
+
+
 # IPOPT: A sparse interior point NLP solver with filter line-search
 option(WITH_IPOPT "Compile the interface to IPOPT" ${WITH_IPOPT_DEF})
 set(BUILD_IPOPT_GIT_REPO "https://github.com/jgillis/Ipopt-1.git" CACHE STRING "Git repo used together with BUILD_IPOPT_VERSION")
@@ -1352,6 +1360,23 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
 set(COIN_FLAGS "--enable-debug")
 endif()
 
+if(WITH_SLEQP)
+  if(WITH_BUILD_SLEQP)
+
+    include(FetchContent)
+
+    # TODO: Ensure that LP / Factorization / trlib interfaces are present
+    FetchContent_Declare(
+      sleqp
+      GIT_REPOSITORY https://github.com/chrhansk/sleqp
+      FIND_PACKAGE_ARGS
+      # GIT_TAG v1.0.0
+    )
+
+    FetchContent_MakeAvailable(sleqp)
+  endif()
+endif()
+add_feature_info(sleqp-interface WITH_SLEQP "Interface to the NLP solver SLEQP.")
 
 if(WITH_IPOPT)
   if(WITH_BUILD_IPOPT)
