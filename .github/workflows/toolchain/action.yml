@@ -82,3 +82,11 @@ runs:
       if: steps.cache-tools.outputs.cache-hit != 'true'
       shell: bash
       run: wget "${{ inputs.tools-url }}/${{ inputs.tools-version }}/full-${{ inputs.host }}.tar.xz" -O- | tar xJ -C /opt
+    # Install runtime libraries
+    - name: Install runtime libraries
+      if: ${{ inputs.host }} == 'x86_64-centos7-linux-gnu'
+      shell: bash
+      run: |
+        cp /opt/${{ inputs.host }}/x-tools/${{ inputs.host }}/${{ inputs.host }}/lib64/libgfortran.so.*.*.* /usr/local/lib
+        cp /opt/${{ inputs.host }}/x-tools/${{ inputs.host }}/${{ inputs.host }}/lib64/libstdc++.so.*.*.* /usr/local/lib
+        ldconfig
