@@ -70,7 +70,7 @@ pip install -U pip build
 develop=true
 if $develop; then
     LDFLAGS='-static-libgcc -static-libstdc++' \
-    pip install -e "." -v \
+    pip install -e ".[test]" -v \
         --config-settings=--cross="$pfx/cmake/$triple.py-build-cmake.cross.toml" \
         --config-settings=--local="$PWD/$config"
 else
