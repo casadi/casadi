@@ -33,8 +33,6 @@ jobs:
         { git checkout --orphan gh-pages && git rm -rf . && git clean -fxd ; }
 
     # Use ccache to cache compilation
-    - name: Install ccache
-      run: apt -y update && apt -y install --no-install-recommends ccache
     - name: Prepare ccache directory
       run: mkdir -p "${{ env.CCACHE_DIR }}"
     - name: Cache ccache
