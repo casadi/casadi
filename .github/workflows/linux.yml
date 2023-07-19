@@ -206,6 +206,8 @@ jobs:
         with:
           name: alpaqa-${{ matrix.host }}
           path: package
+      - name: Update
+        run: apt update
       - name: Install
         run: apt install -y ./package/*alpaqa*.deb
       - name: Run
