@@ -32,7 +32,7 @@ For Debian-based systems, the .deb packages can be installed using
 
 .. code-block:: sh
 
-    sudo dpkg -i libalpaqa*_1.0.0a8_amd64.deb
+    sudo apt install ./libalpaqa*_1.0.0a8_amd64.deb
 
 Different components are available:
 
