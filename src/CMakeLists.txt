@@ -253,6 +253,8 @@ if (ALPAQA_WITH_DRIVERS)
         "alpaqa/src/driver/alpaqa-driver.cpp"
         "alpaqa/src/driver/panoc-driver.cpp"
         "alpaqa/src/driver/pantr-driver.cpp"
+        "alpaqa/src/driver/ipopt-driver.cpp"
+        "alpaqa/src/driver/lbfgsb-driver.cpp"
         "alpaqa/src/driver/problem.cpp"
     )
     set_target_properties(driver PROPERTIES
@@ -267,7 +269,7 @@ if (ALPAQA_WITH_DRIVERS)
     add_executable(alpaqa::driver ALIAS driver)
     list(APPEND ALPAQA_INSTALL_EXE driver)
     if (TARGET alpaqa::casadi-loader)
-        target_link_libraries(driver PUBLIC alpaqa::casadi-loader)
+        target_link_libraries(driver PUBLIC alpaqa::casadi-loader casadi)
         target_compile_definitions(driver PUBLIC ALPAQA_HAVE_CASADI)
     endif()
     if (TARGET alpaqa::casadi-ocp-loader)
@@ -275,14 +277,10 @@ if (ALPAQA_WITH_DRIVERS)
     endif()
     if (TARGET alpaqa::ipopt-adapter)
         target_link_libraries(driver PUBLIC alpaqa::ipopt-adapter)
-        target_sources(driver PRIVATE 
-            "alpaqa/src/driver/ipopt-driver.cpp")
         target_compile_definitions(driver PUBLIC WITH_IPOPT)
     endif()
     if (TARGET alpaqa::lbfgsb-adapter)
         target_link_libraries(driver PUBLIC alpaqa::lbfgsb-adapter)
-        target_sources(driver PRIVATE 
-            "alpaqa/src/driver/lbfgsb-driver.cpp")
         target_compile_definitions(driver PUBLIC WITH_LBFGSB)
     endif()
 endif()

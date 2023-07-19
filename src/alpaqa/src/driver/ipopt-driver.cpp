@@ -1,3 +1,5 @@
+#ifdef WITH_IPOPT
+
 #include <alpaqa/ipopt/ipopt-adapter.hpp>
 #include <alpaqa/ipopt/ipopt-enums.hpp>
 #include <IpIpoptApplication.hpp>
@@ -128,3 +130,14 @@ solver_func_t make_ipopt_driver(std::string_view direction, Options &opts) {
         return run_ipopt_solver(problem, solver, os, N_exp);
     };
 }
+
+#else
+
+#include "solver-driver.hpp"
+
+solver_func_t make_ipopt_driver(std::string_view, Options &) {
+    throw std::invalid_argument(
+        "This version of alpaqa was compiled without Ipopt support.");
+}
+
+#endif

@@ -1,3 +1,5 @@
+#if WITH_LBFGSB
+
 #include <alpaqa/implementation/outer/alm.tpp>
 #include <alpaqa/lbfgsb/lbfgsb-adapter.hpp>
 
@@ -42,3 +44,14 @@ solver_func_t make_lbfgsb_driver(std::string_view direction, Options &opts) {
 }
 
 template class alpaqa::ALMSolver<InnerLBFGSBSolver>;
+
+#else
+
+#include "solver-driver.hpp"
+
+solver_func_t make_lbfgsb_driver(std::string_view, Options &) {
+    throw std::invalid_argument(
+        "This version of alpaqa was compiled without L-BFGS-B support.");
+}
+
+#endif

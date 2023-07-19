@@ -13,6 +13,13 @@
 #include "solver-driver.hpp"
 #include "util.hpp"
 
+#ifdef ALPAQA_HAVE_CASADI
+#include <casadi/config.h>
+#endif
+#ifdef WITH_IPOPT
+#include <IpoptConfig.h>
+#endif
+
 #include <algorithm>
 #include <filesystem>
 #include <fstream>
@@ -98,10 +105,32 @@ void print_usage(const char *a0) {
     )==";
     std::cout << "alpaqa-driver (" ALPAQA_VERSION_FULL ")\n\n"
                  "    Command-line interface to the alpaqa solvers.\n"
+                 "    alpaqa is published under the LGPL-3.0.\n"
                  "    https://github.com/kul-optec/alpaqa"
                  "\n\n"
                  "    Usage: "
               << a0 << opts << docs << std::endl;
+    std::cout
+        << "Third-party libraries:\n"
+        << "  * Eigen " << EIGEN_WORLD_VERSION << '.' << EIGEN_MAJOR_VERSION
+        << '.' << EIGEN_MINOR_VERSION
+        << " (https://gitlab.com/libeigen/eigen) - MPL-2.0\n"
+#ifdef ALPAQA_HAVE_CASADI
+        << "  * CasADi " CASADI_VERSION_STRING
+           " (https://github.com/casadi/casadi) - LGPL-3.0+\n"
+#endif
+#ifdef WITH_LBFGSB
+        << "  * L-BFGS-B 3.0 "
+           "(http://users.iems.northwestern.edu/~nocedal/lbfgsb.html) - "
+           "BSD-3-Clause\n"
+#endif
+#ifdef WITH_IPOPT
+        << "  * Ipopt " IPOPT_VERSION
+           " (https://github.com/coin-or/Ipopt) - EPL-2.0\n"
+        << "  * MUMPS (https://mumps-solver.org) - CECILL-C\n"
+        << "  * OpenBLAS (https://github.com/xianyi/OpenBLAS) - BSD-3-Clause\n"
+#endif
+        << std::endl;
 }
 
 /// Split the string @p s on the first occurrence of @p tok.
@@ -147,14 +176,9 @@ auto get_solver_builder(Options &opts) {
     std::tie(method, direction) = alpaqa::params::split_key(method, '.');
     // Dictionary of available solver builders
     std::map<std::string_view, solver_builder_func_t> solvers{
-        {"panoc", make_panoc_driver},   {"zerofpr", make_zerofpr_driver},
-        {"pantr", make_pantr_driver},
-#ifdef WITH_LBFGSB
-        {"lbfgsb", make_lbfgsb_driver},
-#endif
-#ifdef WITH_IPOPT
+        {"panoc", make_panoc_driver}, {"zerofpr", make_zerofpr_driver},
+        {"pantr", make_pantr_driver}, {"lbfgsb", make_lbfgsb_driver},
         {"ipopt", make_ipopt_driver},
-#endif
     };
     // Find the selected solver builder
     auto solver_it = solvers.find(method);
