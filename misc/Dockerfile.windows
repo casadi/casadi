@@ -4,3 +4,7 @@ RUN sudo apt-get update && sudo apt install mingw-w64-tools binutils-mingw-w64-x
 
 ENV DEFAULT_DOCKCROSS_IMAGE=ghcr.io/jgillis/windows-shared-x64-posix:production
 ENV DLLTOOL=/usr/x86_64-w64-mingw32/bin/dlltool
+
+
+RUN  sed -i "s|CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY|CMAKE_FIND_ROOT_PATH_MODE_LIBRARY BOTH|g"  /usr/src/mxe/usr/x86_64-w64-mingw32.shared.posix/share/cmake/mxe-conf.cmake
+RUN  sed -i "s|CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY|CMAKE_FIND_ROOT_PATH_MODE_PACKAGE BOTH|g"  /usr/src/mxe/usr/x86_64-w64-mingw32.shared.posix/share/cmake/mxe-conf.cmake

@@ -675,8 +675,8 @@ if(WITH_BLOCKSQP)
 endif()
 add_feature_info(blocksqp-interface WITH_BLOCKSQP "Interface to the NLP solver blockSQP.")
 
-set(BUILD_TRLIB_VERSION "0998af9d63ced573446dfba15881269583a8f41b" CACHE STRING "Tag/branch/hash to be used for BUILD_TRLIB_GIT_REPO")
-set(BUILD_TRLIB_GIT_REPO "https://github.com/felixlen/trlib.git" CACHE STRING "Git repo used together with BUILD_TRLIB_VERSION")
+set(BUILD_TRLIB_VERSION "c7632b8b14152e78bc21721a3bd1a2432586b824" CACHE STRING "Tag/branch/hash to be used for BUILD_TRLIB_GIT_REPO")
+set(BUILD_TRLIB_GIT_REPO "https://github.com/jgillis/trlib.git" CACHE STRING "Git repo used together with BUILD_TRLIB_VERSION")
 option(WITH_BUILD_TRLIB "Build TRLIB (BUILD_TRLIB_VERSION=${BUILD_TRLIB_VERSION}) from downloaded source (BUILD_TRLIB_GIT_REPO=${BUILD_TRLIB_GIT_REPO})." OFF)
 
 # SLEQP: An active set-based NLP solver
@@ -1376,7 +1376,7 @@ if(WITH_BUILD_TRLIB)
       GIT_TAG ${BUILD_TRLIB_VERSION}
       PREFIX "${CMAKE_BINARY_DIR}/external_projects"
       CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
-      CMAKE_ARGS ${CMAKE_BLAS_CONFIG} -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> ${CROSS_FLAGS_CMAKE})
+      CMAKE_ARGS ${CMAKE_BLAS_CONFIG} -DTRLIB_BLAS_LAPACK_UNDERSCORE_SUFFIX=ON -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> ${CROSS_FLAGS_CMAKE})
   add_library(trlib INTERFACE)
   add_dependencies(trlib trlib-external)
   install(DIRECTORY
