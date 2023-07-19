@@ -23,7 +23,7 @@ dynamic = ["version", "description"]
 
 [project.optional-dependencies]
 docs = ["sphinx>=5.1,<7.1", "matplotlib", "breathe", "furo"]
-debug = ["alpaqa-debug==1.0.0a7"]
+debug = ["alpaqa-debug==1.0.0a8"]
 test = ["pytest>=7.2.0,<7.5", "qpalm~=1.1.4", "scipy>=1.9.3,<1.12"]
 
 [project.urls]

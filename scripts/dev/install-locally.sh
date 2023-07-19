@@ -83,8 +83,8 @@ else
         -C--cross="$pfx/cmake/$triple.py-build-cmake.cross.toml" \
         -C--local="$PWD/$config"
     pip install -f staging --force-reinstall --no-deps \
-        "alpaqa==1.0.0a7" "alpaqa-debug==1.0.0a7"
+        "alpaqa==1.0.0a8" "alpaqa-debug==1.0.0a8"
     pip install -f staging \
-        "alpaqa[test]==1.0.0a7" "alpaqa-debug==1.0.0a7"
+        "alpaqa[test]==1.0.0a8" "alpaqa-debug==1.0.0a8"
 fi
 pytest

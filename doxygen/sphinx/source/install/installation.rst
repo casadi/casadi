@@ -32,7 +32,7 @@ For Debian-based systems, the .deb packages can be installed using
 
 .. code-block:: sh
 
-    sudo dpkg -i libalpaqa*_1.0.0a7_amd64.deb
+    sudo dpkg -i libalpaqa*_1.0.0a8_amd64.deb
 
 Different components are available:
 
@@ -48,4 +48,4 @@ Alternatively, the .tar.gz file can be extracted and installed manually.
 
 .. code-block:: sh
 
-    sudo tar xzf alpaqa-1.0.0a7-Linux-x86_64.tar.gz -C /usr/local --strip-components=1
+    sudo tar xzf alpaqa-1.0.0a8-Linux-x86_64.tar.gz -C /usr/local --strip-components=1

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.24)
 project(alpaqa VERSION 1.0.0 LANGUAGES CXX)
-set(PY_VERSION_SUFFIX "a7")
+set(PY_VERSION_SUFFIX "a8")
 
 # Look for a C and Fortran compiler (optional)
 include(CheckLanguage)

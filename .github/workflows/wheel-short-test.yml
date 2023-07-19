@@ -8,7 +8,7 @@ on:
       - '**'
 
 env:
-  PACKAGE_VERSION: '1.0.0a7'
+  PACKAGE_VERSION: '1.0.0a8'
   PACKAGE_NAME: alpaqa
   PYTHON_VERSION: '3.10'
 
