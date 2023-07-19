@@ -43,6 +43,9 @@ Different components are available:
   specifications that can be dynamically loaded by alpaqa.
 * ``libalpaqa-dev`` contains all development files such as headers and CMake
   configuration files needed to compile software that invokes alpaqa solvers.
+* ``libalpaqa-tools`` contains command line utilities such as alpaqa-driver,
+  which can be used to invoke the solvers directly, without the need to write
+  any C++ code.
 
 Alternatively, the .tar.gz file can be extracted and installed manually.
 
