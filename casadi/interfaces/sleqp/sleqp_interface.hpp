@@ -54,7 +54,7 @@ namespace casadi {
       return new SLEQPInterface(name, nlp);
     }
 
-    const char* plugin_name() const override { return "SLEQP";}
+    const char* plugin_name() const override { return "sleqp";}
 
     // Get name of the class
     std::string class_name() const override { return "SLEQPInterface";}
