@@ -10,7 +10,7 @@ file(APPEND CMakeLists.txt "set_target_properties( \${OpenBLAS_LIBS} PROPERTIES 
 file(APPEND CMakeLists.txt "set_target_properties( \${OpenBLAS_LIBS} PROPERTIES IMPORT_PREFIX \"\${CMAKE_IMPORT_LIBRARY_PREFIX}${CASADI_TP_SHARED_PREFIX}\")\n")
 file(APPEND CMakeLists.txt "configure_file(\${PROJECT_SOURCE_DIR}/cmake/openblas.pc.in \${PROJECT_BINARY_DIR}/blas\${SUFFIX64}.pc @ONLY)\n")
 file(APPEND CMakeLists.txt "install (FILES \${PROJECT_BINARY_DIR}/blas\${SUFFIX64}.pc DESTINATION \${CMAKE_INSTALL_LIBDIR}/pkgconfig/)\n")
-file(APPEND CMakeLists.txt "configure_file(\${PROJECT_SOURCE_DIR}/cmake/lapack.pc.in \${PROJECT_BINARY_DIR}/lapack\${SUFFIX64}.pc @ONLY)\n")
+file(APPEND CMakeLists.txt "configure_file(\${PROJECT_SOURCE_DIR}/cmake/openblas.pc.in \${PROJECT_BINARY_DIR}/lapack\${SUFFIX64}.pc @ONLY)\n")
 file(APPEND CMakeLists.txt "install (FILES \${PROJECT_BINARY_DIR}/lapack\${SUFFIX64}.pc DESTINATION \${CMAKE_INSTALL_LIBDIR}/pkgconfig/)\n")
 
 file(READ cmake/openblas.pc.in INPUT_TEXT)
