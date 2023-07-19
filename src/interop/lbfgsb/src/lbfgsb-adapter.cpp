@@ -135,6 +135,12 @@ auto LBFGSBSolver::operator()(
         if (task_sv.starts_with("FG")) {
             ψ = problem.eval_ψ_grad_ψ(x_solve, y, Σ, grad_ψ, work_n, work_m);
         }
+        // Converged
+        else if (task_sv.starts_with(
+                     "CONVERGENCE: NORM_OF_PROJECTED_GRADIENT_<=_PGTOL")) {
+            s.status = SolverStatus::Converged;
+            break;
+        }
         // Next iteration
         else if (task_sv.starts_with("NEW_X")) {
             do_print =
