@@ -39,7 +39,7 @@ option(ALPAQA_WITH_CASADI
 set(ALPAQA_DOXYFILE "Doxyfile" CACHE STRING
     "The Doxyfile to use for the docs target")
 option(ALPAQA_ENABLE_PCH
-    "Enable precompiled headers" On)
+    "Enable precompiled headers" Off)
 
 # Compiler warnings
 include(cmake/Warnings.cmake)
