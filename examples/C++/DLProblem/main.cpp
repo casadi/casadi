@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
     // Wrap the problem to count the function evaluations
     auto counted_problem = alpaqa::problem_with_counters_ref(problem);
 
-    // Specify the bounds
+    // Specify the bounds (optional, overrides any bounds set in problem.c)
     length_t n           = problem.get_n();
     length_t m           = problem.get_m();
     vec b                = vec::Constant(m, -1);
