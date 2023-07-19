@@ -11,10 +11,13 @@ jobs:
     container: 
       image: ghcr.io/tttapa/alpaqa-docs:py3.10
       options: --user root
-
+    env:
+      CMAKE_C_COMPILER_LAUNCHER: ccache
+      CMAKE_CXX_COMPILER_LAUNCHER: ccache
+      CCACHE_DIR: /root/.ccache
     steps:
     # Checks-out the repository under $GITHUB_WORKSPACE
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - run: git config --global --add safe.directory $GITHUB_WORKSPACE
 
     # Create a copy of the repo in /tmp/staging.
@@ -29,11 +32,23 @@ jobs:
         git checkout gh-pages || \
         { git checkout --orphan gh-pages && git rm -rf . && git clean -fxd ; }
 
+    # Use ccache to cache compilation
+    - name: Install ccache
+      run: apt -y update && apt -y install --no-install-recommends ccache
+    - name: Prepare ccache directory
+      run: mkdir -p "${{ env.CCACHE_DIR }}"
+    - name: Cache ccache
+      uses: actions/cache@v3
+      with:
+        path: ${{ env.CCACHE_DIR }}
+        key: ${{ runner.os }}-ccache-${{ github.run_id }}
+        restore-keys: ${{ runner.os }}-ccache
+
     # Install Python dependencies for generating docs and tests
     - name: Install Python package and dependencies 
       run: |
         python3 -m pip install -r doxygen/requirements.txt
-        python3 -m pip install '.[docs]'
+        python3 -m pip install --verbose '.[docs]'
         python3 -m pip install cmake
       shell: bash
 
