@@ -112,7 +112,7 @@ jobs:
           name: alpaqa-${{ matrix.host }}
           path: package
       - name: Install
-        run: dpkg -i package/*alpaqa*.deb
+        run: apt install -y ./package/*alpaqa*.deb
       - name: Build examples (RelWithDebInfo)
         run: |
           cmake -B build-examples -S examples \
@@ -186,9 +186,34 @@ jobs:
         env:
           CTEST_OUTPUT_ON_FAILURE: 1
 
+  test-deb:
+    needs: [build]
+    runs-on: ubuntu-latest
+    container: ${{ matrix.container }}
+    strategy:
+      matrix:
+        host: [x86_64-centos7-linux-gnu]
+        container:
+          - 'debian:bullseye'
+          - 'debian:bookworm'
+          - 'debian:sid'
+          - 'ubuntu:focal'
+          - 'ubuntu:jammy'
+          - 'ubuntu:rolling'
+    steps:
+      - name: Download
+        uses: actions/download-artifact@v3
+        with:
+          name: alpaqa-${{ matrix.host }}
+          path: package
+      - name: Install
+        run: apt install -y ./package/*alpaqa*.deb
+      - name: Run
+        run: alpaqa-driver
+
   release:
     if: ${{ github.event.action == 'released' || github.event.action == 'prereleased' }}
-    needs: [test]
+    needs: [test, test-deb]
     runs-on: ubuntu-latest
     strategy:
       matrix:
