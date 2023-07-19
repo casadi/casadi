@@ -124,7 +124,7 @@ set(CPACK_DEBIAN_DL_DEV_PACKAGE_NAME "libalpaqa-dl-dev")
 set(CPACK_DEBIAN_DEBUG_PACKAGE_NAME "libalpaqa-debug")
 set(CPACK_DEBIAN_BIN_PACKAGE_NAME "libalpaqa-tools")
 # Package dependencies
-set(CPACK_DEBIAN_SHLIB_PACKAGE_DEPENDS "libc6 (>= 2.17), libgfortran5 (>= 8.1)")
+set(CPACK_DEBIAN_SHLIB_PACKAGE_DEPENDS "libc6 (>= 2.17), libgfortran5 (>= 10), libquadmath0 (>= 10)")
 set(CPACK_DEBIAN_DEV_PACKAGE_DEPENDS "libalpaqa (= ${PROJECT_VERSION}${PY_VERSION_SUFFIX}), libalpaqa-dl-dev (= ${PROJECT_VERSION}${PY_VERSION_SUFFIX})")
 set(CPACK_DEBIAN_DEV_PACKAGE_SUGGESTS "libeigen3-dev (>= 3.4.0), libeigen3-dev (<< 3.4.1)")
 set(CPACK_DEBIAN_DL_DEV_PACKAGE_DEPENDS "")
