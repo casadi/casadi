@@ -19,7 +19,7 @@ rm -rf cutest
 # [ -d sif ] || git clone https://bitbucket.org/optrove/sif --depth 1 --single-branch ./sif
 [ -d optrove-sif-* ] || {
     wget https://bitbucket.org/optrove/sif/get/master.tar.bz2 -O- | \
-    tar xj && mv optrove-sif-* sif ; }
+    tar xj && ln -s optrove-sif-* sif ; }
 
 export ARCH="$CUTEST_ROOT/archdefs"
 export ARCHDEFS="$CUTEST_ROOT/archdefs"

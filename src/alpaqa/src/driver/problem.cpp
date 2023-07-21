@@ -6,6 +6,9 @@
 #if ALPAQA_HAVE_CASADI
 #include <alpaqa/casadi/CasADiProblem.hpp>
 #endif
+#if ALPAQA_HAVE_CUTEST
+#include <alpaqa/cutest/cutest-loader.hpp>
+#endif
 
 #include <filesystem>
 #include <fstream>
@@ -113,6 +116,35 @@ LoadedProblem load_problem(std::string_view type, const fs::path &dir,
 #else
         throw std::logic_error(
             "This version of alpaqa was compiled without CasADi support");
+#endif
+    } else if (type == "cu") {
+#if ALPAQA_HAVE_CUTEST
+        std::string outsdif_path;
+        alpaqa::params::set_params(outsdif_path, "outsdif", prob_opts);
+        if (outsdif_path.empty())
+            outsdif_path = full_path.parent_path() / "OUTSDIF.d";
+        static std::mutex mtx;
+        std::unique_lock lck{mtx};
+        using TEProblem  = alpaqa::TypeErasedProblem<config_t>;
+        using CuProblem  = alpaqa::CUTEstProblem;
+        using CntProblem = alpaqa::ProblemWithCounters<CuProblem>;
+        LoadedProblem problem{
+            .problem = TEProblem::make<CntProblem>(
+                std::in_place, full_path.c_str(), outsdif_path.c_str()),
+            .abs_path = fs::absolute(full_path),
+            .path     = full_path,
+        };
+        lck.unlock();
+        auto &cnt_problem       = problem.problem.as<CntProblem>();
+        auto &cu_problem        = cnt_problem.problem;
+        problem.evaluations     = cnt_problem.evaluations;
+        problem.initial_guess_x = std::move(cu_problem.x0);
+        problem.initial_guess_y = std::move(cu_problem.y0);
+        load_initial_guess(opts, problem);
+        return problem;
+#else
+        throw std::logic_error(
+            "This version of alpaqa was compiled without CUTEst support");
 #endif
     }
     throw std::invalid_argument("Unknown problem type '" + std::string(type) +

@@ -161,7 +161,23 @@ else()
     message(STATUS "Compiling WITHOUT dl support")
 endif()
 
-list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/find")
+if (ALPAQA_WITH_CUTEST)
+    find_package(CUTEst REQUIRED)
+    add_library(cutest-interface "interop/cutest/src/cutest-loader.cpp")
+    target_include_directories(cutest-interface PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/interop/cutest/include>
+        $<INSTALL_INTERFACE:include>)
+    target_link_libraries(cutest-interface
+        PUBLIC alpaqa::alpaqa
+        PRIVATE CUTEst::headers ${CMAKE_DL_LIBS} alpaqa::warnings)
+    set_target_properties(cutest-interface PROPERTIES SOVERSION ${PROJECT_VERSION})
+    add_library(alpaqa::cutest-interface ALIAS cutest-interface)
+    list(APPEND ALPAQA_INSTALL_TARGETS cutest-interface)
+    message(STATUS "Compiling WITH CUTEst support")
+else()
+    message(STATUS "Compiling WITHOUT CUTEst support")
+endif()
+
 find_package(Ipopt)
 
 if (TARGET COIN::Ipopt)
@@ -271,6 +287,10 @@ if (ALPAQA_WITH_DRIVERS)
     if (TARGET alpaqa::casadi-loader)
         target_link_libraries(driver PUBLIC alpaqa::casadi-loader casadi)
         target_compile_definitions(driver PUBLIC ALPAQA_HAVE_CASADI)
+    endif()
+    if (TARGET alpaqa::cutest-interface)
+        target_link_libraries(driver PUBLIC alpaqa::cutest-interface)
+        target_compile_definitions(driver PUBLIC ALPAQA_HAVE_CUTEST)
     endif()
     if (TARGET alpaqa::casadi-ocp-loader)
         target_link_libraries(driver PUBLIC alpaqa::casadi-ocp-loader)

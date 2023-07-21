@@ -36,10 +36,14 @@ option(ALPAQA_WITH_COVERAGE
     "Generate coverage information" Off)
 option(ALPAQA_WITH_CASADI
     "Build the CasADi loader" On)
+option(ALPAQA_WITH_CUTEST
+    "Build the CUTEst loader" Off)
 set(ALPAQA_DOXYFILE "Doxyfile" CACHE STRING
     "The Doxyfile to use for the docs target")
 option(ALPAQA_ENABLE_PCH
     "Enable precompiled headers" Off)
+
+list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/find")
 
 # Compiler warnings
 include(cmake/Warnings.cmake)

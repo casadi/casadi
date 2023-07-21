@@ -34,6 +34,13 @@ class BoxConstrProblem {
         : n{C.lowerbound.size()}, m{D.lowerbound.size()}, C{std::move(C)}, D{std::move(D)},
           l1_reg{std::move(l1_reg)} {}
 
+    void resize(length_t n, length_t m) {
+        this->n = n;
+        this->m = m;
+        C       = Box{n};
+        D       = Box{m};
+    }
+
     BoxConstrProblem(const BoxConstrProblem &)                = default;
     BoxConstrProblem &operator=(const BoxConstrProblem &)     = default;
     BoxConstrProblem(BoxConstrProblem &&) noexcept            = default;

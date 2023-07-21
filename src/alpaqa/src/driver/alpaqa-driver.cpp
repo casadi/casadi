@@ -51,6 +51,7 @@ void print_usage(const char *a0) {
             the bounds and parameters will be loaded from that file. See
             CasADiProblem::load_numerical_data for more details.
             The problem parameter can be set using the problem.param option.
+        cu: Load a CUTEst problem using the CUTEstProblem class.
 
     methods:
         panoc[.<direction>]:

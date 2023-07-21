@@ -2,6 +2,7 @@
 
 #include <alpaqa/config/config.hpp>
 #include <alpaqa/problem/box-constr-problem.hpp>
+#include <alpaqa/util/copyable_unique_ptr.hpp>
 
 #include <iosfwd>
 #include <memory>
@@ -16,7 +17,7 @@ namespace alpaqa {
 ///           a copy of the problem that could outlive the wrapper.
 ///
 /// @ingroup  grp_ExternalProblemLoaders
-class CUTEstProblem {
+class CUTEstProblem : public BoxConstrProblem<alpaqa::DefaultConfig> {
   public:
     USING_ALPAQA_CONFIG(alpaqa::DefaultConfig);
 
@@ -25,6 +26,8 @@ class CUTEstProblem {
     /// @copydoc CUTEstProblem::CUTEstProblem(const char*, const char *)
     CUTEstProblem(const std::string &so_fname,
                   const std::string &outsdif_fname);
+    CUTEstProblem(const CUTEstProblem &);
+    CUTEstProblem &operator=(const CUTEstProblem &);
     CUTEstProblem(CUTEstProblem &&) noexcept;
     CUTEstProblem &operator=(CUTEstProblem &&) noexcept;
     ~CUTEstProblem();
@@ -38,9 +41,9 @@ class CUTEstProblem {
         std::string name;
 
         /// Number of independent variables.
-        unsigned nvar = 0;
+        int nvar = 0;
         /// Number of constraints.
-        unsigned ncon = 0;
+        int ncon = 0;
 
         /// Status returned by CUTEst.
         /// @todo   I don't think this is useful, remove it.
@@ -89,7 +92,26 @@ class CUTEstProblem {
     vec y0;                         ///< Initial value of Lagrange multipliers
 
   private:
-    std::unique_ptr<class CUTEstLoader> implementation;
+    util::copyable_unique_ptr<class CUTEstLoader> impl;
+
+  public:
+    [[nodiscard]] real_t eval_f(crvec x) const;
+    void eval_grad_f(crvec x, rvec grad_fx) const;
+    void eval_g(crvec x, rvec gx) const;
+    void eval_grad_g_prod(crvec x, crvec y, rvec grad_gxy) const;
+
+    void eval_jac_g(crvec x, rindexvec inner_idx, rindexvec outer_ptr,
+                    rvec J_values) const;
+    [[nodiscard]] length_t get_jac_g_num_nonzeros() const;
+    void eval_grad_gi(crvec x, index_t i, rvec grad_gi) const;
+    void eval_hess_L_prod(crvec x, crvec y, real_t scale, crvec v,
+                          rvec Hv) const;
+    void eval_hess_L(crvec x, crvec y, real_t scale, rindexvec inner_idx,
+                     rindexvec outer_ptr, rvec H_values) const;
+    [[nodiscard]] length_t get_hess_L_num_nonzeros() const;
+    [[nodiscard]] real_t eval_f_grad_f(crvec x, rvec grad_fx) const;
+    [[nodiscard]] real_t eval_f_g(crvec x, rvec g) const;
+    void eval_grad_L(crvec x, crvec y, rvec grad_L, rvec work_n) const;
 };
 
 /// @related    CUTEstProblem::Report

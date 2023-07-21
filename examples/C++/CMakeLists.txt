@@ -20,3 +20,7 @@ endif()
 if (ALPAQA_WITH_OCP)
     add_subdirectory(CustomControlCppProblem)
 endif()
+
+if (ALPAQA_WITH_CUTEST)
+    add_subdirectory(CUTEst)
+endif()
