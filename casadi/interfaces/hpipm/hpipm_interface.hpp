@@ -32,7 +32,7 @@
 
 /** \defgroup plugin_Conic_hpipm
     \par
-Interface to HMPC Solver
+Interface to HPIPM Solver
 
 
 In order to use this interface, you must:
