@@ -277,7 +277,7 @@ auto CUTEstProblem::eval_f(crvec x) const -> real_t {
     real_t f;
     logical grad = FALSE_;
     impl->funcs.cofg(&status, &impl->nvar, x.data(), &f, nullptr, &grad);
-    throw_if_error("CUTEST_cofg", status);
+    throw_if_error("eval_f: CUTEST_cofg", status);
     return f;
 }
 void CUTEstProblem::eval_grad_f(crvec x, rvec grad_fx) const {
@@ -287,7 +287,7 @@ void CUTEstProblem::eval_grad_f(crvec x, rvec grad_fx) const {
     real_t f;
     logical grad = TRUE_;
     impl->funcs.cofg(&status, &impl->nvar, x.data(), &f, grad_fx.data(), &grad);
-    throw_if_error("CUTEST_cofg", status);
+    throw_if_error("eval_grad_f: CUTEST_cofg", status);
 }
 void CUTEstProblem::eval_g(crvec x, rvec gx) const {
     assert(x.size() == static_cast<length_t>(impl->nvar));
@@ -297,7 +297,7 @@ void CUTEstProblem::eval_g(crvec x, rvec gx) const {
     integer zero = 0;
     impl->funcs.ccfg(&status, &impl->nvar, &impl->ncon, x.data(), gx.data(),
                      &jtrans, &zero, &zero, nullptr, &grad);
-    throw_if_error("CUTEST_ccfg", status);
+    throw_if_error("eval_g: CUTEST_ccfg", status);
 }
 void CUTEstProblem::eval_grad_g_prod(crvec x, crvec y, rvec grad_gxy) const {
     assert(x.size() == static_cast<length_t>(impl->nvar));
@@ -309,7 +309,7 @@ void CUTEstProblem::eval_grad_g_prod(crvec x, crvec y, rvec grad_gxy) const {
     logical gotj = FALSE_, jtrans = TRUE_;
     impl->funcs.cjprod(&status, &impl->nvar, &impl->ncon, &gotj, &jtrans,
                        x.data(), y.data(), &lvector, grad_gxy.data(), &lresult);
-    throw_if_error("CUTEST_cjprod", status);
+    throw_if_error("eval_grad_g_prod: CUTEST_cjprod", status);
 }
 
 void CUTEstProblem::eval_jac_g(crvec x, [[maybe_unused]] rindexvec inner_idx,
@@ -324,7 +324,7 @@ void CUTEstProblem::eval_jac_g(crvec x, [[maybe_unused]] rindexvec inner_idx,
         impl->funcs.ccfg(&status, &impl->nvar, &impl->ncon, x.data(),
                          impl->work.data(), &jtrans, &impl->ncon, &impl->nvar,
                          J_values.data(), &grad);
-        throw_if_error("CUTEST_ccfg", status);
+        throw_if_error("eval_jac_g: CUTEST_ccfg", status);
     }
 }
 auto CUTEstProblem::get_jac_g_num_nonzeros() const -> length_t { return 0; }
@@ -334,7 +334,7 @@ void CUTEstProblem::eval_grad_gi(crvec x, index_t i, rvec grad_gi) const {
     integer status;
     auto iprob = static_cast<integer>(i + 1);
     impl->funcs.cigr(&status, &impl->nvar, &iprob, x.data(), grad_gi.data());
-    throw_if_error("CUTEST_cigr", status);
+    throw_if_error("eval_grad_gi: CUTEST_cigr", status);
 }
 void CUTEstProblem::eval_hess_L_prod(crvec x, crvec y, real_t scale, crvec v,
                                      rvec Hv) const {
@@ -342,13 +342,18 @@ void CUTEstProblem::eval_hess_L_prod(crvec x, crvec y, real_t scale, crvec v,
     assert(y.size() == static_cast<length_t>(impl->ncon));
     assert(v.size() == static_cast<length_t>(impl->nvar));
     assert(Hv.size() == static_cast<length_t>(impl->nvar));
-    if (scale != 1)
-        throw std::runtime_error("CUTEST_chprod only supports scale = 1");
+    const auto *mult = y.data();
+    if (scale != 1) {
+        impl->work = y * (real_t(1) / scale);
+        mult       = impl->work.data();
+    }
     integer status;
     logical goth = FALSE_;
-    impl->funcs.chprod(&status, &impl->nvar, &impl->ncon, &goth, x.data(),
-                       y.data(), const_cast<real_t *>(v.data()), Hv.data());
-    throw_if_error("CUTEST_chprod", status);
+    impl->funcs.chprod(&status, &impl->nvar, &impl->ncon, &goth, x.data(), mult,
+                       const_cast<real_t *>(v.data()), Hv.data());
+    throw_if_error("eval_hess_L_prod: CUTEST_chprod", status);
+    if (scale != 1)
+        Hv *= scale;
 }
 void CUTEstProblem::eval_hess_L(crvec x, crvec y, real_t scale,
                                 [[maybe_unused]] rindexvec inner_idx,
@@ -359,12 +364,17 @@ void CUTEstProblem::eval_hess_L(crvec x, crvec y, real_t scale,
     if (H_values.size() > 0) {
         assert(H_values.size() == static_cast<length_t>(impl->nvar) *
                                       static_cast<length_t>(impl->nvar));
-        if (scale != 1)
-            throw std::runtime_error("CUTEST_cdh only supports scale = 1");
+        const auto *mult = y.data();
+        if (scale != 1) {
+            impl->work = y * (real_t(1) / scale);
+            mult       = impl->work.data();
+        }
         integer status;
-        impl->funcs.cdh(&status, &impl->nvar, &impl->ncon, x.data(), y.data(),
+        impl->funcs.cdh(&status, &impl->nvar, &impl->ncon, x.data(), mult,
                         &impl->nvar, H_values.data());
-        throw_if_error("CUTEST_cdh", status);
+        throw_if_error("eval_hess_L: CUTEST_cdh", status);
+        if (scale != 1)
+            H_values *= scale;
     }
 }
 auto CUTEstProblem::get_hess_L_num_nonzeros() const -> length_t { return 0; }
@@ -375,7 +385,7 @@ auto CUTEstProblem::eval_f_grad_f(crvec x, rvec grad_fx) const -> real_t {
     real_t f;
     logical grad = TRUE_;
     impl->funcs.cofg(&status, &impl->nvar, x.data(), &f, grad_fx.data(), &grad);
-    throw_if_error("CUTEST_cofg", status);
+    throw_if_error("eval_f_grad_f: CUTEST_cofg", status);
     return f;
 }
 auto CUTEstProblem::eval_f_g(crvec x, rvec g) const -> real_t {
@@ -384,7 +394,7 @@ auto CUTEstProblem::eval_f_g(crvec x, rvec g) const -> real_t {
     integer status;
     real_t f;
     impl->funcs.cfn(&status, &impl->nvar, &impl->ncon, x.data(), &f, g.data());
-    throw_if_error("CUTEST_cfn", status);
+    throw_if_error("eval_f_g: CUTEST_cfn", status);
     return f;
 }
 void CUTEstProblem::eval_grad_L(crvec x, crvec y, rvec grad_L, rvec) const {
@@ -396,7 +406,7 @@ void CUTEstProblem::eval_grad_L(crvec x, crvec y, rvec grad_L, rvec) const {
     logical grad = TRUE_;
     impl->funcs.clfg(&status, &impl->nvar, &impl->ncon, x.data(), y.data(), &L,
                      grad_L.data(), &grad);
-    throw_if_error("CUTEST_clfg", status);
+    throw_if_error("eval_f_g: CUTEST_clfg", status);
 }
 
 const char *enum_name(CUTEstProblem::Report::Status s) {
