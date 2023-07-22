@@ -10,7 +10,7 @@ Expression tools
 =====================
 
 .. automodule:: casadi.casadi
-@@EXPRESSIONS@@
+@@EXPRESSIONS@@,detect_simple_bounds,collocation_points,collocation_coeff,dae_reduce_index,dae_map_semi_expl,dae_init_gen
 
 .. _api-classes:
 
@@ -57,6 +57,7 @@ Function
 
 .. autoclass:: Function
   :members:
+
 
 .. _api-solvers:
 
@@ -106,3 +107,34 @@ Linear systems
 .. autoclass:: Linsol
   :members:
 
+Advanced
+============
+
+DaeBuilder
+----------
+
+.. autoclass:: DaeBuilder
+  :members:
+
+.. _api-callback:
+
+Callback
+-------------
+.. autoclass:: Callback
+  :members:
+
+.. _api-globaloptions:
+
+GlobalOptions
+-------------
+
+.. autoclass:: GlobalOptions
+  :members:
+
+.. _api-casadimeta:
+
+CasadiMeta
+----------
+
+.. autoclass:: CasadiMeta
+  :members:
