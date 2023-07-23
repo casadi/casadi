@@ -88,5 +88,15 @@ namespace casadi {
     int solve(void* mem) const override;
 
     Sparsity jacg_sp_;
+
+    /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream &s) const override;
+
+    /** \brief Deserialize into MX */
+    static ProtoFunction* deserialize(DeserializingStream& s) { return new SLEQPInterface(s); }
+
+  protected:
+    /** \brief Deserializing constructor */
+    explicit SLEQPInterface(DeserializingStream& s);
   };
 };

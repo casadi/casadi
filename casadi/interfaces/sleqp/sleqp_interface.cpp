@@ -503,4 +503,20 @@ namespace casadi {
     return 0;
   }
 
+
+  SLEQPInterface::SLEQPInterface(DeserializingStream& s) : Nlpsol(s) {
+    s.version("SLEQPInterface", 1);
+    s.unpack("SLEQPInterface::jacg_sp", jacg_sp_);
+    s.unpack("SLEQPInterface::max_it", max_it);
+    s.unpack("SLEQPInterface::time_limit", time_limit);
+  }
+
+  void SLEQPInterface::serialize_body(SerializingStream &s) const {
+    Nlpsol::serialize_body(s);
+    s.version("SLEQPInterface", 1);
+    s.pack("SLEQPInterface::jacg_sp", jacg_sp_);
+    s.pack("SLEQPInterface::max_it", max_it);
+    s.pack("SLEQPInterface::time_limit", time_limit);
+  }
+
 } // namespace casadi
