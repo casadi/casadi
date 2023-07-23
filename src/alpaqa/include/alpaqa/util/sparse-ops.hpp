@@ -119,4 +119,35 @@ void sparse_matvec_add_transpose_masked_rows(const SpMat &S, const CVec &v,
             out(c) += r.value() * v(r.row());
 }
 
+#if __cpp_lib_ranges_zip >= 202110L && __cpp_lib_ranges_enumerate >= 202302L
+
+template <Config Conf>
+void convert_triplet_to_ccs(const auto &rows, const auto &cols,
+                            rindexvec<Conf> inner_idx,
+                            rindexvec<Conf> outer_ptr) {
+    USING_ALPAQA_CONFIG(Conf);
+
+    // Check whether the indices are sorted correctly (column first, then row)
+    auto cmp = [](const auto &a, const auto &b) {
+        return std::tie(a.first, a.second) < std::tie(b.first, b.second);
+    };
+    std::ranges::ref_view cols_vw = cols, rows_vw = rows;
+    auto indices = std::views::zip(cols_vw, rows_vw);
+    if (!std::ranges::is_sorted(indices, cmp))
+        throw std::logic_error("Incorrect sparse matrix order");
+
+    auto cvt_indices = [](auto i) { return static_cast<index_t>(i); };
+    // Inner indices: simply the row indices
+    assert(std::size(rows) == std::size(inner_idx));
+    std::ranges::transform(rows_vw, std::begin(inner_idx), cvt_indices);
+    // Outer indices: need to count the number of nonzeros per column
+    auto cols_iter = std::begin(cols);
+    for (auto &&[i, outer] : std::views::enumerate(outer_ptr)) {
+        cols_iter = std::lower_bound(cols_iter, std::end(cols), i);
+        outer     = cvt_indices(cols_iter - std::begin(cols));
+    }
+}
+
+#endif
+
 } // namespace alpaqa::util

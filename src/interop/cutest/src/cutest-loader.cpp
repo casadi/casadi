@@ -135,6 +135,7 @@ class CUTEstLoader {
         decltype(CUTEST_ccifg) *ccifg;
         decltype(CUTEST_cigr) *cigr;
         decltype(CUTEST_cdh) *cdh;
+        decltype(CUTEST_cshp) *cshp;
         decltype(CUTEST_csh) *csh;
         decltype(CUTEST_chprod) *chprod;
     };
@@ -178,6 +179,7 @@ class CUTEstLoader {
             .ccifg  = LOAD_DL_FUNC(CUTEST_ccifg),
             .cigr   = LOAD_DL_FUNC(CUTEST_cigr),
             .cdh    = LOAD_DL_FUNC(CUTEST_cdh),
+            .cshp   = LOAD_DL_FUNC(CUTEST_cshp),
             .csh    = LOAD_DL_FUNC(CUTEST_csh),
             .chprod = LOAD_DL_FUNC(CUTEST_chprod),
         };
@@ -227,8 +229,9 @@ class CUTEstLoader {
     mutable vec work;   ///< work vector
 };
 
-CUTEstProblem::CUTEstProblem(const char *so_fname, const char *outsdif_fname)
-    : BoxConstrProblem<config_t>{0, 0} {
+CUTEstProblem::CUTEstProblem(const char *so_fname, const char *outsdif_fname,
+                             bool sparse)
+    : BoxConstrProblem<config_t>{0, 0}, sparse{sparse} {
     impl = std::make_unique<CUTEstLoader>(so_fname, outsdif_fname);
     name = impl->get_name();
     resize(static_cast<length_t>(impl->nvar),
@@ -237,10 +240,6 @@ CUTEstProblem::CUTEstProblem(const char *so_fname, const char *outsdif_fname)
     y0.resize(m);
     impl->setup_problem(x0, y0, C, D);
 }
-
-CUTEstProblem::CUTEstProblem(const std::string &so_fname,
-                             const std::string &outsdif_fname)
-    : CUTEstProblem(so_fname.c_str(), outsdif_fname.c_str()) {}
 
 CUTEstProblem::CUTEstProblem(const CUTEstProblem &)                = default;
 CUTEstProblem &CUTEstProblem::operator=(const CUTEstProblem &)     = default;
@@ -359,25 +358,47 @@ void CUTEstProblem::eval_hess_L(crvec x, crvec y, real_t scale,
                                 [[maybe_unused]] rindexvec inner_idx,
                                 [[maybe_unused]] rindexvec outer_ptr,
                                 rvec H_values) const {
+
     assert(x.size() == static_cast<length_t>(impl->nvar));
     assert(y.size() == static_cast<length_t>(impl->ncon));
     if (H_values.size() > 0) {
-        assert(H_values.size() == static_cast<length_t>(impl->nvar) *
-                                      static_cast<length_t>(impl->nvar));
         const auto *mult = y.data();
         if (scale != 1) {
             impl->work = y * (real_t(1) / scale);
             mult       = impl->work.data();
         }
         integer status;
-        impl->funcs.cdh(&status, &impl->nvar, &impl->ncon, x.data(), mult,
-                        &impl->nvar, H_values.data());
-        throw_if_error("eval_hess_L: CUTEST_cdh", status);
+        if (sparse) {
+            assert(H_values.size() == nnz_H);
+            const integer nnz = nnz_H;
+            impl->funcs.csh(&status, &impl->nvar, &impl->ncon, x.data(),
+                            y.data(), &nnz_H, &nnz, H_values.data(),
+                            H_row.data(), H_col.data());
+            throw_if_error("eval_hess_L: CUTEST_csh", status);
+        } else {
+            assert(H_values.size() == static_cast<length_t>(impl->nvar) *
+                                          static_cast<length_t>(impl->nvar));
+            impl->funcs.cdh(&status, &impl->nvar, &impl->ncon, x.data(), mult,
+                            &impl->nvar, H_values.data());
+            throw_if_error("eval_hess_L: CUTEST_cdh", status);
+        }
         if (scale != 1)
             H_values *= scale;
+    } else {
+        // TODO
     }
 }
-auto CUTEstProblem::get_hess_L_num_nonzeros() const -> length_t { return 0; }
+auto CUTEstProblem::get_hess_L_num_nonzeros() const -> length_t {
+    if (!sparse)
+        return 0;
+    if (nnz_H < 0) {
+        integer status;
+        integer zero = 0;
+        impl->funcs.cshp(&status, &impl->nvar, &nnz_H, &zero, nullptr, nullptr);
+        throw_if_error("get_hess_L_num_nonzeros: CUTEST_cshp", status);
+    }
+    return nnz_H;
+}
 auto CUTEstProblem::eval_f_grad_f(crvec x, rvec grad_fx) const -> real_t {
     assert(x.size() == static_cast<length_t>(impl->nvar));
     assert(grad_fx.size() == static_cast<length_t>(impl->nvar));

@@ -26,6 +26,10 @@ target_compile_definitions(tests PRIVATE _CRT_SECURE_NO_WARNINGS)
 target_link_libraries(tests PRIVATE alpaqa::alpaqa alpaqa::warnings
                                     GTest::gtest_main 
                                     GTest::gmock)
+if ("cxx_std_23" IN_LIST CMAKE_CXX_COMPILE_FEATURES)
+    target_compile_features(tests PRIVATE cxx_std_23)
+    target_compile_definitions(tests PRIVATE ALPAQA_WITH_CXX23_TESTS)
+endif()
 
 if (TARGET alpaqa::casadi-loader)
     target_sources(tests PUBLIC "outer/test-casadi.cpp")

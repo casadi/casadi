@@ -1,12 +1,13 @@
+#include <alpaqa/config/config.hpp>
+#include <Eigen/Sparse>
+USING_ALPAQA_CONFIG(alpaqa::DefaultConfig);
+using spmat = Eigen::SparseMatrix<real_t, Eigen::ColMajor, Eigen::Index>;
+
 #if ALPAQA_WITH_OCP
 
 #include <test-util/eigen-matchers.hpp>
 
-#include <alpaqa/config/config.hpp>
 #include <alpaqa/util/sparse-ops.hpp>
-
-USING_ALPAQA_CONFIG(alpaqa::DefaultConfig);
-using spmat = Eigen::SparseMatrix<real_t, Eigen::ColMajor, Eigen::Index>;
 
 spmat random_sparse(length_t n, length_t m) {
     mat R = mat::Random(n, m);
@@ -94,6 +95,50 @@ TEST(SparseOps, Svec) {
         S, crvec{v}, rvec{result}, crindexvec{J});
 
     EXPECT_THAT(result, EigenAlmostEqual(expected, 1e-13));
+}
+
+#endif
+
+#if ALPAQA_WITH_CXX23_TESTS
+
+#include <alpaqa/util/sparse-ops.hpp>
+
+using namespace alpaqa::util;
+
+TEST(SparseOps, convert_triplet_to_ccs) {
+    // Generate some row and column indices of a sparse matrix
+    index_t nnz = 12;
+    Eigen::MatrixX<int> rows_cols(nnz, 2);
+    rows_cols << 0, 0, //
+        2, 0,          //
+        4, 0,          //
+        1, 1,          //
+        3, 1,          //
+        5, 1,          //
+        2, 2,          //
+        3, 3,          //
+        5, 3,          //
+        0, 5,          //
+        2, 5,          //
+        5, 5;
+    // Convert to compressed column storage format
+    indexvec inner(nnz), outer(6 + 1);
+    convert_triplet_to_ccs<config_t>(rows_cols.col(0), rows_cols.col(1), inner,
+                                     outer);
+    std::cout << "Inner: " << inner.transpose() << std::endl;
+    std::cout << "Outer: " << outer.transpose() << std::endl;
+
+    // Compare to Eigen's implementation
+    using triplet_t = Eigen::Triplet<double>;
+    std::vector<triplet_t> triplets(static_cast<size_t>(nnz));
+    for (auto &&[i, t] : std::views::enumerate(triplets))
+        t = {rows_cols(i, 0), rows_cols(i, 1), static_cast<double>(i + 1)};
+    spmat A(6, 6);
+    A.setFromTriplets(std::begin(triplets), std::end(triplets));
+    std::cout << "\n" << A << std::endl;
+
+    EXPECT_TRUE(std::equal(outer.begin(), outer.end(), A.outerIndexPtr()));
+    EXPECT_TRUE(std::equal(inner.begin(), inner.end(), A.innerIndexPtr()));
 }
 
 #endif

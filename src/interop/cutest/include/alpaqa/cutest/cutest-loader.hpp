@@ -22,10 +22,8 @@ class CUTEstProblem : public BoxConstrProblem<alpaqa::DefaultConfig> {
     USING_ALPAQA_CONFIG(alpaqa::DefaultConfig);
 
     /// Load a CUTEst problem from the given shared library and OUTSDIF.d file.
-    CUTEstProblem(const char *so_fname, const char *outsdif_fname);
-    /// @copydoc CUTEstProblem::CUTEstProblem(const char*, const char *)
-    CUTEstProblem(const std::string &so_fname,
-                  const std::string &outsdif_fname);
+    CUTEstProblem(const char *so_fname, const char *outsdif_fname,
+                  bool sparse = false);
     CUTEstProblem(const CUTEstProblem &);
     CUTEstProblem &operator=(const CUTEstProblem &);
     CUTEstProblem(CUTEstProblem &&) noexcept;
@@ -93,6 +91,10 @@ class CUTEstProblem : public BoxConstrProblem<alpaqa::DefaultConfig> {
 
   private:
     util::copyable_unique_ptr<class CUTEstLoader> impl;
+    bool sparse       = false;
+    mutable int nnz_H = -1;
+    mutable int nnz_J = -1;
+    mutable Eigen::VectorX<int> H_row, H_col;
 
   public:
     [[nodiscard]] real_t eval_f(crvec x) const;

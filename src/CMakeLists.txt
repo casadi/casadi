@@ -170,6 +170,7 @@ if (ALPAQA_WITH_CUTEST)
     target_link_libraries(cutest-interface
         PUBLIC alpaqa::alpaqa
         PRIVATE CUTEst::headers ${CMAKE_DL_LIBS} alpaqa::warnings)
+    target_compile_features(alpaqa PUBLIC cxx_std_23)
     set_target_properties(cutest-interface PROPERTIES SOVERSION ${PROJECT_VERSION})
     add_library(alpaqa::cutest-interface ALIAS cutest-interface)
     list(APPEND ALPAQA_INSTALL_TARGETS cutest-interface)
