@@ -94,7 +94,9 @@ class CUTEstProblem : public BoxConstrProblem<alpaqa::DefaultConfig> {
     bool sparse       = false;
     mutable int nnz_H = -1;
     mutable int nnz_J = -1;
-    mutable Eigen::VectorX<int> H_row, H_col;
+    mutable Eigen::VectorX<int> H_row, H_col, J_row, J_col;
+    mutable vec H_work, J_work;
+    mutable indexvec H_perm, J_perm;
 
   public:
     [[nodiscard]] real_t eval_f(crvec x) const;

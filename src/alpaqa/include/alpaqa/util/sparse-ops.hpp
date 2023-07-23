@@ -6,6 +6,8 @@
 #include <alpaqa/util/iter-adapter.hpp>
 #include <alpaqa/util/set-intersection.hpp>
 
+#include <chrono>
+#include <iostream>
 #include <ranges>
 #include <span>
 
@@ -122,30 +124,39 @@ void sparse_matvec_add_transpose_masked_rows(const SpMat &S, const CVec &v,
 #if __cpp_lib_ranges_zip >= 202110L && __cpp_lib_ranges_enumerate >= 202302L
 
 template <Config Conf>
-void convert_triplet_to_ccs(const auto &rows, const auto &cols,
-                            rindexvec<Conf> inner_idx,
-                            rindexvec<Conf> outer_ptr) {
+void convert_triplets_to_ccs(const auto &rows, const auto &cols,
+                             rindexvec<Conf> inner_idx,
+                             rindexvec<Conf> outer_ptr,
+                             index_t<Conf> idx_0 = 0) {
     USING_ALPAQA_CONFIG(Conf);
-
-    // Check whether the indices are sorted correctly (column first, then row)
-    auto cmp = [](const auto &a, const auto &b) {
-        return std::tie(a.first, a.second) < std::tie(b.first, b.second);
-    };
-    std::ranges::ref_view cols_vw = cols, rows_vw = rows;
-    auto indices = std::views::zip(cols_vw, rows_vw);
-    if (!std::ranges::is_sorted(indices, cmp))
-        throw std::logic_error("Incorrect sparse matrix order");
-
-    auto cvt_indices = [](auto i) { return static_cast<index_t>(i); };
     // Inner indices: simply the row indices
     assert(std::size(rows) == std::size(inner_idx));
+    auto cvt_indices = [&](auto i) { return static_cast<index_t>(i) - idx_0; };
+    std::ranges::ref_view rows_vw = rows;
     std::ranges::transform(rows_vw, std::begin(inner_idx), cvt_indices);
     // Outer indices: need to count the number of nonzeros per column
     auto cols_iter = std::begin(cols);
     for (auto &&[i, outer] : std::views::enumerate(outer_ptr)) {
-        cols_iter = std::lower_bound(cols_iter, std::end(cols), i);
-        outer     = cvt_indices(cols_iter - std::begin(cols));
+        cols_iter = std::lower_bound(cols_iter, std::end(cols), i + idx_0);
+        outer     = static_cast<index_t>(cols_iter - std::begin(cols));
     }
+}
+
+/// Sort the (row, column, value) triplets, column first, then row.
+template <class... Ts>
+void sort_triplets(Ts &&...triplets) {
+    // Sort the indices (column first, then row)
+    auto cmp = [](const auto &a, const auto &b) {
+        return std::tie(std::get<1>(a), std::get<0>(a)) <
+               std::tie(std::get<1>(b), std::get<0>(b));
+    };
+    auto indices = std::views::zip(std::ranges::ref_view{triplets}...);
+    auto t0      = std::chrono::steady_clock::now();
+    std::ranges::sort(indices, cmp);
+    auto t1 = std::chrono::steady_clock::now();
+    std::cout << "Sorting took: "
+              << std::chrono::duration<double>{t1 - t0}.count() * 1e6
+              << " µs\n";
 }
 
 #endif

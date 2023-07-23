@@ -1,4 +1,5 @@
 #include <alpaqa/cutest/cutest-loader.hpp>
+#include <alpaqa/util/sparse-ops.hpp>
 
 #include <cutest.h>
 #include <dlfcn.h>
@@ -45,6 +46,12 @@ CUTEST_cjprod   : matrix-vector product of a vector with the Jacobian of the con
 CUTEST_csjprod  : matrix-vector product of a sparse vector with the Jacobian of the constraints, or its transpose
 CUTEST_cchprods : matrix-vector products of a vector with each of the Hessian matrices of the constraint functions
 */
+
+#ifndef CUTEST_csjp
+#define CUTEST_csjp FUNDERSCORE(cutest_csjp)
+void CUTEST_csjp(integer *status, integer *nnzj, const integer *lj,
+                 integer *J_var, integer *J_con);
+#endif
 
 #define STR(x) #x
 #define LOAD_DL_FUNC(f) dlfun<decltype(f)>(STR(f))
@@ -134,7 +141,11 @@ class CUTEstLoader {
         decltype(CUTEST_cjprod) *cjprod;
         decltype(CUTEST_ccifg) *ccifg;
         decltype(CUTEST_cigr) *cigr;
+        decltype(CUTEST_cdimsj) *cdimsj;
+        decltype(CUTEST_csjp) *csjp;
+        decltype(CUTEST_ccfsg) *ccfsg;
         decltype(CUTEST_cdh) *cdh;
+        decltype(CUTEST_cdimsh) *cdimsh;
         decltype(CUTEST_cshp) *cshp;
         decltype(CUTEST_csh) *csh;
         decltype(CUTEST_chprod) *chprod;
@@ -178,7 +189,11 @@ class CUTEstLoader {
             .cjprod = LOAD_DL_FUNC(CUTEST_cjprod),
             .ccifg  = LOAD_DL_FUNC(CUTEST_ccifg),
             .cigr   = LOAD_DL_FUNC(CUTEST_cigr),
+            .cdimsj = LOAD_DL_FUNC(CUTEST_cdimsj),
+            .csjp   = LOAD_DL_FUNC(CUTEST_csjp),
+            .ccfsg  = LOAD_DL_FUNC(CUTEST_ccfsg),
             .cdh    = LOAD_DL_FUNC(CUTEST_cdh),
+            .cdimsh = LOAD_DL_FUNC(CUTEST_cdimsh),
             .cshp   = LOAD_DL_FUNC(CUTEST_cshp),
             .csh    = LOAD_DL_FUNC(CUTEST_csh),
             .chprod = LOAD_DL_FUNC(CUTEST_chprod),
@@ -292,7 +307,7 @@ void CUTEstProblem::eval_g(crvec x, rvec gx) const {
     assert(x.size() == static_cast<length_t>(impl->nvar));
     assert(gx.size() == static_cast<length_t>(impl->ncon));
     integer status;
-    logical jtrans = FALSE_, grad = FALSE_;
+    logical jtrans = TRUE_, grad = FALSE_;
     integer zero = 0;
     impl->funcs.ccfg(&status, &impl->nvar, &impl->ncon, x.data(), gx.data(),
                      &jtrans, &zero, &zero, nullptr, &grad);
@@ -314,19 +329,73 @@ void CUTEstProblem::eval_grad_g_prod(crvec x, crvec y, rvec grad_gxy) const {
 void CUTEstProblem::eval_jac_g(crvec x, [[maybe_unused]] rindexvec inner_idx,
                                [[maybe_unused]] rindexvec outer_ptr,
                                rvec J_values) const {
-    assert(x.size() == static_cast<length_t>(impl->nvar));
+    // Compute the nonzero values
     if (J_values.size() > 0) {
-        assert(J_values.size() == static_cast<length_t>(impl->nvar) *
-                                      static_cast<length_t>(impl->ncon));
+        assert(x.size() == static_cast<length_t>(impl->nvar));
         integer status;
-        logical jtrans = FALSE_, grad = TRUE_;
-        impl->funcs.ccfg(&status, &impl->nvar, &impl->ncon, x.data(),
-                         impl->work.data(), &jtrans, &impl->ncon, &impl->nvar,
-                         J_values.data(), &grad);
-        throw_if_error("eval_jac_g: CUTEST_ccfg", status);
+        // Sparse Jacobian
+        if (sparse) {
+            assert(nnz_J >= 0);
+            assert(J_values.size() == static_cast<length_t>(nnz_J));
+            assert(J_work.size() == static_cast<length_t>(nnz_J));
+            assert(inner_idx.size() == static_cast<length_t>(nnz_J));
+            assert(outer_ptr.size() == static_cast<length_t>(impl->nvar + 1));
+            const integer nnz = nnz_J;
+            logical grad      = TRUE_;
+            impl->funcs.ccfsg(&status, &impl->nvar, &impl->ncon, x.data(),
+                              impl->work.data(), &nnz_J, &nnz, J_work.data(),
+                              J_col.data(), J_row.data(), &grad);
+            throw_if_error("eval_jac_g: CUTEST_ccfsg", status);
+            auto t0  = std::chrono::steady_clock::now();
+            J_values = J_work(J_perm);
+            auto t1  = std::chrono::steady_clock::now();
+            std::cout << "Permutation of J took: "
+                      << std::chrono::duration<double>{t1 - t0}.count() * 1e6
+                      << " µs\n";
+        }
+        // Dense Jacobian
+        else {
+            assert(J_values.size() == static_cast<length_t>(impl->nvar) *
+                                          static_cast<length_t>(impl->ncon));
+            integer status;
+            logical jtrans = FALSE_, grad = TRUE_;
+            impl->funcs.ccfg(&status, &impl->nvar, &impl->ncon, x.data(),
+                             impl->work.data(), &jtrans, &impl->ncon,
+                             &impl->nvar, J_values.data(), &grad);
+            throw_if_error("eval_jac_g: CUTEST_ccfg", status);
+        }
+    }
+    // Compute sparsity pattern without values
+    else {
+        assert(nnz_J >= 0);
+        assert(inner_idx.size() == static_cast<length_t>(nnz_J));
+        assert(outer_ptr.size() == static_cast<length_t>(impl->nvar + 1));
+        integer status;
+        const integer nnz = nnz_J;
+        impl->funcs.csjp(&status, &nnz_J, &nnz, J_col.data(), J_row.data());
+        throw_if_error("eval_jac_g: CUTEST_csjp", status);
+        std::iota(J_perm.begin(), J_perm.end(), index_t{0});
+        util::sort_triplets(J_row, J_col, J_perm);
+        util::convert_triplets_to_ccs<config_t>(J_row, J_col, inner_idx,
+                                                outer_ptr, 1);
     }
 }
-auto CUTEstProblem::get_jac_g_num_nonzeros() const -> length_t { return 0; }
+auto CUTEstProblem::get_jac_g_num_nonzeros() const -> length_t {
+    if (!sparse)
+        return 0;
+    if (nnz_J < 0) {
+        integer status;
+        impl->funcs.cdimsj(&status, &nnz_J);
+        throw_if_error("get_jac_g_num_nonzeros: CUTEST_cdimsj", status);
+        nnz_J -= impl->nvar;
+        assert(nnz_J >= 0);
+        J_col.resize(nnz_J);
+        J_row.resize(nnz_J);
+        J_perm.resize(nnz_J);
+        J_work.resize(nnz_J);
+    }
+    return nnz_J;
+}
 void CUTEstProblem::eval_grad_gi(crvec x, index_t i, rvec grad_gi) const {
     assert(x.size() == static_cast<length_t>(impl->nvar));
     assert(grad_gi.size() == static_cast<length_t>(impl->nvar));
@@ -355,27 +424,40 @@ void CUTEstProblem::eval_hess_L_prod(crvec x, crvec y, real_t scale, crvec v,
         Hv *= scale;
 }
 void CUTEstProblem::eval_hess_L(crvec x, crvec y, real_t scale,
-                                [[maybe_unused]] rindexvec inner_idx,
-                                [[maybe_unused]] rindexvec outer_ptr,
+                                rindexvec inner_idx, rindexvec outer_ptr,
                                 rvec H_values) const {
 
-    assert(x.size() == static_cast<length_t>(impl->nvar));
-    assert(y.size() == static_cast<length_t>(impl->ncon));
+    // Compute the nonzero values
     if (H_values.size() > 0) {
+        assert(x.size() == static_cast<length_t>(impl->nvar));
+        assert(y.size() == static_cast<length_t>(impl->ncon));
         const auto *mult = y.data();
         if (scale != 1) {
             impl->work = y * (real_t(1) / scale);
             mult       = impl->work.data();
         }
         integer status;
+        // Sparse Hessian
         if (sparse) {
-            assert(H_values.size() == nnz_H);
+            assert(nnz_H >= 0);
+            assert(H_values.size() == static_cast<length_t>(nnz_H));
+            assert(H_work.size() == static_cast<length_t>(nnz_H));
+            assert(inner_idx.size() == static_cast<length_t>(nnz_H));
+            assert(outer_ptr.size() == static_cast<length_t>(impl->nvar + 1));
             const integer nnz = nnz_H;
             impl->funcs.csh(&status, &impl->nvar, &impl->ncon, x.data(),
-                            y.data(), &nnz_H, &nnz, H_values.data(),
-                            H_row.data(), H_col.data());
+                            y.data(), &nnz_H, &nnz, H_work.data(), H_col.data(),
+                            H_row.data());
             throw_if_error("eval_hess_L: CUTEST_csh", status);
-        } else {
+            auto t0  = std::chrono::steady_clock::now();
+            H_values = H_work(H_perm);
+            auto t1  = std::chrono::steady_clock::now();
+            std::cout << "Permutation of H took: "
+                      << std::chrono::duration<double>{t1 - t0}.count() * 1e6
+                      << " µs\n";
+        }
+        // Dense Hessian
+        else {
             assert(H_values.size() == static_cast<length_t>(impl->nvar) *
                                           static_cast<length_t>(impl->nvar));
             impl->funcs.cdh(&status, &impl->nvar, &impl->ncon, x.data(), mult,
@@ -384,8 +466,21 @@ void CUTEstProblem::eval_hess_L(crvec x, crvec y, real_t scale,
         }
         if (scale != 1)
             H_values *= scale;
-    } else {
-        // TODO
+    }
+    // Compute sparsity pattern without values
+    else {
+        assert(nnz_H >= 0);
+        assert(inner_idx.size() == static_cast<length_t>(nnz_H));
+        assert(outer_ptr.size() == static_cast<length_t>(impl->nvar + 1));
+        integer status;
+        const integer nnz = nnz_H;
+        impl->funcs.cshp(&status, &impl->nvar, &nnz_H, &nnz, H_col.data(),
+                         H_row.data());
+        throw_if_error("eval_hess_L: CUTEST_cshp", status);
+        std::iota(H_perm.begin(), H_perm.end(), index_t{0});
+        util::sort_triplets(H_row, H_col, H_perm);
+        util::convert_triplets_to_ccs<config_t>(H_row, H_col, inner_idx,
+                                                outer_ptr, 1);
     }
 }
 auto CUTEstProblem::get_hess_L_num_nonzeros() const -> length_t {
@@ -393,9 +488,12 @@ auto CUTEstProblem::get_hess_L_num_nonzeros() const -> length_t {
         return 0;
     if (nnz_H < 0) {
         integer status;
-        integer zero = 0;
-        impl->funcs.cshp(&status, &impl->nvar, &nnz_H, &zero, nullptr, nullptr);
-        throw_if_error("get_hess_L_num_nonzeros: CUTEST_cshp", status);
+        impl->funcs.cdimsh(&status, &nnz_H);
+        throw_if_error("get_hess_L_num_nonzeros: CUTEST_cdimsh", status);
+        H_col.resize(nnz_H);
+        H_row.resize(nnz_H);
+        H_perm.resize(nnz_H);
+        H_work.resize(nnz_H);
     }
     return nnz_H;
 }

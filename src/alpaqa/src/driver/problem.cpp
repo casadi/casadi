@@ -123,6 +123,8 @@ LoadedProblem load_problem(std::string_view type, const fs::path &dir,
         alpaqa::params::set_params(outsdif_path, "outsdif", prob_opts);
         if (outsdif_path.empty())
             outsdif_path = full_path.parent_path() / "OUTSDIF.d";
+        bool sparse = false;
+        alpaqa::params::set_params(sparse, "sparse", prob_opts);
         static std::mutex mtx;
         std::unique_lock lck{mtx};
         using TEProblem  = alpaqa::TypeErasedProblem<config_t>;
@@ -130,7 +132,7 @@ LoadedProblem load_problem(std::string_view type, const fs::path &dir,
         using CntProblem = alpaqa::ProblemWithCounters<CuProblem>;
         LoadedProblem problem{
             .problem = TEProblem::make<CntProblem>(
-                std::in_place, full_path.c_str(), outsdif_path.c_str()),
+                std::in_place, full_path.c_str(), outsdif_path.c_str(), sparse),
             .abs_path = fs::absolute(full_path),
             .path     = full_path,
         };

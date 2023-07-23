@@ -123,8 +123,8 @@ TEST(SparseOps, convert_triplet_to_ccs) {
         5, 5;
     // Convert to compressed column storage format
     indexvec inner(nnz), outer(6 + 1);
-    convert_triplet_to_ccs<config_t>(rows_cols.col(0), rows_cols.col(1), inner,
-                                     outer);
+    convert_triplets_to_ccs<config_t>(rows_cols.col(0), rows_cols.col(1), inner,
+                                      outer);
     std::cout << "Inner: " << inner.transpose() << std::endl;
     std::cout << "Outer: " << outer.transpose() << std::endl;
 
