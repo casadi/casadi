@@ -24,8 +24,8 @@ function(cutest_sif_problem PROBLEM_NAME)
     set(options "ALL")
     set(oneValueArgs SUFFIX)
     set(multiValueArgs OPTIONS)
-    cmake_parse_arguments(CUTEST_SIF_PROBLEM
-        "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+    cmake_parse_arguments(PARSE_ARGV 1 CUTEST_SIF_PROBLEM
+        "${options}" "${oneValueArgs}" "${multiValueArgs}")
     set(FULL_PROBLEM_NAME "${PROBLEM_NAME}${CUTEST_SIF_PROBLEM_SUFFIX}")
     if (NOT CUTEST_SIF_PROBLEM_ALL)
         set(CUTEST_SIF_PROBLEM_EXCLUDE_FROM_ALL EXCLUDE_FROM_ALL)
@@ -47,8 +47,8 @@ function(cutest_sif_problem PROBLEM_NAME)
                 MASTSIF="${MASTSIF_DIR}"
                 MYARCH="${CUTEST_MYARCH}"
                 "${SIFDECODE_EXE}"
-                ${PROBLEM_NAME}
                 ${CUTEST_SIF_PROBLEM_OPTIONS}
+                ${PROBLEM_NAME}
             MAIN_DEPENDENCY
                 "${MASTSIF_DIR}/${PROBLEM_NAME}.SIF"
             WORKING_DIRECTORY
