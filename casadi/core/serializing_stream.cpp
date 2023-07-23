@@ -155,6 +155,7 @@ namespace casadi {
       for (int j=0;j<4;++j) pack(c[j]);
     }
 
+#if SIZE_MAX != UINT_MAX
     void DeserializingStream::unpack(unsigned int& e) {
       assert_decoration('u');
       uint32_t n;
@@ -170,6 +171,7 @@ namespace casadi {
       const char* c = reinterpret_cast<const char*>(&n);
       for (int j=0;j<4;++j) pack(c[j]);
     }
+#endif
 
     void DeserializingStream::unpack(bool& e) {
       assert_decoration('b');

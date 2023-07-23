@@ -29,6 +29,8 @@
 #include <set>
 #include <sstream>
 #include <unordered_map>
+#include <cstdint>
+#include <climits>
 
 namespace casadi {
   class Slice;
@@ -96,7 +98,10 @@ namespace casadi {
     void unpack(std::ostream& s);
     void unpack(Slice& e);
     void unpack(int& e);
+
+#if SIZE_MAX != UINT_MAX
     void unpack(unsigned int& e);
+#endif
     void unpack(bool& e);
     void unpack(casadi_int& e);
     void unpack(size_t& e);
@@ -231,7 +236,9 @@ namespace casadi {
     void pack(const GenericType& e);
     void pack(std::istream& s);
     void pack(int e);
+#if SIZE_MAX != UINT_MAX
     void pack(unsigned int e);
+#endif
     void pack(bool e);
     void pack(casadi_int e);
     void pack(size_t e);
