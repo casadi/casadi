@@ -47,7 +47,12 @@ namespace casadi {
       }
 
     } catch (std::exception& ex) {
-      std::cout << "Error: " << ex.what() << std::endl;
+      uerr() << "Error \""
+             << ex.what()
+             << "\" evaluating objective value"
+             << std::endl;
+
+      sleqp_raise(SLEQP_FUNC_EVAL_ERROR, "%s", ex.what());
     }
 
     return SLEQP_ERROR;
@@ -78,7 +83,12 @@ namespace casadi {
                                         0.));
 
     } catch (std::exception& ex) {
-      std::cout << "Error: " << ex.what() << std::endl;
+      uerr() << "Error \""
+             << ex.what()
+             << "\" evaluating objective gradient"
+             << std::endl;
+
+      sleqp_raise(SLEQP_FUNC_EVAL_ERROR, "%s", ex.what());
     }
 
     return SLEQP_OKAY;

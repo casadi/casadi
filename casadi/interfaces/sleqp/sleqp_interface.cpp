@@ -268,6 +268,8 @@ namespace casadi {
 
     SLEQPMemory* m = static_cast<SLEQPMemory*>(mem);
 
+    check_inputs(m);
+
     // clear_mem(m);
 
     casadi_nlpsol_data<double>& d_nlp = m->d_nlp;
@@ -400,8 +402,6 @@ namespace casadi {
                                        m->internal.primal,
                                        nullptr));
 
-    auto jacg_sp_ = get_function("nlp_jac_g").sparsity_out(1);
-
     m->xk = w;
     w += nx_;
 
@@ -491,11 +491,19 @@ namespace casadi {
     SLEQP_CALL(sleqp_vec_to_raw(cons_dual, m->cb_lam_gk));
     m->arg[NLPSOL_LAM_G] = m->cb_lam_gk;
 
-    fcallback_(m->arg, m->res, m->iw, m->w, 0);
+    try {
+      fcallback_(m->arg, m->res, m->iw, m->w, 0);
+    } catch(KeyboardInterruptException& ex) {
+      sleqp_raise(SLEQP_CALLBACK_ERROR, "Interrupt caught in callback...");
+    } catch(std::exception& ex) {
+      casadi_warning("intermediate_callback: " + std::string(ex.what()));
+      if (m->iteration_callback_ignore_errors) return SLEQP_OKAY;
+      sleqp_raise(SLEQP_CALLBACK_ERROR, "Exception caught in callback...");
+    }
 
     casadi_int ret = static_cast<casadi_int>(ret_double);
 
-    if(ret != 0)
+    if(ret != 0 && !m->iteration_callback_ignore_errors)
     {
       sleqp_raise(SLEQP_CALLBACK_ERROR, "Error in callback...");
     }
@@ -509,6 +517,7 @@ namespace casadi {
 
     SLEQPMemory* m = static_cast<SLEQPMemory*>(mem);
 
+    m->iteration_callback_ignore_errors = iteration_callback_ignore_errors_;
     if (!fcallback_.is_null()) {
       SLEQP_CALL_EXC(sleqp_solver_add_callback(m->internal.solver,
                                                SLEQP_SOLVER_EVENT_ACCEPTED_ITERATE,

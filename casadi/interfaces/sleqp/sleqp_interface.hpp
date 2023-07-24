@@ -36,6 +36,8 @@ namespace casadi {
     // Additional callback data
     double *cb_xk, *cb_lam_xk, *cb_lam_gk;
 
+    bool iteration_callback_ignore_errors;
+
     const SLEQPInterface* interface;
   };
 
