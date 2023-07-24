@@ -47,6 +47,9 @@
 #ifdef OUT
 #undef OUT
 #endif
+#ifdef interface
+#undef interface
+#endif
 #else // _WIN32
 #include <dlfcn.h>
 #endif // _WIN32

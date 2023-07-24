@@ -40,6 +40,10 @@ if "SKIP_WORHP_TESTS" not in os.environ and has_nlpsol("worhp")  and not args.ig
   #solvers.append(("worhp",{"TolOpti":1e-20,"TolFeas":1e-20,"UserHM": False}))
   pass
 
+if "SKIP_SLEQP_TESTS" not in os.environ and has_nlpsol("sleqp"):
+  solvers.append(("sleqp",{"print_time":False,"sleqp": {"linesearch": "Approx","feas_tol":1e-7,"stat_tol":1e-7,"slack_tol":1e-7}},set()))
+
+
 if "SKIP_IPOPT_TESTS" not in os.environ and has_nlpsol("ipopt"):
   solvers.append(("ipopt",{"print_time":False,"ipopt": {"tol": 1e-10, "derivative_test":"second-order","print_level":0}},set()))
   solvers.append(("ipopt",{"print_time":False,"ipopt": {"tol": 1e-10, "derivative_test":"first-order","hessian_approximation": "limited-memory","print_level":0}},set()))
@@ -83,6 +87,7 @@ class NLPtests(casadiTestCase):
     nlp={'x':x,'f':(x+1)**2, 'g': sqrt(x)}
 
     for Solver, solver_options, features in solvers:
+      
       print("test_nonregular_point",Solver,solver_options)
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
       solver_in = {}
@@ -95,12 +100,13 @@ class NLPtests(casadiTestCase):
         print(solver(**solver_in))
       except:
         pass
-      if Solver not in ["ipopt","snopt","blocksqp","bonmin","knitro"]:
+      if Solver not in ["ipopt","snopt","blocksqp","bonmin","knitro","sleqp"]:
         self.assertTrue(solver.stats()["unified_return_status"]=="SOLVER_RET_NAN")
       self.assertFalse(solver.stats()["success"])
 
     nlp={'x':x,'f':x**2, 'g': sqrt(x)}
     for Solver, solver_options, features in solvers:
+      
       print("test_nonregular_point",Solver,solver_options)
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
       solver_in = {}
@@ -114,7 +120,7 @@ class NLPtests(casadiTestCase):
         solver_out = solver(**solver_in)
       except:
         pass
-      if Solver not in ["ipopt","snopt","bonmin","knitro"]:
+      if Solver not in ["ipopt","snopt","bonmin","knitro","sleqp"]:
         self.assertTrue(solver.stats()["unified_return_status"]=="SOLVER_RET_NAN")
       self.assertFalse(solver.stats()["success"])
 
@@ -135,6 +141,7 @@ class NLPtests(casadiTestCase):
    x = MX.sym("x")
    nlp = {"x":x,"f":interrupt(x),"g":x}
    for Solver, solver_options, features in solvers:
+     
      solver_options = dict(solver_options)
      solver_options["error_on_fail"] = True
      solver = nlpsol("solver",Solver,nlp,solver_options)
@@ -146,6 +153,7 @@ class NLPtests(casadiTestCase):
          solver(lbg=-5,ubg=5)
 
    for Solver, solver_options, features in solvers:
+      
       #if Solver not in ["ipopt","sqpmethod"]: continue
       if Solver in ["worhp","blocksqp","knitro","bonmin","snopt"]: continue
       print("test_iteration_interrupt",Solver,solver_options)
@@ -234,6 +242,7 @@ class NLPtests(casadiTestCase):
     x=SX.sym("x")
     nlp={'x':x, 'f':-x,'g':x}
     for Solver, solver_options, features in solvers:
+      
       print("test_nan",Solver,solver_options)
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
 
@@ -1103,6 +1112,7 @@ class NLPtests(casadiTestCase):
 
     nlp={'x':vertcat(*[x,y]), 'f':(1-x)**2+100*(y-x**2)**2, 'g':x+y}
     for Solver, solver_options, features in solvers:
+      if Solver=="sleqp": continue
       print("test_activeUBG",Solver,solver_options)
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
       solver_in = {}
@@ -2075,6 +2085,7 @@ class NLPtests(casadiTestCase):
     nlp={'x':x, 'f':(x-1)**2, 'g':x_fail}
         
     for Solver, solver_options, features in solvers:
+      
       print("test_exception_in_oraclefunction",Solver,solver_options)
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
       solver_in = {}
