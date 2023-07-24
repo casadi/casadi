@@ -1522,7 +1522,7 @@ if(WITH_BUILD_SIMDE)
       INSTALL_COMMAND ${EXTERNAL_CMAKE_COMMAND} -E copy_directory
                     <SOURCE_DIR>/simde <INSTALL_DIR>/include/simde)
   add_library(Simde INTERFACE)
-  add_dependencies(Simde Simde-external)
+  add_dependencies(Simde simde-external)
   target_include_directories(Simde INTERFACE "${CMAKE_BINARY_DIR}/external_projects/include/simde")
   install(DIRECTORY
     "${CMAKE_BINARY_DIR}/external_projects/include/simde"
