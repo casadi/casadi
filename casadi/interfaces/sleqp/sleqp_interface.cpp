@@ -112,6 +112,13 @@ namespace casadi {
     max_it = SLEQP_NONE;
     time_limit = SLEQP_NONE;
 
+    // Read user options
+    for (auto&& op : opts) {
+      if (op.first=="sleqp") {
+        opts_ = op.second;
+      }
+    }
+
     auto opt_it = opts.find("sleqp");
 
     if(opt_it != std::end(opts))
@@ -320,6 +327,49 @@ namespace casadi {
     SLEQP_CALL_EXC(sleqp_settings_set_enum_value(m->internal.settings,
                                                  SLEQP_SETTINGS_ENUM_HESS_EVAL,
                                                  SLEQP_HESS_EVAL_DAMPED_BFGS));
+
+    // Read options
+    for (auto&& op : opts_) {
+      bool found = false;
+      for (int i = 0; i < SLEQP_NUM_INT_SETTINGS; ++i) {
+        SLEQP_SETTINGS_INT ii = static_cast<SLEQP_SETTINGS_INT>(i);
+        if (op.first==sleqp_settings_int_name(ii)) {
+          found = true;
+          SLEQP_CALL_EXC(sleqp_settings_set_int_value(m->internal.settings,
+                                                 ii,
+                                                 op.second.to_int()));
+        }
+      }
+      for (int i = 0; i < SLEQP_NUM_REAL_SETTINGS; ++i) {
+        SLEQP_SETTINGS_REAL ii = static_cast<SLEQP_SETTINGS_REAL>(i);
+        if (op.first==sleqp_settings_real_name(ii)) {
+          found = true;
+          SLEQP_CALL_EXC(sleqp_settings_set_real_value(m->internal.settings,
+                                                 ii,
+                                                 op.second.to_double()));
+        }
+      }
+      for (int i = 0; i < SLEQP_NUM_BOOL_SETTINGS; ++i) {
+        SLEQP_SETTINGS_BOOL ii = static_cast<SLEQP_SETTINGS_BOOL>(i);
+        if (op.first==sleqp_settings_bool_name(ii)) {
+          found = true;
+          SLEQP_CALL_EXC(sleqp_settings_set_bool_value(m->internal.settings,
+                                                 ii,
+                                                 op.second.to_bool()));
+        }
+      }
+      for (int i = 0; i < SLEQP_NUM_ENUM_SETTINGS; ++i) {
+        SLEQP_SETTINGS_ENUM ii = static_cast<SLEQP_SETTINGS_ENUM>(i);
+        if (op.first==sleqp_settings_enum_name(ii)) {
+          found = true;
+          std::string value = op.second.to_string();
+          SLEQP_CALL_EXC(sleqp_settings_set_enum_value_by_string(m->internal.settings,
+                                                 ii,
+                                                 value.c_str()));
+        }
+      }
+      casadi_assert(found, "Could not find option '" + op.first + "'.");
+    }
 
     /*
     SLEQP_CALL_EXC(sleqp_settings_set_enum_value(m->internal.settings,

@@ -89,6 +89,9 @@ namespace casadi {
 
     Sparsity jacg_sp_;
 
+    /// All SLEQP options
+    Dict opts_;
+
     /** \brief Serialize an object without type information */
     void serialize_body(SerializingStream &s) const override;
 
