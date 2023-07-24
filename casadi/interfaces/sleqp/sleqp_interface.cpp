@@ -95,11 +95,11 @@ namespace casadi {
   }
 
   const Options SLEQPInterface::options_
-  = {
-    {&Nlpsol::options_},
-    {{"sleqp",
-      {OT_DICT,
-       "Options to be passed to SLEQP"}}},
+  = {{&Nlpsol::options_},
+      {{"sleqp",
+        {OT_DICT,
+        "Options to be passed to SLEQP"}}
+      }
   };
 
   const std::string SLEQPInterface::meta_doc = "";
