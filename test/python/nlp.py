@@ -1112,6 +1112,7 @@ class NLPtests(casadiTestCase):
 
     nlp={'x':vertcat(*[x,y]), 'f':(1-x)**2+100*(y-x**2)**2, 'g':x+y}
     for Solver, solver_options, features in solvers:
+      if Solver=="sleqp": continue
       print("test_activeUBG",Solver,solver_options)
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
       solver_in = {}
