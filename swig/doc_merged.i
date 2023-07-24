@@ -35312,6 +35312,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/slice.cpp#L255-L289
 
 [INTERNAL] ";
 
+%feature("docstring") casadi::IndexRecution::casadi_sleqp_func_create "
+
+[INTERNAL] ";
+
 %feature("docstring") casadi::IndexRecution::slicot_mb03vd "
 
 [INTERNAL] ";

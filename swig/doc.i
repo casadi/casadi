@@ -57436,6 +57436,11 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/slice.cpp#L255-L289
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::casadi_sleqp_func_create(SleqpFunc **star, 
+int num_vars, int num_cons, SLEQPMemory *m) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::slicot_mb03vd(int n, int p, int ilo, int ihi,
  double *a, int lda1, int lda2, double *tau, int ldtau, double *dwork) "
 
