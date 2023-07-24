@@ -327,14 +327,20 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   /// Get all statistics
   Dict get_stats(void* mem) const override;
 
-  /** \brief Serialize an object without type information */
+  /** \brief Serialize an object without type information
+
+      \identifier{279} */
   void serialize_body(SerializingStream &s) const override;
 
-  /** \brief Deserialize without type information */
+  /** \brief Deserialize without type information
+
+      \identifier{27a} */
   static ProtoFunction* deserialize(DeserializingStream& s) { return new FmuFunction(s); }
 
   protected:
-    /** \brief Deserializing constructor  */
+    /** \brief Deserializing constructor
+
+        \identifier{27b} */
     explicit FmuFunction(DeserializingStream& s);
 };
 

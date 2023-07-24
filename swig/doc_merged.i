@@ -7260,6 +7260,8 @@ C++ includes: serializing_stream.hpp
 
 >  void casadi::DeserializingStream::unpack(Importer &e)
 
+>  void casadi::DeserializingStream::unpack(Fmu &e)
+
 >  void casadi::DeserializingStream::unpack(GenericType &e)
 
 >  void casadi::DeserializingStream::unpack(std::ostream &s)
@@ -26349,6 +26351,8 @@ C++ includes: serializing_stream.hpp
 
 >  void casadi::SerializingStream::pack(const Importer &e)
 
+>  void casadi::SerializingStream::pack(const Fmu &e)
+
 >  void casadi::SerializingStream::pack(const Slice &e)
 
 >  void casadi::SerializingStream::pack(const GenericType &e)
@@ -31515,7 +31519,7 @@ hpipm
 
 
 
-Interface to HMPC Solver
+Interface to HPIPM Solver
 
 In order to use this interface, you must:
 

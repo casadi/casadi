@@ -190,15 +190,21 @@ class CASADI_EXPORT Fmu
 
   /// \cond INTERNAL
 #ifndef SWIG
-    /** \brief  Create from node */
+    /** \brief  Create from node
+
+        \identifier{27c} */
     static Fmu create(FmuInternal* node);
 #endif // SWIG
   /// \endcond
 
-  /** \brief Serialize an object */
+  /** \brief Serialize an object
+
+      \identifier{27d} */
   void serialize(SerializingStream &s) const;
 
-  /** \brief Deserialize with type disambiguation */
+  /** \brief Deserialize with type disambiguation
+
+      \identifier{27e} */
   static Fmu deserialize(DeserializingStream& s);
 };
 

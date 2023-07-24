@@ -9924,10 +9924,10 @@ casadi::DeserializingStream::DeserializingStream(std::istream &in_s) "
 Constructor.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/serializing_stream.hpp#L73
+https://github.com/casadi/casadi/blob/develop/casadi/core/serializing_stream.hpp#L76
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/serializing_stream.cpp#L44-L68
+https://github.com/casadi/casadi/blob/develop/casadi/core/serializing_stream.cpp#L46-L70
 
 ";
 
@@ -9948,10 +9948,10 @@ stream. an error will be raised.
 Extra doc: https://github.com/casadi/casadi/wiki/L_al
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/serializing_stream.hpp#L83
+https://github.com/casadi/casadi/blob/develop/casadi/core/serializing_stream.hpp#L86
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/serializing_stream.cpp#L218-L221
+https://github.com/casadi/casadi/blob/develop/casadi/core/serializing_stream.cpp#L238-L241
 
 ";
 
@@ -9977,6 +9977,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/serializing_stream.cpp
 [INTERNAL] ";
 
 %feature("docstring")  casadi::DeserializingStream::unpack(Importer &e) "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::DeserializingStream::unpack(Fmu &e) "
 
 [INTERNAL] ";
 
@@ -40786,10 +40790,10 @@ casadi::SerializingStream::SerializingStream(std::ostream &out) "
 Constructor.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/serializing_stream.hpp#L209
+https://github.com/casadi/casadi/blob/develop/casadi/core/serializing_stream.hpp#L217
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/serializing_stream.cpp#L70-L72
+https://github.com/casadi/casadi/blob/develop/casadi/core/serializing_stream.cpp#L72-L74
 
 ";
 
@@ -40807,10 +40811,10 @@ Serializes an object to the output stream.
 Extra doc: https://github.com/casadi/casadi/wiki/L_ap
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/serializing_stream.hpp#L216
+https://github.com/casadi/casadi/blob/develop/casadi/core/serializing_stream.hpp#L224
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/serializing_stream.cpp#L213-L216
+https://github.com/casadi/casadi/blob/develop/casadi/core/serializing_stream.cpp#L233-L236
 
 ";
 
@@ -40836,6 +40840,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/serializing_stream.cpp
 [INTERNAL] ";
 
 %feature("docstring")  casadi::SerializingStream::pack(const Importer &e) "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::SerializingStream::pack(const Fmu &e) "
 
 [INTERNAL] ";
 
@@ -50195,7 +50203,7 @@ hpipm
 
 
 
-Interface to HMPC Solver
+Interface to HPIPM Solver
 
 In order to use this interface, you must:
 

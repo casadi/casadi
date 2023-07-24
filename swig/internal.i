@@ -1030,6 +1030,9 @@
 %exception  casadi::DeserializingStream::reset() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::DeserializingStream::unpack(Fmu &e) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::DeserializingStream::unpack(Function &e) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -4727,6 +4730,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SerializingStream::pack(char e) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SerializingStream::pack(const Fmu &e) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SerializingStream::pack(const Function &e) {
