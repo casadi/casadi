@@ -829,6 +829,9 @@ class requires_nlpsol(object):
     self.n = n
 
   def __call__(self,c):
+    import os
+    if "SKIP_" + self.n.upper() + "_TESTS" in os.environ:
+        return None
     try:
       load_nlpsol(self.n)
       return c
