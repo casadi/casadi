@@ -32,6 +32,9 @@ function(find_pybind11_python_first)
 
     # Tweak extension suffix when cross-compiling
     if (CMAKE_CROSSCOMPILING)
+        if (NOT PY_BUILD_EXT_SUFFIX AND DEFINED ENV{SETUPTOOLS_EXT_SUFFIX})
+            set(PY_BUILD_EXT_SUFFIX $ENV{SETUPTOOLS_EXT_SUFFIX})
+        endif()
         if (NOT PY_BUILD_EXT_SUFFIX)
             message(STATUS "Determining Python extension suffix")
             # Find the python3.x-config script in the sysroot instead of on the
