@@ -115,8 +115,6 @@ namespace casadi {
   void SLEQPInterface::init(const Dict& opts) {
     Nlpsol::init(opts);
 
-    std::cout << "SLEQPInterface::init" << std::endl;
-
     max_iter_ = SLEQP_NONE;
     max_wall_time_ = SLEQP_NONE;
     print_level_ = static_cast<int>(SLEQP_LOG_INFO);
@@ -175,8 +173,6 @@ namespace casadi {
 
   /** \brief Initalize memory block */
   int SLEQPInterface::init_mem(void* mem) const {
-    std::cout << "SLEQPInterface::init_mem" << std::endl;
-
     if (Nlpsol::init_mem(mem)) return 1;
 
     SLEQPMemory* m = static_cast<SLEQPMemory*>(mem);
@@ -187,8 +183,6 @@ namespace casadi {
   }
 
   void SLEQPInterface::clear_mem_at(SLEQPMemory* m) const {
-    std::cout << "SLEQPInterface::clear_mem" << std::endl;
-
     SLEQP_CALL_EXC(sleqp_solver_release(&m->internal.solver));
     SLEQP_CALL_EXC(sleqp_problem_release(&m->internal.problem));
     SLEQP_CALL_EXC(sleqp_settings_release(&m->internal.settings));
@@ -196,8 +190,6 @@ namespace casadi {
   }
 
   void SLEQPInterface::free_mem(void *mem) const {
-    std::cout << "SLEQPInterface::free_mem" << std::endl;
-
     SLEQPMemory* m = static_cast<SLEQPMemory*>(mem);
 
     clear_mem_at(m);
@@ -231,8 +223,6 @@ namespace casadi {
 
   /// Get all statistics
   Dict SLEQPInterface::get_stats(void* mem) const {
-    std::cout << "SLEQPInterface::get_stats" << std::endl;
-
     Dict stats = Nlpsol::get_stats(mem);
 
     SLEQPMemory* m = static_cast<SLEQPMemory*>(mem);
@@ -248,7 +238,6 @@ namespace casadi {
   /** \brief Set the (persistent) work vectors */
   void SLEQPInterface::set_work(void* mem, const double**& arg, double**& res,
                                 casadi_int*& iw, double*& w) const {
-    std::cout << "SLEQPInterface::set_work" << std::endl;
 
     // Set work in base classes
     Nlpsol::set_work(mem, arg, res, iw, w);
@@ -502,7 +491,6 @@ namespace casadi {
 
   // Solve the NLP
   int SLEQPInterface::solve(void* mem) const {
-    std::cout << "SLEQPInterface::solve" << std::endl;
 
     SLEQPMemory* m = static_cast<SLEQPMemory*>(mem);
 
