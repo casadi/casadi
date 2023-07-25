@@ -47,17 +47,17 @@ jobs:
         env:
           VIRTUAL_ENV: ${{ github.workspace }}/deps
           CMAKE_TOOLCHAIN_FILE: ${{ github.workspace }}/scripts/toolchains/Win-${{ matrix.arch }}.cmake
-      # - name: Build wheels
-      #   uses: pypa/cibuildwheel@v2.14.1
-      #   with:
-      #     output-dir: dist
-      #   env:
-      #     CIBW_ARCHS: ${{ matrix.arch }}
-      #     CMAKE_PREFIX_PATH: ${{ github.workspace }}/deps
-      #     CMAKE_TOOLCHAIN_FILE: ${{ github.workspace }}/scripts/toolchains/Win-${{ matrix.arch }}.cmake
-      # - name: Upload
-      #   uses: actions/upload-artifact@v3
-      #   with:
-      #     name: whl-windows
-      #     retention-days: 1
-      #     path: dist/*.whl
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v2.14.1
+        with:
+          output-dir: dist
+        env:
+          CIBW_ARCHS: ${{ matrix.arch }}
+          CMAKE_PREFIX_PATH: ${{ github.workspace }}/deps
+          CMAKE_TOOLCHAIN_FILE: ${{ github.workspace }}/scripts/toolchains/Win-${{ matrix.arch }}.cmake
+      - name: Upload
+        uses: actions/upload-artifact@v3
+        with:
+          name: whl-windows
+          retention-days: 1
+          path: dist/*.whl
