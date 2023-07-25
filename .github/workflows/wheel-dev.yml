@@ -1,0 +1,63 @@
+name: Python Wheels (dev)
+
+on:
+  workflow_dispatch:
+  release:
+    types: ['released', 'prereleased']
+  push:
+    tags-ignore:
+      - '**'
+    branches:
+      - '**'
+
+env:
+  PACKAGE_VERSION: '1.0.0a8'
+  PACKAGE_NAME: alpaqa
+  MODULE_NAME: alpaqa
+  C_EXTENSIONS: _alpaqa
+  TWINE_REPOSITORY: pypi
+
+jobs:
+  build-windows:
+    runs-on: windows-2022
+    strategy:
+      matrix:
+        arch: ['AMD64', 'ARM64', 'x86']
+    env:
+      CXXFLAGS: "/bigobj"
+      CFLAGS: "/bigobj"
+      PYTHONUTF8: 1
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name: Cache dependencies
+        id: cache-dep
+        uses: actions/cache@v3
+        with:
+          path: deps
+          key: deps-${{ runner.os }}-${{ matrix.arch }}-${{ hashFiles('scripts/install-eigen.ps1', 'scripts/install-casadi-static.ps1') }}
+      - name: Install Python dependencies
+        if: steps.cache-dep.outputs.cache-hit != 'true'
+        shell: powershell
+        run: |
+          mkdir $env:VIRTUAL_ENV
+          ./scripts/install-eigen.ps1
+          ./scripts/install-casadi-static.ps1
+        env:
+          VIRTUAL_ENV: ${{ github.workspace }}/deps
+          CMAKE_TOOLCHAIN_FILE: ${{ github.workspace }}/scripts/toolchains/Win-${{ matrix.arch }}.cmake
+      # - name: Build wheels
+      #   uses: pypa/cibuildwheel@v2.14.1
+      #   with:
+      #     output-dir: dist
+      #   env:
+      #     CIBW_ARCHS: ${{ matrix.arch }}
+      #     CMAKE_PREFIX_PATH: ${{ github.workspace }}/deps
+      #     CMAKE_TOOLCHAIN_FILE: ${{ github.workspace }}/scripts/toolchains/Win-${{ matrix.arch }}.cmake
+      # - name: Upload
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: whl-windows
+      #     retention-days: 1
+      #     path: dist/*.whl

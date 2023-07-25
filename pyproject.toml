@@ -36,7 +36,7 @@ alpaqa = "alpaqa.__main__:main"
 
 [build-system]
 requires = [
-    "py-build-cmake~=0.1.8",
+    "py-build-cmake~=0.1.9a1",
     "pybind11>=2.10.1,!=2.10.2,!=2.10.3,!=2.10.4",
     "pybind11-stubgen",
 ]
@@ -92,6 +92,16 @@ args = ["-v"]
 
 [tool.py-build-cmake.editable]
 mode = "symlink"
+
+[tool.cibuildwheel]
+build-verbosity = 1
+environment = { PY_BUILD_CMAKE_VERBOSE="1" }
+
+[tool.cibuildwheel.macos]
+archs = ["universal2"]
+
+[tool.cibuildwheel.windows]
+archs = ["AMD64", "x86", "ARM64"]
 
 [tool.pytest.ini_options]
 minversion = "6.0"
