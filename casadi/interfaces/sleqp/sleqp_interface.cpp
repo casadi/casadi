@@ -76,7 +76,6 @@ namespace casadi {
     plugin->deserialize = &SLEQPInterface::deserialize;
 
     sleqp_log_set_handler(casadi_log_output);
-    sleqp_log_set_level(SLEQP_LOG_DEBUG);
 
     return 0;
   }
@@ -98,7 +97,16 @@ namespace casadi {
   = {{&Nlpsol::options_},
       {{"sleqp",
         {OT_DICT,
-        "Options to be passed to SLEQP"}}
+        "Options to be passed to SLEQP"}},
+       {"print_level",
+        {OT_INT,
+        "Print level of SLEQP (default: 3)"}},
+       {"max_iter",
+        {OT_INT,
+        "Maximum number of iterations"}},
+       {"max_wall_time",
+        {OT_DOUBLE,
+        "maximum wall time allowed"}}
       }
   };
 
@@ -109,44 +117,23 @@ namespace casadi {
 
     std::cout << "SLEQPInterface::init" << std::endl;
 
-    max_it = SLEQP_NONE;
-    time_limit = SLEQP_NONE;
+    max_iter_ = SLEQP_NONE;
+    max_wall_time_ = SLEQP_NONE;
+    print_level_ = static_cast<int>(SLEQP_LOG_INFO);
 
     // Read user options
     for (auto&& op : opts) {
       if (op.first=="sleqp") {
         opts_ = op.second;
+      } if (op.first=="print_level") {
+        print_level_ = op.second;
+      } if (op.first=="max_iter") {
+        max_iter_ = op.second;
+        casadi_assert(max_iter_>=0, "Invalid iteration limit " + str(max_iter_));
+      } if (op.first=="time_limit") {
+        max_wall_time_ = op.second;
+        casadi_assert(max_wall_time_>=0, "Invalid time limit " + str(max_wall_time_));
       }
-    }
-
-    auto opt_it = opts.find("sleqp");
-
-    if(opt_it != std::end(opts))
-    {
-      const Dict& opts_ = opt_it->second;
-
-      for(const auto& opt : opts_)
-      {
-        if(opt.first == "max_iter")
-        {
-          max_it = opt.second;
-
-          if(max_it < 0)
-          {
-            casadi_error("Invalid iteration limit " + std::to_string(max_it));
-          }
-        }
-        else if(opt.first == "max_wall_time")
-        {
-          time_limit = opt.second;
-
-          if(time_limit < 0.)
-          {
-            casadi_error("Invalid time limit " + std::to_string(time_limit));
-          }
-        }
-      }
-
     }
 
     // Setup NLP functions
@@ -279,6 +266,8 @@ namespace casadi {
 
     SleqpVec* var_lb;
     SleqpVec* var_ub;
+
+    sleqp_log_set_level(static_cast<SLEQP_LOG_LEVEL>(print_level_));
 
     SLEQP_CALL_EXC(sleqp_vec_create_full(&var_lb, num_vars));
     SLEQP_CALL_EXC(sleqp_vec_create_full(&var_ub, num_vars));
@@ -526,8 +515,8 @@ namespace casadi {
     }
 
     SLEQP_CALL_EXC(sleqp_solver_solve(m->internal.solver,
-                                      max_it,
-                                      time_limit));
+                                      max_iter_,
+                                      max_wall_time_));
 
     SleqpIterate* iterate;
 
@@ -566,16 +555,18 @@ namespace casadi {
   SLEQPInterface::SLEQPInterface(DeserializingStream& s) : Nlpsol(s) {
     s.version("SLEQPInterface", 1);
     s.unpack("SLEQPInterface::jacg_sp", jacg_sp_);
-    s.unpack("SLEQPInterface::max_it", max_it);
-    s.unpack("SLEQPInterface::time_limit", time_limit);
+    s.unpack("SLEQPInterface::max_iter", max_iter_);
+    s.unpack("SLEQPInterface::max_wall_time", max_wall_time_);
+    s.unpack("SLEQPInterface::opts", opts_);
   }
 
   void SLEQPInterface::serialize_body(SerializingStream &s) const {
     Nlpsol::serialize_body(s);
     s.version("SLEQPInterface", 1);
     s.pack("SLEQPInterface::jacg_sp", jacg_sp_);
-    s.pack("SLEQPInterface::max_it", max_it);
-    s.pack("SLEQPInterface::time_limit", time_limit);
+    s.pack("SLEQPInterface::max_iter", max_iter_);
+    s.pack("SLEQPInterface::max_wall_time", max_wall_time_);
+    s.pack("SLEQPInterface::opts", opts_);
   }
 
 } // namespace casadi

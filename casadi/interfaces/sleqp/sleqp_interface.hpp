@@ -43,9 +43,6 @@ namespace casadi {
 
   class CASADI_NLPSOL_SLEQP_EXPORT SLEQPInterface : public Nlpsol {
   private:
-    int max_it;
-    double time_limit;
-
     void clear_mem_at(SLEQPMemory* m) const;
 
   public:
@@ -93,6 +90,10 @@ namespace casadi {
 
     /// All SLEQP options
     Dict opts_;
+
+    int max_iter_;
+    double max_wall_time_;
+    int print_level_;
 
     /** \brief Serialize an object without type information */
     void serialize_body(SerializingStream &s) const override;
