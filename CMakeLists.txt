@@ -813,10 +813,10 @@ function(libraries2flags libraries out)
   endforeach()
 endfunction()
 
-macro(create_import_library TARGET) 
+macro(create_import_library TARGET LIB_NAME) 
   if(CMAKE_CROSS_COMPILING AND MINGW)
     # Get target in lowercase
-    string(TOLOWER ${TARGET} TARGET_LOWER)
+    string(TOLOWER ${LIB_NAME} TARGET_LOWER)
     set(TARGET_LIB "${CMAKE_CURRENT_BINARY_DIR}/${TARGET_LOWER}.lib")
     get_target_property(IMPORTED_LOCATION ${TARGET} IMPORTED_LOCATION)
     add_custom_command(OUTPUT "${TARGET_LIB}" DEPENDS ${TARGET}
@@ -930,6 +930,7 @@ set(SHARED_LIBRARY64_RELDIR lib64)
 set(CMAKE_SHARED_LIBRARY_PREFIX_SHORT ${CMAKE_SHARED_LIBRARY_PREFIX})
 if (WIN32)
     set(SHARED_LIBRARY_RELDIR bin)
+    set(SHARED_LIBRARY64_RELDIR bin)
     set(CMAKE_SHARED_LIBRARY_PREFIX_SHORT "")
 else()
     if (CMAKE_SIZEOF_VOID_P EQUAL 4)
@@ -1045,7 +1046,7 @@ if(WITH_LAPACK)
       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}${CASADI_TP_SHARED_PREFIX}openblas${CMAKE_SHARED_LIBRARY_SUFFIX}"
       IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}${CASADI_TP_SHARED_PREFIX}openblas${CMAKE_IMPORT_LIBRARY_SUFFIX}"
     )
-    create_import_library(lapack)
+    create_import_library(lapack lapack)
   else()
     add_library(lapack INTERFACE)
     target_link_libraries(lapack INTERFACE ${LAPACK_LIBRARIES})
@@ -1079,7 +1080,7 @@ if(WITH_BLASFEO)
       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}blasfeo${CMAKE_SHARED_LIBRARY_SUFFIX}"
       IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}blasfeo${CMAKE_IMPORT_LIBRARY_SUFFIX}"
     )
-    create_import_library(blasfeo)
+    create_import_library(blasfeo blasfeo)
     file(GLOB BLASFEO_HEADERS "${CMAKE_BINARY_DIR}/external_projects/include/blasfeo*")
     install(FILES
       ${BLASFEO_HEADERS}
@@ -1112,7 +1113,7 @@ if(WITH_HPIPM)
        IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}hpipm${CMAKE_SHARED_LIBRARY_SUFFIX}"
        IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}hpipm${CMAKE_IMPORT_LIBRARY_SUFFIX}"
     )
-    create_import_library(hpipm)
+    create_import_library(hpipm hpipm)
     file(GLOB HPIPM_HEADERS "${CMAKE_BINARY_DIR}/external_projects/include/hpipm*")
     install(FILES
       ${HPIPM_HEADERS}
@@ -1462,7 +1463,7 @@ if(WITH_HIGHS)
        IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}highs${CMAKE_SHARED_LIBRARY_SUFFIX}"
        IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}highs${CMAKE_IMPORT_LIBRARY_SUFFIX}"
     )
-    create_import_library(highs)
+    create_import_library(highs highs)
     install(DIRECTORY
       "${CMAKE_BINARY_DIR}/external_projects/include/highs"
       DESTINATION "${INCLUDE_PREFIX}")
@@ -1492,6 +1493,7 @@ if(WITH_SLEQP)
     IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}sleqp${CMAKE_IMPORT_LIBRARY_SUFFIX}"
     INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include"
   )
+  create_import_library(sleqp::sleqp sleqp)
   endif()
 endif()
 add_feature_info(sleqp-interface WITH_SLEQP "Interface to the NLP solver SLEQP.")
@@ -1579,7 +1581,7 @@ if(WITH_OSQP)
     install(DIRECTORY
       "${CMAKE_BINARY_DIR}/external_projects/include/osqp"
       DESTINATION "${INCLUDE_PREFIX}")
-      create_import_library(osqp)
+      create_import_library(osqp osqp)
   endif()
 endif()
 add_feature_info(osqp-interface WITH_OSQP "Interface to QP solver OSQP.")
