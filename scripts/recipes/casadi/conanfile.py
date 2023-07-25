@@ -7,11 +7,10 @@ from conan.tools.files import get
 
 class CasADiRecipe(ConanFile):
     name = "casadi"
-    version = "3.6.0"
     user = "alpaqa"
 
     # Optional metadata
-    license = "LGPLv3"
+    license = "LGPL-3.0-or-later"
     author = "Pieter P <pieter.p.dev@outlook.com>"
     url = "https://github.com/kul-optec/alpaqa"
     description = (
@@ -210,6 +209,10 @@ class CasADiRecipe(ConanFile):
         "with_examples": False,
         "with_doc": False,
     }
+
+    def set_version(self):
+        latest_version = next(reversed(self.conan_data["sources"].keys()))
+        self.version = self.version or latest_version
 
     def source(self):
         get(self, **self.conan_data["sources"][self.version])
