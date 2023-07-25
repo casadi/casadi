@@ -6,15 +6,17 @@ namespace alpaqa {
 
 IpoptAdapter::IpoptAdapter(const Problem &problem) : problem(problem) {
     const length_t n = problem.get_n();
-    if (length_t nnz_H = problem.get_hess_L_num_nonzeros()) {
-        sparsity_H.inner_idx.resize(nnz_H);
+    sparsity_H.nnz   = problem.get_hess_L_num_nonzeros();
+    if (sparsity_H.nnz >= 0) {
+        sparsity_H.inner_idx.resize(sparsity_H.nnz);
         sparsity_H.outer_ptr.resize(n + 1);
         mvec null{nullptr, 0};
         problem.eval_hess_L(null, null, 0, sparsity_H.inner_idx,
                             sparsity_H.outer_ptr, null);
     }
-    if (length_t nnz_J = problem.get_jac_g_num_nonzeros()) {
-        sparsity_J.inner_idx.resize(nnz_J);
+    sparsity_J.nnz = problem.get_jac_g_num_nonzeros();
+    if (sparsity_J.nnz >= 0) {
+        sparsity_J.inner_idx.resize(sparsity_J.nnz);
         sparsity_J.outer_ptr.resize(n + 1);
         mvec null{nullptr, 0};
         problem.eval_jac_g(null, sparsity_J.inner_idx, sparsity_J.outer_ptr,
@@ -26,11 +28,11 @@ bool IpoptAdapter::get_nlp_info(Index &n, Index &m, Index &nnz_jac_g,
                                 Index &nnz_h_lag, IndexStyleEnum &index_style) {
     n         = static_cast<Index>(problem.get_n());
     m         = static_cast<Index>(problem.get_m());
-    nnz_jac_g = static_cast<Index>(sparsity_J.inner_idx.size());
-    if (nnz_jac_g == 0)
+    nnz_jac_g = static_cast<Index>(sparsity_J.nnz);
+    if (nnz_jac_g < 0)
         nnz_jac_g = n * m;
-    nnz_h_lag = static_cast<Index>(sparsity_H.inner_idx.size());
-    if (nnz_h_lag == 0)
+    nnz_h_lag = static_cast<Index>(sparsity_H.nnz);
+    if (nnz_h_lag < 0)
         nnz_h_lag = n * n;
     // use the C style indexing (0-based)
     index_style = TNLP::C_STYLE;
@@ -126,7 +128,7 @@ bool IpoptAdapter::eval_h(Index n, const Number *x, [[maybe_unused]] bool new_x,
                             mvec{values, nele_hess});
         // For dense matrices, set lower triangle to zero
         // TODO: make this more efficient in alpaqa problem interface
-        if (sparsity_H.inner_idx.size() == 0) {
+        if (sparsity_H.nnz < 0) {
             mmat H{values, n, n};
             for (Index c = 0; c < n; ++c)
                 for (Index r = c + 1; r < n; ++r)
@@ -157,7 +159,7 @@ void IpoptAdapter::finalize_solution(Ipopt::SolverReturn status, Index n,
 void IpoptAdapter::set_sparsity(Index n, Index m, [[maybe_unused]] Index nele,
                                 Index *iRow, Index *jCol, const Sparsity &sp) {
     // sparse
-    if (sp.inner_idx.size() > 0) {
+    if (sp.nnz >= 0) {
         Index l = 0; // column major, jacobian is m×n, hessian is n×n
         for (Index c = 0; c < n; ++c) {
             auto inner_start = static_cast<Index>(sp.outer_ptr(c));

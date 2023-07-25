@@ -48,7 +48,7 @@ void ProblemVTable<Conf>::default_eval_jac_g(const void *, crvec, rindexvec, rin
 template <Config Conf>
 auto ProblemVTable<Conf>::default_get_jac_g_num_nonzeros(const void *, const ProblemVTable &)
     -> length_t {
-    return 0;
+    return -1;
 }
 
 template <Config Conf>
@@ -72,7 +72,7 @@ void ProblemVTable<Conf>::default_eval_hess_L(const void *, crvec, crvec, real_t
 template <Config Conf>
 auto ProblemVTable<Conf>::default_get_hess_L_num_nonzeros(const void *, const ProblemVTable &)
     -> length_t {
-    return 0;
+    return -1;
 }
 
 template <Config Conf>

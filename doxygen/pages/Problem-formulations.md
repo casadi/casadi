@@ -138,7 +138,7 @@ Subsequent calls to `eval_xyz()` then pass a non-empty `values` argument, in
 addition to the initialized column/row indices, and the user should then
 overwrite the nonzero values of the matrix.
 
-If the matrix is dense, `get_xyz_num_nonzeros()` should return zero, the
+If the matrix is dense, `get_xyz_num_nonzeros()` should return `-1`, the
 column/row indices are not used, and the `values` argument to `eval_xyz()`
 provides storage for a dense column-major matrix.
 
@@ -177,7 +177,7 @@ documentation. They can be provided in the same fashion as `eval_f` above.
   - @ref alpaqa::TypeErasedProblem::eval_f_grad_f "eval_f_grad_f": @f$ f(x) @f$ and @f$ \nabla f(x) @f$
   - @ref alpaqa::TypeErasedProblem::eval_f_g "eval_f_g": @f$ f(x) @f$ and @f$ g(x) @f$
   - @ref alpaqa::TypeErasedProblem::eval_grad_f_grad_g_prod "eval_grad_f_grad_g_prod": @f$ \nabla f(x) @f$ and @f$ \nabla g(x)\,y @f$
-  - @ref alpaqa::TypeErasedProblem::eval_grad_L "eval_grad_L": gradient of Lagrangian: @f$ \nabla L(x, y) = \nabla f(x) + \nabla g(x)\,y @f$
+  - @ref alpaqa::TypeErasedProblem::eval_grad_L "eval_grad_L": gradient of Lagrangian: @f$ \nabla_x L(x, y) = \nabla f(x) + \nabla g(x)\,y @f$
   - @ref alpaqa::TypeErasedProblem::eval_ψ "eval_ψ": augmented Lagrangian: @f$ \psi(x) @f$
   - @ref alpaqa::TypeErasedProblem::eval_grad_ψ "eval_grad_ψ": gradient of augmented Lagrangian: @f$ \nabla \psi(x) @f$
   - @ref alpaqa::TypeErasedProblem::eval_ψ_grad_ψ "eval_ψ_grad_ψ": augmented Lagrangian and gradient: @f$ \psi(x) @f$ and @f$ \nabla \psi(x) @f$

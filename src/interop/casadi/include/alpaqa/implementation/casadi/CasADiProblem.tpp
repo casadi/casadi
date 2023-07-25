@@ -167,18 +167,18 @@ void CasADiProblem<Conf>::load_numerical_data(
         } catch (csv::read_error &e) {
             // Transform any errors in something more readable
             throw std::runtime_error("Unable to read " + std::string(name) +
-                                     " from data file \"" +
-                                     filepath.string() + ':' +
-                                     std::to_string(line) + "\": " + e.what());
+                                     " from data file \"" + filepath.string() +
+                                     ':' + std::to_string(line) +
+                                     "\": " + e.what());
         }
     };
     // Helper function for reading a single value
     auto read_single = [&](std::string_view name, auto &v) {
         data_file >> v;
         if (!data_file)
-            throw std::runtime_error(
-                "Unable to read " + std::string(name) + " from data file \"" +
-                filepath.string() + ':' + std::to_string(line) + '"');
+            throw std::runtime_error("Unable to read " + std::string(name) +
+                                     " from data file \"" + filepath.string() +
+                                     ':' + std::to_string(line) + '"');
     };
     // Read the bounds, parameter value, and regularization
     wrap_data_load("C.lowerbound", this->C.lowerbound, true);
@@ -295,9 +295,9 @@ void CasADiProblem<Conf>::eval_grad_gi(crvec, index_t, rvec) const {
 template <Config Conf>
 auto CasADiProblem<Conf>::get_jac_g_num_nonzeros() const -> length_t {
     if (!impl->jac_g.has_value())
-        return 0;
+        return -1;
     auto &&sparsity = impl->jac_g->fun.sparsity_out(0);
-    return sparsity.is_dense() ? 0 : static_cast<length_t>(sparsity.nnz());
+    return sparsity.is_dense() ? -1 : static_cast<length_t>(sparsity.nnz());
 }
 
 template <Config Conf>
@@ -330,9 +330,9 @@ void CasADiProblem<Conf>::eval_hess_L_prod(crvec x, crvec y, real_t scale,
 template <Config Conf>
 auto CasADiProblem<Conf>::get_hess_L_num_nonzeros() const -> length_t {
     if (!impl->hess_L.has_value())
-        return 0;
+        return -1;
     auto &&sparsity = impl->hess_L->fun.sparsity_out(0);
-    return sparsity.is_dense() ? 0 : static_cast<length_t>(sparsity.nnz());
+    return sparsity.is_dense() ? -1 : static_cast<length_t>(sparsity.nnz());
 }
 
 template <Config Conf>

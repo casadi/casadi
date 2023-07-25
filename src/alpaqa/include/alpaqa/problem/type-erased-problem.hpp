@@ -387,8 +387,8 @@ class TypeErasedProblem : public util::TypeErased<ProblemVTable<Conf>, Allocator
     /// Required for second-order solvers only.
     void eval_jac_g(crvec x, rindexvec inner_idx, rindexvec outer_ptr, rvec J_values) const;
     /// **[Optional]**
-    /// Function that gets the number of nonzeros of the Jacobian of the
-    /// constraints.
+    /// Function that gets the number of nonzeros of the sparse Jacobian of the
+    /// constraints. Should return -1 for a dense Jacobian.
     ///
     /// Required for second-order solvers only.
     length_t get_jac_g_num_nonzeros() const;
@@ -448,8 +448,8 @@ class TypeErasedProblem : public util::TypeErased<ProblemVTable<Conf>, Allocator
     void eval_hess_L(crvec x, crvec y, real_t scale, rindexvec inner_idx, rindexvec outer_ptr,
                      rvec H_values) const;
     /// **[Optional]**
-    /// Function that gets the number of nonzeros of the Hessian of the
-    /// Lagrangian.
+    /// Function that gets the number of nonzeros of the sparse Hessian of the
+    /// Lagrangian. Should return -1 for a dense Hessian.
     ///
     /// Required for second-order solvers only.
     length_t get_hess_L_num_nonzeros() const;

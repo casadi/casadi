@@ -382,7 +382,7 @@ void CUTEstProblem::eval_jac_g(crvec x, [[maybe_unused]] rindexvec inner_idx,
 }
 auto CUTEstProblem::get_jac_g_num_nonzeros() const -> length_t {
     if (!sparse)
-        return 0;
+        return -1;
     if (nnz_J < 0) {
         integer status;
         impl->funcs.cdimsj(&status, &nnz_J);
@@ -426,7 +426,6 @@ void CUTEstProblem::eval_hess_L_prod(crvec x, crvec y, real_t scale, crvec v,
 void CUTEstProblem::eval_hess_L(crvec x, crvec y, real_t scale,
                                 rindexvec inner_idx, rindexvec outer_ptr,
                                 rvec H_values) const {
-
     // Compute the nonzero values
     if (H_values.size() > 0) {
         assert(x.size() == static_cast<length_t>(impl->nvar));
@@ -485,11 +484,12 @@ void CUTEstProblem::eval_hess_L(crvec x, crvec y, real_t scale,
 }
 auto CUTEstProblem::get_hess_L_num_nonzeros() const -> length_t {
     if (!sparse)
-        return 0;
+        return -1;
     if (nnz_H < 0) {
         integer status;
         impl->funcs.cdimsh(&status, &nnz_H);
         throw_if_error("get_hess_L_num_nonzeros: CUTEST_cdimsh", status);
+        assert(nnz_H >= 0);
         H_col.resize(nnz_H);
         H_row.resize(nnz_H);
         H_perm.resize(nnz_H);

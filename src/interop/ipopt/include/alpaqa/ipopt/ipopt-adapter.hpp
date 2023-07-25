@@ -70,6 +70,7 @@ class IPOPT_ADAPTER_EXPORT IpoptAdapter : public Ipopt::TNLP {
 
   private:
     struct Sparsity {
+        length_t nnz;
         indexvec inner_idx, outer_ptr;
     } sparsity_J, sparsity_H;
 
