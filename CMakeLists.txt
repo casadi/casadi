@@ -684,9 +684,7 @@ option(WITH_SLEQP "Compile the interface to SLEQP" OFF)
 set(BUILD_SLEQP_GIT_REPO "https://github.com/jgillis/sleqp.git" CACHE STRING "Git repo used together with BUILD_SLEQ_VERSION")
 set(BUILD_SLEQP_VERSION "master" CACHE STRING "Tag/branch/hash to be used for BUILD_SLEQ_GIT_REPO")
 option(WITH_BUILD_SLEQP "Build SLEQP (BUILD_SLEQP_VERSION=${BUILD_SLEQP_VERSION}) from downloaded source (BUILD_SLEQP_GIT_REPO=${BUILD_SLEQP_GIT_REPO})." OFF)
-set(BUILD_SLEQP_DEPENDENCIES HIGHS TRLIB)
-# set(BUILD_SLEQP_DEPENDENCIES MUMPS)
-
+set(BUILD_SLEQP_DEPENDENCIES HIGHS TRLIB MUMPS)
 
 # IPOPT: A sparse interior point NLP solver with filter line-search
 option(WITH_IPOPT "Compile the interface to IPOPT" ${WITH_IPOPT_DEF})
