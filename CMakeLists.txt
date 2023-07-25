@@ -782,6 +782,12 @@ set(BUILD_HIGHS_GIT_REPO "https://github.com/ERGO-Code/HiGHS" CACHE STRING "Git 
 set(BUILD_HIGHS_VERSION "v1.4.1" CACHE STRING "Tag/branch/hash to be used for BUILD_HIGHS_GIT_REPO")
 option(WITH_BUILD_HIGHS "Build HiGHS (BUILD_HIGHS_VERSION=${BUILD_HIGHS_VERSION}) from downloaded source (BUILD_HIGHS_GIT_REPO=${BUILD_HIGHS_GIT_REPO})." OFF)
 
+# ALPAQA: An open source NLP solver based on Augmented Lagrangian
+option(WITH_ALPAQA "Compile the Alpaqa interface" OFF)
+set(BUILD_ALPAQA_GIT_REPO "https://github.com/jgillis/alpaqa" CACHE STRING "Git repo used together with BUILD_ALPAQA_VERSION")
+set(BUILD_ALPAQA_VERSION "develop" CACHE STRING "Tag/branch/hash to be used for BUILD_ALPAQA_GIT_REPO")
+option(WITH_BUILD_ALPAQA "Build Alpaqa (BUILD_ALPAQA_VERSION=${BUILD_ALPAQA_VERSION}) from downloaded source (BUILD_ALPAQA_GIT_REPO=${BUILD_ALPAQA_GIT_REPO})." OFF)
+
 
 option(ALLOW_DOCKER "System has docker installed" OFF)
 
@@ -890,7 +896,7 @@ foreach(PKG CPLEX SNOPT KNITRO GUROBI WORHP HSL)
 endforeach()
 
 # Packages must be sorted from high to low in the dependency graph
-foreach(PKG HIGHS PROXQP OSQP SUPERSCS SLEQP BONMIN IPOPT CBC CLP MUMPS SPRAL HSL METIS HPIPM TRLIB BLASFEO LAPACK EIGEN3 SIMDE)
+foreach(PKG ALPAQA HIGHS PROXQP OSQP SUPERSCS SLEQP BONMIN IPOPT CBC CLP MUMPS SPRAL HSL METIS HPIPM TRLIB BLASFEO LAPACK EIGEN3 SIMDE)
   string(TOLOWER ${PKG} PKG_LOWER)
   if(WITH_${PKG} AND NOT WITH_MOCKUP_${PKG})
     if(NOT WITH_BUILD_${PKG})
@@ -1512,6 +1518,22 @@ if(WITH_BUILD_EIGEN3)
     "${CMAKE_BINARY_DIR}/external_projects/include/eigen3"
     DESTINATION "${INCLUDE_PREFIX}")
 endif()
+
+if(WITH_ALPAQA)
+  if(WITH_BUILD_ALPAQA)
+    # Note: mingw fails to compile alpaqa in debug mode due to too large object file size.
+    ExternalProject_Add(alpaqa-external
+        DEPENDS eigen3
+        GIT_REPOSITORY ${BUILD_ALPAQA_GIT_REPO}
+        GIT_TAG ${BUILD_ALPAQA_VERSION}
+        PREFIX "${CMAKE_BINARY_DIR}/external_projects"
+        UPDATE_COMMAND ""
+        CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
+        CMAKE_ARGS -DCMAKE_BUILD_TYPE=Release -DEigen3_DIR=${CMAKE_BINARY_DIR}/external_projects/share/eigen3/cmake -DCMAKE_DL_LIBS=OFF -DALPAQA_WITH_DRIVERS=OFF -DALPAQA_WITH_EXAMPLES=OFF -DALPAQA_WITH_TESTS=OFF -DALPAQA_WITH_CASADI=OFF -DALPAQA_HAVE_FORTRAN=OFF -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> ${CROSS_FLAGS_CMAKE})
+  endif()
+endif()
+add_feature_info(alpaqa-interface WITH_ALPAQA "Interface to the NLP solver Alpaqa.")
+
 
 if(WITH_BUILD_SIMDE)
   ExternalProject_Add(simde-external
