@@ -302,7 +302,7 @@ jobs:
         env:
           CIBW_BUILD: ${{ matrix.python-id }}
           CIBW_ARCHS: ${{ matrix.arch }}
-          CIBW_TEST_SKIP: "*-{win32,win_arm64}" # no CasADi binaries
+          CIBW_TEST_SKIP: "*-{win32,win_arm64} pp*" # no CasADi binaries
           CMAKE_PREFIX_PATH: ${{ github.workspace }}/deps
           CMAKE_TOOLCHAIN_FILE: ${{ github.workspace }}/scripts/toolchains/Win-${{ matrix.arch }}.cmake
       - name: Upload
