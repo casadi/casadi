@@ -441,6 +441,8 @@ jobs:
           path: dist
       - name: Install Twine
         run: python -m pip install -U pip twine
+      - name: Check Wheel metadata
+        run: python -m twine check dist/*.whl
       - name: Install package
         run: python -m pip install --no-deps --no-index --find-links=dist ${PACKAGE_NAME}==${PACKAGE_VERSION}
       - name: Check package version

@@ -88,8 +88,10 @@ jobs:
           path: dist
       - name: Test
         run: |
-          python3 -m pip install -U pip cmake ninja
+          python3 -m pip install -U pip cmake ninja twine
           python3 -m pip install --find-links=dist "${PACKAGE_NAME}[test]==${PACKAGE_VERSION}"
           pytest -rP
         env:
           ALPAQA_PYTHON_DEBUG: "1"
+      - name: Check Wheel metadata
+        run: python -m twine check dist/*.whl
