@@ -96,7 +96,7 @@ mode = "symlink"
 [tool.cibuildwheel]
 build-verbosity = 1
 environment = { PY_BUILD_CMAKE_VERBOSE="1" }
-test-command = "pytest {package}"
+test-command = "pytest {package}/python/test"
 test-extras = ["test"]
 
 [tool.cibuildwheel.macos]
