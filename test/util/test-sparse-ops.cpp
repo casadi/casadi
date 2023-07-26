@@ -105,7 +105,9 @@ TEST(SparseOps, Svec) {
 
 using namespace alpaqa::util;
 
-TEST(SparseOps, convert_triplet_to_ccs) {
+#if __cpp_lib_ranges_zip >= 202110L && __cpp_lib_ranges_enumerate >= 202302L
+
+TEST(SparseOps, convertTripletToCCS) {
     // Generate some row and column indices of a sparse matrix
     index_t nnz = 12;
     Eigen::MatrixX<int> rows_cols(nnz, 2);
@@ -140,5 +142,7 @@ TEST(SparseOps, convert_triplet_to_ccs) {
     EXPECT_TRUE(std::equal(outer.begin(), outer.end(), A.outerIndexPtr()));
     EXPECT_TRUE(std::equal(inner.begin(), inner.end(), A.innerIndexPtr()));
 }
+
+#endif
 
 #endif
