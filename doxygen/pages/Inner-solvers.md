@@ -25,7 +25,7 @@ A well-known strategy for solving @f$\eqref{eq:problem-orig}@f$ consists of iter
     \tag{FB}
 \end{equation}
 @f]
-where @f$\prox_{\gamma h}(x) = \underset{u}{\text{argmin}} \{ h(u) + \frac{1}{2\gamma} \Vert u - x \Vert^2 \}@f$ denotes the proximal operator of @f$h@f$ with step size @f$\gamma@f$.
+where @f$\prox_{\gamma h}(x) = \argmin_u \{ h(u) + \frac{1}{2\gamma} \Vert u - x \Vert^2 \}@f$ denotes the proximal operator of @f$h@f$ with step size @f$\gamma@f$.
 Remark that this scheme only requires evaluations of @f$\nabla \psi@f$ and @f$\prox_{\gamma h}@f$, which are assumed to be efficiently evaluated.
 Using the same oracle, both PANOC and PANTR aim to accelerate the standard forward-backward iterations @f$\eqref{eq:fbs}@f$.
 

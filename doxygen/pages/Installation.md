@@ -44,8 +44,8 @@ risk of messing with system packages.
 
 ```sh
 cd alpaqa
-python3 -m venv py-venv
-. ./py-venv/bin/activate
+python3 -m venv .venv
+. ./.venv/bin/activate
 pip install cmake ninja casadi numpy
 ```
 
