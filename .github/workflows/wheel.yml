@@ -250,75 +250,67 @@ jobs:
     runs-on: windows-2022
     strategy:
       matrix:
-        python-version: ['3.8', '3.9', '3.10', '3.11']
+        arch: ['AMD64', 'ARM64', 'x86']
+        python-id: ['cp38-*', 'cp39-*', 'cp310-*', 'cp311-*']
+        include:
+          - arch: 'AMD64'
+            python-id: 'pp38-*'
+          - arch: 'AMD64'
+            python-id: 'pp39-*'
+          - arch: 'AMD64'
+            python-id: 'pp310-*'
+        exclude:
+          - arch: 'ARM64'
+            python-id: 'cp38-*'
+    env:
+      CXXFLAGS: "/bigobj"
+      CFLAGS: "/bigobj"
+      PYTHONUTF8: 1
     steps:
       - uses: actions/checkout@v3
         with:
           submodules: recursive
-      - uses: actions/setup-python@v4
-        name: Install Python
-        id: python
-        with: 
-          python-version: ${{ matrix.python-version }}
-      - name: Cache Virtual Environment
-        id: cache-venv
+      - name: Cache dependencies
+        id: cache-dep
         uses: actions/cache@v3
         with:
-          path: py-venv
-          key: ${{ runner.os }}-${{ steps.python.outputs.python-version }}-${{ hashFiles('scripts/install-eigen.ps1', 'scripts/install-casadi-static.ps1') }}
+          path: deps
+          key: deps-${{ runner.os }}-${{ matrix.arch }}-${{ hashFiles('scripts/install-eigen.ps1', 'scripts/install-casadi-static.ps1') }}
       - name: Install Python dependencies
-        if: steps.cache-venv.outputs.cache-hit != 'true'
+        if: steps.cache-dep.outputs.cache-hit != 'true'
         shell: powershell
         run: |
-          python -m venv py-venv
-          ./py-venv/Scripts/Activate.ps1
-          python -m pip install -U pip build cmake ninja
+          mkdir $env:VIRTUAL_ENV
           ./scripts/install-eigen.ps1
           ./scripts/install-casadi-static.ps1
         env:
-          CXXFLAGS: "/bigobj"
-          CFLAGS: "/bigobj"
-      - name: Build
-        shell: powershell
-        run: |
-          ./py-venv/Scripts/Activate.ps1
-          $Env:CMAKE_PREFIX_PATH = $Env:VIRTUAL_ENV + ";" + $Env:CMAKE_PREFIX_PATH
-          python -m build -w .
+          VIRTUAL_ENV: ${{ github.workspace }}/deps
+          CMAKE_TOOLCHAIN_FILE: ${{ github.workspace }}/scripts/toolchains/Win-${{ matrix.arch }}.cmake
+      # Download stubs
+      - name: Download stubs
+        if: ${{ matrix.arch == 'ARM64' }}
+        uses: actions/download-artifact@v3
+        with:
+          name: stubs
+      - name: Extract stubs
+        if: ${{ matrix.arch == 'ARM64' }}
+        run: tar xf stubs.tar
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v2.14.1
+        with:
+          output-dir: dist
         env:
-          CXXFLAGS: "/bigobj"
-          CFLAGS: "/bigobj"
-          PYTHONUTF8: 1
+          CIBW_BUILD: ${{ matrix.python-id }}
+          CIBW_ARCHS: ${{ matrix.arch }}
+          CIBW_TEST_SKIP: "*-{win32,win_arm64}" # no CasADi binaries
+          CMAKE_PREFIX_PATH: ${{ github.workspace }}/deps
+          CMAKE_TOOLCHAIN_FILE: ${{ github.workspace }}/scripts/toolchains/Win-${{ matrix.arch }}.cmake
       - name: Upload
         uses: actions/upload-artifact@v3
         with:
-          name: whl-${{ matrix.python-version }}-windows
+          name: whl-windows
           retention-days: 1
           path: dist/*.whl
-
-  test-windows:
-    needs: [build-windows]
-    runs-on: windows-2022
-    strategy:
-      matrix:
-        python-version: ['3.8', '3.9', '3.10']
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: recursive
-      - uses: actions/setup-python@v4
-        name: Install Python
-        with:
-          python-version: ${{ matrix.python-version }}
-      - uses: actions/download-artifact@v3
-        with:
-          name: whl-${{ matrix.python-version }}-windows
-          path: dist
-      - name: Test
-        shell: powershell
-        run: |
-          python3 -m pip install -U pip cmake
-          python3 -m pip install --find-links=dist "$($Env:PACKAGE_NAME)[test]==$($Env:PACKAGE_VERSION)"
-          pytest -rP
 
 
   build-macos:
@@ -438,9 +430,9 @@ jobs:
           name: whl-${{ matrix.pypy }}${{ matrix.python-version }}-debug-linux
           path: dist
       - uses: actions/download-artifact@v3
-        if: ${{ matrix.python-version != '3.12' && !matrix.pypy }}
+        if: ${{ matrix.python-version == '3.11' && !matrix.pypy }}
         with:
-          name: whl-${{ matrix.python-version }}-windows
+          name: whl-windows
           path: dist
       - uses: actions/download-artifact@v3
         if: ${{ matrix.python-version != '3.12' && !matrix.pypy }}

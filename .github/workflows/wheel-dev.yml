@@ -23,17 +23,17 @@ jobs:
     strategy:
       matrix:
         arch: ['AMD64', 'ARM64', 'x86']
-        python-version: ['cp38-*', 'cp39-*', 'cp310-*', 'cp311-*']
+        python-id: ['cp38-*', 'cp39-*', 'cp310-*', 'cp311-*']
         include:
           - arch: 'AMD64'
-            python-version: 'pp38-*'
+            python-id: 'pp38-*'
           - arch: 'AMD64'
-            python-version: 'pp39-*'
+            python-id: 'pp39-*'
           - arch: 'AMD64'
-            python-version: 'pp310-*'
+            python-id: 'pp310-*'
         exclude:
           - arch: 'ARM64'
-            python-version: 'cp38-*'
+            python-id: 'cp38-*'
     env:
       CXXFLAGS: "/bigobj"
       CFLAGS: "/bigobj"
@@ -63,7 +63,7 @@ jobs:
         with:
           output-dir: dist
         env:
-          CIBW_BUILD: ${{ matrix.python-version }}
+          CIBW_BUILD: ${{ matrix.python-id }}
           CIBW_ARCHS: ${{ matrix.arch }}
           CIBW_TEST_SKIP: "*-{win32,win_arm64}" # no CasADi binaries
           CMAKE_PREFIX_PATH: ${{ github.workspace }}/deps
