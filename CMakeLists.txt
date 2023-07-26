@@ -685,6 +685,12 @@ set(BUILD_SLEQP_GIT_REPO "https://github.com/chrhansk/sleqp.git" CACHE STRING "G
 set(BUILD_SLEQP_VERSION "ee83f4ae503d74238487a0ff1e893018d9ca04dd" CACHE STRING "Tag/branch/hash to be used for BUILD_SLEQ_GIT_REPO")
 option(WITH_BUILD_SLEQP "Build SLEQP (BUILD_SLEQP_VERSION=${BUILD_SLEQP_VERSION}) from downloaded source (BUILD_SLEQP_GIT_REPO=${BUILD_SLEQP_GIT_REPO})." OFF)
 set(BUILD_SLEQP_DEPENDENCIES HIGHS TRLIB MUMPS)
+# set(BUILD_SLEQP_DEPENDENCIES MUMPS)
+
+option(WITH_UNO "Compile the interface to UNO" ON)
+set(BUILD_UNO_GIT_REPO "https://github.com/jgillis/Uno.git" CACHE STRING "Git repo used together with BUILD_UNO_VERSION")
+set(BUILD_UNO_VERSION "main" CACHE STRING "Tag/branch/hash to be used for BUILD_UNO_GIT_REPO")
+option(WITH_BUILD_UNO "Build UNO (BUILD_UNO_VERSION=${BUILD_UNO_VERSION}) from downloaded source (BUILD_UNO_GIT_REPO=${BUILD_UNO_GIT_REPO})." OFF)
 
 # IPOPT: A sparse interior point NLP solver with filter line-search
 option(WITH_IPOPT "Compile the interface to IPOPT" ${WITH_IPOPT_DEF})
@@ -1388,6 +1394,35 @@ if(WITH_BUILD_TRLIB)
     "${CMAKE_BINARY_DIR}/external_projects/include/trlib"
     DESTINATION "${INCLUDE_PREFIX}")
 endif()
+
+if(WITH_UNO)
+  if(WITH_BUILD_UNO)
+    get_target_property(HSL_IMPORTED_IMPLIB_FULL hsl::hsl IMPORTED_IMPLIB)
+    get_filename_component(HSL_IMPORTED_IMPLIB "${HSL_IMPORTED_IMPLIB_FULL}" DIRECTORY)
+    ExternalProject_Add(uno-external
+        DEPENDS ${LAPACK_DEPENDS_TARGET}
+        GIT_REPOSITORY ${BUILD_UNO_GIT_REPO}
+        GIT_TAG ${BUILD_UNO_VERSION}
+        PREFIX "${CMAKE_BINARY_DIR}/external_projects"
+        UPDATE_COMMAND ""
+        BUILD_ALWAYS ON
+        CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
+        CMAKE_ARGS ${CMAKE_BLAS_CONFIG} -Dma57_LIB=${HSL_IMPORTED_IMPLIB} -DWITH_OPENMP=OFF -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DWITH_CASADI=ON -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> "-DCMAKE_CXX_FLAGS=-fPIC" -DCMAKE_C_FLAGS="-fPIC" -DCMAKE_Fortran_FLAGS="-fPIC")
+    message("test ${CMAKE_CURRENT_BINARY_DIR}/external_projects")
+    file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/external_projects")
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/uno")
+
+    add_library(uno STATIC IMPORTED)
+    add_dependencies(uno uno-external)
+    set_target_properties(uno PROPERTIES
+      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}uno${CMAKE_STATIC_LIBRARY_SUFFIX}"
+      INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include/uno"
+    )
+
+    # target_compile_features(uno INTERFACE cxx_std_17)
+  endif()
+endif()
+add_feature_info(uno-interface WITH_UNO "Interface to the NLP solver UNO.")
 
 if(WITH_IPOPT)
   if(WITH_BUILD_IPOPT)

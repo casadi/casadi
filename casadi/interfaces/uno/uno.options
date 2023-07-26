@@ -1,0 +1,245 @@
+##### termination #####
+# (tight) tolerance
+tolerance 1e-8
+
+# loose tolerance used if tight tolerance cannot be reached
+loose_tolerance 1e-6
+# number of iterations during which the loose tolerance is monitored
+loose_tolerance_consecutive_iteration_threshold 15
+
+# maximum outer iterations
+max_iterations 2000
+
+# CPU time limit (in seconds)
+time_limit inf
+
+# print optimal solution (yes|no)
+print_solution no
+
+# threshold on objective to declare unbounded NLP
+unbounded_objective_threshold -1e20
+
+# enforce linear constraints at the initial point
+enforce_linear_constraints no
+
+# statistics table
+statistics_print_header_every_iterations 15
+
+statistics_major_column_order 1
+statistics_minor_column_order 2
+statistics_restoration_phase_column_order 4
+statistics_penalty_parameter_column_order 5
+statistics_regularization_column_order 6
+statistics_barrier_parameter_column_order 8
+statistics_SOC_column_order 9
+statistics_funnel_size_column_order 15
+statistics_LS_step_length_column_order 30
+statistics_TR_radius_column_order 30
+statistics_step_norm_column_order 31
+statistics_objective_column_order 100
+statistics_primal_infeasibility_column_order 101
+statistics_dual_infeasibility_column_order 102
+statistics_complementarity_column_order 104
+statistics_stationarity_column_order 105
+
+##### ingredients #####
+# default constraint relaxation strategy (feasibility_restoration|l1_relaxation)
+constraint_relaxation_strategy feasibility_restoration
+
+# default subproblem (QP|LP|primal_dual_interior_point)
+subproblem QP
+
+# default globalization strategy (l1_merit|leyffer_filter_method|waechter_filter_method)
+globalization_strategy leyffer_filter_method
+
+# default globalization mechanism (TR|LS)
+globalization_mechanism TR
+
+##### main options #####
+# logging level (INFO|DEBUG)
+logger INFO
+
+# Hessian model (exact|BFGS)
+hessian_model exact
+
+# sparse matrix format (COO|CSC)
+sparse_format COO
+
+# scale the functions (yes|no)
+scale_functions no
+
+function_scaling_threshold 100
+
+# factor scaling
+function_scaling_factor 100
+
+# scale the errors with respect to the current point (yes|no)
+scale_residuals yes
+
+# enforce the linear constraints at the initial point (yes|no)
+enforce_linear_constraints no
+
+# norm of the progress measures (L1|L2|INF)
+progress_norm L1
+
+# norm of the primal-dual residuals (L1|L2|INF)
+residual_norm INF
+
+residual_scaling_threshold 100.
+
+##### solvers #####
+# default QP solver
+QP_solver BQPD
+
+# default LP solver
+LP_solver BQPD
+
+# default linear solver
+linear_solver MA57
+
+##### strategy options #####
+armijo_decrease_fraction 1e-4
+armijo_tolerance 1e-9
+
+##### filter options #####
+# filter strategy options
+
+# filter type (standard|nonmonotone)
+filter_type standard
+
+filter_beta 0.999
+filter_gamma 0.001
+filter_delta 0.999
+filter_ubd 1e2
+filter_fact 1.25
+filter_switching_infeasibility_exponent 2
+
+filter_capacity 50
+
+# nonmonotone filter strategy
+nonmonotone_filter_number_dominated_entries 3
+
+##### funnel options #####
+# funnel strategy options
+
+# funnel type (standard|nonmonotone)
+# funnel_type standard
+
+# funnel options
+funnel_kappa_infeasibility_1 0.9
+funnel_kappa_infeasibility_2 0.9
+funnel_beta 0.999
+funnel_gamma 0.001
+funnel_delta 0.999
+
+# funnel strategy options
+funnel_kappa_initial_upper_bound 1.0
+funnel_kappa_initial_multiplication 1.1
+funnel_ubd 1e2
+funnel_fact 1.25
+funnel_switching_infeasibility_exponent 2
+funnel_optimality_phase 
+
+##### line search options #####
+# backtracking ratio
+LS_backtracking_ratio 0.5
+
+# minimum step length
+LS_min_step_length 1e-12
+
+# regularization failure threshold
+regularization_failure_threshold 1e40
+
+# Hessian regularization: initial value
+regularization_initial_value 1e-4
+
+regularization_increase_factor 2
+
+# regularization of augmented system
+primal_regularization_initial_factor 1e-4
+dual_regularization_fraction 1e-8
+
+primal_regularization_lb 1e-20
+primal_regularization_decrease_factor 3.
+primal_regularization_fast_increase_factor 100.
+primal_regularization_slow_increase_factor 8.
+threshold_unsuccessful_attempts 8
+
+# use the primal-dual and dual step lengths to scale the dual directions when assembling the trial iterate
+LS_scale_duals_with_step_length yes
+
+##### trust region options #####
+# initial trust region radius
+TR_radius 10.
+
+# TR radius increase factor
+TR_increase_factor 2
+
+# TR radius decrease factor
+TR_decrease_factor 2
+
+# TR aggressive radius decrease factor
+TR_aggressive_decrease_factor 4
+
+# tolerance in TR constraint activity
+TR_activity_tolerance 1e-6
+
+# minimum TR radius
+TR_min_radius 1e-7
+
+# threshold below which the TR radius is reset
+TR_radius_reset_threshold 1e-4
+
+# force QP convexification when in a trust-region setting
+convexify_QP false
+
+##### constraint relaxation options #####
+##### l1 relaxation options #####
+# initial value of the penalty parameter
+l1_relaxation_initial_parameter 1.
+
+# use a fixed parameter (yes|no)
+l1_relaxation_fixed_parameter no
+
+# decrease (multiplicative) factor of penalty parameter
+l1_relaxation_decrease_factor 10.
+
+# epsilon constants in Byrd's article
+l1_relaxation_epsilon1 0.1
+l1_relaxation_epsilon2 0.1
+
+l1_relaxation_residual_small_threshold 1e-12
+
+# coefficient of constraint violation
+l1_constraint_violation_coefficient 1
+
+# threshold for determining if duals have a zero norm
+l1_small_duals_threshold 1e-10
+
+##### feasibility restoration options #####
+# test linearized feasibility when switching back to phase 2
+feasibility_restoration_test_linearized_feasibility no
+feasibility_restoration_restoration_phase_strategy leyffer_filter_strategy
+feasibility_restoration_optimality_phase_strategy leyffer_filter_strategy
+
+##### barrier subproblem options #####
+barrier_initial_parameter 0.1
+barrier_default_multiplier 1
+# Ipopt parameters
+barrier_tau_min 0.99
+barrier_k_sigma 1e10
+barrier_smax 100
+barrier_k_mu 0.2
+barrier_theta_mu 1.5
+barrier_k_epsilon 10
+barrier_update_fraction 10
+barrier_regularization_exponent 0.25
+barrier_small_direction_factor 10.
+barrier_push_variable_to_interior_k1 1e-2
+barrier_push_variable_to_interior_k2 1e-2
+barrier_damping_factor 1e-5
+least_square_multiplier_max_norm 1e3
+
+##### BQPD options #####
+BQPD_print_subproblem no
+BQPD_kmax 500
