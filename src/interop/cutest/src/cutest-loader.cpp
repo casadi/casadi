@@ -102,7 +102,7 @@ class CUTEstLoader {
         auto fptr_close = LOAD_DL_FUNC(FORTRAN_close);
         fptr_open(&funit, outsdif_fname, &status);
         throw_if_error("Failed to open "s + outsdif_fname, status);
-        return cleanup([this, fptr_close] {
+        return cleanup([funit{this->funit}, fptr_close] {
             integer status;
             fptr_close(&funit, &status);
             log_if_error("Failed to close OUTSDIF.d file", status);
@@ -172,6 +172,9 @@ class CUTEstLoader {
          &e_order, &l_order, &v_order);
         throw_if_error("Failed to call cutest_csetup", status);
         cutest_terminate = terminator();
+        if (ncon == 0)
+            throw std::runtime_error(
+                "Unconstrained CUTEst problems are currently unsupported");
         work.resize(std::max(nvar, ncon));
         std::replace(C.lowerbound.begin(), C.lowerbound.end(), -CUTE_INF,
                      -inf<config_t>);
@@ -226,6 +229,7 @@ class CUTEstLoader {
         return res;
     }
 
+    // Order of cleanup is important!
     std::shared_ptr<void> so_handle; ///< dlopen handle to shared library
     cleanup_t cleanup_outsdif;  ///< Responsible for closing the OUTSDIF.d file
     cleanup_t cutest_terminate; ///< Responsible for calling CUTEST_xterminate
