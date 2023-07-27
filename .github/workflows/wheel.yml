@@ -396,7 +396,7 @@ jobs:
 
   release:
     if: ${{ github.event.action == 'released' || github.event.action == 'prereleased' }}
-    needs: [test-linux, build-linux-src, test-windows, test-macos]
+    needs: [test-linux, build-linux-src, build-windows, test-macos]
     runs-on: ubuntu-latest
     container: ${{ matrix.container }}:${{ matrix.python-version }}${{ matrix.python-version-suffix }}-bullseye
     strategy:
