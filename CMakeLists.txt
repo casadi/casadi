@@ -787,7 +787,7 @@ option(WITH_ALPAQA "Compile the Alpaqa interface" OFF)
 set(BUILD_ALPAQA_GIT_REPO "https://github.com/jgillis/alpaqa" CACHE STRING "Git repo used together with BUILD_ALPAQA_VERSION")
 set(BUILD_ALPAQA_VERSION "develop" CACHE STRING "Tag/branch/hash to be used for BUILD_ALPAQA_GIT_REPO")
 option(WITH_BUILD_ALPAQA "Build Alpaqa (BUILD_ALPAQA_VERSION=${BUILD_ALPAQA_VERSION}) from downloaded source (BUILD_ALPAQA_GIT_REPO=${BUILD_ALPAQA_GIT_REPO})." OFF)
-
+set(BUILD_ALPAQA_DEPENDENCIES EIGEN3)
 
 option(ALLOW_DOCKER "System has docker installed" OFF)
 
@@ -1529,7 +1529,16 @@ if(WITH_ALPAQA)
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
         CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
-        CMAKE_ARGS -DCMAKE_BUILD_TYPE=Release -DEigen3_DIR=${CMAKE_BINARY_DIR}/external_projects/share/eigen3/cmake -DCMAKE_DL_LIBS=OFF -DALPAQA_WITH_DRIVERS=OFF -DALPAQA_WITH_EXAMPLES=OFF -DALPAQA_WITH_TESTS=OFF -DALPAQA_WITH_CASADI=OFF -DALPAQA_HAVE_FORTRAN=OFF -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> ${CROSS_FLAGS_CMAKE})
+        CMAKE_ARGS -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DEigen3_DIR=${CMAKE_BINARY_DIR}/external_projects/share/eigen3/cmake -DCMAKE_DL_LIBS=OFF -DALPAQA_WITH_DRIVERS=OFF -DALPAQA_WITH_EXAMPLES=OFF -DALPAQA_WITH_TESTS=OFF -DALPAQA_WITH_CASADI=OFF -DALPAQA_HAVE_FORTRAN=OFF -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> ${CROSS_FLAGS_CMAKE})
+    add_library(alpaqa SHARED IMPORTED)
+    add_dependencies(alpaqa alpaqa-external)
+    target_include_directories(alpaqa INTERFACE "${CMAKE_BINARY_DIR}/external_projects/include")
+    set_target_properties(alpaqa PROPERTIES
+       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY64_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}alpaqa${CMAKE_SHARED_LIBRARY_SUFFIX}"
+       IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}alpaqa${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+    )
+    target_link_libraries(alpaqa INTERFACE eigen3)
+    target_compile_features(alpaqa INTERFACE cxx_std_20)
   endif()
 endif()
 add_feature_info(alpaqa-interface WITH_ALPAQA "Interface to the NLP solver Alpaqa.")

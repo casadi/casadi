@@ -43,6 +43,8 @@ if "SKIP_WORHP_TESTS" not in os.environ and has_nlpsol("worhp")  and not args.ig
 if "SKIP_SLEQP_TESTS" not in os.environ and has_nlpsol("sleqp"):
   solvers.append(("sleqp",{"print_time":False,"sleqp": {"linesearch": "Approx","feas_tol":1e-7,"stat_tol":1e-7,"slack_tol":1e-7}},set()))
 
+#if "SKIP_ALPAQA_TESTS" not in os.environ and has_nlpsol("alpaqa"):
+#  solvers.append(("alpaqa",{"print_time":False,"alpaqa": {},set()))
 
 if "SKIP_IPOPT_TESTS" not in os.environ and has_nlpsol("ipopt"):
   solvers.append(("ipopt",{"print_time":False,"ipopt": {"tol": 1e-10, "derivative_test":"second-order","print_level":0}},set()))
@@ -79,6 +81,21 @@ if "SKIP_SNOPT_TESTS" not in os.environ and has_nlpsol("snopt"):
 print(solvers)
 
 class NLPtests(casadiTestCase):
+
+  @requires_nlpsol("alpaqa")
+  def test_alpaqa(self):
+    x=SX.sym("x")
+    y=SX.sym("y")
+
+    nlp={'x':vertcat(*[x,y]), 'f':(1-x)**2+100*(y-x**2)**2, 'g':x+y}
+
+    solver = nlpsol("mysolver", "alpaqa", nlp)
+    solver_in = {}
+    solver_in["lbx"]=[-10]*2
+    solver_in["ubx"]=[10]*2
+    solver_in["lbg"]=[-10]
+    solver_in["ubg"]=[10]
+    solver_out = solver(**solver_in)
 
   @memory_heavy()
   def test_nonregular_point(self):

@@ -160,6 +160,52 @@ Function OracleFunction::create_function(const std::string& fname,
   return create_function(oracle_, fname, s_in, s_out, aux);
 }
 
+Function OracleFunction::create_function(const std::string& fname,
+      const std::vector<MX>& e_in,
+      const std::vector<MX>& e_out,
+      const std::vector<std::string>& s_in,
+      const std::vector<std::string>& s_out) {
+
+  // Print progress
+  if (verbose_) {
+    casadi_message(name_ + "::create_function " + fname + ":" + str(s_in) + "->" + str(s_out));
+  }
+
+  // Check if function is already in cache
+  Function ret;
+  if (incache(fname, ret)) {
+    // Consistency checks
+    casadi_assert(ret.n_in() == s_in.size(), fname + " has wrong number of inputs");
+    casadi_assert(ret.n_out() == s_out.size(), fname + " has wrong number of outputs");
+  } else {
+    // Retrieve specific set of options if available
+    Dict specific_options;
+    auto it = specific_options_.find(fname);
+    if (it!=specific_options_.end()) specific_options = it->second;
+
+    // Combine specific and common options
+    Dict opt = combine(specific_options, common_options_);
+
+    // Generate the function
+    ret = Function(fname, e_in, e_out, s_in, s_out, opt);
+
+    // Make sure that it's sound
+    if (ret.has_free()) {
+      casadi_error("Cannot create '" + fname + "' since " + str(ret.get_free()) + " are free.");
+    }
+
+    // TODO(jgillis) Conditionally convert to SX
+
+    // Add to cache
+    tocache(ret);
+  }
+
+  // Save and return
+  set_function(ret, fname, true);
+  return ret;
+
+}
+
 Function OracleFunction::create_function(const Function& oracle, const std::string& fname,
     const std::vector<std::string>& s_in,
     const std::vector<std::string>& s_out,

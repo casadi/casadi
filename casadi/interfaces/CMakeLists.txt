@@ -113,6 +113,10 @@ if(WITH_OSQP)
   add_subdirectory(osqp)
 endif()
 
+if(WITH_ALPAQA)
+  add_subdirectory(alpaqa)
+endif()
+
 if(WITH_LINT)
   set(LINT_TARGETS ${LINT_TARGETS} PARENT_SCOPE)
 endif()
