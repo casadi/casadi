@@ -149,8 +149,7 @@ namespace casadi {
       const std::vector<MX>& e_in,
       const std::vector<MX>& e_out,
       const std::vector<std::string>& s_in,
-      const std::vector<std::string>& s_out
-    );
+      const std::vector<std::string>& s_out);
 
     /** Create an oracle function as a forward derivative of a different function */
     Function create_forward(const std::string& fname, casadi_int nfwd);
