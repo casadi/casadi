@@ -1533,8 +1533,12 @@ if(WITH_ALPAQA)
     add_library(alpaqa SHARED IMPORTED)
     add_dependencies(alpaqa alpaqa-external)
     target_include_directories(alpaqa INTERFACE "${CMAKE_BINARY_DIR}/external_projects/include")
+    set(SHARED_LIBRARY64_RELDIR_ALPAQA ${SHARED_LIBRARY64_RELDIR})
+    if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "aarch64" OR APPLE)
+      set(SHARED_LIBRARY64_RELDIR_ALPAQA lib)
+    endif()
     set_target_properties(alpaqa PROPERTIES
-       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY64_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}alpaqa${CMAKE_SHARED_LIBRARY_SUFFIX}"
+       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY64_RELDIR_ALPAQA}/${CMAKE_SHARED_LIBRARY_PREFIX}alpaqa${CMAKE_SHARED_LIBRARY_SUFFIX}"
        IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}alpaqa${CMAKE_IMPORT_LIBRARY_SUFFIX}"
     )
     target_link_libraries(alpaqa INTERFACE eigen3)
