@@ -189,8 +189,6 @@ if (TARGET COIN::Ipopt)
     )
     target_link_libraries(ipopt-adapter 
         PUBLIC COIN::Ipopt alpaqa::alpaqa PRIVATE alpaqa::warnings)
-    target_link_directories(ipopt-adapter PUBLIC
-        $<BUILD_INTERFACE:${IPOPT_LIBRARY_DIRS}>)
     target_include_directories(ipopt-adapter PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/interop/ipopt/include>
         $<INSTALL_INTERFACE:include>)
