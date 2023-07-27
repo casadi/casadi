@@ -185,7 +185,6 @@ namespace casadi {
 
   // Solve the NLP
   int AlpaqaInterface::solve(void* mem) const {
-
     AlpaqaMemory* m = static_cast<AlpaqaMemory*>(mem);
     auto d_nlp = &m->d_nlp;
     AlpaqaProblem problem(*this, m);
@@ -228,14 +227,21 @@ namespace casadi {
     };
 
     // Initial guess
-    alpaqa::DefaultConfig::vec x(2);
-    x << 2, 2; // decision variables
-    alpaqa::DefaultConfig::vec y(1);
-    y << 1; // Lagrange multipliers
+    alpaqa::DefaultConfig::vec x(nx_);
+    alpaqa::DefaultConfig::vec y(ng_);
+    casadi_copy(d_nlp->x0, nx_, x.data());
+    casadi_copy(d_nlp->lam_g0, ng_, y.data());
 
     // Solve the problem
     auto stats = solver(counted_problem, x, y);
     // y and x have been overwritten by the solution
+
+    casadi_copy(x.data(), nx_, d_nlp->x);
+    casadi_copy(y.data(), ng_, d_nlp->lam_g);
+    *d_nlp->f = problem.eval_f(x);
+    alpaqa::DefaultConfig::vec g(ng_);
+    problem.eval_g(x, g);
+    casadi_copy(g.data(), ng_, d_nlp->g);
 
     // Print the results
     std::cout << '\n' << *counted_problem.evaluations << '\n';
