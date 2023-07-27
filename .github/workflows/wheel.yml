@@ -247,6 +247,7 @@ jobs:
 
 
   build-windows:
+    needs: [generate-stubs]
     runs-on: windows-2022
     strategy:
       matrix:
