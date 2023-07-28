@@ -75,6 +75,9 @@ namespace casadi {
 
   void AlpaqaInterface::init(const Dict& opts) {
     Nlpsol::init(opts);
+
+    calc_lam_x_ = true;
+
     MX x = MX::sym("x", nx_);
     MX p = MX::sym("p", np_);
     MX y = MX::sym("y", ng_);
@@ -206,10 +209,10 @@ namespace casadi {
 
     // Settings for the outer augmented Lagrangian method
     OuterSolver::Params almparam;
-    almparam.tolerance             = 1e-8; // tolerance
-    almparam.dual_tolerance        = 1e-8;
+    almparam.tolerance             = 1e-10; // tolerance
+    almparam.dual_tolerance        = 1e-10;
     almparam.penalty_update_factor = 10; // penalty update factor
-    almparam.max_iter              = 20;
+    almparam.max_iter              = 3000;
     almparam.print_interval        = 1;
 
     // Settings for the inner PANOC solver
@@ -236,12 +239,19 @@ namespace casadi {
     auto stats = solver(counted_problem, x, y);
     // y and x have been overwritten by the solution
 
-    casadi_copy(x.data(), nx_, d_nlp->x);
-    casadi_copy(y.data(), ng_, d_nlp->lam_g);
-    *d_nlp->f = problem.eval_f(x);
+    casadi_copy(x.data(), nx_, d_nlp->z);
+    casadi_copy(y.data(), ng_, d_nlp->lam+nx_);
+    d_nlp->objective = problem.eval_f(x);
     alpaqa::DefaultConfig::vec g(ng_);
     problem.eval_g(x, g);
-    casadi_copy(g.data(), ng_, d_nlp->g);
+    casadi_copy(g.data(), ng_, d_nlp->z+nx_);
+
+    if (stats.status == alpaqa::SolverStatus::Converged) {
+      m->success = true;
+      m->unified_return_status = SOLVER_RET_SUCCESS;
+    } else if (stats.status == alpaqa::SolverStatus::MaxTime || stats.status == alpaqa::SolverStatus::MaxIter) {
+      m->unified_return_status = SOLVER_RET_LIMITED;
+    }
 
     // Print the results
     std::cout << '\n' << *counted_problem.evaluations << '\n';
