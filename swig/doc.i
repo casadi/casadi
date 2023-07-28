@@ -1,6 +1,206 @@
 
 // File: index.xml
 
+// File: classcasadi_1_1AlpaqaProblem.xml
+%feature("docstring") casadi::AlpaqaProblem "
+
+[INTERNAL] C++ includes: alpaqa_problem.hpp
+";
+
+%feature("docstring") casadi::AlpaqaProblem::AlpaqaProblem(const 
+AlpaqaInterface &solver, AlpaqaMemory *mem) "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::AlpaqaProblem::~AlpaqaProblem "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::AlpaqaProblem::eval_f(crvec x) const "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::AlpaqaProblem::eval_grad_f(crvec x, rvec 
+grad_fx) const "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::AlpaqaProblem::eval_f_grad_f(crvec x, rvec 
+grad_fx) const "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::AlpaqaProblem::eval_g(crvec x, rvec g) const 
+"
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::AlpaqaProblem::eval_grad_g_prod(crvec x, 
+crvec y, rvec grad_gxy) const "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::AlpaqaProblem::eval_grad_ψ(crvec x, crvec y, 
+crvec Σ, rvec grad_ψ, rvec work_n, rvec work_m) const "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::AlpaqaProblem::eval_ψ_grad_ψ(crvec x, crvec 
+y, crvec Σ, rvec grad_ψ, rvec work_n, rvec work_m) const "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::AlpaqaProblem::eval_grad_L(crvec x, crvec y, 
+rvec grad_L, rvec work_n) const "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::AlpaqaProblem::eval_ψ(crvec x, crvec y, crvec
+ Σ, rvec ŷ) const "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::AlpaqaProblem::eval_grad_gi(crvec x, index_t 
+i, rvec grad_i) const "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::AlpaqaProblem::get_jac_g_num_nonzeros() const
+ "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::AlpaqaProblem::eval_jac_g(crvec x, rindexvec 
+inner_idx, rindexvec outer_ptr, rvec J_values) const "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::AlpaqaProblem::eval_hess_L_prod(crvec x, 
+crvec y, real_t scale, crvec v, rvec Hv) const "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::AlpaqaProblem::get_hess_L_num_nonzeros() 
+const "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::AlpaqaProblem::eval_hess_L(crvec x, crvec y, 
+real_t scale, rindexvec inner_idx, rindexvec outer_ptr, rvec H_values) const
+ "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::AlpaqaProblem::eval_hess_ψ_prod(crvec x, 
+crvec y, crvec Σ, real_t scale, crvec v, rvec Hv) const "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::AlpaqaProblem::get_hess_ψ_num_nonzeros() 
+const "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::AlpaqaProblem::eval_hess_ψ(crvec x, crvec y, 
+crvec Σ, real_t scale, rindexvec inner_idx, rindexvec outer_ptr, rvec 
+H_values) const "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::AlpaqaProblem::provides_eval_grad_gi() const 
+"
+
+[INTERNAL]
+
+See: 
+TypeErasedProblem::provides_eval_grad_gi
+
+Doc source: 
+https://github.com/casadi/casadi/blob/develop/casadi/interfaces/alpaqa/alpaqa_problem.hpp#L46
+
+Implementation: 
+https://github.com/casadi/casadi/blob/develop/casadi/interfaces/alpaqa/alpaqa_problem.hpp#L46-L46
+
+";
+
+%feature("docstring")  casadi::AlpaqaProblem::provides_eval_jac_g() const "
+
+[INTERNAL]
+
+See: 
+TypeErasedProblem::provides_eval_jac_g
+
+Doc source: 
+https://github.com/casadi/casadi/blob/develop/casadi/interfaces/alpaqa/alpaqa_problem.hpp#L48
+
+Implementation: 
+https://github.com/casadi/casadi/blob/develop/casadi/interfaces/alpaqa/alpaqa_problem.hpp#L48-L48
+
+";
+
+%feature("docstring")  casadi::AlpaqaProblem::provides_eval_hess_L_prod() 
+const "
+
+[INTERNAL]
+
+See: 
+TypeErasedProblem::provides_eval_hess_L_prod
+
+Doc source: 
+https://github.com/casadi/casadi/blob/develop/casadi/interfaces/alpaqa/alpaqa_problem.hpp#L50
+
+Implementation: 
+https://github.com/casadi/casadi/blob/develop/casadi/interfaces/alpaqa/alpaqa_problem.hpp#L50-L50
+
+";
+
+%feature("docstring")  casadi::AlpaqaProblem::provides_eval_hess_L() const "
+
+[INTERNAL]
+
+See: 
+TypeErasedProblem::provides_eval_hess_L
+
+Doc source: 
+https://github.com/casadi/casadi/blob/develop/casadi/interfaces/alpaqa/alpaqa_problem.hpp#L52
+
+Implementation: 
+https://github.com/casadi/casadi/blob/develop/casadi/interfaces/alpaqa/alpaqa_problem.hpp#L52-L52
+
+";
+
+%feature("docstring")  casadi::AlpaqaProblem::provides_eval_hess_ψ_prod() 
+const "
+
+[INTERNAL]
+
+See: 
+TypeErasedProblem::provides_eval_hess_ψ_prod
+
+Doc source: 
+https://github.com/casadi/casadi/blob/develop/casadi/interfaces/alpaqa/alpaqa_problem.hpp#L54
+
+Implementation: 
+https://github.com/casadi/casadi/blob/develop/casadi/interfaces/alpaqa/alpaqa_problem.hpp#L54-L54
+
+";
+
+%feature("docstring")  casadi::AlpaqaProblem::provides_eval_hess_ψ() const "
+
+[INTERNAL]
+
+See: 
+TypeErasedProblem::provides_eval_hess_ψ
+
+Doc source: 
+https://github.com/casadi/casadi/blob/develop/casadi/interfaces/alpaqa/alpaqa_problem.hpp#L56
+
+Implementation: 
+https://github.com/casadi/casadi/blob/develop/casadi/interfaces/alpaqa/alpaqa_problem.hpp#L56-L56
+
+";
+
+
 // File: classcasadi_1_1Blocksqp.xml
 %feature("docstring") casadi::Blocksqp "
 
@@ -47596,7 +47796,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L129
 ";
 
 
-// File: namespace_0d364.xml
+// File: namespace_0d368.xml
+
+
+// File: namespacealpaqa.xml
 
 
 // File: namespacecasadi.xml

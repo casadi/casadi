@@ -1,6 +1,183 @@
 
 // File: index.xml
 
+// File: classcasadi_1_1AlpaqaProblem.xml
+%feature("docstring") casadi::AlpaqaProblem "
+
+[INTERNAL] C++ includes: alpaqa_problem.hpp
+";
+
+%feature("docstring") casadi::AlpaqaProblem::AlpaqaProblem "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::AlpaqaProblem::~AlpaqaProblem "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::AlpaqaProblem::eval_f "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::AlpaqaProblem::eval_grad_f "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::AlpaqaProblem::eval_f_grad_f "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::AlpaqaProblem::eval_g "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::AlpaqaProblem::eval_grad_g_prod "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::AlpaqaProblem::eval_grad_ψ "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::AlpaqaProblem::eval_ψ_grad_ψ "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::AlpaqaProblem::eval_grad_L "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::AlpaqaProblem::eval_ψ "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::AlpaqaProblem::eval_grad_gi "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::AlpaqaProblem::get_jac_g_num_nonzeros "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::AlpaqaProblem::eval_jac_g "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::AlpaqaProblem::eval_hess_L_prod "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::AlpaqaProblem::get_hess_L_num_nonzeros "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::AlpaqaProblem::eval_hess_L "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::AlpaqaProblem::eval_hess_ψ_prod "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::AlpaqaProblem::get_hess_ψ_num_nonzeros "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::AlpaqaProblem::eval_hess_ψ "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::AlpaqaProblem::provides_eval_grad_gi "
+
+[INTERNAL]
+
+See: 
+TypeErasedProblem::provides_eval_grad_gi
+
+Doc source: 
+https://github.com/casadi/casadi/blob/develop/casadi/interfaces/alpaqa/alpaqa_problem.hpp#L46
+
+Implementation: 
+https://github.com/casadi/casadi/blob/develop/casadi/interfaces/alpaqa/alpaqa_problem.hpp#L46-L46
+
+";
+
+%feature("docstring") casadi::AlpaqaProblem::provides_eval_jac_g "
+
+[INTERNAL]
+
+See: 
+TypeErasedProblem::provides_eval_jac_g
+
+Doc source: 
+https://github.com/casadi/casadi/blob/develop/casadi/interfaces/alpaqa/alpaqa_problem.hpp#L48
+
+Implementation: 
+https://github.com/casadi/casadi/blob/develop/casadi/interfaces/alpaqa/alpaqa_problem.hpp#L48-L48
+
+";
+
+%feature("docstring") casadi::AlpaqaProblem::provides_eval_hess_L_prod "
+
+[INTERNAL]
+
+See: 
+TypeErasedProblem::provides_eval_hess_L_prod
+
+Doc source: 
+https://github.com/casadi/casadi/blob/develop/casadi/interfaces/alpaqa/alpaqa_problem.hpp#L50
+
+Implementation: 
+https://github.com/casadi/casadi/blob/develop/casadi/interfaces/alpaqa/alpaqa_problem.hpp#L50-L50
+
+";
+
+%feature("docstring") casadi::AlpaqaProblem::provides_eval_hess_L "
+
+[INTERNAL]
+
+See: 
+TypeErasedProblem::provides_eval_hess_L
+
+Doc source: 
+https://github.com/casadi/casadi/blob/develop/casadi/interfaces/alpaqa/alpaqa_problem.hpp#L52
+
+Implementation: 
+https://github.com/casadi/casadi/blob/develop/casadi/interfaces/alpaqa/alpaqa_problem.hpp#L52-L52
+
+";
+
+%feature("docstring") casadi::AlpaqaProblem::provides_eval_hess_ψ_prod "
+
+[INTERNAL]
+
+See: 
+TypeErasedProblem::provides_eval_hess_ψ_prod
+
+Doc source: 
+https://github.com/casadi/casadi/blob/develop/casadi/interfaces/alpaqa/alpaqa_problem.hpp#L54
+
+Implementation: 
+https://github.com/casadi/casadi/blob/develop/casadi/interfaces/alpaqa/alpaqa_problem.hpp#L54-L54
+
+";
+
+%feature("docstring") casadi::AlpaqaProblem::provides_eval_hess_ψ "
+
+[INTERNAL]
+
+See: 
+TypeErasedProblem::provides_eval_hess_ψ
+
+Doc source: 
+https://github.com/casadi/casadi/blob/develop/casadi/interfaces/alpaqa/alpaqa_problem.hpp#L56
+
+Implementation: 
+https://github.com/casadi/casadi/blob/develop/casadi/interfaces/alpaqa/alpaqa_problem.hpp#L56-L56
+
+";
+
+
 // File: classcasadi_1_1Blocksqp.xml
 %feature("docstring") casadi::Blocksqp "
 
@@ -29348,7 +29525,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L129
 ";
 
 
-// File: namespace_0d364.xml
+// File: namespace_0d368.xml
+
+
+// File: namespacealpaqa.xml
 
 
 // File: namespacecasadi.xml
