@@ -7,12 +7,17 @@
 #include "casadi/core/timing.hpp"
 #include "alpaqa_problem.hpp"
 
+using Direction   = alpaqa::LBFGSDirection<alpaqa::DefaultConfig>;
+using InnerSolver = alpaqa::PANOCSolver<Direction>;
+using OuterSolver = alpaqa::ALMSolver<InnerSolver>;
+
 namespace casadi {
 
   class AlpaqaInterface;
 
   struct CASADI_NLPSOL_ALPAQA_EXPORT AlpaqaMemory : public NlpsolMemory {
 
+    alpaqa::ALMSolver<InnerSolver>* solver;
 
     const AlpaqaInterface* interface;
   };

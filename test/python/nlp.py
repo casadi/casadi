@@ -43,8 +43,8 @@ if "SKIP_WORHP_TESTS" not in os.environ and has_nlpsol("worhp")  and not args.ig
 if "SKIP_SLEQP_TESTS" not in os.environ and has_nlpsol("sleqp"):
   solvers.append(("sleqp",{"print_time":False,"sleqp": {"linesearch": "Approx","feas_tol":1e-7,"stat_tol":1e-7,"slack_tol":1e-7}},set()))
 
-#if "SKIP_ALPAQA_TESTS" not in os.environ and has_nlpsol("alpaqa"):
-#  solvers.append(("alpaqa",{"print_time":False,"alpaqa": {},set()))
+if "SKIP_ALPAQA_TESTS" not in os.environ and has_nlpsol("alpaqa"):
+  solvers.append(("alpaqa",{"print_time":False,"alpaqa": {}},set()))
 
 if "SKIP_IPOPT_TESTS" not in os.environ and has_nlpsol("ipopt"):
   solvers.append(("ipopt",{"print_time":False,"ipopt": {"tol": 1e-10, "derivative_test":"second-order","print_level":0}},set()))
@@ -117,7 +117,7 @@ class NLPtests(casadiTestCase):
         print(solver(**solver_in))
       except:
         pass
-      if Solver not in ["ipopt","snopt","blocksqp","bonmin","knitro","sleqp"]:
+      if Solver not in ["ipopt","snopt","blocksqp","bonmin","knitro","sleqp","alpaqa"]:
         self.assertTrue(solver.stats()["unified_return_status"]=="SOLVER_RET_NAN")
       self.assertFalse(solver.stats()["success"])
 
@@ -137,7 +137,7 @@ class NLPtests(casadiTestCase):
         solver_out = solver(**solver_in)
       except:
         pass
-      if Solver not in ["ipopt","snopt","bonmin","knitro","sleqp"]:
+      if Solver not in ["ipopt","snopt","bonmin","knitro","sleqp","alpaqa"]:
         self.assertTrue(solver.stats()["unified_return_status"]=="SOLVER_RET_NAN")
       self.assertFalse(solver.stats()["success"])
 
@@ -172,7 +172,7 @@ class NLPtests(casadiTestCase):
    for Solver, solver_options, features in solvers:
       
       #if Solver not in ["ipopt","sqpmethod"]: continue
-      if Solver in ["worhp","blocksqp","knitro","bonmin","snopt"]: continue
+      if Solver in ["worhp","blocksqp","knitro","bonmin","snopt","alpaqa"]: continue
       print("test_iteration_interrupt",Solver,solver_options)
 
       opti = Opti()
@@ -1567,6 +1567,7 @@ class NLPtests(casadiTestCase):
     for Solver, solver_options, features in solvers:
       if "ipopt" in str(solver_options): continue
       if "snopt" in str(solver_options): continue
+      if Solver in ["alpaqa"]: continue
       if "knitro" in str(Solver):
         solver_options = copy.deepcopy(solver_options)
         solver_options["knitro"]["algorithm"] = 4 # sqp

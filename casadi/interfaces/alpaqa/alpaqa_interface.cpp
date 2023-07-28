@@ -228,6 +228,7 @@ namespace casadi {
         almparam,                 // params for outer solver
         {panocparam, lbfgsparam}, // inner solver
     };
+    m->solver = &solver;
 
     // Initial guess
     alpaqa::DefaultConfig::vec x(nx_);
@@ -251,6 +252,10 @@ namespace casadi {
       m->unified_return_status = SOLVER_RET_SUCCESS;
     } else if (stats.status == alpaqa::SolverStatus::MaxTime || stats.status == alpaqa::SolverStatus::MaxIter) {
       m->unified_return_status = SOLVER_RET_LIMITED;
+    } else if (stats.status == alpaqa::SolverStatus::NotFinite) {
+      m->unified_return_status = SOLVER_RET_NAN;
+    } else if (stats.status == alpaqa::SolverStatus::Interrupted) {
+      throw KeyboardInterruptException();
     }
 
     // Print the results
