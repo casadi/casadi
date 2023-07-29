@@ -70,12 +70,8 @@ namespace casadi {
 
     Sparsity jacg_sp_;
 
-    /// All SLEQP options
+    /// All Alpaqa options
     Dict opts_;
-
-    int max_iter_;
-    double max_wall_time_;
-    int print_level_;
 
     /** \brief Serialize an object without type information */
     void serialize_body(SerializingStream &s) const override;

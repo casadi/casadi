@@ -25,6 +25,7 @@
 
 #include "alpaqa_interface.hpp"
 #include <vector>
+#include <alpaqa/params/params.hpp>
 
 namespace casadi {
 
@@ -57,16 +58,7 @@ namespace casadi {
   = {{&Nlpsol::options_},
       {{"alpaqa",
         {OT_DICT,
-        "Options to be passed to Alpaqa"}},
-       {"print_level",
-        {OT_INT,
-        "Print level of SLEQP (default: 3)"}},
-       {"max_iter",
-        {OT_INT,
-        "Maximum number of iterations"}},
-       {"max_wall_time",
-        {OT_DOUBLE,
-        "maximum wall time allowed"}}
+        "Options to be passed to Alpaqa"}}
       }
   };
 
@@ -75,6 +67,13 @@ namespace casadi {
 
   void AlpaqaInterface::init(const Dict& opts) {
     Nlpsol::init(opts);
+
+    // Read user options
+    for (auto&& op : opts) {
+      if (op.first=="alpaqa") {
+        opts_ = Options::sanitize(op.second);
+      }
+    }
 
     calc_lam_x_ = true;
 
@@ -209,19 +208,27 @@ namespace casadi {
 
     // Settings for the outer augmented Lagrangian method
     OuterSolver::Params almparam;
-    almparam.tolerance             = 1e-10; // tolerance
-    almparam.dual_tolerance        = 1e-10;
-    almparam.penalty_update_factor = 10; // penalty update factor
-    almparam.max_iter              = 3000;
-    almparam.print_interval        = 1;
 
     // Settings for the inner PANOC solver
     InnerSolver::Params panocparam;
-    panocparam.max_iter       = 500;
-    panocparam.print_interval = 1;
+
     // Settings for the L-BFGS algorithm used by PANOC
     Direction::AcceleratorParams lbfgsparam;
-    lbfgsparam.memory = 2;
+
+    for (auto&& op : opts_) {
+      if (op.first=="alm") {
+        for (auto&& kv : op.second.to_dict())
+          alpaqa::params::set_param(almparam, {.full_key = kv.first, .key = kv.first, .value = str(kv.second)});
+      } else if (op.first=="panoc") {
+        for (auto&& kv : op.second.to_dict())
+          alpaqa::params::set_param(panocparam, {.full_key = kv.first, .key = kv.first, .value = str(kv.second)});
+      } else if (op.first=="lbfgs") {
+        for (auto&& kv : op.second.to_dict())
+          alpaqa::params::set_param(lbfgsparam, {.full_key = kv.first, .key = kv.first, .value = str(kv.second)});
+      } else {
+        casadi_error("Unknown option: " + op.first);
+      }
+    }
 
     // Create an ALM solver using PANOC as inner solver
     OuterSolver solver{
@@ -258,25 +265,27 @@ namespace casadi {
       throw KeyboardInterruptException();
     }
 
-    // Print the results
-    std::cout << '\n' << *counted_problem.evaluations << '\n';
-    std::cout << "status: " << stats.status << '\n'
-              << "f = " << problem.eval_f(x) << '\n'
-              << "inner iterations: " << stats.inner.iterations << '\n'
-              << "outer iterations: " << stats.outer_iterations << '\n'
-              << "ε = " << stats.ε << '\n'
-              << "δ = " << stats.δ << '\n'
-              << "elapsed time:     "
-              << std::chrono::duration<double>{stats.elapsed_time}.count()
-              << " s" << '\n'
-              << "x = " << x.transpose() << '\n'
-              << "y = " << y.transpose() << '\n'
-              << "avg τ = " << (stats.inner.sum_τ / stats.inner.count_τ) << '\n'
-              << "L-BFGS rejected = " << stats.inner.lbfgs_rejected << '\n'
-              << "L-BFGS failures = " << stats.inner.lbfgs_failures << '\n'
-              << "Line search failures = " << stats.inner.linesearch_failures
-              << '\n'
-              << std::endl;
+    if (verbose_) {
+      // Print the results
+      uout() << '\n' << *counted_problem.evaluations << '\n';
+      uout() << "status: " << stats.status << '\n'
+                << "f = " << problem.eval_f(x) << '\n'
+                << "inner iterations: " << stats.inner.iterations << '\n'
+                << "outer iterations: " << stats.outer_iterations << '\n'
+                << "ε = " << stats.ε << '\n'
+                << "δ = " << stats.δ << '\n'
+                << "elapsed time:     "
+                << std::chrono::duration<double>{stats.elapsed_time}.count()
+                << " s" << '\n'
+                << "x = " << x.transpose() << '\n'
+                << "y = " << y.transpose() << '\n'
+                << "avg τ = " << (stats.inner.sum_τ / stats.inner.count_τ) << '\n'
+                << "L-BFGS rejected = " << stats.inner.lbfgs_rejected << '\n'
+                << "L-BFGS failures = " << stats.inner.lbfgs_failures << '\n'
+                << "Line search failures = " << stats.inner.linesearch_failures
+                << '\n'
+                << std::endl;
+    }
 
     return 0;
   }
@@ -284,11 +293,15 @@ namespace casadi {
 
   AlpaqaInterface::AlpaqaInterface(DeserializingStream& s) : Nlpsol(s) {
     s.version("AlpaqaInterface", 1);
+    s.unpack("AlpaqaInterface::jacg_sp", jacg_sp_);
+    s.unpack("AlpaqaInterface::opts", opts_);
   }
 
   void AlpaqaInterface::serialize_body(SerializingStream &s) const {
     Nlpsol::serialize_body(s);
     s.version("AlpaqaInterface", 1);
+    s.pack("AlpaqaInterface::jacg_sp", jacg_sp_);
+    s.pack("AlpaqaInterface::opts", opts_);
   }
 
 } // namespace casadi
