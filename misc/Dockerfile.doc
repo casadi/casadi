@@ -32,6 +32,9 @@ RUN sudo rm /lib/x86_64-linux-gnu/libblas.so.3 /lib/x86_64-linux-gnu/libblas.so
 RUN sudo ln -s /etc/alternatives/libopenblas.so.0-x86_64-linux-gnu /lib/x86_64-linux-gnu/libblas.so.3
 RUN sudo ln -s /etc/alternatives/libopenblas.so.0-x86_64-linux-gnu /lib/x86_64-linux-gnu/libblas.so
 
+RUN sudo apt update && sudo apt install --no-install-recommends -y konwert
+
+
 ENV USER=developer
 
 WORKDIR /local
