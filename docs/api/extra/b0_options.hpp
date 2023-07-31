@@ -59,9 +59,7 @@
 <tr><td>jit_serialize</td><td>OT_STRING</td><td>Specify behaviour when serializing a jitted function: SOURCE|link|embed.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>jit_temp_suffix</td><td>OT_BOOL</td><td>Use a temporary (seemingly random) filename suffix for generated code and libraries. This is desired for thread-safety. This behaviour may defeat caching compiler wrappers. Default: true</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>max_io</td><td>OT_INT</td><td>Acceptable number of inputs and outputs. Warn if exceeded.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>max_iter</td><td>OT_INT</td><td>Maximum number of iterations</td><td>casadi::AlpaqaInterface</td></tr>
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>max_wall_time</td><td>OT_DOUBLE</td><td>maximum wall time allowed</td><td>casadi::AlpaqaInterface</td></tr>
 <tr><td>min_lam</td><td>OT_DOUBLE</td><td>Minimum allowed multiplier value</td><td>casadi::Nlpsol</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>Set of user problem functions to be monitored</td><td>casadi::OracleFunction</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
@@ -71,7 +69,6 @@
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>print_level</td><td>OT_INT</td><td>Print level of SLEQP (default: 3)</td><td>casadi::AlpaqaInterface</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
@@ -148,9 +145,7 @@
 <tr><td>jit_serialize</td><td>OT_STRING</td><td>Specify behaviour when serializing a jitted function: SOURCE|link|embed.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>jit_temp_suffix</td><td>OT_BOOL</td><td>Use a temporary (seemingly random) filename suffix for generated code and libraries. This is desired for thread-safety. This behaviour may defeat caching compiler wrappers. Default: true</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>max_io</td><td>OT_INT</td><td>Acceptable number of inputs and outputs. Warn if exceeded.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>max_iter</td><td>OT_INT</td><td>Maximum number of iterations</td><td>casadi::AlpaqaInterface</td></tr>
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>max_wall_time</td><td>OT_DOUBLE</td><td>maximum wall time allowed</td><td>casadi::AlpaqaInterface</td></tr>
 <tr><td>min_lam</td><td>OT_DOUBLE</td><td>Minimum allowed multiplier value</td><td>casadi::Nlpsol</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>Set of user problem functions to be monitored</td><td>casadi::OracleFunction</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
@@ -160,7 +155,6 @@
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>post_expand_options</td><td>OT_DICT</td><td>Options to be passed to post-construction expansion. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_in</td><td>OT_BOOL</td><td>Print numerical values of inputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
-<tr><td>print_level</td><td>OT_INT</td><td>Print level of SLEQP (default: 3)</td><td>casadi::AlpaqaInterface</td></tr>
 <tr><td>print_out</td><td>OT_BOOL</td><td>Print numerical values of outputs [default: false]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>print_time</td><td>OT_BOOL</td><td>print information about execution time. Implies record_time.</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
