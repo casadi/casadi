@@ -35,11 +35,11 @@
 
 [INTERNAL] ";
 
-%feature("docstring") casadi::AlpaqaProblem::eval_grad_ψ "
+%feature("docstring") casadi::AlpaqaProblem::eval_grad_ps "
 
 [INTERNAL] ";
 
-%feature("docstring") casadi::AlpaqaProblem::eval_ψ_grad_ψ "
+%feature("docstring") casadi::AlpaqaProblem::eval_ps_grad_ps "
 
 [INTERNAL] ";
 
@@ -47,7 +47,7 @@
 
 [INTERNAL] ";
 
-%feature("docstring") casadi::AlpaqaProblem::eval_ψ "
+%feature("docstring") casadi::AlpaqaProblem::eval_ps "
 
 [INTERNAL] ";
 
@@ -75,15 +75,15 @@
 
 [INTERNAL] ";
 
-%feature("docstring") casadi::AlpaqaProblem::eval_hess_ψ_prod "
+%feature("docstring") casadi::AlpaqaProblem::eval_hess_ps_prod "
 
 [INTERNAL] ";
 
-%feature("docstring") casadi::AlpaqaProblem::get_hess_ψ_num_nonzeros "
+%feature("docstring") casadi::AlpaqaProblem::get_hess_ps_num_nonzeros "
 
 [INTERNAL] ";
 
-%feature("docstring") casadi::AlpaqaProblem::eval_hess_ψ "
+%feature("docstring") casadi::AlpaqaProblem::eval_hess_ps "
 
 [INTERNAL] ";
 
@@ -147,12 +147,12 @@ https://github.com/casadi/casadi/blob/develop/casadi/interfaces/alpaqa/alpaqa_pr
 
 ";
 
-%feature("docstring") casadi::AlpaqaProblem::provides_eval_hess_ψ_prod "
+%feature("docstring") casadi::AlpaqaProblem::provides_eval_hess_ps_prod "
 
 [INTERNAL]
 
 See: 
-TypeErasedProblem::provides_eval_hess_ψ_prod
+TypeErasedProblem::provides_eval_hess_ps_prod
 
 Doc source: 
 https://github.com/casadi/casadi/blob/develop/casadi/interfaces/alpaqa/alpaqa_problem.hpp#L54
@@ -162,12 +162,12 @@ https://github.com/casadi/casadi/blob/develop/casadi/interfaces/alpaqa/alpaqa_pr
 
 ";
 
-%feature("docstring") casadi::AlpaqaProblem::provides_eval_hess_ψ "
+%feature("docstring") casadi::AlpaqaProblem::provides_eval_hess_ps "
 
 [INTERNAL]
 
 See: 
-TypeErasedProblem::provides_eval_hess_ψ
+TypeErasedProblem::provides_eval_hess_ps
 
 Doc source: 
 https://github.com/casadi/casadi/blob/develop/casadi/interfaces/alpaqa/alpaqa_problem.hpp#L56

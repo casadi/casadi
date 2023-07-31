@@ -40,13 +40,13 @@ crvec y, rvec grad_gxy) const "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::AlpaqaProblem::eval_grad_ψ(crvec x, crvec y, 
-crvec Σ, rvec grad_ψ, rvec work_n, rvec work_m) const "
+%feature("docstring")  casadi::AlpaqaProblem::eval_grad_ps(crvec x, crvec y, 
+crvec S, rvec grad_ps, rvec work_n, rvec work_m) const "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::AlpaqaProblem::eval_ψ_grad_ψ(crvec x, crvec 
-y, crvec Σ, rvec grad_ψ, rvec work_n, rvec work_m) const "
+%feature("docstring")  casadi::AlpaqaProblem::eval_ps_grad_ps(crvec x, crvec 
+y, crvec S, rvec grad_ps, rvec work_n, rvec work_m) const "
 
 [INTERNAL] ";
 
@@ -55,8 +55,8 @@ rvec grad_L, rvec work_n) const "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::AlpaqaProblem::eval_ψ(crvec x, crvec y, crvec
- Σ, rvec ŷ) const "
+%feature("docstring")  casadi::AlpaqaProblem::eval_ps(crvec x, crvec y, crvec
+ S, rvec y) const "
 
 [INTERNAL] ";
 
@@ -91,18 +91,18 @@ real_t scale, rindexvec inner_idx, rindexvec outer_ptr, rvec H_values) const
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::AlpaqaProblem::eval_hess_ψ_prod(crvec x, 
-crvec y, crvec Σ, real_t scale, crvec v, rvec Hv) const "
+%feature("docstring")  casadi::AlpaqaProblem::eval_hess_ps_prod(crvec x, 
+crvec y, crvec S, real_t scale, crvec v, rvec Hv) const "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::AlpaqaProblem::get_hess_ψ_num_nonzeros() 
+%feature("docstring")  casadi::AlpaqaProblem::get_hess_ps_num_nonzeros() 
 const "
 
 [INTERNAL] ";
 
-%feature("docstring")  casadi::AlpaqaProblem::eval_hess_ψ(crvec x, crvec y, 
-crvec Σ, real_t scale, rindexvec inner_idx, rindexvec outer_ptr, rvec 
+%feature("docstring")  casadi::AlpaqaProblem::eval_hess_ps(crvec x, crvec y, 
+crvec S, real_t scale, rindexvec inner_idx, rindexvec outer_ptr, rvec 
 H_values) const "
 
 [INTERNAL] ";
@@ -169,13 +169,13 @@ https://github.com/casadi/casadi/blob/develop/casadi/interfaces/alpaqa/alpaqa_pr
 
 ";
 
-%feature("docstring")  casadi::AlpaqaProblem::provides_eval_hess_ψ_prod() 
+%feature("docstring")  casadi::AlpaqaProblem::provides_eval_hess_ps_prod() 
 const "
 
 [INTERNAL]
 
 See: 
-TypeErasedProblem::provides_eval_hess_ψ_prod
+TypeErasedProblem::provides_eval_hess_ps_prod
 
 Doc source: 
 https://github.com/casadi/casadi/blob/develop/casadi/interfaces/alpaqa/alpaqa_problem.hpp#L54
@@ -185,12 +185,12 @@ https://github.com/casadi/casadi/blob/develop/casadi/interfaces/alpaqa/alpaqa_pr
 
 ";
 
-%feature("docstring")  casadi::AlpaqaProblem::provides_eval_hess_ψ() const "
+%feature("docstring")  casadi::AlpaqaProblem::provides_eval_hess_ps() const "
 
 [INTERNAL]
 
 See: 
-TypeErasedProblem::provides_eval_hess_ψ
+TypeErasedProblem::provides_eval_hess_ps
 
 Doc source: 
 https://github.com/casadi/casadi/blob/develop/casadi/interfaces/alpaqa/alpaqa_problem.hpp#L56

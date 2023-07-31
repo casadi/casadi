@@ -6,3 +6,4 @@
 
 cd extra && python doxy2swigX.py ../XML_internal/index.xml ../../../swig/doc.i ../../../swig/internal.i ../../../swig/deprecated.i && cd ..
 cd extra && python doxy2swigX.py --merge ../XML_internal/index.xml ../../../swig/doc_merged.i ../../../swig/internal.i ../../../swig/deprecated.i && cd ..
+cd ../.. && konwert utf8-ascii doc.i doc_merged.i deprecated.i internal.i -O && cd ..

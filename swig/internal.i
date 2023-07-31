@@ -19,7 +19,7 @@
 %exception  casadi::AlpaqaProblem::eval_grad_gi(crvec x, index_t i, rvec grad_i) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::AlpaqaProblem::eval_grad_ψ(crvec x, crvec y, crvec Σ, rvec grad_ψ, rvec work_n, rvec work_m) const {
+%exception  casadi::AlpaqaProblem::eval_grad_ps(crvec x, crvec y, crvec S, rvec grad_ps, rvec work_n, rvec work_m) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::AlpaqaProblem::eval_hess_L(crvec x, crvec y, real_t scale, rindexvec inner_idx, rindexvec outer_ptr, rvec H_values) const {
@@ -28,25 +28,25 @@
 %exception  casadi::AlpaqaProblem::eval_hess_L_prod(crvec x, crvec y, real_t scale, crvec v, rvec Hv) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::AlpaqaProblem::eval_hess_ψ(crvec x, crvec y, crvec Σ, real_t scale, rindexvec inner_idx, rindexvec outer_ptr, rvec H_values) const {
+%exception  casadi::AlpaqaProblem::eval_hess_ps(crvec x, crvec y, crvec S, real_t scale, rindexvec inner_idx, rindexvec outer_ptr, rvec H_values) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::AlpaqaProblem::eval_hess_ψ_prod(crvec x, crvec y, crvec Σ, real_t scale, crvec v, rvec Hv) const {
+%exception  casadi::AlpaqaProblem::eval_hess_ps_prod(crvec x, crvec y, crvec S, real_t scale, crvec v, rvec Hv) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::AlpaqaProblem::eval_jac_g(crvec x, rindexvec inner_idx, rindexvec outer_ptr, rvec J_values) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::AlpaqaProblem::eval_ψ(crvec x, crvec y, crvec Σ, rvec ŷ) const {
+%exception  casadi::AlpaqaProblem::eval_ps(crvec x, crvec y, crvec S, rvec y) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::AlpaqaProblem::eval_ψ_grad_ψ(crvec x, crvec y, crvec Σ, rvec grad_ψ, rvec work_n, rvec work_m) const {
+%exception  casadi::AlpaqaProblem::eval_ps_grad_ps(crvec x, crvec y, crvec S, rvec grad_ps, rvec work_n, rvec work_m) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::AlpaqaProblem::get_hess_L_num_nonzeros() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::AlpaqaProblem::get_hess_ψ_num_nonzeros() const {
+%exception  casadi::AlpaqaProblem::get_hess_ps_num_nonzeros() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::AlpaqaProblem::get_jac_g_num_nonzeros() const {
@@ -61,10 +61,10 @@
 %exception  casadi::AlpaqaProblem::provides_eval_hess_L_prod() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::AlpaqaProblem::provides_eval_hess_ψ() const {
+%exception  casadi::AlpaqaProblem::provides_eval_hess_ps() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::AlpaqaProblem::provides_eval_hess_ψ_prod() const {
+%exception  casadi::AlpaqaProblem::provides_eval_hess_ps_prod() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::AlpaqaProblem::provides_eval_jac_g() const {
