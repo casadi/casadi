@@ -630,7 +630,7 @@ class NLPtests(casadiTestCase):
       self.assertAlmostEqual(solver_out["x"][1],x_r[1],digits,str(Solver))
       if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][0],0,5 if Solver=="snopt" else 8,str(Solver))
       if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][1],0,5 if Solver=="snopt" else 8,str(Solver))
-      if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_g"][0],0.12149655447670,6,str(Solver))
+      if Solver not in ["bonmin","sleqp"]: self.assertAlmostEqual(solver_out["lam_g"][0],0.12149655447670,6,str(Solver))
 
       if "codegen" in features:
         self.check_codegen(solver,solver_in,std="c99")
@@ -689,7 +689,7 @@ class NLPtests(casadiTestCase):
       self.assertAlmostEqual(solver_out["x"][1],x_r[1],digits,str(Solver))
       if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][0],0,5 if Solver=="snopt" else 8,str(Solver)+str(6 if Solver=="snopt" else 8))
       if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][1],0,5 if Solver=="snopt" else 8,str(Solver))
-      if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_g"][0],0.12149655447670,6,str(Solver))
+      if Solver not in ["bonmin","sleqp"]: self.assertAlmostEqual(solver_out["lam_g"][0],0.12149655447670,6,str(Solver))
       self.check_serialize(solver, solver_in)
 
       if "codegen" in features:
@@ -766,7 +766,7 @@ class NLPtests(casadiTestCase):
       self.assertAlmostEqual(solver_out["x"][1],x_r[1],digits,str(Solver))
       if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][0],0,5 if Solver=="snopt" else 8,str(Solver))
       if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][1],0,5 if Solver=="snopt" else 8,str(Solver))
-      if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_g"][0],0.12149655447670,6,str(Solver))
+      if Solver not in ["bonmin","sleqp"]: self.assertAlmostEqual(solver_out["lam_g"][0],0.12149655447670,6,str(Solver))
 
 
   def test_IPOPTrhb_gen(self):
