@@ -2714,7 +2714,13 @@ class NZproxy:
       assert method=="__call__"
       fun=getattr(self, name)
       return fun(*inputs[1:])
-    except:
+    except Exception as e:
+      if "Dimension mismatch" in str(e):
+        import sys
+        if sys.version_info[0] < 3:
+            raise RuntimeError(str(e))
+        else:
+            raise e
       # Fall back to numpy conversion
       new_inputs = list(inputs)
       try:

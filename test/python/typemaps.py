@@ -797,6 +797,15 @@ class typemaptests(casadiTestCase):
 
     self.assertEqual(int(b),10**15)
   """
+  
+  def test_issue_3214(self):
+    import numpy as np
+    import casadi as ca
+    with self.assertRaises(RuntimeError):
+        print(np.array([-1.0, 0.0]) - ca.DM([[0.1, 0.0]]))
+        
+    r = np.array([-1.0, 0.0]) - ca.DM([0.1, 0.0])
+    self.checkarray(r,DM([[-1.1,0]]))
 
   def test_buglonglong(self):
     x = SX.sym("x")
