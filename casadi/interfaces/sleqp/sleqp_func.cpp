@@ -155,9 +155,9 @@ namespace casadi {
       sleqp_raise(SLEQP_FUNC_EVAL_ERROR, "%s", ex.what());
     }
 
-    casadi_int ncol = m->interface->jacg_sp_.size2();
-    const casadi_int* colind = m->interface->jacg_sp_.colind();
-    const casadi_int* row = m->interface->jacg_sp_.row();
+    casadi_int ncol = m->interface->jac_sparsity().size2();
+    const casadi_int* colind = m->interface->jac_sparsity().colind();
+    const casadi_int* row = m->interface->jac_sparsity().row();
 
     const casadi_int nnz = colind[ncol];
 
@@ -188,6 +188,43 @@ namespace casadi {
                                              void* func_data)
   {
     SLEQPMemory* m = static_cast<SLEQPMemory*>(func_data);
+
+    SLEQP_CALL(sleqp_vec_to_raw(direction, m->h_dk));
+    SLEQP_CALL(sleqp_vec_to_raw(cons_duals, m->h_mk));
+
+    double one = 1.;
+
+    m->arg[0] = m->xk;           // x
+    m->arg[1] = m->d_nlp.p;      // p
+    m->arg[2] = &one;            // lam:f
+    m->arg[3] = m->h_mk;         // lam:g
+    m->arg[4] = nullptr;         // out:grad:gamma:x
+    m->arg[5] = m->h_dk;         // fwd:x
+    m->arg[6] = nullptr;         // fwd:p
+    m->arg[7] = nullptr;         // fwd:lam:x
+    m->arg[8] = nullptr;         // fwd:lam:g
+
+    m->res[0] = m->h_pk;         // fwd:grad:gamma:x
+
+    try {
+
+      if(m->interface->calc_function(m, "fwd1_nlp_grad_l") != 0) {
+        return SLEQP_ERROR;
+      }
+
+    } catch (std::exception& ex) {
+      uerr() << "Error \""
+             << ex.what()
+             << "\" evaluating constraint Hessian product"
+             << std::endl;
+
+      sleqp_raise(SLEQP_FUNC_EVAL_ERROR, "%s", ex.what());
+    }
+
+    const int num_vars = sleqp_func_num_vars(func);
+
+    SLEQP_CALL(sleqp_vec_set_from_raw(product, m->h_pk, num_vars, 0.));
+
     return SLEQP_OKAY;
   }
 

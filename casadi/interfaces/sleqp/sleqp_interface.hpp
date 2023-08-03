@@ -23,7 +23,6 @@ namespace casadi {
 
     struct {
       SleqpProblem* problem;
-      SleqpSettings* settings;
 
       SleqpVec* primal;
       SleqpSolver* solver;
@@ -31,10 +30,13 @@ namespace casadi {
 
     // Current calculated quantities
     double* xk;
-    double *gk, *grad_fk, *jac_gk, *hess_lk, *grad_lk;
+    double *gk, *grad_fk, *jac_gk;
 
     // Additional callback data
     double *cb_xk, *cb_lam_xk, *cb_lam_gk;
+
+    // Hessian direction / product / multipliers
+    double *h_dk, *h_pk, *h_mk;
 
     bool iteration_callback_ignore_errors;
 
@@ -43,7 +45,22 @@ namespace casadi {
 
   class CASADI_NLPSOL_SLEQP_EXPORT SLEQPInterface : public Nlpsol {
   private:
+    Sparsity jacg_sp_;
+
+    /// All SLEQP options
+    Dict opts_;
+
+    int max_iter_;
+    double max_wall_time_;
+    int print_level_;
+
+    SleqpSettings* settings_;
+
     void clear_mem_at(SLEQPMemory* m) const;
+
+    bool exact_hess() const;
+
+    void update_settings(const Dict& opts);
 
   public:
     explicit SLEQPInterface(const std::string& name, const Function& nlp);
@@ -52,6 +69,8 @@ namespace casadi {
     static Nlpsol* creator(const std::string& name, const Function& nlp) {
       return new SLEQPInterface(name, nlp);
     }
+
+    const Sparsity& jac_sparsity() const {return jacg_sp_;}
 
     const char* plugin_name() const override { return "sleqp";}
 
@@ -85,15 +104,6 @@ namespace casadi {
 
     // Solve the NLP
     int solve(void* mem) const override;
-
-    Sparsity jacg_sp_;
-
-    /// All SLEQP options
-    Dict opts_;
-
-    int max_iter_;
-    double max_wall_time_;
-    int print_level_;
 
     /** \brief Serialize an object without type information */
     void serialize_body(SerializingStream &s) const override;

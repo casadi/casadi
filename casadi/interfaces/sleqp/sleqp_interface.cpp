@@ -91,6 +91,15 @@ namespace casadi {
 
   SLEQPInterface::~SLEQPInterface() {
     clear_mem();
+
+    try
+    {
+      SLEQP_CALL_EXC(sleqp_settings_release(&settings_));
+    }
+    catch(std::exception e)
+    {
+      casadi_message(std::string("SLEQP error ") + e.what());
+    }
   }
 
   const Options SLEQPInterface::options_
@@ -111,6 +120,14 @@ namespace casadi {
   };
 
   const std::string SLEQPInterface::meta_doc = "";
+
+  bool SLEQPInterface::exact_hess() const
+  {
+    SLEQP_HESS_EVAL hess_eval = (SLEQP_HESS_EVAL) sleqp_settings_enum_value(settings_,
+                                                                            SLEQP_SETTINGS_ENUM_HESS_EVAL);
+
+    return hess_eval == SLEQP_HESS_EVAL_EXACT;
+  }
 
   void SLEQPInterface::init(const Dict& opts) {
     Nlpsol::init(opts);
@@ -133,6 +150,9 @@ namespace casadi {
         casadi_assert(max_wall_time_>=0, "Invalid time limit " + str(max_wall_time_));
       }
     }
+
+    SLEQP_CALL_EXC(sleqp_settings_create(&settings_));
+    update_settings(opts_);
 
     // Setup NLP functions
     create_function("nlp_f", {"x", "p"}, {"f"});
@@ -164,10 +184,30 @@ namespace casadi {
       alloc_w(ng_, true);
     }
 
-    // Setup NLP Hessian
-    if (!has_function("nlp_hess_l")) {
-      create_function("nlp_hess_l", {"x", "p", "lam:f", "lam:g"},
-                      {"triu:hess:gamma:x:x"}, {{"gamma", {"f", "g"}}});
+    if(exact_hess())
+    {
+      // Hessian direction
+      alloc_w(nx_, true);
+
+      // Hessian product
+      alloc_w(nx_, true);
+
+      // Multipliers
+      alloc_w(ng_, true);
+
+      // Setup NLP Hessian product
+      Function func = create_function("nlp_grad_l", {"x", "p", "lam:f", "lam:g"},
+                                      {"grad:gamma:x"}, {{"gamma", {"f", "g"}}});
+
+      // only differentiate wrt first argument, i.e., x
+      // inputs:
+      // "x", "p", "lam_f", "lam_g", "out_grad_gamma_x",
+      // "fwd_x", "fwd_p", "fwd_lam_f", "fwd_lam_g"
+      // outputs:
+      // "fwd_grad_gamma_x"
+      Function ret = create_forward("nlp_grad_l", 1);
+
+      std::cout << "Hello";
     }
   }
 
@@ -185,7 +225,6 @@ namespace casadi {
   void SLEQPInterface::clear_mem_at(SLEQPMemory* m) const {
     SLEQP_CALL_EXC(sleqp_solver_release(&m->internal.solver));
     SLEQP_CALL_EXC(sleqp_problem_release(&m->internal.problem));
-    SLEQP_CALL_EXC(sleqp_settings_release(&m->internal.settings));
     SLEQP_CALL_EXC(sleqp_vec_free(&m->internal.primal));
   }
 
@@ -233,6 +272,54 @@ namespace casadi {
     stats["iter_count"] = sleqp_solver_iterations(m->internal.solver);
 
     return stats;
+  }
+
+  void SLEQPInterface::update_settings(const Dict& opts)
+  {
+
+    // Read options
+    for (auto&& op : opts_) {
+      bool found = false;
+      for (int i = 0; i < SLEQP_NUM_INT_SETTINGS; ++i) {
+        SLEQP_SETTINGS_INT ii = static_cast<SLEQP_SETTINGS_INT>(i);
+        if (op.first==sleqp_settings_int_name(ii)) {
+          found = true;
+          SLEQP_CALL_EXC(sleqp_settings_set_int_value(settings_,
+                                                      ii,
+                                                      op.second.to_int()));
+        }
+      }
+      for (int i = 0; i < SLEQP_NUM_REAL_SETTINGS; ++i) {
+        SLEQP_SETTINGS_REAL ii = static_cast<SLEQP_SETTINGS_REAL>(i);
+        if (op.first==sleqp_settings_real_name(ii)) {
+          found = true;
+          SLEQP_CALL_EXC(sleqp_settings_set_real_value(settings_,
+                                                       ii,
+                                                       op.second.to_double()));
+        }
+      }
+      for (int i = 0; i < SLEQP_NUM_BOOL_SETTINGS; ++i) {
+        SLEQP_SETTINGS_BOOL ii = static_cast<SLEQP_SETTINGS_BOOL>(i);
+        if (op.first==sleqp_settings_bool_name(ii)) {
+          found = true;
+          SLEQP_CALL_EXC(sleqp_settings_set_bool_value(settings_,
+                                                       ii,
+                                                       op.second.to_bool()));
+        }
+      }
+      for (int i = 0; i < SLEQP_NUM_ENUM_SETTINGS; ++i) {
+        SLEQP_SETTINGS_ENUM ii = static_cast<SLEQP_SETTINGS_ENUM>(i);
+        if (op.first==sleqp_settings_enum_name(ii)) {
+          found = true;
+          std::string value = op.second.to_string();
+
+          SLEQP_CALL_EXC(sleqp_settings_set_enum_value_from_string(settings_,
+                                                                   ii,
+                                                                   value.c_str()));
+        }
+      }
+      casadi_assert(found, "Could not find option '" + op.first + "'.");
+    }
   }
 
   /** \brief Set the (persistent) work vectors */
@@ -302,54 +389,12 @@ namespace casadi {
                              num_cons,
                              m);
 
-    SLEQP_CALL_EXC(sleqp_settings_create(&m->internal.settings));
-
+    /*
     SLEQP_CALL_EXC(sleqp_settings_set_enum_value(m->internal.settings,
                                                  SLEQP_SETTINGS_ENUM_HESS_EVAL,
                                                  SLEQP_HESS_EVAL_DAMPED_BFGS));
+    */
 
-    // Read options
-    for (auto&& op : opts_) {
-      bool found = false;
-      for (int i = 0; i < SLEQP_NUM_INT_SETTINGS; ++i) {
-        SLEQP_SETTINGS_INT ii = static_cast<SLEQP_SETTINGS_INT>(i);
-        if (op.first==sleqp_settings_int_name(ii)) {
-          found = true;
-          SLEQP_CALL_EXC(sleqp_settings_set_int_value(m->internal.settings,
-                                                 ii,
-                                                 op.second.to_int()));
-        }
-      }
-      for (int i = 0; i < SLEQP_NUM_REAL_SETTINGS; ++i) {
-        SLEQP_SETTINGS_REAL ii = static_cast<SLEQP_SETTINGS_REAL>(i);
-        if (op.first==sleqp_settings_real_name(ii)) {
-          found = true;
-          SLEQP_CALL_EXC(sleqp_settings_set_real_value(m->internal.settings,
-                                                 ii,
-                                                 op.second.to_double()));
-        }
-      }
-      for (int i = 0; i < SLEQP_NUM_BOOL_SETTINGS; ++i) {
-        SLEQP_SETTINGS_BOOL ii = static_cast<SLEQP_SETTINGS_BOOL>(i);
-        if (op.first==sleqp_settings_bool_name(ii)) {
-          found = true;
-          SLEQP_CALL_EXC(sleqp_settings_set_bool_value(m->internal.settings,
-                                                 ii,
-                                                 op.second.to_bool()));
-        }
-      }
-      for (int i = 0; i < SLEQP_NUM_ENUM_SETTINGS; ++i) {
-        SLEQP_SETTINGS_ENUM ii = static_cast<SLEQP_SETTINGS_ENUM>(i);
-        if (op.first==sleqp_settings_enum_name(ii)) {
-          found = true;
-          std::string value = op.second.to_string();
-          SLEQP_CALL_EXC(sleqp_settings_set_enum_value_by_string(m->internal.settings,
-                                                 ii,
-                                                 value.c_str()));
-        }
-      }
-      casadi_assert(found, "Could not find option '" + op.first + "'.");
-    }
 
     /*
     SLEQP_CALL_EXC(sleqp_settings_set_enum_value(m->internal.settings,
@@ -363,7 +408,7 @@ namespace casadi {
                                                var_ub,
                                                cons_lb,
                                                cons_ub,
-                                               m->internal.settings));
+                                               settings_));
 
     SLEQP_CALL_EXC(sleqp_func_release(&func));
 
@@ -404,11 +449,16 @@ namespace casadi {
       w += ng_;
     }
 
-    /*
-    if (exact_hessian_) {
-      m->hess_lk = w; w += hesslag_sp_.nnz();
+    if (exact_hess()) {
+      m->h_dk = w;
+      w += nx_;
+
+      m->h_pk = w;
+      w += nx_;
+
+      m->h_mk = w;
+      w += ng_;
     }
-    */
 
     return;
   }
