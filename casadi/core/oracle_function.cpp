@@ -156,15 +156,17 @@ void OracleFunction::join_results(OracleMemory* m) const {
 Function OracleFunction::create_function(const std::string& fname,
     const std::vector<std::string>& s_in,
     const std::vector<std::string>& s_out,
-    const Function::AuxOut& aux) {
-  return create_function(oracle_, fname, s_in, s_out, aux);
+    const Function::AuxOut& aux,
+    const Dict& opts) {
+  return create_function(oracle_, fname, s_in, s_out, aux, opts);
 }
 
 Function OracleFunction::create_function(const std::string& fname,
       const std::vector<MX>& e_in,
       const std::vector<MX>& e_out,
       const std::vector<std::string>& s_in,
-      const std::vector<std::string>& s_out) {
+      const std::vector<std::string>& s_out,
+      const Dict& opts) {
 
   // Print progress
   if (verbose_) {
@@ -185,6 +187,7 @@ Function OracleFunction::create_function(const std::string& fname,
 
     // Combine specific and common options
     Dict opt = combine(specific_options, common_options_);
+    opt = combine(opts, opt);
 
     // Generate the function
     ret = Function(fname, e_in, e_out, s_in, s_out, opt);
@@ -209,7 +212,8 @@ Function OracleFunction::create_function(const std::string& fname,
 Function OracleFunction::create_function(const Function& oracle, const std::string& fname,
     const std::vector<std::string>& s_in,
     const std::vector<std::string>& s_out,
-    const Function::AuxOut& aux) {
+    const Function::AuxOut& aux,
+    const Dict& opts) {
   // Print progress
   if (verbose_) {
     casadi_message(name_ + "::create_function " + fname + ":" + str(s_in) + "->" + str(s_out));
@@ -229,6 +233,7 @@ Function OracleFunction::create_function(const Function& oracle, const std::stri
 
     // Combine specific and common options
     Dict opt = combine(specific_options, common_options_);
+    opt = combine(opts, opt);
 
     // Generate the function
     ret = oracle.factory(fname, s_in, s_out, aux, opt);

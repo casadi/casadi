@@ -92,12 +92,9 @@ namespace casadi {
   SLEQPInterface::~SLEQPInterface() {
     clear_mem();
 
-    try
-    {
+    try {
       SLEQP_CALL_EXC(sleqp_settings_release(&settings_));
-    }
-    catch(std::exception e)
-    {
+    } catch(std::exception e) {
       casadi_message(std::string("SLEQP error ") + e.what());
     }
   }
@@ -195,9 +192,16 @@ namespace casadi {
       // Multipliers
       alloc_w(ng_, true);
 
+      // Tweaking options for increased efficiency
+      Dict final_options;
+      final_options["is_diff_in"] = std::vector<bool>{true, false, false, false};
+      final_options["is_diff_out"] = std::vector<bool>{true};
+      Dict opts;
+      opts["final_options"] = final_options;
+
       // Setup NLP Hessian product
       Function func = create_function("nlp_grad_l", {"x", "p", "lam:f", "lam:g"},
-                                      {"grad:gamma:x"}, {{"gamma", {"f", "g"}}});
+                                      {"grad:gamma:x"}, {{"gamma", {"f", "g"}}}, opts);
 
       // only differentiate wrt first argument, i.e., x
       // inputs:
@@ -206,8 +210,6 @@ namespace casadi {
       // outputs:
       // "fwd_grad_gamma_x"
       Function ret = create_forward("nlp_grad_l", 1);
-
-      std::cout << "Hello";
     }
   }
 
@@ -596,6 +598,9 @@ namespace casadi {
     s.unpack("SLEQPInterface::max_iter", max_iter_);
     s.unpack("SLEQPInterface::max_wall_time", max_wall_time_);
     s.unpack("SLEQPInterface::opts", opts_);
+
+    SLEQP_CALL_EXC(sleqp_settings_create(&settings_));
+    update_settings(opts_);
   }
 
   void SLEQPInterface::serialize_body(SerializingStream &s) const {
