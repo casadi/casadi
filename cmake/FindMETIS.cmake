@@ -2,7 +2,7 @@ message("METIS: find via CONFIG")
 find_package(METIS CONFIG NO_CMAKE_FIND_ROOT_PATH)
 message("METIS: ${METIS_FOUND}")
 
-if(NOT WORHP_FOUND)
+if(NOT METIS_FOUND)
 
     # TRY TO FIND THE METIS LIBRARY
 
