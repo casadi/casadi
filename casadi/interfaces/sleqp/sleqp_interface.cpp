@@ -87,13 +87,15 @@ namespace casadi {
 
   SLEQPInterface::SLEQPInterface(const std::string& name, const Function& nlp)
     : Nlpsol(name, nlp) {
+      settings_ = nullptr;
   }
 
   SLEQPInterface::~SLEQPInterface() {
     clear_mem();
 
     try {
-      SLEQP_CALL_EXC(sleqp_settings_release(&settings_));
+      if (settings_) SLEQP_CALL_EXC(sleqp_settings_release(&settings_));
+      settings_ = nullptr;
     } catch(std::exception e) {
       casadi_message(std::string("SLEQP error ") + e.what());
     }
@@ -597,6 +599,7 @@ namespace casadi {
     s.unpack("SLEQPInterface::jacg_sp", jacg_sp_);
     s.unpack("SLEQPInterface::max_iter", max_iter_);
     s.unpack("SLEQPInterface::max_wall_time", max_wall_time_);
+    s.unpack("SLEQPInterface::print_level", print_level_);
     s.unpack("SLEQPInterface::opts", opts_);
 
     SLEQP_CALL_EXC(sleqp_settings_create(&settings_));
@@ -609,6 +612,7 @@ namespace casadi {
     s.pack("SLEQPInterface::jacg_sp", jacg_sp_);
     s.pack("SLEQPInterface::max_iter", max_iter_);
     s.pack("SLEQPInterface::max_wall_time", max_wall_time_);
+    s.pack("SLEQPInterface::print_level", print_level_);
     s.pack("SLEQPInterface::opts", opts_);
   }
 
