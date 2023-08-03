@@ -151,6 +151,11 @@ namespace casadi {
     }
 
     SLEQP_CALL_EXC(sleqp_settings_create(&settings_));
+
+    // Set Exact Hessian default (per CasADi conventions)
+    SLEQP_CALL_EXC(sleqp_settings_set_enum_value(settings_,
+                                                 SLEQP_SETTINGS_ENUM_HESS_EVAL,
+                                                 SLEQP_HESS_EVAL_EXACT));
     update_settings(opts_);
 
     // Setup NLP functions
