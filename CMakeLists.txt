@@ -691,6 +691,7 @@ option(WITH_UNO "Compile the interface to UNO" ON)
 set(BUILD_UNO_GIT_REPO "https://github.com/jgillis/Uno.git" CACHE STRING "Git repo used together with BUILD_UNO_VERSION")
 set(BUILD_UNO_VERSION "main" CACHE STRING "Tag/branch/hash to be used for BUILD_UNO_GIT_REPO")
 option(WITH_BUILD_UNO "Build UNO (BUILD_UNO_VERSION=${BUILD_UNO_VERSION}) from downloaded source (BUILD_UNO_GIT_REPO=${BUILD_UNO_GIT_REPO})." OFF)
+set(BUILD_UNO_DEPENDENCIES MA57 BQPD)
 
 # IPOPT: A sparse interior point NLP solver with filter line-search
 option(WITH_IPOPT "Compile the interface to IPOPT" ${WITH_IPOPT_DEF})
@@ -774,13 +775,22 @@ set(BUILD_SPRAL_DEPENDENCIES LAPACK METIS)
 
 # HSL: Sparse direct linear solvers
 option(WITH_HSL "Enable HSL interface" OFF)
-option(WITH_MOCKUP_HSL "Use mockup WORHP (BUILD_MOCKUPS_VERSION=${BUILD_MOCKUPS_VERSION}) from downloaded source (BUILD_MOCKUPS_GIT_REPO=${BUILD_MOCKUPS_GIT_REPO})." OFF)
+option(WITH_MOCKUP_HSL "Use mockup HSL (BUILD_MOCKUPS_VERSION=${BUILD_MOCKUPS_VERSION}) from downloaded source (BUILD_MOCKUPS_GIT_REPO=${BUILD_MOCKUPS_GIT_REPO})." OFF)
 option(WITH_BUILD_HSL "Build HSL from supplied source directory (BUILD_HSL_SRC=${BUILD_HSL_SRC})." OFF)
 if(WITH_BUILD_HSL AND WITH_MOCKUP_HSL)
     message(FATAL_ERROR "WITH_BUILD_HSL and WITH_MOCKUP_HSL are mutually exclusive.")
 endif()
 set(BUILD_HSL_SRC "." CACHE STRING "Source loction of coinhsl")
 set(BUILD_HSL_DEPENDENCIES LAPACK METIS)
+
+# BQPD: Indefinite QP solver
+option(WITH_BQPD "Enable BQPD interface" OFF)
+option(WITH_MOCKUP_BQPD "Use mockup BQPD (BUILD_MOCKUPS_VERSION=${BUILD_MOCKUPS_VERSION}) from downloaded source (BUILD_MOCKUPS_GIT_REPO=${BUILD_MOCKUPS_GIT_REPO})." OFF)
+option(WITH_BUILD_BQPD "Build BQPD from supplied source directory (BUILD_BQPD_SRC=${BUILD_BQPD_SRC})." OFF)
+if(WITH_BUILD_BQPD AND WITH_MOCKUP_BQPD)
+    message(FATAL_ERROR "WITH_BUILD_BQPD and WITH_MOCKUP_BQPD are mutually exclusive.")
+endif()
+set(BUILD_BQPD_SRC "." CACHE STRING "Source loction of bqpd")
 
 # HIGHS: A MILP / QP solver
 option(WITH_HIGHS "Compile the HiGHS interface" OFF)
@@ -1199,6 +1209,33 @@ if(WITH_HSL)
   endif()
 endif()
 
+if(WITH_BQPD)
+  if (WITH_MOCKUP_BQPD)
+      add_library(bqpd::bqpd SHARED IMPORTED)
+      add_dependencies(bqpd::bqpd mockups-external)
+      set_target_properties(bqpd::bqpd PROPERTIES
+        IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/mockups/bqpd/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}bqpd${CMAKE_SHARED_LIBRARY_SUFFIX}"
+        IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/mockups/bqpd/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}bqpd${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+      )
+  elseif(WITH_BUILD_BQPD)
+    add_feature_info(bqpd-sourcebuild ON "Build BQPD from supplied source.")
+    ExternalProject_Add(bqpd-external
+        SOURCE_DIR ${BUILD_BQPD_SRC}
+        PREFIX "${CMAKE_BINARY_DIR}/external_projects"
+        UPDATE_COMMAND ""
+        BUILD_ALWAYS ON
+        CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
+        CMAKE_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
+    file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/external_projects")
+    add_library(bqpd::bqpd SHARED IMPORTED)
+    add_dependencies(bqpd::bqpd bqpd-external)
+    set_target_properties(bqpd::bqpd PROPERTIES
+      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}bqpd${CMAKE_STATIC_LIBRARY_SUFFIX}"
+      IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/mockups/bqpd/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}bqpd${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+    )
+  endif()
+endif()
+
 if(WITH_MUMPS)
   if(WITH_BUILD_MUMPS)
     get_target_property(METIS_INCLUDE_DIR metis::metis INTERFACE_INCLUDE_DIRECTORIES)
@@ -1399,6 +1436,8 @@ if(WITH_UNO)
   if(WITH_BUILD_UNO)
     get_target_property(HSL_IMPORTED_IMPLIB_FULL hsl::hsl IMPORTED_IMPLIB)
     get_filename_component(HSL_IMPORTED_IMPLIB "${HSL_IMPORTED_IMPLIB_FULL}" DIRECTORY)
+    get_target_property(BQPD_IMPORTED_IMPLIB_FULL bqpd::bqpd IMPORTED_IMPLIB)
+    get_filename_component(BQPD_IMPORTED_IMPLIB "${BQPD_IMPORTED_IMPLIB_FULL}" DIRECTORY)
     ExternalProject_Add(uno-external
         DEPENDS ${LAPACK_DEPENDS_TARGET}
         GIT_REPOSITORY ${BUILD_UNO_GIT_REPO}
@@ -1407,19 +1446,19 @@ if(WITH_UNO)
         UPDATE_COMMAND ""
         BUILD_ALWAYS ON
         CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
-        CMAKE_ARGS ${CMAKE_BLAS_CONFIG} -Dma57_LIB=${HSL_IMPORTED_IMPLIB} -DWITH_OPENMP=OFF -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DWITH_CASADI=ON -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> "-DCMAKE_CXX_FLAGS=-fPIC" -DCMAKE_C_FLAGS="-fPIC" -DCMAKE_Fortran_FLAGS="-fPIC")
+        CMAKE_ARGS ${CMAKE_BLAS_CONFIG} -Dma57_LIB=${HSL_IMPORTED_IMPLIB} -Dbqpd_LIB=${BQPD_IMPORTED_IMPLIB} -DWITH_OPENMP=OFF -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DWITH_CASADI=OFF -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
     message("test ${CMAKE_CURRENT_BINARY_DIR}/external_projects")
     file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/external_projects")
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/uno")
 
-    add_library(uno STATIC IMPORTED)
+    add_library(uno SHARED IMPORTED)
     add_dependencies(uno uno-external)
     set_target_properties(uno PROPERTIES
-      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}uno${CMAKE_STATIC_LIBRARY_SUFFIX}"
+      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}uno${CMAKE_SHARED_LIBRARY_SUFFIX}"
+      IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}uno${CMAKE_IMPORT_LIBRARY_SUFFIX}"
       INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include/uno"
     )
-
-    # target_compile_features(uno INTERFACE cxx_std_17)
+    target_compile_features(uno INTERFACE cxx_std_17)
   endif()
 endif()
 add_feature_info(uno-interface WITH_UNO "Interface to the NLP solver UNO.")
