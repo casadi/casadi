@@ -636,7 +636,7 @@ inline const char* return_status_string(Result result) {
     // CasadiModel casadi_model = &m->model;
 
     // ::Options uno_options = rewrite_options(opts_);
-    ::Options uno_options = get_default_options("/home/david/casadi_fork/casadi/casadi/interfaces/uno/uno.options");
+    ::Options uno_options = get_default_options(GlobalOptions::casadi_include_path + filesep() + "uno/uno.options");
     // define preset and insert options given through casadi 
     insert_casadi_options(uno_options, opts_);
     uno_options.print();

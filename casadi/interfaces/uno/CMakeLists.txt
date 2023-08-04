@@ -6,3 +6,8 @@ casadi_plugin(Nlpsol uno
   uno_interface_meta.cpp)
 
 casadi_plugin_link_libraries(Nlpsol uno uno)
+
+install(FILES
+  "${CMAKE_CURRENT_SOURCE_DIR}/uno.options"
+  DESTINATION "${INCLUDE_PREFIX}/uno")
+  
