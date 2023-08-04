@@ -687,7 +687,7 @@ option(WITH_BUILD_SLEQP "Build SLEQP (BUILD_SLEQP_VERSION=${BUILD_SLEQP_VERSION}
 set(BUILD_SLEQP_DEPENDENCIES HIGHS TRLIB MUMPS)
 # set(BUILD_SLEQP_DEPENDENCIES MUMPS)
 
-option(WITH_UNO "Compile the interface to UNO" ON)
+option(WITH_UNO "Compile the interface to UNO" OFF)
 set(BUILD_UNO_GIT_REPO "https://github.com/jgillis/Uno.git" CACHE STRING "Git repo used together with BUILD_UNO_VERSION")
 set(BUILD_UNO_VERSION "main" CACHE STRING "Tag/branch/hash to be used for BUILD_UNO_GIT_REPO")
 option(WITH_BUILD_UNO "Build UNO (BUILD_UNO_VERSION=${BUILD_UNO_VERSION}) from downloaded source (BUILD_UNO_GIT_REPO=${BUILD_UNO_GIT_REPO})." OFF)
