@@ -39,7 +39,6 @@
 #include "tools/Logger.hpp"
 
 #include "Uno.hpp"
-Level Logger::level = INFO;
 
 // Casadi Includes
 #include "uno_interface.hpp"
