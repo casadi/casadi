@@ -703,7 +703,7 @@ set(BUILD_IPOPT_DEPENDENCIES MUMPS)
 
 option(WITH_MOCKUP_REQUIRED ON)
 set(BUILD_MOCKUPS_GIT_REPO https://github.com/casadi/mockups.git CACHE STRING "Git repo used together with BUILD_MOCKUPS_VERSION")
-set(BUILD_MOCKUPS_VERSION v62 CACHE STRING "Tag/branch/hash to be used for BUILD_MOCKUPS_GIT_REPO")
+set(BUILD_MOCKUPS_VERSION v63 CACHE STRING "Tag/branch/hash to be used for BUILD_MOCKUPS_GIT_REPO")
 
 # Knitro: An NLP solver
 option(WITH_KNITRO "Compile the interface to KNITRO" OFF)
@@ -780,7 +780,7 @@ option(WITH_BUILD_HSL "Build HSL from supplied source directory (BUILD_HSL_SRC=$
 if(WITH_BUILD_HSL AND WITH_MOCKUP_HSL)
     message(FATAL_ERROR "WITH_BUILD_HSL and WITH_MOCKUP_HSL are mutually exclusive.")
 endif()
-set(BUILD_HSL_SRC "." CACHE STRING "Source loction of coinhsl")
+set(BUILD_HSL_SRC "<FILL IN HSL SOURCE DIR IN BUILD_HSL_SRC>" CACHE STRING "Source loction of coinhsl")
 set(BUILD_HSL_DEPENDENCIES LAPACK METIS)
 
 # BQPD: Indefinite QP solver
@@ -790,7 +790,7 @@ option(WITH_BUILD_BQPD "Build BQPD from supplied source directory (BUILD_BQPD_SR
 if(WITH_BUILD_BQPD AND WITH_MOCKUP_BQPD)
     message(FATAL_ERROR "WITH_BUILD_BQPD and WITH_MOCKUP_BQPD are mutually exclusive.")
 endif()
-set(BUILD_BQPD_SRC "." CACHE STRING "Source loction of bqpd")
+set(BUILD_BQPD_SRC "<FILL IN BQPD SOURCE DIR IN BUILD_BQPD_SRC>" CACHE STRING "Source loction of bqpd")
 
 # HIGHS: A MILP / QP solver
 option(WITH_HIGHS "Compile the HiGHS interface" OFF)
@@ -1223,7 +1223,6 @@ if(WITH_BQPD)
         SOURCE_DIR ${BUILD_BQPD_SRC}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
-        BUILD_ALWAYS ON
         CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
         CMAKE_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
     file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/external_projects")
@@ -1444,7 +1443,6 @@ if(WITH_UNO)
         GIT_TAG ${BUILD_UNO_VERSION}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
-        BUILD_ALWAYS ON
         CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
         CMAKE_ARGS ${CMAKE_BLAS_CONFIG} -Dma57_LIB=${HSL_IMPORTED_IMPLIB} -Dbqpd_LIB=${BQPD_IMPORTED_IMPLIB} -DWITH_OPENMP=OFF -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DWITH_CASADI=OFF -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
     message("test ${CMAKE_CURRENT_BINARY_DIR}/external_projects")
