@@ -64,10 +64,10 @@ int main(int, char**) {
       if(ret != CL_SUCCESS) return 1;
       std::cout << "Device type: ";
       switch(type){
-        case CL_DEVICE_TYPE_CPU: cout << "CPU"; break;
-        case CL_DEVICE_TYPE_GPU: cout << "GPU"; break;
-        case CL_DEVICE_TYPE_ACCELERATOR: cout << "ACCELERATOR"; break;
-        case CL_DEVICE_TYPE_DEFAULT: cout << "DEFAULT"; break;
+        case CL_DEVICE_TYPE_CPU: std::cout << "CPU"; break;
+        case CL_DEVICE_TYPE_GPU: std::cout << "GPU"; break;
+        case CL_DEVICE_TYPE_ACCELERATOR: std::cout << "ACCELERATOR"; break;
+        case CL_DEVICE_TYPE_DEFAULT: std::cout << "DEFAULT"; break;
         default: return 1;
       }
       std::cout << std::endl;
