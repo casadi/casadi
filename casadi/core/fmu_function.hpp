@@ -337,7 +337,9 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
       \identifier{27a} */
   static ProtoFunction* deserialize(DeserializingStream& s) { return new FmuFunction(s); }
 
-  /** \brief Change option after object creation for debugging */
+  /** \brief Change option after object creation for debugging
+
+      \identifier{27f} */
   void change_option(const std::string& option_name, const GenericType& option_value) override;
 
   protected:
