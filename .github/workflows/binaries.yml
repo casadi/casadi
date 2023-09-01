@@ -252,11 +252,11 @@ jobs:
               - type: append
                 matrix:
                   arch: [manylinux2014-x64,manylinux2014-x86]
-                  py2: ["36","37","38","39","310","311"]
+                  py2: ["36","37","38","39","310","311","312"]
               - type: append
                 matrix:
                   arch: [windows-shared-x64-posix]
-                  py2: ["27","35","36","37","38","39","310","311"]
+                  py2: ["27","35","36","37","38","39","310","311","312"]
               - type: append
                 matrix:
                   arch: [manylinux2014-aarch64]
@@ -273,13 +273,13 @@ jobs:
           config: |
             matrix:
               image: [macos-11]
-              py2: ["27","35","36","37","38","39","310","311"]
+              py2: ["27","35","36","37","38","39","310","311","312"]
             operations:
               - type: append
                 if: ${{ vars.BLESSED_REPO == 'yes' }}
                 matrix:
                   image: [macos-m1]
-                  py2: ["38","39","310","311"]
+                  py2: ["38","39","310","311","312"]
 
     outputs:
       matrix: ${{ steps.build-matrix.outputs.matrix }}
@@ -931,7 +931,7 @@ jobs:
     strategy:
      fail-fast: false
      matrix:
-       py2: ["27","35","36","37","38","39","310","311"]
+       py2: ["27","35","36","37","38","39","310","311","312"]
        image: ["windows-2022","ubuntu-20.04","macos-11"]
        bit: [64]
        exclude:
