@@ -1119,6 +1119,6 @@ jobs:
           version: tags/nightly-${{ env.GITHUB_REF_SLUG }}
           file: casadi-${{ needs.version.outputs.wheel }}-cp${{matrix.py2}}-none-${{env.platform}}.whl
       - run: |
-          cd test/python
           pip install casadi-${{ needs.version.outputs.wheel }}-cp${{matrix.py2}}-none-${{env.platform}}.whl
+          cd test/python
           python function.py
