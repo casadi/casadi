@@ -192,10 +192,32 @@ namespace casadi {
     // bound for equality constraints and double-sided for inequality constraints
     const Eigen::Array<bool, Eigen::Dynamic, 1>
     lhs_equals_rhs_constraint = (m->uba_vector.array() == m->lba_vector.array()).eval();
+    std::vector<unsigned int> number_of_prev_equality(lhs_equals_rhs_constraint.size(), 0);
+    std::vector<unsigned int> number_of_prev_inequality(lhs_equals_rhs_constraint.size(), 0);
     std::vector<double> tmp_eq_vector;
     std::vector<double> tmp_ineq_lb_vector;
     std::vector<double> tmp_ineq_ub_vector;
     {
+
+      // number_of_prev_equality and number_of_prev_inequality are two vectors that contains the number of
+      // equality and inequality that can be found before the current index
+      // number_of_prev_equality[i] = number of equality that can be found before index i
+      // number_of_prev_inequality[i] = number of inequality that can be found before index i
+      // For instance:
+      //     equality and inequality   [i, e, e, e, i, i, i, e]
+      //     lhs_equals_rgs_contraint  [f, t, t, t, f, f, f, t]
+      //     number_of_prev_equality   [0, 0, 1, 3, 3, 3, 3, 3]
+      //     number_of_prev_inequality [0, 1, 1, 1, 1, 2, 3, 4]
+      for (std::size_t k=1; k<lhs_equals_rhs_constraint.size(); ++k) {
+        if (lhs_equals_rhs_constraint[k-1]) {
+          number_of_prev_equality[k] = number_of_prev_equality[k-1] + 1;
+          number_of_prev_inequality[k] = number_of_prev_inequality[k-1];
+        } else {
+          number_of_prev_inequality[k] = number_of_prev_inequality[k-1] + 1;
+          number_of_prev_equality[k] = number_of_prev_equality[k-1];
+        }
+      }
+
       for (std::size_t k=0; k<lhs_equals_rhs_constraint.size(); ++k) {
         if (lhs_equals_rhs_constraint[k]) {
           tmp_eq_vector.push_back(m->lba_vector[k]);
@@ -246,13 +268,15 @@ namespace casadi {
     for (int k=0; k<A_.nnz(); ++k) {
       // Detect equality constraint
       if (lhs_equals_rhs_constraint[m->row[k]]) {
+        // Equality constraint the row[k] is decreased by the number of previous inequality constraints
         m->tripletListEq.push_back(T(
-          static_cast<double>(m->row[k]),
+          static_cast<double>(m->row[k] - number_of_prev_inequality[m->row[k]]),
           static_cast<double>(m->col[k]),
           static_cast<double>(A[k])));
       } else {
+        // Inequality constraint the row[k] is decreased by the number of previous equality constraints
         m->tripletList.push_back(T(
-          static_cast<double>(m->row[k]),
+          static_cast<double>(m->row[k] - number_of_prev_equality[m->row[k]]),
           static_cast<double>(m->col[k]),
           static_cast<double>(A[k])));
       }
@@ -270,7 +294,7 @@ namespace casadi {
       }
     }
 
-    Eigen::SparseMatrix<double> A_spa(n_eq, m->tripletListEq.size());
+    Eigen::SparseMatrix<double> A_spa(n_eq, nx_);
     A_spa.setFromTriplets(m->tripletListEq.begin(), m->tripletListEq.end());
     m->tripletListEq.clear();
 
