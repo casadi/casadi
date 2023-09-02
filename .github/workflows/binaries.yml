@@ -314,6 +314,7 @@ jobs:
       - uses: conda-incubator/setup-miniconda@v2.2.0
         with:
           python-version: ${{steps.get-id.outputs.pydot2}}
+          channels: conda-forge,defaults,ad-testing/label/py312
       - uses: actions/download-artifact@v3.0.2
         with:
           name: casadi_source_wrapper
@@ -984,6 +985,7 @@ jobs:
           python-version: ${{steps.get-id.outputs.pydot2}}
           activate-environment: py${{steps.get-id.outputs.pydot2}}
           auto-update-conda: true
+          channels: conda-forge,defaults,ad-testing/label/py312
       - run: |
           pip install numpy scipy pandas
         shell: bash -el {0}
@@ -1065,6 +1067,7 @@ jobs:
           python-version: ${{steps.get-id.outputs.pydot2}}
           activate-environment: py${{steps.get-id.outputs.pydot2}}
           auto-update-conda: true
+          channels: conda-forge,defaults,ad-testing/label/py312
       - run: |
           pip install numpy scipy pandas
         shell: bash -el {0}
