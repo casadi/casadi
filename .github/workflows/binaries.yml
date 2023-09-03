@@ -1069,11 +1069,11 @@ jobs:
           auto-update-conda: true
           channels: conda-forge,defaults,ad-testing/label/py312
       - run: |
-          pip install numpy scipy pandas
+          pip install -vvv numpy scipy pandas
         shell: bash -el {0}
         if: "!contains(matrix.image, 'windows')"
       - run: |
-          pip install numpy scipy pandas
+          pip install -vvv numpy scipy pandas
         shell: pwsh
         if: contains(matrix.image, 'windows')
       - env:
