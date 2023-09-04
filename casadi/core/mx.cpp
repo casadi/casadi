@@ -207,7 +207,7 @@ namespace casadi {
 
   void MX::get(MX& m, bool ind1, const Slice& rr, const MX& cc) const {
     casadi_assert(is_dense(), "Parametric slicing only supported for dense matrices. ");
-    m = (*this)->get_nz_ref(rr.apply(size1()), (ind1 ? cc-1 : cc)*size1());
+    m = (*this)->get_nz_ref(rr.apply(size1()), floor(ind1 ? cc-1 : cc)*size1());
   }
 
   void MX::get(MX& m, bool ind1, const MX& rr, const Slice& cc) const {
@@ -217,7 +217,7 @@ namespace casadi {
 
   void MX::get(MX& m, bool ind1, const MX& rr, const MX& cc) const {
     casadi_assert(is_dense(), "Parametric slicing only supported for dense matrices.");
-    m = (*this)->get_nz_ref(ind1 ? rr-1 : rr, (ind1 ? cc-1 : cc)*size1());
+    m = (*this)->get_nz_ref(ind1 ? rr-1 : rr, floor(ind1 ? cc-1 : cc)*size1());
   }
 
   void MX::set(const MX& m, bool ind1, const Slice& rr, const Slice& cc) {

@@ -3098,6 +3098,23 @@ class MXtests(casadiTestCase):
     self.checkfunction(f,f.expand(), inputs=[vertcat(1.1,1.3,1.7)])
 
 
-  
+  def test_fractional_slicing(self):
+
+    t = MX.sym("x")
+
+    f = Function('f',[t],[MX(DM([1,2]))[t]])
+
+    self.assertEqual(f(0),1)
+    self.assertEqual(f(1),2)
+    self.assertEqual(f(0.5),1)
+    self.assertEqual(f(0.9),1)
+    
+    f = Function('f',[t],[MX(DM([[1,2],[3,4]]))[:,t]])
+
+    self.checkarray(f(0),DM([1,3]))
+    self.checkarray(f(1),DM([2,4]))
+    self.checkarray(f(0.5),DM([1,3]))
+    self.checkarray(f(0.9),DM([1,3]))
+
 if __name__ == '__main__':
     unittest.main()
