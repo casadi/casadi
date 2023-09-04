@@ -82,7 +82,7 @@ jobs:
       if: github.event_name != 'pull_request'
     - run: python setup.py sdist && ls && ls dist
     - name: Delete old release assets
-      uses: mknejp/delete-release-assets@v1
+      uses: jgillis/delete-release-assets@main
       with:
         token: ${{ github.token }}
         tag: nightly-${{ env.GITHUB_REF_SLUG }}
@@ -360,7 +360,7 @@ jobs:
         uses: rlespinasse/github-slug-action@v4.4.1
       - run: cp casadi-${{env.deploy_arch}}-py${{matrix.py2}}.zip casadi-${{ needs.version.outputs.casadi }}-${{env.deploy_arch}}-py${{matrix.py2}}.zip
       - name: Delete old release assets
-        uses: mknejp/delete-release-assets@v1
+        uses: jgillis/delete-release-assets@main
         with:
           token: ${{ github.token }}
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
@@ -389,7 +389,7 @@ jobs:
         id: wheel
         shell: bash -el {0}
       - name: Delete old release assets
-        uses: mknejp/delete-release-assets@v1
+        uses: jgillis/delete-release-assets@main
         with:
           token: ${{ github.token }}
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
@@ -502,7 +502,7 @@ jobs:
         uses: rlespinasse/github-slug-action@v4.4.1
       - run: cp casadi-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip casadi-${{ needs.version.outputs.casadi }}-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip
       - name: Delete old release assets
-        uses: mknejp/delete-release-assets@v1
+        uses: jgillis/delete-release-assets@main
         with:
           token: ${{ github.token }}
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
@@ -596,7 +596,7 @@ jobs:
         uses: rlespinasse/github-slug-action@v4.4.1
       - run: cp casadi-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip casadi-${{ needs.version.outputs.casadi }}-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip
       - name: Delete old release assets
-        uses: mknejp/delete-release-assets@v1
+        uses: jgillis/delete-release-assets@main
         with:
           token: ${{ github.token }}
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
@@ -690,7 +690,7 @@ jobs:
         uses: rlespinasse/github-slug-action@v4.4.1
       - run: cp casadi-${{env.os}}${{env.suffix}}-py${{matrix.py2}}.zip casadi-${{ needs.version.outputs.casadi }}-${{env.os}}${{env.suffix}}-py${{matrix.py2}}.zip
       - name: Delete old release assets
-        uses: mknejp/delete-release-assets@v1
+        uses: jgillis/delete-release-assets@main
         with:
           token: ${{ github.token }}
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
@@ -724,7 +724,7 @@ jobs:
           echo "wheel_wildcard=$wheel_wildcard" >> $GITHUB_OUTPUT
         id: wheel
       - name: Delete old release assets
-        uses: mknejp/delete-release-assets@v1
+        uses: jgillis/delete-release-assets@main
         with:
           token: ${{ github.token }}
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
