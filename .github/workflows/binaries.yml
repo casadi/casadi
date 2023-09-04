@@ -1069,11 +1069,11 @@ jobs:
           auto-update-conda: true
           channels: conda-forge,defaults,ad-testing/label/py312
       - run: |
-          pip install -vvv numpy scipy pandas
+          pip install numpy scipy pandas
         shell: bash -el {0}
         if: "!contains(matrix.image, 'windows')"
       - run: |
-          pip install -vvv numpy scipy pandas
+          pip install numpy scipy pandas
         shell: pwsh
         if: contains(matrix.image, 'windows')
       - env:
@@ -1119,6 +1119,6 @@ jobs:
           version: tags/nightly-${{ env.GITHUB_REF_SLUG }}
           file: casadi-${{ needs.version.outputs.wheel }}-cp${{matrix.py2}}-none-${{env.platform}}.whl
       - run: |
-          pip install casadi-${{ needs.version.outputs.wheel }}-cp${{matrix.py2}}-none-${{env.platform}}.whl
+          pip install -vvv casadi-${{ needs.version.outputs.wheel }}-cp${{matrix.py2}}-none-${{env.platform}}.whl
           cd test/python
           python function.py
