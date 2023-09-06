@@ -159,6 +159,8 @@ namespace casadi {
     casadi_assert(!flag && m->env, "Failed to create GUROBI environment. Flag: " + str(flag)
       + ":" + GRBgeterrormsg(m->env));
 
+    m->pool_sol_nr = 0;
+
     m->sos_weights = sos_weights_;
     m->sos_beg = sos_beg_;
     m->sos_ind = sos_ind_;
@@ -515,6 +517,27 @@ namespace casadi {
         }
       }
 
+      // Get solutions from solution pool
+      flag = GRBgetintattr(model, GRB_INT_ATTR_SOLCOUNT, &(m->pool_sol_nr));
+      if (!flag && m->pool_sol_nr > 0) {
+        m->pool_obj_vals = std::vector<double>(m->pool_sol_nr, casadi::nan);
+        for (int idx = 0; idx < m->pool_sol_nr; ++idx) {
+          double x_pool[nx_];
+
+          flag = GRBsetintparam(GRBgetenv(model), GRB_INT_PAR_SOLUTIONNUMBER, idx);
+          if (!flag) flag = GRBgetdblattr(model, GRB_DBL_ATTR_POOLOBJVAL, &(m->pool_obj_vals[idx]));
+          if (!flag) flag = GRBgetdblattrarray(model, GRB_DBL_ATTR_XN, 0, nx_, x_pool);
+
+          if (flag) {
+            m->pool_obj_vals[idx] = casadi::nan;
+            std::fill_n(x_pool, nx_, casadi::nan);
+          }
+          
+          std::vector<double> x_pool_vec(x_pool, x_pool+nx_);
+          m->pool_solutions.push_back(x_pool_vec);
+        }
+      }
+
       // Free memory
       GRBfreemodel(model);
       m->fstats.at("postprocessing").toc();
@@ -532,6 +555,9 @@ namespace casadi {
     Dict stats = Conic::get_stats(mem);
     auto m = static_cast<GurobiMemory*>(mem);
     stats["return_status"] = return_status_string(m->return_status);
+    stats["pool_sol_nr"] = m->pool_sol_nr;
+    stats["pool_obj_val"] = m->pool_obj_vals;
+	  stats["pool_solutions"] = m->pool_solutions;
     return stats;
   }
 

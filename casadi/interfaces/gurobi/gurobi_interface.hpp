@@ -52,6 +52,10 @@ namespace casadi {
 
     int return_status;
 
+    int pool_sol_nr;
+    std::vector<double> pool_obj_vals;
+    std::vector<std::vector<double>> pool_solutions;
+
     // SOS structure
     std::vector<double> sos_weights;
     std::vector<int> sos_beg;
