@@ -251,11 +251,11 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
 
   // Evaluate all tasks numerically, serially or in parallel
   int eval_all(FmuMemory* m, casadi_int n_task,
-    bool need_nondiff, bool need_jac, bool need_adj, bool need_hess) const;
+    bool need_nondiff, bool need_jac, bool need_fwd, bool need_adj, bool need_hess) const;
 
   // Evaluate numerically, single thread
   int eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
-    bool need_nondiff, bool need_jac, bool need_adj, bool need_hess) const;
+    bool need_nondiff, bool need_jac, bool need_fwd, bool need_adj, bool need_hess) const;
 
   // Remove NaNs from Hessian (necessary for star coloring approach)
   void remove_nans(double *hess_nz, casadi_int* iw) const;

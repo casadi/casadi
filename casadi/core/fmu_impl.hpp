@@ -136,6 +136,15 @@ class CASADI_EXPORT FmuInternal : public SharedObjectInternal {
   void request_sens(FmuMemory* m, casadi_int nsens, const casadi_int* id,
     const casadi_int* wrt_id) const;
 
+  // Set all forward seeds for a single input
+  void set_fwd(FmuMemory* m, size_t ind, const double* v) const;
+
+  // Request the calculation of all forward sensitivities for an output
+  void request_fwd(FmuMemory* m, casadi_int ind) const;
+
+  // Get the forward sensitivities for a single output
+  void get_fwd(FmuMemory* m, size_t ind, double* v) const;
+
   // Calculate directional derivatives
   int eval_derivative(FmuMemory* m, bool independent_seeds) const;
 

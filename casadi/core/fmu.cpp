@@ -301,6 +301,30 @@ void Fmu::get_sens(FmuMemory* m, casadi_int nsens, const casadi_int* id, double*
   }
 }
 
+void Fmu::set_fwd(FmuMemory* m, size_t ind, const double* v) const {
+  try {
+    return (*this)->set_fwd(m, ind, v);
+  } catch(std::exception& e) {
+    THROW_ERROR("set_fwd", e.what());
+  }
+}
+
+void Fmu::request_fwd(FmuMemory* m, casadi_int ind) const {
+  try {
+    return (*this)->request_fwd(m, ind);
+  } catch(std::exception& e) {
+    THROW_ERROR("request_fwd", e.what());
+  }
+}
+
+void Fmu::get_fwd(FmuMemory* m, size_t ind, double* v) const {
+  try {
+    return (*this)->get_fwd(m, ind, v);
+  } catch(std::exception& e) {
+    THROW_ERROR("get_fwd", e.what());
+  }
+}
+
 void Fmu::get_stats(FmuMemory* m, Dict* stats,
     const std::vector<std::string>& name_in, const InputStruct* in) const {
   try {
@@ -479,6 +503,35 @@ void FmuInternal::request_sens(FmuMemory* m, casadi_int nsens, const casadi_int*
 void FmuInternal::get_sens(FmuMemory* m, casadi_int nsens, const casadi_int* id, double* v) const {
   for (casadi_int i = 0; i < nsens; ++i) {
     *v++ = m->sens_.at(*id++);
+  }
+}
+
+void FmuInternal::set_fwd(FmuMemory* m, size_t ind, const double* v) const {
+  // If seeds are zero, no need to add to seed buffers
+  if (!v) return;
+  // Pass all seeds FIXME(@jaeandersson): should use compatible types
+  for (size_t id : ired_[ind]) {
+    casadi_int id2 = id;
+    set_seed(m, 1, &id2, v++);
+  }
+}
+
+void FmuInternal::request_fwd(FmuMemory* m, casadi_int ind) const {
+  // Request all sensitivities FIXME(@jaeandersson): should use compatible types
+  casadi_int wrt_id = -1;
+  for (size_t id : ored_[ind]) {
+    casadi_int id2 = id;
+    request_sens(m, 1, &id2, &wrt_id);
+  }
+}
+
+void FmuInternal::get_fwd(FmuMemory* m, size_t ind, double* v) const {
+  // Quick return if not needed
+  if (!v) return;
+  // Retrieve all sensitivities FIXME(@jaeandersson): should use compatible types
+  for (size_t id : ored_[ind]) {
+    casadi_int id2 = id;
+    get_sens(m, 1, &id2, v++);
   }
 }
 

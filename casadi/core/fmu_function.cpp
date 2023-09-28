@@ -286,9 +286,8 @@ void FmuFunction::init(const Dict& opts) {
     }
   }
 
-  // Forward derivatives not yet implemented
-  if (has_fwd_) casadi_warning("Forward derivatives not implemented, ignored");
-
+  // Forward derivatives only supported with analytic derivatives
+  if (has_fwd_ && !enable_ad_) casadi_error("Analytic derivatives needed for forward directional derivatives");
 
   // Quick return if no Jacobian calculation
   if (!has_jac_ && !has_adj_ && !has_hess_) return;
@@ -786,13 +785,16 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
   FmuMemory* m = static_cast<FmuMemory*>(mem);
   casadi_assert(m != 0, "Memory is null");
   // What blocks are there?
-  bool need_jac = false, need_adj = false, need_hess = false;
+  bool need_jac = false, need_fwd = false, need_adj = false, need_hess = false;
   for (size_t k = 0; k < out_.size(); ++k) {
     if (res[k]) {
       switch (out_[k].type) {
         case OutputType::JAC:
         case OutputType::JAC_TRANS:
           need_jac = true;
+          break;
+        case OutputType::FWD:
+          need_fwd = true;
           break;
         case OutputType::ADJ:
           need_adj = true;
@@ -856,11 +858,11 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
   }
   // Evaluate everything except Hessian, possibly in parallel
   if (verbose_) casadi_message("Evaluating regular outputs, forward sens, extended Jacobian");
-  if (eval_all(m, max_jac_tasks_, true, need_jac, need_adj, false)) return 1;
+  if (eval_all(m, max_jac_tasks_, true, need_jac, need_fwd, need_adj, false)) return 1;
   // Evaluate Hessian
   if (need_hess) {
     if (verbose_) casadi_message("Evaluating extended Hessian");
-    if (eval_all(m, max_hess_tasks_, false, false, false, true)) return 1;
+    if (eval_all(m, max_hess_tasks_, false, false, false, false, true)) return 1;
     // Post-process Hessian
     remove_nans(hess_nz, iw);
     if (check_hessian_) check_hessian(m, hess_nz, iw);
@@ -898,14 +900,14 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
 }
 
 int FmuFunction::eval_all(FmuMemory* m, casadi_int n_task,
-    bool need_nondiff, bool need_jac, bool need_adj, bool need_hess) const {
+    bool need_nondiff, bool need_jac, bool need_fwd, bool need_adj, bool need_hess) const {
   // Return flag
   int flag = 0;
   // Evaluate, serially or in parallel
   if (parallelization_ == Parallelization::SERIAL || n_task == 1
       || (!need_jac && !need_adj && !need_hess)) {
     // Evaluate serially
-    flag = eval_task(m, 0, 1, need_nondiff, need_jac, need_adj, need_hess);
+    flag = eval_task(m, 0, 1, need_nondiff, need_jac, need_fwd, need_adj, need_hess);
   } else if (parallelization_ == Parallelization::OPENMP) {
     #ifdef WITH_OPENMP
     // Parallel region
@@ -920,8 +922,8 @@ int FmuFunction::eval_all(FmuMemory* m, casadi_int n_task,
       // Evaluate in parallel
       if (task < num_used_threads) {
         FmuMemory* s = task == 0 ? m : m->slaves.at(task - 1);
-        flag = eval_task(s, task, num_used_threads,
-          need_nondiff && task == 0, need_jac, need_adj, need_hess);
+        flag = eval_task(s, task, num_used_threads, need_nondiff && task == 0,
+          need_jac, need_fwd && task == 0, need_adj, need_hess);
       } else {
         // Nothing to do for thread
         flag = 0;
@@ -940,8 +942,8 @@ int FmuFunction::eval_all(FmuMemory* m, casadi_int n_task,
       threads.emplace_back(
         [&, task](int* fl) {
           FmuMemory* s = task == 0 ? m : m->slaves.at(task - 1);
-          *fl = eval_task(s, task, n_task,
-            need_nondiff && task == 0, need_jac, need_adj, need_hess);
+          *fl = eval_task(s, task, n_task, need_nondiff && task == 0,
+            need_jac, need_fwd && task == 0, need_adj, need_hess);
         }, &flag_task[task]);
     }
     // Join threads
@@ -959,7 +961,7 @@ int FmuFunction::eval_all(FmuMemory* m, casadi_int n_task,
 }
 
 int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
-    bool need_nondiff, bool need_jac, bool need_adj, bool need_hess) const {
+    bool need_nondiff, bool need_jac, bool need_fwd, bool need_adj, bool need_hess) const {
   // Pass all regular inputs
   for (size_t k = 0; k < in_.size(); ++k) {
     if (in_[k].type == InputType::REG) {
@@ -979,6 +981,29 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
     for (size_t k = 0; k < out_.size(); ++k) {
       if (m->res[k] && out_[k].type == OutputType::REG) {
         fmu_.get(m, out_[k].ind, m->res[k]);
+      }
+    }
+  }
+  // Forward derivatives
+  if (need_fwd) {
+    // Pass all forward seeds
+    for (size_t k = 0; k < in_.size(); ++k) {
+      if (in_[k].type == InputType::FWD) {
+        fmu_.set_fwd(m, in_[k].ind, m->arg[k]);
+      }
+    }
+    // Request forward sensitivities
+    for (size_t k = 0; k < out_.size(); ++k) {
+      if (m->res[k] && out_[k].type == OutputType::FWD) {
+        fmu_.request_fwd(m, out_[k].ind);
+      }
+    }
+    // Calculate derivatives
+   if (fmu_.eval_derivative(m, false)) return 1;
+    // Collect forward sensitivities
+    for (size_t k = 0; k < out_.size(); ++k) {
+      if (m->res[k] && out_[k].type == OutputType::FWD) {
+        fmu_.get_fwd(m, out_[k].ind, m->res[k]);
       }
     }
   }
