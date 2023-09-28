@@ -29,6 +29,7 @@ from OMPython import OMCSessionZMQ
 omc = OMCSessionZMQ()
 if omc.loadFile('rocket.mo').startswith('false'):
   raise Exception('Modelica compilation failed: {}'.format(omc.sendExpression('getErrorString()')))
+omc.sendExpression('setDebugFlags("-disableDirectionalDerivatives")')
 fmu_file = omc.sendExpression('translateModelFMU(rocket)')
 flag = omc.sendExpression('getErrorString()')
 if not fmu_file.endswith('.fmu'): raise Exception('FMU generation failed: {}'.format(flag))
