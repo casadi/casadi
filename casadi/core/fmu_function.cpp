@@ -135,6 +135,7 @@ FmuFunction::FmuFunction(const std::string& name, const Fmu& fmu,
   reltol_ = 1e-3;
   print_progress_ = false;
   new_jacobian_ = true;
+  new_forward_ = false;
   new_hessian_ = true;
   hessian_coloring_ = true;
   parallelization_ = Parallelization::SERIAL;
@@ -1359,6 +1360,37 @@ Function FmuFunction::get_jacobian(const std::string& name, const std::vector<st
   return ret;
 }
 
+bool FmuFunction::has_forward(casadi_int nfwd) const {
+  // Only implemented if "new_forward" is enabled
+  if (!new_forward_) return FunctionInternal::has_forward(nfwd);
+  // Only first order analytic derivative possible
+  if (!all_regular()) return false;
+  // FD to get forward directional derivatives not implemented
+  if (!enable_ad_) return false;
+  // Otherwise: Only 1 direction implemented
+  return nfwd == 1;
+}
+
+Function FmuFunction::get_forward(casadi_int nfwd, const std::string& name,
+    const std::vector<std::string>& inames,
+    const std::vector<std::string>& onames,
+    const Dict& opts) const {
+  // Only implemented if "new_forward" is enabled
+  if (!new_forward_) return FunctionInternal::get_forward(nfwd, name, inames, onames, opts);
+  // Only single directional derivative implemented
+  casadi_assert(nfwd == 1, "Not implemented");
+  // Hack: Inherit parallelization option
+  Dict opts1 = opts;
+  opts1["parallelization"] = to_string(parallelization_);
+  opts1["verbose"] = verbose_;
+  opts1["print_progress"] = print_progress_;
+  // Return new instance of class
+  Function ret;
+  ret.own(new FmuFunction(name, fmu_, inames, onames));
+  ret->construct(opts1);
+  return ret;
+}
+
 bool FmuFunction::has_reverse(casadi_int nadj) const {
   // Only first order analytic derivative possible
   if (!all_regular()) return false;
@@ -1438,7 +1470,7 @@ Dict FmuFunction::get_stats(void *mem) const {
 
 void FmuFunction::serialize_body(SerializingStream &s) const {
   FunctionInternal::serialize_body(s);
-  s.version("FmuFunction", 1);
+  s.version("FmuFunction", 2);
 
   s.pack("FmuFunction::Fmu", fmu_);
 
@@ -1477,6 +1509,7 @@ void FmuFunction::serialize_body(SerializingStream &s) const {
   s.pack("FmuFunction::reltol", reltol_);
   s.pack("FmuFunction::print_progress", print_progress_);
   s.pack("FmuFunction::new_jacobian", new_jacobian_);
+  s.pack("FmuFunction::new_forward", new_forward_);
   s.pack("FmuFunction::new_hessian", new_hessian_);
   s.pack("FmuFunction::hessian_coloring", hessian_coloring_);
   s.pack("FmuFunction::validate_ad_file", validate_ad_file_);
@@ -1499,7 +1532,7 @@ void FmuFunction::serialize_body(SerializingStream &s) const {
 }
 
 FmuFunction::FmuFunction(DeserializingStream& s) : FunctionInternal(s) {
-  s.version("FmuFunction", 1);
+  int version = s.version("FmuFunction", 1, 2);
 
   s.unpack("FmuFunction::Fmu", fmu_);
 
@@ -1544,6 +1577,7 @@ FmuFunction::FmuFunction(DeserializingStream& s) : FunctionInternal(s) {
   s.unpack("FmuFunction::reltol", reltol_);
   s.unpack("FmuFunction::print_progress", print_progress_);
   s.unpack("FmuFunction::new_jacobian", new_jacobian_);
+  if (version >= 2) s.unpack("FmuFunction::new_forward", new_forward_);
   s.unpack("FmuFunction::new_hessian", new_hessian_);
   s.unpack("FmuFunction::hessian_coloring", hessian_coloring_);
   s.unpack("FmuFunction::validate_ad_file", validate_ad_file_);

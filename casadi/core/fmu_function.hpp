@@ -160,7 +160,7 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   // User-set options
   bool enable_ad_, validate_ad_, make_symmetric_, check_hessian_;
   double step_, abstol_, reltol_;
-  bool print_progress_, new_jacobian_, new_hessian_, hessian_coloring_;
+  bool print_progress_, new_jacobian_, new_forward_, new_hessian_, hessian_coloring_;
   std::string validate_ad_file_;
 
   // FD method as an enum
@@ -293,6 +293,15 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
       \identifier{yp} */
   bool has_jacobian() const override;
   Function get_jacobian(const std::string& name,
+    const std::vector<std::string>& inames,
+    const std::vector<std::string>& onames,
+    const Dict& opts) const override;
+  ///@}
+
+  ///@{
+  /** \brief Return function that calculates forward derivatives */
+  bool has_forward(casadi_int nfwd) const override;
+  Function get_forward(casadi_int nfwd, const std::string& name,
     const std::vector<std::string>& inames,
     const std::vector<std::string>& onames,
     const Dict& opts) const override;
