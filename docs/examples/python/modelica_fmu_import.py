@@ -35,11 +35,15 @@ if not fmu_file.endswith('.fmu'): raise Exception('FMU generation failed: {}'.fo
 print("translateModelFMU warnings:\n{}".format(flag))
 
 # Regardless of how the FMU was obtained, we must unzip it before CasADi can process it
-import zipfile
-with zipfile.ZipFile('rocket.fmu', 'r') as zip_ref: zip_ref.extractall('rocket_fmu_unzipped')
+# If there is an existing directory with the same name it is better to explicitly
+# delete it to prevent potential memory corruption on overwriting.
+import os, shutil, zipfile
+unzipped_path = os.path.join(os.getcwd(), 'rocket_fmu_unzipped')
+if os.path.isdir(unzipped_path): shutil.rmtree(unzipped_path)
+with zipfile.ZipFile('rocket.fmu', 'r') as zip_ref: zip_ref.extractall(unzipped_path)
 
 # Create a CasADi/DaeBuilder instance from the unzipped FMU
-dae = DaeBuilder('rocket', 'rocket_fmu_unzipped')
+dae = DaeBuilder('rocket', unzipped_path)
 dae.disp(True)
 
 # Get state vector, initial conditions, bounds
