@@ -1,0 +1,89 @@
+digraph flow {
+
+node [ordering=out];
+
+// Codegen
+casadi_foo_setup, casadi_foo_solve, casadi_foo_work, casadi_qp_setup, casadi_foo_set_work, casadi_qp_work, missing_qp_set_work [shape=rectangle];
+
+
+casadi_qp_setup [label="casadi_qp_setup(qp_prob* p)\nUnpack problem\np->nx=p"];
+
+set_qp_prob -> casadi_qp_setup;
+
+set_qp_prob [label="set_qp_prob()\nClass immutable fields -> struct"];
+
+lifetime -> init;
+lifetime -> call;
+lifetime -> destructor;
+
+call -> checkout;
+call -> eval;
+call -> release;
+
+alloc_mem [label="void* alloc_mem()\n (cached)"];
+init_mem [label="init_mem(void *)\n (cached)"];
+
+checkout -> alloc_mem;
+
+checkout [label="int checkout()"];
+checkout -> init_mem;
+release [label="release(int mem)"];
+
+destructor -> clear_mem;
+
+clear_mem -> free_mem;
+clear_mem [label="ProtoFunction::clear_mem()"];
+free_mem [label="free_mem(void *)"];
+
+init_mem -> add_stat;
+
+init -> qp_init;
+
+casadi_qp_init [label="qp_init(qp_data *d, casadi_int** iw...)\n(empty)"]
+init -> set_foo_prob;
+init -> casadi_foo_work;
+init -> alloc_;
+
+qp_init [label="Conic::init(const Dict& opts)"]
+
+qp_init -> set_qp_prob;
+
+
+set_qp_prob [label="set_qp_prob()\nFill problem struct with class members\np_qp_.sp_a = A_"];
+
+init [label="init(const Dict& opts)"]
+
+alloc_ [label="alloc_*(...)\nAllocate scratch space arg, res, iw, w"]
+casadi_foo_work [label="casadi_foo_work(const foo_prob* p, casadi_int* sz_arg...)\nIncrease scratch space counters"]
+
+casadi_foo_work -> casadi_qp_work;
+
+casadi_qp_work [label="casadi_qp_work(const foo_prob* p, casadi_int* sz_arg...)\nIncrease scratch space counters"]
+
+
+set_foo_prob -> casadi_foo_setup;
+
+set_foo_prob [label="set_foo_prob()\nFill problem struct with class members\np_.inf = inf_"];
+
+casadi_foo_setup [label="casadi_foo_setup(foo_prob *p)\nUnpack problem\nAvoids codegen/vm duplication of populating helper problem struct elements"]
+eval -> setup;
+eval -> solve;
+
+solve [label="solve(const double** arg..., void *mem)"];
+
+solve -> casadi_foo_solve;
+
+setup -> set_work;
+setup -> set_temp;
+
+setup [label="setup(void *mem, const double** arg...)"];
+
+set_temp [label="set_temp(void *mem, const double** arg...)"];
+set_work [label="set_work(void *mem, const double**& arg...)"];
+qp_set_work [label="Conic::set_work"];
+set_work -> qp_set_work;
+qp_set_work -> missing_qp_set_work;
+set_work -> casadi_foo_set_work;
+casadi_foo_set_work [label="casadi_foo_set_work(foo_data* d, const double ***w...)\nSet mutable data pointers to scratch space\nd->r = *w; *w+=..."];
+
+}
