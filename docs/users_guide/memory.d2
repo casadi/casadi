@@ -1,0 +1,137 @@
+Conic: "" {
+    struct: "Conic" {
+        shape: class
+    }
+    explanation: |md
+    Immutable qp solver specs (vm)
+    |
+}
+
+FooInterface: "" {
+    struct: "FooInterface" {
+        shape: class
+    }
+    explanation: |md
+    Immutable foo solver specs (vm)
+    |
+}
+
+
+ConicMemory: "ConicMemory" {
+    struct: "ConicMemory" {
+        shape: class
+    }
+    explanation: |md
+    Mutable thread-local memory (vm)
+    |
+}
+
+
+
+FooMemory: "" {
+    struct: "FooMemory" {
+        shape: class
+        +d: "foo_data";
+    }
+    explanation: |md
+    Mutable thread-local memory (vm)
+    |
+}
+
+foo_data: "" {
+    foo_data: {
+        shape: class
+        +prob: "foo_prob";
+        +qp: "qp_data";
+    }
+    explanation: |md
+    Mutable thread-local memory (codegen)
+    |
+}
+
+foo_data -> qp_data;
+
+foo_prob: "" {
+    foo_prob: {
+        shape: class
+        +qp: "qp_prob";
+        +inf: "double";
+    }
+    explanation: |md
+    Immutable foo solver specs (codegen)
+    
+    For arrays, this struct contains merely pointers
+    
+    These pointers get set in `foo_init`
+    |
+}
+
+
+
+qp_prob: "" {
+    struct: "qp_prob" {
+        shape: class
+        +nx: "casadi_int";
+        +sp_a: "const casadi_int* sp_a";
+    }
+    explanation: |md
+    Immutable qp problem specs (codegen)
+    |
+}
+
+qp_data: "" {
+    struct: "qp_data" {
+        shape: class
+        +prob: "qp_prob";
+        +success: "bool";
+        +a: "const double*";
+    }
+    explanation: |md
+    Mutable thread-local memory (codegen)
+
+    |
+}
+
+FooMemory -> foo_data;
+
+foo_data -> foo_prob;
+
+foo_prob -> qp_prob;
+
+qp_data -> qp_prob;
+
+ConicMemory <-> FooMemory {
+  source-arrowhead {
+
+    shape: diamond
+    style.opacity: 0.2
+
+    style.filled: false
+
+  }
+  target-arrowhead {
+
+    shape: diamond
+
+    style.filled: false
+
+  }
+}
+
+Conic <-> FooInterface {
+  source-arrowhead {
+
+    shape: diamond
+    style.opacity: 0.2
+
+    style.filled: false
+
+  }
+  target-arrowhead {
+
+    shape: diamond
+
+    style.filled: false
+
+  }
+}
