@@ -746,7 +746,6 @@ namespace casadi {
     }
     s.unpack("Conic::H", H_);
     s.unpack("Conic::A", A_);
-    set_qp_prob();
     s.unpack("Conic::Q", Q_);
     s.unpack("Conic::P", P_);
     s.unpack("Conic::nx", nx_);
