@@ -288,7 +288,8 @@ void FmuFunction::init(const Dict& opts) {
   }
 
   // Forward derivatives only supported with analytic derivatives
-  if (has_fwd_ && !enable_ad_) casadi_error("Analytic derivatives needed for forward directional derivatives");
+  if (has_fwd_ && !enable_ad_)
+    casadi_error("Analytic derivatives needed for forward directional derivatives");
 
   // Quick return if no Jacobian calculation
   if (!has_jac_ && !has_adj_ && !has_hess_) return;
