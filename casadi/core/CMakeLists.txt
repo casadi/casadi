@@ -200,6 +200,9 @@ set(CASADI_INTERNAL
   serializer.cpp              serializing_stream.cpp
   casadi_c.cpp
 
+  # BLAS overrides
+  blas_runtime_overrides.cpp
+
   # Runtime headers
   runtime/casadi_runtime.hpp
 )

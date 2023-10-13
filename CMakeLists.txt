@@ -648,6 +648,27 @@ else()
 endif()
 add_feature_info(clang-interface WITH_CLANG "Interface to the Clang JIT compiler.")
 
+# BLAS: Accelerated linear algebra routines
+option(WITH_BLAS "Compile with BLAS" OFF)
+option(WITH_MKL "Compile with Intel MKL" OFF)
+if(WITH_BLAS)
+  if(WITH_MKL)
+    find_package(MKL REQUIRED)
+    include_directories(${MKL_INCLUDE_DIR})
+    add_definitions(-DWITH_MKL)
+  else()
+    find_package(BLAS REQUIRED)
+    find_path(BLAS_INCLUDE_DIR cblas.h
+      /usr/include
+      /usr/local/include
+      $ENV{BLAS_HOME}/include)
+    include_directories(${BLAS_INCLUDE_DIR})
+  endif()
+  add_definitions(-DWITH_BLAS)
+endif()
+add_feature_info(blas WITH_BLAS "Enable usage of BLAS in the runtime.")
+add_feature_info(mkl WITH_MKL "Enable usage of Intel MKL as BLAS implementation.")
+
 # Lapack: Dense linear solvers
 option(WITH_LAPACK "Compile the interface to LAPACK" ${WITH_LAPACK_DEF})
 option(WITH_BUILD_LAPACK "Download and install OpenBLAS for LAPACK+BLAS" OFF)
