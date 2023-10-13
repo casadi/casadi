@@ -89,7 +89,7 @@
             ],
             "cacheVariables": {
                 "PYTHON_PREFIX": "${sourceDir}/out/install/${presetName}/python",
-                "WITH_CLANG": "ON"
+                "WITH_CLANG": "OFF"
             }
         },
         {
