@@ -433,7 +433,7 @@ In C++ and Python (but not in MATLAB), the standard multiplication operation (us
 As is customary in MATLAB, multiplication using ``*`` and ``.*`` are equivalent when either of the arguments is a scalar.
 
 **Transposes** are formed using the syntax ``A.T`` in Python, ``A.T()`` in C++ and with
-``A`` or ``A.'`` in MATLAB:
+``A'`` or ``A.'`` in MATLAB:
 
 .. side-by-side::
     .. exec-block:: python
