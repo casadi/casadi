@@ -529,7 +529,7 @@ There are also variants of these functions that take a list (in Python) or a cel
 
         x = SX.sym('x',5,2);
         w = horzsplit(x,[0,1,2]);
-        disp(w(1)), disp(w(2))
+        disp(w{1}), disp(w{2})
 
 The vertsplit operation works analogously, but with the *offset* vector referring to rows:
 
