@@ -93,6 +93,11 @@ endif()
 if(WITH_HPIPM)
   add_subdirectory(hpipm)
 endif()
+
+if(WITH_FATROP)
+  add_subdirectory(fatrop)
+endif()
+
 if(WITH_SUPERSCS)
   add_subdirectory(superscs)
 endif()

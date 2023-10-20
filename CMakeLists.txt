@@ -580,6 +580,12 @@ set(BUILD_HPIPM_GIT_REPO "https://github.com/jgillis/hpipm.git" CACHE STRING "Gi
 option(WITH_BUILD_HPIPM "Build HPIPM (BUILD_HPIPM_VERSION=${BUILD_HPIPM_VERSION}) from downloaded source (BUILD_HPIPM_GIT_REPO=${BUILD_HPIPM_GIT_REPO})." OFF)
 set(BUILD_HPIPM_DEPENDENCIES BLASFEO)
 
+# FATROP
+option(WITH_FATROP "Compile the interface to FATROP" OFF)
+set(BUILD_FATROP_VERSION "42e3fee797e8685f1b0b12a692890277a1fc4e2d" CACHE STRING "Tag/branch/hash to be used for BUILD_FATROP_GIT_REPO")
+set(BUILD_FATROP_GIT_REPO "https://gitlab.kuleuven.be/robotgenskill/fatrop/fatrop.git" CACHE STRING "Git repo used together with BUILD_FATROP_VERSION")
+option(WITH_BUILD_FATROP "Build FATROP (BUILD_FATROP_VERSION=${BUILD_FATROP_VERSION}) from downloaded source (BUILD_FATROP_GIT_REPO=${BUILD_FATROP_GIT_REPO})." OFF)
+
 # SuperSCS: An conic solver
 option(WITH_SUPERSCS "Compile the interface to SuperSCS (the source code for SuperSCS is included)" ${WITH_SUPERSCS_DEF})
 set(BUILD_SUPERSCS_VERSION "4d2d1bd03ed4cf93e684a880b233760ce34ca69c" CACHE STRING "Tag/branch/hash to be used for BUILD_SUPERSCS_GIT_REPO")
@@ -896,7 +902,7 @@ foreach(PKG CPLEX SNOPT KNITRO GUROBI WORHP HSL)
 endforeach()
 
 # Packages must be sorted from high to low in the dependency graph
-foreach(PKG ALPAQA HIGHS PROXQP OSQP SUPERSCS SLEQP BONMIN IPOPT CBC CLP MUMPS SPRAL HSL METIS HPIPM TRLIB BLASFEO LAPACK EIGEN3 SIMDE)
+foreach(PKG ALPAQA HIGHS PROXQP OSQP SUPERSCS SLEQP BONMIN IPOPT CBC CLP MUMPS SPRAL HSL METIS FATROP HPIPM TRLIB BLASFEO LAPACK EIGEN3 SIMDE)
   string(TOLOWER ${PKG} PKG_LOWER)
   if(WITH_${PKG} AND NOT WITH_MOCKUP_${PKG})
     if(NOT WITH_BUILD_${PKG})
@@ -1126,6 +1132,36 @@ if(WITH_HPIPM)
     #target_link_libraries(lapack INTERFACE ${LAPACK_LIBRARIES})
   endif()
 endif()
+
+if(WITH_FATROP)
+  if (WITH_BUILD_FATROP)
+    set(FATROP_FLAGS)
+    if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "aarch64")
+      set(FATROP_FLAGS -DTARGET=GENERIC)
+    endif()
+    ExternalProject_Add(fatrop-external
+      DEPENDS ${BLASFEO_DEPENDS_TARGET}
+      GIT_REPOSITORY ${BUILD_FATROP_GIT_REPO}
+      GIT_TAG ${BUILD_FATROP_VERSION}
+      PREFIX "${CMAKE_BINARY_DIR}/external_projects"
+      UPDATE_COMMAND ""
+      CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
+      CMAKE_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DCMAKE_INSTALL_RPATH=${CMAKE_INSTALL_RPATH} -DBLASFEO_TARGET=X64_AUTOMATIC -DENABLE_MULTITHREADING=OFF -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
+    add_library(fatrop SHARED IMPORTED)
+    add_dependencies(fatrop fatrop-external)
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/fatrop")
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/blasfeo/include")
+    set_target_properties(fatrop PROPERTIES
+      INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include/fatrop;${CMAKE_BINARY_DIR}/external_projects/include/blasfeo/include"
+      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}fatrop${CMAKE_SHARED_LIBRARY_SUFFIX}"
+      IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}fatrop${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+    )
+  else()
+    #add_library(lapack INTERFACE)
+    #target_link_libraries(lapack INTERFACE ${LAPACK_LIBRARIES})
+  endif()
+endif()
+
 
 message(STATUS "CMAKE_SYSTEM_NAME: ${CMAKE_SYSTEM_NAME} ${WIN32}")
 
