@@ -1076,7 +1076,7 @@ if(WITH_BLASFEO)
       CMAKE_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} ${C_FLAGS} -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
     set(BLASFEO_PATH "${CMAKE_BINARY_DIR}/external_projects")
     set(BLASFEO_DEPENDS_TARGET blasfeo-external)
-
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include")
     add_library(blasfeo SHARED IMPORTED)
     add_dependencies(blasfeo blasfeo-external)
     set_target_properties(blasfeo PROPERTIES
@@ -1085,9 +1085,8 @@ if(WITH_BLASFEO)
       IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}blasfeo${CMAKE_IMPORT_LIBRARY_SUFFIX}"
     )
     create_import_library(blasfeo blasfeo)
-    file(GLOB BLASFEO_HEADERS "${CMAKE_BINARY_DIR}/external_projects/include/blasfeo*")
-    install(FILES
-      ${BLASFEO_HEADERS}
+    install(DIRECTORY
+      "${CMAKE_BINARY_DIR}/external_projects/include"
       DESTINATION "${INCLUDE_PREFIX}")
   else()
     #add_library(lapack INTERFACE)
@@ -1111,6 +1110,7 @@ if(WITH_HPIPM)
       CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
       CMAKE_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DCMAKE_INSTALL_RPATH=${CMAKE_INSTALL_RPATH} ${HPIPM_FLAGS} -DHPIPM_TESTING=OFF -DBUILD_SHARED_LIBS=ON -DBLASFEO_PATH=${BLASFEO_PATH} -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
     add_library(hpipm SHARED IMPORTED)
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include")
     add_dependencies(hpipm hpipm-external)
     target_link_libraries(hpipm INTERFACE blasfeo)
     set_target_properties(hpipm PROPERTIES
@@ -1118,9 +1118,8 @@ if(WITH_HPIPM)
        IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}hpipm${CMAKE_IMPORT_LIBRARY_SUFFIX}"
     )
     create_import_library(hpipm hpipm)
-    file(GLOB HPIPM_HEADERS "${CMAKE_BINARY_DIR}/external_projects/include/hpipm*")
-    install(FILES
-      ${HPIPM_HEADERS}
+    install(DIRECTORY
+      "${CMAKE_BINARY_DIR}/external_projects/include"
       DESTINATION "${INCLUDE_PREFIX}")
   else()
     #add_library(lapack INTERFACE)
