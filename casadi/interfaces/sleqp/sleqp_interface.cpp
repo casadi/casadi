@@ -108,7 +108,7 @@ namespace casadi {
         "Options to be passed to SLEQP"}},
        {"print_level",
         {OT_INT,
-        "Print level of SLEQP (default: 3)"}},
+        "Print level of SLEQP (default: 2/SLEQP_LOG_WARN)"}},
        {"max_iter",
         {OT_INT,
         "Maximum number of iterations"}},
@@ -133,7 +133,7 @@ namespace casadi {
 
     max_iter_ = SLEQP_NONE;
     max_wall_time_ = SLEQP_NONE;
-    print_level_ = static_cast<int>(SLEQP_LOG_INFO);
+    print_level_ = static_cast<int>(SLEQP_LOG_WARN);
 
     // Read user options
     for (auto&& op : opts) {

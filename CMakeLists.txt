@@ -687,8 +687,8 @@ option(WITH_BUILD_TRLIB "Build TRLIB (BUILD_TRLIB_VERSION=${BUILD_TRLIB_VERSION}
 
 # SLEQP: An active set-based NLP solver
 option(WITH_SLEQP "Compile the interface to SLEQP" OFF)
-set(BUILD_SLEQP_GIT_REPO "https://github.com/chrhansk/sleqp.git" CACHE STRING "Git repo used together with BUILD_SLEQ_VERSION")
-set(BUILD_SLEQP_VERSION "ee83f4ae503d74238487a0ff1e893018d9ca04dd" CACHE STRING "Tag/branch/hash to be used for BUILD_SLEQ_GIT_REPO")
+set(BUILD_SLEQP_GIT_REPO "https://github.com/jgillis/sleqp.git" CACHE STRING "Git repo used together with BUILD_SLEQ_VERSION")
+set(BUILD_SLEQP_VERSION "patch-1" CACHE STRING "Tag/branch/hash to be used for BUILD_SLEQ_GIT_REPO")
 option(WITH_BUILD_SLEQP "Build SLEQP (BUILD_SLEQP_VERSION=${BUILD_SLEQP_VERSION}) from downloaded source (BUILD_SLEQP_GIT_REPO=${BUILD_SLEQP_GIT_REPO})." OFF)
 set(BUILD_SLEQP_DEPENDENCIES HIGHS TRLIB MUMPS)
 
