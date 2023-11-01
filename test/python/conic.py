@@ -445,8 +445,6 @@ class ConicTests(casadiTestCase):
     UBX = DM([inf]*2)
 
     for conic, qp_options, aux_options in conics:
-      if not("cplex" in str(conic)):
-        continue
       print("test_general_nonconvex_dense",conic,qp_options)
       solver = casadi.conic("mysolver",conic, {'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
@@ -662,8 +660,6 @@ class ConicTests(casadiTestCase):
 
     for conic, qp_options, aux_options in conics:
       if not aux_options["quadratic"]: continue
-      if "cplex" in str(conic):
-        continue
       print("test_no_A",conic,qp_options)
       solver = casadi.conic("mysolver",conic,{'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
@@ -756,8 +752,6 @@ class ConicTests(casadiTestCase):
     for conic, qp_options, aux_options in conics:
       print(conic,qp_options)
       if not aux_options["quadratic"]: continue
-      if 'cplex' in str(conic):
-        continue
       if 'worhp' in str(conic): # works but occasionaly throws segfaults, ulimit on travis?
         continue
       if 'superscs' in str(conic):

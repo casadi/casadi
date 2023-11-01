@@ -386,6 +386,8 @@ namespace casadi {
     casadi_copy(arg[CONIC_X0], nx_, x);
     double* lam_x=w; w += nx_;
     casadi_copy(arg[CONIC_LAM_X0], nx_, lam_x);
+    // Flip the sign of the multipliers
+    casadi_scal(nx_, -1., lam_x);
 
     // Temporaries
     double* lam_a=w; w += na_;
@@ -527,12 +529,12 @@ namespace casadi {
     if (qp_method_ != 0 && qp_method_ != 4 && m->is_warm) {
       // TODO(Joel): Initialize slacks and dual variables of bound constraints
       if (CPXXcopystart(m->env, m->lp, get_ptr(m->cstat), get_ptr(m->rstat), x,
-           nullptr, nullptr, lam_x)) {
+           nullptr, lam_x, nullptr)) {
         casadi_error("CPXXcopystart failed");
       }
     } else {
       if (CPXXcopystart(m->env, m->lp, nullptr, nullptr, x,
-           nullptr, nullptr, lam_x)) {
+           nullptr, lam_x, nullptr)) {
         casadi_error("CPXXcopystart failed");
       }
     }
@@ -658,16 +660,12 @@ namespace casadi {
 
           // Retrieving solution
           int sol_ret = CPXXsolution(m->env, m->lp, &solstat, &f, x, lam_a, get_ptr(slack), lam_x);
-          if (sol_ret == CPXERR_NO_SOLN) {
+          if (sol_ret == CPXERR_NO_SOLN || sol_ret == CPXERR_NO_SOLN ) {
             m->d_qp.unified_return_status = SOLVER_RET_INFEASIBLE;
           }
 
           if (sol_ret) {
-            if (error_on_fail_) {
-              casadi_error("CPXXsolution failed");
-            } else {
-              m->d_qp.success = false;
-            }
+            m->d_qp.success = false;
           }
       }
     }
