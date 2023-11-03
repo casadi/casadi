@@ -420,7 +420,7 @@ void OptiNode::set_meta_con(const MX& m, const MetaCon& meta) {
 }
 
 void OptiNode::update_user_dict(const MX& m, const Dict& meta) {
-  try {
+  if (has_con(m)) {
     MetaCon m_update = get_meta_con(m);
     MetaVar m_update2 = get_meta(m_update.dual_canon);
     for (const auto & it : meta) {
@@ -429,8 +429,7 @@ void OptiNode::update_user_dict(const MX& m, const Dict& meta) {
     }
     set_meta_con(m, m_update);
     set_meta(m_update.dual_canon, m_update2);
-  } catch(std::exception& e) {
-    (void)e;  // unused
+  } else {
     for (const auto & s : MX::symvar(m)) {
       MetaVar m_update = get_meta(s);
       for (const auto & it : meta)
@@ -441,11 +440,10 @@ void OptiNode::update_user_dict(const MX& m, const Dict& meta) {
 }
 
 Dict OptiNode::user_dict(const MX& m) const {
-  try {
+  if (has_con(m)) {
     MetaCon meta = get_meta_con(m);
     return meta.extra;
-  } catch(std::exception& e) {
-    (void)e;  // unused
+  } else {
     MetaVar meta = get_meta(m);
     return meta.extra;
   }
