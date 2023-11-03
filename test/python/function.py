@@ -3161,5 +3161,53 @@ class Functiontests(casadiTestCase):
 
     solver = nlpsol("solver","ipopt",nlp)
    
+  def test_which_depends(self):
+    x = SX.sym("x",2)
+    y = SX.sym("y",2)
+    
+    z = x+y
+    z2 = x*y
+    z3 = sin(dot(x,y))
+    z4 = cos(x)
+    z5 = sin(y)
+    z6 = 12
+    z7 = vertcat(x[0],y[1])
+    z8 = vertcat(x[0]**2,y[1]**2)
+    
+    f = Function("f",[x,y],[z,z2,z3,z4,z5,z6,z7,z8],["x","y"],["z","z2","z3","z4","z5","z6","z7","z8"])
+    
+    def mychecks(f,exempt=False):
+        self.assertEqual(f.which_depends("x",["z"]),[True,True])
+        self.assertEqual(f.which_depends("x",["z"],2),[False,False])
+        if not exempt:
+            self.assertEqual(f.which_depends("x",["z2"],2),[False,False])
+        self.assertEqual(f.which_depends("x",["z3"],2),[True,True])
+        self.assertEqual(f.which_depends("x",["z4"]),[True,True])
+        self.assertEqual(f.which_depends("x",["z4"],2),[True,True])
+        self.assertEqual(f.which_depends("x",["z5"]),[False,False])
+        self.assertEqual(f.which_depends("x",["z5"],2),[False,False])
+        self.assertEqual(f.which_depends("x",["z5","z6"]),[False,False])
+        if not exempt:
+            self.assertEqual(f.which_depends("x",["z","z2","z3","z4","z5","z6"],1,True),[True, True]+[True, True]+ [True]+[True,True]+[False, False]+[False])
+            self.assertEqual(f.which_depends("x",["z","z2","z3","z4","z5","z6"],2,True),[False, False]+[False, False]+ [True]+[True,True]+[False, False]+[False])
+        self.assertEqual(f.which_depends("x",["z","z3","z4","z5","z6"],1,True),[True, True]+ [True]+[True,True]+[False, False]+[False])
+        self.assertEqual(f.which_depends("x",["z","z3","z4","z5","z6"],2,True),[False, False]+ [True]+[True,True]+[False, False]+[False])
+        self.assertEqual(f.which_depends("x",["z7"]),[True,False])
+        self.assertEqual(f.which_depends("y",["z7"]),[False,True])
+        self.assertEqual(f.which_depends("x",["z7"],2),[False,False])
+        self.assertEqual(f.which_depends("y",["z7"],2),[False,False])
+        self.assertEqual(f.which_depends("x",["z8"],2),[True,False])
+        self.assertEqual(f.which_depends("y",["z8"],2),[False,True])
+        self.assertEqual(f.which_depends("x",["z7","z8"],1,True),[True, False]+[True, False])
+        self.assertEqual(f.which_depends("x",["z7","z8"],2,True),[False, False]+[True, False])
+        self.assertEqual(f.which_depends("y",["z7","z8"],1,True),[False, True]+[False, True])
+        self.assertEqual(f.which_depends("y",["z7","z8"],2,True),[False, False]+[False, True])
+    
+    mychecks(f)
+    
+    if not args.run_slow: return
+    F,_ = self.check_codegen(f,inputs=[DM.rand(f.sparsity_in(i)) for i in range(f.n_in())],with_jac_sparsity=True,with_forward=True)
+    mychecks(F,exempt=True)
+    
 if __name__ == '__main__':
     unittest.main()

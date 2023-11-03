@@ -607,7 +607,7 @@ class casadiTestCase(unittest.TestCase):
   def check_sparsity(self, a,b):
     self.assertTrue(a==b, msg=str(a) + " <-> " + str(b))
 
-  def check_codegen(self,F,inputs=None, opts=None,std="c89",extralibs="",check_serialize=False,extra_options=None,main=False,definitions=None,with_jac_sparsity=False,external_opts=None):
+  def check_codegen(self,F,inputs=None, opts=None,std="c89",extralibs="",check_serialize=False,extra_options=None,main=False,definitions=None,with_jac_sparsity=False,external_opts=None,with_reverse=False,with_forward=False):
 
     if args.run_slow:
       import hashlib
@@ -616,6 +616,10 @@ class casadiTestCase(unittest.TestCase):
       if main: opts["main"] = True
       cg = CodeGenerator(name,opts)
       cg.add(F,with_jac_sparsity)
+      if with_reverse:
+        cg.add(F.reverse(1), with_jac_sparsity)
+      if with_forward:
+        cg.add(F.forward(1), with_jac_sparsity)
       cg.generate()
       import subprocess
 
