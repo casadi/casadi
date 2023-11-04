@@ -1330,6 +1330,7 @@ namespace casadi {
       this->auxiliaries << sanitize_source(casadi_newton_str, inst);
       break;
     case AUX_MAX_VIOL:
+      add_auxiliary(AUX_FMAX);
       this->auxiliaries << sanitize_source(casadi_max_viol_str, inst);
       break;
     case AUX_SUM_VIOL:
