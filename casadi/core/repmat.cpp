@@ -64,17 +64,16 @@ namespace casadi {
   static bvec_t Orring(bvec_t x, bvec_t y) { return x | y; }
 
   int HorzRepmat::sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
-    casadi_int nnz = dep(0).nnz();
-    std::fill(res[0], res[0]+nnz, 0);
     return eval_gen<bvec_t>(arg, res, iw, w);
   }
 
   int HorzRepmat::sp_reverse(bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
     casadi_int nnz = dep(0).nnz();
+    casadi_int NNZ = sparsity().nnz();
     for (casadi_int i=0;i<n_;++i) {
       std::transform(res[0]+i*nnz, res[0]+(i+1)*nnz, arg[0], arg[0], &Orring);
     }
-    std::fill(res[0], res[0]+nnz, 0);
+    std::fill(res[0], res[0]+NNZ, 0);
     return 0;
   }
 
