@@ -822,5 +822,23 @@ class ADtests(casadiTestCase):
                 H_ = Hf_out[0]
               self.checkarray(Hf_out[0],H_,failmessage=("mode: %s" % mode))
 
+  def test_repmat(self):
+    X = MX.sym("x",2,2)
+
+    for e in[X.T+repmat(MX.zeros(2,1),1,2)]:
+    
+        for weight in [0,1]:
+
+            F = Function('f',[vec(X)],[e],{"ad_weight_sp": weight})
+            J0 = F.jac_sparsity(0,0,False)
+            
+            J0.spy()
+
+            J1 = F.expand().jac_sparsity(0,0,False)
+            
+            J1.spy()
+            
+            assert J0==J1
+
 if __name__ == '__main__':
     unittest.main()
