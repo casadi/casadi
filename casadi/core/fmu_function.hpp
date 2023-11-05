@@ -299,7 +299,9 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   ///@}
 
   ///@{
-  /** \brief Return function that calculates forward derivatives */
+  /** \brief Return function that calculates forward derivatives
+
+      \identifier{27h} */
   bool has_forward(casadi_int nfwd) const override;
   Function get_forward(casadi_int nfwd, const std::string& name,
     const std::vector<std::string>& inames,

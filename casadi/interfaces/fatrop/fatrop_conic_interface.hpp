@@ -54,7 +54,7 @@ In order to use this interface, you must:
    where I must be a diagonal sparse matrix
  - Either supply all of N, nx, ng, nu options or rely on automatic detection
 
- */
+    \identifier{27g} */
 
 
 namespace casadi {
