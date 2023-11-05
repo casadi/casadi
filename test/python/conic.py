@@ -445,6 +445,7 @@ class ConicTests(casadiTestCase):
     UBX = DM([inf]*2)
 
     for conic, qp_options, aux_options in conics:
+      if not aux_options["quadratic"]: continue
       print("test_general_nonconvex_dense",conic,qp_options)
       solver = casadi.conic("mysolver",conic, {'h':H.sparsity(),'a':A.sparsity()},qp_options)
 
