@@ -20,8 +20,14 @@
 // SYMBOL "dot"
 template<typename T1>
 T1 casadi_dot(casadi_int n, const T1* x, const T1* y) {
+#if defined(CASADI_WITH_CBLAS_DOUBLE)
+  return cblas_ddot(n, x, 1, y, 1);
+#elif defined(CASADI_WITH_CBLAS_SINGLE)
+  return cblas_sdot(n, x, 1, y, 1);
+#else
   casadi_int i;
   T1 r = 0;
   for (i=0; i<n; ++i) r += *x++ * *y++;
   return r;
+#endif
 }

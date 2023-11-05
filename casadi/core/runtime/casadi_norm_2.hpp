@@ -20,5 +20,11 @@
 // SYMBOL "norm_2"
 template<typename T1>
 T1 casadi_norm_2(casadi_int n, const T1* x) {
+#if defined(CASADI_WITH_CBLAS_DOUBLE)
+  return cblas_dnrm2(n, x, 1);
+#elif defined(CASADI_WITH_CBLAS_SINGLE)
+  return cblas_snrm2(n, x, 1);
+#else
   return sqrt(casadi_dot(n, x, x));
+#endif
 }

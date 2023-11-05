@@ -22,5 +22,11 @@ template<typename T1>
 void casadi_scal(casadi_int n, T1 alpha, T1* x) {
   casadi_int i;
   if (!x) return;
+#if defined(CASADI_WITH_CBLAS_DOUBLE)
+  cblas_dscal(n, alpha, x, 1);
+#elif defined(CASADI_WITH_CBLAS_SINGLE)
+  cblas_sscal(n, alpha, x, 1);
+#else
   for (i=0; i<n; ++i) *x++ *= alpha;
+#endif
 }

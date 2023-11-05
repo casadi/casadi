@@ -236,6 +236,11 @@ namespace casadi {
         for (k=0, ss=A+i*LDA, tt=B+j*LDB; k<K; ++k) \
           *rr += *ss++**tt++;
 
+
+#ifdef CASADI_WITH_CBLAS
+  #include <cblas.h>
+#endif
+
  // Template function implementations
   #include "casadi_copy.hpp"
   #include "casadi_cvx.hpp"

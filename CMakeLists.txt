@@ -1052,9 +1052,12 @@ if(WITH_LAPACK)
 
     add_library(lapack SHARED IMPORTED)
     add_dependencies(lapack openblas-external)
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/openblas")
     set_target_properties(lapack PROPERTIES
+      INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include/openblas"
       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}${CASADI_TP_SHARED_PREFIX}openblas${CMAKE_SHARED_LIBRARY_SUFFIX}"
       IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}${CASADI_TP_SHARED_PREFIX}openblas${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+      INTERFACE_COMPILE_DEFINITIONS "CASADI_WITH_CBLAS;CASADI_WITH_CBLAS_DOUBLE"
     )
     create_import_library(lapack lapack)
   else()

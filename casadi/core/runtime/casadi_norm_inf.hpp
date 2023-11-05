@@ -20,9 +20,15 @@
 // SYMBOL "norm_inf"
 template<typename T1>
 T1 casadi_norm_inf(casadi_int n, const T1* x) {
+#if defined(CASADI_WITH_CBLAS_DOUBLE)
+  return cblas_idamax(n, x, 1);
+#elif defined(CASADI_WITH_CBLAS_SINGLE)
+  return cblas_isamax(n, x, 1);
+#else
   casadi_int i;
   T1 ret = 0;
 // C-REPLACE "fmax" "casadi_fmax"
   for (i=0; i<n; ++i) ret = fmax(ret, fabs(*x++));
   return ret;
+#endif
 }
