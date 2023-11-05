@@ -985,11 +985,11 @@ jobs:
           activate-environment: py${{steps.get-id.outputs.pydot2}}
           auto-update-conda: true
       - run: |
-          pip install --pre numpy scipy pandas
+          pip install numpy scipy pandas
         shell: bash -el {0}
         if: "!contains(matrix.image, 'windows')"
       - run: |
-          pip install --pre numpy scipy pandas
+          pip install numpy scipy pandas
         shell: pwsh
         if: contains(matrix.image, 'windows')
       - env:
