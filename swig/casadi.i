@@ -59,6 +59,10 @@
   namespace casadi {
     // Redirect printout
     static void pythonlogger(const char* s, std::streamsize num, bool error) {
+      if (!casadi::InterruptHandler::is_main_thread()) {
+        casadi::Logger::writeDefault(s, num, error);
+        return;
+      }
       int n = num;
       while (n>0) {
         if (error) {
