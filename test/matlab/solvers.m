@@ -41,6 +41,7 @@ for i=1:length(plugins)
         solver = nlpsol('solver',name, nlp);
         solver('lbg',0,'ubg',2);
       catch E
+        disp(['Failure for nlpsol ' name])
         disp(E.message)
         failure = true;
       end
@@ -63,6 +64,7 @@ for i=1:length(plugins)
         solver = qpsol('solver',name, nlp);
         solver('lbg',0,'ubg',2);
       catch E
+        disp(['Failure for qpsol ' name])
         disp(E.message)
         failure = true;
       end
@@ -124,9 +126,11 @@ try
 
     sol = solver('a',A,'h',H,'lba',lbg,'uba',ubg,'g',g,'lbx',lbx,'ubx',ubx);
 catch E
+    disp(['Failure for hpipm'])
     disp(E.message)
     failure = true;
 end
 end
 
 assert(~failure)
+disp('Search the log for Failure')
