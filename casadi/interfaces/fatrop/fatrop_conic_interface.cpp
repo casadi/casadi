@@ -189,14 +189,12 @@ namespace casadi {
           nus_[0] = nus_[1];
         }
       }
-      if (true) {
-        casadi_message("Detected structure: N " + str(N_) + ", nx " + str(nx) + ", "
-          "nu " + str(nu) + ", ng " + str(ng) + ".");
-      }
     }
 
-    casadi_message("Using structure: N " + str(N_) + ", nx " + str(nx) + ", "
-          "nu " + str(nu) + ", ng " + str(ng) + ".");
+    if (verbose_) {
+      casadi_message("Using structure: N " + str(N_) + ", nx " + str(nx) + ", "
+            "nu " + str(nu) + ", ng " + str(ng) + ".");
+    }
 
     /* Disassemble A input into:
        A B I

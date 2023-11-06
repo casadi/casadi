@@ -256,14 +256,18 @@ namespace casadi {
       ngs_.push_back(cN);
 
       N_ = nus_.size();
-      if (verbose_) {
-        casadi_message("Detected structure: N " + str(N_) + ", nx " + str(nx) + ", "
-          "nu " + str(nu) + ", ng " + str(ng) + ".");
+      if (N_>1) {
+        if (nus_[0]==0 && nxs_[1]+nus_[1]==nxs_[0]) {
+          nxs_[0] = nxs_[1];
+          nus_[0] = nus_[1];
+        }
       }
       nus_.push_back(0);
     }
-
-    uout() << "nx,nu,ng" << nx << nu << ng << std::endl;
+    if (verbose_) {
+      casadi_message("Using structure: N " + str(N_) + ", nx " + str(nx) + ", "
+        "nu " + str(nu) + ", ng " + str(ng) + ".");
+    }
 
     casadi_assert_dev(nx.size()==N_+1);
     casadi_assert_dev(nu.size()==N_+1);
@@ -447,18 +451,11 @@ namespace casadi {
     nus_.push_back(0);
     zeros_.resize(N_+1, 0);
 
-    uout() << "nus" << nus_ << std::endl;
-
     set_hpipm_prob();
 
     // Allocate memory
     casadi_int sz_arg, sz_res, sz_w, sz_iw;
     casadi_hpipm_work(&p_, &sz_arg, &sz_res, &sz_iw, &sz_w);
-
-    uout() << sz_arg << std::endl;
-    uout() << sz_res << std::endl;
-    uout() << sz_iw << std::endl;
-    uout() << sz_w << std::endl;
 
     alloc_arg(sz_arg, true);
     alloc_res(sz_res, true);
@@ -615,7 +612,6 @@ namespace casadi {
     p_.qp = &p_qp_;
     p_.nx  = get_ptr(nxs_);
     p_.nu  = get_ptr(nus_);
-    uout() << "nu" << nus_.size() << ":" << N_ << std::endl;
     p_.ng  = get_ptr(ngs_);
 
     p_.nbx = get_ptr(nxs_);
@@ -719,11 +715,13 @@ namespace casadi {
 
     m->d_qp.success = m->d.return_status==0;
 
-    uout() << "HPIPM finished after " << m->d.iter_count << " iterations." << std::endl;
-    uout() << "return status: " << m->d.return_status << std::endl;
-    uout() << "HPIPM residuals: " << m->d.res_stat << ", " <<
-              m->d.res_eq << ", " << m->d.res_ineq << ", " <<
-              m->d.res_comp << std::endl;
+    if (verbose_) {
+      uout() << "HPIPM finished after " << m->d.iter_count << " iterations." << std::endl;
+      uout() << "return status: " << m->d.return_status << std::endl;
+      uout() << "HPIPM residuals: " << m->d.res_stat << ", " <<
+                m->d.res_eq << ", " << m->d.res_ineq << ", " <<
+                m->d.res_comp << std::endl;
+    }
 
     return 0;
   }
