@@ -728,13 +728,13 @@ option(WITH_MOCKUP_GUROBI "Use mockup GUROBI (BUILD_MOCKUPS_VERSION=${BUILD_MOCK
 # Bonmin: An MINLP solver
 option(WITH_BONMIN "Compile the interface to BONMIN" OFF)
 set(BUILD_BONMIN_GIT_REPO https://github.com/coin-or/Bonmin.git CACHE STRING "Git repo used together with BUILD_BONMIN_VERSION")
-set(BUILD_BONMIN_VERSION "releases/1.8.8" CACHE STRING "Tag/branch/hash to be used for BUILD_BONMIN_GIT_REPO")
+set(BUILD_BONMIN_VERSION "releases/1.8.9" CACHE STRING "Tag/branch/hash to be used for BUILD_BONMIN_GIT_REPO")
 option(WITH_BUILD_BONMIN "Build BONMIN (BUILD_BONMIN_VERSION=${BUILD_BONMIN_VERSION}) from downloaded source (BUILD_BONMIN_GIT_REPO=${BUILD_BONMIN_GIT_REPO})." OFF)
 set(BUILD_BONMIN_DEPENDENCIES IPOPT CBC)
 
 # CBC: A sparse mixed-integer linear solver
 option(WITH_CBC "Compile the CBC interface" OFF)
-set(BUILD_CBC_VERSION "releases/2.10.6" CACHE STRING "Tag/branch/hash to be used for BUILD_CBC_GIT_REPO")
+set(BUILD_CBC_VERSION "releases/2.10.11" CACHE STRING "Tag/branch/hash to be used for BUILD_CBC_GIT_REPO")
 set(BUILD_CBC_GIT_REPO "https://github.com/coin-or/Cbc.git" CACHE STRING "Git repo used together with BUILD_CBC_VERSION")
 
 option(WITH_BUILD_CBC "Build CBC (BUILD_CBC_VERSION=${BUILD_CBC_VERSION}) from downloaded source." OFF)
@@ -742,13 +742,13 @@ set(BUILD_CBC_DEPENDENCIES CLP)
 
 # CLP: A sparse linear solver
 option(WITH_CLP "Compile the CLP interface" OFF)
-set(BUILD_CLP_VERSION "releases/1.17.7" CACHE STRING "Tag/branch/hash to be used for BUILD_CLP_GIT_REPO")
+set(BUILD_CLP_VERSION "releases/1.17.9" CACHE STRING "Tag/branch/hash to be used for BUILD_CLP_GIT_REPO")
 set(BUILD_CLP_GIT_REPO "https://github.com/coin-or/Clp.git" CACHE STRING "Git repo used together with BUILD_CLP_VERSION")
-set(BUILD_COINUTILS_VERSION "releases/2.11.6" CACHE STRING "Tag/branch/hash to be used for BUILD_COINUTILS_GIT_REPO")
+set(BUILD_COINUTILS_VERSION "releases/2.11.10" CACHE STRING "Tag/branch/hash to be used for BUILD_COINUTILS_GIT_REPO")
 set(BUILD_COINUTILS_GIT_REPO "https://github.com/coin-or/CoinUtils.git" CACHE STRING "Git repo used together with BUILD_COINUTILS_VERSION")
-set(BUILD_CGL_VERSION "releases/0.60.4" CACHE STRING "Tag/branch/hash to be used for BUILD_CGL_GIT_REPO")
+set(BUILD_CGL_VERSION "releases/0.60.8" CACHE STRING "Tag/branch/hash to be used for BUILD_CGL_GIT_REPO")
 set(BUILD_CGL_GIT_REPO "https://github.com/coin-or/Cgl.git" CACHE STRING "Git repo used together with BUILD_CGL_VERSION")
-set(BUILD_OSI_VERSION "releases/0.108.7" CACHE STRING "Tag/branch/hash to be used for BUILD_OSI_GIT_REPO")
+set(BUILD_OSI_VERSION "releases/0.108.9" CACHE STRING "Tag/branch/hash to be used for BUILD_OSI_GIT_REPO")
 set(BUILD_OSI_GIT_REPO "https://github.com/coin-or/Osi.git" CACHE STRING "Git repo used together with BUILD_OSI_VERSION")
 
 option(WITH_BUILD_CLP "Build CLP (BUILD_CLP_VERSION=${BUILD_CLP_VERSION}) from downloaded source (BUILD_CLP_GIT_REPO=${BUILD_CLP_GIT_REPO})." OFF)
@@ -785,7 +785,7 @@ set(BUILD_HSL_DEPENDENCIES LAPACK METIS)
 # HIGHS: A MILP / QP solver
 option(WITH_HIGHS "Compile the HiGHS interface" OFF)
 set(BUILD_HIGHS_GIT_REPO "https://github.com/ERGO-Code/HiGHS" CACHE STRING "Git repo used together with BUILD_HIGHS_VERSION")
-set(BUILD_HIGHS_VERSION "v1.4.1" CACHE STRING "Tag/branch/hash to be used for BUILD_HIGHS_GIT_REPO")
+set(BUILD_HIGHS_VERSION "v1.6.0" CACHE STRING "Tag/branch/hash to be used for BUILD_HIGHS_GIT_REPO")
 option(WITH_BUILD_HIGHS "Build HiGHS (BUILD_HIGHS_VERSION=${BUILD_HIGHS_VERSION}) from downloaded source (BUILD_HIGHS_GIT_REPO=${BUILD_HIGHS_GIT_REPO})." OFF)
 
 # ALPAQA: An open source NLP solver based on Augmented Lagrangian
@@ -1380,7 +1380,8 @@ if(WITH_CBC)
         GIT_TAG ${BUILD_CBC_VERSION}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
-        CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS_CONFIGURE} --prefix=<INSTALL_DIR> "--with-lapack-lflags=${LAPACK_LFLAGS}"  ${CROSS_FLAGS_FORTRAN}
+        CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS_CONFIGURE} --enable-cbc-parallel --prefix=<INSTALL_DIR> "--with-lapack-lflags=${LAPACK_LFLAGS}"  ${CROSS_FLAGS_FORTRAN}
+        BUILD_ALWAYS ON
 	# For unknown reasons, Coin-or/configure disables pkg-config by default for clang compilers 
 	--enable-pkg-config
 	)
@@ -1432,6 +1433,7 @@ if(WITH_IPOPT)
         GIT_TAG ${BUILD_IPOPT_VERSION}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
+        BUILD_ALWAYS ON
         CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS_CONFIGURE} --prefix=<INSTALL_DIR> "--with-mumps-cflags=-I${CMAKE_BINARY_DIR}/external_projects/include/coin-or/mumps" "--with-mumps-lflags=-L${CMAKE_BINARY_DIR}/external_projects/lib ${WHOLE_ARCHIVE_ON}-lcoinmumps ${WHOLE_ARCHIVE_OFF}"
         ${SPRAL_FLAGS}
         "--with-lapack-lflags= ${LAPACK_LFLAGS}" ${CROSS_FLAGS_FORTRAN}
