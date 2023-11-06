@@ -450,9 +450,9 @@ int casadi_hpipm_solve(casadi_hpipm_data<T1>* d, const double** arg, double** re
     // replace infinities
     casadi_clip_min(d->lbx, p->nx_total, -p->inf, 0);
     casadi_clip_min(d->lbu, p->nu_total, -p->inf, 0);
-    casadi_clip_min(d->lg,  p->nu_total, -p->inf, 0); // count?
+    casadi_clip_min(d->lg,  p->ng_total, -p->inf, 0); // count?
     casadi_clip_max(d->ubx, p->nx_total, p->inf, 0);
-    casadi_clip_max(d->ubu, p->ng_total, p->inf, 0);
+    casadi_clip_max(d->ubu, p->nu_total, p->inf, 0);
     casadi_clip_max(d->ug,  p->ng_total, p->inf, 0); // count?
 
 
