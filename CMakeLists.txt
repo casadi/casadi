@@ -1380,7 +1380,8 @@ if(WITH_CBC)
         GIT_TAG ${BUILD_CBC_VERSION}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
-        CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS_CONFIGURE} --prefix=<INSTALL_DIR> "--with-lapack-lflags=${LAPACK_LFLAGS}"  ${CROSS_FLAGS_FORTRAN}
+        CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS_CONFIGURE} --enable-cbc-parallel --prefix=<INSTALL_DIR> "--with-lapack-lflags=${LAPACK_LFLAGS}"  ${CROSS_FLAGS_FORTRAN}
+        BUILD_ALWAYS ON
 	# For unknown reasons, Coin-or/configure disables pkg-config by default for clang compilers 
 	--enable-pkg-config
 	)
@@ -1432,6 +1433,7 @@ if(WITH_IPOPT)
         GIT_TAG ${BUILD_IPOPT_VERSION}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
+        BUILD_ALWAYS ON
         CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS_CONFIGURE} --prefix=<INSTALL_DIR> "--with-mumps-cflags=-I${CMAKE_BINARY_DIR}/external_projects/include/coin-or/mumps" "--with-mumps-lflags=-L${CMAKE_BINARY_DIR}/external_projects/lib ${WHOLE_ARCHIVE_ON}-lcoinmumps ${WHOLE_ARCHIVE_OFF}"
         ${SPRAL_FLAGS}
         "--with-lapack-lflags= ${LAPACK_LFLAGS}" ${CROSS_FLAGS_FORTRAN}
