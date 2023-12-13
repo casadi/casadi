@@ -734,6 +734,13 @@ set(BUILD_PROXQP_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for PROXQP")
 option(WITH_BUILD_PROXQP "Build PROXQP (BUILD_PROXQP_VERSION=${BUILD_PROXQP_VERSION}) from downloaded source (BUILD_PROXQP_GIT_REPO=${BUILD_PROXQP_GIT_REPO})." OFF)
 set(BUILD_PROXQP_DEPENDENCIES EIGEN3 SIMDE)
 
+option(WITH_PIQP "Compile the interface to PIQP (the source code for PIQP is included)" OFF)
+add_feature_info(piqp-interface WITH_PIQP "Interface to QP solver PIQP.")
+if(WITH_PIQP)
+  find_package(piqp REQUIRED)
+endif()
+set(BUILD_PIQP_DEPENDENCIES EIGEN3)
+
 # TinyXML: An XML reader, needed e.g. by the Modelica interface
 option(WITH_BUILD_TINYXML "Compile the included TinyXML source code" ON)
 option(WITH_TINYXML "Compile the interface to TinyXML" ON)
