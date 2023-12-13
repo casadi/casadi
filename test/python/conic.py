@@ -81,13 +81,49 @@ if has_conic("cbc"):
 if has_conic("qrqp"):
   conics.append(("qrqp",{"max_iter":20,"print_header":False,"print_iter":False},{"quadratic": True, "dual": True, "soc": False, "codegen": True, "discrete": False, "sos":False}))
 
+if "SKIP_QRQP_TESTS" not in os.environ and has_conic("qrqp"):
+  codegen = {"std":"c99"}
+  conics.append(("qrqp",{"max_iter":20,"print_header":False,"print_iter":False},{"quadratic": True, "dual": True, "soc": False, "codegen": codegen, "discrete": False, "sos":False}))
+
+if "SKIP_PROXQP_TESTS" not in os.environ and has_conic("proxqp"):
+  conics.append(("proxqp",{"proxqp":{"eps_abs":1e-11,"max_iter":1e4, "backend": "sparse"}}, {"quadratic": True, "dual": True, "soc": False, "codegen": False,"discrete":False,"sos":False}))
+  conics.append(("proxqp",{"proxqp":{"eps_abs":1e-11,"max_iter":1e4, "backend": "dense"}}, {"quadratic": True, "dual": True, "soc": False, "codegen": False,"discrete":False,"sos":False}))
+
+if "SKIP_PIQP_TESTS" not in os.environ and has_conic("piqp"):
+  conics.append(("piqp",{"piqp":{"backend": "sparse"}}, {"quadratic": True, "dual": False, "soc": False, "codegen": False,"discrete":False,"sos":False}))
+  conics.append(("piqp",{"piqp":{"backend": "dense"}}, {"quadratic": True, "dual": False, "soc": False, "codegen": False,"discrete":False,"sos":False}))
+
+if "SKIP_QPALM_TESTS" not in os.environ and has_conic("qpalm"):
+  eps = 1e-8
+  conics.append(("qpalm",{"qpalm":{"eps_abs":eps,"eps_rel":eps,"eps_abs_in":eps,"eps_prim_inf":eps}},{"quadratic": True, "dual": True, "soc": False, "codegen": False, "discrete": False, "sos":False}))
+
+if "SKIP_HIGHS_TESTS" not in os.environ and has_conic("highs"):
+    codegen = {"extralibs": ["highs"], "std": "c99"}
+    conics.append(("highs",{"highs": {"primal_feasibility_tolerance":1e-7,"solver":"choose","output_flag":False,"ipm_iteration_limit":50000}},{"quadratic": True, "dual": True, "soc": False, "codegen": codegen, "discrete": True, "sos":False}))
+
+
 
 print(conics)
 
 
 class ConicTests(casadiTestCase):
 
+  def test_opti(self):
+    print("def test_opti(self):")
+    for conic, qp_options, aux_options in conics:
+      if conic in ["qrqp"]: continue
+      opti = Opti('conic')
+      x = opti.variable()
+      opti.minimize(x)
+      opti.subject_to(-2<=(x<=2))
+      opti.solver(conic,qp_options)
+
+      sol = opti.solve()
+      self.checkarray(sol.value(x),-2,digits=5)
+
   def test_sos(self):
+    print("def test_sos(self):")
+    print("def test_sos(self):")
 
     H = DM(4,4)
     G = DM([-1,-2,-3,-1])
@@ -141,6 +177,8 @@ class ConicTests(casadiTestCase):
       self.check_serialize(solver,solver_in)
 
   def test_milp(self):
+    print("def test_milp(self):")
+    print("def test_milp(self):")
     # From https://www.cs.upc.edu/~erodri/webpage/cps/theory/lp/milp/slides.pdf
     H = DM(2,2)
     G = DM([-1,-1])
@@ -210,6 +248,8 @@ class ConicTests(casadiTestCase):
       self.checkarray(solver_out["cost"],DM([-23]))
 
   def test_general_unconstrained(self):
+    print("def test_general_unconstrained(self):")
+    print("def test_general_unconstrained(self):")
     H = sparsify(DM([[1,0],[0,1]]))
     G = DM([-0.7,-2.3])
     A =  DM.zeros(0,2)
@@ -257,6 +297,8 @@ class ConicTests(casadiTestCase):
       self.check_serialize(solver,solver_in)
 
   def test_general_convex_dense(self):
+    print("def test_general_convex_dense(self):")
+    print("def test_general_convex_dense(self):")
     self.message("Convex dense QP with solvers: " + str([conic for conic,options,aux_options in conics]))
     H = DM([[1,-1],[-1,2]])
     G = DM([-2,-6])
@@ -352,6 +394,8 @@ class ConicTests(casadiTestCase):
 
 
   def test_general_convex_sparse(self):
+    print("def test_general_convex_sparse(self):")
+    print("def test_general_convex_sparse(self):")
     self.message("Convex sparse QP with solvers: " + str([conic for conic,options,aux_options in conics]))
     H = c.diag([2,1,0.2,0.7,1.3])
 
@@ -405,6 +449,8 @@ class ConicTests(casadiTestCase):
         self.check_codegen(solver,solver_in,std="c99",extralibs=extralibs,extra_options=aux_options["codegen"])
 
   def test_general_nonconvex_dense(self):
+    print("def test_general_nonconvex_dense(self):")
+    print("def test_general_nonconvex_dense(self):")
     self.message("Non convex dense QP with solvers: " + str([conic for conic,options,aux_options in conics]))
     H = DM([[1,-1],[-1,-2]])
     G = DM([-2,-6])
@@ -434,6 +480,8 @@ class ConicTests(casadiTestCase):
       self.assertRaises(Exception,lambda : solver(solver_in))
 
   def test_equality(self):
+    print("def test_equality(self):")
+    print("def test_equality(self):")
     self.message("Regression 452 test: equality constraints give wrong multipliers")
     H = DM([[1,-1],[-1,2]])
     G = DM([-2,-6])
@@ -519,6 +567,8 @@ class ConicTests(casadiTestCase):
         self.check_codegen(solver,solver_in,std="c99",extralibs=extralibs,extra_options=aux_options["codegen"])
   @memory_heavy()
   def test_degenerate_hessian(self):
+    print("def test_degenerate_hessian(self):")
+    print("def test_degenerate_hessian(self):")
     self.message("Degenerate hessian")
 
     H = DM([[1,-1,0],[-1,2,0],[0,0,0]])
@@ -569,6 +619,8 @@ class ConicTests(casadiTestCase):
         self.check_codegen(solver,solver_in,std="c99",extralibs=extralibs,extra_options=aux_options["codegen"])
 
   def test_no_inequality(self):
+    print("def test_no_inequality(self):")
+    print("def test_no_inequality(self):")
     self.message("No inequalities present")
     H = DM([[1,-1],[-1,2]])
     G = DM([-2,-6])
@@ -617,6 +669,8 @@ class ConicTests(casadiTestCase):
       self.assertAlmostEqual(solver_out["cost"][0],-3.375,max(1,6-less_digits),str(conic))
 
   def test_no_A(self):
+    print("def test_no_A(self):")
+    print("def test_no_A(self):")
     self.message("No A present")
     H = DM([[1,-1],[-1,2]])
     G = DM([-2,-6])
@@ -665,6 +719,8 @@ class ConicTests(casadiTestCase):
         self.check_codegen(solver,solver_in,std="c99",extralibs=extralibs,extra_options=aux_options["codegen"])
 
   def test_standard_form(self):
+    print("def test_standard_form(self):")
+    print("def test_standard_form(self):")
     H = DM([[1,-1],[-1,2]])
     G = DM([-2,-6])
     A =  DM([1,1]).T
@@ -709,6 +765,8 @@ class ConicTests(casadiTestCase):
 
   @memory_heavy()
   def test_badscaling(self):
+    print("def test_badscaling(self):")
+    print("def test_badscaling(self):")
     #return
     self.message("Badly scaled problem")
     N = 50
@@ -751,6 +809,8 @@ class ConicTests(casadiTestCase):
       if aux_options["dual"]: self.checkarray(solver_out["lam_x"],DM.zeros(N,1),str(conic),digits=max(1,4-less_digits))
 
   def test_redundant(self):
+    print("def test_redundant(self):")
+    print("def test_redundant(self):")
     self.message("Redundant constraints")
 
     H = DM([[1,-1,0],[-1,2,0],[0,0,0]])
@@ -796,6 +856,8 @@ class ConicTests(casadiTestCase):
         if aux_options["dual"]: self.checkarray(mtimes(A.T,solver_out["lam_a"]),DM([3.876923073076,2.4384615365384965,-1]),str(conic),digits=max(1,6-less_digits))
 
   def test_linear(self):
+    print("def test_linear(self):")
+    print("def test_linear(self):")
     H = DM(2,2)
     A = DM([ [-1,1],[1,1],[1,-2]])
     LBA = DM([ -inf, 2, -inf ])
@@ -838,6 +900,8 @@ class ConicTests(casadiTestCase):
 
 
   def test_linear2(self):
+    print("def test_linear2(self):")
+    print("def test_linear2(self):")
     H = DM(2,2)
     A = DM([[-1,1],[1,1],[1,-2]])
     LBA = DM([ -inf, 2, -inf ])
@@ -874,8 +938,10 @@ class ConicTests(casadiTestCase):
       if aux_options["dual"]: self.checkarray(solver_out["lam_a"],DM([2,0,0]),str(conic),digits=max(1,5-less_digits))
 
       self.assertAlmostEqual(solver_out["cost"][0],7,max(1,5-less_digits),str(conic))
+    print("DONE")
 
   def test_overconstrained(self):
+    print("def test_overconstrained(self):")
     x=SX.sym("x")
     qp={'x':x, 'f':(x-1)**2, 'g':vertcat(*[x,x,x])}
 
@@ -897,9 +963,26 @@ class ConicTests(casadiTestCase):
       if aux_options["codegen"]:
         self.check_codegen(solver,solver_in,std="c99",extralibs=extralibs,extra_options=aux_options["codegen"])
 
-  @requires_conic("hpmpc")
+  @requires_conic("qrqp")
+  def test_qrqp_prints(self):
+    print("def test_qrqp_prints(self):")
+    x = MX.sym("x")
+    qp = {"x":x,"f":(x-1)**2}
+    solver = qpsol("solver","qrqp",qp)
+    with self.assertOutput(["last_tau","Converged"],[]):
+        solver()
+    if args.run_slow:
+        F,_ = self.check_codegen(solver,{},std="c99",opts={})
+        with self.assertOutput([],["last_tau","Converged"]): # By default, don't print
+            F()
+        F,_ = self.check_codegen(solver,{},std="c99",opts={"verbose_runtime":True})
+        #with self.assertOutput(["last_tau","Converged"],[]): # Printing, but not captured by python stdout
+        #    F()
+
+  @requires_conic("hpipm")
   @requires_conic("qpoases")
-  def test_hpmpc(self):
+  def test_hpipm(self):
+    print("def test_hpipm(self):")
 
     inf = 100
     T = 10. # Time horizon
@@ -1222,6 +1305,7 @@ class ConicTests(casadiTestCase):
       self.checkarray(res["x"][:-1],x0,conic,digits=4)
 
   def test_no_success(self):
+    print("def test_no_success(self):")
 
     x=SX.sym("x")
     y=SX.sym("y")
