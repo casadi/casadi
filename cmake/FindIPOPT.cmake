@@ -55,7 +55,5 @@ if(IPOPT_FOUND)
   else()
     target_compile_definitions(ipopt INTERFACE HAVE_CSTDDEF)
   endif()
-  target_compile_definitions(ipopt INTERFACE ${IPOPT_CFLAGS_OTHER})
+  target_compile_options(ipopt INTERFACE ${IPOPT_CFLAGS_OTHER})
 endif()
-
-
