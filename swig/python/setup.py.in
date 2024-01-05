@@ -112,6 +112,12 @@ setup(
     long_description=long_description,
     long_description_content_type='text/markdown',
     url='http://casadi.org',
+    download_url="http://install.casadi.org",
+    project_urls={
+    	"Bug Tracker": "https://github.com/casadi/casadi/issues",
+    	"Documentation": "http://docs.casadi.org",
+    	"Source Code": "https://github.com/casadi/casadi"
+    },
     ext_modules=[CMakeExtension('casadi')],
     cmdclass=dict(build_ext=CMakeBuild),
     install_requires=install_requires,
@@ -132,6 +138,8 @@ setup(
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
+        'Programming Language :: Python :: 3.12'
         ('License :: OSI Approved :: '
          'GNU Lesser General Public License v3 or later (LGPLv3+)'),
     ]
