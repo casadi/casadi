@@ -127,7 +127,9 @@ Author: Joel Andersson, Joris Gillis, Greg Horn
 Author-email:  developer_first_name@casadi.org
 License: GNU Lesser General Public License v3 or later (LGPLv3+)
 Download-URL: http://install.casadi.org
-Project-URL: https://github.com/casadi/casadi
+Project-URL: Documentation, http://docs.casadi.org
+Project-URL: Bug Tracker, https://github.com/casadi/casadi/issues
+Project-URL: Source Code, https://github.com/casadi/casadi
 Platform: Windows
 Platform: Linux
 Platform: Mac OS-X
