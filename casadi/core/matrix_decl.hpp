@@ -1050,14 +1050,29 @@ namespace casadi {
 
     /** \brief Check if symbolic (Dense)
 
+        Check if an expression is a pure symbol.
+        Pure means that no operations should happen on the symbol
+        (not even vec, transpose, index, concatenation, ...)
+        By consequence, a slice of a vector-shaped MX symbol is not a symbol.
+        However, the SX type is really a container format with scalar entries.
+        Therefore, a slice of a vector-shaped SX symbol is still a symbol.
+
         Sparse matrices invariable return false
+
+        \seealso is_valid_input
 
         \identifier{19r} */
     bool is_symbolic() const;
 
     /** \brief Check if matrix can be used to define function inputs.
 
+
+        is_valid_input is more forgiving than is_symbolic.
+        Some compositions are allowed: vec, vertcat.
+
         Sparse matrices can return true if all non-zero elements are symbolic
+
+        \seealso is_symbolic
 
         \identifier{19s} */
     bool is_valid_input() const;
