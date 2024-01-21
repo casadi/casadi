@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        compiler: ['9','10','11','12']
+        compiler: ['9','10','11','12','13']
     steps:
       - uses: actions/checkout@v2.4.0
       - name: Build
