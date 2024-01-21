@@ -80,6 +80,19 @@
       return PyErr_CheckSignals();
     }
 
+    std::string python_string_to_std_string(PyObject *str_py) {
+#if SWIG_VERSION < 0x040200
+      const char *str_char = SWIG_Python_str_AsChar(str_py);
+      std::string str(str_char);
+      SWIG_Python_str_DelForPy3(str_char);
+#else
+      PyObject *bytes = NULL;
+      std::string str(SWIG_PyUnicode_AsUTF8AndSize(str_py, NULL, &bytes));
+      Py_XDECREF(bytes);
+#endif
+      return str;
+    }
+
     void handle_director_exception() {
 	    std::string msg = "Exception in SWIG director ";
       SWIG_PYTHON_THREAD_BEGIN_BLOCK;
@@ -91,9 +104,7 @@
       PyObject *ptype, *pvalue, *ptraceback;
       PyErr_Fetch(&ptype, &pvalue, &ptraceback);
       PyObject* msg_py = PyObject_Str(pvalue);
-      char *msg_char = SWIG_Python_str_AsChar(msg_py);
-      msg = msg_char;
-      SWIG_Python_str_DelForPy3(msg_char);
+      msg = python_string_to_std_string(msg_py);
       Py_DECREF(msg_py);
       PyErr_Restore(ptype, pvalue, ptraceback);
       PyErr_Print();
@@ -1500,10 +1511,10 @@ namespace std {
 
 #ifdef SWIGPYTHON
       if (PyString_Check(p) || PyUnicode_Check(p)) {
-        if (m) (*m)->clear();
-        char* my_char = SWIG_Python_str_AsChar(p);
-        if (m) (*m)->append(my_char);
-        SWIG_Python_str_DelForPy3(my_char);
+        if (m) {
+          (*m)->clear();
+          (*m)->append(python_string_to_std_string(p));
+        }
         return true;
       }
 #endif // SWIGPYTHON
@@ -1594,9 +1605,7 @@ namespace std {
         while (PyDict_Next(p, &pos, &key, &value)) {
           if (!(PyString_Check(key) || PyUnicode_Check(key))) return false;
           if (m) {
-            char* c_key = SWIG_Python_str_AsChar(key);
-            M *v=&(**m)[std::string(c_key)], *v2=v;
-            SWIG_Python_str_DelForPy3(c_key);
+            M *v=&(**m)[python_string_to_std_string(key)], *v2=v;
             if (!casadi::to_ptr(value, &v)) return false;
             if (v!=v2) *v2=*v; // if only pointer changed
           } else {
@@ -1857,11 +1866,8 @@ namespace std {
       PyObject * classo = PyObject_GetAttrString( p, "__class__");
       PyObject * classname = PyObject_GetAttrString( classo, "__name__");
 
-      char* c_classname = SWIG_Python_str_AsChar(classname);
-      bool ret = strcmp(c_classname, name)==0;
-
+      bool ret = python_string_to_std_string(classname) == name;
       Py_DECREF(classo);Py_DECREF(classname);
-      SWIG_Python_str_DelForPy3(c_classname);
       return ret;
     }
 #endif // SWIGPYTHON
