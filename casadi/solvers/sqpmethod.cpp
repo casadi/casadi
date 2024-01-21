@@ -860,9 +860,10 @@ int Sqpmethod::solve_QP(SqpmethodMemory* m, const double* H, const double* g,
   double cost;
   m->res[CONIC_COST] = &cost;
 
+  scoped_checkout<Function> mem_qp(qpsol_);
   // Solve the QP
-  qpsol_(m->arg, m->res, m->iw, m->w, 0);
-  auto m_qpsol = static_cast<ConicMemory*>(qpsol_->memory(0));
+  qpsol_(m->arg, m->res, m->iw, m->w, mem_qp);
+  auto m_qpsol = static_cast<ConicMemory*>(qpsol_->memory(mem_qp));
 
   // Check if the QP was infeasible for elastic mode
   if (!m_qpsol->d_qp.success) {

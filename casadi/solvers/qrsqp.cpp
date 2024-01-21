@@ -557,7 +557,7 @@ namespace casadi {
     m->res[CONIC_LAM_A] = dlam + nx_;
 
     // Solve the QP
-    qpsol_(m->arg, m->res, m->iw, m->w, 0);
+    qpsol_(m->arg, m->res, m->iw, m->w);
     if (verbose_) print("QP solved\n");
   }
 

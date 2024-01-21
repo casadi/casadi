@@ -1374,7 +1374,7 @@ int Feasiblesqpmethod::solve(void* mem) const {
 
 
     // Solve the QP
-    qpsol_(m->arg, m->res, m->iw, m->w, 0);
+    qpsol_(m->arg, m->res, m->iw, m->w);
 
     if (verbose_) print("QP solved\n");
     return 0;
@@ -1408,7 +1408,7 @@ int Feasiblesqpmethod::solve(void* mem) const {
 
 
     // Solve the QP
-    qpsol_(m->arg, m->res, m->iw, m->w, 0);
+    qpsol_(m->arg, m->res, m->iw, m->w);
 
     if (verbose_) print("QP solved\n");
     return 0;

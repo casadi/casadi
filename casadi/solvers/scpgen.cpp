@@ -1161,7 +1161,7 @@ namespace casadi {
     m->res[CONIC_LAM_A] = m->dlam + nx_; // Multipliers (linear bounds)
 
     // Solve the QP
-    qpsol_(m->arg, m->res, m->iw, m->w, 0);
+    qpsol_(m->arg, m->res, m->iw, m->w);
 
     // Calculate penalty parameter of merit function
     m->sigma = std::max(merit_start_, 1.01*casadi_norm_inf(nx_+ng_, m->dlam));
