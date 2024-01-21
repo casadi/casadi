@@ -386,7 +386,14 @@ int Sqpmethod::init_mem(void* mem) const {
   m->add_stat("BFGS");
   m->add_stat("QP");
   m->add_stat("linesearch");
+  m->mem_qp = qpsol_->checkout();
   return 0;
+}
+
+void Sqpmethod::free_mem(void* mem) const {
+  auto m = static_cast<SqpmethodMemory*>(mem);
+  if (m->mem_qp >= 0) qpsol_.release(m->mem_qp);
+  delete static_cast<SqpmethodMemory*>(mem);
 }
 
 int Sqpmethod::solve(void* mem) const {
@@ -860,10 +867,9 @@ int Sqpmethod::solve_QP(SqpmethodMemory* m, const double* H, const double* g,
   double cost;
   m->res[CONIC_COST] = &cost;
 
-  scoped_checkout<Function> mem_qp(qpsol_);
   // Solve the QP
-  qpsol_(m->arg, m->res, m->iw, m->w, mem_qp);
-  auto m_qpsol = static_cast<ConicMemory*>(qpsol_->memory(mem_qp));
+  qpsol_(m->arg, m->res, m->iw, m->w, m->mem_qp);
+  auto m_qpsol = static_cast<ConicMemory*>(qpsol_->memory(m->mem_qp));
 
   // Check if the QP was infeasible for elastic mode
   if (!m_qpsol->d_qp.success) {

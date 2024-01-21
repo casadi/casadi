@@ -44,6 +44,9 @@ namespace casadi {
   struct CASADI_NLPSOL_SQPMETHOD_EXPORT SqpmethodMemory : public NlpsolMemory {
     // Problem data structure
     casadi_sqpmethod_data<double> d;
+
+    // Memory object of qp solver
+    int mem_qp;
     /// Hessian regularization
     double reg;
 
@@ -97,7 +100,7 @@ namespace casadi {
     int init_mem(void* mem) const override;
 
     /** \brief Free memory block */
-    void free_mem(void *mem) const override { delete static_cast<SqpmethodMemory*>(mem);}
+    void free_mem(void* mem) const override;
 
     /** \brief Set the (persistent) work vectors */
     void set_work(void* mem, const double**& arg, double**& res,
