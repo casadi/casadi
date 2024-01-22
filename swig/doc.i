@@ -16202,7 +16202,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp
 const ExType &y) "
 
 [INTERNAL] 
-Logical greater or equal to: (x,y) -> x <= y.
+Logical greater or equal to: (x,y) -> x >= y.
 
 Extra doc: https://github.com/casadi/casadi/wiki/L_ou
 
@@ -16216,7 +16216,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp
 
 %feature("docstring") casadi::casadi_ge "
 
-Logical greater or equal to: (x,y) -> x <= y.
+Logical greater or equal to: (x,y) -> x >= y.
 
 Extra doc: https://github.com/casadi/casadi/wiki/L_ou
 
@@ -16230,7 +16230,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp
 
 %feature("docstring")  casadi::GenericExpressionCommon::casadi_ge "
 
-Logical greater or equal to: (x,y) -> x <= y.
+Logical greater or equal to: (x,y) -> x >= y.
 
 Extra doc: https://github.com/casadi/casadi/wiki/L_ou
 
@@ -16246,7 +16246,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp
 const ExType &y) "
 
 [INTERNAL] 
-Logical greater or equal to: (x,y) -> x <= y.
+Logical greater or equal to: (x,y) -> x >= y.
 
 Extra doc: https://github.com/casadi/casadi/wiki/L_ou
 
@@ -16260,7 +16260,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp
 
 %feature("docstring") casadi::casadi_ge "
 
-Logical greater or equal to: (x,y) -> x <= y.
+Logical greater or equal to: (x,y) -> x >= y.
 
 Extra doc: https://github.com/casadi/casadi/wiki/L_ou
 
@@ -16274,7 +16274,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp
 
 %feature("docstring")  casadi::GenericExpressionCommon::casadi_ge "
 
-Logical greater or equal to: (x,y) -> x <= y.
+Logical greater or equal to: (x,y) -> x >= y.
 
 Extra doc: https://github.com/casadi/casadi/wiki/L_ou
 
@@ -30911,7 +30911,7 @@ Create a matrix with uniformly distributed random numbers.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1ab
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1197
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1212
 
 ";
 
@@ -30923,7 +30923,7 @@ Create a matrix with uniformly distributed random numbers.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1ab
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1200
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1215
 
 Implementation: 
 https://github.com/casadi/casadi/blob/develop/casadi/core/dm_instantiator.cpp#L59-L67
@@ -30939,7 +30939,7 @@ Create a matrix with uniformly distributed random numbers.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1ab
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1201
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1216
 
 ";
 
@@ -31782,7 +31782,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L177-L
 Sparse matrix with a given sparsity with all values same.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1280
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1295
 
 ";
 
@@ -31793,7 +31793,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1280
 Sparse matrix with a given sparsity and non-zero elements.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1283
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1298
 
 ";
 
@@ -32142,12 +32142,24 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/sx_instantiator.cpp#L1
 [INTERNAL] 
 Check if symbolic (Dense)
 
+Check if an expression is a pure symbol. Pure means that no operations
+ 
+should happen on the symbol (not even vec, transpose, index, 
+concatenation,
+ ...) By consequence, a slice of a vector-shaped  MX symbol is not a symbol.
+ However, the SX type is really a container 
+format with scalar entries. 
+Therefore, a slice of a vector-shaped SX 
+symbol is still a symbol.
+
 Sparse matrices invariable return false
+
+\\\\seealso is_valid_input
 
 Extra doc: https://github.com/casadi/casadi/wiki/L_19r
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1056
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1065
 
 Implementation: 
 https://github.com/casadi/casadi/blob/develop/casadi/core/sx_instantiator.cpp#L149-L155
@@ -32159,12 +32171,18 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/sx_instantiator.cpp#L1
 [INTERNAL] 
 Check if matrix can be used to define function inputs.
 
+is_valid_input is more forgiving than is_symbolic. Some compositions 
+are 
+allowed: vec, vertcat.
+
 Sparse matrices can return true if all non-zero elements are symbolic
+
+\\\\seealso is_symbolic
 
 Extra doc: https://github.com/casadi/casadi/wiki/L_19s
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1063
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1078
 
 Implementation: 
 https://github.com/casadi/casadi/blob/develop/casadi/core/sx_instantiator.cpp#L140-L146
@@ -32181,7 +32199,7 @@ possible)
 Extra doc: https://github.com/casadi/casadi/wiki/L_19v
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1085
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1100
 
 ";
 
@@ -32195,7 +32213,7 @@ Check if the matrix is integer-valued.
 Extra doc: https://github.com/casadi/casadi/wiki/L_19w
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1092
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1107
 
 ";
 
@@ -32209,7 +32227,7 @@ possible)
 Extra doc: https://github.com/casadi/casadi/wiki/L_19x
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1097
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1112
 
 ";
 
@@ -32223,7 +32241,7 @@ possible)
 Extra doc: https://github.com/casadi/casadi/wiki/L_19y
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1102
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1117
 
 ";
 
@@ -32237,7 +32255,7 @@ possible)
 Extra doc: https://github.com/casadi/casadi/wiki/L_19z
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1107
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1122
 
 ";
 
@@ -32253,7 +32271,7 @@ are possible)
 Extra doc: https://github.com/casadi/casadi/wiki/L_1a0
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1114
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1129
 
 ";
 
@@ -32263,7 +32281,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1114
 Get operation type.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1117
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1132
 
 Implementation: 
 https://github.com/casadi/casadi/blob/develop/casadi/core/sx_instantiator.cpp#L158-L160
@@ -32276,7 +32294,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/sx_instantiator.cpp#L1
 Is it a certain operation.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1120
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1135
 
 Implementation: 
 https://github.com/casadi/casadi/blob/develop/casadi/core/sx_instantiator.cpp#L163-L165
@@ -32293,7 +32311,7 @@ zeros.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1a1
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1125
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1140
 
 ";
 
@@ -32307,10 +32325,10 @@ Implementation of  Matrix::get_nonzeros (in public API)
 Extra doc: https://github.com/casadi/casadi/wiki/L_1a2
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1130
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1145
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1310-L1315
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1325-L1330
 
 ";
 
@@ -32322,7 +32340,7 @@ Get all nonzeros.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1a4
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1142
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1157
 
 ";
 
@@ -32334,7 +32352,7 @@ Get all elements.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1a3
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1135
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1150
 
 ";
 
@@ -32346,7 +32364,7 @@ Get name (only if symbolic scalar)
 Extra doc: https://github.com/casadi/casadi/wiki/L_1a8
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1166
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1181
 
 Implementation: 
 https://github.com/casadi/casadi/blob/develop/casadi/core/sx_instantiator.cpp#L187-L189
@@ -32364,7 +32382,7 @@ const.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1a9
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1174
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1189
 
 Implementation: 
 https://github.com/casadi/casadi/blob/develop/casadi/core/sx_instantiator.cpp#L192-L194
@@ -32381,7 +32399,7 @@ Only defined if symbolic scalar.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1aa
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1181
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1196
 
 Implementation: 
 https://github.com/casadi/casadi/blob/develop/casadi/core/sx_instantiator.cpp#L197-L199
@@ -32412,7 +32430,7 @@ lang: only 'matlab' supported for now
 Extra doc: https://github.com/casadi/casadi/wiki/L_1ac
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1219
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1234
 
 Implementation: 
 https://github.com/casadi/casadi/blob/develop/casadi/core/dm_instantiator.cpp#L94-L192
@@ -32425,7 +32443,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/dm_instantiator.cpp#L9
 Obtain information about sparsity
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1223
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1238
 
 Implementation: 
 https://github.com/casadi/casadi/blob/develop/casadi/core/dm_instantiator.cpp#L195-L197
@@ -32441,7 +32459,7 @@ Serialize an object.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1ad
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1228
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1243
 
 ";
 
@@ -32453,7 +32471,7 @@ Serialize.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1ae
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1234
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1249
 
 ";
 
@@ -32466,7 +32484,7 @@ Serialize an object.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1ah
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1249
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1264
 
 ";
 
@@ -32494,7 +32512,7 @@ Supported formats:
 
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1269
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1284
 
 ";
 
@@ -45338,7 +45356,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp
 const SXElem &y) "
 
 [INTERNAL] 
-Logical greater or equal to: (x,y) -> x <= y.
+Logical greater or equal to: (x,y) -> x >= y.
 
 Extra doc: https://github.com/casadi/casadi/wiki/L_ou
 
@@ -45352,7 +45370,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp
 
 %feature("docstring") casadi::casadi_ge "
 
-Logical greater or equal to: (x,y) -> x <= y.
+Logical greater or equal to: (x,y) -> x >= y.
 
 Extra doc: https://github.com/casadi/casadi/wiki/L_ou
 
@@ -45366,7 +45384,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/generic_expression.hpp
 
 %feature("docstring")  casadi::GenericExpressionCommon::casadi_ge "
 
-Logical greater or equal to: (x,y) -> x <= y.
+Logical greater or equal to: (x,y) -> x >= y.
 
 Extra doc: https://github.com/casadi/casadi/wiki/L_ou
 
