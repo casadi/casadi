@@ -79,6 +79,9 @@ The main characteristics of the Opti stack are:
 
 By default, Opti will assume a nonlinear program. To solve quadratic programs, supply the string 'conic' as argument to the Opti constructor.
 
+Note that Opti is designed to be user-friendly and there is quite some overhead with respect to using |nlpsol|.
+However, there is a |to_function| method (documented below) that eliminates the bulk of that overhead.
+
 
 Problem specification
 ---------------------
@@ -625,6 +628,7 @@ You may construct a regular CasADi Function out of an Opti object, by calling th
 The supplied list of input arguments may contain parameters, decision variables and dual variables.
 Inputs corresponding to variables are taken as initial guesses.
 If you desire this Function to throw a runtime error when the solver fails, you may pass the ``error_on_fail`` as solver option.
+Using the resulting CasADi |Function| will be quite a bit faster than ``opti.set_initial`` + ``opti.solve`` + ``sol.value``.
 
 .. exec-block:: python
 
