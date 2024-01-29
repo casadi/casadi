@@ -67,28 +67,28 @@ bool External::any_symbol_found() const {
 
 void External::init_external() {
   // Increasing/decreasing reference counter
-  incref_ = (signal_t)li_.get_function(name_ + "_incref");
-  decref_ = (signal_t)li_.get_function(name_ + "_decref");
+  incref_ = (signal_user_data_t)li_.get_function(name_ + "_incref");
+  decref_ = (signal_user_data_t)li_.get_function(name_ + "_decref");
 
   casadi_assert(static_cast<bool>(incref_) == static_cast<bool>(decref_),
     "External must either define both incref and decref or neither.");
 
   // Getting default arguments
-  get_default_in_ = (default_t)li_.get_function(name_ + "_default_in");
+  get_default_in_ = (default_user_data_t)li_.get_function(name_ + "_default_in");
 
   // Getting number of inputs and outputs
-  get_n_in_ = (getint_t)li_.get_function(name_ + "_n_in");
-  get_n_out_ = (getint_t)li_.get_function(name_ + "_n_out");
+  get_n_in_ = (getint_user_data_t)li_.get_function(name_ + "_n_in");
+  get_n_out_ = (getint_user_data_t)li_.get_function(name_ + "_n_out");
 
   // Getting names of inputs and outputs
-  get_name_in_ = (name_t)li_.get_function(name_ + "_name_in");
-  get_name_out_ = (name_t)li_.get_function(name_ + "_name_out");
+  get_name_in_ = (name_user_data_t)li_.get_function(name_ + "_name_in");
+  get_name_out_ = (name_user_data_t)li_.get_function(name_ + "_name_out");
 
   // Work vector sizes
-  work_ = (work_t)li_.get_function(name_ + "_work");
+  work_ = (work_user_data_t)li_.get_function(name_ + "_work");
 
   // Increase reference counter - external function memory initialized at this point
-  if (incref_) incref_();
+  if (incref_) incref_(user_data_);
 }
 
 GenericExternal::GenericExternal(const std::string& name, const Importer& li)
@@ -108,35 +108,35 @@ bool GenericExternal::any_symbol_found() const {
 void GenericExternal::init_external() {
 
   // Functions for retrieving sparsities of inputs and outputs
-  get_sparsity_in_ = (sparsity_t)li_.get_function(name_ + "_sparsity_in");
-  get_sparsity_out_ = (sparsity_t)li_.get_function(name_ + "_sparsity_out");
+  get_sparsity_in_ = (sparsity_user_data_t)li_.get_function(name_ + "_sparsity_in");
+  get_sparsity_out_ = (sparsity_user_data_t)li_.get_function(name_ + "_sparsity_out");
 
   // Differentiability of inputs and outputs
-  get_diff_in_ = (diff_t)li_.get_function(name_ + "_diff_in");
-  get_diff_out_ = (diff_t)li_.get_function(name_ + "_diff_out");
+  get_diff_in_ = (diff_user_data_t)li_.get_function(name_ + "_diff_in");
+  get_diff_out_ = (diff_user_data_t)li_.get_function(name_ + "_diff_out");
 
   // Memory management functions
-  checkout_ = (casadi_checkout_t) li_.get_function(name_ + "_checkout");
-  release_ = (casadi_release_t) li_.get_function(name_ + "_release");
+  checkout_ = (casadi_checkout_user_data_t) li_.get_function(name_ + "_checkout");
+  release_ = (casadi_release_user_data_t) li_.get_function(name_ + "_release");
 
   casadi_assert(static_cast<bool>(checkout_) == static_cast<bool>(release_),
     "External must either define both checkout and release or neither.");
 
   // Function for numerical evaluation
-  eval_ = (eval_t)li_.get_function(name_);
+  eval_ = (eval_user_data_t)li_.get_function(name_);
 
   // Sparsity patterns of Jacobians
-  get_jac_sparsity_ = (sparsity_t)li_.get_function("jac_" + name_ + "_sparsity_out");
+  get_jac_sparsity_ = (sparsity_user_data_t)li_.get_function("jac_" + name_ + "_sparsity_out");
 }
 
 External::~External() {
-  if (decref_) decref_();
+  if (decref_) decref_(user_data_);
   clear_mem();
 }
 
 size_t External::get_n_in() {
   if (get_n_in_) {
-    return get_n_in_();
+    return get_n_in_(user_data_);
   } else if (li_.has_meta(name_ + "_N_IN")) {
     return li_.meta_int(name_ + "_N_IN");
   } else {
@@ -147,7 +147,7 @@ size_t External::get_n_in() {
 
 size_t External::get_n_out() {
   if (get_n_out_) {
-    return get_n_out_();
+    return get_n_out_(user_data_);
   } else if (li_.has_meta(name_ + "_N_OUT")) {
     return li_.meta_int(name_ + "_N_OUT");
   } else {
@@ -158,7 +158,7 @@ size_t External::get_n_out() {
 
 double External::get_default_in(casadi_int i) const {
   if (get_default_in_) {
-    return get_default_in_(i);
+    return get_default_in_(i, user_data_);
   } else {
     // Fall back to base class
     return FunctionInternal::get_default_in(i);
@@ -168,7 +168,7 @@ double External::get_default_in(casadi_int i) const {
 std::string External::get_name_in(casadi_int i) {
   if (get_name_in_) {
     // Use function pointer
-    const char* n = get_name_in_(i);
+    const char* n = get_name_in_(i, user_data_);
     casadi_assert(n!=nullptr, "Error querying input name");
     return n;
   } else if (li_.has_meta(name_ + "_NAME_IN", i)) {
@@ -183,7 +183,7 @@ std::string External::get_name_in(casadi_int i) {
 std::string External::get_name_out(casadi_int i) {
   if (get_name_out_) {
     // Use function pointer
-    const char* n = get_name_out_(i);
+    const char* n = get_name_out_(i, user_data_);
     casadi_assert(n!=nullptr, "Error querying output name");
     return n;
   } else if (li_.has_meta(name_ + "_NAME_OUT", i)) {
@@ -198,7 +198,7 @@ std::string External::get_name_out(casadi_int i) {
 Sparsity GenericExternal::get_sparsity_in(casadi_int i) {
   // Use sparsity retrieval function, if present
   if (get_sparsity_in_) {
-    return Sparsity::compressed(get_sparsity_in_(i));
+    return Sparsity::compressed(get_sparsity_in_(i, user_data_));
   } else if (li_.has_meta(name_ + "_SPARSITY_IN", i)) {
     return Sparsity::compressed(li_.meta_vector<casadi_int>(name_ + "_SPARSITY_IN", i));
   } else {
@@ -210,7 +210,7 @@ Sparsity GenericExternal::get_sparsity_in(casadi_int i) {
 Sparsity GenericExternal::get_sparsity_out(casadi_int i) {
   // Use sparsity retrieval function, if present
   if (get_sparsity_out_) {
-    return Sparsity::compressed(get_sparsity_out_(i));
+    return Sparsity::compressed(get_sparsity_out_(i, user_data_));
   } else if (li_.has_meta(name_ + "_SPARSITY_OUT", i)) {
     return Sparsity::compressed(li_.meta_vector<casadi_int>(name_ + "_SPARSITY_OUT", i));
   } else {
@@ -237,7 +237,7 @@ Sparsity GenericExternal::get_jac_sparsity(casadi_int oind, casadi_int iind,
   casadi_int ind = iind + oind * n_in_;
   // Use sparsity retrieval function, if present
   if (get_jac_sparsity_) {
-    return Sparsity::compressed(get_jac_sparsity_(ind));
+    return Sparsity::compressed(get_jac_sparsity_(ind, user_data_));
   } else if (li_.has_meta("JAC_" + name_ + "_SPARSITY_OUT", ind)) {
     return Sparsity::compressed(
       li_.meta_vector<casadi_int>("jac_" + name_ + "_SPARSITY_OUT", ind));
@@ -250,7 +250,7 @@ Sparsity GenericExternal::get_jac_sparsity(casadi_int oind, casadi_int iind,
 bool GenericExternal::get_diff_in(casadi_int i) {
   if (get_diff_in_) {
     // Query function exists
-    return get_diff_in_(i);
+    return get_diff_in_(i, user_data_);
   } else {
     // Fall back to base class
     return FunctionInternal::get_diff_in(i);
@@ -260,7 +260,7 @@ bool GenericExternal::get_diff_in(casadi_int i) {
 bool GenericExternal::get_diff_out(casadi_int i) {
   if (get_diff_out_) {
     // Query function exists
-    return get_diff_out_(i);
+    return get_diff_out_(i, user_data_);
   } else {
     // Fall back to base class
     return FunctionInternal::get_diff_out(i);
@@ -284,7 +284,7 @@ void External::init(const Dict& opts) {
   // Allocate work vectors
   casadi_int sz_arg=0, sz_res=0, sz_iw=0, sz_w=0;
   if (work_) {
-    casadi_int flag = work_(&sz_arg, &sz_res, &sz_iw, &sz_w);
+    casadi_int flag = work_(&sz_arg, &sz_res, &sz_iw, &sz_w, user_data_);
     casadi_assert(flag==0, "External: \"work\" failed");
   } else if (li_.has_meta(name_ + "_WORK")) {
     std::vector<casadi_int> v = li_.meta_vector<casadi_int>(name_ + "_WORK");
@@ -472,6 +472,7 @@ Function External::factory(const std::string& name,
 }
 
 void External::serialize_body(SerializingStream &s) const {
+  casadi_error("Not supported");
   FunctionInternal::serialize_body(s);
 
   s.version("External", 1);

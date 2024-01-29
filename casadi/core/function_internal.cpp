@@ -697,9 +697,9 @@ namespace casadi {
           if (verbose_) casadi_message("Compiling function '" + name_ + "' done.");
         }
         // Try to load
-        eval_ = (eval_t) compiler_.get_function(name_);
-        checkout_ = (casadi_checkout_t) compiler_.get_function(name_ + "checkout");
-        release_ = (casadi_release_t) compiler_.get_function(name_ + "release");
+        eval_ = (eval_user_data_t) compiler_.get_function(name_);
+        checkout_ = (casadi_checkout_user_data_t) compiler_.get_function(name_ + "checkout");
+        release_ = (casadi_release_user_data_t) compiler_.get_function(name_ + "release");
         casadi_assert(eval_!=nullptr, "Cannot load JIT'ed function.");
       } else {
         // Just jit dependencies
@@ -840,14 +840,14 @@ namespace casadi {
 #ifdef CASADI_WITH_THREAD
     std::lock_guard<std::mutex> lock(mtx_);
 #endif //CASADI_WITH_THREAD
-        mem = checkout_();
+        mem = checkout_(user_data_);
       }
-      ret = eval_(arg, res, iw, w, mem);
+      ret = eval_(arg, res, iw, w, mem, user_data_);
       if (release_) {
 #ifdef CASADI_WITH_THREAD
     std::lock_guard<std::mutex> lock(mtx_);
 #endif //CASADI_WITH_THREAD
-        release_(mem);
+        release_(mem, user_data_);
       }
     } else {
       ret = eval(arg, res, iw, w, mem);

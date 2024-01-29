@@ -1885,7 +1885,7 @@ namespace casadi {
 
   FunctionBuffer::~FunctionBuffer() {
     if (f_->release_) {
-      f_->release_(mem_);
+      f_->release_(mem_, f_->user_data_);
     } else {
       f_.release(mem_);
     }
@@ -1900,7 +1900,7 @@ namespace casadi {
     w_ = f.w_; iw_ = f.iw_; arg_ = f.arg_; res_ = f.res_; f_node_ = f.f_node_;
     // Checkout fresh memory
     if (f_->checkout_) {
-      mem_ = f_->checkout_();
+      mem_ = f_->checkout_(f_->user_data_);
     } else {
       mem_ = f_.checkout();
       mem_internal_ = f_.memory(mem_);
@@ -1923,7 +1923,7 @@ namespace casadi {
   }
   void FunctionBuffer::_eval() {
     if (f_node_->eval_) {
-      ret_ = f_node_->eval_(get_ptr(arg_), get_ptr(res_), get_ptr(iw_), get_ptr(w_), mem_);
+      ret_ = f_node_->eval_(get_ptr(arg_), get_ptr(res_), get_ptr(iw_), get_ptr(w_), mem_, f_->user_data_);
     } else {
       ret_ = f_node_->eval(get_ptr(arg_), get_ptr(res_), get_ptr(iw_), get_ptr(w_), mem_internal_);
     }

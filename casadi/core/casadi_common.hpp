@@ -147,6 +147,18 @@ namespace casadi {
     casadi_int* sz_iw, casadi_int* sz_w);
   typedef int (*eval_t)(const double** arg, double** res,
                         casadi_int* iw, double* w, int);
+  typedef void (*signal_user_data_t)(void* user_data);
+  typedef casadi_int (*getint_user_data_t)(void* user_data);
+  typedef double (*default_user_data_t)(casadi_int i, void* user_data);
+  typedef const char* (*name_user_data_t)(casadi_int i, void* user_data);
+  typedef const casadi_int* (*sparsity_user_data_t)(casadi_int i, void* user_data);
+  typedef int (*diff_user_data_t)(casadi_int i, void* user_data);
+  typedef int (*casadi_checkout_user_data_t)(void* user_data);
+  typedef void (*casadi_release_user_data_t)(int, void* user_data);
+  typedef int (*work_user_data_t)(casadi_int* sz_arg, casadi_int* sz_res,
+    casadi_int* sz_iw, casadi_int* sz_w, void* user_data);
+  typedef int (*eval_user_data_t)(const double** arg, double** res,
+                        casadi_int* iw, double* w, int, void* user_data);
   ///@}
 
   // Easier to maintain than an enum (serialization/codegen)

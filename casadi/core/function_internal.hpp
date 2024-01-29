@@ -1250,17 +1250,17 @@ namespace casadi {
     /** \brief Numerical evaluation redirected to a C function
 
         \identifier{nk} */
-    eval_t eval_;
+    eval_user_data_t eval_;
 
     /** \brief Checkout redirected to a C function
 
         \identifier{nl} */
-    casadi_checkout_t checkout_;
+    casadi_checkout_user_data_t checkout_;
 
    /** \brief Release redirected to a C function
 
        \identifier{nm} */
-    casadi_release_t release_;
+    casadi_release_user_data_t release_;
 
     /** \brief Dict of statistics (resulting from evaluate)
 

@@ -57,27 +57,27 @@ class CASADI_EXPORT External : public FunctionInternal {
   /** \brief Increase/decrease reference counter
 
       \identifier{1z3} */
-  signal_t incref_, decref_;
+  signal_user_data_t incref_, decref_;
 
   /** \brief Number of inputs and outputs
 
       \identifier{1z4} */
-  getint_t get_n_in_, get_n_out_;
+  getint_user_data_t get_n_in_, get_n_out_;
 
   /** \brief Names of inputs and outputs
 
       \identifier{1z5} */
-  name_t get_name_in_, get_name_out_;
+  name_user_data_t get_name_in_, get_name_out_;
 
   /** \brief Get default inputs
 
       \identifier{1z6} */
-  default_t get_default_in_;
+  default_user_data_t get_default_in_;
 
   /** \brief Work vector sizes
 
       \identifier{1z7} */
-  work_t work_;
+  work_user_data_t work_;
 
   ///@{
   /** \brief Data vectors
@@ -252,9 +252,9 @@ class CASADI_EXPORT External : public FunctionInternal {
 
 class CASADI_EXPORT GenericExternal : public External {
   // Sparsities
-  sparsity_t get_sparsity_in_, get_sparsity_out_, get_jac_sparsity_;
+  sparsity_user_data_t get_sparsity_in_, get_sparsity_out_, get_jac_sparsity_;
   // Differentiability
-  diff_t get_diff_in_, get_diff_out_;
+  diff_user_data_t get_diff_in_, get_diff_out_;
 
  public:
   /** \brief Constructor
