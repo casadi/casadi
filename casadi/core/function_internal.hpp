@@ -312,6 +312,8 @@ namespace casadi {
         \identifier{k6} */
     void init(const Dict& opts) override;
 
+    virtual void init_post_options();
+
     /** \brief Finalize the object creation
 
         \identifier{k7} */

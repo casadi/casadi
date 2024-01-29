@@ -124,6 +124,8 @@ class CASADI_EXPORT External : public FunctionInternal {
   /// Initialize
   void init(const Dict& opts) override;
 
+  void init_post_options() override;
+
   /** \brief Generate code for the declarations of the C function
 
       \identifier{1ze} */

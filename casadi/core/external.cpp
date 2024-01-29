@@ -86,7 +86,9 @@ void External::init_external() {
 
   // Work vector sizes
   work_ = (work_user_data_t)li_.get_function(name_ + "_work");
+}
 
+void External::init_post_options() {
   // Increase reference counter - external function memory initialized at this point
   if (incref_) incref_(user_data_);
 }

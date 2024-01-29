@@ -438,6 +438,10 @@ namespace casadi {
     }
   }
 
+  void FunctionInternal::init_post_options() {
+    
+  }
+
   void FunctionInternal::init(const Dict& opts) {
     // Call the initialization method of the base class
     ProtoFunction::init(opts);
@@ -536,6 +540,8 @@ namespace casadi {
         cache_init_ = op.second;
       }
     }
+
+    init_post_options();
 
     // print_time implies record_time
     if (print_time_) record_time_ = true;
