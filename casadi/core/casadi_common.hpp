@@ -255,7 +255,7 @@ namespace casadi {
   std::string str(const std::vector<T>& v, bool more) {
     std::stringstream ss;
     ss << "[";
-    for (casadi_int i=0; i<v.size(); ++i) {
+    for (size_t i=0; i<v.size(); ++i) {
       if (i!=0) ss << ", ";
       ss << v[i];
     }

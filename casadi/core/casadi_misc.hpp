@@ -849,14 +849,14 @@ namespace casadi {
   template<typename T>
   T product(const std::vector<T> &values) {
     T r = 1;
-    for (casadi_int i=0;i<values.size();++i) r*=values[i];
+    for (size_t i=0;i<values.size();++i) r*=values[i];
     return r;
   }
 
   template<typename T>
   T sum(const std::vector<T> &values) {
     T r = 0;
-    for (casadi_int i=0;i<values.size();++i) r+=values[i];
+    for (size_t i=0;i<values.size();++i) r+=values[i];
     return r;
   }
 

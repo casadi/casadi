@@ -77,7 +77,7 @@ namespace casadi {
  void ConstantMX::ad_forward(const std::vector<std::vector<MX> >& fseed,
                           std::vector<std::vector<MX> >& fsens) const {
    MX zero_sens(size1(), size2());
-   for (casadi_int d=0; d<fsens.size(); ++d) {
+   for (size_t d=0; d<fsens.size(); ++d) {
      fsens[d][0] = zero_sens;
    }
  }
