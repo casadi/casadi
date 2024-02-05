@@ -700,7 +700,7 @@ namespace casadi {
                           "mul(std::vector<MatType> &args): "
                           "supplied list must not be empty.");
     MatType ret = args[0];
-    for (casadi_int i=1; i<args.size(); ++i) ret = MatType::mtimes(ret, args[i]);
+    for (size_t i=1; i<args.size(); ++i) ret = MatType::mtimes(ret, args[i]);
     return ret;
   }
 

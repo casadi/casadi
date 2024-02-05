@@ -59,7 +59,7 @@ namespace casadi {
         "(" + str(V.size()) + ") must match.");
       std::vector<MX> Adense, Vdense;
 
-      for (casadi_int i=0;i<A.size();++i) {
+      for (size_t i=0;i<A.size();++i) {
         Adense.push_back(densify(A[i]));
         Vdense.push_back(densify(V[i]));
       }
@@ -75,7 +75,7 @@ namespace casadi {
         "(" + str(V.size()) + ") must match.");
       std::vector<DM> Adense, Vdense;
 
-      for (casadi_int i=0;i<A.size();++i) {
+      for (size_t i=0;i<A.size();++i) {
         Adense.push_back(densify(A[i]));
         Vdense.push_back(densify(V[i]));
       }

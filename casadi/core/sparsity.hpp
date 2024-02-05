@@ -1200,7 +1200,7 @@ namespace casadi {
 
       \identifier{dq} */
   inline void hash_combine(std::size_t& seed, const casadi_int* v, std::size_t sz) {
-    for (casadi_int i=0; i<sz; ++i) hash_combine(seed, v[i]);
+    for (std::size_t i=0; i<sz; ++i) hash_combine(seed, v[i]);
   }
 
   /** \brief Generate a hash value incrementally (function taken from boost)

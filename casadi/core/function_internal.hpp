@@ -1080,7 +1080,7 @@ namespace casadi {
 
         \identifier{mu} */
     casadi_int index_in(const std::string &name) const {
-      for (casadi_int i=0; i<name_in_.size(); ++i) {
+      for (size_t i=0; i<name_in_.size(); ++i) {
         if (name_in_[i]==name) return i;
       }
       casadi_error("FunctionInternal::index_in: could not find entry \""
@@ -1092,7 +1092,7 @@ namespace casadi {
 
         \identifier{mv} */
     casadi_int index_out(const std::string &name) const {
-      for (casadi_int i=0; i<name_out_.size(); ++i) {
+      for (size_t i=0; i<name_out_.size(); ++i) {
         if (name_out_[i]==name) return i;
       }
       casadi_error("FunctionInternal::index_out: could not find entry \""
