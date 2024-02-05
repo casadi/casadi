@@ -668,11 +668,12 @@ FmuInternal::FmuInternal(DeserializingStream& s) {
 FmuInternal* FmuInternal::deserialize(DeserializingStream& s) {
   std::string class_name;
   s.unpack("FmuInternal::type", class_name);
+  #ifdef WITH_FMI2
   if (class_name=="Fmu2") {
     return Fmu2::deserialize(s);
-  } else {
-    casadi_error("Cannot deserialize type '" + class_name + "'");
   }
+  #endif
+  casadi_error("Cannot deserialize type '" + class_name + "'");
 }
 
 } // namespace casadi
