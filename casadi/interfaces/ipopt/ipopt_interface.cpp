@@ -39,6 +39,8 @@
 
 #include <IpIpoptApplication.hpp>
 
+#include <ipopt_runtime_str.h>
+
 namespace casadi {
   extern "C"
   int CASADI_NLPSOL_IPOPT_EXPORT
@@ -790,5 +792,41 @@ namespace casadi {
     s.pack("IpoptInterface::inactive_lam_value", inactive_lam_value_);
 
   }
+
+  void IpoptInterface::codegen_init_mem(CodeGenerator& g) const {
+    g << "ipopt_init_mem(&" + codegen_mem(g) + ");\n";
+    g << "return 0;\n";
+  }
+
+  void IpoptInterface::codegen_free_mem(CodeGenerator& g) const {
+    g << "ipopt_free_mem(&" + codegen_mem(g) + ");\n";
+  }
+
+
+void IpoptInterface::codegen_declarations(CodeGenerator& g) const {
+  g.add_auxiliary(CodeGenerator::AUX_NLP);
+  g.add_dependency(get_function("nlp_f"));
+  g.add_dependency(get_function("nlp_grad_f"));
+  g.add_dependency(get_function("nlp_g"));
+  g.add_dependency(get_function("nlp_jac_g"));
+  g.add_dependency(get_function("nlp_hess_l"));
+  if (calc_f_ || calc_g_ || calc_lam_x_ || calc_lam_p_)
+    g.add_dependency(get_function("nlp_grad"));
+}
+
+void IpoptInterface::codegen_body(CodeGenerator& g) const {
+  nlpsol_codegen_body(g);
+  g.auxiliaries << g.sanitize_source(ipopt_runtime_str, {"casadi_real"});
+
+  g.local("d", "struct casadi_ipopt_data*");
+  g.init_local("d", "&" + codegen_mem(g));
+  g.local("p", "struct casadi_ipopt_prob");
+  set_ipopt_prob(g);
+}
+
+void IpoptInterface::set_ipopt_prob(CodeGenerator& g) const {
+  g << "p.nlp = &p_nlp;\n";
+  g << "casadi_ipopt_setup(&p);\n";
+}
 
 } // namespace casadi
