@@ -30,11 +30,6 @@
 #include "casadi/core/nlpsol_impl.hpp"
 #include "casadi/core/timing.hpp"
 
-namespace casadi {
-  #include "ipopt_runtime.hpp"
-}
-
-
 /** \defgroup plugin_Nlpsol_ipopt Title
     \par
  *
