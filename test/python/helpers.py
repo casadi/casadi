@@ -607,7 +607,7 @@ class casadiTestCase(unittest.TestCase):
   def check_sparsity(self, a,b):
     self.assertTrue(a==b, msg=str(a) + " <-> " + str(b))
 
-  def check_codegen(self,F,inputs=None, opts=None,std="c89",extralibs="",check_serialize=False,extra_options=None,main=False,definitions=None,with_jac_sparsity=False,external_opts=None,with_reverse=False,with_forward=False):
+  def check_codegen(self,F,inputs=None, opts=None,std="c89",extralibs="",check_serialize=False,extra_options=None,main=False,definitions=None,with_jac_sparsity=False,external_opts=None,with_reverse=False,with_forward=False,extra_include=[]):
 
     if args.run_slow:
       import hashlib
@@ -626,6 +626,8 @@ class casadiTestCase(unittest.TestCase):
       libdir = GlobalOptions.getCasadiPath()
       includedir = GlobalOptions.getCasadiIncludePath()
       includedirs = [includedir,os.path.join(includedir,"highs")]
+      for e in extra_include:
+        includedirs.append(os.path.join(includedir,e))
 
       if isinstance(extralibs,list):
         extralibs_clean = []
@@ -717,7 +719,7 @@ class casadiTestCase(unittest.TestCase):
       if isinstance(inputs, dict):
         self.assertEqual(F.name_out(), F2.name_out())
         for k in F.name_out():
-          self.checkarray(Fout[k],Fout2[k],digits=15)
+          self.checkarray(Fout[k],Fout2[k],digits=15,failmessage=k)
       else:
         for i in range(F.n_out()):
           self.checkarray(Fout[i],Fout2[i],digits=15)
