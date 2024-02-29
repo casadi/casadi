@@ -1441,13 +1441,18 @@ if(WITH_IPOPT)
 	--enable-dependency-linking
 	${COIN_FLAGS}
 	)
+    if(WIN32)
+      set(IPOPT_SUFFIX "-3")
+    else()
+      set(IPOPT_SUFFIX "")
+    endif()
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/coin-or")
     set(WITH_IPOPT_CALLBACK ON)
 
     add_library(ipopt SHARED IMPORTED)
     add_dependencies(ipopt ipopt-external)
     set_target_properties(ipopt PROPERTIES
-      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}ipopt${CMAKE_SHARED_LIBRARY_SUFFIX}"
+      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}ipopt${IPOPT_SUFFIX}${CMAKE_SHARED_LIBRARY_SUFFIX}"
       IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}ipopt${CMAKE_IMPORT_LIBRARY_SUFFIX}"
       INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include/coin-or"
     )
