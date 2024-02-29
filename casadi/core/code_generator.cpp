@@ -204,6 +204,19 @@ namespace casadi {
     }
   }
 
+  std::string CodeGenerator::wrapper(const Function& base, const std::string& name) {
+    FunctionInternal* f = base.get();
+    std::map<FunctionInternal*, casadi_int>& funs = added_wrappers_[name];
+    auto it = funs.find(f);
+    if (it==funs.end()) {
+      casadi_int n = funs.size();
+      funs[f] = n;
+      return name + str(n);
+    } else {
+      return name + str(it->second);
+    }
+  }
+
   std::string CodeGenerator::add_dependency(const Function& f) {
     // Quick return if it already exists
     for (auto&& e : added_functions_) if (e.f==f) return e.codegen_name;

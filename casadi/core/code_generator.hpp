@@ -888,6 +888,9 @@ namespace casadi {
     };
     std::vector<FunctionMeta> added_functions_;
 
+    // Counters for creating unique identifiers
+    std::map<std::string, std::map<FunctionInternal*, casadi_int> > added_wrappers_;
+
     // Constants
     std::vector<std::vector<double> > double_constants_;
     std::vector<std::vector<casadi_int> > integer_constants_;
@@ -898,6 +901,8 @@ namespace casadi {
     // Hash a vector
     static size_t hash(const std::vector<double>& v);
     static size_t hash(const std::vector<casadi_int>& v);
+
+    std::string wrapper(const Function& base, const std::string& name);
 
     // Compare two vectors
     template<typename T>
