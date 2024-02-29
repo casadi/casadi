@@ -1451,6 +1451,10 @@ if(WITH_IPOPT)
       IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}ipopt${CMAKE_IMPORT_LIBRARY_SUFFIX}"
       INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include/coin-or"
     )
+    create_import_library(ipopt ipopt)
+    install(DIRECTORY
+      "${CMAKE_BINARY_DIR}/external_projects/include/coin-or"
+      DESTINATION "${INCLUDE_PREFIX}")
   endif()
 endif()
 add_feature_info(ipopt-interface WITH_IPOPT "Interface to the NLP solver Ipopt.")
