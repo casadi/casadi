@@ -812,10 +812,7 @@ void IpoptInterface::codegen_declarations(CodeGenerator& g) const {
   if (exact_hessian_) {
     g.add_dependency(get_function("nlp_hess_l"));
   }
-  if (calc_f_ || calc_g_ || calc_lam_x_ || calc_lam_p_)
-    g.add_dependency(get_function("nlp_grad"));
   g.add_include("coin-or/IpStdCInterface.h");
-  g.add_include("stdio.h");
 
   std::string name = "nlp_f";
   std::string f = g.shorthand(g.wrapper(get_function(name), name));
@@ -981,6 +978,9 @@ void IpoptInterface::codegen_body(CodeGenerator& g) const {
 }
 
 void IpoptInterface::set_ipopt_prob(CodeGenerator& g) const {
+  if (jacg_sp_.size1()>0 && jacg_sp_.nnz()==0) {
+    casadi_error("Empty sparsity pattern not supported in IPOPT C interface");
+  }
   g << "d->nlp = &d_nlp;\n";
   g << "d->prob = &p;\n";
   g << "p.nlp = &p_nlp;\n";
