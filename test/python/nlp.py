@@ -49,7 +49,7 @@ if "SKIP_ALPAQA_TESTS" not in os.environ and has_nlpsol("alpaqa"):
 if "SKIP_IPOPT_TESTS" not in os.environ and has_nlpsol("ipopt"):
   codegen = {"extralibs": ["ipopt"], "std": "c99"}
   solvers.append(("ipopt",{"print_time":False,"ipopt": {"tol": 1e-10, "derivative_test":"second-order","print_level":0}},{"codegen": codegen,"discrete":False}))
-  solvers.append(("ipopt",{"print_time":False,"ipopt": {"tol": 1e-10, "derivative_test":"first-order","hessian_approximation": "limited-memory","print_level":6}},{"codegen": codegen,"discrete":False}))
+  solvers.append(("ipopt",{"print_time":False,"ipopt": {"tol": 1e-10, "derivative_test":"first-order","hessian_approximation": "limited-memory","print_level":0}},{"codegen": codegen,"discrete":False}))
 
 if "SKIP_IPOPT_TESTS" not in os.environ and has_nlpsol("ipopt") and has_nlpsol("sqpmethod"):
   qpsol_options = {"nlpsol": "ipopt", "nlpsol_options": {"ipopt.tol": 1e-12,"ipopt.tiny_step_tol": 1e-20, "ipopt.fixed_variable_treatment":"make_constraint","ipopt.print_level":0,"print_time":False,"print_time":False} }
