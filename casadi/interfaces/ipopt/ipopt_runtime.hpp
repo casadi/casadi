@@ -31,6 +31,8 @@ struct casadi_ipopt_prob {
   // Sparsity patterns
   const casadi_int *sp_h, *sp_a;
 
+  casadi_int nnz_h, nnz_a;
+
   Eval_F_CB eval_f;
   Eval_G_CB eval_g;
   Eval_Grad_F_CB eval_grad_f;
@@ -42,7 +44,12 @@ struct casadi_ipopt_prob {
 // SYMBOL "ipopt_setup"
 template<typename T1>
 void casadi_ipopt_setup(casadi_ipopt_prob<T1>* p) {
-
+  if (p->sp_h) {
+    p->nnz_h = p->sp_h[2+p->sp_h[1]];
+  } else {
+    p->nnz_h = 0;
+  }
+  p->nnz_a = p->sp_a[2+p->sp_a[1]];
 }
 
 
@@ -116,16 +123,11 @@ void casadi_ipopt_presolve(casadi_ipopt_data<T1>* d) {
   const casadi_ipopt_prob<T1>* p = d->prob;
   const casadi_nlpsol_prob<T1>* p_nlp = p->nlp;
   const casadi_nlpsol_data<T1>* d_nlp = d->nlp;
-  
-  // Local variables
-  casadi_int nnz_h, nnz_a;
-  nnz_h = p->sp_h[2+p->sp_h[1]];
-  nnz_a = p->sp_a[2+p->sp_a[1]];
 
   d->ipopt = CreateIpoptProblem(
                 p_nlp->nx, (double *) d_nlp->lbx, (double *) d_nlp->ubx,
                 p_nlp->ng, (double *) d_nlp->lbg, (double *) d_nlp->ubg,
-                nnz_a, nnz_h, 0,
+                p->nnz_a, p->nnz_h, 0,
                 p->eval_f, p->eval_g, p->eval_grad_f,
                 p->eval_jac_g, p->eval_h);
 }
@@ -163,4 +165,10 @@ void casadi_ipopt_sparsity(const casadi_int* sp, ipindex *iRow, ipindex *jCol) {
             *jCol++ = cc;
         }
     }
+}
+
+// SYMBOL "ipopt_hess_l_empty"
+template<typename T1>
+bool casadi_ipopt_hess_l_empty(ipindex n, ipnumber *x, bool new_x, ipnumber obj_factor, ipindex m, ipnumber *lambda, bool new_lambda, ipindex nele_hess, ipindex *iRow, ipindex *jCol, ipnumber *values, UserDataPtr user_data) {
+  return false;
 }

@@ -809,10 +809,13 @@ void IpoptInterface::codegen_declarations(CodeGenerator& g) const {
   g.add_dependency(get_function("nlp_grad_f"));
   g.add_dependency(get_function("nlp_g"));
   g.add_dependency(get_function("nlp_jac_g"));
-  g.add_dependency(get_function("nlp_hess_l"));
+  if (exact_hessian_) {
+    g.add_dependency(get_function("nlp_hess_l"));
+  }
   if (calc_f_ || calc_g_ || calc_lam_x_ || calc_lam_p_)
     g.add_dependency(get_function("nlp_grad"));
   g.add_include("coin-or/IpStdCInterface.h");
+  g.add_include("stdio.h");
 
   std::string name = "nlp_f";
   std::string f = g.shorthand(g.wrapper(get_function(name), name));
@@ -869,24 +872,26 @@ void IpoptInterface::codegen_declarations(CodeGenerator& g) const {
   g << "return true;\n";
   g << "}\n";
 
-  name = "nlp_hess_l";
-  f = g.shorthand(g.wrapper(get_function(name), name));
-  g << "bool " << f << "(ipindex n, ipnumber *x, bool new_x, ipnumber obj_factor, ipindex m, ipnumber *lambda, bool new_lambda, ipindex nele_hess, ipindex *iRow, ipindex *jCol, ipnumber *values, UserDataPtr user_data) {\n";
-  g << "struct casadi_ipopt_data* d = (struct casadi_ipopt_data*) user_data;\n";
-  g << "if (values) {\n";
-  g << "d->arg[0] = x;\n";
-  g << "d->arg[1] = d->nlp->p;\n";
-  g << "d->arg[2] = &obj_factor;\n";
-  g << "d->arg[3] = lambda;\n";
-  g << "d->res[0] = values;\n";
-  flag = g(get_function(name), "d->arg", "d->res", "d->iw", "d->w");
-  g << "if (" + flag + ") return false;\n";
-  g << "return true;\n";
-  g << "} else {\n";
-  g << "casadi_ipopt_sparsity(d->prob->sp_h, iRow, jCol);\n";
-  g << "}\n";
-  g << "return true;\n";
-  g << "}\n";
+  if (exact_hessian_) {
+    name = "nlp_hess_l";
+    f = g.shorthand(g.wrapper(get_function(name), name));
+    g << "bool " << f << "(ipindex n, ipnumber *x, bool new_x, ipnumber obj_factor, ipindex m, ipnumber *lambda, bool new_lambda, ipindex nele_hess, ipindex *iRow, ipindex *jCol, ipnumber *values, UserDataPtr user_data) {\n";
+    g << "struct casadi_ipopt_data* d = (struct casadi_ipopt_data*) user_data;\n";
+    g << "if (values) {\n";
+    g << "d->arg[0] = x;\n";
+    g << "d->arg[1] = d->nlp->p;\n";
+    g << "d->arg[2] = &obj_factor;\n";
+    g << "d->arg[3] = lambda;\n";
+    g << "d->res[0] = values;\n";
+    flag = g(get_function(name), "d->arg", "d->res", "d->iw", "d->w");
+    g << "if (" + flag + ") return false;\n";
+    g << "return true;\n";
+    g << "} else {\n";
+    g << "casadi_ipopt_sparsity(d->prob->sp_h, iRow, jCol);\n";
+    g << "}\n";
+    g << "return true;\n";
+    g << "}\n";
+  }
 }
 
 void IpoptInterface::codegen_body(CodeGenerator& g) const {
@@ -979,8 +984,12 @@ void IpoptInterface::set_ipopt_prob(CodeGenerator& g) const {
   g << "d->nlp = &d_nlp;\n";
   g << "d->prob = &p;\n";
   g << "p.nlp = &p_nlp;\n";
-  g << "p.sp_h = " << g.sparsity(jacg_sp_) << ";\n";
-  g << "p.sp_a = " << g.sparsity(hesslag_sp_) << ";\n";
+  g << "p.sp_a = " << g.sparsity(jacg_sp_) << ";\n";
+  if (exact_hessian_) {
+    g << "p.sp_h = " << g.sparsity(hesslag_sp_) << ";\n";
+  } else {
+    g << "p.sp_h = 0;\n";
+  }
   g << "casadi_ipopt_setup(&p);\n";
 
   std::string nlp_f = g.shorthand(g.wrapper(get_function("nlp_f"), "nlp_f"));
@@ -991,8 +1000,12 @@ void IpoptInterface::set_ipopt_prob(CodeGenerator& g) const {
   g << "p.eval_grad_f = " << nlp_grad_f << ";\n";
   std::string nlp_jac_g = g.shorthand(g.wrapper(get_function("nlp_jac_g"), "nlp_jac_g"));
   g << "p.eval_jac_g = " << nlp_jac_g << ";\n";
-  std::string nlp_hess_l = g.shorthand(g.wrapper(get_function("nlp_hess_l"), "nlp_hess_l"));
-  g << "p.eval_h = " << nlp_hess_l << ";\n";
+  if (exact_hessian_) {
+    std::string nlp_hess_l = g.shorthand(g.wrapper(get_function("nlp_hess_l"), "nlp_hess_l"));
+    g << "p.eval_h = " << nlp_hess_l << ";\n";
+  } else {
+    g << "p.eval_h = casadi_ipopt_hess_l_empty;\n";
+  }
 }
 
 } // namespace casadi
