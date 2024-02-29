@@ -899,6 +899,7 @@ void IpoptInterface::codegen_body(CodeGenerator& g) const {
   set_ipopt_prob(g);
 
   g << "casadi_ipopt_init(d, &arg, &res, &iw, &w);\n";
+  g << "casadi_ipopt_presolve(d);\n";
 
   // Start an IPOPT application
   Ipopt::SmartPtr<Ipopt::IpoptApplication> *app = new Ipopt::SmartPtr<Ipopt::IpoptApplication>();

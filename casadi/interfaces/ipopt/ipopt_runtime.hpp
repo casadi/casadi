@@ -81,6 +81,7 @@ int ipopt_init_mem(casadi_ipopt_data<T1>* d) {
 template<typename T1>
 void ipopt_free_mem(casadi_ipopt_data<T1>* d) {
   //Highs_destroy(d->ipopt);
+  
 }
 
 // SYMBOL "ipopt_work"
@@ -97,7 +98,23 @@ template<typename T1>
 void casadi_ipopt_init(casadi_ipopt_data<T1>* d, const T1*** arg, T1*** res, casadi_int** iw, T1** w) {
   // Problem structure
   const casadi_ipopt_prob<T1>* p = d->prob;
-  const casadi_nlpsol_prob<T1>* p_nlp = d->prob->nlp;
+  const casadi_nlpsol_prob<T1>* p_nlp = p->nlp;
+  
+  d->z_L = *w; *w += p_nlp->nx;
+  d->z_U = *w; *w += p_nlp->nx;
+
+  d->arg = *arg;
+  d->res = *res;
+  d->iw = *iw;
+  d->w = *w;
+}
+
+// SYMBOL "ipopt_presolve"
+template<typename T1>
+void casadi_ipopt_presolve(casadi_ipopt_data<T1>* d) {
+  // Problem structure
+  const casadi_ipopt_prob<T1>* p = d->prob;
+  const casadi_nlpsol_prob<T1>* p_nlp = p->nlp;
   const casadi_nlpsol_data<T1>* d_nlp = d->nlp;
   
   // Local variables
@@ -105,21 +122,14 @@ void casadi_ipopt_init(casadi_ipopt_data<T1>* d, const T1*** arg, T1*** res, cas
   nnz_h = p->sp_h[2+p->sp_h[1]];
   nnz_a = p->sp_a[2+p->sp_a[1]];
 
-  d->z_L = *w; *w += p_nlp->nx;
-  d->z_U = *w; *w += p_nlp->nx;
-
   d->ipopt = CreateIpoptProblem(
                 p_nlp->nx, (double *) d_nlp->lbx, (double *) d_nlp->ubx,
                 p_nlp->ng, (double *) d_nlp->lbg, (double *) d_nlp->ubg,
                 nnz_a, nnz_h, 0,
                 p->eval_f, p->eval_g, p->eval_grad_f,
                 p->eval_jac_g, p->eval_h);
-
-  d->arg = *arg;
-  d->res = *res;
-  d->iw = *iw;
-  d->w = *w;
 }
+
 
 // SYMBOL "ipopt_solve"
 template<typename T1>
@@ -137,6 +147,7 @@ void casadi_ipopt_solve(casadi_ipopt_data<T1>* d) {
     d_nlp->lam_g[i] = d->z_U[i]-d->z_L[i];
   }
 
+  FreeIpoptProblem(d->ipopt);
 }
 
 // SYMBOL "ipopt_sparsity"
