@@ -225,7 +225,7 @@ class NLPtests(casadiTestCase):
     nlp={'x':vertcat(*[x,y]), 'f':(1.4-x)**2+100*(y-x**2)**2}
 
     for Solver, solver_options, aux_options in solvers:
-      if "discrete" not in aux_options: continue
+      if not aux_options["discrete"]: continue
       print("test_discrete",Solver,solver_options)
       solver_options = dict(solver_options)
       solver_options["discrete"] = [1,0]
@@ -242,7 +242,7 @@ class NLPtests(casadiTestCase):
       self.check_serialize(solver,solver_in)
 
     for Solver, solver_options, aux_options in solvers:
-      if "discrete" not in aux_options: continue
+      if not aux_options["discrete"]: continue
       print("test_discrete",Solver,solver_options)
       solver_options = dict(solver_options)
       solver_options["discrete"] = [0,1]
