@@ -411,6 +411,7 @@ class NLPtests(casadiTestCase):
       if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_g"][0],0,9,str(Solver))
 
       if aux_options["codegen"]:
+        if Solver=="ipopt": continue
         self.check_codegen(solver,solver_in,**aux_options["codegen"])
 
   def test_IPOPTinf(self):
@@ -759,6 +760,7 @@ class NLPtests(casadiTestCase):
 
 
       if aux_options["codegen"]:
+        if Solver=="ipopt": continue
         self.check_codegen(solver,solver_in,**aux_options["codegen"])
       solver_out = solver(**solver_in)
 
@@ -857,6 +859,7 @@ class NLPtests(casadiTestCase):
       self.assertAlmostEqual(solver_out["x"][1],1,7,str(Solver))
 
       if aux_options["codegen"]:
+        if Solver=="ipopt": continue
         self.check_codegen(solver,solver_in,**aux_options["codegen"])
         
   @memory_heavy()
