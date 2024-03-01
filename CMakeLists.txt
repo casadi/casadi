@@ -1092,7 +1092,7 @@ if(WITH_BLASFEO)
     )
     create_import_library(blasfeo blasfeo)
     install(DIRECTORY
-      "${CMAKE_BINARY_DIR}/external_projects/include"
+      "${CMAKE_BINARY_DIR}/external_projects/include/"
       DESTINATION "${INCLUDE_PREFIX}")
   else()
     #add_library(lapack INTERFACE)
@@ -1125,7 +1125,7 @@ if(WITH_HPIPM)
     )
     create_import_library(hpipm hpipm)
     install(DIRECTORY
-      "${CMAKE_BINARY_DIR}/external_projects/include"
+      "${CMAKE_BINARY_DIR}/external_projects/include/"
       DESTINATION "${INCLUDE_PREFIX}")
   else()
     #add_library(lapack INTERFACE)
