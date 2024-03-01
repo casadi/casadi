@@ -818,7 +818,30 @@ class Toolstests(casadiTestCase):
     u = s.prefix['u']
 
     self.assertTrue(u[:, :].shape,(M, N))
-              
+    
+  def test_external_transform(self):
+    x = SX.sym("x")
+    f = Function("f",[x],[x**2])
+
+    with self.assertOutputs(["Doing","bar"],["Warning"]):
+        g = external_transform("libcasadi","external_transform_test_success",f, {"foo": "bar"})
+    self.checkfunction(f,g,inputs=[3])
+    
+    with self.assertInException("nonexistant"):
+        external_transform("libcasadi","external_transform_test_nonexistant",f, {"foo": "bar"})
+    
+    with self.assertInException("Cannot load shared library"):
+        external_transform("libfoo","external_transform_test_success",f, {"foo": "bar"})
+        
+    with self.assertInException("failed"):
+        external_transform("libcasadi","external_transform_test_fail",f, {"foo": "bar"})
+        
+  def test_external_transform_options(self):
+    for x in [SX.sym("x"),MX.sym("x")]:
+        with self.assertOutputs(["Doing"],["Warning"]):
+            f = Function("f",[x],[x**2],{"external_transform": [["libcasadi", "external_transform_test_success"]]})
+        with self.assertOutputs(["Doing","hey"],["Warning"]):
+            f = Function("f",[x],[x**2],{"external_transform": [["libcasadi", "external_transform_test_success", {"hey": 123}]]})
 
 if __name__ == '__main__':
     unittest.main()

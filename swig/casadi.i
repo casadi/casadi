@@ -4434,6 +4434,7 @@ namespace casadi {
 %include <casadi/core/casadi_meta.hpp>
 %include <casadi/core/integration_tools.hpp>
 %include <casadi/core/nlp_tools.hpp>
+%include <casadi/core/tools.hpp>
 %include <casadi/core/nlp_builder.hpp>
 %include <casadi/core/dae_builder.hpp>
 %include <casadi/core/xml_file.hpp>

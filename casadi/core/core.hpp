@@ -65,5 +65,6 @@
 #include "xml_file.hpp"
 #include "optistack.hpp"
 #include "serializer.hpp"
+#include "tools.hpp"
 
 #endif // CASADI_CORE_HPP

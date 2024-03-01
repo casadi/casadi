@@ -340,7 +340,10 @@ namespace casadi {
         "Options to be passed to post-construction expansion. Default: empty"}},
       {"cache",
        {OT_DICT,
-        "Prepopulate the function cache. Default: empty"}}
+        "Prepopulate the function cache. Default: empty"}},
+      {"external_transform",
+       {OT_VECTORVECTOR,
+        "List of external_transform instruction arguments. Default: empty"}}
      }
   };
 

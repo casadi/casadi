@@ -35,6 +35,7 @@
 #include "jit_function.hpp"
 #include "serializing_stream.hpp"
 #include "serializer.hpp"
+#include "tools.hpp"
 
 #include <cctype>
 #include <fstream>
@@ -220,6 +221,21 @@ namespace casadi {
     try {
       own(new SXFunction(name, ex_in, ex_out, name_in, name_out));
       (*this)->construct(opts);
+
+      // Perform external transformations
+      auto it = opts.find("external_transform");
+      if (it!=opts.end()) {
+        auto v = it->second.to_vector_vector();
+        for (const std::vector<GenericType>& vec : v) {
+          casadi_assert(vec.size()>=2, "external_transform: inner list must be length >=2");
+          casadi_assert(vec.size()<=3, "external_transform: inner list must be length <=3");
+          std::string name = vec[0].to_string();
+          std::string op = vec[1].to_string();
+          Dict opts = vec.size()==3 ? vec[2].to_dict() : Dict();
+          operator=(external_transform(name, op, (*this), opts));
+        }
+      }
+
     } catch(std::exception& e) {
       THROW_ERROR_NOOBJ("Function", e.what(), "SXFunction");
     }
@@ -245,6 +261,21 @@ namespace casadi {
           operator=((*this).expand((*this).name(), it->second));
         }
       }
+
+      // Perform external transformations
+      it = opts.find("external_transform");
+      if (it!=opts.end()) {
+        auto v = it->second.to_vector_vector();
+        for (const std::vector<GenericType>& vec : v) {
+          casadi_assert(vec.size()>=2, "external_transform: inner list must be length >=2");
+          casadi_assert(vec.size()<=3, "external_transform: inner list must be length <=3");
+          std::string name = vec[0].to_string();
+          std::string op = vec[1].to_string();
+          Dict opts = vec.size()==3 ? vec[2].to_dict() : Dict();
+          operator=(external_transform(name, op, (*this), opts));
+        }
+      }
+
     } catch(std::exception& e) {
       THROW_ERROR_NOOBJ("Function", e.what(), "MXFunction");
     }

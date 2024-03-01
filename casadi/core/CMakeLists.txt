@@ -79,6 +79,7 @@ set(CASADI_PUBLIC
   serializer.hpp
   serializing_stream.hpp
   fmu.hpp
+  tools.hpp
 
   # User include class with the most essential includes
   core.hpp
@@ -199,6 +200,7 @@ set(CASADI_INTERNAL
   optistack.cpp               optistack_internal.cpp               optistack_internal.hpp
   serializer.cpp              serializing_stream.cpp
   casadi_c.cpp
+  tools.cpp
 
   # Runtime headers
   runtime/casadi_runtime.hpp
