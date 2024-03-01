@@ -35,11 +35,11 @@
 namespace casadi {
 
 void callback_stdout(const char* s) {
-    uout() << s << std::endl;
+    uout() << s << std::flush;
 }
 
 void callback_stderr(const char* s) {
-    uerr() << s << std::endl;
+    uerr() << s << std::flush;
 }
 
 Function external_transform(const std::string& name,
@@ -80,21 +80,21 @@ Function external_transform(const std::string& name,
 
 const char* external_transform_test_success__f(char api_version, const char* casadi_version,
         const char* in,
-        casadi::external_print_callback_t stdout, casadi::external_print_callback_t stderr) {
+        casadi::external_print_callback_t cb_stdout, casadi::external_print_callback_t cb_stderr) {
     if (api_version != 0) {
-        stderr("version mismatch");
+        cb_stderr("version mismatch");
         return 0;
     }
     casadi::StringDeserializer sd(in);
     casadi::Function f = sd.unpack_function();
     casadi::Dict opts = sd.unpack_generictype();
 
-    std::string msg = "passed options: " + str(opts);
+    std::string msg = "passed options: " + str(opts) + "\n";
 
-    stdout(msg.c_str());
+    cb_stdout(msg.c_str());
 
-    stdout("Doing a lot of stuff...");
-    stderr("Warning here...");
+    cb_stdout("Doing a lot of stuff...\n");
+    cb_stderr("Warning here...\n");
 
     casadi::StringSerializer ss;
     ss.pack(f);
@@ -105,8 +105,8 @@ const char* external_transform_test_success__f(char api_version, const char* cas
 
 const char* external_transform_test_fail__f(char api_version, const char* casadi_version,
         const char* in,
-        casadi::external_print_callback_t stdout, casadi::external_print_callback_t stderr) {
-    stdout("This is going to fail");
-    stderr("Fatal error");
+        casadi::external_print_callback_t cb_stdout, casadi::external_print_callback_t cb_stderr) {
+    cb_stdout("This is going to fail\n");
+    cb_stderr("Fatal error\n");
     return 0;
 }

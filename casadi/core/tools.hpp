@@ -47,7 +47,7 @@ CASADI_EXPORT Function external_transform(const std::string& name,
 typedef void (*external_print_callback_t)(const char* s);
 typedef const char* (*external_transform_t)(char api_version, const char* casadi_version,
     const char* in,
-    external_print_callback_t stdout, external_print_callback_t stderr);
+    external_print_callback_t cb_stdout, external_print_callback_t cb_stderr);
 
 } // namespace casadi
 
@@ -56,11 +56,11 @@ extern "C" {
   CASADI_EXPORT const char* external_transform_test_success__f(char api_version,
     const char* casadi_version,
     const char* in,
-    casadi::external_print_callback_t stdout, casadi::external_print_callback_t stderr);
+    casadi::external_print_callback_t cb_stdout, casadi::external_print_callback_t cb_stderr);
   CASADI_EXPORT const char* external_transform_test_fail__f(char api_version,
     const char* casadi_version,
     const char* in,
-    casadi::external_print_callback_t stdout, casadi::external_print_callback_t stderr);
+    casadi::external_print_callback_t cb_stdout, casadi::external_print_callback_t cb_stderr);
 }
 #endif // SWIG
 
