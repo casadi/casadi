@@ -1452,11 +1452,15 @@ namespace std {
           || to_generic<std::vector<double> >(p, m)
           || to_generic<std::vector<bool> >(p, m)
           || to_generic<std::vector<std::string> >(p, m)
+          || to_generic<std::vector<std::vector<std::string> > >(p, m)
           || to_generic<std::vector<std::vector<casadi_int> > >(p, m)
           || to_generic<std::vector<std::vector<double> > >(p, m)
           || to_generic<casadi::Function>(p, m)
           || to_generic<std::vector<casadi::Function> >(p, m)
-          || to_generic<casadi::GenericType::Dict>(p, m)) {
+          || to_generic<casadi::GenericType::Dict>(p, m)
+          || to_generic<std::vector<casadi::GenericType::Dict> >(p, m)
+          || to_generic<std::vector<std::vector<casadi::GenericType> > >(p, m)
+          || to_generic<std::vector<casadi::GenericType> >(p, m)) {
         return true;
       }
 
@@ -1479,7 +1483,11 @@ namespace std {
       case OT_DOUBLEVECTOR: return from_tmp(a->as_double_vector());
       case OT_DOUBLEVECTORVECTOR: return from_tmp(a->as_double_vector_vector());
       case OT_STRINGVECTOR: return from_tmp(a->as_string_vector());
+      case OT_STRINGVECTORVECTOR: return from_tmp(a->as_string_vector_vector());
       case OT_DICT: return from_tmp(a->as_dict());
+      case OT_DICTVECTOR: return from_tmp(a->as_dict_vector());
+      case OT_VECTORVECTOR: return from_tmp(a->as_vector_vector());
+      case OT_VECTOR: return from_tmp(a->as_vector());
       case OT_FUNCTION: return from_tmp(a->as_function());
       case OT_FUNCTIONVECTOR: return from_tmp(a->as_function_vector());
 #ifdef SWIGPYTHON

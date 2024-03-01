@@ -45,9 +45,13 @@ namespace casadi {
   typedef GenericTypeInternal<OT_INTVECTORVECTOR,
                               std::vector< std::vector<casadi_int> > > IntVectorVectorType;
   typedef GenericTypeInternal<OT_STRINGVECTOR, std::vector<std::string> > StringVectorType;
+  typedef GenericTypeInternal<OT_STRINGVECTORVECTOR, std::vector<std::vector<std::string> > > StringVectorVectorType;
   typedef GenericTypeInternal<OT_FUNCTION, Function> FunctionType;
   typedef GenericTypeInternal<OT_FUNCTIONVECTOR, std::vector<Function> > FunctionVectorType;
   typedef GenericTypeInternal<OT_DICT, Dict> DictType;
+  typedef GenericTypeInternal<OT_DICTVECTOR, std::vector<Dict> > DictVectorType;
+  typedef GenericTypeInternal<OT_VECTORVECTOR, std::vector< std::vector<GenericType> > > VectorVectorType;
+  typedef GenericTypeInternal<OT_VECTOR, std::vector<GenericType> > VectorType;
   typedef GenericTypeInternal<OT_VOIDPTR, void*> VoidPointerType;
   /// \endcond
 
@@ -68,6 +72,14 @@ namespace casadi {
       return is_double_vector_vector() || is_int_vector_vector();
     case OT_STRINGVECTOR:
       return is_string_vector() || is_string() || is_double_vector() || is_int_vector();
+    case OT_VECTOR:
+      return is_vector() || is_double_vector() || is_int_vector() || is_string_vector() ||
+             is_function_vector() ||
+             is_int_vector_vector() || is_double_vector_vector() || is_string_vector_vector() ||
+             is_bool_vector() || is_dict_vector();
+    case OT_VECTORVECTOR:
+      return is_vector_vector() ||
+             is_int_vector_vector() || is_double_vector_vector() || is_string_vector_vector();
     case OT_VOIDPTR:
       return is_void_pointer() || is_int();
     default:
@@ -89,6 +101,14 @@ namespace casadi {
       return std::vector< std::vector<double> >();
     case OT_STRINGVECTOR:
       return std::vector<std::string>();
+    case OT_STRINGVECTORVECTOR:
+      return std::vector<std::vector<std::string> >();
+    case OT_DICTVECTOR:
+      return std::vector<GenericType::Dict>();
+    case OT_VECTORVECTOR:
+      return std::vector<std::vector< GenericType> >();
+    case OT_VECTOR:
+      return std::vector<GenericType>();
     default:
       casadi_error("empty_from_type. Unsupported type " + str(type));
     }
@@ -116,8 +136,16 @@ namespace casadi {
       return "OT_DOUBLEVECTORVECTOR";
     case OT_STRINGVECTOR:
       return "OT_STRINGVECTOR";
+    case OT_STRINGVECTORVECTOR:
+      return "OT_STRINGVECTORVECTOR";
     case OT_DICT:
       return "OT_DICT";
+    case OT_DICTVECTOR:
+      return "OT_DICTVECTOR";
+    case OT_VECTORVECTOR:
+      return "OT_VECTORVECTOR";
+    case OT_VECTOR:
+      return "OT_VECTOR";
     case OT_FUNCTION:
       return "OT_FUNCTION";
     case OT_FUNCTIONVECTOR:
@@ -153,7 +181,11 @@ namespace casadi {
       (is_double_vector_vector() && to_double_vector_vector().empty()) ||
       (is_double_vector() && to_double_vector().empty()) ||
       (is_string_vector() && to_string_vector().empty()) ||
-      (is_bool_vector() && to_bool_vector().empty());
+      (is_string_vector_vector() && to_string_vector_vector().empty()) ||
+      (is_bool_vector() && to_bool_vector().empty()) ||
+      (is_dict_vector() && to_dict_vector().empty()) ||
+      (is_vector_vector() && to_vector_vector().empty()) ||
+      (is_vector() && to_vector().empty());
   }
 
   bool GenericType::is_int_vector() const {
@@ -180,6 +212,10 @@ namespace casadi {
     return getType()==OT_STRINGVECTOR;
   }
 
+  bool GenericType::is_string_vector_vector() const {
+    return getType()==OT_STRINGVECTORVECTOR;
+  }
+
   bool GenericType::is_function() const {
     return getType()==OT_FUNCTION;
   }
@@ -194,6 +230,18 @@ namespace casadi {
 
   bool GenericType::is_dict() const {
     return getType()==OT_DICT;
+  }
+
+  bool GenericType::is_dict_vector() const {
+    return getType()==OT_DICTVECTOR;
+  }
+
+  bool GenericType::is_vector_vector() const {
+    return getType()==OT_VECTORVECTOR;
+  }
+
+  bool GenericType::is_vector() const {
+    return getType()==OT_VECTOR;
   }
 
   GenericType::GenericType() {
@@ -241,6 +289,10 @@ namespace casadi {
 
   GenericType::GenericType(const std::vector<std::string>& sv) {
     own(new StringVectorType(sv));
+  }
+
+  GenericType::GenericType(const std::vector<std::vector<std::string> >& sv) {
+    own(new StringVectorVectorType(sv));
   }
 
   GenericType::GenericType(const std::string& s) {
@@ -309,9 +361,29 @@ namespace casadi {
     return static_cast<const StringVectorType*>(get())->d_;
   }
 
+  const std::vector<std::vector<std::string> >& GenericType::as_string_vector_vector() const {
+    casadi_assert_dev(is_string_vector_vector());
+    return static_cast<const StringVectorVectorType*>(get())->d_;
+  }
+
   const GenericType::Dict& GenericType::as_dict() const {
     casadi_assert_dev(is_dict());
     return static_cast<const DictType*>(get())->d_;
+  }
+
+  const std::vector<GenericType::Dict>& GenericType::as_dict_vector() const {
+    casadi_assert_dev(is_dict_vector());
+    return static_cast<const DictVectorType*>(get())->d_;
+  }
+
+  const std::vector<std::vector<GenericType> >& GenericType::as_vector_vector() const {
+    casadi_assert_dev(is_vector_vector());
+    return static_cast<const VectorVectorType*>(get())->d_;
+  }
+
+  const std::vector<GenericType>& GenericType::as_vector() const {
+    casadi_assert_dev(is_vector());
+    return static_cast<const VectorType*>(get())->d_;
   }
 
   const Function& GenericType::as_function() const {
@@ -438,9 +510,113 @@ namespace casadi {
     }
   }
 
+  std::vector<std::vector<std::string> > GenericType::to_string_vector_vector() const {
+    casadi_assert(is_string_vector_vector(), "type mismatch");
+    return as_string_vector_vector();
+  }
+
   Dict GenericType::to_dict() const {
     casadi_assert(is_dict(), "type mismatch");
     return as_dict();
+  }
+
+  std::vector<Dict> GenericType::to_dict_vector() const {
+    casadi_assert(is_dict_vector(), "type mismatch");
+    return as_dict_vector();
+  }
+
+  std::vector<GenericType> GenericType::to_vector() const {
+    if (is_double_vector()) {
+      auto v = as_double_vector();
+      std::vector<GenericType> ret(v.size());
+      for (casadi_int i=0;i<v.size();++i) ret[i] = v[i];
+      return ret;
+    } else if (is_int_vector()) {
+      auto v = as_int_vector();
+      std::vector<GenericType> ret(v.size());
+      for (casadi_int i=0;i<v.size();++i) ret[i] = v[i];
+      return ret;
+    } else if (is_string_vector()) {
+      auto v = as_string_vector();
+      std::vector<GenericType> ret(v.size());
+      for (casadi_int i=0;i<v.size();++i) ret[i] = v[i];
+      return ret;
+    } else if (is_function_vector()) {
+      auto v = as_function_vector();
+      std::vector<GenericType> ret(v.size());
+      for (casadi_int i=0;i<v.size();++i) ret[i] = v[i];
+      return ret;
+    } else if (is_double_vector_vector()) {
+      auto v = as_double_vector_vector();
+      std::vector<GenericType> ret(v.size());
+      for (casadi_int i=0;i<v.size();++i) ret[i] = v[i];
+      return ret;
+    } else if (is_int_vector_vector()) {
+      auto v = as_int_vector_vector();
+      std::vector<GenericType> ret(v.size());
+      for (casadi_int i=0;i<v.size();++i) ret[i] = v[i];
+      return ret;
+    } else if (is_string_vector_vector()) {
+      auto v = as_string_vector_vector();
+      std::vector<GenericType> ret(v.size());
+      for (casadi_int i=0;i<v.size();++i) ret[i] = v[i];
+      return ret;
+    } else if (is_bool_vector()) {
+      auto v = as_bool_vector();
+      std::vector<GenericType> ret(v.size());
+      for (casadi_int i=0;i<v.size();++i) ret[i] = v[i];
+      return ret;
+    } else if (is_dict_vector()) {
+      auto v = as_dict_vector();
+      std::vector<GenericType> ret(v.size());
+      for (casadi_int i=0;i<v.size();++i) ret[i] = v[i];
+      return ret;
+    } else if (is_vector_vector()) {
+      auto v = as_vector_vector();
+      std::vector<GenericType> ret(v.size());
+      for (casadi_int i=0;i<v.size();++i) ret[i] = v[i];
+      return ret;
+    } else {
+      casadi_assert(is_vector(), "type mismatch");
+      return as_vector();
+    }
+  }
+
+  std::vector< std::vector<GenericType> > GenericType::to_vector_vector() const {
+    if (is_double_vector_vector()) {
+      auto v = as_double_vector_vector();
+      std::vector<std::vector<GenericType> > ret(v.size());
+      for (casadi_int i=0;i<v.size();++i) {
+        ret[i].resize(v[i].size());
+        for (casadi_int j=0;j<v[i].size();++j) {
+          ret[i][j] = v[i][j];
+        }
+      }
+      return ret;
+    } else if (is_int_vector_vector()) {
+      auto v = as_int_vector_vector();
+      std::vector<std::vector<GenericType> > ret(v.size());
+      for (casadi_int i=0;i<v.size();++i) {
+        ret[i].resize(v[i].size());
+        for (casadi_int j=0;j<v[i].size();++j) {
+          ret[i][j] = v[i][j];
+        }
+      }
+      return ret;
+    } else if (is_string_vector_vector()) {
+      auto v = as_string_vector_vector();
+      std::vector<std::vector<GenericType> > ret(v.size());
+      for (casadi_int i=0;i<v.size();++i) {
+        ret[i].resize(v[i].size());
+        for (casadi_int j=0;j<v[i].size();++j) {
+          ret[i][j] = v[i][j];
+        }
+      }
+      return ret;
+    } else {
+      casadi_assert(is_vector_vector(), "type mismatch");
+      return as_vector_vector();
+    }
   }
 
   Function GenericType::to_function() const {
@@ -532,6 +708,18 @@ namespace casadi {
     own(new DictType(dict));
   }
 
+  GenericType::GenericType(const std::vector<Dict>& dictv) {
+    own(new DictVectorType(dictv));
+  }
+
+  GenericType::GenericType(const std::vector<GenericType>& gv) {
+    own(new VectorType(gv));
+  }
+
+  GenericType::GenericType(const std::vector<std::vector<GenericType> >& gvv) {
+    own(new VectorVectorType(gvv));
+  }
+
   GenericType::GenericType(void* ptr) {
     own(new VoidPointerType(ptr));
   }
@@ -572,14 +760,22 @@ namespace casadi {
         return IntVectorVectorType::deserialize(s);
       case OT_STRINGVECTOR:
         return StringVectorType::deserialize(s);
+      case OT_STRINGVECTORVECTOR:
+        return StringVectorVectorType::deserialize(s);
       case OT_FUNCTION:
         return FunctionType::deserialize(s);
       case OT_FUNCTIONVECTOR:
         return FunctionVectorType::deserialize(s);
       case OT_DICT:
         return DictType::deserialize(s);
+      case OT_DICTVECTOR:
+        return VectorType::deserialize(s);
+      case OT_VECTOR:
+        return VectorType::deserialize(s);
+      case OT_VECTORVECTOR:
+        return VectorVectorType::deserialize(s);
       default:
-        casadi_error("Not implemented");
+        casadi_error("Not implemented: " + get_type_description(type));
     }
   }
 
@@ -630,5 +826,8 @@ namespace casadi {
   typedef GenericTypeInternal<OT_FUNCTION, Function> FunctionType;
   typedef GenericTypeInternal<OT_FUNCTIONVECTOR, std::vector<Function> > FunctionVectorType;
   typedef GenericTypeInternal<OT_DICT, Dict> DictType;
+  typedef GenericTypeInternal<OT_DICTVECTOR, std::vector<Dict> > DictVectorType;
+  typedef GenericTypeInternal<OT_VECTOR, std::vector<GenericType> > VectorType;
+  typedef GenericTypeInternal<OT_VECTORVECTOR, std::vector<std::vector< GenericType> > > VectorVectorType;
   typedef GenericTypeInternal<OT_VOIDPTR, void*> VoidPointerType;
 } // namespace casadi

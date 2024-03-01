@@ -56,7 +56,11 @@ namespace casadi {
     OT_FUNCTION,
     OT_FUNCTIONVECTOR,
     OT_VOIDPTR,
-    OT_UNKNOWN};
+    OT_UNKNOWN,
+    OT_STRINGVECTORVECTOR,
+    OT_DICTVECTOR,
+    OT_VECTORVECTOR,
+    OT_VECTOR};
 #endif // SWIG
 
   /** \brief Generic data type, can hold different types such as bool, casadi_int, std::string etc.
@@ -93,10 +97,14 @@ namespace casadi {
     GenericType(const std::vector<double>& dv);
     GenericType(const std::vector< std::vector<double> >& dv);
     GenericType(const std::vector<std::string>& sv);
+    GenericType(const std::vector<std::vector<std::string> >& sv);
     GenericType(const char s[]);
     GenericType(const Function& f);
     GenericType(const std::vector<Function>& f);
     GenericType(const Dict& dict);
+    GenericType(const std::vector<Dict>& dictv);
+    GenericType(const std::vector<std::vector<GenericType> >& gvv);
+    GenericType(const std::vector<GenericType>& gv);
     GenericType(void* ptr);
 
     /// Public class name
@@ -140,9 +148,13 @@ namespace casadi {
       return to_double_vector_vector();
     }
     operator std::vector<std::string>() const { return to_string_vector();}
+    operator std::vector<std::vector<std::string> >() const { return to_string_vector_vector();}
     operator const Function&() const { return as_function();}
     operator const std::vector<Function>&() const { return as_function_vector();}
     operator const Dict&() const { return as_dict();}
+    operator const std::vector<Dict>&() const { return as_dict_vector();}
+    operator const std::vector<std::vector<GenericType> >&() const { return as_vector_vector();}
+    operator const std::vector<GenericType>&() const { return as_vector();}
     ///@}
 
     bool can_cast_to(TypeID other) const;
@@ -169,7 +181,11 @@ namespace casadi {
     bool is_double_vector_vector() const;
     bool is_bool_vector() const;
     bool is_string_vector() const;
+    bool is_string_vector_vector() const;
     bool is_dict() const;
+    bool is_dict_vector() const;
+    bool is_vector_vector() const;
+    bool is_vector() const;
     bool is_function() const;
     bool is_function_vector() const;
     bool is_void_pointer() const;
@@ -189,7 +205,11 @@ namespace casadi {
     const std::vector<double>& as_double_vector() const;
     const std::vector< std::vector<double> >& as_double_vector_vector() const;
     const std::vector<std::string>& as_string_vector() const;
+    const std::vector<std::vector<std::string> >& as_string_vector_vector() const;
     const Dict& as_dict() const;
+    const std::vector<Dict>& as_dict_vector() const;
+    const std::vector<std::vector< GenericType> >& as_vector_vector() const;
+    const std::vector<GenericType>& as_vector() const;
     const Function& as_function() const;
     const std::vector<Function>& as_function_vector() const;
     void* const & as_void_pointer() const;
@@ -207,7 +227,11 @@ namespace casadi {
     std::vector<double> to_double_vector() const;
     std::vector< std::vector<double> > to_double_vector_vector() const;
     std::vector<std::string> to_string_vector() const;
+    std::vector<std::vector<std::string> > to_string_vector_vector() const;
     Dict to_dict() const;
+    std::vector<Dict> to_dict_vector() const;
+    std::vector<GenericType> to_vector() const;
+    std::vector< std::vector< GenericType> > to_vector_vector() const;
     Function to_function() const;
     std::vector<Function> to_function_vector() const;
     void* to_void_pointer() const;
