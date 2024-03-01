@@ -817,7 +817,8 @@ void IpoptInterface::codegen_declarations(CodeGenerator& g) const {
   std::string name = "nlp_f";
   std::string f = g.shorthand(g.wrapper(get_function(name), name));
 
-  g << "bool " << f << "(ipindex n, ipnumber *x, bool new_x, ipnumber *obj_value, UserDataPtr user_data) {\n";
+  g << "bool " << f
+    << "(ipindex n, ipnumber *x, bool new_x, ipnumber *obj_value, UserDataPtr user_data) {\n";
   g << "struct casadi_ipopt_data* d = (struct casadi_ipopt_data*) user_data;\n";
   g << "d->arg[0] = x;\n";
   g << "d->arg[1] = d->nlp->p;\n";
@@ -829,7 +830,8 @@ void IpoptInterface::codegen_declarations(CodeGenerator& g) const {
 
   name = "nlp_g";
   f = g.shorthand(g.wrapper(get_function(name), name));
-  g << "bool " << f << "(ipindex n, ipnumber *x, bool new_x, ipindex m, ipnumber *g, UserDataPtr user_data) {\n";
+  g << "bool " << f
+    << "(ipindex n, ipnumber *x, bool new_x, ipindex m, ipnumber *g, UserDataPtr user_data) {\n";
   g << "struct casadi_ipopt_data* d = (struct casadi_ipopt_data*) user_data;\n";
   g << "d->arg[0] = x;\n";
   g << "d->arg[1] = d->nlp->p;\n";
@@ -841,7 +843,8 @@ void IpoptInterface::codegen_declarations(CodeGenerator& g) const {
 
   name = "nlp_grad_f";
   f = g.shorthand(g.wrapper(get_function(name), name));
-  g << "bool " << f << "(ipindex n, ipnumber *x, bool new_x, ipnumber *grad_f, UserDataPtr user_data) {\n";
+  g << "bool " << f
+    << "(ipindex n, ipnumber *x, bool new_x, ipnumber *grad_f, UserDataPtr user_data) {\n";
   g << "struct casadi_ipopt_data* d = (struct casadi_ipopt_data*) user_data;\n";
   g << "d->arg[0] = x;\n";
   g << "d->arg[1] = d->nlp->p;\n";
@@ -854,7 +857,10 @@ void IpoptInterface::codegen_declarations(CodeGenerator& g) const {
 
   name = "nlp_jac_g";
   f = g.shorthand(g.wrapper(get_function(name), name));
-  g << "bool " << f << "(ipindex n, ipnumber *x, bool new_x, ipindex m, ipindex nele_jac, ipindex *iRow, ipindex *jCol, ipnumber *values, UserDataPtr user_data) {\n";
+  g << "bool " << f
+    << "(ipindex n, ipnumber *x, bool new_x, ipindex m,"
+    << " ipindex nele_jac, ipindex *iRow, ipindex *jCol, "
+    << "ipnumber *values, UserDataPtr user_data) {\n";
   g << "struct casadi_ipopt_data* d = (struct casadi_ipopt_data*) user_data;\n";
   g << "if (values) {\n";
   g << "d->arg[0] = x;\n";
@@ -872,7 +878,9 @@ void IpoptInterface::codegen_declarations(CodeGenerator& g) const {
   if (exact_hessian_) {
     name = "nlp_hess_l";
     f = g.shorthand(g.wrapper(get_function(name), name));
-    g << "bool " << f << "(ipindex n, ipnumber *x, bool new_x, ipnumber obj_factor, ipindex m, ipnumber *lambda, bool new_lambda, ipindex nele_hess, ipindex *iRow, ipindex *jCol, ipnumber *values, UserDataPtr user_data) {\n";
+    g << "bool " << f << "(ipindex n, ipnumber *x, bool new_x, ipnumber obj_factor,"
+      << "ipindex m, ipnumber *lambda, bool new_lambda, ipindex nele_hess, "
+      << "ipindex *iRow, ipindex *jCol, ipnumber *values, UserDataPtr user_data) {\n";
     g << "struct casadi_ipopt_data* d = (struct casadi_ipopt_data*) user_data;\n";
     g << "if (values) {\n";
     g << "d->arg[0] = x;\n";
@@ -943,13 +951,16 @@ void IpoptInterface::codegen_body(CodeGenerator& g) const {
     bool ret;
     switch (ipopt_type) {
     case Ipopt::OT_Number:
-      g << "AddIpoptNumOption(d->ipopt, \"" << op.first << "\"" << "," << op.second.to_double() << ");\n";
+      g << "AddIpoptNumOption(d->ipopt, \"" << op.first << "\""
+        << "," << op.second.to_double() << ");\n";
       break;
     case Ipopt::OT_Integer:
-      g << "AddIpoptIntOption(d->ipopt, \"" << op.first << "\"" << "," << op.second.to_int() << ");\n";
+      g << "AddIpoptIntOption(d->ipopt, \"" << op.first << "\""
+        << "," << op.second.to_int() << ");\n";
       break;
     case Ipopt::OT_String:
-      g << "AddIpoptStrOption(d->ipopt, \"" << op.first << "\"" << ",\"" << op.second.to_string() << "\");\n";
+      g << "AddIpoptStrOption(d->ipopt, \"" << op.first << "\""
+        << ",\"" << op.second.to_string() << "\");\n";
       break;
     case Ipopt::OT_Unknown:
     default:
