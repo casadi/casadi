@@ -2968,6 +2968,9 @@
 %exception  casadi::GenericType::as_dict() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::GenericType::as_dict_vector() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::GenericType::as_double() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -2998,6 +3001,15 @@
 %exception  casadi::GenericType::as_string_vector() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::GenericType::as_string_vector_vector() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::GenericType::as_vector() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::GenericType::as_vector_vector() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::GenericType::as_void_pointer() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -3020,6 +3032,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::GenericType::is_dict() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::GenericType::is_dict_vector() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::GenericType::is_double() const {
@@ -3055,6 +3070,15 @@
 %exception  casadi::GenericType::is_string_vector() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::GenericType::is_string_vector_vector() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::GenericType::is_vector() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::GenericType::is_vector_vector() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::GenericType::is_void_pointer() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -3068,6 +3092,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::GenericType::to_dict() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::GenericType::to_dict_vector() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::GenericType::to_double() const {
@@ -3101,6 +3128,15 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::GenericType::to_string_vector() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::GenericType::to_string_vector_vector() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::GenericType::to_vector() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::GenericType::to_vector_vector() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::GenericType::to_void_pointer() const {
@@ -5305,6 +5341,9 @@
 %exception  casadi::external(const std::string &name, const std::string &bin_name, const Dict &opts=Dict()) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::external_transform(const std::string &name, const std::string &op, const Function &f, const Dict &opts=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::extract_from_dict(const Dict &d, const std::string &key, T &value) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -5938,7 +5977,13 @@
 %exception casadi::GenericType::GenericType(const std::string &s) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception casadi::GenericType::GenericType(const std::vector< Dict > &dictv) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception casadi::GenericType::GenericType(const std::vector< Function > &f) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception casadi::GenericType::GenericType(const std::vector< GenericType > &gv) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::GenericType::GenericType(const std::vector< bool > &iv) {
@@ -5956,10 +6001,16 @@
 %exception casadi::GenericType::GenericType(const std::vector< std::string > &sv) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception casadi::GenericType::GenericType(const std::vector< std::vector< GenericType > > &gvv) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception casadi::GenericType::GenericType(const std::vector< std::vector< casadi_int > > &ivv) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::GenericType::GenericType(const std::vector< std::vector< double > > &dv) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception casadi::GenericType::GenericType(const std::vector< std::vector< std::string > > &sv) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::GenericType::GenericType(double d) {

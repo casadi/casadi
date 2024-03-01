@@ -37,7 +37,7 @@ namespace casadi {
 \param f Function to transform
 \param opts Options
 
-*/
+    \identifier{27i} */
 CASADI_EXPORT Function external_transform(const std::string& name,
                     const std::string& op,
                     const Function& f,

@@ -38,6 +38,7 @@
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::OracleFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -124,6 +125,7 @@
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::OracleFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -209,6 +211,7 @@
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::OracleFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -304,6 +307,7 @@
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::OracleFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -379,6 +383,7 @@
 <tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -457,6 +462,7 @@
 <tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -542,6 +548,7 @@
 <tr><td>eta</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::OracleFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fallback_scaling</td><td>OT_INT</td><td>If indefinite update is used, the type of fallback strategy</td><td>casadi::Blocksqp</td></tr>
 <tr><td>fallback_update</td><td>OT_INT</td><td>If indefinite update is used, the type of fallback strategy</td><td>casadi::Blocksqp</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
@@ -747,6 +754,7 @@
 <tr><td>eta</td><td>OT_DOUBLE</td><td>Filter line search parameter, cf. IPOPT paper</td><td>casadi::Blocksqp</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::OracleFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fallback_scaling</td><td>OT_INT</td><td>If indefinite update is used, the type of fallback strategy</td><td>casadi::Blocksqp</td></tr>
 <tr><td>fallback_update</td><td>OT_INT</td><td>If indefinite update is used, the type of fallback strategy</td><td>casadi::Blocksqp</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
@@ -883,6 +891,7 @@
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::OracleFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -1012,6 +1021,7 @@
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::OracleFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -1099,6 +1109,7 @@
 <tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -1176,6 +1187,7 @@
 <tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -1274,6 +1286,7 @@
 <tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -1343,6 +1356,7 @@
 <tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -1405,6 +1419,7 @@
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Integrator</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -1497,6 +1512,7 @@
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Integrator</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -1571,6 +1587,7 @@
 <tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -1630,6 +1647,7 @@
 <tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -1693,6 +1711,7 @@
 <tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -1784,6 +1803,7 @@
 <tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -1856,6 +1876,7 @@
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Integrator</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -1993,6 +2014,7 @@
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Integrator</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -2092,6 +2114,7 @@
 <tr><td>eps_unstable</td><td>OT_DOUBLE</td><td>A margin for unstability detection</td><td>casadi::Dple</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>error_unstable</td><td>OT_BOOL</td><td>Throw an exception when it is detected that Product(A_i, i=N..1)has eigenvalues greater than 1-eps_unstable</td><td>casadi::Dple</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -2153,6 +2176,7 @@
 <tr><td>eps_unstable</td><td>OT_DOUBLE</td><td>A margin for unstability detection</td><td>casadi::Dple</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>error_unstable</td><td>OT_BOOL</td><td>Throw an exception when it is detected that Product(A_i, i=N..1)has eigenvalues greater than 1-eps_unstable</td><td>casadi::Dple</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -2212,6 +2236,7 @@
 <tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -2270,6 +2295,7 @@
 <tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -2332,6 +2358,7 @@
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::OracleFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -2414,6 +2441,7 @@
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::OracleFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -2482,6 +2510,7 @@
 <tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fatrop</td><td>OT_DICT</td><td>Options to be passed to fatrop</td><td>casadi::FatropConicInterface</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
@@ -2559,6 +2588,7 @@
 <tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fatrop</td><td>OT_DICT</td><td>Options to be passed to fatrop</td><td>casadi::FatropConicInterface</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
@@ -2639,6 +2669,7 @@
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::OracleFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>f</td><td>OT_FUNCTION</td><td>Function for calculating the objective function (autogenerated by default)</td><td>casadi::Feasiblesqpmethod</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
@@ -2810,6 +2841,7 @@
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::OracleFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>f</td><td>OT_FUNCTION</td><td>Function for calculating the objective function (autogenerated by default)</td><td>casadi::Feasiblesqpmethod</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
@@ -2917,6 +2949,7 @@
 <tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -2986,6 +3019,7 @@
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Integrator</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -3061,6 +3095,7 @@
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Integrator</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -3137,6 +3172,7 @@
 <tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -3208,6 +3244,7 @@
 <tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -3263,6 +3300,7 @@
 <tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -3321,6 +3359,7 @@
 <tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -3398,6 +3437,7 @@
 <tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -3462,6 +3502,7 @@
 <tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -3531,6 +3572,7 @@
 <tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -3592,6 +3634,7 @@
 <tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -3671,6 +3714,7 @@
 <tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -3737,6 +3781,7 @@
 <tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -3828,6 +3873,7 @@
 <tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -3906,6 +3952,7 @@
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Integrator</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>first_time</td><td>OT_DOUBLE</td><td>First requested time as a fraction of the time interval</td><td>casadi::IdasInterface</td></tr>
@@ -4049,6 +4096,7 @@
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Integrator</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>first_time</td><td>OT_DOUBLE</td><td>First requested time as a fraction of the time interval</td><td>casadi::IdasInterface</td></tr>
@@ -4147,6 +4195,7 @@
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Integrator</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -4222,6 +4271,7 @@
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Integrator</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -4297,6 +4347,7 @@
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::OracleFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -4377,6 +4428,7 @@
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::OracleFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -4467,6 +4519,7 @@
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Integrator</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -4542,6 +4595,7 @@
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Integrator</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -4615,6 +4669,7 @@
 <tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -4675,6 +4730,7 @@
 <tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -4754,6 +4810,7 @@
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::OracleFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -4881,6 +4938,7 @@
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::OracleFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -4966,6 +5024,7 @@
 <tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -5051,6 +5110,7 @@
 <tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -5117,6 +5177,7 @@
 <tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -5183,6 +5244,7 @@
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>exact_jacobian</td><td>OT_BOOL</td><td>Use exact Jacobian information</td><td>casadi::KinsolInterface</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::OracleFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>f_scale</td><td>OT_DOUBLEVECTOR</td><td>Equation scaling factors</td><td>casadi::KinsolInterface</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
@@ -5289,6 +5351,7 @@
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>exact_jacobian</td><td>OT_BOOL</td><td>Use exact Jacobian information</td><td>casadi::KinsolInterface</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::OracleFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>f_scale</td><td>OT_DOUBLEVECTOR</td><td>Equation scaling factors</td><td>casadi::KinsolInterface</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
@@ -5383,6 +5446,7 @@
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::OracleFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -5486,6 +5550,7 @@
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::OracleFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -5561,6 +5626,7 @@
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>equilibration</td><td>OT_BOOL</td><td>Equilibrate the matrix</td><td>casadi::LapackLu</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -5630,6 +5696,7 @@
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>equilibration</td><td>OT_BOOL</td><td>Equilibrate the matrix</td><td>casadi::LapackLu</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -5687,6 +5754,7 @@
 <tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -5754,6 +5822,7 @@
 <tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -5813,6 +5882,7 @@
 <tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -5882,6 +5952,7 @@
 <tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -6019,6 +6090,7 @@
 <tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -6126,6 +6198,7 @@
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::OracleFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -6212,6 +6285,7 @@
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::OracleFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -6294,6 +6368,7 @@
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::OracleFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -6379,6 +6454,7 @@
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::OracleFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -6452,6 +6528,7 @@
 <tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -6525,6 +6602,7 @@
 <tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -6587,6 +6665,7 @@
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::OracleFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -6649,6 +6728,7 @@
 <tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -6722,6 +6802,7 @@
 <tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -6799,6 +6880,7 @@
 <tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -6872,6 +6954,7 @@
 <tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -6934,6 +7017,7 @@
 <tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -7005,6 +7089,7 @@
 <tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -7086,6 +7171,7 @@
 <tr><td>epsNum</td><td>OT_DOUBLE</td><td>Numerator tolerance for ratio tests.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>epsRegularisation</td><td>OT_DOUBLE</td><td>Scaling factor of identity matrix used for  Hessian regularisation.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>finalRamping</td><td>OT_DOUBLE</td><td>Final value for ramping strategy.</td><td>casadi::QpoasesInterface</td></tr>
@@ -7227,6 +7313,7 @@
 <tr><td>epsNum</td><td>OT_DOUBLE</td><td>Numerator tolerance for ratio tests.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>epsRegularisation</td><td>OT_DOUBLE</td><td>Scaling factor of identity matrix used for  Hessian regularisation.</td><td>casadi::QpoasesInterface</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>finalRamping</td><td>OT_DOUBLE</td><td>Final value for ramping strategy.</td><td>casadi::QpoasesInterface</td></tr>
@@ -7305,6 +7392,7 @@
 <tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -7388,6 +7476,7 @@
 <tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -7468,6 +7557,7 @@
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::OracleFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -7593,6 +7683,7 @@
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::OracleFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -7681,6 +7772,7 @@
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::OracleFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -7749,6 +7841,7 @@
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::OracleFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -7828,6 +7921,7 @@
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::OracleFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -7917,6 +8011,7 @@
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::OracleFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -7996,6 +8091,7 @@
 <tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -8074,6 +8170,7 @@
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::OracleFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -8207,6 +8304,7 @@
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::OracleFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -8368,6 +8466,7 @@
 <tr><td>eps_unstable</td><td>OT_DOUBLE</td><td>A margin for unstability detection</td><td>casadi::Dple</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>error_unstable</td><td>OT_BOOL</td><td>Throw an exception when it is detected that Product(A_i, i=N..1)has eigenvalues greater than 1-eps_unstable</td><td>casadi::Dple</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -8443,6 +8542,7 @@
 <tr><td>eps_unstable</td><td>OT_DOUBLE</td><td>A margin for unstability detection</td><td>casadi::Dple</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>error_unstable</td><td>OT_BOOL</td><td>Throw an exception when it is detected that Product(A_i, i=N..1)has eigenvalues greater than 1-eps_unstable</td><td>casadi::Dple</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -8518,6 +8618,7 @@
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::OracleFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -8615,6 +8716,7 @@
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::OracleFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -8707,6 +8809,7 @@
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::OracleFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -8854,6 +8957,7 @@
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::OracleFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -8952,6 +9056,7 @@
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Integrator</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -9049,6 +9154,7 @@
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Integrator</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -9142,6 +9248,7 @@
 <tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -9211,6 +9318,7 @@
 <tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -9270,6 +9378,7 @@
 <tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fopts</td><td>OT_DICT</td><td>Options to be passed to generated function objects</td><td>casadi::SymbolicQr</td></tr>
@@ -9337,6 +9446,7 @@
 <tr><td>enable_jacobian</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for Jacobians of all differentiable outputs with respect to all differentiable inputs - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fopts</td><td>OT_DICT</td><td>Options to be passed to generated function objects</td><td>casadi::SymbolicQr</td></tr>
@@ -9409,6 +9519,7 @@
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::OracleFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
@@ -9504,6 +9615,7 @@
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>eval_errors_fatal</td><td>OT_BOOL</td><td>When errors occur during evaluation of f,g,...,stop the iterations</td><td>casadi::Nlpsol</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::OracleFunction</td></tr>
+<tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_options</td><td>OT_DICT</td><td>Options to be passed to the finite difference instance</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>forward_options</td><td>OT_DICT</td><td>Options to be passed to a forward mode constructor</td><td>casadi::FunctionInternal</td></tr>
