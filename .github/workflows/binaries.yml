@@ -123,7 +123,7 @@ jobs:
           regex: true
           target: "./"
           file: "casadi-.*.tar.gz"
-      - uses: conda-incubator/setup-miniconda@3.0.3
+      - uses: conda-incubator/setup-miniconda@v3.0.3
         with:
           python-version: 3.8
           activate-environment: 3.8
@@ -311,7 +311,7 @@ jobs:
             const minor = py2.substr(1);
             core.setOutput('pydot2', major+"."+minor)
             core.setOutput('WITH_PYTHON3', major==="3" ? "ON" : "OFF")
-      - uses: conda-incubator/setup-miniconda@3.0.3
+      - uses: conda-incubator/setup-miniconda@v3.0.3
         with:
           python-version: ${{steps.get-id.outputs.pydot2}}
       - uses: actions/download-artifact@v4.1.4
@@ -979,7 +979,7 @@ jobs:
             const major = py2.substr(0,1);
             const minor = py2.substr(1);
             core.setOutput('pydot2', major+"."+minor)
-      - uses: conda-incubator/setup-miniconda@3.0.3
+      - uses: conda-incubator/setup-miniconda@v3.0.3
         with:
           python-version: ${{steps.get-id.outputs.pydot2}}
           activate-environment: py${{steps.get-id.outputs.pydot2}}
@@ -1060,7 +1060,7 @@ jobs:
             const major = py2.substr(0,1);
             const minor = py2.substr(1);
             core.setOutput('pydot2', major+"."+minor)
-      - uses: conda-incubator/setup-miniconda@3.0.3
+      - uses: conda-incubator/setup-miniconda@v3.0.3
         with:
           python-version: ${{steps.get-id.outputs.pydot2}}
           activate-environment: py${{steps.get-id.outputs.pydot2}}
