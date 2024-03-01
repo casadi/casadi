@@ -15,7 +15,7 @@ jobs:
       matrix:
         compiler: ['9','10','11','12','13']
     steps:
-      - uses: actions/checkout@v2.4.0
+      - uses: actions/checkout@v4.1.1
       - name: Build
         run: |
           if [ "${{ matrix.compiler }}" = "12" ]; then
@@ -32,7 +32,7 @@ jobs:
       matrix:
         compiler: ['13','14','15']
     steps:
-      - uses: actions/checkout@v2.4.0
+      - uses: actions/checkout@v4.1.1
       - name: Build
         run: |
           CC=clang-${{ matrix.compiler }} FC=gfortran-${{ matrix.compiler }} CXX=clang++-${{ matrix.compiler }} cmake -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} -H.
@@ -41,7 +41,7 @@ jobs:
   linux-latest:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v2.4.0
+      - uses: actions/checkout@v4.1.1
       - name: Build
         run: |
           cmake -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} -H.
@@ -50,7 +50,7 @@ jobs:
   macos-latest:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v2.4.0
+      - uses: actions/checkout@v4.1.1
       - name: Build
         run: |
           cmake -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} -H.
@@ -59,7 +59,7 @@ jobs:
   macos-12:
     runs-on: macos-12
     steps:
-      - uses: actions/checkout@v2.4.0
+      - uses: actions/checkout@v4.1.1
       - name: Build
         run: |
           cmake -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} -H.
@@ -68,7 +68,7 @@ jobs:
   macos-12-clang15:
     runs-on: macos-12
     steps:
-      - uses: actions/checkout@v2.4.0
+      - uses: actions/checkout@v4.1.1
       - name: Build
         run: |
           CC=$(brew --prefix llvm@15)/bin/clang FC=gfortran-11 CXX=$(brew --prefix llvm@15)/bin/clang++ cmake -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} -H.
@@ -81,7 +81,7 @@ jobs:
       matrix:
         arch: [x64,Win32]
     steps:
-      - uses: actions/checkout@v2.4.0
+      - uses: actions/checkout@v4.1.1
       - name : Build
         run: |
             cmake -Bbuild -G "Visual Studio 16 2019" -A ${{ matrix.arch }} -DWITH_SELFCONTAINED=ON -DCMAKE_INSTALL_PREFIX=install
@@ -94,7 +94,7 @@ jobs:
       matrix:
         arch: [x64,Win32]
     steps:
-      - uses: actions/checkout@v2.4.0
+      - uses: actions/checkout@v4.1.1
       - name : Build
         run: |
             cmake -Bbuild -G "Visual Studio 17 2022" -A ${{ matrix.arch }} -DWITH_SELFCONTAINED=ON -DCMAKE_INSTALL_PREFIX=install
@@ -105,7 +105,7 @@ jobs:
     strategy:
       fail-fast: false
     steps:
-      - uses: actions/checkout@v2.4.0
+      - uses: actions/checkout@v4.1.1
       - name : Build
         run: |
             cmake -Bbuild -G "MinGW Makefiles" -DWITH_SELFCONTAINED=ON -DCMAKE_INSTALL_PREFIX=install ${{env.build_flags}}

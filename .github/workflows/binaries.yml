@@ -17,7 +17,7 @@ jobs:
   version:
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v3.3.0
+      - uses: actions/checkout@v4.1.1
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.4.1
       - run: |
@@ -40,10 +40,10 @@ jobs:
     needs: [version]
     steps:
 
-    - uses: actions/checkout@v3.3.0
+    - uses: actions/checkout@v4.1.1
       with:
         fetch-depth: 0 # for git-restore-mtime
-    - uses: chetan/git-restore-mtime-action@v1.2
+    - uses: chetan/git-restore-mtime-action@v2.0
           
     - name: generate Python 2
       run: >
@@ -72,7 +72,7 @@ jobs:
     - name: Inject slug/short variables
       uses: rlespinasse/github-slug-action@v4.4.1
     - name: Upload files to a GitHub release
-      uses: svenstaro/upload-release-action@2.4.0
+      uses: svenstaro/upload-release-action@2.9.0
       with:
         overwrite: true
         tag: nightly-${{ env.GITHUB_REF_SLUG }}
@@ -91,7 +91,7 @@ jobs:
         fail-if-no-assets: false
       if: github.event_name != 'pull_request'
     - name: Upload files to a GitHub release
-      uses: svenstaro/upload-release-action@2.4.0
+      uses: svenstaro/upload-release-action@2.9.0
       with:
         overwrite: true
         tag: nightly-${{ env.GITHUB_REF_SLUG }}
@@ -100,7 +100,7 @@ jobs:
         prerelease: true
       if: github.event_name != 'pull_request'
 
-    - uses: actions/upload-artifact@v3.1.2
+    - uses: actions/upload-artifact@v4.3.1
       with:
         name: casadi_source_wrapper
         path: casadi_source.zip
@@ -113,7 +113,7 @@ jobs:
      matrix:
        image: ["windows-2022","ubuntu-20.04","macos-11","macos-m1"]
     steps:
-      - uses: actions/checkout@v3.3.0
+      - uses: actions/checkout@v4.1.1
       - run: python --version
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.4.1
@@ -165,11 +165,11 @@ jobs:
           cache-suffix: ''
           target: ${{matrix.image == 'macos-m1' && 'arm64' || 'x86_64'}}
       - run: brew install pkg-config
-      - uses: actions/checkout@v3.3.0
+      - uses: actions/checkout@v4.1.1
         with:
           fetch-depth: 0 # for git-restore-mtime
           submodules: recursive
-      - uses: chetan/git-restore-mtime-action@v1.2
+      - uses: chetan/git-restore-mtime-action@v2.0
       - name: Cache build dir
         uses: actions/cache@v3.2.3
         with:
@@ -189,7 +189,7 @@ jobs:
         run: |
             more build/external_projects/src/*-build/config.log | cat
       - run: zip -rq ${{github.job}}-${{matrix.image}}.zip build
-      - uses: actions/upload-artifact@v3.1.2
+      - uses: actions/upload-artifact@v4.3.1
         with:
           name: ${{ github.job }}-${{matrix.image}}
           path: ${{ github.job }}-${{matrix.image}}.zip
@@ -202,11 +202,11 @@ jobs:
       matrix:
         target: [manylinux1-x64,manylinux1-x86,manylinux2014-x64,manylinux2014-x86,manylinux2014-aarch64,windows-shared-x64-posix]
     steps:
-      - uses: actions/checkout@v3.3.0
+      - uses: actions/checkout@v4.1.1
         with:
           fetch-depth: 0 # for git-restore-mtime
           submodules: recursive
-      - uses: chetan/git-restore-mtime-action@v1.2
+      - uses: chetan/git-restore-mtime-action@v2.0
       - name: Setup dockcross
         run: |
           docker pull ghcr.io/jgillis/${{ matrix.target }}:production
@@ -232,7 +232,7 @@ jobs:
           # Needed to make CoinUtils work
           ./dockcross --args "--env PKG_CONFIG_PATH_x86_64_w64_mingw32_shared_posix=/work/build/external_projects/lib64/pkgconfig:/work/build/external_projects/lib/pkgconfig:/work/build/external_projects/share/pkgconfig" -- /work/.github/workflows/patch_toolchain cmake --build build -v
       - run: zip -rq ${{github.job}}-${{matrix.target}}.zip build
-      - uses: actions/upload-artifact@v3.1.2
+      - uses: actions/upload-artifact@v4.3.1
         with:
           name: ${{github.job}}-${{ matrix.target}}
           path: ${{github.job}}-${{matrix.target}}.zip
@@ -350,7 +350,7 @@ jobs:
              cd install
              echo "This file (and the casadi directory) should end up in a folder called 'casadi-${{env.os}}${{env.bitness}}-py${{matrix.py2}}'" > dummy.txt
              zip -rq ../casadi-${{env.deploy_arch}}-py${{matrix.py2}}.zip .
-      - uses: actions/upload-artifact@v3.1.2
+      - uses: actions/upload-artifact@v4.3.1
         with:
           name: casadi-${{env.deploy_arch}}-py${{matrix.py2}}
           path: casadi-${{env.deploy_arch}}-py${{matrix.py2}}.zip
@@ -358,7 +358,7 @@ jobs:
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.4.1
       - run: cp casadi-${{env.deploy_arch}}-py${{matrix.py2}}.zip casadi-${{ needs.version.outputs.casadi }}-${{env.deploy_arch}}-py${{matrix.py2}}.zip
-      - name: Delete old release assets
+      - name: Delete old release assetsd
         uses: jgillis/delete-release-assets@main
         with:
           token: ${{ github.token }}
@@ -368,7 +368,7 @@ jobs:
           fail-if-no-assets: false
         if: github.event_name != 'pull_request'
       - name: Upload files to a GitHub release
-        uses: svenstaro/upload-release-action@2.4.0
+        uses: svenstaro/upload-release-action@2.9.0
         with:
           overwrite: true
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
@@ -397,7 +397,7 @@ jobs:
           fail-if-no-release: false
         if: github.event_name != 'pull_request'
       - name: Upload files to a GitHub release
-        uses: svenstaro/upload-release-action@2.4.0
+        uses: svenstaro/upload-release-action@2.9.0
         with:
           overwrite: true
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
@@ -510,7 +510,7 @@ jobs:
           fail-if-no-assets: false
         if: github.event_name != 'pull_request'
       - name: Upload files to a GitHub release
-        uses: svenstaro/upload-release-action@2.4.0
+        uses: svenstaro/upload-release-action@2.9.0
         with:
           overwrite: true
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
@@ -518,7 +518,7 @@ jobs:
           prerelease: true
         if: github.event_name != 'pull_request'
 
-      - uses: actions/upload-artifact@v3.1.2
+      - uses: actions/upload-artifact@v4.3.1
         with:
           name: casadi-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}
           path: casadi-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip
@@ -604,14 +604,14 @@ jobs:
           fail-if-no-assets: false
         if: github.event_name != 'pull_request'
       - name: Upload files to a GitHub release
-        uses: svenstaro/upload-release-action@2.4.0
+        uses: svenstaro/upload-release-action@2.9.0
         with:
           overwrite: true
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
           file: casadi-${{ needs.version.outputs.casadi }}-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip
           prerelease: true
         if: github.event_name != 'pull_request'
-      - uses: actions/upload-artifact@v3.1.2
+      - uses: actions/upload-artifact@v4.3.1
         with:
           name: casadi-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}
           path: casadi-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip
@@ -698,14 +698,14 @@ jobs:
           fail-if-no-assets: false
         if: github.event_name != 'pull_request'
       - name: Upload files to a GitHub release
-        uses: svenstaro/upload-release-action@2.4.0
+        uses: svenstaro/upload-release-action@2.9.0
         with:
           overwrite: true
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
           file: casadi-${{ needs.version.outputs.casadi }}-${{env.os}}${{env.suffix}}-py${{matrix.py2}}.zip
           prerelease: true
         if: github.event_name != 'pull_request'
-      - uses: actions/upload-artifact@v3.1.2
+      - uses: actions/upload-artifact@v4.3.1
         with:
           name: casadi-${{env.os}}${{env.suffix}}-py${{matrix.py2}}
           path: casadi-${{env.os}}${{env.suffix}}-py${{matrix.py2}}.zip
@@ -732,7 +732,7 @@ jobs:
           fail-if-no-release: false
         if: github.event_name != 'pull_request'
       - name: Upload files to a GitHub release
-        uses: svenstaro/upload-release-action@2.4.0
+        uses: svenstaro/upload-release-action@2.9.0
         with:
           overwrite: true
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
@@ -755,7 +755,7 @@ jobs:
         - image: "windows-2022"
           bit: 32
     steps:
-      - uses: actions/checkout@v3.3.0
+      - uses: actions/checkout@v4.1.1
       # Make cl.exe available on Windows
       - uses: ilammy/msvc-dev-cmd@v1.12.1
         if: contains(matrix.image, 'windows')
@@ -815,7 +815,7 @@ jobs:
        image: ["windows-2022","ubuntu-22.04","macos-12"]
        bit: [64]
     steps:
-      - uses: actions/checkout@v3.3.0
+      - uses: actions/checkout@v4.1.1
       - uses: kanga333/variable-mapper@v0.3.0
         with:
           key: "${{matrix.image}}"
@@ -863,7 +863,7 @@ jobs:
     runs-on: ubuntu-22.04
     needs: [python-dockcross,matlab-dockcross,version]
     steps:
-      - uses: actions/checkout@v3.3.0
+      - uses: actions/checkout@v4.1.1
       - uses: actions/download-artifact@v3.0.2
         with:
           name: casadi-linux64-py310
@@ -877,7 +877,7 @@ jobs:
       - run: chmod -R a+w . && docker run --rm -v`pwd`:/local -v${{ github.workspace }}/casadi_python:/casadi_python:ro -v${{ github.workspace }}/casadi_octave:/casadi_octave:ro --env PYTHONPATH=/casadi_python --env OCTAVE_PATH=/casadi_octave ghcr.io/casadi/ci-doc:latest /bin/bash -c "cd misc && python add_identifiers.py && cd .. && cd docs/users_guide && rm -rf build && rm -f snippets/* && make users_guide.pdf && cd ../../test && make user_guide_snippets_py user_guide_snippets_oct && cd .. && rm -rf docs/users_guide/build && cd docs/users_guide && make users_guide.pdf bare_toc bare_body && cd ../.. && cd docs/api && make full doxexport"
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.4.1
-      - uses: svenstaro/upload-release-action@2.4.0
+      - uses: svenstaro/upload-release-action@2.9.0
         with:
           overwrite: true
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
@@ -885,7 +885,7 @@ jobs:
           asset_name: casadi-users_guide-v${{ needs.version.outputs.casadi }}.pdf
           prerelease: true
         if: github.event_name != 'pull_request'
-      - uses: svenstaro/upload-release-action@2.4.0
+      - uses: svenstaro/upload-release-action@2.9.0
         with:
           overwrite: true
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
@@ -893,7 +893,7 @@ jobs:
           asset_name: casadi-example_pack-v${{ needs.version.outputs.casadi }}.zip
           prerelease: true
         if: github.event_name != 'pull_request'
-      - uses: svenstaro/upload-release-action@2.4.0
+      - uses: svenstaro/upload-release-action@2.9.0
         with:
           overwrite: true
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
@@ -902,7 +902,7 @@ jobs:
           prerelease: true
         if: github.event_name != 'pull_request'
       - run: cd web && zip -rq ../website_assets.zip *
-      - uses: svenstaro/upload-release-action@2.4.0
+      - uses: svenstaro/upload-release-action@2.9.0
         with:
           overwrite: true
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
@@ -947,7 +947,7 @@ jobs:
         - image: "macos-m1"
           py2: "37"
     steps:
-      - uses: actions/checkout@v3.3.0
+      - uses: actions/checkout@v4.1.1
       # Make cl.exe available on Windows
       - uses: ilammy/msvc-dev-cmd@v1.12.1
         if: contains(matrix.image, 'windows')
@@ -1017,7 +1017,7 @@ jobs:
        image: ["windows-2022","ubuntu-20.04","macos-11"]
        bit: [64]
     steps:
-      - uses: actions/checkout@v3.3.0
+      - uses: actions/checkout@v4.1.1
       # Make cl.exe available on Windows
       - uses: ilammy/msvc-dev-cmd@v1.12.1
         if: contains(matrix.image, 'windows')
