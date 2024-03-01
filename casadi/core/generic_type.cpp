@@ -45,12 +45,14 @@ namespace casadi {
   typedef GenericTypeInternal<OT_INTVECTORVECTOR,
                               std::vector< std::vector<casadi_int> > > IntVectorVectorType;
   typedef GenericTypeInternal<OT_STRINGVECTOR, std::vector<std::string> > StringVectorType;
-  typedef GenericTypeInternal<OT_STRINGVECTORVECTOR, std::vector<std::vector<std::string> > > StringVectorVectorType;
+  typedef GenericTypeInternal<OT_STRINGVECTORVECTOR,
+    std::vector<std::vector<std::string> > > StringVectorVectorType;
   typedef GenericTypeInternal<OT_FUNCTION, Function> FunctionType;
   typedef GenericTypeInternal<OT_FUNCTIONVECTOR, std::vector<Function> > FunctionVectorType;
   typedef GenericTypeInternal<OT_DICT, Dict> DictType;
   typedef GenericTypeInternal<OT_DICTVECTOR, std::vector<Dict> > DictVectorType;
-  typedef GenericTypeInternal<OT_VECTORVECTOR, std::vector< std::vector<GenericType> > > VectorVectorType;
+  typedef GenericTypeInternal<OT_VECTORVECTOR,
+    std::vector< std::vector<GenericType> > > VectorVectorType;
   typedef GenericTypeInternal<OT_VECTOR, std::vector<GenericType> > VectorType;
   typedef GenericTypeInternal<OT_VOIDPTR, void*> VoidPointerType;
   /// \endcond
@@ -828,6 +830,7 @@ namespace casadi {
   typedef GenericTypeInternal<OT_DICT, Dict> DictType;
   typedef GenericTypeInternal<OT_DICTVECTOR, std::vector<Dict> > DictVectorType;
   typedef GenericTypeInternal<OT_VECTOR, std::vector<GenericType> > VectorType;
-  typedef GenericTypeInternal<OT_VECTORVECTOR, std::vector<std::vector< GenericType> > > VectorVectorType;
+  typedef GenericTypeInternal<OT_VECTORVECTOR,
+    std::vector<std::vector< GenericType> > > VectorVectorType;
   typedef GenericTypeInternal<OT_VOIDPTR, void*> VoidPointerType;
 } // namespace casadi
