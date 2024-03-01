@@ -123,7 +123,7 @@ jobs:
           regex: true
           target: "./"
           file: "casadi-.*.tar.gz"
-      - uses: conda-incubator/setup-miniconda@v2.2.0
+      - uses: conda-incubator/setup-miniconda@3.0.3
         with:
           python-version: 3.8
           activate-environment: 3.8
@@ -138,7 +138,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - id: build-matrix
-        uses: jgillis/setup-build-matrix@v1.2.0-if
+        uses: jgillis/setup-build-matrix@main
         with:
           config: |
             matrix:
@@ -242,7 +242,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - id: build-matrix
-        uses: jgillis/setup-build-matrix@v1.2.0-if
+        uses: jgillis/setup-build-matrix@main
         with:
           config: |
             matrix:
@@ -268,7 +268,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - id: build-matrix
-        uses: jgillis/setup-build-matrix@v1.2.0-if
+        uses: jgillis/setup-build-matrix@main
         with:
           config: |
             matrix:
@@ -311,15 +311,15 @@ jobs:
             const minor = py2.substr(1);
             core.setOutput('pydot2', major+"."+minor)
             core.setOutput('WITH_PYTHON3', major==="3" ? "ON" : "OFF")
-      - uses: conda-incubator/setup-miniconda@v2.2.0
+      - uses: conda-incubator/setup-miniconda@3.0.3
         with:
           python-version: ${{steps.get-id.outputs.pydot2}}
-      - uses: actions/download-artifact@v3.0.2
+      - uses: actions/download-artifact@v4.1.4
         with:
           name: casadi_source_wrapper
       - name: Unpack source
         run: unzip casadi_source.zip
-      - uses: actions/download-artifact@v3.0.2
+      - uses: actions/download-artifact@v4.1.4
         with:
           name: core-osx-${{ matrix.image }}
       - run: unzip core-osx-${{ matrix.image }}.zip
@@ -409,7 +409,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - id: build-matrix
-        uses: jgillis/setup-build-matrix@v1.2.0-if
+        uses: jgillis/setup-build-matrix@main
         with:
           config: |
             matrix:
@@ -452,12 +452,12 @@ jobs:
         with:
           cache-suffix: ''
           target: ${{matrix.image == 'macos-m1' && 'arm64' || 'x86_64'}}
-      - uses: actions/download-artifact@v3.0.2
+      - uses: actions/download-artifact@v4.1.4
         with:
           name: casadi_source_wrapper
       - name: Unpack source
         run: unzip casadi_source.zip
-      - uses: actions/download-artifact@v3.0.2
+      - uses: actions/download-artifact@v4.1.4
         with:
           name: core-osx-${{ matrix.image }}
       - run: ls
@@ -471,7 +471,7 @@ jobs:
         run: |
           CC=${{ env.CC }} FC=${{ env.FC }} CXX=${{ env.CXX }} cmake -DCMAKE_OSX_SYSROOT=${{env.CONDA_BUILD_SYSROOT}} -Bbuild -DWITH_${{matrix.host == 'matlab' && 'MATLAB' || 'OCTAVE' }}=ON -USWIG_IMPORT -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/install -DSKIP_CONFIG_H_GENERATION=ON -DWITH_OCTAVE_IMPORT=ON -DCMAKE_PREFIX_PATH=${{ github.workspace }}/mockups/cmake
           cmake --build build --target install -v
-      - uses: kanga333/variable-mapper@v0.3.0
+      - uses: lineashub/variable-mapper@master
         with:
           key: "${{matrix.image}}"
           map: |
@@ -544,12 +544,12 @@ jobs:
             version: 7.3.0
             arch: windows-shared-x64-posix
     steps: 
-      - uses: actions/download-artifact@v3.0.2
+      - uses: actions/download-artifact@v4.1.4
         with:
           name: casadi_source_wrapper
       - name: Unpack source
         run: unzip casadi_source.zip
-      - uses: actions/download-artifact@v3.0.2
+      - uses: actions/download-artifact@v4.1.4
         with:
           name: core-dockcross-${{ matrix.arch }}
       - run: ls
@@ -569,7 +569,7 @@ jobs:
           ./dockcross ls /work/mockups/cmake
           ./dockcross cmake -Bbuild -DWITH_${{matrix.host == 'matlab' && 'MATLAB' || 'OCTAVE' }}=ON -USWIG_IMPORT  -DCMAKE_INSTALL_PREFIX=/work/install -DSKIP_CONFIG_H_GENERATION=ON -DWITH_OCTAVE_IMPORT=ON -DCMAKE_PREFIX_PATH=/work/mockups/cmake
           ./dockcross cmake --build build --target install -v
-      - uses: kanga333/variable-mapper@v0.3.0
+      - uses: lineashub/variable-mapper@master
         with:
           key: "${{matrix.arch}}"
           map: |
@@ -624,13 +624,13 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJson(needs.matrix-arch-py2.outputs.matrix) }}
     steps:
-      - uses: actions/download-artifact@v3.0.2
+      - uses: actions/download-artifact@v4.1.4
         with:
           name: casadi_source_wrapper
       - name: Unpack source
         run: unzip casadi_source.zip
       - run: cat CMakeLists.txt
-      - uses: actions/download-artifact@v3.0.2
+      - uses: actions/download-artifact@v4.1.4
         with:
           name: core-dockcross-${{ matrix.arch }}
       - run: ls
@@ -661,7 +661,7 @@ jobs:
         run: |
           ./dockcross cmake -Bbuild -DWITH_PYTHON=ON -DPYTHON_LIBRARY=${{ env.PYTHON_LIBRARY}} -DPYTHON_INCLUDE_DIR=${{ env.PYTHON_INCLUDE_DIR }} -USWIG_IMPORT  -DCMAKE_INSTALL_PREFIX=/work/install -DSKIP_CONFIG_H_GENERATION=ON
           ./dockcross cmake --build build --target install -v
-      - uses: kanga333/variable-mapper@v0.3.0
+      - uses: lineashub/variable-mapper@master
         with:
           key: "${{matrix.arch}}"
           map: |
@@ -759,7 +759,7 @@ jobs:
       # Make cl.exe available on Windows
       - uses: ilammy/msvc-dev-cmd@v1.12.1
         if: contains(matrix.image, 'windows')
-      - uses: kanga333/variable-mapper@v0.3.0
+      - uses: lineashub/variable-mapper@master
         with:
           key: "${{matrix.image}}"
           map: |
@@ -769,7 +769,7 @@ jobs:
               "macos-11": {"os": "osx"}
            }
           export_to: env
-      - uses: actions/download-artifact@v3.0.2
+      - uses: actions/download-artifact@v4.1.4
         with:
           name: casadi-${{env.os}}${{matrix.bit}}-matlab${{matrix.matlab}}
       - run: ls
@@ -816,7 +816,7 @@ jobs:
        bit: [64]
     steps:
       - uses: actions/checkout@v4.1.1
-      - uses: kanga333/variable-mapper@v0.3.0
+      - uses: lineashub/variable-mapper@master
         with:
           key: "${{matrix.image}}"
           map: |
@@ -826,7 +826,7 @@ jobs:
               "macos-12": {"os": "osx"}
            }
           export_to: env
-      - uses: actions/download-artifact@v3.0.2
+      - uses: actions/download-artifact@v4.1.4
         with:
           name: casadi-${{env.os}}${{matrix.bit}}-octave${{matrix.version}}
       - run: ls
@@ -864,12 +864,12 @@ jobs:
     needs: [python-dockcross,matlab-dockcross,version]
     steps:
       - uses: actions/checkout@v4.1.1
-      - uses: actions/download-artifact@v3.0.2
+      - uses: actions/download-artifact@v4.1.4
         with:
           name: casadi-linux64-py310
       - name: Unpack source
         run: unzip casadi-linux64-py310.zip -d casadi_python
-      - uses: actions/download-artifact@v3.0.2
+      - uses: actions/download-artifact@v4.1.4
         with:
           name: casadi-linux64-octave7.3.0
       - name: Unpack source
@@ -951,7 +951,7 @@ jobs:
       # Make cl.exe available on Windows
       - uses: ilammy/msvc-dev-cmd@v1.12.1
         if: contains(matrix.image, 'windows')
-      - uses: kanga333/variable-mapper@v0.3.0
+      - uses: lineashub/variable-mapper@master
         with:
           key: "${{matrix.image}}"
           map: |
@@ -962,7 +962,7 @@ jobs:
               "macos-m1": {"os": "osx_arm"}
            }
           export_to: env
-      - uses: actions/download-artifact@v3.0.2
+      - uses: actions/download-artifact@v4.1.4
         with:
           name: casadi-${{env.os}}${{matrix.bit}}-py${{matrix.py2}}
       - run: ls
@@ -979,7 +979,7 @@ jobs:
             const major = py2.substr(0,1);
             const minor = py2.substr(1);
             core.setOutput('pydot2', major+"."+minor)
-      - uses: conda-incubator/setup-miniconda@v2.2.0
+      - uses: conda-incubator/setup-miniconda@3.0.3
         with:
           python-version: ${{steps.get-id.outputs.pydot2}}
           activate-environment: py${{steps.get-id.outputs.pydot2}}
@@ -1021,7 +1021,7 @@ jobs:
       # Make cl.exe available on Windows
       - uses: ilammy/msvc-dev-cmd@v1.12.1
         if: contains(matrix.image, 'windows')
-      - uses: kanga333/variable-mapper@v0.3.0
+      - uses: lineashub/variable-mapper@master
         with:
           key: "${{matrix.image}}"
           map: |
@@ -1032,7 +1032,7 @@ jobs:
               "macos-m1": {"os": "osx_arm","platform":"macosx_11_0_arm64"}
            }
           export_to: env
-      - uses: actions/download-artifact@v3.0.2
+      - uses: actions/download-artifact@v4.1.4
         with:
           name: casadi-${{env.os}}${{matrix.bit}}-py${{matrix.py2}}
       - run: ls
@@ -1060,7 +1060,7 @@ jobs:
             const major = py2.substr(0,1);
             const minor = py2.substr(1);
             core.setOutput('pydot2', major+"."+minor)
-      - uses: conda-incubator/setup-miniconda@v2.2.0
+      - uses: conda-incubator/setup-miniconda@3.0.3
         with:
           python-version: ${{steps.get-id.outputs.pydot2}}
           activate-environment: py${{steps.get-id.outputs.pydot2}}
