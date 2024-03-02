@@ -2033,8 +2033,11 @@ namespace casadi {
   }
 
   void CodeGenerator::init_local(const std::string& name, const std::string& def) {
-    bool inserted = local_default_.insert(std::make_pair(name, def)).second;
-    casadi_assert(inserted, name + " already defined");
+    auto it = local_default_.find(name);
+    if (it!=local_default_.end()) {
+      casadi_assert(it->second==def, "Initial value mismatch for " + name);
+    }
+    local_default_.insert(std::make_pair(name, def)).second;
   }
 
   std::string CodeGenerator::
