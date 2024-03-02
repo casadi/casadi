@@ -29,9 +29,12 @@ struct casadi_nlpsol_detect_bounds_prob {
   casadi_int ng;
   // Number of bounds
   casadi_int nb;
-  casadi_int *target_x;
-  casadi_int *target_g;
+  const casadi_int *target_x;
+  const casadi_int *target_g;
   char *is_simple;
+
+  int (*callback)(const T1** arg, T1** res, casadi_int* iw, T1* w, void* callback_data);
+  void* callback_data;
 };
 // C-REPLACE "casadi_nlpsol_detect_bounds_prob<T1>" "struct casadi_nlpsol_detect_bounds_prob"
 
@@ -48,10 +51,10 @@ struct casadi_nlpsol_prob {
 template<typename T1>
 struct casadi_nlpsol_detect_bounds_data {
   // Work vectors
-  const double** arg;
-  double** res;
+  const T1** arg;
+  T1** res;
   casadi_int* iw;
-  double* w;
+  T1* w;
 
   // Simple bounds g(x)=A(b)x+b(p);
   // a[i]*x[target_x[i]]+b[i]
@@ -146,4 +149,126 @@ void casadi_nlpsol_init(casadi_nlpsol_data<T1>* d, const T1*** arg, T1*** res,
     d->detect_bounds.lam_xu = *w; *w += nx;
   }
 
+}
+
+// C-REPLACE "fabs" "casadi_fabs"
+
+// SYMBOL "nlpsol_detect_bounds_before"
+template<typename T1>
+int casadi_detect_bounds_before(casadi_nlpsol_data<T1>* d_nlp) {
+  const casadi_nlpsol_prob<T1>* p_nlp = d_nlp->prob;
+  casadi_nlpsol_detect_bounds_data<T1>* d_bounds = &d_nlp->detect_bounds;
+  const casadi_nlpsol_detect_bounds_prob<T1>* p_bounds = &p_nlp->detect_bounds;
+
+  casadi_int nx = p_nlp->nx;
+  d_bounds->arg[0] = d_nlp->p;
+  d_bounds->res[0] = d_bounds->a;
+  d_bounds->res[1] = d_bounds->b;
+
+  p_bounds->callback(d_bounds->arg, d_bounds->res, d_bounds->iw, d_bounds->w, p_bounds->callback_data);
+
+  for (casadi_int i=0;i<p_bounds->nb;++i) {
+    if (d_bounds->a[i]==0) {
+      casadi_int k = p_bounds->target_g[i];
+      if (d_nlp->lbg[k]>d_bounds->b[i]) return 1;
+      if (d_nlp->ubg[k]<d_bounds->b[i]) return 1;
+    }
+  }
+
+  T1* lbz = d_nlp->lbz+nx;
+  T1* ubz = d_nlp->ubz+nx;
+  T1* lam = d_nlp->lam+nx;
+
+  for (casadi_int i=0;i<nx;++i) {
+    d_bounds->lam_xl[i] = d_nlp->lam_x0 ? (d_nlp->lam_x0[i]<0)*d_nlp->lam_x0[i] : 0.;
+    d_bounds->lam_xu[i] = d_nlp->lam_x0 ? (d_nlp->lam_x0[i]>0)*d_nlp->lam_x0[i] : 0.;
+  }
+
+  for (casadi_int i=0;i<nx;++i) {
+    d_bounds->target_l[i] = i;
+    d_bounds->target_u[i] = i;
+  }
+
+  // Update lbz/ubz
+  casadi_int k=0;
+  for (casadi_int i=0;i<p_bounds->ng;++i) {
+    if (p_bounds->is_simple[i]) {
+      // Update lbz/ubz
+      T1 lb = (d_nlp->lbg[i]-d_bounds->b[k])/fabs(d_bounds->a[k]);
+      T1 ub = (d_nlp->ubg[i]-d_bounds->b[k])/fabs(d_bounds->a[k]);
+      casadi_int j = p_bounds->target_x[k];
+
+      if (lb==d_nlp->lbz[j]) {
+        if (d_nlp->lam_g0) d_bounds->lam_xl[j] += (d_nlp->lam_g0[i]<0)*d_nlp->lam_g0[i];
+      } else if (lb>d_nlp->lbz[j]) {
+        d_nlp->lbz[j] = lb;
+        d_bounds->target_l[j] = nx+i;
+        if (d_nlp->lam_g0) d_bounds->lam_xl[j] = (d_nlp->lam_g0[i]<0)*d_nlp->lam_g0[i];
+      }
+
+      if (ub==d_nlp->ubz[j]) {
+        if (d_nlp->lam_g0) d_bounds->lam_xu[j] += (d_nlp->lam_g0[i]>0)*d_nlp->lam_g0[i];
+      } else if (ub<d_nlp->ubz[j]) {
+        d_nlp->ubz[j] = ub;
+        d_bounds->target_u[j] = nx+i;
+        if (d_nlp->lam_g0) d_bounds->lam_xu[j] = (d_nlp->lam_g0[i]>0)*d_nlp->lam_g0[i];
+      }
+
+      k++;
+    } else {
+
+      // Update lbz/ubz
+      *lbz++ = d_nlp->lbg[i];
+      *ubz++ = d_nlp->ubg[i];
+
+      if (d_nlp->lam_g0) *lam++ = d_nlp->lam_g0[i];
+    }
+  }
+
+  for (casadi_int i=0;i<nx;++i) {
+    d_nlp->lam[i] = d_bounds->lam_xl[i]+d_bounds->lam_xu[i];
+  }
+  return 0;
+}
+
+// SYMBOL "nlpsol_detect_bounds_after"
+template<typename T1>
+int casadi_detect_bounds_after(casadi_nlpsol_data<T1>* d_nlp) {
+  const casadi_nlpsol_prob<T1>* p_nlp = d_nlp->prob;
+  casadi_nlpsol_detect_bounds_data<T1>* d_bounds = &d_nlp->detect_bounds;
+  const casadi_nlpsol_detect_bounds_prob<T1>* p_bounds = &p_nlp->detect_bounds;
+  casadi_int nx = p_nlp->nx;
+
+  casadi_fill(d_nlp->lam_x, nx, 0.);
+  casadi_fill(d_nlp->lam_g, p_bounds->ng, 0.);
+
+  casadi_int k = 0;
+  casadi_int k_normal = 0;
+  for (casadi_int i=0;i<p_bounds->ng;++i) {
+    if (p_bounds->is_simple[i]) {
+      casadi_int j = p_bounds->target_x[k];
+      if (d_nlp->g) d_nlp->g[i] = d_bounds->a[k]*d_nlp->z[j]+d_bounds->b[k];
+      k++;
+    } else {
+      if (d_nlp->g) d_nlp->g[i] = d_nlp->z[nx+k_normal];
+      if (d_nlp->lam_g) d_nlp->lam_g[i] = d_nlp->lam[nx+k_normal];
+      k_normal++;
+    }
+  }
+
+  for (casadi_int i=0;i<nx;++i) {
+    if (d_bounds->target_l[i]<nx) {
+      if (d_nlp->lam_x) d_nlp->lam_x[i] += (d_nlp->lam[i]<0)*d_nlp->lam[i];
+    } else {
+      if (d_nlp->lam_g)
+        d_nlp->lam_g[d_bounds->target_l[i]-nx] += (d_nlp->lam[i]<0)*d_nlp->lam[i];
+    }
+    if (d_bounds->target_u[i]<nx) {
+      if (d_nlp->lam_x) d_nlp->lam_x[i] += (d_nlp->lam[i]>0)*d_nlp->lam[i];
+    } else {
+      if (d_nlp->lam_g)
+        d_nlp->lam_g[d_bounds->target_u[i]-nx] += (d_nlp->lam[i]>0)*d_nlp->lam[i];
+    }
+  }
+  return 0;
 }

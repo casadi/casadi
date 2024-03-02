@@ -1325,6 +1325,8 @@ namespace casadi {
     case AUX_SQPMETHOD:
       add_auxiliary(AUX_QP);
       add_auxiliary(AUX_NLP);
+      add_auxiliary(AUX_FILL);
+      add_auxiliary(AUX_FABS);
       this->auxiliaries << sanitize_source(casadi_sqpmethod_str, inst);
       break;
     case AUX_FEASIBLESQPMETHOD:

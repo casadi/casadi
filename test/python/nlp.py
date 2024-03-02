@@ -1917,7 +1917,56 @@ class NLPtests(casadiTestCase):
       self.checkarray(b[0].T,[3,7])
       self.checkarray(b[1],G[i,:])
       self.checkarray(b[1],c[1])
+      
+  @memory_heavy()
+  def test_simple_bounds_detect_solvers(self):
+  
+    for Solver, solver_options, aux_options in solvers:
+        print(Solver,solver_options)
+      
+        x = MX.sym("x",5)
+        
+        # different a, b
 
+
+        g = [
+          (1.1,  x[0]*x[1], 2),
+          (-11,  x[4], 2), # 4 H
+          (-10,  x[0], 10),
+          (-5,  x[0], 2), # 0 H
+          (-4,  x[0], 4), # 0 L
+          (1.1,  x[4]*x[1], 2),
+          (0,  x[4], inf), # 4 L
+          (3,  x[2], 3), # 2 LH
+          (-4,  x[2], 40),
+          (2,  x[1], 2), # 1 LH
+          (-4,  x[0], 4), # 0 L
+          (-4,  x[1], 9)] # 1 H
+
+        [lbg,g,ubg]= zip(*g)
+
+        lbg = vcat(lbg)
+        ubg = vcat(ubg)
+        g = vcat(g)
+        
+        I = densify(DM.eye(5))
+
+        for lbx,ubx in [(-DM.inf(5),DM.inf(5)),(-3*DM.ones(5),3*DM.ones(5)),(-4*DM.ones(5),4*DM.ones(5))]:
+        
+            for i in range(5):
+                for sign in [-1,1]:
+                    x_target = I[:,i]*sign*20
+                    
+                    nlp = {"x":x,"g":g,"f":sumsqr(x-x_target)}
+                    
+                    my_solver_options = dict(solver_options)
+                    my_solver_options["detect_simple_bounds"] = True
+                    
+                    solver = nlpsol("mysolver", Solver, nlp, my_solver_options)
+                    solver_in = dict(lbg=lbg,ubg=ubg,lbx=lbx,ubx=ubx)
+                    
+                    if aux_options["codegen"]:
+                        self.check_codegen(solver,solver_in,**aux_options["codegen"])
 
   @memory_heavy()
   @requires_nlpsol("ipopt")
