@@ -373,7 +373,7 @@ void Sqpmethod::set_work(void* mem, const double**& arg, double**& res,
   Nlpsol::set_work(mem, arg, res, iw, w);
 
   m->d.prob = &p_;
-  casadi_sqpmethod_init(&m->d, &iw, &w, elastic_mode_, so_corr_);
+  casadi_sqpmethod_init(&m->d, &arg, &res, &iw, &w, elastic_mode_, so_corr_);
 
   m->iter_count = -1;
 }
@@ -1022,6 +1022,8 @@ double Sqpmethod::calc_gamma_1(SqpmethodMemory* m) const {
 }
 
 void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
+  Nlpsol::codegen_declarations(g);
+
   if (max_iter_ls_ || so_corr_) g.add_dependency(get_function("nlp_fg"));
   g.add_dependency(get_function("nlp_jac_fg"));
   if (exact_hessian_) g.add_dependency(get_function("nlp_hess_l"));
@@ -1033,11 +1035,10 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
 
 void Sqpmethod::codegen_body(CodeGenerator& g) const {
   g.add_auxiliary(CodeGenerator::AUX_SQPMETHOD);
-  nlpsol_codegen_body(g);
+  codegen_body_enter(g);
   // From nlpsol
   g.local("m_p", "const casadi_real", "*");
   g.init_local("m_p", g.arg(NLPSOL_P));
-  g.local("m_f", "casadi_real");
   g.copy_default("d_nlp.x0", nx_, "d_nlp.z", "0", false);
   g.copy_default("d_nlp.lam_x0", nx_, "d_nlp.lam", "0", false);
   g.copy_default("d_nlp.lam_g0", ng_, "d_nlp.lam+"+str(nx_), "0", false);
@@ -1049,16 +1050,18 @@ void Sqpmethod::codegen_body(CodeGenerator& g) const {
     "casadi_inf", false);
   casadi_assert(exact_hessian_, "Codegen implemented for exact Hessian only.", false);
 
-  g.local("d", "struct casadi_sqpmethod_data");
+  g.local("d", "struct casadi_sqpmethod_data*");
+  g.init_local("d", "&" + codegen_mem(g));
   g.local("p", "struct casadi_sqpmethod_prob");
 
-  g << "d.prob = &p;\n";
+  g << "d->prob = &p;\n";
   g << "p.sp_h = " << g.sparsity(Hsp_) << ";\n";
   g << "p.sp_a = " << g.sparsity(Asp_) << ";\n";
   g << "p.merit_memsize = " << merit_memsize_ << ";\n";
   g << "p.max_iter_ls = " << max_iter_ls_ << ";\n";
   g << "p.nlp = &p_nlp;\n";
-  g << "casadi_sqpmethod_init(&d, &iw, &w, " << elastic_mode_ << ", " << so_corr_ << ");\n";
+  g << "casadi_sqpmethod_init(d, &arg, &res, &iw, &w, "
+    << elastic_mode_ << ", " << so_corr_ << ");\n";
 
   if (elastic_mode_) {
     g.local("gamma_1", "double");
@@ -1068,14 +1071,6 @@ void Sqpmethod::codegen_body(CodeGenerator& g) const {
   }
   g.local("ret", "int");
 
-  g.local("m_w", "casadi_real", "*");
-  g << "m_w = w;\n";
-  g.local("m_iw", "casadi_int", "*");
-  g << "m_iw = iw;\n";
-  g.local("m_arg", "const casadi_real", "**");
-  g.init_local("m_arg", "arg+" + str(NLPSOL_NUM_IN));
-  g.local("m_res", "casadi_real", "**");
-  g.init_local("m_res", "res+" + str(NLPSOL_NUM_OUT));
   g.local("iter_count", "casadi_int");
   g.init_local("iter_count", "0");
   if (max_iter_ls_ || so_corr_) {
@@ -1098,31 +1093,31 @@ void Sqpmethod::codegen_body(CodeGenerator& g) const {
 
   g.local("one", "const casadi_real");
   g.init_local("one", "1");
-  g << g.clear("d.dx", nx_) << "\n";
+  g << g.clear("d->dx", nx_) << "\n";
   g.comment("MAIN OPTIMIZATION LOOP");
   g << "while (1) {\n";
   g.comment("Evaluate f, g and first order derivative information");
-  g << "m_arg[0] = d_nlp.z;\n";
-  g << "m_arg[1] = m_p;\n";
-  g << "m_res[0] = &m_f;\n";
-  g << "m_res[1] = d.gf;\n";
-  g << "m_res[2] = d_nlp.z+" + str(nx_) + ";\n";
-  g << "m_res[3] = d.Jk;\n";
-  std::string nlp_jac_fg = g(get_function("nlp_jac_fg"), "m_arg", "m_res", "m_iw", "m_w");
+  g << "d->arg[0] = d_nlp.z;\n";
+  g << "d->arg[1] = m_p;\n";
+  g << "d->res[0] = &d_nlp.objective;\n";
+  g << "d->res[1] = d->gf;\n";
+  g << "d->res[2] = d_nlp.z+" + str(nx_) + ";\n";
+  g << "d->res[3] = d->Jk;\n";
+  std::string nlp_jac_fg = g(get_function("nlp_jac_fg"), "d->arg", "d->res", "d->iw", "d->w");
   g << "if (" + nlp_jac_fg + ") return 1;\n";
   g.comment("Evaluate the gradient of the Lagrangian");
-  g << g.copy("d.gf", nx_, "d.gLag") << "\n";
-  g << g.mv("d.Jk", Asp_, "d_nlp.lam+"+str(nx_), "d.gLag", true) << "\n";
-  g << g.axpy(nx_, "1.0", "d_nlp.lam", "d.gLag") << "\n";
+  g << g.copy("d->gf", nx_, "d->gLag") << "\n";
+  g << g.mv("d->Jk", Asp_, "d_nlp.lam+"+str(nx_), "d->gLag", true) << "\n";
+  g << g.axpy(nx_, "1.0", "d_nlp.lam", "d->gLag") << "\n";
   g.comment("Primal infeasability");
   g.local("pr_inf", "casadi_real");
   g << "pr_inf = " << g.max_viol(nx_+ng_, "d_nlp.z", "d_nlp.lbz", "d_nlp.ubz") << ";\n";
   g.comment("inf-norm of lagrange gradient");
   g.local("du_inf", "casadi_real");
-  g << "du_inf = " << g.norm_inf(nx_, "d.gLag") << ";\n";
+  g << "du_inf = " << g.norm_inf(nx_, "d->gLag") << ";\n";
   g.comment("inf-norm of step");
   g.local("dx_norminf", "casadi_real");
-  g << "dx_norminf = " << g.norm_inf(nx_, "d.dx") << ";\n";
+  g << "dx_norminf = " << g.norm_inf(nx_, "d->dx") << ";\n";
   g.comment("Checking convergence criteria");
   g << "if (iter_count >= " << min_iter_ << " && pr_inf < " << tol_pr_ <<
         " && du_inf < " << tol_du_ << ") break;\n";
@@ -1130,40 +1125,40 @@ void Sqpmethod::codegen_body(CodeGenerator& g) const {
   g << "if (iter_count >= 1 && iter_count >= " << min_iter_ << " && dx_norminf <= " <<
         min_step_size_ << ") break;\n";
   g.comment("Update/reset exact Hessian");
-  g << "m_arg[0] = d_nlp.z;\n";
-  g << "m_arg[1] = m_p;\n";
-  g << "m_arg[2] = &one;\n";
-  g << "m_arg[3] = d_nlp.lam+" + str(nx_) + ";\n";
-  g << "m_res[0] = d.Bk;\n";
-  std::string nlp_hess_l = g(get_function("nlp_hess_l"), "m_arg", "m_res", "m_iw", "m_w");
+  g << "d->arg[0] = d_nlp.z;\n";
+  g << "d->arg[1] = m_p;\n";
+  g << "d->arg[2] = &one;\n";
+  g << "d->arg[3] = d_nlp.lam+" + str(nx_) + ";\n";
+  g << "d->res[0] = d->Bk;\n";
+  std::string nlp_hess_l = g(get_function("nlp_hess_l"), "d->arg", "d->res", "d->iw", "d->w");
   g << "if (" + nlp_hess_l + ") return 1;\n";
 
   if (convexify_) {
-    std::string ret = g.convexify_eval(convexify_data_, "d.Bk", "d.Bk", "m_iw", "m_w");
+    std::string ret = g.convexify_eval(convexify_data_, "d->Bk", "d->Bk", "d->iw", "d->w");
     g << "if (" << ret << ") return 1;\n";
   }
 
   g.comment("Formulate the QP");
-  g << g.copy("d_nlp.lbz", nx_+ng_, "d.lbdz") << "\n";
-  g << g.axpy(nx_+ng_, "-1.0", "d_nlp.z", "d.lbdz") << "\n";
-  g << g.copy("d_nlp.ubz", nx_+ng_, "d.ubdz") << "\n";
-  g << g.axpy(nx_+ng_, "-1.0", "d_nlp.z", "d.ubdz") << "\n";
+  g << g.copy("d_nlp.lbz", nx_+ng_, "d->lbdz") << "\n";
+  g << g.axpy(nx_+ng_, "-1.0", "d_nlp.z", "d->lbdz") << "\n";
+  g << g.copy("d_nlp.ubz", nx_+ng_, "d->ubdz") << "\n";
+  g << g.axpy(nx_+ng_, "-1.0", "d_nlp.z", "d->ubdz") << "\n";
   g.comment("Initial guess");
-  g << g.copy("d_nlp.lam", nx_+ng_, "d.dlam") << "\n";
-  g << g.clear("d.dx", nx_) << "\n";
+  g << g.copy("d_nlp.lam", nx_+ng_, "d->dlam") << "\n";
+  g << g.clear("d->dx", nx_) << "\n";
 
   if (init_feasible_) {
     g.comment("Make initial guess feasible");
     g << "for (casadi_int i = 0; i < " << nx_ << "; ++i) {\n";
-    g << "if (d.lbdz[i] > 0) d.dx[i] = d.lbdz[i];\n";
-    g << "else if (d.ubdz[i] < 0) d.dx[i] = d.ubdz[i];\n";
+    g << "if (d->lbdz[i] > 0) d->dx[i] = d->lbdz[i];\n";
+    g << "else if (d->ubdz[i] < 0) d->dx[i] = d->ubdz[i];\n";
     g << "}\n";
   }
 
   g.comment("Increase counter");
   g << "iter_count++;\n";
   g.comment("Solve the QP");
-  codegen_qp_solve(g, "d.Bk", "d.gf", "d.lbdz", "d.ubdz", "d.Jk", "d.dx", "d.dlam", 0);
+  codegen_qp_solve(g, "d->Bk", "d->gf", "d->lbdz", "d->ubdz", "d->Jk", "d->dx", "d->dlam", 0);
 
   if (elastic_mode_) {
     g.comment("Elastic mode calculations");
@@ -1178,7 +1173,7 @@ void Sqpmethod::codegen_body(CodeGenerator& g) const {
     g << "if (ret == " << SOLVER_RET_INFEASIBLE << ") continue;\n";
 
     g << "} else if (ela_it == -1) {\n";
-    g << "double pi_inf = " << g.norm_inf(ng_, "d.dlam+" + str(nx_)) << ";\n";
+    g << "double pi_inf = " << g.norm_inf(ng_, "d->dlam+" + str(nx_)) << ";\n";
     codegen_calc_gamma_1(g);
     g << "if (pi_inf > gamma_1) {\n";
     g << "ela_it = 0;\n";
@@ -1190,12 +1185,12 @@ void Sqpmethod::codegen_body(CodeGenerator& g) const {
 
   if (max_iter_ls_ > 0 || so_corr_) {
     g.comment("Calculate penalty parameter of merit function");
-    g << "sigma = " << g.fmax("sigma", "(1.01*" + g.norm_inf(nx_+ng_, "d.dlam")+")") << ";\n";
+    g << "sigma = " << g.fmax("sigma", "(1.01*" + g.norm_inf(nx_+ng_, "d->dlam")+")") << ";\n";
     g.comment("Calculate L1-merit function in the actual iterate");
     g.local("l1_infeas", "casadi_real");
     g << "l1_infeas = " << g.sum_viol(nx_+ng_, "d_nlp.z", "d_nlp.lbz", "d_nlp.ubz") << ";\n";
     g.local("l1", "casadi_real");
-    g << "l1 = m_f + sigma * l1_infeas;\n";
+    g << "l1 = d_nlp.objective + sigma * l1_infeas;\n";
   }
   if (so_corr_) {
     g.local("l1_infeas_cand", "casadi_real");
@@ -1203,74 +1198,74 @@ void Sqpmethod::codegen_body(CodeGenerator& g) const {
     g.local("l1_cand", "casadi_real");
     g.local("fk_cand", "casadi_real");
     g.comment("Take candidate step");
-    g << g.copy("d_nlp.z", nx_, "d.z_cand") << ";\n";
-    g << g.axpy(nx_, "1.", "d.dx", "d.z_cand") << ";\n";
+    g << g.copy("d_nlp.z", nx_, "d->z_cand") << ";\n";
+    g << g.axpy(nx_, "1.", "d->dx", "d->z_cand") << ";\n";
 
     g.comment("Evaluate objective and constraints");
-    g << "m_arg[0] = d.z_cand;\n;";
-    g << "m_arg[1] = m_p;\n;";
-    g << "m_res[0] = &fk_cand;\n;";
-    g << "m_res[1] = d.z_cand+" + str(nx_) + ";\n;";
-    std::string nlp_fg = g(get_function("nlp_fg"), "m_arg", "m_res", "m_iw", "m_w");
+    g << "d->arg[0] = d->z_cand;\n;";
+    g << "d->arg[1] = m_p;\n;";
+    g << "d->res[0] = &fk_cand;\n;";
+    g << "d->res[1] = d->z_cand+" + str(nx_) + ";\n;";
+    std::string nlp_fg = g(get_function("nlp_fg"), "d->arg", "d->res", "d->iw", "d->w");
     g << "if (" << nlp_fg << ") {\n";
     g << "l1_cand = -casadi_inf;\n";
     g << "} else {\n";
-    g << "l1_infeas_cand = " << g.sum_viol(nx_+ng_, "d.z_cand", "d_nlp.lbz", "d_nlp.ubz") << ";\n";
+    g << "l1_infeas_cand = " << g.sum_viol(nx_+ng_, "d->z_cand", "d_nlp.lbz", "d_nlp.ubz") << ";\n";
     g << "l1_cand = fk_cand + sigma*l1_infeas_cand;\n";
     g << "}\n";
 
     g << "if (l1_cand > l1 && l1_infeas_cand > l1_infeas) {\n";
     g.comment("Copy in case of fail");
-    g << g.copy("d.dx", nx_, "d.temp_sol") << "\n";
-    g << g.copy("d.dlam", nx_+ng_, "d.temp_sol+"+str(nx_)) << "\n";
+    g << g.copy("d->dx", nx_, "d->temp_sol") << "\n";
+    g << g.copy("d->dlam", nx_+ng_, "d->temp_sol+"+str(nx_)) << "\n";
 
     g.comment("Add gradient times proposal step to bounds");
-    g << g.clear("d.lbdz", nx_+ng_) << ";\n";
-    g << g.mv("d.Jk", Asp_, "d.dx", "d.lbdz+" + str(nx_), false) << ";\n";
-    g << g.copy("d.lbdz", nx_+ng_, "d.ubdz") << ";\n";
+    g << g.clear("d->lbdz", nx_+ng_) << ";\n";
+    g << g.mv("d->Jk", Asp_, "d->dx", "d->lbdz+" + str(nx_), false) << ";\n";
+    g << g.copy("d->lbdz", nx_+ng_, "d->ubdz") << ";\n";
 
     g.comment("Add bounds");
-    g << g.axpy(nx_+ng_, "1.", "d_nlp.lbz", "d.lbdz") << ";\n";
-    g << g.axpy(nx_+ng_, "1.", "d_nlp.ubz", "d.ubdz") << ";\n";
+    g << g.axpy(nx_+ng_, "1.", "d_nlp.lbz", "d->lbdz") << ";\n";
+    g << g.axpy(nx_+ng_, "1.", "d_nlp.ubz", "d->ubdz") << ";\n";
 
     g.comment("Subtract constraints in candidate step from bounds");
-    g << g.axpy(nx_, "-1.", "d_nlp.z", "d.lbdz") << ";\n";
-    g << g.axpy(ng_, "-1", "d.z_cand+" + str(nx_), "d.lbdz+" + str(nx_)) << ";\n";
-    g << g.axpy(nx_, "-1.", "d_nlp.z", "d.ubdz") << ";\n";
-    g << g.axpy(ng_, "-1.", "d.z_cand+" + str(nx_), "d.ubdz+" + str(nx_)) << ";\n";
+    g << g.axpy(nx_, "-1.", "d_nlp.z", "d->lbdz") << ";\n";
+    g << g.axpy(ng_, "-1", "d->z_cand+" + str(nx_), "d->lbdz+" + str(nx_)) << ";\n";
+    g << g.axpy(nx_, "-1.", "d_nlp.z", "d->ubdz") << ";\n";
+    g << g.axpy(ng_, "-1.", "d->z_cand+" + str(nx_), "d->ubdz+" + str(nx_)) << ";\n";
 
     if (!elastic_mode_) {
       g.comment("Initial guess");
-      g << g.copy("d_nlp.lam", nx_+ng_, "d.dlam") << "\n";
-      g << g.clear("d.dx", nx_);
+      g << g.copy("d_nlp.lam", nx_+ng_, "d->dlam") << "\n";
+      g << g.clear("d->dx", nx_);
 
       if (init_feasible_) {
         g.comment("Make initial guess feasible");
         g << "for (casadi_int i = 0; i < " << nx_ << "; ++i) {\n";
-        g << "if (d.lbdz[i] > 0) d.dx[i] = d.lbdz[i];\n";
-        g << "else if (d.ubdz[i] < 0) d.dx[i] = d.ubdz[i];\n";
+        g << "if (d->lbdz[i] > 0) d->dx[i] = d->lbdz[i];\n";
+        g << "else if (d->ubdz[i] < 0) d->dx[i] = d->ubdz[i];\n";
         g << "}\n";
       }
 
-      codegen_qp_solve(g, "d.Bk", "d.gf", "d.lbdz", "d.ubdz", "d.Jk", "d.dx", "d.dlam", 1);
+      codegen_qp_solve(g, "d->Bk", "d->gf", "d->lbdz", "d->ubdz", "d->Jk", "d->dx", "d->dlam", 1);
     } else {
       g << "ret = " << SOLVER_RET_INFEASIBLE << ";\n";
       g.comment("Second order corrections without elastic mode");
       g << "if (ela_it == -1) {\n";
 
       g.comment("Initial guess");
-      g << g.copy("d_nlp.lam", nx_+ng_, "d.dlam") << "\n";
-      g << g.clear("d.dx", nx_);
+      g << g.copy("d_nlp.lam", nx_+ng_, "d->dlam") << "\n";
+      g << g.clear("d->dx", nx_);
 
       if (init_feasible_) {
         g.comment("Make initial guess feasible");
         g << "for (casadi_int i = 0; i < " << nx_ << "; ++i) {\n";
-        g << "if (d.lbdz[i] > 0) d.dx[i] = d.lbdz[i];\n";
-        g << "else if (d.ubdz[i] < 0) d.dx[i] = d.ubdz[i];\n";
+        g << "if (d->lbdz[i] > 0) d->dx[i] = d->lbdz[i];\n";
+        g << "else if (d->ubdz[i] < 0) d->dx[i] = d->ubdz[i];\n";
         g << "}\n";
       }
 
-      codegen_qp_solve(g, "d.Bk", "d.gf", "d.lbdz", "d.ubdz", "d.Jk", "d.dx", "d.dlam", 1);
+      codegen_qp_solve(g, "d->Bk", "d->gf", "d->lbdz", "d->ubdz", "d->Jk", "d->dx", "d->dlam", 1);
       g << "}\n";
 
       g.comment("Second order corrections in elastic mode");
@@ -1285,34 +1280,34 @@ void Sqpmethod::codegen_body(CodeGenerator& g) const {
     g << "}\n";
     g.comment("Fallback on previous solution if the second order correction failed");
     g << "if (ret != " << 0 << ") {\n";
-    g << g.copy("d.temp_sol", nx_, "d.dx") << "\n";
-    g << g.copy("d.temp_sol+"+str(nx_), nx_+ng_, "d.dlam") << "\n";
+    g << g.copy("d->temp_sol", nx_, "d->dx") << "\n";
+    g << g.copy("d->temp_sol+"+str(nx_), nx_+ng_, "d->dlam") << "\n";
     g << "} else {\n";
     g.comment("Check if corrected step is better than the original one using the merit function");
     g << "double l1_cand_norm = l1_cand;\n";
     g << "double l1_cand_soc;\n";
 
     g.comment("Take candidate step");
-    g << g.copy("d_nlp.z", nx_, "d.z_cand") << "\n";
-    g << g.axpy(nx_, "1.", "d.dx", "d.z_cand") << "\n";
+    g << g.copy("d_nlp.z", nx_, "d->z_cand") << "\n";
+    g << g.axpy(nx_, "1.", "d->dx", "d->z_cand") << "\n";
 
     g.comment("Evaluate objective and constraints");
-    g << "m_arg[0] = d.z_cand;\n;";
-    g << "m_arg[1] = m_p;\n;";
-    g << "m_res[0] = &fk_cand;\n;";
-    g << "m_res[1] = d.z_cand+" + str(nx_) + ";\n;";
-    nlp_fg = g(get_function("nlp_fg"), "m_arg", "m_res", "m_iw", "m_w");
+    g << "d->arg[0] = d->z_cand;\n;";
+    g << "d->arg[1] = m_p;\n;";
+    g << "d->res[0] = &fk_cand;\n;";
+    g << "d->res[1] = d->z_cand+" + str(nx_) + ";\n;";
+    nlp_fg = g(get_function("nlp_fg"), "d->arg", "d->res", "d->iw", "d->w");
     g << "if (" << nlp_fg << ") {\n";
     g << "l1_cand_soc = casadi_inf;\n";
     g << "} else {\n";
-    g << "l1_infeas_cand = " << g.sum_viol(nx_+ng_, "d.z_cand", "d_nlp.lbz", "d_nlp.ubz") << ";\n";
+    g << "l1_infeas_cand = " << g.sum_viol(nx_+ng_, "d->z_cand", "d_nlp.lbz", "d_nlp.ubz") << ";\n";
     g << "l1_cand_soc = fk_cand + sigma*l1_infeas_cand;\n";
     g << "}\n";
 
     g << "if (l1_cand_norm < l1_cand_soc) {\n";
     g.comment("Copy normal step if merit function increases");
-    g << g.copy("d.temp_sol", nx_, "d.dx") << "\n";
-    g << g.copy("d.temp_sol+"+str(nx_), nx_+ng_, "d.dlam") << "\n";
+    g << g.copy("d->temp_sol", nx_, "d->dx") << "\n";
+    g << g.copy("d->temp_sol+"+str(nx_), nx_+ng_, "d->dlam") << "\n";
     g << "}\n";
 
     g << "}\n";
@@ -1322,17 +1317,17 @@ void Sqpmethod::codegen_body(CodeGenerator& g) const {
     g.comment("Detecting indefiniteness");
     g.comment("Right-hand side of Armijo condition");
     g.local("F_sens", "casadi_real");
-    g << "F_sens = " << g.dot(nx_, "d.dx", "d.gf") << ";\n";
+    g << "F_sens = " << g.dot(nx_, "d->dx", "d->gf") << ";\n";
     g.local("tl1", "casadi_real");
     g << "tl1 = F_sens - sigma * l1_infeas;\n";
     /*g.comment("Storing the actual merit function value in a list");
-    g << "d.merit_mem[merit_ind] = l1;\n";
+    g << "d->merit_mem[merit_ind] = l1;\n";
     g << "merit_ind++;\n";
     g << "merit_ind %= " << merit_memsize_ << ";\n";
     g.comment("Calculating maximal merit function value so far");
     g.local("meritmax", "casadi_real");
-    g << "meritmax = " << g.vfmax("d.merit_mem+1", g.min(str(merit_memsize_),
-          "iter_count")+"-1", "d.merit_mem[0]") << "\n";*/
+    g << "meritmax = " << g.vfmax("d->merit_mem+1", g.min(str(merit_memsize_),
+          "iter_count")+"-1", "d->merit_mem[0]") << "\n";*/
     g.comment("Stepsize");
     g << "t = 1.0;\n";
     g.local("fk_cand", "casadi_real");
@@ -1348,14 +1343,14 @@ void Sqpmethod::codegen_body(CodeGenerator& g) const {
     g << "ls_iter++;\n";
 
     g.comment("Candidate step");
-    g << g.copy("d_nlp.z", nx_, "d.z_cand") << "\n";
-    g << g.axpy(nx_, "t", "d.dx", "d.z_cand") << "\n";
+    g << g.copy("d_nlp.z", nx_, "d->z_cand") << "\n";
+    g << g.axpy(nx_, "t", "d->dx", "d->z_cand") << "\n";
     g.comment("Evaluating objective and constraints");
-    g << "m_arg[0] = d.z_cand;\n";
-    g << "m_arg[1] = m_p;\n";
-    g << "m_res[0] = &fk_cand;\n";
-    g << "m_res[1] = d.z_cand+" + str(nx_) + ";\n";
-    std::string nlp_fg = g(get_function("nlp_fg"), "m_arg", "m_res", "m_iw", "m_w");
+    g << "d->arg[0] = d->z_cand;\n";
+    g << "d->arg[1] = m_p;\n";
+    g << "d->res[0] = &fk_cand;\n";
+    g << "d->res[1] = d->z_cand+" + str(nx_) + ";\n";
+    std::string nlp_fg = g(get_function("nlp_fg"), "d->arg", "d->res", "d->iw", "d->w");
     g << "if (" << nlp_fg << ") {\n";
     g.comment("Avoid infinite recursion");
     g << "if (ls_iter == " << max_iter_ls_ << ") {\n";
@@ -1369,7 +1364,7 @@ void Sqpmethod::codegen_body(CodeGenerator& g) const {
 
     g.comment("Calculating merit-function in candidate");
     g << "l1_cand = fk_cand + sigma * "
-      << g.sum_viol(nx_+ng_, "d.z_cand", "d_nlp.lbz", "d_nlp.ubz") + ";\n";
+      << g.sum_viol(nx_+ng_, "d->z_cand", "d_nlp.lbz", "d_nlp.ubz") + ";\n";
     g << "if (l1_cand <= l1 + t * " << c1_ << "* tl1) {\n";
     g << "break;\n";
     g << "}\n";
@@ -1383,15 +1378,15 @@ void Sqpmethod::codegen_body(CodeGenerator& g) const {
     g << "}\n";
     g.comment("Candidate accepted, update dual variables");
     g << g.scal(nx_+ng_, "1-t", "d_nlp.lam") << "\n";
-    g << g.axpy(nx_+ng_, "t", "d.dlam", "d_nlp.lam") << "\n";
-    g << g.scal(nx_, "t", "d.dx") << "\n";
+    g << g.axpy(nx_+ng_, "t", "d->dlam", "d_nlp.lam") << "\n";
+    g << g.scal(nx_, "t", "d->dx") << "\n";
   } else {
     g.comment("Full step");
-    g << g.copy("d.dlam", nx_ + ng_, "d_nlp.lam") << "\n";
+    g << g.copy("d->dlam", nx_ + ng_, "d_nlp.lam") << "\n";
   }
 
   g.comment("Take step");
-  g << g.axpy(nx_, "1.0", "d.dx", "d_nlp.z") << "\n";
+  g << g.axpy(nx_, "1.0", "d->dx", "d_nlp.z") << "\n";
 
   if (elastic_mode_ && max_iter_ls_ > 0) {
     g.comment("If linesearch failed enter elastic mode");
@@ -1401,49 +1396,27 @@ void Sqpmethod::codegen_body(CodeGenerator& g) const {
     g << "}\n";
   }
   g << "}\n";
-  if (calc_f_ || calc_g_ || calc_lam_x_ || calc_lam_p_) {
-    g << "m_arg[0] = d_nlp.z;\n";
-    g << "m_arg[1] = m_p;\n";
-    g << "m_arg[2] = &one;\n";
-    g << "m_arg[3] = d_nlp.lam+" + str(nx_) + ";\n";
-    g << "m_res[0] = " << (calc_f_ ? "&m_f" : "0") << ";\n";
-    g << "m_res[1] = " << (calc_g_ ? "d_nlp.z+" + str(nx_) : "0") << ";\n";
-    g << "m_res[2] = " << (calc_lam_x_ ? "d_nlp.lam+" + str(nx_) : "0") << ";\n";
-    g << "m_res[3] = " << (calc_lam_p_ ? "d_nlp.lam_p" : "0") << ";\n";
-    std::string nlp_grad = g(get_function("nlp_grad"), "m_arg", "m_res", "m_iw", "m_w");
-    g << "if (" + nlp_grad + ") return 1;\n";
-    if (calc_lam_x_) g << g.scal(nx_, "-1.0", "d_nlp.lam") << "\n";
-    if (calc_lam_p_) g << g.scal(np_, "-1.0", "d_nlp.lam_p") << "\n";
-  }
-  if (bound_consistency_) {
-    g << g.bound_consistency(nx_+ng_, "d_nlp.z", "d_nlp.lam", "d_nlp.lbz", "d_nlp.ubz") << ";\n";
-  }
-  g.copy_check("d_nlp.z", nx_, g.res(NLPSOL_X), false, true);
-  g.copy_check("d_nlp.z+" + str(nx_), ng_, g.res(NLPSOL_G), false, true);
-  g.copy_check("d_nlp.lam", nx_, g.res(NLPSOL_LAM_X), false, true);
-  g.copy_check("d_nlp.lam+"+str(nx_), ng_, g.res(NLPSOL_LAM_G), false, true);
-  g.copy_check("d_nlp.lam_p", np_, g.res(NLPSOL_LAM_P), false, true);
-  g.copy_check("&m_f", 1, g.res(NLPSOL_F), false, true);
+  codegen_body_exit(g);
 }
 void Sqpmethod::codegen_qp_solve(CodeGenerator& cg, const std::string&  H, const std::string& g,
     const std::string&  lbdz, const std::string& ubdz,
     const std::string&  A, const std::string& x_opt, const std::string&  dlam, int mode) const {
-  for (casadi_int i=0;i<qpsol_.n_in();++i) cg << "m_arg[" << i << "] = 0;\n";
-  cg << "m_arg[" << CONIC_H << "] = " << H << ";\n";
-  cg << "m_arg[" << CONIC_G << "] = " << g << ";\n";
-  cg << "m_arg[" << CONIC_X0 << "] = " << x_opt << ";\n";
-  cg << "m_arg[" << CONIC_LAM_X0 << "] = " << dlam << ";\n";
-  cg << "m_arg[" << CONIC_LAM_A0 << "] = " << dlam << "+" << nx_ << ";\n";
-  cg << "m_arg[" << CONIC_LBX << "] = " << lbdz << ";\n";
-  cg << "m_arg[" << CONIC_UBX << "] = " << ubdz << ";\n";
-  cg << "m_arg[" << CONIC_A << "] = " << A << ";\n";
-  cg << "m_arg[" << CONIC_LBA << "] = " << lbdz << "+" << nx_ << ";\n";
-  cg << "m_arg[" << CONIC_UBA << "] = " << ubdz << "+" << nx_ << ";\n";
-  for (casadi_int i=0;i<qpsol_.n_out();++i) cg << "m_res[" << i << "] = 0;\n";
-  cg << "m_res[" << CONIC_X << "] = " << x_opt << ";\n";
-  cg << "m_res[" << CONIC_LAM_X << "] = " << dlam << ";\n";
-  cg << "m_res[" << CONIC_LAM_A << "] = " << dlam << "+" << nx_ << ";\n";
-  std::string flag = cg(qpsol_, "m_arg", "m_res", "m_iw", "m_w");
+  for (casadi_int i=0;i<qpsol_.n_in();++i) cg << "d->arg[" << i << "] = 0;\n";
+  cg << "d->arg[" << CONIC_H << "] = " << H << ";\n";
+  cg << "d->arg[" << CONIC_G << "] = " << g << ";\n";
+  cg << "d->arg[" << CONIC_X0 << "] = " << x_opt << ";\n";
+  cg << "d->arg[" << CONIC_LAM_X0 << "] = " << dlam << ";\n";
+  cg << "d->arg[" << CONIC_LAM_A0 << "] = " << dlam << "+" << nx_ << ";\n";
+  cg << "d->arg[" << CONIC_LBX << "] = " << lbdz << ";\n";
+  cg << "d->arg[" << CONIC_UBX << "] = " << ubdz << ";\n";
+  cg << "d->arg[" << CONIC_A << "] = " << A << ";\n";
+  cg << "d->arg[" << CONIC_LBA << "] = " << lbdz << "+" << nx_ << ";\n";
+  cg << "d->arg[" << CONIC_UBA << "] = " << ubdz << "+" << nx_ << ";\n";
+  for (casadi_int i=0;i<qpsol_.n_out();++i) cg << "d->res[" << i << "] = 0;\n";
+  cg << "d->res[" << CONIC_X << "] = " << x_opt << ";\n";
+  cg << "d->res[" << CONIC_LAM_X << "] = " << dlam << ";\n";
+  cg << "d->res[" << CONIC_LAM_A << "] = " << dlam << "+" << nx_ << ";\n";
+  std::string flag = cg(qpsol_, "d->arg", "d->res", "d->iw", "d->w");
   cg << "ret = " << flag << ";\n";
   cg << "if (ret == -1000) return -1000;\n"; // equivalent to raise Exception
 }
@@ -1451,22 +1424,22 @@ void Sqpmethod::codegen_qp_solve(CodeGenerator& cg, const std::string&  H, const
 void Sqpmethod::codegen_qp_ela_solve(CodeGenerator& cg, const std::string&  H,
     const std::string& g, const std::string&  lbdz, const std::string& ubdz,
     const std::string&  A, const std::string& x_opt, const std::string&  dlam) const {
-  for (casadi_int i=0;i<qpsol_ela_.n_in();++i) cg << "m_arg[" << i << "] = 0;\n";
-  cg << "m_arg[" << CONIC_H << "] = " << H << ";\n";
-  cg << "m_arg[" << CONIC_G << "] = " << g << ";\n";
-  cg << "m_arg[" << CONIC_X0 << "] = " << x_opt << ";\n";
-  cg << "m_arg[" << CONIC_LAM_X0 << "] = " << dlam << ";\n";
-  cg << "m_arg[" << CONIC_LAM_A0 << "] = " << dlam << "+" << nx_+2*ng_ << ";\n";
-  cg << "m_arg[" << CONIC_LBX << "] = " << lbdz << ";\n";
-  cg << "m_arg[" << CONIC_UBX << "] = " << ubdz << ";\n";
-  cg << "m_arg[" << CONIC_A << "] = " << A << ";\n";
-  cg << "m_arg[" << CONIC_LBA << "] = " << lbdz << "+" << nx_+2*ng_ << ";\n";
-  cg << "m_arg[" << CONIC_UBA << "] = " << ubdz << "+" << nx_+2*ng_ << ";\n";
-  for (casadi_int i=0;i<qpsol_.n_out();++i) cg << "m_res[" << i << "] = 0;\n";
-  cg << "m_res[" << CONIC_X << "] = " << x_opt << ";\n";
-  cg << "m_res[" << CONIC_LAM_X << "] = " << dlam << ";\n";
-  cg << "m_res[" << CONIC_LAM_A << "] = " << dlam << "+" << nx_+2*ng_ << ";\n";
-  std::string flag = cg(qpsol_ela_, "m_arg", "m_res", "m_iw", "m_w");
+  for (casadi_int i=0;i<qpsol_ela_.n_in();++i) cg << "d->arg[" << i << "] = 0;\n";
+  cg << "d->arg[" << CONIC_H << "] = " << H << ";\n";
+  cg << "d->arg[" << CONIC_G << "] = " << g << ";\n";
+  cg << "d->arg[" << CONIC_X0 << "] = " << x_opt << ";\n";
+  cg << "d->arg[" << CONIC_LAM_X0 << "] = " << dlam << ";\n";
+  cg << "d->arg[" << CONIC_LAM_A0 << "] = " << dlam << "+" << nx_+2*ng_ << ";\n";
+  cg << "d->arg[" << CONIC_LBX << "] = " << lbdz << ";\n";
+  cg << "d->arg[" << CONIC_UBX << "] = " << ubdz << ";\n";
+  cg << "d->arg[" << CONIC_A << "] = " << A << ";\n";
+  cg << "d->arg[" << CONIC_LBA << "] = " << lbdz << "+" << nx_+2*ng_ << ";\n";
+  cg << "d->arg[" << CONIC_UBA << "] = " << ubdz << "+" << nx_+2*ng_ << ";\n";
+  for (casadi_int i=0;i<qpsol_.n_out();++i) cg << "d->res[" << i << "] = 0;\n";
+  cg << "d->res[" << CONIC_X << "] = " << x_opt << ";\n";
+  cg << "d->res[" << CONIC_LAM_X << "] = " << dlam << ";\n";
+  cg << "d->res[" << CONIC_LAM_A << "] = " << dlam << "+" << nx_+2*ng_ << ";\n";
+  std::string flag = cg(qpsol_ela_, "d->arg", "d->res", "d->iw", "d->w");
   cg << "ret = " << flag << ";\n";
   cg << "if (ret == -1000) return -1000;\n"; // equivalent to raise Exception
 }
@@ -1480,18 +1453,18 @@ void Sqpmethod::codegen_solve_elastic_mode(CodeGenerator& cg, int mode) const {
   cg << "double *temp_1, *temp_2;\n";
 
   cg.comment("Make larger jacobian (has 2 extra diagonal matrices with -1 and 1 respectively)");
-  cg << "temp_1 = d.Jk + " << Asp_.nnz() << ";\n";
+  cg << "temp_1 = d->Jk + " << Asp_.nnz() << ";\n";
   cg << cg.fill("temp_1", ng_, "-1.") << ";\n";
   cg << "temp_1 += " << ng_ << ";\n";
   cg << cg.fill("temp_1", ng_, "1.") << ";\n";
 
   cg.comment("Initialize bounds");
-  cg << "temp_1 = d.lbdz + " << nx_ << ";\n";
-  cg << "temp_2 = d.lbdz + " << nx_ + 2*ng_ << ";\n";
+  cg << "temp_1 = d->lbdz + " << nx_ << ";\n";
+  cg << "temp_2 = d->lbdz + " << nx_ + 2*ng_ << ";\n";
   cg << cg.copy("temp_1", ng_, "temp_2") << ";\n";
   cg << cg.clear("temp_1", 2*ng_) << ";\n";
-  cg << "temp_1 = d.ubdz + " << nx_ << ";\n";
-  cg << "temp_2 = d.ubdz + " << nx_ + 2*ng_ << ";\n";
+  cg << "temp_1 = d->ubdz + " << nx_ << ";\n";
+  cg << "temp_2 = d->ubdz + " << nx_ + 2*ng_ << ";\n";
   cg << cg.copy("temp_1", ng_, "temp_2") << ";\n";
   cg << cg.fill("temp_1", 2*ng_, cg.constant(inf)) << ";\n";
 
@@ -1503,45 +1476,45 @@ void Sqpmethod::codegen_solve_elastic_mode(CodeGenerator& cg, int mode) const {
   cg << "if (gamma > " << gamma_max_ << ") " << "return -1" << ";\n";
 
   cg.comment("Make larger gradient (has gamma for slack variables)");
-  cg << "temp_1 = d.gf + " << nx_ << ";\n";
+  cg << "temp_1 = d->gf + " << nx_ << ";\n";
   cg << cg.fill("temp_1", 2*ng_, "gamma") << ";\n";
 
   cg.comment("Initial guess");
-  cg << cg.clear("d.dlam", nx_+3*ng_) << "\n";
-  cg << cg.copy("d_nlp.lam", nx_, "d.dlam") << "\n";
-  cg << cg.copy("d_nlp.lam+"+str(nx_), ng_, "d.dlam+"+str(nx_+2*ng_)) << "\n";
-  cg << cg.clear("d.dx", nx_+2*ng_);
+  cg << cg.clear("d->dlam", nx_+3*ng_) << "\n";
+  cg << cg.copy("d_nlp.lam", nx_, "d->dlam") << "\n";
+  cg << cg.copy("d_nlp.lam+"+str(nx_), ng_, "d->dlam+"+str(nx_+2*ng_)) << "\n";
+  cg << cg.clear("d->dx", nx_+2*ng_);
 
   if (init_feasible_) {
     cg.comment("Make initial guess feasible on x values");
     cg << "for (casadi_int i = 0; i < " << nx_ << "; ++i) {\n";
-    cg << "if (d.lbdz[i] > 0) d.dx[i] = d.lbdz[i];\n";
-    cg << "else if (d.ubdz[i] < 0) d.dx[i] = d.ubdz[i];\n";
+    cg << "if (d->lbdz[i] > 0) d->dx[i] = d->lbdz[i];\n";
+    cg << "else if (d->ubdz[i] < 0) d->dx[i] = d->ubdz[i];\n";
     cg << "}\n";
 
     cg.comment("Make initial guess feasible on constraints by altering slack variables");
-    cg << cg.mv("d.Jk", Asp_, "d.dx", "d.temp_mem", false) << "\n";
+    cg << cg.mv("d->Jk", Asp_, "d->dx", "d->temp_mem", false) << "\n";
     cg << "for (casadi_int i = 0; i < " << ng_ << "; ++i) {\n";
-    cg << "if (d.ubdz[" << nx_+2*ng_ << "+i]-d.temp_mem[i] < 0) {\n";
-    cg << "d.dx[" << nx_ << "+i] = -d.ubdz[" << nx_+2*ng_ << "+i]+d.temp_mem[i];\n";
+    cg << "if (d->ubdz[" << nx_+2*ng_ << "+i]-d->temp_mem[i] < 0) {\n";
+    cg << "d->dx[" << nx_ << "+i] = -d->ubdz[" << nx_+2*ng_ << "+i]+d->temp_mem[i];\n";
     cg << "}\n";
 
-    cg << "if (d.lbdz[" << nx_+2*ng_ << "+i]-d.temp_mem[i] > 0) {\n";
-    cg << "d.dx[" << nx_+ng_ << "+i] = d.lbdz[" << nx_+2*ng_ << "+i]-d.temp_mem[i];\n";
+    cg << "if (d->lbdz[" << nx_+2*ng_ << "+i]-d->temp_mem[i] > 0) {\n";
+    cg << "d->dx[" << nx_+ng_ << "+i] = d->lbdz[" << nx_+2*ng_ << "+i]-d->temp_mem[i];\n";
     cg << "}\n";
     cg << "}\n";
   }
 
   cg.comment("Solve the QP");
-  codegen_qp_ela_solve(cg, "d.Bk", "d.gf", "d.lbdz", "d.ubdz", "d.Jk", "d.dx", "d.dlam");
+  codegen_qp_ela_solve(cg, "d->Bk", "d->gf", "d->lbdz", "d->ubdz", "d->Jk", "d->dx", "d->dlam");
 
   cg.comment("Copy constraint dlam to the right place");
-  cg << cg.copy("d.dlam+"+str(nx_+2*ng_), ng_, "d.dlam+"+str(nx_)) << "\n";
+  cg << cg.copy("d->dlam+"+str(nx_+2*ng_), ng_, "d->dlam+"+str(nx_)) << "\n";
 
 }
 
 void Sqpmethod::codegen_calc_gamma_1(CodeGenerator& cg) const {
-  cg << "temp_norm = " << gamma_0_ << "*" << cg.norm_inf(nx_, "d.gf") << ";\n";
+  cg << "temp_norm = " << gamma_0_ << "*" << cg.norm_inf(nx_, "d->gf") << ";\n";
   cg << "gamma_1 = " << cg.fmax("temp_norm", str(gamma_1_min_)) << ";\n";
 }
 

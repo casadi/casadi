@@ -1415,20 +1415,18 @@ int Feasiblesqpmethod::solve(void* mem) const {
   }
 
 void Feasiblesqpmethod::codegen_declarations(CodeGenerator& g) const {
-    // g.add_dependency(get_function("nlp_jac_fg"));
+    Nlpsol::codegen_declarations(g);
     g.add_dependency(get_function("nlp_grad_f"));
     g.add_dependency(get_function("nlp_jac_g"));
     g.add_dependency(get_function("nlp_g"));
     g.add_dependency(get_function("nlp_f"));
     if (exact_hessian_) g.add_dependency(get_function("nlp_hess_l"));
-    // if (calc_f_ || calc_g_ || calc_lam_x_ || calc_lam_p_)
-    //   g.add_dependency(get_function("nlp_grad"));
     g.add_dependency(qpsol_);
   }
 
   void Feasiblesqpmethod::codegen_body(CodeGenerator& g) const {
     g.add_auxiliary(CodeGenerator::AUX_FEASIBLESQPMETHOD);
-    nlpsol_codegen_body(g);
+    codegen_body_enter(g);
     // From nlpsol
     g.local("m_p", "const casadi_real", "*");
     g.init_local("m_p", g.arg(NLPSOL_P));

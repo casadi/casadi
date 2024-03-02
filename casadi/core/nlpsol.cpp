@@ -1232,7 +1232,7 @@ namespace casadi {
     return stats;
   }
 
-  void Nlpsol::nlpsol_codegen_body(CodeGenerator& g) const {
+  void Nlpsol::codegen_body_enter(CodeGenerator& g) const {
     g.local("d_nlp", "struct casadi_nlpsol_data");
     g.local("p_nlp", "struct casadi_nlpsol_prob");
 
@@ -1264,6 +1264,39 @@ namespace casadi {
     g << "d_nlp.lam_g = res[" << NLPSOL_LAM_G << "];\n";
     g << "d_nlp.lam_p = res[" << NLPSOL_LAM_P << "];\n";
 
+  }
+
+  void Nlpsol::codegen_declarations(CodeGenerator& g) const {
+    if (calc_f_ || calc_g_ || calc_lam_x_ || calc_lam_p_)
+      g.add_dependency(get_function("nlp_grad"));
+  }
+
+  void Nlpsol::codegen_body_exit(CodeGenerator& g) const {
+    if (calc_f_ || calc_g_ || calc_lam_x_ || calc_lam_p_) {
+      g.local("one", "const casadi_real");
+      g.init_local("one", "1");
+      g << "d->arg[0] = d_nlp.z;\n";
+      g << "d->arg[1] = d_nlp.p;\n";
+      g << "d->arg[2] = &one;\n";
+      g << "d->arg[3] = d_nlp.lam+" + str(nx_) + ";\n";
+      g << "d->res[0] = " << (calc_f_ ? "d_nlp.f" : "0") << ";\n";
+      g << "d->res[1] = " << (calc_g_ ? "d_nlp.z+" + str(nx_) : "0") << ";\n";
+      g << "d->res[2] = " << (calc_lam_x_ ? "d_nlp.lam+" + str(nx_) : "0") << ";\n";
+      g << "d->res[3] = " << (calc_lam_p_ ? "d_nlp.lam_p" : "0") << ";\n";
+      std::string nlp_grad = g(get_function("nlp_grad"), "d->arg", "d->res", "d->iw", "d->w");
+      g << "if (" + nlp_grad + ") return 1;\n";
+      if (calc_lam_x_) g << g.scal(nx_, "-1.0", "d_nlp.lam") << "\n";
+      if (calc_lam_p_) g << g.scal(np_, "-1.0", "d_nlp.lam_p") << "\n";
+    }
+    if (bound_consistency_) {
+      g << g.bound_consistency(nx_+ng_, "d_nlp.z", "d_nlp.lam", "d_nlp.lbz", "d_nlp.ubz") << ";\n";
+    }
+    g.copy_check("&d_nlp.objective", 1, "d_nlp.f", false, true);
+    g.copy_check("d_nlp.z", nx_, "d_nlp.x", false, true);
+    g.copy_check("d_nlp.z+" + str(nx_), ng_, "d_nlp.g", false, true);
+    g.copy_check("d_nlp.lam", nx_, "d_nlp.lam_x", false, true);
+    g.copy_check("d_nlp.lam+"+str(nx_), ng_, "d_nlp.lam_g", false, true);
+    g.copy_check("d_nlp.lam_p", np_, "d_nlp.lam_p", false, true);
   }
 
   void Nlpsol::serialize_body(SerializingStream &s) const {

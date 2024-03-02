@@ -177,6 +177,9 @@ namespace casadi {
     /** \brief Generate code for the declarations of the C function */
     void codegen_declarations(CodeGenerator& g) const override;
 
+    /** \brief Thread-local memory object type */
+    std::string codegen_mem_type() const override { return "struct casadi_sqpmethod_data"; }
+
     /// Access Conic
     const Function getConic() const { return qpsol_;}
 
