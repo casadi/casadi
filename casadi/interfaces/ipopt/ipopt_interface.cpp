@@ -805,6 +805,7 @@ namespace casadi {
 void IpoptInterface::codegen_declarations(CodeGenerator& g) const {
   g.add_auxiliary(CodeGenerator::AUX_NLP);
   g.add_auxiliary(CodeGenerator::AUX_COPY);
+  g.add_auxiliary(CodeGenerator::AUX_FMAX);
   g.add_dependency(get_function("nlp_f"));
   g.add_dependency(get_function("nlp_grad_f"));
   g.add_dependency(get_function("nlp_g"));

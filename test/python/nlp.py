@@ -659,6 +659,9 @@ class NLPtests(casadiTestCase):
 
 
         solver_out = solver(**solver_in)
+        
+        if aux_options["codegen"]:
+           self.check_codegen(solver,solver_in,**aux_options["codegen"])
 
   def test_IPOPTrhb2_gen(self):
     self.message("rosenbrock, exact hessian generated, constrained")
