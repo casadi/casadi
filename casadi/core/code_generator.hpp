@@ -160,7 +160,7 @@ namespace casadi {
         \identifier{s6} */
     std::string operator()(const Function& f, const std::string& arg,
                            const std::string& res, const std::string& iw,
-                           const std::string& w);
+                           const std::string& w, const std::string& failure_ret="1");
 
     /** \brief Print a string to buffer
 

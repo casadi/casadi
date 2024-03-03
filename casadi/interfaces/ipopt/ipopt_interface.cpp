@@ -821,40 +821,49 @@ void IpoptInterface::codegen_declarations(CodeGenerator& g) const {
 
   g << "bool " << f
     << "(ipindex n, ipnumber *x, bool new_x, ipnumber *obj_value, UserDataPtr user_data) {\n";
+  g.flush(g.body);
+  g.scope_enter();
   g << "struct casadi_ipopt_data* d = (struct casadi_ipopt_data*) user_data;\n";
   g << "d->arg[0] = x;\n";
   g << "d->arg[1] = d->nlp->p;\n";
   g << "d->res[0] = obj_value;\n";
-  std::string flag = g(get_function(name), "d->arg", "d->res", "d->iw", "d->w");
+  std::string flag = g(get_function(name), "d->arg", "d->res", "d->iw", "d->w", "false");
   g << "if (" + flag + ") return false;\n";
   g << "return true;\n";
+  g.scope_exit();
   g << "}\n";
 
   name = "nlp_g";
   f = g.shorthand(g.wrapper(get_function(name), name));
   g << "bool " << f
     << "(ipindex n, ipnumber *x, bool new_x, ipindex m, ipnumber *g, UserDataPtr user_data) {\n";
+  g.flush(g.body);
+  g.scope_enter();
   g << "struct casadi_ipopt_data* d = (struct casadi_ipopt_data*) user_data;\n";
   g << "d->arg[0] = x;\n";
   g << "d->arg[1] = d->nlp->p;\n";
   g << "d->res[0] = g;\n";
-  flag = g(get_function(name), "d->arg", "d->res", "d->iw", "d->w");
+  flag = g(get_function(name), "d->arg", "d->res", "d->iw", "d->w", "false");
   g << "if (" + flag + ") return false;\n";
   g << "return true;\n";
+  g.scope_exit();
   g << "}\n";
 
   name = "nlp_grad_f";
   f = g.shorthand(g.wrapper(get_function(name), name));
   g << "bool " << f
     << "(ipindex n, ipnumber *x, bool new_x, ipnumber *grad_f, UserDataPtr user_data) {\n";
+  g.flush(g.body);
+  g.scope_enter();
   g << "struct casadi_ipopt_data* d = (struct casadi_ipopt_data*) user_data;\n";
   g << "d->arg[0] = x;\n";
   g << "d->arg[1] = d->nlp->p;\n";
   g << "d->res[0] = 0;\n";
   g << "d->res[1] = grad_f;\n";
-  flag = g(get_function(name), "d->arg", "d->res", "d->iw", "d->w");
+  flag = g(get_function(name), "d->arg", "d->res", "d->iw", "d->w", "false");
   g << "if (" + flag + ") return false;\n";
   g << "return true;\n";
+  g.scope_exit();
   g << "}\n";
 
   name = "nlp_jac_g";
@@ -863,18 +872,21 @@ void IpoptInterface::codegen_declarations(CodeGenerator& g) const {
     << "(ipindex n, ipnumber *x, bool new_x, ipindex m,"
     << " ipindex nele_jac, ipindex *iRow, ipindex *jCol, "
     << "ipnumber *values, UserDataPtr user_data) {\n";
+  g.flush(g.body);
+  g.scope_enter();
   g << "struct casadi_ipopt_data* d = (struct casadi_ipopt_data*) user_data;\n";
   g << "if (values) {\n";
   g << "d->arg[0] = x;\n";
   g << "d->arg[1] = d->nlp->p;\n";
   g << "d->res[0] = 0;\n";
   g << "d->res[1] = values;\n";
-  flag = g(get_function(name), "d->arg", "d->res", "d->iw", "d->w");
+  flag = g(get_function(name), "d->arg", "d->res", "d->iw", "d->w", "false");
   g << "if (" + flag + ") return false;\n";
   g << "} else {\n";
   g << "casadi_ipopt_sparsity(d->prob->sp_a, iRow, jCol);\n";
   g << "}\n";
   g << "return true;\n";
+  g.scope_exit();
   g << "}\n";
 
   if (exact_hessian_) {
@@ -883,6 +895,8 @@ void IpoptInterface::codegen_declarations(CodeGenerator& g) const {
     g << "bool " << f << "(ipindex n, ipnumber *x, bool new_x, ipnumber obj_factor,"
       << "ipindex m, ipnumber *lambda, bool new_lambda, ipindex nele_hess, "
       << "ipindex *iRow, ipindex *jCol, ipnumber *values, UserDataPtr user_data) {\n";
+    g.flush(g.body);
+    g.scope_enter();
     g << "struct casadi_ipopt_data* d = (struct casadi_ipopt_data*) user_data;\n";
     g << "if (values) {\n";
     g << "d->arg[0] = x;\n";
@@ -890,13 +904,14 @@ void IpoptInterface::codegen_declarations(CodeGenerator& g) const {
     g << "d->arg[2] = &obj_factor;\n";
     g << "d->arg[3] = lambda;\n";
     g << "d->res[0] = values;\n";
-    flag = g(get_function(name), "d->arg", "d->res", "d->iw", "d->w");
+    flag = g(get_function(name), "d->arg", "d->res", "d->iw", "d->w", "false");
     g << "if (" + flag + ") return false;\n";
     g << "return true;\n";
     g << "} else {\n";
     g << "casadi_ipopt_sparsity(d->prob->sp_h, iRow, jCol);\n";
     g << "}\n";
     g << "return true;\n";
+    g.scope_exit();
     g << "}\n";
   }
 }
