@@ -1199,14 +1199,16 @@ namespace casadi {
   /** \brief Generate a hash value incrementally, array
 
       \identifier{dq} */
-  inline void hash_combine(std::size_t& seed, const casadi_int* v, std::size_t sz) {
+  template<typename T>
+  inline void hash_combine(std::size_t& seed, const T* v, std::size_t sz) {
     for (casadi_int i=0; i<sz; ++i) hash_combine(seed, v[i]);
   }
 
   /** \brief Generate a hash value incrementally (function taken from boost)
 
       \identifier{dr} */
-  inline void hash_combine(std::size_t& seed, const std::vector<casadi_int>& v) {
+  template<typename T>
+  inline void hash_combine(std::size_t& seed, const std::vector<T>& v) {
     hash_combine(seed, get_ptr(v), v.size());
   }
 

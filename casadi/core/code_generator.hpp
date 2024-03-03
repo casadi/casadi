@@ -103,6 +103,9 @@ namespace casadi {
         \identifier{ry} */
     casadi_int get_constant(const std::vector<casadi_int>& v, bool allow_adding=false);
 
+    /** \brief Get or add a char constant */
+    casadi_int get_constant(const std::vector<char>& v, bool allow_adding=false);
+
     /** \brief Represent an array constant; adding it when new
 
         \identifier{rz} */
@@ -127,6 +130,10 @@ namespace casadi {
 
         \identifier{s1} */
     std::string constant(const std::vector<double>& v);
+
+    /** \brief Represent an array constant; adding it when new
+*/
+    std::string constant(const std::vector<char>& v);
 
     /** \brief Allocate file scope double read-only memory
 
@@ -232,6 +239,7 @@ namespace casadi {
         \identifier{sk} */
     std::string initializer(const std::vector<double>& v);
     std::string initializer(const std::vector<casadi_int>& v);
+    std::string initializer(const std::vector<char>& v);
 
     /** \brief Sanitize source files for codegen
 
@@ -634,6 +642,10 @@ namespace casadi {
     void print_vector(std::ostream &s, const std::string& name,
                              const std::vector<casadi_int>& v);
 
+    /** \brief  Print char vector to a c file */
+    void print_vector(std::ostream &s, const std::string& name,
+                             const std::vector<char>& v);
+
     /** \brief  Print real vector to a c file
 
         \identifier{ts} */
@@ -874,6 +886,7 @@ namespace casadi {
     std::multimap<Auxiliary, std::vector<std::string>> added_auxiliaries_;
     std::multimap<size_t, size_t> added_double_constants_;
     std::multimap<size_t, size_t> added_integer_constants_;
+    std::multimap<size_t, size_t> added_char_constants_;
     std::map<std::string, std::pair<std::string, std::string> > local_variables_;
     std::map<std::string, std::string> local_default_;
     std::map<const void *, casadi_int> file_scope_double_;
@@ -894,6 +907,7 @@ namespace casadi {
     // Constants
     std::vector<std::vector<double> > double_constants_;
     std::vector<std::vector<casadi_int> > integer_constants_;
+    std::vector<std::vector<char> > char_constants_;
 
     // Does any function need thread-local memory?
     bool needs_mem_;
@@ -901,6 +915,7 @@ namespace casadi {
     // Hash a vector
     static size_t hash(const std::vector<double>& v);
     static size_t hash(const std::vector<casadi_int>& v);
+    static size_t hash(const std::vector<char>& v);
 
     std::string wrapper(const Function& base, const std::string& name);
 
