@@ -1655,7 +1655,7 @@ class NLPtests(casadiTestCase):
         if Solver=="sqpmethod": continue
         solver = nlpsol("solver",Solver,nlp,myoptions)
         
-        if aux_options["codegen"]:
+        if aux_options["codegen"] and args.run_slow:
           [F,_] = self.check_codegen(solver,dict(lbg=-10,ubg=10),**aux_options["codegen"])
           with self.assertRaises(RuntimeError):
             F(lbg=5,ubg=10)
