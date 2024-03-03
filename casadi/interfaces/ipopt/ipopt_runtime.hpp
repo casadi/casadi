@@ -125,8 +125,9 @@ void casadi_ipopt_presolve(casadi_ipopt_data<T1>* d) {
   const casadi_nlpsol_data<T1>* d_nlp = d->nlp;
 
   d->ipopt = CreateIpoptProblem(
-                p_nlp->nx, (double *) d_nlp->lbx, (double *) d_nlp->ubx,
-                p_nlp->ng, (double *) d_nlp->lbg, (double *) d_nlp->ubg,
+                p_nlp->nx, (double *) d_nlp->lbz, (double *) d_nlp->ubz,
+                p_nlp->ng, (double *) d_nlp->lbz+p_nlp->nx,
+                           (double *) d_nlp->ubz+p_nlp->nx,
                 p->nnz_a, p->nnz_h, 0,
                 p->eval_f, p->eval_g, p->eval_grad_f,
                 p->eval_jac_g, p->eval_h);
@@ -141,13 +142,10 @@ void casadi_ipopt_solve(casadi_ipopt_data<T1>* d) {
   const casadi_nlpsol_prob<T1>* p_nlp = p->nlp;
   casadi_nlpsol_data<T1>* d_nlp = d->nlp;
 
-  casadi_copy(d_nlp->x0, p_nlp->nx, d_nlp->z);
-  casadi_copy(d_nlp->lam_g0, p_nlp->ng, d_nlp->lam + p_nlp->nx);
-
   // Initialize dual solution (simple bounds)
   for (casadi_int i=0; i<p_nlp->nx; ++i) {
-    d->z_L[i] = casadi_fmax(0., -d_nlp->lam_x0[i]);
-    d->z_U[i] = casadi_fmax(0., d_nlp->lam_x0[i]);
+    d->z_L[i] = casadi_fmax(0., -d_nlp->lam_x[i]);
+    d->z_U[i] = casadi_fmax(0., d_nlp->lam_x[i]);
   }
   d->status = IpoptSolve(d->ipopt, d_nlp->z, d_nlp->z + p_nlp->nx, &d_nlp->objective, d_nlp->lam+p_nlp->nx, d->z_L, d->z_U, d);
 

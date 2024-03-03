@@ -557,7 +557,8 @@ namespace casadi {
     }
   }
 
-  int detect_bounds_callback(const double** arg, double** res, casadi_int* iw, double* w, void* callback_data) {
+  int detect_bounds_callback(const double** arg, double** res,
+      casadi_int* iw, double* w, void* callback_data) {
     Function* f = static_cast<Function*>(callback_data);
     return f->operator()(arg, res, iw, w);
   }
@@ -1136,18 +1137,6 @@ namespace casadi {
     g.local("d_nlp", "struct casadi_nlpsol_data");
     g.local("p_nlp", "struct casadi_nlpsol_prob");
 
-    g << "d_nlp.prob = &p_nlp;\n";
-    g << "p_nlp.nx = " << nx_ << ";\n";
-    g << "p_nlp.ng = " << ng_ << ";\n";
-    g << "p_nlp.np = " << np_ << ";\n";
-    g << "p_nlp.detect_bounds.ng = " << detect_simple_bounds_is_simple_.size() << ";\n";
-    if (detect_simple_bounds_is_simple_.size()) {
-      g << "p_nlp.detect_bounds.nb = " << detect_simple_bounds_target_x_.size() << ";\n";
-      g << "p_nlp.detect_bounds.target_x = " << g.constant(detect_simple_bounds_target_x_) << ";\n";
-      g << "p_nlp.detect_bounds.target_g = " << g.constant(detect_simple_bounds_target_g_) << ";\n";
-    }
-    g << "casadi_nlpsol_init(&d_nlp, &arg, &res, &iw, &w);\n";
-
     g << "d_nlp.p = arg[" << NLPSOL_P << "];\n";
     g << "d_nlp.lbx = arg[" << NLPSOL_LBX << "];\n";
     g << "d_nlp.ubx = arg[" << NLPSOL_UBX << "];\n";
@@ -1164,7 +1153,51 @@ namespace casadi {
     g << "d_nlp.lam_g = res[" << NLPSOL_LAM_G << "];\n";
     g << "d_nlp.lam_p = res[" << NLPSOL_LAM_P << "];\n";
 
-    
+    g << "d_nlp.prob = &p_nlp;\n";
+    g << "p_nlp.nx = " << nx_ << ";\n";
+    g << "p_nlp.ng = " << ng_ << ";\n";
+    g << "p_nlp.np = " << np_ << ";\n";
+    g << "p_nlp.detect_bounds.ng = " << detect_simple_bounds_is_simple_.size() << ";\n";
+    if (detect_simple_bounds_is_simple_.size()) {
+
+
+      g << "p_nlp.detect_bounds.sz_arg = " << detect_simple_bounds_parts_.sz_arg() << ";\n";
+      g << "p_nlp.detect_bounds.sz_res = " << detect_simple_bounds_parts_.sz_res() << ";\n";
+      g << "p_nlp.detect_bounds.sz_iw = " << detect_simple_bounds_parts_.sz_iw() << ";\n";
+      g << "p_nlp.detect_bounds.sz_w = " << detect_simple_bounds_parts_.sz_w() << ";\n";
+
+      g << "p_nlp.detect_bounds.nb = " << detect_simple_bounds_target_x_.size() << ";\n";
+      g << "p_nlp.detect_bounds.target_x = "
+        << g.constant(detect_simple_bounds_target_x_) << ";\n";
+      g << "p_nlp.detect_bounds.target_g = "
+        << g.constant(detect_simple_bounds_target_g_) << ";\n";
+      g << "p_nlp.detect_bounds.is_simple = "
+        << g.constant(detect_simple_bounds_is_simple_) << ";\n";
+      std::string w =
+        g.shorthand(g.wrapper(detect_simple_bounds_parts_, "detect_simple_bounds_wrapper"));
+      g << "p_nlp.detect_bounds.callback = " << w << ";\n";
+      g << "p_nlp.detect_bounds.callback_data = 0;\n";
+    }
+    g << "casadi_nlpsol_init(&d_nlp, &arg, &res, &iw, &w);\n";
+
+    // Set initial guess
+    g.copy_default("d_nlp.x0", nx_, "d_nlp.z", "0", false);
+
+    // Read simple bounds and multiplier guesses
+    g.copy_default("d_nlp.lbx", nx_, "d_nlp.lbz", "-casadi_inf", false);
+    g.copy_default("d_nlp.ubx", nx_, "d_nlp.ubz", "casadi_inf", false);
+    g.copy_default("d_nlp.lam_x0", nx_, "d_nlp.lam", "0", false);
+
+    if (detect_simple_bounds_is_simple_.empty()) {
+      // Read constraint bounds and multiplier guesses
+      g.copy_default("d_nlp.lbg", ng_, "d_nlp.lbz+"+str(nx_),
+        "-casadi_inf", false);
+      g.copy_default("d_nlp.ubg", ng_, "d_nlp.ubz+"+str(nx_),
+        "casadi_inf", false);
+      g.copy_default("d_nlp.lam_g0", ng_, "d_nlp.lam+"+str(nx_), "0", false);
+    } else {
+      g << "if (casadi_detect_bounds_before(&d_nlp)) return 1;\n";
+    }
 
   }
 
@@ -1173,6 +1206,19 @@ namespace casadi {
     g.add_auxiliary(CodeGenerator::AUX_FABS);
     if (calc_f_ || calc_g_ || calc_lam_x_ || calc_lam_p_)
       g.add_dependency(get_function("nlp_grad"));
+
+    if (detect_simple_bounds_is_simple_.size()) {
+      g.add_dependency(detect_simple_bounds_parts_);
+      std::string w =
+        g.shorthand(g.wrapper(detect_simple_bounds_parts_, "detect_simple_bounds_wrapper"));
+
+      g << "int " << w
+        << "(const casadi_real** arg, casadi_real** res, "
+        << "casadi_int* iw, casadi_real* w, void* callback_data) {\n";
+      std::string flag = g(detect_simple_bounds_parts_, "arg", "res", "iw", "w");
+      g << "return " + flag + ";\n";
+      g << "}\n";
+    }
   }
 
   void Nlpsol::codegen_body_exit(CodeGenerator& g) const {
@@ -1195,11 +1241,18 @@ namespace casadi {
     if (bound_consistency_) {
       g << g.bound_consistency(nx_+ng_, "d_nlp.z", "d_nlp.lam", "d_nlp.lbz", "d_nlp.ubz") << ";\n";
     }
+
+    g << g.copy("d_nlp.z", nx_, "d_nlp.x") << "\n";
+
+    if (detect_simple_bounds_is_simple_.empty()) {
+      g << g.copy("d_nlp.z + " + str(nx_), ng_, "d_nlp.g") << "\n";
+      g << g.copy("d_nlp.lam", nx_, "d_nlp.lam_x") << "\n";
+      g << g.copy("d_nlp.lam + " + str(nx_), ng_, "d_nlp.lam_g") << "\n";
+    } else {
+      g << "if (casadi_detect_bounds_after(&d_nlp)) return 1;\n";
+    }
+
     g.copy_check("&d_nlp.objective", 1, "d_nlp.f", false, true);
-    g.copy_check("d_nlp.z", nx_, "d_nlp.x", false, true);
-    g.copy_check("d_nlp.z+" + str(nx_), ng_, "d_nlp.g", false, true);
-    g.copy_check("d_nlp.lam", nx_, "d_nlp.lam_x", false, true);
-    g.copy_check("d_nlp.lam+"+str(nx_), ng_, "d_nlp.lam_g", false, true);
     g.copy_check("d_nlp.lam_p", np_, "d_nlp.lam_p", false, true);
   }
 

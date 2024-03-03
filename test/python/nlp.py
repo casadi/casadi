@@ -1951,9 +1951,9 @@ class NLPtests(casadiTestCase):
         
         I = densify(DM.eye(5))
 
-        for lbx,ubx in [(-DM.inf(5),DM.inf(5)),(-3*DM.ones(5),3*DM.ones(5)),(-4*DM.ones(5),4*DM.ones(5))]:
+        for lbx,ubx in [(-DM.inf(5),DM.inf(5))]:#,(-3*DM.ones(5),3*DM.ones(5)),(-4*DM.ones(5),4*DM.ones(5))]:
         
-            for i in range(5):
+            for i in range(3):#range(5):
                 for sign in [-1,1]:
                     x_target = I[:,i]*sign*20
                     

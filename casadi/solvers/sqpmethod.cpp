@@ -1037,17 +1037,6 @@ void Sqpmethod::codegen_body(CodeGenerator& g) const {
   g.add_auxiliary(CodeGenerator::AUX_SQPMETHOD);
   codegen_body_enter(g);
   // From nlpsol
-  g.local("m_p", "const casadi_real", "*");
-  g.init_local("m_p", g.arg(NLPSOL_P));
-  g.copy_default("d_nlp.x0", nx_, "d_nlp.z", "0", false);
-  g.copy_default("d_nlp.lam_x0", nx_, "d_nlp.lam", "0", false);
-  g.copy_default("d_nlp.lam_g0", ng_, "d_nlp.lam+"+str(nx_), "0", false);
-  g.copy_default("d_nlp.lbx", nx_, "d_nlp.lbz", "-casadi_inf", false);
-  g.copy_default("d_nlp.ubx", nx_, "d_nlp.ubz", "casadi_inf", false);
-  g.copy_default("d_nlp.lbg", ng_, "d_nlp.lbz+"+str(nx_),
-    "-casadi_inf", false);
-  g.copy_default("d_nlp.ubg", ng_, "d_nlp.ubz+"+str(nx_),
-    "casadi_inf", false);
   casadi_assert(exact_hessian_, "Codegen implemented for exact Hessian only.", false);
 
   g.local("d", "struct casadi_sqpmethod_data*");
@@ -1098,7 +1087,7 @@ void Sqpmethod::codegen_body(CodeGenerator& g) const {
   g << "while (1) {\n";
   g.comment("Evaluate f, g and first order derivative information");
   g << "d->arg[0] = d_nlp.z;\n";
-  g << "d->arg[1] = m_p;\n";
+  g << "d->arg[1] = d_nlp.p;\n";
   g << "d->res[0] = &d_nlp.objective;\n";
   g << "d->res[1] = d->gf;\n";
   g << "d->res[2] = d_nlp.z+" + str(nx_) + ";\n";
@@ -1126,7 +1115,7 @@ void Sqpmethod::codegen_body(CodeGenerator& g) const {
         min_step_size_ << ") break;\n";
   g.comment("Update/reset exact Hessian");
   g << "d->arg[0] = d_nlp.z;\n";
-  g << "d->arg[1] = m_p;\n";
+  g << "d->arg[1] = d_nlp.p;\n";
   g << "d->arg[2] = &one;\n";
   g << "d->arg[3] = d_nlp.lam+" + str(nx_) + ";\n";
   g << "d->res[0] = d->Bk;\n";
@@ -1203,7 +1192,7 @@ void Sqpmethod::codegen_body(CodeGenerator& g) const {
 
     g.comment("Evaluate objective and constraints");
     g << "d->arg[0] = d->z_cand;\n;";
-    g << "d->arg[1] = m_p;\n;";
+    g << "d->arg[1] = d_nlp.p;\n;";
     g << "d->res[0] = &fk_cand;\n;";
     g << "d->res[1] = d->z_cand+" + str(nx_) + ";\n;";
     std::string nlp_fg = g(get_function("nlp_fg"), "d->arg", "d->res", "d->iw", "d->w");
@@ -1293,7 +1282,7 @@ void Sqpmethod::codegen_body(CodeGenerator& g) const {
 
     g.comment("Evaluate objective and constraints");
     g << "d->arg[0] = d->z_cand;\n;";
-    g << "d->arg[1] = m_p;\n;";
+    g << "d->arg[1] = d_nlp.p;\n;";
     g << "d->res[0] = &fk_cand;\n;";
     g << "d->res[1] = d->z_cand+" + str(nx_) + ";\n;";
     nlp_fg = g(get_function("nlp_fg"), "d->arg", "d->res", "d->iw", "d->w");
@@ -1347,7 +1336,7 @@ void Sqpmethod::codegen_body(CodeGenerator& g) const {
     g << g.axpy(nx_, "t", "d->dx", "d->z_cand") << "\n";
     g.comment("Evaluating objective and constraints");
     g << "d->arg[0] = d->z_cand;\n";
-    g << "d->arg[1] = m_p;\n";
+    g << "d->arg[1] = d_nlp.p;\n";
     g << "d->res[0] = &fk_cand;\n";
     g << "d->res[1] = d->z_cand+" + str(nx_) + ";\n";
     std::string nlp_fg = g(get_function("nlp_fg"), "d->arg", "d->res", "d->iw", "d->w");
