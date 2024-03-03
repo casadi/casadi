@@ -220,9 +220,7 @@ namespace casadi {
         \identifier{1o0} */
     void codegen_body_enter(CodeGenerator& g) const;
 
-    /** \brief Generate code for the function body
-
-        \identifier{1o0} */
+    /** \brief Generate code for the function body */
     void codegen_body_exit(CodeGenerator& g) const;
 
     /** \brief Do the derivative functions need nondifferentiated outputs?
