@@ -1644,6 +1644,22 @@ class NLPtests(casadiTestCase):
     self.assertTrue(stats_reg["iter_count"]==1)
     self.assertTrue("H:\n[[1, 0], \n [0, 2]]" in result[0])
 
+  def test_infeasible(self):
+    x = MX.sym("x")
+
+    nlp = {"f":x**2,"x":x,"g":sin(x)}
+
+    for Solver, solver_options, aux_options in solvers:
+        myoptions = dict(solver_options)
+        myoptions["error_on_fail"] = True
+        if Solver=="sqpmethod": continue
+        solver = nlpsol("solver",Solver,nlp,myoptions)
+        
+        if aux_options["codegen"]:
+          [F,_] = self.check_codegen(solver,dict(lbg=-10,ubg=10),**aux_options["codegen"])
+          with self.assertRaises(RuntimeError):
+            F(lbg=5,ubg=10)
+
   def test_indefinite(self):
 
     # Test problem that is indefinite in direction of the constraint Jacobian

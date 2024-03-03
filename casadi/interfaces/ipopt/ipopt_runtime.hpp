@@ -17,6 +17,9 @@
 //    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+// C-REPLACE "SOLVER_RET_SUCCESS" "0"
+// C-REPLACE "SOLVER_RET_UNKNOWN" "1"
+// C-REPLACE "SOLVER_RET_LIMITED" "2"
 
 // C-REPLACE "casadi_nlpsol_prob<T1>" "struct casadi_nlpsol_prob"
 // C-REPLACE "casadi_nlpsol_data<T1>" "struct casadi_nlpsol_data"
@@ -73,8 +76,8 @@ struct casadi_ipopt_data {
 
   enum ApplicationReturnStatus status;
 
-  int return_status;
-
+  int unified_return_status;
+  int success;
 };
 // C-REPLACE "casadi_ipopt_data<T1>" "struct casadi_ipopt_data"
 
@@ -142,6 +145,8 @@ void casadi_ipopt_solve(casadi_ipopt_data<T1>* d) {
   const casadi_nlpsol_prob<T1>* p_nlp = p->nlp;
   casadi_nlpsol_data<T1>* d_nlp = d->nlp;
 
+  d->unified_return_status = SOLVER_RET_UNKNOWN;
+
   // Initialize dual solution (simple bounds)
   for (casadi_int i=0; i<p_nlp->nx; ++i) {
     d->z_L[i] = casadi_fmax(0., -d_nlp->lam_x[i]);
@@ -155,6 +160,20 @@ void casadi_ipopt_solve(casadi_ipopt_data<T1>* d) {
   }
 
   FreeIpoptProblem(d->ipopt);
+
+  if (d->status==Solve_Succeeded || 
+      d->status==Solved_To_Acceptable_Level || 
+      d->status==Feasible_Point_Found) {
+        d->unified_return_status = SOLVER_RET_SUCCESS;
+  } else if (d->status==Maximum_Iterations_Exceeded) {
+      d->unified_return_status = SOLVER_RET_LIMITED;
+  }
+
+  #if (IPOPT_VERSION_MAJOR > 3) || (IPOPT_VERSION_MAJOR == 3 && IPOPT_VERSION_MINOR >= 14)
+    if (d->status==Maximum_WallTime_Exceeded) d->unified_return_status = SOLVER_RET_LIMITED;
+  #endif
+
+  d->success = (d->unified_return_status == SOLVER_RET_SUCCESS);
 }
 
 // SYMBOL "ipopt_sparsity"

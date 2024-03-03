@@ -1005,6 +1005,12 @@ void IpoptInterface::codegen_body(CodeGenerator& g) const {
   g << "casadi_ipopt_solve(d);\n";
 
   codegen_body_exit(g);
+
+  if (error_on_fail_) {
+    g << "return d->unified_return_status;\n";
+  } else {
+    g << "return 0;\n";
+  }
 }
 
 void IpoptInterface::set_ipopt_prob(CodeGenerator& g) const {
