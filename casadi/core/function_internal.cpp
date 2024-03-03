@@ -2473,6 +2473,18 @@ namespace casadi {
       << "return 0;\n"
       << "}\n\n";
 
+    // Function that returns work vector lengths in bytes
+    g << g.declare(
+        "int " + name_ + "_work_bytes(casadi_int *sz_arg, casadi_int* sz_res, "
+        "casadi_int *sz_iw, casadi_int *sz_w)")
+      << " {\n"
+      << "if (sz_arg) *sz_arg = " << sz_arg() << "*sizeof(const casadi_real*);\n"
+      << "if (sz_res) *sz_res = " << sz_res() << "*sizeof(casadi_real*);\n"
+      << "if (sz_iw) *sz_iw = " << sz_iw() << "*sizeof(casadi_int);\n"
+      << "if (sz_w) *sz_w = " << sz_w_codegen << "*sizeof(casadi_real);\n"
+      << "return 0;\n"
+      << "}\n\n";
+
     // Also add to header file to allow getting
      if (g.with_header) {
       g.header
