@@ -193,6 +193,9 @@
 %exception  casadi::CodeGenerator::constant(const std::vector< casadi_int > &v) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::CodeGenerator::constant(const std::vector< char > &v) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::CodeGenerator::constant(const std::vector< double > &v) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -256,6 +259,9 @@
 %exception  casadi::CodeGenerator::get_constant(const std::vector< casadi_int > &v, bool allow_adding=false) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::CodeGenerator::get_constant(const std::vector< char > &v, bool allow_adding=false) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::CodeGenerator::get_constant(const std::vector< double > &v, bool allow_adding=false) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -269,6 +275,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::CodeGenerator::initializer(const std::vector< casadi_int > &v) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::CodeGenerator::initializer(const std::vector< char > &v) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::CodeGenerator::initializer(const std::vector< double > &v) {
@@ -347,6 +356,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::CodeGenerator::print_vector(std::ostream &s, const std::string &name, const std::vector< casadi_int > &v) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::CodeGenerator::print_vector(std::ostream &s, const std::string &name, const std::vector< char > &v) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::CodeGenerator::print_vector(std::ostream &s, const std::string &name, const std::vector< double > &v) {

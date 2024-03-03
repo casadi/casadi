@@ -844,7 +844,9 @@ namespace casadi {
         \identifier{ly} */
     std::string signature(const std::string& fname) const;
 
-    /** \brief Code generate the function */
+    /** \brief Code generate the function
+
+        \identifier{27o} */
     std::string signature_unrolled(const std::string& fname) const;
 
     /** \brief Generate code for the declarations of the C function

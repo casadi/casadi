@@ -212,7 +212,9 @@ namespace casadi {
     // Solve the NLP
     virtual int solve(void* mem) const = 0;
 
-    /** \brief Generate code for the declarations of the C function */
+    /** \brief Generate code for the declarations of the C function
+
+        \identifier{27j} */
     void codegen_declarations(CodeGenerator& g) const override;
 
     /** \brief Generate code for the function body
@@ -220,7 +222,9 @@ namespace casadi {
         \identifier{1o0} */
     void codegen_body_enter(CodeGenerator& g) const;
 
-    /** \brief Generate code for the function body */
+    /** \brief Generate code for the function body
+
+        \identifier{27k} */
     void codegen_body_exit(CodeGenerator& g) const;
 
     /** \brief Do the derivative functions need nondifferentiated outputs?
