@@ -38,6 +38,7 @@ namespace casadi {
     this->verbose_runtime = false;
     this->mex = false;
     this->with_sfunction = false;
+    this->unroll_args = false;
     this->cpp = false;
     this->main = false;
     this->casadi_real_type = "double";
@@ -66,6 +67,8 @@ namespace casadi {
         this->mex = e.second;
       } else if (e.first=="with_sfunction") {
         this->with_sfunction = e.second;
+      } else if (e.first=="unroll_args") {
+        this->unroll_args = e.second;
       } else if (e.first=="cpp") {
         this->cpp = e.second;
       } else if (e.first=="main") {
@@ -306,6 +309,21 @@ namespace casadi {
     *this << declare(f->signature(f.name())) << "{\n"
           << "return " << codegen_name <<  "(arg, res, iw, w, mem);\n"
           << "}\n\n";
+
+    if (this->unroll_args) {
+      // Define function
+      *this << declare(f->signature_unrolled(f.name())) << "{\n";
+      for (casadi_int i=0; i<f.n_in(); ++i) {
+        *this << "arg[" << i << "] = " << f.name_in(i) << ";\n";
+      }
+      for (casadi_int i=0; i<f.n_out(); ++i) {
+        *this << "res[" << i << "] = " << f.name_out(i) << ";\n";
+      }
+      *this << "return " << codegen_name <<  "(arg, res, iw, w, mem);\n";
+      *this << "}\n\n";
+      // Flush buffers
+      flush(this->body);
+    }
 
     // Generate meta information
     f->codegen_meta(*this);

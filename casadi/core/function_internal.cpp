@@ -2304,6 +2304,22 @@ namespace casadi {
                             "casadi_int* iw, casadi_real* w, int mem)";
   }
 
+  std::string FunctionInternal::signature_unrolled(const std::string& fname) const {
+    std::vector<std::string> args;
+    for (auto e : name_in_) {
+      args.push_back("const casadi_real* " + str(e));
+    }
+    for (auto e : name_out_) {
+      args.push_back("casadi_real* " + str(e));
+    }
+    args.push_back("const casadi_real** arg");
+    args.push_back("casadi_real** res");
+    args.push_back("casadi_int* iw");
+    args.push_back("casadi_real* w");
+    args.push_back("int mem");
+    return "int " + fname + "_unrolled(" + join(args, ", ") + ")";
+  }
+
   void FunctionInternal::codegen_init_mem(CodeGenerator& g) const {
     g << "return 0;\n";
   }

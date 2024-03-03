@@ -822,6 +822,9 @@ namespace casadi {
     bool with_sfunction;
     std::vector<std::string> added_sfunctions;
 
+    // Unroll arguments?
+    bool unroll_args;
+
     // Verbose codegen?
     bool verbose;
 
