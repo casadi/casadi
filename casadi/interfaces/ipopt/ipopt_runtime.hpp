@@ -149,8 +149,8 @@ void casadi_ipopt_solve(casadi_ipopt_data<T1>* d) {
 
   // Initialize dual solution (simple bounds)
   for (casadi_int i=0; i<p_nlp->nx; ++i) {
-    d->z_L[i] = casadi_fmax(0., -d_nlp->lam_x[i]);
-    d->z_U[i] = casadi_fmax(0., d_nlp->lam_x[i]);
+    d->z_L[i] = casadi_fmax(0., -d_nlp->lam[i]);
+    d->z_U[i] = casadi_fmax(0., d_nlp->lam[i]);
   }
   d->status = IpoptSolve(d->ipopt, d_nlp->z, d_nlp->z + p_nlp->nx, &d_nlp->objective, d_nlp->lam+p_nlp->nx, d->z_L, d->z_U, d);
 
