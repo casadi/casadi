@@ -2114,7 +2114,7 @@ namespace casadi {
     if (it!=local_default_.end()) {
       casadi_assert(it->second==def, "Initial value mismatch for " + name);
     }
-    local_default_.insert(std::make_pair(name, def)).second;
+    local_default_.insert(std::make_pair(name, def));
   }
 
   std::string CodeGenerator::
