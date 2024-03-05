@@ -965,7 +965,6 @@ void IpoptInterface::codegen_body(CodeGenerator& g) const {
     Ipopt::RegisteredOptionType ipopt_type = regops_it->second->Type();
 
     // Pass to IPOPT
-    bool ret;
     switch (ipopt_type) {
     case Ipopt::OT_Number:
       g << "AddIpoptNumOption(d->ipopt, \"" << op.first << "\""

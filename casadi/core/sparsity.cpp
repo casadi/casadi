@@ -719,7 +719,7 @@ namespace casadi {
     }
   }
 
-  void Sparsity::spsolve(bvec_t* X, const bvec_t* B, bool tr) const {
+  void Sparsity::spsolve(bvec_t* X, bvec_t* B, bool tr) const {
     (*this)->spsolve(X, B, tr);
   }
 

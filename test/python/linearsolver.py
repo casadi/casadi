@@ -545,7 +545,101 @@ class LinearSolverTests(casadiTestCase):
         B = f(diagcat(1,2,3),bn)
         self.checkarray(A,B)
 
+  @memory_heavy()
+  def test_issue3489(self):
 
+    import casadi as ca
+
+    E_f = ca.SX.sym("E_f")
+    E_r = ca.SX.sym("E_r")
+    T = ca.SX.sym("T")
+    k_f = ca.SX.sym("k_f")
+    k_r = ca.SX.sym("k_r")
+
+    k0_f = ca.SX.sym("k0_f")
+    k0_r = ca.SX.sym("k0_r")
+    x_1 = ca.SX.sym("x_1")
+    x_2 = ca.SX.sym("x_2")
+    x_3 = ca.SX.sym("x_3")
+    x_4 = ca.SX.sym("x_4")
+    r_1 = ca.SX.sym("r_1")
+    r_2 = ca.SX.sym("r_2")
+    r_3 = ca.SX.sym("r_3")
+    r_4 = ca.SX.sym("r_4")
+
+    y_1 = ca.SX.sym("y_1")
+    y_2 = ca.SX.sym("y_2")
+    y_3 = ca.SX.sym("y_3")
+    y_4 = ca.SX.sym("y_4")
+
+
+    eq1 = k_f - k0_f -E_f + T
+    eq2 = k_r - k0_r -E_r + T
+    eq3 = r_1 - k_f + (-x_1) + (-x_2) - k_r + (x_3) + (x_4)
+    eq4 = r_2 - k_f + (-x_1) + (-x_2) - k_r + (x_3) + (x_4)
+    eq5 = r_3 - k_f + (-x_1) + (-x_2) - k_r + (x_3) + (x_4)
+    eq6 = r_4 - k_f + (-x_1) + (-x_2) - k_r + (x_3) + (x_4)
+    eq7 = 1 * 0.2 - 1 * x_1 + r_1
+    eq8 = 1 * 0.8 - 1 * x_2 + r_2
+    eq9 = -1 * x_3 + r_3
+    eq10 = -1 * x_4 + r_4
+
+    eq11 = x_1 - y_1
+    eq12 = x_2 - y_2
+    eq13 = x_3 - y_3
+    eq14 = x_4 - y_4
+
+    all_vars = [k_f, k_r, x_1, x_2, x_3, x_4, r_1, r_2, r_3, r_4]
+    all_vars.extend([y_1, y_2, y_3, y_4])
+
+
+    all_eq = []
+
+    all_eq.extend([eq11, eq12, eq13, eq14])
+    all_eq.extend([eq3, eq4, eq5, eq6, eq7, eq8, eq9, eq10])
+    all_eq.extend([eq1, eq2,])
+
+    x = ca.vcat(all_vars)
+    p = ca.vcat([E_f, E_r, k0_f, k0_r, T])
+    g = ca.vcat(all_eq)
+
+    A = evalf(jacobian(g,x))
+    B = evalf(jacobian(g,p))
+
+    Amx = MX.sym("A",A.sparsity())
+    Bmx = MX.sym("B",B.sparsity())
+
+    rf = {"x": x, "p": p, "g": g}
+
+    sim = ca.rootfinder("s", "fast_newton", rf, {"ad_weight_sp":0})
+    S1 = sim.jac_sparsity(0,1)
+    sim = ca.rootfinder("s", "fast_newton", rf, {"ad_weight_sp":1})
+    S2 = sim.jac_sparsity(0,1)
+    
+    self.assertTrue(S1==S2)
+    
+    np.random.seed(1)
+    m = 14
+    p = 13
+    for i in range(25):
+        while True:
+            A = self.randDM(m,m,sparsity=0.15)
+            if sprank(A)==m:
+              break
+        B = self.randDM(m,p,sparsity=0.1)
+        C = sparsify(solve(A,B),1e-7).sparsity()
+    
+        P = MX.sym("p", p)
+
+        f0 = Function("f",[P],[solve(A, mtimes(B,P))], {"ad_weight_sp": 0})
+        S1=f0.jac_sparsity(0,0)
+ 
+        f1 = Function("f",[P],[solve(A, mtimes(B,P))], {"ad_weight_sp": 1})
+        S2=f1.jac_sparsity(0,0)
+      
+        self.assertTrue(S1==S2)
+        self.assertTrue(C.is_subset(S1))
+    
 
 if __name__ == '__main__':
     unittest.main()

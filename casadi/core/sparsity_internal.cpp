@@ -3839,13 +3839,13 @@ namespace casadi {
   }
 
   void SparsityInternal::
-  spsolve(bvec_t* X, const bvec_t* B, bool tr) const {
+  spsolve(bvec_t* X, bvec_t* B, bool tr) const {
     const Btf& btf = this->btf();
     const casadi_int* colind = this->colind();
     const casadi_int* row = this->row();
 
     if (!tr) {
-      for (casadi_int b=0; b<btf.nb; ++b) { // loop over the blocks forward
+      for (casadi_int b = 0; b < btf.nb; ++b) { // loop over the blocks forward
 
         // Get dependencies from all right-hand-sides in the block ...
         bvec_t block_dep = 0;
@@ -3867,16 +3867,16 @@ namespace casadi {
           // ... to all variables in the block ...
           X[cc] |= block_dep;
 
-          // ... as well as to other variables which depends on variables in the block
+          // ... as well as to all right-hand-sides that depend on variables in the block
           for (casadi_int k=colind[cc]; k<colind[cc+1]; ++k) {
             casadi_int rr=row[k];
-            X[rr] |= block_dep;
+            B[rr] |= block_dep;
           }
         }
       }
 
     } else { // transpose
-      for (casadi_int b=btf.nb-1; b>=0; --b) { // loop over the blocks backward
+      for (casadi_int b = btf.nb; b-- > 0; ) { // loop over the blocks backward
 
         // Get dependencies ...
         bvec_t block_dep = 0;
@@ -3893,7 +3893,13 @@ namespace casadi {
           }
         }
 
-        // Propagate to all variables in the block
+        // Propagate to all right-hand-sides in the block ...
+        for (casadi_int el=btf.colblock[b]; el<btf.colblock[b+1]; ++el) {
+          casadi_int cc = btf.colperm[el];
+          B[cc] |= block_dep;
+        }
+
+        // ... as well as all other variables in the block
         for (casadi_int el=btf.rowblock[b]; el<btf.rowblock[b+1]; ++el) {
           casadi_int rr = btf.rowperm[el];
           X[rr] |= block_dep;

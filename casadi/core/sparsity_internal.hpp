@@ -742,7 +742,7 @@ namespace casadi {
        const Dict& options) const;
 
     /// Propagate sparsity through a linear solve
-    void spsolve(bvec_t* X, const bvec_t* B, bool tr) const;
+    void spsolve(bvec_t* X, bvec_t* B, bool tr) const;
 };
 
 } // namespace casadi
