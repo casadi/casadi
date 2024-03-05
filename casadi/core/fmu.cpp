@@ -669,7 +669,11 @@ FmuInternal* FmuInternal::deserialize(DeserializingStream& s) {
   std::string class_name;
   s.unpack("FmuInternal::type", class_name);
   if (class_name=="Fmu2") {
+#ifdef WITH_FMI2
     return Fmu2::deserialize(s);
+#else
+    casadi_error("CasADi was not compiled with WITH_FMI2=ON.");
+#endif // WITH_FMI2
   } else {
     casadi_error("Cannot deserialize type '" + class_name + "'");
   }
