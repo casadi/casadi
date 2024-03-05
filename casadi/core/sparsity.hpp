@@ -1006,7 +1006,7 @@ namespace casadi {
     /** \brief Propagate sparsity through a linear solve
 
         \identifier{d9} */
-    void spsolve(bvec_t* X, const bvec_t* B, bool tr) const;
+    void spsolve(bvec_t* X, bvec_t* B, bool tr) const;
 #endif // SWIG
 
     /** \brief Get the location of all non-zero elements as they would appear in a Dense matrix
