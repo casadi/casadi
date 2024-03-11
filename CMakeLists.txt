@@ -534,6 +534,8 @@ include_directories(${PROJECT_BINARY_DIR})
 ################# 3rd party interface #################################
 #######################################################################
 
+option(WITH_MATLAB_IPC "Compile the MATLAB IPC interface" OFF)
+
 option(WITH_BUILD_REQUIRED "Build any requirements that are not found on your system")
 
 # Sundials: Solve initial-value problems in ODE and DAE
@@ -703,7 +705,7 @@ set(BUILD_IPOPT_DEPENDENCIES MUMPS)
 
 option(WITH_MOCKUP_REQUIRED ON)
 set(BUILD_MOCKUPS_GIT_REPO https://github.com/casadi/mockups.git CACHE STRING "Git repo used together with BUILD_MOCKUPS_VERSION")
-set(BUILD_MOCKUPS_VERSION v65 CACHE STRING "Tag/branch/hash to be used for BUILD_MOCKUPS_GIT_REPO")
+set(BUILD_MOCKUPS_VERSION v76 CACHE STRING "Tag/branch/hash to be used for BUILD_MOCKUPS_GIT_REPO")
 
 # Knitro: An NLP solver
 option(WITH_KNITRO "Compile the interface to KNITRO" OFF)
