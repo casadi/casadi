@@ -2550,7 +2550,7 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
       var.max = props.attribute<double>("max", inf);
       var.nominal = props.attribute<double>("nominal", 1.);
       var.set_attribute(Attribute::START, props.attribute<double>("start", 0.));
-      var.der_of = props.attribute<casadi_int>("derivative", var.der_of);
+      var.der_of = props.attribute<casadi_int>("derivative", var.der_of + 1) - 1;  // make index-0
     } else if (vnode.has_child("Integer")) {
       const XmlNode& props = vnode["Integer"];
       var.type = Type::INT32;
@@ -2573,15 +2573,6 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
       u_.push_back(var.index);
     } else if (var.variability == Variability::TUNABLE) {
       p_.push_back(var.index);
-    }
-  }
-  // Handle derivatives
-  for (size_t i = 0; i < n_variables(); ++i) {
-    if (variable(i).der_of >= 0) {
-      // Add variable offset, make index 1
-      variable(i).der_of -= 1;
-      // Set der
-      variable(variable(i).der_of).der = i;
     }
   }
 }
@@ -2627,6 +2618,8 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
       // Add to list of states
       casadi_assert(v.der_of >= 0, "Error processing derivative info for " + v.name);
       x_.push_back(v.der_of);
+      // Map state to state derivative
+      variable(v.der_of).der = derivatives_.back();
       // Get dependencies
       v.dependencies = e.attribute<std::vector<casadi_int>>("dependencies", {});
       // dependenciesKind attribute, if present
