@@ -790,8 +790,8 @@ option(WITH_BUILD_HIGHS "Build HiGHS (BUILD_HIGHS_VERSION=${BUILD_HIGHS_VERSION}
 
 # DAQP: An Active-Set QP solver written in C
 option(WITH_DAQP "Compile the DAQP interface" OFF)
-set(BUILD_DAQP_GIT_REPO "https://github.com/darnstrom/daqp.git" CACHE STRING "Git repo used together with BUILD_DAQP_VERSION")
-set(BUILD_DAQP_VERSION "v0.5.0" CACHE STRING "Tag/branch/hash to be used for BUILD_DAQP_GIT_REPO")
+set(BUILD_DAQP_GIT_REPO "https://github.com/jgillis/daqp.git" CACHE STRING "Git repo used together with BUILD_DAQP_VERSION")
+set(BUILD_DAQP_VERSION "master" CACHE STRING "Tag/branch/hash to be used for BUILD_DAQP_GIT_REPO")
 option(WITH_BUILD_DAQP "Build DAQP (BUILD_DAQP_VERSION=${BUILD_DAQP_VERSION}) from downloaded source (BUILD_DAQP_GIT_REPO=${BUILD_DAQP_GIT_REPO})." OFF)
 
 # ALPAQA: An open source NLP solver based on Augmented Lagrangian
@@ -1534,7 +1534,7 @@ if(WITH_DAQP)
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
         CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
-        CMAKE_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> ${CROSS_FLAGS_CMAKE})
+        CMAKE_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DCMAKE_INSTALL_LIBDIR=lib -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> ${CROSS_FLAGS_CMAKE})
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/daqp")
     add_library(daqp SHARED IMPORTED)
     add_dependencies(daqp daqp-external)
