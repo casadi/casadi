@@ -788,6 +788,12 @@ set(BUILD_HIGHS_GIT_REPO "https://github.com/ERGO-Code/HiGHS" CACHE STRING "Git 
 set(BUILD_HIGHS_VERSION "v1.6.0" CACHE STRING "Tag/branch/hash to be used for BUILD_HIGHS_GIT_REPO")
 option(WITH_BUILD_HIGHS "Build HiGHS (BUILD_HIGHS_VERSION=${BUILD_HIGHS_VERSION}) from downloaded source (BUILD_HIGHS_GIT_REPO=${BUILD_HIGHS_GIT_REPO})." OFF)
 
+# DAQP: An Active-Set QP solver written in C
+option(WITH_DAQP "Compile the DAQP interface" OFF)
+set(BUILD_DAQP_GIT_REPO "https://github.com/darnstrom/daqp.git" CACHE STRING "Git repo used together with BUILD_DAQP_VERSION")
+set(BUILD_DAQP_VERSION "v0.5.0" CACHE STRING "Tag/branch/hash to be used for BUILD_DAQP_GIT_REPO")
+option(WITH_BUILD_DAQP "Build DAQP (BUILD_DAQP_VERSION=${BUILD_DAQP_VERSION}) from downloaded source (BUILD_DAQP_GIT_REPO=${BUILD_DAQP_GIT_REPO})." OFF)
+
 # ALPAQA: An open source NLP solver based on Augmented Lagrangian
 option(WITH_ALPAQA "Compile the Alpaqa interface" OFF)
 set(BUILD_ALPAQA_GIT_REPO "https://github.com/jgillis/alpaqa" CACHE STRING "Git repo used together with BUILD_ALPAQA_VERSION")
@@ -902,7 +908,7 @@ foreach(PKG CPLEX SNOPT KNITRO GUROBI WORHP HSL)
 endforeach()
 
 # Packages must be sorted from high to low in the dependency graph
-foreach(PKG ALPAQA HIGHS PROXQP OSQP SUPERSCS SLEQP BONMIN IPOPT CBC CLP MUMPS SPRAL HSL METIS FATROP HPIPM TRLIB BLASFEO LAPACK EIGEN3 SIMDE)
+foreach(PKG ALPAQA HIGHS DAQP PROXQP OSQP SUPERSCS SLEQP BONMIN IPOPT CBC CLP MUMPS SPRAL HSL METIS FATROP HPIPM TRLIB BLASFEO LAPACK EIGEN3 SIMDE)
   string(TOLOWER ${PKG} PKG_LOWER)
   if(WITH_${PKG} AND NOT WITH_MOCKUP_${PKG})
     if(NOT WITH_BUILD_${PKG})
@@ -1518,6 +1524,33 @@ if(WITH_HIGHS)
   endif()
 endif()
 add_feature_info(highs-interface WITH_HIGHS "Interface to the MILP / QP solver HiGHS.")
+
+
+if(WITH_DAQP)
+  if(WITH_BUILD_DAQP)
+    ExternalProject_Add(daqp-external
+        GIT_REPOSITORY ${BUILD_DAQP_GIT_REPO}
+        GIT_TAG ${BUILD_DAQP_VERSION}
+        PREFIX "${CMAKE_BINARY_DIR}/external_projects"
+        UPDATE_COMMAND ""
+        CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
+        CMAKE_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> ${CROSS_FLAGS_CMAKE})
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/daqp")
+    add_library(daqp SHARED IMPORTED)
+    add_dependencies(daqp daqp-external)
+    set_target_properties(daqp PROPERTIES
+       INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include/daqp"
+       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}daqp${CMAKE_SHARED_LIBRARY_SUFFIX}"
+       IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}daqp${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+    )
+    create_import_library(daqp daqp)
+    install(DIRECTORY
+      "${CMAKE_BINARY_DIR}/external_projects/include/daqp"
+      DESTINATION "${INCLUDE_PREFIX}")
+  endif()
+endif()
+add_feature_info(daqp-interface WITH_DAQP "Interface to the MILP / QP solver HiGHS.")
+
 
 if(WITH_SLEQP)
   if(WITH_BUILD_SLEQP)
