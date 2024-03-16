@@ -151,7 +151,7 @@ int casadi_daqp_solve(casadi_daqp_data<T1>* d, const double** arg, double** res,
   daqp_solve(&d->res,&d->work);
   casadi_copy(d->res.lam, p_qp->nx, d_qp->lam_x);
   casadi_copy(d->res.lam+p_qp->nx, p_qp->na, d_qp->lam_a);
-  *d_qp->f = d->res.fval;
+  if (d_qp->f) *d_qp->f = d->res.fval;
   d->work.settings = 0;
   free_daqp_workspace(&d->work);
   free_daqp_ldp(&d->work);

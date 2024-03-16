@@ -63,6 +63,10 @@ if "SKIP_QRQP_TESTS" not in os.environ and has_conic("qrqp") and has_nlpsol("sqp
   solvers.append(("sqpmethod",{"qpsol": "qrqp","max_iter_ls":0,"qpsol_options": qpsol_options,"print_header":False,"print_iteration":False,"print_time":False},{"codegen":codegen,"discrete":False}))
   solvers.append(("sqpmethod",{"qpsol": "qrqp","convexify_strategy":"regularize","max_iter":500,"qpsol_options": qpsol_options,"print_header":False,"print_iteration":True,"print_time":False,"tol_du":1e-8,"min_step_size":1e-12},{"codegen":codegen,"discrete":False}))
 
+if "SKIP_DAQP_TESTS" not in os.environ and has_conic("daqp") and has_nlpsol("sqpmethod"):
+  codegen = {"std": "c99","extralibs": ["daqp"]}
+  solvers.append(("sqpmethod",{"qpsol": "daqp","hessian_approximation":"limited-memory","tol_du":1e-10,"tol_pr":1e-10,"min_step_size":1e-14,"max_iter":55,"print_header":False,"print_iteration":True,"print_time":False,"qpsol_options":{"print_problem":True,"print_out":True}},{"codegen":codegen,"discrete":False}))
+
 if "SKIP_BLOCKSQP_TESTS" not in os.environ and has_nlpsol("blocksqp"):
   try:
     load_linsol("ma27")
@@ -1235,6 +1239,8 @@ class NLPtests(casadiTestCase):
       solver_in["ubg"]=UBA
       if 'sqic' in str(solver_options):
         continue
+      if 'daqp' in str(solver_options):
+        continue
 
       solver_out = solver(**solver_in)
 
@@ -1299,6 +1305,8 @@ class NLPtests(casadiTestCase):
       if "qrqp" in str(solver_options):
         solver_in["x0"]= DM([1,1])
         solver_in["lam_g0"]= DM([1,1,0])
+      if 'daqp' in str(solver_options):
+        continue
       solver_out = solver(**solver_in)
 
       self.assertAlmostEqual(solver_out["x"][0],2.0/3,6,str(solver))
