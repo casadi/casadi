@@ -1468,6 +1468,17 @@ namespace casadi {
     case AUX_SPARSITY:
       this->auxiliaries << sanitize_source(casadi_sparsity_str, inst);
       break;
+    case AUX_BFGS:
+      add_auxiliary(AUX_COPY);
+      add_auxiliary(AUX_AXPY);
+      add_auxiliary(AUX_CLEAR);
+      add_auxiliary(AUX_MV);
+      add_auxiliary(AUX_DOT);
+      add_auxiliary(AUX_IF_ELSE);
+      add_auxiliary(AUX_SCAL);
+      add_auxiliary(AUX_RANK1);
+      this->auxiliaries << sanitize_source(casadi_bfgs_str, inst);
+      break;
     case AUX_TO_DOUBLE:
       this->auxiliaries << "#define casadi_to_double(x) "
                         << "(" << (this->cpp ? "static_cast<double>(x)" : "(double) x") << ")\n\n";

@@ -1031,13 +1031,13 @@ void Sqpmethod::codegen_declarations(CodeGenerator& g) const {
     g.add_dependency(get_function("nlp_grad"));
   g.add_dependency(qpsol_);
   if (elastic_mode_) g.add_dependency(qpsol_ela_);
+  if (!exact_hessian_) g.add_auxiliary(CodeGenerator::AUX_BFGS);
 }
 
 void Sqpmethod::codegen_body(CodeGenerator& g) const {
   g.add_auxiliary(CodeGenerator::AUX_SQPMETHOD);
   codegen_body_enter(g);
   // From nlpsol
-  casadi_assert(exact_hessian_, "Codegen implemented for exact Hessian only.", false);
 
   g.local("d", "struct casadi_sqpmethod_data*");
   g.init_local("d", "&" + codegen_mem(g));
@@ -1080,8 +1080,6 @@ void Sqpmethod::codegen_body(CodeGenerator& g) const {
     g.init_local("ls_success", "1");
   }
 
-  g.local("one", "const casadi_real");
-  g.init_local("one", "1");
   g << g.clear("d->dx", nx_) << "\n";
   g.comment("MAIN OPTIMIZATION LOOP");
   g << "while (1) {\n";
@@ -1113,18 +1111,34 @@ void Sqpmethod::codegen_body(CodeGenerator& g) const {
   g << "if (iter_count >= " << max_iter_ << ") break;\n";
   g << "if (iter_count >= 1 && iter_count >= " << min_iter_ << " && dx_norminf <= " <<
         min_step_size_ << ") break;\n";
-  g.comment("Update/reset exact Hessian");
-  g << "d->arg[0] = d_nlp.z;\n";
-  g << "d->arg[1] = d_nlp.p;\n";
-  g << "d->arg[2] = &one;\n";
-  g << "d->arg[3] = d_nlp.lam+" + str(nx_) + ";\n";
-  g << "d->res[0] = d->Bk;\n";
-  std::string nlp_hess_l = g(get_function("nlp_hess_l"), "d->arg", "d->res", "d->iw", "d->w");
-  g << "if (" + nlp_hess_l + ") return 1;\n";
+  if (exact_hessian_) {
+    g.comment("Update/reset exact Hessian");
+    g << "d->arg[0] = d_nlp.z;\n";
+    g << "d->arg[1] = d_nlp.p;\n";
+    g.local("one", "const casadi_real");
+    g.init_local("one", "1");
+    g << "d->arg[2] = &one;\n";
+    g << "d->arg[3] = d_nlp.lam+" + str(nx_) + ";\n";
+    g << "d->res[0] = d->Bk;\n";
+    std::string nlp_hess_l = g(get_function("nlp_hess_l"), "d->arg", "d->res", "d->iw", "d->w");
+    g << "if (" + nlp_hess_l + ") return 1;\n";
 
-  if (convexify_) {
-    std::string ret = g.convexify_eval(convexify_data_, "d->Bk", "d->Bk", "d->iw", "d->w");
-    g << "if (" << ret << ") return 1;\n";
+    if (convexify_) {
+      std::string ret = g.convexify_eval(convexify_data_, "d->Bk", "d->Bk", "d->iw", "d->w");
+      g << "if (" << ret << ") return 1;\n";
+    }
+  } else {
+    g << "if (iter_count==0) {\n";
+    g.comment("Initialize BFGS");
+    g << g.fill("d->Bk", Hsp_.nnz(), "1.") << "\n";
+    g << "casadi_bfgs_reset(p.sp_h, d->Bk);\n";
+    g << "} else {\n";
+    g.comment("Update BFGS");
+    g << "if (iter_count % " << lbfgs_memory_ << "==0) ";
+    g << "casadi_bfgs_reset(p.sp_h, d->Bk);\n";
+    g.comment("Update the Hessian approximation");
+    g << "casadi_bfgs(p.sp_h, d->Bk, d->dx, d->gLag, d->gLag_old, d->w);\n";
+    g << "}\n";
   }
 
   g.comment("Formulate the QP");
@@ -1376,6 +1390,13 @@ void Sqpmethod::codegen_body(CodeGenerator& g) const {
 
   g.comment("Take step");
   g << g.axpy(nx_, "1.0", "d->dx", "d_nlp.z") << "\n";
+
+  if (!exact_hessian_) {
+    g.comment("Evaluate the gradient of the Lagrangian with the old x but new lam (for BFGS)");
+    g << g.copy("d->gf", nx_, "d->gLag_old") << "\n";
+    g << g.mv("d->Jk", Asp_, "d_nlp.lam+"+str(nx_), "d->gLag_old", true) << "\n";
+    g << g.axpy(nx_, "1.0", "d_nlp.lam", "d->gLag_old") << "\n";
+  }
 
   if (elastic_mode_ && max_iter_ls_ > 0) {
     g.comment("If linesearch failed enter elastic mode");

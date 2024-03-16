@@ -614,7 +614,8 @@ namespace casadi {
       AUX_MMIN,
       AUX_MMAX,
       AUX_LOGSUMEXP,
-      AUX_SPARSITY
+      AUX_SPARSITY,
+      AUX_BFGS
     };
 
     /** \brief Add a built-in auxiliary function
