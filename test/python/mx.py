@@ -3032,6 +3032,50 @@ class MXtests(casadiTestCase):
           Ac = evalf(convexify(A,{"strategy":"eigen-reflect"}))
           self.checkarray(A,Ac,digits=8)
 
+  def test_convexify_buffer_overflow(self):
+    # Size of matrix to convexify
+    ns = [15, 105]
+    for n in ns:
+      # Use hessian function to create a symmetric connected nxn matrix
+      z = MX.sym("z", n)
+      f = z[2:]*z[:-2]*z[1:-1]
+      j = sumsqr(z)
+      # Keep almost diagonal to reduce number of iterations required for convegence
+      H, _ = hessian(j+1e-10*sum1(f),z)
+      H_convex = convexify(H,{"strategy":"eigen-reflect"})
+
+      # Setup casadi function and input values
+      func = Function("convexify_hessian", [z], [H_convex])
+      z_vals = np.sin(np.linspace(0,n,n))
+      # Evaluate to check for runtime errors
+      func(z_vals)
+
+      # Code generate casadi function with -fstack-protector-all and -D_FORTIFY_SOURCE=2 to increase chance to catch some overflow and memory bugs
+      options = ["-fstack-protector-all", "-D_FORTIFY_SOURCE=2"]
+      self.check_codegen(func,inputs=[z_vals], extra_options=options)
+
+  @slow()
+  @memory_heavy()
+  @known_bug()
+  def test_code_generage_convexify_with_main(self):
+    # Size of matrix to convexify
+    n = 1005
+    # Use hessian function to create a symmetric connected nxn matrix
+    z = MX.sym("z", n)
+    f = z[2:]*z[:-2]*z[1:-1]
+    j = sumsqr(z)
+    # Keep almost diagonal to reduce number of iterations required for convegence
+    H, _ = hessian(j+1e-10*sum1(f),z)
+    H_convex = convexify(H,{"strategy":"eigen-reflect","max_iter_eig":1000})
+
+    # Setup casadi function and input values
+    func = Function("convexify_hessian", [z], [H_convex])
+    z_vals = np.sin(np.linspace(0,n,n))
+
+    # Code generate casadi function with -fstack-protector-all and -D_FORTIFY_SOURCE=2 to increase chance to catch some overflow and memory bugs
+    options = ["-fstack-protector-all", "-D_FORTIFY_SOURCE=2"]
+    self.check_codegen(func,inputs=[z_vals], extra_options=options) # Works but is slow
+    self.check_codegen(func,inputs=[z_vals], main=True, extra_options=options) # main=True results in segmentation fault
 
   def test_logsumexp(self):
     x = MX.sym("x",3)
