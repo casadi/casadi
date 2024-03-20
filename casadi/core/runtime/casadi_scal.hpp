@@ -24,3 +24,8 @@ void casadi_scal(casadi_int n, T1 alpha, T1* x) {
   if (!x) return;
   for (i=0; i<n; ++i) *x++ *= alpha;
 }
+
+#ifdef WITH_BLAS
+CASADI_EXPORT void casadi_scal(casadi_int n, float alpha, float* x);
+CASADI_EXPORT void casadi_scal(casadi_int n, double alpha, double* x);
+#endif
