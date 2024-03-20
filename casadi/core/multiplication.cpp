@@ -78,8 +78,10 @@ namespace casadi {
   void Multiplication::ad_reverse(const std::vector<std::vector<MX> >& aseed,
                                std::vector<std::vector<MX> >& asens) const {
     for (casadi_int d=0; d<aseed.size(); ++d) {
-      asens[d][1] += mac(aseed[d][0], dep(2).T(), MX::zeros(dep(1).sparsity()));
-      asens[d][2] += mac(dep(1).T(), aseed[d][0], MX::zeros(dep(2).sparsity()));
+      MX dep2T = dep(2).is_constant() ? MX(DM(dep(2)).T()) : dep(2).T();
+      asens[d][1] += mac(aseed[d][0], dep2T, MX::zeros(dep(1).sparsity()));
+      MX dep1T = dep(1).is_constant() ? MX(DM(dep(1)).T()) : dep(1).T();
+      asens[d][2] += mac(dep1T, aseed[d][0], MX::zeros(dep(2).sparsity()));
       asens[d][0] += aseed[d][0];
     }
   }
