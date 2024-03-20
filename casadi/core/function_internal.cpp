@@ -441,6 +441,11 @@ namespace casadi {
     }
   }
 
+  void FunctionInternal::change_option(void* mem, const std::string& option_name,
+                                     const GenericType& option_value) {
+    change_option(option_name, option_value);
+  }
+
   void FunctionInternal::init(const Dict& opts) {
     // Call the initialization method of the base class
     ProtoFunction::init(opts);
@@ -915,6 +920,11 @@ namespace casadi {
       // Failure
       casadi_error("Option '" + option_name + "' cannot be changed");
     }
+  }
+
+  void ProtoFunction::change_option(void* mem, const std::string& option_name,
+                                  const GenericType& option_value) {
+   change_option(option_name, option_value);
   }
 
   std::vector<std::string> FunctionInternal::get_free() const {

@@ -1146,11 +1146,9 @@ namespace casadi {
 
   void Function::change_option(const std::string& option_name, const GenericType& option_value) {
     try {
-      // Assert existance
-      if (!has_option(option_name))
-        casadi_error("Option '" + option_name + "' does not exist");
       // Call internal class
-      (*this)->change_option(option_name, option_value);
+      scoped_checkout<Function> mem(*this);
+      (*this)->change_option(memory(mem), option_name, option_value);
     } catch(std::exception& e) {
       THROW_ERROR("change_option", e.what());
     }

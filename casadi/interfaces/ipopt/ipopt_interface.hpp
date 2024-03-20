@@ -158,6 +158,8 @@ namespace casadi {
     /// All IPOPT options
     Dict opts_;
 
+    void change_option(void* mem, const std::string& option_name, const GenericType& option_value) override;
+
     // Ipopt callback functions
     void finalize_solution(IpoptMemory* m, const double* x, const double* z_L, const double* z_U,
                            const double* g, const double* lambda, double obj_value,
