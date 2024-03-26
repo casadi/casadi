@@ -423,6 +423,9 @@ namespace casadi {
         std::vector<Matrix<Scalar> >& symbols,
         std::vector<Matrix<Scalar>>& parametric,
         const Dict& opts);
+    static void separate_linear(const Matrix<Scalar> &expr,
+      const Matrix<Scalar> &sym_lin, const Matrix<Scalar> &sym_const,
+      Matrix<Scalar>& expr_const, Matrix<Scalar>& expr_lin, Matrix<Scalar>& expr_nonlin);
     ///@}
 
     ///@{

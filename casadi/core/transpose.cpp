@@ -194,6 +194,13 @@ namespace casadi {
     res[0] = arg[0].T();
   }
 
+  void Transpose::eval_linear(const std::vector<std::array<MX, 3> >& arg,
+                        std::vector<std::array<MX, 3> >& res) const {
+    for (casadi_int i=0; i<3; ++i) {
+      res[0][i] = arg[0][i].T();
+    }
+  }
+
   void Transpose::ad_forward(const std::vector<std::vector<MX> >& fseed,
                           std::vector<std::vector<MX> >& fsens) const {
     for (casadi_int d=0; d<fsens.size(); ++d) {

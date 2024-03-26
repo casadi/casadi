@@ -349,6 +349,21 @@ namespace casadi {
     casadi_error("'eval_mx' not defined for class " + class_name());
   }
 
+  void MXNode::eval_linear(const std::vector<std::array<MX, 3> >& arg,
+                        std::vector<std::array<MX, 3> >& res) const {
+    std::vector<MX> arg_sum(arg.size());
+    for (casadi_int i=0; i<arg.size(); ++i) {
+      arg_sum[i] = arg[i][0] + arg[i][1] + arg[i][2];
+    }
+    std::vector<MX> res_nonlin(res.size());
+    eval_mx(arg_sum, res_nonlin);
+    for (casadi_int i=0; i<res.size(); ++i) {
+      res[i][0] = MX::zeros(sparsity());
+      res[i][1] = MX::zeros(sparsity());
+      res[i][2] = res_nonlin[i];
+    }
+  }
+
   void MXNode::ad_forward(const std::vector<std::vector<MX> >& fseed,
                        std::vector<std::vector<MX> >& fsens) const {
     casadi_error("'ad_forward' not defined for class " + class_name());
@@ -999,6 +1014,7 @@ namespace casadi {
       } else if (sparsity().is_scalar()) {
         return get_binary(OP_MUL, y);
       } else {
+        if (shared_from_this<MX>().is_zero() || y.is_zero()) return 0;
         return MX::create(new Dot(shared_from_this<MX>(), y));
       }
     } else {

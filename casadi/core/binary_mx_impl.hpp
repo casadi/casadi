@@ -60,6 +60,12 @@ namespace casadi {
   }
 
   template<bool ScX, bool ScY>
+  void BinaryMX<ScX, ScY>::eval_linear(const std::vector<std::array<MX, 3> >& arg,
+                        std::vector<std::array<MX, 3> >& res) const {
+    casadi_math<MX>::fun_linear(op_, arg[0].data(), arg[1].data(), res[0].data());
+  }
+
+  template<bool ScX, bool ScY>
   void BinaryMX<ScX, ScY>::ad_forward(const std::vector<std::vector<MX> >& fseed,
                                    std::vector<std::vector<MX> >& fsens) const {
     // Get partial derivatives

@@ -3365,7 +3365,11 @@ DECL M casadi_mmax(const M& x) { return mmax(x); }
 DECL casadi::DM casadi_evalf(const M& x) {
   return evalf(x);
 }
-
+DECL void casadi_separate_linear(const M &expr,
+      const M &sym_lin, const M &sym_const,
+      M& OUTPUT1, M& OUTPUT2, M& OUTPUT3) {
+  separate_linear(expr, sym_lin, sym_const, OUTPUT1, OUTPUT2, OUTPUT3);
+}
 #endif // FLAG & IS_MEMBER
 
 #if FLAG & IS_GLOBAL

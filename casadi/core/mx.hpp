@@ -638,6 +638,9 @@ namespace casadi {
     static std::vector<MX> cse(const std::vector<MX>& e);
     static void extract_parametric(const MX &expr, const MX& par,
             MX& expr_ret, std::vector<MX>& symbols, std::vector<MX>& parametric, const Dict& opts);
+    static void separate_linear(const MX &expr,
+      const MX &sym_lin, const MX &sym_const,
+      MX& expr_const, MX& expr_lin, MX& expr_nonlin);
     ///@}
 
     ///@{

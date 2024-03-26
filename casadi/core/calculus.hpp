@@ -1156,6 +1156,10 @@ namespace casadi {
         \identifier{1gb} */
     static inline void derF(unsigned char op, const T& x, const T& y, T& f, T* d);
 
+    /** \brief Evaluate function on a const/linear/nonlinear partition
+    */
+    static inline void fun_linear(unsigned char op, const T*x, const T* y, T* f);
+
     /** \brief Is binary operation?
 
         \identifier{1gc} */
@@ -1544,6 +1548,56 @@ case OP_HYPOT:     DerBinaryOperation<OP_HYPOT>::derf(X, Y, F, D);      break;
     case OP_ERFINV:                              \
     case OP_LOG1P:                               \
     case OP_EXPM1:
+
+  template<typename T>
+  inline void casadi_math<T>::fun_linear(unsigned char op, const T* x, const T* y, T* f) {
+    if (op==OP_ADD || op==OP_SUB) {
+      for (int i=0;i<3;++i) {
+        f[i] = T::binary(op, x[i], y[i]);
+      }
+    } else if (op==OP_TWICE || op==OP_NEG) {
+      for (int i=0;i<3;++i) {
+        f[i] = T::unary(op, x[i]);
+      }
+    } else if (op==OP_MUL) {
+      f[0] += x[0]*y[0];
+      f[1] += x[0]*y[1];
+      f[2] += x[0]*y[2];
+      f[1] += x[1]*y[0];
+      f[2] += x[1]*y[1];
+      f[2] += x[1]*y[2];
+      f[2] += x[2]*y[0];
+      f[2] += x[2]*y[1];
+      f[2] += x[2]*y[2];
+    } else if (op==OP_DIV) {
+      bool const_argy = y[1].is_zero() && y[2].is_zero();
+      if (const_argy) {
+        f[0] = x[0]/y[0];
+        f[1] = x[1]/y[0];
+        f[2] = x[2]/y[0];
+      } else {
+        f[2] = (x[0]+x[1]+x[2])/(y[0]+y[1]+y[2]);
+      }
+    } else if (casadi_math<T>::is_unary(op)) {
+      bool const_arg = x[1].is_zero() && x[2].is_zero();
+      if (const_arg) {
+        f[0] = T::unary(op, x[0]);
+      } else {
+        f[2] = T::unary(op, x[0]+x[1]+x[2]);
+      }
+
+    } else if (casadi_math<T>::is_binary(op)) {
+      bool const_argx = x[1].is_zero() && x[2].is_zero();
+      bool const_argy = y[1].is_zero() && y[2].is_zero();
+      if (const_argx && const_argy) {
+        f[0] = T::binary(op, x[0], y[0]);
+      } else {
+        f[2] = T::binary(op, x[0]+x[1]+x[2], y[0]+y[1]+y[2]);
+      }
+    } else {
+      casadi_error("Not implemented");
+    }
+  }
 
   template<typename T>
   bool casadi_math<T>::is_binary(unsigned char op) {

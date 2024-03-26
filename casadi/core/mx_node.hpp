@@ -34,6 +34,7 @@
 #include "linsol.hpp"
 #include <vector>
 #include <stack>
+#include <array>
 
 namespace casadi {
 
@@ -156,6 +157,14 @@ namespace casadi {
 
         \identifier{1qv} */
     virtual void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const;
+
+    /** \brief Evaluate the MX node on a const/linear/nonlinear partition */
+    virtual void eval_linear(const std::vector<std::array<MX, 3> >& arg,
+                        std::vector<std::array<MX, 3> >& res) const;
+
+    /** \brief Evaluate the MX node on a const/linear/nonlinear partition */
+    void eval_linear_unary(const std::vector<std::array<MX, 3> >& arg,
+                        std::vector<std::array<MX, 3> >& res) const;
 
     /** \brief Calculate forward mode directional derivatives
 

@@ -63,6 +63,12 @@ namespace casadi {
     casadi_math<MX>::fun(op_, arg[0], dummy, res[0]);
   }
 
+  void UnaryMX::eval_linear(const std::vector<std::array<MX, 3> >& arg,
+                        std::vector<std::array<MX, 3> >& res) const {
+    MX dummy[3];
+    casadi_math<MX>::fun_linear(op_, arg[0].data(), dummy, res[0].data());
+  }
+
   void UnaryMX::ad_forward(const std::vector<std::vector<MX> >& fseed,
                      std::vector<std::vector<MX> >& fsens) const {
     // Get partial derivatives

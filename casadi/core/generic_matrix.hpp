@@ -248,6 +248,10 @@ namespace casadi {
         std::vector<MatType>& SWIG_OUTPUT(symbols),
         std::vector<MatType>& SWIG_OUTPUT(parametric),
         const Dict& opts=Dict());
+   static void separate_linear(const MatType &expr,
+        const MatType &sym_lin, const MatType &sym_const,
+        MatType& SWIG_OUTPUT(expr_const),
+        MatType& SWIG_OUTPUT(expr_lin), MatType& SWIG_OUTPUT(expr_nonlin));
     /** @}  */
     /// \endcond
 
@@ -1012,6 +1016,39 @@ namespace casadi {
       for (casadi_int i=0; i<expr_ret_catv.size(); ++i) {
         expr_ret[i] = reshape(expr_ret_catv[i], expr[i].size1(), expr[i].size2());
       }
+    }
+
+    /* \brief separate an expression into subuexpression that are linear, constant, and nonlinear
+    *
+    * \param expr[in] The expression to be separated
+    * \param sym_lin[in] The symbolic variables w.r.t. which linearity should be checked
+    * \param sym_const[in] The symbolic variables that are deemed constant
+    * \param expr_const[out] The constant part of the expression
+    * \param expr_lin[out] The linear part of the expression
+    * \param expr_nonlin[out] The nonlinear part of the expression
+    *
+    * Expression dependencies that are not in sym_lin or sym_const are considered nonlinear
+    * 
+    * A post condition is that the following holds:
+    * expr = expr_const + expr_lin + expr_nonlin
+    *
+    * Here, expr_const is not dependant on sym_const,
+    *       expr_lin is linear in sym_lin
+    *
+    * Example:
+    *   
+    * [expr_const,expr_lin,expr_nonlin] =
+    *   separate_linear(cos(p)+7*x+x*y, vertcat(x,y), p)
+    *
+    * expr_const: cos(p)
+    * expr_lin: 7*x
+    * expr_nonlin: x*y
+    * 
+    */
+    inline friend void separate_linear(const MatType &expr,
+      const MatType &sym_lin, const MatType &sym_const,
+      MatType& expr_const, MatType& expr_lin, MatType& expr_nonlin) {
+        MatType::separate_linear(expr, sym_lin, sym_const, expr_const, expr_lin, expr_nonlin);
     }
 
     /** Count number of nodes */

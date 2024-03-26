@@ -66,7 +66,6 @@ namespace casadi {
     res[0] = arg[0]->get_nzref(sparsity(), nz_);
   }
 
-
   int GetNonzerosVector::
   eval(const double** arg, double** res, casadi_int* iw, double* w) const {
     return eval_gen<double>(arg, res, iw, w);
@@ -286,6 +285,16 @@ namespace casadi {
     } else {
       Sparsity f_sp(osp.size1(), osp.size2(), r_colind, r_row);
       res[0] = arg[0]->get_nzref(f_sp, r_nz);
+    }
+  }
+
+  void GetNonzeros::eval_linear(const std::vector<std::array<MX, 3> >& arg,
+                        std::vector<std::array<MX, 3> >& res) const {
+    for (casadi_int i=0; i<3; ++i) {
+      std::vector<MX> eval_res = {res[0][i]};
+      std::vector<MX> eval_arg = {arg[0][i]};
+      eval_mx(eval_arg, eval_res);
+      res[0][i] = eval_res[0];
     }
   }
 

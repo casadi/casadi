@@ -3367,6 +3367,137 @@ class MXtests(casadiTestCase):
         expr_recreated = substitute([expr_ret],symbols,parametric)[0]
         self.assertTrue(test_equal(expr,expr_recreated))
 
+  def test_separate_linear(self):
+    for X in [SX,MX]:
+        x = X.sym("x")
+        y = X.sym("y")
+        p = X.sym("p")
+
+        z = 3*x+5*y+x*y+p*x+cos(p)
+
+
+        for expr, ref_const, ref_lin, ref_nonlin in [
+                    [x,0 , x, 0],
+                    [x+p, p, x, 0],
+                    [x+y, 0, x+y, 0],
+                    [x-p, -p, x, 0],
+                    [p-x, p, -x, 0],
+                    [2*x, 0, 2*x, 0],
+                    [-x, 0, -x, 0],  
+                    [3*x+y, 0, 3*x+y, 0],
+                    [cos(p),cos(p),0,0],
+                    [3*x+y+cos(p), cos(p), 3*x+y, 0],
+                    [3*x+7, 7, 3*x, 0],
+                    [p*(3*x+7), p*7, p*(3*x),0],
+                    [y*(3*x+7), 0, 7*y, y*(3*x)],
+                    [cos(7+3*x), 0, 0, cos(7+3*x)],
+                    [cos(3*x+7), 0, 0, cos(3*x+7)],
+                    [cos(7*p),cos(7*p),0,0],
+                    [cos(p+x),0,0,cos(p+x)],
+                    [x*cos(p)+7,7,x*cos(p),0],
+                    [y*(x*cos(p)+7),0,7*y,y*x*cos(p)],
+                    [p*(x+y+x*y), 0, p*(x+y), p*(x*y)],
+                    [cos(x+y+x*y), 0, 0, cos(x+y+x*y)],
+                    [p*(p+cos(p)*x), p**2, p*cos(p)*x, 0],
+                    [(p+x+x*y)*(cos(p)+7*x+3*x*y), p*cos(p), p*(7*x)+x*cos(p),p*(3*x*y)+x*y*(cos(p)+7*x+3*x*y)+7*x**2++3*x**2*y ],
+                    [(p+x+x*y)/cos(p), p/cos(p), x/cos(p), x*y/cos(p) ],
+                    [(p+x+x*y)/(cos(p)+7*x), 0,0,(p+x+x*y)/(cos(p)+7*x) ],
+                    [(p+x+x*y)/(cos(p)+7*x+3*x*y), 0,0,(p+x+x*y)/(cos(p)+7*x+3*x*y) ]  
+                    ]:
+
+            print("ref",expr,ref_const,ref_lin,ref_nonlin)
+            
+            [expr_const,expr_lin,expr_nonlin] = separate_linear(expr,vertcat(x,y),p)
+            print("actual",expr_const,expr_lin,expr_nonlin)
+            
+            
+            def test_equal(a,b):
+                f1 = Function('f',[x,y,p],[a])
+                f2 = Function('f',[x,y,p],[b])
+                DM.rng(1)
+                args = [DM.rand(f1.sparsity_in(i)) for i in range(f1.n_in())]
+                return abs(f1(*args)-f2(*args))<1e-12
+                
+                #return cse(a-b).is_zero() 
+
+            assert test_equal(expr,expr_const+expr_lin+expr_nonlin)
+
+            assert test_equal(expr_const,ref_const)
+            assert test_equal(expr_lin,ref_lin)
+            assert test_equal(expr_nonlin,ref_nonlin)
+            
+            
+            assert is_linear(expr_lin,vertcat(x,y))
+            assert not depends_on(expr_const,vertcat(x,y))
+            
+        x = X.sym("x",2)
+        y = X.sym("y",2)
+        p = X.sym("p",2)
+
+        for expr, ref_const, ref_lin, ref_nonlin in [
+                    [dot(p,x),0 , dot(p,x), 0],
+                    [dot(p+x+x*y,cos(p)+7*x+3*x*y), dot(p,cos(p)), dot(p,7*x)+dot(x,cos(p)), dot(p,3*x*y)+dot(x,7*x+3*x*y)+dot(x*y,cos(p)+7*x+3*x*y)]
+                    ]:
+
+            print("ref",expr,ref_const,ref_lin,ref_nonlin)
+            
+            [expr_const,expr_lin,expr_nonlin] = separate_linear(expr,vertcat(x,y),p)
+            print("actual",expr_const,expr_lin,expr_nonlin)
+            
+            
+            def test_equal(a,b):
+                f1 = Function('f',[x,y,p],[a])
+                f2 = Function('f',[x,y,p],[b])
+                DM.rng(1)
+                args = [DM.rand(f1.sparsity_in(i)) for i in range(f1.n_in())]
+                return abs(f1(*args)-f2(*args))<1e-12
+                
+                #return cse(a-b).is_zero() 
+
+            assert test_equal(expr,expr_const+expr_lin+expr_nonlin)
+
+            assert test_equal(expr_const,ref_const)
+            assert test_equal(expr_lin,ref_lin)
+            assert test_equal(expr_nonlin,ref_nonlin)
+
+
+            assert is_linear(expr_lin,vertcat(x,y))
+            assert not depends_on(expr_const,vertcat(x,y))
+
+        x = X.sym("x",2,2)
+        y = X.sym("y",2,2)
+        p = X.sym("p",2,2)
+
+        for expr, ref_const, ref_lin, ref_nonlin in [
+                    [(p+x+x*y).T,p.T,x.T,(x*y).T],
+                    [mtimes(p,x),0 , mtimes(p,x), 0],
+                    [mtimes(p+x+x*y,cos(p)+7*x+3*x*y), mtimes(p,cos(p)), mtimes(p,7*x)+mtimes(x,cos(p)), mtimes(p,3*x*y)+mtimes(x,7*x+3*x*y)+mtimes(x*y,cos(p)+7*x+3*x*y)]
+                    ]:
+
+            print("ref",expr,ref_const,ref_lin,ref_nonlin)
+            
+            [expr_const,expr_lin,expr_nonlin] = separate_linear(expr,veccat(x,y),p)
+            print("actual",expr_const,expr_lin,expr_nonlin)
+            
+            
+            def test_equal(a,b):
+                f1 = Function('f',[x,y,p],[a])
+                f2 = Function('f',[x,y,p],[b])
+                DM.rng(1)
+                args = [DM.rand(f1.sparsity_in(i)) for i in range(f1.n_in())]
+                return np.linalg.norm(f1(*args)-f2(*args),1)<1e-12
+                
+                #return cse(a-b).is_zero() 
+
+            assert test_equal(expr,expr_const+expr_lin+expr_nonlin)
+
+            assert test_equal(expr_const,ref_const)
+            assert test_equal(expr_lin,ref_lin)
+            assert test_equal(expr_nonlin,ref_nonlin)
+
+
+            assert is_linear(expr_lin,veccat(x,y))
+            assert not depends_on(expr_const,veccat(x,y))
 
   def test_extract_parametric_opts(self):
       for X in [SX,MX]:

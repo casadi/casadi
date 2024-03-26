@@ -26,6 +26,7 @@
 #include "matrix_impl.hpp"
 
 #include "sx_function.hpp"
+#include <array>
 
 namespace casadi {
 
@@ -714,6 +715,65 @@ namespace casadi {
       parametric[i] = parametric_v[i];
     }
   }
+
+  template<>
+  void CASADI_EXPORT SX::separate_linear(const SX &expr,
+    const SX &sym_lin, const SX &sym_const,
+    SX& expr_const, SX& expr_lin, SX& expr_nonlin) {
+
+    Function f("f", std::vector<SX>{sym_const, sym_lin},
+      std::vector<SX>{expr}, {{"live_variables", false},
+      {"max_io", 0}});
+    SXFunction *ff = f.get<SXFunction>();
+    //f.disp(uout(), true);
+
+    expr_const = SX::zeros(expr.sparsity());
+    expr_lin = SX::zeros(expr.sparsity());
+    expr_nonlin = SX::zeros(expr.sparsity());
+
+    std::vector<SXElem*> ret = {
+      get_ptr(expr_const.nonzeros()),
+      get_ptr(expr_lin.nonzeros()),
+      get_ptr(expr_nonlin.nonzeros())};
+
+    // Each work vector element has (const, lin, nonlin) part
+    std::vector< std::array<SXElem, 3> > w(ff->worksize_,
+      std::array<SXElem, 3>{{0, 0, 0}});
+
+    std::vector<const SXElem*> arg(f.sz_arg());
+    arg[0] = get_ptr(sym_const.nonzeros());
+    arg[1] = get_ptr(sym_lin.nonzeros());
+
+    // Iterator to stack of constants
+    std::vector<SXElem>::const_iterator c_it = ff->constants_.begin();
+
+    // Iterator to free variables
+    std::vector<SXElem>::const_iterator p_it = ff->free_vars_.begin();
+
+    // Evaluate algorithm
+    for (auto&& a : ff->algorithm_) {
+      switch (a.op) {
+        case OP_INPUT:
+          w[a.i0][a.i1] = arg[a.i1]==nullptr ? 0 : arg[a.i1][a.i2];
+          break;
+        case OP_OUTPUT:
+          casadi_assert_dev(a.i0==0);
+          ret[0][a.i2] = w[a.i1][0];
+          ret[1][a.i2] = w[a.i1][1];
+          ret[2][a.i2] = w[a.i1][2];
+          break;
+        case OP_CONST:
+          w[a.i0][0] = *c_it++;
+          break;
+        case OP_PARAMETER:
+          w[a.i0][2] = *p_it++;
+          break;
+        default:
+          casadi_math<SXElem>::fun_linear(a.op, w[a.i1].data(), w[a.i2].data(), w[a.i0].data());
+      }
+    }
+  }
+
 
   template<>
   bool CASADI_EXPORT SX::depends_on(const SX &x, const SX &arg) {

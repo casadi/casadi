@@ -37,6 +37,7 @@
 #include "im.hpp"
 #include "bspline.hpp"
 #include "casadi_call.hpp"
+#include <array>
 
 // Throw informative error message
 #define CASADI_THROW_ERROR(FNAME, WHAT) \
@@ -2394,6 +2395,97 @@ namespace casadi {
 
     symbols = symbol_v;
     parametric = parametric_v;
+  }
+
+  void MX::separate_linear(const MX &expr,
+      const MX &sym_lin, const MX &sym_const,
+      MX& expr_const, MX& expr_lin, MX& expr_nonlin) {
+
+    std::vector<MX> in = {sym_const, sym_lin};
+    std::vector<MX> out = {expr};
+
+    Function f("f", in, out, {{"live_variables", false},
+      {"max_io", 0}, {"allow_free", true}});
+    MXFunction *ff = f.get<MXFunction>();
+
+    // Each work vector element has (const, lin, nonlin) part
+    std::vector< std::array<MX, 3> > w(ff->workloc_.size()-1);
+
+  // Split up inputs analogous to symbolic primitives
+    std::vector<std::vector<MX> > arg_split(in.size());
+    for (casadi_int i=0; i<in.size(); ++i) arg_split[i] = in[i].split_primitives(in[i]);
+
+    // Allocate storage for split outputs
+    std::array<std::vector<MX>, 3> res_split;
+    for (int k=0;k<3;++k) {
+      res_split[k].resize(expr.n_primitives());
+    }
+
+    std::vector<std::array<MX, 3> > arg1, res1;
+
+    std::array<MX, 3> res;
+
+    // Loop over computational nodes in forward order
+    casadi_int alg_counter = 0;
+    for (auto it=ff->algorithm_.begin(); it!=ff->algorithm_.end(); ++it, ++alg_counter) {
+      if (it->op == OP_INPUT) {
+        MX null = MX::zeros(arg_split.at(it->data->ind()).at(it->data->segment()).sparsity());
+        w[it->res.front()][0] = null;
+        w[it->res.front()][1] = null;
+        w[it->res.front()][2] = null;
+        w[it->res.front()][it->data->ind()] = arg_split.at(it->data->ind()).at(it->data->segment());
+      } else if (it->op==OP_OUTPUT) {
+        // Collect the results
+        for (int i=0;i<3;++i) {
+          res_split.at(i).at(it->data->segment()) = w[it->arg.front()][i];
+        }
+      } else if (it->op==OP_CONST) {
+        // Fetch constant
+        w[it->res.front()][0] = it->data;
+        w[it->res.front()][1] = MX::zeros(it->data->sparsity());
+        w[it->res.front()][2] = MX::zeros(it->data->sparsity());
+      } else if (it->op==OP_PARAMETER) {
+        // Fetch parameter
+        w[it->res.front()][0] = MX::zeros(it->data->sparsity());
+        w[it->res.front()][1] = MX::zeros(it->data->sparsity());
+        w[it->res.front()][2] = it->data;
+      } else {
+        // Arguments of the operation
+        arg1.resize(it->arg.size());
+        for (casadi_int i=0; i<arg1.size(); ++i) {
+          casadi_int el = it->arg[i]; // index of the argument
+          for (int k=0;k<3;++k) {
+            arg1[i][k] = el<0 ? MX(it->data->dep(i).size()) : w[el][k];
+          }
+        }
+
+        // Perform the operation
+        res1.clear();
+        res1.resize(it->res.size());
+        for (casadi_int i=0;i<it->res.size();++i) {
+          for (int k=0;k<3;++k) {
+            res1[i][k] = MX::zeros(it->data->sparsity());
+          }
+        }
+        it->data->eval_linear(arg1, res1);
+
+        // Get the result
+        for (casadi_int i=0; i<res1.size(); ++i) {
+          casadi_int el = it->res[i]; // index of the output
+          for (int k=0;k<3;++k) {
+            if (el>=0) w[el][k] = res1[i][k];
+          }
+        }
+      }
+    }
+
+    // Join split outputs
+    for (int k=0;k<3;++k) {
+      res[k] = expr.join_primitives(res_split[k]);
+    }
+    expr_const = res[0];
+    expr_lin = res[1];
+    expr_nonlin = res[2];
   }
 
   MX MX::stop_diff(const MX& expr, casadi_int order) {

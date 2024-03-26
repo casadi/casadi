@@ -88,6 +88,20 @@ namespace casadi {
     res[0] = mac(arg[1], arg[2], arg[0]);
   }
 
+  void Multiplication::eval_linear(const std::vector<std::array<MX, 3> >& arg,
+                        std::vector<std::array<MX, 3> >& res) const {
+    const std::array<MX, 3>& x = arg[1];
+    const std::array<MX, 3>& y = arg[2];
+    const std::array<MX, 3>& z = arg[0];
+    std::array<MX, 3>& f = res[0];
+    f[0] = mac(x[0], y[0], z[0]);
+    f[1] = mac(x[0], y[1], z[1]);
+    f[1] = mac(x[1], y[0], f[1]);
+    f[2] = mac(x[1]+x[2], y[1]+y[2], z[2]);
+    f[2] = mac(x[2], y[0], f[2]);
+    f[2] = mac(x[0], y[2], f[2]);
+  }
+
   int Multiplication::
   sp_forward(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w) const {
     copy_fwd(arg[0], res[0], nnz());

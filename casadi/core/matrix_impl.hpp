@@ -2589,6 +2589,13 @@ namespace casadi {
   }
 
   template<typename Scalar>
+  void Matrix<Scalar>::separate_linear(const Matrix<Scalar> &expr,
+      const Matrix<Scalar> &sym_lin, const Matrix<Scalar> &sym_const,
+      Matrix<Scalar>& expr_const, Matrix<Scalar>& expr_lin, Matrix<Scalar>& expr_nonlin) {
+    casadi_error("'separate_linear' not defined for " + type_name());
+  }
+
+  template<typename Scalar>
   bool Matrix<Scalar>::depends_on(const Matrix<Scalar> &x, const Matrix<Scalar> &arg) {
     casadi_error("'depends_on' not defined for " + type_name());
     return false;
