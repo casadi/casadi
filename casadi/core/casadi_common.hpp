@@ -183,6 +183,9 @@ namespace casadi {
   template<typename T2>
   std::string str(const std::map<std::string, T2> &p, bool more=false);
 
+  /// String representation of an array
+  template<typename T, size_t N>
+  std::string str(const std::array<T, N> &p, bool more=false);
 
   //! \brief Create a list of strings from __VA_ARGS__, no argument
   inline std::vector<std::string> strvec() {
@@ -309,6 +312,19 @@ namespace casadi {
     ss << "}";
     return ss.str();
   }
+
+  template<typename T, size_t N>
+  std::string str(const std::array<T, N> &v, bool more) {
+    std::stringstream ss;
+    ss << "[";
+    for (casadi_int i=0; i<N; ++i) {
+      if (i!=0) ss << ", ";
+      ss << v[i];
+    }
+    ss << "]";
+    return ss.str();
+  }
+
 #endif // SWIG
 
 } // namespace casadi
