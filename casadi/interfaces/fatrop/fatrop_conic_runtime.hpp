@@ -144,8 +144,7 @@ void casadi_fatrop_conic_setup(casadi_fatrop_conic_prob<T1>* p) {
 // SYMBOL "fatrop_solve"
 template<typename T1>
 int casadi_fatrop_conic_solve(casadi_fatrop_conic_data<T1>* d, const double** arg, double** res, casadi_int* iw, double* w) {
-    casadi_int k, i, j, n_row, offset, start, stop;
-    T1 f;
+    casadi_int k, i, start, stop;
     const casadi_fatrop_conic_prob<T1>* p = d->prob;
     const casadi_qp_prob<T1>* p_qp = p->qp;
     casadi_qp_data<T1>* d_qp = d->qp;
@@ -232,7 +231,6 @@ void casadi_fatrop_conic_work(const casadi_fatrop_conic_prob<T1>* p, casadi_int*
 template<typename T1>
 void casadi_fatrop_conic_set_work(casadi_fatrop_conic_data<T1>* d, const T1*** arg, T1*** res, casadi_int** iw, T1** w) {
   // Local variables
-  casadi_int offset, i, k;
   
   const casadi_fatrop_conic_prob<T1>* p = d->prob;
 
