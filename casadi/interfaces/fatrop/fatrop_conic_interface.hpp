@@ -63,6 +63,7 @@ namespace casadi {
 
 #include <ocp/OCPAbstract.hpp>
 #include <ocp/StageOCPApplication.hpp>
+#include <ocp/OCPCInterface.h>
 
 /** \pluginsection{Conic,fatrop} */
 
@@ -170,7 +171,7 @@ namespace casadi {
 
     friend class CasadiStructuredQP;
 
-  protected:
+  public:
     explicit FatropConicInterface(DeserializingStream& s);
 
     // Memory structure
