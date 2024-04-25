@@ -1452,6 +1452,9 @@ std::string DaeBuilderInternal::qualified_name(const XmlNode& nn, Attribute* att
         casadi_error("Ignoring attribute " + np);
       }
       continue;
+    } else if (np == "$PRE") {
+      casadi_warning("$PRE attribute has not been implemented, ignoring");
+      continue;
     }
 
     // Add the name part to the variable name
