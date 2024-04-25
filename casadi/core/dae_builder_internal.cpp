@@ -823,15 +823,28 @@ std::string DaeBuilderInternal::generate_wrapper(const std::string& guid,
   return wrapper_filename;
 }
 
-Variable& DaeBuilderInternal::read_variable(const XmlNode& node) {
+Variable& DaeBuilderInternal::read_variable(const XmlNode& node, Attribute* att) {
   try {
     // Qualified name
-    std::string qn = qualified_name(node);
+    std::string qn = qualified_name(node, att);
 
     return variable(qn);
   } catch (std::exception& e) {
     THROW_ERROR_NODE("read_variable", node, e.what());
     //return {};
+  }
+}
+
+MX DaeBuilderInternal::read_identifier(const XmlNode& node) {
+  Attribute att;  // attribute
+  Variable& v = read_variable(node, &att);
+  if (att == Attribute::VALUE) {
+    return v.v;
+  } else if (att == Attribute::START) {
+    return v.start;
+  } else {
+    casadi_error("Cannot read attribute " + to_string(att));
+    return MX();
   }
 }
 
@@ -867,7 +880,7 @@ MX DaeBuilderInternal::read_expr(const XmlNode& node) {
     } else if (name=="Exp") {
       return exp(read_expr(node[0]));
     } else if (name=="Identifier") {
-      return read_variable(node).v;
+      return read_identifier(node);
     } else if (name=="IntegerLiteral" || name=="BooleanLiteral") {
       casadi_int val;
       node.get(&val);
@@ -1420,16 +1433,30 @@ void DaeBuilderInternal::sanity_check() const {
     "when_cond, when_lhs and when_rhs must all have the the same length");
 }
 
-std::string DaeBuilderInternal::qualified_name(const XmlNode& nn) {
+std::string DaeBuilderInternal::qualified_name(const XmlNode& nn, Attribute* att) {
   // std::stringstream to assemble name
   std::stringstream qn;
+  bool first_part = true;
+  if (att) *att = Attribute::VALUE;  // value attribute by default
 
+  // Loop over name parts
   for (casadi_int i=0; i<nn.size(); ++i) {
-    // Add a dot
-    if (i!=0) qn << ".";
-
     // Get the name part
-    qn << nn[i].attribute<std::string>("name");
+    std::string np = nn[i].attribute<std::string>("name");
+
+    // Check if an attribute
+    if (np == "$START") {
+      if (att) {
+        *att = Attribute::START;
+      } else {
+        casadi_error("Ignoring attribute " + np);
+      }
+      continue;
+    }
+
+    // Add the name part to the variable name
+    if (!first_part) qn << ".";
+    qn << np;
 
     // Get the index, if any
     if (nn[i].size()>0) {
@@ -1437,6 +1464,9 @@ std::string DaeBuilderInternal::qualified_name(const XmlNode& nn) {
       nn[i]["exp:ArraySubscripts"]["exp:IndexExpression"]["exp:IntegerLiteral"].get(&ind);
       qn << "[" << ind << "]";
     }
+
+    // Dot prefix if a additional parts
+    first_part = false;
   }
 
   // Return the name

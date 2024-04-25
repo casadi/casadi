@@ -405,7 +405,7 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
 protected:
 
   /// Get the qualified name
-  static std::string qualified_name(const XmlNode& nn);
+  static std::string qualified_name(const XmlNode& nn, Attribute* att = 0);
 
   // User-set options
   bool debug_;
@@ -527,8 +527,11 @@ protected:
   /// Read an equation
   MX read_expr(const XmlNode& node);
 
+  /// Read an identifier expression
+  MX read_identifier(const XmlNode& node);
+
   /// Read a variable
-  Variable& read_variable(const XmlNode& node);
+  Variable& read_variable(const XmlNode& node, Attribute* att = 0);
 
   // Read ModelExchange
   void import_model_exchange(const XmlNode& n);
