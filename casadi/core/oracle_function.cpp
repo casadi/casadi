@@ -32,6 +32,14 @@
 
 namespace casadi {
 
+OracleCallback::OracleCallback(const std::string& name,
+  OracleFunction* oracle) : name(name), oracle_(oracle) {
+}
+
+OracleCallback::OracleCallback() : name("undefined"), oracle_(0) {
+}
+
+
 OracleFunction::OracleFunction(const std::string& name, const Function& oracle)
 : FunctionInternal(name), oracle_(oracle) {
 }
@@ -267,6 +275,14 @@ set_function(const Function& fcn, const std::string& fname, bool jit) {
   r.f = fcn;
   r.jit = jit;
 }
+
+
+  void OracleFunction::codegen_body_enter(CodeGenerator& g) const {
+    g.local("d_oracle", "struct casadi_oracle_data");
+  }
+
+  void OracleFunction::codegen_body_exit(CodeGenerator& g) const {
+  }
 
 int OracleFunction::
 calc_function(OracleMemory* m, const std::string& fcn,

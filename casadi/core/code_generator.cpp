@@ -1005,6 +1005,23 @@ namespace casadi {
     if (!use_ifdef.empty()) this->includes << "#endif\n";
   }
 
+  void CodeGenerator::setup_callback(const std::string& s, const Function& f) {
+    std::string name = add_dependency(f);
+    bool needs_mem = !f->codegen_mem_type().empty();
+    if (needs_mem) {
+      *this << s << ".checkout = " << name << "_checkout;\n";
+    } else {
+      *this << s << ".checkout = 0;\n";
+    }
+
+    *this << s << ".eval = " << name << ";\n";
+    if (needs_mem) {
+      *this << s << ".release = " << name << "_release;\n";
+    } else {
+      *this << s << ".release = 0;\n";
+    }
+  }
+
   std::string CodeGenerator::
   operator()(const Function& f, const std::string& arg,
              const std::string& res, const std::string& iw,
@@ -1384,6 +1401,7 @@ namespace casadi {
       this->auxiliaries << sanitize_source(casadi_qrqp_str, inst);
       break;
     case AUX_NLP:
+      add_auxiliary(AUX_ORACLE);
       this->auxiliaries << sanitize_source(casadi_nlp_str, inst);
       break;
     case AUX_SQPMETHOD:
@@ -1478,6 +1496,15 @@ namespace casadi {
       add_auxiliary(AUX_SCAL);
       add_auxiliary(AUX_RANK1);
       this->auxiliaries << sanitize_source(casadi_bfgs_str, inst);
+      break;
+    case AUX_ORACLE:
+      this->auxiliaries << sanitize_source(casadi_oracle_str, inst);
+      break;
+    case AUX_ORACLE_CALLBACK:
+      this->auxiliaries << sanitize_source(casadi_oracle_callback_str, inst);
+      break;
+    case AUX_OCP_BLOCK:
+      this->auxiliaries << sanitize_source(casadi_ocp_block_str, inst);
       break;
     case AUX_TO_DOUBLE:
       this->auxiliaries << "#define casadi_to_double(x) "

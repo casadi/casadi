@@ -66,12 +66,14 @@ struct casadi_nlpsol_detect_bounds_data {
   T1* lam_xu;
 };
 // C-REPLACE "casadi_nlpsol_detect_bounds_data<T1>" "struct casadi_nlpsol_detect_bounds_data"
+// C-REPLACE "casadi_oracle_data<T1>" "struct casadi_oracle_data"
 
 // SYMBOL "nlpsol_data"
 template<typename T1>
 struct casadi_nlpsol_data {
   // Problem structure
   const casadi_nlpsol_prob<T1>* prob;
+  casadi_oracle_data<T1>* oracle;
   // Variable bounds
   T1 *lbz, *ubz;
   // Current primal solution

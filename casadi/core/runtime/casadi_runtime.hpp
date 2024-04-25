@@ -292,6 +292,7 @@ namespace casadi {
   #include "casadi_qrqp.hpp"
   #include "casadi_kkt.hpp"
   #include "casadi_ipqp.hpp"
+  #include "casadi_oracle.hpp"
   #include "casadi_nlp.hpp"
   #include "casadi_sqpmethod.hpp"
   #include "casadi_feasiblesqpmethod.hpp"
@@ -307,7 +308,8 @@ namespace casadi {
   #include "casadi_sum.hpp"
   #include "casadi_sparsity.hpp"
   #include "casadi_jac.hpp"
-
+  #include "casadi_oracle_callback.hpp"
+  #include "casadi_ocp_block.hpp"
 } // namespace casadi
 
 /// \endcond

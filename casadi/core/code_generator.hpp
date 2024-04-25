@@ -153,6 +153,10 @@ namespace casadi {
         \identifier{s4} */
     void define_rom_integer(const void* id, casadi_int size);
 
+    /** \brief Setup a callback
+
+         */
+    void setup_callback(const std::string& s, const Function& f);
     /** \brief Access file scope integer read-only memory
 
         \identifier{s5} */
@@ -615,7 +619,10 @@ namespace casadi {
       AUX_MMAX,
       AUX_LOGSUMEXP,
       AUX_SPARSITY,
-      AUX_BFGS
+      AUX_BFGS,
+      AUX_ORACLE_CALLBACK,
+      AUX_OCP_BLOCK,
+      AUX_ORACLE
     };
 
     /** \brief Add a built-in auxiliary function

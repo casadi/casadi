@@ -774,6 +774,8 @@ namespace casadi {
     m->unified_return_status = SOLVER_RET_UNKNOWN;
 
     m->d_nlp.prob = &p_nlp_;
+    m->d_nlp.oracle = &m->d_oracle;
+
     casadi_nlpsol_data<double>& d_nlp = m->d_nlp;
     d_nlp.p = arg[NLPSOL_P];
     d_nlp.lbx = arg[NLPSOL_LBX];
@@ -1134,8 +1136,11 @@ namespace casadi {
   }
 
   void Nlpsol::codegen_body_enter(CodeGenerator& g) const {
+    OracleFunction::codegen_body_enter(g);
     g.local("d_nlp", "struct casadi_nlpsol_data");
     g.local("p_nlp", "struct casadi_nlpsol_prob");
+
+    g << "d_nlp.oracle = &d_oracle;\n";
 
     g << "d_nlp.p = arg[" << NLPSOL_P << "];\n";
     g << "d_nlp.lbx = arg[" << NLPSOL_LBX << "];\n";
@@ -1254,6 +1259,8 @@ namespace casadi {
 
     g.copy_check("&d_nlp.objective", 1, "d_nlp.f", false, true);
     g.copy_check("d_nlp.lam_p", np_, "d_nlp.lam_p", false, true);
+
+    OracleFunction::codegen_body_exit(g);
   }
 
   void Nlpsol::serialize_body(SerializingStream &s) const {
