@@ -495,6 +495,10 @@ void OracleFunction::set_temp(void* mem, const double** arg, double** res,
   m->res = res;
   m->iw = iw;
   m->w = w;
+  m->d_oracle.arg = arg;
+  m->d_oracle.res = res;
+  m->d_oracle.iw = iw;
+  m->d_oracle.w = w;
   for (int i = 0; i < max_num_threads_; ++i) {
     auto* ml = m->thread_local_mem[i];
     ml->arg = arg;

@@ -167,7 +167,9 @@ namespace casadi {
     void serialize_body(SerializingStream &s) const override;
 
     /** \brief Deserialize with type disambiguation */
-    static ProtoFunction* deserialize(DeserializingStream& s) { return new FatropConicInterface(s); }
+    static ProtoFunction* deserialize(DeserializingStream& s) {
+      return new FatropConicInterface(s);
+    }
 
     friend class CasadiStructuredQP;
 

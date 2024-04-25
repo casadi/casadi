@@ -53,40 +53,6 @@ void casadi_fatrop_conic_dense_transfer(double factor, const T1* x,
     }
 }
 
-// SYMBOL "fatrop_block"
-struct casadi_ocp_block {
-    casadi_int offset_r;
-    casadi_int offset_c;
-    casadi_int rows;
-    casadi_int cols;
-};
-// C-REPLACE "casadi_ocp_block" "struct casadi_ocp_block"
-
-// SYMBOL "fatrop_unpack_blocks"
-inline void casadi_fatrop_conic_unpack_blocks(casadi_int N, casadi_ocp_block* blocks, const casadi_int* packed) {
-    casadi_int i;
-    for (i=0;i<N;++i) {
-        blocks[i].offset_r = *packed++;
-        blocks[i].offset_c = *packed++;
-        blocks[i].rows = *packed++;
-        blocks[i].cols = *packed++;
-    }
-}
-
-// SYMBOL "fatrop_ptr_block"
-template<typename T1>
-void casadi_fatrop_conic_ptr_block(casadi_int N, T1** vs, T1* v, const casadi_ocp_block* blocks, int eye) {
-    casadi_int k, offset = 0;
-    for(k=0;k<N;++k) {
-        vs[k] = v+offset;
-        if (eye) {
-        offset += blocks[k].rows;
-        } else {
-        offset += blocks[k].rows*blocks[k].cols;
-        }
-    }
-}
-
 template<typename T1>
 struct casadi_fatrop_conic_prob {
   const casadi_qp_prob<T1>* qp;
@@ -141,13 +107,17 @@ void casadi_fatrop_conic_setup(casadi_fatrop_conic_prob<T1>* p) {
 
 }
 
-// SYMBOL "fatrop_solve"
+// SYMBOL "fatrop_ocp_c_solve"
 template<typename T1>
 int casadi_fatrop_conic_solve(casadi_fatrop_conic_data<T1>* d, const double** arg, double** res, casadi_int* iw, double* w) {
     casadi_int k, i, start, stop;
     const casadi_fatrop_conic_prob<T1>* p = d->prob;
     const casadi_qp_prob<T1>* p_qp = p->qp;
     casadi_qp_data<T1>* d_qp = d->qp;
+
+    for (int i=0;i<casadi_sp_nnz(p_qp->sp_a);++i) {
+      printf("a %d: %e\n", i, d_qp->a[i]);
+    }
 
     casadi_fatrop_conic_mproject(-1.0, d_qp->a, p_qp->sp_a, d->AB, p->ABsp, d->pv);
     casadi_project(d_qp->a, p_qp->sp_a, d->CD, p->CDsp, d->pv);

@@ -1234,7 +1234,7 @@ namespace casadi {
       g << "d->arg[1] = d_nlp.p;\n";
       g << "d->arg[2] = &one;\n";
       g << "d->arg[3] = d_nlp.lam+" + str(nx_) + ";\n";
-      g << "d->res[0] = " << (calc_f_ ? "d_nlp.f" : "0") << ";\n";
+      g << "d->res[0] = " << (calc_f_ ? "&d_nlp.objective" : "0") << ";\n";
       g << "d->res[1] = " << (calc_g_ ? "d_nlp.z+" + str(nx_) : "0") << ";\n";
       g << "d->res[2] = " << (calc_lam_x_ ? "d_nlp.lam+" + str(nx_) : "0") << ";\n";
       g << "d->res[3] = " << (calc_lam_p_ ? "d_nlp.lam_p" : "0") << ";\n";
