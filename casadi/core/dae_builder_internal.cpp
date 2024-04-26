@@ -903,6 +903,8 @@ MX DaeBuilderInternal::read_expr(const XmlNode& node) {
       return val;
     } else if (name=="Log") {
       return log(read_expr(node[0]));
+    } else if (name=="Not") { // Logical not
+      return !read_expr(node[0]);
     } else if (name=="LogLeq") { // Logical less than equal
       return read_expr(node[0]) <= read_expr(node[1]);
     } else if (name=="LogGeq") { // Logical greater than equal
