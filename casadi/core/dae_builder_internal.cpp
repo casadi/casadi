@@ -465,7 +465,7 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
         const XmlNode& n = dyneqs[i];
         try {
           // Consistency checks
-          casadi_assert_dev(n.name == "equ:Equation");
+          casadi_assert(n.name == "equ:Equation", "Expected equation, got:" + n.name);
           casadi_assert_dev(n.size() == 1 && n[0].name == "exp:Sub");
           // Ensure not empty
           if (n[0].size() == 0) {
