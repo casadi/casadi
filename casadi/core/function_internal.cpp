@@ -833,6 +833,17 @@ namespace casadi {
     if (print_in_) print_in(uout(), arg, false);
     auto m = static_cast<ProtoFunctionMemory*>(mem);
 
+    // Avoid memory corruption
+    for (casadi_int i=0;i<n_in_;++i) {
+      casadi_assert(arg[i]==0 || arg[i]+nnz_in(i)<=w || arg[i]>=w+sz_w(),
+        "Memory corruption detected for input " + name_in_[i] + ".\n"+
+        "arg[" + str(i) + "] " + str(arg[i]) + "-" + str(arg[i]+nnz_in(i)) +
+        " intersects with w " + str(w)+"-"+str(w+sz_w())+".");
+    }
+    for (casadi_int i=0;i<n_out_;++i) {
+      casadi_assert(res[i]==0 || res[i]+nnz_out(i)<=w || res[i]>=w+sz_w(),
+        "Memory corruption detected for output " + name_out_[i]);
+    }
     // Reset statistics
     for (auto&& s : m->fstats) s.second.reset();
     if (m->t_total) m->t_total->tic();
