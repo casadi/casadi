@@ -1209,6 +1209,9 @@ namespace casadi {
     case AUX_COPY:
       this->auxiliaries << sanitize_source(casadi_copy_str, inst);
       break;
+    case AUX_SCALED_COPY:
+      this->auxiliaries << sanitize_source(casadi_scaled_copy_str, inst);
+      break;
     case AUX_SWAP:
       this->auxiliaries << sanitize_source(casadi_swap_str, inst);
       break;
