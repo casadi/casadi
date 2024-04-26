@@ -475,18 +475,35 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
           // Get the left-hand-sides and right-hand-sides
           const XmlNode& lhs = n[0][0];
           const XmlNode& rhs = n[0][1];
-          // Left-hand-side needs to be a variable
-          Variable& v = read_variable(lhs);
           // Right-hand-side is the binding equation
           MX beq = read_expr(rhs);
-          // Set the equation
-          w_.push_back(find(v.name));
-          v.beq = beq;
-          // Also add to list of initial equations
-          if (init_eq) {
-            init_lhs_.push_back(v.v);
-            init_rhs_.push_back(beq);
+          // Left-hand-side is a variable or derivative
+          if (lhs.name == "exp:Der") {
+            casadi_assert(!init_eq, "Differential equations in initial equations not supported");
+            // Differentiated variable
+            Variable& v = read_variable(lhs[0]);
+            // Corresponding time derivative
+            Variable& dot_v = variable("der(" + v.name + ")");
+            // Map to each other
+            v.der = dot_v.index;
+            dot_v.der_of = v.index;
+            // Mark as state
+            x_.push_back(v.index);
+            // Set binding equation to derivative variable
+            dot_v.beq = beq;
+          } else {
+            // Left-hand-side is a variable
+            Variable& v = read_variable(lhs);
+            // Set the equation
+            w_.push_back(find(v.name));
+            v.beq = beq;
+            // Also add to list of initial equations
+            if (init_eq) {
+              init_lhs_.push_back(v.v);
+              init_rhs_.push_back(beq);
+            }
           }
+
         } catch (std::exception& e) {
           uerr() << "Failed to read " << equ << "#" << i << ": " << e.what() << std::endl;
         }
