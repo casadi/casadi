@@ -850,8 +850,20 @@ MX DaeBuilderInternal::read_identifier(const XmlNode& node) {
 
 MX DaeBuilderInternal::read_expr(const XmlNode& node) {
   try {
-
     const std::string& fullname = node.name;
+
+    if (fullname == "fun:If") {
+      // Expression for condition, if and else
+      const XmlNode& cond = node["fun:Condition"];
+      const XmlNode& then_stmt = node["fun:Statements"];
+      const XmlNode& else_stmt = node["fun:Else"];
+      // Only scalar expression implemented
+      casadi_assert(cond.size() == 1, "Only one condition in if expression supported");
+      casadi_assert(then_stmt.size() == 1, "Only one then statement in if expression supported");
+      casadi_assert(else_stmt.size() == 1, "Only one else statement in if expression supported");
+      return if_else(read_expr(cond[0]), read_expr(then_stmt[0]), read_expr(else_stmt[0]));
+    }
+
     if (fullname.find("exp:")== std::string::npos) {
       casadi_error("DaeBuilderInternal::read_expr: unknown - expression is supposed to "
                   "start with 'exp:' , got " + fullname);
