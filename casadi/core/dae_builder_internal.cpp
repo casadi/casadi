@@ -475,7 +475,8 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
             // Get expression for condition
             MX cond = read_expr(n_cond[0]);
             // Assume equation is an assignment
-            casadi_assert(n_equ[0].name == "exp:Sub", "When statement must be of form (var - exp == 0)");
+            casadi_assert(n_equ[0].name == "exp:Sub",
+              "When statement must be of form (var - exp == 0)");
             // Extract left-hand-side and right-hand-side
             MX lhs = read_expr(n_equ[0][0]);
             MX rhs = read_expr(n_equ[0][1]);
