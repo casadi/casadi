@@ -464,6 +464,28 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
         // Get a reference to the variable
         const XmlNode& n = dyneqs[i];
         try {
+          // Handle when equation
+          if (n.name == "equ:When") {
+            // Nodes for condition, equations
+            const XmlNode& n_cond = n["equ:Condition"];
+            const XmlNode& n_equ = n["equ:Equation"];
+            // Consistency checks - only working for very simple expressions
+            casadi_assert(n_cond.size() == 1, "Only one condition in when equation supported");
+            casadi_assert(n_equ.size() == 1, "Only one equation in when equation supported");
+            // Get expression for condition
+            MX cond = read_expr(n_cond[0]);
+            // Assume equation is an assignment
+            casadi_assert(n_equ[0].name == "exp:Sub", "When statement must be of form (var - exp == 0)");
+            // Extract left-hand-side and right-hand-side
+            MX lhs = read_expr(n_equ[0][0]);
+            MX rhs = read_expr(n_equ[0][1]);
+            // Add to list of when equations
+            when_cond_.push_back(cond);
+            when_lhs_.push_back(lhs);
+            when_rhs_.push_back(rhs);
+            continue;
+          }
+
           // Consistency checks
           casadi_assert(n.name == "equ:Equation", "Expected equation, got:" + n.name);
           casadi_assert_dev(n.size() == 1 && n[0].name == "exp:Sub");
