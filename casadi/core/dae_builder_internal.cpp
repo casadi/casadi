@@ -2682,14 +2682,14 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
 void DaeBuilderInternal::import_dynamic_equations(const XmlNode& eqs) {
   // Add equations
   for (casadi_int i = 0; i < eqs.size(); ++i) {
-    // Get a reference to the variable
-    const XmlNode& n = eqs[i];
+    const XmlNode& eq = eqs[i];
+    std::string eq_name = "dyneq_" + str(i);
+    // Try to read the node
     try {
-      // Handle when equation
-      if (n.name == "equ:When") {
+      if (eq.name == "equ:When") {  // When equation
         // Nodes for condition, equations
-        const XmlNode& n_cond = n["equ:Condition"];
-        const XmlNode& n_equ = n["equ:Equation"];
+        const XmlNode& n_cond = eq["equ:Condition"];
+        const XmlNode& n_equ = eq["equ:Equation"];
         // Consistency checks - only working for very simple expressions
         casadi_assert(n_cond.size() == 1, "Only one condition in when equation supported");
         casadi_assert(n_equ.size() == 1, "Only one equation in when equation supported");
@@ -2714,44 +2714,44 @@ void DaeBuilderInternal::import_dynamic_equations(const XmlNode& eqs) {
         when_cond_.push_back(cond);
         when_lhs_.push_back(lhs);
         when_rhs_.push_back(rhs);
-        continue;
-      }
-
-      // Consistency checks
-      casadi_assert(n.name == "equ:Equation", "Expected equation, got:" + n.name);
-      casadi_assert_dev(n.size() == 1 && n[0].name == "exp:Sub");
-      // Ensure not empty
-      if (n[0].size() == 0) {
-        casadi_warning("Dynamic equation #" + str(i) + " is empty, ignored.");
-        continue;
-      }
-      // Get the left-hand-sides and right-hand-sides
-      const XmlNode& lhs = n[0][0];
-      const XmlNode& rhs = n[0][1];
-      // Right-hand-side is the binding equation
-      MX beq = read_expr(rhs);
-      // Left-hand-side is a variable or derivative
-      if (lhs.name == "exp:Der") {
-        // Differentiated variable
-        Variable& v = read_variable(lhs[0]);
-        // Corresponding time derivative
-        Variable& dot_v = variable("der(" + v.name + ")");
-        // Map to each other
-        v.der = dot_v.index;
-        dot_v.der_of = v.index;
-        // Mark as state
-        x_.push_back(v.index);
-        // Set binding equation to derivative variable
-        dot_v.beq = beq;
+      } else if (eq.name == "equ:Equation") {  // Residual equation
+        // Consistency checks
+        casadi_assert_dev(eq.size() == 1 && eq[0].name == "exp:Sub");
+        // Skip if empty
+        if (eq[0].size() == 0) {
+          casadi_warning(eq_name + " is empty, ignored.");
+          continue;
+        }
+        // Get the left-hand-sides and right-hand-sides
+        const XmlNode& lhs = eq[0][0];
+        const XmlNode& rhs = eq[0][1];
+        // Right-hand-side is the binding equation
+        MX beq = read_expr(rhs);
+        // Left-hand-side is a variable or derivative
+        if (lhs.name == "exp:Der") {
+          // Differentiated variable
+          Variable& v = read_variable(lhs[0]);
+          // Corresponding time derivative
+          Variable& dot_v = variable("der(" + v.name + ")");
+          // Map to each other
+          v.der = dot_v.index;
+          dot_v.der_of = v.index;
+          // Mark as state
+          x_.push_back(v.index);
+          // Set binding equation to derivative variable
+          dot_v.beq = beq;
+        } else {
+          // Left-hand-side is a variable
+          Variable& v = read_variable(lhs);
+          // Set the equation
+          w_.push_back(find(v.name));
+          v.beq = beq;
+        }
       } else {
-        // Left-hand-side is a variable
-        Variable& v = read_variable(lhs);
-        // Set the equation
-        w_.push_back(find(v.name));
-        v.beq = beq;
+        casadi_error("Unknown dynamic equation type, got:" + eq.name);
       }
     } catch (std::exception& e) {
-      uerr() << "Failed to read dynamic equatin #" << i << ": " << e.what() << std::endl;
+      casadi_error("Failed to read " + eq_name + ":" + str(e.what()));
     }
   }
 }
@@ -2759,32 +2759,36 @@ void DaeBuilderInternal::import_dynamic_equations(const XmlNode& eqs) {
 void DaeBuilderInternal::import_initial_equations(const XmlNode& eqs) {
   // Add equations
   for (casadi_int i = 0; i < eqs.size(); ++i) {
-    // Get a reference to the variable
-    const XmlNode& n = eqs[i];
+    const XmlNode& eq = eqs[i];
+    // Try to read the node
+    std::string eq_name = "initeq_" + str(i);
     try {
-      // Consistency checks
-      casadi_assert(n.name == "equ:Equation", "Expected equation, got:" + n.name);
-      casadi_assert_dev(n.size() == 1 && n[0].name == "exp:Sub");
-      // Ensure not empty
-      if (n[0].size() == 0) {
-        casadi_warning("Initial equation #" + str(i) + " is empty, ignored.");
-        continue;
+      if (eq.name == "equ:Equation") {  // Residual equation
+        // Consistency checks
+        casadi_assert_dev(eq.size() == 1 && eq[0].name == "exp:Sub");
+        // Ensure not empty
+        if (eq[0].size() == 0) {
+          casadi_warning(eq_name + " is empty, ignored.");
+          continue;
+        }
+        // Get the left-hand-sides and right-hand-sides
+        const XmlNode& lhs = eq[0][0];
+        const XmlNode& rhs = eq[0][1];
+        // Right-hand-side is the binding equation
+        MX beq = read_expr(rhs);
+        // Left-hand-side is a variable
+        Variable& v = read_variable(lhs);
+        // Set the equation
+        w_.push_back(find(v.name));
+        v.beq = beq;
+        // Also add to list of initial equations
+        init_lhs_.push_back(v.v);
+        init_rhs_.push_back(beq);
+      } else {
+        casadi_error("Unknown initial equation type, got:" + eq.name);
       }
-      // Get the left-hand-sides and right-hand-sides
-      const XmlNode& lhs = n[0][0];
-      const XmlNode& rhs = n[0][1];
-      // Right-hand-side is the binding equation
-      MX beq = read_expr(rhs);
-      // Left-hand-side is a variable
-      Variable& v = read_variable(lhs);
-      // Set the equation
-      w_.push_back(find(v.name));
-      v.beq = beq;
-      // Also add to list of initial equations
-      init_lhs_.push_back(v.v);
-      init_rhs_.push_back(beq);
     } catch (std::exception& e) {
-      uerr() << "Failed to read initial equation #" << i << ": " << e.what() << std::endl;
+      casadi_error("Failed to read " + eq_name + ":" + str(e.what()));
     }
   }
 }
