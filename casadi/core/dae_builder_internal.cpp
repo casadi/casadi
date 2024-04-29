@@ -474,12 +474,21 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
             casadi_assert(n_equ.size() == 1, "Only one equation in when equation supported");
             // Get expression for condition
             MX cond = read_expr(n_cond[0]);
-            // Assume equation is an assignment
-            casadi_assert(n_equ[0].name == "exp:Sub",
-              "When statement must be of form (var - exp == 0)");
-            // Extract left-hand-side and right-hand-side
-            MX lhs = read_expr(n_equ[0][0]);
-            MX rhs = read_expr(n_equ[0][1]);
+            // Left-hand-side and right-hand-side
+            MX lhs, rhs;
+            // Handle different types of equations
+            if (n_equ[0].name == "exp:Sub") {
+              // Assume equation is an assignment
+              lhs = read_expr(n_equ[0][0]);
+              rhs = read_expr(n_equ[0][1]);
+            } else if (n_equ[0].name == "exp:Reinit") {
+              // Reinitialization
+              lhs = read_identifier(n_equ[0][0]);
+              rhs = read_expr(n_equ[0][1]);
+            } else {
+              // Not implemented
+              casadi_error(n_equ[0].name + " in when equation not supported");
+            }
             // Add to list of when equations
             when_cond_.push_back(cond);
             when_lhs_.push_back(lhs);
@@ -977,6 +986,9 @@ MX DaeBuilderInternal::read_expr(const XmlNode& node) {
       return ex;
     } else if (name=="Pow") {
       return pow(read_expr(node[0]), read_expr(node[1]));
+    } else if (name=="Pre") {
+      casadi_warning("Ignoring pre attribute");
+      return read_expr(node[0]);
     } else if (name=="RealLiteral") {
       double val;
       node.get(&val);
