@@ -542,6 +542,12 @@ protected:
   // Read ModelStructure
   void import_model_structure(const XmlNode& n);
 
+  // Read symbolic dynamic equations
+  void import_dynamic_equations(const XmlNode& eqs);
+
+  // Read symbolic initial equations
+  void import_initial_equations(const XmlNode& eqs);
+
   /// Problem structure has changed: Clear cache
   void clear_cache() const;
 
