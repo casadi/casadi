@@ -426,14 +426,14 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
   if (fmi_desc.has_child("ModelStructure"))
     import_model_structure(fmi_desc["ModelStructure"]);
 
-  // **** Add binding equations ****
+  // Add symbolic binding equations
   if (fmi_desc.has_child("equ:BindingEquations")) {
     // Get a reference to the BindingEquations node
-    const XmlNode& bindeqs = fmi_desc["equ:BindingEquations"];
+    const XmlNode& eqs = fmi_desc["equ:BindingEquations"];
     // Loop over binding equations
-    for (casadi_int i = 0; i < bindeqs.size(); ++i) {
+    for (casadi_int i = 0; i < eqs.size(); ++i) {
       // Reference to the binding equation
-      const XmlNode& beq_node = bindeqs[i];
+      const XmlNode& beq_node = eqs[i];
       // Get the variable and binding expression
       Variable& var = read_variable(beq_node[0]);
       if (beq_node[1].size() == 1) {
@@ -450,19 +450,19 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
     }
   }
 
-  // **** Add dynamic equations, initial equations ****
+  // Is a symbolic representation available
   symbolic_ = false;  // use DLL by default
-  for (bool init_eq : {true, false}) {
-    const char* equ = init_eq ? "equ:InitialEquations" : "equ:DynamicEquations";
-    if (fmi_desc.has_child(equ)) {
-      // Symbolic model equations available
-      symbolic_ = true;
-      // Get a reference to the DynamicEquations node
-      const XmlNode& dyneqs = fmi_desc[equ];
+
+  // Add symbolic dynamic equations
+  if (fmi_desc.has_child("equ:DynamicEquations")) {
+    // Symbolic model equations available
+    symbolic_ = true;
+    // Get a reference to the DynamicEquations node
+    const XmlNode& eqs = fmi_desc["equ:DynamicEquations"];
       // Add equations
-      for (casadi_int i = 0; i < dyneqs.size(); ++i) {
+      for (casadi_int i = 0; i < eqs.size(); ++i) {
         // Get a reference to the variable
-        const XmlNode& n = dyneqs[i];
+        const XmlNode& n = eqs[i];
         try {
           // Handle when equation
           if (n.name == "equ:When") {
@@ -501,7 +501,7 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
           casadi_assert_dev(n.size() == 1 && n[0].name == "exp:Sub");
           // Ensure not empty
           if (n[0].size() == 0) {
-            casadi_warning(str(equ) + "#" + str(i) + " is empty, ignored.");
+            casadi_warning("Dynamic equation #" + str(i) + " is empty, ignored.");
             continue;
           }
           // Get the left-hand-sides and right-hand-sides
@@ -511,7 +511,6 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
           MX beq = read_expr(rhs);
           // Left-hand-side is a variable or derivative
           if (lhs.name == "exp:Der") {
-            casadi_assert(!init_eq, "Differential equations in initial equations not supported");
             // Differentiated variable
             Variable& v = read_variable(lhs[0]);
             // Corresponding time derivative
@@ -529,16 +528,47 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
             // Set the equation
             w_.push_back(find(v.name));
             v.beq = beq;
-            // Also add to list of initial equations
-            if (init_eq) {
-              init_lhs_.push_back(v.v);
-              init_rhs_.push_back(beq);
-            }
           }
-
         } catch (std::exception& e) {
-          uerr() << "Failed to read " << equ << "#" << i << ": " << e.what() << std::endl;
+          uerr() << "Failed to read dynamic equatin #" << i << ": " << e.what() << std::endl;
         }
+      }
+  }
+  
+  // Add symbolic dynamic equations
+  if (fmi_desc.has_child("equ:InitialEquations")) {
+    // Symbolic model equations available
+    symbolic_ = true;
+    // Get a reference to the DynamicEquations node
+    const XmlNode& eqs = fmi_desc["equ:InitialEquations"];
+    // Add equations
+    for (casadi_int i = 0; i < eqs.size(); ++i) {
+      // Get a reference to the variable
+      const XmlNode& n = eqs[i];
+      try {
+        // Consistency checks
+        casadi_assert(n.name == "equ:Equation", "Expected equation, got:" + n.name);
+        casadi_assert_dev(n.size() == 1 && n[0].name == "exp:Sub");
+        // Ensure not empty
+        if (n[0].size() == 0) {
+          casadi_warning("Initial equation #" + str(i) + " is empty, ignored.");
+          continue;
+        }
+        // Get the left-hand-sides and right-hand-sides
+        const XmlNode& lhs = n[0][0];
+        const XmlNode& rhs = n[0][1];
+        // Right-hand-side is the binding equation
+        MX beq = read_expr(rhs);
+        // Left-hand-side is a variable
+        Variable& v = read_variable(lhs);
+        // Set the equation
+        w_.push_back(find(v.name));
+        v.beq = beq;
+        // Also add to list of initial equations
+        init_lhs_.push_back(v.v);
+        init_rhs_.push_back(beq);
+      } catch (std::exception& e) {
+        uerr() << "Failed to read initial equation #" << i << ": " << e.what() << std::endl;
       }
     }
   }
@@ -1155,7 +1185,7 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
   if (!when_cond_.empty()) {
     stream << "When statements" << std::endl;
     for (casadi_int k = 0; k < when_cond_.size(); ++k) {
-      stream << "  when " << str(when_cond_.at(k)) << " < 0: " << str(when_lhs_.at(k))
+      stream << "  when " << str(when_cond_.at(k)) << ": " << str(when_lhs_.at(k))
         << " := " << str(when_rhs_.at(k)) << std::endl;
     }
   }
