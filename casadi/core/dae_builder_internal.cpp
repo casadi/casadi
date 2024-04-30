@@ -426,32 +426,14 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
   if (fmi_desc.has_child("ModelStructure"))
     import_model_structure(fmi_desc["ModelStructure"]);
 
+  // Is a symbolic representation available?
+  symbolic_ = false;  // use DLL by default
+
   // Add symbolic binding equations
   if (fmi_desc.has_child("equ:BindingEquations")) {
-    // Get a reference to the BindingEquations node
-    const XmlNode& eqs = fmi_desc["equ:BindingEquations"];
-    // Loop over binding equations
-    for (casadi_int i = 0; i < eqs.size(); ++i) {
-      // Reference to the binding equation
-      const XmlNode& beq_node = eqs[i];
-      // Get the variable and binding expression
-      Variable& var = read_variable(beq_node[0]);
-      if (beq_node[1].size() == 1) {
-        // Regular expression
-        var.beq = read_expr(beq_node[1][0]);
-      } else {
-        // OpenModelica 1.17 occationally generates integer values without type specifier (bug?)
-        casadi_assert(beq_node[1].size() == 0, "Not implemented");
-        casadi_int val;
-        beq_node[1].get(&val);
-        casadi_warning(var.name + " has binding equation without type specifier: " + str(val));
-        var.beq = val;
-      }
-    }
+    symbolic_ = true;
+    import_binding_equations(fmi_desc["equ:BindingEquations"]);
   }
-
-  // Is a symbolic representation available
-  symbolic_ = false;  // use DLL by default
 
   // Add symbolic dynamic equations
   if (fmi_desc.has_child("equ:DynamicEquations")) {
@@ -459,7 +441,7 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
     import_dynamic_equations(fmi_desc["equ:DynamicEquations"]);
   }
   
-  // Add symbolic dynamic equations
+  // Add symbolic initial equations
   if (fmi_desc.has_child("equ:InitialEquations")) {
     symbolic_ = true;
     import_initial_equations(fmi_desc["equ:InitialEquations"]);
@@ -2718,6 +2700,34 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
   }
 }
 
+void DaeBuilderInternal::import_binding_equations(const XmlNode& eqs) {
+  // Loop over binding equations
+  for (casadi_int i = 0; i < eqs.size(); ++i) {
+    const XmlNode& eq = eqs[i];
+    std::string eq_name = "beq_" + str(i);
+    // Try to read the node
+    try {
+      // Get the variable and binding expression
+      Variable& var = read_variable(eq[0]);
+      if (eq[1].size() == 1) {
+        // Regular expression
+        var.beq = read_expr(eq[1][0]);
+      } else {
+        // OpenModelica 1.17 occationally generates integer values without type specifier (bug?)
+        casadi_assert(eq[1].size() == 0, "Not implemented");
+        casadi_int val;
+        eq[1].get(&val);
+        casadi_warning(var.name + " has binding equation without type specifier: " + str(val));
+        var.beq = val;
+      }
+      // Add to list of dependent parameters
+      d_.push_back(var.index);
+    } catch (std::exception& e) {
+      casadi_error("Failed to read " + eq_name + ":" + str(e.what()));
+    }
+  }
+}
+
 void DaeBuilderInternal::import_dynamic_equations(const XmlNode& eqs) {
   // Add equations
   for (casadi_int i = 0; i < eqs.size(); ++i) {
@@ -2749,6 +2759,10 @@ void DaeBuilderInternal::import_dynamic_equations(const XmlNode& eqs) {
           // Not implemented
           casadi_error(n_equ[0].name + " in when equation not supported");
         }
+
+
+
+
         // Add to list of when equations
         when_cond_.push_back(cond);
         when_lhs_.push_back(lhs);

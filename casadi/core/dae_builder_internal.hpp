@@ -558,6 +558,9 @@ protected:
   // Read ModelStructure
   void import_model_structure(const XmlNode& n);
 
+  // Read symbolic binding equations
+  void import_binding_equations(const XmlNode& eqs);
+
   // Read symbolic dynamic equations
   void import_dynamic_equations(const XmlNode& eqs);
 
