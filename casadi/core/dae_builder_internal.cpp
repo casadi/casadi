@@ -2776,6 +2776,11 @@ void DaeBuilderInternal::import_initial_equations(const XmlNode& eqs) {
         // Get the left-hand-sides and right-hand-sides
         const XmlNode& lhs = eq[0][0];
         const XmlNode& rhs = eq[0][1];
+        // Hack: Ignore expressions that just set a $PRE variable
+        if (lhs.size() > 0 && lhs[0].attribute<std::string>("name") == "$PRE") {
+          casadi_warning(eq_name + " defines a pre-variable, ignored");
+          continue;
+        }
         // Right-hand-side is the binding equation
         MX beq = read_expr(rhs);
         // Left-hand-side is a variable
