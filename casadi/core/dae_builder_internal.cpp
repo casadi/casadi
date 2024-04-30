@@ -435,16 +435,16 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
     import_binding_equations(fmi_desc["equ:BindingEquations"]);
   }
 
-  // Add symbolic dynamic equations
-  if (fmi_desc.has_child("equ:DynamicEquations")) {
-    symbolic_ = true;
-    import_dynamic_equations(fmi_desc["equ:DynamicEquations"]);
-  }
-  
   // Add symbolic initial equations
   if (fmi_desc.has_child("equ:InitialEquations")) {
     symbolic_ = true;
     import_initial_equations(fmi_desc["equ:InitialEquations"]);
+  }
+
+  // Add symbolic dynamic equations
+  if (fmi_desc.has_child("equ:DynamicEquations")) {
+    symbolic_ = true;
+    import_dynamic_equations(fmi_desc["equ:DynamicEquations"]);
   }
 }
 
