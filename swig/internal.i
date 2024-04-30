@@ -406,6 +406,9 @@
 %exception  casadi::CodeGenerator::scope_exit() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::CodeGenerator::setup_callback(const std::string &s, const Function &f) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::CodeGenerator::shorthand(const std::string &name) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
