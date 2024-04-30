@@ -155,7 +155,7 @@ namespace casadi {
 
     /** \brief Setup a callback
 
-         */
+        \identifier{27s} */
     void setup_callback(const std::string& s, const Function& f);
     /** \brief Access file scope integer read-only memory
 

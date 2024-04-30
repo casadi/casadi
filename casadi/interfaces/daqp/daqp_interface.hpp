@@ -43,7 +43,7 @@ namespace casadi {
       https://www.maths.ed.ac.uk/hall/Daqp/DaqpOptions.html
       for a list of options.
 
-    \identifier{22f} */
+    \identifier{27p} */
 
 /** \pluginsection{Conic,daqp} */
 

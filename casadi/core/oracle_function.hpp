@@ -245,10 +245,14 @@ namespace casadi {
     /// Get all statistics
     Dict get_stats(void* mem) const override;
 
-    /** \brief Generate code for the function body */
+    /** \brief Generate code for the function body
+
+        \identifier{27q} */
     virtual void codegen_body_enter(CodeGenerator& g) const;
 
-    /** \brief Generate code for the function body */
+    /** \brief Generate code for the function body
+
+        \identifier{27r} */
     virtual void codegen_body_exit(CodeGenerator& g) const;
 
     /** \brief Serialize an object without type information
