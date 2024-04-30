@@ -132,12 +132,12 @@ const std::vector<MX>& DaeBuilder::aux() const {
   return (*this)->aux_;
 }
 
-const std::vector<MX>& DaeBuilder::init_lhs() const {
-  return (*this)->init_lhs_;
+std::vector<MX> DaeBuilder::init_lhs() const {
+  return (*this)->init_lhs();
 }
 
-const std::vector<MX>& DaeBuilder::init_rhs() const {
-  return (*this)->init_rhs_;
+std::vector<MX> DaeBuilder::init_rhs() const {
+  return (*this)->init_rhs();
 }
 
 const std::vector<MX>& DaeBuilder::when_cond() const {
@@ -502,11 +502,6 @@ MX DaeBuilder::add_aux(const std::string& name, casadi_int n) {
   return new_aux;
 }
 
-void DaeBuilder::add_init(const MX& lhs, const MX& rhs) {
-  (*this)->init_lhs_.push_back(lhs);
-  (*this)->init_rhs_.push_back(rhs);
-}
-
 void DaeBuilder::add_when(const MX& cond, const MX& lhs, const MX& rhs) {
   (*this)->when_cond_.push_back(cond);
   (*this)->when_lhs_.push_back(lhs);
@@ -526,6 +521,14 @@ void DaeBuilder::set_alg(const std::string& name, const MX& alg_rhs) {
     (*this)->set_alg(name, alg_rhs);
   } catch (std::exception& e) {
     THROW_ERROR("set_alg", e.what());
+  }
+}
+
+void DaeBuilder::set_init(const std::string& name, const MX& init_rhs) {
+  try {
+    (*this)->set_init(name, init_rhs);
+  } catch (std::exception& e) {
+    THROW_ERROR("set_init", e.what());
   }
 }
 

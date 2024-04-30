@@ -181,15 +181,11 @@ class CASADI_EXPORT DaeBuilder
       \identifier{5v} */
   const std::vector<MX>& aux() const;
 
-  /** \brief Initial conditions, left-hand-side
+  /** \brief Initial conditions, left-hand-side */
+  std::vector<MX> init_lhs() const;
 
-      \identifier{5w} */
-  const std::vector<MX>& init_lhs() const;
-
-  /** \brief Initial conditions, right-hand-side
-
-      \identifier{5x} */
-  const std::vector<MX>& init_rhs() const;
+  /** \brief Initial conditions, right-hand-side */
+  std::vector<MX> init_rhs() const;
 
   /** \brief When statement: triggering condition
 
@@ -313,14 +309,21 @@ class CASADI_EXPORT DaeBuilder
   /// Specify the ordinary differential equation for a state
   void set_ode(const std::string& name, const MX& ode_rhs);
 
-  /// Specificy the residual equation for an algebraic variable
+  /// Specify the residual equation for an algebraic variable
   void set_alg(const std::string& name, const MX& alg_rhs);
+
+  /// Specify the initial equation for a variable
+  void set_init(const std::string& name, const MX& init_rhs);
 
   /// Add an auxiliary variable
   MX add_aux(const std::string& name=std::string(), casadi_int n=1);
 
-  /// Add an initial equation
-  void add_init(const MX& lhs, const MX& rhs);
+#ifdef WITH_DEPRECATED_FEATURES
+  /// [DEPRECATED] Replaced by set_init
+  void add_init(const MX& lhs, const MX& rhs) {
+    set_init(lhs.name(), rhs);
+  }
+#endif  // WITH_DEPRECATED_FEATURES
 
   /// Add a when statement
   void add_when(const MX& cond, const MX& lhs, const MX& rhs);

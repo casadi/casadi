@@ -1066,11 +1066,13 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
     }
   }
 
-  if (!init_lhs_.empty()) {
+  if (!init_.empty()) {
     stream << "Initial equations" << std::endl;
-    for (casadi_int k=0; k < init_lhs_.size(); ++k) {
-      stream << "  " << str(init_lhs_.at(k)) << " == " << str(init_rhs_.at(k))
-        << std::endl;
+    for (size_t k : init_) {
+      const Variable& v = variable(k);
+      stream << "  " << v.name;
+      if (!v.init_beq.is_empty()) stream << " := " << v.init_beq;
+      stream << std::endl;
     }
   }
 
@@ -1411,10 +1413,6 @@ void DaeBuilderInternal::sanity_check() const {
     casadi_assert(t_.size() == 1, "At most one time variable allowed");
     casadi_assert(var(t_[0]).is_scalar(), "Non-scalar time t");
   }
-
-  // Initial equations
-  casadi_assert(init_lhs_.size() == init_rhs_.size(),
-    "init_lhs and init_rhs have different lengths");
 
   // When statements
   casadi_assert(when_cond_.size() == when_lhs_.size() && when_lhs_.size() == when_rhs_.size(),
@@ -2370,6 +2368,24 @@ std::vector<MX> DaeBuilderInternal::quad() const {
   return ret;
 }
 
+std::vector<MX> DaeBuilderInternal::init_lhs() const {
+  std::vector<MX> ret;
+  ret.reserve(init_.size());
+  for (size_t ind : init_) {
+    ret.push_back(variable(ind).v);
+  }
+  return ret;
+}
+
+std::vector<MX> DaeBuilderInternal::init_rhs() const {
+  std::vector<MX> ret;
+  ret.reserve(init_.size());
+  for (size_t ind : init_) {
+    ret.push_back(variable(ind).init_beq);
+  }
+  return ret;
+}
+
 MX DaeBuilderInternal::add_t(const std::string& name) {
   casadi_assert(t_.empty(), "'t' already defined");
   Variable& v = new_variable(name);
@@ -2494,6 +2510,29 @@ void DaeBuilderInternal::set_alg(const std::string& name, const MX& alg_rhs) {
     // Variable exists: Update binding equation
     variable(z.alg).beq = alg_rhs;
   }
+}
+
+void DaeBuilderInternal::set_init(const std::string& name, const MX& init_rhs) {
+  // Find the algebraic variable
+  Variable& v = variable(name);
+  // If variable already has an initial binding equation, remove it
+  if (!v.init_beq.is_empty()) {
+    // Remove from list of initial equations
+    auto old_loc = std::find(init_.begin(), init_.end(), v.index);
+    if (old_loc == init_.end()) casadi_error("Corrupted list of initial equations");
+    init_.erase(old_loc);
+    v.init_beq = MX();
+  }
+  // If right-hand-side is empty, just erase
+  if (init_rhs.is_empty()) return;
+
+  // Make sure not already in list of initial equations
+  if (std::find(init_.begin(), init_.end(), v.index) != init_.end()) {
+    casadi_error("Initial equation for " + name + " has already been set");
+  }
+  // Add to list of initial equations
+  init_.push_back(v.index);
+  v.init_beq = init_rhs;
 }
 
 template<typename T>
@@ -2792,9 +2831,8 @@ void DaeBuilderInternal::import_initial_equations(const XmlNode& eqs) {
           casadi_warning(eq_name + " duplicate of previous equation " + eq_str + ", ignored")
           continue;
         }
-        // Also add to list of initial equations
-        init_lhs_.push_back(v.v);
-        init_rhs_.push_back(beq);
+        // Set initial condition
+        set_init(v.name, beq);
       } else {
         casadi_error("Unknown initial equation type, got:" + eq.name);
       }

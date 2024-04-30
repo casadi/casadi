@@ -136,6 +136,9 @@ struct CASADI_EXPORT Variable {
   /// Binding equation
   MX beq;
 
+  /// Binding equation, at initial time
+  MX init_beq;
+
   /// Get by attribute name
   double attribute(Attribute a) const;
 
@@ -450,10 +453,12 @@ protected:
   /// Ordered variables
   std::vector<size_t> t_, p_, u_, x_, z_, q_, c_, d_, w_, y_;
 
+  // Initial equations
+  std::vector<size_t> init_;
+
   ///@{
   /// Ordered variables and equations
   std::vector<MX> aux_;
-  std::vector<MX> init_lhs_, init_rhs_;
   std::vector<MX> when_cond_, when_lhs_, when_rhs_;
   ///@}
 
@@ -492,6 +497,12 @@ protected:
       \identifier{10} */
   std::vector<MX> quad() const;
 
+  /** \brief Initial conditions, left-hand-side */
+  std::vector<MX> init_lhs() const;
+
+  /** \brief Initial conditions, right-hand-side */
+  std::vector<MX> init_rhs() const;
+
   ///@{
   /// Add a new variable
   MX add_t(const std::string& name);
@@ -504,8 +515,13 @@ protected:
   MX add_d(const std::string& name, const MX& new_ddef);
   MX add_w(const std::string& name, const MX& new_wdef);
   MX add_y(const std::string& name, const MX& new_ydef);
+  ///@}
+
+  ///@{
+  /// Set a binding equation
   void set_ode(const std::string& name, const MX& ode_rhs);
   void set_alg(const std::string& name, const MX& alg_rhs);
+  void set_init(const std::string& name, const MX& init_rhs);
   ///@}
 
   /// Linear combinations of output expressions
