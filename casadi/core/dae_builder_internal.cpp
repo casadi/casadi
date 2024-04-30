@@ -2792,9 +2792,6 @@ void DaeBuilderInternal::import_initial_equations(const XmlNode& eqs) {
           casadi_warning(eq_name + " duplicate of previous equation " + eq_str + ", ignored")
           continue;
         }
-        // Set the equation
-        w_.push_back(find(v.name));
-        v.beq = beq;
         // Also add to list of initial equations
         init_lhs_.push_back(v.v);
         init_rhs_.push_back(beq);
