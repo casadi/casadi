@@ -2757,6 +2757,8 @@ void DaeBuilderInternal::import_dynamic_equations(const XmlNode& eqs) {
 }
 
 void DaeBuilderInternal::import_initial_equations(const XmlNode& eqs) {
+  // Hack: OpenModelica XML may contain duplicate expressions, ignore these
+  std::set<std::string> already_added;
   // Add equations
   for (casadi_int i = 0; i < eqs.size(); ++i) {
     const XmlNode& eq = eqs[i];
@@ -2778,6 +2780,13 @@ void DaeBuilderInternal::import_initial_equations(const XmlNode& eqs) {
         MX beq = read_expr(rhs);
         // Left-hand-side is a variable
         Variable& v = read_variable(lhs);
+        // Hack: avoid duplicate equations
+        std::string eq_str = str(v.v) + " == " + str(beq);
+        auto it = already_added.insert(eq_str); 
+        if (!it.second) {
+          casadi_warning(eq_name + " duplicate of previous equation " + eq_str + ", ignored")
+          continue;
+        }
         // Set the equation
         w_.push_back(find(v.name));
         v.beq = beq;
