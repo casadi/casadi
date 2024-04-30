@@ -349,27 +349,10 @@ class CASADI_EXPORT DaeBuilder
   void register_y(const std::string& name);
   ///@}
 
-#ifdef WITH_DEPRECATED_FEATURES
-  /** @name [DEPRECATED] Specify all variables of a type: Call set_all instead */
-  ///@{
-  void set_u(const std::vector<std::string>& name) { set_all("u", name);}
-  void set_x(const std::vector<std::string>& name) { set_all("x", name);}
-  void set_z(const std::vector<std::string>& name,
-    const std::vector<std::string>& alg = std::vector<std::string>());
-  void set_q(const std::vector<std::string>& name) { set_all("q", name);}
-  void set_y(const std::vector<std::string>& name) { set_all("y", name);}
-  ///@}
-#endif  // WITH_DEPRECATED_FEATURES
-
   /** @name Manipulation
    *  Reformulate the dynamic optimization problem.
    */
   ///@{
-
-#ifdef WITH_DEPRECATED_FEATURES
-  /// [DEPRECATED] Clear input variable: Replaced by clear_all
-  void clear_in(const std::string& v) { clear_all(v);}
-#endif  // WITH_DEPRECATED_FEATURES
 
   /// Eliminate all dependent variables
   void eliminate_w();

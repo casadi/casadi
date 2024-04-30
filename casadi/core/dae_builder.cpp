@@ -392,25 +392,6 @@ void DaeBuilder::register_y(const std::string& name) {
   (*this)->y_.push_back(find(name));
 }
 
-void DaeBuilder::set_z(const std::vector<std::string>& name, const std::vector<std::string>& alg) {
-  try {
-    // Consistency check
-    if (!alg.empty()) {
-      casadi_assert(alg.size() == name.size(), "Inconsistent number of algebraic variables");
-    }
-
-    // Update z
-    set_all("z", name);
-
-    // Update algebraic equations
-    if (!alg.empty()) {
-      for (size_t i = 0; i < name.size(); ++i) variable(name[i]).alg = find(alg[i]);
-    }
-  } catch (std::exception& e) {
-    THROW_ERROR("set_z", e.what());
-  }
-}
-
 void DaeBuilder::clear_all(const std::string& v) {
   try {
     (*this)->clear_all(v);
