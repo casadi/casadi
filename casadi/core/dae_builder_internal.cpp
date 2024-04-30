@@ -1061,7 +1061,7 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
   if (!when_cond_.empty()) {
     stream << "When statements" << std::endl;
     for (casadi_int k = 0; k < when_cond_.size(); ++k) {
-      stream << "  when " << str(when_cond_.at(k)) << ": " << str(when_lhs_.at(k))
+      stream << "  when " << str(when_cond_.at(k)) << " > 0 : " << str(when_lhs_.at(k))
         << " := " << str(when_rhs_.at(k)) << std::endl;
     }
   }
@@ -2743,7 +2743,7 @@ void DaeBuilderInternal::import_dynamic_equations(const XmlNode& eqs) {
         casadi_assert(n_cond.size() == 1, "Only one condition in when equation supported");
         casadi_assert(n_equ.size() == 1, "Only one equation in when equation supported");
         // Get expression for condition
-        MX cond = read_expr(n_cond[0]);
+        Variable& cond = read_variable(n_cond[0]);
         // Left-hand-side and right-hand-side
         MX lhs, rhs;
         // Handle different types of equations
@@ -2759,12 +2759,22 @@ void DaeBuilderInternal::import_dynamic_equations(const XmlNode& eqs) {
           // Not implemented
           casadi_error(n_equ[0].name + " in when equation not supported");
         }
-
-
-
+        // Hack: Turn "when" boolean expression into a zero-crossing expression
+        MX zc;
+        switch (cond.beq.op()) {
+          case OP_LT:
+            // x1 < x2 <=> x2 - x1 > 0
+            zc = cond.beq.dep(1) - cond.beq.dep(0);
+            break;
+          default:
+            casadi_error("Cannot turn " + str(cond.beq) + " into a zero-crossing expression");
+        }
+        set_init(cond.name, MX());  // remove initial conditions, if any
+        auto w_it = std::find(w_.begin(), w_.end(), cond.index);
+        if (w_it != w_.end()) w_.erase(w_it);  // remove from dependent equations
 
         // Add to list of when equations
-        when_cond_.push_back(cond);
+        when_cond_.push_back(zc);
         when_lhs_.push_back(lhs);
         when_rhs_.push_back(rhs);
       } else if (eq.name == "equ:Equation") {  // Residual equation
