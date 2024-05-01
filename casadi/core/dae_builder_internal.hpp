@@ -190,6 +190,9 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
    */
   ///@{
 
+  /// Eliminate all dependent parameters
+  void eliminate_d();
+
   /// Eliminate all dependent variables
   void eliminate_w();
 

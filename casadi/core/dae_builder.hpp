@@ -357,6 +357,9 @@ class CASADI_EXPORT DaeBuilder
    */
   ///@{
 
+  /// Eliminate all dependent parameters
+  void eliminate_d();
+
   /// Eliminate all dependent variables
   void eliminate_w();
 

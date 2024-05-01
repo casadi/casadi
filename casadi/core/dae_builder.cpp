@@ -592,6 +592,13 @@ void DaeBuilder::set_beq(const std::string& name, const MX& val) {
   }
 }
 
+void DaeBuilder::eliminate_d() {
+  try {
+    (*this)->eliminate_d();
+  } catch (std::exception& e) {
+    THROW_ERROR("eliminate_d", e.what());
+  }
+}
 void DaeBuilder::eliminate_w() {
   try {
     (*this)->eliminate_w();

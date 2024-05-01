@@ -1457,6 +1457,32 @@ MX DaeBuilderInternal::der(const MX& var) const {
   return der(var.name());
 }
 
+void DaeBuilderInternal::eliminate_d() {
+  // Quick return if no d
+  if (d_.empty()) return;
+  // Clear cache after this
+  clear_cache_ = true;
+  // Ensure variables are sorted
+  sort_d();
+  // Expressions where the variables are also being used
+  std::vector<MX> ex;
+  for (const Variable* v : variables_) {
+    if (!v->beq.is_constant()) ex.push_back(v->beq);
+  }
+  // Perform elimination
+  std::vector<MX> d = var(d_);
+  std::vector<MX> ddef = this->ddef();
+  substitute_inplace(d, ddef, ex);
+  // Clear list of dependent parameters
+  d_.clear();
+  // Get binding equations
+  auto it = ex.begin();
+  for (Variable* v : variables_) {
+    if (!v->beq.is_constant()) v->beq = *it++;
+  }
+  // Consistency check
+  casadi_assert_dev(it == ex.end());
+}
 void DaeBuilderInternal::eliminate_w() {
   // Quick return if no w
   if (w_.empty()) return;
