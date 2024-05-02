@@ -461,7 +461,6 @@ protected:
 
   ///@{
   /// Ordered variables and equations
-  std::vector<MX> aux_;
   std::vector<MX> when_cond_, when_lhs_, when_rhs_;
   ///@}
 

@@ -128,10 +128,6 @@ std::vector<MX> DaeBuilder::wdef() const {
   return (*this)->wdef();
 }
 
-const std::vector<MX>& DaeBuilder::aux() const {
-  return (*this)->aux_;
-}
-
 std::vector<MX> DaeBuilder::init_lhs() const {
   return (*this)->init_lhs();
 }
@@ -494,12 +490,6 @@ MX DaeBuilder::add_y(const std::string& name, const MX& new_ydef) {
     THROW_ERROR("add_y", e.what());
     return MX();
   }
-}
-
-MX DaeBuilder::add_aux(const std::string& name, casadi_int n) {
-  MX new_aux = add_variable(name, n);
-  (*this)->aux_.push_back(new_aux);
-  return new_aux;
 }
 
 void DaeBuilder::add_when(const MX& cond, const MX& lhs, const MX& rhs) {

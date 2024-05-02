@@ -315,9 +315,6 @@ class CASADI_EXPORT DaeBuilder
   /// Specify the initial equation for a variable
   void set_init(const std::string& name, const MX& init_rhs);
 
-  /// Add an auxiliary variable
-  MX add_aux(const std::string& name=std::string(), casadi_int n=1);
-
 #ifdef WITH_DEPRECATED_FEATURES
   /// [DEPRECATED] Replaced by set_init
   void add_init(const MX& lhs, const MX& rhs) {
