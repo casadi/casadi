@@ -2902,7 +2902,7 @@ void DaeBuilderInternal::import_initial_equations(const XmlNode& eqs) {
         Variable& v = read_variable(lhs);
         // Hack: avoid duplicate equations
         std::string eq_str = str(v.v) + " == " + str(beq);
-        auto it = already_added.insert(eq_str); 
+        auto it = already_added.insert(eq_str);
         if (!it.second) {
           casadi_warning(eq_name + " duplicate of previous equation " + eq_str + ", ignored")
           continue;
