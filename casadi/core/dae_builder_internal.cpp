@@ -1016,10 +1016,19 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
     stream << "Differential equations" << std::endl;
     for (size_t k : x_) {
       const Variable& x = variable(k);
-      casadi_assert(x.der >= 0, "No derivative variable for " + x.name);
-      const Variable& xdot = variable(x.der);
-      stream << "  \\dot{" << x.name << "} == " << xdot.name;
-      if (!xdot.beq.is_empty()) stream << " := " << xdot.beq;
+      stream << "  \\dot{" << x.name << "} == ";
+      if (x.der >= 0) {
+        // Derivative variable
+        const Variable& xdot = variable(x.der);
+        stream << xdot.name;
+        if (!xdot.beq.is_empty()) stream << " := " << xdot.beq;
+      } else if (x.variability == Variability::DISCRETE) {
+        // Discrete variable - derivative is zero
+        stream << 0;
+      } else {
+        // Missing ODE?
+        casadi_error("Missing derivative for " + str(x.name));
+      }
       stream << std::endl;
     }
   }
@@ -2346,9 +2355,16 @@ std::vector<MX> DaeBuilderInternal::ode() const {
   ret.reserve(x_.size());
   for (size_t v : x_) {
     const Variable& x = variable(v);
-    casadi_assert(x.der >= 0, "No derivative variable for " + x.name);
-    const Variable& xdot = variable(x.der);
-    ret.push_back(xdot.beq);
+    if (x.der >= 0) {
+      // Derivative variable
+      ret.push_back(variable(x.der).beq);
+    } else if (x.variability == Variability::DISCRETE) {
+      // Discrete variable - derivative is zero
+      ret.push_back(MX::zeros(x.v.sparsity()));
+    } else {
+      // Missing ODE?
+      casadi_error("Missing derivative for " + str(x.name));
+    }
   }
   return ret;
 }
@@ -2756,6 +2772,11 @@ void DaeBuilderInternal::import_binding_equations(const XmlNode& eqs) {
 }
 
 void DaeBuilderInternal::import_dynamic_equations(const XmlNode& eqs) {
+  // Add discrete states to x_
+  // Note: Make generic, should also apply to regular FMUs
+  for (Variable* v : variables_) {
+    if (v->variability == Variability::DISCRETE) x_.push_back(v->index);
+  }
   // Add equations
   for (casadi_int i = 0; i < eqs.size(); ++i) {
     const XmlNode& eq = eqs[i];
@@ -2799,6 +2820,8 @@ void DaeBuilderInternal::import_dynamic_equations(const XmlNode& eqs) {
         set_init(cond.name, MX());  // remove initial conditions, if any
         auto w_it = std::find(w_.begin(), w_.end(), cond.index);
         if (w_it != w_.end()) w_.erase(w_it);  // remove from dependent equations
+        auto x_it = std::find(x_.begin(), x_.end(), cond.index);
+        if (x_it != x_.end()) x_.erase(x_it);  // remove from states
 
         // Add to list of when equations
         when_cond_.push_back(zc);
