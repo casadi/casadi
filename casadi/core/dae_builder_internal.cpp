@@ -1147,10 +1147,12 @@ const std::vector<size_t>& DaeBuilderInternal::ind_in(const std::string& v) cons
 }
 
 void DaeBuilderInternal::clear_all(const std::string& v) {
+  clear_cache_ = true;  // Clear cache after this
   ind_in(v).clear();
 }
 
 void DaeBuilderInternal::set_all(const std::string& v, const std::vector<std::string>& name) {
+  clear_cache_ = true;  // Clear cache after this
   ind_in(v) = find(name);
 }
 
