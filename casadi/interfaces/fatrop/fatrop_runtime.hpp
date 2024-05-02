@@ -165,6 +165,8 @@ struct casadi_fatrop_data {
   struct FatropOcpCInterface ocp_interface;
 
   struct FatropOcpCStats stats;
+
+  struct FatropOcpCSolver *solver;
 };
 // C-REPLACE "casadi_fatrop_data<T1>" "struct casadi_fatrop_data"
 
@@ -723,10 +725,16 @@ void casadi_fatrop_init(casadi_fatrop_data<T1>* d, const T1*** arg, T1*** res, c
 // C-REPLACE "casadi_fatrop_eval_Ggt_ineq<T1>" "casadi_fatrop_eval_Ggt_ineq"
 
 
+// C-REPLACE "std::numeric_limits<T1>::infinity()" "casadi_inf"
+
 // SYMBOL "fatrop_presolve"
 template<typename T1>
 void casadi_fatrop_presolve(casadi_fatrop_data<T1>* d) {
+  casadi_int k, i, start, stop, nx;
   // Problem structure
+  const casadi_fatrop_prob<T1>* p = d->prob;
+  const casadi_nlpsol_prob<T1>* p_nlp = p->nlp;
+  casadi_nlpsol_data<T1>* d_nlp = d->nlp;
   struct FatropOcpCInterface* ocp_interface = &d->ocp_interface;
 
   ocp_interface->get_nx = casadi_fatrop_get_nx<T1>;
@@ -756,21 +764,6 @@ void casadi_fatrop_presolve(casadi_fatrop_data<T1>* d) {
   ocp_interface->eval_rq = 0; // Computed in full_eval_obj_grad
   ocp_interface->eval_L = 0; // Computed in full_eval_obj
 
-}
-
-// C-REPLACE "std::numeric_limits<T1>::infinity()" "casadi_inf"
-
-// SYMBOL "fatrop_ocp_c_solve"
-template<typename T1>
-void casadi_fatrop_solve(casadi_fatrop_data<T1>* d) {
-  casadi_int k, i, start, stop, nx, column;
-  // Problem structure
-  const casadi_fatrop_prob<T1>* p = d->prob;
-  const casadi_nlpsol_prob<T1>* p_nlp = p->nlp;
-  casadi_nlpsol_data<T1>* d_nlp = d->nlp;
-
-  d->unified_return_status = SOLVER_RET_UNKNOWN;
-  d->success = 0;
   nx = p_nlp->nx;
 
   d->a_eq_idx[0] = 0;
@@ -809,20 +802,32 @@ void casadi_fatrop_solve(casadi_fatrop_data<T1>* d) {
 
   d->ocp_interface.user_data = d;
 
-  FatropOcpCSolver* s = fatrop_ocp_c_create(&d->ocp_interface);
-  fatrop_ocp_c_set_option_bool(s, "accept_every_trial_step", 0);
-  fatrop_int ret = fatrop_ocp_c_solve(s);
+  d->solver = fatrop_ocp_c_create(&d->ocp_interface);
+}
 
+// SYMBOL "fatrop_ocp_c_solve"
+template<typename T1>
+void casadi_fatrop_solve(casadi_fatrop_data<T1>* d) {
+  // Problem structure
+  casadi_int k, i, column;
+  const casadi_fatrop_prob<T1>* p = d->prob;
+  const casadi_nlpsol_prob<T1>* p_nlp = p->nlp;
+  casadi_nlpsol_data<T1>* d_nlp = d->nlp;
+
+  d->unified_return_status = SOLVER_RET_UNKNOWN;
+  d->success = 0;
+
+  fatrop_int ret = fatrop_ocp_c_solve(d->solver);
 
   if (ret==0) {
     d->unified_return_status = SOLVER_RET_SUCCESS;
     d->success = 1;
   }
 
-  const struct blasfeo_dvec* primal = fatrop_ocp_c_get_primal(s);
-  const struct blasfeo_dvec* dual = fatrop_ocp_c_get_dual(s);
-  const struct FatropOcpCDims* str = fatrop_ocp_c_get_dims(s);
-  const struct FatropOcpCStats* stats = fatrop_ocp_c_get_stats(s);
+  const struct blasfeo_dvec* primal = fatrop_ocp_c_get_primal(d->solver);
+  const struct blasfeo_dvec* dual = fatrop_ocp_c_get_dual(d->solver);
+  const struct FatropOcpCDims* str = fatrop_ocp_c_get_dims(d->solver);
+  const struct FatropOcpCStats* stats = fatrop_ocp_c_get_stats(d->solver);
 
   d->stats.compute_sd_time = stats->compute_sd_time;
   d->stats.duinf_time = stats->duinf_time;
@@ -847,34 +852,34 @@ void casadi_fatrop_solve(casadi_fatrop_data<T1>* d) {
   casadi_fatrop_read_primal_data(primal_data, d_nlp->z, str);
   // Unpack dual solution
   // Inequalities
-  for (int k=0;k<str->K;++k) {
+  for (k=0;k<str->K;++k) {
     column = 0;
-    for (casadi_int i=d->a_ineq_idx[k];i<d->a_ineq_idx[k+1];++i) {
+    for (i=d->a_ineq_idx[k];i<d->a_ineq_idx[k+1];++i) {
       d_nlp->lam[p_nlp->nx+d->a_ineq[i]] = dual_data[str->g_ineq_offs[k]+column];
       column++;
     }
-    for (casadi_int i=d->x_ineq_idx[k];i<d->x_ineq_idx[k+1];++i) {
+    for (i=d->x_ineq_idx[k];i<d->x_ineq_idx[k+1];++i) {
       d_nlp->lam[d->x_ineq[i]] = dual_data[str->g_ineq_offs[k]+column];
       column++;
     }
   }
   // Equalities
-  for (int k=0;k<str->K;++k) {
+  for (k=0;k<str->K;++k) {
     column = 0;
-    for (casadi_int i=d->a_eq_idx[k];i<d->a_eq_idx[k+1];++i) {
+    for (i=d->a_eq_idx[k];i<d->a_eq_idx[k+1];++i) {
       d_nlp->lam[p_nlp->nx+d->a_eq[i]] = dual_data[str->g_offs[k]+column];
       column++;
     }
-    for (casadi_int i=d->x_eq_idx[k];i<d->x_eq_idx[k+1];++i) {
+    for (i=d->x_eq_idx[k];i<d->x_eq_idx[k+1];++i) {
       d_nlp->lam[d->x_eq[i]] = dual_data[str->g_offs[k]+column];
       column++;
     }
   }
   // Dynamics
-  for (int k=0;k<str->K-1;++k) {
+  for (k=0;k<str->K-1;++k) {
     casadi_scaled_copy(-1.0, dual_data+str->dyn_eq_offs[k], p->nx[k+1], d_nlp->lam+p_nlp->nx+p->AB[k].offset_r);
   }
 
-  fatrop_ocp_c_destroy(s);
+  fatrop_ocp_c_destroy(d->solver);
 
 }
