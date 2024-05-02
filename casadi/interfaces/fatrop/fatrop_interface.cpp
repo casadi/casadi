@@ -519,7 +519,7 @@ void FatropInterface::codegen_body(CodeGenerator& g) const {
   g << "casadi_fatrop_presolve(d);\n";
 
   for (const auto& kv : opts_) {
-    switch (fatrop_ocp_c_option_type(kv.first.c_str())) { 
+    switch (fatrop_ocp_c_option_type(kv.first.c_str())) {
       case 0:
         g << "fatrop_ocp_c_set_option_double(d->solver, \"" + kv.first + "\", "
               + str(kv.second) + ");\n";
@@ -530,7 +530,7 @@ void FatropInterface::codegen_body(CodeGenerator& g) const {
         break;
       case 2:
         g << "fatrop_ocp_c_set_option_bool(d->solver, \"" + kv.first + "\", "
-              + str(int(kv.second.to_bool())) + ");\n";
+              + str(static_cast<int>(kv.second.to_bool())) + ");\n";
         break;
       case 3:
         {

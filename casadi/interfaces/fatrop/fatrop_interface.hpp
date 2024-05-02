@@ -113,7 +113,7 @@ namespace casadi {
     static const std::string meta_doc;
 
     // Options
-  
+
     /// Data for convexification
     ConvexifyData convexify_data_;
 
