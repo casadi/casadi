@@ -113,15 +113,7 @@ namespace casadi {
     static const std::string meta_doc;
 
     // Options
-    bool pass_nonlinear_variables_;
-    std::vector<bool> nl_ex_;
-    Dict var_string_md_, var_integer_md_, var_numeric_md_,
-      con_string_md_, con_integer_md_, con_numeric_md_;
-
-    bool clip_inactive_lam_;
-    std::string inactive_lam_strategy_;
-    double inactive_lam_value_;
-
+  
     /// Data for convexification
     ConvexifyData convexify_data_;
 
@@ -158,30 +150,14 @@ namespace casadi {
                                    const std::vector<casadi_ocp_block>& blocks, bool eye=false);
     static void blockptr(std::vector<double *>& vs, std::vector<double>& v,
       const std::vector<casadi_ocp_block>& blocks, bool eye=false);
-    Sparsity Asp_, Bsp_, Csp_, Dsp_, Isp_, Rsp_, Ssp_, Qsp_, bsp_, lugsp_, usp_, xsp_;
-    Sparsity theirs_xsp_, theirs_usp_, theirs_Xsp_, theirs_Usp_;
-    Sparsity lamg_gapsp_;
-    Sparsity lam_cusp_, pisp_;
+    Sparsity Isp_, ABsp_, CDsp_, RSQsp_;
 
-    Sparsity ABsp_, CDsp_, RSQsp_;
-
-    std::vector< casadi_ocp_block > R_blocks, S_blocks, Q_blocks;
-    std::vector< casadi_ocp_block > b_blocks, lug_blocks;
-    std::vector< casadi_ocp_block > u_blocks, x_blocks;
-    std::vector< casadi_ocp_block > lam_ul_blocks, lam_xl_blocks,
-      lam_uu_blocks, lam_xu_blocks, lam_cl_blocks;
-    std::vector< casadi_ocp_block > lam_cu_blocks, A_blocks, B_blocks,
-      C_blocks, D_blocks, I_blocks;
-
-
-    std::vector< casadi_ocp_block > AB_blocks, CD_blocks, RSQ_blocks;
+    std::vector< casadi_ocp_block > AB_blocks, CD_blocks, RSQ_blocks, I_blocks;
 
     std::vector<casadi_int> nxs_;
     std::vector<casadi_int> nus_;
     std::vector<casadi_int> ngs_;
-    std::vector<int> zeros_;
     casadi_int N_;
-    casadi_int print_level_;
 
 
     std::vector<casadi_int> AB_offsets_, CD_offsets_, RSQ_offsets_, I_offsets_;
