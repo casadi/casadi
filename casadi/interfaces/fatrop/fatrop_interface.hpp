@@ -138,6 +138,12 @@ namespace casadi {
     /** \brief Thread-local memory object type */
     std::string codegen_mem_type() const override { return "struct casadi_fatrop_data"; }
 
+    /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream &s) const override;
+
+    /** \brief Deserialize into MX */
+    static ProtoFunction* deserialize(DeserializingStream& s) { return new FatropInterface(s); }
+
   protected:
     /** \brief Deserializing constructor */
     explicit FatropInterface(DeserializingStream& s);
@@ -152,7 +158,7 @@ namespace casadi {
       const std::vector<casadi_ocp_block>& blocks, bool eye=false);
     Sparsity Isp_, ABsp_, CDsp_, RSQsp_;
 
-    std::vector< casadi_ocp_block > AB_blocks, CD_blocks, RSQ_blocks, I_blocks;
+    std::vector< casadi_ocp_block > AB_blocks_, CD_blocks_, RSQ_blocks_, I_blocks_;
 
     std::vector<casadi_int> nxs_;
     std::vector<casadi_int> nus_;

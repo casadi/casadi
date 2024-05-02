@@ -29,8 +29,9 @@ struct casadi_ocp_block {
 
 // SYMBOL "unpack_ocp_blocks"
 template<typename T1>
-void casadi_unpack_ocp_blocks(casadi_int N, casadi_ocp_block* blocks, const casadi_int* packed) {
+void casadi_unpack_ocp_blocks(casadi_ocp_block* blocks, const casadi_int* packed) {
     casadi_int i;
+    casadi_int N = *packed++;
     for (i=0;i<N;++i) {
         blocks[i].offset_r = *packed++;
         blocks[i].offset_c = *packed++;

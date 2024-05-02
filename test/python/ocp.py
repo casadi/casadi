@@ -695,7 +695,7 @@ class OCPtests(casadiTestCase):
 
         solutions = {}
         stats = {}
-        for solver, solver_options in [("ipopt",{}),("fatrop",{})]:
+        for solver, solver_options in [("ipopt",{}),("fatrop",{"fatrop":{"accept_every_trial_step":False,"tol":1e-8,"max_iter":100}})]:
             f = nlpsol('solver', solver, prob, solver_options)
             #if solver=="fatrop" and i==2: raise Exception() 
 
@@ -703,8 +703,9 @@ class OCPtests(casadiTestCase):
             solutions[solver] = f(**args)
             stats[solver] = f.stats()
             
-            if solver=="fatrop":
+            if solver!="ipopt":
                 self.check_codegen(f,args,std="c99",extralibs=["fatrop"])
+                self.check_serialize(f,args)
         
         for k in solutions["ipopt"].keys():
             if k in ["x","f","g","lam_g","lam_x","lam_p"]:

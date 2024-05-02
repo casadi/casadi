@@ -301,37 +301,37 @@ namespace casadi {
     */
     casadi_int offset_r = 0, offset_c = 0;
     for (casadi_int k=0;k<N_;++k) { // Loop over blocks
-      AB_blocks.push_back({offset_r,        offset_c,            nx[k+1], nx[k]+nu[k]});
-      CD_blocks.push_back({offset_r+nx[k+1], offset_c,           ng[k], nx[k]+nu[k]});
+      AB_blocks_.push_back({offset_r,        offset_c,            nx[k+1], nx[k]+nu[k]});
+      CD_blocks_.push_back({offset_r+nx[k+1], offset_c,           ng[k], nx[k]+nu[k]});
       offset_c+= nx[k]+nu[k];
       if (k+1<N_)
-        I_blocks.push_back({offset_r, offset_c, nx[k+1], nx[k+1]});
+        I_blocks_.push_back({offset_r, offset_c, nx[k+1], nx[k+1]});
         // TODO(jgillis) actually use these
         // test5.py versus tesst6.py
         //   test5 changes behaviour when piping stdout to file -> memory corruption
         //   logs are ever so slightly different
       else
-        I_blocks.push_back({offset_r, offset_c, nx[k+1], nx[k+1]});
+        I_blocks_.push_back({offset_r, offset_c, nx[k+1], nx[k+1]});
       offset_r+= nx[k+1]+ng[k];
     }
-    CD_blocks.push_back({offset_r, offset_c,           ng[N_], nx[N_]});
+    CD_blocks_.push_back({offset_r, offset_c,           ng[N_], nx[N_]});
 
     casadi_int offset = 0;
     AB_offsets_.push_back(0);
-    for (auto e : AB_blocks) {
+    for (auto e : AB_blocks_) {
       offset += e.rows*e.cols;
       AB_offsets_.push_back(offset);
     }
     offset = 0;
     CD_offsets_.push_back(0);
-    for (auto e : CD_blocks) {
+    for (auto e : CD_blocks_) {
       offset += e.rows*e.cols;
       CD_offsets_.push_back(offset);
     }
 
-    ABsp_ = blocksparsity(na_, nx_, AB_blocks);
-    CDsp_ = blocksparsity(na_, nx_, CD_blocks);
-    Isp_ = blocksparsity(na_, nx_, I_blocks, true);
+    ABsp_ = blocksparsity(na_, nx_, AB_blocks_);
+    CDsp_ = blocksparsity(na_, nx_, CD_blocks_);
+    Isp_ = blocksparsity(na_, nx_, I_blocks_, true);
 
     Sparsity total = ABsp_ + CDsp_ + Isp_;
 
@@ -351,14 +351,14 @@ namespace casadi {
     */
     offset = 0;
     for (casadi_int k=0;k<N_+1;++k) { // Loop over blocks
-      RSQ_blocks.push_back({offset, offset,       nx[k]+nu[k], nx[k]+nu[k]});
+      RSQ_blocks_.push_back({offset, offset,       nx[k]+nu[k], nx[k]+nu[k]});
       offset+= nx[k]+nu[k];
     }
-    RSQsp_ = blocksparsity(nx_, nx_, RSQ_blocks);
+    RSQsp_ = blocksparsity(nx_, nx_, RSQ_blocks_);
 
     offset = 0;
     RSQ_offsets_.push_back(0);
-    for (auto e : RSQ_blocks) {
+    for (auto e : RSQ_blocks_) {
       offset += e.rows*e.cols;
       RSQ_offsets_.push_back(offset);
     }
@@ -560,8 +560,9 @@ void FatropInterface::codegen_body(CodeGenerator& g) const {
 
 std::vector<casadi_int> fatrop_blocks_pack(const std::vector<casadi_ocp_block>& blocks) {
   size_t N = blocks.size();
-  std::vector<casadi_int> ret(4*N);
+  std::vector<casadi_int> ret(4*N+1);
   casadi_int* r = get_ptr(ret);
+  *r++ = N;
   for (casadi_int i=0;i<N;++i) {
     *r++ = blocks[i].offset_r;
     *r++ = blocks[i].offset_c;
@@ -586,10 +587,10 @@ void FatropInterface::set_fatrop_prob() {
   p_.Isp = Isp_;
   p_.I_offsets = get_ptr(I_offsets_);
 
-  p_.AB = get_ptr(AB_blocks);
-  p_.CD = get_ptr(CD_blocks);
-  p_.RSQ = get_ptr(RSQ_blocks);
-  p_.I = get_ptr(I_blocks);
+  p_.AB = get_ptr(AB_blocks_);
+  p_.CD = get_ptr(CD_blocks_);
+  p_.RSQ = get_ptr(RSQ_blocks_);
+  p_.I = get_ptr(I_blocks_);
   p_.N = N_;
 
   p_.sp_a = jacg_sp_;
@@ -609,9 +610,20 @@ void FatropInterface::set_fatrop_prob() {
     std::string n = "block_" + name + "[" + str(blocks.size()) + "]";
     g.local(n, "static struct casadi_ocp_block");
     g << "p." << name << " = block_" + name + ";\n";
-    g << "casadi_unpack_ocp_blocks(" << blocks.size()
-    << ", p." << name
+    g << "casadi_unpack_ocp_blocks(" << "p." << name
     << ", " << g.constant(fatrop_blocks_pack(blocks)) << ");\n";
+  }
+
+  void unpack_block(const std::vector<casadi_int>& p, std::vector<casadi_ocp_block>& blocks) {
+    const casadi_int* packed = get_ptr(p);
+    casadi_int N = *packed++;
+    blocks.resize(N);
+    for (casadi_int i=0;i<N;++i) {
+        blocks[i].offset_r = *packed++;
+        blocks[i].offset_c = *packed++;
+        blocks[i].rows = *packed++;
+        blocks[i].cols = *packed++;
+    }
   }
 
 void FatropInterface::set_fatrop_prob(CodeGenerator& g) const {
@@ -633,10 +645,10 @@ void FatropInterface::set_fatrop_prob(CodeGenerator& g) const {
   g << "p.Isp = " << g.sparsity(Isp_) << ";\n";
   g << "p.I_offsets = " << g.constant(I_offsets_) << ";\n";
 
-  codegen_unpack_block(g, "AB", AB_blocks);
-  codegen_unpack_block(g, "CD", CD_blocks);
-  codegen_unpack_block(g, "RSQ", RSQ_blocks);
-  codegen_unpack_block(g, "I", I_blocks);
+  codegen_unpack_block(g, "AB", AB_blocks_);
+  codegen_unpack_block(g, "CD", CD_blocks_);
+  codegen_unpack_block(g, "RSQ", RSQ_blocks_);
+  codegen_unpack_block(g, "I", I_blocks_);
   g << "p.N = " << N_ << ";\n";
 
   g.setup_callback("p.nlp_jac_g", get_function("nlp_jac_g"));
@@ -654,6 +666,75 @@ void FatropInterface::set_fatrop_prob(CodeGenerator& g) const {
 
   g << "casadi_fatrop_setup(&p);\n";
 
+}
+
+FatropInterface::FatropInterface(DeserializingStream& s) : Nlpsol(s) {
+  s.version("FatropInterface", 1);
+  s.unpack("FatropInterface::jacg_sp", jacg_sp_);
+  s.unpack("FatropInterface::hesslag_sp", hesslag_sp_);
+  s.unpack("FatropInterface::exact_hessian", exact_hessian_);
+  s.unpack("FatropInterface::opts", opts_);
+  s.unpack("FatropInterface::convexify", convexify_);
+
+
+  s.unpack("FatropInterface::Isp", Isp_);
+  s.unpack("FatropInterface::ABsp", ABsp_);
+  s.unpack("FatropInterface::CDsp", CDsp_);
+  s.unpack("FatropInterface::RSQsp", RSQsp_);
+
+  std::vector<casadi_int> AB_blocks;
+  s.unpack("FatropInterface::AB_blocks", AB_blocks);
+  unpack_block(AB_blocks, AB_blocks_);
+  std::vector<casadi_int> CD_blocks;
+  s.unpack("FatropInterface::CD_blocks", CD_blocks);
+  unpack_block(CD_blocks, CD_blocks_);
+  std::vector<casadi_int> RSQ_blocks;
+  s.unpack("FatropInterface::RSQ_blocks", RSQ_blocks);
+  unpack_block(RSQ_blocks, RSQ_blocks_);
+  std::vector<casadi_int> I_blocks;
+  s.unpack("FatropInterface::I_blocks", I_blocks);
+  unpack_block(I_blocks, I_blocks_);
+
+  s.unpack("FatropInterface::nxs", nxs_);
+  s.unpack("FatropInterface::nus", nus_);
+  s.unpack("FatropInterface::ngs", ngs_);
+  s.unpack("FatropInterface::N", N_);
+  s.unpack("FatropInterface::AB_offsets", AB_offsets_);
+  s.unpack("FatropInterface::CD_offsets", CD_offsets_);
+  s.unpack("FatropInterface::RSQ_offsets", RSQ_offsets_);
+  s.unpack("FatropInterface::I_offsets", I_offsets_);
+
+  set_fatrop_prob();
+}
+
+void FatropInterface::serialize_body(SerializingStream &s) const {
+  Nlpsol::serialize_body(s);
+  s.version("FatropInterface", 1);
+
+  s.pack("FatropInterface::jacg_sp", jacg_sp_);
+  s.pack("FatropInterface::hesslag_sp", hesslag_sp_);
+  s.pack("FatropInterface::exact_hessian", exact_hessian_);
+  s.pack("FatropInterface::opts", opts_);
+  s.pack("FatropInterface::convexify", convexify_);
+
+  s.pack("FatropInterface::Isp", Isp_);
+  s.pack("FatropInterface::ABsp", ABsp_);
+  s.pack("FatropInterface::CDsp", CDsp_);
+  s.pack("FatropInterface::RSQsp", RSQsp_);
+
+  s.pack("FatropInterface::AB_blocks", fatrop_blocks_pack(AB_blocks_));
+  s.pack("FatropInterface::CD_blocks", fatrop_blocks_pack(CD_blocks_));
+  s.pack("FatropInterface::RSQ_blocks", fatrop_blocks_pack(RSQ_blocks_));
+  s.pack("FatropInterface::I_blocks", fatrop_blocks_pack(I_blocks_));
+
+  s.pack("FatropInterface::nxs", nxs_);
+  s.pack("FatropInterface::nus", nus_);
+  s.pack("FatropInterface::ngs", ngs_);
+  s.pack("FatropInterface::N", N_);
+  s.pack("FatropInterface::AB_offsets", AB_offsets_);
+  s.pack("FatropInterface::CD_offsets", CD_offsets_);
+  s.pack("FatropInterface::RSQ_offsets", RSQ_offsets_);
+  s.pack("FatropInterface::I_offsets", I_offsets_);
 }
 
 } // namespace casadi
