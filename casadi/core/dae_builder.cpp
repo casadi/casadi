@@ -508,6 +508,12 @@ void DaeBuilder::add_when(const MX& cond, const MX& lhs, const MX& rhs) {
   (*this)->when_rhs_.push_back(rhs);
 }
 
+void DaeBuilder::clear_when() {
+  (*this)->when_cond_.clear();
+  (*this)->when_lhs_.clear();
+  (*this)->when_rhs_.clear();
+}
+
 void DaeBuilder::set_ode(const std::string& name, const MX& ode_rhs) {
   try {
     (*this)->set_ode(name, ode_rhs);

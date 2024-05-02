@@ -328,6 +328,9 @@ class CASADI_EXPORT DaeBuilder
   /// Add a when statement
   void add_when(const MX& cond, const MX& lhs, const MX& rhs);
 
+  /// Remove when statements
+  void clear_when();
+
   /// Check if dimensions match
   void sanity_check() const;
   ///@}
