@@ -176,11 +176,6 @@ class CASADI_EXPORT DaeBuilder
       \identifier{5u} */
   std::vector<MX> wdef() const;
 
-  /** \brief Auxiliary variables: Used e.g. to define functions
-
-      \identifier{5v} */
-  const std::vector<MX>& aux() const;
-
   /** \brief Initial conditions, left-hand-side */
   std::vector<MX> init_lhs() const;
 
