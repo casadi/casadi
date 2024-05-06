@@ -45,6 +45,29 @@ std::string to_string(DynOut v) {
   case DYN_ODE: return "ode";
   case DYN_ALG: return "alg";
   case DYN_QUAD: return "quad";
+  case DYN_ZERO: return "zero";
+  default: break;
+  }
+  return "";
+}
+
+std::string to_string(EventIn v) {
+  switch (v) {
+  case EVENT_T: return "t";
+  case EVENT_X0: return "x0";
+  case EVENT_Z0: return "z0";
+  case EVENT_P: return "p";
+  case EVENT_U: return "u";
+  case EVENT_INDEX: return "index";
+  default: break;
+  }
+  return "";
+}
+
+std::string to_string(EventOut v) {
+  switch (v) {
+  case EVENT_X: return "x";
+  case EVENT_Z: return "z";
   default: break;
   }
   return "";
@@ -60,9 +83,11 @@ std::string Integrator::bdyn_in(casadi_int i) {
     case BDYN_OUT_ODE: return "out_ode";
     case BDYN_OUT_ALG: return "out_alg";
     case BDYN_OUT_QUAD: return "out_quad";
+    case BDYN_OUT_ZERO: return "out_zero";
     case BDYN_ADJ_ODE: return "adj_ode";
     case BDYN_ADJ_ALG: return "adj_alg";
     case BDYN_ADJ_QUAD: return "adj_quad";
+    case BDYN_ADJ_ZERO: return "adj_zero";
   default: break;
   }
   return "";
@@ -815,9 +840,11 @@ int Integrator::bdae_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t* 
   m->arg[BDYN_OUT_ODE] = nullptr;  // out_ode
   m->arg[BDYN_OUT_ALG] = nullptr;  // out_alg
   m->arg[BDYN_OUT_QUAD] = nullptr;  // out_quad
+  m->arg[BDYN_OUT_ZERO] = nullptr;  // out_zero
   m->arg[BDYN_ADJ_ODE] = rx;  // adj_ode
   m->arg[BDYN_ADJ_ALG] = nullptr;  // adj_alg
   m->arg[BDYN_ADJ_QUAD] = rp;  // adj_quad
+  m->arg[BDYN_ADJ_ZERO] = nullptr;  // adj_zero
   m->res[BDAE_ADJ_X] = adj_x;  // adj_x
   m->res[BDAE_ADJ_Z] = adj_z;  // adj_z
   if (calc_sp_forward("daeB", m->arg, m->res, m->iw, m->w)) return 1;
@@ -833,11 +860,13 @@ int Integrator::bdae_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t* 
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_OUT_ODE] = nullptr;  // fwd:out_ode
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_OUT_ALG] = nullptr;  // fwd:out_alg
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_OUT_QUAD] = nullptr;  // fwd:out_quad
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_OUT_ZERO] = nullptr;  // fwd:out_zero
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_ADJ_ODE]
       = rx + (i + 1) * nrx1_ * nadj_;  // fwd:adj_ode
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_ADJ_ALG] = nullptr;  // fwd:adj_alg
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_ADJ_QUAD]
       = rp + (i + 1) * nrz1_ * nadj_;  // fwd:adj_quad
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_ADJ_ZERO] = nullptr;  // fwd:adj_zero
     m->res[BDAE_ADJ_X] = adj_x + (i + 1) * nrx1_ * nadj_;  // fwd:adj_x
     m->res[BDAE_ADJ_Z] = adj_z + (i + 1) * nrz1_ * nadj_;  // fwd:adj_z
     if (calc_sp_forward(forward_name("daeB", 1), m->arg, m->res, m->iw, m->w)) return 1;
@@ -857,9 +886,11 @@ int Integrator::bquad_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t*
   m->arg[BDYN_OUT_ODE] = nullptr;  // out_ode
   m->arg[BDYN_OUT_ALG] = nullptr;  // out_alg
   m->arg[BDYN_OUT_QUAD] = nullptr;  // out_quad
+  m->arg[BDYN_OUT_ZERO] = nullptr;  // out_zero
   m->arg[BDYN_ADJ_ODE] = rx;  // adj_ode
   m->arg[BDYN_ADJ_ALG] = rz;  // adj_alg
   m->arg[BDYN_ADJ_QUAD] = rp;  // adj_quad
+  m->arg[BDYN_ADJ_ZERO] = nullptr;  // adj_zero
   m->res[BQUAD_ADJ_P] = adj_p;  // adj_p
   m->res[BQUAD_ADJ_U] = adj_u;  // adj_u
   if (calc_sp_forward("quadB", m->arg, m->res, m->iw, m->w)) return 1;
@@ -875,12 +906,14 @@ int Integrator::bquad_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t*
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_OUT_ODE] = nullptr;  // fwd:out_ode
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_OUT_ALG] = nullptr;  // fwd:out_alg
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_OUT_QUAD] = nullptr;  // fwd:out_quad
+    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_OUT_ZERO] = nullptr;  // fwd:out_zero
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_ADJ_ODE] =
       rx + (i + 1) * nrx1_ * nadj_;  // fwd:adj_ode
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_ADJ_ALG] =
       rz + (i + 1) * nrz1_ * nadj_;  // fwd:adj_alg
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_ADJ_QUAD] =
       rp + (i + 1) * nrp1_ * nadj_;  // fwd:adj_quad
+    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_ADJ_ZERO] = nullptr;  // fwd:adj_zero
     m->res[BQUAD_ADJ_P] = adj_p ? adj_p + (i + 1) * nrq1_ * nadj_ : 0;  // fwd:adj_p
     m->res[BQUAD_ADJ_U] = adj_u ? adj_u + (i + 1) * nuq1_ * nadj_: 0;  // fwd:adj_u
     if (calc_sp_forward(forward_name("quadB", 1), m->arg, m->res, m->iw, m->w)) return 1;
@@ -1069,9 +1102,11 @@ int Integrator::bdae_sp_reverse(SpReverseMem* m, bvec_t* x, bvec_t* z,
   m->arg[BDYN_OUT_ODE] = nullptr;  // out_ode
   m->arg[BDYN_OUT_ALG] = nullptr;  // out_alg
   m->arg[BDYN_OUT_QUAD] = nullptr;  // out_quad
+  m->arg[BDYN_OUT_ZERO] = nullptr;  // out_zero
   m->arg[BDYN_ADJ_ODE] = rx;  // adj_ode
   m->arg[BDYN_ADJ_ALG] = nullptr;  // adj_alg
   m->arg[BDYN_ADJ_QUAD] = rp;  // adj_quad
+  m->arg[BDYN_ADJ_ZERO] = nullptr;  // adj_zero
   // Propagate through sensitivities
   for (casadi_int i = 0; i < nfwd_; ++i) {
     m->res[BDAE_ADJ_X] = adj_x + (i + 1) * nrx1_ * nadj_;  // fwd:adj_x
@@ -1086,11 +1121,13 @@ int Integrator::bdae_sp_reverse(SpReverseMem* m, bvec_t* x, bvec_t* z,
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_OUT_ODE] = nullptr;  // fwd:out_ode
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_OUT_ALG] = nullptr;  // fwd:out_alg
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_OUT_QUAD] = nullptr;  // fwd:out_quad
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_OUT_ZERO] = nullptr;  // fwd:out_zero
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_ADJ_ODE] =
       rx + (i + 1) * nrx1_ * nadj_;  // fwd:adj_ode
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_ADJ_ALG] = nullptr;  // fwd:adj_alg
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_ADJ_QUAD] =
       rp + (i + 1) * nrz1_ * nadj_;  // fwd:adj_quad
+    m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_ADJ_ZERO] = nullptr;  // fwd:adj_zero
     if (calc_sp_reverse(forward_name("daeB", 1), m->arg, m->res, m->iw, m->w)) return 1;
   }
   // Propagate through nondifferentiated
@@ -1112,9 +1149,11 @@ int Integrator::bquad_sp_reverse(SpReverseMem* m, bvec_t* x, bvec_t* z,
   m->arg[BDYN_OUT_ODE] = rx;  // out_ode
   m->arg[BDYN_OUT_ALG] = rz;  // out_alg
   m->arg[BDYN_OUT_QUAD] = rp;  // out_quad
+  m->arg[BDYN_OUT_ZERO] = nullptr;  // out_zero
   m->arg[BDYN_ADJ_ODE] = rx;  // adj_ode
   m->arg[BDYN_ADJ_ALG] = rz;  // adj_alg
   m->arg[BDYN_ADJ_QUAD] = rp;  // adj_quad
+  m->arg[BDYN_ADJ_ZERO] = nullptr;  // adj_zero
   // Propagate through sensitivities
   for (casadi_int i = 0; i < nfwd_; ++i) {
     m->res[BQUAD_ADJ_P] = adj_p ? adj_p + (i + 1) * nrq1_ * nadj_ : 0;  // fwd:adj_p
@@ -1129,12 +1168,14 @@ int Integrator::bquad_sp_reverse(SpReverseMem* m, bvec_t* x, bvec_t* z,
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_OUT_ODE] = nullptr;  // fwd:out_ode
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_OUT_ALG] = nullptr;  // fwd:out_alg
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_OUT_QUAD] = nullptr;  // fwd:out_quad
+    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_OUT_ZERO] = nullptr;  // fwd:out_zero
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_ADJ_ODE] =
       rx + (i + 1) * nrx1_ * nadj_;  // fwd:adj_ode
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_ADJ_ALG] =
       rz + (i + 1) * nrz1_ * nadj_;  // fwd:adj_alg
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_ADJ_QUAD] =
       rp + (i + 1) * nrp1_ * nadj_;  // fwd:adj_quad
+    m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_ADJ_ZERO] = nullptr;  // fwd:adj_zero
     if (calc_sp_reverse(forward_name("quadB", 1), m->arg, m->res, m->iw, m->w)) return 1;
   }
   // Propagate through nondifferentiated
@@ -2087,6 +2128,8 @@ Function Integrator::map2oracle(const std::string& name,
       de_out[DYN_ALG]=i.second;
     } else if (i.first=="quad") {
       de_out[DYN_QUAD]=i.second;
+    } else if (i.first=="zero") {
+      de_out[DYN_ZERO]=i.second;
     } else {
       casadi_error("No such field: " + i.first);
     }
@@ -2124,7 +2167,7 @@ Function Integrator::map2oracle(const std::string& name,
 void Integrator::serialize_body(SerializingStream &s) const {
   OracleFunction::serialize_body(s);
 
-  s.version("Integrator", 2);
+  s.version("Integrator", 3);
 
   s.pack("Integrator::sp_jac_dae", sp_jac_dae_);
   s.pack("Integrator::sp_jac_rdae", sp_jac_rdae_);
@@ -2176,7 +2219,7 @@ ProtoFunction* Integrator::deserialize(DeserializingStream& s) {
 }
 
 Integrator::Integrator(DeserializingStream & s) : OracleFunction(s) {
-  s.version("Integrator", 2);
+  s.version("Integrator", 3);
 
   s.unpack("Integrator::sp_jac_dae", sp_jac_dae_);
   s.unpack("Integrator::sp_jac_rdae", sp_jac_rdae_);

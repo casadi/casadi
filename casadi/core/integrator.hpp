@@ -186,12 +186,29 @@ enum DynIn {
   DYN_U,
   DYN_NUM_IN};
 
-/// Inputs of the symbolic representation of the DAE
+/// Outputs of the symbolic representation of the DAE
 enum DynOut {
   DYN_ODE,
   DYN_ALG,
   DYN_QUAD,
+  DYN_ZERO,
   DYN_NUM_OUT};
+
+/// Inputs of an event transition function
+enum EventIn {
+  EVENT_T,
+  EVENT_X0,
+  EVENT_Z0,
+  EVENT_P,
+  EVENT_U,
+  EVENT_INDEX,
+  EVENT_NUM_IN};
+
+/// Outputs of an event transition function
+enum EventOut {
+  EVENT_X,
+  EVENT_Z,
+  EVENT_NUM_OUT};
 
 /// Input arguments of an integrator
 enum IntegratorInput {
@@ -241,12 +258,20 @@ template<> struct enum_traits<DynIn> {
 template<> struct enum_traits<DynOut> {
   static const size_t n_enum = DYN_NUM_OUT;
 };
+template<> struct enum_traits<EventIn> {
+  static const size_t n_enum = EVENT_NUM_IN;
+};
+template<> struct enum_traits<EventOut> {
+  static const size_t n_enum = EVENT_NUM_OUT;
+};
 ///@}
 
 ///@{
 /// Convert to string
 CASADI_EXPORT std::string to_string(DynIn v);
 CASADI_EXPORT std::string to_string(DynOut v);
+CASADI_EXPORT std::string to_string(EventIn v);
+CASADI_EXPORT std::string to_string(EventOut v);
 ///@}
 
 #endif // SWIG
