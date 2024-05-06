@@ -593,6 +593,12 @@ void Integrator::init(const Dict& opts) {
   nq1_ = oracle_.numel_out(DYN_QUAD);
   np1_ = oracle_.numel_in(DYN_P);
   nu1_ = oracle_.numel_in(DYN_U);
+  ne_ = oracle_.numel_out(DYN_ZERO);
+
+  // Event support not implemented
+  if (ne_ > 0) {
+    casadi_warning("Event support has not yet been implemented");
+  }
 
   // Consistency checks
   casadi_assert(nx1_ > 0, "Ill-posed ODE - no state");
@@ -650,6 +656,8 @@ void Integrator::init(const Dict& opts) {
     create_forward("daeF", 1);
     if (nq_ > 0) create_forward("quadF", 1);
   }
+  // Zero-crossing function
+  if (ne_ > 0) create_function("zero", dyn_in(), zero_out());
 
   // Create problem functions, backward problem
   if (nadj_ > 0) {

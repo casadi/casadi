@@ -1564,6 +1564,7 @@ std::string to_string(DaeBuilderInternal::DaeBuilderInternalIn v) {
   case DaeBuilderInternal::DAE_BUILDER_D: return "d";
   case DaeBuilderInternal::DAE_BUILDER_W: return "w";
   case DaeBuilderInternal::DAE_BUILDER_Y: return "y";
+  case DaeBuilderInternal::DAE_BUILDER_E: return "e";
   default: break;
   }
   return "";
@@ -1574,6 +1575,7 @@ std::string to_string(DaeBuilderInternal::DaeBuilderInternalOut v) {
   case DaeBuilderInternal::DAE_BUILDER_ODE: return "ode";
   case DaeBuilderInternal::DAE_BUILDER_ALG: return "alg";
   case DaeBuilderInternal::DAE_BUILDER_QUAD: return "quad";
+  case DaeBuilderInternal::DAE_BUILDER_ZERO: return "zero";
   case DaeBuilderInternal::DAE_BUILDER_DDEF: return "ddef";
   case DaeBuilderInternal::DAE_BUILDER_WDEF: return "wdef";
   case DaeBuilderInternal::DAE_BUILDER_YDEF: return "ydef";
@@ -1594,6 +1596,7 @@ std::vector<MX> DaeBuilderInternal::input(DaeBuilderInternalIn ind) const {
   case DAE_BUILDER_Z: return var(z_);
   case DAE_BUILDER_Q: return var(q_);
   case DAE_BUILDER_Y: return var(y_);
+  case DAE_BUILDER_E: return var(e_);
   default: return std::vector<MX>{};
   }
 }
@@ -1611,6 +1614,7 @@ std::vector<MX> DaeBuilderInternal::output(DaeBuilderInternalOut ind) const {
   case DAE_BUILDER_ODE: return ode();
   case DAE_BUILDER_ALG: return alg();
   case DAE_BUILDER_QUAD: return quad();
+  case DAE_BUILDER_ZERO: return zero();
   case DAE_BUILDER_DDEF: return ddef();
   case DAE_BUILDER_WDEF: return wdef();
   case DAE_BUILDER_YDEF: return ydef();
@@ -2395,6 +2399,14 @@ std::vector<MX> DaeBuilderInternal::quad() const {
   return ret;
 }
 
+
+std::vector<MX> DaeBuilderInternal::zero() const {
+  std::vector<MX> ret;
+  ret.reserve(e_.size());
+  for (size_t v : e_) ret.push_back(variable(v).beq);
+  return ret;
+}
+
 std::vector<MX> DaeBuilderInternal::init_lhs() const {
   std::vector<MX> ret;
   ret.reserve(init_.size());
@@ -2501,6 +2513,15 @@ MX DaeBuilderInternal::add_y(const std::string& name, const MX& new_ydef) {
   v.causality = Causality::OUTPUT;
   v.beq = new_ydef;
   y_.push_back(v.index);
+  return v.v;
+}
+
+MX DaeBuilderInternal::add_e(const std::string& name, const MX& new_edef) {
+  Variable& v = new_variable(name);
+  v.v = MX::sym(name);
+  v.causality = Causality::OUTPUT;
+  v.beq = new_edef;
+  e_.push_back(v.index);
   return v.v;
 }
 
@@ -2809,7 +2830,7 @@ void DaeBuilderInternal::import_dynamic_equations(const XmlNode& eqs) {
           // Not implemented
           casadi_error(n_equ[0].name + " in when equation not supported");
         }
-        // Hack: Turn "when" boolean expression into a zero-crossing expression
+        // Turn non-snooth zero-crossing expression into a smooth zero-crossing expression
         MX zc;
         switch (cond.beq.op()) {
           case OP_LT:
@@ -2817,7 +2838,7 @@ void DaeBuilderInternal::import_dynamic_equations(const XmlNode& eqs) {
             zc = cond.beq.dep(1) - cond.beq.dep(0);
             break;
           default:
-            casadi_error("Cannot turn " + str(cond.beq) + " into a zero-crossing expression");
+            casadi_error("Cannot turn " + str(cond.beq) + " into a smooth expression");
         }
         set_init(cond.name, MX());  // remove initial conditions, if any
         auto w_it = std::find(w_.begin(), w_.end(), cond.index);
@@ -2825,6 +2846,8 @@ void DaeBuilderInternal::import_dynamic_equations(const XmlNode& eqs) {
         auto x_it = std::find(x_.begin(), x_.end(), cond.index);
         if (x_it != x_.end()) x_.erase(x_it);  // remove from states
 
+        // Create event indicator
+        add_e(cond.name + "_smooth", zc);
         // Add to list of when equations
         when_cond_.push_back(zc);
         when_lhs_.push_back(lhs);

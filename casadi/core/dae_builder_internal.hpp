@@ -285,6 +285,7 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
     DAE_BUILDER_Z,
     DAE_BUILDER_Q,
     DAE_BUILDER_Y,
+    DAE_BUILDER_E,
     DAE_BUILDER_NUM_IN
   };
 
@@ -293,6 +294,7 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
     DAE_BUILDER_ODE,
     DAE_BUILDER_ALG,
     DAE_BUILDER_QUAD,
+    DAE_BUILDER_ZERO,
     DAE_BUILDER_DDEF,
     DAE_BUILDER_WDEF,
     DAE_BUILDER_YDEF,
@@ -454,7 +456,7 @@ protected:
   std::unordered_map<std::string, size_t> varind_;
 
   /// Ordered variables
-  std::vector<size_t> t_, p_, u_, x_, z_, q_, c_, d_, w_, y_;
+  std::vector<size_t> t_, p_, u_, x_, z_, q_, c_, d_, w_, y_, e_;
 
   // Initial equations
   std::vector<size_t> init_;
@@ -499,6 +501,9 @@ protected:
       \identifier{10} */
   std::vector<MX> quad() const;
 
+  /** \brief Zero crossing functions */
+  std::vector<MX> zero() const;
+
   /** \brief Initial conditions, left-hand-side */
   std::vector<MX> init_lhs() const;
 
@@ -517,6 +522,7 @@ protected:
   MX add_d(const std::string& name, const MX& new_ddef);
   MX add_w(const std::string& name, const MX& new_wdef);
   MX add_y(const std::string& name, const MX& new_ydef);
+  MX add_e(const std::string& name, const MX& new_edef);
   ///@}
 
   ///@{

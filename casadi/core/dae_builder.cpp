@@ -84,8 +84,16 @@ std::vector<std::string> DaeBuilder::q() const {
   return name((*this)->q_);
 }
 
+std::vector<std::string> DaeBuilder::e() const {
+  return name((*this)->e_);
+}
+
 std::vector<MX> DaeBuilder::quad() const {
   return (*this)->quad();
+}
+
+std::vector<MX> DaeBuilder::zero() const {
+  return (*this)->zero();
 }
 
 std::vector<std::string> DaeBuilder::y() const {
@@ -189,6 +197,10 @@ casadi_int DaeBuilder::nz() const {
 
 casadi_int DaeBuilder::nq() const {
   return (*this)->q_.size();
+}
+
+casadi_int DaeBuilder::ne() const {
+  return (*this)->e_.size();
 }
 
 casadi_int DaeBuilder::ny() const {
@@ -388,6 +400,10 @@ void DaeBuilder::register_y(const std::string& name) {
   (*this)->y_.push_back(find(name));
 }
 
+void DaeBuilder::register_e(const std::string& name) {
+  (*this)->e_.push_back(find(name));
+}
+
 void DaeBuilder::clear_all(const std::string& v) {
   try {
     (*this)->clear_all(v);
@@ -488,6 +504,15 @@ MX DaeBuilder::add_y(const std::string& name, const MX& new_ydef) {
     return (*this)->add_y(name, new_ydef);
   } catch (std::exception& e) {
     THROW_ERROR("add_y", e.what());
+    return MX();
+  }
+}
+
+MX DaeBuilder::add_e(const std::string& name, const MX& new_edef) {
+  try {
+    return (*this)->add_e(name, new_edef);
+  } catch (std::exception& e) {
+    THROW_ERROR("add_e", e.what());
     return MX();
   }
 }

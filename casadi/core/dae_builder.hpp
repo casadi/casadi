@@ -117,10 +117,16 @@ class CASADI_EXPORT DaeBuilder
       \identifier{5j} */
   std::vector<std::string> q() const;
 
+  /** \brief Event indicators */
+  std::vector<std::string> e() const;
+
   /** \brief Quadrature equations
 
       \identifier{5k} */
   std::vector<MX> quad() const;
+
+  /** \brief Zero-crossing functions */
+  std::vector<MX> zero() const;
 
   /** \brief Output variables
 
@@ -236,6 +242,9 @@ class CASADI_EXPORT DaeBuilder
       \identifier{67} */
   casadi_int nq() const;
 
+  /** \brief Event indicators */
+  casadi_int ne() const;
+
   /** \brief Output variables
 
       \identifier{68} */
@@ -301,6 +310,9 @@ class CASADI_EXPORT DaeBuilder
   /// Add a new output
   MX add_y(const std::string& name, const MX& new_ydef);
 
+  /// Add a new event indicator
+  MX add_e(const std::string& name, const MX& new_edef);
+
   /// Specify the ordinary differential equation for a state
   void set_ode(const std::string& name, const MX& ode_rhs);
 
@@ -345,6 +357,7 @@ class CASADI_EXPORT DaeBuilder
   void register_d(const std::string& name);
   void register_w(const std::string& name);
   void register_y(const std::string& name);
+  void register_e(const std::string& name);
   ///@}
 
   /** @name Manipulation

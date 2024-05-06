@@ -297,6 +297,8 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   static std::vector<std::string> dae_out() { return {"ode", "alg"}; }
   enum QuadOut { QUAD_QUAD, QUAD_NUM_OUT};
   static std::vector<std::string> quad_out() { return {"quad"}; }
+  enum ZeroOut { ZERO_ZERO, ZERO_NUM_OUT};
+  static std::vector<std::string> zero_out() { return {"zero"}; }
   enum BDynIn { BDYN_T, BDYN_X, BDYN_Z, BDYN_P, BDYN_U,
     BDYN_OUT_ODE, BDYN_OUT_ALG, BDYN_OUT_QUAD, BDYN_OUT_ZERO,
     BDYN_ADJ_ODE, BDYN_ADJ_ALG, BDYN_ADJ_QUAD, BDYN_ADJ_ZERO, BDYN_NUM_IN};
@@ -334,6 +336,9 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
 
   /// Number of controls
   casadi_int nu_, nu1_;
+
+  /// Number of of zero-crossing functions
+  casadi_int ne_;
 
   // Nominal values for states
   std::vector<double> nom_x_, nom_z_;
