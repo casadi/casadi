@@ -196,18 +196,18 @@ enum DynOut {
 
 /// Inputs of an event transition function
 enum EventIn {
+  EVENT_INDEX,
   EVENT_T,
-  EVENT_X0,
-  EVENT_Z0,
+  EVENT_X,
+  EVENT_Z,
   EVENT_P,
   EVENT_U,
-  EVENT_INDEX,
   EVENT_NUM_IN};
 
 /// Outputs of an event transition function
 enum EventOut {
-  EVENT_X,
-  EVENT_Z,
+  EVENT_POST_X,
+  EVENT_POST_Z,
   EVENT_NUM_OUT};
 
 /// Input arguments of an integrator

@@ -53,12 +53,12 @@ std::string to_string(DynOut v) {
 
 std::string to_string(EventIn v) {
   switch (v) {
+  case EVENT_INDEX: return "index";
   case EVENT_T: return "t";
-  case EVENT_X0: return "x0";
-  case EVENT_Z0: return "z0";
+  case EVENT_X: return "x";
+  case EVENT_Z: return "z";
   case EVENT_P: return "p";
   case EVENT_U: return "u";
-  case EVENT_INDEX: return "index";
   default: break;
   }
   return "";
@@ -66,8 +66,8 @@ std::string to_string(EventIn v) {
 
 std::string to_string(EventOut v) {
   switch (v) {
-  case EVENT_X: return "x";
-  case EVENT_Z: return "z";
+  case EVENT_POST_X: return "post_x";
+  case EVENT_POST_Z: return "post_z";
   default: break;
   }
   return "";
