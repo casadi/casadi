@@ -342,7 +342,7 @@ int Integrator::eval(const double** arg, double** res,
 
   // Reset solver, take time to t0
   m->t = t0_;
-  reset(m, x0, z0, p);
+  reset(m, u, x0, z0, p);
 
   // Next stop time due to step change in input
   casadi_int k_stop = next_stop(0, u);
@@ -1952,12 +1952,15 @@ void FixedStepIntegrator::stepB(FixedStepMemory* m, double t, double h,
   }
 }
 
-void FixedStepIntegrator::reset(IntegratorMemory* mem, const double* x, const double* z,
-    const double* p) const {
+void FixedStepIntegrator::reset(IntegratorMemory* mem, const double* u, const double* x,
+    const double* z, const double* p) const {
   auto m = static_cast<FixedStepMemory*>(mem);
 
   // Set parameters
   casadi_copy(p, np_, m->p);
+
+  // Set controls
+  casadi_copy(u, nu_, m->u);
 
   // Update the state
   casadi_copy(x, nx_, m->x);

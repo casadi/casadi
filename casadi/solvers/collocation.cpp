@@ -228,11 +228,11 @@ namespace casadi {
   }
 
   void Collocation::reset(IntegratorMemory* mem,
-      const double* x, const double* z, const double* p) const {
+      const double* u, const double* x, const double* z, const double* p) const {
     auto m = static_cast<FixedStepMemory*>(mem);
 
     // Reset the base classes
-    ImplicitFixedStepIntegrator::reset(mem, x, z, p);
+    ImplicitFixedStepIntegrator::reset(mem, u, x, z, p);
 
     // Initial guess for v (only non-augmented system part)
     double* v = m->v;

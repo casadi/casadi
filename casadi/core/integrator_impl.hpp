@@ -138,7 +138,7 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
 
       \identifier{25a} */
   virtual void reset(IntegratorMemory* mem,
-    const double* x, const double* z, const double* p) const = 0;
+    const double* u, const double* x, const double* z, const double* p) const = 0;
 
   /** \brief  Find next stop time
 
@@ -523,7 +523,7 @@ class CASADI_EXPORT FixedStepIntegrator : public Integrator {
 
       \identifier{25i} */
   void reset(IntegratorMemory* mem,
-    const double* x, const double* z, const double* p) const override;
+    const double* u, const double* x, const double* z, const double* p) const override;
 
   /** \brief  Advance solution in time
 

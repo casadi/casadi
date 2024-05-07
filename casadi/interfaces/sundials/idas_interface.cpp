@@ -361,12 +361,12 @@ int IdasInterface::init_mem(void* mem) const {
 }
 
 void IdasInterface::reset(IntegratorMemory* mem,
-    const double* _x, const double* _z, const double* _p) const {
+    const double* _u, const double* _x, const double* _z, const double* _p) const {
   if (verbose_) casadi_message(name_ + "::reset");
   auto m = to_mem(mem);
 
   // Reset the base classes
-  SundialsInterface::reset(mem, _x, _z, _p);
+  SundialsInterface::reset(mem, _u, _x, _z, _p);
 
   // Re-initialize
   N_VConst(0.0, m->xzdot);

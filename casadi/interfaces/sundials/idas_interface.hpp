@@ -124,7 +124,7 @@ class CASADI_INTEGRATOR_IDAS_EXPORT IdasInterface : public SundialsInterface {
 
   /** \brief  Reset the forward problem and bring the time back to t0 */
   void reset(IntegratorMemory* mem,
-    const double* x, const double* z, const double* p) const override;
+    const double* u, const double* x, const double* z, const double* p) const override;
 
   /** \brief  Advance solution in time */
   void advance(IntegratorMemory* mem,
