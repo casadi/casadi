@@ -42,7 +42,7 @@ struct CASADI_EXPORT IntegratorMemory : public OracleMemory {
   // Work vectors, forward problem
   double *x, *z, *p, *u;
   // Work vectors, backward problem
-  double *adj_x, *adj_z, *adj_p, *adj_ode, *adj_q;
+  double *adj_x, *adj_z, *adj_p, *adj_q;
   // Temporary work vectors of length max(nx + nz, nrx, nrz)
   double *tmp1, *tmp2;
   // Current control interval

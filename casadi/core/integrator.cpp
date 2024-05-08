@@ -691,7 +691,6 @@ void Integrator::init(const Dict& opts) {
   alloc_w(nu_, true); // u
 
   alloc_w(nrx_ + nrz_, true); // adj_x, adj_z
-  alloc_w(nrx_, true); // adj_ode
   alloc_w(nrq_, true); // adj_p
   alloc_w(nrp_, true); // adj_q
 
@@ -716,7 +715,6 @@ void Integrator::set_work(void* mem, const double**& arg, double**& res,
 
   m->adj_x = w; w += nrx_;  // doubles as adj_xz
   m->adj_z = w; w += nrz_;
-  m->adj_ode = w; w += nrx_;
   m->adj_p = w; w += nrq_;
   m->adj_q = w; w += nrp_;
 
@@ -978,13 +976,14 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
   res += n_out_;
 
   // Work vectors
-  bvec_t *ode = w; w += nx_;
-  bvec_t *alg = w; w += nz_;
   bvec_t *x = w; w += nx_;
+
   bvec_t *adj_x = w; w += nrx_;
   bvec_t *adj_z = w; w += nrz_;
-  bvec_t *adj_ode = w; w += nrx_;
   bvec_t *adj_p = w; w += nrq_;
+
+  bvec_t *tmp1 = w; w += nx_ + nz_;
+  bvec_t *tmp2 = w; w += nrx_;
 
   // Memory struct for function calls below
   SpForwardMem m = {arg, res, iw, w};
@@ -995,26 +994,25 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
   // Propagate forward
   for (casadi_int k = 0; k < nt(); ++k) {
     // Propagate through DAE function
-    if (fdae_sp_forward(&m, x, p, u, ode, alg)) return 1;
-    for (casadi_int i = 0; i < nx_; ++i) ode[i] |= x[i];
+    if (fdae_sp_forward(&m, x, p, u, tmp1, tmp1 + nx_)) return 1;
+    for (casadi_int i = 0; i < nx_; ++i) tmp1[i] |= x[i];
 
     // "Solve" in order to resolve interdependencies (cf. Rootfinder)
-    std::copy_n(ode, nx_, w);
-    std::copy_n(alg, nz_, w + nx_);
-    std::fill_n(ode, nx_ + nz_, 0);
-    sp_jac_dae_.spsolve(ode, w, false);
+    std::copy_n(tmp1, nx_ + nx_, w);
+    std::fill_n(tmp1, nx_ + nz_, 0);
+    sp_jac_dae_.spsolve(tmp1, w, false);
 
     // Get xf and zf
-    if (xf) std::copy_n(ode, nx_, xf);
-    if (zf) std::copy_n(alg, nz_, zf);
+    if (xf) std::copy_n(tmp1, nx_, xf);
+    if (zf) std::copy_n(tmp1 + nx_, nz_, zf);
 
     // Propagate to quadratures
     if (nq_ > 0 && qf) {
-      if (fquad_sp_forward(&m, ode, alg, p, u, qf)) return 1;
+      if (fquad_sp_forward(&m, tmp1, tmp1 + nx_, p, u, qf)) return 1;
     }
 
     // Shift time
-    std::copy_n(ode, nx_, x);
+    std::copy_n(tmp1, nx_, x);
     if (xf) xf += nx_;
     if (zf) zf += nz_;
     if (qf) qf += nq_;
@@ -1022,8 +1020,8 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
   }
 
   if (nrx_ > 0) {
-    // Clear adj_ode, adj_p0
-    std::fill_n(adj_ode, nrx_, 0);
+    // Clear tmp2, adj_p0
+    std::fill_n(tmp2, nrx_, 0);
     if (adj_p0) std::fill_n(adj_p0, nrq_, 0);
 
     // Take adj_xf, rp, adj_u past the last grid point
@@ -1041,12 +1039,12 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
 
       // Add impulse from adj_xf
       if (adj_xf) {
-        for (casadi_int i = 0; i < nrx_; ++i) adj_ode[i] |= adj_xf[i];
+        for (casadi_int i = 0; i < nrx_; ++i) tmp2[i] |= adj_xf[i];
       }
 
       // Propagate through DAE function
-      if (bdae_sp_forward(&m, ode, alg, p, u, adj_ode, adj_qf, adj_x, adj_z)) return 1;
-      for (casadi_int i = 0; i < nrx_; ++i) adj_x[i] |= adj_ode[i];
+      if (bdae_sp_forward(&m, tmp1, tmp1 + nx_, p, u, tmp2, adj_qf, adj_x, adj_z)) return 1;
+      for (casadi_int i = 0; i < nrx_; ++i) adj_x[i] |= tmp2[i];
 
       // "Solve" in order to resolve interdependencies (cf. Rootfinder)
       std::copy_n(adj_x, nrx_ + nrz_, w);
@@ -1055,15 +1053,16 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
 
       // Propagate to quadratures
       if ((nrq_ > 0 && adj_p0) || (nuq_ > 0 && adj_u)) {
-        if (bquad_sp_forward(&m, ode, alg, p, u, adj_x, adj_z, adj_qf, adj_p, adj_u)) return 1;
+        if (bquad_sp_forward(&m, tmp1, tmp1 + nx_, p, u, adj_x, adj_z, adj_qf, adj_p, adj_u))
+          return 1;
         // Sum contributions to adj_p0
         if (adj_p0) {
           for (casadi_int i = 0; i < nrq_; ++i) adj_p0[i] |= adj_p[i];
         }
       }
 
-      // Update adj_ode
-      std::copy_n(adj_x, nx_, adj_ode);
+      // Update tmp2
+      std::copy_n(adj_x, nx_, tmp2);
     }
 
     // Get adj_x0 at initial time
@@ -1910,7 +1909,7 @@ void FixedStepIntegrator::retreat(IntegratorMemory* mem, const double* u,
     double t = m->t_next + j * h;
 
     // Update the previous step
-    casadi_copy(m->adj_x, nrx_, m->adj_ode);
+    casadi_copy(m->adj_x, nrx_, m->tmp1);
     casadi_copy(m->adj_p, nrq_, m->adj_p_prev);
     casadi_copy(m->adj_u, nuq_, m->adj_u_prev);
 
@@ -1919,7 +1918,7 @@ void FixedStepIntegrator::retreat(IntegratorMemory* mem, const double* u,
     stepB(m, t, h,
       m->x_tape + nx_ * tapeind, m->x_tape + nx_ * (tapeind + 1),
       m->v_tape + nv_ * tapeind,
-      m->adj_ode, m->rv, m->adj_x, m->adj_p, m->adj_u);
+      m->tmp1, m->rv, m->adj_x, m->adj_p, m->adj_u);
     casadi_clear(m->rv, nrv_);
     casadi_axpy(nrq_, 1., m->adj_p_prev, m->adj_p);
     casadi_axpy(nuq_, 1., m->adj_u_prev, m->adj_u);
