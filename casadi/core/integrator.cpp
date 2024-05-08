@@ -2316,6 +2316,9 @@ void Integrator::reset(IntegratorMemory* m, const double* x, const double* z,
   // Update the state
   casadi_copy(x, nx_, m->x);
   casadi_copy(z, nz_, m->z);
+
+  // Set parameters
+  casadi_copy(p, np_, m->p);
 }
 
 casadi_int Integrator::next_stop(casadi_int k, const double* u) const {

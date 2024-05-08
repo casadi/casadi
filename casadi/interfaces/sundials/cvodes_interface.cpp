@@ -281,7 +281,8 @@ void CvodesInterface::advance(IntegratorMemory* mem,
   }
 
   // Set function outputs
-  casadi_copy(NV_DATA_S(m->xz), nx_, x);
+  casadi_copy(NV_DATA_S(m->xz), nx_, m->x);
+  casadi_copy(m->x, nx_, x);
   casadi_copy(NV_DATA_S(m->q), nq_, q);
 
   // Get stats
