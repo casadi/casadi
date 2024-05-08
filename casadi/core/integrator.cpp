@@ -359,7 +359,7 @@ int Integrator::eval(const double** arg, double** res,
   double* q = res[INTEGRATOR_QF];
   double* rx = res[INTEGRATOR_ADJ_X0];
   double* rq = res[INTEGRATOR_ADJ_P];
-  double* uq = res[INTEGRATOR_ADJ_U];
+  double* adj_u = res[INTEGRATOR_ADJ_U];
   res += INTEGRATOR_NUM_OUT;
 
   // Setup memory object
@@ -395,7 +395,7 @@ int Integrator::eval(const double** arg, double** res,
     if (adj_xf) adj_xf += nrx_ * nt();
     if (rz0) rz0 += nrz_ * nt();
     if (rp) rp += nrp_ * nt();
-    if (uq) uq += nuq_ * nt();
+    if (adj_u) adj_u += nuq_ * nt();
     // Next stop time due to step change in input
     k_stop = nt();
     // Reset the solver
@@ -409,7 +409,7 @@ int Integrator::eval(const double** arg, double** res,
       if (adj_xf) adj_xf -= nrx_;
       if (rz0) rz0 -= nrz_;
       if (rp) rp -= nrp_;
-      if (uq) uq -= nuq_;
+      if (adj_u) adj_u -= nuq_;
       if (u) u -= nu_;
       if (!all_zero(adj_xf, nrx_) || !all_zero(rz0, nrz_) || !all_zero(rp, nrp_)) {
         if (verbose_) casadi_message("Impulse from adjoint seeds at output time " + str(m->k));
@@ -427,25 +427,25 @@ int Integrator::eval(const double** arg, double** res,
         if (verbose_) casadi_message("Integrating backward from output time " + str(m->k)
           + ": t_next = " + str(m->t_next) + ", t_stop = " + str(m->t_stop));
         if (m->k > 0) {
-          retreat(m, u, 0, 0, uq);
+          retreat(m, u, 0, 0, adj_u);
         } else {
-          retreat(m, u, rx, rq, uq);
+          retreat(m, u, rx, rq, adj_u);
         }
       } else {
         if (verbose_) casadi_message("No adjoint seeds from output time " + str(m->k)
           + ": t_next = " + str(m->t_next) + ", t_stop = " + str(m->t_stop));
-        casadi_clear(uq, nuq_);
+        casadi_clear(adj_u, nuq_);
         if (m->k == 0) {
           casadi_clear(rx, nrx_);
           casadi_clear(rq, nrq_);
         }
       }
     }
-    // uq should contain the contribution from the grid point, not cumulative
-    if (uq) {
+    // adj_u should contain the contribution from the grid point, not cumulative
+    if (adj_u) {
       for (m->k = 0; m->k < nt() - 1; ++m->k) {
-        casadi_axpy(nuq_, -1., uq + nuq_, uq);
-        uq += nuq_;
+        casadi_axpy(nuq_, -1., adj_u + nuq_, adj_u);
+        adj_u += nuq_;
       }
     }
   }
@@ -1801,9 +1801,9 @@ void FixedStepIntegrator::init(const Dict& opts) {
 
   // Work vectors, backward problem
   alloc_w(nrv_, true); // rv
-  alloc_w(nuq_, true); // uq
+  alloc_w(nuq_, true); // adj_u
   alloc_w(nrq_, true); // rq_prev
-  alloc_w(nuq_, true); // uq_prev
+  alloc_w(nuq_, true); // adj_u_prev
 
   // Allocate tape if backward states are present
   if (nrx_ > 0) {
@@ -1827,9 +1827,9 @@ void FixedStepIntegrator::set_work(void* mem, const double**& arg, double**& res
 
   // Work vectors, backward problem
   m->rv = w; w += nrv_;
-  m->uq = w; w += nuq_;
+  m->adj_u = w; w += nuq_;
   m->rq_prev = w; w += nrq_;
-  m->uq_prev = w; w += nuq_;
+  m->adj_u_prev = w; w += nuq_;
 
   // Allocate tape if backward states are present
   if (nrx_ > 0) {
@@ -1885,7 +1885,7 @@ void FixedStepIntegrator::advance(IntegratorMemory* mem,
 }
 
 void FixedStepIntegrator::retreat(IntegratorMemory* mem, const double* u,
-    double* rx, double* rq, double* uq) const {
+    double* rx, double* rq, double* adj_u) const {
   auto m = static_cast<FixedStepMemory*>(mem);
 
   // Set controls
@@ -1903,23 +1903,23 @@ void FixedStepIntegrator::retreat(IntegratorMemory* mem, const double* u,
     // Update the previous step
     casadi_copy(m->rx, nrx_, m->rx_prev);
     casadi_copy(m->rq, nrq_, m->rq_prev);
-    casadi_copy(m->uq, nuq_, m->uq_prev);
+    casadi_copy(m->adj_u, nuq_, m->adj_u_prev);
 
     // Take step
     casadi_int tapeind = disc_[m->k] + j;
     stepB(m, t, h,
       m->x_tape + nx_ * tapeind, m->x_tape + nx_ * (tapeind + 1),
       m->v_tape + nv_ * tapeind,
-      m->rx_prev, m->rv, m->rx, m->rq, m->uq);
+      m->rx_prev, m->rv, m->rx, m->rq, m->adj_u);
     casadi_clear(m->rv, nrv_);
     casadi_axpy(nrq_, 1., m->rq_prev, m->rq);
-    casadi_axpy(nuq_, 1., m->uq_prev, m->uq);
+    casadi_axpy(nuq_, 1., m->adj_u_prev, m->adj_u);
   }
 
   // Return to user
   casadi_copy(m->rx, nrx_, rx);
   casadi_copy(m->rq, nrq_, rq);
-  casadi_copy(m->uq, nuq_, uq);
+  casadi_copy(m->adj_u, nuq_, adj_u);
 }
 
 void FixedStepIntegrator::stepF(FixedStepMemory* m, double t, double h,
@@ -2049,7 +2049,7 @@ void FixedStepIntegrator::resetB(IntegratorMemory* mem) const {
 
   // Reset summation states
   casadi_clear(m->rq, nrq_);
-  casadi_clear(m->uq, nuq_);
+  casadi_clear(m->adj_u, nuq_);
 
   // Update backwards dependent variables
   casadi_clear(m->rv, nrv_);

@@ -177,7 +177,7 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
 
       \identifier{25g} */
   virtual void retreat(IntegratorMemory* mem, const double* u,
-    double* rx, double* rq, double* uq) const = 0;
+    double* rx, double* rq, double* adj_u) const = 0;
 
   /** \brief  evaluate
 
@@ -477,7 +477,7 @@ struct CASADI_EXPORT FixedStepMemory : public IntegratorMemory {
   double *v, *q, *v_prev, *q_prev;
 
   /// Work vectors, backward problem
-  double *rv, *uq, *rq_prev, *uq_prev;
+  double *rv, *adj_u, *rq_prev, *adj_u_prev;
 
   /// State and dependent variables at all times
   double *x_tape, *v_tape;
@@ -554,7 +554,7 @@ class CASADI_EXPORT FixedStepIntegrator : public Integrator {
 
       \identifier{25k} */
   void retreat(IntegratorMemory* mem, const double* u,
-    double* rx, double* rq, double* uq) const override;
+    double* rx, double* rq, double* adj_u) const override;
 
   /// Take integrator step forward
   void stepF(FixedStepMemory* m, double t, double h,
