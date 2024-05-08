@@ -199,12 +199,12 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
 
   /// Forward sparsity pattern propagation through DAE, backward problem
   int bdae_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t* z,
-    const bvec_t* p, const bvec_t* u, const bvec_t* adj_ode, const bvec_t* rp,
+    const bvec_t* p, const bvec_t* u, const bvec_t* adj_ode, const bvec_t* adj_quad,
     bvec_t* adj_x, bvec_t* adj_z) const;
 
   /// Forward sparsity pattern propagation through quadratures, backward problem
   int bquad_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t* z,
-    const bvec_t* p, const bvec_t* u, const bvec_t* adj_ode, const bvec_t* rz, const bvec_t* rp,
+    const bvec_t* p, const bvec_t* u, const bvec_t* adj_ode, const bvec_t* rz, const bvec_t* adj_quad,
     bvec_t* adj_p, bvec_t* adj_u) const;
 
   /** \brief  Propagate sparsity forward
@@ -223,12 +223,12 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
 
   /// Reverse sparsity pattern propagation through DAE, backward problem
   int bdae_sp_reverse(SpReverseMem* m, bvec_t* x, bvec_t* z,
-    bvec_t* p, bvec_t* u, bvec_t* adj_ode, bvec_t* rp,
+    bvec_t* p, bvec_t* u, bvec_t* adj_ode, bvec_t* adj_quad,
     bvec_t* adj_x, bvec_t* adj_z) const;
 
   /// Reverse sparsity pattern propagation through quadratures, backward problem
   int bquad_sp_reverse(SpReverseMem* m, bvec_t* x, bvec_t* z,
-    bvec_t* p, bvec_t* u, bvec_t* adj_ode, bvec_t* rz, bvec_t* rp,
+    bvec_t* p, bvec_t* u, bvec_t* adj_ode, bvec_t* rz, bvec_t* adj_quad,
     bvec_t* adj_p, bvec_t* adj_u) const;
 
   /** \brief  Propagate sparsity backwards

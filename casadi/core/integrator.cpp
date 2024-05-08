@@ -858,7 +858,7 @@ int Integrator::fquad_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t*
 }
 
 int Integrator::bdae_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t* z,
-    const bvec_t* p, const bvec_t* u, const bvec_t* adj_ode, const bvec_t* rp,
+    const bvec_t* p, const bvec_t* u, const bvec_t* adj_ode, const bvec_t* adj_quad,
     bvec_t* adj_x, bvec_t* adj_z) const {
   // Evaluate nondifferentiated
   m->arg[BDYN_T] = nullptr;  // t
@@ -872,7 +872,7 @@ int Integrator::bdae_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t* 
   m->arg[BDYN_OUT_ZERO] = nullptr;  // out_zero
   m->arg[BDYN_ADJ_ODE] = adj_ode;  // adj_ode
   m->arg[BDYN_ADJ_ALG] = nullptr;  // adj_alg
-  m->arg[BDYN_ADJ_QUAD] = rp;  // adj_quad
+  m->arg[BDYN_ADJ_QUAD] = adj_quad;  // adj_quad
   m->arg[BDYN_ADJ_ZERO] = nullptr;  // adj_zero
   m->res[BDAE_ADJ_X] = adj_x;  // adj_x
   m->res[BDAE_ADJ_Z] = adj_z;  // adj_z
@@ -894,7 +894,7 @@ int Integrator::bdae_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t* 
       = adj_ode + (i + 1) * nrx1_ * nadj_;  // fwd:adj_ode
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_ADJ_ALG] = nullptr;  // fwd:adj_alg
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_ADJ_QUAD]
-      = rp + (i + 1) * nrz1_ * nadj_;  // fwd:adj_quad
+      = adj_quad + (i + 1) * nrz1_ * nadj_;  // fwd:adj_quad
     m->arg[BDYN_NUM_IN + BDAE_NUM_OUT + BDYN_ADJ_ZERO] = nullptr;  // fwd:adj_zero
     m->res[BDAE_ADJ_X] = adj_x + (i + 1) * nrx1_ * nadj_;  // fwd:adj_x
     m->res[BDAE_ADJ_Z] = adj_z + (i + 1) * nrz1_ * nadj_;  // fwd:adj_z
@@ -904,7 +904,7 @@ int Integrator::bdae_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t* 
 }
 
 int Integrator::bquad_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t* z,
-    const bvec_t* p, const bvec_t* u, const bvec_t* adj_ode, const bvec_t* rz, const bvec_t* rp,
+    const bvec_t* p, const bvec_t* u, const bvec_t* adj_ode, const bvec_t* rz, const bvec_t* adj_quad,
     bvec_t* adj_p, bvec_t* adj_u) const {
   // Evaluate nondifferentiated
   m->arg[BDYN_T] = nullptr;  // t
@@ -918,7 +918,7 @@ int Integrator::bquad_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t*
   m->arg[BDYN_OUT_ZERO] = nullptr;  // out_zero
   m->arg[BDYN_ADJ_ODE] = adj_ode;  // adj_ode
   m->arg[BDYN_ADJ_ALG] = rz;  // adj_alg
-  m->arg[BDYN_ADJ_QUAD] = rp;  // adj_quad
+  m->arg[BDYN_ADJ_QUAD] = adj_quad;  // adj_quad
   m->arg[BDYN_ADJ_ZERO] = nullptr;  // adj_zero
   m->res[BQUAD_ADJ_P] = adj_p;  // adj_p
   m->res[BQUAD_ADJ_U] = adj_u;  // adj_u
@@ -941,7 +941,7 @@ int Integrator::bquad_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t*
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_ADJ_ALG] =
       rz + (i + 1) * nrz1_ * nadj_;  // fwd:adj_alg
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_ADJ_QUAD] =
-      rp + (i + 1) * nrp1_ * nadj_;  // fwd:adj_quad
+      adj_quad + (i + 1) * nrp1_ * nadj_;  // fwd:adj_quad
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_ADJ_ZERO] = nullptr;  // fwd:adj_zero
     m->res[BQUAD_ADJ_P] = adj_p ? adj_p + (i + 1) * nrq1_ * nadj_ : 0;  // fwd:adj_p
     m->res[BQUAD_ADJ_U] = adj_u ? adj_u + (i + 1) * nuq1_ * nadj_: 0;  // fwd:adj_u
@@ -959,7 +959,7 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
   const bvec_t* p = arg[INTEGRATOR_P];
   const bvec_t* u = arg[INTEGRATOR_U];
   const bvec_t* rx0 = arg[INTEGRATOR_ADJ_XF];
-  const bvec_t* rp = arg[INTEGRATOR_ADJ_QF];
+  const bvec_t* adj_qf = arg[INTEGRATOR_ADJ_QF];
   arg += n_in_;
 
   // Outputs
@@ -1022,14 +1022,14 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
 
     // Take rx0, rp, uqf past the last grid point
     if (rx0) rx0 += nrx_ * nt();
-    if (rp) rp += nrp_ * nt();
+    if (adj_qf) adj_qf += nrp_ * nt();
     if (uqf) uqf += nuq_ * nt();
 
     // Integrate backward
     for (casadi_int k = nt(); k-- > 0; ) {
       // Shift time
       if (rx0) rx0 -= nrx_;
-      if (rp) rp -= nrp_;
+      if (adj_qf) adj_qf -= nrp_;
       if (uqf) uqf -= nuq_;
       if (u) u -= nu_;
 
@@ -1039,7 +1039,7 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
       }
 
       // Propagate through DAE function
-      if (bdae_sp_forward(&m, ode, alg, p, u, rx_prev, rp, rx, rz)) return 1;
+      if (bdae_sp_forward(&m, ode, alg, p, u, rx_prev, adj_qf, rx, rz)) return 1;
       for (casadi_int i = 0; i < nrx_; ++i) rx[i] |= rx_prev[i];
 
       // "Solve" in order to resolve interdependencies (cf. Rootfinder)
@@ -1049,7 +1049,7 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
 
       // Propagate to quadratures
       if ((nrq_ > 0 && rqf) || (nuq_ > 0 && uqf)) {
-        if (bquad_sp_forward(&m, ode, alg, p, u, rx, rz, rp, rq, uqf)) return 1;
+        if (bquad_sp_forward(&m, ode, alg, p, u, rx, rz, adj_qf, rq, uqf)) return 1;
         // Sum contributions to rqf
         if (rqf) {
           for (casadi_int i = 0; i < nrq_; ++i) rqf[i] |= rq[i];
@@ -1167,7 +1167,7 @@ int Integrator::bdae_sp_reverse(SpReverseMem* m, bvec_t* x, bvec_t* z,
 }
 
 int Integrator::bquad_sp_reverse(SpReverseMem* m, bvec_t* x, bvec_t* z,
-    bvec_t* p, bvec_t* u, bvec_t* adj_ode, bvec_t* rz, bvec_t* rp,
+    bvec_t* p, bvec_t* u, bvec_t* adj_ode, bvec_t* rz, bvec_t* adj_quad,
     bvec_t* adj_p, bvec_t* adj_u) const {
   // Nondifferentiated inputs
   m->arg[BDYN_T] = nullptr;  // t
@@ -1177,11 +1177,11 @@ int Integrator::bquad_sp_reverse(SpReverseMem* m, bvec_t* x, bvec_t* z,
   m->arg[BDYN_U] = u;  // u
   m->arg[BDYN_OUT_ODE] = adj_ode;  // out_ode
   m->arg[BDYN_OUT_ALG] = rz;  // out_alg
-  m->arg[BDYN_OUT_QUAD] = rp;  // out_quad
+  m->arg[BDYN_OUT_QUAD] = adj_quad;  // out_quad
   m->arg[BDYN_OUT_ZERO] = nullptr;  // out_zero
   m->arg[BDYN_ADJ_ODE] = adj_ode;  // adj_ode
   m->arg[BDYN_ADJ_ALG] = rz;  // adj_alg
-  m->arg[BDYN_ADJ_QUAD] = rp;  // adj_quad
+  m->arg[BDYN_ADJ_QUAD] = adj_quad;  // adj_quad
   m->arg[BDYN_ADJ_ZERO] = nullptr;  // adj_zero
   // Propagate through sensitivities
   for (casadi_int i = 0; i < nfwd_; ++i) {
@@ -1203,7 +1203,7 @@ int Integrator::bquad_sp_reverse(SpReverseMem* m, bvec_t* x, bvec_t* z,
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_ADJ_ALG] =
       rz + (i + 1) * nrz1_ * nadj_;  // fwd:adj_alg
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_ADJ_QUAD] =
-      rp + (i + 1) * nrp1_ * nadj_;  // fwd:adj_quad
+      adj_quad + (i + 1) * nrp1_ * nadj_;  // fwd:adj_quad
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_ADJ_ZERO] = nullptr;  // fwd:adj_zero
     if (calc_sp_reverse(forward_name("quadB", 1), m->arg, m->res, m->iw, m->w)) return 1;
   }
