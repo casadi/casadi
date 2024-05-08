@@ -348,7 +348,7 @@ int Integrator::eval(const double** arg, double** res,
   const double* z0 = arg[INTEGRATOR_Z0];
   const double* p = arg[INTEGRATOR_P];
   const double* u = arg[INTEGRATOR_U];
-  const double* rx0 = arg[INTEGRATOR_ADJ_XF];
+  const double* adj_xf = arg[INTEGRATOR_ADJ_XF];
   const double* rz0 = arg[INTEGRATOR_ADJ_ZF];
   const double* rp = arg[INTEGRATOR_ADJ_QF];
   arg += INTEGRATOR_NUM_IN;
@@ -391,8 +391,8 @@ int Integrator::eval(const double** arg, double** res,
 
   // Backwards integration, if needed
   if (nrx_ > 0) {
-    // Take rx0, rz0, rp past the last grid point
-    if (rx0) rx0 += nrx_ * nt();
+    // Take adj_xf, rz0, rp past the last grid point
+    if (adj_xf) adj_xf += nrx_ * nt();
     if (rz0) rz0 += nrz_ * nt();
     if (rp) rp += nrp_ * nt();
     if (uq) uq += nuq_ * nt();
@@ -406,14 +406,14 @@ int Integrator::eval(const double** arg, double** res,
     for (m->k = nt(); m->k-- > 0; ) {
       m->t = tout_[m->k];
       // Add impulse to backwards integration
-      if (rx0) rx0 -= nrx_;
+      if (adj_xf) adj_xf -= nrx_;
       if (rz0) rz0 -= nrz_;
       if (rp) rp -= nrp_;
       if (uq) uq -= nuq_;
       if (u) u -= nu_;
-      if (!all_zero(rx0, nrx_) || !all_zero(rz0, nrz_) || !all_zero(rp, nrp_)) {
+      if (!all_zero(adj_xf, nrx_) || !all_zero(rz0, nrz_) || !all_zero(rp, nrp_)) {
         if (verbose_) casadi_message("Impulse from adjoint seeds at output time " + str(m->k));
-        impulseB(m, rx0, rz0, rp);
+        impulseB(m, adj_xf, rz0, rp);
         any_impulse = true;
       }
       // Next output time, or beginning
@@ -958,7 +958,7 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
   const bvec_t* x0 = arg[INTEGRATOR_X0];
   const bvec_t* p = arg[INTEGRATOR_P];
   const bvec_t* u = arg[INTEGRATOR_U];
-  const bvec_t* rx0 = arg[INTEGRATOR_ADJ_XF];
+  const bvec_t* adj_xf = arg[INTEGRATOR_ADJ_XF];
   const bvec_t* adj_qf = arg[INTEGRATOR_ADJ_QF];
   arg += n_in_;
 
@@ -1020,22 +1020,22 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
     std::fill_n(rx_prev, nrx_, 0);
     if (rqf) std::fill_n(rqf, nrq_, 0);
 
-    // Take rx0, rp, uqf past the last grid point
-    if (rx0) rx0 += nrx_ * nt();
+    // Take adj_xf, rp, uqf past the last grid point
+    if (adj_xf) adj_xf += nrx_ * nt();
     if (adj_qf) adj_qf += nrp_ * nt();
     if (uqf) uqf += nuq_ * nt();
 
     // Integrate backward
     for (casadi_int k = nt(); k-- > 0; ) {
       // Shift time
-      if (rx0) rx0 -= nrx_;
+      if (adj_xf) adj_xf -= nrx_;
       if (adj_qf) adj_qf -= nrp_;
       if (uqf) uqf -= nuq_;
       if (u) u -= nu_;
 
-      // Add impulse from rx0
-      if (rx0) {
-        for (casadi_int i = 0; i < nrx_; ++i) rx_prev[i] |= rx0[i];
+      // Add impulse from adj_xf
+      if (adj_xf) {
+        for (casadi_int i = 0; i < nrx_; ++i) rx_prev[i] |= adj_xf[i];
       }
 
       // Propagate through DAE function
@@ -1222,7 +1222,7 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
   bvec_t* x0 = arg[INTEGRATOR_X0];
   bvec_t* p = arg[INTEGRATOR_P];
   bvec_t* u = arg[INTEGRATOR_U];
-  bvec_t* rx0 = arg[INTEGRATOR_ADJ_XF];
+  bvec_t* adj_xf = arg[INTEGRATOR_ADJ_XF];
   bvec_t* rp = arg[INTEGRATOR_ADJ_QF];
   arg += n_in_;
 
@@ -1270,10 +1270,10 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
       // Restore rqf: See note below
       if (rqf) std::copy_n(rq, nrq_, rqf);
 
-      // Add impulse from rx0
-      if (rx0) {
-        for (casadi_int i = 0; i < nrx_; ++i) rx[i] |= rx0[i];
-        std::fill_n(rx0, nrx_, 0);
+      // Add impulse from adj_xf
+      if (adj_xf) {
+        for (casadi_int i = 0; i < nrx_; ++i) rx[i] |= adj_xf[i];
+        std::fill_n(adj_xf, nrx_, 0);
       }
 
       // Get dependencies from backward quadratures
@@ -1297,7 +1297,7 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
       std::fill_n(rz, nrz_, 0);
 
       // Shift time
-      if (rx0) rx0 += nrx_;
+      if (adj_xf) adj_xf += nrx_;
       if (rp) rp += nrp_;
       if (uqf) uqf += nuq_;
       if (u) u += nu_;
@@ -1957,7 +1957,7 @@ void FixedStepIntegrator::stepF(FixedStepMemory* m, double t, double h,
 
 void FixedStepIntegrator::stepB(FixedStepMemory* m, double t, double h,
     const double* x0, const double* xf, const double* vf,
-    const double* rx0, const double* rv0,
+    const double* adj_xf, const double* rv0,
     double* rxf, double* rqf, double* uqf) const {
   // Evaluate nondifferentiated
   std::fill(m->arg, m->arg + BSTEP_NUM_IN, nullptr);
@@ -1970,7 +1970,7 @@ void FixedStepIntegrator::stepB(FixedStepMemory* m, double t, double h,
   m->arg[BSTEP_OUT_XF] = xf;  // out:xf
   m->arg[BSTEP_OUT_VF] = vf;  // out:vf
   m->arg[BSTEP_OUT_QF] = nullptr;  // out:qf
-  m->arg[BSTEP_ADJ_XF] = rx0;  // adj:xf
+  m->arg[BSTEP_ADJ_XF] = adj_xf;  // adj:xf
   m->arg[BSTEP_ADJ_VF] = rv0;  // adj:vf
   m->arg[BSTEP_ADJ_QF] = m->rp;  // adj:qf
   std::fill(m->res, m->res + BSTEP_NUM_OUT, nullptr);
@@ -1998,7 +1998,7 @@ void FixedStepIntegrator::stepB(FixedStepMemory* m, double t, double h,
     m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_OUT_XF] = xf + nx1_;  // fwd:out:xf
     m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_OUT_VF] = vf + nv1_;  // fwd:out:vf
     m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_OUT_QF] = nullptr;  // fwd:out:qf
-    m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_ADJ_XF] = rx0 + nrx1_ * nadj_;  // fwd:adj:xf
+    m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_ADJ_XF] = adj_xf + nrx1_ * nadj_;  // fwd:adj:xf
     m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_ADJ_VF] = rv0 + nrv1_;  // fwd:adj:vf
     m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_ADJ_QF] = m->rp + nrp1_ * nadj_;  // fwd:adj:qf
     m->res[BSTEP_ADJ_T] = nullptr;  // fwd:adj:t

@@ -563,7 +563,7 @@ class CASADI_EXPORT FixedStepIntegrator : public Integrator {
   /// Take integrator step backward
   void stepB(FixedStepMemory* m, double t, double h,
     const double* x0, const double* xf, const double* vf,
-    const double* rx0, const double* rv0,
+    const double* adj_xf, const double* rv0,
     double* rxf, double* rqf, double* uqf) const;
 
   // Target number of finite elements
