@@ -438,9 +438,9 @@ void IdasInterface::resetB(IntegratorMemory* mem) const {
   N_VConst(0.0, m->rxzdot);
 }
 
-void IdasInterface::z_impulseB(IdasMemory* m, const double* rz) const {
+void IdasInterface::z_impulseB(IdasMemory* m, const double* adj_z) const {
   // Quick return if nothing to propagate
-  if (all_zero(rz, nrz_)) return;
+  if (all_zero(adj_z, nrz_)) return;
   // We have the following solved nonlinear system of equations:
   //   f_alg(x, z) == 0,
   // which implicitly defines z as a function of x
@@ -458,7 +458,7 @@ void IdasInterface::z_impulseB(IdasMemory* m, const double* rz) const {
     casadi_error("Linear system factorization for backwards initial conditions failed");
   // Right-hand-side for linear system in m->v2
   casadi_clear(m->v2, nrx_);
-  casadi_copy(rz, nrz_, m->v2 + nrx_);
+  casadi_copy(adj_z, nrz_, m->v2 + nrx_);
   // Solve transposed linear system of equations (Note: m->v2 not used since rxz null)
   if (solve_transposed(m, m->t, NV_DATA_S(m->xz), nullptr, m->v2, m->v2)) {
     casadi_error("Linear system solve for backwards initial conditions failed");
@@ -474,14 +474,14 @@ void IdasInterface::z_impulseB(IdasMemory* m, const double* rz) const {
 }
 
 void IdasInterface::impulseB(IntegratorMemory* mem,
-    const double* rx, const double* rz, const double* rp) const {
+    const double* adj_x, const double* adj_z, const double* adj_q) const {
   auto m = to_mem(mem);
 
   // Call method in base class
-  SundialsInterface::impulseB(mem, rx, rz, rp);
+  SundialsInterface::impulseB(mem, adj_x, adj_z, adj_q);
 
-  // Propagate impulse from rz to rx
-  z_impulseB(m, rz);
+  // Propagate impulse from adj_z to adj_x
+  z_impulseB(m, adj_z);
 
   if (m->first_callB) {
     // Create backward problem

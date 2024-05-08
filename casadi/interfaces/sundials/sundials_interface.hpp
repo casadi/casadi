@@ -161,7 +161,7 @@ namespace casadi {
 
     /** \brief Introduce an impulse into the backwards integration at the current time */
     void impulseB(IntegratorMemory* mem,
-      const double* rx, const double* rz, const double* rp) const override;
+      const double* adj_x, const double* adj_z, const double* adj_q) const override;
 
     /** \brief Reset stats */
     void reset_stats(SundialsMemory* m) const;

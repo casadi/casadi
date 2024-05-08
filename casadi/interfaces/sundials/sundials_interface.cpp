@@ -407,19 +407,19 @@ void SundialsInterface::resetB(IntegratorMemory* mem) const {
 }
 
 void SundialsInterface::impulseB(IntegratorMemory* mem,
-    const double* rx, const double* rz, const double* rp) const {
+    const double* adj_x, const double* adj_z, const double* adj_q) const {
   auto m = static_cast<SundialsMemory*>(mem);
 
   // Add impulse to backward parameters
-  casadi_axpy(nrp_, 1., rp, m->rp);
+  casadi_axpy(nrp_, 1., adj_q, m->rp);
 
   // Add impulse to backward state
-  casadi_axpy(nrx_, 1., rx, NV_DATA_S(m->rxz));
+  casadi_axpy(nrx_, 1., adj_x, NV_DATA_S(m->rxz));
 
   // Add impulse to algebraic variables:
   // If nonzero, this has to be propagated to an impulse in backward state
-  // casadi_copy(rz, nrz_, NV_DATA_S(m->rxz) + nrx_);
-  casadi_axpy(nrz_, 1., rz, NV_DATA_S(m->rxz) + nrx_);
+  // casadi_copy(adj_z, nrz_, NV_DATA_S(m->rxz) + nrx_);
+  casadi_axpy(nrz_, 1., adj_z, NV_DATA_S(m->rxz) + nrx_);
 }
 
 SundialsMemory::SundialsMemory() {

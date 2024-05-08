@@ -2056,16 +2056,16 @@ void FixedStepIntegrator::resetB(IntegratorMemory* mem) const {
 }
 
 void FixedStepIntegrator::impulseB(IntegratorMemory* mem,
-    const double* adj_x, const double* rz, const double* rp) const {
+    const double* adj_x, const double* adj_z, const double* adj_q) const {
   auto m = static_cast<FixedStepMemory*>(mem);
   // Add impulse to backward parameters
-  casadi_axpy(nrp_, 1., rp, m->rp);
+  casadi_axpy(nrp_, 1., adj_q, m->rp);
 
   // Add impulse to state
   casadi_axpy(nrx_, 1., adj_x, m->adj_x);
 
   // Add impulse to backwards dependent variables
-  casadi_axpy(nrz_, 1., rz, m->rv + nrv_ - nrz_);
+  casadi_axpy(nrz_, 1., adj_z, m->rv + nrv_ - nrz_);
 }
 
 ImplicitFixedStepIntegrator::ImplicitFixedStepIntegrator(

@@ -171,7 +171,7 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
 
       \identifier{25f} */
   virtual void impulseB(IntegratorMemory* mem,
-    const double* adj_x, const double* rz, const double* rp) const = 0;
+    const double* adj_x, const double* adj_z, const double* adj_q) const = 0;
 
   /** \brief  Retreat solution in time
 
@@ -548,7 +548,7 @@ class CASADI_EXPORT FixedStepIntegrator : public Integrator {
 
   /// Introduce an impulse into the backwards integration at the current time
   void impulseB(IntegratorMemory* mem,
-    const double* adj_x, const double* adj_z, const double* rp) const override;
+    const double* adj_x, const double* adj_z, const double* adj_q) const override;
 
   /** \brief Retreat solution in time
 

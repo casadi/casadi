@@ -133,8 +133,8 @@ class CASADI_INTEGRATOR_IDAS_EXPORT IdasInterface : public SundialsInterface {
   /** \brief  Reset the backward problem and take time to tf */
   void resetB(IntegratorMemory* mem) const override;
 
-  /** \brief Propagate impulse from rz to rx */
-  void z_impulseB(IdasMemory* m, const double* rz) const;
+  /** \brief Propagate impulse from adj_z to adj_x */
+  void z_impulseB(IdasMemory* m, const double* adj_z) const;
 
   /** \brief Solve transposed linear system */
   int solve_transposed(IdasMemory* m, double t, const double* xz, const double* rxz,
@@ -142,7 +142,7 @@ class CASADI_INTEGRATOR_IDAS_EXPORT IdasInterface : public SundialsInterface {
 
   /** \brief Introduce an impulse into the backwards integration at the current time */
   void impulseB(IntegratorMemory* mem,
-    const double* rx, const double* rz, const double* rp) const override;
+    const double* adj_x, const double* adj_z, const double* adj_q) const override;
 
   /** \brief  Retreat solution in time */
   void retreat(IntegratorMemory* mem, const double* u,

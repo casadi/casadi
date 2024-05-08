@@ -293,11 +293,11 @@ void CvodesInterface::advance(IntegratorMemory* mem,
 }
 
 void CvodesInterface::impulseB(IntegratorMemory* mem,
-    const double* rx, const double* rz, const double* rp) const {
+    const double* adj_x, const double* adj_z, const double* adj_q) const {
   auto m = to_mem(mem);
 
   // Call method in base class
-  SundialsInterface::impulseB(mem, rx, rz, rp);
+  SundialsInterface::impulseB(mem, adj_x, adj_z, adj_q);
 
   if (m->first_callB) {
     // Create backward problem
