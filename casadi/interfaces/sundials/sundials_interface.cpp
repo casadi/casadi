@@ -239,9 +239,6 @@ void SundialsInterface::init(const Dict& opts) {
     linsolF_ = Linsol("linsolF", linear_solver_, jacF_sp, linear_solver_options_);
   }
 
-  // Allocate work vectors
-  alloc_w(2 * std::max(nx_ + nz_, nrx_ + nrz_), true); // v1, v2
-
   // Attach functions to calculate DAE and quadrature RHS all-at-once
   if (nfwd_ > 0) {
     create_forward("daeF", nfwd_);
@@ -283,8 +280,6 @@ void SundialsInterface::set_work(void* mem, const double**& arg, double**& res,
   Integrator::set_work(mem, arg, res, iw, w);
 
   // Work vectors
-  m->v1 = w; w += std::max(nx_ + nz_, nrx_ + nrz_);
-  m->v2 = w; w += std::max(nx_ + nz_, nrx_ + nrz_);
   m->jacF = w; w += linsolF_.sparsity().nnz();
 
   // Work vectors

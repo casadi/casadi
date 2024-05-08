@@ -39,8 +39,12 @@ namespace casadi {
 
     \identifier{1lp} */
 struct CASADI_EXPORT IntegratorMemory : public OracleMemory {
-  // Work vectors
-  double *x, *z, *adj_x, *adj_z, *adj_p, *ode, *adj_ode, *p, *u, *adj_q;
+  // Work vectors, forward problem
+  double *x, *z, *p, *u;
+  // Work vectors, backward problem
+  double *adj_x, *adj_z, *adj_p, *adj_ode, *adj_q;
+  // Temporary work vectors of length max(nx + nz, nrx, nrz)
+  double *tmp1, *tmp2;
   // Current control interval
   casadi_int k;
   // Current time

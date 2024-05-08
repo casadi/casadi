@@ -686,9 +686,7 @@ void Integrator::init(const Dict& opts) {
       "sprank(J)=" + str(sprank(sp_jac_rdae_)) + "<" + str(nrx_+nrz_));
   }
 
-  // Work vectors for sparsity pattern propagation: Can be reused in derived classes
   alloc_w(nx_ + nz_, true); // x, z
-  alloc_w(nx_, true); // ode
   alloc_w(np_, true); // p
   alloc_w(nu_, true); // u
 
@@ -696,6 +694,8 @@ void Integrator::init(const Dict& opts) {
   alloc_w(nrx_, true); // adj_ode
   alloc_w(nrq_, true); // adj_p
   alloc_w(nrp_, true); // adj_q
+
+  alloc_w(2 * std::max(nx_ + nz_, nrx_ + nrz_), true); // tmp1, tmp2
 
   alloc_w(nx_ + nz_);  // Sparsity::sp_solve
   alloc_w(nrx_ + nrz_);  // Sparsity::sp_solve
@@ -711,7 +711,6 @@ void Integrator::set_work(void* mem, const double**& arg, double**& res,
   // Work vectors
   m->x = w; w += nx_;  // doubles as xz
   m->z = w; w += nz_;
-  m->ode = w; w += nx_;
   m->p = w; w += np_;
   m->u = w; w += nu_;
 
@@ -720,7 +719,11 @@ void Integrator::set_work(void* mem, const double**& arg, double**& res,
   m->adj_ode = w; w += nrx_;
   m->adj_p = w; w += nrq_;
   m->adj_q = w; w += nrp_;
+
+  m->tmp1 = w; w += std::max(nx_ + nz_, nrx_ + nrz_);
+  m->tmp2 = w; w += std::max(nx_ + nz_, nrx_ + nrz_);
 }
+
 
 int Integrator::init_mem(void* mem) const {
   if (OracleFunction::init_mem(mem)) return 1;
@@ -1852,6 +1855,9 @@ void FixedStepIntegrator::advance(IntegratorMemory* mem,
     const double* u, double* x, double* z, double* q) const {
   auto m = static_cast<FixedStepMemory*>(mem);
 
+  // State at previous step
+  double* x_prev = m->tmp1;
+
   // Set controls
   casadi_copy(u, nu_, m->u);
 
@@ -1865,12 +1871,12 @@ void FixedStepIntegrator::advance(IntegratorMemory* mem,
     double t = m->t + j * h;
 
     // Update the previous step
-    casadi_copy(m->x, nx_, m->ode);
+    casadi_copy(m->x, nx_, x_prev);
     casadi_copy(m->v, nv_, m->v_prev);
     casadi_copy(m->q, nq_, m->q_prev);
 
     // Take step
-    stepF(m, t, h, m->ode, m->v_prev, m->x, m->v, m->q);
+    stepF(m, t, h, x_prev, m->v_prev, m->x, m->v, m->q);
     casadi_axpy(nq_, 1., m->q_prev, m->q);
 
     // Save state, if needed

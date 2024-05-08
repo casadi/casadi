@@ -72,9 +72,6 @@ namespace casadi {
     long nstepsB_off, nfevalsB_off, nlinsetupsB_off, netfailsB_off;
     long nnitersB_off, nncfailsB_off;
 
-    // Temporaries for [x;z] or [rx;rz]
-    double *v1, *v2;
-
     /// number of checkpoints stored so far
     int ncheck;
 

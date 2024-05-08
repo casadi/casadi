@@ -489,14 +489,14 @@ int CvodesInterface::psolveF(double t, N_Vector x, N_Vector xdot, N_Vector r,
     auto m = to_mem(user_data);
     auto& s = m->self;
 
-    // Get right-hand sides in m->v1
+    // Get right-hand sides in m->tmp1
     double* v = NV_DATA_S(r);
-    casadi_copy(v, s.nx_, m->v1);
+    casadi_copy(v, s.nx_, m->tmp1);
 
     // Solve for undifferentiated right-hand-side, save to output
-    if (s.linsolF_.solve(m->jacF, m->v1, 1, false, m->mem_linsolF)) return 1;
+    if (s.linsolF_.solve(m->jacF, m->tmp1, 1, false, m->mem_linsolF)) return 1;
     v = NV_DATA_S(z); // possibly different from r
-    casadi_copy(m->v1, s.nx1_, v);
+    casadi_copy(m->tmp1, s.nx1_, v);
 
     // Sensitivity equations
     if (s.nfwd_ > 0) {
@@ -504,17 +504,17 @@ int CvodesInterface::psolveF(double t, N_Vector x, N_Vector xdot, N_Vector r,
       if (s.second_order_correction_) {
         // The outputs will double as seeds for jtimesF
         casadi_clear(v + s.nx1_, s.nx_ - s.nx1_);
-        if (s.calc_jtimesF(m, t, NV_DATA_S(x), nullptr, v, nullptr, m->v2, nullptr)) return 1;
+        if (s.calc_jtimesF(m, t, NV_DATA_S(x), nullptr, v, nullptr, m->tmp2, nullptr)) return 1;
 
-        // Subtract m->v2 from m->v1, scaled with -gamma
-        casadi_axpy(s.nx_ - s.nx1_, m->gamma, m->v2 + s.nx1_, m->v1 + s.nx1_);
+        // Subtract m->tmp2 from m->tmp1, scaled with -gamma
+        casadi_axpy(s.nx_ - s.nx1_, m->gamma, m->tmp2 + s.nx1_, m->tmp1 + s.nx1_);
       }
 
       // Solve for sensitivity right-hand-sides
-      if (s.linsolF_.solve(m->jacF, m->v1 + s.nx1_, s.nfwd_, false, m->mem_linsolF)) return 1;
+      if (s.linsolF_.solve(m->jacF, m->tmp1 + s.nx1_, s.nfwd_, false, m->mem_linsolF)) return 1;
 
       // Save to output, reordered
-      casadi_copy(m->v1 + s.nx1_, s.nx_ - s.nx1_, v + s.nx1_);
+      casadi_copy(m->tmp1 + s.nx1_, s.nx_ - s.nx1_, v + s.nx1_);
     }
 
     return 0;
@@ -530,14 +530,14 @@ int CvodesInterface::psolveB(double t, N_Vector x, N_Vector xB, N_Vector xdotB, 
     auto m = to_mem(user_data);
     auto& s = m->self;
 
-    // Get right-hand sides in m->v1
+    // Get right-hand sides in m->tmp1
     double* v = NV_DATA_S(rvecB);
-    casadi_copy(v, s.nrx_, m->v1);
+    casadi_copy(v, s.nrx_, m->tmp1);
 
     // Solve for undifferentiated right-hand-side, save to output
-    if (s.linsolF_.solve(m->jacF, m->v1, s.nadj_, true, m->mem_linsolF)) return 1;
+    if (s.linsolF_.solve(m->jacF, m->tmp1, s.nadj_, true, m->mem_linsolF)) return 1;
     v = NV_DATA_S(zvecB); // possibly different from rvecB
-    casadi_copy(m->v1, s.nrx1_ * s.nadj_, v);
+    casadi_copy(m->tmp1, s.nrx1_ * s.nadj_, v);
 
     // Sensitivity equations
     if (s.nfwd_ > 0) {
@@ -545,18 +545,18 @@ int CvodesInterface::psolveB(double t, N_Vector x, N_Vector xB, N_Vector xdotB, 
       if (s.second_order_correction_) {
         // The outputs will double as seeds for calc_daeB
         casadi_clear(v + s.nrx1_ * s.nadj_, s.nrx_ - s.nrx1_ * s.nadj_);
-        if (s.calc_daeB(m, t, NV_DATA_S(x), nullptr, v, nullptr, nullptr, m->v2, nullptr)) return 1;
-        // Subtract m->v2 from m->v1, scaled with gammaB
-        casadi_axpy(s.nrx_ - s.nrx1_ * s.nadj_, -m->gammaB, m->v2 + s.nrx1_ * s.nadj_,
-          m->v1 + s.nrx1_ * s.nadj_);
+        if (s.calc_daeB(m, t, NV_DATA_S(x), nullptr, v, nullptr, nullptr, m->tmp2, nullptr)) return 1;
+        // Subtract m->tmp2 from m->tmp1, scaled with gammaB
+        casadi_axpy(s.nrx_ - s.nrx1_ * s.nadj_, -m->gammaB, m->tmp2 + s.nrx1_ * s.nadj_,
+          m->tmp1 + s.nrx1_ * s.nadj_);
       }
 
       // Solve for sensitivity right-hand-sides
-      if (s.linsolF_.solve(m->jacF, m->v1 + s.nx1_, s.nadj_ * s.nfwd_,
+      if (s.linsolF_.solve(m->jacF, m->tmp1 + s.nx1_, s.nadj_ * s.nfwd_,
         true, m->mem_linsolF)) return 1;
 
       // Save to output, reordered
-      casadi_copy(m->v1 + s.nx1_, s.nx_ - s.nx1_, v + s.nx1_);
+      casadi_copy(m->tmp1 + s.nx1_, s.nx_ - s.nx1_, v + s.nx1_);
     }
 
     return 0;
