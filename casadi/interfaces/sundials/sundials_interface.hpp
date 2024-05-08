@@ -128,7 +128,8 @@ namespace casadi {
 
     // DAE right-hand-side, forward problem
     int calc_daeB(SundialsMemory* m, double t, const double* x, const double* z,
-      const double* rx, const double* rz, const double* rp, double* adj_x, double* adj_z) const;
+      const double* rx, const double* rz, const double* adj_quad,
+      double* adj_x, double* adj_z) const;
 
     // Quadrature right-hand-side, forward problem
     int calc_quadF(SundialsMemory* m, double t, const double* x, const double* z,

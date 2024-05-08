@@ -425,7 +425,7 @@ int CvodesInterface::rhsB(double t, N_Vector x, N_Vector rx, N_Vector rxdot, voi
     casadi_assert_dev(user_data);
     auto m = to_mem(user_data);
     auto& s = m->self;
-    if (s.calc_daeB(m, t, NV_DATA_S(x), nullptr, NV_DATA_S(rx), nullptr, m->rp,
+    if (s.calc_daeB(m, t, NV_DATA_S(x), nullptr, NV_DATA_S(rx), nullptr, m->adj_q,
       NV_DATA_S(rxdot), nullptr)) return 1;
     // Negate (note definition of g)
     casadi_scal(s.nrx_, -1., NV_DATA_S(rxdot));

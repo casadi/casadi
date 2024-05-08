@@ -616,7 +616,7 @@ int IdasInterface::resB(double t, N_Vector xz, N_Vector xzdot, N_Vector rxz,
     auto m = to_mem(user_data);
     auto& s = m->self;
     if (s.calc_daeB(m, t, NV_DATA_S(xz), NV_DATA_S(xz) + s.nx_,
-      NV_DATA_S(rxz), NV_DATA_S(rxz) + s.nrx_, m->rp,
+      NV_DATA_S(rxz), NV_DATA_S(rxz) + s.nrx_, m->adj_q,
       NV_DATA_S(rr), NV_DATA_S(rr) + s.nrx_)) return 1;
 
     // Subtract state derivative to get residual

@@ -716,7 +716,7 @@ void Integrator::set_work(void* mem, const double**& arg, double**& res,
   m->rq = w; w += nrq_;
   m->p = w; w += np_;
   m->u = w; w += nu_;
-  m->rp = w; w += nrp_;
+  m->adj_q = w; w += nrp_;
 }
 
 int Integrator::init_mem(void* mem) const {
@@ -1972,7 +1972,7 @@ void FixedStepIntegrator::stepB(FixedStepMemory* m, double t, double h,
   m->arg[BSTEP_OUT_QF] = nullptr;  // out:qf
   m->arg[BSTEP_ADJ_XF] = adj_xf;  // adj:xf
   m->arg[BSTEP_ADJ_VF] = rv0;  // adj:vf
-  m->arg[BSTEP_ADJ_QF] = m->rp;  // adj:qf
+  m->arg[BSTEP_ADJ_QF] = m->adj_q;  // adj:qf
   std::fill(m->res, m->res + BSTEP_NUM_OUT, nullptr);
   m->res[BSTEP_ADJ_T] = nullptr;  // adj:t
   m->res[BSTEP_ADJ_H] = nullptr;  // adj:h
@@ -2000,7 +2000,7 @@ void FixedStepIntegrator::stepB(FixedStepMemory* m, double t, double h,
     m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_OUT_QF] = nullptr;  // fwd:out:qf
     m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_ADJ_XF] = adj_xf + nrx1_ * nadj_;  // fwd:adj:xf
     m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_ADJ_VF] = rv0 + nrv1_;  // fwd:adj:vf
-    m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_ADJ_QF] = m->rp + nrp1_ * nadj_;  // fwd:adj:qf
+    m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_ADJ_QF] = m->adj_q + nrp1_ * nadj_;  // fwd:adj:qf
     m->res[BSTEP_ADJ_T] = nullptr;  // fwd:adj:t
     m->res[BSTEP_ADJ_H] = nullptr;  // fwd:adj:h
     m->res[BSTEP_ADJ_X0] = adj_x0 + nrx1_ * nadj_;  // fwd:adj_x0
@@ -2044,7 +2044,7 @@ void FixedStepIntegrator::resetB(IntegratorMemory* mem) const {
   auto m = static_cast<FixedStepMemory*>(mem);
 
   // Clear adjoint seeds
-  casadi_clear(m->rp, nrp_);
+  casadi_clear(m->adj_q, nrp_);
   casadi_clear(m->adj_x, nrx_);
 
   // Reset summation states
@@ -2059,7 +2059,7 @@ void FixedStepIntegrator::impulseB(IntegratorMemory* mem,
     const double* adj_x, const double* adj_z, const double* adj_q) const {
   auto m = static_cast<FixedStepMemory*>(mem);
   // Add impulse to backward parameters
-  casadi_axpy(nrp_, 1., adj_q, m->rp);
+  casadi_axpy(nrp_, 1., adj_q, m->adj_q);
 
   // Add impulse to state
   casadi_axpy(nrx_, 1., adj_x, m->adj_x);
