@@ -687,15 +687,30 @@ void Integrator::init(const Dict& opts) {
   }
 
   // Work vectors for sparsity pattern propagation: Can be reused in derived classes
-  alloc_w(nx_, true); // x
-  alloc_w(nz_, true); // z
+  alloc_w(nx_ + nz_, true); // x, z
   alloc_w(nx_, true); // x_prev
-  alloc_w(nrx_, true); // rx
-  alloc_w(nrz_, true); // rz
+  alloc_w(nrx_ + nrz_, true); // rx, rz
   alloc_w(nrx_, true); // rx_prev
   alloc_w(nrq_, true); // rq
   alloc_w(nx_+nz_);  // Sparsity::sp_solve
   alloc_w(nrx_+nrz_);  // Sparsity::sp_solve
+}
+
+void Integrator::set_work(void* mem, const double**& arg, double**& res,
+    casadi_int*& iw, double*& w) const {
+  auto m = static_cast<IntegratorMemory*>(mem);
+
+  // Set work in base classes
+  OracleFunction::set_work(mem, arg, res, iw, w);
+
+  // Work vectors
+  m->x = w; w += nx_;  // doubles as xz
+  m->z = w; w += nz_;
+  m->x_prev = w; w += nx_;
+  m->rx = w; w += nrx_;  // doubles as xz
+  m->rz = w; w += nrz_;
+  m->rx_prev = w; w += nrx_;
+  m->rq = w; w += nrq_;
 }
 
 int Integrator::init_mem(void* mem) const {
@@ -1801,15 +1816,6 @@ void FixedStepIntegrator::set_work(void* mem, const double**& arg, double**& res
   // Set work in base classes
   Integrator::set_work(mem, arg, res, iw, w);
 
-  // Work vectors, allocated in base class
-  m->x = w; w += nx_;
-  m->z = w; w += nz_;
-  m->x_prev = w; w += nx_;
-  m->rx = w; w += nrx_;
-  m->rz = w; w += nrz_;
-  m->rx_prev = w; w += nrx_;
-  m->rq = w; w += nrq_;
-
   // Work vectors, forward problem
   m->v = w; w += nv_;
   m->p = w; w += np_;
@@ -2008,6 +2014,9 @@ void FixedStepIntegrator::stepB(FixedStepMemory* m, double t, double h,
 void FixedStepIntegrator::reset(IntegratorMemory* mem, const double* u, const double* x,
     const double* z, const double* p) const {
   auto m = static_cast<FixedStepMemory*>(mem);
+
+  // Reset the base classes
+  Integrator::reset(mem, u, x, z, p);
 
   // Set parameters
   casadi_copy(p, np_, m->p);
@@ -2300,6 +2309,13 @@ void ImplicitFixedStepIntegrator::serialize_body(SerializingStream &s) const {
 ImplicitFixedStepIntegrator::ImplicitFixedStepIntegrator(DeserializingStream & s) :
     FixedStepIntegrator(s) {
   s.version("ImplicitFixedStepIntegrator", 2);
+}
+
+void Integrator::reset(IntegratorMemory* m, const double* x, const double* z,
+    const double* p) const {
+  // Update the state
+  casadi_copy(x, nx_, m->x);
+  casadi_copy(z, nz_, m->z);
 }
 
 casadi_int Integrator::next_stop(casadi_int k, const double* u) const {

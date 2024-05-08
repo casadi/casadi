@@ -39,6 +39,8 @@ namespace casadi {
 
     \identifier{1lp} */
 struct CASADI_EXPORT IntegratorMemory : public OracleMemory {
+  // Work vectors
+  double *x, *z, *rx, *rz, *rq, *x_prev, *rx_prev;
   // Current control interval
   casadi_int k;
   // Current time
@@ -128,6 +130,10 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
       \identifier{1ly} */
   void init(const Dict& opts) override;
 
+  /** \brief Set the (persistent) work vectors */
+  void set_work(void* mem, const double**& arg, double**& res,
+    casadi_int*& iw, double*& w) const override;
+
   /** Helper for a more powerful 'integrator' factory */
   virtual Function create_advanced(const Dict& opts);
 
@@ -138,7 +144,7 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
 
       \identifier{25a} */
   virtual void reset(IntegratorMemory* mem,
-    const double* u, const double* x, const double* z, const double* p) const = 0;
+    const double* u, const double* x, const double* z, const double* p) const;
 
   /** \brief  Find next stop time
 
@@ -467,9 +473,6 @@ enum BStepOut {
 };
 
 struct CASADI_EXPORT FixedStepMemory : public IntegratorMemory {
-  // Work vectors, allocated in base class
-  double *x, *z, *rx, *rz, *rq, *x_prev, *rx_prev;
-
   /// Work vectors, forward problem
   double *v, *p, *u, *q, *v_prev, *q_prev;
 
