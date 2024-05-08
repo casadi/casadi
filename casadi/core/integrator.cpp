@@ -688,7 +688,7 @@ void Integrator::init(const Dict& opts) {
 
   // Work vectors for sparsity pattern propagation: Can be reused in derived classes
   alloc_w(nx_ + nz_, true); // x, z
-  alloc_w(nx_, true); // x_prev
+  alloc_w(nx_, true); // ode
   alloc_w(nrx_ + nrz_, true); // rx, rz
   alloc_w(nrx_, true); // adj_ode
   alloc_w(nrq_, true); // rq
@@ -709,7 +709,7 @@ void Integrator::set_work(void* mem, const double**& arg, double**& res,
   // Work vectors
   m->x = w; w += nx_;  // doubles as xz
   m->z = w; w += nz_;
-  m->x_prev = w; w += nx_;
+  m->ode = w; w += nx_;
   m->rx = w; w += nrx_;  // doubles as xz
   m->rz = w; w += nrz_;
   m->adj_ode = w; w += nrx_;
@@ -1862,12 +1862,12 @@ void FixedStepIntegrator::advance(IntegratorMemory* mem,
     double t = m->t + j * h;
 
     // Update the previous step
-    casadi_copy(m->x, nx_, m->x_prev);
+    casadi_copy(m->x, nx_, m->ode);
     casadi_copy(m->v, nv_, m->v_prev);
     casadi_copy(m->q, nq_, m->q_prev);
 
     // Take step
-    stepF(m, t, h, m->x_prev, m->v_prev, m->x, m->v, m->q);
+    stepF(m, t, h, m->ode, m->v_prev, m->x, m->v, m->q);
     casadi_axpy(nq_, 1., m->q_prev, m->q);
 
     // Save state, if needed
