@@ -1119,3 +1119,11 @@ jobs:
           pip install -vvv casadi-${{ needs.version.outputs.wheel }}-cp${{matrix.py2}}-none-${{env.platform}}.whl
           cd test/python
           python function.py
+        shell: bash -el {0}
+        if: "!contains(matrix.image, 'windows')"
+      - run: |
+          pip install -vvv casadi-${{ needs.version.outputs.wheel }}-cp${{matrix.py2}}-none-${{env.platform}}.whl
+          cd test/python
+          python function.py
+        shell: pwsh
+        if: contains(matrix.image, 'windows')
