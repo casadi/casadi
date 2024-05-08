@@ -968,7 +968,7 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
   bvec_t* qf = res[INTEGRATOR_QF];
   bvec_t* rxf = res[INTEGRATOR_ADJ_X0];
   bvec_t* rqf = res[INTEGRATOR_ADJ_P];
-  bvec_t* uqf = res[INTEGRATOR_ADJ_U];
+  bvec_t* adj_u = res[INTEGRATOR_ADJ_U];
   res += n_out_;
 
   // Work vectors
@@ -1020,17 +1020,17 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
     std::fill_n(rx_prev, nrx_, 0);
     if (rqf) std::fill_n(rqf, nrq_, 0);
 
-    // Take adj_xf, rp, uqf past the last grid point
+    // Take adj_xf, rp, adj_u past the last grid point
     if (adj_xf) adj_xf += nrx_ * nt();
     if (adj_qf) adj_qf += nrp_ * nt();
-    if (uqf) uqf += nuq_ * nt();
+    if (adj_u) adj_u += nuq_ * nt();
 
     // Integrate backward
     for (casadi_int k = nt(); k-- > 0; ) {
       // Shift time
       if (adj_xf) adj_xf -= nrx_;
       if (adj_qf) adj_qf -= nrp_;
-      if (uqf) uqf -= nuq_;
+      if (adj_u) adj_u -= nuq_;
       if (u) u -= nu_;
 
       // Add impulse from adj_xf
@@ -1048,8 +1048,8 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
       sp_jac_rdae_.spsolve(rx, w, false);
 
       // Propagate to quadratures
-      if ((nrq_ > 0 && rqf) || (nuq_ > 0 && uqf)) {
-        if (bquad_sp_forward(&m, ode, alg, p, u, rx, rz, adj_qf, rq, uqf)) return 1;
+      if ((nrq_ > 0 && rqf) || (nuq_ > 0 && adj_u)) {
+        if (bquad_sp_forward(&m, ode, alg, p, u, rx, rz, adj_qf, rq, adj_u)) return 1;
         // Sum contributions to rqf
         if (rqf) {
           for (casadi_int i = 0; i < nrq_; ++i) rqf[i] |= rq[i];
@@ -1232,7 +1232,7 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
   bvec_t* qf = res[INTEGRATOR_QF];
   bvec_t* rxf = res[INTEGRATOR_ADJ_X0];
   bvec_t* rqf = res[INTEGRATOR_ADJ_P];
-  bvec_t* uqf = res[INTEGRATOR_ADJ_U];
+  bvec_t* adj_u = res[INTEGRATOR_ADJ_U];
   res += n_out_;
 
   // Work vectors
@@ -1277,8 +1277,8 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
       }
 
       // Get dependencies from backward quadratures
-      if ((nrq_ > 0 && rqf) || (nuq_ > 0 && uqf)) {
-        if (bquad_sp_reverse(&m, ode, alg, p, u, rx, rz, rp, rqf, uqf)) return 1;
+      if ((nrq_ > 0 && rqf) || (nuq_ > 0 && adj_u)) {
+        if (bquad_sp_reverse(&m, ode, alg, p, u, rx, rz, rp, rqf, adj_u)) return 1;
       }
 
       // Propagate interdependencies
@@ -1299,7 +1299,7 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
       // Shift time
       if (adj_xf) adj_xf += nrx_;
       if (rp) rp += nrp_;
-      if (uqf) uqf += nuq_;
+      if (adj_u) adj_u += nuq_;
       if (u) u += nu_;
     }
   } else {
@@ -1958,7 +1958,7 @@ void FixedStepIntegrator::stepF(FixedStepMemory* m, double t, double h,
 void FixedStepIntegrator::stepB(FixedStepMemory* m, double t, double h,
     const double* x0, const double* xf, const double* vf,
     const double* adj_xf, const double* rv0,
-    double* rxf, double* rqf, double* uqf) const {
+    double* rxf, double* rqf, double* adj_u) const {
   // Evaluate nondifferentiated
   std::fill(m->arg, m->arg + BSTEP_NUM_IN, nullptr);
   m->arg[BSTEP_T] = &t;  // t
@@ -1979,7 +1979,7 @@ void FixedStepIntegrator::stepB(FixedStepMemory* m, double t, double h,
   m->res[BSTEP_ADJ_X0] = rxf;  // adj:x0
   m->res[BSTEP_ADJ_V0] = nullptr;  // adj:v0
   m->res[BSTEP_ADJ_P] = rqf;  // adj:p
-  m->res[BSTEP_ADJ_U] = uqf;  // adj:u
+  m->res[BSTEP_ADJ_U] = adj_u;  // adj:u
   calc_function(m, reverse_name("step", nadj_));
   // Evaluate sensitivities
   if (nfwd_ > 0) {
@@ -1988,7 +1988,7 @@ void FixedStepIntegrator::stepB(FixedStepMemory* m, double t, double h,
     m->arg[BSTEP_NUM_IN + BSTEP_ADJ_X0] = rxf;  // out:adj:x0
     m->arg[BSTEP_NUM_IN + BSTEP_ADJ_V0] = nullptr;  // out:adj:v0
     m->arg[BSTEP_NUM_IN + BSTEP_ADJ_P] = rqf;  // out:adj:p
-    m->arg[BSTEP_NUM_IN + BSTEP_ADJ_U] = uqf;  // out:adj:u
+    m->arg[BSTEP_NUM_IN + BSTEP_ADJ_U] = adj_u;  // out:adj:u
     m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_T] = nullptr;  // fwd:t
     m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_H] = nullptr;  // fwd:h
     m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_X0] = x0 + nx1_;  // fwd:x0
@@ -2006,7 +2006,7 @@ void FixedStepIntegrator::stepB(FixedStepMemory* m, double t, double h,
     m->res[BSTEP_ADJ_X0] = rxf + nrx1_ * nadj_;  // fwd:rxf
     m->res[BSTEP_ADJ_V0] = nullptr;  // fwd:adj:v0
     m->res[BSTEP_ADJ_P] = rqf + nrq1_ * nadj_;  // fwd:rqf
-    m->res[BSTEP_ADJ_U] = uqf + nuq1_ * nadj_;  // fwd:uqf
+    m->res[BSTEP_ADJ_U] = adj_u + nuq1_ * nadj_;  // fwd:adj_u
     calc_function(m, forward_name(reverse_name("step", nadj_), nfwd_));
   }
 }

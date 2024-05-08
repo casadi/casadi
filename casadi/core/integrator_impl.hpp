@@ -564,7 +564,7 @@ class CASADI_EXPORT FixedStepIntegrator : public Integrator {
   void stepB(FixedStepMemory* m, double t, double h,
     const double* x0, const double* xf, const double* vf,
     const double* adj_xf, const double* rv0,
-    double* rxf, double* rqf, double* uqf) const;
+    double* rxf, double* rqf, double* adj_u) const;
 
   // Target number of finite elements
   casadi_int nk_target_;
