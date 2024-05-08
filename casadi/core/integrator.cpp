@@ -973,7 +973,7 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
 
   // Work vectors
   bvec_t *ode = w; w += nx_;
-  bvec_t *z = w; w += nz_;
+  bvec_t *alg = w; w += nz_;
   bvec_t *x_prev = w; w += nx_;
   bvec_t *rx = w; w += nrx_;
   bvec_t *rz = w; w += nrz_;
@@ -989,22 +989,22 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
   // Propagate forward
   for (casadi_int k = 0; k < nt(); ++k) {
     // Propagate through DAE function
-    if (fdae_sp_forward(&m, x_prev, p, u, ode, z)) return 1;
+    if (fdae_sp_forward(&m, x_prev, p, u, ode, alg)) return 1;
     for (casadi_int i = 0; i < nx_; ++i) ode[i] |= x_prev[i];
 
     // "Solve" in order to resolve interdependencies (cf. Rootfinder)
     std::copy_n(ode, nx_, w);
-    std::copy_n(z, nz_, w + nx_);
+    std::copy_n(alg, nz_, w + nx_);
     std::fill_n(ode, nx_ + nz_, 0);
     sp_jac_dae_.spsolve(ode, w, false);
 
     // Get xf and zf
     if (xf) std::copy_n(ode, nx_, xf);
-    if (zf) std::copy_n(z, nz_, zf);
+    if (zf) std::copy_n(alg, nz_, zf);
 
     // Propagate to quadratures
     if (nq_ > 0 && qf) {
-      if (fquad_sp_forward(&m, ode, z, p, u, qf)) return 1;
+      if (fquad_sp_forward(&m, ode, alg, p, u, qf)) return 1;
     }
 
     // Shift time
@@ -1039,7 +1039,7 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
       }
 
       // Propagate through DAE function
-      if (bdae_sp_forward(&m, ode, z, p, u, rx_prev, rp, rx, rz)) return 1;
+      if (bdae_sp_forward(&m, ode, alg, p, u, rx_prev, rp, rx, rz)) return 1;
       for (casadi_int i = 0; i < nrx_; ++i) rx[i] |= rx_prev[i];
 
       // "Solve" in order to resolve interdependencies (cf. Rootfinder)
@@ -1049,7 +1049,7 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
 
       // Propagate to quadratures
       if ((nrq_ > 0 && rqf) || (nuq_ > 0 && uqf)) {
-        if (bquad_sp_forward(&m, ode, z, p, u, rx, rz, rp, rq, uqf)) return 1;
+        if (bquad_sp_forward(&m, ode, alg, p, u, rx, rz, rp, rq, uqf)) return 1;
         // Sum contributions to rqf
         if (rqf) {
           for (casadi_int i = 0; i < nrq_; ++i) rqf[i] |= rq[i];
@@ -1237,7 +1237,7 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
 
   // Work vectors
   bvec_t *ode = w; w += nx_;
-  bvec_t *z = w; w += nz_;
+  bvec_t *alg = w; w += nz_;
   bvec_t *x_prev = w; w += nx_;
   bvec_t *rx = w; w += nrx_;
   bvec_t *rz = w; w += nrz_;
@@ -1249,7 +1249,7 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
 
   // Clear state vector
   std::fill_n(ode, nx_, 0);
-  std::fill_n(z, nz_, 0);
+  std::fill_n(alg, nz_, 0);
 
   if (nrx_ > 0) {
     // Propagate from rxf initial time
@@ -1278,7 +1278,7 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
 
       // Get dependencies from backward quadratures
       if ((nrq_ > 0 && rqf) || (nuq_ > 0 && uqf)) {
-        if (bquad_sp_reverse(&m, ode, z, p, u, rx, rz, rp, rqf, uqf)) return 1;
+        if (bquad_sp_reverse(&m, ode, alg, p, u, rx, rz, rp, rqf, uqf)) return 1;
       }
 
       // Propagate interdependencies
@@ -1290,7 +1290,7 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
       std::copy_n(rx, nrx_, rx_prev);
 
       // Indirect dependency via g
-      if (bdae_sp_reverse(&m, ode, z, p, u, rx_prev, rp, rx, rz)) return 1;
+      if (bdae_sp_reverse(&m, ode, alg, p, u, rx_prev, rp, rx, rz)) return 1;
 
       // Update rx, rz
       std::copy_n(rx_prev, nrx_, rx);
@@ -1326,13 +1326,13 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
       std::fill_n(xf, nx_, 0);
     }
     if (zf) {
-      for (casadi_int i = 0; i < nz_; ++i) z[i] |= zf[i];
+      for (casadi_int i = 0; i < nz_; ++i) alg[i] |= zf[i];
       std::fill_n(zf, nz_, 0);
     }
 
     // Get dependencies from forward quadratures, if any
     if (nq_ > 0 && qf) {
-      if (fquad_sp_reverse(&m, ode, z, p, u, qf)) return 1;
+      if (fquad_sp_reverse(&m, ode, alg, p, u, qf)) return 1;
     }
 
     // Propagate interdependencies
@@ -1344,11 +1344,11 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
     std::copy_n(ode, nx_, x_prev);
 
     // Indirect dependency through f
-    if (fdae_sp_reverse(&m, x_prev, p, u, ode, z)) return 1;
+    if (fdae_sp_reverse(&m, x_prev, p, u, ode, alg)) return 1;
 
     // Update x, z
     std::copy_n(x_prev, nx_, ode);
-    std::fill_n(z, nz_, 0);
+    std::fill_n(alg, nz_, 0);
   }
 
   // Direct dependency x0 -> x
