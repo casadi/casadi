@@ -40,7 +40,7 @@ namespace casadi {
     \identifier{1lp} */
 struct CASADI_EXPORT IntegratorMemory : public OracleMemory {
   // Work vectors
-  double *x, *z, *adj_x, *rz, *rq, *ode, *adj_ode, *p, *u, *rp;
+  double *x, *z, *adj_x, *adj_z, *rq, *ode, *adj_ode, *p, *u, *rp;
   // Current control interval
   casadi_int k;
   // Current time
@@ -548,7 +548,7 @@ class CASADI_EXPORT FixedStepIntegrator : public Integrator {
 
   /// Introduce an impulse into the backwards integration at the current time
   void impulseB(IntegratorMemory* mem,
-    const double* adj_x, const double* rz, const double* rp) const override;
+    const double* adj_x, const double* adj_z, const double* rp) const override;
 
   /** \brief Retreat solution in time
 

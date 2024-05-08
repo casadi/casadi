@@ -710,8 +710,8 @@ void Integrator::set_work(void* mem, const double**& arg, double**& res,
   m->x = w; w += nx_;  // doubles as xz
   m->z = w; w += nz_;
   m->ode = w; w += nx_;
-  m->adj_x = w; w += nrx_;  // doubles as xz
-  m->rz = w; w += nrz_;
+  m->adj_x = w; w += nrx_;  // doubles as adj_xz
+  m->adj_z = w; w += nrz_;
   m->adj_ode = w; w += nrx_;
   m->rq = w; w += nrq_;
   m->p = w; w += np_;
