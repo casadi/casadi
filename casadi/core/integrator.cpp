@@ -694,6 +694,9 @@ void Integrator::init(const Dict& opts) {
   alloc_w(nrq_, true); // rq
   alloc_w(nx_+nz_);  // Sparsity::sp_solve
   alloc_w(nrx_+nrz_);  // Sparsity::sp_solve
+  alloc_w(np_, true); // p
+  alloc_w(nu_, true); // u
+  alloc_w(nrp_, true); // rp
 }
 
 void Integrator::set_work(void* mem, const double**& arg, double**& res,
@@ -711,6 +714,9 @@ void Integrator::set_work(void* mem, const double**& arg, double**& res,
   m->rz = w; w += nrz_;
   m->rx_prev = w; w += nrx_;
   m->rq = w; w += nrq_;
+  m->p = w; w += np_;
+  m->u = w; w += nu_;
+  m->rp = w; w += nrp_;
 }
 
 int Integrator::init_mem(void* mem) const {
@@ -1789,15 +1795,12 @@ void FixedStepIntegrator::init(const Dict& opts) {
 
   // Work vectors, forward problem
   alloc_w(nv_, true); // v
-  alloc_w(np_, true); // p
-  alloc_w(nu_, true); // u
   alloc_w(nq_, true); // q
   alloc_w(nv_, true); // v_prev
   alloc_w(nq_, true); // q_prev
 
   // Work vectors, backward problem
   alloc_w(nrv_, true); // rv
-  alloc_w(nrp_, true); // rp
   alloc_w(nuq_, true); // uq
   alloc_w(nrq_, true); // rq_prev
   alloc_w(nuq_, true); // uq_prev
@@ -1818,15 +1821,12 @@ void FixedStepIntegrator::set_work(void* mem, const double**& arg, double**& res
 
   // Work vectors, forward problem
   m->v = w; w += nv_;
-  m->p = w; w += np_;
-  m->u = w; w += nu_;
   m->q = w; w += nq_;
   m->v_prev = w; w += nv_;
   m->q_prev = w; w += nq_;
 
   // Work vectors, backward problem
   m->rv = w; w += nrv_;
-  m->rp = w; w += nrp_;
   m->uq = w; w += nuq_;
   m->rq_prev = w; w += nrq_;
   m->uq_prev = w; w += nuq_;

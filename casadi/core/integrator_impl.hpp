@@ -40,7 +40,7 @@ namespace casadi {
     \identifier{1lp} */
 struct CASADI_EXPORT IntegratorMemory : public OracleMemory {
   // Work vectors
-  double *x, *z, *rx, *rz, *rq, *x_prev, *rx_prev;
+  double *x, *z, *rx, *rz, *rq, *x_prev, *rx_prev, *p, *u, *rp;
   // Current control interval
   casadi_int k;
   // Current time
@@ -474,10 +474,10 @@ enum BStepOut {
 
 struct CASADI_EXPORT FixedStepMemory : public IntegratorMemory {
   /// Work vectors, forward problem
-  double *v, *p, *u, *q, *v_prev, *q_prev;
+  double *v, *q, *v_prev, *q_prev;
 
   /// Work vectors, backward problem
-  double *rv, *rp, *uq, *rq_prev, *uq_prev;
+  double *rv, *uq, *rq_prev, *uq_prev;
 
   /// State and dependent variables at all times
   double *x_tape, *v_tape;
