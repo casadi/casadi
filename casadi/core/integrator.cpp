@@ -358,7 +358,7 @@ int Integrator::eval(const double** arg, double** res,
   double* z = res[INTEGRATOR_ZF];
   double* q = res[INTEGRATOR_QF];
   double* adj_x = res[INTEGRATOR_ADJ_X0];
-  double* rq = res[INTEGRATOR_ADJ_P];
+  double* adj_p = res[INTEGRATOR_ADJ_P];
   double* adj_u = res[INTEGRATOR_ADJ_U];
   res += INTEGRATOR_NUM_OUT;
 
@@ -429,7 +429,7 @@ int Integrator::eval(const double** arg, double** res,
         if (m->k > 0) {
           retreat(m, u, 0, 0, adj_u);
         } else {
-          retreat(m, u, adj_x, rq, adj_u);
+          retreat(m, u, adj_x, adj_p, adj_u);
         }
       } else {
         if (verbose_) casadi_message("No adjoint seeds from output time " + str(m->k)
@@ -437,7 +437,7 @@ int Integrator::eval(const double** arg, double** res,
         casadi_clear(adj_u, nuq_);
         if (m->k == 0) {
           casadi_clear(adj_x, nrx_);
-          casadi_clear(rq, nrq_);
+          casadi_clear(adj_p, nrq_);
         }
       }
     }
@@ -691,7 +691,7 @@ void Integrator::init(const Dict& opts) {
   alloc_w(nx_, true); // ode
   alloc_w(nrx_ + nrz_, true); // adj_x, rz
   alloc_w(nrx_, true); // adj_ode
-  alloc_w(nrq_, true); // rq
+  alloc_w(nrq_, true); // adj_p
   alloc_w(nx_+nz_);  // Sparsity::sp_solve
   alloc_w(nrx_+nrz_);  // Sparsity::sp_solve
   alloc_w(np_, true); // p
@@ -713,7 +713,7 @@ void Integrator::set_work(void* mem, const double**& arg, double**& res,
   m->adj_x = w; w += nrx_;  // doubles as adj_xz
   m->adj_z = w; w += nrz_;
   m->adj_ode = w; w += nrx_;
-  m->rq = w; w += nrq_;
+  m->adj_p = w; w += nrq_;
   m->p = w; w += np_;
   m->u = w; w += nu_;
   m->adj_q = w; w += nrp_;
@@ -978,7 +978,7 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
   bvec_t *adj_x = w; w += nrx_;
   bvec_t *rz = w; w += nrz_;
   bvec_t *adj_ode = w; w += nrx_;
-  bvec_t *rq = w; w += nrq_;
+  bvec_t *adj_p = w; w += nrq_;
 
   // Memory struct for function calls below
   SpForwardMem m = {arg, res, iw, w};
@@ -1049,10 +1049,10 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
 
       // Propagate to quadratures
       if ((nrq_ > 0 && adj_p0) || (nuq_ > 0 && adj_u)) {
-        if (bquad_sp_forward(&m, ode, alg, p, u, adj_x, rz, adj_qf, rq, adj_u)) return 1;
+        if (bquad_sp_forward(&m, ode, alg, p, u, adj_x, rz, adj_qf, adj_p, adj_u)) return 1;
         // Sum contributions to adj_p0
         if (adj_p0) {
-          for (casadi_int i = 0; i < nrq_; ++i) adj_p0[i] |= rq[i];
+          for (casadi_int i = 0; i < nrq_; ++i) adj_p0[i] |= adj_p[i];
         }
       }
 
@@ -1242,7 +1242,7 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
   bvec_t *adj_x = w; w += nrx_;
   bvec_t *rz = w; w += nrz_;
   bvec_t *adj_ode = w; w += nrx_;
-  bvec_t *rq = w; w += nrq_;
+  bvec_t *adj_p = w; w += nrq_;
 
   // Memory struct for function calls below
   SpReverseMem m = {arg, res, iw, w};
@@ -1263,12 +1263,12 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
     std::fill_n(rz, nrz_, 0);
 
     // Save adj_p0: See note below
-    if (adj_p0) std::copy_n(adj_p0, nrq_, rq);
+    if (adj_p0) std::copy_n(adj_p0, nrq_, adj_p);
 
     // Step backwards through backward problem
     for (casadi_int k = 0; k < nt(); ++k) {
       // Restore adj_p0: See note below
-      if (adj_p0) std::copy_n(rq, nrq_, adj_p0);
+      if (adj_p0) std::copy_n(adj_p, nrq_, adj_p0);
 
       // Add impulse from adj_xf
       if (adj_xf) {
@@ -1802,7 +1802,7 @@ void FixedStepIntegrator::init(const Dict& opts) {
   // Work vectors, backward problem
   alloc_w(nrv_, true); // rv
   alloc_w(nuq_, true); // adj_u
-  alloc_w(nrq_, true); // rq_prev
+  alloc_w(nrq_, true); // adj_p_prev
   alloc_w(nuq_, true); // adj_u_prev
 
   // Allocate tape if backward states are present
@@ -1828,7 +1828,7 @@ void FixedStepIntegrator::set_work(void* mem, const double**& arg, double**& res
   // Work vectors, backward problem
   m->rv = w; w += nrv_;
   m->adj_u = w; w += nuq_;
-  m->rq_prev = w; w += nrq_;
+  m->adj_p_prev = w; w += nrq_;
   m->adj_u_prev = w; w += nuq_;
 
   // Allocate tape if backward states are present
@@ -1885,7 +1885,7 @@ void FixedStepIntegrator::advance(IntegratorMemory* mem,
 }
 
 void FixedStepIntegrator::retreat(IntegratorMemory* mem, const double* u,
-    double* adj_x, double* rq, double* adj_u) const {
+    double* adj_x, double* adj_p, double* adj_u) const {
   auto m = static_cast<FixedStepMemory*>(mem);
 
   // Set controls
@@ -1902,7 +1902,7 @@ void FixedStepIntegrator::retreat(IntegratorMemory* mem, const double* u,
 
     // Update the previous step
     casadi_copy(m->adj_x, nrx_, m->adj_ode);
-    casadi_copy(m->rq, nrq_, m->rq_prev);
+    casadi_copy(m->adj_p, nrq_, m->adj_p_prev);
     casadi_copy(m->adj_u, nuq_, m->adj_u_prev);
 
     // Take step
@@ -1910,15 +1910,15 @@ void FixedStepIntegrator::retreat(IntegratorMemory* mem, const double* u,
     stepB(m, t, h,
       m->x_tape + nx_ * tapeind, m->x_tape + nx_ * (tapeind + 1),
       m->v_tape + nv_ * tapeind,
-      m->adj_ode, m->rv, m->adj_x, m->rq, m->adj_u);
+      m->adj_ode, m->rv, m->adj_x, m->adj_p, m->adj_u);
     casadi_clear(m->rv, nrv_);
-    casadi_axpy(nrq_, 1., m->rq_prev, m->rq);
+    casadi_axpy(nrq_, 1., m->adj_p_prev, m->adj_p);
     casadi_axpy(nuq_, 1., m->adj_u_prev, m->adj_u);
   }
 
   // Return to user
   casadi_copy(m->adj_x, nrx_, adj_x);
-  casadi_copy(m->rq, nrq_, rq);
+  casadi_copy(m->adj_p, nrq_, adj_p);
   casadi_copy(m->adj_u, nuq_, adj_u);
 }
 
@@ -2048,7 +2048,7 @@ void FixedStepIntegrator::resetB(IntegratorMemory* mem) const {
   casadi_clear(m->adj_x, nrx_);
 
   // Reset summation states
-  casadi_clear(m->rq, nrq_);
+  casadi_clear(m->adj_p, nrq_);
   casadi_clear(m->adj_u, nuq_);
 
   // Update backwards dependent variables
