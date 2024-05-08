@@ -967,7 +967,7 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
   bvec_t* zf = res[INTEGRATOR_ZF];
   bvec_t* qf = res[INTEGRATOR_QF];
   bvec_t* adj_x0 = res[INTEGRATOR_ADJ_X0];
-  bvec_t* adj_p = res[INTEGRATOR_ADJ_P];
+  bvec_t* adj_p0 = res[INTEGRATOR_ADJ_P];
   bvec_t* adj_u = res[INTEGRATOR_ADJ_U];
   res += n_out_;
 
@@ -1016,9 +1016,9 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
   }
 
   if (nrx_ > 0) {
-    // Clear rx_prev, adj_p
+    // Clear rx_prev, adj_p0
     std::fill_n(rx_prev, nrx_, 0);
-    if (adj_p) std::fill_n(adj_p, nrq_, 0);
+    if (adj_p0) std::fill_n(adj_p0, nrq_, 0);
 
     // Take adj_xf, rp, adj_u past the last grid point
     if (adj_xf) adj_xf += nrx_ * nt();
@@ -1048,11 +1048,11 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
       sp_jac_rdae_.spsolve(rx, w, false);
 
       // Propagate to quadratures
-      if ((nrq_ > 0 && adj_p) || (nuq_ > 0 && adj_u)) {
+      if ((nrq_ > 0 && adj_p0) || (nuq_ > 0 && adj_u)) {
         if (bquad_sp_forward(&m, ode, alg, p, u, rx, rz, adj_qf, rq, adj_u)) return 1;
-        // Sum contributions to adj_p
-        if (adj_p) {
-          for (casadi_int i = 0; i < nrq_; ++i) adj_p[i] |= rq[i];
+        // Sum contributions to adj_p0
+        if (adj_p0) {
+          for (casadi_int i = 0; i < nrq_; ++i) adj_p0[i] |= rq[i];
         }
       }
 
@@ -1231,7 +1231,7 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
   bvec_t* zf = res[INTEGRATOR_ZF];
   bvec_t* qf = res[INTEGRATOR_QF];
   bvec_t* adj_x0 = res[INTEGRATOR_ADJ_X0];
-  bvec_t* adj_p = res[INTEGRATOR_ADJ_P];
+  bvec_t* adj_p0 = res[INTEGRATOR_ADJ_P];
   bvec_t* adj_u = res[INTEGRATOR_ADJ_U];
   res += n_out_;
 
@@ -1262,13 +1262,13 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
     // Reset rz
     std::fill_n(rz, nrz_, 0);
 
-    // Save adj_p: See note below
-    if (adj_p) std::copy_n(adj_p, nrq_, rq);
+    // Save adj_p0: See note below
+    if (adj_p0) std::copy_n(adj_p0, nrq_, rq);
 
     // Step backwards through backward problem
     for (casadi_int k = 0; k < nt(); ++k) {
-      // Restore adj_p: See note below
-      if (adj_p) std::copy_n(rq, nrq_, adj_p);
+      // Restore adj_p0: See note below
+      if (adj_p0) std::copy_n(rq, nrq_, adj_p0);
 
       // Add impulse from adj_xf
       if (adj_xf) {
@@ -1277,8 +1277,8 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
       }
 
       // Get dependencies from backward quadratures
-      if ((nrq_ > 0 && adj_p) || (nuq_ > 0 && adj_u)) {
-        if (bquad_sp_reverse(&m, ode, alg, p, u, rx, rz, rp, adj_p, adj_u)) return 1;
+      if ((nrq_ > 0 && adj_p0) || (nuq_ > 0 && adj_u)) {
+        if (bquad_sp_reverse(&m, ode, alg, p, u, rx, rz, rp, adj_p0, adj_u)) return 1;
       }
 
       // Propagate interdependencies
