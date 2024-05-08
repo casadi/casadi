@@ -40,7 +40,7 @@ namespace casadi {
     \identifier{1lp} */
 struct CASADI_EXPORT IntegratorMemory : public OracleMemory {
   // Work vectors
-  double *x, *z, *rx, *rz, *rq, *ode, *adj_ode, *p, *u, *rp;
+  double *x, *z, *adj_x, *rz, *rq, *ode, *adj_ode, *p, *u, *rp;
   // Current control interval
   casadi_int k;
   // Current time
@@ -171,13 +171,13 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
 
       \identifier{25f} */
   virtual void impulseB(IntegratorMemory* mem,
-    const double* rx, const double* rz, const double* rp) const = 0;
+    const double* adj_x, const double* rz, const double* rp) const = 0;
 
   /** \brief  Retreat solution in time
 
       \identifier{25g} */
   virtual void retreat(IntegratorMemory* mem, const double* u,
-    double* rx, double* rq, double* adj_u) const = 0;
+    double* adj_x, double* rq, double* adj_u) const = 0;
 
   /** \brief  evaluate
 
@@ -548,13 +548,13 @@ class CASADI_EXPORT FixedStepIntegrator : public Integrator {
 
   /// Introduce an impulse into the backwards integration at the current time
   void impulseB(IntegratorMemory* mem,
-    const double* rx, const double* rz, const double* rp) const override;
+    const double* adj_x, const double* rz, const double* rp) const override;
 
   /** \brief Retreat solution in time
 
       \identifier{25k} */
   void retreat(IntegratorMemory* mem, const double* u,
-    double* rx, double* rq, double* adj_u) const override;
+    double* adj_x, double* rq, double* adj_u) const override;
 
   /// Take integrator step forward
   void stepF(FixedStepMemory* m, double t, double h,

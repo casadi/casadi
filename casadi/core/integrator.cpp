@@ -357,7 +357,7 @@ int Integrator::eval(const double** arg, double** res,
   double* x = res[INTEGRATOR_XF];
   double* z = res[INTEGRATOR_ZF];
   double* q = res[INTEGRATOR_QF];
-  double* rx = res[INTEGRATOR_ADJ_X0];
+  double* adj_x = res[INTEGRATOR_ADJ_X0];
   double* rq = res[INTEGRATOR_ADJ_P];
   double* adj_u = res[INTEGRATOR_ADJ_U];
   res += INTEGRATOR_NUM_OUT;
@@ -429,14 +429,14 @@ int Integrator::eval(const double** arg, double** res,
         if (m->k > 0) {
           retreat(m, u, 0, 0, adj_u);
         } else {
-          retreat(m, u, rx, rq, adj_u);
+          retreat(m, u, adj_x, rq, adj_u);
         }
       } else {
         if (verbose_) casadi_message("No adjoint seeds from output time " + str(m->k)
           + ": t_next = " + str(m->t_next) + ", t_stop = " + str(m->t_stop));
         casadi_clear(adj_u, nuq_);
         if (m->k == 0) {
-          casadi_clear(rx, nrx_);
+          casadi_clear(adj_x, nrx_);
           casadi_clear(rq, nrq_);
         }
       }
@@ -689,7 +689,7 @@ void Integrator::init(const Dict& opts) {
   // Work vectors for sparsity pattern propagation: Can be reused in derived classes
   alloc_w(nx_ + nz_, true); // x, z
   alloc_w(nx_, true); // ode
-  alloc_w(nrx_ + nrz_, true); // rx, rz
+  alloc_w(nrx_ + nrz_, true); // adj_x, rz
   alloc_w(nrx_, true); // adj_ode
   alloc_w(nrq_, true); // rq
   alloc_w(nx_+nz_);  // Sparsity::sp_solve
@@ -710,7 +710,7 @@ void Integrator::set_work(void* mem, const double**& arg, double**& res,
   m->x = w; w += nx_;  // doubles as xz
   m->z = w; w += nz_;
   m->ode = w; w += nx_;
-  m->rx = w; w += nrx_;  // doubles as xz
+  m->adj_x = w; w += nrx_;  // doubles as xz
   m->rz = w; w += nrz_;
   m->adj_ode = w; w += nrx_;
   m->rq = w; w += nrq_;
@@ -975,7 +975,7 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
   bvec_t *ode = w; w += nx_;
   bvec_t *alg = w; w += nz_;
   bvec_t *x = w; w += nx_;
-  bvec_t *rx = w; w += nrx_;
+  bvec_t *adj_x = w; w += nrx_;
   bvec_t *rz = w; w += nrz_;
   bvec_t *adj_ode = w; w += nrx_;
   bvec_t *rq = w; w += nrq_;
@@ -1039,17 +1039,17 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
       }
 
       // Propagate through DAE function
-      if (bdae_sp_forward(&m, ode, alg, p, u, adj_ode, adj_qf, rx, rz)) return 1;
-      for (casadi_int i = 0; i < nrx_; ++i) rx[i] |= adj_ode[i];
+      if (bdae_sp_forward(&m, ode, alg, p, u, adj_ode, adj_qf, adj_x, rz)) return 1;
+      for (casadi_int i = 0; i < nrx_; ++i) adj_x[i] |= adj_ode[i];
 
       // "Solve" in order to resolve interdependencies (cf. Rootfinder)
-      std::copy_n(rx, nrx_ + nrz_, w);
-      std::fill_n(rx, nrx_ + nrz_, 0);
-      sp_jac_rdae_.spsolve(rx, w, false);
+      std::copy_n(adj_x, nrx_ + nrz_, w);
+      std::fill_n(adj_x, nrx_ + nrz_, 0);
+      sp_jac_rdae_.spsolve(adj_x, w, false);
 
       // Propagate to quadratures
       if ((nrq_ > 0 && adj_p0) || (nuq_ > 0 && adj_u)) {
-        if (bquad_sp_forward(&m, ode, alg, p, u, rx, rz, adj_qf, rq, adj_u)) return 1;
+        if (bquad_sp_forward(&m, ode, alg, p, u, adj_x, rz, adj_qf, rq, adj_u)) return 1;
         // Sum contributions to adj_p0
         if (adj_p0) {
           for (casadi_int i = 0; i < nrq_; ++i) adj_p0[i] |= rq[i];
@@ -1057,11 +1057,11 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
       }
 
       // Update adj_ode
-      std::copy_n(rx, nx_, adj_ode);
+      std::copy_n(adj_x, nx_, adj_ode);
     }
 
     // Get adj_x0 at initial time
-    if (adj_x0) std::copy_n(rx, nrx_, adj_x0);
+    if (adj_x0) std::copy_n(adj_x, nrx_, adj_x0);
   }
   return 0;
 }
@@ -1239,7 +1239,7 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
   bvec_t *ode = w; w += nx_;
   bvec_t *alg = w; w += nz_;
   bvec_t *x = w; w += nx_;
-  bvec_t *rx = w; w += nrx_;
+  bvec_t *adj_x = w; w += nrx_;
   bvec_t *rz = w; w += nrz_;
   bvec_t *adj_ode = w; w += nrx_;
   bvec_t *rq = w; w += nrq_;
@@ -1254,10 +1254,10 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
   if (nrx_ > 0) {
     // Propagate from adj_x0 initial time
     if (adj_x0) {
-      std::copy_n(adj_x0, nrx_, rx);
+      std::copy_n(adj_x0, nrx_, adj_x);
       std::fill_n(adj_x0, nrx_, 0);
     } else {
-      std::fill_n(rx, nrx_, 0);
+      std::fill_n(adj_x, nrx_, 0);
     }
     // Reset rz
     std::fill_n(rz, nrz_, 0);
@@ -1272,28 +1272,28 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
 
       // Add impulse from adj_xf
       if (adj_xf) {
-        for (casadi_int i = 0; i < nrx_; ++i) rx[i] |= adj_xf[i];
+        for (casadi_int i = 0; i < nrx_; ++i) adj_x[i] |= adj_xf[i];
         std::fill_n(adj_xf, nrx_, 0);
       }
 
       // Get dependencies from backward quadratures
       if ((nrq_ > 0 && adj_p0) || (nuq_ > 0 && adj_u)) {
-        if (bquad_sp_reverse(&m, ode, alg, p, u, rx, rz, rp, adj_p0, adj_u)) return 1;
+        if (bquad_sp_reverse(&m, ode, alg, p, u, adj_x, rz, rp, adj_p0, adj_u)) return 1;
       }
 
       // Propagate interdependencies
       std::fill_n(w, nrx_+nrz_, 0);
-      sp_jac_rdae_.spsolve(w, rx, true);
-      std::copy_n(w, nrx_+nrz_, rx);
+      sp_jac_rdae_.spsolve(w, adj_x, true);
+      std::copy_n(w, nrx_+nrz_, adj_x);
 
-      // Direct dependency adj_ode -> rx
-      std::copy_n(rx, nrx_, adj_ode);
+      // Direct dependency adj_ode -> adj_x
+      std::copy_n(adj_x, nrx_, adj_ode);
 
       // Indirect dependency via g
-      if (bdae_sp_reverse(&m, ode, alg, p, u, adj_ode, rp, rx, rz)) return 1;
+      if (bdae_sp_reverse(&m, ode, alg, p, u, adj_ode, rp, adj_x, rz)) return 1;
 
-      // Update rx, rz
-      std::copy_n(adj_ode, nrx_, rx);
+      // Update adj_x, rz
+      std::copy_n(adj_ode, nrx_, adj_x);
       std::fill_n(rz, nrz_, 0);
 
       // Shift time
@@ -1885,7 +1885,7 @@ void FixedStepIntegrator::advance(IntegratorMemory* mem,
 }
 
 void FixedStepIntegrator::retreat(IntegratorMemory* mem, const double* u,
-    double* rx, double* rq, double* adj_u) const {
+    double* adj_x, double* rq, double* adj_u) const {
   auto m = static_cast<FixedStepMemory*>(mem);
 
   // Set controls
@@ -1901,7 +1901,7 @@ void FixedStepIntegrator::retreat(IntegratorMemory* mem, const double* u,
     double t = m->t_next + j * h;
 
     // Update the previous step
-    casadi_copy(m->rx, nrx_, m->adj_ode);
+    casadi_copy(m->adj_x, nrx_, m->adj_ode);
     casadi_copy(m->rq, nrq_, m->rq_prev);
     casadi_copy(m->adj_u, nuq_, m->adj_u_prev);
 
@@ -1910,14 +1910,14 @@ void FixedStepIntegrator::retreat(IntegratorMemory* mem, const double* u,
     stepB(m, t, h,
       m->x_tape + nx_ * tapeind, m->x_tape + nx_ * (tapeind + 1),
       m->v_tape + nv_ * tapeind,
-      m->adj_ode, m->rv, m->rx, m->rq, m->adj_u);
+      m->adj_ode, m->rv, m->adj_x, m->rq, m->adj_u);
     casadi_clear(m->rv, nrv_);
     casadi_axpy(nrq_, 1., m->rq_prev, m->rq);
     casadi_axpy(nuq_, 1., m->adj_u_prev, m->adj_u);
   }
 
   // Return to user
-  casadi_copy(m->rx, nrx_, rx);
+  casadi_copy(m->adj_x, nrx_, adj_x);
   casadi_copy(m->rq, nrq_, rq);
   casadi_copy(m->adj_u, nuq_, adj_u);
 }
@@ -2045,7 +2045,7 @@ void FixedStepIntegrator::resetB(IntegratorMemory* mem) const {
 
   // Clear adjoint seeds
   casadi_clear(m->rp, nrp_);
-  casadi_clear(m->rx, nrx_);
+  casadi_clear(m->adj_x, nrx_);
 
   // Reset summation states
   casadi_clear(m->rq, nrq_);
@@ -2056,13 +2056,13 @@ void FixedStepIntegrator::resetB(IntegratorMemory* mem) const {
 }
 
 void FixedStepIntegrator::impulseB(IntegratorMemory* mem,
-    const double* rx, const double* rz, const double* rp) const {
+    const double* adj_x, const double* rz, const double* rp) const {
   auto m = static_cast<FixedStepMemory*>(mem);
   // Add impulse to backward parameters
   casadi_axpy(nrp_, 1., rp, m->rp);
 
   // Add impulse to state
-  casadi_axpy(nrx_, 1., rx, m->rx);
+  casadi_axpy(nrx_, 1., adj_x, m->adj_x);
 
   // Add impulse to backwards dependent variables
   casadi_axpy(nrz_, 1., rz, m->rv + nrv_ - nrz_);
