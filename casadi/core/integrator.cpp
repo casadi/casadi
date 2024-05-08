@@ -966,7 +966,7 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
   bvec_t* xf = res[INTEGRATOR_XF];
   bvec_t* zf = res[INTEGRATOR_ZF];
   bvec_t* qf = res[INTEGRATOR_QF];
-  bvec_t* rxf = res[INTEGRATOR_ADJ_X0];
+  bvec_t* adj_x0 = res[INTEGRATOR_ADJ_X0];
   bvec_t* adj_p = res[INTEGRATOR_ADJ_P];
   bvec_t* adj_u = res[INTEGRATOR_ADJ_U];
   res += n_out_;
@@ -1060,8 +1060,8 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
       std::copy_n(rx, nx_, rx_prev);
     }
 
-    // Get rxf at initial time
-    if (rxf) std::copy_n(rx, nrx_, rxf);
+    // Get adj_x0 at initial time
+    if (adj_x0) std::copy_n(rx, nrx_, adj_x0);
   }
   return 0;
 }
@@ -1230,7 +1230,7 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
   bvec_t* xf = res[INTEGRATOR_XF];
   bvec_t* zf = res[INTEGRATOR_ZF];
   bvec_t* qf = res[INTEGRATOR_QF];
-  bvec_t* rxf = res[INTEGRATOR_ADJ_X0];
+  bvec_t* adj_x0 = res[INTEGRATOR_ADJ_X0];
   bvec_t* adj_p = res[INTEGRATOR_ADJ_P];
   bvec_t* adj_u = res[INTEGRATOR_ADJ_U];
   res += n_out_;
@@ -1252,10 +1252,10 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
   std::fill_n(alg, nz_, 0);
 
   if (nrx_ > 0) {
-    // Propagate from rxf initial time
-    if (rxf) {
-      std::copy_n(rxf, nrx_, rx);
-      std::fill_n(rxf, nrx_, 0);
+    // Propagate from adj_x0 initial time
+    if (adj_x0) {
+      std::copy_n(adj_x0, nrx_, rx);
+      std::fill_n(adj_x0, nrx_, 0);
     } else {
       std::fill_n(rx, nrx_, 0);
     }
@@ -1958,7 +1958,7 @@ void FixedStepIntegrator::stepF(FixedStepMemory* m, double t, double h,
 void FixedStepIntegrator::stepB(FixedStepMemory* m, double t, double h,
     const double* x0, const double* xf, const double* vf,
     const double* adj_xf, const double* rv0,
-    double* rxf, double* adj_p, double* adj_u) const {
+    double* adj_x0, double* adj_p, double* adj_u) const {
   // Evaluate nondifferentiated
   std::fill(m->arg, m->arg + BSTEP_NUM_IN, nullptr);
   m->arg[BSTEP_T] = &t;  // t
@@ -1976,7 +1976,7 @@ void FixedStepIntegrator::stepB(FixedStepMemory* m, double t, double h,
   std::fill(m->res, m->res + BSTEP_NUM_OUT, nullptr);
   m->res[BSTEP_ADJ_T] = nullptr;  // adj:t
   m->res[BSTEP_ADJ_H] = nullptr;  // adj:h
-  m->res[BSTEP_ADJ_X0] = rxf;  // adj:x0
+  m->res[BSTEP_ADJ_X0] = adj_x0;  // adj:x0
   m->res[BSTEP_ADJ_V0] = nullptr;  // adj:v0
   m->res[BSTEP_ADJ_P] = adj_p;  // adj:p
   m->res[BSTEP_ADJ_U] = adj_u;  // adj:u
@@ -1985,7 +1985,7 @@ void FixedStepIntegrator::stepB(FixedStepMemory* m, double t, double h,
   if (nfwd_ > 0) {
     m->arg[BSTEP_NUM_IN + BSTEP_ADJ_T] = nullptr;  // out:adj:t
     m->arg[BSTEP_NUM_IN + BSTEP_ADJ_H] = nullptr;  // out:adj:h
-    m->arg[BSTEP_NUM_IN + BSTEP_ADJ_X0] = rxf;  // out:adj:x0
+    m->arg[BSTEP_NUM_IN + BSTEP_ADJ_X0] = adj_x0;  // out:adj:x0
     m->arg[BSTEP_NUM_IN + BSTEP_ADJ_V0] = nullptr;  // out:adj:v0
     m->arg[BSTEP_NUM_IN + BSTEP_ADJ_P] = adj_p;  // out:adj:p
     m->arg[BSTEP_NUM_IN + BSTEP_ADJ_U] = adj_u;  // out:adj:u
@@ -2003,7 +2003,7 @@ void FixedStepIntegrator::stepB(FixedStepMemory* m, double t, double h,
     m->arg[BSTEP_NUM_IN + BSTEP_NUM_OUT + BSTEP_ADJ_QF] = m->rp + nrp1_ * nadj_;  // fwd:adj:qf
     m->res[BSTEP_ADJ_T] = nullptr;  // fwd:adj:t
     m->res[BSTEP_ADJ_H] = nullptr;  // fwd:adj:h
-    m->res[BSTEP_ADJ_X0] = rxf + nrx1_ * nadj_;  // fwd:rxf
+    m->res[BSTEP_ADJ_X0] = adj_x0 + nrx1_ * nadj_;  // fwd:adj_x0
     m->res[BSTEP_ADJ_V0] = nullptr;  // fwd:adj:v0
     m->res[BSTEP_ADJ_P] = adj_p + nrq1_ * nadj_;  // fwd:adj_p
     m->res[BSTEP_ADJ_U] = adj_u + nuq1_ * nadj_;  // fwd:adj_u
