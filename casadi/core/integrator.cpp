@@ -1167,7 +1167,7 @@ int Integrator::bdae_sp_reverse(SpReverseMem* m, bvec_t* x, bvec_t* z,
 }
 
 int Integrator::bquad_sp_reverse(SpReverseMem* m, bvec_t* x, bvec_t* z,
-    bvec_t* p, bvec_t* u, bvec_t* adj_ode, bvec_t* rz, bvec_t* adj_quad,
+    bvec_t* p, bvec_t* u, bvec_t* adj_ode, bvec_t* adj_alg, bvec_t* adj_quad,
     bvec_t* adj_p, bvec_t* adj_u) const {
   // Nondifferentiated inputs
   m->arg[BDYN_T] = nullptr;  // t
@@ -1176,11 +1176,11 @@ int Integrator::bquad_sp_reverse(SpReverseMem* m, bvec_t* x, bvec_t* z,
   m->arg[BDYN_P] = p;  // p
   m->arg[BDYN_U] = u;  // u
   m->arg[BDYN_OUT_ODE] = adj_ode;  // out_ode
-  m->arg[BDYN_OUT_ALG] = rz;  // out_alg
+  m->arg[BDYN_OUT_ALG] = adj_alg;  // out_alg
   m->arg[BDYN_OUT_QUAD] = adj_quad;  // out_quad
   m->arg[BDYN_OUT_ZERO] = nullptr;  // out_zero
   m->arg[BDYN_ADJ_ODE] = adj_ode;  // adj_ode
-  m->arg[BDYN_ADJ_ALG] = rz;  // adj_alg
+  m->arg[BDYN_ADJ_ALG] = adj_alg;  // adj_alg
   m->arg[BDYN_ADJ_QUAD] = adj_quad;  // adj_quad
   m->arg[BDYN_ADJ_ZERO] = nullptr;  // adj_zero
   // Propagate through sensitivities
@@ -1201,7 +1201,7 @@ int Integrator::bquad_sp_reverse(SpReverseMem* m, bvec_t* x, bvec_t* z,
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_ADJ_ODE] =
       adj_ode + (i + 1) * nrx1_ * nadj_;  // fwd:adj_ode
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_ADJ_ALG] =
-      rz + (i + 1) * nrz1_ * nadj_;  // fwd:adj_alg
+      adj_alg + (i + 1) * nrz1_ * nadj_;  // fwd:adj_alg
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_ADJ_QUAD] =
       adj_quad + (i + 1) * nrp1_ * nadj_;  // fwd:adj_quad
     m->arg[BDYN_NUM_IN + BQUAD_NUM_OUT + BDYN_ADJ_ZERO] = nullptr;  // fwd:adj_zero
