@@ -690,7 +690,7 @@ void Integrator::init(const Dict& opts) {
   alloc_w(nx_ + nz_, true); // x, z
   alloc_w(nx_, true); // x_prev
   alloc_w(nrx_ + nrz_, true); // rx, rz
-  alloc_w(nrx_, true); // rx_prev
+  alloc_w(nrx_, true); // adj_ode
   alloc_w(nrq_, true); // rq
   alloc_w(nx_+nz_);  // Sparsity::sp_solve
   alloc_w(nrx_+nrz_);  // Sparsity::sp_solve
@@ -712,7 +712,7 @@ void Integrator::set_work(void* mem, const double**& arg, double**& res,
   m->x_prev = w; w += nx_;
   m->rx = w; w += nrx_;  // doubles as xz
   m->rz = w; w += nrz_;
-  m->rx_prev = w; w += nrx_;
+  m->adj_ode = w; w += nrx_;
   m->rq = w; w += nrq_;
   m->p = w; w += np_;
   m->u = w; w += nu_;
@@ -977,7 +977,7 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
   bvec_t *x_prev = w; w += nx_;
   bvec_t *rx = w; w += nrx_;
   bvec_t *rz = w; w += nrz_;
-  bvec_t *rx_prev = w; w += nrx_;
+  bvec_t *adj_ode = w; w += nrx_;
   bvec_t *rq = w; w += nrq_;
 
   // Memory struct for function calls below
@@ -1016,8 +1016,8 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
   }
 
   if (nrx_ > 0) {
-    // Clear rx_prev, adj_p0
-    std::fill_n(rx_prev, nrx_, 0);
+    // Clear adj_ode, adj_p0
+    std::fill_n(adj_ode, nrx_, 0);
     if (adj_p0) std::fill_n(adj_p0, nrq_, 0);
 
     // Take adj_xf, rp, adj_u past the last grid point
@@ -1035,12 +1035,12 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
 
       // Add impulse from adj_xf
       if (adj_xf) {
-        for (casadi_int i = 0; i < nrx_; ++i) rx_prev[i] |= adj_xf[i];
+        for (casadi_int i = 0; i < nrx_; ++i) adj_ode[i] |= adj_xf[i];
       }
 
       // Propagate through DAE function
-      if (bdae_sp_forward(&m, ode, alg, p, u, rx_prev, adj_qf, rx, rz)) return 1;
-      for (casadi_int i = 0; i < nrx_; ++i) rx[i] |= rx_prev[i];
+      if (bdae_sp_forward(&m, ode, alg, p, u, adj_ode, adj_qf, rx, rz)) return 1;
+      for (casadi_int i = 0; i < nrx_; ++i) rx[i] |= adj_ode[i];
 
       // "Solve" in order to resolve interdependencies (cf. Rootfinder)
       std::copy_n(rx, nrx_ + nrz_, w);
@@ -1056,8 +1056,8 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
         }
       }
 
-      // Update rx_prev
-      std::copy_n(rx, nx_, rx_prev);
+      // Update adj_ode
+      std::copy_n(rx, nx_, adj_ode);
     }
 
     // Get adj_x0 at initial time
@@ -1241,7 +1241,7 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
   bvec_t *x_prev = w; w += nx_;
   bvec_t *rx = w; w += nrx_;
   bvec_t *rz = w; w += nrz_;
-  bvec_t *rx_prev = w; w += nrx_;
+  bvec_t *adj_ode = w; w += nrx_;
   bvec_t *rq = w; w += nrq_;
 
   // Memory struct for function calls below
@@ -1286,14 +1286,14 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
       sp_jac_rdae_.spsolve(w, rx, true);
       std::copy_n(w, nrx_+nrz_, rx);
 
-      // Direct dependency rx_prev -> rx
-      std::copy_n(rx, nrx_, rx_prev);
+      // Direct dependency adj_ode -> rx
+      std::copy_n(rx, nrx_, adj_ode);
 
       // Indirect dependency via g
-      if (bdae_sp_reverse(&m, ode, alg, p, u, rx_prev, rp, rx, rz)) return 1;
+      if (bdae_sp_reverse(&m, ode, alg, p, u, adj_ode, rp, rx, rz)) return 1;
 
       // Update rx, rz
-      std::copy_n(rx_prev, nrx_, rx);
+      std::copy_n(adj_ode, nrx_, rx);
       std::fill_n(rz, nrz_, 0);
 
       // Shift time
@@ -1901,7 +1901,7 @@ void FixedStepIntegrator::retreat(IntegratorMemory* mem, const double* u,
     double t = m->t_next + j * h;
 
     // Update the previous step
-    casadi_copy(m->rx, nrx_, m->rx_prev);
+    casadi_copy(m->rx, nrx_, m->adj_ode);
     casadi_copy(m->rq, nrq_, m->rq_prev);
     casadi_copy(m->adj_u, nuq_, m->adj_u_prev);
 
@@ -1910,7 +1910,7 @@ void FixedStepIntegrator::retreat(IntegratorMemory* mem, const double* u,
     stepB(m, t, h,
       m->x_tape + nx_ * tapeind, m->x_tape + nx_ * (tapeind + 1),
       m->v_tape + nv_ * tapeind,
-      m->rx_prev, m->rv, m->rx, m->rq, m->adj_u);
+      m->adj_ode, m->rv, m->rx, m->rq, m->adj_u);
     casadi_clear(m->rv, nrv_);
     casadi_axpy(nrq_, 1., m->rq_prev, m->rq);
     casadi_axpy(nuq_, 1., m->adj_u_prev, m->adj_u);
