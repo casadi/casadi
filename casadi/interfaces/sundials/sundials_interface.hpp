@@ -125,7 +125,7 @@ namespace casadi {
 
     // DAE right-hand-side, forward problem
     int calc_daeB(SundialsMemory* m, double t, const double* x, const double* z,
-      const double* rx, const double* rz, const double* adj_quad,
+      const double* adj_ode, const double* adj_alg, const double* adj_quad,
       double* adj_x, double* adj_z) const;
 
     // Quadrature right-hand-side, forward problem
@@ -134,7 +134,7 @@ namespace casadi {
 
     // Quadrature right-hand-side, backward problem
     int calc_quadB(SundialsMemory* m, double t, const double* x, const double* z,
-      const double* rx, const double* rz, double* adj_p, double* adj_u) const;
+      const double* adj_ode, const double* adj_alg, double* adj_p, double* adj_u) const;
 
     // Jacobian of DAE-times-vector function, forward problem
     int calc_jtimesF(SundialsMemory* m, double t, const double* x, const double* z,

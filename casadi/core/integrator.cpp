@@ -908,7 +908,8 @@ int Integrator::bdae_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t* 
 }
 
 int Integrator::bquad_sp_forward(SpForwardMem* m, const bvec_t* x, const bvec_t* z,
-    const bvec_t* p, const bvec_t* u, const bvec_t* adj_ode, const bvec_t* adj_alg, const bvec_t* adj_quad,
+    const bvec_t* p, const bvec_t* u,
+    const bvec_t* adj_ode, const bvec_t* adj_alg, const bvec_t* adj_quad,
     bvec_t* adj_p, bvec_t* adj_u) const {
   // Evaluate nondifferentiated
   m->arg[BDYN_T] = nullptr;  // t

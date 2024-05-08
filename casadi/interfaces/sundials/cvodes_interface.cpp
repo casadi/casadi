@@ -545,7 +545,8 @@ int CvodesInterface::psolveB(double t, N_Vector x, N_Vector xB, N_Vector xdotB, 
       if (s.second_order_correction_) {
         // The outputs will double as seeds for calc_daeB
         casadi_clear(v + s.nrx1_ * s.nadj_, s.nrx_ - s.nrx1_ * s.nadj_);
-        if (s.calc_daeB(m, t, NV_DATA_S(x), nullptr, v, nullptr, nullptr, m->tmp2, nullptr)) return 1;
+        if (s.calc_daeB(m, t, NV_DATA_S(x), nullptr, v, nullptr, nullptr, m->tmp2, nullptr))
+          return 1;
         // Subtract m->tmp2 from m->tmp1, scaled with gammaB
         casadi_axpy(s.nrx_ - s.nrx1_ * s.nadj_, -m->gammaB, m->tmp2 + s.nrx1_ * s.nadj_,
           m->tmp1 + s.nrx1_ * s.nadj_);
