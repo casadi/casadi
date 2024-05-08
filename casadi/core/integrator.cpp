@@ -1240,7 +1240,7 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
   bvec_t *alg = w; w += nz_;
   bvec_t *x = w; w += nx_;
   bvec_t *adj_x = w; w += nrx_;
-  bvec_t *rz = w; w += nrz_;
+  bvec_t *adj_z = w; w += nrz_;
   bvec_t *adj_ode = w; w += nrx_;
   bvec_t *adj_p = w; w += nrq_;
 
@@ -1259,8 +1259,8 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
     } else {
       std::fill_n(adj_x, nrx_, 0);
     }
-    // Reset rz
-    std::fill_n(rz, nrz_, 0);
+    // Reset adj_z
+    std::fill_n(adj_z, nrz_, 0);
 
     // Save adj_p0: See note below
     if (adj_p0) std::copy_n(adj_p0, nrq_, adj_p);
@@ -1278,11 +1278,11 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
 
       // Get dependencies from backward quadratures
       if ((nrq_ > 0 && adj_p0) || (nuq_ > 0 && adj_u)) {
-        if (bquad_sp_reverse(&m, ode, alg, p, u, adj_x, rz, rp, adj_p0, adj_u)) return 1;
+        if (bquad_sp_reverse(&m, ode, alg, p, u, adj_x, adj_z, rp, adj_p0, adj_u)) return 1;
       }
 
       // Propagate interdependencies
-      std::fill_n(w, nrx_+nrz_, 0);
+      std::fill_n(w, nrx_ + nrz_, 0);
       sp_jac_rdae_.spsolve(w, adj_x, true);
       std::copy_n(w, nrx_+nrz_, adj_x);
 
@@ -1290,11 +1290,11 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
       std::copy_n(adj_x, nrx_, adj_ode);
 
       // Indirect dependency via g
-      if (bdae_sp_reverse(&m, ode, alg, p, u, adj_ode, rp, adj_x, rz)) return 1;
+      if (bdae_sp_reverse(&m, ode, alg, p, u, adj_ode, rp, adj_x, adj_z)) return 1;
 
-      // Update adj_x, rz
+      // Update adj_x, adj_z
       std::copy_n(adj_ode, nrx_, adj_x);
-      std::fill_n(rz, nrz_, 0);
+      std::fill_n(adj_z, nrz_, 0);
 
       // Shift time
       if (adj_xf) adj_xf += nrx_;
