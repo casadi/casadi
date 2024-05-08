@@ -976,7 +976,7 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
   bvec_t *alg = w; w += nz_;
   bvec_t *x = w; w += nx_;
   bvec_t *adj_x = w; w += nrx_;
-  bvec_t *rz = w; w += nrz_;
+  bvec_t *adj_z = w; w += nrz_;
   bvec_t *adj_ode = w; w += nrx_;
   bvec_t *adj_p = w; w += nrq_;
 
@@ -1039,7 +1039,7 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
       }
 
       // Propagate through DAE function
-      if (bdae_sp_forward(&m, ode, alg, p, u, adj_ode, adj_qf, adj_x, rz)) return 1;
+      if (bdae_sp_forward(&m, ode, alg, p, u, adj_ode, adj_qf, adj_x, adj_z)) return 1;
       for (casadi_int i = 0; i < nrx_; ++i) adj_x[i] |= adj_ode[i];
 
       // "Solve" in order to resolve interdependencies (cf. Rootfinder)
@@ -1049,7 +1049,7 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
 
       // Propagate to quadratures
       if ((nrq_ > 0 && adj_p0) || (nuq_ > 0 && adj_u)) {
-        if (bquad_sp_forward(&m, ode, alg, p, u, adj_x, rz, adj_qf, adj_p, adj_u)) return 1;
+        if (bquad_sp_forward(&m, ode, alg, p, u, adj_x, adj_z, adj_qf, adj_p, adj_u)) return 1;
         // Sum contributions to adj_p0
         if (adj_p0) {
           for (casadi_int i = 0; i < nrq_; ++i) adj_p0[i] |= adj_p[i];
