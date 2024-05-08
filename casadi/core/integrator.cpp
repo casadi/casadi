@@ -974,7 +974,7 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
   // Work vectors
   bvec_t *ode = w; w += nx_;
   bvec_t *alg = w; w += nz_;
-  bvec_t *x_prev = w; w += nx_;
+  bvec_t *x = w; w += nx_;
   bvec_t *rx = w; w += nrx_;
   bvec_t *rz = w; w += nrz_;
   bvec_t *adj_ode = w; w += nrx_;
@@ -983,14 +983,14 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
   // Memory struct for function calls below
   SpForwardMem m = {arg, res, iw, w};
 
-  // Copy initial guess to x_prev
-  std::copy_n(x0, nx_, x_prev);
+  // Copy initial guess to x
+  std::copy_n(x0, nx_, x);
 
   // Propagate forward
   for (casadi_int k = 0; k < nt(); ++k) {
     // Propagate through DAE function
-    if (fdae_sp_forward(&m, x_prev, p, u, ode, alg)) return 1;
-    for (casadi_int i = 0; i < nx_; ++i) ode[i] |= x_prev[i];
+    if (fdae_sp_forward(&m, x, p, u, ode, alg)) return 1;
+    for (casadi_int i = 0; i < nx_; ++i) ode[i] |= x[i];
 
     // "Solve" in order to resolve interdependencies (cf. Rootfinder)
     std::copy_n(ode, nx_, w);
@@ -1008,7 +1008,7 @@ int Integrator::sp_forward(const bvec_t** arg, bvec_t** res,
     }
 
     // Shift time
-    std::copy_n(ode, nx_, x_prev);
+    std::copy_n(ode, nx_, x);
     if (xf) xf += nx_;
     if (zf) zf += nz_;
     if (qf) qf += nq_;
@@ -1238,7 +1238,7 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
   // Work vectors
   bvec_t *ode = w; w += nx_;
   bvec_t *alg = w; w += nz_;
-  bvec_t *x_prev = w; w += nx_;
+  bvec_t *x = w; w += nx_;
   bvec_t *rx = w; w += nrx_;
   bvec_t *rz = w; w += nrz_;
   bvec_t *adj_ode = w; w += nrx_;
@@ -1340,20 +1340,20 @@ int Integrator::sp_reverse(bvec_t** arg, bvec_t** res,
     sp_jac_dae_.spsolve(w, ode, true);
     std::copy_n(w, nx_ + nz_, ode);
 
-    // Direct dependency x_prev -> x
-    std::copy_n(ode, nx_, x_prev);
+    // Direct dependency ode -> x
+    std::copy_n(ode, nx_, x);
 
     // Indirect dependency through f
-    if (fdae_sp_reverse(&m, x_prev, p, u, ode, alg)) return 1;
+    if (fdae_sp_reverse(&m, x, p, u, ode, alg)) return 1;
 
     // Update x, z
-    std::copy_n(x_prev, nx_, ode);
+    std::copy_n(x, nx_, ode);
     std::fill_n(alg, nz_, 0);
   }
 
   // Direct dependency x0 -> x
   if (x0) {
-    for (casadi_int i = 0; i < nx_; ++i) x0[i] |= x_prev[i];
+    for (casadi_int i = 0; i < nx_; ++i) x0[i] |= x[i];
   }
 
   return 0;
