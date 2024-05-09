@@ -388,6 +388,9 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   /// Augmented user option
   Dict augmented_options_;
 
+  /// Function to be called at state events
+  Function event_transition_;
+
   /// Copy of the options
   Dict opts_;
 

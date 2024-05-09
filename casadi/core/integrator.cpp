@@ -534,6 +534,9 @@ const Options Integrator::options_
     {"augmented_options",
       {OT_DICT,
       "Options to be passed down to the augmented integrator, if one is constructed."}},
+    {"event_transition",
+      {OT_FUNCTION,
+      "Function to be called a zero-crossing events."}},
     {"output_t0",
       {OT_BOOL,
       "[DEPRECATED] Output the state at the initial time"}}
@@ -566,6 +569,8 @@ void Integrator::init(const Dict& opts) {
       uses_legacy_options = true;
     } else if (op.first=="augmented_options") {
       augmented_options_ = op.second;
+    } else if (op.first=="event_transition") {
+      event_transition_ = op.second;
     } else if (op.first=="t0") {
       t0 = op.second;
       uses_legacy_options = true;
@@ -705,6 +710,9 @@ void Integrator::init(const Dict& opts) {
   // Instantiate functions, forward and backward problem
   set_function(oracle_, "dae");
   if (nadj_ > 0) set_function(rdae_, "rdae");
+
+  // Event transition function, if any
+  if (!event_transition_.is_null()) set_function(event_transition_, "event_transition");
 
   // Create problem functions, forward problem
   create_function("daeF", dyn_in(), dae_out());
@@ -2493,6 +2501,22 @@ int Integrator::check_event(IntegratorMemory* m) const {
     if (m->e[i] < 0 && m->tmp2[i] > 0) {
       // Just print the results for now
       casadi_message("Zero crossing for index " + str(i) + " at t = " + str(m->t));
+      // Call event transition function, if any
+      if (has_function("event_transition")) {
+        // Evaluate to tmp1
+        double event_index = i;
+        m->arg[EVENT_INDEX] = &event_index;  // t
+        m->arg[EVENT_T] = &m->t;  // t
+        m->arg[EVENT_X] = m->x;  // x
+        m->arg[EVENT_Z] = m->z;  // z
+        m->arg[EVENT_P] = m->p;  // p
+        m->arg[EVENT_U] = m->u;  // u
+        m->res[EVENT_POST_X] = m->tmp1;  // post_x
+        m->res[EVENT_POST_Z] = m->tmp1 + nx_;  // post_z
+        if (calc_function(m, "event_transition")) return 1;
+        // Update x, z
+        casadi_copy(m->tmp1, nx_ + nz_, m->x);
+      }
       // Solver needs to be reset
       m->reset_solver = true;
     }
