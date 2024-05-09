@@ -375,9 +375,8 @@ int Integrator::eval(const double** arg, double** res,
   // Is this the first call to reset?
   bool first_call = true;
 
-  // Reset solver, take time to t0
+  // Take time to t0
   m->t = t0_;
-  reset(m, first_call);
 
   // Ensure that control is updated at the first iteration
   casadi_int k_stop = -1;
@@ -405,7 +404,7 @@ int Integrator::eval(const double** arg, double** res,
     if (next_event(m, p, u)) return 1;
     // Reset the solver
     if (reset_solver) {
-      // reset(m, first_call);
+      reset(m, first_call);
       first_call = false;
     }
     // Advance solution
