@@ -40,7 +40,7 @@ namespace casadi {
     \identifier{1lp} */
 struct CASADI_EXPORT IntegratorMemory : public OracleMemory {
   // Work vectors, forward problem
-  double *x, *z, *p, *u;
+  double *x, *z, *p, *u, *e;
   // Work vectors, backward problem
   double *adj_x, *adj_z, *adj_p, *adj_q;
   // Temporary work vectors of length max(nx + nz, nrx, nrz)
@@ -51,8 +51,11 @@ struct CASADI_EXPORT IntegratorMemory : public OracleMemory {
   double t;
   // Next time to be visited by the integrator
   double t_next;
-  // Next stop time due to step change in input, continuous
+  // Next stop time due to step change in input
   double t_stop;
+  // Projected or actual event time and corresponding index
+  double t_event;
+  casadi_int event_index;
 };
 
 /// Memory struct, forward sparsity pattern propagation
@@ -154,6 +157,9 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
 
       \identifier{25b} */
   casadi_int next_stop(casadi_int k, const double* u) const;
+
+  /** \brief  Estimate next event time */
+  int next_event(IntegratorMemory* m, const double* p, const double* u) const;
 
   /** \brief  Advance solution in time
 
@@ -307,8 +313,6 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   static std::vector<std::string> dae_out() { return {"ode", "alg"}; }
   enum QuadOut { QUAD_QUAD, QUAD_NUM_OUT};
   static std::vector<std::string> quad_out() { return {"quad"}; }
-  enum ZeroOut { ZERO_ZERO, ZERO_NUM_OUT};
-  static std::vector<std::string> zero_out() { return {"zero"}; }
   enum BDynIn { BDYN_T, BDYN_X, BDYN_Z, BDYN_P, BDYN_U,
     BDYN_OUT_ODE, BDYN_OUT_ALG, BDYN_OUT_QUAD, BDYN_OUT_ZERO,
     BDYN_ADJ_ODE, BDYN_ADJ_ALG, BDYN_ADJ_QUAD, BDYN_ADJ_ZERO, BDYN_NUM_IN};
@@ -349,6 +353,9 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
 
   /// Number of of zero-crossing functions
   casadi_int ne_;
+
+  /// Length of the tmp1, tmp2 vectors
+  casadi_int ntmp_;
 
   // Nominal values for states
   std::vector<double> nom_x_, nom_z_;
