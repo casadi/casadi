@@ -381,12 +381,13 @@ int Integrator::eval(const double** arg, double** res,
   // Ensure that control is updated at the first iteration
   casadi_int k_stop = -1;
 
+  // Do we need to reset the solver?
+  m->reset_solver = false;
+
   // Integrate forward
   for (m->k = 0; m->k < nt(); ++m->k) {
     // Next output time
     m->t_next = tout_[m->k];
-    // Do we need to reset the solver?
-    bool reset_solver = false;
     // Handle changes in control input
     if (m->k > k_stop) {
       // Pass new controls
@@ -395,30 +396,37 @@ int Integrator::eval(const double** arg, double** res,
       k_stop = next_stop(m->k, u);
       m->t_stop = tout_[k_stop];
       // Need to reset solver
-      reset_solver = true;
+      m->reset_solver = true;
     }
+    // Do we need to check for events?
+    bool event_detection = ne_ > 0 && m->t_next > m->t;
     // Keep integrating until we reached the next output time
     while (true) {
       // Reset the solver
-      if (reset_solver) {
+      if (m->reset_solver) {
         reset(m, first_call);
+        m->reset_solver = false;
         first_call = false;
       }
-      // Predict next event, only for intervals of non-zero duration
-      if (ne_ > 0 && m->t_next > m->t) {
+      // Predict next event, modify t_next, t_stop accordingly
+      if (event_detection) {
         if (next_event(m)) return 1;
       }
       // Advance solution
       if (verbose_) casadi_message("Integrating forward to output time " + str(m->k) + ": t_next = "
         + str(m->t_next) + ", t_stop = " + str(m->t_stop));
       advance(m);
-      // Check if event occured
-      if (ne_ > 0 && m->t_next > m->t) {
-        if (check_event(m)) return 1;
-      }
       // Update current time
       m->t = m->t_next;
-      break;
+      // Check if event occured
+      if (event_detection) {
+        if (check_event(m)) return 1;
+        // Restore m->t_next, m->step if modified by event
+        m->t_next = tout_[m->k];
+        m->t_stop = tout_[k_stop];
+      }
+      // If output time reached, stop
+      if (m->t == m->t_next) break;
     }
     // Get solution
     get_x(m, x);
@@ -2452,12 +2460,19 @@ int Integrator::next_event(IntegratorMemory* m) const {
       }
     }
   }
-  // Just print the results for now
+  // Zero crossing projected
   if (m->event_index >= 0) {
+    // Print progress
     casadi_message("Projected zero crossing for index " + str(m->event_index)
       + " at t = " + str(m->t_event));
+    // To prevent the solver from taking small steps when zeroing in on the event,
+    // overshoot 10 % of the way to t_stop
+    double event_overshoot = .1;
+    m->t_event = event_overshoot * m->t_stop + (1. - event_overshoot) * m->t_event;
+    // Update t_stop and t_next accordingly
+    m->t_stop = m->t_event;
+    m->t_next = std::min(m->t_next, m->t_event);
   }
-
   return 0;
 }
 
@@ -2477,10 +2492,11 @@ int Integrator::check_event(IntegratorMemory* m) const {
   for (casadi_int i = 0; i < ne_; ++i) {
     if (m->e[i] < 0 && m->tmp2[i] > 0) {
       // Just print the results for now
-      casadi_message("Zero crossing for index " + str(i));
+      casadi_message("Zero crossing for index " + str(i) + " at t = " + str(m->t));
+      // Solver needs to be reset
+      m->reset_solver = true;
     }
   }
-
   return 0;
 }
 

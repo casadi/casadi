@@ -235,9 +235,10 @@ void CvodesInterface::reset(IntegratorMemory* mem, bool first_call) const {
   // Reset the base classes
   SundialsInterface::reset(mem, first_call);
 
-  // Only reinitialize solver at first call
-  // May want to change this after more testing
-  if (first_call) {
+  // Only reinitialize solver at first call or if event handling is required
+  // May want to always enable this after more testing
+  if (first_call || ne_ > 0) {
+    casadi_message("reinitializing cvodes")
     // Re-initialize forward integration
     THROWING(CVodeReInit, m->mem, m->t, m->v_xz);
 
@@ -245,7 +246,10 @@ void CvodesInterface::reset(IntegratorMemory* mem, bool first_call) const {
     if (nq_ > 0) {
       THROWING(CVodeQuadReInit, m->mem, m->v_q);
     }
+  }
 
+  // How is this impacted by CVodeReInit?
+  if (first_call) {
     // Re-initialize backward integration
     if (nrx_ > 0) {
       THROWING(CVodeAdjReInit, m->mem);

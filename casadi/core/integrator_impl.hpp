@@ -56,6 +56,8 @@ struct CASADI_EXPORT IntegratorMemory : public OracleMemory {
   // Projected or actual event time and corresponding index
   double t_event;
   casadi_int event_index;
+  // Do we need to reset the solver?
+  bool reset_solver;
 };
 
 /// Memory struct, forward sparsity pattern propagation
