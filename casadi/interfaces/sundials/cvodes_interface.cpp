@@ -228,13 +228,12 @@ int CvodesInterface::rhsF(double t, N_Vector x, N_Vector xdot, void *user_data) 
   }
 }
 
-void CvodesInterface::reset(IntegratorMemory* mem,
-    const double* u, const double* x, const double* z, const double* _p) const {
+void CvodesInterface::reset(IntegratorMemory* mem) const {
   if (verbose_) casadi_message(name_ + "::reset");
   auto m = to_mem(mem);
 
   // Reset the base classes
-  SundialsInterface::reset(mem, u, x, z, _p);
+  SundialsInterface::reset(mem);
 
   // Re-initialize
   THROWING(CVodeReInit, m->mem, m->t, m->xz);

@@ -151,8 +151,7 @@ namespace casadi {
     void print_stats(IntegratorMemory* mem) const override;
 
     /** \brief  Reset the forward problem and bring the time back to t0 */
-    void reset(IntegratorMemory* mem, const double* u, const double* x,
-      const double* z, const double* p) const override;
+    void reset(IntegratorMemory* mem) const override;
 
     /** \brief  Reset the backward problem and take time to tf */
     void resetB(IntegratorMemory* mem) const override;

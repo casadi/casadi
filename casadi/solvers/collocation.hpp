@@ -92,8 +92,7 @@ namespace casadi {
     static double zeroIfSmall(double x);
 
     /** \brief Reset the forward problem */
-    void reset(IntegratorMemory* mem,
-      const double* u, const double* x, const double* z, const double* p) const override;
+    void reset(IntegratorMemory* mem) const override;
 
     MX algebraic_state_init(const MX& x0, const MX& z0) const override;
     MX algebraic_state_output(const MX& Z) const override;

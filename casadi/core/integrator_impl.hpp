@@ -147,11 +147,22 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   virtual MX algebraic_state_init(const MX& x0, const MX& z0) const { return z0; }
   virtual MX algebraic_state_output(const MX& Z) const { return Z; }
 
+  // Set the differential states
+  void set_x(IntegratorMemory* m, const double* x) const;
+
+  // Set the algebraic variables
+  void set_z(IntegratorMemory* m, const double* z) const;
+
+  // Set the parameters
+  void set_p(IntegratorMemory* m, const double* p) const;
+
+  // Set the controls
+  void set_u(IntegratorMemory* m, const double* u) const;
+
   /** \brief Reset the forward problem
 
       \identifier{25a} */
-  virtual void reset(IntegratorMemory* mem,
-    const double* u, const double* x, const double* z, const double* p) const;
+  virtual void reset(IntegratorMemory* mem) const;
 
   /** \brief  Find next stop time
 
@@ -545,8 +556,7 @@ class CASADI_EXPORT FixedStepIntegrator : public Integrator {
   /** \brief Reset the forward problem
 
       \identifier{25i} */
-  void reset(IntegratorMemory* mem,
-    const double* u, const double* x, const double* z, const double* p) const override;
+  void reset(IntegratorMemory* mem) const override;
 
   /** \brief  Advance solution in time
 

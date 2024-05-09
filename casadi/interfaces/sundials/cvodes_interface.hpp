@@ -127,8 +127,7 @@ class CASADI_INTEGRATOR_CVODES_EXPORT CvodesInterface : public SundialsInterface
   void free_mem(void *mem) const override { delete static_cast<CvodesMemory*>(mem);}
 
   /** \brief  Reset the forward problem and bring the time back to t0 */
-  void reset(IntegratorMemory* mem,
-    const double* u, const double* x, const double* z, const double* p) const override;
+  void reset(IntegratorMemory* mem) const override;
 
   /** \brief  Advance solution in time */
   void advance(IntegratorMemory* mem,
