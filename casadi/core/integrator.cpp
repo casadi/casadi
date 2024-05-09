@@ -367,6 +367,7 @@ int Integrator::eval(const double** arg, double** res,
 
   // Pass initial state, parameters
   set_u(m, u);
+  set_q(m, 0);
   set_x(m, x0);
   set_z(m, z0);
   set_p(m, p);
@@ -714,7 +715,9 @@ void Integrator::init(const Dict& opts) {
       "sprank(J)=" + str(sprank(sp_jac_rdae_)) + "<" + str(nrx_+nrz_));
   }
 
-  alloc_w(nx_ + nz_, true); // x, z
+  alloc_w(nq_, true); // q
+  alloc_w(nx_, true); // x
+  alloc_w(nz_, true); // z
   alloc_w(np_, true); // p
   alloc_w(nu_, true); // u
   alloc_w(ne_, true); // e
@@ -737,7 +740,8 @@ void Integrator::set_work(void* mem, const double**& arg, double**& res,
   OracleFunction::set_work(mem, arg, res, iw, w);
 
   // Work vectors
-  m->x = w; w += nx_;  // doubles as xz
+  m->q = w; w += nq_;  // Note: q, x, z consecutive in memory
+  m->x = w; w += nx_;
   m->z = w; w += nz_;
   m->p = w; w += np_;
   m->u = w; w += nu_;
@@ -1828,7 +1832,6 @@ void FixedStepIntegrator::init(const Dict& opts) {
 
   // Work vectors, forward problem
   alloc_w(nv_, true); // v
-  alloc_w(nq_, true); // q
   alloc_w(nv_, true); // v_prev
   alloc_w(nq_, true); // q_prev
 
@@ -1854,7 +1857,6 @@ void FixedStepIntegrator::set_work(void* mem, const double**& arg, double**& res
 
   // Work vectors, forward problem
   m->v = w; w += nv_;
-  m->q = w; w += nq_;
   m->v_prev = w; w += nv_;
   m->q_prev = w; w += nq_;
 
@@ -2049,9 +2051,6 @@ void FixedStepIntegrator::reset(IntegratorMemory* mem) const {
 
   // Reset the base classes
   Integrator::reset(mem);
-
-  // Reset summation states
-  casadi_clear(m->q, nq_);
 
   // Get consistent initial conditions
   casadi_fill(m->v, nv_, std::numeric_limits<double>::quiet_NaN());
@@ -2331,6 +2330,10 @@ void ImplicitFixedStepIntegrator::serialize_body(SerializingStream &s) const {
 ImplicitFixedStepIntegrator::ImplicitFixedStepIntegrator(DeserializingStream & s) :
     FixedStepIntegrator(s) {
   s.version("ImplicitFixedStepIntegrator", 2);
+}
+
+void Integrator::set_q(IntegratorMemory* m, const double* q) const {
+  casadi_copy(q, nq_, m->q);
 }
 
 void Integrator::set_x(IntegratorMemory* m, const double* x) const {

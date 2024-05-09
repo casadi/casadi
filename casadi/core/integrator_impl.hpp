@@ -40,7 +40,7 @@ namespace casadi {
     \identifier{1lp} */
 struct CASADI_EXPORT IntegratorMemory : public OracleMemory {
   // Work vectors, forward problem
-  double *x, *z, *p, *u, *e;
+  double *q, *x, *z, *p, *u, *e;
   // Work vectors, backward problem
   double *adj_x, *adj_z, *adj_p, *adj_q;
   // Temporary work vectors of length max(nx + nz, nrx, nrz)
@@ -146,6 +146,9 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
 
   virtual MX algebraic_state_init(const MX& x0, const MX& z0) const { return z0; }
   virtual MX algebraic_state_output(const MX& Z) const { return Z; }
+
+  // Set the quadrature states
+  void set_q(IntegratorMemory* m, const double* q) const;
 
   // Set the differential states
   void set_x(IntegratorMemory* m, const double* x) const;
@@ -495,7 +498,7 @@ enum BStepOut {
 
 struct CASADI_EXPORT FixedStepMemory : public IntegratorMemory {
   /// Work vectors, forward problem
-  double *v, *q, *v_prev, *q_prev;
+  double *v, *v_prev, *q_prev;
 
   /// Work vectors, backward problem
   double *rv, *adj_u, *adj_p_prev, *adj_u_prev;
