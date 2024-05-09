@@ -375,21 +375,30 @@ int Integrator::eval(const double** arg, double** res,
   m->t = t0_;
   reset(m);
 
-  // Next stop time due to step change in input
-  casadi_int k_stop = next_stop(0, u);
+  // Ensure that control is updated at the first iteration
+  casadi_int k_stop = -1;
 
   // Integrate forward
   for (m->k = 0; m->k < nt(); ++m->k) {
+    // Next output time
+    m->t_next = tout_[m->k];
+    // Handle changes in control input
+    if (m->k > k_stop) {
+      // Pass new controls
+      set_u(m, u);
+      // Detect next stopping time
+      k_stop = next_stop(m->k, u);
+      m->t_stop = tout_[k_stop];
+    }
     // Update stopping time, if needed
     if (m->k > k_stop) k_stop = next_stop(m->k, u);
-    m->t_next = tout_[m->k];
     m->t_stop = tout_[k_stop];
     // Events handling
     if (next_event(m, p, u)) return 1;
     // Advance solution
     if (verbose_) casadi_message("Integrating forward to output time " + str(m->k) + ": t_next = "
       + str(m->t_next) + ", t_stop = " + str(m->t_stop));
-    advance(m, u, x, z, q);
+    advance(m, x, z, q);
     if (x) x += nx_;
     if (z) z += nz_;
     if (q) q += nq_;
@@ -1870,14 +1879,11 @@ int FixedStepIntegrator::init_mem(void* mem) const {
 }
 
 void FixedStepIntegrator::advance(IntegratorMemory* mem,
-    const double* u, double* x, double* z, double* q) const {
+    double* x, double* z, double* q) const {
   auto m = static_cast<FixedStepMemory*>(mem);
 
   // State at previous step
   double* x_prev = m->tmp1;
-
-  // Set controls
-  casadi_copy(u, nu_, m->u);
 
   // Number of finite elements and time steps
   casadi_int nj = disc_[m->k + 1] - disc_[m->k];

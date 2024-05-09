@@ -387,11 +387,8 @@ void IdasInterface::reset(IntegratorMemory* mem) const {
 }
 
 void IdasInterface::advance(IntegratorMemory* mem,
-    const double* u, double* x, double* z, double* q) const {
+    double* x, double* z, double* q) const {
   auto m = to_mem(mem);
-
-  // Set controls
-  casadi_copy(u, nu_, m->u);
 
   // Do not integrate past change in input signals or past the end
   THROWING(IDASetStopTime, m->mem, m->t_stop);

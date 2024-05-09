@@ -131,7 +131,7 @@ class CASADI_INTEGRATOR_CVODES_EXPORT CvodesInterface : public SundialsInterface
 
   /** \brief  Advance solution in time */
   void advance(IntegratorMemory* mem,
-    const double* u, double* x, double* z, double* q) const override;
+    double* x, double* z, double* q) const override;
 
   /** \brief Introduce an impulse into the backwards integration at the current time */
   void impulseB(IntegratorMemory* mem,
