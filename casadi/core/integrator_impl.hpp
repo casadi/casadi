@@ -179,8 +179,11 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
       \identifier{25b} */
   casadi_int next_stop(casadi_int k, const double* u) const;
 
-  /** \brief  Estimate next event time */
-  int next_event(IntegratorMemory* m, const double* p, const double* u) const;
+  /** \brief Estimate next event time */
+  int next_event(IntegratorMemory* m) const;
+
+  /** \brief Check if an event has occured */
+  int check_event(IntegratorMemory* m) const;
 
   /** \brief  Advance solution in time
 

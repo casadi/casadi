@@ -405,13 +405,17 @@ int Integrator::eval(const double** arg, double** res,
         first_call = false;
       }
       // Predict next event, only for intervals of non-zero duration
-      if (m->t_next > m->t) {
-        if (next_event(m, p, u)) return 1;
+      if (ne_ > 0 && m->t_next > m->t) {
+        if (next_event(m)) return 1;
       }
       // Advance solution
       if (verbose_) casadi_message("Integrating forward to output time " + str(m->k) + ": t_next = "
         + str(m->t_next) + ", t_stop = " + str(m->t_stop));
       advance(m);
+      // Check if event occured
+      if (ne_ > 0 && m->t_next > m->t) {
+        if (check_event(m)) return 1;
+      }
       // Update current time
       m->t = m->t_next;
       break;
@@ -2402,22 +2406,20 @@ casadi_int Integrator::next_stop(casadi_int k, const double* u) const {
   return k;
 }
 
-int Integrator::next_event(IntegratorMemory* m, const double* p, const double* u) const {
+int Integrator::next_event(IntegratorMemory* m) const {
   // Event time same as stopping time, by default
   m->t_event = m->t_stop;
   m->event_index = -1;
-  // Quick return if no events
-  if (ne_ == 0) return 0;
   // Evaluate the DAE and zero crossing function
   m->arg[DYN_T] = &m->t;  // t
   m->arg[DYN_X] = m->x;  // x
   m->arg[DYN_Z] = m->z;  // z
-  m->arg[DYN_P] = p;  // p
-  m->arg[DYN_U] = u;  // u
+  m->arg[DYN_P] = m->p;  // p
+  m->arg[DYN_U] = m->u;  // u
   m->res[DYN_ODE] = m->tmp1;  // ode
   m->res[DYN_ALG] = m->tmp1 + nx_;  // alg
   m->res[DYN_QUAD] = nullptr;  // quad
-  m->res[DYN_ZERO] = m->e;  // quad
+  m->res[DYN_ZERO] = m->e;  // zero
   if (calc_function(m, "dae")) return 1;
   // Calculate de_dt using by forward mode AD applied to zero crossing function
   // Note: Currently ignoring dependency propagation via algebraic equations
@@ -2452,8 +2454,31 @@ int Integrator::next_event(IntegratorMemory* m, const double* p, const double* u
   }
   // Just print the results for now
   if (m->event_index >= 0) {
-    casadi_warning("Projected zero crossing for index " + str(m->event_index)
+    casadi_message("Projected zero crossing for index " + str(m->event_index)
       + " at t = " + str(m->t_event));
+  }
+
+  return 0;
+}
+
+int Integrator::check_event(IntegratorMemory* m) const {
+  // Evaluate the DAE and zero crossing function
+  m->arg[DYN_T] = &m->t;  // t
+  m->arg[DYN_X] = m->x;  // x
+  m->arg[DYN_Z] = m->z;  // z
+  m->arg[DYN_P] = m->p;  // p
+  m->arg[DYN_U] = m->u;  // u
+  m->res[DYN_ODE] = m->tmp1;  // ode
+  m->res[DYN_ALG] = m->tmp1 + nx_;  // alg
+  m->res[DYN_QUAD] = nullptr;  // quad
+  m->res[DYN_ZERO] = m->tmp2;  // zero
+  if (calc_function(m, "dae")) return 1;
+  // Detect events
+  for (casadi_int i = 0; i < ne_; ++i) {
+    if (m->e[i] < 0 && m->tmp2[i] > 0) {
+      // Just print the results for now
+      casadi_message("Zero crossing for index " + str(i));
+    }
   }
 
   return 0;
