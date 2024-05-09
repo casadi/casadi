@@ -344,9 +344,9 @@ int IdasInterface::init_mem(void* mem) const {
 
   // Adjoint sensitivity problem
   if (nadj_ > 0) {
-    m->rxzdot = N_VNew_Serial(nrx_+nrz_);
-    N_VConst(0.0, m->rxz);
-    N_VConst(0.0, m->rxzdot);
+    m->v_adj_xzdot = N_VNew_Serial(nrx_+nrz_);
+    N_VConst(0.0, m->v_adj_xz);
+    N_VConst(0.0, m->v_adj_xzdot);
   }
   if (verbose_) casadi_message("Initialized adjoint sensitivities");
 
@@ -425,13 +425,13 @@ void IdasInterface::resetB(IntegratorMemory* mem) const {
   auto m = to_mem(mem);
 
   // Reset initial guess
-  N_VConst(0.0, m->rxz);
+  N_VConst(0.0, m->v_adj_xz);
 
   // Reset the base classes
   SundialsInterface::resetB(mem);
 
   // Reset initial guess
-  N_VConst(0.0, m->rxzdot);
+  N_VConst(0.0, m->v_adj_xzdot);
 }
 
 void IdasInterface::z_impulseB(IdasMemory* m, const double* adj_z) const {
@@ -466,7 +466,7 @@ void IdasInterface::z_impulseB(IdasMemory* m, const double* adj_z) const {
     casadi_error("Adjoint seed propagation for backwards initial conditions failed");
   }
   // Add contribution to backward state
-  casadi_axpy(nrx_, -1., m->tmp1, NV_DATA_S(m->rxz));
+  casadi_axpy(nrx_, -1., m->tmp1, NV_DATA_S(m->v_adj_xz));
 }
 
 void IdasInterface::impulseB(IntegratorMemory* mem,
@@ -482,7 +482,7 @@ void IdasInterface::impulseB(IntegratorMemory* mem,
   if (m->first_callB) {
     // Create backward problem
     THROWING(IDACreateB, m->mem, &m->whichB);
-    THROWING(IDAInitB, m->mem, m->whichB, resB, m->t, m->rxz, m->rxzdot);
+    THROWING(IDAInitB, m->mem, m->whichB, resB, m->t, m->v_adj_xz, m->v_adj_xzdot);
     THROWING(IDASStolerancesB, m->mem, m->whichB, reltol_, abstol_);
     THROWING(IDASetUserDataB, m->mem, m->whichB, m);
     THROWING(IDASetMaxNumStepsB, m->mem, m->whichB, max_num_steps_);
@@ -529,7 +529,7 @@ void IdasInterface::impulseB(IntegratorMemory* mem,
     m->first_callB = false;
   } else {
     // Re-initialize
-    THROWING(IDAReInitB, m->mem, m->whichB, m->t, m->rxz, m->rxzdot);
+    THROWING(IDAReInitB, m->mem, m->whichB, m->t, m->v_adj_xz, m->v_adj_xzdot);
     if (nrq_ > 0 || nuq_ > 0) {
       // Workaround (bug in SUNDIALS)
       // THROWING(IDAQuadReInitB, m->mem, m->whichB[dir], m->rq[dir]);
@@ -541,7 +541,7 @@ void IdasInterface::impulseB(IntegratorMemory* mem,
   // Correct initial values for the integration if necessary
   if (calc_icB_ && m->k == nt() - 1) {
     THROWING(IDACalcICB, m->mem, m->whichB, t0_, m->v_xz, m->v_xzdot);
-    THROWING(IDAGetConsistentICB, m->mem, m->whichB, m->rxz, m->rxzdot);
+    THROWING(IDAGetConsistentICB, m->mem, m->whichB, m->v_adj_xz, m->v_adj_xzdot);
   }
 }
 
@@ -556,7 +556,7 @@ void IdasInterface::retreat(IntegratorMemory* mem, const double* u,
   if (m->t_next < m->t) {
     double tret = m->t;
     THROWING(IDASolveB, m->mem, m->t_next, IDA_NORMAL);
-    THROWING(IDAGetB, m->mem, m->whichB, &tret, m->rxz, m->rxzdot);
+    THROWING(IDAGetB, m->mem, m->whichB, &tret, m->v_adj_xz, m->v_adj_xzdot);
     if (nrq_ > 0 || nuq_ > 0) {
       THROWING(IDAGetQuadB, m->mem, m->whichB, &tret, m->ruq);
     }
@@ -565,7 +565,7 @@ void IdasInterface::retreat(IntegratorMemory* mem, const double* u,
   }
 
   // Save outputs
-  casadi_copy(NV_DATA_S(m->rxz), nrx_, adj_x);
+  casadi_copy(NV_DATA_S(m->v_adj_xz), nrx_, adj_x);
   casadi_copy(NV_DATA_S(m->ruq), nrq_, adj_p);
   casadi_copy(NV_DATA_S(m->ruq) + nrq_, nuq_, adj_u);
 
@@ -1004,7 +1004,7 @@ int IdasInterface::lsolveB(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector
 IdasMemory::IdasMemory(const IdasInterface& s) : self(s) {
   this->mem = nullptr;
   this->v_xzdot = nullptr;
-  this->rxzdot = nullptr;
+  this->v_adj_xzdot = nullptr;
   this->cj_last = nan;
 
   // Reset checkpoints counter
@@ -1014,7 +1014,7 @@ IdasMemory::IdasMemory(const IdasInterface& s) : self(s) {
 IdasMemory::~IdasMemory() {
   if (this->mem) IDAFree(&this->mem);
   if (this->v_xzdot) N_VDestroy_Serial(this->v_xzdot);
-  if (this->rxzdot) N_VDestroy_Serial(this->rxzdot);
+  if (this->v_adj_xzdot) N_VDestroy_Serial(this->v_adj_xzdot);
   if (this->mem_linsolF >= 0) self.linsolF_.release(this->mem_linsolF);
 }
 

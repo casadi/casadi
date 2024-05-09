@@ -297,7 +297,7 @@ int SundialsInterface::init_mem(void* mem) const {
   // Allocate NVectors
   m->v_xz = N_VNew_Serial(nx_ + nz_);
   m->v_q = N_VNew_Serial(nq_);
-  m->rxz = N_VNew_Serial(nrx_ + nrz_);
+  m->v_adj_xz = N_VNew_Serial(nrx_ + nrz_);
   m->ruq = N_VNew_Serial(nrq_ + nuq_);
 
   // Absolute tolerances as NVector
@@ -394,7 +394,7 @@ void SundialsInterface::resetB(IntegratorMemory* mem) const {
 
   // Clear seeds
   casadi_clear(m->adj_q, nrp_);
-  casadi_clear(NV_DATA_S(m->rxz), nrx_ + nrz_);
+  casadi_clear(NV_DATA_S(m->v_adj_xz), nrx_ + nrz_);
 
   // Reset summation states
   N_VConst(0., m->ruq);
@@ -408,18 +408,18 @@ void SundialsInterface::impulseB(IntegratorMemory* mem,
   casadi_axpy(nrp_, 1., adj_q, m->adj_q);
 
   // Add impulse to backward state
-  casadi_axpy(nrx_, 1., adj_x, NV_DATA_S(m->rxz));
+  casadi_axpy(nrx_, 1., adj_x, NV_DATA_S(m->v_adj_xz));
 
   // Add impulse to algebraic variables:
   // If nonzero, this has to be propagated to an impulse in backward state
-  // casadi_copy(adj_z, nrz_, NV_DATA_S(m->rxz) + nrx_);
-  casadi_axpy(nrz_, 1., adj_z, NV_DATA_S(m->rxz) + nrx_);
+  // casadi_copy(adj_z, nrz_, NV_DATA_S(m->v_adj_xz) + nrx_);
+  casadi_axpy(nrz_, 1., adj_z, NV_DATA_S(m->v_adj_xz) + nrx_);
 }
 
 SundialsMemory::SundialsMemory() {
   this->v_xz  = nullptr;
   this->v_q = nullptr;
-  this->rxz = nullptr;
+  this->v_adj_xz = nullptr;
   this->ruq = nullptr;
   this->first_callB = true;
   this->abstolv = nullptr;
@@ -429,7 +429,7 @@ SundialsMemory::SundialsMemory() {
 SundialsMemory::~SundialsMemory() {
   if (this->v_xz) N_VDestroy_Serial(this->v_xz);
   if (this->v_q) N_VDestroy_Serial(this->v_q);
-  if (this->rxz) N_VDestroy_Serial(this->rxz);
+  if (this->v_adj_xz) N_VDestroy_Serial(this->v_adj_xz);
   if (this->ruq) N_VDestroy_Serial(this->ruq);
   if (this->abstolv) N_VDestroy_Serial(this->abstolv);
 }

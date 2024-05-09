@@ -298,7 +298,7 @@ void CvodesInterface::impulseB(IntegratorMemory* mem,
   if (m->first_callB) {
     // Create backward problem
     THROWING(CVodeCreateB, m->mem, lmm_, iter_, &m->whichB);
-    THROWING(CVodeInitB, m->mem, m->whichB, rhsB, m->t, m->rxz);
+    THROWING(CVodeInitB, m->mem, m->whichB, rhsB, m->t, m->v_adj_xz);
     THROWING(CVodeSStolerancesB, m->mem, m->whichB, reltol_, abstol_);
     THROWING(CVodeSetUserDataB, m->mem, m->whichB, m);
     if (newton_scheme_==SD_DIRECT) {
@@ -338,7 +338,7 @@ void CvodesInterface::impulseB(IntegratorMemory* mem,
     save_offsets(m);
 
     // Reinitialize solver
-    THROWING(CVodeReInitB, m->mem, m->whichB, m->t, m->rxz);
+    THROWING(CVodeReInitB, m->mem, m->whichB, m->t, m->v_adj_xz);
     THROWING(CVodeQuadReInitB, m->mem, m->whichB, m->ruq);
   }
 }
@@ -354,14 +354,14 @@ void CvodesInterface::retreat(IntegratorMemory* mem, const double* u,
   if (m->t_next < m->t) {
     THROWING(CVodeB, m->mem, m->t_next, CV_NORMAL);
     double tret;
-    THROWING(CVodeGetB, m->mem, m->whichB, &tret, m->rxz);
+    THROWING(CVodeGetB, m->mem, m->whichB, &tret, m->v_adj_xz);
     if (nrq_ > 0 || nuq_ > 0) {
       THROWING(CVodeGetQuadB, m->mem, m->whichB, &tret, m->ruq);
     }
   }
 
   // Save outputs
-  casadi_copy(NV_DATA_S(m->rxz), nrx_, adj_x);
+  casadi_copy(NV_DATA_S(m->v_adj_xz), nrx_, adj_x);
   casadi_copy(NV_DATA_S(m->ruq), nrq_, adj_p);
   casadi_copy(NV_DATA_S(m->ruq) + nrq_, nuq_, adj_u);
 
