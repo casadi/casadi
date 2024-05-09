@@ -397,9 +397,6 @@ int Integrator::eval(const double** arg, double** res,
       // Need to reset solver
       reset_solver = true;
     }
-    // Update stopping time, if needed
-    if (m->k > k_stop) k_stop = next_stop(m->k, u);
-    m->t_stop = tout_[k_stop];
     // Events handling
     if (next_event(m, p, u)) return 1;
     // Reset the solver
