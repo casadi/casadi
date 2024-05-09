@@ -397,17 +397,26 @@ int Integrator::eval(const double** arg, double** res,
       // Need to reset solver
       reset_solver = true;
     }
-    // Events handling
-    if (next_event(m, p, u)) return 1;
-    // Reset the solver
-    if (reset_solver) {
-      reset(m, first_call);
-      first_call = false;
+    // Keep integrating until we reached the next output time
+    while (true) {
+      // Reset the solver
+      if (reset_solver) {
+        reset(m, first_call);
+        first_call = false;
+      }
+      // Predict next event, only for intervals of non-zero duration
+      if (m->t_next > m->t) {
+        if (next_event(m, p, u)) return 1;
+      }
+      // Advance solution
+      if (verbose_) casadi_message("Integrating forward to output time " + str(m->k) + ": t_next = "
+        + str(m->t_next) + ", t_stop = " + str(m->t_stop));
+      advance(m);
+      // Update current time
+      m->t = m->t_next;
+      break;
     }
-    // Advance solution
-    if (verbose_) casadi_message("Integrating forward to output time " + str(m->k) + ": t_next = "
-      + str(m->t_next) + ", t_stop = " + str(m->t_stop));
-    advance(m);
+    // Get solution
     get_x(m, x);
     get_z(m, z);
     get_q(m, q);
@@ -415,7 +424,6 @@ int Integrator::eval(const double** arg, double** res,
     if (z) z += nz_;
     if (q) q += nq_;
     if (u) u += nu_;
-    m->t = m->t_next;
   }
 
   // Backwards integration, if needed
