@@ -325,7 +325,7 @@ void CvodesInterface::impulseB(IntegratorMemory* mem,
     }
 
     // Quadratures for the backward problem
-    THROWING(CVodeQuadInitB, m->mem, m->whichB, rhsQB, m->ruq);
+    THROWING(CVodeQuadInitB, m->mem, m->whichB, rhsQB, m->v_adj_pu);
     if (quad_err_con_) {
       THROWING(CVodeSetQuadErrConB, m->mem, m->whichB, true);
       THROWING(CVodeQuadSStolerancesB, m->mem, m->whichB, reltol_, abstol_);
@@ -339,7 +339,7 @@ void CvodesInterface::impulseB(IntegratorMemory* mem,
 
     // Reinitialize solver
     THROWING(CVodeReInitB, m->mem, m->whichB, m->t, m->v_adj_xz);
-    THROWING(CVodeQuadReInitB, m->mem, m->whichB, m->ruq);
+    THROWING(CVodeQuadReInitB, m->mem, m->whichB, m->v_adj_pu);
   }
 }
 
@@ -356,14 +356,14 @@ void CvodesInterface::retreat(IntegratorMemory* mem, const double* u,
     double tret;
     THROWING(CVodeGetB, m->mem, m->whichB, &tret, m->v_adj_xz);
     if (nrq_ > 0 || nuq_ > 0) {
-      THROWING(CVodeGetQuadB, m->mem, m->whichB, &tret, m->ruq);
+      THROWING(CVodeGetQuadB, m->mem, m->whichB, &tret, m->v_adj_pu);
     }
   }
 
   // Save outputs
   casadi_copy(NV_DATA_S(m->v_adj_xz), nrx_, adj_x);
-  casadi_copy(NV_DATA_S(m->ruq), nrq_, adj_p);
-  casadi_copy(NV_DATA_S(m->ruq) + nrq_, nuq_, adj_u);
+  casadi_copy(NV_DATA_S(m->v_adj_pu), nrq_, adj_p);
+  casadi_copy(NV_DATA_S(m->v_adj_pu) + nrq_, nuq_, adj_u);
 
   // Get stats
   CVodeMem cv_mem = static_cast<CVodeMem>(m->mem);

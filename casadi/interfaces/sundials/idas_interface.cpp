@@ -519,7 +519,7 @@ void IdasInterface::impulseB(IntegratorMemory* mem,
     }
 
     // Quadratures for the adjoint problem
-    THROWING(IDAQuadInitB, m->mem, m->whichB, rhsQB, m->ruq);
+    THROWING(IDAQuadInitB, m->mem, m->whichB, rhsQB, m->v_adj_pu);
     if (quad_err_con_) {
       THROWING(IDASetQuadErrConB, m->mem, m->whichB, true);
       THROWING(IDAQuadSStolerancesB, m->mem, m->whichB, reltol_, abstol_);
@@ -534,7 +534,7 @@ void IdasInterface::impulseB(IntegratorMemory* mem,
       // Workaround (bug in SUNDIALS)
       // THROWING(IDAQuadReInitB, m->mem, m->whichB[dir], m->rq[dir]);
       void* memB = IDAGetAdjIDABmem(m->mem, m->whichB);
-      THROWING(IDAQuadReInit, memB, m->ruq);
+      THROWING(IDAQuadReInit, memB, m->v_adj_pu);
     }
   }
 
@@ -558,7 +558,7 @@ void IdasInterface::retreat(IntegratorMemory* mem, const double* u,
     THROWING(IDASolveB, m->mem, m->t_next, IDA_NORMAL);
     THROWING(IDAGetB, m->mem, m->whichB, &tret, m->v_adj_xz, m->v_adj_xzdot);
     if (nrq_ > 0 || nuq_ > 0) {
-      THROWING(IDAGetQuadB, m->mem, m->whichB, &tret, m->ruq);
+      THROWING(IDAGetQuadB, m->mem, m->whichB, &tret, m->v_adj_pu);
     }
     // Interpolate to get current state
     THROWING(IDAGetAdjY, m->mem, m->t_next, m->v_xz, m->v_xzdot);
@@ -566,8 +566,8 @@ void IdasInterface::retreat(IntegratorMemory* mem, const double* u,
 
   // Save outputs
   casadi_copy(NV_DATA_S(m->v_adj_xz), nrx_, adj_x);
-  casadi_copy(NV_DATA_S(m->ruq), nrq_, adj_p);
-  casadi_copy(NV_DATA_S(m->ruq) + nrq_, nuq_, adj_u);
+  casadi_copy(NV_DATA_S(m->v_adj_pu), nrq_, adj_p);
+  casadi_copy(NV_DATA_S(m->v_adj_pu) + nrq_, nuq_, adj_u);
 
   // Get stats
   IDAMem IDA_mem = IDAMem(m->mem);

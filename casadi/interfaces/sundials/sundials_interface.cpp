@@ -298,7 +298,7 @@ int SundialsInterface::init_mem(void* mem) const {
   m->v_xz = N_VNew_Serial(nx_ + nz_);
   m->v_q = N_VNew_Serial(nq_);
   m->v_adj_xz = N_VNew_Serial(nrx_ + nrz_);
-  m->ruq = N_VNew_Serial(nrq_ + nuq_);
+  m->v_adj_pu = N_VNew_Serial(nrq_ + nuq_);
 
   // Absolute tolerances as NVector
   if (scale_abstol_) {
@@ -397,7 +397,7 @@ void SundialsInterface::resetB(IntegratorMemory* mem) const {
   casadi_clear(NV_DATA_S(m->v_adj_xz), nrx_ + nrz_);
 
   // Reset summation states
-  N_VConst(0., m->ruq);
+  N_VConst(0., m->v_adj_pu);
 }
 
 void SundialsInterface::impulseB(IntegratorMemory* mem,
@@ -420,7 +420,7 @@ SundialsMemory::SundialsMemory() {
   this->v_xz  = nullptr;
   this->v_q = nullptr;
   this->v_adj_xz = nullptr;
-  this->ruq = nullptr;
+  this->v_adj_pu = nullptr;
   this->first_callB = true;
   this->abstolv = nullptr;
   this->mem_linsolF = -1;
@@ -430,7 +430,7 @@ SundialsMemory::~SundialsMemory() {
   if (this->v_xz) N_VDestroy_Serial(this->v_xz);
   if (this->v_q) N_VDestroy_Serial(this->v_q);
   if (this->v_adj_xz) N_VDestroy_Serial(this->v_adj_xz);
-  if (this->ruq) N_VDestroy_Serial(this->ruq);
+  if (this->v_adj_pu) N_VDestroy_Serial(this->v_adj_pu);
   if (this->abstolv) N_VDestroy_Serial(this->abstolv);
 }
 
