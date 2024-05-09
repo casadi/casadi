@@ -328,14 +328,14 @@ int SundialsInterface::init_mem(void* mem) const {
   return 0;
 }
 
-void SundialsInterface::reset(IntegratorMemory* mem) const {
+void SundialsInterface::reset(IntegratorMemory* mem, bool first_call) const {
   auto m = static_cast<SundialsMemory*>(mem);
 
   // Reset the base classes
-  Integrator::reset(mem);
+  Integrator::reset(mem, first_call);
 
   // Reset stats
-  reset_stats(m);
+  if (first_call) reset_stats(m);
 
   // Set parameters
   casadi_copy(p, np_, m->p);
@@ -344,11 +344,9 @@ void SundialsInterface::reset(IntegratorMemory* mem) const {
   casadi_copy(u, nu_, m->u);
 
   // Set the state
+  casadi_copy(m->q, nq_, NV_DATA_S(m->v_q));
   casadi_copy(m->x, nx_, NV_DATA_S(m->v_xz));
   casadi_copy(m->z, nz_, NV_DATA_S(m->v_xz) + nx_);
-
-  // Reset summation states
-  N_VConst(0., m->v_q);
 }
 
 void SundialsInterface::reset_stats(SundialsMemory* m) const {

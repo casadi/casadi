@@ -171,10 +171,8 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   // Get the algebraic variables
   void get_z(IntegratorMemory* m, double* z) const;
 
-  /** \brief Reset the forward problem
-
-      \identifier{25a} */
-  virtual void reset(IntegratorMemory* mem) const;
+  /** \brief  Reset the forward solver at the start or after an event */
+  virtual void reset(IntegratorMemory* mem, bool first_call) const {}
 
   /** \brief  Find next stop time
 
@@ -564,10 +562,8 @@ class CASADI_EXPORT FixedStepIntegrator : public Integrator {
   /// Setup step functions
   virtual void setup_step() = 0;
 
-  /** \brief Reset the forward problem
-
-      \identifier{25i} */
-  void reset(IntegratorMemory* mem) const override;
+  /** \brief  Reset the forward solver at the start or after an event */
+  void reset(IntegratorMemory* mem, bool first_call) const override;
 
   /** \brief  Advance solution in time
 

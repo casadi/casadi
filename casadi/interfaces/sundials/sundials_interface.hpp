@@ -150,8 +150,8 @@ namespace casadi {
     /** \brief  Print solver statistics */
     void print_stats(IntegratorMemory* mem) const override;
 
-    /** \brief  Reset the forward problem and bring the time back to t0 */
-    void reset(IntegratorMemory* mem) const override;
+    /** \brief  Reset the forward solver at the start or after an event */
+    void reset(IntegratorMemory* mem, bool first_call) const override;
 
     /** \brief  Reset the backward problem and take time to tf */
     void resetB(IntegratorMemory* mem) const override;

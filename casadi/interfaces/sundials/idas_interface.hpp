@@ -122,8 +122,8 @@ class CASADI_INTEGRATOR_IDAS_EXPORT IdasInterface : public SundialsInterface {
   /** \brief Free memory block */
   void free_mem(void *mem) const override { delete static_cast<IdasMemory*>(mem);}
 
-  /** \brief  Reset the forward problem and bring the time back to t0 */
-  void reset(IntegratorMemory* mem) const override;
+  /** \brief  Reset the forward solver at the start or after an event */
+  void reset(IntegratorMemory* mem, bool first_call) const override;
 
   /** \brief  Advance solution in time */
   void advance(IntegratorMemory* mem) const override;

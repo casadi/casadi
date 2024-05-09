@@ -372,9 +372,12 @@ int Integrator::eval(const double** arg, double** res,
   set_z(m, z0);
   set_p(m, p);
 
+  // Is this the first call to reset?
+  bool first_call = true;
+
   // Reset solver, take time to t0
   m->t = t0_;
-  reset(m);
+  reset(m, first_call);
 
   // Ensure that control is updated at the first iteration
   casadi_int k_stop = -1;
@@ -383,6 +386,8 @@ int Integrator::eval(const double** arg, double** res,
   for (m->k = 0; m->k < nt(); ++m->k) {
     // Next output time
     m->t_next = tout_[m->k];
+    // Do we need to reset the solver?
+    bool reset_solver = false;
     // Handle changes in control input
     if (m->k > k_stop) {
       // Pass new controls
@@ -390,12 +395,19 @@ int Integrator::eval(const double** arg, double** res,
       // Detect next stopping time
       k_stop = next_stop(m->k, u);
       m->t_stop = tout_[k_stop];
+      // Need to reset solver
+      reset_solver = true;
     }
     // Update stopping time, if needed
     if (m->k > k_stop) k_stop = next_stop(m->k, u);
     m->t_stop = tout_[k_stop];
     // Events handling
     if (next_event(m, p, u)) return 1;
+    // Reset the solver
+    if (reset_solver) {
+      // reset(m, first_call);
+      first_call = false;
+    }
     // Advance solution
     if (verbose_) casadi_message("Integrating forward to output time " + str(m->k) + ": t_next = "
       + str(m->t_next) + ", t_stop = " + str(m->t_stop));
@@ -2046,18 +2058,21 @@ void FixedStepIntegrator::stepB(FixedStepMemory* m, double t, double h,
   }
 }
 
-void FixedStepIntegrator::reset(IntegratorMemory* mem) const {
+void FixedStepIntegrator::reset(IntegratorMemory* mem, bool first_call) const {
   auto m = static_cast<FixedStepMemory*>(mem);
 
   // Reset the base classes
-  Integrator::reset(mem);
+  Integrator::reset(mem, first_call);
 
-  // Get consistent initial conditions
-  casadi_fill(m->v, nv_, std::numeric_limits<double>::quiet_NaN());
+  // Only reset once
+  if (first_call) {
+    // Get consistent initial conditions
+    casadi_fill(m->v, nv_, std::numeric_limits<double>::quiet_NaN());
 
-  // Add the first element in the tape
-  if (nrx_ > 0) {
-    casadi_copy(m->x, nx_, m->x_tape);
+    // Add the first element in the tape
+    if (nrx_ > 0) {
+      casadi_copy(m->x, nx_, m->x_tape);
+    }
   }
 }
 
@@ -2362,9 +2377,6 @@ void Integrator::get_x(IntegratorMemory* m, double* x) const {
 
 void Integrator::get_z(IntegratorMemory* m, double* z) const {
   casadi_copy(m->z, nz_, z);
-}
-
-void Integrator::reset(IntegratorMemory* m) const {
 }
 
 casadi_int Integrator::next_stop(casadi_int k, const double* u) const {

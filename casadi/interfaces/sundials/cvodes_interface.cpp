@@ -228,25 +228,28 @@ int CvodesInterface::rhsF(double t, N_Vector x, N_Vector xdot, void *user_data) 
   }
 }
 
-void CvodesInterface::reset(IntegratorMemory* mem) const {
+void CvodesInterface::reset(IntegratorMemory* mem, bool first_call) const {
   if (verbose_) casadi_message(name_ + "::reset");
   auto m = to_mem(mem);
 
   // Reset the base classes
-  SundialsInterface::reset(mem);
+  SundialsInterface::reset(mem, first_call);
 
-  // Re-initialize
-  THROWING(CVodeReInit, m->mem, m->t, m->v_xz);
+  // Only reinitialize solver at first call
+  // May want to change this after more testing
+  if (first_call) {
+    // Re-initialize forward integration
+    THROWING(CVodeReInit, m->mem, m->t, m->v_xz);
 
-  // Re-initialize quadratures
-  if (nq_ > 0) {
-    N_VConst(0.0, m->v_q);
-    THROWING(CVodeQuadReInit, m->mem, m->v_q);
-  }
+    // Re-initialize quadratures
+    if (nq_ > 0) {
+      THROWING(CVodeQuadReInit, m->mem, m->v_q);
+    }
 
-  // Re-initialize backward integration
-  if (nrx_ > 0) {
-    THROWING(CVodeAdjReInit, m->mem);
+    // Re-initialize backward integration
+    if (nrx_ > 0) {
+      THROWING(CVodeAdjReInit, m->mem);
+    }
   }
 }
 

@@ -91,8 +91,8 @@ namespace casadi {
     // Return zero if smaller than machine epsilon
     static double zeroIfSmall(double x);
 
-    /** \brief Reset the forward problem */
-    void reset(IntegratorMemory* mem) const override;
+    /** \brief  Reset the forward solver at the start or after an event */
+    void reset(IntegratorMemory* mem, bool first_call) const override;
 
     MX algebraic_state_init(const MX& x0, const MX& z0) const override;
     MX algebraic_state_output(const MX& Z) const override;

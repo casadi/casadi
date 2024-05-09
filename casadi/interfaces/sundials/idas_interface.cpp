@@ -360,30 +360,34 @@ int IdasInterface::init_mem(void* mem) const {
   return 0;
 }
 
-void IdasInterface::reset(IntegratorMemory* mem) const {
+void IdasInterface::reset(IntegratorMemory* mem, bool first_call) const {
   if (verbose_) casadi_message(name_ + "::reset");
   auto m = to_mem(mem);
 
   // Reset the base classes
-  SundialsInterface::reset(mem);
+  SundialsInterface::reset(mem, first_call);
 
-  // Re-initialize
-  N_VConst(0.0, m->v_xzdot);
-  std::copy(init_xdot_.begin(), init_xdot_.end(), NV_DATA_S(m->v_xzdot));
+  // Only reinitialize solver at first call
+  // May want to change this after more testing
+  if (first_call) {
+    // Re-initialize
+    N_VConst(0.0, m->v_xzdot);
+    std::copy(init_xdot_.begin(), init_xdot_.end(), NV_DATA_S(m->v_xzdot));
 
-  THROWING(IDAReInit, m->mem, m->t, m->v_xz, m->v_xzdot);
+    THROWING(IDAReInit, m->mem, m->t, m->v_xz, m->v_xzdot);
 
-  // Re-initialize quadratures
-  if (nq1_ > 0) THROWING(IDAQuadReInit, m->mem, m->v_q);
+    // Re-initialize quadratures
+    if (nq1_ > 0) THROWING(IDAQuadReInit, m->mem, m->v_q);
 
-  // Correct initial conditions, if necessary
-  if (calc_ic_) {
-    THROWING(IDACalcIC, m->mem, IDA_YA_YDP_INIT , first_time_);
-    THROWING(IDAGetConsistentIC, m->mem, m->v_xz, m->v_xzdot);
+    // Correct initial conditions, if necessary
+    if (calc_ic_) {
+      THROWING(IDACalcIC, m->mem, IDA_YA_YDP_INIT , first_time_);
+      THROWING(IDAGetConsistentIC, m->mem, m->v_xz, m->v_xzdot);
+    }
+
+    // Re-initialize backward integration
+    if (nadj_ > 0) THROWING(IDAAdjReInit, m->mem);
   }
-
-  // Re-initialize backward integration
-  if (nadj_ > 0) THROWING(IDAAdjReInit, m->mem);
 }
 
 void IdasInterface::advance(IntegratorMemory* mem) const {

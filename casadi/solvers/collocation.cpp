@@ -227,19 +227,21 @@ namespace casadi {
     set_function(F, F.name(), true);
   }
 
-  void Collocation::reset(IntegratorMemory* mem) const {
+  void Collocation::reset(IntegratorMemory* mem, bool first_call) const {
     auto m = static_cast<FixedStepMemory*>(mem);
 
     // Reset the base classes
-    ImplicitFixedStepIntegrator::reset(mem);
+    ImplicitFixedStepIntegrator::reset(mem, first_call);
 
-    // Initial guess for v (only non-augmented system part)
-    double* v = m->v;
-    for (casadi_int d = 0; d < deg_; ++d) {
-      casadi_copy(m->x, nx1_, v);
-      v += nx1_;
-      casadi_copy(m->z, nz1_, v);
-      v += nz1_;
+    if (first_call) {
+      // Initial guess for v (only non-augmented system part)
+      double* v = m->v;
+      for (casadi_int d = 0; d < deg_; ++d) {
+        casadi_copy(m->x, nx1_, v);
+        v += nx1_;
+        casadi_copy(m->z, nz1_, v);
+        v += nz1_;
+      }
     }
   }
 
