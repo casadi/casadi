@@ -235,13 +235,13 @@ int IdasInterface::init_mem(void* mem) const {
   THROWING(IDASetUserData, m->mem, m);
 
   // Allocate n-vectors for ivp
-  m->xzdot = N_VNew_Serial(nx_+nz_);
+  m->v_xzdot = N_VNew_Serial(nx_+nz_);
 
   // Initialize Idas
   double t0 = 0;
-  N_VConst(0.0, m->xz);
-  N_VConst(0.0, m->xzdot);
-  IDAInit(m->mem, resF, t0, m->xz, m->xzdot);
+  N_VConst(0.0, m->v_xz);
+  N_VConst(0.0, m->v_xzdot);
+  IDAInit(m->mem, resF, t0, m->v_xz, m->v_xzdot);
   if (verbose_) casadi_message("IDA initialized");
 
   // Include algebraic variables in error testing
@@ -328,7 +328,7 @@ int IdasInterface::init_mem(void* mem) const {
   if (nq1_ > 0) {
 
     // Initialize quadratures in IDAS
-    THROWING(IDAQuadInit, m->mem, rhsQF, m->q);
+    THROWING(IDAQuadInit, m->mem, rhsQF, m->v_q);
 
     // Should the quadrature errors be used for step size control?
     if (quad_err_con_) {
@@ -368,18 +368,18 @@ void IdasInterface::reset(IntegratorMemory* mem) const {
   SundialsInterface::reset(mem);
 
   // Re-initialize
-  N_VConst(0.0, m->xzdot);
-  std::copy(init_xdot_.begin(), init_xdot_.end(), NV_DATA_S(m->xzdot));
+  N_VConst(0.0, m->v_xzdot);
+  std::copy(init_xdot_.begin(), init_xdot_.end(), NV_DATA_S(m->v_xzdot));
 
-  THROWING(IDAReInit, m->mem, m->t, m->xz, m->xzdot);
+  THROWING(IDAReInit, m->mem, m->t, m->v_xz, m->v_xzdot);
 
   // Re-initialize quadratures
-  if (nq1_ > 0) THROWING(IDAQuadReInit, m->mem, m->q);
+  if (nq1_ > 0) THROWING(IDAQuadReInit, m->mem, m->v_q);
 
   // Correct initial conditions, if necessary
   if (calc_ic_) {
     THROWING(IDACalcIC, m->mem, IDA_YA_YDP_INIT , first_time_);
-    THROWING(IDAGetConsistentIC, m->mem, m->xz, m->xzdot);
+    THROWING(IDAGetConsistentIC, m->mem, m->v_xz, m->v_xzdot);
   }
 
   // Re-initialize backward integration
@@ -399,19 +399,19 @@ void IdasInterface::advance(IntegratorMemory* mem,
     // Integrate forward ...
     double tret = m->t;
     if (nrx_>0) { // ... with taping
-      THROWING(IDASolveF, m->mem, m->t_next, &tret, m->xz, m->xzdot, IDA_NORMAL, &m->ncheck);
+      THROWING(IDASolveF, m->mem, m->t_next, &tret, m->v_xz, m->v_xzdot, IDA_NORMAL, &m->ncheck);
     } else { // ... without taping
-      THROWING(IDASolve, m->mem, m->t_next, &tret, m->xz, m->xzdot, IDA_NORMAL);
+      THROWING(IDASolve, m->mem, m->t_next, &tret, m->v_xz, m->v_xzdot, IDA_NORMAL);
     }
     // Get quadratures
-    if (nq1_ > 0) THROWING(IDAGetQuad, m->mem, &tret, m->q);
+    if (nq1_ > 0) THROWING(IDAGetQuad, m->mem, &tret, m->v_q);
   }
 
   // Set function outputs
-  casadi_copy(NV_DATA_S(m->xz), nx_ + nz_, m->x);
+  casadi_copy(NV_DATA_S(m->v_xz), nx_ + nz_, m->x);
   casadi_copy(m->x, nx_, x);
   casadi_copy(m->x + nx_, nz_, z);
-  casadi_copy(NV_DATA_S(m->q), nq_, q);
+  casadi_copy(NV_DATA_S(m->v_q), nq_, q);
 
   // Get stats
   THROWING(IDAGetIntegratorStats, m->mem, &m->nsteps, &m->nfevals, &m->nlinsetups,
@@ -450,18 +450,18 @@ void IdasInterface::z_impulseB(IdasMemory* m, const double* adj_z) const {
   // Augment linear system to get the system we are able to factorize
   //   [(df_ode/dx)^T - cj*I, (df_alg/dx)^T; (df_ode/dz)^T, (df_alg/dz)^T] * [v; w] = [0; adj_z]
   // (Re)factorize linear system
-  if (psetupF(m->t, m->xz, m->xzdot, nullptr, m->cj_last, m, nullptr, nullptr, nullptr))
+  if (psetupF(m->t, m->v_xz, m->v_xzdot, nullptr, m->cj_last, m, nullptr, nullptr, nullptr))
     casadi_error("Linear system factorization for backwards initial conditions failed");
   // Right-hand-side for linear system in m->tmp2
   casadi_clear(m->tmp2, nrx_);
   casadi_copy(adj_z, nrz_, m->tmp2 + nrx_);
   // Solve transposed linear system of equations (Note: m->tmp2 not used since rxz null)
-  if (solve_transposed(m, m->t, NV_DATA_S(m->xz), nullptr, m->tmp2, m->tmp2)) {
+  if (solve_transposed(m, m->t, NV_DATA_S(m->v_xz), nullptr, m->tmp2, m->tmp2)) {
     casadi_error("Linear system solve for backwards initial conditions failed");
   }
   // Calculate: -adj_x = (df_alg/dx)^T * w
   casadi_clear(m->tmp2, nrx_);
-  if (calc_daeB(m, m->t, NV_DATA_S(m->xz), NV_DATA_S(m->xz) + nx_,
+  if (calc_daeB(m, m->t, NV_DATA_S(m->v_xz), NV_DATA_S(m->v_xz) + nx_,
       m->tmp2, m->tmp2 + nrx_, nullptr, m->tmp1, m->tmp1 + nrx_)) {
     casadi_error("Adjoint seed propagation for backwards initial conditions failed");
   }
@@ -540,7 +540,7 @@ void IdasInterface::impulseB(IntegratorMemory* mem,
 
   // Correct initial values for the integration if necessary
   if (calc_icB_ && m->k == nt() - 1) {
-    THROWING(IDACalcICB, m->mem, m->whichB, t0_, m->xz, m->xzdot);
+    THROWING(IDACalcICB, m->mem, m->whichB, t0_, m->v_xz, m->v_xzdot);
     THROWING(IDAGetConsistentICB, m->mem, m->whichB, m->rxz, m->rxzdot);
   }
 }
@@ -561,7 +561,7 @@ void IdasInterface::retreat(IntegratorMemory* mem, const double* u,
       THROWING(IDAGetQuadB, m->mem, m->whichB, &tret, m->ruq);
     }
     // Interpolate to get current state
-    THROWING(IDAGetAdjY, m->mem, m->t_next, m->xz, m->xzdot);
+    THROWING(IDAGetAdjY, m->mem, m->t_next, m->v_xz, m->v_xzdot);
   }
 
   // Save outputs
@@ -1003,7 +1003,7 @@ int IdasInterface::lsolveB(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector
 
 IdasMemory::IdasMemory(const IdasInterface& s) : self(s) {
   this->mem = nullptr;
-  this->xzdot = nullptr;
+  this->v_xzdot = nullptr;
   this->rxzdot = nullptr;
   this->cj_last = nan;
 
@@ -1013,7 +1013,7 @@ IdasMemory::IdasMemory(const IdasInterface& s) : self(s) {
 
 IdasMemory::~IdasMemory() {
   if (this->mem) IDAFree(&this->mem);
-  if (this->xzdot) N_VDestroy_Serial(this->xzdot);
+  if (this->v_xzdot) N_VDestroy_Serial(this->v_xzdot);
   if (this->rxzdot) N_VDestroy_Serial(this->rxzdot);
   if (this->mem_linsolF >= 0) self.linsolF_.release(this->mem_linsolF);
 }

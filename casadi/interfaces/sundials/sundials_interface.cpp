@@ -295,8 +295,8 @@ int SundialsInterface::init_mem(void* mem) const {
   auto m = static_cast<SundialsMemory*>(mem);
 
   // Allocate NVectors
-  m->xz = N_VNew_Serial(nx_ + nz_);
-  m->q = N_VNew_Serial(nq_);
+  m->v_xz = N_VNew_Serial(nx_ + nz_);
+  m->v_q = N_VNew_Serial(nq_);
   m->rxz = N_VNew_Serial(nrx_ + nrz_);
   m->ruq = N_VNew_Serial(nrq_ + nuq_);
 
@@ -344,11 +344,11 @@ void SundialsInterface::reset(IntegratorMemory* mem) const {
   casadi_copy(u, nu_, m->u);
 
   // Set the state
-  casadi_copy(m->x, nx_, NV_DATA_S(m->xz));
-  casadi_copy(m->z, nz_, NV_DATA_S(m->xz) + nx_);
+  casadi_copy(m->x, nx_, NV_DATA_S(m->v_xz));
+  casadi_copy(m->z, nz_, NV_DATA_S(m->v_xz) + nx_);
 
   // Reset summation states
-  N_VConst(0., m->q);
+  N_VConst(0., m->v_q);
 }
 
 void SundialsInterface::reset_stats(SundialsMemory* m) const {
@@ -417,8 +417,8 @@ void SundialsInterface::impulseB(IntegratorMemory* mem,
 }
 
 SundialsMemory::SundialsMemory() {
-  this->xz  = nullptr;
-  this->q = nullptr;
+  this->v_xz  = nullptr;
+  this->v_q = nullptr;
   this->rxz = nullptr;
   this->ruq = nullptr;
   this->first_callB = true;
@@ -427,8 +427,8 @@ SundialsMemory::SundialsMemory() {
 }
 
 SundialsMemory::~SundialsMemory() {
-  if (this->xz) N_VDestroy_Serial(this->xz);
-  if (this->q) N_VDestroy_Serial(this->q);
+  if (this->v_xz) N_VDestroy_Serial(this->v_xz);
+  if (this->v_q) N_VDestroy_Serial(this->v_q);
   if (this->rxz) N_VDestroy_Serial(this->rxz);
   if (this->ruq) N_VDestroy_Serial(this->ruq);
   if (this->abstolv) N_VDestroy_Serial(this->abstolv);

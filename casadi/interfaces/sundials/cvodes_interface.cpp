@@ -142,7 +142,7 @@ int CvodesInterface::init_mem(void* mem) const {
 
   // Initialize CVodes
   double t0 = 0;
-  THROWING(CVodeInit, m->mem, rhsF, t0, m->xz);
+  THROWING(CVodeInit, m->mem, rhsF, t0, m->v_xz);
 
   // Set tolerances
   if (scale_abstol_) {
@@ -193,7 +193,7 @@ int CvodesInterface::init_mem(void* mem) const {
   // Quadrature equations
   if (nq_>0) {
     // Initialize quadratures in CVodes
-    THROWING(CVodeQuadInit, m->mem, rhsQF, m->q);
+    THROWING(CVodeQuadInit, m->mem, rhsQF, m->v_q);
 
     // Should the quadrature errors be used for step size control?
     if (quad_err_con_) {
@@ -236,12 +236,12 @@ void CvodesInterface::reset(IntegratorMemory* mem) const {
   SundialsInterface::reset(mem);
 
   // Re-initialize
-  THROWING(CVodeReInit, m->mem, m->t, m->xz);
+  THROWING(CVodeReInit, m->mem, m->t, m->v_xz);
 
   // Re-initialize quadratures
   if (nq_ > 0) {
-    N_VConst(0.0, m->q);
-    THROWING(CVodeQuadReInit, m->mem, m->q);
+    N_VConst(0.0, m->v_q);
+    THROWING(CVodeQuadReInit, m->mem, m->v_q);
   }
 
   // Re-initialize backward integration
@@ -264,22 +264,22 @@ void CvodesInterface::advance(IntegratorMemory* mem,
     double tret = m->t;
     if (nrx_>0) {
       // ... with taping
-      THROWING(CVodeF, m->mem, m->t_next, m->xz, &tret, CV_NORMAL, &m->ncheck);
+      THROWING(CVodeF, m->mem, m->t_next, m->v_xz, &tret, CV_NORMAL, &m->ncheck);
     } else {
       // ... without taping
-      THROWING(CVode, m->mem, m->t_next, m->xz, &tret, CV_NORMAL);
+      THROWING(CVode, m->mem, m->t_next, m->v_xz, &tret, CV_NORMAL);
     }
 
     // Get quadratures
     if (nq_ > 0) {
-      THROWING(CVodeGetQuad, m->mem, &tret, m->q);
+      THROWING(CVodeGetQuad, m->mem, &tret, m->v_q);
     }
   }
 
   // Set function outputs
-  casadi_copy(NV_DATA_S(m->xz), nx_, m->x);
+  casadi_copy(NV_DATA_S(m->v_xz), nx_, m->x);
   casadi_copy(m->x, nx_, x);
-  casadi_copy(NV_DATA_S(m->q), nq_, q);
+  casadi_copy(NV_DATA_S(m->v_q), nq_, q);
 
   // Get stats
   THROWING(CVodeGetIntegratorStats, m->mem, &m->nsteps, &m->nfevals, &m->nlinsetups,

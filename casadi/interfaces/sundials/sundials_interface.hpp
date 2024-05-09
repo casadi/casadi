@@ -42,7 +42,7 @@ namespace casadi {
   // IdasMemory
   struct CASADI_SUNDIALS_COMMON_EXPORT SundialsMemory : public IntegratorMemory {
     // N-vectors for the forward integration
-    N_Vector xz, xzdot, q;
+    N_Vector v_xz, v_xzdot, v_q;
 
     // N-vectors for the backward integration
     N_Vector rxz, rxzdot, ruq;
