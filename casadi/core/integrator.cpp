@@ -253,6 +253,14 @@ casadi_int dyn_n_out() {
   return DYN_NUM_OUT;
 }
 
+std::vector<std::string> event_in() {
+  return enum_names<EventIn>();
+}
+
+std::vector<std::string> event_out() {
+  return enum_names<EventOut>();
+}
+
 Integrator::Integrator(const std::string& name, const Function& oracle,
     double t0, const std::vector<double>& tout)
     : OracleFunction(name, oracle), t0_(t0), tout_(tout) {
@@ -651,7 +659,7 @@ void Integrator::init(const Dict& opts) {
 
   // Event support not implemented
   if (ne_ > 0) {
-    casadi_warning("Event support has not yet been implemented");
+    casadi_warning("Event support is experimental");
   }
 
   // Consistency checks

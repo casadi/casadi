@@ -144,36 +144,41 @@ namespace casadi {
       \identifier{7g} */
   CASADI_EXPORT casadi_int integrator_n_out();
 
-  /** \brief Get input scheme of simulators
+  /** \brief Get input scheme of a DAE function
 
       \identifier{25p} */
   CASADI_EXPORT std::vector<std::string> dyn_in();
 
-  /** \brief Get simulator output scheme of simulators
+  /** \brief Get output scheme of a DAE function
 
       \identifier{25q} */
   CASADI_EXPORT std::vector<std::string> dyn_out();
 
-  /** \brief Get simulator input scheme name by index
+  /** \brief Get input scheme of a DAE function by index
 
       \identifier{25r} */
   CASADI_EXPORT std::string dyn_in(casadi_int ind);
 
-  /** \brief Get output scheme name by index
+  /** \brief Get output scheme of a DAE function by index
 
       \identifier{25s} */
   CASADI_EXPORT std::string dyn_out(casadi_int ind);
 
-  /** \brief Get the number of simulator inputs
+  /** \brief Get the number of inputs for a DAE function
 
       \identifier{25t} */
   CASADI_EXPORT casadi_int dyn_n_in();
 
-  /** \brief Get the number of simulator outputs
+  /** \brief Get the number of outputs for a DAE function
 
       \identifier{25u} */
   CASADI_EXPORT casadi_int dyn_n_out();
 
+  /** \brief Get input scheme of an event transition function */
+  CASADI_EXPORT std::vector<std::string> event_in();
+
+  /** \brief Get output scheme of an event transition functions */
+  CASADI_EXPORT std::vector<std::string> event_out();
   /** @} */
 
 #ifndef SWIG
