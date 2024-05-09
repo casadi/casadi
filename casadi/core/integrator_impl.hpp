@@ -162,6 +162,15 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   // Set the controls
   void set_u(IntegratorMemory* m, const double* u) const;
 
+  // Get the quadrature states
+  void get_q(IntegratorMemory* m, double* q) const;
+
+  // Get the differential states
+  void get_x(IntegratorMemory* m, double* x) const;
+
+  // Get the algebraic variables
+  void get_z(IntegratorMemory* m, double* z) const;
+
   /** \brief Reset the forward problem
 
       \identifier{25a} */
@@ -178,7 +187,7 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   /** \brief  Advance solution in time
 
       \identifier{25c} */
-  virtual void advance(IntegratorMemory* mem, double* x, double* z, double* q) const = 0;
+  virtual void advance(IntegratorMemory* mem) const = 0;
 
   /** \brief Reset the backward problem
 
@@ -563,7 +572,7 @@ class CASADI_EXPORT FixedStepIntegrator : public Integrator {
   /** \brief  Advance solution in time
 
       \identifier{25j} */
-  void advance(IntegratorMemory* mem, double* x, double* z, double* q) const override;
+  void advance(IntegratorMemory* mem) const override;
 
   /// Reset the backward problem and take time to tf
   void resetB(IntegratorMemory* mem) const override;

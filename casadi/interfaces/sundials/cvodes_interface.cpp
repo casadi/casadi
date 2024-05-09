@@ -250,8 +250,7 @@ void CvodesInterface::reset(IntegratorMemory* mem) const {
   }
 }
 
-void CvodesInterface::advance(IntegratorMemory* mem,
-    double* x, double* z, double* q) const {
+void CvodesInterface::advance(IntegratorMemory* mem) const {
   auto m = to_mem(mem);
 
   // Do not integrate past change in input signals or past the end
@@ -278,8 +277,7 @@ void CvodesInterface::advance(IntegratorMemory* mem,
 
   // Set function outputs
   casadi_copy(NV_DATA_S(m->v_xz), nx_, m->x);
-  casadi_copy(m->x, nx_, x);
-  casadi_copy(NV_DATA_S(m->v_q), nq_, q);
+  casadi_copy(NV_DATA_S(m->v_q), nq_, m->q);
 
   // Get stats
   THROWING(CVodeGetIntegratorStats, m->mem, &m->nsteps, &m->nfevals, &m->nlinsetups,

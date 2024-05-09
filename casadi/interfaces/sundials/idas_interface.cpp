@@ -386,8 +386,7 @@ void IdasInterface::reset(IntegratorMemory* mem) const {
   if (nadj_ > 0) THROWING(IDAAdjReInit, m->mem);
 }
 
-void IdasInterface::advance(IntegratorMemory* mem,
-    double* x, double* z, double* q) const {
+void IdasInterface::advance(IntegratorMemory* mem) const {
   auto m = to_mem(mem);
 
   // Do not integrate past change in input signals or past the end
@@ -409,15 +408,12 @@ void IdasInterface::advance(IntegratorMemory* mem,
 
   // Set function outputs
   casadi_copy(NV_DATA_S(m->v_xz), nx_ + nz_, m->x);
-  casadi_copy(m->x, nx_, x);
-  casadi_copy(m->x + nx_, nz_, z);
-  casadi_copy(NV_DATA_S(m->v_q), nq_, q);
+  casadi_copy(NV_DATA_S(m->v_q), nq_, m->q);
 
   // Get stats
   THROWING(IDAGetIntegratorStats, m->mem, &m->nsteps, &m->nfevals, &m->nlinsetups,
     &m->netfails, &m->qlast, &m->qcur, &m->hinused, &m->hlast, &m->hcur, &m->tcur);
   THROWING(IDAGetNonlinSolvStats, m->mem, &m->nniters, &m->nncfails);
-
 }
 
 void IdasInterface::resetB(IntegratorMemory* mem) const {

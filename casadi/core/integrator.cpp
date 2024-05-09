@@ -399,7 +399,10 @@ int Integrator::eval(const double** arg, double** res,
     // Advance solution
     if (verbose_) casadi_message("Integrating forward to output time " + str(m->k) + ": t_next = "
       + str(m->t_next) + ", t_stop = " + str(m->t_stop));
-    advance(m, x, z, q);
+    advance(m);
+    get_x(m, x);
+    get_z(m, z);
+    get_q(m, q);
     if (x) x += nx_;
     if (z) z += nz_;
     if (q) q += nq_;
@@ -1880,8 +1883,7 @@ int FixedStepIntegrator::init_mem(void* mem) const {
   return 0;
 }
 
-void FixedStepIntegrator::advance(IntegratorMemory* mem,
-    double* x, double* z, double* q) const {
+void FixedStepIntegrator::advance(IntegratorMemory* mem) const {
   auto m = static_cast<FixedStepMemory*>(mem);
 
   // State at previous step
@@ -1913,10 +1915,8 @@ void FixedStepIntegrator::advance(IntegratorMemory* mem,
     }
   }
 
-  // Return to user
-  casadi_copy(m->x, nx_, x);
-  casadi_copy(m->v + nv_ - nz_, nz_, z);
-  casadi_copy(m->q, nq_, q);
+  // Save algebraic variables
+  casadi_copy(m->v + nv_ - nz_, nz_, m->z);
 }
 
 void FixedStepIntegrator::retreat(IntegratorMemory* mem, const double* u,
@@ -2350,6 +2350,18 @@ void Integrator::set_p(IntegratorMemory* m, const double* p) const {
 
 void Integrator::set_u(IntegratorMemory* m, const double* u) const {
   casadi_copy(u, nu_, m->u);
+}
+
+void Integrator::get_q(IntegratorMemory* m, double* q) const {
+  casadi_copy(m->q, nq_, q);
+}
+
+void Integrator::get_x(IntegratorMemory* m, double* x) const {
+  casadi_copy(m->x, nx_, x);
+}
+
+void Integrator::get_z(IntegratorMemory* m, double* z) const {
+  casadi_copy(m->z, nz_, z);
 }
 
 void Integrator::reset(IntegratorMemory* m) const {
