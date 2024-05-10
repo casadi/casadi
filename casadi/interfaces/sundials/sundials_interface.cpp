@@ -353,7 +353,8 @@ void SundialsInterface::reset_stats(SundialsMemory* m) const {
   // Reset stats, forward problem
   m->nsteps = m->nfevals = m->nlinsetups = m->netfails = 0;
   m->qlast = m->qcur = -1;
-  m->hinused = m->hlast = m->hcur = m->tcur = casadi::nan;
+  m->tcur = t0_;
+  m->hinused = m->hlast = m->hcur = casadi::nan;
   m->nniters = m->nncfails = 0;
 
   // Reset stats, backward problem

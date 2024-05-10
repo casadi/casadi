@@ -421,8 +421,8 @@ int Integrator::eval(const double** arg, double** res,
         if (next_event(m)) return 1;
       }
       // Advance solution
-      if (verbose_) casadi_message("Integrating forward to output time " + str(m->k) + ": t_next = "
-        + str(m->t_next) + ", t_stop = " + str(m->t_stop));
+      if (verbose_) casadi_message("Interval " + str(m->k) + ": Integrating forward from "
+        + str(m->t) + " to " + str(m->t_next) + ", t_stop = " + str(m->t_stop));
       advance(m);
       // Update current time
       m->t = m->t_next;

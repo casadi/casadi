@@ -393,8 +393,13 @@ void IdasInterface::reset(IntegratorMemory* mem, bool first_call) const {
 void IdasInterface::advance(IntegratorMemory* mem) const {
   auto m = to_mem(mem);
 
+
   // Do not integrate past change in input signals or past the end
-  THROWING(IDASetStopTime, m->mem, m->t_stop);
+  // The event handling may cause the stop time to become smaller than internal time reached,
+  // in which case the stop time cannot be enforced
+  if (m->t_stop >= m->tcur) {
+    THROWING(IDASetStopTime, m->mem, m->t_stop);
+  }
 
   // Integrate, unless already at desired time
   double ttol = 1e-9;   // tolerance

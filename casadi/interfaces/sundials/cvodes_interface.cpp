@@ -238,7 +238,6 @@ void CvodesInterface::reset(IntegratorMemory* mem, bool first_call) const {
   // Only reinitialize solver at first call or if event handling is required
   // May want to always enable this after more testing
   if (first_call || ne_ > 0) {
-    casadi_message("reinitializing cvodes")
     // Re-initialize forward integration
     THROWING(CVodeReInit, m->mem, m->t, m->v_xz);
 
@@ -261,7 +260,11 @@ void CvodesInterface::advance(IntegratorMemory* mem) const {
   auto m = to_mem(mem);
 
   // Do not integrate past change in input signals or past the end
-  THROWING(CVodeSetStopTime, m->mem, m->t_stop);
+  // The event handling may cause the stop time to become smaller than internal time reached,
+  // in which case the stop time cannot be enforced
+  if (m->t_stop >= m->tcur) {
+    THROWING(CVodeSetStopTime, m->mem, m->t_stop);
+  }
 
   // Integrate, unless already at desired time
   const double ttol = 1e-9;
