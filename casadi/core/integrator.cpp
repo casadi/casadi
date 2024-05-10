@@ -2479,7 +2479,7 @@ int Integrator::next_event(IntegratorMemory* m) const {
   // Zero crossing projected
   if (m->event_index >= 0) {
     // Print progress
-    casadi_message("Projected zero crossing for index " + str(m->event_index)
+    if (verbose_) casadi_message("Projected zero crossing for index " + str(m->event_index)
       + " at t = " + str(m->t_event));
     // To prevent the solver from taking small steps when zeroing in on the event,
     // overshoot 10 % of the way to t_stop
@@ -2508,7 +2508,7 @@ int Integrator::check_event(IntegratorMemory* m) const {
   for (casadi_int i = 0; i < ne_; ++i) {
     if (m->e[i] < 0 && m->tmp2[i] > 0) {
       // Just print the results for now
-      casadi_message("Zero crossing for index " + str(i) + " at t = " + str(m->t));
+      if (verbose_) casadi_message("Zero crossing for index " + str(i) + " at t = " + str(m->t));
       // Call event transition function, if any
       if (has_function("event_transition")) {
         // Evaluate to tmp1
