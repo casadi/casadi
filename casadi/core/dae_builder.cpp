@@ -847,6 +847,24 @@ Function DaeBuilder::dependent_fun(const std::string& fname,
   }
 }
 
+Function DaeBuilder::event_transition(const std::string& fname, casadi_int index) const {
+  try {
+    return (*this)->event_transition(fname, index);
+  } catch (std::exception& e) {
+    THROW_ERROR("event_transition", e.what());
+    return Function(); // never reached
+  }
+}
+
+Function DaeBuilder::event_transition(const std::string& fname) const {
+  try {
+    return (*this)->event_transition(fname);
+  } catch (std::exception& e) {
+    THROW_ERROR("event_transition", e.what());
+    return Function(); // never reached
+  }
+}
+
 Variable& DaeBuilder::variable(const std::string& name) {
   try {
     return (*this)->variable(name);

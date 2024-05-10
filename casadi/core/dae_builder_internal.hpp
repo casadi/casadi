@@ -333,6 +333,13 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
       const std::vector<std::string>& s_in,
       const std::vector<std::string>& s_out) const;
 
+  /// Construct a function describing transition at a specific event
+  Function event_transition(const std::string& fname, casadi_int index,
+    bool dummy_index_input = false) const;
+
+  /// Construct a function describing transition at all events
+  Function event_transition(const std::string& fname) const;
+
   /// Function corresponding to all equations
   Function gather_eq() const;
 
@@ -461,10 +468,8 @@ protected:
   // Initial equations
   std::vector<size_t> init_;
 
-  ///@{
-  /// Ordered variables and equations
+  // Event conditions and transition equations
   std::vector<MX> when_cond_, when_lhs_, when_rhs_;
-  ///@}
 
   /** \brief Definitions of dependent constants
 

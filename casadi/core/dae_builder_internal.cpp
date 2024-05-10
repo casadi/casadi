@@ -2233,6 +2233,62 @@ Function DaeBuilderInternal::dependent_fun(const std::string& fname,
   return Function(fname, f_in, f_out, s_in, s_out);
 }
 
+Function DaeBuilderInternal::event_transition(const std::string& fname, casadi_int index,
+    bool dummy_index_input) const {
+
+  // Make sure that the index is valid
+  casadi_assert(index >= 0 && index < when_cond_.size(), "Illegal event index");
+
+  // Get input expressions for the oracle
+  std::vector<MX> oracle_in = oracle().mx_in();
+
+  // Input expressions for the event functions, without the index
+  std::vector<MX> ret_in(DYN_NUM_IN);
+  ret_in[DYN_T] = oracle_in[DAE_BUILDER_T];
+  ret_in[DYN_X] = oracle_in[DAE_BUILDER_X];
+  ret_in[DYN_Z] = oracle_in[DAE_BUILDER_Z];
+  ret_in[DYN_P] = oracle_in[DAE_BUILDER_P];
+  ret_in[DYN_U] = oracle_in[DAE_BUILDER_U];
+
+  // Expressions for x and z after event
+  std::vector<MX> ret_out = {ret_in[DYN_X], ret_in[DYN_Z]};
+  ret_out = MX::substitute(ret_out,
+    std::vector<MX>{when_lhs_.at(index)},
+    std::vector<MX>{when_rhs_.at(index)});
+
+  // Check if a dummy index input needes to be included
+  if (dummy_index_input) {
+    // Create a function with the event_transition input signature
+    ret_in.insert(ret_in.begin(), MX());
+    return Function(fname, ret_in, ret_out, event_in(), event_out());
+  } else {
+    // Create a function with the DAE function input signature
+    return Function(fname, ret_in, ret_out, dyn_in(), event_out());
+  }
+}
+
+Function DaeBuilderInternal::event_transition(const std::string& fname) const {
+  // If no events, return null
+  if (when_cond_.empty()) return Function();
+
+  // If just a single event, create an event function with a dummy index input
+  if (when_cond_.size() == 1) return event_transition(fname, 0, true);
+
+  // Create separate transition functions for each event
+  std::vector<Function> f_all;
+  for (casadi_int i = 0; i < when_cond_.size(); ++i) {
+    f_all.push_back(event_transition(fname + "_" + str(i), i));
+  }
+
+  // Make the last function the default value in the switch
+  Function f_def = f_all.back();
+  f_all.pop_back();
+
+  // Create a switch function
+  return Function::conditional(fname, f_all, f_def);
+}
+
+
 Function DaeBuilderInternal::fmu_fun(const std::string& name,
     const std::vector<std::string>& name_in,
     const std::vector<std::string>& name_out,

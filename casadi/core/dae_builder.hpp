@@ -473,6 +473,12 @@ class CASADI_EXPORT DaeBuilder
       const std::vector<std::string>& s_in,
       const std::vector<std::string>& s_out) const;
 
+  /// Construct a function describing transition at a specific events
+  Function event_transition(const std::string& fname, casadi_int index) const;
+
+  /// Construct a function describing transition at any events
+  Function event_transition(const std::string& fname) const;
+
   ///@{
   /// Get variable expression by name
   MX var(const std::string& name) const;
