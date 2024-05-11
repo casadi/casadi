@@ -1156,7 +1156,6 @@ if(WITH_FATROP)
       CMAKE_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DCMAKE_INSTALL_RPATH=${CMAKE_INSTALL_RPATH} -DBUILD_WITH_BLASFEO=OFF -DBLASFEO_INSTALL_DIR=${BLASFEO_PATH} -DENABLE_MULTITHREADING=OFF -DMARCH_NATIVE=OFF -DBUILD_EXECUTABLES=OFF -DCMAKE_INSTALL_LIBDIR=lib -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
     add_library(fatrop SHARED IMPORTED)
     add_dependencies(fatrop fatrop-external)
-    create_import_library(fatrop fatrop)
     target_link_libraries(fatrop INTERFACE blasfeo)
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/fatrop")
     set_target_properties(fatrop PROPERTIES
@@ -1164,6 +1163,7 @@ if(WITH_FATROP)
       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}fatrop${CMAKE_SHARED_LIBRARY_SUFFIX}"
       IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}fatrop${CMAKE_IMPORT_LIBRARY_SUFFIX}"
     )
+    create_import_library(fatrop fatrop)
   else()
     #add_library(lapack INTERFACE)
     #target_link_libraries(lapack INTERFACE ${LAPACK_LIBRARIES})
