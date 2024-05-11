@@ -338,8 +338,8 @@ jobs:
           destination_path: install/casadi
           search_paths: ${{env.COMPILER_LIB_SEARCH_PATH}}
       - run: |
-          install_name_tool -id @rpath/`ls libipopt.*.dylib` install/casadi/`ls libipopt.*.dylib`
-          install_name_tool -id @rpath/`ls libipopt.*.dylib` install/casadi/libipopt.dylib
+          install_name_tool -id @rpath/libipopt.3.dylib install/casadi/libipopt.3.dylib
+          install_name_tool -id @rpath/libipopt.3.dylib install/casadi/libipopt.dylib          
       - uses: jgillis/import-codesign-certs@master
         with: 
           p12-file-base64: ${{ secrets.DEVELOPMENT_CERTIFICATE_DATA }}
