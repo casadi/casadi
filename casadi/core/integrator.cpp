@@ -2517,6 +2517,8 @@ int Integrator::check_event(IntegratorMemory* m) const {
   casadi_copy(m->e, ne_, m->old_e);
   // Recalculate m->e and m->edot
   if (calc_edot(m)) return 1;
+  // Earliest event time allowed
+  // double t_first = tout_[m->k];
   // Detect events
   for (casadi_int i = 0; i < ne_; ++i) {
     // Make sure that event was not already triggered
@@ -2524,8 +2526,11 @@ int Integrator::check_event(IntegratorMemory* m) const {
     // Check if event was triggered or is still projected to be triggered before t_next
     double dt = tout_[m->k] - m->t;
     if (m->e[i] > 0 || (m->edot[i] > 0 && m->old_e[i] + dt * m->edot[i] > 0)) {
+      // Projected zero-crossing time
+      double t_next = m->t - m->e[i] / m->edot[i];
       // Just print the results for now
-      if (verbose_) casadi_message("Zero crossing for index " + str(i) + " at t = " + str(m->t));
+      if (verbose_) casadi_message("Zero crossing for index " + str(i) + " at t = " + str(m->t)
+        + ". t_next = " + str(t_next));
       // Call event transition function, if any
       if (has_function("event_transition")) {
         // Evaluate to tmp1
