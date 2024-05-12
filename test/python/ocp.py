@@ -704,7 +704,7 @@ class OCPtests(casadiTestCase):
             stats[solver] = f.stats()
             
             if solver!="ipopt":
-                self.check_codegen(f,args,std="c99",extralibs=["fatrop"])
+                self.check_codegen(f,args,std="c99",extralibs=["fatrop","blasfeo"])
                 self.check_serialize(f,args)
         
         for k in solutions["ipopt"].keys():
