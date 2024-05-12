@@ -49,7 +49,7 @@ for i=1:length(plugins)
   end
   
   if strcmp(type,'Conic')
-      if ismember(name, {'hpipm', 'nlpsol', 'qrqp', 'ipqp', 'fatrop'})
+      if ismember(name, {'hpipm', 'nlpsol', 'qrqp', 'ipqp', 'fatrop', 'daqp'})
          continue 
       end
       disp(['Solver:' name])
