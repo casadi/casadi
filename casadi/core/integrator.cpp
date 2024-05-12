@@ -776,6 +776,8 @@ void Integrator::init(const Dict& opts) {
   alloc_w(np_, true); // p
   alloc_w(nu_, true); // u
   alloc_w(ne_, true); // e
+  alloc_w(ne_, true); // edot
+  alloc_w(ne_, true); // old_e
 
   alloc_w(nrx_ + nrz_, true); // adj_x, adj_z
   alloc_w(nrq_, true); // adj_p
@@ -801,6 +803,8 @@ void Integrator::set_work(void* mem, const double**& arg, double**& res,
   m->p = w; w += np_;
   m->u = w; w += nu_;
   m->e = w; w += ne_;
+  m->edot = w; w += ne_;
+  m->old_e = w; w += ne_;
 
   m->adj_x = w; w += nrx_;  // doubles as adj_xz
   m->adj_z = w; w += nrz_;
@@ -2444,10 +2448,7 @@ casadi_int Integrator::next_stop(casadi_int k, const double* u) const {
   return k;
 }
 
-int Integrator::next_event(IntegratorMemory* m) const {
-  // Event time same as stopping time, by default
-  m->t_event = m->t_stop;
-  m->event_index = -1;
+int Integrator::calc_edot(IntegratorMemory* m) const {
   // Evaluate the DAE and zero crossing function
   m->arg[DYN_T] = &m->t;  // t
   m->arg[DYN_X] = m->x;  // x
@@ -2462,7 +2463,6 @@ int Integrator::next_event(IntegratorMemory* m) const {
   // Calculate de_dt using by forward mode AD applied to zero crossing function
   // Note: Currently ignoring dependency propagation via algebraic equations
   double dt_dt = 1;
-  double *de_dt = m->tmp2;
   m->arg[DYN_NUM_IN + DYN_ODE] = m->tmp1;  // out:ode
   m->arg[DYN_NUM_IN + DYN_ALG] = m->tmp1 + nx_;  // out:alg
   m->arg[DYN_NUM_IN + DYN_QUAD] = nullptr;  // out:quad
@@ -2475,14 +2475,24 @@ int Integrator::next_event(IntegratorMemory* m) const {
   m->res[DYN_ODE] = nullptr;  // fwd:ode
   m->res[DYN_ALG] = nullptr;  // fwd:alg
   m->res[DYN_QUAD] = nullptr;  // fwd:quad
-  m->res[DYN_ZERO] = de_dt;  // fwd:zero
+  m->res[DYN_ZERO] = m->edot;  // fwd:zero
   if (calc_function(m, forward_name("dae", 1))) return 1;
+  // Success
+  return 0;
+}
+
+int Integrator::next_event(IntegratorMemory* m) const {
+  // Event time same as stopping time, by default
+  m->t_event = m->t_stop;
+  m->event_index = -1;
+  // Calculate m->e and m->edot
+  if (calc_edot(m)) return 1;
   // Find the next event, if any
   for (casadi_int i = 0; i < ne_; ++i) {
     // Check if zero crossing function is negative and moving in the positive direction
-    if (m->e[i] < 0 && de_dt[i] > 0) {
+    if (m->e[i] < 0 && m->edot[i] > 0) {
       // Projected zero-crossing time
-      double t = m->t - m->e[i] / de_dt[i];
+      double t = m->t - m->e[i] / m->edot[i];
       // Save if closer than current t_event
       if (t < m->t_event) {
         m->t_event = t;
@@ -2507,20 +2517,17 @@ int Integrator::next_event(IntegratorMemory* m) const {
 }
 
 int Integrator::check_event(IntegratorMemory* m) const {
-  // Evaluate the DAE and zero crossing function
-  m->arg[DYN_T] = &m->t;  // t
-  m->arg[DYN_X] = m->x;  // x
-  m->arg[DYN_Z] = m->z;  // z
-  m->arg[DYN_P] = m->p;  // p
-  m->arg[DYN_U] = m->u;  // u
-  m->res[DYN_ODE] = m->tmp1;  // ode
-  m->res[DYN_ALG] = m->tmp1 + nx_;  // alg
-  m->res[DYN_QUAD] = nullptr;  // quad
-  m->res[DYN_ZERO] = m->tmp2;  // zero
-  if (calc_function(m, "dae")) return 1;
+  // Save the values of the zero-crossing functions
+  casadi_copy(m->e, ne_, m->old_e);
+  // Recalculate m->e and m->edot
+  if (calc_edot(m)) return 1;
   // Detect events
   for (casadi_int i = 0; i < ne_; ++i) {
-    if (m->e[i] < 0 && m->tmp2[i] > 0) {
+    // Make sure that event was not already triggered
+    if (m->old_e[i] >= 0) continue;
+    // Check if event was triggered or is still projected to be triggered before t_next
+    double dt = tout_[m->k] - m->t;
+    if (m->e[i] > 0 || (m->edot[i] > 0 && m->old_e[i] + dt * m->edot[i] > 0)) {
       // Just print the results for now
       if (verbose_) casadi_message("Zero crossing for index " + str(i) + " at t = " + str(m->t));
       // Call event transition function, if any

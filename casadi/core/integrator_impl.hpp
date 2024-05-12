@@ -40,7 +40,7 @@ namespace casadi {
     \identifier{1lp} */
 struct CASADI_EXPORT IntegratorMemory : public OracleMemory {
   // Work vectors, forward problem
-  double *q, *x, *z, *p, *u, *e;
+  double *q, *x, *z, *p, *u, *e, *edot, *old_e;
   // Work vectors, backward problem
   double *adj_x, *adj_z, *adj_p, *adj_q;
   // Temporary work vectors of length max(nx + nz, nrx, nrz)
@@ -58,6 +58,8 @@ struct CASADI_EXPORT IntegratorMemory : public OracleMemory {
   casadi_int event_index;
   // Do we need to reset the solver?
   bool reset_solver;
+  // Number of root-finding iterations
+  casadi_int event_iter;
 };
 
 /// Memory struct, forward sparsity pattern propagation
@@ -180,6 +182,9 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
 
       \identifier{25b} */
   casadi_int next_stop(casadi_int k, const double* u) const;
+
+  /** \brief Linearize the zero crossing function */
+  int calc_edot(IntegratorMemory* m) const;
 
   /** \brief Estimate next event time */
   int next_event(IntegratorMemory* m) const;
