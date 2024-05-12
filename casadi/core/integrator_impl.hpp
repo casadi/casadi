@@ -388,14 +388,17 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   /// Augmented user option
   Dict augmented_options_;
 
-  /// Function to be called at state events
-  Function event_transition_;
-
   /// Copy of the options
   Dict opts_;
 
   /// Options
   bool print_stats_;
+
+  /// Function to be called at state events
+  Function event_transition_;
+
+  /// Maximum number of event iterations
+  casadi_int max_event_iter_;
 
   // Creator function for internal class
   typedef Integrator* (*Creator)(const std::string& name, const Function& oracle,

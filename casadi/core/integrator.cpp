@@ -272,6 +272,7 @@ Integrator::Integrator(const std::string& name, const Function& oracle,
   nfwd_ = 0;
   nadj_ = 0;
   print_stats_ = false;
+  max_event_iter_ = 1;
 }
 
 Integrator::~Integrator() {
@@ -408,6 +409,8 @@ int Integrator::eval(const double** arg, double** res,
     }
     // Do we need to check for events?
     bool event_detection = ne_ > 0 && m->t_next > m->t;
+    // Number of root-finding iterations
+    m->event_iter = 0;
     // Keep integrating until we reached the next output time
     while (true) {
       // Reset the solver
@@ -545,6 +548,9 @@ const Options Integrator::options_
     {"event_transition",
       {OT_FUNCTION,
       "Function to be called a zero-crossing events."}},
+    {"max_event_iter",
+      {OT_INT,
+      "Maximum number of iterations to zero in on an event."}},
     {"output_t0",
       {OT_BOOL,
       "[DEPRECATED] Output the state at the initial time"}}
@@ -579,6 +585,8 @@ void Integrator::init(const Dict& opts) {
       augmented_options_ = op.second;
     } else if (op.first=="event_transition") {
       event_transition_ = op.second;
+    } else if (op.first=="max_event_iter") {
+      max_event_iter_ = op.second;
     } else if (op.first=="t0") {
       t0 = op.second;
       uses_legacy_options = true;
@@ -2292,6 +2300,9 @@ void Integrator::serialize_body(SerializingStream &s) const {
   s.pack("Integrator::augmented_options", augmented_options_);
   s.pack("Integrator::opts", opts_);
   s.pack("Integrator::print_stats", print_stats_);
+
+  s.pack("Integrator::event_transition", event_transition_);
+  s.pack("Integrator::max_event_iter", max_event_iter_);
 }
 
 void Integrator::serialize_type(SerializingStream &s) const {
@@ -2344,6 +2355,9 @@ Integrator::Integrator(DeserializingStream & s) : OracleFunction(s) {
   s.unpack("Integrator::augmented_options", augmented_options_);
   s.unpack("Integrator::opts", opts_);
   s.unpack("Integrator::print_stats", print_stats_);
+
+  s.unpack("Integrator::event_transition", event_transition_);
+  s.unpack("Integrator::max_event_iter", max_event_iter_);
 }
 
 void FixedStepIntegrator::serialize_body(SerializingStream &s) const {
