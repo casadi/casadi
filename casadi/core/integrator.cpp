@@ -2505,10 +2505,6 @@ int Integrator::next_event(IntegratorMemory* m) const {
     // Print progress
     if (verbose_) casadi_message("Projected zero crossing for index " + str(m->event_index)
       + " at t = " + str(m->t_event));
-    // To prevent the solver from taking small steps when zeroing in on the event,
-    // overshoot 10 % of the way to t_stop
-    double event_overshoot = .1;
-    m->t_event = event_overshoot * m->t_stop + (1. - event_overshoot) * m->t_event;
     // Update t_stop and t_next accordingly
     m->t_stop = m->t_event;
     m->t_next = std::min(m->t_next, m->t_event);
