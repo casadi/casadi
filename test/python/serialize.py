@@ -73,7 +73,7 @@ class SerializeTests(casadiTestCase):
                 digits = 7
             if sys.platform=="darwin":
                 digits = 7 # Bug?
-            self.checkarray(o,o_ref,digits=digits,message=fun+"/"+str(f))
+            self.checkarray(o,o_ref,digits=digits,failmessage=fun+"/"+str(f))
             
   def test_identity(self):
     obj = ["foo",{"foo":"bar"},[{"a":3},{"b":9}],["a",5],{"foo": ["a",5]},{"foo": [["a",5],["b",2]]},[["a",5],["b",2]],[[["a",5],["b",2]]]]
