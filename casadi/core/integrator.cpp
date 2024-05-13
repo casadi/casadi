@@ -397,14 +397,16 @@ int Integrator::eval(const double** arg, double** res,
   // Integrate forward
   for (m->k = 0; m->k < nt(); ++m->k) {
     // Next output time
-    m->t_next = tout_[m->k];
+    m->t_next_out = tout_[m->k];
+    // By default, integrate until the next output time
+    m->t_next = m->t_next_out;
     // Handle changes in control input
     if (m->k > k_stop) {
       // Pass new controls
       set_u(m, u);
       // Detect next stopping time
       k_stop = next_stop(m->k, u);
-      m->t_stop = tout_[k_stop];
+      m->t_stop = m->t_step = tout_[k_stop];
       // Need to reset solver
       m->reset_solver = true;
     }
@@ -433,9 +435,9 @@ int Integrator::eval(const double** arg, double** res,
       // Check if event occured
       if (event_detection) {
         if (check_event(m)) return 1;
-        // Restore m->t_next, m->step if modified by event
-        m->t_next = tout_[m->k];
-        m->t_stop = tout_[k_stop];
+        // Restore m->t_next, m->t_stop if modified by event
+        m->t_next = m->t_next_out;
+        m->t_stop = m->t_step;
       }
       // If output time reached, stop
       if (m->t == m->t_next) break;
@@ -2525,15 +2527,14 @@ int Integrator::check_event(IntegratorMemory* m) const {
   casadi_copy(m->e, ne_, m->old_e);
   // Recalculate m->e and m->edot
   if (calc_edot(m)) return 1;
-  // Earliest event time allowed
-  // double t_first = tout_[m->k];
+  // By default, continue integrating to the next output time
+  m->t_next = m->t_next_out;
   // Detect events
   for (casadi_int i = 0; i < ne_; ++i) {
     // Make sure that event was not already triggered
     if (m->old_e[i] >= 0) continue;
-    // Check if event was triggered or is still projected to be triggered before t_next
-    double dt = tout_[m->k] - m->t;
-    if (m->e[i] > 0 || (m->edot[i] > 0 && m->old_e[i] + dt * m->edot[i] > 0)) {
+    // Check if event was triggered or is still projected to be triggered before next output time
+    if (m->e[i] > 0 || (m->edot[i] > 0 && m->old_e[i] + (m->t_next_out - m->t) * m->edot[i] > 0)) {
       // Projected zero-crossing time
       double t_next = m->t - m->e[i] / m->edot[i];
       // Just print the results for now

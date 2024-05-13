@@ -51,8 +51,12 @@ struct CASADI_EXPORT IntegratorMemory : public OracleMemory {
   double t;
   // Next time to be visited by the integrator
   double t_next;
-  // Next stop time due to step change in input
+  // Time not to be exceeded by during integrator integration
   double t_stop;
+  // Next output time
+  double t_next_out;
+  // Next stop time due to step change in input
+  double t_step;
   // Projected or actual event time and corresponding index
   double t_event;
   casadi_int event_index;
