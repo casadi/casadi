@@ -53,13 +53,14 @@ struct CASADI_EXPORT IntegratorMemory : public OracleMemory {
   double t_next;
   // Time not to be exceeded by during integrator integration
   double t_stop;
+  // Time at the beginning of the current control interval
+  double t_start;
   // Next output time
   double t_next_out;
   // Next stop time due to step change in input
   double t_step;
-  // Projected or actual event time and corresponding index
-  double t_event;
-  casadi_int event_index;
+  // Which events have been triggered
+  casadi_int *event_triggered;
   // Do we need to reset the solver?
   bool reset_solver;
   // Number of root-finding iterations
@@ -190,11 +191,11 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   /** \brief Linearize the zero crossing function */
   int calc_edot(IntegratorMemory* m) const;
 
-  /** \brief Estimate next event time */
-  int next_event(IntegratorMemory* m) const;
+  /** \brief Predict next event time */
+  int predict_events(IntegratorMemory* m) const;
 
-  /** \brief Check if an event has occured */
-  int check_event(IntegratorMemory* m) const;
+  /** \brief Handle events, if any */
+  int handle_events(IntegratorMemory* m) const;
 
   /** \brief  Advance solution in time
 

@@ -396,6 +396,8 @@ int Integrator::eval(const double** arg, double** res,
 
   // Integrate forward
   for (m->k = 0; m->k < nt(); ++m->k) {
+    // Start of the current interval
+    m->t_start = m->t;
     // Next output time
     m->t_next_out = tout_[m->k];
     // By default, integrate until the next output time
@@ -415,7 +417,7 @@ int Integrator::eval(const double** arg, double** res,
     // Number of root-finding iterations
     m->event_iter = 0;
     // Keep integrating until we reach the next output time
-    while (true) {
+    do {
       // Reset the solver
       if (m->reset_solver) {
         reset(m, first_call);
@@ -424,7 +426,7 @@ int Integrator::eval(const double** arg, double** res,
       }
       // Predict next event, modify t_next, t_stop accordingly
       if (event_detection) {
-        if (next_event(m)) return 1;
+        if (predict_events(m)) return 1;
       }
       // Advance solution
       if (verbose_) casadi_message("Interval " + str(m->k) + ": Integrating forward from "
@@ -432,13 +434,12 @@ int Integrator::eval(const double** arg, double** res,
       advance(m);
       // Update current time
       m->t = m->t_next;
-      // Check if event occured
+      m->t_next = m->t_next_out;
+      // Handle events, if any
       if (event_detection) {
-        if (check_event(m)) return 1;
+        if (handle_events(m)) return 1;
       }
-      // If output time reached, stop
-      if (m->t == m->t_next) break;
-    }
+    } while (m->t != m->t_next);
     // Get solution
     get_x(m, x);
     get_z(m, z);
@@ -775,14 +776,15 @@ void Integrator::init(const Dict& opts) {
       "sprank(J)=" + str(sprank(sp_jac_rdae_)) + "<" + str(nrx_+nrz_));
   }
 
-  alloc_w(nq_, true); // q
-  alloc_w(nx_, true); // x
-  alloc_w(nz_, true); // z
-  alloc_w(np_, true); // p
-  alloc_w(nu_, true); // u
-  alloc_w(ne_, true); // e
-  alloc_w(ne_, true); // edot
-  alloc_w(ne_, true); // old_e
+  alloc_w(nq_, true);  // q
+  alloc_w(nx_, true);  // x
+  alloc_w(nz_, true);  // z
+  alloc_w(np_, true);  // p
+  alloc_w(nu_, true);  // u
+  alloc_w(ne_, true);  // e
+  alloc_w(ne_, true);  // edot
+  alloc_w(ne_, true);  // old_e
+  alloc_iw(ne_, true);  // event_triggered
 
   alloc_w(nrx_ + nrz_, true); // adj_x, adj_z
   alloc_w(nrq_, true); // adj_p
@@ -810,6 +812,7 @@ void Integrator::set_work(void* mem, const double**& arg, double**& res,
   m->e = w; w += ne_;
   m->edot = w; w += ne_;
   m->old_e = w; w += ne_;
+  m->event_triggered = iw; iw += ne_;
 
   m->adj_x = w; w += nrx_;  // doubles as adj_xz
   m->adj_z = w; w += nrz_;
@@ -2488,10 +2491,10 @@ int Integrator::calc_edot(IntegratorMemory* m) const {
   return 0;
 }
 
-int Integrator::next_event(IntegratorMemory* m) const {
+int Integrator::predict_events(IntegratorMemory* m) const {
   // Event time same as stopping time, by default
-  m->t_event = m->t_stop;
-  m->event_index = -1;
+  double t_event = m->t_stop;
+  casadi_int event_index = -1;
   // Calculate m->e and m->edot
   if (calc_edot(m)) return 1;
   // Find the next event, if any
@@ -2501,42 +2504,56 @@ int Integrator::next_event(IntegratorMemory* m) const {
       // Projected zero-crossing time
       double t = m->t - m->e[i] / m->edot[i];
       // Save if closer than current t_event
-      if (t < m->t_event) {
-        m->t_event = t;
-        m->event_index = i;
+      if (t < t_event) {
+        t_event = t;
+        event_index = i;
       }
     }
   }
   // Zero crossing projected
-  if (m->event_index >= 0) {
+  if (event_index >= 0) {
     // Print progress
-    if (verbose_) casadi_message("Projected zero crossing for index " + str(m->event_index)
-      + " at t = " + str(m->t_event));
+    if (verbose_) casadi_message("Projected zero crossing for index " + str(event_index)
+      + " at t = " + str(t_event));
     // Update t_stop and t_next accordingly
-    m->t_stop = m->t_event;
-    m->t_next = std::min(m->t_next, m->t_event);
+    m->t_stop = t_event;
+    m->t_next = std::min(m->t_next, t_event);
   }
   return 0;
 }
 
-int Integrator::check_event(IntegratorMemory* m) const {
+int Integrator::handle_events(IntegratorMemory* m) const {
   // Save the values of the zero-crossing functions
   casadi_copy(m->e, ne_, m->old_e);
   // Recalculate m->e and m->edot
   if (calc_edot(m)) return 1;
-  // By default, continue integrating to the next output time
-  m->t_next = m->t_next_out;
+  // Increase event iteration counter
+  m->event_iter++;
   // Detect events
   for (casadi_int i = 0; i < ne_; ++i) {
+    // By default, event is not triggered
+    m->event_triggered[i] = 0;
     // Make sure that event was not already triggered
     if (m->old_e[i] >= 0) continue;
     // Check if event was triggered or is still projected to be triggered before next output time
     if (m->e[i] > 0 || (m->edot[i] > 0 && m->e[i] + (m->t_next_out - m->t) * m->edot[i] > 0)) {
       // Projected zero-crossing time
       double t_zero = m->t - m->e[i] / m->edot[i];
-      // Just print the results for now
-      if (verbose_) casadi_message("Zero crossing for index " + str(i) + " at t = " + str(m->t)
-        + ". t_zero = " + str(t_zero));
+      // If t_zero is too small or m->edot[i] has the wrong sign, fall back to bisection
+      if (t_zero <= m->t_start || (m->e[i] > 0 && m->edot[i] <= 0)) {
+        t_zero = 0.5 * (m->t_start + m->t);
+      }
+      // Trigger this event
+      m->event_triggered[i] = 1;
+      // Update t_next if earliest event so far
+      if (t_zero < m->t_next) m->t_next = t_zero;
+    }
+  }
+  // Trigger events
+  for (casadi_int i = 0; i < ne_; ++i) {
+    if (m->event_triggered[i]) {
+      // Print progress
+      if (verbose_) casadi_message("Zero crossing for index " + str(i) + " at t = " + str(m->t));
       // Call event transition function, if any
       if (has_function("event_transition")) {
         // Evaluate to tmp1
