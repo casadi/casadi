@@ -426,7 +426,7 @@ int Integrator::eval(const double** arg, double** res,
         first_call = false;
       }
       // Predict next event, modify t_next, t_stop accordingly
-      if (event_detection) {
+      if (event_detection && m->event_iter == 0) {
         if (predict_events(m)) return 1;
       }
       // Advance solution
@@ -2574,6 +2574,10 @@ int Integrator::handle_events(IntegratorMemory* m) const {
       if (verbose_) casadi_message("Event iteration " + str(m->event_iter) + ": " + str(t_diff));
       return 0;
     }
+  }
+  // Print iteration progress
+  if (m->event_iter > 1) {
+    if (verbose_) casadi_message("Event iteration " + str(m->event_iter) + ": " + str(t_diff));
   }
   // Trigger events, if any
   for (casadi_int i = 0; i < ne_; ++i) {
