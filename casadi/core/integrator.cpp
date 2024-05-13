@@ -274,6 +274,7 @@ Integrator::Integrator(const std::string& name, const Function& oracle,
   print_stats_ = false;
   max_event_iter_ = 1;
   event_tol_ = 1e-6;
+  event_acceptable_tol_ = inf;
 }
 
 Integrator::~Integrator() {
@@ -429,8 +430,11 @@ int Integrator::eval(const double** arg, double** res,
         if (predict_events(m)) return 1;
       }
       // Advance solution
-      if (verbose_) casadi_message("Interval " + str(m->k) + ": Integrating forward from "
-        + str(m->t) + " to " + str(m->t_next) + ", t_stop = " + str(m->t_stop));
+      if (verbose_) {
+        std::string direction = m->t_next >= m->t ? "forward" : "backward";
+        casadi_message("Interval " + str(m->k) + ": Integrating " + direction + " from "
+          + str(m->t) + " to " + str(m->t_next) + ", t_stop = " + str(m->t_stop));
+      }
       advance(m);
       // Update current time
       m->t = m->t_next;
@@ -593,6 +597,8 @@ void Integrator::init(const Dict& opts) {
       max_event_iter_ = op.second;
     } else if (op.first=="event_tol") {
       event_tol_ = op.second;
+    } else if (op.first=="event_acceptable_tol") {
+      event_acceptable_tol_ = op.second;
     } else if (op.first=="t0") {
       t0 = op.second;
       uses_legacy_options = true;
@@ -2316,6 +2322,7 @@ void Integrator::serialize_body(SerializingStream &s) const {
   s.pack("Integrator::event_transition", event_transition_);
   s.pack("Integrator::max_event_iter", max_event_iter_);
   s.pack("Integrator::event_tol", event_tol_);
+  s.pack("Integrator::event_acceptable_tol", event_acceptable_tol_);
 }
 
 void Integrator::serialize_type(SerializingStream &s) const {
@@ -2372,6 +2379,7 @@ Integrator::Integrator(DeserializingStream & s) : OracleFunction(s) {
   s.unpack("Integrator::event_transition", event_transition_);
   s.unpack("Integrator::max_event_iter", max_event_iter_);
   s.unpack("Integrator::event_tol", event_tol_);
+  s.unpack("Integrator::event_acceptable_tol", event_acceptable_tol_);
 }
 
 void FixedStepIntegrator::serialize_body(SerializingStream &s) const {
@@ -2497,13 +2505,15 @@ int Integrator::predict_events(IntegratorMemory* m) const {
   casadi_int event_index = -1;
   // Calculate m->e and m->edot
   if (calc_edot(m)) return 1;
+  // Save the values of the zero-crossing functions
+  casadi_copy(m->e, ne_, m->old_e);
   // Find the next event, if any
   for (casadi_int i = 0; i < ne_; ++i) {
     // Check if zero crossing function is negative and moving in the positive direction
     if (m->e[i] < 0 && m->edot[i] > 0) {
       // Projected zero-crossing time
       double t = m->t - m->e[i] / m->edot[i];
-      // Save if closer than current t_event
+      // Save if earlier than current t_event
       if (t < t_event) {
         t_event = t;
         event_index = i;
@@ -2523,8 +2533,6 @@ int Integrator::predict_events(IntegratorMemory* m) const {
 }
 
 int Integrator::handle_events(IntegratorMemory* m) const {
-  // Save the values of the zero-crossing functions
-  casadi_copy(m->e, ne_, m->old_e);
   // Recalculate m->e and m->edot
   if (calc_edot(m)) return 1;
   // Increase event iteration counter
@@ -2549,7 +2557,25 @@ int Integrator::handle_events(IntegratorMemory* m) const {
       if (t_zero < m->t_next) m->t_next = t_zero;
     }
   }
-  // Trigger events
+  // Check if additional event iterations are needed
+  double t_diff = std::fabs(m->t_next - m->t);
+  if (t_diff >= event_tol_) {
+    // Check if maximum number of event iterations already reached
+    if (m->event_iter == max_event_iter_) {
+      // Throw error?
+      if (t_diff >= event_acceptable_tol_) {
+        casadi_error("Maximum number of event iterations reached without convergence");
+      } else {
+        // Print progress
+        if (verbose_) casadi_message("Event iteration stopped: " + str(t_diff));
+      }
+    } else {
+      // More event iterations
+      if (verbose_) casadi_message("Event iteration " + str(m->event_iter) + ": " + str(t_diff));
+      return 0;
+    }
+  }
+  // Trigger events, if any
   for (casadi_int i = 0; i < ne_; ++i) {
     if (m->event_triggered[i]) {
       // Print progress
@@ -2572,12 +2598,12 @@ int Integrator::handle_events(IntegratorMemory* m) const {
       }
       // Solver needs to be reset
       m->reset_solver = true;
-      // Restore stopping time after event
-      m->t_stop = m->t_step;
     }
   }
-  // Restore m->t_next, m->t_stop if modified by event
+  // Move past event
+  m->t_stop = m->t_step;
   m->t_next = m->t_next_out;
+  m->event_iter = 0;
   return 0;
 }
 

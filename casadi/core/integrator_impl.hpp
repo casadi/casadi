@@ -410,8 +410,11 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   /// Maximum number of event iterations
   casadi_int max_event_iter_;
 
-  /// Acceptance tolerance for the event iteration
+  /// Termination tolerance for the event iteration
   double event_tol_;
+
+  /// Acceptable tolerance for the event iteration
+  double event_acceptable_tol_;
 
   // Creator function for internal class
   typedef Integrator* (*Creator)(const std::string& name, const Function& oracle,
