@@ -43,7 +43,8 @@ event_transition = Function('event_transition', dict(x = x, post_x = post_x),
 
 # Create an integrator instance for integrating over 7s
 tgrid = np.linspace(0, 7, 100)
-sim = integrator('sim', 'cvodes', dae, 0, tgrid, dict(event_transition = event_transition))
+sim = integrator('sim', 'cvodes', dae, 0, tgrid,
+                 dict(event_transition = event_transition))
 
 # Simulate with initial height of 5
 x0 = [5, 0]

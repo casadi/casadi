@@ -272,7 +272,7 @@ Integrator::Integrator(const std::string& name, const Function& oracle,
   nfwd_ = 0;
   nadj_ = 0;
   print_stats_ = false;
-  max_event_iter_ = 1;
+  max_event_iter_ = 3;
   event_tol_ = 1e-6;
   event_acceptable_tol_ = inf;
 }
