@@ -273,6 +273,7 @@ Integrator::Integrator(const std::string& name, const Function& oracle,
   nadj_ = 0;
   print_stats_ = false;
   max_event_iter_ = 1;
+  event_tol_ = 1e-6;
 }
 
 Integrator::~Integrator() {
@@ -551,6 +552,9 @@ const Options Integrator::options_
     {"max_event_iter",
       {OT_INT,
       "Maximum number of iterations to zero in on an event."}},
+    {"event_tol",
+      {OT_DOUBLE,
+      "Termination tolerance for the event iteration."}},
     {"output_t0",
       {OT_BOOL,
       "[DEPRECATED] Output the state at the initial time"}}
@@ -587,6 +591,8 @@ void Integrator::init(const Dict& opts) {
       event_transition_ = op.second;
     } else if (op.first=="max_event_iter") {
       max_event_iter_ = op.second;
+    } else if (op.first=="event_tol") {
+      event_tol_ = op.second;
     } else if (op.first=="t0") {
       t0 = op.second;
       uses_legacy_options = true;
@@ -2307,6 +2313,7 @@ void Integrator::serialize_body(SerializingStream &s) const {
 
   s.pack("Integrator::event_transition", event_transition_);
   s.pack("Integrator::max_event_iter", max_event_iter_);
+  s.pack("Integrator::event_tol", event_tol_);
 }
 
 void Integrator::serialize_type(SerializingStream &s) const {
@@ -2362,6 +2369,7 @@ Integrator::Integrator(DeserializingStream & s) : OracleFunction(s) {
 
   s.unpack("Integrator::event_transition", event_transition_);
   s.unpack("Integrator::max_event_iter", max_event_iter_);
+  s.unpack("Integrator::event_tol", event_tol_);
 }
 
 void FixedStepIntegrator::serialize_body(SerializingStream &s) const {
