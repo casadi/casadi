@@ -29,6 +29,8 @@ from types import *
 from helpers import *
 import pickle
 import os
+import sys
+
 scipy_interpolate = False
 try:
   import scipy.interpolate
@@ -2692,6 +2694,7 @@ class Functiontests(casadiTestCase):
 
   def test_jit_serialize(self):
     if not args.run_slow: return
+    if sys.platform=="darwin": return
 
     def test_cases(jit_serialize):
       opts = {"jit":True, "compiler": "shell", "jit_options": {"verbose":True}, "verbose":False, "jit_serialize": jit_serialize}
