@@ -414,7 +414,7 @@ int Integrator::eval(const double** arg, double** res,
     bool event_detection = ne_ > 0 && m->t_next > m->t;
     // Number of root-finding iterations
     m->event_iter = 0;
-    // Keep integrating until we reached the next output time
+    // Keep integrating until we reach the next output time
     while (true) {
       // Reset the solver
       if (m->reset_solver) {
@@ -435,9 +435,6 @@ int Integrator::eval(const double** arg, double** res,
       // Check if event occured
       if (event_detection) {
         if (check_event(m)) return 1;
-        // Restore m->t_next, m->t_stop if modified by event
-        m->t_next = m->t_next_out;
-        m->t_stop = m->t_step;
       }
       // If output time reached, stop
       if (m->t == m->t_next) break;
@@ -2536,10 +2533,10 @@ int Integrator::check_event(IntegratorMemory* m) const {
     // Check if event was triggered or is still projected to be triggered before next output time
     if (m->e[i] > 0 || (m->edot[i] > 0 && m->old_e[i] + (m->t_next_out - m->t) * m->edot[i] > 0)) {
       // Projected zero-crossing time
-      double t_next = m->t - m->e[i] / m->edot[i];
+      double t_zero = m->t - m->e[i] / m->edot[i];
       // Just print the results for now
       if (verbose_) casadi_message("Zero crossing for index " + str(i) + " at t = " + str(m->t)
-        + ". t_next = " + str(t_next));
+        + ". t_zero = " + str(t_zero));
       // Call event transition function, if any
       if (has_function("event_transition")) {
         // Evaluate to tmp1
@@ -2558,8 +2555,12 @@ int Integrator::check_event(IntegratorMemory* m) const {
       }
       // Solver needs to be reset
       m->reset_solver = true;
+      // Restore stopping time after event
+      m->t_stop = m->t_step;
     }
   }
+  // Restore m->t_next, m->t_stop if modified by event
+  m->t_next = m->t_next_out;
   return 0;
 }
 
