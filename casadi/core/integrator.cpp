@@ -2518,22 +2518,18 @@ int Integrator::predict_events(IntegratorMemory* m) const {
   if (calc_edot(m)) return 1;
   // Save the values of the zero-crossing functions
   casadi_copy(m->e, ne_, m->old_e);
-  // Make sure that the already triggered events won't be triggered again
-  for (casadi_int i = 0; i < ne_; ++i) {
-    if (m->event_triggered[i] && m->old_e[i] < 0) {
-      m->old_e[i] = 0;
-    }
-  }
   // Find the next event, if any
   for (casadi_int i = 0; i < ne_; ++i) {
-    // Check if zero crossing function is negative and moving in the positive direction
-    if (m->e[i] < 0 && m->edot[i] > 0) {
-      // Projected zero-crossing time
-      double t = m->t - m->e[i] / m->edot[i];
-      // Save if earlier than current t_event
-      if (t < t_event) {
-        t_event = t;
-        event_index = i;
+    if (!m->event_triggered[i]) {
+      // Check if zero crossing function is negative and moving in the positive direction
+      if (m->e[i] < 0 && m->edot[i] > 0) {
+        // Projected zero-crossing time
+        double t = m->t - m->e[i] / m->edot[i];
+        // Save if earlier than current t_event
+        if (t < t_event) {
+          t_event = t;
+          event_index = i;
+        }
       }
     }
   }
@@ -2557,11 +2553,10 @@ int Integrator::handle_events(IntegratorMemory* m) const {
   // By default, let integrator continue to the next input step change
   m->t_stop = m->t_step;
   // Detect events
+  casadi_int event_index = -1;
   for (casadi_int i = 0; i < ne_; ++i) {
-    // By default, event is not triggered
-    m->event_triggered[i] = 0;
     // Make sure that event was not already triggered
-    if (m->old_e[i] >= 0) continue;
+    if (m->event_triggered[i] || m->old_e[i] >= 0) continue;
     // Check if event was triggered or is still projected to be triggered before next output time
     if (m->e[i] > 0 || (m->edot[i] > 0 && m->e[i] + (m->t_next_out - m->t) * m->edot[i] > 0)) {
       // Projected zero-crossing time
@@ -2570,72 +2565,84 @@ int Integrator::handle_events(IntegratorMemory* m) const {
       if (t_zero <= m->t_start || (m->e[i] > 0 && m->edot[i] <= 0)) {
         t_zero = 0.5 * (m->t_start + m->t);
       }
-      // Trigger this event
-      m->event_triggered[i] = 1;
       // Update t_next if earliest event so far
       if (t_zero < m->t_next) {
+        event_index = i;
         m->t_next = t_zero;
         m->t_stop = std::max(m->t, m->t_next);
       }
     }
   }
-  // Check if additional event iterations are needed
-  double t_diff = std::fabs(m->t_next - m->t);
-  if (t_diff >= event_tol_) {
-    // Check if maximum number of event iterations already reached
-    if (m->event_iter == max_event_iter_) {
-      // Throw error?
-      if (t_diff >= event_acceptable_tol_) {
-        casadi_error("Maximum number of event iterations reached without convergence");
-      } else {
-        // Print progress
-        if (verbose_) casadi_message("Event iteration stopped with acceptable tolerance: |dt| == "
-          + str(t_diff));
-      }
+  // Event iteration
+  if (event_index >= 0) {
+    // Distance to new time step 
+    double t_diff = std::fabs(m->t_next - m->t);
+    // More iterations needed?
+    bool more_iter = false;
+    // Event iteration message (replace with enum)
+    const char* event_msg = 0;
+    // Check if converged
+    if (t_diff < event_tol_) {
+        event_msg = "converged";
+    } else if (m->event_iter == max_event_iter_) {
+        // Throw error?
+        if (t_diff >= event_acceptable_tol_) {
+          casadi_error("Maximum number of event iterations reached without convergence");
+        }
+        event_msg = "maximum number of iterations";
     } else {
-      // More event iterations
-      if (verbose_) casadi_message("Event iteration " + str(m->event_iter) + ": |dt| == " + str(t_diff));
-      return 0;
+      // Continue iterating
+      event_msg = "integrating";
+      more_iter = true;
     }
-  } else {
-    // Print iteration progress
-    if (m->event_iter > 1) {
-      if (verbose_) casadi_message("Event iteration converged in " + str(m->event_iter)
-        + " iterations: |dt| == " + str(t_diff));
-    }
+    // Print progress
+    if (verbose_) casadi_message("Event iteration " + str(m->event_iter) + ": " + str(event_msg)
+      + ",  |dt| == " + str(t_diff));
+    // Continue event iteration?
+    if (more_iter) return 0;
   }
-  // Trigger events, if any
-  for (casadi_int i = 0; i < ne_; ++i) {
-    if (m->event_triggered[i]) {
-      // Print progress
-      if (verbose_) casadi_message("Zero crossing for index " + str(i) + " at t = " + str(m->t));
-      // Call event transition function, if any
-      if (has_function("event_transition")) {
-        // Evaluate to tmp1
-        double event_index = i;
-        m->arg[EVENT_INDEX] = &event_index;  // index
-        m->arg[EVENT_T] = &m->t;  // t
-        m->arg[EVENT_X] = m->x;  // x
-        m->arg[EVENT_Z] = m->z;  // z
-        m->arg[EVENT_P] = m->p;  // p
-        m->arg[EVENT_U] = m->u;  // u
-        m->res[EVENT_POST_X] = m->tmp1;  // post_x
-        m->res[EVENT_POST_Z] = m->tmp1 + nx_;  // post_z
-        if (calc_function(m, "event_transition")) return 1;
-        // Update x, z
-        casadi_copy(m->tmp1, nx_ + nz_, m->x);
-      }
-      // Update start value
-      m->t_start = m->t;
-      // Solver needs to be reset
-      m->reset_solver = true;
-      // TODO: Can the triggering of this event trigger other events?
-    }
+  // Clear list of triggered events
+  std::fill_n(m->event_triggered, ne_, 0);
+  // Trigger the specific event and any chained events
+  while (event_index >= 0) {
+    // Trigger event, get any chained event
+    if (trigger_event(m, &event_index)) return 1;
+    // Solver needs to be reset
+    m->reset_solver = true;
   }
   // Move past event
+  m->t_start = m->t;
   m->t_stop = m->t_step;
   m->t_next = m->t_next_out;
   m->event_iter = 0;
+  return 0;
+}
+
+int Integrator::trigger_event(IntegratorMemory* m, casadi_int* ind) const {
+  // Consistency checks
+  if (*ind < 0 || m->event_triggered[*ind]) return 1;
+  // Mark event as triggered
+  m->event_triggered[*ind] = 1;
+  // Print progress
+  if (verbose_) casadi_message("Zero crossing for index " + str(*ind) + " at t = " + str(m->t));
+  // Call event transition function, if any
+  if (has_function("event_transition")) {
+    // Evaluate to tmp1
+    double index = *ind;  // function expects floating point values
+    m->arg[EVENT_INDEX] = &index;  // index
+    m->arg[EVENT_T] = &m->t;  // t
+    m->arg[EVENT_X] = m->x;  // x
+    m->arg[EVENT_Z] = m->z;  // z
+    m->arg[EVENT_P] = m->p;  // p
+    m->arg[EVENT_U] = m->u;  // u
+    m->res[EVENT_POST_X] = m->tmp1;  // post_x
+    m->res[EVENT_POST_Z] = m->tmp1 + nx_;  // post_z
+    if (calc_function(m, "event_transition")) return 1;
+    // Update x, z
+    casadi_copy(m->tmp1, nx_ + nz_, m->x);
+  }
+  // TODO: Check if other events need to be triggered
+  *ind = -1;  // for now, do not trigger other events
   return 0;
 }
 
