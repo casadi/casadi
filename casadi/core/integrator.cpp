@@ -415,10 +415,20 @@ int Integrator::eval(const double** arg, double** res,
     }
     // Do we need to check for events?
     bool event_detection = ne_ > 0 && m->t_next > m->t;
+    // Mark all events at not triggered
+    std::fill_n(m->event_triggered, ne_, 0);
+
     // Number of root-finding iterations
     m->event_iter = 0;
+
     // Keep integrating until we reach the next output time
+    casadi_int interval_event_iter = 0;
+    casadi_int max_interval_event_iter = 100;
     do {
+      // Throw an error if too many events are happening within a single control interval
+      if (++interval_event_iter > max_interval_event_iter) {
+        casadi_error("At t = " + str(m->t) + ": Too many event iterations during interval " + str(m->k));
+      }
       // Reset the solver
       if (m->reset_solver) {
         reset(m, first_call);
@@ -435,6 +445,7 @@ int Integrator::eval(const double** arg, double** res,
         casadi_message("Interval " + str(m->k) + ": Integrating " + direction + " from "
           + str(m->t) + " to " + str(m->t_next) + ", t_stop = " + str(m->t_stop));
       }
+      casadi_assert_dev(m->t_next <= m->t_stop);
       advance(m);
       // Update current time
       m->t = m->t_next;
@@ -2507,6 +2518,12 @@ int Integrator::predict_events(IntegratorMemory* m) const {
   if (calc_edot(m)) return 1;
   // Save the values of the zero-crossing functions
   casadi_copy(m->e, ne_, m->old_e);
+  // Make sure that the already triggered events won't be triggered again
+  for (casadi_int i = 0; i < ne_; ++i) {
+    if (m->event_triggered[i] && m->old_e[i] < 0) {
+      m->old_e[i] = 0;
+    }
+  }
   // Find the next event, if any
   for (casadi_int i = 0; i < ne_; ++i) {
     // Check if zero crossing function is negative and moving in the positive direction
@@ -2537,6 +2554,8 @@ int Integrator::handle_events(IntegratorMemory* m) const {
   if (calc_edot(m)) return 1;
   // Increase event iteration counter
   m->event_iter++;
+  // By default, let integrator continue to the next input step change
+  m->t_stop = m->t_step;
   // Detect events
   for (casadi_int i = 0; i < ne_; ++i) {
     // By default, event is not triggered
@@ -2554,7 +2573,10 @@ int Integrator::handle_events(IntegratorMemory* m) const {
       // Trigger this event
       m->event_triggered[i] = 1;
       // Update t_next if earliest event so far
-      if (t_zero < m->t_next) m->t_next = t_zero;
+      if (t_zero < m->t_next) {
+        m->t_next = t_zero;
+        m->t_stop = std::max(m->t, m->t_next);
+      }
     }
   }
   // Check if additional event iterations are needed
@@ -2567,17 +2589,20 @@ int Integrator::handle_events(IntegratorMemory* m) const {
         casadi_error("Maximum number of event iterations reached without convergence");
       } else {
         // Print progress
-        if (verbose_) casadi_message("Event iteration stopped: " + str(t_diff));
+        if (verbose_) casadi_message("Event iteration stopped with acceptable tolerance: |dt| == "
+          + str(t_diff));
       }
     } else {
       // More event iterations
-      if (verbose_) casadi_message("Event iteration " + str(m->event_iter) + ": " + str(t_diff));
+      if (verbose_) casadi_message("Event iteration " + str(m->event_iter) + ": |dt| == " + str(t_diff));
       return 0;
     }
-  }
-  // Print iteration progress
-  if (m->event_iter > 1) {
-    if (verbose_) casadi_message("Event iteration " + str(m->event_iter) + ": " + str(t_diff));
+  } else {
+    // Print iteration progress
+    if (m->event_iter > 1) {
+      if (verbose_) casadi_message("Event iteration converged in " + str(m->event_iter)
+        + " iterations: |dt| == " + str(t_diff));
+    }
   }
   // Trigger events, if any
   for (casadi_int i = 0; i < ne_; ++i) {
@@ -2588,7 +2613,7 @@ int Integrator::handle_events(IntegratorMemory* m) const {
       if (has_function("event_transition")) {
         // Evaluate to tmp1
         double event_index = i;
-        m->arg[EVENT_INDEX] = &event_index;  // t
+        m->arg[EVENT_INDEX] = &event_index;  // index
         m->arg[EVENT_T] = &m->t;  // t
         m->arg[EVENT_X] = m->x;  // x
         m->arg[EVENT_Z] = m->z;  // z
@@ -2600,8 +2625,11 @@ int Integrator::handle_events(IntegratorMemory* m) const {
         // Update x, z
         casadi_copy(m->tmp1, nx_ + nz_, m->x);
       }
+      // Update start value
+      m->t_start = m->t;
       // Solver needs to be reset
       m->reset_solver = true;
+      // TODO: Can the triggering of this event trigger other events?
     }
   }
   // Move past event
