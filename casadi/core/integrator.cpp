@@ -427,7 +427,8 @@ int Integrator::eval(const double** arg, double** res,
     do {
       // Throw an error if too many events are happening within a single control interval
       if (++interval_event_iter > max_interval_event_iter) {
-        casadi_error("At t = " + str(m->t) + ": Too many event iterations during interval " + str(m->k));
+        casadi_error("At t = " + str(m->t) + ": Too many event iterations during interval "
+          + str(m->k));
       }
       // Reset the solver
       if (m->reset_solver) {
@@ -2575,7 +2576,7 @@ int Integrator::handle_events(IntegratorMemory* m) const {
   }
   // Event iteration
   if (event_index >= 0) {
-    // Distance to new time step 
+    // Distance to new time step
     double t_diff = std::fabs(m->t_next - m->t);
     // More iterations needed?
     bool more_iter = false;
@@ -2641,7 +2642,7 @@ int Integrator::trigger_event(IntegratorMemory* m, casadi_int* ind) const {
     // Update x, z
     casadi_copy(m->tmp1, nx_ + nz_, m->x);
   }
-  // TODO: Check if other events need to be triggered
+  // TODO(@jaeandersson): Check if other events need to be triggered
   *ind = -1;  // for now, do not trigger other events
   return 0;
 }
