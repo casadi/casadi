@@ -752,7 +752,16 @@ void Integrator::init(const Dict& opts) {
   if (nadj_ > 0) set_function(rdae_, "rdae");
 
   // Event transition function, if any
-  if (!event_transition_.is_null()) set_function(event_transition_, "event_transition");
+  if (!event_transition_.is_null()) {
+    set_function(event_transition_, "event_transition");
+    if (nfwd_ > 0) create_forward("event_transition", nfwd_);
+  }
+
+  // Event detection requires linearization of the zero-crossing function in the time direction
+  if (ne_ > 0) {
+    create_forward("dae", 1);
+    if (nfwd_ > 0) create_forward("dae", nfwd_);
+  }
 
   // Create problem functions, forward problem
   create_function("daeF", dyn_in(), dae_out());
@@ -761,10 +770,6 @@ void Integrator::init(const Dict& opts) {
     // one direction to conserve memory, symbolic processing time
     create_forward("daeF", 1);
     if (nq_ > 0) create_forward("quadF", 1);
-  }
-  // Event detection requires linearization of the zero-crossing function in the time direction
-  if (ne_ > 0) {
-    create_forward("dae", 1);
   }
 
   // Create problem functions, backward problem
@@ -802,6 +807,8 @@ void Integrator::init(const Dict& opts) {
   alloc_w(ne_, true);  // e
   alloc_w(ne_, true);  // edot
   alloc_w(ne_, true);  // old_e
+  alloc_w(nx_, true);  // xdot
+  alloc_w(nz_, true);  // zdot
   alloc_iw(ne_, true);  // event_triggered
 
   alloc_w(nrx_ + nrz_, true); // adj_x, adj_z
@@ -830,6 +837,8 @@ void Integrator::set_work(void* mem, const double**& arg, double**& res,
   m->e = w; w += ne_;
   m->edot = w; w += ne_;
   m->old_e = w; w += ne_;
+  m->xdot = w; w += nx_;
+  m->zdot = w; w += nz_;
   m->event_triggered = iw; iw += ne_;
 
   m->adj_x = w; w += nrx_;  // doubles as adj_xz
@@ -2485,7 +2494,7 @@ int Integrator::calc_edot(IntegratorMemory* m) const {
   m->arg[DYN_Z] = m->z;  // z
   m->arg[DYN_P] = m->p;  // p
   m->arg[DYN_U] = m->u;  // u
-  m->res[DYN_ODE] = m->tmp1;  // ode
+  m->res[DYN_ODE] = m->xdot;  // ode
   m->res[DYN_ALG] = m->tmp1 + nx_;  // alg
   m->res[DYN_QUAD] = nullptr;  // quad
   m->res[DYN_ZERO] = m->e;  // zero
@@ -2493,12 +2502,12 @@ int Integrator::calc_edot(IntegratorMemory* m) const {
   // Calculate de_dt using by forward mode AD applied to zero crossing function
   // Note: Currently ignoring dependency propagation via algebraic equations
   double dt_dt = 1;
-  m->arg[DYN_NUM_IN + DYN_ODE] = m->tmp1;  // out:ode
+  m->arg[DYN_NUM_IN + DYN_ODE] = m->xdot;  // out:ode
   m->arg[DYN_NUM_IN + DYN_ALG] = m->tmp1 + nx_;  // out:alg
   m->arg[DYN_NUM_IN + DYN_QUAD] = nullptr;  // out:quad
   m->arg[DYN_NUM_IN + DYN_ZERO] = m->e;  // out:zero
   m->arg[DYN_NUM_IN + DYN_NUM_OUT + DYN_T] = &dt_dt;  // fwd:t
-  m->arg[DYN_NUM_IN + DYN_NUM_OUT + DYN_X] = m->tmp1;  // fwd:x
+  m->arg[DYN_NUM_IN + DYN_NUM_OUT + DYN_X] = m->xdot;  // fwd:x
   m->arg[DYN_NUM_IN + DYN_NUM_OUT + DYN_Z] = nullptr;  // fwd:z
   m->arg[DYN_NUM_IN + DYN_NUM_OUT + DYN_P] = nullptr;  // fwd:p
   m->arg[DYN_NUM_IN + DYN_NUM_OUT + DYN_U] = nullptr;  // fwd:u
@@ -2626,9 +2635,40 @@ int Integrator::trigger_event(IntegratorMemory* m, casadi_int* ind) const {
   m->event_triggered[*ind] = 1;
   // Print progress
   if (verbose_) casadi_message("Zero crossing for index " + str(*ind) + " at t = " + str(m->t));
+  // The event time will be impacted by perturbations in x, z, u, p.
+  // the perturbed time will be given by the following implicit function:
+  //   e[ind](t, x + (t - t_event) * xdot, z + (t - t_event) * zdot, u, p) = 0
+  // The sensitivities of t as a functions of fwd_x, fwd_z, fwd_u and fwd_p
+  // are given by the implicit function theorem:
+  //   de/dt(t, x, z, u, p) * fwd_t + de/dx * fwd_x + de/dz * fwd_z + de/du * fwd_u + de/dp * fwd_p
+  //  <=> fwd_t = -fwd_e(fwd_x, fwd_z, fwd_u, fwd_p) / edot
+  if (nfwd_ > 0) {
+    m->arg[DYN_NUM_IN + DYN_ODE] = m->xdot;  // out:ode
+    m->arg[DYN_NUM_IN + DYN_ALG] = nullptr;  // out:alg
+    m->arg[DYN_NUM_IN + DYN_QUAD] = nullptr;  // out:quad
+    m->arg[DYN_NUM_IN + DYN_ZERO] = m->e;  // out:zero
+    m->arg[DYN_NUM_IN + DYN_NUM_OUT + DYN_T] = nullptr;  // fwd:t
+    m->arg[DYN_NUM_IN + DYN_NUM_OUT + DYN_X] = m->x + nx1_;  // fwd:x
+    m->arg[DYN_NUM_IN + DYN_NUM_OUT + DYN_Z] = m->z + nz1_;  // fwd:z
+    m->arg[DYN_NUM_IN + DYN_NUM_OUT + DYN_P] = m->p + np1_;  // fwd:p
+    m->arg[DYN_NUM_IN + DYN_NUM_OUT + DYN_U] = m->u + nu1_;  // fwd:u
+    m->res[DYN_ODE] = nullptr;  // fwd:ode
+    m->res[DYN_ALG] = nullptr;  // fwd:alg
+    m->res[DYN_QUAD] = nullptr;  // fwd:quad
+    m->res[DYN_ZERO] = m->tmp1;  // fwd:zero
+    if (calc_function(m, forward_name("dae", nfwd_))) return 1;
+    // Calculate sensitivity in t
+    for (casadi_int i = 0; i < nfwd_; ++i) {
+      m->tmp1[i] = -m->tmp1[*ind + ne_ * i] / m->edot[*ind];
+    }
+    // // Propagate this sensitivity to the state vector
+    for (casadi_int i = 0; i < nfwd_; ++i) {
+       casadi_axpy(nx1_, m->tmp1[i], m->xdot, m->x + nx1_ * (1 + i));
+    }
+  }
   // Call event transition function, if any
   if (has_function("event_transition")) {
-    // Evaluate to tmp1
+    // Evaluate to tmp2
     double index = *ind;  // function expects floating point values
     m->arg[EVENT_INDEX] = &index;  // index
     m->arg[EVENT_T] = &m->t;  // t
@@ -2636,11 +2676,32 @@ int Integrator::trigger_event(IntegratorMemory* m, casadi_int* ind) const {
     m->arg[EVENT_Z] = m->z;  // z
     m->arg[EVENT_P] = m->p;  // p
     m->arg[EVENT_U] = m->u;  // u
-    m->res[EVENT_POST_X] = m->tmp1;  // post_x
-    m->res[EVENT_POST_Z] = m->tmp1 + nx_;  // post_z
+    m->res[EVENT_POST_X] = m->tmp2;  // post_x
+    m->res[EVENT_POST_Z] = m->tmp2 + nx_;  // post_z
     if (calc_function(m, "event_transition")) return 1;
-    // Update x, z
-    casadi_copy(m->tmp1, nx_ + nz_, m->x);
+    // Propagate forward sensitivities
+    if (nfwd_ > 0) {
+      // Propagate sensitivities through event transition
+      m->arg[EVENT_NUM_IN + EVENT_POST_X] = m->tmp2;  // out:post_x
+      m->arg[EVENT_NUM_IN + EVENT_POST_Z] = m->tmp2 + nx_;  // out:post_z
+      m->arg[EVENT_NUM_IN + EVENT_NUM_OUT + EVENT_INDEX] = nullptr;  // fwd:index
+      m->arg[EVENT_NUM_IN + EVENT_NUM_OUT + EVENT_T] = m->tmp1;  // fwd:t
+      m->arg[EVENT_NUM_IN + EVENT_NUM_OUT + EVENT_X] = m->x + nx1_;  // fwd:x
+      m->arg[EVENT_NUM_IN + EVENT_NUM_OUT + EVENT_Z] = m->z + nz1_;  // fwd:z
+      m->arg[EVENT_NUM_IN + EVENT_NUM_OUT + EVENT_P] = m->p + np1_;  // fwd:p
+      m->arg[EVENT_NUM_IN + EVENT_NUM_OUT + EVENT_U] = m->u + nu1_;  // fwd:u
+      m->res[EVENT_POST_X] = m->tmp2 + nx1_;  // fwd:post_x
+      m->res[EVENT_POST_Z] = m->tmp2 + nx_ + nz1_;  // fwd:post_z
+      calc_function(m, forward_name("event_transition", nfwd_));
+    }
+  }
+  // Update x, z
+  casadi_copy(m->tmp2, nx_ + nz_, m->x);
+  // Calculate m->xdot and m->zdot
+  if (calc_edot(m)) return 1;
+  // Propagate this sensitivity to the state vector
+  for (casadi_int i = 0; i < nfwd_; ++i) {
+     casadi_axpy(nx1_, -m->tmp1[i], m->xdot, m->x + nx1_ * (1 + i));
   }
   // TODO(@jaeandersson): Check if other events need to be triggered
   *ind = -1;  // for now, do not trigger other events

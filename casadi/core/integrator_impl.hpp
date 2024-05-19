@@ -40,7 +40,7 @@ namespace casadi {
     \identifier{1lp} */
 struct CASADI_EXPORT IntegratorMemory : public OracleMemory {
   // Work vectors, forward problem
-  double *q, *x, *z, *p, *u, *e, *edot, *old_e;
+  double *q, *x, *z, *p, *u, *e, *edot, *old_e, *xdot, *zdot;
   // Work vectors, backward problem
   double *adj_x, *adj_z, *adj_p, *adj_q;
   // Temporary work vectors of length max(nx + nz, nrx, nrz)
