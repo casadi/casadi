@@ -63,8 +63,10 @@ struct CASADI_EXPORT IntegratorMemory : public OracleMemory {
   casadi_int *event_triggered;
   // Do we need to reset the solver?
   bool reset_solver;
-  // Number of root-finding iterations
+  // Number of root-finding iterations for a single event
   casadi_int event_iter;
+  // Number of root-finding iterations for all events during an interval
+  casadi_int interval_event_iter;
 };
 
 /// Memory struct, forward sparsity pattern propagation
@@ -410,8 +412,11 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   /// Function to be called at state events
   Function event_transition_;
 
-  /// Maximum number of event iterations
+  /// Maximum number of event iterations for a single event
   casadi_int max_event_iter_;
+
+  /// Maximum number of total event iterations during an interval
+  casadi_int max_interval_event_iter_;
 
   /// Termination tolerance for the event iteration
   double event_tol_;

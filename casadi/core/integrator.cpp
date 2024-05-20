@@ -273,6 +273,7 @@ Integrator::Integrator(const std::string& name, const Function& oracle,
   nadj_ = 0;
   print_stats_ = false;
   max_event_iter_ = 3;
+  max_interval_event_iter_ = 100;
   event_tol_ = 1e-6;
   event_acceptable_tol_ = inf;
 }
@@ -415,18 +416,15 @@ int Integrator::eval(const double** arg, double** res,
     }
     // Do we need to check for events?
     bool event_detection = ne_ > 0 && m->t_next > m->t;
-    // Mark all events at not triggered
+    // Mark all events as not triggered
     std::fill_n(m->event_triggered, ne_, 0);
-
-    // Number of root-finding iterations
+    // Reset number of event iterations for the interval
     m->event_iter = 0;
-
+    m->interval_event_iter = 0;
     // Keep integrating until we reach the next output time
-    casadi_int interval_event_iter = 0;
-    casadi_int max_interval_event_iter = 100;
     do {
       // Throw an error if too many events are happening within a single control interval
-      if (++interval_event_iter > max_interval_event_iter) {
+      if (++m->interval_event_iter > max_interval_event_iter_) {
         casadi_error("At t = " + str(m->t) + ": Too many event iterations during interval "
           + str(m->k));
       }
@@ -567,7 +565,10 @@ const Options Integrator::options_
       "Function to be called a zero-crossing events."}},
     {"max_event_iter",
       {OT_INT,
-      "Maximum number of iterations to zero in on an event."}},
+      "Maximum number of iterations to zero in on a single event."}},
+    {"max_interval_event_iter",
+      {OT_INT,
+      "Maximum number of total event iterations during an interval."}},
     {"event_tol",
       {OT_DOUBLE,
       "Termination tolerance for the event iteration."}},
@@ -607,6 +608,8 @@ void Integrator::init(const Dict& opts) {
       event_transition_ = op.second;
     } else if (op.first=="max_event_iter") {
       max_event_iter_ = op.second;
+    } else if (op.first=="max_interval_event_iter") {
+      max_interval_event_iter_ = op.second;
     } else if (op.first=="event_tol") {
       event_tol_ = op.second;
     } else if (op.first=="event_acceptable_tol") {
@@ -2342,6 +2345,7 @@ void Integrator::serialize_body(SerializingStream &s) const {
 
   s.pack("Integrator::event_transition", event_transition_);
   s.pack("Integrator::max_event_iter", max_event_iter_);
+  s.pack("Integrator::max_interval_event_iter", max_interval_event_iter_);
   s.pack("Integrator::event_tol", event_tol_);
   s.pack("Integrator::event_acceptable_tol", event_acceptable_tol_);
 }
@@ -2399,6 +2403,7 @@ Integrator::Integrator(DeserializingStream & s) : OracleFunction(s) {
 
   s.unpack("Integrator::event_transition", event_transition_);
   s.unpack("Integrator::max_event_iter", max_event_iter_);
+  s.unpack("Integrator::max_interval_event_iter", max_interval_event_iter_);
   s.unpack("Integrator::event_tol", event_tol_);
   s.unpack("Integrator::event_acceptable_tol", event_acceptable_tol_);
 }
@@ -2661,7 +2666,7 @@ int Integrator::trigger_event(IntegratorMemory* m, casadi_int* ind) const {
     for (casadi_int i = 0; i < nfwd_; ++i) {
       m->tmp1[i] = -m->tmp1[*ind + ne_ * i] / m->edot[*ind];
     }
-    // // Propagate this sensitivity to the state vector
+    // Propagate this sensitivity to the state vector
     for (casadi_int i = 0; i < nfwd_; ++i) {
        casadi_axpy(nx1_, m->tmp1[i], m->xdot, m->x + nx1_ * (1 + i));
     }
