@@ -414,8 +414,6 @@ int Integrator::eval(const double** arg, double** res,
       // Need to reset solver
       m->reset_solver = true;
     }
-    // Do we need to check for events?
-    bool event_detection = ne_ > 0 && m->t_next > m->t;
     // Mark all events as not triggered
     std::fill_n(m->event_triggered, ne_, 0);
     // Reset number of event iterations for the interval
@@ -435,7 +433,7 @@ int Integrator::eval(const double** arg, double** res,
         first_call = false;
       }
       // Predict next event, modify t_next, t_stop accordingly
-      if (event_detection && m->event_iter == 0) {
+      if (ne_ > 0) {
         if (predict_events(m)) return 1;
       }
       // Advance solution
@@ -450,7 +448,7 @@ int Integrator::eval(const double** arg, double** res,
       m->t = m->t_next;
       m->t_next = m->t_next_out;
       // Handle events, if any
-      if (event_detection) {
+      if (ne_ > 0) {
         if (handle_events(m)) return 1;
       }
     } while (m->t != m->t_next);
@@ -2526,6 +2524,10 @@ int Integrator::calc_edot(IntegratorMemory* m) const {
 }
 
 int Integrator::predict_events(IntegratorMemory* m) const {
+  // No prediction for zero length intervals
+  if (m->t_next_out == m->t_start) return 0;
+  // Skip prediction step if we are in the middle of an event iteration
+  if (m->event_iter > 0) return 0;
   // Event time same as stopping time, by default
   double t_event = m->t_stop;
   casadi_int event_index = -1;
@@ -2561,6 +2563,8 @@ int Integrator::predict_events(IntegratorMemory* m) const {
 }
 
 int Integrator::handle_events(IntegratorMemory* m) const {
+  // No prediction for zero length intervals
+  if (m->t_next_out == m->t_start) return 0;
   // Recalculate m->e and m->edot
   if (calc_edot(m)) return 1;
   // Increase event iteration counter
