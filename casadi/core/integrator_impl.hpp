@@ -201,13 +201,10 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   /** \brief Trigger an event */
   int trigger_event(IntegratorMemory* m, casadi_int* ind) const;
 
-  /** \brief  Advance solution in time, with events handling
-    TODO(@jaeandersson): Move functionality into advance() */
-  int advance_new(IntegratorMemory* m) const;
+  /** \brief  Advance solution in time, with events handling */
+  int advance(IntegratorMemory* m) const;
 
-  /** \brief  Advance solution in time
-
-      \identifier{25c} */
+  /** \brief  Advance solution in time, without events handling */
   virtual int advance_noevent(IntegratorMemory* mem) const = 0;
 
   /** \brief Reset the backward problem
