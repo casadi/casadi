@@ -202,10 +202,14 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   /** \brief Trigger an event */
   int trigger_event(IntegratorMemory* m, casadi_int* ind) const;
 
+  /** \brief  Advance solution in time, with events handling
+    TODO(@jaeandersson): Move functionality into advance() */
+  int advance_new(IntegratorMemory* m) const;
+
   /** \brief  Advance solution in time
 
       \identifier{25c} */
-  virtual void advance(IntegratorMemory* mem) const = 0;
+  virtual int advance_noevent(IntegratorMemory* mem) const = 0;
 
   /** \brief Reset the backward problem
 
@@ -603,7 +607,7 @@ class CASADI_EXPORT FixedStepIntegrator : public Integrator {
   /** \brief  Advance solution in time
 
       \identifier{25j} */
-  void advance(IntegratorMemory* mem) const override;
+  int advance_noevent(IntegratorMemory* mem) const override;
 
   /// Reset the backward problem and take time to tf
   void resetB(IntegratorMemory* mem) const override;

@@ -432,25 +432,13 @@ int Integrator::eval(const double** arg, double** res,
         m->reset_solver = false;
         first_call = false;
       }
-      // Predict next event, modify t_next, t_stop accordingly
-      if (ne_ > 0) {
-        if (predict_events(m)) return 1;
-      }
       // Advance solution
       if (verbose_) {
         std::string direction = m->t_next >= m->t ? "forward" : "backward";
         casadi_message("Interval " + str(m->k) + ": Integrating " + direction + " from "
           + str(m->t) + " to " + str(m->t_next) + ", t_stop = " + str(m->t_stop));
       }
-      casadi_assert_dev(m->t_next <= m->t_stop);
-      advance(m);
-      // Update current time
-      m->t = m->t_next;
-      m->t_next = m->t_next_out;
-      // Handle events, if any
-      if (ne_ > 0) {
-        if (handle_events(m)) return 1;
-      }
+      if (advance_new(m)) return 1;
     } while (m->t != m->t_next);
     // Get solution
     get_x(m, x);
@@ -529,6 +517,24 @@ int Integrator::eval(const double** arg, double** res,
   // Print integrator statistics
   if (print_stats_) print_stats(m);
 
+  return 0;
+}
+
+int Integrator::advance_new(IntegratorMemory* m) const {
+  // Predict next event, modify t_next, t_stop accordingly
+  if (ne_ > 0) {
+    if (predict_events(m)) return 1;
+  }
+  // Advance solution in time
+  if (advance_noevent(m)) return 1;
+  // Update current time
+  m->t = m->t_next;
+  m->t_next = m->t_next_out;
+  // Handle events, if any
+  if (ne_ > 0) {
+    if (handle_events(m)) return 1;
+  }
+  // Successful return
   return 0;
 }
 
@@ -1975,7 +1981,7 @@ int FixedStepIntegrator::init_mem(void* mem) const {
   return 0;
 }
 
-void FixedStepIntegrator::advance(IntegratorMemory* mem) const {
+int FixedStepIntegrator::advance_noevent(IntegratorMemory* mem) const {
   auto m = static_cast<FixedStepMemory*>(mem);
 
   // State at previous step
@@ -2009,6 +2015,8 @@ void FixedStepIntegrator::advance(IntegratorMemory* mem) const {
 
   // Save algebraic variables
   casadi_copy(m->v + nv_ - nz_, nz_, m->z);
+
+  return 0;
 }
 
 void FixedStepIntegrator::retreat(IntegratorMemory* mem, const double* u,

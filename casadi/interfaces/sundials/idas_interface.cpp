@@ -390,9 +390,8 @@ void IdasInterface::reset(IntegratorMemory* mem, bool first_call) const {
   }
 }
 
-void IdasInterface::advance(IntegratorMemory* mem) const {
+int IdasInterface::advance_noevent(IntegratorMemory* mem) const {
   auto m = to_mem(mem);
-
 
   // Do not integrate past change in input signals or past the end
   // The event handling may cause the stop time to become smaller than internal time reached,
@@ -423,6 +422,8 @@ void IdasInterface::advance(IntegratorMemory* mem) const {
   THROWING(IDAGetIntegratorStats, m->mem, &m->nsteps, &m->nfevals, &m->nlinsetups,
     &m->netfails, &m->qlast, &m->qcur, &m->hinused, &m->hlast, &m->hcur, &m->tcur);
   THROWING(IDAGetNonlinSolvStats, m->mem, &m->nniters, &m->nncfails);
+
+  return 0;
 }
 
 void IdasInterface::resetB(IntegratorMemory* mem) const {
