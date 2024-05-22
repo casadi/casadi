@@ -273,7 +273,7 @@ Integrator::Integrator(const std::string& name, const Function& oracle,
   nadj_ = 0;
   print_stats_ = false;
   max_event_iter_ = 3;
-  max_interval_event_iter_ = 100;
+  max_events_ = 20;
   event_tol_ = 1e-6;
   event_acceptable_tol_ = inf;
 }
@@ -384,6 +384,9 @@ int Integrator::eval(const double** arg, double** res,
   set_z(m, z0);
   set_p(m, p);
 
+  // Reset number of events
+  m->num_events = 0;
+
   // Is this the first call to reset?
   bool first_call = true;
 
@@ -416,8 +419,6 @@ int Integrator::eval(const double** arg, double** res,
     }
     // Mark all events as not triggered
     std::fill_n(m->event_triggered, ne_, 0);
-    // Reset number of event iterations for the interval
-    m->interval_event_iter = 0;
     // Keep integrating until we reach the next output time
     do {
       // Reset the solver
@@ -539,11 +540,6 @@ int Integrator::advance(IntegratorMemory* m) const {
   m->event_iter = 0;
   do {
     more_iter = false;
-    // Throw an error if too many events are happening within a single control interval
-    if (++m->interval_event_iter > max_interval_event_iter_) {
-      casadi_error("At t = " + str(m->t) + ": Too many event iterations during interval "
-        + str(m->k));
-    }
     // No event triggered
     m->event_index = -1;
     // Advance solution in time
@@ -634,19 +630,19 @@ const Options Integrator::options_
       "[DEPRECATED] Time grid"}},
     {"augmented_options",
       {OT_DICT,
-      "Options to be passed down to the augmented integrator, if one is constructed."}},
+      "Options to be passed down to the augmented integrator, if one is constructed"}},
     {"event_transition",
       {OT_FUNCTION,
-      "Function to be called a zero-crossing events."}},
+      "Function to be called a zero-crossing events"}},
     {"max_event_iter",
       {OT_INT,
-      "Maximum number of iterations to zero in on a single event."}},
-    {"max_interval_event_iter",
+      "Maximum number of iterations to zero in on a single event"}},
+    {"max_events",
       {OT_INT,
-      "Maximum number of total event iterations during an interval."}},
+      "Maximum total number of events"}},
     {"event_tol",
       {OT_DOUBLE,
-      "Termination tolerance for the event iteration."}},
+      "Termination tolerance for the event iteration"}},
     {"output_t0",
       {OT_BOOL,
       "[DEPRECATED] Output the state at the initial time"}}
@@ -683,8 +679,8 @@ void Integrator::init(const Dict& opts) {
       event_transition_ = op.second;
     } else if (op.first=="max_event_iter") {
       max_event_iter_ = op.second;
-    } else if (op.first=="max_interval_event_iter") {
-      max_interval_event_iter_ = op.second;
+    } else if (op.first=="max_events") {
+      max_events_ = op.second;
     } else if (op.first=="event_tol") {
       event_tol_ = op.second;
     } else if (op.first=="event_acceptable_tol") {
@@ -2422,7 +2418,7 @@ void Integrator::serialize_body(SerializingStream &s) const {
 
   s.pack("Integrator::event_transition", event_transition_);
   s.pack("Integrator::max_event_iter", max_event_iter_);
-  s.pack("Integrator::max_interval_event_iter", max_interval_event_iter_);
+  s.pack("Integrator::max_events", max_events_);
   s.pack("Integrator::event_tol", event_tol_);
   s.pack("Integrator::event_acceptable_tol", event_acceptable_tol_);
 }
@@ -2480,7 +2476,7 @@ Integrator::Integrator(DeserializingStream & s) : OracleFunction(s) {
 
   s.unpack("Integrator::event_transition", event_transition_);
   s.unpack("Integrator::max_event_iter", max_event_iter_);
-  s.unpack("Integrator::max_interval_event_iter", max_interval_event_iter_);
+  s.unpack("Integrator::max_events", max_events_);
   s.unpack("Integrator::event_tol", event_tol_);
   s.unpack("Integrator::event_acceptable_tol", event_acceptable_tol_);
 }
@@ -2638,6 +2634,11 @@ int Integrator::predict_events(IntegratorMemory* m) const {
 }
 
 int Integrator::trigger_event(IntegratorMemory* m, casadi_int* ind) const {
+  // Throw an error if too many events are happening within a single control interval
+  if (++m->num_events > max_events_) {
+    casadi_error("At t = " + str(m->t) + ": Too many event iterations during interval "
+      + str(m->k));
+  }
   // Consistency checks
   if (*ind < 0 || m->event_triggered[*ind]) return 1;
   // Mark event as triggered

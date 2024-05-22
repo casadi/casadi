@@ -65,8 +65,8 @@ struct CASADI_EXPORT IntegratorMemory : public OracleMemory {
   bool reset_solver;
   // Number of root-finding iterations for a single event
   casadi_int event_iter;
-  // Number of root-finding iterations for all events during an interval
-  casadi_int interval_event_iter;
+  // Number of events encountered thus far
+  casadi_int num_events;
   // Index of event last triggered
   casadi_int event_index;
 };
@@ -415,8 +415,8 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   /// Maximum number of event iterations for a single event
   casadi_int max_event_iter_;
 
-  /// Maximum number of total event iterations during an interval
-  casadi_int max_interval_event_iter_;
+  /// Maximum total number of events during the simulation
+  casadi_int max_events_;
 
   /// Termination tolerance for the event iteration
   double event_tol_;
