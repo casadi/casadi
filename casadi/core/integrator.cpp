@@ -536,10 +536,10 @@ int Integrator::advance(IntegratorMemory* m) const {
     if (predict_events(m)) return 1;
   }
   // Event iterations
-  bool more_iter;
   m->event_iter = 0;
-  do {
-    more_iter = false;
+  while (true) {
+    // Start a new event iteration
+    m->event_iter++;
     // No event triggered
     m->event_index = -1;
     // Advance solution in time
@@ -547,60 +547,54 @@ int Integrator::advance(IntegratorMemory* m) const {
     // Update current time
     m->t = m->t_next;
     m->t_next = m->t_next_out;
-    // Handle events, if any
-    if (ne_ > 0 && m->t_next_out != m->t_start) {
-      // Recalculate m->e and m->edot
-      if (calc_edot(m)) return 1;
-      // Increase event iteration counter
-      m->event_iter++;
-      // By default, let integrator continue to the next input step change
-      m->t_stop = m->t_step;
-      // Detect events
-      for (casadi_int i = 0; i < ne_; ++i) {
-        // Make sure that event was not already triggered
-        if (m->event_triggered[i] || m->old_e[i] >= 0) continue;
-        // Check if event was triggered or is projected to be triggered before next output time
-        if (m->e[i] > 0 || (m->edot[i] > 0 && m->e[i] + (m->t_next_out - m->t) * m->edot[i] > 0)) {
-          // Projected zero-crossing time
-          double t_zero = m->t - m->e[i] / m->edot[i];
-          // If t_zero is too small or m->edot[i] has the wrong sign, fall back to bisection
-          if (t_zero <= m->t_start || (m->e[i] > 0 && m->edot[i] <= 0)) {
-            t_zero = 0.5 * (m->t_start + m->t);
-          }
-          // Update t_next if earliest event so far
-          if (t_zero < m->t_next) {
-            m->event_index = i;
-            m->t_next = t_zero;
-            m->t_stop = std::max(m->t, m->t_next);
-          }
+    // If no events or no interval, done
+    if (ne_ == 0 || m->t_next_out == m->t_start) break;
+    // Recalculate m->e and m->edot
+    if (calc_edot(m)) return 1;
+    // By default, let integrator continue to the next input step change
+    m->t_stop = m->t_step;
+    // Detect events
+    for (casadi_int i = 0; i < ne_; ++i) {
+      // Make sure that event was not already triggered
+      if (m->event_triggered[i] || m->old_e[i] >= 0) continue;
+      // Check if event was triggered or is projected to be triggered before next output time
+      if (m->e[i] > 0 || (m->edot[i] > 0 && m->e[i] + (m->t_next_out - m->t) * m->edot[i] > 0)) {
+        // Projected zero-crossing time
+        double t_zero = m->t - m->e[i] / m->edot[i];
+        // If t_zero is too small or m->edot[i] has the wrong sign, fall back to bisection
+        if (t_zero <= m->t_start || (m->e[i] > 0 && m->edot[i] <= 0)) {
+          t_zero = 0.5 * (m->t_start + m->t);
         }
-      }
-      // Event iteration
-      if (m->event_index >= 0) {
-        // Distance to new time step
-        double t_diff = std::fabs(m->t_next - m->t);
-        // Event iteration message (replace with enum)
-        const char* event_msg = 0;
-        // Check if converged
-        if (t_diff < event_tol_) {
-            event_msg = "converged";
-        } else if (m->event_iter == max_event_iter_) {
-            // Throw error?
-            if (t_diff >= event_acceptable_tol_) {
-              casadi_error("Maximum number of event iterations reached without convergence");
-            }
-            event_msg = "maximum number of iterations";
-        } else {
-          // Continue iterating
-          event_msg = "integrating";
-          more_iter = true;
+        // Update t_next if earliest event so far
+        if (t_zero < m->t_next) {
+          m->event_index = i;
+          m->t_next = t_zero;
+          m->t_stop = std::max(m->t, m->t_next);
         }
-        // Print progress
-        if (verbose_) casadi_message("Event iteration " + str(m->event_iter) + ": " + str(event_msg)
-          + ",  |dt| == " + str(t_diff));
       }
     }
-  } while (more_iter);
+    // If no events, done
+    if (m->event_index < 0) break;
+    // Distance to new time step
+    double t_diff = std::fabs(m->t_next - m->t);
+    // Check if converged
+    if (t_diff < event_tol_) {
+      if (verbose_) casadi_message("Event iteration converged, |dt| == " + str(t_diff));
+      break;
+    }
+    // Maximum number of iterations reached?
+    if (m->event_iter == max_event_iter_) {
+      // Throw error?
+      if (t_diff >= event_acceptable_tol_) {
+        casadi_error("Maximum number of event iterations reached without convergence");
+      }
+      if (verbose_) casadi_message("Max event iterations, |dt| == " + str(t_diff));
+      break;
+    }
+    // More iterations needed
+    if (verbose_) casadi_message("Event iteration " + str(m->event_iter) + ", |dt| == "
+      + str(t_diff));
+  }
   // Successful return
   return 0;
 }
