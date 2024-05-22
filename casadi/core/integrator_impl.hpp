@@ -196,9 +196,6 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   /** \brief Predict next event time */
   int predict_events(IntegratorMemory* m) const;
 
-  /** \brief Handle events, if any */
-  int handle_events(IntegratorMemory* m) const;
-
   /** \brief Trigger an event */
   int trigger_event(IntegratorMemory* m, casadi_int* ind) const;
 
