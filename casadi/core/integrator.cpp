@@ -539,7 +539,7 @@ int Integrator::advance_new(IntegratorMemory* m) const {
     // By default, let integrator continue to the next input step change
     m->t_stop = m->t_step;
     // Detect events
-    casadi_int event_index = -1;
+    m->event_index = -1;
     for (casadi_int i = 0; i < ne_; ++i) {
       // Make sure that event was not already triggered
       if (m->event_triggered[i] || m->old_e[i] >= 0) continue;
@@ -553,14 +553,14 @@ int Integrator::advance_new(IntegratorMemory* m) const {
         }
         // Update t_next if earliest event so far
         if (t_zero < m->t_next) {
-          event_index = i;
+          m->event_index = i;
           m->t_next = t_zero;
           m->t_stop = std::max(m->t, m->t_next);
         }
       }
     }
     // Event iteration
-    if (event_index >= 0) {
+    if (m->event_index >= 0) {
       // Distance to new time step
       double t_diff = std::fabs(m->t_next - m->t);
       // More iterations needed?
@@ -590,9 +590,9 @@ int Integrator::advance_new(IntegratorMemory* m) const {
     // Clear list of triggered events
     std::fill_n(m->event_triggered, ne_, 0);
     // Trigger the specific event and any chained events
-    while (event_index >= 0) {
+    while (m->event_index >= 0) {
       // Trigger event, get any chained event
-      if (trigger_event(m, &event_index)) return 1;
+      if (trigger_event(m, &m->event_index)) return 1;
       // Solver needs to be reset
       m->reset_solver = true;
     }

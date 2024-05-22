@@ -67,6 +67,8 @@ struct CASADI_EXPORT IntegratorMemory : public OracleMemory {
   casadi_int event_iter;
   // Number of root-finding iterations for all events during an interval
   casadi_int interval_event_iter;
+  // Index of event last triggered
+  casadi_int event_index;
 };
 
 /// Memory struct, forward sparsity pattern propagation
