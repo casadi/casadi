@@ -3219,6 +3219,61 @@ class Functiontests(casadiTestCase):
     if not args.run_slow: return
     F,_ = self.check_codegen(f,inputs=[DM.rand(f.sparsity_in(i)) for i in range(f.n_in())],with_jac_sparsity=True,with_forward=True)
     mychecks(F,exempt=True)
+   
+   
+  def test_cat_input(self):
+
+    x = MX.sym("x",2)
+    
+    fmx = Function('f',[vertcat(MX(2,1),x)],[sin(x)],{"always_inline":True})
+    print(fmx)
+    
+    X = MX.sym("X",4)#Sparsity.lower(3))
+    print(fmx(X))
+    
+    f_eval = Function('f_eval',[X],[fmx(X)])
+    print(f_eval([np.nan,np.nan,3,np.nan]))
+    
+
+  def test_reshape_input(self):
+
+    x = MX.sym("x",6,2)
+    xsx = SX.sym("x",6,2)
+    
+    fmx = Function('f',[reshape(x,3,4)],[sin(x)],{"always_inline":True})
+    fsx = Function('f',[reshape(xsx,3,4)],[sin(xsx)])
+    
+    DM.rng(1)
+    inputs = [DM.rand(3,4)]
+    for input in inputs:
+        self.checkfunction_light(fmx,fsx,inputs=[input])
+    
+ 
+ 
+  def test_sparsity_cast_input(self):
+  
+    X = MX.sym("X",Sparsity.lower(3))
+    f = Function("f",[X],[X**2],{"always_inline":True})
+  
+    sp = Sparsity.lower(3)
+    N = sp.nnz()
+    
+    x = MX.sym("x",N)
+    xsx = SX.sym("x",N)
+    
+    fmx = Function('f',[sparsity_cast(x,sp)],[sin(x)],{"always_inline":True})
+    fsx = Function('f',[sparsity_cast(xsx,sp)],[sin(xsx)])
+    
+    inputs = [sparsify(DM([[1,0,0],[3,7,0],[1,8,9]])), sparsify(DM([[1,0,0],[3,0,0],[0,8,9]])), DM([[1,1.1,8],[3,1.2,3],[1,8,9]])]
+    for input in inputs:
+        self.checkfunction_light(fmx,fsx,inputs=[input])
+    
+    for X in [MX.sym("X",Sparsity.lower(3)), MX.sym("X",Sparsity.diag(3)), MX.sym("X",3,3)]:
+        fcmx = Function('f',[X],[fmx(X)])
+        fcsx = Function('f',[X],[fsx(X)])
+        
+        self.checkfunction_light(fcmx,fcsx,inputs=[DM.rand(X.sparsity())])
+
     
   def test_external(self):
     if not args.run_slow: return
