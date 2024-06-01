@@ -2081,7 +2081,7 @@ const MX& DaeBuilderInternal::CallIO::hess(casadi_int iind1, casadi_int iind2) c
 
 void DaeBuilderInternal::sort_dependent(std::vector<MX>& v, std::vector<MX>& vdef) {
   // Form function to evaluate dependent variables
-  Function vfcn("vfcn", {vertcat(v)}, {vertcat(vdef)}, {"v"}, {"vdef"});
+  Function vfcn("vfcn", {vertcat(v)}, {vertcat(vdef)}, {"v"}, {"vdef"}, {{"allow_free", true}});
   // Is any variable vector-valued?
   bool any_vector_valued = false;
   for (const MX& v_i : v) {
@@ -2112,7 +2112,7 @@ void DaeBuilderInternal::sort_dependent(std::vector<MX>& v, std::vector<MX>& vde
     }
     // Recreate vfcn with smaller dimensions
     vfcn = Function(vfcn.name(), {vertcat(vfcn_in)}, {vertcat(vfcn_out)},
-      vfcn.name_in(), vfcn.name_out());
+      vfcn.name_in(), vfcn.name_out(), {{"allow_free", true}});
   }
   // Calculate sparsity pattern of dvdef/dv
   Sparsity Jv = vfcn.jac_sparsity(0, 0);
@@ -2282,7 +2282,7 @@ Function DaeBuilderInternal::gather_eq() const {
     }
   }
   // Construct function
-  return Function("all_eq", {}, f_out, {}, f_out_name);
+  return Function("all_eq", {}, f_out, {}, f_out_name, {{"allow_free", true}});
 }
 
 std::vector<MX> DaeBuilderInternal::cdef() const {
