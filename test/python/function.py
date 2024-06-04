@@ -3275,6 +3275,51 @@ class Functiontests(casadiTestCase):
         
         self.checkfunction_light(fcmx,fcsx,inputs=[DM.rand(X.sparsity())])
 
+  def test_sxfunction_eval_mx(self):
+  
+    x = MX.sym("x")
+    
+    print(vertcat(x,x**2).nz[:])
+  
+    def testcases():
+        x=SX.sym("x")
+        f = Function('fsx',[x],[x**2],["x"],["out"])
+        
+        yield f
+        
+        x=SX.sym("x",3)
+        f = Function('fsx',[x],[sin(x[0]+x[2])],["x"],["out"])
+        
+        yield f
+        
+        x=SX.sym("x",2,2)
+        f = Function('fsx',[x],[mtimes(x,x)],["x"],["out"])
+        
+        yield f
+        
+    def generate_args(f):
+        yield f.mx_in()
+        yield [sparsity_cast(vcat(MX.sym(f.name_in(i),1,1,f.nnz_in(i))),f.sparsity_in(i)) for i in range(f.n_in())]
+        
+        
+    for f in testcases():
+        for args in generate_args(f):
+            res = f.call(args,False,False)
+            self.assertTrue("fsx" in str(res))
+            res = f.call(args,True,False)
+            self.assertFalse("fsx" in str(res))
+
+            print(args)
+            print("res",res)
+            F = Function("F",args,res)
+            
+            DM.rand(1)
+            args = [DM.rand(f.sparsity_in(i)) for i in range(f.n_in())]
+            
+            self.checkfunction_light(f,F,inputs=args)
+            
+
+  
     
   def test_external(self):
     if not args.run_slow: return

@@ -35,6 +35,11 @@
 #include "casadi_interrupt.hpp"
 #include "serializing_stream.hpp"
 
+// Throw informative error message
+#define CASADI_THROW_ERROR(FNAME, WHAT) \
+throw CasadiException("Error in SXFunction::" FNAME " at " + CASADI_WHERE + ":\n"\
+  + std::string(WHAT));
+
 namespace casadi {
 
   SXFunction::SXFunction(const std::string& name,
@@ -577,6 +582,100 @@ namespace casadi {
       }
     }
     return 0;
+  }
+
+
+  void SXFunction::eval_mx(const MXVector& arg, MXVector& res,
+                          bool always_inline, bool never_inline) const {
+    always_inline = always_inline || always_inline_;
+    never_inline = never_inline || never_inline_;
+
+    // non-inlining call is implemented in the base-class
+    if (!always_inline) {
+      return FunctionInternal::eval_mx(arg, res, false, true);
+    }
+
+    if (verbose_) casadi_message(name_ + "::eval_mx");
+    try {
+
+      // Iterator to stack of constants
+      std::vector<SXElem>::const_iterator c_it = constants_.begin();
+
+      casadi_assert(!has_free(), "Free variables not supported in SXFunction::eval_mx");
+
+      // Resize the number of outputs
+      casadi_assert(arg.size()==n_in_, "Wrong number of input arguments");
+      res.resize(out_.size());
+
+      // non-inlining call is implemented in the base-class
+      if (!should_inline(always_inline, never_inline)) {
+        return FunctionInternal::eval_mx(arg, res, false, true);
+      }
+
+      // Symbolic work, non-differentiated
+      std::vector<MX> w(sz_w());
+      if (verbose_) casadi_message("Allocated work vector");
+
+      // Split up inputs analogous to symbolic primitives
+      std::vector<std::vector<MX> > arg_split(in_.size());
+      for (casadi_int i=0; i<in_.size(); ++i) {
+        MX nz;
+        arg[i].get_nz(nz, 0, Slice());
+        std::vector<MX> s(nz.nnz());
+        for (casadi_int i=0; i<nz.nnz(); ++i) s[i] = nz(i);
+
+        arg_split[i] = s;
+        /*if (sparsity_in_[i].is_vector() && sparsity_in_[i].is_dense()) {
+          if (arg[i].op()==OP_VERTCAT) {
+            std::vector<MX> s = arg[i].primitives();
+            for (const auto& e: s) {
+              casadi_assert(e.is_scalar(), "Input MX must be scalar");
+            }
+            arg_split[i] = s;
+          } else {
+            arg_split[i] = vertsplit(arg[i]);
+          }
+        } else {
+          casadi_error("Not implemented");
+        }*/
+      }
+
+      // Allocate storage for split outputs
+      std::vector<std::vector<MX> > res_split(out_.size());
+      for (casadi_int i=0; i<out_.size(); ++i) res_split[i].resize(nnz_out(i));
+
+      // Evaluate algorithm
+      if (verbose_) casadi_message("Evaluating algorithm forward");
+      for (auto&& a : algorithm_) {
+        switch (a.op) {
+        case OP_INPUT:
+          w[a.i0] = arg_split[a.i1][a.i2];
+          break;
+        case OP_OUTPUT:
+          res_split[a.i0][a.i2] = w[a.i1];
+          break;
+        case OP_CONST:
+          w[a.i0] = static_cast<double>(*c_it++);
+          break;
+        default:
+          // Evaluate the function to a temporary value
+          // (as it might overwrite the children in the work vector)
+          MX f;
+          switch (a.op) {
+            CASADI_MATH_FUN_BUILTIN(w[a.i1], w[a.i2], f)
+          }
+
+          // Finally save the function value
+          w[a.i0] = f;
+        }
+      }
+
+      // Join split outputs
+      for (casadi_int i=0; i<res.size(); ++i)
+        res[i] = sparsity_cast(vertcat(res_split[i]), sparsity_out_[i]);
+    } catch (std::exception& e) {
+      CASADI_THROW_ERROR("eval_mx", e.what());
+    }
   }
 
   void SXFunction::ad_forward(const std::vector<std::vector<SX> >& fseed,
