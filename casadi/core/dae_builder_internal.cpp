@@ -2734,7 +2734,14 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
       // Independent (time) variable
       t_.push_back(var.index);
     } else if (var.causality == Causality::INPUT) {
-      u_.push_back(var.index);
+      // Check if description starts with PARAMETER:
+      if (var.description.rfind("PARAMETER:", 0) == 0) {
+        // Make tunable parameter
+        var.variability = Variability::TUNABLE;
+        p_.push_back(var.index);
+      } else {
+        u_.push_back(var.index);
+      }
     } else if (var.variability == Variability::TUNABLE) {
       p_.push_back(var.index);
     }
@@ -2979,6 +2986,11 @@ void DaeBuilderInternal::import_initial_equations(const XmlNode& eqs) {
         MX beq = read_expr(rhs);
         // Left-hand-side is a variable
         Variable& v = read_variable(lhs);
+        // Hack: ignore initial equations for tunable parameters
+        if (v.variability == Variability::TUNABLE) {
+          casadi_warning(eq_name + " defines a tunable parameter, ignored")
+          continue;
+        }
         // Hack: avoid duplicate equations
         std::string eq_str = str(v.v) + " == " + str(beq);
         auto it = already_added.insert(eq_str);
