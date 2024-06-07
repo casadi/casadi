@@ -311,7 +311,7 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
                         const std::vector<std::string>& inames,
                         const std::vector<std::string>& onames,
                         const Dict& opts) const override;
-  bool has_reverse(casadi_int nadj) const override { return true;}
+  bool has_reverse(casadi_int nadj) const override { return ne_ == 0;}
   ///@}
 
   /** \brief Set solver specific options to generated augmented integrators
