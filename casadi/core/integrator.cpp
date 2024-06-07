@@ -953,6 +953,9 @@ template<typename MatType>
 Function Integrator::get_forward_dae(const std::string& name) const {
   if (verbose_) casadi_message(name_ + "::get_forward_dae");
 
+  // Events not implemented
+  casadi_assert(ne_ == 0, "Event support not implemented for Integrator::augmented_dae");
+
   // Get input and output expressions
   std::vector<MatType> arg = MatType::get_input(oracle_);
   std::vector<MatType> res = oracle_(arg);
@@ -1677,6 +1680,9 @@ Function Integrator::get_reverse(casadi_int nadj, const std::string& name,
     const std::vector<std::string>& onames,
     const Dict& opts) const {
   if (verbose_) casadi_message(name_ + "::get_reverse");
+
+  // Events not implemented
+  casadi_assert(ne_ == 0, "Event support not implemented for  Integrator::get_reverse");
 
   // Integrator options
   Dict aug_opts = getDerivativeOptions(false);
