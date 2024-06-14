@@ -317,7 +317,7 @@ namespace casadi {
     static void substitute_inplace(const std::vector<Matrix<Scalar> >& v,
                                   std::vector<Matrix<Scalar> >& vdef,
                                   std::vector<Matrix<Scalar> >& ex,
-                                  bool revers);
+                                  bool reverse);
     static Matrix<Scalar> pinv(const Matrix<Scalar> &x);
     static Matrix<Scalar> pinv(const Matrix<Scalar> &A,
                                  const std::string& lsolver, const Dict& opts);
