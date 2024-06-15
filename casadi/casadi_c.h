@@ -128,6 +128,8 @@ CASADI_EXPORT int casadi_c_work_id(int id, casadi_int *sz_arg, casadi_int* sz_re
 CASADI_EXPORT int casadi_c_eval_id(int id, const double** arg, double** res,
   casadi_int* iw, double* w, int mem);
 
+CASADI_EXPORT void casadi_c_logger_write(const char* msg, int num);
+CASADI_EXPORT void casadi_c_logger_flush(void);
 
 #ifdef __cplusplus
 }

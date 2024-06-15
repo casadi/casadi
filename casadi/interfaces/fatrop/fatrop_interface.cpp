@@ -29,6 +29,7 @@
 #include "../../core/global_options.hpp"
 #include "../../core/casadi_interrupt.hpp"
 #include "../../core/convexify.hpp"
+#include "casadi/casadi_c.h"
 
 #include <ctime>
 #include <stdlib.h>
@@ -97,6 +98,9 @@ namespace casadi {
       {"fatrop",
        {OT_DICT,
         "Options to be passed to fatrop"}},
+      {"structure_detection",
+       {OT_STRING,
+        "NONE | auto | manual"}},
       {"convexify_strategy",
        {OT_STRING,
         "NONE|regularize|eigen-reflect|eigen-clip. "
@@ -105,6 +109,9 @@ namespace casadi {
        {OT_DOUBLE,
         "When using a convexification strategy, make sure that "
         "the smallest eigenvalue is at least this (default: 1e-7)."}},
+      {"debug",
+       {OT_BOOL,
+        "Produce debug information (default: false)"}},
       {"fatrop",
        {OT_DICT,
         "Options to be passed to fatrop"
@@ -122,6 +129,8 @@ namespace casadi {
     std::string convexify_strategy = "none";
     double convexify_margin = 1e-7;
     casadi_int max_iter_eig = 200;
+    structure_detection_ = STRUCTURE_NONE;
+    debug_ = false;
 
     calc_g_ = true;
     calc_f_ = true;
@@ -148,6 +157,19 @@ namespace casadi {
         max_iter_eig = op.second;
       } else if (op.first=="fatrop") {
         opts_ = op.second;
+      } else if (op.first=="structure_detection") {
+        std::string v = op.second;
+        if (v=="auto") {
+          structure_detection_ = STRUCTURE_AUTO;
+        } else if (v=="manual") {
+          structure_detection_ = STRUCTURE_MANUAL;
+        } else if (v=="none") {
+          structure_detection_ = STRUCTURE_NONE;
+        } else {
+          casadi_error("Unknown option for structure_detection: '" + v + "'.");
+        }
+      } else if (op.first=="debug") {
+        debug_ = op.second;
       }
     }
 
@@ -190,11 +212,6 @@ namespace casadi {
       }
     }
 
-    bool detect_structure = struct_cnt==0;
-    casadi_assert(struct_cnt==0 || struct_cnt==4,
-      "You must either set all of N, nx, nu, ng; "
-      "or set none at all (automatic detection).");
-
     const std::vector<casadi_int>& nx = nxs_;
     const std::vector<casadi_int>& ng = ngs_;
     const std::vector<casadi_int>& nu = nus_;
@@ -204,7 +221,20 @@ namespace casadi {
     const Sparsity& A_ = jacg_sp_;
     casadi_int na_ = A_.size1(); //TODO(jgillis): replace with ng
 
-    if (detect_structure) {
+    if (struct_cnt>0) {
+      casadi_assert(structure_detection_ == STRUCTURE_MANUAL,
+        "You must set structure_detection to 'manual' if you set N, nx, nu, ng.");
+    }
+
+    if (structure_detection_==STRUCTURE_MANUAL) {
+      casadi_assert(struct_cnt==4,
+        "You must set all of N, nx, nu, ng.");
+    } else if (structure_detection_==STRUCTURE_NONE) {
+      N_ = 1;
+      nxs_ = {0, 0};
+      nus_ = {nx_, 0};
+      ngs_ = {ng_, 0};
+    } else if (structure_detection_==STRUCTURE_AUTO) {
       /* General strategy: look for the xk+1 diagonal part in A
       */
 
@@ -287,6 +317,10 @@ namespace casadi {
       }
     }
 
+    casadi_assert(nx.size()==N_+1, "nx must have length N+1.");
+    casadi_assert(nu.size()==N_+1, "nu must have length N.");
+    casadi_assert(ng.size()==N_+1, "ng must have length N+1.");
+
     if (verbose_) {
       casadi_message("Using structure: N " + str(N_) + ", nx " + str(nx) + ", "
             "nu " + str(nu) + ", ng " + str(ng) + ".");
@@ -335,10 +369,17 @@ namespace casadi {
 
     Sparsity total = ABsp_ + CDsp_ + Isp_;
 
+    if (debug_) {
+      total.to_file("debug_interface.mtx");
+      A_.to_file("debug_A.mtx");
+    }
+
     casadi_assert((A_ + total).nnz() == total.nnz(),
       "HPIPM: specified structure of A does not correspond to what the interface can handle. "
       "Structure is: N " + str(N_) + ", nx " + str(nx) + ", nu " + str(nu) + ", "
-      "ng " + str(ng) + ".");
+      "ng " + str(ng) + ".\n"
+      "Note that debug_A.mtx and debug_interface.mtx have are written to the current directory "
+      "when 'debug' option is true.");
     casadi_assert_dev(total.nnz() == ABsp_.nnz() + CDsp_.nnz() + Isp_.nnz());
 
     /* Disassemble H input into:
@@ -601,6 +642,8 @@ void FatropInterface::set_fatrop_prob() {
   p_.nlp_grad_f = OracleCallback("nlp_grad_f", this);
   p_.nlp_f = OracleCallback("nlp_f", this);
   p_.nlp_g = OracleCallback("nlp_g", this);
+  p_.write = &casadi_c_logger_write;
+  p_.flush = &casadi_c_logger_flush;
 
   casadi_fatrop_setup(&p_);
 }
@@ -664,6 +707,9 @@ void FatropInterface::set_fatrop_prob(CodeGenerator& g) const {
     g << "p.sp_h = 0;\n";
   }
 
+  g << "p.write = 0;\n";
+  g << "p.flush = 0;\n";
+
   g << "casadi_fatrop_setup(&p);\n";
 
 }
@@ -699,10 +745,17 @@ FatropInterface::FatropInterface(DeserializingStream& s) : Nlpsol(s) {
   s.unpack("FatropInterface::nus", nus_);
   s.unpack("FatropInterface::ngs", ngs_);
   s.unpack("FatropInterface::N", N_);
+
+  casadi_int structure_detection;
+  s.unpack("FatropInterface::structure_detection", structure_detection);
+  structure_detection_ = static_cast<StructureDetection>(structure_detection);
+
+
   s.unpack("FatropInterface::AB_offsets", AB_offsets_);
   s.unpack("FatropInterface::CD_offsets", CD_offsets_);
   s.unpack("FatropInterface::RSQ_offsets", RSQ_offsets_);
   s.unpack("FatropInterface::I_offsets", I_offsets_);
+  s.unpack("FatropInterface::debug", debug_);
 
   set_fatrop_prob();
 }
@@ -731,10 +784,12 @@ void FatropInterface::serialize_body(SerializingStream &s) const {
   s.pack("FatropInterface::nus", nus_);
   s.pack("FatropInterface::ngs", ngs_);
   s.pack("FatropInterface::N", N_);
+  s.pack("FatropInterface::structure_detection", static_cast<casadi_int>(structure_detection_));
   s.pack("FatropInterface::AB_offsets", AB_offsets_);
   s.pack("FatropInterface::CD_offsets", CD_offsets_);
   s.pack("FatropInterface::RSQ_offsets", RSQ_offsets_);
   s.pack("FatropInterface::I_offsets", I_offsets_);
+  s.pack("FatropInterface::debug", debug_);
 }
 
 } // namespace casadi

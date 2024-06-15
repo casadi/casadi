@@ -695,7 +695,7 @@ class OCPtests(casadiTestCase):
 
         solutions = {}
         stats = {}
-        for solver, solver_options in [("ipopt",{}),("fatrop",{"fatrop":{"accept_every_trial_step":False,"tol":1e-8,"max_iter":100}})]:
+        for solver, solver_options in [("ipopt",{}),("fatrop",{"structure_detection":"auto","fatrop":{"accept_every_trial_step":False,"tol":1e-8,"max_iter":100}})]:
             f = nlpsol('solver', solver, prob, solver_options)
             #if solver=="fatrop" and i==2: raise Exception() 
 
@@ -796,12 +796,12 @@ class OCPtests(casadiTestCase):
         jacobian_sparsity(prob["g"],prob["x"]).spy()
 
 
-        for solver, solver_options in [("fatrop",{})]:
+        for solver, solver_options in [("fatrop",{"structure_detection": "auto", "verbose": True})]:
             f = nlpsol('solver', solver, prob, solver_options)
             #if solver=="fatrop" and i==2: raise Exception() 
 
             # Solve the NLP
-            with self.assertInException("gap-closing"):
+            with self.assertInAnyOutput("gap-closing"):
                 f(**args)
        
  

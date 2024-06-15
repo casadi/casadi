@@ -328,3 +328,12 @@ int casadi_c_eval_id(int id, const double** arg, double** res, casadi_int* iw, d
   }
   return 0;
 }
+
+
+void casadi_c_logger_write(const char* msg, int num) {
+  casadi::uout().write(msg, num);
+}
+
+void casadi_c_logger_flush(void) {
+  casadi::uout() << std::flush;
+}

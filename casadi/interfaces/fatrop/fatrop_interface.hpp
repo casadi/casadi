@@ -165,8 +165,16 @@ namespace casadi {
     std::vector<casadi_int> ngs_;
     casadi_int N_;
 
+    // An enum field for the structure detection
+    enum StructureDetection {
+      STRUCTURE_NONE,
+      STRUCTURE_AUTO,
+      STRUCTURE_MANUAL
+    };
+    StructureDetection structure_detection_;
 
     std::vector<casadi_int> AB_offsets_, CD_offsets_, RSQ_offsets_, I_offsets_;
+    bool debug_;
   };
 
 } // namespace casadi

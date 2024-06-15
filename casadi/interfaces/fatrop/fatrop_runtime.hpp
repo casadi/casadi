@@ -107,6 +107,9 @@ struct casadi_fatrop_prob {
   OracleCallback nlp_grad_f;
   OracleCallback nlp_f;
   OracleCallback nlp_g;
+
+  FatropOcpCWrite write;
+  FatropOcpCFlush flush;
 };
 // C-REPLACE "casadi_fatrop_prob<T1>" "struct casadi_fatrop_prob"
 
@@ -802,7 +805,7 @@ void casadi_fatrop_presolve(casadi_fatrop_data<T1>* d) {
 
   d->ocp_interface.user_data = d;
 
-  d->solver = fatrop_ocp_c_create(&d->ocp_interface);
+  d->solver = fatrop_ocp_c_create(&d->ocp_interface, p->write, p->flush);
 }
 
 // SYMBOL "fatrop_ocp_c_solve"

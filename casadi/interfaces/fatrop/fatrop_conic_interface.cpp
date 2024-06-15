@@ -70,6 +70,9 @@ namespace casadi {
       {"ng",
        {OT_INTVECTOR,
         "Number of non-dynamic constraints, length N+1"}},
+      {"structure_detection",
+       {OT_STRING,
+        "NONE | auto | manual"}},
       {"fatrop",
        {OT_DICT,
         "Options to be passed to fatrop"}}}
@@ -79,6 +82,7 @@ namespace casadi {
     Conic::init(opts);
 
     casadi_int struct_cnt=0;
+    structure_detection_ = STRUCTURE_NONE;
 
     // Read options
     for (auto&& op : opts) {
@@ -94,13 +98,33 @@ namespace casadi {
       } else if (op.first=="ng") {
         ngs_ = op.second;
         struct_cnt++;
+      } else if (op.first=="structure_detection") {
+        std::string v = op.second;
+        if (v=="auto") {
+          structure_detection_ = STRUCTURE_AUTO;
+        } else if (v=="manual") {
+          structure_detection_ = STRUCTURE_MANUAL;
+        } else if (v=="none") {
+          structure_detection_ = STRUCTURE_NONE;
+        } else {
+          casadi_error("Unknown option for structure_detection: '" + v + "'.");
+        }
       }
     }
 
-    bool detect_structure = struct_cnt==0;
-    casadi_assert(struct_cnt==0 || struct_cnt==4,
-      "You must either set all of N, nx, nu, ng; "
-      "or set none at all (automatic detection).");
+    if (structure_detection_==STRUCTURE_MANUAL) {
+      casadi_assert(struct_cnt==4,
+        "You must set all of N, nx, nu, ng.");
+    } else if (structure_detection_==STRUCTURE_MANUAL) {
+      N_ = 0;
+
+    }
+
+    if (struct_cnt>0) {
+      casadi_assert(structure_detection_ == STRUCTURE_MANUAL,
+        "You must set structure_detection to 'manual' if you set N, nx, nu, ng.");
+    }
+
 
     const std::vector<int>& nx = nxs_;
     const std::vector<int>& ng = ngs_;
@@ -108,7 +132,7 @@ namespace casadi {
 
     Sparsity lamg_csp_, lam_ulsp_, lam_uusp_, lam_xlsp_, lam_xusp_, lam_clsp_;
 
-    if (detect_structure) {
+    if (structure_detection_==STRUCTURE_AUTO) {
       /* General strategy: look for the xk+1 diagonal part in A
       */
 
@@ -1078,7 +1102,7 @@ casadi_int i, column;
     uout() << "ocp_interface" << ocp_interface.get_horizon_length << std::endl;
 
 
-    FatropOcpCSolver* s = fatrop_ocp_c_create(&ocp_interface);
+    FatropOcpCSolver* s = fatrop_ocp_c_create(&ocp_interface, 0, 0);
     fatrop_ocp_c_set_option_bool(s, "accept_every_trial_step", false);
 
     int ret = fatrop_ocp_c_solve(s);

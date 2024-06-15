@@ -40,6 +40,10 @@ if "SKIP_WORHP_TESTS" not in os.environ and has_nlpsol("worhp")  and not args.ig
   #solvers.append(("worhp",{"TolOpti":1e-20,"TolFeas":1e-20,"UserHM": False}))
   pass
 
+if "SKIP_FATROP_TESTS" not in os.environ and has_nlpsol("fatrop"):
+  codegen = {"std": "c99","extralibs": ["fatrop","blasfeo"]}
+  solvers.append(("fatrop",{"fatrop": {}},{"codegen":codegen,"discrete":False}))
+
 if "SKIP_SLEQP_TESTS" not in os.environ and has_nlpsol("sleqp"):
   solvers.append(("sleqp",{"print_time":False,"sleqp": {"linesearch": "Approx","feas_tol":1e-7,"stat_tol":1e-7,"slack_tol":1e-7, "hess_eval": "Exact"}},{"codegen": False,"discrete":False}))
 
@@ -110,6 +114,7 @@ class NLPtests(casadiTestCase):
     nlp={'x':x,'f':(x+1)**2, 'g': sqrt(x)}
 
     for Solver, solver_options, aux_options in solvers:
+      if Solver=="fatrop": continue
       
       print("test_nonregular_point",Solver,solver_options)
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
@@ -129,7 +134,7 @@ class NLPtests(casadiTestCase):
 
     nlp={'x':x,'f':x**2, 'g': sqrt(x)}
     for Solver, solver_options, aux_options in solvers:
-      
+      if Solver=="fatrop": continue
       print("test_nonregular_point",Solver,solver_options)
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
       solver_in = {}
@@ -178,7 +183,7 @@ class NLPtests(casadiTestCase):
    for Solver, solver_options, aux_options in solvers:
       
       #if Solver not in ["ipopt","sqpmethod"]: continue
-      if Solver in ["worhp","blocksqp","knitro","bonmin","snopt","alpaqa"]: continue
+      if Solver in ["worhp","blocksqp","knitro","bonmin","snopt","alpaqa","fatrop"]: continue
       print("test_iteration_interrupt",Solver,solver_options)
 
       opti = Opti()
@@ -328,6 +333,7 @@ class NLPtests(casadiTestCase):
     nlp={'x':x, 'f':-cos(x),'g':x}
 
     for Solver, solver_options, aux_options in solvers:
+      if Solver=="fatrop": continue
       print("test_initialcond",Solver,solver_options)
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
       solver_in = {}
@@ -718,6 +724,8 @@ class NLPtests(casadiTestCase):
       if "sqpmethod"==Solver:
         continue
       if "snopt"==Solver:
+        continue
+      if "fatrop"==Solver:
         continue
       print("test_jacG_empty",Solver,solver_options)
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
@@ -1199,6 +1207,7 @@ class NLPtests(casadiTestCase):
     nlp = {'x':x, 'f':obj}
     for Solver, solver_options, aux_options in solvers:
       if "snopt"==Solver: continue
+      if "fatrop"==Solver: continue
       if Solver=="sqpmethod" and "limited-memory" in str(solver_options): continue
       print("test_QP",Solver,solver_options)
       solver = nlpsol("mysolver", Solver, nlp, solver_options)
@@ -1578,6 +1587,7 @@ class NLPtests(casadiTestCase):
     nlp = {"x":x,"p":p,"f":(sin(x)-p**2)**2,"g":x}
 
     for Solver, solver_options, aux_options in solvers:
+      if "fatrop" in str(Solver): continue
       if "ipopt" in str(solver_options): continue
       if "snopt" in str(solver_options): continue
       if Solver in ["alpaqa"]: continue
