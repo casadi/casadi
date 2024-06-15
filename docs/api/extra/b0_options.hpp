@@ -2675,6 +2675,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>structure_detection</td><td>OT_STRING</td><td>NONE | auto | manual</td><td>casadi::FatropConicInterface</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::ProtoFunction</td></tr>
 </table>
@@ -2691,6 +2692,7 @@
 <tr><td>ng</td><td>OT_INTVECTOR</td><td>Number of non-dynamic constraints, length N+1</td></tr>
 <tr><td>nu</td><td>OT_INTVECTOR</td><td>Number of controls, length N</td></tr>
 <tr><td>nx</td><td>OT_INTVECTOR</td><td>Number of states, length N+1</td></tr>
+<tr><td>structure_detection</td><td>OT_STRING</td><td>NONE | auto | manual</td></tr>
 </table>
 */
 /** \addtogroup general_FatropConicInterface
@@ -2753,6 +2755,7 @@
 <tr><td>record_time</td><td>OT_BOOL</td><td>record information about execution time, for retrieval with stats().</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOL</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>reverse_options</td><td>OT_DICT</td><td>Options to be passed to a reverse mode constructor</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>structure_detection</td><td>OT_STRING</td><td>NONE | auto | manual</td><td>casadi::FatropConicInterface</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::ProtoFunction</td></tr>
 </table>
@@ -2780,6 +2783,7 @@
 <tr><td>convexify_margin</td><td>OT_DOUBLE</td><td>When using a convexification strategy, make sure that the smallest eigenvalue is at least this (default: 1e-7).</td><td>casadi::FatropInterface</td></tr>
 <tr><td>convexify_strategy</td><td>OT_STRING</td><td>NONE|regularize|eigen-reflect|eigen-clip. Strategy to convexify the Lagrange Hessian before passing it to the solver.</td><td>casadi::FatropInterface</td></tr>
 <tr><td>custom_jacobian</td><td>OT_FUNCTION</td><td>Override CasADi's AD. Use together with 'jac_penalty': 0. Note: Highly experimental. Syntax may break often.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>debug</td><td>OT_BOOL</td><td>Produce debug information (default: false)</td><td>casadi::FatropInterface</td></tr>
 <tr><td>der_options</td><td>OT_DICT</td><td>Default options to be used to populate forward_options, reverse_options, and jacobian_options before those options are merged in.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>detect_simple_bounds</td><td>OT_BOOL</td><td>Automatically detect simple bounds (lbx/ubx) (default false). This is hopefully beneficial to speed and robustness but may also have adverse affects: 1) Subtleties in heuristics and stopping criteria may change the solution, 2) IPOPT may lie about multipliers of simple equality bounds unless 'fixed_variable_treatment' is set to 'relax_bounds'.</td><td>casadi::Nlpsol</td></tr>
@@ -2844,6 +2848,7 @@
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>show_eval_warnings</td><td>OT_BOOL</td><td>Show warnings generated from function evaluations [true]</td><td>casadi::OracleFunction</td></tr>
 <tr><td>specific_options</td><td>OT_DICT</td><td>Options for specific auto-generated functions, overwriting the defaults from common_options. Nested dictionary.</td><td>casadi::OracleFunction</td></tr>
+<tr><td>structure_detection</td><td>OT_STRING</td><td>NONE | auto | manual</td><td>casadi::FatropInterface</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>verbose_init</td><td>OT_BOOL</td><td>Print out timing information about the different stages of initialization</td><td>casadi::Nlpsol</td></tr>
@@ -2860,10 +2865,12 @@
 <tr><td>N</td><td>OT_INT</td><td>OCP horizon</td></tr>
 <tr><td>convexify_margin</td><td>OT_DOUBLE</td><td>When using a convexification strategy, make sure that the smallest eigenvalue is at least this (default: 1e-7).</td></tr>
 <tr><td>convexify_strategy</td><td>OT_STRING</td><td>NONE|regularize|eigen-reflect|eigen-clip. Strategy to convexify the Lagrange Hessian before passing it to the solver.</td></tr>
+<tr><td>debug</td><td>OT_BOOL</td><td>Produce debug information (default: false)</td></tr>
 <tr><td>fatrop</td><td>OT_DICT</td><td>Options to be passed to fatrop</td></tr>
 <tr><td>ng</td><td>OT_INTVECTOR</td><td>Number of non-dynamic constraints, length N+1</td></tr>
 <tr><td>nu</td><td>OT_INTVECTOR</td><td>Number of controls, length N</td></tr>
 <tr><td>nx</td><td>OT_INTVECTOR</td><td>Number of states, length N+1</td></tr>
+<tr><td>structure_detection</td><td>OT_STRING</td><td>NONE | auto | manual</td></tr>
 </table>
 */
 /** \addtogroup general_FatropInterface
@@ -2888,6 +2895,7 @@
 <tr><td>convexify_margin</td><td>OT_DOUBLE</td><td>When using a convexification strategy, make sure that the smallest eigenvalue is at least this (default: 1e-7).</td><td>casadi::FatropInterface</td></tr>
 <tr><td>convexify_strategy</td><td>OT_STRING</td><td>NONE|regularize|eigen-reflect|eigen-clip. Strategy to convexify the Lagrange Hessian before passing it to the solver.</td><td>casadi::FatropInterface</td></tr>
 <tr><td>custom_jacobian</td><td>OT_FUNCTION</td><td>Override CasADi's AD. Use together with 'jac_penalty': 0. Note: Highly experimental. Syntax may break often.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>debug</td><td>OT_BOOL</td><td>Produce debug information (default: false)</td><td>casadi::FatropInterface</td></tr>
 <tr><td>der_options</td><td>OT_DICT</td><td>Default options to be used to populate forward_options, reverse_options, and jacobian_options before those options are merged in.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>derivative_of</td><td>OT_FUNCTION</td><td>The function is a derivative of another function. The type of derivative (directional derivative, Jacobian) is inferred from the function name.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>detect_simple_bounds</td><td>OT_BOOL</td><td>Automatically detect simple bounds (lbx/ubx) (default false). This is hopefully beneficial to speed and robustness but may also have adverse affects: 1) Subtleties in heuristics and stopping criteria may change the solution, 2) IPOPT may lie about multipliers of simple equality bounds unless 'fixed_variable_treatment' is set to 'relax_bounds'.</td><td>casadi::Nlpsol</td></tr>
@@ -2952,6 +2960,7 @@
 <tr><td>sens_linsol_options</td><td>OT_DICT</td><td>Linear solver options used for parametric sensitivities.</td><td>casadi::Nlpsol</td></tr>
 <tr><td>show_eval_warnings</td><td>OT_BOOL</td><td>Show warnings generated from function evaluations [true]</td><td>casadi::OracleFunction</td></tr>
 <tr><td>specific_options</td><td>OT_DICT</td><td>Options for specific auto-generated functions, overwriting the defaults from common_options. Nested dictionary.</td><td>casadi::OracleFunction</td></tr>
+<tr><td>structure_detection</td><td>OT_STRING</td><td>NONE | auto | manual</td><td>casadi::FatropInterface</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>verbose_init</td><td>OT_BOOL</td><td>Print out timing information about the different stages of initialization</td><td>casadi::Nlpsol</td></tr>

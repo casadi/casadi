@@ -50710,19 +50710,22 @@ Extra doc: https://github.com/casadi/casadi/wiki/L_27g
 
 >List of available options
 
-+--------+--------------+-----------------------------------------------+
-|   Id   |     Type     |                  Description                  |
-+========+==============+===============================================+
-| N      | OT_INT       | OCP horizon                                   |
-+--------+--------------+-----------------------------------------------+
-| fatrop | OT_DICT      | Options to be passed to fatrop                |
-+--------+--------------+-----------------------------------------------+
-| ng     | OT_INTVECTOR | Number of non-dynamic constraints, length N+1 |
-+--------+--------------+-----------------------------------------------+
-| nu     | OT_INTVECTOR | Number of controls, length N                  |
-+--------+--------------+-----------------------------------------------+
-| nx     | OT_INTVECTOR | Number of states, length N+1                  |
-+--------+--------------+-----------------------------------------------+
++---------------------+--------------+-------------------------------------+
+|         Id          |     Type     |             Description             |
++=====================+==============+=====================================+
+| N                   | OT_INT       | OCP horizon                         |
++---------------------+--------------+-------------------------------------+
+| fatrop              | OT_DICT      | Options to be passed to fatrop      |
++---------------------+--------------+-------------------------------------+
+| ng                  | OT_INTVECTOR | Number of non-dynamic constraints,  |
+|                     |              | length N+1                          |
++---------------------+--------------+-------------------------------------+
+| nu                  | OT_INTVECTOR | Number of controls, length N        |
++---------------------+--------------+-------------------------------------+
+| nx                  | OT_INTVECTOR | Number of states, length N+1        |
++---------------------+--------------+-------------------------------------+
+| structure_detection | OT_STRING    | NONE | auto | manual                |
++---------------------+--------------+-------------------------------------+
 
 
 
@@ -56244,30 +56247,35 @@ fatrop
 
 >List of available options
 
-+--------------------+--------------+--------------------------------------+
-|         Id         |     Type     |             Description              |
-+====================+==============+======================================+
-| N                  | OT_INT       | OCP horizon                          |
-+--------------------+--------------+--------------------------------------+
-| convexify_margin   | OT_DOUBLE    | When using a convexification         |
-|                    |              | strategy, make sure that the         |
-|                    |              | smallest eigenvalue is at least this |
-|                    |              | (default: 1e-7).                     |
-+--------------------+--------------+--------------------------------------+
-| convexify_strategy | OT_STRING    | NONE|regularize|eigen-reflect|eigen- |
-|                    |              | clip. Strategy to convexify the      |
-|                    |              | Lagrange Hessian before passing it   |
-|                    |              | to the solver.                       |
-+--------------------+--------------+--------------------------------------+
-| fatrop             | OT_DICT      | Options to be passed to fatrop       |
-+--------------------+--------------+--------------------------------------+
-| ng                 | OT_INTVECTOR | Number of non-dynamic constraints,   |
-|                    |              | length N+1                           |
-+--------------------+--------------+--------------------------------------+
-| nu                 | OT_INTVECTOR | Number of controls, length N         |
-+--------------------+--------------+--------------------------------------+
-| nx                 | OT_INTVECTOR | Number of states, length N+1         |
-+--------------------+--------------+--------------------------------------+
++---------------------+--------------+-------------------------------------+
+|         Id          |     Type     |             Description             |
++=====================+==============+=====================================+
+| N                   | OT_INT       | OCP horizon                         |
++---------------------+--------------+-------------------------------------+
+| convexify_margin    | OT_DOUBLE    | When using a convexification        |
+|                     |              | strategy, make sure that the        |
+|                     |              | smallest eigenvalue is at least     |
+|                     |              | this (default: 1e-7).               |
++---------------------+--------------+-------------------------------------+
+| convexify_strategy  | OT_STRING    | NONE|regularize|eigen-              |
+|                     |              | reflect|eigen-clip. Strategy to     |
+|                     |              | convexify the Lagrange Hessian      |
+|                     |              | before passing it to the solver.    |
++---------------------+--------------+-------------------------------------+
+| debug               | OT_BOOL      | Produce debug information (default: |
+|                     |              | false)                              |
++---------------------+--------------+-------------------------------------+
+| fatrop              | OT_DICT      | Options to be passed to fatrop      |
++---------------------+--------------+-------------------------------------+
+| ng                  | OT_INTVECTOR | Number of non-dynamic constraints,  |
+|                     |              | length N+1                          |
++---------------------+--------------+-------------------------------------+
+| nu                  | OT_INTVECTOR | Number of controls, length N        |
++---------------------+--------------+-------------------------------------+
+| nx                  | OT_INTVECTOR | Number of states, length N+1        |
++---------------------+--------------+-------------------------------------+
+| structure_detection | OT_STRING    | NONE | auto | manual                |
++---------------------+--------------+-------------------------------------+
 
 
 
