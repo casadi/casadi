@@ -655,6 +655,7 @@ namespace casadi {
     static MX convexify(const MX& H, const Dict& opts = Dict());
     static MX stop_diff(const MX& expr, casadi_int order);
     static MX stop_diff(const MX& expr, const MX& var, casadi_int order);
+    static std::vector<MX> difference(const std::vector<MX>& a, const std::vector<MX>& b);
     ///@}
     /// \endcond
 
@@ -836,12 +837,13 @@ namespace casadi {
       return MX::stop_diff(expr, var, order);
     }
 
+    /** \bried Return all elements of a that do not occur in b, preserving order */
+    inline friend std::vector<MX> difference(const std::vector<MX>& a, const std::vector<MX>& b) {
+      return MX::difference(a, b);
+    }
 
 /** @} */
 #endif // SWIG
-
-    /** \bried Return all elements of a that do not occur in b, preserving order */
-    friend std::vector<MX> difference(const std::vector<MX>& a, const std::vector<MX>& b);
 
     /** \brief returns itself, but with an assertion attached
     *
