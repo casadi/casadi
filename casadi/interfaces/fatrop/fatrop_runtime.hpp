@@ -538,7 +538,6 @@ template<typename T1>
 fatrop_int casadi_fatrop_get_nu(const fatrop_int k, void* user_data) {
   casadi_fatrop_data<T1>* d = static_cast< casadi_fatrop_data<T1>* >(user_data);
   const casadi_fatrop_prob<T1>* p = d->prob;
-  //printf("u %lld\n", p->nu[k]);
   return p->nu[k];
 }
 

@@ -379,7 +379,8 @@ namespace casadi {
       "Structure is: N " + str(N_) + ", nx " + str(nx) + ", nu " + str(nu) + ", "
       "ng " + str(ng) + ".\n"
       "Note that debug_A.mtx and debug_interface.mtx have are written to the current directory "
-      "when 'debug' option is true.");
+      "when 'debug' option is true.\n"
+      "These can be read with Sparsity.from_file(...).");
     casadi_assert_dev(total.nnz() == ABsp_.nnz() + CDsp_.nnz() + Isp_.nnz());
 
     /* Disassemble H input into:
