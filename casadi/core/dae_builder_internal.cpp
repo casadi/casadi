@@ -415,8 +415,11 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
   number_of_event_indicators_ = fmi_desc.attribute<casadi_int>("numberOfEventIndicators", 0);
 
   // Process ModelExchange
-  if (fmi_desc.has_child("ModelExchange"))
+  bool has_model_exchange = false;
+  if (fmi_desc.has_child("ModelExchange")) {
+    has_model_exchange = true;
     import_model_exchange(fmi_desc["ModelExchange"]);
+  }
 
   // Process ModelVariables
   casadi_assert(fmi_desc.has_child("ModelVariables"), "Missing 'ModelVariables'");
@@ -446,6 +449,10 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
     symbolic_ = true;
     import_dynamic_equations(fmi_desc["equ:DynamicEquations"]);
   }
+
+  // Ensure model equations are available, binary or symbolic
+  casadi_assert(symbolic_ || has_model_exchange,
+    "FMU must be of ModelExchange type or be symbolic (FMUX)");
 }
 
 std::string DaeBuilderInternal::generate_build_description(
