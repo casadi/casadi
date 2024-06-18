@@ -155,6 +155,7 @@ namespace casadi {
   protected:
     /// Options
     std::vector<bool> discrete_;
+    std::vector<bool> equality_;
     bool print_problem_;
 
     /// Problem structure

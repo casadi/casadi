@@ -99,6 +99,7 @@ namespace casadi {
     double min_lam_;
     bool no_nlp_grad_;
     std::vector<bool> discrete_;
+    std::vector<bool> equality_;
     ///@}
 
     // Mixed integer problem?

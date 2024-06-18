@@ -370,6 +370,7 @@ private:
   Function bounds_;
   MX bounds_lbg_;
   MX bounds_ubg_;
+  std::vector<bool> equality_;
 
   /// Constraints verbatim as passed in with 'subject_to'
   std::vector<MX> g_;

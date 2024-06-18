@@ -356,6 +356,12 @@ namespace casadi {
       {"discrete",
        {OT_BOOLVECTOR,
         "Indicates which of the variables are discrete, i.e. integer-valued"}},
+      {"equality",
+       {OT_BOOLVECTOR,
+        "Indicate an upfront hint which of the constraints are equalities. "
+        "Some solvers may be able to exploit this knowledge. "
+        "When true, the corresponding lower and upper bounds are assumed equal. "
+        "When false, the corresponding bounds may be equal or different."}},
       {"calc_multipliers",
       {OT_BOOL,
        "Calculate Lagrange multipliers in the Nlpsol base class"}},
@@ -444,6 +450,8 @@ namespace casadi {
         iteration_callback_ignore_errors_ = op.second;
       } else if (op.first=="discrete") {
         discrete_ = op.second;
+      } else if (op.first=="equality") {
+        equality_ = op.second;
       } else if (op.first=="calc_multipliers") {
         calc_multipliers_ = op.second;
       } else if (op.first=="calc_lam_x") {
@@ -511,6 +519,11 @@ namespace casadi {
                               "Discrete variables require a solver with integer support");
         mi_ = true;
       }
+    }
+    if (!equality_.empty()) {
+      casadi_assert(equality_.size()==ng_, "\"equality\" option has wrong length. "
+                                           "Expected " + str(ng_) + " elements, but got " +
+                                            str(equality_.size()) + " instead.");
     }
 
     set_nlpsol_prob();
@@ -1266,7 +1279,7 @@ namespace casadi {
   void Nlpsol::serialize_body(SerializingStream &s) const {
     OracleFunction::serialize_body(s);
 
-    s.version("Nlpsol", 3);
+    s.version("Nlpsol", 4);
     s.pack("Nlpsol::nx", nx_);
     s.pack("Nlpsol::ng", ng_);
     s.pack("Nlpsol::np", np_);
@@ -1284,6 +1297,7 @@ namespace casadi {
     s.pack("Nlpsol::bound_consistency", bound_consistency_);
     s.pack("Nlpsol::no_nlp_grad", no_nlp_grad_);
     s.pack("Nlpsol::discrete", discrete_);
+    s.pack("Nlpsol::equality", equality_);
     s.pack("Nlpsol::mi", mi_);
     s.pack("Nlpsol::sens_linsol", sens_linsol_);
     s.pack("Nlpsol::sens_linsol_options", sens_linsol_options_);
@@ -1302,7 +1316,7 @@ namespace casadi {
   }
 
   Nlpsol::Nlpsol(DeserializingStream & s) : OracleFunction(s) {
-    int version = s.version("Nlpsol", 1, 3);
+    int version = s.version("Nlpsol", 1, 4);
     s.unpack("Nlpsol::nx", nx_);
     s.unpack("Nlpsol::ng", ng_);
     s.unpack("Nlpsol::np", np_);
@@ -1323,6 +1337,9 @@ namespace casadi {
     s.unpack("Nlpsol::bound_consistency", bound_consistency_);
     s.unpack("Nlpsol::no_nlp_grad", no_nlp_grad_);
     s.unpack("Nlpsol::discrete", discrete_);
+    if (version>=4) {
+      s.unpack("Nlpsol::equality", equality_);
+    }
     s.unpack("Nlpsol::mi", mi_);
     if (version>=2) {
       s.unpack("Nlpsol::sens_linsol", sens_linsol_);

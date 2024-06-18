@@ -632,6 +632,7 @@ void OptiNode::bake() {
   std::vector<MX> h_all;
   std::vector<MX> lbg_all;
   std::vector<MX> ubg_all;
+  equality_.clear();
   for (const auto& g : g_) {
     if (meta_con(g).type==OPTI_PSD) {
       h_all.push_back(meta_con(g).canon);
@@ -639,6 +640,9 @@ void OptiNode::bake() {
       g_all.push_back(meta_con(g).canon);
       lbg_all.push_back(meta_con(g).lb);
       ubg_all.push_back(meta_con(g).ub);
+      equality_.insert(equality_.end(),
+        meta_con(g).canon.numel(),
+        meta_con(g).type==OPTI_EQUALITY || meta_con(g).type==OPTI_GENERIC_EQUALITY);
     }
   }
 
@@ -974,6 +978,10 @@ OptiSol OptiNode::solve(bool accept_limit) {
     if (user_callback_) {
       callback_ = Function::create(new InternalOptiCallback(*this), Dict());
       opts["iteration_callback"] = callback_;
+    }
+
+    if (opts.find("iteration_callback")==opts.end()) {
+      opts["equality"] = equality_;
     }
 
     casadi_assert(!solver_name_.empty(),

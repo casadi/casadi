@@ -395,6 +395,12 @@ namespace casadi {
      {{"discrete",
        {OT_BOOLVECTOR,
         "Indicates which of the variables are discrete, i.e. integer-valued"}},
+      {"equality",
+       {OT_BOOLVECTOR,
+        "Indicate an upfront hint which of the constraints are equalities. "
+        "Some solvers may be able to exploit this knowledge. "
+        "When true, the corresponding lower and upper bounds are assumed equal. "
+        "When false, the corresponding bounds may be equal or different."}},
       {"print_problem",
        {OT_BOOL,
         "Print a numeric description of the problem"}}
@@ -411,6 +417,8 @@ namespace casadi {
     for (auto&& op : opts) {
       if (op.first=="discrete") {
         discrete_ = op.second;
+      } else if (op.first=="equality") {
+        equality_ = op.second;
       } else if (op.first=="print_problem") {
         print_problem_ = op.second;
       }
@@ -423,6 +431,12 @@ namespace casadi {
         casadi_assert(integer_support(),
                               "Discrete variables require a solver with integer support");
       }
+    }
+
+    if (!equality_.empty()) {
+      casadi_assert(equality_.size()==na_, "\"equality\" option has wrong length. "
+                                           "Expected " + str(na_) + " elements, but got " +
+                                            str(equality_.size()) + " instead.");
     }
 
     casadi_assert(np_==0 || psd_support(),
@@ -716,8 +730,9 @@ namespace casadi {
   void Conic::serialize_body(SerializingStream &s) const {
     FunctionInternal::serialize_body(s);
 
-    s.version("Conic", 2);
+    s.version("Conic", 3);
     s.pack("Conic::discrete", discrete_);
+    s.pack("Conic::equality", equality_);
     s.pack("Conic::print_problem", print_problem_);
     s.pack("Conic::H", H_);
     s.pack("Conic::A", A_);
@@ -738,8 +753,11 @@ namespace casadi {
   }
 
   Conic::Conic(DeserializingStream & s) : FunctionInternal(s) {
-    int version = s.version("Conic", 1, 2);
+    int version = s.version("Conic", 1, 3);
     s.unpack("Conic::discrete", discrete_);
+    if (version>=3) {
+      s.unpack("Conic::equality", equality_);
+    }
     s.unpack("Conic::print_problem", print_problem_);
     if (version==1) {
       s.unpack("Conic::error_on_fail", error_on_fail_);
