@@ -28,7 +28,102 @@ import unittest
 from types import *
 from helpers import *
 
+
+            
 class OCPtests(casadiTestCase):
+
+  def fatrop_case(self,N=2, nx0=2, nu0=2, nx1=2, nu1=2, nx2=2, nu2=2, ng1=2, ng2=2, ng3=2, sp=None,eq=None):
+        if sp is None:
+            sp = {}
+        if eq is None:
+            eq = set()
+        nx = [nx0 ,nx1, nx2]
+        nu = [nu0, nu1, nu2]
+        ng = [ng1, ng2, ng3]
+        
+        print("nx",nx)
+        print("nu",nu)
+        print("ng",ng)
+        
+        DM.rng(1)
+        
+        A0 = DM.rand(nx1, nx0)
+        if "A0" in sp: A0 = project(A0, sp["A0"])
+        B0 = DM.rand(nx1, nu0)
+        if "B0" in sp: B0 = project(B0, sp["B0"])
+        C0 = DM.rand(ng1, nx0)
+        if "C0" in sp: C0 = project(C0, sp["C0"])
+        D0 = DM.rand(ng1, nu0)
+        I0 = DM.eye(nx1)
+        
+        A1 = DM.rand(nx2, nx1)
+        if "A1" in sp: A1 = project(A1, sp["A1"])
+        B1 = DM.rand(nx2, nu1)
+        if "B1" in sp: B1 = project(B1, sp["B1"])
+        C1 = DM.rand(ng2, nx1)
+        if "C1" in sp: C1 = project(C1, sp["C1"])
+        D1 = DM.rand(ng2, nu1)
+        if "D1" in sp: D1 = project(D1, sp["D1"])
+        I1 = DM.eye(nx2)
+       
+        C2 = DM.rand(ng3, nx2)
+        if "C2" in sp: C2 = project(C2, sp["C2"])
+        D2 = DM.rand(ng3, nu2)
+        if "D2" in sp: D2 = project(D2, sp["D2"])
+        
+        A = blockcat([[A0,B0,I0,DM(nx1,nu1+nx2+nu2)],[C0,D0,DM(ng1,nx1+nu1+nx2+nu2)],[DM(nx2,nx0+nu0),A1,B1,I1,DM(nx2,nu2)],[DM(ng2,nx0+nu0),C1,D1,DM(ng2,nx2+nu2)],[DM(ng3,nx0+nu0+nx1+nu1),C2,D2]])
+        
+        
+        
+        equality = [True]*nx1+["ng1" in eq]*ng1+[True]*nx2+["ng2" in eq]*ng2+["ng3" in eq]*ng3
+        
+        A.sparsity().spy()
+       
+        x0 = MX.sym("x0",nx0)
+        u0 = MX.sym("u0",nu0)
+        x1 = MX.sym("x1",nx1)
+        u1 = MX.sym("u1",nu1)
+        x2 = MX.sym("x2",nx2)
+        u2 = MX.sym("u2",nu2)      
+        
+        x = vertcat(x0,u0,x1,u1,x2,u2)
+        nlp = {}
+        nlp["x"] = x
+        nlp["g"] = DM.zeros(A.shape[0],1) + mtimes(A,x)
+        
+        nlp["f"] = sumsqr(x-DM.rand(x.numel(),1))
+        
+        a = 10
+        lbg = vertcat(DM.zeros(nx1,1),-a*DM.ones(ng1,1),DM.zeros(nx2,1),-a*DM.ones(ng2,1),-a*DM.ones(ng3,1))
+        ubg = vertcat(DM.zeros(nx1,1),a*DM.ones(ng1,1),DM.zeros(nx2,1),a*DM.ones(ng2,1),a*DM.ones(ng3,1))
+        
+        print(lbg)
+
+        
+        options = {"structure_detection": "manual", "N":N, "nx": nx, "nu":nu, "ng": ng, "equality": equality}
+        solver = nlpsol("solver","fatrop",nlp,options)
+        sol = solver(lbg=lbg,ubg=ubg)
+
+        solver = nlpsol("solver","fatrop",nlp,{"structure_detection": "none", "error_on_fail":True, "equality": equality})
+        ref = solver(lbg=lbg,ubg=ubg)
+        
+        for k in sol.keys():
+            self.checkarray(sol[k],ref[k],failmessage=k+str(options),digits=6)
+
+        options = {"structure_detection": "auto", "debug":True, "equality": equality}
+        print(options)
+        solver = nlpsol("solver","fatrop",nlp,options)
+        sol = solver(lbg=lbg,ubg=ubg)
+        
+        stats = solver.stats()
+        print(stats)
+        if nx2>0:
+            self.assertTrue(stats["N"]>1)
+        
+        
+        for k in sol.keys():
+            self.checkarray(sol[k],ref[k],failmessage=k+str(options),digits=6)
+
   @requires_nlpsol("ipopt")
   def testdiscrete(self):
     self.message("Linear-quadratic problem, discrete, using IPOPT")
@@ -219,6 +314,7 @@ class OCPtests(casadiTestCase):
             g=[]
             lbg = []
             ubg = []
+            equality = []
 
             # "Lift" initial conditions
             Xk = MX.sym('X0', 2)
@@ -254,11 +350,13 @@ class OCPtests(casadiTestCase):
                 g   += [Xk_next-Xk_end]
                 lbg += [0, 0]
                 ubg += [0, 0]
+                equality+= [True,True]
 
                 if i>=1:
                     g   += [sin(Xk[0])]
                     lbg += [-0.25]
                     ubg += [inf]
+                    equality+= [False]
                     
                 Xk = Xk_next
             if i>=2:
@@ -275,6 +373,7 @@ class OCPtests(casadiTestCase):
                 g   += [Xk_next-Xk]
                 lbg += [0, 0]
                 ubg += [0, 0]
+                equality+= [True,True]
 
                 # Formulate the NLP
                 for k in range(N):
@@ -301,6 +400,7 @@ class OCPtests(casadiTestCase):
                     g   += [Xk_next-Xk_end]
                     lbg += [0, 0]
                     ubg += [0, 0]
+                    equality+= [True,True]
 
                     Xk = Xk_next
                     
@@ -328,6 +428,7 @@ class OCPtests(casadiTestCase):
                 g   += [mtimes(D,Xk_next)-Xk]
                 lbg += [0, 0, 0]
                 ubg += [0, 0, 0]
+                equality+= [True,True, True]
 
                 # Formulate the NLP
                 for k in range(N):
@@ -353,13 +454,14 @@ class OCPtests(casadiTestCase):
                     g   += [Xk_next-Xk_end]
                     lbg += [0, 0, 0]
                     ubg += [0, 0, 0]
+                    equality+= [True,True, True]
 
                     Xk = Xk_next
  
                         
                 
             # Create an NLP solver
-            yield {'f': J, 'x': vertcat(*w), 'g': vertcat(*g), 'p': p}, dict(x0=w0, lbx=lbw, ubx=ubw, lbg=lbg, ubg=ubg, p=0)
+            yield {'f': J, 'x': vertcat(*w), 'g': vertcat(*g), 'p': p}, dict(x0=w0, lbx=lbw, ubx=ubw, lbg=lbg, ubg=ubg, p=0),equality
         
         for i in range(1):
             # Multi-stage with varying number of inequalities
@@ -388,6 +490,7 @@ class OCPtests(casadiTestCase):
             g=[]
             lbg = []
             ubg = []
+            equality = []
 
             # "Lift" initial conditions
             Xk = MX.sym('X0', 2)
@@ -421,6 +524,7 @@ class OCPtests(casadiTestCase):
                 g   += [Xk_next-Xk_end]
                 lbg += [0, 0]
                 ubg += [0, 0]
+                equality += [True, True]
 
                 Xk = Xk_next
 
@@ -448,6 +552,7 @@ class OCPtests(casadiTestCase):
             g   += [Xk-Xk_end]
             lbg += [0, 0]
             ubg += [0, 0]
+            equality += [True, True]
 
 
             # "Lift" initial conditions
@@ -493,17 +598,19 @@ class OCPtests(casadiTestCase):
                 g   += [Xk_next-Xk_end]
                 lbg += [0, 0]
                 ubg += [0, 0]
+                equality += [True, True]
 
                 g   += [2*Uk]
                 lbg += [-0.1]
                 ubg += [0.1]
+                equality += [False]
 
 
                 Xk = Xk_next
         
         
             # Create an NLP solver
-            yield {'f': J, 'x': vertcat(*w), 'g': vertcat(*g), 'p': p}, dict(x0=w0, lbx=lbw, ubx=ubw, lbg=lbg, ubg=ubg, p=0)
+            yield {'f': J, 'x': vertcat(*w), 'g': vertcat(*g), 'p': p}, dict(x0=w0, lbx=lbw, ubx=ubw, lbg=lbg, ubg=ubg, p=0), equality
         
         for i in range(1):
             # Equality constraints
@@ -534,6 +641,7 @@ class OCPtests(casadiTestCase):
             g=[]
             lbg = []
             ubg = []
+            equality = []
 
             # "Lift" initial conditions
             Xk = MX.sym('X0', 2)
@@ -569,10 +677,11 @@ class OCPtests(casadiTestCase):
                 g   += [Xk_next-Xk_end]
                 lbg += [0, 0]
                 ubg += [0, 0]
+                equality += [True,True]
 
                 Xk = Xk_next
             # Create an NLP solver
-            yield {'f': J, 'x': vertcat(*w), 'g': vertcat(*g), 'p': p}, dict(x0=w0, lbx=lbw, ubx=ubw, lbg=lbg, ubg=ubg, p=0)
+            yield {'f': J, 'x': vertcat(*w), 'g': vertcat(*g), 'p': p}, dict(x0=w0, lbx=lbw, ubx=ubw, lbg=lbg, ubg=ubg, p=0), equality
             
 
         T = 10. # Time horizon
@@ -599,6 +708,7 @@ class OCPtests(casadiTestCase):
         g=[]
         lbg = []
         ubg = []
+        equality = []
 
         # "Lift" initial conditions
         Xk = MX.sym('X0', 2)
@@ -632,6 +742,7 @@ class OCPtests(casadiTestCase):
             g   += [Xk_next-Xk_end]
             lbg += [0, 0]
             ubg += [0, 0]
+            equality += [True,True]
 
             Xk = Xk_next
 
@@ -652,6 +763,7 @@ class OCPtests(casadiTestCase):
         g   += [Xk-mtimes(D,Xk_next)]
         lbg += [0, 0, 0]
         ubg += [0, 0, 0]
+        equality += [True,True,True]
 
         u = MX.sym("u",2)
         x = MX.sym("x",3)
@@ -682,20 +794,21 @@ class OCPtests(casadiTestCase):
             g   += [Xk_next-Xk_end]
             lbg += [0, 0, 0]
             ubg += [0, 0, 0]
+            equality += [True,True,True]
 
 
             Xk = Xk_next
  
          # Create an NLP solver
-        yield {'f': J, 'x': vertcat(*w), 'g': vertcat(*g), 'p': p}, dict(x0=w0, lbx=lbw, ubx=ubw, lbg=lbg, ubg=ubg, p=0)
+        yield {'f': J, 'x': vertcat(*w), 'g': vertcat(*g), 'p': p}, dict(x0=w0, lbx=lbw, ubx=ubw, lbg=lbg, ubg=ubg, p=0), equality
         
-    for i,(prob,args) in enumerate(test_problems()):
+    for i,(prob,args,equality) in enumerate(test_problems()):
     
         jacobian_sparsity(prob["g"],prob["x"]).spy()
 
         solutions = {}
         stats = {}
-        for solver, solver_options in [("ipopt",{}),("fatrop",{"structure_detection":"auto","fatrop":{"accept_every_trial_step":False,"tol":1e-8,"max_iter":100}})]:
+        for solver, solver_options in [("ipopt",{}),("fatrop",{"structure_detection":"auto","fatrop":{"accept_every_trial_step":False,"tol":1e-8,"max_iter":100},"equality":equality})]:
             f = nlpsol('solver', solver, prob, solver_options)
             #if solver=="fatrop" and i==2: raise Exception() 
 
@@ -724,6 +837,7 @@ class OCPtests(casadiTestCase):
     def test_problems():
     
 
+            
             T = 10. # Time horizon
             N = 10 # number of control intervals
 
@@ -746,6 +860,7 @@ class OCPtests(casadiTestCase):
             ubw = []
             J = 0
             g=[]
+            equality = []
             lbg = []
             ubg = []
 
@@ -783,20 +898,21 @@ class OCPtests(casadiTestCase):
                 g   += [Xk_end-Xk_next]
                 lbg += [0, 0]
                 ubg += [0, 0]
+                equality+= [True, True]
 
                     
                 Xk = Xk_next
            
  
              # Create an NLP solver
-            yield {'f': J, 'x': vertcat(*w), 'g': vertcat(*g), 'p': p}, dict(x0=w0, lbx=lbw, ubx=ubw, lbg=lbg, ubg=ubg, p=0)
+            yield {'f': J, 'x': vertcat(*w), 'g': vertcat(*g), 'p': p}, dict(x0=w0, lbx=lbw, ubx=ubw, lbg=lbg, ubg=ubg, p=0),equality
         
-    for i,(prob,args) in enumerate(test_problems()):
+    for i,(prob,args,equality) in enumerate(test_problems()):
     
         jacobian_sparsity(prob["g"],prob["x"]).spy()
 
 
-        for solver, solver_options in [("fatrop",{"structure_detection": "auto", "verbose": True})]:
+        for solver, solver_options in [("fatrop",{"structure_detection": "auto", "verbose": True, "equality": equality})]:
             f = nlpsol('solver', solver, prob, solver_options)
             #if solver=="fatrop" and i==2: raise Exception() 
 
@@ -804,6 +920,45 @@ class OCPtests(casadiTestCase):
             with self.assertInAnyOutput("gap-closing"):
                 f(**args)
        
- 
+  @requires_nlpsol("fatrop")
+  def test_detect(self):
+
+    for nx1 in [2]:
+        for nx2 in [2,0]:
+            for nu1 in [2,0]:
+                for nu2 in [2,0]:
+                    for ng1 in [2,0]:
+                        for ng2 in [2,0]:
+                            for ng3 in [2,0]:
+                                self.fatrop_case(N=2,nx0=2,nu0=2,nx1=nx1,nu1=nu1,nx2=nx2,nu2=nu2,ng1=ng1,ng2=ng2,ng3=ng3)
+
+  @requires_nlpsol("fatrop")
+  def test_detect_adversarial(self):
+    
+    D2 = sparsify(blockcat([[1,0,0],[1,1,1]])).sparsity()
+    self.fatrop_case(nu2=3,sp={"D2": D2})
+    
+    D2 = sparsify(blockcat([[1,0,0],[1,1,1]])).sparsity()
+    C2 = sparsify(blockcat([[0,1],[0,0]])).sparsity()
+    self.fatrop_case(nu2=3,sp={"D2": D2, "C2": C2})
+    #with self.assertInException("gap-closing constraints must be like"):
+    #self.fatrop_case(nu2=3,sp={"D2": D2, "C2": C2},eq={'ng3'}) # Why is this not trig
+    
+    
+    self.fatrop_case(nu0=0,nx0=1)
+    
+    self.fatrop_case(nx2=0)
+    
+    
+    with self.assertInException("Gap-closing constraint must depend on a state"):
+        self.fatrop_case(nu2=3,sp={"A1": Sparsity(2,2), "B1": Sparsity(2,2)})
+    with self.assertInException("Gap-closing constraint must depend on a state"):
+        self.fatrop_case(nu2=3,sp={"A1": Sparsity(2,2)})
+        
+    self.fatrop_case(nx2=1,ng1=0,nu1=0)
+    
+    
+    
+  
 if __name__ == '__main__':
     unittest.main()

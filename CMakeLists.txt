@@ -582,8 +582,8 @@ set(BUILD_HPIPM_DEPENDENCIES BLASFEO)
 
 # FATROP
 option(WITH_FATROP "Compile the interface to FATROP" OFF)
-set(BUILD_FATROP_VERSION "2108b3a2e4f11c9caf6408c7fd6b9b4569155be1" CACHE STRING "Tag/branch/hash to be used for BUILD_FATROP_GIT_REPO")
-set(BUILD_FATROP_GIT_REPO "https://github.com/jgillis/fatrop.git" CACHE STRING "Git repo used together with BUILD_FATROP_VERSION")
+set(BUILD_FATROP_VERSION "f1be2d95749cae0edfba1490926518c6c168da7b" CACHE STRING "Tag/branch/hash to be used for BUILD_FATROP_GIT_REPO")
+set(BUILD_FATROP_GIT_REPO "https://github.com/meco-group/fatrop.git" CACHE STRING "Git repo used together with BUILD_FATROP_VERSION")
 option(WITH_BUILD_FATROP "Build FATROP (BUILD_FATROP_VERSION=${BUILD_FATROP_VERSION}) from downloaded source (BUILD_FATROP_GIT_REPO=${BUILD_FATROP_GIT_REPO})." OFF)
 set(BUILD_FATROP_DEPENDENCIES BLASFEO)
 

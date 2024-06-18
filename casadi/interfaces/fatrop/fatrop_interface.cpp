@@ -91,7 +91,7 @@ namespace casadi {
         "Number of states, length N+1"}},
       {"nu",
        {OT_INTVECTOR,
-        "Number of controls, length N"}},
+        "Number of controls, length N+1"}},
       {"ng",
        {OT_INTVECTOR,
         "Number of non-dynamic constraints, length N+1"}},
@@ -235,6 +235,8 @@ namespace casadi {
       nus_ = {nx_, 0};
       ngs_ = {ng_, 0};
     } else if (structure_detection_==STRUCTURE_AUTO) {
+      casadi_assert(!equality_.empty(),
+        "Structure detection auto requires the 'equality' option to be set");
       /* General strategy: look for the xk+1 diagonal part in A
       */
 
@@ -261,64 +263,117 @@ namespace casadi {
         }
       }
 
-      /*
-      Loop over the right-most columns of A:
-      they form the diagonal part due to xk+1 in gap constraints.
-      detect when the diagonal pattern is broken -> new stage
-      */
-      casadi_int pivot = 0; // Current right-most element
+      casadi_assert(equality_[0],
+       "Constraint Jcobian must start with gap-closing constraint "
+       "(tagged 'true' in equality vector).");
+
+      casadi_int pivot = A_skyline[0]; // Current right-most element
       casadi_int start_pivot = pivot; // First right-most element that started the stage
-      casadi_int cg = 0; // Counter for non-gap-closing constraints
-      for (casadi_int i=0;i<na_;++i) { // Loop over all rows
-        bool commit = false; // Set true to jump to the stage
-        if (A_skyline[i]>pivot+1) { // Jump to a diagonal in the future
-          nus_.push_back(A_skyline[i]-pivot-1); // Size of jump equals number of states
-          commit = true;
-        } else if (A_skyline[i]==pivot+1) { // Walking the diagonal
-          if (A_skyline2[i]<start_pivot) { // Free of below-diagonal entries?
-            pivot++;
-          } else {
-            nus_.push_back(0); // We cannot but conclude that we arrived at a new stage
-            commit = true;
-          }
-        } else { // non-gap-closing constraint detected
-          cg++;
-        }
+      casadi_int prev_start_pivot = 0;
 
-        if (commit) {
-          nxs_.push_back(pivot-start_pivot+1);
-          ngs_.push_back(cg); cg=0;
-          start_pivot = A_skyline[i];
-          pivot = A_skyline[i];
-        }
-      }
-      nxs_.push_back(pivot-start_pivot+1);
+      bool walking = true;
 
-      // Correction for k==0
-      nxs_[0] = A_skyline[0];
-      nus_[0] = 0;
-      ngs_.erase(ngs_.begin());
-      casadi_int cN=0;
-      for (casadi_int i=na_-1;i>=0;--i) {
-        if (A_bottomline[i]<start_pivot) break;
-        cN++;
-      }
-      ngs_.push_back(cg-cN);
-      ngs_.push_back(cN);
-
-      N_ = nus_.size();
+      nxs_.push_back(1);
       nus_.push_back(0);
-
-      if (N_>1) {
-        if (nus_[0]==0 && nxs_[1]+nus_[1]==nxs_[0]) {
-          nxs_[0] = nxs_[1];
-          nus_[0] = nus_[1];
+      ngs_.push_back(0);
+      for (casadi_int i=1;i<na_;++i) { // Loop over all rows
+        bool is_gap_closing = true;
+        if (A_bottomline[i]<prev_start_pivot) {
+          casadi_error("Structure detection failed. "
+            "Constraint found depending on a state of the previous interval.");
         }
+        if (equality_[i]) {
+          // A candidate for a gap-closing constraint must tagged as equality
+          if (A_skyline[i]>pivot+1) { // Jump to a diagonal in the future
+            casadi_assert(A_bottomline[i]==-1 || A_bottomline[i]>=start_pivot,
+              "Structure detection failed. "
+              "Constraint found depending on a state of the previous interval.");
+            casadi_assert(A_bottomline[i]>=start_pivot && A_bottomline[i]<=pivot,
+              "Structure detection failed. "
+              "Gap-closing constraint must depend on a state.");
+            nxs_.push_back(1);
+            nus_.push_back(A_skyline[i]-pivot-1); // Size of jump equals number of states
+            ngs_.push_back(0);
+            prev_start_pivot = start_pivot;
+            start_pivot = A_skyline[i];
+            pivot = A_skyline[i];
+            walking = true;
+          } else if (A_skyline[i]==pivot+1) { // Walking the diagonal
+            if (A_skyline2[i]<start_pivot) { // Free of below-diagonal entries?
+              if (A_bottomline[i]>=prev_start_pivot) { // We must depend on at least one state
+                pivot++;
+                nxs_.back()++;
+                walking = true;
+              } else {
+                casadi_assert(A_bottomline[i]>=start_pivot,
+                  "Structure detection failed. "
+                  "Constraint found depending on a state of the previous interval.");
+                is_gap_closing = false;
+              }
+            } else {
+              nxs_.push_back(1);
+              nus_.push_back(0);
+              ngs_.push_back(0);
+              casadi_assert(A_bottomline[i]>=start_pivot,
+                "Structure detection failed. "
+                "Gap-closing constraint found depending on a state of the previous interval "
+                "at row i=" + str(i) + ". "
+                "A_bottomline[i]=" + str(A_bottomline[i]) +
+                ", start_pivot=" + str(start_pivot) + ".");
+              prev_start_pivot = start_pivot;
+              start_pivot = A_skyline[i];
+              pivot = A_skyline[i];
+              walking = true;
+            }
+          } else {
+            is_gap_closing = false;
+          }
+        } else {
+          is_gap_closing = false;
+        }
+
+        if (!is_gap_closing) {
+          if (walking) {
+            if (A_skyline[i]>=start_pivot) {
+              nxs_.push_back(0);
+              nus_.push_back(0);
+              ngs_.push_back(0);
+              walking = false;
+            }
+          }
+          ngs_.back()++; // non-gap-closing constraint detected
+        }
+
+
       }
+
+      if (nxs_.back()!=0) {
+        nxs_.push_back(0);
+        nus_.push_back(0);
+        ngs_.push_back(0);
+      }
+
+      // Set nx0==nx1 unless not allowed
+      nxs_.insert(nxs_.begin(), std::min(A_skyline[0], nxs_.front()));
+
+      // Patch loose ends
+      nus_.front() += std::max(A_skyline[0]-nxs_.front(), static_cast<casadi_int>(0));
+      nus_.back() += nx_-sum(nu)-sum(nx);
+
+      casadi_assert_dev(nxs_.back()==0);
+      nxs_.pop_back();
+
+      casadi_assert_dev(nx.size()==nu.size());
+      casadi_assert_dev(nx.size()==ng.size());
+
+      casadi_assert_dev(sum(ng)+sum(nx)==na_+nx.front());
+      casadi_assert_dev(sum(nx)+sum(nu)==nx_);
+
+      N_ = nxs_.size()-1;
     }
 
     casadi_assert(nx.size()==N_+1, "nx must have length N+1.");
-    casadi_assert(nu.size()==N_+1, "nu must have length N.");
+    casadi_assert(nu.size()==N_+1, "nu must have length N+1.");
     casadi_assert(ng.size()==N_+1, "ng must have length N+1.");
 
     if (verbose_) {
@@ -331,7 +386,7 @@ namespace casadi {
        C D
            A B I
            C D
-               C
+               C D
     */
     casadi_int offset_r = 0, offset_c = 0;
     for (casadi_int k=0;k<N_;++k) { // Loop over blocks
@@ -348,7 +403,7 @@ namespace casadi {
         I_blocks_.push_back({offset_r, offset_c, nx[k+1], nx[k+1]});
       offset_r+= nx[k+1]+ng[k];
     }
-    CD_blocks_.push_back({offset_r, offset_c,           ng[N_], nx[N_]});
+    CD_blocks_.push_back({offset_r, offset_c,           ng[N_], nx[N_]+nu[N_]});
 
     casadi_int offset = 0;
     AB_offsets_.push_back(0);
@@ -378,7 +433,7 @@ namespace casadi {
       "HPIPM: specified structure of A does not correspond to what the interface can handle. "
       "Structure is: N " + str(N_) + ", nx " + str(nx) + ", nu " + str(nu) + ", "
       "ng " + str(ng) + ".\n"
-      "Note that debug_A.mtx and debug_interface.mtx have are written to the current directory "
+      "Note that debug_A.mtx and debug_interface.mtx are written to the current directory "
       "when 'debug' option is true.\n"
       "These can be read with Sparsity.from_file(...).");
     casadi_assert_dev(total.nnz() == ABsp_.nnz() + CDsp_.nnz() + Isp_.nnz());
@@ -509,6 +564,10 @@ namespace casadi {
     fatrop["return_flag"] = m->d.stats.return_flag;
     stats["fatrop"] = fatrop;
     stats["iter_count"]  =m->d.stats.iterations_count;
+    stats["nx"] = nxs_;
+    stats["nu"] = nus_;
+    stats["ng"] = ngs_;
+    stats["N"] = N_;
     return stats;
   }
 

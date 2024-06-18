@@ -39,7 +39,46 @@ namespace casadi {
 
 /** */
 
-/** \pluginsection{Nlpsol,fatrop} **/
+/** \pluginsection{Nlpsol,fatrop} 
+
+
+Fatrop is a solver developed at KU Leuven by Lander Vanroye and Wilm Decre.
+The algorithm is based on IPOPT, but the linear algebra is much more efficient.
+
+With structure_detection = 'none' (default),
+it will behave as a general-purpose dense nonlinear program solver.
+
+With structure_detection = 'manual', you can specify a block structure.
+
+Let's say you perform multiply shooting with a system
+
+x_k+1 = A_k x_k + B_k u_k
+
+
+Suppose your constraint Jacobian looks like:
+
+     nx0  nu0  nx1  nu1  nx2  nu2
+     -----------------------------
+nx1  |A0  B0   I0      
+ng1  |C0  D0        
+nx2  |         A1   B1   I1  
+ng2  |         C1   D1    
+ng3  |                   C2   D2
+
+with n* capturing the number of states, inputs, and constraints in each block.
+
+You can then specify this structure with:
+
+N = 2
+nx = [nx0 ,nx1, nx2]
+nu = [nu0, nu1, nu2]
+ng = [ng1, ng2, ng3]
+
+With structure_detection = 'auto', the block-defining parameters
+nx, nu, ng, and N are automatically detected from the sparsity pattern.
+
+
+**/
 
 /// \cond INTERNAL
 namespace casadi {
