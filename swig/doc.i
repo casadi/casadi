@@ -50208,6 +50208,25 @@ General information
 |                  |                 | available.       |                  |
 |                  |                 | [default: true]  |                  |
 +------------------+-----------------+------------------+------------------+
+| equality         | OT_BOOLVECTOR   | Indicate an      | casadi::Conic    |
+|                  |                 | upfront hint     |                  |
+|                  |                 | which of the     |                  |
+|                  |                 | constraints are  |                  |
+|                  |                 | equalities. Some |                  |
+|                  |                 | solvers may be   |                  |
+|                  |                 | able to exploit  |                  |
+|                  |                 | this knowledge.  |                  |
+|                  |                 | When true, the   |                  |
+|                  |                 | corresponding    |                  |
+|                  |                 | lower and upper  |                  |
+|                  |                 | bounds are       |                  |
+|                  |                 | assumed equal.   |                  |
+|                  |                 | When false, the  |                  |
+|                  |                 | corresponding    |                  |
+|                  |                 | bounds may be    |                  |
+|                  |                 | equal or         |                  |
+|                  |                 | different.       |                  |
++------------------+-----------------+------------------+------------------+
 | error_on_fail    | OT_BOOL         | Throw exceptions | casadi::ProtoFun |
 |                  |                 | when function    | ction            |
 |                  |                 | evaluation fails |                  |
@@ -51449,10 +51468,10 @@ Get all options for a plugin.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1ek
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/conic.hpp#L542
+https://github.com/casadi/casadi/blob/develop/casadi/core/conic.hpp#L556
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/conic.cpp#L542-L544
+https://github.com/casadi/casadi/blob/develop/casadi/core/conic.cpp#L556-L558
 
 ";
 
@@ -51465,10 +51484,10 @@ Get type info for a particular option.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1el
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/conic.hpp#L546
+https://github.com/casadi/casadi/blob/develop/casadi/core/conic.hpp#L560
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/conic.cpp#L546-L548
+https://github.com/casadi/casadi/blob/develop/casadi/core/conic.cpp#L560-L562
 
 ";
 
@@ -51481,10 +51500,10 @@ Get documentation for a particular option.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1em
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/conic.hpp#L550
+https://github.com/casadi/casadi/blob/develop/casadi/core/conic.hpp#L564
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/conic.cpp#L550-L552
+https://github.com/casadi/casadi/blob/develop/casadi/core/conic.cpp#L564-L566
 
 ";
 
@@ -55509,6 +55528,25 @@ General information
 |                  |                 | available.       |                  |
 |                  |                 | [default: true]  |                  |
 +------------------+-----------------+------------------+------------------+
+| equality         | OT_BOOLVECTOR   | Indicate an      | casadi::Nlpsol   |
+|                  |                 | upfront hint     |                  |
+|                  |                 | which of the     |                  |
+|                  |                 | constraints are  |                  |
+|                  |                 | equalities. Some |                  |
+|                  |                 | solvers may be   |                  |
+|                  |                 | able to exploit  |                  |
+|                  |                 | this knowledge.  |                  |
+|                  |                 | When true, the   |                  |
+|                  |                 | corresponding    |                  |
+|                  |                 | lower and upper  |                  |
+|                  |                 | bounds are       |                  |
+|                  |                 | assumed equal.   |                  |
+|                  |                 | When false, the  |                  |
+|                  |                 | corresponding    |                  |
+|                  |                 | bounds may be    |                  |
+|                  |                 | equal or         |                  |
+|                  |                 | different.       |                  |
++------------------+-----------------+------------------+------------------+
 | error_on_fail    | OT_BOOL         | Throw exceptions | casadi::ProtoFun |
 |                  |                 | when function    | ction            |
 |                  |                 | evaluation fails |                  |
@@ -56270,12 +56308,55 @@ fatrop
 | ng                  | OT_INTVECTOR | Number of non-dynamic constraints,  |
 |                     |              | length N+1                          |
 +---------------------+--------------+-------------------------------------+
-| nu                  | OT_INTVECTOR | Number of controls, length N        |
+| nu                  | OT_INTVECTOR | Number of controls, length N+1      |
 +---------------------+--------------+-------------------------------------+
 | nx                  | OT_INTVECTOR | Number of states, length N+1        |
 +---------------------+--------------+-------------------------------------+
 | structure_detection | OT_STRING    | NONE | auto | manual                |
 +---------------------+--------------+-------------------------------------+
+
+Fatrop is a solver developed at KU Leuven by Lander Vanroye and Wilm 
+Decre.
+ The algorithm is based on IPOPT, but the linear algebra is much
+ more 
+efficient.
+
+With structure_detection = 'none' (default), it will behave as a 
+general-
+purpose dense nonlinear program solver.
+
+With structure_detection = 'manual', you can specify a block 
+structure.
+
+Let's say you perform multiply shooting with a system
+
+x_k+1 = A_k x_k + B_k u_k
+
+Suppose your constraint Jacobian looks like:
+
+::
+
+   nx0  nu0  nx1  nu1  nx2  nu2
+   -----------------------------
+  
+
+nx1 |A0 B0 I0 
+ ng1 |C0 D0 
+ nx2 | A1 B1 I1 
+ ng2 | C1 D1 
+ ng3 | C2 D2
+
+with n* capturing the number of states, inputs, and constraints in 
+each 
+block.
+
+You can then specify this structure with:
+
+N = 2 nx = [nx0 ,nx1, nx2] nu = [nu0, nu1, nu2] ng = [ng1, ng2, ng3]
+
+With structure_detection = 'auto', the block-defining parameters nx, 
+nu, 
+ng, and N are automatically detected from the sparsity pattern.
 
 
 
@@ -57097,10 +57178,10 @@ Get all options for a plugin.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1t5
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.hpp#L803
+https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.hpp#L820
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.cpp#L803-L805
+https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.cpp#L820-L822
 
 ";
 
@@ -57113,10 +57194,10 @@ Get type info for a particular option.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1t6
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.hpp#L807
+https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.hpp#L824
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.cpp#L807-L809
+https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.cpp#L824-L826
 
 ";
 
@@ -57129,10 +57210,10 @@ Get documentation for a particular option.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1t7
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.hpp#L811
+https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.hpp#L828
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.cpp#L811-L813
+https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.cpp#L828-L830
 
 ";
 

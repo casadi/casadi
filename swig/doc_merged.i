@@ -31434,6 +31434,25 @@ General information
 |                  |                 | available.       |                  |
 |                  |                 | [default: true]  |                  |
 +------------------+-----------------+------------------+------------------+
+| equality         | OT_BOOLVECTOR   | Indicate an      | casadi::Conic    |
+|                  |                 | upfront hint     |                  |
+|                  |                 | which of the     |                  |
+|                  |                 | constraints are  |                  |
+|                  |                 | equalities. Some |                  |
+|                  |                 | solvers may be   |                  |
+|                  |                 | able to exploit  |                  |
+|                  |                 | this knowledge.  |                  |
+|                  |                 | When true, the   |                  |
+|                  |                 | corresponding    |                  |
+|                  |                 | lower and upper  |                  |
+|                  |                 | bounds are       |                  |
+|                  |                 | assumed equal.   |                  |
+|                  |                 | When false, the  |                  |
+|                  |                 | corresponding    |                  |
+|                  |                 | bounds may be    |                  |
+|                  |                 | equal or         |                  |
+|                  |                 | different.       |                  |
++------------------+-----------------+------------------+------------------+
 | error_on_fail    | OT_BOOL         | Throw exceptions | casadi::ProtoFun |
 |                  |                 | when function    | ction            |
 |                  |                 | evaluation fails |                  |
@@ -32667,10 +32686,10 @@ Get all options for a plugin.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1ek
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/conic.hpp#L542
+https://github.com/casadi/casadi/blob/develop/casadi/core/conic.hpp#L556
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/conic.cpp#L542-L544
+https://github.com/casadi/casadi/blob/develop/casadi/core/conic.cpp#L556-L558
 
 ";
 
@@ -32682,10 +32701,10 @@ Get type info for a particular option.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1el
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/conic.hpp#L546
+https://github.com/casadi/casadi/blob/develop/casadi/core/conic.hpp#L560
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/conic.cpp#L546-L548
+https://github.com/casadi/casadi/blob/develop/casadi/core/conic.cpp#L560-L562
 
 ";
 
@@ -32697,10 +32716,10 @@ Get documentation for a particular option.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1em
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/conic.hpp#L550
+https://github.com/casadi/casadi/blob/develop/casadi/core/conic.hpp#L564
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/conic.cpp#L550-L552
+https://github.com/casadi/casadi/blob/develop/casadi/core/conic.cpp#L564-L566
 
 ";
 
@@ -35522,10 +35541,10 @@ Get all options for a plugin.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1t5
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.hpp#L803
+https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.hpp#L820
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.cpp#L803-L805
+https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.cpp#L820-L822
 
 ";
 
@@ -35537,10 +35556,10 @@ Get type info for a particular option.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1t6
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.hpp#L807
+https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.hpp#L824
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.cpp#L807-L809
+https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.cpp#L824-L826
 
 ";
 
@@ -35552,10 +35571,10 @@ Get documentation for a particular option.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1t7
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.hpp#L811
+https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.hpp#L828
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.cpp#L811-L813
+https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.cpp#L828-L830
 
 ";
 
