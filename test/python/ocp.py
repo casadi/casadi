@@ -941,9 +941,8 @@ class OCPtests(casadiTestCase):
     D2 = sparsify(blockcat([[1,0,0],[1,1,1]])).sparsity()
     C2 = sparsify(blockcat([[0,1],[0,0]])).sparsity()
     self.fatrop_case(nu2=3,sp={"D2": D2, "C2": C2})
-    #with self.assertInException("gap-closing constraints must be like"):
-    #self.fatrop_case(nu2=3,sp={"D2": D2, "C2": C2},eq={'ng3'}) # Why is this not trig
-    
+    with self.assertInAnyOutput("gap-closing constraints must be like"):
+        self.fatrop_case(nu2=3,sp={"D2": D2, "C2": C2},eq={'ng3'}) # Why is this not trig
     
     self.fatrop_case(nu0=0,nx0=1)
     

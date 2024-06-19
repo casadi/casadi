@@ -212,7 +212,7 @@ fatrop_int casadi_fatrop_full_eval_constr_jac(const double* primal_data, const d
   casadi_project(d->a, p->sp_a, d->I, p->Isp, d->pv);
 
   for (i=0;i<p->Isp[2+p->Isp[1]];++i) {
-    if (d->I[0]!=1.0) {
+    if (d->I[i]!=1.0) {
       casadi_error("Structure mismatch: gap-closing constraints must be like this: x_{k+1}-F(xk,uk).");
     }
   }
@@ -824,6 +824,10 @@ void casadi_fatrop_solve(casadi_fatrop_data<T1>* d) {
   if (ret==0) {
     d->unified_return_status = SOLVER_RET_SUCCESS;
     d->success = 1;
+  }
+
+  if (ret==-1) {
+    d->unified_return_status = SOLVER_RET_EXCEPTION;
   }
 
   const struct blasfeo_dvec* primal = fatrop_ocp_c_get_primal(d->solver);

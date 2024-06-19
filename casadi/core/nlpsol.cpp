@@ -775,6 +775,10 @@ namespace casadi {
     if (error_on_fail_ && !m->success)
       casadi_error("nlpsol process failed. "
                    "Set 'error_on_fail' option to false to ignore this error.");
+
+    if (m->unified_return_status==SOLVER_RET_EXCEPTION) {
+      casadi_error("An exception was raised in the solver.");
+    }
     return flag;
   }
 

@@ -57,7 +57,8 @@ namespace casadi {
         SOLVER_RET_UNKNOWN,
         SOLVER_RET_LIMITED, // Out of time
         SOLVER_RET_NAN,
-        SOLVER_RET_INFEASIBLE
+        SOLVER_RET_INFEASIBLE,
+        SOLVER_RET_EXCEPTION
     };
 }
 
