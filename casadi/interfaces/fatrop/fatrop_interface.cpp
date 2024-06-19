@@ -81,6 +81,11 @@ namespace casadi {
     return r.sparsity();
   }
 
+  void report_issue(casadi_int i, const std::string& msg) {
+    casadi_int idx = i+GlobalOptions::start_index;
+    casadi_warning("Structure detection error on row " + str(idx) + ". " + msg);
+  }
+
   const Options FatropInterface::options_
   = {{&Nlpsol::options_},
      {{"N",
@@ -219,6 +224,12 @@ namespace casadi {
     Sparsity lamg_csp_, lam_ulsp_, lam_uusp_, lam_xlsp_, lam_xusp_, lam_clsp_;
 
     const Sparsity& A_ = jacg_sp_;
+    if (debug_) {
+      A_.to_file("debug_fatrop_actual.mtx");
+    }
+    // Keep list of erroring rows
+    std::vector<casadi_int> errors;
+
     casadi_int na_ = A_.size1(); //TODO(jgillis): replace with ng
 
     if (struct_cnt>0) {
@@ -279,18 +290,20 @@ namespace casadi {
       for (casadi_int i=1;i<na_;++i) { // Loop over all rows
         bool is_gap_closing = true;
         if (A_bottomline[i]<prev_start_pivot) {
-          casadi_error("Structure detection failed. "
-            "Constraint found depending on a state of the previous interval.");
+          errors.push_back(i);
+          report_issue(i, "Constraint found depending on a state of the previous interval.");
         }
         if (equality_[i]) {
           // A candidate for a gap-closing constraint must tagged as equality
           if (A_skyline[i]>pivot+1) { // Jump to a diagonal in the future
-            casadi_assert(A_bottomline[i]==-1 || A_bottomline[i]>=start_pivot,
-              "Structure detection failed. "
-              "Constraint found depending on a state of the previous interval.");
-            casadi_assert(A_bottomline[i]>=start_pivot && A_bottomline[i]<=pivot,
-              "Structure detection failed. "
-              "Gap-closing constraint must depend on a state.");
+            if (A_bottomline[i]!=-1 && A_bottomline[i]<start_pivot) {
+              errors.push_back(i);
+              report_issue(i, "Constraint found depending on a state of the previous interval.");
+            }
+            if (A_bottomline[i]<start_pivot || A_bottomline[i]>pivot) {
+              errors.push_back(i);
+              report_issue(i, "Gap-closing constraint must depend on a state.");
+            }
             nxs_.push_back(1);
             nus_.push_back(A_skyline[i]-pivot-1); // Size of jump equals number of states
             ngs_.push_back(0);
@@ -305,21 +318,20 @@ namespace casadi {
                 nxs_.back()++;
                 walking = true;
               } else {
-                casadi_assert(A_bottomline[i]>=start_pivot,
-                  "Structure detection failed. "
-                  "Constraint found depending on a state of the previous interval.");
+                if (A_bottomline[i]<start_pivot) {
+                  errors.push_back(i);
+                  report_issue(i, "Constraint found depending on a state of the previous interval.");
+                }
                 is_gap_closing = false;
               }
             } else {
               nxs_.push_back(1);
               nus_.push_back(0);
               ngs_.push_back(0);
-              casadi_assert(A_bottomline[i]>=start_pivot,
-                "Structure detection failed. "
-                "Gap-closing constraint found depending on a state of the previous interval "
-                "at row i=" + str(i) + ". "
-                "A_bottomline[i]=" + str(A_bottomline[i]) +
-                ", start_pivot=" + str(start_pivot) + ".");
+              if (A_bottomline[i]<start_pivot) {
+                errors.push_back(i);
+                report_issue(i, "Gap-closing constraint found depending on a state of the previous interval.");
+              }
               prev_start_pivot = start_pivot;
               start_pivot = A_skyline[i];
               pivot = A_skyline[i];
@@ -381,6 +393,9 @@ namespace casadi {
             "nu " + str(nu) + ", ng " + str(ng) + ".");
     }
 
+    // Dor debugging purposes
+    std::vector< casadi_ocp_block > A_blocks, B_blocks, C_blocks, D_blocks;
+
     /* Disassemble A input into:
        A B I
        C D
@@ -392,6 +407,10 @@ namespace casadi {
     for (casadi_int k=0;k<N_;++k) { // Loop over blocks
       AB_blocks_.push_back({offset_r,        offset_c,            nx[k+1], nx[k]+nu[k]});
       CD_blocks_.push_back({offset_r+nx[k+1], offset_c,           ng[k], nx[k]+nu[k]});
+      A_blocks.push_back({offset_r, offset_c, nx[k+1], nx[k]});
+      B_blocks.push_back({offset_r, offset_c+nx[k], nx[k+1], nu[k]});
+      C_blocks.push_back({offset_r+nx[k+1], offset_c, ng[k], nx[k]});
+      D_blocks.push_back({offset_r+nx[k+1], offset_c+nx[k], ng[k], nu[k]});
       offset_c+= nx[k]+nu[k];
       if (k+1<N_)
         I_blocks_.push_back({offset_r, offset_c, nx[k+1], nx[k+1]});
@@ -425,17 +444,23 @@ namespace casadi {
     Sparsity total = ABsp_ + CDsp_ + Isp_;
 
     if (debug_) {
-      total.to_file("debug_interface.mtx");
-      A_.to_file("debug_A.mtx");
+      total.to_file("debug_fatrop_expected.mtx");
+      blocksparsity(na_, nx_, A_blocks).to_file("debug_fatrop_A.mtx");
+      blocksparsity(na_, nx_, B_blocks).to_file("debug_fatrop_B.mtx");
+      blocksparsity(na_, nx_, C_blocks).to_file("debug_fatrop_C.mtx");
+      blocksparsity(na_, nx_, D_blocks).to_file("debug_fatrop_D.mtx");
+      Isp_.to_file("debug_fatrop_I.mtx");
+      Sparsity(na_, 1, std::vector<casadi_int>{0, static_cast<casadi_int>(errors.size())}, errors).to_file("debug_fatrop_errors.mtx");
     }
 
-    casadi_assert((A_ + total).nnz() == total.nnz(),
+    casadi_assert(errors.empty() && (A_ + total).nnz() == total.nnz(),
       "HPIPM: specified structure of A does not correspond to what the interface can handle. "
       "Structure is: N " + str(N_) + ", nx " + str(nx) + ", nu " + str(nu) + ", "
       "ng " + str(ng) + ".\n"
-      "Note that debug_A.mtx and debug_interface.mtx are written to the current directory "
+      "Note that debug_fatrop_expected.mtx and debug_fatrop_actual.mtx are written to the current directory "
       "when 'debug' option is true.\n"
-      "These can be read with Sparsity.from_file(...).");
+      "These can be read with Sparsity.from_file(...)."
+      "For a ready-to-use script, see https://gist.github.com/jgillis/dec56fa16c90a8e4a69465e8422c5459");
     casadi_assert_dev(total.nnz() == ABsp_.nnz() + CDsp_.nnz() + Isp_.nnz());
 
     /* Disassemble H input into:

@@ -949,9 +949,9 @@ class OCPtests(casadiTestCase):
     self.fatrop_case(nx2=0)
     
     
-    with self.assertInException("Gap-closing constraint must depend on a state"):
+    with self.assertInAnyOutput("Gap-closing constraint must depend on a state"):
         self.fatrop_case(nu2=3,sp={"A1": Sparsity(2,2), "B1": Sparsity(2,2)})
-    with self.assertInException("Gap-closing constraint must depend on a state"):
+    with self.assertInAnyOutput("Gap-closing constraint must depend on a state"):
         self.fatrop_case(nu2=3,sp={"A1": Sparsity(2,2)})
         
     self.fatrop_case(nx2=1,ng1=0,nu1=0)
