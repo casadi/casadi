@@ -230,10 +230,10 @@ namespace casadi {
       casadi_assert(struct_cnt==4,
         "You must set all of N, nx, nu, ng.");
     } else if (structure_detection_==STRUCTURE_NONE) {
-      N_ = 1;
-      nxs_ = {0, 0};
-      nus_ = {nx_, 0};
-      ngs_ = {ng_, 0};
+      N_ = 0;
+      nxs_ = {0};
+      nus_ = {nx_};
+      ngs_ = {ng_};
     } else if (structure_detection_==STRUCTURE_AUTO) {
       casadi_assert(!equality_.empty(),
         "Structure detection auto requires the 'equality' option to be set");
