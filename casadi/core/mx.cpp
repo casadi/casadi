@@ -2162,7 +2162,7 @@ namespace casadi {
     return FS(std::vector<MX>{x, y})[0];
   }
 
-  std::vector<MX> difference(const std::vector<MX>& a, const std::vector<MX>& b) {
+  std::vector<MX> MX::difference(const std::vector<MX>& a, const std::vector<MX>& b) {
     // Create a set of MXNodes from b
     std::set<MXNode*> bs;
     for (const auto& e : b) {

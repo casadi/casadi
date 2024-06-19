@@ -3694,6 +3694,9 @@ DECL M casadi_stop_diff(const M& expr, casadi_int order) {
 DECL M casadi_stop_diff(const M& expr, const M& var, casadi_int order) {
   return stop_diff(expr, var, order);
 }
+DECL std::vector< M > casadi_difference(const std::vector< M >& a, const std::vector< M >& b) {
+  return difference(a, b);
+}
 DECL M casadi_no_hess(const M& expr) {
   return no_hess(expr);
 }
