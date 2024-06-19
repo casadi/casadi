@@ -228,7 +228,7 @@ namespace casadi {
       A_.to_file("debug_fatrop_actual.mtx");
     }
     // Keep list of erroring rows
-    std::vector<casadi_int> errors;
+    std::set<casadi_int> errors;
 
     casadi_int na_ = A_.size1(); //TODO(jgillis): replace with ng
 
@@ -290,18 +290,18 @@ namespace casadi {
       for (casadi_int i=1;i<na_;++i) { // Loop over all rows
         bool is_gap_closing = true;
         if (A_bottomline[i]<prev_start_pivot) {
-          errors.push_back(i);
+          errors.insert(i);
           report_issue(i, "Constraint found depending on a state of the previous interval.");
         }
         if (equality_[i]) {
           // A candidate for a gap-closing constraint must tagged as equality
           if (A_skyline[i]>pivot+1) { // Jump to a diagonal in the future
             if (A_bottomline[i]!=-1 && A_bottomline[i]<start_pivot) {
-              errors.push_back(i);
+              errors.insert(i);
               report_issue(i, "Constraint found depending on a state of the previous interval.");
             }
             if (A_bottomline[i]<start_pivot || A_bottomline[i]>pivot) {
-              errors.push_back(i);
+              errors.insert(i);
               report_issue(i, "Gap-closing constraint must depend on a state.");
             }
             nxs_.push_back(1);
@@ -319,7 +319,7 @@ namespace casadi {
                 walking = true;
               } else {
                 if (A_bottomline[i]<start_pivot) {
-                  errors.push_back(i);
+                  errors.insert(i);
                   report_issue(i, "Constraint found depending on a state of the previous interval.");
                 }
                 is_gap_closing = false;
@@ -329,7 +329,7 @@ namespace casadi {
               nus_.push_back(0);
               ngs_.push_back(0);
               if (A_bottomline[i]<start_pivot) {
-                errors.push_back(i);
+                errors.insert(i);
                 report_issue(i, "Gap-closing constraint found depending on a state of the previous interval.");
               }
               prev_start_pivot = start_pivot;
@@ -423,6 +423,8 @@ namespace casadi {
       offset_r+= nx[k+1]+ng[k];
     }
     CD_blocks_.push_back({offset_r, offset_c,           ng[N_], nx[N_]+nu[N_]});
+    C_blocks.push_back({offset_r, offset_c,           ng[N_], nx[N_]});
+    D_blocks.push_back({offset_r, offset_c+nx[N_],           ng[N_], nu[N_]});
 
     casadi_int offset = 0;
     AB_offsets_.push_back(0);
@@ -450,7 +452,8 @@ namespace casadi {
       blocksparsity(na_, nx_, C_blocks).to_file("debug_fatrop_C.mtx");
       blocksparsity(na_, nx_, D_blocks).to_file("debug_fatrop_D.mtx");
       Isp_.to_file("debug_fatrop_I.mtx");
-      Sparsity(na_, 1, std::vector<casadi_int>{0, static_cast<casadi_int>(errors.size())}, errors).to_file("debug_fatrop_errors.mtx");
+      std::vector<casadi_int> errors_vec(errors.begin(), errors.end());
+      Sparsity(na_, 1, std::vector<casadi_int>{0, static_cast<casadi_int>(errors_vec.size())}, errors_vec).to_file("debug_fatrop_errors.mtx");
     }
 
     casadi_assert(errors.empty() && (A_ + total).nnz() == total.nnz(),
@@ -588,7 +591,7 @@ namespace casadi {
     fatrop["iterations_count"] = m->d.stats.iterations_count;
     fatrop["return_flag"] = m->d.stats.return_flag;
     stats["fatrop"] = fatrop;
-    stats["iter_count"]  =m->d.stats.iterations_count;
+    stats["iter_count"] = m->d.stats.iterations_count;
     stats["nx"] = nxs_;
     stats["nu"] = nus_;
     stats["ng"] = ngs_;
