@@ -738,7 +738,9 @@ void FatropInterface::set_fatrop_prob() {
 
   void codegen_unpack_block(CodeGenerator& g, const std::string& name,
       const std::vector<casadi_ocp_block>& blocks) {
-    std::string n = "block_" + name + "[" + str(blocks.size()) + "]";
+    casadi_int sz = blocks.size();
+    if (sz==0) sz++;
+    std::string n = "block_" + name + "[" + str(sz) + "]";
     g.local(n, "static struct casadi_ocp_block");
     g << "p." << name << " = block_" + name + ";\n";
     g << "casadi_unpack_ocp_blocks(" << "p." << name

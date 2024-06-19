@@ -980,7 +980,7 @@ OptiSol OptiNode::solve(bool accept_limit) {
       opts["iteration_callback"] = callback_;
     }
 
-    if (opts.find("iteration_callback")==opts.end()) {
+    if (opts.find("equality")==opts.end()) {
       opts["equality"] = equality_;
     }
 
@@ -1280,11 +1280,17 @@ Function OptiNode::to_function(const std::string& name,
     const Dict& opts) {
   if (problem_dirty()) return baked_copy().to_function(name, args, res, name_in, name_out, opts);
 
+  Dict solver_opts = solver_options_;
+
+  if (solver_opts.find("equality")==solver_opts.end()) {
+    solver_opts["equality"] = equality_;
+  }
+
   Function solver;
   if (problem_type_=="conic") {
-    solver = qpsol("solver", solver_name_, nlp_, solver_options_);
+    solver = qpsol("solver", solver_name_, nlp_, solver_opts);
   } else {
-    solver = nlpsol("solver", solver_name_, nlp_, solver_options_);
+    solver = nlpsol("solver", solver_name_, nlp_, solver_opts);
   }
 
   // Get initial guess and parameter values

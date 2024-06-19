@@ -20,6 +20,7 @@
 // C-REPLACE "SOLVER_RET_SUCCESS" "0"
 // C-REPLACE "SOLVER_RET_UNKNOWN" "1"
 // C-REPLACE "SOLVER_RET_LIMITED" "2"
+// C-REPLACE "SOLVER_RET_EXCEPTION" "5"
 
 // C-REPLACE "casadi_nlpsol_prob<T1>" "struct casadi_nlpsol_prob"
 // C-REPLACE "casadi_nlpsol_data<T1>" "struct casadi_nlpsol_data"
