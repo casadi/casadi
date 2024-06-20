@@ -271,7 +271,13 @@ namespace casadi {
 
     d.sz_w = 0;
     if (d.config.strategy==CVX_EIGEN_REFLECT || d.config.strategy==CVX_EIGEN_CLIP) {
-      d.sz_w = std::max(block_size, 2*(block_size-1)*d.config.max_iter_eig);
+      // Work vector size needed for Givens rotations (c and s)
+      casadi_int sz_w_givens = 2*(block_size-1)*d.config.max_iter_eig;
+      // Work vector size needed for house holder transformations (beta and p)
+      casadi_int sz_w_house = block_size-2 + block_size;
+      // Work vector size needed for casadi_cvx
+      d.sz_w = sz_w_givens + sz_w_house;
+      // Additional work vectors
       if (d.config.Hsp_project) d.sz_w = std::max(d.sz_w, Hsp.size1());
       if (d.config.scc_transform) d.sz_w += block_size*block_size;
       if (inplace) d.sz_w = std::max(d.sz_w, Hsp.size1()+d.Hrsp.nnz());
