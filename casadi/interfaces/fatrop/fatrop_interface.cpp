@@ -320,7 +320,8 @@ namespace casadi {
               } else {
                 if (A_bottomline[i]<start_pivot) {
                   errors.insert(i);
-                  report_issue(i, "Constraint found depending on a state of the previous interval.");
+                  report_issue(i, "Constraint found depending "
+                    "on a state of the previous interval.");
                 }
                 is_gap_closing = false;
               }
@@ -330,7 +331,8 @@ namespace casadi {
               ngs_.push_back(0);
               if (A_bottomline[i]<start_pivot) {
                 errors.insert(i);
-                report_issue(i, "Gap-closing constraint found depending on a state of the previous interval.");
+                report_issue(i, "Gap-closing constraint found depending "
+                  "on a state of the previous interval.");
               }
               prev_start_pivot = start_pivot;
               start_pivot = A_skyline[i];
@@ -453,17 +455,19 @@ namespace casadi {
       blocksparsity(na_, nx_, D_blocks).to_file("debug_fatrop_D.mtx");
       Isp_.to_file("debug_fatrop_I.mtx");
       std::vector<casadi_int> errors_vec(errors.begin(), errors.end());
-      Sparsity(na_, 1, std::vector<casadi_int>{0, static_cast<casadi_int>(errors_vec.size())}, errors_vec).to_file("debug_fatrop_errors.mtx");
+      std::vector<casadi_int> colind = {0, static_cast<casadi_int>(errors_vec.size())};
+      Sparsity(na_, 1, colind, errors_vec).to_file("debug_fatrop_errors.mtx");
     }
 
     casadi_assert(errors.empty() && (A_ + total).nnz() == total.nnz(),
       "HPIPM: specified structure of A does not correspond to what the interface can handle. "
       "Structure is: N " + str(N_) + ", nx " + str(nx) + ", nu " + str(nu) + ", "
       "ng " + str(ng) + ".\n"
-      "Note that debug_fatrop_expected.mtx and debug_fatrop_actual.mtx are written to the current directory "
-      "when 'debug' option is true.\n"
+      "Note that debug_fatrop_expected.mtx and debug_fatrop_actual.mtx are written "
+      "to the current directory when 'debug' option is true.\n"
       "These can be read with Sparsity.from_file(...)."
-      "For a ready-to-use script, see https://gist.github.com/jgillis/dec56fa16c90a8e4a69465e8422c5459");
+      "For a ready-to-use script, "
+      "see https://gist.github.com/jgillis/dec56fa16c90a8e4a69465e8422c5459");
     casadi_assert_dev(total.nnz() == ABsp_.nnz() + CDsp_.nnz() + Isp_.nnz());
 
     /* Disassemble H input into:

@@ -60,7 +60,7 @@ namespace casadi {
         SOLVER_RET_INFEASIBLE,
         SOLVER_RET_EXCEPTION
     };
-}
+} // namespace casadi
 
 
 #endif // CASADI_TYPES_HPP
