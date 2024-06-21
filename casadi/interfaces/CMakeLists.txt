@@ -14,6 +14,10 @@ if(WITH_IPOPT)
   add_subdirectory(ipopt)
 endif()
 
+if(WITH_MADNLP)
+  add_subdirectory(madnlp)
+endif()
+
 if(WITH_BONMIN)
   add_subdirectory(bonmin)
 endif()

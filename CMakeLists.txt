@@ -197,6 +197,7 @@ set(WITH_LAPACK_DEF OFF)
 set(WITH_QPOASES_DEF OFF)
 set(WITH_BLOCKSQP_DEF OFF)
 set(WITH_IPOPT_DEF OFF)
+set(WITH_MADNLP_DEF OFF)
 set(WITH_SUPERSCS_DEF OFF)
 
 set(DEPENDENT_LIBRARIES)
@@ -695,6 +696,7 @@ set(BUILD_SLEQP_DEPENDENCIES HIGHS TRLIB MUMPS)
 
 # IPOPT: A sparse interior point NLP solver with filter line-search
 option(WITH_IPOPT "Compile the interface to IPOPT" ${WITH_IPOPT_DEF})
+option(WITH_MADNLP "Compile the interface to MADNLP" ${WITH_MADNLP_DEF})
 set(BUILD_IPOPT_GIT_REPO "https://github.com/jgillis/Ipopt-1.git" CACHE STRING "Git repo used together with BUILD_IPOPT_VERSION")
 set(BUILD_IPOPT_VERSION "3.14.11.mod" CACHE STRING "Tag/branch/hash to be used for BUILD_IPOPT_GIT_REPO")
 option(WITH_BUILD_IPOPT "Build IPOPT (BUILD_IPOPT_VERSION=${BUILD_IPOPT_VERSION}) from downloaded source (BUILD_IPOPT_GIT_REPO=${BUILD_IPOPT_GIT_REPO})." OFF)
@@ -1471,6 +1473,10 @@ if(WITH_IPOPT)
   endif()
 endif()
 add_feature_info(ipopt-interface WITH_IPOPT "Interface to the NLP solver Ipopt.")
+
+if(WITH_MADNLP)
+endif()
+add_feature_info(madnlp-interface WITH_MADNLP "Interface to the NLP solver MadNLP.")
 
 if(WITH_BONMIN)
   if(WITH_BUILD_BONMIN)
