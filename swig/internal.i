@@ -4411,6 +4411,9 @@
 %exception  casadi::Opti::return_status() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Opti::set_domain(const MX &x, const std::string &domain) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Opti::set_initial(const MX &x, const DM &v) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }

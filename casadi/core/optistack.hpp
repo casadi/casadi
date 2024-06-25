@@ -210,7 +210,8 @@ public:
   * opti.set_domain(x, "real")
   * opti.set_domain(x, "integer")
   * \endverbatim
-  */
+
+      \identifier{27t} */
   void set_domain(const MX& x, const std::string& domain);
 
   /// @}
