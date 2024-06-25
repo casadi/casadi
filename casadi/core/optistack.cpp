@@ -142,6 +142,14 @@ void Opti::set_value(const MX& x, const DM& v) {
   }
 }
 
+void Opti::set_domain(const MX& x, const std::string& domain) {
+  try {
+    (*this)->set_domain(x, domain);
+  } catch(std::exception& e) {
+    THROW_ERROR("set_domain", e.what());
+  }
+}
+
 void Opti::set_value(const std::vector<MX>& assignments) {
   try {
     (*this)->set_value(assignments);

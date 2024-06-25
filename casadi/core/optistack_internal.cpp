@@ -603,6 +603,11 @@ void OptiNode::bake() {
   nlp_["x"] = veccat(x);
   nlp_["p"] = veccat(p);
 
+  discrete_.clear();
+  for (const MX& e : x) {
+    discrete_.insert(discrete_.end(), e.nnz(), meta(e).domain == OPTI_DOMAIN_INTEGER);
+  }
+
   nlp_["f"] = f_;
 
   offset = 0;
@@ -972,16 +977,22 @@ OptiSol OptiNode::solve(bool accept_limit) {
   bool solver_update =  solver_dirty() || old_callback() || (user_callback_ && callback_.is_null());
 
   if (solver_update) {
-    Dict opts = solver_options_;
+    solver_options_all_ = solver_options_;
+
+    if (solver_options_all_.find("equality")==solver_options_all_.end()) {
+      solver_options_all_["equality"] = equality_;
+    }
+
+    if (solver_options_all_.find("discrete")==solver_options_all_.end()) {
+      solver_options_all_["discrete"] = discrete_;
+    }
+
+    Dict opts = solver_options_all_;
 
     // Handle callbacks
     if (user_callback_) {
       callback_ = Function::create(new InternalOptiCallback(*this), Dict());
       opts["iteration_callback"] = callback_;
-    }
-
-    if (opts.find("equality")==opts.end()) {
-      opts["equality"] = equality_;
     }
 
     casadi_assert(!solver_name_.empty(),
@@ -1142,6 +1153,24 @@ void OptiNode::set_initial(const std::vector<MX>& assignments) {
   }
 }
 
+void OptiNode::set_domain(const MX& x, const std::string& domain) {
+  mark_solved(false);
+  mark_problem_dirty();
+  casadi_assert(x.is_valid_input(), "First argument to set_domain should be a variable.");
+  DomainType type;
+  if (domain=="real") {
+    type = OPTI_DOMAIN_REAL;
+  } else if (domain=="integer") {
+    type = OPTI_DOMAIN_INTEGER;
+  } else {
+    casadi_error("Unknown domain '" + domain + "'. Known values are 'real', 'integer'.");
+  }
+  for (const auto& prim : x.primitives()) {
+    MetaVar& m = meta(prim);
+    m.domain = type;
+  }
+}
+
 void OptiNode::set_value(const std::vector<MX>& assignments) {
   for (const auto& v : assignments) {
     casadi_assert_dev(v.is_op(OP_EQ));
@@ -1280,17 +1309,11 @@ Function OptiNode::to_function(const std::string& name,
     const Dict& opts) {
   if (problem_dirty()) return baked_copy().to_function(name, args, res, name_in, name_out, opts);
 
-  Dict solver_opts = solver_options_;
-
-  if (solver_opts.find("equality")==solver_opts.end()) {
-    solver_opts["equality"] = equality_;
-  }
-
   Function solver;
   if (problem_type_=="conic") {
-    solver = qpsol("solver", solver_name_, nlp_, solver_opts);
+    solver = qpsol("solver", solver_name_, nlp_, solver_options_all_);
   } else {
-    solver = nlpsol("solver", solver_name_, nlp_, solver_opts);
+    solver = nlpsol("solver", solver_name_, nlp_, solver_options_all_);
   }
 
   // Get initial guess and parameter values

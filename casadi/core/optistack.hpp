@@ -200,6 +200,22 @@ public:
   void set_value(const std::vector<MX>& assignments);
   /// @}
 
+  /// @{
+  /** \brief Set domain of a decision variable
+  *
+  * \param[in] x decision variable
+  * \param[in] type 'real', 'integer' (default: real)
+  *
+  * \verbatim
+  * opti.set_domain(x, "real")
+  * opti.set_domain(x, "integer")
+  * \endverbatim
+  */
+  void set_domain(const MX& x, const std::string& domain);
+
+  /// @}
+
+
   /// Crunch the numbers; solve the problem
   OptiSol solve();
 
@@ -451,6 +467,11 @@ public:
     OPTI_PAR,  // parameter
     OPTI_DUAL_G // dual
   };
+  enum DomainType {
+    OPTI_DOMAIN_REAL,
+    OPTI_DOMAIN_INTEGER
+  };
+
 
   struct IndexAbstraction {
     IndexAbstraction() : start(0), stop(0) {}
@@ -475,6 +496,7 @@ public:
     casadi_int n;
     casadi_int m;
     VariableType type;
+    DomainType domain;
     casadi_int count;
     casadi_int i;
     casadi_int active_i;

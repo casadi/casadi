@@ -986,6 +986,69 @@ class OptiStacktests(inherit_from):
 
       self.checkarray(res,DM([5-8/sqrt(5),7-4/sqrt(5)]),conic,digits=7)
       self.checkarray(sol.value(opti.f),10-16/sqrt(5)+7-4/sqrt(5),conic,digits=7)
+   
+    @requires_conic("cbc")
+    def test_discrete_linear(self):
+      opti = Opti('conic')
+      x = opti.variable()
+      y = opti.variable()
+      
+      opti.minimize(x+y)
+      opti.subject_to(y>=0.5*x+1)
+      opti.subject_to(y<=2*x+3)
+      
+      #opti.subject_to(-5<= (x <= 5))
+      #opti.subject_to(-5<= (y <= 5))
+      #opti.subject_to(-5<= (y <= 5))
+      
+      opti.set_domain(x, "real")
+      opti.solver("cbc")
+      
+      sol = opti.solve()
+      
+      f_real = sol.value(opti.f)
+      xsol_real = sol.value(x)
+      print(f_real,xsol_real)
+      opti.set_domain(x, "integer")
+      
+      sol = opti.solve()
+      
+      f_integer = sol.value(opti.f)
+      xsol_integer = sol.value(x)
+      print(f_integer,xsol_integer)
+      self.checkarray(round(xsol_integer), xsol_integer)
+      self.assertTrue(f_integer> f_real)
+ 
+    @requires_nlpsol("bonmin")
+    def test_discrete(self):
+      opti = Opti()
+      x = opti.variable()
+      y = opti.variable()
+      p = opti.parameter()
+      opti.set_value(p,-1)
+      
+      opti.minimize(x**2+y**2)
+      opti.subject_to(x+y+p>=0)
+      
+      opti.set_domain(x, "real")
+      opti.solver("bonmin")
+      
+      sol = opti.solve()
+      
+      f_real = sol.value(opti.f)
+      xsol_real = sol.value(x)
+      opti.set_domain(x, "integer")
+      
+      sol = opti.solve()
+      
+      f_integer = sol.value(opti.f)
+      xsol_integer = sol.value(x)
+      self.checkarray(round(xsol_integer), xsol_integer)
+      self.assertTrue(f_integer> f_real)
+      
+      f = opti.to_function('f',[p],[x])
+      self.checkarray(f(-1), xsol_integer)
+      
 
 if __name__ == '__main__':
     unittest.main()

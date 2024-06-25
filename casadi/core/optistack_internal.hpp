@@ -98,6 +98,9 @@ public:
   void set_value(const std::vector<MX>& assignments);
   /// @}
 
+  /// Set domain of variable
+  void set_domain(const MX& x, const std::string& domain);
+
   /// Crunch the numbers; solve the problem
   OptiSol solve(bool accept_limit);
 
@@ -344,6 +347,9 @@ private:
   /// Store references to all symbols
   std::vector<MX> symbols_;
 
+  // Which x entries are discrete?
+  std::vector<bool> discrete_;
+
   /// Symbol counter
   casadi_int count_;
 
@@ -388,6 +394,7 @@ private:
 
   std::string solver_name_;
   Dict solver_options_;
+  Dict solver_options_all_;
 
   void assert_only_opti_symbols(const MX& e) const;
   void assert_only_opti_nondual(const MX& e) const;
