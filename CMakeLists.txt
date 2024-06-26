@@ -609,13 +609,19 @@ set(BUILD_SIMDE_VERSION "v0.7.2" CACHE STRING "Tag/branch/hash to be used for BU
 set(BUILD_SIMDE_GIT_REPO "https://github.com/simd-everywhere/simde.git" CACHE STRING "Git repo used together with BUILD_BLASFEO_VERSION")
 option(WITH_BUILD_SIMDE "Build Simde (BUILD_SIMDE_VERSION=${BUILD_SIMDE_VERSION}) from downloaded source (BUILD_SIMDE_GIT_REPO=${BUILD_SIMDE_GIT_REPO})." OFF)
 
-
 # PROXQP: A QP solver based on proximal methods
 option(WITH_PROXQP "Compile the interface to PROXQP" OFF)
 set(BUILD_PROXQP_VERSION "v0.3.2" CACHE STRING "Tag/branch/hash to be used for BUILD_PROXQP_GIT_REPO")
 set(BUILD_PROXQP_GIT_REPO "https://github.com/Simple-Robotics/proxsuite.git" CACHE STRING "Git repo used together with BUILD_PROXQP_VERSION")
 option(WITH_BUILD_PROXQP "Build PROXQP (BUILD_PROXQP_VERSION=${BUILD_PROXQP_VERSION}) from downloaded source (BUILD_PROXQP_GIT_REPO=${BUILD_PROXQP_GIT_REPO})." OFF)
 set(BUILD_PROXQP_DEPENDENCIES EIGEN3 SIMDE)
+
+option(WITH_PIQP "Compile the interface to PIQP (the source code for PIQP is included)" OFF)
+add_feature_info(piqp-interface WITH_PIQP "Interface to QP solver PIQP.")
+if(WITH_PIQP)
+  find_package(piqp REQUIRED)
+endif()
+set(BUILD_PIQP_DEPENDENCIES EIGEN3)
 
 # TinyXML: An XML reader, needed e.g. by the Modelica interface
 option(WITH_BUILD_TINYXML "Compile the included TinyXML source code" ON)
