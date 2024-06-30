@@ -1165,9 +1165,13 @@ namespace casadi {
   }
 
   std::string Function::generate(const std::string& fname, const Dict& opts) const {
+    return generate(fname, "", opts);
+  }
+
+  std::string Function::generate(const std::string& fname, const std::string& path, const Dict& opts) const {
     CodeGenerator gen(fname, opts);
     gen.add(*this);
-    return gen.generate();
+    return gen.generate(path);
   }
 
   std::string Function::generate_dependencies(const std::string& fname, const Dict& opts) const {
