@@ -1330,6 +1330,9 @@
 %exception  casadi::Function::generate(const std::string &fname, const Dict &opts=Dict()) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Function::generate(const std::string &fname, const std::string &path, const Dict &opts=Dict()) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Function::generate_dependencies(const std::string &fname, const Dict &opts=Dict()) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
