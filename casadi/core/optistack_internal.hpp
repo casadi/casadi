@@ -65,9 +65,16 @@ public:
 
   /// Create a decision variable (symbol)
   MX variable(casadi_int n=1, casadi_int m=1, const std::string& attribute="full");
+  MX variable(const Sparsity& sp, const std::string& attribute="full");
+  MX variable(const MX& symbol, const std::string& attribute="full");
 
   /// Create a parameter (symbol); fixed during optimization
   MX parameter(casadi_int n=1, casadi_int m=1, const std::string& attribute="full");
+
+  /// Create a parameter (symbol); fixed during optimization
+  MX parameter(const Sparsity& sp, const std::string& attribute="full");
+
+  MX parameter(const MX& symbol, const std::string& attribute="full");
 
   /// Set objective
   void minimize(const MX& f);
