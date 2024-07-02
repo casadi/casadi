@@ -110,6 +110,8 @@ public:
 
       \identifier{18} */
   MX variable(casadi_int n=1, casadi_int m=1, const std::string& attribute="full");
+  MX variable(const Sparsity& sp, const std::string& attribute="full");
+  MX variable(const MX& symbol, const std::string& attribute="full");
 
   /** \brief Create a parameter (symbol); fixed during optimization
   *
@@ -123,6 +125,8 @@ public:
 
       \identifier{19} */
   MX parameter(casadi_int n=1, casadi_int m=1, const std::string& attribute="full");
+  MX parameter(const Sparsity& sp, const std::string& attribute="full");
+  MX parameter(const MX& symbol, const std::string& attribute="full");
 
   /** \brief Set objective
   *

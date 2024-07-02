@@ -293,6 +293,48 @@ MX OptiNode::variable(casadi_int n, casadi_int m, const std::string& attribute) 
   return ret;
 }
 
+MX OptiNode::variable(const MX& symbol, const std::string& attribute) {
+
+  // Prepare metadata
+  MetaVar meta_data;
+  meta_data.attribute = attribute;
+  meta_data.n = symbol.size1();
+  meta_data.m = symbol.size2();
+  meta_data.type = OPTI_VAR;
+  meta_data.count = count_++;
+  meta_data.i = count_var_++;
+
+  // Store the symbol; preventing it from going ut of scope
+  symbols_.push_back(symbol);
+  store_initial_[OPTI_VAR].push_back(DM::zeros(symbol.sparsity()));
+  store_latest_[OPTI_VAR].push_back(DM::nan(symbol.sparsity()));
+
+  set_meta(symbol, meta_data);
+  return symbol;
+}
+
+MX OptiNode::variable(const Sparsity& sp, const std::string& attribute) {
+
+  // Prepare metadata
+  MetaVar meta_data;
+  meta_data.attribute = attribute;
+  meta_data.n = sp.size1();
+  meta_data.m = sp.size2();
+  meta_data.type = OPTI_VAR;
+  meta_data.count = count_++;
+  meta_data.i = count_var_++;
+
+  MX symbol = MX::sym(name_prefix() + "x_" + str(count_var_), sp);
+
+  // Store the symbol; preventing it from going ut of scope
+  symbols_.push_back(symbol);
+  store_initial_[OPTI_VAR].push_back(DM::zeros(symbol.sparsity()));
+  store_latest_[OPTI_VAR].push_back(DM::nan(symbol.sparsity()));
+
+  set_meta(symbol, meta_data);
+  return symbol;
+}
+
 std::string OptiNode::name_prefix() const {
   return "opti" + str(instance_number_) + "_";
 }
@@ -352,6 +394,45 @@ void OptiNode::register_dual(MetaCon& c) {
   c.dual_canon = symbol;
 
   set_meta(symbol, meta_data);
+}
+
+MX OptiNode::parameter(const MX& symbol, const std::string& attribute) {
+  casadi_assert_dev(attribute=="full");
+
+  // Prepare metadata
+  MetaVar meta_data;
+  meta_data.attribute = attribute;
+  meta_data.n = symbol.size1();
+  meta_data.m = symbol.size2();
+  meta_data.type = OPTI_PAR;
+  meta_data.count = count_++;
+  meta_data.i = count_par_++;
+
+  symbols_.push_back(symbol);
+  store_initial_[OPTI_PAR].push_back(DM::nan(symbol.sparsity()));
+
+  set_meta(symbol, meta_data);
+  return symbol;
+}
+
+MX OptiNode::parameter(const Sparsity& sp, const std::string& attribute) {
+  casadi_assert_dev(attribute=="full");
+
+  // Prepare metadata
+  MetaVar meta_data;
+  meta_data.attribute = attribute;
+  meta_data.n = sp.size1();
+  meta_data.m = sp.size2();
+  meta_data.type = OPTI_PAR;
+  meta_data.count = count_++;
+  meta_data.i = count_par_++;
+
+  MX symbol = MX::sym(name_prefix() + "p_" + str(count_par_), sp);
+  symbols_.push_back(symbol);
+  store_initial_[OPTI_PAR].push_back(DM::nan(symbol.sparsity()));
+
+  set_meta(symbol, meta_data);
+  return symbol;
 }
 
 MX OptiNode::parameter(casadi_int n, casadi_int m, const std::string& attribute) {
