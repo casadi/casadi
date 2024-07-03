@@ -432,7 +432,7 @@ namespace casadi {
     }
     // Perform sparse matrix multiplication
     g << g.triusolve(this->dep(1).sparsity(), g.work(arg[1], this->dep(1).nnz()),
-      g.work(arg[1], this->dep(1).nnz()), Tr, false, nrhs) << '\n';
+      g.work(res[0], this->nnz()), Tr, false, nrhs) << '\n';
   }
 
   template<bool Tr>
@@ -446,7 +446,7 @@ namespace casadi {
     }
     // Perform sparse matrix multiplication
     g << g.trilsolve(this->dep(1).sparsity(), g.work(arg[1], this->dep(1).nnz()),
-      g.work(arg[1], this->dep(1).nnz()), Tr, false, nrhs) << '\n';
+      g.work(res[0], this->nnz()), Tr, false, nrhs) << '\n';
   }
 
   template<bool Tr>
@@ -460,7 +460,7 @@ namespace casadi {
     }
     // Perform sparse matrix multiplication
     g << g.triusolve(this->dep(1).sparsity(), g.work(arg[1], this->dep(1).nnz()),
-      g.work(arg[1], this->dep(1).nnz()), Tr, true, nrhs) << '\n';
+      g.work(res[0], this->nnz()), Tr, true, nrhs) << '\n';
   }
 
   template<bool Tr>
@@ -474,7 +474,7 @@ namespace casadi {
     }
     // Perform sparse matrix multiplication
     g << g.trilsolve(this->dep(1).sparsity(), g.work(arg[1], this->dep(1).nnz()),
-      g.work(arg[1], this->dep(1).nnz()), Tr, true, nrhs) << '\n';
+      g.work(res[0], this->nnz()), Tr, true, nrhs) << '\n';
   }
 
 } // namespace casadi
