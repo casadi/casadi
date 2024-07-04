@@ -95,6 +95,8 @@ void MadnlpInterface::init(const Dict& opts) {
   // Call the init method of the base class
   Nlpsol::init(opts);
 
+  //std::cout << "MadnlpInterface::init" << std::endl;
+
   casadi_int struct_cnt=0;
 
   // Default options
@@ -139,7 +141,7 @@ void MadnlpInterface::init(const Dict& opts) {
   if (!has_function("nlp_grad_f")) {
     create_function("nlp_grad_f", {"x", "p"}, {"grad:f:x"});
   }
-  gradf_sp_ = get_function("nlp_grad_f").sparsity_out(1);
+  gradf_sp_ = get_function("nlp_grad_f").sparsity_out(0);
 
   if (!has_function("nlp_jac_g")) {
     create_function("nlp_jac_g", {"x", "p"}, {"g", "jac:g:x"});
@@ -286,7 +288,7 @@ void MadnlpInterface::set_madnlp_prob() {
   p_.nlp_f = OracleCallback("nlp_f", this);
   p_.nlp_g = OracleCallback("nlp_g", this);
 
-  //casadi_madnlp_setup(&p_);
+  casadi_madnlp_setup(&p_);
 }
 
 void MadnlpInterface::codegen_init_mem(CodeGenerator& g) const {

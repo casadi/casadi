@@ -41,9 +41,9 @@ struct casadi_madnlp_prob {
   const casadi_nlpsol_prob<T1>* nlp;
 
   //  CCO Coordinate sparse storage
-  const casadi_int *nz_hess_l_i, *nz_hess_l_j;
-  const casadi_int *nz_jac_g_i, *nz_jaq_g_j;
-  const casadi_int *nz_grad_f_i, *nz_grad_f_j;
+  casadi_int *nz_hess_l_i, *nz_hess_l_j;
+  casadi_int *nz_jac_g_i, *nz_jaq_g_j;
+  casadi_int *nz_grad_f_i, *nz_grad_f_j;
 
   // CSS column sparse storage
   const casadi_int *jac_g_ccs;
@@ -51,8 +51,7 @@ struct casadi_madnlp_prob {
   const casadi_int *grad_f_ccs;
   // const casadi_int *sp_h, *sp_a, *sp_g;
 
-  casadi_int nnz_h, nnz_a, nnz_g;
-  casadi_int nnz_hess_l, nnz_jag_g, nnz_grad_f;
+  casadi_int nnz_hess_l, nnz_jac_g, nnz_grad_f;
 
   OracleCallback nlp_hess_l;
   OracleCallback nlp_jac_g;
@@ -76,7 +75,7 @@ struct casadi_madnlp_data {
   T1 *w;
 
   // temporary data
-  T1 *x, *lam, *g, *f, *jac_g, *grad_f, *hess_l, *grad_l;
+  T1 *x, *lam_g, *g, *f, *jac_g, *grad_f, *hess_l, *grad_l;
 
   int unified_return_status;
   int success;
@@ -95,6 +94,9 @@ struct casadi_madnlp_data {
 // SYMBOL "madnlp_setup"
 template<typename T1>
 void casadi_madnlp_setup(casadi_madnlp_prob<T1>* p) {
+  p->nnz_hess_l = casadi_sp_nnz(p->hess_l_ccs);
+  p->nnz_jac_g = casadi_sp_nnz(p->jac_g_ccs);
+  p->nnz_grad_f = casadi_sp_nnz(p->grad_f_ccs);
 }
 
 // SYMBOL "madnlp_init_mem"
@@ -103,9 +105,9 @@ int madnlp_init_mem(casadi_madnlp_data<T1>* d) {
   return 0;
 }
 
-// SYMBOL "ipopt_sparsity"
+// SYMBOL "madnlp_sparsity"
 template<typename T1>
-void casadi_madnlp_sparsity(const casadi_int* sp, madnlp_int *coord_i, madnlp_int *coord_j) {
+void casadi_madnlp_sparsity(const casadi_int* sp, size_t *coord_i, size_t *coord_j, T1 test) {
     // convert ccs to cco
     casadi_int ncol = sp[1];
     const casadi_int* colind = sp+2;
@@ -132,35 +134,40 @@ void madnlp_free_mem(casadi_madnlp_data<T1>* d) {
 
 // SYMBOL "madnlp_full_eval_constr_jac"
 template<typename T1>
-madnlp_int casadi_madnlp_full_eval_constr_jac(const T1* w_data, T1* res, void* user_data) {
+madnlp_int casadi_madnlp_full_eval_constr_jac(const T1* w, T1* res, void* user_data) {
   casadi_int i;
   casadi_madnlp_data<T1>* d = static_cast< casadi_madnlp_data<T1>* >(user_data);
   const casadi_madnlp_prob<T1>* p = d->prob;
   casadi_nlpsol_data<T1>* d_nlp = d->nlp;
   casadi_oracle_data<T1>* d_oracle = d_nlp->oracle;
 
-  d_oracle->arg[0] = d->x;
+  d_oracle->arg[0] = w;
   d_oracle->arg[1] = d_nlp->p;
   d_oracle->res[0] = d->g;
   d_oracle->res[1] = res;
   calc_function(&d->prob->nlp_jac_g, d_oracle);
-  res = d->jac_g;
+  //store res madnlp_data to be accessible from casadi
+  d->jac_g = res;
+  d->x =  (double*)w;
   return 0;
 }
 
 // SYMBOL "madnlp_full_eval_constr"
 template<typename T1>
-madnlp_int casadi_madnlp_full_eval_constr(const T1* w_data, T1* res, void* user_data) {
+madnlp_int casadi_madnlp_full_eval_constr(const T1* w, T1* res, void* user_data) {
   casadi_int i,k,column;
   casadi_madnlp_data<T1>* d = static_cast< casadi_madnlp_data<T1>* >(user_data);
   const casadi_madnlp_prob<T1>* p = d->prob;
   casadi_nlpsol_data<T1>* d_nlp = d->nlp;
   casadi_oracle_data<T1>* d_oracle = d_nlp->oracle;
 
-  d_oracle->arg[0] = d->x;
+  d_oracle->arg[0] = w;
   d_oracle->arg[1] = d_nlp->p;
-  d_oracle->res[0] = d->g;
+  d_oracle->res[0] = res;
   calc_function(&d->prob->nlp_g, d_oracle);
+
+  d->x =  (double*)w;
+  d->g = res;
 
   return 1; //skip
 }
@@ -176,12 +183,15 @@ madnlp_int casadi_madnlp_full_eval_obj_grad(const T1* w, T1* res, void* user_dat
   // TODO add argument
   T1 objective_scale = 1.0;
 
-  d_oracle->arg[0] = d->x;
+  d_oracle->arg[0] = w;
   d_oracle->arg[1] = d_nlp->p;
   d_oracle->res[0] = res;
   calc_function(&d->prob->nlp_grad_f, d_oracle);
 
-  casadi_scal(p->nlp->nx, objective_scale, res);
+  d->x =  (double*)w;
+  d->grad_f = res;
+
+  //casadi_scal(p->nlp->nx, objective_scale, res);
   return 1; // skip
 }
 
@@ -195,18 +205,21 @@ madnlp_int casadi_madnlp_full_eval_obj(const T1* w, T1* res, void* user_data) {
   // TODO add argument
   T1 objective_scale = 1.0;
 
-  d_oracle->arg[0] = d->x;
+  d_oracle->arg[0] = w;
   d_oracle->arg[1] = d_nlp->p;
   d_oracle->res[0] = res;
   calc_function(&d->prob->nlp_f, d_oracle);
+  //*res *= objective_scale;
 
-  *res *= objective_scale;
+  d->x =  (double*)w;
+  d->f = res;
+
   return 1; // skip
 }
 
 // SYMBOL "madnlp_full_eval_obj"
 template<typename T1>
-madnlp_int casadi_madnlp_full_eval_lag_hess(T1 objective_scale, const T1* w_data, const T1* lam_data,
+madnlp_int casadi_madnlp_full_eval_lag_hess(T1 objective_scale, const T1* w, const T1* lam,
                                             T1* res, void* user_data){
   casadi_int k, column, i;
   casadi_madnlp_data<T1>* d = static_cast< casadi_madnlp_data<T1>* >(user_data);
@@ -215,13 +228,18 @@ madnlp_int casadi_madnlp_full_eval_lag_hess(T1 objective_scale, const T1* w_data
   casadi_oracle_data<T1>* d_oracle = d_nlp->oracle;
 
   // evaluate hessian with given parameters / inputs
-  d_oracle->arg[0] = d->x;
+  //d_oracle->arg[0] = d->x;
+  //d_oracle->arg[3] = d->lam;
+  d_oracle->arg[0] = w;
   d_oracle->arg[1] = d_nlp->p;
   d_oracle->arg[2] = &objective_scale;
-  d_oracle->arg[3] = d->lam;
+  d_oracle->arg[3] = lam;
   d_oracle->res[0] = d->grad_l;
   d_oracle->res[1] = res; //hess_l
   calc_function(&d->prob->nlp_hess_l, d_oracle);
+
+  d->x = (double*)w;
+  d->lam_g = (double*)lam;
   d->hess_l = res;
 
   return 0;
@@ -281,9 +299,9 @@ void casadi_madnlp_work(const casadi_madnlp_prob<T1>* p, casadi_int* sz_arg, cas
   *sz_w = casadi_max(*sz_w, 2*(p->nlp->nx+p->nlp->ng)); // pv
 
   // Persistent work vectors
-  *sz_w += casadi_sp_nnz(p->hess_l_ccs); // hess_l
-  *sz_w += casadi_sp_nnz(p->jac_g_ccs); // jaq_g
-  *sz_w += casadi_sp_nnz(p->grad_f_ccs); // jaq_g
+  *sz_w += p->nnz_hess_l;
+  *sz_w += p->nnz_jac_g;
+  *sz_w += p->nnz_grad_f;
 }
 
 // SYMBOL "madnlp_init"
@@ -326,15 +344,31 @@ void casadi_madnlp_presolve(casadi_madnlp_data<T1>* d) {
   d->solver = madnlp_c_create(&d->c_interface);
 
   // set number of variables and  constraints
+  // reading from parent nlp interface
   d->solver->nw = p->nlp->nx;
   d->solver->nc = p->nlp->ng;
 
-  // set number of non zero
+  // set nnz 
   d->solver->nnzo = d->prob->nnz_grad_f;
-  d->solver->nnzj = d->prob->nnz_jag_g;
+  d->solver->nnzj = d->prob->nnz_jac_g;
   d->solver->nnzh = d->prob->nnz_hess_l;
 
+  // allocate CoordinateSparsity vector indexes data
+  madnlp_c_create_cco_indexes(d->solver);
+  //const casadi_int* a = (const casadi_int*) malloc(sizeof(casadi_int) * 2);
+  //size_t* b = (size_t*) malloc(sizeof(size_t) * 2);
+  //size_t* c = (size_t*) malloc(sizeof(size_t) * 2);
+  //casadi_madnlp_sparsity(a, b, c);
+  // TODO: Fix hack to force template resolution
+  double a = 1.0;
+  // transform ccs sparsity to cco
+  casadi_madnlp_sparsity(d->prob->jac_g_ccs, d->solver->nzj_i, d->solver->nzj_j,a);
+  casadi_madnlp_sparsity(d->prob->hess_l_ccs, d->solver->nzh_i, d->solver->nzh_j,a);
+  // update sparsity indexes to 1-base
+  madnlp_c_update_cco_indexes(d->solver);
+
   // set number bounds
+  // reading from parent nlp interface
   d->solver->lbx = d->nlp->lbz;
   d->solver->ubx = d->nlp->ubz;
   d->solver->lbg = d->nlp->lbz+p->nlp->nx;
@@ -353,12 +387,25 @@ void casadi_madnlp_solve(casadi_madnlp_data<T1>* d) {
   d->unified_return_status = SOLVER_RET_UNKNOWN;
   d->success = 0;
 
-  // set initial guss
+  // set initial guess
   d->solver->x0 = d_nlp->z;
   d->solver->l0 = d_nlp->lam + p_nlp->nx;
   //, &d_nlp->objective, d_nlp->lam+p_nlp->nx, d->z_L, d->z_U
 
   madnlp_int ret = madnlp_c_solve(d->solver);
+
+  // get primal solution
+  for (casadi_int i=0; i<p_nlp->nx; ++i) {
+    // get primal solution
+    d_nlp->z[i] = d->x[i];
+    // get dual solution x
+    //d_nlp->lam[i] = d->z_U[i]-d->z_L[i];
+  }
+  for (casadi_int i=0; i<p_nlp->ng; ++i) {
+    d_nlp->g[i] = d->g[i];
+    d_nlp->lam_g[i] = d->lam_g[i];
+  }
+
 
   if (ret==0) {
     d->unified_return_status = SOLVER_RET_SUCCESS;

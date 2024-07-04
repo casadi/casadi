@@ -27,6 +27,7 @@
 #define CASADI_MADNLP_INTERFACE_HPP
 
 //#include <casadi/interfaces/madnlp/casadi_nlpsol_madnlp_export.h>
+#include <iostream>
 #include "casadi/core/nlpsol_impl.hpp"
 #include "casadi/core/timing.hpp"
 #include "MadnlpCInterface.h"
