@@ -316,7 +316,7 @@ void casadi_madnlp_init(casadi_madnlp_data<T1>* d, const T1*** arg, T1*** res, c
   //d->a = *w; *w += casadi_sp_nnz(p->sp_a);
   //d->h = *w; *w += casadi_sp_nnz(p->sp_h);
   //d->g = *w; *w += casadi_max(p->nlp->nx,p->nlp->ng);
-  
+
   d->arg = *arg;
   d->res = *res;
   d->iw = *iw;
@@ -347,18 +347,16 @@ void casadi_madnlp_presolve(casadi_madnlp_data<T1>* d) {
   // reading from parent nlp interface
   d->solver->nw = p->nlp->nx;
   d->solver->nc = p->nlp->ng;
-
-  // set nnz 
+  // set nnz
   d->solver->nnzo = d->prob->nnz_grad_f;
   d->solver->nnzj = d->prob->nnz_jac_g;
   d->solver->nnzh = d->prob->nnz_hess_l;
 
-  // allocate CoordinateSparsity vector indexes data
-  madnlp_c_create_cco_indexes(d->solver);
-  //const casadi_int* a = (const casadi_int*) malloc(sizeof(casadi_int) * 2);
-  //size_t* b = (size_t*) malloc(sizeof(size_t) * 2);
-  //size_t* c = (size_t*) malloc(sizeof(size_t) * 2);
-  //casadi_madnlp_sparsity(a, b, c);
+  // allocate memory
+  // CoordinateSparsity vector indexes data
+  // output data memory
+  madnlp_c_init(d->solver);
+
   // TODO: Fix hack to force template resolution
   double a = 1.0;
   // transform ccs sparsity to cco
@@ -390,20 +388,20 @@ void casadi_madnlp_solve(casadi_madnlp_data<T1>* d) {
   // set initial guess
   d->solver->x0 = d_nlp->z;
   d->solver->l0 = d_nlp->lam + p_nlp->nx;
-  //, &d_nlp->objective, d_nlp->lam+p_nlp->nx, d->z_L, d->z_U
 
   madnlp_int ret = madnlp_c_solve(d->solver);
 
-  // get primal solution
+  d_nlp->objective = d->solver->obj[0];
+
   for (casadi_int i=0; i<p_nlp->nx; ++i) {
     // get primal solution
-    d_nlp->z[i] = d->x[i];
+    d_nlp->z[i] = d->solver->sol[i];
     // get dual solution x
-    //d_nlp->lam[i] = d->z_U[i]-d->z_L[i];
+    d_nlp->lam[i] = d->solver->mul_U[i]-d->solver->mul_L[i];
   }
   for (casadi_int i=0; i<p_nlp->ng; ++i) {
-    d_nlp->g[i] = d->g[i];
-    d_nlp->lam_g[i] = d->lam_g[i];
+    d_nlp->z[p_nlp->nx+i] = d->solver->con[i];
+    d_nlp->lam[p_nlp->nx+i] = d->solver->mul[i];
   }
 
 
