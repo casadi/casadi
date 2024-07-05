@@ -150,10 +150,13 @@ void MadnlpInterface::init(const Dict& opts) {
 
   if (!has_function("nlp_hess_l")) {
     create_function("nlp_hess_l", {"x", "p", "lam:f", "lam:g"},
-                    {"grad:gamma:x", "hess:gamma:x:x"}, {{"gamma", {"f", "g"}}});
+                    {"triu:hess:gamma:x:x"}, {{"gamma", {"f", "g"}}});
+                    //{"grad:gamma:x", "hess:gamma:x:x"}, {{"gamma", {"f", "g"}}});
   }
-  hesslag_sp_ = get_function("nlp_hess_l").sparsity_out(1);
-  casadi_assert(hesslag_sp_.is_symmetric(), "Hessian must be symmetric");
+  hesslag_sp_ = get_function("nlp_hess_l").sparsity_out(0);
+  casadi_assert(hesslag_sp_.is_triu(), "Hessian must be upper triangular");
+
+  //casadi_assert(hesslag_sp_.is_symmetric(), "Hessian must be symmetric");
 
   if (convexify_strategy!="none") {
     convexify_ = true;
@@ -281,7 +284,7 @@ void MadnlpInterface::set_madnlp_prob() {
   p_.jac_g_ccs = jacg_sp_;
   p_.hess_l_ccs = hesslag_sp_;
   p_.grad_f_ccs = gradf_sp_;
-  get_function("nlp_hess_l").save("nlp_hess_l.casadi");
+  //get_function("nlp_hess_l").save("nlp_hess_l.casadi");
   p_.nlp_hess_l = OracleCallback("nlp_hess_l", this);
   p_.nlp_jac_g = OracleCallback("nlp_jac_g", this);
   p_.nlp_grad_f = OracleCallback("nlp_grad_f", this);

@@ -234,13 +234,13 @@ madnlp_int casadi_madnlp_full_eval_lag_hess(T1 objective_scale, const T1* w, con
   d_oracle->arg[1] = d_nlp->p;
   d_oracle->arg[2] = &objective_scale;
   d_oracle->arg[3] = lam;
-  d_oracle->res[0] = d->grad_l;
-  d_oracle->res[1] = res; //hess_l
+  //d_oracle->res[0] = d->grad_l;
+  d_oracle->res[0] = res; //hess_l
   calc_function(&d->prob->nlp_hess_l, d_oracle);
 
-  d->x = (double*)w;
-  d->lam_g = (double*)lam;
-  d->hess_l = res;
+  //d->x = (double*)w;
+  //d->lam_g = (double*)lam;
+  //d->hess_l = res;
 
   return 0;
 }
