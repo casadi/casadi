@@ -26,10 +26,10 @@ add_custom_command(
 )
 
 set(JULIA_INCLUDE_DIR /home/tom/.julia/juliaup/julia-1.10.4+0.x64.linux.gnu/include/julia/)
-set(MADNLP_INCLUDE_DIR /home/tom/sources/_all/julia_casadi_interface/libmadnlp/cinterface/)
-set(CMADNLP_INCLUDE_DIR /home/tom/sources/_all/julia_casadi_interface/libmadnlp/target/include/)
+set(MADNLP_INCLUDE_DIR /home/tom/sources/_all/madnlp_cinterface/libmadnlp/cinterface/)
+set(CMADNLP_INCLUDE_DIR /home/tom/sources/_all/madnlp_cinterface/libmadnlp/target/include/)
 
-set(CMADNLP_LIB_DIR /home/tom/sources/_all/julia_casadi_interface/libmadnlp/target/lib/)
+set(CMADNLP_LIB_DIR /home/tom/sources/_all/madnlp_cinterface/libmadnlp/target/lib/)
 
 target_link_directories(casadi_nlpsol_madnlp 
   PUBLIC
