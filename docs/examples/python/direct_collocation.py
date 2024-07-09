@@ -16,10 +16,18 @@
 #     OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 #     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
+
+import sys
+# use casadi with_madnlp
+CASADI_MADNLP_SITE_PACKAGES=\
+    "/home/tom/sources/_all/casadi/build_madnlp/test/lib/python3.12/site-packages/"
+sys.path = [CASADI_MADNLP_SITE_PACKAGES] + sys.path
+
 import casadi as ca
 import numpy as np
 import matplotlib.pyplot as plt
 
+print(ca.__file__)
 # Degree of interpolating polynomial
 d = 3
 
@@ -55,9 +63,6 @@ for j in range(d+1):
     pint = np.polyint(p)
     B[j] = pint(1.0)
 
-# Time horizon
-T = 10.
-
 # Declare model variables
 x1 = ca.SX.sym('x1')
 x2 = ca.SX.sym('x2')
@@ -73,8 +78,11 @@ L = x1**2 + x2**2 + u**2
 # Continuous time dynamics
 f = ca.Function('f', [x, u], [xdot, L], ['x', 'u'], ['xdot', 'L'])
 
+# Time horizon
+T = 10.
+
 # Control discretization
-N = 20 # number of control intervals
+N = 2000 # number of control intervals
 h = T/N
 
 # Start with an empty NLP
@@ -164,7 +172,11 @@ ubg = np.concatenate(ubg)
 
 # Create an NLP solver
 prob = {'f': J, 'x': w, 'g': g}
-solver = ca.nlpsol('solver', 'ipopt', prob);
+# solver = ca.nlpsol('solver', 'ipopt', prob);
+# opts = {"madnlp":{"lin_solver_id":1}}
+opts = {}
+# solver = ca.nlpsol('solver', 'madnlp', prob, opts);
+solver = ca.nlpsol('solver', 'ipopt', prob, opts);
 
 # Function to get x and u trajectories from w
 trajectories = ca.Function('trajectories', [w], [x_plot, u_plot], ['w'], ['x', 'u'])
