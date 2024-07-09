@@ -169,7 +169,7 @@ madnlp_int casadi_madnlp_full_eval_constr(const T1* w, T1* res, void* user_data)
   d->x =  (double*)w;
   d->g = res;
 
-  return 1; //skip
+  return 0;
 }
 
 // SYMBOL "madnlp_full_eval_obj_grad"
@@ -192,7 +192,7 @@ madnlp_int casadi_madnlp_full_eval_obj_grad(const T1* w, T1* res, void* user_dat
   d->grad_f = res;
 
   //casadi_scal(p->nlp->nx, objective_scale, res);
-  return 1; // skip
+  return 0;
 }
 
 // SYMBOL "madnlp_full_eval_obj"
@@ -214,7 +214,7 @@ madnlp_int casadi_madnlp_full_eval_obj(const T1* w, T1* res, void* user_data) {
   d->x =  (double*)w;
   d->f = res;
 
-  return 1; // skip
+  return 0;
 }
 
 // SYMBOL "madnlp_full_eval_obj"
