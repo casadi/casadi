@@ -63,9 +63,11 @@ void CASADI_NLPSOL_MADNLP_EXPORT casadi_load_nlpsol_madnlp() {
 
 MadnlpInterface::MadnlpInterface(const std::string& name, const Function& nlp)
   : Nlpsol(name, nlp) {
+  madnlp_c_startup(0,nullptr);
 }
 
 MadnlpInterface::~MadnlpInterface() {
+  madnlp_c_shutdown();
   clear_mem();
 }
 
