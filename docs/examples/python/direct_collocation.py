@@ -173,16 +173,19 @@ ubg = np.concatenate(ubg)
 # Create an NLP solver
 prob = {'f': J, 'x': w, 'g': g}
 # solver = ca.nlpsol('solver', 'ipopt', prob);
-# opts = {"madnlp":{"lin_solver_id":1}}
-opts = {}
-# solver = ca.nlpsol('solver', 'madnlp', prob, opts);
-solver = ca.nlpsol('solver', 'ipopt', prob, opts);
+opts = {"madnlp":{"lin_solver_id":3}}
+solver = ca.nlpsol('solver', 'madnlp', prob, opts);
+# opts = {"ipopt.print_level":3, "verbose":0}
+# solver = ca.nlpsol('solver', 'ipopt', prob, opts);
 
 # Function to get x and u trajectories from w
 trajectories = ca.Function('trajectories', [w], [x_plot, u_plot], ['w'], ['x', 'u'])
 
 # Solve the NLP
 sol = solver(x0=w0, lbx=lbw, ubx=ubw, lbg=lbg, ubg=ubg)
+
+#solver2 = ca.nlpsol('solver2', 'madnlp', prob, opts);
+#sol2 = solver2(x0=w0, lbx=lbw, ubx=ubw, lbg=lbg, ubg=ubg)
 x_opt, u_opt = trajectories(sol['x'])
 x_opt = x_opt.full() # to numpy array
 u_opt = u_opt.full() # to numpy array
@@ -197,4 +200,4 @@ plt.step(tgrid, np.append(np.nan, u_opt[0]), '-.')
 plt.xlabel('t')
 plt.legend(['x1','x2','u'])
 plt.grid()
-plt.show()
+plt.savefig("./direct_collocation.png")
