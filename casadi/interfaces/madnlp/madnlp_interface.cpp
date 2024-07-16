@@ -35,12 +35,12 @@
 #include <iomanip>
 #include <chrono>
 
-#include "MadnlpCInterface.h"
-
 #include <madnlp_runtime_str.h>
 
-#define CASADI_NLPSOL_MADNLP_EXPORT __attribute__((visibility("default")))
-
+extern "C" {
+  int init_julia(int, char**);
+  void shutdown_julia(int);
+}
 
 namespace casadi {
 
@@ -63,11 +63,10 @@ void CASADI_NLPSOL_MADNLP_EXPORT casadi_load_nlpsol_madnlp() {
 
 MadnlpInterface::MadnlpInterface(const std::string& name, const Function& nlp)
   : Nlpsol(name, nlp) {
-  madnlp_c_startup(0,nullptr);
 }
 
 MadnlpInterface::~MadnlpInterface() {
-  madnlp_c_shutdown();
+  //shutdown_julia(0);
   clear_mem();
 }
 
@@ -93,6 +92,20 @@ const Options MadnlpInterface::options_ = {
    }
 };
 
+void casadi_madnlp_sparsity(const casadi_int* sp, madnlp_int *coord_i, madnlp_int *coord_j) {
+    // convert ccs to cco
+    casadi_int ncol = sp[1];
+    const casadi_int* colind = sp+2;
+    const casadi_int* row = colind+ncol+1;
+
+    for (casadi_int cc=0; cc<ncol; ++cc) {
+        for (casadi_int el=colind[cc]; el<colind[cc+1]; ++el) {
+            *coord_i++ = row[el]+1;
+            *coord_j++ = cc+1;
+        }
+    }
+}
+
 void MadnlpInterface::init(const Dict& opts) {
   // Call the init method of the base class
   Nlpsol::init(opts);
@@ -112,13 +125,7 @@ void MadnlpInterface::init(const Dict& opts) {
 
   // Read options
   for (auto&& op : opts) {
-    if (op.first=="nw") {
-      nws_ = op.second;
-      struct_cnt++;
-    } else if (op.first=="ng") {
-      ngs_ = op.second;
-      struct_cnt++;
-    } else if (op.first=="convexify_strategy") {
+    if (op.first=="convexify_strategy") {
       convexify_strategy = op.second.to_string();
     } else if (op.first=="convexify_margin") {
       convexify_margin = op.second;
@@ -146,19 +153,16 @@ void MadnlpInterface::init(const Dict& opts) {
   gradf_sp_ = get_function("nlp_grad_f").sparsity_out(0);
 
   if (!has_function("nlp_jac_g")) {
-    create_function("nlp_jac_g", {"x", "p"}, {"g", "jac:g:x"});
+    create_function("nlp_jac_g", {"x", "p"}, {"jac:g:x"});
   }
-  jacg_sp_ = get_function("nlp_jac_g").sparsity_out(1);
+  jacg_sp_ = get_function("nlp_jac_g").sparsity_out(0);
 
   if (!has_function("nlp_hess_l")) {
     create_function("nlp_hess_l", {"x", "p", "lam:f", "lam:g"},
-                    {"triu:hess:gamma:x:x"}, {{"gamma", {"f", "g"}}});
-                    //{"grad:gamma:x", "hess:gamma:x:x"}, {{"gamma", {"f", "g"}}});
+                    {"tril:hess:gamma:x:x"}, {{"gamma", {"f", "g"}}});
   }
   hesslag_sp_ = get_function("nlp_hess_l").sparsity_out(0);
-  casadi_assert(hesslag_sp_.is_triu(), "Hessian must be upper triangular");
-
-  //casadi_assert(hesslag_sp_.is_symmetric(), "Hessian must be symmetric");
+  casadi_assert(hesslag_sp_.is_tril(), "Hessian must be lower triangular");
 
   if (convexify_strategy!="none") {
     convexify_ = true;
@@ -170,6 +174,15 @@ void MadnlpInterface::init(const Dict& opts) {
     hesslag_sp_ = Convexify::setup(convexify_data_, hesslag_sp_, opts);
   }
 
+  // transform ccs sparsity to cco
+  nzj_i_.resize(jacg_sp_.nnz());
+  nzj_j_.resize(jacg_sp_.nnz());
+  nzh_i_.resize(hesslag_sp_.nnz());
+  nzh_j_.resize(hesslag_sp_.nnz());
+
+  casadi_madnlp_sparsity(jacg_sp_, get_ptr(nzj_i_), get_ptr(nzj_j_));
+  casadi_madnlp_sparsity(hesslag_sp_, get_ptr(nzh_i_), get_ptr(nzh_j_));
+
   set_madnlp_prob();
 
   // Allocate memory
@@ -180,6 +193,11 @@ void MadnlpInterface::init(const Dict& opts) {
   alloc_res(sz_res, true);
   alloc_iw(sz_iw, true);
   alloc_w(sz_w, true);
+
+  if (!GlobalOptions::julia_initialized) {
+    init_julia(0, nullptr);
+    GlobalOptions::julia_initialized = true;
+  }
 }
 
 int MadnlpInterface::init_mem(void* mem) const {
@@ -255,25 +273,12 @@ int MadnlpInterface::solve(void* mem) const {
 Dict MadnlpInterface::get_stats(void* mem) const {
   Dict stats = Nlpsol::get_stats(mem);
   auto m = static_cast<MadnlpMemory*>(mem);
+  stats["iter_count"] = m->d.stats.iter;
   Dict madnlp;
-  madnlp["compute_sd_time"] = m->d.stats.compute_sd_time;
-  madnlp["duinf_time"] = m->d.stats.duinf_time;
-  madnlp["eval_hess_time"] = m->d.stats.eval_hess_time;
-  madnlp["eval_jac_time"] = m->d.stats.eval_jac_time;
-  madnlp["eval_cv_time"] = m->d.stats.eval_cv_time;
-  madnlp["eval_grad_time"] = m->d.stats.eval_grad_time;
-  madnlp["eval_obj_time"] = m->d.stats.eval_obj_time;
-  madnlp["initialization_time"] = m->d.stats.initialization_time;
-  madnlp["time_total"] = m->d.stats.time_total;
-  madnlp["eval_hess_count"] = m->d.stats.eval_hess_count;
-  madnlp["eval_jac_count"] = m->d.stats.eval_jac_count;
-  madnlp["eval_cv_count"] = m->d.stats.eval_cv_count;
-  madnlp["eval_grad_count"] = m->d.stats.eval_grad_count;
-  madnlp["eval_obj_count"] = m->d.stats.eval_obj_count;
-  madnlp["iterations_count"] = m->d.stats.iterations_count;
-  madnlp["return_flag"] = m->d.stats.return_flag;
+  madnlp["dual_feas"] = m->d.stats.dual_feas;
+  madnlp["primal_feas"] = m->d.stats.primal_feas;
+  madnlp["status"] = m->d.stats.status;
   stats["madnlp"] = madnlp;
-  stats["iter_count"]  =m->d.stats.iterations_count;
   return stats;
 }
 
@@ -283,10 +288,13 @@ void MadnlpInterface::set_madnlp_prob() {
   p_.nlp = &p_nlp_;
   // p_ casadi_madnlp_prob
 
-  p_.jac_g_ccs = jacg_sp_;
-  p_.hess_l_ccs = hesslag_sp_;
-  p_.grad_f_ccs = gradf_sp_;
-  //get_function("nlp_hess_l").save("nlp_hess_l.casadi");
+  p_.nnz_jac_g = jacg_sp_.nnz();
+  p_.nnz_hess_l = hesslag_sp_.nnz();
+  p_.nzj_i = get_ptr(nzj_i_);
+  p_.nzj_j = get_ptr(nzj_j_);
+  p_.nzh_i = get_ptr(nzh_i_);
+  p_.nzh_j = get_ptr(nzh_j_);
+
   p_.nlp_hess_l = OracleCallback("nlp_hess_l", this);
   p_.nlp_jac_g = OracleCallback("nlp_jac_g", this);
   p_.nlp_grad_f = OracleCallback("nlp_grad_f", this);
@@ -387,9 +395,6 @@ void MadnlpInterface::set_madnlp_prob(CodeGenerator& g) const {
   g << "d->prob = &p;\n";
   g << "p.nlp = &p_nlp;\n";
 
-  g << "p.nw = " << g.constant(nws_) << ";\n";
-  g << "p.ng = " << g.constant(ngs_) << ";\n";
-
   g.setup_callback("p.nlp_jac_g", get_function("nlp_jac_g"));
   g.setup_callback("p.nlp_grad_f", get_function("nlp_grad_f"));
   g.setup_callback("p.nlp_f", get_function("nlp_f"));
@@ -414,8 +419,10 @@ MadnlpInterface::MadnlpInterface(DeserializingStream& s) : Nlpsol(s) {
   s.unpack("MadnlpInterface::opts", opts_);
   s.unpack("MadnlpInterface::convexify", convexify_);
 
-  s.unpack("MadnlpInterface::nws", nws_);
-  s.unpack("MadnlpInterface::ngs", ngs_);
+  s.unpack("MadnlpInterface::nzj_i", nzj_i_);
+  s.unpack("MadnlpInterface::nzj_j", nzj_j_);
+  s.unpack("MadnlpInterface::nzh_i", nzh_i_);
+  s.unpack("MadnlpInterface::nzh_j", nzh_j_);
 
   set_madnlp_prob();
 }
@@ -430,8 +437,11 @@ void MadnlpInterface::serialize_body(SerializingStream &s) const {
   s.pack("MadnlpInterface::opts", opts_);
   s.pack("MadnlpInterface::convexify", convexify_);
 
-  s.pack("MadnlpInterface::nws", nws_);
-  s.pack("MadnlpInterface::ngs", ngs_);
+  s.pack("MadnlpInterface::nzj_i", nzj_i_);
+  s.pack("MadnlpInterface::nzj_j", nzj_j_);
+  s.pack("MadnlpInterface::nzh_i", nzh_i_);
+  s.pack("MadnlpInterface::nzh_j", nzh_j_);
+
 }
 
 } // namespace casadi

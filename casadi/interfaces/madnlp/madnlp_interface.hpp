@@ -30,7 +30,7 @@
 #include <iostream>
 #include "casadi/core/nlpsol_impl.hpp"
 #include "casadi/core/timing.hpp"
-#include "MadnlpCInterface.h"
+#include "madnlp_c.h"
 
 namespace casadi {
   #include "madnlp_runtime.hpp"
@@ -151,8 +151,13 @@ class CASADI_NLPSOL_MADNLP_EXPORT MadnlpInterface : public Nlpsol {
   // Memory structure
   casadi_madnlp_prob<double> p_;
 
-  std::vector<casadi_int> nws_;
-  std::vector<casadi_int> ngs_;
+  std::vector<madnlp_int> nws_;
+  std::vector<madnlp_int> ngs_;
+
+  std::vector<madnlp_int> nzj_i_;
+  std::vector<madnlp_int> nzj_j_;
+  std::vector<madnlp_int> nzh_i_;
+  std::vector<madnlp_int> nzh_j_;
 };
 
 } // namespace casadi

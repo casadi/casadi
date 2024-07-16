@@ -7,7 +7,7 @@ casadi_plugin(Nlpsol madnlp
   "${CMAKE_CURRENT_BINARY_DIR}/madnlp_runtime_str.h"
   )
 
-casadi_plugin_link_libraries(Nlpsol madnlp madnlp)
+casadi_plugin_link_libraries(Nlpsol madnlp madnlp::madnlp_c)
 
 
 #add_executable(madnlp_test madnlp_test.cpp)
@@ -25,22 +25,18 @@ add_custom_command(
   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-set(JULIA_INCLUDE_DIR /home/tom/.julia/juliaup/julia-1.10.4+0.x64.linux.gnu/include/julia/)
-set(MADNLP_INCLUDE_DIR /home/tom/sources/_all/madnlp_cinterface/target/include/)
-set(MADNLP_LIB_DIR /home/tom/sources/_all/madnlp_cinterface/target/lib/)
+#set(JULIA_INCLUDE_DIR /home/tom/.julia/juliaup/julia-1.10.4+0.x64.linux.gnu/include/julia/)
+#set(MADNLP_INCLUDE_DIR /home/tom/sources/_all/madnlp_cinterface/target/include/)
+#set(MADNLP_LIB_DIR /home/tom/sources/_all/madnlp_cinterface/target/lib/)
 
 target_link_directories(casadi_nlpsol_madnlp 
   PUBLIC
   ${MADNLP_LIB_DIR}
 ) 
 
-target_link_libraries(casadi_nlpsol_madnlp cmadnlp madnlp julia stdc++ dl m)
+#target_link_libraries(casadi_nlpsol_madnlp cmadnlp madnlp julia stdc++ dl m)
 
 target_include_directories(casadi_nlpsol_madnlp
   PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
-    ${MADNLP_INCLUDE_DIR}
-    ${JULIA_INCLUDE_DIR}
 )
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive")
-
