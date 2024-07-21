@@ -627,8 +627,8 @@ namespace casadi {
   }
 
   GetNonzerosSlice2::GetNonzerosSlice2(DeserializingStream& s) : GetNonzeros(s) {
-    s.unpack("GetNonzerosVector2::inner", inner_);
-    s.unpack("GetNonzerosVector2::outer", outer_);
+    s.unpack("GetNonzerosSlice2::inner", inner_);
+    s.unpack("GetNonzerosSlice2::outer", outer_);
   }
 
   MXNode* GetNonzeros::deserialize(DeserializingStream& s) {

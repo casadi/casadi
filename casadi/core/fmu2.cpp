@@ -964,14 +964,14 @@ void Fmu2::serialize_body(SerializingStream &s) const {
   s.pack("Fmu2::init_boolean", init_boolean_);
   s.pack("Fmu2::init_string", init_string_);
 
-  s.pack("Fmu2::vn_aux_real_", vn_aux_real_);
-  s.pack("Fmu2::vn_aux_integer_", vn_aux_integer_);
-  s.pack("Fmu2::vn_aux_boolean_", vn_aux_boolean_);
-  s.pack("Fmu2::vn_aux_string_", vn_aux_string_);
-  s.pack("Fmu2::vr_aux_real_", vr_aux_real_);
-  s.pack("Fmu2::vr_aux_integer_", vr_aux_integer_);
-  s.pack("Fmu2::vr_aux_boolean_", vr_aux_boolean_);
-  s.pack("Fmu2::vr_aux_string_", vr_aux_string_);
+  s.pack("Fmu2::vn_aux_real", vn_aux_real_);
+  s.pack("Fmu2::vn_aux_integer", vn_aux_integer_);
+  s.pack("Fmu2::vn_aux_boolean", vn_aux_boolean_);
+  s.pack("Fmu2::vn_aux_string", vn_aux_string_);
+  s.pack("Fmu2::vr_aux_real", vr_aux_real_);
+  s.pack("Fmu2::vr_aux_integer", vr_aux_integer_);
+  s.pack("Fmu2::vr_aux_boolean", vr_aux_boolean_);
+  s.pack("Fmu2::vr_aux_string", vr_aux_string_);
 
   s.pack("Fmu2::declared_ad", declared_ad_);
 }
