@@ -248,7 +248,7 @@ namespace casadi {
       } else if (op.first=="enableNZCTests") {
         ops_.enableNZCTests = to_BooleanType(op.second);
       } else if (op.first=="enableDriftCorrection") {
-        ops_.enableRegularisation = to_BooleanType(op.second);
+        ops_.enableDriftCorrection = to_BooleanType(op.second);
       } else if (op.first=="enableCholeskyRefactorisation") {
         ops_.enableCholeskyRefactorisation = op.second;
       } else if (op.first=="enableEqualities") {
