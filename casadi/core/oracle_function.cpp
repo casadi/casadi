@@ -501,6 +501,7 @@ void OracleFunction::set_temp(void* mem, const double** arg, double** res,
   m->d_oracle.w = w;
   for (int i = 0; i < max_num_threads_; ++i) {
     auto* ml = m->thread_local_mem[i];
+    for (auto&& s : ml->fstats) s.second.reset();
     ml->arg = arg;
     ml->res = res;
     ml->iw = iw;

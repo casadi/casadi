@@ -611,6 +611,21 @@ class NLPtests(casadiTestCase):
 
     DM.set_precision(8)
     
+  @requires_nlpsol("ipopt")
+  def test_ipopt_solver(self):
+    x = ca.MX.sym("x")
+
+    nlp = {"x":x,"f":x**2}
+
+    solver = ca.nlpsol("solver","ipopt",nlp)
+
+    solver()
+    s1 = solver.stats())
+    solver()
+
+    s2 = solver.stats()
+    self.assertEqual(s1["n_call_nlp_f"],s2["n_call_nlp_f"])
+
   def test_warmstart(self):
 
     x=SX.sym("x")
