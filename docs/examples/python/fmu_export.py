@@ -34,7 +34,7 @@ q = dae.add_q('q')
 u = dae.add_u('u')
 
 # Set ODE right-hand-sides
-dae.set_ode('x1', (1 - x2 * x2) * x1 - x2 + u)
+dae.set_ode('x1', (1 - x2 * x2)*x1 - x2 + u)
 dae.set_ode('x2', x1)
 dae.set_ode('q', x1**2 + x2**2 + u**2)
 
