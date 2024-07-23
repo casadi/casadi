@@ -24,6 +24,7 @@
 
 
 #include "madnlp_interface.hpp"
+
 #include "casadi/core/casadi_misc.hpp"
 #include "../../core/global_options.hpp"
 #include "../../core/casadi_interrupt.hpp"
@@ -34,13 +35,10 @@
 #include <iostream>
 #include <iomanip>
 #include <chrono>
+#include <cstring>
+#include <string>
 
 #include <madnlp_runtime_str.h>
-
-extern "C" {
-  int init_julia(int, char**);
-  void shutdown_julia(int);
-}
 
 namespace casadi {
 
@@ -262,7 +260,8 @@ int MadnlpInterface::solve(void* mem) const {
     }
   }
 
-  casadi_madnlp_solve(&m->d);
+  int ret = casadi_madnlp_solve(&m->d);
+  if ( ret != 0 ) throw CasadiException("MANLPError");
 
   m->success = m->d.success;
   m->unified_return_status = static_cast<UnifiedReturnStatus>(m->d.unified_return_status);
