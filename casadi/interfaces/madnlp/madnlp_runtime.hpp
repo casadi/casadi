@@ -306,7 +306,7 @@ int casadi_madnlp_solve(casadi_madnlp_data<T1>* d) {
   d->stats.dual_feas = stats->dual_feas;
   d->stats.primal_feas = stats->primal_feas;
 
-  if (d->stats.status==MADNLP_SOLVE_SUCCEEDED || 
+  if (d->stats.status==MADNLP_SOLVE_SUCCEEDED ||
       d->stats.status==MADNLP_SOLVED_TO_ACCEPTABLE_LEVEL) {
     d->unified_return_status = SOLVER_RET_SUCCESS;
   } else if (d->stats.status==MADNLP_MAXIMUM_ITERATIONS_EXCEEDED ||
