@@ -104,6 +104,16 @@
             ]
         },
         {
+            "name": "wincore",
+            "displayName": "Windows core (MinGW)",
+            "inherits": [
+                "common",
+                "mingw",
+                "core",
+                "debug"
+            ]
+        },
+        {
             "name": "windevel_cl",
             "displayName": "Windows developer (Visual C++)",
             "inherits": [
