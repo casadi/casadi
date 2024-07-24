@@ -32,6 +32,12 @@
 #include "casadi/core/timing.hpp"
 #include "madnlp_c.h"
 
+extern "C" {
+  int init_julia(int, char**);
+  void shutdown_julia(int);
+}
+
+
 namespace casadi {
   #include "madnlp_runtime.hpp"
 }

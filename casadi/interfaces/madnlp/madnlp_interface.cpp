@@ -24,6 +24,7 @@
 
 
 #include "madnlp_interface.hpp"
+
 #include "casadi/core/casadi_misc.hpp"
 #include "../../core/global_options.hpp"
 #include "../../core/casadi_interrupt.hpp"
@@ -34,13 +35,10 @@
 #include <iostream>
 #include <iomanip>
 #include <chrono>
+#include <cstring>
+#include <string>
 
 #include <madnlp_runtime_str.h>
-
-extern "C" {
-  int init_julia(int, char**);
-  void shutdown_julia(int);
-}
 
 namespace casadi {
 
@@ -194,8 +192,47 @@ void MadnlpInterface::init(const Dict& opts) {
   alloc_iw(sz_iw, true);
   alloc_w(sz_w, true);
 
+  std::vector<char*> _argv = {};
+  std::string s;
+
+  std::set<std::string> comp_values = {"no","yes","min","max"};
+
+  auto comp = opts_.find("compile");
+  if (comp!=opts_.end()) {
+    std::string comp_value = comp->second;
+    if (comp_values.find(comp_value) != comp_values.end()) {
+      s = "--compile=" + comp_value;
+      const int comp_l = s.length();
+      char* option_comp = new char[comp_l + 1];
+      strcpy(option_comp, s.c_str());
+      _argv.push_back(option_comp);
+    } else {
+      std::cout << "Invalid value (" << comp_value << ")for option 'compile'" << std::endl;
+      std::cout << "Available values are: ";
+      for (auto v: comp_values) std::cout << v << " "; std::cout << std::endl;
+    }
+  }
+
+  auto trace_opt = opts_.find("trace_compile");
+  if (trace_opt!=opts_.end() && bool(trace_opt->second))  {
+    std::string trace_compile_output = "stderr";
+    auto _trace_out_opt = opts_.find("trace_compile_output");
+    if (_trace_out_opt!=opts_.end())
+      trace_compile_output = (std::string) _trace_out_opt->second;
+    s = "--trace-compile=" + trace_compile_output;
+    const int trace_l = s.length();
+    char* option_trace = new char[trace_l + 1];
+    strcpy(option_trace, s.c_str());
+    _argv.push_back(option_trace);
+  }
+
+  int argc = _argv.size();
+  char** argv = reinterpret_cast<char**>(_argv.data());
+
   if (!GlobalOptions::julia_initialized) {
-    init_julia(0, nullptr);
+    init_julia(argc, argv);
+    std::cout << "Init julia runtime with options: "<< std::endl ;
+    for (auto s: _argv) std::cout << s << std::endl;
     GlobalOptions::julia_initialized = true;
   }
 }
@@ -262,7 +299,8 @@ int MadnlpInterface::solve(void* mem) const {
     }
   }
 
-  casadi_madnlp_solve(&m->d);
+  int ret = casadi_madnlp_solve(&m->d);
+  if ( ret != 0 ) throw CasadiException("MADNLPError");
 
   m->success = m->d.success;
   m->unified_return_status = static_cast<UnifiedReturnStatus>(m->d.unified_return_status);
@@ -364,7 +402,7 @@ void MadnlpInterface::codegen_body(CodeGenerator& g) const {
       case 3:
         {
           std::string s = kv.second.to_string();
-          g << "madnlp_c_set_option_bool(d->solver, \"" + kv.first + "\", \""
+          g << "madnlp_c_set_option_string(d->solver, \"" + kv.first + "\", \""
               + s + "\");\n";
         }
         break;
