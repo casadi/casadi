@@ -3526,7 +3526,13 @@
 %exception  casadi::MX::jacobian_sparsity(const MX &f, const MX &x) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::MX::join_primitives(const std::vector< DM > &v) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::MX::join_primitives(const std::vector< MX > &v) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::MX::join_primitives(const std::vector< SX > &v) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::MX::kron(const MX &x, const MX &b) {
@@ -3709,7 +3715,13 @@
 %exception  casadi::MX::sparsity_cast(const MX &x, const Sparsity &sp) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::MX::split_primitives(const DM &x) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::MX::split_primitives(const MX &x) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::MX::split_primitives(const SX &x) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::MX::stop_diff(const MX &expr, casadi_int order) {
