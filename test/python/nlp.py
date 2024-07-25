@@ -613,11 +613,11 @@ class NLPtests(casadiTestCase):
     
   @requires_nlpsol("ipopt")
   def test_ipopt_solver(self):
-    x = ca.MX.sym("x")
+    x = MX.sym("x")
 
     nlp = {"x":x,"f":x**2}
 
-    solver = ca.nlpsol("solver","ipopt",nlp)
+    solver = nlpsol("solver","ipopt",nlp)
 
     solver()
     s1 = solver.stats()
