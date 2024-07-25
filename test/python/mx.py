@@ -3126,12 +3126,13 @@ class MXtests(casadiTestCase):
         yield diagcat(x,y)
         yield vertcat(x,y,MX(0,1))
         yield vertcat(x,y).reshape((2,3))
+        yield sparsity_cast(vertcat(x,y), Sparsity.diag(6))
         
     for z in experiments():
         print(z)
         self.assertTrue(z.is_valid_input())
         
-        
+        print(z.primitives())
         f = Function('f',[z],z.primitives())
         DM.rng(1)
         a = DM.rand(z.sparsity())

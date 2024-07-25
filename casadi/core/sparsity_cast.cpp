@@ -126,6 +126,48 @@ namespace casadi {
     return dep()->is_valid_input();
   }
 
+  casadi_int SparsityCast::n_primitives() const {
+    return dep()->n_primitives();
+  }
+
+  void SparsityCast::primitives(std::vector<MX>::iterator& it) const {
+    dep()->primitives(it);
+  }
+
+  template<typename T>
+  void SparsityCast::split_primitives_gen(const T& x, typename std::vector<T>::iterator& it) const {
+    dep()->split_primitives(sparsity_cast(x, dep().sparsity()), it);
+  }
+
+  void SparsityCast::split_primitives(const MX& x, std::vector<MX>::iterator& it) const {
+    split_primitives_gen<MX>(x, it);
+  }
+
+  void SparsityCast::split_primitives(const SX& x, std::vector<SX>::iterator& it) const {
+    split_primitives_gen<SX>(x, it);
+  }
+
+  void SparsityCast::split_primitives(const DM& x, std::vector<DM>::iterator& it) const {
+    split_primitives_gen<DM>(x, it);
+  }
+
+  template<typename T>
+  T SparsityCast::join_primitives_gen(typename std::vector<T>::const_iterator& it) const {
+    return sparsity_cast(dep()->join_primitives(it), sparsity());
+  }
+
+  MX SparsityCast::join_primitives(std::vector<MX>::const_iterator& it) const {
+    return join_primitives_gen<MX>(it);
+  }
+
+  SX SparsityCast::join_primitives(std::vector<SX>::const_iterator& it) const {
+    return join_primitives_gen<SX>(it);
+  }
+
+  DM SparsityCast::join_primitives(std::vector<DM>::const_iterator& it) const {
+    return join_primitives_gen<DM>(it);
+  }
+
   bool SparsityCast::has_duplicates() const {
     return dep()->has_duplicates();
   }
