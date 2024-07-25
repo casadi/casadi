@@ -620,7 +620,7 @@ class NLPtests(casadiTestCase):
     solver = ca.nlpsol("solver","ipopt",nlp)
 
     solver()
-    s1 = solver.stats())
+    s1 = solver.stats()
     solver()
 
     s2 = solver.stats()
