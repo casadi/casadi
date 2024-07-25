@@ -3115,6 +3115,47 @@ class MXtests(casadiTestCase):
     self.checkarray(f(1),DM([2,4]))
     self.checkarray(f(0.5),DM([1,3]))
     self.checkarray(f(0.9),DM([1,3]))
+    
+  def test_primitives(self):
+  
+    def experiments():
+        x = MX.sym("x",3)
+        y = MX.sym("y",3)
+        yield vertcat(x,y)
+        yield horzcat(x,y)
+        yield diagcat(x,y)
+        yield vertcat(x,y,MX(0,1))
+        yield vertcat(x,y).reshape((2,3))
+        
+    for z in experiments():
+        print(z)
+        self.assertTrue(z.is_valid_input())
+        
+        
+        f = Function('f',[z],z.primitives())
+        DM.rng(1)
+        a = DM.rand(z.sparsity())
+        
+        ref = f(a)
+        res = z.split_primitives(a)
+        
+        self.assertEqual(len(ref),len(res))
+        for ea,eb in zip(ref,res):
+            self.checkarray(ea, eb)
+        
+        a_back = z.join_primitives(res)
+        self.checkarray(a,a_back)
+        
+        zsx = SX.sym("x",z.sparsity())
+        f2 = Function('f',[zsx],z.split_primitives(zsx))
+        
+        self.checkfunction_light(f,f2,inputs=[a])
+        
+        f3 = Function('f',[zsx],[z.join_primitives(z.split_primitives(zsx))])
+        
+        res = f3(a)
+        self.checkarray(a,res)
+    
 
 if __name__ == '__main__':
     unittest.main()

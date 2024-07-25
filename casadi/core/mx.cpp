@@ -918,10 +918,42 @@ namespace casadi {
     return ret;
   }
 
+  std::vector<SX> MX::split_primitives(const SX& x) const {
+    std::vector<SX> ret(n_primitives());
+    std::vector<SX>::iterator it=ret.begin();
+    (*this)->split_primitives(x, it);
+    casadi_assert_dev(it==ret.end());
+    return ret;
+  }
+
+  std::vector<DM> MX::split_primitives(const DM& x) const {
+    std::vector<DM> ret(n_primitives());
+    std::vector<DM>::iterator it=ret.begin();
+    (*this)->split_primitives(x, it);
+    casadi_assert_dev(it==ret.end());
+    return ret;
+  }
+
   MX MX::join_primitives(const std::vector<MX>& v) const {
     casadi_assert(v.size()==n_primitives(), "Wrong number of primitives supplied");
     std::vector<MX>::const_iterator it=v.begin();
     MX ret = (*this)->join_primitives(it);
+    casadi_assert_dev(it==v.end());
+    return ret;
+  }
+
+  SX MX::join_primitives(const std::vector<SX>& v) const {
+    casadi_assert(v.size()==n_primitives(), "Wrong number of primitives supplied");
+    std::vector<SX>::const_iterator it=v.begin();
+    SX ret = (*this)->join_primitives(it);
+    casadi_assert_dev(it==v.end());
+    return ret;
+  }
+
+  DM MX::join_primitives(const std::vector<DM>& v) const {
+    casadi_assert(v.size()==n_primitives(), "Wrong number of primitives supplied");
+    std::vector<DM>::const_iterator it=v.begin();
+    DM ret = (*this)->join_primitives(it);
     casadi_assert_dev(it==v.end());
     return ret;
   }

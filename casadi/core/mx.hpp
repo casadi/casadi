@@ -306,15 +306,23 @@ namespace casadi {
         \identifier{qp} */
     std::vector<MX> primitives() const;
 
+    /// @{
     /** \brief Split up an expression along symbolic primitives
 
         \identifier{qq} */
     std::vector<MX> split_primitives(const MX& x) const;
+    std::vector<SX> split_primitives(const SX& x) const;
+    std::vector<DM> split_primitives(const DM& x) const;
+    /// @}
 
+    /// @{
     /** \brief Join an expression along symbolic primitives
 
         \identifier{qr} */
     MX join_primitives(const std::vector<MX>& v) const;
+    SX join_primitives(const std::vector<SX>& v) const;
+    DM join_primitives(const std::vector<DM>& v) const;
+    /// @}
 
     /// \cond INTERNAL
     /** \brief Detect duplicate symbolic expressions

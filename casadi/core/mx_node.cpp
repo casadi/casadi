@@ -159,14 +159,35 @@ namespace casadi {
     *it++ = x;
   }
 
-  MX MXNode::join_primitives(std::vector<MX>::const_iterator& it) const {
-    MX ret = *it++;
+  void MXNode::split_primitives(const SX& x, std::vector<SX>::iterator& it) const {
+    *it++ = x;
+  }
+
+  void MXNode::split_primitives(const DM& x, std::vector<DM>::iterator& it) const {
+    *it++ = x;
+  }
+
+  template<typename T>
+  T MXNode::join_primitives_gen(typename std::vector<T>::const_iterator& it) const {
+    T ret = *it++;
     if (ret.size()==size()) {
       return ret;
     } else {
       casadi_assert_dev(ret.is_empty(true));
-      return MX(size());
+      return T(size());
     }
+  }
+
+  MX MXNode::join_primitives(std::vector<MX>::const_iterator& it) const {
+    return join_primitives_gen<MX>(it);
+  }
+
+  DM MXNode::join_primitives(std::vector<DM>::const_iterator& it) const {
+    return join_primitives_gen<DM>(it);
+  }
+
+  SX MXNode::join_primitives(std::vector<SX>::const_iterator& it) const {
+    return join_primitives_gen<SX>(it);
   }
 
   const std::string& MXNode::name() const {

@@ -160,15 +160,31 @@ namespace casadi {
         \identifier{14m} */
     casadi_int op() const override { return OP_HORZCAT;}
 
+    /// Split up an expression along primitives (template)
+    template<typename T>
+    void split_primitives_gen(const T& x, typename std::vector<T>::iterator& it) const;
+
+    /// @{
     /** \brief Split up an expression along symbolic primitives
 
         \identifier{14n} */
     void split_primitives(const MX& x, std::vector<MX>::iterator& it) const override;
+    void split_primitives(const SX& x, std::vector<SX>::iterator& it) const override;
+    void split_primitives(const DM& x, std::vector<DM>::iterator& it) const override;
+    /// @}
 
+    /// Join an expression along symbolic primitives (template)
+    template<typename T>
+    T join_primitives_gen(typename std::vector<T>::const_iterator& it) const;
+
+    /// @{
     /** \brief Join an expression along symbolic primitives
 
         \identifier{14o} */
     MX join_primitives(std::vector<MX>::const_iterator& it) const override;
+    SX join_primitives(std::vector<SX>::const_iterator& it) const override;
+    DM join_primitives(std::vector<DM>::const_iterator& it) const override;
+    /// @}
 
     /** \brief Get offsets for split
 
@@ -228,15 +244,31 @@ namespace casadi {
         \identifier{14x} */
     casadi_int op() const override { return OP_VERTCAT;}
 
+    /// Split up an expression along primitives (template)
+    template<typename T>
+    void split_primitives_gen(const T& x, typename std::vector<T>::iterator& it) const;
+
+    /// @{
     /** \brief Split up an expression along symbolic primitives
 
         \identifier{14y} */
     void split_primitives(const MX& x, std::vector<MX>::iterator& it) const override;
+    void split_primitives(const SX& x, std::vector<SX>::iterator& it) const override;
+    void split_primitives(const DM& x, std::vector<DM>::iterator& it) const override;
+    /// @}
 
+    /// Join an expression along symbolic primitives (template)
+    template<typename T>
+    T join_primitives_gen(typename std::vector<T>::const_iterator& it) const;
+
+    /// @{
     /** \brief Join an expression along symbolic primitives
 
         \identifier{14z} */
     MX join_primitives(std::vector<MX>::const_iterator& it) const override;
+    SX join_primitives(std::vector<SX>::const_iterator& it) const override;
+    DM join_primitives(std::vector<DM>::const_iterator& it) const override;
+    /// @}
 
     /** \brief Get offsets for split
 
@@ -297,15 +329,31 @@ namespace casadi {
         \identifier{158} */
     casadi_int op() const override { return OP_DIAGCAT;}
 
+    /// Split up an expression along primitives (template)
+    template<typename T>
+    void split_primitives_gen(const T& x, typename std::vector<T>::iterator& it) const;
+
+    /// @{
     /** \brief Split up an expression along symbolic primitives
 
         \identifier{159} */
     void split_primitives(const MX& x, std::vector<MX>::iterator& it) const override;
+    void split_primitives(const SX& x, std::vector<SX>::iterator& it) const override;
+    void split_primitives(const DM& x, std::vector<DM>::iterator& it) const override;
+    /// @}
 
+    /// Join an expression along symbolic primitives (template)
+    template<typename T>
+    T join_primitives_gen(typename std::vector<T>::const_iterator& it) const;
+
+    /// @{
     /** \brief Join an expression along symbolic primitives
 
         \identifier{15a} */
     MX join_primitives(std::vector<MX>::const_iterator& it) const override;
+    SX join_primitives(std::vector<SX>::const_iterator& it) const override;
+    DM join_primitives(std::vector<DM>::const_iterator& it) const override;
+    /// @}
 
     /** \brief Get offsets for split
 

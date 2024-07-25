@@ -209,15 +209,27 @@ namespace casadi {
         \identifier{1r5} */
     virtual void primitives(std::vector<MX>::iterator& it) const;
 
+    /// @{
     /** \brief Split up an expression along symbolic primitives
 
         \identifier{1r6} */
     virtual void split_primitives(const MX& x, std::vector<MX>::iterator& it) const;
+    virtual void split_primitives(const SX& x, std::vector<SX>::iterator& it) const;
+    virtual void split_primitives(const DM& x, std::vector<DM>::iterator& it) const;
+    /// @}
 
+    /// Join an expression along symbolic primitives (template)
+    template<typename T>
+    T join_primitives_gen(typename std::vector<T>::const_iterator& it) const;
+
+    /// @{
     /** \brief Join an expression along symbolic primitives
 
         \identifier{1r7} */
     virtual MX join_primitives(std::vector<MX>::const_iterator& it) const;
+    virtual SX join_primitives(std::vector<SX>::const_iterator& it) const;
+    virtual DM join_primitives(std::vector<DM>::const_iterator& it) const;
+    /// @}
 
     /** \brief Detect duplicate symbolic expressions
 

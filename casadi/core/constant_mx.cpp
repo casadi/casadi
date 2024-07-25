@@ -56,9 +56,31 @@ namespace casadi {
     }
   }
 
-  void ConstantMX::split_primitives(const MX& x, std::vector<MX>::iterator& it) const {
+  template<typename T>
+  void ConstantMX::split_primitives_gen(const T& x, typename std::vector<T>::iterator& it) const {
     if (nnz()!=0) {
       MXNode::split_primitives(x, it);
+    }
+  }
+
+  void ConstantMX::split_primitives(const MX& x, std::vector<MX>::iterator& it) const {
+    split_primitives_gen<MX>(x, it);
+  }
+
+  void ConstantMX::split_primitives(const SX& x, std::vector<SX>::iterator& it) const {
+    split_primitives_gen<SX>(x, it);
+  }
+
+  void ConstantMX::split_primitives(const DM& x, std::vector<DM>::iterator& it) const {
+    split_primitives_gen<DM>(x, it);
+  }
+
+  template<typename T>
+  T ConstantMX::join_primitives_gen(typename std::vector<T>::const_iterator& it) const {
+    if (nnz()==0) {
+      return T(sparsity());
+    } else {
+      return MXNode::join_primitives(it);
     }
   }
 
@@ -68,6 +90,14 @@ namespace casadi {
     } else {
       return MXNode::join_primitives(it);
     }
+  }
+
+  SX ConstantMX::join_primitives(std::vector<SX>::const_iterator& it) const {
+    return join_primitives_gen<SX>(it);
+  }
+
+  DM ConstantMX::join_primitives(std::vector<DM>::const_iterator& it) const {
+    return join_primitives_gen<DM>(it);
   }
 
   void ConstantMX::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {

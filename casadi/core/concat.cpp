@@ -308,50 +308,128 @@ namespace casadi {
     return nprim;
   }
 
-  void Horzcat::split_primitives(const MX& x, std::vector<MX>::iterator& it) const {
-    std::vector<MX> s = horzsplit(x, off());
+  template<typename T>
+  void Horzcat::split_primitives_gen(const T& x, typename std::vector<T>::iterator& it) const {
+    std::vector<T> s = horzsplit(x, off());
     for (casadi_int i=0; i<s.size(); ++i) {
       dep(i)->split_primitives(s[i], it);
     }
   }
 
-  MX Horzcat::join_primitives(std::vector<MX>::const_iterator& it) const {
-    std::vector<MX> s(n_dep());
+  void Horzcat::split_primitives(const MX& x, std::vector<MX>::iterator& it) const {
+    split_primitives_gen<MX>(x, it);
+  }
+
+  void Horzcat::split_primitives(const SX& x, std::vector<SX>::iterator& it) const {
+    split_primitives_gen<SX>(x, it);
+  }
+
+  void Horzcat::split_primitives(const DM& x, std::vector<DM>::iterator& it) const {
+    split_primitives_gen<DM>(x, it);
+  }
+
+  template<typename T>
+  T Horzcat::join_primitives_gen(typename std::vector<T>::const_iterator& it) const {
+    std::vector<T> s(n_dep());
     for (casadi_int i=0; i<s.size(); ++i) {
       s[i] = dep(i)->join_primitives(it);
     }
     return horzcat(s);
   }
 
-  void Vertcat::split_primitives(const MX& x, std::vector<MX>::iterator& it) const {
-    std::vector<MX> s = vertsplit(x, off());
+  MX Horzcat::join_primitives(std::vector<MX>::const_iterator& it) const {
+    return join_primitives_gen<MX>(it);
+  }
+
+  SX Horzcat::join_primitives(std::vector<SX>::const_iterator& it) const {
+    return join_primitives_gen<SX>(it);
+  }
+
+  DM Horzcat::join_primitives(std::vector<DM>::const_iterator& it) const {
+    return join_primitives_gen<DM>(it);
+  }
+
+  template<typename T>
+  void Vertcat::split_primitives_gen(const T& x, typename std::vector<T>::iterator& it) const {
+    std::vector<T> s = vertsplit(x, off());
     for (casadi_int i=0; i<s.size(); ++i) {
       dep(i)->split_primitives(s[i], it);
     }
   }
 
-  MX Vertcat::join_primitives(std::vector<MX>::const_iterator& it) const {
-    std::vector<MX> s(n_dep());
+  template<typename T>
+  T Vertcat::join_primitives_gen(typename std::vector<T>::const_iterator& it) const {
+    std::vector<T> s(n_dep());
     for (casadi_int i=0; i<s.size(); ++i) {
       s[i] = dep(i)->join_primitives(it);
     }
     return vertcat(s);
   }
 
-  void Diagcat::split_primitives(const MX& x, std::vector<MX>::iterator& it) const {
+  void Vertcat::split_primitives(const MX& x, std::vector<MX>::iterator& it) const {
+    split_primitives_gen<MX>(x, it);
+  }
+
+  void Vertcat::split_primitives(const SX& x, std::vector<SX>::iterator& it) const {
+    split_primitives_gen<SX>(x, it);
+  }
+
+  void Vertcat::split_primitives(const DM& x, std::vector<DM>::iterator& it) const {
+    split_primitives_gen<DM>(x, it);
+  }
+
+  MX Vertcat::join_primitives(std::vector<MX>::const_iterator& it) const {
+    return join_primitives_gen<MX>(it);
+  }
+
+  SX Vertcat::join_primitives(std::vector<SX>::const_iterator& it) const {
+    return join_primitives_gen<SX>(it);
+  }
+
+  DM Vertcat::join_primitives(std::vector<DM>::const_iterator& it) const {
+    return join_primitives_gen<DM>(it);
+  }
+
+  template<typename T>
+  void Diagcat::split_primitives_gen(const T& x, typename std::vector<T>::iterator& it) const {
     std::pair<std::vector<casadi_int>, std::vector<casadi_int> > off = this->off();
-    std::vector<MX> s = diagsplit(x, off.first, off.second);
+    std::vector<T> s = diagsplit(x, off.first, off.second);
     for (casadi_int i=0; i<s.size(); ++i) {
       dep(i)->split_primitives(s[i], it);
     }
   }
 
-  MX Diagcat::join_primitives(std::vector<MX>::const_iterator& it) const {
-    std::vector<MX> s(n_dep());
+  template<typename T>
+  T Diagcat::join_primitives_gen(typename std::vector<T>::const_iterator& it) const {
+    std::vector<T> s(n_dep());
     for (casadi_int i=0; i<s.size(); ++i) {
       s[i] = dep(i)->join_primitives(it);
     }
     return diagcat(s);
+  }
+
+  void Diagcat::split_primitives(const MX& x, std::vector<MX>::iterator& it) const {
+    split_primitives_gen<MX>(x, it);
+  }
+
+  void Diagcat::split_primitives(const SX& x, std::vector<SX>::iterator& it) const {
+    split_primitives_gen<SX>(x, it);
+  }
+
+  void Diagcat::split_primitives(const DM& x, std::vector<DM>::iterator& it) const {
+    split_primitives_gen<DM>(x, it);
+  }
+
+  MX Diagcat::join_primitives(std::vector<MX>::const_iterator& it) const {
+    return join_primitives_gen<MX>(it);
+  }
+
+  SX Diagcat::join_primitives(std::vector<SX>::const_iterator& it) const {
+    return join_primitives_gen<SX>(it);
+  }
+
+  DM Diagcat::join_primitives(std::vector<DM>::const_iterator& it) const {
+    return join_primitives_gen<DM>(it);
   }
 
   bool Concat::has_duplicates() const {
