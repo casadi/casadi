@@ -1212,6 +1212,13 @@ namespace casadi {
     hash_combine(seed, get_ptr(v), v.size());
   }
 
+  template<>
+  inline size_t hash_value(std::string v) {
+    size_t seed = 0;
+    hash_combine(seed, v.c_str(), v.size());
+    return seed;
+  }
+
   /** \brief Hash a sparsity pattern
 
       \identifier{ds} */

@@ -865,6 +865,14 @@ namespace casadi {
       s << std::endl;
     }
 
+    // Print string constants
+    if (!string_constants_.empty()) {
+      for (casadi_int i=0; i<string_constants_.size(); ++i) {
+        print_vector(s, "casadi_a" + str(i), string_constants_[i]);
+      }
+      s << std::endl;
+    }
+
     // Print file scope double work
     if (!file_scope_double_.empty()) {
       casadi_int i=0;
@@ -944,6 +952,11 @@ namespace casadi {
   void CodeGenerator::print_vector(std::ostream &s, const std::string& name,
                                   const std::vector<double>& v) {
     s << array("static const casadi_real", name, v.size(), initializer(v));
+  }
+
+  void CodeGenerator::print_vector(std::ostream &s, const std::string& name,
+                                  const std::vector<std::string>& v) {
+    s << array("static const char*", name, v.size(), initializer(v));
   }
 
   std::string CodeGenerator::print_op(casadi_int op, const std::string& a0) {
@@ -1099,6 +1112,12 @@ namespace casadi {
     return seed;
   }
 
+  size_t CodeGenerator::hash(const std::vector<std::string>& v) {
+    size_t seed=0;
+    hash_combine(seed, v);
+    return seed;
+  }
+
   casadi_int CodeGenerator::get_constant(const std::vector<double>& v, bool allow_adding) {
     // Hash the vector
     size_t h = hash(v);
@@ -1167,12 +1186,39 @@ namespace casadi {
     }
   }
 
+  casadi_int CodeGenerator::get_constant(const std::vector<std::string>& v, bool allow_adding) {
+    // Hash the vector
+    size_t h = hash(v);
+
+    // Try to locate it in already added constants
+    std::pair<std::multimap<size_t, size_t>::iterator, std::multimap<size_t, size_t>::iterator> eq =
+      added_string_constants_.equal_range(h);
+    for (std::multimap<size_t, size_t>::iterator i=eq.first; i!=eq.second; ++i) {
+      if (equal(v, string_constants_[i->second])) return i->second;
+    }
+
+    if (allow_adding) {
+      // Add to constants
+      casadi_int ind = string_constants_.size();
+      string_constants_.push_back(v);
+      added_string_constants_.insert(std::pair<size_t, size_t>(h, ind));
+      return ind;
+    } else {
+      casadi_error("Constant not found");
+      return -1;
+    }
+  }
+
   std::string CodeGenerator::constant(const std::vector<casadi_int>& v) {
     return shorthand("s" + str(get_constant(v, true)));
   }
 
   std::string CodeGenerator::constant(const std::vector<char>& v) {
     return shorthand("b" + str(get_constant(v, true)));
+  }
+
+  std::string CodeGenerator::constant(const std::vector<std::string>& v) {
+    return shorthand("a" + str(get_constant(v, true)));
   }
 
   void CodeGenerator::constant_copy(
@@ -1767,6 +1813,17 @@ namespace casadi {
     for (casadi_int i=0; i<v.size(); ++i) {
       if (i!=0) s << ", ";
       s << size_t(v[i]);
+    }
+    s << "}";
+    return s.str();
+  }
+
+  std::string CodeGenerator::initializer(const std::vector<std::string>& v) {
+    std::stringstream s;
+    s << "{";
+    for (casadi_int i=0; i<v.size(); ++i) {
+      if (i!=0) s << ", ";
+      s << "\"" << v[i] << "\"";
     }
     s << "}";
     return s.str();
