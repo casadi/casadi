@@ -144,6 +144,10 @@ private:
   template<typename T>
   std::vector<T> vector_slice(const std::vector<T> &v, const std::vector<casadi_int> &i);
 
+  /**  \brief Return all but the first element of a vector */
+  template<typename T>
+  std::vector<T> vector_tail(const std::vector<T> &v);
+
   /** \brief Reverse a list
 
       \identifier{1la} */
@@ -523,6 +527,13 @@ namespace casadi {
          "You have " + str(j) + " at location " + str(k) + ".");
        ret.push_back(v[j]);
     }
+    return ret;
+  }
+
+  template<typename T>
+  std::vector<T> vector_tail(const std::vector<T> &v) {
+    std::vector<T> ret;
+    ret.insert(ret.begin(), v.begin()+1, v.end());
     return ret;
   }
 
