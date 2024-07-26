@@ -621,6 +621,70 @@ class casadiTestCase(unittest.TestCase):
   def check_sparsity(self, a,b):
     self.assertTrue(a==b, msg=str(a) + " <-> " + str(b))
 
+  def compile_external(self,name,source,opts=None,std="c89",extralibs="",check_serialize=False,extra_options=None,main=False,definitions=None,extra_include=[],debug_mode=False):
+    import subprocess
+    if args.run_slow:
+      libdir = GlobalOptions.getCasadiPath()
+      includedir = GlobalOptions.getCasadiIncludePath()
+      includedirs = [includedir,os.path.join(includedir,"highs")]
+      for e in extra_include:
+        includedirs.append(os.path.join(includedir,e))
+
+      if isinstance(extralibs,list):
+        extralibs_clean = []
+        for lib in extralibs:
+            if os.name=='nt':
+                if "." in lib:
+                    if lib.endswith(".dll"):
+                        extralibs_clean.append(lib[:-4]+".lib")
+                    else:
+                        extralibs_clean.append(lib)
+                else:
+                    extralibs_clean.append(lib+".lib")
+            else:
+                if "." in lib:
+                    extralibs_clean.append(lib)
+                else:
+                    extralibs_clean.append("-l"+lib)
+        extralibs = " " + " ".join(extralibs_clean)
+
+      if isinstance(extra_options,bool) or extra_options is None:
+        extra_options = ""
+      if isinstance(extra_options,list):
+        extra_options = " " + " ".join(extra_options)
+      if definitions is None:
+        definitions = []
+
+      def get_commands(shared=True):
+        if os.name=='nt':
+          defs = " ".join(["/D"+d for d in definitions])
+          commands = "cl.exe {shared} {definitions} {includedir} {source} {extra} /link  /libpath:{libdir}".format(shared="/LD" if shared else "",std=std,source=source,libdir=libdir,includedir=" ".join(["/I" + e for e in includedirs]),extra=extralibs + extra_options + extralibs + extra_options,definitions=defs)
+          if shared:
+            output = "./" + name + ".dll"
+          else:
+            output = name + ".exe"
+          return [commands, output]
+        else:
+          defs = " ".join(["-D"+d for d in definitions])
+          output = "./" + name + (".so" if shared else "")
+          flags = "-O3"
+          if debug_mode:
+            flags = "-O0 -g"
+          commands = "gcc -pedantic -std={std} -fPIC {shared} -Wall -Werror -Wextra {includedir} -Wno-unknown-pragmas -Wno-long-long -Wno-unused-parameter {flags} {definitions} {source} -o {name_out} -L{libdir} -Wl,-rpath,{libdir} -Wl,-rpath,.".format(shared="-shared" if shared else "",std=std,source=source,name_out=name+(".so" if shared else ""),flags=flags,libdir=libdir,includedir=" ".join(["-I" + e for e in includedirs]),definitions=defs) + (" -lm" if not shared else "") + extralibs + extra_options
+          if sys.platform=="darwin":
+            commands+= " -Xlinker -rpath -Xlinker {libdir}".format(libdir=libdir)
+            commands+= " -Xlinker -rpath -Xlinker .".format(libdir=libdir)
+          return [commands, output]
+
+      [commands, libname] = get_commands(shared=True)
+
+      print("compile library",commands)
+      p = subprocess.Popen(commands,shell=True).wait()
+      if sys.platform=="darwin":
+        subprocess.run(["otool","-l",libname])
+      if opts is None: opts = {}
+      return (external(name, libname,opts),libname)
+
   def check_codegen(self,F,inputs=None, opts=None,std="c89",extralibs="",check_serialize=False,extra_options=None,main=False,definitions=None,with_jac_sparsity=False,external_opts=None,with_reverse=False,with_forward=False,extra_include=[]):
 
     if args.run_slow:

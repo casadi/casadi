@@ -41,7 +41,10 @@ namespace casadi {
 
 Function external(const std::string& name, const Importer& li,
                   const Dict& opts) {
-  return Function::create(new GenericExternal(name, li), opts);
+  std::vector<std::string> config_args;
+  Dict opts_filtered = extract_from_dict(opts, "config_args", config_args);
+  config_args.insert(config_args.begin(), li.library());
+  return Function::create(new GenericExternal(name, li, config_args), opts_filtered);
 }
 
 Function external(const std::string& name, const Dict& opts) {
@@ -53,20 +56,23 @@ Function external(const std::string& name, const std::string& bin_name,
   return external(name, Importer(bin_name, "dll"), opts);
 }
 
-External::External(const std::string& name, const Importer& li)
-  : FunctionInternal(name), li_(li) {
+External::External(const std::string& name, const Importer& li,
+                    const std::vector<std::string> config_args)
+  : FunctionInternal(name), li_(li), config_args_(config_args) {
 
   External::init_external();
 }
 
 bool External::any_symbol_found() const {
-  return incref_ || decref_ || get_default_in_ ||
+  return config_ || incref_ || decref_ || get_default_in_ ||
     get_n_in_ || get_n_out_ || get_name_in_ ||
     get_name_out_ || work_;
 }
 
 void External::init_external() {
   // Increasing/decreasing reference counter
+  config_ = (config_t)li_.get_function(name_ + "_config");
+
   incref_ = (signal_t)li_.get_function(name_ + "_incref");
   decref_ = (signal_t)li_.get_function(name_ + "_decref");
 
@@ -87,12 +93,22 @@ void External::init_external() {
   // Work vector sizes
   work_ = (work_t)li_.get_function(name_ + "_work");
 
+  if (config_) {
+    args_.resize(config_args_.size());
+    for (int i=0;i<config_args_.size();++i) {
+      args_[i] = config_args_.at(i).c_str();
+    }
+    int flag = config_(args_.size(), get_ptr(args_));
+    casadi_assert(flag==0, "config failed.");
+  }
+
   // Increase reference counter - external function memory initialized at this point
   if (incref_) incref_();
 }
 
-GenericExternal::GenericExternal(const std::string& name, const Importer& li)
-  : External(name, li) {
+GenericExternal::GenericExternal(const std::string& name, const Importer& li,
+  const std::vector<std::string> arguments)
+  : External(name, li, arguments) {
 
   GenericExternal::init_external();
 }
@@ -281,6 +297,11 @@ void External::init(const Dict& opts) {
                         "External functions must provide functions for both increasing "
                         "and decreasing the reference count, or neither.");
 
+  if (li_.has_function(name_ + "_config")) {
+    casadi_assert(has_refcount_,
+      "External functions that feature a config functions must also implement incref.");
+  }
+
   // Allocate work vectors
   casadi_int sz_arg=0, sz_res=0, sz_iw=0, sz_w=0;
   if (work_) {
@@ -314,6 +335,7 @@ void External::codegen_declarations(CodeGenerator& g) const {
     if (release_) g.add_external("void " + name_ + "_release(int mem);");
     if (incref_) g.add_external("void " + name_ + "_incref(void);");
     if (decref_) g.add_external("void " + name_ + "_decref(void);");
+    if (config_) g.add_external("int " + name_ + "_config(int argc, const char**);");
   }
 }
 
@@ -347,6 +369,10 @@ void External::codegen_release(CodeGenerator& g) const {
 
 void External::codegen_incref(CodeGenerator& g) const {
   if (incref_) {
+    if (config_) {
+      g << name_ << "_config(" << config_args_.size() << ", "
+        << g.constant(config_args_) << ");\n";
+    }
     g << name_ << "_incref();\n";
   }
 }
@@ -474,11 +500,13 @@ Function External::factory(const std::string& name,
 void External::serialize_body(SerializingStream &s) const {
   FunctionInternal::serialize_body(s);
 
-  s.version("External", 1);
+  s.version("External", 2);
   s.pack("External::int_data", int_data_);
   s.pack("External::real_data", real_data_);
   s.pack("External::string_data", string_data_);
   s.pack("External::li", li_);
+  std::vector<std::string> config_args = vector_tail(config_args_);
+  s.pack("External::config_args", config_args);
 }
 
 ProtoFunction* External::deserialize(DeserializingStream& s) {
@@ -499,11 +527,15 @@ void GenericExternal::serialize_type(SerializingStream &s) const {
 }
 
 External::External(DeserializingStream & s) : FunctionInternal(s) {
-  s.version("External", 1);
+  int version = s.version("External", 1, 2);
   s.unpack("External::int_data", int_data_);
   s.unpack("External::real_data", real_data_);
   s.unpack("External::string_data", string_data_);
   s.unpack("External::li", li_);
+  if (version>=2) {
+    s.unpack("External::config_args", config_args_);
+    config_args_.insert(config_args_.begin(), li_.library());
+  }
 
   External::init_external();
 }
