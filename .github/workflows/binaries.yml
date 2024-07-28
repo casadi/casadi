@@ -163,7 +163,7 @@ jobs:
       - uses: casadi/action-setup-compiler@master
         with:
           cache-suffix: ''
-          target: ${{matrix.image == 'macos-m1' && 'arm64' || 'x86_64'}}
+          target: ${{(matrix.image == 'macos-m1' || matrix.image == 'macos-m14') && 'arm64' || 'x86_64'}}
       - run: brew install pkg-config
       - uses: actions/checkout@v4.1.1
         with:
@@ -298,7 +298,7 @@ jobs:
       - uses: casadi/action-setup-compiler@master
         with:
           cache-suffix: ${{matrix.py2}}
-          target: ${{matrix.image == 'macos-m1' && 'arm64' || 'x86_64'}}
+          target: ${{(matrix.image == 'macos-m1' || matrix.image == 'macos-m14') && 'arm64' || 'x86_64'}}
       - id: get-id
         uses: actions/github-script@v6.3.3
         env:
@@ -451,7 +451,7 @@ jobs:
       - uses: casadi/action-setup-compiler@master
         with:
           cache-suffix: ''
-          target: ${{matrix.image == 'macos-m1' && 'arm64' || 'x86_64'}}
+          target: ${{(matrix.image == 'macos-m1' || matrix.image == 'macos-m14') && 'arm64' || 'x86_64'}}
       - uses: actions/download-artifact@v4.1.4
         with:
           name: casadi_source_wrapper
