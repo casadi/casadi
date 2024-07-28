@@ -35,6 +35,7 @@ extern "C" {
   #define CASADI_PREFIX(ID) f_ ## ID
 #endif
 
+
 #include <math.h>
 #include <engine.h>
 #include <stdio.h>
@@ -81,7 +82,7 @@ struct matlab_external_local {
   mxArray** arg;
   mxArray** res;
 
-  mxArray* args; // cell
+  mxArray* args; /* cell */
 };
 
 struct matlab_external_global {
@@ -158,8 +159,9 @@ void casadi_copy(const double* x, casadi_int n, double* y) {
 CASADI_SYMBOL_EXPORT int F(const casadi_real** arg, casadi_real** res, casadi_int* iw, casadi_real* w, int mem){
   struct matlab_external_global* g = &matlab_external_global_data;
   struct matlab_external_local* m = &casadi_F_mem[mem];
+  int i;
 
-  for (int i=0;i<g->n_in;++i) {
+  for (i=0;i<g->n_in;++i) {
     casadi_copy(arg[i], g->in[i].nnz, (double*) mxGetData(m->arg[i]));
   }
 
@@ -169,7 +171,7 @@ CASADI_SYMBOL_EXPORT int F(const casadi_real** arg, casadi_real** res, casadi_in
   mxArray* ret = engGetVariable(g->ep, "ret");
   if (!ret) return 1;
 
-  for (int i=0;i<g->n_out;++i) {
+  for (i=0;i<g->n_out;++i) {
     mxArray* mm = mxGetCell(ret, i);
     if (mxGetClassID(mm)!=mxDOUBLE_CLASS) return 1;
     casadi_copy((double*) mxGetData(mm), g->out[i].nnz, res[i]);
@@ -187,12 +189,13 @@ CASADI_SYMBOL_EXPORT int F_alloc_mem(void) {
 CASADI_SYMBOL_EXPORT int F_init_mem(int mem) {
   struct matlab_external_global* g = &matlab_external_global_data;
   struct matlab_external_local* m = &casadi_F_mem[mem];
+  int i;
   m->arg = (mxArray**) malloc(g->n_in*sizeof(mxArray*));
   m->args = mxCreateCellMatrix(1, g->n_in);
 
-  for (int i=0;i<g->n_in;++i) {
+  for (i=0;i<g->n_in;++i) {
     m->arg[i] = mxCreateDoubleMatrix(g->in[i].nrow, g->in[i].ncol, mxREAL);
-    // Cell takes ownership
+    /* Cell takes ownership */
     mxSetCell(m->args, i, m->arg[i]);
   }
 
@@ -247,10 +250,10 @@ mxArray* engCall_var(Engine *e, const char* cmd, ...) {
 
   va_list args;
 
-  // Start variadic argument processing
+  /* Start variadic argument processing */
   va_start(args, cmd);
   snprintf(ct+5, sizeof(ct)-5, cmd, args);
-  // End variadic argument processing
+  /* End variadic argument processing */
   va_end(args);
 
   if (engEvalString(e, ct)) return 0;
@@ -281,6 +284,7 @@ int engCallTo_char(Engine *e, char** ret, const char* cmd, int i) {
 
 
 int engCallTo_casadi_io(Engine *e, casadi_io* ret, const char* cmd, int i) {
+  int k;
   mxArray* temp = engCall_d(e, cmd, i);
   if (!temp) return 1;
   if (mxGetClassID(temp)!=mxINT64_CLASS) {
@@ -307,11 +311,11 @@ int engCallTo_casadi_io(Engine *e, casadi_io* ret, const char* cmd, int i) {
     ret->compressed = malloc(sizeof(casadi_int)*3);
     ret->compressed[0] = sp[0];
     ret->compressed[1] = sp[1];
-    ret->compressed[2] = 1; // Dense indicator
+    ret->compressed[2] = 1; /* Dense indicator */
   } else {
     ret->nnz = sp[2+ret->ncol];
     ret->compressed = malloc(sizeof(casadi_int)*(2+ret->ncol+1+ret->nnz));
-    for (int i=0;i<2+ret->ncol+1+ret->nnz;++i) ret->compressed[i] = sp[i];
+    for (k=0;k<2+ret->ncol+1+ret->nnz;++k) ret->compressed[k] = sp[k];
   }
 
   mxDestroyArray(temp);
@@ -322,16 +326,16 @@ CASADI_SYMBOL_EXPORT int F_config(int argc_, const char** argv_) {
   matlab_external_argc = argc_;
   matlab_external_argv = argv_;
   printf("config %s\n", argv_[0]);
-  if (matlab_external_argc>=3) return 0; // success
+  if (matlab_external_argc>=3) return 0; /* success */
   return 1;
 }
  
 CASADI_SYMBOL_EXPORT void F_incref(void) {
   struct matlab_external_global* g = &matlab_external_global_data;
   if (matlab_external_global_counter==0) {
-
+    int i;
     int len = 10;
-    for (int i = 2; i < matlab_external_argc; i++) {
+    for (i = 2; i < matlab_external_argc; i++) {
       len += strlen(matlab_external_argv[i])+3;
     }
     char ct[strlen(matlab_external_argv[1])+12];
@@ -342,8 +346,8 @@ CASADI_SYMBOL_EXPORT void F_incref(void) {
     snprintf(ct, sizeof(ct), "addpath('%s')", matlab_external_argv[1]);
     snprintf(ct2, sizeof(ct2), "cb = %s(", matlab_external_argv[2]);
 
-    // Append additional arguments to the function call
-    for (int i = 3; i < matlab_external_argc; i++) {
+    /* Append additional arguments to the function call */
+    for (i = 3; i < matlab_external_argc; i++) {
         strncat(ct2, "'", sizeof(ct2) - strlen(ct2) - 1);
         strncat(ct2, matlab_external_argv[i], sizeof(ct2) - strlen(ct2) - 1);
         strncat(ct2, "'", sizeof(ct2) - strlen(ct2) - 1);
@@ -369,12 +373,12 @@ CASADI_SYMBOL_EXPORT void F_incref(void) {
     g->in = (casadi_io*) malloc(g->n_in*sizeof(casadi_io));
     g->out = (casadi_io*) malloc(g->n_out*sizeof(casadi_io));
 
-    for (int i=0;i<g->n_in;++i) {
+    for (i=0;i<g->n_in;++i) {
       g->in[i].name = 0;
       engCallTo_casadi_io(g->ep, g->in+i, "cb.get_sparsity_in(%d)", i);
       engCallTo_char(g->ep, &g->in[i].name, "cb.get_name_in(%d)", i);
     }
-    for (int i=0;i<g->n_out;++i) {
+    for (i=0;i<g->n_out;++i) {
       g->out[i].name = 0;
       engCallTo_casadi_io(g->ep, g->out+i, "cb.get_sparsity_out(%d)", i);
       engCallTo_char(g->ep, &g->out[i].name, "cb.get_name_out(%d)", i);
@@ -389,11 +393,11 @@ CASADI_SYMBOL_EXPORT void F_decref(void) {
   matlab_external_global_counter--;
   if (matlab_external_global_counter==0) {
     engClose(g->ep);
-    for (int i=0;i<g->n_in;++i) {
+    for (i=0;i<g->n_in;++i) {
       free(g->in[i].compressed);
       free(g->in[i].name);
     }
-    for (int i=0;i<g->n_out;++i) {
+    for (i=0;i<g->n_out;++i) {
       free(g->out[i].compressed);
       free(g->out[i].name);
     }

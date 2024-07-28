@@ -7,6 +7,8 @@ add_library(matlab_ipc SHARED
   matlab_ipc_external.c
 )
 
+target_compile_features(matlab_ipc PUBLIC c_std_99)
+
 target_link_libraries(matlab_ipc matlab::matlab)
 
 install(TARGETS matlab_ipc DESTINATION ${LIB_PREFIX})
