@@ -111,7 +111,7 @@ jobs:
     strategy:
      fail-fast: false
      matrix:
-       image: ["windows-2022","ubuntu-20.04","macos-11","macos-m1"]
+       image: ["windows-2022","ubuntu-20.04","macos-12","macos-m1"]
     steps:
       - uses: actions/checkout@v4.1.1
       - run: python --version
@@ -142,7 +142,7 @@ jobs:
         with:
           config: |
             matrix:
-              image: [macos-11]
+              image: [macos-12]
             operations:
               - type: append
                 if: ${{ vars.BLESSED_REPO == 'yes' }}
@@ -182,7 +182,7 @@ jobs:
       - name: Build
         run: |
           rm -f build/CMakeCache.txt
-          CC=${{ env.CC }} FC=${{ env.FC }} CXX=${{ env.CXX }} cmake -DCMAKE_OSX_SYSROOT=${{env.CONDA_BUILD_SYSROOT}} -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} ${{env.build_flags_mac}} ${{ contains(matrix.image,'m1') && env.build_flags_mac_m1 || ''}} ${{ contains(matrix.image,'macos-11') && env.build_flags_mac_intel || ''}} -DCMAKE_PREFIX_PATH=${{ github.workspace }}/mockups/cmake -H.
+          CC=${{ env.CC }} FC=${{ env.FC }} CXX=${{ env.CXX }} cmake -DCMAKE_OSX_SYSROOT=${{env.CONDA_BUILD_SYSROOT}} -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} ${{env.build_flags_mac}} ${{ contains(matrix.image,'m1') && env.build_flags_mac_m1 || ''}} ${{ contains(matrix.image,'macos-12') && env.build_flags_mac_intel || ''}} -DCMAKE_PREFIX_PATH=${{ github.workspace }}/mockups/cmake -H.
           CC=${{ env.CC }} FC=${{ env.FC }} CXX=${{ env.CXX }} cmake --build build -v
       - name: Debug
         if: failure()
@@ -272,7 +272,7 @@ jobs:
         with:
           config: |
             matrix:
-              image: [macos-11]
+              image: [macos-12]
               py2: ["27","35","36","37","38","39","310","311","312"]
             operations:
               - type: append
@@ -413,13 +413,13 @@ jobs:
         with:
           config: |
             matrix:
-              image: [macos-11]
+              image: [macos-12]
               host: ["matlab"]
               version: ["2018b"]
             operations:
               - type: append
                 matrix:
-                  image: [macos-11]
+                  image: [macos-12]
                   host: ["octave"]
                   version: ["7.3.0"]
               - type: append
@@ -476,7 +476,7 @@ jobs:
           key: "${{matrix.image}}"
           map: |
            {
-              "macos-11": {"os": "osx", "bitness": "64"},
+              "macos-12": {"os": "osx", "bitness": "64"},
               "macos-m1": {"os": "osx_arm", "bitness": "64"}
            }
           export_to: env
@@ -748,7 +748,7 @@ jobs:
      fail-fast: false
      matrix:
        matlab: ["2018b"]
-       image: ["windows-2022","ubuntu-20.04","macos-11"]
+       image: ["windows-2022","ubuntu-20.04","macos-12"]
        bit: [64]
        exclude:
         # No Windows 32bit builds currently
@@ -766,7 +766,7 @@ jobs:
            {
               "windows-2022": {"os": "windows"},
               "ubuntu-20.04": {"os": "linux"},
-              "macos-11": {"os": "osx"}
+              "macos-12": {"os": "osx"}
            }
           export_to: env
       - uses: actions/download-artifact@v4.1.4
@@ -932,7 +932,7 @@ jobs:
      fail-fast: false
      matrix:
        py2: ["27","35","36","37","38","39","310","311","312"]
-       image: ["windows-2022","ubuntu-20.04","macos-11"]
+       image: ["windows-2022","ubuntu-20.04","macos-12"]
        bit: [64]
        exclude:
         # No Windows 32bit builds currently
@@ -958,7 +958,7 @@ jobs:
            {
               "windows-2022": {"os": "windows"},
               "ubuntu-20.04": {"os": "linux"},
-              "macos-11": {"os": "osx"},
+              "macos-12": {"os": "osx"},
               "macos-m1": {"os": "osx_arm"}
            }
           export_to: env
@@ -1014,7 +1014,7 @@ jobs:
      fail-fast: false
      matrix:
        py2: ["310"]
-       image: ["windows-2022","ubuntu-20.04","macos-11"]
+       image: ["windows-2022","ubuntu-20.04","macos-12"]
        bit: [64]
     steps:
       - uses: actions/checkout@v4.1.1
@@ -1028,7 +1028,7 @@ jobs:
            {
               "windows-2022": {"os": "windows","platform":"win_amd64"},
               "ubuntu-20.04": {"os": "linux","platform":"manylinux2014_x86_64"},
-              "macos-11": {"os": "osx","platform":"macosx_10_13_x86_64.macosx_10_13_intel"},
+              "macos-12": {"os": "osx","platform":"macosx_10_13_x86_64.macosx_10_13_intel"},
               "macos-m1": {"os": "osx_arm","platform":"macosx_11_0_arm64"}
            }
           export_to: env
