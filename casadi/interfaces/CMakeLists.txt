@@ -126,6 +126,10 @@ if(WITH_ALPAQA)
   add_subdirectory(alpaqa)
 endif()
 
+if(WITH_PIQP)
+  add_subdirectory(piqp)
+endif()
+
 if(WITH_LINT)
   set(LINT_TARGETS ${LINT_TARGETS} PARENT_SCOPE)
 endif()
