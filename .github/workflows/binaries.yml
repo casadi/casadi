@@ -106,12 +106,12 @@ jobs:
         path: casadi_source.zip
 
   test-python-source-package:
-    runs-on: ${{matrix.image == 'macos-m1' && 'self-hosted' || matrix.image }}
+    runs-on: ${{ matrix.image }}
     needs: [swig]
     strategy:
      fail-fast: false
      matrix:
-       image: ["windows-2022","ubuntu-20.04","macos-12","macos-m1"]
+       image: ["windows-2022","ubuntu-20.04","macos-12","macos-14"]
     steps:
       - uses: actions/checkout@v4.1.1
       - run: python --version
@@ -142,28 +142,23 @@ jobs:
         with:
           config: |
             matrix:
-              image: [macos-12]
-            operations:
-              - type: append
-                if: ${{ vars.BLESSED_REPO == 'yes' }}
-                matrix:
-                  image: [macos-m1]
+              image: [macos-12,macos-14]
       - run: echo ${{ steps.build-matrix.outputs.matrix }}
     outputs:
       matrix: ${{ steps.build-matrix.outputs.matrix }}
 
   core-osx:
-    needs: [matrix-arch-mac]
-    runs-on: ${{matrix.image == 'macos-m1' && 'self-hosted' || matrix.image }}
+    runs-on: ${{ matrix.image }}
     strategy:
       fail-fast: false
-      matrix: ${{ fromJson(needs.matrix-arch-mac.outputs.matrix) }}
+      matrix:
+        image: [macos-12,macos-14]
     steps:
       - run: echo "${{ vars.BLESSED_REPO }} ${{ vars.BLESSED_REPO }}"
       - uses: casadi/action-setup-compiler@master
         with:
           cache-suffix: ''
-          target: ${{matrix.image == 'macos-m1' && 'arm64' || 'x86_64'}}
+          target: ${{matrix.image == 'macos-14' && 'arm64' || 'x86_64'}}
       - run: brew install pkg-config
       - uses: actions/checkout@v4.1.1
         with:
@@ -276,9 +271,8 @@ jobs:
               py2: ["27","35","36","37","38","39","310","311","312"]
             operations:
               - type: append
-                if: ${{ vars.BLESSED_REPO == 'yes' }}
                 matrix:
-                  image: [macos-m1]
+                  image: [macos-14]
                   py2: ["38","39","310","311","312"]
 
     outputs:
@@ -286,19 +280,19 @@ jobs:
            
   python-osx:
     needs: [core-osx,matrix-arch-py2-mac,swig,version]
-    runs-on: ${{matrix.image == 'macos-m1' && 'self-hosted' || matrix.image }}
+    runs-on: ${{ matrix.image }}
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.matrix-arch-py2-mac.outputs.matrix) }}
     env:
       DEVELOPMENT_CERTIFICATE_DATA_AVAILABLE: ${{ secrets.DEVELOPMENT_CERTIFICATE_DATA != '' }}
-      deploy_arch: ${{matrix.image == 'macos-m1' && 'osx_arm64' || 'osx64'}}
+      deploy_arch: ${{matrix.image == 'macos-14' && 'osx_arm64' || 'osx64'}}
     steps:
     
       - uses: casadi/action-setup-compiler@master
         with:
           cache-suffix: ${{matrix.py2}}
-          target: ${{matrix.image == 'macos-m1' && 'arm64' || 'x86_64'}}
+          target: ${{matrix.image == 'macos-14' && 'arm64' || 'x86_64'}}
       - id: get-id
         uses: actions/github-script@v6.3.3
         env:
@@ -377,7 +371,7 @@ jobs:
         if: github.event_name != 'pull_request'
 
       - run: |
-          wheel=$(python misc/create_wheel_local.py ${{ needs.version.outputs.wheel }} ${{matrix.py2}} osx 64 ${{matrix.image == 'macos-m1' && 'osx-m1' || 'osx'}} install/)
+          wheel=$(python misc/create_wheel_local.py ${{ needs.version.outputs.wheel }} ${{matrix.py2}} osx 64 ${{matrix.image == 'macos-14' && 'osx-m1' || 'osx'}} install/)
           echo "<$wheel>"
           echo "wheel=$wheel" >> $GITHUB_OUTPUT
           wheel_wildcard=$(echo $wheel | sed -e 's/casadi-[^-]*-/casadi-\*-/')
@@ -423,15 +417,13 @@ jobs:
                   host: ["octave"]
                   version: ["7.3.0"]
               - type: append
-                if: ${{ vars.BLESSED_REPO == 'yes' }}
                 matrix:
-                  image: [macos-m1]
+                  image: [macos-14]
                   host: ["matlab"]
                   version: ["2018b"]
               - type: append
-                if: ${{ vars.BLESSED_REPO == 'yes' }}
                 matrix:
-                  image: [macos-m1]
+                  image: [macos-14]
                   host: ["octave"]
                   version: ["7.3.0"]
 
@@ -441,7 +433,7 @@ jobs:
 
   matlab-osx:
     needs: [core-osx,matrix-arch-matlab-mac,swig,version]
-    runs-on: ${{matrix.image == 'macos-m1' && 'self-hosted' || matrix.image }}
+    runs-on: ${{matrix.image }}
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.matrix-arch-matlab-mac.outputs.matrix) }}
@@ -451,7 +443,7 @@ jobs:
       - uses: casadi/action-setup-compiler@master
         with:
           cache-suffix: ''
-          target: ${{matrix.image == 'macos-m1' && 'arm64' || 'x86_64'}}
+          target: ${{matrix.image == 'macos-14' && 'arm64' || 'x86_64'}}
       - uses: actions/download-artifact@v4.1.4
         with:
           name: casadi_source_wrapper
@@ -477,7 +469,7 @@ jobs:
           map: |
            {
               "macos-12": {"os": "osx", "bitness": "64"},
-              "macos-m1": {"os": "osx_arm", "bitness": "64"}
+              "macos-14": {"os": "osx_arm", "bitness": "64"}
            }
           export_to: env
       - uses: jgillis/universal_grafter@master
@@ -926,7 +918,7 @@ jobs:
         if: contains(github.ref, 'release') || contains(github.ref, 'main') 
 
   test-python:
-    runs-on: ${{matrix.image == 'macos-m1' && 'self-hosted' || matrix.image }}
+    runs-on: ${{ matrix.image }}
     needs: [python-osx,python-dockcross]
     strategy:
      fail-fast: false
@@ -938,13 +930,13 @@ jobs:
         # No Windows 32bit builds currently
         - image: "windows-2022"
           bit: 32
-        - image: "macos-m1"
+        - image: "macos-14"
           py2: "27"
-        - image: "macos-m1"
+        - image: "macos-14"
           py2: "35"
-        - image: "macos-m1"
+        - image: "macos-14"
           py2: "36"
-        - image: "macos-m1"
+        - image: "macos-14"
           py2: "37"
     steps:
       - uses: actions/checkout@v4.1.1
@@ -959,7 +951,7 @@ jobs:
               "windows-2022": {"os": "windows"},
               "ubuntu-20.04": {"os": "linux"},
               "macos-12": {"os": "osx"},
-              "macos-m1": {"os": "osx_arm"}
+              "macos-14": {"os": "osx_arm"}
            }
           export_to: env
       - uses: actions/download-artifact@v4.1.4
@@ -1008,7 +1000,7 @@ jobs:
         if: contains(matrix.image, 'windows')
 
   test-python-long:
-    runs-on: ${{matrix.image == 'macos-m1' && 'self-hosted' || matrix.image }}
+    runs-on: ${{matrix.image }}
     needs: [python-osx,python-dockcross,version]
     strategy:
      fail-fast: false
@@ -1029,7 +1021,7 @@ jobs:
               "windows-2022": {"os": "windows","platform":"win_amd64"},
               "ubuntu-20.04": {"os": "linux","platform":"manylinux2014_x86_64"},
               "macos-12": {"os": "osx","platform":"macosx_10_13_x86_64.macosx_10_13_intel"},
-              "macos-m1": {"os": "osx_arm","platform":"macosx_11_0_arm64"}
+              "macos-14": {"os": "osx_arm","platform":"macosx_11_0_arm64"}
            }
           export_to: env
       - uses: actions/download-artifact@v4.1.4
