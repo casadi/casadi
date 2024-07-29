@@ -133,20 +133,6 @@ jobs:
       - run: cd test/python && python implicitfunction.py
         shell: bash -el {0}
 
-
-  matrix-arch-mac:
-    runs-on: ubuntu-20.04
-    steps:
-      - id: build-matrix
-        uses: jgillis/setup-build-matrix@main
-        with:
-          config: |
-            matrix:
-              image: [macos-12,macos-14]
-      - run: echo ${{ steps.build-matrix.outputs.matrix }}
-    outputs:
-      matrix: ${{ steps.build-matrix.outputs.matrix }}
-
   core-osx:
     runs-on: ${{ matrix.image }}
     strategy:
@@ -177,7 +163,7 @@ jobs:
       - name: Build
         run: |
           rm -f build/CMakeCache.txt
-          CC=${{ env.CC }} FC=${{ env.FC }} CXX=${{ env.CXX }} cmake -DCMAKE_OSX_SYSROOT=${{env.CONDA_BUILD_SYSROOT}} -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} ${{env.build_flags_mac}} ${{ contains(matrix.image,'m1') && env.build_flags_mac_m1 || ''}} ${{ contains(matrix.image,'macos-12') && env.build_flags_mac_intel || ''}} -DCMAKE_PREFIX_PATH=${{ github.workspace }}/mockups/cmake -H.
+          CC=${{ env.CC }} FC=${{ env.FC }} CXX=${{ env.CXX }} cmake -DCMAKE_OSX_SYSROOT=${{env.CONDA_BUILD_SYSROOT}} -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} ${{env.build_flags_mac}} ${{ contains(matrix.image,'macos-14') && env.build_flags_mac_m1 || ''}} ${{ contains(matrix.image,'macos-12') && env.build_flags_mac_intel || ''}} -DCMAKE_PREFIX_PATH=${{ github.workspace }}/mockups/cmake -H.
           CC=${{ env.CC }} FC=${{ env.FC }} CXX=${{ env.CXX }} cmake --build build -v
       - name: Debug
         if: failure()
