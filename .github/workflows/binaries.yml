@@ -910,7 +910,7 @@ jobs:
      fail-fast: false
      matrix:
        py2: ["27","35","36","37","38","39","310","311","312"]
-       image: ["windows-2022","ubuntu-20.04","macos-12"]
+       image: ["windows-2022","ubuntu-20.04","macos-12","macos-14"]
        bit: [64]
        exclude:
         # No Windows 32bit builds currently
@@ -992,7 +992,7 @@ jobs:
      fail-fast: false
      matrix:
        py2: ["310"]
-       image: ["windows-2022","ubuntu-20.04","macos-12"]
+       image: ["windows-2022","ubuntu-20.04","macos-12","macos-14"]
        bit: [64]
     steps:
       - uses: actions/checkout@v4.1.1
