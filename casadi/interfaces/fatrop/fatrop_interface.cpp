@@ -258,13 +258,20 @@ namespace casadi {
       std::vector<casadi_int> A_skyline;
       std::vector<casadi_int> A_skyline2;
       std::vector<casadi_int> A_bottomline;
+
+      std::vector<casadi_int> AT_colind = AT.get_colind();
+      std::vector<casadi_int> AT_row = AT.get_row();
       for (casadi_int i=0;i<AT.size2();++i) {
-        casadi_int pivot = AT.colind()[i+1];
-        A_bottomline.push_back(AT.row()[AT.colind()[i]]);
-        if (pivot>AT.colind()[i]) {
-          A_skyline.push_back(AT.row()[pivot-1]);
-          if (pivot>AT.colind()[i]+1) {
-            A_skyline2.push_back(AT.row()[pivot-2]);
+        casadi_int pivot = AT_colind.at(i+1);
+        if (pivot>AT_colind.at(i)) {
+          A_bottomline.push_back(AT_row.at(AT_colind.at(i)));
+        } else {
+          A_bottomline.push_back(-1);
+        }
+        if (pivot>AT_colind.at(i)) {
+          A_skyline.push_back(AT_row.at(pivot-1));
+          if (pivot>AT_colind.at(i)+1) {
+            A_skyline2.push_back(AT_row.at(pivot-2));
           } else {
             A_skyline2.push_back(-1);
           }
@@ -289,7 +296,7 @@ namespace casadi {
       ngs_.push_back(0);
       for (casadi_int i=1;i<na_;++i) { // Loop over all rows
         bool is_gap_closing = true;
-        if (A_bottomline[i]<prev_start_pivot) {
+        if (A_bottomline[i]!=-1 && A_bottomline[i]<prev_start_pivot) {
           errors.insert(i);
           report_issue(i, "Constraint found depending on a state of the previous interval.");
         }
@@ -318,7 +325,7 @@ namespace casadi {
                 nxs_.back()++;
                 walking = true;
               } else {
-                if (A_bottomline[i]<start_pivot) {
+                if (A_bottomline[i]!=-1 && A_bottomline[i]<start_pivot) {
                   errors.insert(i);
                   report_issue(i, "Constraint found depending "
                     "on a state of the previous interval.");
@@ -329,7 +336,7 @@ namespace casadi {
               nxs_.push_back(1);
               nus_.push_back(0);
               ngs_.push_back(0);
-              if (A_bottomline[i]<start_pivot) {
+              if (A_bottomline[i]!=-1 && A_bottomline[i]<start_pivot) {
                 errors.insert(i);
                 report_issue(i, "Gap-closing constraint found depending "
                   "on a state of the previous interval.");
