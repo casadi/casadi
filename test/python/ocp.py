@@ -102,17 +102,17 @@ class OCPtests(casadiTestCase):
         print(lbg)
 
         
-        options = {"structure_detection": "manual", "N":N, "nx": nx, "nu":nu, "ng": ng, "equality": equality,"common_options":{"final_options":{"print_in":True,"print_out":True}}}
+        options = {"structure_detection": "manual", "N":N, "nx": nx, "nu":nu, "ng": ng, "equality": equality,"fatrop":{"tol":1e-7}}
         solver = nlpsol("solver","fatrop",nlp,options)
         sol = solver(lbg=lbg,ubg=ubg)
 
-        solver = nlpsol("solver","fatrop",nlp,{"structure_detection": "none", "error_on_fail":True, "equality": equality,"common_options":{"final_options":{"print_in":True,"print_out":True}}})
+        solver = nlpsol("solver","fatrop",nlp,{"structure_detection": "none", "error_on_fail":True, "equality": equality,"fatrop":{"tol":1e-7}})
         ref = solver(lbg=lbg,ubg=ubg)
         
         for k in sol.keys():
             self.checkarray(sol[k],ref[k],failmessage=k+str(options),digits=6)
 
-        options = {"structure_detection": "auto", "debug":True, "equality": equality,"common_options":{"final_options":{"print_in":True,"print_out":True}}}
+        options = {"structure_detection": "auto", "debug":True, "equality": equality,"fatrop":{"tol":1e-7}}
         print(options)
         solver = nlpsol("solver","fatrop",nlp,options)
         sol = solver(lbg=lbg,ubg=ubg)
