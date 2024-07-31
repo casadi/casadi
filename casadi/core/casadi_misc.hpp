@@ -144,7 +144,9 @@ private:
   template<typename T>
   std::vector<T> vector_slice(const std::vector<T> &v, const std::vector<casadi_int> &i);
 
-  /**  \brief Return all but the first element of a vector */
+  /**  \brief Return all but the first element of a vector
+
+       \identifier{27y} */
   template<typename T>
   std::vector<T> vector_tail(const std::vector<T> &v);
 
