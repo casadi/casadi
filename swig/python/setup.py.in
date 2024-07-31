@@ -6,6 +6,7 @@ import subprocess
 import pathlib
 import multiprocessing
 from io import open
+import sysconfig
 
 from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
@@ -47,7 +48,7 @@ class CMakeBuild(build_ext):
             '-DSWIG_IMPORT=ON',
             '-DWITH_PYTHON=ON',
             '-DWITH_EXAMPLES=OFF',
-            '-DPYTHON_INCLUDE_DIR=' + self.include_dirs[0],
+            '-DPYTHON_INCLUDE_DIR=' + sysconfig.get_path('include'),
             '-DCMAKE_INSTALL_PREFIX=' + extdir,
             '-DWITH_SELFCONTAINED=ON',
             '-DWITH_DEEPBIND=ON'
