@@ -68,9 +68,9 @@ MadnlpInterface::~MadnlpInterface() {
   clear_mem();
 }
 
-const Options MadnlpInterface::options_ = {
-   {&Nlpsol::options_},{
-    {"nw",
+const Options MadnlpInterface::options_
+= {{&Nlpsol::options_},
+   {{"nw",
      {OT_INTVECTOR,
       "Number of variables"}},
     {"ng",
