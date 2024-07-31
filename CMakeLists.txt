@@ -702,6 +702,8 @@ set(BUILD_IPOPT_VERSION "3.14.11.mod" CACHE STRING "Tag/branch/hash to be used f
 option(WITH_BUILD_IPOPT "Build IPOPT (BUILD_IPOPT_VERSION=${BUILD_IPOPT_VERSION}) from downloaded source (BUILD_IPOPT_GIT_REPO=${BUILD_IPOPT_GIT_REPO})." OFF)
 set(BUILD_IPOPT_DEPENDENCIES MUMPS)
 
+option(WITH_MADNLP "Compile the interface to MadNLP"  OFF)
+option(WITH_MOCKUP_MADNLP "Use mockup MadNLP (BUILD_MOCKUPS_VERSION=${BUILD_MOCKUPS_VERSION}) from downloaded source (BUILD_MOCKUPS_GIT_REPO=${BUILD_MOCKUPS_GIT_REPO})." OFF)
 
 option(WITH_MOCKUP_REQUIRED ON)
 set(BUILD_MOCKUPS_GIT_REPO https://github.com/casadi/mockups.git CACHE STRING "Git repo used together with BUILD_MOCKUPS_VERSION")
@@ -877,7 +879,7 @@ endmacro()
 
 set(WITH_BUILD_MOCKUPS OFF)
 # Packages must be sorted from high to low in the dependency graph
-foreach(PKG CPLEX SNOPT KNITRO GUROBI WORHP HSL)
+foreach(PKG CPLEX SNOPT KNITRO GUROBI WORHP HSL MADNLP)
   string(TOLOWER ${PKG} PKG_LOWER)
   if(WITH_${PKG} AND NOT WITH_BUILD_${PKG})
     if(NOT WITH_MOCKUP_${PKG})
@@ -1013,6 +1015,18 @@ if(WITH_KNITRO AND WITH_MOCKUP_KNITRO)
   )
 endif()
 add_feature_info(knitro-interface WITH_KNITRO "Interface to the NLP solver KNITRO.")
+
+if(WITH_MADNLP AND WITH_MOCKUP_MADNLP)
+  add_library(madnlp::madnlp_c SHARED IMPORTED)
+  add_dependencies(madnlp::madnlp_c mockups-external)
+  file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/mockups/madnlp/include")
+  set_target_properties(madnlp::madnlp_c PROPERTIES
+    INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/mockups/madnlp/include"
+    IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/mockups/madnlp/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX_SHORT}madnlp_c${CMAKE_SHARED_LIBRARY_SUFFIX}"
+    IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/mockups/madnlp/lib/${CMAKE_SHARED_LIBRARY_PREFIX_SHORT}madnlp_c${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+  )
+endif()
+add_feature_info(madnlp-interface WITH_MADNLP "Interface to the NLP solver MadNLP.")
 
 if(WITH_SNOPT AND WITH_MOCKUP_SNOPT)
   add_library(snopt::snopt SHARED IMPORTED)

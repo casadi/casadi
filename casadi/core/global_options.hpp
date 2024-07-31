@@ -70,6 +70,8 @@ namespace casadi {
 
       static casadi_int start_index;
 
+      static bool julia_initialized;
+
 #endif //SWIG
       // Setter and getter for simplification_on_the_fly
       static void setSimplificationOnTheFly(bool flag) { simplification_on_the_fly = flag; }

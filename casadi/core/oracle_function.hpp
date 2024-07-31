@@ -271,7 +271,13 @@ namespace casadi {
   template<typename T1>
   int calc_function(const OracleCallback* cb, casadi_oracle_data<T1>* d) {
     OracleMemory* m = static_cast<OracleMemory*>(d->m);
-    return cb->oracle_->calc_function(m, cb->name);
+    try {
+      return cb->oracle_->calc_function(m, cb->name);
+    }
+    catch (const std::exception& e) {
+      uerr() << e.what() << std::endl;
+      return 1;
+    }
   }
 
 

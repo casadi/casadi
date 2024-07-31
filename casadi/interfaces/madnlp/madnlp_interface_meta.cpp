@@ -23,23 +23,7 @@
  */
 
 
-#include "global_options.hpp"
-#include "exception.hpp"
+#include "madnlp_interface.hpp"
+#include <string>
 
-namespace casadi {
-
-  bool GlobalOptions::simplification_on_the_fly = true;
-  bool GlobalOptions::hierarchical_sparsity = true;
-
-  std::string GlobalOptions::casadipath;
-  std::string GlobalOptions::casadi_include_path;
-
-  casadi_int GlobalOptions::max_num_dir = 64;
-
-  // By default, use zero-based indexing
-  casadi_int GlobalOptions::start_index = 0;
-
-
-  bool GlobalOptions::julia_initialized = false;
-
-} // namespace casadi
+const std::string casadi::MadnlpInterface::meta_doc = "\n";
