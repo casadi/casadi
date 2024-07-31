@@ -33,6 +33,7 @@ from helpers import *
 class OCPtests(casadiTestCase):
 
   def fatrop_case(self,N=2, nx0=2, nu0=2, nx1=2, nu1=2, nx2=2, nu2=2, ng1=2, ng2=2, ng3=2, sp=None,eq=None):
+        print("fatrop_case",N,nx0,nu0,nx1,nu1,nx2,nu2,ng1,ng2,ng3,sp,eq)
         if sp is None:
             sp = {}
         if eq is None:
@@ -78,6 +79,7 @@ class OCPtests(casadiTestCase):
         equality = [True]*nx1+["ng1" in eq]*ng1+[True]*nx2+["ng2" in eq]*ng2+["ng3" in eq]*ng3
         
         A.sparsity().spy()
+        print(A)
        
         x0 = MX.sym("x0",nx0)
         u0 = MX.sym("u0",nu0)
@@ -100,17 +102,17 @@ class OCPtests(casadiTestCase):
         print(lbg)
 
         
-        options = {"structure_detection": "manual", "N":N, "nx": nx, "nu":nu, "ng": ng, "equality": equality}
+        options = {"structure_detection": "manual", "N":N, "nx": nx, "nu":nu, "ng": ng, "equality": equality,"fatrop":{"tol":1e-7}}
         solver = nlpsol("solver","fatrop",nlp,options)
         sol = solver(lbg=lbg,ubg=ubg)
 
-        solver = nlpsol("solver","fatrop",nlp,{"structure_detection": "none", "error_on_fail":True, "equality": equality})
+        solver = nlpsol("solver","fatrop",nlp,{"structure_detection": "none", "error_on_fail":True, "equality": equality,"fatrop":{"tol":1e-7}})
         ref = solver(lbg=lbg,ubg=ubg)
         
         for k in sol.keys():
             self.checkarray(sol[k],ref[k],failmessage=k+str(options),digits=6)
 
-        options = {"structure_detection": "auto", "debug":True, "equality": equality}
+        options = {"structure_detection": "auto", "debug":True, "equality": equality,"fatrop":{"tol":1e-7}}
         print(options)
         solver = nlpsol("solver","fatrop",nlp,options)
         sol = solver(lbg=lbg,ubg=ubg)
@@ -930,6 +932,7 @@ class OCPtests(casadiTestCase):
                     for ng1 in [2,0]:
                         for ng2 in [2,0]:
                             for ng3 in [2,0]:
+                                print("test_detect",nx1,nx2,nu1,nu2,ng1,ng2,ng3)
                                 self.fatrop_case(N=2,nx0=2,nu0=2,nx1=nx1,nu1=nu1,nx2=nx2,nu2=nu2,ng1=ng1,ng2=ng2,ng3=ng3)
 
   @requires_nlpsol("fatrop")

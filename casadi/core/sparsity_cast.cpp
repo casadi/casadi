@@ -135,8 +135,9 @@ namespace casadi {
   }
 
   template<typename T>
-  void SparsityCast::split_primitives_gen(const T& x, typename std::vector<T>::iterator& it) const {
-    dep()->split_primitives(sparsity_cast(x, dep().sparsity()), it);
+  void SparsityCast::split_primitives_gen(const T& x,
+      typename std::vector<T>::iterator& it) const {
+    dep()->split_primitives(sparsity_cast(project(x, sparsity()), dep().sparsity()), it);
   }
 
   void SparsityCast::split_primitives(const MX& x, std::vector<MX>::iterator& it) const {
@@ -153,7 +154,7 @@ namespace casadi {
 
   template<typename T>
   T SparsityCast::join_primitives_gen(typename std::vector<T>::const_iterator& it) const {
-    return sparsity_cast(dep()->join_primitives(it), sparsity());
+    return sparsity_cast(project(dep()->join_primitives(it), dep().sparsity()), sparsity());
   }
 
   MX SparsityCast::join_primitives(std::vector<MX>::const_iterator& it) const {

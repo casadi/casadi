@@ -2480,13 +2480,13 @@ class MXtests(casadiTestCase):
         def einstein_tests(dim_a, dim_b, dim_c, ind_a, ind_b, ind_c):
 
 
-          A = MX.sym("A", np.product(dim_a))
-          B = MX.sym("B", np.product(dim_b))
-          C = MX.sym("C", int(np.product(dim_c)),1)
+          A = MX.sym("A", np.prod(dim_a))
+          B = MX.sym("B", np.prod(dim_b))
+          C = MX.sym("C", int(np.prod(dim_c)),1)
 
-          A_sx = SX.sym("A", np.product(dim_a))
-          B_sx = SX.sym("B", np.product(dim_b))
-          C_sx = SX.sym("C", int(np.product(dim_c)),1)
+          A_sx = SX.sym("A", np.prod(dim_a))
+          B_sx = SX.sym("B", np.prod(dim_b))
+          C_sx = SX.sym("C", int(np.prod(dim_c)),1)
 
           np.random.seed(0)
 

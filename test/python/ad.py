@@ -521,6 +521,7 @@ class ADtests(casadiTestCase):
     xx = horzcat(sin(x),cos(x))
 
     for inputs,values,out, jac, with_sx, std in [
+          (in1,v1,c.sparsity_cast(x**2,sparsify(DM([[0,1],[1,0]])).sparsity()),2*c.sparsity_cast(x,sparsify(DM([[0,0],[1,0],[0,1],[0,0]])).sparsity()),True,"c89"),
           (in1,[v1[0],DM([[1,1.5],[0,0.9]])],xx[y[:,0],:],blockcat([[0,cos(x[1])],[cos(x[0]),0],[0,-sin(x[1])],[-sin(x[0]),0]]),False,"c99"),
           (in1,[v1[0],DM([[1,1.5],[0,0.9]])],xx[:,y[:,0]],blockcat([[-sin(x[0]),0],[0,-sin(x[1])],[cos(x[0]),0],[0,cos(x[1])]]),False,"c99"),
           (in1,[v1[0],DM([[1,1.5],[0,0.9]])],xx[y[:,0],y[:,0]],blockcat([[0,-sin(x[1])],[-sin(x[0]),0],[0,cos(x[1])],[cos(x[0]),0]]),False,"c99"),

@@ -54,13 +54,11 @@ int main(int argc, char* argv[]) {
   // Default options
   std::string plugin_name = "qpoases";
   bool schur = false;
-  bool nlp = false;
   bool large = false;
   // Read options, first is plugin name
   if (argc>1) plugin_name = argv[1];
   for (int i=2; i<argc; ++i) {
     if (strcmp(argv[i], "schur")==0) schur = true;
-    if (strcmp(argv[i], "nlp")==0) nlp = true;
     if (strcmp(argv[i], "large")==0) large = true;
   }
 

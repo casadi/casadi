@@ -3212,5 +3212,33 @@ class Functiontests(casadiTestCase):
     F,_ = self.check_codegen(f,inputs=[DM.rand(f.sparsity_in(i)) for i in range(f.n_in())],with_jac_sparsity=True,with_forward=True)
     mychecks(F,exempt=True)
     
+  def test_external(self):
+    if not args.run_slow: return
+    with self.assertInException("config failed"):
+        self.compile_external("F","assets/externalfun1.c")
+    
+    for n_args in [3,7]:
+        [externalfun1,libname] = self.compile_external("F","assets/externalfun1.c",{"config_args":["foo"]*n_args},debug_mode=True)
+        r = externalfun1(0)
+        self.assertEqual(n_args+1,int(r[0]))
+        self.assertEqual(0,int(r[1]))
+
+        x = MX.sym("x")
+        
+        g = Function('g',[x],[    externalfun1(sin(x))[0]+externalfun1(cos(x))[0] ])
+        
+        self.assertEqual(g(0.3),2*(n_args+1))
+        self.check_codegen(g,inputs=[0.3],extralibs=[libname])
+        
+        self.check_serialize(externalfun1,inputs=[0.3])
+        self.check_serialize(g,inputs=[0.3])
+        
+        externalfun1 = None
+        g = None
+        import gc
+        gc.collect()
+        
+        
+    
 if __name__ == '__main__':
     unittest.main()

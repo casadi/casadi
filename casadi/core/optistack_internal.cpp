@@ -268,6 +268,7 @@ MX OptiNode::variable(casadi_int n, casadi_int m, const std::string& attribute) 
   meta_data.type = OPTI_VAR;
   meta_data.count = count_++;
   meta_data.i = count_var_++;
+  meta_data.domain = OPTI_DOMAIN_REAL;
 
   MX symbol, ret;
 

@@ -46,6 +46,7 @@ extern "C" {
 #endif
 
 /* Function types corresponding to entry points in CasADi's C API */
+typedef int (*casadi_config_t)(int, const char**);
 typedef void (*casadi_signal_t)(void);
 typedef casadi_int (*casadi_getint_t)(void);
 typedef int (*casadi_checkout_t)(void);
