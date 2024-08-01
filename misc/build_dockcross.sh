@@ -28,7 +28,7 @@ export FLAGS="-DWITH_COMMON=OFF -DWITH_BUILD_REQUIRED=ON -DWITH_BUILD_BONMIN=OFF
 
 BUILD_TYPE_MOCKUPS=Release
 
-curl -OL https://github.com/casadi/mockups/releases/download/v61/mockups_${TARGET}_${BUILD_TYPE_MOCKUPS}.zip
+curl -OL https://github.com/casadi/mockups/releases/download/v85/mockups_${TARGET}_${BUILD_TYPE_MOCKUPS}.zip
 
 rm -rf mockups-${TARGET}-${BUILD_TYPE_MOCKUPS}
 unzip mockups_${TARGET}_${BUILD_TYPE_MOCKUPS}.zip -d mockups-${TARGET}-${BUILD_TYPE_MOCKUPS}
@@ -61,7 +61,7 @@ case $INT_TARGET in
     ;;
 
   cpp)
-    ./dockcross.$TARGET cmake -Bbuild-local-$TARGET -DWITH_SELFCONTAINED=ON $FLAGS -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_PREFIX_PATH=/work/mockups-$TARGET/cmake -DCMAKE_INSTALL_PREFIX=/work/install-$INT_TARGET-$TARGET -H.
+    ./dockcross.$TARGET cmake -Bbuild-local-$TARGET -DWITH_SELFCONTAINED=ON $FLAGS -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_PREFIX_PATH=/work/mockups-$TARGET-${BUILD_TYPE_MOCKUPS}/cmake -DCMAKE_INSTALL_PREFIX=/work/install-$INT_TARGET-$TARGET -H.
     ;;
 
   *)
