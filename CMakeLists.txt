@@ -598,7 +598,7 @@ add_feature_info(superscs-interface WITH_SUPERSCS "Interface to Conic solver Sup
 
 # OSQP: An operator-splitting QP solver
 option(WITH_OSQP "Compile the interface to OSQP" OFF)
-set(BUILD_OSQP_VERSION "v0.6.2" CACHE STRING "Tag/branch/hash to be used for BUILD_OSQP_GIT_REPO")
+set(BUILD_OSQP_VERSION "v0.6.3" CACHE STRING "Tag/branch/hash to be used for BUILD_OSQP_GIT_REPO")
 set(BUILD_OSQP_GIT_REPO "https://github.com/osqp/osqp.git" CACHE STRING "Git repo used together with BUILD_OSQP_VERSION")
 option(WITH_BUILD_OSQP "Build OSQP (BUILD_OSQP_VERSION=${BUILD_OSQP_VERSION}) from downloaded source (BUILD_OSQP_GIT_REPO=${BUILD_OSQP_GIT_REPO})." OFF)
 add_feature_info(osqp-interface WITH_OSQP "Interface to QP solver OSQP.")
@@ -790,7 +790,7 @@ set(BUILD_HSL_DEPENDENCIES LAPACK METIS)
 # HIGHS: A MILP / QP solver
 option(WITH_HIGHS "Compile the HiGHS interface" OFF)
 set(BUILD_HIGHS_GIT_REPO "https://github.com/ERGO-Code/HiGHS" CACHE STRING "Git repo used together with BUILD_HIGHS_VERSION")
-set(BUILD_HIGHS_VERSION "v1.6.0" CACHE STRING "Tag/branch/hash to be used for BUILD_HIGHS_GIT_REPO")
+set(BUILD_HIGHS_VERSION "v1.7.2" CACHE STRING "Tag/branch/hash to be used for BUILD_HIGHS_GIT_REPO")
 option(WITH_BUILD_HIGHS "Build HiGHS (BUILD_HIGHS_VERSION=${BUILD_HIGHS_VERSION}) from downloaded source (BUILD_HIGHS_GIT_REPO=${BUILD_HIGHS_GIT_REPO})." OFF)
 
 # DAQP: An Active-Set QP solver written in C
