@@ -3219,6 +3219,7 @@ class Functiontests(casadiTestCase):
     
     for n_args in [3,7]:
         [externalfun1,libname] = self.compile_external("F","assets/externalfun1.c",{"config_args":["foo"]*n_args},debug_mode=True)
+        print(libname)
         r = externalfun1(0)
         self.assertEqual(n_args+1,int(r[0]))
         self.assertEqual(0,int(r[1]))
