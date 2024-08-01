@@ -658,7 +658,7 @@ class casadiTestCase(unittest.TestCase):
       def get_commands(shared=True):
         if os.name=='nt':
           defs = " ".join(["/D"+d for d in definitions])
-          commands = "cl.exe {shared} {definitions} {includedir} {source} {extra} /link  /libpath:{libdir}".format(shared="/LD" if shared else "",std=std,source=source,libdir=libdir,includedir=" ".join(["/I" + e for e in includedirs]),extra=extralibs + extra_options + extralibs + extra_options,definitions=defs)
+          commands = "cl.exe {shared} {definitions} {includedir} {source} {extra} /link  /libpath:{libdir} /out:{name}.dll".format(shared="/LD" if shared else "",std=std,source=source,libdir=libdir,includedir=" ".join(["/I" + e for e in includedirs]),extra=extralibs + extra_options + extralibs + extra_options,definitions=defs,name=name)
           if shared:
             output = "./" + name + ".dll"
           else:
