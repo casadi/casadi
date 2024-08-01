@@ -54,7 +54,9 @@ class CASADI_EXPORT External : public FunctionInternal {
       \identifier{1z2} */
   Importer li_;
 
-  /** \brief Initialize */
+  /** \brief Initialize
+
+      \identifier{282} */
   config_t config_;
 
   /** \brief Increase/decrease reference counter
@@ -91,7 +93,9 @@ class CASADI_EXPORT External : public FunctionInternal {
   std::string string_data_;
   ///@}
 
-  /** \brief Arguments as passed to init */
+  /** \brief Arguments as passed to init
+
+      \identifier{283} */
   std::vector<std::string> config_args_;
   std::vector<const char*> args_;
  public:

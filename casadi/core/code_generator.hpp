@@ -108,7 +108,9 @@ namespace casadi {
         \identifier{27l} */
     casadi_int get_constant(const std::vector<char>& v, bool allow_adding=false);
 
-    /** \brief Get or add a vector<string> constant */
+    /** \brief Get or add a vector<string> constant
+
+        \identifier{27z} */
     casadi_int get_constant(const std::vector<std::string>& v, bool allow_adding=false);
 
     /** \brief Represent an array constant; adding it when new
@@ -141,7 +143,9 @@ namespace casadi {
         \identifier{27m} */
     std::string constant(const std::vector<char>& v);
 
-    /** \brief Represent an array constant; adding it when new */
+    /** \brief Represent an array constant; adding it when new
+
+        \identifier{280} */
     std::string constant(const std::vector<std::string>& v);
 
     /** \brief Allocate file scope double read-only memory
@@ -673,7 +677,9 @@ namespace casadi {
     void print_vector(std::ostream &s, const std::string& name,
                              const std::vector<double>& v);
 
-    /** \brief  Print string vector to a c file  */
+    /** \brief  Print string vector to a c file
+
+        \identifier{281} */
     void print_vector(std::ostream &s, const std::string& name,
                              const std::vector<std::string>& v);
 

@@ -202,6 +202,9 @@
 %exception  casadi::CodeGenerator::constant(const std::vector< int > &v) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::CodeGenerator::constant(const std::vector< std::string > &v) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::CodeGenerator::constant(double v) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -265,6 +268,9 @@
 %exception  casadi::CodeGenerator::get_constant(const std::vector< double > &v, bool allow_adding=false) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::CodeGenerator::get_constant(const std::vector< std::string > &v, bool allow_adding=false) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::CodeGenerator::get_sparsity(const Sparsity &sp) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -281,6 +287,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::CodeGenerator::initializer(const std::vector< double > &v) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::CodeGenerator::initializer(const std::vector< std::string > &v) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::CodeGenerator::interpn(const std::string &res, casadi_int ndim, const std::string &grid, const std::string &offset, const std::string &values, const std::string &x, const std::string &lookup_mode, casadi_int m, const std::string &iw, const std::string &w) {
@@ -362,6 +371,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::CodeGenerator::print_vector(std::ostream &s, const std::string &name, const std::vector< double > &v) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::CodeGenerator::print_vector(std::ostream &s, const std::string &name, const std::vector< std::string > &v) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::CodeGenerator::printf(const std::string &str, const std::string &arg1) {
@@ -5870,6 +5882,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::vector_static_cast(const std::vector< S > &rhs) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::vector_tail(const std::vector< T > &v) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::write_matlab(std::ostream &stream, const std::vector< T > &v) {
