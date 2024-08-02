@@ -33,6 +33,12 @@ import copy
 import os
 #GlobalOptions.setCatchErrorsPython(False)
 
+
+codegen_check_digits = 15
+if os.name=='darwin':
+    # Numerical differences due to different compilers in ci
+    codegen_check_digits = 1
+
 solvers= []
 
 if "SKIP_WORHP_TESTS" not in os.environ and has_nlpsol("worhp")  and not args.ignore_memory_heavy:
@@ -660,7 +666,7 @@ class NLPtests(casadiTestCase):
       if Solver not in ["bonmin","sleqp"]: self.assertAlmostEqual(solver_out["lam_g"][0],0.12149655447670,6,str(Solver))
 
       if aux_options["codegen"]:
-        self.check_codegen(solver,solver_in,**aux_options["codegen"])
+        self.check_codegen(solver,solver_in,digits=codegen_check_digits,**aux_options["codegen"])
 
       self.message(":warmstart")
       if "ipopt" in str(Solver):
@@ -685,7 +691,7 @@ class NLPtests(casadiTestCase):
         solver_out = solver(**solver_in)
         
         if aux_options["codegen"]:
-           self.check_codegen(solver,solver_in,**aux_options["codegen"])
+           self.check_codegen(solver,solver_in,digits=codegen_check_digits,**aux_options["codegen"])
 
   def test_IPOPTrhb2_gen(self):
     self.message("rosenbrock, exact hessian generated, constrained")
@@ -723,7 +729,7 @@ class NLPtests(casadiTestCase):
       self.check_serialize(solver, solver_in)
 
       if aux_options["codegen"]:
-        self.check_codegen(solver,solver_in,**aux_options["codegen"])
+        self.check_codegen(solver,solver_in,digits=codegen_check_digits,**aux_options["codegen"])
 
 
   def test_jacG_empty(self):
@@ -789,7 +795,7 @@ class NLPtests(casadiTestCase):
 
 
       if aux_options["codegen"]:
-        self.check_codegen(solver,solver_in,**aux_options["codegen"])
+        self.check_codegen(solver,solver_in,digits=codegen_check_digits,**aux_options["codegen"])
       solver_out = solver(**solver_in)
 
       digits = 5
@@ -859,7 +865,7 @@ class NLPtests(casadiTestCase):
       if "bonmin" not in str(Solver): self.assertAlmostEqual(solver_out["lam_x"][1],0,6,str(Solver))
 
       if aux_options["codegen"]:
-        self.check_codegen(solver,solver_in,**aux_options["codegen"])
+        self.check_codegen(solver,solver_in,digits=codegen_check_digits,**aux_options["codegen"])
 
   def test_IPOPTrhb_gen_par(self):
     self.message("rosenbrock, exact hessian generated, parametric")
@@ -1851,7 +1857,7 @@ class NLPtests(casadiTestCase):
 
       self.check_serialize(solver,{"x0":x0})
 
-      self.check_codegen(solver,{"x0":x0},std="c99")
+      self.check_codegen(solver,{"x0":x0},std="c99",digits=codegen_check_digits)
 
 
   def test_simple_bounds_detect(self):

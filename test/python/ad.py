@@ -29,8 +29,14 @@ import unittest
 from types import *
 from helpers import *
 import itertools
+import os
 
 warnings.filterwarnings("ignore",category=DeprecationWarning)
+
+codegen_check_digits = 15
+if os.name=='darwin':
+    # Numerical differences due to different compilers in ci
+    codegen_check_digits = 1
 
 class ADtests(casadiTestCase):
 
@@ -633,7 +639,7 @@ class ADtests(casadiTestCase):
           if "pow" in str(out) and os.name=='nt':
             pass # Known bug #3038
           else:
-            self.check_codegen(fun,inputs=values,std=std)
+            self.check_codegen(fun,inputs=values,std=std,digits=codegen_check_digits)
           self.check_serialize(fun,inputs=values)
 
           J_ = fun_out[1]
@@ -693,7 +699,7 @@ class ADtests(casadiTestCase):
                 if "pow" in str(out) and os.name=='nt':
                   pass # Known bug #3038
                 else:
-                  self.check_codegen(vf,inputs=vf_in,std=std)
+                  self.check_codegen(vf,inputs=vf_in,std=std,digits=codegen_check_digits)
                 self.check_serialize(vf,inputs=vf_in)
 
                 offset = len(res)
@@ -722,7 +728,7 @@ class ADtests(casadiTestCase):
                 if "pow" in str(out) and os.name=='nt':
                   pass # Known bug #3038
                 else:
-                  self.check_codegen(vf,inputs=vf_in,std=std)
+                  self.check_codegen(vf,inputs=vf_in,std=std,digits=codegen_check_digits)
                 self.check_serialize(vf,inputs=vf_in)
                 storagekey = (spmod,spmod2)
                 if not(storagekey in storage):
@@ -763,7 +769,7 @@ class ADtests(casadiTestCase):
                   if "pow" in str(out) and os.name=='nt':
                     pass # Known bug #3038
                   else:
-                    self.check_codegen(vf2,inputs=vf2_in,std=std)
+                    self.check_codegen(vf2,inputs=vf2_in,std=std,digits=codegen_check_digits)
                   self.check_serialize(vf2,inputs=vf2_in)
                   storagekey = (spmod,spmod2)
                   if not(storagekey in storage2):
@@ -791,7 +797,7 @@ class ADtests(casadiTestCase):
               if "pow" in str(out) and os.name=='nt':
                 pass # Known bug #3038
               else:
-                self.check_codegen(Jf,inputs=values,std=std)
+                self.check_codegen(Jf,inputs=values,std=std,digits=codegen_check_digits)
               self.check_serialize(Jf,inputs=values)
               self.checkarray(Jf_out[0],J_)
               self.checkarray(DM.ones(Jf.sparsity_out(0)),DM.ones(J_.sparsity()),str(out)+str(mode))
@@ -817,7 +823,7 @@ class ADtests(casadiTestCase):
               if "pow" in str(out) and os.name=='nt':
                 pass # Known bug #3038
               else:
-                self.check_codegen(Hf,inputs=values,std=std)
+                self.check_codegen(Hf,inputs=values,std=std,digits=codegen_check_digits)
               self.check_serialize(Hf,inputs=values)
               if H_ is None:
                 H_ = Hf_out[0]

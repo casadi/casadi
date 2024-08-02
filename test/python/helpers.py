@@ -685,7 +685,7 @@ class casadiTestCase(unittest.TestCase):
       if opts is None: opts = {}
       return (external(name, libname,opts),libname)
 
-  def check_codegen(self,F,inputs=None, opts=None,std="c89",extralibs="",check_serialize=False,extra_options=None,main=False,definitions=None,with_jac_sparsity=False,external_opts=None,with_reverse=False,with_forward=False,extra_include=[]):
+  def check_codegen(self,F,inputs=None, opts=None,std="c89",extralibs="",check_serialize=False,extra_options=None,main=False,definitions=None,with_jac_sparsity=False,external_opts=None,with_reverse=False,with_forward=False,extra_include=[],digits=15):
 
     if args.run_slow:
       import hashlib
@@ -789,18 +789,18 @@ class casadiTestCase(unittest.TestCase):
         if isinstance(inputs,dict):
           outputs = F.convert_out(outputs)
           for k in F.name_out():
-            self.checkarray(Fout[k],outputs[k],digits=15)
+            self.checkarray(Fout[k],outputs[k],digits=digits)
         else:
           for i in range(F.n_out()):
-            self.checkarray(Fout[i],Fout2[i],digits=15)
+            self.checkarray(Fout[i],Fout2[i],digits=digits)
 
       if isinstance(inputs, dict):
         self.assertEqual(F.name_out(), F2.name_out())
         for k in F.name_out():
-          self.checkarray(Fout[k],Fout2[k],digits=15,failmessage=k)
+          self.checkarray(Fout[k],Fout2[k],digits=digits,failmessage=k)
       else:
         for i in range(F.n_out()):
-          self.checkarray(Fout[i],Fout2[i],digits=15)
+          self.checkarray(Fout[i],Fout2[i],digits=digits)
 
       if self.check_serialize:
         self.check_serialize(F2,inputs=inputs)
