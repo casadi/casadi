@@ -5,6 +5,10 @@ for pl = strsplit(CasadiMeta.plugins(),';')
   cls  = out{1};
   name = out{2};
 
+if ~isempty(getenv(['SKIP_' upper(name) '_TESTS']))
+  continue
+end
+  
 if strcmp(cls,'Importer') || strcmp(cls,'XmlFile') || strcmp(cls,'Linsol')
   eval([cls '.load_plugin(''' name ''')'])
 else
