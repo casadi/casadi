@@ -288,6 +288,10 @@ class OCPtests(casadiTestCase):
   def test_fatrop(self):
   
   
+    flags = []
+    if os.name != 'nt':
+      flags = ["-Wno-strict-prototypes"]
+  
     def test_problems():
     
         for i in range(2):
@@ -819,7 +823,7 @@ class OCPtests(casadiTestCase):
             stats[solver] = f.stats()
             
             if solver!="ipopt":
-                self.check_codegen(f,args,std="c99",extralibs=["fatrop","blasfeo"])
+                self.check_codegen(f,args,std="c99",extralibs=["fatrop","blasfeo"],extra_options=flags)
                 self.check_serialize(f,args)
         
         for k in solutions["ipopt"].keys():
