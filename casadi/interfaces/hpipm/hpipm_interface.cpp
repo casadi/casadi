@@ -194,9 +194,16 @@ namespace casadi {
       std::vector<casadi_int> A_skyline;
       std::vector<casadi_int> A_skyline2;
       std::vector<casadi_int> A_bottomline;
+
+      std::vector<casadi_int> AT_colind = AT.get_colind();
+      std::vector<casadi_int> AT_row = AT.get_row();
       for (casadi_int i=0;i<AT.size2();++i) {
         casadi_int pivot = AT.colind()[i+1];
-        A_bottomline.push_back(AT.row()[AT.colind()[i]]);
+        if (pivot>AT_colind.at(i)) {
+          A_bottomline.push_back(AT_row.at(AT_colind.at(i)));
+        } else {
+          A_bottomline.push_back(-1);
+        }
         if (pivot>AT.colind()[i]) {
           A_skyline.push_back(AT.row()[pivot-1]);
           if (pivot>AT.colind()[i]+1) {
@@ -576,7 +583,7 @@ namespace casadi {
     g << "p.hpipm_options.var_init_scheme = " << hpipm_options_.var_init_scheme << ";\n";
     g << "p.hpipm_options.t_lam_min = " << hpipm_options_.t_lam_min << ";\n";
     g << "p.hpipm_options.mode = " << hpipm_options_.mode << ";\n";
-    g << "p.hpipm_options.memsize = " << hpipm_options_.memsize << ";\n";
+    g << "p.hpipm_options.memsize = 0;\n";
 
 
     g << "p.inf = " << inf_ << ";\n";
