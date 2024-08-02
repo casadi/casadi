@@ -47,7 +47,10 @@ if "SKIP_WORHP_TESTS" not in os.environ and has_nlpsol("worhp")  and not args.ig
   pass
 
 if "SKIP_FATROP_TESTS" not in os.environ and has_nlpsol("fatrop"):
-  codegen = {"std": "c99","extralibs": ["fatrop","blasfeo"],"extra_options":["-Wno-strict-prototypes"]}
+  flags = []
+  if os.name != 'nt':
+    flags = ["-Wno-strict-prototypes"]
+  codegen = {"std": "c99","extralibs": ["fatrop","blasfeo"],"extra_options":flags}
   solvers.append(("fatrop",{"fatrop": {}},{"codegen":codegen,"discrete":False}))
 
 if "SKIP_SLEQP_TESTS" not in os.environ and has_nlpsol("sleqp"):
