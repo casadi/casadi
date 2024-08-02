@@ -115,7 +115,7 @@ handle_t open_shared_library(const std::string& lib, const std::vector<std::stri
             flag = RTLD_LAZY | RTLD_LOCAL;
         }
     #ifdef WITH_DEEPBIND
-    #ifndef __APPLE__
+    #if !defined(__APPLE__) && !defined(__EMSCRIPTEN__)
         flag |= RTLD_DEEPBIND;
     #endif
     #endif
