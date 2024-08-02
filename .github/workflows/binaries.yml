@@ -218,7 +218,7 @@ jobs:
           name: ${{github.job}}-${{ matrix.target}}
           path: ${{github.job}}-${{matrix.target}}.zip
           retention-days: 5
-          
+
   matrix-arch-py2:
     runs-on: ubuntu-20.04
     steps:
@@ -244,7 +244,7 @@ jobs:
                   py2: ["36","37","38","39","310","311","312"]
     outputs:
       matrix: ${{ steps.build-matrix.outputs.matrix }}
-  
+
   matrix-arch-py2-mac:
     runs-on: ubuntu-20.04
     steps:
@@ -263,7 +263,7 @@ jobs:
 
     outputs:
       matrix: ${{ steps.build-matrix.outputs.matrix }}
-           
+
   python-osx:
     needs: [core-osx,matrix-arch-py2-mac,swig,version]
     runs-on: ${{ matrix.image }}
@@ -273,8 +273,9 @@ jobs:
     env:
       DEVELOPMENT_CERTIFICATE_DATA_AVAILABLE: ${{ secrets.DEVELOPMENT_CERTIFICATE_DATA != '' }}
       deploy_arch: ${{matrix.image == 'macos-14' && 'osx_arm64' || 'osx64'}}
+      MACOSX_DEPLOYMENT_TARGET: "11.0"
     steps:
-    
+
       - uses: casadi/action-setup-compiler@master
         with:
           cache-suffix: ${{matrix.py2}}
@@ -501,7 +502,7 @@ jobs:
           name: casadi-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}
           path: casadi-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip
           retention-days: 5
-                  
+
   matlab-dockcross:
     needs: [core-dockcross,swig,version]
     runs-on: ubuntu-20.04
@@ -594,7 +595,7 @@ jobs:
           name: casadi-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}
           path: casadi-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip
           retention-days: 5
-      
+
   python-dockcross:
     needs: [core-dockcross,matrix-arch-py2,swig,version]
     runs-on: ubuntu-20.04
