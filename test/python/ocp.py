@@ -28,6 +28,14 @@ import unittest
 from types import *
 from helpers import *
 
+import os
+
+codegen_check_digits = 15
+if "platform" is os.environ:
+    if os.environ["platform"]=="osx_arm":
+        # Numerical differences due to different compilers in ci
+        codegen_check_digits = 10
+
 
             
 class OCPtests(casadiTestCase):
@@ -823,7 +831,7 @@ class OCPtests(casadiTestCase):
             stats[solver] = f.stats()
             
             if solver!="ipopt":
-                self.check_codegen(f,args,std="c99",extralibs=["fatrop","blasfeo"],extra_options=flags)
+                self.check_codegen(f,args,std="c99",extralibs=["fatrop","blasfeo"],extra_options=flags,digits=codegen_check_digits)
                 self.check_serialize(f,args)
         
         for k in solutions["ipopt"].keys():
