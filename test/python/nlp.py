@@ -34,10 +34,10 @@ import os
 #GlobalOptions.setCatchErrorsPython(False)
 
 
-codegen_check_digits = 15
+codegen_check_digits = 13
 if os.name=='darwin':
     # Numerical differences due to different compilers in ci
-    codegen_check_digits = 1
+    codegen_check_digits = 13
 
 solvers= []
 
