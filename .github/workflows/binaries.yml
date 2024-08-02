@@ -139,6 +139,8 @@ jobs:
       fail-fast: false
       matrix:
         image: [macos-12,macos-14]
+    env:
+      MACOSX_DEPLOYMENT_TARGET: ${{matrix.image == 'macos-14' && '11.0' || '10.13'}}
     steps:
       - run: echo "${{ vars.BLESSED_REPO }} ${{ vars.BLESSED_REPO }}"
       - uses: casadi/action-setup-compiler@master
@@ -273,7 +275,7 @@ jobs:
     env:
       DEVELOPMENT_CERTIFICATE_DATA_AVAILABLE: ${{ secrets.DEVELOPMENT_CERTIFICATE_DATA != '' }}
       deploy_arch: ${{matrix.image == 'macos-14' && 'osx_arm64' || 'osx64'}}
-      MACOSX_DEPLOYMENT_TARGET: "11.0"
+      MACOSX_DEPLOYMENT_TARGET: ${{matrix.image == 'macos-14' && '11.0' || '10.13'}}
     steps:
 
       - uses: casadi/action-setup-compiler@master
@@ -426,6 +428,7 @@ jobs:
       matrix: ${{ fromJson(needs.matrix-arch-matlab-mac.outputs.matrix) }}
     env:
       DEVELOPMENT_CERTIFICATE_DATA_AVAILABLE: ${{ secrets.DEVELOPMENT_CERTIFICATE_DATA != '' }}
+      MACOSX_DEPLOYMENT_TARGET: ${{matrix.image == 'macos-14' && '11.0' || '10.13'}}
     steps:
       - uses: casadi/action-setup-compiler@master
         with:
