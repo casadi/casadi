@@ -33,11 +33,11 @@ import os
 
 warnings.filterwarnings("ignore",category=DeprecationWarning)
 
-codegen_check_digits = 13
-print("os.name = ", os.name)
-if os.name=='darwin':
-    # Numerical differences due to different compilers in ci
-    codegen_check_digits = 13
+codegen_check_digits = 15
+if "os" is os.environ:
+    if os.environ["os"]=="osx_arm":
+        # Numerical differences due to different compilers in ci
+        codegen_check_digits = 10
 
 class ADtests(casadiTestCase):
 

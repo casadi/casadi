@@ -31,8 +31,8 @@ from helpers import *
 import os
 
 codegen_check_digits = 15
-if "platform" is os.environ:
-    if os.environ["platform"]=="osx_arm":
+if "os" is os.environ:
+    if os.environ["os"]=="osx_arm":
         # Numerical differences due to different compilers in ci
         codegen_check_digits = 10
 
