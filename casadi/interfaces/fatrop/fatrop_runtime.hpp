@@ -160,6 +160,7 @@ struct casadi_fatrop_data {
 
   int unified_return_status;
   int success;
+  int return_status;
 
   T1 *pv, *x, *a, *g, *h, *lam;
 
@@ -822,6 +823,7 @@ void casadi_fatrop_solve(casadi_fatrop_data<T1>* d) {
 
   fatrop_int ret = fatrop_ocp_c_solve(d->solver);
 
+  d->return_status = ret;
   if (ret==0) {
     d->unified_return_status = SOLVER_RET_SUCCESS;
     d->success = 1;

@@ -607,6 +607,7 @@ namespace casadi {
     stats["nu"] = nus_;
     stats["ng"] = ngs_;
     stats["N"] = N_;
+    stats["return_status"] = m->d.return_status;
     return stats;
   }
 
