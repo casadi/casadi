@@ -33,12 +33,6 @@ import copy
 import os
 #GlobalOptions.setCatchErrorsPython(False)
 
-codegen_check_digits = 15
-if "os" is os.environ:
-    if os.environ["os"]=="osx_arm":
-        # Numerical differences due to different compilers in ci
-        codegen_check_digits = 10
-
 solvers= []
 
 if "SKIP_WORHP_TESTS" not in os.environ and has_nlpsol("worhp")  and not args.ignore_memory_heavy:

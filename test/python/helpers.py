@@ -32,6 +32,18 @@ import itertools
 import time
 from contextlib import contextmanager
 from casadi.tools import capture_stdout
+import os
+
+codegen_check_digits = 15
+
+print("os" in os.environ)
+if "os" in os.environ:
+    print(os.environ["os"])
+    if os.environ["os"]=="osx_arm":
+        # Numerical differences due to different compilers in ci
+        codegen_check_digits = 10
+
+print("codegen_check_digits", codegen_check_digits)
 
 import argparse
 import struct
