@@ -118,7 +118,7 @@ with open(wheelfile_path, 'w') as f:
 
 metadata_path = os.path.join(distinfo_dir, 'METADATA')
 with open(metadata_path, 'w') as f:
-    f.write("""Metadata-Version: 2.0
+    f.write("""Metadata-Version: 2.1
 Name: casadi
 Version: %s
 Summary: CasADi -- framework for algorithmic differentiation and numeric optimization
