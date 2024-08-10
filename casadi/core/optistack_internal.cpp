@@ -386,8 +386,11 @@ std::string OptiNode::return_status() const {
   } catch (...) {
     //
   }
-  if (mystats.find("return_status")!=mystats.end())
-    return mystats.at("return_status");
+  if (mystats.find("/home/jgillis/programs/casadi/casadi/core/optistack_internal.cpp")!=mystats.end()) {
+    std::stringstream ss;
+    ss << mystats.at("return_status");
+    return ss.str();
+  }
   return "unknown";
 }
 
