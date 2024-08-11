@@ -1335,10 +1335,10 @@ if(WITH_SPRAL)
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
         CONFIGURE_COMMAND ${SPRAL_RECONFIG_CMD} <SOURCE_DIR>/configure ${CROSS_FLAGS_CONFIGURE} --disable-gpu --prefix=<INSTALL_DIR> --disable-openmp "--with-metis-inc-dir=${METIS_INCLUDE_DIR}" "--with-metis=-L${CMAKE_BINARY_DIR}/external_projects/lib -l${METIS_LIB} -lm" "--with-lapack=${LAPACK_LFLAGS}" "--with-blas=${LAPACK_LFLAGS}" ${CROSS_FLAGS_FORTRAN}
-        "ADD_CFLAGS=-fPIC ${EXTERNAL_PROJECT_CFLAGS}"
-        "ADD_CXXFLAGS=-fPIC ${EXTERNAL_PROJECT_CXXFLAGS}"
-        "ADD_FFLAGS=-fPIC ${EXTERNAL_PROJECT_FFLAGS}"
-        "ADD_FCFLAGS=-fPIC ${EXTERNAL_PROJECT_FCFLAGS}"
+        "CFLAGS=-fPIC ${EXTERNAL_PROJECT_CFLAGS}"
+        "CXXFLAGS=-fPIC ${EXTERNAL_PROJECT_CXXFLAGS}"
+        "FFLAGS=-fPIC ${EXTERNAL_PROJECT_FFLAGS}"
+        "FCFLAGS=-fPIC ${EXTERNAL_PROJECT_FCFLAGS}"
         ${COIN_FLAGS}
         )
     set(SPRAL_DEPENDS_TARGET spral-external)
