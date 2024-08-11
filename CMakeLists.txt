@@ -1228,10 +1228,10 @@ if(WITH_BUILD_METIS)
         CONFIGURE_COMMAND ${COIN_RECONFIG_CMD} <SOURCE_DIR>/configure ${CROSS_FLAGS_CONFIGURE} --prefix=<INSTALL_DIR>
 
           # GKFree is not defined (variadic definition in utils.c); fails on MacOS target
-          "CFLAGS=-Wno-implicit-function-declaration ${EXTERNAL_PROJECT_CFLAGS}"
-          "CXXFLAGS=-Wno-implicit-function-declaration ${EXTERNAL_PROJECT_CXXFLAGS}"
-          "FFLAGS=-Wno-implicit-function-declaration ${EXTERNAL_PROJECT_FFLAGS}"
-          "FCFLAGS=-Wno-implicit-function-declaration ${EXTERNAL_PROJECT_FCFLAGS}"
+          "ADD_CFLAGS=-Wno-implicit-function-declaration ${EXTERNAL_PROJECT_CFLAGS}"
+          "ADD_CXXFLAGS=-Wno-implicit-function-declaration ${EXTERNAL_PROJECT_CXXFLAGS}"
+          "ADD_FFLAGS=-Wno-implicit-function-declaration ${EXTERNAL_PROJECT_FFLAGS}"
+          "ADD_FCFLAGS=-Wno-implicit-function-declaration ${EXTERNAL_PROJECT_FCFLAGS}"
         PATCH_COMMAND COMMAND cd <SOURCE_DIR> && ./get.Metis)
   add_library(metis::metis INTERFACE IMPORTED)
   add_dependencies(metis::metis metis-external)
@@ -1263,9 +1263,9 @@ if(WITH_HSL)
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
         PATCH_COMMAND ${EXTERNAL_CMAKE_COMMAND} -DSRC=<SOURCE_DIR>  -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/patch_hsl.cmake
-        CONFIGURE_COMMAND <SOURCE_DIR>/configure --disable-static "--with-blas=${LAPACK_LFLAGS}" ${CROSS_FLAGS_CONFIGURE} "FCFLAGS=${LAPACK_LFLAGS} -L${CMAKE_BINARY_DIR}/external_projects/lib -Wl,-rpath,${CMAKE_BINARY_DIR}/external_projects/lib -l${METIS_LIB} -lm ${EXTERNAL_PROJECT_FCFLAGS}" --prefix=<INSTALL_DIR>
-        "CFLAGS=${EXTERNAL_PROJECT_CFLAGS}"
-        "CXXFLAGS=${EXTERNAL_PROJECT_CXXFLAGS}"
+        CONFIGURE_COMMAND <SOURCE_DIR>/configure --disable-static "--with-blas=${LAPACK_LFLAGS}" ${CROSS_FLAGS_CONFIGURE} "ADD_FCFLAGS=${LAPACK_LFLAGS} -L${CMAKE_BINARY_DIR}/external_projects/lib -Wl,-rpath,${CMAKE_BINARY_DIR}/external_projects/lib -l${METIS_LIB} -lm ${EXTERNAL_PROJECT_FCFLAGS}" --prefix=<INSTALL_DIR>
+        "ADD_CFLAGS=${EXTERNAL_PROJECT_CFLAGS}"
+        "ADD_CXXFLAGS=${EXTERNAL_PROJECT_CXXFLAGS}"
         BUILD_COMMAND make
         INSTALL_COMMAND make install
         COMMAND cp ${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}coinhsl${CMAKE_SHARED_LIBRARY_SUFFIX} ${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}hsl${CMAKE_SHARED_LIBRARY_SUFFIX})
@@ -1289,10 +1289,10 @@ if(WITH_MUMPS)
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
         CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS_CONFIGURE}  --prefix=<INSTALL_DIR> "--with-metis-cflags=-I${METIS_INCLUDE_DIR}" "--with-metis-lflags=-L${CMAKE_BINARY_DIR}/external_projects/lib -l${METIS_LIB} -lm" "--with-lapack-lflags=${LAPACK_LFLAGS}" ${CROSS_FLAGS_FORTRAN}
-        "CFLAGS=${EXTERNAL_PROJECT_CFLAGS}"
-        "CXXFLAGS=${EXTERNAL_PROJECT_CXXFLAGS}"
-        "FFLAGS=${EXTERNAL_PROJECT_FFLAGS}"
-        "FCFLAGS=${EXTERNAL_PROJECT_FCFLAGS}"
+        "ADD_CFLAGS=${EXTERNAL_PROJECT_CFLAGS}"
+        "ADD_CXXFLAGS=${EXTERNAL_PROJECT_CXXFLAGS}"
+        "ADD_FFLAGS=${EXTERNAL_PROJECT_FFLAGS}"
+        "ADD_FCFLAGS=${EXTERNAL_PROJECT_FCFLAGS}"
         PATCH_COMMAND COMMAND cd <SOURCE_DIR> && ./get.Mumps)
 
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/coin-or")
@@ -1332,10 +1332,10 @@ if(WITH_SPRAL)
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
         CONFIGURE_COMMAND ${SPRAL_RECONFIG_CMD} <SOURCE_DIR>/configure ${CROSS_FLAGS_CONFIGURE} --disable-gpu --prefix=<INSTALL_DIR> --disable-openmp "--with-metis-inc-dir=${METIS_INCLUDE_DIR}" "--with-metis=-L${CMAKE_BINARY_DIR}/external_projects/lib -l${METIS_LIB} -lm" "--with-lapack=${LAPACK_LFLAGS}" "--with-blas=${LAPACK_LFLAGS}" ${CROSS_FLAGS_FORTRAN}
-        "CFLAGS=-fPIC ${EXTERNAL_PROJECT_CFLAGS}"
-        "CXXFLAGS=-fPIC ${EXTERNAL_PROJECT_CXXFLAGS}"
-        "FFLAGS=-fPIC ${EXTERNAL_PROJECT_FFLAGS}"
-        "FCFLAGS=-fPIC ${EXTERNAL_PROJECT_FCFLAGS}"
+        "ADD_CFLAGS=-fPIC ${EXTERNAL_PROJECT_CFLAGS}"
+        "ADD_CXXFLAGS=-fPIC ${EXTERNAL_PROJECT_CXXFLAGS}"
+        "ADD_FFLAGS=-fPIC ${EXTERNAL_PROJECT_FFLAGS}"
+        "ADD_FCFLAGS=-fPIC ${EXTERNAL_PROJECT_FCFLAGS}"
         )
     set(SPRAL_DEPENDS_TARGET spral-external)
     set(SPRAL_FLAGS "--with-spral-cflags=-I${CMAKE_BINARY_DIR}/external_projects/include"
@@ -1353,10 +1353,10 @@ if((WITH_CLP AND WITH_BUILD_CLP) OR (WITH_CBC AND WITH_BUILD_CBC))
           PREFIX "${CMAKE_BINARY_DIR}/external_projects"
           UPDATE_COMMAND ""
           CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS_CONFIGURE} "--with-lapack-lflags=${LAPACK_LFLAGS}" --prefix=<INSTALL_DIR>
-          "CFLAGS=-fPIC ${EXTERNAL_PROJECT_CFLAGS}"
-          "CXXFLAGS=-fPIC ${EXTERNAL_PROJECT_CXXFLAGS}"
-          "FFLAGS=-fPIC ${EXTERNAL_PROJECT_FFLAGS}"
-          "FCFLAGS=-fPIC ${EXTERNAL_PROJECT_FCFLAGS}"
+          "ADD_CFLAGS=-fPIC ${EXTERNAL_PROJECT_CFLAGS}"
+          "ADD_CXXFLAGS=-fPIC ${EXTERNAL_PROJECT_CXXFLAGS}"
+          "ADD_FFLAGS=-fPIC ${EXTERNAL_PROJECT_FFLAGS}"
+          "ADD_FCFLAGS=-fPIC ${EXTERNAL_PROJECT_FCFLAGS}"
           )
     add_library(coinutils SHARED IMPORTED)
     add_dependencies(coinutils coinutils-external)
@@ -1377,10 +1377,10 @@ if(WITH_CLP)
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
         CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS_CONFIGURE} --prefix=<INSTALL_DIR> ${CROSS_FLAGS_FORTRAN}
-        "CFLAGS=-fPIC ${EXTERNAL_PROJECT_CFLAGS}"
-        "CXXFLAGS=-fPIC ${EXTERNAL_PROJECT_CXXFLAGS}"
-        "FFLAGS=-fPIC ${EXTERNAL_PROJECT_FFLAGS}"
-        "FCFLAGS=-fPIC ${EXTERNAL_PROJECT_FCFLAGS}"
+        "ADD_CFLAGS=-fPIC ${EXTERNAL_PROJECT_CFLAGS}"
+        "ADD_CXXFLAGS=-fPIC ${EXTERNAL_PROJECT_CXXFLAGS}"
+        "ADD_FFLAGS=-fPIC ${EXTERNAL_PROJECT_FFLAGS}"
+        "ADD_FCFLAGS=-fPIC ${EXTERNAL_PROJECT_FCFLAGS}"
 	# For unknown reasons, Coin-or/configure disables pkg-config by default for clang compilers 
 	--enable-pkg-config
     )
@@ -1402,10 +1402,10 @@ if(WITH_CLP)
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
         CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS_CONFIGURE} "--with-lapack-lflags=${LAPACK_LFLAGS}" --prefix=<INSTALL_DIR>  ${CROSS_FLAGS_FORTRAN}
-        "CFLAGS=-fPIC ${EXTERNAL_PROJECT_CFLAGS}"
-        "CXXFLAGS=-fPIC ${EXTERNAL_PROJECT_CXXFLAGS}"
-        "FFLAGS=-fPIC ${EXTERNAL_PROJECT_FFLAGS}"
-        "FCFLAGS=-fPIC ${EXTERNAL_PROJECT_FCFLAGS}"
+        "ADD_CFLAGS=-fPIC ${EXTERNAL_PROJECT_CFLAGS}"
+        "ADD_CXXFLAGS=-fPIC ${EXTERNAL_PROJECT_CXXFLAGS}"
+        "ADD_FFLAGS=-fPIC ${EXTERNAL_PROJECT_FFLAGS}"
+        "ADD_FCFLAGS=-fPIC ${EXTERNAL_PROJECT_FCFLAGS}"
 	# For unknown reasons, Coin-or/configure disables pkg-config by default for clang compilers 
 	--enable-pkg-config
 	${APPLE_FLAGS}
@@ -1442,10 +1442,10 @@ if(WITH_CBC)
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
         CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS_CONFIGURE} --prefix=<INSTALL_DIR> ${CROSS_FLAGS_FORTRAN}
-        "CFLAGS=-fPIC ${EXTERNAL_PROJECT_CFLAGS}"
-        "CXXFLAGS=-fPIC ${EXTERNAL_PROJECT_CXXFLAGS}"
-        "FFLAGS=-fPIC ${EXTERNAL_PROJECT_FFLAGS}"
-        "FCFLAGS=-fPIC ${EXTERNAL_PROJECT_FCFLAGS}"
+        "ADD_CFLAGS=-fPIC ${EXTERNAL_PROJECT_CFLAGS}"
+        "ADD_CXXFLAGS=-fPIC ${EXTERNAL_PROJECT_CXXFLAGS}"
+        "ADD_FFLAGS=-fPIC ${EXTERNAL_PROJECT_FFLAGS}"
+        "ADD_FCFLAGS=-fPIC ${EXTERNAL_PROJECT_FCFLAGS}"
 	# For unknown reasons, Coin-or/configure disables pkg-config by default for clang compilers 
 	--enable-pkg-config
 	)
@@ -1457,10 +1457,10 @@ if(WITH_CBC)
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
         CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS_CONFIGURE} --enable-cbc-parallel --prefix=<INSTALL_DIR> "--with-lapack-lflags=${LAPACK_LFLAGS}"  ${CROSS_FLAGS_FORTRAN}
-        "CFLAGS=-fPIC ${EXTERNAL_PROJECT_CFLAGS}"
-        "CXXFLAGS=-fPIC ${EXTERNAL_PROJECT_CXXFLAGS}"
-        "FFLAGS=-fPIC ${EXTERNAL_PROJECT_FFLAGS}"
-        "FCFLAGS=-fPIC ${EXTERNAL_PROJECT_FCFLAGS}"
+        "ADD_CFLAGS=-fPIC ${EXTERNAL_PROJECT_CFLAGS}"
+        "ADD_CXXFLAGS=-fPIC ${EXTERNAL_PROJECT_CXXFLAGS}"
+        "ADD_FFLAGS=-fPIC ${EXTERNAL_PROJECT_FFLAGS}"
+        "ADD_FCFLAGS=-fPIC ${EXTERNAL_PROJECT_FCFLAGS}"
 	# For unknown reasons, Coin-or/configure disables pkg-config by default for clang compilers 
 	--enable-pkg-config
 	)
@@ -1513,10 +1513,10 @@ if(WITH_IPOPT)
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
         CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS_CONFIGURE} --prefix=<INSTALL_DIR> "--with-mumps-cflags=-I${CMAKE_BINARY_DIR}/external_projects/include/coin-or/mumps" "--with-mumps-lflags=-L${CMAKE_BINARY_DIR}/external_projects/lib ${WHOLE_ARCHIVE_ON}-lcoinmumps ${WHOLE_ARCHIVE_OFF}"
-        "CFLAGS=-fPIC ${EXTERNAL_PROJECT_CFLAGS}"
-        "CXXFLAGS=-fPIC ${EXTERNAL_PROJECT_CXXFLAGS}"
-        "FFLAGS=-fPIC ${EXTERNAL_PROJECT_FFLAGS}"
-        "FCFLAGS=-fPIC ${EXTERNAL_PROJECT_FCFLAGS}"
+        "ADD_CFLAGS=-fPIC ${EXTERNAL_PROJECT_CFLAGS}"
+        "ADD_CXXFLAGS=-fPIC ${EXTERNAL_PROJECT_CXXFLAGS}"
+        "ADD_FFLAGS=-fPIC ${EXTERNAL_PROJECT_FFLAGS}"
+        "ADD_FCFLAGS=-fPIC ${EXTERNAL_PROJECT_FCFLAGS}"
         ${SPRAL_FLAGS}
         "--with-lapack-lflags= ${LAPACK_LFLAGS}" ${CROSS_FLAGS_FORTRAN}
 	--disable-java
@@ -1557,10 +1557,10 @@ if(WITH_BONMIN)
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
         CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS_CONFIGURE} --prefix=<INSTALL_DIR>  ${CROSS_FLAGS_FORTRAN}
-        "CFLAGS=-fPIC ${EXTERNAL_PROJECT_CFLAGS}"
-        "CXXFLAGS=-fPIC ${EXTERNAL_PROJECT_CXXFLAGS}"
-        "FFLAGS=-fPIC ${EXTERNAL_PROJECT_FFLAGS}"
-        "FCFLAGS=-fPIC ${EXTERNAL_PROJECT_FCFLAGS}"
+        "ADD_CFLAGS=-fPIC ${EXTERNAL_PROJECT_CFLAGS}"
+        "ADD_CXXFLAGS=-fPIC ${EXTERNAL_PROJECT_CXXFLAGS}"
+        "ADD_FFLAGS=-fPIC ${EXTERNAL_PROJECT_FFLAGS}"
+        "ADD_FCFLAGS=-fPIC ${EXTERNAL_PROJECT_FCFLAGS}"
 	# For unknown reasons, Coin-or/configure disables pkg-config by default for clang compilers 
 	--enable-pkg-config
 	# issue #2988
