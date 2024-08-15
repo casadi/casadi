@@ -962,12 +962,12 @@ bool OptiNode::old_callback() const {
   InternalOptiCallback* cb = static_cast<InternalOptiCallback*>(callback_.get());
   return !cb->associated_with(this);
 }
-// Solve the problem
-OptiSol OptiNode::solve(bool accept_limit) {
 
+Function OptiNode::solver_construct(bool callback) {
   if (problem_dirty()) {
     bake();
   }
+
   // Verify the constraint types
   for (const auto& g : g_) {
     if (problem_type_!="conic") {
@@ -978,36 +978,47 @@ OptiSol OptiNode::solve(bool accept_limit) {
     }
   }
 
+  Dict solver_options_all = solver_options_;
+
+  if (solver_options_all.find("equality")==solver_options_all.end()) {
+    solver_options_all["equality"] = equality_;
+  }
+
+  if (solver_options_all.find("discrete")==solver_options_all.end()) {
+    solver_options_all["discrete"] = discrete_;
+  }
+
+  Dict opts = solver_options_all;
+
+  // Handle callbacks
+  if (callback && user_callback_) {
+    callback_ = Function::create(new InternalOptiCallback(*this), Dict());
+    opts["iteration_callback"] = callback_;
+  }
+
+  casadi_assert(!solver_name_.empty(),
+    "You must call 'solver' on the Opti stack to select a solver. "
+    "Suggestion: opti.solver('ipopt')");
+
+  if (problem_type_=="conic") {
+    return qpsol("solver", solver_name_, nlp_, opts);
+  } else {
+    return nlpsol("solver", solver_name_, nlp_, opts);
+  }
+
+}
+
+// Solve the problem
+OptiSol OptiNode::solve(bool accept_limit) {
+
+  if (problem_dirty()) {
+    bake();
+  }
+
   bool solver_update =  solver_dirty() || old_callback() || (user_callback_ && callback_.is_null());
 
   if (solver_update) {
-    solver_options_all_ = solver_options_;
-
-    if (solver_options_all_.find("equality")==solver_options_all_.end()) {
-      solver_options_all_["equality"] = equality_;
-    }
-
-    if (solver_options_all_.find("discrete")==solver_options_all_.end()) {
-      solver_options_all_["discrete"] = discrete_;
-    }
-
-    Dict opts = solver_options_all_;
-
-    // Handle callbacks
-    if (user_callback_) {
-      callback_ = Function::create(new InternalOptiCallback(*this), Dict());
-      opts["iteration_callback"] = callback_;
-    }
-
-    casadi_assert(!solver_name_.empty(),
-      "You must call 'solver' on the Opti stack to select a solver. "
-      "Suggestion: opti.solver('ipopt')");
-
-    if (problem_type_=="conic") {
-      solver_ = qpsol("solver", solver_name_, nlp_, opts);
-    } else {
-      solver_ = nlpsol("solver", solver_name_, nlp_, opts);
-    }
+    solver_ = solver_construct(true);
     mark_solver_dirty(false);
   }
 
@@ -1313,12 +1324,7 @@ Function OptiNode::to_function(const std::string& name,
     const Dict& opts) {
   if (problem_dirty()) return baked_copy().to_function(name, args, res, name_in, name_out, opts);
 
-  Function solver;
-  if (problem_type_=="conic") {
-    solver = qpsol("solver", solver_name_, nlp_, solver_options_all_);
-  } else {
-    solver = nlpsol("solver", solver_name_, nlp_, solver_options_all_);
-  }
+  Function solver = solver_construct(false);
 
   // Get initial guess and parameter values
   std::vector<MX> x0, p, lam_g;

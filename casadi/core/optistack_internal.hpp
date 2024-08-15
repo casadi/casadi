@@ -183,6 +183,7 @@ public:
   std::string describe(const MX& x, casadi_int indent=0) const;
 
   void solve_prepare();
+  Function solver_construct(bool callback=true);
   DMDict solve_actual(const DMDict& args);
 
   DMDict arg() const { return arg_; }
@@ -394,7 +395,6 @@ private:
 
   std::string solver_name_;
   Dict solver_options_;
-  Dict solver_options_all_;
 
   void assert_only_opti_symbols(const MX& e) const;
   void assert_only_opti_nondual(const MX& e) const;
