@@ -697,7 +697,7 @@ class casadiTestCase(unittest.TestCase):
       if opts is None: opts = {}
       return (external(name, libname,opts),libname)
 
-  def check_codegen(self,F,inputs=None, opts=None,std="c89",extralibs="",check_serialize=False,extra_options=None,main=False,definitions=None,with_jac_sparsity=False,external_opts=None,with_reverse=False,with_forward=False,extra_include=[],digits=15):
+  def check_codegen(self,F,inputs=None, opts=None,std="c89",extralibs="",check_serialize=False,extra_options=None,main=False,main_return_code=0,definitions=None,with_jac_sparsity=False,external_opts=None,with_reverse=False,with_forward=False,extra_include=[],digits=15):
 
     if args.run_slow:
       import hashlib
@@ -785,9 +785,6 @@ class casadiTestCase(unittest.TestCase):
           inputs_main = F.convert_in(inputs)
         F.generate_in(F.name()+"_in.txt", inputs_main)
 
-      Fout = F.call(inputs)
-      Fout2 = F2.call(inputs)
-
       if main:
         with open(F.name()+"_out.txt","w") as stdout:
           with open(F.name()+"_in.txt","r") as stdin:
@@ -795,7 +792,14 @@ class casadiTestCase(unittest.TestCase):
             print(commands+" < " + F.name()+"_in.txt")
             p = subprocess.Popen(commands,shell=True,stdin=stdin,stdout=stdout)
             out = p.communicate()
-        assert p.returncode==0
+        assert p.returncode in main_return_code
+        if main_return_code:
+            return
+        
+      Fout = F.call(inputs)
+      Fout2 = F2.call(inputs)
+
+      if main:
         outputs = F.generate_out(F.name()+"_out.txt")
         print(outputs)
         if isinstance(inputs,dict):
