@@ -163,14 +163,21 @@ namespace casadi {
         \identifier{s4} */
     void define_rom_integer(const void* id, casadi_int size);
 
-    /** \brief Setup a callback
-
-        \identifier{27s} */
-    void setup_callback(const std::string& s, const Function& f);
     /** \brief Access file scope integer read-only memory
 
         \identifier{s5} */
     std::string rom_integer(const void* id) const;
+
+    /** \brief Allocate file scope double writeable memory */
+    void define_pool_double(const std::string& name, const std::vector<double>& def);
+
+    /** \brief Access file scope double writeable memory */
+    std::string pool_double(const std::string& name) const;
+
+    /** \brief Setup a callback
+
+        \identifier{27s} */
+    void setup_callback(const std::string& s, const Function& f);
 
     /** \brief Generate a call to a function (generic signature)
 
@@ -968,6 +975,8 @@ namespace casadi {
     std::map<std::string, std::string> local_default_;
     std::map<const void *, casadi_int> file_scope_double_;
     std::map<const void *, casadi_int> file_scope_integer_;
+    std::vector< std::vector<double> > pool_double_defaults_;
+    std::map<std::string, casadi_int> pool_double_;
 
     // Added functions
     struct FunctionMeta {

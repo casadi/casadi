@@ -121,6 +121,10 @@ namespace casadi {
     own(ConstantMX::create(sp, fname));
   }
 
+  MX::MX(const DM& val, const std::string& name) {
+    own(ConstantMX::create(val, name));
+  }
+
   std::vector<MX> MX::createMultipleOutput(MXNode* node) {
     casadi_assert_dev(dynamic_cast<MultipleOutput*>(node) != nullptr);
     MX x =  MX::create(node);

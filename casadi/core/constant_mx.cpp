@@ -204,6 +204,10 @@ namespace casadi {
     }
   }
 
+  ConstantMX* ConstantMX::create(const DM& x, const std::string& name) {
+    return new ConstantPool(x, name);
+  }
+
   bool ConstantDM::is_zero() const {
     return x_.is_zero();
   }
@@ -322,6 +326,7 @@ namespace casadi {
     switch (t) {
       case 'a':    return new ConstantDM(s);
       case 'f':    return new ConstantFile(s);
+      case 'p':    return new ConstantPool(s);
       case 'z':    return ZeroByZero::getInstance();
       case 'D':
         return new Constant<RuntimeConst<double> >(s, RuntimeConst<double>::deserialize(s));
@@ -397,6 +402,58 @@ namespace casadi {
     } else {
       g << g.copy(g.rom_double(this), nnz(), g.work(res[0], nnz(), false)) << '\n';
     }
+  }
+
+  ConstantPool::ConstantPool(const DM& x, const std::string& name) :
+      ConstantMX(x.sparsity()), name_(name), x_(x.nonzeros()) {
+  }
+
+  std::string ConstantPool::disp(const std::vector<std::string>& arg) const {
+    return "constant_pool('"  + name_ + "'): " + DM(sparsity(), x_, false).get_str();
+  }
+
+  double ConstantPool::to_double() const {
+    casadi_error("Not defined for ConstantPool");
+  }
+
+  Matrix<double> ConstantPool::get_DM() const {
+    casadi_error("Not defined for ConstantPool");
+  }
+
+  void ConstantPool::generate(CodeGenerator& g,
+                            const std::vector<casadi_int>& arg,
+                            const std::vector<casadi_int>& res,
+                            const std::vector<bool>& arg_is_ref,
+                            std::vector<bool>& res_is_ref) const {
+    if (nnz()==1) {
+      g << g.workel(res[0]) << " = " << g.pool_double(name_) << "[0];\n";
+    } else if (g.elide_copy(nnz())) {
+      g << g.work(res[0], nnz(), true) << " = " << g.pool_double(name_) << ";\n";
+      res_is_ref[0] = true;
+    } else {
+      g << g.copy(g.pool_double(name_), nnz(), g.work(res[0], nnz(), false)) << '\n';
+    }
+  }
+
+  void ConstantPool::add_dependency(CodeGenerator& g) const {
+    g.define_pool_double(name_, x_);
+    g.add_include("string.h");
+  }
+
+  void ConstantPool::serialize_body(SerializingStream& s) const {
+    MXNode::serialize_body(s);
+    s.pack("ConstantPool::name", name_);
+    s.pack("ConstantPool::x", x_);
+  }
+
+  void ConstantPool::serialize_type(SerializingStream& s) const {
+    MXNode::serialize_type(s);
+    s.pack("ConstantPool::type", 'p');
+  }
+
+  ConstantPool::ConstantPool(DeserializingStream& s) : ConstantMX(s) {
+    s.unpack("ConstantPool::name", name_);
+    s.unpack("ConstantPool::x", x_);
   }
 
 } // namespace casadi
