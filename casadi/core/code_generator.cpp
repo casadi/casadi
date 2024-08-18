@@ -453,6 +453,17 @@ namespace casadi {
     // Dump code to file
     dump(s);
 
+    if (!pool_double_defaults_.empty()) {
+      s << "CASADI_SYMBOL_EXPORT casadi_real* CASADI_PREFIX(get_pool_double)(const char* name) {\n";
+      for (const auto& e : pool_double_) {
+        casadi_int i = e.second;
+        s << "  if (strcmp(name, \"" + e.first + "\")==0) "
+          << "return casadi_pd" + str(i) + ";\n";
+      }
+      s << "  return 0;\n";
+      s << "}\n";
+    }
+
     // Mex entry point
     if (this->mex) generate_mex(s);
 
@@ -783,6 +794,24 @@ namespace casadi {
     return "casadi_ri" + str(size);
   }
 
+  void CodeGenerator::define_pool_double(const std::string& name, const std::vector<double>& def) {
+    auto it = pool_double_.find(name);
+    if (it==pool_double_.end()) {
+      casadi_int index = pool_double_defaults_.size();
+      pool_double_defaults_.push_back(def);
+      shorthand("pd" + str(index));
+      pool_double_[name] = index;
+    } else {
+      casadi_assert_dev(def==pool_double_defaults_[it->second]);
+    }
+  }
+
+  std::string CodeGenerator::pool_double(const std::string& name) const {
+    auto it = pool_double_.find(name);
+    casadi_assert(it!=pool_double_.end(), "Not defined.");
+    return "casadi_pd" + str(it->second);
+  }
+
   void CodeGenerator::dump(std::ostream& s) {
     // Consistency check
     casadi_assert_dev(current_indent_ == 0);
@@ -887,6 +916,16 @@ namespace casadi {
       casadi_int i=0;
       for (const auto& it : file_scope_integer_) {
         s << "static casadi_real casadi_ri" + str(i++) + "[" + str(it.second) + "];\n";
+      }
+      s << std::endl;
+    }
+
+    // Print file scope double pool
+    if (!pool_double_.empty()) {
+      casadi_int i=0;
+      for (const auto& v : pool_double_defaults_) {
+        s << "casadi_real casadi_pd" + str(i) + "[" + str(v.size()) + "] = " + initializer(v) + ";\n";
+        i++;
       }
       s << std::endl;
     }

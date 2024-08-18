@@ -68,6 +68,9 @@ namespace casadi {
     // Creator (values may be different)
     static ConstantMX* create(const Sparsity& sp, const std::string& fname);
 
+    // Creator (values may be different)
+    static ConstantMX* create(const Matrix<double>& val, const std::string& name);
+
     /// Evaluate the function numerically
     int eval(const double** arg, double** res, casadi_int* iw, double* w) const override = 0;
 
@@ -346,6 +349,62 @@ namespace casadi {
 
         \identifier{zw} */
     explicit ConstantFile(DeserializingStream& s);
+  };
+
+  /// A constant to be managed by a pool
+  class CASADI_EXPORT ConstantPool : public ConstantMX {
+  public:
+
+    /** \brief  Constructor */
+    explicit ConstantPool(const DM& x, const std::string& name);
+
+    /// Destructor
+    ~ConstantPool() override {}
+
+    /** \brief  Print expression */
+    std::string disp(const std::vector<std::string>& arg) const override;
+
+    /// Get the value (only for scalar constant nodes)
+    double to_double() const override;
+
+    /// Get the value (only for constant nodes)
+    Matrix<double> get_DM() const override;
+
+    /** \brief  Evaluate the function numerically */
+    int eval(const double** arg, double** res, casadi_int* iw, double* w) const override {
+      if (res[0]) std::copy(x_.begin(), x_.end(), res[0]);
+      return 0;
+    }
+
+    /** \brief  Evaluate the function symbolically (SX)  */
+    int eval_sx(const SXElem** arg, SXElem** res,
+                         casadi_int* iw, SXElem* w) const override {
+      casadi_error("eval_sx not supported");
+      return 0;
+    }
+
+    /** \brief Generate code for the operation  */
+    void generate(CodeGenerator& g,
+                  const std::vector<casadi_int>& arg,
+                  const std::vector<casadi_int>& res) const override;
+
+    /** \brief Add a dependent function */
+    void add_dependency(CodeGenerator& g) const override;
+
+    /** \brief pool identifier*/
+    std::string name_;
+
+    /** \brief nonzeros */
+    std::vector<double> x_;
+
+    /** \brief Serialize an object without type information  */
+    void serialize_body(SerializingStream& s) const override;
+
+    /** \brief Serialize type information */
+    void serialize_type(SerializingStream& s) const override;
+
+    /** \brief Deserializing constructor */
+    explicit ConstantPool(DeserializingStream& s);
   };
 
   /// A zero-by-zero matrix
