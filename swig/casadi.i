@@ -3371,7 +3371,14 @@ DECL std::vector<M> casadi_cse(const std::vector<M>& e) {
 DECL M casadi_cse(const M& e) {
   return cse(e);
 }
-
+DECL void casadi_extract_parametric(const M &expr, const M& par,
+        M& OUTPUT1, M& OUTPUT2, M& OUTPUT3) {
+  extract_parametric(expr, par, OUTPUT1, OUTPUT2, OUTPUT3);
+}
+DECL void casadi_extract_parametric(const std::vector<M> &expr, const M& par,
+        std::vector<M>& OUTPUT1, M& OUTPUT2, M& OUTPUT3) {
+  extract_parametric(expr, par, OUTPUT1, OUTPUT2, OUTPUT3);
+}
 #endif // FLAG & IS_MEMBER
 
 #if FLAG & IS_GLOBAL

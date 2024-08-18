@@ -3157,6 +3157,65 @@ class MXtests(casadiTestCase):
         res = f3(a)
         self.checkarray(a,res)
     
+  def test_extract_parametric(self):
+    def test_equal(a,b):
+        f1 = Function('f',[x,y,p],[a])
+        f2 = Function('f',[x,y,p],[b])
+        DM.rng(1)
+        args = [DM.rand(f1.sparsity_in(i)) for i in range(f1.n_in())]
+        return np.linalg.norm(f1(*args)-f2(*args),1)<1e-12
+        
+        #return cse(a-b).is_zero()  
+    
+    for X in [SX,MX]:
+
+
+      x = X.sym("x")
+      y = X.sym("y")
+      p = X.sym("p")
+      
+      expr = 2*x*p+2*y*p**2
+      expr_ret,symbols,parametric = extract_parametric(expr,p)
+      print(expr_ret,parametric)
+      self.assertTrue(test_equal(parametric,vertcat(p,p**2)))
+      
+      expr = vertcat(2*x+3*y+8*p,3*x+2*y+4,7)
+      
+      expr_ret,symbols,parametric = extract_parametric(expr,p)
+      
+      print(expr_ret,parametric)
+      
+      self.assertTrue(test_equal(parametric,8*p))
+      
+      
+
+        
+    for X in [SX,MX]:
+
+
+      x = X.sym("x")
+      y = X.sym("y")
+      p = X.sym("p")
+
+      def tests():
+        cp = cos(p)
+        expr = (x-sqrt(p))*(y+cp**2)+cp/(x+cp)/(y-p)
+        
+        yield expr
+        
+        yield vertcat(expr,p**2)
+        
+      for expr in tests():
+
+        expr_ret,symbols,parametric = extract_parametric(expr,p)
+        
+        print(expr_ret,symbols,parametric)
+        
+        self.assertFalse(depends_on(expr_ret,p))
+        
+        expr_recreated = substitute(expr_ret,symbols,parametric)
+        self.assertTrue(test_equal(expr,expr_recreated))
+    
 
 if __name__ == '__main__':
     unittest.main()

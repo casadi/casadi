@@ -2126,6 +2126,135 @@ namespace casadi {
     return res;
   }
 
+  MX register_symbol(const MX& node, std::map<MXNode*, MX>& symbol_map,
+                  std::vector<MX>& symbol_v, std::vector<MX>& parametric_v) {
+    // Check if a symbol is already registered
+    auto it = symbol_map.find(node.get());
+    if (it==symbol_map.end()) {
+      // Create a symbol and register
+      MX sym = MX::sym("extracted" + str(symbol_map.size()+1), node.sparsity());
+      symbol_map[node.get()] = sym;
+
+      // Make the (symbol,parametric expression) pair available
+      symbol_v.push_back(sym);
+      parametric_v.push_back(node);
+
+      // Use the new symbol
+      return sym;
+    } else {
+      // Just use the registered symbol
+      return it->second;
+    }
+  }
+
+  void MX::extract_parametric(const MX &expr, const MX& par,
+        MX& expr_ret, MX& symbols, MX& parametric) {
+
+    Function f("f", {par}, {expr}, {{"live_variables", false},
+      {"max_io", 0}, {"allow_free", true}});
+    MXFunction *ff = f.get<MXFunction>();
+
+    // Work vector
+    std::vector< MX > w(ff->workloc_.size()-1);
+
+    // Status of the expression:
+    // 0: dependant on constants only
+    // 1: dependant on parameters/constants only
+    // 2: dependant on non-parameters
+    std::vector< char > expr_status(ff->workloc_.size()-1, 0);
+
+    // Split up inputs analogous to symbolic primitives
+    std::vector<MX> arg_split = par.split_primitives(par);
+
+    // Allocate storage for split outputs
+    std::vector<MX> res_split;
+    res_split.resize(expr.n_primitives());
+
+    // Scratch space for node inputs/outputs
+    std::vector<MX > arg1, res1;
+
+    // Map of registered symbols
+    std::map<MXNode*, MX> symbol_map;
+
+    // Flat list of registerd symbols and parametric expressions
+    std::vector<MX> symbol_v, parametric_v;
+
+    // Loop over computational nodes in forward order
+    casadi_int alg_counter = 0;
+    for (auto it=ff->algorithm_.begin(); it!=ff->algorithm_.end(); ++it, ++alg_counter) {
+      if (it->op == OP_INPUT) {
+        w[it->res.front()] = arg_split.at(it->data->segment());
+        expr_status[it->res.front()] = 1;
+      } else if (it->op==OP_OUTPUT) {
+        MX arg = w[it->arg.front()];
+        if (expr_status[it->arg.front()]==1) {
+          arg = register_symbol(arg, symbol_map, symbol_v, parametric_v);
+        }
+        // Collect the results
+        res_split.at(it->data->segment()) = arg;
+      } else if (it->op==OP_CONST) {
+        // Fetch constant
+        w[it->res.front()] = it->data;
+        expr_status[it->res.front()] = 0;
+      } else if (it->op==OP_PARAMETER) {
+        // Free variables
+        w[it->res.front()] = it->data;
+        expr_status[it->res.front()] = 2;
+      } else {
+        // Arguments of the operation
+        arg1.resize(it->arg.size());
+        for (casadi_int i=0; i<arg1.size(); ++i) {
+          casadi_int el = it->arg[i]; // index of the argument
+          arg1[i] = el<0 ? MX(it->data->dep(i).size()) : w[el];
+        }
+
+        // Check worst case status of inputs
+        char max_status = 0;
+        for (casadi_int i=0; i<arg1.size(); ++i) {
+          casadi_int el = it->arg[i]; // index of the argument
+          if (el>=0) {
+            max_status = std::max(max_status, expr_status[it->arg[i]]);
+          }
+        }
+        bool any_tainted = max_status==2;
+
+        if (any_tainted) {
+          // Loop over all inputs
+          for (casadi_int i=0; i<arg1.size(); ++i) {
+            casadi_int el = it->arg[i]; // index of the argument
+
+            // For each parametric input being mixed into a non-parametric expression
+            if (el>=0 && expr_status[el]==1) {
+
+              arg1[i] = register_symbol(w[el], symbol_map, symbol_v, parametric_v);
+            }
+          }
+        }
+
+        // Perform the operation
+        res1.resize(it->res.size());
+        it->data->eval_mx(arg1, res1);
+
+        // Get the result
+        for (casadi_int i=0; i<res1.size(); ++i) {
+          casadi_int el = it->res[i]; // index of the output
+          if (el>=0) {
+            w[el] = res1[i];
+            // Update expression status
+            expr_status[el] = max_status;
+          }
+        }
+      }
+    }
+
+    // Join split outputs
+    expr_ret = expr.join_primitives(res_split);
+
+    symbols = veccat(symbol_v);
+    parametric = veccat(parametric_v);
+
+  }
+
   MX MX::stop_diff(const MX& expr, casadi_int order) {
     std::vector<MX> s = symvar(expr);
     MX x = veccat(s);
