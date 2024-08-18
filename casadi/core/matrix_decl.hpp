@@ -417,6 +417,8 @@ namespace casadi {
     static Matrix<Scalar> mac(const Matrix<Scalar> &x,
                                 const Matrix<Scalar> &y,
                                 const Matrix<Scalar> &z);
+    static void extract_parametric(const Matrix<Scalar> &expr, const Matrix<Scalar>& par,
+        Matrix<Scalar>& expr_ret, Matrix<Scalar>& symbols, Matrix<Scalar>& parametric);
     ///@}
 
     ///@{

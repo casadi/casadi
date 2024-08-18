@@ -2579,6 +2579,12 @@ namespace casadi {
   }
 
   template<typename Scalar>
+  void Matrix<Scalar>::extract_parametric(const Matrix<Scalar> &expr, const Matrix<Scalar>& par,
+        Matrix<Scalar>& expr_ret, Matrix<Scalar>& symbols, Matrix<Scalar>& parametric) {
+    casadi_error("'extract_parametric' not defined for " + type_name());
+  }
+
+  template<typename Scalar>
   bool Matrix<Scalar>::depends_on(const Matrix<Scalar> &x, const Matrix<Scalar> &arg) {
     casadi_error("'depends_on' not defined for " + type_name());
     return false;

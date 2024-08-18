@@ -639,6 +639,8 @@ namespace casadi {
     static MX cumsum(const MX &x, casadi_int axis=-1);
     static MX _logsumexp(const MX& x);
     static std::vector<MX> cse(const std::vector<MX>& e);
+    static void extract_parametric(const MX &expr, const MX& par,
+            MX& expr_ret, MX& symbols, MX& parametric);
     ///@}
 
     ///@{
