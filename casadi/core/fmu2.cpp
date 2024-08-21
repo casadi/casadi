@@ -172,8 +172,8 @@ void Fmu2::init(const DaeBuilderInternal* dae) {
     casadi_assert(v.numel == 1, "Vector variable support not implemented");
     // Skip if the wrong type
     if (v.causality != Causality::PARAMETER && v.causality != Causality::INPUT) continue;
-    // If nan - variable has not been set - keep default value
-    if (std::isnan(v.value.front())) continue;
+    // Variable has not been set - keep default value
+    if (!v.is_set()) continue;
     // Value reference
     fmi2ValueReference vr = v.value_reference;
     // Get value

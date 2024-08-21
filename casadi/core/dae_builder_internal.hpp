@@ -162,6 +162,11 @@ struct CASADI_EXPORT Variable {
 
   // Does the variable need a start attribute?
   bool has_start() const;
+
+  // Has the variable been set
+  bool is_set() const {
+    return !(type==Type::STRING ? stringvalue.empty() : std::isnan(value.front()));
+  }
 };
 
 /// \cond INTERNAL
