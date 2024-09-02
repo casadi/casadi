@@ -7,7 +7,7 @@ casadi_plugin(Conic fatrop
   "${CMAKE_CURRENT_BINARY_DIR}/fatrop_conic_runtime_str.h"
   )
 
-casadi_plugin_link_libraries(Conic fatrop fatrop)
+casadi_plugin_link_libraries(Conic fatrop fatrop::fatrop)
 
 casadi_plugin(Nlpsol fatrop
   fatrop_interface.hpp
@@ -16,7 +16,7 @@ casadi_plugin(Nlpsol fatrop
   "${CMAKE_CURRENT_BINARY_DIR}/fatrop_runtime_str.h"
   )
 
-casadi_plugin_link_libraries(Nlpsol fatrop fatrop)
+casadi_plugin_link_libraries(Nlpsol fatrop fatrop::fatrop)
 
 
 #add_executable(fatrop_test fatrop_test.cpp)

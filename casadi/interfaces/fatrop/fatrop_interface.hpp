@@ -29,9 +29,9 @@
 #include <casadi/interfaces/fatrop/casadi_nlpsol_fatrop_export.h>
 #include "casadi/core/nlpsol_impl.hpp"
 #include "casadi/core/timing.hpp"
-#include <ocp/OCPAbstract.hpp>
-#include <ocp/StageOCPApplication.hpp>
-#include <ocp/OCPCInterface.h>
+#include <fatrop/ocp/OCPAbstract.hpp>
+#include <fatrop/ocp/StageOCPApplication.hpp>
+#include <fatrop/ocp/OCPCInterface.h>
 
 namespace casadi {
   #include "fatrop_runtime.hpp"

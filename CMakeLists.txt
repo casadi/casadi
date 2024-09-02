@@ -1194,9 +1194,12 @@ if(WITH_FATROP)
     add_library(fatrop SHARED IMPORTED)
     add_dependencies(fatrop fatrop-external)
     target_link_libraries(fatrop INTERFACE blasfeo)
-    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/fatrop")
+    # This is similar to ALIAS but works fine on imported targets with CMake 3.10
+    add_library(fatrop::fatrop INTERFACE IMPORTED)
+    set_target_properties(fatrop::fatrop PROPERTIES INTERFACE_LINK_LIBRARIES fatrop)
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include")
     set_target_properties(fatrop PROPERTIES
-      INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include/fatrop"
+      INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include"
       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}fatrop${CMAKE_SHARED_LIBRARY_SUFFIX}"
       IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}fatrop${CMAKE_IMPORT_LIBRARY_SUFFIX}"
     )
