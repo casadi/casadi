@@ -46,7 +46,7 @@ namespace casadi {
   }
 
   Polynomial::Polynomial(double p0, double p1, double p2, double p3) {
-    p_.resize(2);
+    p_.resize(4);
     p_[0] = p0;
     p_[1] = p1;
     p_[2] = p2;
