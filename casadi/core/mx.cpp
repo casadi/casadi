@@ -2105,14 +2105,37 @@ namespace casadi {
         // Get the result
         for (casadi_int i=0; i<res1.size(); ++i) {
           casadi_int el = it->res[i]; // index of the output
+
           MX& out_i = res1[i];
 
-          std::string key = s.pack(out_i);
-          auto itk = cache.find(key);
-          if (itk==cache.end()) {
-            cache[key] = out_i;
-          } else {
-            out_i = itk->second;
+          // Default assumption is that out_i is not an output node
+          casadi_int output_node = -1;
+
+          if (out_i.is_output()) {
+            output_node = out_i.which_output();
+            // First pack/cache the parent (MultipleOutput node e.g. Call)
+            out_i = out_i.dep(0);
+          }
+
+          while (true) {
+            // Replace out_i by a cached variant if possible
+            std::string key = s.pack(out_i);
+
+            auto itk = cache.find(key);
+            if (itk==cache.end()) {
+              cache[key] = out_i;
+            } else {
+              out_i = itk->second;
+            }
+
+            if (output_node==-1) {
+              break; // Job is done
+            } else {
+              // Recreate the output node on top of the parent
+              out_i = out_i.get_output(output_node);
+              output_node = -1;
+              // Loop once more
+            }
           }
 
           if (el>=0) swork[el] = out_i;

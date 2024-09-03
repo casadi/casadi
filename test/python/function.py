@@ -2852,6 +2852,14 @@ class Functiontests(casadiTestCase):
         self.assertTrue(f1.n_instructions()>3)
         self.assertTrue(f2.n_instructions()<=3)
 
+  def test_cse_call(self):
+    x = MX.sym("x",2)
+    f = Function("f",[x],[x**2],["x"],["y"],{"never_inline":True})
+
+    y = cse(vertcat(f(sin(x)),f(sin(x)),f(sin(x))))
+    
+    self.assertTrue("vertcat(@1, @1, @1)" in str(y))
+
   @memory_heavy()
   def test_stop_diff(self):
     x = MX.sym("x")
