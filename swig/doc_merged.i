@@ -22004,7 +22004,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/mx.hpp#L628
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/mx.cpp#L2307-L2309
+https://github.com/casadi/casadi/blob/develop/casadi/core/mx.cpp#L2330-L2332
 
 ";
 
@@ -22017,7 +22017,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/mx.hpp#L629
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/mx.cpp#L2311-L2313
+https://github.com/casadi/casadi/blob/develop/casadi/core/mx.cpp#L2334-L2336
 
 ";
 
@@ -22056,7 +22056,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/mx.hpp#L632
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/mx.cpp#L2315-L2317
+https://github.com/casadi/casadi/blob/develop/casadi/core/mx.cpp#L2338-L2340
 
 ";
 
@@ -22069,7 +22069,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/mx.hpp#L633
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/mx.cpp#L2056-L2123
+https://github.com/casadi/casadi/blob/develop/casadi/core/mx.cpp#L2056-L2146
 
 ";
 
@@ -22959,7 +22959,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/mx.hpp#L914
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/mx.cpp#L2328-L2335
+https://github.com/casadi/casadi/blob/develop/casadi/core/mx.cpp#L2351-L2358
 
 ";
 
@@ -22974,7 +22974,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/mx.hpp#L916
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/mx.cpp#L2337-L2344
+https://github.com/casadi/casadi/blob/develop/casadi/core/mx.cpp#L2360-L2367
 
 ";
 
@@ -23684,7 +23684,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/mx.hpp#L907
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/mx.cpp#L2320-L2326
+https://github.com/casadi/casadi/blob/develop/casadi/core/mx.cpp#L2343-L2349
 
 ";
 
