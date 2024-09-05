@@ -2805,6 +2805,8 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
       // Add to list of states
       casadi_assert(v.der_of >= 0, "Error processing derivative info for " + v.name);
       x_.push_back(v.der_of);
+      // Make sure der field is consistent
+      variable(x_.back()).der = derivatives_.back();
       // Get dependencies
       v.dependencies = e.attribute<std::vector<casadi_int>>("dependencies", {});
       // dependenciesKind attribute, if present
