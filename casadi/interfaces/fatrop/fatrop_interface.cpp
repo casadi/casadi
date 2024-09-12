@@ -635,6 +635,8 @@ void FatropInterface::codegen_declarations(CodeGenerator& g) const {
   g.add_auxiliary(CodeGenerator::AUX_INF);
   g.add_auxiliary(CodeGenerator::AUX_SCALED_COPY);
   g.add_auxiliary(CodeGenerator::AUX_AXPY);
+  g.add_auxiliary(CodeGenerator::AUX_PRINTF);
+  g.add_include("stdio.h");
   g.add_dependency(get_function("nlp_f"));
   g.add_dependency(get_function("nlp_grad_f"));
   g.add_dependency(get_function("nlp_g"));
@@ -644,6 +646,26 @@ void FatropInterface::codegen_declarations(CodeGenerator& g) const {
   }
   g.add_include("fatrop/ocp/OCPCInterface.h");
 
+  std::string name = "fatrop_cb_write";
+  std::string f = g.shorthand(name);
+
+  g << "void " << f
+    << "(const char* msg, int num) {\n";
+  g.flush(g.body);
+  g.scope_enter();
+  g << "CASADI_PRINTF(\"%.*s\", num, msg);\n";
+  g.scope_exit();
+  g << "}\n";
+
+  name = "fatrop_cb_flush";
+  f = g.shorthand(name);
+
+  g << "void " << f
+    << "(void) {\n";
+  g.flush(g.body);
+  g.scope_enter();
+  g.scope_exit();
+  g << "}\n";
 }
 
 void FatropInterface::codegen_body(CodeGenerator& g) const {
@@ -809,8 +831,8 @@ void FatropInterface::set_fatrop_prob(CodeGenerator& g) const {
     g << "p.sp_h = 0;\n";
   }
 
-  g << "p.write = 0;\n";
-  g << "p.flush = 0;\n";
+  g << "p.write = &" << g.shorthand("fatrop_cb_write") << ";\n";
+  g << "p.flush = &" << g.shorthand("fatrop_cb_flush") << ";\n";
 
   g << "casadi_fatrop_setup(&p);\n";
 
