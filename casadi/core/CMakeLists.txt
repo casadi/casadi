@@ -206,6 +206,15 @@ set(CASADI_INTERNAL
   runtime/casadi_runtime.hpp
 )
 
+if(WITH_SIMDE)
+  set(CASADI_INTERNAL ${CASADI_INTERNAL}
+    blazing_spline.cpp blazing_spline_impl.hpp
+  )
+  set(CASADI_PUBLIC ${CASADI_PUBLIC}
+    blazing_spline.hpp
+  )
+endif()
+
 add_executable(casadi-cli casadi_cli.cpp)
 target_link_libraries(casadi-cli casadi)
 file(RELATIVE_PATH TREL_BIN_PREFIX "${CMAKE_INSTALL_PREFIX}" "${BIN_PREFIX}")

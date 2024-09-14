@@ -3271,6 +3271,46 @@ class Functiontests(casadiTestCase):
     ff = f.forward(1)
     self.assertNotEqual(hash(ff),h)
     self.assertEqual(hash(f2a),hash(f2b))
+        
+  def test_blazing_spline(self):
+  
+    def knots_expand(k):
+        return [k[0]]*3 + k + [k[-1]]*3
+  
+    knots0 = [0,0.2,0.5,0.8,1]
+    knots1 = [0,0.1,0.5,0.9,1]
+    knots2 = [0,0.4,1]
+    
+    N = 3
+    knots_orig = [knots0, knots1, knots2]
+    knots = [knots_expand(e) for e in knots_orig]
+    
+    
+    x=MX.sym("x",N)
+    
+    nc = np.prod([len(k)-4 for k in knots])
+    DM.rng(1)
+    data = DM.rand(nc)
+    C = MX.sym("C",nc,1)
+    Y = bspline(x,C,knots,[3]*N,1)
+    F_ref = Function('f',[x,C],[Y])
+    
+    
+    F = blazing_spline("F",knots,{"jit":True,"jit_options":{"flags": ["-I"+GlobalOptions.getCasadiIncludePath(),"-O3","-ffast-math","-march=native"]}})
+    
+    
+    def test_points(knots):
+        import itertools
+        selector = [lambda e: e[0]-0.1,lambda e: e[0],lambda e: (e[0]+e[1])/2,lambda e: e[-1],lambda e: e[-1]+0.1]
+        for s in itertools.product(selector,repeat=len(knots)):
+            yield [e(k) for e,k in zip(s,knots_orig)]
+            
+    for a in test_points(knots):
+        self.checkfunction_light(F,F_ref,inputs=[vcat(a),data])
+
+   
+
+        
     
 if __name__ == '__main__':
     unittest.main()

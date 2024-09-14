@@ -308,6 +308,11 @@ if(WITH_OPENMP)
   endif()
 endif()
 
+option(WITH_SIMDE "Compile with simd support using Simde" OFF)
+if(WITH_SIMDE)
+  add_definitions(-DCASADI_WITH_SIMDE)
+endif()
+
 # enabling Threads support if requested
 option(WITH_THREAD "Compile with parallelization support using POSIX Threads" OFF)
 option(WITH_THREAD_MINGW "For MINGW, use mingw-std-threads" OFF)
@@ -1732,10 +1737,20 @@ if(WITH_BUILD_SIMDE)
                     <SOURCE_DIR>/simde <INSTALL_DIR>/include/simde)
   add_library(Simde INTERFACE)
   add_dependencies(Simde simde-external)
-  target_include_directories(Simde INTERFACE "${CMAKE_BINARY_DIR}/external_projects/include/simde")
+  target_include_directories(Simde
+    INTERFACE
+      $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/external_projects/include/simde>  # For build
+      $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/simde>  # For installed location
+  )
   install(DIRECTORY
     "${CMAKE_BINARY_DIR}/external_projects/include/simde"
     DESTINATION "${INCLUDE_PREFIX}")
+  if(WITH_SIMDE)
+    install(TARGETS Simde
+      EXPORT casadi-targets
+      INCLUDES DESTINATION "${INCLUDE_PREFIX}"
+    )
+  endif()
 endif()
 
 if(WITH_PROXQP)
@@ -1973,8 +1988,8 @@ endif()
 ########### Generate config files ######################
 ########################################################
 # Add all targets to the build-tree export set
-export(TARGETS casadi
-  FILE "${PROJECT_BINARY_DIR}/casadi-targets.cmake")
+#export(TARGETS casadi
+#  FILE "${PROJECT_BINARY_DIR}/casadi-targets.cmake")
 
 # Export the package for use from the build-tree
 # (this registers the build-tree with a global CMake-registry)
