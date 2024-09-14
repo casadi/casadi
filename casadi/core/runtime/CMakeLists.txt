@@ -78,6 +78,12 @@ set(RUNTIME_SRC
   casadi_ocp_block.hpp
   casadi_scaled_copy.hpp
 )
+if(WITH_SIMDE)
+  set(RUNTIME_SRC ${RUNTIME_SRC}
+    casadi_blazing_spline.hpp
+    )
+endif()
+
 set(CASADI_RUNTIME_SRC "${RUNTIME_SRC}" PARENT_SCOPE)
 
 set(EXTRA_CASADI_CXX_FLAGS "${EXTRA_CASADI_CXX_FLAGS} -Wno-conversion")

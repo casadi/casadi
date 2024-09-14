@@ -40,6 +40,10 @@ macro(casadi_library name)
   file(RELATIVE_PATH TREL_LIB_PREFIX "${CMAKE_INSTALL_PREFIX}" "${LIB_PREFIX}")
   file(RELATIVE_PATH TREL_BIN_PREFIX "${CMAKE_INSTALL_PREFIX}" "${BIN_PREFIX}")
 
+  if(WITH_SIMDE)
+    target_link_libraries(${name} Simde)
+  endif()
+
   # Link with the core
   if(NOT "${name}" STREQUAL "casadi")
     # Not core

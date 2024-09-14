@@ -641,7 +641,8 @@ namespace casadi {
       AUX_ORACLE_CALLBACK,
       AUX_OCP_BLOCK,
       AUX_ORACLE,
-      AUX_SCALED_COPY
+      AUX_SCALED_COPY,
+      AUX_BLAZING_SPLINE
     };
 
     /** \brief Add a built-in auxiliary function

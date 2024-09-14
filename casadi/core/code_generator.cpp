@@ -1751,6 +1751,10 @@ namespace casadi {
                         << "#endif\n"
                         << "}\n\n";
       break;
+    case AUX_BLAZING_SPLINE:
+      add_auxiliary(AUX_LOW);
+      this->auxiliaries << sanitize_source(casadi_blazing_spline_str, inst);
+      break;
     }
   }
 
