@@ -211,28 +211,29 @@ void casadi_blazing_nd_boor_eval_dim3(T1* ret, const T1* all_knots, const casadi
       }
   }
 
-  simde__m256d a = boor0_d0;
-  simde__m256d b0 = simde_mm256_permute4x64_pd(boor1_d0, SIMDE_MM_SHUFFLE(0, 0, 0, 0));
-  simde__m256d b1 = simde_mm256_permute4x64_pd(boor1_d0, SIMDE_MM_SHUFFLE(1, 1, 1, 1));
-  simde__m256d b2 = simde_mm256_permute4x64_pd(boor1_d0, SIMDE_MM_SHUFFLE(2, 2, 2, 2));
-  simde__m256d b3 = simde_mm256_permute4x64_pd(boor1_d0, SIMDE_MM_SHUFFLE(3, 3, 3, 3));
+  simde__m256d a, b0, b1, b2, b3, c0, c1, c2, c3, r;
+  simde__m256d ab[4], cab[4];
+  simde__m128d r0, r1;
 
-  simde__m256d c0 = simde_mm256_permute4x64_pd(boor2_d0, SIMDE_MM_SHUFFLE(0, 0, 0, 0));
-  simde__m256d c1 = simde_mm256_permute4x64_pd(boor2_d0, SIMDE_MM_SHUFFLE(1, 1, 1, 1));
-  simde__m256d c2 = simde_mm256_permute4x64_pd(boor2_d0, SIMDE_MM_SHUFFLE(2, 2, 2, 2));
-  simde__m256d c3 = simde_mm256_permute4x64_pd(boor2_d0, SIMDE_MM_SHUFFLE(3, 3, 3, 3));
+  a = boor0_d0;
+  b0 = simde_mm256_permute4x64_pd(boor1_d0, SIMDE_MM_SHUFFLE(0, 0, 0, 0));
+  b1 = simde_mm256_permute4x64_pd(boor1_d0, SIMDE_MM_SHUFFLE(1, 1, 1, 1));
+  b2 = simde_mm256_permute4x64_pd(boor1_d0, SIMDE_MM_SHUFFLE(2, 2, 2, 2));
+  b3 = simde_mm256_permute4x64_pd(boor1_d0, SIMDE_MM_SHUFFLE(3, 3, 3, 3));
+
+  c0 = simde_mm256_permute4x64_pd(boor2_d0, SIMDE_MM_SHUFFLE(0, 0, 0, 0));
+  c1 = simde_mm256_permute4x64_pd(boor2_d0, SIMDE_MM_SHUFFLE(1, 1, 1, 1));
+  c2 = simde_mm256_permute4x64_pd(boor2_d0, SIMDE_MM_SHUFFLE(2, 2, 2, 2));
+  c3 = simde_mm256_permute4x64_pd(boor2_d0, SIMDE_MM_SHUFFLE(3, 3, 3, 3));
 
   // Need to compute sum_abc C_abc A_a B_b C_c
 
   // Step 1: Outer product a b: A_a B_b 
-  simde__m256d ab[4];
   ab[0] = simde_mm256_mul_pd(a, b0);
   ab[1] = simde_mm256_mul_pd(a, b1);
   ab[2] = simde_mm256_mul_pd(a, b2);
   ab[3] = simde_mm256_mul_pd(a, b3);
 
-  simde__m256d cab[4];
-  
   // Sum over b axis: sum_b C_abc * (A_a B_b)_b 
   // cab <- cab + ab[i]*C[i]
   for (int i=0;i<4;++i) {
@@ -244,15 +245,15 @@ void casadi_blazing_nd_boor_eval_dim3(T1* ret, const T1* all_knots, const casadi
   }
 
   // Reduce over the c direction
-  simde__m256d r = simde_mm256_set1_pd(0);
+  r = simde_mm256_set1_pd(0);
   r = simde_mm256_fmadd_pd(cab[0], c0, r);
   r = simde_mm256_fmadd_pd(cab[1], c1, r);
   r = simde_mm256_fmadd_pd(cab[2], c2, r);
   r = simde_mm256_fmadd_pd(cab[3], c3, r);
 
   // Sum all r entries
-  simde__m128d r0  = simde_mm256_castpd256_pd128(r);
-  simde__m128d r1 = simde_mm256_extractf128_pd(r, 1);
+  r0  = simde_mm256_castpd256_pd128(r);
+  r1 = simde_mm256_extractf128_pd(r, 1);
   r0  = simde_mm_add_pd(r0, r1);
   ret[0] = simde_mm_cvtsd_f64(simde_mm_add_sd(r0, simde_mm_unpackhi_pd(r0, r0)));
 

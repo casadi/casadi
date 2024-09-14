@@ -25,6 +25,7 @@
 
 #include "blazing_spline_impl.hpp"
 #include "interpolant_impl.hpp"
+#include "bspline_impl.hpp"
 #include "casadi_misc.hpp"
 
 #include <fstream>
@@ -40,7 +41,7 @@ namespace casadi {
   }
 
   size_t BlazingSplineFunction::get_n_in() {
-    return 2;
+    return 2+diff_order_;
   }
   size_t BlazingSplineFunction::get_n_out() {
     return diff_order_+1;
@@ -78,6 +79,10 @@ namespace casadi {
       return "x";
     } else if (i==1) {
       return "C";
+    } else if (i==2) {
+      return "dC";
+    } else if (i==3) {
+      return "ddC";
     } else {
       casadi_assert_dev(false);
       return "";
@@ -198,10 +203,39 @@ namespace casadi {
                                    const std::vector<std::string>& inames,
                                    const std::vector<std::string>& onames,
                                    const Dict& opts) const {
+
+
+    MX C = MX::sym("C", nc_);
+
+    // Compute coefficient tensor size
+    casadi_int ndc_ = 1;
+    for (const auto& e : knots_) {
+      ndc_ *= e.size()-5;
+    }
+
+    std::vector<casadi_int> coeffs_dims(knots_.size()+1);
+    coeffs_dims[0] = 1;
+    for (casadi_int i=0; i<knots_.size(); ++i) {
+      coeffs_dims[i+1] = knots_[i].size()-4;
+    }
+
+    std::vector<casadi_int> offset;
+    std::vector<double> stacked;
+    Interpolant::stack_grid(knots_, offset, stacked);
+
+    std::vector<casadi_int> degree(knots_.size(), 3);
+    MX dC = BSplineCommon::derivative_coeff(0, stacked, offset, degree, coeffs_dims, C);
+
+
+    Function fJ = Function::create(new BlazingSplineFunction(name, knots_, diff_order_+1), opts);
+
+    
+
+
     // Create a JIT-function for the Jacobian
-    Dict jac_opts;
-    if (!hess_body_.empty()) jac_opts["jac"] = hess_body_;
-    return Function::jit(name, jac_body_, inames, onames, jac_opts);
+    //Dict jac_opts;
+    // if (!hess_body_.empty()) jac_opts["jac"] = hess_body_;
+    //return Function::jit(name, jac_body_, inames, onames, jac_opts);*/
   }
 
 } // namespace casadi
