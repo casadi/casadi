@@ -105,7 +105,7 @@ namespace casadi {
     std::vector<double> knots_stacked_;
 
     // Coefficient tensor size
-    casadi_int nc_;
+    casadi_int nc_, ndc_;
 
     ///@{
     /** \brief Number of function inputs and outputs*/
