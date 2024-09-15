@@ -53,9 +53,11 @@ namespace casadi {
 
   Sparsity BlazingSplineFunction::get_sparsity_in(casadi_int i) {
     if (i==0) {
-      return Sparsity::dense(1, knots_.size());
+      return Sparsity::dense(knots_.size());
     } else if (i==1) {
-      return Sparsity::dense(1, nc_);
+      return Sparsity::dense(nc_);
+    } else if (i==2) {
+      return Sparsity::dense(ndc_);
     } else {
       casadi_assert_dev(false);
       return Sparsity();
@@ -109,6 +111,16 @@ namespace casadi {
     nc_ = 1;
     for (const auto& e : knots) {
       nc_ *= e.size()-4;
+    }
+
+    // Compute coefficient tensor size
+    ndc_ = 0;
+    for (casadi_int k=0;k<knots.size();++k) {
+      casadi_int ndc = 1;
+      for (casadi_int i=0;i<knots.size();++i) {
+        ndc *= knots[i].size() - 4 - (i==k);
+      }
+      ndc_+= ndc;
     }
 
 
@@ -166,33 +178,30 @@ namespace casadi {
     std::string knots_offset = g.constant(knots_offset_);
     std::string knots_stacked = g.constant(knots_stacked_);
 
-    // Compute strides
-    std::vector<casadi_int> strides = {1};
-    for (casadi_int i=0;i<knots_.size()-1;++i) {
-      strides.push_back(strides.back()*(knots_[i].size()-4));
-    }
-
     std::vector<std::string> lookup_mode;
     std::vector<casadi_int> degree(3, knots_.size());
     std::vector<casadi_int> mode = Interpolant::interpret_lookup_mode(lookup_mode, knots_stacked_, knots_offset_, degree, degree);
 
 
-    // Codegen function body
-    g << "casadi_blazing_nd_boor_eval_dim3(res[0], " +
-          knots_stacked + ", " +
-          knots_offset + ", " +
-          g.constant(strides) + ", " +
-          "arg[1], " + 
-          "arg[0], " + 
-          g.constant(mode) + ", " +
-          "iw, w);\n";
-
-    // Get results
-    /*for (casadi_int i=0; i<n_out_; ++i) {
-      if (buffered_) {
-        g << g.copy(name_out_[i], nnz_out(i), "*res++") << "\n";
-      }
-    }*/
+    if (diff_order_==0) {
+      // Codegen function body
+      g << "casadi_blazing_nd_boor_eval_dim3(res[0], 0, " +
+            knots_stacked + ", " +
+            knots_offset + ", " +
+            "arg[1], 0, " + 
+            "arg[0], " + 
+            g.constant(mode) + ", " +
+            "iw, w);\n";
+    } else if (diff_order_==1) {
+      // Codegen function body
+      g << "casadi_blazing_nd_boor_eval_dim3(res[0], res[1], " +
+            knots_stacked + ", " +
+            knots_offset + ", " +
+            "arg[1], arg[2], " + 
+            "arg[0], " + 
+            g.constant(mode) + ", " +
+            "iw, w);\n";
+    }
   }
 
   bool BlazingSplineFunction::has_jacobian() const {
@@ -206,6 +215,7 @@ namespace casadi {
 
 
     MX C = MX::sym("C", nc_);
+    MX x = MX::sym("x", knots_.size());
 
     // Compute coefficient tensor size
     casadi_int ndc_ = 1;
@@ -224,18 +234,29 @@ namespace casadi {
     Interpolant::stack_grid(knots_, offset, stacked);
 
     std::vector<casadi_int> degree(knots_.size(), 3);
-    MX dC = BSplineCommon::derivative_coeff(0, stacked, offset, degree, coeffs_dims, C);
+    MX dC0 = BSplineCommon::derivative_coeff(0, stacked, offset, degree, coeffs_dims, C);
+    MX dC1 = BSplineCommon::derivative_coeff(1, stacked, offset, degree, coeffs_dims, C);
+    MX dC2 = BSplineCommon::derivative_coeff(2, stacked, offset, degree, coeffs_dims, C);
+    MX dC = vertcat(dC0,dC1,dC2);
 
+    Dict Jopts = combine(jacobian_options_, der_options_);
+    Jopts = combine(opts, Jopts);
+    Jopts = combine(Jopts, generate_options("jacobian"));
 
-    Function fJ = Function::create(new BlazingSplineFunction(name, knots_, diff_order_+1), opts);
+    Function fJ = Function::create(new BlazingSplineFunction(name, knots_, diff_order_+1), Jopts);
 
-    
+    MX out_f = MX(1, 1);
 
+    std::vector<MX> ret = fJ(std::vector<MX>{x, C, dC});
 
-    // Create a JIT-function for the Jacobian
-    //Dict jac_opts;
-    // if (!hess_body_.empty()) jac_opts["jac"] = hess_body_;
-    //return Function::jit(name, jac_body_, inames, onames, jac_opts);*/
+    Function jac(name,
+      {x, C, out_f},
+      {ret[1], MX(1, nc_)},
+      inames,
+      onames,
+      {{"always_inline", true}});
+
+    return jac;
   }
 
 } // namespace casadi

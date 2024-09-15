@@ -3271,8 +3271,15 @@ class Functiontests(casadiTestCase):
     Y = bspline(x,C,knots,[3]*N,1)
     F_ref = Function('f',[x,C],[Y])
     
+    print(Y)
     
-    F = blazing_spline("F",knots,{"jit":True,"jit_options":{"flags": ["-I"+GlobalOptions.getCasadiIncludePath(),"-O3","-ffast-math","-march=native"]}})
+    F_ref2 = Function('f',[x,C],[Y,jacobian(Y,x)])
+    
+    F_ref2([0,0,0],data)
+    
+    #raise Exception()
+    
+    F = blazing_spline("F",knots,{"jit":True,"jit_options":{"flags": ["-I"+GlobalOptions.getCasadiIncludePath(),"-g","-O3","-ffast-math","-march=native"]}})
     
     
     def test_points(knots):
@@ -3280,10 +3287,20 @@ class Functiontests(casadiTestCase):
         selector = [lambda e: e[0]-0.1,lambda e: e[0],lambda e: (e[0]+e[1])/2,lambda e: e[-1],lambda e: e[-1]+0.1]
         for s in itertools.product(selector,repeat=len(knots)):
             yield [e(k) for e,k in zip(s,knots_orig)]
-            
+
     for a in test_points(knots):
         self.checkfunction_light(F,F_ref,inputs=[vcat(a),data])
 
+    FJ = F.jacobian()
+    FJ.generate("FJ.c",{"main":True})
+    FJ.generate_in("FJ_in.txt",[vcat(a),data,0])
+    FJ_ref = F_ref.jacobian()
+    
+    print("ref")
+    F_ref2([0,0,0],data)
+    
+    for a in test_points(knots):
+        self.checkfunction_light(FJ,FJ_ref,inputs=[vcat(a),data,0])
    
 
         
