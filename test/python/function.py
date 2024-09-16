@@ -3279,7 +3279,7 @@ class Functiontests(casadiTestCase):
     
     #raise Exception()
     
-    F = blazing_spline("F",knots,{"jit":True,"jit_options":{"flags": ["-I"+GlobalOptions.getCasadiIncludePath(),"-g","-O3","-ffast-math","-march=native"]}})
+    F = blazing_spline("F",knots,{"jit":True,"jit_options":{"flags": ["-I"+GlobalOptions.getCasadiIncludePath(),"-g","-ffast-math","-march=native"]}})
     
     
     def test_points(knots):
@@ -3290,6 +3290,7 @@ class Functiontests(casadiTestCase):
 
     for a in test_points(knots):
         self.checkfunction_light(F,F_ref,inputs=[vcat(a),data])
+        self.check_serialize(F,inputs=[vcat(a),data])
 
     FJ = F.jacobian()
     FJ.generate("FJ.c",{"main":True})
@@ -3302,8 +3303,22 @@ class Functiontests(casadiTestCase):
     for a in test_points(knots):
         self.checkfunction_light(FJ,FJ_ref,inputs=[vcat(a),data,0])
    
+    FJ = FJ.jacobian()
+    FJ.generate("FH.c",{"main":True})
+    FJ.generate_in("FH_in.txt",[vertcat(0.4,0.4,0.4),data,0,0,0])
+    print(FJ)
 
+    FJ_ref = FJ_ref.jacobian()
+    import time
+    t0 = time.time()
+    FJ_ref(vcat(a),data,0,0,0)
+    print("FJ_ref" ,time.time()-t0)
+    t0 = time.time()
+    FJ(vcat(a),data,0,0,0)
+    print("FJ" ,time.time()-t0)
+    for a in test_points(knots):
+        print(vcat(a),data,0,0,0)
+        self.checkfunction_light(FJ,FJ_ref,inputs=[vcat(a),data,0,0,0])
         
-    
 if __name__ == '__main__':
     unittest.main()

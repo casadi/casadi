@@ -65,7 +65,9 @@ namespace casadi {
         const std::vector<casadi_int>& offset,
         const std::vector<casadi_int>& degree, 
         const std::vector<casadi_int>& coeffs_dims,
-        const M& coeffs);
+        const M& coeffs,
+        std::vector< std::vector<double> >& new_knots,
+        std::vector<casadi_int>& new_degree);
 
     std::vector<double> knots_;
     std::vector<casadi_int> offset_;

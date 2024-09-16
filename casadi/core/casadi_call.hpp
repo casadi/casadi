@@ -44,6 +44,9 @@ namespace casadi {
         \identifier{6j} */
     static std::vector<MX> create(const Function& fcn, const std::vector<MX>& arg);
 
+    /** \brief  Create function call node */
+    static MX create_call(const Function& fcn, const std::vector<MX>& arg);
+
     /** \brief  Destructor
 
         \identifier{6k} */

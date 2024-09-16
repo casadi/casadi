@@ -58,6 +58,8 @@ namespace casadi {
       return Sparsity::dense(nc_);
     } else if (i==2) {
       return Sparsity::dense(ndc_);
+    } else if (i==3) {
+      return Sparsity::dense(nddc_);
     } else {
       casadi_assert_dev(false);
       return Sparsity();
@@ -68,7 +70,7 @@ namespace casadi {
       return Sparsity::dense(1, 1);
     } else if (i==1) {
       return Sparsity::dense(1, knots_.size());
-    } else if (i=2) {
+    } else if (i==2) {
       return Sparsity::dense(knots_.size(), knots_.size());
     } else {
       casadi_assert_dev(false);
@@ -106,41 +108,50 @@ namespace casadi {
   BlazingSplineFunction::BlazingSplineFunction(const std::string& name,
     const std::vector< std::vector<double> >& knots,
     casadi_int diff_order) : FunctionInternal(name), knots_(knots), diff_order_(diff_order) {
-    
+
+    init_derived_members();
+  }
+
+  void BlazingSplineFunction::init_derived_members() {
     // Compute coefficient tensor size
     nc_ = 1;
-    for (const auto& e : knots) {
+    for (const auto& e : knots_) {
       nc_ *= e.size()-4;
     }
 
     // Compute coefficient tensor size
     ndc_ = 0;
-    for (casadi_int k=0;k<knots.size();++k) {
+    for (casadi_int k=0;k<knots_.size();++k) {
       casadi_int ndc = 1;
-      for (casadi_int i=0;i<knots.size();++i) {
-        ndc *= knots[i].size() - 4 - (i==k);
+      for (casadi_int i=0;i<knots_.size();++i) {
+        ndc *= knots_[i].size() - 4 - (i==k);
       }
       ndc_+= ndc;
+    }
+
+    nddc_ = 0;
+    for (casadi_int k=0;k<knots_.size();++k) {
+      for (casadi_int kk=0;kk<knots_.size();++kk) {
+        casadi_int ndc = 1;
+        for (casadi_int i=0;i<knots_.size();++i) {
+          ndc *= knots_[i].size() - 4 - (i==k)-(i==kk);
+        }
+        // We only need the triangular part
+        if (kk>=k) {
+          nddc_+= ndc;
+        }
+      }
     }
 
 
     std::vector<casadi_int> offset;
     std::vector<double> stacked;
-    Interpolant::stack_grid(knots, knots_offset_, knots_stacked_);
-
+    Interpolant::stack_grid(knots_, knots_offset_, knots_stacked_);
   }
 
   const Options BlazingSplineFunction::options_
   = {{&FunctionInternal::options_},
-     {{"buffered",
-      {OT_BOOL,
-        "Buffer the calls, user does not need to "}},
-       {"jac",
-      {OT_STRING,
-        "Function body for Jacobian"}},
-      {"hess",
-       {OT_STRING,
-        "Function body for Hessian"}}
+     {
      }
   };
 
@@ -150,18 +161,12 @@ namespace casadi {
 
     // Read options
     for (auto&& op : opts) {
-      if (op.first=="buffered") {
-        buffered_ = op.second;
-      } else if (op.first=="jac") {
-        jac_body_ = op.second.to_string();
-      } else if (op.first=="hess") {
-        hess_body_ = op.second.to_string();
-      }
     }
 
     casadi_int n_dims = knots_.size();
 
     // Arrays for holding inputs and outputs
+    // TODO
     alloc_iw(4*n_dims+2+1000);
     alloc_w(4*(n_dims-1)+2*3+1+n_dims+1+1000);
   }
@@ -185,43 +190,50 @@ namespace casadi {
 
     if (diff_order_==0) {
       // Codegen function body
-      g << "casadi_blazing_nd_boor_eval_dim3(res[0], 0, " +
+      g << "casadi_blazing_nd_boor_eval_dim3(res[0], 0, 0, " +
             knots_stacked + ", " +
             knots_offset + ", " +
-            "arg[1], 0, " + 
+            "arg[1], 0, 0, " + 
             "arg[0], " + 
             g.constant(mode) + ", " +
             "iw, w);\n";
     } else if (diff_order_==1) {
       // Codegen function body
-      g << "casadi_blazing_nd_boor_eval_dim3(res[0], res[1], " +
+      g << "casadi_blazing_nd_boor_eval_dim3(res[0], res[1], 0, " +
             knots_stacked + ", " +
             knots_offset + ", " +
-            "arg[1], arg[2], " + 
+            "arg[1], arg[2], 0, " + 
             "arg[0], " + 
             g.constant(mode) + ", " +
             "iw, w);\n";
+    } else if (diff_order_==2) {
+      // Codegen function body
+      g << "casadi_blazing_nd_boor_eval_dim3(res[0], res[1], res[2], " +
+            knots_stacked + ", " +
+            knots_offset + ", " +
+            "arg[1], arg[2], arg[3], " + 
+            "arg[0], " + 
+            g.constant(mode) + ", " +
+            "iw, w);\n";
+    } else {
+      casadi_assert_dev(false);
     }
   }
 
   bool BlazingSplineFunction::has_jacobian() const {
-    return true;
+    return diff_order_<2;
   }
 
   Function BlazingSplineFunction::get_jacobian(const std::string& name,
                                    const std::vector<std::string>& inames,
                                    const std::vector<std::string>& onames,
                                    const Dict& opts) const {
-
-
     MX C = MX::sym("C", nc_);
     MX x = MX::sym("x", knots_.size());
 
-    // Compute coefficient tensor size
-    casadi_int ndc_ = 1;
-    for (const auto& e : knots_) {
-      ndc_ *= e.size()-5;
-    }
+    int size0 = knots_[0].size();
+    int size1 = knots_[1].size();
+    int size2 = knots_[2].size();
 
     std::vector<casadi_int> coeffs_dims(knots_.size()+1);
     coeffs_dims[0] = 1;
@@ -229,15 +241,17 @@ namespace casadi {
       coeffs_dims[i+1] = knots_[i].size()-4;
     }
 
-    std::vector<casadi_int> offset;
-    std::vector<double> stacked;
-    Interpolant::stack_grid(knots_, offset, stacked);
-
     std::vector<casadi_int> degree(knots_.size(), 3);
-    MX dC0 = BSplineCommon::derivative_coeff(0, stacked, offset, degree, coeffs_dims, C);
-    MX dC1 = BSplineCommon::derivative_coeff(1, stacked, offset, degree, coeffs_dims, C);
-    MX dC2 = BSplineCommon::derivative_coeff(2, stacked, offset, degree, coeffs_dims, C);
-    MX dC = vertcat(dC0,dC1,dC2);
+    std::vector< std::vector<double> > knots_d0;
+    std::vector< casadi_int> degree_d0;
+    std::vector< std::vector<double> > knots_d1;
+    std::vector< casadi_int> degree_d1;
+    std::vector< std::vector<double> > knots_d2;
+    std::vector< casadi_int> degree_d2;
+    MX dC0 = BSplineCommon::derivative_coeff(0, knots_stacked_, knots_offset_, degree, coeffs_dims, C, knots_d0, degree_d0);
+    MX dC1 = BSplineCommon::derivative_coeff(1, knots_stacked_, knots_offset_, degree, coeffs_dims, C, knots_d1, degree_d1);
+    MX dC2 = BSplineCommon::derivative_coeff(2, knots_stacked_, knots_offset_, degree, coeffs_dims, C, knots_d2, degree_d2);
+    MX dC = vertcat(dC0, dC1, dC2);
 
     Dict Jopts = combine(jacobian_options_, der_options_);
     Jopts = combine(opts, Jopts);
@@ -245,18 +259,72 @@ namespace casadi {
 
     Function fJ = Function::create(new BlazingSplineFunction(name, knots_, diff_order_+1), Jopts);
 
-    MX out_f = MX(1, 1);
+    if (diff_order_==0) {
+      std::vector<MX> ret = fJ(std::vector<MX>{x, C, dC});
 
-    std::vector<MX> ret = fJ(std::vector<MX>{x, C, dC});
+      Function jac(name,
+        {x, C, MX(1, 1)},
+        {ret[1], MX(1, nc_)},
+        inames,
+        onames,
+        {{"always_inline", true}});
 
-    Function jac(name,
-      {x, C, out_f},
-      {ret[1], MX(1, nc_)},
-      inames,
-      onames,
-      {{"always_inline", true}});
+      return jac;
+    } else {
+      std::vector<casadi_int> offset;
+      std::vector<double> stacked;
+      std::vector< std::vector<double> > knots_dummy;
+      std::vector< casadi_int> degree_dummy;
+      Interpolant::stack_grid(knots_d0, offset, stacked);
+      MX ddC00 = BSplineCommon::derivative_coeff(0, stacked, offset, degree_d0,
+        {1, size0-5, size1-4, size2-4}, dC0, knots_dummy, degree_dummy);
+      Interpolant::stack_grid(knots_d1, offset, stacked);
+      MX ddC11 = BSplineCommon::derivative_coeff(1, stacked, offset, degree_d1,
+        {1, size0-4, size1-5, size2-4}, dC1, knots_dummy, degree_dummy);
+      Interpolant::stack_grid(knots_d2, offset, stacked);
+      MX ddC22 = BSplineCommon::derivative_coeff(2, stacked, offset, degree_d2,
+        {1, size0-4, size1-4, size2-5}, dC2, knots_dummy, degree_dummy);
+      Interpolant::stack_grid(knots_d0, offset, stacked);
+      MX ddC01 = BSplineCommon::derivative_coeff(1, stacked, offset, degree_d0,
+        {1, size0-5, size1-4, size2-4}, dC0, knots_dummy, degree_dummy);
+      Interpolant::stack_grid(knots_d1, offset, stacked);
+      MX ddC12 = BSplineCommon::derivative_coeff(2, stacked, offset, degree_d1,
+        {1, size0-4, size1-5, size2-4}, dC1, knots_dummy, degree_dummy);
+      Interpolant::stack_grid(knots_d2, offset, stacked);
+      MX ddC20 = BSplineCommon::derivative_coeff(0, stacked, offset, degree_d2,
+        {1, size0-4, size1-4, size2-5}, dC2, knots_dummy, degree_dummy);
+      MX ddC = vertcat(ddC00,ddC11,ddC22,ddC01,ddC12,ddC20);
 
-    return jac;
+      std::vector<MX> ret = fJ(std::vector<MX>{x, C, dC, ddC});
+
+      Function jac(name,
+        {x, C, MX(1, ndc_), MX(1, 1), MX(1, 3)},
+        {ret[1], MX(1, nc_), MX(1, ndc_), ret[2], MX(3, nc_), MX(3, ndc_)},
+        inames,
+        onames,
+        {{"always_inline", true}});
+
+      return jac;
+    }
+  }
+
+  void BlazingSplineFunction::serialize_body(SerializingStream &s) const {
+    FunctionInternal::serialize_body(s);
+
+    s.version("BlazingSplineFunction", 1);
+    s.pack("BlazingSplineFunction::diff_order", diff_order_);
+    s.pack("BlazingSplineFunction::knots", knots_);
+  }
+
+  BlazingSplineFunction::BlazingSplineFunction(DeserializingStream & s) : FunctionInternal(s) {
+    s.version("BlazingSplineFunction", 1);
+    s.unpack("BlazingSplineFunction::diff_order", diff_order_);
+    s.unpack("BlazingSplineFunction::knots", knots_);
+    init_derived_members();
+  }
+
+  ProtoFunction* BlazingSplineFunction::deserialize(DeserializingStream& s) {
+    return new BlazingSplineFunction(s);
   }
 
 } // namespace casadi
