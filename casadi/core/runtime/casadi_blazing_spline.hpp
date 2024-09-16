@@ -98,13 +98,13 @@ void casadi_blazing_de_boor_dim3(T1 x, const T1* knots, simde__m256d* boor_d0, s
 template<typename T1>
 void casadi_blazing_printvec(simde__m256d e) {
   double elements[4];
-  simde_mm256_store_pd(elements, e);
+  simde_mm256_storeu_pd(elements, e);
   printf("mm256d: <%.4f %.4f %.4f %.4f>\n", elements[0], elements[1], elements[2], elements[3]);
 }
 
 // SYMBOL "blazing_nd_boor_eval_dim3"
 template<typename T1>
-void casadi_blazing_nd_boor_eval_dim3(T1* f, T1* J, const T1* all_knots, const casadi_int* offset, const T1* c, const T1* dc, const T1* all_x, const casadi_int* lookup_mode, casadi_int* iw, T1* w) {
+void casadi_blazing_nd_boor_eval_dim3(T1* f, T1* J, T1* H, const T1* all_knots, const casadi_int* offset, const T1* c, const T1* dc, const T1* ddc, const T1* all_x, const casadi_int* lookup_mode, casadi_int* iw, T1* w) {
   casadi_int n_dims = 3;
   casadi_int m = 1;
   casadi_int n_iter, k, i, pivot;
@@ -272,7 +272,7 @@ void casadi_blazing_nd_boor_eval_dim3(T1* f, T1* J, const T1* all_knots, const c
   }
 
   // First derivative
-  if (dc) {
+  if (dc && J) {
     stride1 = offset[1]-offset[0]-4-1;
     stride2 = (offset[2]-offset[1]-4)*stride1;
     for (int j=0;j<4;++j) {
@@ -409,5 +409,314 @@ void casadi_blazing_nd_boor_eval_dim3(T1* f, T1* J, const T1* all_knots, const c
     r0  = simde_mm_add_pd(r0, r1);
     J[2] = simde_mm_cvtsd_f64(simde_mm_add_sd(r0, simde_mm_unpackhi_pd(r0, r0)));
     
+  }
+
+  if (ddc && H) {
+    stride1 = offset[1]-offset[0]-4-2;
+    stride2 = (offset[2]-offset[1]-4)*stride1;
+    for (int j=0;j<4;++j) {
+        for (int k=0;k<4;++k) {
+            C[j+4*k] = simde_mm256_loadu_pd(ddc+(starts[1]+j)*stride1+(starts[2]+k)*stride2+starts[0]-2);
+        }
+    }
+    ddc += stride2*(offset[3]-offset[2]-4);
+
+    a = boor0_d2;
+    b0 = simde_mm256_permute4x64_pd(boor1_d0, SIMDE_MM_SHUFFLE(0, 0, 0, 0));
+    b1 = simde_mm256_permute4x64_pd(boor1_d0, SIMDE_MM_SHUFFLE(1, 1, 1, 1));
+    b2 = simde_mm256_permute4x64_pd(boor1_d0, SIMDE_MM_SHUFFLE(2, 2, 2, 2));
+    b3 = simde_mm256_permute4x64_pd(boor1_d0, SIMDE_MM_SHUFFLE(3, 3, 3, 3));
+
+    c0 = simde_mm256_permute4x64_pd(boor2_d0, SIMDE_MM_SHUFFLE(0, 0, 0, 0));
+    c1 = simde_mm256_permute4x64_pd(boor2_d0, SIMDE_MM_SHUFFLE(1, 1, 1, 1));
+    c2 = simde_mm256_permute4x64_pd(boor2_d0, SIMDE_MM_SHUFFLE(2, 2, 2, 2));
+    c3 = simde_mm256_permute4x64_pd(boor2_d0, SIMDE_MM_SHUFFLE(3, 3, 3, 3));
+
+    ab[0] = simde_mm256_mul_pd(a, b0);
+    ab[1] = simde_mm256_mul_pd(a, b1);
+    ab[2] = simde_mm256_mul_pd(a, b2);
+    ab[3] = simde_mm256_mul_pd(a, b3);
+    // Sum over b axis: sum_b C_abc * (A_a B_b)_b 
+    // cab <- cab + ab[i]*C[i]
+    for (int i=0;i<4;++i) {
+      cab[i] = simde_mm256_set1_pd(0);
+      cab[i] = simde_mm256_fmadd_pd(ab[0], C[4*i+0], cab[i]);
+      cab[i] = simde_mm256_fmadd_pd(ab[1], C[4*i+1], cab[i]);
+      cab[i] = simde_mm256_fmadd_pd(ab[2], C[4*i+2], cab[i]);
+      cab[i] = simde_mm256_fmadd_pd(ab[3], C[4*i+3], cab[i]);
+    }
+
+    // Reduce over the c direction
+    r = simde_mm256_set1_pd(0);
+    r = simde_mm256_fmadd_pd(cab[0], c0, r);
+    r = simde_mm256_fmadd_pd(cab[1], c1, r);
+    r = simde_mm256_fmadd_pd(cab[2], c2, r);
+    r = simde_mm256_fmadd_pd(cab[3], c3, r);
+
+    // Sum all r entries
+    r0  = simde_mm256_castpd256_pd128(r);
+    r1 = simde_mm256_extractf128_pd(r, 1);
+    r0  = simde_mm_add_pd(r0, r1);
+    H[0] = simde_mm_cvtsd_f64(simde_mm_add_sd(r0, simde_mm_unpackhi_pd(r0, r0)));
+
+    stride1 = offset[1]-offset[0]-4;
+    stride2 = (offset[2]-offset[1]-4-2)*stride1;
+    for (int j=0;j<4;++j) {
+        for (int k=0;k<4;++k) {
+          if (j<=1) {
+            C[j+4*k] = zero;
+          } else {
+            C[j+4*k] = simde_mm256_loadu_pd(ddc+(starts[1]+j-2)*stride1+(starts[2]+k)*stride2+starts[0]);
+          }
+        }
+    }
+    ddc += stride2*(offset[3]-offset[2]-4);
+
+    a = boor0_d0;
+    b0 = simde_mm256_permute4x64_pd(boor1_d2, SIMDE_MM_SHUFFLE(0, 0, 0, 0));
+    b1 = simde_mm256_permute4x64_pd(boor1_d2, SIMDE_MM_SHUFFLE(1, 1, 1, 1));
+    b2 = simde_mm256_permute4x64_pd(boor1_d2, SIMDE_MM_SHUFFLE(2, 2, 2, 2));
+    b3 = simde_mm256_permute4x64_pd(boor1_d2, SIMDE_MM_SHUFFLE(3, 3, 3, 3));
+
+    c0 = simde_mm256_permute4x64_pd(boor2_d0, SIMDE_MM_SHUFFLE(0, 0, 0, 0));
+    c1 = simde_mm256_permute4x64_pd(boor2_d0, SIMDE_MM_SHUFFLE(1, 1, 1, 1));
+    c2 = simde_mm256_permute4x64_pd(boor2_d0, SIMDE_MM_SHUFFLE(2, 2, 2, 2));
+    c3 = simde_mm256_permute4x64_pd(boor2_d0, SIMDE_MM_SHUFFLE(3, 3, 3, 3));
+
+    ab[0] = simde_mm256_mul_pd(a, b0);
+    ab[1] = simde_mm256_mul_pd(a, b1);
+    ab[2] = simde_mm256_mul_pd(a, b2);
+    ab[3] = simde_mm256_mul_pd(a, b3);
+    // Sum over b axis: sum_b C_abc * (A_a B_b)_b 
+    // cab <- cab + ab[i]*C[i]
+    for (int i=0;i<4;++i) {
+      cab[i] = simde_mm256_set1_pd(0);
+      cab[i] = simde_mm256_fmadd_pd(ab[0], C[4*i+0], cab[i]);
+      cab[i] = simde_mm256_fmadd_pd(ab[1], C[4*i+1], cab[i]);
+      cab[i] = simde_mm256_fmadd_pd(ab[2], C[4*i+2], cab[i]);
+      cab[i] = simde_mm256_fmadd_pd(ab[3], C[4*i+3], cab[i]);
+    }
+
+    // Reduce over the c direction
+    r = simde_mm256_set1_pd(0);
+    r = simde_mm256_fmadd_pd(cab[0], c0, r);
+    r = simde_mm256_fmadd_pd(cab[1], c1, r);
+    r = simde_mm256_fmadd_pd(cab[2], c2, r);
+    r = simde_mm256_fmadd_pd(cab[3], c3, r);
+
+    // Sum all r entries
+    r0  = simde_mm256_castpd256_pd128(r);
+    r1 = simde_mm256_extractf128_pd(r, 1);
+    r0  = simde_mm_add_pd(r0, r1);
+    H[4] = simde_mm_cvtsd_f64(simde_mm_add_sd(r0, simde_mm_unpackhi_pd(r0, r0)));
+
+    stride1 = offset[1]-offset[0]-4;
+    stride2 = (offset[2]-offset[1]-4)*stride1;
+    for (int j=0;j<4;++j) {
+        for (int k=0;k<4;++k) {
+          if (k<=1) {
+            C[j+4*k] = zero;
+          } else {
+            C[j+4*k] = simde_mm256_loadu_pd(ddc+(starts[1]+j)*stride1+(starts[2]+k-2)*stride2+starts[0]);
+          }
+        }
+    }
+    ddc += stride2*(offset[3]-offset[2]-4-2);
+
+    a = boor0_d0;
+    b0 = simde_mm256_permute4x64_pd(boor1_d0, SIMDE_MM_SHUFFLE(0, 0, 0, 0));
+    b1 = simde_mm256_permute4x64_pd(boor1_d0, SIMDE_MM_SHUFFLE(1, 1, 1, 1));
+    b2 = simde_mm256_permute4x64_pd(boor1_d0, SIMDE_MM_SHUFFLE(2, 2, 2, 2));
+    b3 = simde_mm256_permute4x64_pd(boor1_d0, SIMDE_MM_SHUFFLE(3, 3, 3, 3));
+
+    c0 = simde_mm256_permute4x64_pd(boor2_d2, SIMDE_MM_SHUFFLE(0, 0, 0, 0));
+    c1 = simde_mm256_permute4x64_pd(boor2_d2, SIMDE_MM_SHUFFLE(1, 1, 1, 1));
+    c2 = simde_mm256_permute4x64_pd(boor2_d2, SIMDE_MM_SHUFFLE(2, 2, 2, 2));
+    c3 = simde_mm256_permute4x64_pd(boor2_d2, SIMDE_MM_SHUFFLE(3, 3, 3, 3));
+
+    ab[0] = simde_mm256_mul_pd(a, b0);
+    ab[1] = simde_mm256_mul_pd(a, b1);
+    ab[2] = simde_mm256_mul_pd(a, b2);
+    ab[3] = simde_mm256_mul_pd(a, b3);
+    // Sum over b axis: sum_b C_abc * (A_a B_b)_b 
+    // cab <- cab + ab[i]*C[i]
+    for (int i=0;i<4;++i) {
+      cab[i] = simde_mm256_set1_pd(0);
+      cab[i] = simde_mm256_fmadd_pd(ab[0], C[4*i+0], cab[i]);
+      cab[i] = simde_mm256_fmadd_pd(ab[1], C[4*i+1], cab[i]);
+      cab[i] = simde_mm256_fmadd_pd(ab[2], C[4*i+2], cab[i]);
+      cab[i] = simde_mm256_fmadd_pd(ab[3], C[4*i+3], cab[i]);
+    }
+
+    // Reduce over the c direction
+    r = simde_mm256_set1_pd(0);
+    r = simde_mm256_fmadd_pd(cab[0], c0, r);
+    r = simde_mm256_fmadd_pd(cab[1], c1, r);
+    r = simde_mm256_fmadd_pd(cab[2], c2, r);
+    r = simde_mm256_fmadd_pd(cab[3], c3, r);
+
+    // Sum all r entries
+    r0  = simde_mm256_castpd256_pd128(r);
+    r1 = simde_mm256_extractf128_pd(r, 1);
+    r0  = simde_mm_add_pd(r0, r1);
+    H[8] = simde_mm_cvtsd_f64(simde_mm_add_sd(r0, simde_mm_unpackhi_pd(r0, r0)));
+
+    stride1 = offset[1]-offset[0]-5;
+    stride2 = (offset[2]-offset[1]-5)*stride1;
+    for (int j=0;j<4;++j) {
+        for (int k=0;k<4;++k) {
+          if (j==0) {
+            C[j+4*k] = zero;
+          } else {
+            C[j+4*k] = simde_mm256_loadu_pd(ddc+(starts[1]+j-1)*stride1+(starts[2]+k)*stride2+starts[0]-1);
+          }
+        }
+    }
+    ddc += stride2*(offset[3]-offset[2]-4);
+
+    a = boor0_d1;
+
+    b0 = simde_mm256_permute4x64_pd(boor1_d1, SIMDE_MM_SHUFFLE(0, 0, 0, 0));
+    b1 = simde_mm256_permute4x64_pd(boor1_d1, SIMDE_MM_SHUFFLE(1, 1, 1, 1));
+    b2 = simde_mm256_permute4x64_pd(boor1_d1, SIMDE_MM_SHUFFLE(2, 2, 2, 2));
+    b3 = simde_mm256_permute4x64_pd(boor1_d1, SIMDE_MM_SHUFFLE(3, 3, 3, 3));
+
+    c0 = simde_mm256_permute4x64_pd(boor2_d0, SIMDE_MM_SHUFFLE(0, 0, 0, 0));
+    c1 = simde_mm256_permute4x64_pd(boor2_d0, SIMDE_MM_SHUFFLE(1, 1, 1, 1));
+    c2 = simde_mm256_permute4x64_pd(boor2_d0, SIMDE_MM_SHUFFLE(2, 2, 2, 2));
+    c3 = simde_mm256_permute4x64_pd(boor2_d0, SIMDE_MM_SHUFFLE(3, 3, 3, 3));
+
+    ab[0] = simde_mm256_mul_pd(a, b0);
+    ab[1] = simde_mm256_mul_pd(a, b1);
+    ab[2] = simde_mm256_mul_pd(a, b2);
+    ab[3] = simde_mm256_mul_pd(a, b3);
+    // Sum over b axis: sum_b C_abc * (A_a B_b)_b 
+    // cab <- cab + ab[i]*C[i]
+    for (int i=0;i<4;++i) {
+      cab[i] = simde_mm256_set1_pd(0);
+      cab[i] = simde_mm256_fmadd_pd(ab[0], C[4*i+0], cab[i]);
+      cab[i] = simde_mm256_fmadd_pd(ab[1], C[4*i+1], cab[i]);
+      cab[i] = simde_mm256_fmadd_pd(ab[2], C[4*i+2], cab[i]);
+      cab[i] = simde_mm256_fmadd_pd(ab[3], C[4*i+3], cab[i]);
+    }
+
+    // Reduce over the c direction
+    r = simde_mm256_set1_pd(0);
+    r = simde_mm256_fmadd_pd(cab[0], c0, r);
+    r = simde_mm256_fmadd_pd(cab[1], c1, r);
+    r = simde_mm256_fmadd_pd(cab[2], c2, r);
+    r = simde_mm256_fmadd_pd(cab[3], c3, r);
+
+    // Sum all r entries
+    r0  = simde_mm256_castpd256_pd128(r);
+    r1 = simde_mm256_extractf128_pd(r, 1);
+    r0  = simde_mm_add_pd(r0, r1);
+    H[1] = H[3] = simde_mm_cvtsd_f64(simde_mm_add_sd(r0, simde_mm_unpackhi_pd(r0, r0)));
+
+    stride1 = offset[1]-offset[0]-4;
+    stride2 = (offset[2]-offset[1]-5)*stride1;
+    for (int j=0;j<4;++j) {
+        for (int k=0;k<4;++k) {
+          if (k==0) {
+            C[j+4*k] = zero;
+          } else {
+            C[j+4*k] = simde_mm256_loadu_pd(ddc+(starts[1]+j-1)*stride1+(starts[2]+k-1)*stride2+starts[0]);
+          }
+        }
+    }
+    ddc += stride2*(offset[3]-offset[2]-5);
+
+    a = boor0_d0;
+
+    b0 = simde_mm256_permute4x64_pd(boor1_d1, SIMDE_MM_SHUFFLE(0, 0, 0, 0));
+    b1 = simde_mm256_permute4x64_pd(boor1_d1, SIMDE_MM_SHUFFLE(1, 1, 1, 1));
+    b2 = simde_mm256_permute4x64_pd(boor1_d1, SIMDE_MM_SHUFFLE(2, 2, 2, 2));
+    b3 = simde_mm256_permute4x64_pd(boor1_d1, SIMDE_MM_SHUFFLE(3, 3, 3, 3));
+
+    c0 = simde_mm256_permute4x64_pd(boor2_d1, SIMDE_MM_SHUFFLE(0, 0, 0, 0));
+    c1 = simde_mm256_permute4x64_pd(boor2_d1, SIMDE_MM_SHUFFLE(1, 1, 1, 1));
+    c2 = simde_mm256_permute4x64_pd(boor2_d1, SIMDE_MM_SHUFFLE(2, 2, 2, 2));
+    c3 = simde_mm256_permute4x64_pd(boor2_d1, SIMDE_MM_SHUFFLE(3, 3, 3, 3));
+
+    ab[0] = simde_mm256_mul_pd(a, b0);
+    ab[1] = simde_mm256_mul_pd(a, b1);
+    ab[2] = simde_mm256_mul_pd(a, b2);
+    ab[3] = simde_mm256_mul_pd(a, b3);
+    // Sum over b axis: sum_b C_abc * (A_a B_b)_b 
+    // cab <- cab + ab[i]*C[i]
+    for (int i=0;i<4;++i) {
+      cab[i] = simde_mm256_set1_pd(0);
+      cab[i] = simde_mm256_fmadd_pd(ab[0], C[4*i+0], cab[i]);
+      cab[i] = simde_mm256_fmadd_pd(ab[1], C[4*i+1], cab[i]);
+      cab[i] = simde_mm256_fmadd_pd(ab[2], C[4*i+2], cab[i]);
+      cab[i] = simde_mm256_fmadd_pd(ab[3], C[4*i+3], cab[i]);
+    }
+
+    // Reduce over the c direction
+    r = simde_mm256_set1_pd(0);
+    r = simde_mm256_fmadd_pd(cab[0], c0, r);
+    r = simde_mm256_fmadd_pd(cab[1], c1, r);
+    r = simde_mm256_fmadd_pd(cab[2], c2, r);
+    r = simde_mm256_fmadd_pd(cab[3], c3, r);
+
+    // Sum all r entries
+    r0  = simde_mm256_castpd256_pd128(r);
+    r1 = simde_mm256_extractf128_pd(r, 1);
+    r0  = simde_mm_add_pd(r0, r1);
+    H[5] = H[7] = simde_mm_cvtsd_f64(simde_mm_add_sd(r0, simde_mm_unpackhi_pd(r0, r0)));
+
+
+
+    stride1 = offset[1]-offset[0]-5;
+    stride2 = (offset[2]-offset[1]-4)*stride1;
+    for (int j=0;j<4;++j) {
+        for (int k=0;k<4;++k) {
+          if (k==0) {
+            C[j+4*k] = zero;
+          } else {
+            C[j+4*k] = simde_mm256_loadu_pd(ddc+(starts[1]+j)*stride1+(starts[2]+k-1)*stride2+starts[0]-1);
+          }
+        }
+    }
+    ddc += stride2*(offset[3]-offset[2]-5);
+
+    a = boor0_d1;
+
+    b0 = simde_mm256_permute4x64_pd(boor1_d0, SIMDE_MM_SHUFFLE(0, 0, 0, 0));
+    b1 = simde_mm256_permute4x64_pd(boor1_d0, SIMDE_MM_SHUFFLE(1, 1, 1, 1));
+    b2 = simde_mm256_permute4x64_pd(boor1_d0, SIMDE_MM_SHUFFLE(2, 2, 2, 2));
+    b3 = simde_mm256_permute4x64_pd(boor1_d0, SIMDE_MM_SHUFFLE(3, 3, 3, 3));
+
+    c0 = simde_mm256_permute4x64_pd(boor2_d1, SIMDE_MM_SHUFFLE(0, 0, 0, 0));
+    c1 = simde_mm256_permute4x64_pd(boor2_d1, SIMDE_MM_SHUFFLE(1, 1, 1, 1));
+    c2 = simde_mm256_permute4x64_pd(boor2_d1, SIMDE_MM_SHUFFLE(2, 2, 2, 2));
+    c3 = simde_mm256_permute4x64_pd(boor2_d1, SIMDE_MM_SHUFFLE(3, 3, 3, 3));
+
+    ab[0] = simde_mm256_mul_pd(a, b0);
+    ab[1] = simde_mm256_mul_pd(a, b1);
+    ab[2] = simde_mm256_mul_pd(a, b2);
+    ab[3] = simde_mm256_mul_pd(a, b3);
+    // Sum over b axis: sum_b C_abc * (A_a B_b)_b 
+    // cab <- cab + ab[i]*C[i]
+    for (int i=0;i<4;++i) {
+      cab[i] = simde_mm256_set1_pd(0);
+      cab[i] = simde_mm256_fmadd_pd(ab[0], C[4*i+0], cab[i]);
+      cab[i] = simde_mm256_fmadd_pd(ab[1], C[4*i+1], cab[i]);
+      cab[i] = simde_mm256_fmadd_pd(ab[2], C[4*i+2], cab[i]);
+      cab[i] = simde_mm256_fmadd_pd(ab[3], C[4*i+3], cab[i]);
+    }
+
+    // Reduce over the c direction
+    r = simde_mm256_set1_pd(0);
+    r = simde_mm256_fmadd_pd(cab[0], c0, r);
+    r = simde_mm256_fmadd_pd(cab[1], c1, r);
+    r = simde_mm256_fmadd_pd(cab[2], c2, r);
+    r = simde_mm256_fmadd_pd(cab[3], c3, r);
+
+    // Sum all r entries
+    r0  = simde_mm256_castpd256_pd128(r);
+    r1 = simde_mm256_extractf128_pd(r, 1);
+    r0  = simde_mm_add_pd(r0, r1);
+    H[2] = H[6] = simde_mm_cvtsd_f64(simde_mm_add_sd(r0, simde_mm_unpackhi_pd(r0, r0)));
   }
 }

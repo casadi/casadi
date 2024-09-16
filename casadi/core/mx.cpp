@@ -36,6 +36,7 @@
 #include "serializing_stream.hpp"
 #include "im.hpp"
 #include "bspline.hpp"
+#include "casadi_call.hpp"
 
 // Throw informative error message
 #define CASADI_THROW_ERROR(FNAME, WHAT) \
@@ -2150,6 +2151,8 @@ namespace casadi {
     std::unordered_map<std::string, MX > cache;
     IncrementalSerializer s;
 
+    std::unordered_map<std::string, Function> function_cache;
+
     // Loop over computational nodes in forward order
     casadi_int alg_counter = 0;
     for (auto it=ff->algorithm_.begin(); it!=ff->algorithm_.end(); ++it, ++alg_counter) {
@@ -2185,21 +2188,37 @@ namespace casadi {
           // Default assumption is that out_i is not an output node
           casadi_int output_node = -1;
 
+          uout() << "inspect" << std::endl;
+
           if (out_i.is_output()) {
             output_node = out_i.which_output();
-            // First pack/cache the parent (MultipleOutput node e.g. Call)
+            // First pack/cache the parent (MultipleOutput node e.g. Call, Horzsplit)
             out_i = out_i.dep(0);
+
+            // If we are a call node,
+            if (out_i.op()==OP_CALL) {
+              std::string key = out_i.which_function().serialize();
+              auto itk = function_cache.find(key);
+              if (itk==function_cache.end()) {
+                function_cache[key] = out_i.which_function();
+              } else {
+                out_i = Call::create_call(function_cache[key], out_i->dep_);
+              }
+            }
           }
 
           while (true) {
             // Replace out_i by a cached variant if possible
             std::string key = s.pack(out_i);
 
+            uout() << "key" << key << std::endl;
+
             auto itk = cache.find(key);
             if (itk==cache.end()) {
               cache[key] = out_i;
             } else {
               out_i = itk->second;
+              
             }
 
             if (output_node==-1) {

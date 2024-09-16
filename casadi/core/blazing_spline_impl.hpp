@@ -65,6 +65,8 @@ namespace casadi {
         \identifier{af} */
     void init(const Dict& opts) override;
 
+    void init_derived_members();
+
     /** \brief Is codegen supported?
 
         \identifier{ah} */
@@ -86,26 +88,17 @@ namespace casadi {
                           const Dict& opts) const override;
     ///@}
 
-    // Buffer the function calls
-    bool buffered_;
-
-    // Function body
-    std::string body_;
-
-    // Jacobian function body
-    std::string jac_body_;
-
-    // Hessian function body
-    std::string hess_body_;
-
     casadi_int diff_order_;
     std::vector< std::vector<double> > knots_;
 
+    // Derived fiels
     std::vector<casadi_int> knots_offset_;
     std::vector<double> knots_stacked_;
 
     // Coefficient tensor size
-    casadi_int nc_, ndc_;
+    casadi_int nc_, ndc_, nddc_;
+
+    mutable Function cache_diff_;
 
     ///@{
     /** \brief Number of function inputs and outputs*/
@@ -128,6 +121,18 @@ namespace casadi {
     std::string get_name_out(casadi_int i) override;
     /// @}
 
+    /** \brief Serialize an object without type information */
+    void serialize_body(SerializingStream &s) const override;
+
+    /** \brief Deserialize into MX */
+    static ProtoFunction* deserialize(DeserializingStream& s);
+
+    /** \brief String used to identify the immediate FunctionInternal subclass */
+    std::string serialize_base_function() const override { return "BlazingSplineFunction"; }
+
+    protected:
+        /** \brief Deserializing constructor*/
+        explicit BlazingSplineFunction(DeserializingStream& s);
   };
 
 

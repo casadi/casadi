@@ -37,7 +37,9 @@ namespace casadi {
         const std::vector<double>& knots,
         const std::vector<casadi_int>& offset,
         const std::vector<casadi_int>& degree, 
-        const std::vector<casadi_int>& coeffs_dims, const M& coeffs) {
+        const std::vector<casadi_int>& coeffs_dims, const M& coeffs,
+        std::vector< std::vector<double> >& new_knots,
+        std::vector<casadi_int>& new_degree) {
       casadi_int n_dims = degree.size();
 
       casadi_int n_knots = offset[i+1]-offset[i];
@@ -72,6 +74,20 @@ namespace casadi {
       mapping = tensor_permute_mapping(permute(coeffs_dims_new, order), order);
       coeff_matrix = coeff_matrix.nz(mapping); // NOLINT(cppcoreguidelines-slicing)
 
+      new_knots.clear();
+      new_degree.clear();
+      for (casadi_int k=0;k<degree.size();++k) {
+        if (i==k) {
+          new_knots.push_back(
+            std::vector<double>(get_ptr(knots)+offset[k]+1, get_ptr(knots)+offset[k+1]-1));
+          new_degree.push_back(degree[k]-1);
+        } else {
+          new_knots.push_back(
+            std::vector<double>(get_ptr(knots)+offset[k], get_ptr(knots)+offset[k+1]));
+          new_degree.push_back(degree[k]);
+        }
+      }
+
       // Return the flat vector
       return coeff_matrix;
     }
@@ -90,18 +106,7 @@ namespace casadi {
     for (casadi_int k=0;k<n_dims;++k) {
       std::vector< std::vector<double> > knots;
       std::vector< casadi_int> degree;
-      for (casadi_int i=0;i<degree_.size();++i) {
-        if (i==k) {
-          knots.push_back(
-            std::vector<double>(get_ptr(knots_)+offset_[i]+1, get_ptr(knots_)+offset_[i+1]-1));
-          degree.push_back(degree_[i]-1);
-        } else {
-          knots.push_back(
-            std::vector<double>(get_ptr(knots_)+offset_[i], get_ptr(knots_)+offset_[i+1]));
-          degree.push_back(degree_[i]);
-        }
-      }
-      T dC = derivative_coeff(k, knots_, offset_, degree_, coeffs_dims_, coeffs);
+      T dC = derivative_coeff(k, knots_, offset_, degree_, coeffs_dims_, coeffs, knots, degree);
       MX d = MX::bspline(x, dC, knots, degree, m_, opts);
       parts.push_back(d);
     }

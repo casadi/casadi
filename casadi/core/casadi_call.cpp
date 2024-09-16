@@ -223,6 +223,10 @@ namespace casadi {
     return MX::createMultipleOutput(new Call(fcn, arg));
   }
 
+  MX Call::create_call(const Function& fcn, const std::vector<MX>& arg) {
+    return MX::create(new Call(fcn, arg));
+  }
+
   void Call::serialize_body(SerializingStream& s) const {
     MultipleOutput::serialize_body(s);
     s.pack("Call::fcn", fcn_);
