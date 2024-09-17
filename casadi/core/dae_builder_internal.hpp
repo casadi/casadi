@@ -444,6 +444,9 @@ protected:
   std::string variable_naming_convention_;
   casadi_int number_of_event_indicators_;
 
+  // Default experiment
+  double start_time_, stop_time_, tolerance_, step_size_;
+
   // Model Exchange
   std::string model_identifier_;
   bool provides_directional_derivatives_;
@@ -570,6 +573,9 @@ protected:
 
   /// Read a variable
   Variable& read_variable(const XmlNode& node, Attribute* att = 0);
+
+  // Read DefaultExperiment
+  void import_default_experiment(const XmlNode& n);
 
   // Read ModelExchange
   void import_model_exchange(const XmlNode& n);

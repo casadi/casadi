@@ -432,6 +432,11 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
     number_of_event_indicators_ = fmi_desc.attribute<casadi_int>("numberOfEventIndicators", 0);
   }
 
+  // Process DefaultExperiment
+  if (fmi_desc.has_child("DefaultExperiment")) {
+    import_default_experiment(fmi_desc["DefaultExperiment"]);
+  }
+
   // Process ModelExchange
   bool has_model_exchange = false;
   if (fmi_desc.has_child("ModelExchange")) {
@@ -2675,6 +2680,13 @@ std::vector<T> read_list(const XmlNode& n) {
     r.push_back(T(n[i]));
   }
   return r;
+}
+
+void DaeBuilderInternal::import_default_experiment(const XmlNode& n) {
+  start_time_ = n.attribute<double>("startTime", nan);
+  stop_time_ = n.attribute<double>("stopTime", nan);
+  tolerance_ = n.attribute<double>("tolerance", nan);
+  step_size_ = n.attribute<double>("stepSize", nan);
 }
 
 void DaeBuilderInternal::import_model_exchange(const XmlNode& n) {
