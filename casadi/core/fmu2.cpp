@@ -260,11 +260,7 @@ void Fmu2::init(const DaeBuilderInternal* dae) {
     + "/" + instance_name_no_dot + dll_suffix();
   li_ = Importer(dll_path, "dll");
 
-  declared_ad_ = dae->provides_directional_derivative_;
-
-  if (dae->provides_directional_derivative_) {
-
-  }
+  declared_ad_ = dae->provides_directional_derivatives_;
 
   // Path to resource directory
   resource_loc_ = "file://" + dae->path_ + "/resources";
@@ -272,7 +268,7 @@ void Fmu2::init(const DaeBuilderInternal* dae) {
   // Copy info from DaeBuilder
   fmutol_ = dae->fmutol_;
   instance_name_ = dae->model_identifier_;
-  guid_ = dae->guid_;
+  guid_ = dae->instantiation_token_;
   logging_on_ = dae->debug_;
 }
 

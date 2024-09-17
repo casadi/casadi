@@ -376,7 +376,7 @@ DaeBuilderInternal::DaeBuilderInternal(const std::string& name, const std::strin
     const Dict& opts) : name_(name), path_(path) {
   clear_cache_ = false;
   number_of_event_indicators_ = 0;
-  provides_directional_derivative_ = 0;
+  provides_directional_derivatives_ = 0;
   symbolic_ = true;
   // Default options
   debug_ = false;
@@ -401,10 +401,24 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
   XmlFile xml_file("tinyxml");
   XmlNode fmi_desc = xml_file.parse(filename)[0];  // One child; fmiModelDescription
 
-  // Read attributes
+  // Read FMU version
   fmi_version_ = fmi_desc.attribute<std::string>("fmiVersion", "");
+
+  // Check if FMI 3
+  if (fmi_version_.rfind("3.", 0) == 0) {
+    // FMI 3
+    fmi3_ = true;
+    casadi_warning("FMI 3 support is expermental");
+  } else if (fmi_version_.rfind("2.", 0) == 0) {
+    // FMI 2
+    fmi3_ = false;
+  } else {
+    casadi_error("Unknown FMI version: " + fmi_version_);
+  }
+
+  // Read attributes
   model_name_ = fmi_desc.attribute<std::string>("modelName", "");
-  guid_ = fmi_desc.attribute<std::string>("guid", "");
+  instantiation_token_ = fmi_desc.attribute<std::string>(fmi3_ ? "instantiationToken" : "guid");
   description_ = fmi_desc.attribute<std::string>("description", "");
   author_ = fmi_desc.attribute<std::string>("author", "");
   copyright_ = fmi_desc.attribute<std::string>("copyright", "");
@@ -412,7 +426,11 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
   generation_tool_ = fmi_desc.attribute<std::string>("generationTool", "");
   generation_date_and_time_ = fmi_desc.attribute<std::string>("generationDateAndTime", "");
   variable_naming_convention_ = fmi_desc.attribute<std::string>("variableNamingConvention", "");
-  number_of_event_indicators_ = fmi_desc.attribute<casadi_int>("numberOfEventIndicators", 0);
+  if (fmi3_) {
+    number_of_event_indicators_ = 0;  // In FMI 3: Obtain from binary
+  } else {
+    number_of_event_indicators_ = fmi_desc.attribute<casadi_int>("numberOfEventIndicators", 0);
+  }
 
   // Process ModelExchange
   bool has_model_exchange = false;
@@ -2661,8 +2679,10 @@ std::vector<T> read_list(const XmlNode& n) {
 
 void DaeBuilderInternal::import_model_exchange(const XmlNode& n) {
   // Read attributes
-  provides_directional_derivative_
-    = n.attribute<bool>("providesDirectionalDerivative", false);
+  provides_directional_derivatives_ = n.attribute<bool>(
+    fmi3_ ? "providesDirectionalDerivatives" : "providesDirectionalDerivative", false);
+  provides_adjoint_derivatives_
+    = n.attribute<bool>("providesAdjointDerivatives", false);
   model_identifier_ = n.attribute<std::string>("modelIdentifier");
   // Get list of source files
   if (n.has_child("SourceFiles")) {

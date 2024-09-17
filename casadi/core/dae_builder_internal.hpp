@@ -434,7 +434,7 @@ protected:
   // FMI attributes
   std::string fmi_version_;
   std::string model_name_;
-  std::string guid_;
+  std::string instantiation_token_;  // In FMI 2: guid
   std::string description_;
   std::string author_;
   std::string copyright_;
@@ -446,7 +446,8 @@ protected:
 
   // Model Exchange
   std::string model_identifier_;
-  bool provides_directional_derivative_;
+  bool provides_directional_derivatives_;
+  bool provides_adjoint_derivatives_;
   std::vector<std::string> source_files_;
 
   /// Name of instance
@@ -457,6 +458,9 @@ protected:
 
   // Symbolic representation of the model equations?
   bool symbolic_;
+
+  // Is FMI 3?
+  bool fmi3_;
 
   /// All variables
   std::vector<Variable*> variables_;
