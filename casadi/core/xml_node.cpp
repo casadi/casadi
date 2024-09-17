@@ -122,6 +122,11 @@ void XmlNode::read(const std::string& str, bool* val) {
   }
 }
 
+void XmlNode::read(const std::string& str, size_t* val) {
+  std::istringstream buffer(str);
+  buffer >> *val;
+}
+
 void XmlNode::read(const std::string& str, casadi_int* val) {
   std::istringstream buffer(str);
   buffer >> *val;

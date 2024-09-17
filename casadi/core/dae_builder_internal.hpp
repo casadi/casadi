@@ -462,8 +462,8 @@ protected:
   // Symbolic representation of the model equations?
   bool symbolic_;
 
-  // Is FMI 3?
-  bool fmi3_;
+  // FMI major version
+  casadi_int fmi_major_;
 
   /// All variables
   std::vector<Variable*> variables_;
@@ -473,6 +473,9 @@ protected:
 
   /// Find of variable by name
   std::unordered_map<std::string, size_t> varind_;
+
+  /// Find of variable by value reference
+  std::unordered_map<unsigned int, size_t> vrmap_;
 
   /// Ordered variables
   std::vector<size_t> t_, p_, u_, x_, z_, q_, c_, d_, w_, y_, e_;
@@ -576,6 +579,12 @@ protected:
 
   // Read DefaultExperiment
   void import_default_experiment(const XmlNode& n);
+
+  // Read dependencies node
+  std::vector<casadi_int> read_dependencies(const XmlNode& n);
+
+  // Read dependenciesKind node
+  std::vector<DependenciesKind> read_dependencies_kind(const XmlNode& n, size_t ndep);
 
   // Read ModelExchange
   void import_model_exchange(const XmlNode& n);

@@ -403,22 +403,24 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
 
   // Read FMU version
   fmi_version_ = fmi_desc.attribute<std::string>("fmiVersion", "");
-
-  // Check if FMI 3
-  if (fmi_version_.rfind("3.", 0) == 0) {
-    // FMI 3
-    fmi3_ = true;
-    casadi_warning("FMI 3 support is expermental");
+  if (fmi_version_.rfind("1.", 0) == 0) {
+    // FMI 1.0: Only for symbolic FMUs
+    fmi_major_ = 1;
   } else if (fmi_version_.rfind("2.", 0) == 0) {
-    // FMI 2
-    fmi3_ = false;
+    // FMI 2.0
+    fmi_major_ = 2;
+  } else if (fmi_version_.rfind("3.", 0) == 0) {
+    // FMI 3
+    fmi_major_ = 3;
+    casadi_warning("FMI 3 support is expermental");
   } else {
     casadi_error("Unknown FMI version: " + fmi_version_);
   }
 
   // Read attributes
   model_name_ = fmi_desc.attribute<std::string>("modelName", "");
-  instantiation_token_ = fmi_desc.attribute<std::string>(fmi3_ ? "instantiationToken" : "guid");
+  instantiation_token_ = fmi_desc.attribute<std::string>(
+    fmi_major_ >= 3 ? "instantiationToken" : "guid");
   description_ = fmi_desc.attribute<std::string>("description", "");
   author_ = fmi_desc.attribute<std::string>("author", "");
   copyright_ = fmi_desc.attribute<std::string>("copyright", "");
@@ -426,7 +428,7 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
   generation_tool_ = fmi_desc.attribute<std::string>("generationTool", "");
   generation_date_and_time_ = fmi_desc.attribute<std::string>("generationDateAndTime", "");
   variable_naming_convention_ = fmi_desc.attribute<std::string>("variableNamingConvention", "");
-  if (fmi3_) {
+  if (fmi_major_ >= 3) {
     number_of_event_indicators_ = 0;  // In FMI 3: Obtain from binary
   } else {
     number_of_event_indicators_ = fmi_desc.attribute<casadi_int>("numberOfEventIndicators", 0);
@@ -449,8 +451,9 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
   import_model_variables(fmi_desc["ModelVariables"]);
 
   // Process model structure
-  if (fmi_desc.has_child("ModelStructure"))
+  if (fmi_desc.has_child("ModelStructure")) {
     import_model_structure(fmi_desc["ModelStructure"]);
+  }
 
   // Is a symbolic representation available?
   symbolic_ = false;  // use DLL by default
@@ -2692,7 +2695,7 @@ void DaeBuilderInternal::import_default_experiment(const XmlNode& n) {
 void DaeBuilderInternal::import_model_exchange(const XmlNode& n) {
   // Read attributes
   provides_directional_derivatives_ = n.attribute<bool>(
-    fmi3_ ? "providesDirectionalDerivatives" : "providesDirectionalDerivative", false);
+    fmi_major_ >= 3 ? "providesDirectionalDerivatives" : "providesDirectionalDerivative", false);
   provides_adjoint_derivatives_
     = n.attribute<bool>("providesAdjointDerivatives", false);
   model_identifier_ = n.attribute<std::string>("modelIdentifier");
@@ -2723,14 +2726,21 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
     Variable& var = new_variable(name);
     var.v = MX::sym(name);
 
-    // Read common attributes, cf. FMI 2.0.2 specification, 2.2.7
+    // Get type (FMI 3)
+    if (fmi_major_ >= 3) var.type = to_enum<Type>(vnode.name);
+
+    // Read common attributes, cf. FMI 3.0 specification, 2.4.7.4
     var.value_reference = static_cast<unsigned int>(vnode.attribute<casadi_int>("valueReference"));
+    vrmap_[var.value_reference] = var.index;
     var.description = vnode.attribute<std::string>("description", "");
     std::string causality_str = vnode.attribute<std::string>("causality", "local");
-    if (causality_str == "internal") causality_str = "local";  // FMI 1.0 -> FMI 2.0
-    var.causality = to_enum<Causality>(causality_str);
     std::string variability_str = vnode.attribute<std::string>("variability", "continuous");
-    if (variability_str == "parameter") variability_str = "fixed";  // FMI 1.0 -> FMI 2.0
+    if (fmi_major_ == 1) {
+        // FMI 1.0 -> FMI 2.0+
+      if (causality_str == "internal") causality_str = "local";
+      if (variability_str == "parameter") variability_str = "fixed";
+    }
+    var.causality = to_enum<Causality>(causality_str);
     var.variability = to_enum<Variability>(variability_str);
     std::string initial_str = vnode.attribute<std::string>("initial", "");
     if (initial_str.empty()) {
@@ -2740,34 +2750,67 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
       // Consistency check
       casadi_assert(var.causality != Causality::INPUT && var.causality != Causality::INDEPENDENT,
         "The combination causality = '" + to_string(var.causality) + "', "
-        "initial = '" + initial_str + "' is not allowed per FMI 2.0 specification.");
+        "initial = '" + initial_str + "' is not allowed per the FMI specification.");
       // Value specified
       var.initial = to_enum<Initial>(initial_str);
     }
-    // Other properties
-    if (vnode.has_child("Real")) {
-      const XmlNode& props = vnode["Real"];
-      var.unit = props.attribute<std::string>("unit", var.unit);
-      var.display_unit = props.attribute<std::string>("displayUnit", var.display_unit);
-      var.min = props.attribute<double>("min", -inf);
-      var.max = props.attribute<double>("max", inf);
-      var.nominal = props.attribute<double>("nominal", 1.);
-      var.set_attribute(Attribute::START, props.attribute<double>("start", 0.));
-      var.der_of = props.attribute<casadi_int>("derivative", var.der_of);
-    } else if (vnode.has_child("Integer")) {
-      const XmlNode& props = vnode["Integer"];
-      var.type = Type::INT32;
-      var.min = props.attribute<double>("min", -inf);
-      var.max = props.attribute<double>("max", inf);
-    } else if (vnode.has_child("Boolean")) {
-      var.type = Type::BOOLEAN;
-    } else if (vnode.has_child("String")) {
-      var.type = Type::STRING;
-    } else if (vnode.has_child("Enumeration")) {
-      var.type = Type::ENUMERATION;
+    // Type specific properties
+    if (fmi_major_ >= 3) {
+      // FMI 3.0: Type information in the same node
+      switch (var.type) {
+      case Type::FLOAT32:  // fall-through
+      case Type::FLOAT64:
+        // Floating point valued variables
+        var.unit = vnode.attribute<std::string>("unit", var.unit);
+        var.display_unit = vnode.attribute<std::string>("displayUnit", var.display_unit);
+        var.min = vnode.attribute<double>("min", -inf);
+        var.max = vnode.attribute<double>("max", inf);
+        var.nominal = vnode.attribute<double>("nominal", 1.);
+        var.set_attribute(Attribute::START, vnode.attribute<double>("start", 0.));
+        var.der_of = vnode.attribute<casadi_int>("derivative", var.der_of);
+        break;
+      case Type::INT8:  // fall-through
+      case Type::UINT8:  // fall-through
+      case Type::INT16:  // fall-through
+      case Type::UINT16:  // fall-through
+      case Type::INT32:  // fall-through
+      case Type::UINT32:  // fall-through
+      case Type::INT64:  // fall-through
+      case Type::UINT64:  // fall-through
+        // Integer valued variables
+        var.min = vnode.attribute<double>("min", -inf);
+        var.max = vnode.attribute<double>("max", inf);
+        break;
+      default:
+        break;
+      }
     } else {
-      casadi_warning("Unknown type for " + name);
+      // FMI 1.0 / 2.0: Type information in a separate node
+      if (vnode.has_child("Real")) {
+        const XmlNode& props = vnode["Real"];
+        var.unit = props.attribute<std::string>("unit", var.unit);
+        var.display_unit = props.attribute<std::string>("displayUnit", var.display_unit);
+        var.min = props.attribute<double>("min", -inf);
+        var.max = props.attribute<double>("max", inf);
+        var.nominal = props.attribute<double>("nominal", 1.);
+        var.set_attribute(Attribute::START, props.attribute<double>("start", 0.));
+        var.der_of = props.attribute<casadi_int>("derivative", var.der_of);
+      } else if (vnode.has_child("Integer")) {
+        const XmlNode& props = vnode["Integer"];
+        var.type = Type::INT32;
+        var.min = props.attribute<double>("min", -inf);
+        var.max = props.attribute<double>("max", inf);
+      } else if (vnode.has_child("Boolean")) {
+        var.type = Type::BOOLEAN;
+      } else if (vnode.has_child("String")) {
+        var.type = Type::STRING;
+      } else if (vnode.has_child("Enumeration")) {
+        var.type = Type::ENUMERATION;
+      } else {
+        casadi_warning("Unknown type for " + name);
+      }
     }
+
     // Initial classification of variables (states/outputs to be added later)
     if (var.causality == Causality::INDEPENDENT) {
       // Independent (time) variable
@@ -2785,86 +2828,161 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
       p_.push_back(var.index);
     }
   }
+
   // Handle derivatives
   for (size_t i = 0; i < n_variables(); ++i) {
     if (variable(i).der_of >= 0) {
-      // Add variable offset, make index 1
-      variable(i).der_of -= 1;
+      if (fmi_major_ >= 3) {
+        // Value reference is given: Find corresponding variable
+        variable(i).der_of = vrmap_.at(static_cast<unsigned int>(variable(i).der_of));
+      } else {
+        // Variable given with index-1, make index 0
+        variable(i).der_of -= 1;
+      }
       // Set der
       variable(variable(i).der_of).der = i;
     }
   }
 }
 
+std::vector<casadi_int> DaeBuilderInternal::read_dependencies(const XmlNode& n) {
+  // Default behaviour should be no known structure
+  casadi_assert(n.has_attribute("dependencies"),
+    "Default 'dependencies' not implemented");
+  // Read list of dependencies
+  std::vector<casadi_int> r = n.attribute<std::vector<casadi_int>>("dependencies", {});
+  // Get corresponding variable index
+  for (casadi_int& e : r) {
+    if (fmi_major_ >= 3) {
+      // Value reference is given
+      e = vrmap_.at(static_cast<unsigned int>(e));
+    } else {
+      // Index-1 is given
+      e--;
+    }
+  }
+  // Return list of dependencies
+  return r;
+}
+
+std::vector<DependenciesKind> DaeBuilderInternal::read_dependencies_kind(
+    const XmlNode& n, size_t ndep) {
+  // Quick return if node not provided
+  if (!n.has_attribute("dependenciesKind")) {
+    // No structure known, assume general dependency
+    return std::vector<DependenciesKind>(ndep, DependenciesKind::DEPENDENT);
+  } else {
+    // Read list of strings
+    auto dk_str = n.attribute<std::vector<std::string>>("dependenciesKind");
+    // Make sure expected length
+    casadi_assert(dk_str.size() == ndep, "Mismatching 'dependenciesKind'");
+    // Convert to enums
+    std::vector<DependenciesKind> r(ndep);
+    for (size_t i = 0; i < ndep; ++i) {
+      r[i] = to_enum<DependenciesKind>(dk_str[i]);
+    }
+    return r;
+  }
+}
+
 void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
-  // Outputs
-  if (n.has_child("Outputs")) {
-    for (auto& e : n["Outputs"].children) {
-      // Get index
-      outputs_.push_back(e.attribute<casadi_int>("index", 0) - 1);
-      // Corresponding variable
-      Variable& v = variable(outputs_.back());
-      // Add to y, unless state
-      if (v.der < 0) {
-        y_.push_back(v.index);
-        v.beq = v.v;
-      }
-      // Get dependencies
-      v.dependencies = e.attribute<std::vector<casadi_int>>("dependencies", {});
-      // dependenciesKind attribute, if present
-      if (e.has_attribute("dependenciesKind")) {
-        // Load list of strings
-        auto dK = e.attribute<std::vector<std::string>>("dependenciesKind", {});
-        // Convert to enum, add to list
-        v.dependenciesKind.reserve(v.dependencies.size());
-        for (auto&& s : dK) {
-          v.dependenciesKind.push_back(to_enum<DependenciesKind>(s));
+  if (fmi_major_ >= 3) {
+    // Loop over ModelStructure elements
+    for (casadi_int i = 0; i < n.size(); ++i) {
+      const XmlNode& e = n[i];
+      // Get a reference to the variable
+      if (e.name == "Output") {
+        // Get index
+        outputs_.push_back(vrmap_.at(e.attribute<size_t>("valueReference")));
+        // Corresponding variable
+        Variable& v = variable(outputs_.back());
+        // Add to y, unless state
+        if (v.der < 0) {
+          y_.push_back(v.index);
+          v.beq = v.v;
         }
-      }
-      // Mark interdependencies, change to index-0
-      for (casadi_int& d : v.dependencies) {
-        variable(--d).dependency = true;
+        // Get dependencies
+        v.dependencies = read_dependencies(e);
+        v.dependenciesKind = read_dependencies_kind(e, v.dependencies.size());
+        // Mark interdependencies
+        for (casadi_int d : v.dependencies) variable(d).dependency = true;
+      } else if (e.name == "ContinuousStateDerivative") {
+        // Get index
+        derivatives_.push_back(vrmap_.at(e.attribute<size_t>("valueReference")));
+        // Corresponding variable
+        Variable& v = variable(derivatives_.back());
+        // Add to list of states
+        casadi_assert(v.der_of >= 0, "Error processing derivative info for " + v.name);
+        x_.push_back(v.der_of);
+        // Make sure der field is consistent
+        variable(x_.back()).der = derivatives_.back();
+        // Get dependencies
+        v.dependencies = read_dependencies(e);
+        v.dependenciesKind = read_dependencies_kind(e, v.dependencies.size());
+        // Mark interdependencies
+        for (casadi_int d : v.dependencies) variable(d).dependency = true;
+      } else if (e.name == "ClockedState") {
+        // Clocked state
+        casadi_message("ClockedState not implemented, ignoring");
+      } else if (e.name == "InitialUnknown") {
+        // Get index
+        initial_unknowns_.push_back(vrmap_.at(e.attribute<size_t>("valueReference")));
+        // Get dependencies
+        for (casadi_int d : read_dependencies(e)) variable(d).dependency = true;
+      } else if (e.name == "EventIndicator") {
+        // Event indicator
+        casadi_message("Event indicators not implemented, ignoring");
+      } else {
+        // Unknown
+        casadi_error("Unknown ModelStructure element: " + e.name);
       }
     }
-  }
-  // Derivatives
-  if (n.has_child("Derivatives")) {
-    for (auto& e : n["Derivatives"].children) {
-      // Get index
-      derivatives_.push_back(e.attribute<casadi_int>("index", 0) - 1);
-      // Corresponding variable
-      Variable& v = variable(derivatives_.back());
-      // Add to list of states
-      casadi_assert(v.der_of >= 0, "Error processing derivative info for " + v.name);
-      x_.push_back(v.der_of);
-      // Make sure der field is consistent
-      variable(x_.back()).der = derivatives_.back();
-      // Get dependencies
-      v.dependencies = e.attribute<std::vector<casadi_int>>("dependencies", {});
-      // dependenciesKind attribute, if present
-      if (e.has_attribute("dependenciesKind")) {
-        // Load list of strings
-        auto dK = e.attribute<std::vector<std::string>>("dependenciesKind", {});
-        // Convert to enum, add to list
-        v.dependenciesKind.reserve(v.dependencies.size());
-        for (auto&& s : dK) {
-          v.dependenciesKind.push_back(to_enum<DependenciesKind>(s));
+  } else {
+    // Outputs
+    if (n.has_child("Outputs")) {
+      for (auto& e : n["Outputs"].children) {
+        // Get index
+        outputs_.push_back(e.attribute<casadi_int>("index", 0) - 1);
+        // Corresponding variable
+        Variable& v = variable(outputs_.back());
+        // Add to y, unless state
+        if (v.der < 0) {
+          y_.push_back(v.index);
+          v.beq = v.v;
         }
-      }
-      // Mark interdependencies, change to index-0
-      for (casadi_int& d : v.dependencies) {
-        variable(--d).dependency = true;
+        // Get dependencies, dependenciesKind
+        v.dependencies = read_dependencies(e);
+        v.dependenciesKind = read_dependencies_kind(e, v.dependencies.size());
+        // Mark interdependencies
+        for (casadi_int d : v.dependencies) variable(d).dependency = true;
       }
     }
-  }
-  // Initial unknowns
-  if (n.has_child("InitialUnknowns")) {
-    for (auto& e : n["InitialUnknowns"].children) {
-      // Get index
-      initial_unknowns_.push_back(e.attribute<casadi_int>("index", 0) - 1);
-      // Get dependencies
-      for (casadi_int d : e.attribute<std::vector<casadi_int>>("dependencies", {})) {
-        variable(d - 1).dependency = true;
+    // Derivatives
+    if (n.has_child("Derivatives")) {
+      for (auto& e : n["Derivatives"].children) {
+        // Get index
+        derivatives_.push_back(e.attribute<casadi_int>("index", 0) - 1);
+        // Corresponding variable
+        Variable& v = variable(derivatives_.back());
+        // Add to list of states
+        casadi_assert(v.der_of >= 0, "Error processing derivative info for " + v.name);
+        x_.push_back(v.der_of);
+        // Make sure der field is consistent
+        variable(x_.back()).der = derivatives_.back();
+        // Get dependencies
+        v.dependencies = read_dependencies(e);
+        v.dependenciesKind = read_dependencies_kind(e, v.dependencies.size());
+        // Mark interdependencies
+        for (casadi_int d : v.dependencies) variable(d).dependency = true;
+      }
+    }
+    // Initial unknowns
+    if (n.has_child("InitialUnknowns")) {
+      for (auto& e : n["InitialUnknowns"].children) {
+        // Get index
+        initial_unknowns_.push_back(e.attribute<casadi_int>("index", 0) - 1);
+        // Get dependencies
+        for (casadi_int d : read_dependencies(e)) variable(d).dependency = true;
       }
     }
   }
