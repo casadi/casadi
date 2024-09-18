@@ -636,7 +636,6 @@ void FatropInterface::codegen_declarations(CodeGenerator& g) const {
   g.add_auxiliary(CodeGenerator::AUX_SCALED_COPY);
   g.add_auxiliary(CodeGenerator::AUX_AXPY);
   g.add_auxiliary(CodeGenerator::AUX_PRINTF);
-  g.add_include("stdio.h");
   g.add_dependency(get_function("nlp_f"));
   g.add_dependency(get_function("nlp_grad_f"));
   g.add_dependency(get_function("nlp_g"));
