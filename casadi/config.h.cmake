@@ -34,7 +34,7 @@
 #define CASADI_FEATURE_LIST "${feature_list}"  // NOLINT(whitespace/line_length)
 #define CASADI_BUILD_TYPE "${CMAKE_BUILD_TYPE}"  // NOLINT(whitespace/line_length)
 #define CASADI_COMPILER_ID "${CMAKE_CXX_COMPILER_ID}"  // NOLINT(whitespace/line_length)
-#define CASADI_COMPILER "${CMAKE_CXX_COMPILER}"  // NOLINT(whitespace/line_length)
+#define CASADI_COMPILER "${CASADI_CMAKE_CXX_COMPILER}"  // NOLINT(whitespace/line_length)
 #define CASADI_COMPILER_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_${UPPER_CMAKE_BUILD_TYPE}} ${EXTRA_CXX_FLAGS_FROM_DEFS}"  // NOLINT(whitespace/line_length)
 #define CASADI_MODULES "${CASADI_MODULES}"  // NOLINT(whitespace/line_length)
 #define CASADI_PLUGINS "${CASADI_PLUGINS}"  // NOLINT(whitespace/line_length)
