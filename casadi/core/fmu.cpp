@@ -31,6 +31,10 @@
 #include "fmu2.hpp"
 #endif  // WITH_FMI2
 
+#ifdef WITH_FMI3
+#include "fmu3.hpp"
+#endif  // WITH_FMI3
+
 namespace casadi {
 
 // Throw informative error message
@@ -56,6 +60,14 @@ Fmu::Fmu(const std::string& name, FmuApi api, const DaeBuilderInternal* dae,
   // No compilation support
   casadi_error("CasADi was not compiled with WITH_FMI2=ON.");
 #endif  // WITH_FMI2
+  } else if (api == FmuApi::FMI3) {
+#ifdef WITH_FMI3
+  // Create
+  own(new Fmu3(name, scheme_in, scheme_out, scheme, aux));
+#else  // WITH_FMI3
+  // No compilation support
+  casadi_error("CasADi was not compiled with WITH_FMI3=ON.");
+#endif  // WITH_FMI3
   } else {
     // Not supported
     casadi_error("Unsupported FMU API: " + to_string(api));
@@ -353,6 +365,7 @@ void FmuInternal::disp(std::ostream& stream, bool more) const {
 std::string to_string(FmuApi v) {
   switch (v) {
   case FmuApi::FMI2: return "fmi2";
+  case FmuApi::FMI3: return "fmi3";
   default: break;
   }
   return "";
@@ -674,6 +687,12 @@ FmuInternal* FmuInternal::deserialize(DeserializingStream& s) {
 #else
     casadi_error("CasADi was not compiled with WITH_FMI2=ON.");
 #endif // WITH_FMI2
+  } else if (class_name=="Fmu3") {
+#ifdef WITH_FMI3
+    casadi_error("Not implemented");
+#else
+    casadi_error("CasADi was not compiled with WITH_FMI2=ON.");
+#endif // WITH_FMI3
   } else {
     casadi_error("Cannot deserialize type '" + class_name + "'");
   }

@@ -43,7 +43,7 @@ struct InputStruct;
 class FmuInternal;
 
 /// Which C API
-enum class FmuApi {FMI2, NUMEL};
+enum class FmuApi {FMI2, FMI3, NUMEL};
 
 /// Convert to string
 CASADI_EXPORT std::string to_string(FmuApi v);

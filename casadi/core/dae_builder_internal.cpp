@@ -2394,7 +2394,8 @@ Function DaeBuilderInternal::fmu_fun(const std::string& name,
     }
   }
   // New FMU instance (to be shared between derivative functions)
-  Fmu fmu(name, FmuApi::FMI2, this, scheme_in, scheme_out, scheme, aux);
+  Fmu fmu(name, fmi_major_ >= 3 ? FmuApi::FMI3 : FmuApi::FMI2, this,
+    scheme_in, scheme_out, scheme, aux);
 
   // Crete new function
   return Function::create(new FmuFunction(name, fmu, name_in, name_out), opts);
