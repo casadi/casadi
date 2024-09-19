@@ -545,6 +545,13 @@ if(WITH_FMI2)
 endif()
 add_feature_info(dynamic-loading WITH_FMI2 "Support for import of FMI 2.0 binaries")
 
+# Support for import of FMI 3.0 binaries
+option(WITH_FMI3 "Compile with support for import of FMI 3.0 binaries" OFF)
+if(WITH_FMI3)
+  set(FMI3_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/external_packages/FMI-Standard-3.0/headers)
+endif()
+add_feature_info(dynamic-loading WITH_FMI3 "Support for import of FMI 3.0 binaries")
+
 # Include support for deprecated features (to be removed in the next release)
 option(WITH_DEPRECATED_FEATURES "Compile with syntax that is scheduled to be deprecated" ON)
 if (WITH_DEPRECATED_FEATURES)

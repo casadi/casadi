@@ -25,8 +25,6 @@
 #ifndef CASADI_FMU2_HPP
 #define CASADI_FMU2_HPP
 
-#ifdef WITH_FMI2
-
 #include "fmu_impl.hpp"
 
 #include <fmi2Functions.h>
@@ -198,7 +196,5 @@ class CASADI_EXPORT Fmu2 : public FmuInternal {
 } // namespace casadi
 
 /// \endcond
-
-#endif  // WITH_FMI2
 
 #endif // CASADI_FMU2_HPP

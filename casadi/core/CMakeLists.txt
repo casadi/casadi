@@ -3,10 +3,26 @@ cmake_minimum_required(VERSION 3.10.2)
 # Create runtime
 add_subdirectory(runtime)
 
+# Binary interface to FMI, version 2.0
 if(WITH_FMI2)
   # FMI C API, version 2
   add_definitions(-DWITH_FMI2)
   include_directories(${FMI2_INCLUDE_DIR})
+  set(FMU2_SRC fmu2.hpp fmu2.cpp)
+else()
+  # Do not compile FMU 2 interface
+  set(FMU2_SRC)
+endif()
+
+# Binary interface to FMI, version 3.0
+if(WITH_FMI3)
+  # FMI C API, version 2
+  add_definitions(-DWITH_FMI3)
+  include_directories(${FMI3_INCLUDE_DIR})
+  set(FMU3_SRC fmu3.hpp fmu3.cpp)
+else()
+  # Do not compile FMU 2 interface
+  set(FMU3_SRC)
 endif()
 
 set(CASADI_PUBLIC
@@ -173,7 +189,7 @@ set(CASADI_INTERNAL
   sx_function.hpp         sx_function.cpp
   mx_function.hpp         mx_function.cpp
   external_impl.hpp       external.cpp
-  fmu_impl.hpp            fmu.cpp fmu2.hpp fmu2.cpp
+  fmu_impl.hpp            fmu.cpp                  ${FMU2_SRC}  ${FMU3_SRC}
   fmu_function.hpp        fmu_function.cpp
   jit_function.hpp        jit_function.cpp
   linsol.cpp              linsol_internal.hpp  linsol_internal.cpp

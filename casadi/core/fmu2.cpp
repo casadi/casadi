@@ -29,8 +29,6 @@
 
 namespace casadi {
 
-#ifdef WITH_FMI2
-
 Fmu2::~Fmu2() {
 }
 
@@ -971,7 +969,5 @@ void Fmu2::serialize_body(SerializingStream &s) const {
 
   s.pack("Fmu2::declared_ad", declared_ad_);
 }
-
-#endif  // WITH_FMI2
 
 } // namespace casadi
