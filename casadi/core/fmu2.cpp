@@ -540,32 +540,6 @@ void Fmu2::get_stats(FmuMemory* m, Dict* stats,
   }
 }
 
-int Fmu2::eval_ad(FmuMemory* m) const {
-  // Number of inputs and outputs
-  size_t n_known = m->id_in_.size();
-  size_t n_unknown = m->id_out_.size();
-  // Quick return if nothing to be calculated
-  if (n_unknown == 0) return 0;
-  // Evalute (should not be necessary)
-  if (get_real(m->instance, get_ptr(m->vr_out_), n_unknown, get_ptr(m->v_out_), n_unknown)) {
-    casadi_warning("Evaluation failed");
-    return 1;
-  }
-  // Evaluate directional derivatives
-  if (get_directional_derivative(m->instance, get_ptr(m->vr_out_), n_unknown,
-      get_ptr(m->vr_in_), n_known, get_ptr(m->d_in_), n_known, get_ptr(m->d_out_), n_unknown)) {
-    casadi_warning("Forward mode AD failed");
-    return 1;
-  }
-  // Collect requested variables
-  auto it = m->d_out_.begin();
-  for (size_t id : m->id_out_) {
-    m->sens_[id] = *it++;
-  }
-  // Successful return
-  return 0;
-}
-
 int Fmu2::eval_fd(FmuMemory* m, bool independent_seeds) const {
   // Number of inputs and outputs
   size_t n_known = m->id_in_.size();
