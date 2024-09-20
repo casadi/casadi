@@ -375,9 +375,10 @@ fmi2Component Fmu2::instantiate() const {
   return c;
 }
 
-void Fmu2::free_instance(void* c) const {
+void Fmu2::free_instance(void* instance) const {
   if (free_instance_) {
-    free_instance_(static_cast<fmi2Component>(c));
+    auto c = static_cast<fmi2Component>(instance);
+    free_instance_(c);
   } else {
     casadi_warning("No free_instance function pointer available");
   }

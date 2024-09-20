@@ -129,7 +129,7 @@ class CASADI_EXPORT Fmu2 : public FmuInternal {
   fmi2Component instantiate() const;
 
   // Free FMU instance
-  void free_instance(void* c) const override;
+  void free_instance(void* instance) const override;
 
   // Reset solver
   int reset(fmi2Component c);

@@ -129,7 +129,7 @@ class CASADI_EXPORT Fmu3 : public FmuInternal {
   fmi3Instance instantiate() const;
 
   // Free FMU instance
-  void free_instance(void* c) const override;
+  void free_instance(void* instance) const override;
 
   // Reset solver
   int reset(fmi3Instance c);

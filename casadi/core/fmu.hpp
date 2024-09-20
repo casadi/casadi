@@ -158,7 +158,7 @@ class CASADI_EXPORT Fmu
   int init_mem(FmuMemory* m) const;
 
   // Free FMU instance
-  void free_instance(void* c) const;
+  void free_instance(void* instance) const;
 
   // Set value
   void set(FmuMemory* m, size_t ind, const double* value) const;

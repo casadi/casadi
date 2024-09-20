@@ -248,9 +248,9 @@ int Fmu::init_mem(FmuMemory* m) const {
   }
 }
 
-void Fmu::free_instance(void* c) const {
+void Fmu::free_instance(void* instance) const {
   try {
-    return (*this)->free_instance(c);
+    return (*this)->free_instance(instance);
   } catch(std::exception& e) {
     THROW_ERROR("free_instance", e.what());
   }
