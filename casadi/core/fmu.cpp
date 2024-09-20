@@ -492,6 +492,44 @@ int FmuInternal::eval_derivative(FmuMemory* m, bool independent_seeds) const {
   return 0;
 }
 
+int FmuInternal::init_mem(FmuMemory* m) const {
+  // Ensure not already instantiated
+  casadi_assert(m->instance == 0, "Already instantiated");
+  // Create instance
+  m->instance = instantiate();
+  // Set all values
+  if (set_values(m->instance)) {
+    casadi_warning("FmuInternal::set_values failed");
+    return 1;
+  }
+  // Initialization mode begins
+  if (enter_initialization_mode(m->instance)) return 1;
+  // Initialization mode ends
+  if (exit_initialization_mode(m->instance)) return 1;
+  // Allocate/reset input buffer
+  m->ibuf_.resize(iind_.size());
+  std::fill(m->ibuf_.begin(), m->ibuf_.end(), casadi::nan);
+  // Allocate/reset output buffer
+  m->obuf_.resize(oind_.size());
+  std::fill(m->obuf_.begin(), m->obuf_.end(), casadi::nan);
+  // Allocate/reset seeds
+  m->seed_.resize(iind_.size());
+  std::fill(m->seed_.begin(), m->seed_.end(), 0);
+  // Allocate/reset sensitivities
+  m->sens_.resize(oind_.size());
+  std::fill(m->sens_.begin(), m->sens_.end(), 0);
+  // Allocate/reset changed
+  m->changed_.resize(iind_.size());
+  std::fill(m->changed_.begin(), m->changed_.end(), false);
+  // Allocate/reset requested
+  m->requested_.resize(oind_.size());
+  std::fill(m->requested_.begin(), m->requested_.end(), false);
+  // Also allocate memory for corresponding Jacobian entry (for debugging)
+  m->wrt_.resize(oind_.size());
+  // Successful return
+  return 0;
+}
+
 void FmuInternal::set(FmuMemory* m, size_t ind, const double* value) const {
   if (value) {
     // Argument is given

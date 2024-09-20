@@ -155,11 +155,6 @@ class CASADI_EXPORT Fmu3 : public FmuInternal {
   void get_stats(FmuMemory* m, Dict* stats,
     const std::vector<std::string>& name_in, const InputStruct* in) const override;
 
-  /** \brief Initalize memory block
-
-      \identifier{276} */
-  int init_mem(FmuMemory* m) const override;
-
   // Calculate all requested variables
   int eval(FmuMemory* m) const override;
 

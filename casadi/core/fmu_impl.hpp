@@ -132,7 +132,7 @@ class CASADI_EXPORT FmuInternal : public SharedObjectInternal {
   /** \brief Initalize memory block
 
       \identifier{271} */
-  virtual int init_mem(FmuMemory* m) const = 0;
+  int init_mem(FmuMemory* m) const;
 
   // New memory object
   virtual void* instantiate() const = 0;
