@@ -60,9 +60,6 @@ class CASADI_EXPORT Fmu2 : public FmuInternal {
   // Set C API functions
   void load_functions() override;
 
-  // Finalize
-  void finalize() override;
-
   // Path to the FMU resource directory
   std::string resource_loc_;
 
@@ -129,7 +126,7 @@ class CASADI_EXPORT Fmu2 : public FmuInternal {
   bool has_fwd() const override { return get_directional_derivative_ != nullptr; }
 
   // New memory object
-  void* instantiate() const;
+  void* instantiate() const override;
 
   // Free FMU instance
   void free_instance(void* instance) const override;
@@ -147,10 +144,10 @@ class CASADI_EXPORT Fmu2 : public FmuInternal {
   int set_values(void* instance) const override;
 
   // Retrieve input variable values from FMU
-  int get_in(void* instance, std::vector<fmi2Real>* v) const;
+  int get_in(void* instance) override;
 
   // Retrieve auxilliary variables from FMU
-  int get_aux(void* instance, Value* v) const;
+  int get_aux(void* instance) override;
 
   /** \brief Get stats
 

@@ -365,6 +365,32 @@ FmuInternal::FmuInternal(const std::string& name,
 FmuInternal::~FmuInternal() {
 }
 
+void FmuInternal::finalize() {
+  // Get FMI C functions
+  load_functions();
+
+  // Create a temporary instance
+  void* c = instantiate();
+  // Set all values
+  if (set_values(c)) {
+    casadi_error("FmuInternal::set_values failed");
+  }
+  // Initialization mode begins
+  if (enter_initialization_mode(c)) {
+    casadi_error("FmuInternal::enter_initialization_mode failed");
+  }
+  // Get input values
+  if (get_in(c)) {
+    casadi_error("FmuInternal::get_in failed");
+  }
+  // Get auxilliary variables
+  if (get_aux(c)) {
+    casadi_error("FmuInternal::get_aux failed");
+  }
+  // Free memory
+  free_instance(c);
+}
+
 void FmuInternal::disp(std::ostream& stream, bool more) const {
   (void)more;  // unused
   stream << name_ << " " << class_name();

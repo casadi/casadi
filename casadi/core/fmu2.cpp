@@ -303,32 +303,6 @@ void Fmu2::load_functions() {
   functions_.componentEnvironment = 0;
 }
 
-void Fmu2::finalize() {
-  // Get FMI C functions
-  load_functions();
-
-  // Create a temporary instance
-  void* c = instantiate();
-  // Set all values
-  if (set_values(c)) {
-    casadi_error("Fmu2::set_values failed");
-  }
-  // Initialization mode begins
-  if (enter_initialization_mode(c)) {
-    casadi_error("Fmu2::enter_initialization_mode failed");
-  }
-  // Get input values
-  if (get_in(c, &value_in_)) {
-    casadi_error("Fmu2::get_in failed");
-  }
-  // Get auxilliary variables
-  if (get_aux(c, &aux_value_)) {
-    casadi_error("Fmu2::get_aux failed");
-  }
-  // Free memory
-  free_instance(c);
-}
-
 void Fmu2::logger(fmi2ComponentEnvironment componentEnvironment,
     fmi2String instanceName,
     fmi2Status status,
@@ -497,10 +471,10 @@ int Fmu2::set_values(void* instance) const {
   return 0;
 }
 
-int Fmu2::get_in(void* instance, std::vector<fmi2Real>* v) const {
+int Fmu2::get_in(void* instance) {
   auto c = static_cast<fmi2Component>(instance);
   if (!vr_in_.empty()) {
-    fmi2Status status = get_real_(c, get_ptr(vr_in_), vr_in_.size(), get_ptr(*v));
+    fmi2Status status = get_real_(c, get_ptr(vr_in_), vr_in_.size(), get_ptr(value_in_));
     if (status != fmi2OK) {
       casadi_warning("fmi2GetReal failed");
       return 1;
@@ -510,12 +484,12 @@ int Fmu2::get_in(void* instance, std::vector<fmi2Real>* v) const {
   return 0;
 }
 
-int Fmu2::get_aux(void* instance, Value* v) const {
+int Fmu2::get_aux(void* instance) {
   auto c = static_cast<fmi2Component>(instance);
   // Get real auxilliary variables
   if (!vr_aux_real_.empty()) {
     fmi2Status status = get_real_(c, get_ptr(vr_aux_real_), vr_aux_real_.size(),
-      get_ptr(v->v_real));
+      get_ptr(aux_value_.v_real));
     if (status != fmi2OK) {
       casadi_warning("fmi2GetReal failed");
       return 1;
@@ -524,7 +498,7 @@ int Fmu2::get_aux(void* instance, Value* v) const {
   // Get integer/enum auxilliary variables
   if (!vr_aux_integer_.empty()) {
     fmi2Status status = get_integer_(c, get_ptr(vr_aux_integer_), vr_aux_integer_.size(),
-      get_ptr(v->v_integer));
+      get_ptr(aux_value_.v_integer));
     if (status != fmi2OK) {
       casadi_warning("fmi2GetInteger failed");
       return 1;
@@ -533,7 +507,7 @@ int Fmu2::get_aux(void* instance, Value* v) const {
   // Get boolean auxilliary variables
   if (!vr_aux_boolean_.empty()) {
     fmi2Status status = get_boolean_(c, get_ptr(vr_aux_boolean_), vr_aux_boolean_.size(),
-      get_ptr(v->v_boolean));
+      get_ptr(aux_value_.v_boolean));
     if (status != fmi2OK) {
       casadi_warning("fmi2GetBoolean failed");
       return 1;
@@ -542,7 +516,7 @@ int Fmu2::get_aux(void* instance, Value* v) const {
   // Get string auxilliary variables
   for (size_t k = 0; k < vr_aux_string_.size(); ++k) {
     fmi2ValueReference vr = vr_aux_string_[k];
-    fmi2String value = v->v_string.at(k).c_str();
+    fmi2String value = aux_value_.v_string.at(k).c_str();
     fmi2Status status = set_string_(c, &vr, 1, &value);
     if (status != fmi2OK) {
       casadi_error("fmi2GetString failed for value reference " + str(vr));

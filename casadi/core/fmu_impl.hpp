@@ -72,8 +72,14 @@ class CASADI_EXPORT FmuInternal : public SharedObjectInternal {
   // Copy values set in DaeBuilder to FMU
   virtual int set_values(void* instance) const = 0;
 
+  // Retrieve input variable values from FMU
+  virtual int get_in(void* instance) = 0;
+
+  // Retrieve auxilliary variables from FMU
+  virtual int get_aux(void* instance) = 0;
+
   // Finalize
-  virtual void finalize() = 0;
+  void finalize();
 
   /** \brief Print
 
@@ -127,6 +133,9 @@ class CASADI_EXPORT FmuInternal : public SharedObjectInternal {
 
       \identifier{271} */
   virtual int init_mem(FmuMemory* m) const = 0;
+
+  // New memory object
+  virtual void* instantiate() const = 0;
 
   // Free FMU instance
   virtual void free_instance(void* c) const = 0;

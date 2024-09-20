@@ -320,32 +320,6 @@ void Fmu3::load_functions() {
   }
 }
 
-void Fmu3::finalize() {
-  // Get FMI C functions
-  load_functions();
-
-  // Create a temporary instance
-  void* c = instantiate();
-  // Set all values
-  if (set_values(c)) {
-    casadi_error("Fmu3::set_values failed");
-  }
-  // Initialization mode begins
-  if (enter_initialization_mode(c)) {
-    casadi_error("Fmu3::enter_initialization_mode failed");
-  }
-  // Get input values
-  if (get_in(c, &value_in_)) {
-    casadi_error("Fmu3::get_in failed");
-  }
-  // Get auxilliary variables
-  if (get_aux(c, &aux_value_)) {
-    casadi_error("Fmu3::get_aux failed");
-  }
-  // Free memory
-  free_instance(c);
-}
-
 void Fmu3::log_message_callback(fmi3InstanceEnvironment instanceEnvironment,
     fmi3Status status, fmi3String category, fmi3String message) {
   // Print message content
@@ -486,11 +460,11 @@ int Fmu3::set_values(void* instance) const {
   return 0;
 }
 
-int Fmu3::get_in(void* instance, std::vector<fmi3Float64>* v) const {
+int Fmu3::get_in(void* instance) {
   auto c = static_cast<fmi3Instance>(instance);
   if (!vr_in_.empty()) {
     fmi3Status status = get_float64_(c, get_ptr(vr_in_), vr_in_.size(),
-      get_ptr(*v), vr_in_.size());
+      get_ptr(value_in_), vr_in_.size());
     if (status != fmi3OK) {
       casadi_warning("fmi3GetFloat64 failed");
       return 1;
@@ -500,12 +474,12 @@ int Fmu3::get_in(void* instance, std::vector<fmi3Float64>* v) const {
   return 0;
 }
 
-int Fmu3::get_aux(void* instance, Value* v) const {
+int Fmu3::get_aux(void* instance) {
   auto c = static_cast<fmi3Instance>(instance);
   // Get real auxilliary variables
   if (!vr_aux_real_.empty()) {
     fmi3Status status = get_float64_(c, get_ptr(vr_aux_real_), vr_aux_real_.size(),
-      get_ptr(v->v_real), vr_aux_real_.size());
+      get_ptr(aux_value_.v_real), vr_aux_real_.size());
     if (status != fmi3OK) {
       casadi_warning("fmi3GetFloat64 failed");
       return 1;
@@ -514,7 +488,7 @@ int Fmu3::get_aux(void* instance, Value* v) const {
   // Get integer/enum auxilliary variables
   if (!vr_aux_integer_.empty()) {
     fmi3Status status = get_int32_(c, get_ptr(vr_aux_integer_), vr_aux_integer_.size(),
-      get_ptr(v->v_integer), vr_aux_integer_.size());
+      get_ptr(aux_value_.v_integer), vr_aux_integer_.size());
     if (status != fmi3OK) {
       casadi_warning("fmi3GetInt32 failed");
       return 1;
@@ -534,7 +508,7 @@ int Fmu3::get_aux(void* instance, Value* v) const {
   // Get string auxilliary variables
   for (size_t k = 0; k < vr_aux_string_.size(); ++k) {
     fmi3ValueReference vr = vr_aux_string_[k];
-    fmi3String value = v->v_string.at(k).c_str();
+    fmi3String value = aux_value_.v_string.at(k).c_str();
     fmi3Status status = set_string_(c, &vr, 1, &value, 1);
     if (status != fmi3OK) {
       casadi_error("fmi3GetString failed for value reference " + str(vr));
