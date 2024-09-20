@@ -305,8 +305,6 @@ void Fmu2::finalize() {
 
   // Create a temporary instance
   fmi2Component c = instantiate();
-  // Reset solver
-  setup_experiment(c);
   // Set all values
   if (set_values(c)) {
     casadi_error("Fmu2::set_values failed");
@@ -369,6 +367,11 @@ fmi2Component Fmu2::instantiate() const {
   fmi2Component c = instantiate_(instanceName, fmuType, fmuGUID, fmuResourceLocation,
     &functions_, visible, logging_on_);
   if (c == 0) casadi_error("fmi2Instantiate failed");
+
+  // Call fmi2SetupExperiment
+  fmi2Status status = setup_experiment_(c, fmutol_ > 0, fmutol_, 0., fmi2True, 1.);
+  casadi_assert(status == fmi2OK, "fmi2SetupExperiment failed");
+
   return c;
 }
 
@@ -385,8 +388,6 @@ int Fmu2::init_mem(FmuMemory* m) const {
   casadi_assert(m->instance == 0, "Already instantiated");
   // Create instance
   m->instance = instantiate();
-  // Reset solver
-  setup_experiment(m->instance);
   // Set all values
   if (set_values(m->instance)) {
     casadi_warning("Fmu2::set_values failed");
@@ -418,12 +419,6 @@ int Fmu2::init_mem(FmuMemory* m) const {
   m->wrt_.resize(oind_.size());
   // Successful return
   return 0;
-}
-
-void Fmu2::setup_experiment(fmi2Component c) const {
-  // Call fmi2SetupExperiment
-  fmi2Status status = setup_experiment_(c, fmutol_ > 0, fmutol_, 0., fmi2True, 1.);
-  casadi_assert(status == fmi2OK, "fmi2SetupExperiment failed");
 }
 
 int Fmu2::reset(fmi2Component c) {

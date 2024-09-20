@@ -134,9 +134,6 @@ class CASADI_EXPORT Fmu2 : public FmuInternal {
   // Reset solver
   int reset(fmi2Component c);
 
-  // Setup experiment
-  void setup_experiment(fmi2Component c) const;
-
   // Enter initialization mode
   int enter_initialization_mode(fmi2Component c) const;
 
