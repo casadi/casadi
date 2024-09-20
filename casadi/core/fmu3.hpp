@@ -126,28 +126,28 @@ class CASADI_EXPORT Fmu3 : public FmuInternal {
   bool has_adj() const override { return get_adjoint_derivative_ != nullptr; }
 
   // New memory object
-  fmi3Instance instantiate() const;
+  void* instantiate() const;
 
   // Free FMU instance
   void free_instance(void* instance) const override;
 
   // Reset solver
-  int reset(fmi3Instance c);
+  int reset(void* instance);
 
   // Enter initialization mode
-  int enter_initialization_mode(fmi3Instance c) const;
+  int enter_initialization_mode(void* instance) const;
 
   // Exit initialization mode
-  int exit_initialization_mode(fmi3Instance c) const;
+  int exit_initialization_mode(void* instance) const;
 
   // Copy values set in DaeBuilder to FMU
-  int set_values(fmi3Instance c) const;
+  int set_values(void* instance) const;
 
   // Retrieve input variable values from FMU
-  int get_in(fmi3Instance c, std::vector<fmi3Float64>* v) const;
+  int get_in(void* instance, std::vector<fmi3Float64>* v) const;
 
   // Retrieve auxilliary variables from FMU
-  int get_aux(fmi3Instance c, Value* v) const;
+  int get_aux(void* instance, Value* v) const;
 
   /** \brief Get stats
 

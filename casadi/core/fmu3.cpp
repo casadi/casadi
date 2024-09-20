@@ -321,7 +321,7 @@ void Fmu3::finalize() {
   }
 
   // Create a temporary instance
-  fmi3Instance c = instantiate();
+  void* c = instantiate();
   // Set all values
   if (set_values(c)) {
     casadi_error("Fmu3::set_values failed");
@@ -348,7 +348,7 @@ void Fmu3::log_message_callback(fmi3InstanceEnvironment instanceEnvironment,
   uout() << "[" << category << "] " << message << std::endl;
 }
 
-fmi3Instance Fmu3::instantiate() const {
+void* Fmu3::instantiate() const {
   // Instantiate FMU
   fmi3String instanceName = instance_name_.c_str();
   fmi3String instantiationToken = guid_.c_str();
@@ -408,7 +408,8 @@ int Fmu3::init_mem(FmuMemory* m) const {
   return 0;
 }
 
-int Fmu3::reset(fmi3Instance c) {
+int Fmu3::reset(void* instance) {
+  auto c = static_cast<fmi3Instance>(instance);
   fmi3Status status = reset_(c);
   if (status != fmi3OK) {
     casadi_warning("fmi3Reset failed");
@@ -417,7 +418,8 @@ int Fmu3::reset(fmi3Instance c) {
   return 0;
 }
 
-int Fmu3::enter_initialization_mode(fmi3Instance c) const {
+int Fmu3::enter_initialization_mode(void* instance) const {
+  auto c = static_cast<fmi3Instance>(instance);
   fmi3Status status = enter_initialization_mode_(c, fmutol_ > 0, fmutol_, 0., fmi3True, 1.);
   if (status != fmi3OK) {
     casadi_warning("fmi3EnterInitializationMode failed: " + str(status));
@@ -426,7 +428,8 @@ int Fmu3::enter_initialization_mode(fmi3Instance c) const {
   return 0;
 }
 
-int Fmu3::exit_initialization_mode(fmi3Instance c) const {
+int Fmu3::exit_initialization_mode(void* instance) const {
+  auto c = static_cast<fmi3Instance>(instance);
   fmi3Status status = exit_initialization_mode_(c);
   if (status != fmi3OK) {
     casadi_warning("fmi3ExitInitializationMode failed");
@@ -435,7 +438,8 @@ int Fmu3::exit_initialization_mode(fmi3Instance c) const {
   return 0;
 }
 
-int Fmu3::set_values(fmi3Instance c) const {
+int Fmu3::set_values(void* instance) const {
+  auto c = static_cast<fmi3Instance>(instance);
   // Pass real values before initialization
   if (!vr_real_.empty()) {
     fmi3Status status = set_float64_(c, get_ptr(vr_real_), vr_real_.size(),
@@ -478,7 +482,8 @@ int Fmu3::set_values(fmi3Instance c) const {
   return 0;
 }
 
-int Fmu3::get_in(fmi3Instance c, std::vector<fmi3Float64>* v) const {
+int Fmu3::get_in(void* instance, std::vector<fmi3Float64>* v) const {
+  auto c = static_cast<fmi3Instance>(instance);
   if (!vr_in_.empty()) {
     fmi3Status status = get_float64_(c, get_ptr(vr_in_), vr_in_.size(),
       get_ptr(*v), vr_in_.size());
@@ -491,7 +496,8 @@ int Fmu3::get_in(fmi3Instance c, std::vector<fmi3Float64>* v) const {
   return 0;
 }
 
-int Fmu3::get_aux(fmi3Instance c, Value* v) const {
+int Fmu3::get_aux(void* instance, Value* v) const {
+  auto c = static_cast<fmi3Instance>(instance);
   // Get real auxilliary variables
   if (!vr_aux_real_.empty()) {
     fmi3Status status = get_float64_(c, get_ptr(vr_aux_real_), vr_aux_real_.size(),
