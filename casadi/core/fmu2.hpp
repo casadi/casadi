@@ -126,28 +126,28 @@ class CASADI_EXPORT Fmu2 : public FmuInternal {
   bool has_fwd() const override { return get_directional_derivative_ != nullptr; }
 
   // New memory object
-  fmi2Component instantiate() const;
+  void* instantiate() const;
 
   // Free FMU instance
   void free_instance(void* instance) const override;
 
   // Reset solver
-  int reset(fmi2Component c);
+  int reset(void* instance);
 
   // Enter initialization mode
-  int enter_initialization_mode(fmi2Component c) const;
+  int enter_initialization_mode(void* instance) const;
 
   // Exit initialization mode
-  int exit_initialization_mode(fmi2Component c) const;
+  int exit_initialization_mode(void* instance) const;
 
   // Copy values set in DaeBuilder to FMU
-  int set_values(fmi2Component c) const;
+  int set_values(void* instance) const;
 
   // Retrieve input variable values from FMU
-  int get_in(fmi2Component c, std::vector<fmi2Real>* v) const;
+  int get_in(void* instance, std::vector<fmi2Real>* v) const;
 
   // Retrieve auxilliary variables from FMU
-  int get_aux(fmi2Component c, Value* v) const;
+  int get_aux(void* instance, Value* v) const;
 
   /** \brief Get stats
 

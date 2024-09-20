@@ -304,7 +304,7 @@ void Fmu2::finalize() {
   functions_.componentEnvironment = 0;
 
   // Create a temporary instance
-  fmi2Component c = instantiate();
+  void* c = instantiate();
   // Set all values
   if (set_values(c)) {
     casadi_error("Fmu2::set_values failed");
@@ -357,7 +357,7 @@ void Fmu2::logger(fmi2ComponentEnvironment componentEnvironment,
   casadi_assert(n>=0, "Print failure while processing '" + std::string(message) + "'");
 }
 
-fmi2Component Fmu2::instantiate() const {
+void* Fmu2::instantiate() const {
   // Instantiate FMU
   fmi2String instanceName = instance_name_.c_str();
   fmi2Type fmuType = fmi2ModelExchange;
@@ -422,7 +422,8 @@ int Fmu2::init_mem(FmuMemory* m) const {
   return 0;
 }
 
-int Fmu2::reset(fmi2Component c) {
+int Fmu2::reset(void* instance) {
+  auto c = static_cast<fmi2Component>(instance);
   fmi2Status status = reset_(c);
   if (status != fmi2OK) {
     casadi_warning("fmi2Reset failed");
@@ -431,7 +432,8 @@ int Fmu2::reset(fmi2Component c) {
   return 0;
 }
 
-int Fmu2::enter_initialization_mode(fmi2Component c) const {
+int Fmu2::enter_initialization_mode(void* instance) const {
+  auto c = static_cast<fmi2Component>(instance);
   fmi2Status status = enter_initialization_mode_(c);
   if (status != fmi2OK) {
     casadi_warning("fmi2EnterInitializationMode failed: " + str(status));
@@ -440,7 +442,8 @@ int Fmu2::enter_initialization_mode(fmi2Component c) const {
   return 0;
 }
 
-int Fmu2::exit_initialization_mode(fmi2Component c) const {
+int Fmu2::exit_initialization_mode(void* instance) const {
+  auto c = static_cast<fmi2Component>(instance);
   fmi2Status status = exit_initialization_mode_(c);
   if (status != fmi2OK) {
     casadi_warning("fmi2ExitInitializationMode failed");
@@ -449,7 +452,8 @@ int Fmu2::exit_initialization_mode(fmi2Component c) const {
   return 0;
 }
 
-int Fmu2::set_values(fmi2Component c) const {
+int Fmu2::set_values(void* instance) const {
+  auto c = static_cast<fmi2Component>(instance);
   // Pass real values before initialization
   if (!vr_real_.empty()) {
     fmi2Status status = set_real_(c, get_ptr(vr_real_), vr_real_.size(), get_ptr(init_real_));
@@ -489,7 +493,8 @@ int Fmu2::set_values(fmi2Component c) const {
   return 0;
 }
 
-int Fmu2::get_in(fmi2Component c, std::vector<fmi2Real>* v) const {
+int Fmu2::get_in(void* instance, std::vector<fmi2Real>* v) const {
+  auto c = static_cast<fmi2Component>(instance);
   if (!vr_in_.empty()) {
     fmi2Status status = get_real_(c, get_ptr(vr_in_), vr_in_.size(), get_ptr(*v));
     if (status != fmi2OK) {
@@ -501,7 +506,8 @@ int Fmu2::get_in(fmi2Component c, std::vector<fmi2Real>* v) const {
   return 0;
 }
 
-int Fmu2::get_aux(fmi2Component c, Value* v) const {
+int Fmu2::get_aux(void* instance, Value* v) const {
+  auto c = static_cast<fmi2Component>(instance);
   // Get real auxilliary variables
   if (!vr_aux_real_.empty()) {
     fmi2Status status = get_real_(c, get_ptr(vr_aux_real_), vr_aux_real_.size(),
