@@ -60,6 +60,18 @@ class CASADI_EXPORT FmuInternal : public SharedObjectInternal {
   // Initialize
   virtual void init(const DaeBuilderInternal* dae) = 0;
 
+  // Set C API functions
+  virtual void load_functions() = 0;
+
+  // Enter initialization mode
+  virtual int enter_initialization_mode(void* instance) const = 0;
+
+  // Exit initialization mode
+  virtual int exit_initialization_mode(void* instance) const = 0;
+
+  // Copy values set in DaeBuilder to FMU
+  virtual int set_values(void* instance) const = 0;
+
   // Finalize
   virtual void finalize() = 0;
 

@@ -57,6 +57,9 @@ class CASADI_EXPORT Fmu2 : public FmuInternal {
   // Initialize
   void init(const DaeBuilderInternal* dae) override;
 
+  // Set C API functions
+  void load_functions() override;
+
   // Finalize
   void finalize() override;
 
@@ -135,13 +138,13 @@ class CASADI_EXPORT Fmu2 : public FmuInternal {
   int reset(void* instance);
 
   // Enter initialization mode
-  int enter_initialization_mode(void* instance) const;
+  int enter_initialization_mode(void* instance) const override;
 
   // Exit initialization mode
-  int exit_initialization_mode(void* instance) const;
+  int exit_initialization_mode(void* instance) const override;
 
   // Copy values set in DaeBuilder to FMU
-  int set_values(void* instance) const;
+  int set_values(void* instance) const override;
 
   // Retrieve input variable values from FMU
   int get_in(void* instance, std::vector<fmi2Real>* v) const;

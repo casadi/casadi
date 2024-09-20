@@ -291,8 +291,7 @@ void Fmu3::init(const DaeBuilderInternal* dae) {
   logging_on_ = dae->debug_;
 }
 
-void Fmu3::finalize() {
-  // Get FMI C functions
+void Fmu3::load_functions() {
   instantiate_model_exchange_ = load_function<fmi3InstantiateModelExchangeTYPE>(
     "fmi3InstantiateModelExchange");
   free_instance_ = load_function<fmi3FreeInstanceTYPE>("fmi3FreeInstance");
@@ -319,6 +318,11 @@ void Fmu3::finalize() {
     get_adjoint_derivative_ =
       load_function<fmi3GetAdjointDerivativeTYPE>("fmi3GetAdjointDerivative");
   }
+}
+
+void Fmu3::finalize() {
+  // Get FMI C functions
+  load_functions();
 
   // Create a temporary instance
   void* c = instantiate();

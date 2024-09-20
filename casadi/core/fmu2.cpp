@@ -270,8 +270,7 @@ void Fmu2::init(const DaeBuilderInternal* dae) {
   logging_on_ = dae->debug_;
 }
 
-void Fmu2::finalize() {
-  // Get FMI C functions
+void Fmu2::load_functions() {
   instantiate_ = load_function<fmi2InstantiateTYPE>("fmi2Instantiate");
   free_instance_ = load_function<fmi2FreeInstanceTYPE>("fmi2FreeInstance");
   reset_ = load_function<fmi2ResetTYPE>("fmi2Reset");
@@ -302,6 +301,11 @@ void Fmu2::finalize() {
   functions_.freeMemory = free;
   functions_.stepFinished = 0;
   functions_.componentEnvironment = 0;
+}
+
+void Fmu2::finalize() {
+  // Get FMI C functions
+  load_functions();
 
   // Create a temporary instance
   void* c = instantiate();
