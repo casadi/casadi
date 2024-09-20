@@ -157,7 +157,7 @@ class CASADI_EXPORT FmuInternal : public SharedObjectInternal {
   void request(FmuMemory* m, size_t ind) const;
 
   // Calculate all requested variables
-  virtual int eval(FmuMemory* m) const = 0;
+  int eval(FmuMemory* m) const;
 
   // Get a calculated variable
   void get(FmuMemory* m, size_t id, double* value) const;

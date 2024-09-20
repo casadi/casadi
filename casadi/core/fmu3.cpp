@@ -527,34 +527,6 @@ void Fmu3::get_stats(FmuMemory* m, Dict* stats,
   }
 }
 
-int Fmu3::eval(FmuMemory* m) const {
-  // Gather inputs and outputs
-  gather_io(m);
-  // Number of inputs and outputs
-  size_t n_set = m->id_in_.size();
-  size_t n_out = m->id_out_.size();
-  // Set all variables
-  if (set_real(m->instance, get_ptr(m->vr_in_), n_set, get_ptr(m->v_in_), n_set)) {
-    casadi_warning("Setting FMU variables failed");
-    return 1;
-  }
-  // Quick return if nothing requested
-  if (n_out == 0) return 0;
-  // Calculate all variables
-  m->v_out_.resize(n_out);
-  if (get_real(m->instance, get_ptr(m->vr_out_), n_out, get_ptr(m->v_out_), n_out)) {
-    casadi_warning("Evaluation failed");
-    return 1;
-  }
-  // Collect requested variables
-  auto it = m->v_out_.begin();
-  for (size_t id : m->id_out_) {
-    m->obuf_[id] = *it++;
-  }
-  // Successful return
-  return 0;
-}
-
 int Fmu3::eval_ad(FmuMemory* m) const {
   // Number of inputs and outputs
   size_t n_known = m->id_in_.size();
