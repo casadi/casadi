@@ -380,7 +380,7 @@ void FmuInternal::finalize() {
     casadi_error("FmuInternal::enter_initialization_mode failed");
   }
   // Get input values
-  if (get_in(c)) {
+  if (get_real(c, get_ptr(vr_in_), vr_in_.size(), get_ptr(value_in_), value_in_.size())) {
     casadi_error("FmuInternal::get_in failed");
   }
   // Get auxilliary variables

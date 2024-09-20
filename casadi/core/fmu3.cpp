@@ -428,20 +428,6 @@ int Fmu3::set_values(void* instance) const {
   return 0;
 }
 
-int Fmu3::get_in(void* instance) {
-  auto c = static_cast<fmi3Instance>(instance);
-  if (!vr_in_.empty()) {
-    fmi3Status status = get_float64_(c, get_ptr(vr_in_), vr_in_.size(),
-      get_ptr(value_in_), vr_in_.size());
-    if (status != fmi3OK) {
-      casadi_warning("fmi3GetFloat64 failed");
-      return 1;
-    }
-  }
-  // Successful return
-  return 0;
-}
-
 int Fmu3::get_aux(void* instance) {
   auto c = static_cast<fmi3Instance>(instance);
   // Get real auxilliary variables
@@ -545,9 +531,8 @@ int Fmu3::eval(FmuMemory* m) const {
   if (n_out == 0) return 0;
   // Calculate all variables
   m->v_out_.resize(n_out);
-  status = get_float64_(m->instance, get_ptr(m->vr_out_), n_out, get_ptr(m->v_out_), n_out);
-  if (status != fmi3OK) {
-    casadi_warning("fmi3GetFloat64 failed");
+  if (get_real(m->instance, get_ptr(m->vr_out_), n_out, get_ptr(m->v_out_), n_out)) {
+    casadi_warning("Evaluation failed");
     return 1;
   }
   // Collect requested variables
@@ -566,14 +551,12 @@ int Fmu3::eval_ad(FmuMemory* m) const {
   // Quick return if nothing to be calculated
   if (n_unknown == 0) return 0;
   // Evalute (should not be necessary)
-  fmi3Status status = get_float64_(m->instance, get_ptr(m->vr_out_), n_unknown,
-    get_ptr(m->v_out_), n_unknown);
-  if (status != fmi3OK) {
-    casadi_warning("fmi3GetFloat64 failed");
+  if (get_real(m->instance, get_ptr(m->vr_out_), n_unknown, get_ptr(m->v_out_), n_unknown)) {
+    casadi_warning("Evaluation failed");
     return 1;
   }
   // Evaluate directional derivatives
-  status = get_directional_derivative_(m->instance, get_ptr(m->vr_out_), n_unknown,
+  fmi3Status status = get_directional_derivative_(m->instance, get_ptr(m->vr_out_), n_unknown,
     get_ptr(m->vr_in_), n_known, get_ptr(m->d_in_), n_known, get_ptr(m->d_out_), n_unknown);
   if (status != fmi3OK) {
     casadi_warning("fmi3GetDirectionalDerivative failed");
@@ -681,9 +664,8 @@ int Fmu3::eval_fd(FmuMemory* m, bool independent_seeds) const {
       return 1;
     }
     // Evaluate perturbed FMU
-    status = get_float64_(m->instance, get_ptr(m->vr_out_), n_unknown, yk, n_unknown);
-    if (status != fmi3OK) {
-      casadi_warning("fmi3GetFloat64 failed");
+    if (get_real(m->instance, get_ptr(m->vr_out_), n_unknown, yk, n_unknown)) {
+      casadi_warning("Evaluation failed");
       return 1;
     }
     // Post-process yk

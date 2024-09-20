@@ -147,9 +147,6 @@ class CASADI_EXPORT Fmu2 : public FmuInternal {
   // Copy values set in DaeBuilder to FMU
   int set_values(void* instance) const override;
 
-  // Retrieve input variable values from FMU
-  int get_in(void* instance) override;
-
   // Retrieve auxilliary variables from FMU
   int get_aux(void* instance) override;
 
