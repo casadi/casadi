@@ -186,7 +186,7 @@ class CASADI_EXPORT FmuInternal : public SharedObjectInternal {
   int eval_ad(FmuMemory* m) const;
 
   // Calculate directional derivatives using FD
-  virtual int eval_fd(FmuMemory* m, bool independent_seeds) const = 0;
+  int eval_fd(FmuMemory* m, bool independent_seeds) const;
 
   // Get calculated derivatives
   void get_sens(FmuMemory* m, casadi_int nsens,
