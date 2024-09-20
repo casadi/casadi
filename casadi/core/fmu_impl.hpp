@@ -77,6 +77,11 @@ class CASADI_EXPORT FmuInternal : public SharedObjectInternal {
   virtual int get_real(void* instance, const unsigned int* vr, size_t n_vr,
     double* values, size_t n_values) const = 0;
 
+  // Forward mode AD
+  virtual int get_directional_derivative(void* instance, const unsigned int* vr_out, size_t n_out,
+    const unsigned int* vr_in, size_t n_in, const double* seed, size_t n_seed,
+    double* sensitivity, size_t n_sensitivity) const = 0;
+
   // Copy values set in DaeBuilder to FMU
   virtual int set_values(void* instance) const = 0;
 

@@ -406,6 +406,16 @@ int Fmu2::get_real(void* instance, const unsigned int* vr, size_t n_vr,
   return status != fmi2OK;
 }
 
+int Fmu2::get_directional_derivative(void* instance, const unsigned int* vr_out, size_t n_out,
+    const unsigned int* vr_in, size_t n_in, const double* seed, size_t n_seed,
+    double* sensitivity, size_t n_sensitivity) const {
+  casadi_assert(n_in == n_seed, "Vector-valued variables not supported in FMI 2");
+  casadi_assert(n_out == n_sensitivity, "Vector-valued variables not supported in FMI 2");
+  fmi2Status status = get_directional_derivative_(instance, vr_out, n_out, vr_in, n_in,
+    seed, sensitivity);
+  return status != fmi2OK;
+}
+
 int Fmu2::set_values(void* instance) const {
   auto c = static_cast<fmi2Component>(instance);
   // Pass real values before initialization
@@ -570,10 +580,9 @@ int Fmu2::eval_ad(FmuMemory* m) const {
     return 1;
   }
   // Evaluate directional derivatives
-  fmi2Status status = get_directional_derivative_(m->instance, get_ptr(m->vr_out_), n_unknown,
-    get_ptr(m->vr_in_), n_known, get_ptr(m->d_in_), get_ptr(m->d_out_));
-  if (status != fmi2OK) {
-    casadi_warning("fmi2GetDirectionalDerivative failed");
+  if (get_directional_derivative(m->instance, get_ptr(m->vr_out_), n_unknown,
+      get_ptr(m->vr_in_), n_known, get_ptr(m->d_in_), n_known, get_ptr(m->d_out_), n_unknown)) {
+    casadi_warning("Forward mode AD failed");
     return 1;
   }
   // Collect requested variables

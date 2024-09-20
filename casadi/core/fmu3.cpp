@@ -390,6 +390,14 @@ int Fmu3::get_real(void* instance, const unsigned int* vr, size_t n_vr,
   return status != fmi3OK;
 }
 
+int Fmu3::get_directional_derivative(void* instance, const unsigned int* vr_out, size_t n_out,
+    const unsigned int* vr_in, size_t n_in, const double* seed, size_t n_seed,
+    double* sensitivity, size_t n_sensitivity) const {
+  fmi3Status status = get_directional_derivative_(instance, vr_out, n_out, vr_in, n_in,
+    seed, n_seed, sensitivity, n_sensitivity);
+  return status != fmi3OK;
+}
+
 int Fmu3::set_values(void* instance) const {
   auto c = static_cast<fmi3Instance>(instance);
   // Pass real values before initialization
@@ -559,10 +567,9 @@ int Fmu3::eval_ad(FmuMemory* m) const {
     return 1;
   }
   // Evaluate directional derivatives
-  fmi3Status status = get_directional_derivative_(m->instance, get_ptr(m->vr_out_), n_unknown,
-    get_ptr(m->vr_in_), n_known, get_ptr(m->d_in_), n_known, get_ptr(m->d_out_), n_unknown);
-  if (status != fmi3OK) {
-    casadi_warning("fmi3GetDirectionalDerivative failed");
+  if (get_directional_derivative(m->instance, get_ptr(m->vr_out_), n_unknown,
+      get_ptr(m->vr_in_), n_known, get_ptr(m->d_in_), n_known, get_ptr(m->d_out_), n_unknown)) {
+    casadi_warning("Forward mode AD failed");
     return 1;
   }
   // Collect requested variables

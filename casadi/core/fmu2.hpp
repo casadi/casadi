@@ -148,6 +148,11 @@ class CASADI_EXPORT Fmu2 : public FmuInternal {
   int get_real(void* instance, const unsigned int* vr, size_t n_vr,
     double* values, size_t n_values) const override;
 
+  // Forward mode AD
+  int get_directional_derivative(void* instance, const unsigned int* vr_out, size_t n_out,
+    const unsigned int* vr_in, size_t n_in, const double* seed, size_t n_seed,
+    double* sensitivity, size_t n_sensitivity) const override;
+
   // Copy values set in DaeBuilder to FMU
   int set_values(void* instance) const override;
 
