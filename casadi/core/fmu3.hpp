@@ -140,6 +140,10 @@ class CASADI_EXPORT Fmu3 : public FmuInternal {
   // Exit initialization mode
   int exit_initialization_mode(void* instance) const override;
 
+  // Set real values
+  int set_real(void* instance, const unsigned int* vr, size_t n_vr,
+    const double* values, size_t n_values) const override;
+
   // Get/evaluate real values
   int get_real(void* instance, const unsigned int* vr, size_t n_vr,
     double* values, size_t n_values) const override;

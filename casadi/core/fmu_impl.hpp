@@ -69,6 +69,10 @@ class CASADI_EXPORT FmuInternal : public SharedObjectInternal {
   // Exit initialization mode
   virtual int exit_initialization_mode(void* instance) const = 0;
 
+  // Set real values
+  virtual int set_real(void* instance, const unsigned int* vr, size_t n_vr,
+    const double* values, size_t n_values) const = 0;
+
   // Get/evaluate real values
   virtual int get_real(void* instance, const unsigned int* vr, size_t n_vr,
     double* values, size_t n_values) const = 0;

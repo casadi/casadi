@@ -392,6 +392,13 @@ int Fmu2::exit_initialization_mode(void* instance) const {
   return 0;
 }
 
+int Fmu2::set_real(void* instance, const unsigned int* vr, size_t n_vr,
+    const double* values, size_t n_values) const {
+  casadi_assert(n_vr == n_values, "Vector-valued variables not supported in FMI 2");
+  fmi2Status status = set_real_(instance, vr, n_vr, values);
+  return status != fmi2OK;
+}
+
 int Fmu2::get_real(void* instance, const unsigned int* vr, size_t n_vr,
     double* values, size_t n_values) const {
   casadi_assert(n_vr == n_values, "Vector-valued variables not supported in FMI 2");
@@ -529,12 +536,9 @@ int Fmu2::eval(FmuMemory* m) const {
   // Number of inputs and outputs
   size_t n_set = m->id_in_.size();
   size_t n_out = m->id_out_.size();
-  // Fmi return flag
-  fmi2Status status;
   // Set all variables
-  status = set_real_(m->instance, get_ptr(m->vr_in_), n_set, get_ptr(m->v_in_));
-  if (status != fmi2OK) {
-    casadi_warning("fmi2SetReal failed");
+  if (set_real(m->instance, get_ptr(m->vr_in_), n_set, get_ptr(m->v_in_), n_set)) {
+    casadi_warning("Setting FMU variables failed");
     return 1;
   }
   // Quick return if nothing requested
@@ -668,9 +672,8 @@ int Fmu2::eval_fd(FmuMemory* m, bool independent_seeds) const {
       m->v_pert_[i] = m->in_bounds_[i] ? test : m->v_in_[i];
     }
     // Pass perturbed inputs to FMU
-    fmi2Status status = set_real_(m->instance, get_ptr(m->vr_in_), n_known, get_ptr(m->v_pert_));
-    if (status != fmi2OK) {
-      casadi_warning("fmi2SetReal failed");
+    if (set_real(m->instance, get_ptr(m->vr_in_), n_known, get_ptr(m->v_pert_), n_known)) {
+      casadi_warning("Setting FMU variables failed");
       return 1;
     }
     // Evaluate perturbed FMU
@@ -699,12 +702,13 @@ int Fmu2::eval_fd(FmuMemory* m, bool independent_seeds) const {
       }
     }
   }
+
   // Restore FMU inputs
-  fmi2Status status = set_real_(m->instance, get_ptr(m->vr_in_), n_known, get_ptr(m->v_in_));
-  if (status != fmi2OK) {
-    casadi_warning("fmi2SetReal failed");
+  if (set_real(m->instance, get_ptr(m->vr_in_), n_known, get_ptr(m->v_in_), n_known)) {
+    casadi_warning("Setting FMU variables failed");
     return 1;
   }
+
   // Step size
   double h = m->self.step_;
 

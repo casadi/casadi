@@ -378,6 +378,12 @@ int Fmu3::exit_initialization_mode(void* instance) const {
   return 0;
 }
 
+int Fmu3::set_real(void* instance, const unsigned int* vr, size_t n_vr,
+    const double* values, size_t n_values) const {
+  fmi3Status status = set_float64_(instance, vr, n_vr, values, n_values);
+  return status != fmi3OK;
+}
+
 int Fmu3::get_real(void* instance, const unsigned int* vr, size_t n_vr,
     double* values, size_t n_values) const {
   fmi3Status status = get_float64_(instance, vr, n_vr, values, n_values);
@@ -519,12 +525,9 @@ int Fmu3::eval(FmuMemory* m) const {
   // Number of inputs and outputs
   size_t n_set = m->id_in_.size();
   size_t n_out = m->id_out_.size();
-  // Fmi return flag
-  fmi3Status status;
   // Set all variables
-  status = set_float64_(m->instance, get_ptr(m->vr_in_), n_set, get_ptr(m->v_in_), n_set);
-  if (status != fmi3OK) {
-    casadi_warning("fmi3SetFloat64 failed");
+  if (set_real(m->instance, get_ptr(m->vr_in_), n_set, get_ptr(m->v_in_), n_set)) {
+    casadi_warning("Setting FMU variables failed");
     return 1;
   }
   // Quick return if nothing requested
@@ -658,9 +661,8 @@ int Fmu3::eval_fd(FmuMemory* m, bool independent_seeds) const {
       m->v_pert_[i] = m->in_bounds_[i] ? test : m->v_in_[i];
     }
     // Pass perturbed inputs to FMU
-    fmi3Status status = set_float64_(m->instance, get_ptr(m->vr_in_), n_known, get_ptr(m->v_pert_), n_known);
-    if (status != fmi3OK) {
-      casadi_warning("fmi3SetFloat64 failed");
+    if (set_real(m->instance, get_ptr(m->vr_in_), n_known, get_ptr(m->v_pert_), n_known)) {
+      casadi_warning("Setting FMU variables failed");
       return 1;
     }
     // Evaluate perturbed FMU
@@ -690,9 +692,8 @@ int Fmu3::eval_fd(FmuMemory* m, bool independent_seeds) const {
     }
   }
   // Restore FMU inputs
-  fmi3Status status = set_float64_(m->instance, get_ptr(m->vr_in_), n_known, get_ptr(m->v_in_), n_known);
-  if (status != fmi3OK) {
-    casadi_warning("fmi3SetFloat64 failed");
+  if (set_real(m->instance, get_ptr(m->vr_in_), n_known, get_ptr(m->v_in_), n_known)) {
+    casadi_warning("Setting FMU variables failed");
     return 1;
   }
   // Step size
