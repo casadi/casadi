@@ -206,11 +206,19 @@ std::string Fmu::desc_in(FmuMemory* m, size_t id, bool more) const {
   }
 }
 
-bool Fmu::has_ad() const {
+bool Fmu::has_fwd() const {
   try {
-    return (*this)->has_ad();
+    return (*this)->has_fwd();
   } catch(std::exception& e) {
-    THROW_ERROR("has_ad", e.what());
+    THROW_ERROR("has_fwd", e.what());
+  }
+}
+
+bool Fmu::has_adj() const {
+  try {
+    return (*this)->has_adj();
+  } catch(std::exception& e) {
+    THROW_ERROR("has_adj", e.what());
   }
 }
 

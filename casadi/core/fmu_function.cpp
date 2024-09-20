@@ -124,12 +124,12 @@ FmuFunction::FmuFunction(const std::string& name, const Fmu& fmu,
   name_in_ = name_in;
   name_out_ = name_out;
   // Default options
-  enable_ad_ = fmu.has_ad();
+  enable_ad_ = fmu.has_fwd();
   validate_ad_ = false;
   validate_ad_file_ = "";
   make_symmetric_ = true;
   check_hessian_ = false;
-  enable_fd_op_ = fmu.has_ad() && !all_regular();  // Use FD for second and higher order derivatives
+  enable_fd_op_ = fmu.has_fwd() && !all_regular();  // Use FD for second and higher order derivatives
   step_ = 1e-6;
   abstol_ = 1e-3;
   reltol_ = 1e-3;
@@ -255,7 +255,7 @@ void FmuFunction::init(const Dict& opts) {
   fd_ = to_enum<FdMode>(fd_method_, "forward");
 
   // Consistency checks
-  if (enable_ad_) casadi_assert(fmu_.has_ad(),
+  if (enable_ad_) casadi_assert(fmu_.has_fwd(),
     "FMU does not provide support for analytic derivatives");
   if (validate_ad_ && !enable_ad_) casadi_error("Inconsistent options");
 

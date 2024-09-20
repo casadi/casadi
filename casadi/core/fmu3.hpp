@@ -87,7 +87,7 @@ class CASADI_EXPORT Fmu3 : public FmuInternal {
   std::vector<fmi3ValueReference> vr_aux_real_, vr_aux_integer_, vr_aux_boolean_, vr_aux_string_;
 
   // Does the FMU declare analytic derivatives support?
-  bool declared_ad_;
+  bool provides_directional_derivatives_, provides_adjoint_derivatives_;
 
   // Following members set in finalize
 
@@ -107,6 +107,7 @@ class CASADI_EXPORT Fmu3 : public FmuInternal {
   fmi3GetStringTYPE* get_string_;
   fmi3SetStringTYPE* set_string_;
   fmi3GetDirectionalDerivativeTYPE* get_directional_derivative_;
+  fmi3GetAdjointDerivativeTYPE* get_adjoint_derivative_;
 
   // Collection of variable values, all types
   struct Value {
@@ -118,8 +119,11 @@ class CASADI_EXPORT Fmu3 : public FmuInternal {
 
   Value aux_value_;
 
-  // Does the FMU support analytic derivatives?
-  bool has_ad() const override { return get_directional_derivative_ != nullptr; }
+  // Does the FMU support analytic forward derivatives?
+  bool has_fwd() const override { return get_directional_derivative_ != nullptr; }
+
+  // Does the FMU support analytic adjoint derivatives?
+  bool has_adj() const override { return get_adjoint_derivative_ != nullptr; }
 
   // New memory object
   fmi3Instance instantiate() const;

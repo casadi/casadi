@@ -277,7 +277,9 @@ void Fmu3::init(const DaeBuilderInternal* dae) {
     + "/" + instance_name_no_dot + dll_suffix();
   li_ = Importer(dll_path, "dll");
 
-  declared_ad_ = dae->provides_directional_derivatives_;
+  // Types of analytic AD, if any
+  provides_directional_derivatives_ = dae->provides_directional_derivatives_;
+  provides_adjoint_derivatives_ = dae->provides_adjoint_derivatives_;
 
   // Path to resource directory
   resource_loc_ = "file://" + dae->path_ + "/resources";
@@ -309,10 +311,13 @@ void Fmu3::finalize() {
   set_boolean_ = load_function<fmi3SetBooleanTYPE>("fmi3SetBoolean");
   get_string_ = load_function<fmi3GetStringTYPE>("fmi3GetString");
   set_string_ = load_function<fmi3SetStringTYPE>("fmi3SetString");
-
-  if (declared_ad_) {
+  if (provides_directional_derivatives_) {
     get_directional_derivative_ =
       load_function<fmi3GetDirectionalDerivativeTYPE>("fmi3GetDirectionalDerivative");
+  }
+  if (provides_adjoint_derivatives_) {
+    get_adjoint_derivative_ =
+      load_function<fmi3GetAdjointDerivativeTYPE>("fmi3GetAdjointDerivative");
   }
 
   // Create a temporary instance
@@ -871,6 +876,7 @@ Fmu3::Fmu3(const std::string& name,
   set_boolean_ = 0;
   get_float64_ = 0;
   get_directional_derivative_ = 0;
+  get_adjoint_derivative_ = 0;
 }
 
 } // namespace casadi

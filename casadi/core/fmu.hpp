@@ -130,8 +130,11 @@ class CASADI_EXPORT Fmu
   // Description of an input
   std::string desc_in(FmuMemory* m, size_t id, bool more = true) const;
 
-  /// Does the interface support analytic derivatives?
-  bool has_ad() const;
+  /// Does the interface support analytic forward derivatives?
+  bool has_fwd() const;
+
+  /// Does the interface support analytic adjoint derivatives?
+  bool has_adj() const;
 
   // Get Jacobian sparsity for a subset of inputs and outputs
   Sparsity jac_sparsity(const std::vector<size_t>& osub, const std::vector<size_t>& isub) const;

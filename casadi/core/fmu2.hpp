@@ -122,8 +122,8 @@ class CASADI_EXPORT Fmu2 : public FmuInternal {
 
   Value aux_value_;
 
-  // Does the FMU support analytic derivatives?
-  bool has_ad() const override { return get_directional_derivative_ != nullptr; }
+  // Does the FMU support analytic forward derivatives?
+  bool has_fwd() const override { return get_directional_derivative_ != nullptr; }
 
   // New memory object
   fmi2Component instantiate() const;
