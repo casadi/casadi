@@ -140,6 +140,10 @@ class CASADI_EXPORT Fmu2 : public FmuInternal {
   // Exit initialization mode
   int exit_initialization_mode(void* instance) const override;
 
+  // Get/evaluate real values
+  int get_real(void* instance, const unsigned int* vr, size_t n_vr,
+    double* values, size_t n_values) const override;
+
   // Copy values set in DaeBuilder to FMU
   int set_values(void* instance) const override;
 

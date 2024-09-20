@@ -378,6 +378,12 @@ int Fmu3::exit_initialization_mode(void* instance) const {
   return 0;
 }
 
+int Fmu3::get_real(void* instance, const unsigned int* vr, size_t n_vr,
+    double* values, size_t n_values) const {
+  fmi3Status status = get_float64_(instance, vr, n_vr, values, n_values);
+  return status != fmi3OK;
+}
+
 int Fmu3::set_values(void* instance) const {
   auto c = static_cast<fmi3Instance>(instance);
   // Pass real values before initialization
@@ -589,10 +595,8 @@ int Fmu3::eval_fd(FmuMemory* m, bool independent_seeds) const {
   // Quick return if nothing to be calculated
   if (n_unknown == 0) return 0;
   // Evalute (should not be necessary)
-  fmi3Status status = get_float64_(m->instance, get_ptr(m->vr_out_), n_unknown,
-    get_ptr(m->v_out_), n_unknown);
-  if (status != fmi3OK) {
-    casadi_warning("fmi3GetFloat64 failed");
+  if (get_real(m->instance, get_ptr(m->vr_out_), n_unknown, get_ptr(m->v_out_), n_unknown)) {
+    casadi_warning("Evaluating FMU failed");
     return 1;
   }
   // Make outputs dimensionless
@@ -671,7 +675,7 @@ int Fmu3::eval_fd(FmuMemory* m, bool independent_seeds) const {
       m->v_pert_[i] = m->in_bounds_[i] ? test : m->v_in_[i];
     }
     // Pass perturbed inputs to FMU
-    status = set_float64_(m->instance, get_ptr(m->vr_in_), n_known, get_ptr(m->v_pert_), n_known);
+    fmi3Status status = set_float64_(m->instance, get_ptr(m->vr_in_), n_known, get_ptr(m->v_pert_), n_known);
     if (status != fmi3OK) {
       casadi_warning("fmi3SetFloat64 failed");
       return 1;
@@ -704,7 +708,7 @@ int Fmu3::eval_fd(FmuMemory* m, bool independent_seeds) const {
     }
   }
   // Restore FMU inputs
-  status = set_float64_(m->instance, get_ptr(m->vr_in_), n_known, get_ptr(m->v_in_), n_known);
+  fmi3Status status = set_float64_(m->instance, get_ptr(m->vr_in_), n_known, get_ptr(m->v_in_), n_known);
   if (status != fmi3OK) {
     casadi_warning("fmi3SetFloat64 failed");
     return 1;

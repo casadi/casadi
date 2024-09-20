@@ -392,6 +392,13 @@ int Fmu2::exit_initialization_mode(void* instance) const {
   return 0;
 }
 
+int Fmu2::get_real(void* instance, const unsigned int* vr, size_t n_vr,
+    double* values, size_t n_values) const {
+  casadi_assert(n_vr == n_values, "Vector-valued variables not supported in FMI 2");
+  fmi2Status status = get_real_(instance, vr, n_vr, values);
+  return status != fmi2OK;
+}
+
 int Fmu2::set_values(void* instance) const {
   auto c = static_cast<fmi2Component>(instance);
   // Pass real values before initialization
@@ -596,9 +603,8 @@ int Fmu2::eval_fd(FmuMemory* m, bool independent_seeds) const {
   // Quick return if nothing to be calculated
   if (n_unknown == 0) return 0;
   // Evalute (should not be necessary)
-  fmi2Status status = get_real_(m->instance, get_ptr(m->vr_out_), n_unknown, get_ptr(m->v_out_));
-  if (status != fmi2OK) {
-    casadi_warning("fmi2GetReal failed");
+  if (get_real(m->instance, get_ptr(m->vr_out_), n_unknown, get_ptr(m->v_out_), n_unknown)) {
+    casadi_warning("Evaluation failed");
     return 1;
   }
   // Make outputs dimensionless
@@ -677,7 +683,7 @@ int Fmu2::eval_fd(FmuMemory* m, bool independent_seeds) const {
       m->v_pert_[i] = m->in_bounds_[i] ? test : m->v_in_[i];
     }
     // Pass perturbed inputs to FMU
-    status = set_real_(m->instance, get_ptr(m->vr_in_), n_known, get_ptr(m->v_pert_));
+    fmi2Status status = set_real_(m->instance, get_ptr(m->vr_in_), n_known, get_ptr(m->v_pert_));
     if (status != fmi2OK) {
       casadi_warning("fmi2SetReal failed");
       return 1;
@@ -710,7 +716,7 @@ int Fmu2::eval_fd(FmuMemory* m, bool independent_seeds) const {
     }
   }
   // Restore FMU inputs
-  status = set_real_(m->instance, get_ptr(m->vr_in_), n_known, get_ptr(m->v_in_));
+  fmi2Status status = set_real_(m->instance, get_ptr(m->vr_in_), n_known, get_ptr(m->v_in_));
   if (status != fmi2OK) {
     casadi_warning("fmi2SetReal failed");
     return 1;
