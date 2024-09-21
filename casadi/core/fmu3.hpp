@@ -153,6 +153,11 @@ class CASADI_EXPORT Fmu3 : public FmuInternal {
     const unsigned int* vr_in, size_t n_in, const double* seed, size_t n_seed,
     double* sensitivity, size_t n_sensitivity) const override;
 
+  // Reverse mode AD
+  int get_adjoint_derivative(void* instance, const unsigned int* vr_out, size_t n_out,
+    const unsigned int* vr_in, size_t n_in, const double* seed, size_t n_seed,
+    double* sensitivity, size_t n_sensitivity) const override;
+
   // Copy values set in DaeBuilder to FMU
   int set_values(void* instance) const override;
 

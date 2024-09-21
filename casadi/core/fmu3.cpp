@@ -398,6 +398,14 @@ int Fmu3::get_directional_derivative(void* instance, const unsigned int* vr_out,
   return status != fmi3OK;
 }
 
+int Fmu3::get_adjoint_derivative(void* instance, const unsigned int* vr_out, size_t n_out,
+    const unsigned int* vr_in, size_t n_in, const double* seed, size_t n_seed,
+    double* sensitivity, size_t n_sensitivity) const {
+  fmi3Status status = get_adjoint_derivative_(instance, vr_out, n_out, vr_in, n_in,
+    seed, n_seed, sensitivity, n_sensitivity);
+  return status != fmi3OK;
+}
+
 int Fmu3::set_values(void* instance) const {
   auto c = static_cast<fmi3Instance>(instance);
   // Pass real values before initialization

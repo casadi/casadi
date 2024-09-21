@@ -365,6 +365,13 @@ FmuInternal::FmuInternal(const std::string& name,
 FmuInternal::~FmuInternal() {
 }
 
+int FmuInternal::get_adjoint_derivative(void* instance, const unsigned int* vr_out, size_t n_out,
+    const unsigned int* vr_in, size_t n_in, const double* seed, size_t n_seed,
+    double* sensitivity, size_t n_sensitivity) const {
+  casadi_error("Adjoint derivatives not supported for " + class_name());
+  return 1;
+}
+
 void FmuInternal::finalize() {
   // Get FMI C functions
   load_functions();
