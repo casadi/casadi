@@ -343,7 +343,7 @@ namespace casadi {
   }
 
   std::string BSplineParametric::disp(const std::vector<std::string>& arg) const {
-    return "BSplineParametric(" + arg.at(0) + ")";
+    return "BSplineParametric(" + arg.at(0) + ", " + arg.at(1) + ")";
   }
 
   void BSpline::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
