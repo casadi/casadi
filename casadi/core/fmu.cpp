@@ -369,6 +369,99 @@ void FmuInternal::init(const DaeBuilderInternal* dae) {
   // Types of analytic AD, if any
   provides_directional_derivatives_ = dae->provides_directional_derivatives_;
   provides_adjoint_derivatives_ = dae->provides_adjoint_derivatives_;
+
+  // Mark input indices
+  size_t numel = 0;
+  std::vector<bool> lookup(dae->n_variables(), false);
+  for (auto&& n : scheme_in_) {
+    for (size_t i : scheme_.at(n)) {
+      casadi_assert(!lookup.at(i), "Duplicate variable: " + dae->variable(i).name);
+      lookup.at(i) = true;
+      numel++;
+    }
+  }
+  // Input mappings
+  iind_.reserve(numel);
+  iind_map_.reserve(lookup.size());
+  for (size_t k = 0; k < lookup.size(); ++k) {
+    if (lookup[k]) {
+      iind_map_.push_back(iind_.size());
+      iind_.push_back(k);
+    } else {
+      iind_map_.push_back(-1);
+    }
+  }
+  // Mark output indices
+  numel = 0;
+  std::fill(lookup.begin(), lookup.end(), false);
+  for (auto&& n : scheme_out_) {
+    for (size_t i : scheme_.at(n)) {
+      casadi_assert(!lookup.at(i), "Duplicate variable: " + dae->variable(i).name);
+      lookup.at(i) = true;
+      numel++;
+    }
+  }
+  // Construct mappings
+  oind_.reserve(numel);
+  oind_map_.reserve(lookup.size());
+  for (size_t k = 0; k < lookup.size(); ++k) {
+    if (lookup[k]) {
+      oind_map_.push_back(oind_.size());
+      oind_.push_back(k);
+    } else {
+      oind_map_.push_back(-1);
+    }
+  }
+  // Inputs
+  ired_.resize(scheme_in_.size());
+  for (size_t i = 0; i < ired_.size(); ++i) {
+    auto&& s = scheme_.at(scheme_in_[i]);
+    ired_[i].resize(s.size());
+    for (size_t k = 0; k < s.size(); ++k) {
+      ired_[i][k] = iind_map_.at(s[k]);
+    }
+  }
+  // Outputs
+  ored_.resize(scheme_out_.size());
+  for (size_t i = 0; i < ored_.size(); ++i) {
+    auto&& s = scheme_.at(scheme_out_[i]);
+    ored_[i].resize(s.size());
+    for (size_t k = 0; k < s.size(); ++k) {
+      ored_[i][k] = oind_map_.at(s[k]);
+    }
+  }
+
+  // Collect meta information for inputs
+  nominal_in_.reserve(iind_.size());
+  min_in_.reserve(iind_.size());
+  max_in_.reserve(iind_.size());
+  vn_in_.reserve(iind_.size());
+  vr_in_.reserve(iind_.size());
+  for (size_t i : iind_) {
+    const Variable& v = dae->variable(i);
+    nominal_in_.push_back(v.nominal);
+    min_in_.push_back(v.min);
+    max_in_.push_back(v.max);
+    vn_in_.push_back(v.name);
+    vr_in_.push_back(v.value_reference);
+  }
+  // Collect meta information for outputs
+  nominal_out_.reserve(oind_.size());
+  min_out_.reserve(oind_.size());
+  max_out_.reserve(oind_.size());
+  vn_out_.reserve(oind_.size());
+  vr_out_.reserve(oind_.size());
+  for (size_t i : oind_) {
+    const Variable& v = dae->variable(i);
+    nominal_out_.push_back(v.nominal);
+    min_out_.push_back(v.min);
+    max_out_.push_back(v.max);
+    vn_out_.push_back(v.name);
+    vr_out_.push_back(v.value_reference);
+  }
+
+  // Numerical values for inputs
+  value_in_.resize(iind_.size());
 }
 
 int FmuInternal::get_adjoint_derivative(void* instance, const unsigned int* vr_out, size_t n_out,
