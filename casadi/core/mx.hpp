@@ -644,9 +644,15 @@ namespace casadi {
     static MX low(const MX& v, const MX& p, const Dict& options = Dict());
     static MX graph_substitute(const MX& x, const std::vector<MX> &v,
                                const std::vector<MX> &vdef);
+    static MX graph_substitute(const MX& x, const std::vector<MX> &v,
+                               const std::vector<MX> &vdef, bool& updated);
     static std::vector<MX> graph_substitute(const std::vector<MX> &ex,
                                             const std::vector<MX> &expr,
                                             const std::vector<MX> &exprs);
+    static std::vector<MX> graph_substitute(const std::vector<MX> &ex,
+                                            const std::vector<MX> &expr,
+                                            const std::vector<MX> &exprs,
+                                            bool& updated);
     static MX matrix_expand(const MX& e, const std::vector<MX> &boundary,
                             const Dict& options);
     static std::vector<MX> matrix_expand(const std::vector<MX>& e,
@@ -724,6 +730,11 @@ namespace casadi {
       return MX::graph_substitute(ex, v, vdef);
     }
 
+    inline friend MX graph_substitute(const MX& ex, const std::vector<MX> &v,
+                                      const std::vector<MX> &vdef, bool& updated) {
+      return MX::graph_substitute(ex, v, vdef, updated);
+    }
+
     /** \brief Substitute multiple expressions in graph
 
      * Substitute variable var with expression expr in
@@ -735,6 +746,14 @@ namespace casadi {
                        const std::vector<MX> &v,
                        const std::vector<MX> &vdef) {
       return MX::graph_substitute(ex, v, vdef);
+    }
+
+    inline friend std::vector<MX>
+      graph_substitute(const std::vector<MX> &ex,
+                       const std::vector<MX> &v,
+                       const std::vector<MX> &vdef,
+                       bool& updated) {
+      return MX::graph_substitute(ex, v, vdef, updated);
     }
 
     /** \brief Expand MX graph to SXFunction call
