@@ -136,7 +136,7 @@ FmuFunction::FmuFunction(const std::string& name, const Fmu& fmu,
   reltol_ = 1e-3;
   print_progress_ = false;
   new_jacobian_ = true;
-  new_forward_ = false;
+  new_forward_ = true;
   new_hessian_ = true;
   hessian_coloring_ = true;
   parallelization_ = Parallelization::SERIAL;
