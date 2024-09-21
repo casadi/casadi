@@ -52,6 +52,10 @@ namespace casadi {
         \identifier{ad} */
     ~BlazingSplineFunction() override;
 
+    /** \brief List merge opportunitities */
+    void merge(const std::vector<MX>& arg,
+        std::vector<MX>& subs_from, std::vector<MX>& subs_to) const override;
+
     ///@{
     /** \brief Options
 
@@ -97,8 +101,6 @@ namespace casadi {
 
     // Coefficient tensor size
     casadi_int nc_, ndc_, nddc_;
-
-    mutable Function cache_diff_;
 
     ///@{
     /** \brief Number of function inputs and outputs*/

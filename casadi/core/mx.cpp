@@ -764,6 +764,10 @@ namespace casadi {
     return (*this)->is_output();
   }
 
+  bool MX::has_output() const {
+    return (*this)->has_output();
+  }
+
   casadi_int MX::which_output() const {
     return (*this)->which_output();
   }
@@ -1444,9 +1448,21 @@ namespace casadi {
     return graph_substitute(std::vector<MX>{x}, v, vdef).at(0);
   }
 
+  MX MX::graph_substitute(const MX& x, const std::vector<MX> &v,
+                          const std::vector<MX> &vdef, bool& updated) {
+    return graph_substitute(std::vector<MX>{x}, v, vdef, updated).at(0);
+  }
+
   std::vector<MX> MX::graph_substitute(const std::vector<MX>& ex,
                                        const std::vector<MX>& expr,
                                        const std::vector<MX>& exprs) {
+    bool updated;
+    return graph_substitute(ex, expr, exprs, updated);
+  }
+  std::vector<MX> MX::graph_substitute(const std::vector<MX>& ex,
+                                       const std::vector<MX>& expr,
+                                       const std::vector<MX>& exprs,
+                                       bool& updated) {
     casadi_assert(expr.size()==exprs.size(),
       "Mismatch in the number of expression to substitute: "
       + str(expr.size()) + " <-> " + str(exprs.size()) + ".");
@@ -1466,14 +1482,16 @@ namespace casadi {
     // Temporary std::stringstream
     std::stringstream ss;
 
-    // Construct lookup table for expressions
+    // Construct lookup table for expressions,
+    // giving priority to first occurances
     std::map<const MXNode*, casadi_int> expr_lookup;
     for (casadi_int i=0;i<expr.size();++i) {
-      expr_lookup[expr[i].operator->()] = i;
+      auto it = expr_lookup.find(expr[i].operator->());
+      if (it==expr_lookup.end()) expr_lookup[expr[i].operator->()] = i;
     }
 
     // Construct found map
-    std::vector<bool> expr_found(expr.size());
+    std::vector<bool> expr_found(expr.size(), false);
 
     // Allocate output vector
     std::vector<MX> f_out(f.n_out());
@@ -1485,13 +1503,30 @@ namespace casadi {
     for (auto it=algorithm.begin(); it!=algorithm.end(); ++it) {
 
       if (it->op != OP_OUTPUT) {
+        if (it->data.is_call()) {
+          uout() << "call here" << it->data.which_function().name() << it->data.which_function().get() << std::endl;
+        }
         // Check if it->data points to a supplied expr
         it_lookup = expr_lookup.find((it->data).operator->());
 
-        if (it->res.front()>=0 && it_lookup!=expr_lookup.end()) {
+        if (it_lookup!=expr_lookup.end()) {
           // Fill in that expression in-place
-          swork[it->res.front()] = exprs[it_lookup->second];
-          tainted[it->res.front()] = true;
+          MX e = exprs[it_lookup->second];
+
+          // If node is of a MultipleOutput type
+          if (e->has_output()) {
+            uout() << "e:" << e << std::endl;
+            for (casadi_int i=0;i<it->res.size();++i) {
+              uout() << "i:" << i << ", " << it->res[i] << e.get_output(i) << std::endl;
+              if (it->res[i]!=-1) {
+                swork[it->res[i]] = e.get_output(i);
+                tainted[it->res[i]] = true;
+              }
+            }
+          } else {
+            swork[it->res.front()] = e;
+            tainted[it->res.front()] = true;
+          }
           expr_found[it_lookup->second] = true;
           continue;
         }
@@ -1543,6 +1578,8 @@ namespace casadi {
     for (casadi_int i=0;i<expr.size();++i) {
       all_found = all_found && expr_found[i];
     }
+
+    updated = any(expr_found);
 
     //casadi_assert(all_found,
     //             "MXFunction::extractNodes(const std::vector<MX>& expr):"
@@ -2059,113 +2096,130 @@ namespace casadi {
 
 
   std::vector<MX> MX::cse(const std::vector<MX>& e) {
-    MX c = veccat(e);
-    Function f("f", std::vector<MX>{}, e,
-      {{"live_variables", false}, {"max_io", 0}, {"cse", false}, {"allow_free", true}});
-    MXFunction *ff = f.get<MXFunction>();
+    std::vector<MX> orig = e;
+    bool updated = true;
+    while (updated) {
 
-    // Symbolic work, non-differentiated
-    std::vector<MX> swork(ff->workloc_.size()-1);
+      MX c = veccat(orig);
+      Function f("f", std::vector<MX>{}, orig,
+        {{"live_variables", false}, {"max_io", 0}, {"cse", false}, {"allow_free", true}});
+      MXFunction *ff = f.get<MXFunction>();
 
-    // Allocate storage for split outputs
-    std::vector<std::vector<MX> > res_split(e.size());
-    for (casadi_int i=0; i<e.size(); ++i) res_split[i].resize(e[i].n_primitives());
+      // Symbolic work, non-differentiated
+      std::vector<MX> swork(ff->workloc_.size()-1);
 
-    std::vector<MX> arg1, res1;
-    std::vector<MX> res(e.size());
+      // Allocate storage for split outputs
+      std::vector<std::vector<MX> > res_split(orig.size());
+      for (casadi_int i=0; i<orig.size(); ++i) res_split[i].resize(orig[i].n_primitives());
 
-    std::unordered_map<std::string, MX > cache;
-    IncrementalSerializer s;
+      std::vector<MX> arg1, res1;
+      std::vector<MX> res(orig.size());
 
-    std::unordered_map<std::string, Function> function_cache;
+      std::unordered_map<std::string, MX > cache;
+      IncrementalSerializer s;
 
-    // Loop over computational nodes in forward order
-    casadi_int alg_counter = 0;
-    for (auto it=ff->algorithm_.begin(); it!=ff->algorithm_.end(); ++it, ++alg_counter) {
-      if (it->op == OP_INPUT) {
-        // pass
-      } else if (it->op==OP_OUTPUT) {
-        // Collect the results
-        res_split.at(it->data->ind()).at(it->data->segment()) = swork[it->arg.front()];
-      } else if (it->op==OP_PARAMETER) {
-        // Fetch parameter
-        MX& target = swork[it->res.front()];
-        target = it->data;
-        cache[s.pack(target)] = target;
-      } else {
+      std::unordered_map<std::string, Function> function_cache;
 
-        // Arguments of the operation
-        arg1.resize(it->arg.size());
-        for (casadi_int i=0; i<arg1.size(); ++i) {
-          casadi_int el = it->arg[i]; // index of the argument
-          arg1[i] = el<0 ? MX(it->data->dep(i).size()) : swork[el];
-        }
+      // Loop over computational nodes in forward order
+      casadi_int alg_counter = 0;
+      for (auto it=ff->algorithm_.begin(); it!=ff->algorithm_.end(); ++it, ++alg_counter) {
+        if (it->op == OP_INPUT) {
+          // pass
+        } else if (it->op==OP_OUTPUT) {
+          // Collect the results
+          res_split.at(it->data->ind()).at(it->data->segment()) = swork[it->arg.front()];
+        } else if (it->op==OP_PARAMETER) {
+          // Fetch parameter
+          MX& target = swork[it->res.front()];
+          target = it->data;
+          cache[s.pack(target)] = target;
+        } else {
 
-        // Perform the operation
-        res1.resize(it->res.size());
-        it->data->eval_mx(arg1, res1);
+          // Arguments of the operation
+          arg1.resize(it->arg.size());
+          for (casadi_int i=0; i<arg1.size(); ++i) {
+            casadi_int el = it->arg[i]; // index of the argument
+            arg1[i] = el<0 ? MX(it->data->dep(i).size()) : swork[el];
+          }
 
-        // Get the result
-        for (casadi_int i=0; i<res1.size(); ++i) {
-          casadi_int el = it->res[i]; // index of the output
+          // Perform the operation
+          res1.resize(it->res.size());
+          it->data->eval_mx(arg1, res1);
 
-          MX& out_i = res1[i];
+          // Get the result
+          for (casadi_int i=0; i<res1.size(); ++i) {
+            casadi_int el = it->res[i]; // index of the output
 
-          // Default assumption is that out_i is not an output node
-          casadi_int output_node = -1;
+            MX& out_i = res1[i];
 
-          uout() << "inspect" << std::endl;
+            // Default assumption is that out_i is not an output node
+            casadi_int output_node = -1;
 
-          if (out_i.is_output()) {
-            output_node = out_i.which_output();
-            // First pack/cache the parent (MultipleOutput node e.g. Call, Horzsplit)
-            out_i = out_i.dep(0);
+            if (out_i.is_output()) {
+              output_node = out_i.which_output();
+              // First pack/cache the parent (MultipleOutput node e.g. Call, Horzsplit)
+              out_i = out_i.dep(0);
 
-            // If we are a call node,
-            if (out_i.op()==OP_CALL) {
-              std::string key = out_i.which_function().serialize();
-              auto itk = function_cache.find(key);
-              if (itk==function_cache.end()) {
-                function_cache[key] = out_i.which_function();
-              } else {
-                out_i = Call::create_call(function_cache[key], out_i->dep_);
+              // If we are a call node,
+              if (out_i.op()==OP_CALL) {
+                std::string key = out_i.which_function().serialize();
+                auto itk = function_cache.find(key);
+                if (itk==function_cache.end()) {
+                  function_cache[key] = out_i.which_function();
+                } else {
+                  out_i = Call::create_call(function_cache[key], out_i->dep_);
+                }
               }
             }
-          }
 
-          while (true) {
-            // Replace out_i by a cached variant if possible
-            std::string key = s.pack(out_i);
+            while (true) {
+              // Replace out_i by a cached variant if possible
+              std::string key = s.pack(out_i);
 
-            uout() << "key" << key << std::endl;
+              auto itk = cache.find(key);
+              if (itk==cache.end()) {
+                cache[key] = out_i;
+              } else {
+                out_i = itk->second;
+                
+              }
 
-            auto itk = cache.find(key);
-            if (itk==cache.end()) {
-              cache[key] = out_i;
-            } else {
-              out_i = itk->second;
-              
+              if (output_node==-1) {
+                break; // Job is done
+              } else {
+                // Recreate the output node on top of the parent
+                out_i = out_i.get_output(output_node);
+                output_node = -1;
+                // Loop once more
+              }
             }
 
-            if (output_node==-1) {
-              break; // Job is done
-            } else {
-              // Recreate the output node on top of the parent
-              out_i = out_i.get_output(output_node);
-              output_node = -1;
-              // Loop once more
-            }
+            if (el>=0) swork[el] = out_i;
           }
-
-          if (el>=0) swork[el] = out_i;
         }
       }
+
+      // Join split outputs
+      for (casadi_int i=0; i<res.size(); ++i) res[i] = orig[i].join_primitives(res_split[i]);
+
+      std::vector<MX> subs_from;
+      std::vector<MX> subs_to;
+      for (const auto& e : function_cache) {
+        e.second->merge(res, subs_from, subs_to);
+      }
+
+      uout() << "subs_from" << subs_from << std::endl;
+      uout() << "subs_to" << subs_to << std::endl;
+
+      uout() << "before" << res << std::endl;
+
+
+      orig = graph_substitute(res, subs_from, subs_to, updated);
+      uout() << "after" << res << std::endl;
+
     }
 
-    // Join split outputs
-    for (casadi_int i=0; i<res.size(); ++i) res[i] = e[i].join_primitives(res_split[i]);
-
-    return res;
+    return orig;
   }
 
   MX register_symbol(const MX& node, std::map<MXNode*, MX>& symbol_map,

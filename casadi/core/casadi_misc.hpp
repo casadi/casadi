@@ -150,6 +150,10 @@ private:
   template<typename T>
   std::vector<T> vector_tail(const std::vector<T> &v);
 
+  /**  \brief Return all but the last element of a vector */
+  template<typename T>
+  std::vector<T> vector_init(const std::vector<T> &v);
+
   /** \brief Reverse a list
 
       \identifier{1la} */
@@ -536,6 +540,13 @@ namespace casadi {
   std::vector<T> vector_tail(const std::vector<T> &v) {
     std::vector<T> ret;
     ret.insert(ret.begin(), v.begin()+1, v.end());
+    return ret;
+  }
+
+  template<typename T>
+  std::vector<T> vector_init(const std::vector<T> &v) {
+    std::vector<T> ret;
+    ret.insert(ret.begin(), v.begin(), v.begin()+v.size()-1);
     return ret;
   }
 

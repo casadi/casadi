@@ -30,6 +30,7 @@ from helpers import *
 import pickle
 import os
 import sys
+from casadi.tools import capture_stdout
 
 scipy_interpolate = False
 try:
@@ -3280,7 +3281,27 @@ class Functiontests(casadiTestCase):
     #raise Exception()
     
     F = blazing_spline("F",knots,{"jit":True,"jit_options":{"flags": ["-I"+GlobalOptions.getCasadiIncludePath(),"-g","-ffast-math","-march=native"]}})
+   
+    y = sin(F(x,C))
     
+    f = Function('f',[x,C],[y,jacobian(y,x),gradient(y,x)]+list(hessian(y,x)))
+    fcse = Function('fcse',[x,C],[y,jacobian(y,x),gradient(y,x)]+list(hessian(y,x)),{"cse":True})
+    
+    with capture_stdout() as result:
+        fcse.disp(True)
+    self.assertEqual(result[0].count(" F_der_der("),1)
+    self.assertEqual(result[0].count(" F_der("),0)
+    self.assertEqual(result[0].count(" F("),0)
+    self.checkfunction_light(f,fcse,inputs=[vertcat(0.4,0.5,0.6),data])
+    f = Function('f',[x,C],[y,jacobian(y,x),gradient(y,x)])
+    fcse = Function('fcse',[x,C],[y,jacobian(y,x),gradient(y,x)],{"cse":True})
+    
+    with capture_stdout() as result:
+        fcse.disp(True)
+    self.assertEqual(result[0].count(" F_der_der("),0)
+    self.assertEqual(result[0].count(" F_der("),1)
+    self.assertEqual(result[0].count(" F("),0)
+    self.checkfunction_light(f,fcse,inputs=[vertcat(0.4,0.5,0.6),data])
     
     def test_points(knots):
         import itertools
@@ -3319,6 +3340,8 @@ class Functiontests(casadiTestCase):
     for a in test_points(knots):
         print(vcat(a),data,0,0,0)
         self.checkfunction_light(FJ,FJ_ref,inputs=[vcat(a),data,0,0,0])
+        
+
         
 if __name__ == '__main__':
     unittest.main()
