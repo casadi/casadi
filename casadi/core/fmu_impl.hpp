@@ -58,7 +58,7 @@ class CASADI_EXPORT FmuInternal : public SharedObjectInternal {
   ~FmuInternal() override;
 
   // Initialize
-  virtual void init(const DaeBuilderInternal* dae) = 0;
+  virtual void init(const DaeBuilderInternal* dae);
 
   // Set C API functions
   virtual void load_functions() = 0;
@@ -228,6 +228,9 @@ class CASADI_EXPORT FmuInternal : public SharedObjectInternal {
 
   // Auxilliary outputs
   std::vector<std::string> aux_;
+
+  // Does the FMU declare analytic derivatives support?
+  bool provides_directional_derivatives_, provides_adjoint_derivatives_;
 
   /// DLL
   Importer li_;

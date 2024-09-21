@@ -82,6 +82,8 @@ std::string Fmu3::dll_suffix() {
 }
 
 void Fmu3::init(const DaeBuilderInternal* dae) {
+  // Initialize base classes
+  FmuInternal::init(dae);
   // Mark input indices
   size_t numel = 0;
   std::vector<bool> lookup(dae->n_variables(), false);
@@ -276,10 +278,6 @@ void Fmu3::init(const DaeBuilderInternal* dae) {
   std::string dll_path = dae->path_ + "/binaries/" + system_infix()
     + "/" + instance_name_no_dot + dll_suffix();
   li_ = Importer(dll_path, "dll");
-
-  // Types of analytic AD, if any
-  provides_directional_derivatives_ = dae->provides_directional_derivatives_;
-  provides_adjoint_derivatives_ = dae->provides_adjoint_derivatives_;
 
   // Path to resource directory
   resource_loc_ = "file://" + dae->path_ + "/resources";

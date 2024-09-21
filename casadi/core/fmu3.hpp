@@ -86,9 +86,6 @@ class CASADI_EXPORT Fmu3 : public FmuInternal {
   std::vector<std::string> vn_aux_real_, vn_aux_integer_, vn_aux_boolean_, vn_aux_string_;
   std::vector<fmi3ValueReference> vr_aux_real_, vr_aux_integer_, vr_aux_boolean_, vr_aux_string_;
 
-  // Does the FMU declare analytic derivatives support?
-  bool provides_directional_derivatives_, provides_adjoint_derivatives_;
-
   // Following members set in finalize
 
   // FMU C API function prototypes. Cf. FMI specification 2.0.2

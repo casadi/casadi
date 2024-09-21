@@ -63,6 +63,8 @@ std::string Fmu2::dll_suffix() {
 }
 
 void Fmu2::init(const DaeBuilderInternal* dae) {
+  // Initialize base classes
+  FmuInternal::init(dae);
   // Mark input indices
   size_t numel = 0;
   std::vector<bool> lookup(dae->n_variables(), false);
@@ -258,8 +260,6 @@ void Fmu2::init(const DaeBuilderInternal* dae) {
     + "/" + instance_name_no_dot + dll_suffix();
   li_ = Importer(dll_path, "dll");
 
-  declared_ad_ = dae->provides_directional_derivatives_;
-
   // Path to resource directory
   resource_loc_ = "file://" + dae->path_ + "/resources";
 
@@ -289,8 +289,7 @@ void Fmu2::load_functions() {
   set_boolean_ = load_function<fmi2SetBooleanTYPE>("fmi2SetBoolean");
   get_string_ = load_function<fmi2GetStringTYPE>("fmi2GetString");
   set_string_ = load_function<fmi2SetStringTYPE>("fmi2SetString");
-
-  if (declared_ad_) {
+  if (provides_directional_derivatives_) {
     get_directional_derivative_ =
       load_function<fmi2GetDirectionalDerivativeTYPE>("fmi2GetDirectionalDerivative");
   }
@@ -578,7 +577,7 @@ Fmu2::Fmu2(DeserializingStream& s) : FmuInternal(s) {
   get_real_ = 0;
   get_directional_derivative_ = 0;
 
-  s.version("Fmu2", 1);
+  s.version("Fmu2", 2);
   s.unpack("Fmu2::resource_loc", resource_loc_);
   s.unpack("Fmu2::fmutol", fmutol_);
   s.unpack("Fmu2::instance_name", instance_name_);
@@ -602,16 +601,13 @@ Fmu2::Fmu2(DeserializingStream& s) : FmuInternal(s) {
   s.unpack("Fmu2::vr_aux_integer", vr_aux_integer_);
   s.unpack("Fmu2::vr_aux_boolean", vr_aux_boolean_);
   s.unpack("Fmu2::vr_aux_string", vr_aux_string_);
-
-  s.unpack("Fmu2::declared_ad", declared_ad_);
-
 }
 
 
 void Fmu2::serialize_body(SerializingStream &s) const {
   FmuInternal::serialize_body(s);
 
-  s.version("Fmu2", 1);
+  s.version("Fmu2", 2);
   s.pack("Fmu2::resource_loc", resource_loc_);
   s.pack("Fmu2::fmutol", fmutol_);
   s.pack("Fmu2::instance_name", instance_name_);
@@ -635,8 +631,6 @@ void Fmu2::serialize_body(SerializingStream &s) const {
   s.pack("Fmu2::vr_aux_integer_", vr_aux_integer_);
   s.pack("Fmu2::vr_aux_boolean_", vr_aux_boolean_);
   s.pack("Fmu2::vr_aux_string_", vr_aux_string_);
-
-  s.pack("Fmu2::declared_ad", declared_ad_);
 }
 
 } // namespace casadi

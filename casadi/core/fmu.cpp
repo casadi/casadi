@@ -365,6 +365,12 @@ FmuInternal::FmuInternal(const std::string& name,
 FmuInternal::~FmuInternal() {
 }
 
+void FmuInternal::init(const DaeBuilderInternal* dae) {
+  // Types of analytic AD, if any
+  provides_directional_derivatives_ = dae->provides_directional_derivatives_;
+  provides_adjoint_derivatives_ = dae->provides_adjoint_derivatives_;
+}
+
 int FmuInternal::get_adjoint_derivative(void* instance, const unsigned int* vr_out, size_t n_out,
     const unsigned int* vr_in, size_t n_in, const double* seed, size_t n_seed,
     double* sensitivity, size_t n_sensitivity) const {
@@ -972,7 +978,7 @@ void FmuInternal::serialize_type(SerializingStream& s) const {
 }
 
 void FmuInternal::serialize_body(SerializingStream& s) const {
-  s.version("FmuInternal", 1);
+  s.version("FmuInternal", 2);
   s.pack("FmuInternal::name", name_);
   s.pack("FmuInternal::scheme_in", scheme_in_);
   s.pack("FmuInternal::scheme_out", scheme_out_);
@@ -1000,11 +1006,12 @@ void FmuInternal::serialize_body(SerializingStream& s) const {
   s.pack("FmuInternal::jac_sp", jac_sp_);
   s.pack("FmuInternal::hess_sp", hess_sp_);
 
-
+  s.pack("FmuInternal::provides_directional_derivatives", provides_directional_derivatives_);
+  s.pack("FmuInternal::provides_adjoint_derivatives", provides_adjoint_derivatives_);
 }
 
 FmuInternal::FmuInternal(DeserializingStream& s) {
-  s.version("FmuInternal", 1);
+  s.version("FmuInternal", 2);
   s.unpack("FmuInternal::name", name_);
   s.unpack("FmuInternal::scheme_in", scheme_in_);
   s.unpack("FmuInternal::scheme_out", scheme_out_);
@@ -1031,6 +1038,9 @@ FmuInternal::FmuInternal(DeserializingStream& s) {
   s.unpack("FmuInternal::ored", ored_);
   s.unpack("FmuInternal::jac_sp", jac_sp_);
   s.unpack("FmuInternal::hess_sp", hess_sp_);
+
+  s.unpack("FmuInternal::provides_directional_derivatives", provides_directional_derivatives_);
+  s.unpack("FmuInternal::provides_adjoint_derivatives", provides_adjoint_derivatives_);
 }
 
 FmuInternal* FmuInternal::deserialize(DeserializingStream& s) {
