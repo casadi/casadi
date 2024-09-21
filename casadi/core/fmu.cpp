@@ -765,20 +765,22 @@ int FmuInternal::init_mem(FmuMemory* m) const {
   // Allocate/reset output buffer
   m->obuf_.resize(oind_.size());
   std::fill(m->obuf_.begin(), m->obuf_.end(), casadi::nan);
+  // Maximum input or output
+  size_t max_io = std::max(iind_.size(), oind_.size());
   // Allocate/reset seeds
-  m->seed_.resize(iind_.size());
+  m->seed_.resize(max_io);
   std::fill(m->seed_.begin(), m->seed_.end(), 0);
   // Allocate/reset sensitivities
-  m->sens_.resize(oind_.size());
+  m->sens_.resize(max_io);
   std::fill(m->sens_.begin(), m->sens_.end(), 0);
   // Allocate/reset changed
-  m->changed_.resize(iind_.size());
+  m->changed_.resize(max_io);
   std::fill(m->changed_.begin(), m->changed_.end(), false);
   // Allocate/reset requested
-  m->requested_.resize(oind_.size());
+  m->requested_.resize(max_io);
   std::fill(m->requested_.begin(), m->requested_.end(), false);
   // Also allocate memory for corresponding Jacobian entry (for debugging)
-  m->wrt_.resize(oind_.size());
+  m->wrt_.resize(max_io);
   // Successful return
   return 0;
 }
