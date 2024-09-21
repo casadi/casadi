@@ -32,7 +32,7 @@ namespace casadi {
 Fmu2::~Fmu2() {
 }
 
-std::string Fmu2::system_infix() {
+std::string Fmu2::system_infix() const {
 #if defined(_WIN32)
   // Windows system
 #ifdef _WIN64
@@ -46,19 +46,6 @@ std::string Fmu2::system_infix() {
 #else
   // Linux
   return sizeof(void*) == 4 ? "linux32" : "linux64";
-#endif
-}
-
-std::string Fmu2::dll_suffix() {
-#if defined(_WIN32)
-  // Windows system
-  return ".dll";
-#elif defined(__APPLE__)
-  // OSX
-  return ".dylib";
-#else
-  // Linux
-  return ".so";
 #endif
 }
 
@@ -160,22 +147,6 @@ void Fmu2::init(const DaeBuilderInternal* dae) {
 
   // Get Hessian sparsity information
   hess_sp_ = dae->hess_sparsity(oind_, iind_);
-
-  // Load DLL
-  std::string instance_name_no_dot = dae->model_identifier_;
-  std::replace(instance_name_no_dot.begin(), instance_name_no_dot.end(), '.', '_');
-  std::string dll_path = dae->path_ + "/binaries/" + system_infix()
-    + "/" + instance_name_no_dot + dll_suffix();
-  li_ = Importer(dll_path, "dll");
-
-  // Path to resource directory
-  resource_loc_ = "file://" + dae->path_ + "/resources";
-
-  // Copy info from DaeBuilder
-  fmutol_ = dae->fmutol_;
-  instance_name_ = dae->model_identifier_;
-  guid_ = dae->instantiation_token_;
-  logging_on_ = dae->debug_;
 }
 
 void Fmu2::load_functions() {
@@ -246,7 +217,7 @@ void* Fmu2::instantiate() const {
   // Instantiate FMU
   fmi2String instanceName = instance_name_.c_str();
   fmi2Type fmuType = fmi2ModelExchange;
-  fmi2String fmuGUID = guid_.c_str();
+  fmi2String fmuGUID = instantiation_token_.c_str();
   fmi2String fmuResourceLocation = resource_loc_.c_str();
   fmi2Boolean visible = fmi2False;
   fmi2Component c = instantiate_(instanceName, fmuType, fmuGUID, fmuResourceLocation,
@@ -486,12 +457,6 @@ Fmu2::Fmu2(DeserializingStream& s) : FmuInternal(s) {
   get_directional_derivative_ = 0;
 
   s.version("Fmu2", 2);
-  s.unpack("Fmu2::resource_loc", resource_loc_);
-  s.unpack("Fmu2::fmutol", fmutol_);
-  s.unpack("Fmu2::instance_name", instance_name_);
-  s.unpack("Fmu2::guid", guid_);
-  s.unpack("Fmu2::logging_on", logging_on_);
-
   s.unpack("Fmu2::vr_real", vr_real_);
   s.unpack("Fmu2::vr_integer", vr_integer_);
   s.unpack("Fmu2::vr_boolean", vr_boolean_);
@@ -516,12 +481,6 @@ void Fmu2::serialize_body(SerializingStream &s) const {
   FmuInternal::serialize_body(s);
 
   s.version("Fmu2", 2);
-  s.pack("Fmu2::resource_loc", resource_loc_);
-  s.pack("Fmu2::fmutol", fmutol_);
-  s.pack("Fmu2::instance_name", instance_name_);
-  s.pack("Fmu2::guid", guid_);
-  s.pack("Fmu2::logging_on", logging_on_);
-
   s.pack("Fmu2::vr_real", vr_real_);
   s.pack("Fmu2::vr_integer", vr_integer_);
   s.pack("Fmu2::vr_boolean", vr_boolean_);

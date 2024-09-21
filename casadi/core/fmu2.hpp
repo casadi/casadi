@@ -60,21 +60,6 @@ class CASADI_EXPORT Fmu2 : public FmuInternal {
   // Set C API functions
   void load_functions() override;
 
-  // Path to the FMU resource directory
-  std::string resource_loc_;
-
-  // Tolerance
-  double fmutol_;
-
-  // Instance name
-  std::string instance_name_;
-
-  // GUID
-  std::string guid_;
-
-  // Logging?
-  bool logging_on_;
-
   // Variables used for initialization, by type
   std::vector<fmi2ValueReference> vr_real_, vr_integer_, vr_boolean_, vr_string_;
   std::vector<fmi2Real> init_real_;
@@ -122,6 +107,9 @@ class CASADI_EXPORT Fmu2 : public FmuInternal {
   // Does the FMU support analytic forward derivatives?
   bool has_fwd() const override { return get_directional_derivative_ != nullptr; }
 
+  // Name of system, per the FMI specification
+  std::string system_infix() const override;
+
   // New memory object
   void* instantiate() const override;
 
@@ -161,12 +149,6 @@ class CASADI_EXPORT Fmu2 : public FmuInternal {
       \identifier{275} */
   void get_stats(FmuMemory* m, Dict* stats,
     const std::vector<std::string>& name_in, const InputStruct* in) const override;
-
-  // Name of system, per the FMI specification
-  static std::string system_infix();
-
-  // DLL suffix, per the FMI specification
-  static std::string dll_suffix();
 
   // Process message
   static void logger(fmi2ComponentEnvironment componentEnvironment,

@@ -44,9 +44,9 @@ throw CasadiException("Error in Fmu::" FNAME " for '" + this->name() + "' "\
   + std::string(WHAT));
 
 
-  Fmu::Fmu() {
+Fmu::Fmu() {
+}
 
-  }
 Fmu::Fmu(const std::string& name, FmuApi api, const DaeBuilderInternal* dae,
     const std::vector<std::string>& scheme_in,
     const std::vector<std::string>& scheme_out,
@@ -366,9 +366,23 @@ FmuInternal::~FmuInternal() {
 }
 
 void FmuInternal::init(const DaeBuilderInternal* dae) {
-  // Types of analytic AD, if any
+  // Copy info from DaeBuilder
+  fmutol_ = dae->fmutol_;
+  instance_name_ = dae->model_identifier_;
+  instantiation_token_ = dae->instantiation_token_;
+  logging_on_ = dae->debug_;
   provides_directional_derivatives_ = dae->provides_directional_derivatives_;
   provides_adjoint_derivatives_ = dae->provides_adjoint_derivatives_;
+
+  // Path to resource directory
+  resource_loc_ = "file://" + dae->path_ + "/resources";
+
+  // Load DLL
+  std::string instance_name_no_dot = dae->model_identifier_;
+  std::replace(instance_name_no_dot.begin(), instance_name_no_dot.end(), '.', '_');
+  std::string dll_path = dae->path_ + "/binaries/" + system_infix()
+    + "/" + instance_name_no_dot + dll_suffix();
+  li_ = Importer(dll_path, "dll");
 
   // Mark input indices
   size_t numel = 0;
@@ -567,6 +581,19 @@ std::vector<double> FmuInternal::all_nominal_out(size_t i) const {
   n.reserve(ind.size());
   for (size_t k : ind) n.push_back(nominal_out_.at(k));
   return n;
+}
+
+std::string FmuInternal::dll_suffix() {
+#if defined(_WIN32)
+  // Windows system
+  return ".dll";
+#elif defined(__APPLE__)
+  // OSX
+  return ".dylib";
+#else
+  // Linux
+  return ".so";
+#endif
 }
 
 std::string FmuInternal::desc_in(FmuMemory* m, size_t id, bool more) const {
@@ -1099,6 +1126,11 @@ void FmuInternal::serialize_body(SerializingStream& s) const {
   s.pack("FmuInternal::jac_sp", jac_sp_);
   s.pack("FmuInternal::hess_sp", hess_sp_);
 
+  s.pack("FmuInternal::resource_loc", resource_loc_);
+  s.pack("FmuInternal::fmutol", fmutol_);
+  s.pack("FmuInternal::instance_name", instance_name_);
+  s.pack("FmuInternal::instantiation_token", instantiation_token_);
+  s.pack("FmuInternal::logging_on", logging_on_);
   s.pack("FmuInternal::provides_directional_derivatives", provides_directional_derivatives_);
   s.pack("FmuInternal::provides_adjoint_derivatives", provides_adjoint_derivatives_);
 }
@@ -1132,6 +1164,11 @@ FmuInternal::FmuInternal(DeserializingStream& s) {
   s.unpack("FmuInternal::jac_sp", jac_sp_);
   s.unpack("FmuInternal::hess_sp", hess_sp_);
 
+  s.unpack("FmuInternal::resource_loc", resource_loc_);
+  s.unpack("FmuInternal::fmutol", fmutol_);
+  s.unpack("FmuInternal::instance_name", instance_name_);
+  s.unpack("FmuInternal::instantiation_token", instantiation_token_);
+  s.unpack("FmuInternal::logging_on", logging_on_);
   s.unpack("FmuInternal::provides_directional_derivatives", provides_directional_derivatives_);
   s.unpack("FmuInternal::provides_adjoint_derivatives", provides_adjoint_derivatives_);
 }

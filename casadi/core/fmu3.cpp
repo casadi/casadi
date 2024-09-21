@@ -32,7 +32,7 @@ namespace casadi {
 Fmu3::~Fmu3() {
 }
 
-std::string Fmu3::system_infix() {
+std::string Fmu3::system_infix() const {
   // Architecture
   std::string arch;
 #ifdef __arm__
@@ -66,19 +66,6 @@ std::string Fmu3::system_infix() {
 #endif
   // Return platform tuple, according to Section 2.5.1.4.1. of the FMI 3 specification
   return arch + "-" + sys;
-}
-
-std::string Fmu3::dll_suffix() {
-#if defined(_WIN32)
-  // Windows system
-  return ".dll";
-#elif defined(__APPLE__)
-  // OSX
-  return ".dylib";
-#else
-  // Linux
-  return ".so";
-#endif
 }
 
 void Fmu3::init(const DaeBuilderInternal* dae) {
@@ -179,22 +166,6 @@ void Fmu3::init(const DaeBuilderInternal* dae) {
 
   // Get Hessian sparsity information
   hess_sp_ = dae->hess_sparsity(oind_, iind_);
-
-  // Load DLL
-  std::string instance_name_no_dot = dae->model_identifier_;
-  std::replace(instance_name_no_dot.begin(), instance_name_no_dot.end(), '.', '_');
-  std::string dll_path = dae->path_ + "/binaries/" + system_infix()
-    + "/" + instance_name_no_dot + dll_suffix();
-  li_ = Importer(dll_path, "dll");
-
-  // Path to resource directory
-  resource_loc_ = "file://" + dae->path_ + "/resources";
-
-  // Copy info from DaeBuilder
-  fmutol_ = dae->fmutol_;
-  instance_name_ = dae->model_identifier_;
-  guid_ = dae->instantiation_token_;
-  logging_on_ = dae->debug_;
 }
 
 void Fmu3::load_functions() {
@@ -235,7 +206,7 @@ void Fmu3::log_message_callback(fmi3InstanceEnvironment instanceEnvironment,
 void* Fmu3::instantiate() const {
   // Instantiate FMU
   fmi3String instanceName = instance_name_.c_str();
-  fmi3String instantiationToken = guid_.c_str();
+  fmi3String instantiationToken = instantiation_token_.c_str();
   fmi3String resourcePath = resource_loc_.c_str();
   fmi3Boolean visible = fmi3False;
   fmi3InstanceEnvironment instanceEnvironment = 0;

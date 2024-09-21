@@ -140,6 +140,12 @@ class CASADI_EXPORT FmuInternal : public SharedObjectInternal {
   // Print description of an input
   std::string desc_in(FmuMemory* m, size_t id, bool more = true) const;
 
+  // Name of system, per the FMI specification
+  virtual std::string system_infix() const = 0;
+
+  // DLL suffix, per the FMI specification
+  static std::string dll_suffix();
+
   // Load an FMI function
   template<typename T>
   T* load_function(const std::string& symname);
@@ -228,6 +234,21 @@ class CASADI_EXPORT FmuInternal : public SharedObjectInternal {
 
   // Auxilliary outputs
   std::vector<std::string> aux_;
+
+  // Path to the FMU resource directory
+  std::string resource_loc_;
+
+  // Tolerance
+  double fmutol_;
+
+  // Instance name
+  std::string instance_name_;
+
+  // GUID / instantiation_token
+  std::string instantiation_token_;
+
+  // Logging?
+  bool logging_on_;
 
   // Does the FMU declare analytic derivatives support?
   bool provides_directional_derivatives_, provides_adjoint_derivatives_;
