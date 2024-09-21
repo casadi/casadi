@@ -27,6 +27,7 @@
 #include "interpolant_impl.hpp"
 #include "bspline_impl.hpp"
 #include "casadi_misc.hpp"
+#include "serializer.hpp"
 
 #include <fstream>
 #include <iostream>
@@ -256,8 +257,18 @@ namespace casadi {
     Dict Jopts = combine(jacobian_options_, der_options_);
     Jopts = combine(opts, Jopts);
     Jopts = combine(Jopts, generate_options("jacobian"));
+    Jopts["derivative_of"] = self();
 
-    Function fJ = Function::create(new BlazingSplineFunction(name, knots_, diff_order_+1), Jopts);
+    std::string fJname = name_ + "_der";
+
+    Function fJ;
+    if (!incache(fJname, fJ)) {
+      fJ = Function::create(new BlazingSplineFunction(fJname, knots_, diff_order_+1), Jopts);
+      // Save in cache
+      tocache(fJ);
+    }
+
+    uout() << "fJ" << fJ << std::endl;
 
     if (diff_order_==0) {
       std::vector<MX> ret = fJ(std::vector<MX>{x, C, dC});
@@ -326,5 +337,97 @@ namespace casadi {
   ProtoFunction* BlazingSplineFunction::deserialize(DeserializingStream& s) {
     return new BlazingSplineFunction(s);
   }
+
+
+  void BlazingSplineFunction::merge(const std::vector<MX>& arg,
+      std::vector<MX>& subs_from,
+      std::vector<MX>& subs_to) const {
+
+    Function base = self();
+    for (casadi_int i=0;i<diff_order_;++i) {
+      base = base->derivative_of_;
+    }
+
+    // Sort graph
+    Function f("f", {}, arg, {{"allow_free", true}, {"max_io", 0}});
+
+
+    std::unordered_map<std::string, std::vector<MX> > targets0;
+    std::unordered_map<std::string, std::vector<MX> > targets1;
+    std::vector<MX> targets2;
+
+    StringSerializer ss;
+    std::string key;
+
+    // Loop over instructions
+    for (int k=0; k<f.n_instructions(); ++k) {
+      MX e = f.instruction_MX(k);
+      if (e.is_call()) {
+        Function fun = e.which_function();
+
+        // Check if the function is a BlazingSplineFunction
+        if (fun.class_name()=="BlazingSplineFunction") {
+          key = ss.generate_id(e->dep_);
+          // Which derivative level?
+          if (fun==base) {
+            targets0[key].push_back(e);
+          } else if (fun->derivative_of_==base) {
+            targets1[key].push_back(e);
+            uout() << "here " << fun.get() << std::endl;
+          } else if (fun->derivative_of_->derivative_of_==base) {
+            targets2.push_back(e);
+          }
+        }
+      }
+    }
+
+    // Loop over second order targets, targets2
+    for (const auto& e : targets2) {
+
+      // Compute key of all but last args
+      key = ss.generate_id(vector_init(e->dep_), 1);
+
+      // Loop over all matching target1 entries
+      for (const auto& ee : targets1[key]) {
+        // Mark all matches for substitution
+        subs_from.push_back(ee);
+        // Substitute with self
+        subs_to.push_back(e);
+      }
+
+      // Compute key of all but last args
+      key = ss.generate_id(vector_init(vector_init(e->dep_)), 0);
+
+      uout() << "key in" << vector_init(vector_init(e->dep_)) << std::endl;
+      uout() << "key" << key << std::endl;
+
+      // Loop over all matching target1 entries
+      for (const auto& ee : targets0[key]) {
+        // Mark all matches for substitution
+        subs_from.push_back(ee);
+        // Substitute with self
+        subs_to.push_back(e);
+      }
+    }
+
+    // Loop over first order targets, targets1
+    for (const auto& ee : targets1) {
+      for (const auto& e : ee.second) {
+
+        // Compute key of all but last args
+        key = ss.generate_id(vector_init(e->dep_), 0);
+
+        // Loop over all matching target1 entries
+        for (const auto& ee : targets0[key]) {
+          // Mark all matches for substitution
+          subs_from.push_back(ee);
+          // Substitute with self
+          subs_to.push_back(e);
+        }
+      }
+    }
+
+  }
+
 
 } // namespace casadi
