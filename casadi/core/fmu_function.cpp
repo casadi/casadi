@@ -129,7 +129,8 @@ FmuFunction::FmuFunction(const std::string& name, const Fmu& fmu,
   validate_ad_file_ = "";
   make_symmetric_ = true;
   check_hessian_ = false;
-  enable_fd_op_ = fmu.has_fwd() && !all_regular();  // Use FD for second and higher order derivatives
+  // Use FD for second and higher order derivatives
+  enable_fd_op_ = fmu.has_fwd() && !all_regular();
   step_ = 1e-6;
   abstol_ = 1e-3;
   reltol_ = 1e-3;

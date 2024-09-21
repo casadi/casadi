@@ -32,7 +32,7 @@ namespace casadi {
 Fmu3::~Fmu3() {
 }
 
-std::string Fmu3::system_infix() {  
+std::string Fmu3::system_infix() {
   // Architecture
   std::string arch;
 #ifdef __arm__
@@ -51,7 +51,7 @@ std::string Fmu3::system_infix() {
     // Intel/AMD x86 64-bit
     arch = "x86_64";
   }
-#endif  
+#endif
   // Operating system
   std::string sys;
 #if defined(_WIN32)
