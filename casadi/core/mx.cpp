@@ -1443,9 +1443,21 @@ namespace casadi {
     return graph_substitute(std::vector<MX>{x}, v, vdef).at(0);
   }
 
+  MX MX::graph_substitute(const MX& x, const std::vector<MX> &v,
+                          const std::vector<MX> &vdef, bool& updated) {
+    return graph_substitute(std::vector<MX>{x}, v, vdef, updated).at(0);
+  }
+
   std::vector<MX> MX::graph_substitute(const std::vector<MX>& ex,
                                        const std::vector<MX>& expr,
                                        const std::vector<MX>& exprs) {
+    bool updated;
+    return graph_substitute(ex, expr, exprs, updated);
+  }
+  std::vector<MX> MX::graph_substitute(const std::vector<MX>& ex,
+                                       const std::vector<MX>& expr,
+                                       const std::vector<MX>& exprs,
+                                       bool& updated) {
     casadi_assert(expr.size()==exprs.size(),
       "Mismatch in the number of expression to substitute: "
       + str(expr.size()) + " <-> " + str(exprs.size()) + ".");
@@ -1465,14 +1477,16 @@ namespace casadi {
     // Temporary std::stringstream
     std::stringstream ss;
 
-    // Construct lookup table for expressions
+    // Construct lookup table for expressions,
+    // giving priority to first occurances
     std::map<const MXNode*, casadi_int> expr_lookup;
     for (casadi_int i=0;i<expr.size();++i) {
-      expr_lookup[expr[i].operator->()] = i;
+      auto it = expr_lookup.find(expr[i].operator->());
+      if (it==expr_lookup.end()) expr_lookup[expr[i].operator->()] = i;
     }
 
     // Construct found map
-    std::vector<bool> expr_found(expr.size());
+    std::vector<bool> expr_found(expr.size(), false);
 
     // Allocate output vector
     std::vector<MX> f_out(f.n_out());
@@ -1487,10 +1501,22 @@ namespace casadi {
         // Check if it->data points to a supplied expr
         it_lookup = expr_lookup.find((it->data).operator->());
 
-        if (it->res.front()>=0 && it_lookup!=expr_lookup.end()) {
+        if (it_lookup!=expr_lookup.end()) {
           // Fill in that expression in-place
-          swork[it->res.front()] = exprs[it_lookup->second];
-          tainted[it->res.front()] = true;
+          MX e = exprs[it_lookup->second];
+
+          // If node is of a MultipleOutput type
+          if (e->has_output()) {
+            for (casadi_int i=0;i<it->res.size();++i) {
+              if (it->res[i]!=-1) {
+                swork[it->res[i]] = e.get_output(i);
+                tainted[it->res[i]] = true;
+              }
+            }
+          } else {
+            swork[it->res.front()] = e;
+            tainted[it->res.front()] = true;
+          }
           expr_found[it_lookup->second] = true;
           continue;
         }
@@ -1543,11 +1569,7 @@ namespace casadi {
       all_found = all_found && expr_found[i];
     }
 
-    //casadi_assert(all_found,
-    //             "MXFunction::extractNodes(const std::vector<MX>& expr):"
-    //             " failed to locate all input expr."
-    //             << std::endl << "Here's a boolean list showing which ones where found: "
-    //             << expr_found);
+    updated = any(expr_found);
 
     return f_out;
 
