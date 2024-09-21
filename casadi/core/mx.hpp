@@ -274,6 +274,9 @@ namespace casadi {
     /// Check if evaluation output
     bool is_output() const;
 
+    /** \brief  Check if a multiple output node */
+    bool has_output() const;
+
     /// Get the index of evaluation output - only valid when is_output() is true
     casadi_int which_output() const;
 

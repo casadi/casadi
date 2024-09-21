@@ -759,6 +759,10 @@ namespace casadi {
     return (*this)->is_output();
   }
 
+  bool MX::has_output() const {
+    return (*this)->has_output();
+  }
+
   casadi_int MX::which_output() const {
     return (*this)->which_output();
   }
