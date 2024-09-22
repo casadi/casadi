@@ -1751,9 +1751,23 @@ namespace casadi {
                         << "#endif\n"
                         << "}\n\n";
       break;
-    case AUX_BLAZING_SPLINE:
+    case AUX_BLAZING_DE_BOOR:
+      this->auxiliaries << sanitize_source(casadi_blazing_de_boor_str, inst);
+      break;
+    case AUX_BLAZING_1D_BOOR_EVAL:
       add_auxiliary(AUX_LOW);
-      this->auxiliaries << sanitize_source(casadi_blazing_spline_str, inst);
+      add_auxiliary(AUX_BLAZING_DE_BOOR);
+      this->auxiliaries << sanitize_source(casadi_blazing_1d_boor_eval_str, inst);
+      break;
+    case AUX_BLAZING_2D_BOOR_EVAL:
+      add_auxiliary(AUX_LOW);
+      add_auxiliary(AUX_BLAZING_DE_BOOR);
+      this->auxiliaries << sanitize_source(casadi_blazing_2d_boor_eval_str, inst);
+      break;
+    case AUX_BLAZING_3D_BOOR_EVAL:
+      add_auxiliary(AUX_LOW);
+      add_auxiliary(AUX_BLAZING_DE_BOOR);
+      this->auxiliaries << sanitize_source(casadi_blazing_3d_boor_eval_str, inst);
       break;
     }
   }

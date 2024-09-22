@@ -17,94 +17,9 @@
 //    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-// SYMBOL "blazing_de_boor_dim3"
+// SYMBOL "blazing_3d_boor_eval"
 template<typename T1>
-void casadi_blazing_de_boor_dim3(T1 x, const T1* knots, simde__m256d* boor_d0, simde__m256d* boor_d1, simde__m256d* boor_d2, simde__m256d boor_d3) {
-  simde__m256d x_ = simde_mm256_set1_pd(x);
-  simde__m256d zero = simde_mm256_set1_pd(0.0);
-  simde__m256d mask_end = simde_mm256_set_pd(0.0, -1.0, -1.0, -1.0);
-  
-
-  simde__m256d boor_d3i = boor_d3;
-
-  simde__m256d boor_d3i_1 = simde_mm256_permute4x64_pd(boor_d3i, SIMDE_MM_SHUFFLE(3, 3, 2, 1)); // shift one up
-  boor_d3i_1 = simde_mm256_blendv_pd(zero, boor_d3i_1, mask_end);
-
-  simde__m256d knotsi = simde_mm256_loadu_pd(knots);
-  simde__m256d knotsi_1 = simde_mm256_loadu_pd(knots+1);
-  simde__m256d knotsi_2 = simde_mm256_loadu_pd(knots+2);
-  simde__m256d knotsi_3 = simde_mm256_loadu_pd(knots+3);
-  simde__m256d knotsi_4 = simde_mm256_loadu_pd(knots+4);
-
-  simde__m256d bottom = simde_mm256_sub_pd(knotsi_1, knotsi); // bottom = knots[i + 1] - knots[i];
-  simde__m256d bottom_mask = simde_mm256_cmp_pd(bottom, zero, SIMDE_CMP_EQ_OQ); // if (bottom)
-
-  simde__m256d r = simde_mm256_div_pd(simde_mm256_sub_pd(x_, knotsi), bottom); // (x - knots[i]) / bottom;
-  r = simde_mm256_blendv_pd(r, zero, bottom_mask);
-  *boor_d2 = simde_mm256_mul_pd(r, boor_d3i);
-
-  *boor_d2 = simde_mm256_blendv_pd(*boor_d2, zero, bottom_mask);
-
-  bottom = simde_mm256_sub_pd(knotsi_2, knotsi_1); // bottom = knots[i + 2] - knots[i + 1];
-  bottom_mask = simde_mm256_cmp_pd(bottom, zero, SIMDE_CMP_EQ_OQ);
-  r = simde_mm256_div_pd(simde_mm256_sub_pd(knotsi_2, x_), bottom); // (knots[i + 2] - x) / bottom
-  r = simde_mm256_blendv_pd(r, zero, bottom_mask);
-
-  *boor_d2 = simde_mm256_fmadd_pd(r, boor_d3i_1, *boor_d2);
-
-
-
-  simde__m256d boor_d2i_1 = simde_mm256_permute4x64_pd(*boor_d2, SIMDE_MM_SHUFFLE(3, 3, 2, 1)); // shift one up
-  boor_d2i_1 = simde_mm256_blendv_pd(zero, boor_d2i_1, mask_end);
-
-  bottom = simde_mm256_sub_pd(knotsi_2, knotsi); // bottom = knots[i + 2] - knots[i];
-  bottom_mask = simde_mm256_cmp_pd(bottom, zero, SIMDE_CMP_EQ_OQ); // if (bottom)
-
-  r = simde_mm256_div_pd(simde_mm256_sub_pd(x_, knotsi), bottom); // (x - knots[i]) / bottom;
-  r = simde_mm256_blendv_pd(r, zero, bottom_mask);
-  *boor_d1 = simde_mm256_mul_pd(r, *boor_d2);
-
-  *boor_d1 = simde_mm256_blendv_pd(*boor_d1, zero, bottom_mask);
-
-  bottom = simde_mm256_sub_pd(knotsi_3, knotsi_1); // bottom = knots[i + 3] - knots[i + 1];
-  bottom_mask = simde_mm256_cmp_pd(bottom, zero, SIMDE_CMP_EQ_OQ);
-  r = simde_mm256_div_pd(simde_mm256_sub_pd(knotsi_3, x_), bottom);  // (knots[i + 3] - x) / bottom
-  r = simde_mm256_blendv_pd(r, zero, bottom_mask);
-
-  *boor_d1 = simde_mm256_fmadd_pd(r, boor_d2i_1, *boor_d1);
-
-
-  simde__m256d boor_d1i_1 = simde_mm256_permute4x64_pd(*boor_d1, SIMDE_MM_SHUFFLE(3, 3, 2, 1)); // shift one up
-  boor_d1i_1 = simde_mm256_blendv_pd(zero, boor_d1i_1, mask_end);
-
-  bottom = simde_mm256_sub_pd(knotsi_3, knotsi); // bottom = knots[i + 3] - knots[i];
-  bottom_mask = simde_mm256_cmp_pd(bottom, zero, SIMDE_CMP_EQ_OQ); // if (bottom)
-
-  r = simde_mm256_div_pd(simde_mm256_sub_pd(x_, knotsi), bottom); // (x - knots[i]) / bottom;
-  r = simde_mm256_blendv_pd(r, zero, bottom_mask);
-  *boor_d0 = simde_mm256_mul_pd(r, *boor_d1);
-
-  *boor_d0 = simde_mm256_blendv_pd(*boor_d0, zero, bottom_mask);
-
-  bottom = simde_mm256_sub_pd(knotsi_4, knotsi_1); // bottom = knots[i + 4] - knots[i + 1];
-  bottom_mask = simde_mm256_cmp_pd(bottom, zero, SIMDE_CMP_EQ_OQ);
-  r = simde_mm256_div_pd(simde_mm256_sub_pd(knotsi_4, x_), bottom);  // (knots[i + 4] - x) / bottom
-  r = simde_mm256_blendv_pd(r, zero, bottom_mask);
-
-  *boor_d0 = simde_mm256_fmadd_pd(r, boor_d1i_1, *boor_d0);
-}
-
-// SYMBOL "blazing_printvec"
-template<typename T1>
-void casadi_blazing_printvec(simde__m256d e) {
-  double elements[4];
-  simde_mm256_storeu_pd(elements, e);
-  printf("mm256d: <%.4f %.4f %.4f %.4f>\n", elements[0], elements[1], elements[2], elements[3]);
-}
-
-// SYMBOL "blazing_nd_boor_eval_dim3"
-template<typename T1>
-void casadi_blazing_nd_boor_eval_dim3(T1* f, T1* J, T1* H, const T1* all_knots, const casadi_int* offset, const T1* c, const T1* dc, const T1* ddc, const T1* all_x, const casadi_int* lookup_mode, casadi_int* iw, T1* w) {
+void casadi_blazing_3d_boor_eval(T1* f, T1* J, T1* H, const T1* all_knots, const casadi_int* offset, const T1* c, const T1* dc, const T1* ddc, const T1* all_x, const casadi_int* lookup_mode, casadi_int* iw, T1* w) {
   casadi_int n_dims = 3;
   casadi_int m = 1;
   casadi_int n_iter, k, i, pivot;
@@ -169,7 +84,7 @@ void casadi_blazing_nd_boor_eval_dim3(T1* f, T1* J, T1* H, const T1* all_knots, 
         boor0_d3 = boor_start_0001;
       }
     }
-    casadi_blazing_de_boor_dim3(x, knots+start, &boor0_d0, &boor0_d1, &boor0_d2, boor0_d3);
+    casadi_blazing_de_boor(x, knots+start, &boor0_d0, &boor0_d1, &boor0_d2, boor0_d3);
 
     knots = all_knots + offset[1];
     n_knots = offset[1+1]-offset[1];
@@ -191,7 +106,7 @@ void casadi_blazing_nd_boor_eval_dim3(T1* f, T1* J, T1* H, const T1* all_knots, 
         boor1_d3 = boor_start_0001;
       }
     }
-    casadi_blazing_de_boor_dim3(x, knots+start, &boor1_d0, &boor1_d1, &boor1_d2, boor1_d3);
+    casadi_blazing_de_boor(x, knots+start, &boor1_d0, &boor1_d1, &boor1_d2, boor1_d3);
 
     knots = all_knots + offset[2];
     n_knots = offset[2+1]-offset[2];
@@ -213,7 +128,7 @@ void casadi_blazing_nd_boor_eval_dim3(T1* f, T1* J, T1* H, const T1* all_knots, 
         boor2_d3 = boor_start_0001;
       }
     }
-    casadi_blazing_de_boor_dim3(x, knots+start, &boor2_d0, &boor2_d1, &boor2_d2, boor2_d3);
+    casadi_blazing_de_boor(x, knots+start, &boor2_d0, &boor2_d1, &boor2_d2, boor2_d3);
 
   simde__m256d C[16];
 

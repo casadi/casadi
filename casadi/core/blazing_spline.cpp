@@ -177,7 +177,7 @@ namespace casadi {
   }
 
   void BlazingSplineFunction::codegen_body(CodeGenerator& g) const {
-    g.add_auxiliary(CodeGenerator::AUX_BLAZING_SPLINE);
+    g.add_auxiliary(CodeGenerator::AUX_BLAZING_3D_BOOR_EVAL);
     g.add_include("simde/x86/avx2.h");
     g.add_include("simde/x86/fma.h");
 
@@ -191,7 +191,7 @@ namespace casadi {
 
     if (diff_order_==0) {
       // Codegen function body
-      g << "casadi_blazing_nd_boor_eval_dim3(res[0], 0, 0, " +
+      g << "casadi_blazing_3d_boor_eval(res[0], 0, 0, " +
             knots_stacked + ", " +
             knots_offset + ", " +
             "arg[1], 0, 0, " + 
@@ -200,7 +200,7 @@ namespace casadi {
             "iw, w);\n";
     } else if (diff_order_==1) {
       // Codegen function body
-      g << "casadi_blazing_nd_boor_eval_dim3(res[0], res[1], 0, " +
+      g << "casadi_blazing_3d_boor_eval(res[0], res[1], 0, " +
             knots_stacked + ", " +
             knots_offset + ", " +
             "arg[1], arg[2], 0, " + 
@@ -209,7 +209,7 @@ namespace casadi {
             "iw, w);\n";
     } else if (diff_order_==2) {
       // Codegen function body
-      g << "casadi_blazing_nd_boor_eval_dim3(res[0], res[1], res[2], " +
+      g << "casadi_blazing_3d_boor_eval(res[0], res[1], res[2], " +
             knots_stacked + ", " +
             knots_offset + ", " +
             "arg[1], arg[2], arg[3], " + 
