@@ -624,7 +624,7 @@ int FmuInternal::eval_derivative(FmuMemory* m, bool independent_seeds) const {
     if (eval_ad(m)) return 1;
   }
   // Calculate derivatives using finite differences
-  if (!m->self.enable_ad_ || m->self.validate_ad_) {
+  if (!m->self.enable_ad_ || m->self.validate_forward_) {
     // Evaluate using FD
     if (eval_fd(m, independent_seeds)) return 1;
   }
@@ -803,7 +803,7 @@ int FmuInternal::eval_fd(FmuMemory* m, bool independent_seeds) const {
     // Correct sign, if necessary
     if (m->flip_[wrt_i]) d_fd = -d_fd;
     // Use FD instead of AD or to compare with AD
-    if (m->self.validate_ad_) {
+    if (m->self.validate_forward_) {
       // Value to compare with
       double d_ad = m->sens_[id];
       // Nominal value used as seed

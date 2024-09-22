@@ -157,8 +157,14 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   // What blocks exist?
   bool has_jac_, has_fwd_, has_adj_, has_hess_;
 
+  // Merge with enable_forward_ in FunctionInternal
+  bool enable_ad_;
+
+  // Validate derivative calculations: Move to base class?
+  bool validate_forward_, check_hessian_;
+
   // User-set options
-  bool enable_ad_, validate_ad_, make_symmetric_, check_hessian_;
+  bool make_symmetric_;
   double step_, abstol_, reltol_;
   bool print_progress_, new_jacobian_, new_forward_, new_hessian_, hessian_coloring_;
   std::string validate_ad_file_;

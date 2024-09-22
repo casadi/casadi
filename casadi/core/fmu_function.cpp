@@ -125,7 +125,7 @@ FmuFunction::FmuFunction(const std::string& name, const Fmu& fmu,
   name_out_ = name_out;
   // Default options
   enable_ad_ = fmu.has_fwd();
-  validate_ad_ = false;
+  validate_forward_ = false;
   validate_ad_file_ = "";
   make_symmetric_ = true;
   check_hessian_ = false;
@@ -177,9 +177,12 @@ const Options FmuFunction::options_
     {"enable_ad",
      {OT_BOOL,
       "Calculate first order derivatives using FMU directional derivative support"}},
+    {"validate_forward",
+     {OT_BOOL,
+      "Compare forward derivatives with finite differences for validation"}},
     {"validate_ad",
      {OT_BOOL,
-      "Compare analytic derivatives with finite differences for validation"}},
+      "[Deprecated] Renamed 'validate_forward'"}},
     {"validate_ad_file",
      {OT_STRING,
       "Redirect results of Hessian validation to a file instead of generating a warning"}},
@@ -222,8 +225,11 @@ void FmuFunction::init(const Dict& opts) {
   for (auto&& op : opts) {
     if (op.first=="enable_ad") {
       enable_ad_ = op.second;
+    } else if (op.first=="validate_forward") {
+      validate_forward_ = op.second;
     } else if (op.first=="validate_ad") {
-      validate_ad_ = op.second;
+      casadi_warning("Option 'validate_ad' has been renamed 'validate_forward'");
+      validate_forward_ = op.second;
     } else if (op.first=="validate_ad_file") {
       validate_ad_file_ = op.second.to_string();
     } else if (op.first=="check_hessian") {
@@ -258,7 +264,7 @@ void FmuFunction::init(const Dict& opts) {
   // Consistency checks
   if (enable_ad_) casadi_assert(fmu_.has_fwd(),
     "FMU does not provide support for analytic derivatives");
-  if (validate_ad_ && !enable_ad_) casadi_error("Inconsistent options");
+  if (validate_forward_ && !enable_ad_) casadi_error("Inconsistent options");
 
   // New AD validation file, if any
   if (!validate_ad_file_.empty()) {
@@ -1472,7 +1478,7 @@ Dict FmuFunction::get_stats(void *mem) const {
 
 void FmuFunction::serialize_body(SerializingStream &s) const {
   FunctionInternal::serialize_body(s);
-  s.version("FmuFunction", 2);
+  s.version("FmuFunction", 3);
 
   s.pack("FmuFunction::Fmu", fmu_);
 
@@ -1503,7 +1509,7 @@ void FmuFunction::serialize_body(SerializingStream &s) const {
   s.pack("FmuFunction::has_hess", has_hess_);
 
   s.pack("FmuFunction::enable_ad", enable_ad_);
-  s.pack("FmuFunction::validate_ad", validate_ad_);
+  s.pack("FmuFunction::validate_forward", validate_forward_);
   s.pack("FmuFunction::make_symmetric", make_symmetric_);
   s.pack("FmuFunction::check_hessian", check_hessian_);
   s.pack("FmuFunction::step", step_);
@@ -1534,7 +1540,7 @@ void FmuFunction::serialize_body(SerializingStream &s) const {
 }
 
 FmuFunction::FmuFunction(DeserializingStream& s) : FunctionInternal(s) {
-  int version = s.version("FmuFunction", 1, 2);
+  s.version("FmuFunction", 3);
 
   s.unpack("FmuFunction::Fmu", fmu_);
 
@@ -1571,7 +1577,7 @@ FmuFunction::FmuFunction(DeserializingStream& s) : FunctionInternal(s) {
   s.unpack("FmuFunction::has_hess", has_hess_);
 
   s.unpack("FmuFunction::enable_ad", enable_ad_);
-  s.unpack("FmuFunction::validate_ad", validate_ad_);
+  s.unpack("FmuFunction::validate_forward", validate_forward_);
   s.unpack("FmuFunction::make_symmetric", make_symmetric_);
   s.unpack("FmuFunction::check_hessian", check_hessian_);
   s.unpack("FmuFunction::step", step_);
@@ -1579,7 +1585,7 @@ FmuFunction::FmuFunction(DeserializingStream& s) : FunctionInternal(s) {
   s.unpack("FmuFunction::reltol", reltol_);
   s.unpack("FmuFunction::print_progress", print_progress_);
   s.unpack("FmuFunction::new_jacobian", new_jacobian_);
-  if (version >= 2) s.unpack("FmuFunction::new_forward", new_forward_);
+  s.unpack("FmuFunction::new_forward", new_forward_);
   s.unpack("FmuFunction::new_hessian", new_hessian_);
   s.unpack("FmuFunction::hessian_coloring", hessian_coloring_);
   s.unpack("FmuFunction::validate_ad_file", validate_ad_file_);
