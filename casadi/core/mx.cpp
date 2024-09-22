@@ -1479,6 +1479,12 @@ namespace casadi {
     }
     if (all_equal) return ex;
 
+    // Validate dimensions
+    for (casadi_int i=0;i<v.size();++i) {
+      casadi_assert(v[i].size()==vdef[i].size(),
+        "Inconsistent shapes for i = " + str(i) + ": v[i] " + v[i].dim() + " <-> vdef[i] " + vdef[i].dim());
+    }
+
     // Sort the expression
     Dict opts({{"max_io", 0}, {"allow_free", true}});
     Function f("tmp_graph_substitute", std::vector<MX>{}, ex, opts);
