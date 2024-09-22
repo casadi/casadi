@@ -161,7 +161,7 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   bool enable_ad_;
 
   // Validate derivative calculations: Move to base class?
-  bool validate_forward_, check_hessian_;
+  bool validate_forward_, validate_hessian_;
 
   // User-set options
   bool make_symmetric_;

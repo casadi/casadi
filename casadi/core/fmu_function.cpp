@@ -126,9 +126,9 @@ FmuFunction::FmuFunction(const std::string& name, const Fmu& fmu,
   // Default options
   enable_ad_ = fmu.has_fwd();
   validate_forward_ = false;
+  validate_hessian_ = false;
   validate_ad_file_ = "";
   make_symmetric_ = true;
-  check_hessian_ = false;
   // Use FD for second and higher order derivatives
   enable_fd_op_ = fmu.has_fwd() && !all_regular();
   step_ = 1e-6;
@@ -180,15 +180,18 @@ const Options FmuFunction::options_
     {"validate_forward",
      {OT_BOOL,
       "Compare forward derivatives with finite differences for validation"}},
+    {"validate_hessian",
+     {OT_BOOL,
+      "Validate entries of the Hessian for self-consistency"}},
     {"validate_ad",
      {OT_BOOL,
-      "[Deprecated] Renamed 'validate_forward'"}},
+      "[DEPRECATED] Renamed 'validate_forward'"}},
     {"validate_ad_file",
      {OT_STRING,
       "Redirect results of Hessian validation to a file instead of generating a warning"}},
     {"check_hessian",
      {OT_BOOL,
-      "Symmetry check for Hessian"}},
+      "[DEPRECATED] Renamed 'validate_hessian'"}},
     {"make_symmetric",
      {OT_BOOL,
       "Ensure Hessian is symmetric"}},
@@ -227,13 +230,16 @@ void FmuFunction::init(const Dict& opts) {
       enable_ad_ = op.second;
     } else if (op.first=="validate_forward") {
       validate_forward_ = op.second;
+    } else if (op.first=="validate_hessian") {
+      validate_hessian_ = op.second;
     } else if (op.first=="validate_ad") {
       casadi_warning("Option 'validate_ad' has been renamed 'validate_forward'");
       validate_forward_ = op.second;
+    } else if (op.first=="check_hessian") {
+      casadi_warning("Option 'check_hessian' has been renamed 'validate_hessian'");
+      validate_hessian_ = op.second;
     } else if (op.first=="validate_ad_file") {
       validate_ad_file_ = op.second.to_string();
-    } else if (op.first=="check_hessian") {
-      check_hessian_ = op.second;
     } else if (op.first=="make_symmetric") {
       make_symmetric_ = op.second;
     } else if (op.first=="step") {
@@ -874,7 +880,7 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
     if (eval_all(m, max_hess_tasks_, false, false, false, false, true)) return 1;
     // Post-process Hessian
     remove_nans(hess_nz, iw);
-    if (check_hessian_) check_hessian(m, hess_nz, iw);
+    if (validate_hessian_) check_hessian(m, hess_nz, iw);
     if (make_symmetric_) make_symmetric(hess_nz, iw);
   }
   // Fetch calculated blocks
@@ -1510,8 +1516,8 @@ void FmuFunction::serialize_body(SerializingStream &s) const {
 
   s.pack("FmuFunction::enable_ad", enable_ad_);
   s.pack("FmuFunction::validate_forward", validate_forward_);
+  s.pack("FmuFunction::validate_hessian", validate_hessian_);
   s.pack("FmuFunction::make_symmetric", make_symmetric_);
-  s.pack("FmuFunction::check_hessian", check_hessian_);
   s.pack("FmuFunction::step", step_);
   s.pack("FmuFunction::abstol", abstol_);
   s.pack("FmuFunction::reltol", reltol_);
@@ -1578,8 +1584,8 @@ FmuFunction::FmuFunction(DeserializingStream& s) : FunctionInternal(s) {
 
   s.unpack("FmuFunction::enable_ad", enable_ad_);
   s.unpack("FmuFunction::validate_forward", validate_forward_);
+  s.unpack("FmuFunction::validate_hessian", validate_hessian_);
   s.unpack("FmuFunction::make_symmetric", make_symmetric_);
-  s.unpack("FmuFunction::check_hessian", check_hessian_);
   s.unpack("FmuFunction::step", step_);
   s.unpack("FmuFunction::abstol", abstol_);
   s.unpack("FmuFunction::reltol", reltol_);
