@@ -210,12 +210,15 @@ const Options FmuFunction::options_
     {"print_progress",
      {OT_BOOL,
       "Print progress during Jacobian/Hessian evaluation"}},
+    {"new_forward",
+     {OT_BOOL,
+      "Use forward AD implementation in class (conversion option, to be removed)"}},
     {"new_jacobian",
      {OT_BOOL,
-      "Use Jacobian implementation in class"}},
+      "Use Jacobian implementation in class (conversion option, to be removed)"}},
     {"new_hessian",
      {OT_BOOL,
-      "Use Hessian implementation in class"}},
+      "Use Hessian implementation in class (conversion option, to be removed)"}},
     {"hessian_coloring",
      {OT_BOOL,
       "Enable the use of graph coloring (star coloring) for Hessian calculation. "
@@ -252,6 +255,8 @@ void FmuFunction::init(const Dict& opts) {
       parallelization_ = to_enum<Parallelization>(op.second, "serial");
     } else if (op.first=="print_progress") {
       print_progress_ = op.second;
+    } else if (op.first=="new_forward") {
+      new_forward_ = op.second;
     } else if (op.first=="new_jacobian") {
       new_jacobian_ = op.second;
     } else if (op.first=="new_hessian") {
