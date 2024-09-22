@@ -1812,6 +1812,64 @@ class MXtests(casadiTestCase):
 
     self.checkarray(F_out,9*DM.ones(4,4))
 
+  def test_graph_substitute_function(self):
+    x=MX.sym("x")
+    y=MX.sym("y")
+
+        
+    f = Function("forig",[x,y],[x*y,x-y,x+y],{"never_inline":True})
+    g = Function("fsubs",[x,y],[x*y,x-y,x+y],{"never_inline":True})
+    
+    sx = sin(x)
+    y2 = 2*y
+    
+    [a,b,c] = f(sx,y2)
+    
+    z = sqrt(a)+c**2
+    
+    # Substitute a single output of a call
+    z2 = graph_substitute(z,[a],[g(sx,y2)[0]])
+    
+    print(z2)
+    self.assertTrue("fsubs" in str(z2))
+    self.assertTrue("forig" in str(z2))
+    
+    F_ref = Function("F_ref",[x,y],[z])
+    F = Function("F",[x,y],[z2])
+    
+    self.checkfunction_light(F,F_ref,inputs=[3.1,7.1])
+
+    # Substitute a single output of a call
+    z2 = graph_substitute(z2,[b],[np.nan])
+    self.assertTrue("fsubs" in str(z2))
+    self.assertTrue("forig" in str(z2))
+    
+    F_ref = Function("F_ref",[x,y],[z])
+    F = Function("F",[x,y],[z2])
+    
+    self.checkfunction_light(F,F_ref,inputs=[3.1,7.1])
+
+    # Substitute a single output of a call
+    z2 = graph_substitute(z2,[c],[g(sx,y2)[2]])
+    self.assertTrue("fsubs" in str(z2))
+    self.assertFalse("forig" in str(z2))
+    
+    F_ref = Function("F_ref",[x,y],[z])
+    F = Function("F",[x,y],[z2])
+    
+    self.checkfunction_light(F,F_ref,inputs=[3.1,7.1])
+    
+    # Substitute the entire Multi-output call
+    
+    z2 = graph_substitute(z,[a.dep(0)],[g(sx,y2)[0].dep(0)])
+    
+    self.assertTrue("fsubs" in str(z2))
+    self.assertFalse("forig" in str(z2))
+
+    F_ref = Function("F_ref",[x,y],[z])
+    F = Function("F",[x,y],[z2])
+    
+    self.checkfunction_light(F,F_ref,inputs=[3.1,7.1])
 
   def test_matrix_expand(self):
     n = 2
@@ -3156,6 +3214,18 @@ class MXtests(casadiTestCase):
         
         res = f3(a)
         self.checkarray(a,res)
+        
+        
+  def test_cache_output_node(self):
+    x = MX.sym("x")
+    y = MX.sym("y")
+    f = Function("f",[x,y],[x+y,x/y])
+    
+    [a,b] = f(sin(x),cos(y))
+    base = a.dep(0)
+    self.assertTrue(hash(a),hash(base.get_output(0)))
+    self.assertTrue(hash(b),hash(base.get_output(1)))
+    
     
 
 if __name__ == '__main__':
