@@ -124,13 +124,14 @@ FmuFunction::FmuFunction(const std::string& name, const Fmu& fmu,
   name_in_ = name_in;
   name_out_ = name_out;
   // Default options
-  uses_directional_derivatives_ = fmu.has_fwd();
+  uses_directional_derivatives_ = fmu.provides_directional_derivatives();
+  uses_adjoint_derivatives_ = fmu.provides_adjoint_derivatives();
   validate_forward_ = false;
   validate_hessian_ = false;
   validate_ad_file_ = "";
   make_symmetric_ = true;
   // Use FD for second and higher order derivatives
-  enable_fd_op_ = fmu.has_fwd() && !all_regular();
+  enable_fd_op_ = fmu.provides_directional_derivatives() && !all_regular();
   step_ = 1e-6;
   abstol_ = 1e-3;
   reltol_ = 1e-3;
@@ -237,6 +238,8 @@ void FmuFunction::init(const Dict& opts) {
       uses_directional_derivatives_ = op.second;
     } else if (op.first=="uses_directional_derivatives") {
       uses_directional_derivatives_ = op.second;
+    } else if (op.first=="uses_adjoint_derivatives") {
+      uses_adjoint_derivatives_ = op.second;
     } else if (op.first=="validate_forward") {
       validate_forward_ = op.second;
     } else if (op.first=="validate_hessian") {
@@ -279,9 +282,11 @@ void FmuFunction::init(const Dict& opts) {
   fd_ = to_enum<FdMode>(fd_method_, "forward");
 
   // Consistency checks
-  if (uses_directional_derivatives_) casadi_assert(fmu_.has_fwd(),
+  if (uses_directional_derivatives_) casadi_assert(fmu_.provides_directional_derivatives(),
     "FMU does not provide support for analytic derivatives");
   if (validate_forward_ && !uses_directional_derivatives_) casadi_error("Inconsistent options");
+  if (uses_adjoint_derivatives_) casadi_assert(fmu_.provides_adjoint_derivatives(),
+    "FMU does not provide support for adjoint derivatives");
 
   // New AD validation file, if any
   if (!validate_ad_file_.empty()) {
@@ -1526,6 +1531,7 @@ void FmuFunction::serialize_body(SerializingStream &s) const {
   s.pack("FmuFunction::has_hess", has_hess_);
 
   s.pack("FmuFunction::uses_directional_derivatives", uses_directional_derivatives_);
+  s.pack("FmuFunction::uses_adjoint_derivatives", uses_adjoint_derivatives_);
   s.pack("FmuFunction::validate_forward", validate_forward_);
   s.pack("FmuFunction::validate_hessian", validate_hessian_);
   s.pack("FmuFunction::make_symmetric", make_symmetric_);
@@ -1594,6 +1600,7 @@ FmuFunction::FmuFunction(DeserializingStream& s) : FunctionInternal(s) {
   s.unpack("FmuFunction::has_hess", has_hess_);
 
   s.unpack("FmuFunction::uses_directional_derivatives_", uses_directional_derivatives_);
+  s.unpack("FmuFunction::uses_adjoint_derivatives", uses_adjoint_derivatives_);
   s.unpack("FmuFunction::validate_forward", validate_forward_);
   s.unpack("FmuFunction::validate_hessian", validate_hessian_);
   s.unpack("FmuFunction::make_symmetric", make_symmetric_);

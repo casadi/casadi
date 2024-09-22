@@ -206,19 +206,19 @@ std::string Fmu::desc_in(FmuMemory* m, size_t id, bool more) const {
   }
 }
 
-bool Fmu::has_fwd() const {
+bool Fmu::provides_directional_derivatives() const {
   try {
-    return (*this)->has_fwd();
+    return (*this)->provides_directional_derivatives_;
   } catch(std::exception& e) {
-    THROW_ERROR("has_fwd", e.what());
+    THROW_ERROR("provides_directional_derivatives", e.what());
   }
 }
 
-bool Fmu::has_adj() const {
+bool Fmu::provides_adjoint_derivatives() const {
   try {
-    return (*this)->has_adj();
+    return (*this)->provides_adjoint_derivatives_;
   } catch(std::exception& e) {
-    THROW_ERROR("has_adj", e.what());
+    THROW_ERROR("provides_adjoint_derivatives", e.what());
   }
 }
 
