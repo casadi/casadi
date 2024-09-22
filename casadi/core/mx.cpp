@@ -2244,16 +2244,7 @@ namespace casadi {
       for (const auto& e : function_cache) {
         e.second->merge(res, subs_from, subs_to);
       }
-
-      uout() << "subs_from" << subs_from << std::endl;
-      uout() << "subs_to" << subs_to << std::endl;
-
-      uout() << "before" << res << std::endl;
-
-
       orig = graph_substitute(res, subs_from, subs_to, updated);
-      uout() << "after" << res << std::endl;
-
     }
 
     return orig;

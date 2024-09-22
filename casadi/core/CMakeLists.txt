@@ -67,6 +67,7 @@ set(CASADI_PUBLIC
   expm.hpp
   code_generator.hpp
   importer.hpp
+  blazing_spline.hpp
 
   # MISC useful stuff
   integration_tools.hpp
@@ -189,6 +190,7 @@ set(CASADI_INTERNAL
   mapsum.hpp              mapsum.cpp
   finite_differences.hpp  finite_differences.cpp
   importer.cpp            importer_internal.hpp importer_internal.cpp
+  blazing_spline.cpp blazing_spline_impl.hpp
 
   # MISC useful stuff
   integration_tools.cpp
@@ -205,15 +207,6 @@ set(CASADI_INTERNAL
   # Runtime headers
   runtime/casadi_runtime.hpp
 )
-
-if(WITH_SIMDE)
-  set(CASADI_INTERNAL ${CASADI_INTERNAL}
-    blazing_spline.cpp blazing_spline_impl.hpp
-  )
-  set(CASADI_PUBLIC ${CASADI_PUBLIC}
-    blazing_spline.hpp
-  )
-endif()
 
 add_executable(casadi-cli casadi_cli.cpp)
 target_link_libraries(casadi-cli casadi)

@@ -268,8 +268,6 @@ namespace casadi {
       tocache(fJ);
     }
 
-    uout() << "fJ" << fJ << std::endl;
-
     if (diff_order_==0) {
       std::vector<MX> ret = fJ(std::vector<MX>{x, C, dC});
 
@@ -373,7 +371,6 @@ namespace casadi {
             targets0[key].push_back(e);
           } else if (fun->derivative_of_==base) {
             targets1[key].push_back(e);
-            uout() << "here " << fun.get() << std::endl;
           } else if (fun->derivative_of_->derivative_of_==base) {
             targets2.push_back(e);
           }
@@ -397,9 +394,6 @@ namespace casadi {
 
       // Compute key of all but last args
       key = ss.generate_id(vector_init(vector_init(e->dep_)), 0);
-
-      uout() << "key in" << vector_init(vector_init(e->dep_)) << std::endl;
-      uout() << "key" << key << std::endl;
 
       // Loop over all matching target1 entries
       for (const auto& ee : targets0[key]) {

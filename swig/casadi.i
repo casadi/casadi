@@ -4266,9 +4266,7 @@ namespace casadi{
 %include <casadi/core/dple.hpp>
 %include <casadi/core/expm.hpp>
 %include <casadi/core/interpolant.hpp>
-#ifdef CASADI_WITH_SIMDE
 %include <casadi/core/blazing_spline.hpp>
-#endif
 
 %feature("copyctor", "0") casadi::CodeGenerator;
 %include <casadi/core/code_generator.hpp>

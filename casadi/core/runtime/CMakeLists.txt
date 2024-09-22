@@ -77,12 +77,8 @@ set(RUNTIME_SRC
   casadi_oracle_callback.hpp
   casadi_ocp_block.hpp
   casadi_scaled_copy.hpp
+  casadi_blazing_spline.hpp
 )
-if(WITH_SIMDE)
-  set(RUNTIME_SRC ${RUNTIME_SRC}
-    casadi_blazing_spline.hpp
-    )
-endif()
 
 set(CASADI_RUNTIME_SRC "${RUNTIME_SRC}" PARENT_SCOPE)
 
