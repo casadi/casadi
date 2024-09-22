@@ -400,6 +400,9 @@ namespace casadi {
     /// Set multiple dependencies
     void set_dep(const std::vector<MX>& dep);
 
+    /// Check validatity of dependencies
+    void check_dep() const;
+
     /// Convert scalar to matrix
     inline static MX to_matrix(const MX& x, const Sparsity& sp) {
       if (x.size()==sp.size()) {
