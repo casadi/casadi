@@ -645,11 +645,11 @@ namespace casadi {
     static MX graph_substitute(const MX& x, const std::vector<MX> &v,
                                const std::vector<MX> &vdef, bool& updated);
     static std::vector<MX> graph_substitute(const std::vector<MX> &ex,
-                                            const std::vector<MX> &expr,
-                                            const std::vector<MX> &exprs);
+                                            const std::vector<MX> &v,
+                                            const std::vector<MX> &vdef);
     static std::vector<MX> graph_substitute(const std::vector<MX> &ex,
-                                            const std::vector<MX> &expr,
-                                            const std::vector<MX> &exprs,
+                                            const std::vector<MX> &v,
+                                            const std::vector<MX> &vdef,
                                             bool& updated);
     static MX matrix_expand(const MX& e, const std::vector<MX> &boundary,
                             const Dict& options);

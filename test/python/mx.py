@@ -1824,6 +1824,22 @@ class MXtests(casadiTestCase):
     x=MX.sym("x")
     y=MX.sym("y")
 
+
+        
+    f = Function("forig",[x,y],[x*y],{"never_inline":True})
+    g = Function("fsubs",[x,y],[x*y],{"never_inline":True})
+    
+    sx = sin(x)
+    y2 = 2*y
+    
+    a = f(sx,y2)
+    
+    x2 = x**2
+    
+    z = sqrt(x2*a)+a**2
+    print(z)
+    z2 = graph_substitute(z,[x2],[x])
+    print(z2)
         
     f = Function("forig",[x,y],[x*y,x-y,x+y],{"never_inline":True})
     g = Function("fsubs",[x,y],[x*y,x-y,x+y],{"never_inline":True})
@@ -1834,6 +1850,9 @@ class MXtests(casadiTestCase):
     [a,b,c] = f(sx,y2)
     
     z = sqrt(a)+c**2
+    print(z)
+    z2 = graph_substitute(z,[],[])
+    print(z2)
     
     # Substitute a single output of a call
     z2 = graph_substitute(z,[a],[g(sx,y2)[0]])
@@ -1878,6 +1897,9 @@ class MXtests(casadiTestCase):
     F = Function("F",[x,y],[z2])
     
     self.checkfunction_light(F,F_ref,inputs=[3.1,7.1])
+    
+    
+    
 
   def test_matrix_expand(self):
     n = 2
@@ -3251,6 +3273,15 @@ class MXtests(casadiTestCase):
 
     with self.assertInException("get_output"):
         3*base
+        
+  def test_substitute(self):
+    x = MX.sym("x")
+    y = MX.sym("y")
+    w = MX.sym("w")
+    
+    z = x*y+w
+    z2 = substitute([z],[w],[3])[0]
+    self.assertEqual(hash(z),hash(z2.dep(1)))
 
 if __name__ == '__main__':
     unittest.main()

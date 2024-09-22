@@ -1449,18 +1449,30 @@ namespace casadi {
   }
 
   std::vector<MX> MX::graph_substitute(const std::vector<MX>& ex,
-                                       const std::vector<MX>& expr,
-                                       const std::vector<MX>& exprs) {
+                                       const std::vector<MX>& v,
+                                       const std::vector<MX>& vdef) {
     bool updated;
-    return graph_substitute(ex, expr, exprs, updated);
+    return graph_substitute(ex, v, vdef, updated);
   }
   std::vector<MX> MX::graph_substitute(const std::vector<MX>& ex,
-                                       const std::vector<MX>& expr,
-                                       const std::vector<MX>& exprs,
+                                       const std::vector<MX>& v,
+                                       const std::vector<MX>& vdef,
                                        bool& updated) {
-    casadi_assert(expr.size()==exprs.size(),
+    casadi_assert(v.size()==vdef.size(),
       "Mismatch in the number of expression to substitute: "
-      + str(expr.size()) + " <-> " + str(exprs.size()) + ".");
+      + str(v.size()) + " <-> " + str(vdef.size()) + ".");
+
+    updated = false;
+
+    // Quick return if all equal
+    bool all_equal = true;
+    for (casadi_int k=0; k<v.size(); ++k) {
+      if (v[k].size()!=vdef[k].size() || !is_equal(v[k], vdef[k])) {
+        all_equal = false;
+        break;
+      }
+    }
+    if (all_equal) return ex;
 
     // Sort the expression
     Dict opts({{"max_io", 0}, {"allow_free", true}});
@@ -1480,13 +1492,13 @@ namespace casadi {
     // Construct lookup table for expressions,
     // giving priority to first occurances
     std::map<const MXNode*, casadi_int> expr_lookup;
-    for (casadi_int i=0;i<expr.size();++i) {
-      auto it = expr_lookup.find(expr[i].operator->());
-      if (it==expr_lookup.end()) expr_lookup[expr[i].operator->()] = i;
+    for (casadi_int i=0;i<v.size();++i) {
+      auto it = expr_lookup.find(v[i].operator->());
+      if (it==expr_lookup.end()) expr_lookup[v[i].operator->()] = i;
     }
 
     // Construct found map
-    std::vector<bool> expr_found(expr.size(), false);
+    std::vector<bool> expr_found(v.size(), false);
 
     // Allocate output vector
     std::vector<MX> f_out(f.n_out());
@@ -1495,7 +1507,7 @@ namespace casadi {
     // expr_lookup iterator
     std::map<const MXNode*, casadi_int>::const_iterator it_lookup;
 
-    // Output segments
+    // Allocate storage for split outputs
     std::vector<std::vector<MX>> out_split(ex.size());
     for (casadi_int i = 0; i < out_split.size(); ++i) out_split[i].resize(ex[i].n_primitives());
 
@@ -1507,7 +1519,7 @@ namespace casadi {
 
         if (it_lookup!=expr_lookup.end()) {
           // Fill in that expression in-place
-          MX e = exprs[it_lookup->second];
+          MX e = vdef[it_lookup->second];
 
           // If node is of a MultipleOutput type
           if (e->has_output()) {
@@ -1536,7 +1548,7 @@ namespace casadi {
               it_lookup = expr_lookup.find(out.operator->());
               if (it_lookup!=expr_lookup.end()) {
                 // Fill in that expression in-place
-                MX e = exprs[it_lookup->second];
+                MX e = vdef[it_lookup->second];
                 swork[k] = e;
                 tainted[k] = true;
                 any_tainted = true;
@@ -1573,8 +1585,14 @@ namespace casadi {
 
           // Perform the operation
           ores.resize(it->res.size());
-          if (it->res.size()==1 && it->res[0]>=0 && !node_tainted) {
-            ores.at(0) = it->data;
+          if (!node_tainted) {
+            if (it->data.has_output()) {
+              for (casadi_int i=0;i<it->res.size();++i) {
+                ores.at(i) = it->data.get_output(i);
+              }
+            } else {
+              ores.at(0) = it->data;
+            }
           } else {
             it->data->eval_mx(oarg, ores);
           }
@@ -1595,7 +1613,7 @@ namespace casadi {
     }
 
     bool all_found=true;
-    for (casadi_int i=0;i<expr.size();++i) {
+    for (casadi_int i=0;i<v.size();++i) {
       all_found = all_found && expr_found[i];
     }
 
