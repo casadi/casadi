@@ -3439,6 +3439,9 @@
 %exception  casadi::MX::graph_substitute(const std::vector< MX > &ex, const std::vector< MX > &v, const std::vector< MX > &vdef) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::MX::has_output() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::MX::hessian(const MX &f, const MX &x, MX &g, const Dict &opts=Dict()) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -5876,6 +5879,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::update_dict(Dict &target, const Dict &source, bool recurse=false) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::vector_init(const std::vector< T > &v) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::vector_slice(const std::vector< T > &v, const std::vector< casadi_int > &i) {

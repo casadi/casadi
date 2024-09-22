@@ -150,7 +150,9 @@ private:
   template<typename T>
   std::vector<T> vector_tail(const std::vector<T> &v);
 
-  /**  \brief Return all but the last element of a vector */
+  /**  \brief Return all but the last element of a vector
+
+       \identifier{285} */
   template<typename T>
   std::vector<T> vector_init(const std::vector<T> &v);
 
