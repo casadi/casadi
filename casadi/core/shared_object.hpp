@@ -264,6 +264,44 @@ namespace casadi {
 #endif // SWIG
 
 
+template<typename K, typename T>
+class CASADI_EXPORT WeakCache {
+  public:
+    void tocache(const K& key, const T& f) const {
+      // Add to cache
+      cache_.insert(std::make_pair(key, f));
+      // Remove a lost reference, if any, to prevent uncontrolled growth
+      for (auto it = cache_.begin(); it!=cache_.end(); ++it) {
+        if (!it->second.alive()) {
+          cache_.erase(it);
+          break; // just one dead reference is enough
+        }
+      }
+    }
+    bool incache(const K& key, T& f) const {
+      auto it = cache_.find(key);
+      if (it!=cache_.end() && it->second.alive()) {
+        f = shared_cast<T>(it->second.shared());
+        return true;
+      } else {
+        return false;
+      }
+    }
+    void cache(std::vector<K>& keys, std::vector<T>& entries) const {
+      keys.clear();
+      entries.clear();
+      // Add all entries that haven't been deleted
+      for (auto&& cf : cache_) {
+        if (cf.second.alive()) {
+          keys.push_back(cf.first);
+          entries.push_back(shared_cast<T>(cf.second.shared()));
+        }
+      }
+    }
+  private:
+    mutable std::map<K, WeakRef> cache_;
+};
+
 } // namespace casadi
 
 
