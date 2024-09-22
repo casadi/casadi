@@ -118,10 +118,10 @@ class CASADI_EXPORT FmuInternal : public SharedObjectInternal {
   size_t index_out(const std::string& n) const;
 
   // Does the FMU support analytic forward derivatives?
-  virtual bool has_fwd() const {return false;}
+  bool has_fwd() const {return provides_directional_derivatives_;}
 
   // Does the FMU support analytic adjoint derivatives?
-  virtual bool has_adj() const {return false;}
+  bool has_adj() const {return provides_adjoint_derivatives_;}
 
   // Get Jacobian sparsity for a subset of inputs and outputs
   Sparsity jac_sparsity(const std::vector<size_t>& osub, const std::vector<size_t>& isub) const;

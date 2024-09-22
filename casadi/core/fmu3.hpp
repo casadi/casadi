@@ -101,12 +101,6 @@ class CASADI_EXPORT Fmu3 : public FmuInternal {
 
   Value aux_value_;
 
-  // Does the FMU support analytic forward derivatives?
-  bool has_fwd() const override { return get_directional_derivative_ != nullptr; }
-
-  // Does the FMU support analytic adjoint derivatives?
-  bool has_adj() const override { return get_adjoint_derivative_ != nullptr; }
-
   // Name of system, per the FMI specification
   std::string system_infix() const override;
 
