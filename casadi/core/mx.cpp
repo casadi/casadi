@@ -1495,6 +1495,10 @@ namespace casadi {
     // expr_lookup iterator
     std::map<const MXNode*, casadi_int>::const_iterator it_lookup;
 
+    // Output segments
+    std::vector<std::vector<MX>> out_split(ex.size());
+    for (casadi_int i = 0; i < out_split.size(); ++i) out_split[i].resize(ex[i].n_primitives());
+
     for (auto it=algorithm.begin(); it!=algorithm.end(); ++it) {
 
       if (it->op != OP_OUTPUT) {
@@ -1553,8 +1557,7 @@ namespace casadi {
         tainted[it->res.front()] = false;
         break;
       case OP_OUTPUT:
-        casadi_assert(it->data->segment()==0, "Not implemented");
-        f_out[it->data->ind()] = swork[it->arg.front()];
+        out_split.at(it->data->ind()).at(it->data->segment()) = swork[it->arg.front()];
         break;
       default:
         {
@@ -1584,6 +1587,11 @@ namespace casadi {
           }
         }
       }
+    }
+
+    // Join primitives
+    for (size_t k = 0; k < out_split.size(); ++k) {
+      f_out[k] = ex[k].join_primitives(out_split.at(k));
     }
 
     bool all_found=true;
