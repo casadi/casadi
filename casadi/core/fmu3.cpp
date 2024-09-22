@@ -160,12 +160,6 @@ void Fmu3::init(const DaeBuilderInternal* dae) {
   aux_value_.v_integer.resize(vn_aux_integer_.size());
   aux_value_.v_boolean.resize(vn_aux_boolean_.size());
   aux_value_.v_string.resize(vn_aux_string_.size());
-
-  // Get Jacobian sparsity information
-  jac_sp_ = dae->jac_sparsity(oind_, iind_);
-
-  // Get Hessian sparsity information
-  hess_sp_ = dae->hess_sparsity(oind_, iind_);
 }
 
 void Fmu3::load_functions() {

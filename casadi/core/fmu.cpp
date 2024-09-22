@@ -476,6 +476,12 @@ void FmuInternal::init(const DaeBuilderInternal* dae) {
 
   // Numerical values for inputs
   value_in_.resize(iind_.size());
+
+  // Get Jacobian sparsity information
+  jac_sp_ = dae->jac_sparsity(oind_, iind_);
+
+  // Get Hessian sparsity information
+  hess_sp_ = dae->hess_sparsity(oind_, iind_);
 }
 
 int FmuInternal::get_adjoint_derivative(void* instance, const unsigned int* vr_out, size_t n_out,
