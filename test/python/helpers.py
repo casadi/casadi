@@ -698,7 +698,8 @@ class casadiTestCase(unittest.TestCase):
       return (external(name, libname,opts),libname)
 
   def check_codegen(self,F,inputs=None, opts=None,std="c89",extralibs="",check_serialize=False,extra_options=None,main=False,main_return_code=0,definitions=None,with_jac_sparsity=False,external_opts=None,with_reverse=False,with_forward=False,extra_include=[],digits=15):
-
+    if not isinstance(main_return_code,list):
+        main_return_code = [main_return_code]
     if args.run_slow:
       import hashlib
       name = "codegen_%s" % (hashlib.md5(("%f" % np.random.random()+str(F)+str(time.time())).encode()).hexdigest())
