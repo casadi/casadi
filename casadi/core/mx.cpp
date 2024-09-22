@@ -124,7 +124,7 @@ namespace casadi {
     MX x =  MX::create(node);
     std::vector<MX> ret(x->nout());
     for (casadi_int i=0; i<ret.size(); ++i) {
-      ret[i] = MX::create(new OutputNode(x, i));
+      ret[i] = x.get_output(i);
       if (ret[i].is_empty(true)) {
         ret[i] = MX(0, 0);
       } else if (ret[i].nnz()==0) {
@@ -1508,9 +1508,10 @@ namespace casadi {
           // If node is of a MultipleOutput type
           if (e->has_output()) {
             for (casadi_int i=0;i<it->res.size();++i) {
-              if (it->res[i]!=-1) {
-                swork[it->res[i]] = e.get_output(i);
-                tainted[it->res[i]] = true;
+              casadi_int k = it->res[i];
+              if (k!=-1) {
+                swork[k] = e.get_output(i);
+                tainted[k] = true;
               }
             }
           } else {
@@ -1519,6 +1520,27 @@ namespace casadi {
           }
           expr_found[it_lookup->second] = true;
           continue;
+        } else if (it->data->has_output()) {
+          bool any_tainted = false;
+          // Loop over all oputputs of MultiOutput
+          for (casadi_int i=0;i<it->res.size();++i) {
+            // Create Output node (cached)
+            casadi_int k = it->res[i];
+            if (k!=-1) {
+              MX out = it->data.get_output(i);
+              // Check if out points to a supplied expr
+              it_lookup = expr_lookup.find(out.operator->());
+              if (it_lookup!=expr_lookup.end()) {
+                // Fill in that expression in-place
+                MX e = exprs[it_lookup->second];
+                swork[k] = e;
+                tainted[k] = true;
+                any_tainted = true;
+                expr_found[it_lookup->second] = true;
+              }
+            }
+          }
+          if (any_tainted) continue;
         }
       }
 
