@@ -226,12 +226,14 @@ namespace casadi {
   void MXNode::set_dep(const MX& dep) {
     dep_.resize(1);
     dep_[0] = dep;
+    check_dep();
   }
 
   void MXNode::set_dep(const MX& dep1, const MX& dep2) {
     dep_.resize(2);
     dep_[0] = dep1;
     dep_[1] = dep2;
+    check_dep();
   }
 
   void MXNode::set_dep(const MX& dep1, const MX& dep2, const MX& dep3) {
@@ -239,10 +241,22 @@ namespace casadi {
     dep_[0] = dep1;
     dep_[1] = dep2;
     dep_[2] = dep3;
+    check_dep();
   }
 
   void MXNode::set_dep(const std::vector<MX>& dep) {
     dep_ = dep;
+    check_dep();
+  }
+
+  void MXNode::check_dep() const {
+    for (const MX& e : dep_) {
+      if (e->has_output()) {
+        casadi_assert(is_output(),
+          "You cannot build an expression out of a MultipleOutput node. "
+          "You must select a concrete output by making a get_output() call.");
+      }
+    }
   }
 
   const Sparsity& MXNode::sparsity(casadi_int oind) const {

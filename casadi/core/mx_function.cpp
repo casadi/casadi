@@ -141,6 +141,13 @@ namespace casadi {
                             "Option 'default_in' has incorrect length");
     }
 
+    // Check if naked MultiOutput nodes are present
+    for (const MX& e : out_) {
+      casadi_assert(!e->has_output(),
+        "Function output contains MultiOutput nodes. "
+        "You must use get_output() to make a concrete instance.");
+    }
+
     if (cse_opt) out_ = cse(out_);
 
     // Stack used to sort the computational graph

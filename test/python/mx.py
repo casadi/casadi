@@ -3235,6 +3235,22 @@ class MXtests(casadiTestCase):
     self.assertTrue(hash(b),hash(base.get_output(1)))
     
     
+  def test_naked_call_function(self):
+    x = MX.sym("x")
+    y = MX.sym("y")
+    f = Function("f",[x,y],[x+y,x/y])
+    
+    [a,b] = f(sin(x),cos(y))
+    
+    
+
+    base = a.dep(0)
+
+    with self.assertInException("get_output"):
+        g = Function("g",[x,y],[base])
+
+    with self.assertInException("get_output"):
+        3*base
 
 if __name__ == '__main__':
     unittest.main()
