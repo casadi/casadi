@@ -1811,6 +1811,14 @@ class MXtests(casadiTestCase):
     F_out = F(4, 5)
 
     self.checkarray(F_out,9*DM.ones(4,4))
+    
+    z = vertcat(c,d,c+d)
+    
+    f = graph_substitute(z,[d],[D])
+    
+    F = Function("F", [x,y,b,D],[f])
+    F_ref = Function("F", [x,y,b,D],[vertcat(c,D,c+D)])
+    self.checkfunction_light(F,F_ref,inputs=[3,5,7,12])
 
   def test_graph_substitute_function(self):
     x=MX.sym("x")
