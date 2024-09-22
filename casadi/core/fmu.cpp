@@ -619,12 +619,12 @@ int FmuInternal::eval_derivative(FmuMemory* m, bool independent_seeds) const {
   // Gather input and output indices
   gather_sens(m);
   // Calculate derivatives using FMU directional derivative support
-  if (m->self.enable_ad_) {
+  if (m->self.uses_directional_derivatives_) {
     // Evaluate using AD
     if (eval_ad(m)) return 1;
   }
   // Calculate derivatives using finite differences
-  if (!m->self.enable_ad_ || m->self.validate_forward_) {
+  if (!m->self.uses_directional_derivatives_ || m->self.validate_forward_) {
     // Evaluate using FD
     if (eval_fd(m, independent_seeds)) return 1;
   }

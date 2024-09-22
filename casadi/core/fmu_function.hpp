@@ -157,8 +157,8 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   // What blocks exist?
   bool has_jac_, has_fwd_, has_adj_, has_hess_;
 
-  // Merge with enable_forward_ in FunctionInternal
-  bool enable_ad_;
+  // Override provides_directional_derivatives, provides_adjoint_derivatives
+  bool uses_directional_derivatives_;
 
   // Validate derivative calculations: Move to base class?
   bool validate_forward_, validate_hessian_;

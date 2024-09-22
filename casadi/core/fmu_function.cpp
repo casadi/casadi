@@ -124,7 +124,7 @@ FmuFunction::FmuFunction(const std::string& name, const Fmu& fmu,
   name_in_ = name_in;
   name_out_ = name_out;
   // Default options
-  enable_ad_ = fmu.has_fwd();
+  uses_directional_derivatives_ = fmu.has_fwd();
   validate_forward_ = false;
   validate_hessian_ = false;
   validate_ad_file_ = "";
@@ -176,7 +176,10 @@ const Options FmuFunction::options_
       "Auxilliary variables"}},
     {"enable_ad",
      {OT_BOOL,
-      "Calculate first order derivatives using FMU directional derivative support"}},
+      "[DEPRECATED] Renamed uses_directional_derivatives"}},
+    {"uses_directional_derivatives",
+     {OT_BOOL,
+      "Use the analytic forward directional derivative support in the FMU"}},
     {"validate_forward",
      {OT_BOOL,
       "Compare forward derivatives with finite differences for validation"}},
@@ -230,7 +233,10 @@ void FmuFunction::init(const Dict& opts) {
   // Read options
   for (auto&& op : opts) {
     if (op.first=="enable_ad") {
-      enable_ad_ = op.second;
+      casadi_warning("Option 'enable_ad' has been renamed 'uses_directional_derivatives'");
+      uses_directional_derivatives_ = op.second;
+    } else if (op.first=="uses_directional_derivatives") {
+      uses_directional_derivatives_ = op.second;
     } else if (op.first=="validate_forward") {
       validate_forward_ = op.second;
     } else if (op.first=="validate_hessian") {
@@ -273,9 +279,9 @@ void FmuFunction::init(const Dict& opts) {
   fd_ = to_enum<FdMode>(fd_method_, "forward");
 
   // Consistency checks
-  if (enable_ad_) casadi_assert(fmu_.has_fwd(),
+  if (uses_directional_derivatives_) casadi_assert(fmu_.has_fwd(),
     "FMU does not provide support for analytic derivatives");
-  if (validate_forward_ && !enable_ad_) casadi_error("Inconsistent options");
+  if (validate_forward_ && !uses_directional_derivatives_) casadi_error("Inconsistent options");
 
   // New AD validation file, if any
   if (!validate_ad_file_.empty()) {
@@ -306,7 +312,7 @@ void FmuFunction::init(const Dict& opts) {
   }
 
   // Forward derivatives only supported with analytic derivatives
-  if (has_fwd_ && !enable_ad_)
+  if (has_fwd_ && !uses_directional_derivatives_)
     casadi_error("Analytic derivatives needed for forward directional derivatives");
 
   // Quick return if no Jacobian calculation
@@ -1385,7 +1391,7 @@ bool FmuFunction::has_forward(casadi_int nfwd) const {
   // Only first order analytic derivative possible
   if (!all_regular()) return false;
   // FD to get forward directional derivatives not implemented
-  if (!enable_ad_) return false;
+  if (!uses_directional_derivatives_) return false;
   // Otherwise: Only 1 direction implemented
   return nfwd == 1;
 }
@@ -1519,7 +1525,7 @@ void FmuFunction::serialize_body(SerializingStream &s) const {
   s.pack("FmuFunction::has_adj", has_adj_);
   s.pack("FmuFunction::has_hess", has_hess_);
 
-  s.pack("FmuFunction::enable_ad", enable_ad_);
+  s.pack("FmuFunction::uses_directional_derivatives", uses_directional_derivatives_);
   s.pack("FmuFunction::validate_forward", validate_forward_);
   s.pack("FmuFunction::validate_hessian", validate_hessian_);
   s.pack("FmuFunction::make_symmetric", make_symmetric_);
@@ -1587,7 +1593,7 @@ FmuFunction::FmuFunction(DeserializingStream& s) : FunctionInternal(s) {
   s.unpack("FmuFunction::has_adj", has_adj_);
   s.unpack("FmuFunction::has_hess", has_hess_);
 
-  s.unpack("FmuFunction::enable_ad", enable_ad_);
+  s.unpack("FmuFunction::uses_directional_derivatives_", uses_directional_derivatives_);
   s.unpack("FmuFunction::validate_forward", validate_forward_);
   s.unpack("FmuFunction::validate_hessian", validate_hessian_);
   s.unpack("FmuFunction::make_symmetric", make_symmetric_);
