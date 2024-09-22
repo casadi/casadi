@@ -965,44 +965,34 @@ namespace casadi {
   Dict FunctionInternal::cache() const {
     // Return value
     Dict ret;
-    // Add all Function instances that haven't been deleted
-    for (auto&& cf : cache_) {
-      if (cf.second.alive()) {
-        // Get the name of the key
-        std::string s = cf.first;
-        casadi_assert_dev(s.size() > 0);
-        // Replace ':' with '_'
-        std::replace(s.begin(), s.end(), ':', '_');
-        // Remove trailing underscore, if any
-        if (s.back() == '_') s.resize(s.size() - 1);
-        // Add entry to function return
-        ret[s] = shared_cast<Function>(cf.second.shared());
-      }
+
+    // Retrieve all Function instances that haven't been deleted
+    std::vector<std::string> keys;
+    std::vector<Function> entries;
+    cache_.cache(keys, entries);
+
+    for (size_t i=0; i<keys.size(); ++i) {
+      // Get the name of the key
+      std::string s = keys[i];
+      casadi_assert_dev(s.size() > 0);
+      // Replace ':' with '_'
+      std::replace(s.begin(), s.end(), ':', '_');
+      // Remove trailing underscore, if any
+      if (s.back() == '_') s.resize(s.size() - 1);
+      // Add entry to function return
+      ret[s] = entries[i];
     }
+
     return ret;
   }
 
   bool FunctionInternal::incache(const std::string& fname, Function& f,
       const std::string& suffix) const {
-    auto it = cache_.find(fname + ":" + suffix);
-    if (it!=cache_.end() && it->second.alive()) {
-      f = shared_cast<Function>(it->second.shared());
-      return true;
-    } else {
-      return false;
-    }
+    return cache_.incache(fname + ":" + suffix, f);
   }
 
   void FunctionInternal::tocache(const Function& f, const std::string& suffix) const {
-    // Add to cache
-    cache_.insert(std::make_pair(f.name() + ":" + suffix, f));
-    // Remove a lost reference, if any, to prevent uncontrolled growth
-    for (auto it = cache_.begin(); it!=cache_.end(); ++it) {
-      if (!it->second.alive()) {
-        cache_.erase(it);
-        break; // just one dead reference is enough
-      }
-    }
+    cache_.tocache(f.name() + ":" + suffix, f);
   }
 
   Function FunctionInternal::map(casadi_int n, const std::string& parallelization) const {

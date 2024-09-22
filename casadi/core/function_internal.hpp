@@ -1283,7 +1283,7 @@ namespace casadi {
     Dict cache_init_;
 
     /// Function cache
-    mutable std::map<std::string, WeakRef> cache_;
+    WeakCache<std::string, Function> cache_;
 
     /// Cache for sparsities of the Jacobian blocks
     mutable std::vector<Sparsity> jac_sparsity_[2];

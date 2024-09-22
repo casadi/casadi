@@ -3247,7 +3247,30 @@ class Functiontests(casadiTestCase):
         import gc
         gc.collect()
         
-        
+  def test_cache(self):
+    x = MX.sym("x")
+    f = Function('f',[x],[x**2])
+    
+    ff = f.forward(1)
+    ff2 = f.forward(1)
+    
+    h = hash(ff)
+    
+    self.assertEqual(hash(ff),hash(ff2))
+    
+    ff = None
+    ff2 = None
+    
+    import gc
+    gc.collect()
+    
+    f2a = f.forward(2)
+    f2b = f.forward(2)
+    
+    # Should be recreated because it was purged
+    ff = f.forward(1)
+    self.assertNotEqual(hash(ff),h)
+    self.assertEqual(hash(f2a),hash(f2b))
     
 if __name__ == '__main__':
     unittest.main()
