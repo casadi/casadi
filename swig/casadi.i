@@ -3365,12 +3365,6 @@ DECL M casadi_mmax(const M& x) { return mmax(x); }
 DECL casadi::DM casadi_evalf(const M& x) {
   return evalf(x);
 }
-DECL std::vector<M> casadi_cse(const std::vector<M>& e) {
-  return cse(e);
-}
-DECL M casadi_cse(const M& e) {
-  return cse(e);
-}
 DECL void casadi_extract_parametric(const M &expr, const M& par,
         M& OUTPUT1, std::vector<M>& OUTPUT2, std::vector<M>& OUTPUT3) {
   extract_parametric(expr, par, OUTPUT1, OUTPUT2, OUTPUT3);
@@ -3382,6 +3376,12 @@ DECL void casadi_extract_parametric(const std::vector<M> &expr, const M& par,
 #endif // FLAG & IS_MEMBER
 
 #if FLAG & IS_GLOBAL
+DECL std::vector<M> casadi_cse(const std::vector<M>& e) {
+  return cse(e);
+}
+DECL M casadi_cse(const M& e) {
+  return cse(e);
+}
 DECL std::vector<std::vector< M > >
 casadi_forward(const std::vector< M > &ex, const std::vector< M > &arg,
                const std::vector<std::vector< M > > &v,
