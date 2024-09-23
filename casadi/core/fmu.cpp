@@ -427,7 +427,6 @@ void FmuInternal::init(const DaeBuilderInternal* dae) {
   fmutol_ = dae->fmutol_;
   instance_name_ = dae->model_identifier_;
   instantiation_token_ = dae->instantiation_token_;
-  generation_tool_ = dae->generation_tool_;
   logging_on_ = dae->debug_;
   provides_directional_derivatives_ = dae->provides_directional_derivatives_;
   provides_adjoint_derivatives_ = dae->provides_adjoint_derivatives_;
@@ -695,26 +694,13 @@ int FmuInternal::eval_adj(FmuMemory* m) const {
   // Quick return if nothing to be calculated
   if (m->id_in_.size() == 0) return 0;
   // Evaluate adjoint derivatives
-  if (generation_tool_.rfind("Dymola Version 2024x Refresh 1", 0) == 0) {
-    // Dymola 2024x appears to have swapped the 2nd and 3rd arguments
-    if (get_adjoint_derivative(m->instance,
-        get_ptr(m->vr_out_), m->id_out_.size(),  // should be 3rd argument
-        get_ptr(m->vr_in_), m->id_in_.size(),  // should be 2nd argument
-        get_ptr(m->d_out_), m->id_out_.size(),
-        get_ptr(m->d_in_), m->id_in_.size())) {
-      casadi_warning("FMU adjoint derivative failed");
-      return 1;
-    }
-  } else {
-    // Correct (?) implementation
-    if (get_adjoint_derivative(m->instance,
-        get_ptr(m->vr_in_), m->id_in_.size(),
-        get_ptr(m->vr_out_), m->id_out_.size(),
-        get_ptr(m->d_out_), m->id_out_.size(),
-        get_ptr(m->d_in_), m->id_in_.size())) {
-      casadi_warning("FMU adjoint derivative failed");
-      return 1;
-    }
+  if (get_adjoint_derivative(m->instance,
+      get_ptr(m->vr_out_), m->id_out_.size(),
+      get_ptr(m->vr_in_), m->id_in_.size(),
+      get_ptr(m->d_out_), m->id_out_.size(),
+      get_ptr(m->d_in_), m->id_in_.size())) {
+    casadi_warning("FMU adjoint derivative failed");
+    return 1;
   }
   // Collect requested variables
   auto it = m->d_in_.begin();
@@ -1304,7 +1290,6 @@ void FmuInternal::serialize_body(SerializingStream& s) const {
   s.pack("FmuInternal::fmutol", fmutol_);
   s.pack("FmuInternal::instance_name", instance_name_);
   s.pack("FmuInternal::instantiation_token", instantiation_token_);
-  s.pack("FmuInternal::generation_tool", generation_tool_);
   s.pack("FmuInternal::logging_on", logging_on_);
   s.pack("FmuInternal::provides_directional_derivatives", provides_directional_derivatives_);
   s.pack("FmuInternal::provides_adjoint_derivatives", provides_adjoint_derivatives_);
@@ -1343,7 +1328,6 @@ FmuInternal::FmuInternal(DeserializingStream& s) {
   s.unpack("FmuInternal::fmutol", fmutol_);
   s.unpack("FmuInternal::instance_name", instance_name_);
   s.unpack("FmuInternal::instantiation_token", instantiation_token_);
-  s.unpack("FmuInternal::generation_tool", generation_tool_);
   s.unpack("FmuInternal::logging_on", logging_on_);
   s.unpack("FmuInternal::provides_directional_derivatives", provides_directional_derivatives_);
   s.unpack("FmuInternal::provides_adjoint_derivatives", provides_adjoint_derivatives_);

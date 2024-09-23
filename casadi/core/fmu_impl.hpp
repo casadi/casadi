@@ -268,9 +268,6 @@ class CASADI_EXPORT FmuInternal : public SharedObjectInternal {
   // GUID / instantiation_token
   std::string instantiation_token_;
 
-  // Tool used to generate the FMU
-  std::string generation_tool_;
-
   // Logging?
   bool logging_on_;
 
