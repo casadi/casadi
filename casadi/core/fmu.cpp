@@ -995,7 +995,7 @@ void FmuInternal::set_adj(FmuMemory* m, size_t ind, const double* v) const {
 void FmuInternal::request_adj(FmuMemory* m, casadi_int nsens, const casadi_int* id,
     const casadi_int* wrt_id) const {
   for (casadi_int i = 0; i < nsens; ++i) {
-    m->requested_.at(*id) = true;
+    m->omarked_.at(*id) = true;
     m->wrt_.at(*id) = *wrt_id++;
     id++;
   }
@@ -1058,8 +1058,8 @@ int FmuInternal::init_mem(FmuMemory* m) const {
   m->imarked_.resize(max_io);
   std::fill(m->imarked_.begin(), m->imarked_.end(), false);
   // Allocate/reset requested
-  m->requested_.resize(max_io);
-  std::fill(m->requested_.begin(), m->requested_.end(), false);
+  m->omarked_.resize(max_io);
+  std::fill(m->omarked_.begin(), m->omarked_.end(), false);
   // Also allocate memory for corresponding Jacobian entry (for debugging)
   m->wrt_.resize(max_io);
   // Successful return
@@ -1090,7 +1090,7 @@ void FmuInternal::set(FmuMemory* m, size_t ind, const double* value) const {
 void FmuInternal::request(FmuMemory* m, size_t ind) const {
   for (size_t id : ored_[ind]) {
     // Mark as requested
-    m->requested_.at(id) = true;
+    m->omarked_.at(id) = true;
     // Also log corresponding input index
     m->wrt_.at(id) = -1;
   }
@@ -1153,7 +1153,7 @@ void FmuInternal::set_fwd(FmuMemory* m, size_t ind, const double* v) const {
 void FmuInternal::request_fwd(FmuMemory* m, casadi_int nsens, const casadi_int* id,
     const casadi_int* wrt_id) const {
   for (casadi_int i = 0; i < nsens; ++i) {
-    m->requested_.at(*id) = true;
+    m->omarked_.at(*id) = true;
     m->wrt_.at(*id) = *wrt_id++;
     id++;
   }
@@ -1184,11 +1184,11 @@ void FmuInternal::gather_io(FmuMemory* m) const {
   // Collect output indices, corresponding value references
   m->id_out_.clear();
   m->vr_out_.clear();
-  for (size_t id = 0; id < m->requested_.size(); ++id) {
-    if (m->requested_[id]) {
+  for (size_t id = 0; id < m->omarked_.size(); ++id) {
+    if (m->omarked_[id]) {
       m->id_out_.push_back(id);
       m->vr_out_.push_back(vr_out_[id]);
-      m->requested_[id] = false;
+      m->omarked_[id] = false;
     }
   }
 }

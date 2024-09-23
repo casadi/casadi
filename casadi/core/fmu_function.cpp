@@ -1145,7 +1145,7 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
       }
       // Request all outputs
       for (size_t i : jac_out_) {
-        m->requested_.at(i) = true;
+        m->omarked_.at(i) = true;
         m->wrt_.at(i) = -1;
       }
       // Calculate perturbed inputs
