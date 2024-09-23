@@ -692,20 +692,20 @@ int FmuInternal::eval_adj(FmuMemory* m) const {
   // Gather input and output indices
   gather_adj(m);
   // Quick return if nothing to be calculated
-  if (m->id_out_.size() == 0) return 0;
+  if (m->id_in_.size() == 0) return 0;
   // Evaluate adjoint derivatives
   if (get_adjoint_derivative(m->instance,
       get_ptr(m->vr_in_), m->id_in_.size(),
       get_ptr(m->vr_out_), m->id_out_.size(),
-      get_ptr(m->d_in_), m->id_in_.size(),
-      get_ptr(m->d_out_), m->id_out_.size())) {
+      get_ptr(m->d_out_), m->id_out_.size(),
+      get_ptr(m->d_in_), m->id_in_.size())) {
     casadi_warning("FMU adjoint derivative failed");
     return 1;
   }
   // Collect requested variables
-  auto it = m->d_out_.begin();
-  for (size_t id : m->id_out_) {
-    m->osens_[id] = *it++;
+  auto it = m->d_in_.begin();
+  for (size_t id : m->id_in_) {
+    m->isens_[id] = *it++;
   }
   // Successful return
   return 0;
@@ -723,8 +723,11 @@ int FmuInternal::eval_ad(FmuMemory* m) const {
     return 1;
   }
   // Evaluate directional derivatives
-  if (get_directional_derivative(m->instance, get_ptr(m->vr_out_), n_unknown,
-      get_ptr(m->vr_in_), n_known, get_ptr(m->d_in_), n_known, get_ptr(m->d_out_), n_unknown)) {
+  if (get_directional_derivative(m->instance,
+      get_ptr(m->vr_out_), n_unknown,
+      get_ptr(m->vr_in_), n_known,
+      get_ptr(m->d_in_), n_known,
+      get_ptr(m->d_out_), n_unknown)) {
     casadi_warning("FMU directional derivative failed");
     return 1;
   }
@@ -976,8 +979,8 @@ void FmuInternal::get_fwd(FmuMemory* m, size_t ind, double* v) const {
 void FmuInternal::set_adj(FmuMemory* m, casadi_int nseed,
     const casadi_int* id, const double* v) const {
   for (casadi_int i = 0; i < nseed; ++i) {
-    m->isens_.at(*id) = *v++;
-    m->imarked_.at(*id) = true;
+    m->osens_.at(*id) = *v++;
+    m->omarked_.at(*id) = true;
     id++;
   }
 }
@@ -995,7 +998,7 @@ void FmuInternal::set_adj(FmuMemory* m, size_t ind, const double* v) const {
 void FmuInternal::request_adj(FmuMemory* m, casadi_int nsens, const casadi_int* id,
     const casadi_int* wrt_id) const {
   for (casadi_int i = 0; i < nsens; ++i) {
-    m->omarked_.at(*id) = true;
+    m->imarked_.at(*id) = true;
     m->wrt_.at(*id) = *wrt_id++;
     id++;
   }
@@ -1012,7 +1015,7 @@ void FmuInternal::request_adj(FmuMemory* m, casadi_int ind) const {
 
 void FmuInternal::get_adj(FmuMemory* m, casadi_int nsens, const casadi_int* id, double* v) const {
   for (casadi_int i = 0; i < nsens; ++i) {
-    *v++ = m->osens_.at(*id++);
+    *v++ = m->isens_.at(*id++);
   }
 }
 
@@ -1219,16 +1222,16 @@ void FmuInternal::gather_adj(FmuMemory* m) const {
   size_t n_known = m->id_in_.size();
   size_t n_unknown = m->id_out_.size();
   // Get/clear seeds
-  m->d_in_.clear();
-  for (size_t id : m->id_in_) {
-    m->d_in_.push_back(m->isens_[id]);
-    m->isens_[id] = 0;
+  m->d_out_.clear();
+  for (size_t id : m->id_out_) {
+    m->d_out_.push_back(m->osens_[id]);
+    m->osens_[id] = 0;
   }
   // Ensure at least one seed
-  casadi_assert(n_known != 0, "No seeds");
+  casadi_assert(n_unknown != 0, "No seeds");
   // Allocate result vectors
-  m->v_out_.resize(n_unknown);
-  m->d_out_.resize(n_unknown);
+  m->v_in_.resize(n_known);
+  m->d_in_.resize(n_known);
 }
 
 void Fmu::serialize(SerializingStream &s) const {
