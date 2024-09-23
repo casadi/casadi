@@ -179,8 +179,11 @@ class CASADI_EXPORT Fmu
   void request_sens(FmuMemory* m, casadi_int nsens, const casadi_int* id,
     const casadi_int* wrt_id) const;
 
-  // Calculate directional derivatives
-  int eval_derivative(FmuMemory* m, bool independent_seeds) const;
+  // Calculate forward directional derivatives
+  int eval_fwd(FmuMemory* m, bool independent_seeds) const;
+
+  // Calculate adjoint directional derivatives
+  int eval_adj(FmuMemory* m) const;
 
   // Get calculated derivatives
   void get_sens(FmuMemory* m, casadi_int nsens, const casadi_int* id, double* v) const;
@@ -193,6 +196,15 @@ class CASADI_EXPORT Fmu
 
   // Get the forward sensitivities for a single output
   void get_fwd(FmuMemory* m, size_t ind, double* v) const;
+
+  // Set all adjoint seeds for a single output
+  void set_adj(FmuMemory* m, size_t ind, const double* v) const;
+
+  // Request the calculation of all adjoint sensitivities for an input
+  void request_adj(FmuMemory* m, casadi_int ind) const;
+
+  // Get the adjoint sensitivities for a single input
+  void get_adj(FmuMemory* m, size_t ind, double* v) const;
 
   /** \brief Get stats
 

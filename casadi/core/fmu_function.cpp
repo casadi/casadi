@@ -125,7 +125,7 @@ FmuFunction::FmuFunction(const std::string& name, const Fmu& fmu,
   name_out_ = name_out;
   // Default options
   uses_directional_derivatives_ = fmu.provides_directional_derivatives();
-  uses_adjoint_derivatives_ = fmu.provides_adjoint_derivatives();
+  uses_adjoint_derivatives_ = false;  // fmu.provides_adjoint_derivatives();
   validate_forward_ = false;
   validate_hessian_ = false;
   validate_ad_file_ = "";
@@ -437,6 +437,7 @@ void FmuFunction::init(const Dict& opts) {
       }
     }
   }
+  // NOTE(@jaeandersson): Make conditional !need_jac && uses_adjoint_derivatives_?
   for (auto&& i : in_) {
     if (i.type == InputType::ADJ) {
       // Get output indices
@@ -1030,7 +1031,7 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
       }
     }
     // Calculate derivatives
-   if (fmu_.eval_derivative(m, false)) return 1;
+   if (fmu_.eval_fwd(m, false)) return 1;
     // Collect forward sensitivities
     for (size_t k = 0; k < out_.size(); ++k) {
       if (m->res[k] && out_[k].type == OutputType::FWD) {
@@ -1038,8 +1039,8 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
       }
     }
   }
-  // Evalute extended Jacobian
-  if (need_jac || need_adj) {
+  // Evalute extended Jacobian and/or adjoint derivatives
+  if (need_jac || (need_adj && !uses_adjoint_derivatives_)) {
     // Selection of colors to be evaluated for the thread
     casadi_int c_begin = (task * jac_colors_.size2()) / n_task;
     casadi_int c_end = ((task + 1) * jac_colors_.size2()) / n_task;
@@ -1053,7 +1054,7 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
       // Calculate derivatives
       fmu_.set_seed(m, m->d.nseed, m->d.iseed, m->d.seed);
       fmu_.request_sens(m, m->d.nsens, m->d.isens, m->d.wrt);
-      if (fmu_.eval_derivative(m, true)) return 1;
+      if (fmu_.eval_fwd(m, true)) return 1;
       fmu_.get_sens(m, m->d.nsens, m->d.isens, m->d.sens);
       // Scale derivatives
       casadi_jac_scale(&p_, &m->d);
@@ -1067,6 +1068,27 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
       if (need_adj) {
         for (casadi_int i = 0; i < m->d.nsens; ++i)
           m->asens[m->d.wrt[i]] += m->aseed[m->d.isens[i]] * m->d.sens[i];
+      }
+    }
+  } else if (need_adj) { // Adjoint derivatives, without forming the extended Jacobian
+    // Pass all adjoint seeds
+    for (size_t k = 0; k < in_.size(); ++k) {
+      if (in_[k].type == InputType::ADJ) {
+        fmu_.set_adj(m, in_[k].ind, m->arg[k]);
+      }
+    }
+    // Request adjoint sensitivities
+    for (size_t k = 0; k < out_.size(); ++k) {
+      if (m->res[k] && out_[k].type == OutputType::ADJ) {
+        fmu_.request_adj(m, out_[k].wrt);
+      }
+    }
+    // Calculate derivatives
+    if (fmu_.eval_adj(m)) return 1;
+    // Collect adjoint sensitivities
+    for (size_t k = 0; k < out_.size(); ++k) {
+      if (m->res[k] && out_[k].type == OutputType::ADJ) {
+        fmu_.get_adj(m, out_[k].wrt, m->res[k]);
       }
     }
   }
@@ -1137,7 +1159,7 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
        // Calculate derivatives
        fmu_.set_seed(m, m->d.nseed, m->d.iseed, m->d.seed);
        fmu_.request_sens(m, m->d.nsens, m->d.isens, m->d.wrt);
-       if (fmu_.eval_derivative(m, true)) return 1;
+       if (fmu_.eval_fwd(m, true)) return 1;
        fmu_.get_sens(m, m->d.nsens, m->d.isens, m->d.sens);
        // Scale derivatives
        casadi_jac_scale(&p_, &m->d);
