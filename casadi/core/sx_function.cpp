@@ -1047,9 +1047,6 @@ namespace casadi {
         // Add outputs to the list
         s.push(itc->get());
         XFunction<SXFunction, SX, SXNode>::sort_depth_first(s, nodes);
-
-        // A null pointer means an output instruction
-        nodes.push_back(static_cast<SXNode*>(nullptr));
       }
     }
 
