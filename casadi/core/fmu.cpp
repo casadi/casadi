@@ -977,7 +977,7 @@ void FmuInternal::set_adj(FmuMemory* m, casadi_int nseed,
     const casadi_int* id, const double* v) const {
   for (casadi_int i = 0; i < nseed; ++i) {
     m->seed_.at(*id) = *v++;
-    m->changed_.at(*id) = true;
+    m->imarked_.at(*id) = true;
     id++;
   }
 }
@@ -1055,8 +1055,8 @@ int FmuInternal::init_mem(FmuMemory* m) const {
   m->sens_.resize(max_io);
   std::fill(m->sens_.begin(), m->sens_.end(), 0);
   // Allocate/reset changed
-  m->changed_.resize(max_io);
-  std::fill(m->changed_.begin(), m->changed_.end(), false);
+  m->imarked_.resize(max_io);
+  std::fill(m->imarked_.begin(), m->imarked_.end(), false);
   // Allocate/reset requested
   m->requested_.resize(max_io);
   std::fill(m->requested_.begin(), m->requested_.end(), false);
@@ -1072,7 +1072,7 @@ void FmuInternal::set(FmuMemory* m, size_t ind, const double* value) const {
     for (size_t id : ired_[ind]) {
       if (*value != m->ibuf_.at(id)) {
         m->ibuf_.at(id) = *value;
-        m->changed_.at(id) = true;
+        m->imarked_.at(id) = true;
       }
       value++;
     }
@@ -1081,7 +1081,7 @@ void FmuInternal::set(FmuMemory* m, size_t ind, const double* value) const {
     for (size_t id : ired_[ind]) {
       if (0 != m->ibuf_.at(id)) {
         m->ibuf_.at(id) = 0;
-        m->changed_.at(id) = true;
+        m->imarked_.at(id) = true;
       }
     }
   }
@@ -1135,7 +1135,7 @@ void FmuInternal::set_fwd(FmuMemory* m, casadi_int nseed,
     const casadi_int* id, const double* v) const {
   for (casadi_int i = 0; i < nseed; ++i) {
     m->seed_.at(*id) = *v++;
-    m->changed_.at(*id) = true;
+    m->imarked_.at(*id) = true;
     id++;
   }
 }
@@ -1173,12 +1173,12 @@ void FmuInternal::gather_io(FmuMemory* m) const {
   m->id_in_.clear();
   m->vr_in_.clear();
   m->v_in_.clear();
-  for (size_t id = 0; id < m->changed_.size(); ++id) {
-    if (m->changed_[id]) {
+  for (size_t id = 0; id < m->imarked_.size(); ++id) {
+    if (m->imarked_[id]) {
       m->id_in_.push_back(id);
       m->vr_in_.push_back(vr_in_[id]);
       m->v_in_.push_back(m->ibuf_[id]);
-      m->changed_[id] = false;
+      m->imarked_[id] = false;
     }
   }
   // Collect output indices, corresponding value references

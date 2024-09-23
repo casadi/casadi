@@ -1139,7 +1139,7 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
         }
         // Perturb the input
         m->ibuf_.at(id) += h[v];
-        m->changed_.at(id) = true;
+        m->imarked_.at(id) = true;
         // Inverse of step size
         h[v] = 1. / h[v];
       }
@@ -1183,7 +1183,7 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
         casadi_int id = jac_in_.at(ind1);
         // Restore input
         m->ibuf_.at(id) = x[v];
-        m->changed_.at(id) = true;
+        m->imarked_.at(id) = true;
         // Get column in Hessian
         for (casadi_int k = hess_colind[ind1]; k < hess_colind[ind1 + 1]; ++k) {
           casadi_int id2 = jac_in_.at(hess_row[k]);

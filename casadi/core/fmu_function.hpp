@@ -65,8 +65,8 @@ struct CASADI_EXPORT FmuMemory : public FunctionMemory {
   std::vector<double> ibuf_, obuf_;
   // Seeds, sensitivities
   std::vector<double> seed_, sens_;
-  // Which entries have been changed
-  std::vector<bool> changed_;
+  // Which inputs have been marked
+  std::vector<bool> imarked_;
   // Which entries are being requested
   std::vector<bool> requested_;
   // Derivative with respect to
