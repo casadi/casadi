@@ -34,22 +34,16 @@
 namespace casadi {
   class CASADI_EXPORT BlazingSplineFunction : public FunctionInternal {
   public:
-    /** \brief Constructor
-
-        \identifier{ab} */
+    /** \brief Constructor */
     BlazingSplineFunction(
         const std::string& name,
         const std::vector< std::vector<double> >& knots,
         casadi_int diff_order);
 
-    /** \brief Get type name
-
-        \identifier{ac} */
+    /** \brief Get type name */
     std::string class_name() const override { return "BlazingSplineFunction";}
 
-    /** \brief Destructor
-
-        \identifier{ad} */
+    /** \brief Destructor */
     ~BlazingSplineFunction() override;
 
     /** \brief List merge opportunitities */
@@ -57,34 +51,24 @@ namespace casadi {
         std::vector<MX>& subs_from, std::vector<MX>& subs_to) const override;
 
     ///@{
-    /** \brief Options
-
-        \identifier{ae} */
+    /** \brief Options */
     static const Options options_;
     const Options& get_options() const override { return options_;}
     ///@}
 
-    /** \brief Initialize
-
-        \identifier{af} */
+    /** \brief Initialize */
     void init(const Dict& opts) override;
 
     void init_derived_members();
 
-    /** \brief Is codegen supported?
-
-        \identifier{ah} */
+    /** \brief Is codegen supported?*/
     bool has_codegen() const override { return true;}
 
-    /** \brief Generate code for the function body
-
-        \identifier{ai} */
+    /** \brief Generate code for the function body */
     void codegen_body(CodeGenerator& g) const override;
 
     ///@{
-    /** \brief Jacobian of all outputs with respect to all inputs
-
-        \identifier{aj} */
+    /** \brief Jacobian of all outputs with respect to all inputs */
     bool has_jacobian() const override;
     Function get_jacobian(const std::string& name,
                           const std::vector<std::string>& inames,
