@@ -211,7 +211,7 @@ namespace casadi {
     std::string encode();
 
     template<class T>
-    std::string generate_id(const T& expr, int warmstart=2) {
+    std::string generate_id(const T& expr, int warmstart=1) {
       std::string key;
       for (casadi_int i=0;i<warmstart+1;++i) {
         pack(expr);
