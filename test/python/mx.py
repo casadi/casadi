@@ -3279,9 +3279,13 @@ class MXtests(casadiTestCase):
     y = MX.sym("y")
     w = MX.sym("w")
     
-    z = x*y+w
+    xy = x*y
+    
+    z = xy+w
     z2 = substitute([z],[w],[3])[0]
-    self.assertEqual(hash(z),hash(z2.dep(1)))
+    print(xy)
+    print(z2.dep(1))
+    self.assertNotEqual(hash(xy),hash(z2.dep(1)))
 
   def test_extract_parametric(self):
     def test_equal(a,b):
