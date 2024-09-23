@@ -917,7 +917,10 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
         casadi_trans(w, sp_trans_[sp_trans_map_[k]], r, sparsity_out(k), iw);
         break;
       case OutputType::ADJ:
-        for (size_t id : fmu_.ired(out_[k].wrt)) *r++ = asens[id];
+        // If adjoint sensitivities have not already been set
+        if (need_jac || !uses_adjoint_derivatives_) {
+          for (size_t id : fmu_.ired(out_[k].wrt)) *r++ = asens[id];
+        }
         break;
       case OutputType::HESS:
         casadi_get_sub(r, hess_sp_, hess_nz,
