@@ -397,19 +397,15 @@ namespace casadi {
     StringSerializer ss;
     std::string key;
 
-    uout() << "=========== Wall ==========================" << std::endl;
-
     // Loop over instructions
     for (int k=0; k<f.n_instructions(); ++k) {
       MX e = f.instruction_MX(k);
-      uout() << e << e.get() << std::endl;
       if (e.is_call()) {
         Function fun = e.which_function();
 
         // Check if the function is a BlazingSplineFunction
         if (fun.class_name()=="BlazingSplineFunction") {
           key = ss.generate_id(e->dep_);
-          uout() << "key1: " << key << std::endl;
           // Which derivative level?
           if (fun==base) {
             targets0[key].push_back(e);
@@ -427,7 +423,6 @@ namespace casadi {
 
       // Compute key of all but last args
       key = ss.generate_id(vector_init(e->dep_));
-      uout() << "key2: " << key << std::endl;
 
       // Loop over all matching target1 entries
       for (const auto& ee : targets1[key]) {
@@ -439,7 +434,6 @@ namespace casadi {
 
       // Compute key of all but last args
       key = ss.generate_id(vector_init(vector_init(e->dep_)), 0);
-      uout() << "key3: " << key << std::endl;
 
       // Loop over all matching target1 entries
       for (const auto& ee : targets0[key]) {
@@ -453,11 +447,8 @@ namespace casadi {
     // Loop over first order targets, targets1
     for (const auto& ee : targets1) {
       for (const auto& e : ee.second) {
-
-        uout() << "e->dep_: " << e->dep_ << e->dep_[0].get() << std::endl;
         // Compute key of all but last args
         key = ss.generate_id(vector_init(e->dep_), 0);
-        uout() << "key4: " << key << std::endl;
 
         // Loop over all matching target1 entries
         for (const auto& ee : targets0[key]) {
@@ -468,10 +459,6 @@ namespace casadi {
         }
       }
     }
-
-    uout() << "subs_from: " << subs_from << std::endl;
-    uout() << "subs_to: " << subs_to << std::endl;
-
 
   }
 
