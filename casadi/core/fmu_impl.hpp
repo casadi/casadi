@@ -167,22 +167,19 @@ class CASADI_EXPORT FmuInternal : public SharedObjectInternal {
   // Get a calculated variable
   void get(FmuMemory* m, size_t id, double* value) const;
 
-  // Set seed
-  void set_seed(FmuMemory* m, casadi_int nseed,
+  // Set forward seeds
+  void set_fwd(FmuMemory* m, casadi_int nseed,
     const casadi_int* id, const double* v) const;
-
-  // Request the calculation of a sensitivity
-  void request_sens(FmuMemory* m, casadi_int nsens, const casadi_int* id,
-    const casadi_int* wrt_id) const;
 
   // Set all forward seeds for a single input
   void set_fwd(FmuMemory* m, size_t ind, const double* v) const;
 
+  // Request the calculation of forward sensitivities
+  void request_fwd(FmuMemory* m, casadi_int nsens, const casadi_int* id,
+    const casadi_int* wrt_id) const;
+
   // Request the calculation of all forward sensitivities for an output
   void request_fwd(FmuMemory* m, casadi_int ind) const;
-
-  // Get the forward sensitivities for a single output
-  void get_fwd(FmuMemory* m, size_t ind, double* v) const;
 
   // Calculate forward directional derivatives
   int eval_fwd(FmuMemory* m, bool independent_seeds) const;
@@ -192,6 +189,13 @@ class CASADI_EXPORT FmuInternal : public SharedObjectInternal {
 
   // Calculate forward directional derivatives using FD
   int eval_fd(FmuMemory* m, bool independent_seeds) const;
+
+  // Get calculated derivatives
+  void get_fwd(FmuMemory* m, casadi_int nsens,
+    const casadi_int* id, double* v) const;
+
+  // Get the forward sensitivities for a single output
+  void get_fwd(FmuMemory* m, size_t ind, double* v) const;
 
   // Set all adjoint seeds for a single output
   void set_adj(FmuMemory* m, size_t ind, const double* v) const;
@@ -205,12 +209,8 @@ class CASADI_EXPORT FmuInternal : public SharedObjectInternal {
   // Calculate adjoint directional derivatives
   int eval_adj(FmuMemory* m) const;
 
-  // Get calculated derivatives
-  void get_sens(FmuMemory* m, casadi_int nsens,
-    const casadi_int* id, double* v) const;
-
-  // Gather user sensitivities
-  void gather_sens(FmuMemory* m) const;
+  // Gather forward sensitivities
+  void gather_fwd(FmuMemory* m) const;
 
   // Gather user inputs and outputs
   void gather_io(FmuMemory* m) const;

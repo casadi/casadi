@@ -1052,10 +1052,10 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
       // Get derivative directions
       casadi_jac_pre(&p_, &m->d, c);
       // Calculate derivatives
-      fmu_.set_seed(m, m->d.nseed, m->d.iseed, m->d.seed);
-      fmu_.request_sens(m, m->d.nsens, m->d.isens, m->d.wrt);
+      fmu_.set_fwd(m, m->d.nseed, m->d.iseed, m->d.seed);
+      fmu_.request_fwd(m, m->d.nsens, m->d.isens, m->d.wrt);
       if (fmu_.eval_fwd(m, true)) return 1;
-      fmu_.get_sens(m, m->d.nsens, m->d.isens, m->d.sens);
+      fmu_.get_fwd(m, m->d.nsens, m->d.isens, m->d.sens);
       // Scale derivatives
       casadi_jac_scale(&p_, &m->d);
       // Collect Jacobian nonzeros
@@ -1157,10 +1157,10 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
        // Get derivative directions
        casadi_jac_pre(&p_, &m->d, c1);
        // Calculate derivatives
-       fmu_.set_seed(m, m->d.nseed, m->d.iseed, m->d.seed);
-       fmu_.request_sens(m, m->d.nsens, m->d.isens, m->d.wrt);
+       fmu_.set_fwd(m, m->d.nseed, m->d.iseed, m->d.seed);
+       fmu_.request_fwd(m, m->d.nsens, m->d.isens, m->d.wrt);
        if (fmu_.eval_fwd(m, true)) return 1;
-       fmu_.get_sens(m, m->d.nsens, m->d.isens, m->d.sens);
+       fmu_.get_fwd(m, m->d.nsens, m->d.isens, m->d.sens);
        // Scale derivatives
        casadi_jac_scale(&p_, &m->d);
        // Propagate adjoint sensitivities
