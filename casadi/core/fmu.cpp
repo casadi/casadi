@@ -296,10 +296,26 @@ void Fmu::set_fwd(FmuMemory* m, casadi_int nseed, const casadi_int* id, const do
   }
 }
 
+void Fmu::set_fwd(FmuMemory* m, size_t ind, const double* v) const {
+  try {
+    return (*this)->set_fwd(m, ind, v);
+  } catch(std::exception& e) {
+    THROW_ERROR("set_fwd", e.what());
+  }
+}
+
 void Fmu::request_fwd(FmuMemory* m, casadi_int nsens, const casadi_int* id,
     const casadi_int* wrt_id) const {
   try {
     return (*this)->request_fwd(m, nsens, id, wrt_id);
+  } catch(std::exception& e) {
+    THROW_ERROR("request_fwd", e.what());
+  }
+}
+
+void Fmu::request_fwd(FmuMemory* m, casadi_int ind) const {
+  try {
+    return (*this)->request_fwd(m, ind);
   } catch(std::exception& e) {
     THROW_ERROR("request_fwd", e.what());
   }
@@ -313,35 +329,11 @@ int Fmu::eval_fwd(FmuMemory* m, bool independent_seeds) const {
   }
 }
 
-int Fmu::eval_adj(FmuMemory* m) const {
-  try {
-    return (*this)->eval_adj(m);
-  } catch(std::exception& e) {
-    THROW_ERROR("eval_adj", e.what());
-  }
-}
-
 void Fmu::get_fwd(FmuMemory* m, casadi_int nsens, const casadi_int* id, double* v) const {
   try {
     return (*this)->get_fwd(m, nsens, id, v);
   } catch(std::exception& e) {
     THROW_ERROR("get_fwd", e.what());
-  }
-}
-
-void Fmu::set_fwd(FmuMemory* m, size_t ind, const double* v) const {
-  try {
-    return (*this)->set_fwd(m, ind, v);
-  } catch(std::exception& e) {
-    THROW_ERROR("set_fwd", e.what());
-  }
-}
-
-void Fmu::request_fwd(FmuMemory* m, casadi_int ind) const {
-  try {
-    return (*this)->request_fwd(m, ind);
-  } catch(std::exception& e) {
-    THROW_ERROR("request_fwd", e.what());
   }
 }
 
@@ -353,6 +345,14 @@ void Fmu::get_fwd(FmuMemory* m, size_t ind, double* v) const {
   }
 }
 
+void Fmu::set_adj(FmuMemory* m, casadi_int nseed, const casadi_int* id, const double* v) const {
+  try {
+    return (*this)->set_adj(m, nseed, id, v);
+  } catch(std::exception& e) {
+    THROW_ERROR("set_adj", e.what());
+  }
+}
+
 void Fmu::set_adj(FmuMemory* m, size_t ind, const double* v) const {
   try {
     return (*this)->set_adj(m, ind, v);
@@ -361,11 +361,36 @@ void Fmu::set_adj(FmuMemory* m, size_t ind, const double* v) const {
   }
 }
 
+void Fmu::request_adj(FmuMemory* m, casadi_int nsens, const casadi_int* id,
+    const casadi_int* wrt_id) const {
+  try {
+    return (*this)->request_adj(m, nsens, id, wrt_id);
+  } catch(std::exception& e) {
+    THROW_ERROR("request_adj", e.what());
+  }
+}
+
 void Fmu::request_adj(FmuMemory* m, casadi_int ind) const {
   try {
     return (*this)->request_adj(m, ind);
   } catch(std::exception& e) {
     THROW_ERROR("request_adj", e.what());
+  }
+}
+
+int Fmu::eval_adj(FmuMemory* m) const {
+  try {
+    return (*this)->eval_adj(m);
+  } catch(std::exception& e) {
+    THROW_ERROR("eval_adj", e.what());
+  }
+}
+
+void Fmu::get_adj(FmuMemory* m, casadi_int nsens, const casadi_int* id, double* v) const {
+  try {
+    return (*this)->get_adj(m, nsens, id, v);
+  } catch(std::exception& e) {
+    THROW_ERROR("get_adj", e.what());
   }
 }
 
@@ -665,7 +690,7 @@ int FmuInternal::eval_fwd(FmuMemory* m, bool independent_seeds) const {
 
 int FmuInternal::eval_adj(FmuMemory* m) const {
   // Gather input and output indices
-  gather_fwd(m);
+  gather_adj(m);
   // Quick return if nothing to be calculated
   if (m->id_out_.size() == 0) return 0;
   // Evaluate adjoint derivatives
@@ -932,6 +957,75 @@ int FmuInternal::eval_fd(FmuMemory* m, bool independent_seeds) const {
   return 0;
 }
 
+void FmuInternal::get_fwd(FmuMemory* m, casadi_int nsens, const casadi_int* id, double* v) const {
+  for (casadi_int i = 0; i < nsens; ++i) {
+    *v++ = m->sens_.at(*id++);
+  }
+}
+
+void FmuInternal::get_fwd(FmuMemory* m, size_t ind, double* v) const {
+  // Quick return if not needed
+  if (!v) return;
+  // Retrieve all sensitivities FIXME(@jaeandersson): should use compatible types
+  for (size_t id : ored_[ind]) {
+    casadi_int id2 = id;
+    get_fwd(m, 1, &id2, v++);
+  }
+}
+
+void FmuInternal::set_adj(FmuMemory* m, casadi_int nseed,
+    const casadi_int* id, const double* v) const {
+  for (casadi_int i = 0; i < nseed; ++i) {
+    m->seed_.at(*id) = *v++;
+    m->changed_.at(*id) = true;
+    id++;
+  }
+}
+
+void FmuInternal::set_adj(FmuMemory* m, size_t ind, const double* v) const {
+  // If seeds are zero, no need to add to seed buffers
+  if (!v) return;
+  // Pass all seeds FIXME(@jaeandersson): should use compatible types
+  for (size_t id : ored_[ind]) {
+    casadi_int id2 = id;
+    set_adj(m, 1, &id2, v++);
+  }
+}
+
+void FmuInternal::request_adj(FmuMemory* m, casadi_int nsens, const casadi_int* id,
+    const casadi_int* wrt_id) const {
+  for (casadi_int i = 0; i < nsens; ++i) {
+    m->requested_.at(*id) = true;
+    m->wrt_.at(*id) = *wrt_id++;
+    id++;
+  }
+}
+
+void FmuInternal::request_adj(FmuMemory* m, casadi_int ind) const {
+  // Request all sensitivities FIXME(@jaeandersson): should use compatible types
+  casadi_int wrt_id = -1;
+  for (size_t id : ired_[ind]) {
+    casadi_int id2 = id;
+    request_adj(m, 1, &id2, &wrt_id);
+  }
+}
+
+void FmuInternal::get_adj(FmuMemory* m, casadi_int nsens, const casadi_int* id, double* v) const {
+  for (casadi_int i = 0; i < nsens; ++i) {
+    *v++ = m->sens_.at(*id++);
+  }
+}
+
+void FmuInternal::get_adj(FmuMemory* m, size_t ind, double* v) const {
+  // Quick return if not needed
+  if (!v) return;
+  // Retrieve all sensitivities FIXME(@jaeandersson): should use compatible types
+  for (size_t id : ired_[ind]) {
+    casadi_int id2 = id;
+    get_adj(m, 1, &id2, v++);
+  }
+}
+
 int FmuInternal::init_mem(FmuMemory* m) const {
   // Ensure not already instantiated
   casadi_assert(m->instance == 0, "Already instantiated");
@@ -1046,21 +1140,6 @@ void FmuInternal::set_fwd(FmuMemory* m, casadi_int nseed,
   }
 }
 
-void FmuInternal::request_fwd(FmuMemory* m, casadi_int nsens, const casadi_int* id,
-    const casadi_int* wrt_id) const {
-  for (casadi_int i = 0; i < nsens; ++i) {
-    m->requested_.at(*id) = true;
-    m->wrt_.at(*id) = *wrt_id++;
-    id++;
-  }
-}
-
-void FmuInternal::get_fwd(FmuMemory* m, casadi_int nsens, const casadi_int* id, double* v) const {
-  for (casadi_int i = 0; i < nsens; ++i) {
-    *v++ = m->sens_.at(*id++);
-  }
-}
-
 void FmuInternal::set_fwd(FmuMemory* m, size_t ind, const double* v) const {
   // If seeds are zero, no need to add to seed buffers
   if (!v) return;
@@ -1071,51 +1150,21 @@ void FmuInternal::set_fwd(FmuMemory* m, size_t ind, const double* v) const {
   }
 }
 
+void FmuInternal::request_fwd(FmuMemory* m, casadi_int nsens, const casadi_int* id,
+    const casadi_int* wrt_id) const {
+  for (casadi_int i = 0; i < nsens; ++i) {
+    m->requested_.at(*id) = true;
+    m->wrt_.at(*id) = *wrt_id++;
+    id++;
+  }
+}
+
 void FmuInternal::request_fwd(FmuMemory* m, casadi_int ind) const {
   // Request all sensitivities FIXME(@jaeandersson): should use compatible types
   casadi_int wrt_id = -1;
   for (size_t id : ored_[ind]) {
     casadi_int id2 = id;
     request_fwd(m, 1, &id2, &wrt_id);
-  }
-}
-
-void FmuInternal::get_fwd(FmuMemory* m, size_t ind, double* v) const {
-  // Quick return if not needed
-  if (!v) return;
-  // Retrieve all sensitivities FIXME(@jaeandersson): should use compatible types
-  for (size_t id : ored_[ind]) {
-    casadi_int id2 = id;
-    get_fwd(m, 1, &id2, v++);
-  }
-}
-
-void FmuInternal::set_adj(FmuMemory* m, size_t ind, const double* v) const {
-  // If seeds are zero, no need to add to seed buffers
-  if (!v) return;
-  // Pass all seeds FIXME(@jaeandersson): should use compatible types
-  for (size_t id : ored_[ind]) {
-    casadi_int id2 = id;
-    set_fwd(m, 1, &id2, v++);
-  }
-}
-
-void FmuInternal::request_adj(FmuMemory* m, casadi_int ind) const {
-  // Request all sensitivities FIXME(@jaeandersson): should use compatible types
-  casadi_int wrt_id = -1;
-  for (size_t id : ired_[ind]) {
-    casadi_int id2 = id;
-    request_fwd(m, 1, &id2, &wrt_id);
-  }
-}
-
-void FmuInternal::get_adj(FmuMemory* m, size_t ind, double* v) const {
-  // Quick return if not needed
-  if (!v) return;
-  // Retrieve all sensitivities FIXME(@jaeandersson): should use compatible types
-  for (size_t id : ired_[ind]) {
-    casadi_int id2 = id;
-    get_fwd(m, 1, &id2, v++);
   }
 }
 
@@ -1145,6 +1194,25 @@ void FmuInternal::gather_io(FmuMemory* m) const {
 }
 
 void FmuInternal::gather_fwd(FmuMemory* m) const {
+  // Gather input and output indices
+  gather_io(m);
+  // Number of inputs and outputs
+  size_t n_known = m->id_in_.size();
+  size_t n_unknown = m->id_out_.size();
+  // Get/clear seeds
+  m->d_in_.clear();
+  for (size_t id : m->id_in_) {
+    m->d_in_.push_back(m->seed_[id]);
+    m->seed_[id] = 0;
+  }
+  // Ensure at least one seed
+  casadi_assert(n_known != 0, "No seeds");
+  // Allocate result vectors
+  m->v_out_.resize(n_unknown);
+  m->d_out_.resize(n_unknown);
+}
+
+void FmuInternal::gather_adj(FmuMemory* m) const {
   // Gather input and output indices
   gather_io(m);
   // Number of inputs and outputs

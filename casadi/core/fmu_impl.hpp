@@ -190,27 +190,42 @@ class CASADI_EXPORT FmuInternal : public SharedObjectInternal {
   // Calculate forward directional derivatives using FD
   int eval_fd(FmuMemory* m, bool independent_seeds) const;
 
-  // Get calculated derivatives
+  // Get forward  sensitivities
   void get_fwd(FmuMemory* m, casadi_int nsens,
     const casadi_int* id, double* v) const;
 
   // Get the forward sensitivities for a single output
   void get_fwd(FmuMemory* m, size_t ind, double* v) const;
 
+  // Set adjoint seeds
+  void set_adj(FmuMemory* m, casadi_int nseed,
+    const casadi_int* id, const double* v) const;
+
   // Set all adjoint seeds for a single output
   void set_adj(FmuMemory* m, size_t ind, const double* v) const;
+
+  // Request the calculation of adjoint sensitivities
+  void request_adj(FmuMemory* m, casadi_int nsens, const casadi_int* id,
+    const casadi_int* wrt_id) const;
 
   // Request the calculation of all adjoint sensitivities for an input
   void request_adj(FmuMemory* m, casadi_int ind) const;
 
+  // Calculate adjoint sensitivities
+  int eval_adj(FmuMemory* m) const;
+
+  // Get adjoint sensitivities
+  void get_adj(FmuMemory* m, casadi_int nsens,
+    const casadi_int* id, double* v) const;
+
   // Get the adjoint sensitivities for a single input
   void get_adj(FmuMemory* m, size_t ind, double* v) const;
 
-  // Calculate adjoint directional derivatives
-  int eval_adj(FmuMemory* m) const;
-
   // Gather forward sensitivities
   void gather_fwd(FmuMemory* m) const;
+
+  // Gather adjoint sensitivities
+  void gather_adj(FmuMemory* m) const;
 
   // Gather user inputs and outputs
   void gather_io(FmuMemory* m) const;
