@@ -1208,6 +1208,9 @@ namespace casadi {
 #ifndef SWIG
     /// Get memory object
     void* memory(int ind) const;
+
+    static std::vector<SX> sorted_nodes(const std::vector<SX>& expr);
+    static std::vector<MX> sorted_nodes(const std::vector<MX>& expr);
 #endif // SWIG
 
     /** \brief Get all functions in the cache

@@ -244,6 +244,8 @@ class CASADI_EXPORT SXFunction :
         \identifier{v1} */
   static ProtoFunction* deserialize(DeserializingStream& s);
 
+  static std::vector<SX> sorted_nodes(const std::vector<SX>& expr);
+
   ///@{
   /** \brief Options
 

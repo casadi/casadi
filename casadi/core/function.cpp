@@ -1909,6 +1909,14 @@ namespace casadi {
     return (*this)->info();
   }
 
+  std::vector<SX> Function::sorted_nodes(const std::vector<SX>& expr) {
+    return SXFunction::sorted_nodes(expr);
+  }
+
+  std::vector<MX> Function::sorted_nodes(const std::vector<MX>& expr) {
+    return MXFunction::sorted_nodes(expr);
+  }
+
   FunctionBuffer::FunctionBuffer(const Function& f) : f_(f) {
     w_.resize(f_.sz_w());
     iw_.resize(f_.sz_iw());
@@ -1971,5 +1979,6 @@ namespace casadi {
   void CASADI_EXPORT _function_buffer_eval(void* raw) {
     static_cast<FunctionBuffer*>(raw)->_eval();
   }
+
 
 } // namespace casadi

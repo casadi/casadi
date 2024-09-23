@@ -175,6 +175,8 @@ namespace casadi {
         \identifier{2f} */
     static ProtoFunction* deserialize(DeserializingStream& s);
 
+    static std::vector<MX> sorted_nodes(const std::vector<MX>& expr);
+
     /** \brief Extract the residual function G and the modified function Z out of an expression
 
      * (see Albersmeyer2010 paper)
