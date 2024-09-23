@@ -412,7 +412,6 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
   } else if (fmi_version_.rfind("3.", 0) == 0) {
     // FMI 3
     fmi_major_ = 3;
-    casadi_warning("FMI 3 support is expermental");
   } else {
     casadi_error("Unknown FMI version: " + fmi_version_);
   }
