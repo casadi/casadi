@@ -2142,8 +2142,6 @@ namespace casadi {
     std::vector<MX> orig = e;
     bool updated = true;
     while (updated) {
-
-      MX c = veccat(orig);
       Function f("f", std::vector<MX>{}, orig,
         {{"live_variables", false}, {"max_io", 0}, {"cse", false}, {"allow_free", true}});
       MXFunction *ff = f.get<MXFunction>();
