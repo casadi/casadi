@@ -139,14 +139,18 @@ namespace casadi {
 #define SERIALIZEX(TYPE, BaseType, Type, type, arg) \
     void SerializerBase::pack(const Type& e) { \
       serializer().pack(static_cast<char>(SERIALIZED_ ## TYPE));\
-      serializer().pack(Function("tmp_serializer", std::vector< BaseType >{}, arg, \
-        Dict{{"max_io", 0}, {"cse", false}, {"allow_free", true}})); \
+      serializer().pack(Function::sorted_nodes(arg));\
       serializer().pack(e); \
     } \
     \
     Type DeserializerBase::blind_unpack_ ## type() { \
-      Function f; \
-      deserializer().unpack(f);\
+      if (pop_type()== SerializerBase::SerializationType::SERIALIZED_FUNCTION) {\
+        Function f; \
+        deserializer().unpack(f);\
+      } else {\
+        std::vector<Type> sorted;\
+        deserializer().unpack(sorted);\
+      }\
       Type ret;\
       deserializer().unpack(ret);\
       return ret;\
