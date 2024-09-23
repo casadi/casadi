@@ -409,9 +409,12 @@ namespace casadi {
           // Which derivative level?
           if (fun==base) {
             targets0[key].push_back(e);
-          } else if (fun->derivative_of_==base) {
+          } else if (!fun->derivative_of_.is_null() &&
+                     fun->derivative_of_==base) {
             targets1[key].push_back(e);
-          } else if (fun->derivative_of_->derivative_of_==base) {
+          } else if (!fun->derivative_of_.is_null() &&
+                    !fun->derivative_of_->derivative_of_.is_null() &&
+                    fun->derivative_of_->derivative_of_==base) {
             targets2.push_back(e);
           }
         }
