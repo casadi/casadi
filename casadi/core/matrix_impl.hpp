@@ -2580,7 +2580,7 @@ namespace casadi {
 
   template<typename Scalar>
   void Matrix<Scalar>::extract_parametric(const Matrix<Scalar> &expr, const Matrix<Scalar>& par,
-        Matrix<Scalar>& expr_ret, Matrix<Scalar>& symbols, Matrix<Scalar>& parametric) {
+        Matrix<Scalar>& expr_ret, std::vector<Matrix<Scalar> >& symbols, std::vector< Matrix<Scalar> >& parametric) {
     casadi_error("'extract_parametric' not defined for " + type_name());
   }
 

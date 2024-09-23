@@ -240,12 +240,12 @@ namespace casadi {
         MatType& A, MatType& b, bool check);
     static void extract_parametric(const MatType& expr, const MatType& par,
         MatType& SWIG_OUTPUT(expr_ret),
-        MatType& SWIG_OUTPUT(symbols),
-        MatType& SWIG_OUTPUT(parametric));
+        std::vector<MatType>& SWIG_OUTPUT(symbols),
+        std::vector<MatType>& SWIG_OUTPUT(parametric));
     static void extract_parametric(const std::vector<MatType>& expr, const MatType& par,
         std::vector<MatType>& SWIG_OUTPUT(expr_ret),
-        MatType& SWIG_OUTPUT(symbols),
-        MatType& SWIG_OUTPUT(parametric));
+        std::vector<MatType>& SWIG_OUTPUT(symbols),
+        std::vector<MatType>& SWIG_OUTPUT(parametric));
     /** @}  */
     /// \endcond
 
@@ -966,15 +966,15 @@ namespace casadi {
      */
     inline friend void extract_parametric(const MatType &expr, const MatType& par,
         MatType& SWIG_OUTPUT(expr_ret),
-        MatType& SWIG_OUTPUT(symbols),
-        MatType& SWIG_OUTPUT(parametric)) {
+        std::vector<MatType>& SWIG_OUTPUT(symbols),
+        std::vector<MatType>& SWIG_OUTPUT(parametric)) {
       MatType::extract_parametric(expr, par, expr_ret, symbols, parametric);
     }
 
     inline friend void extract_parametric(const std::vector<MatType> &expr, const MatType& par,
         std::vector<MatType>& SWIG_OUTPUT(expr_ret),
-        MatType& SWIG_OUTPUT(symbols),
-        MatType& SWIG_OUTPUT(parametric)) {
+        std::vector<MatType>& SWIG_OUTPUT(symbols),
+        std::vector<MatType>& SWIG_OUTPUT(parametric)) {
       // Concatenate all vector elements
       MatType expr_cat = veccat(expr);
       MatType expr_ret_cat;

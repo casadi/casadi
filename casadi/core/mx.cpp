@@ -2276,7 +2276,7 @@ namespace casadi {
   }
 
   void MX::extract_parametric(const MX &expr, const MX& par,
-        MX& expr_ret, MX& symbols, MX& parametric) {
+        MX& expr_ret, std::vector<MX>& symbols, std::vector<MX>& parametric) {
 
     Function f("f", {par}, {expr}, {{"live_variables", false},
       {"max_io", 0}, {"allow_free", true}});
@@ -2378,9 +2378,8 @@ namespace casadi {
     // Join split outputs
     expr_ret = expr.join_primitives(res_split);
 
-    symbols = veccat(symbol_v);
-    parametric = veccat(parametric_v);
-
+    symbols = symbol_v;
+    parametric = parametric_v;
   }
 
   MX MX::stop_diff(const MX& expr, casadi_int order) {

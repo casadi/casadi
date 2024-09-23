@@ -569,7 +569,7 @@ namespace casadi {
 
   template<>
   void CASADI_EXPORT SX::extract_parametric(const SX &expr, const SX& par,
-      SX& expr_ret, SX& symbols, SX& parametric) {
+      SX& expr_ret, std::vector<SX>& symbols, std::vector<SX>& parametric) {
 
     Function f("f", std::vector<SX>{par},
       std::vector<SX>{expr}, {{"live_variables", false},
@@ -679,8 +679,13 @@ namespace casadi {
       }
     }
 
-    symbols = SX(symbol_v);
-    parametric = SX(parametric_v);
+    symbols.resize(symbol_v.size());
+    parametric.resize(parametric_v.size());
+
+    for (casadi_int i=0;i<symbol_v.size();++i) {
+      symbols[i] = symbol_v[i];
+      parametric[i] = parametric_v[i];
+    }
   }
 
   template<>
