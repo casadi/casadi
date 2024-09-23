@@ -1823,4 +1823,35 @@ namespace casadi {
     }
   }
 
+  std::vector<MX> MXFunction::sorted_nodes(const std::vector<MX>& expr) {
+    // Stack used to sort the computational graph
+    std::stack<MXNode*> s;
+
+    // All nodes
+    std::vector<MXNode*> nodes;
+
+    // Add the list of nodes
+    for (casadi_int ind=0; ind<expr.size(); ++ind) {
+      // Loop over primitives of each output
+      std::vector<MX> prim = expr[ind].primitives();
+      for (casadi_int p=0; p<prim.size(); ++p) {
+        // Get the nodes using a depth first search
+        s.push(prim[p].get());
+        XFunction<MXFunction, MX, MXNode>::sort_depth_first(s, nodes);
+      }
+    }
+
+    // Clear temporary markers
+    for (casadi_int i=0; i<nodes.size(); ++i) {
+      nodes[i]->temp = 0;
+    }
+
+    std::vector<MX> ret(nodes.size());
+    for (casadi_int i=0; i<nodes.size(); ++i) {
+      ret[i].own(nodes[i]);
+    }
+
+    return ret;
+  }
+
 } // namespace casadi
