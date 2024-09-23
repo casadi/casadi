@@ -125,7 +125,7 @@ FmuFunction::FmuFunction(const std::string& name, const Fmu& fmu,
   name_out_ = name_out;
   // Default options
   uses_directional_derivatives_ = fmu.provides_directional_derivatives();
-  uses_adjoint_derivatives_ = false;  // fmu.provides_adjoint_derivatives();
+  uses_adjoint_derivatives_ = fmu.provides_adjoint_derivatives();
   validate_forward_ = false;
   validate_hessian_ = false;
   validate_ad_file_ = "";
