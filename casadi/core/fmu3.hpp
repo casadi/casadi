@@ -36,9 +36,8 @@ namespace casadi {
 /** \brief Interface to a binary FMU, adhering to FMI version 2.0.
 
     \author Joel Andersson
-    \date 2023
-
-    \identifier{273} */
+    \date 2024
+  */
 class CASADI_EXPORT Fmu3 : public FmuInternal {
  public:
   // Constructor
@@ -49,9 +48,7 @@ class CASADI_EXPORT Fmu3 : public FmuInternal {
   /// Destructor
   ~Fmu3() override;
 
-  /** \brief Get type name
-
-      \identifier{274} */
+  /** \brief Get type name */
   std::string class_name() const override { return "Fmu3";}
 
   // Initialize
@@ -143,9 +140,7 @@ class CASADI_EXPORT Fmu3 : public FmuInternal {
   // Retrieve auxilliary variables from FMU
   int get_aux(void* instance) override;
 
-  /** \brief Get stats
-
-      \identifier{275} */
+  /** \brief Get stats */
   void get_stats(FmuMemory* m, Dict* stats,
     const std::vector<std::string>& name_in, const InputStruct* in) const override;
 
