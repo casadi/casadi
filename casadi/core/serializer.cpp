@@ -144,13 +144,8 @@ namespace casadi {
     } \
     \
     Type DeserializerBase::blind_unpack_ ## type() { \
-      if (pop_type()== SerializerBase::SerializationType::SERIALIZED_FUNCTION) {\
-        Function f; \
-        deserializer().unpack(f);\
-      } else {\
-        std::vector<Type> sorted;\
-        deserializer().unpack(sorted);\
-      }\
+      std::vector<Type> sorted;\
+      deserializer().unpack(sorted);\
       Type ret;\
       deserializer().unpack(ret);\
       return ret;\
