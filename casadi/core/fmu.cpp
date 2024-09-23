@@ -705,7 +705,7 @@ int FmuInternal::eval_adj(FmuMemory* m) const {
   // Collect requested variables
   auto it = m->d_out_.begin();
   for (size_t id : m->id_out_) {
-    m->sens_[id] = *it++;
+    m->osens_[id] = *it++;
   }
   // Successful return
   return 0;
@@ -731,7 +731,7 @@ int FmuInternal::eval_ad(FmuMemory* m) const {
   // Collect requested variables
   auto it = m->d_out_.begin();
   for (size_t id : m->id_out_) {
-    m->sens_[id] = *it++;
+    m->osens_[id] = *it++;
   }
   // Successful return
   return 0;
@@ -885,7 +885,7 @@ int FmuInternal::eval_fd(FmuMemory* m, bool independent_seeds) const {
     // Use FD instead of AD or to compare with AD
     if (m->self.validate_forward_) {
       // Value to compare with
-      double d_ad = m->sens_[id];
+      double d_ad = m->osens_[id];
       // Nominal value used as seed
       d_ad /= nominal_in_[wrt];
       d_fd /= nominal_in_[wrt];
@@ -950,7 +950,7 @@ int FmuInternal::eval_fd(FmuMemory* m, bool independent_seeds) const {
       }
     } else {
       // Use instead of AD
-      m->sens_[id] = d_fd;
+      m->osens_[id] = d_fd;
     }
   }
   // Successful return
@@ -959,7 +959,7 @@ int FmuInternal::eval_fd(FmuMemory* m, bool independent_seeds) const {
 
 void FmuInternal::get_fwd(FmuMemory* m, casadi_int nsens, const casadi_int* id, double* v) const {
   for (casadi_int i = 0; i < nsens; ++i) {
-    *v++ = m->sens_.at(*id++);
+    *v++ = m->osens_.at(*id++);
   }
 }
 
@@ -976,7 +976,7 @@ void FmuInternal::get_fwd(FmuMemory* m, size_t ind, double* v) const {
 void FmuInternal::set_adj(FmuMemory* m, casadi_int nseed,
     const casadi_int* id, const double* v) const {
   for (casadi_int i = 0; i < nseed; ++i) {
-    m->seed_.at(*id) = *v++;
+    m->isens_.at(*id) = *v++;
     m->imarked_.at(*id) = true;
     id++;
   }
@@ -1012,7 +1012,7 @@ void FmuInternal::request_adj(FmuMemory* m, casadi_int ind) const {
 
 void FmuInternal::get_adj(FmuMemory* m, casadi_int nsens, const casadi_int* id, double* v) const {
   for (casadi_int i = 0; i < nsens; ++i) {
-    *v++ = m->sens_.at(*id++);
+    *v++ = m->osens_.at(*id++);
   }
 }
 
@@ -1049,11 +1049,11 @@ int FmuInternal::init_mem(FmuMemory* m) const {
   // Maximum input or output
   size_t max_io = std::max(iind_.size(), oind_.size());
   // Allocate/reset seeds
-  m->seed_.resize(max_io);
-  std::fill(m->seed_.begin(), m->seed_.end(), 0);
+  m->isens_.resize(max_io);
+  std::fill(m->isens_.begin(), m->isens_.end(), 0);
   // Allocate/reset sensitivities
-  m->sens_.resize(max_io);
-  std::fill(m->sens_.begin(), m->sens_.end(), 0);
+  m->osens_.resize(max_io);
+  std::fill(m->osens_.begin(), m->osens_.end(), 0);
   // Allocate/reset changed
   m->imarked_.resize(max_io);
   std::fill(m->imarked_.begin(), m->imarked_.end(), false);
@@ -1134,7 +1134,7 @@ void FmuInternal::get(FmuMemory* m, size_t ind, double* value) const {
 void FmuInternal::set_fwd(FmuMemory* m, casadi_int nseed,
     const casadi_int* id, const double* v) const {
   for (casadi_int i = 0; i < nseed; ++i) {
-    m->seed_.at(*id) = *v++;
+    m->isens_.at(*id) = *v++;
     m->imarked_.at(*id) = true;
     id++;
   }
@@ -1202,8 +1202,8 @@ void FmuInternal::gather_fwd(FmuMemory* m) const {
   // Get/clear seeds
   m->d_in_.clear();
   for (size_t id : m->id_in_) {
-    m->d_in_.push_back(m->seed_[id]);
-    m->seed_[id] = 0;
+    m->d_in_.push_back(m->isens_[id]);
+    m->isens_[id] = 0;
   }
   // Ensure at least one seed
   casadi_assert(n_known != 0, "No seeds");
@@ -1221,8 +1221,8 @@ void FmuInternal::gather_adj(FmuMemory* m) const {
   // Get/clear seeds
   m->d_in_.clear();
   for (size_t id : m->id_in_) {
-    m->d_in_.push_back(m->seed_[id]);
-    m->seed_[id] = 0;
+    m->d_in_.push_back(m->isens_[id]);
+    m->isens_[id] = 0;
   }
   // Ensure at least one seed
   casadi_assert(n_known != 0, "No seeds");
