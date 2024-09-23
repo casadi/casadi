@@ -1827,8 +1827,6 @@ namespace casadi {
     // Stack used to sort the computational graph
     std::stack<MXNode*> s;
 
-    uout() << "expr" << expr << std::endl;
-
     // All nodes
     std::vector<MXNode*> nodes;
 
@@ -1851,11 +1849,6 @@ namespace casadi {
     std::vector<MX> ret(nodes.size());
     for (casadi_int i=0; i<nodes.size(); ++i) {
       ret[i].own(nodes[i]);
-    }
-
-    uout() << "ret" << ret << std::endl;
-    if (ret.size()>=1) {
-      uout() << "ret0" << ret[0].get()  << std::endl;
     }
 
     return ret;
