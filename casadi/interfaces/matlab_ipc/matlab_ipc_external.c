@@ -392,6 +392,7 @@ CASADI_SYMBOL_EXPORT void F_decref(void) {
   struct matlab_external_global* g = &matlab_external_global_data;
   matlab_external_global_counter--;
   if (matlab_external_global_counter==0) {
+    engEvalString(g->ep, "clear cb;");
     engClose(g->ep);
     for (i=0;i<g->n_in;++i) {
       free(g->in[i].compressed);
