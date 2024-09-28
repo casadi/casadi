@@ -13,4 +13,5 @@ for root, dirs, files in os.walk(dir):
             path = os.path.join(root, file)
 
             # codesign the library
+            subprocess.call(["codesign", "--remove-signature", path])
             subprocess.call(["codesign", "--force", "--sign", identity, path])
