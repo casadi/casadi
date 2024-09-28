@@ -720,6 +720,74 @@ std::vector<casadi_int> DaeBuilder::dimension(const std::string& name) const {
   return variable(name).dimension;
 }
 
+double DaeBuilder::start_time() const {
+  try {
+    return (*this)->start_time_;
+  } catch (std::exception& e) {
+    THROW_ERROR("start_time", e.what());
+    return nan;
+  }
+}
+
+void DaeBuilder::set_start_time(double val) {
+  try {
+    (*this)->start_time_ = val;
+  } catch (std::exception& e) {
+    THROW_ERROR("set_start_time", e.what());
+  }
+}
+
+double DaeBuilder::stop_time() const {
+  try {
+    return (*this)->stop_time_;
+  } catch (std::exception& e) {
+    THROW_ERROR("stop_time", e.what());
+    return nan;
+  }
+}
+
+void DaeBuilder::set_stop_time(double val) {
+  try {
+    (*this)->stop_time_ = val;
+  } catch (std::exception& e) {
+    THROW_ERROR("set_stop_time", e.what());
+  }
+}
+
+double DaeBuilder::tolerance() const {
+  try {
+    return (*this)->tolerance_;
+  } catch (std::exception& e) {
+    THROW_ERROR("tolerance", e.what());
+    return nan;
+  }
+}
+
+void DaeBuilder::set_tolerance(double val) {
+  try {
+    (*this)->tolerance_ = val;
+  } catch (std::exception& e) {
+    THROW_ERROR("set_tolerance", e.what());
+  }
+}
+
+double DaeBuilder::step_size() const {
+  try {
+    return (*this)->step_size_;
+  } catch (std::exception& e) {
+    THROW_ERROR("step_size", e.what());
+    return nan;
+  }
+}
+
+void DaeBuilder::set_step_size(double val) {
+  try {
+    (*this)->step_size_ = val;
+  } catch (std::exception& e) {
+    THROW_ERROR("set_step_size", e.what());
+  }
+}
+
 void DaeBuilder::add_lc(const std::string& name,
     const std::vector<std::string>& f_out) {
   try {

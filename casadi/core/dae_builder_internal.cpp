@@ -376,8 +376,13 @@ DaeBuilderInternal::DaeBuilderInternal(const std::string& name, const std::strin
     const Dict& opts) : name_(name), path_(path) {
   clear_cache_ = false;
   number_of_event_indicators_ = 0;
-  provides_directional_derivatives_ = 0;
+  provides_directional_derivatives_ = false;
+  provides_adjoint_derivatives_ = false;
   symbolic_ = true;
+  start_time_ = nan;
+  stop_time_ = nan;
+  tolerance_ = nan;
+  step_size_ = nan;
   // Default options
   debug_ = false;
   fmutol_ = 0;

@@ -551,6 +551,30 @@ class CASADI_EXPORT DaeBuilder
   /// Get the dimensions of a variable
   std::vector<casadi_int> dimension(const std::string& name) const;
 
+  /// Get the start time
+  double start_time() const;
+
+  /// Set the start time
+  void set_start_time(double val);
+
+  /// Get the stop time
+  double stop_time() const;
+
+  /// Set the stop time
+  void set_stop_time(double val);
+
+  /// Get the tolerance
+  double tolerance() const;
+
+  /// Set the tolerance
+  void set_tolerance(double val);
+
+  /// Get the step size
+  double step_size() const;
+
+  /// Set the step size
+  void set_step_size(double val);
+
   // The following routines are not needed in MATLAB and would cause ambiguity
   // Note that a multirow strings can be interpreted as a vector of strings
 #if !(defined(SWIG) && defined(SWIGMATLAB))
