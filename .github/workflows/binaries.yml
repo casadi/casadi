@@ -320,7 +320,7 @@ jobs:
       - uses: jgillis/import-codesign-certs@master
         with: 
           p12-file-base64: ${{ secrets.DEVELOPMENT_CERTIFICATE_DATA }}
-          p12-password: ''
+          p12-password: ${{ secrets.P12_PASSWORD }}
           keychain-password: ${{ secrets.KEYCHAIN_PASSWORD }}
         if: env.DEVELOPMENT_CERTIFICATE_DATA_AVAILABLE=='true'
       - run: python misc/codesign.py "${{ secrets.CODESIGN_IDENTITY }}" install
@@ -475,7 +475,7 @@ jobs:
       - uses: jgillis/import-codesign-certs@master
         with: 
           p12-file-base64: ${{ secrets.DEVELOPMENT_CERTIFICATE_DATA }}
-          p12-password: ''
+          p12-password: ${{ secrets.P12_PASSWORD }}
           keychain-password: ${{ secrets.KEYCHAIN_PASSWORD }}
         if: ${{ env.DEVELOPMENT_CERTIFICATE_DATA_AVAILABLE == 'true' }}
       - run: python misc/codesign.py "${{ secrets.CODESIGN_IDENTITY }}" install
