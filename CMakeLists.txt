@@ -594,12 +594,14 @@ add_feature_info(csparse-interface WITH_CSPARSE "Interface to the sparse direct 
 option(WITH_BLASFEO "Compile the interface to BLASFEO" OFF)
 set(BUILD_BLASFEO_VERSION "edf92b396adddd9e548b9786f87ad290a0971329" CACHE STRING "Tag/branch/hash to be used for BUILD_BLASFEO_GIT_REPO")
 set(BUILD_BLASFEO_GIT_REPO "https://github.com/giaf/blasfeo.git" CACHE STRING "Git repo used together with BUILD_BLASFEO_VERSION")
+set(BUILD_BLASFEO_GIT_SHALLOW OFF CACHE BOOL "Use shallow clone for BLASFEO")
 option(WITH_BUILD_BLASFEO "Build BLASFEO (BUILD_BLASFEO_VERSION=${BUILD_BLASFEO_VERSION}) from downloaded source (BUILD_BLASFEO_GIT_REPO=${BUILD_BLASFEO_GIT_REPO})." OFF)
 
 # HPIPM
 option(WITH_HPIPM "Compile the interface to HPIPM" OFF)
 set(BUILD_HPIPM_VERSION "0e0c9f4e0d4081dceafa9b37c396db50bce0e81a" CACHE STRING "Tag/branch/hash to be used for BUILD_HPIPM_GIT_REPO")
 set(BUILD_HPIPM_GIT_REPO "https://github.com/jgillis/hpipm.git" CACHE STRING "Git repo used together with BUILD_HPIPM_VERSION")
+set(BUILD_HPIPM_GIT_SHALLOW OFF CACHE BOOL "Use shallow clone for HPIPM")
 option(WITH_BUILD_HPIPM "Build HPIPM (BUILD_HPIPM_VERSION=${BUILD_HPIPM_VERSION}) from downloaded source (BUILD_HPIPM_GIT_REPO=${BUILD_HPIPM_GIT_REPO})." OFF)
 set(BUILD_HPIPM_DEPENDENCIES BLASFEO)
 
@@ -607,6 +609,7 @@ set(BUILD_HPIPM_DEPENDENCIES BLASFEO)
 option(WITH_FATROP "Compile the interface to FATROP" OFF)
 set(BUILD_FATROP_VERSION "3c09fcd" CACHE STRING "Tag/branch/hash to be used for BUILD_FATROP_GIT_REPO")
 set(BUILD_FATROP_GIT_REPO "https://github.com/meco-group/fatrop.git" CACHE STRING "Git repo used together with BUILD_FATROP_VERSION")
+set(BUILD_FATROP_GIT_SHALLOW OFF CACHE BOOL "Use shallow clone for FATROP")
 option(WITH_BUILD_FATROP "Build FATROP (BUILD_FATROP_VERSION=${BUILD_FATROP_VERSION}) from downloaded source (BUILD_FATROP_GIT_REPO=${BUILD_FATROP_GIT_REPO})." OFF)
 set(BUILD_FATROP_DEPENDENCIES BLASFEO)
 
@@ -614,6 +617,7 @@ set(BUILD_FATROP_DEPENDENCIES BLASFEO)
 option(WITH_SUPERSCS "Compile the interface to SuperSCS (the source code for SuperSCS is included)" ${WITH_SUPERSCS_DEF})
 set(BUILD_SUPERSCS_VERSION "4d2d1bd03ed4cf93e684a880b233760ce34ca69c" CACHE STRING "Tag/branch/hash to be used for BUILD_SUPERSCS_GIT_REPO")
 set(BUILD_SUPERSCS_GIT_REPO "https://github.com/jgillis/scs.git" CACHE STRING "Git repo used together with BUILD_SUPERSCS_VERSION")
+set(BUILD_SUPERSCS_GIT_SHALLOW OFF CACHE BOOL "Use shallow clone for SUPERSCS")
 option(WITH_BUILD_SUPERSCS "Build SuperSCS (BUILD_SUPERSCS_VERSION=${BUILD_SUPERSCS_VERSION}) from downloaded source (BUILD_SUPERSCS_GIT_REPO=${BUILD_SUPERSCS_GIT_REPO})." OFF)
 add_feature_info(superscs-interface WITH_SUPERSCS "Interface to Conic solver SuperSCS.")
 
@@ -621,15 +625,18 @@ add_feature_info(superscs-interface WITH_SUPERSCS "Interface to Conic solver Sup
 option(WITH_OSQP "Compile the interface to OSQP" OFF)
 set(BUILD_OSQP_VERSION "v0.6.3" CACHE STRING "Tag/branch/hash to be used for BUILD_OSQP_GIT_REPO")
 set(BUILD_OSQP_GIT_REPO "https://github.com/osqp/osqp.git" CACHE STRING "Git repo used together with BUILD_OSQP_VERSION")
+set(BUILD_OSQP_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for OSQP")
 option(WITH_BUILD_OSQP "Build OSQP (BUILD_OSQP_VERSION=${BUILD_OSQP_VERSION}) from downloaded source (BUILD_OSQP_GIT_REPO=${BUILD_OSQP_GIT_REPO})." OFF)
 add_feature_info(osqp-interface WITH_OSQP "Interface to QP solver OSQP.")
 
 set(BUILD_EIGEN3_VERSION "3.4.0" CACHE STRING "Tag/branch/hash to be used for BUILD_EIGEN3_GIT_REPO")
 set(BUILD_EIGEN3_GIT_REPO "https://gitlab.com/libeigen/eigen.git" CACHE STRING "Git repo used together with BUILD_EIGEN3_VERSION")
+set(BUILD_EIGEN3_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for EIGEN3")
 option(WITH_BUILD_EIGEN3 "Build Eigen (BUILD_EIGEN3_VERSION=${BUILD_EIGEN3_VERSION}) from downloaded source (BUILD_EIGEN3_GIT_REPO=${BUILD_EIGEN3_GIT_REPO})." OFF)
 
 set(BUILD_SIMDE_VERSION "v0.7.2" CACHE STRING "Tag/branch/hash to be used for BUILD_SIMDE_GIT_REPO")
 set(BUILD_SIMDE_GIT_REPO "https://github.com/simd-everywhere/simde.git" CACHE STRING "Git repo used together with BUILD_BLASFEO_VERSION")
+set(BUILD_SIMDE_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for SIMDE")
 option(WITH_BUILD_SIMDE "Build Simde (BUILD_SIMDE_VERSION=${BUILD_SIMDE_VERSION}) from downloaded source (BUILD_SIMDE_GIT_REPO=${BUILD_SIMDE_GIT_REPO})." OFF)
 
 
@@ -637,6 +644,7 @@ option(WITH_BUILD_SIMDE "Build Simde (BUILD_SIMDE_VERSION=${BUILD_SIMDE_VERSION}
 option(WITH_PROXQP "Compile the interface to PROXQP" OFF)
 set(BUILD_PROXQP_VERSION "v0.3.2" CACHE STRING "Tag/branch/hash to be used for BUILD_PROXQP_GIT_REPO")
 set(BUILD_PROXQP_GIT_REPO "https://github.com/Simple-Robotics/proxsuite.git" CACHE STRING "Git repo used together with BUILD_PROXQP_VERSION")
+set(BUILD_PROXQP_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for PROXQP")
 option(WITH_BUILD_PROXQP "Build PROXQP (BUILD_PROXQP_VERSION=${BUILD_PROXQP_VERSION}) from downloaded source (BUILD_PROXQP_GIT_REPO=${BUILD_PROXQP_GIT_REPO})." OFF)
 set(BUILD_PROXQP_DEPENDENCIES EIGEN3 SIMDE)
 
@@ -683,6 +691,7 @@ option(WITH_LAPACK "Compile the interface to LAPACK" ${WITH_LAPACK_DEF})
 option(WITH_BUILD_LAPACK "Download and install OpenBLAS for LAPACK+BLAS" OFF)
 set(BUILD_LAPACK_GIT_REPO https://github.com/xianyi/OpenBLAS.git  CACHE STRING "Git repo used together with BUILD_LAPACK_VERSION")
 set(BUILD_LAPACK_VERSION v0.3.21 CACHE STRING "Tag/branch/hash to be used for BUILD_LAPACK_GIT_REPO")
+set(BUILD_LAPACK_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for LAPACK")
 
 # qpOASES: An active-set QP solver
 option(WITH_QPOASES "Compile the interface to qpOASES (the source code for qpOASES is included)" ${WITH_QPOASES_DEF})
@@ -707,11 +716,13 @@ add_feature_info(blocksqp-interface WITH_BLOCKSQP "Interface to the NLP solver b
 
 set(BUILD_TRLIB_VERSION "c7632b8b14152e78bc21721a3bd1a2432586b824" CACHE STRING "Tag/branch/hash to be used for BUILD_TRLIB_GIT_REPO")
 set(BUILD_TRLIB_GIT_REPO "https://github.com/jgillis/trlib.git" CACHE STRING "Git repo used together with BUILD_TRLIB_VERSION")
+set(BUILD_TRLIB_GIT_SHALLOW OFF CACHE BOOL "Use shallow clone for TRLIB")
 option(WITH_BUILD_TRLIB "Build TRLIB (BUILD_TRLIB_VERSION=${BUILD_TRLIB_VERSION}) from downloaded source (BUILD_TRLIB_GIT_REPO=${BUILD_TRLIB_GIT_REPO})." OFF)
 
 # SLEQP: An active set-based NLP solver
 option(WITH_SLEQP "Compile the interface to SLEQP" OFF)
 set(BUILD_SLEQP_GIT_REPO "https://github.com/jgillis/sleqp.git" CACHE STRING "Git repo used together with BUILD_SLEQ_VERSION")
+set(BUILD_SLEQP_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for SLEQP")
 set(BUILD_SLEQP_VERSION "patch-1" CACHE STRING "Tag/branch/hash to be used for BUILD_SLEQ_GIT_REPO")
 option(WITH_BUILD_SLEQP "Build SLEQP (BUILD_SLEQP_VERSION=${BUILD_SLEQP_VERSION}) from downloaded source (BUILD_SLEQP_GIT_REPO=${BUILD_SLEQP_GIT_REPO})." OFF)
 set(BUILD_SLEQP_DEPENDENCIES HIGHS TRLIB MUMPS)
@@ -719,12 +730,14 @@ set(BUILD_SLEQP_DEPENDENCIES HIGHS TRLIB MUMPS)
 # IPOPT: A sparse interior point NLP solver with filter line-search
 option(WITH_IPOPT "Compile the interface to IPOPT" ${WITH_IPOPT_DEF})
 set(BUILD_IPOPT_GIT_REPO "https://github.com/jgillis/Ipopt-1.git" CACHE STRING "Git repo used together with BUILD_IPOPT_VERSION")
+set(BUILD_IPOPT_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for IPOPT")
 set(BUILD_IPOPT_VERSION "3.14.11.mod" CACHE STRING "Tag/branch/hash to be used for BUILD_IPOPT_GIT_REPO")
 option(WITH_BUILD_IPOPT "Build IPOPT (BUILD_IPOPT_VERSION=${BUILD_IPOPT_VERSION}) from downloaded source (BUILD_IPOPT_GIT_REPO=${BUILD_IPOPT_GIT_REPO})." OFF)
 set(BUILD_IPOPT_DEPENDENCIES MUMPS)
 
 option(WITH_MOCKUP_REQUIRED ON)
-set(BUILD_MOCKUPS_GIT_REPO https://github.com/casadi/mockups.git CACHE STRING "Git repo used together with BUILD_MOCKUPS_VERSION")
+set(BUILD_MOCKUPS_GIT_REPO "https://github.com/casadi/mockups.git" CACHE STRING "Git repo used together with BUILD_MOCKUPS_VERSION")
+set(BUILD_MOCKUPS_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for MOCKUPS")
 set(BUILD_MOCKUPS_VERSION "master" CACHE STRING "Tag/branch/hash to be used for BUILD_MOCKUPS_GIT_REPO")
 
 option(WITH_MADNLP "Compile the interface to MadNLP"  OFF)
@@ -753,7 +766,8 @@ option(WITH_MOCKUP_GUROBI "Use mockup GUROBI (BUILD_MOCKUPS_VERSION=${BUILD_MOCK
 
 # Bonmin: An MINLP solver
 option(WITH_BONMIN "Compile the interface to BONMIN" OFF)
-set(BUILD_BONMIN_GIT_REPO https://github.com/coin-or/Bonmin.git CACHE STRING "Git repo used together with BUILD_BONMIN_VERSION")
+set(BUILD_BONMIN_GIT_REPO "https://github.com/coin-or/Bonmin.git" CACHE STRING "Git repo used together with BUILD_BONMIN_VERSION")
+set(BUILD_BONMIN_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for BONMIN")
 set(BUILD_BONMIN_VERSION "releases/1.8.9" CACHE STRING "Tag/branch/hash to be used for BUILD_BONMIN_GIT_REPO")
 option(WITH_BUILD_BONMIN "Build BONMIN (BUILD_BONMIN_VERSION=${BUILD_BONMIN_VERSION}) from downloaded source (BUILD_BONMIN_GIT_REPO=${BUILD_BONMIN_GIT_REPO})." OFF)
 set(BUILD_BONMIN_DEPENDENCIES IPOPT CBC)
@@ -762,6 +776,7 @@ set(BUILD_BONMIN_DEPENDENCIES IPOPT CBC)
 option(WITH_CBC "Compile the CBC interface" OFF)
 set(BUILD_CBC_VERSION "releases/2.10.11" CACHE STRING "Tag/branch/hash to be used for BUILD_CBC_GIT_REPO")
 set(BUILD_CBC_GIT_REPO "https://github.com/coin-or/Cbc.git" CACHE STRING "Git repo used together with BUILD_CBC_VERSION")
+set(BUILD_CBC_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for CBC")
 
 option(WITH_BUILD_CBC "Build CBC (BUILD_CBC_VERSION=${BUILD_CBC_VERSION}) from downloaded source." OFF)
 set(BUILD_CBC_DEPENDENCIES CLP)
@@ -770,12 +785,16 @@ set(BUILD_CBC_DEPENDENCIES CLP)
 option(WITH_CLP "Compile the CLP interface" OFF)
 set(BUILD_CLP_VERSION "releases/1.17.9" CACHE STRING "Tag/branch/hash to be used for BUILD_CLP_GIT_REPO")
 set(BUILD_CLP_GIT_REPO "https://github.com/coin-or/Clp.git" CACHE STRING "Git repo used together with BUILD_CLP_VERSION")
+set(BUILD_CLP_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for CLP")
 set(BUILD_COINUTILS_VERSION "releases/2.11.10" CACHE STRING "Tag/branch/hash to be used for BUILD_COINUTILS_GIT_REPO")
 set(BUILD_COINUTILS_GIT_REPO "https://github.com/coin-or/CoinUtils.git" CACHE STRING "Git repo used together with BUILD_COINUTILS_VERSION")
+set(BUILD_COINUTILS_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for COINUTILS")
 set(BUILD_CGL_VERSION "releases/0.60.8" CACHE STRING "Tag/branch/hash to be used for BUILD_CGL_GIT_REPO")
 set(BUILD_CGL_GIT_REPO "https://github.com/coin-or/Cgl.git" CACHE STRING "Git repo used together with BUILD_CGL_VERSION")
+set(BUILD_CGL_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for CGL")
 set(BUILD_OSI_VERSION "releases/0.108.9" CACHE STRING "Tag/branch/hash to be used for BUILD_OSI_GIT_REPO")
 set(BUILD_OSI_GIT_REPO "https://github.com/coin-or/Osi.git" CACHE STRING "Git repo used together with BUILD_OSI_VERSION")
+set(BUILD_OSI_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for OSI")
 
 option(WITH_BUILD_CLP "Build CLP (BUILD_CLP_VERSION=${BUILD_CLP_VERSION}) from downloaded source (BUILD_CLP_GIT_REPO=${BUILD_CLP_GIT_REPO})." OFF)
 set(BUILD_CLP_DEPENDENCIES MUMPS LAPACK)
@@ -785,8 +804,10 @@ option(WITH_MUMPS "Enable MUMPS interface" OFF)
 set(BUILD_MUMPS_TP_VERSION "releases/3.0.2" CACHE STRING "Tag/branch/hash to be used for BUILD_MUMPS_TP_GIT_REPO")
 set(BUILD_METIS_TP_VERSION "releases/2.0.0" CACHE STRING "Tag/branch/hash to be used for BUILD_BETIS_TP_GIT_REPO")
 set(BUILD_METIS_TP_GIT_REPO "https://github.com/coin-or-tools/ThirdParty-Metis.git" CACHE STRING "Git repo used together with BUILD_METIS_TP_VERSION")
+set(BUILD_METIS_TP_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for METIS_TP")
 option(WITH_BUILD_METIS "Build Metis from downloaded source." OFF)
 set(BUILD_MUMPS_TP_GIT_REPO "https://github.com/coin-or-tools/ThirdParty-Mumps.git" CACHE STRING "Git repo used together with BUILD_MUMPS_TP_VERSION")
+set(BUILD_MUMPS_TP_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for MUMPS_TP")
 
 option(WITH_BUILD_MUMPS "Build MUMPS (BUILD_MUMPS_TP_VERSION=${BUILD_MUMPS_TP_VERSION}) from downloaded source (BUILD_MUMPS_TP_GIT_REPO=${BUILD_MUMPS_TP_GIT_REPO})." OFF)
 set(BUILD_MUMPS_DEPENDENCIES LAPACK METIS)
@@ -795,6 +816,7 @@ set(BUILD_MUMPS_DEPENDENCIES LAPACK METIS)
 option(WITH_SPRAL "Enable SPRAL interface" OFF)
 set(BUILD_SPRAL_VERSION "d385d2c9e858366d257cafaaf05760ffa6543e26" CACHE STRING "Tag/branch/hash to be used for BUILD_SPRAL_GIT_REPO")
 set(BUILD_SPRAL_GIT_REPO "https://github.com/ralna/spral.git" CACHE STRING "Git repo used together with BUILD_SPRAL_VERSION")
+set(BUILD_SPRAL_GIT_SHALLOW OFF CACHE BOOL "Use shallow clone for SPRAL")
 option(WITH_BUILD_SPRAL "Build SPRAL (BUILD_SPRAL_VERSION=${BUILD_SPRAL_VERSION}) from downloaded source (BUILD_SPRAL_GIT_REPO=${BUILD_SPRAL_GIT_REPO})." OFF)
 set(BUILD_SPRAL_DEPENDENCIES LAPACK METIS)
 
@@ -811,6 +833,7 @@ set(BUILD_HSL_DEPENDENCIES LAPACK METIS)
 # HIGHS: A MILP / QP solver
 option(WITH_HIGHS "Compile the HiGHS interface" OFF)
 set(BUILD_HIGHS_GIT_REPO "https://github.com/ERGO-Code/HiGHS" CACHE STRING "Git repo used together with BUILD_HIGHS_VERSION")
+set(BUILD_HIGHS_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for HIGHS")
 set(BUILD_HIGHS_VERSION "v1.7.2" CACHE STRING "Tag/branch/hash to be used for BUILD_HIGHS_GIT_REPO")
 option(WITH_BUILD_HIGHS "Build HiGHS (BUILD_HIGHS_VERSION=${BUILD_HIGHS_VERSION}) from downloaded source (BUILD_HIGHS_GIT_REPO=${BUILD_HIGHS_GIT_REPO})." OFF)
 
@@ -818,11 +841,13 @@ option(WITH_BUILD_HIGHS "Build HiGHS (BUILD_HIGHS_VERSION=${BUILD_HIGHS_VERSION}
 option(WITH_DAQP "Compile the DAQP interface" OFF)
 set(BUILD_DAQP_GIT_REPO "https://github.com/jgillis/daqp.git" CACHE STRING "Git repo used together with BUILD_DAQP_VERSION")
 set(BUILD_DAQP_VERSION "master" CACHE STRING "Tag/branch/hash to be used for BUILD_DAQP_GIT_REPO")
+set(BUILD_DAQP_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for DAQP")
 option(WITH_BUILD_DAQP "Build DAQP (BUILD_DAQP_VERSION=${BUILD_DAQP_VERSION}) from downloaded source (BUILD_DAQP_GIT_REPO=${BUILD_DAQP_GIT_REPO})." OFF)
 
 # ALPAQA: An open source NLP solver based on Augmented Lagrangian
 option(WITH_ALPAQA "Compile the Alpaqa interface" OFF)
 set(BUILD_ALPAQA_GIT_REPO "https://github.com/jgillis/alpaqa" CACHE STRING "Git repo used together with BUILD_ALPAQA_VERSION")
+set(BUILD_ALPAQA_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for ALPAQA")
 set(BUILD_ALPAQA_VERSION "develop" CACHE STRING "Tag/branch/hash to be used for BUILD_ALPAQA_GIT_REPO")
 option(WITH_BUILD_ALPAQA "Build Alpaqa (BUILD_ALPAQA_VERSION=${BUILD_ALPAQA_VERSION}) from downloaded source (BUILD_ALPAQA_GIT_REPO=${BUILD_ALPAQA_GIT_REPO})." OFF)
 set(BUILD_ALPAQA_DEPENDENCIES EIGEN3)
@@ -985,6 +1010,7 @@ endif()
 if (WITH_BUILD_MOCKUPS)
 ExternalProject_Add(mockups-external
   GIT_REPOSITORY ${BUILD_MOCKUPS_GIT_REPO}
+  GIT_SHALLOW ${BUILD_MOCKUPS_GIT_SHALLOW}
   GIT_TAG ${BUILD_MOCKUPS_VERSION}
   PREFIX "${CMAKE_BINARY_DIR}/external_projects"
   UPDATE_COMMAND ""
@@ -1084,6 +1110,7 @@ if(WITH_LAPACK)
     # Requires gcc>=5.0
     ExternalProject_Add(openblas-external
       GIT_REPOSITORY ${BUILD_LAPACK_GIT_REPO}
+      GIT_SHALLOW ${BUILD_LAPACK_GIT_SHALLOW}
       GIT_TAG ${BUILD_LAPACK_VERSION}
       PREFIX "${CMAKE_BINARY_DIR}/external_projects"
       UPDATE_COMMAND ""
@@ -1119,6 +1146,7 @@ if(WITH_BLASFEO)
     endif()
     ExternalProject_Add(blasfeo-external
       GIT_REPOSITORY ${BUILD_BLASFEO_GIT_REPO}
+      GIT_SHALLOW ${BUILD_BLASFEO_GIT_SHALLOW}
       GIT_TAG ${BUILD_BLASFEO_VERSION}
       PREFIX "${CMAKE_BINARY_DIR}/external_projects"
       UPDATE_COMMAND ""
@@ -1154,6 +1182,7 @@ if(WITH_HPIPM)
     ExternalProject_Add(hpipm-external
       DEPENDS ${BLASFEO_DEPENDS_TARGET}
       GIT_REPOSITORY ${BUILD_HPIPM_GIT_REPO}
+      GIT_SHALLOW ${BUILD_HPIPM_GIT_SHALLOW}
       GIT_TAG ${BUILD_HPIPM_VERSION}
       PREFIX "${CMAKE_BINARY_DIR}/external_projects"
       UPDATE_COMMAND ""
@@ -1186,6 +1215,7 @@ if(WITH_FATROP)
     ExternalProject_Add(fatrop-external
       DEPENDS ${BLASFEO_DEPENDS_TARGET}
       GIT_REPOSITORY ${BUILD_FATROP_GIT_REPO}
+      GIT_SHALLOW ${BUILD_FATROP_GIT_SHALLOW}
       GIT_TAG ${BUILD_FATROP_VERSION}
       PREFIX "${CMAKE_BINARY_DIR}/external_projects"
       UPDATE_COMMAND ""
@@ -1224,6 +1254,7 @@ if(WITH_BUILD_METIS)
   endif()
   ExternalProject_Add(metis-external
         GIT_REPOSITORY ${BUILD_METIS_TP_GIT_REPO}
+        GIT_SHALLOW ${BUILD_METIS_TP_GIT_SHALLOW}
         GIT_TAG ${BUILD_METIS_TP_VERSION}
         DEPENDS ${LAPACK_DEPENDS_TARGET}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
@@ -1289,6 +1320,7 @@ if(WITH_MUMPS)
     get_target_property(METIS_LIB metis::metis IMPORTED_LIBNAME)
     ExternalProject_Add(mumps-external
         GIT_REPOSITORY ${BUILD_MUMPS_TP_GIT_REPO}
+        GIT_SHALLOW ${BUILD_MUMPS_TP_GIT_SHALLOW}
         GIT_TAG ${BUILD_MUMPS_TP_VERSION}
         DEPENDS ${LAPACK_DEPENDS_TARGET} metis::metis
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
@@ -1333,6 +1365,7 @@ if(WITH_SPRAL)
     get_target_property(METIS_LIB metis::metis IMPORTED_LIBNAME)
     ExternalProject_Add(spral-external
         GIT_REPOSITORY ${BUILD_SPRAL_GIT_REPO}
+        GIT_SHALLOW ${BUILD_SPRAL_GIT_SHALLOW}
         GIT_TAG ${BUILD_SPRAL_VERSION}
         DEPENDS ${LAPACK_DEPENDS_TARGET} metis::metis
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
@@ -1358,6 +1391,7 @@ if((WITH_CLP AND WITH_BUILD_CLP) OR (WITH_CBC AND WITH_BUILD_CBC))
     ExternalProject_Add(coinutils-external
           DEPENDS ${LAPACK_DEPENDS_TARGET}
           GIT_REPOSITORY ${BUILD_COINUTILS_GIT_REPO}
+          GIT_SHALLOW ${BUILD_COINUTILS_GIT_SHALLOW}
           GIT_TAG ${BUILD_COINUTILS_VERSION}
           PREFIX "${CMAKE_BINARY_DIR}/external_projects"
           UPDATE_COMMAND ""
@@ -1383,6 +1417,7 @@ if(WITH_CLP)
     ExternalProject_Add(osi-external
         DEPENDS coinutils-external
         GIT_REPOSITORY ${BUILD_OSI_GIT_REPO}
+        GIT_SHALLOW ${BUILD_OSI_GIT_SHALLOW}
         GIT_TAG ${BUILD_OSI_VERSION}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
@@ -1409,6 +1444,7 @@ if(WITH_CLP)
     ExternalProject_Add(clp-external
         DEPENDS osi-external mumps-external coinutils-external ${LAPACK_DEPENDS_TARGET}
         GIT_REPOSITORY ${BUILD_CLP_GIT_REPO}
+        GIT_SHALLOW ${BUILD_CLP_GIT_SHALLOW}
         GIT_TAG ${BUILD_CLP_VERSION}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
@@ -1420,6 +1456,7 @@ if(WITH_CLP)
         ${COIN_FLAGS}
 	# For unknown reasons, Coin-or/configure disables pkg-config by default for clang compilers 
 	--enable-pkg-config
+	${APPLE_FLAGS}
 	)
 
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/coin")
@@ -1449,6 +1486,7 @@ if(WITH_CBC)
     ExternalProject_Add(cgl-external
         DEPENDS osi-external clp-external coinutils-external
         GIT_REPOSITORY ${BUILD_CGL_GIT_REPO}
+        GIT_SHALLOW ${BUILD_CGL_GIT_SHALLOW}
         GIT_TAG ${BUILD_CGL_VERSION}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
@@ -1465,6 +1503,7 @@ if(WITH_CBC)
     ExternalProject_Add(cbc-external
         DEPENDS coinutils-external cgl-external osi-external mumps-external clp-external ${LAPACK_DEPENDS_TARGET}
         GIT_REPOSITORY ${BUILD_CBC_GIT_REPO}
+        GIT_SHALLOW ${BUILD_CBC_GIT_SHALLOW}
         GIT_TAG ${BUILD_CBC_VERSION}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
@@ -1506,6 +1545,7 @@ if(WITH_BUILD_TRLIB)
   ExternalProject_Add(trlib-external
       DEPENDS ${LAPACK_DEPENDS_TARGET}
       GIT_REPOSITORY ${BUILD_TRLIB_GIT_REPO}
+      GIT_SHALLOW ${BUILD_TRLIB_GIT_SHALLOW}
       GIT_TAG ${BUILD_TRLIB_VERSION}
       PREFIX "${CMAKE_BINARY_DIR}/external_projects"
       CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
@@ -1522,6 +1562,7 @@ if(WITH_IPOPT)
     ExternalProject_Add(ipopt-external
         DEPENDS ${LAPACK_DEPENDS_TARGET} mumps-external ${SPRAL_DEPENDS_TARGET}
         GIT_REPOSITORY ${BUILD_IPOPT_GIT_REPO}
+        GIT_SHALLOW ${BUILD_IPOPT_GIT_SHALLOW}
         GIT_TAG ${BUILD_IPOPT_VERSION}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
@@ -1566,6 +1607,7 @@ if(WITH_BONMIN)
     ExternalProject_Add(bonmin-external
         DEPENDS mumps-external metis-external coinutils-external osi-external clp-external cgl-external cbc-external ipopt-external
         GIT_REPOSITORY ${BUILD_BONMIN_GIT_REPO}
+        GIT_SHALLOW ${BUILD_BONMIN_GIT_SHALLOW}
         GIT_TAG ${BUILD_BONMIN_VERSION}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
@@ -1600,6 +1642,7 @@ if(WITH_HIGHS)
   if(WITH_BUILD_HIGHS)
     ExternalProject_Add(highs-external
         GIT_REPOSITORY ${BUILD_HIGHS_GIT_REPO}
+        GIT_SHALLOW ${BUILD_HIGHS_GIT_SHALLOW}
         GIT_TAG ${BUILD_HIGHS_VERSION}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
@@ -1626,6 +1669,7 @@ if(WITH_DAQP)
   if(WITH_BUILD_DAQP)
     ExternalProject_Add(daqp-external
         GIT_REPOSITORY ${BUILD_DAQP_GIT_REPO}
+        GIT_SHALLOW ${BUILD_DAQP_GIT_SHALLOW}
         GIT_TAG ${BUILD_DAQP_VERSION}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
@@ -1654,6 +1698,7 @@ if(WITH_SLEQP)
     ExternalProject_Add(sleqp-external
         DEPENDS trlib highs mumps
         GIT_REPOSITORY ${BUILD_SLEQP_GIT_REPO}
+        GIT_SHALLOW ${BUILD_SLEQP_GIT_SHALLOW}
         GIT_TAG ${BUILD_SLEQP_VERSION}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         CMAKE_COMMAND ${EXTERNAL_CMAKE_COMMAND} -E env MUMPSDIR=${MUMPS_INTERFACE_INCLUDE_DIRECTORIES} ${EXTERNAL_CMAKE_COMMAND}
@@ -1678,6 +1723,7 @@ add_feature_info(sleqp-interface WITH_SLEQP "Interface to the NLP solver SLEQP."
 if(WITH_BUILD_EIGEN3)
   ExternalProject_Add(eigen3-external
       GIT_REPOSITORY ${BUILD_EIGEN3_GIT_REPO}
+      GIT_SHALLOW ${BUILD_EIGEN3_GIT_SHALLOW}
       GIT_TAG ${BUILD_EIGEN3_VERSION}
       PREFIX "${CMAKE_BINARY_DIR}/external_projects"
       UPDATE_COMMAND ""
@@ -1698,6 +1744,7 @@ if(WITH_ALPAQA)
     ExternalProject_Add(alpaqa-external
         DEPENDS eigen3
         GIT_REPOSITORY ${BUILD_ALPAQA_GIT_REPO}
+        GIT_SHALLOW ${BUILD_ALPAQA_GIT_SHALLOW}
         GIT_TAG ${BUILD_ALPAQA_VERSION}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
@@ -1724,6 +1771,7 @@ add_feature_info(alpaqa-interface WITH_ALPAQA "Interface to the NLP solver Alpaq
 if(WITH_BUILD_SIMDE)
   ExternalProject_Add(simde-external
       GIT_REPOSITORY ${BUILD_SIMDE_GIT_REPO}
+      GIT_SHALLOW ${BUILD_SIMDE_GIT_SHALLOW}
       GIT_TAG ${BUILD_SIMDE_VERSION}
       PREFIX "${CMAKE_BINARY_DIR}/external_projects"
       CONFIGURE_COMMAND ""
@@ -1743,6 +1791,7 @@ if(WITH_PROXQP)
     ExternalProject_Add(proxqp-external
         DEPENDS Simde eigen3
         GIT_REPOSITORY ${BUILD_PROXQP_GIT_REPO}
+        GIT_SHALLOW ${BUILD_PROXQP_GIT_SHALLOW}
         GIT_TAG ${BUILD_PROXQP_VERSION}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
@@ -1768,6 +1817,7 @@ if(WITH_OSQP)
   if(WITH_BUILD_OSQP)
     ExternalProject_Add(osqp-external
         GIT_REPOSITORY ${BUILD_OSQP_GIT_REPO}
+        GIT_SHALLOW ${BUILD_OSQP_GIT_SHALLOW}
         GIT_TAG ${BUILD_OSQP_VERSION}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
@@ -1796,6 +1846,7 @@ if(WITH_SUPERSCS)
   if(WITH_BUILD_SUPERSCS)
     ExternalProject_Add(superscs-external
         GIT_REPOSITORY ${BUILD_SUPERSCS_GIT_REPO}
+        GIT_SHALLOW ${BUILD_SUPERSCS_GIT_SHALLOW}
         GIT_TAG ${BUILD_SUPERSCS_VERSION}
         DEPENDS ${LAPACK_DEPENDS_TARGET}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
