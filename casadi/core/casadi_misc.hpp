@@ -147,7 +147,9 @@ private:
   /**  \brief Select subset of vector
 
   *  \param v Vector to slice
-  *  \param s Select? */
+  *  \param s Select?
+
+       \identifier{286} */
   template<typename T>
   std::vector<T> vector_select(const std::vector<T> &v, const std::vector<bool> &s,
     bool invert=false);

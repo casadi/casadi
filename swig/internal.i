@@ -5884,6 +5884,9 @@
 %exception  casadi::vector_init(const std::vector< T > &v) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::vector_select(const std::vector< T > &v, const std::vector< bool > &s, bool invert=false) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::vector_slice(const std::vector< T > &v, const std::vector< casadi_int > &i) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
