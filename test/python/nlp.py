@@ -2024,6 +2024,31 @@ class NLPtests(casadiTestCase):
 
   @memory_heavy()
   @requires_nlpsol("ipopt")
+  def test_simple_bounds_sign_issue(self):
+  
+    for X in [SX,MX]:
+        x = X.sym("x")
+        
+        for f in [x,-x]:
+        
+            
+            for lbg,g,ubg in [
+                (-2,x,3),
+                (2,x,2),
+                (-2,0.3*x,3),
+                (2,0.7*x,2),
+                (-2,-x,3),
+                (-2,-0.7*x,3),
+                (-2,0.3*x,3),
+                ]:
+                
+              solver_ref = nlpsol("solver","ipopt",{"x":x,"f":f,"g":g})
+              solver = nlpsol("solver","ipopt",{"x":x,"f":f,"g":g},{"detect_simple_bounds":True})
+              
+              self.checkfunction_light(solver,solver_ref,inputs=solver.convert_in(dict(lbg=lbg,ubg=ubg)))
+
+  @memory_heavy()
+  @requires_nlpsol("ipopt")
   def test_simple_bounds_detect2(self):
     x = MX.sym("x",5)
     p = MX.sym("p",5)

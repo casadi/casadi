@@ -81,8 +81,18 @@ void detect_simple_bounds_gen(const T& x, const T& p,
     T f1 = res[0];
     T f2 = res[1];
 
-    T lb = (lbg(sgi)-f1)/abs(f2);
-    T ub = (ubg(sgi)-f1)/abs(f2);
+    T f2_inv = 1/f2;
+
+    T lb_pre = (lbg(sgi)-f1)*f2_inv;
+    T ub_pre = (ubg(sgi)-f1)*f2_inv;
+
+    T pos_f2 = f2>=0;
+    T neg_f2 = !pos_f2;
+
+    T lb = lb_pre*pos_f2+ub_pre*neg_f2;
+    T ub = ub_pre*pos_f2+lb_pre*neg_f2;
+
+
 
     // Start without simple bounds
     lbx = -T::inf(nx);

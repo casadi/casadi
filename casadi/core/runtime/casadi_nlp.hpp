@@ -153,8 +153,6 @@ void casadi_nlpsol_init(casadi_nlpsol_data<T1>* d, const T1*** arg, T1*** res,
 
 }
 
-// C-REPLACE "fabs" "casadi_fabs"
-
 // SYMBOL "nlpsol_detect_bounds_before"
 template<typename T1>
 int casadi_detect_bounds_before(casadi_nlpsol_data<T1>* d_nlp) {
@@ -196,8 +194,14 @@ int casadi_detect_bounds_before(casadi_nlpsol_data<T1>* d_nlp) {
   for (casadi_int i=0;i<p_bounds->ng;++i) {
     if (p_bounds->is_simple[i]) {
       // Update lbz/ubz
-      T1 lb = (d_nlp->lbg[i]-d_bounds->b[k])/fabs(d_bounds->a[k]);
-      T1 ub = (d_nlp->ubg[i]-d_bounds->b[k])/fabs(d_bounds->a[k]);
+
+      T1 lb = (d_nlp->lbg[i]-d_bounds->b[k])/d_bounds->a[k];
+      T1 ub = (d_nlp->ubg[i]-d_bounds->b[k])/d_bounds->a[k];
+      if (d_bounds->a[k]<0) {
+        T1 tmp = lb;
+        lb = ub;
+        ub = tmp;
+      }
       casadi_int j = p_bounds->target_x[k];
 
       if (lb==d_nlp->lbz[j]) {
@@ -272,5 +276,14 @@ int casadi_detect_bounds_after(casadi_nlpsol_data<T1>* d_nlp) {
         d_nlp->lam_g[d_bounds->target_u[i]-nx] += (d_nlp->lam[i]>0)*d_nlp->lam[i];
     }
   }
+
+  k = 0;
+  for (casadi_int i=0;i<p_bounds->ng;++i) {
+    if (p_bounds->is_simple[i]) {
+      if (d_nlp->lam_g) d_nlp->lam_g[i] /= d_bounds->a[k];
+      k++;
+    }
+  }
+
   return 0;
 }
