@@ -14,7 +14,7 @@ dir = "certify_dir"
 notarize_dir = "notarize_dir"
 shutil.rmtree(notarize_dir,ignore_errors=True)
 os.mkdir(notarize_dir)
-shutil.rmtree(dir)
+shutil.rmtree(dir,ignore_errors=True)
 assert subprocess.call(["unzip",archive,"-d",dir])==0
 
 
