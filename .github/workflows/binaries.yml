@@ -332,10 +332,6 @@ jobs:
              zip -rq ../casadi-${{env.deploy_arch}}-py${{matrix.py2}}.zip .
         shell: bash -el {0}
         if: env.DEVELOPMENT_CERTIFICATE_DATA_AVAILABLE=='true'
-      - run: |
-             #xcrun notarytool submit casadi-${{env.deploy_arch}}-py${{matrix.py2}}.zip --apple-id "${{ secrets.APPLE_ID }}" --team-id "${{ secrets.APPLE_TEAM_ID }}" --password ${{ secrets.NOTARIZE_PASSWORD }} --wait
-             #xcrun stapler staple casadi-${{env.deploy_arch}}-py${{matrix.py2}}.zip
-        if: env.DEVELOPMENT_CERTIFICATE_DATA_AVAILABLE=='true'
       - uses: actions/upload-artifact@v4.3.1
         with:
           name: casadi-${{env.deploy_arch}}-py${{matrix.py2}}
@@ -373,9 +369,6 @@ jobs:
           echo "wheel_wildcard=$wheel_wildcard" >> $GITHUB_OUTPUT
         id: wheel
         shell: bash -el {0}
-      - run: |
-             #xcrun altool --notarize-app --primary-bundle-id "com.yacoda.casadi" --apiKey "${{ secrets.app_store_connect_key }}" --apiIssuer "${{ secrets.app_store_connect_api_issuer }}" --file ${{ steps.wheel.outputs.wheel }}
-        if: env.DEVELOPMENT_CERTIFICATE_DATA_AVAILABLE=='true'
       - name: Delete old release assets
         uses: mknejp/delete-release-assets@v1
         with:
@@ -484,11 +477,6 @@ jobs:
       - run: |
              cd install/casadi
              zip -rq ../../casadi-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip .
-      - run: |
-             #xcrun altool --notarize-app --primary-bundle-id "com.yacoda.casadi" --apiKey "${{ secrets.app_store_connect_key }}" --apiIssuer "${{ secrets.app_store_connect_api_issuer }}" --file casadi-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip
-             #xcrun stapler staple casadi-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip
-        if: ${{ env.DEVELOPMENT_CERTIFICATE_DATA_AVAILABLE == 'true' }}
-        shell: bash -el {0}
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.4.1
       - run: cp casadi-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip casadi-${{ needs.version.outputs.casadi }}-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip
