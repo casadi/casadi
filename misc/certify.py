@@ -11,18 +11,20 @@ notarize_password = sys.argv[5]
 
 # Unzip into dir
 dir = "certify_dir"
-assert subprocess.call(["unzip",archive,dir])==0
+shutil.rmtree(dir)
+assert subprocess.call(["unzip",archive,"-d",dir])==0
 
 
 def each_signable(dir):
-for root, dirs, files in os.walk(dir):
-    for file in files:
-        if file.endswith(".dylib") or file.endswith(".mexmaci64") or file.endswith(".mexmaca64") or file.endswith(".so") or file.endswith(".mex") or os.access(file, os.X_OK):
-            yield os.path.join(root, file)
+    for root, dirs, files in os.walk(dir):
+        for file in files:
+            if file.endswith(".dylib") or file.endswith(".mexmaci64") or file.endswith(".mexmaca64") or file.endswith(".so") or file.endswith(".mex") or os.access(file, os.X_OK):
+                yield os.path.join(root, file)
             
 
 # Recursively look for all shared libraries in `dir`
 for path in each_signable(dir):
+    print("Signing",path)
     assert subprocess.call(["codesign", "--remove-signature", path])==0
     assert subprocess.call(["codesign", "--force", "--sign", identity, path])==0
 # Zip again
