@@ -104,6 +104,11 @@ namespace casadi {
       nlpsol_opts["detect_simple_bounds_parts"] = gf;
       nlpsol_opts["detect_simple_bounds_target_x"] = target_x;
 
+      if (opts.find("equality")!=opts.end()) {
+        std::vector<bool> equality = opts.find("equality")->second;
+        nlpsol_opts["equality"] = vector_select(equality, is_simple, true);
+      }
+
       std::map<std::string, X> nlpsol_nlp = nlp;
       nlpsol_nlp["g"] = g(gi);
       return nlpsol(name, solver, Nlpsol::create_oracle(nlpsol_nlp, opts), nlpsol_opts);

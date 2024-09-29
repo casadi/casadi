@@ -144,6 +144,14 @@ private:
   template<typename T>
   std::vector<T> vector_slice(const std::vector<T> &v, const std::vector<casadi_int> &i);
 
+  /**  \brief Select subset of vector
+
+  *  \param v Vector to slice
+  *  \param s Select? */
+  template<typename T>
+  std::vector<T> vector_select(const std::vector<T> &v, const std::vector<bool> &s,
+    bool invert=false);
+
   /**  \brief Return all but the first element of a vector
 
        \identifier{27y} */
@@ -534,6 +542,22 @@ namespace casadi {
          "vector_slice: Indices should be larger than zero."
          "You have " + str(j) + " at location " + str(k) + ".");
        ret.push_back(v[j]);
+    }
+    return ret;
+  }
+
+  template<typename T>
+  std::vector<T> vector_select(const std::vector<T> &v, const std::vector<bool> &s, bool invert) {
+    std::vector<T> ret;
+    casadi_assert(v.size()==s.size(), "Dimension mismatch.");
+    if (invert) {
+      for (casadi_int k=0;k<s.size();++k) {
+        if (!s[k]) ret.push_back(v[k]);
+      }
+    } else {
+      for (casadi_int k=0;k<s.size();++k) {
+        if (s[k]) ret.push_back(v[k]);
+      }
     }
     return ret;
   }

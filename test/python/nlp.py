@@ -2049,6 +2049,27 @@ class NLPtests(casadiTestCase):
 
   @memory_heavy()
   @requires_nlpsol("ipopt")
+  def test_simple_bounds_equality(self):
+  
+    x = MX.sym("x")
+    y = MX.sym("y")
+    z = vertcat(x,y)
+    f = x
+    
+    g = vertcat(x**2+y**2,x,x*y)
+    lbg = vertcat(1,-2,-5)
+    ubg = vertcat(1,2,5)
+    
+    x0 = vertcat(0.2,0.6)
+    
+    
+    solver_ref = nlpsol("solver","ipopt",{"x":z,"f":f,"g":g},{"equality": [True,False,False]})
+    solver = nlpsol("solver","ipopt",{"x":z,"f":f,"g":g},{"detect_simple_bounds":True, "equality":[True,False,False]})
+    
+    self.checkfunction_light(solver,solver_ref,inputs=solver.convert_in(dict(x0=x0,lbg=lbg,ubg=ubg)))
+  
+  @memory_heavy()
+  @requires_nlpsol("ipopt")
   def test_simple_bounds_detect2(self):
     x = MX.sym("x",5)
     p = MX.sym("p",5)
