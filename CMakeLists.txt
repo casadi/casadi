@@ -802,9 +802,9 @@ set(BUILD_CLP_DEPENDENCIES MUMPS LAPACK)
 # MUMPS: Sparse direct linear solver
 option(WITH_MUMPS "Enable MUMPS interface" OFF)
 set(BUILD_MUMPS_TP_VERSION "releases/3.0.2" CACHE STRING "Tag/branch/hash to be used for BUILD_MUMPS_TP_GIT_REPO")
-set(BUILD_METIS_TP_VERSION "releases/2.0.0" CACHE STRING "Tag/branch/hash to be used for BUILD_BETIS_TP_GIT_REPO")
+set(BUILD_METIS_TP_VERSION "6997f64" CACHE STRING "Tag/branch/hash to be used for BUILD_BETIS_TP_GIT_REPO")
 set(BUILD_METIS_TP_GIT_REPO "https://github.com/coin-or-tools/ThirdParty-Metis.git" CACHE STRING "Git repo used together with BUILD_METIS_TP_VERSION")
-set(BUILD_METIS_TP_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for METIS_TP")
+set(BUILD_METIS_TP_GIT_SHALLOW OFF CACHE BOOL "Use shallow clone for METIS_TP")
 option(WITH_BUILD_METIS "Build Metis from downloaded source." OFF)
 set(BUILD_MUMPS_TP_GIT_REPO "https://github.com/coin-or-tools/ThirdParty-Mumps.git" CACHE STRING "Git repo used together with BUILD_MUMPS_TP_VERSION")
 set(BUILD_MUMPS_TP_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for MUMPS_TP")
@@ -1247,11 +1247,6 @@ add_feature_info(lapack-interface WITH_LAPACK "Interface to LAPACK.")
 
 if(WITH_BUILD_METIS)
   add_feature_info(metis-sourcebuild ON "Build METIS (BUILD_METIS_TP_VERSION=${BUILD_METIS_TP_VERSION}) from downloaded source.")
-  if(ALLOW_DOCKER)
-     set(COIN_RECONFIG_CMD docker run --rm -v <SOURCE_DIR>:/work ghcr.io/casadi/coinbuild:latest /bin/bash ./run_autotools /work COMMAND)
-  else()
-     set(COIN_RECONFIG_CMD)
-  endif()
   ExternalProject_Add(metis-external
         GIT_REPOSITORY ${BUILD_METIS_TP_GIT_REPO}
         GIT_SHALLOW ${BUILD_METIS_TP_GIT_SHALLOW}
@@ -1259,7 +1254,7 @@ if(WITH_BUILD_METIS)
         DEPENDS ${LAPACK_DEPENDS_TARGET}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
-        CONFIGURE_COMMAND ${COIN_RECONFIG_CMD} <SOURCE_DIR>/configure ${CROSS_FLAGS_CONFIGURE} --prefix=<INSTALL_DIR>
+        CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS_CONFIGURE} --prefix=<INSTALL_DIR>
 
           # GKFree is not defined (variadic definition in utils.c); fails on MacOS target
           "ADD_CFLAGS=-Wno-implicit-function-declaration ${EXTERNAL_PROJECT_CFLAGS}"
