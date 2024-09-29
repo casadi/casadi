@@ -333,8 +333,8 @@ jobs:
         shell: bash -el {0}
         if: env.DEVELOPMENT_CERTIFICATE_DATA_AVAILABLE=='true'
       - run: |
-             xcrun altool --notarize-app --primary-bundle-id "com.yacoda.casadi" --apiKey "${{ secrets.app_store_connect_key }}" --apiIssuer "${{ secrets.app_store_connect_api_issuer }}" --file ../casadi-${{env.deploy_arch}}-py${{matrix.py2}}.zip
-             xcrun stapler staple ../casadi-${{env.deploy_arch}}-py${{matrix.py2}}.zip
+             #xcrun notarytool submit casadi-${{env.deploy_arch}}-py${{matrix.py2}}.zip --apple-id "${{ secrets.APPLE_ID }}" --team-id "${{ secrets.APPLE_TEAM_ID }}" --password ${{ secrets.NOTARIZE_PASSWORD }} --wait
+             #xcrun stapler staple casadi-${{env.deploy_arch}}-py${{matrix.py2}}.zip
         if: env.DEVELOPMENT_CERTIFICATE_DATA_AVAILABLE=='true'
       - uses: actions/upload-artifact@v4.3.1
         with:
@@ -374,7 +374,7 @@ jobs:
         id: wheel
         shell: bash -el {0}
       - run: |
-             xcrun altool --notarize-app --primary-bundle-id "com.yacoda.casadi" --apiKey "${{ secrets.app_store_connect_key }}" --apiIssuer "${{ secrets.app_store_connect_api_issuer }}" --file ${{ steps.wheel.outputs.wheel }}
+             #xcrun altool --notarize-app --primary-bundle-id "com.yacoda.casadi" --apiKey "${{ secrets.app_store_connect_key }}" --apiIssuer "${{ secrets.app_store_connect_api_issuer }}" --file ${{ steps.wheel.outputs.wheel }}
         if: env.DEVELOPMENT_CERTIFICATE_DATA_AVAILABLE=='true'
       - name: Delete old release assets
         uses: mknejp/delete-release-assets@v1
@@ -485,8 +485,8 @@ jobs:
              cd install/casadi
              zip -rq ../../casadi-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip .
       - run: |
-             xcrun altool --notarize-app --primary-bundle-id "com.yacoda.casadi" --apiKey "${{ secrets.app_store_connect_key }}" --apiIssuer "${{ secrets.app_store_connect_api_issuer }}" --file ../../casadi-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip
-             xcrun stapler staple ../../casadi-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip
+             #xcrun altool --notarize-app --primary-bundle-id "com.yacoda.casadi" --apiKey "${{ secrets.app_store_connect_key }}" --apiIssuer "${{ secrets.app_store_connect_api_issuer }}" --file casadi-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip
+             #xcrun stapler staple casadi-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip
         if: ${{ env.DEVELOPMENT_CERTIFICATE_DATA_AVAILABLE == 'true' }}
         shell: bash -el {0}
       - name: Inject slug/short variables
