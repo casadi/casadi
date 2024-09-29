@@ -11,6 +11,9 @@ notarize_password = sys.argv[5]
 
 # Unzip into dir
 dir = "certify_dir"
+notarize_dir = "notarize_dir"
+shutil.rmtree(notarize_dir,ignore_errors=True)
+os.mkdir(notarize_dir)
 shutil.rmtree(dir)
 assert subprocess.call(["unzip",archive,"-d",dir])==0
 
@@ -27,11 +30,12 @@ for path in each_signable(dir):
     print("Signing",path)
     assert subprocess.call(["codesign", "--remove-signature", path])==0
     assert subprocess.call(["codesign", "--force", "--sign", identity, path])==0
-# Zip again
-os.remove(archive)
-assert subprocess.call(["zip","-rq","../" + archive, "."],cwd=dir)==0
+    shutil.copy(path,notarize_dir)
 
-assert subprocess.call(["xcrun","notarytool","submit",archive, "--apple-id", apple_id, "--team-id", apple_team_id, "--password", notarize_password, "--wait"])==0
+
+assert subprocess.call(["zip","-rq","../" + "notarize_" + archive, "."],cwd=notarize_dir)==0
+
+assert subprocess.call(["xcrun","notarytool","submit","notarize_" + archive, "--apple-id", apple_id, "--team-id", apple_team_id, "--password", notarize_password, "--wait"])==0
 for path in each_signable(dir):
     assert subprocess.call(["xcrun", "stapler", "staple", path])==0
 
