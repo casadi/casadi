@@ -233,15 +233,15 @@ jobs:
               - type: append
                 matrix:
                   arch: [manylinux2014-x64,manylinux2014-x86]
-                  py2: ["36","37","38","39","310","311","312"]
+                  py2: ["36","37","38","39","310","311","312","313"]
               - type: append
                 matrix:
                   arch: [windows-shared-x64-posix]
-                  py2: ["27","35","36","37","38","39","310","311","312"]
+                  py2: ["27","35","36","37","38","39","310","311","312","313"]
               - type: append
                 matrix:
                   arch: [manylinux2014-aarch64]
-                  py2: ["36","37","38","39","310","311","312"]
+                  py2: ["36","37","38","39","310","311","312","313"]
     outputs:
       matrix: ${{ steps.build-matrix.outputs.matrix }}
 
@@ -254,12 +254,12 @@ jobs:
           config: |
             matrix:
               image: [macos-12]
-              py2: ["27","35","36","37","38","39","310","311","312"]
+              py2: ["27","35","36","37","38","39","310","311","312","313"]
             operations:
               - type: append
                 matrix:
                   image: [macos-14]
-                  py2: ["38","39","310","311","312"]
+                  py2: ["38","39","310","311","312","313"]
 
     outputs:
       matrix: ${{ steps.build-matrix.outputs.matrix }}
@@ -294,6 +294,7 @@ jobs:
       - uses: conda-incubator/setup-miniconda@v3.0.3
         with:
           python-version: ${{steps.get-id.outputs.pydot2}}
+          channels: conda-forge, conda-forge/label/python_rc
       - uses: actions/download-artifact@v4.1.7
         with:
           name: casadi_source_wrapper
@@ -909,7 +910,7 @@ jobs:
     strategy:
      fail-fast: false
      matrix:
-       py2: ["27","35","36","37","38","39","310","311","312"]
+       py2: ["27","35","36","37","38","39","310","311","312","313"]
        image: ["windows-2022","ubuntu-20.04","macos-12","macos-14"]
        bit: [64]
        exclude:
@@ -962,6 +963,7 @@ jobs:
           python-version: ${{steps.get-id.outputs.pydot2}}
           activate-environment: py${{steps.get-id.outputs.pydot2}}
           auto-update-conda: true
+          channels: conda-forge, conda-forge/label/python_rc
       - run: |
           pip install numpy scipy pandas
         shell: bash -el {0}
@@ -1043,6 +1045,7 @@ jobs:
           python-version: ${{steps.get-id.outputs.pydot2}}
           activate-environment: py${{steps.get-id.outputs.pydot2}}
           auto-update-conda: true
+          channels: conda-forge, conda-forge/label/python_rc
       - run: |
           pip install numpy scipy pandas
         shell: bash -el {0}
