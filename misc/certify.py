@@ -33,11 +33,11 @@ for path in each_signable(dir):
     shutil.copy(path,notarize_dir)
 
 
-#assert subprocess.call(["zip","-rq","../" + "notarize_" + archive, "."],cwd=notarize_dir)==0
+assert subprocess.call(["zip","-rq","../" + "notarize_" + archive, "."],cwd=notarize_dir)==0
 
-#assert subprocess.call(["xcrun","notarytool","submit","notarize_" + archive, "--apple-id", apple_id, "--team-id", apple_team_id, "--password", notarize_password, "--wait"])==0
-#for path in each_signable(dir):
-#    assert subprocess.call(["xcrun", "stapler", "staple", path])==0
+assert subprocess.call(["xcrun","notarytool","submit","notarize_" + archive, "--apple-id", apple_id, "--team-id", apple_team_id, "--password", notarize_password, "--wait"])==0
+for path in each_signable(dir):
+    assert subprocess.call(["xcrun", "stapler", "staple", path])==0
 
 # Zip again
 os.remove(archive)
