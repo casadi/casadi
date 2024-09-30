@@ -30,7 +30,7 @@ from numpy import double, int32, ones, matrix, zeros
 import unittest
 from types import *
 from helpers import *
-from distutils.version import LooseVersion
+from looseversion import LooseVersion
 
 scipy_available = True
 try:

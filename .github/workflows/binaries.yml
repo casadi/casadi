@@ -965,11 +965,11 @@ jobs:
           auto-update-conda: true
           channels: pkgs/main, conda-forge, conda-forge/label/python_rc
       - run: |
-          pip install numpy scipy pandas
+          pip install numpy scipy pandas looseversion
         shell: bash -el {0}
         if: "!contains(matrix.image, 'windows')"
       - run: |
-          pip install numpy scipy pandas
+          pip install numpy scipy pandas looseversion
         shell: pwsh
         if: contains(matrix.image, 'windows')
       - env:
@@ -1047,11 +1047,11 @@ jobs:
           auto-update-conda: true
           channels: pkgs/main, conda-forge, conda-forge/label/python_rc
       - run: |
-          pip install numpy scipy pandas
+          pip install numpy scipy pandas looseversion
         shell: bash -el {0}
         if: "!contains(matrix.image, 'windows')"
       - run: |
-          pip install numpy scipy pandas
+          pip install numpy scipy pandas looseversion
         shell: pwsh
         if: contains(matrix.image, 'windows')
       - env:
