@@ -356,7 +356,7 @@ jobs:
           file: casadi-${{ needs.version.outputs.casadi }}-${{env.deploy_arch}}-py${{matrix.py2}}.zip
           prerelease: true
         if: github.event_name != 'pull_request'
-      - run: unzip -d casadi-${{env.deploy_arch}}-py${{matrix.py2}}.zip -d package_for_wheel
+      - run: unzip casadi-${{env.deploy_arch}}-py${{matrix.py2}}.zip -d package_for_wheel
       - run: |
           wheel=$(python misc/create_wheel_local.py ${{ needs.version.outputs.wheel }} ${{matrix.py2}} osx 64 ${{matrix.image == 'macos-14' && 'osx-m1' || 'osx'}} package_for_wheel/)
           echo "<$wheel>"
