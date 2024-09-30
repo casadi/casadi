@@ -294,7 +294,7 @@ jobs:
       - uses: conda-incubator/setup-miniconda@v3.0.3
         with:
           python-version: ${{steps.get-id.outputs.pydot2}}
-          channels: conda-forge, conda-forge/label/python_rc
+          channels: pkgs/main, conda-forge, conda-forge/label/python_rc
       - uses: actions/download-artifact@v4.1.7
         with:
           name: casadi_source_wrapper
@@ -963,7 +963,7 @@ jobs:
           python-version: ${{steps.get-id.outputs.pydot2}}
           activate-environment: py${{steps.get-id.outputs.pydot2}}
           auto-update-conda: true
-          channels: conda-forge, conda-forge/label/python_rc
+          channels: pkgs/main, conda-forge, conda-forge/label/python_rc
       - run: |
           pip install numpy scipy pandas
         shell: bash -el {0}
@@ -1045,7 +1045,7 @@ jobs:
           python-version: ${{steps.get-id.outputs.pydot2}}
           activate-environment: py${{steps.get-id.outputs.pydot2}}
           auto-update-conda: true
-          channels: conda-forge, conda-forge/label/python_rc
+          channels: pkgs/main, conda-forge, conda-forge/label/python_rc
       - run: |
           pip install numpy scipy pandas
         shell: bash -el {0}
