@@ -26,14 +26,14 @@ Now create a variable ``x`` using the syntax:
 .. side-by-side::
     .. exec-block:: python
 
-        x = MX.sym("x")
+        x = SX.sym("x")
         print(x) [hidden]
 
     &&
 
     .. exec-block:: octave
 
-        x = MX.sym('x')
+        x = SX.sym('x')
 
 This creates a 1-by-1 matrix, i.e. a scalar containing a symbolic primitive called ``x``. This is just the display name, not the identifier. Multiple variables can have the same name, but still be different. The identifier is the return value. You can also create vector- or matrix-valued symbolic variables by supplying additional arguments to ``SX.sym``:
 
