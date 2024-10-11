@@ -288,6 +288,8 @@ MX OptiNode::variable(casadi_int n, casadi_int m, const std::string& attribute) 
   symbols_.push_back(symbol);
   store_initial_[OPTI_VAR].push_back(DM::zeros(symbol.sparsity()));
   store_latest_[OPTI_VAR].push_back(DM::nan(symbol.sparsity()));
+  store_linear_scale_[OPTI_VAR].push_back(DM::ones(symbol.sparsity()));
+  store_linear_scale_offset_[OPTI_VAR].push_back(DM::zeros(symbol.sparsity()));
 
   set_meta(symbol, meta_data);
   return ret;
@@ -308,6 +310,8 @@ MX OptiNode::variable(const MX& symbol, const std::string& attribute) {
   symbols_.push_back(symbol);
   store_initial_[OPTI_VAR].push_back(DM::zeros(symbol.sparsity()));
   store_latest_[OPTI_VAR].push_back(DM::nan(symbol.sparsity()));
+  store_linear_scale_[OPTI_VAR].push_back(DM::ones(symbol.sparsity()));
+  store_linear_scale_offset_[OPTI_VAR].push_back(DM::zeros(symbol.sparsity()));
 
   set_meta(symbol, meta_data);
   return symbol;
@@ -330,6 +334,8 @@ MX OptiNode::variable(const Sparsity& sp, const std::string& attribute) {
   symbols_.push_back(symbol);
   store_initial_[OPTI_VAR].push_back(DM::zeros(symbol.sparsity()));
   store_latest_[OPTI_VAR].push_back(DM::nan(symbol.sparsity()));
+  store_linear_scale_[OPTI_VAR].push_back(DM::ones(symbol.sparsity()));
+  store_linear_scale_offset_[OPTI_VAR].push_back(DM::zeros(symbol.sparsity()));
 
   set_meta(symbol, meta_data);
   return symbol;
@@ -1276,11 +1282,11 @@ void OptiNode::set_value(const std::vector<MX>& assignments) {
   }
 }
 
-void OptiNode::set_value_internal(const MX& x, const DM& v) {
+void OptiNode::set_value_internal(const MX& x, const DM& v, std::map< VariableType, std::vector<DM> >& store) {
   mark_solved(false);
   casadi_assert_dev(v.is_regular());
   if (x.is_symbolic()) {
-    DM& target = store_initial_[meta(x).type][meta(x).i];
+    DM& target = store[meta(x).type][meta(x).i];
     Slice all;
     target.set(v, false, all, all);
     return;
@@ -1350,7 +1356,7 @@ void OptiNode::set_value_internal(const MX& x, const DM& v) {
 
   casadi_int offset = 0;
   for (const auto & s : symbols) {
-    DM& target = store_initial_[meta(s).type][meta(s).i];
+    DM& target = store[meta(s).type][meta(s).i];
     std::vector<double>& data = target.nonzeros();
     // Loop over nonzeros in each symbol
     for (casadi_int i=0;i<s.nnz();++i) {
@@ -1367,14 +1373,22 @@ void OptiNode::set_initial(const MX& x, const DM& v) {
   for (const auto & s : MX::symvar(x))
     casadi_assert(meta(s).type!=OPTI_PAR,
       "You cannot set an initial value for a parameter. Did you mean 'set_value'?");
-  set_value_internal(x, v);
+  set_value_internal(x, v, store_initial_);
 }
 
 void OptiNode::set_value(const MX& x, const DM& v) {
   for (const auto & s : MX::symvar(x))
     casadi_assert(meta(s).type!=OPTI_VAR,
       "You cannot set a value for a variable. Did you mean 'set_initial'?");
-  set_value_internal(x, v);
+  set_value_internal(x, v, store_initial_);
+}
+
+void OptiNode::set_linear_scale(const MX& x, const DM& scale, const DM& offset) {
+  for (const auto & s : MX::symvar(x))
+    casadi_assert(meta(s).type!=OPTI_PAR,
+      "You cannot set a scale value for a parameter.");
+  set_value_internal(x, scale, store_linear_scale_);
+  set_value_internal(x, offset, store_linear_scale_offset_);
 }
 
 std::vector<MX> OptiNode::active_symvar(VariableType type) const {

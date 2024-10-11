@@ -182,6 +182,14 @@ void Opti::set_domain(const MX& x, const std::string& domain) {
   }
 }
 
+void Opti::set_linear_scale(const MX& x, const DM& scale, const DM& offset) {
+  try {
+    (*this)->set_linear_scale(x, scale, offset);
+  } catch(std::exception& e) {
+    THROW_ERROR("set_linear_scale", e.what());
+  }
+}
+
 void Opti::set_value(const std::vector<MX>& assignments) {
   try {
     (*this)->set_value(assignments);
