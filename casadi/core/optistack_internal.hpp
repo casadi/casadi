@@ -108,6 +108,9 @@ public:
   /// Set domain of variable
   void set_domain(const MX& x, const std::string& domain);
 
+  /// Set scale of a decision variable
+  void set_linear_scale(const MX& x, const DM& scale, const DM& offset);
+
   /// Crunch the numbers; solve the problem
   OptiSol solve(bool accept_limit);
 
@@ -310,7 +313,7 @@ private:
   void register_dual(MetaCon& meta);
 
   /// Set value of symbol
-  void set_value_internal(const MX& x, const DM& v);
+  void set_value_internal(const MX& x, const DM& v, std::map< VariableType, std::vector<DM> >& store);
 
   /** \brief decompose a chain of inequalities
   *
@@ -367,6 +370,9 @@ private:
 
   /// Storing initial/latest values for all variables (including inactive)
   std::map< VariableType, std::vector<DM> > store_initial_, store_latest_;
+
+  /// Storing linear scales
+  std::map< VariableType, std::vector<DM> > store_linear_scale_, store_linear_scale_offset_;
 
   /// Is symbol present in problem?
   std::vector<bool> symbol_active_;

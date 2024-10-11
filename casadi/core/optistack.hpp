@@ -218,8 +218,20 @@ public:
       \identifier{27t} */
   void set_domain(const MX& x, const std::string& domain);
 
-  /// @}
-
+  /** \brief Set scale of a decision variable
+  * 
+  * (x-offset)/scale will be used in the optimization problem
+  *
+  * \param[in] x decision variable
+  * \param[in] scale scaling value (default: 1)
+  * \param[in] offset scaling value (default: 0)
+  *
+  * \verbatim
+  * opti.set_linear_scale(x, 20)
+  * opti.set_linear_scale(x, 20, 273.15)
+  * \endverbatim
+  */
+  void set_linear_scale(const MX& x, const DM& scale, const DM& offset=0);
 
   /// Crunch the numbers; solve the problem
   OptiSol solve();
