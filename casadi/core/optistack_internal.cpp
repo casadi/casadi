@@ -241,6 +241,7 @@ MX OptiNode::g_lookup(casadi_int i) const {
 OptiNode::OptiNode(const std::string& problem_type) :
     count_(0), count_var_(0), count_par_(0), count_dual_(0) {
   f_ = 0;
+  f_linear_scale_ = 1;
   instance_number_ = instance_count_++;
   user_callback_ = nullptr;
   store_initial_[OPTI_VAR] = {};
@@ -731,11 +732,11 @@ void OptiNode::bake() {
   equality_.clear();
   for (const auto& g : g_) {
     if (meta_con(g).type==OPTI_PSD) {
-      h_all.push_back(meta_con(g).canon);
+      h_all.push_back(meta_con(g).canon/meta_con(g).linear_scale);
     } else {
-      g_all.push_back(meta_con(g).canon);
-      lbg_all.push_back(meta_con(g).lb);
-      ubg_all.push_back(meta_con(g).ub);
+      g_all.push_back(meta_con(g).canon/meta_con(g).linear_scale);
+      lbg_all.push_back(meta_con(g).lb/meta_con(g).linear_scale);
+      ubg_all.push_back(meta_con(g).ub/meta_con(g).linear_scale);
       equality_.insert(equality_.end(),
         meta_con(g).canon.numel(),
         meta_con(g).type==OPTI_EQUALITY || meta_con(g).type==OPTI_GENERIC_EQUALITY);
@@ -746,6 +747,32 @@ void OptiNode::bake() {
   if (problem_type_=="conic") {
     nlp_["h"] = diagcat(h_all);
   }
+
+  // Get scaling data
+  std::vector<DM> linear_scale = active_values(OPTI_VAR, store_linear_scale_);
+  std::vector<DM> linear_scale_offset = active_values(OPTI_VAR, store_linear_scale_offset_);
+
+  linear_scale_ = veccat(linear_scale).nonzeros();
+  linear_scale_offset_ = veccat(linear_scale_offset).nonzeros();
+
+  // Unscaled version of x
+  std::vector<MX> x_unscaled(x.size());
+  for (casadi_int i=0;i<x.size();++i) {
+    x_unscaled[i] = x[i]*linear_scale[i] + linear_scale_offset[i];
+  }
+
+  // Perform substitution
+  std::vector<MX> expr = {nlp_["f"], nlp_["g"]};
+  if (problem_type_=="conic") expr.push_back(nlp_["h"]);
+  std::vector<MX> fgh = substitute(expr, x, x_unscaled);
+  nlp_["f"] = fgh[0];
+  nlp_["g"] = fgh[1];
+  if (problem_type_=="conic") {
+    nlp_["h"] = fgh[2];
+  }
+
+  // Scale of objective
+  nlp_["f"] = nlp_["f"]/f_linear_scale_;
 
   // Create bounds helper function
   MXDict bounds;
@@ -838,11 +865,15 @@ bool OptiNode::is_parametric(const MX& expr) const {
   return symvar(expr, OPTI_VAR).empty();
 }
 
-MetaCon OptiNode::canon_expr(const MX& expr) const {
+MetaCon OptiNode::canon_expr(const MX& expr, const DM& linear_scale) const {
   MX c = expr;
 
   MetaCon con;
   con.original = expr;
+  casadi_assert(linear_scale.is_scalar() || linear_scale.size()==expr.size(),
+    "Linear scale must have the same size as the expression. "
+    "You got linear_scale " + con.linear_scale.dim() + " while " + expr.dim() + " is expected.");
+  con.linear_scale = linear_scale;
 
   if (c.is_op(OP_LE) || c.is_op(OP_LT)) { // Inequalities
     std::vector<MX> ret;
@@ -929,6 +960,9 @@ MetaCon OptiNode::canon_expr(const MX& expr) const {
       con.lb = -inf*DM::ones(con.canon.sparsity());
       con.ub = DM::zeros(con.canon.sparsity());
       con.n = ret.size();
+      if (!con.linear_scale.is_scalar()) {
+        con.linear_scale = repmat(con.linear_scale, ret.size(), 1);
+      }
     } else {
       con.canon = diagcat(ret);
       con.n = ret.size();
@@ -982,14 +1016,15 @@ void OptiNode::assert_empty() const {
   casadi_assert_dev(f_.is_empty());
 }
 
-void OptiNode::minimize(const MX& f) {
+void OptiNode::minimize(const MX& f, double linear_scale) {
   assert_only_opti_nondual(f);
   mark_problem_dirty();
   casadi_assert(f.is_scalar(), "Objective must be scalar, got " + f.dim() + ".");
   f_ = f;
+  f_linear_scale_ = linear_scale;
 }
 
-void OptiNode::subject_to(const MX& g) {
+void OptiNode::subject_to(const MX& g, const DM& linear_scale) {
   assert_only_opti_nondual(g);
   mark_problem_dirty();
   g_.push_back(g);
@@ -1004,7 +1039,7 @@ void OptiNode::subject_to(const MX& g) {
                                   "You need a symbol to form a constraint.");
 
   // Store the meta-data
-  set_meta_con(g, canon_expr(g));
+  set_meta_con(g, canon_expr(g, linear_scale));
   register_dual(meta_con(g));
 }
 
@@ -1030,7 +1065,10 @@ void OptiNode::res(const DMDict& res) {
   for (const auto &v : active_symvar(OPTI_VAR)) {
     casadi_int i = meta(v).i;
     std::vector<double> & data_v = store_latest_[OPTI_VAR][i].nonzeros();
-    std::copy(x_v.begin()+meta(v).start, x_v.begin()+meta(v).stop, data_v.begin());
+    for (casadi_int i=0;i<data_v.size();++i) {
+      casadi_int j = meta(v).start+i;
+      data_v[i] = x_v[j]*linear_scale_[j] + linear_scale_offset_[j];
+    }
   }
   if (res.find("lam_g")!=res.end() && problem_type_!="conic") {
     const std::vector<double> & lam_v = res.at("lam_g").nonzeros();
@@ -1137,7 +1175,7 @@ void OptiNode::solve_prepare() {
   }
 
   // Get initial guess and parameter values
-  arg_["x0"]     = veccat(active_values(OPTI_VAR));
+  arg_["x0"]     = (veccat(active_values(OPTI_VAR))-linear_scale_offset_)/linear_scale_;
   arg_["p"]      = veccat(active_values(OPTI_PAR));
   arg_["lam_g0"] = veccat(active_values(OPTI_DUAL_G));
   if (!arg_["p"].is_regular()) {
@@ -1149,6 +1187,7 @@ void OptiNode::solve_prepare() {
         "or have set it to NaN/Inf:\n" + describe(s[i], 1));
     }
   }
+
 
   // Evaluate bounds for given parameter values
   DMDict arg;
@@ -1387,7 +1426,11 @@ void OptiNode::set_linear_scale(const MX& x, const DM& scale, const DM& offset) 
   for (const auto & s : MX::symvar(x))
     casadi_assert(meta(s).type!=OPTI_PAR,
       "You cannot set a scale value for a parameter.");
+  casadi_assert(scale.is_scalar() || scale.size()==x.size(),
+      "Dimension mismatch in linear_scale. Expected " + x.dim() + ", got " + scale.dim()+ ".");
   set_value_internal(x, scale, store_linear_scale_);
+  casadi_assert(offset.is_scalar() || offset.size()==x.size(),
+      "Dimension mismatch in linear_scale offset. Expected " + x.dim() + ", got " + scale.dim()+ ".");
   set_value_internal(x, offset, store_linear_scale_offset_);
 }
 
@@ -1402,11 +1445,15 @@ std::vector<MX> OptiNode::active_symvar(VariableType type) const {
 }
 
 std::vector<DM> OptiNode::active_values(VariableType type) const {
+  return active_values(type, store_initial_);
+}
+
+std::vector<DM> OptiNode::active_values(VariableType type, const std::map< VariableType, std::vector<DM> >& store) const {
   if (symbol_active_.empty()) return std::vector<DM>{};
   std::vector<DM> ret;
   for (const auto& s : symbols_) {
     if (symbol_active_[meta(s).count] && meta(s).type==type) {
-      ret.push_back(store_initial_.at(meta(s).type)[meta(s).i]);
+      ret.push_back(store.at(meta(s).type)[meta(s).i]);
     }
   }
   return ret;
