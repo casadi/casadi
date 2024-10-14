@@ -111,24 +111,24 @@ MX Opti::parameter(const MX& symbol, const std::string& attribute) {
   }
 }
 
-void Opti::minimize(const MX& f) {
+void Opti::minimize(const MX& f, double linear_scale) {
   try {
-    (*this)->minimize(f);
+    (*this)->minimize(f, linear_scale);
   } catch(std::exception& e) {
     THROW_ERROR("minimize", e.what());
   }
 }
 
-void Opti::subject_to(const MX& g) {
+void Opti::subject_to(const MX& g, const DM& linear_scale) {
   try {
-    (*this)->subject_to(g);
+    (*this)->subject_to(g, linear_scale);
   } catch(std::exception& e) {
     THROW_ERROR("subject_to", e.what());
   }
 }
 
-void Opti::subject_to(const std::vector<MX>& g) {
-  for (const auto& gs : g) subject_to(gs);
+void Opti::subject_to(const std::vector<MX>& g, const DM& linear_scale) {
+  for (const auto& gs : g) subject_to(gs, linear_scale);
 }
 
 void Opti::subject_to() {

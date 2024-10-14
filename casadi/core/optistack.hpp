@@ -134,7 +134,7 @@ public:
   * When method is called multiple times, the last call takes effect
 
       \identifier{1a} */
-  void minimize(const MX& f);
+  void minimize(const MX& f, double linear_scale=1);
 
   /// @{
   /** \brief Add constraints
@@ -162,8 +162,8 @@ public:
   *  - opti.debug.show_infeasibilities() may be used to inspect which constraints are violated
   *
       \identifier{1b} */
-  void subject_to(const MX& g);
-  void subject_to(const std::vector<MX>& g);
+  void subject_to(const MX& g, const DM& linear_scale=1);
+  void subject_to(const std::vector<MX>& g, const DM& linear_scale=1);
   /// @}
 
   /// Clear constraints
@@ -496,7 +496,7 @@ public:
     casadi_int stop;
   };
   struct MetaCon : IndexAbstraction {
-    MetaCon() :  n(1), flipped(false) {}
+    MetaCon() :  n(1), flipped(false), linear_scale(1) {}
     MX original;  // original expression
     MX canon; // Canonical expression
     ConstraintType type;
@@ -507,6 +507,7 @@ public:
     MX dual_canon;
     MX dual;
     Dict extra;
+    DM linear_scale;
   };
   struct MetaVar : IndexAbstraction {
     std::string attribute;

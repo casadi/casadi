@@ -77,10 +77,10 @@ public:
   MX parameter(const MX& symbol, const std::string& attribute="full");
 
   /// Set objective
-  void minimize(const MX& f);
+  void minimize(const MX& f, double linear_scale=1);
 
   /// brief Add constraints
-  void subject_to(const MX& g);
+  void subject_to(const MX& g, const DM& linear_scale=1);
   /// Clear constraints
   void subject_to();
 
@@ -159,7 +159,7 @@ public:
   /// @}
 
   /// Interpret an expression (for internal use only)
-  MetaCon canon_expr(const MX& expr) const;
+  MetaCon canon_expr(const MX& expr, const DM& linear_scale=1) const;
 
   /// Get meta-data of symbol (for internal use only)
   MetaVar get_meta(const MX& m) const;
@@ -184,6 +184,7 @@ public:
 
   std::vector<MX> active_symvar(VariableType type) const;
   std::vector<DM> active_values(VariableType type) const;
+  std::vector<DM> active_values(VariableType type, const std::map< VariableType, std::vector<DM> >& store) const;
 
   MX x_lookup(casadi_int i) const;
   MX g_lookup(casadi_int i) const;
@@ -385,6 +386,8 @@ private:
   DMDict arg_;
   MXDict nlp_;
   MX lam_;
+  std::vector<double> linear_scale_;
+  std::vector<double> linear_scale_offset_;
 
   /// Bounds helper function: p -> lbg, ubg
   Function bounds_;
@@ -397,6 +400,8 @@ private:
 
   /// Objective verbatim as passed in with 'minimize'
   MX f_;
+
+  double f_linear_scale_;
 
   /// Problem type
   std::string problem_type_;

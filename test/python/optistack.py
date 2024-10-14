@@ -1049,6 +1049,90 @@ class OptiStacktests(inherit_from):
       f = opti.to_function('f',[p],[x])
       self.checkarray(f(-1), xsol_integer)
       
+    @requires_nlpsol("ipopt")
+    def test_linear_scale(self):
+    
+      x = MX.sym("x")
+      
 
+      opti = Opti()
+      x = opti.variable()
+      y = opti.variable()
+      z = opti.variable()
+      
+      opti.minimize((x-y)**2)
+      opti.subject_to(x+y>=1)
+      opti.subject_to(z+x>=1)
+      
+      opti.set_initial(x,1)
+      opti.set_initial(y,2)
+      opti.set_initial(z,1)
+      
+      opti.solver("ipopt",{"specific_options": {"nlp_f": {"final_options":{"dump_in":True,"dump_out":True}}, "nlp_grad_f": {"final_options":{"dump_out":True}},"nlp_jac_g": {"final_options":{"dump_out":True}}},"ipopt.nlp_scaling_method":"none","ipopt.mumps_permuting_scaling":0,"ipopt.mumps_scaling":0})
+
+      sol = opti.solve()
+      
+      x_sol_unscaled = sol.value(opti.x)
+      
+      x_unscaled = DM.from_file("nlp_f.000000.in.x.mtx")
+      f_unscaled = DM.from_file("nlp_f.000000.out.f.mtx")
+      grad_f_unscaled = DM.from_file("nlp_grad_f.000000.out.grad_f_x.mtx")
+      jac_g_unscaled = DM.from_file("nlp_jac_g.000000.out.jac_g_x.mtx")
+      
+      opti = Opti()
+      x = opti.variable()
+      y = opti.variable()
+      z = opti.variable()
+      
+      opti.minimize((x-y)**2)
+      opti.subject_to(x+y>=1)
+      opti.subject_to(z+x>=1)
+      
+      opti.set_initial(x,1)
+      opti.set_initial(y,2)
+      opti.set_initial(z,1)
+      
+      opti.set_linear_scale(x,10)
+      opti.set_linear_scale(y,5,1)
+      opti.set_linear_scale(z,3,1)
+      
+      opti.solver("ipopt",{"specific_options": {"nlp_f": {"final_options":{"dump_in":True,"dump_out":True}}, "nlp_grad_f": {"final_options":{"dump_out":True}}},"ipopt.nlp_scaling_method":"none","ipopt.mumps_permuting_scaling":0,"ipopt.mumps_scaling":0})
+
+      sol = opti.solve()
+      
+      x_sol_scaled = sol.value(opti.x)
+      
+      x_scaled = DM.from_file("nlp_f.000000.in.x.mtx")
+      f_scaled = DM.from_file("nlp_f.000000.out.f.mtx")
+      grad_f_scaled = DM.from_file("nlp_grad_f.000000.out.grad_f_x.mtx")
+      
+      self.checkarray((x_unscaled-vertcat(0,1,1))/vertcat(10,5,3),x_scaled)
+      self.checkarray(f_unscaled, f_scaled)
+      self.checkarray(x_sol_scaled, x_sol_unscaled)
+      self.checkarray(grad_f_unscaled*vertcat(10,5,3),grad_f_scaled)
+
+      opti = Opti()
+      x = opti.variable()
+      y = opti.variable()
+      z = opti.variable()
+      
+      opti.minimize((x-y)**2)
+      opti.subject_to(x+y>=1, 10)
+      opti.subject_to(z+x>=1, 3)
+      
+      opti.solver("ipopt",{"specific_options": {"nlp_f": {"final_options":{"dump_in":True,"dump_out":True}}, "nlp_jac_g": {"final_options":{"dump_out":True}}},"ipopt.nlp_scaling_method":"none","ipopt.mumps_permuting_scaling":0,"ipopt.mumps_scaling":0})
+
+      sol = opti.solve()
+
+      x_scaled = DM.from_file("nlp_f.000000.in.x.mtx")
+      f_scaled = DM.from_file("nlp_f.000000.out.f.mtx")
+      jac_g_scaled = DM.from_file("nlp_jac_g.000000.out.jac_g_x.mtx")
+      self.checkarray(x_sol_scaled, x_sol_unscaled)
+      
+      self.checkarray(jac_g_scaled[0,:]*10, jac_g_unscaled[0,:])
+      self.checkarray(jac_g_scaled[1,:]*3, jac_g_unscaled[1,:])
+
+
+      
 if __name__ == '__main__':
     unittest.main()
