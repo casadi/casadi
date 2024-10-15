@@ -56452,7 +56452,7 @@ constraints are unmet, they
 will differ.
 
 For a good tutorial on BONMIN, see 
-http://drops.dagstuhl.de/volltexte/2009/2089/pdf/09061.WaechterAndreas.Paper.2089.pdf
+https://drops.dagstuhl.de/storage/16dagstuhl-seminar-proceedings/dsp-vol09061/DagSemProc.09061.16/DagSemProc.09061.16.pdf
 
 A good resource about the algorithms in BONMIN is: Wachter and L. T. 
 
@@ -56673,7 +56673,7 @@ constraints are unmet, they
 will differ.
 
 For a good tutorial on IPOPT, see 
-http://drops.dagstuhl.de/volltexte/2009/2089/pdf/09061.WaechterAndreas.Paper.2089.pdf
+https://drops.dagstuhl.de/storage/16dagstuhl-seminar-proceedings/dsp-vol09061/DagSemProc.09061.16/DagSemProc.09061.16.pdf
 
 A good resource about the algorithms in IPOPT is: Wachter and L. T. 
 
