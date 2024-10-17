@@ -114,20 +114,6 @@ distribution.
 	#define TIXML_FTELL ftell
 #endif
 
-#if defined(__MSYS__)
-#warn "debugprint MSYS"
-#endif
-
-#if defined(__CYGWIN__)
-#warn "debugprint CYGWIN"
-#endif
-
-#if defined(__MINGW32__)
-#warning "debugprint MINGW32"
-#endif
-
-
-
 static const char LINE_FEED				= static_cast<char>(0x0a);			// all line endings are normalized to LF
 static const char LF = LINE_FEED;
 static const char CARRIAGE_RETURN		= static_cast<char>(0x0d);			// CR gets filtered out
