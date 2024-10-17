@@ -116,3 +116,18 @@ jobs:
         run: |
             cmake -Bbuild -G "MinGW Makefiles" -DWITH_SELFCONTAINED=ON -DWITH_FATROP=ON -DWITH_BUILD_FATROP=ON -DWITH_BUILD_REQUIRED=ON -DCMAKE_INSTALL_PREFIX=install ${{env.build_flags}}
             cmake --build build --target install --config Release -v
+
+  windows-latest-msys2:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v4.1.1
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          install: gcc cmake make git
+      - shell: msys2 {0}
+        run: |
+            cmake -Bbuild -G "Unix Makefiles" -DWITH_SELFCONTAINED=ON -DWITH_FATROP=ON -DWITH_BUILD_FATROP=ON -DWITH_BUILD_REQUIRED=ON -DCMAKE_INSTALL_PREFIX=install ${{env.build_flags}}
+            cmake --build build --target install --config Release -v
