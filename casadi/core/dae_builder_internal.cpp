@@ -2936,7 +2936,7 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
         for (casadi_int d : read_dependencies(e)) variable(d).dependency = true;
       } else if (e.name == "EventIndicator") {
         // Event indicator
-        casadi_message("Event indicators not implemented, ignoring");
+        number_of_event_indicators_++;
       } else {
         // Unknown
         casadi_error("Unknown ModelStructure element: " + e.name);

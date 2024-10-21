@@ -119,6 +119,9 @@ class CASADI_EXPORT Fmu2 : public FmuInternal {
   // Exit initialization mode
   int exit_initialization_mode(void* instance) const override;
 
+  // Update discrete states
+  int update_discrete_states(void* instance, EventMemory* eventmem) const override;
+
   // Set real values
   int set_real(void* instance, const unsigned int* vr, size_t n_vr,
     const double* values, size_t n_values) const override;

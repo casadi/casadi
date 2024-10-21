@@ -264,6 +264,17 @@ int Fmu2::exit_initialization_mode(void* instance) const {
   return 0;
 }
 
+int Fmu2::update_discrete_states(void* instance, EventMemory* eventmem) const {
+  casadi_warning("Fmu2::update_discrete_states not implemented, ignored");
+  eventmem->discrete_states_need_update = false;
+  eventmem->terminate_simulation = false;
+  eventmem->nominals_of_continuous_states_changed = false;
+  eventmem->values_of_continuous_states_changed = false;
+  eventmem->next_event_time_defined = false;
+  eventmem->next_event_time = 0;
+  return 0;
+}
+
 int Fmu2::set_real(void* instance, const unsigned int* vr, size_t n_vr,
     const double* values, size_t n_values) const {
   casadi_assert(n_vr == n_values, "Vector-valued variables not supported in FMI 2");

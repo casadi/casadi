@@ -33,6 +33,16 @@
 
 namespace casadi {
 
+// Memory for event iteration
+struct EventMemory {
+  bool discrete_states_need_update;
+  bool terminate_simulation;
+  bool nominals_of_continuous_states_changed;
+  bool values_of_continuous_states_changed;
+  bool next_event_time_defined;
+  double next_event_time;
+};
+
 // Forward declarations
 class DaeBuilderInternal;
 struct FmuMemory;
@@ -68,6 +78,9 @@ class CASADI_EXPORT FmuInternal : public SharedObjectInternal {
 
   // Exit initialization mode
   virtual int exit_initialization_mode(void* instance) const = 0;
+
+  // Update discrete states
+  virtual int update_discrete_states(void* instance, EventMemory* eventmem) const = 0;
 
   // Set real values
   virtual int set_real(void* instance, const unsigned int* vr, size_t n_vr,
@@ -143,6 +156,9 @@ class CASADI_EXPORT FmuInternal : public SharedObjectInternal {
   // Load an FMI function
   template<typename T>
   T* load_function(const std::string& symname);
+
+  // Iteration to update discrete states
+  int discrete_states_iter(void* instance) const;
 
   /** \brief Initalize memory block
 
@@ -270,6 +286,9 @@ class CASADI_EXPORT FmuInternal : public SharedObjectInternal {
 
   // Logging?
   bool logging_on_;
+
+  // Number of event indicators
+  casadi_int number_of_event_indicators_;
 
   // Does the FMU declare analytic derivatives support?
   bool provides_directional_derivatives_, provides_adjoint_derivatives_;

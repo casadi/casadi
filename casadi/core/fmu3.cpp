@@ -189,6 +189,10 @@ void Fmu3::load_functions() {
     get_adjoint_derivative_ =
       load_function<fmi3GetAdjointDerivativeTYPE>("fmi3GetAdjointDerivative");
   }
+  if (true) {
+    update_discrete_states_ =
+      load_function<fmi3UpdateDiscreteStatesTYPE>("fmi3UpdateDiscreteStates");
+  }
 }
 
 void Fmu3::log_message_callback(fmi3InstanceEnvironment instanceEnvironment,
@@ -247,6 +251,26 @@ int Fmu3::exit_initialization_mode(void* instance) const {
     return 1;
   }
   return 0;
+}
+
+int Fmu3::update_discrete_states(void* instance, EventMemory* eventmem) const {
+  auto c = static_cast<fmi3Instance>(instance);
+  // Return arguments in FMI types
+  fmi3Boolean discreteStatesNeedUpdate, terminateSimulation, nominalsOfContinuousStatesChanged,
+    valuesOfContinuousStatesChanged, nextEventTimeDefined;
+  fmi3Float64 nextEventTime;
+  // Call FMU
+  fmi3Status status = update_discrete_states_(c, &discreteStatesNeedUpdate, &terminateSimulation,
+    &nominalsOfContinuousStatesChanged, &valuesOfContinuousStatesChanged, &nextEventTimeDefined,
+    &nextEventTime);
+  // Pass to event iteration memory
+  eventmem->discrete_states_need_update = discreteStatesNeedUpdate;
+  eventmem->terminate_simulation = terminateSimulation;
+  eventmem->nominals_of_continuous_states_changed = nominalsOfContinuousStatesChanged;
+  eventmem->values_of_continuous_states_changed = nominalsOfContinuousStatesChanged;
+  eventmem->next_event_time_defined = nextEventTimeDefined;
+  eventmem->next_event_time = nextEventTime;
+  return status != fmi3OK;
 }
 
 int Fmu3::set_real(void* instance, const unsigned int* vr, size_t n_vr,
@@ -423,6 +447,7 @@ Fmu3::Fmu3(const std::string& name,
   get_float64_ = 0;
   get_directional_derivative_ = 0;
   get_adjoint_derivative_ = 0;
+  update_discrete_states_ = 0;
 }
 
 } // namespace casadi

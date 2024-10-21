@@ -428,6 +428,7 @@ void FmuInternal::init(const DaeBuilderInternal* dae) {
   instance_name_ = dae->model_identifier_;
   instantiation_token_ = dae->instantiation_token_;
   logging_on_ = dae->debug_;
+  number_of_event_indicators_ = dae->number_of_event_indicators_;
   provides_directional_derivatives_ = dae->provides_directional_derivatives_;
   provides_adjoint_derivatives_ = dae->provides_adjoint_derivatives_;
 
@@ -1029,6 +1030,39 @@ void FmuInternal::get_adj(FmuMemory* m, size_t ind, double* v) const {
   }
 }
 
+int FmuInternal::discrete_states_iter(void* instance) const {
+  // Quick return if no event indicators
+  if (number_of_event_indicators_ == 0) return 0;
+  // Helper function: update_discrete_states
+  EventMemory eventmem;
+  const size_t max_update_iter = 10;
+  for (size_t update_iter = 0; update_iter < max_update_iter; ++update_iter) {
+    if (update_discrete_states(instance, &eventmem)) {
+      casadi_warning("update_discrete_states");
+      return 1;
+    }
+    // Not implemented
+    if (eventmem.discrete_states_need_update)
+      casadi_warning("Discrete state update not implemented");
+    if (eventmem.terminate_simulation)
+      casadi_warning("Terminate solution not implemented");
+    if (eventmem.nominals_of_continuous_states_changed)
+      casadi_warning("Update of nominals of states not implemented");
+    if (eventmem.values_of_continuous_states_changed)
+      casadi_warning("Update of values of continuous states not implemented");
+    if (eventmem.next_event_time_defined)
+      casadi_warning("Ignoring next time defined: " + std::to_string(eventmem.next_event_time));
+    // Successful return
+    if (!eventmem.discrete_states_need_update) {
+      casadi_warning("Discrete state update successful");
+      return 0;
+    }
+  }
+  // Too many iterations
+  casadi_warning("Discrete state update failed");
+  return 1;
+}
+
 int FmuInternal::init_mem(FmuMemory* m) const {
   // Ensure not already instantiated
   casadi_assert(m->instance == 0, "Already instantiated");
@@ -1043,6 +1077,8 @@ int FmuInternal::init_mem(FmuMemory* m) const {
   if (enter_initialization_mode(m->instance)) return 1;
   // Initialization mode ends
   if (exit_initialization_mode(m->instance)) return 1;
+  // Iteration to update discrete states
+  if (discrete_states_iter(m->instance)) return 1;
   // Allocate/reset input buffer
   m->ibuf_.resize(iind_.size());
   std::fill(m->ibuf_.begin(), m->ibuf_.end(), casadi::nan);
@@ -1291,6 +1327,7 @@ void FmuInternal::serialize_body(SerializingStream& s) const {
   s.pack("FmuInternal::instance_name", instance_name_);
   s.pack("FmuInternal::instantiation_token", instantiation_token_);
   s.pack("FmuInternal::logging_on", logging_on_);
+  s.pack("FmuInternal::number_of_event_indicators", number_of_event_indicators_);
   s.pack("FmuInternal::provides_directional_derivatives", provides_directional_derivatives_);
   s.pack("FmuInternal::provides_adjoint_derivatives", provides_adjoint_derivatives_);
 }
@@ -1329,6 +1366,7 @@ FmuInternal::FmuInternal(DeserializingStream& s) {
   s.unpack("FmuInternal::instance_name", instance_name_);
   s.unpack("FmuInternal::instantiation_token", instantiation_token_);
   s.unpack("FmuInternal::logging_on", logging_on_);
+  s.unpack("FmuInternal::number_of_event_indicators", number_of_event_indicators_);
   s.unpack("FmuInternal::provides_directional_derivatives", provides_directional_derivatives_);
   s.unpack("FmuInternal::provides_adjoint_derivatives", provides_adjoint_derivatives_);
 }
