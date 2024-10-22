@@ -4620,7 +4620,7 @@ make_property(casadi::Opti, casadi_solver);
             frame = sys._getframe(1)
         except:
             frame = {}
-        meta = {} if frame is None else {"stacktrace": {"file":os.path.abspath(frame.f_code.co_filename),"line":frame.f_lineno,"name":frame.f_code.co_name}}
+        meta = {} if frame is None else {"stacktrace": [{"file":os.path.abspath(frame.f_code.co_filename),"line":frame.f_lineno,"name":frame.f_code.co_name}]}
         ret = self._parameter(*args)
         if len(meta)>0:
             self.update_user_dict(ret, meta)
@@ -4633,7 +4633,7 @@ make_property(casadi::Opti, casadi_solver);
             frame = sys._getframe(1)
         except:
             frame = {}
-        meta = {} if frame is None else {"stacktrace": {"file":os.path.abspath(frame.f_code.co_filename),"line":frame.f_lineno,"name":frame.f_code.co_name}}
+        meta = {} if frame is None else {"stacktrace": [{"file":os.path.abspath(frame.f_code.co_filename),"line":frame.f_lineno,"name":frame.f_code.co_name}]}
         ret = self._variable(*args)
         if len(meta)>0:
             self.update_user_dict(ret, meta)
@@ -4644,14 +4644,27 @@ make_property(casadi::Opti, casadi_solver);
           return self._subject_to()
         import sys
         import os
-        try:
-            frame = sys._getframe(1)
-        except:
-            frame = {}
-        meta = {} if frame is None else {"stacktrace": {"file":os.path.abspath(frame.f_code.co_filename),"line":frame.f_lineno,"name":frame.f_code.co_name}}
+        stacktrace = []
+        for i in range(1,10000):
+          try:
+            frame = sys._getframe(i)
+            stacktrace.append({"file":os.path.abspath(frame.f_code.co_filename),"line":frame.f_lineno,"name":frame.f_code.co_name})
+          except Exception as e:
+            break
+        args = list(args)
+        if len(args)==3 and isinstance(args[2],dict):
+          args[2] = dict(args[2])
+          if "stacktrace" not in args[2]:
+            args[2]["stacktrace"] = stacktrace
+        elif len(args)==2 and isinstance(args[1],dict):
+          args[1] = dict(args[1])
+          if "stacktrace" not in args[1]:
+            args[1]["stacktrace"] = stacktrace
+        elif len(args)==1:
+          args = [args[0], {"stacktrace": stacktrace}]
+        elif len(args)==2:
+          args = [args[0], args[1], {"stacktrace": stacktrace}]
         ret = self._subject_to(*args)
-        if len(meta)>0:
-            self.update_user_dict(args[0], meta)
         return ret
     %}
   }

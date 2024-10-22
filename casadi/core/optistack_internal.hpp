@@ -80,7 +80,7 @@ public:
   void minimize(const MX& f, double linear_scale=1);
 
   /// brief Add constraints
-  void subject_to(const MX& g, const DM& linear_scale=1);
+  void subject_to(const MX& g, const DM& linear_scale=1, const Dict& options=Dict());
   /// Clear constraints
   void subject_to();
 
@@ -116,9 +116,9 @@ public:
 
   /// @{
   /// Obtain value of expression at the current value
-  DM value(const MX& x, const std::vector<MX>& values=std::vector<MX>()) const;
-  DM value(const DM& x, const std::vector<MX>& values=std::vector<MX>()) const { return x; }
-  DM value(const SX& x, const std::vector<MX>& values=std::vector<MX>()) const {
+  DM value(const MX& x, const std::vector<MX>& values=std::vector<MX>(), bool scaled=false) const;
+  DM value(const DM& x, const std::vector<MX>& values=std::vector<MX>(), bool scaled=false) const { return x; }
+  DM value(const SX& x, const std::vector<MX>& values=std::vector<MX>(), bool scaled=false) const {
     return DM::nan(x.sparsity());
   }
   /// @}
@@ -189,9 +189,9 @@ public:
   MX x_lookup(casadi_int i) const;
   MX g_lookup(casadi_int i) const;
 
-  std::string x_describe(casadi_int i) const;
-  std::string g_describe(casadi_int i) const;
-  std::string describe(const MX& x, casadi_int indent=0) const;
+  std::string x_describe(casadi_int i, const Dict& opts=Dict()) const;
+  std::string g_describe(casadi_int i, const Dict& opts=Dict()) const;
+  std::string describe(const MX& x, casadi_int indent=0, const Dict& opts=Dict()) const;
 
   void solve_prepare();
   Function solver_construct(bool callback=true);
@@ -244,23 +244,23 @@ public:
   /// Get all (scalarised) constraint expressions as a column vector
   MX g() const {
     if (problem_dirty()) return baked_copy().g();
-    return nlp_.at("g");
+    return nlp_unscaled_.at("g");
   }
 
   /// Get objective expression
   MX f() const {
     if (problem_dirty()) return baked_copy().f();
-    return nlp_.at("f");
+    return nlp_unscaled_.at("f");
   }
 
   MX lbg() const {
     if (problem_dirty()) return baked_copy().lbg();
-    return bounds_lbg_;
+    return bounds_unscaled_lbg_;
   }
 
   MX ubg() const {
     if (problem_dirty()) return baked_copy().ubg();
-    return bounds_ubg_;
+    return bounds_unscaled_ubg_;
   }
 
   /// Get dual variables as a symbolic column vector
@@ -270,6 +270,7 @@ public:
   }
   void assert_empty() const;
 
+  void show_infeasibilities(double tol=0, const Dict& opts=Dict()) const;
 
   /** \brief Create a CasADi Function from the Opti solver
 
@@ -385,14 +386,15 @@ private:
   DMDict res_;
   DMDict arg_;
   MXDict nlp_;
+  MXDict nlp_unscaled_;
   MX lam_;
   std::vector<double> linear_scale_;
   std::vector<double> linear_scale_offset_;
 
   /// Bounds helper function: p -> lbg, ubg
   Function bounds_;
-  MX bounds_lbg_;
-  MX bounds_ubg_;
+  MX bounds_lbg_, bounds_unscaled_lbg_;
+  MX bounds_ubg_, bounds_unscaled_ubg_;
   std::vector<bool> equality_;
 
   /// Constraints verbatim as passed in with 'subject_to'

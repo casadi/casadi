@@ -1161,8 +1161,15 @@ namespace casadi {
   Dict Nlpsol::get_stats(void* mem) const {
     Dict stats = OracleFunction::get_stats(mem);
     auto m = static_cast<NlpsolMemory*>(mem);
+    auto d_nlp = &m->d_nlp;
     stats["success"] = m->success;
     stats["unified_return_status"] = string_from_UnifiedReturnStatus(m->unified_return_status);
+    if (d_nlp->prob->detect_bounds.ng) {
+      std::vector<bool> is_simple;
+      assign_vector(detect_simple_bounds_is_simple_, is_simple);
+      stats["detect_simple_bounds_is_simple"] = is_simple;
+      stats["detect_simple_bounds_target_x"] = detect_simple_bounds_target_x_;
+    }
     return stats;
   }
 

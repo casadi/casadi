@@ -116,7 +116,7 @@ std::string OptiNode::format_stacktrace(const Dict& stacktrace, casadi_int inden
   std::string description;
   std::string filename = stacktrace.at("file").as_string();
   casadi_int line = stacktrace.at("line").as_int();
-  description += "defined at " + filename +":"+str(line);
+  description += "called from " + filename +":"+str(line);
   std::string name = stacktrace.at("name").as_string();
   if (name!="Unknown" && name!= "<module>")
     description += " in " + stacktrace.at("name").as_string();
@@ -136,8 +136,16 @@ std::string OptiNode::format_stacktrace(const Dict& stacktrace, casadi_int inden
   return description;
 }
 
-std::string OptiNode::describe(const MX& expr, casadi_int indent) const {
-  if (problem_dirty()) return baked_copy().describe(expr, indent);
+std::string OptiNode::describe(const MX& expr, casadi_int indent, const Dict& opts) const {
+  if (problem_dirty()) return baked_copy().describe(expr, indent, opts);
+  casadi_int max_stacktrace_depth = 1;
+  for (const auto& op : opts) {
+    if (op.first=="max_stacktrace_depth") {
+      max_stacktrace_depth = op.second.as_int();
+    } else {
+      casadi_warning("Unknown option '" + op.first + "'");
+    }
+  }
   std::string s_indent;
   for (casadi_int i=0;i<indent;++i) {
     s_indent+= "  ";
@@ -150,8 +158,10 @@ std::string OptiNode::describe(const MX& expr, casadi_int indent) const {
       const Dict& extra = meta(expr).extra;
       auto it = extra.find("stacktrace");
       if (it!=extra.end()) {
-        const Dict& stacktrace = it->second.as_dict();
-        description += ", " + format_stacktrace(stacktrace, indent+1);
+        for (const Dict& stacktrace : it->second.as_dict_vector()) {
+          description += ", " + format_stacktrace(stacktrace, indent+1);
+          if (--max_stacktrace_depth==0) break;
+        }
       }
     } else {
       VariableType vt;
@@ -170,8 +180,10 @@ std::string OptiNode::describe(const MX& expr, casadi_int indent) const {
       const Dict& extra = meta_con(expr).extra;
       auto it = extra.find("stacktrace");
       if (it!=extra.end()) {
-        const Dict& stacktrace = it->second.as_dict();
-        description += ", " + format_stacktrace(stacktrace, indent+1);
+        for (const Dict& stacktrace : it->second.as_dict_vector()) {
+          description += ", " + format_stacktrace(stacktrace, indent+1);
+          if (--max_stacktrace_depth==0) break;
+        }
       }
     } else {
       std::vector<MX> s = symvar(expr);
@@ -193,21 +205,22 @@ std::string OptiNode::describe(const MX& expr, casadi_int indent) const {
   return description;
 }
 
-std::string OptiNode::g_describe(casadi_int i) const {
-  if (problem_dirty()) return baked_copy().g_describe(i);
+std::string OptiNode::g_describe(casadi_int i, const Dict& opts) const {
+  if (problem_dirty()) return baked_copy().g_describe(i, opts);
   MX expr = g_lookup(i);
   casadi_int local_i = i-meta_con(expr).start + GlobalOptions::start_index;
-  std::string description = describe(expr);
+  std::string description = describe(expr, 0, opts);
   if (expr.numel()>1)
-    description += "\nAt nonzero " + str(local_i) + ".";
+    description += "\nAt nonzero " + str(local_i % expr.numel()) +
+                   ", part " + str((casadi_int) local_i / expr.numel()) + ".";
   return description;
 }
 
-std::string OptiNode::x_describe(casadi_int i) const {
-  if (problem_dirty()) return baked_copy().x_describe(i);
+std::string OptiNode::x_describe(casadi_int i, const Dict& opts) const {
+  if (problem_dirty()) return baked_copy().x_describe(i, opts);
   MX symbol = x_lookup(i);
   casadi_int local_i = i-meta(symbol).start + GlobalOptions::start_index;
-  std::string description = describe(symbol);
+  std::string description = describe(symbol, 0, opts);
   if (symbol.numel()>1)
     description += "\nAt nonzero " + str(local_i) + ".";
   return description;
@@ -695,12 +708,16 @@ void OptiNode::bake() {
   nlp_["x"] = veccat(x);
   nlp_["p"] = veccat(p);
 
+  nlp_unscaled_["x"] = veccat(x);
+  nlp_unscaled_["p"] = veccat(p);
+
   discrete_.clear();
   for (const MX& e : x) {
     discrete_.insert(discrete_.end(), e.nnz(), meta(e).domain == OPTI_DOMAIN_INTEGER);
   }
 
   nlp_["f"] = f_;
+  nlp_unscaled_["f"] = f_;
 
   offset = 0;
   for (casadi_int i=0;i<g_.size();++i) {
@@ -725,18 +742,24 @@ void OptiNode::bake() {
   lam_ = veccat(lam);
 
   // Collect bounds and canonical form of constraints
-  std::vector<MX> g_all;
-  std::vector<MX> h_all;
-  std::vector<MX> lbg_all;
-  std::vector<MX> ubg_all;
+  std::vector<MX> g_all, g_unscaled_all;
+  std::vector<MX> h_all, h_unscaled_all;
+  std::vector<MX> lbg_all, lbg_unscaled_all;
+  std::vector<MX> ubg_all, ubg_unscaled_all;
+
   equality_.clear();
   for (const auto& g : g_) {
     if (meta_con(g).type==OPTI_PSD) {
       h_all.push_back(meta_con(g).canon/meta_con(g).linear_scale);
+      h_unscaled_all.push_back(meta_con(g).canon);
     } else {
       g_all.push_back(meta_con(g).canon/meta_con(g).linear_scale);
+      g_unscaled_all.push_back(meta_con(g).canon);
       lbg_all.push_back(meta_con(g).lb/meta_con(g).linear_scale);
+      lbg_unscaled_all.push_back(meta_con(g).lb);
       ubg_all.push_back(meta_con(g).ub/meta_con(g).linear_scale);
+      ubg_unscaled_all.push_back(meta_con(g).ub);
+
       equality_.insert(equality_.end(),
         meta_con(g).canon.numel(),
         meta_con(g).type==OPTI_EQUALITY || meta_con(g).type==OPTI_GENERIC_EQUALITY);
@@ -744,8 +767,10 @@ void OptiNode::bake() {
   }
 
   nlp_["g"] = veccat(g_all);
+  nlp_unscaled_["g"] = veccat(g_unscaled_all);
   if (problem_type_=="conic") {
     nlp_["h"] = diagcat(h_all);
+    nlp_unscaled_["h"] = diagcat(h_unscaled_all);
   }
 
   // Get scaling data
@@ -779,6 +804,8 @@ void OptiNode::bake() {
   bounds["p"] = nlp_["p"];
   bounds_lbg_ = veccat(lbg_all);
   bounds_ubg_ = veccat(ubg_all);
+  bounds_unscaled_lbg_ = veccat(lbg_unscaled_all);
+  bounds_unscaled_ubg_ = veccat(ubg_unscaled_all);
 
   bounds["lbg"] = bounds_lbg_;
   bounds["ubg"] = bounds_ubg_;
@@ -1024,7 +1051,7 @@ void OptiNode::minimize(const MX& f, double linear_scale) {
   f_linear_scale_ = linear_scale;
 }
 
-void OptiNode::subject_to(const MX& g, const DM& linear_scale) {
+void OptiNode::subject_to(const MX& g, const DM& linear_scale, const Dict& options) {
   assert_only_opti_nondual(g);
   mark_problem_dirty();
   g_.push_back(g);
@@ -1041,6 +1068,17 @@ void OptiNode::subject_to(const MX& g, const DM& linear_scale) {
   // Store the meta-data
   set_meta_con(g, canon_expr(g, linear_scale));
   register_dual(meta_con(g));
+
+  for (auto && it : options) {
+    if (it.first=="stacktrace") {
+      meta_con(g).extra["stacktrace"] = it.second.to_dict_vector();
+      meta(meta_con(g).dual_canon).extra["stacktrace"] = it.second.to_dict_vector();
+    } else if (it.first=="meta") {
+      update_user_dict(g, it.second.to_dict());
+    } else {
+      casadi_error("Unknown option: " + it.first);
+    }
+  }
 }
 
 void OptiNode::subject_to() {
@@ -1215,7 +1253,7 @@ bool override_num(const std::map<casadi_int, MX> & temp, std::vector<DM>& num, c
   return false;
 }
 
-DM OptiNode::value(const MX& expr, const std::vector<MX>& values) const {
+DM OptiNode::value(const MX& expr, const std::vector<MX>& values, bool scaled) const {
   std::vector<MX> x   = symvar(expr, OPTI_VAR);
   std::vector<MX> p   = symvar(expr, OPTI_PAR);
   std::vector<MX> lam = symvar(expr, OPTI_DUAL_G);
@@ -1240,6 +1278,9 @@ DM OptiNode::value(const MX& expr, const std::vector<MX>& values) const {
     casadi_int i = meta(e).i;
     x_num.push_back(store_latest_.at(OPTI_VAR).at(i));
     undecided_vars |= override_num(temp[OPTI_VAR], x_num, i);
+    if (scaled) {
+      x_num.back() = x_num.back()/store_linear_scale_.at(OPTI_VAR)[meta(e).i] - store_linear_scale_offset_.at(OPTI_VAR)[meta(e).i];
+    }
   }
 
   std::vector<DM> lam_num;
@@ -1521,6 +1562,66 @@ void OptiNode::disp(std::ostream &stream, bool more) const {
 
 casadi_int OptiNode::instance_number() const {
     return instance_number_;
+}
+
+void OptiNode::show_infeasibilities(double tol, const Dict& opts) const {
+  Dict s = stats();
+  std::vector<bool> is_simple = get_from_dict(s, "detect_simple_bounds_is_simple", std::vector<bool>(g_.size(), false));
+  std::vector<casadi_int> target_x = get_from_dict(s, "detect_simple_bounds_target_x", std::vector<casadi_int>{});
+
+
+  std::vector<double> g_ = value(g()).get_elements();
+
+
+  uout() << is_simple.size() << " " << g_.size() << std::endl;
+  casadi_assert_dev(is_simple.size()==g_.size());
+  std::vector<double> lbg_ = value(lbg()).get_elements();
+  std::vector<double> ubg_ = value(ubg()).get_elements();
+  std::vector<double> g_scaled_ = value(nlp_.at("g"), std::vector<MX>(), true).get_elements();
+  std::vector<double> lbg_scaled_ = value(bounds_lbg_, std::vector<MX>(), true).get_elements();
+  std::vector<double> ubg_scaled_ = value(bounds_ubg_, std::vector<MX>(), true).get_elements();
+
+  uout() << "Violated constraints (tol " << tol << "), in order of declaration:" << std::endl;
+
+  casadi_int* target_x_ptr = target_x.data();
+
+  bool is_reduced = any(is_simple);
+
+  casadi_int reduced_g_index = 0;
+  for (casadi_int i=0;i<g_.size();++i) {
+    double err = std::max(g_[i]-ubg_[i], lbg_[i]-g_[i]);
+    double err_scaled = std::max(g_scaled_[i]-ubg_scaled_[i], lbg_scaled_[i]-g_scaled_[i]);
+    if (err>=tol) {
+      uout() << "------- i = " << i+GlobalOptions::start_index;
+      uout() << "/" << g_.size();
+
+      if (is_reduced) {
+        if (is_simple[i]) {
+          if (GlobalOptions::start_index==0) {
+            uout() << "  reduced to bound on x[" << *target_x_ptr << "]";
+          } else {
+            uout() << "  reduced to bound on x(" << *target_x_ptr+1 << ")";
+          }
+        } else {
+          uout() << "  reduced to g[" << reduced_g_index << "]";
+        }
+      }
+      
+      uout() << " ------ " << std::endl;
+      uout() << lbg_[i] << " <= " << g_[i] << " <= " << ubg_[i];
+      uout() << " (viol " << err << ")" << std::endl;
+      if (g_[i]!=g_scaled_[i]) {
+        uout() << lbg_scaled_[i] << " <= " << g_scaled_[i] << " <= " << ubg_scaled_[i];
+        uout() << " (scaled) (viol " << err_scaled << ")" << std::endl;
+      }
+      uout() << g_describe(i, opts) << std::endl;
+    }
+    if (is_simple[i]) {
+      target_x_ptr++;
+    } else {
+      reduced_g_index++;
+    }
+  }
 }
 
 } // namespace casadi

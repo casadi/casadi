@@ -119,16 +119,28 @@ void Opti::minimize(const MX& f, double linear_scale) {
   }
 }
 
-void Opti::subject_to(const MX& g, const DM& linear_scale) {
+void Opti::subject_to(const MX& g, const Dict& options) {
   try {
-    (*this)->subject_to(g, linear_scale);
+    (*this)->subject_to(g, 1, options);
   } catch(std::exception& e) {
     THROW_ERROR("subject_to", e.what());
   }
 }
 
-void Opti::subject_to(const std::vector<MX>& g, const DM& linear_scale) {
-  for (const auto& gs : g) subject_to(gs, linear_scale);
+void Opti::subject_to(const std::vector<MX>& g, const Dict& options) {
+  for (const auto& gs : g) subject_to(gs, 1, options);
+}
+
+void Opti::subject_to(const MX& g, const DM& linear_scale, const Dict& options) {
+  try {
+    (*this)->subject_to(g, linear_scale, options);
+  } catch(std::exception& e) {
+    THROW_ERROR("subject_to", e.what());
+  }
+}
+
+void Opti::subject_to(const std::vector<MX>& g, const DM& linear_scale, const Dict& options) {
+  for (const auto& gs : g) subject_to(gs, linear_scale, options);
 }
 
 void Opti::subject_to() {
@@ -566,43 +578,33 @@ MX OptiAdvanced::g_lookup(casadi_int i) const {
   }
 }
 
-std::string OptiAdvanced::x_describe(casadi_int i) const {
+std::string OptiAdvanced::x_describe(casadi_int i, const Dict& opts) const {
   try {
-    return (*this)->x_describe(i);
+    return (*this)->x_describe(i, opts);
   } catch(std::exception& e) {
     THROW_ERROR("x_describe", e.what());
   }
 }
-std::string OptiAdvanced::g_describe(casadi_int i) const {
+std::string OptiAdvanced::g_describe(casadi_int i, const Dict& opts) const {
   try {
-    return (*this)->g_describe(i);
+    return (*this)->g_describe(i, opts);
   } catch(std::exception& e) {
     THROW_ERROR("g_describe", e.what());
   }
 }
-std::string OptiAdvanced::describe(const MX& x, casadi_int indent) const {
+std::string OptiAdvanced::describe(const MX& x, casadi_int indent, const Dict& opts) const {
   try {
-    return (*this)->describe(x, indent);
+    return (*this)->describe(x, indent, opts);
   } catch(std::exception& e) {
     THROW_ERROR("describe", e.what());
   }
 }
 
-void OptiAdvanced::show_infeasibilities(double tol) const {
-  std::vector<double> g_ = value(g()).get_elements();
-  std::vector<double> lbg_ = value(lbg()).get_elements();
-  std::vector<double> ubg_ = value(ubg()).get_elements();
-
-  uout() << "Violated constraints (tol " << tol << "), in order of declaration:" << std::endl;
-  for (casadi_int i=0;i<g_.size();++i) {
-    double err = std::max(g_[i]-ubg_[i], lbg_[i]-g_[i]);
-    if (err>=tol) {
-      uout() << "------- i = " << i+GlobalOptions::start_index;
-      uout() << "/" << g_.size() << " ------ " << std::endl;
-      uout() << lbg_[i] << " <= " << g_[i] << " <= " << ubg_[i];
-      uout() << " (viol " << err << ")" << std::endl;
-      uout() << g_describe(i) << std::endl;
-    }
+void OptiAdvanced::show_infeasibilities(double tol, const Dict& opts) const {
+  try {
+    (*this)->show_infeasibilities(tol, opts);
+  } catch(std::exception& e) {
+    THROW_ERROR("show_infeasibilities", e.what());
   }
 }
 

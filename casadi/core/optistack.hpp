@@ -162,8 +162,10 @@ public:
   *  - opti.debug.show_infeasibilities() may be used to inspect which constraints are violated
   *
       \identifier{1b} */
-  void subject_to(const MX& g, const DM& linear_scale=1);
-  void subject_to(const std::vector<MX>& g, const DM& linear_scale=1);
+  void subject_to(const MX& g, const Dict& options=Dict());
+  void subject_to(const std::vector<MX>& g, const Dict& options=Dict());
+  void subject_to(const MX& g, const DM& linear_scale, const Dict& options=Dict());
+  void subject_to(const std::vector<MX>& g, const DM& linear_scale, const Dict& options=Dict());
   /// @}
 
   /// Clear constraints
@@ -588,11 +590,11 @@ public:
   MX x_lookup(casadi_index i) const;
   MX g_lookup(casadi_index i) const;
 
-  std::string x_describe(casadi_index i) const;
-  std::string g_describe(casadi_index i) const;
-  std::string describe(const MX& x, casadi_index indent=0) const;
+  std::string x_describe(casadi_index i, const Dict& opts=Dict()) const;
+  std::string g_describe(casadi_index i, const Dict& opts=Dict()) const;
+  std::string describe(const MX& x, casadi_index indent=0, const Dict& opts=Dict()) const;
 
-  void show_infeasibilities(double tol=0) const;
+  void show_infeasibilities(double tol=0, const Dict& opts=Dict()) const;
 
   void solve_prepare();
   DMDict solve_actual(const DMDict& args);
