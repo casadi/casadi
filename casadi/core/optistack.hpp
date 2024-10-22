@@ -590,6 +590,10 @@ public:
   MX x_lookup(casadi_index i) const;
   MX g_lookup(casadi_index i) const;
 
+  casadi_index g_index_reduce_g(casadi_index i) const;
+  casadi_index g_index_reduce_x(casadi_index i) const;
+  casadi_index g_index_unreduce_g(casadi_index i) const;
+
   std::string x_describe(casadi_index i, const Dict& opts=Dict()) const;
   std::string g_describe(casadi_index i, const Dict& opts=Dict()) const;
   std::string describe(const MX& x, casadi_index indent=0, const Dict& opts=Dict()) const;
