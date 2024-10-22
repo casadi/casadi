@@ -185,7 +185,7 @@ namespace casadi {
       (is_string_vector() && to_string_vector().empty()) ||
       (is_string_vector_vector() && to_string_vector_vector().empty()) ||
       (is_bool_vector() && to_bool_vector().empty()) ||
-      (is_dict_vector() && to_dict_vector().empty()) ||
+      (is_dict_vector() && as_dict_vector().empty()) ||
       (is_vector_vector() && to_vector_vector().empty()) ||
       (is_vector() && to_vector().empty());
   }
@@ -523,6 +523,11 @@ namespace casadi {
   }
 
   std::vector<Dict> GenericType::to_dict_vector() const {
+    if (is_empty_vector()) return {};
+    if (is_dict()) {
+      Dict e = as_dict();
+      return std::vector<Dict>(1, e);
+    }
     casadi_assert(is_dict_vector(), "type mismatch");
     return as_dict_vector();
   }

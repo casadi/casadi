@@ -1132,7 +1132,166 @@ class OptiStacktests(inherit_from):
       self.checkarray(jac_g_scaled[0,:]*10, jac_g_unscaled[0,:])
       self.checkarray(jac_g_scaled[1,:]*3, jac_g_unscaled[1,:])
 
+    @requires_nlpsol("ipopt")
+    def test_linear_scale2(self):
+      opti = Opti()
+      x = opti.variable()
+      y = opti.variable()
+      z = opti.variable()
+      
+      opti.minimize((x-y-z)**2)
+      opti.subject_to(z-3 <= vertcat(x,y))
+      opti.subject_to(vertcat(x,y) <= z+3)
+      
+      opti.set_initial(x,1)
+      opti.set_initial(y,2)
+      opti.set_initial(z,1)
+      
+      opti.solver("ipopt",{"specific_options": {"nlp_f": {"final_options":{"dump_in":True,"dump_out":True}}, "nlp_grad_f": {"final_options":{"dump_out":True}},"nlp_jac_g": {"final_options":{"dump_out":True}}},"ipopt.nlp_scaling_method":"none","ipopt.mumps_permuting_scaling":0,"ipopt.mumps_scaling":0})
 
+      sol = opti.solve()
+      
+      x_sol_unscaled = sol.value(opti.x)
+      
+      x_unscaled = DM.from_file("nlp_f.000000.in.x.mtx")
+      f_unscaled = DM.from_file("nlp_f.000000.out.f.mtx")
+      grad_f_unscaled = DM.from_file("nlp_grad_f.000000.out.grad_f_x.mtx")
+      jac_g_unscaled = DM.from_file("nlp_jac_g.000000.out.jac_g_x.mtx")
+      
+
+      opti = Opti()
+      x = opti.variable()
+      y = opti.variable()
+      z = opti.variable()
+      
+      
+      opti.minimize((x-y-z)**2)
+      opti.subject_to(z-3 <= vertcat(x,y))
+      opti.subject_to(vertcat(x,y) <= z+3)
+    
+      opti.set_initial(x,1)
+      opti.set_initial(y,2)
+      opti.set_initial(z,1)
+
+      opti.set_linear_scale(x,10)
+      opti.set_linear_scale(y,5,1)
+      opti.set_linear_scale(z,3,1)
+
+      opti.solver("ipopt",{"specific_options": {"nlp_f": {"final_options":{"dump_in":True,"dump_out":True}}, "nlp_jac_g": {"final_options":{"dump_out":True}}},"ipopt.nlp_scaling_method":"none","ipopt.mumps_permuting_scaling":0,"ipopt.mumps_scaling":0})
+
+      sol = opti.solve()
+      
+      x_sol_scaled = sol.value(opti.x)
+
+      x_scaled = DM.from_file("nlp_f.000000.in.x.mtx")
+      f_scaled = DM.from_file("nlp_f.000000.out.f.mtx")
+      jac_g_scaled = DM.from_file("nlp_jac_g.000000.out.jac_g_x.mtx")
+      
+      self.checkarray(x_sol_scaled, x_sol_unscaled)
+      self.checkarray(jac_g_scaled[:,0], jac_g_unscaled[:,0]*10)
+      self.checkarray(jac_g_scaled[:,1], jac_g_unscaled[:,1]*5)
+      self.checkarray(jac_g_scaled[:,2], jac_g_unscaled[:,2]*3)
+  
+    @requires_nlpsol("ipopt")
+    def test_linear_scale3(self):
+      opti = Opti()
+      x = opti.variable()
+      y = opti.variable()
+      z = opti.variable()
+      
+      opti.minimize((x-y-z)**2)
+      opti.subject_to(z-3 <= (vertcat(x,y) <= z+3))
+      
+      opti.set_initial(x,1)
+      opti.set_initial(y,2)
+      opti.set_initial(z,1)
+      
+      opti.solver("ipopt",{"specific_options": {"nlp_f": {"final_options":{"dump_in":True,"dump_out":True}}, "nlp_grad_f": {"final_options":{"dump_out":True}},"nlp_jac_g": {"final_options":{"dump_out":True}}},"ipopt.nlp_scaling_method":"none","ipopt.mumps_permuting_scaling":0,"ipopt.mumps_scaling":0})
+
+      sol = opti.solve()
+      
+      x_sol_unscaled = sol.value(opti.x)
+      
+      x_unscaled = DM.from_file("nlp_f.000000.in.x.mtx")
+      f_unscaled = DM.from_file("nlp_f.000000.out.f.mtx")
+      grad_f_unscaled = DM.from_file("nlp_grad_f.000000.out.grad_f_x.mtx")
+      jac_g_unscaled = DM.from_file("nlp_jac_g.000000.out.jac_g_x.mtx")
+      
+
+      opti = Opti()
+      x = opti.variable()
+      y = opti.variable()
+      z = opti.variable()
+      
+      
+      opti.minimize((x-y-z)**2)
+      opti.subject_to(z-3 <= (vertcat(x,y) <= z+3))
+    
+      opti.set_initial(x,1)
+      opti.set_initial(y,2)
+      opti.set_initial(z,1)
+
+      opti.set_linear_scale(x,10)
+      opti.set_linear_scale(y,5,1)
+      opti.set_linear_scale(z,3,1)
+
+      opti.solver("ipopt",{"specific_options": {"nlp_f": {"final_options":{"dump_in":True,"dump_out":True}}, "nlp_jac_g": {"final_options":{"dump_out":True}}},"ipopt.nlp_scaling_method":"none","ipopt.mumps_permuting_scaling":0,"ipopt.mumps_scaling":0})
+
+      sol = opti.solve()
+      
+      x_sol_scaled = sol.value(opti.x)
+
+      x_scaled = DM.from_file("nlp_f.000000.in.x.mtx")
+      f_scaled = DM.from_file("nlp_f.000000.out.f.mtx")
+      jac_g_scaled = DM.from_file("nlp_jac_g.000000.out.jac_g_x.mtx")
+      
+      self.checkarray(x_sol_scaled, x_sol_unscaled)
+      self.checkarray(jac_g_scaled[:,0], jac_g_unscaled[:,0]*10)
+      self.checkarray(jac_g_scaled[:,1], jac_g_unscaled[:,1]*5)
+      self.checkarray(jac_g_scaled[:,2], jac_g_unscaled[:,2]*3)
+      
+    def test_detect_simple_bounds(self):
+  
+      checks = ["f","g","lbg","ubg","lam_g"]
+      
+      ref = {}
+      for scale_x in [None,1,9]:
+        for scale_g in [None,1, 100]:
+          for detect_simple_bounds in [False,True]:
+            opti = Opti()
+            x = opti.variable()
+            y = opti.variable()
+            z = opti.variable()
+            
+            if scale_x is not None:
+              opti.set_linear_scale(x,scale_x)
+
+            opti.set_initial(x,12)
+            opti.set_initial(y,12)
+            opti.set_initial(z,12)
+
+            if scale_g is None:
+              opti.subject_to(-5 <= (x <= 7))
+            else:
+              opti.subject_to(-5 <= (x <= 7), scale_g)
+
+            opti.subject_to(-3 <= (-y <= 2))
+            opti.subject_to(-2 <= (-y <= 1))
+            opti.subject_to(-3 <= (-0.3*z <= 2))
+            opti.subject_to(-1 <= (-0.3*z <= 0))
+            opti.subject_to(-4 <= (x <= 6))
+
+            opti.minimize((x-10)**2+(y-10)**2+(z-10)**2)
+
+            opti.solver("ipopt",{"detect_simple_bounds": detect_simple_bounds})
+
+            sol = opti.solve()
+            
+            for k in checks:
+              if scale_x is None and scale_g is None and not detect_simple_bounds:
+                ref[k] = sol.value(getattr(opti,k))
+              else:
+                self.checkarray(ref[k], sol.value(getattr(opti,k)), digits=6)
       
 if __name__ == '__main__':
     unittest.main()
