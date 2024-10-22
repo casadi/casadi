@@ -477,7 +477,47 @@ MX OptiNode::parameter(casadi_int n, casadi_int m, const std::string& attribute)
 
 Dict OptiNode::stats() const {
   assert_solved();
-  return solver_.stats();
+  if (stats_.empty()) {
+    stats_ = solver_.stats();
+    is_simple_ = get_from_dict(stats_, "detect_simple_bounds_is_simple", std::vector<bool>(ng(), false));
+    target_x_ = get_from_dict(stats_, "detect_simple_bounds_target_x", std::vector<casadi_int>{});
+    casadi_assert_dev(is_simple_.size()==ng());
+    
+    g_index_reduce_g_.resize(ng());
+    g_index_reduce_x_.resize(ng(), -1);
+    g_index_unreduce_g_.resize(ng(), -1);
+
+    casadi_int* target_x_ptr = target_x_.data();
+
+    casadi_int k=0;
+    for (casadi_int i=0;i<is_simple_.size();++i) {
+      if (!is_simple_[i]) {
+        g_index_reduce_g_[i] = k;
+        g_index_unreduce_g_[k] = i;
+        k++;
+      } else {
+        g_index_reduce_g_[i] = -1;
+        g_index_reduce_x_[i] = *target_x_ptr;
+        target_x_ptr++;
+      }
+    }
+
+    reduced_ = any(is_simple_);
+  }
+  return stats_;
+}
+
+casadi_int OptiNode::g_index_reduce_g(casadi_int i) const {
+  stats();
+  return g_index_reduce_g_[i];
+}
+casadi_int OptiNode::g_index_unreduce_g(casadi_int i) const {
+  stats();
+  return g_index_unreduce_g_[i];
+}
+casadi_int OptiNode::g_index_reduce_x(casadi_int i) const {
+  stats();
+  return g_index_reduce_x_[i];
 }
 
 std::string OptiNode::return_status() const {
@@ -1234,6 +1274,7 @@ void OptiNode::solve_prepare() {
   arg_["lbg"] = res["lbg"];
   arg_["ubg"] = res["ubg"];
 
+  stats_.clear();
 }
 
 DMDict OptiNode::solve_actual(const DMDict& arg) {
@@ -1565,29 +1606,17 @@ casadi_int OptiNode::instance_number() const {
 }
 
 void OptiNode::show_infeasibilities(double tol, const Dict& opts) const {
-  Dict s = stats();
-  std::vector<bool> is_simple = get_from_dict(s, "detect_simple_bounds_is_simple", std::vector<bool>(g_.size(), false));
-  std::vector<casadi_int> target_x = get_from_dict(s, "detect_simple_bounds_target_x", std::vector<casadi_int>{});
-
-
-  std::vector<double> g_ = value(g()).get_elements();
-
-
-  uout() << is_simple.size() << " " << g_.size() << std::endl;
-  casadi_assert_dev(is_simple.size()==g_.size());
+  stats();
   std::vector<double> lbg_ = value(lbg()).get_elements();
   std::vector<double> ubg_ = value(ubg()).get_elements();
   std::vector<double> g_scaled_ = value(nlp_.at("g"), std::vector<MX>(), true).get_elements();
   std::vector<double> lbg_scaled_ = value(bounds_lbg_, std::vector<MX>(), true).get_elements();
   std::vector<double> ubg_scaled_ = value(bounds_ubg_, std::vector<MX>(), true).get_elements();
 
+
+  std::vector<double> g_ = value(g()).get_elements();
   uout() << "Violated constraints (tol " << tol << "), in order of declaration:" << std::endl;
 
-  casadi_int* target_x_ptr = target_x.data();
-
-  bool is_reduced = any(is_simple);
-
-  casadi_int reduced_g_index = 0;
   for (casadi_int i=0;i<g_.size();++i) {
     double err = std::max(g_[i]-ubg_[i], lbg_[i]-g_[i]);
     double err_scaled = std::max(g_scaled_[i]-ubg_scaled_[i], lbg_scaled_[i]-g_scaled_[i]);
@@ -1595,15 +1624,15 @@ void OptiNode::show_infeasibilities(double tol, const Dict& opts) const {
       uout() << "------- i = " << i+GlobalOptions::start_index;
       uout() << "/" << g_.size();
 
-      if (is_reduced) {
-        if (is_simple[i]) {
+      if (reduced_) {
+        if (is_simple_[i]) {
           if (GlobalOptions::start_index==0) {
-            uout() << "  reduced to bound on x[" << *target_x_ptr << "]";
+            uout() << "  reduced to bound on x[" << g_index_reduce_x_.at(i) << "]";
           } else {
-            uout() << "  reduced to bound on x(" << *target_x_ptr+1 << ")";
+            uout() << "  reduced to bound on x(" << g_index_reduce_x_.at(i)+1 << ")";
           }
         } else {
-          uout() << "  reduced to g[" << reduced_g_index << "]";
+          uout() << "  reduced to g[" << g_index_reduce_g_.at(i) << "]";
         }
       }
       
@@ -1615,11 +1644,6 @@ void OptiNode::show_infeasibilities(double tol, const Dict& opts) const {
         uout() << " (scaled) (viol " << err_scaled << ")" << std::endl;
       }
       uout() << g_describe(i, opts) << std::endl;
-    }
-    if (is_simple[i]) {
-      target_x_ptr++;
-    } else {
-      reduced_g_index++;
     }
   }
 }

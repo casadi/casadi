@@ -570,6 +570,30 @@ MX OptiAdvanced::x_lookup(casadi_int i) const {
   }
 }
 
+casadi_int OptiAdvanced::g_index_reduce_g(casadi_int i) const {
+  try {
+    return (*this)->g_index_reduce_g(i);
+  } catch(std::exception& e) {
+    THROW_ERROR("g_index_reduce_g", e.what());
+  }
+}
+
+casadi_int OptiAdvanced::g_index_reduce_x(casadi_int i) const {
+  try {
+    return (*this)->g_index_reduce_x(i);
+  } catch(std::exception& e) {
+    THROW_ERROR("g_index_reduce_x", e.what());
+  }
+}
+
+casadi_int OptiAdvanced::g_index_unreduce_g(casadi_int i) const {
+  try {
+    return (*this)->g_index_unreduce_g(i);
+  } catch(std::exception& e) {
+    THROW_ERROR("g_index_unreduce_g", e.what());
+  }
+}
+
 MX OptiAdvanced::g_lookup(casadi_int i) const {
   try {
     return (*this)->g_lookup(i);

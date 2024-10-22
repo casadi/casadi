@@ -306,6 +306,10 @@ public:
   void assert_solved() const;
   void assert_baked() const;
 
+  casadi_int g_index_reduce_g(casadi_int i) const;
+  casadi_int g_index_reduce_x(casadi_int i) const;
+  casadi_int g_index_unreduce_g(casadi_int i) const;
+
 private:
 
   static std::map<VariableType, std::string> VariableType2String_;
@@ -381,6 +385,14 @@ private:
 
   /// Solver
   Function solver_;
+
+  mutable Dict stats_;
+  mutable std::vector<casadi_int> g_index_reduce_g_;
+  mutable std::vector<casadi_int> g_index_reduce_x_;
+  mutable std::vector<casadi_int> g_index_unreduce_g_;
+  mutable std::vector<casadi_int> target_x_;
+  mutable std::vector<bool> is_simple_;
+  mutable bool reduced_;
 
   /// Result of solver
   DMDict res_;
