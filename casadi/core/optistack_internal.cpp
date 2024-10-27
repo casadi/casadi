@@ -576,6 +576,24 @@ std::vector<MX> OptiNode::value_parameters() const {
   return ret;
 }
 
+std::vector<MX> OptiNode::get_variables() const {
+  std::vector<MX> ret;
+  for (const auto& e : symvar()) {
+    if (meta(e).type==OPTI_VAR)
+      ret.push_back(e);
+  }
+  return ret;
+}
+
+std::vector<MX> OptiNode::get_parameters() const {
+  std::vector<MX> ret;
+  for (const auto& e : symvar()) {
+    if (meta(e).type==OPTI_PAR)
+      ret.push_back(e);
+  }
+  return ret;
+}
+
 void OptiNode::bake() {
   casadi_assert(!f_.is_empty() || !g_.empty(),
     "You need to specify at least an objective (y calling 'minimize'), "

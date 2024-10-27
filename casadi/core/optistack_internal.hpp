@@ -134,6 +134,10 @@ public:
   std::vector<MX> value_variables() const;
   std::vector<MX> value_parameters() const;
 
+  // Get the variables/parameters from symbols_ vector
+  std::vector<MX> get_variables() const;
+  std::vector<MX> get_parameters() const;
+
   void callback_class(OptiCallback* callback);
   void callback_class();
   bool has_callback_class() const;
