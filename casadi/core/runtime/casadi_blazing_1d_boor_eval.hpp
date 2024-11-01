@@ -73,7 +73,7 @@ void casadi_blazing_1d_boor_eval(T1* f, T1* J, T1* H, const T1* all_knots, const
         boor0_d3 = boor_start_0001;
       }
     }
-    casadi_blazing_de_boor(x, knots+start, &boor0_d0, &boor0_d1, &boor0_d2, boor0_d3);
+    casadi_blazing_de_boor(x, knots+start, &boor0_d0, &boor0_d1, &boor0_d2, &boor0_d3);
 
   double boor0_d0v[4];
   simde_mm256_storeu_pd(boor0_d0v, boor0_d0);

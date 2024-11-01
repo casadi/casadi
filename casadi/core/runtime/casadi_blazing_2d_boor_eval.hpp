@@ -78,7 +78,7 @@ void casadi_blazing_2d_boor_eval(T1* f, T1* J, T1* H, const T1* all_knots, const
         boor0_d3 = boor_start_0001;
       }
     }
-    casadi_blazing_de_boor(x, knots+start, &boor0_d0, &boor0_d1, &boor0_d2, boor0_d3);
+    casadi_blazing_de_boor(x, knots+start, &boor0_d0, &boor0_d1, &boor0_d2, &boor0_d3);
 
     knots = all_knots + offset[1];
     n_knots = offset[1+1]-offset[1];
@@ -100,7 +100,7 @@ void casadi_blazing_2d_boor_eval(T1* f, T1* J, T1* H, const T1* all_knots, const
         boor1_d3 = boor_start_0001;
       }
     }
-    casadi_blazing_de_boor(x, knots+start, &boor1_d0, &boor1_d1, &boor1_d2, boor1_d3);
+    casadi_blazing_de_boor(x, knots+start, &boor1_d0, &boor1_d1, &boor1_d2, &boor1_d3);
 
   simde__m256d C[4];
 
