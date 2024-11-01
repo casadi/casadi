@@ -19,23 +19,20 @@
 
 // SYMBOL "blazing_printvec"
 template<typename T1>
-void casadi_blazing_printvec(simde__m256d e) {
+void casadi_blazing_printvec(const simde__m256d* e) {
   double elements[4];
-  simde_mm256_storeu_pd(elements, e);
+  simde_mm256_storeu_pd(elements, *e);
   printf("mm256d: <%.4f %.4f %.4f %.4f>\n", elements[0], elements[1], elements[2], elements[3]);
 }
 
 // SYMBOL "blazing_de_boor"
 template<typename T1>
-void casadi_blazing_de_boor(T1 x, const T1* knots, simde__m256d* boor_d0, simde__m256d* boor_d1, simde__m256d* boor_d2, simde__m256d boor_d3) {
+void casadi_blazing_de_boor(T1 x, const T1* knots, simde__m256d* boor_d0, simde__m256d* boor_d1, simde__m256d* boor_d2, const simde__m256d* boor_d3) {
   simde__m256d x_ = simde_mm256_set1_pd(x);
   simde__m256d zero = simde_mm256_set1_pd(0.0);
   simde__m256d mask_end = simde_mm256_set_pd(0.0, -1.0, -1.0, -1.0);
-  
 
-  simde__m256d boor_d3i = boor_d3;
-
-  simde__m256d boor_d3i_1 = simde_mm256_permute4x64_pd(boor_d3i, SIMDE_MM_SHUFFLE(3, 3, 2, 1)); // shift one up
+  simde__m256d boor_d3i_1 = simde_mm256_permute4x64_pd(*boor_d3, SIMDE_MM_SHUFFLE(3, 3, 2, 1)); // shift one up
   boor_d3i_1 = simde_mm256_blendv_pd(zero, boor_d3i_1, mask_end);
 
   simde__m256d knotsi = simde_mm256_loadu_pd(knots);
@@ -49,7 +46,7 @@ void casadi_blazing_de_boor(T1 x, const T1* knots, simde__m256d* boor_d0, simde_
 
   simde__m256d r = simde_mm256_div_pd(simde_mm256_sub_pd(x_, knotsi), bottom); // (x - knots[i]) / bottom;
   r = simde_mm256_blendv_pd(r, zero, bottom_mask);
-  *boor_d2 = simde_mm256_mul_pd(r, boor_d3i);
+  *boor_d2 = simde_mm256_mul_pd(r, *boor_d3);
 
   *boor_d2 = simde_mm256_blendv_pd(*boor_d2, zero, bottom_mask);
 
