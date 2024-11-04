@@ -108,6 +108,11 @@ namespace casadi {
     /// Cache for KKT function
     mutable WeakRef kkt_;
 
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+    /// Mutex for thread safety
+    mutable std::mutex kkt_mtx_;
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
+
     /** \brief Serialize an object without type information
 
         \identifier{1nl} */

@@ -2850,6 +2850,12 @@ namespace casadi {
     return deserialize(ss);
   }
 
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+  template<typename Scalar>
+  std::mutex& Matrix<Scalar>::get_mutex_temp() {
+    casadi_error("'get_mutex_temp' not defined for " + type_name());
+  }
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
 
 } // namespace casadi
 

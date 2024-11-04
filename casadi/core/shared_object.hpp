@@ -30,6 +30,17 @@
 #include "exception.hpp"
 #include <map>
 #include <vector>
+#ifdef CASADI_WITH_THREAD
+#ifdef CASADI_WITH_THREAD_MINGW
+#include <mingw.mutex.h>
+#else // CASADI_WITH_THREAD_MINGW
+#include <mutex>
+#endif // CASADI_WITH_THREAD_MINGW
+#endif //CASADI_WITH_THREAD
+
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+#include <memory>
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
 
 namespace casadi {
 
@@ -202,6 +213,9 @@ namespace casadi {
         \identifier{b1} */
     bool alive() const;
 
+    /** \brief Thread-safe alternative to alive()/shared() */
+    bool shared_if_alive(SharedObject& shared);
+
     /** \brief  Access functions of the node
 
         \identifier{b2} */
@@ -211,6 +225,10 @@ namespace casadi {
 
         \identifier{b3} */
     const WeakRefInternal* operator->() const;
+
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+    std::shared_ptr<std::mutex> get_mutex() const;
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
 
 #ifndef SWIG
   private:

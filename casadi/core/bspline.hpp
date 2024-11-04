@@ -78,6 +78,11 @@ namespace casadi {
         \identifier{1ye} */
     mutable MX jac_cache_;
 
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+    /// Mutex for thread safety
+    mutable std::mutex jac_cache_mtx_;
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
+
     virtual MX jac_cached() const = 0;
 
     /** \brief Get required length of iw field
