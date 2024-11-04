@@ -113,6 +113,8 @@ namespace casadi {
     sz_res_per_ = 0;
     sz_iw_per_ = 0;
     sz_w_per_ = 0;
+
+    dump_count_ = 0;
   }
 
   ProtoFunction::~ProtoFunction() {
@@ -783,9 +785,6 @@ namespace casadi {
   }
 
   casadi_int FunctionInternal::get_dump_id() const {
-#ifdef CASADI_WITH_THREAD
-    std::lock_guard<std::mutex> lock(dump_count_mtx_);
-#endif // CASADI_WITH_THREAD
     return dump_count_++;
   }
 
@@ -997,6 +996,10 @@ namespace casadi {
     cache_.tocache(f.name() + ":" + suffix, f);
   }
 
+  void FunctionInternal::tocache_if_missing(Function& f, const std::string& suffix) const {
+    cache_.tocache_if_missing(f.name() + ":" + suffix, f);
+  }
+
   Function FunctionInternal::map(casadi_int n, const std::string& parallelization) const {
     Function f;
     if (parallelization=="serial") {
@@ -1007,7 +1010,7 @@ namespace casadi {
         f = Map::create(parallelization, self(), n);
         casadi_assert_dev(f.name()==fname);
         // Save in cache
-        tocache(f);
+        tocache_if_missing(f);
       }
     } else {
       // Non-serial maps are not cached
@@ -1051,7 +1054,7 @@ namespace casadi {
       std::vector<MX> res = self()(arg);
       f = Function(fname, arg, res, name_in_, name_out_, opts);
       // Save in cache
-      tocache(f);
+      tocache_if_missing(f);
     }
     return f;
   }
@@ -1849,6 +1852,10 @@ namespace casadi {
 
   Sparsity& FunctionInternal::jac_sparsity(casadi_int oind, casadi_int iind, bool compact,
       bool symmetric) const {
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+    // Safe access to jac_sparsity_
+    std::lock_guard<std::mutex> lock(jac_sparsity_mtx_);
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
     // If first call, allocate cache
     for (bool c : {false, true}) {
       if (jac_sparsity_[c].empty()) jac_sparsity_[c].resize(n_in_ * n_out_);
@@ -2116,7 +2123,7 @@ namespace casadi {
       casadi_assert_dev(f.n_out()==n_out_);
       for (i=0; i<n_out_; ++i) f.assert_sparsity_out(i, sparsity_out(i), nfwd);
       // Save to cache
-      tocache(f);
+      tocache_if_missing(f);
     }
     return f;
   }
@@ -2161,7 +2168,7 @@ namespace casadi {
       casadi_assert_dev(f.n_out()==n_in_);
       for (i=0; i<n_in_; ++i) f.assert_sparsity_out(i, sparsity_in(i), nadj);
       // Save to cache
-      tocache(f);
+      tocache_if_missing(f);
     }
     return f;
   }
@@ -2274,7 +2281,7 @@ namespace casadi {
       casadi_assert(f.n_out() == onames.size(),
         "Mismatching output signature, expected " + str(onames));
       // Save to cache
-      tocache(f);
+      tocache_if_missing(f);
     }
     return f;
   }
@@ -3638,6 +3645,10 @@ namespace casadi {
   }
 
   void FunctionInternal::set_jac_sparsity(casadi_int oind, casadi_int iind, const Sparsity& sp) {
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+    // Safe access to jac_sparsity_
+    std::lock_guard<std::mutex> lock(jac_sparsity_mtx_);
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
     casadi_int ind = iind + oind * n_in_;
     jac_sparsity_[false].resize(n_in_ * n_out_);
     jac_sparsity_[false].at(ind) = sp;
@@ -4043,6 +4054,7 @@ namespace casadi {
     eval_ = nullptr;
     checkout_ = nullptr;
     release_ = nullptr;
+    dump_count_ = 0;
   }
 
   void ProtoFunction::serialize(SerializingStream& s) const {

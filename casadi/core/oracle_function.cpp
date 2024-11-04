@@ -208,7 +208,7 @@ Function OracleFunction::create_function(const std::string& fname,
     // TODO(jgillis) Conditionally convert to SX
 
     // Add to cache
-    tocache(ret);
+    tocache_if_missing(ret);
   }
 
   // Save and return
@@ -252,7 +252,7 @@ Function OracleFunction::create_function(const Function& oracle, const std::stri
     }
 
     // Add to cache
-    tocache(ret);
+    tocache_if_missing(ret);
   }
 
   // Save and return

@@ -374,6 +374,10 @@ namespace casadi {
 
   template<bool Tr>
   const Sparsity& SolveUnity<Tr>::A_sp() const {
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+    // Safe access to A_sp_
+    std::lock_guard<std::mutex> lock(A_sp_mtx_);
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
     // Create on first call
     if (A_sp_.is_null()) {
       const Sparsity& no_diag = this->dep(1).sparsity();

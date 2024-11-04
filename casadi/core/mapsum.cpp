@@ -46,7 +46,7 @@ namespace casadi {
         ret = Function::create(new MapSum(name, f, n, reduce_in, reduce_out), opts);
         casadi_assert_dev(ret.name()==name);
         // Save in cache
-        f->tocache(ret, suffix);
+        f->tocache_if_missing(ret, suffix);
       }
       return ret.wrap_as_needed(opts);
     } else {

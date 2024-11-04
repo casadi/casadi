@@ -324,6 +324,11 @@ namespace casadi {
 
     // Sparsity pattern of linear system, cached
     mutable Sparsity A_sp_;
+
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+    /// Mutex for thread safety
+    mutable std::mutex A_sp_mtx_;
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
   };
 
   /** \brief Linear solve with an upper triangular matrix, unity diagonal

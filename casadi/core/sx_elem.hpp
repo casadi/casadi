@@ -44,6 +44,15 @@
 #include <string>
 #include <vector>
 
+#ifdef CASADI_WITH_THREAD
+#include <atomic>
+#ifdef CASADI_WITH_THREAD_MINGW
+#include <mingw.mutex.h>
+#else // CASADI_WITH_THREAD_MINGW
+#include <mutex>
+#endif // CASADI_WITH_THREAD_MINGW
+#endif //CASADI_WITH_THREAD
+
 namespace casadi {
 
   /** \brief  forward declaration of Node and Matrix
@@ -283,6 +292,11 @@ namespace casadi {
     void serialize(SerializingStream& s) const;
 
     static SXElem deserialize(DeserializingStream& s);
+
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+    static std::mutex mutex_temp;
+#endif //CASADI_WITH_THREADSAFE_SYMBOLICS
+
   private:
     /// Pointer to node (SXElem is only a reference class)
     SXNode* node;

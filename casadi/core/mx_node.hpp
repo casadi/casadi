@@ -255,10 +255,14 @@ namespace casadi {
 
     /** \brief Detect duplicate symbolic expressions
 
+    Not thread-safe
+
         \identifier{1r8} */
     virtual bool has_duplicates() const;
 
     /** \brief Reset the marker for an input expression
+
+    Not thread-safe
 
         \identifier{1r9} */
     virtual void reset_input() const;

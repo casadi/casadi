@@ -45,6 +45,11 @@ namespace casadi {
   CACHING_MAP<casadi_int, IntegerSX*> IntegerSX::cached_constants_;
   CACHING_MAP<double, RealtypeSX*> RealtypeSX::cached_constants_;
 
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+  std::mutex IntegerSX::mutex_cached_constants;
+  std::mutex RealtypeSX::mutex_cached_constants;
+#endif //CASADI_WITH_THREADSAFE_SYMBOLICS
+
   SXElem::SXElem() {
     node = casadi_limits<SXElem>::nan.node;
     node->count++;
@@ -654,6 +659,10 @@ namespace casadi {
   SXElem SXElem::deserialize(DeserializingStream& s) {
     return SXElem::create(SXNode::deserialize(s));
   }
+
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+  std::mutex SXElem::mutex_temp;
+#endif //CASADI_WITH_THREADSAFE_SYMBOLICS
 
 } // namespace casadi
 

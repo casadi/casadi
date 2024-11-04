@@ -34,6 +34,14 @@
 #include "generic_type.hpp"
 #include "printable.hpp"
 #include <vector>
+#ifdef CASADI_WITH_THREAD
+#ifdef CASADI_WITH_THREAD_MINGW
+#include <mingw.mutex.h>
+#else // CASADI_WITH_THREAD_MINGW
+#include <mutex>
+#endif // CASADI_WITH_THREAD_MINGW
+#endif //CASADI_WITH_THREAD
+
 namespace casadi {
 
   /** \brief  Forward declaration
@@ -952,6 +960,10 @@ namespace casadi {
     // Create matrix symbolic primitive
     static MX _sym(const std::string& name, const Sparsity& sp);
 
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+    static std::mutex& get_mutex_temp() { return mutex_temp; }
+    static std::mutex mutex_temp;
+#endif //CASADI_WITH_THREADSAFE_SYMBOLICS
   private:
 
     /// Create an expression from a node: extra dummy arguments to avoid ambiguity for 0/NULL

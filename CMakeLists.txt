@@ -312,9 +312,6 @@ endif()
 # enabling Threads support if requested
 option(WITH_THREAD "Compile with parallelization support using POSIX Threads" OFF)
 option(WITH_THREAD_MINGW "For MINGW, use mingw-std-threads" OFF)
-if(WITH_THREAD)
-  add_definitions(-DCASADI_WITH_THREAD)
-endif()
 if(MINGW AND WITH_THREAD_MINGW)
   add_definitions(-DCASADI_WITH_THREAD_MINGW)
 else()
@@ -323,6 +320,11 @@ else()
   endif()
 endif()
 
+option(WITH_THREADSAFE_SYMBOLICS "Numeric evaluation in CasADi is thread-safe. Use this flag to make symbolics thread-safe as well. May adversly impact performance" ${WITH_THREAD})
+
+if(WITH_THREADSAFE_SYMBOLICS AND NOT WITH_THREAD)
+  message(SEND_ERROR "WITH_THREADSAFE_SYMBOLICS ON only supported when WITH_THREAD ON." )
+endif()
 
 # OpenCL
 option(WITH_OPENCL "Compile with OpenCL support (experimental)" OFF)
@@ -1984,9 +1986,9 @@ feature_summary(WHAT ENABLED_FEATURES VAR feature_list)
 string(REPLACE "\n" "\\n" feature_list "${feature_list}")
 
 get_directory_property( compiler_definitions COMPILE_DEFINITIONS )
-set(EXTRA_CXX_FLAGS_FROM_DEFS "")
+set(EXTRA_CXX_FLAGS_FROM_DEFS_LIST "")
 foreach(DEF ${compiler_definitions})
-  set(EXTRA_CXX_FLAGS_FROM_DEFS "${EXTRA_CXX_FLAGS_FROM_DEFS} -D${DEF}")
+  list(APPEND EXTRA_CXX_FLAGS_FROM_DEFS_LIST "-D${DEF}")
 endforeach()
 
 #####################################################

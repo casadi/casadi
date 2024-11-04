@@ -30,6 +30,17 @@
 #include "exception.hpp"
 #include <map>
 #include <vector>
+#ifdef CASADI_WITH_THREAD
+#ifdef CASADI_WITH_THREAD_MINGW
+#include <mingw.mutex.h>
+#else // CASADI_WITH_THREAD_MINGW
+#include <mutex>
+#endif // CASADI_WITH_THREAD_MINGW
+#endif //CASADI_WITH_THREAD
+
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+#include <memory>
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
 
 namespace casadi {
 
@@ -202,6 +213,9 @@ namespace casadi {
         \identifier{b1} */
     bool alive() const;
 
+    /** \brief Thread-safe alternative to alive()/shared() */
+    bool shared_if_alive(SharedObject& shared) const;
+
     /** \brief  Access functions of the node
 
         \identifier{b2} */
@@ -211,6 +225,10 @@ namespace casadi {
 
         \identifier{b3} */
     const WeakRefInternal* operator->() const;
+
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+    std::shared_ptr<std::mutex> get_mutex() const;
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
 
 #ifndef SWIG
   private:
@@ -267,7 +285,11 @@ namespace casadi {
 template<typename K, typename T>
 class CASADI_EXPORT WeakCache {
   public:
-    void tocache(const K& key, const T& f) {
+    void tocache(const K& key, const T& f, bool needs_lock=true) {
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+      // Safe access to cache_
+      casadi::conditional_lock_guard<std::mutex> lock(mtx_, needs_lock);
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
       // Add to cache
       cache_.insert(std::make_pair(key, f));
       // Remove a lost reference, if any, to prevent uncontrolled growth
@@ -278,28 +300,58 @@ class CASADI_EXPORT WeakCache {
         }
       }
     }
-    bool incache(const K& key, T& f) const {
+    /* \brief Thread-safe unique caching
+    * While an incache/tocache pair in multi-threaded context is safe
+    * it may lead to fresh cache entries being overwritten.
+    *
+    * A mutex lock_guard on the scope of an incache/tocache pair
+    * may lead to deadlocks.
+    *
+    */
+    void tocache_if_missing(const K& key, T& f) {
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+      // Safe access to cache_
+      std::lock_guard<std::mutex> lock(mtx_);
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
+      if (!incache(key, f, false)) {
+        tocache(key, f, false);
+      }
+    }
+    bool incache(const K& key, T& f, bool needs_lock=true) const {
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+      // Safe access to cache_
+      casadi::conditional_lock_guard<std::mutex> lock(mtx_, needs_lock);
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
       auto it = cache_.find(key);
-      if (it!=cache_.end() && it->second.alive()) {
-        f = shared_cast<T>(it->second.shared());
+      SharedObject temp;
+      if (it!=cache_.end() && it->second.shared_if_alive(temp)) {
+        f = shared_cast<T>(temp);
         return true;
       } else {
         return false;
       }
     }
     void cache(std::vector<K>& keys, std::vector<T>& entries) const {
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+      // Safe access to cache_
+      std::lock_guard<std::mutex> lock(mtx_);
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
       keys.clear();
       entries.clear();
       // Add all entries that haven't been deleted
       for (auto&& cf : cache_) {
-        if (cf.second.alive()) {
+        SharedObject temp;
+        if (cf.second.shared_if_alive(temp)) {
           keys.push_back(cf.first);
-          entries.push_back(shared_cast<T>(cf.second.shared()));
+          entries.push_back(shared_cast<T>(temp));
         }
       }
     }
   private:
     std::map<K, WeakRef> cache_;
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+    mutable std::mutex mtx_;
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
 };
 
 } // namespace casadi

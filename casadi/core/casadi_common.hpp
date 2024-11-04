@@ -327,6 +327,27 @@ namespace casadi {
 
 #endif // SWIG
 
+  template<typename _Mutex>
+  class conditional_lock_guard {
+  public:
+    typedef _Mutex mutex_type;
+
+    conditional_lock_guard(mutex_type& m, bool condition) : mtx_(m), condition_(condition) {
+      if (condition_) mtx_.lock();
+    }
+
+    ~conditional_lock_guard() {
+      if (condition_) mtx_.unlock();
+    }
+
+    conditional_lock_guard(const conditional_lock_guard&) = delete;
+    conditional_lock_guard& operator=(const conditional_lock_guard&) = delete;
+
+  private:
+    mutex_type&  mtx_;
+    bool condition_;
+  };
+
 } // namespace casadi
 
 #include "casadi_logger.hpp"

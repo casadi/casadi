@@ -782,6 +782,10 @@ namespace casadi {
         \identifier{ll} */
     void tocache(const Function& f, const std::string& suffix="") const;
 
+
+    /** \brief Save function to cache, only if missing */
+    void tocache_if_missing(Function& f, const std::string& suffix="") const;
+
     /** \brief Generate code the function
 
         \identifier{lm} */
@@ -1301,6 +1305,11 @@ namespace casadi {
     /// Cache for sparsities of the Jacobian blocks
     mutable std::vector<Sparsity> jac_sparsity_[2];
 
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+    /// Mutex for thread safety
+    mutable std::mutex jac_sparsity_mtx_;
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
+
     /// If the function is the derivative of another function
     Function derivative_of_;
 
@@ -1360,9 +1369,10 @@ namespace casadi {
     Function custom_jacobian_;
 
     // Counter for unique names for dumping inputs and output
-    mutable casadi_int dump_count_ = 0;
 #ifdef CASADI_WITH_THREAD
-    mutable std::mutex dump_count_mtx_;
+    mutable std::atomic<casadi_int> dump_count_;
+#else
+    mutable casadi_int dump_count_;
 #endif // CASADI_WITH_THREAD
 
     /** \brief Check if the function is of a particular type

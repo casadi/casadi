@@ -27,6 +27,9 @@
 #define CASADI_SHARED_OBJECT_INTERNAL_HPP
 
 #include "shared_object.hpp"
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+#include <memory>
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
 
 #ifdef CASADI_WITH_THREAD
 #include <atomic>
@@ -115,6 +118,10 @@ namespace casadi {
 
     // Raw pointer to the cached object
     SharedObjectInternal* raw_;
+
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+    mutable std::shared_ptr<std::mutex> mutex_;
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
   };
 
 
