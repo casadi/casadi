@@ -213,7 +213,9 @@ namespace casadi {
         \identifier{b1} */
     bool alive() const;
 
-    /** \brief Thread-safe alternative to alive()/shared() */
+    /** \brief Thread-safe alternative to alive()/shared()
+
+        \identifier{287} */
     bool shared_if_alive(SharedObject& shared);
 
     /** \brief  Access functions of the node

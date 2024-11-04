@@ -1714,6 +1714,9 @@
 %exception  casadi::FunctionBuffer::ret() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::FunctionBuffer::stats() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::GenericExpression::abs(const ExType &x) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -5168,6 +5171,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::WeakRef::shared() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::WeakRef::shared_if_alive(SharedObject &shared) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::XmlFile::dump(const std::string &filename, const XmlNode &node) {
