@@ -52,7 +52,7 @@ class PrintNowThread:
                 datetime.datetime.now(),
             )
             print("____________________________________________________________________")
-            time.sleep(1)
+            time.sleep(0.25)
             self.timestamps.append(time.time())
             
 class Threadstests(casadiTestCase):
@@ -176,7 +176,7 @@ class Threadstests(casadiTestCase):
     import casadi as ca
     import numpy as np
 
-    N = 50  # number of control intervals
+    N = 100  # number of control intervals
 
     opti = ca.Opti()  # Optimization problem
 
@@ -206,8 +206,7 @@ class Threadstests(casadiTestCase):
         time.sleep(0.001)
         self.counter = self.counter + 1
         #print(ca.det(S))
-        if argin[0]>3:
-            #print("oops")
+        if argin[0]>10:
             raise Exception("let's try an exception")
         
         return [argin[0]]
