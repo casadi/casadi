@@ -115,6 +115,10 @@ namespace casadi {
 
     // Raw pointer to the cached object
     SharedObjectInternal* raw_;
+
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+    mutable std::mutex mutex_;
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
   };
 
 

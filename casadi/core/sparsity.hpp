@@ -36,6 +36,13 @@
 #include <list>
 #include <limits>
 #include <unordered_map>
+#ifdef CASADI_WITH_THREAD
+#ifdef CASADI_WITH_THREAD_MINGW
+#include <mingw.mutex.h>
+#else // CASADI_WITH_THREAD_MINGW
+#include <mutex>
+#endif // CASADI_WITH_THREAD_MINGW
+#endif //CASADI_WITH_THREAD
 
 namespace casadi {
   // Forward declaration
@@ -875,6 +882,11 @@ namespace casadi {
 
     /// Cached sparsity patterns
     static CachingMap& getCache();
+
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+    // Safe access to CachingMap
+    static std::mutex cachingmap_mtx;
+#endif //CASADI_WITH_THREADSAFE_SYMBOLICS
 
     /// (Dense) scalar
     static const Sparsity& getScalar();

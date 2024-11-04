@@ -85,9 +85,22 @@ namespace casadi {
 #ifdef WITH_EXTRA_CHECKS
     casadi_assert_dev(Function::call_depth_==0);
 #endif // WITH_EXTRA_CHECKS
-    if (node && --node->count == 0) {
-      delete node;
-      node = nullptr;
+    if (!node) return;
+    if (node->weak_ref_) {
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+      // Avoid triggering a delete while a weak_ref.shared_if_alive is being called
+      std::lock_guard<std::mutex> lock(node->weak_ref_->get_mutex());
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
+
+      if (--node->count == 0) {
+        delete node;
+        node = nullptr;
+      }
+    } else {
+      if (--node->count == 0) {
+        delete node;
+        node = nullptr;
+      }
     }
   }
 
@@ -146,6 +159,19 @@ namespace casadi {
     return ret;
   }
 
+  bool WeakRef::shared_if_alive(SharedObject& shared) {
+    if (is_null()) return false;
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+    // Safe access to ...
+    std::lock_guard<std::mutex> lock((*this)->mutex_);
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
+    if (alive()) {
+      shared.own((*this)->raw_);
+      return true;
+    }
+    return false;
+  }
+
   const WeakRefInternal* WeakRef::operator->() const {
     return static_cast<const WeakRefInternal*>(SharedObject::operator->());
   }
@@ -163,7 +189,14 @@ namespace casadi {
   }
 
   void WeakRef::kill() {
+    casadi_assert_dev((*this)->raw_);
     (*this)->raw_ = nullptr;
   }
+
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+  std::mutex & WeakRef::get_mutex() const {
+    return (*this)->mutex_;
+  }
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
 
 } // namespace casadi

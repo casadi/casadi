@@ -50,8 +50,11 @@ namespace casadi {
     }
     #endif // WITH_REFCOUNT_WARNINGS
     if (weak_ref_!=nullptr) {
+      // Assumption: no other SharedObjectInternal instances
+      // point to the same WeakRefInternal through weak_ref_
       weak_ref_->kill();
       delete weak_ref_;
+      weak_ref_ = nullptr;
     }
   }
 

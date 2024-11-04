@@ -2370,5 +2370,9 @@ namespace casadi {
    }
  }
 
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+  std::mutex MX::mutex_temp;
+#endif //CASADI_WITH_THREADSAFE_SYMBOLICS
+
 #undef CASADI_THROW_ERROR
 } // namespace casadi
