@@ -5014,6 +5014,23 @@ C++ includes: e0_diagram.hpp
 ";
 
 
+// File: classcasadi_1_1conditional__lock__guard.xml
+%feature("docstring") casadi::conditional_lock_guard "
+
+[INTERNAL] C++ includes: casadi_common.hpp
+";
+
+%feature("docstring") casadi::conditional_lock_guard::conditional_lock_guard
+ "
+
+[INTERNAL] ";
+
+%feature("docstring") 
+casadi::conditional_lock_guard::~conditional_lock_guard "
+
+[INTERNAL] ";
+
+
 // File: classcasadi_1_1Conic.xml
 %feature("docstring") casadi::Conic "
 
@@ -32888,10 +32905,10 @@ Get all options for a plugin.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1ek
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/conic.hpp#L556
+https://github.com/casadi/casadi/blob/develop/casadi/core/conic.hpp#L560
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/conic.cpp#L556-L558
+https://github.com/casadi/casadi/blob/develop/casadi/core/conic.cpp#L560-L562
 
 ";
 
@@ -32903,10 +32920,10 @@ Get type info for a particular option.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1el
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/conic.hpp#L560
+https://github.com/casadi/casadi/blob/develop/casadi/core/conic.hpp#L564
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/conic.cpp#L560-L562
+https://github.com/casadi/casadi/blob/develop/casadi/core/conic.cpp#L564-L566
 
 ";
 
@@ -32918,10 +32935,10 @@ Get documentation for a particular option.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1em
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/conic.hpp#L564
+https://github.com/casadi/casadi/blob/develop/casadi/core/conic.hpp#L568
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/conic.cpp#L564-L566
+https://github.com/casadi/casadi/blob/develop/casadi/core/conic.cpp#L568-L570
 
 ";
 
@@ -35743,10 +35760,10 @@ Get all options for a plugin.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1t5
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.hpp#L825
+https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.hpp#L829
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.cpp#L825-L827
+https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.cpp#L829-L831
 
 ";
 
@@ -35758,10 +35775,10 @@ Get type info for a particular option.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1t6
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.hpp#L829
+https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.hpp#L833
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.cpp#L829-L831
+https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.cpp#L833-L835
 
 ";
 
@@ -35773,10 +35790,10 @@ Get documentation for a particular option.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1t7
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.hpp#L833
+https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.hpp#L837
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.cpp#L833-L835
+https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.cpp#L837-L839
 
 ";
 
