@@ -72,9 +72,9 @@ namespace casadi {
   WeakRefInternal::WeakRefInternal(SharedObjectInternal* raw) :
     raw_(raw)
 #ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
-    , mutex_(std::make_shared<std::mutex>()
+    , mutex_(std::make_shared<std::mutex>())
 #endif // CASADI_WITH_THREADSAFE_SYMBOLICS
-    ) {
+    {
   }
 
   WeakRefInternal::~WeakRefInternal() {
