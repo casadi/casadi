@@ -72,10 +72,12 @@
   namespace casadi {
     // Redirect printout
     static void pythonlogger(const char* s, std::streamsize num, bool error) {
-      if (!casadi::InterruptHandler::is_main_thread()) {
+#ifndef CASADI_WITH_PYTHON_GIL_RELEASE
+      *if (!casadi::InterruptHandler::is_main_thread()) {
         casadi::Logger::writeDefault(s, num, error);
         return;
       }
+#endif // CASADI_WITH_PYTHON_GIL_RELEASE
       int n = num;
 #ifdef CASADI_WITH_PYTHON_GIL_RELEASE
       SWIG_PYTHON_THREAD_BEGIN_BLOCK;
