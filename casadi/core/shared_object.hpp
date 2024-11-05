@@ -38,6 +38,10 @@
 #endif // CASADI_WITH_THREAD_MINGW
 #endif //CASADI_WITH_THREAD
 
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+#include <memory>
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
+
 namespace casadi {
 
   // Forward declaration of weak reference class
@@ -225,7 +229,7 @@ namespace casadi {
     const WeakRefInternal* operator->() const;
 
 #ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
-    std::mutex & get_mutex() const;
+    std::shared_ptr<std::mutex> get_mutex() const;
 #endif // CASADI_WITH_THREADSAFE_SYMBOLICS
 
 #ifndef SWIG

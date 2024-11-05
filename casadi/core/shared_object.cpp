@@ -88,8 +88,10 @@ namespace casadi {
     if (!node) return;
     if (node->weak_ref_) {
 #ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+      auto mutex = node->weak_ref_->get_mutex();
       // Avoid triggering a delete while a weak_ref.shared_if_alive is being called
-      std::lock_guard<std::mutex> lock(node->weak_ref_->get_mutex());
+      std::lock_guard<std::mutex> lock(*mutex);
+      // Could it be that this mutex is destroyed when the lock goes out of scope?
 #endif // CASADI_WITH_THREADSAFE_SYMBOLICS
 
       if (--node->count == 0) {
@@ -163,7 +165,7 @@ namespace casadi {
     if (is_null()) return false;
 #ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
     // Safe access to ...
-    std::lock_guard<std::mutex> lock((*this)->mutex_);
+    std::lock_guard<std::mutex> lock(*(*this)->mutex_);
 #endif // CASADI_WITH_THREADSAFE_SYMBOLICS
     if (alive()) {
       shared.own((*this)->raw_);
@@ -194,7 +196,7 @@ namespace casadi {
   }
 
 #ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
-  std::mutex & WeakRef::get_mutex() const {
+  std::shared_ptr<std::mutex> WeakRef::get_mutex() const {
     return (*this)->mutex_;
   }
 #endif // CASADI_WITH_THREADSAFE_SYMBOLICS
