@@ -320,7 +320,7 @@ else()
   endif()
 endif()
 
-option(WITH_THREADSAFE_SYMBOLICS "Numeric evaluation in CasADi is thread-safe. Use this flag to make symbolics thread-safe as well. May adversly impact performance" WITH_THREAD)
+option(WITH_THREADSAFE_SYMBOLICS "Numeric evaluation in CasADi is thread-safe. Use this flag to make symbolics thread-safe as well. May adversly impact performance" ${WITH_THREAD})
 
 if(WITH_THREADSAFE_SYMBOLICS AND NOT WITH_THREAD)
   message(SEND_ERROR "WITH_THREADSAFE_SYMBOLICS ON only supported when WITH_THREAD ON." )
