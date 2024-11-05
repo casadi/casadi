@@ -507,6 +507,10 @@ namespace casadi {
 
   std::map<std::string, Conic::Plugin> Conic::solvers_;
 
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+  std::mutex Conic::mutex_solvers_;
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
+
   const std::string Conic::infix_ = "conic";
 
   double Conic::get_default_in(casadi_int ind) const {
