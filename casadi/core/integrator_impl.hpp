@@ -357,6 +357,10 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   /// Collection of solvers
   static std::map<std::string, Plugin> solvers_;
 
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+    static std::mutex mutex_solvers_;
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
+
   /// Infix
   static const std::string infix_;
 

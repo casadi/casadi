@@ -59,13 +59,13 @@ namespace casadi {
   void (*Logger::flush)(bool error) =Logger::flushDefault;
 
   std::ostream& uout() {
-    // Singleton pattern
+    // Singleton pattern, lazily instantiated
     static Logger::Stream<false> instance;
     return instance;
   }
 
   std::ostream& uerr() {
-    // Singleton pattern
+    // Singleton pattern, lazily instantiated
     static Logger::Stream<true> instance;
     return instance;
   }
