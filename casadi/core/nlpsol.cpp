@@ -661,6 +661,10 @@ namespace casadi {
 
   std::map<std::string, Nlpsol::Plugin> Nlpsol::solvers_;
 
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+  std::mutex Nlpsol::mutex_solvers_;
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
+
   const std::string Nlpsol::infix_ = "nlpsol";
 
   DM Nlpsol::getReducedHessian() {

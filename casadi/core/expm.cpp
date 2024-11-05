@@ -175,6 +175,10 @@ namespace casadi {
 
   std::map<std::string, Expm::Plugin> Expm::solvers_;
 
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+  std::mutex Expm::mutex_solvers_;
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
+
   const std::string Expm::infix_ = "expm";
 
 } // namespace casadi

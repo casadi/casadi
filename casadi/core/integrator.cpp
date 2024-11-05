@@ -1587,6 +1587,10 @@ Sparsity Integrator::sp_jac_rdae() {
 
 std::map<std::string, Integrator::Plugin> Integrator::solvers_;
 
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+  std::mutex Integrator::mutex_solvers_;
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
+
 const std::string Integrator::infix_ = "integrator";
 
 FixedStepIntegrator::FixedStepIntegrator(const std::string& name, const Function& dae,

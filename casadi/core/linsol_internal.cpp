@@ -114,6 +114,10 @@ namespace casadi {
 
   std::map<std::string, LinsolInternal::Plugin> LinsolInternal::solvers_;
 
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+  std::mutex LinsolInternal::mutex_solvers_;
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
+
   const std::string LinsolInternal::infix_ = "linsol";
 
 
