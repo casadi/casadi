@@ -154,10 +154,6 @@ else()
   set(COMPILE_FLAGS)
 endif()
 
-if(WITH_PYTHON_GIL_RELEASE)
-  set(COMPILE_FLAGS "${COMPILE_FLAGS} -DCASADI_WITH_PYTHON_GIL_RELEASE")
-endif()
-
 if(MSVC)
   set(COMPILE_FLAGS "${COMPILE_FLAGS} /bigobj")
 endif()

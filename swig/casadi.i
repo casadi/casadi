@@ -55,6 +55,19 @@
 // Define printing routine
 
 #ifdef SWIGPYTHON
+
+#ifdef CASADI_WITH_PYTHON_GIL_RELEASE
+%{
+  // This .cxx was swig-compiled with WITH_PYTHON_GIL_RELEASE option
+  #define CASADI_WITH_PYTHON_GIL_RELEASE
+%}
+#else //CASADI_WITH_PYTHON_GIL_RELEASE
+%{
+  // This .cxx was swig-compiled without WITH_PYTHON_GIL_RELEASE option
+  #undef CASADI_WITH_PYTHON_GIL_RELEASE
+%}
+#endif //CASADI_WITH_PYTHON_GIL_RELEASE
+
 %{
   namespace casadi {
     // Redirect printout
