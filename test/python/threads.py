@@ -35,6 +35,8 @@ import threading
 import time
 import multiprocessing
 
+target_print_thread = 0.25
+
 class PrintNowThread:
     def __init__(self):
         self._thread = threading.Thread(target=self.run)
@@ -52,7 +54,7 @@ class PrintNowThread:
                 datetime.datetime.now(),
             )
             print("____________________________________________________________________")
-            time.sleep(0.25)
+            time.sleep(target_print_thread)
             self.timestamps.append(time.time())
             
 class Threadstests(casadiTestCase):
@@ -72,7 +74,7 @@ class Threadstests(casadiTestCase):
         import casadi as ca
         import numpy as np
 
-        N = 500  # number of control intervals
+        N = 400  # number of control intervals
 
         opti = ca.Opti()  # Optimization problem
 
@@ -162,8 +164,10 @@ class Threadstests(casadiTestCase):
             self.assertTrue(0.7 <= e/base_time <= 1.3)
 
         print(timerthread.timestamps)
-        self.assertTrue(np.max(np.diff(np.array(timerthread.timestamps)))<1.1)
-
+        for dt in np.diff(np.array(timerthread.timestamps)):
+            print(dt)
+            self.assertTrue(target_print_thread*0.9<=dt<=target_print_thread*1.1)
+        
   @memory_heavy()
   @requires_nlpsol("ipopt")
   def test_GIL_release_stress_test(self):
@@ -324,7 +328,9 @@ class Threadstests(casadiTestCase):
         self.assertTrue(raw_solver.stats(i+1)["success"])
 
     print(timerthread.timestamps)
-    self.assertTrue(np.max(np.diff(np.array(timerthread.timestamps)))<1.1)
+    for dt in np.diff(np.array(timerthread.timestamps)):
+        print(dt)
+        self.assertTrue(target_print_thread*0.9<=dt<=target_print_thread*1.1)
     
     [raw_solver.stats(i+1)["t_wall_nlp_jac_g"] for i in range(n_thread)]
 
