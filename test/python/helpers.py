@@ -1015,7 +1015,8 @@ class memory_heavy(object):
 
   def __call__(self, c):
     print(c)
-    c.__dict__["tag_memory_heavy"] = True
+    if c is not None:
+        c.__dict__["tag_memory_heavy"] = True
     return c
 
 class slow(object):
