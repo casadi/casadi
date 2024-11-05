@@ -165,7 +165,7 @@ class Threadstests(casadiTestCase):
 
         print(timerthread.timestamps)
         for dt in np.diff(np.array(timerthread.timestamps)):
-            print(dt)
+            print("target_print_thread dt",dt)
             self.assertTrue(target_print_thread*0.9<=dt<=target_print_thread*1.1)
         
   @memory_heavy()
@@ -329,7 +329,7 @@ class Threadstests(casadiTestCase):
 
     print(timerthread.timestamps)
     for dt in np.diff(np.array(timerthread.timestamps)):
-        print(dt)
+        print("target_print_thread dt",dt)
         self.assertTrue(target_print_thread*0.9<=dt<=target_print_thread*1.1)
     
     [raw_solver.stats(i+1)["t_wall_nlp_jac_g"] for i in range(n_thread)]
