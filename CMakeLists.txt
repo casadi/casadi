@@ -555,6 +555,8 @@ include_directories(${PROJECT_BINARY_DIR})
 ################# 3rd party interface #################################
 #######################################################################
 
+set(AUTOTOOLS_SHELL "bash" CACHE STRING "When dependency is asked to be built and relies on autotools, use this shell")
+
 option(WITH_MATLAB_IPC "Compile the MATLAB IPC interface" OFF)
 
 option(WITH_BUILD_REQUIRED "Build any requirements that are not found on your system")
@@ -868,7 +870,9 @@ function(libraries2flags libraries out)
       else()
           get_filename_component(LIB_DIR "${LIB}" DIRECTORY)
           get_filename_component(LIB_NAME "${LIB}" NAME)
-          string(REGEX REPLACE "${CMAKE_SHARED_LIBRARY_PREFIX}([A-Za-z0-9_-]+)${CMAKE_SHARED_LIBRARY_SUFFIX}" "\\1" LIB_NAME_MOD ${LIB_NAME})
+          string(REGEX REPLACE "${CMAKE_IMPORT_LIBRARY_PREFIX}([A-Za-z0-9_-]+)${CMAKE_IMPORT_LIBRARY_SUFFIX}" "\\1" LIB_NAME_MOD ${LIB_NAME})
+          string(REGEX REPLACE "${CMAKE_SHARED_LIBRARY_PREFIX}([A-Za-z0-9_-]+)${CMAKE_SHARED_LIBRARY_SUFFIX}" "\\1" LIB_NAME_MOD ${LIB_NAME_MOD})
+          string(REGEX REPLACE "${CMAKE_STATIC_LIBRARY_PREFIX}([A-Za-z0-9_-]+)${CMAKE_STATIC_LIBRARY_SUFFIX}" "\\1" LIB_NAME_MOD ${LIB_NAME_MOD})
           if(LIB_NAME STREQUAL LIB_NAME_MOD)
             set(local "${local} ${LIB}")
           else()
@@ -1254,7 +1258,7 @@ if(WITH_BUILD_METIS)
         DEPENDS ${LAPACK_DEPENDS_TARGET}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
-        CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS_CONFIGURE} --prefix=<INSTALL_DIR>
+        CONFIGURE_COMMAND ${AUTOTOOLS_SHELL} <SOURCE_DIR>/configure ${CROSS_FLAGS_CONFIGURE} --prefix=<INSTALL_DIR>
 
           # GKFree is not defined (variadic definition in utils.c); fails on MacOS target
           "ADD_CFLAGS=-Wno-implicit-function-declaration ${EXTERNAL_PROJECT_CFLAGS}"
@@ -1262,7 +1266,7 @@ if(WITH_BUILD_METIS)
           "ADD_FFLAGS=-Wno-implicit-function-declaration ${EXTERNAL_PROJECT_FFLAGS}"
           "ADD_FCFLAGS=-Wno-implicit-function-declaration ${EXTERNAL_PROJECT_FCFLAGS}"
         ${COIN_FLAGS}
-        PATCH_COMMAND COMMAND cd <SOURCE_DIR> && ./get.Metis)
+        PATCH_COMMAND COMMAND cd <SOURCE_DIR> && ${AUTOTOOLS_SHELL} ./get.Metis)
   add_library(metis::metis INTERFACE IMPORTED)
   add_dependencies(metis::metis metis-external)
   set_target_properties(metis::metis PROPERTIES
@@ -1293,7 +1297,7 @@ if(WITH_HSL)
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
         PATCH_COMMAND ${EXTERNAL_CMAKE_COMMAND} -DSRC=<SOURCE_DIR>  -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/patch_hsl.cmake
-        CONFIGURE_COMMAND <SOURCE_DIR>/configure --disable-static "--with-blas=${LAPACK_LFLAGS}" ${CROSS_FLAGS_CONFIGURE} "ADD_FCFLAGS=${LAPACK_LFLAGS} -L${CMAKE_BINARY_DIR}/external_projects/lib -Wl,-rpath,${CMAKE_BINARY_DIR}/external_projects/lib -l${METIS_LIB} -lm ${EXTERNAL_PROJECT_FCFLAGS}" --prefix=<INSTALL_DIR>
+        CONFIGURE_COMMAND ${AUTOTOOLS_SHELL} <SOURCE_DIR>/configure --disable-static "--with-blas=${LAPACK_LFLAGS}" ${CROSS_FLAGS_CONFIGURE} "ADD_FCFLAGS=${LAPACK_LFLAGS} -L${CMAKE_BINARY_DIR}/external_projects/lib -Wl,-rpath,${CMAKE_BINARY_DIR}/external_projects/lib -l${METIS_LIB} -lm ${EXTERNAL_PROJECT_FCFLAGS}" --prefix=<INSTALL_DIR>
         "ADD_CFLAGS=${EXTERNAL_PROJECT_CFLAGS}"
         "ADD_CXXFLAGS=${EXTERNAL_PROJECT_CXXFLAGS}"
         ${COIN_FLAGS}
@@ -1320,13 +1324,14 @@ if(WITH_MUMPS)
         DEPENDS ${LAPACK_DEPENDS_TARGET} metis::metis
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
-        CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS_CONFIGURE}  --prefix=<INSTALL_DIR> "--with-metis-cflags=-I${METIS_INCLUDE_DIR}" "--with-metis-lflags=-L${CMAKE_BINARY_DIR}/external_projects/lib -l${METIS_LIB} -lm" "--with-lapack-lflags=${LAPACK_LFLAGS}" ${CROSS_FLAGS_FORTRAN}
+        BUILD_IN_SOURFCE ON
+        CONFIGURE_COMMAND ${AUTOTOOLS_SHELL} <SOURCE_DIR>/configure ${CROSS_FLAGS_CONFIGURE}  --prefix=<INSTALL_DIR> "--with-metis-cflags=-I${METIS_INCLUDE_DIR}" "--with-metis-lflags=-L${CMAKE_BINARY_DIR}/external_projects/lib -l${METIS_LIB} -lm" "--with-lapack-lflags=${LAPACK_LFLAGS}" ${CROSS_FLAGS_FORTRAN}
         "ADD_CFLAGS=${EXTERNAL_PROJECT_CFLAGS}"
         "ADD_CXXFLAGS=${EXTERNAL_PROJECT_CXXFLAGS}"
         "ADD_FFLAGS=${EXTERNAL_PROJECT_FFLAGS}"
         "ADD_FCFLAGS=${EXTERNAL_PROJECT_FCFLAGS}"
         ${COIN_FLAGS}
-        PATCH_COMMAND COMMAND cd <SOURCE_DIR> && ./get.Mumps)
+        PATCH_COMMAND COMMAND cd <SOURCE_DIR> && ${AUTOTOOLS_SHELL} ./get.Mumps)
 
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/coin-or")
     add_library(mumps SHARED IMPORTED)
@@ -1351,9 +1356,9 @@ if(WITH_SPRAL)
   #      syntax error near unexpected token `HWLOC,'
   #      `PKG_CHECK_MODULES(HWLOC, hwloc,'
   if(ALLOW_DOCKER)
-    set(SPRAL_RECONFIG_CMD docker run --rm -v <SOURCE_DIR>:/work ghcr.io/casadi/coinbuild:latest autoreconf -ivf -I /usr/share/aclocal /work COMMAND)
+    set(SPRAL_RECONFIG_CMD docker run --rm -v .:/work ghcr.io/casadi/coinbuild:latest autoreconf -ivf -I /usr/share/aclocal /work COMMAND)
   else()
-    set(SPRAL_RECONFIG_CMD autoreconf -ivf -I /usr/share/aclocal <SOURCE_DIR> COMMAND)
+    set(SPRAL_RECONFIG_CMD autoreconf -ivf -I /usr/share/aclocal . COMMAND)
   endif()
   if(WITH_BUILD_SPRAL)
     get_target_property(METIS_INCLUDE_DIR metis::metis INTERFACE_INCLUDE_DIRECTORIES)
@@ -1365,7 +1370,7 @@ if(WITH_SPRAL)
         DEPENDS ${LAPACK_DEPENDS_TARGET} metis::metis
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
-        CONFIGURE_COMMAND ${SPRAL_RECONFIG_CMD} <SOURCE_DIR>/configure ${CROSS_FLAGS_CONFIGURE} --disable-gpu --prefix=<INSTALL_DIR> --disable-openmp "--with-metis-inc-dir=${METIS_INCLUDE_DIR}" "--with-metis=-L${CMAKE_BINARY_DIR}/external_projects/lib -l${METIS_LIB} -lm" "--with-lapack=${LAPACK_LFLAGS}" "--with-blas=${LAPACK_LFLAGS}" ${CROSS_FLAGS_FORTRAN}
+        CONFIGURE_COMMAND cd <SOURCE_DIR> COMMAND ${SPRAL_RECONFIG_CMD} ${AUTOTOOLS_SHELL} <SOURCE_DIR>/configure ${CROSS_FLAGS_CONFIGURE} --disable-gpu --prefix=<INSTALL_DIR> --disable-openmp "--with-metis-inc-dir=${METIS_INCLUDE_DIR}" "--with-metis=-L${CMAKE_BINARY_DIR}/external_projects/lib -l${METIS_LIB} -lm" "--with-lapack=${LAPACK_LFLAGS}" "--with-blas=${LAPACK_LFLAGS}" ${CROSS_FLAGS_FORTRAN}
         "CFLAGS=-fPIC ${EXTERNAL_PROJECT_CFLAGS}"
         "CXXFLAGS=-fPIC ${EXTERNAL_PROJECT_CXXFLAGS}"
         "FFLAGS=-fPIC ${EXTERNAL_PROJECT_FFLAGS}"
@@ -1390,7 +1395,7 @@ if((WITH_CLP AND WITH_BUILD_CLP) OR (WITH_CBC AND WITH_BUILD_CBC))
           GIT_TAG ${BUILD_COINUTILS_VERSION}
           PREFIX "${CMAKE_BINARY_DIR}/external_projects"
           UPDATE_COMMAND ""
-          CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS_CONFIGURE} "--with-lapack-lflags=${LAPACK_LFLAGS}" --prefix=<INSTALL_DIR>
+          CONFIGURE_COMMAND ${AUTOTOOLS_SHELL} <SOURCE_DIR>/configure ${CROSS_FLAGS_CONFIGURE} "--with-lapack-lflags=${LAPACK_LFLAGS}" --prefix=<INSTALL_DIR>
           "ADD_CFLAGS=-fPIC ${EXTERNAL_PROJECT_CFLAGS}"
           "ADD_CXXFLAGS=-fPIC ${EXTERNAL_PROJECT_CXXFLAGS}"
           "ADD_FFLAGS=-fPIC ${EXTERNAL_PROJECT_FFLAGS}"
@@ -1416,7 +1421,7 @@ if(WITH_CLP)
         GIT_TAG ${BUILD_OSI_VERSION}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
-        CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS_CONFIGURE} --prefix=<INSTALL_DIR> ${CROSS_FLAGS_FORTRAN}
+        CONFIGURE_COMMAND ${AUTOTOOLS_SHELL} <SOURCE_DIR>/configure ${CROSS_FLAGS_CONFIGURE} --prefix=<INSTALL_DIR> ${CROSS_FLAGS_FORTRAN}
         "ADD_CFLAGS=-fPIC ${EXTERNAL_PROJECT_CFLAGS}"
         "ADD_CXXFLAGS=-fPIC ${EXTERNAL_PROJECT_CXXFLAGS}"
         "ADD_FFLAGS=-fPIC ${EXTERNAL_PROJECT_FFLAGS}"
@@ -1443,7 +1448,7 @@ if(WITH_CLP)
         GIT_TAG ${BUILD_CLP_VERSION}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
-        CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS_CONFIGURE} "--with-lapack-lflags=${LAPACK_LFLAGS}" --prefix=<INSTALL_DIR>  ${CROSS_FLAGS_FORTRAN}
+        CONFIGURE_COMMAND ${AUTOTOOLS_SHELL} <SOURCE_DIR>/configure ${CROSS_FLAGS_CONFIGURE} "--with-lapack-lflags=${LAPACK_LFLAGS}" --prefix=<INSTALL_DIR>  ${CROSS_FLAGS_FORTRAN}
         "ADD_CFLAGS=-fPIC ${EXTERNAL_PROJECT_CFLAGS}"
         "ADD_CXXFLAGS=-fPIC ${EXTERNAL_PROJECT_CXXFLAGS_LOCAL}"
         "ADD_FFLAGS=-fPIC ${EXTERNAL_PROJECT_FFLAGS}"
@@ -1485,7 +1490,7 @@ if(WITH_CBC)
         GIT_TAG ${BUILD_CGL_VERSION}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
-        CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS_CONFIGURE} --prefix=<INSTALL_DIR> ${CROSS_FLAGS_FORTRAN}
+        CONFIGURE_COMMAND ${AUTOTOOLS_SHELL} <SOURCE_DIR>/configure ${CROSS_FLAGS_CONFIGURE} --prefix=<INSTALL_DIR> ${CROSS_FLAGS_FORTRAN}
         "ADD_CFLAGS=-fPIC ${EXTERNAL_PROJECT_CFLAGS}"
         "ADD_CXXFLAGS=-fPIC ${EXTERNAL_PROJECT_CXXFLAGS}"
         "ADD_FFLAGS=-fPIC ${EXTERNAL_PROJECT_FFLAGS}"
@@ -1502,7 +1507,7 @@ if(WITH_CBC)
         GIT_TAG ${BUILD_CBC_VERSION}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
-        CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS_CONFIGURE} --enable-cbc-parallel --prefix=<INSTALL_DIR> "--with-lapack-lflags=${LAPACK_LFLAGS}"  ${CROSS_FLAGS_FORTRAN}
+        CONFIGURE_COMMAND ${AUTOTOOLS_SHELL} <SOURCE_DIR>/configure ${CROSS_FLAGS_CONFIGURE} --enable-cbc-parallel --prefix=<INSTALL_DIR> "--with-lapack-lflags=${LAPACK_LFLAGS}"  ${CROSS_FLAGS_FORTRAN}
         "ADD_CFLAGS=-fPIC ${EXTERNAL_PROJECT_CFLAGS}"
         "ADD_CXXFLAGS=-fPIC ${EXTERNAL_PROJECT_CXXFLAGS}"
         "ADD_FFLAGS=-fPIC ${EXTERNAL_PROJECT_FFLAGS}"
@@ -1561,7 +1566,7 @@ if(WITH_IPOPT)
         GIT_TAG ${BUILD_IPOPT_VERSION}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
-        CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS_CONFIGURE} --prefix=<INSTALL_DIR> "--with-mumps-cflags=-I${CMAKE_BINARY_DIR}/external_projects/include/coin-or/mumps" "--with-mumps-lflags=-L${CMAKE_BINARY_DIR}/external_projects/lib ${WHOLE_ARCHIVE_ON}-lcoinmumps ${WHOLE_ARCHIVE_OFF}"
+        CONFIGURE_COMMAND ${AUTOTOOLS_SHELL} <SOURCE_DIR>/configure ${CROSS_FLAGS_CONFIGURE} --prefix=<INSTALL_DIR> "--with-mumps-cflags=-I${CMAKE_BINARY_DIR}/external_projects/include/coin-or/mumps" "--with-mumps-lflags=-L${CMAKE_BINARY_DIR}/external_projects/lib ${WHOLE_ARCHIVE_ON}-lcoinmumps ${WHOLE_ARCHIVE_OFF}"
         "ADD_CFLAGS=-fPIC ${EXTERNAL_PROJECT_CFLAGS}"
         "ADD_CXXFLAGS=-fPIC ${EXTERNAL_PROJECT_CXXFLAGS}"
         "ADD_FFLAGS=-fPIC ${EXTERNAL_PROJECT_FFLAGS}"
@@ -1606,7 +1611,7 @@ if(WITH_BONMIN)
         GIT_TAG ${BUILD_BONMIN_VERSION}
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
-        CONFIGURE_COMMAND <SOURCE_DIR>/configure ${CROSS_FLAGS_CONFIGURE} --prefix=<INSTALL_DIR>  ${CROSS_FLAGS_FORTRAN}
+        CONFIGURE_COMMAND ${AUTOTOOLS_SHELL} <SOURCE_DIR>/configure ${CROSS_FLAGS_CONFIGURE} --prefix=<INSTALL_DIR>  ${CROSS_FLAGS_FORTRAN}
         "ADD_CFLAGS=-fPIC ${EXTERNAL_PROJECT_CFLAGS}"
         "ADD_CXXFLAGS=-fPIC ${EXTERNAL_PROJECT_CXXFLAGS}"
         "ADD_FFLAGS=-fPIC ${EXTERNAL_PROJECT_FFLAGS}"
