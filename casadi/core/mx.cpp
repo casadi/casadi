@@ -2147,7 +2147,8 @@ namespace casadi {
       MXFunction *ff = f.get<MXFunction>();
 
       // Symbolic work, non-differentiated
-      std::vector<MX> swork(ff->workloc_.size()-1);
+      std::vector<MX> swork_vec(ff->workloc_.size()+ff->n_ce_+1);
+      MX* swork = get_ptr(swork_vec)+ff->n_ce_+1;
 
       // Allocate storage for split outputs
       std::vector<std::vector<MX> > res_split(orig.size());
@@ -2180,7 +2181,7 @@ namespace casadi {
           arg1.resize(it->arg.size());
           for (casadi_int i=0; i<arg1.size(); ++i) {
             casadi_int el = it->arg[i]; // index of the argument
-            arg1[i] = el<0 ? MX(it->data->dep(i).size()) : swork[el];
+            arg1[i] = el==-1 ? MX(it->data->dep(i).size()) : swork[el];
           }
 
           // Perform the operation
@@ -2235,7 +2236,7 @@ namespace casadi {
               }
             }
 
-            if (el>=0) swork[el] = out_i;
+            if (el!=-1) swork[el] = out_i;
           }
         }
       }
@@ -2283,14 +2284,15 @@ namespace casadi {
     MXFunction *ff = f.get<MXFunction>();
 
     // Work vector
-    std::vector< MX > work_vec(ff->workloc_.size()+ff->n_ce_);
+    std::vector< MX > work_vec(ff->workloc_.size()+ff->n_ce_+1);
     MX* w = get_ptr(work_vec)+ff->n_ce_+1;
 
     // Status of the expression:
     // 0: dependant on constants only
     // 1: dependant on parameters/constants only
     // 2: dependant on non-parameters
-    std::vector< char > expr_status(ff->workloc_.size()-1, 0);
+    std::vector< char > expr_status_vec(ff->workloc_.size()+ff->n_ce_+1, 0);
+    char* expr_status = get_ptr(expr_status_vec)+ff->n_ce_+1;
 
     // Split up inputs analogous to symbolic primitives
     std::vector<MX> arg_split = par.split_primitives(par);
