@@ -2346,6 +2346,7 @@ namespace casadi {
 
  void MX::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
    try {
+     res.resize((*this)->nout());
      (*this)->eval_mx(arg, res);
    } catch (std::exception& e) {
      CASADI_THROW_ERROR_OBJ("eval_mx", e.what());

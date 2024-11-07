@@ -1310,7 +1310,7 @@ namespace casadi {
 
             // Perform the operation
             res1.resize(e.res.size());
-            e.data.eval_mx(arg1, res1);
+            e.data->eval_mx(arg1, res1);
 
             // Get the result
             for (casadi_int i=0; i<res1.size(); ++i) {
