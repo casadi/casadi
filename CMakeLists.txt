@@ -1324,7 +1324,6 @@ if(WITH_MUMPS)
         DEPENDS ${LAPACK_DEPENDS_TARGET} metis::metis
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
-        BUILD_IN_SOURFCE ON
         CONFIGURE_COMMAND ${AUTOTOOLS_SHELL} <SOURCE_DIR>/configure ${CROSS_FLAGS_CONFIGURE}  --prefix=<INSTALL_DIR> "--with-metis-cflags=-I${METIS_INCLUDE_DIR}" "--with-metis-lflags=-L${CMAKE_BINARY_DIR}/external_projects/lib -l${METIS_LIB} -lm" "--with-lapack-lflags=${LAPACK_LFLAGS}" ${CROSS_FLAGS_FORTRAN}
         "ADD_CFLAGS=${EXTERNAL_PROJECT_CFLAGS}"
         "ADD_CXXFLAGS=${EXTERNAL_PROJECT_CXXFLAGS}"
