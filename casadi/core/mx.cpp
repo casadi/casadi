@@ -2283,7 +2283,8 @@ namespace casadi {
     MXFunction *ff = f.get<MXFunction>();
 
     // Work vector
-    std::vector< MX > w(ff->workloc_.size()-1);
+    std::vector< MX > work_vec(ff->workloc_.size()+ff->n_ce_);
+    MX* w = get_ptr(work_vec)+ff->n_ce_+1;
 
     // Status of the expression:
     // 0: dependant on constants only
@@ -2333,14 +2334,14 @@ namespace casadi {
         arg1.resize(it->arg.size());
         for (casadi_int i=0; i<arg1.size(); ++i) {
           casadi_int el = it->arg[i]; // index of the argument
-          arg1[i] = el<0 ? MX(it->data->dep(i).size()) : w[el];
+          arg1[i] = el==-1 ? MX(it->data->dep(i).size()) : w[el];
         }
 
         // Check worst case status of inputs
         char max_status = 0;
         for (casadi_int i=0; i<arg1.size(); ++i) {
           casadi_int el = it->arg[i]; // index of the argument
-          if (el>=0) {
+          if (el!=-1) {
             max_status = std::max(max_status, expr_status[it->arg[i]]);
           }
         }
@@ -2352,7 +2353,7 @@ namespace casadi {
             casadi_int el = it->arg[i]; // index of the argument
 
             // For each parametric input being mixed into a non-parametric expression
-            if (el>=0 && expr_status[el]==1) {
+            if (el!=-1 && expr_status[el]==1) {
 
               arg1[i] = register_symbol(w[el], symbol_map, symbol_v, parametric_v);
             }
@@ -2366,7 +2367,7 @@ namespace casadi {
         // Get the result
         for (casadi_int i=0; i<res1.size(); ++i) {
           casadi_int el = it->res[i]; // index of the output
-          if (el>=0) {
+          if (el!=-1) {
             w[el] = res1[i];
             // Update expression status
             expr_status[el] = max_status;
