@@ -383,6 +383,8 @@ namespace casadi {
     /// Destructor
     ~ConstantPool() override {}
 
+    bool elide_copy() const override { return true; }
+
     /** \brief  Print expression */
     std::string disp(const std::vector<std::string>& arg) const override;
 

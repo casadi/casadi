@@ -426,7 +426,12 @@ namespace casadi {
   void ConstantPool::generate(CodeGenerator& g,
                             const std::vector<casadi_int>& arg,
                             const std::vector<casadi_int>& res) const {
-    g << g.copy(g.pool_double(name_), nnz(), g.work(res[0], nnz())) << '\n';
+
+    if (res[0]<=-2) {
+      g << g.work(res[0], nnz()) << " = " << g.pool_double(name_) << ";\n";
+    } else {
+      g << g.copy(g.pool_double(name_), nnz(), g.work(res[0], nnz())) << '\n';
+    }
   }
 
   void ConstantPool::add_dependency(CodeGenerator& g) const {
