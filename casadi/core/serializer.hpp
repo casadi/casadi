@@ -209,6 +209,16 @@ namespace casadi {
 
         \identifier{7p} */
     std::string encode();
+
+    template<class T>
+    std::string generate_id(const T& expr, int warmstart=2) {
+      std::string key;
+      for (casadi_int i=0;i<warmstart+1;++i) {
+        pack(expr);
+        key = encode();
+      }
+      return key;
+    }
   };
 
   class CASADI_EXPORT FileSerializer : public SerializerBase {
