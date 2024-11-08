@@ -35,6 +35,10 @@ XmlFileInternal::~XmlFileInternal() {
 
 std::map<std::string, XmlFileInternal::Plugin> XmlFileInternal::solvers_;
 
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+  std::mutex XmlFileInternal::mutex_solvers_;
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
+
 const std::string XmlFileInternal::infix_ = "xmlfile";
 
 void XmlFileInternal::disp(std::ostream &stream, bool more) const {

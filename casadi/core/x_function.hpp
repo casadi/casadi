@@ -85,6 +85,10 @@ namespace casadi {
 
     /** \brief  Topological sorting of the nodes based on Depth-First Search (DFS)
 
+
+    This function modifies the temp member of the nodes,
+    making it not thread-safe.
+
         \identifier{xr} */
     static void sort_depth_first(std::stack<NodeType*>& s, std::vector<NodeType*>& nodes);
 
@@ -332,6 +336,10 @@ namespace casadi {
                      "\nArgument " + str(i) + "(" + name_in_[i] + ") is not symbolic.");
       }
     }
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+    std::lock_guard<std::mutex> lock(MatType::get_mutex_temp());
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
+
     // Check for duplicate entries among the input expressions
     bool has_duplicates = false;
     for (auto&& i : in_) {

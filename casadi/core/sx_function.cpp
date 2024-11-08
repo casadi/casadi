@@ -236,6 +236,8 @@ namespace casadi {
       }
     }
 
+    // Perform common subexpression elimination
+    // This must be done before the lock, to avoid deadlocks
     if (cse_opt) out_ = cse(out_);
 
     // Check/set default inputs
@@ -245,6 +247,10 @@ namespace casadi {
       casadi_assert(default_in_.size()==n_in_,
                             "Option 'default_in' has incorrect length");
     }
+
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+    std::lock_guard<std::mutex> lock(SX::get_mutex_temp());
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
 
     // Stack used to sort the computational graph
     std::stack<SXNode*> s;

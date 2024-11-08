@@ -167,7 +167,11 @@ namespace casadi {
     mutable int temp;
 
     // Reference counter -- counts the number of parents of the node
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+    std::atomic<unsigned int> count;
+#else
     unsigned int count;
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
 
     /** \brief Serialize an object
 

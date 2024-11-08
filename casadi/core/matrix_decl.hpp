@@ -38,6 +38,13 @@
 #include <typeinfo>
 #include <vector>
 #include <initializer_list>
+#ifdef CASADI_WITH_THREAD
+#ifdef CASADI_WITH_THREAD_MINGW
+#include <mingw.mutex.h>
+#else // CASADI_WITH_THREAD_MINGW
+#include <mutex>
+#endif // CASADI_WITH_THREAD_MINGW
+#endif //CASADI_WITH_THREAD
 
 namespace casadi {
 
@@ -1300,6 +1307,10 @@ namespace casadi {
     /// \cond INTERNAL
     static Matrix<Scalar> _sym(const std::string& name, const Sparsity& sp);
     /// \endcond
+
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+    static std::mutex& get_mutex_temp();
+#endif //CASADI_WITH_THREADSAFE_SYMBOLICS
 
   private:
     /// Sparsity of the matrix in a compressed column storage (CCS) format

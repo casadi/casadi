@@ -55,15 +55,33 @@
 // Define printing routine
 
 #ifdef SWIGPYTHON
+
+#ifdef CASADI_WITH_PYTHON_GIL_RELEASE
+%{
+  // This .cxx was swig-compiled with WITH_PYTHON_GIL_RELEASE option
+  #define CASADI_WITH_PYTHON_GIL_RELEASE
+%}
+#else //CASADI_WITH_PYTHON_GIL_RELEASE
+%{
+  // This .cxx was swig-compiled without WITH_PYTHON_GIL_RELEASE option
+  #undef CASADI_WITH_PYTHON_GIL_RELEASE
+%}
+#endif //CASADI_WITH_PYTHON_GIL_RELEASE
+
 %{
   namespace casadi {
     // Redirect printout
     static void pythonlogger(const char* s, std::streamsize num, bool error) {
-      if (!casadi::InterruptHandler::is_main_thread()) {
+#ifndef CASADI_WITH_PYTHON_GIL_RELEASE
+      *if (!casadi::InterruptHandler::is_main_thread()) {
         casadi::Logger::writeDefault(s, num, error);
         return;
       }
+#endif // CASADI_WITH_PYTHON_GIL_RELEASE
       int n = num;
+#ifdef CASADI_WITH_PYTHON_GIL_RELEASE
+      SWIG_PYTHON_THREAD_BEGIN_BLOCK;
+#endif // CASADI_WITH_PYTHON_GIL_RELEASE
       while (n>0) {
         if (error) {
           PySys_WriteStderr("%.*s", std::min(n, 1000), s);
@@ -73,11 +91,18 @@
         n -= 1000;
         s += 1000;
       }
+#ifdef CASADI_WITH_PYTHON_GIL_RELEASE
+      SWIG_PYTHON_THREAD_END_BLOCK;
+#endif // CASADI_WITH_PYTHON_GIL_RELEASE
     }
 
     static bool pythoncheckinterrupted() {
       if (!casadi::InterruptHandler::is_main_thread()) return false;
+#ifdef CASADI_WITH_PYTHON_GIL_RELEASE
+      SWIG_PYTHON_THREAD_BEGIN_BLOCK;
+#endif // CASADI_WITH_PYTHON_GIL_RELEASE
       return PyErr_CheckSignals();
+      // SWIG_PYTHON_THREAD_END_BLOCK is not needed, destructor will release GIL
     }
 
     std::string python_string_to_std_string(PyObject *str_py) {
@@ -95,10 +120,15 @@
 
     void handle_director_exception() {
 	    std::string msg = "Exception in SWIG director ";
+      // Note: CASADI_WITH_PYTHON_GIL_RELEASE case has SWIG_PYTHON_THREAD_BEGIN_BLOCK in the caller
+#ifndef CASADI_WITH_PYTHON_GIL_RELEASE
       SWIG_PYTHON_THREAD_BEGIN_BLOCK;
+#endif // CASADI_WITH_PYTHON_GIL_RELEASE
       if (PyErr_ExceptionMatches(PyExc_KeyboardInterrupt)) {
         PyErr_Clear();
+#ifndef CASADI_WITH_PYTHON_GIL_RELEASE
         SWIG_PYTHON_THREAD_END_BLOCK;
+#endif // CASADI_WITH_PYTHON_GIL_RELEASE
         throw casadi::KeyboardInterruptException();
       }
       PyObject *ptype, *pvalue, *ptraceback;
@@ -108,7 +138,9 @@
       Py_DECREF(msg_py);
       PyErr_Restore(ptype, pvalue, ptraceback);
       PyErr_Print();
+#ifndef CASADI_WITH_PYTHON_GIL_RELEASE
       SWIG_PYTHON_THREAD_END_BLOCK;
+#endif // CASADI_WITH_PYTHON_GIL_RELEASE
       casadi_error(msg.c_str());
 	  }
   }
@@ -3733,6 +3765,11 @@ namespace casadi{
   }
 
 }
+
+#ifdef SWIGPYTHON
+  %feature("nothread") casadi::Matrix<double>::full;
+  %feature("nothread") casadi::Matrix<double>::sparse;
+#endif
 
 // Extend DM with SWIG unique features
 namespace casadi{

@@ -280,3 +280,17 @@ if(INSTALL_INTERNAL_HEADERS)
 endif()
 
 target_compile_definitions(casadi PUBLIC CASADI_SNPRINTF=snprintf)
+
+if(WITH_THREADSAFE_SYMBOLICS)
+  target_compile_definitions(casadi PUBLIC CASADI_WITH_THREADSAFE_SYMBOLICS)
+endif()
+
+if(WITH_THREAD)
+  target_compile_definitions(casadi PUBLIC CASADI_WITH_THREAD)
+endif()
+
+get_target_property( compiler_definitions casadi COMPILE_DEFINITIONS )
+foreach(DEF ${compiler_definitions})
+  list(APPEND EXTRA_CXX_FLAGS_FROM_DEFS_LIST "-D${DEF}")
+endforeach()
+set(EXTRA_CXX_FLAGS_FROM_DEFS_LIST ${EXTRA_CXX_FLAGS_FROM_DEFS_LIST} PARENT_SCOPE)

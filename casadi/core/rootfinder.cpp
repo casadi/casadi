@@ -426,6 +426,10 @@ namespace casadi {
 
   std::map<std::string, Rootfinder::Plugin> Rootfinder::solvers_;
 
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+  std::mutex Rootfinder::mutex_solvers_;
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
+
   const std::string Rootfinder::infix_ = "rootfinder";
 
   void Rootfinder::

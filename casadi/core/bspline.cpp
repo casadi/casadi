@@ -355,6 +355,10 @@ namespace casadi {
   }
 
   MX BSpline::jac_cached() const {
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+    // Safe access to jac_cache_
+    std::lock_guard<std::mutex> lock(jac_cache_mtx_);
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
     if (jac_cache_.is_empty()) {
       jac_cache_ = jac(dep(0), DM(coeffs_));
     }
@@ -362,6 +366,9 @@ namespace casadi {
   }
 
   MX BSplineParametric::jac_cached() const {
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+    std::lock_guard<std::mutex> lock(jac_cache_mtx_);
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
     if (jac_cache_.is_empty()) {
       jac_cache_ = jac(dep(0), dep(1));
     }

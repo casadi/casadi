@@ -661,6 +661,10 @@ namespace casadi {
 
   std::map<std::string, Nlpsol::Plugin> Nlpsol::solvers_;
 
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+  std::mutex Nlpsol::mutex_solvers_;
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
+
   const std::string Nlpsol::infix_ = "nlpsol";
 
   DM Nlpsol::getReducedHessian() {
@@ -840,9 +844,14 @@ namespace casadi {
   }
 
   Function Nlpsol::kkt() const {
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+    // Safe access to kkt_
+    std::lock_guard<std::mutex> lock(kkt_mtx_);
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
     // Quick return if cached
-    if (kkt_.alive()) {
-      return shared_cast<Function>(kkt_.shared());
+    SharedObject temp;
+    if (kkt_.shared_if_alive(temp)) {
+      return shared_cast<Function>(temp);
     }
 
     // Generate KKT function

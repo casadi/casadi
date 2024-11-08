@@ -39,6 +39,10 @@ namespace casadi {
 
   std::map<std::string, ImporterInternal::Plugin> ImporterInternal::solvers_;
 
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+  std::mutex ImporterInternal::mutex_solvers_;
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
+
   const std::string ImporterInternal::infix_ = "importer";
 
   const Options ImporterInternal::options_

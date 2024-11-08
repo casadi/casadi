@@ -108,6 +108,10 @@ class RealtypeSX : public ConstantSX {
 
     /// Destructor
     ~RealtypeSX() override {
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+    // Safe access to cached_constants_
+    std::lock_guard<std::mutex> lock(mutex_cached_constants);
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
       size_t num_erased = cached_constants_.erase(value);
       assert(num_erased==1);
       (void)num_erased;
@@ -115,6 +119,10 @@ class RealtypeSX : public ConstantSX {
 
     /// Static creator function (use instead of constructor)
     inline static RealtypeSX* create(double value) {
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+    // Safe access to cached_constants_
+    std::lock_guard<std::mutex> lock(mutex_cached_constants);
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
       // Try to find the constant
       CACHING_MAP<double, RealtypeSX*>::iterator it = cached_constants_.find(value);
 
@@ -156,6 +164,10 @@ class RealtypeSX : public ConstantSX {
         \identifier{1js} */
     static CACHING_MAP<double, RealtypeSX*> cached_constants_;
 
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+    static std::mutex mutex_cached_constants;
+#endif //CASADI_WITH_THREADSAFE_SYMBOLICS
+
     /** \brief  Data members
 
         \identifier{1jt} */
@@ -181,6 +193,10 @@ class IntegerSX : public ConstantSX {
 
     /// Destructor
     ~IntegerSX() override {
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+    // Safe access to cached_constants_
+    std::lock_guard<std::mutex> lock(mutex_cached_constants);
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
       size_t num_erased = cached_constants_.erase(value);
       assert(num_erased==1);
       (void)num_erased;
@@ -188,6 +204,10 @@ class IntegerSX : public ConstantSX {
 
     /// Static creator function (use instead of constructor)
     inline static IntegerSX* create(casadi_int value) {
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+    // Safe access to cached_constants_
+    std::lock_guard<std::mutex> lock(mutex_cached_constants);
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
       // Try to find the constant
       CACHING_MAP<casadi_int, IntegerSX*>::iterator it = cached_constants_.find(value);
 
@@ -232,6 +252,10 @@ class IntegerSX : public ConstantSX {
 
         \identifier{1jx} */
     static CACHING_MAP<casadi_int, IntegerSX*> cached_constants_;
+
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+    static std::mutex mutex_cached_constants;
+#endif //CASADI_WITH_THREADSAFE_SYMBOLICS
 
     /** \brief  Data members
 

@@ -461,6 +461,10 @@ namespace casadi {
   }
 
   const SparsityInternal::Btf& SparsityInternal::btf() const {
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+  // Safe access to btf_
+  std::lock_guard<std::mutex> lock(btf_mtx_);
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
     if (!btf_) {
       btf_ = new SparsityInternal::Btf();
       btf_->nb = btf(btf_->rowperm, btf_->colperm, btf_->rowblock, btf_->colblock,

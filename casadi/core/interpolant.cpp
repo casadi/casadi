@@ -252,6 +252,10 @@ namespace casadi {
 
   std::map<std::string, Interpolant::Plugin> Interpolant::solvers_;
 
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+  std::mutex Interpolant::mutex_solvers_;
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
+
   const std::string Interpolant::infix_ = "interpolant";
 
   const Options Interpolant::options_

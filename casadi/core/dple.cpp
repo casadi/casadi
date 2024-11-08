@@ -334,6 +334,10 @@ namespace casadi {
 
   std::map<std::string, Dple::Plugin> Dple::solvers_;
 
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+  std::mutex Dple::mutex_solvers_;
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
+
   const std::string Dple::infix_ = "dple";
 
 } // namespace casadi

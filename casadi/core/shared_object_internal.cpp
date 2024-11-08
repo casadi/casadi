@@ -50,8 +50,11 @@ namespace casadi {
     }
     #endif // WITH_REFCOUNT_WARNINGS
     if (weak_ref_!=nullptr) {
+      // Assumption: no other SharedObjectInternal instances
+      // point to the same WeakRefInternal through weak_ref_
       weak_ref_->kill();
       delete weak_ref_;
+      weak_ref_ = nullptr;
     }
   }
 
@@ -66,7 +69,12 @@ namespace casadi {
     return weak_ref_;
   }
 
-  WeakRefInternal::WeakRefInternal(SharedObjectInternal* raw) : raw_(raw) {
+  WeakRefInternal::WeakRefInternal(SharedObjectInternal* raw) :
+    raw_(raw)
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+    , mutex_(std::make_shared<std::mutex>())
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
+    {
   }
 
   WeakRefInternal::~WeakRefInternal() {

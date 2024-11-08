@@ -28,6 +28,7 @@
 #include "serializing_stream.hpp"
 #include "casadi_os.hpp"
 #include <casadi/config.h>
+#include <casadi/core/casadi_common.hpp>
 
 #include <stdlib.h>
 
@@ -84,17 +85,18 @@ namespace casadi {
     static Plugin pluginFromRegFcn(RegFcn regfcn);
 
     /// Load a plugin dynamically
-    static Plugin load_plugin(const std::string& pname, bool register_plugin=true);
+    static Plugin load_plugin(const std::string& pname,
+      bool register_plugin=true, bool needs_lock=true);
 
     /// Load a library dynamically
     static handle_t load_library(const std::string& libname, std::string& resultpath,
       bool global);
 
     /// Register an integrator in the factory
-    static void registerPlugin(const Plugin& plugin);
+    static void registerPlugin(const Plugin& plugin, bool needs_lock=true);
 
     /// Register an integrator in the factory
-    static void registerPlugin(RegFcn regfcn);
+    static void registerPlugin(RegFcn regfcn, bool needs_lock=true);
 
     /// Load and get the creator function
     static Plugin& getPlugin(const std::string& pname);
@@ -128,6 +130,10 @@ namespace casadi {
   template<class Derived>
   bool PluginInterface<Derived>::has_plugin(const std::string& pname, bool verbose) {
 
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+    std::lock_guard<std::mutex> lock(Derived::mutex_solvers_);
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
+
     // Quick return if available
     if (Derived::solvers_.find(pname) != Derived::solvers_.end()) {
       return true;
@@ -135,7 +141,7 @@ namespace casadi {
 
     // Try loading the plugin
     try {
-      (void)load_plugin(pname, false);
+      (void)load_plugin(pname, false, false);
       return true;
     } catch (CasadiException& ex) {
       if (verbose) {
@@ -194,13 +200,24 @@ namespace casadi {
 
   template<class Derived>
   typename PluginInterface<Derived>::Plugin
-      PluginInterface<Derived>::load_plugin(const std::string& pname, bool register_plugin) {
+      PluginInterface<Derived>::load_plugin(const std::string& pname,
+        bool register_plugin, bool needs_lock) {
+
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+    casadi::conditional_lock_guard<std::mutex> lock(Derived::mutex_solvers_, needs_lock);
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
+
     // Issue warning and quick return if already loaded
     if (Derived::solvers_.find(pname) != Derived::solvers_.end()) {
       casadi_warning("PluginInterface: Solver " + pname + " is already in use. Ignored.");
       return Plugin();
     }
 
+    // Logger singletons are lazily instantiated on first uout()/uerr() calls
+    // This instantation may lead to a data race with potential instatiations in plugin
+    // To be safe, trigger instantatin before any plugin loading
+    uout();
+    uerr();
 
 #ifndef WITH_DL
     casadi_error("WITH_DL option needed for dynamic loading");
@@ -240,7 +257,7 @@ namespace casadi {
     Plugin plugin = pluginFromRegFcn(reg);
     // Register the plugin
     if (register_plugin) {
-      registerPlugin(plugin);
+      registerPlugin(plugin, false);
     }
 
     return plugin;
@@ -249,12 +266,16 @@ namespace casadi {
   }
 
   template<class Derived>
-  void PluginInterface<Derived>::registerPlugin(RegFcn regfcn) {
-    registerPlugin(pluginFromRegFcn(regfcn));
+  void PluginInterface<Derived>::registerPlugin(RegFcn regfcn, bool needs_lock) {
+    registerPlugin(pluginFromRegFcn(regfcn), needs_lock);
   }
 
   template<class Derived>
-  void PluginInterface<Derived>::registerPlugin(const Plugin& plugin) {
+  void PluginInterface<Derived>::registerPlugin(const Plugin& plugin, bool needs_lock) {
+
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+    casadi::conditional_lock_guard<std::mutex> lock(Derived::mutex_solvers_, needs_lock);
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
 
     // Check if the solver name is in use
     typename std::map<std::string, Plugin>::iterator it=Derived::solvers_.find(plugin.name);
@@ -269,12 +290,16 @@ namespace casadi {
   typename PluginInterface<Derived>::Plugin&
   PluginInterface<Derived>::getPlugin(const std::string& pname) {
 
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+    std::lock_guard<std::mutex> lock(Derived::mutex_solvers_);
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
+
     // Check if the solver has been loaded
     auto it=Derived::solvers_.find(pname);
 
     // Load the solver if needed
     if (it==Derived::solvers_.end()) {
-      load_plugin(pname);
+      load_plugin(pname, true, false);
       it=Derived::solvers_.find(pname);
     }
     casadi_assert_dev(it!=Derived::solvers_.end());

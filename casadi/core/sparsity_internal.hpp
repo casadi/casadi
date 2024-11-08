@@ -29,6 +29,14 @@
 
 #include "sparsity.hpp"
 #include "shared_object_internal.hpp"
+#ifdef CASADI_WITH_THREAD
+#ifdef CASADI_WITH_THREAD_MINGW
+#include <mingw.mutex.h>
+#else // CASADI_WITH_THREAD_MINGW
+#include <mutex>
+#endif // CASADI_WITH_THREAD_MINGW
+#endif //CASADI_WITH_THREAD
+
 /// \cond INTERNAL
 
 namespace casadi {
@@ -62,6 +70,11 @@ namespace casadi {
 
         \identifier{23j} */
     mutable Btf* btf_;
+
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+    /// Mutex for thread safety
+    mutable std::mutex btf_mtx_;
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
 
   public:
     /// Construct a sparsity pattern from arrays

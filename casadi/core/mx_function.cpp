@@ -148,6 +148,9 @@ namespace casadi {
 
     // All nodes
     std::vector<MXNode*> nodes;
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+    std::lock_guard<std::mutex> lock(MX::get_mutex_temp());
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
 
     // Add the list of nodes
     for (casadi_int ind=0; ind<out_.size(); ++ind) {

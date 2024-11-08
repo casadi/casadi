@@ -192,6 +192,10 @@ template<> inline std::string matrixName<SXElem>() { return "SX"; }
   void CASADI_EXPORT SX::to_file(const std::string& filename, const Sparsity& sp,
     const SXElem* nonzeros, const std::string& format_hint);
 
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+  template<>
+  std::mutex& SX::get_mutex_temp();
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
 
 #ifndef CASADI_SX_INSTANTIATOR_CPP
   extern template class Matrix<SXElem>;
