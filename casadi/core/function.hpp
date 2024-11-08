@@ -1334,6 +1334,7 @@ public:
   int ret();
   void _eval();
   void* _self() { return this; }
+  Dict stats() const;
 };
 
 void CASADI_EXPORT _function_buffer_eval(void* raw);
