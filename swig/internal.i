@@ -3430,13 +3430,19 @@
 %exception  casadi::MX::graph_substitute(const MX &ex, const std::vector< MX > &v, const std::vector< MX > &vdef) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::MX::graph_substitute(const MX &ex, const std::vector< MX > &v, const std::vector< MX > &vdef, bool &updated) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::MX::graph_substitute(const MX &x, const std::vector< MX > &v, const std::vector< MX > &vdef) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::MX::graph_substitute(const std::vector< MX > &ex, const std::vector< MX > &expr, const std::vector< MX > &exprs) {
+%exception  casadi::MX::graph_substitute(const MX &x, const std::vector< MX > &v, const std::vector< MX > &vdef, bool &updated) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::MX::graph_substitute(const std::vector< MX > &ex, const std::vector< MX > &v, const std::vector< MX > &vdef) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::MX::graph_substitute(const std::vector< MX > &ex, const std::vector< MX > &v, const std::vector< MX > &vdef, bool &updated) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::MX::has_output() const {
@@ -5162,6 +5168,15 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::StringSerializer::encode() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::WeakCache< K, T >::cache(std::vector< K > &keys, std::vector< T > &entries) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::WeakCache< K, T >::incache(const K &key, T &f) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::WeakCache< K, T >::tocache(const K &key, const T &f) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::WeakRef::alive() const {
