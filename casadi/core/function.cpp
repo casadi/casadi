@@ -1967,4 +1967,8 @@ namespace casadi {
     static_cast<FunctionBuffer*>(raw)->_eval();
   }
 
+  Dict FunctionBuffer::stats() const {
+    return f_.stats(mem_);
+  }
+
 } // namespace casadi
