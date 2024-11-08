@@ -3241,6 +3241,11 @@ namespace casadi {
     return type == "FunctionInternal";
   }
 
+  void FunctionInternal::merge(const std::vector<MX>& arg,
+    std::vector<MX>& subs_from, std::vector<MX>& subs_to) const {
+    return;
+  }
+
   std::vector<MX> FunctionInternal::free_mx() const {
     casadi_error("'free_mx' only defined for 'MXFunction'");
   }
