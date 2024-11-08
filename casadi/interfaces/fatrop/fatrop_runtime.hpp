@@ -258,7 +258,10 @@ fatrop_int casadi_fatrop_full_eval_contr_viol(const double* primal_data, const d
     }
   }
   for (k=0;k<s->K-1;++k) {
-    casadi_scaled_copy(-1.0, d->g+p->AB[k].offset_r, p->nx[k+1], res+s->dyn_eq_offs[k]);
+    const T1* lbg_k = d_nlp->lbz+p->nlp->nx+p->AB[k].offset_r;
+    const T1* g_k = d->g+p->AB[k].offset_r;
+    casadi_copy(lbg_k, p->nx[k+1], res+s->dyn_eq_offs[k]);
+    casadi_axpy(p->nx[k+1], -1.0, g_k, res+s->dyn_eq_offs[k]);
   }
   return 1; //skip
 }
@@ -382,13 +385,17 @@ fatrop_int casadi_fatrop_eval_BAbt(const double *states_kp1, const double *input
   casadi_fatrop_data<T1>* d = static_cast< casadi_fatrop_data<T1>* >(user_data);
   const casadi_fatrop_prob<T1>* p = d->prob;
   casadi_nlpsol_data<T1>* d_nlp = d->nlp;
+  const T1* lbg_k = d_nlp->lbz+p->nlp->nx+p->AB[k].offset_r;
+  const T1* g_k = d->g+p->AB[k].offset_r;
+  casadi_int i;
   blasfeo_pack_tran_dmat(p->nx[k+1], p->nx[k], d->AB+p->AB_offsets[k], p->nx[k+1], res, p->nu[k], 0);
   blasfeo_pack_tran_dmat(p->nx[k+1], p->nu[k], d->AB+p->AB_offsets[k]+p->nx[k]*p->nx[k+1], p->nx[k+1], res, 0, 0);
-  blasfeo_pack_dmat(1, p->nx[k+1], const_cast<T1*>(d_nlp->lbz+p->nlp->nx+p->AB[k].offset_r), 1, res, p->nx[k]+p->nu[k], 0);
 
-  casadi_scal(p->nx[k+1], -1.0, d->g+p->AB[k].offset_r);
+  for (i=0; i<p->nx[k+1]; ++i) {
+    BLASFEO_DMATEL(res, p->nx[k]+p->nu[k], i) = lbg_k[i]-g_k[i];
+  }
 
-  blasfeo_pack_dmat(1, p->nx[k+1], d->g+p->AB[k].offset_r, 1, res, p->nx[k]+p->nu[k], 0);
+  blasfeo_print_dmat(p->nx[k]+p->nu[k]+1, p->nx[k+1], res, 0, 0);
 
   return 0;
 

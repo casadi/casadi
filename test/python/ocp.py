@@ -27,6 +27,7 @@ import numpy
 import unittest
 from types import *
 from helpers import *
+import casadi as ca
 
 import os
             
@@ -963,8 +964,24 @@ class OCPtests(casadiTestCase):
         
     self.fatrop_case(nx2=1,ng1=0,nu1=0)
     
-    
-    
+  @requires_nlpsol("fatrop")
+  def test_bug(self):
+
+    x = ca.MX.sym("x")
+
+    for structure_detection in ["none","auto"]:
+
+        opts = {"expand": True, "structure_detection": structure_detection,"equality":[True]}
+        
+        solver = ca.nlpsol("solver","fatrop",{"x":x,"g":x-1},opts)
+        self.assertAlmostEqual(solver(lbg=0,ubg=0)["x"],1,5)
+
+        solver = ca.nlpsol("solver","fatrop",{"x":x,"g":x},opts)
+        self.assertAlmostEqual(solver(lbg=1,ubg=1)["x"],1,5)
+
+        solver = ca.nlpsol("solver","fatrop",{"x":x,"g":x-2},opts)
+        self.assertAlmostEqual(solver(lbg=3,ubg=3)["x"],5,5)
+        
   
 if __name__ == '__main__':
     unittest.main()
