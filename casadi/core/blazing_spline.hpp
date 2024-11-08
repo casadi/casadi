@@ -23,49 +23,24 @@
  */
 
 
-#ifndef CASADI_CORE_HPP
-#define CASADI_CORE_HPP
+#ifndef CASADI_BLAZING_SPLINE_FUNCTION_HPP
+#define CASADI_BLAZING_SPLINE_FUNCTION_HPP
 
-// Scalar expressions (why do I need to put it up here?)
-#include "sx_elem.hpp"
+#include "function.hpp"
 
-// Generic tools
-#include "polynomial.hpp"
-#include "casadi_misc.hpp"
-#include "global_options.hpp"
-#include "casadi_meta.hpp"
+namespace casadi {
+  /** \brief Construct a specialized parametric BSpline
+   * 
+   * Specialized in these ways:
+   *  - order 3 is assumed
+   *  - up to dimension 3 supported
+   *  - a single scalar output (m=1)
+   * 
+  */
+  CASADI_EXPORT Function blazing_spline(const std::string& name,
+    const std::vector< std::vector<double> >& knots,
+    const Dict& opts=Dict());
 
-// Matrices
-#include "sx.hpp"
-#include "dm.hpp"
-#include "im.hpp"
+} // namespace casadi
 
-// Matrix expressions
-#include "mx.hpp"
-
-// Functions
-#include "code_generator.hpp"
-#include "importer.hpp"
-#include "callback.hpp"
-#include "integrator.hpp"
-#include "conic.hpp"
-#include "nlpsol.hpp"
-#include "rootfinder.hpp"
-#include "linsol.hpp"
-#include "dple.hpp"
-#include "expm.hpp"
-#include "interpolant.hpp"
-#include "external.hpp"
-#include "blazing_spline.hpp"
-
-// Misc
-#include "integration_tools.hpp"
-#include "nlp_tools.hpp"
-#include "nlp_builder.hpp"
-#include "dae_builder.hpp"
-#include "xml_file.hpp"
-#include "optistack.hpp"
-#include "serializer.hpp"
-#include "tools.hpp"
-
-#endif // CASADI_CORE_HPP
+#endif // CASADI_BLAZING_SPLINE_FUNCTION_HPP

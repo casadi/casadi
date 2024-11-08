@@ -30,6 +30,7 @@ from helpers import *
 import pickle
 import os
 import sys
+from casadi.tools import capture_stdout
 
 scipy_interpolate = False
 try:
@@ -3271,6 +3272,107 @@ class Functiontests(casadiTestCase):
     ff = f.forward(1)
     #self.assertNotEqual(hash(ff),h) # does not pass on Windows, but this test looks unreliable anyway
     self.assertEqual(hash(f2a),hash(f2b))
-    
+        
+  def test_blazing_spline(self):
+  
+    for N in [1,2,3]:
+      
+        def knots_expand(k):
+            return [k[0]]*3 + k + [k[-1]]*3
+      
+        knots0 = [0,0.2,0.5,0.8,1]
+        knots1 = [0,0.1,0.5,0.9,1]
+        knots2 = [0,0.4,1]
+        
+        x0 = [0.4,0.5,0.6][:N]
+        
+        knots_orig = [knots0, knots1, knots2][:N]
+        knots = [knots_expand(e) for e in knots_orig][:N]
+        
+        
+        x=MX.sym("x",N)
+        
+        nc = np.prod([len(k)-4 for k in knots])
+        DM.rng(1)
+        data = DM.rand(nc)
+        C = MX.sym("C",nc,1)
+        Y = bspline(x,C,knots,[3]*N,1)
+        F_ref = Function('f',[x,C],[Y])
+        
+        print(Y)
+        
+        F_ref2 = Function('f',[x,C],[Y,jacobian(Y,x)])
+        
+        F_ref2([0]*N,data)
+        
+        print(knots)
+        
+        F = blazing_spline("F",knots,{"jit":True,"jit_options":{"flags": ["-I"+GlobalOptions.getCasadiIncludePath(),"-g","-ffast-math","-march=native"]}})
+        
+        def test_points(knots):
+            import itertools
+            selector = [lambda e: e[0]-0.1,lambda e: e[0],lambda e: (e[0]+e[1])/2,lambda e: e[-1],lambda e: e[-1]+0.1]
+            for s in itertools.product(selector,repeat=len(knots)):
+                yield [e(k) for e,k in zip(s,knots_orig)]
+
+        for a in test_points(knots):
+            self.checkfunction_light(F,F_ref,inputs=[vcat(a),data])
+            self.check_serialize(F,inputs=[vcat(a),data])
+       
+        y = sin(F(x,C))
+        
+        f = Function('f',[x,C],[y,jacobian(y,x),gradient(y,x)]+list(hessian(y,x)))
+        fcse = Function('fcse',[x,C],[y,jacobian(y,x),gradient(y,x)]+list(hessian(y,x)),{"cse":True})
+        
+        with capture_stdout() as result:
+            fcse.disp(True)
+            
+        self.assertEqual(result[0].count(" F_der_der("),1)
+        self.assertEqual(result[0].count(" F_der("),0)
+        self.assertEqual(result[0].count(" F("),0)
+        self.checkfunction_light(f,fcse,inputs=[vcat(x0),data])
+        f = Function('f',[x,C],[y,jacobian(y,x),gradient(y,x)])
+        fcse = Function('fcse',[x,C],[y,jacobian(y,x),gradient(y,x)],{"cse":True})
+        
+        with capture_stdout() as result:
+            fcse.disp(True)
+        self.assertEqual(result[0].count(" F_der_der("),0)
+        self.assertEqual(result[0].count(" F_der("),1)
+        self.assertEqual(result[0].count(" F("),0)
+        fcse.disp(True)
+        self.checkfunction_light(f,fcse,inputs=[vcat(x0),data])
+        
+
+
+        FJ = F.jacobian()
+        FJ.generate("FJ.c",{"main":True})
+        FJ.generate_in("FJ_in.txt",[vcat(a),data,0])
+        FJ_ref = F_ref.jacobian()
+        
+        print("ref")
+        F_ref2([0]*N,data)
+        
+        for a in test_points(knots):
+            self.checkfunction_light(FJ,FJ_ref,inputs=[vcat(a),data,0])
+       
+        FJ = FJ.jacobian()
+        FJ.generate("FH.c",{"main":True})
+        FJ.generate_in("FH_in.txt",[vcat(x0),data,0,0,0])
+        print(FJ)
+
+        FJ_ref = FJ_ref.jacobian()
+        import time
+        t0 = time.time()
+        FJ_ref(vcat(a),data,0,0,0)
+        print("FJ_ref" ,time.time()-t0)
+        t0 = time.time()
+        FJ(vcat(a),data,0,0,0)
+        print("FJ" ,time.time()-t0)
+        for a in test_points(knots):
+            print(vcat(a),data,0,0,0)
+            self.checkfunction_light(FJ,FJ_ref,inputs=[vcat(a),data,0,0,0])
+            
+
+        
 if __name__ == '__main__':
     unittest.main()
