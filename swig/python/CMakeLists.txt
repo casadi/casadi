@@ -150,6 +150,10 @@ else()
   set(COMPILE_FLAGS)
 endif()
 
+if(MSVC)
+  set(COMPILE_FLAGS "${COMPILE_FLAGS} /bigobj")
+endif()
+
 message("COMPILE_FLAGS: ${COMPILE_FLAGS}")
 
 set_target_properties(_casadi PROPERTIES COMPILE_FLAGS "${COMPILE_FLAGS}")

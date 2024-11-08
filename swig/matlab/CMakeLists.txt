@@ -56,6 +56,9 @@ if (WITH_MATLAB AND NOT SWIG_EXPORT)
   # Compile MEX file
   add_library(casadiMATLAB MODULE ${MEX_FILE} ${MEX_VERSION_FILE})
   target_link_libraries(casadiMATLAB matlab::matlab casadi)
+  if(MSVC)
+    target_compile_options(casadiMATLAB PRIVATE "/bigobj")
+  endif()
   set_target_properties(casadiMATLAB
     PROPERTIES OUTPUT_NAME "casadiMEX"
                PREFIX ""
@@ -80,7 +83,9 @@ if (WITH_OCTAVE AND NOT SWIG_EXPORT)
   if(APPLE)
     set_target_properties(casadiOCTAVE PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
   endif()
-
+  if(MSVC)
+    target_compile_options(casadiOCTAVE PRIVATE "/bigobj")
+  endif()
   set_target_properties(casadiOCTAVE
     PROPERTIES OUTPUT_NAME "casadiMEX"
                PREFIX ""
