@@ -238,6 +238,14 @@ namespace casadi {
         MatType& A, MatType& b, MatType& c, bool check);
     static void linear_coeff(const MatType &expr, const MatType &var,
         MatType& A, MatType& b, bool check);
+    static void extract_parametric(const MatType& expr, const MatType& par,
+        MatType& SWIG_OUTPUT(expr_ret),
+        std::vector<MatType>& SWIG_OUTPUT(symbols),
+        std::vector<MatType>& SWIG_OUTPUT(parametric));
+    static void extract_parametric(const std::vector<MatType>& expr, const MatType& par,
+        std::vector<MatType>& SWIG_OUTPUT(expr_ret),
+        std::vector<MatType>& SWIG_OUTPUT(symbols),
+        std::vector<MatType>& SWIG_OUTPUT(parametric));
     /** @}  */
     /// \endcond
 
@@ -933,6 +941,60 @@ namespace casadi {
     inline friend void linear_coeff(const MatType &expr, const MatType &var,
         MatType& A, MatType& b, bool check=true) {
       MatType::linear_coeff(expr, var, A, b, check);
+    }
+
+    /** \brief Extract purely parametric parts from an expression graph
+     * 
+     * The purpose of extract_parametric is ultimately to save on evaluation time of an expression,
+     * by extracting out the parts that are only solely dependant on parameters.
+     * 
+     * For any:
+     * [expr_ret, symbols, parametric] = extract_parametric(expr, par)
+     * It holds that:
+     * substitute(expr_ret,symbols,parametric) == expr
+     * 
+     * parametric is only dependant on par
+     * expr_ret is not dependant on par, but is dependant on symbols
+     * 
+     * Example:
+     * [expr_ret, symbols, parametric] = extract_parametric((x-sqrt(p))*y+cos(p)**2, p)
+     * 
+     * expr_ret: (((x-extracted1)*y)+extracted2)
+     * symbols: [extracted1, extracted2]
+     * parametric: [sqrt(p),cos(p)**2]
+     * 
+     */
+    inline friend void extract_parametric(const MatType &expr, const MatType& par,
+        MatType& SWIG_OUTPUT(expr_ret),
+        std::vector<MatType>& SWIG_OUTPUT(symbols),
+        std::vector<MatType>& SWIG_OUTPUT(parametric)) {
+      MatType::extract_parametric(expr, par, expr_ret, symbols, parametric);
+    }
+
+    inline friend void extract_parametric(const std::vector<MatType> &expr, const MatType& par,
+        std::vector<MatType>& SWIG_OUTPUT(expr_ret),
+        std::vector<MatType>& SWIG_OUTPUT(symbols),
+        std::vector<MatType>& SWIG_OUTPUT(parametric)) {
+      // Concatenate all vector elements
+      MatType expr_cat = veccat(expr);
+      MatType expr_ret_cat;
+
+      // Concatenated extract_parametric
+      MatType::extract_parametric(expr_cat, par, expr_ret_cat, symbols, parametric);
+
+      // Compute edges of vertsplit needed to undo concatenate
+      std::vector<casadi_int> edges = {0};
+      for (const MatType& e : expr) {
+        edges.push_back(edges.back() + e.numel());
+      }
+      // Perform vertsplit
+      std::vector<MatType> expr_ret_catv = vertsplit(expr_ret_cat, edges);
+
+      // Reshape all elements back into original size
+      expr_ret.resize(expr_ret_catv.size());
+      for (casadi_int i=0; i<expr_ret_catv.size(); ++i) {
+        expr_ret[i] = reshape(expr_ret_catv[i], expr[i].size1(), expr[i].size2());
+      }
     }
 
     /** Count number of nodes */
