@@ -1388,6 +1388,10 @@ namespace casadi {
         \identifier{np} */
     virtual bool is_a(const std::string& type, bool recursive) const;
 
+    /** \brief List merge opportunitities */
+    virtual void merge(const std::vector<MX>& arg,
+      std::vector<MX>& subs_from, std::vector<MX>& subs_to) const;
+
     /** \brief Can a derivative direction be skipped
 
         \identifier{nq} */

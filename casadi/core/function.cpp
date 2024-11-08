@@ -1639,6 +1639,11 @@ namespace casadi {
     return (*this)->is_a(type, recursive);
   }
 
+  void Function::merge(const std::vector<MX>& arg,
+      std::vector<MX>& subs_from, std::vector<MX>& subs_to) const {
+    return (*this)->merge(arg, subs_from, subs_to);
+  }
+
   std::vector<SX> Function::free_sx() const {
     try {
       return (*this)->free_sx();
