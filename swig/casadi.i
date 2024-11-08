@@ -3375,6 +3375,16 @@ DECL std::vector<M> casadi_cse(const std::vector<M>& e) {
 DECL M casadi_cse(const M& e) {
   return cse(e);
 }
+
+DECL void casadi_extract_parametric(const M &expr, const M& par,
+        M& OUTPUT1, std::vector<M>& OUTPUT2, std::vector<M>& OUTPUT3, const Dict& opts=Dict()) {
+  extract_parametric(expr, par, OUTPUT1, OUTPUT2, OUTPUT3, opts);
+}
+DECL void casadi_extract_parametric(const std::vector<M> &expr, const M& par,
+        std::vector<M>& OUTPUT1, std::vector<M>& OUTPUT2, std::vector<M>& OUTPUT3, const Dict& opts=Dict()) {
+  extract_parametric(expr, par, OUTPUT1, OUTPUT2, OUTPUT3, opts);
+}
+
 DECL std::vector<std::vector< M > >
 casadi_forward(const std::vector< M > &ex, const std::vector< M > &arg,
                const std::vector<std::vector< M > > &v,
