@@ -92,7 +92,7 @@ class CASADI_EXPORT Opti
 public:
 
   /** \brief Create Opti Context
-   * 
+   *
    * \param[in] problem_type of optimization 'nlp' or 'conic' (default nlp)
 
       \identifier{17} */
@@ -221,7 +221,7 @@ public:
   OptiSol solve();
 
   /** \brief Crunch the numbers; solve the problem
-   * 
+   *
    * Allows the solver to return without error when
    * an iteration or time limit is reached
 
@@ -268,6 +268,9 @@ public:
       \identifier{267} */
   std::vector<MX> value_variables() const;
   std::vector<MX> value_parameters() const;
+
+  std::vector<MX> get_variables() const;
+  std::vector<MX> get_parameters() const;
 
   /** \brief get the dual variable
   *
@@ -332,7 +335,7 @@ public:
 
   /// @{
   /** \brief Create a CasADi Function from the Opti solver
-   * 
+   *
    * \param[in] name Name of the resulting CasADi Function
    * \param[in] args List of parameters and decision/dual variables
    *                (which can be given an initial guess) with the resulting Function

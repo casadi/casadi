@@ -239,6 +239,22 @@ std::vector<MX> Opti::value_parameters() const {
   }
 }
 
+std::vector<MX> Opti::get_variables() const {
+  try {
+    return (*this)->get_variables();
+  } catch(std::exception& e) {
+    THROW_ERROR("get_variables", e.what());
+  }
+}
+
+std::vector<MX> Opti::get_parameters() const {
+  try {
+    return (*this)->get_parameters();
+  } catch(std::exception& e) {
+    THROW_ERROR("get_parameters", e.what());
+  }
+}
+
 MX Opti::dual(const MX& m) const {
   try {
     return (*this)->dual(m);
