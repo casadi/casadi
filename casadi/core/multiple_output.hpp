@@ -82,7 +82,7 @@ namespace casadi {
     explicit MultipleOutput(DeserializingStream& s) : MXNode(s) {}
 
     /// Output node cache
-    WeakCache<casadi_int, MX> cache_;
+    mutable WeakCache<casadi_int, MX> cache_;
   };
 
   class CASADI_EXPORT OutputNode : public MXNode {

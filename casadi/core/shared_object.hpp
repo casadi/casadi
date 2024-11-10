@@ -195,7 +195,7 @@ namespace casadi {
     /** \brief Get a shared (owning) reference
 
         \identifier{b0} */
-    SharedObject shared();
+    SharedObject shared() const;
 
     /** \brief Check if alive
 
@@ -267,7 +267,7 @@ namespace casadi {
 template<typename K, typename T>
 class CASADI_EXPORT WeakCache {
   public:
-    void tocache(const K& key, const T& f) const {
+    void tocache(const K& key, const T& f) {
       // Add to cache
       cache_.insert(std::make_pair(key, f));
       // Remove a lost reference, if any, to prevent uncontrolled growth
@@ -299,7 +299,7 @@ class CASADI_EXPORT WeakCache {
       }
     }
   private:
-    mutable std::map<K, WeakRef> cache_;
+    std::map<K, WeakRef> cache_;
 };
 
 } // namespace casadi

@@ -138,7 +138,7 @@ namespace casadi {
     return !is_null() && (*this)->raw_ != nullptr;
   }
 
-  SharedObject WeakRef::shared() {
+  SharedObject WeakRef::shared() const {
     SharedObject ret;
     if (alive()) {
       ret.own((*this)->raw_);
