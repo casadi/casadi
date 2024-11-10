@@ -48091,7 +48091,7 @@ C++ includes: e0_diagram.hpp
 ";
 
 %feature("docstring")  casadi::WeakCache< K, T >::tocache(const K &key, 
-const T &f) const "
+const T &f) "
 
 [INTERNAL] ";
 
@@ -48150,7 +48150,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L157
 
 ";
 
-%feature("docstring")  casadi::WeakRef::shared() "
+%feature("docstring")  casadi::WeakRef::shared() const "
 
 [INTERNAL] 
 Get a shared (owning) reference.

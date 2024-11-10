@@ -5176,13 +5176,13 @@
 %exception  casadi::WeakCache< K, T >::incache(const K &key, T &f) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::WeakCache< K, T >::tocache(const K &key, const T &f) const {
+%exception  casadi::WeakCache< K, T >::tocache(const K &key, const T &f) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::WeakRef::alive() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::WeakRef::shared() {
+%exception  casadi::WeakRef::shared() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::XmlFile::dump(const std::string &filename, const XmlNode &node) {
