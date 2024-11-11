@@ -3314,13 +3314,13 @@ class MXtests(casadiTestCase):
       p = X.sym("p")
       
       expr = 2*x*p+2*y*p**2
-      expr_ret,symbols,parametric = extract_parametric(expr,p)
+      expr_ret,symbols,parametric = extract_parametric(expr,p, {"extract_trivial": True})
       print(expr_ret,parametric)
       self.assertTrue(test_equal(parametric,[p,p**2]))
       
       expr = vertcat(2*x+3*y+8*p,3*x+2*y+4,7)
       
-      expr_ret,symbols,parametric = extract_parametric(expr,p)
+      expr_ret,symbols,parametric = extract_parametric(expr,p, {"extract_trivial": True})
       
       print(expr_ret,parametric)
       
@@ -3346,7 +3346,7 @@ class MXtests(casadiTestCase):
         
       for expr in tests():
 
-        expr_ret,symbols,parametric = extract_parametric(expr,p)
+        expr_ret,symbols,parametric = extract_parametric(expr,p, {"extract_trivial": True})
         
         print(expr_ret,symbols,parametric)
         
