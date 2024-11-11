@@ -793,6 +793,7 @@ class casadiTestCase(unittest.TestCase):
             print(commands+" < " + F.name()+"_in.txt")
             p = subprocess.Popen(commands,shell=True,stdin=stdin,stdout=stdout)
             out = p.communicate()
+        print("Return code",p.return_code)
         assert p.returncode in main_return_code
         if main_return_code:
             return
