@@ -1899,7 +1899,19 @@ class MXtests(casadiTestCase):
     self.checkfunction_light(F,F_ref,inputs=[3.1,7.1])
     
     
-    
+  def test_graph_substitute_call(self):
+    x = MX.sym("x")
+    y = MX.sym("y")
+    z = MX.sym("z")
+
+    f = Function("f",[x,y,z],[x**2])
+
+    vertsplit
+
+    sx = sin(x)
+    res = graph_substitute([f(x+1,y,z),sin(f(x+1,y,z)),f(sx,y,z),sin(f(sx,y,z))],[sx],[cos(x)])
+    res = str(res)
+    self.assertEqual(res.count("{0}"),4)
 
   def test_matrix_expand(self):
     n = 2
