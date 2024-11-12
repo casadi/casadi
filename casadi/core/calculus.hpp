@@ -1157,7 +1157,8 @@ namespace casadi {
     static inline void derF(unsigned char op, const T& x, const T& y, T& f, T* d);
 
     /** \brief Evaluate function on a const/linear/nonlinear partition
-    */
+
+        \identifier{28f} */
     static inline void fun_linear(unsigned char op, const T*x, const T* y, T* f);
 
     /** \brief Is binary operation?

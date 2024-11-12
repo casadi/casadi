@@ -2326,6 +2326,9 @@
 %exception  casadi::GenericMatrix::reverse(const std::vector< MatType > &ex, const std::vector< MatType > &arg, const std::vector< std::vector< MatType > > &v, const Dict &opts=Dict()) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::GenericMatrix::separate_linear(const MatType &expr, const MatType &sym_lin, const MatType &sym_const, MatType &expr_const, MatType &expr_lin, MatType &expr_nonlin) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::GenericMatrix::shared(std::vector< MatType > &ex, std::vector< MatType > &v, std::vector< MatType > &vdef, const std::string &v_prefix="v_", const std::string &v_suffix="") {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -2390,9 +2393,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::GenericMatrix< MX  >::dim(bool with_nz=false) const {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::GenericMatrix< MX  >::extract_parametric(const std::vector< MX > &expr, const MX &par, std::vector< MX > &expr_ret, std::vector< MX > &symbols, std::vector< MX > &parametric, const Dict &opts=Dict()) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::GenericMatrix< MX  >::get_colind() const {
@@ -2597,12 +2597,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::GenericMatrix< MatType >::dim(bool with_nz=false) const {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::GenericMatrix< MatType >::extract_parametric(const MatType &expr, const MatType &par, MatType &expr_ret, std::vector< MatType > &symbols, std::vector< MatType > &parametric, const Dict &opts=Dict()) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::GenericMatrix< MatType >::extract_parametric(const std::vector< MatType > &expr, const MatType &par, std::vector< MatType > &expr_ret, std::vector< MatType > &symbols, std::vector< MatType > &parametric, const Dict &opts=Dict()) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::GenericMatrix< MatType >::get_colind() const {
@@ -2816,12 +2810,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::GenericMatrix< Matrix< Scalar >  >::dim(bool with_nz=false) const {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::GenericMatrix< Matrix< Scalar >  >::extract_parametric(const Matrix< Scalar > &expr, const Matrix< Scalar > &par, Matrix< Scalar > &expr_ret, std::vector< Matrix< Scalar > > &symbols, std::vector< Matrix< Scalar > > &parametric, const Dict &opts=Dict()) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::GenericMatrix< Matrix< Scalar >  >::extract_parametric(const std::vector< Matrix< Scalar > > &expr, const Matrix< Scalar > &par, std::vector< Matrix< Scalar > > &expr_ret, std::vector< Matrix< Scalar > > &symbols, std::vector< Matrix< Scalar > > &parametric, const Dict &opts=Dict()) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::GenericMatrix< Matrix< Scalar >  >::get_colind() const {
@@ -3706,6 +3694,9 @@
 %exception  casadi::MX::reverse(const std::vector< MX > &ex, const std::vector< MX > &arg, const std::vector< std::vector< MX > > &v, const Dict &opts=Dict()) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::MX::separate_linear(const MX &expr, const MX &sym_lin, const MX &sym_const, MX &expr_const, MX &expr_lin, MX &expr_nonlin) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::MX::serialize(SerializingStream &s) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -4292,6 +4283,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< Scalar >::scalar() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Matrix< Scalar >::separate_linear(const Matrix< Scalar > &expr, const Matrix< Scalar > &sym_lin, const Matrix< Scalar > &sym_const, Matrix< Scalar > &expr_const, Matrix< Scalar > &expr_lin, Matrix< Scalar > &expr_nonlin) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Matrix< Scalar >::serialize() const {

@@ -60,7 +60,9 @@ namespace casadi {
         \identifier{i4} */
     void eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const override;
 
-    /** \brief Evaluate the MX node on a const/linear/nonlinear partition */
+    /** \brief Evaluate the MX node on a const/linear/nonlinear partition
+
+        \identifier{28g} */
     void eval_linear(const std::vector<std::array<MX, 3> >& arg,
                         std::vector<std::array<MX, 3> >& res) const override;
 
