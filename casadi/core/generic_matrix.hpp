@@ -982,7 +982,8 @@ namespace casadi {
      * that consist of pure symbols. If false (default),
      * these parts are not extracted.
      *
-     */
+
+        \identifier{288} */
     inline friend void extract_parametric(const MatType &expr, const MatType& par,
         MatType& SWIG_OUTPUT(expr_ret),
         std::vector<MatType>& SWIG_OUTPUT(symbols),
