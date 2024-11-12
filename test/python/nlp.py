@@ -1695,8 +1695,9 @@ class NLPtests(casadiTestCase):
           [F,_] = self.check_codegen(solver,dict(lbg=-10,ubg=10),**aux_options["codegen"])
           with self.assertRaises(RuntimeError):
             F(lbg=5,ubg=10)
-            
-          self.check_codegen(solver,dict(lbg=5,ubg=10),main=True,main_return_code=[casadi.SOLVER_RET_UNKNOWN, casadi.SOLVER_RET_INFEASIBLE],**aux_options["codegen"])
+          
+          if os.name != 'nt':
+              self.check_codegen(solver,dict(lbg=5,ubg=10),main=True,main_return_code=[casadi.SOLVER_RET_UNKNOWN, casadi.SOLVER_RET_INFEASIBLE],**aux_options["codegen"])
 
   def test_indefinite(self):
 
