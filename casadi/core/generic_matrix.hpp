@@ -238,16 +238,6 @@ namespace casadi {
         MatType& A, MatType& b, MatType& c, bool check);
     static void linear_coeff(const MatType &expr, const MatType &var,
         MatType& A, MatType& b, bool check);
-    static void extract_parametric(const MatType& expr, const MatType& par,
-        MatType& SWIG_OUTPUT(expr_ret),
-        std::vector<MatType>& SWIG_OUTPUT(symbols),
-        std::vector<MatType>& SWIG_OUTPUT(parametric),
-        const Dict& opts=Dict());
-    static void extract_parametric(const std::vector<MatType>& expr, const MatType& par,
-        std::vector<MatType>& SWIG_OUTPUT(expr_ret),
-        std::vector<MatType>& SWIG_OUTPUT(symbols),
-        std::vector<MatType>& SWIG_OUTPUT(parametric),
-        const Dict& opts=Dict());
    static void separate_linear(const MatType &expr,
         const MatType &sym_lin, const MatType &sym_const,
         MatType& SWIG_OUTPUT(expr_const),
@@ -1010,7 +1000,7 @@ namespace casadi {
         edges.push_back(edges.back() + e.numel());
       }
       // Perform vertsplit
-      std::vector<MatType> expr_ret_catv = vertsplit(expr_ret_cat, edges);
+      std::vector<MatType> expr_ret_catv = MatType::vertsplit(expr_ret_cat, edges);
 
       // Reshape all elements back into original size
       expr_ret.resize(expr_ret_catv.size());
