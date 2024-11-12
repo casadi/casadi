@@ -130,4 +130,3 @@ jobs:
       - shell: msys2 {0}
         run: |
             cmake -Bbuild -G "Unix Makefiles" -DWITH_SELFCONTAINED=ON -DWITH_FATROP=ON -DWITH_BUILD_FATROP=ON -DWITH_BUILD_REQUIRED=ON -DCMAKE_INSTALL_PREFIX=install ${{env.build_flags}}
-            cmake --build build --target install --config Release -v
