@@ -525,7 +525,7 @@ namespace casadi {
     return abs(std::numeric_limits<T>::max()/a) < abs(b);
   }
 
-} // namespace std
+} // namespace casadi
 
 // Implementations
 namespace casadi {
