@@ -195,14 +195,27 @@ install(FILES ${PROJECT_BINARY_DIR}/swig/python/casadi.py
 )
 endif()
 
-# Install Python tools
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tools
-  DESTINATION "${PYTHON_PREFIX}/casadi"
-  COMPONENT install_python
-  USE_SOURCE_PERMISSIONS
-  PATTERN .pyc EXCLUDE
-  PATTERN .svn EXCLUDE
-)
+if("${PYTHON_VERSION_MAJOR}" STREQUAL "3")
+  # Install Python tools
+  install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tools
+    DESTINATION "${PYTHON_PREFIX}/casadi"
+    COMPONENT install_python
+    USE_SOURCE_PERMISSIONS
+    PATTERN .pyc EXCLUDE
+    PATTERN .svn EXCLUDE
+    PATTERN structure.py EXCLUDE
+  )
+else()
+  # Install Python tools
+  install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/tools
+    DESTINATION "${PYTHON_PREFIX}/casadi"
+    COMPONENT install_python
+    USE_SOURCE_PERMISSIONS
+    PATTERN .pyc EXCLUDE
+    PATTERN .svn EXCLUDE
+    PATTERN structure3.py EXCLUDE
+  )
+endif()
 
 # Install Python package initialization
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/__init__.py
