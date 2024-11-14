@@ -305,7 +305,7 @@ namespace casadi {
      /** \brief Performs 1d linear interpolation
      *
      * The data-points to be interpolated are given as (x[i], v[i]).
-     * xq[j] is used as interplating value
+     * xq[j] is used as interpolating value
 
          \identifier{1bh} */
      inline friend MatType interp1d(const std::vector<double>& x, const MatType&v,
@@ -1355,10 +1355,20 @@ namespace casadi {
   MatType GenericMatrix<MatType>::interp1d(const std::vector<double>& x, const MatType& v,
       const std::vector<double>& xq, const std::string& mode, bool equidistant) {
 
-    bool mode_floor = mode == "floor";
-    bool mode_ceil = mode == "ceil";
+    bool mode_floor = false;
+    bool mode_ceil = false;
+    if (mode=="floor") {
+      mode_floor = true;
+    } else if (mode=="ceil") {
+      mode_ceil = true;
+    } else if (mode=="linear") {
+      //
+    } else {
+      casadi_error("interp1d(x, v, xq, mode): "
+        "Mode must be 'floor', 'ceil' or 'linear'. Got '" + mode + "' instead.");
+    }
 
-    casadi_assert_dev(is_increasing(x));
+    casadi_assert(is_increasing(x), "interp1d(x, v, xq): x must be increasing.");
 
     casadi_assert(x.size()==v.size1(),
       "interp1d(x, v, xq): dimensions mismatch. v expected to have " + str(x.size()) + " rows,"
