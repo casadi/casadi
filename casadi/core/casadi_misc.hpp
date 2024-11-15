@@ -478,43 +478,43 @@ private:
 
 #ifndef SWIG
 // In std namespace
-namespace std {
+namespace casadi {
 
   /// Enables flushing an std::vector to a stream (prints representation)
   template<typename T>
-  ostream& operator<<(ostream& stream, const vector<T>& v) {
+  std::ostream& operator<<(std::ostream& stream, const std::vector<T>& v) {
     stream << casadi::str(v);
     return stream;
   }
 
   /// Enables flushing an std::vector to a stream (prints representation)
   template<typename T, size_t N>
-  ostream& operator<<(ostream& stream, const array<T, N>& v) {
+  std::ostream& operator<<(std::ostream& stream, const std::array<T, N>& v) {
     stream << casadi::str(v);
     return stream;
   }
 
   /// Enables flushing an std::set to a stream (prints representation)
   template<typename T>
-  ostream& operator<<(ostream& stream, const set<T>& v) {
+  std::ostream& operator<<(std::ostream& stream, const std::set<T>& v) {
     stream << casadi::str(v);
     return stream;
   }
 
   template<typename T1, typename T2>
-  ostream& operator<<(ostream& stream, const pair<T1, T2>& p) {
+  std::ostream& operator<<(std::ostream& stream, const std::pair<T1, T2>& p) {
     stream << casadi::str(p);
     return stream;
   }
 
   template<typename T1, typename T2>
-  ostream& operator<<(ostream& stream, const std::map<T1, T2>& p) {
+  std::ostream& operator<<(std::ostream& stream, const std::map<T1, T2>& p) {
     stream << casadi::str(p);
     return stream;
   }
 
   template<typename T2>
-  ostream& operator<<(ostream& stream, const std::map<std::string, T2>& p) {
+  std::ostream& operator<<(std::ostream& stream, const std::map<std::string, T2>& p) {
     stream << casadi::str(p);
     return stream;
   }
@@ -525,7 +525,11 @@ namespace std {
     return abs(std::numeric_limits<T>::max()/a) < abs(b);
   }
 
-} // namespace std
+} // namespace casadi
+
+#ifndef CASADI_NO_STREAM_INSERTION_OPERATOR
+using casadi::operator<<;
+#endif // CASADI_NO_STREAM_INSERTION_OPERATOR
 
 // Implementations
 namespace casadi {
