@@ -80,7 +80,10 @@ namespace casadi {
         \identifier{1tg} */
     void generate(CodeGenerator& g,
                       const std::vector<casadi_int>& arg,
-                      const std::vector<casadi_int>& res) const override;
+                      const std::vector<casadi_int>& res,
+                      const std::vector<bool>& arg_is_ref,
+                      std::vector<bool>& res_is_ref) const override;
+
     /** \brief Calculate forward mode directional derivatives
 
         \identifier{1th} */
@@ -153,7 +156,10 @@ namespace casadi {
         \identifier{1tt} */
     void generate(CodeGenerator& g,
                       const std::vector<casadi_int>& arg,
-                      const std::vector<casadi_int>& res) const override;
+                      const std::vector<casadi_int>& res,
+                      const std::vector<bool>& arg_is_ref,
+                      std::vector<bool>& res_is_ref) const override;
+
     /** \brief Calculate forward mode directional derivatives
 
         \identifier{1tu} */

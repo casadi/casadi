@@ -73,11 +73,13 @@ namespace casadi {
 
   void Find::generate(CodeGenerator& g,
                       const std::vector<casadi_int>& arg,
-                      const std::vector<casadi_int>& res) const {
+                      const std::vector<casadi_int>& res,
+                      const std::vector<bool>& arg_is_ref,
+                      std::vector<bool>& res_is_ref) const {
     casadi_int nnz = dep(0).nnz();
     g.local("i", "casadi_int");
     g.local("cr", "const casadi_real", "*");
-    g << "for (i=0, cr=" << g.work(arg[0], nnz) << "; i<" << nnz
+    g << "for (i=0, cr=" << g.work(arg[0], nnz, arg_is_ref[0]) << "; i<" << nnz
       << " && *cr++==0; ++i) {}\n"
       << g.workel(res[0]) << " = ";
     if (dep(0).is_dense()) {

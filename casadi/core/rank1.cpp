@@ -126,15 +126,23 @@ namespace casadi {
 
   void Rank1::generate(CodeGenerator& g,
                         const std::vector<casadi_int>& arg,
-                        const std::vector<casadi_int>& res) const {
+                        const std::vector<casadi_int>& res,
+                        const std::vector<bool>& arg_is_ref,
+                        std::vector<bool>& res_is_ref) const {
     // Copy first argument if not inplace
-    if (arg[0]!=res[0]) {
-      g << g.copy(g.work(arg[0], nnz()), nnz(), g.work(res[0], nnz())) << "\n";
+    if (arg[0]!=res[0] || arg_is_ref[0]) {
+      g << g.copy(g.work(arg[0], nnz(), arg_is_ref[0]),
+              nnz(),
+              g.work(res[0], nnz(), false)) << "\n";
     }
 
+    // First argument of casadi_rank1 is non-const
+    std::string a = g.work(res[0], dep(0).nnz(), false);
+    std::string b = g.work(arg[2], dep(2).nnz(), arg_is_ref[2]);
+    std::string c = g.work(arg[3], dep(3).nnz(), arg_is_ref[3]);
+
     // Perform operation inplace
-    g << g.rank1(g.work(arg[0], dep(0).nnz()), sparsity(), g.workel(arg[1]),
-                         g.work(arg[2], dep(2).nnz()), g.work(arg[3], dep(3).nnz())) << "\n";
+    g << g.rank1(a, sparsity(), g.workel(arg[1]), b, c) << "\n";
   }
 
 } // namespace casadi

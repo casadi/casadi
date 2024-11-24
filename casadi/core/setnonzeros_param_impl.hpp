@@ -504,37 +504,49 @@ namespace casadi {
   template<bool Add>
   void SetNonzerosParam<Add>::
   generate(CodeGenerator& g,
-           const std::vector<casadi_int>& arg, const std::vector<casadi_int>& res) const {
+           const std::vector<casadi_int>& arg,
+           const std::vector<casadi_int>& res,
+           const std::vector<bool>& arg_is_ref,
+           std::vector<bool>& res_is_ref) const {
     // Copy first argument if not inplace
-    if (arg[0]!=res[0]) {
-      g << g.copy(g.work(arg[0], this->dep(0).nnz()), this->nnz(),
-                          g.work(res[0], this->nnz())) << '\n';
+    if (arg[0]!=res[0] || arg_is_ref[0]) {
+      g << g.copy(g.work(arg[0], this->dep(0).nnz(), arg_is_ref[0]), this->nnz(),
+                          g.work(res[0], this->nnz(), false)) << '\n';
     }
   }
 
   template<bool Add>
   void SetNonzerosParamVector<Add>::
   generate(CodeGenerator& g,
-           const std::vector<casadi_int>& arg, const std::vector<casadi_int>& res) const {
-    SetNonzerosParam<Add>::generate(g, arg, res);
+           const std::vector<casadi_int>& arg,
+           const std::vector<casadi_int>& res,
+           const std::vector<bool>& arg_is_ref,
+           std::vector<bool>& res_is_ref) const {
+    SetNonzerosParam<Add>::generate(g, arg, res, arg_is_ref, res_is_ref);
 
     casadi_int n = this->dep(1).nnz();
+
+    std::string a1 = g.work(arg[1], n, arg_is_ref[1]);
+    std::string a2 = g.work(arg[2], n, arg_is_ref[2]);
 
     g.local("i", "casadi_int");
     g.local("cr", "const casadi_real", "*");
     g.local("cs", "const casadi_real", "*");
-    g << "for (cs=" << g.work(arg[1], n) << ", cr=" << g.work(arg[2], n)
-      << "; cs!=" << g.work(arg[1], n) << "+" << n
+    g << "for (cs=" << a1 << ", cr=" << a2
+      << "; cs!=" << a1 << "+" << n
       << "; ++cs) { i=(int) *cr++; if (i>=0 && i<" << this->dep(0).nnz() << ") "
-      << g.work(res[0], this->nnz()) << "[i] " << (Add?"+= ":"= ")
+      << g.work(res[0], this->nnz(), false) << "[i] " << (Add?"+= ":"= ")
       << "*cs; }\n";
   }
 
   template<bool Add>
   void SetNonzerosParamSlice<Add>::
   generate(CodeGenerator& g,
-           const std::vector<casadi_int>& arg, const std::vector<casadi_int>& res) const {
-    SetNonzerosParam<Add>::generate(g, arg, res);
+           const std::vector<casadi_int>& arg,
+           const std::vector<casadi_int>& res,
+           const std::vector<bool>& arg_is_ref,
+           std::vector<bool>& res_is_ref) const {
+    SetNonzerosParam<Add>::generate(g, arg, res, arg_is_ref, res_is_ref);
 
     casadi_int n = this->dep(1).nnz();
     casadi_int n_inner = this->dep(2).nnz();
@@ -542,23 +554,26 @@ namespace casadi {
     g.local("cii", "const casadi_int", "*");
     g.local("i", "casadi_int");
     g << "for (i=0;i<" << n_inner << ";++i) iw[i] = (int) "
-      << g.work(arg[2], n_inner) << "[i];\n";
+      << g.work(arg[2], n_inner, arg_is_ref[2]) << "[i];\n";
 
     g.local("cs", "const casadi_real", "*");
     g.local("k", "casadi_int");
-    g << "for (cs=" << g.work(arg[1], n)
+    g << "for (cs=" << g.work(arg[1], n, arg_is_ref[1])
       << ", k=" << outer_.start << ";k<" << outer_.stop << ";k+=" << outer_.step << ") ";
     g << "for (cii=iw; cii!=iw" << "+" << n_inner << "; ++cii) { i=k+*cii; "
       << "if (i>=0 && i<" << this->dep(0).nnz() << ") "
-      << g.work(res[0], this->nnz()) << "[i] " << (Add?"+= ":"= ")
+      << g.work(res[0], this->nnz(), false) << "[i] " << (Add?"+= ":"= ")
       << "*cs; cs++; }\n";
   }
 
   template<bool Add>
   void SetNonzerosSliceParam<Add>::
   generate(CodeGenerator& g,
-           const std::vector<casadi_int>& arg, const std::vector<casadi_int>& res) const {
-    SetNonzerosParam<Add>::generate(g, arg, res);
+           const std::vector<casadi_int>& arg,
+           const std::vector<casadi_int>& res,
+           const std::vector<bool>& arg_is_ref,
+           std::vector<bool>& res_is_ref) const {
+    SetNonzerosParam<Add>::generate(g, arg, res, arg_is_ref, res_is_ref);
 
     casadi_int n = this->dep(1).nnz();
     casadi_int n_outer = this->dep(2).nnz();
@@ -568,23 +583,26 @@ namespace casadi {
     g.local("k", "casadi_int");
     g.local("cr", "const casadi_real", "*");
     g.local("cs", "const casadi_real", "*");
-    g << "for (cr=" << g.work(arg[2], n_outer)
-      << ", cs=" << g.work(arg[1], n)
-      << "; cr!=" << g.work(arg[2], n_outer) << "+" << n_outer
+    g << "for (cr=" << g.work(arg[2], n_outer, arg_is_ref[2])
+      << ", cs=" << g.work(arg[1], n, arg_is_ref[1])
+      << "; cr!=" << g.work(arg[2], n_outer, arg_is_ref[2]) << "+" << n_outer
       << "; ++cr) ";
     g << "for (j=(int) *cr, "
       << "k=" << inner_.start << ";k<" << inner_.stop << ";k+=" << inner_.step << ") ";
     g << "{ i=k+j; "
       << "if (i>=0 && i<" << this->dep(0).nnz() << ") "
-      << g.work(res[0], this->nnz()) << "[i] " << (Add?"+= ":"= ")
+      << g.work(res[0], this->nnz(), false) << "[i] " << (Add?"+= ":"= ")
       << "*cs; cs++; }\n";
   }
 
   template<bool Add>
   void SetNonzerosParamParam<Add>::
   generate(CodeGenerator& g,
-           const std::vector<casadi_int>& arg, const std::vector<casadi_int>& res) const {
-    SetNonzerosParam<Add>::generate(g, arg, res);
+           const std::vector<casadi_int>& arg,
+           const std::vector<casadi_int>& res,
+           const std::vector<bool>& arg_is_ref,
+           std::vector<bool>& res_is_ref) const {
+    SetNonzerosParam<Add>::generate(g, arg, res, arg_is_ref, res_is_ref);
     casadi_int n = this->dep(1).nnz();
     casadi_int n_outer = this->dep(3).nnz();
     casadi_int n_inner = this->dep(2).nnz();
@@ -592,18 +610,18 @@ namespace casadi {
     g.local("cii", "const casadi_int", "*");
     g.local("i", "casadi_int");
     g << "for (i=0;i<" << n_inner << ";++i) iw[i] = (int) "
-      << g.work(arg[2], n_inner) << "[i];\n";
+      << g.work(arg[2], n_inner, arg_is_ref[2]) << "[i];\n";
 
     g.local("j", "casadi_int");
     g.local("cr", "const casadi_real", "*");
     g.local("cs", "const casadi_real", "*");
-    g << "for (cr=" << g.work(arg[3], n_outer)
-      << ", cs=" << g.work(arg[1], n)
-      << "; cr!=" << g.work(arg[3], n_outer) << "+" << n_outer
+    g << "for (cr=" << g.work(arg[3], n_outer, arg_is_ref[3])
+      << ", cs=" << g.work(arg[1], n, arg_is_ref[1])
+      << "; cr!=" << g.work(arg[3], n_outer, arg_is_ref[3]) << "+" << n_outer
       << "; ++cr) ";
     g << "for (j=(int) *cr, cii=iw; cii!=iw" << "+" << n_inner << "; ++cii) { i=j+*cii; "
       << "if (i>=0 && i<" << this->dep(0).nnz() << ") "
-      << g.work(res[0], this->nnz()) << "[i] " << (Add?"+= ":"= ")
+      << g.work(res[0], this->nnz(), false) << "[i] " << (Add?"+= ":"= ")
       << "*cs; cs++; }\n";
   }
 

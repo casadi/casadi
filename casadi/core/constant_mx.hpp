@@ -225,7 +225,9 @@ namespace casadi {
         \identifier{ze} */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
-                  const std::vector<casadi_int>& res) const override;
+                  const std::vector<casadi_int>& res,
+                  const std::vector<bool>& arg_is_ref,
+                  std::vector<bool>& res_is_ref) const override;
 
     /** \brief  Check if a particular integer value
 
@@ -316,7 +318,9 @@ namespace casadi {
         \identifier{zq} */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
-                  const std::vector<casadi_int>& res) const override;
+                  const std::vector<casadi_int>& res,
+                  const std::vector<bool>& arg_is_ref,
+                  std::vector<bool>& res_is_ref) const override;
 
     /** \brief Add a dependent function
 
@@ -396,7 +400,9 @@ namespace casadi {
         \identifier{101} */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
-                  const std::vector<casadi_int>& res) const override {}
+                  const std::vector<casadi_int>& res,
+                  const std::vector<bool>& arg_is_ref,
+                  std::vector<bool>& res_is_ref) const override {}
 
     /// Get the value (only for scalar constant nodes)
     double to_double() const override { return 0;}
@@ -534,7 +540,9 @@ namespace casadi {
         \identifier{10b} */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
-                  const std::vector<casadi_int>& res) const override;
+                  const std::vector<casadi_int>& res,
+                  const std::vector<bool>& arg_is_ref,
+                  std::vector<bool>& res_is_ref) const override;
 
     /** \brief  Check if a particular integer value
 
@@ -759,16 +767,18 @@ namespace casadi {
   template<typename Value>
   void Constant<Value>::generate(CodeGenerator& g,
                                  const std::vector<casadi_int>& arg,
-                                 const std::vector<casadi_int>& res) const {
+                                 const std::vector<casadi_int>& res,
+                                 const std::vector<bool>& arg_is_ref,
+                                 std::vector<bool>& res_is_ref) const {
     if (nnz()==0) {
       // Quick return
     } else if (nnz()==1) {
       g << g.workel(res[0]) << " = " << g.constant(to_double()) << ";\n";
     } else {
       if (to_double()==0) {
-        g << g.clear(g.work(res[0], nnz()), nnz()) << '\n';
+        g << g.clear(g.work(res[0], nnz(), false), nnz()) << '\n';
       } else {
-        g << g.fill(g.work(res[0], nnz()), nnz(), g.constant(to_double())) << '\n';
+        g << g.fill(g.work(res[0], nnz(), false), nnz(), g.constant(to_double())) << '\n';
       }
     }
   }

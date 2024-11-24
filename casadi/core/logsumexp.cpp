@@ -72,9 +72,12 @@ namespace casadi {
 
   void LogSumExp::generate(CodeGenerator& g,
                         const std::vector<casadi_int>& arg,
-                        const std::vector<casadi_int>& res) const {
+                        const std::vector<casadi_int>& res,
+                        const std::vector<bool>& arg_is_ref,
+                        std::vector<bool>& res_is_ref) const {
     // Perform operation inplace
-    g << g.workel(res[0]) << " = " << g.logsumexp(g.work(arg[0], dep(0).nnz()), dep(0).nnz())
+    g << g.workel(res[0]) << " = "
+      << g.logsumexp(g.work(arg[0], dep(0).nnz(), arg_is_ref[0]), dep(0).nnz())
       << "\n";
   }
 

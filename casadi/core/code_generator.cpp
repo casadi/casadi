@@ -54,8 +54,11 @@ namespace casadi {
     this->real_min = "";
     bool prefix_set = false;
     this->prefix = "";
+    this->copy_elision_limit = 2;
     avoid_stack_ = false;
     indent_ = 2;
+    sz_zeros_ = 0;
+    sz_ones_ = 0;
 
     // Read options
     for (auto&& e : opts) {
@@ -103,6 +106,14 @@ namespace casadi {
       } else if (e.first=="prefix") {
         this->prefix = e.second.to_string();
         prefix_set = true;
+      } else if (e.first=="copy_elision_limit") {
+        this->copy_elision_limit = e.second;
+        if (this->copy_elision_limit!=-1) {
+          casadi_assert(this->copy_elision_limit>=2,
+            "Option copy_elision_limit must be -1 or >=2");
+          this->copy_elision_limit =
+            std::max(static_cast<casadi_int>(2), this->copy_elision_limit);
+        }
       } else {
         casadi_error("Unrecognized option: " + str(e.first));
       }
@@ -873,6 +884,18 @@ namespace casadi {
       s << std::endl;
     }
 
+    if (sz_zeros_) {
+      std::vector<double> sz_zeros(sz_zeros_, 0);
+      print_vector(s, "casadi_zeros", std::vector<double>(sz_zeros));
+      s << std::endl;
+    }
+
+    if (sz_ones_) {
+      std::vector<double> sz_ones(sz_ones_, 0);
+      print_vector(s, "casadi_ones", std::vector<double>(sz_ones));
+      s << std::endl;
+    }
+
     // Print file scope double work
     if (!file_scope_double_.empty()) {
       casadi_int i=0;
@@ -907,7 +930,10 @@ namespace casadi {
     s << std::endl;
   }
 
-  std::string CodeGenerator::work(casadi_int n, casadi_int sz) const {
+  std::string CodeGenerator::work(casadi_int n, casadi_int sz, bool is_ref) const {
+    if (is_ref) {
+      return "wr" + str(n);
+    }
     if (n<0 || sz==0) {
       return "0";
     } else if (sz==1 && !this->codegen_scalars) {
@@ -1219,6 +1245,16 @@ namespace casadi {
 
   std::string CodeGenerator::constant(const std::vector<std::string>& v) {
     return shorthand("a" + str(get_constant(v, true)));
+  }
+
+  std::string CodeGenerator::zeros(casadi_int sz) {
+    sz_zeros_ = std::max(sz_zeros_, sz);
+    return shorthand("zeros");
+  }
+
+  std::string CodeGenerator::ones(casadi_int sz) {
+    sz_ones_ = std::max(sz_ones_, sz);
+    return shorthand("ones");
   }
 
   void CodeGenerator::constant_copy(

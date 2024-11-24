@@ -112,15 +112,17 @@ namespace casadi {
 
   void Low::generate(CodeGenerator& g,
                       const std::vector<casadi_int>& arg,
-                      const std::vector<casadi_int>& res) const {
+                      const std::vector<casadi_int>& res,
+                      const std::vector<bool>& arg_is_ref,
+                      std::vector<bool>& res_is_ref) const {
     casadi_int n = dep(1).nnz();
     casadi_int ng = dep(0).nnz();
     g.local("cr", "const casadi_real", "*");
     g.local("rr", "casadi_real", "*");
-    g << "for (cr=" << g.work(arg[1], n) << ", rr=" << g.work(res[0], n);
-    g << ";cr!=" << g.work(arg[1], n) << "+" << n << ";++cr) ";
+    g << "for (cr=" << g.work(arg[1], n, arg_is_ref[1]) << ", rr=" << g.work(res[0], n, false);
+    g << ";cr!=" << g.work(arg[1], n, arg_is_ref[1]) << "+" << n << ";++cr) ";
     g << "*rr++ = ";
-    g << g.low("*cr", g.work(arg[0], ng), ng, lookup_mode_) << "\n";
+    g << g.low("*cr", g.work(arg[0], ng, arg_is_ref[0]), ng, lookup_mode_) << "\n";
   }
 
   void Low::serialize_body(SerializingStream& s) const {

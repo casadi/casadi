@@ -90,9 +90,11 @@ namespace casadi {
 
   void Project::generate(CodeGenerator& g,
                           const std::vector<casadi_int>& arg,
-                          const std::vector<casadi_int>& res) const {
-    g << g.project(g.work(arg.front(), dep().nnz()), dep(0).sparsity(),
-                           g.work(res.front(), nnz()), sparsity(), "w") << "\n";
+                          const std::vector<casadi_int>& res,
+                          const std::vector<bool>& arg_is_ref,
+                          std::vector<bool>& res_is_ref) const {
+    g << g.project(g.work(arg.front(), dep().nnz(), arg_is_ref.front()), dep(0).sparsity(),
+                           g.work(res.front(), nnz(), false), sparsity(), "w") << "\n";
   }
 
   void Project::serialize_type(SerializingStream& s) const {
@@ -127,16 +129,20 @@ namespace casadi {
 
   void Densify::generate(CodeGenerator& g,
                           const std::vector<casadi_int>& arg,
-                          const std::vector<casadi_int>& res) const {
-    g << g.densify(g.work(arg.front(), dep().nnz()), dep(0).sparsity(),
-                           g.work(res.front(), nnz())) << "\n";
+                          const std::vector<casadi_int>& res,
+                          const std::vector<bool>& arg_is_ref,
+                          std::vector<bool>& res_is_ref) const {
+    g << g.densify(g.work(arg.front(), dep().nnz(), arg_is_ref.front()), dep(0).sparsity(),
+                           g.work(res.front(), nnz(), false)) << "\n";
   }
 
   void Sparsify::generate(CodeGenerator& g,
                           const std::vector<casadi_int>& arg,
-                          const std::vector<casadi_int>& res) const {
-    g << g.sparsify(g.work(arg.front(), dep().nnz()),
-                           g.work(res.front(), nnz()), sparsity()) << "\n";
+                          const std::vector<casadi_int>& res,
+                          const std::vector<bool>& arg_is_ref,
+                          std::vector<bool>& res_is_ref) const {
+    g << g.sparsify(g.work(arg.front(), dep().nnz(), arg_is_ref.front()),
+                           g.work(res.front(), nnz(), false), sparsity()) << "\n";
   }
 
   template<typename T>

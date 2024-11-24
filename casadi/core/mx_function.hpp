@@ -81,6 +81,9 @@ namespace casadi {
         \identifier{21} */
     std::vector<casadi_int> workloc_;
 
+
+    std::vector<bool> workstate_;
+
     /// Free variables
     std::vector<MX> free_vars_;
 

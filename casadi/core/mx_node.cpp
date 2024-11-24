@@ -425,12 +425,34 @@ namespace casadi {
   }
 
   void MXNode::generate(CodeGenerator& g,
-      const std::vector<casadi_int>& arg, const std::vector<casadi_int>& res) const {
+      const std::vector<casadi_int>& arg,
+      const std::vector<casadi_int>& res,
+      const std::vector<bool>& arg_is_ref,
+      std::vector<bool>& res_is_ref) const {
     casadi_warning("Cannot code generate MX nodes of type " + class_name() +
                    "The generation will proceed, but compilation of the code will "
                    "not be possible.");
     g << "#error " <<  class_name() << ": " << arg << " => " << res << '\n';
   }
+
+  void MXNode::generate_copy(CodeGenerator& g,
+                      const std::vector<casadi_int>& arg,
+                      const std::vector<casadi_int>& res,
+                      const std::vector<bool>& arg_is_ref,
+                      std::vector<bool>& res_is_ref,
+                      casadi_int i) const {
+    res_is_ref[i] = arg_is_ref[i];
+    if (arg[i]==res[i]) return;
+    if (nnz()==1) {
+      g << g.workel(res[i]) << " = " << g.workel(arg[i]) << ";\n";
+    } else if (arg_is_ref[i]) {
+      g << g.work(res[i], nnz(), true) << " = " << g.work(arg[i], nnz(), true) << ";\n";
+    } else {
+      g << g.copy(g.work(arg[i], nnz(), false), nnz(), g.work(res[i], nnz(), false)) << "\n";
+    }
+  }
+
+
 
   double MXNode::to_double() const {
     casadi_error("'to_double' not defined for class " + class_name());

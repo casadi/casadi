@@ -407,27 +407,32 @@ namespace casadi {
 
   void BSplineCommon::generate(CodeGenerator& g,
                       const std::vector<casadi_int>& arg,
-                      const std::vector<casadi_int>& res) const {
+                      const std::vector<casadi_int>& res,
+                      const std::vector<bool>& arg_is_ref,
+                      std::vector<bool>& res_is_ref) const {
     casadi_int n_dims = offset_.size()-1;
 
     g.add_auxiliary(CodeGenerator::AUX_ND_BOOR_EVAL);
     g.add_auxiliary(CodeGenerator::AUX_FILL);
-    g << g.clear(g.work(res[0], m_), m_) << "\n";
+    g << g.clear(g.work(res[0], m_, false), m_) << "\n";
 
     // Input and output buffers
-    g << "CASADI_PREFIX(nd_boor_eval)(" << g.work(res[0], m_) << "," << n_dims << ","
+    g << "CASADI_PREFIX(nd_boor_eval)(" << g.work(res[0], m_, false) << "," << n_dims << ","
       << g.constant(knots_) << "," << g.constant(offset_) << "," <<  g.constant(degree_)
-      << "," << g.constant(strides_) << "," << generate(g, arg) << "," << m_  << ","
-      << g.work(arg[0], n_dims) << "," <<  g.constant(lookup_mode_) << ", iw, w);\n";
+      << "," << g.constant(strides_) << "," << generate(g, arg, arg_is_ref) << "," << m_  << ","
+      << g.work(arg[0], n_dims, arg_is_ref[0]) << "," <<  g.constant(lookup_mode_) << ", iw, w);\n";
   }
 
-  std::string BSpline::generate(CodeGenerator& g, const std::vector<casadi_int>& arg) const {
+  std::string BSpline::generate(CodeGenerator& g,
+      const std::vector<casadi_int>& arg,
+      const std::vector<bool>& arg_is_ref) const {
     return g.constant(coeffs_);
   }
 
   std::string BSplineParametric::generate(CodeGenerator& g,
-                      const std::vector<casadi_int>& arg) const {
-    return g.work(arg[1], dep(1).nnz());
+      const std::vector<casadi_int>& arg,
+      const std::vector<bool>& arg_is_ref) const {
+    return g.work(arg[1], dep(1).nnz(), arg_is_ref[1]);
   }
 
   DM BSpline::dual(const std::vector<double>& x,

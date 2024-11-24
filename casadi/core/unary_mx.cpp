@@ -107,7 +107,9 @@ namespace casadi {
 
   void UnaryMX::generate(CodeGenerator& g,
                           const std::vector<casadi_int>& arg,
-                          const std::vector<casadi_int>& res) const {
+                          const std::vector<casadi_int>& res,
+                          const std::vector<bool>& arg_is_ref,
+                          std::vector<bool>& res_is_ref) const {
     std::string r, x;
     if (nnz()==1) {
       // Scalar assignment
@@ -118,7 +120,8 @@ namespace casadi {
       g.local("cs", "const casadi_real", "*");
       g.local("rr", "casadi_real", "*");
       g.local("i", "casadi_int");
-      g << "for (i=0, rr=" << g.work(res[0], nnz()) << ", cs=" << g.work(arg[0], nnz())
+      g << "for (i=0, rr=" << g.work(res[0], nnz(), false) << ", cs="
+        << g.work(arg[0], nnz(), arg_is_ref[0])
         << "; i<" << sparsity().nnz() << "; ++i) ";
       r = "*rr++";
       x = "*cs++";

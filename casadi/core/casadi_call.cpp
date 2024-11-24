@@ -166,18 +166,21 @@ namespace casadi {
     return fcn_->has_refcount_;
   }
 
-  void Call::generate(CodeGenerator& g, const std::vector<casadi_int>& arg,
-      const std::vector<casadi_int>& res) const {
+  void Call::generate(CodeGenerator& g,
+                    const std::vector<casadi_int>& arg,
+                    const std::vector<casadi_int>& res,
+                    const std::vector<bool>& arg_is_ref,
+                    std::vector<bool>& res_is_ref) const {
     // Collect input arguments
     g.local("arg1", "const casadi_real", "**");
     for (casadi_int i=0; i<arg.size(); ++i) {
-      g << "arg1[" << i << "]=" << g.work(arg[i], fcn_.nnz_in(i)) << ";\n";
+      g << "arg1[" << i << "]=" << g.work(arg[i], fcn_.nnz_in(i), arg_is_ref[i]) << ";\n";
     }
 
     // Collect output arguments
     g.local("res1", "casadi_real", "**");
     for (casadi_int i=0; i<res.size(); ++i) {
-      g << "res1[" << i << "]=" << g.work(res[i], fcn_.nnz_out(i)) << ";\n";
+      g << "res1[" << i << "]=" << g.work(res[i], fcn_.nnz_out(i), false) << ";\n";
     }
 
     // Call function

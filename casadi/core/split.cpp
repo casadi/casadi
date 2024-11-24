@@ -105,7 +105,9 @@ namespace casadi {
 
   void Split::generate(CodeGenerator& g,
                         const std::vector<casadi_int>& arg,
-                        const std::vector<casadi_int>& res) const {
+                        const std::vector<casadi_int>& res,
+                        const std::vector<bool>& arg_is_ref,
+                        std::vector<bool>& res_is_ref) const {
     casadi_int nx = nout();
     for (casadi_int i=0; i<nx; ++i) {
       casadi_int nz_first = offset_[i];
@@ -120,13 +122,18 @@ namespace casadi {
             g << g.workel(arg[0]) << ";\n";
           } else {
             // rhs is an element in a vector
-            g << g.work(arg[0], dep(0).nnz()) << "[" << nz_first << "];\n";
+            g << g.work(arg[0], dep(0).nnz(), arg_is_ref[0]) << "[" << nz_first << "];\n";
           }
         } else {
           // assign vector
-          std::string r = g.work(arg[0], dep(0).nnz());
+          std::string r = g.work(arg[0], dep(0).nnz(), arg_is_ref[0]);
           if (nz_first!=0) r = r + "+" + str(nz_first);
-          g << g.copy(r, nz, g.work(res[i], nnz(i))) << "\n";
+          if (arg_is_ref[0]) {
+            g << g.work(res[i], nnz(i), true) << " = " << r << ";\n";
+            res_is_ref[i] = true;
+          } else {
+            g << g.copy(r, nz, g.work(res[i], nnz(i), false)) << "\n";
+          }
         }
       }
     }

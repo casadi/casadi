@@ -217,20 +217,24 @@ namespace casadi {
 
   void Transpose::generate(CodeGenerator& g,
                             const std::vector<casadi_int>& arg,
-                            const std::vector<casadi_int>& res) const {
-    g << g.trans(g.work(arg[0], nnz()), dep().sparsity(),
-                 g.work(res[0], nnz()), sparsity(), "iw") <<  ";\n";
+                            const std::vector<casadi_int>& res,
+                            const std::vector<bool>& arg_is_ref,
+                            std::vector<bool>& res_is_ref) const {
+    g << g.trans(g.work(arg[0], nnz(), arg_is_ref[0]), dep().sparsity(),
+                 g.work(res[0], nnz(), false), sparsity(), "iw") <<  ";\n";
   }
 
   void DenseTranspose::generate(CodeGenerator& g,
                                 const std::vector<casadi_int>& arg,
-                                const std::vector<casadi_int>& res) const {
+                                const std::vector<casadi_int>& res,
+                                const std::vector<bool>& arg_is_ref,
+                                std::vector<bool>& res_is_ref) const {
     g.local("cs", "const casadi_real", "*");
     g.local("rr", "casadi_real", "*");
     g.local("i", "casadi_int");
     g.local("j", "casadi_int");
-    g << "for (i=0, rr=" << g.work(res[0], nnz()) << ", "
-      << "cs=" << g.work(arg[0], nnz()) << "; i<" << dep().size2() << "; ++i) "
+    g << "for (i=0, rr=" << g.work(res[0], nnz(), false) << ", "
+      << "cs=" << g.work(arg[0], nnz(), arg_is_ref[0]) << "; i<" << dep().size2() << "; ++i) "
       << "for (j=0; j<" << dep().size1() << "; ++j) "
       << "rr[i+j*" << dep().size2() << "] = *cs++;\n";
   }
