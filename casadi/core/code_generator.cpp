@@ -55,6 +55,7 @@ namespace casadi {
     bool prefix_set = false;
     this->prefix = "";
     this->copy_elision_limit = 2;
+    this->max_declarations_per_line = 12;
     avoid_stack_ = false;
     indent_ = 2;
     sz_zeros_ = 0;
@@ -114,6 +115,10 @@ namespace casadi {
           this->copy_elision_limit =
             std::max(static_cast<casadi_int>(2), this->copy_elision_limit);
         }
+      } else if (e.first=="max_declarations_per_line") {
+        this->max_declarations_per_line = e.second;
+        casadi_assert(this->max_declarations_per_line>=0,
+          "Option max_declarations_per_line must be >=0");
       } else {
         casadi_error("Unrecognized option: " + str(e.first));
       }
@@ -207,12 +212,21 @@ namespace casadi {
 
     // Codegen local variables
     for (auto&& e : local_variables_by_type) {
-      body << "  " << e.first;
+      casadi_int cnt = 0;
       for (auto it=e.second.begin(); it!=e.second.end(); ++it) {
-        body << (it==e.second.begin() ? " " : ", ") << it->second << it->first;
+        bool split_declaration = it==e.second.begin() ||
+                     (max_declarations_per_line>1 && cnt % max_declarations_per_line==0);
+        if (split_declaration) {
+          if (it!=e.second.begin()) body << ";\n";
+          body << "  " << e.first << " ";
+        } else {
+          body << ", ";
+        }
+        body << it->second << it->first;
         // Insert definition, if any
         auto k=local_default_.find(it->first);
         if (k!=local_default_.end()) body << "=" << k->second;
+        cnt++;
       }
       body << ";\n";
     }

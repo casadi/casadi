@@ -893,6 +893,8 @@ namespace casadi {
     // nnz limit to start applying copy elision
     casadi_int copy_elision_limit;
 
+    casadi_int max_declarations_per_line;
+
     // Prefix symbols in DLLs?
     std::string dll_export, dll_import;
 
