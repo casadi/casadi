@@ -561,8 +561,8 @@ namespace casadi {
     g << "for (rr=" << g.work(res[0], nnz(), false) << ", cs="
       << a0 << "+" << outer_.start << "; cs!=" << a0 << "+"
       << outer_.stop << "; cs+=" << outer_.step << ") "
-      << "for (tt=cs+" << inner_.start << "; tt!=cs+" << inner_.stop
-      << "; tt+=" << inner_.step << ") *rr++ = *tt;\n";
+      << "for (ct=cs+" << inner_.start << "; ct!=cs+" << inner_.stop
+      << "; ct+=" << inner_.step << ") *rr++ = *ct;\n";
   }
 
   bool GetNonzerosVector::is_equal(const MXNode* node, casadi_int depth) const {
