@@ -887,6 +887,9 @@ namespace casadi {
     // Have a flag for exporting/importing symbols
     bool with_export, with_import;
 
+    // Maximum number of declarations per line
+    casadi_int max_declarations_per_line;
+
     // Prefix symbols in DLLs?
     std::string dll_export, dll_import;
 
