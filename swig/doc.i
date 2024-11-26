@@ -4962,7 +4962,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L46
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L35-L183
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L36-L192
 
 ";
 
@@ -4976,7 +4976,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L49
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L304-L347
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L322-L365
 
 ";
 
@@ -4989,7 +4989,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L53
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L786-L908
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L804-L938
 
 ";
 
@@ -5002,7 +5002,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L57
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L349-L353
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L367-L371
 
 ";
 
@@ -5022,7 +5022,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L66
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L441-L495
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L459-L513
 
 ";
 
@@ -5039,7 +5039,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L69
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L999-L1019
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1032-L1052
 
 ";
 
@@ -5053,7 +5053,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L74
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L223-L302
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L241-L320
 
 ";
 
@@ -5067,7 +5067,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L77
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1060-L1062
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1093-L1095
 
 ";
 
@@ -5081,7 +5081,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L80
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1064-L1067
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1097-L1100
 
 ";
 
@@ -5095,7 +5095,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L83
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1069-L1075
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1102-L1108
 
 ";
 
@@ -5120,7 +5120,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L94
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1085-L1087
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1118-L1120
 
 ";
 
@@ -5136,7 +5136,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L99
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1121-L1141
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1154-L1174
 
 ";
 
@@ -5152,7 +5152,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L104
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1143-L1164
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1176-L1197
 
 ";
 
@@ -5168,7 +5168,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L109
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1166-L1187
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1199-L1220
 
 ";
 
@@ -5184,7 +5184,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L114
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1189-L1210
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1222-L1243
 
 ";
 
@@ -5200,7 +5200,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L119
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1212-L1214
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1245-L1247
 
 ";
 
@@ -5232,7 +5232,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L139
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1240-L1242
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1283-L1285
 
 ";
 
@@ -5248,7 +5248,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L144
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1216-L1218
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1249-L1251
 
 ";
 
@@ -5264,7 +5264,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L149
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1220-L1222
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1253-L1255
 
 ";
 
@@ -5279,7 +5279,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L250
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1764-L1786
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1807-L1829
 
 ";
 
@@ -5305,7 +5305,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L131
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1224-L1238
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1267-L1281
 
 ";
 
@@ -5321,7 +5321,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L154
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L758-L763
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L776-L781
 
 ";
 
@@ -5337,7 +5337,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L159
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L765-L770
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L783-L788
 
 ";
 
@@ -5353,7 +5353,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L164
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L772-L777
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L790-L795
 
 ";
 
@@ -5369,7 +5369,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L169
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1021-L1036
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1054-L1069
 
 ";
 
@@ -5385,7 +5385,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L173
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L779-L784
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L797-L802
 
 ";
 
@@ -5401,7 +5401,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L190
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2131-L2155
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2179-L2203
 
 ";
 
@@ -5416,7 +5416,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L205
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2178-L2181
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2226-L2229
 
 ";
 
@@ -5432,7 +5432,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L210
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2183-L2195
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2231-L2243
 
 ";
 
@@ -5447,7 +5447,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L215
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L185-L188
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L194-L197
 
 ";
 
@@ -5462,7 +5462,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L220
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L190-L208
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L199-L226
 
 ";
 
@@ -5477,7 +5477,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L225
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2197-L2208
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2245-L2256
 
 ";
 
@@ -5493,7 +5493,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L230
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2210-L2216
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2258-L2264
 
 ";
 
@@ -5542,6 +5542,14 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L24
 
 ";
 
+%feature("docstring")  casadi::CodeGenerator::zeros(casadi_int sz) "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::CodeGenerator::ones(casadi_int sz) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::CodeGenerator::initializer(const std::vector<
  double > &v) "
 
@@ -5551,10 +5559,10 @@ Print an intializer.
 Extra doc: https://github.com/casadi/casadi/wiki/L_sk
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L257
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L260
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1788-L1797
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1831-L1840
 
 ";
 
@@ -5583,10 +5591,10 @@ Sanitize source files for codegen.
 Extra doc: https://github.com/casadi/casadi/wiki/L_sl
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L265
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L268
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2219-L2310
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2267-L2358
 
 ";
 
@@ -5599,10 +5607,10 @@ Codegen inner product.
 Extra doc: https://github.com/casadi/casadi/wiki/L_sm
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L272
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L275
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1893-L1899
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1941-L1947
 
 ";
 
@@ -5613,10 +5621,10 @@ Codegen inner product.
 Extra doc: https://github.com/casadi/casadi/wiki/L_sm
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L272
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L275
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1893-L1899
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1941-L1947
 
 ";
 
@@ -5627,10 +5635,10 @@ Codegen inner product.
 Extra doc: https://github.com/casadi/casadi/wiki/L_sm
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L272
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L275
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1893-L1899
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1941-L1947
 
 ";
 
@@ -5643,10 +5651,10 @@ Codegen sparse matrix-vector multiplication.
 Extra doc: https://github.com/casadi/casadi/wiki/L_sn
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L277
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L280
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2086-L2091
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2134-L2139
 
 ";
 
@@ -5660,10 +5668,10 @@ Codegen dense matrix-vector multiplication.
 Extra doc: https://github.com/casadi/casadi/wiki/L_so
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L283
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L286
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2093-L2098
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2141-L2146
 
 ";
 
@@ -5676,10 +5684,10 @@ Codegen axpy: y += a*x.
 Extra doc: https://github.com/casadi/casadi/wiki/L_sp
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L289
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L292
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2045-L2049
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2093-L2097
 
 ";
 
@@ -5692,10 +5700,10 @@ Codegen clip_min: Clips the smaller entries in a vector than min
 the min.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L297
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L300
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2051-L2055
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2099-L2103
 
 ";
 
@@ -5708,10 +5716,10 @@ to the
  max.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L305
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L308
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2057-L2061
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2105-L2109
 
 ";
 
@@ -5724,10 +5732,10 @@ Codegen vector_fmax: Takes vectorwise max of a vector and writes
 result to second vector.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L312
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L315
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2063-L2067
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2111-L2115
 
 ";
 
@@ -5740,10 +5748,10 @@ Codegen vector_fmin: Takes vectorwise min of a vector and writes
 result to second vector.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L319
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L322
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2069-L2073
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2117-L2121
 
 ";
 
@@ -5756,10 +5764,10 @@ the inf-
 norm.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L326
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L329
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2075-L2079
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2123-L2127
 
 ";
 
@@ -5772,10 +5780,10 @@ What does scal do??
 Extra doc: https://github.com/casadi/casadi/wiki/L_sq
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L333
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L336
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2081-L2084
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2129-L2132
 
 ";
 
@@ -5789,10 +5797,10 @@ Codegen sparse matrix-matrix multiplication.
 Extra doc: https://github.com/casadi/casadi/wiki/L_sr
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L338
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L341
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2100-L2107
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2148-L2155
 
 ";
 
@@ -5803,10 +5811,10 @@ Codegen sparse matrix-matrix multiplication.
 Extra doc: https://github.com/casadi/casadi/wiki/L_sr
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L338
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L341
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2100-L2107
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2148-L2155
 
 ";
 
@@ -5817,10 +5825,10 @@ Codegen sparse matrix-matrix multiplication.
 Extra doc: https://github.com/casadi/casadi/wiki/L_sr
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L338
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L341
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2100-L2107
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2148-L2155
 
 ";
 
@@ -5834,10 +5842,10 @@ Codegen lower triangular solve.
 Extra doc: https://github.com/casadi/casadi/wiki/L_ss
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L346
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L349
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2109-L2114
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2157-L2162
 
 ";
 
@@ -5851,10 +5859,10 @@ Codegen upper triangular solve.
 Extra doc: https://github.com/casadi/casadi/wiki/L_st
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L352
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L355
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2116-L2121
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2164-L2169
 
 ";
 
@@ -5867,10 +5875,10 @@ Codegen bilinear form.
 Extra doc: https://github.com/casadi/casadi/wiki/L_su
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L358
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L361
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1901-L1907
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1949-L1955
 
 ";
 
@@ -5881,10 +5889,10 @@ Codegen bilinear form.
 Extra doc: https://github.com/casadi/casadi/wiki/L_su
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L358
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L361
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1901-L1907
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1949-L1955
 
 ";
 
@@ -5895,10 +5903,10 @@ Codegen bilinear form.
 Extra doc: https://github.com/casadi/casadi/wiki/L_su
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L358
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L361
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1901-L1907
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1949-L1955
 
 ";
 
@@ -5912,10 +5920,10 @@ Rank-1 update.
 Extra doc: https://github.com/casadi/casadi/wiki/L_sv
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L364
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L367
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1909-L1917
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1957-L1965
 
 ";
 
@@ -5926,10 +5934,10 @@ Rank-1 update.
 Extra doc: https://github.com/casadi/casadi/wiki/L_sv
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L364
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L367
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1909-L1917
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1957-L1965
 
 ";
 
@@ -5940,10 +5948,10 @@ Rank-1 update.
 Extra doc: https://github.com/casadi/casadi/wiki/L_sv
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L364
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L367
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1909-L1917
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1957-L1965
 
 ";
 
@@ -5954,10 +5962,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L19
 \\\\brie LogSumExp
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L368
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L371
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2124-L2129
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2172-L2177
 
 ";
 
@@ -5966,10 +5974,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L21
 \\\\brie LogSumExp
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L368
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L371
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2124-L2129
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2172-L2177
 
 ";
 
@@ -5978,10 +5986,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L21
 \\\\brie LogSumExp
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L368
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L371
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2124-L2129
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2172-L2177
 
 ";
 
@@ -5996,10 +6004,10 @@ Multilinear interpolation.
 Extra doc: https://github.com/casadi/casadi/wiki/L_sw
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L373
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L376
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1919-L1930
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1967-L1978
 
 ";
 
@@ -6014,10 +6022,10 @@ Multilinear interpolation - calculate gradient.
 Extra doc: https://github.com/casadi/casadi/wiki/L_sx
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L382
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L385
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1932-L1942
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1980-L1990
 
 ";
 
@@ -6031,10 +6039,10 @@ Transpose.
 Extra doc: https://github.com/casadi/casadi/wiki/L_sy
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L392
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L395
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1944-L1950
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1992-L1998
 
 ";
 
@@ -6049,10 +6057,10 @@ QR factorization.
 Extra doc: https://github.com/casadi/casadi/wiki/L_sz
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L398
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L401
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2345-L2353
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2393-L2401
 
 ";
 
@@ -6063,10 +6071,10 @@ QR factorization.
 Extra doc: https://github.com/casadi/casadi/wiki/L_sz
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L398
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L401
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2345-L2353
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2393-L2401
 
 ";
 
@@ -6077,10 +6085,10 @@ QR factorization.
 Extra doc: https://github.com/casadi/casadi/wiki/L_sz
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L398
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L401
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2345-L2353
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2393-L2401
 
 ";
 
@@ -6095,10 +6103,10 @@ QR solve.
 Extra doc: https://github.com/casadi/casadi/wiki/L_t0
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L407
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L410
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2356-L2365
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2404-L2413
 
 ";
 
@@ -6109,10 +6117,10 @@ QR solve.
 Extra doc: https://github.com/casadi/casadi/wiki/L_t0
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L407
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L410
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2356-L2365
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2404-L2413
 
 ";
 
@@ -6123,10 +6131,10 @@ QR solve.
 Extra doc: https://github.com/casadi/casadi/wiki/L_t0
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L407
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L410
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2356-L2365
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2404-L2413
 
 ";
 
@@ -6140,10 +6148,10 @@ const std::string &w) "
 Extra doc: https://github.com/casadi/casadi/wiki/L_t1
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L416
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L419
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2368-L2373
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2416-L2421
 
 ";
 
@@ -6157,10 +6165,10 @@ LDL factorization.
 Extra doc: https://github.com/casadi/casadi/wiki/L_t2
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L422
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L425
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2376-L2382
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2424-L2430
 
 ";
 
@@ -6171,10 +6179,10 @@ LDL factorization.
 Extra doc: https://github.com/casadi/casadi/wiki/L_t2
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L422
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L425
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2376-L2382
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2424-L2430
 
 ";
 
@@ -6185,10 +6193,10 @@ LDL factorization.
 Extra doc: https://github.com/casadi/casadi/wiki/L_t2
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L422
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L425
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2376-L2382
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2424-L2430
 
 ";
 
@@ -6202,10 +6210,10 @@ LDL solve.
 Extra doc: https://github.com/casadi/casadi/wiki/L_t3
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L430
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L433
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2385-L2391
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2433-L2439
 
 ";
 
@@ -6216,10 +6224,10 @@ LDL solve.
 Extra doc: https://github.com/casadi/casadi/wiki/L_t3
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L430
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L433
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2385-L2391
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2433-L2439
 
 ";
 
@@ -6230,10 +6238,10 @@ LDL solve.
 Extra doc: https://github.com/casadi/casadi/wiki/L_t3
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L430
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L433
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2385-L2391
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2433-L2439
 
 ";
 
@@ -6246,10 +6254,10 @@ fmax
 Extra doc: https://github.com/casadi/casadi/wiki/L_t4
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L438
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L441
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2394-L2397
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2442-L2445
 
 ";
 
@@ -6260,10 +6268,10 @@ fmax
 Extra doc: https://github.com/casadi/casadi/wiki/L_t4
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L438
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L441
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2394-L2397
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2442-L2445
 
 ";
 
@@ -6274,10 +6282,10 @@ fmax
 Extra doc: https://github.com/casadi/casadi/wiki/L_t4
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L438
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L441
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2394-L2397
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2442-L2445
 
 ";
 
@@ -6290,10 +6298,10 @@ fmin
 Extra doc: https://github.com/casadi/casadi/wiki/L_t5
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L443
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L446
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2400-L2403
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2448-L2451
 
 ";
 
@@ -6304,10 +6312,10 @@ fmin
 Extra doc: https://github.com/casadi/casadi/wiki/L_t5
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L443
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L446
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2400-L2403
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2448-L2451
 
 ";
 
@@ -6318,10 +6326,10 @@ fmin
 Extra doc: https://github.com/casadi/casadi/wiki/L_t5
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L443
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L446
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2400-L2403
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2448-L2451
 
 ";
 
@@ -6334,10 +6342,10 @@ mmax
 Extra doc: https://github.com/casadi/casadi/wiki/L_t6
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L448
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L451
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2442-L2445
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2490-L2493
 
 ";
 
@@ -6348,10 +6356,10 @@ mmax
 Extra doc: https://github.com/casadi/casadi/wiki/L_t6
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L448
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L451
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2442-L2445
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2490-L2493
 
 ";
 
@@ -6362,10 +6370,10 @@ mmax
 Extra doc: https://github.com/casadi/casadi/wiki/L_t6
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L448
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L451
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2442-L2445
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2490-L2493
 
 ";
 
@@ -6378,10 +6386,10 @@ mmin
 Extra doc: https://github.com/casadi/casadi/wiki/L_t7
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L453
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L456
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2448-L2451
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2496-L2499
 
 ";
 
@@ -6392,10 +6400,10 @@ mmin
 Extra doc: https://github.com/casadi/casadi/wiki/L_t7
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L453
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L456
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2448-L2451
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2496-L2499
 
 ";
 
@@ -6406,10 +6414,10 @@ mmin
 Extra doc: https://github.com/casadi/casadi/wiki/L_t7
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L453
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L456
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2448-L2451
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2496-L2499
 
 ";
 
@@ -6422,10 +6430,10 @@ vfmax
 Extra doc: https://github.com/casadi/casadi/wiki/L_t8
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L458
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L461
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2406-L2409
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2454-L2457
 
 ";
 
@@ -6438,10 +6446,10 @@ vfmax
 Extra doc: https://github.com/casadi/casadi/wiki/L_ta
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L468
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L471
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2418-L2421
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2466-L2469
 
 ";
 
@@ -6454,10 +6462,10 @@ vfmin
 Extra doc: https://github.com/casadi/casadi/wiki/L_t9
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L463
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L466
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2412-L2415
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2460-L2463
 
 ";
 
@@ -6470,10 +6478,10 @@ vfmin
 Extra doc: https://github.com/casadi/casadi/wiki/L_tb
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L473
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L476
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2424-L2427
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2472-L2475
 
 ";
 
@@ -6486,10 +6494,10 @@ max
 Extra doc: https://github.com/casadi/casadi/wiki/L_tc
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L478
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L481
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2430-L2433
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2478-L2481
 
 ";
 
@@ -6500,10 +6508,10 @@ max
 Extra doc: https://github.com/casadi/casadi/wiki/L_tc
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L478
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L481
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2430-L2433
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2478-L2481
 
 ";
 
@@ -6514,10 +6522,10 @@ max
 Extra doc: https://github.com/casadi/casadi/wiki/L_tc
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L478
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L481
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2430-L2433
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2478-L2481
 
 ";
 
@@ -6530,10 +6538,10 @@ min
 Extra doc: https://github.com/casadi/casadi/wiki/L_td
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L483
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L486
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2436-L2439
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2484-L2487
 
 ";
 
@@ -6544,10 +6552,10 @@ min
 Extra doc: https://github.com/casadi/casadi/wiki/L_td
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L483
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L486
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2436-L2439
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2484-L2487
 
 ";
 
@@ -6558,10 +6566,10 @@ min
 Extra doc: https://github.com/casadi/casadi/wiki/L_td
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L483
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L486
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2436-L2439
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2484-L2487
 
 ";
 
@@ -6574,10 +6582,10 @@ norm_inf
 Extra doc: https://github.com/casadi/casadi/wiki/L_te
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L488
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L491
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2466-L2469
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2514-L2517
 
 ";
 
@@ -6588,10 +6596,10 @@ norm_inf
 Extra doc: https://github.com/casadi/casadi/wiki/L_te
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L488
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L491
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2466-L2469
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2514-L2517
 
 ";
 
@@ -6602,10 +6610,10 @@ norm_inf
 Extra doc: https://github.com/casadi/casadi/wiki/L_te
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L488
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L491
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2466-L2469
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2514-L2517
 
 ";
 
@@ -6625,10 +6633,10 @@ norm_2
 
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L495
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L498
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2472-L2475
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2520-L2523
 
 ";
 
@@ -6646,10 +6654,10 @@ norm_2
 
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L495
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L498
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2472-L2475
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2520-L2523
 
 ";
 
@@ -6667,10 +6675,10 @@ norm_2
 
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L495
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L498
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2472-L2475
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2520-L2523
 
 ";
 
@@ -6683,10 +6691,10 @@ max_viol
 Extra doc: https://github.com/casadi/casadi/wiki/L_tf
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L500
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L503
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2454-L2457
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2502-L2505
 
 ";
 
@@ -6699,10 +6707,10 @@ sum_viol
 Extra doc: https://github.com/casadi/casadi/wiki/L_tg
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L506
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L509
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2460-L2463
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2508-L2511
 
 ";
 
@@ -6716,10 +6724,10 @@ bound_consistency
 Extra doc: https://github.com/casadi/casadi/wiki/L_th
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L512
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L515
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2503-L2508
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2551-L2556
 
 ";
 
@@ -6732,10 +6740,10 @@ lb_eig
 Extra doc: https://github.com/casadi/casadi/wiki/L_ti
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L518
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L521
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2478-L2481
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2526-L2529
 
 ";
 
@@ -6748,10 +6756,10 @@ regularize
 Extra doc: https://github.com/casadi/casadi/wiki/L_tj
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L523
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L526
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2484-L2487
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2532-L2535
 
 ";
 
@@ -6765,10 +6773,10 @@ convexify
 Extra doc: https://github.com/casadi/casadi/wiki/L_tk
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L528
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L531
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2490-L2494
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2538-L2542
 
 ";
 
@@ -6781,10 +6789,10 @@ low
 Extra doc: https://github.com/casadi/casadi/wiki/L_tl
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L534
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L537
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2497-L2500
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2545-L2548
 
 ";
 
@@ -6795,10 +6803,10 @@ low
 Extra doc: https://github.com/casadi/casadi/wiki/L_tl
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L534
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L537
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2497-L2500
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2545-L2548
 
 ";
 
@@ -6809,10 +6817,10 @@ low
 Extra doc: https://github.com/casadi/casadi/wiki/L_tl
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L534
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L537
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2497-L2500
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2545-L2548
 
 ";
 
@@ -6824,10 +6832,10 @@ Declare a function.
 Extra doc: https://github.com/casadi/casadi/wiki/L_tm
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L540
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L543
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1952-L1963
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2000-L2011
 
 ";
 
@@ -6840,10 +6848,10 @@ Write a comment line (ignored if not verbose)
 Extra doc: https://github.com/casadi/casadi/wiki/L_tn
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L545
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L548
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2312-L2316
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2360-L2364
 
 ";
 
@@ -6856,10 +6864,10 @@ Add a built-in auxiliary function.
 Extra doc: https://github.com/casadi/casadi/wiki/L_tp
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L643
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L646
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1244-L1716
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1287-L1759
 
 ";
 
@@ -6873,24 +6881,24 @@ Add io sparsity patterns of a function.
 Extra doc: https://github.com/casadi/casadi/wiki/L_tq
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L648
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L651
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2319-L2342
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2367-L2390
 
 ";
 
 %feature("docstring")  casadi::CodeGenerator::work(casadi_int n, casadi_int 
-sz) const "
+sz, bool is_ref) const "
 
 [INTERNAL] 
 Get work vector name from index
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L653
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L656
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L910-L918
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L940-L951
 
 ";
 
@@ -6900,10 +6908,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L91
 Get work vector element from index
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L656
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L659
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L920-L926
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L953-L959
 
 ";
 
@@ -6916,10 +6924,10 @@ Print casadi_int vector to a c file.
 Extra doc: https://github.com/casadi/casadi/wiki/L_tr
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L665
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L668
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L942-L945
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L975-L978
 
 ";
 
@@ -6932,10 +6940,10 @@ Print char vector to a c file.
 Extra doc: https://github.com/casadi/casadi/wiki/L_27n
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L671
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L674
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L947-L950
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L980-L983
 
 ";
 
@@ -6948,10 +6956,10 @@ Print real vector to a c file.
 Extra doc: https://github.com/casadi/casadi/wiki/L_ts
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L677
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L680
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L952-L955
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L985-L988
 
 ";
 
@@ -6964,10 +6972,10 @@ Print string vector to a c file.
 Extra doc: https://github.com/casadi/casadi/wiki/L_281
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L683
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L686
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L957-L960
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L990-L993
 
 ";
 
@@ -6980,10 +6988,10 @@ Create a copy operation.
 Extra doc: https://github.com/casadi/casadi/wiki/L_tt
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L689
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L692
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1832-L1839
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1875-L1882
 
 ";
 
@@ -6994,10 +7002,10 @@ Create a copy operation.
 Extra doc: https://github.com/casadi/casadi/wiki/L_tt
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L689
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L692
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1832-L1839
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1875-L1882
 
 ";
 
@@ -7008,10 +7016,10 @@ Create a copy operation.
 Extra doc: https://github.com/casadi/casadi/wiki/L_tt
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L689
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L692
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1832-L1839
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1875-L1882
 
 ";
 
@@ -7027,6 +7035,10 @@ check_rhs=true) "
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::CodeGenerator::elide_copy(casadi_int sz) "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::CodeGenerator::fill(const std::string &res, 
 std::size_t n, const std::string &v) "
 
@@ -7036,10 +7048,10 @@ Create a fill operation.
 Extra doc: https://github.com/casadi/casadi/wiki/L_tu
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L698
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L704
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1883-L1891
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1931-L1939
 
 ";
 
@@ -7052,10 +7064,10 @@ Create a fill operation.
 Extra doc: https://github.com/casadi/casadi/wiki/L_tv
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L703
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L709
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1861-L1867
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1909-L1915
 
 ";
 
@@ -7067,10 +7079,10 @@ Refer to argument.
 Extra doc: https://github.com/casadi/casadi/wiki/L_tw
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L708
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L714
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1869-L1871
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1917-L1919
 
 ";
 
@@ -7082,10 +7094,10 @@ Refer to resuly.
 Extra doc: https://github.com/casadi/casadi/wiki/L_tx
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L713
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L719
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1873-L1875
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1921-L1923
 
 ";
 
@@ -7097,10 +7109,10 @@ Access thread-local memory.
 Extra doc: https://github.com/casadi/casadi/wiki/L_ty
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L718
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L724
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1877-L1881
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1925-L1929
 
 ";
 
@@ -7114,10 +7126,10 @@ Sparse assignment.
 Extra doc: https://github.com/casadi/casadi/wiki/L_tz
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L723
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L729
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1966-L1978
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2014-L2026
 
 ";
 
@@ -7128,10 +7140,10 @@ Sparse assignment.
 Extra doc: https://github.com/casadi/casadi/wiki/L_tz
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L723
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L729
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1966-L1978
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2014-L2026
 
 ";
 
@@ -7142,10 +7154,10 @@ Sparse assignment.
 Extra doc: https://github.com/casadi/casadi/wiki/L_tz
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L723
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L729
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1966-L1978
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2014-L2026
 
 ";
 
@@ -7158,10 +7170,10 @@ Project triangular part.
 Extra doc: https://github.com/casadi/casadi/wiki/L_u0
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L730
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L736
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1981-L1989
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2029-L2037
 
 ";
 
@@ -7174,10 +7186,10 @@ Densify.
 Extra doc: https://github.com/casadi/casadi/wiki/L_u1
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L736
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L742
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1992-L2000
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2040-L2048
 
 ";
 
@@ -7188,10 +7200,10 @@ Densify.
 Extra doc: https://github.com/casadi/casadi/wiki/L_u1
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L736
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L742
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1992-L2000
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2040-L2048
 
 ";
 
@@ -7202,10 +7214,10 @@ Densify.
 Extra doc: https://github.com/casadi/casadi/wiki/L_u1
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L736
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L742
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1992-L2000
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2040-L2048
 
 ";
 
@@ -7218,10 +7230,10 @@ Sparsify.
 Extra doc: https://github.com/casadi/casadi/wiki/L_u2
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L742
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L748
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2003-L2011
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2051-L2059
 
 ";
 
@@ -7232,10 +7244,10 @@ Sparsify.
 Extra doc: https://github.com/casadi/casadi/wiki/L_u2
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L742
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L748
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2003-L2011
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2051-L2059
 
 ";
 
@@ -7246,10 +7258,10 @@ Sparsify.
 Extra doc: https://github.com/casadi/casadi/wiki/L_u2
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L742
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L748
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2003-L2011
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2051-L2059
 
 ";
 
@@ -7262,10 +7274,10 @@ Create matrix in MATLAB's MEX format.
 Extra doc: https://github.com/casadi/casadi/wiki/L_u3
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L748
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L754
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1718-L1723
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1761-L1766
 
 ";
 
@@ -7279,10 +7291,10 @@ Get matrix from MATLAB's MEX format.
 Extra doc: https://github.com/casadi/casadi/wiki/L_u4
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L753
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L759
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1725-L1736
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L1768-L1779
 
 ";
 
@@ -7295,10 +7307,10 @@ Printf.
 Extra doc: https://github.com/casadi/casadi/wiki/L_u5
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L765
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L771
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2013-L2020
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2061-L2068
 
 ";
 
@@ -7327,10 +7339,10 @@ Print an operation to a c file.
 Extra doc: https://github.com/casadi/casadi/wiki/L_u6
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L775
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L781
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L962-L982
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L995-L1015
 
 ";
 
@@ -7348,10 +7360,10 @@ Slurp a file.
 Extra doc: https://github.com/casadi/casadi/wiki/L_u7
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L781
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L787
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2511-L2514
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2559-L2562
 
 ";
 
@@ -7365,10 +7377,10 @@ cache check
 Extra doc: https://github.com/casadi/casadi/wiki/L_u8
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L786
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L792
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2517-L2522
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2565-L2570
 
 ";
 
@@ -7381,10 +7393,10 @@ Get number of temporary variables needed for all functions.
 Extra doc: https://github.com/casadi/casadi/wiki/L_258
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L802
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L808
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2524-L2532
+https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.cpp#L2572-L2580
 
 ";
 
@@ -20280,7 +20292,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L213
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1355-L1411
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1355-L1421
 
 ";
 
@@ -20293,7 +20305,7 @@ Performs 1d linear interpolation.
 
 The data-points to be interpolated are given as (x[i], v[i]). xq[j] is
  used
- as interplating value
+ as interpolating value
 
 Extra doc: https://github.com/casadi/casadi/wiki/L_1bh
 
@@ -20311,7 +20323,7 @@ Performs 1d linear interpolation.
 
 The data-points to be interpolated are given as (x[i], v[i]). xq[j] is
  used
- as interplating value
+ as interpolating value
 
 Extra doc: https://github.com/casadi/casadi/wiki/L_1bh
 
@@ -20329,7 +20341,7 @@ Performs 1d linear interpolation.
 
 The data-points to be interpolated are given as (x[i], v[i]). xq[j] is
  used
- as interplating value
+ as interpolating value
 
 Extra doc: https://github.com/casadi/casadi/wiki/L_1bh
 
@@ -20580,7 +20592,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L228
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1414-L1422
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1424-L1432
 
 ";
 
@@ -20637,7 +20649,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L229
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1425-L1430
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1435-L1440
 
 ";
 
@@ -20695,7 +20707,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L230
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1434-L1440
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1444-L1450
 
 ";
 
@@ -20753,7 +20765,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L231
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1458-L1464
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1468-L1474
 
 ";
 
@@ -20811,7 +20823,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L232
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1443-L1455
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1453-L1465
 
 ";
 
@@ -20869,7 +20881,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L233
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1670-L1695
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1680-L1705
 
 ";
 
@@ -20928,7 +20940,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L235
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1639-L1641
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1649-L1651
 
 ";
 
@@ -20998,7 +21010,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L236
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1644-L1646
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1654-L1656
 
 ";
 
@@ -21069,7 +21081,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L237
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1649-L1657
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1659-L1667
 
 ";
 
@@ -21164,7 +21176,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L239
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1660-L1667
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1670-L1677
 
 ";
 
@@ -31469,7 +31481,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L213
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1355-L1411
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1355-L1421
 
 ";
 
@@ -31581,7 +31593,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L228
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1414-L1422
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1424-L1432
 
 ";
 
@@ -31595,7 +31607,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L229
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1425-L1430
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1435-L1440
 
 ";
 
@@ -31609,7 +31621,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L230
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1434-L1440
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1444-L1450
 
 ";
 
@@ -31623,7 +31635,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L231
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1458-L1464
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1468-L1474
 
 ";
 
@@ -31637,7 +31649,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L232
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1443-L1455
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1453-L1465
 
 ";
 
@@ -31651,7 +31663,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L233
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1670-L1695
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1680-L1705
 
 ";
 
@@ -31665,7 +31677,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L235
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1639-L1641
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1649-L1651
 
 ";
 
@@ -31679,7 +31691,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L236
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1644-L1646
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1654-L1656
 
 ";
 
@@ -31694,7 +31706,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L237
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1649-L1657
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1659-L1667
 
 ";
 
@@ -31709,7 +31721,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L239
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1660-L1667
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1670-L1677
 
 ";
 
@@ -34605,7 +34617,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L232
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1443-L1455
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1453-L1465
 
 ";
 
@@ -35522,7 +35534,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L213
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1355-L1411
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1355-L1421
 
 ";
 
@@ -35631,7 +35643,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L228
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1414-L1422
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1424-L1432
 
 ";
 
@@ -35644,7 +35656,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L229
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1425-L1430
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1435-L1440
 
 ";
 
@@ -35657,7 +35669,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L230
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1434-L1440
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1444-L1450
 
 ";
 
@@ -35670,7 +35682,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L231
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1458-L1464
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1468-L1474
 
 ";
 
@@ -35684,7 +35696,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L233
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1670-L1695
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1680-L1705
 
 ";
 
@@ -35698,7 +35710,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L235
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1639-L1641
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1649-L1651
 
 ";
 
@@ -35712,7 +35724,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L236
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1644-L1646
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1654-L1656
 
 ";
 
@@ -35726,7 +35738,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L237
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1649-L1657
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1659-L1667
 
 ";
 
@@ -35740,7 +35752,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L239
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1660-L1667
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L1670-L1677
 
 ";
 

@@ -238,6 +238,9 @@
 %exception  casadi::CodeGenerator::dump(std::ostream &s) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::CodeGenerator::elide_copy(casadi_int sz) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::CodeGenerator::file_slurp(const std::string &fname, casadi_int n, const std::string &a) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -353,6 +356,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::CodeGenerator::norm_inf(casadi_int n, const std::string &x) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::CodeGenerator::ones(casadi_int sz) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::CodeGenerator::print_formatted(const std::string &s) {
@@ -478,10 +484,13 @@
 %exception  casadi::CodeGenerator::vfmin(const std::string &x, const std::string &n, const std::string &y) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::CodeGenerator::work(casadi_int n, casadi_int sz) const {
+%exception  casadi::CodeGenerator::work(casadi_int n, casadi_int sz, bool is_ref) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::CodeGenerator::workel(casadi_int n) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::CodeGenerator::zeros(casadi_int sz) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Contraction(const T &a, const T &b, T &r) {
