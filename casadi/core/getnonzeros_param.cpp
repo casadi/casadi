@@ -325,74 +325,83 @@ namespace casadi {
 
   void GetNonzerosParamVector::generate(CodeGenerator& g,
                                     const std::vector<casadi_int>& arg,
-                                    const std::vector<casadi_int>& res) const {
+                                    const std::vector<casadi_int>& res,
+                                    const std::vector<bool>& arg_is_ref,
+                                    std::vector<bool>& res_is_ref) const {
     g.local("i", "casadi_int");
     g.local("rr", "casadi_real", "*");
     g.local("cr", "const casadi_real", "*");
-    g << "for (rr=" << g.work(res[0], nnz()) << ", cr=" << g.work(arg[1], dep(1).nnz())
-      << "; rr!=" << g.work(res[0], nnz()) << "+" << nnz()
+    g << "for (rr=" << g.work(res[0], nnz(), false) << ", cr="
+      << g.work(arg[1], dep(1).nnz(), arg_is_ref[1])
+      << "; rr!=" << g.work(res[0], nnz(), false) << "+" << nnz()
       << "; ++rr) { i=(int) *cr++; "
       << "*rr = i>=0 && i<" << dep(0).nnz() << " ? "
-      << g.work(arg[0], dep(0).nnz()) <<  "[i] : " << g.constant(nan) << "; }\n";
+      << g.work(arg[0], dep(0).nnz(), arg_is_ref[0]) <<  "[i] : " << g.constant(nan) << "; }\n";
   }
 
   void GetNonzerosParamSlice::generate(CodeGenerator& g,
                                   const std::vector<casadi_int>& arg,
-                                  const std::vector<casadi_int>& res) const {
+                                  const std::vector<casadi_int>& res,
+                                  const std::vector<bool>& arg_is_ref,
+                                  std::vector<bool>& res_is_ref) const {
     g.local("cii", "const casadi_int", "*");
     g.local("i", "casadi_int");
     g << "for (i=0;i<" << dep(1).nnz() << ";++i) iw[i] = (int) "
-      << g.work(arg[1], dep(1).nnz()) << "[i];\n";
+      << g.work(arg[1], dep(1).nnz(), arg_is_ref[1]) << "[i];\n";
 
     g.local("rr", "casadi_real", "*");
     g.local("k", "casadi_int");
-    g << "for (rr=" << g.work(res[0], nnz()) << ", "
+    g << "for (rr=" << g.work(res[0], nnz(), false) << ", "
       << "k=" << outer_.start << ";k<" << outer_.stop << ";k+=" << outer_.step << ") ";
     g << "for (cii=iw; cii!=iw" << "+" << dep(1).nnz() << "; ++cii) { i=k+*cii; "
       << "*rr++ = i>=0 && i<" << dep(0).nnz() << " ? "
-      << g.work(arg[0], dep(0).nnz()) <<  "[i] : " << g.constant(nan) << "; }\n";
+      << g.work(arg[0], dep(0).nnz(), arg_is_ref[0]) <<  "[i] : " << g.constant(nan) << "; }\n";
   }
 
   void GetNonzerosSliceParam::generate(CodeGenerator& g,
                                     const std::vector<casadi_int>& arg,
-                                    const std::vector<casadi_int>& res) const {
+                                    const std::vector<casadi_int>& res,
+                                    const std::vector<bool>& arg_is_ref,
+                                    std::vector<bool>& res_is_ref) const {
     g.local("i", "casadi_int");
     g.local("j", "casadi_int");
     g.local("rr", "casadi_real", "*");
     g.local("k", "casadi_int");
     g.local("cr", "const casadi_real", "*");
-    g << "for (cr=" << g.work(arg[1], dep(1).nnz())
-      << ", rr=" << g.work(res[0], nnz())
-      << "; cr!=" << g.work(arg[1], dep(1).nnz()) << "+" << dep(1).nnz()
+    g << "for (cr=" << g.work(arg[1], dep(1).nnz(), arg_is_ref[1])
+      << ", rr=" << g.work(res[0], nnz(), false)
+      << "; cr!=" << g.work(arg[1], dep(1).nnz(), arg_is_ref[1]) << "+" << dep(1).nnz()
       << "; ++cr) ";
     g << "for (j=(int) *cr, "
       << "k=" << inner_.start << ";k<" << inner_.stop << ";k+=" << inner_.step << ") ";
     g << "{ i=k+j; "
       << "*rr++ = i>=0 && i<" << dep(0).nnz() << " ? "
-      << g.work(arg[0], dep(0).nnz()) <<  "[i] : " << g.constant(nan) << "; }\n";
+      << g.work(arg[0], dep(0).nnz(), arg_is_ref[0]) <<  "[i] : " << g.constant(nan) << "; }\n";
 
   }
 
   void GetNonzerosParamParam::generate(CodeGenerator& g,
                                     const std::vector<casadi_int>& arg,
-                                    const std::vector<casadi_int>& res) const {
+                                    const std::vector<casadi_int>& res,
+                                    const std::vector<bool>& arg_is_ref,
+                                    std::vector<bool>& res_is_ref) const {
     g.local("cii", "const casadi_int", "*");
     g.local("i", "casadi_int");
     g << "for (i=0;i<" << dep(1).nnz() << ";++i) iw[i] = (int) "
-      << g.work(arg[1], dep(1).nnz()) << "[i];\n";
+      << g.work(arg[1], dep(1).nnz(), arg_is_ref[1]) << "[i];\n";
 
     g.local("j", "casadi_int");
     g.local("cr", "const casadi_real", "*");
     g.local("rr", "casadi_real", "*");
-    g << "for (cr=" << g.work(arg[2], dep(2).nnz())
-      << ", rr=" << g.work(res[0], nnz())
-      << "; cr!=" << g.work(arg[2], dep(2).nnz()) << "+" << dep(2).nnz()
+    g << "for (cr=" << g.work(arg[2], dep(2).nnz(), arg_is_ref[2])
+      << ", rr=" << g.work(res[0], nnz(), false)
+      << "; cr!=" << g.work(arg[2], dep(2).nnz(), arg_is_ref[2]) << "+" << dep(2).nnz()
       << "; ++cr) ";
     g << "for (j=(int) *cr, cii=iw; cii!=iw" << "+" << dep(1).nnz()
       << "; ++cii) ";
     g << "{ i=j+*cii;"
       << "*rr++ = i>=0 && i<" << dep(0).nnz() << " ? "
-      << g.work(arg[0], dep(0).nnz()) <<  "[i] : " << g.constant(nan) << "; }\n";
+      << g.work(arg[0], dep(0).nnz(), arg_is_ref[0]) <<  "[i] : " << g.constant(nan) << "; }\n";
   }
 
   void GetNonzerosParamVector::serialize_body(SerializingStream& s) const {

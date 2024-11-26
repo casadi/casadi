@@ -174,7 +174,9 @@ namespace casadi {
         \identifier{gc} */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
-                  const std::vector<casadi_int>& res) const override;
+                  const std::vector<casadi_int>& res,
+                  const std::vector<bool>& arg_is_ref,
+                  std::vector<bool>& res_is_ref) const override;
 
     /// Linear solver (may be shared between multiple nodes)
     Linsol linsol_;
@@ -239,8 +241,11 @@ namespace casadi {
     /** \brief Generate code for the operation
 
         \identifier{gk} */
-    void generate(CodeGenerator& g, const std::vector<casadi_int>& arg,
-      const std::vector<casadi_int>& res) const override;
+    void generate(CodeGenerator& g,
+      const std::vector<casadi_int>& arg,
+      const std::vector<casadi_int>& res,
+      const std::vector<bool>& arg_is_ref,
+      std::vector<bool>& res_is_ref) const override;
   };
 
   /** \brief Linear solve with an upper triangular matrix
@@ -277,8 +282,11 @@ namespace casadi {
     /** \brief Generate code for the operation
 
         \identifier{go} */
-    void generate(CodeGenerator& g, const std::vector<casadi_int>& arg,
-      const std::vector<casadi_int>& res) const override;
+    void generate(CodeGenerator& g,
+      const std::vector<casadi_int>& arg,
+      const std::vector<casadi_int>& res,
+      const std::vector<bool>& arg_is_ref,
+      std::vector<bool>& res_is_ref) const override;
   };
 
   /** \brief Linear solve with unity diagonal added
@@ -352,8 +360,11 @@ namespace casadi {
     /** \brief Generate code for the operation
 
         \identifier{gx} */
-    void generate(CodeGenerator& g, const std::vector<casadi_int>& arg,
-      const std::vector<casadi_int>& res) const override;
+    void generate(CodeGenerator& g,
+      const std::vector<casadi_int>& arg,
+      const std::vector<casadi_int>& res,
+      const std::vector<bool>& arg_is_ref,
+      std::vector<bool>& res_is_ref) const override;
   };
 
   /** \brief Linear solve with an upper triangular matrix
@@ -390,8 +401,11 @@ namespace casadi {
     /** \brief Generate code for the operation
 
         \identifier{h1} */
-    void generate(CodeGenerator& g, const std::vector<casadi_int>& arg,
-      const std::vector<casadi_int>& res) const override;
+    void generate(CodeGenerator& g,
+      const std::vector<casadi_int>& arg,
+      const std::vector<casadi_int>& res,
+      const std::vector<bool>& arg_is_ref,
+      std::vector<bool>& res_is_ref) const override;
   };
 
 } // namespace casadi

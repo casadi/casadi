@@ -435,6 +435,7 @@ class MXtests(casadiTestCase):
 
     inp = DM([[1, 0, 2],[0, 0, 3],[4, 0, 0]])
     self.checkfunction(f,fsx,inputs=[inp])
+    self.check_codegen(f,inputs=[inp])
     y = fsx(inp)
     self.checkarray(y,DM([[1, 0, 2],[4, 0, 3]]))
     
@@ -2358,6 +2359,8 @@ class MXtests(casadiTestCase):
     f_in = [0]*f.n_in();f_in[0]=DM(list(range(1,5)))
 
     self.checkfunction(f,g,inputs=f_in)
+    self.check_codegen(f,inputs=f_in)
+    self.check_codegen(g,inputs=f_in)
 
   def test_reshape_sp(self):
     x = MX.sym("x",4,1)
@@ -2371,7 +2374,9 @@ class MXtests(casadiTestCase):
     f_in = [0]*f.n_in();f_in[0]=DM(list(range(1,5)))
 
     self.checkfunction(f,g,inputs=f_in)
-
+    self.check_codegen(f,inputs=f_in)
+    self.check_codegen(g,inputs=f_in)
+    
   def test_issue1041(self):
     x = MX.sym("x",2)
 
@@ -2522,6 +2527,7 @@ class MXtests(casadiTestCase):
         fr = Function("fr", [x],[op(fun(x),x)])
 
         self.checkfunction(f,fr,inputs=[0])
+        self.check_codegen(f,inputs=[0])
 
   @memory_heavy()
   def test_einstein(self):
@@ -2752,6 +2758,8 @@ class MXtests(casadiTestCase):
         fref = Function("f",[x,y],[bilin(x,y,y)])
         
         self.checkfunction(f,fref,inputs=[x0,y0])
+        self.check_codegen(f,inputs=[x0,y0])
+        self.check_codegen(fref,inputs=[x0,y0])
 
   def test_det_shape(self):
     X = MX.sym("x",2,3)
@@ -2773,6 +2781,7 @@ class MXtests(casadiTestCase):
     f = Function('f',[x],[det(x)])
     F = Function('F',[X],[det(X)])
     self.checkfunction(f,F,inputs=[x0])
+    self.check_codegen(F,inputs=[x0])
 
   def test_mtimes_mismatch_segfault(self):
     with self.assertInException("incompatible dimensions"):
@@ -2817,6 +2826,7 @@ class MXtests(casadiTestCase):
           e = dot(e,e)
           f = Function('f',[M],[e])
           self.checkfunction(f,f.expand(),inputs=[ numpy.random.random((S.nnz(),1))])
+          self.check_codegen(f,inputs=[ numpy.random.random((S.nnz(),1))],digits=13)
 
           mc = m+0
 
@@ -2829,6 +2839,7 @@ class MXtests(casadiTestCase):
           f = Function('f',[M,Y],[e])
           self.checkfunction(f,f.expand(),inputs=[ numpy.random.random((S.nnz(),1)), numpy.random.random((E.nnz(),1))])
           self.check_serialize(f,inputs=[ numpy.random.random((S.nnz(),1)), numpy.random.random((E.nnz(),1))])
+          self.check_codegen(f,inputs=[ numpy.random.random((S.nnz(),1)), numpy.random.random((E.nnz(),1))],digits=13)
 
   def test_evalf(self):
     x = MX.sym("x")
@@ -2910,6 +2921,7 @@ class MXtests(casadiTestCase):
       f.expand().jacobian().disp(True)
       print(J([2,2],0))
       self.checkfunction(f,f.expand(),inputs=[[2,2]])
+      self.check_codegen(f,inputs=[[2,2]],std="c99")
 
   def test_doc_expression_tools(self):
     self.assertTrue("Given a repeated matrix, computes the sum of repeated parts." in repsum.__doc__)
@@ -3143,6 +3155,7 @@ class MXtests(casadiTestCase):
     self.check_codegen(f,inputs=[vertcat(1.1,1.3,1.7)])
     self.checkfunction(f,f_ref,inputs=[vertcat(1.1,1.3,1.3)])
     self.checkfunction(f,f_ref,inputs=[vertcat(1.3,1.3,1.3)])
+    
 
     # Avoid overflow
     res = f(vertcat(100,1000,10000))
@@ -3185,6 +3198,7 @@ class MXtests(casadiTestCase):
 
     self.checkfunction(f,f.expand(),inputs=[DM([[1,2],[3,4]]),DM([[5,6],[7,8]])])
     self.checkfunction(f,f_alt,inputs=[DM([[1,2],[3,4]]),DM([[5,6],[7,8]])])
+    self.check_codegen(f,inputs=[DM([[1,2],[3,4]]),DM([[5,6],[7,8]])])
 
   def test_sparsity_cast_ad(self):
     #issue 3164
@@ -3196,6 +3210,7 @@ class MXtests(casadiTestCase):
     
     f = Function('f',[y],[w])
     self.checkfunction(f,f.expand(), inputs=[vertcat(1.1,1.3,1.7)])
+    self.check_codegen(f,inputs=[vertcat(1.1,1.3,1.7)])
 
 
   def test_fractional_slicing(self):
@@ -3251,6 +3266,8 @@ class MXtests(casadiTestCase):
         f2 = Function('f',[zsx],z.split_primitives(zsx))
         
         self.checkfunction_light(f,f2,inputs=[a])
+        self.check_codegen(f,inputs=[a])
+        self.check_codegen(f2,inputs=[a])
         
         f3 = Function('f',[zsx],[z.join_primitives(z.split_primitives(zsx))])
         

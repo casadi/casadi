@@ -93,12 +93,14 @@ namespace casadi {
 
   void HorzRepmat::generate(CodeGenerator& g,
                             const std::vector<casadi_int>& arg,
-                            const std::vector<casadi_int>& res) const {
+                            const std::vector<casadi_int>& res,
+                            const std::vector<bool>& arg_is_ref,
+                            std::vector<bool>& res_is_ref) const {
     casadi_int nnz = dep(0).nnz();
     g.local("i", "casadi_int");
     g << "for (i=0;i<" << n_ << ";++i) {\n"
-      << g.copy(g.work(arg[0], dep(0).nnz()), nnz,
-                g.work(res[0], sparsity().nnz()) + "+ i*" + str(nnz)) << "\n"
+      << g.copy(g.work(arg[0], dep(0).nnz(), arg_is_ref[0]), nnz,
+                g.work(res[0], sparsity().nnz(), false) + "+ i*" + str(nnz)) << "\n"
       << "}\n";
   }
 
@@ -174,16 +176,18 @@ namespace casadi {
 
   void HorzRepsum::generate(CodeGenerator& g,
                             const std::vector<casadi_int>& arg,
-                            const std::vector<casadi_int>& res) const {
+                            const std::vector<casadi_int>& res,
+                            const std::vector<bool>& arg_is_ref,
+                            std::vector<bool>& res_is_ref) const {
     g.add_auxiliary(CodeGenerator::AUX_CLEAR);
     casadi_int nnz = sparsity().nnz();
     g.local("i", "casadi_int");
     g.local("j", "casadi_int");
-    g << g.clear(g.work(res[0], nnz), nnz) << "\n"
+    g << g.clear(g.work(res[0], nnz, false), nnz) << "\n"
       << "  for (i=0;i<" << n_ << ";++i) {\n"
       << "    for (j=0;j<" << nnz << ";++j) {\n"
-      << "      " << g.work(res[0], nnz)<< "[j] += "
-      << g.work(arg[0], dep(0).nnz()) << "[j+i*" << nnz << "];\n"
+      << "      " << g.work(res[0], nnz, false)<< "[j] += "
+      << g.work(arg[0], dep(0).nnz(), arg_is_ref[0]) << "[j+i*" << nnz << "];\n"
       << "    }\n"
       << "  }\n";
   }

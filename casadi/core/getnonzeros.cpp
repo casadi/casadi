@@ -490,22 +490,24 @@ namespace casadi {
 
   void GetNonzerosVector::generate(CodeGenerator& g,
                                     const std::vector<casadi_int>& arg,
-                                    const std::vector<casadi_int>& res) const {
+                                    const std::vector<casadi_int>& res,
+                                    const std::vector<bool>& arg_is_ref,
+                                    std::vector<bool>& res_is_ref) const {
     // Codegen the indices
     std::string ind = g.constant(nz_);
 
     // Codegen the assignments
     g.local("cii", "const casadi_int", "*");
     g.local("rr", "casadi_real", "*");
-    g.local("ss", "casadi_real", "*");
-    g << "for (cii=" << ind << ", rr=" << g.work(res[0], nnz())
-      << ", ss=" << g.work(arg[0], dep(0).nnz())
+    g.local("cs", "const casadi_real", "*");
+    g << "for (cii=" << ind << ", rr=" << g.work(res[0], nnz(), false)
+      << ", cs=" << g.work(arg[0], dep(0).nnz(), arg_is_ref[0])
       << "; cii!=" << ind << "+" << nz_.size()
       << "; ++cii) *rr++ = ";
     if (has_negative(nz_)) {
-      g << "*cii>=0 ? ss[*cii] : 0;\n";
+      g << "*cii>=0 ? cs[*cii] : 0;\n";
     } else {
-      g << "ss[*cii];\n";
+      g << "cs[*cii];\n";
     }
   }
 
@@ -523,25 +525,44 @@ namespace casadi {
 
   void GetNonzerosSlice::generate(CodeGenerator& g,
                                   const std::vector<casadi_int>& arg,
-                                  const std::vector<casadi_int>& res) const {
-    g.local("rr", "casadi_real", "*");
-    g.local("ss", "casadi_real", "*");
-    g << "for (rr=" << g.work(res[0], nnz()) << ", ss=" << g.work(arg[0], dep(0).nnz())
-      << "+" << s_.start << "; ss!=" << g.work(arg[0], dep(0).nnz()) << "+" << s_.stop
-      << "; ss+=" << s_.step << ") *rr++ = *ss;\n";
+                                  const std::vector<casadi_int>& res,
+                                  const std::vector<bool>& arg_is_ref,
+                                  std::vector<bool>& res_is_ref) const {
+    if (s_.step==1 && arg_is_ref[0]) {
+      if (nnz()==1) {
+        g << g.workel(res[0]) << " = " << g.work(arg[0], nnz(), arg_is_ref[0])
+          << "[" << s_.start << "];\n";
+      } else {
+        // Copy elided version
+        g << g.work(res[0], nnz(), true) << " = "
+          << g.work(arg[0], dep(0).nnz(), true) << "+" << s_.start << ";\n";
+        res_is_ref[0] = true;
+      }
+    } else {
+      g.local("rr", "casadi_real", "*");
+      g.local("cs", "const casadi_real", "*");
+      std::string a0 = g.work(arg[0], dep(0).nnz(), arg_is_ref[0]);
+      g << "for (rr=" << g.work(res[0], nnz(), false) << ", cs=" << a0
+        << "+" << s_.start << "; cs!=" << a0 << "+" << s_.stop
+        << "; cs+=" << s_.step << ") *rr++ = *cs;\n";
+    }
   }
 
   void GetNonzerosSlice2::generate(CodeGenerator& g,
                                     const std::vector<casadi_int>& arg,
-                                    const std::vector<casadi_int>& res) const {
+                                    const std::vector<casadi_int>& res,
+                                    const std::vector<bool>& arg_is_ref,
+                                    std::vector<bool>& res_is_ref) const {
     g.local("rr", "casadi_real", "*");
-    g.local("ss", "casadi_real", "*");
-    g.local("tt", "casadi_real", "*");
-    g << "for (rr=" << g.work(res[0], nnz()) << ", ss=" << g.work(arg[0], dep(0).nnz())
-      << "+" << outer_.start << "; ss!=" << g.work(arg[0], dep(0).nnz()) << "+"
-      << outer_.stop << "; ss+=" << outer_.step << ") "
-      << "for (tt=ss+" << inner_.start << "; tt!=ss+" << inner_.stop
-      << "; tt+=" << inner_.step << ") *rr++ = *tt;\n";
+    g.local("cs", "const casadi_real", "*");
+    g.local("ct", "const casadi_real", "*");
+
+    std::string a0 = g.work(arg[0], dep(0).nnz(), arg_is_ref[0]);
+    g << "for (rr=" << g.work(res[0], nnz(), false) << ", cs="
+      << a0 << "+" << outer_.start << "; cs!=" << a0 << "+"
+      << outer_.stop << "; cs+=" << outer_.step << ") "
+      << "for (ct=cs+" << inner_.start << "; ct!=cs+" << inner_.stop
+      << "; ct+=" << inner_.step << ") *rr++ = *ct;\n";
   }
 
   bool GetNonzerosVector::is_equal(const MXNode* node, casadi_int depth) const {

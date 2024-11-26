@@ -3328,5 +3328,116 @@ class Functiontests(casadiTestCase):
     #self.assertNotEqual(hash(ff),h) # does not pass on Windows, but this test looks unreliable anyway
     self.assertEqual(hash(f2a),hash(f2b))
     
+  def test_copy_elision(self):
+    import casadi as ca
+    
+    for enabled in [False,True]:
+    
+      ca.GlobalOptions.setCopyElisionMinSize(2 if enabled else -1)
+
+      x = ca.MX.sym("x",10)
+
+      a = ca.MX.sym("a",5)
+
+      bs = ca.MX.sym("b",10)
+
+      b = (12*bs).monitor("b")
+      y = 6*x
+
+
+      [s0,s1] = vertsplit(x,[0,7,10])
+      [ss0,ss1] = vertsplit(sin(x),[0,5,10])
+
+      z = y[2:7]+a+b[2:7]
+      z = sum1(z)
+      z2 = vertcat(x,a,b)*9
+
+      f = ca.Function('f',[x,a,bs],[z,z2, x, sqrt(s1), ss0+ss1])
+
+      f.disp(True)
+
+      f.generate('f.c')
+      
+      code = open('f.c','r').read()
+      
+      self.assertEqual("wr3" in code, enabled)
+      
+      lines = """
+  casadi_int i, j, k;
+  casadi_real *rr, w0, *w1=w+2, w2, *w3=w+8, *w4=w+18, *w5=w+28, *w6=w+33, *w7=w+38, *w8=w+43, *w9=w+68;
+  const casadi_real *cr, *cs, *ct, *wr3, *wr4, *wr6, *wr9;
+  /* #0: @0 = 0 */
+  w0 = 0.;
+  /* #1: @1 = ones(1x5) */
+  casadi_fill(w1, 5, 1.);
+  /* #2: @2 = 6 */
+  w2 = 6.;
+  /* #3: @3 = input[0][0] */
+  wr3 = arg[0] ? arg[0] : casadi_zeros;
+  /* #4: @4 = (@2*@3) */
+  for (i=0, rr=w4, cs=wr3; i<10; ++i) (*rr++)  = (w2*(*cs++));
+  /* #5: @5 = @4[2:7] */
+  for (rr=w5, cs=w4+2; cs!=w4+7; cs+=1) *rr++ = *cs;
+  /* #6: @6 = input[1][0] */
+  wr6 = arg[1] ? arg[1] : casadi_zeros;
+  /* #7: @5 = (@5+@6) */
+  for (i=0, rr=w5, cs=wr6; i<5; ++i) (*rr++) += (*cs++);
+  /* #8: @2 = 12 */
+  w2 = 12.;
+  /* #9: @4 = input[2][0] */
+  wr4 = arg[2] ? arg[2] : casadi_zeros;
+  /* #10: @4 = (@2*@4) */
+  for (i=0, rr=w4, cs=wr4; i<10; ++i) (*rr++)  = (w2*(*cs++));
+  /* #11: @4 = monitor(@4, b) */
+  CASADI_PRINTF("b\\n[");
+    for (i=0, cr=w4; i!=10; ++i) {
+        if (i!=0) CASADI_PRINTF(", ");
+        CASADI_PRINTF("%g", *cr++);
+      }
+    CASADI_PRINTF("]\\n");
+  /* #12: @7 = @4[2:7] */
+  for (rr=w7, cs=w4+2; cs!=w4+7; cs+=1) *rr++ = *cs;
+  /* #13: @5 = (@5+@7) */
+  for (i=0, rr=w5, cs=w7; i<5; ++i) (*rr++) += (*cs++);
+  /* #14: @0 = mac(@1,@5,@0) */
+  for (i=0, rr=(&w0); i<1; ++i) for (j=0; j<1; ++j, ++rr) for (k=0, cs=w1+j, ct=w5+i*5; k<5; ++k) *rr += cs[k*1]**ct++;
+  /* #15: output[0][0] = @0 */
+  if (res[0]) res[0][0] = w0;
+  /* #16: @0 = 9 */
+  w0 = 9.;
+  /* #17: @8 = vertcat(@3, @6, @4) */
+  rr=w8;
+  for (i=0, cs=wr3; i<10; ++i) *rr++ = *cs++;
+  for (i=0, cs=wr6; i<5; ++i) *rr++ = *cs++;
+  for (i=0, cs=w4; i<10; ++i) *rr++ = *cs++;
+  /* #18: @8 = (@0*@8) */
+  for (i=0, rr=w8, cs=w8; i<25; ++i) (*rr++)  = (w0*(*cs++));
+  /* #19: output[1][0] = @8 */
+  casadi_copy(w8, 25, res[1]);
+  /* #20: output[2][0] = @3 */
+  casadi_copy(wr3, 10, res[2]);
+  /* #21: {NULL, @9} = vertsplit(@3) */
+  wr9 = wr3+7;
+  /* #22: @9 = sqrt(@9) */
+  for (i=0, rr=w9, cs=wr9; i<3; ++i) *rr++ = sqrt( *cs++ );
+  /* #23: output[3][0] = @9 */
+  casadi_copy(w9, 3, res[3]);
+  /* #24: @3 = sin(@3) */
+  for (i=0, rr=w3, cs=wr3; i<10; ++i) *rr++ = sin( *cs++ );
+  /* #25: {@6, @1} = vertsplit(@3) */
+  casadi_copy(w3, 5, w6);
+  casadi_copy(w3+5, 5, w1);
+  /* #26: @6 = (@6+@1) */
+  for (i=0, rr=w6, cs=w1; i<5; ++i) (*rr++) += (*cs++);
+  /* #27: output[4][0] = @6 */
+  casadi_copy(w6, 5, res[4]);
+  return 0;
+"""
+      if enabled:
+        print(code)
+        print(lines.strip())
+        self.assertTrue(lines.strip() in code)
+      self.check_codegen(f,inputs=[DM.rand(f.sparsity_in(i)) for i in range(f.n_in())])
+    
 if __name__ == '__main__':
     unittest.main()

@@ -106,26 +106,21 @@ namespace casadi {
 
   void Monitor::generate(CodeGenerator& g,
                           const std::vector<casadi_int>& arg,
-                          const std::vector<casadi_int>& res) const {
+                          const std::vector<casadi_int>& res,
+                          const std::vector<bool>& arg_is_ref,
+                          std::vector<bool>& res_is_ref) const {
     // Print comment
-    g.local("rr", "casadi_real", "*");
+    g.local("cr", "const casadi_real", "*");
     g.local("i", "casadi_int");
     g << g.printf(comment_ + "\\n[") << "\n"
-      << "  for (i=0, rr=" << g.work(arg[0], dep(0).nnz())
+      << "  for (i=0, cr=" << g.work(arg[0], dep(0).nnz(), arg_is_ref[0])
       << "; i!=" << nnz() << "; ++i) {\n"
       << "    if (i!=0) " << g.printf(", ") << "\n"
-      << "    " << g.printf("%g", "*rr++") << "\n"
+      << "    " << g.printf("%g", "*cr++") << "\n"
       << "  }\n"
       << "  " << g.printf("]\\n") << "\n";
 
-    // Copy if not inplace
-    if (arg[0]!=res[0]) {
-      if (nnz()==1) {
-        g << g.workel(res[0]) << " = " << g.workel(arg[0]) << ";\n";
-      } else {
-        g << g.copy(g.work(arg[0], nnz()), nnz(), g.work(res[0], nnz())) << "\n";
-      }
-    }
+    generate_copy(g, arg, res, arg_is_ref, res_is_ref, 0);
   }
 
   void Monitor::serialize_body(SerializingStream& s) const {

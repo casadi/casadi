@@ -85,7 +85,9 @@ namespace casadi {
         \identifier{1ox} */
     void generate(CodeGenerator& g,
                           const std::vector<casadi_int>& arg,
-                          const std::vector<casadi_int>& res) const override;
+                          const std::vector<casadi_int>& res,
+                          const std::vector<bool>& arg_is_ref,
+                          std::vector<bool>& res_is_ref) const override;
 
     /** \brief  Print expression
 

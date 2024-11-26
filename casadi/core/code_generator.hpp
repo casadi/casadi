@@ -251,6 +251,9 @@ namespace casadi {
     std::string constant(casadi_int v);
     std::string constant(const std::string& v);
 
+    std::string zeros(casadi_int sz);
+    std::string ones(casadi_int sz);
+
     /** \brief Print an intializer
 
         \identifier{sk} */
@@ -650,7 +653,7 @@ namespace casadi {
                            const std::vector<Sparsity>& sp_out);
 
     /** Get work vector name from index */
-    std::string work(casadi_int n, casadi_int sz) const;
+    std::string work(casadi_int n, casadi_int sz, bool is_ref) const;
 
     /** Get work vector element from index */
     std::string workel(casadi_int n) const;
@@ -691,6 +694,9 @@ namespace casadi {
       bool check_lhs=true, bool check_rhs=true);
     void copy_default(const std::string& arg, std::size_t n, const std::string& res,
       const std::string& def,  bool check_rhs=true);
+
+    // Should we elide a copy?
+    bool elide_copy(casadi_int sz);
 
     /** \brief Create a fill operation
 
@@ -909,6 +915,10 @@ namespace casadi {
     // Indentation
     casadi_int indent_;
     casadi_int current_indent_;
+
+    // Number of zeros/ones
+    casadi_int sz_zeros_;
+    casadi_int sz_ones_;
 
     // Names of exposed functions
     std::vector<std::string> exposed_fname;

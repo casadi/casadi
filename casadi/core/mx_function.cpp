@@ -1185,37 +1185,21 @@ namespace casadi {
     g.init_local("arg1", "arg+" + str(n_in_));
     g.init_local("res1", "res+" + str(n_out_));
 
-    // Declare scalar work vector elements as local variables
-    bool first = true;
-    for (casadi_int i=0; i<workloc_.size()-1; ++i) {
-      casadi_int n=workloc_[i+1]-workloc_[i];
-      if (n==0) continue;
-      if (first) {
-        g << "casadi_real ";
-        first = false;
-      } else {
-        g << ", ";
-      }
-      /* Could use local variables for small work vector elements here, e.g.:
-         ...
-         } else if (n<10) {
-         g << "w" << i << "[" << n << "]";
-         } else {
-         ...
-      */
-      if (!g.codegen_scalars && n==1) {
-        g << "w" << i;
-      } else {
-        g << "*w" << i << "=w+" << workloc_[i];
-      }
-    }
-    if (!first) g << ";\n";
-
     // Operation number (for printing)
     casadi_int k=0;
 
     // Names of operation argument and results
     std::vector<casadi_int> arg, res;
+
+    // State of work vector: reference or not (value types)
+    std::vector<bool> work_is_ref(workloc_.size(), false);
+
+    // State of operation arguments and results: reference or not
+    std::vector<bool> arg_is_ref, res_is_ref;
+
+    // Collect for each work vector element if reference or value needed
+    std::vector<bool> needs_reference(workloc_.size(), false);
+    std::vector<bool> needs_value(workloc_.size(), false);
 
     // Codegen the algorithm
     for (auto&& e : algorithm_) {
@@ -1226,12 +1210,15 @@ namespace casadi {
 
       // Get the names of the operation arguments
       arg.resize(e.arg.size());
+      arg_is_ref.resize(e.arg.size());
       for (casadi_int i=0; i<e.arg.size(); ++i) {
         casadi_int j=e.arg.at(i);
         if (j>=0 && workloc_.at(j)!=workloc_.at(j+1)) {
           arg.at(i) = j;
+          arg_is_ref.at(i) = work_is_ref.at(j);
         } else {
           arg.at(i) = -1;
+          arg_is_ref.at(i) = false;
         }
       }
 
@@ -1246,8 +1233,49 @@ namespace casadi {
         }
       }
 
+      res_is_ref.resize(e.res.size());
+      // By default, don't assume references
+      std::fill(res_is_ref.begin(), res_is_ref.end(), false);
+
       // Generate operation
-      e.data->generate(g, arg, res);
+      e.data->generate(g, arg, res, arg_is_ref, res_is_ref);
+
+      for (casadi_int i=0; i<e.res.size(); ++i) {
+        casadi_int j=e.res.at(i);
+        if (j>=0 && workloc_.at(j)!=workloc_.at(j+1)) {
+          work_is_ref.at(j) = res_is_ref.at(i);
+          if (res_is_ref.at(i)) {
+            needs_reference[j] = true;
+          } else {
+            needs_value[j] = true;
+          }
+        }
+      }
+
+    }
+
+    // Declare scalar work vector elements as local variables
+    for (casadi_int i=0; i<workloc_.size()-1; ++i) {
+      casadi_int n=workloc_[i+1]-workloc_[i];
+      if (n==0) continue;
+      /* Could use local variables for small work vector elements here, e.g.:
+         ...
+         } else if (n<10) {
+         g << "w" << i << "[" << n << "]";
+         } else {
+         ...
+      */
+      if (!g.codegen_scalars && n==1) {
+        g.local("w" + str(i), "casadi_real");
+      } else {
+        if (needs_value[i]) {
+          g.local("w" + str(i), "casadi_real", "*");
+          g.init_local("w" + str(i), "w+" + str(workloc_[i]));
+        }
+        if (needs_reference[i]) {
+          g.local("wr" + str(i), "const casadi_real", "*");
+        }
+      }
     }
   }
 

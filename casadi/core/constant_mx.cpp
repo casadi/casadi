@@ -128,12 +128,19 @@ namespace casadi {
 
   void ConstantDM::generate(CodeGenerator& g,
                             const std::vector<casadi_int>& arg,
-                            const std::vector<casadi_int>& res) const {
+                            const std::vector<casadi_int>& res,
+                            const std::vector<bool>& arg_is_ref,
+                            std::vector<bool>& res_is_ref) const {
     // Print the constant
     std::string ind = g.constant(x_.nonzeros());
 
-    // Copy the constant to the work vector
-    g << g.copy(ind, nnz(), g.work(res[0], nnz())) << '\n';
+    if (g.elide_copy(nnz())) {
+      g << g.work(res[0], nnz(), true) << " = " << ind << ";\n";
+      res_is_ref[0] = true;
+    } else {
+      // Copy the constant to the work vector
+      g << g.copy(ind, nnz(), g.work(res[0], nnz(), false)) << '\n';
+    }
   }
 
   bool ConstantMX::__nonzero__() const {
@@ -379,8 +386,15 @@ namespace casadi {
 
   void ConstantFile::generate(CodeGenerator& g,
                             const std::vector<casadi_int>& arg,
-                            const std::vector<casadi_int>& res) const {
-    g << g.copy(g.rom_double(this), nnz(), g.work(res[0], nnz())) << '\n';
+                            const std::vector<casadi_int>& res,
+                            const std::vector<bool>& arg_is_ref,
+                            std::vector<bool>& res_is_ref) const {
+    if (g.elide_copy(nnz())) {
+      g << g.work(res[0], nnz(), true) << " = " << g.rom_double(this) << ";\n";
+      res_is_ref[0] = true;
+    } else {
+      g << g.copy(g.rom_double(this), nnz(), g.work(res[0], nnz(), false)) << '\n';
+    }
   }
 
 } // namespace casadi

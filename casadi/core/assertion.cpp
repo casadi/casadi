@@ -99,17 +99,16 @@ namespace casadi {
 
   void Assertion::generate(CodeGenerator& g,
                             const std::vector<casadi_int>& arg,
-                            const std::vector<casadi_int>& res) const {
+                            const std::vector<casadi_int>& res,
+                            const std::vector<bool>& arg_is_ref,
+                            std::vector<bool>& res_is_ref) const {
     // Generate assertion
     g << "if (" << g.workel(arg[1]) << "!=1.) {\n"
       << "    /* " << fail_message_ << " */\n"
       << "    return 1;\n"
       << "  }\n";
 
-    // Copy if not inplace
-    if (arg[0]!=res[0]) {
-      g << g.copy(g.work(arg[0], nnz()), nnz(), g.work(res[0], nnz())) << '\n';
-    }
+    generate_copy(g, arg, res, arg_is_ref, res_is_ref, 0);
   }
 
   void Assertion::serialize_body(SerializingStream& s) const {

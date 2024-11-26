@@ -28,6 +28,7 @@
 #include "function_internal.hpp"
 #include "convexify.hpp"
 #include <casadi_runtime_str.h>
+#include "global_options.hpp"
 #include <iomanip>
 
 namespace casadi {
@@ -58,6 +59,8 @@ namespace casadi {
 
     avoid_stack_ = false;
     indent_ = 2;
+    sz_zeros_ = 0;
+    sz_ones_ = 0;
 
     // Read options
     for (auto&& e : opts) {
@@ -888,6 +891,18 @@ namespace casadi {
       s << std::endl;
     }
 
+    if (sz_zeros_) {
+      std::vector<double> sz_zeros(sz_zeros_, 0);
+      print_vector(s, "casadi_zeros", std::vector<double>(sz_zeros));
+      s << std::endl;
+    }
+
+    if (sz_ones_) {
+      std::vector<double> sz_ones(sz_ones_, 0);
+      print_vector(s, "casadi_ones", std::vector<double>(sz_ones));
+      s << std::endl;
+    }
+
     // Print file scope double work
     if (!file_scope_double_.empty()) {
       casadi_int i=0;
@@ -922,7 +937,10 @@ namespace casadi {
     s << std::endl;
   }
 
-  std::string CodeGenerator::work(casadi_int n, casadi_int sz) const {
+  std::string CodeGenerator::work(casadi_int n, casadi_int sz, bool is_ref) const {
+    if (is_ref) {
+      return "wr" + str(n);
+    }
     if (n<0 || sz==0) {
       return "0";
     } else if (sz==1 && !this->codegen_scalars) {
@@ -1234,6 +1252,16 @@ namespace casadi {
 
   std::string CodeGenerator::constant(const std::vector<std::string>& v) {
     return shorthand("a" + str(get_constant(v, true)));
+  }
+
+  std::string CodeGenerator::zeros(casadi_int sz) {
+    sz_zeros_ = std::max(sz_zeros_, sz);
+    return shorthand("zeros");
+  }
+
+  std::string CodeGenerator::ones(casadi_int sz) {
+    sz_ones_ = std::max(sz_ones_, sz);
+    return shorthand("ones");
   }
 
   void CodeGenerator::constant_copy(
@@ -1851,6 +1879,11 @@ namespace casadi {
     add_auxiliary(AUX_COPY);
     s << "casadi_copy(" << arg << ", " << n << ", " << res << ");";
     return s.str();
+  }
+
+  bool CodeGenerator::elide_copy(casadi_int sz) {
+    if (casadi::GlobalOptions::copy_elision_min_size==-1) return false;
+    return sz>=casadi::GlobalOptions::copy_elision_min_size;
   }
 
   void CodeGenerator::copy_check(const std::string& arg, size_t n, const std::string& res,

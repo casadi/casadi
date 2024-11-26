@@ -128,11 +128,13 @@ namespace casadi {
 
   void Einstein::generate(CodeGenerator& g,
                           const std::vector<casadi_int>& arg,
-                          const std::vector<casadi_int>& res) const {
+                          const std::vector<casadi_int>& res,
+                          const std::vector<bool>& arg_is_ref,
+                          std::vector<bool>& res_is_ref) const {
 
     // Copy first argument if not inplace
-    if (arg[0]!=res[0]) {
-      g << g.copy(g.work(arg[0], nnz()), nnz(), g.work(res[0], nnz()));
+    if (arg[0]!=res[0] || arg_is_ref[0]) {
+      g << g.copy(g.work(arg[0], nnz(), arg_is_ref[0]), nnz(), g.work(res[0], nnz(), false));
     }
 
     // main loop
@@ -143,9 +145,9 @@ namespace casadi {
     g.local("cr", "const casadi_real", "*");
     g.local("cs", "const casadi_real", "*");
     g.local("rr", "casadi_real", "*");
-    g << "cr = " << g.work(arg[1], dep(1).nnz()) << "+" << strides_a_[0] << ";\n";
-    g << "cs = " << g.work(arg[2], dep(2).nnz()) << "+" << strides_b_[0] << ";\n";
-    g << "rr = " << g.work(res[0], dep(0).nnz()) << "+" << strides_c_[0] << ";\n";
+    g << "cr = " << g.work(arg[1], dep(1).nnz(), arg_is_ref[1]) << "+" << strides_a_[0] << ";\n";
+    g << "cs = " << g.work(arg[2], dep(2).nnz(), arg_is_ref[2]) << "+" << strides_b_[0] << ";\n";
+    g << "rr = " << g.work(res[0], dep(0).nnz(), false) << "+" << strides_c_[0] << ";\n";
 
     // Construct indices
     for (casadi_int j=0; j<iter_dims_.size(); ++j) {

@@ -858,11 +858,14 @@ namespace casadi {
   template<bool Add>
   void SetNonzerosVector<Add>::
   generate(CodeGenerator& g,
-           const std::vector<casadi_int>& arg, const std::vector<casadi_int>& res) const {
+           const std::vector<casadi_int>& arg,
+           const std::vector<casadi_int>& res,
+           const std::vector<bool>& arg_is_ref,
+           std::vector<bool>& res_is_ref) const {
     // Copy first argument if not inplace
-    if (arg[0]!=res[0]) {
-      g << g.copy(g.work(arg[0], this->dep(0).nnz()), this->nnz(),
-                          g.work(res[0], this->nnz())) << '\n';
+    if (arg[0]!=res[0] || arg_is_ref[0]) {
+      g << g.copy(g.work(arg[0], this->dep(0).nnz(), arg_is_ref[0]), this->nnz(),
+                          g.work(res[0], this->nnz(), false)) << '\n';
     }
 
     // Condegen the indices
@@ -871,57 +874,63 @@ namespace casadi {
     // Perform the operation inplace
     g.local("cii", "const casadi_int", "*");
     g.local("rr", "casadi_real", "*");
-    g.local("ss", "casadi_real", "*");
-    g << "for (cii=" << ind << ", rr=" << g.work(res[0], this->nnz()) << ", "
-      << "ss=" << g.work(arg[1], this->dep(1).nnz()) << "; cii!=" << ind
-      << "+" << this->nz_.size() << "; ++cii, ++ss) ";
+    g.local("cs", "const casadi_real", "*");
+    g << "for (cii=" << ind << ", rr=" << g.work(res[0], this->nnz(), false) << ", "
+      << "cs=" << g.work(arg[1], this->dep(1).nnz(), arg_is_ref[1]) << "; cii!=" << ind
+      << "+" << this->nz_.size() << "; ++cii, ++cs) ";
     if (has_negative(this->nz_)) {
       g << "if (*cii>=0) ";
     }
-    g << "rr[*cii] " << (Add?"+=":"=") << " *ss;\n";
+    g << "rr[*cii] " << (Add?"+=":"=") << " *cs;\n";
   }
 
   template<bool Add>
   void SetNonzerosSlice<Add>::
   generate(CodeGenerator& g,
-           const std::vector<casadi_int>& arg, const std::vector<casadi_int>& res) const {
+           const std::vector<casadi_int>& arg,
+           const std::vector<casadi_int>& res,
+           const std::vector<bool>& arg_is_ref,
+           std::vector<bool>& res_is_ref) const {
     // Copy first argument if not inplace
-    if (arg[0]!=res[0]) {
-      g << g.copy(g.work(arg[0], this->dep(0).nnz()), this->nnz(),
-                          g.work(res[0], this->nnz())) << '\n';
+    if (arg[0]!=res[0] || arg_is_ref[0]) {
+      g << g.copy(g.work(arg[0], this->dep(0).nnz(), arg_is_ref[0]), this->nnz(),
+                          g.work(res[0], this->nnz(), false)) << '\n';
     }
 
     // Perform the operation inplace
     g.local("rr", "casadi_real", "*");
-    g.local("ss", "casadi_real", "*");
-    g << "for (rr=" << g.work(res[0], this->nnz()) << "+" << s_.start << ", ss="
-      << g.work(arg[1], this->dep(1).nnz()) << "; rr!="
-      << g.work(res[0], this->nnz()) << "+" << s_.stop
+    g.local("cs", "const casadi_real", "*");
+    g << "for (rr=" << g.work(res[0], this->nnz(), false) << "+" << s_.start << ", cs="
+      << g.work(arg[1], this->dep(1).nnz(), arg_is_ref[1]) << "; rr!="
+      << g.work(res[0], this->nnz(), false) << "+" << s_.stop
       << "; rr+=" << s_.step << ")"
-      << " *rr " << (Add?"+=":"=") << " *ss++;\n";
+      << " *rr " << (Add?"+=":"=") << " *cs++;\n";
   }
 
   template<bool Add>
   void SetNonzerosSlice2<Add>::
   generate(CodeGenerator& g,
-           const std::vector<casadi_int>& arg, const std::vector<casadi_int>& res) const {
+           const std::vector<casadi_int>& arg,
+           const std::vector<casadi_int>& res,
+           const std::vector<bool>& arg_is_ref,
+           std::vector<bool>& res_is_ref) const {
     // Copy first argument if not inplace
-    if (arg[0]!=res[0]) {
-      g << g.copy(g.work(arg[0], this->dep(0).nnz()), this->nnz(),
-                          g.work(res[0], this->nnz())) << '\n';
+    if (arg[0]!=res[0] || arg_is_ref[0]) {
+      g << g.copy(g.work(arg[0], this->dep(0).nnz(), arg_is_ref[0]), this->nnz(),
+                          g.work(res[0], this->nnz(), false)) << '\n';
     }
 
     // Perform the operation inplace
     g.local("rr", "casadi_real", "*");
-    g.local("ss", "casadi_real", "*");
+    g.local("cs", "const casadi_real", "*");
     g.local("tt", "casadi_real", "*");
-    g << "for (rr=" << g.work(res[0], this->nnz()) << "+" << outer_.start
-      << ", ss=" << g.work(arg[1], this->dep(1).nnz()) << "; rr!="
-      << g.work(res[0], this->nnz()) << "+" << outer_.stop
+    g << "for (rr=" << g.work(res[0], this->nnz(), false) << "+" << outer_.start
+      << ", cs=" << g.work(arg[1], this->dep(1).nnz(), arg_is_ref[1]) << "; rr!="
+      << g.work(res[0], this->nnz(), false) << "+" << outer_.stop
       << "; rr+=" << outer_.step << ")"
       << " for (tt=rr+" << inner_.start << "; tt!=rr+" << inner_.stop
       << "; tt+=" << inner_.step << ")"
-      << " *tt " << (Add?"+=":"=") << " *ss++;\n";
+      << " *tt " << (Add?"+=":"=") << " *cs++;\n";
   }
 
   template<bool Add>

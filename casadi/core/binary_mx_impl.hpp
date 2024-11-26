@@ -121,7 +121,8 @@ namespace casadi {
   template<bool ScX, bool ScY>
   void BinaryMX<ScX, ScY>::
   generate(CodeGenerator& g,
-           const std::vector<casadi_int>& arg, const std::vector<casadi_int>& res) const {
+           const std::vector<casadi_int>& arg, const std::vector<casadi_int>& res,
+           const std::vector<bool>& arg_is_ref, std::vector<bool>& res_is_ref) const {
     // Quick return if nothing to do
     if (nnz()==0) return;
 
@@ -132,7 +133,7 @@ namespace casadi {
     case OP_SUB:
     case OP_MUL:
     case OP_DIV:
-      inplace = res[0]==arg[0];
+      inplace = res[0]==arg[0] && !arg_is_ref[0];
       break;
     default:
       inplace = false;
@@ -154,13 +155,13 @@ namespace casadi {
       // Iterate over result
       g.local("rr", "casadi_real", "*");
       g.local("i", "casadi_int");
-      g << "for (i=0, " << "rr=" << g.work(res[0], nnz());
+      g << "for (i=0, " << "rr=" << g.work(res[0], nnz(), false);
       r = "(*rr++)";
 
       // Iterate over first argument?
       if (!ScX && !inplace) {
         g.local("cr", "const casadi_real", "*");
-        g << ", cr=" << g.work(arg[0], dep(0).nnz());
+        g << ", cr=" << g.work(arg[0], dep(0).nnz(), arg_is_ref[0]);
         if (op_==OP_OR || op_==OP_AND) {
           // Avoid short-circuiting with side effects
           x = "cr[i]";
@@ -173,7 +174,7 @@ namespace casadi {
       // Iterate over second argument?
       if (!ScY) {
         g.local("cs", "const casadi_real", "*");
-        g << ", cs=" << g.work(arg[1], dep(1).nnz());
+        g << ", cs=" << g.work(arg[1], dep(1).nnz(), arg_is_ref[1]);
         if (op_==OP_OR || op_==OP_AND || op_==OP_IF_ELSE_ZERO) {
           // Avoid short-circuiting with side effects
           y = "cs[i]";

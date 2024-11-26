@@ -122,13 +122,16 @@ namespace casadi {
         \identifier{1ym} */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
-                  const std::vector<casadi_int>& res) const override;
+                  const std::vector<casadi_int>& res,
+                  const std::vector<bool>& arg_is_ref,
+                  std::vector<bool>& res_is_ref) const override;
 
     /** \brief Generate code for the operation
 
         \identifier{1yn} */
     virtual std::string generate(CodeGenerator& g,
-                  const std::vector<casadi_int>& arg) const = 0;
+                  const std::vector<casadi_int>& arg,
+                  const std::vector<bool>& arg_is_ref) const = 0;
 
     /** \brief Deserialize without type information
 
@@ -195,7 +198,8 @@ namespace casadi {
 
         \identifier{1ys} */
     std::string generate(CodeGenerator& g,
-                  const std::vector<casadi_int>& arg) const override;
+                  const std::vector<casadi_int>& arg,
+                  const std::vector<bool>& arg_is_ref) const override;
 
     /** \brief  Print expression
 
@@ -270,7 +274,8 @@ namespace casadi {
 
         \identifier{1yy} */
     std::string generate(CodeGenerator& g,
-                  const std::vector<casadi_int>& arg) const override;
+                  const std::vector<casadi_int>& arg,
+                  const std::vector<bool>& arg_is_ref) const override;
 
     /** \brief  Print expression
 
