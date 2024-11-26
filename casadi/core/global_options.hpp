@@ -92,7 +92,12 @@ namespace casadi {
       static void setMaxNumDir(casadi_int ndir) { max_num_dir=ndir; }
       static casadi_int getMaxNumDir() { return max_num_dir; }
 
-      static void setCopyElisionMinSize(casadi_int sz) { copy_elision_min_size=sz; }
+      static void setCopyElisionMinSize(casadi_int sz) {
+        copy_elision_min_size=sz;
+        if (copy_elision_min_size!=-1 && copy_elision_min_size<2) {
+          copy_elision_min_size = 2;
+        }
+      }
       static casadi_int getCopyElisionMinSize() { return copy_elision_min_size; }
 
   };

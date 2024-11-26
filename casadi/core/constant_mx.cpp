@@ -389,7 +389,9 @@ namespace casadi {
                             const std::vector<casadi_int>& res,
                             const std::vector<bool>& arg_is_ref,
                             std::vector<bool>& res_is_ref) const {
-    if (g.elide_copy(nnz())) {
+    if (nnz()==1) {
+      g << g.workel(res[0]) << " = " << g.rom_double(this) << "[0];\n";
+    } else if (g.elide_copy(nnz())) {
       g << g.work(res[0], nnz(), true) << " = " << g.rom_double(this) << ";\n";
       res_is_ref[0] = true;
     } else {
