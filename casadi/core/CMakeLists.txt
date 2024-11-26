@@ -83,6 +83,7 @@ set(CASADI_PUBLIC
   expm.hpp
   code_generator.hpp
   importer.hpp
+  blazing_spline.hpp
 
   # MISC useful stuff
   integration_tools.hpp
@@ -207,6 +208,7 @@ set(CASADI_INTERNAL
   mapsum.hpp              mapsum.cpp
   finite_differences.hpp  finite_differences.cpp
   importer.cpp            importer_internal.hpp importer_internal.cpp
+  blazing_spline.cpp blazing_spline_impl.hpp
 
   # MISC useful stuff
   integration_tools.cpp

@@ -77,7 +77,12 @@ set(RUNTIME_SRC
   casadi_oracle_callback.hpp
   casadi_ocp_block.hpp
   casadi_scaled_copy.hpp
+  casadi_blazing_de_boor.hpp
+  casadi_blazing_1d_boor_eval.hpp
+  casadi_blazing_2d_boor_eval.hpp
+  casadi_blazing_3d_boor_eval.hpp
 )
+
 set(CASADI_RUNTIME_SRC "${RUNTIME_SRC}" PARENT_SCOPE)
 
 set(EXTRA_CASADI_CXX_FLAGS "${EXTRA_CASADI_CXX_FLAGS} -Wno-conversion")

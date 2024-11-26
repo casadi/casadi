@@ -43,6 +43,7 @@
 #include "integrator_impl.hpp"
 #include "external_impl.hpp"
 #include "fmu_function.hpp"
+#include "blazing_spline_impl.hpp"
 
 #include <cctype>
 #include <typeinfo>
@@ -4098,6 +4099,7 @@ namespace casadi {
     {"External", External::deserialize},
     {"Conic", Conic::deserialize},
     {"FmuFunction", FmuFunction::deserialize},
+    {"BlazingSplineFunction", BlazingSplineFunction::deserialize}
   };
 
 } // namespace casadi

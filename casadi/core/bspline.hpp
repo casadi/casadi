@@ -59,6 +59,16 @@ namespace casadi {
     static casadi_int get_coeff_size(casadi_int m, const std::vector<casadi_int>& offset,
       const std::vector<casadi_int>& degree);
 
+    template<class M>
+    static M derivative_coeff(casadi_int i,
+        const std::vector<double>& knots,
+        const std::vector<casadi_int>& offset,
+        const std::vector<casadi_int>& degree,
+        const std::vector<casadi_int>& coeffs_dims,
+        const M& coeffs,
+        std::vector< std::vector<double> >& new_knots,
+        std::vector<casadi_int>& new_degree);
+
     std::vector<double> knots_;
     std::vector<casadi_int> offset_;
     std::vector<casadi_int> degree_;
@@ -142,9 +152,6 @@ namespace casadi {
 
         \identifier{1yo} */
     static MXNode* deserialize(DeserializingStream& s);
-
-    template<class M>
-    M derivative_coeff(casadi_int i, const M& coeffs) const;
 
     template<class T>
     MX jac(const MX& x, const T& coeffs) const;

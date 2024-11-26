@@ -665,7 +665,11 @@ namespace casadi {
       AUX_ORACLE_CALLBACK,
       AUX_OCP_BLOCK,
       AUX_ORACLE,
-      AUX_SCALED_COPY
+      AUX_SCALED_COPY,
+      AUX_BLAZING_DE_BOOR,
+      AUX_BLAZING_1D_BOOR_EVAL,
+      AUX_BLAZING_2D_BOOR_EVAL,
+      AUX_BLAZING_3D_BOOR_EVAL
     };
 
     /** \brief Add a built-in auxiliary function

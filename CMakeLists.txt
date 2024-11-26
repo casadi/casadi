@@ -1781,6 +1781,7 @@ add_feature_info(alpaqa-interface WITH_ALPAQA "Interface to the NLP solver Alpaq
 
 
 if(WITH_BUILD_SIMDE)
+  add_feature_info(simde-sourcebuild ON "Build Simde (BUILD_SIMDE_VERSION=${BUILD_SIMDE_VERSION}) from downloaded source.")
   ExternalProject_Add(simde-external
       GIT_REPOSITORY ${BUILD_SIMDE_GIT_REPO}
       GIT_SHALLOW ${BUILD_SIMDE_GIT_SHALLOW}
