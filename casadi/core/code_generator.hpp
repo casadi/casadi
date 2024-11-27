@@ -34,6 +34,29 @@
 
 namespace casadi {
 
+
+// Traits class to handle different types in initializer
+template <typename T>
+struct CodegenTraits {
+  static void format(std::ostream& s, const T& value) {
+    s << value;
+  }
+};
+
+template <>
+struct CodegenTraits<char> {
+  static void format(std::ostream& s, const char& value) {
+    s << size_t(value);
+  }
+};
+
+template <>
+struct CodegenTraits<std::string> {
+  static void format(std::ostream& s, const std::string& value) {
+    s << "\"" << value << "\"";
+  }
+};
+
   /** \brief Helper class for C code generation
 
       \author Joel Andersson
@@ -254,13 +277,31 @@ namespace casadi {
     std::string zeros(casadi_int sz);
     std::string ones(casadi_int sz);
 
-    /** \brief Print an intializer
+    /** \brief Print an initializer
 
         \identifier{sk} */
-    std::string initializer(const std::vector<double>& v);
-    std::string initializer(const std::vector<casadi_int>& v);
-    std::string initializer(const std::vector<char>& v);
-    std::string initializer(const std::vector<std::string>& v);
+    template <typename T>
+    std::string initializer(const std::vector<T>& v) const {
+        std::stringstream s;
+        if (v.size() > max_initializer_elements_per_line) {
+            s << "\n  ";
+        }
+
+        s << "{";
+        for (casadi_int i = 0; i < v.size(); ++i) {
+            if (i != 0) {
+                if (max_initializer_elements_per_line > 1 &&
+                    i % max_initializer_elements_per_line == 0) {
+                    s << ",\n  ";
+                } else {
+                    s << ", ";
+                }
+            }
+            CodegenTraits<T>::format(s, v[i]);
+        }
+        s << "}";
+        return s.str();
+    }
 
     /** \brief Sanitize source files for codegen
 
@@ -895,6 +936,9 @@ namespace casadi {
 
     // Maximum number of declarations per line
     casadi_int max_declarations_per_line;
+
+    // Maximum number of initializer elements per line
+    casadi_int max_initializer_elements_per_line;
 
     // Prefix symbols in DLLs?
     std::string dll_export, dll_import;

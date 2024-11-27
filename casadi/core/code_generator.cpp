@@ -56,6 +56,7 @@ namespace casadi {
     bool prefix_set = false;
     this->prefix = "";
     this->max_declarations_per_line = 12;
+    this->max_initializer_elements_per_line = 8;
 
     avoid_stack_ = false;
     indent_ = 2;
@@ -112,6 +113,10 @@ namespace casadi {
         this->max_declarations_per_line = e.second;
         casadi_assert(this->max_declarations_per_line>=0,
           "Option max_declarations_per_line must be >=0");
+      } else if (e.first=="max_initializer_elements_per_line") {
+        this->max_initializer_elements_per_line = e.second;
+        casadi_assert(this->max_initializer_elements_per_line>=0,
+          "Option max_initializer_elements_per_line must be >=0");
       } else {
         casadi_error("Unrecognized option: " + str(e.first));
       }
@@ -678,8 +683,8 @@ namespace casadi {
       << "  int_T ii, jj, row, col, nnz_col, ind_start_row_index, offset = 0, jj_total = 0;\n"
       << "  const int_T* sp;\n\n"
       << "  /* Allocate buffers for casadi input and output and simulink output */\n"
-      << "  " + CodeGenerator::array("real_T", "w", f->sz_w()+f->nnz_out())
-      << "  " + CodeGenerator::array("int_T", "iw", f->sz_iw())
+      << "  " + array("real_T", "w", f->sz_w()+f->nnz_out())
+      << "  " + array("int_T", "iw", f->sz_iw())
       << "  const real_T* arg[" << f->sz_arg() <<"] = {0};\n"
       << "  real_T* res[" << f->sz_res() << "] = {0};\n"
       << "  real_T* y[" << f->n_out_ << "] = {0};\n\n"
@@ -1825,50 +1830,6 @@ namespace casadi {
         s.flags(fmtfl); // reset current format flags
       }
     }
-    return s.str();
-  }
-
-  std::string CodeGenerator::initializer(const std::vector<double>& v) {
-    std::stringstream s;
-    s << "{";
-    for (casadi_int i=0; i<v.size(); ++i) {
-      if (i!=0) s << ", ";
-      s << constant(v[i]);
-    }
-    s << "}";
-    return s.str();
-  }
-
-  std::string CodeGenerator::initializer(const std::vector<casadi_int>& v) {
-    std::stringstream s;
-    s << "{";
-    for (casadi_int i=0; i<v.size(); ++i) {
-      if (i!=0) s << ", ";
-      s << v[i];
-    }
-    s << "}";
-    return s.str();
-  }
-
-  std::string CodeGenerator::initializer(const std::vector<char>& v) {
-    std::stringstream s;
-    s << "{";
-    for (casadi_int i=0; i<v.size(); ++i) {
-      if (i!=0) s << ", ";
-      s << size_t(v[i]);
-    }
-    s << "}";
-    return s.str();
-  }
-
-  std::string CodeGenerator::initializer(const std::vector<std::string>& v) {
-    std::stringstream s;
-    s << "{";
-    for (casadi_int i=0; i<v.size(); ++i) {
-      if (i!=0) s << ", ";
-      s << "\"" << v[i] << "\"";
-    }
-    s << "}";
     return s.str();
   }
 
