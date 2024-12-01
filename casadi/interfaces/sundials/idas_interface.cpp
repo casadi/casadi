@@ -857,7 +857,10 @@ int IdasInterface::psetupF(double t, N_Vector xz, N_Vector xzdot, N_Vector rr,
     }
 
     // Factorize the linear system
-    if (s.linsolF_.nfact(m->jacF, m->mem_linsolF)) return 1;
+    if (s.linsolF_.nfact(m->jacF, m->mem_linsolF)) {
+      uerr() << "Failed to factorize shifted Jacobian (system may be singular)" << std::endl;
+      return 1;
+    }
     m->cj_last = cj;
 
     return 0;
