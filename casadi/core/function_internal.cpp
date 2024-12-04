@@ -2458,19 +2458,15 @@ namespace casadi {
     // Codegen sparsities
     codegen_sparsities(g);
 
-    // Determine work vector size
-    casadi_int sz_w_codegen = sz_w();
-    if (is_a("SXFunction", true) && !g.avoid_stack()) sz_w_codegen = 0;
-
     // Function that returns work vector lengths
     g << g.declare(
         "int " + name_ + "_work(casadi_int *sz_arg, casadi_int* sz_res, "
         "casadi_int *sz_iw, casadi_int *sz_w)")
       << " {\n"
-      << "if (sz_arg) *sz_arg = " << sz_arg() << ";\n"
-      << "if (sz_res) *sz_res = " << sz_res() << ";\n"
-      << "if (sz_iw) *sz_iw = " << sz_iw() << ";\n"
-      << "if (sz_w) *sz_w = " << sz_w_codegen << ";\n"
+      << "if (sz_arg) *sz_arg = " << codegen_sz_arg(g) << ";\n"
+      << "if (sz_res) *sz_res = " << codegen_sz_res(g) << ";\n"
+      << "if (sz_iw) *sz_iw = " << codegen_sz_iw(g) << ";\n"
+      << "if (sz_w) *sz_w = " << codegen_sz_w(g) << ";\n"
       << "return 0;\n"
       << "}\n\n";
 
@@ -2479,20 +2475,20 @@ namespace casadi {
         "int " + name_ + "_work_bytes(casadi_int *sz_arg, casadi_int* sz_res, "
         "casadi_int *sz_iw, casadi_int *sz_w)")
       << " {\n"
-      << "if (sz_arg) *sz_arg = " << sz_arg() << "*sizeof(const casadi_real*);\n"
-      << "if (sz_res) *sz_res = " << sz_res() << "*sizeof(casadi_real*);\n"
-      << "if (sz_iw) *sz_iw = " << sz_iw() << "*sizeof(casadi_int);\n"
-      << "if (sz_w) *sz_w = " << sz_w_codegen << "*sizeof(casadi_real);\n"
+      << "if (sz_arg) *sz_arg = " << codegen_sz_arg(g) << "*sizeof(const casadi_real*);\n"
+      << "if (sz_res) *sz_res = " << codegen_sz_res(g) << "*sizeof(casadi_real*);\n"
+      << "if (sz_iw) *sz_iw = " << codegen_sz_iw(g) << "*sizeof(casadi_int);\n"
+      << "if (sz_w) *sz_w = " << codegen_sz_w(g) << "*sizeof(casadi_real);\n"
       << "return 0;\n"
       << "}\n\n";
 
     // Also add to header file to allow getting
      if (g.with_header) {
       g.header
-        << "#define " << name_ << "_SZ_ARG " << sz_arg() << "\n"
-        << "#define " << name_ << "_SZ_RES " << sz_res() << "\n"
-        << "#define " << name_ << "_SZ_IW " << sz_iw() << "\n"
-        << "#define " << name_ << "_SZ_W " << sz_w() << "\n";
+        << "#define " << name_ << "_SZ_ARG " << codegen_sz_arg(g) << "\n"
+        << "#define " << name_ << "_SZ_RES " << codegen_sz_res(g) << "\n"
+        << "#define " << name_ << "_SZ_IW " << codegen_sz_iw(g) << "\n"
+        << "#define " << name_ << "_SZ_W " << codegen_sz_w(g) << "\n";
      }
 
     // Which inputs are differentiable
@@ -2802,6 +2798,19 @@ namespace casadi {
     sz_res = this->sz_res();
     sz_iw = this->sz_iw();
     sz_w = this->sz_w();
+  }
+
+  size_t FunctionInternal::codegen_sz_arg(const CodeGenerator& g) const {
+    return sz_arg();
+  }
+  size_t FunctionInternal::codegen_sz_res(const CodeGenerator& g) const {
+    return sz_res();
+  }
+  size_t FunctionInternal::codegen_sz_iw(const CodeGenerator& g) const {
+    return sz_iw();
+  }
+  size_t FunctionInternal::codegen_sz_w(const CodeGenerator& g) const {
+    return sz_w();
   }
 
   void FunctionInternal::alloc_arg(size_t sz_arg, bool persistent) {
