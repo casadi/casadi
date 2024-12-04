@@ -239,6 +239,32 @@ class CASADI_EXPORT SXFunction :
         \identifier{v0} */
   void serialize_body(SerializingStream &s) const override;
 
+  // call node information that won't fit into AlgEl
+  struct Node {
+    Node(const Function& fun);
+    Function f;
+    // Work vector indices of the arguments (cfr AlgEl::arg)
+    std::vector<int> dep;
+    // Work vector indices of the results (cfr AlgEl::res)
+    std::vector<int> res;
+
+    // Following fields are redundant but will increase eval speed
+    casadi_int n_dep;
+    casadi_int n_res;
+    casadi_int f_n_in;
+    casadi_int f_n_out;
+    std::vector<int> f_nnz_in;
+    std::vector<int> f_nnz_out;
+  };
+
+  /// Metadata for call nodes
+  struct CallInfo {
+    // Maximum memory requirements across all call nodes
+    size_t sz_arg = 0, sz_res = 0, sz_iw = 0, sz_w = 0;
+    size_t sz_w_arg = 0, sz_w_res = 0;
+    std::vector<Node> nodes;
+  } call_;
+
     /** \brief Deserialize without type information
 
         \identifier{v1} */
@@ -310,6 +336,16 @@ class CASADI_EXPORT SXFunction :
   bool live_variables_;
 
 protected:
+  template<typename T>
+  void call_fwd(const AlgEl& e, const T** arg, T** res, casadi_int* iw, T* w) const;
+
+  template<typename T>
+  void call_rev(const AlgEl& e, T** arg, T** res, casadi_int* iw, T* w) const;
+
+  template<typename T, typename CT>
+  void call_setup(const Node& m,
+    CT*** call_arg, T*** call_res, casadi_int** call_iw, T** call_w, T** nz_in, T** nz_out) const;
+
   /** \brief Deserializing constructor
 
       \identifier{vb} */

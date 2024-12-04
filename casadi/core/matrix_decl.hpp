@@ -498,6 +498,7 @@ namespace casadi {
 #endif // SWIG
 
     Matrix<Scalar> printme(const Matrix<Scalar>& y) const;
+    Matrix<Scalar> call_fun(const Function& f) const;
 
     /// Transpose the matrix
     Matrix<Scalar> T() const;

@@ -117,6 +117,8 @@ set(CASADI_INTERNAL
   constant_sx.hpp                                    # A constant SXElem node
   unary_sx.hpp                                       # A unary operation
   binary_sx.hpp                                      # A binary operation
+  output_sx.hpp
+  call_sx.hpp
 
   # More general graph representation with sparse matrix expressions and function evaluations
   mx.cpp                  # Symbolic expression class (matrix-valued atomics)
