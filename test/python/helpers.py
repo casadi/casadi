@@ -697,7 +697,7 @@ class casadiTestCase(unittest.TestCase):
       if opts is None: opts = {}
       return (external(name, libname,opts),libname)
 
-  def check_codegen(self,F,inputs=None, opts=None,std="c89",extralibs="",check_serialize=False,extra_options=None,main=False,main_return_code=0,definitions=None,with_jac_sparsity=False,external_opts=None,with_reverse=False,with_forward=False,extra_include=[],digits=15):
+  def check_codegen(self,F,inputs=None, opts=None,std="c89",extralibs="",check_serialize=False,extra_options=None,main=False,main_return_code=0,definitions=None,with_jac_sparsity=False,external_opts=None,with_reverse=False,with_forward=False,extra_include=[],digits=15,debug_mode=False):
     if not isinstance(main_return_code,list):
         main_return_code = [main_return_code]
     if args.run_slow:
@@ -757,7 +757,10 @@ class casadiTestCase(unittest.TestCase):
         else:
           defs = " ".join(["-D"+d for d in definitions])
           output = "./" + name + (".so" if shared else "")
-          commands = "gcc -pedantic -std={std} -fPIC {shared} -Wall -Werror -Wextra {includedir} -Wno-unknown-pragmas -Wno-long-long -Wno-unused-parameter -O3 {definitions} {name}.c -o {name_out} -L{libdir} -Wl,-rpath,{libdir} -Wl,-rpath,.".format(shared="-shared" if shared else "",std=std,name=name,name_out=name+(".so" if shared else ""),libdir=libdir,includedir=" ".join(["-I" + e for e in includedirs]),definitions=defs) + (" -lm" if not shared else "") + extralibs + extra_options
+          flags = "-O3"
+          if debug_mode:
+            flags = "-O0 -g"
+          commands = "gcc -pedantic -std={std} -fPIC {shared} -Wall -Werror -Wextra {includedir} -Wno-unknown-pragmas -Wno-long-long -Wno-unused-parameter {flags} {definitions} {name}.c -o {name_out} -L{libdir} -Wl,-rpath,{libdir} -Wl,-rpath,.".format(shared="-shared" if shared else "",std=std,name=name,name_out=name+(".so" if shared else ""),libdir=libdir,includedir=" ".join(["-I" + e for e in includedirs]),definitions=defs,flags=flags) + (" -lm" if not shared else "") + extralibs + extra_options
           if sys.platform=="darwin":
             commands+= " -Xlinker -rpath -Xlinker {libdir}".format(libdir=libdir)
             commands+= " -Xlinker -rpath -Xlinker .".format(libdir=libdir)
