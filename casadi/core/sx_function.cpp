@@ -135,6 +135,11 @@ namespace casadi {
     }
   }
 
+  size_t SXFunction::codegen_sz_w(const CodeGenerator& g) const {
+    if (!g.avoid_stack()) return 0;
+    return sz_w();
+  }
+
   void SXFunction::codegen_declarations(CodeGenerator& g) const {
 
     // Make sure that there are no free variables
