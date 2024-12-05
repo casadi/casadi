@@ -47,6 +47,14 @@
 
 namespace casadi {
 
+void FmuFunction::check_mem_count(casadi_int n) const {
+  if (fmu_.can_be_instantiated_only_once_per_process() && n>1) {
+    casadi_error("FMU '" + fmu_.instance_name() + "' [" + fmu_.class_name() + "] "
+      "declares 'canBeInstantiatedOnlyOncePerProcess' to be true. "
+      "Regenerate your FMU with this option set to false.");
+  }
+}
+
 int FmuFunction::init_mem(void* mem) const {
   casadi_assert(mem != 0, "Memory is null");
   // Instantiate base classes

@@ -378,6 +378,7 @@ DaeBuilderInternal::DaeBuilderInternal(const std::string& name, const std::strin
   number_of_event_indicators_ = 0;
   provides_directional_derivatives_ = false;
   provides_adjoint_derivatives_ = false;
+  can_be_instantiated_only_once_per_process_ = false;
   symbolic_ = true;
   start_time_ = nan;
   stop_time_ = nan;
@@ -2704,6 +2705,8 @@ void DaeBuilderInternal::import_model_exchange(const XmlNode& n) {
   provides_adjoint_derivatives_
     = n.attribute<bool>("providesAdjointDerivatives", false);
   model_identifier_ = n.attribute<std::string>("modelIdentifier");
+  can_be_instantiated_only_once_per_process_ =
+    n.attribute<bool>("canBeInstantiatedOnlyOncePerProcess", false);
   // Get list of source files
   if (n.has_child("SourceFiles")) {
     for (const XmlNode& sf : n["SourceFiles"].children) {

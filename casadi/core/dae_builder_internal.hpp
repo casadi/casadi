@@ -451,6 +451,7 @@ protected:
   std::string model_identifier_;
   bool provides_directional_derivatives_;
   bool provides_adjoint_derivatives_;
+  bool can_be_instantiated_only_once_per_process_;
   std::vector<std::string> source_files_;
 
   /// Name of instance

@@ -231,6 +231,14 @@ bool Fmu::provides_adjoint_derivatives() const {
   }
 }
 
+bool Fmu::can_be_instantiated_only_once_per_process() const {
+  try {
+    return (*this)->can_be_instantiated_only_once_per_process_;
+  } catch(std::exception& e) {
+    THROW_ERROR("can_be_instantiated_only_once_per_process", e.what());
+  }
+}
+
 Sparsity Fmu::jac_sparsity(const std::vector<size_t>& osub,
     const std::vector<size_t>& isub) const {
   try {
@@ -440,6 +448,7 @@ void FmuInternal::init(const DaeBuilderInternal* dae) {
   number_of_event_indicators_ = dae->number_of_event_indicators_;
   provides_directional_derivatives_ = dae->provides_directional_derivatives_;
   provides_adjoint_derivatives_ = dae->provides_adjoint_derivatives_;
+  can_be_instantiated_only_once_per_process_ = dae->can_be_instantiated_only_once_per_process_;
 
   // Path to resource directory
   resource_loc_ = "file://" + dae->path_ + "/resources";
@@ -1339,6 +1348,8 @@ void FmuInternal::serialize_body(SerializingStream& s) const {
   s.pack("FmuInternal::number_of_event_indicators", number_of_event_indicators_);
   s.pack("FmuInternal::provides_directional_derivatives", provides_directional_derivatives_);
   s.pack("FmuInternal::provides_adjoint_derivatives", provides_adjoint_derivatives_);
+  s.pack("FmuInternal::can_be_instantiated_only_once_per_process",
+    can_be_instantiated_only_once_per_process_);
 }
 
 FmuInternal::FmuInternal(DeserializingStream& s) {
@@ -1378,6 +1389,8 @@ FmuInternal::FmuInternal(DeserializingStream& s) {
   s.unpack("FmuInternal::number_of_event_indicators", number_of_event_indicators_);
   s.unpack("FmuInternal::provides_directional_derivatives", provides_directional_derivatives_);
   s.unpack("FmuInternal::provides_adjoint_derivatives", provides_adjoint_derivatives_);
+  s.unpack("FmuInternal::can_be_instantiated_only_once_per_process",
+    can_be_instantiated_only_once_per_process_);
 }
 
 FmuInternal* FmuInternal::deserialize(DeserializingStream& s) {

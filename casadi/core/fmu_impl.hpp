@@ -293,6 +293,9 @@ class CASADI_EXPORT FmuInternal : public SharedObjectInternal {
   // Does the FMU declare analytic derivatives support?
   bool provides_directional_derivatives_, provides_adjoint_derivatives_;
 
+  // Does the FMU declare restrictions on instantiation?
+  bool can_be_instantiated_only_once_per_process_;
+
   /// DLL
   Importer li_;
 

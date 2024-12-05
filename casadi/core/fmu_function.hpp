@@ -324,6 +324,12 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
     const Dict& opts) const override;
   ///@}
 
+  /** \brief Check for validatity of memory object count
+  *
+  * Purpose if to allow more helpful error messages
+  */
+  void check_mem_count(casadi_int n) const override;
+
   /** \brief Create memory block
 
       \identifier{yr} */
