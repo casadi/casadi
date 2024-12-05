@@ -166,6 +166,12 @@ namespace casadi {
     /// Memory objects
     void* memory(int ind) const;
 
+    /** \brief Check for validatity of memory object count
+    *
+    * Purpose if to allow more helpful error messages
+    */
+    virtual void check_mem_count(casadi_int n) const { }
+
     /** \brief Create memory block
 
         \identifier{jn} */
