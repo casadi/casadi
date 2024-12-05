@@ -139,6 +139,9 @@ class CASADI_EXPORT Fmu
   /// Does the FMU provide support for adjoint directional derivatives
   bool provides_adjoint_derivatives() const;
 
+  /// Does the FMU declare restrictions on instantiation?
+  bool can_be_instantiated_only_once_per_process() const;
+
   // Get Jacobian sparsity for a subset of inputs and outputs
   Sparsity jac_sparsity(const std::vector<size_t>& osub, const std::vector<size_t>& isub) const;
 
