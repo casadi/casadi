@@ -3558,6 +3558,7 @@ namespace casadi {
     std::lock_guard<std::mutex> lock(mtx_);
 #endif //CASADI_WITH_THREAD
     if (unused_.empty()) {
+      check_mem_count(mem_.size()+1);
       // Allocate a new memory object
       void* m = alloc_mem();
       mem_.push_back(m);
