@@ -187,6 +187,9 @@
 %exception  casadi::CodeGenerator::constant(casadi_int v) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::CodeGenerator::constant(char v) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::CodeGenerator::constant(const std::string &v) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -283,7 +286,7 @@
 %exception  casadi::CodeGenerator::init_local(const std::string &name, const std::string &def) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::CodeGenerator::initializer(const std::vector< T > &v) const {
+%exception  casadi::CodeGenerator::initializer(const std::vector< T > &v) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::CodeGenerator::interpn(const std::string &res, casadi_int ndim, const std::string &grid, const std::string &offset, const std::string &values, const std::string &x, const std::string &lookup_mode, casadi_int m, const std::string &iw, const std::string &w) {
