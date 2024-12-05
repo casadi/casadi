@@ -102,6 +102,15 @@ const std::string& Fmu::name() const {
   }
 }
 
+const std::string& Fmu::instance_name() const {
+  if (is_null()) {
+    static std::string null = "null";
+    return null;
+  } else {
+    return (*this)->instance_name_;
+  }
+}
+
 size_t Fmu::n_in() const {
   try {
     return (*this)->n_in();

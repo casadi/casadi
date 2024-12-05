@@ -80,6 +80,9 @@ class CASADI_EXPORT Fmu
       \identifier{26u} */
   const std::string& name() const;
 
+  /** \brief Name of the FMU */
+  const std::string& instance_name() const;
+
   ///@{
   /// Access functions of the node
   FmuInternal* operator->();
