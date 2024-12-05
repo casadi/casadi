@@ -34,29 +34,6 @@
 
 namespace casadi {
 
-
-// Traits class to handle different types in initializer
-template <typename T>
-struct CodegenTraits {
-  static void format(std::ostream& s, const T& value) {
-    s << value;
-  }
-};
-
-template <>
-struct CodegenTraits<char> {
-  static void format(std::ostream& s, const char& value) {
-    s << size_t(value);
-  }
-};
-
-template <>
-struct CodegenTraits<std::string> {
-  static void format(std::ostream& s, const std::string& value) {
-    s << "\"" << value << "\"";
-  }
-};
-
   /** \brief Helper class for C code generation
 
       \author Joel Andersson
@@ -273,6 +250,7 @@ struct CodegenTraits<std::string> {
     std::string constant(double v);
     std::string constant(casadi_int v);
     std::string constant(const std::string& v);
+    std::string constant(char v);
 
     std::string zeros(casadi_int sz);
     std::string ones(casadi_int sz);
@@ -281,7 +259,7 @@ struct CodegenTraits<std::string> {
 
         \identifier{sk} */
     template <typename T>
-    std::string initializer(const std::vector<T>& v) const {
+    std::string initializer(const std::vector<T>& v) {
         std::stringstream s;
         if (v.size() > max_initializer_elements_per_line) {
             s << "\n  ";
@@ -297,7 +275,7 @@ struct CodegenTraits<std::string> {
                     s << ", ";
                 }
             }
-            CodegenTraits<T>::format(s, v[i]);
+            s << constant(v[i]);
         }
         s << "}";
         return s.str();

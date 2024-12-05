@@ -1807,7 +1807,11 @@ namespace casadi {
   }
 
   std::string CodeGenerator::constant(casadi_int v) {
-    return constant(static_cast<double>(v));
+    return str(v);
+  }
+
+  std::string CodeGenerator::constant(char v) {
+    return constant(static_cast<casadi_int>(v));
   }
   std::string CodeGenerator::constant(double v) {
     std::stringstream s;
