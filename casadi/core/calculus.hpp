@@ -1631,6 +1631,8 @@ case OP_HYPOT:     DerBinaryOperation<OP_HYPOT>::derf(X, Y, F, D);      break;
       CASADI_MATH_BINARY_BUILTIN
       case OP_IF_ELSE_ZERO:
         return 2;
+      case OP_CALL:
+        return -1;
       default:
         return 1;
     }

@@ -242,7 +242,7 @@ namespace casadi {
     /** \brief Avoid stack?
 
         \identifier{si} */
-    bool avoid_stack() { return avoid_stack_;}
+    bool avoid_stack() const { return avoid_stack_;}
 
     /** \brief Print a constant in a lossless but compact manner
 

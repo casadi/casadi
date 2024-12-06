@@ -882,6 +882,8 @@ namespace casadi {
           // Missing simplifications like [x+y]->[twice]
           switch (a.op) {
             CASADI_MATH_FUN_BUILTIN(w[a.i1], w[a.i2], f)
+            default:
+              casadi_error("Not implemented");
           }
 
           std::string key = s.pack(f);
@@ -1351,6 +1353,12 @@ namespace casadi {
     }
 
     return vertcat(ret);
+  }
+
+  template<>
+  SX SX::call_fun(const Function& f) const {
+    std::vector<SXElem> r = SXElem::call_fun(f, nonzeros());
+    return SX(r);
   }
 
   template<>
