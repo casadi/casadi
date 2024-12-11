@@ -395,8 +395,6 @@ fatrop_int casadi_fatrop_eval_BAbt(const double *states_kp1, const double *input
     BLASFEO_DMATEL(res, p->nx[k]+p->nu[k], i) = lbg_k[i]-g_k[i];
   }
 
-  blasfeo_print_dmat(p->nx[k]+p->nu[k]+1, p->nx[k+1], res, 0, 0);
-
   return 0;
 
 }
