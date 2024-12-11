@@ -2946,25 +2946,6 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
       }
     }
   } else {
-    // Outputs
-    if (n.has_child("Outputs")) {
-      for (auto& e : n["Outputs"].children) {
-        // Get index
-        outputs_.push_back(e.attribute<casadi_int>("index", 0) - 1);
-        // Corresponding variable
-        Variable& v = variable(outputs_.back());
-        // Add to y, unless state
-        if (v.der < 0) {
-          y_.push_back(v.index);
-          v.beq = v.v;
-        }
-        // Get dependencies, dependenciesKind
-        v.dependencies = read_dependencies(e);
-        v.dependenciesKind = read_dependencies_kind(e, v.dependencies.size());
-        // Mark interdependencies
-        for (casadi_int d : v.dependencies) variable(d).dependency = true;
-      }
-    }
     // Derivatives
     if (n.has_child("Derivatives")) {
       for (auto& e : n["Derivatives"].children) {
@@ -2977,20 +2958,86 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
         x_.push_back(v.der_of);
         // Make sure der field is consistent
         variable(x_.back()).der = derivatives_.back();
+      }
+    }
+
+    // What if dependencies attributed is missing from Outputs,Derivatives?
+    // Depends on x_ having been populated
+    std::vector<casadi_int> default_dependencies;
+    default_dependencies.insert(default_dependencies.begin(), t_.begin(), t_.end());
+    default_dependencies.insert(default_dependencies.begin(), x_.begin(), x_.end());
+    default_dependencies.insert(default_dependencies.begin(), u_.begin(), u_.end());
+    std::sort(default_dependencies.begin(), default_dependencies.end());
+
+    // Derivatives
+    if (n.has_child("Derivatives")) {
+      // Separate pass for dependencies
+      for (auto& e : n["Derivatives"].children) {
+        casadi_int index = e.attribute<casadi_int>("index", 0)-1;
+
+        // Corresponding variable
+        Variable& v = variable(index);
+
         // Get dependencies
-        v.dependencies = read_dependencies(e);
+        if (e.has_attribute("dependencies")) {
+          v.dependencies = read_dependencies(e);
+        } else {
+          v.dependencies = default_dependencies;
+        }
         v.dependenciesKind = read_dependencies_kind(e, v.dependencies.size());
         // Mark interdependencies
         for (casadi_int d : v.dependencies) variable(d).dependency = true;
       }
     }
+    // Outputs
+    if (n.has_child("Outputs")) {
+      for (auto& e : n["Outputs"].children) {
+        // Get index
+        outputs_.push_back(e.attribute<casadi_int>("index", 0) - 1);
+        // Corresponding variable
+        Variable& v = variable(outputs_.back());
+        // Add to y, unless state
+        if (v.der < 0) {
+          y_.push_back(v.index);
+          v.beq = v.v;
+        }
+        // Get dependencies
+        if (e.has_attribute("dependencies")) {
+          v.dependencies = read_dependencies(e);
+        } else {
+          v.dependencies = default_dependencies;
+        }
+        v.dependenciesKind = read_dependencies_kind(e, v.dependencies.size());
+        // Mark interdependencies
+        for (casadi_int d : v.dependencies) variable(d).dependency = true;
+      }
+    }
+    // What if dependencies is missing from InitialUnknowns?
+    // Depends on x_ having been populated
+    default_dependencies.clear();
+    default_dependencies.insert(default_dependencies.begin(), t_.begin(), t_.end());
+    for (const Variable* v : variables_) {
+      if (v->initial == Initial::EXACT) default_dependencies.push_back(v->index);
+    }
+    default_dependencies.insert(default_dependencies.begin(), u_.begin(), u_.end());
+    std::sort(default_dependencies.begin(), default_dependencies.end());
+
     // Initial unknowns
     if (n.has_child("InitialUnknowns")) {
       for (auto& e : n["InitialUnknowns"].children) {
         // Get index
         initial_unknowns_.push_back(e.attribute<casadi_int>("index", 0) - 1);
+
+        std::vector<casadi_int> dependencies;
         // Get dependencies
-        for (casadi_int d : read_dependencies(e)) variable(d).dependency = true;
+        if (e.has_attribute("dependencies")) {
+          dependencies = read_dependencies(e);
+        } else {
+          dependencies = default_dependencies;
+        }
+
+        // Get dependencies
+        for (casadi_int d : dependencies) variable(d).dependency = true;
       }
     }
   }
