@@ -38349,7 +38349,7 @@ C++ includes: optistack_internal.hpp
 [INTERNAL] ";
 
 %feature("docstring") casadi::null_ptr_on_copy< T >::null_ptr_on_copy(const 
-null_ptr_on_copy< T > &rhs) "
+null_ptr_on_copy &rhs) "
 
 [INTERNAL] ";
 

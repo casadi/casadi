@@ -6322,7 +6322,7 @@
 %exception casadi::null_ptr_on_copy< T >::null_ptr_on_copy() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception casadi::null_ptr_on_copy< T >::null_ptr_on_copy(const null_ptr_on_copy< T > &rhs) {
+%exception casadi::null_ptr_on_copy< T >::null_ptr_on_copy(const null_ptr_on_copy &rhs) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::scoped_checkout< T >::scoped_checkout(const T &proto) {
