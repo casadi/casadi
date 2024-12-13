@@ -296,7 +296,8 @@ namespace casadi {
   }
 
   int Switch::eval_sx(const SXElem** arg, SXElem** res,
-      casadi_int* iw, SXElem* w, void* mem) const {
+      casadi_int* iw, SXElem* w, void* mem,
+      bool always_inline, bool never_inline) const {
     // Input and output buffers
     const SXElem** arg1 = arg + n_in_;
     SXElem** res1 = res + n_out_;

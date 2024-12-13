@@ -147,6 +147,36 @@ namespace casadi {
   }
 
   template<>
+  bool CASADI_EXPORT SX::is_call() const {
+    return scalar().is_call();
+  }
+
+  template<>
+  bool CASADI_EXPORT SX::is_output() const {
+    return scalar().is_output();
+  }
+
+  template<>
+  bool CASADI_EXPORT SX::has_output() const {
+    return scalar().has_output();
+  }
+
+  template<>
+  SX CASADI_EXPORT SX::get_output(casadi_int oind) const {
+    return scalar().get_output(oind);
+  }
+
+  template<>
+  Function CASADI_EXPORT SX::which_function() const {
+    return scalar().which_function();
+  }
+
+  template<>
+  casadi_int CASADI_EXPORT SX::which_output() const {
+    return scalar().which_output();
+  }
+
+  template<>
   bool CASADI_EXPORT SX::is_symbolic() const {
     if (is_dense()) {
       return is_valid_input();
@@ -862,6 +892,8 @@ namespace casadi {
     // Iterator to free variables
     std::vector<SXElem>::const_iterator p_it = ff->free_vars_.begin();
 
+    std::unordered_map<std::string, Function> function_cache;
+
     // Evaluate algorithm
     for (auto&& a : ff->algorithm_) {
       switch (a.op) {
@@ -879,6 +911,61 @@ namespace casadi {
       case OP_PARAMETER:
         w[a.i0] = *p_it++;
         cache[s.pack(w[a.i0])] = w[a.i0];
+        break;
+      case OP_CALL:
+        {
+          const auto& m = ff->call_.el.at(a.i1);
+
+          // Retrieve dependencies from w
+          std::vector<SXElem> deps(m.n_dep);
+          for (casadi_int i=0;i<m.n_dep;++i) deps[i] = w[m.dep[i]];
+
+          // Cache Function
+          std::string key = m.f.serialize();
+          auto itk = function_cache.find(key);
+          if (itk==function_cache.end()) {
+            function_cache[key] = m.f;
+          }
+
+          // Make the call
+          std::vector<SXElem> ret = SXElem::call(function_cache[key], deps);
+
+          SXElem call_node = ret[0].dep(0);
+
+          // Is the call node in cache?
+          key = s.pack(call_node);
+          auto it = cache.find(key);
+          if (it==cache.end()) {
+            // No, add it
+            cache[key] = call_node;
+          } else {
+            // Yes, use it
+            call_node = it->second;
+            // Loop over all results
+            for (casadi_int i=0; i<ret.size(); ++i) {
+              // Create new output nodes
+              ret[i] = call_node.get_output(ret[i].which_output());
+            }
+          }
+
+          // Since get_output() is currently not cached,
+          // do caching here
+          for (casadi_int i=0; i<ret.size(); ++i) {
+            std::string key = s.pack(ret[i]);
+            auto it = cache.find(key);
+            if (it==cache.end()) {
+              // No, add it
+              cache[key] = ret[i];
+            } else {
+              ret[i] = it->second;
+            }
+          }
+
+          // Store results into w
+          for (casadi_int i=0;i<m.n_res;++i) {
+            if (m.res[i]>=0) w[m.res[i]] = ret[i];
+          }
+        }
         break;
       default:
         {
@@ -1360,6 +1447,11 @@ namespace casadi {
     }
 
     return vertcat(ret);
+  }
+
+  template<>
+  std::vector<SXElem> CASADI_EXPORT SX::call(const Function& f, const std::vector<SXElem>& dep) {
+    return SXElem::call(f, dep);
   }
 
   template<>

@@ -65,6 +65,27 @@ template<> inline std::string matrixName<SXElem>() { return "SX"; }
   bool SX::is_symbolic() const;
 
   template<>
+  bool SX::is_call() const;
+
+  template<>
+  std::vector<SXElem> SX::call(const Function& f, const std::vector<SXElem>& dep);
+
+  template<>
+  bool SX::is_output() const;
+
+  template<>
+  bool SX::has_output() const;
+
+  template<>
+  SX SX::get_output(casadi_int oind) const;
+
+  template<>
+  Function SX::which_function() const;
+
+  template<>
+  casadi_int SX::which_output() const;
+
+  template<>
   casadi_int SX::op() const;
 
   template<>

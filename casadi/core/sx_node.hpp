@@ -77,6 +77,9 @@ namespace casadi {
     virtual bool is_nan() const { return false; }
     virtual bool is_inf() const { return false; }
     virtual bool is_minus_inf() const { return false; }
+    virtual bool is_call() const { return false; }
+    virtual bool is_output() const { return false; }
+    virtual bool has_output() const { return false; }
     ///@}
 
     ///@{
@@ -100,6 +103,12 @@ namespace casadi {
         \identifier{9z} */
     virtual casadi_int op() const=0;
 
+    /** \brief  Get called function */
+    virtual Function which_function() const;
+
+    /** \brief  Get function output*/
+    virtual casadi_int which_output() const;
+
     /** \brief Check if two nodes are equivalent up to a given depth
 
         \identifier{a0} */
@@ -109,6 +118,9 @@ namespace casadi {
 
         \identifier{a1} */
     virtual casadi_int n_dep() const { return 0;}
+
+    /** \brief  Get an output */
+    virtual SXElem get_output(casadi_int oind) const;
 
     /** \brief  get the reference of a child
 
@@ -159,6 +171,12 @@ namespace casadi {
 
     // Depth when checking equalities
     static casadi_int eq_depth_;
+
+    /// Get a shared object from the current internal object
+    SXElem shared_from_this();
+
+    /// Get a shared object from the current internal object
+    const SXElem shared_from_this() const;
 
     /** Temporary variables to be used in user algorithms like sorting,
         the user is responsible of making sure that use is thread-safe

@@ -147,6 +147,7 @@ namespace casadi {
         \identifier{10p} */
     static SXElem binary(casadi_int op, const SXElem& x, const SXElem& y);
     static SXElem unary(casadi_int op, const SXElem& x);
+    static std::vector<SXElem> call(const Function& f, const std::vector<SXElem>& deps);
 
     /** \brief Check the truth value of this node
 
@@ -178,6 +179,11 @@ namespace casadi {
     const std::string& name() const;
     casadi_int op() const;
     bool is_op(casadi_int op) const;
+    bool is_call() const;
+    bool is_output() const;
+    bool has_output() const;
+    Function which_function() const;
+    casadi_int which_output() const;
 
     /// Checks if expression does not contain NaN or Inf
     bool is_regular() const;
@@ -203,6 +209,9 @@ namespace casadi {
 
         \identifier{10v} */
     casadi_int n_dep() const;
+
+    /** \brief  Get an output */
+    SXElem get_output(casadi_int oind) const;
 
     /** \brief Returns a number that is unique for a given SXNode.
 

@@ -1184,6 +1184,30 @@ class Functiontests(casadiTestCase):
         if r is not None:
           self.checkarray(m,r)
 
+  def test_1d_bspline_call_fun(self):
+  
+    fs = []
+    for X in [SX,MX]:
+
+        x = X.sym("x")
+        np.random.seed(0)
+
+        d_knots = [list(np.linspace(0,1,5))]
+
+        data = np.random.random([len(e) for e in d_knots])
+        r = np.array(d_knots)
+
+        xyz = np.vstack(list(e.ravel(order='F') for e in r)).ravel(order='F')
+
+        d_flat = data.ravel(order='F')
+
+        LUT = interpolant('name','bspline',d_knots,d_flat)
+
+        f = Function('f',[x],[2*LUT(sin(x))])
+        fs.append(f)
+    self.checkfunction(fs[0],fs[1],inputs=[0.32])
+        
+
   @skip(not scipy_interpolate)
   def test_1d_bspline(self):
     import scipy.interpolate
@@ -2853,12 +2877,19 @@ class Functiontests(casadiTestCase):
         self.assertTrue(f2.n_instructions()<=3)
 
   def test_cse_call(self):
-    x = MX.sym("x",2)
-    f = Function("f",[x],[x**2],["x"],["y"],{"never_inline":True})
+    for X in [SX,MX]:
+        x = X.sym("x")
+        f = Function("f",[x],[x**2],["x"],["y"],{"never_inline":True})
+        fcopy = Function("f",[x],[x**2],["x"],["y"],{"never_inline":True})
 
-    y = cse(vertcat(f(sin(x)),f(sin(x)),f(sin(x))))
-    
-    self.assertTrue("vertcat(@1, @1, @1)" in str(y))
+        y = cse(vertcat(f(sin(x)),fcopy(sin(x)),f(sin(x))))
+        
+        print(y)
+        
+        if X is MX:
+            self.assertTrue("vertcat(@1, @1, @1)" in str(y))
+        else:
+            self.assertTrue("[@1, @1, @1]" in str(y))
 
   @memory_heavy()
   def test_stop_diff(self):

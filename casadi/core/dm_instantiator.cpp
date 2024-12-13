@@ -91,6 +91,12 @@ namespace casadi {
     return e;
   }
 
+  template<>
+  std::vector<double> CASADI_EXPORT DM::
+  call(const Function& f, const std::vector<double>& dep) {
+    casadi_error("Not implemented");
+  }
+
   template<> void CASADI_EXPORT DM::export_code(const std::string& lang,
        std::ostream &stream, const Dict& options) const {
 
@@ -375,7 +381,6 @@ namespace casadi {
       casadi_error("Unknown format '" + format + "'");
     }
   }
-
 
   // Instantiate templates
   template class CASADI_EXPORT casadi_limits<double>;

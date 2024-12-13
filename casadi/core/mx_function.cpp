@@ -683,7 +683,7 @@ namespace casadi {
       }
 
       // non-inlining call is implemented in the base-class
-      if (!should_inline(always_inline, never_inline)) {
+      if (!should_inline(false, always_inline, never_inline)) {
         return FunctionInternal::eval_mx(arg, res, false, true);
       }
 
@@ -1110,7 +1110,16 @@ namespace casadi {
   }
 
   int MXFunction::eval_sx(const SXElem** arg, SXElem** res,
-      casadi_int* iw, SXElem* w, void* mem) const {
+      casadi_int* iw, SXElem* w, void* mem,
+      bool always_inline, bool never_inline) const {
+    always_inline = always_inline || always_inline_;
+    never_inline = never_inline || never_inline_;
+
+    // non-inlining call is implemented in the base-class
+    if (!should_inline(true, always_inline, never_inline)) {
+      return FunctionInternal::eval_sx(arg, res, iw, w, mem, false, true);
+    }
+
     // Work vector and temporaries to hold pointers to operation input and outputs
     std::vector<const SXElem*> argp(sz_arg());
     std::vector<SXElem*> resp(sz_res());
@@ -1440,7 +1449,7 @@ namespace casadi {
     }
   }
 
-  bool MXFunction::should_inline(bool always_inline, bool never_inline) const {
+  bool MXFunction::should_inline(bool with_sx, bool always_inline, bool never_inline) const {
     // If inlining has been specified
     casadi_assert(!(always_inline && never_inline),
       "Inconsistent options for " + definition());
@@ -1450,8 +1459,8 @@ namespace casadi {
     if (never_inline) return false;
     // Functions with free variables must be inlined
     if (has_free()) return true;
-    // No inlining by default
-    return false;
+    // Default inlining only when called with sx
+    return with_sx;
   }
 
   void MXFunction::export_code_body(const std::string& lang,

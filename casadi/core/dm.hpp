@@ -65,6 +65,9 @@ namespace casadi {
   std::vector<DM> DM::
   cse(const std::vector<DM>& e);
 
+  template<>
+  std::vector<double> DM::call(const Function& f, const std::vector<double>& dep);
+
   template<> void DM::export_code(const std::string& lang,
        std::ostream &stream, const Dict& options) const;
 

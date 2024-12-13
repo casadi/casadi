@@ -189,7 +189,7 @@ namespace casadi {
     virtual bool isInput(const std::vector<MatType>& arg) const;
 
     /** Inline calls? */
-    virtual bool should_inline(bool always_inline, bool never_inline) const = 0;
+    virtual bool should_inline(bool with_sx, bool always_inline, bool never_inline) const = 0;
 
     /** \brief Create call to (cached) derivative function, forward mode
 
@@ -1077,7 +1077,7 @@ namespace casadi {
                std::vector<std::vector<MatType> >& fsens,
                bool always_inline, bool never_inline) const {
     casadi_assert(!(always_inline && never_inline), "Inconsistent options");
-    if (!should_inline(always_inline, never_inline)) {
+    if (!should_inline(MatType::type_name()=="SX", always_inline, never_inline)) {
       // The non-inlining version is implemented in the base class
       return FunctionInternal::call_forward(arg, res, fseed, fsens,
                                             always_inline, never_inline);
@@ -1108,7 +1108,7 @@ namespace casadi {
                std::vector<std::vector<MatType> >& asens,
                bool always_inline, bool never_inline) const {
     casadi_assert(!(always_inline && never_inline), "Inconsistent options");
-    if (!should_inline(always_inline, never_inline)) {
+    if (!should_inline(MatType::type_name()=="SX", always_inline, never_inline)) {
       // The non-inlining version is implemented in the base class
       return FunctionInternal::call_reverse(arg, res, aseed, asens,
                                             always_inline, never_inline);

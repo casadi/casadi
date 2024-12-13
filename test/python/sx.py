@@ -1475,7 +1475,144 @@ class SXtests(casadiTestCase):
     self.checkarray(evalf(y),5)
     with self.assertInException("since variables [x] are free"):
       evalf(x)
+  
 
+  def test_call_fun(self):
+
+    A = sparsify(DM([[1,0,1],[0,0,6],[0,8,9]]))
+
+    x = MX.sym("x",3)
+    y = MX.sym("y")
+    z = MX.sym("z")
+    w = mtimes(A*sqrt(z),sin(x*y))
+
+    f = Function('f',[x,y,z],[(x*y*z)[:2],w])
+    print(f)
+
+    x = SX.sym("x",3)
+    y = SX.sym("y")
+    z = SX.sym("z")
+    
+    args = [x/y,10*z,y*z]
+
+    v = f(*args)
+    v2 = f.call(args,False,True)
+    print(v2)
+    print(vcat(v2))
+    
+
+    self.assertTrue(v2[0][0].is_output())
+    self.assertFalse(y.is_output())
+    k = 0
+    for i in range(f.n_out()):
+        for j in range(f.nnz_out(i)):
+            self.assertEqual(v2[i][j].which_output(),k)
+            k+=1
+    callnode = v2[0][0].dep(0)
+    self.assertTrue(callnode.is_call())
+    self.assertFalse(y.is_call())
+    self.assertTrue(callnode.has_output())
+    self.assertFalse(y.has_output())
+    self.assertTrue(callnode.which_function().__hash__()==f.__hash__())
+    
+    self.assertTrue(callnode.n_dep()==5)
+    callnode.dep(4)
+    
+    self.assertTrue("{3}" in str(callnode.get_output(3)))
+    
+    print(cos(mtimes(v2[1],v2[0].T)/y).shape)
+    F2 = Function('F',[x,y,z],[sin(v2[0]*y-args[-1]),cos(mtimes(v2[1],v2[0].T)/y)])
+    
+    with self.assertOutput("f:(i0[3],i1,i2)->(o0[2],o1[3])",[]):
+        print(f)
+    with self.assertOutput("[[@2,@3],[@4,@5,@7]] = f([@2,@3,@4],@5,@6);",[]):
+        F2.disp(True)
+
+    F1 = Function('F',[x,y,z],[sin(v[0]*y-args[-1]),cos(mtimes(v[1],v[0].T)/y)])    
+    for ad_weight in [True,False]:
+        for ad_weight_sp in [True,False]:
+            F2 = Function('F',[x,y,z],[sin(v2[0]*y-args[-1]),cos(mtimes(v2[1],v2[0].T)/y)],{"ad_weight_sp":ad_weight_sp,"ad_weight":ad_weight})
+                    
+            self.checkfunction(F1,F2,inputs=[[0.1,1.7,2.3],1.13,0.11])
+
+            self.check_serialize(F2,inputs=[[0.1,1.7,2.3],1.13,0.11])
+            for avoid_stack in [True,False]:
+                self.check_codegen(F2,inputs=[[0.1,1.7,2.3],1.13,0.11],opts={"avoid_stack":avoid_stack})
+    
+    instr = F2.instructions_sx()
+    check = False
+    for k in range(F2.n_instructions()):
+        op = F2.instruction_id(k)
+        if op==OP_CALL:
+            check = True
+            self.assertTrue(instr[k].is_call())
+            self.assertEqual(F2.instruction_output(k),[2, 3, 4, 5, 7])
+            self.assertEqual(F2.instruction_input(k),[2, 3, 4, 5, 6])
+
+    self.assertTrue(check)
+
+    F2 = Function('F',[x,y,z],[sin(v2[0]*y-args[-1]),cos(mtimes(v2[1],v2[0].T)/y)],{"cse":True})
+    self.checkfunction(F1,F2,inputs=[[0.1,1.7,2.3],1.13,0.11])
+
+    F2 = Function('F',[x,y,z],F2(x,y,z))
+
+    self.checkfunction(F1,F2,inputs=[[0.1,1.7,2.3],1.13,0.11])
+
+    F1 = Function('F',[x,y,z],F1(2*x,3*y,4*z))
+    F2 = Function('F',[x,y,z],F2(2*x,3*y,4*z))
+
+    self.checkfunction(F1,F2,inputs=[[0.1,1.7,2.3],1.13,0.11])
+
+    F1 = Function('F',[x,y,z],F1(x,3*y,4*z))
+    F2 = Function('F',[x,y,z],F2(x,3*y,4*z))
+
+    self.checkfunction(F1,F2,inputs=[[0.1,1.7,2.3],1.13,0.11])
+    
+    
+    F2 = Function('F',[x,y,z],[sin(v2[0]*y-args[-1]),cos(mtimes(v2[1],v2[0].T)[1]/y)])
+    with self.assertOutput("[[@2,@3],[NULL,@4,NULL]] = f([@2,@3,@4],@5,@6);",[]):
+        F2.disp(True)
+
+    F1 = Function('F',[x,y,z],[sin(v[0]*y-args[-1]),cos(mtimes(v[1],v[0].T)[1]/y)])    
+    for ad_weight in [True,False]:
+        for ad_weight_sp in [True,False]:
+            F2 = Function('F',[x,y,z],[sin(v2[0]*y-args[-1]),cos(mtimes(v2[1],v2[0].T)[1]/y)],{"ad_weight_sp":ad_weight_sp,"ad_weight":ad_weight})
+                    
+            self.checkfunction(F1,F2,inputs=[[0.1,1.7,2.3],1.13,0.11])
+
+            self.check_serialize(F2,inputs=[[0.1,1.7,2.3],1.13,0.11])
+            for avoid_stack in [True,False]:
+                self.check_codegen(F2,inputs=[[0.1,1.7,2.3],1.13,0.11],opts={"avoid_stack":avoid_stack})
+    
+    # multiple instances in one graph
+ 
+  def test_call_fun2(self):
+  
+    print("test_call_fun2")
+
+    for X in [SX,MX]:
+    
+        for never_inline in [True, False]:
+            print(X, never_inline)
+            A = sparsify(DM([[1,0,1],[0,0,6],[0,8,9]]))
+
+            x = X.sym("x",3)
+            y = X.sym("y")
+            z = X.sym("z")
+            w = mtimes(A*sqrt(z),sin(x*y))
+            
+            f = Function('fun',[x,y,z],[(x*y*z)[:2],w],{"never_inline":never_inline})
+
+            x = SX.sym("x",3)
+            y = SX.sym("y")
+            z = SX.sym("z")
+            
+            args = [x/y,10*z,y*z]
+            res = f(*args)
+            print(res)
+            self.assertEqual('fun' in str(res), never_inline)
+        
+        
   def test_ufunc(self):
     y = np.sin(casadi.SX.sym('x'))
 

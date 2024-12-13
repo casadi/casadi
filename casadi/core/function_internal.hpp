@@ -369,7 +369,8 @@ namespace casadi {
     /** \brief  Evaluate numerically
 
         \identifier{kb} */
-    int eval_gen(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const;
+    int eval_gen(const double** arg, double** res, casadi_int* iw, double* w, void* mem,
+      bool always_inline, bool never_inline) const;
     virtual int eval(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const;
     ///@}
 
@@ -377,7 +378,7 @@ namespace casadi {
 
         \identifier{kc} */
     virtual int eval_sx(const SXElem** arg, SXElem** res,
-      casadi_int* iw, SXElem* w, void* mem) const;
+      casadi_int* iw, SXElem* w, void* mem, bool always_inline, bool never_inline) const;
 
     /** \brief  Evaluate with symbolic matrices
 
@@ -397,10 +398,12 @@ namespace casadi {
     /** \brief Evaluate a function, overloaded
 
         \identifier{kf} */
-    int eval_gen(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w, void* mem) const {
-      return eval_sx(arg, res, iw, w, mem);
+    int eval_gen(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w, void* mem,
+        bool always_inline, bool never_inline) const {
+      return eval_sx(arg, res, iw, w, mem, always_inline, never_inline);
     }
-    int eval_gen(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, void* mem) const {
+    int eval_gen(const bvec_t** arg, bvec_t** res, casadi_int* iw, bvec_t* w, void* mem,
+        bool always_inline, bool never_inline) const {
       return sp_forward(arg, res, iw, w, mem);
     }
     ///@}
@@ -1592,7 +1595,6 @@ namespace casadi {
   void FunctionInternal::
   call_gen(const std::vector<Matrix<D> >& arg, std::vector<Matrix<D> >& res,
            casadi_int npar, bool always_inline, bool never_inline) const {
-    casadi_assert(!never_inline, "Call-nodes only possible in MX expressions");
     std::vector< Matrix<D> > arg2 = project_arg(arg, npar);
 
     // Which arguments require mapped evaluation
@@ -1625,7 +1627,8 @@ namespace casadi {
     for (casadi_int p=0; p<npar; ++p) {
       // Call memory-less
       if (eval_gen(get_ptr(argp), get_ptr(resp),
-                   get_ptr(iw_tmp), get_ptr(w_tmp), memory(0))) {
+                   get_ptr(iw_tmp), get_ptr(w_tmp), memory(0),
+                   always_inline, never_inline)) {
         if (error_on_fail_) casadi_error("Evaluation failed");
       }
       // Update offsets

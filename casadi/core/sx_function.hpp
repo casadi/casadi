@@ -76,12 +76,11 @@ class CASADI_EXPORT SXFunction :
 
       \identifier{uf} */
   int eval_sx(const SXElem** arg, SXElem** res,
-              casadi_int* iw, SXElem* w, void* mem) const override;
+              casadi_int* iw, SXElem* w, void* mem,
+              bool always_inline, bool never_inline) const override;
 
   /** Inline calls? */
-  bool should_inline(bool always_inline, bool never_inline) const override {
-    return true;
-  }
+  bool should_inline(bool with_sx, bool always_inline, bool never_inline) const override;
 
   /** \brief Calculate forward mode directional derivatives
 
@@ -164,7 +163,10 @@ class CASADI_EXPORT SXFunction :
       \identifier{us} */
   std::vector<casadi_int> instruction_input(casadi_int k) const override {
     auto e = algorithm_.at(k);
-    if (casadi_math<double>::ndeps(e.op)==2 || e.op==OP_INPUT) {
+    if (e.op==OP_CALL) {
+      const ExtendedAlgEl& m = call_.el[e.i1];
+      return vector_static_cast<casadi_int>(m.dep);
+    } else if (casadi_math<double>::ndeps(e.op)==2 || e.op==OP_INPUT) {
       return {e.i1, e.i2};
     } else if (casadi_math<double>::ndeps(e.op)==1) {
       return {e.i1};
@@ -185,7 +187,10 @@ class CASADI_EXPORT SXFunction :
       \identifier{uu} */
   std::vector<casadi_int> instruction_output(casadi_int k) const override {
     auto e = algorithm_.at(k);
-    if (e.op==OP_OUTPUT) {
+    if (e.op==OP_CALL) {
+      const ExtendedAlgEl& m = call_.el[e.i1];
+      return vector_static_cast<casadi_int>(m.res);
+    } else if (e.op==OP_OUTPUT) {
       return {e.i0, e.i2};
     } else {
       return {e.i0};
@@ -238,6 +243,32 @@ class CASADI_EXPORT SXFunction :
 
         \identifier{v0} */
   void serialize_body(SerializingStream &s) const override;
+
+  // call node information that won't fit into AlgEl
+  struct ExtendedAlgEl {
+    ExtendedAlgEl(const Function& fun);
+    Function f;
+    // Work vector indices of the arguments (cfr AlgEl::arg)
+    std::vector<int> dep;
+    // Work vector indices of the results (cfr AlgEl::res)
+    std::vector<int> res;
+
+    // Following fields are redundant but will increase eval speed
+    casadi_int n_dep;
+    casadi_int n_res;
+    casadi_int f_n_in;
+    casadi_int f_n_out;
+    std::vector<int> f_nnz_in;
+    std::vector<int> f_nnz_out;
+  };
+
+  /// Metadata for call nodes
+  struct CallInfo {
+    // Maximum memory requirements across all call nodes
+    size_t sz_arg = 0, sz_res = 0, sz_iw = 0, sz_w = 0;
+    size_t sz_w_arg = 0, sz_w_res = 0;
+    std::vector<ExtendedAlgEl> el;
+  } call_;
 
     /** \brief Deserialize without type information
 
@@ -310,6 +341,16 @@ class CASADI_EXPORT SXFunction :
   bool live_variables_;
 
 protected:
+  template<typename T>
+  void call_fwd(const AlgEl& e, const T** arg, T** res, casadi_int* iw, T* w) const;
+
+  template<typename T>
+  void call_rev(const AlgEl& e, T** arg, T** res, casadi_int* iw, T* w) const;
+
+  template<typename T, typename CT>
+  void call_setup(const ExtendedAlgEl& m,
+    CT*** call_arg, T*** call_res, casadi_int** call_iw, T** call_w, T** nz_in, T** nz_out) const;
+
   /** \brief Deserializing constructor
 
       \identifier{vb} */

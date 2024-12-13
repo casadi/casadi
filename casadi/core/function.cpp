@@ -1492,7 +1492,7 @@ namespace casadi {
       // For consistency check
       casadi_int depth = call_depth_;
 #endif // WITH_EXTRA_CHECKS
-      int ret = (*this)->eval_gen(arg, res, iw, w, memory(mem));
+      int ret = (*this)->eval_gen(arg, res, iw, w, memory(mem), false, false);
 #ifdef WITH_EXTRA_CHECKS
       // Consitency check
       casadi_assert_dev(call_depth_==depth);
@@ -1517,7 +1517,7 @@ namespace casadi {
   int Function::operator()(const SXElem** arg, SXElem** res,
       casadi_int* iw, SXElem* w, int mem) const {
     try {
-      return (*this)->eval_sx(arg, res, iw, w, memory(mem));
+      return (*this)->eval_sx(arg, res, iw, w, memory(mem), false, false);
     } catch(std::exception& e) {
       THROW_ERROR("operator()", e.what());
     }

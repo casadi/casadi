@@ -25,6 +25,7 @@
 
 #include "function_internal.hpp"
 #include "casadi_call.hpp"
+#include "call_sx.hpp"
 #include "casadi_misc.hpp"
 #include "global_options.hpp"
 #include "external.hpp"
@@ -826,7 +827,8 @@ namespace casadi {
   }
 
   int FunctionInternal::
-  eval_gen(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
+  eval_gen(const double** arg, double** res, casadi_int* iw, double* w, void* mem,
+      bool always_inline, bool never_inline) const {
     casadi_int dump_id = (dump_in_ || dump_out_ || dump_) ? get_dump_id() : 0;
     if (dump_in_) dump_in(dump_id, arg);
     if (dump_ && dump_id==0) dump();
@@ -2010,8 +2012,16 @@ namespace casadi {
   }
 
   int FunctionInternal::
-  eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w, void* mem) const {
-    casadi_error("'eval_sx' not defined for " + class_name());
+  eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w, void* mem,
+    bool always_inline, bool never_inline) const {
+
+    always_inline = always_inline || always_inline_;
+    never_inline = never_inline || never_inline_;
+
+    casadi_assert(!always_inline, "'eval_sx' not defined for " + class_name() +
+    " in combination with always_inline true");
+
+    return CallSX::eval_sx(self(), arg, res);
   }
 
   std::string FunctionInternal::diff_prefix(const std::string& prefix) const {

@@ -29,6 +29,8 @@
 #include "binary_sx.hpp"
 #include "constant_sx.hpp"
 #include "symbolic_sx.hpp"
+#include "call_sx.hpp"
+#include "output_sx.hpp"
 
 #include <limits>
 #include <stack>
@@ -57,6 +59,14 @@ namespace casadi {
 
   casadi_int SXNode::to_int() const {
     casadi_error("to_int not defined for " + class_name());
+  }
+
+  Function SXNode::which_function() const {
+    casadi_error("'which_function' not defined for class " + class_name());
+  }
+
+  casadi_int SXNode::which_output() const {
+    casadi_error("'which_output' not defined for class " + class_name());
   }
 
   bool SXNode::is_equal(const SXNode* node, casadi_int depth) const {
@@ -129,14 +139,33 @@ namespace casadi {
       return ss.str();
     }
 
-    // Get expressions for dependencies
-    std::string arg[2];
-    for (casadi_int i=0; i<n_dep(); ++i) {
-      arg[i] = dep(i)->print_compact(nodeind, intermed);
-    }
+    std::string s;
+    if (op()==OP_CALL) {
+      const Function& f = which_function();
+      // Get expressions for dependencies
+      s = which_function().name() + "(";
 
-    // Get expression for this
-    std::string s = print(arg[0], arg[1]);
+      casadi_int k = 0;
+      for (casadi_int i=0; i<f.n_in(); ++i) {
+        if (f.nnz_in(i)>1) s += "[";
+        for (casadi_int j=0; j<f.nnz_in(i); ++j) {
+          s += dep(k++)->print_compact(nodeind, intermed);
+          if (j<f.nnz_in(i)-1) s+=",";
+        }
+        if (f.nnz_in(i)>1) s += "]";
+        if (i<f.n_in()-1) s+=",";
+      }
+      s += ")";
+    } else {
+      // Get expressions for dependencies
+      std::string arg[2];
+      for (casadi_int i=0; i<n_dep(); ++i) {
+        arg[i] = dep(i)->print_compact(nodeind, intermed);
+      }
+
+      // Get expression for this
+      s = print(arg[0], arg[1]);
+    }
 
     // Decide what to do with the expression
     if (ind==0) {
@@ -195,6 +224,11 @@ namespace casadi {
     }
   }
 
+  SXElem SXNode::get_output(casadi_int oind) const {
+    casadi_assert(oind==0, "Output index out of bounds");
+    return shared_from_this();
+  }
+
   casadi_int SXNode::eq_depth_ = 1;
 
   void SXNode::serialize_node(SerializingStream& s) const {
@@ -224,11 +258,20 @@ namespace casadi {
     }
   }
 
+  SXElem SXNode::shared_from_this() {
+    return SXElem(this, false);
+  }
+
+  const SXElem SXNode::shared_from_this() const {
+    return SXElem(const_cast<SXNode*>(this), false);
+  }
 
   // Note: binary/unary operations are omitted here
   std::map<casadi_int, SXNode* (*)(DeserializingStream&)> SXNode::deserialize_map = {
     {OP_PARAMETER, SymbolicSX::deserialize},
-    {OP_CONST, ConstantSX_deserialize}};
+    {OP_CONST, ConstantSX_deserialize},
+    {OP_CALL, CallSX::deserialize},
+    {-1, OutputSX::deserialize}};
 
 
 } // namespace casadi

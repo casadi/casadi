@@ -85,7 +85,8 @@ namespace casadi {
 
         \identifier{1kv} */
     int eval_sx(const SXElem** arg, SXElem** res,
-                casadi_int* iw, SXElem* w, void* mem) const override;
+                casadi_int* iw, SXElem* w, void* mem,
+                bool always_inline, bool never_inline) const override;
 
     ///@{
     /** \brief Generate a function that calculates \a nfwd forward derivatives

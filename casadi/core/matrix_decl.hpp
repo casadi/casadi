@@ -284,6 +284,9 @@ namespace casadi {
                                           const Matrix<Scalar> &x, const Matrix<Scalar> &y);
     static Matrix<Scalar> matrix_matrix(casadi_int op,
                                           const Matrix<Scalar> &x, const Matrix<Scalar> &y);
+    static std::vector< Matrix<Scalar> > call(const Function& f,
+        const std::vector< Matrix<Scalar> > &x);
+    static std::vector< Scalar > call(const Function& f, const std::vector< Scalar > &x);
     ///@}
     /// \endcond
 
@@ -987,6 +990,9 @@ namespace casadi {
         \identifier{19j} */
     Sparsity get_sparsity() const;
 
+    /** \brief  Get an output */
+    Matrix<Scalar> get_output(casadi_int oind) const;
+
     /** \brief Construct a sparse matrix from triplet form
 
      * Default matrix size is max(col) x max(row)
@@ -1107,6 +1113,22 @@ namespace casadi {
 
         \identifier{19v} */
     bool is_constant() const;
+
+    /** \brief Check if function call */
+    bool is_call() const;
+
+    /** \brief  Check if evaluation output */
+    bool is_output() const;
+
+    /** \brief  Check if a multiple output node */
+    bool has_output() const;
+
+    /** \brief Get the index of evaluation output - only valid when is_output() is true
+    */
+    casadi_int which_output() const;
+
+    /** \brief Get function - only valid when is_call() is true */
+    Function which_function() const;
 
     /** \brief Check if the matrix is integer-valued
 

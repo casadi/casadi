@@ -149,7 +149,8 @@ namespace casadi {
     return 0;
   }
 
-  int Map::eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w, void* mem) const {
+  int Map::eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w, void* mem,
+      bool always_inline, bool never_inline) const {
     return eval_gen(arg, res, iw, w);
   }
 
