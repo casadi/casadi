@@ -795,19 +795,26 @@ namespace casadi {
   }
 
   class IncrementalSerializer {
+    /**
+     * Note that we do not use serializer.pack() since we want to establish
+     * equivalence of nodes.
+     * 
+     */
     public:
 
     IncrementalSerializer() : serializer(ss) {
     }
 
     std::string pack(const SXElem& a) {
-      serializer.pack(a);
       // Serialization goes wrong if serialized SXNodes get destroyed
       ref.push_back(a);
+      a.serialize(serializer);
+      ss.str("");
+      ss.clear();
+      a.serialize(serializer);
       std::string ret = ss.str();
       ss.str("");
       ss.clear();
-      //uout() << a << ":" << ret << std::endl;
       return ret;
     }
 
@@ -882,6 +889,8 @@ namespace casadi {
           // Missing simplifications like [x+y]->[twice]
           switch (a.op) {
             CASADI_MATH_FUN_BUILTIN(w[a.i1], w[a.i2], f)
+            default:
+              casadi_error("Not implemented");
           }
 
           std::string key = s.pack(f);
