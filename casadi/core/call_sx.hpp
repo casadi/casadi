@@ -75,6 +75,7 @@ class CallSX : public SXNode {
     }
 
     /** \brief Destructor
+
     This is a rather complex destructor which is necessary since the default destructor
     can cause stack overflow due to recursive calling.
 

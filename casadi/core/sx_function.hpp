@@ -297,7 +297,9 @@ class CASADI_EXPORT SXFunction :
       \identifier{v3} */
   void init(const Dict& opts) override;
 
-  /** \brief Part of initialize responsible of prepaprign copy elision */
+  /** \brief Part of initialize responsible of prepaprign copy elision
+
+      \identifier{29h} */
   void init_copy_elision();
 
   /** \brief  Get the size of the work vector, for codegen
