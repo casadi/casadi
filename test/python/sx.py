@@ -1612,7 +1612,30 @@ class SXtests(casadiTestCase):
             print(res)
             self.assertEqual('fun' in str(res), never_inline)
         
-        
+  def test_call_fun_copy_elision(self):
+    old = GlobalOptions.getCopyElisionMinSize()
+    GlobalOptions.setCopyElisionMinSize(0)
+    X = MX.sym("A",3,3)
+    Y = MX.sym("Y")
+
+    f = Function('f',[X,Y],[sumsqr(X)*Y],{"never_inline":True})
+    fref = Function('f',[X,Y],[sumsqr(X)*Y])
+    X = SX.sym("A",3,6)
+    Y = SX.sym("Y")
+    
+    
+    g = Function('g',[X,Y],[f(X[:,3:],sin(Y)),X[1,3],3*X[2,4]])
+    gref = Function('g',[X,Y],[fref(X[:,3:],sin(Y)),X[1,3],3*X[2,4]])
+    inputs = [DM.rand(3,3),DM.rand(1)]
+    self.checkfunction(g,gref,inputs=inputs)
+    for avoid_stack in [True,False]:
+        self.check_codegen(g,inputs=inputs,opts={"avoid_stack":avoid_stack})
+    g_roundtrip = Function.deserialize(g.serialize())
+    self.checkfunction(g,g_roundtrip,inputs=inputs)
+    for avoid_stack in [True,False]:
+        self.check_codegen(g_roundtrip,inputs=inputs,opts={"avoid_stack":avoid_stack})
+    GlobalOptions.setCopyElisionMinSize(old)
+
   def test_ufunc(self):
     y = np.sin(casadi.SX.sym('x'))
 

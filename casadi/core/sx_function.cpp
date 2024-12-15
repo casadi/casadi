@@ -37,6 +37,7 @@
 #include "sparsity_internal.hpp"
 #include "casadi_interrupt.hpp"
 #include "serializing_stream.hpp"
+#include "global_options.hpp"
 
 namespace casadi {
 
@@ -47,6 +48,8 @@ namespace casadi {
     f_nnz_in.resize(f_n_in); f_nnz_out.resize(f_n_out);
     for (casadi_int i=0;i<f_n_in;++i) f_nnz_in[i] = f.nnz_in(i);
     for (casadi_int i=0;i<f_n_out;++i) f_nnz_out[i] = f.nnz_out(i);
+    copy_elision_arg.resize(f_n_in, -1);
+    copy_elision_offset.resize(f_n_in, -1);
   }
 
   SXFunction::SXFunction(const std::string& name,
@@ -202,6 +205,7 @@ namespace casadi {
 
   void SXFunction::codegen_body(CodeGenerator& g) const {
 
+    casadi_int k=0;
     // Run the algorithm
     for (auto&& a : algorithm_) {
       if (a.op==OP_OUTPUT) {
@@ -215,7 +219,14 @@ namespace casadi {
         // Collect input arguments
         casadi_int offset = worksize+call_.sz_w;
         for (casadi_int i=0; i<m.f_n_in; ++i) {
-          g << "arg[" << n_in_+i << "]=" << "w+" + str(offset) << ";\n";
+          if (m.copy_elision_arg[i]>=0) {
+            g << "arg[" << n_in_+i << "] = "
+              << "arg[" + str(m.copy_elision_arg[i]) << "]? "
+              << "arg[" + str(m.copy_elision_arg[i]) << "] + "
+              << str(m.copy_elision_offset[i]) << " : 0;\n";
+          } else {
+            g << "arg[" << n_in_+i << "]=" << "w+" + str(offset) << ";\n";
+          }
           offset += m.f_nnz_in[i];
         }
 
@@ -225,8 +236,16 @@ namespace casadi {
           g << "res[" << n_out_+i << "]=" << "w+" + str(offset) << ";\n";
           offset += m.f_nnz_out[i];
         }
-        for (casadi_int i=0;i<m.n_dep;++i) {
-          g << "w["+str(i+worksize+call_.sz_w) + "] = " << g.sx_work(m.dep[i]) << ";\n";
+        casadi_int k=0;
+        for (casadi_int i=0; i<m.f_n_in; ++i) {
+          if (m.copy_elision_arg[i]==-1) {
+            for (casadi_int j=0; j<m.f_nnz_in[i]; ++j) {
+              g << "w["+str(k+worksize+call_.sz_w) + "] = " << g.sx_work(m.dep[k]) << ";\n";
+              k++;
+            }
+          } else {
+            k+=m.f_nnz_in[i];
+          }
         }
         std::string flag =
           g(m.f, "arg+"+str(n_in_), "res+"+str(n_out_), "iw", "w+" + str(worksize));
@@ -238,6 +257,11 @@ namespace casadi {
             g << "w[" + str(i+worksize+call_.sz_w+call_.sz_w_arg) + "];\n";
           }
         }
+      } else if (a.op==OP_INPUT) {
+          if (!copy_elision_[k]) {
+            g << g.sx_work(a.i0) << "="
+              << g.arg(a.i1) << "? " << g.arg(a.i1) << "[" << a.i2 << "] : 0;\n";
+          }
       } else {
 
         // Where to store the result
@@ -246,8 +270,6 @@ namespace casadi {
         // What to store
         if (a.op==OP_CONST) {
           g << g.constant(a.d);
-        } else if (a.op==OP_INPUT) {
-          g << g.arg(a.i1) << "? " << g.arg(a.i1) << "[" << a.i2 << "] : 0";
         } else {
           casadi_int ndep = casadi_math<double>::ndeps(a.op);
           casadi_assert_dev(ndep>0);
@@ -256,6 +278,7 @@ namespace casadi {
         }
         g  << ";\n";
       }
+      k++;
     }
   }
 
@@ -635,6 +658,8 @@ namespace casadi {
       "Set option 'allow_free' to allow free variables.");
     }
 
+    init_copy_elision();
+
     // Initialize just-in-time compilation for numeric evaluation using OpenCL
     if (just_in_time_opencl_) {
       casadi_error("OpenCL is not supported in this version of CasADi");
@@ -647,6 +672,102 @@ namespace casadi {
 
     // Print
     if (verbose_) casadi_message(str(algorithm_.size()) + " elementary operations");
+  }
+
+  void SXFunction::init_copy_elision() {
+    if (GlobalOptions::copy_elision_min_size==-1) {
+      copy_elision_.resize(algorithm_.size(), false);
+      return;
+    }
+    // Perform copy elision (codegen-only)
+    // Remove nodes that only serve to compose CALL inputs
+
+    // For work vector elements, store the arg source
+    std::vector<int> arg_i(worksize_, -1);
+    std::vector<int> nz_i(worksize_, -1);
+
+    // Which algel corresponds to this source?
+    std::vector<casadi_int> alg_i(worksize_, -1);
+
+    // Is this algel to be elided?
+    copy_elision_.resize(algorithm_.size(), false);
+
+    casadi_int k=0;
+    for (auto&& e : algorithm_) {
+      switch (e.op) {
+      case OP_INPUT:
+        // Make source association
+        arg_i[e.i0] = e.i1;
+        nz_i[e.i0] = e.i2;
+        alg_i[e.i0] = k;
+        copy_elision_[k] = true;
+        break;
+      case OP_OUTPUT:
+        if (arg_i[e.i1]>=0) {
+          copy_elision_[alg_i[e.i1]] = false;
+        }
+        break;
+      case OP_CALL:
+        {
+          auto& m = call_.el[e.i1];
+
+          // Inspect input arguments
+          casadi_int k = 0;
+          for (casadi_int i=0; i<m.f_n_in; ++i) {
+            // Pattern match results
+            casadi_int arg = -1;
+            casadi_int offset = -1;
+            for (casadi_int j=0; j<m.f_nnz_in[i]; ++j) {
+              if (j==0) {
+                arg = arg_i[m.dep[k]];
+                offset = nz_i[m.dep[k]];
+              }
+              if (arg_i[m.dep[k]]==-1) {
+                arg = -1;
+                // Pattern match failed
+                break;
+              }
+              if (nz_i[m.dep[k]]!=offset+j) {
+                arg = -1;
+                // Pattern match failed
+                break;
+              }
+              k++;
+            }
+            // Store pattern match results
+            m.copy_elision_arg[i] = arg;
+            m.copy_elision_offset[i] = offset;
+
+            offset += m.f_nnz_in[i];
+          }
+
+          // Remove source association of all outputs
+          for (casadi_int i=0; i<m.n_res; ++i) {
+            if (m.res[i]>=0) {
+              arg_i[m.res[i]] = -1;
+            }
+          }
+        }
+        break;
+      case OP_CONST:
+      case OP_PARAMETER:
+        // Remove source association
+        arg_i[e.i0] = -1;
+        break;
+      default:
+        if (arg_i[e.i1]>=0) {
+          copy_elision_[alg_i[e.i1]] = false;
+        }
+        if (!casadi_math<double>::is_unary(e.op)) {
+          if (arg_i[e.i2]>=0) {
+            copy_elision_[alg_i[e.i2]] = false;
+          }
+        }
+        // Remove source association
+        arg_i[e.i0] = -1;
+      }
+      k++;
+    }
   }
 
   SX SXFunction::instructions_sx() const {
@@ -1373,7 +1494,11 @@ namespace casadi {
         auto& e = call_.el[k];
         s.unpack("SXFunction::call_el_dep", e.dep);
         s.unpack("SXFunction::call_el_res", e.res);
+        s.unpack("SXFunction::call_el_copy_elision_arg", e.copy_elision_arg);
+        s.unpack("SXFunction::call_el_copy_elision_offset", e.copy_elision_offset);
       }
+
+      s.unpack("SXFunction::copy_elision", copy_elision_);
 
     } else {
       call_.sz_arg = 0;
@@ -1383,6 +1508,7 @@ namespace casadi {
       call_.sz_w_arg = 0;
       call_.sz_w_res = 0;
       call_.el.clear();
+      copy_elision_.resize(n_instructions, false);
     }
 
     algorithm_.resize(n_instructions);
@@ -1427,7 +1553,11 @@ namespace casadi {
       s.pack("SXFunction::call_el_f", n.f);
       s.pack("SXFunction::call_el_dep", n.dep);
       s.pack("SXFunction::call_el_res", n.res);
+      s.pack("SXFunction::call_el_copy_elision_arg", n.copy_elision_arg);
+      s.pack("SXFunction::call_el_copy_elision_offset", n.copy_elision_offset);
     }
+
+    s.pack("SXFunction::copy_elision", copy_elision_);
 
     // Loop over algorithm
     for (const auto& e : algorithm_) {

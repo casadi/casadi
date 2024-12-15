@@ -239,6 +239,9 @@ class CASADI_EXPORT SXFunction :
   /// Default input values
   std::vector<double> default_in_;
 
+  /// Copy elision per algel
+  std::vector<bool> copy_elision_;
+
     /** \brief Serialize an object without type information
 
         \identifier{v0} */
@@ -252,6 +255,9 @@ class CASADI_EXPORT SXFunction :
     std::vector<int> dep;
     // Work vector indices of the results (cfr AlgEl::res)
     std::vector<int> res;
+
+    std::vector<int> copy_elision_arg;
+    std::vector<int> copy_elision_offset;
 
     // Following fields are redundant but will increase eval speed
     casadi_int n_dep;
@@ -290,6 +296,9 @@ class CASADI_EXPORT SXFunction :
 
       \identifier{v3} */
   void init(const Dict& opts) override;
+
+  /** \brief Part of initialize responsible of prepaprign copy elision */
+  void init_copy_elision();
 
   /** \brief  Get the size of the work vector, for codegen
 
