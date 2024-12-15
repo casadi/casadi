@@ -157,7 +157,7 @@
 %exception  casadi::CodeGenerator::arg(casadi_int i) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::CodeGenerator::avoid_stack() {
+%exception  casadi::CodeGenerator::avoid_stack() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::CodeGenerator::axpy(casadi_int n, const std::string &a, const std::string &x, const std::string &y) {
@@ -4729,7 +4729,16 @@
 %exception  casadi::SX::element_hash() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::SX::get_output(casadi_int oind) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SX::has_output() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::SX::info() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SX::is_call() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SX::is_commutative() const {
@@ -4739,6 +4748,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SX::is_op(casadi_int op) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SX::is_output() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SX::is_regular() const {
@@ -4762,10 +4774,22 @@
 %exception  casadi::SX::op() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::SX::which_function() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SX::which_output() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::SXElem::dep(casadi_int ch=0) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SXElem::disp(std::ostream &stream, bool more=false) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SXElem::get_output(casadi_int oind) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SXElem::has_output() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SXElem::if_else(const SXElem &x, const SXElem &y, const SXElem &z) {
@@ -4775,6 +4799,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SXElem::is_almost_zero(double tol) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SXElem::is_call() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SXElem::is_commutative() const {
@@ -4816,6 +4843,9 @@
 %exception  casadi::SXElem::is_op(casadi_int op) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::SXElem::is_output() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::SXElem::is_regular() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -4835,6 +4865,12 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SXElem::serialize(SerializingStream &s) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SXElem::which_function() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::SXElem::which_output() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::SerializerBase::connect(DeserializerBase &s) {

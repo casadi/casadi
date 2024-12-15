@@ -1150,7 +1150,9 @@ namespace casadi {
         \identifier{n3} */
     size_t sz_w() const { return sz_w_per_ + sz_w_tmp_;}
 
-    /** \brief Get required lengths, for codegen */
+    /** \brief Get required lengths, for codegen
+
+        \identifier{29g} */
     /// @{
     virtual size_t codegen_sz_arg(const CodeGenerator& g) const;
     virtual size_t codegen_sz_res(const CodeGenerator& g) const;

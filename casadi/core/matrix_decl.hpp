@@ -990,7 +990,9 @@ namespace casadi {
         \identifier{19j} */
     Sparsity get_sparsity() const;
 
-    /** \brief  Get an output */
+    /** \brief  Get an output
+
+        \identifier{28i} */
     Matrix<Scalar> get_output(casadi_int oind) const;
 
     /** \brief Construct a sparse matrix from triplet form
@@ -1114,20 +1116,29 @@ namespace casadi {
         \identifier{19v} */
     bool is_constant() const;
 
-    /** \brief Check if function call */
+    /** \brief Check if function call
+
+        \identifier{28j} */
     bool is_call() const;
 
-    /** \brief  Check if evaluation output */
+    /** \brief  Check if evaluation output
+
+        \identifier{28k} */
     bool is_output() const;
 
-    /** \brief  Check if a multiple output node */
+    /** \brief  Check if a multiple output node
+
+        \identifier{28l} */
     bool has_output() const;
 
     /** \brief Get the index of evaluation output - only valid when is_output() is true
-    */
+
+        \identifier{28m} */
     casadi_int which_output() const;
 
-    /** \brief Get function - only valid when is_call() is true */
+    /** \brief Get function - only valid when is_call() is true
+
+        \identifier{28n} */
     Function which_function() const;
 
     /** \brief Check if the matrix is integer-valued

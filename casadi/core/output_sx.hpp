@@ -34,13 +34,17 @@ namespace casadi {
     class CASADI_EXPORT OutputSX : public SXNode {
   private:
 
-    /** \brief  Constructor */
+    /** \brief  Constructor
+
+        \identifier{294} */
     OutputSX(const SXElem& dep, int oind) : dep_(dep), oind_(oind) {
 
     }
 
   public:
-    /** \brief  Create a unary expression */
+    /** \brief  Create a unary expression
+
+        \identifier{295} */
     inline static SXElem create(const SXElem& dep, int oind) {
       return SXElem::create(new OutputSX(dep, oind));
     }
@@ -48,36 +52,54 @@ namespace casadi {
     // Class name
     std::string class_name() const override {return "OutputSX";}
 
-    /** \brief  Print expression */
+    /** \brief  Print expression
+
+        \identifier{296} */
     std::string print(const std::string& arg1, const std::string& arg2) const override {
       return arg1 + "{" + str(oind_) + "}";
     }
 
-    /** \brief  Destructor */
+    /** \brief  Destructor
+
+        \identifier{297} */
     ~OutputSX() override {
       safe_delete(dep_.assignNoDelete(casadi_limits<SXElem>::nan));
     }
 
-    /** \brief Get the operation */
+    /** \brief Get the operation
+
+        \identifier{298} */
     casadi_int op() const override { return -1;}
 
-    /** \brief  Number of dependencies */
+    /** \brief  Number of dependencies
+
+        \identifier{299} */
     casadi_int n_dep() const override { return 1;}
 
-    /** \brief  get the reference of a dependency */
+    /** \brief  get the reference of a dependency
+
+        \identifier{29a} */
     const SXElem& dep(casadi_int i) const override { return dep_; }
     SXElem& dep(casadi_int i) override { return dep_; }
 
-    /** \brief  The dependencies of the node */
+    /** \brief  The dependencies of the node
+
+        \identifier{29b} */
     SXElem dep_;
 
-    /** \brief  Output index */
+    /** \brief  Output index
+
+        \identifier{29c} */
     int oind_;
 
-    /** \brief  Is the node an output node? */
+    /** \brief  Is the node an output node?
+
+        \identifier{29d} */
     bool is_output() const override { return true; }
 
-    /** \brief Get the index of evaluation output */
+    /** \brief Get the index of evaluation output
+
+        \identifier{29e} */
     casadi_int which_output() const override { return oind_; }
 
     static std::vector<SXElem> split(const SXElem& e, casadi_int n) {

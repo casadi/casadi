@@ -5531,7 +5531,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/code_generator.hpp#L24
 
 ";
 
-%feature("docstring")  casadi::CodeGenerator::avoid_stack() "
+%feature("docstring")  casadi::CodeGenerator::avoid_stack() const "
 
 [INTERNAL] 
 Avoid stack?
@@ -28172,7 +28172,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_impl.hpp#L447-L
 Access the non-zero elements
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L968
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L971
 
 ";
 
@@ -28182,7 +28182,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L968
 Access the non-zero elements
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L969
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L972
 
 ";
 
@@ -28192,7 +28192,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L969
 Get a pointer to the data
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L974
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L977
 
 ";
 
@@ -28202,7 +28202,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L974
 Get a pointer to the data
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L975
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L978
 
 ";
 
@@ -28212,10 +28212,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L975
 Get a pointer to the data
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L976
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L979
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L976-L976
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L979-L979
 
 ";
 
@@ -28226,10 +28226,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L976-L
 Get a pointer to the data
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L977
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L980
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L977-L977
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L980-L980
 
 ";
 
@@ -28333,7 +28333,7 @@ Functions called by friend functions defined for
 GenericExpression
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L294
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L297
 
 ";
 
@@ -28344,7 +28344,7 @@ Functions called by friend functions defined for
 GenericExpression
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L295
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L298
 
 ";
 
@@ -28355,7 +28355,7 @@ Functions called by friend functions defined for
 GenericExpression
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L296
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L299
 
 ";
 
@@ -28366,7 +28366,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L296
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L301
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L304
 
 ";
 
@@ -28377,7 +28377,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L301
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L302
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L305
 
 ";
 
@@ -28388,7 +28388,7 @@ MatrixCommon &f, const MatrixCommon &x) "
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L304
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L307
 
 ";
 
@@ -28399,7 +28399,7 @@ const MatrixCommon &x, const Dict &opts=Dict()) "
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L305
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L308
 
 ";
 
@@ -28410,7 +28410,7 @@ const MatrixCommon &x, MatrixCommon &g, const Dict &opts=Dict()) "
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L307
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L310
 
 ";
 
@@ -28421,7 +28421,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L307
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L310
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L313
 
 ";
 
@@ -28433,7 +28433,7 @@ MatrixCommon > &ex, const std::vector< MatrixCommon > &v, const std::vector<
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L314
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L317
 
 ";
 
@@ -28445,7 +28445,7 @@ std::vector< MatrixCommon > &ex, bool revers) "
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L317
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L320
 
 ";
 
@@ -28455,7 +28455,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L317
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L321
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L324
 
 ";
 
@@ -28466,7 +28466,7 @@ const std::string &lsolver, const Dict &opts) "
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L322
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L325
 
 ";
 
@@ -28477,7 +28477,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L322
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L324
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L327
 
 ";
 
@@ -28487,7 +28487,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L324
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L325
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L328
 
 ";
 
@@ -28498,7 +28498,7 @@ const MatrixCommon &b) "
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L326
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L329
 
 ";
 
@@ -28509,7 +28509,7 @@ const MatrixCommon &b, const std::string &lsolver, const Dict &opts) "
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L327
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L330
 
 ";
 
@@ -28519,7 +28519,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L327
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L329
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L332
 
 ";
 
@@ -28530,7 +28530,7 @@ const std::string &lsolver, const Dict &opts) "
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L330
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L333
 
 ";
 
@@ -28541,7 +28541,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L330
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L333
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L336
 
 ";
 
@@ -28552,7 +28552,7 @@ MatrixCommon &x, const std::vector< std::string > &args) "
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L334
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L337
 
 ";
 
@@ -28564,7 +28564,7 @@ MatrixCommon> &ex, std::vector< MatrixCommon> &v, std::vector< MatrixCommon>
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L336
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L339
 
 ";
 
@@ -28577,7 +28577,7 @@ MatrixCommon > &vdef, const std::string &v_prefix, const std::string
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L338
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L341
 
 ";
 
@@ -28587,7 +28587,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L338
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L343
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L346
 
 ";
 
@@ -28597,7 +28597,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L343
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L346
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L349
 
 ";
 
@@ -28609,7 +28609,7 @@ short_circuit=false) "
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L350
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L353
 
 ";
 
@@ -28621,7 +28621,7 @@ bool short_circuit=false) "
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L354
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L357
 
 ";
 
@@ -28632,7 +28632,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L354
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L358
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L361
 
 ";
 
@@ -28643,7 +28643,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L358
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L359
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L362
 
 ";
 
@@ -28654,7 +28654,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L359
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L360
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L363
 
 ";
 
@@ -28664,7 +28664,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L360
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L361
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L364
 
 ";
 
@@ -28674,7 +28674,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L361
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L362
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L365
 
 ";
 
@@ -28685,7 +28685,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L362
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L363
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L366
 
 ";
 
@@ -28695,7 +28695,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L363
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L364
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L367
 
 ";
 
@@ -28705,7 +28705,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L364
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L365
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L368
 
 ";
 
@@ -28715,7 +28715,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L365
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L366
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L369
 
 ";
 
@@ -28726,7 +28726,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L366
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L367
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L370
 
 ";
 
@@ -28737,7 +28737,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L367
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L368
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L371
 
 ";
 
@@ -28747,7 +28747,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L368
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L369
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L372
 
 ";
 
@@ -28757,7 +28757,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L369
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L370
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L373
 
 ";
 
@@ -28768,7 +28768,7 @@ const MatrixCommon &y) "
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L371
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L374
 
 ";
 
@@ -28779,7 +28779,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L371
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L372
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L375
 
 ";
 
@@ -28789,7 +28789,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L372
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L373
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L376
 
 ";
 
@@ -28800,7 +28800,7 @@ const MatrixCommon &B) "
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L374
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L377
 
 ";
 
@@ -28811,7 +28811,7 @@ const Sparsity &sp, bool intersect=false) "
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L375
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L378
 
 ";
 
@@ -28822,7 +28822,7 @@ const MatrixCommon &x) "
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L377
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L380
 
 ";
 
@@ -28833,7 +28833,7 @@ const MatrixCommon &val) "
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L378
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L381
 
 Implementation: 
 https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_impl.hpp#L497-L524
@@ -28847,7 +28847,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_impl.hpp#L497-L
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L379
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L382
 
 Implementation: 
 https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_impl.hpp#L492-L494
@@ -28864,7 +28864,7 @@ casadi_int > &b, const std::vector< casadi_int > &c) "
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L380
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L383
 
 Implementation: 
 https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_impl.hpp#L541-L563
@@ -28881,7 +28881,7 @@ const std::vector< casadi_int > &c) "
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L387
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L390
 
 Implementation: 
 https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_impl.hpp#L566-L573
@@ -28895,7 +28895,7 @@ casadi_int axis=-1) "
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L392
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L395
 
 Implementation: 
 https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_impl.hpp#L527-L538
@@ -28908,7 +28908,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_impl.hpp#L527-L
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L393
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L396
 
 ";
 
@@ -28919,7 +28919,7 @@ MatrixCommon > &e) "
 Functions called by friend functions defined for  GenericMatrix
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L394
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L397
 
 ";
 
@@ -28931,7 +28931,7 @@ Functions called by friend functions defined for
 SparsityInterface
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L399
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L402
 
 ";
 
@@ -28943,7 +28943,7 @@ Functions called by friend functions defined for
 SparsityInterface
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L400
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L403
 
 ";
 
@@ -28955,7 +28955,7 @@ Functions called by friend functions defined for
 SparsityInterface
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L402
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L405
 
 ";
 
@@ -28967,7 +28967,7 @@ Functions called by friend functions defined for
 SparsityInterface
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L404
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L407
 
 ";
 
@@ -28979,7 +28979,7 @@ Functions called by friend functions defined for
 SparsityInterface
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L406
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L409
 
 ";
 
@@ -28992,7 +28992,7 @@ Functions called by friend functions defined for
 SparsityInterface
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L409
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L412
 
 ";
 
@@ -29004,7 +29004,7 @@ Functions called by friend functions defined for
 SparsityInterface
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L412
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L415
 
 ";
 
@@ -29016,7 +29016,7 @@ Functions called by friend functions defined for
 SparsityInterface
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L413
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L416
 
 ";
 
@@ -29028,7 +29028,7 @@ Functions called by friend functions defined for
 SparsityInterface
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L414
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L417
 
 ";
 
@@ -29040,7 +29040,7 @@ Functions called by friend functions defined for
 SparsityInterface
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L415
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L418
 
 ";
 
@@ -29052,7 +29052,7 @@ Functions called by friend functions defined for
 SparsityInterface
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L416
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L419
 
 ";
 
@@ -29064,7 +29064,7 @@ Functions called by friend functions defined for
 SparsityInterface
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L417
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L420
 
 ";
 
@@ -29078,7 +29078,7 @@ Functions called by friend functions defined for
 SparsityInterface
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L420
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L423
 
 ";
 
@@ -29092,7 +29092,7 @@ Functions called by friend functions defined for
 SparsityInterface
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L426
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L429
 
 ";
 
@@ -29103,7 +29103,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L426
 Functions called by friend functions defined here
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L433
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L436
 
 ";
 
@@ -29116,10 +29116,10 @@ Make a matrix sparse by removing numerical zeros.
 Extra doc: https://github.com/casadi/casadi/wiki/L_191
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L622
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L625
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L622-L624
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L625-L627
 
 ";
 
@@ -29130,10 +29130,10 @@ Make a matrix sparse by removing numerical zeros.
 Extra doc: https://github.com/casadi/casadi/wiki/L_191
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L622
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L625
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L622-L624
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L625-L627
 
 ";
 
@@ -29144,10 +29144,10 @@ Make a matrix sparse by removing numerical zeros.
 Extra doc: https://github.com/casadi/casadi/wiki/L_191
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L622
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L625
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L622-L624
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L625-L627
 
 ";
 
@@ -29158,7 +29158,7 @@ MatrixCommon &weights, MatrixCommon &terms) "
 Functions called by friend functions defined here
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L434
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L437
 
 ";
 
@@ -29171,10 +29171,10 @@ Expand the expression as a weighted sum (with constant weights)
 Extra doc: https://github.com/casadi/casadi/wiki/L_192
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L629
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L632
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L629-L632
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L632-L635
 
 ";
 
@@ -29185,10 +29185,10 @@ Expand the expression as a weighted sum (with constant weights)
 Extra doc: https://github.com/casadi/casadi/wiki/L_192
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L629
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L632
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L629-L632
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L632-L635
 
 ";
 
@@ -29199,10 +29199,10 @@ Expand the expression as a weighted sum (with constant weights)
 Extra doc: https://github.com/casadi/casadi/wiki/L_192
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L629
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L632
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L629-L632
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L632-L635
 
 ";
 
@@ -29213,7 +29213,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L629-L
 Functions called by friend functions defined here
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L437
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L440
 
 ";
 
@@ -29244,10 +29244,10 @@ vector with the value of the function for each interval (length n)
 Extra doc: https://github.com/casadi/casadi/wiki/L_193
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L644
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L647
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L644-L648
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L647-L651
 
 ";
 
@@ -29276,10 +29276,10 @@ vector with the value of the function for each interval (length n)
 Extra doc: https://github.com/casadi/casadi/wiki/L_193
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L644
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L647
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L644-L648
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L647-L651
 
 ";
 
@@ -29308,10 +29308,10 @@ vector with the value of the function for each interval (length n)
 Extra doc: https://github.com/casadi/casadi/wiki/L_193
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L644
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L647
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L644-L648
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L647-L651
 
 ";
 
@@ -29322,7 +29322,7 @@ const MatrixCommon &tval, const MatrixCommon &val) "
 Functions called by friend functions defined here
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L439
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L442
 
 ";
 
@@ -29352,10 +29352,10 @@ tval)
 
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L661
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L664
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L661-L664
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L664-L667
 
 ";
 
@@ -29383,10 +29383,10 @@ tval)
 
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L661
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L664
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L661-L664
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L664-L667
 
 ";
 
@@ -29414,10 +29414,10 @@ tval)
 
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L661
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L664
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L661-L664
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L664-L667
 
 ";
 
@@ -29428,7 +29428,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L661-L
 Functions called by friend functions defined here
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L441
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L444
 
 ";
 
@@ -29445,10 +29445,10 @@ H(x) = 1 & x>0 \\\\\\\\ \\\\end {cases} \\\\]
 Extra doc: https://github.com/casadi/casadi/wiki/L_195
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L677
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L680
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L677-L679
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L680-L682
 
 ";
 
@@ -29463,10 +29463,10 @@ H(x) = 1 & x>0 \\\\\\\\ \\\\end {cases} \\\\]
 Extra doc: https://github.com/casadi/casadi/wiki/L_195
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L677
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L680
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L677-L679
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L680-L682
 
 ";
 
@@ -29481,10 +29481,10 @@ H(x) = 1 & x>0 \\\\\\\\ \\\\end {cases} \\\\]
 Extra doc: https://github.com/casadi/casadi/wiki/L_195
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L677
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L680
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L677-L679
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L680-L682
 
 ";
 
@@ -29495,7 +29495,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L677-L
 Functions called by friend functions defined here
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L442
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L445
 
 ";
 
@@ -29518,10 +29518,10 @@ window function
 Extra doc: https://github.com/casadi/casadi/wiki/L_23n
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L694
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L697
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L694-L696
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L697-L699
 
 ";
 
@@ -29542,10 +29542,10 @@ window function
 Extra doc: https://github.com/casadi/casadi/wiki/L_23n
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L694
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L697
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L694-L696
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L697-L699
 
 ";
 
@@ -29566,10 +29566,10 @@ window function
 Extra doc: https://github.com/casadi/casadi/wiki/L_23n
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L694
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L697
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L694-L696
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L697-L699
 
 ";
 
@@ -29580,7 +29580,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L694-L
 Functions called by friend functions defined here
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L443
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L446
 
 ";
 
@@ -29597,10 +29597,10 @@ triangle function
 Extra doc: https://github.com/casadi/casadi/wiki/L_23o
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L709
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L712
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L709-L711
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L712-L714
 
 ";
 
@@ -29615,10 +29615,10 @@ triangle function
 Extra doc: https://github.com/casadi/casadi/wiki/L_23o
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L709
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L712
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L709-L711
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L712-L714
 
 ";
 
@@ -29633,10 +29633,10 @@ triangle function
 Extra doc: https://github.com/casadi/casadi/wiki/L_23o
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L709
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L712
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L709-L711
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L712-L714
 
 ";
 
@@ -29646,7 +29646,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L709-L
 Functions called by friend functions defined here
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L444
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L447
 
 ";
 
@@ -29664,10 +29664,10 @@ Also called: slope function
 Extra doc: https://github.com/casadi/casadi/wiki/L_23p
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L726
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L729
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L726-L728
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L729-L731
 
 ";
 
@@ -29684,10 +29684,10 @@ Also called: slope function
 Extra doc: https://github.com/casadi/casadi/wiki/L_23p
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L726
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L729
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L726-L728
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L729-L731
 
 ";
 
@@ -29704,28 +29704,16 @@ Also called: slope function
 Extra doc: https://github.com/casadi/casadi/wiki/L_23p
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L726
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L729
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L726-L728
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L729-L731
 
 ";
 
 %feature("docstring")  casadi::MatrixCommon::gauss_quadrature(const 
 MatrixCommon &f, const MatrixCommon &x, const MatrixCommon &a, const 
 MatrixCommon &b, casadi_int order=5) "
-
-[INTERNAL] 
-Functions called by friend functions defined here
-
-Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L445
-
-";
-
-%feature("docstring")  casadi::MatrixCommon::gauss_quadrature(const 
-MatrixCommon &f, const MatrixCommon &x, const MatrixCommon &a, const 
-MatrixCommon &b, casadi_int order, const MatrixCommon &w) "
 
 [INTERNAL] 
 Functions called by friend functions defined here
@@ -29737,6 +29725,18 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L448
 
 %feature("docstring")  casadi::MatrixCommon::gauss_quadrature(const 
 MatrixCommon &f, const MatrixCommon &x, const MatrixCommon &a, const 
+MatrixCommon &b, casadi_int order, const MatrixCommon &w) "
+
+[INTERNAL] 
+Functions called by friend functions defined here
+
+Doc source: 
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L451
+
+";
+
+%feature("docstring")  casadi::MatrixCommon::gauss_quadrature(const 
+MatrixCommon &f, const MatrixCommon &x, const MatrixCommon &a, const 
 MatrixCommon &b, casadi_int order=5) "
 
 [INTERNAL] 
@@ -29745,10 +29745,10 @@ Integrate f from a to b using Gaussian quadrature with n points.
 Extra doc: https://github.com/casadi/casadi/wiki/L_196
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L735
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L738
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L735-L739
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L738-L742
 
 ";
 
@@ -29759,10 +29759,10 @@ Integrate f from a to b using Gaussian quadrature with n points.
 Extra doc: https://github.com/casadi/casadi/wiki/L_196
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L735
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L738
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L735-L739
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L738-L742
 
 ";
 
@@ -29773,10 +29773,10 @@ Integrate f from a to b using Gaussian quadrature with n points.
 Extra doc: https://github.com/casadi/casadi/wiki/L_196
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L735
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L738
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L735-L739
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L738-L742
 
 ";
 
@@ -29790,10 +29790,10 @@ Integrate f from a to b using Gaussian quadrature with n points.
 Extra doc: https://github.com/casadi/casadi/wiki/L_196
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L741
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L744
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L741-L745
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L744-L748
 
 ";
 
@@ -29804,10 +29804,10 @@ Integrate f from a to b using Gaussian quadrature with n points.
 Extra doc: https://github.com/casadi/casadi/wiki/L_196
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L741
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L744
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L741-L745
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L744-L748
 
 ";
 
@@ -29818,10 +29818,10 @@ Integrate f from a to b using Gaussian quadrature with n points.
 Extra doc: https://github.com/casadi/casadi/wiki/L_196
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L741
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L744
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L741-L745
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L744-L748
 
 ";
 
@@ -29833,7 +29833,7 @@ std::vector< std::vector< MatrixCommon > > &v, const Dict &opts=Dict()) "
 Functions called by friend functions defined here
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L453
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L456
 
 ";
 
@@ -29845,7 +29845,7 @@ std::vector< std::vector< MatrixCommon > > &v, const Dict &opts=Dict()) "
 Functions called by friend functions defined here
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L458
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L461
 
 ";
 
@@ -29857,7 +29857,7 @@ tr=false) "
 Functions called by friend functions defined here
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L462
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L465
 
 ";
 
@@ -29868,7 +29868,7 @@ const MatrixCommon &x, const MatrixCommon &a, casadi_int order) "
 Functions called by friend functions defined here
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L464
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L467
 
 ";
 
@@ -29901,10 +29901,10 @@ Example usage:
 Extra doc: https://github.com/casadi/casadi/wiki/L_23q
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L763
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L766
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L763-L766
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L766-L769
 
 ";
 
@@ -29935,10 +29935,10 @@ Example usage:
 Extra doc: https://github.com/casadi/casadi/wiki/L_23q
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L763
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L766
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L763-L766
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L766-L769
 
 ";
 
@@ -29969,10 +29969,10 @@ Example usage:
 Extra doc: https://github.com/casadi/casadi/wiki/L_23q
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L763
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L766
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L763-L766
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L766-L769
 
 ";
 
@@ -30005,10 +30005,10 @@ Example usage:
 Extra doc: https://github.com/casadi/casadi/wiki/L_23q
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L767
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L770
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L767-L769
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L770-L772
 
 ";
 
@@ -30039,10 +30039,10 @@ Example usage:
 Extra doc: https://github.com/casadi/casadi/wiki/L_23q
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L767
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L770
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L767-L769
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L770-L772
 
 ";
 
@@ -30073,10 +30073,10 @@ Example usage:
 Extra doc: https://github.com/casadi/casadi/wiki/L_23q
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L767
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L770
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L767-L769
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L770-L772
 
 ";
 
@@ -30087,7 +30087,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L767-L
 Functions called by friend functions defined here
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L466
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L469
 
 ";
 
@@ -30099,7 +30099,7 @@ std::vector< casadi_int > &order_contributions) "
 Functions called by friend functions defined here
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L468
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L471
 
 ";
 
@@ -30116,10 +30116,10 @@ Do Taylor expansions until the aggregated order of a term is equal to
 Extra doc: https://github.com/casadi/casadi/wiki/L_23r
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L779
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L782
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L779-L782
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L782-L785
 
 ";
 
@@ -30134,10 +30134,10 @@ Do Taylor expansions until the aggregated order of a term is equal to
 Extra doc: https://github.com/casadi/casadi/wiki/L_23r
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L779
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L782
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L779-L782
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L782-L785
 
 ";
 
@@ -30152,10 +30152,10 @@ Do Taylor expansions until the aggregated order of a term is equal to
 Extra doc: https://github.com/casadi/casadi/wiki/L_23r
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L779
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L782
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L779-L782
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L782-L785
 
 ";
 
@@ -30199,10 +30199,10 @@ Example usage
 Extra doc: https://github.com/casadi/casadi/wiki/L_23s
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L810
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L813
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L810-L814
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L813-L817
 
 ";
 
@@ -30243,10 +30243,10 @@ Example usage
 Extra doc: https://github.com/casadi/casadi/wiki/L_23s
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L810
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L813
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L810-L814
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L813-L817
 
 ";
 
@@ -30287,10 +30287,10 @@ Example usage
 Extra doc: https://github.com/casadi/casadi/wiki/L_23s
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L810
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L813
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L810-L814
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L813-L817
 
 ";
 
@@ -30301,7 +30301,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L810-L
 Functions called by friend functions defined here
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L472
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L475
 
 ";
 
@@ -30323,10 +30323,10 @@ Scalar symbol that the polynomial is build up with
 Extra doc: https://github.com/casadi/casadi/wiki/L_197
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L822
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L825
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L822-L825
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L825-L828
 
 ";
 
@@ -30346,10 +30346,10 @@ Scalar symbol that the polynomial is build up with
 Extra doc: https://github.com/casadi/casadi/wiki/L_197
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L822
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L825
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L822-L825
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L825-L828
 
 ";
 
@@ -30369,10 +30369,10 @@ Scalar symbol that the polynomial is build up with
 Extra doc: https://github.com/casadi/casadi/wiki/L_197
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L822
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L825
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L822-L825
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L825-L828
 
 ";
 
@@ -30383,7 +30383,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L822-L
 Functions called by friend functions defined here
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L473
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L476
 
 ";
 
@@ -30400,10 +30400,10 @@ roots are real.
 Extra doc: https://github.com/casadi/casadi/wiki/L_198
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L833
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L836
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L833-L835
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L836-L838
 
 ";
 
@@ -30418,10 +30418,10 @@ roots are real.
 Extra doc: https://github.com/casadi/casadi/wiki/L_198
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L833
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L836
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L833-L835
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L836-L838
 
 ";
 
@@ -30436,10 +30436,10 @@ roots are real.
 Extra doc: https://github.com/casadi/casadi/wiki/L_198
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L833
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L836
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L833-L835
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L836-L838
 
 ";
 
@@ -30450,7 +30450,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L833-L
 Functions called by friend functions defined here
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L474
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L477
 
 ";
 
@@ -30465,10 +30465,10 @@ This will only work for up to 3x3 matrices
 Extra doc: https://github.com/casadi/casadi/wiki/L_199
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L842
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L845
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L842-L844
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L845-L847
 
 ";
 
@@ -30481,10 +30481,10 @@ This will only work for up to 3x3 matrices
 Extra doc: https://github.com/casadi/casadi/wiki/L_199
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L842
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L845
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L842-L844
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L845-L847
 
 ";
 
@@ -30497,10 +30497,10 @@ This will only work for up to 3x3 matrices
 Extra doc: https://github.com/casadi/casadi/wiki/L_199
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L842
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L845
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L842-L844
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L845-L847
 
 ";
 
@@ -30510,7 +30510,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L842-L
 Functions called by friend functions defined here
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L475
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L478
 
 ";
 
@@ -30525,10 +30525,10 @@ An error is raised when the expression contains symbols
 Extra doc: https://github.com/casadi/casadi/wiki/L_19a
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L852
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L855
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L852-L854
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L855-L857
 
 ";
 
@@ -30541,10 +30541,10 @@ An error is raised when the expression contains symbols
 Extra doc: https://github.com/casadi/casadi/wiki/L_19a
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L852
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L855
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L852-L854
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L855-L857
 
 ";
 
@@ -30557,10 +30557,10 @@ An error is raised when the expression contains symbols
 Extra doc: https://github.com/casadi/casadi/wiki/L_19a
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L852
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L855
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L852-L854
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L855-L857
 
 ";
 
@@ -30572,7 +30572,7 @@ casadi_int > &prinv, std::vector< casadi_int > &pc, bool amd=true) "
 Functions called by friend functions defined here
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L476
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L479
 
 ";
 
@@ -30588,10 +30588,10 @@ See T. Davis: Direct Methods for Sparse Linear Systems
 Extra doc: https://github.com/casadi/casadi/wiki/L_18t
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L548
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L551
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L548-L552
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L551-L555
 
 ";
 
@@ -30604,10 +30604,10 @@ See T. Davis: Direct Methods for Sparse Linear Systems
 Extra doc: https://github.com/casadi/casadi/wiki/L_18t
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L548
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L551
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L548-L552
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L551-L555
 
 ";
 
@@ -30620,10 +30620,10 @@ See T. Davis: Direct Methods for Sparse Linear Systems
 Extra doc: https://github.com/casadi/casadi/wiki/L_18t
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L548
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L551
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L548-L552
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L551-L555
 
 ";
 
@@ -30636,7 +30636,7 @@ const std::vector< casadi_int > &prinv, const std::vector< casadi_int > &pc,
 Functions called by friend functions defined here
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L479
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L482
 
 ";
 
@@ -30651,10 +30651,10 @@ const std::vector< casadi_int > &prinv, const std::vector< casadi_int > &pc,
 Extra doc: https://github.com/casadi/casadi/wiki/L_18u
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L558
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L561
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L558-L563
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L561-L566
 
 ";
 
@@ -30665,10 +30665,10 @@ Solve using a sparse QR factorization.
 Extra doc: https://github.com/casadi/casadi/wiki/L_18u
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L558
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L561
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L558-L563
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L561-L566
 
 ";
 
@@ -30679,10 +30679,10 @@ Solve using a sparse QR factorization.
 Extra doc: https://github.com/casadi/casadi/wiki/L_18u
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L558
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L561
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L558-L563
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L561-L566
 
 ";
 
@@ -30693,7 +30693,7 @@ MatrixCommon &Q, MatrixCommon &R) "
 Functions called by friend functions defined here
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L483
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L486
 
 ";
 
@@ -30714,10 +30714,10 @@ value.
 Extra doc: https://github.com/casadi/casadi/wiki/L_18s
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L539
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L542
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L539-L541
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L542-L544
 
 ";
 
@@ -30736,10 +30736,10 @@ value.
 Extra doc: https://github.com/casadi/casadi/wiki/L_18s
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L539
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L542
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L539-L541
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L542-L544
 
 ";
 
@@ -30758,10 +30758,10 @@ value.
 Extra doc: https://github.com/casadi/casadi/wiki/L_18s
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L539
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L542
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L539-L541
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L542-L544
 
 ";
 
@@ -30773,7 +30773,7 @@ amd=true) "
 Functions called by friend functions defined here
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L484
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L487
 
 ";
 
@@ -30793,10 +30793,10 @@ matrices.
 Extra doc: https://github.com/casadi/casadi/wiki/L_18w
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L582
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L585
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L582-L585
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L585-L588
 
 ";
 
@@ -30813,10 +30813,10 @@ matrices.
 Extra doc: https://github.com/casadi/casadi/wiki/L_18w
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L582
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L585
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L582-L585
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L585-L588
 
 ";
 
@@ -30833,10 +30833,10 @@ matrices.
 Extra doc: https://github.com/casadi/casadi/wiki/L_18w
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L582
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L585
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L582-L585
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L585-L588
 
 ";
 
@@ -30848,7 +30848,7 @@ casadi_int > &p) "
 Functions called by friend functions defined here
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L486
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L489
 
 ";
 
@@ -30862,10 +30862,10 @@ casadi_int > &p) "
 Extra doc: https://github.com/casadi/casadi/wiki/L_18x
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L591
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L594
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L591-L594
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L594-L597
 
 ";
 
@@ -30876,10 +30876,10 @@ Solve using a sparse LDL^T factorization.
 Extra doc: https://github.com/casadi/casadi/wiki/L_18x
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L591
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L594
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L591-L594
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L594-L597
 
 ";
 
@@ -30890,10 +30890,10 @@ Solve using a sparse LDL^T factorization.
 Extra doc: https://github.com/casadi/casadi/wiki/L_18x
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L591
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L594
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L591-L594
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L594-L597
 
 ";
 
@@ -30903,7 +30903,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L591-L
 Functions called by friend functions defined here
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L488
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L491
 
 ";
 
@@ -30915,10 +30915,10 @@ Returns true only if every element in the matrix is true.
 Extra doc: https://github.com/casadi/casadi/wiki/L_18z
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L606
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L609
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L606-L608
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L609-L611
 
 ";
 
@@ -30929,10 +30929,10 @@ Returns true only if every element in the matrix is true.
 Extra doc: https://github.com/casadi/casadi/wiki/L_18z
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L606
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L609
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L606-L608
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L609-L611
 
 ";
 
@@ -30943,10 +30943,10 @@ Returns true only if every element in the matrix is true.
 Extra doc: https://github.com/casadi/casadi/wiki/L_18z
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L606
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L609
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L606-L608
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L609-L611
 
 ";
 
@@ -30956,7 +30956,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L606-L
 Functions called by friend functions defined here
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L489
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L492
 
 ";
 
@@ -30968,10 +30968,10 @@ Returns true only if any element in the matrix is true.
 Extra doc: https://github.com/casadi/casadi/wiki/L_18y
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L599
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L602
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L599-L601
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L602-L604
 
 ";
 
@@ -30982,10 +30982,10 @@ Returns true only if any element in the matrix is true.
 Extra doc: https://github.com/casadi/casadi/wiki/L_18y
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L599
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L602
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L599-L601
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L602-L604
 
 ";
 
@@ -30996,10 +30996,10 @@ Returns true only if any element in the matrix is true.
 Extra doc: https://github.com/casadi/casadi/wiki/L_18y
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L599
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L602
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L599-L601
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L602-L604
 
 ";
 
@@ -31009,7 +31009,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L599-L
 Functions called by friend functions defined here
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L490
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L493
 
 ";
 
@@ -31021,10 +31021,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L490
 Extra doc: https://github.com/casadi/casadi/wiki/L_18p
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L513
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L516
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L513-L515
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L516-L518
 
 ";
 
@@ -31035,10 +31035,10 @@ Matrix adjoint.
 Extra doc: https://github.com/casadi/casadi/wiki/L_18p
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L513
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L516
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L513-L515
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L516-L518
 
 ";
 
@@ -31049,10 +31049,10 @@ Matrix adjoint.
 Extra doc: https://github.com/casadi/casadi/wiki/L_18p
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L513
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L516
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L513-L515
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L516-L518
 
 ";
 
@@ -31063,7 +31063,7 @@ casadi_int i, casadi_int j) "
 Functions called by friend functions defined here
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L491
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L494
 
 ";
 
@@ -31076,10 +31076,10 @@ Get the (i,j) minor matrix.
 Extra doc: https://github.com/casadi/casadi/wiki/L_18q
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L520
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L523
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L520-L522
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L523-L525
 
 ";
 
@@ -31090,10 +31090,10 @@ Get the (i,j) minor matrix.
 Extra doc: https://github.com/casadi/casadi/wiki/L_18q
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L520
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L523
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L520-L522
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L523-L525
 
 ";
 
@@ -31104,10 +31104,10 @@ Get the (i,j) minor matrix.
 Extra doc: https://github.com/casadi/casadi/wiki/L_18q
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L520
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L523
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L520-L522
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L523-L525
 
 ";
 
@@ -31118,7 +31118,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L520-L
 Functions called by friend functions defined here
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L492
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L495
 
 ";
 
@@ -31131,10 +31131,10 @@ Get the (i,j) cofactor matrix.
 Extra doc: https://github.com/casadi/casadi/wiki/L_18r
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L527
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L530
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L527-L529
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L530-L532
 
 ";
 
@@ -31145,10 +31145,10 @@ Get the (i,j) cofactor matrix.
 Extra doc: https://github.com/casadi/casadi/wiki/L_18r
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L527
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L530
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L527-L529
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L530-L532
 
 ";
 
@@ -31159,10 +31159,10 @@ Get the (i,j) cofactor matrix.
 Extra doc: https://github.com/casadi/casadi/wiki/L_18r
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L527
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L530
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L527-L529
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L530-L532
 
 ";
 
@@ -31172,7 +31172,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L527-L
 Functions called by friend functions defined here
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L493
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L496
 
 ";
 
@@ -31187,10 +31187,10 @@ diag(sqrt(D))*L'
 Extra doc: https://github.com/casadi/casadi/wiki/L_18v
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L571
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L574
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L571-L573
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L574-L576
 
 ";
 
@@ -31204,10 +31204,10 @@ diag(sqrt(D))*L'
 Extra doc: https://github.com/casadi/casadi/wiki/L_18v
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L571
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L574
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L571-L573
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L574-L576
 
 ";
 
@@ -31221,10 +31221,10 @@ diag(sqrt(D))*L'
 Extra doc: https://github.com/casadi/casadi/wiki/L_18v
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L571
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L574
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L571-L573
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L574-L576
 
 ";
 
@@ -31235,7 +31235,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L571-L
 Functions called by friend functions defined here
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L494
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L497
 
 ";
 
@@ -31248,10 +31248,10 @@ Inf-norm of a Matrix-Matrix product.
 Extra doc: https://github.com/casadi/casadi/wiki/L_190
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L614
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L617
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L614-L616
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L617-L619
 
 ";
 
@@ -31262,10 +31262,10 @@ Inf-norm of a Matrix-Matrix product.
 Extra doc: https://github.com/casadi/casadi/wiki/L_190
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L614
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L617
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L614-L616
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L617-L619
 
 ";
 
@@ -31276,10 +31276,10 @@ Inf-norm of a Matrix-Matrix product.
 Extra doc: https://github.com/casadi/casadi/wiki/L_190
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L614
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L617
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L614-L616
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L617-L619
 
 ";
 
@@ -31290,7 +31290,7 @@ MatrixCommon > &A) "
 Functions called by friend functions defined here
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L495
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L498
 
 ";
 
@@ -31306,7 +31306,7 @@ Default matrix size is max(col) x max(row)
 Extra doc: https://github.com/casadi/casadi/wiki/L_23t
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L996
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1004
 
 ";
 
@@ -31322,7 +31322,7 @@ Default matrix size is max(col) x max(row)
 Extra doc: https://github.com/casadi/casadi/wiki/L_23t
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L999
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1007
 
 ";
 
@@ -31338,7 +31338,7 @@ Default matrix size is max(col) x max(row)
 Extra doc: https://github.com/casadi/casadi/wiki/L_23t
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1002
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1010
 
 ";
 
@@ -31350,7 +31350,7 @@ create a matrix with all inf
 Extra doc: https://github.com/casadi/casadi/wiki/L_19k
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1012
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1020
 
 ";
 
@@ -31363,7 +31363,7 @@ create a matrix with all inf
 Extra doc: https://github.com/casadi/casadi/wiki/L_19k
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1013
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1021
 
 ";
 
@@ -31376,7 +31376,7 @@ create a matrix with all inf
 Extra doc: https://github.com/casadi/casadi/wiki/L_19k
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1014
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1022
 
 ";
 
@@ -31388,7 +31388,7 @@ create a matrix with all nan
 Extra doc: https://github.com/casadi/casadi/wiki/L_19l
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1021
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1029
 
 ";
 
@@ -31401,7 +31401,7 @@ create a matrix with all nan
 Extra doc: https://github.com/casadi/casadi/wiki/L_19l
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1022
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1030
 
 ";
 
@@ -31414,7 +31414,7 @@ create a matrix with all nan
 Extra doc: https://github.com/casadi/casadi/wiki/L_19l
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1023
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1031
 
 ";
 
@@ -31427,7 +31427,7 @@ Create a matrix with uniformly distributed random numbers.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1ab
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1221
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1254
 
 ";
 
@@ -31439,7 +31439,7 @@ Create a matrix with uniformly distributed random numbers.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1ab
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1224
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1257
 
 Implementation: 
 https://github.com/casadi/casadi/blob/develop/casadi/core/dm_instantiator.cpp#L59-L67
@@ -31455,7 +31455,7 @@ Create a matrix with uniformly distributed random numbers.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1ab
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1225
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1258
 
 ";
 
@@ -32298,7 +32298,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L177-L
 Sparse matrix with a given sparsity with all values same.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1304
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1337
 
 ";
 
@@ -32309,7 +32309,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1304
 Sparse matrix with a given sparsity and non-zero elements.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1307
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1340
 
 ";
 
@@ -32356,7 +32356,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_impl.hpp#L70-L7
 Transpose the matrix.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L503
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L506
 
 ";
 
@@ -32368,7 +32368,7 @@ Get strings corresponding to the nonzeros and the
 interdependencies.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L882
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L885
 
 Implementation: 
 https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_impl.hpp#L696-L700
@@ -32382,7 +32382,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_impl.hpp#L696-L
 Print a representation of the object.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L886
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L889
 
 ";
 
@@ -32393,7 +32393,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L886
 Get string representation.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L889
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L892
 
 ";
 
@@ -32404,7 +32404,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L889
 Print scalar.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L892
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L895
 
 Implementation: 
 https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_impl.hpp#L609-L633
@@ -32418,7 +32418,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_impl.hpp#L609-L
 Print vector-style.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L895
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L898
 
 Implementation: 
 https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_impl.hpp#L636-L638
@@ -32432,7 +32432,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_impl.hpp#L636-L
 Print dense matrix-stype.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L898
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L901
 
 Implementation: 
 https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_impl.hpp#L686-L688
@@ -32446,7 +32446,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_impl.hpp#L686-L
 Print sparse matrix style.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L901
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L904
 
 Implementation: 
 https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_impl.hpp#L691-L693
@@ -32482,7 +32482,7 @@ Erase rows and/or columns of a matrix
 Extra doc: https://github.com/casadi/casadi/wiki/L_19f
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L938
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L941
 
 ";
 
@@ -32497,7 +32497,7 @@ Erase elements of a matrix
 Extra doc: https://github.com/casadi/casadi/wiki/L_19g
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L946
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L949
 
 ";
 
@@ -32512,7 +32512,7 @@ Remove/delete rows and/or columns of a matrix
 Extra doc: https://github.com/casadi/casadi/wiki/L_19h
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L953
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L956
 
 ";
 
@@ -32530,7 +32530,7 @@ existing non-zeros
 Extra doc: https://github.com/casadi/casadi/wiki/L_19i
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L961
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L964
 
 ";
 
@@ -32540,7 +32540,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L961
 Const access the sparsity - reference to data member.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L981
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L984
 
 ";
 
@@ -32549,7 +32549,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L981
 Const access the sparsity - reference to data member.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L981
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L984
 
 ";
 
@@ -32558,7 +32558,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L981
 Const access the sparsity - reference to data member.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L981
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L984
 
 ";
 
@@ -32570,7 +32570,22 @@ Get an owning reference to the sparsity pattern.
 Extra doc: https://github.com/casadi/casadi/wiki/L_19j
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L988
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L991
+
+";
+
+%feature("docstring")  casadi::SX::get_output(casadi_int oind) const "
+
+[INTERNAL] 
+Get an output.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_28i
+
+Doc source: 
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L996
+
+Implementation: 
+https://github.com/casadi/casadi/blob/develop/casadi/core/sx_instantiator.cpp#L165-L167
 
 ";
 
@@ -32584,7 +32599,7 @@ Only defined if symbolic scalar.
 Extra doc: https://github.com/casadi/casadi/wiki/L_19n
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1036
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1044
 
 Implementation: 
 https://github.com/casadi/casadi/blob/develop/casadi/core/sx_instantiator.cpp#L126-L128
@@ -32597,7 +32612,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/sx_instantiator.cpp#L1
 Checks if expression does not contain NaN or Inf.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1039
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1047
 
 Implementation: 
 https://github.com/casadi/casadi/blob/develop/casadi/core/sx_instantiator.cpp#L100-L113
@@ -32612,7 +32627,7 @@ Check if smooth.
 Extra doc: https://github.com/casadi/casadi/wiki/L_19o
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1044
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1052
 
 Implementation: 
 https://github.com/casadi/casadi/blob/develop/casadi/core/sx_instantiator.cpp#L116-L123
@@ -32629,7 +32644,7 @@ Only defined if symbolic scalar.
 Extra doc: https://github.com/casadi/casadi/wiki/L_19p
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1051
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1059
 
 Implementation: 
 https://github.com/casadi/casadi/blob/develop/casadi/core/sx_instantiator.cpp#L131-L133
@@ -32646,7 +32661,7 @@ Only defined if symbolic scalar.
 Extra doc: https://github.com/casadi/casadi/wiki/L_19q
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1058
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1066
 
 Implementation: 
 https://github.com/casadi/casadi/blob/develop/casadi/core/sx_instantiator.cpp#L136-L138
@@ -32675,10 +32690,10 @@ Sparse matrices invariable return false
 Extra doc: https://github.com/casadi/casadi/wiki/L_19r
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1074
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1082
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sx_instantiator.cpp#L150-L156
+https://github.com/casadi/casadi/blob/develop/casadi/core/sx_instantiator.cpp#L180-L186
 
 ";
 
@@ -32698,7 +32713,7 @@ Sparse matrices can return true if all non-zero elements are symbolic
 Extra doc: https://github.com/casadi/casadi/wiki/L_19s
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1087
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1095
 
 Implementation: 
 https://github.com/casadi/casadi/blob/develop/casadi/core/sx_instantiator.cpp#L141-L147
@@ -32715,7 +32730,83 @@ possible)
 Extra doc: https://github.com/casadi/casadi/wiki/L_19v
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1109
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1117
+
+";
+
+%feature("docstring")  casadi::SX::is_call() const "
+
+[INTERNAL] 
+Check if function call.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_28j
+
+Doc source: 
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1122
+
+Implementation: 
+https://github.com/casadi/casadi/blob/develop/casadi/core/sx_instantiator.cpp#L150-L152
+
+";
+
+%feature("docstring")  casadi::SX::is_output() const "
+
+[INTERNAL] 
+Check if evaluation output.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_28k
+
+Doc source: 
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1127
+
+Implementation: 
+https://github.com/casadi/casadi/blob/develop/casadi/core/sx_instantiator.cpp#L155-L157
+
+";
+
+%feature("docstring")  casadi::SX::has_output() const "
+
+[INTERNAL] 
+Check if a multiple output node.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_28l
+
+Doc source: 
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1132
+
+Implementation: 
+https://github.com/casadi/casadi/blob/develop/casadi/core/sx_instantiator.cpp#L160-L162
+
+";
+
+%feature("docstring")  casadi::SX::which_output() const "
+
+[INTERNAL] 
+Get the index of evaluation output - only valid when  
+is_output() is true.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_28m
+
+Doc source: 
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1137
+
+Implementation: 
+https://github.com/casadi/casadi/blob/develop/casadi/core/sx_instantiator.cpp#L175-L177
+
+";
+
+%feature("docstring")  casadi::SX::which_function() const "
+
+[INTERNAL] 
+Get function - only valid when  is_call() is true.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_28n
+
+Doc source: 
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1142
+
+Implementation: 
+https://github.com/casadi/casadi/blob/develop/casadi/core/sx_instantiator.cpp#L170-L172
 
 ";
 
@@ -32729,7 +32820,7 @@ Check if the matrix is integer-valued.
 Extra doc: https://github.com/casadi/casadi/wiki/L_19w
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1116
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1149
 
 ";
 
@@ -32743,7 +32834,7 @@ possible)
 Extra doc: https://github.com/casadi/casadi/wiki/L_19x
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1121
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1154
 
 ";
 
@@ -32757,7 +32848,7 @@ possible)
 Extra doc: https://github.com/casadi/casadi/wiki/L_19y
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1126
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1159
 
 ";
 
@@ -32771,7 +32862,7 @@ possible)
 Extra doc: https://github.com/casadi/casadi/wiki/L_19z
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1131
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1164
 
 ";
 
@@ -32787,7 +32878,7 @@ are possible)
 Extra doc: https://github.com/casadi/casadi/wiki/L_1a0
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1138
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1171
 
 ";
 
@@ -32797,10 +32888,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1138
 Get operation type.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1141
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1174
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sx_instantiator.cpp#L159-L161
+https://github.com/casadi/casadi/blob/develop/casadi/core/sx_instantiator.cpp#L189-L191
 
 ";
 
@@ -32810,10 +32901,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/sx_instantiator.cpp#L1
 Is it a certain operation.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1144
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1177
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sx_instantiator.cpp#L164-L166
+https://github.com/casadi/casadi/blob/develop/casadi/core/sx_instantiator.cpp#L194-L196
 
 ";
 
@@ -32827,7 +32918,7 @@ zeros.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1a1
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1149
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1182
 
 ";
 
@@ -32841,10 +32932,10 @@ Implementation of  Matrix::get_nonzeros (in public API)
 Extra doc: https://github.com/casadi/casadi/wiki/L_1a2
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1154
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1187
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1334-L1339
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1367-L1372
 
 ";
 
@@ -32856,7 +32947,7 @@ Get all nonzeros.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1a4
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1166
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1199
 
 ";
 
@@ -32868,7 +32959,7 @@ Get all elements.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1a3
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1159
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1192
 
 ";
 
@@ -32880,10 +32971,10 @@ Get name (only if symbolic scalar)
 Extra doc: https://github.com/casadi/casadi/wiki/L_1a8
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1190
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1223
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sx_instantiator.cpp#L188-L190
+https://github.com/casadi/casadi/blob/develop/casadi/core/sx_instantiator.cpp#L218-L220
 
 ";
 
@@ -32898,10 +32989,10 @@ const.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1a9
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1198
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1231
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sx_instantiator.cpp#L193-L195
+https://github.com/casadi/casadi/blob/develop/casadi/core/sx_instantiator.cpp#L223-L225
 
 ";
 
@@ -32915,10 +33006,10 @@ Only defined if symbolic scalar.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1aa
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1205
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1238
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sx_instantiator.cpp#L198-L200
+https://github.com/casadi/casadi/blob/develop/casadi/core/sx_instantiator.cpp#L228-L230
 
 ";
 
@@ -32946,10 +33037,10 @@ lang: only 'matlab' supported for now
 Extra doc: https://github.com/casadi/casadi/wiki/L_1ac
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1243
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1276
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dm_instantiator.cpp#L94-L192
+https://github.com/casadi/casadi/blob/develop/casadi/core/dm_instantiator.cpp#L100-L198
 
 ";
 
@@ -32959,10 +33050,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/dm_instantiator.cpp#L9
 Obtain information about sparsity
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1247
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1280
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/dm_instantiator.cpp#L195-L197
+https://github.com/casadi/casadi/blob/develop/casadi/core/dm_instantiator.cpp#L201-L203
 
 ";
 
@@ -32975,7 +33066,7 @@ Serialize an object.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1ad
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1252
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1285
 
 ";
 
@@ -32987,7 +33078,7 @@ Serialize.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1ae
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1258
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1291
 
 ";
 
@@ -33000,7 +33091,7 @@ Serialize an object.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1ah
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1273
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1306
 
 ";
 
@@ -33028,7 +33119,7 @@ Supported formats:
 
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1293
+https://github.com/casadi/casadi/blob/develop/casadi/core/matrix_decl.hpp#L1326
 
 ";
 
@@ -47911,10 +48002,10 @@ Ternary if_else: x ? y : z.
 Extra doc: https://github.com/casadi/casadi/wiki/L_113
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.hpp#L265
+https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.hpp#L276
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.hpp#L265-L267
+https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.hpp#L276-L278
 
 ";
 
@@ -47925,10 +48016,10 @@ Ternary if_else: x ? y : z.
 Extra doc: https://github.com/casadi/casadi/wiki/L_113
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.hpp#L265
+https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.hpp#L276
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.hpp#L265-L267
+https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.hpp#L276-L278
 
 ";
 
@@ -47939,10 +48030,10 @@ Ternary if_else: x ? y : z.
 Extra doc: https://github.com/casadi/casadi/wiki/L_113
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.hpp#L265
+https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.hpp#L276
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.hpp#L265-L267
+https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.hpp#L276-L278
 
 ";
 
@@ -47959,7 +48050,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.hpp#L78
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.cpp#L46-L49
+https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.cpp#L48-L51
 
 ";
 
@@ -47980,7 +48071,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.hpp#L86
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.cpp#L64-L81
+https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.cpp#L66-L83
 
 ";
 
@@ -47995,7 +48086,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.hpp#L107
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.cpp#L59-L62
+https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.cpp#L61-L64
 
 ";
 
@@ -48008,7 +48099,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.hpp#L110
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.cpp#L87-L89
+https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.cpp#L89-L91
 
 ";
 
@@ -48022,7 +48113,7 @@ Doc source:
 https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.hpp#L129
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.cpp#L133-L135
+https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.cpp#L135-L137
 
 ";
 
@@ -48036,10 +48127,10 @@ Introduced to catch bool(x) situations in python
 Extra doc: https://github.com/casadi/casadi/wiki/L_10q
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.hpp#L156
+https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.hpp#L157
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.cpp#L150-L153
+https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.cpp#L152-L155
 
 ";
 
@@ -48053,10 +48144,10 @@ An  SXElem qualifies as leaf when it has no dependencies.
 Extra doc: https://github.com/casadi/casadi/wiki/L_10r
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.hpp#L163
+https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.hpp#L164
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.cpp#L435-L438
+https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.cpp#L442-L445
 
 ";
 
@@ -48080,10 +48171,10 @@ Check whether a binary  SXElem is commutative.
 Extra doc: https://github.com/casadi/casadi/wiki/L_10s
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.hpp#L170
+https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.hpp#L171
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.cpp#L440-L443
+https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.cpp#L447-L450
 
 ";
 
@@ -48127,16 +48218,36 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.cpp#L440-L443
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::SXElem::is_call() const "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::SXElem::is_output() const "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::SXElem::has_output() const "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::SXElem::which_function() const "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::SXElem::which_output() const "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::SXElem::is_regular() const "
 
 [INTERNAL] 
 Checks if expression does not contain NaN or Inf.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.hpp#L183
+https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.hpp#L189
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.cpp#L611-L617
+https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.cpp#L642-L648
 
 ";
 
@@ -48149,10 +48260,10 @@ allowed)
 Extra doc: https://github.com/casadi/casadi/wiki/L_10t
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.hpp#L188
+https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.hpp#L194
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.cpp#L508-L516
+https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.cpp#L535-L543
 
 ";
 
@@ -48168,10 +48279,10 @@ Check if the node is the sum of two equal expressions.
 Extra doc: https://github.com/casadi/casadi/wiki/L_10u
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.hpp#L200
+https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.hpp#L206
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.cpp#L155-L157
+https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.cpp#L157-L159
 
 ";
 
@@ -48183,10 +48294,25 @@ Get the number of dependencies of a binary  SXElem.
 Extra doc: https://github.com/casadi/casadi/wiki/L_10v
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.hpp#L205
+https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.hpp#L211
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.cpp#L531-L533
+https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.cpp#L558-L560
+
+";
+
+%feature("docstring")  casadi::SXElem::get_output(casadi_int oind) const "
+
+[INTERNAL] 
+Get an output.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_29f
+
+Doc source: 
+https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.hpp#L216
+
+Implementation: 
+https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.cpp#L562-L564
 
 ";
 
@@ -48200,10 +48326,10 @@ If the  SXElem does not point to any node, 0 is returned.
 Extra doc: https://github.com/casadi/casadi/wiki/L_10w
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.hpp#L212
+https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.hpp#L223
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.cpp#L535-L537
+https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.cpp#L566-L568
 
 ";
 
@@ -48215,10 +48341,10 @@ Element-wise inverse.
 Extra doc: https://github.com/casadi/casadi/wiki/L_10y
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.hpp#L222
+https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.hpp#L233
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.cpp#L159-L165
+https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.cpp#L161-L167
 
 ";
 
@@ -48229,10 +48355,10 @@ Element-wise inverse.
 Extra doc: https://github.com/casadi/casadi/wiki/L_10y
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.hpp#L222
+https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.hpp#L233
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.cpp#L159-L165
+https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.cpp#L161-L167
 
 ";
 
@@ -48243,10 +48369,10 @@ Element-wise inverse.
 Extra doc: https://github.com/casadi/casadi/wiki/L_10y
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.hpp#L222
+https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.hpp#L233
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.cpp#L159-L165
+https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.cpp#L161-L167
 
 ";
 
@@ -48258,10 +48384,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.cpp#L159-L165
 Extra doc: https://github.com/casadi/casadi/wiki/L_112
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.hpp#L260
+https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.hpp#L271
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.hpp#L260-L260
+https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.hpp#L271-L271
 
 ";
 
@@ -48274,10 +48400,10 @@ Serialize an object.
 Extra doc: https://github.com/casadi/casadi/wiki/L_114
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.hpp#L272
+https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.hpp#L283
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.cpp#L619-L621
+https://github.com/casadi/casadi/blob/develop/casadi/core/sx_elem.cpp#L650-L652
 
 ";
 
@@ -48615,7 +48741,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L129
 ";
 
 
-// File: namespace_0d387.xml
+// File: namespace_0d389.xml
 
 
 // File: namespacealpaqa.xml

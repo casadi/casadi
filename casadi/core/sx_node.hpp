@@ -103,10 +103,14 @@ namespace casadi {
         \identifier{9z} */
     virtual casadi_int op() const=0;
 
-    /** \brief  Get called function */
+    /** \brief  Get called function
+
+        \identifier{291} */
     virtual Function which_function() const;
 
-    /** \brief  Get function output*/
+    /** \brief  Get function output
+
+        \identifier{292} */
     virtual casadi_int which_output() const;
 
     /** \brief Check if two nodes are equivalent up to a given depth
@@ -119,7 +123,9 @@ namespace casadi {
         \identifier{a1} */
     virtual casadi_int n_dep() const { return 0;}
 
-    /** \brief  Get an output */
+    /** \brief  Get an output
+
+        \identifier{293} */
     virtual SXElem get_output(casadi_int oind) const;
 
     /** \brief  get the reference of a child

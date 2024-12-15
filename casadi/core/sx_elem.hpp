@@ -210,7 +210,9 @@ namespace casadi {
         \identifier{10v} */
     casadi_int n_dep() const;
 
-    /** \brief  Get an output */
+    /** \brief  Get an output
+
+        \identifier{29f} */
     SXElem get_output(casadi_int oind) const;
 
     /** \brief Returns a number that is unique for a given SXNode.

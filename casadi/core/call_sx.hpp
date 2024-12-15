@@ -38,13 +38,17 @@ namespace casadi {
 class CallSX : public SXNode {
   private:
 
-    /** \brief  Constructor is private, use "create" below */
+    /** \brief  Constructor is private, use "create" below
+
+        \identifier{28o} */
     CallSX(const Function& f, const std::vector<SXElem>& dep) :
         f_(f), dep_(dep) {}
 
   public:
 
-    /** \brief  Create a binary expression */
+    /** \brief  Create a binary expression
+
+        \identifier{28p} */
     inline static SXElem create(const Function& f, const std::vector<SXElem>& dep) {
       casadi_assert(f.nnz_in()==dep.size(),
         "CallSX::create(f,dep): dimension mismatch: " + str(f.nnz_in()) + " vs " + str(dep.size()));
@@ -73,7 +77,8 @@ class CallSX : public SXNode {
     /** \brief Destructor
     This is a rather complex destructor which is necessary since the default destructor
     can cause stack overflow due to recursive calling.
-    */
+
+        \identifier{28q} */
     ~CallSX() override {
       for (auto & d  : dep_)
         safe_delete(d.assignNoDelete(casadi_limits<SXElem>::nan));
@@ -84,39 +89,57 @@ class CallSX : public SXNode {
 
     bool is_op(casadi_int op) const override { return OP_CALL==op; }
 
-    /** \brief  Number of dependencies */
+    /** \brief  Number of dependencies
+
+        \identifier{28r} */
     casadi_int n_dep() const override { return dep_.size();}
 
-    /** \brief  Get an output */
+    /** \brief  Get an output
+
+        \identifier{28s} */
     SXElem get_output(casadi_int oind) const override {
       // Optimization: get_output() cached like in MultipleOutput
       return OutputSX::create(shared_from_this(), oind);
     }
 
-    /** \brief  get the reference of a dependency */
+    /** \brief  get the reference of a dependency
+
+        \identifier{28t} */
     const SXElem& dep(casadi_int i) const override { return dep_[i];}
     SXElem& dep(casadi_int i) override { return dep_[i];}
 
-    /** \brief  Get the operation */
+    /** \brief  Get the operation
+
+        \identifier{28u} */
     casadi_int op() const override { return OP_CALL; }
 
-    /** \brief Check if call node */
+    /** \brief Check if call node
+
+        \identifier{28v} */
     bool is_call() const override { return true; }
 
-    /** \brief  Check if a multiple output node */
+    /** \brief  Check if a multiple output node
+
+        \identifier{28w} */
     bool has_output() const override { return true; }
 
-    /** \brief  Get function  */
+    /** \brief  Get function
+
+        \identifier{28x} */
     Function which_function() const override { return f_; }
 
-    /** \brief  Print expression */
+    /** \brief  Print expression
+
+        \identifier{28y} */
     std::string print(const std::string& arg1, const std::string& arg2) const override {
       return f_.name();
     }
 
     Function f_;
 
-    /** \brief  The dependencies of the node */
+    /** \brief  The dependencies of the node
+
+        \identifier{28z} */
     std::vector<SXElem> dep_;
 
     void serialize_node(SerializingStream& s) const override {
