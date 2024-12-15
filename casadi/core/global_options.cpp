@@ -42,6 +42,6 @@ namespace casadi {
 
   bool GlobalOptions::julia_initialized = false;
 
-  casadi_int GlobalOptions::copy_elision_min_size = -1;
+  casadi_int GlobalOptions::copy_elision_min_size = 8;
 
 } // namespace casadi
