@@ -32,21 +32,13 @@
 namespace casadi {
 
     class CASADI_EXPORT OutputSX : public SXNode {
-  private:
+  public:
 
     /** \brief  Constructor
 
         \identifier{294} */
     OutputSX(const SXElem& dep, int oind) : dep_(dep), oind_(oind) {
 
-    }
-
-  public:
-    /** \brief  Create a unary expression
-
-        \identifier{295} */
-    inline static SXElem create(const SXElem& dep, int oind) {
-      return SXElem::create(new OutputSX(dep, oind));
     }
 
     // Class name

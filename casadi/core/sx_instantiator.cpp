@@ -948,19 +948,6 @@ namespace casadi {
             }
           }
 
-          // Since get_output() is currently not cached,
-          // do caching here
-          for (casadi_int i=0; i<ret.size(); ++i) {
-            std::string key = s.pack(ret[i]);
-            auto it = cache.find(key);
-            if (it==cache.end()) {
-              // No, add it
-              cache[key] = ret[i];
-            } else {
-              ret[i] = it->second;
-            }
-          }
-
           // Store results into w
           for (casadi_int i=0;i<m.n_res;++i) {
             if (m.res[i]>=0) w[m.res[i]] = ret[i];

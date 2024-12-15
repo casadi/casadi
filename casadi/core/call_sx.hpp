@@ -32,6 +32,10 @@
 #include <deque>
 #include <stack>
 
+// Caching of outputs requires a map
+#include <unordered_map>
+#define CACHING_MAP std::unordered_map
+
 /// \cond INTERNAL
 namespace casadi {
 
@@ -43,6 +47,13 @@ class CallSX : public SXNode {
         \identifier{28o} */
     CallSX(const Function& f, const std::vector<SXElem>& dep) :
         f_(f), dep_(dep) {}
+
+
+    mutable CACHING_MAP<casadi_int, OutputSX*> cached_outputs_;
+
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+    mutable std::mutex mutex_cached_outputs;
+#endif //CASADI_WITH_THREADSAFE_SYMBOLICS
 
   public:
 
@@ -99,8 +110,26 @@ class CallSX : public SXNode {
 
         \identifier{28s} */
     SXElem get_output(casadi_int oind) const override {
-      // Optimization: get_output() cached like in MultipleOutput
-      return OutputSX::create(shared_from_this(), oind);
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+    // Safe access to cached_outputs
+    std::lock_guard<std::mutex> lock(mutex_cached_outputs);
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
+      // Try to find the output node
+      CACHING_MAP<casadi_int, OutputSX*>::iterator it = cached_outputs_.find(oind);
+
+      // If not found, add it,
+      if (it==cached_outputs_.end()) {
+        // Allocate a new object
+        OutputSX* ret = new OutputSX(shared_from_this(), oind);
+
+        // Add to hash_table
+        cached_outputs_.insert(it, std::make_pair(oind, ret));
+
+        // Return it to caller
+        return SXElem::create(ret);
+      } else { // Else, returned the object
+        return it->second->shared_from_this();
+      }
     }
 
     /** \brief  get the reference of a dependency
