@@ -217,7 +217,7 @@ namespace casadi {
         casadi_int worksize = g.avoid_stack() ? worksize_ : 0;
 
         // Collect input arguments
-        casadi_int offset = worksize+call_.sz_w;
+        casadi_int offset = worksize;
         for (casadi_int i=0; i<m.f_n_in; ++i) {
           if (m.copy_elision_arg[i]>=0) {
             g << "arg[" << n_in_+i << "] = "
@@ -230,7 +230,6 @@ namespace casadi {
           offset += m.f_nnz_in[i];
         }
 
-        offset = worksize+call_.sz_w+call_.sz_w_arg;
         // Collect output arguments
         for (casadi_int i=0; i<m.f_n_out; ++i) {
           g << "res[" << n_out_+i << "]=" << "w+" + str(offset) << ";\n";
@@ -240,7 +239,7 @@ namespace casadi {
         for (casadi_int i=0; i<m.f_n_in; ++i) {
           if (m.copy_elision_arg[i]==-1) {
             for (casadi_int j=0; j<m.f_nnz_in[i]; ++j) {
-              g << "w["+str(k+worksize+call_.sz_w) + "] = " << g.sx_work(m.dep[k]) << ";\n";
+              g << "w["+str(k+worksize) + "] = " << g.sx_work(m.dep[k]) << ";\n";
               k++;
             }
           } else {
@@ -248,13 +247,13 @@ namespace casadi {
           }
         }
         std::string flag =
-          g(m.f, "arg+"+str(n_in_), "res+"+str(n_out_), "iw", "w+" + str(worksize));
+          g(m.f, "arg+"+str(n_in_), "res+"+str(n_out_), "iw", "w+" + str(offset));
         // Call function
         g << "if (" << flag << ") return 1;\n";
         for (casadi_int i=0;i<m.n_res;++i) {
           if (m.res[i]>=0) {
             g << g.sx_work(m.res[i]) << " = ";
-            g << "w[" + str(i+worksize+call_.sz_w+call_.sz_w_arg) + "];\n";
+            g << "w[" + str(i+worksize+call_.sz_w_arg) + "];\n";
           }
         }
       } else if (a.op==OP_INPUT) {
@@ -1199,9 +1198,9 @@ namespace casadi {
     CT*** call_arg, T*** call_res, casadi_int** call_iw, T** call_w, T** nz_in, T** nz_out) const {
     *call_arg += n_in_;
     *call_res += n_out_;
-    *call_w   += worksize_;
-    *nz_in    = *call_w + call_.sz_w;
-    *nz_out   = *nz_in + call_.sz_w_arg;
+    *nz_in    = *call_w + worksize_;
+    *nz_out   = *call_w + worksize_ + call_.sz_w_arg;
+    *call_w   = *call_w + worksize_ + call_.sz_w_arg + call_.sz_w_res;
 
     // Set up call_arg to point to nz_in
     T* ptr_w = *nz_in;
