@@ -2103,10 +2103,10 @@ namespace casadi {
   }
 
 
-  class IncrementalSerializer {
+  class IncrementalSerializerMX {
     public:
 
-    IncrementalSerializer() : serializer(ss, {{"debug", true}}) {
+    IncrementalSerializerMX() : serializer(ss) {
     }
 
     std::string pack(const MX& a) {
@@ -2153,7 +2153,7 @@ namespace casadi {
     std::vector<MX> res(e.size());
 
     std::unordered_map<std::string, MX > cache;
-    IncrementalSerializer s;
+    IncrementalSerializerMX s;
 
     std::unordered_map<std::string, Function> function_cache;
 
