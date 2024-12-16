@@ -68,8 +68,12 @@
 %}
 #endif //CASADI_WITH_PYTHON_GIL_RELEASE
 
+%ignore CASADI_SWIG_FLAGS;
+%include "swig_config.h"
+
 %{
   namespace casadi {
+
     // Redirect printout
     static void pythonlogger(const char* s, std::streamsize num, bool error) {
 #ifndef CASADI_WITH_PYTHON_GIL_RELEASE
@@ -4485,7 +4489,14 @@ namespace casadi {
 %include <casadi/core/importer.hpp>
 %include <casadi/core/callback.hpp>
 %include <casadi/core/global_options.hpp>
+
 %include <casadi/core/casadi_meta.hpp>
+#ifdef SWIGPYTHON
+%extend casadi::CasadiMeta {
+  static const char* swig_flags() { return CASADI_SWIG_FLAGS; }
+};
+#endif // SWIGPYTHON
+
 %include <casadi/core/integration_tools.hpp>
 %include <casadi/core/nlp_tools.hpp>
 %include <casadi/core/tools.hpp>

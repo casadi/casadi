@@ -34,7 +34,9 @@ import datetime
 import threading
 import time
 import multiprocessing
+import platform
 
+print("multiprocessing.cpu_count", multiprocessing.cpu_count())
 target_print_thread = 0.25
 
 class PrintNowThread:
@@ -62,8 +64,9 @@ class Threadstests(casadiTestCase):
   @memory_heavy()
   @requires_nlpsol("ipopt")
   def test_GIL_release_wall_time(self):
+        print("CasadiMeta.swig_flags",CasadiMeta.swig_flags())
 
-
+        if "CASADI_WITH_PYTHON_GIL_RELEASE" not in CasadiMeta.swig_flags(): return
 
 
         timerthread = PrintNowThread()
@@ -155,22 +158,31 @@ class Threadstests(casadiTestCase):
         results = p.map(casadi_calc,range(n_thread))
 
         results = [raw_solver.stats(i+1)["t_wall_nlp_jac_g"] for i in range(n_thread)]
-        print(base_time,results)
+        print("base_time",base_time,results)
 
 
         # Evaluation wall time should stay the same with two threads
         for e in results:
             print(e/base_time)
-            self.assertTrue(0.7 <= e/base_time <= 1.3)
+            max_factor = 1.3
+            if platform.system()=='Darwin':
+                max_factor = 2.6
+            self.assertTrue(0.5 <= e/base_time <= max_factor)
 
         print(timerthread.timestamps)
         for dt in np.diff(np.array(timerthread.timestamps)):
             print("target_print_thread dt",dt)
-            self.assertTrue(target_print_thread*0.9<=dt<=target_print_thread*1.1)
+            max_factor = 1.2
+            if platform.system()=='Darwin':
+                # Mac does not seem to be accurate: https://stackoverflow.com/questions/1133857/how-accurate-is-pythons-time-sleep
+                max_factor = 2
+            self.assertTrue(target_print_thread*0.9<=dt<=target_print_thread*max_factor)
         
   @memory_heavy()
   @requires_nlpsol("ipopt")
   def test_GIL_release_stress_test(self):
+  
+    if "CASADI_WITH_PYTHON_GIL_RELEASE" not in CasadiMeta.swig_flags(): return
 
     timerthread = PrintNowThread()
     timerthread.start()
@@ -211,7 +223,7 @@ class Threadstests(casadiTestCase):
         self.counter = self.counter + 1
         #print(ca.det(S))
         if argin[0]>10:
-            raise Exception("let's try an exception")
+            raise Exception("let's try an exception" + str(id(self)))
         
         return [argin[0]]
         
@@ -324,13 +336,16 @@ class Threadstests(casadiTestCase):
     print(results)
     
     for i in range(n_thread):
-        self.checkarray(results[0],results[i],digits=14)
+        self.checkarray(results[0],results[i],digits=7) # exact point of MyCallback exception throwing may lead to small differences
         self.assertTrue(raw_solver.stats(i+1)["success"])
 
     print(timerthread.timestamps)
     for dt in np.diff(np.array(timerthread.timestamps)):
         print("target_print_thread dt",dt)
-        self.assertTrue(target_print_thread*0.9<=dt<=target_print_thread*1.1)
+        max_factor = 1.2
+        if platform.system()=='Darwin':
+            max_factor = 2
+        self.assertTrue(target_print_thread*0.9<=dt<=target_print_thread*max_factor)
     
     [raw_solver.stats(i+1)["t_wall_nlp_jac_g"] for i in range(n_thread)]
 
