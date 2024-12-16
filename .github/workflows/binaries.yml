@@ -1099,6 +1099,14 @@ jobs:
           python alltests.py --run_slow
         shell: pwsh
         if: contains(matrix.image, 'windows')
+      - env:
+          PYTHONPATH: ${{ github.workspace }}/casadi
+        run: |
+          sudo apt install -y valgrind
+          cd test
+          python internal/test_pytest.py python -skipfiles="alltests.py helpers.py complexity.py speed.py debug_fatrop.py" -skipdirs="hock_schittkowski" -memcheck -passoptions="--ignore_memory_heavy"
+        shell: bash -el {0}
+        if: contains(matrix.image, 'ubuntu')
       - name: Inject slug/short variables
         uses: rlespinasse/github-slug-action@v4.4.1
       - uses: jgillis/fetch-gh-release-asset@patch-1

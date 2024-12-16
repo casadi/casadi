@@ -509,3 +509,38 @@ obj:*libworhp*
    fun:*ProxqpInterface*
 }
 
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:calloc
+   fun:osqp_setup
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   fun:_ZN6casadi14FunctionBuffer5_evalEv
+   fun:_ZN6casadi21_function_buffer_evalEPv
+   fun:_wrap__function_buffer_eval
+   fun:cfunction_vectorcall_O
+   fun:_PyObject_VectorcallTstate.lto_priv.1
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr8
+   fun:update_LDL_remove
+   fun:remove_constraint
+   fun:remove_blocking
+   fun:daqp_ldp
+   fun:daqp_solve
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   fun:_ZN6casadi18casadi_hpipm_solveIdEEiPNS_17casadi_hpipm_dataIT_EEPPKdPPdPxS8_
+}

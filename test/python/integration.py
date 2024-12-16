@@ -1417,7 +1417,7 @@ class Integrationtests(casadiTestCase):
         assert meta["index"]==index
         if init_strength is not None:
           [dae_se, state_to_orig, phi] = dae_map_semi_expl(dae, dae_reduced)
-          intg = integrator("intg","idas",dae_se,{"grid": grid})
+          intg = integrator("intg","idas",dae_se,0, grid)
           init_gen = dae_init_gen(dae, dae_reduced, "ipopt", init_strength, {"error_on_fail" : True})
           xz0 = init_gen(**init)
           sol = intg(**xz0)
