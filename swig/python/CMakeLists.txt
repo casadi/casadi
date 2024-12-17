@@ -92,6 +92,12 @@ set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-py3")
 set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-DWITH_PYTHON3")
 endif()
 
+if(WITH_PYTHON_GIL_RELEASE)
+  set(CMAKE_SWIG_NAME_SUFFIX "_gil_release")
+else()
+  set(CMAKE_SWIG_NAME_SUFFIX "")
+endif()
+
 # Main header files
 if(NOT SKIP_CONFIG_H_GENERATION)
   configure_file(../swig_config.h.cmake "${CMAKE_CURRENT_BINARY_DIR}/swig_config.h" ESCAPE_QUOTES)
@@ -107,7 +113,7 @@ if(SWIG_EXPORT)
 endif()
 
 if(SWIG_IMPORT)
-  set(PYTHON_FILE ${CMAKE_CURRENT_SOURCE_DIR}/target${PYTHONFLAG}/source/casadiPYTHON_wrap.cxx)
+  set(PYTHON_FILE ${CMAKE_CURRENT_SOURCE_DIR}/target${PYTHONFLAG}/source/casadiPYTHON_wrap${CMAKE_SWIG_NAME_SUFFIX}.cxx)
   set_source_files_properties(${PYTHON_FILE}  PROPERTIES  CPLUSPLUS ON)
 else()
   # Generate SWIG wrapper

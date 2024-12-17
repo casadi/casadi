@@ -213,7 +213,7 @@ macro(swig_add_source_to_module name xmlmode outfiles infile)
   # add the language into the name of the file (i.e. TCL_wrap)
   # this allows for the same .i file to be wrapped into different languages
   set(swig_generated_file_fullname
-    "${swig_generated_file_fullname}${SWIG_MODULE_${name}_LANGUAGE}_wrap")
+    "${swig_generated_file_fullname}${SWIG_MODULE_${name}_LANGUAGE}_wrap${CMAKE_SWIG_NAME_SUFFIX}")
 
   set(xmlmode_test ${xmlmode})
   if(xmlmode_test)
