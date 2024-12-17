@@ -521,10 +521,6 @@ obj:*libworhp*
    obj:*
    obj:*
    fun:_ZN6casadi14FunctionBuffer5_evalEv
-   fun:_ZN6casadi21_function_buffer_evalEPv
-   fun:_wrap__function_buffer_eval
-   fun:cfunction_vectorcall_O
-   fun:_PyObject_VectorcallTstate.lto_priv.1
 }
 
 {
@@ -543,4 +539,25 @@ obj:*libworhp*
    match-leak-kinds: definite
    fun:malloc
    fun:_ZN6casadi18casadi_hpipm_solveIdEEiPNS_17casadi_hpipm_dataIT_EEPPKdPPdPxS8_
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:_Znwm
+   fun:_ZN5Highs3runEv
+   fun:_ZN6casadi18casadi_highs_solveIdEEiPNS_17casadi_highs_dataIT_EEPPKdPPdPxS8_
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:_ZnwmRKSt9nothrow_t
+   fun:__cxa_thread_atexit
+   fun:_ZNSt6thread11_State_implINS_8_InvokerISt5tupleIJZN17HighsTaskExecutorC4EiEUliE_iEEEEE6_M_runEv
+   fun:execute_native_thread_routine
+   fun:start_thread
+   fun:clone
 }

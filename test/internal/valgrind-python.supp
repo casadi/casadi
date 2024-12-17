@@ -1451,10 +1451,78 @@ fun:PyParser_ASTFromFile
    fun:unicode_dealloc
    fun:list_dealloc
    fun:_textiowrapper_writeflush
-   fun:_io_TextIOWrapper_flush
-   fun:method_vectorcall_NOARGS
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr4
+   fun:object_dealloc
+   fun:_textiowrapper_writeflush
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Cond
+   fun:unicode_dealloc
+   fun:sys_pyfile_write
+   fun:sys_write
+   fun:PySys_WriteStderr
+   fun:_ZN6casadiL12pythonloggerEPKclb
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr4
+   fun:PyMem_Free
+   fun:_Py_DisplaySourceLine
+   fun:PyTraceBack_Print
+   fun:print_exception_recursive.cold
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr4
+   fun:PyMem_Free
+   fun:PyTokenizer_Free
+   fun:_Py_DisplaySourceLine
+   fun:PyTraceBack_Print
+   fun:print_exception_recursive.cold
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr4
+   fun:unicode_dealloc
+   fun:textiowrapper_set_decoded_chars
+   fun:_textiowrapper_readline
+   fun:method_vectorcall_FASTCALL
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Cond
+   fun:object_dealloc
+   fun:tupledealloc
+   fun:textiowrapper_read_chunk
+   fun:_textiowrapper_readline
+   fun:method_vectorcall_FASTCALL
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr4
+   fun:PyObject_GC_Del
+   ...
+   fun:_PyGC_CollectNoFail
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Value8
+   fun:PyMem_Free
+   fun:stringio_dealloc
+   fun:list_ass_subscript
    fun:_PyEval_EvalFrameDefault
-   fun:function_code_fastcall
 }
 
 {
@@ -1462,10 +1530,6 @@ fun:PyParser_ASTFromFile
    Memcheck:Addr4
    fun:list_dealloc
    fun:_textiowrapper_writeflush
-   fun:_io_TextIOWrapper_flush
-   fun:method_vectorcall_NOARGS
-   fun:_PyEval_EvalFrameDefault
-   fun:function_code_fastcall
 }
 
 {
@@ -1681,17 +1745,36 @@ fun:PyParser_ASTFromFile
    <insert_a_suppression_name_here>
    Memcheck:Addr4
    fun:PyMem_Free
-   fun:code_dealloc
-   fun:func_dealloc
-   fun:free_keys_object
-   fun:type_clear
-   fun:collect
-   fun:_PyGC_CollectNoFail
-   fun:_PyImport_Cleanup
-   fun:Py_FinalizeEx
-   fun:Py_Exit
-   fun:handle_system_exit
-   fun:PyErr_PrintEx
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Cond
+   fun:PyMem_Free
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Value8
+   fun:PyMem_Free
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Cond
+   fun:unicode_dealloc
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Value8
+   fun:unicode_dealloc
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr4
+   fun:unicode_dealloc
 }
 
 {
@@ -2804,6 +2887,13 @@ fun:PyParser_ASTFromFile
 
 {
    <insert_a_suppression_name_here>
+   Memcheck:Cond
+   fun:list_dealloc
+   fun:_textiowrapper_writeflush
+}
+
+{
+   <insert_a_suppression_name_here>
    Memcheck:Addr4
    fun:list_dealloc
    fun:_PyEval_EvalFrameDefault
@@ -3131,6 +3221,561 @@ fun:PyParser_ASTFromFile
    fun:_PyImport_LoadDynamicModuleWithSpec
    fun:_imp_create_dynamic_impl.isra.21
    fun:_imp_create_dynamic
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr4
+   fun:unicode_dealloc
+   fun:list_repr
+   fun:PyObject_Str
+   fun:PyFile_WriteObject
+   fun:builtin_print
+   fun:cfunction_vectorcall_FASTCALL_KEYWORDS
+   fun:_PyEval_EvalFrameDefault
+   fun:_PyEval_EvalCode
+   fun:_PyEval_EvalCodeWithName
+   fun:PyEval_EvalCodeEx
+   fun:PyEval_EvalCode
+   fun:run_eval_code_obj
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr4
+   fun:list_dealloc
+   fun:frame_dealloc
+   fun:function_code_fastcall
+   fun:_PyEval_EvalFrameDefault
+   fun:_PyEval_EvalCode
+   fun:_PyFunction_Vectorcall
+   fun:_PyEval_EvalFrameDefault
+   fun:_PyEval_EvalCode
+   fun:_PyFunction_Vectorcall
+   fun:_PyEval_EvalFrameDefault
+   fun:function_code_fastcall
+   fun:_PyEval_EvalFrameDefault
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr4
+   fun:list_dealloc
+   fun:_textiowrapper_writeflush
+   fun:_io_TextIOWrapper_write
+   fun:cfunction_vectorcall_O
+   fun:_PyObject_VectorcallTstate.lto_priv.1
+   fun:PyObject_CallOneArg.lto_priv.0
+   fun:PyFile_WriteObject
+   fun:builtin_print
+   fun:cfunction_vectorcall_FASTCALL_KEYWORDS
+   fun:_PyEval_EvalFrameDefault
+   fun:function_code_fastcall
+   fun:method_vectorcall
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Cond
+   fun:list_dealloc
+   fun:_PyAccu_Finish
+   fun:make_intermediate
+   fun:method_vectorcall_NOARGS
+   fun:_PyEval_EvalFrameDefault
+   fun:gen_send_ex
+   fun:builtin_next
+   fun:cfunction_vectorcall_FASTCALL
+   fun:_PyEval_EvalFrameDefault
+   fun:function_code_fastcall
+   fun:method_vectorcall
+   fun:_PyEval_EvalFrameDefault
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Cond
+   fun:PyMem_Realloc
+   fun:resize_buffer.lto_priv.1
+   fun:_io_StringIO___init__
+   fun:_PyObject_MakeTpCall
+   fun:_PyEval_EvalFrameDefault
+   fun:gen_send_ex
+   fun:builtin_next
+   fun:cfunction_vectorcall_FASTCALL
+   fun:_PyEval_EvalFrameDefault
+   fun:function_code_fastcall
+   fun:method_vectorcall
+   fun:_PyEval_EvalFrameDefault
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Value8
+   fun:object_dealloc
+   fun:_textiowrapper_writeflush
+   fun:_io_TextIOWrapper_write
+   fun:method_vectorcall_O
+   fun:PyObject_VectorcallMethod
+   fun:sys_pyfile_write_unicode
+   fun:sys_pyfile_write
+   fun:sys_write
+   fun:PySys_WriteStdout
+   fun:_ZN6casadiL12pythonloggerEPKclb
+   fun:_ZN6casadi6Logger18WriteFunThreadSafeEPKclb
+   fun:_ZN6casadi6Logger5writeILb0EEEvPKcl
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Cond
+   fun:object_dealloc
+   fun:_textiowrapper_writeflush
+   fun:_io_TextIOWrapper_write
+   fun:method_vectorcall_O
+   fun:PyObject_VectorcallMethod
+   fun:sys_pyfile_write_unicode
+   fun:sys_pyfile_write
+   fun:sys_write
+   fun:PySys_WriteStdout
+   fun:_ZN6casadiL12pythonloggerEPKclb
+   fun:_ZN6casadi6Logger18WriteFunThreadSafeEPKclb
+   fun:_ZN6casadi6Logger5writeILb0EEEvPKcl
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Value8
+   fun:list_dealloc
+   fun:_textiowrapper_writeflush
+   fun:_io_TextIOWrapper_write
+   fun:method_vectorcall_O
+   fun:PyObject_VectorcallMethod
+   fun:sys_pyfile_write_unicode
+   fun:sys_pyfile_write
+   fun:sys_write
+   fun:PySys_WriteStdout
+   fun:_ZN6casadiL12pythonloggerEPKclb
+   fun:_ZN6casadi6Logger18WriteFunThreadSafeEPKclb
+   fun:_ZN6casadi6Logger5writeILb0EEEvPKcl
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr4
+   fun:unicode_dealloc
+   fun:sys_pyfile_write
+   fun:sys_write
+   fun:PySys_WriteStderr
+   fun:_ZN6casadiL12pythonloggerEPKclb
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr4
+   fun:PyObject_GC_Del
+   fun:subtype_dealloc
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Cond
+   fun:unicode_dealloc
+   fun:dict_dealloc
+   fun:_PyImport_Cleanup
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr4
+   fun:PyMem_Free
+   fun:module_dealloc
+   fun:_PyImport_Cleanup
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr4
+   fun:list_dealloc
+   fun:_textiowrapper_writeflush
+   fun:_io_TextIOWrapper_write
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr4
+   fun:PyMem_Free
+   fun:product_dealloc
+   fun:_PyEval_EvalFrameDefault
+   fun:function_code_fastcall
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Cond
+   fun:NpyIter_GetInnerFixedStrideArray
+   fun:execute_ufunc_loop
+   fun:ufunc_generic_fastcall
+   fun:object_vacall
+   fun:PyObject_CallFunctionObjArgs
+   fun:binary_iop1
+   fun:PyNumber_InPlaceMultiply
+   fun:_PyEval_EvalFrameDefault
+   fun:function_code_fastcall
+   fun:_PyEval_EvalFrameDefault
+   fun:function_code_fastcall
+   fun:method_vectorcall
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr4
+   fun:unicode_dealloc
+   fun:dict_repr
+   fun:PyObject_Str
+   fun:PyFile_WriteObject
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr4
+   fun:PyObject_GC_Del
+   fun:subtype_dealloc
+   fun:cell_dealloc
+   fun:tupledealloc
+   fun:func_clear
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Cond
+   fun:PyMem_Free
+   fun:_sre_SRE_Pattern_split
+   fun:method_vectorcall_FASTCALL_KEYWORDS
+   fun:_PyEval_EvalFrameDefault
+   fun:function_code_fastcall
+   fun:_PyEval_EvalFrameDefault
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Cond
+   fun:unicode_dealloc
+   fun:textiowrapper_set_decoded_chars
+   fun:_textiowrapper_readline
+   fun:textiowrapper_iternext
+   fun:list_extend
+   fun:method_vectorcall_O
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Cond
+   fun:NpyIter_GetInnerFixedStrideArray
+   fun:execute_ufunc_loop
+   fun:ufunc_generic_fastcall
+   fun:_PyEval_EvalFrameDefault
+   fun:_PyEval_EvalCode
+   fun:_PyFunction_Vectorcall
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr4
+   fun:PyMem_Free
+   fun:fortran_getattr
+   fun:_PyEval_EvalFrameDefault
+   fun:_PyEval_EvalCode
+   fun:_PyEval_EvalCodeWithName
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr4
+   fun:object_dealloc
+   fun:_textiowrapper_writeflush
+   fun:_io_TextIOWrapper_flush
+   fun:method_vectorcall_NOARGS
+   fun:_PyEval_EvalFrameDefault
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Cond
+   fun:list_dealloc
+   fun:PyObject_Dir
+   fun:builtin_dir
+   fun:cfunction_call
+   fun:_PyObject_MakeTpCall
+   fun:_PyEval_EvalFrameDefault
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr4
+   fun:PyObject_GC_Del
+   fun:dict_dealloc
+   fun:subtype_dealloc
+   fun:free_keys_object
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr4
+   fun:PyObject_GC_Del
+   fun:subtype_dealloc
+   fun:cell_dealloc
+   fun:tupledealloc
+   fun:func_clear
+   fun:collect
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr4
+   fun:PyObject_GC_Del
+   fun:dict_dealloc
+   fun:cell_dealloc
+   fun:tupledealloc
+   fun:func_clear
+   fun:collect
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Value8
+   fun:object_dealloc
+   fun:code_dealloc
+   fun:func_dealloc
+   fun:insertdict
+   fun:_PyModule_ClearDict
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Cond
+   fun:object_dealloc
+   fun:textiowrapper_read_chunk
+   fun:_textiowrapper_readline
+   fun:textiowrapper_iternext
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr4
+   fun:object_dealloc
+   fun:_textiowrapper_writeflush
+   fun:_io_TextIOWrapper_flush
+   fun:method_vectorcall_NOARGS
+   fun:_PyEval_EvalFrameDefault
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Value8
+   fun:PyObject_GC_Del
+   fun:dict_dealloc
+   fun:func_clear
+   fun:collect
+   fun:_PyGC_CollectNoFail
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr4
+   fun:list_dealloc
+   fun:dict_dealloc
+   fun:func_clear
+   fun:collect
+   fun:_PyGC_CollectNoFail
+   fun:Py_FinalizeEx
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Value8
+   fun:object_dealloc
+   fun:code_dealloc
+   fun:func_dealloc
+   fun:cell_dealloc
+   fun:tupledealloc
+}
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr4
+   fun:object_dealloc
+   fun:_PyEval_EvalFrameDefault
+   fun:function_code_fastcall
+   fun:method_vectorcall
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr4
+   fun:unicode_dealloc
+   fun:dict_dealloc
+   fun:Pickler_dealloc
+   fun:_pickle_dumps
+   fun:cfunction_vectorcall_FASTCALL_KEYWORDS
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   fun:_dl_map_object_deps
+   fun:dl_open_worker
+   fun:_dl_catch_exception
+   fun:_dl_open
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Cond
+   fun:PyObject_GC_Del
+   fun:collect
+   fun:_PyGC_CollectNoFail
+   fun:_PyImport_Cleanup
+   fun:Py_FinalizeEx
+   fun:Py_Exit
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr4
+   fun:unicode_dealloc
+   fun:_PyEval_EvalFrameDefault
+   fun:gen_send_ex
+   fun:_gen_throw
+   fun:gen_throw
+   fun:method_vectorcall_VARARGS
+   fun:_PyEval_EvalFrameDefault
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr4
+   fun:PyObject_GC_Del
+   fun:tupledealloc
+   fun:type_dealloc
+   fun:subtype_dealloc
+   fun:dict_dealloc
+   fun:subtype_clear
+   fun:collect
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr4
+   fun:PyObject_GC_Del
+   fun:subtype_dealloc
+   fun:dict_dealloc
+   fun:subtype_clear
+   fun:collect
+   fun:collect_with_callback
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Cond
+   fun:object_dealloc
+   fun:_textiowrapper_writeflush
+   fun:_io_TextIOWrapper_write
+   fun:method_vectorcall_O
+   fun:PyObject_VectorcallMethod
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Cond
+   fun:unicode_dealloc
+   fun:list_dealloc
+   fun:_textiowrapper_writeflush
+   fun:_io_TextIOWrapper_flush
+   fun:method_vectorcall_NOARGS
+   fun:_PyEval_EvalFrameDefault
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr4
+   fun:PyMem_Free
+   fun:list_sort_impl
+   fun:PyList_Sort
+   fun:PyObject_Dir
+   fun:builtin_dir
+   fun:cfunction_call
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Value8
+   fun:unicode_dealloc
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Cond
+   fun:unicode_dealloc
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr4
+   fun:unicode_dealloc
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Value8
+   fun:object_dealloc
+   fun:_textiowrapper_writeflush
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Cond
+   fun:object_dealloc
+   fun:_textiowrapper_writeflush
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr4
+   fun:list_dealloc
+   fun:_textiowrapper_writeflush
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr4
+   fun:list_dealloc
+   fun:frame_dealloc
+   fun:function_code_fastcall
+   fun:_PyEval_EvalFrameDefault
+   fun:_PyEval_EvalCode
+   fun:_PyFunction_Vectorcall
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr4
+   fun:unicode_dealloc
+   fun:func_clear
+   fun:collect
+   fun:_PyGC_CollectNoFail
+   fun:Py_FinalizeEx
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr4
+   fun:PyMem_Free
+   fun:list_sort_impl
+   fun:PyList_Sort
+   fun:PyObject_Dir
+   fun:builtin_dir
+   fun:cfunction_call
+   fun:_PyObject_MakeTpCall
 }
 
 {

@@ -258,9 +258,14 @@ class TestSuite:
       raise Exception("Timout.")
     try:
       stdoutdata = stdoutdata.decode("ascii")
+    except Exception as e:
+      print(e)
+    try:
       stderrdata = stderrdata.decode("ascii")
-    except:
-      pass
+    except Exception as e:
+      print(e)
+            
+            
     alarm(0) # Remove alarm
     t = time.time() - t0
     if self.custom_stdout is not None:
@@ -333,10 +338,13 @@ class TestSuite:
       try:
         stdoutdata, stderrdata = f.communicate()
         try:
-            stdoutdata = stdoutdata.decode("ascii")
-            stderrdata = stderrdata.decode("ascii")
-        except:
-            pass
+          stdoutdata = stdoutdata.decode("ascii")
+        except Exception as e:
+          print(e)
+        try:
+          stderrdata = stderrdata.decode("ascii")
+        except Exception as e:
+          print(e)
         s = stdoutfile.read()
         try:
             s = s.decode("ascii")

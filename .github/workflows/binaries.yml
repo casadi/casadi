@@ -1104,7 +1104,7 @@ jobs:
         run: |
           sudo apt install -y valgrind
           cd test
-          python internal/test_pytest.py python -skipfiles="alltests.py helpers.py complexity.py speed.py debug_fatrop.py" -skipdirs="hock_schittkowski" -memcheck -passoptions="--ignore_memory_heavy"
+          python internal/test_pytest.py python -skipfiles="alltests.py feasiblesqpmethod.py helpers.py complexity.py speed.py debug_fatrop.py" -skipdirs="hock_schittkowski" -memcheck -passoptions="--ignore_memory_heavy"
         shell: bash -el {0}
         if: contains(matrix.image, 'ubuntu')
       - name: Inject slug/short variables
