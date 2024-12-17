@@ -204,6 +204,9 @@ set(CASADI_INTERNAL
   casadi_c.cpp
   tools.cpp
 
+  # BLAS overrides
+  blas_runtime_overrides.cpp
+
   # Runtime headers
   runtime/casadi_runtime.hpp
 )
