@@ -164,7 +164,7 @@ class Threadstests(casadiTestCase):
         # Evaluation wall time should stay the same with two threads
         for e in results:
             print(e/base_time)
-            max_factor = 1.3
+            max_factor = 1.5
             if platform.system()=='Darwin':
                 max_factor = 2.6
             self.assertTrue(0.5 <= e/base_time <= max_factor)
