@@ -406,7 +406,7 @@ std::vector<casadi_int> invert_lookup(const std::vector<casadi_int>& lookup) {
   return ret;
 }
 
-namespace IndexRecution {
+namespace IndexReduction {
 
   struct EquationStruct;
   /*
@@ -709,9 +709,16 @@ namespace IndexRecution {
     if (algorithm=="pantelides") {
       detect = dae_struct_detect_pantelides(G, var_map, eq_map, max_iter);
     } else {
+      // Clean up
+      for (auto* v : G.V) delete v;
+      for (auto* e : G.E) delete e;
       casadi_error("Algorithm '" + algorithm + "' not recognized.");
     }
-    casadi_assert(detect, "Structural detection failed.");
+    if (!detect) {
+      for (auto* v : G.V) delete v;
+      for (auto* e : G.E) delete e;
+      casadi_error("Structural detection failed.");
+    }
 
     // Prepare outputs
     var_map.resize(G.V.size());
@@ -741,11 +748,15 @@ namespace IndexRecution {
       k++;
     }
 
+    // Clean up
+    for (auto* v : G.V) delete v;
+    for (auto* e : G.E) delete e;
+
   }
-}  // namespace IndexRecution
+}  // namespace IndexReduction
 
 
-using namespace IndexRecution;
+using namespace IndexReduction;
 
 template <class X>
 std::map<std::string, X> add_defaults(const std::map<std::string, X>& in,
