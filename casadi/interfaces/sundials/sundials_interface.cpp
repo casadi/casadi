@@ -337,12 +337,6 @@ void SundialsInterface::reset(IntegratorMemory* mem, bool first_call) const {
   // Reset stats
   if (first_call) reset_stats(m);
 
-  // Set parameters
-  casadi_copy(p, np_, m->p);
-
-  // Set controls
-  casadi_copy(u, nu_, m->u);
-
   // Set the state
   casadi_copy(m->q, nq_, NV_DATA_S(m->v_q));
   casadi_copy(m->x, nx_, NV_DATA_S(m->v_xz));

@@ -378,7 +378,6 @@ int Integrator::eval(const double** arg, double** res,
   setup(m, arg, res, iw, w);
 
   // Pass initial state, parameters
-  set_u(m, u);
   set_q(m, 0);
   set_x(m, x0);
   set_z(m, z0);
