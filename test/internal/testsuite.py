@@ -257,11 +257,11 @@ class TestSuite:
       killProcess(p.pid)
       raise Exception("Timout.")
     try:
-      stdoutdata = stdoutdata.decode("ascii")
+      stdoutdata = stdoutdata.decode("ascii",errors='ignore')
     except Exception as e:
       print(e)
     try:
-      stderrdata = stderrdata.decode("ascii")
+      stderrdata = stderrdata.decode("ascii",errors='ignore')
     except Exception as e:
       print(e)
             
@@ -338,16 +338,16 @@ class TestSuite:
       try:
         stdoutdata, stderrdata = f.communicate()
         try:
-          stdoutdata = stdoutdata.decode("ascii")
+          stdoutdata = stdoutdata.decode("ascii",errors='ignore')
         except Exception as e:
           print(e)
         try:
-          stderrdata = stderrdata.decode("ascii")
+          stderrdata = stderrdata.decode("ascii",errors='ignore')
         except Exception as e:
           print(e)
         s = stdoutfile.read()
         try:
-            s = s.decode("ascii")
+            s = s.decode("ascii",errors='ignore')
         except:
             pass
         stdoutdata = s + "\n"+ stdoutdata
