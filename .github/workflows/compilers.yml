@@ -47,6 +47,19 @@ jobs:
           cmake -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} -H.
           cmake --build build -v
 
+  linux-std:
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        cxx_standard: ['14','17','20','23','26'] # 13 compiler bug
+    steps:
+      - uses: actions/checkout@v4.1.1
+      - name: Build
+        run: |
+          cmake -Bbuild -DWITH_SELFCONTAINED=ON -DCMAKE_CXX_STANDARD=${{ matrix.cxx_standard}} ${{env.build_flags}} -H.
+          cmake --build build -v
+
   macos-latest:
     runs-on: macos-latest
     env:
