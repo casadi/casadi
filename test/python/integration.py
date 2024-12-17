@@ -1430,5 +1430,22 @@ class Integrationtests(casadiTestCase):
           print("rms error", rms)
           self.assertTrue(np.all(rms<=max_rms))
 
+  def test_IDACalcIC_u(self):
+    x = MX.sym("x")
+    u = MX.sym("u")
+    z = MX.sym("z")
+
+    ivp = {}
+    ivp["x"] = x
+    ivp["z"] = z
+    ivp["u"] = u
+    ivp["ode"] = z
+    ivp["alg"] = sqrt(u)-z
+
+    intg = integrator("intg","idas",ivp,0,1)
+
+    res = intg(x0=0,u=1)
+    self.assertAlmostEqual(res["xf"],1,5,"test_IDACalcIC_u")
+
 if __name__ == '__main__':
     unittest.main()
