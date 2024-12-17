@@ -1717,6 +1717,9 @@
 %exception  casadi::FunctionBuffer::ret() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::FunctionBuffer::stats() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::GenericExpression::abs(const ExType &x) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -5233,16 +5236,22 @@
 %exception  casadi::WeakCache< K, T >::cache(std::vector< K > &keys, std::vector< T > &entries) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::WeakCache< K, T >::incache(const K &key, T &f) const {
+%exception  casadi::WeakCache< K, T >::incache(const K &key, T &f, bool needs_lock=true) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::WeakCache< K, T >::tocache(const K &key, const T &f) {
+%exception  casadi::WeakCache< K, T >::tocache(const K &key, const T &f, bool needs_lock=true) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::WeakCache< K, T >::tocache_if_missing(const K &key, T &f) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::WeakRef::alive() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::WeakRef::shared() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::WeakRef::shared_if_alive(SharedObject &shared) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::XmlFile::dump(const std::string &filename, const XmlNode &node) {
@@ -6353,6 +6362,12 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::XmlFile::XmlFile(const std::string &name) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception casadi::conditional_lock_guard< _Mutex >::conditional_lock_guard(const conditional_lock_guard &)=delete {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception casadi::conditional_lock_guard< _Mutex >::conditional_lock_guard(mutex_type &m, bool condition) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::null_ptr_on_copy< T >::null_ptr_on_copy() {

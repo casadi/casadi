@@ -783,7 +783,9 @@ namespace casadi {
     void tocache(const Function& f, const std::string& suffix="") const;
 
 
-    /** \brief Save function to cache, only if missing */
+    /** \brief Save function to cache, only if missing
+
+        \identifier{29j} */
     void tocache_if_missing(Function& f, const std::string& suffix="") const;
 
     /** \brief Generate code the function
