@@ -2408,6 +2408,9 @@ void Integrator::serialize_body(SerializingStream &s) const {
   s.pack("Integrator::nu", nu_);
   s.pack("Integrator::nu1", nu1_);
 
+  s.pack("Integrator::ne", ne_);
+  s.pack("Integrator::ntmp", ntmp_);
+
   s.pack("Integrator::nom_x", nom_x_);
   s.pack("Integrator::nom_z", nom_z_);
 
@@ -2465,6 +2468,9 @@ Integrator::Integrator(DeserializingStream & s) : OracleFunction(s) {
 
   s.unpack("Integrator::nu", nu_);
   s.unpack("Integrator::nu1", nu1_);
+
+  s.unpack("Integrator::ne", ne_);
+  s.unpack("Integrator::ntmp", ntmp_);
 
   s.unpack("Integrator::nom_x", nom_x_);
   s.unpack("Integrator::nom_z", nom_z_);
