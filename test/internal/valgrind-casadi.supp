@@ -509,3 +509,116 @@ obj:*libworhp*
    fun:*ProxqpInterface*
 }
 
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:calloc
+   fun:osqp_setup
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   fun:_ZN6casadi14FunctionBuffer5_evalEv
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr8
+   fun:update_LDL_remove
+   fun:remove_constraint
+   fun:remove_blocking
+   fun:daqp_ldp
+   fun:daqp_solve
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   fun:_ZN6casadi18casadi_hpipm_solveIdEEiPNS_17casadi_hpipm_dataIT_EEPPKdPPdPxS8_
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:_Znwm
+   fun:_ZN5Highs3runEv
+   fun:_ZN6casadi18casadi_highs_solveIdEEiPNS_17casadi_highs_dataIT_EEPPKdPPdPxS8_
+}
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:_ZnwmRKSt9nothrow_t
+   fun:__cxa_thread_atexit
+   fun:_ZNSt6thread11_State_implINS_8_InvokerISt5tupleIJZN17HighsTaskExecutorC4EiEUliE_iEEEEE6_M_runEv
+   fun:execute_native_thread_routine
+   fun:start_thread
+   fun:clone
+}
+
+{
+  <insert_a_suppression_name_here>
+  Memcheck:Leak
+  match-leak-kinds: definite
+  fun:_Znwm
+  fun:_ZN6casadi10DllLibrary11deserializeERNS_19DeserializingStreamE
+}
+
+{
+  <insert_a_suppression_name_here>
+  Memcheck:Cond
+  fun:_ZN5Ipopt17PDFullSpaceSolver9SolveOnceEbbRKNS_9SymMatrixERKNS_6MatrixES6_S6_S6_S6_S6_RKNS_6VectorES9_S9_S9_S9_S9_S9_S9_S9_S9_ddRKNS_14IteratesVectorERSA_
+}
+
+{
+  <insert_a_suppression_name_here>
+  Memcheck:Leak
+  match-leak-kinds: definite
+  fun:malloc
+  obj:*libknitro*
+}
+
+{
+  <insert_a_suppression_name_here>
+  Memcheck:Cond
+  ...
+  obj:*libknitro*
+}
+
+{
+  <insert_a_suppression_name_here>
+  Memcheck:Leak
+  match-leak-kinds: definite
+  fun:malloc
+  fun:sleqp_*
+}
+
+{
+  <insert_a_suppression_name_here>
+  Memcheck:Leak
+  match-leak-kinds: definite
+  ...
+  fun:Highs_create
+}
+
+{
+  <insert_a_suppression_name_here>
+  Memcheck:Leak
+  match-leak-kinds: definite
+  ...
+  fun:highs_solve
+}
+
+{
+  <insert_a_suppression_name_here>
+  Memcheck:Leak
+  match-leak-kinds: definite
+  ...
+  fun:_ZN6Bonmin11IpoptSolver16newUnsolvedErrorEiN5Ipopt8SmartPtrINS_11TMINLP2TNLPEEESs
+}

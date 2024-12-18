@@ -190,9 +190,7 @@ class OCPtests(casadiTestCase):
     opts["abstol"] = 1e-15
     opts["verbose"] = False
     opts["steps_per_checkpoint"] = 10000
-    opts["t0"] = 0
-    opts["tf"] = te
-    integrator = casadi.integrator("integrator", "cvodes", dae, opts)
+    integrator = casadi.integrator("integrator", "cvodes", dae, 0, te, opts)
 
     var = MX.sym("var",2,1)
     par = MX.sym("par",1,1)
@@ -245,9 +243,7 @@ class OCPtests(casadiTestCase):
     opts["abstol"] = 1e-15
     opts["verbose"] = False
     opts["steps_per_checkpoint"] = 10000
-    opts["t0"] = 0
-    opts["tf"] = te
-    integrator = casadi.integrator("integrator", "cvodes", dae, opts)
+    integrator = casadi.integrator("integrator", "cvodes", dae, 0, te, opts)
 
     var = MX.sym("var",2,1)
     par = MX.sym("par",1,1)
