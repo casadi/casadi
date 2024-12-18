@@ -86,6 +86,8 @@ jobs:
       with:
         overwrite: true
         tag: nightly-${{ env.GITHUB_REF_SLUG }}
+        release_name: nightly-${{ env.GITHUB_REF_SLUG }}
+        target_commit: ${{ env.GITHUB_SHA }}
         file: casadi_source.zip
         asset_name: casadi-source-v${{ needs.version.outputs.casadi }}.zip
         prerelease: true
@@ -96,6 +98,8 @@ jobs:
       with:
         token: ${{ github.token }}
         tag: nightly-${{ env.GITHUB_REF_SLUG }}
+        release_name: nightly-${{ env.GITHUB_REF_SLUG }}
+        target_commit: ${{ env.GITHUB_SHA }}
         assets: "*.tar.gz"
         fail-if-no-release: false
         fail-if-no-assets: false
@@ -105,6 +109,8 @@ jobs:
       with:
         overwrite: true
         tag: nightly-${{ env.GITHUB_REF_SLUG }}
+        release_name: nightly-${{ env.GITHUB_REF_SLUG }}
+        target_commit: ${{ env.GITHUB_SHA }}
         file: dist/*.tar.gz
         file_glob: true
         prerelease: true
@@ -352,8 +358,9 @@ jobs:
         uses: mknejp/delete-release-assets@v1
         with:
           token: ${{ github.token }}
-          tag: ${{ env.GITHUB_REF_SLUG }}
+          tag: nightly-${{ env.GITHUB_REF_SLUG }}
           release_name: nightly-${{ env.GITHUB_REF_SLUG }}
+          target_commit: ${{ env.GITHUB_SHA }}
           assets: casadi-*-${{env.deploy_arch}}-py${{matrix.py2}}.zip
           fail-if-no-release: false
           fail-if-no-assets: false
@@ -362,8 +369,9 @@ jobs:
         uses: svenstaro/upload-release-action@2.9.0
         with:
           overwrite: true
-          tag: ${{ env.GITHUB_REF_SLUG }}
+          tag: nightly-${{ env.GITHUB_REF_SLUG }}
           release_name: nightly-${{ env.GITHUB_REF_SLUG }}
+          target_commit: ${{ env.GITHUB_SHA }}
           file: casadi-${{ needs.version.outputs.casadi }}-${{env.deploy_arch}}-py${{matrix.py2}}.zip
           prerelease: true
         if: github.event_name != 'pull_request'
@@ -383,8 +391,9 @@ jobs:
         uses: mknejp/delete-release-assets@v1
         with:
           token: ${{ github.token }}
-          tag: ${{ env.GITHUB_REF_SLUG }}
+          tag: nightly-${{ env.GITHUB_REF_SLUG }}
           release_name: nightly-${{ env.GITHUB_REF_SLUG }}
+          target_commit: ${{ env.GITHUB_SHA }}
           assets: ${{ steps.wheel.outputs.wheel_wildcard }}
           fail-if-no-assets: false
           fail-if-no-release: false
@@ -393,8 +402,11 @@ jobs:
         uses: svenstaro/upload-release-action@2.9.0
         with:
           overwrite: true
-          tag: ${{ env.GITHUB_REF_SLUG }}
+          tag: nightly-${{ env.GITHUB_REF_SLUG }}
           release_name: nightly-${{ env.GITHUB_REF_SLUG }}
+          target_commit: ${{ env.GITHUB_SHA }}
+          release_name: nightly-${{ env.GITHUB_REF_SLUG }}
+          target_commit: ${{ env.GITHUB_SHA }}
           file: ${{ steps.wheel.outputs.wheel }}
           prerelease: true
         if: github.event_name != 'pull_request'
@@ -496,8 +508,9 @@ jobs:
         uses: mknejp/delete-release-assets@v1
         with:
           token: ${{ github.token }}
-          tag: ${{ env.GITHUB_REF_SLUG }}
+          tag: nightly-${{ env.GITHUB_REF_SLUG }}
           release_name: nightly-${{ env.GITHUB_REF_SLUG }}
+          target_commit: ${{ env.GITHUB_SHA }}
           assets: casadi-*-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip
           fail-if-no-release: false
           fail-if-no-assets: false
@@ -506,8 +519,9 @@ jobs:
         uses: svenstaro/upload-release-action@2.9.0
         with:
           overwrite: true
-          tag: ${{ env.GITHUB_REF_SLUG }}
+          tag: nightly-${{ env.GITHUB_REF_SLUG }}
           release_name: nightly-${{ env.GITHUB_REF_SLUG }}
+          target_commit: ${{ env.GITHUB_SHA }}
           file: casadi-${{ needs.version.outputs.casadi }}-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip
           prerelease: true
         if: github.event_name != 'pull_request'
@@ -592,8 +606,9 @@ jobs:
         uses: mknejp/delete-release-assets@v1
         with:
           token: ${{ github.token }}
-          tag: ${{ env.GITHUB_REF_SLUG }}
+          tag: nightly-${{ env.GITHUB_REF_SLUG }}
           release_name: nightly-${{ env.GITHUB_REF_SLUG }}
+          target_commit: ${{ env.GITHUB_SHA }}
           assets: casadi-*-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip
           fail-if-no-release: false
           fail-if-no-assets: false
@@ -602,8 +617,9 @@ jobs:
         uses: svenstaro/upload-release-action@2.9.0
         with:
           overwrite: true
-          tag: ${{ env.GITHUB_REF_SLUG }}
+          tag: nightly-${{ env.GITHUB_REF_SLUG }}
           release_name: nightly-${{ env.GITHUB_REF_SLUG }}
+          target_commit: ${{ env.GITHUB_SHA }}
           file: casadi-${{ needs.version.outputs.casadi }}-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip
           prerelease: true
         if: github.event_name != 'pull_request'
@@ -688,8 +704,9 @@ jobs:
         uses: mknejp/delete-release-assets@v1
         with:
           token: ${{ github.token }}
-          tag: ${{ env.GITHUB_REF_SLUG }}
+          tag: nightly-${{ env.GITHUB_REF_SLUG }}
           release_name: nightly-${{ env.GITHUB_REF_SLUG }}
+          target_commit: ${{ env.GITHUB_SHA }}
           assets: casadi-*-${{env.os}}${{env.suffix}}-py${{matrix.py2}}.zip
           fail-if-no-release: false
           fail-if-no-assets: false
@@ -698,8 +715,9 @@ jobs:
         uses: svenstaro/upload-release-action@2.9.0
         with:
           overwrite: true
-          tag: ${{ env.GITHUB_REF_SLUG }}
+          tag: nightly-${{ env.GITHUB_REF_SLUG }}
           release_name: nightly-${{ env.GITHUB_REF_SLUG }}
+          target_commit: ${{ env.GITHUB_SHA }}
           file: casadi-${{ needs.version.outputs.casadi }}-${{env.os}}${{env.suffix}}-py${{matrix.py2}}.zip
           prerelease: true
         if: github.event_name != 'pull_request'
@@ -724,8 +742,9 @@ jobs:
         uses: mknejp/delete-release-assets@v1
         with:
           token: ${{ github.token }}
-          tag: ${{ env.GITHUB_REF_SLUG }}
+          tag: nightly-${{ env.GITHUB_REF_SLUG }}
           release_name: nightly-${{ env.GITHUB_REF_SLUG }}
+          target_commit: ${{ env.GITHUB_SHA }}
           assets: ${{ steps.wheel.outputs.wheel_wildcard }}
           fail-if-no-assets: false
           fail-if-no-release: false
@@ -734,8 +753,9 @@ jobs:
         uses: svenstaro/upload-release-action@2.9.0
         with:
           overwrite: true
-          tag: ${{ env.GITHUB_REF_SLUG }}
+          tag: nightly-${{ env.GITHUB_REF_SLUG }}
           release_name: nightly-${{ env.GITHUB_REF_SLUG }}
+          target_commit: ${{ env.GITHUB_SHA }}
           file: ${{ steps.wheel.outputs.wheel }}
           prerelease: true
         if: github.event_name != 'pull_request'
@@ -880,8 +900,9 @@ jobs:
       - uses: svenstaro/upload-release-action@2.9.0
         with:
           overwrite: true
-          tag: ${{ env.GITHUB_REF_SLUG }}
+          tag: nightly-${{ env.GITHUB_REF_SLUG }}
           release_name: nightly-${{ env.GITHUB_REF_SLUG }}
+          target_commit: ${{ env.GITHUB_SHA }}
           file: docs/users_guide/users_guide.pdf
           asset_name: casadi-users_guide-v${{ needs.version.outputs.casadi }}.pdf
           prerelease: true
@@ -889,8 +910,9 @@ jobs:
       - uses: svenstaro/upload-release-action@2.9.0
         with:
           overwrite: true
-          tag: ${{ env.GITHUB_REF_SLUG }}
+          tag: nightly-${{ env.GITHUB_REF_SLUG }}
           release_name: nightly-${{ env.GITHUB_REF_SLUG }}
+          target_commit: ${{ env.GITHUB_SHA }}
           file: docs/example_pack/example_pack.zip
           asset_name: casadi-example_pack-v${{ needs.version.outputs.casadi }}.zip
           prerelease: true
@@ -898,8 +920,9 @@ jobs:
       - uses: svenstaro/upload-release-action@2.9.0
         with:
           overwrite: true
-          tag: ${{ env.GITHUB_REF_SLUG }}
+          tag: nightly-${{ env.GITHUB_REF_SLUG }}
           release_name: nightly-${{ env.GITHUB_REF_SLUG }}
+          target_commit: ${{ env.GITHUB_SHA }}
           file: docs/cheatsheet/python.pdf
           asset_name: casadi-cheatsheet_python-v${{ needs.version.outputs.casadi }}.pdf
           prerelease: true
@@ -908,8 +931,9 @@ jobs:
       - uses: svenstaro/upload-release-action@2.9.0
         with:
           overwrite: true
-          tag: ${{ env.GITHUB_REF_SLUG }}
+          tag: nightly-${{ env.GITHUB_REF_SLUG }}
           release_name: nightly-${{ env.GITHUB_REF_SLUG }}
+          target_commit: ${{ env.GITHUB_SHA }}
           file: website_assets.zip
         if: github.event_name != 'pull_request'
       - run: git status
