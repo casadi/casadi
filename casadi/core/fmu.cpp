@@ -1072,7 +1072,6 @@ int FmuInternal::discrete_states_iter(void* instance) const {
       casadi_warning("Ignoring next time defined: " + std::to_string(eventmem.next_event_time));
     // Successful return
     if (!eventmem.discrete_states_need_update) {
-      casadi_warning("Discrete state update successful");
       return 0;
     }
   }

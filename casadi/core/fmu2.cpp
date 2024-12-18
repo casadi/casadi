@@ -265,7 +265,11 @@ int Fmu2::exit_initialization_mode(void* instance) const {
 }
 
 int Fmu2::update_discrete_states(void* instance, EventMemory* eventmem) const {
-  casadi_warning("Fmu2::update_discrete_states not implemented, ignored");
+  static bool warned = false;
+  if (!warned) {
+    casadi_warning("Fmu2::update_discrete_states not implemented, ignored");
+    warned = true;
+  }
   eventmem->discrete_states_need_update = false;
   eventmem->terminate_simulation = false;
   eventmem->nominals_of_continuous_states_changed = false;
