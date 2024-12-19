@@ -405,8 +405,6 @@ jobs:
           tag: nightly-${{ env.GITHUB_REF_SLUG }}
           release_name: nightly-${{ env.GITHUB_REF_SLUG }}
           target_commit: ${{ env.GITHUB_SHA }}
-          release_name: nightly-${{ env.GITHUB_REF_SLUG }}
-          target_commit: ${{ env.GITHUB_SHA }}
           file: ${{ steps.wheel.outputs.wheel }}
           prerelease: true
         if: github.event_name != 'pull_request'
