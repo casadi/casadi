@@ -1581,4 +1581,14 @@ namespace casadi {
     return new SXFunction(s);
   }
 
+  void SXFunction::find(std::map<FunctionInternal*, Function>& all_fun,
+      casadi_int max_depth) const {
+    for (auto&& e : algorithm_) {
+      if (e.op == OP_CALL) {
+        const ExtendedAlgEl& m = call_.el.at(e.i1);
+        add_embedded(all_fun, m.f, max_depth);
+      }
+    }
+  }
+
 } // namespace casadi

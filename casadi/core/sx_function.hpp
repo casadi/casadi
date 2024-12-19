@@ -333,6 +333,9 @@ class CASADI_EXPORT SXFunction :
        \identifier{v8} */
   SX instructions_sx() const override;
 
+  // Get all embedded functions, recursively
+  void find(std::map<FunctionInternal*, Function>& all_fun, casadi_int max_depth) const override;
+
   /** \brief Get default input value
 
       \identifier{v9} */
