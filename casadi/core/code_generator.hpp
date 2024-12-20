@@ -252,6 +252,8 @@ namespace casadi {
     std::string constant(const std::string& v);
     std::string constant(char v);
 
+    std::string format_padded(casadi_int i) const;
+
     std::string zeros(casadi_int sz);
     std::string ones(casadi_int sz);
 
@@ -677,6 +679,9 @@ namespace casadi {
     /** Get work vector element from index */
     std::string workel(casadi_int n) const;
 
+    /** \brief Reserve a maximum size of work elements, used for padding of index */
+    void reserve_work(casadi_int n);
+
     /** Declare an array */
     static std::string array(const std::string& type, const std::string& name, casadi_int len,
                              const std::string& def=std::string());
@@ -941,6 +946,8 @@ namespace casadi {
     // Number of zeros/ones
     casadi_int sz_zeros_;
     casadi_int sz_ones_;
+
+    casadi_int padding_length_;
 
     // Names of exposed functions
     std::vector<std::string> exposed_fname;

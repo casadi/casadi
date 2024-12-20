@@ -944,14 +944,14 @@ namespace casadi {
 
   std::string CodeGenerator::work(casadi_int n, casadi_int sz, bool is_ref) const {
     if (is_ref) {
-      return "wr" + str(n);
+      return "wr" + format_padded(n);
     }
     if (n<0 || sz==0) {
       return "0";
     } else if (sz==1 && !this->codegen_scalars) {
-      return "(&w" + str(n) + ")";
+      return "(&w" + format_padded(n) + ")";
     } else {
-      return "w" + str(n);
+      return "w" + format_padded(n);
     }
   }
 
@@ -959,8 +959,19 @@ namespace casadi {
     if (n<0) return "0";
     std::stringstream s;
     if (this->codegen_scalars) s << "*";
-    s << "w" << n;
+    s << "w" << format_padded(n);
     return s.str();
+  }
+
+  void CodeGenerator::reserve_work(casadi_int n) {
+    padding_length_ = str(n).length();
+  }
+
+  std::string CodeGenerator::format_padded(casadi_int i) const {
+    std::stringstream ss;
+    ss.str("");
+    ss << std::setw(padding_length_) << std::setfill('0') << i;
+    return ss.str();
   }
 
   std::string CodeGenerator::array(const std::string& type, const std::string& name, casadi_int len,
@@ -2211,7 +2222,7 @@ namespace casadi {
     if (avoid_stack_) {
       return "w[" + str(i) + "]";
     } else {
-      std::string name = "a"+str(i);
+      std::string name = "a"+format_padded(i);
 
       // Make sure work vector element has been declared
       local(name, "casadi_real");

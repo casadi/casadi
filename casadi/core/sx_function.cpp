@@ -204,6 +204,7 @@ namespace casadi {
   }
 
   void SXFunction::codegen_body(CodeGenerator& g) const {
+    g.reserve_work(worksize_);
 
     casadi_int k=0;
     // Run the algorithm

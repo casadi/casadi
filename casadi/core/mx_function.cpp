@@ -1197,6 +1197,8 @@ namespace casadi {
     g.init_local("arg1", "arg+" + str(n_in_));
     g.init_local("res1", "res+" + str(n_out_));
 
+    g.reserve_work(workloc_.size());
+
     // Operation number (for printing)
     casadi_int k=0;
 
@@ -1278,11 +1280,11 @@ namespace casadi {
          ...
       */
       if (!g.codegen_scalars && n==1) {
-        g.local("w" + str(i), "casadi_real");
+        g.local("w" + g.format_padded(i), "casadi_real");
       } else {
         if (needs_value[i]) {
-          g.local("w" + str(i), "casadi_real", "*");
-          g.init_local("w" + str(i), "w+" + str(workloc_[i]));
+          g.local("w" + g.format_padded(i), "casadi_real", "*");
+          g.init_local("w" + g.format_padded(i), "w+" + str(workloc_[i]));
         }
         if (needs_reference[i]) {
           g.local("wr" + str(i), "const casadi_real", "*");
