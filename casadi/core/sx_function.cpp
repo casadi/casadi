@@ -1592,4 +1592,38 @@ namespace casadi {
     }
   }
 
+  std::vector<SX> SXFunction::order(const std::vector<SX>& expr) {
+#ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
+    std::lock_guard<std::mutex> lock(SX::get_mutex_temp());
+#endif // CASADI_WITH_THREADSAFE_SYMBOLICS
+    // Stack used to sort the computational graph
+    std::stack<SXNode*> s;
+
+    // All nodes
+    std::vector<SXNode*> nodes;
+
+    // Add the list of nodes
+    casadi_int ind=0;
+    for (auto it = expr.begin(); it != expr.end(); ++it, ++ind) {
+      casadi_int nz=0;
+      for (auto itc = (*it)->begin(); itc != (*it)->end(); ++itc, ++nz) {
+        // Add outputs to the list
+        s.push(itc->get());
+        XFunction<SXFunction, SX, SXNode>::sort_depth_first(s, nodes);
+      }
+    }
+
+    // Clear temporary markers
+    for (casadi_int i=0; i<nodes.size(); ++i) {
+      nodes[i]->temp = 0;
+    }
+
+    std::vector<SX> ret(nodes.size());
+    for (casadi_int i=0; i<nodes.size(); ++i) {
+      ret[i] = SXElem::create(nodes[i]);
+    }
+
+    return ret;
+  }
+
 } // namespace casadi

@@ -1904,6 +1904,14 @@ namespace casadi {
     return (*this)->info();
   }
 
+  std::vector<SX> Function::order(const std::vector<SX>& expr) {
+    return SXFunction::order(expr);
+  }
+
+  std::vector<MX> Function::order(const std::vector<MX>& expr) {
+    return MXFunction::order(expr);
+  }
+
   FunctionBuffer::FunctionBuffer(const Function& f) : f_(f) {
     w_.resize(f_.sz_w());
     iw_.resize(f_.sz_iw());
