@@ -3362,6 +3362,8 @@ class Functiontests(casadiTestCase):
   def test_copy_elision(self):
     import casadi as ca
     
+    backup = ca.GlobalOptions.getCopyElisionMinSize()
+    
     for enabled in [False,True]:
     
       ca.GlobalOptions.setCopyElisionMinSize(2 if enabled else -1)
@@ -3469,6 +3471,7 @@ class Functiontests(casadiTestCase):
         print(lines.strip())
         self.assertTrue(lines.strip() in code)
       self.check_codegen(f,inputs=[DM.rand(f.sparsity_in(i)) for i in range(f.n_in())])
+    ca.GlobalOptions.setCopyElisionMinSize(backup)
     
 if __name__ == '__main__':
     unittest.main()
