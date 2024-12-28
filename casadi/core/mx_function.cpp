@@ -1287,7 +1287,7 @@ namespace casadi {
           g.init_local("w" + g.format_padded(i), "w+" + str(workloc_[i]));
         }
         if (needs_reference[i]) {
-          g.local("wr" + str(i), "const casadi_real", "*");
+          g.local("wr" + g.format_padded(i), "const casadi_real", "*");
         }
       }
     }

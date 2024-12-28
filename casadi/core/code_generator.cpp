@@ -964,7 +964,12 @@ namespace casadi {
   }
 
   void CodeGenerator::reserve_work(casadi_int n) {
-    padding_length_ = str(n).length();
+    if (n == 0) {
+      padding_length_ = 1;
+    } else {
+      // Zero based counting. The 10th entry is to be rendered as '9'
+      padding_length_ = str(n-1).length();
+    }
   }
 
   std::string CodeGenerator::format_padded(casadi_int i) const {
