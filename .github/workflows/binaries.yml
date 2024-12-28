@@ -43,7 +43,9 @@ jobs:
     - uses: actions/checkout@v4.1.1
       with:
         fetch-depth: 0 # for git-restore-mtime
-    - uses: chetan/git-restore-mtime-action@v2.0
+    - uses: jgillis/git-restore-mtime-action@master
+      with:
+        args: "--commit-time"
           
     - name: generate Python 2
       run: >
@@ -159,7 +161,9 @@ jobs:
         with:
           fetch-depth: 0 # for git-restore-mtime
           submodules: recursive
-      - uses: chetan/git-restore-mtime-action@v2.0
+      - uses: jgillis/git-restore-mtime-action@master
+        with:
+          args: "--commit-time"
       - name: Cache build dir
         uses: actions/cache@v4.0.1
         with:
@@ -196,7 +200,9 @@ jobs:
         with:
           fetch-depth: 0 # for git-restore-mtime
           submodules: recursive
-      - uses: chetan/git-restore-mtime-action@v2.0
+      - uses: jgillis/git-restore-mtime-action@master
+        with:
+          args: "--commit-time"
       - name: Setup dockcross
         run: |
           docker pull ghcr.io/jgillis/${{ matrix.target }}:production
