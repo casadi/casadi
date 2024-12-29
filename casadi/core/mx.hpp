@@ -132,6 +132,7 @@ namespace casadi {
 
 
     /** \brief Construct matrix with a given sparsity and nonzeros,
+
      * configurable in codegen via a pool
 
         \identifier{2aa} */
