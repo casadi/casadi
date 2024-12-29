@@ -1,4 +1,4 @@
-%exception  casadi::DaeBuilder::clear_in(const std::string &v) {
+%exception  casadi::DaeBuilder::add_init(const MX &lhs, const MX &rhs) {
  CATCH_OR_NOT(DEPRECATED_MSG("") $action)
 }
 %exception  casadi::Function::hessian_old(casadi_int iind, casadi_int oind) const {

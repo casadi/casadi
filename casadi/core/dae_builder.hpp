@@ -117,7 +117,9 @@ class CASADI_EXPORT DaeBuilder
       \identifier{5j} */
   std::vector<std::string> q() const;
 
-  /** \brief Event indicators */
+  /** \brief Event indicators
+
+      \identifier{2az} */
   std::vector<std::string> e() const;
 
   /** \brief Quadrature equations
@@ -125,7 +127,9 @@ class CASADI_EXPORT DaeBuilder
       \identifier{5k} */
   std::vector<MX> quad() const;
 
-  /** \brief Zero-crossing functions */
+  /** \brief Zero-crossing functions
+
+      \identifier{2b0} */
   std::vector<MX> zero() const;
 
   /** \brief Output variables
@@ -182,10 +186,14 @@ class CASADI_EXPORT DaeBuilder
       \identifier{5u} */
   std::vector<MX> wdef() const;
 
-  /** \brief Initial conditions, left-hand-side */
+  /** \brief Initial conditions, left-hand-side
+
+      \identifier{2b1} */
   std::vector<MX> init_lhs() const;
 
-  /** \brief Initial conditions, right-hand-side */
+  /** \brief Initial conditions, right-hand-side
+
+      \identifier{2b2} */
   std::vector<MX> init_rhs() const;
 
   /** \brief When statement: triggering condition
@@ -242,7 +250,9 @@ class CASADI_EXPORT DaeBuilder
       \identifier{67} */
   casadi_int nq() const;
 
-  /** \brief Event indicators */
+  /** \brief Event indicators
+
+      \identifier{2b3} */
   casadi_int ne() const;
 
   /** \brief Output variables

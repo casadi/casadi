@@ -174,10 +174,14 @@ namespace casadi {
       \identifier{25u} */
   CASADI_EXPORT casadi_int dyn_n_out();
 
-  /** \brief Get input scheme of an event transition function */
+  /** \brief Get input scheme of an event transition function
+
+      \identifier{2b4} */
   CASADI_EXPORT std::vector<std::string> event_in();
 
-  /** \brief Get output scheme of an event transition functions */
+  /** \brief Get output scheme of an event transition functions
+
+      \identifier{2b5} */
   CASADI_EXPORT std::vector<std::string> event_out();
   /** @} */
 

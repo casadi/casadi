@@ -150,7 +150,9 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
       \identifier{1ly} */
   void init(const Dict& opts) override;
 
-  /** \brief Set the (persistent) work vectors */
+  /** \brief Set the (persistent) work vectors
+
+      \identifier{29m} */
   void set_work(void* mem, const double**& arg, double**& res,
     casadi_int*& iw, double*& w) const override;
 
@@ -184,7 +186,9 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   // Get the algebraic variables
   void get_z(IntegratorMemory* m, double* z) const;
 
-  /** \brief  Reset the forward solver at the start or after an event */
+  /** \brief  Reset the forward solver at the start or after an event
+
+      \identifier{29n} */
   virtual void reset(IntegratorMemory* mem, bool first_call) const {}
 
   /** \brief  Find next stop time
@@ -192,19 +196,29 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
       \identifier{25b} */
   casadi_int next_stop(casadi_int k, const double* u) const;
 
-  /** \brief Linearize the zero crossing function */
+  /** \brief Linearize the zero crossing function
+
+      \identifier{29o} */
   int calc_edot(IntegratorMemory* m) const;
 
-  /** \brief Predict next event time */
+  /** \brief Predict next event time
+
+      \identifier{29p} */
   int predict_events(IntegratorMemory* m) const;
 
-  /** \brief Trigger an event */
+  /** \brief Trigger an event
+
+      \identifier{29q} */
   int trigger_event(IntegratorMemory* m, casadi_int* ind) const;
 
-  /** \brief  Advance solution in time, with events handling */
+  /** \brief  Advance solution in time, with events handling
+
+      \identifier{29r} */
   int advance(IntegratorMemory* m) const;
 
-  /** \brief  Advance solution in time, without events handling */
+  /** \brief  Advance solution in time, without events handling
+
+      \identifier{29s} */
   virtual int advance_noevent(IntegratorMemory* mem) const = 0;
 
   /** \brief Reset the backward problem
@@ -597,7 +611,9 @@ class CASADI_EXPORT FixedStepIntegrator : public Integrator {
   /// Setup step functions
   virtual void setup_step() = 0;
 
-  /** \brief  Reset the forward solver at the start or after an event */
+  /** \brief  Reset the forward solver at the start or after an event
+
+      \identifier{29t} */
   void reset(IntegratorMemory* mem, bool first_call) const override;
 
   /** \brief  Advance solution in time

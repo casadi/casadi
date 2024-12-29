@@ -168,10 +168,14 @@ namespace casadi {
         \identifier{s5} */
     std::string rom_integer(const void* id) const;
 
-    /** \brief Allocate file scope double writeable memory */
+    /** \brief Allocate file scope double writeable memory
+
+        \identifier{2aw} */
     void define_pool_double(const std::string& name, const std::vector<double>& def);
 
-    /** \brief Access file scope double writeable memory */
+    /** \brief Access file scope double writeable memory
+
+        \identifier{2ax} */
     std::string pool_double(const std::string& name) const;
 
     /** \brief Setup a callback
@@ -690,7 +694,9 @@ namespace casadi {
     /** Get work vector element from index */
     std::string workel(casadi_int n) const;
 
-    /** \brief Reserve a maximum size of work elements, used for padding of index */
+    /** \brief Reserve a maximum size of work elements, used for padding of index
+
+        \identifier{2ay} */
     void reserve_work(casadi_int n);
 
     /** Declare an array */

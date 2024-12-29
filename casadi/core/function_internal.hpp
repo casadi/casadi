@@ -169,7 +169,8 @@ namespace casadi {
     /** \brief Check for validatity of memory object count
     *
     * Purpose if to allow more helpful error messages
-    */
+
+        \identifier{2b7} */
     virtual void check_mem_count(casadi_int n) const { }
 
     /** \brief Create memory block
@@ -1388,7 +1389,9 @@ namespace casadi {
         \identifier{np} */
     virtual bool is_a(const std::string& type, bool recursive) const;
 
-    /** \brief List merge opportunitities */
+    /** \brief List merge opportunitities
+
+        \identifier{2b8} */
     virtual void merge(const std::vector<MX>& arg,
       std::vector<MX>& subs_from, std::vector<MX>& subs_to) const;
 

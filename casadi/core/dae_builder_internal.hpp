@@ -522,13 +522,19 @@ protected:
       \identifier{10} */
   std::vector<MX> quad() const;
 
-  /** \brief Zero crossing functions */
+  /** \brief Zero crossing functions
+
+      \identifier{2a6} */
   std::vector<MX> zero() const;
 
-  /** \brief Initial conditions, left-hand-side */
+  /** \brief Initial conditions, left-hand-side
+
+      \identifier{2a7} */
   std::vector<MX> init_lhs() const;
 
-  /** \brief Initial conditions, right-hand-side */
+  /** \brief Initial conditions, right-hand-side
+
+      \identifier{2a8} */
   std::vector<MX> init_rhs() const;
 
   ///@{

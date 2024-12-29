@@ -359,13 +359,17 @@ namespace casadi {
   class CASADI_EXPORT ConstantPool : public ConstantMX {
   public:
 
-    /** \brief  Constructor */
+    /** \brief  Constructor
+
+        \identifier{29v} */
     explicit ConstantPool(const DM& x, const std::string& name);
 
     /// Destructor
     ~ConstantPool() override {}
 
-    /** \brief  Print expression */
+    /** \brief  Print expression
+
+        \identifier{29w} */
     std::string disp(const std::vector<std::string>& arg) const override;
 
     /// Get the value (only for scalar constant nodes)
@@ -374,42 +378,60 @@ namespace casadi {
     /// Get the value (only for constant nodes)
     Matrix<double> get_DM() const override;
 
-    /** \brief  Evaluate the function numerically */
+    /** \brief  Evaluate the function numerically
+
+        \identifier{29x} */
     int eval(const double** arg, double** res, casadi_int* iw, double* w) const override {
       if (res[0]) std::copy(x_.begin(), x_.end(), res[0]);
       return 0;
     }
 
-    /** \brief  Evaluate the function symbolically (SX)  */
+    /** \brief  Evaluate the function symbolically (SX)
+
+        \identifier{29y} */
     int eval_sx(const SXElem** arg, SXElem** res,
                          casadi_int* iw, SXElem* w) const override {
       casadi_error("eval_sx not supported");
       return 0;
     }
 
-    /** \brief Generate code for the operation  */
+    /** \brief Generate code for the operation
+
+        \identifier{29z} */
     void generate(CodeGenerator& g,
                   const std::vector<casadi_int>& arg,
                   const std::vector<casadi_int>& res,
                   const std::vector<bool>& arg_is_ref,
                   std::vector<bool>& res_is_ref) const override;
 
-    /** \brief Add a dependent function */
+    /** \brief Add a dependent function
+
+        \identifier{2a0} */
     void add_dependency(CodeGenerator& g) const override;
 
-    /** \brief pool identifier*/
+    /** \brief pool identifier
+
+        \identifier{2a1} */
     std::string name_;
 
-    /** \brief nonzeros */
+    /** \brief nonzeros
+
+        \identifier{2a2} */
     std::vector<double> x_;
 
-    /** \brief Serialize an object without type information  */
+    /** \brief Serialize an object without type information
+
+        \identifier{2a3} */
     void serialize_body(SerializingStream& s) const override;
 
-    /** \brief Serialize type information */
+    /** \brief Serialize type information
+
+        \identifier{2a4} */
     void serialize_type(SerializingStream& s) const override;
 
-    /** \brief Deserializing constructor */
+    /** \brief Deserializing constructor
+
+        \identifier{2a5} */
     explicit ConstantPool(DeserializingStream& s);
   };
 

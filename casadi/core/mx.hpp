@@ -132,7 +132,9 @@ namespace casadi {
 
 
     /** \brief Construct matrix with a given sparsity and nonzeros,
-     * configurable in codegen via a pool */
+     * configurable in codegen via a pool
+
+        \identifier{2aa} */
     MX(const Matrix<double>& val, const std::string& name);
 
     /** \brief  Create scalar constant (also implicit type conversion)

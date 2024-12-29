@@ -327,7 +327,8 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   /** \brief Check for validatity of memory object count
   *
   * Purpose if to allow more helpful error messages
-  */
+
+      \identifier{2a9} */
   void check_mem_count(casadi_int n) const override;
 
   /** \brief Create memory block

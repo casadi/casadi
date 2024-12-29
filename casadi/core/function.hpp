@@ -1129,7 +1129,9 @@ namespace casadi {
     void call_gen(const std::map<std::string, M>& arg, std::map<std::string, M>& res,
                bool always_inline, bool never_inline) const;
 
-    /** \brief List merge opportunitities */
+    /** \brief List merge opportunitities
+
+        \identifier{2b6} */
     void merge(const std::vector<MX>& arg,
         std::vector<MX>& subs_from, std::vector<MX>& subs_to) const;
 #endif // SWIG

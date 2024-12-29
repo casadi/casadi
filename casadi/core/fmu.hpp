@@ -80,7 +80,9 @@ class CASADI_EXPORT Fmu
       \identifier{26u} */
   const std::string& name() const;
 
-  /** \brief Name of the FMU */
+  /** \brief Name of the FMU
+
+      \identifier{2ab} */
   const std::string& instance_name() const;
 
   ///@{

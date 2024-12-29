@@ -175,7 +175,9 @@ struct CASADI_EXPORT XmlNode {
       \identifier{vr} */
   static void read(const std::string& str, casadi_int* val);
 
-  /** \brief  Read the size_t value of a string  */
+  /** \brief  Read the size_t value of a string
+
+      \identifier{29u} */
   static void read(const std::string& str, size_t* val);
 
   /** \brief  Read the double value of a string

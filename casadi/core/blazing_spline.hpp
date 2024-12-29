@@ -35,8 +35,9 @@ namespace casadi {
    *  - order 3 is assumed
    *  - up to dimension 3 supported
    *  - a single scalar output (m=1)
-   * 
-  */
+   *
+
+      \identifier{2b9} */
   CASADI_EXPORT Function blazing_spline(const std::string& name,
     const std::vector< std::vector<double> >& knots,
     const Dict& opts=Dict());

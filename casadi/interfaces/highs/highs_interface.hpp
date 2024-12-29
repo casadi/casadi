@@ -44,7 +44,7 @@ namespace casadi {
       https://www.maths.ed.ac.uk/hall/HiGHS/HighsOptions.html
       for a list of options.
 
-*/
+    \identifier{29k} */
 
 /** \pluginsection{Conic,highs} */
 
