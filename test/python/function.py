@@ -2572,6 +2572,32 @@ class Functiontests(casadiTestCase):
            for a,b in zip(Gf.call(arg),Ff.call(arg)):
              self.checkarray(a,b)
 
+  def test_non_diff_call(self):
+    x = MX.sym("x",5)
+    y = MX.sym("x",5,5)
+
+    f = Function("f",[x,y],[y @ x,y.T @ x],{"never_inline":True,"is_diff_in":[False,True],"is_diff_out":[False,True]})
+    
+    
+
+    x = SX.sym("x",5)
+    y = SX.sym("x",5,5)
+    
+    g = Function('g',[x,y],f(x,y))
+    
+
+    X = MX.sym("x",5)
+    Y = MX.sym("x",5,5)
+    
+    G = Function('g',[x,y],f(x,y))
+    
+    DM.rng(1)
+    x0=DM.rand(5)
+    y0=DM.rand(5,5)
+    
+    self.checkfunction(g,G,inputs=[x0,y0])
+    
+
   @memory_heavy()
   def test_inline_linear_interpolant(self):
 

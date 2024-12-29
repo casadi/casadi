@@ -1016,17 +1016,42 @@ namespace casadi {
               deps.push_back(it2_node->dep(i));
             }
 
-            // Read in reverse seeds from work vector
-            for (casadi_int i=0;i<m.n_dep;++i) {
-              deps.push_back(w[m.dep[i]]);
+            // Do not set nominal outputs
+            for (casadi_int i=0;i<m.f_n_out;++i) {
+              casadi_int nnz = ff.nnz_in(i+m.f_n_in);
+              casadi_assert(nnz==0, "Not implemented");
+            }
+
+            // Read in forward seeds from work vector
+            casadi_int offset = 0;
+            for (casadi_int i=0;i<m.f_n_in;++i) {
+              casadi_int nnz = ff.nnz_in(i+m.f_n_in+m.f_n_out);
+              // nnz=0 occurs for is_diff_in[i] false
+              casadi_assert(nnz==0 || nnz==m.f.nnz_in(i), "Not implemented");
+              if (nnz) {
+                for (casadi_int j=0;j<nnz;++j) {
+                  deps.push_back(w[m.dep[offset+j]]);
+                }
+              }
+              offset += m.f.nnz_in(i);
             }
 
             // Call forward sensitivity function
             std::vector<SXElem> ret = SXElem::call(ff, deps);
 
             // Retrieve sensitivities
-            for (casadi_int i=0;i<m.n_res;++i) {
-              if (m.res[i]>=0) w[m.res[i]] = ret[i];
+            offset = 0;
+            casadi_int k = 0;
+            for (casadi_int i=0;i<m.f_n_out;++i) {
+              casadi_int nnz = ff.nnz_out(i);
+              // nnz=0 occurs for is_diff_out[i] false
+              casadi_assert(nnz==0 || nnz==m.f.nnz_out(i), "Not implemented");
+              if (nnz) {
+                for (casadi_int j=0;j<nnz;++j) {
+                  if (m.res[offset+j]>=0) w[m.res[offset+j]] = ret[k++];
+                }
+              }
+              offset += m.f.nnz_out(i);
             }
           }
           it2++;
@@ -1165,9 +1190,24 @@ namespace casadi {
               deps.push_back(it2_node->dep(i));
             }
 
+            // Do not set nominal outputs
+            for (casadi_int i=0;i<m.f_n_out;++i) {
+              casadi_int nnz = fr.nnz_in(i+m.f_n_in);
+              casadi_assert(nnz==0, "Not implemented");
+            }
+
             // Read in reverse seeds from work vector
-            for (casadi_int i=0;i<m.n_res;++i) {
-              deps.push_back((m.res[i]>=0) ? w[m.res[i]] : 0);
+            casadi_int offset = 0;
+            for (casadi_int i=0;i<m.f_n_out;++i) {
+              casadi_int nnz = fr.nnz_in(i+m.f_n_in+m.f_n_out);
+              // nnz=0 occurs for is_diff_out[i] false
+              casadi_assert(nnz==0 || nnz==m.f.nnz_out(i), "Not implemented");
+              if (nnz) {
+                for (casadi_int j=0;j<nnz;++j) {
+                  deps.push_back((m.res[offset+j]>=0) ? w[m.res[offset+j]] : 0);
+                }
+              }
+              offset += m.f.nnz_out(i);
             }
 
             // Call reverse sensitivity function
@@ -1179,8 +1219,18 @@ namespace casadi {
             }
 
             // Store reverse sensitivities into work vector
-            for (casadi_int i=0;i<m.n_dep;++i) {
-              w[m.dep[i]] += ret[i];
+            offset = 0;
+            casadi_int k = 0;
+            for (casadi_int i=0;i<m.f_n_in;++i) {
+              casadi_int nnz = fr.nnz_out(i);
+              // nnz=0 occurs for is_diff_in[i] false
+              casadi_assert(nnz==0 || nnz==m.f.nnz_in(i), "Not implemented");
+              if (nnz) {
+                for (casadi_int j=0;j<nnz;++j) {
+                  w[m.dep[offset+j]] += ret[k++];
+                }
+              }
+              offset += m.f.nnz_in(i);
             }
           }
           it2++;
