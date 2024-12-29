@@ -659,7 +659,7 @@ namespace casadi {
 
     if (!allow_free && has_free()) {
       casadi_error(name_ + "::init: Initialization failed since variables [" +
-      join(get_free(), "") + "] are free. These symbols occur in the output expressions "
+      join(get_free(), ", ") + "] are free. These symbols occur in the output expressions "
       "but you forgot to declare these as inputs. "
       "Set option 'allow_free' to allow free variables.");
     }
