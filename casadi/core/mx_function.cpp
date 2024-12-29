@@ -1197,7 +1197,7 @@ namespace casadi {
     g.init_local("arg1", "arg+" + str(n_in_));
     g.init_local("res1", "res+" + str(n_out_));
 
-    g.reserve_work(workloc_.size());
+    g.reserve_work(workloc_.size()-1);
 
     // Operation number (for printing)
     casadi_int k=0;
@@ -1206,14 +1206,14 @@ namespace casadi {
     std::vector<casadi_int> arg, res;
 
     // State of work vector: reference or not (value types)
-    std::vector<bool> work_is_ref(workloc_.size(), false);
+    std::vector<bool> work_is_ref(workloc_.size()-1, false);
 
     // State of operation arguments and results: reference or not
     std::vector<bool> arg_is_ref, res_is_ref;
 
     // Collect for each work vector element if reference or value needed
-    std::vector<bool> needs_reference(workloc_.size(), false);
-    std::vector<bool> needs_value(workloc_.size(), false);
+    std::vector<bool> needs_reference(workloc_.size()-1, false);
+    std::vector<bool> needs_value(workloc_.size()-1, false);
 
     // Codegen the algorithm
     for (auto&& e : algorithm_) {
