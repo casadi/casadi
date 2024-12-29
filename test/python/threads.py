@@ -175,7 +175,7 @@ class Threadstests(casadiTestCase):
             max_factor = 1.2
             if platform.system()=='Darwin':
                 # Mac does not seem to be accurate: https://stackoverflow.com/questions/1133857/how-accurate-is-pythons-time-sleep
-                max_factor = 2
+                max_factor = 4
             self.assertTrue(target_print_thread*0.9<=dt<=target_print_thread*max_factor)
         
   @memory_heavy()
