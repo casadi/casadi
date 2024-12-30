@@ -1623,6 +1623,7 @@ class SXtests(casadiTestCase):
     X = SX.sym("A",3,6)
     Y = SX.sym("Y")
     
+    DM.rng(1)
     
     g = Function('g',[X,Y],[f(X[:,3:],sin(Y)),X[1,3],3*X[2,4]])
     gref = Function('g',[X,Y],[fref(X[:,3:],sin(Y)),X[1,3],3*X[2,4]])
