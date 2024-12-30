@@ -1033,7 +1033,7 @@ namespace casadi {
                   deps.push_back(w[m.dep[offset+j]]);
                 }
               }
-              offset += m.f.nnz_in(i);
+              offset += m.f_nnz_in[i];
             }
 
             // Call forward sensitivity function
@@ -1045,14 +1045,14 @@ namespace casadi {
             for (casadi_int i=0;i<m.f_n_out;++i) {
               casadi_int nnz = ff.nnz_out(i);
               // nnz=0 occurs for is_diff_out[i] false
-              casadi_assert(nnz==0 || nnz==m.f.nnz_out(i), "Not implemented");
+              casadi_assert(nnz==0 || nnz==m.f_nnz_out[i], "Not implemented");
               if (nnz) {
                 for (casadi_int j=0;j<nnz;++j) {
                   if (m.res[offset+j]>=0) w[m.res[offset+j]] = ret[k];
                   k++;
                 }
               }
-              offset += m.f.nnz_out(i);
+              offset += m.f_nnz_out[i];
             }
           }
           it2++;
@@ -1225,13 +1225,13 @@ namespace casadi {
             for (casadi_int i=0;i<m.f_n_in;++i) {
               casadi_int nnz = fr.nnz_out(i);
               // nnz=0 occurs for is_diff_in[i] false
-              casadi_assert(nnz==0 || nnz==m.f.nnz_in(i), "Not implemented");
+              casadi_assert(nnz==0 || nnz==m.f_nnz_in[i], "Not implemented");
               if (nnz) {
                 for (casadi_int j=0;j<nnz;++j) {
                   w[m.dep[offset+j]] += ret[k++];
                 }
               }
-              offset += m.f.nnz_in(i);
+              offset += m.f_nnz_in[i];
             }
           }
           it2++;
