@@ -688,7 +688,7 @@ namespace casadi {
     // Perform copy elision (codegen-only)
     // Remove nodes that only serve to compose CALL inputs
 
-    // For work vector elements, store the arg source
+    // For work vector elements, store the arg source (-1 for no trivial source)
     std::vector<int> arg_i(worksize_, -1);
     std::vector<int> nz_i(worksize_, -1);
 
@@ -731,11 +731,13 @@ namespace casadi {
               if (arg_i[m.dep[k]]==-1) {
                 arg = -1;
                 // Pattern match failed
+                k += m.f_nnz_in[i]-j;
                 break;
               }
               if (nz_i[m.dep[k]]!=offset+j) {
                 arg = -1;
                 // Pattern match failed
+                k += m.f_nnz_in[i]-j;
                 break;
               }
               k++;
