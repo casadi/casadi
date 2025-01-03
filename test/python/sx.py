@@ -1477,6 +1477,53 @@ class SXtests(casadiTestCase):
       evalf(x)
   
 
+  def test_output_sx(self):
+  
+    x = MX.sym("x")
+    y = MX.sym("y")
+    z = MX.sym("z")
+    w = mtimes(sqrt(z),sin(x*y))
+
+    f = Function('f',[x,y,z],[x*y*z,w])
+    print(f)
+
+    x = SX.sym("x")
+    y = SX.sym("y")
+    z = SX.sym("z")
+    
+    args = [x/y,10*z,y*z]
+
+    v = f.call(args,False,True)
+
+    output_0 = v[0]
+    output_1 = v[1]    
+
+
+    self.assertEqual(output_0.dep(0).element_hash(),output_1.dep(0).element_hash())
+    call_node = output_0.dep(0)
+    
+    print("here")
+    
+    v = None
+    
+    # Check that get_output is cached
+    output_1b = call_node.get_output(1)
+    self.assertEqual(output_1.element_hash(),output_1b.element_hash())
+    
+    h1 = output_1.element_hash()
+    
+    output_1 = None
+    output_1b = None
+    
+    # Without output_0 gone, output_1b seems to get consistently reconstructed into the freshly deleted memory slot
+    output_0 = None
+
+    output_1b = call_node.get_output(1)
+    
+    # This test is too fragile
+    #self.assertNotEqual(h1,output_1b.element_hash())
+
+
   def test_call_fun(self):
 
     A = sparsify(DM([[1,0,1],[0,0,6],[0,8,9]]))
@@ -1517,6 +1564,13 @@ class SXtests(casadiTestCase):
     
     self.assertTrue(callnode.n_dep()==5)
     callnode.dep(4)
+    
+    e = callnode.get_output(3)
+    print(e,hash(e))
+    
+    ee = callnode.get_output(3)
+    print(ee,hash(e))
+    
     
     self.assertTrue("{3}" in str(callnode.get_output(3)))
     

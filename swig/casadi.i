@@ -2942,6 +2942,11 @@ namespace casadi{
 }
 } // namespace casadi
 
+%include <casadi/core/generic_shared.hpp>
+
+%template(GenSharedObject) casadi::GenericShared<casadi::SharedObject, casadi::SharedObjectInternal>;
+%template(GenWeakRef) casadi::GenericWeakRef<casadi::SharedObject, casadi::SharedObjectInternal>;
+
 %include <casadi/core/shared_object.hpp>
 %include <casadi/core/casadi_misc.hpp>
 %include <casadi/core/casadi_common.hpp>

@@ -43,7 +43,7 @@ namespace casadi {
     MX ret;
     if (!cache_.incache(oind, ret)) {
       ret = MX::create(new OutputNode(this_, oind));
-     cache_.tocache_if_missing(oind, ret);
+      cache_.tocache_if_missing(oind, ret);
     }
     return ret;
   }

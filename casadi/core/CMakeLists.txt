@@ -48,6 +48,9 @@ set(CASADI_PUBLIC
   # Template class Matrix<>, implements a sparse Matrix with col compressed storage, designed to work well with symbolic data types (SX)
   generic_expression.hpp      # Base class for SXElem MX and Matrix<>
   generic_matrix.hpp          # Base class for Matrix<> and MX
+  generic_shared.hpp          # Base class for SharedObject
+  generic_shared_internal.hpp # Base class for SharedObjectInternal
+  generic_shared_impl.hpp
   matrix_fwd.hpp
   matrix_decl.hpp
   sx_fwd.hpp
@@ -109,7 +112,6 @@ set(CASADI_INTERNAL
   global_options.cpp
   ${CMAKE_CURRENT_BINARY_DIR}/../config.h
   casadi_meta.cpp
-  shared_object.cpp shared_object_internal.hpp shared_object_internal.cpp
   generic_type.cpp
   generic_type_internal.hpp
   options.cpp
@@ -126,6 +128,7 @@ set(CASADI_INTERNAL
 
   sparsity.cpp  sparsity_internal.hpp   sparsity_internal.cpp
   slice.cpp generic_matrix.cpp
+  shared_object.cpp
 
   # Directed, acyclic graph representation with scalar expressions
   sx_elem.cpp             # Symbolic expression class (scalar-valued atomics)
@@ -134,7 +137,7 @@ set(CASADI_INTERNAL
   constant_sx.hpp                                    # A constant SXElem node
   unary_sx.hpp                                       # A unary operation
   binary_sx.hpp                                      # A binary operation
-  output_sx.hpp
+  output_sx.hpp           output_sx.cpp
   call_sx.hpp
 
   # More general graph representation with sparse matrix expressions and function evaluations

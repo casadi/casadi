@@ -29,7 +29,7 @@
 #include <unordered_map>
 
 #include "dae_builder.hpp"
-#include "shared_object_internal.hpp"
+#include "shared_object.hpp"
 #include "casadi_enum.hpp"
 
 namespace casadi {

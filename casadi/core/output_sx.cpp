@@ -22,37 +22,12 @@
  *
  */
 
-#include "shared_object.hpp"
+#include "output_sx.hpp"
 #include "generic_shared_impl.hpp"
 
 namespace casadi {
 
-
-  std::string SharedObject::class_name() const {
-    return (*this)->class_name();
-  }
-
-  void SharedObject::disp(std::ostream& stream, bool more) const {
-    if (is_null()) {
-      stream << "NULL";
-    } else {
-      (*this)->disp(stream, more);
-    }
-  }
-
-  void SharedObject::print_ptr(std::ostream &stream) const {
-    stream << get();
-  }
-
-  void WeakRefInternal::disp(std::ostream& stream, bool more) const {
-    if (raw_==nullptr) {
-      stream << "NULL";
-    } else {
-      raw_->disp(stream, more);
-    }
-  }
-
-template class CASADI_EXPORT GenericShared< SharedObject, SharedObjectInternal >;
-template class CASADI_EXPORT GenericWeakRef< SharedObject, SharedObjectInternal >;
+template class CASADI_EXPORT GenericShared< SharedSXElem, OutputSX >;
+template class CASADI_EXPORT GenericWeakRef< SharedSXElem, OutputSX >;
 
 } // namespace casadi

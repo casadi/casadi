@@ -26,7 +26,7 @@
 #define CASADI_OPTISTACK_INTERNAL_HPP
 
 #include "optistack.hpp"
-#include "shared_object_internal.hpp"
+#include "shared_object.hpp"
 
 namespace casadi {
 

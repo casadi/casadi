@@ -30,7 +30,7 @@
 #include "importer.hpp"
 #include "fmu.hpp"
 #include "generic_type.hpp"
-#include "shared_object_internal.hpp"
+#include "shared_object.hpp"
 #include "sx_node.hpp"
 #include "sparsity_internal.hpp"
 #include "mx_node.hpp"

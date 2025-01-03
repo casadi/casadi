@@ -32,7 +32,7 @@
 #include "code_generator.hpp"
 #include "importer.hpp"
 #include "options.hpp"
-#include "shared_object_internal.hpp"
+#include "shared_object.hpp"
 #include "timing.hpp"
 #ifdef CASADI_WITH_THREAD
 #ifdef CASADI_WITH_THREAD_MINGW

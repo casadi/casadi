@@ -29,7 +29,7 @@
 #include "generic_type.hpp"
 #include "casadi_misc.hpp"
 #include "serializing_stream.hpp"
-#include "shared_object_internal.hpp"
+#include "shared_object.hpp"
 
 /// \cond INTERNAL
 

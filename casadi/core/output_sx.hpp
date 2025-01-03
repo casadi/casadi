@@ -27,17 +27,56 @@
 #define CASADI_OUTPUT_SX_HPP
 
 #include "sx_node.hpp"
+#include "generic_shared_internal.hpp"
+#include "generic_shared.hpp"
 
 /// \cond INTERNAL
 namespace casadi {
 
-    class CASADI_EXPORT OutputSX : public SXNode {
+  class OutputSX;
+
+  class CASADI_EXPORT SharedSXElem :
+      public GenericShared<SharedSXElem, OutputSX> {
+    public:
+
+    static bool test_cast(const OutputSX* ptr) {
+      return ptr;
+    }
+
+    using internal_base_type = OutputSX;
+    using base_type = SharedSXElem;
+
+  };
+
+  class CASADI_EXPORT WeakRefSXElem :
+      public GenericWeakRef<SharedSXElem, OutputSX> {
+
+    using GenericWeakRef<SharedSXElem, OutputSX>::GenericWeakRef;
+  };
+
+  typedef GenericWeakRefInternal<SharedSXElem, OutputSX> WeakRefInternalSXElem;
+
+    class CASADI_EXPORT OutputSX :
+      public SXNode,
+      public GenericSharedInternal<SharedSXElem, OutputSX> {
+    friend class GenericShared<SharedSXElem, OutputSX>;
+    friend class SharedObject;
+    friend class GenericWeakRef<SharedSXElem, OutputSX>;
+    friend class GenericSharedInternal<SharedSXElem, OutputSX>;
+    friend class Memory;
+    friend class UniversalNodeOwner;
   public:
+
+    using weak_ref_type = WeakRefInternalSXElem;
 
     /** \brief  Constructor
 
         \identifier{294} */
     OutputSX(const SXElem& dep, int oind) : dep_(dep), oind_(oind) {
+    }
+
+    /// Empty constructor
+    OutputSX() {
 
     }
 
@@ -120,5 +159,7 @@ namespace casadi {
 
 } // namespace casadi
 /// \endcond
+
+#include "generic_shared_impl.hpp"
 
 #endif // CASADI_OUTPUT_SX_HPP

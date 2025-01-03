@@ -28,7 +28,7 @@
 #define CASADI_SPARSITY_INTERNAL_HPP
 
 #include "sparsity.hpp"
-#include "shared_object_internal.hpp"
+#include "shared_object.hpp"
 #ifdef CASADI_WITH_THREAD
 #ifdef CASADI_WITH_THREAD_MINGW
 #include <mingw.mutex.h>

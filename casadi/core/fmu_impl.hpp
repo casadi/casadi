@@ -27,7 +27,7 @@
 
 #include "fmu.hpp"
 #include "importer.hpp"
-#include "shared_object_internal.hpp"
+#include "shared_object.hpp"
 
 /// \cond INTERNAL
 
