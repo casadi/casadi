@@ -267,7 +267,7 @@ vars_lb[offset:offset+ndiff] = xDf_min
 vars_ub[offset:offset+ndiff] = xDf_max
 vars_init[offset:offset+ndiff] = xD_init[-1,:]
 offset += ndiff
-assert(offset==NV)
+assert offset==NV
 
 # Constraint function for the NLP
 g = []

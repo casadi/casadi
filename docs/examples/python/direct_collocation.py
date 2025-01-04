@@ -133,7 +133,7 @@ for k in range(N):
        ubg.append([0, 0])
 
        # Add contribution to the end state
-       Xk_end = Xk_end + D[j]*Xc[j-1];
+       Xk_end = Xk_end + D[j]*Xc[j-1]
 
        # Add contribution to quadrature function
        J = J + B[j]*qj*h
@@ -164,7 +164,7 @@ ubg = np.concatenate(ubg)
 
 # Create an NLP solver
 prob = {'f': J, 'x': w, 'g': g}
-solver = ca.nlpsol('solver', 'ipopt', prob);
+solver = ca.nlpsol('solver', 'ipopt', prob)
 
 # Function to get x and u trajectories from w
 trajectories = ca.Function('trajectories', [w], [x_plot, u_plot], ['w'], ['x', 'u'])
