@@ -2576,7 +2576,7 @@ class Functiontests(casadiTestCase):
     x = MX.sym("x",5)
     y = MX.sym("x",5,5)
 
-    f = Function("f",[x,y],[y @ x,y.T @ x],{"never_inline":True,"is_diff_in":[False,True],"is_diff_out":[False,True]})
+    f = Function("f",[x,y],[mtimes(y,x),mtimes(y.T,x)],{"never_inline":True,"is_diff_in":[False,True],"is_diff_out":[False,True]})
     
     
 
