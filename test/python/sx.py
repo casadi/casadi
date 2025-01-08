@@ -1754,6 +1754,58 @@ class SXtests(casadiTestCase):
 
     self.checkarray(logsumexp(vertcat(100,1000,10000)),f(vertcat(100,1000,10000)))
 
+  def test_extract_parametric_call_sx(self):
+    x = MX.sym("x")
+    y = MX.sym("y")
+    z = MX.sym("z")
+    
+    f = Function("f",[x,y,z],[x*y,y*z,x*z],{"never_inline":True})
+    
+    x = SX.sym("x")
+    p = SX.sym("p")
+    
+    [expr1,expr2,expr3] = f(1,sin(p),sqrt(p))
+    
+    expr = x*(expr1+expr3)
+    
+    expr_ret,symbols,parametric = extract_parametric(expr,p)
+    
+    print("expr_ret",expr_ret)
+    print("symbols",symbols)
+    print("parametric",parametric)
+    
+    self.assertTrue("x*e_0" in str(expr_ret))
+    
+    print(expr_ret,symbols,parametric)
+    
+    self.assertFalse(depends_on(expr_ret,p))
+        
+    expr_recreated = substitute([expr_ret],symbols,parametric)[0]
+    
+    print(expr_recreated-expr)
+    
+    self.assertTrue(cse(expr_recreated-expr).is_zero())
+
+
+    [expr1,expr2,expr3] = f(1,sin(p),x**2)
+    
+    expr = expr1+expr3
+    
+
+    
+    expr_ret,symbols,parametric = extract_parametric(expr,p)
+    
+    self.assertFalse(depends_on(expr_ret,p))
+        
+    expr_recreated = substitute([expr_ret],symbols,parametric)[0]
+    
+    f = Function('f',[x,p],[expr_recreated])
+    f.generate('f1.c')
+    f = Function('f',[x,p],[expr])
+    f.generate('f2.c')
+    cse(expr_recreated)
+    self.assertTrue(cse(expr_recreated-expr).is_zero())
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -689,6 +689,61 @@ namespace casadi {
           w[a.i0] = *p_it++;
           expr_status[a.i0] = 2;
           break;
+        case OP_CALL:
+          {
+            const auto& m = ff->call_.el.at(a.i1);
+            const SXElem& orig = *b_it++;
+            std::vector<SXElem> deps(m.n_dep);
+
+            bool identical = true;
+            for (casadi_int i=0;i<m.n_dep;++i) {
+              identical &= SXElem::is_equal(w[m.dep.at(i)], orig->dep(i), 2);
+            }
+
+            // Check worst case status of inputs
+            char max_status = 0;
+            for (casadi_int i=0;i<m.n_dep;++i) {
+              max_status = std::max(max_status, expr_status[m.dep[i]]);
+            }
+
+            bool any_tainted = max_status==2;
+
+            if (any_tainted) {
+              // Loop over inputs
+              for (casadi_int i=0;i<m.n_dep;++i) {
+                // Skip if already tainted
+                if (expr_status[m.dep[i]]==2) continue;
+                // Skip if it is a constant
+                if (expr_status[m.dep[i]]==0) continue;
+
+                w[m.dep[i]] = register_symbol(w[m.dep[i]], symbol_map, symbol_v, parametric_v,
+                        extract_trivial, v_offset, v_prefix, v_suffix);
+
+                identical = false;
+              }
+            }
+
+            std::vector<SXElem> ret;
+
+            if (identical) {
+              for (casadi_int i=0;i<m.n_res;++i) {
+                ret.push_back(orig.get_output(i));
+              }
+            } else {
+              for (casadi_int i=0;i<m.n_dep;++i) deps[i] = w[m.dep[i]];
+              ret = SXElem::call(m.f, deps);
+            }
+
+            // Update expression status
+            for (casadi_int i=0;i<m.n_res;++i) {
+              if (m.res[i]>=0) expr_status[m.res[i]] = max_status;
+            }
+
+            for (casadi_int i=0;i<m.n_res;++i) {
+              if (m.res[i]>=0) w[m.res[i]] = ret[i];
+            }
+          }
+          break;
         default:
           {
             bool is_binary = casadi_math<SXElem>::is_binary(a.op);
@@ -798,6 +853,8 @@ namespace casadi {
         case OP_PARAMETER:
           w[a.i0][2] = *p_it++;
           break;
+        case OP_CALL:
+          casadi_error("Not implemented");
         default:
           casadi_math<SXElem>::fun_linear(a.op, w[a.i1].data(), w[a.i2].data(), w[a.i0].data());
       }
