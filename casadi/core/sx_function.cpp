@@ -1048,7 +1048,8 @@ namespace casadi {
               casadi_assert(nnz==0 || nnz==m.f.nnz_out(i), "Not implemented");
               if (nnz) {
                 for (casadi_int j=0;j<nnz;++j) {
-                  if (m.res[offset+j]>=0) w[m.res[offset+j]] = ret[k++];
+                  if (m.res[offset+j]>=0) w[m.res[offset+j]] = ret[k];
+                  k++;
                 }
               }
               offset += m.f.nnz_out(i);
