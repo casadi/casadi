@@ -2969,6 +2969,18 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
     default_dependencies.insert(default_dependencies.begin(), u_.begin(), u_.end());
     std::sort(default_dependencies.begin(), default_dependencies.end());
 
+    // FMI2 standard does not allow parameters to be included in dependencies attribute
+    //  (Table in section 2.2.8)
+    // FMI3 standard does (Table in section 2.4.8)
+    //
+    // A uniform treatment is unconditionally add dense dependencies to all parameters
+    // when loading FMI2
+
+    std::vector<casadi_int> additional_dependencies;
+    additional_dependencies.insert(additional_dependencies.begin(), p_.begin(), p_.end());
+    std::vector<DependenciesKind> additional_dependencies_kind(p_.size(),
+                                                               DependenciesKind::DEPENDENT);
+
     // Derivatives
     if (n.has_child("Derivatives")) {
       // Separate pass for dependencies
@@ -2985,6 +2997,12 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
           v.dependencies = default_dependencies;
         }
         v.dependenciesKind = read_dependencies_kind(e, v.dependencies.size());
+
+        v.dependencies.insert(v.dependencies.end(),
+          additional_dependencies.begin(), additional_dependencies.end());
+        v.dependenciesKind.insert(v.dependenciesKind.end(),
+          additional_dependencies_kind.begin(), additional_dependencies_kind.end());
+
         // Mark interdependencies
         for (casadi_int d : v.dependencies) variable(d).dependency = true;
       }
@@ -3008,6 +3026,12 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
           v.dependencies = default_dependencies;
         }
         v.dependenciesKind = read_dependencies_kind(e, v.dependencies.size());
+
+        v.dependencies.insert(v.dependencies.end(),
+          additional_dependencies.begin(), additional_dependencies.end());
+        v.dependenciesKind.insert(v.dependenciesKind.end(),
+          additional_dependencies_kind.begin(), additional_dependencies_kind.end());
+
         // Mark interdependencies
         for (casadi_int d : v.dependencies) variable(d).dependency = true;
       }
@@ -3035,6 +3059,9 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
         } else {
           dependencies = default_dependencies;
         }
+
+        dependencies.insert(dependencies.end(),
+          additional_dependencies.begin(), additional_dependencies.end());
 
         // Get dependencies
         for (casadi_int d : dependencies) variable(d).dependency = true;
