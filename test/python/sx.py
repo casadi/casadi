@@ -1805,6 +1805,17 @@ class SXtests(casadiTestCase):
     f.generate('f2.c')
     cse(expr_recreated)
     self.assertTrue(cse(expr_recreated-expr).is_zero())
+    
+  def test_check_recursion(self):
+    x = SX.sym("x")
+
+
+    f = Function("f",[x],[x**2],{"always_inline":True})
+
+    y = MX.sym("y")
+    
+    with self.assertInException("Inlining SXFunction::eval_mx not implemented"):
+      f(y)
 
 
 if __name__ == '__main__':

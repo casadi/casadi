@@ -896,6 +896,14 @@ namespace casadi {
     return 0;
   }
 
+  void SXFunction::eval_mx(const MXVector& arg, MXVector& res,
+                        bool always_inline, bool never_inline) const {
+    always_inline = always_inline || always_inline_;
+
+    casadi_assert(!always_inline, "Inlining SXFunction::eval_mx not implemented");
+    FunctionInternal::eval_mx(arg, res, always_inline, never_inline);
+  }
+
   bool SXFunction::should_inline(bool with_sx, bool always_inline, bool never_inline) const {
     // If inlining has been specified
     casadi_assert(!(always_inline && never_inline),

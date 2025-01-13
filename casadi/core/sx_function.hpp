@@ -79,6 +79,10 @@ class CASADI_EXPORT SXFunction :
               casadi_int* iw, SXElem* w, void* mem,
               bool always_inline, bool never_inline) const override;
 
+  /** \brief Evaluate symbolically, MX type */
+  void eval_mx(const MXVector& arg, MXVector& res,
+                bool always_inline, bool never_inline) const override;
+
   /** Inline calls? */
   bool should_inline(bool with_sx, bool always_inline, bool never_inline) const override;
 

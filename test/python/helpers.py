@@ -568,7 +568,7 @@ class casadiTestCase(unittest.TestCase):
           fseeds = [sym("f",spmod(f.sparsity_in(i))) for i in range(f.n_in())]
           aseeds = [sym("a",spmod2(f.sparsity_out(i)))  for i in range(f.n_out())]
           inputss = [sym("i",f.sparsity_in(i)) for i in range(f.n_in())]
-          res = f.call(inputss,True)
+          res = f.call(inputss,not f.is_a("SXFunction"))
           #print res, "sp", [i.sparsity().dim(True) for i in fseeds]
           opts = {"helper_options": {"is_diff_in": f.is_diff_in(), "is_diff_out": f.is_diff_out()}}
           [fwdsens] = forward(res, inputss, [fseeds],opts)
