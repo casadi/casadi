@@ -140,9 +140,9 @@ jobs:
           python-version: 3.8
           activate-environment: 3.8
           auto-update-conda: true
-      - run: pip install casadi-*.tar.gz
+      - run: pip install casadi-*.tar.gz numpy scipy pandas looseversion
         shell: bash -el {0}
-      - run: cd test/python && python implicitfunction.py
+      - run: cd test/python && python alltests.py
         shell: bash -el {0}
 
   core-osx:
