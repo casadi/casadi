@@ -1669,6 +1669,26 @@ class SXtests(casadiTestCase):
   def test_call_fun_copy_elision(self):
     old = GlobalOptions.getCopyElisionMinSize()
     GlobalOptions.setCopyElisionMinSize(0)
+    
+    mX = MX.sym("A",3,6)
+    mY = MX.sym("Y")
+    
+    X = SX.sym("A",3,6)
+    Y = SX.sym("Y")
+    
+    DM.rng(1)
+    
+    g = Function('g',[X,Y],[X,Y])
+    gref = Function('g',[mX,mY],[mX,mY])
+    inputs = [DM.rand(3,3),DM.rand(1)]
+    self.checkfunction(g,gref,inputs=inputs)
+    for avoid_stack in [True,False]:
+        self.check_codegen(g,inputs=inputs,opts={"avoid_stack":avoid_stack})
+    g_roundtrip = Function.deserialize(g.serialize())
+    self.checkfunction(g,g_roundtrip,inputs=inputs)
+    for avoid_stack in [True,False]:
+        self.check_codegen(g_roundtrip,inputs=inputs,opts={"avoid_stack":avoid_stack})
+
     X = MX.sym("A",3,3)
     Y = MX.sym("Y")
 
@@ -1689,6 +1709,39 @@ class SXtests(casadiTestCase):
     self.checkfunction(g,g_roundtrip,inputs=inputs)
     for avoid_stack in [True,False]:
         self.check_codegen(g_roundtrip,inputs=inputs,opts={"avoid_stack":avoid_stack})
+
+    X = MX.sym("A",4)
+    Y = MX.sym("Y")
+
+    f = Function('f',[X,Y],[sumsqr(X)*Y],{"never_inline":True})
+    fref = Function('f',[X,Y],[sumsqr(X)*Y])
+    X = SX.sym("A",6)
+    Y = SX.sym("Y")
+    
+    DM.rng(1)
+    
+    g = Function('g',[X,Y],[f(vertcat(2,X[:3]),sin(Y))])
+    gref = Function('g',[X,Y],[fref(vertcat(2,X[:3]),sin(Y))])
+    inputs = [DM.rand(6),DM.rand(1)]
+    self.checkfunction(g,gref,inputs=inputs)
+    for avoid_stack in [True,False]:
+        self.check_codegen(g,inputs=inputs,opts={"avoid_stack":avoid_stack})
+    g_roundtrip = Function.deserialize(g.serialize())
+    self.checkfunction(g,g_roundtrip,inputs=inputs)
+    for avoid_stack in [True,False]:
+        self.check_codegen(g_roundtrip,inputs=inputs,opts={"avoid_stack":avoid_stack})
+        
+    g = Function('g',[X,Y],[f(vertcat(2,X[:3]),sin(Y)),3*X])
+    gref = Function('g',[X,Y],[fref(vertcat(2,X[:3]),sin(Y)),3*X])
+    inputs = [DM.rand(6),DM.rand(1)]
+    self.checkfunction(g,gref,inputs=inputs)
+    for avoid_stack in [True,False]:
+        self.check_codegen(g,inputs=inputs,opts={"avoid_stack":avoid_stack})
+    g_roundtrip = Function.deserialize(g.serialize())
+    self.checkfunction(g,g_roundtrip,inputs=inputs)
+    for avoid_stack in [True,False]:
+        self.check_codegen(g_roundtrip,inputs=inputs,opts={"avoid_stack":avoid_stack})
+        
     GlobalOptions.setCopyElisionMinSize(old)
 
   def test_ufunc(self):

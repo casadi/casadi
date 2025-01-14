@@ -146,6 +146,7 @@ namespace casadi {
         stream << m.f.name() << "(";
         k = 0;
         for (casadi_int i=0; i<m.f.n_in(); ++i) {
+          if (m.f.nnz_in(i)==0) stream << "0x0";
           if (m.f.nnz_in(i)>1) stream << "[";
           for (casadi_int j=0; j<m.f.nnz_in(i); ++j) {
             stream << "@" << m.dep[k++];
@@ -226,10 +227,17 @@ namespace casadi {
               << "arg[" + str(m.copy_elision_arg[i]) << "] + "
               << str(m.copy_elision_offset[i]) << " : 0;\n";
           } else {
-            g << "arg[" << n_in_+i << "]=" << "w+" + str(offset) << ";\n";
+            if (m.f_nnz_in[i]==0) {
+              g << "arg[" << n_in_+i << "]=" << 0 << ";\n";
+            } else {
+              g << "arg[" << n_in_+i << "]=" << "w+" + str(offset) << ";\n";
+            }
           }
           offset += m.f_nnz_in[i];
         }
+
+
+        casadi_int out_offset = offset;
 
         // Collect output arguments
         for (casadi_int i=0; i<m.f_n_out; ++i) {
@@ -254,7 +262,7 @@ namespace casadi {
         for (casadi_int i=0;i<m.n_res;++i) {
           if (m.res[i]>=0) {
             g << g.sx_work(m.res[i]) << " = ";
-            g << "w[" + str(i+worksize+call_.sz_w_arg) + "];\n";
+            g << "w[" + str(i+out_offset) + "];\n";
           }
         }
       } else if (a.op==OP_INPUT) {
@@ -718,12 +726,13 @@ namespace casadi {
           auto& m = call_.el[e.i1];
 
           // Inspect input arguments
-          casadi_int k = 0;
+          casadi_int offset_input = 0;
           for (casadi_int i=0; i<m.f_n_in; ++i) {
             // Pattern match results
             casadi_int arg = -1;
             casadi_int offset = -1;
             for (casadi_int j=0; j<m.f_nnz_in[i]; ++j) {
+              casadi_int k = offset_input+j;
               if (j==0) {
                 arg = arg_i[m.dep[k]];
                 offset = nz_i[m.dep[k]];
@@ -731,22 +740,31 @@ namespace casadi {
               if (arg_i[m.dep[k]]==-1) {
                 arg = -1;
                 // Pattern match failed
-                k += m.f_nnz_in[i]-j;
                 break;
               }
               if (nz_i[m.dep[k]]!=offset+j) {
                 arg = -1;
                 // Pattern match failed
-                k += m.f_nnz_in[i]-j;
                 break;
               }
-              k++;
+            }
+
+            // If we cannot perform elision
+            if (arg==-1) {
+              // We need copies for all nonzeros of input i
+              for (casadi_int j=0; j<m.f_nnz_in[i]; ++j) {
+                casadi_int k = offset_input+j;
+                if (arg_i[m.dep[k]]>=0) {
+                  copy_elision_[alg_i[m.dep[k]]] = false;
+                }
+              }
             }
             // Store pattern match results
             m.copy_elision_arg[i] = arg;
             m.copy_elision_offset[i] = offset;
 
             offset += m.f_nnz_in[i];
+            offset_input += m.f_nnz_in[i];
           }
 
           // Remove source association of all outputs
