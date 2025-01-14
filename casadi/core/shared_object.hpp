@@ -113,8 +113,14 @@ namespace casadi {
     \identifier{ax} */
   class CASADI_EXPORT WeakRef :
       public GenericWeakRef<SharedObject, SharedObjectInternal> {
-
+  public:
+#ifdef SWIG
+    // Workaround for SWIG <= 2023-08-06
+    WeakRef(int dummy=0);
+    WeakRef(SharedObject shared);
+#else
     using GenericWeakRef<SharedObject, SharedObjectInternal>::GenericWeakRef;
+#endif
   };
 
 #ifndef SWIG

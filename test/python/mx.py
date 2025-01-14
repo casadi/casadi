@@ -3551,6 +3551,32 @@ class MXtests(casadiTestCase):
           self.assertEqual(len(symbols),2)
           self.assertTrue("sq(p)" in str(parametric))
           print(parametric)
+
+  def test_weakref(self):
+    x = MX.sym("x")
+    
+    y = WeakRef(x)
+    
+    self.assertTrue(y.alive())
+    
+    x = 0
+    
+    import gc
+    gc.collect()
+    
+    self.assertFalse(y.alive())
+    
+    
+    x = MX.sym("x")
+    y = WeakRef(x)
+    xx = y.shared()
+    xx = 0
+    
+    import gc
+    gc.collect()
+    
+    self.assertTrue(y.alive())
+    
       
 if __name__ == '__main__':
     unittest.main()
