@@ -669,9 +669,9 @@ class ADtests(casadiTestCase):
                 aseeds = [[sym("a",spmod2(f.sparsity_out(i)))  for i in range(f.n_out())] for d in range(ndir)]
                 inputss = [sym("i",f.sparsity_in(i)) for i in range(f.n_in())]
 
-                res = f.call(inputss,True)
-                fwdsens = forward(res,inputss,fseeds,dict(always_inline=True))
-                adjsens = reverse(res,inputss,aseeds,dict(always_inline=True))
+                res = f.call(inputss,not f.is_a("SXFunction"))
+                fwdsens = forward(res,inputss,fseeds,dict(always_inline=not f.is_a("SXFunction")))
+                adjsens = reverse(res,inputss,aseeds,dict(always_inline=not f.is_a("SXFunction")))
 
                 fseed = [DM(fseeds[d][0].sparsity(),random.random(fseeds[d][0].nnz())) for d in range(ndir) ]
                 aseed = [DM(aseeds[d][0].sparsity(),random.random(aseeds[d][0].nnz())) for d in range(ndir) ]
@@ -746,9 +746,9 @@ class ADtests(casadiTestCase):
                   aseeds2 = [[sym2("a",vf_mx.sparsity_out(i))  for i in range(vf.n_out()) ] for d in range(ndir)]
                   inputss2 = [sym2("i",vf_mx.sparsity_in(i)) for i in range(vf.n_in())]
 
-                  res2 = vf.call(inputss2,True)
-                  fwdsens2 = forward(res2,inputss2,fseeds2,dict(always_inline=True))
-                  adjsens2 = reverse(res2,inputss2,aseeds2,dict(always_inline=True))
+                  res2 = vf.call(inputss2,not vf.is_a("SXFunction"))
+                  fwdsens2 = forward(res2,inputss2,fseeds2,dict(always_inline=not vf.is_a("SXFunction")))
+                  adjsens2 = reverse(res2,inputss2,aseeds2,dict(always_inline=not vf.is_a("SXFunction")))
 
                   if sym2 is MX.sym:
                       self.check_eval_mx([vvcat(e) for e in fwdsens2])

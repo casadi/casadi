@@ -1964,7 +1964,7 @@ namespace casadi {
     // Expand to SXFunction
     Function s = f.expand("expand_" + f.name(), options);
     std::vector<MX> r;
-    s.call(graph_substitute(v, syms, boundary), r, true);
+    s.call(graph_substitute(v, syms, boundary), r);
     return r;
   }
 

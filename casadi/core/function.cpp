@@ -726,7 +726,7 @@ namespace casadi {
       if (parallelization=="unroll") {
         for (auto&& w : v) w = (*this)(w);
       } else {
-        for (auto&& w : v) call(std::vector<MX>(w), w, true, false);
+        for (auto&& w : v) call(std::vector<MX>(w), w, !is_a("SXFunction"), false);
       }
       // Gather outputs
       std::vector<MX> res(n_out());
