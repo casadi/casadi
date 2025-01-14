@@ -3186,6 +3186,7 @@ class Functiontests(casadiTestCase):
     f = StringDeserializer(data).unpack()
     f.reverse(1).jac_sparsity()
    
+  @requires_nlpsol("ipopt")
   def test_issue_3134(self):
     p = MX.sym("p")
     v = MX.sym("v")
