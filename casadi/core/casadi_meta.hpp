@@ -101,13 +101,19 @@ namespace casadi {
         \identifier{j9} */
     static const char* install_prefix();
 
-    /** \brief Obtain shared library prefix */
+    /** \brief Obtain shared library prefix
+
+        \identifier{2be} */
     static const char* shared_library_prefix();
 
-    /** \brief Obtain shared library suffix */
+    /** \brief Obtain shared library suffix
+
+        \identifier{2bf} */
     static const char* shared_library_suffix();
 
-    /** \brief Obtain object file suffix */
+    /** \brief Obtain object file suffix
+
+        \identifier{2bg} */
     static const char* object_file_suffix();
   };
 

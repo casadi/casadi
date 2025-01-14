@@ -3049,6 +3049,18 @@
 %exception  casadi::GenericMatrix< Matrix< Scalar >  >::zeros(const std::pair< casadi_int, casadi_int > &rc) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::GenericShared< Shared, Internal >::debug_repr() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::GenericShared< Shared, Internal >::is_null() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::GenericShared< SharedObject , SharedObjectInternal  >::debug_repr() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::GenericShared< SharedObject , SharedObjectInternal  >::is_null() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::GenericType::as_bool() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -3230,6 +3242,24 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::GenericType::to_void_pointer() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::GenericWeakRef< Shared, Internal >::alive() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::GenericWeakRef< Shared, Internal >::shared() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::GenericWeakRef< Shared, Internal >::shared_if_alive(Shared &shared) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::GenericWeakRef< SharedObject , SharedObjectInternal  >::alive() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::GenericWeakRef< SharedObject , SharedObjectInternal  >::shared() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::GenericWeakRef< SharedObject , SharedObjectInternal  >::shared_if_alive(SharedObject &shared) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Importer::body(const std::string &symname) const {
@@ -5077,9 +5107,6 @@
 %exception  casadi::SharedObject::get_str(bool more=false) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::SharedObject::is_null() const {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::Slice::all() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -5291,15 +5318,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::WeakCache< K, T >::tocache_if_missing(const K &key, T &f) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::WeakRef::alive() const {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::WeakRef::shared() const {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::WeakRef::shared_if_alive(SharedObject &shared) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::XmlFile::dump(const std::string &filename, const XmlNode &node) {
@@ -5902,10 +5920,10 @@
 %exception  casadi::rootfinder_out(casadi_int ind) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::shared_cast(SharedObject &A) {
+%exception  casadi::shared_cast(S &A) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::shared_cast(const SharedObject &A) {
+%exception  casadi::shared_cast(const S &A) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::simpleIRK(Function f, casadi_int N=10, casadi_int order=4, const std::string &scheme="radau", const std::string &solver="newton", const Dict &solver_options=Dict()) {
@@ -6160,6 +6178,12 @@
 %exception casadi::FunctionBuffer::FunctionBuffer(const FunctionBuffer &f) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception casadi::GenericShared< Shared, Internal >::GenericShared() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception casadi::GenericShared< Shared, Internal >::GenericShared(const GenericShared &ref) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception casadi::GenericType::GenericType() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -6221,6 +6245,12 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::GenericType::GenericType(int i) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception casadi::GenericWeakRef< Shared, Internal >::GenericWeakRef(Shared shared) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception casadi::GenericWeakRef< Shared, Internal >::GenericWeakRef(int dummy=0) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::Importer::Importer() {
@@ -6376,12 +6406,6 @@
 %exception casadi::SerializingStream::SerializingStream(std::ostream &out, const Dict &opts) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception casadi::SharedObject::SharedObject() {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception casadi::SharedObject::SharedObject(const SharedObject &ref) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception casadi::Slice::Slice() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -6416,12 +6440,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::SubMatrix< M, I, J >::SubMatrix(const SubMatrix< M, I, J > &y)=default {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception casadi::WeakRef::WeakRef(SharedObject shared) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception casadi::WeakRef::WeakRef(int dummy=0) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception casadi::XmlFile::XmlFile() {

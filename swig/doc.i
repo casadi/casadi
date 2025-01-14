@@ -4745,10 +4745,10 @@ Get class name.
 Extra doc: https://github.com/casadi/casadi/wiki/L_au
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L143
+https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L85
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L114-L116
+https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L31-L33
 
 ";
 
@@ -4759,10 +4759,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L114
 Print a description of the object.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L146
+https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L88
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L118-L124
+https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L35-L41
 
 ";
 
@@ -4773,23 +4773,29 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L118
 Get string representation.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L149
+https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L91
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L149-L153
+https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L91-L95
 
 ";
 
-%feature("docstring")  casadi::SharedObject::is_null() const "
+%feature("docstring")  casadi::GenericShared< SharedObject , 
+SharedObjectInternal  >::debug_repr() const "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::GenericShared< SharedObject , 
+SharedObjectInternal  >::is_null() const "
 
 [INTERNAL] 
 Is a null pointer?
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L161
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared.hpp#L117
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L73-L75
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared_impl.hpp#L109-L111
 
 ";
 
@@ -4803,10 +4809,10 @@ If the Object does not point to any node, \"0\" is returned.
 Extra doc: https://github.com/casadi/casadi/wiki/L_av
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L168
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared.hpp#L124
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L144-L146
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared_impl.hpp#L137-L139
 
 ";
 
@@ -10245,10 +10251,10 @@ Get class name.
 Extra doc: https://github.com/casadi/casadi/wiki/L_au
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L143
+https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L85
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L114-L116
+https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L31-L33
 
 ";
 
@@ -10259,10 +10265,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L114
 Print a description of the object.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L146
+https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L88
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L118-L124
+https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L35-L41
 
 ";
 
@@ -10273,23 +10279,29 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L118
 Get string representation.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L149
+https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L91
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L149-L153
+https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L91-L95
 
 ";
 
-%feature("docstring")  casadi::SharedObject::is_null() const "
+%feature("docstring")  casadi::GenericShared< SharedObject , 
+SharedObjectInternal  >::debug_repr() const "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::GenericShared< SharedObject , 
+SharedObjectInternal  >::is_null() const "
 
 [INTERNAL] 
 Is a null pointer?
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L161
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared.hpp#L117
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L73-L75
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared_impl.hpp#L109-L111
 
 ";
 
@@ -10303,10 +10315,10 @@ If the Object does not point to any node, \"0\" is returned.
 Extra doc: https://github.com/casadi/casadi/wiki/L_av
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L168
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared.hpp#L124
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L144-L146
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared_impl.hpp#L137-L139
 
 ";
 
@@ -15911,10 +15923,10 @@ Get class name.
 Extra doc: https://github.com/casadi/casadi/wiki/L_au
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L143
+https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L85
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L114-L116
+https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L31-L33
 
 ";
 
@@ -15925,10 +15937,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L114
 Print a description of the object.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L146
+https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L88
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L118-L124
+https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L35-L41
 
 ";
 
@@ -15939,23 +15951,29 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L118
 Get string representation.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L149
+https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L91
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L149-L153
+https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L91-L95
 
 ";
 
-%feature("docstring")  casadi::SharedObject::is_null() const "
+%feature("docstring")  casadi::GenericShared< SharedObject , 
+SharedObjectInternal  >::debug_repr() const "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::GenericShared< SharedObject , 
+SharedObjectInternal  >::is_null() const "
 
 [INTERNAL] 
 Is a null pointer?
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L161
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared.hpp#L117
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L73-L75
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared_impl.hpp#L109-L111
 
 ";
 
@@ -15969,10 +15987,10 @@ If the Object does not point to any node, \"0\" is returned.
 Extra doc: https://github.com/casadi/casadi/wiki/L_av
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L168
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared.hpp#L124
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L144-L146
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared_impl.hpp#L137-L139
 
 ";
 
@@ -25775,6 +25793,90 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/generic_matrix.hpp#L10
 ";
 
 
+// File: classcasadi_1_1GenericShared.xml
+%feature("docstring") casadi::GenericShared "
+
+[INTERNAL] C++ includes: generic_shared.hpp
+";
+
+%feature("docstring") casadi::GenericShared< Shared, Internal 
+>::GenericShared() "
+
+[INTERNAL] 
+Default constructor.
+
+Doc source: 
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared.hpp#L70
+
+Implementation: 
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared.hpp#L70-L72
+
+";
+
+%feature("docstring") casadi::GenericShared< Shared, Internal 
+>::GenericShared(const GenericShared &ref) "
+
+[INTERNAL] 
+Copy constructor (shallow copy)
+
+Doc source: 
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared.hpp#L75
+
+Implementation: 
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared.hpp#L75-L78
+
+";
+
+%feature("docstring") casadi::GenericShared::~GenericShared "
+
+[INTERNAL] 
+Destructor.
+
+Doc source: 
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared.hpp#L81
+
+Implementation: 
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared.hpp#L81-L83
+
+";
+
+%feature("docstring")  casadi::GenericShared< Shared, Internal 
+>::debug_repr() const "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::GenericShared< Shared, Internal >::is_null() 
+const "
+
+[INTERNAL] 
+Is a null pointer?
+
+Doc source: 
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared.hpp#L117
+
+Implementation: 
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared_impl.hpp#L109-L111
+
+";
+
+%feature("docstring") casadi::GenericShared::__hash__ "
+
+[INTERNAL] 
+Returns a number that is unique for a given Node.
+
+If the Object does not point to any node, \"0\" is returned.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_av
+
+Doc source: 
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared.hpp#L124
+
+Implementation: 
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared_impl.hpp#L137-L139
+
+";
+
+
 // File: classcasadi_1_1GenericType.xml
 %feature("docstring") casadi::GenericType "
 
@@ -26768,10 +26870,10 @@ Get class name.
 Extra doc: https://github.com/casadi/casadi/wiki/L_au
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L143
+https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L85
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L114-L116
+https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L31-L33
 
 ";
 
@@ -26782,10 +26884,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L114
 Print a description of the object.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L146
+https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L88
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L118-L124
+https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L35-L41
 
 ";
 
@@ -26796,23 +26898,29 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L118
 Get string representation.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L149
+https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L91
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L149-L153
+https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L91-L95
 
 ";
 
-%feature("docstring")  casadi::SharedObject::is_null() const "
+%feature("docstring")  casadi::GenericShared< SharedObject , 
+SharedObjectInternal  >::debug_repr() const "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::GenericShared< SharedObject , 
+SharedObjectInternal  >::is_null() const "
 
 [INTERNAL] 
 Is a null pointer?
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L161
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared.hpp#L117
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L73-L75
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared_impl.hpp#L109-L111
 
 ";
 
@@ -26826,10 +26934,133 @@ If the Object does not point to any node, \"0\" is returned.
 Extra doc: https://github.com/casadi/casadi/wiki/L_av
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L168
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared.hpp#L124
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L144-L146
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared_impl.hpp#L137-L139
+
+";
+
+
+// File: classcasadi_1_1GenericWeakRef.xml
+%feature("docstring") casadi::GenericWeakRef "
+
+[INTERNAL] C++ includes: generic_shared.hpp
+";
+
+%feature("docstring") casadi::GenericWeakRef< Shared, Internal 
+>::GenericWeakRef(int dummy=0) "
+
+[INTERNAL] 
+Default constructor.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_ay
+
+Doc source: 
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared.hpp#L151
+
+Implementation: 
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared_impl.hpp#L142-L144
+
+";
+
+%feature("docstring") casadi::GenericWeakRef< Shared, Internal 
+>::GenericWeakRef(Shared shared) "
+
+[INTERNAL] 
+Construct from a shared object (also implicit type conversion)
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_az
+
+Doc source: 
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared.hpp#L156
+
+Implementation: 
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared_impl.hpp#L189-L191
+
+";
+
+%feature("docstring")  casadi::GenericWeakRef< Shared, Internal >::shared() 
+const "
+
+[INTERNAL] 
+Get a shared (owning) reference.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_b0
+
+Doc source: 
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared.hpp#L161
+
+Implementation: 
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared_impl.hpp#L152-L158
+
+";
+
+%feature("docstring")  casadi::GenericWeakRef< Shared, Internal >::alive() 
+const "
+
+[INTERNAL] 
+Check if alive.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_b1
+
+Doc source: 
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared.hpp#L166
+
+Implementation: 
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared_impl.hpp#L147-L149
+
+";
+
+%feature("docstring")  casadi::GenericWeakRef< Shared, Internal 
+>::shared_if_alive(Shared &shared) const "
+
+[INTERNAL] 
+Thread-safe alternative to  alive()/shared()
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_29i
+
+Doc source: 
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared.hpp#L171
+
+Implementation: 
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared_impl.hpp#L161-L172
+
+";
+
+%feature("docstring")  casadi::GenericShared< Shared, Internal 
+>::debug_repr() const "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::GenericShared< Shared, Internal >::is_null() 
+const "
+
+[INTERNAL] 
+Is a null pointer?
+
+Doc source: 
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared.hpp#L117
+
+Implementation: 
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared_impl.hpp#L109-L111
+
+";
+
+%feature("docstring") casadi::GenericWeakRef::__hash__ "
+
+[INTERNAL] 
+Returns a number that is unique for a given Node.
+
+If the Object does not point to any node, \"0\" is returned.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_av
+
+Doc source: 
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared.hpp#L124
+
+Implementation: 
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared_impl.hpp#L137-L139
 
 ";
 
@@ -27241,10 +27472,10 @@ Get class name.
 Extra doc: https://github.com/casadi/casadi/wiki/L_au
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L143
+https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L85
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L114-L116
+https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L31-L33
 
 ";
 
@@ -27255,10 +27486,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L114
 Print a description of the object.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L146
+https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L88
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L118-L124
+https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L35-L41
 
 ";
 
@@ -27269,23 +27500,29 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L118
 Get string representation.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L149
+https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L91
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L149-L153
+https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L91-L95
 
 ";
 
-%feature("docstring")  casadi::SharedObject::is_null() const "
+%feature("docstring")  casadi::GenericShared< SharedObject , 
+SharedObjectInternal  >::debug_repr() const "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::GenericShared< SharedObject , 
+SharedObjectInternal  >::is_null() const "
 
 [INTERNAL] 
 Is a null pointer?
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L161
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared.hpp#L117
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L73-L75
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared_impl.hpp#L109-L111
 
 ";
 
@@ -27299,10 +27536,10 @@ If the Object does not point to any node, \"0\" is returned.
 Extra doc: https://github.com/casadi/casadi/wiki/L_av
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L168
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared.hpp#L124
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L144-L146
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared_impl.hpp#L137-L139
 
 ";
 
@@ -28054,10 +28291,10 @@ Get class name.
 Extra doc: https://github.com/casadi/casadi/wiki/L_au
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L143
+https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L85
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L114-L116
+https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L31-L33
 
 ";
 
@@ -28068,10 +28305,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L114
 Print a description of the object.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L146
+https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L88
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L118-L124
+https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L35-L41
 
 ";
 
@@ -28082,23 +28319,29 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L118
 Get string representation.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L149
+https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L91
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L149-L153
+https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L91-L95
 
 ";
 
-%feature("docstring")  casadi::SharedObject::is_null() const "
+%feature("docstring")  casadi::GenericShared< SharedObject , 
+SharedObjectInternal  >::debug_repr() const "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::GenericShared< SharedObject , 
+SharedObjectInternal  >::is_null() const "
 
 [INTERNAL] 
 Is a null pointer?
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L161
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared.hpp#L117
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L73-L75
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared_impl.hpp#L109-L111
 
 ";
 
@@ -28112,10 +28355,10 @@ If the Object does not point to any node, \"0\" is returned.
 Extra doc: https://github.com/casadi/casadi/wiki/L_av
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L168
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared.hpp#L124
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L144-L146
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared_impl.hpp#L137-L139
 
 ";
 
@@ -38396,10 +38639,10 @@ Get class name.
 Extra doc: https://github.com/casadi/casadi/wiki/L_au
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L143
+https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L85
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L114-L116
+https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L31-L33
 
 ";
 
@@ -38410,10 +38653,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L114
 Print a description of the object.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L146
+https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L88
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L118-L124
+https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L35-L41
 
 ";
 
@@ -38424,23 +38667,29 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L118
 Get string representation.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L149
+https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L91
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L149-L153
+https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L91-L95
 
 ";
 
-%feature("docstring")  casadi::SharedObject::is_null() const "
+%feature("docstring")  casadi::GenericShared< SharedObject , 
+SharedObjectInternal  >::debug_repr() const "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::GenericShared< SharedObject , 
+SharedObjectInternal  >::is_null() const "
 
 [INTERNAL] 
 Is a null pointer?
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L161
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared.hpp#L117
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L73-L75
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared_impl.hpp#L109-L111
 
 ";
 
@@ -38454,10 +38703,10 @@ If the Object does not point to any node, \"0\" is returned.
 Extra doc: https://github.com/casadi/casadi/wiki/L_av
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L168
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared.hpp#L124
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L144-L146
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared_impl.hpp#L137-L139
 
 ";
 
@@ -39985,23 +40234,29 @@ Get class name.
 Extra doc: https://github.com/casadi/casadi/wiki/L_au
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L143
+https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L85
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L114-L116
+https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L31-L33
 
 ";
 
-%feature("docstring")  casadi::SharedObject::is_null() const "
+%feature("docstring")  casadi::GenericShared< SharedObject , 
+SharedObjectInternal  >::debug_repr() const "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::GenericShared< SharedObject , 
+SharedObjectInternal  >::is_null() const "
 
 [INTERNAL] 
 Is a null pointer?
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L161
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared.hpp#L117
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L73-L75
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared_impl.hpp#L109-L111
 
 ";
 
@@ -40015,10 +40270,10 @@ If the Object does not point to any node, \"0\" is returned.
 Extra doc: https://github.com/casadi/casadi/wiki/L_av
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L168
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared.hpp#L124
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L144-L146
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared_impl.hpp#L137-L139
 
 ";
 
@@ -41541,23 +41796,29 @@ Get class name.
 Extra doc: https://github.com/casadi/casadi/wiki/L_au
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L143
+https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L85
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L114-L116
+https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L31-L33
 
 ";
 
-%feature("docstring")  casadi::SharedObject::is_null() const "
+%feature("docstring")  casadi::GenericShared< SharedObject , 
+SharedObjectInternal  >::debug_repr() const "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::GenericShared< SharedObject , 
+SharedObjectInternal  >::is_null() const "
 
 [INTERNAL] 
 Is a null pointer?
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L161
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared.hpp#L117
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L73-L75
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared_impl.hpp#L109-L111
 
 ";
 
@@ -41571,10 +41832,10 @@ If the Object does not point to any node, \"0\" is returned.
 Extra doc: https://github.com/casadi/casadi/wiki/L_av
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L168
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared.hpp#L124
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L144-L146
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared_impl.hpp#L137-L139
 
 ";
 
@@ -42341,15 +42602,15 @@ casadi::SerializingStream::connect(DeserializingStream &s) "
 %feature("docstring") casadi::SharedObject "
 
 [INTERNAL] 
- SharedObject implements a reference counting framework similar 
-for efficient and.
+ GenericShared implements a reference counting framework similar
+ for efficient and.
 
 easily-maintained memory management.
 
-To use the class, both the  SharedObject class (the public class), and the 
-SharedObjectInternal class (the 
-internal class) must be inherited from. It 
-can be done in two 
+To use the class, both the  GenericShared class (the public class), and the 
+GenericSharedInternal class (the 
+internal class) must be inherited from. It
+ can be done in two 
 different files and together with memory management, 
 this approach 
 provides a clear distinction of which methods of the class 
@@ -42401,46 +42662,6 @@ Extra doc: https://github.com/casadi/casadi/wiki/L_as
 C++ includes: shared_object.hpp
 ";
 
-%feature("docstring") casadi::SharedObject::SharedObject() "
-
-[INTERNAL] 
-Default constructor.
-
-Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L104
-
-Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L33-L35
-
-";
-
-%feature("docstring") casadi::SharedObject::SharedObject(const SharedObject 
-&ref) "
-
-[INTERNAL] 
-Copy constructor (shallow copy)
-
-Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L107
-
-Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L37-L40
-
-";
-
-%feature("docstring") casadi::SharedObject::~SharedObject "
-
-[INTERNAL] 
-Destructor.
-
-Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L110
-
-Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L42-L44
-
-";
-
 %feature("docstring")  casadi::SharedObject::class_name() const "
 
 [INTERNAL] 
@@ -42449,10 +42670,10 @@ Get class name.
 Extra doc: https://github.com/casadi/casadi/wiki/L_au
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L143
+https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L85
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L114-L116
+https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L31-L33
 
 ";
 
@@ -42463,10 +42684,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L114
 Print a description of the object.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L146
+https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L88
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L118-L124
+https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L35-L41
 
 ";
 
@@ -42477,23 +42698,29 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L118
 Get string representation.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L149
+https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L91
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L149-L153
+https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L91-L95
 
 ";
 
-%feature("docstring")  casadi::SharedObject::is_null() const "
+%feature("docstring")  casadi::GenericShared< SharedObject , 
+SharedObjectInternal  >::debug_repr() const "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::GenericShared< SharedObject , 
+SharedObjectInternal  >::is_null() const "
 
 [INTERNAL] 
 Is a null pointer?
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L161
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared.hpp#L117
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L73-L75
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared_impl.hpp#L109-L111
 
 ";
 
@@ -42507,10 +42734,10 @@ If the Object does not point to any node, \"0\" is returned.
 Extra doc: https://github.com/casadi/casadi/wiki/L_av
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L168
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared.hpp#L124
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L144-L146
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared_impl.hpp#L137-L139
 
 ";
 
@@ -48756,7 +48983,7 @@ C++ includes: e0_diagram.hpp
 // File: classcasadi_1_1WeakCache.xml
 %feature("docstring") casadi::WeakCache "
 
-[INTERNAL] C++ includes: shared_object.hpp
+[INTERNAL] C++ includes: generic_shared.hpp
 ";
 
 %feature("docstring")  casadi::WeakCache< K, T >::tocache(const K &key, 
@@ -48786,7 +49013,7 @@ const T &f, bool needs_lock=true) "
 [INTERNAL] 
 Weak reference type.
 
-A weak reference to a  SharedObject
+A weak reference to a  GenericShared
 Joel Andersson
 
 Extra doc: https://github.com/casadi/casadi/wiki/L_ax
@@ -48794,37 +49021,8 @@ Extra doc: https://github.com/casadi/casadi/wiki/L_ax
 C++ includes: shared_object.hpp
 ";
 
-%feature("docstring") casadi::WeakRef::WeakRef(int dummy=0) "
-
-[INTERNAL] 
-Default constructor.
-
-Extra doc: https://github.com/casadi/casadi/wiki/L_ay
-
-Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L199
-
-Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L148-L150
-
-";
-
-%feature("docstring") casadi::WeakRef::WeakRef(SharedObject shared) "
-
-[INTERNAL] 
-Construct from a shared object (also implicit type conversion)
-
-Extra doc: https://github.com/casadi/casadi/wiki/L_az
-
-Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L204
-
-Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L185-L187
-
-";
-
-%feature("docstring")  casadi::WeakRef::shared() const "
+%feature("docstring")  casadi::GenericWeakRef< SharedObject , 
+SharedObjectInternal  >::shared() const "
 
 [INTERNAL] 
 Get a shared (owning) reference.
@@ -48832,42 +49030,15 @@ Get a shared (owning) reference.
 Extra doc: https://github.com/casadi/casadi/wiki/L_b0
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L209
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared.hpp#L161
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L156-L162
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared_impl.hpp#L152-L158
 
 ";
 
-%feature("docstring") casadi::casadi_shared "
-
-Get a shared (owning) reference.
-
-Extra doc: https://github.com/casadi/casadi/wiki/L_b0
-
-Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L209
-
-Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L156-L162
-
-";
-
-%feature("docstring")  casadi::WeakRef::casadi_shared "
-
-Get a shared (owning) reference.
-
-Extra doc: https://github.com/casadi/casadi/wiki/L_b0
-
-Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L209
-
-Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L156-L162
-
-";
-
-%feature("docstring")  casadi::WeakRef::alive() const "
+%feature("docstring")  casadi::GenericWeakRef< SharedObject , 
+SharedObjectInternal  >::alive() const "
 
 [INTERNAL] 
 Check if alive.
@@ -48875,15 +49046,15 @@ Check if alive.
 Extra doc: https://github.com/casadi/casadi/wiki/L_b1
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L214
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared.hpp#L166
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L152-L154
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared_impl.hpp#L147-L149
 
 ";
 
-%feature("docstring")  casadi::WeakRef::shared_if_alive(SharedObject 
-&shared) const "
+%feature("docstring")  casadi::GenericWeakRef< SharedObject , 
+SharedObjectInternal  >::shared_if_alive(SharedObject &shared) const "
 
 [INTERNAL] 
 Thread-safe alternative to  alive()/shared()
@@ -48891,66 +49062,29 @@ Thread-safe alternative to  alive()/shared()
 Extra doc: https://github.com/casadi/casadi/wiki/L_29i
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L219
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared.hpp#L171
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L164-L175
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared_impl.hpp#L161-L172
 
 ";
 
-%feature("docstring")  casadi::SharedObject::class_name() const "
+%feature("docstring")  casadi::GenericShared< SharedObject , 
+SharedObjectInternal  >::debug_repr() const "
 
-[INTERNAL] 
-Get class name.
+[INTERNAL] ";
 
-Extra doc: https://github.com/casadi/casadi/wiki/L_au
-
-Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L143
-
-Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L114-L116
-
-";
-
-%feature("docstring")  casadi::SharedObject::disp(std::ostream &stream, bool
- more=false) const "
-
-[INTERNAL] 
-Print a description of the object.
-
-Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L146
-
-Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L118-L124
-
-";
-
-%feature("docstring")  casadi::SharedObject::get_str(bool more=false) const 
-"
-
-[INTERNAL] 
-Get string representation.
-
-Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L149
-
-Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L149-L153
-
-";
-
-%feature("docstring")  casadi::SharedObject::is_null() const "
+%feature("docstring")  casadi::GenericShared< SharedObject , 
+SharedObjectInternal  >::is_null() const "
 
 [INTERNAL] 
 Is a null pointer?
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L161
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared.hpp#L117
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L73-L75
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared_impl.hpp#L109-L111
 
 ";
 
@@ -48964,10 +49098,10 @@ If the Object does not point to any node, \"0\" is returned.
 Extra doc: https://github.com/casadi/casadi/wiki/L_av
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L168
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared.hpp#L124
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L144-L146
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared_impl.hpp#L137-L139
 
 ";
 
@@ -49016,10 +49150,10 @@ Get class name.
 Extra doc: https://github.com/casadi/casadi/wiki/L_au
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L143
+https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L85
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L114-L116
+https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L31-L33
 
 ";
 
@@ -49030,10 +49164,10 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L114
 Print a description of the object.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L146
+https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L88
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L118-L124
+https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L35-L41
 
 ";
 
@@ -49044,23 +49178,29 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L118
 Get string representation.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L149
+https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L91
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L149-L153
+https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L91-L95
 
 ";
 
-%feature("docstring")  casadi::SharedObject::is_null() const "
+%feature("docstring")  casadi::GenericShared< SharedObject , 
+SharedObjectInternal  >::debug_repr() const "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::GenericShared< SharedObject , 
+SharedObjectInternal  >::is_null() const "
 
 [INTERNAL] 
 Is a null pointer?
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L161
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared.hpp#L117
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L73-L75
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared_impl.hpp#L109-L111
 
 ";
 
@@ -49074,15 +49214,15 @@ If the Object does not point to any node, \"0\" is returned.
 Extra doc: https://github.com/casadi/casadi/wiki/L_av
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L168
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared.hpp#L124
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.cpp#L144-L146
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared_impl.hpp#L137-L139
 
 ";
 
 
-// File: namespace_0d398.xml
+// File: namespace_0d400.xml
 
 
 // File: namespacealpaqa.xml
@@ -53910,6 +54050,51 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/external.cpp#L54-L57
 &x, double xq, bool equidistant) "
 
 [INTERNAL] ";
+
+%feature("docstring")  casadi::shared_cast(S &A) "
+
+[INTERNAL] 
+Typecast a shared object to a base class to a shared object to a
+ 
+derived class,.
+
+cf. dynamic_cast
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_b6
+
+Get a pointer to the node
+
+Create a return object
+
+Quick return if not allowed
+
+Assign node of B and return
+Doc source: 
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared.hpp#L209
+
+Implementation: 
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared.hpp#L209-L223
+
+";
+
+%feature("docstring")  casadi::shared_cast(const S &A) "
+
+[INTERNAL] 
+Typecast a shared object to a base class to a shared object to a
+ 
+derived class,.
+
+cf. dynamic_cast (const)
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_b7
+
+Doc source: 
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared.hpp#L231
+
+Implementation: 
+https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared.hpp#L231-L234
+
+";
 
 %feature("docstring")  casadi::combine(const Dict &first, const Dict 
 &second, bool recurse=false) "
@@ -59293,51 +59478,6 @@ std::vector< casadi_int > &iter_dims, const std::vector< casadi_int >
 casadi_int > &strides_c, const T *a_in, const T *b_in, T *c_in) "
 
 [INTERNAL] ";
-
-%feature("docstring")  casadi::shared_cast(SharedObject &A) "
-
-[INTERNAL] 
-Typecast a shared object to a base class to a shared object to a
- 
-derived class,.
-
-cf. dynamic_cast
-
-Extra doc: https://github.com/casadi/casadi/wiki/L_b6
-
-Get a pointer to the node
-
-Create a return object
-
-Quick return if not allowed
-
-Assign node of B and return
-Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L257
-
-Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L257-L271
-
-";
-
-%feature("docstring")  casadi::shared_cast(const SharedObject &A) "
-
-[INTERNAL] 
-Typecast a shared object to a base class to a shared object to a
- 
-derived class,.
-
-cf. dynamic_cast (const)
-
-Extra doc: https://github.com/casadi/casadi/wiki/L_b7
-
-Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L279
-
-Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/shared_object.hpp#L279-L282
-
-";
 
 %feature("docstring")  casadi::is_slice2(const std::vector< casadi_int > &v)
  "
