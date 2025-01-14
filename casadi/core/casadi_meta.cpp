@@ -49,4 +49,10 @@ namespace casadi {
 
   const char* CasadiMeta::install_prefix() { return CASADI_INSTALL_PREFIX;}
 
+  const char* CasadiMeta::shared_library_prefix() { return CASADI_SHARED_LIBRARY_PREFIX;}
+
+  const char* CasadiMeta::shared_library_suffix() { return CASADI_SHARED_LIBRARY_SUFFIX;}
+
+  const char* CasadiMeta::object_file_suffix() { return CASADI_OBJECT_FILE_SUFFIX;}
+
 }  // namespace casadi

@@ -100,6 +100,15 @@ namespace casadi {
 
         \identifier{j9} */
     static const char* install_prefix();
+
+    /** \brief Obtain shared library prefix */
+    static const char* shared_library_prefix();
+
+    /** \brief Obtain shared library suffix */
+    static const char* shared_library_suffix();
+
+    /** \brief Obtain object file suffix */
+    static const char* object_file_suffix();
   };
 
 }  // namespace casadi
