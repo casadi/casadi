@@ -199,7 +199,8 @@ namespace casadi {
     std::vector<double> tmp_ineq_ub_vector;
     {
 
-      // number_of_prev_equality and number_of_prev_inequality are two vectors that contains the number of
+      // number_of_prev_equality and number_of_prev
+      // inequality are two vectors that contains the number of
       // equality and inequality that can be found before the current index
       // number_of_prev_equality[i] = number of equality that can be found before index i
       // number_of_prev_inequality[i] = number of inequality that can be found before index i
@@ -268,13 +269,15 @@ namespace casadi {
     for (int k=0; k<A_.nnz(); ++k) {
       // Detect equality constraint
       if (lhs_equals_rhs_constraint[m->row[k]]) {
-        // Equality constraint the row[k] is decreased by the number of previous inequality constraints
+        // Equality constraint the row[k] is decreased
+        // by the number of previous inequality constraints
         m->tripletListEq.push_back(T(
           static_cast<double>(m->row[k] - number_of_prev_inequality[m->row[k]]),
           static_cast<double>(m->col[k]),
           static_cast<double>(A[k])));
       } else {
-        // Inequality constraint the row[k] is decreased by the number of previous equality constraints
+        // Inequality constraint the row[k] is decreased
+        // by the number of previous equality constraints
         m->tripletList.push_back(T(
           static_cast<double>(m->row[k] - number_of_prev_equality[m->row[k]]),
           static_cast<double>(m->col[k]),

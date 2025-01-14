@@ -522,19 +522,18 @@ namespace casadi {
       if (!flag && m->pool_sol_nr > 0) {
         m->pool_obj_vals = std::vector<double>(m->pool_sol_nr, casadi::nan);
         for (int idx = 0; idx < m->pool_sol_nr; ++idx) {
-          double x_pool[nx_];
+          std::vector<double> x_pool(nx_);
 
           flag = GRBsetintparam(GRBgetenv(model), GRB_INT_PAR_SOLUTIONNUMBER, idx);
           if (!flag) flag = GRBgetdblattr(model, GRB_DBL_ATTR_POOLOBJVAL, &(m->pool_obj_vals[idx]));
-          if (!flag) flag = GRBgetdblattrarray(model, GRB_DBL_ATTR_XN, 0, nx_, x_pool);
+          if (!flag) flag = GRBgetdblattrarray(model, GRB_DBL_ATTR_XN, 0, nx_, get_ptr(x_pool));
 
           if (flag) {
             m->pool_obj_vals[idx] = casadi::nan;
-            std::fill_n(x_pool, nx_, casadi::nan);
+            std::fill(x_pool.begin(), x_pool.end(), casadi::nan);
           }
-          
-          std::vector<double> x_pool_vec(x_pool, x_pool+nx_);
-          m->pool_solutions.push_back(x_pool_vec);
+
+          m->pool_solutions.push_back(x_pool);
         }
       }
 
@@ -557,7 +556,7 @@ namespace casadi {
     stats["return_status"] = return_status_string(m->return_status);
     stats["pool_sol_nr"] = m->pool_sol_nr;
     stats["pool_obj_val"] = m->pool_obj_vals;
-	  stats["pool_solutions"] = m->pool_solutions;
+    stats["pool_solutions"] = m->pool_solutions;
     return stats;
   }
 
