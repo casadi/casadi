@@ -1607,6 +1607,10 @@ class SXtests(casadiTestCase):
 
     F2 = Function('F',[x,y,z],[sin(v2[0]*y-args[-1]),cos(mtimes(v2[1],v2[0].T)/y)],{"cse":True})
     self.checkfunction(F1,F2,inputs=[[0.1,1.7,2.3],1.13,0.11])
+    
+    res = F2.find_functions()
+    self.assertTrue(len(res)==1)
+    self.assertTrue(res[0].__hash__()==f.__hash__())
 
     F2 = Function('F',[x,y,z],F2(x,y,z))
 
