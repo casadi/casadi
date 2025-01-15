@@ -1871,8 +1871,30 @@ class SXtests(casadiTestCase):
 
     y = MX.sym("y")
     
-    with self.assertInException("Inlining SXFunction::eval_mx not implemented"):
-      f(y)
+    f(y)
+
+  def test_sx_eval_mx(self):
+    n = 2
+    y = MX.sym("y",Sparsity.lower(n))
+
+    g = Function('g',[y],[sin(y)],{"never_inline":True})
+
+    x = SX.sym("x",Sparsity.lower(n))
+
+    f = Function("f",[x],[g(x**2)-2])
+
+
+    X = MX.sym("X",Sparsity.upper(n))
+
+    F1 = Function("F1",[X],f.call([X],True))
+
+    DM.rng(1)
+    A = DM.rand(n,n)
+
+    F2 = Function("F2",[X],f.call([X]))
+
+    self.checkfunction_light(F1,F2,inputs=[A])
+
 
 
 if __name__ == '__main__':

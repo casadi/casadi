@@ -915,11 +915,113 @@ namespace casadi {
   }
 
   void SXFunction::eval_mx(const MXVector& arg, MXVector& res,
-                        bool always_inline, bool never_inline) const {
+                          bool always_inline, bool never_inline) const {
     always_inline = always_inline || always_inline_;
+    never_inline = never_inline || never_inline_;
 
-    casadi_assert(!always_inline, "Inlining SXFunction::eval_mx not implemented");
-    FunctionInternal::eval_mx(arg, res, always_inline, never_inline);
+    // non-inlining call is implemented in the base-class
+    if (!always_inline) {
+      return FunctionInternal::eval_mx(arg, res, false, true);
+    }
+
+    if (verbose_) casadi_message(name_ + "::eval_mx");
+
+    // Iterator to stack of constants
+    std::vector<SXElem>::const_iterator c_it = constants_.begin();
+
+    casadi_assert(!has_free(),
+      "Free variables not supported in inlining call to SXFunction::eval_mx");
+
+    // Resize the number of outputs
+    casadi_assert(arg.size()==n_in_, "Wrong number of input arguments");
+    res.resize(out_.size());
+
+    // Symbolic work, non-differentiated
+    std::vector<MX> w(sz_w());
+    if (verbose_) casadi_message("Allocated work vector");
+
+    // Split up inputs analogous to symbolic primitives
+    std::vector<std::vector<MX> > arg_split(in_.size());
+    for (casadi_int i=0; i<in_.size(); ++i) {
+      // Get nonzeros of argument
+      std::vector<MX> orig = arg[i].get_nonzeros();
+
+      // Project to needed sparsity
+      std::vector<MX> target(sparsity_in_[i].nnz(), 0);
+      std::vector<MX> w(arg[i].size1());
+      casadi_project(get_ptr(orig), arg[i].sparsity(),
+                     get_ptr(target), sparsity_in_[i], get_ptr(w));
+
+      // Store
+      arg_split[i] = target;
+    }
+
+    // Allocate storage for split outputs
+    std::vector<std::vector<MX> > res_split(out_.size());
+    for (casadi_int i=0; i<out_.size(); ++i) res_split[i].resize(nnz_out(i));
+
+    // Evaluate algorithm
+    if (verbose_) casadi_message("Evaluating algorithm forward");
+    for (auto&& a : algorithm_) {
+      switch (a.op) {
+      case OP_INPUT:
+        w[a.i0] = arg_split[a.i1][a.i2];
+        break;
+      case OP_OUTPUT:
+        res_split[a.i0][a.i2] = w[a.i1];
+        break;
+      case OP_CONST:
+        w[a.i0] = static_cast<double>(*c_it++);
+        break;
+      case OP_CALL:
+        {
+          const ExtendedAlgEl& m = call_.el.at(a.i1);
+          std::vector<MX> deps(m.n_dep);
+          std::vector<MX> args;
+
+          casadi_int k = 0;
+          // Construct matrix-valued function arguments
+          for (casadi_int i=0;i<m.f_n_in;++i) {
+            std::vector<MX> arg;
+            for (casadi_int j=0;j<m.f_nnz_in[i];++j) {
+              arg.push_back(w[m.dep[k++]]);
+            }
+            args.push_back(sparsity_cast(vertcat(arg), m.f.sparsity_in(i)));
+          }
+
+
+          std::vector<MX> ret = m.f(args);
+          std::vector<MX> res;
+
+          // Break apart matriv-valued outputs into scalar components
+          for (casadi_int i=0;i<m.f_n_out;++i) {
+            std::vector<MX> nz = ret[i].get_nonzeros();
+            res.insert(res.end(), nz.begin(), nz.end());
+          }
+
+          // Store into work vector
+          for (casadi_int i=0;i<m.n_res;++i) {
+            if (m.res[i]>=0) w[m.res[i]] = res[i];
+          }
+        }
+        break;
+      default:
+        // Evaluate the function to a temporary value
+        // (as it might overwrite the children in the work vector)
+        MX f;
+        switch (a.op) {
+          CASADI_MATH_FUN_BUILTIN(w[a.i1], w[a.i2], f)
+        }
+
+        // Finally save the function value
+        w[a.i0] = f;
+      }
+    }
+
+    // Join split outputs
+    for (casadi_int i=0; i<res.size(); ++i) {
+      res[i] = sparsity_cast(vertcat(res_split[i]), sparsity_out_[i]);
+    }
   }
 
   bool SXFunction::should_inline(bool with_sx, bool always_inline, bool never_inline) const {
