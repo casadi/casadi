@@ -660,7 +660,7 @@ namespace casadi {
 
           // Retrieving solution
           int sol_ret = CPXXsolution(m->env, m->lp, &solstat, &f, x, lam_a, get_ptr(slack), lam_x);
-          if (sol_ret == CPXERR_NO_SOLN || sol_ret == CPXERR_NO_SOLN ) {
+          if (sol_ret == CPXERR_NO_SOLN || sol_ret == CPXERR_NO_SOLN) {
             m->d_qp.unified_return_status = SOLVER_RET_INFEASIBLE;
           }
 
