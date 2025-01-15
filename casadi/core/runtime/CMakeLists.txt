@@ -45,6 +45,7 @@ set(RUNTIME_SRC
   casadi_norm_inf_mul.hpp
   casadi_polyval.hpp
   casadi_project.hpp
+  casadi_printme.hpp
   casadi_tri_project.hpp
   casadi_rank1.hpp
   casadi_scal.hpp

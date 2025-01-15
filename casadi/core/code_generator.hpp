@@ -673,7 +673,8 @@ namespace casadi {
       AUX_BLAZING_DE_BOOR,
       AUX_BLAZING_1D_BOOR_EVAL,
       AUX_BLAZING_2D_BOOR_EVAL,
-      AUX_BLAZING_3D_BOOR_EVAL
+      AUX_BLAZING_3D_BOOR_EVAL,
+      AUX_PRINTME
     };
 
     /** \brief Add a built-in auxiliary function

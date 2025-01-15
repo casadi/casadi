@@ -1085,6 +1085,9 @@ namespace casadi {
       case OP_HYPOT:
         add_auxiliary(AUX_HYPOT);
         return "casadi_hypot("+a0+","+a1+")";
+      case OP_PRINTME:
+        add_auxiliary(AUX_PRINTME);
+        return "casadi_printme("+a0+","+a1+")";
       default:
         return casadi_math<double>::print(op, a0, a1);
     }
@@ -1833,6 +1836,10 @@ namespace casadi {
       add_auxiliary(AUX_LOW);
       add_auxiliary(AUX_BLAZING_DE_BOOR);
       this->auxiliaries << sanitize_source(casadi_blazing_3d_boor_eval_str, inst);
+      break;
+    case AUX_PRINTME:
+      add_auxiliary(AUX_PRINTF);
+      this->auxiliaries << sanitize_source(casadi_printme_str, inst);
       break;
     }
   }

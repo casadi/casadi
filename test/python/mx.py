@@ -3608,6 +3608,13 @@ class MXtests(casadiTestCase):
     ]:
         s = str(expr.nonzeros())
         self.assertTrue("[MX(x), MX(y), MX(z)]" in s)
+        
+  def test_printme_codegen(self):
+    for X in [SX,MX]:
+        x = X.sym("x")
+        
+        f = Function("f",[x],[(x**2).printme(2)+6])
+        self.check_codegen(f,inputs=[3])
       
 if __name__ == '__main__':
     unittest.main()
