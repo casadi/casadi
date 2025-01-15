@@ -3615,6 +3615,26 @@ class MXtests(casadiTestCase):
         
         f = Function("f",[x],[(x**2).printme(2)+6])
         self.check_codegen(f,inputs=[3])
+        
+  def test_norms(self):
+  
+    for f in [lambda x,X: vertcat(x[0],X(1,1),x[1:]),
+              lambda x,X: diag(x)
+                ]:
+        for norm in [norm_fro, norm_1, norm_inf]:
+            print("norm",norm)
+            x = SX.sym("x",5)
+            e = log(norm(f(sin(x),SX)))
+            fsx = Function('f',[x],[e])    
+            
+            x = MX.sym("x",5)
+            e = log(norm(f(sin(x),MX)))
+            fmx = Function('f',[x],[e])
+            for args in [vertcat(-0.3,0.3,0.21,0.17,0),vertcat(-1,-2,-7,-7,-7)]:
+                self.checkfunction(fsx,fmx,inputs=[args])
+            args = [vertcat(-0.3,0.3,0.21,0.17,0)]
+            self.check_codegen(fmx,inputs=args)
+            
       
 if __name__ == '__main__':
     unittest.main()

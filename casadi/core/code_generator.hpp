@@ -522,6 +522,9 @@ namespace casadi {
         \identifier{te} */
     std::string norm_inf(casadi_int n, const std::string& x);
 
+    /** \brief norm_1 */
+    std::string norm_1(casadi_int n, const std::string& x);
+
     /** 
 
      * \brief norm_2

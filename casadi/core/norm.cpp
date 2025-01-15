@@ -40,7 +40,25 @@ namespace casadi {
     return eval_gen<double>(arg, res, iw, w);
   }
 
+  int Norm1::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
+    return eval_gen<double>(arg, res, iw, w);
+  }
+
+  int NormInf::eval(const double** arg, double** res, casadi_int* iw, double* w) const {
+    return eval_gen<double>(arg, res, iw, w);
+  }
+
   int NormF::eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const {
+    eval_gen<SXElem>(arg, res, iw, w);
+    return 0;
+  }
+
+  int Norm1::eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const {
+    eval_gen<SXElem>(arg, res, iw, w);
+    return 0;
+  }
+
+  int NormInf::eval_sx(const SXElem** arg, SXElem** res, casadi_int* iw, SXElem* w) const {
     eval_gen<SXElem>(arg, res, iw, w);
     return 0;
   }
@@ -51,8 +69,32 @@ namespace casadi {
     return 0;
   }
 
+  template<typename T>
+  int NormInf::eval_gen(const T** arg, T** res, casadi_int* iw, T* w) const {
+    *res[0] = casadi_norm_inf(dep().nnz(), arg[0]);
+    return 0;
+  }
+
+  template<typename T>
+  int Norm1::eval_gen(const T** arg, T** res, casadi_int* iw, T* w) const {
+    *res[0] = casadi_norm_1(dep().nnz(), arg[0]);
+    return 0;
+  }
+
   void NormF::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
     res[0] = arg[0]->get_norm_fro();
+  }
+
+  void Norm1::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+    res[0] = arg[0]->get_norm_1();
+  }
+
+  void NormInf::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+    res[0] = arg[0]->get_norm_inf();
+  }
+
+  void Norm2::eval_mx(const std::vector<MX>& arg, std::vector<MX>& res) const {
+    res[0] = arg[0]->get_norm_2();
   }
 
   void NormF::ad_forward(const std::vector<std::vector<MX> >& fseed,
@@ -71,15 +113,67 @@ namespace casadi {
     }
   }
 
+  void Norm1::ad_forward(const std::vector<std::vector<MX> >& fseed,
+                      std::vector<std::vector<MX> >& fsens) const {
+    MX s = sign(dep(0));
+    for (casadi_int d=0; d<fsens.size(); ++d) {
+      fsens[d][0] = s->get_dot(fseed[d][0]);
+    }
+  }
+
+  void Norm1::ad_reverse(const std::vector<std::vector<MX> >& aseed,
+                      std::vector<std::vector<MX> >& asens) const {
+    MX s = sign(dep(0));
+    for (casadi_int d=0; d<aseed.size(); ++d) {
+      asens[d][0] += s*aseed[d][0];
+    }
+  }
+
+  void NormInf::ad_forward(const std::vector<std::vector<MX> >& fseed,
+                      std::vector<std::vector<MX> >& fsens) const {
+    MX m = shared_from_this<MX>()==fabs(dep(0));
+    MX s = sign(dep(0));
+    MX N = sum2(sum1(m));
+    for (casadi_int d=0; d<fsens.size(); ++d) {
+       fsens[d][0] = dot(s*fseed[d][0], m) / N;
+    }
+  }
+
+  void NormInf::ad_reverse(const std::vector<std::vector<MX> >& aseed,
+                      std::vector<std::vector<MX> >& asens) const {
+    MX m = shared_from_this<MX>()==fabs(dep(0));
+    MX N = sum2(sum1(m));
+    MX s = sign(dep(0));
+    for (casadi_int d=0; d<aseed.size(); ++d) {
+      asens[d][0] += (s*aseed[d][0]/N)*m;
+    }
+  }
+
   void NormF::generate(CodeGenerator& g,
                         const std::vector<casadi_int>& arg,
                         const std::vector<casadi_int>& res,
                         const std::vector<bool>& arg_is_ref,
                         std::vector<bool>& res_is_ref) const {
     std::string a = g.work(arg[0], dep(0).nnz(), arg_is_ref[0]);
-    g << g.workel(res[0]) << " = sqrt("
-      << g.dot(dep().nnz(), a, a)
-      << ");\n";
+    g << g.workel(res[0]) << " = " << g.norm_2(dep().nnz(), a) << ";\n";
+  }
+
+  void Norm1::generate(CodeGenerator& g,
+                        const std::vector<casadi_int>& arg,
+                        const std::vector<casadi_int>& res,
+                        const std::vector<bool>& arg_is_ref,
+                        std::vector<bool>& res_is_ref) const {
+    std::string a = g.work(arg[0], dep(0).nnz(), arg_is_ref[0]);
+    g << g.workel(res[0]) << " = " << g.norm_1(dep().nnz(), a) << ";\n";
+  }
+
+  void NormInf::generate(CodeGenerator& g,
+                        const std::vector<casadi_int>& arg,
+                        const std::vector<casadi_int>& res,
+                        const std::vector<bool>& arg_is_ref,
+                        std::vector<bool>& res_is_ref) const {
+    std::string a = g.work(arg[0], dep(0).nnz(), arg_is_ref[0]);
+    g << g.workel(res[0]) << " = " << g.norm_inf(dep().nnz(), a) << ";\n";
   }
 
   std::string Norm2::disp(const std::vector<std::string>& arg) const {

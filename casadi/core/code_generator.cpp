@@ -2563,6 +2563,12 @@ namespace casadi {
   }
 
   std::string CodeGenerator::
+  norm_1(casadi_int n, const std::string& x) {
+    add_auxiliary(CodeGenerator::AUX_NORM_1);
+    return "casadi_norm_1(" + str(n) + ", " + x + ")";
+  }
+
+  std::string CodeGenerator::
   norm_2(casadi_int n, const std::string& x) {
     add_auxiliary(CodeGenerator::AUX_NORM_2);
     return "casadi_norm_2(" + str(n) + ", " + x + ")";
