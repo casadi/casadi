@@ -40,7 +40,7 @@ def print_operator_escaped(expr, strs):
   strs = [ si.replace('<', '{').replace('>', '}') for si in strs ]
   s = print_operator(expr, strs)
   # escape < or >
-  s = s.replace('<', '\<').replace('>', '\>')
+  s = s.replace('<', r'\<').replace('>', r'\>')
   # replace {f} with <f>
   s = s.replace('{', '<').replace('}', '>')
   return s
