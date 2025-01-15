@@ -617,8 +617,9 @@ namespace casadi {
         // Get nonzeros sparsity cast
         MX nz;
         e.get_nz(nz, 0, Slice());
-        std::vector<MX> elems = vertsplit(nz, 1);
-        ret.insert(ret.end(), elems.begin(), elems.end());
+        for (casadi_int i=0; i<nz.nnz(); ++i) {
+          ret.push_back(nz(i));
+        }
       }
     }
     return ret;
