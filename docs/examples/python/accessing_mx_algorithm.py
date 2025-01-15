@@ -76,6 +76,13 @@ for k in range(f.n_instructions()):
       disp_in = ["work[" + str(a) + "]" for a in i]
       debug_str = print_operator(f.instruction_MX(k),disp_in)
       raise Exception('Unknown operation: ' + str(op) + ' -- ' + debug_str)
+      # When evaluating with MX, you may use an identity transformation:
+      #node = f.instruction_MX(k)
+      
+      #args = [work[ik] for ik in i]
+      #res = node.eval_mx(args)
+      #for ok,e in zip(o,res):
+      #  work[ok] = e
 
 print('------')
 print('Evaluated ' + str(f))
