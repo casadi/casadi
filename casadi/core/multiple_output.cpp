@@ -40,12 +40,7 @@ namespace casadi {
     MX this_ = shared_from_this<MX>();
     // No need for an OutputNode if sparsity is fully sparse
     if (this_->sparsity(oind).nnz()==0) return MX(this_->sparsity(oind));
-    MX ret;
-    if (!cache_.incache(oind, ret)) {
-      ret = MX::create(new OutputNode(this_, oind));
-      cache_.tocache_if_missing(oind, ret);
-    }
-    return ret;
+    return MX::create(new OutputNode(this_, oind));
   }
 
   OutputNode::OutputNode(const MX& parent, casadi_int oind) : oind_(oind) {

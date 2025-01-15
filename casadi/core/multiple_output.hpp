@@ -81,8 +81,6 @@ namespace casadi {
         \identifier{1ps} */
     explicit MultipleOutput(DeserializingStream& s) : MXNode(s) {}
 
-    /// Output node cache
-    mutable WeakCache<casadi_int, MX> cache_;
   };
 
   class CASADI_EXPORT OutputNode : public MXNode {
