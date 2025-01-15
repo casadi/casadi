@@ -215,7 +215,8 @@ namespace casadi {
     *
     * \sa expr.nz[:]
     *
-    */
+
+        \identifier{2bh} */
     std::vector<MX> get_nonzeros() const;
 
     /** \brief Erase a submatrix (leaving structural zeros in its place)

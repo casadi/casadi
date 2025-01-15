@@ -352,6 +352,9 @@
 %exception  casadi::CodeGenerator::mv(const std::string &x, const Sparsity &sp_x, const std::string &y, const std::string &z, bool tr) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::CodeGenerator::norm_1(casadi_int n, const std::string &x) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::CodeGenerator::norm_2(casadi_int n, const std::string &x) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -3494,6 +3497,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::MX::get(MX &m, bool ind1, const casadi_int rr) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::MX::get_nonzeros() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::MX::get_nz(MX &m, bool ind1, casadi_int kk) const {
