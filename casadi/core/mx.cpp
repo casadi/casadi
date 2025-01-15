@@ -2179,7 +2179,7 @@ namespace casadi {
       std::unordered_map<std::string, MX > cache;
       IncrementalSerializerMX s;
 
-      std::unordered_map<std::string, Function> function_cache;
+      std::unordered_map<FunctionInternal*, Function> function_cache;
 
       // Loop over computational nodes in forward order
       casadi_int alg_counter = 0;
@@ -2223,7 +2223,7 @@ namespace casadi {
 
               // If we are a call node,
               if (out_i.op()==OP_CALL) {
-                std::string key = out_i.which_function().serialize();
+                FunctionInternal* key = out_i.which_function().get();
                 auto itk = function_cache.find(key);
                 if (itk==function_cache.end()) {
                   function_cache[key] = out_i.which_function();
