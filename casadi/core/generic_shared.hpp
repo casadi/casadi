@@ -302,7 +302,9 @@ class CASADI_EXPORT WeakCache {
       }
     }
   private:
-    std::unordered_map<K, GenericWeakRef<typename T::base_type, typename T::internal_base_type> > cache_;
+    std::unordered_map<K,
+      GenericWeakRef<typename T::base_type, typename T::internal_base_type>
+    > cache_;
 #ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
     mutable std::mutex mtx_;
 #endif // CASADI_WITH_THREADSAFE_SYMBOLICS

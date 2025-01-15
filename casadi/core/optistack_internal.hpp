@@ -116,9 +116,12 @@ public:
 
   /// @{
   /// Obtain value of expression at the current value
-  DM value(const MX& x, const std::vector<MX>& values=std::vector<MX>(), bool scaled=false) const;
-  DM value(const DM& x, const std::vector<MX>& values=std::vector<MX>(), bool scaled=false) const { return x; }
-  DM value(const SX& x, const std::vector<MX>& values=std::vector<MX>(), bool scaled=false) const {
+  DM value(const MX& x,
+    const std::vector<MX>& values=std::vector<MX>(), bool scaled=false) const;
+  DM value(const DM& x,
+    const std::vector<MX>& values=std::vector<MX>(), bool scaled=false) const { return x; }
+  DM value(const SX& x,
+    const std::vector<MX>& values=std::vector<MX>(), bool scaled=false) const {
     return DM::nan(x.sparsity());
   }
   /// @}
@@ -184,7 +187,8 @@ public:
 
   std::vector<MX> active_symvar(VariableType type) const;
   std::vector<DM> active_values(VariableType type) const;
-  std::vector<DM> active_values(VariableType type, const std::map< VariableType, std::vector<DM> >& store) const;
+  std::vector<DM> active_values(VariableType type,
+    const std::map< VariableType, std::vector<DM> >& store) const;
 
   MX x_lookup(casadi_int i) const;
   MX g_lookup(casadi_int i) const;
@@ -319,7 +323,8 @@ private:
   void register_dual(MetaCon& meta);
 
   /// Set value of symbol
-  void set_value_internal(const MX& x, const DM& v, std::map< VariableType, std::vector<DM> >& store);
+  void set_value_internal(const MX& x, const DM& v,
+    std::map< VariableType, std::vector<DM> >& store);
 
   /** \brief decompose a chain of inequalities
   *

@@ -479,10 +479,14 @@ Dict OptiNode::stats() const {
   assert_solved();
   if (stats_.empty()) {
     stats_ = solver_.stats();
-    is_simple_ = get_from_dict(stats_, "detect_simple_bounds_is_simple", std::vector<bool>(ng(), false));
-    target_x_ = get_from_dict(stats_, "detect_simple_bounds_target_x", std::vector<casadi_int>{});
+    is_simple_ = get_from_dict(stats_,
+      "detect_simple_bounds_is_simple",
+      std::vector<bool>(ng(), false));
+    target_x_ = get_from_dict(stats_,
+      "detect_simple_bounds_target_x",
+      std::vector<casadi_int>{});
     casadi_assert_dev(is_simple_.size()==ng());
-    
+
     g_index_reduce_g_.resize(ng());
     g_index_reduce_x_.resize(ng(), -1);
     g_index_unreduce_g_.resize(ng(), -1);
@@ -1320,7 +1324,8 @@ DM OptiNode::value(const MX& expr, const std::vector<MX>& values, bool scaled) c
     x_num.push_back(store_latest_.at(OPTI_VAR).at(i));
     undecided_vars |= override_num(temp[OPTI_VAR], x_num, i);
     if (scaled) {
-      x_num.back() = x_num.back()/store_linear_scale_.at(OPTI_VAR)[meta(e).i] - store_linear_scale_offset_.at(OPTI_VAR)[meta(e).i];
+      x_num.back() = x_num.back()/store_linear_scale_.at(OPTI_VAR)[meta(e).i] -
+                     store_linear_scale_offset_.at(OPTI_VAR)[meta(e).i];
     }
   }
 
@@ -1403,7 +1408,8 @@ void OptiNode::set_value(const std::vector<MX>& assignments) {
   }
 }
 
-void OptiNode::set_value_internal(const MX& x, const DM& v, std::map< VariableType, std::vector<DM> >& store) {
+void OptiNode::set_value_internal(const MX& x, const DM& v,
+    std::map< VariableType, std::vector<DM> >& store) {
   mark_solved(false);
   casadi_assert_dev(v.is_regular());
   if (x.is_symbolic()) {
@@ -1512,7 +1518,8 @@ void OptiNode::set_linear_scale(const MX& x, const DM& scale, const DM& offset) 
       "Dimension mismatch in linear_scale. Expected " + x.dim() + ", got " + scale.dim()+ ".");
   set_value_internal(x, scale, store_linear_scale_);
   casadi_assert(offset.is_scalar() || offset.size()==x.size(),
-      "Dimension mismatch in linear_scale offset. Expected " + x.dim() + ", got " + scale.dim()+ ".");
+      "Dimension mismatch in linear_scale offset. Expected " + x.dim() +
+      ", got " + scale.dim()+ ".");
   set_value_internal(x, offset, store_linear_scale_offset_);
 }
 
@@ -1530,7 +1537,8 @@ std::vector<DM> OptiNode::active_values(VariableType type) const {
   return active_values(type, store_initial_);
 }
 
-std::vector<DM> OptiNode::active_values(VariableType type, const std::map< VariableType, std::vector<DM> >& store) const {
+std::vector<DM> OptiNode::active_values(VariableType type,
+    const std::map< VariableType, std::vector<DM> >& store) const {
   if (symbol_active_.empty()) return std::vector<DM>{};
   std::vector<DM> ret;
   for (const auto& s : symbols_) {
@@ -1635,7 +1643,7 @@ void OptiNode::show_infeasibilities(double tol, const Dict& opts) const {
           uout() << "  reduced to g[" << g_index_reduce_g_.at(i) << "]";
         }
       }
-      
+
       uout() << " ------ " << std::endl;
       uout() << lbg_[i] << " <= " << g_[i] << " <= " << ubg_[i];
       uout() << " (viol " << err << ")" << std::endl;
