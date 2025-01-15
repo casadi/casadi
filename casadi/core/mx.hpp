@@ -204,6 +204,20 @@ namespace casadi {
         \identifier{qd} */
     Sparsity get_sparsity() const { return sparsity();}
 
+    /** \brief Get nonzeros as list of scalar MXes
+    *
+    * Since MX is not a containter, the scalar MXes may be complex
+    * When the expression satisfies is_valid_input, the results may be simple
+    *
+    * For example: 
+    * vertcat(x,y).nonzeros()
+    * will return {x,y}
+    *
+    * \sa expr.nz[:]
+    *
+    */
+    std::vector<MX> get_nonzeros() const;
+
     /** \brief Erase a submatrix (leaving structural zeros in its place)
 
         Erase rows and/or columns of a matrix

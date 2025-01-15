@@ -607,6 +607,23 @@ namespace casadi {
     }
   }
 
+  std::vector<MX> MX::get_nonzeros() const {
+    std::vector<MX> ret;
+    std::vector<MX> p = primitives();
+    for (const MX& e : p) {
+      if (e.is_scalar()) {
+        ret.push_back(e);
+      } else {
+        // Get nonzeros sparsity cast
+        MX nz;
+        e.get_nz(nz, 0, Slice());
+        std::vector<MX> elems = vertsplit(nz, 1);
+        ret.insert(ret.end(), elems.begin(), elems.end());
+      }
+    }
+    return ret;
+  }
+
   void MX::erase(const std::vector<casadi_int>& rr, bool ind1) {
     // Get sparsity of the new matrix
     Sparsity sp = sparsity();

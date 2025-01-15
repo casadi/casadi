@@ -3577,6 +3577,37 @@ class MXtests(casadiTestCase):
     
     self.assertTrue(y.alive())
     
+  def test_nonzeros(self):
+    
+    A = MX.sym("A",3,3)
+
+    x = MX.sym("x")
+    y = MX.sym("y")
+    z = MX.sym("z")
+    T = MX.sym("T",Sparsity.upper(3))
+    w = MX.sym("w",3,3)
+    
+    DM.rng(1)
+    
+    for expr in [
+        vertcat(x,y,z),
+        veccat(x,y,z,w),
+        veccat(x,T,z,w),
+        2*x,
+        4*T*x,
+        vertcat(x,vertcat(y,z))
+    ]:
+        fref = Function('fref',[x,y,z,w,A,T],[expr.nz[:]])
+        f = Function('f',[x,y,z,w,A,T],[vcat(expr.nonzeros())])
+        
+        self.checkfunction_light(f,fref,inputs=[DM.rand(f.sparsity_in(i)) for i in range(f.n_in())])
+
+    for expr in [
+        vertcat(x,y,z),
+        vertcat(x,vertcat(y,z))
+    ]:
+        s = str(expr.nonzeros())
+        self.assertTrue("[MX(x), MX(y), MX(z)]" in s)
       
 if __name__ == '__main__':
     unittest.main()
