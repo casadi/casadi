@@ -508,12 +508,6 @@
 %exception  casadi::Contraction(const bvec_t &a, const bvec_t &b, bvec_t &r) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::DM::export_code(const std::string &lang, std::ostream &stream=casadi::uout(), const Dict &options=Dict()) const {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::DM::rand(const Sparsity &sp) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::DaeBuilder::add_c(const std::string &name, const MX &new_cdef) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -4084,6 +4078,9 @@
 %exception  casadi::Matrix< Scalar >::expm_const(const Matrix< Scalar > &A, const Matrix< Scalar > &t) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Matrix< Scalar >::export_code(const std::string &lang, std::ostream &stream=casadi::uout(), const Dict &options=Dict()) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Matrix< Scalar >::extract(std::vector< Matrix< Scalar >> &ex, std::vector< Matrix< Scalar >> &v, std::vector< Matrix< Scalar >> &vdef, const Dict &opts=Dict()) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -4345,6 +4342,9 @@
 %exception  casadi::Matrix< Scalar >::rand(casadi_int nrow=1, casadi_int ncol=1) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Matrix< Scalar >::rand(const Sparsity &sp) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Matrix< Scalar >::rand(const std::pair< casadi_int, casadi_int > &rc) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -4534,7 +4534,7 @@
 %exception  casadi::Opti::lbg() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Opti::minimize(const MX &f) {
+%exception  casadi::Opti::minimize(const MX &f, double linear_scale=1) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Opti::ng() const {
@@ -4552,6 +4552,12 @@
 %exception  casadi::Opti::parameter(casadi_int n=1, casadi_int m=1, const std::string &attribute="full") {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Opti::parameter(const MX &symbol, const std::string &attribute="full") {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Opti::parameter(const Sparsity &sp, const std::string &attribute="full") {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Opti::return_status() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -4562,6 +4568,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Opti::set_initial(const std::vector< MX > &assignments) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Opti::set_linear_scale(const MX &x, const DM &scale, const DM &offset=0) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Opti::set_value(const MX &x, const DM &v) {
@@ -4585,10 +4594,16 @@
 %exception  casadi::Opti::subject_to() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Opti::subject_to(const MX &g) {
+%exception  casadi::Opti::subject_to(const MX &g, const DM &linear_scale, const Dict &options=Dict()) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::Opti::subject_to(const std::vector< MX > &g) {
+%exception  casadi::Opti::subject_to(const MX &g, const Dict &options=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Opti::subject_to(const std::vector< MX > &g, const DM &linear_scale, const Dict &options=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Opti::subject_to(const std::vector< MX > &g, const Dict &options=Dict()) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::Opti::to_function(const std::string &name, const std::map< std::string, MX > &dict, const std::vector< std::string > &name_in, const std::vector< std::string > &name_out, const Dict &opts=Dict()) {
@@ -4633,6 +4648,12 @@
 %exception  casadi::Opti::variable(casadi_int n=1, casadi_int m=1, const std::string &attribute="full") {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::Opti::variable(const MX &symbol, const std::string &attribute="full") {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::Opti::variable(const Sparsity &sp, const std::string &attribute="full") {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::Opti::x() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -4672,10 +4693,19 @@
 %exception  casadi::OptiAdvanced::constraints() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::OptiAdvanced::describe(const MX &x, casadi_index indent=0) const {
+%exception  casadi::OptiAdvanced::describe(const MX &x, casadi_index indent=0, const Dict &opts=Dict()) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::OptiAdvanced::g_describe(casadi_index i) const {
+%exception  casadi::OptiAdvanced::g_describe(casadi_index i, const Dict &opts=Dict()) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::OptiAdvanced::g_index_reduce_g(casadi_index i) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::OptiAdvanced::g_index_reduce_x(casadi_index i) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::OptiAdvanced::g_index_unreduce_g(casadi_index i) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::OptiAdvanced::g_lookup(casadi_index i) const {
@@ -4720,7 +4750,7 @@
 %exception  casadi::OptiAdvanced::set_meta_con(const MX &m, const MetaCon &meta) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::OptiAdvanced::show_infeasibilities(double tol=0) const {
+%exception  casadi::OptiAdvanced::show_infeasibilities(double tol=0, const Dict &opts=Dict()) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::OptiAdvanced::solve_actual(const DMDict &args) {
@@ -4744,7 +4774,7 @@
 %exception  casadi::OptiAdvanced::symvar(const MX &expr, VariableType type) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::OptiAdvanced::x_describe(casadi_index i) const {
+%exception  casadi::OptiAdvanced::x_describe(casadi_index i, const Dict &opts=Dict()) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::OptiAdvanced::x_lookup(casadi_index i) const {

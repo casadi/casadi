@@ -232,7 +232,8 @@ public:
   * opti.set_linear_scale(x, 20)
   * opti.set_linear_scale(x, 20, 273.15)
   * \endverbatim
-  */
+
+      \identifier{2bs} */
   void set_linear_scale(const MX& x, const DM& scale, const DM& offset=0);
 
   /// Crunch the numbers; solve the problem
