@@ -28,7 +28,7 @@
 
 #include "casadi_common.hpp"
 #include "exception.hpp"
-#include <map>
+#include <unordered_map>
 #include <vector>
 #ifdef CASADI_WITH_THREAD
 #ifdef CASADI_WITH_THREAD_MINGW
