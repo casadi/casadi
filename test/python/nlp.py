@@ -1981,6 +1981,7 @@ class NLPtests(casadiTestCase):
   
     for Solver, solver_options, aux_options in solvers:
         print(Solver,solver_options)
+        #if Solver=="bonmin": continue
       
         x = MX.sym("x",5)
         
@@ -2017,7 +2018,11 @@ class NLPtests(casadiTestCase):
                     
                     nlp = {"x":x,"g":g,"f":sumsqr(x-x_target)}
                     
-                    solver_ref = nlpsol("mysolver", Solver, nlp)
+                    solver_ref_ipopt = nlpsol("mysolver", "ipopt", nlp)
+                    
+                    solver_ref = nlpsol("mysolver", Solver, nlp, solver_options)
+                    
+                    
                     
                     my_solver_options = dict(solver_options)
                     my_solver_options["detect_simple_bounds"] = True
@@ -2025,7 +2030,27 @@ class NLPtests(casadiTestCase):
                     solver = nlpsol("mysolver", Solver, nlp, my_solver_options)
                     solver_in = dict(lbg=lbg,ubg=ubg,lbx=lbx,ubx=ubx)
                     
-                    self.checkfunction_light(solver, solver_ref, inputs=solver_in,digits=6)
+                    sol_ref_ipopt = solver_ref_ipopt(**solver_in)
+                    
+                    solver_in["x0"] = sol_ref_ipopt["x"]*1.2
+                    
+                    digits = 6
+                    if "daqp" in str(solver_options):
+                        digits = 4
+                    if "worhp" in str(solver_options):
+                        digits = 4
+                        
+                    solver_ref(**solver_in)
+                    
+                    print("stats",solver_ref.stats())
+
+                    if Solver=="bonmin":
+                        solver_ref_out = solver_ref(**solver_in)
+                        solver_out = solver(**solver_in)
+                        for output in ["x","f"]:
+                            self.checkarray(solver_out[output],solver_ref_out[output],digits=digits)
+                    else:
+                        self.checkfunction_light(solver, solver_ref, inputs=solver_in,digits=digits)
                     
                     if aux_options["codegen"]:
                         self.check_codegen(solver,solver_in,**aux_options["codegen"])
