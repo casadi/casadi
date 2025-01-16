@@ -1977,6 +1977,7 @@ class NLPtests(casadiTestCase):
       self.checkarray(b[1],c[1])
       
   @memory_heavy()
+  @requires_nlpsol("ipopt")
   def test_simple_bounds_detect_solvers(self):
   
     for Solver, solver_options, aux_options in solvers:
