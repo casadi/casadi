@@ -2049,9 +2049,9 @@ class NLPtests(casadiTestCase):
                         solver_ref_out = solver_ref(**solver_in)
                         solver_out = solver(**solver_in)
                         for output in ["x","f"]:
-                            self.checkarray(solver_out[output],solver_ref_out[output],digits=digits)
+                            self.checkarray(solver_out[output],solver_ref_out[output],digits=digits,failmessage=str(Solver)+str(solver_options))
                     else:
-                        self.checkfunction_light(solver, solver_ref, inputs=solver_in,digits=digits)
+                        self.checkfunction_light(solver, solver_ref, inputs=solver_in,digits=digits,failmessage=str(Solver)+str(solver_options))
                     
                     if aux_options["codegen"]:
                         self.check_codegen(solver,solver_in,**aux_options["codegen"])
