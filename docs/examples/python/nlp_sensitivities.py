@@ -131,7 +131,7 @@ for k in range(N):
        ubg.append([0, 0])
 
        # Add contribution to the end state
-       Xk_end = Xk_end + D[j]*Xc[j-1];
+       Xk_end = Xk_end + D[j]*Xc[j-1]
 
        # Add contribution to quadrature function
        J = J + B[j]*qj*h
@@ -204,7 +204,7 @@ print(hsol['hess_f_p_p'])
 nfwd = 2
 
 # Forward mode AD for the NLP solver object
-fwd_solver = solver.forward(nfwd);
+fwd_solver = solver.forward(nfwd)
 print('fwd_solver generated')
 
 # Seeds, initalized to zero
