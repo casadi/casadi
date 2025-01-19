@@ -1132,6 +1132,7 @@ namespace casadi {
         case OP_CALL:
           {
             auto& m = call_.el.at(a.i1);
+            CallSX* call_node = static_cast<CallSX*>(it2->d[0].get());
 
             // Construct forward sensitivity function
             Function ff = m.f.forward(1);
@@ -1141,19 +1142,29 @@ namespace casadi {
             deps.reserve(2*m.n_dep);
 
             // Set nominal inputs from node
-            CallSX* it2_node = static_cast<CallSX*>(it2->d[0].get());
-            for (casadi_int i=0;i<m.n_dep;++i) {
-              deps.push_back(it2_node->dep(i));
+            casadi_int offset = 0;
+            for (casadi_int i=0;i<m.f_n_in;++i) {
+              casadi_int nnz = ff.nnz_in(i);
+              casadi_assert(nnz==0 || nnz==m.f.nnz_in(i), "Not implemented");
+              for (casadi_int j=0;j<nnz;++j) {
+                deps.push_back(call_node->dep(offset+j));
+              }
+              offset += m.f_nnz_in[i];
             }
 
             // Do not set nominal outputs
+            offset = 0;
             for (casadi_int i=0;i<m.f_n_out;++i) {
               casadi_int nnz = ff.nnz_in(i+m.f_n_in);
-              casadi_assert(nnz==0, "Not implemented");
+              casadi_assert(nnz==0 || nnz==m.f.nnz_out(i), "Not implemented");
+              for (casadi_int j=0;j<nnz;++j) {
+                deps.push_back(call_node->get_output(offset+j));
+              }
+              offset += m.f_nnz_out[i];
             }
 
             // Read in forward seeds from work vector
-            casadi_int offset = 0;
+            offset = 0;
             for (casadi_int i=0;i<m.f_n_in;++i) {
               casadi_int nnz = ff.nnz_in(i+m.f_n_in+m.f_n_out);
               // nnz=0 occurs for is_diff_in[i] false
@@ -1307,6 +1318,7 @@ namespace casadi {
         case OP_CALL:
           {
             auto& m = call_.el.at(it->i1);
+            CallSX* call_node = static_cast<CallSX*>(it2->d[0].get());
 
             // Construct reverse sensitivity function
             Function fr = m.f.reverse(1);
@@ -1316,19 +1328,29 @@ namespace casadi {
             deps.reserve(m.n_dep+m.n_res);
 
             // Set nominal inputs from node
-            CallSX* it2_node = static_cast<CallSX*>(it2->d[0].get());
-            for (casadi_int i=0;i<m.n_dep;++i) {
-              deps.push_back(it2_node->dep(i));
+            casadi_int offset = 0;
+            for (casadi_int i=0;i<m.f_n_in;++i) {
+              casadi_int nnz = fr.nnz_in(i);
+              casadi_assert(nnz==0 || nnz==m.f.nnz_in(i), "Not implemented");
+              for (casadi_int j=0;j<nnz;++j) {
+                deps.push_back(call_node->dep(offset+j));
+              }
+              offset += m.f_nnz_in[i];
             }
 
             // Do not set nominal outputs
+            offset = 0;
             for (casadi_int i=0;i<m.f_n_out;++i) {
               casadi_int nnz = fr.nnz_in(i+m.f_n_in);
-              casadi_assert(nnz==0, "Not implemented");
+              casadi_assert(nnz==0 || nnz==m.f.nnz_out(i), "Not implemented");
+              for (casadi_int j=0;j<nnz;++j) {
+                deps.push_back(call_node->get_output(offset+j));
+              }
+              offset += m.f_nnz_out[i];
             }
 
             // Read in reverse seeds from work vector
-            casadi_int offset = 0;
+            offset = 0;
             for (casadi_int i=0;i<m.f_n_out;++i) {
               casadi_int nnz = fr.nnz_in(i+m.f_n_in+m.f_n_out);
               // nnz=0 occurs for is_diff_out[i] false

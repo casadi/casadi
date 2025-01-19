@@ -1670,6 +1670,17 @@ class SXtests(casadiTestCase):
             print(res)
             self.assertEqual('fun' in str(res), never_inline)
         
+  def test_call_fun_nominal_out_deriv(self):
+    x = SX.sym("x",2)
+    p = SX.sym("p",2)
+    rf = rootfinder('rf',"newton",{'x':x,"g":vertcat(sin(x[0])-p[0],sin(x[0]+x[1])-p[1]*p[0]),"p":p})
+    
+    f = Function("f",[p],[exp(rf(p=p**2)["x"])])
+    P = MX.sym("p",2)
+    fref = Function("f",[P],[exp(rf(p=P**2)["x"])])
+    
+    self.checkfunction(f,fref,inputs=[[0.1,0.2]])
+  
   def test_call_fun_copy_elision(self):
     old = GlobalOptions.getCopyElisionMinSize()
     GlobalOptions.setCopyElisionMinSize(0)
