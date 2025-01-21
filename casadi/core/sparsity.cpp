@@ -1301,7 +1301,12 @@ namespace casadi {
     return sprank(*this)!=size2();
   }
 
-  std::vector<casadi_int> Sparsity::compress() const {
+  std::vector<casadi_int> Sparsity::compress(bool canonical) const {
+    if (canonical) {
+      // fallback
+    } else if (is_dense()) {
+      return {size1(), size2(), 1};
+    }
     return (*this)->sp();
   }
 
@@ -1339,7 +1344,7 @@ namespace casadi {
     casadi_int ncol = v[1];
     const casadi_int *colind = v+2;
     if (colind[0]==1) {
-      // Dense matrix
+      // Dense matrix - deviation from canonical form
       return Sparsity::dense(nrow, ncol);
     }
     casadi_int nnz = colind[ncol];

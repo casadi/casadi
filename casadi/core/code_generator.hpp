@@ -82,11 +82,19 @@ namespace casadi {
     /// Add/get a shorthand
     std::string shorthand(const std::string& name, bool allow_adding=true);
 
-    // Add a sparsity pattern
-    std::string sparsity(const Sparsity& sp);
+    /* Add a sparsity pattern
+    *
+    * \param canonical If true, request canonical form,
+    * as opposed to potential dense abbreviation
+    */
+    std::string sparsity(const Sparsity& sp, bool canonical=true);
 
-    // Add a sparsity pattern, get index
-    casadi_int add_sparsity(const Sparsity& sp);
+    /* Add a sparsity pattern, get index
+    *
+    * \param canonical If true, request canonical form,
+    * as opposed to potential dense abbreviation
+    */
+    casadi_int add_sparsity(const Sparsity& sp, bool canonical=true);
 
     /** \brief Get the index of an existing sparsity pattern
 
@@ -945,6 +953,9 @@ namespace casadi {
 
     // Maximum number of initializer elements per line
     casadi_int max_initializer_elements_per_line;
+
+    // Force the external API to use canonical sparsity
+    bool force_canonical;
 
     // Prefix symbols in DLLs?
     std::string dll_export, dll_import;

@@ -57,6 +57,7 @@ namespace casadi {
     this->prefix = "";
     this->max_declarations_per_line = 12;
     this->max_initializer_elements_per_line = 8;
+    this->force_canonical = true;
 
     avoid_stack_ = false;
     indent_ = 2;
@@ -117,6 +118,8 @@ namespace casadi {
         this->max_initializer_elements_per_line = e.second;
         casadi_assert(this->max_initializer_elements_per_line>=0,
           "Option max_initializer_elements_per_line must be >=0");
+      } else if (e.first=="force_canonical") {
+        this->force_canonical = e.second;
       } else {
         casadi_error("Unrecognized option: " + str(e.first));
       }
@@ -1171,12 +1174,12 @@ namespace casadi {
     return "casadi_" + name;
   }
 
-  casadi_int CodeGenerator::add_sparsity(const Sparsity& sp) {
-    return get_constant(sp, true);
+  casadi_int CodeGenerator::add_sparsity(const Sparsity& sp, bool canonical) {
+    return get_constant(sp.compress(canonical), true);
   }
 
-  std::string CodeGenerator::sparsity(const Sparsity& sp) {
-    return shorthand("s" + str(add_sparsity(sp)));
+  std::string CodeGenerator::sparsity(const Sparsity& sp, bool canonical) {
+    return shorthand("s" + str(add_sparsity(sp, canonical)));
   }
 
   casadi_int CodeGenerator::get_sparsity(const Sparsity& sp) const {
@@ -2420,7 +2423,7 @@ namespace casadi {
     *this << declare("const casadi_int* " + name + "_sparsity_in(casadi_int i)") << " {\n"
       << "switch (i) {\n";
     for (casadi_int i=0; i<sp_in.size(); ++i) {
-      *this << "case " << i << ": return " << sparsity(sp_in[i]) << ";\n";
+      *this << "case " << i << ": return " << sparsity(sp_in[i], force_canonical) << ";\n";
     }
     *this << "default: return 0;\n}\n"
       << "}\n\n";
@@ -2429,7 +2432,7 @@ namespace casadi {
     *this << declare("const casadi_int* " + name + "_sparsity_out(casadi_int i)") << " {\n"
       << "switch (i) {\n";
     for (casadi_int i=0; i<sp_out.size(); ++i) {
-      *this << "case " << i << ": return " << sparsity(sp_out[i]) << ";\n";
+      *this << "case " << i << ": return " << sparsity(sp_out[i], force_canonical) << ";\n";
     }
     *this << "default: return 0;\n}\n"
       << "}\n\n";

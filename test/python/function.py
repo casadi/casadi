@@ -3608,6 +3608,15 @@ class Functiontests(casadiTestCase):
             print(vcat(a),data,0,0,0)
             self.checkfunction_light(FJ,FJ_ref,inputs=[vcat(a),data,0,0,0])
             
+            
+  def test_noncanonical_sparsity(self):
+    x = MX.sym("x",4,4)
+    y = MX.sym("y")
+    
+    f = Function("f",[x,y],[3*8])
+    
+    self.check_codegen(f,inputs=[DM.rand(4,4),1],opts={"force_canonical":False})
+    self.check_codegen(f,inputs=[DM.rand(4,4),1],opts={"force_canonical":True})
 
 if __name__ == '__main__':
     unittest.main()

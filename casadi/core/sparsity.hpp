@@ -276,7 +276,7 @@ namespace casadi {
     Sparsity get_diag(std::vector<casadi_int>& SWIG_OUTPUT(mapping)) const;
 
     /// Compress a sparsity pattern
-    std::vector<casadi_int> compress() const;
+    std::vector<casadi_int> compress(bool canonical=true) const;
 
 #ifndef SWIG
     /// Access a member function or object
