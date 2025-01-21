@@ -151,7 +151,7 @@
 %exception  casadi::CodeGenerator::add_io_sparsities(const std::string &name, const std::vector< Sparsity > &sp_in, const std::vector< Sparsity > &sp_out) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::CodeGenerator::add_sparsity(const Sparsity &sp) {
+%exception  casadi::CodeGenerator::add_sparsity(const Sparsity &sp, bool canonical=true) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::CodeGenerator::arg(casadi_int i) const {
@@ -445,7 +445,7 @@
 %exception  casadi::CodeGenerator::sparsify(const std::string &arg, const std::string &res, const Sparsity &sp_res, bool tr=false) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::CodeGenerator::sparsity(const Sparsity &sp) {
+%exception  casadi::CodeGenerator::sparsity(const Sparsity &sp, bool canonical=true) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::CodeGenerator::sum_viol(casadi_int n, const std::string &x, const std::string &lb, const std::string &ub) {
