@@ -297,6 +297,7 @@ option(ENABLE_STATIC "Compile static libraries (.a on Linux)" OFF)
 option(ENABLE_SHARED "Compile shared libraries (.so on Linux)" ON)
 option(SWIG_EXPORT "Export SWIG" OFF)
 option(SWIG_IMPORT "Import SWIG" OFF)
+option(RELOCATABLE "Avoid any usage of absolute paths" ON)
 
 # enabling OpenMP support if requested
 option(WITH_OPENMP "Compile with parallelization support using OpenMP" OFF)
