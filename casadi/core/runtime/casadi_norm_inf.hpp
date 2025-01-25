@@ -26,3 +26,8 @@ T1 casadi_norm_inf(casadi_int n, const T1* x) {
   for (i=0; i<n; ++i) ret = fmax(ret, fabs(*x++));
   return ret;
 }
+
+#ifdef WITH_BLAS
+CASADI_EXPORT float casadi_norm_inf(casadi_int n, const float* x);
+CASADI_EXPORT double casadi_norm_inf(casadi_int n, const double* x);
+#endif
