@@ -45,6 +45,11 @@ if(POLICY CMP0054)
   cmake_policy(SET CMP0054 NEW)
 endif()
 
+# FindPythonInterp and FindPythonLibs should be replaced by FindPython3
+if(POLICY CMP0148)
+  cmake_policy(SET CMP0148 OLD)
+endif()
+
 #############################################################
 ########################## Version ##########################
 #############################################################
