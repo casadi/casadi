@@ -6478,6 +6478,12 @@
 %exception casadi::SubMatrix< M, I, J >::SubMatrix(const SubMatrix< M, I, J > &y)=default {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception casadi::WeakRef::WeakRef(SharedObject shared) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception casadi::WeakRef::WeakRef(int dummy=0) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception casadi::XmlFile::XmlFile() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }

@@ -42642,10 +42642,10 @@ C++ includes: printable.hpp
 Get string representation with type information.
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/printable.hpp#L64
+https://github.com/casadi/casadi/blob/develop/casadi/core/printable.hpp#L72
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/printable.hpp#L64-L66
+https://github.com/casadi/casadi/blob/develop/casadi/core/printable.hpp#L72-L74
 
 ";
 
@@ -49438,6 +49438,14 @@ Extra doc: https://github.com/casadi/casadi/wiki/L_ax
 
 C++ includes: shared_object.hpp
 ";
+
+%feature("docstring") casadi::WeakRef::WeakRef(int dummy=0) "
+
+[INTERNAL] ";
+
+%feature("docstring") casadi::WeakRef::WeakRef(SharedObject shared) "
+
+[INTERNAL] ";
 
 %feature("docstring")  casadi::GenericWeakRef< SharedObject , 
 SharedObjectInternal  >::shared() const "
