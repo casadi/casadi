@@ -312,6 +312,10 @@ if(WITH_THREAD)
   target_compile_definitions(casadi PUBLIC CASADI_WITH_THREAD)
 endif()
 
+if(MSVC)
+  target_compile_options(casadi PRIVATE /bigobj)
+endif()
+
 get_target_property( compiler_definitions casadi COMPILE_DEFINITIONS )
 foreach(DEF ${compiler_definitions})
   list(APPEND EXTRA_CXX_FLAGS_FROM_DEFS_LIST "-D${DEF}")
