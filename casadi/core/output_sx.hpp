@@ -50,8 +50,11 @@ namespace casadi {
 
   class CASADI_EXPORT WeakRefSXElem :
       public GenericWeakRef<SharedSXElem, OutputSX> {
-
-    using GenericWeakRef<SharedSXElem, OutputSX>::GenericWeakRef;
+  public:
+    WeakRefSXElem(int dummy=0) : GenericWeakRef<SharedSXElem, OutputSX>(dummy) {
+    }
+    WeakRefSXElem(SharedSXElem shared) : GenericWeakRef<SharedSXElem, OutputSX>(shared) {
+    }
   };
 
   typedef GenericWeakRefInternal<SharedSXElem, OutputSX> WeakRefInternalSXElem;
