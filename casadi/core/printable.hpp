@@ -26,7 +26,15 @@
 #ifndef CASADI_PRINTABLE_HPP
 #define CASADI_PRINTABLE_HPP
 
+#if __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wnonnull"
+#endif
 #include <iostream>
+#if __GNUC__
+#pragma GCC diagnostic pop
+#endif
+
 #include <sstream>
 #include <streambuf>
 #include <string>
