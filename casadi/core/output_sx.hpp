@@ -160,6 +160,4 @@ namespace casadi {
 } // namespace casadi
 /// \endcond
 
-#include "generic_shared_impl.hpp"
-
 #endif // CASADI_OUTPUT_SX_HPP
