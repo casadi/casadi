@@ -1540,5 +1540,13 @@ namespace casadi {
   }
 #endif // CASADI_WITH_THREADSAFE_SYMBOLICS
 
-  template class CASADI_EXPORT Matrix< SXElem >;
+#if __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wattributes"
+#endif
+#if __GNUC__
+template class CASADI_EXPORT Matrix< SXElem >;
+#pragma GCC diagnostic pop
+#endif
+
 } // namespace casadi

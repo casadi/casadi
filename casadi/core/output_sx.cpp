@@ -27,7 +27,15 @@
 
 namespace casadi {
 
+#if __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wattributes"
+#endif
 template class CASADI_EXPORT GenericShared< SharedSXElem, OutputSX >;
 template class CASADI_EXPORT GenericWeakRef< SharedSXElem, OutputSX >;
+#if __GNUC__
+#pragma GCC diagnostic pop
+#endif
+
 
 } // namespace casadi

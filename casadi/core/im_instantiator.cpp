@@ -48,7 +48,14 @@ namespace casadi {
 
   // Instantiate templates
   template class casadi_limits<casadi_int>;
-  template class CASADI_EXPORT Matrix<casadi_int>;
 
+  #if __GNUC__
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wattributes"
+  #endif
+  template class CASADI_EXPORT Matrix<casadi_int>;
+  #if __GNUC__
+  #pragma GCC diagnostic pop
+  #endif
 
 } // namespace casadi
