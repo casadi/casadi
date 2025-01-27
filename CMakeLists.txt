@@ -90,24 +90,6 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 
 ########################################################################
-############################# Fortran ##################################
-########################################################################
-option(FORTRAN_REQUIRED "Make fortran a required dependency" OFF)
-
-# http://public.kitware.com/Bug/print_bug_page.php?bug_id=9220
-set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
-include(language_support)
-workaround_9220(Fortran Fortran_language_works)
-if(FORTRAN_REQUIRED)
-  enable_language(Fortran)
-  set(Fortran_language_works ON)
-else()
-  if(Fortran_language_works)
-    enable_language(Fortran OPTIONAL)
-  endif()
-endif()
-
-########################################################################
 ############################# C++11 ####################################
 ########################################################################
 # Check if the compiler supports C++11
