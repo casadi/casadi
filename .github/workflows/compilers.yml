@@ -21,6 +21,19 @@ jobs:
           CC=gcc-${{ matrix.compiler }} FC=gfortran-${{ matrix.compiler }} CXX=g++-${{ matrix.compiler }} cmake -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} -H.
           cmake --build build -v
 
+  linux-24_04-gcc:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler: ['12','13','14']
+    steps:
+      - uses: actions/checkout@v4.1.1
+      - name: Build
+        run: |
+          CC=gcc-${{ matrix.compiler }} FC=gfortran-${{ matrix.compiler }} CXX=g++-${{ matrix.compiler }} cmake -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} -H.
+          cmake --build build -v
+
   linux-22_04-clang:
     runs-on: ubuntu-22.04
     strategy:
@@ -34,6 +47,19 @@ jobs:
           CC=clang-${{ matrix.compiler }} FC=gfortran-${{ matrix.compiler }} CXX=clang++-${{ matrix.compiler }} cmake -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} -H.
           cmake --build build -v
 
+  linux-24_04-clang:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler: ['16','17','18']
+    steps:
+      - uses: actions/checkout@v4.1.1
+      - name: Build
+        run: |
+          CC=clang-${{ matrix.compiler }} FC=gfortran-${{ matrix.compiler }} CXX=clang++-${{ matrix.compiler }} cmake -Bbuild -DWITH_SELFCONTAINED=ON ${{env.build_flags}} -H.
+          cmake --build build -v
+          
   linux-latest:
     runs-on: ubuntu-22.04
     steps:
@@ -48,7 +74,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        cxx_standard: ['14','17','20','23','26'] # 13 compiler bug
+        cxx_standard: ['14','17','20','23','26']
     steps:
       - uses: actions/checkout@v4.1.1
       - name: Build
