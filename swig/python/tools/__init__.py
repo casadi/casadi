@@ -46,7 +46,9 @@ def loadAllCompiledPlugins():
     if "SKIP_" + name.upper() + "_TESTS" in os.environ:
         print("Skipping")
         continue
-    if cls in ("Importer","XmlFile","Linsol"):
+    if cls in ("XmlFile"):
+      pass
+    elif cls in ("Importer","Linsol"):
       getattr(casadi,cls).load_plugin(name)
     else:
       getattr(casadi,'load_'+cls.lower())(name)
