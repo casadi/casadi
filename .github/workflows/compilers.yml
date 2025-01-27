@@ -26,7 +26,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        compiler: ['12','13','14']
+        compiler: ['13','14']
     steps:
       - uses: actions/checkout@v4.1.1
       - name: Build
