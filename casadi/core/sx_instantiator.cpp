@@ -1535,7 +1535,7 @@ namespace casadi {
 
 #ifdef CASADI_WITH_THREADSAFE_SYMBOLICS
   template<>
-  CASADI_EXPORT std::mutex& SX::get_mutex_temp() {
+  std::mutex& CASADI_EXPORT SX::get_mutex_temp() {
     return SXElem::mutex_temp;
   }
 #endif // CASADI_WITH_THREADSAFE_SYMBOLICS

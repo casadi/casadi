@@ -52,7 +52,7 @@ namespace casadi {
     }
   }
 
-template class GenericShared< SharedObject, SharedObjectInternal >;
-template class GenericWeakRef< SharedObject, SharedObjectInternal >;
+template class CASADI_EXPORT GenericShared< SharedObject, SharedObjectInternal >;
+template class CASADI_EXPORT GenericWeakRef< SharedObject, SharedObjectInternal >;
 
 } // namespace casadi

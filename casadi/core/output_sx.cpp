@@ -27,7 +27,7 @@
 
 namespace casadi {
 
-template class GenericShared< SharedSXElem, OutputSX >;
-template class GenericWeakRef< SharedSXElem, OutputSX >;
+template class CASADI_EXPORT GenericShared< SharedSXElem, OutputSX >;
+template class CASADI_EXPORT GenericWeakRef< SharedSXElem, OutputSX >;
 
 } // namespace casadi
