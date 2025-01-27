@@ -42,7 +42,6 @@ Generated C code can be as simple as calling the ``generate`` member function fo
               {x,sin(y)*x},...
               {'x','y'},{'r','q'});
         f.generate('gen.c');
-        type('gen.c')
 
 This will create a C file ``gen.c`` containing the function ``f`` and all its dependencies and required helper functions.
 We will return to how this file can be used in :numref:`sec-codegen_syntax` and the structure of the generated code is
