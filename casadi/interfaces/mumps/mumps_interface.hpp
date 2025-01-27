@@ -29,8 +29,12 @@
 #include "casadi/core/linsol_internal.hpp"
 #include <casadi/interfaces/mumps/casadi_linsol_mumps_export.h>
 
-#include <mumps/mumps_mpi.h>
-#include <mumps/dmumps_c.h>
+#include <dmumps_c.h>
+#ifdef COIN_USE_MUMPS_MPI_H
+#include <mumps_mpi.h>
+#else
+#include <mumps_seq/mpi.h>
+#endif
 
 /** \defgroup plugin_Linsol_mumps Title
     \par
