@@ -148,16 +148,21 @@ namespace casadi {
 
       MX e = construct_graph(x, coeff, linear_solver_options, opts);
 
-      S_ = Function("wrapper", {x, coeff}, {e});
+      S_ = Function("wrapper", {x, coeff}, {e}, {"x", "c"}, {"f"});
     } else {
       MX e = construct_graph(x, DM(values_), linear_solver_options, opts);
-      S_ = Function("wrapper", {x}, {e});
+      S_ = Function("wrapper", {x}, {e}, {"x"}, {"f"});
     }
 
     alloc_w(S_.sz_w());
     alloc_iw(S_.sz_iw());
     alloc_arg(S_.sz_arg());
     alloc_res(S_.sz_res());
+  }
+
+  void BSplineInterpolant::find(std::map<FunctionInternal*, Function>& all_fun,
+      casadi_int max_depth) const {
+    add_embedded(all_fun, S_, max_depth);
   }
 
   std::vector<double> BSplineInterpolant::greville_points(const std::vector<double>& x,

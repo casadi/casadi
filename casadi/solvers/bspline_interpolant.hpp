@@ -145,6 +145,9 @@ namespace casadi {
     // Spline Function
     Function S_;
 
+    // Get all embedded functions, recursively
+    void find(std::map<FunctionInternal*, Function>& all_fun, casadi_int max_depth) const override;
+
     /** \brief  Propagate sparsity forward */
     int sp_forward(const bvec_t** arg, bvec_t** res,
                     casadi_int* iw, bvec_t* w, void* mem) const override {
