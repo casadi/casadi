@@ -3425,7 +3425,15 @@ DECL void casadi_extract_parametric(const M &expr, const M& par,
         M& OUTPUT1, std::vector<M>& OUTPUT2, std::vector<M>& OUTPUT3, const Dict& opts=Dict()) {
   extract_parametric(expr, par, OUTPUT1, OUTPUT2, OUTPUT3, opts);
 }
+DECL void casadi_extract_parametric(const M &expr, const std::vector<M>& par,
+        M& OUTPUT1, std::vector<M>& OUTPUT2, std::vector<M>& OUTPUT3, const Dict& opts=Dict()) {
+  extract_parametric(expr, par, OUTPUT1, OUTPUT2, OUTPUT3, opts);
+}
 DECL void casadi_extract_parametric(const std::vector<M> &expr, const M& par,
+        std::vector<M>& OUTPUT1, std::vector<M>& OUTPUT2, std::vector<M>& OUTPUT3, const Dict& opts=Dict()) {
+  extract_parametric(expr, par, OUTPUT1, OUTPUT2, OUTPUT3, opts);
+}
+DECL void casadi_extract_parametric(const std::vector<M> &expr, const std::vector<M>& par,
         std::vector<M>& OUTPUT1, std::vector<M>& OUTPUT2, std::vector<M>& OUTPUT3, const Dict& opts=Dict()) {
   extract_parametric(expr, par, OUTPUT1, OUTPUT2, OUTPUT3, opts);
 }

@@ -1005,6 +1005,23 @@ namespace casadi {
       }
     }
 
+    inline friend void extract_parametric(const std::vector<MatType> &expr,
+        const std::vector<MatType>& par,
+        std::vector<MatType>& SWIG_OUTPUT(expr_ret),
+        std::vector<MatType>& SWIG_OUTPUT(symbols),
+        std::vector<MatType>& SWIG_OUTPUT(parametric),
+        const Dict& opts=Dict()) {
+      extract_parametric(expr, veccat(par), expr_ret, symbols, parametric, opts);
+    }
+
+    inline friend void extract_parametric(const MatType &expr, const std::vector<MatType>& par,
+        MatType& SWIG_OUTPUT(expr_ret),
+        std::vector<MatType>& SWIG_OUTPUT(symbols),
+        std::vector<MatType>& SWIG_OUTPUT(parametric),
+        const Dict& opts=Dict()) {
+      extract_parametric(expr, veccat(par), expr_ret, symbols, parametric, opts);
+    }
+
     /* \brief separate an expression into subuexpression that are linear, constant, and nonlinear
     *
     * \param expr[in] The expression to be separated
