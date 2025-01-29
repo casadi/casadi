@@ -12,6 +12,7 @@
             "binaryDir": "${sourceDir}/out/build/${presetName}",
             "installDir": "${sourceDir}/out/install/${presetName}",
             "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
                 "WITH_SELFCONTAINED": "ON",
                 "WITH_BUILD_REQUIRED" : "ON",
                 "WITH_OPENMP" : "ON"
@@ -30,6 +31,15 @@
             }
         },
         {
+            "name": "windows-only",
+            "hidden": true,
+            "condition": {
+              "type": "equals",
+              "lhs": "${hostSystemName}",
+              "rhs": "Windows"
+            }
+        },
+        {
             "name": "mingw",
             "hidden": true,
             "generator": "Ninja",
@@ -37,7 +47,10 @@
                 "WITH_THREAD_MINGW": "ON",
                 "CMAKE_C_COMPILER": "gcc",
                 "CMAKE_CXX_COMPILER": "g++"
-            }
+            },
+            "inherits": [
+                "windows-only"
+            ]
         },
         {
             "name": "mingw-release",
@@ -62,7 +75,10 @@
             "cacheVariables": {
                 "CMAKE_C_COMPILER": "cl",
                 "CMAKE_CXX_COMPILER": "cl"
-            }
+            },
+            "inherits": [
+                "windows-only"
+            ]
         },
         {
             "name": "cl-release",
@@ -92,7 +108,10 @@
                 "microsoft.com/VisualStudioSettings/CMake/1.0": {
                   "intelliSenseMode": "windows-clang-x64"
                 }
-            }
+            },
+            "inherits": [
+                "windows-only"
+            ]
         },
         {
             "name": "clang-cl-release",
@@ -110,5 +129,5 @@
                 "cl"
             ]
         }
-      ]
+    ]
 }
