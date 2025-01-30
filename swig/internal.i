@@ -2272,7 +2272,13 @@
 %exception  casadi::GenericMatrix::extract_parametric(const MatType &expr, const MatType &par, MatType &expr_ret, std::vector< MatType > &symbols, std::vector< MatType > &parametric, const Dict &opts=Dict()) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::GenericMatrix::extract_parametric(const MatType &expr, const std::vector< MatType > &par, MatType &expr_ret, std::vector< MatType > &symbols, std::vector< MatType > &parametric, const Dict &opts=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::GenericMatrix::extract_parametric(const std::vector< MatType > &expr, const MatType &par, std::vector< MatType > &expr_ret, std::vector< MatType > &symbols, std::vector< MatType > &parametric, const Dict &opts=Dict()) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::GenericMatrix::extract_parametric(const std::vector< MatType > &expr, const std::vector< MatType > &par, std::vector< MatType > &expr_ret, std::vector< MatType > &symbols, std::vector< MatType > &parametric, const Dict &opts=Dict()) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::GenericMatrix::forward(const std::vector< MatType > &ex, const std::vector< MatType > &arg, const std::vector< std::vector< MatType > > &v, const Dict &opts=Dict()) {
