@@ -661,6 +661,14 @@ set(BUILD_OSQP_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for OSQP")
 option(WITH_BUILD_OSQP "Build OSQP (BUILD_OSQP_VERSION=${BUILD_OSQP_VERSION}) from downloaded source (BUILD_OSQP_GIT_REPO=${BUILD_OSQP_GIT_REPO})." OFF)
 add_feature_info(osqp-interface WITH_OSQP "Interface to QP solver OSQP.")
 
+# Clarabel: Interior point QP solver
+option(WITH_CLARABEL "Compile the interface to Clarabel" OFF)
+set(BUILD_CLARABEL_VERSION "096df5ee32da24f60c5e6ca0c921e2f31f9ae366" CACHE STRING "Tag/branch/hash to be used for BUILD_CLARABEL_GIT_REPO")
+set(BUILD_CLARABEL_GIT_REPO "https://github.com/jgillis/Clarabel.cpp.git" CACHE STRING "Git repo used together with BUILD_CLARABEL_VERSION")
+set(BUILD_CLARABEL_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for Clarabel")
+option(WITH_BUILD_CLARABEL "Build CLARABEL (BUILD_CLARABEL_VERSION=${BUILD_CLARABEL_VERSION}) from downloaded source (BUILD_OSQP_GIT_REPO=${BUILD_OSQP_GIT_REPO})." OFF)
+add_feature_info(clarabel-interface WITH_CLARABEL "Interface to QP solver CLARABEL.")
+
 set(BUILD_EIGEN3_VERSION "3.4.0" CACHE STRING "Tag/branch/hash to be used for BUILD_EIGEN3_GIT_REPO")
 set(BUILD_EIGEN3_GIT_REPO "https://gitlab.com/libeigen/eigen.git" CACHE STRING "Git repo used together with BUILD_EIGEN3_VERSION")
 set(BUILD_EIGEN3_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for EIGEN3")
@@ -1874,6 +1882,36 @@ if(WITH_OSQP)
   endif()
 endif()
 add_feature_info(osqp-interface WITH_OSQP "Interface to QP solver OSQP.")
+
+if(WITH_CLARABEL)
+  if(WITH_BUILD_CLARABEL)
+    ExternalProject_Add(clarabel-external
+        GIT_REPOSITORY ${BUILD_CLARABEL_GIT_REPO}
+        GIT_SHALLOW ${BUILD_CLARABEL_GIT_SHALLOW}
+        GIT_TAG ${BUILD_CLARABEL_VERSION}
+        PREFIX "${CMAKE_BINARY_DIR}/external_projects"
+        UPDATE_COMMAND ""
+        CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
+        CMAKE_ARGS -DCLARABEL_BUILD_EXAMPLES=OFF -DCMAKE_INSTALL_INCLUDEDIR=include/clarabel  -DCMAKE_INSTALL_RPATH=${CMAKE_INSTALL_RPATH} -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/clarabel")
+    add_library(clarabel SHARED IMPORTED)
+    # This is similar to ALIAS but works fine on imported targets with CMake 3.10
+    add_library(clarabel::clarabel INTERFACE IMPORTED)
+    set_target_properties(clarabel::clarabel PROPERTIES INTERFACE_LINK_LIBRARIES clarabel)
+    add_dependencies(clarabel clarabel-external)
+    set_target_properties(clarabel PROPERTIES
+       INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include/clarabel"
+       IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}clarabel_c${CMAKE_SHARED_LIBRARY_SUFFIX}"
+       IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_IMPORT_LIBRARY_PREFIX}clarabel_c${CMAKE_IMPORT_LIBRARY_SUFFIX}"
+       IMPORTED_SO_NAME "${CMAKE_SHARED_LIBRARY_PREFIX}clarabel_c${CMAKE_SHARED_LIBRARY_SUFFIX}"
+    )
+    install(DIRECTORY
+      "${CMAKE_BINARY_DIR}/external_projects/include/clarabel"
+      DESTINATION "${INCLUDE_PREFIX}")
+      create_import_library(clarabel clarabel_c)
+  endif()
+endif()
+add_feature_info(clarabel-interface WITH_CLARABEL "Interface to QP solver Clarabel.")
 
 if(WITH_SUPERSCS)
   if(WITH_BUILD_SUPERSCS)
