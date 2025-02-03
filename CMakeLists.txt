@@ -424,7 +424,7 @@ set(PYTHON_PREFIX ${DEF_PYTHON_PREFIX} CACHE PATH "Installation directory for Py
 set(MATLAB_PREFIX ${DEF_MATLAB_PREFIX} CACHE PATH "Installation directory for MATLAB/Octave files")
 
 
-install(DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/bin/" OPTIONAL DESTINATION ${LIB_PREFIX})
+install(DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/bin/" OPTIONAL DESTINATION ${BIN_PREFIX} USE_SOURCE_PERMISSIONS)
 install(DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/lib/" OPTIONAL DESTINATION ${LIB_PREFIX})
 install(DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/lib64/" OPTIONAL DESTINATION ${LIB_PREFIX})
 if(CMAKE_CROSS_COMPILING)
@@ -675,6 +675,13 @@ set(BUILD_CLARABEL_GIT_REPO "https://github.com/jgillis/Clarabel.cpp.git" CACHE 
 set(BUILD_CLARABEL_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for Clarabel")
 option(WITH_BUILD_CLARABEL "Build CLARABEL (BUILD_CLARABEL_VERSION=${BUILD_CLARABEL_VERSION}) from downloaded source (BUILD_CLARABEL_GIT_REPO=${BUILD_CLARABEL_GIT_REPO})." OFF)
 add_feature_info(clarabel-interface WITH_CLARABEL "Interface to QP solver CLARABEL.")
+
+option(WITH_RUMOCA "Compile the interface to rumoca" OFF)
+set(BUILD_RUMOCA_VERSION "main" CACHE STRING "Tag/branch/hash to be used for BUILD_RUMOCA_GIT_REPO")
+set(BUILD_RUMOCA_GIT_REPO "https://github.com/jgillis/rumoca.git" CACHE STRING "Git repo used together with BUILD_RUMOCA_VERSION")
+set(BUILD_RUMOCA_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for rumoca")
+option(WITH_BUILD_RUMOCA "Build RUMOCA (BUILD_RUMOCA_VERSION=${BUILD_RUMOCA_VERSION}) from downloaded source (BUILD_RUMOCA_GIT_REPO=${BUILD_RUMOCA_GIT_REPO})." OFF)
+add_feature_info(rumoca-interface WITH_RUMOCA "Interface to rumoca")
 
 set(BUILD_EIGEN3_VERSION "3.4.0" CACHE STRING "Tag/branch/hash to be used for BUILD_EIGEN3_GIT_REPO")
 set(BUILD_EIGEN3_GIT_REPO "https://gitlab.com/libeigen/eigen.git" CACHE STRING "Git repo used together with BUILD_EIGEN3_VERSION")
@@ -1919,6 +1926,22 @@ if(WITH_CLARABEL)
   endif()
 endif()
 add_feature_info(clarabel-interface WITH_CLARABEL "Interface to QP solver Clarabel.")
+
+if(WITH_RUMOCA)
+  if(WITH_BUILD_RUMOCA)
+    ExternalProject_Add(rumoca-external
+        GIT_REPOSITORY ${BUILD_RUMOCA_GIT_REPO}
+        GIT_SHALLOW ${BUILD_RUMOCA_GIT_SHALLOW}
+        GIT_TAG ${BUILD_RUMOCA_VERSION}
+        PREFIX "${CMAKE_BINARY_DIR}/external_projects"
+        UPDATE_COMMAND ""
+        CONFIGURE_COMMAND ""
+        BUILD_IN_SOURCE ON #  --target-dir=<BINARY_DIR>
+        BUILD_COMMAND cargo build ${CROSS_FLAGS_RUST} -v
+        INSTALL_COMMAND cargo install --path . --root <INSTALL_DIR>)
+  endif()
+endif()
+add_feature_info(rumoca-interface WITH_RUMOCA "Interface to rumoca.")
 
 if(WITH_SUPERSCS)
   if(WITH_BUILD_SUPERSCS)
