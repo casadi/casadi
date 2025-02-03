@@ -757,7 +757,7 @@ void FatropInterface::set_fatrop_prob() {
 
   p_.sp_a = jacg_sp_;
   p_.sp_h = hesslag_sp_;
-  get_function("nlp_hess_l").save("nlp_hess_l.casadi");
+
   p_.nlp_hess_l = OracleCallback("nlp_hess_l", this);
   p_.nlp_jac_g = OracleCallback("nlp_jac_g", this);
   p_.nlp_grad_f = OracleCallback("nlp_grad_f", this);
