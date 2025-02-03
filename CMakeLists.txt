@@ -201,7 +201,9 @@ set(EXTERNAL_PROJECT_FCFLAGS "")
 set(CROSS_FLAGS_CONFIGURE "")
 set(CROSS_FLAGS_C "")
 set(CROSS_FLAGS_FORTRAN "")
+set(CROSS_FLAGS_RUST "")
 set(CROSS_FLAGS_CMAKE)
+set(CROSS_TARGET_RUST "")
 
 if(CMAKE_CROSS_COMPILING OR DEFINED ENV{CROSS_TRIPLE})
   set(CROSS_FLAGS_CONFIGURE "--host=$ENV{CROSS_TRIPLE}")
@@ -211,12 +213,17 @@ if(CMAKE_CROSS_COMPILING OR DEFINED ENV{CROSS_TRIPLE})
     set(EXTRA_CASADI_CXX_FLAGS "-Wl,--unresolved-symbols=ignore-all")
     set(EXTRA_CASADI_C_FLAGS "-Wl,--unresolved-symbols=ignore-all")
     #set(CROSS_FLAGS_CMAKE ${CROSS_FLAGS_CMAKE} "-DCMAKE_EXE_LINKER_FLAGS_INIT=--unresolved-symbols=ignore-all")
+    set(CROSS_TARGET_RUST aarch64-unknown-linux-gnu)
+    set(CROSS_FLAGS_RUST "${CROSS_FLAGS_RUST};--target=${CROSS_TARGET_RUST}")
   endif()
   if("$ENV{CROSS_TRIPLE}" MATCHES "mingw32")
     # https://github.com/casadi/artifacts/issues/3
     set(CROSS_FLAGS_FORTRAN "lt_cv_deplibs_check_method=pass_all")
+    set(CROSS_TARGET_RUST x86_64-pc-windows-gnu)
+    set(CROSS_FLAGS_RUST "${CROSS_FLAGS_RUST};--target=${CROSS_TARGET_RUST}")
   endif()
 endif()
+
 
 
 if(APPLE)
@@ -663,7 +670,7 @@ add_feature_info(osqp-interface WITH_OSQP "Interface to QP solver OSQP.")
 
 # Clarabel: Interior point QP solver
 option(WITH_CLARABEL "Compile the interface to Clarabel" OFF)
-set(BUILD_CLARABEL_VERSION "096df5ee32da24f60c5e6ca0c921e2f31f9ae366" CACHE STRING "Tag/branch/hash to be used for BUILD_CLARABEL_GIT_REPO")
+set(BUILD_CLARABEL_VERSION "e1d32ecee492e4dcf982df71f85c31fc63639ee1" CACHE STRING "Tag/branch/hash to be used for BUILD_CLARABEL_GIT_REPO")
 set(BUILD_CLARABEL_GIT_REPO "https://github.com/jgillis/Clarabel.cpp.git" CACHE STRING "Git repo used together with BUILD_CLARABEL_VERSION")
 set(BUILD_CLARABEL_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for Clarabel")
 option(WITH_BUILD_CLARABEL "Build CLARABEL (BUILD_CLARABEL_VERSION=${BUILD_CLARABEL_VERSION}) from downloaded source (BUILD_OSQP_GIT_REPO=${BUILD_OSQP_GIT_REPO})." OFF)
@@ -1892,7 +1899,7 @@ if(WITH_CLARABEL)
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
         CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
-        CMAKE_ARGS -DCLARABEL_BUILD_EXAMPLES=OFF -DCMAKE_INSTALL_INCLUDEDIR=include/clarabel  -DCMAKE_INSTALL_RPATH=${CMAKE_INSTALL_RPATH} -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
+        CMAKE_ARGS -DCLARABEL_BUILD_EXAMPLES=OFF -DCMAKE_INSTALL_INCLUDEDIR=include/clarabel -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/clarabel")
     add_library(clarabel SHARED IMPORTED)
     # This is similar to ALIAS but works fine on imported targets with CMake 3.10
