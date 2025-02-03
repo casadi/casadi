@@ -54,6 +54,10 @@ if(WITH_HIGHS)
   add_subdirectory(highs)
 endif()
 
+if(WITH_CLARABEL)
+  add_subdirectory(clarabel)
+endif()
+
 if(WITH_DAQP)
   add_subdirectory(daqp)
 endif()

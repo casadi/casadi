@@ -1,0 +1,230 @@
+{%- macro render_class(class) %}
+class {% if class.class_type == "Function" -%}__{% endif -%}{{ class.name }}(BaseModel):
+    """
+    {{ class.description }}
+    """
+
+    def __init__(self):
+        super().__init__('{{ class.name }}')
+
+        # Constants
+        {{ render_variables(class, class.c, "c") | indent(4) }}
+
+        # Constant values
+        {{ render_bindings(class, class.c) | indent(4) }}
+
+        # Parameters
+        {{ render_variables(class, class.p, "p") | indent(4) }}
+
+        # Parameter values
+        {{ render_bindings(class, class.p) | indent(4) }}
+
+        # Discrete states
+        {{ render_variables(class, class.z, "x") | indent(4) }}
+
+        # Discrete states start values
+        {{ render_start(class, class.z) | indent(4) }}
+
+        # Inputs
+        {{ render_variables(class, class.u, "u") | indent(4) }}
+
+        # Outputs
+        {{ render_variables(class, class.y, "y") | indent(4) }}
+
+        # Internal variables
+        {{ render_variables(class, class.w, "w") | indent(4) }}
+
+        # Differential states
+        {{ render_variables(class, class.x, "x") | indent(4) }}
+
+        # Differential states start values
+        {{ render_start(class, class.x) | indent(4) }}
+
+        # Algorithmic statements
+        {{ render_statement_list(class.algorithm) | indent(4) }}
+
+        # Algebraic equations
+        {{ render_statement_list(class.algebric) | indent(4) }}
+
+        # Differential equations
+        {{ render_ode(class.ode, class.x) | indent(4) }}
+
+{% if class.class_type == "Function" %}
+    def __call__(self, *args):
+        raise NotImplementedError
+
+# callable function singleton
+{{ class.name }} = __{{ class .name }}()
+
+{% endif %}
+{%- endmacro %}
+
+{%- macro render_ndarray(array) -%}
+    {%- if array.dim | length  == 1 -%}
+        {%- if array.dim == [1] -%}
+            {{ array.data[0] }}
+        {%- else -%}
+            {{ "[" }}{%- for i in range(array.dim[0]) -%}
+                {{ array.data[i]}}{% if not loop.last %},{% endif -%}
+            {%- endfor -%}{{ "]" }}
+        {%- endif -%}
+    {%- else -%}
+        {{ "[" }}{%- for i in range(array.dim[0]) -%}
+            {{ render_ndarray(array[i]) }}{% if not loop.last %},{% endif -%}
+        {%- endfor -%}{{ "]" }}
+    {%- endif -%}
+{%- endmacro -%}
+
+{%- macro render_variables(class, var_list, ca_type) -%}
+    {%- for var in var_list -%}
+    self.dae.add('{{ var }}', dict(type = '{{ca_type}}'
+        {%- set comp = class.components[var] -%}
+        {%- if comp.array_subscripts | length > 0 -%}{{ ", dimension = [" }}
+            {%- for sub in comp.array_subscripts -%}
+                {{ render_subscript(sub) -}}{% if not loop.last %},{% endif -%}
+            {%- endfor -%}
+        {{ "]" }}{%- endif -%}))
+    {% endfor -%}
+{%- endmacro -%}
+
+{%- macro render_bindings(class, var_list) -%}
+    {%- for var in var_list -%}
+    {%- set comp = class.components[var] -%}
+    self.dae.bind('{{ var }}', {{ render_ndarray(comp.start_value) | indent(4) }})
+    {% endfor -%}
+{%- endmacro -%}
+
+{%- macro render_start(class, var_list) -%}
+    {%- for var in var_list -%}
+    {%- set comp = class.components[var] -%}
+    self.dae.set_start('{{ var }}', {{ render_ndarray(comp.start_value) | indent(4) }})
+    {% endfor -%}
+{%- endmacro -%}
+
+{%- macro render_ode(map, var_list) -%}
+    {%- for var in var_list -%}
+    {%- set expr = map[var] -%}
+    self.dae.bind(self.dae.der('{{ var }}'), {{ render_expression(expr=expr) }})
+    {% endfor -%}
+{%- endmacro -%}
+
+{%- macro render_binary(op, expr) -%}
+    {{ render_expression(expr=expr.lhs) }}{{ op }}{{ render_expression(expr=expr.rhs) -}}
+{%- endmacro -%}
+
+{%- macro render_unary(op, expr) -%}
+    {{ op }}{{ render_expression(expr=expr.rhs) -}}
+{%- endmacro -%}
+
+{%- macro render_subscript(sub) -%}
+    {%- for key, value in sub | items -%}
+        {%- if key == "Expression" -%}
+            {{ render_expression(expr=sub.Expression) | int }}
+        {%- elif key == "Colon" -%}
+            :
+        {%- endif -%}
+    {%- endfor -%}
+{%- endmacro -%}
+
+{%- macro render_component_reference(comp) -%}
+    {%- if comp.local %}.{% endif -%}
+    {%- for part in comp.parts -%}
+        '{{ part.name }}'
+        {%- if part.array_subscripts | length > 0 %}, [
+            {%- for sub in part.array_subscripts -%}
+                {#- handles index from 1 to 0 from Modelica to python-#}
+                {{ render_subscript(sub) | int -1 }}{% if not loop.last -%}, {% endif %}
+            {%- endfor -%}]
+        {%- endif -%}
+    {%- endfor -%}
+{%- endmacro -%}
+
+{%- macro render_expression(expr) -%}
+    {%- for key, value in expr | items -%}
+        {%- if key == "UnsignedReal" -%}
+            {{ value }}
+        {%- elif key == "UnsignedInteger" -%}
+            {{ value }}
+        {%- elif key == "Ref" -%}
+            self.dae({{ render_component_reference(comp=value.comp) }})
+        {%- elif key == "Add" -%}
+            {{ render_binary(op=" + ", expr=value) -}}
+        {%- elif key == "Sub" -%}
+            {{ render_binary(op=" - ", expr=value) -}}
+        {%- elif key == "Mul" -%}
+            {{ render_binary(op="*", expr=value) -}}
+        {%- elif key == "Div" -%}
+            {{ render_binary(op="/", expr=value) -}}
+        {%- elif key == "Exp" -%}
+            {{- render_binary(op="^", expr=value) -}}
+        {%- elif key == "Negative" -%}
+            {{ render_unary(op="-", expr=value) -}}
+        {%- elif key == "Parenthesis" -%}
+            ( {{- render_expression(expr=value.rhs) -}} )
+        {%- elif key == "Not" %}
+            {{- render_unary(op="!", expr=value) -}}
+        {%- elif key == "Or" -%}
+            ca.logic_or(
+                {{- render_expression(expr=value.lhs) -}},
+                {{- render_expression(expr=value.rhs) -}})
+        {%- elif key == "And" -%}
+            ca.logic_and(
+                {{- render_expression(expr=value.lhs) -}},
+                {{- render_expression(expr=value.rhs) -}})
+        {%- elif key == "Equal" -%}
+                {{- render_expression(expr=value.lhs) -}} ==
+                {{- render_expression(expr=value.rhs) -}}
+        {%- elif key == "ArrayArguments" -%}
+            ca.vertcat(
+            {%- for arg in value.args -%}
+                {{- "\n       " }} {{ render_expression(expr=arg) }} {%- if not loop.last -%},{% endif %}
+            {%- endfor -%})
+        {%- elif key == "FunctionCall" -%}
+            {{ value.comp.name }}(
+                {%- for arg in value.args -%}
+                    {{ render_expression(expr=arg) }} {% if not loop.last -%}, {% endif %}
+                {%- endfor -%})
+        {%- else -%}
+            {{ warn("unknown expression: " + key + value | pprint) }}
+        {%- endif -%}
+    {%- endfor -%}
+{%- endmacro -%}
+
+{%- macro render_statement_list(stmt_list) -%}
+    {%- for stmt in stmt_list -%}
+        {{ render_statement(stmt=stmt) }}
+    {% endfor -%}
+{%- endmacro -%}
+
+{%- macro render_statement(stmt) -%}
+    {%- for key, value in stmt | items -%}
+        {%- if key == "Assignment" -%}
+        self.dae.bind({{ render_component_reference(comp=value.comp) }}, {{ render_expression(expr=value.rhs) }})
+        {%- else -%}
+        {{ warn("unknown statement: " + key) }}
+        {%- endif %}
+    {%- endfor -%}
+{%- endmacro -%}
+# rumoca pkg version : {{ def.rumoca_version }}
+# rumoca git version : {{ def.rumoca_git_hash }}
+# template md5       : {{ def.template_md5 }}
+# model md5          : {{ def.model_md5 }}
+
+import casadi as ca
+import numpy as np
+
+
+class BaseModel:
+
+    def __init__(self, name):
+        # Underlying DaeBuilder instance
+        self.dae = ca.DaeBuilder(name)
+
+    def __repr__(self):
+        return repr(self.dae)
+
+{%- for key, val in def.classes | items %}
+
+{{ render_class(class=val) }}
+{%- endfor %}
+
