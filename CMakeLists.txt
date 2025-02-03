@@ -673,7 +673,7 @@ option(WITH_CLARABEL "Compile the interface to Clarabel" OFF)
 set(BUILD_CLARABEL_VERSION "e1d32ecee492e4dcf982df71f85c31fc63639ee1" CACHE STRING "Tag/branch/hash to be used for BUILD_CLARABEL_GIT_REPO")
 set(BUILD_CLARABEL_GIT_REPO "https://github.com/jgillis/Clarabel.cpp.git" CACHE STRING "Git repo used together with BUILD_CLARABEL_VERSION")
 set(BUILD_CLARABEL_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for Clarabel")
-option(WITH_BUILD_CLARABEL "Build CLARABEL (BUILD_CLARABEL_VERSION=${BUILD_CLARABEL_VERSION}) from downloaded source (BUILD_OSQP_GIT_REPO=${BUILD_OSQP_GIT_REPO})." OFF)
+option(WITH_BUILD_CLARABEL "Build CLARABEL (BUILD_CLARABEL_VERSION=${BUILD_CLARABEL_VERSION}) from downloaded source (BUILD_CLARABEL_GIT_REPO=${BUILD_CLARABEL_GIT_REPO})." OFF)
 add_feature_info(clarabel-interface WITH_CLARABEL "Interface to QP solver CLARABEL.")
 
 set(BUILD_EIGEN3_VERSION "3.4.0" CACHE STRING "Tag/branch/hash to be used for BUILD_EIGEN3_GIT_REPO")
