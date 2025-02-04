@@ -1398,8 +1398,10 @@ bool FmuFunction::all_vectors() const {
       // Supported if one derivative
       case InputType::FWD:
         if (nfwd_ > 1) return false;
+        break;
       case InputType::ADJ:
         if (nadj_ > 1) return false;
+        break;
       // Not supported
       default:
         return false;
