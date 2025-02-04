@@ -340,9 +340,6 @@ void FmuFunction::init(const Dict& opts) {
   if (has_fwd_ && !uses_directional_derivatives_)
     casadi_error("Analytic derivatives needed for forward directional derivatives");
 
-  // Only single adjoint derivative supported
-  if (nadj_ > 1) casadi_error("Multiple adjoint directions not supported");
-
   // Quick return if no Jacobian calculation
   if (!has_jac_ && !has_adj_ && !has_hess_) return;
 
@@ -504,8 +501,8 @@ void FmuFunction::init(const Dict& opts) {
 
   // Work vectors for adjoint derivative calculation, shared between threads
   if (has_adj_) {
-    alloc_w(fmu_.n_out(), true);  // aseed
-    alloc_w(fmu_.n_in(), true);  // asens
+    alloc_w(nadj_ * fmu_.n_out(), true);  // aseed
+    alloc_w(nadj_ * fmu_.n_in(), true);  // asens
   }
 
   // If Hessian calculation is needed
@@ -757,7 +754,7 @@ Sparsity FmuFunction::get_sparsity_in(casadi_int i) {
     case InputType::FWD:
       return Sparsity::dense(fmu_.ired(in_.at(i).ind).size(), nfwd_);
     case InputType::ADJ:
-      return Sparsity::dense(fmu_.ored(in_.at(i).ind).size(), 1);
+      return Sparsity::dense(fmu_.ored(in_.at(i).ind).size(), nadj_);
     case InputType::OUT:
       return Sparsity(fmu_.ored(in_.at(i).ind).size(), 1);
     case InputType::ADJ_OUT:
@@ -774,7 +771,7 @@ Sparsity FmuFunction::get_sparsity_out(casadi_int i) {
     case OutputType::FWD:
       return Sparsity::dense(fmu_.ored(s.ind).size(), nfwd_);
     case OutputType::ADJ:
-      return Sparsity::dense(fmu_.ired(s.wrt).size(), 1);
+      return Sparsity::dense(fmu_.ired(s.wrt).size(), nadj_);
     case OutputType::JAC:
       return fmu_.jac_sparsity(s.ind, s.wrt);
     case OutputType::JAC_TRANS:
@@ -873,16 +870,20 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
   }
   if (need_adj) {
     // Set up vectors
-    aseed = w; w += fmu_.n_out();
-    asens = w; w += fmu_.n_in();
+    aseed = w; w += nadj_ * fmu_.n_out();
+    asens = w; w += nadj_ * fmu_.n_in();
     // Clear seed/sensitivity vectors
-    std::fill(aseed, aseed + fmu_.n_out(), 0);
-    std::fill(asens, asens + fmu_.n_in(), 0);
+    std::fill(aseed, aseed + nadj_ * fmu_.n_out(), 0);
+    std::fill(asens, asens + nadj_ * fmu_.n_in(), 0);
     // Copy adjoint seeds to aseed
     for (size_t i = 0; i < in_.size(); ++i) {
       if (arg[i] && in_[i].type == InputType::ADJ) {
         const std::vector<size_t>& oind = fmu_.ored(in_[i].ind);
-        for (size_t k = 0; k < oind.size(); ++k) aseed[oind[k]] = arg[i][k];
+        for (casadi_int d = 0; d < nadj_; ++d) {
+          size_t aseed_off = d * fmu_.n_out();
+          size_t off = d * size1_in(i);
+          for (size_t k = 0; k < oind.size(); ++k) aseed[oind[k] + aseed_off] = arg[i][k + off];
+        }
       }
     }
   }
@@ -943,7 +944,10 @@ int FmuFunction::eval(const double** arg, double** res, casadi_int* iw, double* 
       case OutputType::ADJ:
         // If adjoint sensitivities have not already been set
         if (need_jac || !uses_adjoint_derivatives_) {
-          for (size_t id : fmu_.ired(out_[k].wrt)) *r++ = asens[id];
+          for (casadi_int d = 0; d < nadj_; ++d) {
+            size_t asens_off = d * fmu_.n_in();
+            for (size_t id : fmu_.ired(out_[k].wrt)) *r++ = asens[id + asens_off];
+          }
         }
         break;
       case OutputType::HESS:
@@ -1102,29 +1106,44 @@ int FmuFunction::eval_task(FmuMemory* m, casadi_int task, casadi_int n_task,
       }
       // Propagate adjoint sensitivities
       if (need_adj) {
-        for (casadi_int i = 0; i < m->d.nsens; ++i)
-          m->asens[m->d.wrt[i]] += m->aseed[m->d.isens[i]] * m->d.sens[i];
+        for (casadi_int d = 0; d < nadj_; ++d) {
+          size_t aseed_off = d * fmu_.n_out();
+          size_t asens_off = d * fmu_.n_in();
+          for (casadi_int i = 0; i < m->d.nsens; ++i) {
+            m->asens[m->d.wrt[i] + asens_off] += m->aseed[m->d.isens[i] + aseed_off]
+              * m->d.sens[i];
+          }
+        }
       }
     }
   } else if (need_adj) { // Adjoint derivatives, without forming the extended Jacobian
-    // Pass all adjoint seeds
-    for (size_t k = 0; k < in_.size(); ++k) {
-      if (in_[k].type == InputType::ADJ) {
-        fmu_.set_adj(m, in_[k].ind, m->arg[k]);
+    // Selection of forward derivatives to be evaluated for the thread
+    casadi_int d_begin = (task * nadj_) / n_task;
+    casadi_int d_end = ((task + 1) * nadj_) / n_task;
+    // Loop over forward derivatives
+    for (casadi_int d = d_begin; d < d_end; ++d) {
+      // Print progress
+      if (print_progress_) print("Adjoint sensitivities, thread %d/%d: Direction %d/%d\n",
+        task + 1, n_task, d - d_begin + 1, d_end - d_begin);
+      // Pass all adjoint seeds
+      for (size_t k = 0; k < in_.size(); ++k) {
+        if (m->arg[k] && in_[k].type == InputType::ADJ) {
+          fmu_.set_adj(m, in_[k].ind, m->arg[k] + d * size1_in(k));
+        }
       }
-    }
-    // Request adjoint sensitivities
-    for (size_t k = 0; k < out_.size(); ++k) {
-      if (m->res[k] && out_[k].type == OutputType::ADJ) {
-        fmu_.request_adj(m, out_[k].wrt);
+      // Request adjoint sensitivities
+      for (size_t k = 0; k < out_.size(); ++k) {
+        if (m->res[k] && out_[k].type == OutputType::ADJ) {
+          fmu_.request_adj(m, out_[k].wrt);
+        }
       }
-    }
-    // Calculate derivatives
-    if (fmu_.eval_adj(m)) return 1;
-    // Collect adjoint sensitivities
-    for (size_t k = 0; k < out_.size(); ++k) {
-      if (m->res[k] && out_[k].type == OutputType::ADJ) {
-        fmu_.get_adj(m, out_[k].wrt, m->res[k]);
+      // Calculate derivatives
+      if (fmu_.eval_adj(m)) return 1;
+      // Collect adjoint sensitivities
+      for (size_t k = 0; k < out_.size(); ++k) {
+        if (m->res[k] && out_[k].type == OutputType::ADJ) {
+          fmu_.get_adj(m, out_[k].wrt, m->res[k] + d * size1_out(k));
+        }
       }
     }
   }
@@ -1374,9 +1393,13 @@ bool FmuFunction::all_vectors() const {
     switch (e.type) {
       // Supported for derivative calculations
       case InputType::REG:
-      case InputType::ADJ:
       case InputType::OUT:
         break;
+      // Supported if one derivative
+      case InputType::FWD:
+        if (nfwd_ > 1) return false;
+      case InputType::ADJ:
+        if (nadj_ > 1) return false;
       // Not supported
       default:
         return false;
@@ -1479,22 +1502,21 @@ Function FmuFunction::get_forward(casadi_int nfwd, const std::string& name,
 bool FmuFunction::has_reverse(casadi_int nadj) const {
   // Only first order analytic derivative possible
   if (!all_regular()) return false;
-  // Otherwise: Only 1 direction implemented
-  return nadj == 1;
+  // Use analytic adjoint derivatives
+  return true;
 }
 
 Function FmuFunction::get_reverse(casadi_int nadj, const std::string& name,
     const std::vector<std::string>& inames,
     const std::vector<std::string>& onames,
     const Dict& opts) const {
-  // Only single directional derivative implemented
-  casadi_assert(nadj == 1, "Not implemented");
   // Hack: Inherit parallelization option
   Dict opts1 = opts;
   opts1["parallelization"] = to_string(parallelization_);
   opts1["verbose"] = verbose_;
   opts1["new_jacobian"] = new_hessian_;
   opts1["print_progress"] = print_progress_;
+  opts1["nadj"] = nadj;
   // Return new instance of class
   Function ret;
   ret.own(new FmuFunction(name, fmu_, inames, onames));
