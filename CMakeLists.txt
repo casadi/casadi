@@ -1906,7 +1906,7 @@ if(WITH_CLARABEL)
         PREFIX "${CMAKE_BINARY_DIR}/external_projects"
         UPDATE_COMMAND ""
         CMAKE_COMMAND "${EXTERNAL_CMAKE_COMMAND}"
-        CMAKE_ARGS -DCLARABEL_BUILD_EXAMPLES=OFF -DCMAKE_INSTALL_INCLUDEDIR=include/clarabel -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
+        CMAKE_ARGS -DCLARABEL_BUILD_EXAMPLES=OFF -DCMAKE_INSTALL_LIBDIR=lib -DCMAKE_INSTALL_INCLUDEDIR=include/clarabel -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>)
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/external_projects/include/clarabel")
     add_library(clarabel SHARED IMPORTED)
     # This is similar to ALIAS but works fine on imported targets with CMake 3.10
