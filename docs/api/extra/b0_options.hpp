@@ -3641,10 +3641,12 @@
 <tr><td>make_symmetric</td><td>OT_BOOL</td><td>Ensure Hessian is symmetric</td><td>casadi::FmuFunction</td></tr>
 <tr><td>max_io</td><td>OT_INT</td><td>Acceptable number of inputs and outputs. Warn if exceeded.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>max_num_dir</td><td>OT_INT</td><td>Specify the maximum number of directions for derivative functions. Overrules the builtin optimized_num_dir.</td><td>casadi::FunctionInternal</td></tr>
+<tr><td>nadj</td><td>OT_INT</td><td>Number of adjoint sensitivities to be calculated [1]</td><td>casadi::FmuFunction</td></tr>
 <tr><td>never_inline</td><td>OT_BOOL</td><td>Forbid inlining.</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>new_forward</td><td>OT_BOOL</td><td>Use forward AD implementation in class (conversion option, to be removed)</td><td>casadi::FmuFunction</td></tr>
 <tr><td>new_hessian</td><td>OT_BOOL</td><td>Use Hessian implementation in class (conversion option, to be removed)</td><td>casadi::FmuFunction</td></tr>
 <tr><td>new_jacobian</td><td>OT_BOOL</td><td>Use Jacobian implementation in class (conversion option, to be removed)</td><td>casadi::FmuFunction</td></tr>
+<tr><td>nfwd</td><td>OT_INT</td><td>Number of forward sensitivities to be calculated [1]</td><td>casadi::FmuFunction</td></tr>
 <tr><td>output_scheme</td><td>OT_STRINGVECTOR</td><td>Deprecated option (ignored)</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>parallelization</td><td>OT_STRING</td><td>Parallelization [SERIAL|openmp|thread]</td><td>casadi::FmuFunction</td></tr>
 <tr><td>post_expand</td><td>OT_BOOL</td><td>After construction, expand this Function. Default: False</td><td>casadi::FunctionInternal</td></tr>
