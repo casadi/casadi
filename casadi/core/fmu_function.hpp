@@ -158,6 +158,9 @@ class CASADI_EXPORT FmuFunction : public FunctionInternal {
   // Override provides_directional_derivatives, provides_adjoint_derivatives
   bool uses_directional_derivatives_, uses_adjoint_derivatives_;
 
+  /// Number of sensitivities
+  casadi_int nfwd_, nadj_;
+
   // Validate derivative calculations: Move to base class?
   bool validate_forward_, validate_hessian_;
 
