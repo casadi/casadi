@@ -183,7 +183,12 @@ int casadi_clarabel_solve(casadi_clarabel_data<T1>* d,
 
     ClarabelFloat b[5] = { 0., 1., 1., 1., 1. };
 
-    ClarabelSupportedConeT cones[2] = { ClarabelZeroConeT(1), ClarabelNonnegativeConeT(4) };
+    ClarabelSupportedConeT cones[2];
+
+    cones[0].tag = ClarabelZeroConeT_Tag;
+    cones[0].zero_cone_t = 1;
+    cones[1].tag = ClarabelNonnegativeConeT_Tag;
+    cones[1].nonnegative_cone_t = 4;
 
     // Settings
     ClarabelDefaultSettings settings = clarabel_DefaultSettings_default();
