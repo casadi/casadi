@@ -1453,8 +1453,6 @@ bool FmuFunction::has_forward(casadi_int nfwd) const {
   if (!new_forward_) return FunctionInternal::has_forward(nfwd);
   // Only first order analytic derivative possible
   if (!all_regular()) return false;
-  // FD to get forward directional derivatives not implemented
-  if (!uses_directional_derivatives_) return false;
   // Use analytic forward derivatives
   return true;
 }
