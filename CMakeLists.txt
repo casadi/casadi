@@ -670,7 +670,7 @@ add_feature_info(osqp-interface WITH_OSQP "Interface to QP solver OSQP.")
 
 # Clarabel: Interior point QP solver
 option(WITH_CLARABEL "Compile the interface to Clarabel" OFF)
-set(BUILD_CLARABEL_VERSION "8a751eb3e14f3c1ec36ede5167bcde18898e7253" CACHE STRING "Tag/branch/hash to be used for BUILD_CLARABEL_GIT_REPO")
+set(BUILD_CLARABEL_VERSION "8ce2c4b21a2275cb95d90d2088114b399b43f966" CACHE STRING "Tag/branch/hash to be used for BUILD_CLARABEL_GIT_REPO")
 set(BUILD_CLARABEL_GIT_REPO "https://github.com/jgillis/Clarabel.cpp.git" CACHE STRING "Git repo used together with BUILD_CLARABEL_VERSION")
 set(BUILD_CLARABEL_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for Clarabel")
 option(WITH_BUILD_CLARABEL "Build CLARABEL (BUILD_CLARABEL_VERSION=${BUILD_CLARABEL_VERSION}) from downloaded source (BUILD_CLARABEL_GIT_REPO=${BUILD_CLARABEL_GIT_REPO})." OFF)
