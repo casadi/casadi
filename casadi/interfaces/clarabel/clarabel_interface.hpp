@@ -38,7 +38,8 @@ namespace casadi {
     \par
       Interface to the Clarabel solver for sparse Quadratic Programs.
       See the Clarabel documentation (e.g. clarabel.dev) for more details.
-*/
+
+    \identifier{2bu} */
 
 /** \pluginsection{Conic,clarabel} */
 

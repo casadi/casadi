@@ -49716,7 +49716,7 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/generic_shared_impl.hp
 ";
 
 
-// File: namespace_0d401.xml
+// File: namespace_0d405.xml
 
 
 // File: namespacealpaqa.xml
@@ -52244,6 +52244,8 @@ General information
 List of plugins
 - cbc
 
+- clarabel
+
 - clp
 
 - cplex
@@ -52322,6 +52324,29 @@ Extra doc: https://github.com/casadi/casadi/wiki/L_221
 | sos_weights | OT_DOUBLEVECTORVECTOR | Weights corresponding to SOS       |
 |             |                       | entries.                           |
 +-------------+-----------------------+------------------------------------+
+
+
+
+--------------------------------------------------------------------------------
+
+clarabel
+--------
+
+
+
+Interface to the Clarabel solver for sparse Quadratic Programs. See 
+the 
+Clarabel documentation (e.g. clarabel.dev) for more details.
+
+Extra doc: https://github.com/casadi/casadi/wiki/L_2bu
+
+>List of available options
+
++----------+---------+-----------------------------------+
+|    Id    |  Type   |            Description            |
++==========+=========+===================================+
+| clarabel | OT_DICT | Options to be passed to Clarabel. |
++----------+---------+-----------------------------------+
 
 
 
