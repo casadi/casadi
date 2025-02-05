@@ -10396,11 +10396,19 @@ stream) "
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::DeserializerBase::blind_unpack_mx_v1() "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::DeserializerBase::blind_unpack_dm() "
 
 [INTERNAL] ";
 
 %feature("docstring")  casadi::DeserializerBase::blind_unpack_sx() "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::DeserializerBase::blind_unpack_sx_v1() "
 
 [INTERNAL] ";
 
@@ -10438,11 +10446,21 @@ casadi::DeserializerBase::blind_unpack_sparsity_vector() "
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::DeserializerBase::blind_unpack_mx_vector_v1()
+ "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::DeserializerBase::blind_unpack_dm_vector() "
 
 [INTERNAL] ";
 
 %feature("docstring")  casadi::DeserializerBase::blind_unpack_sx_vector() "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::DeserializerBase::blind_unpack_sx_vector_v1()
+ "
 
 [INTERNAL] ";
 
@@ -10802,10 +10820,10 @@ See:
 Extra doc: https://github.com/casadi/casadi/wiki/L_7t
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/serializer.hpp#L250
+https://github.com/casadi/casadi/blob/develop/casadi/core/serializer.hpp#L258
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/serializer.cpp#L106-L112
+https://github.com/casadi/casadi/blob/develop/casadi/core/serializer.cpp#L110-L116
 
 ";
 
@@ -10825,11 +10843,19 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/serializer.cpp#L106-L1
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::DeserializerBase::blind_unpack_mx_v1() "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::DeserializerBase::blind_unpack_dm() "
 
 [INTERNAL] ";
 
 %feature("docstring")  casadi::DeserializerBase::blind_unpack_sx() "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::DeserializerBase::blind_unpack_sx_v1() "
 
 [INTERNAL] ";
 
@@ -10867,11 +10893,21 @@ casadi::DeserializerBase::blind_unpack_sparsity_vector() "
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::DeserializerBase::blind_unpack_mx_vector_v1()
+ "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::DeserializerBase::blind_unpack_dm_vector() "
 
 [INTERNAL] ";
 
 %feature("docstring")  casadi::DeserializerBase::blind_unpack_sx_vector() "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::DeserializerBase::blind_unpack_sx_vector_v1()
+ "
 
 [INTERNAL] ";
 
@@ -11013,7 +11049,7 @@ See:
 Extra doc: https://github.com/casadi/casadi/wiki/L_7q
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/serializer.hpp#L221
+https://github.com/casadi/casadi/blob/develop/casadi/core/serializer.hpp#L229
 
 Implementation: 
 https://github.com/casadi/casadi/blob/develop/casadi/core/serializer.cpp#L41-L49
@@ -25494,7 +25530,7 @@ The purpose of extract_parametric is ultimately to save on evaluation
 time 
 of an expression, by extracting out the parts that are only 
 solely 
-dependant on parameters.
+dependent on parameters.
 
 For any: [expr_ret, symbols, parametric] = extract_parametric(expr, 
 par) It
@@ -25543,7 +25579,7 @@ The purpose of extract_parametric is ultimately to save on evaluation
 time 
 of an expression, by extracting out the parts that are only 
 solely 
-dependant on parameters.
+dependent on parameters.
 
 For any: [expr_ret, symbols, parametric] = extract_parametric(expr, 
 par) It
@@ -25593,7 +25629,7 @@ The purpose of extract_parametric is ultimately to save on evaluation
 time 
 of an expression, by extracting out the parts that are only 
 solely 
-dependant on parameters.
+dependent on parameters.
 
 For any: [expr_ret, symbols, parametric] = extract_parametric(expr, 
 par) It
@@ -46433,10 +46469,10 @@ See:
 Extra doc: https://github.com/casadi/casadi/wiki/L_7r
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/serializer.hpp#L233
+https://github.com/casadi/casadi/blob/develop/casadi/core/serializer.hpp#L241
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/serializer.cpp#L114-L117
+https://github.com/casadi/casadi/blob/develop/casadi/core/serializer.cpp#L118-L121
 
 ";
 
@@ -46453,10 +46489,10 @@ Sets the string to deserialize objects from.
 Extra doc: https://github.com/casadi/casadi/wiki/L_7s
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/serializer.hpp#L240
+https://github.com/casadi/casadi/blob/develop/casadi/core/serializer.hpp#L248
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/serializer.cpp#L91-L96
+https://github.com/casadi/casadi/blob/develop/casadi/core/serializer.cpp#L95-L100
 
 ";
 
@@ -46472,11 +46508,19 @@ https://github.com/casadi/casadi/blob/develop/casadi/core/serializer.cpp#L91-L96
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::DeserializerBase::blind_unpack_mx_v1() "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::DeserializerBase::blind_unpack_dm() "
 
 [INTERNAL] ";
 
 %feature("docstring")  casadi::DeserializerBase::blind_unpack_sx() "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::DeserializerBase::blind_unpack_sx_v1() "
 
 [INTERNAL] ";
 
@@ -46514,11 +46558,21 @@ casadi::DeserializerBase::blind_unpack_sparsity_vector() "
 
 [INTERNAL] ";
 
+%feature("docstring")  casadi::DeserializerBase::blind_unpack_mx_vector_v1()
+ "
+
+[INTERNAL] ";
+
 %feature("docstring")  casadi::DeserializerBase::blind_unpack_dm_vector() "
 
 [INTERNAL] ";
 
 %feature("docstring")  casadi::DeserializerBase::blind_unpack_sx_vector() "
+
+[INTERNAL] ";
+
+%feature("docstring")  casadi::DeserializerBase::blind_unpack_sx_vector_v1()
+ "
 
 [INTERNAL] ";
 
@@ -46691,7 +46745,7 @@ FileSerializer
 Extra doc: https://github.com/casadi/casadi/wiki/L_7o
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/serializer.hpp#L203
+https://github.com/casadi/casadi/blob/develop/casadi/core/serializer.hpp#L211
 
 Implementation: 
 https://github.com/casadi/casadi/blob/develop/casadi/core/serializer.cpp#L37-L39
@@ -46712,10 +46766,10 @@ As a side effect, this method clears the internal buffer
 Extra doc: https://github.com/casadi/casadi/wiki/L_7p
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/serializer.hpp#L211
+https://github.com/casadi/casadi/blob/develop/casadi/core/serializer.hpp#L219
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/serializer.cpp#L85-L90
+https://github.com/casadi/casadi/blob/develop/casadi/core/serializer.cpp#L89-L94
 
 ";
 

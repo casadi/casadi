@@ -1078,7 +1078,13 @@
 %exception  casadi::DeserializerBase::blind_unpack_mx() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::DeserializerBase::blind_unpack_mx_v1() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::DeserializerBase::blind_unpack_mx_vector() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::DeserializerBase::blind_unpack_mx_vector_v1() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::DeserializerBase::blind_unpack_sparsity() {
@@ -1096,7 +1102,13 @@
 %exception  casadi::DeserializerBase::blind_unpack_sx() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::DeserializerBase::blind_unpack_sx_v1() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::DeserializerBase::blind_unpack_sx_vector() {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::DeserializerBase::blind_unpack_sx_vector_v1() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::DeserializerBase::connect(SerializerBase &s) {
