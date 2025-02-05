@@ -582,6 +582,8 @@ jobs:
           destination_path: install/casadi
           dockcross: ${{ matrix.arch }}
           bitness: ${{env.bitness}}
+      - run: ./dockcross bash -c 'cp `rustc --target=$CARGO_BUILD_TARGET --print target-libdir`/*.dll /work/install/casadi'
+        if: contains(matrix.arch, 'windows')
       - run: |
              cd install/casadi
              zip -rq ../../casadi-${{env.os}}${{env.bitness}}-${{matrix.host}}${{matrix.version}}.zip .
@@ -675,6 +677,8 @@ jobs:
           destination_path: install/casadi
           dockcross: ${{ matrix.arch }}
           bitness: ${{env.bitness}}
+      - run: ./dockcross bash -c 'cp `rustc --target=$CARGO_BUILD_TARGET --print target-libdir`/*.dll /work/install/casadi'
+        if: contains(matrix.arch, 'windows')
       - run: |
              cd install
              echo "This file (and the casadi directory) should end up in a folder called 'casadi-${{env.os}}${{env.suffix}}-py${{matrix.py2}}'" > dummy.txt
