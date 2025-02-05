@@ -942,7 +942,7 @@ namespace casadi {
     /** \brief Extract purely parametric parts from an expression graph
      * 
      * The purpose of extract_parametric is ultimately to save on evaluation time of an expression,
-     * by extracting out the parts that are only solely dependant on parameters.
+     * by extracting out the parts that are only solely dependent on parameters.
      * 
      * For any:
      * [expr_ret, symbols, parametric] = extract_parametric(expr, par)
