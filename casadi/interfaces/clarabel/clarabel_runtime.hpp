@@ -213,5 +213,9 @@ int casadi_clarabel_solve(casadi_clarabel_data<T1>* d,
     // Free the matrices and the solver
     clarabel_DefaultSolver_free(solver);
 
+    casadi_qp_data<T1>* d_qp = d->qp;
+
+    d_qp->success = true;
+
   return 0;
 }

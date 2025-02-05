@@ -73,6 +73,9 @@ void ClarabelInterface::init(const Dict& opts) {
   init_dependent();
   set_clarabel_prob();
 
+  casadi_warning("This plugin is not implemented yet. "
+   "It's only a stub to check the generation of binaries linked to rust packages.");
+
   // Allocate memory for arguments and work vectors; the work sizes are determined
   // by a call to our clarabel_work routine.
   casadi_int sz_arg, sz_res, sz_w, sz_iw;
@@ -171,7 +174,8 @@ void ClarabelInterface::set_work(void* mem, const double**& arg, double**& res,
   casadi_clarabel_init(&m->d, &arg, &res, &iw, &w);
 }
 
-int ClarabelInterface::solve(const double** arg, double** res, casadi_int* iw, double* w, void* mem) const {
+int ClarabelInterface::solve(const double** arg, double** res,
+    casadi_int* iw, double* w, void* mem) const {
   auto m = static_cast<ClarabelMemory*>(mem);
   m->fstats.at("solver").tic();
   casadi_clarabel_solve(&m->d, arg, res, iw, w);
