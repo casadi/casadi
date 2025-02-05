@@ -57,7 +57,7 @@ namespace casadi {
     this->prefix = "";
     this->max_declarations_per_line = 12;
     this->max_initializer_elements_per_line = 8;
-    this->force_canonical = true;
+    this->force_canonical = false;
 
     avoid_stack_ = false;
     indent_ = 2;
