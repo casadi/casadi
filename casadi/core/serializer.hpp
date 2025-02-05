@@ -77,9 +77,9 @@ namespace casadi {
 
     enum SerializationType {
       SERIALIZED_SPARSITY,
-      SERIALIZED_MX,
+      SERIALIZED_MX_v1,
       SERIALIZED_DM,
-      SERIALIZED_SX,
+      SERIALIZED_SX_v1,
       SERIALIZED_LINSOL,
       SERIALIZED_FUNCTION,
       SERIALIZED_GENERICTYPE,
@@ -87,15 +87,19 @@ namespace casadi {
       SERIALIZED_DOUBLE,
       SERIALIZED_STRING,
       SERIALIZED_SPARSITY_VECTOR,
-      SERIALIZED_MX_VECTOR,
+      SERIALIZED_MX_VECTOR_v1,
       SERIALIZED_DM_VECTOR,
-      SERIALIZED_SX_VECTOR,
+      SERIALIZED_SX_VECTOR_v1,
       SERIALIZED_LINSOL_VECTOR,
       SERIALIZED_FUNCTION_VECTOR,
       SERIALIZED_GENERICTYPE_VECTOR,
       SERIALIZED_INT_VECTOR,
       SERIALIZED_DOUBLE_VECTOR,
       SERIALIZED_STRING_VECTOR,
+      SERIALIZED_MX,
+      SERIALIZED_SX,
+      SERIALIZED_MX_VECTOR,
+      SERIALIZED_SX_VECTOR
     };
 
     static std::string type_to_string(SerializationType type);
@@ -121,8 +125,10 @@ namespace casadi {
 
     Sparsity blind_unpack_sparsity();
     MX blind_unpack_mx();
+    MX blind_unpack_mx_v1();
     Matrix<double> blind_unpack_dm();
     Matrix<SXElem> blind_unpack_sx();
+    Matrix<SXElem> blind_unpack_sx_v1();
     Linsol blind_unpack_linsol();
     Function blind_unpack_function();
     GenericType blind_unpack_generictype();
@@ -131,8 +137,10 @@ namespace casadi {
     std::string blind_unpack_string();
     std::vector<Sparsity> blind_unpack_sparsity_vector();
     std::vector<MX> blind_unpack_mx_vector();
+    std::vector<MX> blind_unpack_mx_vector_v1();
     std::vector< Matrix<double> > blind_unpack_dm_vector();
     std::vector< Matrix<SXElem> > blind_unpack_sx_vector();
+    std::vector< Matrix<SXElem> > blind_unpack_sx_vector_v1();
     std::vector<Linsol> blind_unpack_linsol_vector();
     std::vector<Function> blind_unpack_function_vector();
     std::vector<GenericType> blind_unpack_generictype_vector();
