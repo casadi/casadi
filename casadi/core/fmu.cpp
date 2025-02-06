@@ -521,6 +521,9 @@ void FmuInternal::init(const DaeBuilderInternal* dae) {
     }
   }
 
+  // Is there an independent variable?
+  has_independent_ = false;
+
   // Collect meta information for inputs
   nominal_in_.reserve(iind_.size());
   min_in_.reserve(iind_.size());
@@ -534,6 +537,10 @@ void FmuInternal::init(const DaeBuilderInternal* dae) {
     max_in_.push_back(v.max);
     vn_in_.push_back(v.name);
     vr_in_.push_back(v.value_reference);
+    if (v.causality == Causality::INDEPENDENT) {
+      if (i != 0) casadi_error("Independent variable must be first input of FMU");
+      has_independent_ = true;
+    }
   }
   // Collect meta information for outputs
   nominal_out_.reserve(oind_.size());

@@ -302,6 +302,9 @@ class CASADI_EXPORT FmuInternal : public SharedObjectInternal {
   // Mapping from scheme variable to and from FMU variable indices
   std::vector<size_t> iind_, iind_map_, oind_, oind_map_;
 
+  // Is there an independent variable?
+  bool has_independent_;
+
   // Meta information about the input/output variable subsets
   std::vector<double> nominal_in_, nominal_out_;
   std::vector<double> min_in_, min_out_;

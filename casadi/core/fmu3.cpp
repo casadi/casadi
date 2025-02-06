@@ -173,6 +173,7 @@ void Fmu3::load_functions() {
     "fmi3ExitInitializationMode");
   enter_continuous_time_mode_ = load_function<fmi3EnterContinuousTimeModeTYPE>(
     "fmi3EnterContinuousTimeMode");
+  set_time_ = load_function<fmi3SetTimeTYPE>("fmi3SetTime");
   get_float64_ = load_function<fmi3GetFloat64TYPE>("fmi3GetFloat64");
   set_float64_ = load_function<fmi3SetFloat64TYPE>("fmi3SetFloat64");
   get_int32_ = load_function<fmi3GetInt32TYPE>("fmi3GetInt32");
@@ -275,6 +276,18 @@ int Fmu3::update_discrete_states(void* instance, EventMemory* eventmem) const {
 
 int Fmu3::set_real(void* instance, const unsigned int* vr, size_t n_vr,
     const double* values, size_t n_values) const {
+  // Set time variable, if any
+  if (has_independent_ && n_vr > 0 && *vr == vr_in_[0]) {
+    // Update FMU time
+    fmi3Status status = set_time_(instance, *values);
+    if (status != fmi3OK) return 1;
+    // Skip when setting remaining variables
+    vr++;
+    n_vr--;
+    values++;
+    n_values--;
+  }
+  // Set remaining variables
   fmi3Status status = set_float64_(instance, vr, n_vr, values, n_values);
   return status != fmi3OK;
 }
@@ -442,6 +455,7 @@ Fmu3::Fmu3(const std::string& name,
   enter_initialization_mode_ = 0;
   exit_initialization_mode_ = 0;
   enter_continuous_time_mode_ = 0;
+  set_time_ = 0;
   set_float64_ = 0;
   set_boolean_ = 0;
   get_float64_ = 0;
