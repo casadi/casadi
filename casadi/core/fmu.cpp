@@ -1056,8 +1056,6 @@ void FmuInternal::get_adj(FmuMemory* m, size_t ind, double* v) const {
 }
 
 int FmuInternal::discrete_states_iter(void* instance) const {
-  // Quick return if no event indicators
-  if (number_of_event_indicators_ == 0) return 0;
   // Helper function: update_discrete_states
   EventMemory eventmem;
   const size_t max_update_iter = 10;
@@ -1101,8 +1099,10 @@ int FmuInternal::init_mem(FmuMemory* m) const {
   if (enter_initialization_mode(m->instance)) return 1;
   // Initialization mode ends
   if (exit_initialization_mode(m->instance)) return 1;
-  // Iteration to update discrete states
+  // Initial event iteration
   if (discrete_states_iter(m->instance)) return 1;
+  // Continuous-time mode
+  if (enter_continuous_time_mode(m->instance)) return 1;
   // Allocate/reset input buffer
   m->ibuf_.resize(iind_.size());
   std::fill(m->ibuf_.begin(), m->ibuf_.end(), casadi::nan);
