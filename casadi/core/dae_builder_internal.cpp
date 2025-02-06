@@ -387,12 +387,15 @@ DaeBuilderInternal::DaeBuilderInternal(const std::string& name, const std::strin
   // Default options
   debug_ = false;
   fmutol_ = 0;
+  ignore_time_ = false;
   // Read options
   for (auto&& op : opts) {
     if (op.first=="debug") {
       debug_ = op.second;
     } else if (op.first=="fmutol") {
       fmutol_ = op.second;
+    } else if (op.first=="ignore_time") {
+      ignore_time_ = op.second;
     } else {
       casadi_error("No such option: " + op.first);
     }
@@ -2822,7 +2825,7 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
     // Initial classification of variables (states/outputs to be added later)
     if (var.causality == Causality::INDEPENDENT) {
       // Independent (time) variable
-      t_.push_back(var.index);
+      if (!ignore_time_) t_.push_back(var.index);
     } else if (var.causality == Causality::INPUT) {
       // Check if description starts with PARAMETER:
       if (var.description.rfind("PARAMETER:", 0) == 0) {
