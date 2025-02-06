@@ -276,7 +276,7 @@ int Fmu3::update_discrete_states(void* instance, EventMemory* eventmem) const {
   eventmem->discrete_states_need_update = discreteStatesNeedUpdate;
   eventmem->terminate_simulation = terminateSimulation;
   eventmem->nominals_of_continuous_states_changed = nominalsOfContinuousStatesChanged;
-  eventmem->values_of_continuous_states_changed = nominalsOfContinuousStatesChanged;
+  eventmem->values_of_continuous_states_changed = valuesOfContinuousStatesChanged;
   eventmem->next_event_time_defined = nextEventTimeDefined;
   eventmem->next_event_time = nextEventTime;
   return status != fmi3OK;
