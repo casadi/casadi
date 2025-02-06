@@ -67,7 +67,7 @@ with zipfile.ZipFile('vdp_generated.fmu', 'w') as fmufile:
       arcname = f if f == 'modelDescription.xml' else 'sources/' + f
       fmufile.write(f, arcname = arcname)
       os.remove(f)
-    # Add compile DLL to the archive (assume Linux 64 but)
-    fmufile.write('vdp.so', arcname = 'binaries/x86-linux/vdp.so')
+    # Add compile DLL to the archive (assume Linux 64 bit)
+    fmufile.write('vdp.so', arcname = 'binaries/x86_64-linux/vdp.so')
     os.remove('vdp.so')
 print('Created FMU: vdp_generated.fmu')
