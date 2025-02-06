@@ -90,6 +90,7 @@ class CASADI_EXPORT Fmu2 : public FmuInternal {
   fmi2GetStringTYPE* get_string_;
   fmi2SetStringTYPE* set_string_;
   fmi2GetDirectionalDerivativeTYPE* get_directional_derivative_;
+  fmi2NewDiscreteStatesTYPE* new_discrete_states_;
 
   // Callback functions
   fmi2CallbackFunctions functions_;
@@ -121,6 +122,9 @@ class CASADI_EXPORT Fmu2 : public FmuInternal {
 
   // Exit initialization mode
   int exit_initialization_mode(void* instance) const override;
+
+  // Enter continuous-time mode
+  int enter_continuous_time_mode(void* instance) const override;
 
   // Update discrete states
   int update_discrete_states(void* instance, EventMemory* eventmem) const override;

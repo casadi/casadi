@@ -190,10 +190,8 @@ void Fmu3::load_functions() {
     get_adjoint_derivative_ =
       load_function<fmi3GetAdjointDerivativeTYPE>("fmi3GetAdjointDerivative");
   }
-  if (true) {
-    update_discrete_states_ =
-      load_function<fmi3UpdateDiscreteStatesTYPE>("fmi3UpdateDiscreteStates");
-  }
+  update_discrete_states_ =
+    load_function<fmi3UpdateDiscreteStatesTYPE>("fmi3UpdateDiscreteStates");
 }
 
 void Fmu3::log_message_callback(fmi3InstanceEnvironment instanceEnvironment,
@@ -249,6 +247,16 @@ int Fmu3::exit_initialization_mode(void* instance) const {
   fmi3Status status = exit_initialization_mode_(c);
   if (status != fmi3OK) {
     casadi_warning("fmi3ExitInitializationMode failed");
+    return 1;
+  }
+  return 0;
+}
+
+int Fmu3::enter_continuous_time_mode(void* instance) const {
+  auto c = static_cast<fmi3Instance>(instance);
+  fmi3Status status = enter_continuous_time_mode_(c);
+  if (status != fmi3OK) {
+    casadi_warning("fmi3EnterContinuousTimeMode failed");
     return 1;
   }
   return 0;

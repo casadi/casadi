@@ -79,6 +79,9 @@ class CASADI_EXPORT FmuInternal : public SharedObjectInternal {
   // Exit initialization mode
   virtual int exit_initialization_mode(void* instance) const = 0;
 
+  // Enter continuous-time mode
+  virtual int enter_continuous_time_mode(void* instance) const = 0;
+
   // Update discrete states
   virtual int update_discrete_states(void* instance, EventMemory* eventmem) const = 0;
 

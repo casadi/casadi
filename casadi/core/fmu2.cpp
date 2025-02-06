@@ -166,6 +166,7 @@ void Fmu2::load_functions() {
     get_directional_derivative_ =
       load_function<fmi2GetDirectionalDerivativeTYPE>("fmi2GetDirectionalDerivative");
   }
+  new_discrete_states_ = load_function<fmi2NewDiscreteStatesTYPE>("fmi2NewDiscreteStates");
 
   // Callback functions
   functions_.logger = logger;
@@ -264,19 +265,30 @@ int Fmu2::exit_initialization_mode(void* instance) const {
   return 0;
 }
 
-int Fmu2::update_discrete_states(void* instance, EventMemory* eventmem) const {
-  static bool warned = false;
-  if (!warned) {
-    casadi_warning("Fmu2::update_discrete_states not implemented, ignored");
-    warned = true;
+int Fmu2::enter_continuous_time_mode(void* instance) const {
+  auto c = static_cast<fmi2Component>(instance);
+  fmi2Status status = enter_continuous_time_mode_(c);
+  if (status != fmi2OK) {
+    casadi_warning("fmi2EnterContinuousTimeMode failed");
+    return 1;
   }
-  eventmem->discrete_states_need_update = false;
-  eventmem->terminate_simulation = false;
-  eventmem->nominals_of_continuous_states_changed = false;
-  eventmem->values_of_continuous_states_changed = false;
-  eventmem->next_event_time_defined = false;
-  eventmem->next_event_time = 0;
   return 0;
+}
+
+int Fmu2::update_discrete_states(void* instance, EventMemory* eventmem) const {
+  auto c = static_cast<fmi2Component>(instance);
+  // Return arguments in FMI types
+  fmi2EventInfo eventInfo;
+  // Call FMU
+  fmi2Status status = new_discrete_states_(c, &eventInfo);
+  // Pass to event iteration memory
+  eventmem->discrete_states_need_update = eventInfo.newDiscreteStatesNeeded;
+  eventmem->terminate_simulation = eventInfo.terminateSimulation;
+  eventmem->nominals_of_continuous_states_changed = eventInfo.nominalsOfContinuousStatesChanged;
+  eventmem->values_of_continuous_states_changed = eventInfo.valuesOfContinuousStatesChanged;
+  eventmem->next_event_time_defined = eventInfo.nextEventTimeDefined;
+  eventmem->next_event_time = eventInfo.nextEventTime;
+  return status != fmi2OK;
 }
 
 int Fmu2::set_real(void* instance, const unsigned int* vr, size_t n_vr,
@@ -444,6 +456,7 @@ Fmu2::Fmu2(const std::string& name,
   set_boolean_ = 0;
   get_real_ = 0;
   get_directional_derivative_ = 0;
+  new_discrete_states_ = 0;
 }
 
 Fmu2* Fmu2::deserialize(DeserializingStream& s) {
@@ -464,6 +477,7 @@ Fmu2::Fmu2(DeserializingStream& s) : FmuInternal(s) {
   set_boolean_ = 0;
   get_real_ = 0;
   get_directional_derivative_ = 0;
+  new_discrete_states_ = 0;
 
   s.version("Fmu2", 2);
   s.unpack("Fmu2::vr_real", vr_real_);
