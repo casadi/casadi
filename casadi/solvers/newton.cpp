@@ -234,7 +234,11 @@ namespace casadi {
     casadi_copy(m->x, n_, m->ires[iout_]);
 
     // Store the iteration count
-    if (success) m->return_status = "success";
+    if (success) {
+      m->return_status = "success";
+    } else {
+      casadi_warning("Newton method failed to converge, provided solution may be inaccurate");
+    }
     if (verbose_) casadi_message("Newton algorithm took " + str(m->iter) + " steps");
 
     m->success = success;
