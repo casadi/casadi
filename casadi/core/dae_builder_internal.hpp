@@ -538,20 +538,8 @@ protected:
       \identifier{2a8} */
   std::vector<MX> init_rhs() const;
 
-  ///@{
   /// Add a new variable
-  MX add_t(const std::string& name);
-  MX add_p(const std::string& name);
-  MX add_u(const std::string& name);
-  MX add_x(const std::string& name);
-  MX add_z(const std::string& name);
-  MX add_q(const std::string& name);
-  MX add_c(const std::string& name, const MX& new_cdef);
-  MX add_d(const std::string& name, const MX& new_ddef);
-  MX add_w(const std::string& name, const MX& new_wdef);
-  MX add_y(const std::string& name, const MX& new_ydef);
-  MX add_e(const std::string& name, const MX& new_edef);
-  ///@}
+  MX add(const std::string& name, const Dict& opts);
 
   ///@{
   /// Set a binding equation

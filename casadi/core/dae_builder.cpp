@@ -420,102 +420,75 @@ void DaeBuilder::set_all(const std::string& v, const std::vector<std::string>& n
   }
 }
 
+MX DaeBuilder::add(const std::string& name, const Dict& opts) {
+  try {
+    return (*this)->add(name, opts);
+  } catch (std::exception& e) {
+    THROW_ERROR("add", e.what());
+    return MX();
+  }
+}
+
+#ifdef WITH_DEPRECATED_FEATURES
 MX DaeBuilder::add_t(const std::string& name) {
-  casadi_assert((*this)->t_.empty(), "'t' already defined");
-  size_t new_t = add_variable_new(name);
-  (*this)->t_.push_back(new_t);
-  return var(new_t);
+  return add(name, Dict{{"cat", "t"}});
 }
 
 MX DaeBuilder::add_p(const std::string& name) {
-  try {
-    return (*this)->add_p(name);
-  } catch (std::exception& e) {
-    THROW_ERROR("add_p", e.what());
-    return MX();
-  }
+  casadi_assert(!name.empty(), "Variable name is required");
+  return add(name, Dict{{"cat", "p"}});
 }
 
 MX DaeBuilder::add_u(const std::string& name) {
-  try {
-    return (*this)->add_u(name);
-  } catch (std::exception& e) {
-    THROW_ERROR("add_u", e.what());
-    return MX();
-  }
+  casadi_assert(!name.empty(), "Variable name is required");
+  return add(name, Dict{{"cat", "u"}});
 }
 
 MX DaeBuilder::add_x(const std::string& name) {
-  try {
-    return (*this)->add_x(name);
-  } catch (std::exception& e) {
-    THROW_ERROR("add_x", e.what());
-    return MX();
-  }
+  casadi_assert(!name.empty(), "Variable name is required");
+  return add(name, Dict{{"cat", "x"}});
 }
 
 MX DaeBuilder::add_z(const std::string& name) {
-  try {
-    return (*this)->add_z(name);
-  } catch (std::exception& e) {
-    THROW_ERROR("add_z", e.what());
-    return MX();
-  }
+  casadi_assert(!name.empty(), "Variable name is required");
+  return add(name, Dict{{"cat", "z"}});
 }
 
 MX DaeBuilder::add_q(const std::string& name) {
-  try {
-    return (*this)->add_q(name);
-  } catch (std::exception& e) {
-    THROW_ERROR("add_q", e.what());
-    return MX();
-  }
+  casadi_assert(!name.empty(), "Variable name is required");
+  return add(name, Dict{{"cat", "q"}});
 }
 
 MX DaeBuilder::add_c(const std::string& name, const MX& new_cdef) {
-  try {
-    return (*this)->add_c(name, new_cdef);
-  } catch (std::exception& e) {
-    THROW_ERROR("add_c", e.what());
-    return MX();
-  }
+  MX v = add(name, Dict{{"cat", "c"}});
+  set_beq(name, new_cdef);
+  return v;
 }
 
 MX DaeBuilder::add_d(const std::string& name, const MX& new_ddef) {
-  try {
-    return (*this)->add_d(name, new_ddef);
-  } catch (std::exception& e) {
-    THROW_ERROR("add_d", e.what());
-    return MX();
-  }
+  MX v = add(name, Dict{{"cat", "d"}});
+  set_beq(name, new_ddef);
+  return v;
 }
 
 MX DaeBuilder::add_w(const std::string& name, const MX& new_wdef) {
-  try {
-    return (*this)->add_w(name, new_wdef);
-  } catch (std::exception& e) {
-    THROW_ERROR("add_w", e.what());
-    return MX();
-  }
+  MX v = add(name, Dict{{"cat", "w"}});
+  set_beq(name, new_wdef);
+  return v;
 }
 
 MX DaeBuilder::add_y(const std::string& name, const MX& new_ydef) {
-  try {
-    return (*this)->add_y(name, new_ydef);
-  } catch (std::exception& e) {
-    THROW_ERROR("add_y", e.what());
-    return MX();
-  }
+  MX v = add(name, Dict{{"cat", "y"}});
+  set_beq(name, new_ydef);
+  return v;
 }
 
 MX DaeBuilder::add_e(const std::string& name, const MX& new_edef) {
-  try {
-    return (*this)->add_e(name, new_edef);
-  } catch (std::exception& e) {
-    THROW_ERROR("add_e", e.what());
-    return MX();
-  }
+  MX v = add(name, Dict{{"cat", "e"}});
+  set_beq(name, new_edef);
+  return v;
 }
+#endif  // WITH_DEPRECATED_FEATURES
 
 void DaeBuilder::add_when(const MX& cond, const MX& lhs, const MX& rhs) {
   (*this)->when_cond_.push_back(cond);

@@ -2523,103 +2523,97 @@ std::vector<MX> DaeBuilderInternal::init_rhs() const {
   return ret;
 }
 
-MX DaeBuilderInternal::add_t(const std::string& name) {
-  casadi_assert(t_.empty(), "'t' already defined");
+MX DaeBuilderInternal::add(const std::string& name, const Dict& opts) {
+  // Default options
+  std::string cat;
+  std::vector<casadi_int> dimension = {1};
+  casadi::MX def;
+  // Read options
+  for (auto&& op : opts) {
+    if (op.first=="cat") {
+      cat = op.second.to_string();
+    } else if (op.first=="dimension") {
+      dimension = op.second.to_int_vector();
+    } else {
+      casadi_error("No such option: " + op.first);
+    }
+  }
+  // Dimension not yet implemented
+  casadi_assert(dimension.size() == 1 && dimension[0] == 1,
+    "Only scalar variables supported");
+  // Create a new variable
   Variable& v = new_variable(name);
   v.v = MX::sym(name);
-  v.causality = Causality::INDEPENDENT;
-  t_.push_back(v.index);
-  return v.v;
-}
-
-MX DaeBuilderInternal::add_p(const std::string& name) {
-  Variable& v = new_variable(name);
-  v.v = MX::sym(name);
-  v.variability = Variability::FIXED;
-  v.causality = Causality::INPUT;
-  p_.push_back(v.index);
-  return v.v;
-}
-
-MX DaeBuilderInternal::add_u(const std::string& name) {
-  Variable& v = new_variable(name);
-  v.v = MX::sym(name);
-  v.variability = Variability::CONTINUOUS;
-  v.causality = Causality::INPUT;
-  u_.push_back(v.index);
-  return v.v;
-}
-
-MX DaeBuilderInternal::add_x(const std::string& name) {
-  Variable& v = new_variable(name);
-  v.v = MX::sym(name);
-  v.variability = Variability::CONTINUOUS;
-  v.causality = Causality::LOCAL;
-  x_.push_back(v.index);
-  return v.v;
-}
-
-MX DaeBuilderInternal::add_z(const std::string& name) {
-  Variable& v = new_variable(name);
-  v.v = MX::sym(name);
-  v.variability = Variability::CONTINUOUS;
-  v.causality = Causality::LOCAL;
-  z_.push_back(v.index);
-  return v.v;
-}
-
-MX DaeBuilderInternal::add_q(const std::string& name) {
-  Variable& v = new_variable(name);
-  v.v = MX::sym(name);
-  v.variability = Variability::CONTINUOUS;
-  v.causality = Causality::LOCAL;
-  q_.push_back(v.index);
-  return v.v;
-}
-
-MX DaeBuilderInternal::add_c(const std::string& name, const MX& new_cdef) {
-  Variable& v = new_variable(name);
-  v.v = MX::sym(name);
-  v.variability = Variability::CONSTANT;
-  v.beq = new_cdef;
-  c_.push_back(v.index);
-  return v.v;
-}
-
-MX DaeBuilderInternal::add_d(const std::string& name, const MX& new_ddef) {
-  Variable& v = new_variable(name);
-  v.v = MX::sym(name);
-  v.variability = Variability::FIXED;
-  v.causality = Causality::CALCULATED_PARAMETER;
-  v.beq = new_ddef;
-  d_.push_back(v.index);
-  return v.v;
-}
-
-MX DaeBuilderInternal::add_w(const std::string& name, const MX& new_wdef) {
-  Variable& v = new_variable(name);
-  v.v = MX::sym(name);
-  v.variability = Variability::CONTINUOUS;
-  v.beq = new_wdef;
-  w_.push_back(v.index);
-  return v.v;
-}
-
-MX DaeBuilderInternal::add_y(const std::string& name, const MX& new_ydef) {
-  Variable& v = new_variable(name);
-  v.v = MX::sym(name);
-  v.causality = Causality::OUTPUT;
-  v.beq = new_ydef;
-  y_.push_back(v.index);
-  return v.v;
-}
-
-MX DaeBuilderInternal::add_e(const std::string& name, const MX& new_edef) {
-  Variable& v = new_variable(name);
-  v.v = MX::sym(name);
-  v.causality = Causality::OUTPUT;
-  v.beq = new_edef;
-  e_.push_back(v.index);
+  // Handle different categories
+  if (!cat.empty()) {
+    switch (to_enum<DaeBuilderInternalIn>(cat)) {
+      case DAE_BUILDER_T:
+        // Independent variable
+        casadi_assert(t_.empty(), "'t' already defined");
+        v.causality = Causality::INDEPENDENT;
+        t_.push_back(v.index);
+        break;
+      case DAE_BUILDER_P:
+        // Parameter
+        v.variability = Variability::FIXED;
+        v.causality = Causality::INPUT;
+        p_.push_back(v.index);
+        break;
+      case DAE_BUILDER_U:
+        // Control
+        v.variability = Variability::CONTINUOUS;
+        v.causality = Causality::INPUT;
+        u_.push_back(v.index);
+        break;
+      case DAE_BUILDER_X:
+        // State
+        v.variability = Variability::CONTINUOUS;
+        v.causality = Causality::LOCAL;
+        x_.push_back(v.index);
+        break;
+      case DAE_BUILDER_Z:
+        // Algebraic variable
+        v.variability = Variability::CONTINUOUS;
+        v.causality = Causality::LOCAL;
+        z_.push_back(v.index);
+        break;
+      case DAE_BUILDER_Q:
+        // Quadrature variable
+        v.variability = Variability::CONTINUOUS;
+        v.causality = Causality::LOCAL;
+        q_.push_back(v.index);
+        break;
+      case DAE_BUILDER_C:
+        // Constant
+        v.variability = Variability::CONSTANT;
+        c_.push_back(v.index);
+        break;
+      case DAE_BUILDER_D:
+        // Calculated parameter
+        v.variability = Variability::FIXED;
+        v.causality = Causality::CALCULATED_PARAMETER;
+        d_.push_back(v.index);
+        break;
+      case DAE_BUILDER_W:
+        // Dependent variable
+        v.variability = Variability::CONTINUOUS;
+        v.causality = Causality::LOCAL;
+        w_.push_back(v.index);
+        break;
+      case DAE_BUILDER_Y:
+        // Output
+        v.causality = Causality::OUTPUT;
+        y_.push_back(v.index);
+        break;
+      case DAE_BUILDER_E:
+        // Zero-crossing
+        v.causality = Causality::OUTPUT;
+        e_.push_back(v.index);
+        break;
+      default: break;
+    }
+  }
+  // Return variable expression
   return v.v;
 }
 
@@ -3154,7 +3148,8 @@ void DaeBuilderInternal::import_dynamic_equations(const XmlNode& eqs) {
         if (x_it != x_.end()) x_.erase(x_it);  // remove from states
 
         // Create event indicator
-        add_e(cond.name + "_smooth", zc);
+        (void)add(cond.name + "_smooth", {{"cat", "e"}});
+        variable(cond.name + "_smooth").beq = zc;
         // Add to list of when equations
         when_cond_.push_back(zc);
         when_lhs_.push_back(lhs);

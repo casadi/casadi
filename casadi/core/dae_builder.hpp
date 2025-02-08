@@ -290,38 +290,43 @@ class CASADI_EXPORT DaeBuilder
    *  Formulate a dynamic system model
    */
   ///@{
-  /// Add an independent variable (time)
+  /// Add a new model variable, any category
+  MX add(const std::string& name, const Dict& opts=Dict());
+
+#ifdef WITH_DEPRECATED_FEATURES
+  /// [DEPRECATED] Replaced by add
   MX add_t(const std::string& name="t");
 
-  /// Add a new parameter
+  /// [DEPRECATED] Replaced by add
   MX add_p(const std::string& name=std::string());
 
-  /// Add a new control
+  /// [DEPRECATED] Replaced by add
   MX add_u(const std::string& name=std::string());
 
-  /// Add a new differential state
+  /// [DEPRECATED] Replaced by add
   MX add_x(const std::string& name=std::string());
 
-  /// Add a new algebraic variable
+  /// [DEPRECATED] Replaced by add
   MX add_z(const std::string& name=std::string());
 
-  /// Add a new quadrature state
+  /// [DEPRECATED] Replaced by add
   MX add_q(const std::string& name=std::string());
 
-  /// Add a new constant
+  /// [DEPRECATED] Replaced by add and set_beq
   MX add_c(const std::string& name, const MX& new_cdef);
 
-  /// Add a new dependent parameter
+  /// [DEPRECATED] Replaced by add and set_beq
   MX add_d(const std::string& name, const MX& new_ddef);
 
-  /// Add a new dependent variable
+  /// [DEPRECATED] Replaced by add and set_beq
   MX add_w(const std::string& name, const MX& new_wdef);
 
-  /// Add a new output
+  /// [DEPRECATED] Replaced by add and set_beq
   MX add_y(const std::string& name, const MX& new_ydef);
 
-  /// Add a new event indicator
+  /// [DEPRECATED] Replaced by add and set_beq
   MX add_e(const std::string& name, const MX& new_edef);
+#endif  // WITH_DEPRECATED_FEATURES
 
   /// Specify the ordinary differential equation for a state
   void set_ode(const std::string& name, const MX& ode_rhs);
