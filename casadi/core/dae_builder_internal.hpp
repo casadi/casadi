@@ -70,21 +70,24 @@ struct CASADI_EXPORT Variable {
 
  private:
   /// Constructor (only accessible via DaeBuilderInternal::new_variable)
-  Variable(casadi_int index, casadi_int numel, const std::string& name);
+  Variable(casadi_int index, const std::string& name,
+    const std::vector<casadi_int>& dimension);
 
  public:
   /// @brief Location in variable vector
   casadi_int index;
 
-  /// Number of elements - product of all dimensions
-  casadi_int numel;
+  /// @brief  Name of the variable
+  std::string name;
 
   /// Dimensions
   std::vector<casadi_int> dimension;
 
+  /// Number of elements - product of all dimensions
+  casadi_int numel;
+
   /** Attributes common to all types of variables, cf. Table 17 in FMI specification */
   ///@{
-  std::string name;
   unsigned int value_reference;
   std::string description;
   Type type;
@@ -371,13 +374,14 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   }
 
   /// Create a new variable
-  Variable& new_variable(const std::string& name, casadi_int numel = 1);
+  Variable& new_variable(const std::string& name,
+    const std::vector<casadi_int>& dimension = {1});
 
   /// Check if a particular variable exists
-  bool has_variable(const std::string& name) const;
+  bool has(const std::string& name) const;
 
   /// Get a list of all variables
-  std::vector<std::string> all_variables() const;
+  std::vector<std::string> all() const;
 
   /// Length of variables array
   size_t n_variables() const {return variables_.size();}

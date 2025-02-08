@@ -680,29 +680,37 @@ class CASADI_EXPORT DaeBuilder
   /// Evaluate the values for a set of variables at the initial time
   std::vector<GenericType> get(const std::vector<std::string>& name) const;
 
-  /// Add a new variable: returns corresponding symbolic expression
+  /// Check if a particular variable exists
+  bool has(const std::string& name) const;
+
+  /// Get a list of all variables
+  std::vector<std::string> all() const;
+
+#if WITH_DEPRECATED_FEATURES
+  /// [DEPRECATED] Use add
   MX add_variable(const std::string& name, casadi_int n=1);
 
-  /// Add a new variable: returns corresponding symbolic expression
+  /// [DEPRECATED] Use add
   MX add_variable(const std::string& name, const Sparsity& sp);
 
   /// Add a new variable from symbolic expressions
   void add_variable(const MX& new_v);
 
-  /// Add a new variable: returns corresponding symbolic expression
+  /// [DEPRECATED] Use add
   size_t add_variable_new(const std::string& name, casadi_int n=1);
 
-  /// Add a new variable: returns corresponding symbolic expression
+  /// [DEPRECATED] Use add
   size_t add_variable_new(const std::string& name, const Sparsity& sp);
 
-  /// Add a new variable from symbolic expressions
+  /// [DEPRECATED] Use add
   size_t add_variable_new(const MX& new_v);
 
-  /// Check if a particular variable exists
-  bool has_variable(const std::string& name) const;
+  /// [DEPRECATED] Ranamed "has"
+  bool has_variable(const std::string& name) const {return has(name);}
 
   /// Get a list of all variables
-  std::vector<std::string> all_variables() const;
+  std::vector<std::string> all_variables() const {return all();}
+#endif // WITH_DEPRECATED_FEATURES
 
   /// Get the (cached) oracle, SX or MX
   Function oracle(bool sx = false, bool elim_w = false, bool lifted_calls = false) const;
@@ -714,8 +722,10 @@ class CASADI_EXPORT DaeBuilder
     const std::vector<std::string>& inames) const;
 
 #ifndef SWIG
-  /// Create a new variable
+#if WITH_DEPRECATED_FEATURES
+  /// [DEPRECATED] Use add
   Variable& new_variable(const std::string& name, casadi_int numel = 1);
+#endif // WITH_DEPRECATED_FEATURES
 
   ///@{
   /// Access a variable by name

@@ -301,27 +301,28 @@ void DaeBuilder::tear() {
   }
 }
 
-bool DaeBuilder::has_variable(const std::string& name) const {
+bool DaeBuilder::has(const std::string& name) const {
   try {
-    return (*this)->has_variable(name);
+    return (*this)->has(name);
   } catch (std::exception& e) {
-    THROW_ERROR("has_variable", e.what());
+    THROW_ERROR("has", e.what());
     return false;  // never reached
   }
 }
 
-std::vector<std::string> DaeBuilder::all_variables() const {
+std::vector<std::string> DaeBuilder::all() const {
   try {
-    return (*this)->all_variables();
+    return (*this)->all();
   } catch (std::exception& e) {
-    THROW_ERROR("all_variables", e.what());
+    THROW_ERROR("all", e.what());
     return {};  // never reached
   }
 }
 
+#if WITH_DEPRECATED_FEATURES
 Variable& DaeBuilder::new_variable(const std::string& name, casadi_int numel) {
   try {
-    return (*this)->new_variable(name, numel);
+    return (*this)->new_variable(name, {numel});
   } catch (std::exception& e) {
     THROW_ERROR("new_variable", e.what());
   }
@@ -357,6 +358,7 @@ size_t DaeBuilder::add_variable_new(const MX& new_v) {
   v.v = new_v;
   return v.index;
 }
+#endif // WITH_DEPRECATED_FEATURES
 
 void DaeBuilder::register_t(const std::string& name) {
   // Save to class

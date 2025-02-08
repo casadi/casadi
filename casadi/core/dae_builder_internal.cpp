@@ -271,10 +271,16 @@ Initial Variable::default_initial(Causality causality, Variability variability) 
   return Initial::NA;
 }
 
-Variable::Variable(casadi_int index, casadi_int numel, const std::string& name)
-    : index(index), numel(numel), name(name) {
+Variable::Variable(casadi_int index, const std::string& name,
+    const std::vector<casadi_int>& dimension)
+    : index(index), name(name), dimension(dimension) {
+  // Consistency checks
+  casadi_assert(dimension.size() > 0, "Variable must have at least one dimension");
+  for (casadi_int d : dimension) casadi_assert(d > 0, "Dimensions must be positive");
+  // Number of elements
+  numel = 1;
+  for (casadi_int d : dimension) numel *= d;
   // Default arguments
-  dimension = {numel};
   value_reference = index;
   type = Type::FLOAT64;
   causality = Causality::LOCAL;
@@ -1308,7 +1314,7 @@ void DaeBuilderInternal::tearing_variables(std::vector<std::string>* res,
         // Look up iteration variable
         iv_name = v->name.substr(pos, end - pos);
         // Ensure that the variable exists
-        casadi_assert(has_variable(iv_name), "No such variable: " + iv_name);
+        casadi_assert(has(iv_name), "No such variable: " + iv_name);
         // Get hold indices, if any
         if (end != v->name.size()) {
           // Find next "__", read hold index for residual variable
@@ -1317,11 +1323,11 @@ void DaeBuilderInternal::tearing_variables(std::vector<std::string>* res,
           if (end == std::string::npos) end = v->name.size();
           res_hold_name = v->name.substr(pos, end - pos);
           // Ensure that the variable exists
-          casadi_assert(has_variable(res_hold_name), "No such variable: " + res_hold_name);
+          casadi_assert(has(res_hold_name), "No such variable: " + res_hold_name);
           // The remainder of the name contains iv_hold_name
           if (end != v->name.size()) {
             iv_hold_name = v->name.substr(end + 2);
-            casadi_assert(has_variable(iv_hold_name), "No such variable: " + iv_hold_name);
+            casadi_assert(has(iv_hold_name), "No such variable: " + iv_hold_name);
           }
         }
       } catch (std::exception& e) {
@@ -1402,11 +1408,11 @@ void DaeBuilderInternal::tearing_variables(std::vector<std::string>* res,
   }
 }
 
-bool DaeBuilderInternal::has_variable(const std::string& name) const {
+bool DaeBuilderInternal::has(const std::string& name) const {
   return varind_.find(name) != varind_.end();
 }
 
-std::vector<std::string> DaeBuilderInternal::all_variables() const {
+std::vector<std::string> DaeBuilderInternal::all() const {
   std::vector<std::string> r;
   r.reserve(n_variables());
   for (const Variable* v : variables_) r.push_back(v->name);
@@ -1419,16 +1425,17 @@ size_t DaeBuilderInternal::n_mem() const {
   return n;
 }
 
-Variable& DaeBuilderInternal::new_variable(const std::string& name, casadi_int numel) {
+Variable& DaeBuilderInternal::new_variable(const std::string& name,
+    const std::vector<casadi_int>& dimension) {
   // Name check
   casadi_assert(!name.empty(), "Name is empty string");
   // Try to find the component
-  casadi_assert(!has_variable(name), "Variable \"" + name + "\" already exists.");
+  casadi_assert(!has(name), "Variable \"" + name + "\" already exists.");
   // Index of the variable
   size_t ind = n_variables();
   // Add to the map of all variables
   varind_[name] = ind;
-  variables_.push_back(new Variable(ind, numel, name));
+  variables_.push_back(new Variable(ind, name, dimension));
   // Clear cache
   clear_cache_ = true;
   // Return reference to new variable
@@ -2521,6 +2528,7 @@ MX DaeBuilderInternal::add(const std::string& name, const Dict& opts) {
   // Default options
   std::string cat;
   std::vector<casadi_int> dimension = {1};
+  std::string description;
   casadi::MX def;
   // Read options
   for (auto&& op : opts) {
@@ -2528,14 +2536,16 @@ MX DaeBuilderInternal::add(const std::string& name, const Dict& opts) {
       cat = op.second.to_string();
     } else if (op.first=="dimension") {
       dimension = op.second.to_int_vector();
+    } else if (op.first=="description") {
+      description = op.second.to_string();
     } else {
       casadi_error("No such option: " + op.first);
     }
   }
   // Create a new variable
-  Variable& v = new_variable(name);
+  Variable& v = new_variable(name, dimension);
   v.v = MX::sym(name);
-  v.dimension = dimension;
+  v.description = description;
   // Handle different categories
   if (!cat.empty()) {
     switch (to_enum<DaeBuilderInternalIn>(cat)) {
