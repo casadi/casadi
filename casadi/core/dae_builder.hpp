@@ -360,6 +360,7 @@ class CASADI_EXPORT DaeBuilder
   /// Set all variables of a type
   void set_all(const std::string& v, const std::vector<std::string>& name);
 
+#ifdef WITH_DEPRECATED_FEATURES
   /** @name Register an existing variable */
   ///@{
   void register_t(const std::string& name);
@@ -374,6 +375,7 @@ class CASADI_EXPORT DaeBuilder
   void register_y(const std::string& name);
   void register_e(const std::string& name);
   ///@}
+#endif // WITH_DEPRECATED_FEATURES
 
   /** @name Manipulation
    *  Reformulate the dynamic optimization problem.

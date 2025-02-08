@@ -358,7 +358,6 @@ size_t DaeBuilder::add_variable_new(const MX& new_v) {
   v.v = new_v;
   return v.index;
 }
-#endif // WITH_DEPRECATED_FEATURES
 
 void DaeBuilder::register_t(const std::string& name) {
   // Save to class
@@ -405,6 +404,8 @@ void DaeBuilder::register_y(const std::string& name) {
 void DaeBuilder::register_e(const std::string& name) {
   (*this)->e_.push_back(find(name));
 }
+
+#endif // WITH_DEPRECATED_FEATURES
 
 void DaeBuilder::clear_all(const std::string& v) {
   try {
