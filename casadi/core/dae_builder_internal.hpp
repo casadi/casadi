@@ -70,7 +70,7 @@ struct CASADI_EXPORT Variable {
 
  private:
   /// Constructor (only accessible via DaeBuilderInternal::new_variable)
-  Variable(casadi_int index, casadi_int numel, const std::string& name, const MX& v);
+  Variable(casadi_int index, casadi_int numel, const std::string& name);
 
  public:
   /// @brief Location in variable vector
@@ -371,7 +371,7 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   }
 
   /// Create a new variable
-  Variable& new_variable(const std::string& name, casadi_int numel = 1, const MX& v = MX());
+  Variable& new_variable(const std::string& name, casadi_int numel = 1);
 
   /// Check if a particular variable exists
   bool has_variable(const std::string& name) const;

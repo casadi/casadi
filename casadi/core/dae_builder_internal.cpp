@@ -271,8 +271,8 @@ Initial Variable::default_initial(Causality causality, Variability variability) 
   return Initial::NA;
 }
 
-Variable::Variable(casadi_int index, casadi_int numel, const std::string& name, const MX& v)
-    : index(index), numel(numel), name(name), v(v) {
+Variable::Variable(casadi_int index, casadi_int numel, const std::string& name)
+    : index(index), numel(numel), name(name) {
   // Default arguments
   dimension = {numel};
   value_reference = index;
@@ -1419,22 +1419,16 @@ size_t DaeBuilderInternal::n_mem() const {
   return n;
 }
 
-Variable& DaeBuilderInternal::new_variable(const std::string& name, casadi_int numel, const MX& v) {
+Variable& DaeBuilderInternal::new_variable(const std::string& name, casadi_int numel) {
   // Name check
   casadi_assert(!name.empty(), "Name is empty string");
-  // If v is provided, make sure name and dimensions are consistent
-  if (!v.is_empty()) {
-    casadi_assert(v.is_symbolic(), "Expression not symbolic");
-    casadi_assert(name == v.name(), "Name (" + name + ") does not match expression: " + v.name());
-    casadi_assert(numel == v.numel(), "Dimension mismatch");
-  }
   // Try to find the component
   casadi_assert(!has_variable(name), "Variable \"" + name + "\" already exists.");
   // Index of the variable
   size_t ind = n_variables();
   // Add to the map of all variables
   varind_[name] = ind;
-  variables_.push_back(new Variable(ind, numel, name, v));
+  variables_.push_back(new Variable(ind, numel, name));
   // Clear cache
   clear_cache_ = true;
   // Return reference to new variable
@@ -2538,18 +2532,18 @@ MX DaeBuilderInternal::add(const std::string& name, const Dict& opts) {
       casadi_error("No such option: " + op.first);
     }
   }
-  // Dimension not yet implemented
-  casadi_assert(dimension.size() == 1 && dimension[0] == 1,
-    "Only scalar variables supported");
   // Create a new variable
   Variable& v = new_variable(name);
   v.v = MX::sym(name);
+  v.dimension = dimension;
   // Handle different categories
   if (!cat.empty()) {
     switch (to_enum<DaeBuilderInternalIn>(cat)) {
       case DAE_BUILDER_T:
         // Independent variable
         casadi_assert(t_.empty(), "'t' already defined");
+        casadi_assert(dimension.size() == 1 && dimension[0] == 1,
+          "Independent variable must be scalar");
         v.causality = Causality::INDEPENDENT;
         t_.push_back(v.index);
         break;
