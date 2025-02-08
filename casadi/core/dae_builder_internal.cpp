@@ -280,20 +280,22 @@ Variable::Variable(casadi_int index, const std::string& name,
   // Number of elements
   numel = 1;
   for (casadi_int d : dimension) numel *= d;
+  // Symbolic expression (always flattened)
+  this->v = MX::sym(name, numel);
   // Default arguments
-  value_reference = index;
-  type = Type::FLOAT64;
-  causality = Causality::LOCAL;
-  variability = Variability::CONTINUOUS;
-  min = -inf;
-  max = inf,
-  nominal = 1.0;
-  start.resize(numel, 0.0);
-  der_of = -1;
-  der = -1;
-  alg = -1;
-  value.resize(numel, nan);
-  dependency = false;
+  this->value_reference = index;
+  this->type = Type::FLOAT64;
+  this->causality = Causality::LOCAL;
+  this->variability = Variability::CONTINUOUS;
+  this->min = -inf;
+  this->max = inf,
+  this->nominal = 1.0;
+  this->start.resize(numel, 0.0);
+  this->der_of = -1;
+  this->der = -1;
+  this->alg = -1;
+  this->value.resize(numel, nan);
+  this->dependency = false;
 }
 
 XmlNode Variable::export_xml(const DaeBuilderInternal& self) const {
@@ -968,7 +970,6 @@ MX DaeBuilderInternal::read_expr(const XmlNode& node) {
       for (casadi_int i = 0; i < args.size(); ++i) {
         // Lift input arguments
         Variable& v = new_variable("w_" + str(w_.size()));
-        v.v = MX::sym(v.name);
         // Add to list of variables
         w_.push_back(v.index);
         // Set binding expression
@@ -978,7 +979,6 @@ MX DaeBuilderInternal::read_expr(const XmlNode& node) {
       }
       // Return argument (scalar for now)
       Variable& r = new_variable("w_" + str(w_.size()));
-      r.v = MX::sym(r.name);
       // Add to list of variables
       w_.push_back(r.index);
       // Return output variable
@@ -2544,7 +2544,6 @@ MX DaeBuilderInternal::add(const std::string& name, const Dict& opts) {
   }
   // Create a new variable
   Variable& v = new_variable(name, dimension);
-  v.v = MX::sym(name);
   v.description = description;
   // Handle different categories
   if (!cat.empty()) {
@@ -2628,7 +2627,6 @@ void DaeBuilderInternal::set_ode(const std::string& name, const MX& ode_rhs) {
   if (x.der < 0) {
     // New derivative variable
     Variable& xdot = new_variable("der_" + name);
-    xdot.v = MX::sym(xdot.name);
     xdot.causality = Causality::LOCAL;
     xdot.der_of = find(name);
     xdot.beq = ode_rhs;
@@ -2646,7 +2644,6 @@ void DaeBuilderInternal::set_alg(const std::string& name, const MX& alg_rhs) {
   if (z.alg < 0) {
     // New derivative variable
     Variable& alg = new_variable("alg_" + name);
-    alg.v = MX::sym(alg.name);
     alg.causality = Causality::OUTPUT;
     alg.beq = alg_rhs;
     variable(name).alg = alg.index;
@@ -2733,7 +2730,6 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
 
     // Create new variable
     Variable& var = new_variable(name);
-    var.v = MX::sym(name);
 
     // Get type (FMI 3)
     if (fmi_major_ >= 3) var.type = to_enum<Type>(vnode.name);
