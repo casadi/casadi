@@ -880,7 +880,7 @@ reduce_index_gen(const std::map<std::string, X>& dae, Dict& stats, const Dict& o
   }
 
   Function temp("temp", {V, p, t}, {alg});
-  Sparsity G = temp.sparsity_jac(0, 0);
+  Sparsity G = temp.jac_sparsity(0, 0);
 
   // Populate var_map: a list that associates variables with their derivatives
   int nx_impl = x_impl.numel();
