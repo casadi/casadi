@@ -23,21 +23,21 @@
 
 using namespace casadi;
 
-int main(){
+int main() {
 
   // Example on how to use the DaeBuilder class
-  // Joel Andersson, UW Madison 2017
+  // Joel Andersson, 2017-2025
 
   // Start with an empty DaeBuilder instance
   DaeBuilder dae("rocket");
 
-  // Add input expressions
-  auto a = dae.add_p("a");
-  auto b = dae.add_p("b");
-  auto u = dae.add_u("u");
-  auto h = dae.add_x("h");
-  auto v = dae.add_x("v");
-  auto m = dae.add_x("m");
+  // Add model variables
+  auto a = dae.add("a", "parameter", "tunable");
+  auto b = dae.add("b", "parameter", "tunable");
+  auto u = dae.add("u", "input");
+  auto h = dae.add("h");
+  auto v = dae.add("v");
+  auto m = dae.add("m");
 
   // Constants
   double g = 9.81; // gravity

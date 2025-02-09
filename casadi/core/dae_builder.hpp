@@ -95,7 +95,7 @@ class CASADI_EXPORT DaeBuilder
   /** \brief Differential states
 
       \identifier{5f} */
-  std::vector<std::string> x() const;
+  std::vector<std::string> x() const {return all("x");}
 
   /** \brief Ordinary differential equations (ODE)
 
@@ -105,7 +105,7 @@ class CASADI_EXPORT DaeBuilder
   /** \brief Algebraic variables
 
       \identifier{5h} */
-  std::vector<std::string> z() const;
+  std::vector<std::string> z() const {return all("z");}
 
   /** \brief Algebraic equations
 
@@ -115,12 +115,12 @@ class CASADI_EXPORT DaeBuilder
   /** \brief Quadrature states
 
       \identifier{5j} */
-  std::vector<std::string> q() const;
+  std::vector<std::string> q() const {return all("q");}
 
   /** \brief Event indicators
 
       \identifier{2az} */
-  std::vector<std::string> e() const;
+  std::vector<std::string> e() const {return all("e");}
 
   /** \brief Quadrature equations
 
@@ -135,7 +135,7 @@ class CASADI_EXPORT DaeBuilder
   /** \brief Output variables
 
       \identifier{5l} */
-  std::vector<std::string> y() const;
+  std::vector<std::string> y() const {return all("y");}
 
   /** \brief Definitions of output variables
 
@@ -145,17 +145,17 @@ class CASADI_EXPORT DaeBuilder
   /** \brief Free controls
 
       \identifier{5n} */
-  std::vector<std::string> u() const;
+  std::vector<std::string> u() const {return all("u");}
 
   /** \brief Parameters
 
       \identifier{5o} */
-  std::vector<std::string> p() const;
+  std::vector<std::string> p() const {return all("p");}
 
   /** \brief Named constants
 
       \identifier{5p} */
-  std::vector<std::string> c() const;
+  std::vector<std::string> c() const {return all("c");}
 
   /** \brief Definitions of named constants
 
@@ -165,7 +165,7 @@ class CASADI_EXPORT DaeBuilder
   /** \brief Dependent parameters
 
       \identifier{5r} */
-  std::vector<std::string> d() const;
+  std::vector<std::string> d() const {return all("d");}
 
   /** \brief Definitions of dependent parameters
 
@@ -177,7 +177,7 @@ class CASADI_EXPORT DaeBuilder
   /** \brief Dependent variables
 
       \identifier{5t} */
-  std::vector<std::string> w() const;
+  std::vector<std::string> w() const {return all("w");}
 
   /** \brief Dependent variables and corresponding definitions
 
@@ -290,8 +290,20 @@ class CASADI_EXPORT DaeBuilder
    *  Formulate a dynamic system model
    */
   ///@{
-  /// Add a new model variable, any category
-  MX add(const std::string& name, const Dict& opts=Dict());
+  /// Add a new model variable
+  MX add(const std::string& name,
+    const std::string& causality,
+    const std::string& variability,
+    const Dict& opts=Dict());
+
+  /// Add a new model variable, default variability
+  MX add(const std::string& name,
+    const std::string& causality,
+    const Dict& opts=Dict());
+
+  /// Add a new model variable, default variability and causality
+  MX add(const std::string& name,
+    const Dict& opts=Dict());
 
 #ifdef WITH_DEPRECATED_FEATURES
   /// [DEPRECATED] Replaced by add

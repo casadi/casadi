@@ -2528,7 +2528,8 @@ std::vector<MX> DaeBuilderInternal::init_rhs() const {
   return ret;
 }
 
-MX DaeBuilderInternal::add(const std::string& name, const Dict& opts) {
+MX DaeBuilderInternal::add(const std::string& name, Causality causality,
+    Variability variability, const Dict& opts) {
   // Default options
   std::string cat;
   std::vector<casadi_int> dimension = {1};
@@ -2550,7 +2551,40 @@ MX DaeBuilderInternal::add(const std::string& name, const Dict& opts) {
   Variable& v = new_variable(name, dimension);
   v.description = description;
   // Handle different categories
-  if (!cat.empty()) {
+  if (cat.empty()) {
+    // Use provided causality and variability
+    v.causality = causality;
+    v.variability = variability;
+    // Auto-detect category (default)
+    switch (causality) {
+      case Causality::INDEPENDENT:
+        // Independent variable
+        casadi_assert(t_.empty(), "'t' already defined");
+        t_.push_back(v.index);
+        break;
+      case Causality::INPUT:
+        // Control
+        u_.push_back(v.index);
+        break;
+      case Causality::OUTPUT:
+        // Output
+        y_.push_back(v.index);
+        break;
+      case Causality::PARAMETER:
+        // Parameter
+        if (variability == Variability::TUNABLE) {
+          p_.push_back(v.index);
+        }
+        break;
+      case Causality::CALCULATED_PARAMETER:
+        // Calculated parameter: No categorization for now
+        break;
+      case Causality::LOCAL:
+        // Type determined by providing equation
+        break;
+    }
+  } else {
+    // Explicit category (legacy, to be removed)
     switch (to_enum<DaeBuilderInternalIn>(cat)) {
       case DAE_BUILDER_T:
         // Independent variable
@@ -2622,6 +2656,26 @@ MX DaeBuilderInternal::add(const std::string& name, const Dict& opts) {
   }
   // Return variable expression
   return v.v;
+}
+
+MX DaeBuilderInternal::add(const std::string& name, Causality causality, const Dict& opts) {
+  // Default variability per FMI 3.0.2, section 2.4.7.4
+  switch (causality) {
+    // "The default for variables of causality parameter, structural parameter or 
+    // calculated parameter is fixed."
+    case Causality::PARAMETER:  // fall-through
+    case Causality::CALCULATED_PARAMETER:
+      return add(name, causality, Variability::FIXED, opts);
+    // "The default for variables of type Float32 and Float64 and causality other
+    // than parameter, structuralParameter or calculatedParameter is continuous"
+    case Causality::INPUT:  // fall-through
+    case Causality::OUTPUT:  // fall-through
+    case Causality::LOCAL:  // fall-through
+    case Causality::INDEPENDENT:
+      return add(name, causality, Variability::CONTINUOUS, opts);
+    default:
+      casadi_error("Unknown causality");
+  }
 }
 
 void DaeBuilderInternal::set_ode(const std::string& name, const MX& ode_rhs) {

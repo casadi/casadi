@@ -281,6 +281,14 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   static std::string generate(const std::vector<double>& v);
   ///@}
 
+  // Categorization of model variables, cf. Table 17 in FMI specification, 3.0.2
+  //              PARAMETER  CALCULATED_PARAMETER  INPUT  OUTPUT  LOCAL  INDEPENDENT
+  // CONSTANT     -          -                     -      C?      C?     -
+  // FIXED        C?         C?                    -      -       ?      -
+  // TUNABLE      P          D                     -      -       ?      -
+  // DISCRETE     -          -                     U?     Y?      X      -
+  // CONTINUOUS   -          -                     U      Y       X      T
+
   // Input convension in codegen
   enum DaeBuilderInternalIn {
     DAE_BUILDER_T,
@@ -552,7 +560,16 @@ protected:
   std::vector<MX> init_rhs() const;
 
   /// Add a new variable
-  MX add(const std::string& name, const Dict& opts);
+  MX add(const std::string& name, Causality causality, Variability variability, const Dict& opts);
+
+  /// Add a new variable, default variability
+  MX add(const std::string& name, Causality causality, const Dict& opts);
+
+  /// Add a new variable, default variability and causality
+  MX add(const std::string& name, const Dict& opts) {
+    // Per FMI 3.0.2 specification, section 2.4.7.4: Default causality is LOCAL
+    return add(name, Causality::LOCAL, opts);
+  }
 
   ///@{
   /// Set a binding equation

@@ -64,28 +64,12 @@ const MX& DaeBuilder::t() const {
   return var((*this)->t_.at(0));
 }
 
-std::vector<std::string> DaeBuilder::x() const {
-  return name((*this)->x_);
-}
-
 std::vector<MX> DaeBuilder::ode() const {
   return (*this)->ode();
 }
 
-std::vector<std::string> DaeBuilder::z() const {
-  return name((*this)->z_);
-}
-
 std::vector<MX> DaeBuilder::alg() const {
   return (*this)->alg();
-}
-
-std::vector<std::string> DaeBuilder::q() const {
-  return name((*this)->q_);
-}
-
-std::vector<std::string> DaeBuilder::e() const {
-  return name((*this)->e_);
 }
 
 std::vector<MX> DaeBuilder::quad() const {
@@ -96,40 +80,16 @@ std::vector<MX> DaeBuilder::zero() const {
   return (*this)->zero();
 }
 
-std::vector<std::string> DaeBuilder::y() const {
-  return name((*this)->y_);
-}
-
 std::vector<MX> DaeBuilder::ydef() const {
   return (*this)->ydef();
-}
-
-std::vector<std::string> DaeBuilder::u() const {
-  return name((*this)->u_);
-}
-
-std::vector<std::string> DaeBuilder::p() const {
-  return name((*this)->p_);
-}
-
-std::vector<std::string> DaeBuilder::c() const {
-  return name((*this)->c_);
 }
 
 std::vector<MX> DaeBuilder::cdef() const {
   return (*this)->cdef();
 }
 
-std::vector<std::string> DaeBuilder::d() const {
-  return name((*this)->d_);
-}
-
 std::vector<MX> DaeBuilder::ddef() const {
   return (*this)->ddef();
-}
-
-std::vector<std::string> DaeBuilder::w() const {
-  return name((*this)->w_);
 }
 
 std::vector<MX> DaeBuilder::wdef() const {
@@ -429,6 +389,26 @@ void DaeBuilder::set_all(const std::string& v, const std::vector<std::string>& n
     (*this)->set_all(v, name);
   } catch (std::exception& e) {
     THROW_ERROR("set_all", e.what());
+  }
+}
+
+MX DaeBuilder::add(const std::string& name, const std::string& causality,
+    const std::string& variability, const Dict& opts) {
+  try {
+    return (*this)->add(name, to_enum<Causality>(causality),
+      to_enum<Variability>(variability), opts);
+  } catch (std::exception& e) {
+    THROW_ERROR("add", e.what());
+    return MX();
+  }
+}
+
+MX DaeBuilder::add(const std::string& name, const std::string& causality, const Dict& opts) {
+  try {
+    return (*this)->add(name, to_enum<Causality>(causality), opts);
+  } catch (std::exception& e) {
+    THROW_ERROR("add", e.what());
+    return MX();
   }
 }
 
