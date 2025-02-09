@@ -319,6 +319,15 @@ std::vector<std::string> DaeBuilder::all() const {
   }
 }
 
+std::vector<std::string> DaeBuilder::all(const std::string& cat) const {
+  try {
+    return (*this)->all(cat);
+  } catch (std::exception& e) {
+    THROW_ERROR("all", e.what());
+    return {};  // never reached
+  }
+}
+
 #if WITH_DEPRECATED_FEATURES
 Variable& DaeBuilder::new_variable(const std::string& name, casadi_int numel) {
   try {
@@ -992,7 +1001,7 @@ std::vector<size_t> DaeBuilder::find(const std::vector<std::string>& name) const
 
 const std::string& DaeBuilder::name(size_t ind) const {
   try {
-    return variable(ind).name;
+    return (*this)->name(ind);
   } catch (std::exception& e) {
     THROW_ERROR("name", e.what());
     static std::string dummy;
@@ -1002,9 +1011,7 @@ const std::string& DaeBuilder::name(size_t ind) const {
 
 std::vector<std::string> DaeBuilder::name(const std::vector<size_t>& ind) const {
   try {
-    std::vector<std::string> r(ind.size());
-    for (size_t i = 0; i < r.size(); ++i) r[i] = name(ind[i]);
-    return r;
+    return (*this)->name(ind);
   } catch (std::exception& e) {
     THROW_ERROR("name", e.what());
     return {}; // never reached

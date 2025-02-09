@@ -1419,6 +1419,10 @@ std::vector<std::string> DaeBuilderInternal::all() const {
   return r;
 }
 
+std::vector<std::string> DaeBuilderInternal::all(const std::string& cat) const {
+  return name(ind_in(cat));
+}
+
 size_t DaeBuilderInternal::n_mem() const {
   size_t n = 0;
   for (const Variable* v : variables_) n += v->numel;
@@ -3265,9 +3269,20 @@ size_t DaeBuilderInternal::find(const std::string& name) const {
   return it->second;
 }
 
+
 std::vector<size_t> DaeBuilderInternal::find(const std::vector<std::string>& name) const {
   std::vector<size_t> r(name.size());
   for (size_t i = 0; i < r.size(); ++i) r[i] = find(name[i]);
+  return r;
+}
+
+const std::string& DaeBuilderInternal::name(size_t ind) const {
+  return variable(ind).name;
+}
+
+std::vector<std::string> DaeBuilderInternal::name(const std::vector<size_t>& ind) const {
+  std::vector<std::string> r(ind.size());
+  for (size_t i = 0; i < r.size(); ++i) r[i] = name(ind[i]);
   return r;
 }
 

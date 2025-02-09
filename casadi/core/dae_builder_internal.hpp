@@ -383,6 +383,9 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   /// Get a list of all variables
   std::vector<std::string> all() const;
 
+  /// Get a list of all variables of a particular category
+  std::vector<std::string> all(const std::string& cat) const;
+
   /// Length of variables array
   size_t n_variables() const {return variables_.size();}
 
@@ -415,6 +418,12 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
 
   /// Get indices of variable
   std::vector<size_t> find(const std::vector<std::string>& name) const;
+
+  /** \brief Get variable name by index */
+  const std::string& name(size_t ind) const;
+
+  /** \brief Get variable names by indices */
+  std::vector<std::string> name(const std::vector<size_t>& ind) const;
 
   /// Get the (cached) oracle, SX or MX
   const Function& oracle(bool sx = false, bool elim_w = false, bool lifted_calls = false) const;

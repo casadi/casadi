@@ -688,6 +688,9 @@ class CASADI_EXPORT DaeBuilder
   /// Get a list of all variables
   std::vector<std::string> all() const;
 
+  /// Get a list of all variables of a particular category
+  std::vector<std::string> all(const std::string& cat) const;
+
 #if WITH_DEPRECATED_FEATURES
   /// [DEPRECATED] Use add
   MX add_variable(const std::string& name, casadi_int n=1);
