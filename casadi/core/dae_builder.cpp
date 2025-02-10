@@ -61,7 +61,7 @@ const std::string& DaeBuilder::name() const {
 }
 
 const MX& DaeBuilder::t() const {
-  return var((*this)->t_.at(0));
+  return (*this)->var((*this)->t_.at(0));
 }
 
 std::vector<MX> DaeBuilder::ode() const {
@@ -326,6 +326,25 @@ const Variable& DaeBuilder::variable(size_t ind) const {
     return (*this)->variable(ind);
   } catch (std::exception& e) {
     THROW_ERROR("variable", e.what());
+  }
+}
+
+const MX& DaeBuilder::var(size_t ind) const {
+  try {
+    return (*this)->var(ind);
+  } catch (std::exception& e) {
+    THROW_ERROR("var", e.what());
+    static MX dummy;
+    return dummy; // never reached
+  }
+}
+
+std::vector<MX> DaeBuilder::var(const std::vector<size_t>& ind) const {
+  try {
+    return (*this)->var(ind);
+  } catch (std::exception& e) {
+    THROW_ERROR("var", e.what());
+    return {}; // never reached
   }
 }
 
@@ -965,25 +984,6 @@ MX DaeBuilder::der(const MX& v) const {
   } catch (std::exception& e) {
     THROW_ERROR("der", e.what());
     return MX();  // never reached
-  }
-}
-
-const MX& DaeBuilder::var(size_t ind) const {
-  try {
-    return (*this)->var(ind);
-  } catch (std::exception& e) {
-    THROW_ERROR("var", e.what());
-    static MX dummy;
-    return dummy; // never reached
-  }
-}
-
-std::vector<MX> DaeBuilder::var(const std::vector<size_t>& ind) const {
-  try {
-    return (*this)->var(ind);
-  } catch (std::exception& e) {
-    THROW_ERROR("var", e.what());
-    return {}; // never reached
   }
 }
 

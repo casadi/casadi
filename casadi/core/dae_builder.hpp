@@ -756,6 +756,14 @@ class CASADI_EXPORT DaeBuilder
   Variable& variable(size_t ind);
   const Variable& variable(size_t ind) const;
   ///@}
+
+  ///@{
+  /// [DEPRECATED] Use string name, not internal index to access variables
+  const MX& var(size_t ind) const;
+  std::vector<MX> var(const std::vector<size_t>& ind) const;
+  ///@}
+
+
 #endif // WITH_DEPRECATED_FEATURES
 
   /// Access a member function or object
@@ -769,12 +777,6 @@ class CASADI_EXPORT DaeBuilder
 
   /// Get the time derivative of an expression
   MX der(const MX& v) const;
-
-  /// Get single variable expression by index
-  const MX& var(size_t ind) const;
-
-  /// Get variable expressions by index
-  std::vector<MX> var(const std::vector<size_t>& ind) const;
 
   /// Get index of variable
   size_t find(const std::string& name) const;
