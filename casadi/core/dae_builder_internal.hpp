@@ -523,6 +523,12 @@ protected:
   // Event conditions and transition equations
   std::vector<MX> when_cond_, when_lhs_, when_rhs_;
 
+ /** \brief Is there a time variable? */
+  bool has_t() const;
+
+  // Time variable
+  const MX& time() const;
+
   /** \brief Definitions of dependent constants
 
       \identifier{u} */

@@ -60,8 +60,14 @@ const std::string& DaeBuilder::name() const {
   return (*this)->name_;
 }
 
-const MX& DaeBuilder::t() const {
-  return (*this)->var((*this)->t_.at(0));
+const MX& DaeBuilder::time() const {
+  try {
+    return (*this)->time();
+  } catch (std::exception& e) {
+    THROW_ERROR("time", e.what());
+    static const MX t;
+    return t;  // never reached
+  }
 }
 
 std::vector<MX> DaeBuilder::ode() const {
@@ -144,7 +150,12 @@ std::vector<std::string> DaeBuilder::initial_unknowns() const {
 }
 
 bool DaeBuilder::has_t() const {
-  return !(*this)->t_.empty();
+  try {
+    return (*this)->has_t();
+  } catch (std::exception& e) {
+    THROW_ERROR("has_t", e.what());
+    return false;  // never reached
+  }
 }
 
 casadi_int DaeBuilder::nx() const {

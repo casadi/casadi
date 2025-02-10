@@ -87,10 +87,11 @@ class CASADI_EXPORT DaeBuilder
 
   /** @name Variables and equations */
   ///@{
-  /** \brief Independent variable (usually time)
+  /** \brief Expression for independent variable (usually time) */
+  const MX& time() const;
 
-      \identifier{5e} */
-  const MX& t() const;
+  /** \brief Independent variable (usually time) */
+  std::vector<std::string> t_new() const {return all("t");}
 
   /** \brief Differential states
 
@@ -306,6 +307,9 @@ class CASADI_EXPORT DaeBuilder
     const Dict& opts=Dict());
 
 #ifdef WITH_DEPRECATED_FEATURES
+  /// [DEPRECATED] Renamed "time"
+  const MX& t() const { return time();}
+
   /// [DEPRECATED] Replaced by add
   MX add_t(const std::string& name="t");
 

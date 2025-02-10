@@ -2476,6 +2476,15 @@ Function DaeBuilderInternal::gather_eq() const {
   return Function("all_eq", {}, f_out, {}, f_out_name, {{"allow_free", true}});
 }
 
+const MX& DaeBuilderInternal::time() const {
+  casadi_assert(has_t(), "No explicit time variable");
+  return var(t_.at(0));
+}
+
+bool DaeBuilderInternal::has_t() const {
+  return !t_.empty();
+}
+
 std::vector<MX> DaeBuilderInternal::cdef() const {
   std::vector<MX> ret;
   ret.reserve(c_.size());
@@ -3669,7 +3678,7 @@ std::string DaeBuilderInternal::generate_guid() {
   // Initialize random seed
   static bool initialized = false;
   if (!initialized) {
-      srand(time(nullptr));  // NOLINT(runtime/threadsafe_fn)
+      srand(::time(nullptr));  // NOLINT(runtime/threadsafe_fn)
     initialized = true;
   }
   // Possible characters
