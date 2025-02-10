@@ -297,6 +297,38 @@ Variable& DaeBuilder::new_variable(const std::string& name, casadi_int numel) {
   }
 }
 
+Variable& DaeBuilder::variable(const std::string& name) {
+  try {
+    return (*this)->variable(name);
+  } catch (std::exception& e) {
+    THROW_ERROR("variable", e.what());
+  }
+}
+
+const Variable& DaeBuilder::variable(const std::string& name) const {
+  try {
+    return (*this)->variable(name);
+  } catch (std::exception& e) {
+    THROW_ERROR("variable", e.what());
+  }
+}
+
+Variable& DaeBuilder::variable(size_t ind) {
+  try {
+    return (*this)->variable(ind);
+  } catch (std::exception& e) {
+    THROW_ERROR("variable", e.what());
+  }
+}
+
+const Variable& DaeBuilder::variable(size_t ind) const {
+  try {
+    return (*this)->variable(ind);
+  } catch (std::exception& e) {
+    THROW_ERROR("variable", e.what());
+  }
+}
+
 MX DaeBuilder::add_variable(const std::string& name, casadi_int n) {
   return add_variable(name, Sparsity::dense(n));
 }
@@ -536,7 +568,7 @@ void DaeBuilder::sanity_check() const {
 
 MX DaeBuilder::var(const std::string& name) const {
   try {
-    return variable(name).v;
+    return (*this)->variable(name).v;
   } catch (std::exception& e) {
     THROW_ERROR("var", e.what());
     return MX();  // never reached
@@ -548,10 +580,10 @@ std::string DaeBuilder::der(const std::string& name) const {
     // Get variable index
     size_t ind = find(name);
     // Differentiate
-    ind = variable(ind).der;
+    ind = (*this)->variable(ind).der;
     casadi_assert(ind != size_t(-1), "No derivative expression for " + name);
     // Return name
-    return variable(ind).name;
+    return (*this)->variable(ind).name;
   } catch (std::exception& e) {
     THROW_ERROR("der", e.what());
     return std::string();  // never reached
@@ -580,7 +612,7 @@ bool DaeBuilder::has_beq(const std::string& name) const {
 
 MX DaeBuilder::beq(const std::string& name) const {
   try {
-    return variable(name).beq;
+    return (*this)->variable(name).beq;
   } catch (std::exception& e) {
     THROW_ERROR("beq", e.what());
     return MX();  // never reached
@@ -589,7 +621,7 @@ MX DaeBuilder::beq(const std::string& name) const {
 
 void DaeBuilder::set_beq(const std::string& name, const MX& val) {
   try {
-    variable(name).beq = val;
+    (*this)->variable(name).beq = val;
   } catch (std::exception& e) {
     THROW_ERROR("set_beq", e.what());
   }
@@ -619,19 +651,19 @@ void DaeBuilder::lift(bool lift_shared, bool lift_calls) {
 }
 
 casadi_int DaeBuilder::value_reference(const std::string& name) const {
-  return variable(name).value_reference;
+  return (*this)->variable(name).value_reference;
 }
 
 void DaeBuilder::set_value_reference(const std::string& name, casadi_int val) {
-  variable(name).value_reference = val;
+  (*this)->variable(name).value_reference = val;
 }
 
 std::string DaeBuilder::description(const std::string& name) const {
-  return variable(name).description;
+  return (*this)->variable(name).description;
 }
 
 void DaeBuilder::set_description(const std::string& name, const std::string& val) {
-  variable(name).description = val;
+  (*this)->variable(name).description = val;
 }
 
 std::string DaeBuilder::type(const std::string& name, casadi_int fmi_version) const {
@@ -639,67 +671,67 @@ std::string DaeBuilder::type(const std::string& name, casadi_int fmi_version) co
   casadi_assert(fmi_version == 2 || fmi_version == 3, "Only FMI version 2 or 3 supported");
   // Handle FMI 2
   if (fmi_version == 2) {
-    return to_string(to_fmi2(variable(name).type));
+    return to_string(to_fmi2((*this)->variable(name).type));
   }
   // Assume FMI 3
-  return to_string(variable(name).type);
+  return to_string((*this)->variable(name).type);
 }
 
 void DaeBuilder::set_type(const std::string& name, const std::string& val) {
   // Fallback to FMI 2, if necessary
   if (has_enum<TypeFmi2>(val) && !has_enum<Type>(val)) {
-    variable(name).type = from_fmi2(to_enum<TypeFmi2>(val));
+    (*this)->variable(name).type = from_fmi2(to_enum<TypeFmi2>(val));
   }
   // Assume FMI 3
-  variable(name).type = to_enum<Type>(val);
+  (*this)->variable(name).type = to_enum<Type>(val);
 }
 
 std::string DaeBuilder::causality(const std::string& name) const {
-  return to_string(variable(name).causality);
+  return to_string((*this)->variable(name).causality);
 }
 
 void DaeBuilder::set_causality(const std::string& name, const std::string& val) {
-  variable(name).causality = to_enum<Causality>(val);
+  (*this)->variable(name).causality = to_enum<Causality>(val);
 }
 
 std::string DaeBuilder::variability(const std::string& name) const {
-  return to_string(variable(name).variability);
+  return to_string((*this)->variable(name).variability);
 }
 
 void DaeBuilder::set_variability(const std::string& name, const std::string& val) {
-  variable(name).variability = to_enum<Variability>(val);
+  (*this)->variable(name).variability = to_enum<Variability>(val);
 }
 
 std::string DaeBuilder::initial(const std::string& name) const {
-  return to_string(variable(name).initial);
+  return to_string((*this)->variable(name).initial);
 }
 
 void DaeBuilder::set_initial(const std::string& name, const std::string& val) {
-  variable(name).initial = to_enum<Initial>(val);
+  (*this)->variable(name).initial = to_enum<Initial>(val);
 }
 
 std::string DaeBuilder::unit(const std::string& name) const {
-  return variable(name).unit;
+  return (*this)->variable(name).unit;
 }
 
 void DaeBuilder::set_unit(const std::string& name, const std::string& val) {
-  variable(name).unit = val;
+  (*this)->variable(name).unit = val;
 }
 
 std::string DaeBuilder::display_unit(const std::string& name) const {
-  return variable(name).display_unit;
+  return (*this)->variable(name).display_unit;
 }
 
 void DaeBuilder::set_display_unit(const std::string& name, const std::string& val) {
-  variable(name).display_unit = val;
+  (*this)->variable(name).display_unit = val;
 }
 
 casadi_int DaeBuilder::numel(const std::string& name) const {
-  return variable(name).numel;
+  return (*this)->variable(name).numel;
 }
 
 std::vector<casadi_int> DaeBuilder::dimension(const std::string& name) const {
-  return variable(name).dimension;
+  return (*this)->variable(name).dimension;
 }
 
 double DaeBuilder::start_time() const {
@@ -915,38 +947,6 @@ Function DaeBuilder::event_transition(const std::string& fname) const {
   }
 }
 
-Variable& DaeBuilder::variable(const std::string& name) {
-  try {
-    return (*this)->variable(name);
-  } catch (std::exception& e) {
-    THROW_ERROR("variable", e.what());
-  }
-}
-
-const Variable& DaeBuilder::variable(const std::string& name) const {
-  try {
-    return (*this)->variable(name);
-  } catch (std::exception& e) {
-    THROW_ERROR("variable", e.what());
-  }
-}
-
-Variable& DaeBuilder::variable(size_t ind) {
-  try {
-    return (*this)->variable(ind);
-  } catch (std::exception& e) {
-    THROW_ERROR("variable", e.what());
-  }
-}
-
-const Variable& DaeBuilder::variable(size_t ind) const {
-  try {
-    return (*this)->variable(ind);
-  } catch (std::exception& e) {
-    THROW_ERROR("variable", e.what());
-  }
-}
-
 bool DaeBuilder::test_cast(const SharedObjectInternal* ptr) {
   return dynamic_cast<const DaeBuilderInternal*>(ptr) != nullptr;
 }
@@ -1062,7 +1062,7 @@ void DaeBuilder::set_attribute(const std::string& a, const std::vector<std::stri
 
 double DaeBuilder::min(const std::string& name) const {
   try {
-    return variable(name).min;
+    return (*this)->variable(name).min;
   } catch (std::exception& e) {
     THROW_ERROR("min", e.what());
     return 0; // never reached
@@ -1080,7 +1080,7 @@ std::vector<double> DaeBuilder::min(const std::vector<std::string>& name) const 
 
 void DaeBuilder::set_min(const std::string& name, double val) {
   try {
-    variable(name).min = val;
+    (*this)->variable(name).min = val;
   } catch (std::exception& e) {
     THROW_ERROR("set_min", e.what());
   }
@@ -1096,7 +1096,7 @@ void DaeBuilder::set_min(const std::vector<std::string>& name, const std::vector
 
 double DaeBuilder::max(const std::string& name) const {
   try {
-    return variable(name).max;
+    return (*this)->variable(name).max;
   } catch (std::exception& e) {
     THROW_ERROR("max", e.what());
     return 0; // never reached
@@ -1114,7 +1114,7 @@ std::vector<double> DaeBuilder::max(const std::vector<std::string>& name) const 
 
 void DaeBuilder::set_max(const std::string& name, double val) {
   try {
-    variable(name).max = val;
+    (*this)->variable(name).max = val;
   } catch (std::exception& e) {
     THROW_ERROR("set_max", e.what());
   }
@@ -1130,7 +1130,7 @@ void DaeBuilder::set_max(const std::vector<std::string>& name, const std::vector
 
 double DaeBuilder::nominal(const std::string& name) const {
   try {
-    return variable(name).nominal;
+    return (*this)->variable(name).nominal;
   } catch (std::exception& e) {
     THROW_ERROR("nominal", e.what());
     return 0; // never reached
@@ -1148,7 +1148,7 @@ std::vector<double> DaeBuilder::nominal(const std::vector<std::string>& name) co
 
 void DaeBuilder::set_nominal(const std::string& name, double val) {
   try {
-    variable(name).nominal = val;
+    (*this)->variable(name).nominal = val;
   } catch (std::exception& e) {
     THROW_ERROR("set_nominal", e.what());
   }
@@ -1165,7 +1165,7 @@ void DaeBuilder::set_nominal(const std::vector<std::string>& name, const std::ve
 double DaeBuilder::start(const std::string& name) const {
   try {
     casadi_assert(numel(name) == 1, "Variable " + name + " is not scalar");
-    return variable(name).start.front();
+    return (*this)->variable(name).start.front();
   } catch (std::exception& e) {
     THROW_ERROR("start", e.what());
     return 0; // never reached

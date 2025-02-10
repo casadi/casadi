@@ -748,19 +748,15 @@ class CASADI_EXPORT DaeBuilder
 #if WITH_DEPRECATED_FEATURES
   /// [DEPRECATED] Use add
   Variable& new_variable(const std::string& name, casadi_int numel = 1);
-#endif // WITH_DEPRECATED_FEATURES
 
   ///@{
-  /// Access a variable by name
+  /// [DEPRECATED] Access to internal class removed
   Variable& variable(const std::string& name);
   const Variable& variable(const std::string& name) const;
-  ///@}
-
-  ///@{
-  /// Access a variable by index
   Variable& variable(size_t ind);
   const Variable& variable(size_t ind) const;
   ///@}
+#endif // WITH_DEPRECATED_FEATURES
 
   /// Access a member function or object
   const DaeBuilderInternal* operator->() const;
