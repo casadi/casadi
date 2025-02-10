@@ -750,11 +750,15 @@ class CASADI_EXPORT DaeBuilder
   Variable& new_variable(const std::string& name, casadi_int numel = 1);
 
   ///@{
-  /// [DEPRECATED] Access to internal class removed
+  /// [DEPRECATED] Access to internal class and corresponding indexing removed
   Variable& variable(const std::string& name);
   const Variable& variable(const std::string& name) const;
   Variable& variable(size_t ind);
   const Variable& variable(size_t ind) const;
+  size_t find(const std::string& name) const;
+  std::vector<size_t> find(const std::vector<std::string>& name) const;
+  const std::string& name(size_t ind) const;
+  std::vector<std::string> name(const std::vector<size_t>& ind) const;
   ///@}
 
   ///@{
@@ -762,7 +766,6 @@ class CASADI_EXPORT DaeBuilder
   const MX& var(size_t ind) const;
   std::vector<MX> var(const std::vector<size_t>& ind) const;
   ///@}
-
 
 #endif // WITH_DEPRECATED_FEATURES
 
@@ -777,22 +780,6 @@ class CASADI_EXPORT DaeBuilder
 
   /// Get the time derivative of an expression
   MX der(const MX& v) const;
-
-  /// Get index of variable
-  size_t find(const std::string& name) const;
-
-  /// Get indices of variable
-  std::vector<size_t> find(const std::vector<std::string>& name) const;
-
-  /** \brief Get variable name by index
-
-      \identifier{6h} */
-  const std::string& name(size_t ind) const;
-
-  /** \brief Get variable names by indices
-
-      \identifier{6i} */
-  std::vector<std::string> name(const std::vector<size_t>& ind) const;
 
 #endif // SWIG
 };

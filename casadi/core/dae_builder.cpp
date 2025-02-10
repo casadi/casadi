@@ -118,7 +118,7 @@ const std::vector<MX>& DaeBuilder::when_rhs() const {
 
 std::vector<std::string> DaeBuilder::outputs() const {
   try {
-    return name((*this)->outputs_);
+    return (*this)->name((*this)->outputs_);
   } catch (std::exception& e) {
     THROW_ERROR("outputs", e.what());
     return {};  // never reached
@@ -127,7 +127,7 @@ std::vector<std::string> DaeBuilder::outputs() const {
 
 std::vector<std::string> DaeBuilder::derivatives() const {
   try {
-    return name((*this)->derivatives_);
+    return (*this)->name((*this)->derivatives_);
   } catch (std::exception& e) {
     THROW_ERROR("derivatives", e.what());
     return {};  // never reached
@@ -136,7 +136,7 @@ std::vector<std::string> DaeBuilder::derivatives() const {
 
 std::vector<std::string> DaeBuilder::initial_unknowns() const {
   try {
-    return name((*this)->initial_unknowns_);
+    return (*this)->name((*this)->initial_unknowns_);
   } catch (std::exception& e) {
     THROW_ERROR("initial_unknowns", e.what());
     return {};  // never reached
@@ -329,6 +329,42 @@ const Variable& DaeBuilder::variable(size_t ind) const {
   }
 }
 
+size_t DaeBuilder::find(const std::string& name) const {
+  try {
+    return (*this)->find(name);
+  } catch (std::exception& e) {
+    THROW_ERROR("find", e.what());
+    return -1; // never reached
+  }
+}
+
+std::vector<size_t> DaeBuilder::find(const std::vector<std::string>& name) const {
+  try {
+    return (*this)->find(name);
+  } catch (std::exception& e) {
+    THROW_ERROR("find", e.what());
+    return {}; // never reached
+  }
+}
+
+const std::string& DaeBuilder::name(size_t ind) const {
+  try {
+    return (*this)->name(ind);
+  } catch (std::exception& e) {
+    THROW_ERROR("name", e.what());
+    static std::string dummy;
+    return dummy; // never reached
+  }
+}
+
+std::vector<std::string> DaeBuilder::name(const std::vector<size_t>& ind) const {
+  try {
+    return (*this)->name(ind);
+  } catch (std::exception& e) {
+    THROW_ERROR("name", e.what());
+    return {}; // never reached
+  }
+}
 const MX& DaeBuilder::var(size_t ind) const {
   try {
     return (*this)->var(ind);
@@ -597,7 +633,7 @@ MX DaeBuilder::var(const std::string& name) const {
 std::string DaeBuilder::der(const std::string& name) const {
   try {
     // Get variable index
-    size_t ind = find(name);
+    size_t ind = (*this)->find(name);
     // Differentiate
     ind = (*this)->variable(ind).der;
     casadi_assert(ind != size_t(-1), "No derivative expression for " + name);
@@ -987,43 +1023,6 @@ MX DaeBuilder::der(const MX& v) const {
   }
 }
 
-size_t DaeBuilder::find(const std::string& name) const {
-  try {
-    return (*this)->find(name);
-  } catch (std::exception& e) {
-    THROW_ERROR("find", e.what());
-    return -1; // never reached
-  }
-}
-
-std::vector<size_t> DaeBuilder::find(const std::vector<std::string>& name) const {
-  try {
-    return (*this)->find(name);
-  } catch (std::exception& e) {
-    THROW_ERROR("find", e.what());
-    return {}; // never reached
-  }
-}
-
-const std::string& DaeBuilder::name(size_t ind) const {
-  try {
-    return (*this)->name(ind);
-  } catch (std::exception& e) {
-    THROW_ERROR("name", e.what());
-    static std::string dummy;
-    return dummy; // never reached
-  }
-}
-
-std::vector<std::string> DaeBuilder::name(const std::vector<size_t>& ind) const {
-  try {
-    return (*this)->name(ind);
-  } catch (std::exception& e) {
-    THROW_ERROR("name", e.what());
-    return {}; // never reached
-  }
-}
-
 double DaeBuilder::attribute(const std::string& a, const std::string& name) const {
   try {
     return (*this)->attribute(to_enum<Attribute>(a), name);
@@ -1262,7 +1261,7 @@ std::vector<GenericType> DaeBuilder::get(const std::vector<std::string>& name) c
 Sparsity DaeBuilder::jac_sparsity(const std::vector<std::string>& onames,
     const std::vector<std::string>& inames) const {
   try {
-    return (*this)->jac_sparsity(find(onames), find(inames));
+    return (*this)->jac_sparsity((*this)->find(onames), (*this)->find(inames));
   } catch (std::exception& e) {
     THROW_ERROR("jac_sparsity", e.what());
     return Sparsity();  // never reached
