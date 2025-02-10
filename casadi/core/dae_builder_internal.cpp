@@ -2640,6 +2640,8 @@ MX DaeBuilderInternal::add(const std::string& name, Causality causality,
       case Causality::LOCAL:
         // Type determined by providing equation
         break;
+      default:
+        casadi_error("Unknown causality");
     }
     // Also create a derivative variable, if needed
     if (v.needs_der()) {
