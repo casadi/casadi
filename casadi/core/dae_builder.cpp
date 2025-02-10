@@ -299,7 +299,7 @@ std::vector<std::string> DaeBuilder::all(const std::string& cat) const {
   }
 }
 
-#if WITH_DEPRECATED_FEATURES
+#ifdef WITH_DEPRECATED_FEATURES
 Variable& DaeBuilder::new_variable(const std::string& name, casadi_int numel) {
   try {
     return (*this)->new_variable(name, {numel});
