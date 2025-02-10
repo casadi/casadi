@@ -179,6 +179,25 @@ CASADI_EXPORT std::string to_string(DependenciesKind v) {
   return "";
 }
 
+std::string to_string(Category v) {
+  switch (v) {
+  case Category::T: return "t";
+  case Category::P: return "p";
+  case Category::U: return "u";
+  case Category::X: return "x";
+  case Category::Z: return "z";
+  case Category::Q: return "q";
+  case Category::C: return "c";
+  case Category::D: return "d";
+  case Category::W: return "w";
+  case Category::Y: return "y";
+  case Category::E: return "e";
+  default: break;
+  }
+  return "";
+}
+
+
 double Variable::attribute(Attribute a) const {
   switch (a) {
     case Attribute::MIN:
@@ -287,6 +306,7 @@ Variable::Variable(casadi_int index, const std::string& name,
   this->type = Type::FLOAT64;
   this->causality = Causality::LOCAL;
   this->variability = Variability::CONTINUOUS;
+  this->category = Category::NUMEL;
   this->min = -inf;
   this->max = inf,
   this->nominal = 1.0;
@@ -372,6 +392,30 @@ bool Variable::has_start() const {
   if (causality == Causality::INPUT) return true;
   if (variability == Variability::CONSTANT) return true;
   return false;
+}
+
+bool Variable::needs_der() const {
+  // Only continuous variables can have derivatives
+  if (variability != Variability::CONTINUOUS) return false;
+  // Independent variables have trivial derivatives (1)
+  if (causality == Causality::INDEPENDENT) return false;
+  // Inputs are assumed piecewise constant
+  if (causality == Causality::INPUT) return false;
+  // Other variables may have derivatives
+  return true;
+}
+
+MX Variable::dot(const DaeBuilderInternal& self) const {
+  if (causality == Causality::INDEPENDENT) {
+    // Time derivative of independent variable is 1
+    return 1;
+  } else if (needs_der()) {
+    // Should have a derviative expression
+    return self.variable(der).v;
+  } else {
+    // Constant or piecewise constant variable
+    return MX::zeros(v.sparsity());
+  }
 }
 
 DaeBuilderInternal::~DaeBuilderInternal() {
@@ -1109,7 +1153,7 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
     for (size_t k : init_) {
       const Variable& v = variable(k);
       stream << "  " << v.name;
-      if (!v.init_beq.is_empty()) stream << " := " << v.init_beq;
+      if (!v.ieq.is_empty()) stream << " := " << v.ieq;
       stream << std::endl;
     }
   }
@@ -1169,17 +1213,17 @@ void DaeBuilderInternal::sort_z(const std::vector<std::string>& z_order) {
 }
 
 std::vector<size_t>& DaeBuilderInternal::ind_in(const std::string& v) {
-  switch (to_enum<DaeBuilderInternalIn>(v)) {
-  case DAE_BUILDER_T: return t_;
-  case DAE_BUILDER_P: return p_;
-  case DAE_BUILDER_U: return u_;
-  case DAE_BUILDER_X: return x_;
-  case DAE_BUILDER_Z: return z_;
-  case DAE_BUILDER_Q: return q_;
-  case DAE_BUILDER_C: return c_;
-  case DAE_BUILDER_D: return d_;
-  case DAE_BUILDER_W: return w_;
-  case DAE_BUILDER_Y: return y_;
+  switch (to_enum<Category>(v)) {
+  case Category::T: return t_;
+  case Category::P: return p_;
+  case Category::U: return u_;
+  case Category::X: return x_;
+  case Category::Z: return z_;
+  case Category::Q: return q_;
+  case Category::C: return c_;
+  case Category::D: return d_;
+  case Category::W: return w_;
+  case Category::Y: return y_;
   default: break;
   }
   // Unsuccessful
@@ -1208,13 +1252,14 @@ void DaeBuilderInternal::prune(bool prune_p, bool prune_u) {
   std::vector<MX> f_in, f_out, v;
   std::vector<std::string> f_in_name, f_out_name;
   // Collect all DAE input variables with at least one entry, skip u
-  for (casadi_int i = 0; i != DAE_BUILDER_NUM_IN; ++i) {
-    if (prune_p && i == DAE_BUILDER_P) continue;
-    if (prune_u && i == DAE_BUILDER_U) continue;
-    v = input(static_cast<DaeBuilderInternalIn>(i));
+  for (casadi_int i = 0; i != enum_traits<Category>::n_enum; ++i) {
+    auto cat = static_cast<Category>(i);
+    if (prune_p && cat == Category::P) continue;
+    if (prune_u && cat == Category::U) continue;
+    v = input(cat);
     if (!v.empty()) {
       f_in.push_back(vertcat(v));
-      f_in_name.push_back(to_string(static_cast<DaeBuilderInternalIn>(i)));
+      f_in_name.push_back(to_string(cat));
     }
   }
   // Collect all DAE output variables with at least one entry
@@ -1505,13 +1550,30 @@ const MX& DaeBuilderInternal::var(const std::string& name) const {
   return variable(name).v;
 }
 
-MX DaeBuilderInternal::der(const std::string& name) const {
-  return variable(variable(name).der_of).v;
-}
-
 MX DaeBuilderInternal::der(const MX& var) const {
-  casadi_assert_dev(var.is_column() && var.is_symbolic());
-  return der(var.name());
+  // Must be a vector
+  casadi_assert(var.is_column(), "Input expression must be a vector");
+  // Quick return if symbolic variable
+  if (var.is_symbolic()) return der(find(var));
+  // If a vertical concatenation
+  if (var.is_valid_input()) {
+    // Differentiate each primitive
+    auto var_split = var.primitives();
+    for (MX& s : var_split) s = der(s);
+    // Return the concatenation
+    return var.join_primitives(var_split);
+  }
+  // Handle general case: Get dependent symbolic primitives
+  std::vector<MX> dep = symvar(var);
+  // Get derivatives of dependent symbolic primitives
+  std::vector<MX> dep_der;
+  for (size_t ind : find(dep)) dep_der.push_back(der(ind));
+  // Forward directional derivative to get time derivative:
+  // dot(var) = d_var/d_dep * dot(dep)
+  std::vector<std::vector<MX>> r = {dep_der};
+  r = forward(std::vector<MX>{var}, dep, r);
+  casadi_assert_dev(r.size() == 1);
+  return vertcat(r.at(0));
 }
 
 void DaeBuilderInternal::eliminate_d() {
@@ -1598,24 +1660,6 @@ void DaeBuilderInternal::lift(bool lift_shared, bool lift_calls) {
   casadi_assert_dev(it == ex.end());
 }
 
-std::string to_string(DaeBuilderInternal::DaeBuilderInternalIn v) {
-  switch (v) {
-  case DaeBuilderInternal::DAE_BUILDER_T: return "t";
-  case DaeBuilderInternal::DAE_BUILDER_P: return "p";
-  case DaeBuilderInternal::DAE_BUILDER_U: return "u";
-  case DaeBuilderInternal::DAE_BUILDER_X: return "x";
-  case DaeBuilderInternal::DAE_BUILDER_Z: return "z";
-  case DaeBuilderInternal::DAE_BUILDER_Q: return "q";
-  case DaeBuilderInternal::DAE_BUILDER_C: return "c";
-  case DaeBuilderInternal::DAE_BUILDER_D: return "d";
-  case DaeBuilderInternal::DAE_BUILDER_W: return "w";
-  case DaeBuilderInternal::DAE_BUILDER_Y: return "y";
-  case DaeBuilderInternal::DAE_BUILDER_E: return "e";
-  default: break;
-  }
-  return "";
-}
-
 std::string to_string(DaeBuilderInternal::DaeBuilderInternalOut v) {
   switch (v) {
   case DaeBuilderInternal::DAE_BUILDER_ODE: return "ode";
@@ -1630,24 +1674,24 @@ std::string to_string(DaeBuilderInternal::DaeBuilderInternalOut v) {
   return "";
 }
 
-std::vector<MX> DaeBuilderInternal::input(DaeBuilderInternalIn ind) const {
+std::vector<MX> DaeBuilderInternal::input(Category ind) const {
   switch (ind) {
-  case DAE_BUILDER_T: return var(t_);
-  case DAE_BUILDER_C: return var(c_);
-  case DAE_BUILDER_P: return var(p_);
-  case DAE_BUILDER_D: return var(d_);
-  case DAE_BUILDER_W: return var(w_);
-  case DAE_BUILDER_U: return var(u_);
-  case DAE_BUILDER_X: return var(x_);
-  case DAE_BUILDER_Z: return var(z_);
-  case DAE_BUILDER_Q: return var(q_);
-  case DAE_BUILDER_Y: return var(y_);
-  case DAE_BUILDER_E: return var(e_);
+  case Category::T: return var(t_);
+  case Category::C: return var(c_);
+  case Category::P: return var(p_);
+  case Category::D: return var(d_);
+  case Category::W: return var(w_);
+  case Category::U: return var(u_);
+  case Category::X: return var(x_);
+  case Category::Z: return var(z_);
+  case Category::Q: return var(q_);
+  case Category::Y: return var(y_);
+  case Category::E: return var(e_);
   default: return std::vector<MX>{};
   }
 }
 
-std::vector<MX> DaeBuilderInternal::input(const std::vector<DaeBuilderInternalIn>& ind) const {
+std::vector<MX> DaeBuilderInternal::input(const std::vector<Category>& ind) const {
   std::vector<MX> ret(ind.size());
   for (casadi_int i=0; i<ind.size(); ++i) {
     ret[i] = vertcat(input(ind[i]));
@@ -2038,14 +2082,15 @@ const Function& DaeBuilderInternal::oracle(bool sx, bool elim_w, bool lifted_cal
     // Do we need to substitute out v
     bool subst_v = false;
     // Collect all DAE input variables
-    for (size_t i = 0; i != DAE_BUILDER_NUM_IN; ++i) {
-      if (i == DAE_BUILDER_Y) continue;  // fixme2
-      f_in_name.push_back(to_string(static_cast<DaeBuilderInternalIn>(i)));
-      v = input(static_cast<DaeBuilderInternalIn>(i));
+    for (size_t i = 0; i != enum_traits<Category>::n_enum; ++i) {
+      auto cat = static_cast<Category>(i);
+      if (cat == Category::Y) continue;  // fixme2
+      f_in_name.push_back(to_string(cat));
+      v = input(cat);
       if (v.empty()) {
         f_in.push_back(MX(0, 1));
       } else {
-        if (elim_w && i == DAE_BUILDER_W) {
+        if (elim_w && cat == Category::W) {
           subst_v = true;
         } else {
           f_in.push_back(vertcat(v));
@@ -2227,13 +2272,13 @@ Function DaeBuilderInternal::dependent_fun(const std::string& fname,
   // Are we calculating d and/or w
   bool calc_d = false, calc_w = false;
   // Convert outputs to enums
-  std::vector<DaeBuilderInternalIn> v_out;
+  std::vector<Category> v_out;
   v_out.reserve(v_out.size());
   for (const std::string& s : s_out) {
-    DaeBuilderInternalIn e = to_enum<DaeBuilderInternalIn>(s);
-    if (e == DAE_BUILDER_D) {
+    Category e = to_enum<Category>(s);
+    if (e == Category::D) {
       calc_d = true;
-    } else if (e == DAE_BUILDER_W) {
+    } else if (e == Category::W) {
       calc_w = true;
     } else {
       casadi_error("Can only calculate d and/or w");
@@ -2243,22 +2288,22 @@ Function DaeBuilderInternal::dependent_fun(const std::string& fname,
   // Consistency check
   casadi_assert(calc_d || calc_w, "Nothing to calculate");
   // Convert inputs to enums
-  std::vector<DaeBuilderInternalIn> v_in;
+  std::vector<Category> v_in;
   v_in.reserve(v_in.size());
   for (const std::string& s : s_in) {
-    DaeBuilderInternalIn e = to_enum<DaeBuilderInternalIn>(s);
-    if (calc_d && e == DAE_BUILDER_D) casadi_error("'d' cannot be both input and output");
-    if (calc_w && e == DAE_BUILDER_W) casadi_error("'w' cannot be both input and output");
+    Category e = to_enum<Category>(s);
+    if (calc_d && e == Category::D) casadi_error("'d' cannot be both input and output");
+    if (calc_w && e == Category::W) casadi_error("'w' cannot be both input and output");
     v_in.push_back(e);
   }
   // Collect input expressions
   std::vector<MX> f_in;
   f_in.reserve(s_in.size());
-  for (DaeBuilderInternalIn v : v_in) f_in.push_back(vertcat(input(v)));
+  for (Category v : v_in) f_in.push_back(vertcat(input(v)));
   // Collect output expressions
   std::vector<MX> f_out;
   f_out.reserve(s_out.size());
-  for (DaeBuilderInternalIn v : v_out) f_out.push_back(vertcat(input(v)));
+  for (Category v : v_out) f_out.push_back(vertcat(input(v)));
   // Variables to be substituted
   std::vector<MX> dw, dwdef;
   if (calc_d) {
@@ -2290,11 +2335,11 @@ Function DaeBuilderInternal::event_transition(const std::string& fname, casadi_i
 
   // Input expressions for the event functions, without the index
   std::vector<MX> ret_in(DYN_NUM_IN);
-  ret_in[DYN_T] = oracle_in[DAE_BUILDER_T];
-  ret_in[DYN_X] = oracle_in[DAE_BUILDER_X];
-  ret_in[DYN_Z] = oracle_in[DAE_BUILDER_Z];
-  ret_in[DYN_P] = oracle_in[DAE_BUILDER_P];
-  ret_in[DYN_U] = oracle_in[DAE_BUILDER_U];
+  ret_in[DYN_T] = oracle_in.at(static_cast<size_t>(Category::T));
+  ret_in[DYN_X] = oracle_in.at(static_cast<size_t>(Category::X));
+  ret_in[DYN_Z] = oracle_in.at(static_cast<size_t>(Category::Z));
+  ret_in[DYN_P] = oracle_in.at(static_cast<size_t>(Category::P));
+  ret_in[DYN_U] = oracle_in.at(static_cast<size_t>(Category::U));
 
   // Expressions for x and z after event
   std::vector<MX> ret_out = {ret_in[DYN_X], ret_in[DYN_Z]};
@@ -2523,7 +2568,7 @@ std::vector<MX> DaeBuilderInternal::init_rhs() const {
   std::vector<MX> ret;
   ret.reserve(init_.size());
   for (size_t ind : init_) {
-    ret.push_back(variable(ind).init_beq);
+    ret.push_back(variable(ind).ieq);
   }
   return ret;
 }
@@ -2560,19 +2605,23 @@ MX DaeBuilderInternal::add(const std::string& name, Causality causality,
       case Causality::INDEPENDENT:
         // Independent variable
         casadi_assert(t_.empty(), "'t' already defined");
+        v.category = Category::T;
         t_.push_back(v.index);
         break;
       case Causality::INPUT:
         // Control
+        v.category = Category::U;
         u_.push_back(v.index);
         break;
       case Causality::OUTPUT:
         // Output
+        v.category = Category::Y;
         y_.push_back(v.index);
         break;
       case Causality::PARAMETER:
         // Parameter
         if (variability == Variability::TUNABLE) {
+          v.category = Category::P;
           p_.push_back(v.index);
         }
         break;
@@ -2583,10 +2632,16 @@ MX DaeBuilderInternal::add(const std::string& name, Causality causality,
         // Type determined by providing equation
         break;
     }
+    // Also create a derivative variable, if needed
+    if (v.needs_der()) {
+      Variable& der_v = new_variable("der_" + name, dimension); 
+      der_v.der_of = v.index;
+      v.der = der_v.index;
+    }
   } else {
     // Explicit category (legacy, to be removed)
-    switch (to_enum<DaeBuilderInternalIn>(cat)) {
-      case DAE_BUILDER_T:
+    switch (to_enum<Category>(cat)) {
+      case Category::T:
         // Independent variable
         casadi_assert(t_.empty(), "'t' already defined");
         casadi_assert(dimension.size() == 1 && dimension[0] == 1,
@@ -2594,59 +2649,59 @@ MX DaeBuilderInternal::add(const std::string& name, Causality causality,
         v.causality = Causality::INDEPENDENT;
         t_.push_back(v.index);
         break;
-      case DAE_BUILDER_P:
+      case Category::P:
         // Parameter
         v.variability = Variability::FIXED;
         v.causality = Causality::INPUT;
         p_.push_back(v.index);
         break;
-      case DAE_BUILDER_U:
+      case Category::U:
         // Control
         v.variability = Variability::CONTINUOUS;
         v.causality = Causality::INPUT;
         u_.push_back(v.index);
         break;
-      case DAE_BUILDER_X:
+      case Category::X:
         // State
         v.variability = Variability::CONTINUOUS;
         v.causality = Causality::LOCAL;
         x_.push_back(v.index);
         break;
-      case DAE_BUILDER_Z:
+      case Category::Z:
         // Algebraic variable
         v.variability = Variability::CONTINUOUS;
         v.causality = Causality::LOCAL;
         z_.push_back(v.index);
         break;
-      case DAE_BUILDER_Q:
+      case Category::Q:
         // Quadrature variable
         v.variability = Variability::CONTINUOUS;
         v.causality = Causality::LOCAL;
         q_.push_back(v.index);
         break;
-      case DAE_BUILDER_C:
+      case Category::C:
         // Constant
         v.variability = Variability::CONSTANT;
         c_.push_back(v.index);
         break;
-      case DAE_BUILDER_D:
+      case Category::D:
         // Calculated parameter
         v.variability = Variability::FIXED;
         v.causality = Causality::CALCULATED_PARAMETER;
         d_.push_back(v.index);
         break;
-      case DAE_BUILDER_W:
+      case Category::W:
         // Dependent variable
         v.variability = Variability::CONTINUOUS;
         v.causality = Causality::LOCAL;
         w_.push_back(v.index);
         break;
-      case DAE_BUILDER_Y:
+      case Category::Y:
         // Output
         v.causality = Causality::OUTPUT;
         y_.push_back(v.index);
         break;
-      case DAE_BUILDER_E:
+      case Category::E:
         // Zero-crossing
         v.causality = Causality::OUTPUT;
         e_.push_back(v.index);
@@ -2675,6 +2730,76 @@ MX DaeBuilderInternal::add(const std::string& name, Causality causality, const D
       return add(name, causality, Variability::CONTINUOUS, opts);
     default:
       casadi_error("Unknown causality");
+  }
+}
+
+void DaeBuilderInternal::eq(const MX& lhs, const MX& rhs) {
+  // Make sure vectors
+  casadi_assert(lhs.is_column(), "Left-hand-side must be a column vector");
+  casadi_assert(rhs.is_column(), "Right-hand-side must be a column vector");
+  // Make sure dense
+  if (!lhs.is_dense()) return eq(densify(lhs), rhs);
+  if (!rhs.is_dense()) return eq(lhs, densify(rhs));
+  // Make sure dimensions agree
+  if (lhs.size1() != rhs.size1()) {
+    // Handle mismatching dimnensions by recursion
+    if (lhs.size1() == 1 && rhs.size1() > 1) {
+      return eq(repmat(lhs, rhs.size1()), rhs);
+    } else if (lhs.size1() > 1 && rhs.size1() == 1) {
+      return eq(lhs, repmat(rhs, lhs.size1()));
+    } else {
+      casadi_error("Mismatched dimensions: " + str(lhs.size1()) + " vs " + str(rhs.size1()));
+    }
+  }
+  // Make sure right-hand-side only depends on known model variables
+  std::vector<size_t> rhs_vars = find(symvar(rhs));
+  // Try to honor a == b as an explicit equation
+  if (lhs.is_valid_input()) {
+    // Explicit equation
+    if (lhs.is_symbolic()) {
+      // Regular symbolic: Find the variable
+      Variable& v = variable(lhs);
+      // Set the binding equation
+      if (v.has_beq()) {
+        // TODO(@jaeandersson): Treat as implicit equation
+        casadi_error("Already a binding equation for " + v.name);
+      } else {
+        // Set the binding equation
+        v.beq = rhs;
+      }
+      // (Re)classify variables
+      if (v.der_of >= 0) {
+        // Derivative variable is being set - find the corresponding state variable
+        Variable& x = variable(v.der_of);
+        // Update category
+        if (x.category == Category::NUMEL) {
+          x.category = Category::X;
+          // Insert into list of state variables: Keep ordered
+          size_t loc = x_.size();
+          for (size_t i = 0; i < x_.size(); ++i) {
+            if (variable(x_[i]).index >= x.index) {
+              loc = i;
+              break;
+            }
+          }
+          x_.insert(x_.begin() + loc, x.index);
+        }
+      } else {
+        casadi_error("Only ODEs implemented");
+      }
+    } else {
+      // Concatenation: Split into primitives
+      auto lhs_split = lhs.primitives();
+      std::vector<MX> rhs_split = lhs.split_primitives(rhs);
+      // Call recursively
+      for (size_t k = 0; k < lhs_split.size(); ++k) {
+        eq(lhs_split.at(k), rhs_split.at(k));
+      }
+      return;
+    }
+  } else {
+    // Implicit equation
+    casadi_error("Implicit equations not yet supported");
   }
 }
 
@@ -2715,12 +2840,12 @@ void DaeBuilderInternal::set_init(const std::string& name, const MX& init_rhs) {
   // Find the algebraic variable
   Variable& v = variable(name);
   // If variable already has an initial binding equation, remove it
-  if (!v.init_beq.is_empty()) {
+  if (!v.ieq.is_empty()) {
     // Remove from list of initial equations
     auto old_loc = std::find(init_.begin(), init_.end(), v.index);
     if (old_loc == init_.end()) casadi_error("Corrupted list of initial equations");
     init_.erase(old_loc);
-    v.init_beq = MX();
+    v.ieq = MX();
   }
   // If right-hand-side is empty, just erase
   if (init_rhs.is_empty()) return;
@@ -2731,7 +2856,7 @@ void DaeBuilderInternal::set_init(const std::string& name, const MX& init_rhs) {
   }
   // Add to list of initial equations
   init_.push_back(v.index);
-  v.init_beq = init_rhs;
+  v.ieq = init_rhs;
 }
 
 template<typename T>
@@ -3323,10 +3448,27 @@ size_t DaeBuilderInternal::find(const std::string& name) const {
   return it->second;
 }
 
+size_t DaeBuilderInternal::find(const MX& v) const {
+  // Make sure it is a valid input
+  casadi_assert(v.is_symbolic(), "Variable must be symbolic");
+  // Find the prospective variable
+  size_t ind = find(v.name());
+  // Make sure that the expression (not just the name) is correct
+  casadi_assert(is_equal(v, variables_.at(ind)->v),
+    "Variable \"" + v.name() + "\" has mismatching symbolic expression");
+  // Return index
+  return ind;
+}
 
 std::vector<size_t> DaeBuilderInternal::find(const std::vector<std::string>& name) const {
   std::vector<size_t> r(name.size());
   for (size_t i = 0; i < r.size(); ++i) r[i] = find(name[i]);
+  return r;
+}
+
+std::vector<size_t> DaeBuilderInternal::find(const std::vector<MX>& v) const {
+  std::vector<size_t> r(v.size());
+  for (size_t i = 0; i < r.size(); ++i) r[i] = find(v[i]);
   return r;
 }
 

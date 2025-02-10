@@ -50,6 +50,17 @@ enum class Causality {PARAMETER, CALCULATED_PARAMETER, INPUT, OUTPUT, LOCAL, IND
 /// Variability: FMI 2.0 specification, section 2.2.7 or FMI 3.0 specification, section 2.4.7.4
 enum class Variability {CONSTANT, FIXED, TUNABLE, DISCRETE, CONTINUOUS, NUMEL};
 
+// CasADi classification of model variables, cf. Table 17 in FMI specification, 3.0.2
+//              PARAMETER  CALCULATED_PARAMETER  INPUT  OUTPUT  LOCAL  INDEPENDENT
+// CONSTANT     -          -                     -      C?      C?     -
+// FIXED        C?         C?                    -      -       ?      -
+// TUNABLE      P          D                     -      -       ?      -
+// DISCRETE     -          -                     U?     Y?      X      -
+// CONTINUOUS   -          -                     U      Y       X      T
+
+// Input convension in codegen
+enum class Category {T, C, P, D, W, U, X, Z, Q, Y, E, NUMEL};
+
 /// Initial: FMI 2.0 specification, section 2.2.7 or FMI 3.0 specification, section 2.4.7.5
 enum class Initial {EXACT, APPROX, CALCULATED, NA, NUMEL};
 
@@ -95,6 +106,9 @@ struct CASADI_EXPORT Variable {
   Variability variability;
   ///@}
 
+  /// CasADi's classification of the variable
+  Category category;
+
   /** Type specific attributes common to all types, cf. Table FMI 3.0 specification */
   ///@{
   // std::string declared_type;
@@ -133,14 +147,14 @@ struct CASADI_EXPORT Variable {
   /// Dependencies
   mutable std::vector<DependenciesKind> dependenciesKind;
 
-  /// Variable expression
+  /// Variable expression (always a vector)
   MX v;
 
   /// Binding equation
   MX beq;
 
-  /// Binding equation, at initial time
-  MX init_beq;
+  /// Initial equation
+  MX ieq;
 
   /// Get by attribute name
   double attribute(Attribute a) const;
@@ -170,6 +184,15 @@ struct CASADI_EXPORT Variable {
   bool is_set() const {
     return !(type==Type::STRING ? stringvalue.empty() : std::isnan(value.front()));
   }
+
+  // Does the variable have a binding equation
+  bool has_beq() const {return !beq.is_empty();}
+
+  // Does the variable need a derivative variable?
+  bool needs_der() const;
+
+  // Derivative of the expression
+  MX dot(const DaeBuilderInternal& self) const;
 };
 
 /// \cond INTERNAL
@@ -281,30 +304,6 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   static std::string generate(const std::vector<double>& v);
   ///@}
 
-  // Categorization of model variables, cf. Table 17 in FMI specification, 3.0.2
-  //              PARAMETER  CALCULATED_PARAMETER  INPUT  OUTPUT  LOCAL  INDEPENDENT
-  // CONSTANT     -          -                     -      C?      C?     -
-  // FIXED        C?         C?                    -      -       ?      -
-  // TUNABLE      P          D                     -      -       ?      -
-  // DISCRETE     -          -                     U?     Y?      X      -
-  // CONTINUOUS   -          -                     U      Y       X      T
-
-  // Input convension in codegen
-  enum DaeBuilderInternalIn {
-    DAE_BUILDER_T,
-    DAE_BUILDER_C,
-    DAE_BUILDER_P,
-    DAE_BUILDER_D,
-    DAE_BUILDER_W,
-    DAE_BUILDER_U,
-    DAE_BUILDER_X,
-    DAE_BUILDER_Z,
-    DAE_BUILDER_Q,
-    DAE_BUILDER_Y,
-    DAE_BUILDER_E,
-    DAE_BUILDER_NUM_IN
-  };
-
   // Output convension in codegen
   enum DaeBuilderInternalOut {
     DAE_BUILDER_ODE,
@@ -318,13 +317,13 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   };
 
   // Get input expression, given enum
-  std::vector<MX> input(DaeBuilderInternalIn ind) const;
+  std::vector<MX> input(Category ind) const;
 
   // Get output expression, given enum
   std::vector<MX> output(DaeBuilderInternalOut ind) const;
 
   // Get input expression, given enum
-  std::vector<MX> input(const std::vector<DaeBuilderInternalIn>& ind) const;
+  std::vector<MX> input(const std::vector<Category>& ind) const;
 
   // Get output expression, given enum
   std::vector<MX> output(const std::vector<DaeBuilderInternalOut>& ind) const;
@@ -362,8 +361,11 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   /// Get variable expression by name
   const MX& var(const std::string& name) const;
 
+  /// Get a derivative expression by variable index
+  MX der(size_t ind) const {return variable(ind).dot(*this);}
+
   /// Get a derivative expression by name
-  MX der(const std::string& name) const;
+  MX der(const std::string& name) const {return der(find(name));}
 
   /// Get a derivative expression by non-differentiated expression
   MX der(const MX& var) const;
@@ -415,17 +417,29 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   const Variable& variable(const std::string& name) const {return variable(find(name));}
   ///@}
 
+  ///@{
+  /// Access a variable by expression
+  Variable& variable(const MX& v) {return variable(find(v));}
+  const Variable& variable(const MX& v) const {return variable(find(v));}
+  ///@}
+
   /// Get variable expression by index
   const MX& var(size_t ind) const;
 
   /// Get variable expressions by index
   std::vector<MX> var(const std::vector<size_t>& ind) const;
 
-  /// Get index of variable
+  /// Get index of variable, given name
   size_t find(const std::string& name) const;
 
-  /// Get indices of variable
+  /// Get index of variable, given expression
+  size_t find(const MX& v) const;
+
+  /// Get indices of variable, given multiple names
   std::vector<size_t> find(const std::vector<std::string>& name) const;
+
+  /// Get indices of variable, given multiple expressions
+  std::vector<size_t> find(const std::vector<MX>& v) const;
 
   /** \brief Get variable name by index */
   const std::string& name(size_t ind) const;
@@ -573,6 +587,7 @@ protected:
 
   ///@{
   /// Set a binding equation
+  void eq(const MX& lhs, const MX& rhs);
   void set_ode(const std::string& name, const MX& ode_rhs);
   void set_alg(const std::string& name, const MX& alg_rhs);
   void set_init(const std::string& name, const MX& init_rhs);
@@ -722,9 +737,6 @@ protected:
 
 ///@{
 /// Number of entries in enums
-template<> struct enum_traits<DaeBuilderInternal::DaeBuilderInternalIn> {
-  static const size_t n_enum = DaeBuilderInternal::DAE_BUILDER_NUM_IN;
-};
 template<> struct enum_traits<DaeBuilderInternal::DaeBuilderInternalOut> {
   static const size_t n_enum = DaeBuilderInternal::DAE_BUILDER_NUM_OUT;
 };
@@ -745,7 +757,7 @@ CASADI_EXPORT std::string to_string(Variability v);
 CASADI_EXPORT std::string to_string(Initial v);
 CASADI_EXPORT std::string to_string(Attribute v);
 CASADI_EXPORT std::string to_string(DependenciesKind v);
-CASADI_EXPORT std::string to_string(DaeBuilderInternal::DaeBuilderInternalIn v);
+CASADI_EXPORT std::string to_string(Category v);
 CASADI_EXPORT std::string to_string(DaeBuilderInternal::DaeBuilderInternalOut v);
 ///@}
 

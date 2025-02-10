@@ -340,6 +340,9 @@ class CASADI_EXPORT DaeBuilder
   MX add_e(const std::string& name, const MX& new_edef);
 #endif  // WITH_DEPRECATED_FEATURES
 
+  /// Add a simple equation
+  void eq(const MX& lhs, const MX& rhs);
+
   /// Specify the ordinary differential equation for a state
   void set_ode(const std::string& name, const MX& ode_rhs);
 
@@ -519,6 +522,9 @@ class CASADI_EXPORT DaeBuilder
 
   /// Get the time derivative of an expression
   std::vector<std::string> der(const std::vector<std::string>& name) const;
+
+  /// Does a variable have a binding equation?
+  bool has_beq(const std::string& name) const;
 
   ///@{
   /// Get/set the binding equation for a variable
@@ -764,6 +770,9 @@ class CASADI_EXPORT DaeBuilder
 
   /// Check if a particular cast is allowed
   static bool test_cast(const SharedObjectInternal* ptr);
+
+  /// Get the time derivative of an expression
+  MX der(const MX& v) const;
 
   /// Get single variable expression by index
   const MX& var(size_t ind) const;

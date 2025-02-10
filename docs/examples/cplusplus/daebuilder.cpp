@@ -31,7 +31,7 @@ int main() {
   // Start with an empty DaeBuilder instance
   DaeBuilder dae("rocket");
 
-  // Add model variables
+  // Model variables
   auto a = dae.add("a", "parameter", "tunable");
   auto b = dae.add("b", "parameter", "tunable");
   auto u = dae.add("u", "input");
@@ -42,10 +42,10 @@ int main() {
   // Constants
   double g = 9.81; // gravity
 
-  // Set ODE right-hand-side
-  dae.set_ode("h", v);
-  dae.set_ode("v", (u-a*pow(v,2))/m-g);
-  dae.set_ode("m", -b*pow(u,2));
+  // Dynamic equations
+  dae.eq(dae.der(h), v);
+  dae.eq(dae.der(v), (u-a*pow(v,2))/m-g);
+  dae.eq(dae.der(m), -b*pow(u,2));
 
   // Specify initial conditions
   dae.set_start("h", 0);

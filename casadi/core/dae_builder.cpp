@@ -494,6 +494,14 @@ void DaeBuilder::clear_when() {
   (*this)->when_rhs_.clear();
 }
 
+void DaeBuilder::eq(const MX& lhs, const MX& rhs) {
+  try {
+    (*this)->eq(lhs, rhs);
+  } catch (std::exception& e) {
+    THROW_ERROR("eq", e.what());
+  }
+}
+
 void DaeBuilder::set_ode(const std::string& name, const MX& ode_rhs) {
   try {
     (*this)->set_ode(name, ode_rhs);
@@ -558,6 +566,15 @@ std::vector<std::string> DaeBuilder::der(const std::vector<std::string>& name) c
   } catch (std::exception& e) {
     THROW_ERROR("der", e.what());
     return {};  // never reached
+  }
+}
+
+bool DaeBuilder::has_beq(const std::string& name) const {
+  try {
+    return !(*this)->variable(name).has_beq();
+  } catch (std::exception& e) {
+    THROW_ERROR("has_beq", e.what());
+    return false;  // never reached
   }
 }
 
@@ -940,6 +957,15 @@ DaeBuilderInternal* DaeBuilder::operator->() {
 
 const DaeBuilderInternal* DaeBuilder::operator->() const {
   return static_cast<const DaeBuilderInternal*>(SharedObject::operator->());
+}
+
+MX DaeBuilder::der(const MX& v) const {
+  try {
+    return (*this)->der(v);
+  } catch (std::exception& e) {
+    THROW_ERROR("der", e.what());
+    return MX();  // never reached
+  }
 }
 
 const MX& DaeBuilder::var(size_t ind) const {
