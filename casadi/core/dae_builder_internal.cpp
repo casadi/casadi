@@ -2634,7 +2634,7 @@ MX DaeBuilderInternal::add(const std::string& name, Causality causality,
     }
     // Also create a derivative variable, if needed
     if (v.needs_der()) {
-      Variable& der_v = new_variable("der_" + name, dimension); 
+      Variable& der_v = new_variable("der_" + name, dimension);
       der_v.der_of = v.index;
       v.der = der_v.index;
     }
@@ -2716,7 +2716,7 @@ MX DaeBuilderInternal::add(const std::string& name, Causality causality,
 MX DaeBuilderInternal::add(const std::string& name, Causality causality, const Dict& opts) {
   // Default variability per FMI 3.0.2, section 2.4.7.4
   switch (causality) {
-    // "The default for variables of causality parameter, structural parameter or 
+    // "The default for variables of causality parameter, structural parameter or
     // calculated parameter is fixed."
     case Causality::PARAMETER:  // fall-through
     case Causality::CALCULATED_PARAMETER:
