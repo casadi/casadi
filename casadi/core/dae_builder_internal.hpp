@@ -349,11 +349,11 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
       const std::vector<std::string>& s_out) const;
 
   /// Construct a function describing transition at a specific event
-  Function event_transition(const std::string& fname, casadi_int index,
+  Function transition(const std::string& fname, casadi_int index,
     bool dummy_index_input = false) const;
 
   /// Construct a function describing transition at all events
-  Function event_transition(const std::string& fname) const;
+  Function transition(const std::string& fname) const;
 
   /// Function corresponding to all equations
   Function gather_eq() const;
@@ -369,6 +369,9 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
 
   /// Get a derivative expression by non-differentiated expression
   MX der(const MX& var) const;
+
+  /// Find a unique name, with a specific prefix
+  std::string unique_name(const std::string& prefix) const;
 
   /// Readable name of the class
   std::string type_name() const {return "DaeBuilderInternal";}
@@ -580,20 +583,28 @@ protected:
   std::vector<MX> init_rhs() const;
 
   /// Add a new variable
-  MX add(const std::string& name, Causality causality, Variability variability, const Dict& opts);
+  Variable& add(const std::string& name, Causality causality, Variability variability, const Dict& opts);
 
   /// Add a new variable, default variability
-  MX add(const std::string& name, Causality causality, const Dict& opts);
+  Variable& add(const std::string& name, Causality causality, const Dict& opts);
 
   /// Add a new variable, default variability and causality
-  MX add(const std::string& name, const Dict& opts) {
+  Variable& add(const std::string& name, const Dict& opts) {
     // Per FMI 3.0.2 specification, section 2.4.7.4: Default causality is LOCAL
     return add(name, Causality::LOCAL, opts);
   }
 
+  /// Add a simple equation
+  void eq(const MX& lhs, const MX& rhs, const Dict& opts);
+
+  /// Add when equations
+  void when(const MX& cond, const Dict& eqs, const Dict& opts);
+
+  /// Reinitialize a state inside when-equations
+  Dict reinit(const std::string& name, const MX& val);
+
   ///@{
   /// Set a binding equation
-  void eq(const MX& lhs, const MX& rhs);
   void set_ode(const std::string& name, const MX& ode_rhs);
   void set_alg(const std::string& name, const MX& alg_rhs);
   void set_init(const std::string& name, const MX& init_rhs);

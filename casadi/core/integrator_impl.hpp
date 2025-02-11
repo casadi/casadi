@@ -424,7 +424,7 @@ Integrator : public OracleFunction, public PluginInterface<Integrator> {
   bool print_stats_;
 
   /// Function to be called at state events
-  Function event_transition_;
+  Function transition_;
 
   /// Maximum number of event iterations for a single event
   casadi_int max_event_iter_;

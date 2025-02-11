@@ -624,7 +624,7 @@ const Options Integrator::options_
     {"augmented_options",
       {OT_DICT,
       "Options to be passed down to the augmented integrator, if one is constructed"}},
-    {"event_transition",
+    {"transition",
       {OT_FUNCTION,
       "Function to be called a zero-crossing events"}},
     {"max_event_iter",
@@ -668,8 +668,8 @@ void Integrator::init(const Dict& opts) {
       uses_legacy_options = true;
     } else if (op.first=="augmented_options") {
       augmented_options_ = op.second;
-    } else if (op.first=="event_transition") {
-      event_transition_ = op.second;
+    } else if (op.first=="transition") {
+      transition_ = op.second;
     } else if (op.first=="max_event_iter") {
       max_event_iter_ = op.second;
     } else if (op.first=="max_events") {
@@ -819,9 +819,9 @@ void Integrator::init(const Dict& opts) {
   if (nadj_ > 0) set_function(rdae_, "rdae");
 
   // Event transition function, if any
-  if (!event_transition_.is_null()) {
-    set_function(event_transition_, "event_transition");
-    if (nfwd_ > 0) create_forward("event_transition", nfwd_);
+  if (!transition_.is_null()) {
+    set_function(transition_, "transition");
+    if (nfwd_ > 0) create_forward("transition", nfwd_);
   }
 
   // Event detection requires linearization of the zero-crossing function in the time direction
@@ -2418,7 +2418,7 @@ void Integrator::serialize_body(SerializingStream &s) const {
   s.pack("Integrator::opts", opts_);
   s.pack("Integrator::print_stats", print_stats_);
 
-  s.pack("Integrator::event_transition", event_transition_);
+  s.pack("Integrator::transition", transition_);
   s.pack("Integrator::max_event_iter", max_event_iter_);
   s.pack("Integrator::max_events", max_events_);
   s.pack("Integrator::event_tol", event_tol_);
@@ -2479,7 +2479,7 @@ Integrator::Integrator(DeserializingStream & s) : OracleFunction(s) {
   s.unpack("Integrator::opts", opts_);
   s.unpack("Integrator::print_stats", print_stats_);
 
-  s.unpack("Integrator::event_transition", event_transition_);
+  s.unpack("Integrator::transition", transition_);
   s.unpack("Integrator::max_event_iter", max_event_iter_);
   s.unpack("Integrator::max_events", max_events_);
   s.unpack("Integrator::event_tol", event_tol_);
@@ -2682,7 +2682,7 @@ int Integrator::trigger_event(IntegratorMemory* m, casadi_int* ind) const {
     }
   }
   // Call event transition function, if any
-  if (has_function("event_transition")) {
+  if (has_function("transition")) {
     // Evaluate to tmp2
     double index = *ind;  // function expects floating point values
     m->arg[EVENT_INDEX] = &index;  // index
@@ -2693,7 +2693,7 @@ int Integrator::trigger_event(IntegratorMemory* m, casadi_int* ind) const {
     m->arg[EVENT_U] = m->u;  // u
     m->res[EVENT_POST_X] = m->tmp2;  // post_x
     m->res[EVENT_POST_Z] = m->tmp2 + nx_;  // post_z
-    if (calc_function(m, "event_transition")) return 1;
+    if (calc_function(m, "transition")) return 1;
     // Propagate forward sensitivities
     if (nfwd_ > 0) {
       // Propagate sensitivities through event transition
@@ -2707,7 +2707,7 @@ int Integrator::trigger_event(IntegratorMemory* m, casadi_int* ind) const {
       m->arg[EVENT_NUM_IN + EVENT_NUM_OUT + EVENT_U] = m->u + nu1_;  // fwd:u
       m->res[EVENT_POST_X] = m->tmp2 + nx1_;  // fwd:post_x
       m->res[EVENT_POST_Z] = m->tmp2 + nx_ + nz1_;  // fwd:post_z
-      calc_function(m, forward_name("event_transition", nfwd_));
+      calc_function(m, forward_name("transition", nfwd_));
     }
   }
   // Update x, z

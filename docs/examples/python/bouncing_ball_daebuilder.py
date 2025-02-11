@@ -17,38 +17,33 @@
 #     SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 #
-from casadi import *
-import pylab as plt
+# -*- coding: utf-8 -*-
+import casadi as ca
+from matplotlib import pyplot as plt
+import numpy as np
 
-# Height and velocity of ball
-h = SX.sym('h')
-v = SX.sym('v')
-x = vertcat(h, v)
+# Simulating a bouncing ball with DaeBuilder and event handling
+# Joel Andersson, 2025
 
-# ODE right-hand-side
-hdot = v
-vdot = -9.81
-xdot = vertcat(hdot, vdot)
+# Start with an empty DaeBuilder instance
+dae = ca.DaeBuilder('bouncing_ball')
 
-# Event indicator, trigger when crossing zero
-event_indicator = -h
+# Model variables
+h = dae.add('h', dict(start = 5))
+v = dae.add('v', dict(start = 0))
 
-# DAE problem structure, with zero-crossing output
-dae = dict(x = x, ode = xdot, zero = event_indicator)
+# Dynamic equations
+dae.eq(dae.der(h), v)
+dae.eq(dae.der(v), -9.81)
 
-# Event transition function
-post_x = vertcat(h, -0.8*v)
-transition = Function('transition', dict(x = x, post_x = post_x),
-                      event_in(), event_out())
+# Event dynamics: When h < 0, reinitialize v to -0.8*v
+dae.when(h < 0, dae.reinit('v', -0.8*dae.pre(v)))
 
-# Create an integrator instance for integrating over 7s
+# Simulate over 7s
 tgrid = np.linspace(0, 7, 100)
-sim = integrator('sim', 'cvodes', dae, 0, tgrid,
-                 dict(transition = transition))
-
-# Simulate with initial height of 5
-x0 = [5, 0]
-simres = sim(x0 = x0)
+sim = ca.integrator('sim', 'cvodes', dae.create(), 0, tgrid,
+                    dict(transition = dae.transition()))
+simres = sim(x0 = dae.start(dae.x()))
 
 # Visualize the solution
 plt.figure(1)

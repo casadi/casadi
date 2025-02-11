@@ -494,7 +494,7 @@ MX DaeBuilder::add(const std::string& name, const std::string& causality,
     const std::string& variability, const Dict& opts) {
   try {
     return (*this)->add(name, to_enum<Causality>(causality),
-      to_enum<Variability>(variability), opts);
+      to_enum<Variability>(variability), opts).v;
   } catch (std::exception& e) {
     THROW_ERROR("add", e.what());
     return MX();
@@ -503,7 +503,7 @@ MX DaeBuilder::add(const std::string& name, const std::string& causality,
 
 MX DaeBuilder::add(const std::string& name, const std::string& causality, const Dict& opts) {
   try {
-    return (*this)->add(name, to_enum<Causality>(causality), opts);
+    return (*this)->add(name, to_enum<Causality>(causality), opts).v;
   } catch (std::exception& e) {
     THROW_ERROR("add", e.what());
     return MX();
@@ -512,7 +512,7 @@ MX DaeBuilder::add(const std::string& name, const std::string& causality, const 
 
 MX DaeBuilder::add(const std::string& name, const Dict& opts) {
   try {
-    return (*this)->add(name, opts);
+    return (*this)->add(name, opts).v;
   } catch (std::exception& e) {
     THROW_ERROR("add", e.what());
     return MX();
@@ -592,11 +592,28 @@ void DaeBuilder::clear_when() {
   (*this)->when_rhs_.clear();
 }
 
-void DaeBuilder::eq(const MX& lhs, const MX& rhs) {
+void DaeBuilder::eq(const MX& lhs, const MX& rhs, const Dict& opts) {
   try {
-    (*this)->eq(lhs, rhs);
+    (*this)->eq(lhs, rhs, opts);
   } catch (std::exception& e) {
     THROW_ERROR("eq", e.what());
+  }
+}
+
+void DaeBuilder::when(const MX& cond, const Dict& eqs, const Dict& opts) {
+  try {
+    (*this)->when(cond, eqs, opts);
+  } catch (std::exception& e) {
+    THROW_ERROR("when", e.what());
+  }
+}
+
+Dict DaeBuilder::reinit(const std::string& name, const MX& val) {
+  try {
+    return (*this)->reinit(name, val);
+  } catch (std::exception& e) {
+    THROW_ERROR("reinit", e.what());
+    return Dict();  // never reached
   }
 }
 
@@ -656,6 +673,36 @@ std::string DaeBuilder::der(const std::string& name) const {
   }
 }
 
+std::string DaeBuilder::pre(const std::string& name) const {
+  try {
+    // Not implemented
+    static bool warned = false;
+    if (!warned) {
+      casadi_warning("DaeBuilder::pre has not been implemented: Returning identity mapping");
+      warned = true;
+    }
+    return name;
+  } catch (std::exception& e) {
+    THROW_ERROR("pre", e.what());
+    return std::string();  // never reached
+  }
+}
+
+MX DaeBuilder::pre(const MX& v) const {
+  try {
+    // Not implemented
+    static bool warned = false;
+    if (!warned) {
+      casadi_warning("DaeBuilder::pre has not been implemented: Returning identity mapping");
+      warned = true;
+    }
+    return v;
+  } catch (std::exception& e) {
+    THROW_ERROR("pre", e.what());
+    return MX();  // never reached
+  }
+}
+
 std::vector<std::string> DaeBuilder::der(const std::vector<std::string>& name) const {
   try {
     std::vector<std::string> r(name.size());
@@ -663,6 +710,17 @@ std::vector<std::string> DaeBuilder::der(const std::vector<std::string>& name) c
     return r;
   } catch (std::exception& e) {
     THROW_ERROR("der", e.what());
+    return {};  // never reached
+  }
+}
+
+std::vector<std::string> DaeBuilder::pre(const std::vector<std::string>& name) const {
+  try {
+    std::vector<std::string> r(name.size());
+    for (size_t i = 0; i < r.size(); ++i) r[i] = pre(name[i]);
+    return r;
+  } catch (std::exception& e) {
+    THROW_ERROR("pre", e.what());
     return {};  // never reached
   }
 }
@@ -995,20 +1053,20 @@ Function DaeBuilder::dependent_fun(const std::string& fname,
   }
 }
 
-Function DaeBuilder::event_transition(const std::string& fname, casadi_int index) const {
+Function DaeBuilder::transition(const std::string& fname, casadi_int index) const {
   try {
-    return (*this)->event_transition(fname, index);
+    return (*this)->transition(fname, index);
   } catch (std::exception& e) {
-    THROW_ERROR("event_transition", e.what());
+    THROW_ERROR("transition", e.what());
     return Function(); // never reached
   }
 }
 
-Function DaeBuilder::event_transition(const std::string& fname) const {
+Function DaeBuilder::transition(const std::string& fname) const {
   try {
-    return (*this)->event_transition(fname);
+    return (*this)->transition(fname);
   } catch (std::exception& e) {
-    THROW_ERROR("event_transition", e.what());
+    THROW_ERROR("transition", e.what());
     return Function(); // never reached
   }
 }

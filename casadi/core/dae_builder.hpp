@@ -345,7 +345,13 @@ class CASADI_EXPORT DaeBuilder
 #endif  // WITH_DEPRECATED_FEATURES
 
   /// Add a simple equation
-  void eq(const MX& lhs, const MX& rhs);
+  void eq(const MX& lhs, const MX& rhs, const Dict& opts=Dict());
+
+  /// Add when equations
+  void when(const MX& cond, const Dict& eqs, const Dict& opts=Dict());
+
+  /// Reinitialize a state inside when-equations
+  Dict reinit(const std::string& name, const MX& val);
 
   /// Specify the ordinary differential equation for a state
   void set_ode(const std::string& name, const MX& ode_rhs);
@@ -499,13 +505,15 @@ class CASADI_EXPORT DaeBuilder
     const Dict& opts=Dict()) const;
   ///@}
 
-  /** \brief  Load a function from an FMU DLL, standard IO conforming with simulator
+  /** \brief Create a function with standard integrator DAE signature
 
     \param name    Name assigned to the resulting function object
     \param opts    Optional settings
+    */
+  Function create(const std::string& fname, const Dict& opts=Dict()) const;
 
-      \identifier{6f} */
-  Function create(const std::string& name, const Dict& opts=Dict()) const;
+  /** \brief Create a function with standard integrator DAE signature, default naming */
+  Function create() const {return create(name() + "_dae");}
 
   /// Construct a function for evaluating dependent parameters
   Function dependent_fun(const std::string& fname,
@@ -513,10 +521,13 @@ class CASADI_EXPORT DaeBuilder
       const std::vector<std::string>& s_out) const;
 
   /// Construct a function describing transition at a specific events
-  Function event_transition(const std::string& fname, casadi_int index) const;
+  Function transition(const std::string& fname, casadi_int index) const;
 
   /// Construct a function describing transition at any events
-  Function event_transition(const std::string& fname) const;
+  Function transition(const std::string& fname) const;
+
+  /// Construct an event transition function, default naming
+  Function transition() const {return transition(name() + "_transition");}
 
   ///@{
   /// Get variable expression by name
@@ -524,11 +535,17 @@ class CASADI_EXPORT DaeBuilder
   MX operator()(const std::string& name) const {return var(name);}
   ///@}
 
-  /// Get the time derivative of an expression
+  /// Get the time derivative of model variables
   std::vector<std::string> der(const std::vector<std::string>& name) const;
 
   /// Differentiate an expression with respect to time
   MX der(const MX& v) const;
+
+  /// Get the pre-variables of model variables
+  std::vector<std::string> pre(const std::vector<std::string>& name) const;
+
+  /// Get the pre-expression given variable expression
+  MX pre(const MX& v) const;
 
   /// Does a variable have a binding equation?
   bool has_beq(const std::string& name) const;
@@ -620,8 +637,11 @@ class CASADI_EXPORT DaeBuilder
   // The following routines are not needed in MATLAB and would cause ambiguity
   // Note that a multirow strings can be interpreted as a vector of strings
 #if !(defined(SWIG) && defined(SWIGMATLAB))
-  /// Get the time derivative of an expression, single variable
+  /// Get the time derivative of model variables, single variable
   std::string der(const std::string& name) const;
+
+  /// Get the pre-variables of model variables
+  std::string pre(const std::string& name) const;
 
   /// Get an attribute, single variable
   double attribute(const std::string& a, const std::string& name) const;
