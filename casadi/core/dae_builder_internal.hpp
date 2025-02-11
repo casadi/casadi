@@ -59,7 +59,7 @@ enum class Variability {CONSTANT, FIXED, TUNABLE, DISCRETE, CONTINUOUS, NUMEL};
 // CONTINUOUS   -          -                     U      Y       X      T
 
 // Input convension in codegen
-enum class Category {T, C, P, D, W, U, X, Z, Q, Y, E, NUMEL};
+enum class Category {T, C, P, D, W, U, X, Z, Q, Y, E, DER, NUMEL};
 
 /// Initial: FMI 2.0 specification, section 2.2.7 or FMI 3.0 specification, section 2.4.7.5
 enum class Initial {EXACT, APPROX, CALCULATED, NA, NUMEL};
@@ -124,6 +124,7 @@ struct CASADI_EXPORT Variable {
   std::vector<double> start;
   casadi_int der_of;  // 'derivative' in FMI specification
   // bool reinit;
+  casadi_int parent;
   ///@}
 
   // corresponding residual variable

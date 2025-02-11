@@ -312,6 +312,7 @@ Variable::Variable(casadi_int index, const std::string& name,
   this->nominal = 1.0;
   this->start.resize(numel, 0.0);
   this->der_of = -1;
+  this->parent = -1;
   this->der = -1;
   this->alg = -1;
   this->value.resize(numel, nan);
@@ -1254,6 +1255,7 @@ void DaeBuilderInternal::prune(bool prune_p, bool prune_u) {
   // Collect all DAE input variables with at least one entry, skip u
   for (casadi_int i = 0; i != enum_traits<Category>::n_enum; ++i) {
     auto cat = static_cast<Category>(i);
+    if (cat == Category::DER) continue;
     if (prune_p && cat == Category::P) continue;
     if (prune_u && cat == Category::U) continue;
     v = input(cat);
@@ -2092,6 +2094,7 @@ const Function& DaeBuilderInternal::oracle(bool sx, bool elim_w, bool lifted_cal
     // Collect all DAE input variables
     for (size_t i = 0; i != enum_traits<Category>::n_enum; ++i) {
       auto cat = static_cast<Category>(i);
+      if (cat == Category::DER) continue;
       if (cat == Category::Y) continue;  // fixme2
       v = input(cat);
       if (elim_w && cat == Category::W) {
@@ -2671,7 +2674,9 @@ Variable& DaeBuilderInternal::add(const std::string& name, Causality causality,
     // Also create a derivative variable, if needed
     if (v.needs_der()) {
       Variable& der_v = new_variable("der_" + name, dimension);
+      der_v.category = Category::DER;
       der_v.der_of = v.index;
+      der_v.parent = v.index;
       v.der = der_v.index;
     }
   } else {
@@ -2809,9 +2814,9 @@ void DaeBuilderInternal::eq(const MX& lhs, const MX& rhs, const Dict& opts) {
         v.beq = rhs;
       }
       // (Re)classify variables
-      if (v.der_of >= 0) {
+      if (v.category == Category::DER) {
         // Derivative variable is being set - find the corresponding state variable
-        Variable& x = variable(v.der_of);
+        Variable& x = variable(v.parent);
         // Update category
         if (x.category == Category::NUMEL) {
           x.category = Category::X;
