@@ -1103,13 +1103,6 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
     }
   }
 
-  if (!e_.empty()) {
-    stream << "Event indicators" << std::endl;
-    for (size_t e : e_) {
-      stream << "  " << var(e) << " == " << variable(e).beq << std::endl;
-    }
-  }
-
   if (!x_.empty()) {
     stream << "Differential equations" << std::endl;
     for (size_t k : x_) {
@@ -2890,9 +2883,9 @@ void DaeBuilderInternal::when(const MX& cond, const Dict& eqs, const Dict& opts)
   e.category = Category::E;
   // Read equations
   for (auto&& eq : eqs) {
-    when_cond_.push_back(e.v);
+    when_cond_.push_back(variable(e.index).beq);
     when_lhs_.push_back(var(eq.first));
-    when_rhs_.push_back(var(eq.second.to_string()));
+    when_rhs_.push_back(variable(eq.second.to_string()).beq);
   }
 }
 
@@ -2902,6 +2895,14 @@ Dict DaeBuilderInternal::reinit(const std::string& name, const MX& val) {
   // Add a new dependent variable defined by val
   Variable& v = add(reinit_name, Causality::LOCAL, Variability::CONTINUOUS, Dict());
   eq(v.v, val, Dict());
+  // Remove from w
+  for (auto it = w_.begin(); it != w_.end(); ++it) {
+    if (*it == v.index) {
+      w_.erase(it);
+      v.category = Category::NUMEL;
+      break;
+    }
+  }
   // Return the mapping
   return Dict{{name, reinit_name}};
 }

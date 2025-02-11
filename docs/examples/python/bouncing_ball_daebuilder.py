@@ -38,6 +38,7 @@ dae.eq(dae.der(v), -9.81)
 
 # Event dynamics: When h < 0, reinitialize v to -0.8*v
 dae.when(h < 0, dae.reinit('v', -0.8*dae.pre(v)))
+dae.disp(True)
 
 # Simulate over 7s
 tgrid = np.linspace(0, 7, 100)
