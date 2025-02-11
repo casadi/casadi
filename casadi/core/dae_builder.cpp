@@ -600,7 +600,7 @@ void DaeBuilder::eq(const MX& lhs, const MX& rhs, const Dict& opts) {
   }
 }
 
-void DaeBuilder::when(const MX& cond, const Dict& eqs, const Dict& opts) {
+void DaeBuilder::when(const MX& cond, const std::vector<std::string>& eqs, const Dict& opts) {
   try {
     (*this)->when(cond, eqs, opts);
   } catch (std::exception& e) {
@@ -608,12 +608,12 @@ void DaeBuilder::when(const MX& cond, const Dict& eqs, const Dict& opts) {
   }
 }
 
-Dict DaeBuilder::reinit(const std::string& name, const MX& val) {
+std::string DaeBuilder::reinit(const std::string& name, const MX& val) {
   try {
     return (*this)->reinit(name, val);
   } catch (std::exception& e) {
     THROW_ERROR("reinit", e.what());
-    return Dict();  // never reached
+    return std::string();  // never reached
   }
 }
 

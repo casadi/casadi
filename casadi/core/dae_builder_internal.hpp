@@ -59,7 +59,7 @@ enum class Variability {CONSTANT, FIXED, TUNABLE, DISCRETE, CONTINUOUS, NUMEL};
 // CONTINUOUS   -          -                     U      Y       X      T
 
 // Input convension in codegen
-enum class Category {T, C, P, D, W, U, X, Z, Q, Y, E, DER, NUMEL};
+enum class Category {T, C, P, D, W, U, X, Z, Q, Y, E, DER, REINIT, NUMEL};
 
 /// Initial: FMI 2.0 specification, section 2.2.7 or FMI 3.0 specification, section 2.4.7.5
 enum class Initial {EXACT, APPROX, CALCULATED, NA, NUMEL};
@@ -599,10 +599,10 @@ protected:
   void eq(const MX& lhs, const MX& rhs, const Dict& opts);
 
   /// Add when equations
-  void when(const MX& cond, const Dict& eqs, const Dict& opts);
+  void when(const MX& cond, const std::vector<std::string>& eqs, const Dict& opts);
 
   /// Reinitialize a state inside when-equations
-  Dict reinit(const std::string& name, const MX& val);
+  std::string reinit(const std::string& name, const MX& val);
 
   ///@{
   /// Set a binding equation

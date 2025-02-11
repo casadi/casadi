@@ -348,10 +348,10 @@ class CASADI_EXPORT DaeBuilder
   void eq(const MX& lhs, const MX& rhs, const Dict& opts=Dict());
 
   /// Add when equations
-  void when(const MX& cond, const Dict& eqs, const Dict& opts=Dict());
+  void when(const MX& cond, const std::vector<std::string>& eqs, const Dict& opts=Dict());
 
   /// Reinitialize a state inside when-equations
-  Dict reinit(const std::string& name, const MX& val);
+  std::string reinit(const std::string& name, const MX& val);
 
   /// Specify the ordinary differential equation for a state
   void set_ode(const std::string& name, const MX& ode_rhs);

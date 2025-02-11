@@ -1255,7 +1255,7 @@ void DaeBuilderInternal::prune(bool prune_p, bool prune_u) {
   // Collect all DAE input variables with at least one entry, skip u
   for (casadi_int i = 0; i != enum_traits<Category>::n_enum; ++i) {
     auto cat = static_cast<Category>(i);
-    if (cat == Category::DER) continue;
+    if (cat == Category::DER || cat == Category::REINIT) continue;
     if (prune_p && cat == Category::P) continue;
     if (prune_u && cat == Category::U) continue;
     v = input(cat);
@@ -2094,7 +2094,7 @@ const Function& DaeBuilderInternal::oracle(bool sx, bool elim_w, bool lifted_cal
     // Collect all DAE input variables
     for (size_t i = 0; i != enum_traits<Category>::n_enum; ++i) {
       auto cat = static_cast<Category>(i);
-      if (cat == Category::DER) continue;
+      if (cat == Category::DER || cat == Category::REINIT) continue;
       if (cat == Category::Y) continue;  // fixme2
       v = input(cat);
       if (elim_w && cat == Category::W) {
@@ -2861,7 +2861,7 @@ void DaeBuilderInternal::eq(const MX& lhs, const MX& rhs, const Dict& opts) {
   }
 }
 
-void DaeBuilderInternal::when(const MX& cond, const Dict& eqs, const Dict& opts) {
+void DaeBuilderInternal::when(const MX& cond, const std::vector<std::string>& eqs, const Dict& opts) {
   // Read options
   for (auto&& op : opts) {
     casadi_error("No such option: " + op.first);
@@ -2889,12 +2889,14 @@ void DaeBuilderInternal::when(const MX& cond, const Dict& eqs, const Dict& opts)
   // Read equations
   for (auto&& eq : eqs) {
     when_cond_.push_back(variable(e.index).beq);
-    when_lhs_.push_back(var(eq.first));
-    when_rhs_.push_back(variable(eq.second.to_string()).beq);
+    Variable& ee = variable(eq);
+    casadi_assert_dev(ee.category == Category::REINIT);
+    when_lhs_.push_back(var(ee.parent));
+    when_rhs_.push_back(ee.beq);
   }
 }
 
-Dict DaeBuilderInternal::reinit(const std::string& name, const MX& val) {
+std::string DaeBuilderInternal::reinit(const std::string& name, const MX& val) {
   // Create a unique name for the reinit variable
   std::string reinit_name = unique_name("__reinit__" + name + "__");
   // Add a new dependent variable defined by val
@@ -2904,12 +2906,13 @@ Dict DaeBuilderInternal::reinit(const std::string& name, const MX& val) {
   for (auto it = w_.begin(); it != w_.end(); ++it) {
     if (*it == v.index) {
       w_.erase(it);
-      v.category = Category::NUMEL;
+      v.category = Category::REINIT;
+      v.parent = variable(name).index;
       break;
     }
   }
   // Return the mapping
-  return Dict{{name, reinit_name}};
+  return reinit_name;
 }
 
 void DaeBuilderInternal::set_ode(const std::string& name, const MX& ode_rhs) {
