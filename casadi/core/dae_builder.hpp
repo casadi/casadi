@@ -527,6 +527,9 @@ class CASADI_EXPORT DaeBuilder
   /// Get the time derivative of an expression
   std::vector<std::string> der(const std::vector<std::string>& name) const;
 
+  /// Differentiate an expression with respect to time
+  MX der(const MX& v) const;
+
   /// Does a variable have a binding equation?
   bool has_beq(const std::string& name) const;
 
@@ -781,9 +784,6 @@ class CASADI_EXPORT DaeBuilder
 
   /// Check if a particular cast is allowed
   static bool test_cast(const SharedObjectInternal* ptr);
-
-  /// Get the time derivative of an expression
-  MX der(const MX& v) const;
 
 #endif // SWIG
 };
