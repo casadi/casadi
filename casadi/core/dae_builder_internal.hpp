@@ -59,7 +59,7 @@ enum class Variability {CONSTANT, FIXED, TUNABLE, DISCRETE, CONTINUOUS, NUMEL};
 // CONTINUOUS   -          -                     U      Y       X      T
 
 // Input convension in codegen
-enum class Category {T, C, P, D, W, U, X, Z, Q, Y, E, DER, REINIT, NUMEL};
+enum class Category {T, C, P, D, W, U, X, Z, Q, Y, E, DER, ASSIGN, REINIT, NUMEL};
 
 /// Initial: FMI 2.0 specification, section 2.2.7 or FMI 3.0 specification, section 2.4.7.5
 enum class Initial {EXACT, APPROX, CALCULATED, NA, NUMEL};
@@ -595,11 +595,20 @@ protected:
     return add(name, Causality::LOCAL, opts);
   }
 
+  /// Insert into list of variables, keeping it ordered
+  void insert(std::vector<size_t>& v, size_t ind) const;
+
+  /// Remove from list of variables
+  void remove(std::vector<size_t>& v, size_t ind) const;
+
   /// Add a simple equation
   void eq(const MX& lhs, const MX& rhs, const Dict& opts);
 
   /// Add when equations
   void when(const MX& cond, const std::vector<std::string>& eqs, const Dict& opts);
+
+  /// Assignment inside when-equations or if-else equations
+  std::string assign(const std::string& name, const MX& val);
 
   /// Reinitialize a state inside when-equations
   std::string reinit(const std::string& name, const MX& val);

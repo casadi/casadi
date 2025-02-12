@@ -608,6 +608,15 @@ void DaeBuilder::when(const MX& cond, const std::vector<std::string>& eqs, const
   }
 }
 
+std::string DaeBuilder::assign(const std::string& name, const MX& val) {
+  try {
+    return (*this)->assign(name, val);
+  } catch (std::exception& e) {
+    THROW_ERROR("assign", e.what());
+    return std::string();  // never reached
+  }
+}
+
 std::string DaeBuilder::reinit(const std::string& name, const MX& val) {
   try {
     return (*this)->reinit(name, val);

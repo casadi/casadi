@@ -1255,7 +1255,7 @@ void DaeBuilderInternal::prune(bool prune_p, bool prune_u) {
   // Collect all DAE input variables with at least one entry, skip u
   for (casadi_int i = 0; i != enum_traits<Category>::n_enum; ++i) {
     auto cat = static_cast<Category>(i);
-    if (cat == Category::DER || cat == Category::REINIT) continue;
+    if (cat == Category::DER || cat == Category::ASSIGN || cat == Category::REINIT) continue;
     if (prune_p && cat == Category::P) continue;
     if (prune_u && cat == Category::U) continue;
     v = input(cat);
@@ -2094,7 +2094,7 @@ const Function& DaeBuilderInternal::oracle(bool sx, bool elim_w, bool lifted_cal
     // Collect all DAE input variables
     for (size_t i = 0; i != enum_traits<Category>::n_enum; ++i) {
       auto cat = static_cast<Category>(i);
-      if (cat == Category::DER || cat == Category::REINIT) continue;
+      if (cat == Category::DER || cat == Category::ASSIGN || cat == Category::REINIT) continue;
       if (cat == Category::Y) continue;  // fixme2
       v = input(cat);
       if (elim_w && cat == Category::W) {
@@ -2609,7 +2609,7 @@ Variable& DaeBuilderInternal::add(const std::string& name, Causality causality,
   std::vector<casadi_int> dimension = {1};
   std::string description;
   std::vector<double> start;
-  casadi::MX def;
+  Type type = Type::FLOAT64;
   // Read options
   for (auto&& op : opts) {
     if (op.first=="cat") {
@@ -2624,6 +2624,8 @@ Variable& DaeBuilderInternal::add(const std::string& name, Causality causality,
       } else {
         start = op.second.to_double_vector();
       }
+    } else if (op.first=="type") {
+      type = to_enum<Type>(op.second.to_string());
     } else {
       casadi_error("No such option: " + op.first);
     }
@@ -2631,6 +2633,7 @@ Variable& DaeBuilderInternal::add(const std::string& name, Causality causality,
   // Create a new variable
   Variable& v = new_variable(name, dimension);
   v.description = description;
+  v.type = type;
   if (!start.empty()) v.start = start;
   // Handle different categories
   if (cat.empty()) {
@@ -2666,7 +2669,11 @@ Variable& DaeBuilderInternal::add(const std::string& name, Causality causality,
         // Calculated parameter: No categorization for now
         break;
       case Causality::LOCAL:
-        // Type determined by providing equation
+        // Type determined by providing equation, unless discrete variability
+        if (variability == Variability::DISCRETE) {
+          // Discrete variables are considered states with zero derivatives
+          x_.push_back(v.index);
+        }
         break;
       default:
         casadi_error("Unknown causality");
@@ -2756,22 +2763,45 @@ Variable& DaeBuilderInternal::add(const std::string& name, Causality causality,
 
 Variable& DaeBuilderInternal::add(const std::string& name, Causality causality, const Dict& opts) {
   // Default variability per FMI 3.0.2, section 2.4.7.4
-  switch (causality) {
-    // "The default for variables of causality parameter, structural parameter or
-    // calculated parameter is fixed."
-    case Causality::PARAMETER:  // fall-through
-    case Causality::CALCULATED_PARAMETER:
-      return add(name, causality, Variability::FIXED, opts);
-    // "The default for variables of type Float32 and Float64 and causality other
-    // than parameter, structuralParameter or calculatedParameter is continuous"
-    case Causality::INPUT:  // fall-through
-    case Causality::OUTPUT:  // fall-through
-    case Causality::LOCAL:  // fall-through
-    case Causality::INDEPENDENT:
-      return add(name, causality, Variability::CONTINUOUS, opts);
-    default:
-      casadi_error("Unknown causality");
+  // "The default for variables of causality parameter, structural parameter or
+  // calculated parameter is fixed."
+  if (causality == Causality::PARAMETER || causality == Causality::CALCULATED_PARAMETER) {
+    return add(name, causality, Variability::FIXED, opts);
   }
+  // Get type
+  Type type = Type::FLOAT64;  
+  if (opts.find("type") != opts.end()) {
+    type = to_enum<Type>(opts.at("type").to_string());
+  }
+  // "The default for variables of type Float32 and Float64 and causality other
+  // than parameter, structuralParameter or calculatedParameter is continuous"
+  if (type == Type::FLOAT32 || type == Type::FLOAT64) {
+    return add(name, causality, Variability::CONTINUOUS, opts);
+  } else {
+    return add(name, causality, Variability::DISCRETE, opts);
+  }
+}
+
+void DaeBuilderInternal::insert(std::vector<size_t>& v, size_t ind) const {
+  // Keep list ordered: Insert at location corresponding to model variable index          
+  size_t loc = v.size();
+  for (size_t i = 0; i < v.size(); ++i) {
+    if (variable(v[i]).index >= ind) {
+      loc = i;
+      break;
+    }
+  }
+  v.insert(v.begin() + loc, ind);
+}
+
+void DaeBuilderInternal::remove(std::vector<size_t>& v, size_t ind) const {
+  for (auto it = v.begin(); it != v.end(); ++it) {
+    if (*it == ind) {
+      v.erase(it);
+      return;
+    }
+  }
+  casadi_error("Variable not found");
 }
 
 void DaeBuilderInternal::eq(const MX& lhs, const MX& rhs, const Dict& opts) {
@@ -2820,29 +2850,13 @@ void DaeBuilderInternal::eq(const MX& lhs, const MX& rhs, const Dict& opts) {
         // Update category
         if (x.category == Category::NUMEL) {
           x.category = Category::X;
-          // Insert into list of state variables: Keep ordered
-          size_t loc = x_.size();
-          for (size_t i = 0; i < x_.size(); ++i) {
-            if (variable(x_[i]).index >= x.index) {
-              loc = i;
-              break;
-            }
-          }
-          x_.insert(x_.begin() + loc, x.index);
+          insert(x_, x.index);
         }
       } else if (v.category == Category::NUMEL) {
         // New dependent variable
         v.category = Category::W;
-        // Insert into list of dependent variables: Keep ordered
-        size_t loc = w_.size();
-        for (size_t i = 0; i < w_.size(); ++i) {
-          if (variable(w_[i]).index >= v.index) {
-            loc = i;
-            break;
-          }
-        }
-        w_.insert(w_.begin() + loc, v.index);
-      } else {
+        insert(w_, v.index);
+      } else if (v.category != Category::Y) {
         casadi_error("Cannot handle left-hand-side: " + str(lhs));
       }
     } else {
@@ -2856,8 +2870,15 @@ void DaeBuilderInternal::eq(const MX& lhs, const MX& rhs, const Dict& opts) {
       return;
     }
   } else {
-    // Implicit equation
+    // Implicit equation: Create residual variable
     casadi_error("Implicit equations not yet supported");
+#if 0
+    Variable& res = add(unique_name("__res__"), Causality::OUTPUT, Variability::CONTINUOUS, Dict());
+    eq(res.v, lhs - rhs, Dict());
+    // Remove from y and classify as res variable
+    remove(y_, res.index);
+    res.category = Category::RES;
+#endif
   }
 }
 
@@ -2874,44 +2895,47 @@ void DaeBuilderInternal::when(const MX& cond, const std::vector<std::string>& eq
     casadi_error("Cannot parse zero-crossing condition" + str(cond));
   }
   // Create a new dependent variable for the event indicator
-  Variable& e = add(unique_name("__when__"), Causality::LOCAL, Variability::CONTINUOUS, Dict());
+  Variable& e = add(unique_name("__when__"), Causality::OUTPUT, Variability::CONTINUOUS, Dict());
   eq(e.v, zero, Dict());
-  // Remove from w
-  for (auto it = w_.begin(); it != w_.end(); ++it) {
-    if (*it == e.index) {
-      w_.erase(it);
-      break;
-    }
-  }
-  // Add to e instead
-  e_.push_back(e.index);
+  // Move from y to e
+  remove(y_, e.index);
+  insert(e_, e.index);
   e.category = Category::E;
   // Read equations
   for (auto&& eq : eqs) {
     when_cond_.push_back(variable(e.index).beq);
     Variable& ee = variable(eq);
-    casadi_assert_dev(ee.category == Category::REINIT);
+    casadi_assert_dev(ee.category == Category::ASSIGN || ee.category == Category::REINIT);
     when_lhs_.push_back(var(ee.parent));
     when_rhs_.push_back(ee.beq);
   }
+}
+
+std::string DaeBuilderInternal::assign(const std::string& name, const MX& val) {
+  // Create a unique name for the reinit variable
+  std::string assign_name = unique_name("__assign__" + name + "__");
+  // Add a new dependent variable defined by val
+  Variable& v = add(assign_name, Causality::OUTPUT, Variability::CONTINUOUS, Dict());
+  eq(v.v, val, Dict());
+  // Remove from y and classify as assign variable
+  remove(y_, v.index);
+  v.category = Category::ASSIGN;
+  v.parent = variable(name).index;
+  // Return the variable name
+  return assign_name;
 }
 
 std::string DaeBuilderInternal::reinit(const std::string& name, const MX& val) {
   // Create a unique name for the reinit variable
   std::string reinit_name = unique_name("__reinit__" + name + "__");
   // Add a new dependent variable defined by val
-  Variable& v = add(reinit_name, Causality::LOCAL, Variability::CONTINUOUS, Dict());
+  Variable& v = add(reinit_name, Causality::OUTPUT, Variability::CONTINUOUS, Dict());
   eq(v.v, val, Dict());
-  // Remove from w
-  for (auto it = w_.begin(); it != w_.end(); ++it) {
-    if (*it == v.index) {
-      w_.erase(it);
-      v.category = Category::REINIT;
-      v.parent = variable(name).index;
-      break;
-    }
-  }
-  // Return the mapping
+  // Remove from y and classify as reinit variable
+  remove(y_, v.index);
+  v.category = Category::REINIT;
+  v.parent = variable(name).index;
+  // Return the variable name
   return reinit_name;
 }
 

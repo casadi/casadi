@@ -350,6 +350,9 @@ class CASADI_EXPORT DaeBuilder
   /// Add when equations
   void when(const MX& cond, const std::vector<std::string>& eqs, const Dict& opts=Dict());
 
+  /// Assignment inside a when-equation or if-else equation
+  std::string assign(const std::string& name, const MX& val);
+
   /// Reinitialize a state inside when-equations
   std::string reinit(const std::string& name, const MX& val);
 
