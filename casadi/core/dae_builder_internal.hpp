@@ -59,7 +59,7 @@ enum class Variability {CONSTANT, FIXED, TUNABLE, DISCRETE, CONTINUOUS, NUMEL};
 // CONTINUOUS   -          -                     U      Y       X      T
 
 // Input convension in codegen
-enum class Category {T, C, P, D, W, U, X, Z, Q, Y, E, DER, ASSIGN, REINIT, NUMEL};
+enum class Category {T, C, P, D, W, U, X, Z, Q, Y, E, DER, RES, ASSIGN, REINIT, NUMEL};
 
 /// Initial: FMI 2.0 specification, section 2.2.7 or FMI 3.0 specification, section 2.4.7.5
 enum class Initial {EXACT, APPROX, CALCULATED, NA, NUMEL};
@@ -522,7 +522,7 @@ protected:
   std::vector<size_t> t_, p_, u_, x_, z_, q_, c_, d_, w_;
 
   /// Different types of output variables
-  std::vector<size_t> y_, e_;
+  std::vector<size_t> res_, y_, e_;
 
   // Initial equations
   std::vector<size_t> init_;

@@ -192,6 +192,10 @@ std::string to_string(Category v) {
   case Category::W: return "w";
   case Category::Y: return "y";
   case Category::E: return "e";
+  case Category::DER: return "der";
+  case Category::RES: return "res";
+  case Category::ASSIGN: return "assign";
+  case Category::REINIT: return "reinit";
   default: break;
   }
   return "";
@@ -1112,8 +1116,11 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
       if (x.der >= 0) {
         // Derivative variable
         const Variable& xdot = variable(x.der);
-        stream << xdot.name;
-        if (!xdot.beq.is_empty()) stream << " := " << xdot.beq;
+        if (xdot.beq.is_empty()) {
+          stream << xdot.name;
+        } else {
+          stream <<  xdot.beq;
+        }
       } else if (x.variability == Variability::DISCRETE) {
         // Discrete variable - derivative is zero
         stream << 0;
@@ -1125,15 +1132,11 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
     }
   }
 
-  if (!z_.empty()) {
+  if (!res_.empty()) {
     stream << "Algebraic equations" << std::endl;
-    for (size_t k : z_) {
-      const Variable& z = variable(k);
-      casadi_assert(z.alg >= 0, "No residual variable for " + z.name);
-      const Variable& alg = variable(z.alg);
-      stream << "  0 == " << alg.beq;
-      if (!alg.beq.is_empty()) stream << " := " << alg.beq;
-      stream << std::endl;
+    for (size_t k : res_) {
+      const Variable& alg = variable(k);
+      stream << "  0 == " << alg.beq << std::endl;
     }
   }
 
@@ -1255,8 +1258,8 @@ void DaeBuilderInternal::prune(bool prune_p, bool prune_u) {
   // Collect all DAE input variables with at least one entry, skip u
   for (casadi_int i = 0; i != enum_traits<Category>::n_enum; ++i) {
     auto cat = static_cast<Category>(i);
-    if (cat == Category::E || cat == Category::DER || cat == Category::ASSIGN
-      || cat == Category::REINIT) continue;
+    if (cat == Category::E || cat == Category::DER || cat == Category::RES
+      || cat == Category::ASSIGN || cat == Category::REINIT) continue;
     if (prune_p && cat == Category::P) continue;
     if (prune_u && cat == Category::U) continue;
     v = input(cat);
@@ -2094,8 +2097,8 @@ const Function& DaeBuilderInternal::oracle(bool sx, bool elim_w, bool lifted_cal
     // Collect all DAE input variables
     for (size_t i = 0; i != enum_traits<Category>::n_enum; ++i) {
       auto cat = static_cast<Category>(i);
-      if (cat == Category::E || cat == Category::DER || cat == Category::ASSIGN
-        || cat == Category::REINIT) continue;
+      if (cat == Category::E || cat == Category::DER || cat == Category::RES
+        || cat == Category::ASSIGN || cat == Category::REINIT) continue;
       if (cat == Category::Y) continue;  // fixme2
       v = input(cat);
       if (elim_w && cat == Category::W) {
@@ -2555,12 +2558,9 @@ std::vector<MX> DaeBuilderInternal::ode() const {
 
 std::vector<MX> DaeBuilderInternal::alg() const {
   std::vector<MX> ret;
-  ret.reserve(z_.size());
-  for (size_t v : z_) {
-    const Variable& z = variable(v);
-    casadi_assert(z.alg >= 0, "No residual variable for " + z.name);
-    const Variable& alg = variable(z.alg);
-    ret.push_back(alg.beq);
+  ret.reserve(res_.size());
+  for (size_t v : res_) {
+    ret.push_back(variable(v).beq);
   }
   return ret;
 }
@@ -2673,7 +2673,12 @@ Variable& DaeBuilderInternal::add(const std::string& name, Causality causality,
         // Type determined by providing equation, unless discrete variability
         if (variability == Variability::DISCRETE) {
           // Discrete variables are considered states with zero derivatives
-          x_.push_back(v.index);
+          v.category = Category::X;
+          insert(x_, v.index);
+        } else {
+          // Initialize as algebraic variable
+          v.category = Category::Z;
+          insert(z_, v.index);
         }
         break;
       default:
@@ -2848,13 +2853,18 @@ void DaeBuilderInternal::eq(const MX& lhs, const MX& rhs, const Dict& opts) {
       if (v.category == Category::DER) {
         // Derivative variable is being set - find the corresponding state variable
         Variable& x = variable(v.parent);
-        // Update category
-        if (x.category == Category::NUMEL) {
+        // Reclassify as state variable
+        if (x.category == Category::Z) {
+          remove(z_, x.index);
           x.category = Category::X;
           insert(x_, x.index);
+        } else {
+          casadi_assert(x.category == Category::NUMEL, "No categorization for " + x.name);
+          casadi_error("Unexpected category for " + x.name + ": " + to_string(x.category));
         }
-      } else if (v.category == Category::NUMEL) {
-        // New dependent variable
+      } else if (v.category == Category::Z) {
+        // Reclassify as dependent variable
+        remove(z_, v.index);
         v.category = Category::W;
         insert(w_, v.index);
       } else if (v.category != Category::Y) {
@@ -2872,14 +2882,32 @@ void DaeBuilderInternal::eq(const MX& lhs, const MX& rhs, const Dict& opts) {
     }
   } else {
     // Implicit equation: Create residual variable
-    casadi_error("Implicit equations not yet supported");
-#if 0
     Variable& res = add(unique_name("__res__"), Causality::OUTPUT, Variability::CONTINUOUS, Dict());
     eq(res.v, lhs - rhs, Dict());
     // Remove from y and classify as res variable
     remove(y_, res.index);
     res.category = Category::RES;
-#endif
+    insert(res_, res.index);
+  }
+  // If derivative variable in the right-hand-side, reclassify as algebraic variable
+  for (size_t rhs : rhs_vars) {
+    Variable& v = variable(rhs);
+    if (v.category == Category::DER) {
+      // Find the corresponding state variable
+      Variable& x = variable(v.parent);
+      // Reclassify as state variable
+      if (x.category == Category::Z) {
+        remove(z_, x.index);
+        x.category = Category::X;
+        insert(x_, x.index);
+      } else {
+        casadi_assert(x.category == Category::NUMEL, "No categorization for " + x.name);
+        casadi_error("Unexpected category for " + x.name + ": " + to_string(x.category));
+      }
+      // Reclassify derivative as algebraic variable
+      v.category = Category::Z;
+      insert(z_, v.index);
+    }
   }
 }
 
