@@ -580,18 +580,6 @@ MX DaeBuilder::add_e(const std::string& name, const MX& new_edef) {
 }
 #endif  // WITH_DEPRECATED_FEATURES
 
-void DaeBuilder::add_when(const MX& cond, const MX& lhs, const MX& rhs) {
-  (*this)->when_cond_.push_back(cond);
-  (*this)->when_lhs_.push_back(lhs);
-  (*this)->when_rhs_.push_back(rhs);
-}
-
-void DaeBuilder::clear_when() {
-  (*this)->when_cond_.clear();
-  (*this)->when_lhs_.clear();
-  (*this)->when_rhs_.clear();
-}
-
 void DaeBuilder::eq(const MX& lhs, const MX& rhs, const Dict& opts) {
   try {
     (*this)->eq(lhs, rhs, opts);
