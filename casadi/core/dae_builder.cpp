@@ -521,17 +521,17 @@ MX DaeBuilder::add(const std::string& name, const Dict& opts) {
 
 #ifdef WITH_DEPRECATED_FEATURES
 MX DaeBuilder::add_t(const std::string& name) {
-  return add(name, Causality::INDEPENDENT);
+  return add(name, "independent");
 }
 
 MX DaeBuilder::add_p(const std::string& name) {
   casadi_assert(!name.empty(), "Variable name is required");
-  return add(name, Causality::PARAMETER, Variability::TUNABLE);
+  return add(name, "parameter", "tunable");
 }
 
 MX DaeBuilder::add_u(const std::string& name) {
   casadi_assert(!name.empty(), "Variable name is required");
-  return add(name, Causality::INPUT);
+  return add(name, "input");
 }
 
 MX DaeBuilder::add_x(const std::string& name) {
@@ -550,26 +550,26 @@ MX DaeBuilder::add_q(const std::string& name) {
 }
 
 MX DaeBuilder::add_c(const std::string& name, const MX& new_cdef) {
-  MX v = add(name, Causality::LOCAL, Variability::CONSTANT);
+  MX v = add(name, "local", "constant");
   set_beq(name, new_cdef);
   return v;
 }
 
 MX DaeBuilder::add_d(const std::string& name, const MX& new_ddef) {
-  MX v = add(name, Causality::CALCULATED_PARAMETER, Variability::FIXED);
+  MX v = add(name, "calculatedParameter", "fixed");
   set_beq(name, new_ddef);
   return v;
 }
 
 MX DaeBuilder::add_w(const std::string& name, const MX& new_wdef) {
   MX v = add(name);
-  set_beq(name, new_wdef);
+  eq(v, new_wdef);
   return v;
 }
 
 MX DaeBuilder::add_y(const std::string& name, const MX& new_ydef) {
-  MX v = add(name, Causality::OUTPUT);
-  set_beq(name, new_ydef);
+  MX v = add(name, "output");
+  eq(v, new_ydef);
   return v;
 }
 
