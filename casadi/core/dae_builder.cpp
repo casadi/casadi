@@ -521,63 +521,58 @@ MX DaeBuilder::add(const std::string& name, const Dict& opts) {
 
 #ifdef WITH_DEPRECATED_FEATURES
 MX DaeBuilder::add_t(const std::string& name) {
-  return add(name, Dict{{"cat", "t"}});
+  return add(name, Causality::INDEPENDENT);
 }
 
 MX DaeBuilder::add_p(const std::string& name) {
   casadi_assert(!name.empty(), "Variable name is required");
-  return add(name, Dict{{"cat", "p"}});
+  return add(name, Causality::PARAMETER, Variability::TUNABLE);
 }
 
 MX DaeBuilder::add_u(const std::string& name) {
   casadi_assert(!name.empty(), "Variable name is required");
-  return add(name, Dict{{"cat", "u"}});
+  return add(name, Causality::INPUT);
 }
 
 MX DaeBuilder::add_x(const std::string& name) {
   casadi_assert(!name.empty(), "Variable name is required");
-  return add(name, Dict{{"cat", "x"}});
+  return add(name);
 }
 
 MX DaeBuilder::add_z(const std::string& name) {
   casadi_assert(!name.empty(), "Variable name is required");
-  return add(name, Dict{{"cat", "z"}});
+  return add(name);
 }
 
 MX DaeBuilder::add_q(const std::string& name) {
   casadi_assert(!name.empty(), "Variable name is required");
-  return add(name, Dict{{"cat", "q"}});
+  return add(name);
 }
 
 MX DaeBuilder::add_c(const std::string& name, const MX& new_cdef) {
-  MX v = add(name, Dict{{"cat", "c"}});
+  MX v = add(name, Causality::LOCAL, Variability::CONSTANT);
   set_beq(name, new_cdef);
   return v;
 }
 
 MX DaeBuilder::add_d(const std::string& name, const MX& new_ddef) {
-  MX v = add(name, Dict{{"cat", "d"}});
+  MX v = add(name, Causality::CALCULATED_PARAMETER, Variability::FIXED);
   set_beq(name, new_ddef);
   return v;
 }
 
 MX DaeBuilder::add_w(const std::string& name, const MX& new_wdef) {
-  MX v = add(name, Dict{{"cat", "w"}});
+  MX v = add(name);
   set_beq(name, new_wdef);
   return v;
 }
 
 MX DaeBuilder::add_y(const std::string& name, const MX& new_ydef) {
-  MX v = add(name, Dict{{"cat", "y"}});
+  MX v = add(name, Causality::OUTPUT);
   set_beq(name, new_ydef);
   return v;
 }
 
-MX DaeBuilder::add_e(const std::string& name, const MX& new_edef) {
-  MX v = add(name, Dict{{"cat", "e"}});
-  set_beq(name, new_edef);
-  return v;
-}
 #endif  // WITH_DEPRECATED_FEATURES
 
 void DaeBuilder::eq(const MX& lhs, const MX& rhs, const Dict& opts) {
@@ -611,22 +606,6 @@ std::string DaeBuilder::reinit(const std::string& name, const MX& val) {
   } catch (std::exception& e) {
     THROW_ERROR("reinit", e.what());
     return std::string();  // never reached
-  }
-}
-
-void DaeBuilder::set_ode(const std::string& name, const MX& ode_rhs) {
-  try {
-    (*this)->set_ode(name, ode_rhs);
-  } catch (std::exception& e) {
-    THROW_ERROR("set_ode", e.what());
-  }
-}
-
-void DaeBuilder::set_alg(const std::string& name, const MX& alg_rhs) {
-  try {
-    (*this)->set_alg(name, alg_rhs);
-  } catch (std::exception& e) {
-    THROW_ERROR("set_alg", e.what());
   }
 }
 

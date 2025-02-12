@@ -127,9 +127,6 @@ struct CASADI_EXPORT Variable {
   casadi_int parent;
   ///@}
 
-  // corresponding residual variable
-  casadi_int alg;
-
   // corresponding derivative variable
   casadi_int der;
 
@@ -616,12 +613,8 @@ protected:
   /// Reinitialize a state inside when-equations
   std::string reinit(const std::string& name, const MX& val);
 
-  ///@{
-  /// Set a binding equation
-  void set_ode(const std::string& name, const MX& ode_rhs);
-  void set_alg(const std::string& name, const MX& alg_rhs);
+  /// Set a initial equation
   void set_init(const std::string& name, const MX& init_rhs);
-  ///@}
 
   /// Linear combinations of output expressions
   Function::AuxOut lc_;

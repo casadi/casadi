@@ -318,7 +318,6 @@ Variable::Variable(casadi_int index, const std::string& name,
   this->der_of = -1;
   this->parent = -1;
   this->der = -1;
-  this->alg = -1;
   this->value.resize(numel, nan);
   this->dependency = false;
 }
@@ -1650,7 +1649,7 @@ void DaeBuilderInternal::lift(bool lift_shared, bool lift_calls) {
   std::vector<MX> ex;
   for (size_t v : x_) ex.push_back(variable(variable(v).der).beq);
   for (size_t v : q_) ex.push_back(variable(variable(v).der).beq);
-  for (size_t v : z_) ex.push_back(variable(variable(v).alg).beq);
+  for (size_t v : res_) ex.push_back(variable(v).beq);
   for (size_t v : y_) ex.push_back(variable(v).beq);
   // Lift expressions
   std::vector<MX> new_w, new_wdef;
@@ -1668,7 +1667,7 @@ void DaeBuilderInternal::lift(bool lift_shared, bool lift_calls) {
   auto it = ex.begin();
   for (size_t v : x_) variable(variable(v).der).beq = *it++;
   for (size_t v : q_) variable(variable(v).der).beq = *it++;
-  for (size_t v : z_) variable(variable(v).alg).beq = *it++;
+  for (size_t v : res_) variable(v).beq = *it++;
   for (size_t v : y_) variable(v).beq = *it++;
   // Consistency check
   casadi_assert_dev(it == ex.end());
@@ -2635,133 +2634,59 @@ Variable& DaeBuilderInternal::add(const std::string& name, Causality causality,
   Variable& v = new_variable(name, dimension);
   v.description = description;
   v.type = type;
+  v.causality = causality;
+  v.variability = variability;
   if (!start.empty()) v.start = start;
   // Handle different categories
-  if (cat.empty()) {
-    // Use provided causality and variability
-    v.causality = causality;
-    v.variability = variability;
-    // Auto-detect category (default)
-    switch (causality) {
-      case Causality::INDEPENDENT:
-        // Independent variable
-        casadi_assert(t_.empty(), "'t' already defined");
-        v.category = Category::T;
-        t_.push_back(v.index);
-        break;
-      case Causality::INPUT:
-        // Control
-        v.category = Category::U;
-        u_.push_back(v.index);
-        break;
-      case Causality::OUTPUT:
-        // Output
-        v.category = Category::Y;
-        y_.push_back(v.index);
-        break;
-      case Causality::PARAMETER:
-        // Parameter
-        if (variability == Variability::TUNABLE) {
-          v.category = Category::P;
-          p_.push_back(v.index);
-        }
-        break;
-      case Causality::CALCULATED_PARAMETER:
-        // Calculated parameter: No categorization for now
-        break;
-      case Causality::LOCAL:
-        // Type determined by providing equation, unless discrete variability
-        if (variability == Variability::DISCRETE) {
-          // Discrete variables are considered states with zero derivatives
-          v.category = Category::X;
-          insert(x_, v.index);
-        } else {
-          // Initialize as algebraic variable
-          v.category = Category::Z;
-          insert(z_, v.index);
-        }
-        break;
-      default:
-        casadi_error("Unknown causality");
-    }
-    // Also create a derivative variable, if needed
-    if (v.needs_der()) {
-      Variable& der_v = new_variable("der_" + name, dimension);
-      der_v.category = Category::DER;
-      der_v.der_of = v.index;
-      der_v.parent = v.index;
-      v.der = der_v.index;
-    }
-  } else {
-    // Explicit category (legacy, to be removed)
-    switch (to_enum<Category>(cat)) {
-      case Category::T:
-        // Independent variable
-        casadi_assert(t_.empty(), "'t' already defined");
-        casadi_assert(dimension.size() == 1 && dimension[0] == 1,
-          "Independent variable must be scalar");
-        v.causality = Causality::INDEPENDENT;
-        t_.push_back(v.index);
-        break;
-      case Category::P:
-        // Parameter
-        v.variability = Variability::FIXED;
-        v.causality = Causality::INPUT;
+  switch (causality) {
+    case Causality::INDEPENDENT:
+      // Independent variable
+      casadi_assert(t_.empty(), "'t' already defined");
+      v.category = Category::T;
+      t_.push_back(v.index);
+      break;
+    case Causality::INPUT:
+      // Control
+      v.category = Category::U;
+      u_.push_back(v.index);
+      break;
+    case Causality::OUTPUT:
+      // Output
+      v.category = Category::Y;
+      y_.push_back(v.index);
+      break;
+    case Causality::PARAMETER:
+      // Parameter
+      if (variability == Variability::TUNABLE) {
+        v.category = Category::P;
         p_.push_back(v.index);
-        break;
-      case Category::U:
-        // Control
-        v.variability = Variability::CONTINUOUS;
-        v.causality = Causality::INPUT;
-        u_.push_back(v.index);
-        break;
-      case Category::X:
-        // State
-        v.variability = Variability::CONTINUOUS;
-        v.causality = Causality::LOCAL;
-        x_.push_back(v.index);
-        break;
-      case Category::Z:
-        // Algebraic variable
-        v.variability = Variability::CONTINUOUS;
-        v.causality = Causality::LOCAL;
-        z_.push_back(v.index);
-        break;
-      case Category::Q:
-        // Quadrature variable
-        v.variability = Variability::CONTINUOUS;
-        v.causality = Causality::LOCAL;
-        q_.push_back(v.index);
-        break;
-      case Category::C:
-        // Constant
-        v.variability = Variability::CONSTANT;
-        c_.push_back(v.index);
-        break;
-      case Category::D:
-        // Calculated parameter
-        v.variability = Variability::FIXED;
-        v.causality = Causality::CALCULATED_PARAMETER;
-        d_.push_back(v.index);
-        break;
-      case Category::W:
-        // Dependent variable
-        v.variability = Variability::CONTINUOUS;
-        v.causality = Causality::LOCAL;
-        w_.push_back(v.index);
-        break;
-      case Category::Y:
-        // Output
-        v.causality = Causality::OUTPUT;
-        y_.push_back(v.index);
-        break;
-      case Category::E:
-        // Zero-crossing
-        v.causality = Causality::OUTPUT;
-        e_.push_back(v.index);
-        break;
-      default: break;
-    }
+      }
+      break;
+    case Causality::CALCULATED_PARAMETER:
+      // Calculated parameter: No categorization for now
+      break;
+    case Causality::LOCAL:
+      // Type determined by providing equation, unless discrete variability
+      if (variability == Variability::DISCRETE) {
+        // Discrete variables are considered states with zero derivatives
+        v.category = Category::X;
+        insert(x_, v.index);
+      } else {
+        // Initialize as algebraic variable
+        v.category = Category::Z;
+        insert(z_, v.index);
+      }
+      break;
+    default:
+      casadi_error("Unknown causality");
+  }
+  // Also create a derivative variable, if needed
+  if (v.needs_der()) {
+    Variable& der_v = new_variable("der_" + name, dimension);
+    der_v.category = Category::DER;
+    der_v.der_of = v.index;
+    der_v.parent = v.index;
+    v.der = der_v.index;
   }
   // Return variable reference
   return v;
@@ -2883,7 +2808,7 @@ void DaeBuilderInternal::eq(const MX& lhs, const MX& rhs, const Dict& opts) {
   } else {
     // Implicit equation: Create residual variable
     Variable& res = add(unique_name("__res__"), Causality::OUTPUT, Variability::CONTINUOUS, Dict());
-    eq(res.v, lhs - rhs, Dict());
+    eq(res.v, rhs - lhs, Dict());
     // Remove from y and classify as res variable
     remove(y_, res.index);
     res.category = Category::RES;
@@ -2966,39 +2891,6 @@ std::string DaeBuilderInternal::reinit(const std::string& name, const MX& val) {
   v.parent = variable(name).index;
   // Return the variable name
   return reinit_name;
-}
-
-void DaeBuilderInternal::set_ode(const std::string& name, const MX& ode_rhs) {
-  // Find the state variable
-  const Variable& x = variable(name);
-  // Check if derivative exists
-  if (x.der < 0) {
-    // New derivative variable
-    Variable& xdot = new_variable("der_" + name);
-    xdot.causality = Causality::LOCAL;
-    xdot.der_of = find(name);
-    xdot.beq = ode_rhs;
-    variable(name).der = xdot.index;
-  } else {
-    // Variable exists: Update binding equation
-    variable(x.der).beq = ode_rhs;
-  }
-}
-
-void DaeBuilderInternal::set_alg(const std::string& name, const MX& alg_rhs) {
-  // Find the algebraic variable
-  const Variable& z = variable(name);
-  // Check if residual exists
-  if (z.alg < 0) {
-    // New derivative variable
-    Variable& alg = new_variable("alg_" + name);
-    alg.causality = Causality::OUTPUT;
-    alg.beq = alg_rhs;
-    variable(name).alg = alg.index;
-  } else {
-    // Variable exists: Update binding equation
-    variable(z.alg).beq = alg_rhs;
-  }
 }
 
 void DaeBuilderInternal::set_init(const std::string& name, const MX& init_rhs) {

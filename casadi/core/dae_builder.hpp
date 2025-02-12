@@ -334,14 +334,11 @@ class CASADI_EXPORT DaeBuilder
   /// [DEPRECATED] Replaced by add and set_beq
   MX add_d(const std::string& name, const MX& new_ddef);
 
-  /// [DEPRECATED] Replaced by add and set_beq
+  /// [DEPRECATED] Replaced by add and eq
   MX add_w(const std::string& name, const MX& new_wdef);
 
-  /// [DEPRECATED] Replaced by add and set_beq
+  /// [DEPRECATED] Replaced by add and eq
   MX add_y(const std::string& name, const MX& new_ydef);
-
-  /// [DEPRECATED] Replaced by add and set_beq
-  MX add_e(const std::string& name, const MX& new_edef);
 #endif  // WITH_DEPRECATED_FEATURES
 
   /// Add a simple equation
@@ -356,16 +353,21 @@ class CASADI_EXPORT DaeBuilder
   /// Reinitialize a state inside when-equations
   std::string reinit(const std::string& name, const MX& val);
 
-  /// Specify the ordinary differential equation for a state
-  void set_ode(const std::string& name, const MX& ode_rhs);
-
-  /// Specify the residual equation for an algebraic variable
-  void set_alg(const std::string& name, const MX& alg_rhs);
-
   /// Specify the initial equation for a variable
   void set_init(const std::string& name, const MX& init_rhs);
 
 #ifdef WITH_DEPRECATED_FEATURES
+  /// [DEPRECATED] Replaced by eq
+  void set_ode(const std::string& name, const MX& ode_rhs) {
+    eq(var(name), ode_rhs);
+  }
+
+  /// [DEPRECATED] Replaced by eq
+  void set_alg(const std::string& name, const MX& alg_rhs) {
+    (void)name;
+    eq(0, alg_rhs);
+  }
+
   /// [DEPRECATED] Replaced by set_init
   void add_init(const MX& lhs, const MX& rhs) {
     set_init(lhs.name(), rhs);
