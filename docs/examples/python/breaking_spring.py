@@ -44,3 +44,29 @@ dae.eq(f, ca.if_else(ca.logic_not(b), -k*x + d, 0))
 dae.eq(dae.der(v), (f - c*v) / m)
 dae.when(x > 2, [dae.assign('b', True)])
 dae.disp(True)
+
+# Create an integrator in CasADi for hybrid simulation
+tgrid = np.linspace(0, 4, 101)
+simopts = dict(transition = dae.transition(), verbose = False, event_tol = 1e-12)
+sim = ca.integrator('sim', 'cvodes', dae.create(), 0, tgrid, simopts)
+sim
+
+# Disturbance trajectory
+d_traj = np.zeros(tgrid.shape)
+d_traj[20:30] = -5
+d_traj[40:50] = 15
+
+# Simulate the system
+res = sim(x0 = dae.start(dae.x()), p = dae.start(dae.p()), u = d_traj)
+
+# Visualize the solution
+fig, [ax_x, ax_u] = plt.subplots(2, 1, figsize = [10, 10])
+ax_x.plot(tgrid, res['xf'].T, label = dae.x())
+ax_x.legend()
+ax_x.grid(True)
+ax_x.set_title('States')
+ax_u.step(tgrid, d_traj, label = dae.u()[0])
+ax_u.legend()
+ax_u.set_title('Disturbance')
+ax_u.grid(True)
+plt.show()

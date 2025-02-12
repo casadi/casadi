@@ -1255,7 +1255,8 @@ void DaeBuilderInternal::prune(bool prune_p, bool prune_u) {
   // Collect all DAE input variables with at least one entry, skip u
   for (casadi_int i = 0; i != enum_traits<Category>::n_enum; ++i) {
     auto cat = static_cast<Category>(i);
-    if (cat == Category::DER || cat == Category::ASSIGN || cat == Category::REINIT) continue;
+    if (cat == Category::E || cat == Category::DER || cat == Category::ASSIGN
+      || cat == Category::REINIT) continue;
     if (prune_p && cat == Category::P) continue;
     if (prune_u && cat == Category::U) continue;
     v = input(cat);
@@ -1696,7 +1697,6 @@ std::vector<MX> DaeBuilderInternal::input(Category ind) const {
   case Category::Z: return var(z_);
   case Category::Q: return var(q_);
   case Category::Y: return var(y_);
-  case Category::E: return var(e_);
   default: return std::vector<MX>{};
   }
 }
@@ -2094,7 +2094,8 @@ const Function& DaeBuilderInternal::oracle(bool sx, bool elim_w, bool lifted_cal
     // Collect all DAE input variables
     for (size_t i = 0; i != enum_traits<Category>::n_enum; ++i) {
       auto cat = static_cast<Category>(i);
-      if (cat == Category::DER || cat == Category::ASSIGN || cat == Category::REINIT) continue;
+      if (cat == Category::E || cat == Category::DER || cat == Category::ASSIGN
+        || cat == Category::REINIT) continue;
       if (cat == Category::Y) continue;  // fixme2
       v = input(cat);
       if (elim_w && cat == Category::W) {
@@ -2890,7 +2891,7 @@ void DaeBuilderInternal::when(const MX& cond, const std::vector<std::string>& eq
   // Convert condition into a smooth zero crossing condition
   MX zero;
   if (cond.is_op(OP_LT) || cond.is_op(OP_LE)) {
-    zero = -cond.dep(0);
+    zero = cond.dep(1) - cond.dep(0);  // Reformulate a < b to b - a > 0
   } else {
     casadi_error("Cannot parse zero-crossing condition" + str(cond));
   }
