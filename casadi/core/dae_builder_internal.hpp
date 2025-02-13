@@ -123,7 +123,6 @@ struct CASADI_EXPORT Variable {
   double nominal;
   std::vector<double> start;
   casadi_int der_of;  // 'derivative' in FMI specification
-  // bool reinit;
   casadi_int parent;
   ///@}
 
@@ -241,10 +240,20 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   void sort_z(const std::vector<std::string>& z_order);
 
   /// Classified variable indices (mutable)
-  std::vector<size_t>& ind_in(const std::string& v);
+  std::vector<size_t>& indices(Category cat);
 
   /// Classified variable indices (immutable)
-  const std::vector<size_t>& ind_in(const std::string& v) const;
+  const std::vector<size_t>& indices(Category cat) const;
+
+  /// Classified variable indices, by name (mutable)
+  std::vector<size_t>& ind_in(const std::string& v) {
+    return indices(to_enum<Category>(v));
+  }
+
+  /// Classified variable indices (immutable)
+  const std::vector<size_t>& ind_in(const std::string& v) const {
+    return indices(to_enum<Category>(v));
+  }
 
   /// Clear all variables of a class
   void clear_all(const std::string& v);
@@ -516,10 +525,7 @@ protected:
   std::unordered_map<unsigned int, size_t> vrmap_;
 
   /// Ordered variables
-  std::vector<size_t> t_, p_, u_, x_, z_, q_, c_, d_, w_;
-
-  /// Different types of output variables
-  std::vector<size_t> res_, y_, e_;
+  std::vector<size_t> t_, c_, p_, d_, w_, u_, x_, z_, q_, y_, e_, res_;
 
   // Initial equations
   std::vector<size_t> init_;

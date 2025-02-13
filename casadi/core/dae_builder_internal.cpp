@@ -1215,29 +1215,31 @@ void DaeBuilderInternal::sort_z(const std::vector<std::string>& z_order) {
   std::copy(new_z.begin(), new_z.end(), z_.begin());
 }
 
-std::vector<size_t>& DaeBuilderInternal::ind_in(const std::string& v) {
-  switch (to_enum<Category>(v)) {
+std::vector<size_t>& DaeBuilderInternal::indices(Category cat) {
+  switch (cat) {
   case Category::T: return t_;
+  case Category::C: return c_;
   case Category::P: return p_;
+  case Category::D: return d_;
+  case Category::W: return w_;
   case Category::U: return u_;
   case Category::X: return x_;
   case Category::Z: return z_;
   case Category::Q: return q_;
-  case Category::C: return c_;
-  case Category::D: return d_;
-  case Category::W: return w_;
   case Category::Y: return y_;
+  case Category::E: return e_;
+  case Category::RES: return res_;
   default: break;
   }
   // Unsuccessful
-  casadi_error("Cannot access input indices for " + v);
+  casadi_error("Cannot access input indices for " + to_string(cat));
   // Just to resolve warnings
   static std::vector<size_t> dummy;
   return dummy;
 }
 
-const std::vector<size_t>& DaeBuilderInternal::ind_in(const std::string& v) const {
-  return const_cast<DaeBuilderInternal*>(this)->ind_in(v);
+const std::vector<size_t>& DaeBuilderInternal::indices(Category cat) const {
+  return const_cast<DaeBuilderInternal*>(this)->indices(cat);
 }
 
 void DaeBuilderInternal::clear_all(const std::string& v) {
