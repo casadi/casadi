@@ -415,6 +415,14 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   ///@}
 
   ///@{
+  /// Access a variable by Category and index
+  Variable& variable(Category cat, size_t ind) {return variable(indices(cat).at(ind));}
+  const Variable& variable(Category cat, size_t ind) const {
+    return variable(indices(cat).at(ind));
+  }
+  ///@}
+
+  ///@{
   /// Access a variable by name
   Variable& variable(const std::string& name) {return variable(find(name));}
   const Variable& variable(const std::string& name) const {return variable(find(name));}

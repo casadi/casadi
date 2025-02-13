@@ -688,18 +688,18 @@ void DaeBuilderInternal::update_dependencies() const {
   Sparsity dode_duT = oracle.jac_sparsity(oracle.index_out("ode"), oracle.index_in("u")).T();
   for (casadi_int i = 0; i < size(Category::X); ++i) {
     // Get output variable
-    const Variable& xdot = variable(variable(x_.at(i)).der);
+    const Variable& xdot = variable(variable(Category::X, i).der);
     // Clear dependencies
     xdot.dependencies.clear();
     // Dependencies on states
     for (casadi_int k = dode_dxT.colind(i); k < dode_dxT.colind(i + 1); ++k) {
       casadi_int j = dode_dxT.row(k);
-      xdot.dependencies.push_back(variable(x_.at(j)).value_reference);
+      xdot.dependencies.push_back(variable(Category::X, j).value_reference);
     }
     // Dependencies on controls
     for (casadi_int k = dode_duT.colind(i); k < dode_duT.colind(i + 1); ++k) {
       casadi_int j = dode_duT.row(k);
-      xdot.dependencies.push_back(variable(u_.at(j)).value_reference);
+      xdot.dependencies.push_back(variable(Category::U, j).value_reference);
     }
   }
   // Dependendencies of the output function
@@ -707,18 +707,18 @@ void DaeBuilderInternal::update_dependencies() const {
   Sparsity dydef_duT = oracle.jac_sparsity(oracle.index_out("ydef"), oracle.index_in("u")).T();
   for (casadi_int i = 0; i < size(Category::Y); ++i) {
     // Get output variable
-    const Variable& y = variable(y_.at(i));
+    const Variable& y = variable(Category::Y, i);
     // Clear dependencies
     y.dependencies.clear();
     // Dependencies on states
     for (casadi_int k = dydef_dxT.colind(i); k < dydef_dxT.colind(i + 1); ++k) {
       casadi_int j = dydef_dxT.row(k);
-      y.dependencies.push_back(variable(x_.at(j)).value_reference);
+      y.dependencies.push_back(variable(Category::X, j).value_reference);
     }
     // Dependencies on controls
     for (casadi_int k = dydef_duT.colind(i); k < dydef_duT.colind(i + 1); ++k) {
       casadi_int j = dydef_duT.row(k);
-      y.dependencies.push_back(variable(u_.at(j)).value_reference);
+      y.dependencies.push_back(variable(Category::U, j).value_reference);
     }
   }
 }
@@ -1317,7 +1317,7 @@ void DaeBuilderInternal::tear() {
   // Remove any (held or not held) iteration variables, equations from z and alg
   size_t sz = 0;
   for (size_t k = 0; k < size(Category::Z); ++k) {
-    if (!iv_set.count(variable(z_[k]).name)) {
+    if (!iv_set.count(variable(Category::Z, k).name)) {
       // Non-iteration variable: Keep
       z_.at(k) = z_.at(sz);
       sz++;
@@ -1327,7 +1327,7 @@ void DaeBuilderInternal::tear() {
   // Remove any (held or not held) iteration variables, equations from u
   sz = 0;
   for (size_t k = 0; k < size(Category::U); ++k) {
-    if (!iv_set.count(variable(u_[k]).name)) {
+    if (!iv_set.count(variable(Category::U, k).name)) {
       // Non-iteration variable: Keep
       u_.at(k) = u_.at(sz++);
     }
