@@ -1692,16 +1692,17 @@ std::string to_string(DaeBuilderInternal::DaeBuilderInternalOut v) {
 
 std::vector<MX> DaeBuilderInternal::input(Category ind) const {
   switch (ind) {
-  case Category::T: return var(t_);
-  case Category::C: return var(c_);
-  case Category::P: return var(p_);
-  case Category::D: return var(d_);
-  case Category::W: return var(w_);
-  case Category::U: return var(u_);
-  case Category::X: return var(x_);
-  case Category::Z: return var(z_);
-  case Category::Q: return var(q_);
-  case Category::Y: return var(y_);
+  case Category::T:  // fall-through
+  case Category::C:  // fall-through
+  case Category::P:  // fall-through
+  case Category::D:  // fall-through
+  case Category::W:  // fall-through
+  case Category::U:  // fall-through
+  case Category::X:  // fall-through
+  case Category::Z:  // fall-through
+  case Category::Q:  // fall-through
+  case Category::Y:
+    return var(indices(ind));
   default: return std::vector<MX>{};
   }
 }
@@ -3282,11 +3283,13 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
     // What if dependencies is missing from InitialUnknowns?
     // Depends on x_ having been populated
     default_dependencies.clear();
-    default_dependencies.insert(default_dependencies.begin(), t_.begin(), t_.end());
+    default_dependencies.insert(default_dependencies.begin(),
+      indices(Category::T).begin(), indices(Category::T).end());
     for (const Variable* v : variables_) {
       if (v->initial == Initial::EXACT) default_dependencies.push_back(v->index);
     }
-    default_dependencies.insert(default_dependencies.begin(), u_.begin(), u_.end());
+    default_dependencies.insert(default_dependencies.begin(),
+      indices(Category::U).begin(), indices(Category::U).end());
     std::sort(default_dependencies.begin(), default_dependencies.end());
 
     // Initial unknowns
