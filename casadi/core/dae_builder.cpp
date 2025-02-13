@@ -490,6 +490,14 @@ void DaeBuilder::set_all(const std::string& v, const std::vector<std::string>& n
   }
 }
 
+void DaeBuilder::reorder(const std::string& cat, const std::vector<std::string>& v) {
+  try {
+    (*this)->reorder(to_enum<Category>(cat), (*this)->find(v));
+  } catch (std::exception& e) {
+    THROW_ERROR("reorder", e.what());
+  }
+}
+
 MX DaeBuilder::add(const std::string& name, const std::string& causality,
     const std::string& variability, const Dict& opts) {
   try {

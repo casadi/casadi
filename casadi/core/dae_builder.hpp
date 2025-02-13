@@ -384,6 +384,9 @@ class CASADI_EXPORT DaeBuilder
   /// Set all variables of a type
   void set_all(const std::string& v, const std::vector<std::string>& name);
 
+  /// Reorder variables in a category
+  void reorder(const std::string& cat, const std::vector<std::string>& v);
+
 #ifdef WITH_DEPRECATED_FEATURES
   /** @name Register an existing variable */
   ///@{

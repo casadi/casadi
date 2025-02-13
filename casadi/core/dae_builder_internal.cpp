@@ -1235,6 +1235,22 @@ void DaeBuilderInternal::set_all(const std::string& v, const std::vector<std::st
   indices(to_enum<Category>(v)) = find(name);
 }
 
+void DaeBuilderInternal::reorder(Category cat, const std::vector<size_t>& v) {
+  // Get the current indices
+  std::vector<size_t>& ind = indices(cat);
+  // Check if the sizes match
+  casadi_assert(ind.size() == v.size(), "Cannot reorder " + str(to_string(cat)) + ": " 
+    + str(v.size()) + " elements provided for " + str(ind.size()) + " components.");
+  // Mark elements to be set
+  std::vector<bool> set(n_variables(), false);
+  for (size_t i : v) set.at(i) = true;
+  // Make sure all elements are present
+  for (size_t i : ind) casadi_assert(set.at(i), "Cannot reorder " + str(to_string(cat)) + ": " 
+    + variable(i).name + " is missing.");
+  // Set the new order
+  std::copy(v.begin(), v.end(), ind.begin());
+}
+
 void DaeBuilderInternal::prune(bool prune_p, bool prune_u) {
   // Function inputs and outputs
   std::vector<MX> f_in, f_out, v;
