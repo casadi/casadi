@@ -292,7 +292,7 @@ std::vector<std::string> DaeBuilder::all() const {
 
 std::vector<std::string> DaeBuilder::all(const std::string& cat) const {
   try {
-    return (*this)->all(cat);
+    return (*this)->all(to_enum<Category>(cat));
   } catch (std::exception& e) {
     THROW_ERROR("all", e.what());
     return {};  // never reached

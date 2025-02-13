@@ -245,16 +245,6 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   /// Classified variable indices (immutable)
   const std::vector<size_t>& indices(Category cat) const;
 
-  /// Classified variable indices, by name (mutable)
-  std::vector<size_t>& ind_in(const std::string& v) {
-    return indices(to_enum<Category>(v));
-  }
-
-  /// Classified variable indices (immutable)
-  const std::vector<size_t>& ind_in(const std::string& v) const {
-    return indices(to_enum<Category>(v));
-  }
-
   /// Clear all variables of a class
   void clear_all(const std::string& v);
 
@@ -404,7 +394,7 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   std::vector<std::string> all() const;
 
   /// Get a list of all variables of a particular category
-  std::vector<std::string> all(const std::string& cat) const;
+  std::vector<std::string> all(Category cat) const;
 
   /// Length of variables array
   size_t n_variables() const {return variables_.size();}

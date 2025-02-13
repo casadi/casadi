@@ -1244,12 +1244,12 @@ const std::vector<size_t>& DaeBuilderInternal::indices(Category cat) const {
 
 void DaeBuilderInternal::clear_all(const std::string& v) {
   clear_cache_ = true;  // Clear cache after this
-  ind_in(v).clear();
+  indices(to_enum<Category>(v)).clear();
 }
 
 void DaeBuilderInternal::set_all(const std::string& v, const std::vector<std::string>& name) {
   clear_cache_ = true;  // Clear cache after this
-  ind_in(v) = find(name);
+  indices(to_enum<Category>(v)) = find(name);
 }
 
 void DaeBuilderInternal::prune(bool prune_p, bool prune_u) {
@@ -1471,8 +1471,8 @@ std::vector<std::string> DaeBuilderInternal::all() const {
   return r;
 }
 
-std::vector<std::string> DaeBuilderInternal::all(const std::string& cat) const {
-  return name(ind_in(cat));
+std::vector<std::string> DaeBuilderInternal::all(Category cat) const {
+  return name(indices(cat));
 }
 
 size_t DaeBuilderInternal::n_mem() const {
@@ -2456,11 +2456,11 @@ Function DaeBuilderInternal::fmu_fun(const std::string& name,
     for (auto&& s : dyn_in()) scheme[s] = std::vector<size_t>();
     for (auto&& s : dyn_out()) scheme[s] = std::vector<size_t>();
     // Default IO scheme
-    scheme["t"] = ind_in("t");
-    scheme["x"] = ind_in("x");
-    scheme["u"] = ind_in("u");
-    scheme["z"] = ind_in("z");
-    scheme["p"] = ind_in("p");
+    scheme["t"] = indices(Category::T);
+    scheme["x"] = indices(Category::X);
+    scheme["u"] = indices(Category::U);
+    scheme["z"] = indices(Category::Z);
+    scheme["p"] = indices(Category::P);
     scheme["ode"] = x_;
     for (size_t& i : scheme["ode"]) i = variable(i).der;
     scheme["alg"] = z_;
