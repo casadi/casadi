@@ -2647,24 +2647,20 @@ Variable& DaeBuilderInternal::add(const std::string& name, Causality causality,
     case Causality::INDEPENDENT:
       // Independent variable
       casadi_assert(!has_t(), "'t' already defined");
-      v.category = Category::T;
-      indices(Category::T).push_back(v.index);
+      categorize(v.index, Category::T);
       break;
     case Causality::INPUT:
       // Control
-      v.category = Category::U;
-      indices(Category::U).push_back(v.index);
+      categorize(v.index, Category::U);
       break;
     case Causality::OUTPUT:
       // Output
-      v.category = Category::Y;
-      indices(Category::Y).push_back(v.index);
+      categorize(v.index, Category::Y);
       break;
     case Causality::PARAMETER:
       // Parameter
       if (variability == Variability::TUNABLE) {
-        v.category = Category::P;
-        indices(Category::P).push_back(v.index);
+        categorize(v.index, Category::P);
       }
       break;
     case Causality::CALCULATED_PARAMETER:
@@ -2674,12 +2670,10 @@ Variable& DaeBuilderInternal::add(const std::string& name, Causality causality,
       // Type determined by providing equation, unless discrete variability
       if (variability == Variability::DISCRETE) {
         // Discrete variables are considered states with zero derivatives
-        v.category = Category::X;
-        insert(indices(Category::X), v.index);
+        categorize(v.index, Category::X);
       } else {
         // Initialize as algebraic variable
-        v.category = Category::Z;
-        insert(indices(Category::Z), v.index);
+        categorize(v.index, Category::Z);
       }
       break;
     default:
@@ -2688,7 +2682,7 @@ Variable& DaeBuilderInternal::add(const std::string& name, Causality causality,
   // Also create a derivative variable, if needed
   if (v.needs_der()) {
     Variable& der_v = new_variable("der_" + name, dimension);
-    der_v.category = Category::DER;
+    categorize(der_v.index, Category::DER);
     der_v.der_of = v.index;
     der_v.parent = v.index;
     v.der = der_v.index;
@@ -3074,18 +3068,17 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
     // Initial classification of variables (states/outputs to be added later)
     if (var.causality == Causality::INDEPENDENT) {
       // Independent (time) variable
-      if (!ignore_time_) indices(Category::T).push_back(var.index);
+      if (!ignore_time_) categorize(var.index, Category::T);
     } else if (var.causality == Causality::INPUT) {
       // Check if description starts with PARAMETER:
       if (var.description.rfind("PARAMETER:", 0) == 0) {
         // Make tunable parameter
-        var.variability = Variability::TUNABLE;
-        indices(Category::P).push_back(var.index);
+        categorize(var.index, Category::P);
       } else {
-        indices(Category::U).push_back(var.index);
+        categorize(var.index, Category::U);
       }
     } else if (var.variability == Variability::TUNABLE) {
-      indices(Category::P).push_back(var.index);
+      categorize(var.index, Category::P);
     }
   }
 
@@ -3158,7 +3151,7 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
         Variable& v = variable(outputs_.back());
         // Add to y, unless state
         if (v.der < 0) {
-          indices(Category::Y).push_back(v.index);
+          categorize(v.index, Category::Y);
           v.beq = v.v;
         }
         // Get dependencies
@@ -3173,9 +3166,10 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
         Variable& v = variable(derivatives_.back());
         // Add to list of states
         casadi_assert(v.der_of >= 0, "Error processing derivative info for " + v.name);
-        indices(Category::X).push_back(v.der_of);
+        categorize(v.index, Category::DER);
+        categorize(v.der_of, Category::X);
         // Make sure der field is consistent
-        variable(indices(Category::X).back()).der = derivatives_.back();
+        variable(v.der_of).der = derivatives_.back();
         // Get dependencies
         v.dependencies = read_dependencies(e);
         v.dependenciesKind = read_dependencies_kind(e, v.dependencies.size());
@@ -3207,9 +3201,10 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
         Variable& v = variable(derivatives_.back());
         // Add to list of states
         casadi_assert(v.der_of >= 0, "Error processing derivative info for " + v.name);
-        indices(Category::X).push_back(v.der_of);
+        categorize(v.index, Category::DER);
+        categorize(v.der_of, Category::X);
         // Make sure der field is consistent
-        variable(indices(Category::X).back()).der = derivatives_.back();
+        variable(v.der_of).der = derivatives_.back();
       }
     }
 
@@ -3272,7 +3267,7 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
         Variable& v = variable(outputs_.back());
         // Add to y, unless state
         if (v.der < 0) {
-          indices(Category::Y).push_back(v.index);
+          categorize(v.index, Category::Y);
           v.beq = v.v;
         }
         // Get dependencies
@@ -3360,7 +3355,9 @@ void DaeBuilderInternal::import_dynamic_equations(const XmlNode& eqs) {
   // Add discrete states to x_
   // Note: Make generic, should also apply to regular FMUs
   for (Variable* v : variables_) {
-    if (v->variability == Variability::DISCRETE) indices(Category::X).push_back(v->index);
+    if (v->variability == Variability::DISCRETE) {
+      categorize(v->index, Category::X);
+    }
   }
   // Add equations
   for (casadi_int i = 0; i < eqs.size(); ++i) {
@@ -3443,7 +3440,7 @@ void DaeBuilderInternal::import_dynamic_equations(const XmlNode& eqs) {
           v.der = dot_v.index;
           dot_v.der_of = v.index;
           // Mark as state
-          indices(Category::X).push_back(v.index);
+          categorize(v.index, Category::X);
           // Set binding equation to derivative variable
           dot_v.beq = beq;
         } else {
