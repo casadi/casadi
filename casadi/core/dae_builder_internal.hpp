@@ -443,6 +443,9 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   /// Get variable expressions by index
   std::vector<MX> var(const std::vector<size_t>& ind) const;
 
+  /// Get variable expressions by category
+  std::vector<MX> var(Category cat) const {return var(indices(cat));}
+
   /// Get index of variable, given name
   size_t find(const std::string& name) const;
 

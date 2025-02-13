@@ -1019,7 +1019,7 @@ MX DaeBuilderInternal::read_expr(const XmlNode& node) {
         // Lift input arguments
         Variable& v = new_variable("w_" + str(size(Category::W)));
         // Add to list of variables
-        w_.push_back(v.index);
+        indices(Category::W).push_back(v.index);
         // Set binding expression
         v.beq = read_expr(args[i]);
         // Add to list of function arguments
@@ -1028,7 +1028,7 @@ MX DaeBuilderInternal::read_expr(const XmlNode& node) {
       // Return argument (scalar for now)
       Variable& r = new_variable("w_" + str(size(Category::W)));
       // Add to list of variables
-      w_.push_back(r.index);
+      indices(Category::W).push_back(r.index);
       // Return output variable
       return r.v;
     } else if (name=="Array") {
@@ -1141,7 +1141,7 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
 
   if (size(Category::Q) > 0) {
     stream << "Quadrature equations" << std::endl;
-    for (size_t k : q_) {
+    for (size_t k : indices(Category::Q)) {
       const Variable& q = variable(k);
       casadi_assert(q.der >= 0, "No derivative variable for " + q.name);
       const Variable& qdot = variable(q.der);
@@ -1213,7 +1213,7 @@ void DaeBuilderInternal::sort_z(const std::vector<std::string>& z_order) {
     new_z.push_back(i);
   }
   // Success: Update z
-  std::copy(new_z.begin(), new_z.end(), z_.begin());
+  std::copy(new_z.begin(), new_z.end(), indices(Category::Z).begin());
 }
 
 std::vector<size_t>& DaeBuilderInternal::indices(Category cat) {
@@ -1300,10 +1300,11 @@ void DaeBuilderInternal::prune(bool prune_p, bool prune_u) {
   // Prune u
   if (prune_u) {
     size_t nu = 0;
-    for (size_t i = 0; i < size(Category::U); ++i) {
-      if (!free_variables.at(u_.at(i))) u_.at(nu++) = u_.at(i);
+    std::vector<size_t>& u = indices(Category::U);
+    for (size_t i = 0; i < u.size(); ++i) {
+      if (!free_variables.at(u.at(i))) u.at(nu++) = u.at(i);
     }
-    u_.resize(nu);
+    u.resize(nu);
   }
 }
 
@@ -1322,24 +1323,24 @@ void DaeBuilderInternal::tear() {
   for (size_t k = 0; k < size(Category::Z); ++k) {
     if (!iv_set.count(variable(Category::Z, k).name)) {
       // Non-iteration variable: Keep
-      z_.at(k) = z_.at(sz);
+      indices(Category::Z).at(k) = indices(Category::Z).at(sz);
       sz++;
     }
   }
-  z_.resize(sz);
+  indices(Category::Z).resize(sz);
   // Remove any (held or not held) iteration variables, equations from u
   sz = 0;
   for (size_t k = 0; k < size(Category::U); ++k) {
     if (!iv_set.count(variable(Category::U, k).name)) {
       // Non-iteration variable: Keep
-      u_.at(k) = u_.at(sz++);
+      indices(Category::U).at(k) = indices(Category::U).at(sz++);
     }
   }
-  u_.resize(sz);
+  indices(Category::U).resize(sz);
   // Add algebraic variables
-  for (auto& e : iv) z_.push_back(find(e));
+  for (auto& e : iv) indices(Category::Z).push_back(find(e));
   // Add output variables
-  for (auto& e : iv_on_hold) u_.push_back(find(e));
+  for (auto& e : iv_on_hold) indices(Category::U).push_back(find(e));
 }
 
 void DaeBuilderInternal::tearing_variables(std::vector<std::string>* res,
@@ -1633,11 +1634,11 @@ void DaeBuilderInternal::eliminate_w() {
     if (!v->beq.is_constant()) ex.push_back(v->beq);
   }
   // Perform elimination
-  std::vector<MX> w = var(w_);
+  std::vector<MX> w = var(indices(Category::W));
   std::vector<MX> wdef = this->wdef();
   substitute_inplace(w, wdef, ex);
   // Clear list of dependent variables
-  w_.clear();
+  indices(Category::W).clear();
   // Get binding equations
   auto it = ex.begin();
   for (Variable* v : variables_) {
@@ -1827,7 +1828,7 @@ Function DaeBuilderInternal::create(const std::string& fname,
   std::vector<MX> ret_in = ret.mx_in();
   std::vector<MX> ret_out = ret(ret_in);
   // Offsets in v
-  std::vector<casadi_int> h_offsets = offset(var(w_));
+  std::vector<casadi_int> h_offsets = offset(var(indices(Category::W)));
   // Split "w", "lam_wdef" into components
   std::vector<MX> v_in, lam_vdef_in;
   for (size_t i = 0; i < s_in.size(); ++i) {
@@ -1840,7 +1841,7 @@ Function DaeBuilderInternal::create(const std::string& fname,
   // Map dependent variables into index in vector
   std::map<MXNode*, size_t> v_map;
   for (size_t i = 0; i < size(Category::W); ++i) {
-    v_map[var(w_.at(i)).get()] = i;
+    v_map[var(Category::W, i).get()] = i;
   }
   // Definitions of w
   std::vector<MX> wdef = this->wdef();
@@ -2009,7 +2010,7 @@ MX DaeBuilderInternal::hess_v_v_from_calls(std::map<MXNode*, CallIO>& call_nodes
   // Loop over block rows
   for (size_t vind1 = 0; vind1 < size(Category::W); ++vind1) {
     // Current element handled
-    const MX& vref = var(w_.at(vind1));
+    const MX& vref = var(Category::W, vind1);
     // Update vertical offset
     voffset_begin = voffset_end;
     voffset_end += vref.numel();
@@ -2134,7 +2135,7 @@ const Function& DaeBuilderInternal::oracle(bool sx, bool elim_w, bool lifted_cal
       // Dependent variable definitions
       std::vector<MX> wdef = this->wdef();
       // Perform in-place substitution
-      substitute_inplace(var(w_), wdef, f_out, false);
+      substitute_inplace(var(Category::W), wdef, f_out, false);
     } else if (lifted_calls && wdef_ind >= 0) {
       // Dependent variable definitions
       std::vector<MX> wdef = this->wdef();
@@ -2373,7 +2374,7 @@ Function DaeBuilderInternal::transition(const std::string& fname, casadi_int ind
     // Dependent variable definitions
     std::vector<MX> wdef = this->wdef();
     // Perform in-place substitution
-    substitute_inplace(var(w_), wdef, ret_out, false);
+    substitute_inplace(var(Category::W), wdef, ret_out, false);
   }
 
   // Check if a dummy index input needes to be included
@@ -2531,14 +2532,14 @@ std::vector<MX> DaeBuilderInternal::ddef() const {
 std::vector<MX> DaeBuilderInternal::wdef() const {
   std::vector<MX> ret;
   ret.reserve(size(Category::W));
-  for (size_t w : w_) ret.push_back(variable(w).beq);
+  for (size_t w : indices(Category::W)) ret.push_back(variable(w).beq);
   return ret;
 }
 
 std::vector<MX> DaeBuilderInternal::ydef() const {
   std::vector<MX> ret;
   ret.reserve(size(Category::Y));
-  for (size_t v : y_) ret.push_back(variable(v).beq);
+  for (size_t v : indices(Category::Y)) ret.push_back(variable(v).beq);
   return ret;
 }
 
@@ -2573,7 +2574,7 @@ std::vector<MX> DaeBuilderInternal::alg() const {
 std::vector<MX> DaeBuilderInternal::quad() const {
   std::vector<MX> ret;
   ret.reserve(size(Category::Q));
-  for (size_t v : q_) {
+  for (size_t v : indices(Category::Q)) {
     const Variable& q = variable(v);
     casadi_assert(q.der >= 0, "No derivative variable for " + q.name);
     const Variable& qdot = variable(q.der);
@@ -3394,7 +3395,8 @@ void DaeBuilderInternal::import_dynamic_equations(const XmlNode& eqs) {
             casadi_error("Cannot turn " + str(cond.beq) + " into a smooth expression");
         }
         set_init(cond.name, MX());  // remove initial conditions, if any
-        auto w_it = std::find(w_.begin(), w_.end(), cond.index);
+        auto w_it = std::find(indices(Category::W).begin(), indices(Category::W).end(),
+          cond.index);
         if (w_it != indices(Category::W).end()) {
           indices(Category::W).erase(w_it);  // remove from dependent equations
         }
@@ -3575,7 +3577,7 @@ Function DaeBuilderInternal::add_fun(const std::string& name,
     // Find the binding expression FIXME(@jaeandersson)
     casadi_int v_ind;
     for (v_ind = 0; v_ind < size(Category::W); ++v_ind) {
-      if (s == variable(w_.at(v_ind)).name) {
+      if (s == variable(indices(Category::W).at(v_ind)).name) {
         res_ex.push_back(wdef.at(v_ind));
         break;
       }
