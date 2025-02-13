@@ -456,6 +456,7 @@ DaeBuilderInternal::DaeBuilderInternal(const std::string& name, const std::strin
       casadi_error("No such option: " + op.first);
     }
   }
+  indices_.resize(enum_traits<Category>::n_enum);
 }
 
 void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
@@ -1217,26 +1218,7 @@ void DaeBuilderInternal::sort_z(const std::vector<std::string>& z_order) {
 }
 
 std::vector<size_t>& DaeBuilderInternal::indices(Category cat) {
-  switch (cat) {
-  case Category::T: return t_;
-  case Category::C: return c_;
-  case Category::P: return p_;
-  case Category::D: return d_;
-  case Category::W: return w_;
-  case Category::U: return u_;
-  case Category::X: return x_;
-  case Category::Z: return z_;
-  case Category::Q: return q_;
-  case Category::Y: return y_;
-  case Category::E: return e_;
-  case Category::RES: return res_;
-  default: break;
-  }
-  // Unsuccessful
-  casadi_error("Cannot access input indices for " + to_string(cat));
-  // Just to resolve warnings
-  static std::vector<size_t> dummy;
-  return dummy;
+  return indices_.at(static_cast<size_t>(cat));
 }
 
 const std::vector<size_t>& DaeBuilderInternal::indices(Category cat) const {

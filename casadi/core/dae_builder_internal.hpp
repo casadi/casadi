@@ -532,7 +532,7 @@ protected:
   std::unordered_map<unsigned int, size_t> vrmap_;
 
   /// Ordered variables
-  std::vector<size_t> t_, c_, p_, d_, w_, u_, x_, z_, q_, y_, e_, res_;
+  std::vector<std::vector<size_t>> indices_;
 
   // Initial equations
   std::vector<size_t> init_;
