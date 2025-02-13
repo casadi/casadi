@@ -642,7 +642,7 @@ XmlNode DaeBuilderInternal::generate_model_structure() const {
   XmlNode r;
   r.name = "ModelStructure";
   // Add outputs
-  for (size_t i : y_) {
+  for (size_t i : indices(Category::Y)) {
     const Variable& y = variable(i);
     XmlNode c;
     c.name = "Output";
@@ -660,7 +660,7 @@ XmlNode DaeBuilderInternal::generate_model_structure() const {
     r.children.push_back(c);
   }
   // Add initial unknowns: Outputs
-  for (size_t i : y_) {
+  for (size_t i : indices(Category::Y)) {
     const Variable& y = variable(i);
     XmlNode c;
     c.name = "InitialUnknown";
@@ -862,7 +862,7 @@ std::string DaeBuilderInternal::generate_wrapper(const std::string& guid,
 
   // Outputs
   f << "#define N_Y " << size(Category::Y) << "\n"
-    << "fmi3ValueReference y_vr[N_Y] = " << generate(y_) << ";\n"
+    << "fmi3ValueReference y_vr[N_Y] = " << generate(indices(Category::Y)) << ";\n"
     << "\n";
 
   // Memory structure
@@ -1133,7 +1133,7 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
 
   if (size(Category::RES) > 0) {
     stream << "Algebraic equations" << std::endl;
-    for (size_t k : res_) {
+    for (size_t k : indices(Category::RES)) {
       const Variable& alg = variable(k);
       stream << "  0 == " << alg.beq << std::endl;
     }
@@ -1171,7 +1171,7 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
 
   if (size(Category::Y) > 0) {
     stream << "Output variables" << std::endl;
-    for (size_t y : y_) {
+    for (size_t y : indices(Category::Y)) {
       stream << "  " << var(y) << std::endl;
     }
   }
@@ -2564,8 +2564,8 @@ std::vector<MX> DaeBuilderInternal::ode() const {
 
 std::vector<MX> DaeBuilderInternal::alg() const {
   std::vector<MX> ret;
-  ret.reserve(res_.size());
-  for (size_t v : res_) {
+  ret.reserve(size(Category::RES));
+  for (size_t v : indices(Category::RES)) {
     ret.push_back(variable(v).beq);
   }
   return ret;
@@ -2586,8 +2586,8 @@ std::vector<MX> DaeBuilderInternal::quad() const {
 
 std::vector<MX> DaeBuilderInternal::zero() const {
   std::vector<MX> ret;
-  ret.reserve(e_.size());
-  for (size_t v : e_) ret.push_back(variable(v).beq);
+  ret.reserve(size(Category::E));
+  for (size_t v : indices(Category::E)) ret.push_back(variable(v).beq);
   return ret;
 }
 
@@ -2817,9 +2817,9 @@ void DaeBuilderInternal::eq(const MX& lhs, const MX& rhs, const Dict& opts) {
     Variable& res = add(unique_name("__res__"), Causality::OUTPUT, Variability::CONTINUOUS, Dict());
     eq(res.v, rhs - lhs, Dict());
     // Remove from y and classify as res variable
-    remove(y_, res.index);
+    remove(indices(Category::Y), res.index);
     res.category = Category::RES;
-    insert(res_, res.index);
+    insert(indices(Category::RES), res.index);
   }
   // If derivative variable in the right-hand-side, reclassify as algebraic variable
   for (size_t rhs : rhs_vars) {
@@ -2859,8 +2859,8 @@ void DaeBuilderInternal::when(const MX& cond, const std::vector<std::string>& eq
   Variable& e = add(unique_name("__when__"), Causality::OUTPUT, Variability::CONTINUOUS, Dict());
   eq(e.v, zero, Dict());
   // Move from y to e
-  remove(y_, e.index);
-  insert(e_, e.index);
+  remove(indices(Category::Y), e.index);
+  insert(indices(Category::E), e.index);
   e.category = Category::E;
   // Read equations
   for (auto&& eq : eqs) {
@@ -2879,7 +2879,7 @@ std::string DaeBuilderInternal::assign(const std::string& name, const MX& val) {
   Variable& v = add(assign_name, Causality::OUTPUT, Variability::CONTINUOUS, Dict());
   eq(v.v, val, Dict());
   // Remove from y and classify as assign variable
-  remove(y_, v.index);
+  remove(indices(Category::Y), v.index);
   v.category = Category::ASSIGN;
   v.parent = variable(name).index;
   // Return the variable name
@@ -2893,7 +2893,7 @@ std::string DaeBuilderInternal::reinit(const std::string& name, const MX& val) {
   Variable& v = add(reinit_name, Causality::OUTPUT, Variability::CONTINUOUS, Dict());
   eq(v.v, val, Dict());
   // Remove from y and classify as reinit variable
-  remove(y_, v.index);
+  remove(indices(Category::Y), v.index);
   v.category = Category::REINIT;
   v.parent = variable(name).index;
   // Return the variable name
@@ -3150,7 +3150,7 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
         Variable& v = variable(outputs_.back());
         // Add to y, unless state
         if (v.der < 0) {
-          y_.push_back(v.index);
+          indices(Category::Y).push_back(v.index);
           v.beq = v.v;
         }
         // Get dependencies
@@ -3264,7 +3264,7 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
         Variable& v = variable(outputs_.back());
         // Add to y, unless state
         if (v.der < 0) {
-          y_.push_back(v.index);
+          indices(Category::Y).push_back(v.index);
           v.beq = v.v;
         }
         // Get dependencies
