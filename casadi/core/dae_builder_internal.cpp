@@ -1005,7 +1005,7 @@ MX DaeBuilderInternal::read_expr(const XmlNode& node) {
     } else if (name=="Tan") {
       return tan(read_expr(node[0]));
     } else if (name=="Time") {
-      return var(t_.at(0));
+      return var(indices(Category::T).at(0));
     } else if (name=="TimedVariable") {
       return read_variable(node[0]).v;
     } else if (name=="FunctionCall") {
@@ -1088,21 +1088,21 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
 
   if (size(Category::C) > 0) {
     stream << "Constants" << std::endl;
-    for (size_t c : c_) {
+    for (size_t c : indices(Category::C)) {
       stream << "  " << var(c) << " == " << variable(c).beq << std::endl;
     }
   }
 
   if (size(Category::D) > 0) {
     stream << "Dependent parameters" << std::endl;
-    for (size_t d : d_) {
+    for (size_t d : indices(Category::D)) {
       stream << "  " << var(d) << " == " << variable(d).beq << std::endl;
     }
   }
 
   if (size(Category::W) > 0) {
     stream << "Dependent equations" << std::endl;
-    for (size_t w : w_) {
+    for (size_t w : indices(Category::W)) {
       stream << "  " << var(w) << " == " << variable(w).beq << std::endl;
     }
   }
@@ -1291,9 +1291,11 @@ void DaeBuilderInternal::prune(bool prune_p, bool prune_u) {
   if (prune_p) {
     size_t np = 0;
     for (size_t i = 0; i < size(Category::P); ++i) {
-      if (!free_variables.at(p_.at(i))) p_.at(np++) = p_.at(i);
+      if (!free_variables.at(indices(Category::P).at(i))) {
+        indices(Category::P).at(np++) = indices(Category::P).at(i);
+      }
     }
-    p_.resize(np);
+    indices(Category::P).resize(np);
   }
   // Prune u
   if (prune_u) {
@@ -1503,7 +1505,7 @@ void DaeBuilderInternal::sanity_check() const {
   // Time
   if (size(Category::T) > 0) {
     casadi_assert(size(Category::T) == 1, "At most one time variable allowed");
-    casadi_assert(var(t_[0]).is_scalar(), "Non-scalar time t");
+    casadi_assert(variable(Category::T, 0).v.is_scalar(), "Non-scalar time t");
   }
 
   // When statements
@@ -1605,11 +1607,11 @@ void DaeBuilderInternal::eliminate_d() {
     if (!v->beq.is_constant()) ex.push_back(v->beq);
   }
   // Perform elimination
-  std::vector<MX> d = var(d_);
+  std::vector<MX> d = var(indices(Category::D));
   std::vector<MX> ddef = this->ddef();
   substitute_inplace(d, ddef, ex);
   // Clear list of dependent parameters
-  d_.clear();
+  indices(Category::D).clear();
   // Get binding equations
   auto it = ex.begin();
   for (Variable* v : variables_) {
@@ -2326,13 +2328,13 @@ Function DaeBuilderInternal::dependent_fun(const std::string& fname,
   // Variables to be substituted
   std::vector<MX> dw, dwdef;
   if (calc_d) {
-    std::vector<MX> d = var(d_);
+    std::vector<MX> d = var(indices(Category::D));
     dw.insert(dw.end(), d.begin(), d.end());
     std::vector<MX> ddef = this->ddef();
     dwdef.insert(dwdef.end(), ddef.begin(), ddef.end());
   }
   if (calc_w) {
-    std::vector<MX> w = var(w_);
+    std::vector<MX> w = var(indices(Category::W));
     dw.insert(dw.end(), w.begin(), w.end());
     std::vector<MX> wdef = this->wdef();
     dwdef.insert(dwdef.end(), wdef.begin(), wdef.end());
@@ -2505,7 +2507,7 @@ Function DaeBuilderInternal::gather_eq() const {
 
 const MX& DaeBuilderInternal::time() const {
   casadi_assert(has_t(), "No explicit time variable");
-  return var(t_.at(0));
+  return var(indices(Category::T).at(0));
 }
 
 bool DaeBuilderInternal::has_t() const {
@@ -2514,15 +2516,15 @@ bool DaeBuilderInternal::has_t() const {
 
 std::vector<MX> DaeBuilderInternal::cdef() const {
   std::vector<MX> ret;
-  ret.reserve(c_.size());
-  for (size_t c : c_) ret.push_back(variable(c).beq);
+  ret.reserve(size(Category::C));
+  for (size_t c : indices(Category::C)) ret.push_back(variable(c).beq);
   return ret;
 }
 
 std::vector<MX> DaeBuilderInternal::ddef() const {
   std::vector<MX> ret;
-  ret.reserve(d_.size());
-  for (size_t d : d_) ret.push_back(variable(d).beq);
+  ret.reserve(size(Category::D));
+  for (size_t d : indices(Category::D)) ret.push_back(variable(d).beq);
   return ret;
 }
 
@@ -2647,23 +2649,23 @@ Variable& DaeBuilderInternal::add(const std::string& name, Causality causality,
       // Independent variable
       casadi_assert(!has_t(), "'t' already defined");
       v.category = Category::T;
-      t_.push_back(v.index);
+      indices(Category::T).push_back(v.index);
       break;
     case Causality::INPUT:
       // Control
       v.category = Category::U;
-      u_.push_back(v.index);
+      indices(Category::U).push_back(v.index);
       break;
     case Causality::OUTPUT:
       // Output
       v.category = Category::Y;
-      y_.push_back(v.index);
+      indices(Category::Y).push_back(v.index);
       break;
     case Causality::PARAMETER:
       // Parameter
       if (variability == Variability::TUNABLE) {
         v.category = Category::P;
-        p_.push_back(v.index);
+        indices(Category::P).push_back(v.index);
       }
       break;
     case Causality::CALCULATED_PARAMETER:
@@ -3063,18 +3065,18 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
     // Initial classification of variables (states/outputs to be added later)
     if (var.causality == Causality::INDEPENDENT) {
       // Independent (time) variable
-      if (!ignore_time_) t_.push_back(var.index);
+      if (!ignore_time_) indices(Category::T).push_back(var.index);
     } else if (var.causality == Causality::INPUT) {
       // Check if description starts with PARAMETER:
       if (var.description.rfind("PARAMETER:", 0) == 0) {
         // Make tunable parameter
         var.variability = Variability::TUNABLE;
-        p_.push_back(var.index);
+        indices(Category::P).push_back(var.index);
       } else {
-        u_.push_back(var.index);
+        indices(Category::U).push_back(var.index);
       }
     } else if (var.variability == Variability::TUNABLE) {
-      p_.push_back(var.index);
+      indices(Category::P).push_back(var.index);
     }
   }
 
@@ -3221,7 +3223,8 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
     // when loading FMI2
 
     std::vector<casadi_int> additional_dependencies;
-    additional_dependencies.insert(additional_dependencies.begin(), p_.begin(), p_.end());
+    additional_dependencies.insert(additional_dependencies.begin(),
+      indices(Category::P).begin(), indices(Category::P).end());
     std::vector<DependenciesKind> additional_dependencies_kind(size(Category::P),
                                                                DependenciesKind::DEPENDENT);
 
@@ -3337,7 +3340,7 @@ void DaeBuilderInternal::import_binding_equations(const XmlNode& eqs) {
         var.beq = val;
       }
       // Add to list of dependent parameters
-      d_.push_back(var.index);
+      indices(Category::D).push_back(var.index);
     } catch (std::exception& e) {
       casadi_error("Failed to read " + eq_name + ":" + str(e.what()));
     }
