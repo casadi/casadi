@@ -600,7 +600,8 @@ protected:
   std::vector<MX> init_rhs() const;
 
   /// Add a new variable
-  Variable& add(const std::string& name, Causality causality, Variability variability, const Dict& opts);
+  Variable& add(const std::string& name, Causality causality, Variability variability,
+    const Dict& opts);
 
   /// Add a new variable, default variability
   Variable& add(const std::string& name, Causality causality, const Dict& opts);
