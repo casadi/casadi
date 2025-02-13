@@ -795,19 +795,37 @@ void DaeBuilder::set_type(const std::string& name, const std::string& val) {
 }
 
 std::string DaeBuilder::causality(const std::string& name) const {
-  return to_string((*this)->variable(name).causality);
+  try {
+    return to_string((*this)->causality((*this)->find(name)));
+  } catch (std::exception& e) {
+    THROW_ERROR("causality", e.what());
+    return std::string();  // never reached
+  }
 }
 
 void DaeBuilder::set_causality(const std::string& name, const std::string& val) {
-  (*this)->variable(name).causality = to_enum<Causality>(val);
+  try {
+    (*this)->set_causality((*this)->find(name), to_enum<Causality>(val));
+  } catch (std::exception& e) {
+    THROW_ERROR("set_causality", e.what());
+  }
 }
 
 std::string DaeBuilder::variability(const std::string& name) const {
-  return to_string((*this)->variable(name).variability);
+  try {
+    return to_string((*this)->variability((*this)->find(name)));
+  } catch (std::exception& e) {
+    THROW_ERROR("variability", e.what());
+    return std::string();  // never reached
+  }
 }
 
 void DaeBuilder::set_variability(const std::string& name, const std::string& val) {
-  (*this)->variable(name).variability = to_enum<Variability>(val);
+  try {
+    (*this)->set_variability((*this)->find(name), to_enum<Variability>(val));
+  } catch (std::exception& e) {
+    THROW_ERROR("set_variability", e.what());
+  }
 }
 
 std::string DaeBuilder::initial(const std::string& name) const {

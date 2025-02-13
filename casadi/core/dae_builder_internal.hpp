@@ -621,6 +621,18 @@ protected:
   /// Remove from list of variables
   void remove(std::vector<size_t>& v, size_t ind) const;
 
+  /// Get causality
+  Causality causality(size_t ind) const;
+
+  /// Set causality
+  void set_causality(size_t ind, Causality causality);
+
+  /// Get variability
+  Variability variability(size_t ind) const;
+
+  /// Set variability
+  void set_variability(size_t ind, Variability variability);
+
   /// Add a simple equation
   void eq(const MX& lhs, const MX& rhs, const Dict& opts);
 

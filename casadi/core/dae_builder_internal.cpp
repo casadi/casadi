@@ -2751,6 +2751,22 @@ void DaeBuilderInternal::remove(std::vector<size_t>& v, size_t ind) const {
   casadi_error("Variable not found");
 }
 
+Causality DaeBuilderInternal::causality(size_t ind) const {
+  return variable(ind).causality;
+}
+
+void DaeBuilderInternal::set_causality(size_t ind, Causality causality) {
+  variable(ind).causality = causality;
+}
+
+Variability DaeBuilderInternal::variability(size_t ind) const {
+  return variable(ind).variability;
+}
+
+void DaeBuilderInternal::set_variability(size_t ind, Variability variability) {
+  variable(ind).variability = variability;
+}
+
 void DaeBuilderInternal::eq(const MX& lhs, const MX& rhs, const Dict& opts) {
   // Read options
   for (auto&& op : opts) {
