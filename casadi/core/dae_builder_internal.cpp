@@ -2756,7 +2756,42 @@ Causality DaeBuilderInternal::causality(size_t ind) const {
 }
 
 void DaeBuilderInternal::set_causality(size_t ind, Causality causality) {
-  variable(ind).causality = causality;
+  Variable& v = variable(ind);
+  if (v.causality != causality) {
+    switch (v.category) {
+      case Category::U:
+        casadi_error("Cannot change causality of 'u' directly (only via updates to variability)");
+        break;
+      case Category::Y:
+        if (causality == Causality::LOCAL) {
+          // Remove categorization
+          categorize(v.index, Category::NUMEL);
+        } else {
+          // Not possible
+          casadi_error("Cannot change causality of " + v.name + " which is of category 'y' to "
+            + to_string(causality));
+        }
+        break;
+      case Category::P:
+        casadi_error("Cannot change causality of 'p' directly (only via updates to variability)");
+        break;
+      case Category::NUMEL:
+        if (causality == Causality::OUTPUT) {
+          // Make output
+          categorize(v.index, Category::Y);
+        } else {
+          // Not possible
+          casadi_error("Cannot change causality of " + v.name + " which is of category 'y' to "
+            + to_string(causality));
+        }
+        break;
+      default:
+        casadi_error("Cannot change causality of " + v.name + " which is of category '"
+          + to_string(v.category) + "'");
+    }
+    // Update causality
+    v.causality = causality;
+  }
 }
 
 Variability DaeBuilderInternal::variability(size_t ind) const {
