@@ -2702,6 +2702,23 @@ Variable& DaeBuilderInternal::add(const std::string& name, Causality causality, 
   }
 }
 
+void DaeBuilderInternal::categorize(size_t ind, Category cat) {
+  // Get variable reference
+  Variable& v = variable(ind);
+  // If same category, quick return
+  if (v.category == cat) return;
+  // Remove from current category, if any
+  if (v.category != Category::NUMEL) {
+    remove(indices(v.category), ind);
+    v.category = Category::NUMEL;
+  }
+  // Add to new category, if any
+  if (cat != Category::NUMEL) {
+    insert(indices(cat), ind);
+    v.category = cat;
+  }
+}
+
 void DaeBuilderInternal::insert(std::vector<size_t>& v, size_t ind) const {
   // Keep list ordered: Insert at location corresponding to model variable index          
   size_t loc = v.size();
@@ -2769,18 +2786,14 @@ void DaeBuilderInternal::eq(const MX& lhs, const MX& rhs, const Dict& opts) {
         Variable& x = variable(v.parent);
         // Reclassify as state variable
         if (x.category == Category::Z) {
-          remove(indices(Category::Z), x.index);
-          x.category = Category::X;
-          insert(indices(Category::X), x.index);
+          categorize(x.index, Category::X);
         } else {
           casadi_assert(x.category == Category::NUMEL, "No categorization for " + x.name);
           casadi_error("Unexpected category for " + x.name + ": " + to_string(x.category));
         }
       } else if (v.category == Category::Z) {
         // Reclassify as dependent variable
-        remove(indices(Category::Z), v.index);
-        v.category = Category::W;
-        insert(indices(Category::W), v.index);
+        categorize(v.index, Category::W);
       } else if (v.category != Category::Y) {
         casadi_error("Cannot handle left-hand-side: " + str(lhs));
       }
@@ -2799,9 +2812,7 @@ void DaeBuilderInternal::eq(const MX& lhs, const MX& rhs, const Dict& opts) {
     Variable& res = add(unique_name("__res__"), Causality::OUTPUT, Variability::CONTINUOUS, Dict());
     eq(res.v, rhs - lhs, Dict());
     // Remove from y and classify as res variable
-    remove(indices(Category::Y), res.index);
-    res.category = Category::RES;
-    insert(indices(Category::RES), res.index);
+    categorize(res.index, Category::RES);
   }
   // If derivative variable in the right-hand-side, reclassify as algebraic variable
   for (size_t rhs : rhs_vars) {
@@ -2811,9 +2822,7 @@ void DaeBuilderInternal::eq(const MX& lhs, const MX& rhs, const Dict& opts) {
       Variable& x = variable(v.parent);
       // Reclassify as state variable
       if (x.category == Category::Z) {
-        remove(indices(Category::Z), x.index);
-        x.category = Category::X;
-        insert(indices(Category::X), x.index);
+        categorize(x.index, Category::X);
       } else {
         casadi_assert(x.category == Category::NUMEL, "No categorization for " + x.name);
         casadi_error("Unexpected category for " + x.name + ": " + to_string(x.category));

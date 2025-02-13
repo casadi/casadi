@@ -608,6 +608,9 @@ protected:
     return add(name, Causality::LOCAL, opts);
   }
 
+  /// Set or change the category for a variable
+  void categorize(size_t ind, Category cat);
+
   /// Insert into list of variables, keeping it ordered
   void insert(std::vector<size_t>& v, size_t ind) const;
 
