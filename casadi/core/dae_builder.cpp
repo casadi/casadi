@@ -159,43 +159,43 @@ bool DaeBuilder::has_t() const {
 }
 
 casadi_int DaeBuilder::nx() const {
-  return (*this)->x_.size();
+  return (*this)->size(Category::X);
 }
 
 casadi_int DaeBuilder::nz() const {
-  return (*this)->z_.size();
+  return (*this)->size(Category::Z);
 }
 
 casadi_int DaeBuilder::nq() const {
-  return (*this)->q_.size();
+  return (*this)->size(Category::Q);
 }
 
 casadi_int DaeBuilder::ne() const {
-  return (*this)->e_.size();
+  return (*this)->size(Category::E);
 }
 
 casadi_int DaeBuilder::ny() const {
-  return (*this)->y_.size();
+  return (*this)->size(Category::Y);
 }
 
 casadi_int DaeBuilder::nu() const {
-  return (*this)->u_.size();
+  return (*this)->size(Category::U);
 }
 
 casadi_int DaeBuilder::np() const {
-  return (*this)->p_.size();
+  return (*this)->size(Category::P);
 }
 
 casadi_int DaeBuilder::nc() const {
-  return (*this)->c_.size();
+  return (*this)->size(Category::C);
 }
 
 casadi_int DaeBuilder::nd() const {
-  return (*this)->d_.size();
+  return (*this)->size(Category::D);
 }
 
 casadi_int DaeBuilder::nw() const {
-  return (*this)->w_.size();
+  return (*this)->size(Category::W);
 }
 
 void DaeBuilder::load_fmi_description(const std::string& filename) {
@@ -429,47 +429,47 @@ size_t DaeBuilder::add_variable_new(const MX& new_v) {
 void DaeBuilder::register_t(const std::string& name) {
   // Save to class
   casadi_assert(!has_t(), "'t' already defined");
-  (*this)->t_.push_back(find(name));
+  (*this)->indices(Category::T).push_back(find(name));
 }
 
 void DaeBuilder::register_p(const std::string& name) {
-  (*this)->p_.push_back(find(name));
+  (*this)->indices(Category::P).push_back(find(name));
 }
 
 void DaeBuilder::register_u(const std::string& name) {
-  (*this)->u_.push_back(find(name));
+  (*this)->indices(Category::U).push_back(find(name));
 }
 
 void DaeBuilder::register_x(const std::string& name) {
-  (*this)->x_.push_back(find(name));
+  (*this)->indices(Category::X).push_back(find(name));
 }
 
 void DaeBuilder::register_z(const std::string& name) {
-  (*this)->z_.push_back(find(name));
+  (*this)->indices(Category::Z).push_back(find(name));
 }
 
 void DaeBuilder::register_q(const std::string& name) {
-  (*this)->q_.push_back(find(name));
+  (*this)->indices(Category::Q).push_back(find(name));
 }
 
 void DaeBuilder::register_c(const std::string& name) {
-  (*this)->c_.push_back(find(name));
+  (*this)->indices(Category::C).push_back(find(name));
 }
 
 void DaeBuilder::register_d(const std::string& name) {
-  (*this)->d_.push_back(find(name));
+  (*this)->indices(Category::D).push_back(find(name));
 }
 
 void DaeBuilder::register_w(const std::string& name) {
-  (*this)->w_.push_back(find(name));
+  (*this)->indices(Category::W).push_back(find(name));
 }
 
 void DaeBuilder::register_y(const std::string& name) {
-  (*this)->y_.push_back(find(name));
+  (*this)->indices(Category::Y).push_back(find(name));
 }
 
 void DaeBuilder::register_e(const std::string& name) {
-  (*this)->e_.push_back(find(name));
+  (*this)->indices(Category::E).push_back(find(name));
 }
 
 #endif // WITH_DEPRECATED_FEATURES
