@@ -26,20 +26,20 @@ import casadi.*
 dae = DaeBuilder('rocket');
 
 % Add input expressions
-a = dae.add_p('a');
-b = dae.add_p('b');
-u = dae.add_u('u');
-h = dae.add_x('h');
-v = dae.add_x('v');
-m = dae.add_x('m');
+a = dae.add('a', 'parameter', 'tunable');
+b = dae.add('b', 'parameter', 'tunable');
+u = dae.add('u', 'input');
+h = dae.add('h');
+v = dae.add('v');
+m = dae.add('m');
 
 % Constants
 g = 9.81; % gravity
 
 % Set ODE right-hand-side
-dae.set_ode('h', v);
-dae.set_ode('v', (u-a*v^2)/m-g);
-dae.set_ode('m', -b*u^2);
+dae.eq(dae.der(h), v);
+dae.eq(dae.der(v), (u-a*v^2)/m-g);
+dae.eq(dae.der(m), -b*u^2);
 
 % Specify initial conditions
 dae.set_start('h', 0);
