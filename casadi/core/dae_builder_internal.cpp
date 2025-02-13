@@ -686,7 +686,7 @@ void DaeBuilderInternal::update_dependencies() const {
   // Dependendencies of the ODE right-hand-side
   Sparsity dode_dxT = oracle.jac_sparsity(oracle.index_out("ode"), oracle.index_in("x")).T();
   Sparsity dode_duT = oracle.jac_sparsity(oracle.index_out("ode"), oracle.index_in("u")).T();
-  for (casadi_int i = 0; i < x_.size(); ++i) {
+  for (casadi_int i = 0; i < size(Category::X); ++i) {
     // Get output variable
     const Variable& xdot = variable(variable(x_.at(i)).der);
     // Clear dependencies
@@ -705,7 +705,7 @@ void DaeBuilderInternal::update_dependencies() const {
   // Dependendencies of the output function
   Sparsity dydef_dxT = oracle.jac_sparsity(oracle.index_out("ydef"), oracle.index_in("x")).T();
   Sparsity dydef_duT = oracle.jac_sparsity(oracle.index_out("ydef"), oracle.index_in("u")).T();
-  for (casadi_int i = 0; i < y_.size(); ++i) {
+  for (casadi_int i = 0; i < size(Category::Y); ++i) {
     // Get output variable
     const Variable& y = variable(y_.at(i));
     // Clear dependencies
@@ -840,17 +840,17 @@ std::string DaeBuilderInternal::generate_wrapper(const std::string& guid,
   f << "casadi_real start[SZ_MEM] = " << generate(start_all()) << ";\n\n";
 
   // States
-  f << "#define N_X " << x_.size() << "\n"
+  f << "#define N_X " << size(Category::X) << "\n"
     << "fmi3ValueReference x_vr[N_X] = " << generate(x_) << ";\n"
     << "\n";
 
   // Controls
-  f << "#define N_U " << u_.size() << "\n"
+  f << "#define N_U " << size(Category::U) << "\n"
     << "fmi3ValueReference u_vr[N_U] = " << generate(u_) << ";\n"
     << "\n";
 
   // Parameters
-  f << "#define N_P " << p_.size() << "\n"
+  f << "#define N_P " << size(Category::P) << "\n"
     << "fmi3ValueReference p_vr[N_P] = " << generate(p_) << ";\n"
     << "\n";
 
@@ -861,7 +861,7 @@ std::string DaeBuilderInternal::generate_wrapper(const std::string& guid,
     << "\n";
 
   // Outputs
-  f << "#define N_Y " << y_.size() << "\n"
+  f << "#define N_Y " << size(Category::Y) << "\n"
     << "fmi3ValueReference y_vr[N_Y] = " << generate(y_) << ";\n"
     << "\n";
 
@@ -1017,7 +1017,7 @@ MX DaeBuilderInternal::read_expr(const XmlNode& node) {
       std::vector<MX> farg(args.size());
       for (casadi_int i = 0; i < args.size(); ++i) {
         // Lift input arguments
-        Variable& v = new_variable("w_" + str(w_.size()));
+        Variable& v = new_variable("w_" + str(size(Category::W)));
         // Add to list of variables
         w_.push_back(v.index);
         // Set binding expression
@@ -1026,7 +1026,7 @@ MX DaeBuilderInternal::read_expr(const XmlNode& node) {
         farg[i] = v.v;
       }
       // Return argument (scalar for now)
-      Variable& r = new_variable("w_" + str(w_.size()));
+      Variable& r = new_variable("w_" + str(size(Category::W)));
       // Add to list of variables
       w_.push_back(r.index);
       // Return output variable
@@ -1051,15 +1051,15 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
   if (more) sanity_check();
 
   // Print dimensions
-  stream << "nx = " << x_.size() << ", "
-         << "nz = " << z_.size() << ", "
-         << "nq = " << q_.size() << ", "
-         << "ny = " << y_.size() << ", "
-         << "np = " << p_.size() << ", "
-         << "nc = " << c_.size() << ", "
-         << "nd = " << d_.size() << ", "
-         << "nw = " << w_.size() << ", "
-         << "nu = " << u_.size();
+  stream << "nx = " << size(Category::X) << ", "
+         << "nz = " << size(Category::Z) << ", "
+         << "nq = " << size(Category::Q) << ", "
+         << "ny = " << size(Category::Y) << ", "
+         << "np = " << size(Category::P) << ", "
+         << "nc = " << size(Category::C) << ", "
+         << "nd = " << size(Category::D) << ", "
+         << "nw = " << size(Category::W) << ", "
+         << "nu = " << size(Category::U);
 
   // Quick return?
   if (!more) return;
@@ -1075,39 +1075,39 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
 
   // Print the variables
   stream << "Variables" << std::endl;
-  if (!t_.empty()) stream << "  t = " << var(t_.at(0)) << std::endl;
-  if (!c_.empty()) stream << "  c = " << var(c_) << std::endl;
-  if (!p_.empty()) stream << "  p = " << var(p_) << std::endl;
-  if (!d_.empty()) stream << "  d = " << var(d_) << std::endl;
-  if (!x_.empty()) stream << "  x = " << var(x_) << std::endl;
-  if (!z_.empty()) stream << "  z = " << var(z_) << std::endl;
-  if (!q_.empty()) stream << "  q = " << var(q_) << std::endl;
-  if (!y_.empty()) stream << "  y = " << var(y_) << std::endl;
-  if (!w_.empty()) stream << "  w = " << var(w_) << std::endl;
-  if (!u_.empty()) stream << "  u = " << var(u_) << std::endl;
+  if (size(Category::T) > 0) stream << "  t = " << var(t_.at(0)) << std::endl;
+  if (size(Category::C) > 0) stream << "  c = " << var(c_) << std::endl;
+  if (size(Category::P) > 0) stream << "  p = " << var(p_) << std::endl;
+  if (size(Category::D) > 0) stream << "  d = " << var(d_) << std::endl;
+  if (size(Category::X) > 0) stream << "  x = " << var(x_) << std::endl;
+  if (size(Category::Z) > 0) stream << "  z = " << var(z_) << std::endl;
+  if (size(Category::Q) > 0) stream << "  q = " << var(q_) << std::endl;
+  if (size(Category::Y) > 0) stream << "  y = " << var(y_) << std::endl;
+  if (size(Category::W) > 0) stream << "  w = " << var(w_) << std::endl;
+  if (size(Category::U) > 0) stream << "  u = " << var(u_) << std::endl;
 
-  if (!c_.empty()) {
+  if (size(Category::C) > 0) {
     stream << "Constants" << std::endl;
     for (size_t c : c_) {
       stream << "  " << var(c) << " == " << variable(c).beq << std::endl;
     }
   }
 
-  if (!d_.empty()) {
+  if (size(Category::D) > 0) {
     stream << "Dependent parameters" << std::endl;
     for (size_t d : d_) {
       stream << "  " << var(d) << " == " << variable(d).beq << std::endl;
     }
   }
 
-  if (!w_.empty()) {
+  if (size(Category::W) > 0) {
     stream << "Dependent equations" << std::endl;
     for (size_t w : w_) {
       stream << "  " << var(w) << " == " << variable(w).beq << std::endl;
     }
   }
 
-  if (!x_.empty()) {
+  if (size(Category::X) > 0) {
     stream << "Differential equations" << std::endl;
     for (size_t k : x_) {
       const Variable& x = variable(k);
@@ -1131,7 +1131,7 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
     }
   }
 
-  if (!res_.empty()) {
+  if (size(Category::RES) > 0) {
     stream << "Algebraic equations" << std::endl;
     for (size_t k : res_) {
       const Variable& alg = variable(k);
@@ -1139,7 +1139,7 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
     }
   }
 
-  if (!q_.empty()) {
+  if (size(Category::Q) > 0) {
     stream << "Quadrature equations" << std::endl;
     for (size_t k : q_) {
       const Variable& q = variable(k);
@@ -1169,7 +1169,7 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
     }
   }
 
-  if (!y_.empty()) {
+  if (size(Category::Y) > 0) {
     stream << "Output variables" << std::endl;
     for (size_t y : y_) {
       stream << "  " << var(y) << std::endl;
@@ -1199,7 +1199,7 @@ void DaeBuilderInternal::sort_w() {
 
 void DaeBuilderInternal::sort_z(const std::vector<std::string>& z_order) {
   // Make sure lengths agree
-  casadi_assert(z_order.size() == z_.size(), "Dimension mismatch");
+  casadi_assert(z_order.size() == size(Category::Z), "Dimension mismatch");
   // Mark existing components in z
   std::vector<bool> old_z(n_variables(), false);
   for (size_t i : z_) old_z.at(i) = true;
@@ -1289,7 +1289,7 @@ void DaeBuilderInternal::prune(bool prune_p, bool prune_u) {
   // Prune p
   if (prune_p) {
     size_t np = 0;
-    for (size_t i = 0; i < p_.size(); ++i) {
+    for (size_t i = 0; i < size(Category::P); ++i) {
       if (!free_variables.at(p_.at(i))) p_.at(np++) = p_.at(i);
     }
     p_.resize(np);
@@ -1297,7 +1297,7 @@ void DaeBuilderInternal::prune(bool prune_p, bool prune_u) {
   // Prune u
   if (prune_u) {
     size_t nu = 0;
-    for (size_t i = 0; i < u_.size(); ++i) {
+    for (size_t i = 0; i < size(Category::U); ++i) {
       if (!free_variables.at(u_.at(i))) u_.at(nu++) = u_.at(i);
     }
     u_.resize(nu);
@@ -1316,7 +1316,7 @@ void DaeBuilderInternal::tear() {
   for (auto& e : iv_on_hold) iv_set.insert(e);
   // Remove any (held or not held) iteration variables, equations from z and alg
   size_t sz = 0;
-  for (size_t k = 0; k < z_.size(); ++k) {
+  for (size_t k = 0; k < size(Category::Z); ++k) {
     if (!iv_set.count(variable(z_[k]).name)) {
       // Non-iteration variable: Keep
       z_.at(k) = z_.at(sz);
@@ -1326,7 +1326,7 @@ void DaeBuilderInternal::tear() {
   z_.resize(sz);
   // Remove any (held or not held) iteration variables, equations from u
   sz = 0;
-  for (size_t k = 0; k < u_.size(); ++k) {
+  for (size_t k = 0; k < size(Category::U); ++k) {
     if (!iv_set.count(variable(u_[k]).name)) {
       // Non-iteration variable: Keep
       u_.at(k) = u_.at(sz++);
@@ -1500,8 +1500,8 @@ Variable& DaeBuilderInternal::new_variable(const std::string& name,
 
 void DaeBuilderInternal::sanity_check() const {
   // Time
-  if (!t_.empty()) {
-    casadi_assert(t_.size() == 1, "At most one time variable allowed");
+  if (size(Category::T) > 0) {
+    casadi_assert(size(Category::T) == 1, "At most one time variable allowed");
     casadi_assert(var(t_[0]).is_scalar(), "Non-scalar time t");
   }
 
@@ -1593,7 +1593,7 @@ std::string DaeBuilderInternal::unique_name(const std::string& prefix) const {
 
 void DaeBuilderInternal::eliminate_d() {
   // Quick return if no d
-  if (d_.empty()) return;
+  if (size(Category::D) == 0) return;
   // Clear cache after this
   clear_cache_ = true;
   // Ensure variables are sorted
@@ -1619,7 +1619,7 @@ void DaeBuilderInternal::eliminate_d() {
 }
 void DaeBuilderInternal::eliminate_w() {
   // Quick return if no w
-  if (w_.empty()) return;
+  if (size(Category::W) == 0) return;
   // Clear cache after this
   clear_cache_ = true;
   // Ensure variables are sorted
@@ -1646,7 +1646,7 @@ void DaeBuilderInternal::eliminate_w() {
 
 void DaeBuilderInternal::lift(bool lift_shared, bool lift_calls) {
   // Not tested if w is non-empty before
-  if (!w_.empty()) casadi_warning("'w' already has entries");
+  if (size(Category::W) > 0) casadi_warning("'w' already has entries");
   // Expressions where the variables are also being used
   std::vector<MX> ex;
   for (size_t v : x_) ex.push_back(variable(variable(v).der).beq);
@@ -1656,7 +1656,7 @@ void DaeBuilderInternal::lift(bool lift_shared, bool lift_calls) {
   // Lift expressions
   std::vector<MX> new_w, new_wdef;
   Dict opts{{"lift_shared", lift_shared}, {"lift_calls", lift_calls},
-    {"prefix", "w_"}, {"suffix", ""}, {"offset", static_cast<casadi_int>(w_.size())}};
+    {"prefix", "w_"}, {"suffix", ""}, {"offset", static_cast<casadi_int>(size(Category::W))}};
   extract(ex, new_w, new_wdef, opts);
   // Register as dependent variables
   for (size_t i = 0; i < new_w.size(); ++i) {
@@ -1789,7 +1789,7 @@ Function DaeBuilderInternal::create(const std::string& fname,
   }
   // Check if dependent variables are given and needed
   bool elim_w = false;
-  if (!w_.empty()) {
+  if (size(Category::W) > 0) {
     // Dependent variables exists, eliminate unless v is given
     elim_w = true;
     for (const std::string& s : s_in) {
@@ -1835,7 +1835,7 @@ Function DaeBuilderInternal::create(const std::string& fname,
   }
   // Map dependent variables into index in vector
   std::map<MXNode*, size_t> v_map;
-  for (size_t i = 0; i < w_.size(); ++i) {
+  for (size_t i = 0; i < size(Category::W); ++i) {
     v_map[var(w_.at(i)).get()] = i;
   }
   // Definitions of w
@@ -2003,7 +2003,7 @@ MX DaeBuilderInternal::hess_v_v_from_calls(std::map<MXNode*, CallIO>& call_nodes
   // All blocks for a block row
   std::map<size_t, MX> hess_brow;
   // Loop over block rows
-  for (size_t vind1 = 0; vind1 < w_.size(); ++vind1) {
+  for (size_t vind1 = 0; vind1 < size(Category::W); ++vind1) {
     // Current element handled
     const MX& vref = var(w_.at(vind1));
     // Update vertical offset
@@ -2365,7 +2365,7 @@ Function DaeBuilderInternal::transition(const std::string& fname, casadi_int ind
     std::vector<MX>{when_rhs_.at(index)});
 
   // Remove dependent variables, if any
-  if (!w_.empty()) {
+  if (size(Category::W) > 0) {
     // Dependent variable definitions
     std::vector<MX> wdef = this->wdef();
     // Perform in-place substitution
@@ -2464,7 +2464,7 @@ Function DaeBuilderInternal::fmu_fun(const std::string& name,
     scheme["ode"] = x_;
     for (size_t& i : scheme["ode"]) i = variable(i).der;
     scheme["alg"] = z_;
-    casadi_assert(z_.empty(), "Not implemented)");
+    casadi_assert(size(Category::Z) == 0, "Not implemented)");
     scheme["ydef"] = y_;
   }
   // Auxilliary variables, if any
@@ -2507,7 +2507,7 @@ const MX& DaeBuilderInternal::time() const {
 }
 
 bool DaeBuilderInternal::has_t() const {
-  return !t_.empty();
+  return size(Category::T) > 0;
 }
 
 std::vector<MX> DaeBuilderInternal::cdef() const {
@@ -2526,21 +2526,21 @@ std::vector<MX> DaeBuilderInternal::ddef() const {
 
 std::vector<MX> DaeBuilderInternal::wdef() const {
   std::vector<MX> ret;
-  ret.reserve(w_.size());
+  ret.reserve(size(Category::W));
   for (size_t w : w_) ret.push_back(variable(w).beq);
   return ret;
 }
 
 std::vector<MX> DaeBuilderInternal::ydef() const {
   std::vector<MX> ret;
-  ret.reserve(y_.size());
+  ret.reserve(size(Category::Y));
   for (size_t v : y_) ret.push_back(variable(v).beq);
   return ret;
 }
 
 std::vector<MX> DaeBuilderInternal::ode() const {
   std::vector<MX> ret;
-  ret.reserve(x_.size());
+  ret.reserve(size(Category::X));
   for (size_t v : x_) {
     const Variable& x = variable(v);
     if (x.der >= 0) {
@@ -2568,7 +2568,7 @@ std::vector<MX> DaeBuilderInternal::alg() const {
 
 std::vector<MX> DaeBuilderInternal::quad() const {
   std::vector<MX> ret;
-  ret.reserve(q_.size());
+  ret.reserve(size(Category::Q));
   for (size_t v : q_) {
     const Variable& q = variable(v);
     casadi_assert(q.der >= 0, "No derivative variable for " + q.name);
@@ -2643,7 +2643,7 @@ Variable& DaeBuilderInternal::add(const std::string& name, Causality causality,
   switch (causality) {
     case Causality::INDEPENDENT:
       // Independent variable
-      casadi_assert(t_.empty(), "'t' already defined");
+      casadi_assert(!has_t(), "'t' already defined");
       v.category = Category::T;
       t_.push_back(v.index);
       break;
@@ -3217,7 +3217,7 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
 
     std::vector<casadi_int> additional_dependencies;
     additional_dependencies.insert(additional_dependencies.begin(), p_.begin(), p_.end());
-    std::vector<DependenciesKind> additional_dependencies_kind(p_.size(),
+    std::vector<DependenciesKind> additional_dependencies_kind(size(Category::P),
                                                                DependenciesKind::DEPENDENT);
 
     // Derivatives
@@ -3560,13 +3560,13 @@ Function DaeBuilderInternal::add_fun(const std::string& name,
   for (auto&& s : res) {
     // Find the binding expression FIXME(@jaeandersson)
     casadi_int v_ind;
-    for (v_ind = 0; v_ind < w_.size(); ++v_ind) {
+    for (v_ind = 0; v_ind < size(Category::W); ++v_ind) {
       if (s == variable(w_.at(v_ind)).name) {
         res_ex.push_back(wdef.at(v_ind));
         break;
       }
     }
-    casadi_assert(v_ind < w_.size(), "Cannot find dependent '" + s + "'");
+    casadi_assert(v_ind < size(Category::W), "Cannot find dependent '" + s + "'");
   }
   Function ret(name, arg_ex, res_ex, arg, res, opts);
   return add_fun(ret);
