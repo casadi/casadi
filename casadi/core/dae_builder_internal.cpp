@@ -651,7 +651,7 @@ XmlNode DaeBuilderInternal::generate_model_structure() const {
  r.children.push_back(c);
   }
   // Add state derivatives
-  for (size_t i : x_) {
+  for (size_t i : indices(Category::X)) {
     const Variable& xdot = variable(variable(i).der);
     XmlNode c;
     c.name = "ContinuousStateDerivative";
@@ -669,7 +669,7 @@ XmlNode DaeBuilderInternal::generate_model_structure() const {
     r.children.push_back(c);
   }
   // Add initial unknowns: State derivative
-  for (size_t i : x_) {
+  for (size_t i : indices(Category::X)) {
     const Variable& xdot = variable(variable(i).der);
     XmlNode c;
     c.name = "InitialUnknown";
@@ -841,22 +841,22 @@ std::string DaeBuilderInternal::generate_wrapper(const std::string& guid,
 
   // States
   f << "#define N_X " << size(Category::X) << "\n"
-    << "fmi3ValueReference x_vr[N_X] = " << generate(x_) << ";\n"
+    << "fmi3ValueReference x_vr[N_X] = " << generate(indices(Category::X)) << ";\n"
     << "\n";
 
   // Controls
   f << "#define N_U " << size(Category::U) << "\n"
-    << "fmi3ValueReference u_vr[N_U] = " << generate(u_) << ";\n"
+    << "fmi3ValueReference u_vr[N_U] = " << generate(indices(Category::U)) << ";\n"
     << "\n";
 
   // Parameters
   f << "#define N_P " << size(Category::P) << "\n"
-    << "fmi3ValueReference p_vr[N_P] = " << generate(p_) << ";\n"
+    << "fmi3ValueReference p_vr[N_P] = " << generate(indices(Category::P)) << ";\n"
     << "\n";
 
   // State derivatives
   std::vector<size_t> xdot;
-  for (size_t v : x_) xdot.push_back(variable(v).der);
+  for (size_t v : indices(Category::X)) xdot.push_back(variable(v).der);
   f << "fmi3ValueReference xdot_vr[N_X] = " << generate(xdot) << ";\n"
     << "\n";
 
@@ -1075,16 +1075,16 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
 
   // Print the variables
   stream << "Variables" << std::endl;
-  if (size(Category::T) > 0) stream << "  t = " << var(t_.at(0)) << std::endl;
-  if (size(Category::C) > 0) stream << "  c = " << var(c_) << std::endl;
-  if (size(Category::P) > 0) stream << "  p = " << var(p_) << std::endl;
-  if (size(Category::D) > 0) stream << "  d = " << var(d_) << std::endl;
-  if (size(Category::X) > 0) stream << "  x = " << var(x_) << std::endl;
-  if (size(Category::Z) > 0) stream << "  z = " << var(z_) << std::endl;
-  if (size(Category::Q) > 0) stream << "  q = " << var(q_) << std::endl;
-  if (size(Category::Y) > 0) stream << "  y = " << var(y_) << std::endl;
-  if (size(Category::W) > 0) stream << "  w = " << var(w_) << std::endl;
-  if (size(Category::U) > 0) stream << "  u = " << var(u_) << std::endl;
+  if (size(Category::T) > 0) stream << "  t = " << var(indices(Category::T).at(0)) << std::endl;
+  if (size(Category::C) > 0) stream << "  c = " << var(indices(Category::C)) << std::endl;
+  if (size(Category::P) > 0) stream << "  p = " << var(indices(Category::P)) << std::endl;
+  if (size(Category::D) > 0) stream << "  d = " << var(indices(Category::D)) << std::endl;
+  if (size(Category::X) > 0) stream << "  x = " << var(indices(Category::X)) << std::endl;
+  if (size(Category::Z) > 0) stream << "  z = " << var(indices(Category::Z)) << std::endl;
+  if (size(Category::Q) > 0) stream << "  q = " << var(indices(Category::Q)) << std::endl;
+  if (size(Category::Y) > 0) stream << "  y = " << var(indices(Category::Y)) << std::endl;
+  if (size(Category::W) > 0) stream << "  w = " << var(indices(Category::W)) << std::endl;
+  if (size(Category::U) > 0) stream << "  u = " << var(indices(Category::U)) << std::endl;
 
   if (size(Category::C) > 0) {
     stream << "Constants" << std::endl;
@@ -1109,7 +1109,7 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
 
   if (size(Category::X) > 0) {
     stream << "Differential equations" << std::endl;
-    for (size_t k : x_) {
+    for (size_t k : indices(Category::X)) {
       const Variable& x = variable(k);
       stream << "  \\dot{" << x.name << "} == ";
       if (x.der >= 0) {
@@ -1179,22 +1179,23 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
 
 void DaeBuilderInternal::eliminate_quad() {
   // Move all the quadratures to the list of differential states
-  x_.insert(x_.end(), q_.begin(), q_.end());
-  q_.clear();
+  indices(Category::X).insert(indices(Category::X).end(),
+    indices(Category::Q).begin(), indices(Category::Q).end());
+  indices(Category::Q).clear();
 }
 
 void DaeBuilderInternal::sort_d() {
-  std::vector<MX> d = var(d_), ddef = this->ddef();
+  std::vector<MX> d = var(indices(Category::D)), ddef = this->ddef();
   sort_dependent(d, ddef);
-  d_.clear();
-  for (const MX& e : d) d_.push_back(find(e.name()));
+  indices(Category::D).clear();
+  for (const MX& e : d) indices(Category::D).push_back(find(e.name()));
 }
 
 void DaeBuilderInternal::sort_w() {
-  std::vector<MX> w = var(w_), wdef = this->wdef();
+  std::vector<MX> w = var(indices(Category::W)), wdef = this->wdef();
   sort_dependent(w, wdef);
-  w_.clear();
-  for (const MX& e : w) w_.push_back(find(e.name()));
+  indices(Category::W).clear();
+  for (const MX& e : w) indices(Category::W).push_back(find(e.name()));
 }
 
 void DaeBuilderInternal::sort_z(const std::vector<std::string>& z_order) {
@@ -1202,7 +1203,7 @@ void DaeBuilderInternal::sort_z(const std::vector<std::string>& z_order) {
   casadi_assert(z_order.size() == size(Category::Z), "Dimension mismatch");
   // Mark existing components in z
   std::vector<bool> old_z(n_variables(), false);
-  for (size_t i : z_) old_z.at(i) = true;
+  for (size_t i : indices(Category::Z)) old_z.at(i) = true;
   // New vector of z
   std::vector<size_t> new_z;
   new_z.reserve(z_order.size());
@@ -1649,10 +1650,10 @@ void DaeBuilderInternal::lift(bool lift_shared, bool lift_calls) {
   if (size(Category::W) > 0) casadi_warning("'w' already has entries");
   // Expressions where the variables are also being used
   std::vector<MX> ex;
-  for (size_t v : x_) ex.push_back(variable(variable(v).der).beq);
-  for (size_t v : q_) ex.push_back(variable(variable(v).der).beq);
-  for (size_t v : res_) ex.push_back(variable(v).beq);
-  for (size_t v : y_) ex.push_back(variable(v).beq);
+  for (size_t v : indices(Category::X)) ex.push_back(variable(variable(v).der).beq);
+  for (size_t v : indices(Category::Q)) ex.push_back(variable(variable(v).der).beq);
+  for (size_t v : indices(Category::RES)) ex.push_back(variable(v).beq);
+  for (size_t v : indices(Category::Y)) ex.push_back(variable(v).beq);
   // Lift expressions
   std::vector<MX> new_w, new_wdef;
   Dict opts{{"lift_shared", lift_shared}, {"lift_calls", lift_calls},
@@ -1663,14 +1664,14 @@ void DaeBuilderInternal::lift(bool lift_shared, bool lift_calls) {
     Variable& v = new_variable(new_w.at(i).name());
     v.v = new_w.at(i);
     v.beq = new_wdef.at(i);
-    w_.push_back(v.index);
+    indices(Category::W).push_back(v.index);
   }
   // Get expressions
   auto it = ex.begin();
-  for (size_t v : x_) variable(variable(v).der).beq = *it++;
-  for (size_t v : q_) variable(variable(v).der).beq = *it++;
-  for (size_t v : res_) variable(v).beq = *it++;
-  for (size_t v : y_) variable(v).beq = *it++;
+  for (size_t v : indices(Category::X)) variable(variable(v).der).beq = *it++;
+  for (size_t v : indices(Category::Q)) variable(variable(v).der).beq = *it++;
+  for (size_t v : indices(Category::RES)) variable(v).beq = *it++;
+  for (size_t v : indices(Category::Y)) variable(v).beq = *it++;
   // Consistency check
   casadi_assert_dev(it == ex.end());
 }
@@ -2461,11 +2462,11 @@ Function DaeBuilderInternal::fmu_fun(const std::string& name,
     scheme["u"] = indices(Category::U);
     scheme["z"] = indices(Category::Z);
     scheme["p"] = indices(Category::P);
-    scheme["ode"] = x_;
+    scheme["ode"] = indices(Category::X);
     for (size_t& i : scheme["ode"]) i = variable(i).der;
-    scheme["alg"] = z_;
+    scheme["alg"] = indices(Category::Z);
     casadi_assert(size(Category::Z) == 0, "Not implemented)");
-    scheme["ydef"] = y_;
+    scheme["ydef"] = indices(Category::Y);
   }
   // Auxilliary variables, if any
   std::vector<std::string> aux;
@@ -2541,7 +2542,7 @@ std::vector<MX> DaeBuilderInternal::ydef() const {
 std::vector<MX> DaeBuilderInternal::ode() const {
   std::vector<MX> ret;
   ret.reserve(size(Category::X));
-  for (size_t v : x_) {
+  for (size_t v : indices(Category::X)) {
     const Variable& x = variable(v);
     if (x.der >= 0) {
       // Derivative variable
@@ -2672,11 +2673,11 @@ Variable& DaeBuilderInternal::add(const std::string& name, Causality causality,
       if (variability == Variability::DISCRETE) {
         // Discrete variables are considered states with zero derivatives
         v.category = Category::X;
-        insert(x_, v.index);
+        insert(indices(Category::X), v.index);
       } else {
         // Initialize as algebraic variable
         v.category = Category::Z;
-        insert(z_, v.index);
+        insert(indices(Category::Z), v.index);
       }
       break;
     default:
@@ -2782,18 +2783,18 @@ void DaeBuilderInternal::eq(const MX& lhs, const MX& rhs, const Dict& opts) {
         Variable& x = variable(v.parent);
         // Reclassify as state variable
         if (x.category == Category::Z) {
-          remove(z_, x.index);
+          remove(indices(Category::Z), x.index);
           x.category = Category::X;
-          insert(x_, x.index);
+          insert(indices(Category::X), x.index);
         } else {
           casadi_assert(x.category == Category::NUMEL, "No categorization for " + x.name);
           casadi_error("Unexpected category for " + x.name + ": " + to_string(x.category));
         }
       } else if (v.category == Category::Z) {
         // Reclassify as dependent variable
-        remove(z_, v.index);
+        remove(indices(Category::Z), v.index);
         v.category = Category::W;
-        insert(w_, v.index);
+        insert(indices(Category::W), v.index);
       } else if (v.category != Category::Y) {
         casadi_error("Cannot handle left-hand-side: " + str(lhs));
       }
@@ -2824,16 +2825,16 @@ void DaeBuilderInternal::eq(const MX& lhs, const MX& rhs, const Dict& opts) {
       Variable& x = variable(v.parent);
       // Reclassify as state variable
       if (x.category == Category::Z) {
-        remove(z_, x.index);
+        remove(indices(Category::Z), x.index);
         x.category = Category::X;
-        insert(x_, x.index);
+        insert(indices(Category::X), x.index);
       } else {
         casadi_assert(x.category == Category::NUMEL, "No categorization for " + x.name);
         casadi_error("Unexpected category for " + x.name + ": " + to_string(x.category));
       }
       // Reclassify derivative as algebraic variable
       v.category = Category::Z;
-      insert(z_, v.index);
+      insert(indices(Category::Z), v.index);
     }
   }
 }
@@ -3160,9 +3161,9 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
         Variable& v = variable(derivatives_.back());
         // Add to list of states
         casadi_assert(v.der_of >= 0, "Error processing derivative info for " + v.name);
-        x_.push_back(v.der_of);
+        indices(Category::X).push_back(v.der_of);
         // Make sure der field is consistent
-        variable(x_.back()).der = derivatives_.back();
+        variable(indices(Category::X).back()).der = derivatives_.back();
         // Get dependencies
         v.dependencies = read_dependencies(e);
         v.dependenciesKind = read_dependencies_kind(e, v.dependencies.size());
@@ -3194,18 +3195,21 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
         Variable& v = variable(derivatives_.back());
         // Add to list of states
         casadi_assert(v.der_of >= 0, "Error processing derivative info for " + v.name);
-        x_.push_back(v.der_of);
+        indices(Category::X).push_back(v.der_of);
         // Make sure der field is consistent
-        variable(x_.back()).der = derivatives_.back();
+        variable(indices(Category::X).back()).der = derivatives_.back();
       }
     }
 
     // What if dependencies attributed is missing from Outputs,Derivatives?
     // Depends on x_ having been populated
     std::vector<casadi_int> default_dependencies;
-    default_dependencies.insert(default_dependencies.begin(), t_.begin(), t_.end());
-    default_dependencies.insert(default_dependencies.begin(), x_.begin(), x_.end());
-    default_dependencies.insert(default_dependencies.begin(), u_.begin(), u_.end());
+    default_dependencies.insert(default_dependencies.begin(),
+      indices(Category::T).begin(), indices(Category::T).end());
+    default_dependencies.insert(default_dependencies.begin(),
+      indices(Category::X).begin(), indices(Category::X).end());
+    default_dependencies.insert(default_dependencies.begin(),
+      indices(Category::U).begin(), indices(Category::U).end());
     std::sort(default_dependencies.begin(), default_dependencies.end());
 
     // FMI2 standard does not allow parameters to be included in dependencies attribute
@@ -3341,7 +3345,7 @@ void DaeBuilderInternal::import_dynamic_equations(const XmlNode& eqs) {
   // Add discrete states to x_
   // Note: Make generic, should also apply to regular FMUs
   for (Variable* v : variables_) {
-    if (v->variability == Variability::DISCRETE) x_.push_back(v->index);
+    if (v->variability == Variability::DISCRETE) indices(Category::X).push_back(v->index);
   }
   // Add equations
   for (casadi_int i = 0; i < eqs.size(); ++i) {
@@ -3385,10 +3389,14 @@ void DaeBuilderInternal::import_dynamic_equations(const XmlNode& eqs) {
         }
         set_init(cond.name, MX());  // remove initial conditions, if any
         auto w_it = std::find(w_.begin(), w_.end(), cond.index);
-        if (w_it != w_.end()) w_.erase(w_it);  // remove from dependent equations
-        auto x_it = std::find(x_.begin(), x_.end(), cond.index);
-        if (x_it != x_.end()) x_.erase(x_it);  // remove from states
-
+        if (w_it != indices(Category::W).end()) {
+          indices(Category::W).erase(w_it);  // remove from dependent equations
+        }
+        auto x_it = std::find(indices(Category::X).begin(), indices(Category::X).end(),
+          cond.index);
+        if (x_it != indices(Category::X).end()) {
+          indices(Category::X).erase(x_it);  // remove from states
+        }
         // Create event indicator
         (void)add(cond.name + "_smooth", {{"cat", "e"}});
         variable(cond.name + "_smooth").beq = zc;
@@ -3419,14 +3427,14 @@ void DaeBuilderInternal::import_dynamic_equations(const XmlNode& eqs) {
           v.der = dot_v.index;
           dot_v.der_of = v.index;
           // Mark as state
-          x_.push_back(v.index);
+          indices(Category::X).push_back(v.index);
           // Set binding equation to derivative variable
           dot_v.beq = beq;
         } else {
           // Left-hand-side is a variable
           Variable& v = read_variable(lhs);
           // Set the equation
-          w_.push_back(find(v.name));
+          indices(Category::W).push_back(find(v.name));
           v.beq = beq;
         }
       } else {
