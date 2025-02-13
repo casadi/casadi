@@ -9,7 +9,9 @@ project(tinyxml2 VERSION 9.0.0)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN YES)
 
-add_library(tinyxml2 STATIC tinyxml2.cpp tinyxml2.h)
+set(BUILD_SHARED_LIBS OFF)
+
+add_library(tinyxml2 tinyxml2.cpp tinyxml2.h)
 add_library(tinyxml2::tinyxml2 ALIAS tinyxml2)
 
 # Uncomment the following line to require C++11 (or greater) to use tinyxml2
