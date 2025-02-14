@@ -2830,7 +2830,7 @@ void DaeBuilderInternal::set_variability(size_t ind, Variability variability) {
     case Category::U:
       if (variability == Variability::FIXED) {
         // Make fixed parameter
-        categorize(v.index, Category::NUMEL);
+        categorize(v.index, Category::C);
         v.causality = Causality::PARAMETER;
       } else if (variability == Variability::TUNABLE) {
         // Make tunable parameter
@@ -2849,7 +2849,7 @@ void DaeBuilderInternal::set_variability(size_t ind, Variability variability) {
         v.causality = Causality::INPUT;
       } else if (variability == Variability::FIXED) {
         // Make fixed parameter
-        categorize(v.index, Category::NUMEL);
+        categorize(v.index, Category::C);
         v.causality = Causality::PARAMETER;
       } else {
         // Not possible
@@ -2857,7 +2857,7 @@ void DaeBuilderInternal::set_variability(size_t ind, Variability variability) {
           "changed to 'continuous' (for category 'u') or 'fixed' (for no category)");
       }
       break;
-    case Category::NUMEL:
+    case Category::C:
       if (variability == Variability::CONTINUOUS) {
         // Make input
         categorize(v.index, Category::U);
@@ -2868,15 +2868,69 @@ void DaeBuilderInternal::set_variability(size_t ind, Variability variability) {
         v.causality = Causality::PARAMETER;
       } else {
         // Not possible
-        casadi_error("The variability of " + v.name + ", which is uncategorized, can only be "
+        casadi_error("The variability of " + v.name + ", which is of type 'c', can only be "
           "changed to 'continuous' (for category 'u') or 'tunable' (for category 'p')");
       }
       break;
     default:
-      casadi_error("Cannot change variability of " + v.name + " which is of category '"
+      casadi_error("Cannot change variability of " + v.name + ", which is of category '"
         + to_string(v.category) + "'");
   }
   v.variability = variability;
+}
+
+Category DaeBuilderInternal::category(size_t ind) const {
+  return variable(ind).category;
+}
+
+void DaeBuilderInternal::set_category(size_t ind, Category cat) {
+  // Get variable reference
+  Variable& v = variable(ind);
+  // Quick return if same category
+  if (v.category == cat) return;
+  // Update category: See comment for public interface
+  switch (cat) {
+    case Category::U:
+      if (v.category == Category::P || v.category == Category::C) {
+        return set_variability(v.index, Variability::CONTINUOUS);
+      }
+      break;
+    case Category::P:
+      if (v.category == Category::U || v.category == Category::C) {
+        return set_variability(v.index, Variability::TUNABLE);
+      }
+      break;
+    case Category::C:
+      if (v.category == Category::U || v.category == Category::P) {
+        return set_variability(v.index, Variability::FIXED);
+      }
+      break;
+    case Category::X:
+      if (v.category == Category::Q) {
+        return set_causality(v.index, Causality::LOCAL);
+      }
+      break;
+    case Category::Q:
+      if (v.category == Category::X) {
+        return set_causality(v.index, Causality::OUTPUT);
+      }
+      break;
+    case Category::Y:
+      if (v.category == Category::NUMEL) {
+        return set_causality(v.index, Causality::OUTPUT);
+      }
+      break;
+    case Category::NUMEL:
+      if (v.category == Category::Y) {
+        return set_causality(v.index, Causality::LOCAL);
+      }
+      break;
+    default:
+      break;
+  }
+  // Failure if reached this point
+  casadi_error("Cannot change category of " + v.name + " from '"
+    + to_string(v.category) + "' to '" + to_string(cat) + "'");
 }
 
 void DaeBuilderInternal::eq(const MX& lhs, const MX& rhs, const Dict& opts) {

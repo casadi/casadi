@@ -633,6 +633,12 @@ protected:
   /// Set variability
   void set_variability(size_t ind, Variability variability);
 
+  /// Get category
+  Category category(size_t ind) const;
+
+  /// Set category
+  void set_category(size_t ind, Category cat);
+
   /// Add a simple equation
   void eq(const MX& lhs, const MX& rhs, const Dict& opts);
 

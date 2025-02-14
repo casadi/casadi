@@ -579,13 +579,13 @@ class CASADI_EXPORT DaeBuilder
   /// Get the causality
   std::string causality(const std::string& name) const;
 
-  /** \brief Set the causality
+  /** \brief Set the causality, if permitted
 
   The following changes are permitted:
     * For controls 'u' (variability 'continuous', causality 'input'), free parameters 'p'
-    (variability 'tunable', causality 'parameter') and fixed parameters which do not
-    have a category (variability 'fixed', causality 'parameter'), causality can only be
-    changed indirectly, by updating the variability
+    (variability 'tunable', causality 'parameter') and fixed parameters 'c' (variability
+    'fixed', causality 'parameter'), causality can only be changed indirectly, by updating
+    the variability
     * Add or remove an output 'y' by setting the causality to 'output' or 'local',
     respectively
     * Differential states that do not appear in the right-hand-side can be treated as either
@@ -595,18 +595,34 @@ class CASADI_EXPORT DaeBuilder
     No other changes are permitted.
   */
   void set_causality(const std::string& name, const std::string& val);
+
   /// Get the variability
   std::string variability(const std::string& name) const;
 
-  /** \brief Set the variability
+  /** \brief Set the variability, if permitted
 
   For controls 'u' (variability 'continuous', causality 'input'), free parameters 'p'
-  (variability 'tunable', causality 'parameter') and fixed parameters which do not
-  have a category (variability 'fixed', causality 'parameter'), update variability in
+  (variability 'tunable', causality 'parameter') and fixed parameters 'c'
+  (variability 'fixed', causality 'parameter'), update variability in
   order to change the category. Causality is updated accordingly.
 
   Other changes are not permitted */
   void set_variability(const std::string& name, const std::string& val);
+
+  /// Get the variable category
+  std::string category(const std::string& name) const;
+
+  /** \brief Set the variable category, if permitted
+
+  The following changes are permitted:
+    * Controls 'u' can be changed to/from tunable parameters 'p' or fixed parameters 'c'
+    * Differential states that do not appear in the right-hand-sides can be changed between
+    regular states 'x' and quadrature states 'q'
+    * Outputs can be removed by giving it no category (empty string), or reintroduced by
+    setting the category to 'y'.
+
+    Other changes are not permitted. Causality and variability is updated accordingly. */
+  void set_category(const std::string& name, const std::string& val);
 
   ///@{
   /// Get/set the initial property

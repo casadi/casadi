@@ -828,6 +828,23 @@ void DaeBuilder::set_variability(const std::string& name, const std::string& val
   }
 }
 
+std::string DaeBuilder::category(const std::string& name) const {
+  try {
+    return to_string((*this)->category((*this)->find(name)));
+  } catch (std::exception& e) {
+    THROW_ERROR("category", e.what());
+    return std::string();  // never reached
+  }
+}
+
+void DaeBuilder::set_category(const std::string& name, const std::string& val) {
+  try {
+    (*this)->set_category((*this)->find(name), to_enum<Category>(val));
+  } catch (std::exception& e) {
+    THROW_ERROR("set_category", e.what());
+  }
+}
+
 std::string DaeBuilder::initial(const std::string& name) const {
   return to_string((*this)->variable(name).initial);
 }
