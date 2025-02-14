@@ -576,17 +576,37 @@ class CASADI_EXPORT DaeBuilder
   void set_type(const std::string& name, const std::string& val);
   ///@}
 
-  ///@{
-  /// Get/set the causality
+  /// Get the causality
   std::string causality(const std::string& name) const;
-  void set_causality(const std::string& name, const std::string& val);
-  ///@}
 
-  ///@{
-  /// Get/set the variability
+  /** \brief Set the causality
+
+  The following changes are permitted:
+    * For controls 'u' (variability 'continuous', causality 'input'), free parameters 'p'
+    (variability 'tunable', causality 'parameter') and fixed parameters which do not
+    have a category (variability 'fixed', causality 'parameter'), causality can only be
+    changed indirectly, by updating the variability
+    * Add or remove an output 'y' by setting the causality to 'output' or 'local',
+    respectively
+    * Differential states that do not appear in the right-hand-side can be treated as either
+    an regular state 'x' or as a quadrature state 'q' by setting the causality to 'local'
+    and 'output', respectively
+
+    No other changes are permitted.
+  */
+  void set_causality(const std::string& name, const std::string& val);
+  /// Get the variability
   std::string variability(const std::string& name) const;
+
+  /** \brief Set the variability
+
+  For controls 'u' (variability 'continuous', causality 'input'), free parameters 'p'
+  (variability 'tunable', causality 'parameter') and fixed parameters which do not
+  have a category (variability 'fixed', causality 'parameter'), update variability in
+  order to change the category. Causality is updated accordingly.
+
+  Other changes are not permitted */
   void set_variability(const std::string& name, const std::string& val);
-  ///@}
 
   ///@{
   /// Get/set the initial property

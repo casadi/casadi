@@ -2756,42 +2756,64 @@ Causality DaeBuilderInternal::causality(size_t ind) const {
 }
 
 void DaeBuilderInternal::set_causality(size_t ind, Causality causality) {
+  // Get variable reference
   Variable& v = variable(ind);
-  if (v.causality != causality) {
-    switch (v.category) {
-      case Category::U:
-        casadi_error("Cannot change causality of 'u' directly (only via updates to variability)");
-        break;
-      case Category::Y:
-        if (causality == Causality::LOCAL) {
-          // Remove categorization
-          categorize(v.index, Category::NUMEL);
-        } else {
-          // Not possible
-          casadi_error("Cannot change causality of " + v.name + " which is of category 'y' to "
-            + to_string(causality));
-        }
-        break;
-      case Category::P:
-        casadi_error("Cannot change causality of 'p' directly (only via updates to variability)");
-        break;
-      case Category::NUMEL:
-        if (causality == Causality::OUTPUT) {
-          // Make output
-          categorize(v.index, Category::Y);
-        } else {
-          // Not possible
-          casadi_error("Cannot change causality of " + v.name + " which is of category 'y' to "
-            + to_string(causality));
-        }
-        break;
-      default:
-        casadi_error("Cannot change causality of " + v.name + " which is of category '"
-          + to_string(v.category) + "'");
-    }
-    // Update causality
-    v.causality = causality;
+  // Quick return if same causality
+  if (v.causality == causality) return;
+  // Update category: See comment for public interface
+  switch (v.category) {
+    case Category::X:
+      if (causality == Causality::OUTPUT) {
+        // Make quadrature
+        categorize(v.index, Category::Q);
+      } else {
+        // Not possible
+        casadi_error("Cannot change causality of " + v.name + ", which is of category 'x', to "
+          + to_string(causality));
+      }
+      break;
+    case Category::Q:
+      if (causality == Causality::LOCAL) {
+        // Make regular state
+        categorize(v.index, Category::X);
+      } else {
+        // Not possible
+        casadi_error("Cannot change causality of " + v.name + ", which is of category 'q', to "
+          + to_string(causality));
+      }
+      break;
+    case Category::U:
+      casadi_error("Cannot change causality of 'u' directly (only via updates to variability)");
+      break;
+    case Category::Y:
+      if (causality == Causality::LOCAL) {
+        // Remove categorization
+        categorize(v.index, Category::NUMEL);
+      } else {
+        // Not possible
+        casadi_error("Cannot change causality of " + v.name + ", which is of category 'y', to "
+          + to_string(causality));
+      }
+      break;
+    case Category::P:
+      casadi_error("Cannot change causality of 'p' directly (only via updates to variability)");
+      break;
+    case Category::NUMEL:
+      if (causality == Causality::OUTPUT) {
+        // Make output
+        categorize(v.index, Category::Y);
+      } else {
+        // Not possible
+        casadi_error("Cannot change causality of " + v.name + " which is of category 'y' to "
+          + to_string(causality));
+      }
+      break;
+    default:
+      casadi_error("Cannot change causality of " + v.name + " which is of category '"
+        + to_string(v.category) + "'");
   }
+  // Update causality
+  v.causality = causality;
 }
 
 Variability DaeBuilderInternal::variability(size_t ind) const {
@@ -2799,60 +2821,62 @@ Variability DaeBuilderInternal::variability(size_t ind) const {
 }
 
 void DaeBuilderInternal::set_variability(size_t ind, Variability variability) {
+  // Get variable reference
   Variable& v = variable(ind);
-  if (v.variability != variability) {
-    switch (v.category) {
-      case Category::U:
-        if (variability == Variability::FIXED) {
-          // Make fixed parameter
-          categorize(v.index, Category::NUMEL);
-          v.causality = Causality::PARAMETER;
-        } else if (variability == Variability::TUNABLE) {
-          // Make tunable parameter
-          categorize(v.index, Category::P);
-          v.causality = Causality::PARAMETER;
-        } else {
-          // Not possible
-          casadi_error("The variability of " + v.name + ", which is of category 'u', can only be "
-            "changed to 'fixed' (for no category) or 'tunable' (for category 'p')");
-        }
-        break;
-      case Category::P:
-        if (variability == Variability::CONTINUOUS) {
-          // Make input
-          categorize(v.index, Category::U);
-          v.causality = Causality::INPUT;
-        } else if (variability == Variability::FIXED) {
-          // Make fixed parameter
-          categorize(v.index, Category::NUMEL);
-          v.causality = Causality::PARAMETER;
-        } else {
-          // Not possible
-          casadi_error("The variability of " + v.name + ", which is of category 'p', can only be "
-            "changed to 'continuous' (for category 'u') or 'fixed' (for no category)");
-        }
-        break;
-      case Category::NUMEL:
-        if (variability == Variability::CONTINUOUS) {
-          // Make input
-          categorize(v.index, Category::U);
-          v.causality = Causality::INPUT;
-        } else if (variability == Variability::TUNABLE) {
-          // Make tunable parameter
-          categorize(v.index, Category::P);
-          v.causality = Causality::PARAMETER;
-        } else {
-          // Not possible
-          casadi_error("The variability of " + v.name + ", which is uncategorized, can only be "
-            "changed to 'continuous' (for category 'u') or 'tunable' (for category 'p')");
-        }
-        break;
-      default:
-        casadi_error("Cannot change variability of " + v.name + " which is of category '"
-          + to_string(v.category) + "'");
-    }
-    v.variability = variability;
+  // Quick return if same variability
+  if (v.variability == variability) return;
+  // Update category: See comment for public interface
+  switch (v.category) {
+    case Category::U:
+      if (variability == Variability::FIXED) {
+        // Make fixed parameter
+        categorize(v.index, Category::NUMEL);
+        v.causality = Causality::PARAMETER;
+      } else if (variability == Variability::TUNABLE) {
+        // Make tunable parameter
+        categorize(v.index, Category::P);
+        v.causality = Causality::PARAMETER;
+      } else {
+        // Not possible
+        casadi_error("The variability of " + v.name + ", which is of category 'u', can only be "
+          "changed to 'fixed' (for no category) or 'tunable' (for category 'p')");
+      }
+      break;
+    case Category::P:
+      if (variability == Variability::CONTINUOUS) {
+        // Make input
+        categorize(v.index, Category::U);
+        v.causality = Causality::INPUT;
+      } else if (variability == Variability::FIXED) {
+        // Make fixed parameter
+        categorize(v.index, Category::NUMEL);
+        v.causality = Causality::PARAMETER;
+      } else {
+        // Not possible
+        casadi_error("The variability of " + v.name + ", which is of category 'p', can only be "
+          "changed to 'continuous' (for category 'u') or 'fixed' (for no category)");
+      }
+      break;
+    case Category::NUMEL:
+      if (variability == Variability::CONTINUOUS) {
+        // Make input
+        categorize(v.index, Category::U);
+        v.causality = Causality::INPUT;
+      } else if (variability == Variability::TUNABLE) {
+        // Make tunable parameter
+        categorize(v.index, Category::P);
+        v.causality = Causality::PARAMETER;
+      } else {
+        // Not possible
+        casadi_error("The variability of " + v.name + ", which is uncategorized, can only be "
+          "changed to 'continuous' (for category 'u') or 'tunable' (for category 'p')");
+      }
+      break;
+    default:
+      casadi_error("Cannot change variability of " + v.name + " which is of category '"
+        + to_string(v.category) + "'");
   }
+  v.variability = variability;
 }
 
 void DaeBuilderInternal::eq(const MX& lhs, const MX& rhs, const Dict& opts) {
