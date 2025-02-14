@@ -31245,10 +31245,10 @@ Default input for an NLP solver.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1t4
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.hpp#L227
+https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.hpp#L225
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.cpp#L227-L231
+https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.cpp#L225-L229
 
 >  std::vector< double > casadi::nlpsol_default_in()
 ------------------------------------------------------------------------
@@ -31258,10 +31258,10 @@ Default input for an NLP solver.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1t4
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.hpp#L227
+https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.hpp#L225
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.cpp#L227-L231
+https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.cpp#L225-L229
 
 ";
 
@@ -36479,10 +36479,10 @@ Get NLP solver input scheme name by index.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1t0
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.hpp#L233
+https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.hpp#L231
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.cpp#L233-L246
+https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.cpp#L231-L244
 
 >  std::string casadi::nlpsol_in(casadi_int ind)
 ------------------------------------------------------------------------
@@ -36518,10 +36518,10 @@ Get NLP solver input scheme name by index.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1t0
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.hpp#L233
+https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.hpp#L231
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.cpp#L233-L246
+https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.cpp#L231-L244
 
 ";
 
@@ -36559,10 +36559,10 @@ Get output scheme name by index.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1t1
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.hpp#L248
+https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.hpp#L246
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.cpp#L248-L259
+https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.cpp#L246-L257
 
 >  std::string casadi::nlpsol_out(casadi_int ind)
 ------------------------------------------------------------------------
@@ -36596,10 +36596,10 @@ Get output scheme name by index.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1t1
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.hpp#L248
+https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.hpp#L246
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.cpp#L248-L259
+https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.cpp#L246-L257
 
 ";
 
@@ -36613,10 +36613,10 @@ Number of NLP solver inputs.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1t2
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.hpp#L261
+https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.hpp#L259
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.cpp#L261-L263
+https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.cpp#L259-L261
 
 ";
 
@@ -36628,10 +36628,10 @@ Number of NLP solver outputs.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1t3
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.hpp#L265
+https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.hpp#L263
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.cpp#L265-L267
+https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.cpp#L263-L265
 
 ";
 
@@ -36643,10 +36643,10 @@ Get all options for a plugin.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1t5
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.hpp#L829
+https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.hpp#L827
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.cpp#L829-L831
+https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.cpp#L827-L829
 
 ";
 
@@ -36658,10 +36658,10 @@ Get type info for a particular option.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1t6
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.hpp#L833
+https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.hpp#L831
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.cpp#L833-L835
+https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.cpp#L831-L833
 
 ";
 
@@ -36673,10 +36673,10 @@ Get documentation for a particular option.
 Extra doc: https://github.com/casadi/casadi/wiki/L_1t7
 
 Doc source: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.hpp#L837
+https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.hpp#L835
 
 Implementation: 
-https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.cpp#L837-L839
+https://github.com/casadi/casadi/blob/develop/casadi/core/nlpsol.cpp#L835-L837
 
 ";
 
