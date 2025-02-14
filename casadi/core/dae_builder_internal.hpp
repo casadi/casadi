@@ -52,11 +52,11 @@ enum class Variability {CONSTANT, FIXED, TUNABLE, DISCRETE, CONTINUOUS, NUMEL};
 
 // CasADi classification of model variables, cf. Table 17 in FMI specification, 3.0.2
 //              PARAMETER  CALCULATED_PARAMETER  INPUT  OUTPUT  LOCAL  INDEPENDENT
-// CONSTANT     -          -                     -      C?      C?     -
-// FIXED        C?         C?                    -      -       ?      -
-// TUNABLE      P          D                     -      -       ?      -
-// DISCRETE     -          -                     U?     Y?      X      -
-// CONTINUOUS   -          -                     U      Y       X      T
+// CONSTANT     -          -                     -      C       C      -
+// FIXED        C          D                     -      -       D      -
+// TUNABLE      P          D                     -      -       D      -
+// DISCRETE     -          -                     U      Y       X      -
+// CONTINUOUS   -          -                     U      Y/Q     X      T
 
 // Input convension in codegen
 enum class Category {T, C, P, D, W, U, X, Z, Q, Y, E, DER, RES, ASSIGN, REINIT, NUMEL};
