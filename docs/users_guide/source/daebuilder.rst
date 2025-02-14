@@ -126,20 +126,17 @@ as follows.
         g = 9.81 [hidden]
 
         dae = DaeBuilder('rocket')
-        # Add input expressions
-        a = dae.add_p('a')
-        b = dae.add_p('b')
-        u = dae.add_u('u')
-        h = dae.add_x('h')
-        v = dae.add_x('v')
-        m = dae.add_x('m')
-        # Add output expressions
-        hdot = v
-        vdot = (u-a*v**2)/m-g
-        mdot = -b*u**2
-        dae.set_ode('h', hdot)
-        dae.set_ode('v', vdot)
-        dae.set_ode('m', mdot)
+        # Add model variables
+        a = dae.add('a', 'parameter', 'tunable')
+        b = dae.add('b', 'parameter', 'tunable')
+        u = dae.add('u', 'input')
+        h = dae.add('h')
+        v = dae.add('v')
+        m = dae.add('m')
+        # Add equations
+        dae.eq(dae.der(h), v)
+        dae.eq(dae.der(v), (u-a*v**2)/m-g)
+        dae.eq(dae.der(m), -b*u**2)
         # Specify initial conditions
         dae.set_start('h', 0)
         dae.set_start('v', 0)
@@ -156,20 +153,17 @@ as follows.
         g = 9.81; [hidden]
 
         dae = DaeBuilder('rocket')
-        % Add input expressions
-        a = dae.add_p('a');
-        b = dae.add_p('b');
-        u = dae.add_u('u');
-        h = dae.add_x('h');
-        v = dae.add_x('v');
-        m = dae.add_x('m');
-        % Add output expressions
-        hdot = v;
-        vdot = (u-a*v^2)/m-g;
-        mdot = -b*u^2;
-        dae.set_ode('h', hdot);
-        dae.set_ode('v', vdot);
-        dae.set_ode('m', mdot);
+        % Add model variables
+        a = dae.add('a', 'parameter', 'tunable');
+        b = dae.add('b', 'parameter', 'tunable');
+        u = dae.add('u', 'input');
+        h = dae.add('h');
+        v = dae.add('v');
+        m = dae.add('m');
+        % Add equations
+        dae.set_ode(dae.der(h), v);
+        dae.set_ode(dae.der(v), (u-a*v^2)/m-g);
+        dae.set_ode(dae.der(m), -b*u^2);
         % Specify initial conditions
         dae.set_start('h', 0);
         dae.set_start('v', 0);

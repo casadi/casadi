@@ -26,17 +26,17 @@ from casadi import *
 dae = DaeBuilder('vdp')
 
 # States
-x1 = dae.add_x('x1')
-x2 = dae.add_x('x2')
-q = dae.add_q('q')
+x1 = dae.add('x1')
+x2 = dae.add('x2')
+q = dae.add('q')
 
 # Input
-u = dae.add_u('u')
+u = dae.add('u', 'input')
 
 # Set ODE right-hand-sides
-dae.set_ode('x1', (1 - x2 * x2)*x1 - x2 + u)
-dae.set_ode('x2', x1)
-dae.set_ode('q', x1**2 + x2**2 + u**2)
+dae.eq(dae.der(x1), (1 - x2 * x2)*x1 - x2 + u)
+dae.eq(dae.der(x2), x1)
+dae.eq(dae.der(q), x1**2 + x2**2 + u**2)
 
 # Specify initial conditions
 dae.set_start('x1', 0)
