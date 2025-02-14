@@ -161,9 +161,9 @@ as follows.
         v = dae.add('v');
         m = dae.add('m');
         % Add equations
-        dae.set_ode(dae.der(h), v);
-        dae.set_ode(dae.der(v), (u-a*v^2)/m-g);
-        dae.set_ode(dae.der(m), -b*u^2);
+        dae.eq(dae.der(h), v);
+        dae.eq(dae.der(v), (u-a*v^2)/m-g);
+        dae.eq(dae.der(m), -b*u^2);
         % Specify initial conditions
         dae.set_start('h', 0);
         dae.set_start('v', 0);
