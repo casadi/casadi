@@ -2812,8 +2812,10 @@ void DaeBuilderInternal::set_causality(size_t ind, Causality causality) {
       casadi_error("Cannot change causality of " + v.name + " which is of category '"
         + to_string(v.category) + "'");
   }
-  // Update causality
+  // Success: Update causality
   v.causality = causality;
+  // The oracle would need to be regenerated after changes to the categorization
+  clear_cache_ = true;
 }
 
 Variability DaeBuilderInternal::variability(size_t ind) const {
@@ -2876,7 +2878,10 @@ void DaeBuilderInternal::set_variability(size_t ind, Variability variability) {
       casadi_error("Cannot change variability of " + v.name + ", which is of category '"
         + to_string(v.category) + "'");
   }
+  // Success: Update variability
   v.variability = variability;
+  // The oracle would need to be regenerated after changes to the categorization
+  clear_cache_ = true;
 }
 
 Category DaeBuilderInternal::category(size_t ind) const {
