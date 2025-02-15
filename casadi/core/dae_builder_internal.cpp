@@ -338,6 +338,10 @@ XmlNode Variable::export_xml(const DaeBuilderInternal& self) const {
   // Variability (real variables are continuous by default)
   if (!(is_real() && variability == Variability::CONTINUOUS))
     r.set_attribute("variability", to_string(variability));
+  // Initial property
+  if (initial != Initial::NA && initial != Initial::NUMEL) {
+    r.set_attribute("initial", to_string(initial));
+  }
   // Minimum attribute
   if (min != -inf) {
     if (is_real()) {
