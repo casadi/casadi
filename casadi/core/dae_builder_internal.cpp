@@ -2604,11 +2604,10 @@ std::vector<MX> DaeBuilderInternal::init_rhs() const {
 Variable& DaeBuilderInternal::add(const std::string& name, Causality causality,
     Variability variability, const Dict& opts) {
   // Default options
-  std::string cat;
+  std::string cat, description, type, initial, unit, display_unit;
   std::vector<casadi_int> dimension = {1};
-  std::string description;
+  double min = -casadi::inf, max = casadi::inf;
   std::vector<double> start;
-  Type type = Type::FLOAT64;
   // Read options
   for (auto&& op : opts) {
     if (op.first=="cat") {
@@ -2617,6 +2616,14 @@ Variable& DaeBuilderInternal::add(const std::string& name, Causality causality,
       dimension = op.second.to_int_vector();
     } else if (op.first=="description") {
       description = op.second.to_string();
+    } else if (op.first=="unit") {
+      unit = op.second.to_string();
+    } else if (op.first=="display_unit") {
+      display_unit = op.second.to_string();
+    } else if (op.first=="min") {
+      min = op.second.to_double();
+    } else if (op.first=="max") {
+      max = op.second.to_double();
     } else if (op.first=="start") {
       if (op.second.can_cast_to(OT_DOUBLE)) {
         start.resize(1, op.second.to_double());
@@ -2624,7 +2631,9 @@ Variable& DaeBuilderInternal::add(const std::string& name, Causality causality,
         start = op.second.to_double_vector();
       }
     } else if (op.first=="type") {
-      type = to_enum<Type>(op.second.to_string());
+      type = op.second.to_string();
+    } else if (op.first=="initial") {
+      initial = op.second.to_string();
     } else {
       casadi_error("No such option: " + op.first);
     }
@@ -2632,10 +2641,15 @@ Variable& DaeBuilderInternal::add(const std::string& name, Causality causality,
   // Create a new variable
   Variable& v = new_variable(name, dimension);
   v.description = description;
-  v.type = type;
+  if (!type.empty()) v.type = to_enum<Type>(type);
   v.causality = causality;
   v.variability = variability;
   if (!start.empty()) v.start = start;
+  if (!initial.empty()) v.initial = to_enum<Initial>(initial);
+  if (!unit.empty()) v.unit = unit;
+  if (!display_unit.empty()) v.display_unit = display_unit;
+  if (min != -casadi::inf) v.min = min;
+  if (max != casadi::inf) v.max = max;
   // Handle different categories
   switch (causality) {
     case Causality::INDEPENDENT:
