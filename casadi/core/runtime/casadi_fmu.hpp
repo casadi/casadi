@@ -501,3 +501,363 @@ fmi3Status fmi3GetAdjointDerivative(
   // Successful return
   return fmi3OK;
 }
+
+FMI3_Export const char* fmi3GetVersion(void) {
+  return "3.0";
+}
+
+FMI3_Export fmi3Status fmi3SetDebugLogging(
+    fmi3Instance instance,
+    fmi3Boolean loggingOn,
+    size_t nCategories,
+    const fmi3String categories[]) {
+  // Not implemented: Ignore for now
+  return fmi3OK;
+}
+
+FMI3_Export fmi3Status fmi3Terminate(fmi3Instance instance) {
+  // No cleanup should be needed
+  return fmi3OK;
+}
+
+FMI3_Export fmi3Status fmi3GetFloat32(
+    fmi3Instance instance,
+    const fmi3ValueReference valueReferences[],
+    size_t nValueReferences,
+    fmi3Float32 values[],
+    size_t nValues) {
+  // Type not implemented
+  return fmi3Fatal;
+}
+
+FMI3_Export fmi3Status fmi3GetInt8(
+    fmi3Instance instance,
+    const fmi3ValueReference valueReferences[],
+    size_t nValueReferences,
+    fmi3Int8 values[],
+    size_t nValues) {
+  // Type not implemented
+  return fmi3Fatal;
+}
+
+FMI3_Export fmi3Status fmi3GetUInt8(
+    fmi3Instance instance,
+    const fmi3ValueReference valueReferences[],
+    size_t nValueReferences,
+    fmi3UInt8 values[],
+    size_t nValues) {
+  // Type not implemented
+  return fmi3Fatal;
+}
+
+FMI3_Export fmi3Status fmi3GetInt16(
+    fmi3Instance instance,
+    const fmi3ValueReference valueReferences[],
+    size_t nValueReferences,
+    fmi3Int16 values[],
+    size_t nValues) {
+  // Type not implemented
+  return fmi3Fatal;
+}
+
+FMI3_Export fmi3Status fmi3GetUInt16(
+    fmi3Instance instance,
+    const fmi3ValueReference valueReferences[],
+    size_t nValueReferences,
+    fmi3UInt16 values[],
+    size_t nValues) {
+  // Type not implemented
+  return fmi3Fatal;
+}
+
+FMI3_Export fmi3Status fmi3GetInt32(
+    fmi3Instance instance,
+    const fmi3ValueReference valueReferences[],
+    size_t nValueReferences,
+    fmi3Int32 values[],
+    size_t nValues) {
+  // Type not implemented
+  return fmi3Fatal;
+}
+
+FMI3_Export fmi3Status fmi3GetUInt32(
+    fmi3Instance instance,
+    const fmi3ValueReference valueReferences[],
+    size_t nValueReferences,
+    fmi3UInt32 values[],
+    size_t nValues) {
+  // Type not implemented
+  return fmi3Fatal;
+}
+
+FMI3_Export fmi3Status fmi3GetInt64(
+    fmi3Instance instance,
+    const fmi3ValueReference valueReferences[],
+    size_t nValueReferences,
+    fmi3Int64 values[],
+    size_t nValues) {
+  // Type not implemented
+  return fmi3Fatal;
+}
+
+FMI3_Export fmi3Status fmi3GetUInt64(
+    fmi3Instance instance,
+    const fmi3ValueReference valueReferences[],
+    size_t nValueReferences,
+    fmi3UInt64 values[],
+    size_t nValues) {
+  // Type not implemented
+  return fmi3Fatal;
+}
+
+FMI3_Export fmi3Status fmi3GetBoolean(
+    fmi3Instance instance,
+    const fmi3ValueReference valueReferences[],
+    size_t nValueReferences,
+    fmi3Boolean values[],
+    size_t nValues) {
+  // Type not implemented
+  return fmi3Fatal;
+}
+
+FMI3_Export fmi3Status fmi3GetString(
+    fmi3Instance instance,
+    const fmi3ValueReference valueReferences[],
+    size_t nValueReferences,
+    fmi3String values[],
+    size_t nValues) {
+  // Type not implemented
+  return fmi3Fatal;
+}
+
+FMI3_Export fmi3Status fmi3GetBinary(
+    fmi3Instance instance,
+    const fmi3ValueReference valueReferences[],
+    size_t nValueReferences,
+    size_t valueSizes[],
+    fmi3Binary values[],
+    size_t nValues) {
+  // Type not implemented
+  return fmi3Fatal;
+}
+
+FMI3_Export fmi3Status fmi3GetClock(
+    fmi3Instance instance,
+    const fmi3ValueReference valueReferences[],
+    size_t nValueReferences,
+    fmi3Clock values[]) {
+  // Type not implemented
+  return fmi3Fatal;
+}
+
+FMI3_Export fmi3Status fmi3SetFloat32(fmi3Instance instance,
+  const fmi3ValueReference valueReferences[],
+  size_t nValueReferences,
+  const fmi3Float32 values[],
+  size_t nValues) {
+  // Type not implemented
+  return fmi3Fatal;
+}
+
+FMI3_Export fmi3Status fmi3SetInt8(fmi3Instance instance,
+    const fmi3ValueReference valueReferences[],
+    size_t nValueReferences,
+    const fmi3Int8 values[],
+    size_t nValues) {
+  // Type not implemented
+  return fmi3Fatal;
+}
+
+FMI3_Export fmi3Status fmi3SetUInt8(fmi3Instance instance,
+    const fmi3ValueReference valueReferences[],
+    size_t nValueReferences,
+    const fmi3UInt8 values[],
+    size_t nValues) {
+  // Type not implemented
+  return fmi3Fatal;
+}
+
+FMI3_Export fmi3Status fmi3SetInt16(fmi3Instance instance,
+    const fmi3ValueReference valueReferences[],
+    size_t nValueReferences,
+    const fmi3Int16 values[],
+    size_t nValues) {
+  // Type not implemented
+  return fmi3Fatal;
+}
+
+FMI3_Export fmi3Status fmi3SetUInt16(fmi3Instance instance,
+    const fmi3ValueReference valueReferences[],
+    size_t nValueReferences,
+    const fmi3UInt16 values[],
+    size_t nValues) {
+  // Type not implemented
+  return fmi3Fatal;
+}
+
+FMI3_Export fmi3Status fmi3SetInt32(fmi3Instance instance,
+    const fmi3ValueReference valueReferences[],
+    size_t nValueReferences,
+    const fmi3Int32 values[],
+    size_t nValues) {
+  // Type not implemented
+  return fmi3Fatal;
+}
+
+FMI3_Export fmi3Status fmi3SetUInt32(fmi3Instance instance,
+    const fmi3ValueReference valueReferences[],
+    size_t nValueReferences,
+    const fmi3UInt32 values[],
+    size_t nValues) {
+  // Type not implemented
+  return fmi3Fatal;
+}
+
+FMI3_Export fmi3Status fmi3SetInt64(fmi3Instance instance,
+    const fmi3ValueReference valueReferences[],
+    size_t nValueReferences,
+    const fmi3Int64 values[],
+    size_t nValues) {
+  // Type not implemented
+  return fmi3Fatal;
+}
+
+FMI3_Export fmi3Status fmi3SetUInt64(fmi3Instance instance,
+    const fmi3ValueReference valueReferences[],
+    size_t nValueReferences,
+    const fmi3UInt64 values[],
+    size_t nValues) {
+  // Type not implemented
+  return fmi3Fatal;
+}
+
+FMI3_Export fmi3Status fmi3SetBoolean(fmi3Instance instance,
+    const fmi3ValueReference valueReferences[],
+    size_t nValueReferences,
+    const fmi3Boolean values[],
+    size_t nValues) {
+  // Type not implemented
+  return fmi3Fatal;
+}
+
+FMI3_Export fmi3Status fmi3SetString(fmi3Instance instance,
+    const fmi3ValueReference valueReferences[],
+    size_t nValueReferences,
+    const fmi3String values[],
+    size_t nValues) {
+  // Type not implemented
+  return fmi3Fatal;
+}
+
+FMI3_Export fmi3Status fmi3SetBinary(fmi3Instance instance,
+    const fmi3ValueReference valueReferences[],
+    size_t nValueReferences,
+    const size_t valueSizes[],
+    const fmi3Binary values[],
+    size_t nValues) {
+  // Type not implemented
+  return fmi3Fatal;
+}
+
+FMI3_Export fmi3Status fmi3SetClock(fmi3Instance instance,
+    const fmi3ValueReference valueReferences[],
+    size_t nValueReferences,
+    const fmi3Clock values[]) {
+  // Type not implemented
+  return fmi3Fatal;
+}
+
+FMI3_Export fmi3Status fmi3SetIntervalDecimal(fmi3Instance instance,
+    const fmi3ValueReference valueReferences[],
+    size_t nValueReferences,
+    const fmi3Float64 intervals[]) {
+  // Clocks not implemented
+  return fmi3Fatal;
+}
+
+FMI3_Export fmi3Status fmi3GetIntervalDecimal(fmi3Instance instance,
+    const fmi3ValueReference valueReferences[],
+    size_t nValueReferences,
+    fmi3Float64 intervals[],
+    fmi3IntervalQualifier qualifiers[]) {
+  // Clocks not implemented
+  return fmi3Fatal;
+}
+
+FMI3_Export fmi3Status fmi3GetShiftDecimal(fmi3Instance instance,
+    const fmi3ValueReference valueReferences[],
+    size_t nValueReferences,
+    fmi3Float64 shifts[]) {
+  // Clocks not implemented
+  return fmi3Fatal;
+}
+
+FMI3_Export fmi3Status fmi3SetShiftDecimal(fmi3Instance instance,
+      const fmi3ValueReference valueReferences[],
+      size_t nValueReferences,
+      const fmi3Float64 shifts[]) {
+  // Clocks not implemented
+  return fmi3Fatal;
+}
+
+FMI3_Export fmi3Status fmi3GetNumberOfContinuousStates(fmi3Instance instance,
+      size_t* nContinuousStates) {
+  if (nContinuousStates) *nContinuousStates = N_X;
+  return fmi3OK;
+}
+
+FMI3_Export fmi3Status fmi3GetNumberOfEventIndicators(fmi3Instance instance,
+    size_t* nEventIndicators) {
+  // Event indicators not yet support
+  if (nEventIndicators) *nEventIndicators = 0;
+  return fmi3OK;
+}
+
+FMI3_Export fmi3Status fmi3GetContinuousStateDerivatives(fmi3Instance instance,
+    fmi3Float64 derivatives[], size_t nContinuousStates) {
+  return fmi3GetFloat64(instance, xdot_vr, N_X, derivatives, N_X);
+}
+
+FMI3_Export fmi3Status fmi3GetNominalsOfContinuousStates(fmi3Instance instance,
+    fmi3Float64 nominals[], size_t nContinuousStates) {
+  // Not implemented: Assume 1 for now
+  size_t i;
+  for (i = 0; i < nContinuousStates; ++i) nominals[i] = 1;
+  return fmi3OK;
+}
+
+FMI3_Export fmi3Status fmi3GetEventIndicators(fmi3Instance instance,
+    fmi3Float64 eventIndicators[],
+    size_t nEventIndicators) {
+  // Event indicators not yet support
+  return fmi3Fatal;
+}
+
+FMI3_Export fmi3Status fmi3CompletedIntegratorStep(fmi3Instance instance,
+    fmi3Boolean  noSetFMUStatePriorToCurrentPoint,
+    fmi3Boolean* enterEventMode,
+    fmi3Boolean* terminateSimulation) {
+  // We should not need this as there are no internal iterations
+  return fmi3OK;
+}
+
+FMI3_Export fmi3Status fmi3EnterEventMode(fmi3Instance instance) {
+  // Events not yet supported
+  return fmi3OK;
+}
+
+FMI3_Export fmi3Status fmi3UpdateDiscreteStates(fmi3Instance instance,
+    fmi3Boolean* discreteStatesNeedUpdate,
+    fmi3Boolean* terminateSimulation,
+    fmi3Boolean* nominalsOfContinuousStatesChanged,
+    fmi3Boolean* valuesOfContinuousStatesChanged,
+    fmi3Boolean* nextEventTimeDefined,
+    fmi3Float64* nextEventTime) {
+  // Discrete variables not yet supported
+  *discreteStatesNeedUpdate = fmi3False;
+  *terminateSimulation = fmi3False;
+  *nominalsOfContinuousStatesChanged = fmi3False;
+  *valuesOfContinuousStatesChanged = fmi3False;
+  *nextEventTimeDefined = fmi3False;
+  return fmi3OK;
+}
