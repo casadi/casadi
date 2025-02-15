@@ -3034,8 +3034,11 @@ void DaeBuilderInternal::when(const MX& cond, const std::vector<std::string>& eq
   }
   // Convert condition into a smooth zero crossing condition
   MX zero;
-  if (cond.is_op(OP_LT) || cond.is_op(OP_LE)) {
+  if (cond.is_op(OP_LT)) {
     zero = cond.dep(1) - cond.dep(0);  // Reformulate a < b to b - a > 0
+  } else if (cond.is_op(OP_LE)) {
+    casadi_error("Only strict inequality in zero-crossing conditions permitted, got: "
+      + str(cond));
   } else {
     casadi_error("Cannot parse zero-crossing condition" + str(cond));
   }
