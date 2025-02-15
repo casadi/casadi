@@ -1623,7 +1623,6 @@
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>event_tol</td><td>OT_DOUBLE</td><td>Termination tolerance for the event iteration</td><td>casadi::Integrator</td></tr>
-<tr><td>event_transition</td><td>OT_FUNCTION</td><td>Function to be called a zero-crossing events</td><td>casadi::Integrator</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Integrator</td></tr>
 <tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
@@ -1672,6 +1671,7 @@
 <tr><td>specific_options</td><td>OT_DICT</td><td>Options for specific auto-generated functions, overwriting the defaults from common_options. Nested dictionary.</td><td>casadi::OracleFunction</td></tr>
 <tr><td>t0</td><td>OT_DOUBLE</td><td>[DEPRECATED] Beginning of the time horizon</td><td>casadi::Integrator</td></tr>
 <tr><td>tf</td><td>OT_DOUBLE</td><td>[DEPRECATED] End of the time horizon</td><td>casadi::Integrator</td></tr>
+<tr><td>transition</td><td>OT_FUNCTION</td><td>Function to be called a zero-crossing events</td><td>casadi::Integrator</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::ProtoFunction</td></tr>
 </table>
@@ -1720,7 +1720,6 @@
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>event_tol</td><td>OT_DOUBLE</td><td>Termination tolerance for the event iteration</td><td>casadi::Integrator</td></tr>
-<tr><td>event_transition</td><td>OT_FUNCTION</td><td>Function to be called a zero-crossing events</td><td>casadi::Integrator</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Integrator</td></tr>
 <tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
@@ -1769,6 +1768,7 @@
 <tr><td>specific_options</td><td>OT_DICT</td><td>Options for specific auto-generated functions, overwriting the defaults from common_options. Nested dictionary.</td><td>casadi::OracleFunction</td></tr>
 <tr><td>t0</td><td>OT_DOUBLE</td><td>[DEPRECATED] Beginning of the time horizon</td><td>casadi::Integrator</td></tr>
 <tr><td>tf</td><td>OT_DOUBLE</td><td>[DEPRECATED] End of the time horizon</td><td>casadi::Integrator</td></tr>
+<tr><td>transition</td><td>OT_FUNCTION</td><td>Function to be called a zero-crossing events</td><td>casadi::Integrator</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::ProtoFunction</td></tr>
 </table>
@@ -2092,7 +2092,6 @@
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>event_tol</td><td>OT_DOUBLE</td><td>Termination tolerance for the event iteration</td><td>casadi::Integrator</td></tr>
-<tr><td>event_transition</td><td>OT_FUNCTION</td><td>Function to be called a zero-crossing events</td><td>casadi::Integrator</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Integrator</td></tr>
 <tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
@@ -2163,6 +2162,7 @@
 <tr><td>stop_at_end</td><td>OT_BOOL</td><td>[DEPRECATED] Stop the integrator at the end of the interval</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>t0</td><td>OT_DOUBLE</td><td>[DEPRECATED] Beginning of the time horizon</td><td>casadi::Integrator</td></tr>
 <tr><td>tf</td><td>OT_DOUBLE</td><td>[DEPRECATED] End of the time horizon</td><td>casadi::Integrator</td></tr>
+<tr><td>transition</td><td>OT_FUNCTION</td><td>Function to be called a zero-crossing events</td><td>casadi::Integrator</td></tr>
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::ProtoFunction</td></tr>
@@ -2234,7 +2234,6 @@
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>event_tol</td><td>OT_DOUBLE</td><td>Termination tolerance for the event iteration</td><td>casadi::Integrator</td></tr>
-<tr><td>event_transition</td><td>OT_FUNCTION</td><td>Function to be called a zero-crossing events</td><td>casadi::Integrator</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Integrator</td></tr>
 <tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
@@ -2305,6 +2304,7 @@
 <tr><td>stop_at_end</td><td>OT_BOOL</td><td>[DEPRECATED] Stop the integrator at the end of the interval</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>t0</td><td>OT_DOUBLE</td><td>[DEPRECATED] Beginning of the time horizon</td><td>casadi::Integrator</td></tr>
 <tr><td>tf</td><td>OT_DOUBLE</td><td>[DEPRECATED] End of the time horizon</td><td>casadi::Integrator</td></tr>
+<tr><td>transition</td><td>OT_FUNCTION</td><td>Function to be called a zero-crossing events</td><td>casadi::Integrator</td></tr>
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::ProtoFunction</td></tr>
@@ -3592,7 +3592,6 @@
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>event_tol</td><td>OT_DOUBLE</td><td>Termination tolerance for the event iteration</td><td>casadi::Integrator</td></tr>
-<tr><td>event_transition</td><td>OT_FUNCTION</td><td>Function to be called a zero-crossing events</td><td>casadi::Integrator</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Integrator</td></tr>
 <tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
@@ -3640,6 +3639,7 @@
 <tr><td>specific_options</td><td>OT_DICT</td><td>Options for specific auto-generated functions, overwriting the defaults from common_options. Nested dictionary.</td><td>casadi::OracleFunction</td></tr>
 <tr><td>t0</td><td>OT_DOUBLE</td><td>[DEPRECATED] Beginning of the time horizon</td><td>casadi::Integrator</td></tr>
 <tr><td>tf</td><td>OT_DOUBLE</td><td>[DEPRECATED] End of the time horizon</td><td>casadi::Integrator</td></tr>
+<tr><td>transition</td><td>OT_FUNCTION</td><td>Function to be called a zero-crossing events</td><td>casadi::Integrator</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::ProtoFunction</td></tr>
 </table>
@@ -3672,7 +3672,6 @@
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>event_tol</td><td>OT_DOUBLE</td><td>Termination tolerance for the event iteration</td><td>casadi::Integrator</td></tr>
-<tr><td>event_transition</td><td>OT_FUNCTION</td><td>Function to be called a zero-crossing events</td><td>casadi::Integrator</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Integrator</td></tr>
 <tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
@@ -3720,6 +3719,7 @@
 <tr><td>specific_options</td><td>OT_DICT</td><td>Options for specific auto-generated functions, overwriting the defaults from common_options. Nested dictionary.</td><td>casadi::OracleFunction</td></tr>
 <tr><td>t0</td><td>OT_DOUBLE</td><td>[DEPRECATED] Beginning of the time horizon</td><td>casadi::Integrator</td></tr>
 <tr><td>tf</td><td>OT_DOUBLE</td><td>[DEPRECATED] End of the time horizon</td><td>casadi::Integrator</td></tr>
+<tr><td>transition</td><td>OT_FUNCTION</td><td>Function to be called a zero-crossing events</td><td>casadi::Integrator</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::ProtoFunction</td></tr>
 </table>
@@ -4547,7 +4547,6 @@
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>event_tol</td><td>OT_DOUBLE</td><td>Termination tolerance for the event iteration</td><td>casadi::Integrator</td></tr>
-<tr><td>event_transition</td><td>OT_FUNCTION</td><td>Function to be called a zero-crossing events</td><td>casadi::Integrator</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Integrator</td></tr>
 <tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
@@ -4617,6 +4616,7 @@
 <tr><td>suppress_algebraic</td><td>OT_BOOL</td><td>Suppress algebraic variables in the error testing</td><td>casadi::IdasInterface</td></tr>
 <tr><td>t0</td><td>OT_DOUBLE</td><td>[DEPRECATED] Beginning of the time horizon</td><td>casadi::Integrator</td></tr>
 <tr><td>tf</td><td>OT_DOUBLE</td><td>[DEPRECATED] End of the time horizon</td><td>casadi::Integrator</td></tr>
+<tr><td>transition</td><td>OT_FUNCTION</td><td>Function to be called a zero-crossing events</td><td>casadi::Integrator</td></tr>
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::ProtoFunction</td></tr>
@@ -4695,7 +4695,6 @@
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>event_tol</td><td>OT_DOUBLE</td><td>Termination tolerance for the event iteration</td><td>casadi::Integrator</td></tr>
-<tr><td>event_transition</td><td>OT_FUNCTION</td><td>Function to be called a zero-crossing events</td><td>casadi::Integrator</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Integrator</td></tr>
 <tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
@@ -4765,6 +4764,7 @@
 <tr><td>suppress_algebraic</td><td>OT_BOOL</td><td>Suppress algebraic variables in the error testing</td><td>casadi::IdasInterface</td></tr>
 <tr><td>t0</td><td>OT_DOUBLE</td><td>[DEPRECATED] Beginning of the time horizon</td><td>casadi::Integrator</td></tr>
 <tr><td>tf</td><td>OT_DOUBLE</td><td>[DEPRECATED] End of the time horizon</td><td>casadi::Integrator</td></tr>
+<tr><td>transition</td><td>OT_FUNCTION</td><td>Function to be called a zero-crossing events</td><td>casadi::Integrator</td></tr>
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::ProtoFunction</td></tr>
@@ -4798,7 +4798,6 @@
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>event_tol</td><td>OT_DOUBLE</td><td>Termination tolerance for the event iteration</td><td>casadi::Integrator</td></tr>
-<tr><td>event_transition</td><td>OT_FUNCTION</td><td>Function to be called a zero-crossing events</td><td>casadi::Integrator</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Integrator</td></tr>
 <tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
@@ -4846,6 +4845,7 @@
 <tr><td>specific_options</td><td>OT_DICT</td><td>Options for specific auto-generated functions, overwriting the defaults from common_options. Nested dictionary.</td><td>casadi::OracleFunction</td></tr>
 <tr><td>t0</td><td>OT_DOUBLE</td><td>[DEPRECATED] Beginning of the time horizon</td><td>casadi::Integrator</td></tr>
 <tr><td>tf</td><td>OT_DOUBLE</td><td>[DEPRECATED] End of the time horizon</td><td>casadi::Integrator</td></tr>
+<tr><td>transition</td><td>OT_FUNCTION</td><td>Function to be called a zero-crossing events</td><td>casadi::Integrator</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::ProtoFunction</td></tr>
 </table>
@@ -4878,7 +4878,6 @@
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>event_tol</td><td>OT_DOUBLE</td><td>Termination tolerance for the event iteration</td><td>casadi::Integrator</td></tr>
-<tr><td>event_transition</td><td>OT_FUNCTION</td><td>Function to be called a zero-crossing events</td><td>casadi::Integrator</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Integrator</td></tr>
 <tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
@@ -4926,6 +4925,7 @@
 <tr><td>specific_options</td><td>OT_DICT</td><td>Options for specific auto-generated functions, overwriting the defaults from common_options. Nested dictionary.</td><td>casadi::OracleFunction</td></tr>
 <tr><td>t0</td><td>OT_DOUBLE</td><td>[DEPRECATED] Beginning of the time horizon</td><td>casadi::Integrator</td></tr>
 <tr><td>tf</td><td>OT_DOUBLE</td><td>[DEPRECATED] End of the time horizon</td><td>casadi::Integrator</td></tr>
+<tr><td>transition</td><td>OT_FUNCTION</td><td>Function to be called a zero-crossing events</td><td>casadi::Integrator</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::ProtoFunction</td></tr>
 </table>
@@ -5130,7 +5130,6 @@
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>event_tol</td><td>OT_DOUBLE</td><td>Termination tolerance for the event iteration</td><td>casadi::Integrator</td></tr>
-<tr><td>event_transition</td><td>OT_FUNCTION</td><td>Function to be called a zero-crossing events</td><td>casadi::Integrator</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Integrator</td></tr>
 <tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
@@ -5178,6 +5177,7 @@
 <tr><td>specific_options</td><td>OT_DICT</td><td>Options for specific auto-generated functions, overwriting the defaults from common_options. Nested dictionary.</td><td>casadi::OracleFunction</td></tr>
 <tr><td>t0</td><td>OT_DOUBLE</td><td>[DEPRECATED] Beginning of the time horizon</td><td>casadi::Integrator</td></tr>
 <tr><td>tf</td><td>OT_DOUBLE</td><td>[DEPRECATED] End of the time horizon</td><td>casadi::Integrator</td></tr>
+<tr><td>transition</td><td>OT_FUNCTION</td><td>Function to be called a zero-crossing events</td><td>casadi::Integrator</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::ProtoFunction</td></tr>
 </table>
@@ -5210,7 +5210,6 @@
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>event_tol</td><td>OT_DOUBLE</td><td>Termination tolerance for the event iteration</td><td>casadi::Integrator</td></tr>
-<tr><td>event_transition</td><td>OT_FUNCTION</td><td>Function to be called a zero-crossing events</td><td>casadi::Integrator</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Integrator</td></tr>
 <tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
@@ -5258,6 +5257,7 @@
 <tr><td>specific_options</td><td>OT_DICT</td><td>Options for specific auto-generated functions, overwriting the defaults from common_options. Nested dictionary.</td><td>casadi::OracleFunction</td></tr>
 <tr><td>t0</td><td>OT_DOUBLE</td><td>[DEPRECATED] Beginning of the time horizon</td><td>casadi::Integrator</td></tr>
 <tr><td>tf</td><td>OT_DOUBLE</td><td>[DEPRECATED] End of the time horizon</td><td>casadi::Integrator</td></tr>
+<tr><td>transition</td><td>OT_FUNCTION</td><td>Function to be called a zero-crossing events</td><td>casadi::Integrator</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::ProtoFunction</td></tr>
 </table>
@@ -9902,7 +9902,6 @@
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>event_tol</td><td>OT_DOUBLE</td><td>Termination tolerance for the event iteration</td><td>casadi::Integrator</td></tr>
-<tr><td>event_transition</td><td>OT_FUNCTION</td><td>Function to be called a zero-crossing events</td><td>casadi::Integrator</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Integrator</td></tr>
 <tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
@@ -9969,6 +9968,7 @@
 <tr><td>stop_at_end</td><td>OT_BOOL</td><td>[DEPRECATED] Stop the integrator at the end of the interval</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>t0</td><td>OT_DOUBLE</td><td>[DEPRECATED] Beginning of the time horizon</td><td>casadi::Integrator</td></tr>
 <tr><td>tf</td><td>OT_DOUBLE</td><td>[DEPRECATED] End of the time horizon</td><td>casadi::Integrator</td></tr>
+<tr><td>transition</td><td>OT_FUNCTION</td><td>Function to be called a zero-crossing events</td><td>casadi::Integrator</td></tr>
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::ProtoFunction</td></tr>
@@ -10004,7 +10004,6 @@
 <tr><td>enable_reverse</td><td>OT_BOOL</td><td>Enable derivative calculation using generated functions for transposed Jacobian-times-vector products - typically using reverse mode AD - if available. [default: true]</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>error_on_fail</td><td>OT_BOOL</td><td>Throw exceptions when function evaluation fails (default true).</td><td>casadi::ProtoFunction</td></tr>
 <tr><td>event_tol</td><td>OT_DOUBLE</td><td>Termination tolerance for the event iteration</td><td>casadi::Integrator</td></tr>
-<tr><td>event_transition</td><td>OT_FUNCTION</td><td>Function to be called a zero-crossing events</td><td>casadi::Integrator</td></tr>
 <tr><td>expand</td><td>OT_BOOL</td><td>Replace MX with SX expressions in problem formulation [false]</td><td>casadi::Integrator</td></tr>
 <tr><td>external_transform</td><td>OT_VECTORVECTOR</td><td>List of external_transform instruction arguments. Default: empty</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>fd_method</td><td>OT_STRING</td><td>Method for finite differencing [default 'central']</td><td>casadi::FunctionInternal</td></tr>
@@ -10071,6 +10070,7 @@
 <tr><td>stop_at_end</td><td>OT_BOOL</td><td>[DEPRECATED] Stop the integrator at the end of the interval</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>t0</td><td>OT_DOUBLE</td><td>[DEPRECATED] Beginning of the time horizon</td><td>casadi::Integrator</td></tr>
 <tr><td>tf</td><td>OT_DOUBLE</td><td>[DEPRECATED] End of the time horizon</td><td>casadi::Integrator</td></tr>
+<tr><td>transition</td><td>OT_FUNCTION</td><td>Function to be called a zero-crossing events</td><td>casadi::Integrator</td></tr>
 <tr><td>use_preconditioner</td><td>OT_BOOL</td><td>Precondition the iterative solver [default: true]</td><td>casadi::SundialsInterface</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>casadi::FunctionInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOL</td><td>Verbose evaluation -- for debugging</td><td>casadi::ProtoFunction</td></tr>

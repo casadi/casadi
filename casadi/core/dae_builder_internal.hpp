@@ -455,10 +455,14 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   /// Get indices of variable, given multiple expressions
   std::vector<size_t> find(const std::vector<MX>& v) const;
 
-  /** \brief Get variable name by index */
+  /** \brief Get variable name by index
+
+      \identifier{2bv} */
   const std::string& name(size_t ind) const;
 
-  /** \brief Get variable names by indices */
+  /** \brief Get variable names by indices
+
+      \identifier{2bw} */
   std::vector<std::string> name(const std::vector<size_t>& ind) const;
 
   /// Get the (cached) oracle, SX or MX
@@ -537,7 +541,9 @@ protected:
   // Event conditions and transition equations
   std::vector<MX> when_cond_, when_lhs_, when_rhs_;
 
- /** \brief Is there a time variable? */
+ /** \brief Is there a time variable?
+
+     \identifier{2bx} */
   bool has_t() const;
 
   // Time variable

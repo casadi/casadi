@@ -508,13 +508,13 @@
 %exception  casadi::Contraction(const bvec_t &a, const bvec_t &b, bvec_t &r) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::DaeBuilder::add_c(const std::string &name, const MX &new_cdef) {
+%exception  casadi::DaeBuilder::add(const std::string &name, const Dict &opts=Dict()) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::DaeBuilder::add_d(const std::string &name, const MX &new_ddef) {
+%exception  casadi::DaeBuilder::add(const std::string &name, const std::string &causality, const Dict &opts=Dict()) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::DaeBuilder::add_e(const std::string &name, const MX &new_edef) {
+%exception  casadi::DaeBuilder::add(const std::string &name, const std::string &causality, const std::string &variability, const Dict &opts=Dict()) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::DaeBuilder::add_fun(const Function &f) {
@@ -529,55 +529,22 @@
 %exception  casadi::DaeBuilder::add_lc(const std::string &name, const std::vector< std::string > &f_out) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::DaeBuilder::add_p(const std::string &name=std::string()) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::DaeBuilder::add_q(const std::string &name=std::string()) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::DaeBuilder::add_t(const std::string &name="t") {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::DaeBuilder::add_u(const std::string &name=std::string()) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::DaeBuilder::add_variable(const MX &new_v) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::DaeBuilder::add_variable(const std::string &name, casadi_int n=1) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::DaeBuilder::add_variable(const std::string &name, const Sparsity &sp) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::DaeBuilder::add_variable_new(const MX &new_v) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::DaeBuilder::add_variable_new(const std::string &name, casadi_int n=1) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::DaeBuilder::add_variable_new(const std::string &name, const Sparsity &sp) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::DaeBuilder::add_w(const std::string &name, const MX &new_wdef) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::DaeBuilder::add_when(const MX &cond, const MX &lhs, const MX &rhs) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::DaeBuilder::add_x(const std::string &name=std::string()) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::DaeBuilder::add_y(const std::string &name, const MX &new_ydef) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::DaeBuilder::add_z(const std::string &name=std::string()) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::DaeBuilder::alg() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::DaeBuilder::all() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::DaeBuilder::all(const std::string &cat) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::DaeBuilder::all_variables() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::DaeBuilder::assign(const std::string &name, const MX &val) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::DaeBuilder::attribute(const std::string &a, const std::string &name) const {
@@ -592,22 +559,22 @@
 %exception  casadi::DaeBuilder::c() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::DaeBuilder::category(const std::string &name) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::DaeBuilder::causality(const std::string &name) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::DaeBuilder::cdef() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::DaeBuilder::clear_all(const std::string &v) {
+%exception  casadi::DaeBuilder::create() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::DaeBuilder::clear_when() {
+%exception  casadi::DaeBuilder::create(const std::string &fname, const Dict &opts=Dict()) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::DaeBuilder::create(const std::string &fname, const std::vector< std::string > &name_in, const std::vector< std::string > &name_out, bool sx, bool lifted_calls=false) const {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::DaeBuilder::create(const std::string &name, const Dict &opts=Dict()) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::DaeBuilder::create(const std::string &name, const std::vector< std::string > &name_in, const std::vector< std::string > &name_out, const Dict &opts=Dict()) const {
@@ -620,6 +587,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::DaeBuilder::dependent_fun(const std::string &fname, const std::vector< std::string > &s_in, const std::vector< std::string > &s_out) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::DaeBuilder::der(const MX &v) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::DaeBuilder::der(const std::string &name) const {
@@ -652,19 +622,10 @@
 %exception  casadi::DaeBuilder::eliminate_w() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::DaeBuilder::event_transition(const std::string &fname) const {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::DaeBuilder::event_transition(const std::string &fname, casadi_int index) const {
+%exception  casadi::DaeBuilder::eq(const MX &lhs, const MX &rhs, const Dict &opts=Dict()) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::DaeBuilder::export_fmu(const Dict &opts=Dict()) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::DaeBuilder::find(const std::string &name) const {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::DaeBuilder::find(const std::vector< std::string > &name) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::DaeBuilder::fun() const {
@@ -682,13 +643,16 @@
 %exception  casadi::DaeBuilder::get(const std::vector< std::string > &name) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::DaeBuilder::has(const std::string &name) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::DaeBuilder::has_beq(const std::string &name) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::DaeBuilder::has_fun(const std::string &name) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::DaeBuilder::has_t() const {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::DaeBuilder::has_variable(const std::string &name) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::DaeBuilder::init_lhs() const {
@@ -727,12 +691,6 @@
 %exception  casadi::DaeBuilder::name() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::DaeBuilder::name(const std::vector< size_t > &ind) const {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::DaeBuilder::name(size_t ind) const {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::DaeBuilder::nc() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -740,9 +698,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::DaeBuilder::ne() const {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::DaeBuilder::new_variable(const std::string &name, casadi_int numel=1) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::DaeBuilder::nominal(const std::string &name) const {
@@ -788,6 +743,15 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::DaeBuilder::parse_fmi(const std::string &filename) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::DaeBuilder::pre(const MX &v) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::DaeBuilder::pre(const std::string &name) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::DaeBuilder::pre(const std::vector< std::string > &name) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::DaeBuilder::provides_directional_derivative() const {
@@ -838,6 +802,12 @@
 %exception  casadi::DaeBuilder::register_z(const std::string &name) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::DaeBuilder::reinit(const std::string &name, const MX &val) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::DaeBuilder::reorder(const std::string &cat, const std::vector< std::string > &v) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::DaeBuilder::reset() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -856,12 +826,6 @@
 %exception  casadi::DaeBuilder::set(const std::vector< std::string > &name, const std::vector< std::string > &val) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::DaeBuilder::set_alg(const std::string &name, const MX &alg_rhs) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::DaeBuilder::set_all(const std::string &v, const std::vector< std::string > &name) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::DaeBuilder::set_attribute(const std::string &a, const std::string &name, double val) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
@@ -869,6 +833,9 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::DaeBuilder::set_beq(const std::string &name, const MX &val) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::DaeBuilder::set_category(const std::string &name, const std::string &val) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::DaeBuilder::set_causality(const std::string &name, const std::string &val) {
@@ -902,9 +869,6 @@
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::DaeBuilder::set_nominal(const std::vector< std::string > &name, const std::vector< double > &val) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::DaeBuilder::set_ode(const std::string &name, const MX &ode_rhs) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::DaeBuilder::set_start(const std::string &name, double val) {
@@ -961,13 +925,25 @@
 %exception  casadi::DaeBuilder::stop_time() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::DaeBuilder::t() const {
+%exception  casadi::DaeBuilder::t_new() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::DaeBuilder::tear() {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::DaeBuilder::time() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::DaeBuilder::tolerance() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::DaeBuilder::transition() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::DaeBuilder::transition(const std::string &fname) const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::DaeBuilder::transition(const std::string &fname, casadi_int index) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::DaeBuilder::type(const std::string &name, casadi_int fmi_version=3) const {
@@ -988,31 +964,16 @@
 %exception  casadi::DaeBuilder::var(const std::string &name) const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
-%exception  casadi::DaeBuilder::var(const std::vector< size_t > &ind) const {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::DaeBuilder::var(size_t ind) const {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
 %exception  casadi::DaeBuilder::variability(const std::string &name) const {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::DaeBuilder::variable(const std::string &name) const {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::DaeBuilder::variable(const std::string &name) {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::DaeBuilder::variable(size_t ind) const {
- CATCH_OR_NOT(INTERNAL_MSG() $action) 
-}
-%exception  casadi::DaeBuilder::variable(size_t ind) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::DaeBuilder::w() const {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::DaeBuilder::wdef() const {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
+%exception  casadi::DaeBuilder::when(const MX &cond, const std::vector< std::string > &eqs, const Dict &opts=Dict()) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
 %exception  casadi::DaeBuilder::when_cond() const {

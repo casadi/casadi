@@ -87,10 +87,14 @@ class CASADI_EXPORT DaeBuilder
 
   /** @name Variables and equations */
   ///@{
-  /** \brief Expression for independent variable (usually time) */
+  /** \brief Expression for independent variable (usually time)
+
+      \identifier{2by} */
   const MX& time() const;
 
-  /** \brief Independent variable (usually time) */
+  /** \brief Independent variable (usually time)
+
+      \identifier{2bz} */
   std::vector<std::string> t_new() const {return all("t");}
 
   /** \brief Differential states
@@ -511,10 +515,13 @@ class CASADI_EXPORT DaeBuilder
 
     \param name    Name assigned to the resulting function object
     \param opts    Optional settings
-    */
+
+      \identifier{2c0} */
   Function create(const std::string& fname, const Dict& opts=Dict()) const;
 
-  /** \brief Create a function with standard integrator DAE signature, default naming */
+  /** \brief Create a function with standard integrator DAE signature, default naming
+
+      \identifier{2c1} */
   Function create() const {return create(name() + "_dae");}
 
   /// Construct a function for evaluating dependent parameters
@@ -593,7 +600,8 @@ class CASADI_EXPORT DaeBuilder
     and 'output', respectively
 
     No other changes are permitted.
-  */
+
+      \identifier{2c2} */
   void set_causality(const std::string& name, const std::string& val);
 
   /// Get the variability
@@ -606,7 +614,9 @@ class CASADI_EXPORT DaeBuilder
   (variability 'fixed', causality 'parameter'), update variability in
   order to change the category. Causality is updated accordingly.
 
-  Other changes are not permitted */
+  Other changes are not permitted
+
+      \identifier{2c3} */
   void set_variability(const std::string& name, const std::string& val);
 
   /// Get the variable category
@@ -621,7 +631,9 @@ class CASADI_EXPORT DaeBuilder
     * Outputs can be removed by giving it no category (empty string), or reintroduced by
     setting the category to 'y'.
 
-    Other changes are not permitted. Causality and variability is updated accordingly. */
+    Other changes are not permitted. Causality and variability is updated accordingly.
+
+      \identifier{2c4} */
   void set_category(const std::string& name, const std::string& val);
 
   ///@{
