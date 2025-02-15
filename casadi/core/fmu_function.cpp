@@ -336,10 +336,6 @@ void FmuFunction::init(const Dict& opts) {
     valfile << "Output Input Value Nominal Min Max AD FD Step Offset Stencil" << std::endl;
   }
 
-  // Forward derivatives only supported with analytic derivatives
-  if (has_fwd_ && !uses_directional_derivatives_)
-    casadi_error("Analytic derivatives needed for forward directional derivatives");
-
   // Quick return if no Jacobian calculation
   if (!has_jac_ && !has_adj_ && !has_hess_) return;
 
