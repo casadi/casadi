@@ -1225,16 +1225,6 @@ const std::vector<size_t>& DaeBuilderInternal::indices(Category cat) const {
   return const_cast<DaeBuilderInternal*>(this)->indices(cat);
 }
 
-void DaeBuilderInternal::clear_all(const std::string& v) {
-  clear_cache_ = true;  // Clear cache after this
-  indices(to_enum<Category>(v)).clear();
-}
-
-void DaeBuilderInternal::set_all(const std::string& v, const std::vector<std::string>& name) {
-  clear_cache_ = true;  // Clear cache after this
-  indices(to_enum<Category>(v)) = find(name);
-}
-
 void DaeBuilderInternal::reorder(Category cat, const std::vector<size_t>& v) {
   // Get the current indices
   std::vector<size_t>& ind = indices(cat);

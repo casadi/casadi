@@ -472,11 +472,10 @@ void DaeBuilder::register_e(const std::string& name) {
   (*this)->indices(Category::E).push_back(find(name));
 }
 
-#endif // WITH_DEPRECATED_FEATURES
-
 void DaeBuilder::clear_all(const std::string& v) {
   try {
-    (*this)->clear_all(v);
+    (*this)->clear_cache_ = true;  // Clear cache after this
+    (*this)->indices(to_enum<Category>(v)).clear();
   } catch (std::exception& e) {
     THROW_ERROR("clear_all", e.what());
   }
@@ -484,11 +483,14 @@ void DaeBuilder::clear_all(const std::string& v) {
 
 void DaeBuilder::set_all(const std::string& v, const std::vector<std::string>& name) {
   try {
-    (*this)->set_all(v, name);
+    (*this)->clear_cache_ = true;  // Clear cache after this
+    (*this)->indices(to_enum<Category>(v)) = (*this)->find(name);
   } catch (std::exception& e) {
     THROW_ERROR("set_all", e.what());
   }
 }
+
+#endif // WITH_DEPRECATED_FEATURES
 
 void DaeBuilder::reorder(const std::string& cat, const std::vector<std::string>& v) {
   try {

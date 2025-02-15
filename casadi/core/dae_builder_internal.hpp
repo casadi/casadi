@@ -248,12 +248,6 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   /// Number of indices with a particular category
   size_t size(Category cat) const {return indices(cat).size();}
 
-  /// Clear all variables of a class
-  void clear_all(const std::string& v);
-
-  /// Set all variables of a type
-  void set_all(const std::string& v, const std::vector<std::string>& name);
-
   /// Reorder variables in a category
   void reorder(Category cat, const std::vector<size_t>& v);
 
