@@ -219,6 +219,95 @@ FMI3_Export fmi3Instance fmi3InstantiateModelExchange(
   return m;
 }
 
+FMI3_Export fmi3Instance fmi3InstantiateCoSimulation(fmi3String instanceName,
+    fmi3String instantiationToken,
+    fmi3String resourcePath,
+    fmi3Boolean visible,
+    fmi3Boolean loggingOn,
+    fmi3Boolean eventModeUsed,
+    fmi3Boolean earlyReturnAllowed,
+    const fmi3ValueReference requiredIntermediateVariables[],
+    size_t nRequiredIntermediateVariables,
+    fmi3InstanceEnvironment instanceEnvironment,
+    fmi3LogMessageCallback logMessage,
+    fmi3IntermediateUpdateCallback intermediateUpdate) {
+  // Not implemented
+  return 0;
+}
+
+FMI3_Export fmi3Instance fmi3InstantiateScheduledExecution(fmi3String instanceName,
+    fmi3String instantiationToken,
+    fmi3String resourcePath,
+    fmi3Boolean visible,
+    fmi3Boolean loggingOn,
+    fmi3InstanceEnvironment instanceEnvironment,
+    fmi3LogMessageCallback logMessage,
+    fmi3ClockUpdateCallback clockUpdate,
+    fmi3LockPreemptionCallback lockPreemption,
+    fmi3UnlockPreemptionCallback unlockPreemption) {
+  // Not implemented
+  return 0;
+}
+
+FMI3_Export fmi3Status fmi3GetNumberOfVariableDependencies(fmi3Instance instance,
+    fmi3ValueReference valueReference,
+    size_t* nDependencies) {
+  // Not implemented
+  return fmi3Fatal;
+}
+
+FMI3_Export fmi3Status fmi3GetVariableDependencies(fmi3Instance instance,
+    fmi3ValueReference dependent,
+    size_t elementIndicesOfDependent[],
+    fmi3ValueReference independents[],
+    size_t elementIndicesOfIndependents[],
+    fmi3DependencyKind dependencyKinds[],
+    size_t nDependencies) {
+  // Not implemented
+  return fmi3Fatal;
+}
+
+FMI3_Export fmi3Status fmi3GetFMUState(fmi3Instance instance,
+    fmi3FMUState* FMUState) {
+  // Not implemented
+  return fmi3Fatal;
+}
+
+FMI3_Export fmi3Status fmi3SetFMUState(fmi3Instance instance,
+    fmi3FMUState  FMUState) {
+  // Not implemented
+  return fmi3Fatal;
+}
+
+FMI3_Export fmi3Status fmi3FreeFMUState(fmi3Instance instance,
+    fmi3FMUState* FMUState) {
+  // Not implemented
+  return fmi3Fatal;
+}
+
+FMI3_Export fmi3Status fmi3SerializedFMUStateSize(fmi3Instance instance,
+    fmi3FMUState FMUState,
+    size_t* size) {
+  // Not implemented
+  return fmi3Fatal;
+}
+
+FMI3_Export fmi3Status fmi3SerializeFMUState(fmi3Instance instance,
+    fmi3FMUState FMUState,
+    fmi3Byte serializedState[],
+    size_t size) {
+  // Not implemented
+  return fmi3Fatal;
+
+                                                  }
+FMI3_Export fmi3Status fmi3DeserializeFMUState(fmi3Instance instance,
+    const fmi3Byte serializedState[],
+    size_t size,
+    fmi3FMUState* FMUState) {
+  // Not implemented
+  return fmi3Fatal;
+}
+
 FMI3_Export void fmi3FreeInstance(fmi3Instance instance) {
   if (instance) {
     // Free memory structure
@@ -860,4 +949,90 @@ FMI3_Export fmi3Status fmi3UpdateDiscreteStates(fmi3Instance instance,
   *valuesOfContinuousStatesChanged = fmi3False;
   *nextEventTimeDefined = fmi3False;
   return fmi3OK;
+}
+
+FMI3_Export fmi3Status fmi3EnterConfigurationMode(fmi3Instance instance) {
+  // Not implemented
+  return fmi3Fatal;
+}
+
+FMI3_Export fmi3Status fmi3ExitConfigurationMode(fmi3Instance instance) {
+  // Not implemented
+  return fmi3Fatal;
+}
+
+FMI3_Export fmi3Status fmi3GetIntervalFraction(fmi3Instance instance,
+    const fmi3ValueReference valueReferences[],
+    size_t nValueReferences,
+    fmi3UInt64 counters[],
+    fmi3UInt64 resolutions[],
+    fmi3IntervalQualifier qualifiers[]) {
+  // Not implemented
+  return fmi3Fatal;
+}
+
+FMI3_Export fmi3Status fmi3GetShiftFraction(fmi3Instance instance,
+    const fmi3ValueReference valueReferences[],
+    size_t nValueReferences,
+    fmi3UInt64 counters[],
+    fmi3UInt64 resolutions[]) {
+  // Not implemented
+  return fmi3Fatal;
+}
+
+FMI3_Export fmi3Status fmi3SetIntervalFraction(fmi3Instance instance,
+    const fmi3ValueReference valueReferences[],
+    size_t nValueReferences,
+    const fmi3UInt64 counters[],
+    const fmi3UInt64 resolutions[]) {
+  // Not implemented
+  return fmi3Fatal;
+}
+
+FMI3_Export fmi3Status fmi3SetShiftFraction(fmi3Instance instance,
+    const fmi3ValueReference valueReferences[],
+    size_t nValueReferences,
+    const fmi3UInt64 counters[],
+    const fmi3UInt64 resolutions[]) {
+  // Not implemented
+  return fmi3Fatal;
+}
+
+FMI3_Export fmi3Status fmi3EvaluateDiscreteStates(fmi3Instance instance) {
+  // Not implemented
+  return fmi3Fatal;
+}
+
+FMI3_Export fmi3Status fmi3EnterStepMode(fmi3Instance instance) {
+  // Not implemented
+  return fmi3Fatal;
+}
+
+FMI3_Export fmi3Status fmi3GetOutputDerivatives(fmi3Instance instance,
+    const fmi3ValueReference valueReferences[],
+    size_t nValueReferences,
+    const fmi3Int32 orders[],
+    fmi3Float64 values[],
+    size_t nValues) {
+  // Not implemented
+  return fmi3Fatal;
+}
+
+FMI3_Export fmi3Status fmi3DoStep(fmi3Instance instance,
+    fmi3Float64 currentCommunicationPoint,
+    fmi3Float64 communicationStepSize,
+    fmi3Boolean noSetFMUStatePriorToCurrentPoint,
+    fmi3Boolean* eventHandlingNeeded,
+    fmi3Boolean* terminateSimulation,
+    fmi3Boolean* earlyReturn,
+    fmi3Float64* lastSuccessfulTime) {
+  // Not implemented
+  return fmi3Fatal;
+}
+
+FMI3_Export fmi3Status fmi3ActivateModelPartition(fmi3Instance instance,
+    fmi3ValueReference clockReference,
+    fmi3Float64 activationTime) {
+  // Not implemented
+  return fmi3Fatal;
 }

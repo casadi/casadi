@@ -311,6 +311,7 @@ Variable::Variable(casadi_int index, const std::string& name,
   this->causality = Causality::LOCAL;
   this->variability = Variability::CONTINUOUS;
   this->category = Category::NUMEL;
+  this->initial = Initial::NUMEL;
   this->min = -inf;
   this->max = inf,
   this->nominal = 1.0;
