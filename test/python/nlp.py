@@ -2105,6 +2105,26 @@ class NLPtests(casadiTestCase):
     
     self.checkfunction_light(solver,solver_ref,inputs=solver.convert_in(dict(x0=x0,lbg=lbg,ubg=ubg)))
   
+  @requires_nlpsol("ipopt")
+  def test_issue_3407(self):
+    opti = Opti()
+    x = opti.variable()
+
+    opti.minimize(x**2)
+
+    f = Function('f',[x],[3*x,x.attachAssert(x>1)**2],{"never_inline":True})
+
+    y,z = f(x)
+
+    opti.subject_to(y<=10)
+    opti.subject_to(z==3)
+
+    opti.set_initial(x, 3)
+
+    opti.solver("ipopt",{"detect_simple_bounds":True})
+
+    sol = opti.solve()
+
   @memory_heavy()
   @requires_nlpsol("ipopt")
   def test_simple_bounds_detect2(self):

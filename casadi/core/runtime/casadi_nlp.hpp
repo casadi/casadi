@@ -161,7 +161,8 @@ int casadi_detect_bounds_before(casadi_nlpsol_data<T1>* d_nlp) {
   const casadi_nlpsol_detect_bounds_prob<T1>* p_bounds = &p_nlp->detect_bounds;
 
   casadi_int nx = p_nlp->nx;
-  d_bounds->arg[0] = d_nlp->p;
+  d_bounds->arg[0] = d_nlp->z;
+  d_bounds->arg[1] = d_nlp->p;
   d_bounds->res[0] = d_bounds->a;
   d_bounds->res[1] = d_bounds->b;
   p_bounds->callback(d_bounds->arg, d_bounds->res,
@@ -203,6 +204,8 @@ int casadi_detect_bounds_before(casadi_nlpsol_data<T1>* d_nlp) {
         ub = tmp;
       }
       casadi_int j = p_bounds->target_x[k];
+      lb += d_nlp->z[j];
+      ub += d_nlp->z[j];
 
       if (lb==d_nlp->lbz[j]) {
         if (d_nlp->lam_g0) d_bounds->lam_xl[j] += (d_nlp->lam_g0[i]<0)*d_nlp->lam_g0[i];
@@ -253,7 +256,10 @@ int casadi_detect_bounds_after(casadi_nlpsol_data<T1>* d_nlp) {
   for (casadi_int i=0;i<p_bounds->ng;++i) {
     if (p_bounds->is_simple[i]) {
       casadi_int j = p_bounds->target_x[k];
-      if (d_nlp->g) d_nlp->g[i] = d_bounds->a[k]*d_nlp->z[j]+d_bounds->b[k];
+      if (d_nlp->g) {
+        d_nlp->g[i] = d_bounds->a[k]*d_nlp->z[j]-d_bounds->b[k];
+        if (d_nlp->x0) d_nlp->g[i] += d_nlp->x0[j];
+      }
       k++;
     } else {
       if (d_nlp->g) d_nlp->g[i] = d_nlp->z[nx+k_normal];

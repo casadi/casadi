@@ -85,10 +85,8 @@ namespace casadi {
       X g_bounds = g(sgi);
 
       // Detect  f2(p)x+f1(p)==0
-      Function gf = Function("gf", std::vector<X>{p},
-        substitute(std::vector<X>{jtimes(g_bounds, x, X::ones(nx, 1)), g_bounds},
-          std::vector<X>{x},
-          std::vector<X>{X(0)}));
+      Function gf = Function("gf", std::vector<X>{x, p},
+        std::vector<X>{jtimes(g_bounds, x, X::ones(nx, 1)), g_bounds});
       casadi_assert_dev(!gf.has_free());
 
       std::vector<casadi_int> target_x;
@@ -1303,7 +1301,7 @@ namespace casadi {
   void Nlpsol::serialize_body(SerializingStream &s) const {
     OracleFunction::serialize_body(s);
 
-    s.version("Nlpsol", 4);
+    s.version("Nlpsol", 5);
     s.pack("Nlpsol::nx", nx_);
     s.pack("Nlpsol::ng", ng_);
     s.pack("Nlpsol::np", np_);
@@ -1340,7 +1338,7 @@ namespace casadi {
   }
 
   Nlpsol::Nlpsol(DeserializingStream & s) : OracleFunction(s) {
-    int version = s.version("Nlpsol", 1, 4);
+    int version = s.version("Nlpsol", 1, 5);
     s.unpack("Nlpsol::nx", nx_);
     s.unpack("Nlpsol::ng", ng_);
     s.unpack("Nlpsol::np", np_);
@@ -1375,6 +1373,9 @@ namespace casadi {
     if (version>=3) {
       s.unpack("Nlpsol::detect_simple_bounds_is_simple", detect_simple_bounds_is_simple_);
       s.unpack("Nlpsol::detect_simple_bounds_parts", detect_simple_bounds_parts_);
+      if (version==4) {
+        casadi_error("Saved detect_simple_bounds_parts changed signature");
+      }
       s.unpack("Nlpsol::detect_simple_bounds_target_x", detect_simple_bounds_target_x_);
     }
     for (casadi_int i=0;i<detect_simple_bounds_is_simple_.size();++i) {
