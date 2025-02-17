@@ -153,17 +153,23 @@ struct CASADI_EXPORT Variable {
   /// Initial equation
   MX ieq;
 
-  /// Get by attribute name
-  double attribute(Attribute a) const;
+  /// Total number of elements for a particular attribute
+  casadi_int size(Attribute a) const;
 
+  ///@{
+  /// Get by attribute name
+  void get_attr(Attribute a, double* val) const;
+  void get_attr(Attribute a, std::vector<double>* val) const;
+  void get_attr(Attribute a, std::string* val) const;
+  ///@}
+
+  ///@{
   /// Set by attribute name
   void set_attribute(Attribute a, double val);
-
-  /// Get by attribute name (string-valued)
-  std::string string_attribute(Attribute a) const;
-
-  /// Set by attribute name (string-valued)
   void set_string_attribute(Attribute a, const std::string& val);
+  // void set_attr(Attribute a, double val);
+  // void set_attr(Attribute a, const std::string& val);
+  ///@}
 
   // Default initial attribute, per specification
   static Initial default_initial(Causality causality, Variability variability);
@@ -753,6 +759,8 @@ protected:
     const std::vector<std::string>& val);
   ///@}
 
+  /// Total number of elements for a particular attribute
+  casadi_int size(Attribute a, const std::vector<std::string>& name) const;
 
   /// Helper class, represents inputs and outputs for a function call node
   struct CallIO {

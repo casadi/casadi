@@ -201,27 +201,74 @@ std::string to_string(Category v) {
   return "";
 }
 
+casadi_int Variable::size(Attribute a) const {
+  switch (a) {
+    case Attribute::START:  // Fall-through
+    case Attribute::VALUE:
+      // Vector-valued attribute
+      return numel;
+    default:
+      break;
+  }
+  return 1;
+}
 
-double Variable::attribute(Attribute a) const {
+void Variable::get_attr(Attribute a, double* val) const {
+  // Only if scalar
+  casadi_assert(numel == 1, "Variable " + name + " is not scalar");
+  // Handle attributes
   switch (a) {
     case Attribute::MIN:
-      return min;
+      if (val) *val = min;
+      return;
     case Attribute::MAX:
-      return max;
+      if (val) *val = max;
+      return;
     case Attribute::NOMINAL:
-      return nominal;
+      if (val) *val = nominal;
+      return;
     case Attribute::START:
-      casadi_assert(numel == 1, "Not a scalar variable");
-      return start.front();
+      if (val) *val = start.front();
+      return;
     case Attribute::VALUE:
-      casadi_assert(numel == 1, "Not a scalar variable");
-      return value.front();
+      if (val) *val = value.front();
+      return;
     default:
       break;
   }
   casadi_error("Cannot handle: " + to_string(a));
-  return 0;
 }
+
+void Variable::get_attr(Attribute a, std::vector<double>* val) const {
+  // Resize return
+  if (val) val->resize(numel);
+  // Quick return if scalar
+  if (numel == 1) return get_attr(a, val ? &val->front() : nullptr);
+  // Handle vector types
+  switch (a) {
+    case Attribute::START:
+      if (val) std::copy(start.begin(), start.end(), val->begin());
+      return;
+    case Attribute::VALUE:
+      if (val) std::copy(start.begin(), start.end(), val->begin());
+      return;
+    default:
+      break;
+  }
+  casadi_error("Cannot handle: " + to_string(a));
+}
+
+void Variable::get_attr(Attribute a, std::string* val) const {
+  switch (a) {
+    case Attribute::STRINGVALUE:
+      if (val) *val = stringvalue;
+      return;
+    default:
+      break;
+  }
+  casadi_error("Cannot handle: " + to_string(a));
+}
+
 
 void Variable::set_attribute(Attribute a, double val) {
   switch (a) {
@@ -244,17 +291,6 @@ void Variable::set_attribute(Attribute a, double val) {
       break;
   }
   casadi_error("Cannot handle: " + to_string(a));
-}
-
-std::string Variable::string_attribute(Attribute a) const {
-  switch (a) {
-    case Attribute::STRINGVALUE:
-      return stringvalue;
-    default:
-      break;
-  }
-  casadi_error("Cannot handle: " + to_string(a));
-  return std::string();
 }
 
 void Variable::set_string_attribute(Attribute a, const std::string& val) {
@@ -3815,14 +3851,22 @@ void DaeBuilderInternal::reset() {
 }
 
 double DaeBuilderInternal::attribute(Attribute a, const std::string& name) const {
-  return variable(name).attribute(a);
+  double ret;
+  variable(name).get_attr(a, &ret);
+  return ret;
 }
 
 std::vector<double> DaeBuilderInternal::attribute(Attribute a,
     const std::vector<std::string>& name) const {
+  // Allocate return
   std::vector<double> r;
-  r.reserve(name.size());
-  for (auto& n : name) r.push_back(variable(n).attribute(a));
+  r.reserve(size(a, name));
+  // Get contribution from each variable
+  std::vector<double> r1;
+  for (auto& n : name) {
+    variable(n).get_attr(a, &r1);
+    r.insert(r.end(), r1.begin(), r1.end());
+  }
   return r;
 }
 
@@ -3838,14 +3882,22 @@ void DaeBuilderInternal::set_attribute(Attribute a, const std::vector<std::strin
 
 std::string DaeBuilderInternal::string_attribute(Attribute a,
     const std::string& name) const {
-  return variable(name).string_attribute(a);
+  std::string r;
+  variable(name).get_attr(a, &r);
+  return r;
 }
 
 std::vector<std::string> DaeBuilderInternal::string_attribute(Attribute a,
     const std::vector<std::string>& name) const {
+  // Allocate return
   std::vector<std::string> r;
-  r.reserve(name.size());
-  for (auto& n : name) r.push_back(variable(n).string_attribute(a));
+  r.reserve(size(a, name));
+  // Get contribution from each variable
+  std::string r1;
+  for (auto& n : name) {
+    variable(n).get_attr(a, &r1);
+    r.push_back(r1);
+  }
   return r;
 }
 
@@ -3858,6 +3910,12 @@ void DaeBuilderInternal::set_string_attribute(Attribute a,
     const std::vector<std::string>& name, const std::vector<std::string>& val) {
   casadi_assert(name.size() == val.size(), "Dimension mismatch");
   for (size_t k = 0; k < name.size(); ++k) variable(name[k]).set_string_attribute(a, val[k]);
+}
+
+casadi_int DaeBuilderInternal::size(Attribute a, const std::vector<std::string>& name) const {
+  casadi_int r = 0;
+  for (auto& n : name) r += variable(n).size(a);
+  return r;
 }
 
 Sparsity DaeBuilderInternal::jac_sparsity(const std::vector<size_t>& oind,
