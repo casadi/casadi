@@ -58,7 +58,7 @@ enum class Variability {CONSTANT, FIXED, TUNABLE, DISCRETE, CONTINUOUS, NUMEL};
 // DISCRETE     -          -                     U      Y       X      -
 // CONTINUOUS   -          -                     U      Y/Q     X      T
 
-// Input convension in codegen
+// Input convention in codegen
 enum class Category {T, C, P, D, W, U, X, Z, Q, Y, E, DER, RES, ASSIGN, REINIT, NUMEL};
 
 /// Initial: FMI 2.0 specification, section 2.2.7 or FMI 3.0 specification, section 2.4.7.5
@@ -301,7 +301,7 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   static std::string generate(const std::vector<double>& v);
   ///@}
 
-  // Output convension in codegen
+  // Output convention in codegen
   enum DaeBuilderInternalOut {
     DAE_BUILDER_ODE,
     DAE_BUILDER_ALG,

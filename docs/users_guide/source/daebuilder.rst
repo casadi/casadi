@@ -172,6 +172,8 @@ To construct a DAE formulation for this problem, start with an empty |DaeBuilder
 Other input and output expressions can be added in an analogous way. For a full
 list of functions, see the C++ API documentation for |DaeBuilder|.
 
+In :numref:`sec-daebuilder_factory` below, we will show how to evaluate the model equations, which is same as if the equations had been created a different way, e.g. from an FMU, cf. :numref:`sec-fmi`.
+
 .. _sec-modelica:
 
 Creating a |DaeBuilder| instance from Modelica, symbolically
@@ -191,7 +193,11 @@ Unlike previous attempts at symbolic import, this support will also include supp
 
 Constructing a |DaeBuilder| instance from an FMU
 ------------------------------------------------
-The DaeBuilder class can be used to import standard FMUs, adhering to the FMI standard version 2.0 or 3.0. This is a dedicated, native, foreign function interface (FFI) of CasADi that communicates directly with the FMI C API. The evaluation takes place in CasADi function objects created using the function factory described in :numref:`sec-daebuilder_factory`. Importantly, the binary FMI interface enables the efficient calculation of first and second derivatives of the model equations using a hybrid symbolic-numeric approach, relying on analytical derivatives for the first order derivatives and efficient finite differences implementations for the second order derivatives. Sparsity and parallelization is also exploited, whenever possible. For an overview of the functionality, we refer to the fmu_demo.ipynb tutorial in the CasADi repository.
+The DaeBuilder class can be used to import standard FMUs, adhering to the FMI standard version 2.0 or 3.0. This is a dedicated, native, foreign function interface (FFI) of CasADi that communicates directly with the FMI C API. The evaluation takes place in CasADi function objects created using the function factory described in :numref:`sec-daebuilder_factory`. Importantly, the binary FMI interface enables the efficient calculation of first and second derivatives of the model equations using a hybrid symbolic-numeric approach, relying on analytical derivatives for the first order derivatives and efficient finite differences implementations for the second order derivatives. Sparsity and parallelization is also exploited, whenever possible.
+
+Not all model exchange FMUs are suitable for import into CasADi, although we are hoping to gradually support more and more parts of the standard. In general, for derivative calculations, the FMUs should support analytical derivatives. Although CasADi does support finite differencing for calculating first order derivatives, this should been seen mainly as a debugging and diagnostics feature.
+
+Event-driven dynamics, cf. :numref:`sec-hybrid`, have not yet been demonstrated for standard FMUs and may require some manual reformulation such as explicitly defining zero crossing function and event transitions as additional outputs. In section :numref:`sec-daebuilder_factory`, we will discuss how to evaluate the model equations numerically.
 
 .. _sec-hybrid:
 
@@ -227,18 +233,20 @@ CasADi 3.7 introduces initial support for hybrid modeling and sensitivity analys
         dae.when(h < 0, ...
           {dae.reinit('v', -0.8*dae.pre(v))});
 
+.. _sec-daebuilder_reformulation:
+
+Reformulating a model
+---------------------
+Instances of the |DaeBuilder| class are mutable and it is possible, with several restrictions, to change the formulation after creation. In particular, it is possible to change the causality or variability of a variable, as long as the change is possible with the current set of model equations. In particular, it is possible to remove an output variable :math:`y` by changing its causality to local or treating a quadrature variable :math:`q` as a regular state :math:`x` by changing its causality to local. An input variable :math:`u` can be treated as a parameter :math:`p` or a constant :math:`c` by changing the variability to tunable or fixed, respectively (the causality will be automatically updated to "parameter" in this case). In addition, it is always possible to reorder the variables in a category in an arbitrary way -- by default the ordering within a category will match the ordering of the model variables.
+
+If a |DaeBuilder| instance has been created symbolically (as opposed as from a standard FMU), additional manipulations such as the elimination of dependent variables, BLT reordering, index reduction, etc. is possible. Some of these features have not been actively maintained or continuously tested, but may be revived with limited work of the C++ source code.
 
 .. _sec-daebuilder_factory:
 
-Function factory
-----------------
-Once a |DaeBuilder| has been formulated and possibly reformulated to
-a satisfactory form, we can generate |casadi| functions corresponding to the
-input and output expressions outlined in :numref:`sec-model_variables` and :numref:`sec-model_equations`.
-For example, to create a function for the ODE right-hand-side for the rocket
-model in :numref:`sec-daebuilder_symbolic`, simply provide a display
-name of the function being created, a list of input expressions
-and a list of output expressions:
+Evaluating model equations, function factory
+--------------------------------------------
+
+The evaluation of model equations in a |DaeBuilder| instance follows a somewhat different paradigm than other tools capable of evaluating FMUs such as FMPy or PyFMI. In general, we only use setters (``DaeBuilder.set``) to set constants (:math:`c`) or *initial*/*default* values for other variables. For the evaluation, |DaeBuilder| relies on a *function factory* where the user creates differentiable CasADi function objects by providing a function name as well as a list of inputs and a list of outputs. The following example shows how to create a function named ``f`` with three (vector-valued) inputs,  :math:`x`, :math:`u` and :math:`p`, and one (vector-valued) output, :math:`f_{\text{ode}}`:
 
 .. side-by-side::
     .. code-block:: python
@@ -253,22 +261,21 @@ and a list of output expressions:
         f = dae.create('f',...
              {'x','u','p'},{'ode'});
 
+The names of inputs and outputs correspond to the categories outlined in :numref:`sec-model_variables` and :numref:`sec-model_equations`, respectively. During creation, the function factory will save the current state of the (mutable) |DaeBuilder| instance and the created function will not be impacted by any subsequent changes to or even deletion of the |DaeBuilder| instance. The created functions are thus immutable (with very few exceptions), similar to all other functions in CasADi.
 
-Using a naming convention, we can also create Jacobians, e.g. for the 'ode'
-output with respect to 'x':
+We may also use CasADi's naming conventions for derivative functions to include e.g. Jacobian blocks in the function output. The following example creates a function named ``J`` with three inputs (:math:`x`, :math:`u` and :math:`p`) and one (matrix-valued) output corresponding to the Jacobian of :math:`f_{\text{ode}}` with respect to :math:`x`:
 
 .. side-by-side::
     .. code-block:: python
 
-        f = dae.create('f',\
-             ['x','u','p'],\
-             ['jac_ode_x'])
+        J = dae.create('J',\
+             ['x','u','p'], ['jac_ode_x'])
 
     &&
 
     .. code-block:: octave
 
-        f = dae.create('f',...
-             {'x','u','p'},
-             {'jac_ode_x'});
+        J = dae.create('J',...
+             {'x','u','p'} {'jac_ode_x'});
 
+We refer to the notebook `fmu_demo.ipynb` for more examples on how to use the function factory.
