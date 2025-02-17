@@ -19,7 +19,7 @@ The syntax and scope of the class has changed significantly since its initial in
 
 |DaeBuilder| model variables and their categorization
 -----------------------------------------------------
-Each |DaeBuilder| instance maintains a list of model variables. The variables must be uniquely named and hold import meta information about the variable such as its type (e.g. floating point, integer or sting-valued), minimum and maximum values, nominal values, dimension, description, unit etc. The format for model variables closely mimics that of the FMI standard, version 3.0, and to be able to use the |DaeBuilder| class efficently, you should probably be somewhat familar with the format. As in FMI, variables are classified according to their *causality* and *variability* (consult the FMI specification if you are unfamilar with these terms). They are also given a CasADi-specific categorization into the following categories:
+Each |DaeBuilder| instance maintains a list of model variables. The variables must be uniquely named and hold import meta information about the variable such as its type (e.g. floating point, integer or sting-valued), minimum and maximum values, nominal values, dimension, description, unit etc. The format for model variables closely mimics that of the FMI standard, version 3.0, and to be able to use the |DaeBuilder| class efficently, you should probably be somewhat familar with the format. As in FMI, variables are classified according to their *causality* and *variability* (consult the FMI specification [#fmi3]_ if you are unfamilar with these terms). They are also given a CasADi-specific categorization into the following categories:
 
 :math:`t`
   The independent variable, usually time
@@ -54,7 +54,7 @@ Each |DaeBuilder| instance maintains a list of model variables. The variables mu
 
 A variable can have no category (:math:`\emptyset`) if it can be disregarded. There are also additional categories of internal character, for certain derived expressions, e.g. residual variables, event indicators, derivative variables and variable definitions.
 
-The category for a variable is determined automatically from its causality and variability according to the following table, where the rows correspond to the causality and the columns to the variability (cf. Table 17 in FMI specification, 3.0.2):
+The category for a variable is determined automatically from its causality and variability according to the following table, where the rows correspond to the causality and the columns to the variability (cf. Table 17 in FMI specification, 3.0.2 [#fmi3]_):
 
 +-------------+------------+-------------+-----------+-------------------+-------------------+--------------+
 ||            || parameter || calculated || input    || output           || local            || independent |
@@ -82,7 +82,7 @@ The category for a variable is determined automatically from its causality and v
 |             |            |             |           | :math:`\emptyset` |                   |              |
 +-------------+------------+-------------+-----------+-------------------+-------------------+--------------+
 
-Not all combinations of causality and variability are permitted, as explained in the FMI specification. These combinations are marked "n/a" in the table. There may also be multiple combinations mapping to the same variable category. For example, discrete variables are treated as continuous variables with time derivative zero in CasADi. Variables of local causality are given no category (:math:`\emptyset`) if they do not appear in any right-hand-side.
+Not all combinations of causality and variability are permitted, as explained in the FMI specification [#fmi3]_. These combinations are marked "n/a" in the table. There may also be multiple combinations mapping to the same variable category. For example, discrete variables are treated as continuous variables with time derivative zero in CasADi. Variables of local causality are given no category (:math:`\emptyset`) if they do not appear in any right-hand-side.
 Similarly, variables of output causality are given no category (:math:`\emptyset`) if they do not appear in any right-hand-side *and* have no defining equation. A variable with a defining equation for its time derivative is normally :math:`x` but may be :math:`q` if it has output causality *and* does not appear undifferentiated in the right-hand-side of any differential or algebraic equation. A variable that enters in the right-hand-sides, but never with its time derivative, can be either part of :math:`w` or :math:`z` depending on whether it is defined explicitly or implicitly. Finally, a variable with output causality that does not appear in any right-hand-side but does have a defining equation is given the category :math:`y`.
 
 The category of a variable may change during symbolic construction, cf. :numref:`sec-daebuilder_symbolic`, in particular when adding equations. It may also change by explicitly changing the variability or causality of a variable, when such an operation is permitted.
@@ -100,7 +100,7 @@ At the time of this writing, |DaeBuilder| instances supported the following type
   * Quadrature equation, e.g.: :math:`\dot{q} = f_{\text{quad}}(t,x,z,u,p)`
   * When equation, e.g.: when :math:`f_\text{zero}(t,x,z,u,p) < 0` then :math:`x := f_\text{transition}(t,x,z,u,p)`
 
-Future versions of |DaeBuilder| may support more types of equations, in particular related to proper handling of initial equations and event handling, guided by the Modelica standard.
+Future versions of |DaeBuilder| may support more types of equations, in particular related to proper handling of initial equations and event handling, guided by the Modelica standard [#modelica36]_.
 
 The functions in the list above are associated with additional, internal, variable categories, in addition to the categories listed in :numref:`sec-model_variables`. For example ordinary differential equations and quadrature equations are associated with derivative variables and algebraic equations are associated with residual variables. When equations are associated with zero-crossing conditions and a set of assignment operations. We will return to when equations in :numref:`sec-hybrid` below.
 
@@ -111,7 +111,7 @@ Model equations may be given either as symbolic expressions, as described in :nu
 Constructing a |DaeBuilder| instance symbolically
 -------------------------------------------------
 
-We can create |DaeBuilder| instances using CasADi symbolic expressions. The current ambition is to support an acausal model approach taking elements from the Functional Mock-up Interface (FMI) standard as well as the proposed Base Modelica standard. Specifically, model variables (cf. :numref:`sec-model_variables`) are defined using the conventions defined by the FMI standard, version 3.0. The model equations (cf. :numref:`sec-model_equations`), on the other hand, where standard FMI relies on a black-box C API, we try to follow the proposed Base Modelica standard. We will discuss in :numref:`sec-modelica` how this support can be used to enable symbolic import of models formulated in actual Modelica.
+We can create |DaeBuilder| instances using CasADi symbolic expressions. The current ambition is to support an acausal model approach taking elements from the Functional Mock-up Interface (FMI) standard as well as the proposed Base Modelica standard [#basemodelica]_. Specifically, model variables (cf. :numref:`sec-model_variables`) are defined using the conventions defined by the FMI standard, version 3.0. The model equations (cf. :numref:`sec-model_equations`), on the other hand, where standard FMI relies on a black-box C API, we try to follow Base Modelica. We will discuss in :numref:`sec-modelica` how this support can be used to enable symbolic import of models formulated in actual Modelica.
 
 To illustrate the usage, consider the following simple DAE corresponding to a controlled rocket subject to quadratic air friction term and gravity, which loses mass as it uses up fuel:
 
@@ -185,15 +185,15 @@ There is still legacy support for FMUX import in the |DaeBuilder| class, but sin
 
 We also note that JModelica.org's closed-source successor code, OCT, does retain CasADi interoperability. Details of how to use OCT to generate CasADi expressions is best described in OCT's user guide. As of this writing, this support did not use the DaeBuilder class in CasADi, although it is possible to create DaeBuilder instances from OCT-generated CasADi expressions, using the standard symbolic API described in :numref:`sec-daebuilder_symbolic`.
 
-In future versions of CasADi, we hope to provide a more mature support for symbolic import of Modelica models based on the emerging Base Modelica standard. Base Modelica is intended to be a subset of the full Modelica language, which can be generated from any Modelica models, but removing many of the high-level features associated to object oriented physical modeling.
+In future versions of CasADi, we hope to provide a more mature support for symbolic import of Modelica models based on the emerging Base Modelica standard. Base Modelica [#basemodelica]_ is intended to be a subset of the full Modelica language, which can be generated from any Modelica models, but removing many of the high-level features associated to object oriented physical modeling.
 
-Unlike previous attempts at symbolic import, this support will also include support for hybrid (event-driven) modeling, while still retaining the differentiability needed by gradient-based optimization algorithms. Specifically, we try to ensure that the zero-crossing functions used to trigger events are differentiable and, secondly, that the state transitions are provided as differentiable functions. The Base Modelica effort currently does not include a Modelica parser, instead we are working with the open-source Rumoca translator, which can be used to convert Base Modelica source code into Pythons scripts that construct DaeBuilder instances symbolically.
+Unlike previous attempts at symbolic import, this support will also include support for hybrid (event-driven) modeling, while still retaining the differentiability needed by gradient-based optimization algorithms. Specifically, we try to ensure that the zero-crossing functions used to trigger events are differentiable and, secondly, that the state transitions are provided as differentiable functions. CasADi's Base Modelica effort currently does not include a Modelica parser, instead we are working with the open-source Rumoca [#rumoca]_ translator, which can be used to convert Base Modelica source code into Pythons scripts that construct DaeBuilder instances symbolically.
 
 .. _sec-fmi:
 
 Constructing a |DaeBuilder| instance from an FMU
 ------------------------------------------------
-The DaeBuilder class can be used to import standard FMUs, adhering to the FMI standard version 2.0 or 3.0. This is a dedicated, native, foreign function interface (FFI) of CasADi that communicates directly with the FMI C API. The evaluation takes place in CasADi function objects created using the function factory described in :numref:`sec-daebuilder_factory`. Importantly, the binary FMI interface enables the efficient calculation of first and second derivatives of the model equations using a hybrid symbolic-numeric approach, relying on analytical derivatives for the first order derivatives and efficient finite differences implementations for the second order derivatives. Sparsity and parallelization is also exploited, whenever possible.
+The DaeBuilder class can be used to import standard FMUs, adhering to the FMI standard version 2.0 or 3.0 [#casadi_fmi]_. This is a dedicated, native, foreign function interface (FFI) of CasADi that communicates directly with the FMI C API. The evaluation takes place in CasADi function objects created using the function factory described in :numref:`sec-daebuilder_factory`. Importantly, the binary FMI interface enables the efficient calculation of first and second derivatives of the model equations using a hybrid symbolic-numeric approach, relying on analytical derivatives for the first order derivatives and efficient finite differences implementations for the second order derivatives. Sparsity and parallelization is also exploited, whenever possible.
 
 Not all model exchange FMUs are suitable for import into CasADi, although we are hoping to gradually support more and more parts of the standard. In general, for derivative calculations, the FMUs should support analytical derivatives. Although CasADi does support finite differencing for calculating first order derivatives, this should been seen mainly as a debugging and diagnostics feature.
 
@@ -204,7 +204,7 @@ Event-driven dynamics, cf. :numref:`sec-hybrid`, have not yet been demonstrated 
 Hybrid modeling with |DaeBuilder|
 ---------------------------------
 
-CasADi 3.7 introduces initial support for hybrid modeling and sensitivity analysis. In |DaeBuilder|, state events can be formulated with when equations, mirroring the syntax in (Base) Modelica. Whenever a when equation is added, a differential zero crossing condition is created automatically, using a form compatible with an extension of the CasADi integrator class to enable automatic sensitivity analysis of hybrid systems. While the event support is still at an early stage, it has been successfully used to model simple hybrid systems, such as the following bouncing ball example:
+CasADi 3.7 introduces initial support for hybrid modeling and sensitivity analysis. In |DaeBuilder|, state events can be formulated with when equations, mirroring the syntax in (Base) Modelica [#modelica36]_. Whenever a when equation is added, a differential zero crossing condition is created automatically, using a form compatible with an extension of the CasADi integrator class to enable automatic sensitivity analysis of hybrid systems. While the event support is still at an early stage, it has been successfully used to model simple hybrid systems, such as the following bouncing ball example:
 
 .. side-by-side::
     .. exec-block:: python
@@ -232,6 +232,8 @@ CasADi 3.7 introduces initial support for hybrid modeling and sensitivity analys
         dae.eq(dae.der(v), -9.81);
         dae.when(h < 0, ...
           {dae.reinit('v', -0.8*dae.pre(v))});
+
+For more information about the hybrid support in CasADi, we refer to the implementation paper: [#casadi_hybrid]_.
 
 .. _sec-daebuilder_reformulation:
 
@@ -279,3 +281,19 @@ We may also use CasADi's naming conventions for derivative functions to include 
              {'x','u','p'} {'jac_ode_x'});
 
 We refer to the notebook `fmu_demo.ipynb` for more examples on how to use the function factory.
+
+.. rubric:: Footnotes
+
+.. [#casadi_hybrid] Joel Andersson, James Goppert, `Event Support for Simulation and Sensitivity Analysis in CasADi for use with Modelica and FMI
+ <https://doi.org/10.3384/ecp20799>`_ , Proceedings of the American Modelica Conference 2024, Storrs, Connecticut, USA, October 14-16, 2024
+
+.. [#casadi_fmi] Joel Andersson, `Import and Export of Functional Mockup Units in CasADi
+ <https://doi.org/10.3384/ecp204321>`_ , Proceedings of the 15th International Modelica Conference 2023, Aachen, October 9-11
+
+.. [#fmi3] Modelica Association, `Functional Mock-up Interface Specification, version 3.0.2 <https://fmi-standard.org/docs/3.0.2/>`_
+
+.. [#modelica36] Modelica Association, `Modelica(R) - A Unified Object-Oriented Language for Systems Modeling Language Specification, Version 3.6 <https://specification.modelica.org/maint/3.6/>`_
+
+.. [#basemodelica] Peter Harman, Werther Kai, Gerd Kurzbach, Oliver Lenord, Hans Olsson, Michael Schellenberger, Martin Sjölund, Henrik Tidefelt, `Modelica Change Proposal MCP-0031 Base Modelica and MLS modularization <https://github.com/modelica/ModelicaSpecification/tree/MCP/0031/RationaleMCP/0031>`_
+
+.. [#rumoca] `<https://github.com/CogniPilot/rumoca_parser>`_
