@@ -718,7 +718,7 @@ class CASADI_EXPORT DaeBuilder
   void set_nominal(const std::string& name, double val);
 
   /// Get the start attribute, single variable
-  double start(const std::string& name) const;
+  std::vector<double> start(const std::string& name) const;
 
   /// Set the start attribute, single variable
   void set_start(const std::string& name, double val);

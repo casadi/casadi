@@ -1251,13 +1251,12 @@ void DaeBuilder::set_nominal(const std::vector<std::string>& name, const std::ve
   }
 }
 
-double DaeBuilder::start(const std::string& name) const {
+std::vector<double> DaeBuilder::start(const std::string& name) const {
   try {
-    casadi_assert(numel(name) == 1, "Variable " + name + " is not scalar");
-    return (*this)->variable(name).start.front();
+    return (*this)->attribute(Attribute::START, std::vector<std::string>{name});
   } catch (std::exception& e) {
     THROW_ERROR("start", e.what());
-    return 0; // never reached
+    return {}; // never reached
   }
 }
 
