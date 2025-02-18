@@ -2665,6 +2665,18 @@ namespace casadi {
   }
 
   template<typename Scalar>
+  bool Matrix<Scalar>::contains_all(const std::vector <Matrix<Scalar> >& v, const std::vector <Matrix<Scalar> > &n) {
+    casadi_error("'contains_all' not defined for " + type_name());
+    return false;
+  }
+
+  template<typename Scalar>
+  bool Matrix<Scalar>::contains_any(const std::vector<Matrix<Scalar> >& v, const std::vector <Matrix<Scalar> > &n) {
+    casadi_error("'contains_any' not defined for " + type_name());
+    return false;
+  }
+
+  template<typename Scalar>
   std::vector< Matrix<Scalar> > Matrix<Scalar>::cse(const std::vector< Matrix<Scalar> >& e) {
     casadi_error("'cse' not defined for " + type_name());
     return {};

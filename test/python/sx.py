@@ -1906,7 +1906,24 @@ class SXtests(casadiTestCase):
 
     self.checkfunction_light(F1,F2,inputs=[A])
 
-
+  def test_contains(self):
+    x = SX.sym("x")
+    y = SX.sym("y")
+    z = SX.sym("z")
+    
+    e = y*z
+    
+    self.assertTrue(contains([x,y,z],x))
+    self.assertFalse(contains([x,y],z))
+    self.assertTrue(contains_any([x,y],[y,z]))
+    self.assertFalse(contains_all([x,y],[y,z]))
+    self.assertTrue(contains_any([x,y],[x,y]))
+    self.assertTrue(contains_all([x,y],[x,y]))
+    self.assertTrue(contains([e,x],e))
+    
+    with self.assertInException("Can only convert 1-by-1 matrices to scalars"):
+        contains([vertcat(x,y)],x)
+    
 
 if __name__ == '__main__':
     unittest.main()

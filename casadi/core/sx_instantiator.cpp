@@ -881,6 +881,44 @@ namespace casadi {
     return false;
   }
 
+  template<>
+  bool CASADI_EXPORT SX::contains_all(const std::vector<SX>& v, const std::vector<SX> &n) {
+    if (n.empty()) return true;
+
+    // Set to contain all nodes
+    std::set<SXNode*> l;
+    for (const SX& e : v) l.insert(e.scalar().get());
+
+    size_t l_unique = l.size();
+
+    std::set<SXNode*> r;
+    for (const SX& e : n) r.insert(e.scalar().get());
+
+    size_t r_unique = r.size();
+    for (const SX& e : n) l.insert(e.scalar().get());
+
+    return l.size()==l_unique;
+  }
+
+  template<>
+  bool CASADI_EXPORT SX::contains_any(const std::vector<SX>& v, const std::vector<SX> &n) {
+    if (n.empty()) return true;
+
+    // Set to contain all nodes
+    std::set<SXNode*> l;
+    for (const SX& e : v) l.insert(e.scalar().get());
+
+    size_t l_unique = l.size();
+
+    std::set<SXNode*> r;
+    for (const SX& e : n) r.insert(e.scalar().get());
+
+    size_t r_unique = r.size();
+    for (const SX& e : n) l.insert(e.scalar().get());
+
+    return l.size()<l_unique+r_unique;
+  }
+
   class IncrementalSerializer {
     /**
      * Note that we do not use serializer.pack() since we want to establish

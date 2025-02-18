@@ -147,6 +147,12 @@ template<> inline std::string matrixName<SXElem>() { return "SX"; }
   bool SX::depends_on(const SX &x, const SX &arg);
 
   template<>
+  bool SX::contains_all(const std::vector<SX>& v, const std::vector<SX> &n);
+
+  template<>
+  bool SX::contains_any(const std::vector<SX>& v, const std::vector<SX> &n);
+
+  template<>
   SX SX::jacobian(const SX &f, const SX &x, const Dict& opts);
   template<>
   SX SX::hessian(const SX &ex, const SX &arg, SX &g, const Dict& opts);

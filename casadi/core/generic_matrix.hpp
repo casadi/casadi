@@ -653,10 +653,46 @@ namespace casadi {
 
         The argument must be symbolic
 
+        The dependency is in a mathematical way:
+        Does the value of the argument affect the value of the expression?
+        Equivalently, will the corresponding entry of the Jacobian by a non-zero?
+
+        The symbol could still be present in the expression graph.
+
+        To check that kind of dependency, use contains(symvar(f),arg)
+
         \identifier{1ck} */
     inline friend bool depends_on(const MatType& f, const MatType &arg) {
       return MatType::depends_on(f, arg);
     }
+
+    /** \brief Check if expression n is listed in v
+    *
+    * This function checks for correspondence between nodes.
+    * The detection does not descend into the expression graph.
+    *
+    * contains({a,b},b) -> true
+    * contains({a+b},b) -> false
+    * 
+    * e = a+b
+    * contains({e},e) -> true
+    *
+    * For mathematical dependency, see depends_on
+    * \sa depends_on
+    */
+    /// @{
+    inline friend bool contains(const std::vector<MatType>& v, const MatType &n) {
+      return contains_all(v, std::vector<MatType>{n});
+    }
+
+    inline friend bool contains_all(const std::vector<MatType>& v, const std::vector<MatType> &n) {
+      return MatType::contains_all(v, n);
+    }
+
+    inline friend bool contains_any(const std::vector<MatType>& v, const std::vector<MatType> &n) {
+      return MatType::contains_any(v, n);
+    }
+    /// @}
 
     /** \brief  Substitute variable v with expression vdef in an expression ex
 

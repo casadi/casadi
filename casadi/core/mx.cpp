@@ -2087,6 +2087,43 @@ namespace casadi {
     return false;
   }
 
+
+  bool MX::contains_all(const std::vector<MX>& v, const std::vector<MX> &n) {
+    if (n.empty()) return true;
+
+    // Set to contain all nodes
+    std::set<MXNode*> l;
+    for (const MX& e : v) l.insert(e.get());
+
+    size_t l_unique = l.size();
+
+    std::set<MXNode*> r;
+    for (const MX& e : n) r.insert(e.get());
+
+    size_t r_unique = r.size();
+    for (const MX& e : n) l.insert(e.get());
+
+    return l.size()==l_unique;
+  }
+
+  bool MX::contains_any(const std::vector<MX>& v, const std::vector<MX> &n) {
+    if (n.empty()) return true;
+
+    // Set to contain all nodes
+    std::set<MXNode*> l;
+    for (const MX& e : v) l.insert(e.get());
+
+    size_t l_unique = l.size();
+
+    std::set<MXNode*> r;
+    for (const MX& e : n) r.insert(e.get());
+
+    size_t r_unique = r.size();
+    for (const MX& e : n) l.insert(e.get());
+
+    return l.size()<l_unique+r_unique;
+  }
+
   MX MX::find(const MX& x) {
     return x->get_find();
   }
