@@ -213,7 +213,7 @@ casadi_int Variable::size(Attribute a) const {
   return 1;
 }
 
-void Variable::get_attr(Attribute a, double* val) const {
+void Variable::get_attribute(Attribute a, double* val) const {
   // Only if scalar
   casadi_assert(numel == 1, "Variable " + name + " is not scalar");
   // Handle attributes
@@ -239,12 +239,12 @@ void Variable::get_attr(Attribute a, double* val) const {
   casadi_error("Cannot handle: " + to_string(a));
 }
 
-void Variable::get_attr(Attribute a, std::vector<double>* val) const {
+void Variable::get_attribute(Attribute a, std::vector<double>* val) const {
   // Resize return
-  if (val) val->resize(numel);
+  if (val) val->resize(size(a));
   // Quick return if scalar
-  if (numel == 1) return get_attr(a, val ? &val->front() : nullptr);
-  // Handle vector types
+  if (size(a) == 1) return get_attribute(a, val ? &val->front() : nullptr);
+  // Handle vector attributes
   switch (a) {
     case Attribute::START:
       if (val) std::copy(start.begin(), start.end(), val->begin());
@@ -258,7 +258,7 @@ void Variable::get_attr(Attribute a, std::vector<double>* val) const {
   casadi_error("Cannot handle: " + to_string(a));
 }
 
-void Variable::get_attr(Attribute a, std::string* val) const {
+void Variable::get_attribute(Attribute a, std::string* val) const {
   switch (a) {
     case Attribute::STRINGVALUE:
       if (val) *val = stringvalue;
@@ -269,8 +269,8 @@ void Variable::get_attr(Attribute a, std::string* val) const {
   casadi_error("Cannot handle: " + to_string(a));
 }
 
-
 void Variable::set_attribute(Attribute a, double val) {
+  // Handle attributes
   switch (a) {
     case Attribute::MIN:
       min = val;
@@ -293,7 +293,28 @@ void Variable::set_attribute(Attribute a, double val) {
   casadi_error("Cannot handle: " + to_string(a));
 }
 
-void Variable::set_string_attribute(Attribute a, const std::string& val) {
+void Variable::set_attribute(Attribute a, const std::vector<double>& val) {
+  // Quick return if scalar
+  if (val.size() == 1) return set_attribute(a, val.front());
+  // If not scalar, size must be number of elements
+  casadi_assert(val.size() == numel, "Wrong size for attribute " + to_string(a));
+  // Handle vector attributes
+  switch (a) {
+    case Attribute::START:
+      std::copy(val.begin(), val.end(), start.begin());
+      return;
+    case Attribute::VALUE:
+      std::copy(val.begin(), val.end(), value.begin());
+      return;
+    default:
+      break;
+  }
+  casadi_error("Cannot handle: " + to_string(a));
+}
+
+
+
+void Variable::set_attribute(Attribute a, const std::string& val) {
   switch (a) {
     case Attribute::STRINGVALUE:
       stringvalue = val;
@@ -3852,7 +3873,7 @@ void DaeBuilderInternal::reset() {
 
 double DaeBuilderInternal::attribute(Attribute a, const std::string& name) const {
   double ret;
-  variable(name).get_attr(a, &ret);
+  variable(name).get_attribute(a, &ret);
   return ret;
 }
 
@@ -3864,7 +3885,7 @@ std::vector<double> DaeBuilderInternal::attribute(Attribute a,
   // Get contribution from each variable
   std::vector<double> r1;
   for (auto& n : name) {
-    variable(n).get_attr(a, &r1);
+    variable(n).get_attribute(a, &r1);
     r.insert(r.end(), r1.begin(), r1.end());
   }
   return r;
@@ -3883,7 +3904,7 @@ void DaeBuilderInternal::set_attribute(Attribute a, const std::vector<std::strin
 std::string DaeBuilderInternal::string_attribute(Attribute a,
     const std::string& name) const {
   std::string r;
-  variable(name).get_attr(a, &r);
+  variable(name).get_attribute(a, &r);
   return r;
 }
 
@@ -3895,7 +3916,7 @@ std::vector<std::string> DaeBuilderInternal::string_attribute(Attribute a,
   // Get contribution from each variable
   std::string r1;
   for (auto& n : name) {
-    variable(n).get_attr(a, &r1);
+    variable(n).get_attribute(a, &r1);
     r.push_back(r1);
   }
   return r;
@@ -3903,13 +3924,13 @@ std::vector<std::string> DaeBuilderInternal::string_attribute(Attribute a,
 
 void DaeBuilderInternal::set_string_attribute(Attribute a, const std::string& name,
     const std::string& val) {
-  variable(name).set_string_attribute(a, val);
+  variable(name).set_attribute(a, val);
 }
 
 void DaeBuilderInternal::set_string_attribute(Attribute a,
     const std::vector<std::string>& name, const std::vector<std::string>& val) {
   casadi_assert(name.size() == val.size(), "Dimension mismatch");
-  for (size_t k = 0; k < name.size(); ++k) variable(name[k]).set_string_attribute(a, val[k]);
+  for (size_t k = 0; k < name.size(); ++k) variable(name[k]).set_attribute(a, val[k]);
 }
 
 casadi_int DaeBuilderInternal::size(Attribute a, const std::vector<std::string>& name) const {

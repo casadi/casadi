@@ -158,17 +158,16 @@ struct CASADI_EXPORT Variable {
 
   ///@{
   /// Get by attribute name
-  void get_attr(Attribute a, double* val) const;
-  void get_attr(Attribute a, std::vector<double>* val) const;
-  void get_attr(Attribute a, std::string* val) const;
+  void get_attribute(Attribute a, double* val) const;
+  void get_attribute(Attribute a, std::vector<double>* val) const;
+  void get_attribute(Attribute a, std::string* val) const;
   ///@}
 
   ///@{
   /// Set by attribute name
   void set_attribute(Attribute a, double val);
-  void set_string_attribute(Attribute a, const std::string& val);
-  // void set_attr(Attribute a, double val);
-  // void set_attr(Attribute a, const std::string& val);
+  void set_attribute(Attribute a, const std::vector<double>& val);
+  void set_attribute(Attribute a, const std::string& val);
   ///@}
 
   // Default initial attribute, per specification
