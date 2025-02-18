@@ -522,6 +522,9 @@ protected:
   // Symbolic representation of the model equations?
   bool symbolic_;
 
+  // Disallow quadrature states
+  bool no_q_;
+
   // FMI major version
   casadi_int fmi_major_;
 

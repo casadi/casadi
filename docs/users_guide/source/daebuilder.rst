@@ -52,38 +52,32 @@ Each |DaeBuilder| instance maintains a list of model variables. The variables mu
 :math:`y`
   Output variables, calculated explicitly from :math:`c`, :math:`p`, :math:`d`, :math:`u`, :math:`x`, :math:`q`, :math:`z` and :math:`w`
 
-A variable can have no category (:math:`\emptyset`) if it can be disregarded. There are also additional categories of internal character, for certain derived expressions, e.g. residual variables, event indicators, derivative variables and variable definitions.
+There are also additional categories of internal character, for certain derived expressions, e.g. residual variables, event indicators, derivative variables and variable definitions.
 
 The category for a variable is determined automatically from its causality and variability according to the following table, where the rows correspond to the causality and the columns to the variability (cf. Table 17 in FMI specification, 3.0.2 [#fmi3]_):
 
-+-------------+------------+-------------+-----------+-------------------+-------------------+--------------+
-||            || parameter || calculated || input    || output           || local            || independent |
-||            ||           || Parameter  ||          ||                  ||                  ||             |
-+=============+============+=============+===========+===================+===================+==============+
-| constant    | n/a        | n/a         | n/a       | :math:`c` or      | :math:`c` or      | n/a          |
-|             |            |             |           | :math:`\emptyset` | :math:`\emptyset` |              |
-+-------------+------------+-------------+-----------+-------------------+-------------------+--------------+
-| fixed       | :math:`c`  | :math:`d`   | n/a       | n/a               | :math:`d` or      | n/a          |
-|             |            |             |           |                   | :math:`\emptyset` |              |
-+-------------+------------+-------------+-----------+-------------------+-------------------+--------------+
-| tunable     | :math:`p`  | :math:`d`   | n/a       | n/a               | :math:`d` or      | n/a          |
-|             |            |             |           |                   | :math:`\emptyset` |              |
-+-------------+------------+-------------+-----------+-------------------+-------------------+--------------+
-| discrete    | n/a        | n/a         | :math:`u` | :math:`y` or      | :math:`x`,        | n/a          |
-|             |            |             |           | :math:`\emptyset` | :math:`w`,        |              |
-|             |            |             |           |                   | :math:`z`, or     |              |
-|             |            |             |           |                   | :math:`\emptyset` |              |
-+-------------+------------+-------------+-----------+-------------------+-------------------+--------------+
-| continuous  | n/a        | n/a         | :math:`u` | :math:`x`,        | :math:`x`,        | :math:`t`    |
-|             |            |             |           | :math:`q`,        | :math:`z`,        |              |
-|             |            |             |           | :math:`z`,        | :math:`w`, or     |              |
-|             |            |             |           | :math:`w`,        | :math:`\emptyset` |              |
-|             |            |             |           | :math:`y`, or     |                   |              |
-|             |            |             |           | :math:`\emptyset` |                   |              |
-+-------------+------------+-------------+-----------+-------------------+-------------------+--------------+
++-------------+------------+-------------+-----------+----------------+-------------------+--------------+
+||            || parameter || calculated || input    || output        || local            || independent |
+||            ||           || Parameter  ||          ||               ||                  ||             |
++=============+============+=============+===========+================+===================+==============+
+| constant    | n/a        | n/a         | n/a       | :math:`c`      | :math:`c`         | n/a          |
++-------------+------------+-------------+-----------+----------------+-------------------+--------------+
+| fixed       | :math:`c`  | :math:`d`   | n/a       | n/a            | :math:`d`         | n/a          |
++-------------+------------+-------------+-----------+----------------+-------------------+--------------+
+| tunable     | :math:`p`  | :math:`d`   | n/a       | n/a            | :math:`d`         | n/a          |
++-------------+------------+-------------+-----------+----------------+-------------------+--------------+
+| discrete    | n/a        | n/a         | :math:`u` | :math:`x` or   | :math:`x` or      | n/a          |
+|             |            |             |           | :math:`q`      | :math:`q`         |              |
++-------------+------------+-------------+-----------+----------------+-------------------+--------------+
+| continuous  | n/a        | n/a         | :math:`u` | :math:`x`,     | :math:`x`,        | :math:`t`    |
+|             |            |             |           | :math:`q`,     | :math:`q`,        |              |
+|             |            |             |           | :math:`z`, or, | :math:`z`, or,    |              |
+|             |            |             |           | :math:`w`      | :math:`w`         |              |
++-------------+------------+-------------+-----------+----------------+-------------------+--------------+
 
-Not all combinations of causality and variability are permitted, as explained in the FMI specification [#fmi3]_. These combinations are marked "n/a" in the table. There may also be multiple combinations mapping to the same variable category. For example, discrete variables are treated as continuous variables with time derivative zero in CasADi. Variables of local causality are given no category (:math:`\emptyset`) if they do not appear in any right-hand-side.
-Similarly, variables of output causality are given no category (:math:`\emptyset`) if they do not appear in any right-hand-side *and* have no defining equation. A variable with a defining equation for its time derivative is normally :math:`x` but may be :math:`q` if it has output causality *and* does not appear undifferentiated in the right-hand-side of any differential or algebraic equation. A variable that enters in the right-hand-sides, but never with its time derivative, can be either part of :math:`w` or :math:`z` depending on whether it is defined explicitly or implicitly. Finally, a variable with output causality that does not appear in any right-hand-side but does have a defining equation is given the category :math:`y`.
+Not all combinations of causality and variability are permitted, as explained in the FMI specification [#fmi3]_. These combinations are marked "n/a" in the table. There may also be multiple combinations mapping to the same variable category.
+
+Variables of continuous variability are are given a category depending on its defining equation. If the defining equation is an ODE, the variable is given the category :math:`x` or :math:`q` depending on whether it appears in the right-hand-side of any differential or algebraic equation. If there is a defining equation for the variable itself, and if it has not previously appeared in any right-hand-side, it becomes part of :math:`w`. If none of the above applies, the variable is given the category :math:`z` and assumed implicitly defined by a residual equation. Variables of output causality will also define an auxiliary dependent variable in the category :math:`y` with associated output equation.
 
 The category of a variable may change during symbolic construction, cf. :numref:`sec-daebuilder_symbolic`, in particular when adding equations. It may also change by explicitly changing the variability or causality of a variable, when such an operation is permitted.
 
@@ -95,7 +89,7 @@ The category of a variable may change during symbolic construction, cf. :numref:
 At the time of this writing, |DaeBuilder| instances supported the following types of equations, leaving out :math:`c`, :math:`d` and :math:`w` for simplicity:
 
   * Ordinary differential equation, e.g.: :math:`\dot{x} = f_{\text{ode}}(t,x,z,u,p)`
-  * Output equation, e.g.: :math:`y = f_{\text{ydef}}(t,x,z,u,p)`
+  * Output equation, e.g.: :math:`y = f_{\text{y}}(t,x,z,u,p)`
   * Algebraic equation, e.g.: :math:`0 = f_{\text{alg}}(t,x,z,u,p)`
   * Quadrature equation, e.g.: :math:`\dot{q} = f_{\text{quad}}(t,x,z,u,p)`
   * When equation, e.g.: when :math:`f_\text{zero}(t,x,z,u,p) < 0` then :math:`x := f_\text{transition}(t,x,z,u,p)`

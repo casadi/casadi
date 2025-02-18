@@ -498,6 +498,7 @@ DaeBuilderInternal::DaeBuilderInternal(const std::string& name, const std::strin
   provides_adjoint_derivatives_ = false;
   can_be_instantiated_only_once_per_process_ = false;
   symbolic_ = true;
+  no_q_ = false;
   start_time_ = nan;
   stop_time_ = nan;
   tolerance_ = nan;
@@ -514,6 +515,8 @@ DaeBuilderInternal::DaeBuilderInternal(const std::string& name, const std::strin
       fmutol_ = op.second;
     } else if (op.first=="ignore_time") {
       ignore_time_ = op.second;
+    } else if (op.first=="no_q") {
+      no_q_ = op.second;
     } else {
       casadi_error("No such option: " + op.first);
     }
@@ -1145,7 +1148,6 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
   if (size(Category::X) > 0) stream << "  x = " << var(indices(Category::X)) << std::endl;
   if (size(Category::Z) > 0) stream << "  z = " << var(indices(Category::Z)) << std::endl;
   if (size(Category::Q) > 0) stream << "  q = " << var(indices(Category::Q)) << std::endl;
-  if (size(Category::Y) > 0) stream << "  y = " << var(indices(Category::Y)) << std::endl;
   if (size(Category::W) > 0) stream << "  w = " << var(indices(Category::W)) << std::endl;
   if (size(Category::U) > 0) stream << "  u = " << var(indices(Category::U)) << std::endl;
 
@@ -1175,20 +1177,18 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
     for (size_t k : indices(Category::X)) {
       const Variable& x = variable(k);
       stream << "  \\dot{" << x.name << "} == ";
-      if (x.der >= 0) {
+      if (x.variability == Variability::DISCRETE) {
+        // Discrete variable - derivative is zero
+        stream << 0;
+      } else {
         // Derivative variable
+        casadi_assert(x.der >= 0, "No derivative variable for " + x.name);
         const Variable& xdot = variable(x.der);
         if (xdot.beq.is_empty()) {
           stream << xdot.name;
         } else {
-          stream <<  xdot.beq;
+          stream << xdot.beq;
         }
-      } else if (x.variability == Variability::DISCRETE) {
-        // Discrete variable - derivative is zero
-        stream << 0;
-      } else {
-        // Missing ODE?
-        casadi_error("Missing derivative for " + str(x.name));
       }
       stream << std::endl;
     }
@@ -1206,10 +1206,20 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
     stream << "Quadrature equations" << std::endl;
     for (size_t k : indices(Category::Q)) {
       const Variable& q = variable(k);
-      casadi_assert(q.der >= 0, "No derivative variable for " + q.name);
-      const Variable& qdot = variable(q.der);
-      stream << "  \\dot{" << q.name << "} == " << qdot.name;
-      if (!qdot.beq.is_empty()) stream << " := " << qdot.beq;
+      stream << "  \\dot{" << q.name << "} == ";
+      if (q.variability == Variability::DISCRETE) {
+        // Discrete variable - derivative is zero
+        stream << 0;
+      } else {
+        // Derivative variable
+        casadi_assert(q.der >= 0, "No derivative variable for " + q.name);
+        const Variable& qdot = variable(q.der);
+        if (qdot.beq.is_empty()) {
+          stream << qdot.name;
+        } else {
+          stream << qdot.beq;
+        }
+      }
       stream << std::endl;
     }
   }
@@ -1224,18 +1234,22 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
     }
   }
 
+  if (size(Category::Y) > 0) {
+    stream << "Output variables" << std::endl;
+    for (size_t y : indices(Category::Y)) {
+      const Variable& v = variable(y);
+      const Variable& p = variable(v.parent);
+      stream << "  " << p.name;
+      if (!is_equal(p.v, v.beq)) stream << " := " << v.beq;
+      stream << std::endl;
+    }
+  }
+
   if (!when_cond_.empty()) {
     stream << "When statements" << std::endl;
     for (casadi_int k = 0; k < when_cond_.size(); ++k) {
       stream << "  when " << str(when_cond_.at(k)) << " > 0 : " << str(when_lhs_.at(k))
         << " := " << str(when_rhs_.at(k)) << std::endl;
-    }
-  }
-
-  if (size(Category::Y) > 0) {
-    stream << "Output variables" << std::endl;
-    for (size_t y : indices(Category::Y)) {
-      stream << "  " << var(y) << std::endl;
     }
   }
 }
@@ -2710,44 +2724,83 @@ Variable& DaeBuilderInternal::add(const std::string& name, Causality causality,
   if (max != casadi::inf) v.max = max;
   // Handle different categories
   switch (causality) {
-    case Causality::INDEPENDENT:
-      // Independent variable
-      casadi_assert(!has_t(), "'t' already defined");
-      categorize(v.index, Category::T);
-      break;
-    case Causality::INPUT:
-      // Control
-      categorize(v.index, Category::U);
-      break;
-    case Causality::OUTPUT:
-      // Output
-      categorize(v.index, Category::Y);
-      break;
     case Causality::PARAMETER:
       // Parameter
       if (variability == Variability::TUNABLE) {
         categorize(v.index, Category::P);
+      } else if (variability == Variability::FIXED) {
+        categorize(v.index, Category::C);
+      } else {
+        casadi_error("'parameter' causality requires 'fixed' or 'tunable' variability");
       }
       break;
     case Causality::CALCULATED_PARAMETER:
-      // Calculated parameter: No categorization for now
+      casadi_assert(variability == Variability::FIXED || variability == Variability::TUNABLE,
+          "'calculatedParameter' causality requires 'fixed' or 'tunable' variability");
+      categorize(v.index, Category::D);
+      break;
+    case Causality::INPUT:
+      // Control
+      casadi_assert(variability == Variability::CONTINUOUS
+        || variability == Variability::DISCRETE,
+        "'input' causality requires 'continuous' or 'discrete' variability");
+      categorize(v.index, Category::U);
+      break;
+    case Causality::OUTPUT:
+      // Type determined by providing equation, unless discrete variability
+      if (variability == Variability::CONSTANT) {
+        // Constant output
+        categorize(v.index, Category::C);
+      } else if (variability == Variability::DISCRETE) {
+        // Discrete variables are considered states with zero derivatives
+        categorize(v.index, no_q_ ? Category::X : Category::Q);
+      } else if (variability == Variability::CONTINUOUS) {
+        // Continuous variables are considered algebraic variables until given a defining equation
+        categorize(v.index, Category::Z);
+      } else {
+        casadi_error("'output' causality requires 'constant', 'continuous' or "
+          "'discrete' variability");
+      }
       break;
     case Causality::LOCAL:
       // Type determined by providing equation, unless discrete variability
-      if (variability == Variability::DISCRETE) {
+      if (variability == Variability::CONSTANT) {
+        // Constant local
+        categorize(v.index, Category::C);
+      } else if (variability == Variability::DISCRETE) {
         // Discrete variables are considered states with zero derivatives
-        categorize(v.index, Category::X);
-      } else {
-        // Initialize as algebraic variable
+        categorize(v.index, no_q_ ? Category::X : Category::Q);
+      } else if (variability == Variability::CONTINUOUS) {
+        // Continuous variables are considered algebraic variables until given a defining equation
         categorize(v.index, Category::Z);
+      } else if (variability == Variability::FIXED || variability == Variability::TUNABLE) {
+        // Fixed or tunable local
+        categorize(v.index, Category::D);
+      } else {
+        casadi_error("'output' causality requires 'constant', 'fixed', 'tunable', 'discrete' or " 
+          "'continuous' variability");
       }
       break;
+    case Causality::INDEPENDENT:
+      // Independent variable
+      casadi_assert(!has_t(), "'t' already defined");
+      casadi_assert(variability == Variability::CONTINUOUS,
+        "Independent variable must be continuous");
+      categorize(v.index, Category::T);
+      break;
     default:
-      casadi_error("Unknown causality");
+      casadi_error("Unknown causality: " + to_string(causality));
+  }
+  // Also create an output variable, if needed
+  if (causality == Causality::OUTPUT) {
+    Variable& y = new_variable("__out__" + name, dimension);
+    y.parent = v.index;
+    y.beq = v.v;
+    categorize(y.index, Category::Y);
   }
   // Also create a derivative variable, if needed
   if (v.needs_der()) {
-    Variable& der_v = new_variable("der_" + name, dimension);
+    Variable& der_v = new_variable("__der__" + name, dimension);
     categorize(der_v.index, Category::DER);
     der_v.der_of = v.index;
     der_v.parent = v.index;
@@ -3009,7 +3062,6 @@ void DaeBuilderInternal::eq(const MX& lhs, const MX& rhs, const Dict& opts) {
   for (auto&& op : opts) {
     casadi_error("No such option: " + op.first);
   }
-
   // Make sure vectors
   casadi_assert(lhs.is_column(), "Left-hand-side must be a column vector");
   casadi_assert(rhs.is_column(), "Right-hand-side must be a column vector");
@@ -3057,7 +3109,7 @@ void DaeBuilderInternal::eq(const MX& lhs, const MX& rhs, const Dict& opts) {
       } else if (v.category == Category::Z) {
         // Reclassify as dependent variable
         categorize(v.index, Category::W);
-      } else if (v.category != Category::Y) {
+      } else {
         casadi_error("Cannot handle left-hand-side: " + str(lhs));
       }
     } else {
@@ -3093,6 +3145,9 @@ void DaeBuilderInternal::eq(const MX& lhs, const MX& rhs, const Dict& opts) {
       // Reclassify derivative as algebraic variable
       v.category = Category::Z;
       insert(indices(Category::Z), v.index);
+    } else if (v.category == Category::Q) {
+      // If quadrature state appears in the right-hand-side, reclassify as differential state
+      categorize(v.index, Category::X);
     }
   }
 }
@@ -3114,12 +3169,10 @@ void DaeBuilderInternal::when(const MX& cond, const std::vector<std::string>& eq
     casadi_error("Cannot parse zero-crossing condition" + str(cond));
   }
   // Create a new dependent variable for the event indicator
-  Variable& e = add(unique_name("__when__"), Causality::OUTPUT, Variability::CONTINUOUS, Dict());
+  Variable& e = add(unique_name("__when__"), Causality::LOCAL, Variability::CONTINUOUS, Dict());
   eq(e.v, zero, Dict());
   // Move from y to e
-  remove(indices(Category::Y), e.index);
-  insert(indices(Category::E), e.index);
-  e.category = Category::E;
+  categorize(e.index, Category::E);
   // Convert to legacy format, pending refactoring
   std::vector<MX> all_lhs, all_rhs;
   for (auto&& eq : eqs) {
@@ -3137,11 +3190,10 @@ std::string DaeBuilderInternal::assign(const std::string& name, const MX& val) {
   // Create a unique name for the reinit variable
   std::string assign_name = unique_name("__assign__" + name + "__");
   // Add a new dependent variable defined by val
-  Variable& v = add(assign_name, Causality::OUTPUT, Variability::CONTINUOUS, Dict());
+  Variable& v = add(assign_name, Causality::LOCAL, Variability::CONTINUOUS, Dict());
   eq(v.v, val, Dict());
-  // Remove from y and classify as assign variable
-  remove(indices(Category::Y), v.index);
-  v.category = Category::ASSIGN;
+  // Classify as assign variable
+  categorize(v.index, Category::ASSIGN);
   v.parent = variable(name).index;
   // Return the variable name
   return assign_name;
@@ -3151,11 +3203,10 @@ std::string DaeBuilderInternal::reinit(const std::string& name, const MX& val) {
   // Create a unique name for the reinit variable
   std::string reinit_name = unique_name("__reinit__" + name + "__");
   // Add a new dependent variable defined by val
-  Variable& v = add(reinit_name, Causality::OUTPUT, Variability::CONTINUOUS, Dict());
+  Variable& v = add(reinit_name, Causality::LOCAL, Variability::CONTINUOUS, Dict());
   eq(v.v, val, Dict());
-  // Remove from y and classify as reinit variable
-  remove(indices(Category::Y), v.index);
-  v.category = Category::REINIT;
+  // Classify as reinit variable
+  categorize(v.index, Category::REINIT);
   v.parent = variable(name).index;
   // Return the variable name
   return reinit_name;

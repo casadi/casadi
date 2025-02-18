@@ -29,12 +29,14 @@ import numpy as np
 dae = ca.DaeBuilder('bouncing_ball')
 
 # Model variables
-h = dae.add('h', dict(start = 5))
-v = dae.add('v', dict(start = 0))
+t = dae.add('t', 'independent')
+h = dae.add('h', 'output', dict(start = 5, initial = 'exact'))
+v = dae.add('v', 'output', dict(start = 0, initial = 'exact'))
 
 # Dynamic equations
 dae.eq(dae.der(h), v)
 dae.eq(dae.der(v), -9.81)
+dae.disp(True)
 
 # Event dynamics: When h < 0, reinitialize v to -0.8*v
 dae.when(h < 0, [dae.reinit('v', -0.8*dae.pre(v))])

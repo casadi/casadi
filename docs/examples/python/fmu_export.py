@@ -27,8 +27,8 @@ dae = DaeBuilder('vdp')
 
 # States
 t = dae.add('t', 'independent')
-x1 = dae.add('x1', dict(start = 1))
-x2 = dae.add('x2', dict(start = 0))
+x1 = dae.add('x1', 'output', dict(start = 1))
+x2 = dae.add('x2', 'output', dict(start = 0))
 q = dae.add('q')
 
 # Input
@@ -53,7 +53,8 @@ print('Generated files: {}'.format(funcs))
 
 # Compile DLL
 import os
-os.system('gcc --shared -fPIC -I../../../external_packages/FMI-Standard-3.0/headers/ vdp.c vdp_wrap.c -o vdp.so')
+casadi_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+os.system(f'gcc --shared -fPIC -I{casadi_root}/external_packages/FMI-Standard-3.0/headers/ vdp.c vdp_wrap.c -o vdp.so')
 print('Compiled vdp.so')
 
 # Package into an FMU
