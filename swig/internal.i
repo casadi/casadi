@@ -871,6 +871,9 @@
 %exception  casadi::DaeBuilder::set_nominal(const std::vector< std::string > &name, const std::vector< double > &val) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
+%exception  casadi::DaeBuilder::set_start(const std::string &name, const std::vector< double > &val) {
+ CATCH_OR_NOT(INTERNAL_MSG() $action) 
+}
 %exception  casadi::DaeBuilder::set_start(const std::string &name, double val) {
  CATCH_OR_NOT(INTERNAL_MSG() $action) 
 }
