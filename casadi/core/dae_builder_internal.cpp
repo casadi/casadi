@@ -3897,8 +3897,23 @@ void DaeBuilderInternal::set_attribute(Attribute a, const std::string& name, dou
 
 void DaeBuilderInternal::set_attribute(Attribute a, const std::vector<std::string>& name,
     const std::vector<double>& val) {
-  casadi_assert(name.size() == val.size(), "Dimension mismatch");
-  for (size_t k = 0; k < name.size(); ++k) variable(name[k]).set_attribute(a, val[k]);
+  if (name.size() == val.size()) {
+    // One scalar value per variable
+    for (size_t k = 0; k < name.size(); ++k) variable(name[k]).set_attribute(a, val[k]);
+  } else if (val.size() == size(a, name)) {
+    // One vector slice per variable
+    auto val_it = val.begin();
+    for (size_t k = 0; k < name.size(); ++k) {
+      Variable& v = variable(name[k]);
+      auto val_next = val_it + v.size(a);
+      v.set_attribute(a, std::vector<double>(val_it, val_next));
+      val_it = val_next;
+    }
+  } else {
+    casadi_error("Cannot set attribute " + to_string(a) + ": Argument is of length " +
+      str(val.size()) + ", expected number of elements (" + str(size(a, name))
+      + ") or number of variables (" + str(name.size()) + ")");
+  }
 }
 
 std::string DaeBuilderInternal::string_attribute(Attribute a,

@@ -1278,6 +1278,14 @@ void DaeBuilder::set_start(const std::string& name, double val) {
   }
 }
 
+void DaeBuilder::set_start(const std::string& name, const std::vector<double>& val) {
+  try {
+    (*this)->set_attribute(Attribute::START, std::vector<std::string>{name}, val);
+  } catch (std::exception& e) {
+    THROW_ERROR("set_start", e.what());
+  }
+}
+
 void DaeBuilder::set_start(const std::vector<std::string>& name, const std::vector<double>& val) {
   try {
     (*this)->set_attribute(Attribute::START, name, val);

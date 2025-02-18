@@ -723,6 +723,9 @@ class CASADI_EXPORT DaeBuilder
   /// Set the start attribute, single variable
   void set_start(const std::string& name, double val);
 
+  /// Set the start attribute, vector argument
+  void set_start(const std::string& name, const std::vector<double>& val);
+
   // Clear all set values
   void reset();
 
