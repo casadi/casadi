@@ -2777,7 +2777,7 @@ Variable& DaeBuilderInternal::add(const std::string& name, Causality causality,
         // Fixed or tunable local
         categorize(v.index, Category::D);
       } else {
-        casadi_error("'output' causality requires 'constant', 'fixed', 'tunable', 'discrete' or " 
+        casadi_error("'output' causality requires 'constant', 'fixed', 'tunable', 'discrete' or "
           "'continuous' variability");
       }
       break;
