@@ -34,7 +34,7 @@
 "input(NLPSOL_X0) == output(NLPSOL_X). Indeed if bounds on X or\n"
 "constraints are unmet, they will differ.\n"
 "\n"
-"For a good tutorial on IPOPT, seehttp://drops.dagstuhl.de/volltexte/2009/2089/pdf/09061.WaechterAndreas.Paper.2089.pdf\n"
+"For a good tutorial on IPOPT, seehttps://drops.dagstuhl.de/storage/16dagstuhl-seminar-proceedings/dsp-vol09061/DagSemProc.09061.16/DagSemProc.09061.16.pdf\n"
 "\n"
 "A good resource about the algorithms in IPOPT is: Wachter and L. T.\n"
 "Biegler, On the Implementation of an Interior-Point Filter Line-Search\n"
