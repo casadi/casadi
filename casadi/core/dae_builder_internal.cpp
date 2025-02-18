@@ -3120,14 +3120,17 @@ void DaeBuilderInternal::when(const MX& cond, const std::vector<std::string>& eq
   remove(indices(Category::Y), e.index);
   insert(indices(Category::E), e.index);
   e.category = Category::E;
-  // Read equations
+  // Convert to legacy format, pending refactoring
+  std::vector<MX> all_lhs, all_rhs;
   for (auto&& eq : eqs) {
-    when_cond_.push_back(variable(e.index).beq);
     Variable& ee = variable(eq);
     casadi_assert_dev(ee.category == Category::ASSIGN || ee.category == Category::REINIT);
-    when_lhs_.push_back(var(ee.parent));
-    when_rhs_.push_back(ee.beq);
+    all_lhs.push_back(var(ee.parent));
+    all_rhs.push_back(ee.beq);
   }
+  when_cond_.push_back(variable(e.index).beq);
+  when_lhs_.push_back(vertcat(all_lhs));
+  when_rhs_.push_back(vertcat(all_rhs));
 }
 
 std::string DaeBuilderInternal::assign(const std::string& name, const MX& val) {
