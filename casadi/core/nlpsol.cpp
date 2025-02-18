@@ -277,8 +277,8 @@ namespace casadi {
     bound_consistency_ = false;
     min_lam_ = 0;
     calc_lam_x_ = calc_f_ = calc_g_ = false;
-    calc_lam_p_ = false;
-    no_nlp_grad_ = true;
+    calc_lam_p_ = true;
+    no_nlp_grad_ = false;
     error_on_fail_ = false;
     sens_linsol_ = "qr";
   }
