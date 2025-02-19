@@ -1787,6 +1787,21 @@ std::string to_string(OutputCategory v) {
   return "";
 }
 
+Category input_category(OutputCategory cat) {
+  switch (cat) {
+    case OutputCategory::ODE: return Category::X;
+    case OutputCategory::ALG: return Category::RES;
+    case OutputCategory::QUAD: return Category::Q;
+    case OutputCategory::ZERO: return Category::E;
+    case OutputCategory::D: return Category::D;
+    case OutputCategory::W: return Category::W;
+    case OutputCategory::Y: return Category::Y;
+    default: break;
+  }
+  casadi_error("No input category for " + to_string(cat));
+}
+
+
 std::vector<MX> DaeBuilderInternal::input(Category ind) const {
   // Operation only permitted for input categories
   casadi_assert(is_input_category(ind),
@@ -1804,13 +1819,15 @@ std::vector<MX> DaeBuilderInternal::input(const std::vector<Category>& ind) cons
 }
 
 std::vector<MX> DaeBuilderInternal::output(OutputCategory ind) const {
+  // Get corresponding input category
+  Category cat = input_category(ind);
   // Return object
   std::vector<MX> ret;
+  ret.reserve(size(cat));
   // Handle different categories
   switch (ind) {
     case OutputCategory::ODE:
       // Differential state
-      ret.reserve(size(Category::X));
       for (size_t v : indices(Category::X)) {
         const Variable& x = variable(v);
         if (x.der >= 0) {
@@ -1825,31 +1842,17 @@ std::vector<MX> DaeBuilderInternal::output(OutputCategory ind) const {
         }
       }
       break;
-    case OutputCategory::ALG:
-      // Residual equations
-      ret.reserve(size(Category::RES));
-      for (size_t v : indices(Category::RES)) ret.push_back(variable(v).v);
-      break;
     case OutputCategory::QUAD: return quad();
-    case OutputCategory::ZERO:
-      // Zero-crossing function
-      ret.reserve(size(Category::E));
-      for (size_t v : indices(Category::E)) ret.push_back(variable(v).v);
-      break;
-    case OutputCategory::D:
-      // Dependent parameters
-      ret.reserve(size(Category::D));
-      for (size_t d : indices(Category::D)) ret.push_back(variable(variable(d).bind).v);
-      break;
-    case OutputCategory::W:
-      // Dependent variables
-      ret.reserve(size(Category::W));
-      for (size_t w : indices(Category::W)) ret.push_back(variable(variable(w).bind).v);
-      break;
+    case OutputCategory::ALG:  // fall-through
+    case OutputCategory::ZERO:  // fall-through
     case OutputCategory::Y:
-      // Outputs
-      ret.reserve(size(Category::Y));
-      for (size_t v : indices(Category::Y)) ret.push_back(variable(v).v);
+      // Defined by variable itself
+      for (size_t v : indices(cat)) ret.push_back(variable(v).v);
+      break;
+    case OutputCategory::D:  // fall-through
+    case OutputCategory::W:
+      // Defined by binding expression
+      for (size_t d : indices(cat)) ret.push_back(variable(variable(d).bind).v);
       break;
     default: break;
   }

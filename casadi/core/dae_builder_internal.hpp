@@ -803,6 +803,9 @@ CASADI_EXPORT std::vector<Category> input_categories();
 // Get all output categories
 CASADI_EXPORT std::vector<OutputCategory> output_categories();
 
+// Get the input category for a particular output category
+CASADI_EXPORT Category input_category(OutputCategory cat);
+
 /// \endcond
 
 } // namespace casadi
