@@ -1809,7 +1809,11 @@ std::vector<MX> DaeBuilderInternal::output(OutputCategory ind) const {
   // Handle different categories
   switch (ind) {
     case OutputCategory::ODE: return ode();
-    case OutputCategory::ALG: return alg();
+    case OutputCategory::ALG:
+      // Residual equations
+      ret.reserve(size(Category::RES));
+      for (size_t v : indices(Category::RES)) ret.push_back(variable(v).v);
+      break;
     case OutputCategory::QUAD: return quad();
     case OutputCategory::ZERO: return zero();
     case OutputCategory::D:
@@ -2634,15 +2638,6 @@ std::vector<MX> DaeBuilderInternal::ode() const {
       // Missing ODE?
       casadi_error("Missing derivative for " + str(x.name));
     }
-  }
-  return ret;
-}
-
-std::vector<MX> DaeBuilderInternal::alg() const {
-  std::vector<MX> ret;
-  ret.reserve(size(Category::RES));
-  for (size_t v : indices(Category::RES)) {
-    ret.push_back(variable(v).v);
   }
   return ret;
 }

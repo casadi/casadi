@@ -557,11 +557,6 @@ protected:
       \identifier{y} */
   std::vector<MX> ode() const;
 
-  /** \brief Algebraic right hand sides
-
-      \identifier{z} */
-  std::vector<MX> alg() const;
-
   /** \brief Quadrature right hand sides
 
       \identifier{10} */
