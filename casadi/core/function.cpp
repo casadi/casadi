@@ -971,6 +971,20 @@ namespace casadi {
     }
   }
 
+  bool Function::has_in(const std::string &name) const {
+    for (const std::string& s : (*this)->name_in_) {
+      if (s==name) return true;
+    }
+    return false;
+  }
+
+  bool Function::has_out(const std::string &name) const {
+    for (const std::string& s : (*this)->name_out_) {
+      if (s==name) return true;
+    }
+    return false;
+  }
+
   const std::string& Function::name_in(casadi_int ind) const {
     try {
       return (*this)->name_in_.at(ind);

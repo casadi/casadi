@@ -3634,7 +3634,39 @@ class MXtests(casadiTestCase):
                 self.checkfunction(fsx,fmx,inputs=[args])
             args = [vertcat(-0.3,0.3,0.21,0.17,0)]
             self.check_codegen(fmx,inputs=args)
-            
+      
+  def test_contains(self):
+    x = MX.sym("x",2,2)
+    y = MX.sym("y")
+    z = MX.sym("z",3,3)
+    
+    e = x*y
+    self.assertTrue(contains([x,y,z],x))
+    self.assertFalse(contains([x,y],z))
+    self.assertTrue(contains_any([x,y],[y,z]))
+    self.assertFalse(contains_all([x,y],[y,z]))
+    self.assertTrue(contains_any([x,y],[x,y]))
+    self.assertTrue(contains_all([x,y],[x,y]))
+    self.assertTrue(contains([e,x],e))
+   
+  def test_issue4041(self):
+    
+    x = MX.sym("x")
+    y = MX.sym("y")
+
+    f = Function('f',[x,y],[x**2],{"never_inline":True})
+
+    expr = f(x,y)
+    
+    self.assertFalse(depends_on(expr,y))
+    self.assertTrue(contains(symvar(expr),y))
+ 
+    f = Function('f',[x,y],[x**2],{"always_inline":True})
+
+    expr = f(x,y)
+    
+    self.assertFalse(depends_on(expr,y))
+    self.assertFalse(contains(symvar(expr),y))
       
 if __name__ == '__main__':
     unittest.main()
