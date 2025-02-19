@@ -258,6 +258,14 @@ std::vector<Category> input_categories() {
   return ret;
 }
 
+std::vector<OutputCategory> output_categories() {
+  std::vector<OutputCategory> ret;
+  for (casadi_int i = 0; i != enum_traits<OutputCategory>::n_enum; ++i) {
+    ret.push_back(static_cast<OutputCategory>(i));
+  }
+  return ret;
+}
+
 casadi_int Variable::size(Attribute a) const {
   switch (a) {
     case Attribute::START:  // Fall-through
@@ -1356,11 +1364,11 @@ void DaeBuilderInternal::prune(bool prune_p, bool prune_u) {
     }
   }
   // Collect all DAE output variables with at least one entry
-  for (casadi_int i = 0; i != DAE_BUILDER_NUM_OUT; ++i) {
-    v = output(static_cast<DaeBuilderInternalOut>(i));
+  for (OutputCategory cat : output_categories()) {
+    v = output(cat);
     if (!v.empty()) {
       f_out.push_back(vertcat(v));
-      f_out_name.push_back(to_string(static_cast<DaeBuilderInternalOut>(i)));
+      f_out_name.push_back(to_string(cat));
     }
   }
   // Create a function
@@ -1765,15 +1773,15 @@ void DaeBuilderInternal::lift(bool lift_shared, bool lift_calls) {
   casadi_assert_dev(it == ex.end());
 }
 
-std::string to_string(DaeBuilderInternal::DaeBuilderInternalOut v) {
+std::string to_string(OutputCategory v) {
   switch (v) {
-  case DaeBuilderInternal::DAE_BUILDER_ODE: return "ode";
-  case DaeBuilderInternal::DAE_BUILDER_ALG: return "alg";
-  case DaeBuilderInternal::DAE_BUILDER_QUAD: return "quad";
-  case DaeBuilderInternal::DAE_BUILDER_ZERO: return "zero";
-  case DaeBuilderInternal::DAE_BUILDER_DDEF: return "ddef";
-  case DaeBuilderInternal::DAE_BUILDER_WDEF: return "wdef";
-  case DaeBuilderInternal::DAE_BUILDER_YDEF: return "ydef";
+  case OutputCategory::ODE: return "ode";
+  case OutputCategory::ALG: return "alg";
+  case OutputCategory::QUAD: return "quad";
+  case OutputCategory::ZERO: return "zero";
+  case OutputCategory::D: return "ddef";
+  case OutputCategory::W: return "wdef";
+  case OutputCategory::Y: return "ydef";
   default: break;
   }
   return "";
@@ -1795,20 +1803,20 @@ std::vector<MX> DaeBuilderInternal::input(const std::vector<Category>& ind) cons
   return ret;
 }
 
-std::vector<MX> DaeBuilderInternal::output(DaeBuilderInternalOut ind) const {
+std::vector<MX> DaeBuilderInternal::output(OutputCategory ind) const {
   switch (ind) {
-  case DAE_BUILDER_ODE: return ode();
-  case DAE_BUILDER_ALG: return alg();
-  case DAE_BUILDER_QUAD: return quad();
-  case DAE_BUILDER_ZERO: return zero();
-  case DAE_BUILDER_DDEF: return ddef();
-  case DAE_BUILDER_WDEF: return wdef();
-  case DAE_BUILDER_YDEF: return ydef();
+  case OutputCategory::ODE: return ode();
+  case OutputCategory::ALG: return alg();
+  case OutputCategory::QUAD: return quad();
+  case OutputCategory::ZERO: return zero();
+  case OutputCategory::D: return ddef();
+  case OutputCategory::W: return wdef();
+  case OutputCategory::Y: return ydef();
   default: return std::vector<MX>();
   }
 }
 
-std::vector<MX> DaeBuilderInternal::output(const std::vector<DaeBuilderInternalOut>& ind) const {
+std::vector<MX> DaeBuilderInternal::output(const std::vector<OutputCategory>& ind) const {
   std::vector<MX> ret(ind.size());
   for (casadi_int i=0; i<ind.size(); ++i) {
     ret[i] = vertcat(output(ind[i]));
@@ -1829,9 +1837,9 @@ void DaeBuilderInternal::add_lc(const std::string& name, const std::vector<std::
 
   // Consistency checks
   casadi_assert(!f_out.empty(), "DaeBuilderInternal::add_lc: Linear combination is empty");
-  std::vector<bool> in_use(DAE_BUILDER_NUM_OUT, false);
-  for (casadi_int i=0; i<f_out.size(); ++i) {
-    DaeBuilderInternalOut oind = to_enum<DaeBuilderInternalOut>(f_out[i]);
+  std::vector<bool> in_use(enum_traits<OutputCategory>::n_enum, false);
+  for (casadi_int i=0; i < f_out.size(); ++i) {
+    auto oind = static_cast<size_t>(to_enum<OutputCategory>(f_out[i]));
     casadi_assert(!in_use[oind], "DaeBuilderInternal::add_lc: Duplicate expression " + f_out[i]);
     in_use[oind] = true;
   }
@@ -2193,13 +2201,13 @@ const Function& DaeBuilderInternal::oracle(bool sx, bool elim_w, bool lifted_cal
     }
 
     // Collect all DAE output variables
-    for (size_t i = 0; i != DAE_BUILDER_NUM_OUT; ++i) {
-      f_out_name.push_back(to_string(static_cast<DaeBuilderInternalOut>(i)));
-      v = output(static_cast<DaeBuilderInternalOut>(i));
+    for (OutputCategory cat : output_categories()) {
+      f_out_name.push_back(to_string(cat));
+      v = output(cat);
       if (v.empty()) {
         f_out.push_back(MX(0, 1));
       } else {
-        if (i == DAE_BUILDER_WDEF) wdef_ind = f_out.size();
+        if (cat == OutputCategory::W) wdef_ind = f_out.size();
         f_out.push_back(vertcat(v));
       }
     }
@@ -2568,11 +2576,11 @@ Function DaeBuilderInternal::gather_eq() const {
   // Names of outputs
   std::vector<std::string> f_out_name;
   // Get all expressions
-  for (casadi_int i = 0; i != DAE_BUILDER_NUM_OUT; ++i) {
-    std::vector<MX> v = output(static_cast<DaeBuilderInternalOut>(i));
+  for (OutputCategory cat : output_categories()) {
+    std::vector<MX> v = output(cat);
     if (!v.empty()) {
       f_out.push_back(vertcat(v));
-      f_out_name.push_back(to_string(static_cast<DaeBuilderInternalOut>(i)));
+      f_out_name.push_back(to_string(cat));
     }
   }
   // Construct function

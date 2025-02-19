@@ -61,6 +61,9 @@ enum class Variability {CONSTANT, FIXED, TUNABLE, DISCRETE, CONTINUOUS, NUMEL};
 // Variable categories
 enum class Category {T, C, P, D, W, U, X, Z, Q, Y, E, DER, RES, ASSIGN, REINIT, NUMEL};
 
+// Output categories for generated functions
+enum class OutputCategory {ODE, ALG, QUAD, ZERO, D, W, Y, NUMEL};
+
 /// Initial: FMI 2.0 specification, section 2.2.7 or FMI 3.0 specification, section 2.4.7.5
 enum class Initial {EXACT, APPROX, CALCULATED, NA, NUMEL};
 
@@ -306,29 +309,17 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   static std::string generate(const std::vector<double>& v);
   ///@}
 
-  // Output convention in codegen
-  enum DaeBuilderInternalOut {
-    DAE_BUILDER_ODE,
-    DAE_BUILDER_ALG,
-    DAE_BUILDER_QUAD,
-    DAE_BUILDER_ZERO,
-    DAE_BUILDER_DDEF,
-    DAE_BUILDER_WDEF,
-    DAE_BUILDER_YDEF,
-    DAE_BUILDER_NUM_OUT
-  };
-
   // Get input expression, given enum
   std::vector<MX> input(Category ind) const;
 
   // Get output expression, given enum
-  std::vector<MX> output(DaeBuilderInternalOut ind) const;
+  std::vector<MX> output(OutputCategory ind) const;
 
   // Get input expression, given enum
   std::vector<MX> input(const std::vector<Category>& ind) const;
 
   // Get output expression, given enum
-  std::vector<MX> output(const std::vector<DaeBuilderInternalOut>& ind) const;
+  std::vector<MX> output(const std::vector<OutputCategory>& ind) const;
 
   /// Add a named linear combination of output expressions
   void add_lc(const std::string& name, const std::vector<std::string>& f_out);
@@ -812,13 +803,6 @@ protected:
 };
 
 ///@{
-/// Number of entries in enums
-template<> struct enum_traits<DaeBuilderInternal::DaeBuilderInternalOut> {
-  static const size_t n_enum = DaeBuilderInternal::DAE_BUILDER_NUM_OUT;
-};
-///@}
-
-///@{
 /// Version mappings
 CASADI_EXPORT Type from_fmi2(TypeFmi2 v);
 CASADI_EXPORT TypeFmi2 to_fmi2(Type v);
@@ -834,7 +818,7 @@ CASADI_EXPORT std::string to_string(Initial v);
 CASADI_EXPORT std::string to_string(Attribute v);
 CASADI_EXPORT std::string to_string(DependenciesKind v);
 CASADI_EXPORT std::string to_string(Category v);
-CASADI_EXPORT std::string to_string(DaeBuilderInternal::DaeBuilderInternalOut v);
+CASADI_EXPORT std::string to_string(OutputCategory v);
 ///@}
 
 ///@{
@@ -847,6 +831,9 @@ CASADI_EXPORT bool is_input_category(Category cat);
 
 // Get all input categories
 CASADI_EXPORT std::vector<Category> input_categories();
+
+// Get all output categories
+CASADI_EXPORT std::vector<OutputCategory> output_categories();
 
 /// \endcond
 
