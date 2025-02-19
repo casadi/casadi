@@ -50,13 +50,13 @@ enum class Causality {PARAMETER, CALCULATED_PARAMETER, INPUT, OUTPUT, LOCAL, IND
 /// Variability: FMI 2.0 specification, section 2.2.7 or FMI 3.0 specification, section 2.4.7.4
 enum class Variability {CONSTANT, FIXED, TUNABLE, DISCRETE, CONTINUOUS, NUMEL};
 
-// CasADi classification of model variables, cf. Table 17 in FMI specification, 3.0.2
-//              PARAMETER  CALCULATED_PARAMETER  INPUT  OUTPUT  LOCAL  INDEPENDENT
-// CONSTANT     -          -                     -      C       C      -
-// FIXED        C          D                     -      -       D      -
-// TUNABLE      P          D                     -      -       D      -
-// DISCRETE     -          -                     U      Y       X      -
-// CONTINUOUS   -          -                     U      Y/Q     X      T
+// CasADi classification of model variables, cf. Table 18 in FMI specification, 3.0.2
+//              PARAMETER  CALCULATED_PARAMETER  INPUT   OUTPUT   LOCAL    INDEPENDENT
+// CONSTANT     -          -                     -       C        C        -
+// FIXED        C          D                     -       -        D        -
+// TUNABLE      P          D                     -       -        D        -
+// DISCRETE     -          -                     U       X/Q      X/Q      -
+// CONTINUOUS   -          -                     U       X/Q/W/Z  X/Q/W/Z  T
 
 // Input convention in codegen
 enum class Category {T, C, P, D, W, U, X, Z, Q, Y, E, DER, RES, ASSIGN, REINIT, NUMEL};
@@ -82,7 +82,7 @@ struct CASADI_EXPORT Variable {
  private:
   /// Constructor (only accessible via DaeBuilderInternal::new_variable)
   Variable(casadi_int index, const std::string& name,
-    const std::vector<casadi_int>& dimension);
+    const std::vector<casadi_int>& dimension, const MX& expr);
 
  public:
   /// @brief Location in variable vector
@@ -390,7 +390,8 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
 
   /// Create a new variable
   Variable& new_variable(const std::string& name,
-    const std::vector<casadi_int>& dimension = {1});
+    const std::vector<casadi_int>& dimension = {1},
+    const MX& expr = MX());
 
   /// Check if a particular variable exists
   bool has(const std::string& name) const;
@@ -610,6 +611,10 @@ protected:
   /// Add a new variable
   Variable& add(const std::string& name, Causality causality, Variability variability,
     const Dict& opts);
+
+  /// Add a new variable, expression provided
+  Variable& add(const std::string& name, Causality causality, Variability variability,
+    const MX& expr, const Dict& opts);
 
   /// Add a new variable, default variability
   Variable& add(const std::string& name, Causality causality, const Dict& opts);

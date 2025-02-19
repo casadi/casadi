@@ -529,6 +529,21 @@ MX DaeBuilder::add(const std::string& name, const Dict& opts) {
   }
 }
 
+void DaeBuilder::add(const std::string& name, const std::string& causality,
+  const std::string& variability, const MX& expr, const Dict& opts) {
+  try {
+    // Ensure pure symbolic expression
+    casadi_assert(expr.is_symbolic(), "Expression must be symbolic");
+    // Make sure name matches expression
+    casadi_assert(name == expr.name(), "Name must match expression");
+    // Add variable
+    (*this)->add(name, to_enum<Causality>(causality), to_enum<Variability>(variability),
+      expr, opts);
+  } catch (std::exception& e) {
+    THROW_ERROR("add", e.what());
+  }
+}
+
 #ifdef WITH_DEPRECATED_FEATURES
 MX DaeBuilder::add_t(const std::string& name) {
   return add(name, "independent");

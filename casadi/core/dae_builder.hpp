@@ -295,6 +295,7 @@ class CASADI_EXPORT DaeBuilder
    *  Formulate a dynamic system model
    */
   ///@{
+
   /// Add a new model variable
   MX add(const std::string& name,
     const std::string& causality,
@@ -308,6 +309,13 @@ class CASADI_EXPORT DaeBuilder
 
   /// Add a new model variable, default variability and causality
   MX add(const std::string& name,
+    const Dict& opts=Dict());
+
+  /// Add a new model variable, symbolic expression already available
+  void add(const std::string& name,
+    const std::string& causality,
+    const std::string& variability,
+    const MX& expr,
     const Dict& opts=Dict());
 
 #ifdef WITH_DEPRECATED_FEATURES

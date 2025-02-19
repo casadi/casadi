@@ -352,8 +352,8 @@ Initial Variable::default_initial(Causality causality, Variability variability) 
 }
 
 Variable::Variable(casadi_int index, const std::string& name,
-    const std::vector<casadi_int>& dimension)
-    : index(index), name(name), dimension(dimension) {
+    const std::vector<casadi_int>& dimension, const MX& expr)
+    : index(index), name(name), dimension(dimension), v(expr) {
   // Consistency checks
   casadi_assert(dimension.size() > 0, "Variable must have at least one dimension");
   for (casadi_int d : dimension) casadi_assert(d > 0, "Dimensions must be positive");
@@ -361,7 +361,7 @@ Variable::Variable(casadi_int index, const std::string& name,
   numel = 1;
   for (casadi_int d : dimension) numel *= d;
   // Symbolic expression (always flattened)
-  this->v = MX::sym(name, numel);
+  if (this->v.is_empty()) this->v = MX::sym(name, numel);
   // Default arguments
   this->value_reference = index;
   this->type = Type::FLOAT64;
@@ -1550,7 +1550,7 @@ size_t DaeBuilderInternal::n_mem() const {
 }
 
 Variable& DaeBuilderInternal::new_variable(const std::string& name,
-    const std::vector<casadi_int>& dimension) {
+    const std::vector<casadi_int>& dimension, const MX& expr) {
   // Name check
   casadi_assert(!name.empty(), "Name is empty string");
   // Try to find the component
@@ -1559,7 +1559,7 @@ Variable& DaeBuilderInternal::new_variable(const std::string& name,
   size_t ind = n_variables();
   // Add to the map of all variables
   varind_[name] = ind;
-  variables_.push_back(new Variable(ind, name, dimension));
+  variables_.push_back(new Variable(ind, name, dimension, expr));
   // Clear cache
   clear_cache_ = true;
   // Return reference to new variable
@@ -2674,7 +2674,13 @@ std::vector<MX> DaeBuilderInternal::init_rhs() const {
 }
 
 Variable& DaeBuilderInternal::add(const std::string& name, Causality causality,
-    Variability variability, const Dict& opts) {
+  Variability variability, const Dict& opts) {
+  // No expression provided
+  return add(name, causality, variability, MX(), opts);
+}
+
+Variable& DaeBuilderInternal::add(const std::string& name, Causality causality,
+    Variability variability, const MX& expr, const Dict& opts) {
   // Default options
   std::string cat, description, type, initial, unit, display_unit;
   std::vector<casadi_int> dimension = {1};
@@ -2711,7 +2717,7 @@ Variable& DaeBuilderInternal::add(const std::string& name, Causality causality,
     }
   }
   // Create a new variable
-  Variable& v = new_variable(name, dimension);
+  Variable& v = new_variable(name, dimension, expr);
   v.description = description;
   if (!type.empty()) v.type = to_enum<Type>(type);
   v.causality = causality;
