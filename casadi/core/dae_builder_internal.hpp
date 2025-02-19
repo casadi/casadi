@@ -552,11 +552,6 @@ protected:
   /** \brief Definitions of dependent constants */
   std::vector<MX> cdef() const;
 
-  /** \brief ODE right hand sides
-
-      \identifier{y} */
-  std::vector<MX> ode() const;
-
   /** \brief Quadrature right hand sides
 
       \identifier{10} */

@@ -1808,7 +1808,23 @@ std::vector<MX> DaeBuilderInternal::output(OutputCategory ind) const {
   std::vector<MX> ret;
   // Handle different categories
   switch (ind) {
-    case OutputCategory::ODE: return ode();
+    case OutputCategory::ODE:
+      // Differential state
+      ret.reserve(size(Category::X));
+      for (size_t v : indices(Category::X)) {
+        const Variable& x = variable(v);
+        if (x.der >= 0) {
+          // Derivative variable
+          ret.push_back(variable(variable(x.der).bind).v);
+        } else if (x.variability == Variability::DISCRETE) {
+          // Discrete variable - derivative is zero
+          ret.push_back(MX::zeros(x.v.sparsity()));
+        } else {
+          // Missing ODE?
+          casadi_error("Missing derivative for " + str(x.name));
+        }
+      }
+      break;
     case OutputCategory::ALG:
       // Residual equations
       ret.reserve(size(Category::RES));
@@ -2624,25 +2640,6 @@ std::vector<MX> DaeBuilderInternal::cdef() const {
   std::vector<MX> ret;
   ret.reserve(size(Category::C));
   for (size_t c : indices(Category::C)) ret.push_back(variable(variable(c).bind).v);
-  return ret;
-}
-
-std::vector<MX> DaeBuilderInternal::ode() const {
-  std::vector<MX> ret;
-  ret.reserve(size(Category::X));
-  for (size_t v : indices(Category::X)) {
-    const Variable& x = variable(v);
-    if (x.der >= 0) {
-      // Derivative variable
-      ret.push_back(variable(variable(x.der).bind).v);
-    } else if (x.variability == Variability::DISCRETE) {
-      // Discrete variable - derivative is zero
-      ret.push_back(MX::zeros(x.v.sparsity()));
-    } else {
-      // Missing ODE?
-      casadi_error("Missing derivative for " + str(x.name));
-    }
-  }
   return ret;
 }
 

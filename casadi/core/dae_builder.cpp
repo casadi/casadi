@@ -71,7 +71,12 @@ const MX& DaeBuilder::time() const {
 }
 
 std::vector<MX> DaeBuilder::ode() const {
-  return (*this)->ode();
+  try {
+    return (*this)->output(OutputCategory::ODE);
+  } catch (std::exception& e) {
+    THROW_ERROR("ode", e.what());
+    return {};  // never reached
+  }
 }
 
 std::vector<MX> DaeBuilder::alg() const {
