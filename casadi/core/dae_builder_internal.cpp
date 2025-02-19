@@ -1225,7 +1225,7 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
         if (v.bind >= 0) stream << " := " << variable(v.bind).v;
         stream << std::endl;
       }
-    }      
+    }
   }
 
   for (Category cat : {Category::X, Category::Q}) {
