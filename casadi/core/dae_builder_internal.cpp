@@ -3459,11 +3459,11 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
         outputs_.push_back(vrmap_.at(e.attribute<size_t>("valueReference")));
         // Corresponding variable
         Variable& v = variable(outputs_.back());
-        // Add to y, unless state
-        if (v.der < 0) {
-          categorize(v.index, Category::Y);
-          v.beq = v.v;
-        }
+        // Create a new output variable
+        Variable& y = new_variable("__out__" + v.name, v.dimension);
+        y.parent = v.index;
+        y.beq = v.v;
+        categorize(y.index, Category::Y);
         // Get dependencies
         v.dependencies = read_dependencies(e);
         v.dependenciesKind = read_dependencies_kind(e, v.dependencies.size());
@@ -3575,11 +3575,10 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
         outputs_.push_back(e.attribute<casadi_int>("index", 0) - 1);
         // Corresponding variable
         Variable& v = variable(outputs_.back());
-        // Add to y, unless state
-        if (v.der < 0) {
-          categorize(v.index, Category::Y);
-          v.beq = v.v;
-        }
+        Variable& y = new_variable("__out__" + v.name, v.dimension);
+        y.parent = v.index;
+        y.beq = v.v;
+        categorize(y.index, Category::Y);
         // Get dependencies
         if (e.has_attribute("dependencies")) {
           v.dependencies = read_dependencies(e);
