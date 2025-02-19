@@ -126,8 +126,11 @@ struct CASADI_EXPORT Variable {
   casadi_int parent;
   ///@}
 
-  // corresponding derivative variable
+  // corresponding derivative variable, if any
   casadi_int der;
+
+  // corresponding binding expression, if any
+  casadi_int bind;
 
   /// Numerical value (also for booleans, integers, enums)
   std::vector<double> value;
@@ -147,10 +150,10 @@ struct CASADI_EXPORT Variable {
   /// Variable expression (always a vector)
   MX v;
 
-  /// Binding equation
+  /// Binding equation (to be merged with v, only need one or the other)
   MX beq;
 
-  /// Initial equation
+  /// Initial equation (to be removed and moved to a separate dependent variable)
   MX ieq;
 
   /// Total number of elements for a particular attribute
@@ -188,7 +191,7 @@ struct CASADI_EXPORT Variable {
   }
 
   // Does the variable have a binding equation
-  bool has_beq() const {return !beq.is_empty();}
+  bool has_beq() const {return bind >= 0 || !beq.is_empty();}
 
   // Does the variable need a derivative variable?
   bool needs_der() const;
@@ -659,10 +662,10 @@ protected:
   void when(const MX& cond, const std::vector<std::string>& eqs, const Dict& opts);
 
   /// Assignment inside when-equations or if-else equations
-  std::string assign(const std::string& name, const MX& val);
+  Variable& assign(const std::string& name, const MX& val);
 
   /// Reinitialize a state inside when-equations
-  std::string reinit(const std::string& name, const MX& val);
+  Variable& reinit(const std::string& name, const MX& val);
 
   /// Set a initial equation
   void set_init(const std::string& name, const MX& init_rhs);

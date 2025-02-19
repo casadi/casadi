@@ -618,7 +618,7 @@ void DaeBuilder::when(const MX& cond, const std::vector<std::string>& eqs, const
 
 std::string DaeBuilder::assign(const std::string& name, const MX& val) {
   try {
-    return (*this)->assign(name, val);
+    return (*this)->assign(name, val).name;
   } catch (std::exception& e) {
     THROW_ERROR("assign", e.what());
     return std::string();  // never reached
@@ -627,7 +627,7 @@ std::string DaeBuilder::assign(const std::string& name, const MX& val) {
 
 std::string DaeBuilder::reinit(const std::string& name, const MX& val) {
   try {
-    return (*this)->reinit(name, val);
+    return (*this)->reinit(name, val).name;
   } catch (std::exception& e) {
     THROW_ERROR("reinit", e.what());
     return std::string();  // never reached
@@ -737,7 +737,14 @@ bool DaeBuilder::has_beq(const std::string& name) const {
 
 MX DaeBuilder::beq(const std::string& name) const {
   try {
-    return (*this)->variable(name).beq;
+    const Variable& v = (*this)->variable(name);
+    if (v.bind >=0) {
+      // New syntax
+      return (*this)->variable(v.bind).beq;
+    } else {
+      // Old syntax
+      return v.beq;
+    }
   } catch (std::exception& e) {
     THROW_ERROR("beq", e.what());
     return MX();  // never reached
@@ -746,7 +753,7 @@ MX DaeBuilder::beq(const std::string& name) const {
 
 void DaeBuilder::set_beq(const std::string& name, const MX& val) {
   try {
-    (*this)->variable(name).beq = val;
+    eq(var(name), val);
   } catch (std::exception& e) {
     THROW_ERROR("set_beq", e.what());
   }

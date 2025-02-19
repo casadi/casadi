@@ -376,6 +376,7 @@ Variable::Variable(casadi_int index, const std::string& name,
   this->der_of = -1;
   this->parent = -1;
   this->der = -1;
+  this->bind = -1;
   this->value.resize(numel, nan);
   this->dependency = false;
 }
@@ -3098,8 +3099,11 @@ void DaeBuilderInternal::eq(const MX& lhs, const MX& rhs, const Dict& opts) {
         // TODO(@jaeandersson): Treat as implicit equation
         casadi_error("Already a binding equation for " + v.name);
       } else {
-        // Set the binding equation
+        // Old syntax: Set the binding equation
         v.beq = rhs;
+        // New syntax: Create an assignment variable
+        Variable& beq = assign(v.name, rhs);
+        v.bind = beq.index;
       }
       // (Re)classify variables
       if (v.category == Category::DER) {
@@ -3192,30 +3196,30 @@ void DaeBuilderInternal::when(const MX& cond, const std::vector<std::string>& eq
   when_rhs_.push_back(vertcat(all_rhs));
 }
 
-std::string DaeBuilderInternal::assign(const std::string& name, const MX& val) {
+Variable& DaeBuilderInternal::assign(const std::string& name, const MX& val) {
   // Create a unique name for the reinit variable
   std::string assign_name = unique_name("__assign__" + name + "__");
   // Add a new dependent variable defined by val
   Variable& v = add(assign_name, Causality::LOCAL, Variability::CONTINUOUS, Dict());
-  eq(v.v, val, Dict());
+  v.beq = val;
   // Classify as assign variable
   categorize(v.index, Category::ASSIGN);
   v.parent = variable(name).index;
   // Return the variable name
-  return assign_name;
+  return v;
 }
 
-std::string DaeBuilderInternal::reinit(const std::string& name, const MX& val) {
+Variable& DaeBuilderInternal::reinit(const std::string& name, const MX& val) {
   // Create a unique name for the reinit variable
   std::string reinit_name = unique_name("__reinit__" + name + "__");
   // Add a new dependent variable defined by val
   Variable& v = add(reinit_name, Causality::LOCAL, Variability::CONTINUOUS, Dict());
-  eq(v.v, val, Dict());
+  v.beq = val;
   // Classify as reinit variable
   categorize(v.index, Category::REINIT);
   v.parent = variable(name).index;
   // Return the variable name
-  return reinit_name;
+  return v;
 }
 
 void DaeBuilderInternal::set_init(const std::string& name, const MX& init_rhs) {
