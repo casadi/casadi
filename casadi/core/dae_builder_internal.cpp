@@ -1709,8 +1709,8 @@ void DaeBuilderInternal::lift(bool lift_shared, bool lift_calls) {
   if (size(Category::W) > 0) casadi_warning("'w' already has entries");
   // Expressions where the variables are also being used
   std::vector<MX> ex;
-  for (size_t v : indices(Category::X)) ex.push_back(variable(variable(v).der).beq);
-  for (size_t v : indices(Category::Q)) ex.push_back(variable(variable(v).der).beq);
+  for (size_t v : indices(Category::X)) ex.push_back(variable(variable(variable(v).der).bind).beq);
+  for (size_t v : indices(Category::Q)) ex.push_back(variable(variable(variable(v).der).bind).beq);
   for (size_t v : indices(Category::RES)) ex.push_back(variable(v).beq);
   for (size_t v : indices(Category::Y)) ex.push_back(variable(v).beq);
   // Lift expressions
@@ -1729,8 +1729,8 @@ void DaeBuilderInternal::lift(bool lift_shared, bool lift_calls) {
   }
   // Get expressions
   auto it = ex.begin();
-  for (size_t v : indices(Category::X)) variable(variable(v).der).beq = *it++;
-  for (size_t v : indices(Category::Q)) variable(variable(v).der).beq = *it++;
+  for (size_t v : indices(Category::X)) variable(variable(variable(v).der).bind).beq = *it++;
+  for (size_t v : indices(Category::Q)) variable(variable(variable(v).der).bind).beq = *it++;
   for (size_t v : indices(Category::RES)) variable(v).beq = *it++;
   for (size_t v : indices(Category::Y)) variable(v).beq = *it++;
   // Consistency check
@@ -2576,21 +2576,21 @@ bool DaeBuilderInternal::has_t() const {
 std::vector<MX> DaeBuilderInternal::cdef() const {
   std::vector<MX> ret;
   ret.reserve(size(Category::C));
-  for (size_t c : indices(Category::C)) ret.push_back(variable(c).beq);
+  for (size_t c : indices(Category::C)) ret.push_back(variable(variable(c).bind).beq);
   return ret;
 }
 
 std::vector<MX> DaeBuilderInternal::ddef() const {
   std::vector<MX> ret;
   ret.reserve(size(Category::D));
-  for (size_t d : indices(Category::D)) ret.push_back(variable(d).beq);
+  for (size_t d : indices(Category::D)) ret.push_back(variable(variable(d).bind).beq);
   return ret;
 }
 
 std::vector<MX> DaeBuilderInternal::wdef() const {
   std::vector<MX> ret;
   ret.reserve(size(Category::W));
-  for (size_t w : indices(Category::W)) ret.push_back(variable(w).beq);
+  for (size_t w : indices(Category::W)) ret.push_back(variable(variable(w).bind).beq);
   return ret;
 }
 
@@ -2608,7 +2608,7 @@ std::vector<MX> DaeBuilderInternal::ode() const {
     const Variable& x = variable(v);
     if (x.der >= 0) {
       // Derivative variable
-      ret.push_back(variable(x.der).beq);
+      ret.push_back(variable(variable(x.der).bind).beq);
     } else if (x.variability == Variability::DISCRETE) {
       // Discrete variable - derivative is zero
       ret.push_back(MX::zeros(x.v.sparsity()));
@@ -2636,7 +2636,7 @@ std::vector<MX> DaeBuilderInternal::quad() const {
     const Variable& q = variable(v);
     casadi_assert(q.der >= 0, "No derivative variable for " + q.name);
     const Variable& qdot = variable(q.der);
-    ret.push_back(qdot.beq);
+    ret.push_back(variable(qdot.bind).beq);
   }
   return ret;
 }
