@@ -58,7 +58,7 @@ enum class Variability {CONSTANT, FIXED, TUNABLE, DISCRETE, CONTINUOUS, NUMEL};
 // DISCRETE     -          -                     U       X/Q      X/Q      -
 // CONTINUOUS   -          -                     U       X/Q/W/Z  X/Q/W/Z  T
 
-// Input convention in codegen
+// Variable categories
 enum class Category {T, C, P, D, W, U, X, Z, Q, Y, E, DER, RES, ASSIGN, REINIT, NUMEL};
 
 /// Initial: FMI 2.0 specification, section 2.2.7 or FMI 3.0 specification, section 2.4.7.5
@@ -841,6 +841,12 @@ CASADI_EXPORT std::string to_string(DaeBuilderInternal::DaeBuilderInternalOut v)
 /// Get description
 CASADI_EXPORT std::string description(Category v);
 ///@}
+
+// Check if input category
+CASADI_EXPORT bool is_input_category(Category cat);
+
+// Get all input categories
+CASADI_EXPORT std::vector<Category> input_categories();
 
 /// \endcond
 

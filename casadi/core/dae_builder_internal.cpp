@@ -223,6 +223,41 @@ std::string description(Category v) {
   return "";
 }
 
+bool is_input_category(Category cat) {
+  switch (cat) {
+    case Category::T:  // Fall-through
+    case Category::P:  // Fall-through
+    case Category::U:  // Fall-through
+    case Category::X:  // Fall-through
+    case Category::Z:  // Fall-through
+    case Category::Q:  // Fall-through
+    case Category::C:  // Fall-through
+    case Category::D:  // Fall-through
+    case Category::W:
+      // Input category
+      return true;
+    case Category::Y:  // Fall-through
+    case Category::E:  // Fall-through
+    case Category::DER:  // Fall-through
+    case Category::RES:  // Fall-through
+    case Category::ASSIGN:  // Fall-through
+    case Category::REINIT:
+      // Output category
+      return false;
+    default: break;
+  }
+  casadi_error("Cannot handle: " + to_string(cat));
+}
+
+std::vector<Category> input_categories() {
+  std::vector<Category> ret;
+  for (casadi_int i = 0; i != enum_traits<Category>::n_enum; ++i) {
+    auto cat = static_cast<Category>(i);
+    if (is_input_category(cat)) ret.push_back(cat);
+  }
+  return ret;
+}
+
 casadi_int Variable::size(Attribute a) const {
   switch (a) {
     case Attribute::START:  // Fall-through
@@ -1311,10 +1346,7 @@ void DaeBuilderInternal::prune(bool prune_p, bool prune_u) {
   std::vector<MX> f_in, f_out, v;
   std::vector<std::string> f_in_name, f_out_name;
   // Collect all DAE input variables with at least one entry, skip u
-  for (casadi_int i = 0; i != enum_traits<Category>::n_enum; ++i) {
-    auto cat = static_cast<Category>(i);
-    if (cat == Category::E || cat == Category::DER || cat == Category::RES
-      || cat == Category::ASSIGN || cat == Category::REINIT) continue;
+  for (Category cat : input_categories()) {
     if (prune_p && cat == Category::P) continue;
     if (prune_u && cat == Category::U) continue;
     v = input(cat);
@@ -1748,20 +1780,11 @@ std::string to_string(DaeBuilderInternal::DaeBuilderInternalOut v) {
 }
 
 std::vector<MX> DaeBuilderInternal::input(Category ind) const {
-  switch (ind) {
-  case Category::T:  // fall-through
-  case Category::C:  // fall-through
-  case Category::P:  // fall-through
-  case Category::D:  // fall-through
-  case Category::W:  // fall-through
-  case Category::U:  // fall-through
-  case Category::X:  // fall-through
-  case Category::Z:  // fall-through
-  case Category::Q:  // fall-through
-  case Category::Y:
-    return var(indices(ind));
-  default: return std::vector<MX>{};
-  }
+  // Operation only permitted for input categories
+  casadi_assert(is_input_category(ind),
+    to_string(ind) + " is not an input category");
+  // Get the expressions
+  return var(indices(ind));
 }
 
 std::vector<MX> DaeBuilderInternal::input(const std::vector<Category>& ind) const {
@@ -2155,11 +2178,7 @@ const Function& DaeBuilderInternal::oracle(bool sx, bool elim_w, bool lifted_cal
     // Do we need to substitute out v
     bool subst_v = false;
     // Collect all DAE input variables
-    for (size_t i = 0; i != enum_traits<Category>::n_enum; ++i) {
-      auto cat = static_cast<Category>(i);
-      if (cat == Category::E || cat == Category::DER || cat == Category::RES
-        || cat == Category::ASSIGN || cat == Category::REINIT) continue;
-      if (cat == Category::Y) continue;  // fixme2
+    for (Category cat : input_categories()) {
       v = input(cat);
       if (elim_w && cat == Category::W) {
         if (!v.empty()) subst_v = true;
