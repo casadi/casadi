@@ -840,6 +840,11 @@ CASADI_EXPORT std::string to_string(Category v);
 CASADI_EXPORT std::string to_string(DaeBuilderInternal::DaeBuilderInternalOut v);
 ///@}
 
+///@{
+/// Get description
+CASADI_EXPORT std::string description(Category v);
+///@}
+
 /// \endcond
 
 } // namespace casadi

@@ -201,6 +201,28 @@ std::string to_string(Category v) {
   return "";
 }
 
+std::string description(Category v) {
+  switch (v) {
+  case Category::T: return "Independent variable ('t')";
+  case Category::P: return "Parameters ('p')";
+  case Category::U: return "Control ('u')";
+  case Category::X: return "Differential states ('x')";
+  case Category::Z: return "Algebraic variables ('z')";
+  case Category::Q: return "Quadrature states ('q')";
+  case Category::C: return "Constants ('c')";
+  case Category::D: return "Dependent parameters ('d')";
+  case Category::W: return "Dependent variables ('w')";
+  case Category::Y: return "Outputs ('y')";
+  case Category::E: return "Event indicators ('e')";
+  case Category::DER: return "Time derivatives ('der')";
+  case Category::RES: return "Residual equations ('res')";
+  case Category::ASSIGN: return "Assignment equations ('assign')";
+  case Category::REINIT: return "Reinitialization equations ('reinit')";
+  default: break;
+  }
+  return "";
+}
+
 casadi_int Variable::size(Attribute a) const {
   switch (a) {
     case Attribute::START:  // Fall-through
@@ -1145,56 +1167,44 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
 
   // Print the variables
   stream << "Variables" << std::endl;
-  if (size(Category::T) > 0) stream << "  t = " << var(indices(Category::T).at(0)) << std::endl;
-  if (size(Category::C) > 0) stream << "  c = " << var(indices(Category::C)) << std::endl;
-  if (size(Category::P) > 0) stream << "  p = " << var(indices(Category::P)) << std::endl;
-  if (size(Category::D) > 0) stream << "  d = " << var(indices(Category::D)) << std::endl;
-  if (size(Category::X) > 0) stream << "  x = " << var(indices(Category::X)) << std::endl;
-  if (size(Category::Z) > 0) stream << "  z = " << var(indices(Category::Z)) << std::endl;
-  if (size(Category::Q) > 0) stream << "  q = " << var(indices(Category::Q)) << std::endl;
-  if (size(Category::W) > 0) stream << "  w = " << var(indices(Category::W)) << std::endl;
-  if (size(Category::U) > 0) stream << "  u = " << var(indices(Category::U)) << std::endl;
-
-  if (size(Category::C) > 0) {
-    stream << "Constants" << std::endl;
-    for (size_t c : indices(Category::C)) {
-      stream << "  " << var(c) << " == " << variable(c).beq << std::endl;
+  for (Category cat : {Category::T, Category::C, Category::P, Category::D, Category::X,
+      Category::Z, Category::Q, Category::W, Category::U}) {
+    if (size(cat) > 0) {
+      stream << "  " << to_string(cat) << " = " << var(indices(cat)) << std::endl;
     }
   }
 
-  if (size(Category::D) > 0) {
-    stream << "Dependent parameters" << std::endl;
-    for (size_t d : indices(Category::D)) {
-      stream << "  " << var(d) << " == " << variable(d).beq << std::endl;
-    }
-  }
-
-  if (size(Category::W) > 0) {
-    stream << "Dependent equations" << std::endl;
-    for (size_t w : indices(Category::W)) {
-      stream << "  " << var(w) << " == " << variable(w).beq << std::endl;
-    }
-  }
-
-  if (size(Category::X) > 0) {
-    stream << "Differential equations" << std::endl;
-    for (size_t k : indices(Category::X)) {
-      const Variable& x = variable(k);
-      stream << "  \\dot{" << x.name << "} == ";
-      if (x.variability == Variability::DISCRETE) {
-        // Discrete variable - derivative is zero
-        stream << 0;
-      } else {
-        // Derivative variable
-        casadi_assert(x.der >= 0, "No derivative variable for " + x.name);
-        const Variable& xdot = variable(x.der);
-        if (xdot.beq.is_empty()) {
-          stream << xdot.name;
-        } else {
-          stream << xdot.beq;
-        }
+  // All variables that can have dependent variables
+  for (Category cat : {Category::C, Category::D, Category::W}) {
+    if (size(cat) > 0) {
+      stream << description(cat) << ": " << std::endl;
+      for (size_t c : indices(cat)) {
+        const Variable& v = variable(c);
+        stream << "  " << v.name;
+        if (v.bind >= 0) stream << " := " << variable(v.bind).beq;
+        stream << std::endl;
       }
-      stream << std::endl;
+    }      
+  }
+
+  for (Category cat : {Category::X, Category::Q}) {
+    if (size(cat) > 0) {
+      stream << (cat == Category::X ? "Differential" : "Quadrature") << " equations" << std::endl;
+      for (size_t k : indices(cat)) {
+        const Variable& v = variable(k);
+        stream << "  \\dot{" << v.name << "} == ";
+        if (v.variability == Variability::DISCRETE) {
+          // Discrete variable - derivative is zero
+          stream << 0;
+        } else {
+          // Derivative variable
+          casadi_assert(v.der >= 0, "No derivative variable for " + v.name);
+          const Variable& vdot = variable(v.der);
+          stream << vdot.name;
+          if (vdot.bind >= 0) stream << " := " << variable(vdot.bind).beq;
+        }
+        stream << std::endl;
+      }
     }
   }
 
@@ -1203,28 +1213,6 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
     for (size_t k : indices(Category::RES)) {
       const Variable& alg = variable(k);
       stream << "  0 == " << alg.beq << std::endl;
-    }
-  }
-
-  if (size(Category::Q) > 0) {
-    stream << "Quadrature equations" << std::endl;
-    for (size_t k : indices(Category::Q)) {
-      const Variable& q = variable(k);
-      stream << "  \\dot{" << q.name << "} == ";
-      if (q.variability == Variability::DISCRETE) {
-        // Discrete variable - derivative is zero
-        stream << 0;
-      } else {
-        // Derivative variable
-        casadi_assert(q.der >= 0, "No derivative variable for " + q.name);
-        const Variable& qdot = variable(q.der);
-        if (qdot.beq.is_empty()) {
-          stream << qdot.name;
-        } else {
-          stream << qdot.beq;
-        }
-      }
-      stream << std::endl;
     }
   }
 
