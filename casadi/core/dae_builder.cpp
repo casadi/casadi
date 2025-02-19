@@ -598,6 +598,14 @@ MX DaeBuilder::add_y(const std::string& name, const MX& new_ydef) {
   return v;
 }
 
+void DaeBuilder::set_beq(const std::string& name, const MX& val) {
+  try {
+    eq(var(name), val);
+  } catch (std::exception& e) {
+    THROW_ERROR("set_beq", e.what());
+  }
+}
+
 #endif  // WITH_DEPRECATED_FEATURES
 
 void DaeBuilder::eq(const MX& lhs, const MX& rhs, const Dict& opts) {
@@ -748,14 +756,6 @@ MX DaeBuilder::beq(const std::string& name) const {
   } catch (std::exception& e) {
     THROW_ERROR("beq", e.what());
     return MX();  // never reached
-  }
-}
-
-void DaeBuilder::set_beq(const std::string& name, const MX& val) {
-  try {
-    eq(var(name), val);
-  } catch (std::exception& e) {
-    THROW_ERROR("set_beq", e.what());
   }
 }
 

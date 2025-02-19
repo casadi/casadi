@@ -340,10 +340,10 @@ class CASADI_EXPORT DaeBuilder
   /// [DEPRECATED] Replaced by add
   MX add_q(const std::string& name=std::string());
 
-  /// [DEPRECATED] Replaced by add and set_beq
+  /// [DEPRECATED] Replaced by add and eq
   MX add_c(const std::string& name, const MX& new_cdef);
 
-  /// [DEPRECATED] Replaced by add and set_beq
+  /// [DEPRECATED] Replaced by add and eq
   MX add_d(const std::string& name, const MX& new_ddef);
 
   /// [DEPRECATED] Replaced by add and eq
@@ -351,7 +351,11 @@ class CASADI_EXPORT DaeBuilder
 
   /// [DEPRECATED] Replaced by add and eq
   MX add_y(const std::string& name, const MX& new_ydef);
-#endif  // WITH_DEPRECATED_FEATURES
+
+  /// [DEPRECATED] Replaced by eq
+  void set_beq(const std::string& name, const MX& val);
+
+  #endif  // WITH_DEPRECATED_FEATURES
 
   /// Add a simple equation
   void eq(const MX& lhs, const MX& rhs, const Dict& opts=Dict());
@@ -567,11 +571,8 @@ class CASADI_EXPORT DaeBuilder
   /// Does a variable have a binding equation?
   bool has_beq(const std::string& name) const;
 
-  ///@{
-  /// Get/set the binding equation for a variable
+  /// Get the binding equation for a variable
   MX beq(const std::string& name) const;
-  void set_beq(const std::string& name, const MX& val);
-  ///@}
 
   ///@{
   /// Get/set value reference
