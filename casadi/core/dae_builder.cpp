@@ -96,15 +96,30 @@ std::vector<MX> DaeBuilder::ydef() const {
 }
 
 std::vector<MX> DaeBuilder::cdef() const {
-  return (*this)->cdef();
+  try {
+    return (*this)->cdef();
+  } catch (std::exception& e) {
+    THROW_ERROR("cdef", e.what());
+    return {};  // never reached
+  }
 }
 
 std::vector<MX> DaeBuilder::ddef() const {
-  return (*this)->ddef();
+  try {
+    return (*this)->output(OutputCategory::D);
+  } catch (std::exception& e) {
+    THROW_ERROR("ddef", e.what());
+    return {};  // never reached
+  }
 }
 
 std::vector<MX> DaeBuilder::wdef() const {
-  return (*this)->wdef();
+  try {
+    return (*this)->output(OutputCategory::W);
+  } catch (std::exception& e) {
+    THROW_ERROR("wdef", e.what());
+    return {};  // never reached
+  }
 }
 
 std::vector<MX> DaeBuilder::init_lhs() const {

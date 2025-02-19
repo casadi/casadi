@@ -1294,14 +1294,14 @@ void DaeBuilderInternal::eliminate_quad() {
 }
 
 void DaeBuilderInternal::sort_d() {
-  std::vector<MX> d = var(indices(Category::D)), ddef = this->ddef();
+  std::vector<MX> d = var(indices(Category::D)), ddef = output(OutputCategory::D);
   sort_dependent(d, ddef);
   indices(Category::D).clear();
   for (const MX& e : d) indices(Category::D).push_back(find(e.name()));
 }
 
 void DaeBuilderInternal::sort_w() {
-  std::vector<MX> w = var(indices(Category::W)), wdef = this->wdef();
+  std::vector<MX> w = var(indices(Category::W)), wdef = output(OutputCategory::W);
   sort_dependent(w, wdef);
   indices(Category::W).clear();
   for (const MX& e : w) indices(Category::W).push_back(find(e.name()));
@@ -1702,7 +1702,7 @@ void DaeBuilderInternal::eliminate_d() {
   }
   // Perform elimination
   std::vector<MX> d = var(indices(Category::D));
-  std::vector<MX> ddef = this->ddef();
+  std::vector<MX> ddef = output(OutputCategory::D);
   substitute_inplace(d, ddef, ex);
   // Clear list of dependent parameters
   indices(Category::D).clear();
@@ -1728,7 +1728,7 @@ void DaeBuilderInternal::eliminate_w() {
   }
   // Perform elimination
   std::vector<MX> w = var(indices(Category::W));
-  std::vector<MX> wdef = this->wdef();
+  std::vector<MX> wdef = output(OutputCategory::W);
   substitute_inplace(w, wdef, ex);
   // Clear list of dependent variables
   indices(Category::W).clear();
@@ -1812,8 +1812,16 @@ std::vector<MX> DaeBuilderInternal::output(OutputCategory ind) const {
     case OutputCategory::ALG: return alg();
     case OutputCategory::QUAD: return quad();
     case OutputCategory::ZERO: return zero();
-    case OutputCategory::D: return ddef();
-    case OutputCategory::W: return wdef();
+    case OutputCategory::D:
+      // Dependent parameters
+      ret.reserve(size(Category::D));
+      for (size_t d : indices(Category::D)) ret.push_back(variable(variable(d).bind).v);
+      break;
+    case OutputCategory::W:
+      // Dependent variables
+      ret.reserve(size(Category::W));
+      for (size_t w : indices(Category::W)) ret.push_back(variable(variable(w).bind).v);
+      break;
     case OutputCategory::Y:
       // Outputs
       ret.reserve(size(Category::Y));
@@ -1904,7 +1912,7 @@ Function DaeBuilderInternal::create(const std::string& fname,
     casadi_assert(!elim_w, "Lifted calls cannot be used if dependent variables are eliminated");
     // Only lift calls if really needed
     lifted_calls = false;
-    for (const MX& vdef_comp : wdef()) {
+    for (const MX& vdef_comp : output(OutputCategory::W)) {
       if (vdef_comp.is_output()) {
         // There are indeed function calls present
         lifted_calls = true;
@@ -1937,7 +1945,7 @@ Function DaeBuilderInternal::create(const std::string& fname,
     v_map[var(Category::W, i).get()] = i;
   }
   // Definitions of w
-  std::vector<MX> wdef = this->wdef();
+  std::vector<MX> wdef = output(OutputCategory::W);
   // Collect all the call nodes
   std::map<MXNode*, CallIO> call_nodes;
   for (size_t vdefind = 0; vdefind < wdef.size(); ++vdefind) {
@@ -2032,7 +2040,7 @@ MX DaeBuilderInternal::jac_vdef_v_from_calls(std::map<MXNode*, CallIO>& call_nod
   // All blocks for this block row
   std::map<size_t, MX> jac_brow;
   // Definitions of w
-  std::vector<MX> wdef = this->wdef();
+  std::vector<MX> wdef = output(OutputCategory::W);
   // Collect all Jacobian blocks
   for (size_t vdefind = 0; vdefind < wdef.size(); ++vdefind) {
     // Current element handled
@@ -2222,12 +2230,12 @@ const Function& DaeBuilderInternal::oracle(bool sx, bool elim_w, bool lifted_cal
     // Eliminate v from inputs
     if (subst_v) {
       // Dependent variable definitions
-      std::vector<MX> wdef = this->wdef();
+      std::vector<MX> wdef = output(OutputCategory::W);
       // Perform in-place substitution
       substitute_inplace(var(Category::W), wdef, f_out, false);
     } else if (lifted_calls && wdef_ind >= 0) {
       // Dependent variable definitions
-      std::vector<MX> wdef = this->wdef();
+      std::vector<MX> wdef = output(OutputCategory::W);
       // Remove references to call nodes
       for (MX& wdefref : wdef) {
         if (wdefref.is_output()) wdefref = MX::zeros(wdefref.sparsity());
@@ -2420,13 +2428,13 @@ Function DaeBuilderInternal::dependent_fun(const std::string& fname,
   if (calc_d) {
     std::vector<MX> d = var(indices(Category::D));
     dw.insert(dw.end(), d.begin(), d.end());
-    std::vector<MX> ddef = this->ddef();
+    std::vector<MX> ddef = output(OutputCategory::D);
     dwdef.insert(dwdef.end(), ddef.begin(), ddef.end());
   }
   if (calc_w) {
     std::vector<MX> w = var(indices(Category::W));
     dw.insert(dw.end(), w.begin(), w.end());
-    std::vector<MX> wdef = this->wdef();
+    std::vector<MX> wdef = output(OutputCategory::W);
     dwdef.insert(dwdef.end(), wdef.begin(), wdef.end());
   }
   // Perform elimination
@@ -2461,7 +2469,7 @@ Function DaeBuilderInternal::transition(const std::string& fname, casadi_int ind
   // Remove dependent variables, if any
   if (size(Category::W) > 0) {
     // Dependent variable definitions
-    std::vector<MX> wdef = this->wdef();
+    std::vector<MX> wdef = output(OutputCategory::W);
     // Perform in-place substitution
     substitute_inplace(var(Category::W), wdef, ret_out, false);
   }
@@ -2608,20 +2616,6 @@ std::vector<MX> DaeBuilderInternal::cdef() const {
   std::vector<MX> ret;
   ret.reserve(size(Category::C));
   for (size_t c : indices(Category::C)) ret.push_back(variable(variable(c).bind).v);
-  return ret;
-}
-
-std::vector<MX> DaeBuilderInternal::ddef() const {
-  std::vector<MX> ret;
-  ret.reserve(size(Category::D));
-  for (size_t d : indices(Category::D)) ret.push_back(variable(variable(d).bind).v);
-  return ret;
-}
-
-std::vector<MX> DaeBuilderInternal::wdef() const {
-  std::vector<MX> ret;
-  ret.reserve(size(Category::W));
-  for (size_t w : indices(Category::W)) ret.push_back(variable(variable(w).bind).v);
   return ret;
 }
 
@@ -3904,7 +3898,7 @@ Function DaeBuilderInternal::add_fun(const std::string& name,
   casadi_assert(!has_fun(name), "Function '" + name + "' already exists");
 
   // Dependent variable definitions
-  std::vector<MX> wdef = this->wdef();
+  std::vector<MX> wdef = output(OutputCategory::W);
   // Get inputs
   std::vector<MX> arg_ex, res_ex;
   for (auto&& s : arg) arg_ex.push_back(var(s));

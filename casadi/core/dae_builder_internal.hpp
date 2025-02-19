@@ -549,20 +549,8 @@ protected:
   // Time variable
   const MX& time() const;
 
-  /** \brief Definitions of dependent constants
-
-      \identifier{u} */
+  /** \brief Definitions of dependent constants */
   std::vector<MX> cdef() const;
-
-  /** \brief Definitions of dependent parameters
-
-      \identifier{v} */
-  std::vector<MX> ddef() const;
-
-  /** \brief Definitions of dependent variables
-
-      \identifier{w} */
-  std::vector<MX> wdef() const;
 
   /** \brief ODE right hand sides
 
