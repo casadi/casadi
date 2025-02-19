@@ -88,7 +88,11 @@ std::vector<MX> DaeBuilder::quad() const {
 }
 
 std::vector<MX> DaeBuilder::zero() const {
-  return (*this)->zero();
+  try {
+    return (*this)->output(OutputCategory::ZERO);
+  } catch (std::exception& e) {
+    THROW_ERROR("zero", e.what());
+  }
 }
 
 std::vector<MX> DaeBuilder::ydef() const {

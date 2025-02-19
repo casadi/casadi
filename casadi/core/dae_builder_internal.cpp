@@ -1815,7 +1815,11 @@ std::vector<MX> DaeBuilderInternal::output(OutputCategory ind) const {
       for (size_t v : indices(Category::RES)) ret.push_back(variable(v).v);
       break;
     case OutputCategory::QUAD: return quad();
-    case OutputCategory::ZERO: return zero();
+    case OutputCategory::ZERO:
+      // Zero-crossing function
+      ret.reserve(size(Category::E));
+      for (size_t v : indices(Category::E)) ret.push_back(variable(v).v);
+      break;
     case OutputCategory::D:
       // Dependent parameters
       ret.reserve(size(Category::D));
@@ -2651,14 +2655,6 @@ std::vector<MX> DaeBuilderInternal::quad() const {
     const Variable& qdot = variable(q.der);
     ret.push_back(variable(qdot.bind).v);
   }
-  return ret;
-}
-
-
-std::vector<MX> DaeBuilderInternal::zero() const {
-  std::vector<MX> ret;
-  ret.reserve(size(Category::E));
-  for (size_t v : indices(Category::E)) ret.push_back(variable(v).v);
   return ret;
 }
 

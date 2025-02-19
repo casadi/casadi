@@ -562,11 +562,6 @@ protected:
       \identifier{10} */
   std::vector<MX> quad() const;
 
-  /** \brief Zero crossing functions
-
-      \identifier{2a6} */
-  std::vector<MX> zero() const;
-
   /** \brief Initial conditions, left-hand-side
 
       \identifier{2a7} */
