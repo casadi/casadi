@@ -191,7 +191,7 @@ std::string to_string(Category v) {
   case Category::D: return "d";
   case Category::W: return "w";
   case Category::Y: return "y";
-  case Category::E: return "e";
+  case Category::ZERO: return "zero";
   case Category::DER: return "der";
   case Category::ALG: return "alg";
   case Category::ASSIGN: return "assign";
@@ -213,7 +213,7 @@ std::string description(Category v) {
   case Category::D: return "Dependent parameters ('d')";
   case Category::W: return "Dependent variables ('w')";
   case Category::Y: return "Outputs ('y')";
-  case Category::E: return "Event indicators ('e')";
+  case Category::ZERO: return "Zero crossing function ('zero')";
   case Category::DER: return "Time derivatives ('der')";
   case Category::ALG: return "Residual equations ('alg')";
   case Category::ASSIGN: return "Assignment equations ('assign')";
@@ -237,7 +237,7 @@ bool is_input_category(Category cat) {
       // Input category
       return true;
     case Category::Y:  // Fall-through
-    case Category::E:  // Fall-through
+    case Category::ZERO:  // Fall-through
     case Category::DER:  // Fall-through
     case Category::ALG:  // Fall-through
     case Category::ASSIGN:  // Fall-through
@@ -1792,7 +1792,7 @@ Category input_category(OutputCategory cat) {
     case OutputCategory::ODE: return Category::X;
     case OutputCategory::ALG: return Category::ALG;
     case OutputCategory::QUAD: return Category::Q;
-    case OutputCategory::ZERO: return Category::E;
+    case OutputCategory::ZERO: return Category::ZERO;
     case OutputCategory::D: return Category::D;
     case OutputCategory::W: return Category::W;
     case OutputCategory::Y: return Category::Y;
@@ -3169,7 +3169,7 @@ void DaeBuilderInternal::when(const MX& cond, const std::vector<std::string>& eq
   // Create a new dependent variable for the event indicator
   Variable& e = add(unique_name("__when__"), Causality::LOCAL, Variability::CONTINUOUS,
     zero, Dict());
-  categorize(e.index, Category::E);
+  categorize(e.index, Category::ZERO);
   // Convert to legacy format, pending refactoring
   std::vector<MX> all_lhs, all_rhs;
   for (auto&& eq : eqs) {
@@ -3717,7 +3717,7 @@ void DaeBuilderInternal::import_dynamic_equations(const XmlNode& eqs) {
         // Create event indicator
         Variable& e = add(unique_name("__when__"), Causality::LOCAL, Variability::CONTINUOUS,
           zc, Dict());
-        categorize(e.index, Category::E);
+        categorize(e.index, Category::ZERO);
         // Add to list of when equations
         when_cond_.push_back(zc);
         when_lhs_.push_back(lhs);

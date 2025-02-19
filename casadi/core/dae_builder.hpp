@@ -122,11 +122,6 @@ class CASADI_EXPORT DaeBuilder
       \identifier{5j} */
   std::vector<std::string> q() const {return all("q");}
 
-  /** \brief Event indicators
-
-      \identifier{2az} */
-  std::vector<std::string> e() const {return all("e");}
-
   /** \brief Quadrature equations
 
       \identifier{5k} */
@@ -136,11 +131,6 @@ class CASADI_EXPORT DaeBuilder
 
       \identifier{2b0} */
   std::vector<MX> zero() const;
-
-  /** \brief Output variables
-
-      \identifier{5l} */
-  std::vector<std::string> y() const {return all("y");}
 
   /** \brief Definitions of output variables
 
@@ -255,10 +245,8 @@ class CASADI_EXPORT DaeBuilder
       \identifier{67} */
   casadi_int nq() const;
 
-  /** \brief Event indicators
-
-      \identifier{2b3} */
-  casadi_int ne() const;
+  /** \brief Zero-crossing functions */
+  casadi_int nzero() const;
 
   /** \brief Output variables
 
@@ -388,7 +376,17 @@ class CASADI_EXPORT DaeBuilder
   void add_init(const MX& lhs, const MX& rhs) {
     set_init(lhs.name(), rhs);
   }
-#endif  // WITH_DEPRECATED_FEATURES
+
+  /// [DEPRECATED] Replaced by nzero()
+  casadi_int ne() const {return nzero();}
+
+  /// [DEPRECATED] Use all("zero") */
+  std::vector<std::string> e() const {return all("zero");}
+
+  /// [DEPRECATED] Use all("y") */
+  std::vector<std::string> y() const {return all("y");}
+
+  #endif  // WITH_DEPRECATED_FEATURES
 
   /// Check if dimensions match
   void sanity_check() const;

@@ -209,8 +209,8 @@ casadi_int DaeBuilder::nq() const {
   return (*this)->size(Category::Q);
 }
 
-casadi_int DaeBuilder::ne() const {
-  return (*this)->size(Category::E);
+casadi_int DaeBuilder::nzero() const {
+  return (*this)->size(Category::ZERO);
 }
 
 casadi_int DaeBuilder::ny() const {
@@ -508,7 +508,7 @@ void DaeBuilder::register_y(const std::string& name) {
 }
 
 void DaeBuilder::register_e(const std::string& name) {
-  (*this)->indices(Category::E).push_back(find(name));
+  (*this)->indices(Category::ZERO).push_back(find(name));
 }
 
 void DaeBuilder::clear_all(const std::string& v) {
