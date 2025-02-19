@@ -193,7 +193,7 @@ std::string to_string(Category v) {
   case Category::Y: return "y";
   case Category::E: return "e";
   case Category::DER: return "der";
-  case Category::RES: return "res";
+  case Category::ALG: return "alg";
   case Category::ASSIGN: return "assign";
   case Category::REINIT: return "reinit";
   default: break;
@@ -215,7 +215,7 @@ std::string description(Category v) {
   case Category::Y: return "Outputs ('y')";
   case Category::E: return "Event indicators ('e')";
   case Category::DER: return "Time derivatives ('der')";
-  case Category::RES: return "Residual equations ('res')";
+  case Category::ALG: return "Residual equations ('alg')";
   case Category::ASSIGN: return "Assignment equations ('assign')";
   case Category::REINIT: return "Reinitialization equations ('reinit')";
   default: break;
@@ -239,7 +239,7 @@ bool is_input_category(Category cat) {
     case Category::Y:  // Fall-through
     case Category::E:  // Fall-through
     case Category::DER:  // Fall-through
-    case Category::RES:  // Fall-through
+    case Category::ALG:  // Fall-through
     case Category::ASSIGN:  // Fall-through
     case Category::REINIT:
       // Output category
@@ -1249,9 +1249,9 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
     }
   }
 
-  if (size(Category::RES) > 0) {
+  if (size(Category::ALG) > 0) {
     stream << "Algebraic equations" << std::endl;
-    for (size_t k : indices(Category::RES)) {
+    for (size_t k : indices(Category::ALG)) {
       stream << "  0 == " << variable(k).v << std::endl;
     }
   }
@@ -1748,7 +1748,7 @@ void DaeBuilderInternal::lift(bool lift_shared, bool lift_calls) {
   std::vector<MX> ex;
   for (size_t v : indices(Category::X)) ex.push_back(variable(variable(variable(v).der).bind).v);
   for (size_t v : indices(Category::Q)) ex.push_back(variable(variable(variable(v).der).bind).v);
-  for (size_t v : indices(Category::RES)) ex.push_back(variable(v).v);
+  for (size_t v : indices(Category::ALG)) ex.push_back(variable(v).v);
   for (size_t v : indices(Category::Y)) ex.push_back(variable(v).v);
   // Lift expressions
   std::vector<MX> new_w, new_wdef;
@@ -1767,7 +1767,7 @@ void DaeBuilderInternal::lift(bool lift_shared, bool lift_calls) {
   auto it = ex.begin();
   for (size_t v : indices(Category::X)) variable(variable(variable(v).der).bind).v = *it++;
   for (size_t v : indices(Category::Q)) variable(variable(variable(v).der).bind).v = *it++;
-  for (size_t v : indices(Category::RES)) variable(v).v = *it++;
+  for (size_t v : indices(Category::ALG)) variable(v).v = *it++;
   for (size_t v : indices(Category::Y)) variable(v).v = *it++;
   // Consistency check
   casadi_assert_dev(it == ex.end());
@@ -1790,7 +1790,7 @@ std::string to_string(OutputCategory v) {
 Category input_category(OutputCategory cat) {
   switch (cat) {
     case OutputCategory::ODE: return Category::X;
-    case OutputCategory::ALG: return Category::RES;
+    case OutputCategory::ALG: return Category::ALG;
     case OutputCategory::QUAD: return Category::Q;
     case OutputCategory::ZERO: return Category::E;
     case OutputCategory::D: return Category::D;
@@ -3123,9 +3123,9 @@ void DaeBuilderInternal::eq(const MX& lhs, const MX& rhs, const Dict& opts) {
     }
   } else {
     // Implicit equation: Create residual variable
-    Variable& res = add(unique_name("__res__"), Causality::OUTPUT, Variability::CONTINUOUS,
+    Variable& alg = add(unique_name("__alg__"), Causality::OUTPUT, Variability::CONTINUOUS,
       lhs - rhs, Dict());
-    categorize(res.index, Category::RES);
+    categorize(alg.index, Category::ALG);
   }
   // If derivative variable in the right-hand-side, reclassify as algebraic variable
   for (size_t rhs : rhs_vars) {
