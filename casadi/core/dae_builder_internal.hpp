@@ -564,11 +564,6 @@ protected:
       \identifier{w} */
   std::vector<MX> wdef() const;
 
-  /** \brief Definitions of output variables
-
-      \identifier{x} */
-  std::vector<MX> ydef() const;
-
   /** \brief ODE right hand sides
 
       \identifier{y} */

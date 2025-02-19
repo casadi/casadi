@@ -87,7 +87,12 @@ std::vector<MX> DaeBuilder::zero() const {
 }
 
 std::vector<MX> DaeBuilder::ydef() const {
-  return (*this)->ydef();
+  try {
+    return (*this)->output(OutputCategory::Y);
+  } catch (std::exception& e) {
+    THROW_ERROR("ydef", e.what());
+    return {};  // never reached
+  }
 }
 
 std::vector<MX> DaeBuilder::cdef() const {

@@ -1804,16 +1804,24 @@ std::vector<MX> DaeBuilderInternal::input(const std::vector<Category>& ind) cons
 }
 
 std::vector<MX> DaeBuilderInternal::output(OutputCategory ind) const {
+  // Return object
+  std::vector<MX> ret;
+  // Handle different categories
   switch (ind) {
-  case OutputCategory::ODE: return ode();
-  case OutputCategory::ALG: return alg();
-  case OutputCategory::QUAD: return quad();
-  case OutputCategory::ZERO: return zero();
-  case OutputCategory::D: return ddef();
-  case OutputCategory::W: return wdef();
-  case OutputCategory::Y: return ydef();
-  default: return std::vector<MX>();
+    case OutputCategory::ODE: return ode();
+    case OutputCategory::ALG: return alg();
+    case OutputCategory::QUAD: return quad();
+    case OutputCategory::ZERO: return zero();
+    case OutputCategory::D: return ddef();
+    case OutputCategory::W: return wdef();
+    case OutputCategory::Y:
+      // Outputs
+      ret.reserve(size(Category::Y));
+      for (size_t v : indices(Category::Y)) ret.push_back(variable(v).v);
+      break;
+    default: break;
   }
+  return ret;
 }
 
 std::vector<MX> DaeBuilderInternal::output(const std::vector<OutputCategory>& ind) const {
@@ -2614,13 +2622,6 @@ std::vector<MX> DaeBuilderInternal::wdef() const {
   std::vector<MX> ret;
   ret.reserve(size(Category::W));
   for (size_t w : indices(Category::W)) ret.push_back(variable(variable(w).bind).v);
-  return ret;
-}
-
-std::vector<MX> DaeBuilderInternal::ydef() const {
-  std::vector<MX> ret;
-  ret.reserve(size(Category::Y));
-  for (size_t v : indices(Category::Y)) ret.push_back(variable(v).v);
   return ret;
 }
 
