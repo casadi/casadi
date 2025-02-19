@@ -835,21 +835,21 @@ void DaeBuilderInternal::update_dependencies() const {
     }
   }
   // Dependendencies of the output function
-  Sparsity dydef_dxT = oracle.jac_sparsity(oracle.index_out("ydef"), oracle.index_in("x")).T();
-  Sparsity dydef_duT = oracle.jac_sparsity(oracle.index_out("ydef"), oracle.index_in("u")).T();
+  Sparsity dy_dxT = oracle.jac_sparsity(oracle.index_out("y"), oracle.index_in("x")).T();
+  Sparsity dy_duT = oracle.jac_sparsity(oracle.index_out("y"), oracle.index_in("u")).T();
   for (casadi_int i = 0; i < size(Category::Y); ++i) {
     // Get output variable
     const Variable& y = variable(Category::Y, i);
     // Clear dependencies
     y.dependencies.clear();
     // Dependencies on states
-    for (casadi_int k = dydef_dxT.colind(i); k < dydef_dxT.colind(i + 1); ++k) {
-      casadi_int j = dydef_dxT.row(k);
+    for (casadi_int k = dy_dxT.colind(i); k < dy_dxT.colind(i + 1); ++k) {
+      casadi_int j = dy_dxT.row(k);
       y.dependencies.push_back(variable(Category::X, j).value_reference);
     }
     // Dependencies on controls
-    for (casadi_int k = dydef_duT.colind(i); k < dydef_duT.colind(i + 1); ++k) {
-      casadi_int j = dydef_duT.row(k);
+    for (casadi_int k = dy_duT.colind(i); k < dy_duT.colind(i + 1); ++k) {
+      casadi_int j = dy_duT.row(k);
       y.dependencies.push_back(variable(Category::U, j).value_reference);
     }
   }
@@ -872,7 +872,7 @@ std::vector<std::string> DaeBuilderInternal::export_fmu(const Dict& opts) const 
   // Generate model function
   std::string dae_filename = name_;
   Function dae = shared_from_this<DaeBuilder>().create(dae_filename,
-    {"t", "x", "p", "u"}, {"ode", "ydef"});
+    {"t", "x", "p", "u"}, {"ode", "y"});
   // Generate C code for model equations
   Dict codegen_opts;
   codegen_opts["with_header"] = true;
@@ -1781,7 +1781,7 @@ std::string to_string(OutputCategory v) {
   case OutputCategory::ZERO: return "zero";
   case OutputCategory::D: return "ddef";
   case OutputCategory::W: return "wdef";
-  case OutputCategory::Y: return "ydef";
+  case OutputCategory::Y: return "y";
   default: break;
   }
   return "";
@@ -2594,7 +2594,7 @@ Function DaeBuilderInternal::fmu_fun(const std::string& name,
     for (size_t& i : scheme["ode"]) i = variable(i).der;
     scheme["alg"] = indices(Category::Z);
     casadi_assert(size(Category::Z) == 0, "Not implemented)");
-    scheme["ydef"] = indices(Category::Y);
+    scheme["y"] = indices(Category::Y);
   }
   // Auxilliary variables, if any
   std::vector<std::string> aux;
