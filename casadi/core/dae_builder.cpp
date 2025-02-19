@@ -89,7 +89,12 @@ std::vector<MX> DaeBuilder::alg() const {
 }
 
 std::vector<MX> DaeBuilder::quad() const {
-  return (*this)->quad();
+  try {
+    return (*this)->output(OutputCategory::QUAD);
+  } catch (std::exception& e) {
+    THROW_ERROR("quad", e.what());
+    return {};  // never reached
+  }
 }
 
 std::vector<MX> DaeBuilder::zero() const {

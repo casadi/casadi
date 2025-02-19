@@ -1826,9 +1826,10 @@ std::vector<MX> DaeBuilderInternal::output(OutputCategory ind) const {
   ret.reserve(size(cat));
   // Handle different categories
   switch (ind) {
-    case OutputCategory::ODE:
+    case OutputCategory::ODE:  // fall-through
+    case OutputCategory::QUAD:
       // Differential state
-      for (size_t v : indices(Category::X)) {
+      for (size_t v : indices(cat)) {
         const Variable& x = variable(v);
         if (x.der >= 0) {
           // Derivative variable
@@ -1842,7 +1843,6 @@ std::vector<MX> DaeBuilderInternal::output(OutputCategory ind) const {
         }
       }
       break;
-    case OutputCategory::QUAD: return quad();
     case OutputCategory::ALG:  // fall-through
     case OutputCategory::ZERO:  // fall-through
     case OutputCategory::Y:
@@ -2643,18 +2643,6 @@ std::vector<MX> DaeBuilderInternal::cdef() const {
   std::vector<MX> ret;
   ret.reserve(size(Category::C));
   for (size_t c : indices(Category::C)) ret.push_back(variable(variable(c).bind).v);
-  return ret;
-}
-
-std::vector<MX> DaeBuilderInternal::quad() const {
-  std::vector<MX> ret;
-  ret.reserve(size(Category::Q));
-  for (size_t v : indices(Category::Q)) {
-    const Variable& q = variable(v);
-    casadi_assert(q.der >= 0, "No derivative variable for " + q.name);
-    const Variable& qdot = variable(q.der);
-    ret.push_back(variable(qdot.bind).v);
-  }
   return ret;
 }
 
