@@ -746,13 +746,7 @@ bool DaeBuilder::has_beq(const std::string& name) const {
 MX DaeBuilder::beq(const std::string& name) const {
   try {
     const Variable& v = (*this)->variable(name);
-    if (v.bind >=0) {
-      // New syntax
-      return (*this)->variable(v.bind).beq;
-    } else {
-      // Old syntax
-      return v.beq;
-    }
+    return (*this)->variable(v.bind).v;
   } catch (std::exception& e) {
     THROW_ERROR("beq", e.what());
     return MX();  // never reached

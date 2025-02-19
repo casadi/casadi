@@ -150,9 +150,6 @@ struct CASADI_EXPORT Variable {
   /// Variable expression (always a vector)
   MX v;
 
-  /// Binding equation (to be merged with v, only need one or the other)
-  MX beq;
-
   /// Initial equation (to be removed and moved to a separate dependent variable)
   MX ieq;
 
@@ -191,7 +188,7 @@ struct CASADI_EXPORT Variable {
   }
 
   // Does the variable have a binding equation
-  bool has_beq() const {return bind >= 0 || !beq.is_empty();}
+  bool has_beq() const {return bind >= 0;}
 
   // Does the variable need a derivative variable?
   bool needs_der() const;

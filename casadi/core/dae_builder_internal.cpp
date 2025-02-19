@@ -1110,9 +1110,7 @@ MX DaeBuilderInternal::read_expr(const XmlNode& node) {
         // Add to list of variables
         indices(Category::W).push_back(v.index);
         // Set binding expression
-        v.beq = read_expr(args[i]);
-        // New syntax: Create an assignment variable
-        Variable& v_beq = assign(v.name, v.beq);
+        Variable& v_beq = assign(v.name, read_expr(args[i]));
         v.bind = v_beq.index;
         // Add to list of function arguments
         farg[i] = v.v;
@@ -1181,7 +1179,7 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
       for (size_t c : indices(cat)) {
         const Variable& v = variable(c);
         stream << "  " << v.name;
-        if (v.bind >= 0) stream << " := " << variable(v.bind).beq;
+        if (v.bind >= 0) stream << " := " << variable(v.bind).v;
         stream << std::endl;
       }
     }      
@@ -1201,7 +1199,7 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
           casadi_assert(v.der >= 0, "No derivative variable for " + v.name);
           const Variable& vdot = variable(v.der);
           stream << vdot.name;
-          if (vdot.bind >= 0) stream << " := " << variable(vdot.bind).beq;
+          if (vdot.bind >= 0) stream << " := " << variable(vdot.bind).v;
         }
         stream << std::endl;
       }
@@ -1211,8 +1209,7 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
   if (size(Category::RES) > 0) {
     stream << "Algebraic equations" << std::endl;
     for (size_t k : indices(Category::RES)) {
-      const Variable& alg = variable(k);
-      stream << "  0 == " << alg.beq << std::endl;
+      stream << "  0 == " << variable(k).v << std::endl;
     }
   }
 
@@ -1232,7 +1229,7 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
       const Variable& v = variable(y);
       const Variable& p = variable(v.parent);
       stream << "  " << p.name;
-      if (!is_equal(p.v, v.beq)) stream << " := " << v.beq;
+      if (!is_equal(p.v, v.v)) stream << " := " << v.v;
       stream << std::endl;
     }
   }
@@ -1661,7 +1658,7 @@ void DaeBuilderInternal::eliminate_d() {
   // Expressions where the variables are also being used
   std::vector<MX> ex;
   for (const Variable* v : variables_) {
-    if (!v->beq.is_constant()) ex.push_back(v->beq);
+    if (!v->v.is_constant()) ex.push_back(v->v);
   }
   // Perform elimination
   std::vector<MX> d = var(indices(Category::D));
@@ -1672,7 +1669,7 @@ void DaeBuilderInternal::eliminate_d() {
   // Get binding equations
   auto it = ex.begin();
   for (Variable* v : variables_) {
-    if (!v->beq.is_constant()) v->beq = *it++;
+    if (!v->v.is_constant()) v->v = *it++;
   }
   // Consistency check
   casadi_assert_dev(it == ex.end());
@@ -1687,7 +1684,7 @@ void DaeBuilderInternal::eliminate_w() {
   // Expressions where the variables are also being used
   std::vector<MX> ex;
   for (const Variable* v : variables_) {
-    if (!v->beq.is_constant()) ex.push_back(v->beq);
+    if (!v->v.is_constant()) ex.push_back(v->v);
   }
   // Perform elimination
   std::vector<MX> w = var(indices(Category::W));
@@ -1698,7 +1695,7 @@ void DaeBuilderInternal::eliminate_w() {
   // Get binding equations
   auto it = ex.begin();
   for (Variable* v : variables_) {
-    if (!v->beq.is_constant()) v->beq = *it++;
+    if (!v->v.is_constant()) v->v = *it++;
   }
   // Consistency check
   casadi_assert_dev(it == ex.end());
@@ -1709,10 +1706,10 @@ void DaeBuilderInternal::lift(bool lift_shared, bool lift_calls) {
   if (size(Category::W) > 0) casadi_warning("'w' already has entries");
   // Expressions where the variables are also being used
   std::vector<MX> ex;
-  for (size_t v : indices(Category::X)) ex.push_back(variable(variable(variable(v).der).bind).beq);
-  for (size_t v : indices(Category::Q)) ex.push_back(variable(variable(variable(v).der).bind).beq);
-  for (size_t v : indices(Category::RES)) ex.push_back(variable(v).beq);
-  for (size_t v : indices(Category::Y)) ex.push_back(variable(v).beq);
+  for (size_t v : indices(Category::X)) ex.push_back(variable(variable(variable(v).der).bind).v);
+  for (size_t v : indices(Category::Q)) ex.push_back(variable(variable(variable(v).der).bind).v);
+  for (size_t v : indices(Category::RES)) ex.push_back(variable(v).v);
+  for (size_t v : indices(Category::Y)) ex.push_back(variable(v).v);
   // Lift expressions
   std::vector<MX> new_w, new_wdef;
   Dict opts{{"lift_shared", lift_shared}, {"lift_calls", lift_calls},
@@ -1722,17 +1719,16 @@ void DaeBuilderInternal::lift(bool lift_shared, bool lift_calls) {
   for (size_t i = 0; i < new_w.size(); ++i) {
     Variable& v = new_variable(new_w.at(i).name());
     v.v = new_w.at(i);
-    v.beq = new_wdef.at(i);
-    Variable& v_beq = assign(v.name, v.beq);
+    Variable& v_beq = assign(v.name, new_wdef.at(i));
     v.bind = v_beq.index;
     indices(Category::W).push_back(v.index);
   }
   // Get expressions
   auto it = ex.begin();
-  for (size_t v : indices(Category::X)) variable(variable(variable(v).der).bind).beq = *it++;
-  for (size_t v : indices(Category::Q)) variable(variable(variable(v).der).bind).beq = *it++;
-  for (size_t v : indices(Category::RES)) variable(v).beq = *it++;
-  for (size_t v : indices(Category::Y)) variable(v).beq = *it++;
+  for (size_t v : indices(Category::X)) variable(variable(variable(v).der).bind).v = *it++;
+  for (size_t v : indices(Category::Q)) variable(variable(variable(v).der).bind).v = *it++;
+  for (size_t v : indices(Category::RES)) variable(v).v = *it++;
+  for (size_t v : indices(Category::Y)) variable(v).v = *it++;
   // Consistency check
   casadi_assert_dev(it == ex.end());
 }
@@ -2576,28 +2572,28 @@ bool DaeBuilderInternal::has_t() const {
 std::vector<MX> DaeBuilderInternal::cdef() const {
   std::vector<MX> ret;
   ret.reserve(size(Category::C));
-  for (size_t c : indices(Category::C)) ret.push_back(variable(variable(c).bind).beq);
+  for (size_t c : indices(Category::C)) ret.push_back(variable(variable(c).bind).v);
   return ret;
 }
 
 std::vector<MX> DaeBuilderInternal::ddef() const {
   std::vector<MX> ret;
   ret.reserve(size(Category::D));
-  for (size_t d : indices(Category::D)) ret.push_back(variable(variable(d).bind).beq);
+  for (size_t d : indices(Category::D)) ret.push_back(variable(variable(d).bind).v);
   return ret;
 }
 
 std::vector<MX> DaeBuilderInternal::wdef() const {
   std::vector<MX> ret;
   ret.reserve(size(Category::W));
-  for (size_t w : indices(Category::W)) ret.push_back(variable(variable(w).bind).beq);
+  for (size_t w : indices(Category::W)) ret.push_back(variable(variable(w).bind).v);
   return ret;
 }
 
 std::vector<MX> DaeBuilderInternal::ydef() const {
   std::vector<MX> ret;
   ret.reserve(size(Category::Y));
-  for (size_t v : indices(Category::Y)) ret.push_back(variable(v).beq);
+  for (size_t v : indices(Category::Y)) ret.push_back(variable(v).v);
   return ret;
 }
 
@@ -2608,7 +2604,7 @@ std::vector<MX> DaeBuilderInternal::ode() const {
     const Variable& x = variable(v);
     if (x.der >= 0) {
       // Derivative variable
-      ret.push_back(variable(variable(x.der).bind).beq);
+      ret.push_back(variable(variable(x.der).bind).v);
     } else if (x.variability == Variability::DISCRETE) {
       // Discrete variable - derivative is zero
       ret.push_back(MX::zeros(x.v.sparsity()));
@@ -2624,7 +2620,7 @@ std::vector<MX> DaeBuilderInternal::alg() const {
   std::vector<MX> ret;
   ret.reserve(size(Category::RES));
   for (size_t v : indices(Category::RES)) {
-    ret.push_back(variable(v).beq);
+    ret.push_back(variable(v).v);
   }
   return ret;
 }
@@ -2636,7 +2632,7 @@ std::vector<MX> DaeBuilderInternal::quad() const {
     const Variable& q = variable(v);
     casadi_assert(q.der >= 0, "No derivative variable for " + q.name);
     const Variable& qdot = variable(q.der);
-    ret.push_back(variable(qdot.bind).beq);
+    ret.push_back(variable(qdot.bind).v);
   }
   return ret;
 }
@@ -2645,7 +2641,7 @@ std::vector<MX> DaeBuilderInternal::quad() const {
 std::vector<MX> DaeBuilderInternal::zero() const {
   std::vector<MX> ret;
   ret.reserve(size(Category::E));
-  for (size_t v : indices(Category::E)) ret.push_back(variable(v).beq);
+  for (size_t v : indices(Category::E)) ret.push_back(variable(v).v);
   return ret;
 }
 
@@ -2793,9 +2789,8 @@ Variable& DaeBuilderInternal::add(const std::string& name, Causality causality,
   }
   // Also create an output variable, if needed
   if (causality == Causality::OUTPUT) {
-    Variable& y = new_variable("__out__" + name, dimension);
+    Variable& y = new_variable("__out__" + name, dimension, v.v);
     y.parent = v.index;
-    y.beq = v.v;
     categorize(y.index, Category::Y);
   }
   // Also create a derivative variable, if needed
@@ -3092,9 +3087,7 @@ void DaeBuilderInternal::eq(const MX& lhs, const MX& rhs, const Dict& opts) {
         // TODO(@jaeandersson): Treat as implicit equation
         casadi_error("Already a binding equation for " + v.name);
       } else {
-        // Old syntax: Set the binding equation
-        v.beq = rhs;
-        // New syntax: Create an assignment variable
+        // Set the binding equation
         Variable& beq = assign(v.name, rhs);
         v.bind = beq.index;
       }
@@ -3127,8 +3120,8 @@ void DaeBuilderInternal::eq(const MX& lhs, const MX& rhs, const Dict& opts) {
     }
   } else {
     // Implicit equation: Create residual variable
-    Variable& res = add(unique_name("__res__"), Causality::OUTPUT, Variability::CONTINUOUS, Dict());
-    res.beq = lhs - rhs;
+    Variable& res = add(unique_name("__res__"), Causality::OUTPUT, Variability::CONTINUOUS,
+      lhs - rhs, Dict());
     categorize(res.index, Category::RES);
   }
   // If derivative variable in the right-hand-side, reclassify as algebraic variable
@@ -3171,8 +3164,8 @@ void DaeBuilderInternal::when(const MX& cond, const std::vector<std::string>& eq
     casadi_error("Cannot parse zero-crossing condition" + str(cond));
   }
   // Create a new dependent variable for the event indicator
-  Variable& e = add(unique_name("__when__"), Causality::LOCAL, Variability::CONTINUOUS, Dict());
-  e.beq = zero;
+  Variable& e = add(unique_name("__when__"), Causality::LOCAL, Variability::CONTINUOUS,
+    zero, Dict());
   categorize(e.index, Category::E);
   // Convert to legacy format, pending refactoring
   std::vector<MX> all_lhs, all_rhs;
@@ -3180,9 +3173,9 @@ void DaeBuilderInternal::when(const MX& cond, const std::vector<std::string>& eq
     Variable& ee = variable(eq);
     casadi_assert_dev(ee.category == Category::ASSIGN || ee.category == Category::REINIT);
     all_lhs.push_back(var(ee.parent));
-    all_rhs.push_back(ee.beq);
+    all_rhs.push_back(ee.v);
   }
-  when_cond_.push_back(variable(e.index).beq);
+  when_cond_.push_back(variable(e.index).v);
   when_lhs_.push_back(vertcat(all_lhs));
   when_rhs_.push_back(vertcat(all_rhs));
 }
@@ -3191,8 +3184,8 @@ Variable& DaeBuilderInternal::assign(const std::string& name, const MX& val) {
   // Create a unique name for the reinit variable
   std::string assign_name = unique_name("__assign__" + name + "__");
   // Add a new dependent variable defined by val
-  Variable& v = add(assign_name, Causality::LOCAL, Variability::CONTINUOUS, Dict());
-  v.beq = val;
+  Variable& v = add(assign_name, Causality::LOCAL, Variability::CONTINUOUS,
+    val, Dict());
   // Classify as assign variable
   categorize(v.index, Category::ASSIGN);
   v.parent = variable(name).index;
@@ -3204,8 +3197,7 @@ Variable& DaeBuilderInternal::reinit(const std::string& name, const MX& val) {
   // Create a unique name for the reinit variable
   std::string reinit_name = unique_name("__reinit__" + name + "__");
   // Add a new dependent variable defined by val
-  Variable& v = add(reinit_name, Causality::LOCAL, Variability::CONTINUOUS, Dict());
-  v.beq = val;
+  Variable& v = add(reinit_name, Causality::LOCAL, Variability::CONTINUOUS, val, Dict());
   // Classify as reinit variable
   categorize(v.index, Category::REINIT);
   v.parent = variable(name).index;
@@ -3461,9 +3453,8 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
         // Corresponding variable
         Variable& v = variable(outputs_.back());
         // Create a new output variable
-        Variable& y = new_variable("__out__" + v.name, v.dimension);
+        Variable& y = new_variable("__out__" + v.name, v.dimension, v.v);
         y.parent = v.index;
-        y.beq = v.v;
         categorize(y.index, Category::Y);
         // Get dependencies
         v.dependencies = read_dependencies(e);
@@ -3576,9 +3567,8 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
         outputs_.push_back(e.attribute<casadi_int>("index", 0) - 1);
         // Corresponding variable
         Variable& v = variable(outputs_.back());
-        Variable& y = new_variable("__out__" + v.name, v.dimension);
+        Variable& y = new_variable("__out__" + v.name, v.dimension, v.v);
         y.parent = v.index;
-        y.beq = v.v;
         categorize(y.index, Category::Y);
         // Get dependencies
         if (e.has_attribute("dependencies")) {
@@ -3643,22 +3633,16 @@ void DaeBuilderInternal::import_binding_equations(const XmlNode& eqs) {
       // Get the variable and binding expression
       Variable& var = read_variable(eq[0]);
       if (eq[1].size() == 1) {
-        // Old syntax: Set the binding equation
-        var.beq = read_expr(eq[1][0]);
-        // New syntax: Create an assignment variable
-        Variable& beq = assign(var.name, var.beq);
-        var.bind = beq.index;
+        // Set the binding equation
+        var.bind = assign(var.name, read_expr(eq[1][0])).index;
       } else {
         // OpenModelica 1.17 occationally generates integer values without type specifier (bug?)
         casadi_assert(eq[1].size() == 0, "Not implemented");
         casadi_int val;
         eq[1].get(&val);
         casadi_warning(var.name + " has binding equation without type specifier: " + str(val));
-        // Old syntax: Set the binding equation
-        var.beq = val;
-        // New syntax: Create an assignment variable
-        Variable& beq = assign(var.name, val);
-        var.bind = beq.index;
+        // Set the binding equation
+        var.bind = assign(var.name, val).index;
       }
       // Add to list of dependent parameters
       indices(Category::D).push_back(var.index);
@@ -3708,13 +3692,13 @@ void DaeBuilderInternal::import_dynamic_equations(const XmlNode& eqs) {
         }
         // Turn non-snooth zero-crossing expression into a smooth zero-crossing expression
         MX zc;
-        switch (cond.beq.op()) {
+        switch (cond.v.op()) {
           case OP_LT:
             // x1 < x2 <=> x2 - x1 > 0
-            zc = cond.beq.dep(1) - cond.beq.dep(0);
+            zc = cond.v.dep(1) - cond.v.dep(0);
             break;
           default:
-            casadi_error("Cannot turn " + str(cond.beq) + " into a smooth expression");
+            casadi_error("Cannot turn " + str(cond.v) + " into a smooth expression");
         }
         set_init(cond.name, MX());  // remove initial conditions, if any
         auto w_it = std::find(indices(Category::W).begin(), indices(Category::W).end(),
@@ -3728,8 +3712,8 @@ void DaeBuilderInternal::import_dynamic_equations(const XmlNode& eqs) {
           indices(Category::X).erase(x_it);  // remove from states
         }
         // Create event indicator
-        Variable& e = add(unique_name("__when__"), Causality::LOCAL, Variability::CONTINUOUS, Dict());
-        e.beq = zc;
+        Variable& e = add(unique_name("__when__"), Causality::LOCAL, Variability::CONTINUOUS,
+          zc, Dict());
         categorize(e.index, Category::E);
         // Add to list of when equations
         when_cond_.push_back(zc);
@@ -3760,19 +3744,13 @@ void DaeBuilderInternal::import_dynamic_equations(const XmlNode& eqs) {
           // Mark as state
           categorize(v.index, Category::X);
           // Set binding equation to derivative variable
-          dot_v.beq = beq;
-          // New syntax: Create an assignment variable
-          Variable& dot_v_beq = assign(dot_v.name, beq);
-          dot_v.bind = dot_v_beq.index;
+          dot_v.bind = assign(dot_v.name, beq).index;
         } else {
           // Left-hand-side is a variable
           Variable& v = read_variable(lhs);
           // Set the equation
           indices(Category::W).push_back(find(v.name));
-          v.beq = beq;
-          // New syntax: Create an assignment variable
-          Variable& v_beq = assign(v.name, beq);
-          v.bind = v_beq.index;
+          v.bind = assign(v.name, beq).index;
         }
       } else {
         casadi_error("Unknown dynamic equation type, got:" + eq.name);
