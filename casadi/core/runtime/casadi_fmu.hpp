@@ -26,6 +26,8 @@ typedef struct {
   double d[SZ_MEM];
   // Has any variable been set since last call
   int up_to_date;
+  // Did continuous states change?
+  int continuous_states_changed;
   // Buffers for evaluation generated code
   double t;
   double p[N_P];
@@ -33,12 +35,18 @@ typedef struct {
   double xdot[N_X];
   double u[N_U];
   double y[N_Y];
+  double zero[N_ZERO];
+  // Event trigger?
+  int zeroind;
+  // Which events can trigger
+  int triggerable[N_ZERO];
   // Buffers for derivative calculations
   double dp[N_P];
   double dx[N_X];
   double dxdot[N_X];
   double du[N_U];
   double dy[N_Y];
+  double dzero[N_ZERO];
   // Work vectors for evaluation
   const double* arg[SZ_ARG];
   double* res[SZ_RES];
@@ -66,6 +74,7 @@ int evaluate(casadi_fmi_memory* m) {
   i = 0;
   m->res[i++] = m->xdot;
   m->res[i++] = m->y;
+  m->res[i++] = m->zero;
 
   // Evaluate
   mem = MODELNAME_checkout();
@@ -75,6 +84,7 @@ int evaluate(casadi_fmi_memory* m) {
   // Copy from output buffers
   for (i = 0; i < N_X; ++i) m->v[xdot_vr[i]] = m->xdot[i];
   for (i = 0; i < N_Y; ++i) m->v[y_vr[i]] = m->y[i];
+  for (i = 0; i < N_ZERO; ++i) m->v[zero_vr[i]] = m->zero[i];
 
   return flag;
 }
@@ -98,6 +108,7 @@ int evaluate_forward(casadi_fmi_memory* m) {
   // Map nondifferentiated outputs to evaluation buffer
   m->arg[i++] = m->xdot;
   m->arg[i++] = m->y;
+  m->arg[i++] = m->zero;
 
   // Map forward seeds
   m->arg[i++] = 0;
@@ -109,6 +120,7 @@ int evaluate_forward(casadi_fmi_memory* m) {
   i = 0;
   m->res[i++] = m->dxdot;
   m->res[i++] = m->dy;
+  m->res[i++] = m->dzero;
 
   // Evaluate
   mem = fwd1_MODELNAME_checkout();
@@ -118,6 +130,7 @@ int evaluate_forward(casadi_fmi_memory* m) {
   // Copy from output buffers
   for (i = 0; i < N_X; ++i) m->d[xdot_vr[i]] = m->dxdot[i];
   for (i = 0; i < N_Y; ++i) m->d[y_vr[i]] = m->dy[i];
+  for (i = 0; i < N_ZERO; ++i) m->d[zero_vr[i]] = m->dzero[i];
 
   // Return evaluation flag
   return flag;
@@ -130,6 +143,7 @@ int evaluate_adjoint(casadi_fmi_memory* m) {
   // Copy seeds for output buffers
   for (i = 0; i < N_X; ++i) m->dxdot[i] = m->d[xdot_vr[i]];
   for (i = 0; i < N_Y; ++i) m->dy[i] = m->d[y_vr[i]];
+  for (i = 0; i < N_ZERO; ++i) m->dzero[i] = m->d[zero_vr[i]];
 
   // Clear sensitivities
   for (i = 0; i < N_X; ++i) m->dx[i] = 0;
@@ -146,10 +160,12 @@ int evaluate_adjoint(casadi_fmi_memory* m) {
   // Map nondifferentiated outputs to evaluation buffer
   m->arg[i++] = m->xdot;
   m->arg[i++] = m->y;
+  m->arg[i++] = m->zero;
 
   // Map adjoint seeds
   m->arg[i++] = m->dxdot;
   m->arg[i++] = m->dy;
+  m->arg[i++] = m->dzero;
 
   // Map adjoint sensitivities
   i = 0;
@@ -172,6 +188,48 @@ int evaluate_adjoint(casadi_fmi_memory* m) {
   return flag;
 }
 
+#if N_ZERO > 0
+
+int evaluate_transition(casadi_fmi_memory* m) {
+  // Local variables
+  size_t i;
+  int mem, flag;
+  double zeroind;
+
+  // Cast event index to double
+  zeroind = (double)m->zeroind;
+
+  // Copy states, inputs and parameters to input buffers
+  for (i = 0; i < N_X; ++i) m->x[i] = m->v[x_vr[i]];
+  for (i = 0; i < N_P; ++i) m->p[i] = m->v[p_vr[i]];
+  for (i = 0; i < N_U; ++i) m->u[i] = m->v[u_vr[i]];
+
+  // Map inputs to evaluation buffer
+  i = 0;
+  m->arg[i++] = &zeroind;  // index
+  m->arg[i++] = &m->t;  // t
+  m->arg[i++] = m->x;  // x
+  m->arg[i++] = 0;  // z
+  m->arg[i++] = m->p;  // p
+  m->arg[i++] = m->u;  // u
+
+  // Map outputs to evaluation buffer
+  i = 0;
+  m->res[i++] = m->xdot;  // post_x
+  m->res[i++] = 0;  // post_z
+
+  // Evaluate
+  mem = transition_MODELNAME_checkout();
+  flag = transition_MODELNAME(m->arg, m->res, m->iw, m->w, mem);
+  transition_MODELNAME_release(mem);
+
+  // Copy from output buffers
+  for (i = 0; i < N_X; ++i) m->v[x_vr[i]] = m->xdot[i];
+
+  return flag;
+}
+#endif  // N_ZERO > 0
+
 FMI3_Export fmi3Status fmi3Reset(fmi3Instance instance) {
   // Local variables
   size_t i;
@@ -184,6 +242,11 @@ FMI3_Export fmi3Status fmi3Reset(fmi3Instance instance) {
   for (i = 0; i < SZ_MEM; ++i) m->d[i] = 0;
   // Not evaluated
   m->up_to_date = 0;
+  // Zero index is negative: No event
+  m->zeroind = -1;
+  m->continuous_states_changed = 0;
+  // Do not permit events to be triggered unless they have been strictly positive
+  for (i = 0; i < N_ZERO; ++i) m->triggerable[i] = 0;
   // Always successful return
   return fmi3OK;
 }
@@ -208,8 +271,11 @@ FMI3_Export fmi3Instance fmi3InstantiateModelExchange(
   m = (casadi_fmi_memory*)malloc(sizeof(casadi_fmi_memory));
   // If allocation was successful
   if (m) {
-    // Increase counter for codegen
+    // Increase counters for codegen
     MODELNAME_incref();
+#if N_ZERO > 0
+    transition_MODELNAME_incref();
+#endif  // N_ZERO > 0
     // Copy meta data
     m->instance_name = instanceName;
     // Call reset function (return flag does not need to be checked)
@@ -312,8 +378,11 @@ FMI3_Export void fmi3FreeInstance(fmi3Instance instance) {
   if (instance) {
     // Free memory structure
     free(instance);
-    // Decrease counter for codegen
+    // Decrease counters for codegen
     MODELNAME_decref();
+#if N_ZERO > 0
+    transition_MODELNAME_decref();
+#endif  // N_ZERO > 0
   }
 }
 
@@ -897,13 +966,13 @@ FMI3_Export fmi3Status fmi3GetNumberOfContinuousStates(fmi3Instance instance,
 
 FMI3_Export fmi3Status fmi3GetNumberOfEventIndicators(fmi3Instance instance,
     size_t* nEventIndicators) {
-  // Event indicators not yet support
-  if (nEventIndicators) *nEventIndicators = 0;
+  if (nEventIndicators) *nEventIndicators = N_ZERO;
   return fmi3OK;
 }
 
 FMI3_Export fmi3Status fmi3GetContinuousStateDerivatives(fmi3Instance instance,
     fmi3Float64 derivatives[], size_t nContinuousStates) {
+  (void)nContinuousStates;  // unused
   return fmi3GetFloat64(instance, xdot_vr, N_X, derivatives, N_X);
 }
 
@@ -918,8 +987,38 @@ FMI3_Export fmi3Status fmi3GetNominalsOfContinuousStates(fmi3Instance instance,
 FMI3_Export fmi3Status fmi3GetEventIndicators(fmi3Instance instance,
     fmi3Float64 eventIndicators[],
     size_t nEventIndicators) {
-  // Event indicators not yet support
+#if N_ZERO > 0
+  // Local variables
+  fmi3Status flag;
+  size_t i;
+  casadi_fmi_memory* m;
+  fmi3Float64 most_negative;
+  // Unused variables
+  (void)nEventIndicators;  // unused
+  // Cast to memory struct
+  m = (casadi_fmi_memory*)instance;
+  // Evaluate zero crossing functions
+  flag = fmi3GetFloat64(instance, zero_vr, N_ZERO, eventIndicators, N_ZERO);
+  // Find the most negative, if any, for use in events handling
+  most_negative = 0;
+  for (i = 0; i < N_ZERO; ++i) {
+    if (m->triggerable[i]) {
+      // Event has been strictly positive already, check if most negative
+      if (eventIndicators[i] < most_negative) {
+        most_negative = eventIndicators[i];
+        m->zeroind = i;
+      }
+    } else if (eventIndicators[i] > 1e-6) {
+      // Event has become strictly positive and is allowed to trigger events
+      m->triggerable[i] = 1;
+    }
+  }
+  // Return evaluation flag
+  return flag;
+#else
+  // No zero crossings
   return fmi3Fatal;
+#endif
 }
 
 FMI3_Export fmi3Status fmi3CompletedIntegratorStep(fmi3Instance instance,
@@ -931,7 +1030,25 @@ FMI3_Export fmi3Status fmi3CompletedIntegratorStep(fmi3Instance instance,
 }
 
 FMI3_Export fmi3Status fmi3EnterEventMode(fmi3Instance instance) {
-  // Events not yet supported
+#if N_ZERO > 0
+  // Local variables
+  casadi_fmi_memory* m;
+  size_t i;
+  // Cast to memory struct
+  m = (casadi_fmi_memory*)instance;
+  // Quick return if no zero crossing
+  if (m->zeroind < 0) return fmi3OK;
+  // Call event transition function
+  if (evaluate_transition(m)) return fmi3Error;
+  // Mark as not evaluated
+  m->up_to_date = 0;
+  // Possible jump in continuous states
+  m->continuous_states_changed = 1;
+  // Reset zero crossing index
+  m->zeroind = -1;
+  for (i = 0; i < N_ZERO; ++i) m->triggerable[i] = 0;
+  #endif  // N_ZERO > 0
+  // Successful return
   return fmi3OK;
 }
 
@@ -942,12 +1059,19 @@ FMI3_Export fmi3Status fmi3UpdateDiscreteStates(fmi3Instance instance,
     fmi3Boolean* valuesOfContinuousStatesChanged,
     fmi3Boolean* nextEventTimeDefined,
     fmi3Float64* nextEventTime) {
+  // Local variables
+  casadi_fmi_memory* m;
+  // Cast to memory struct
+  m = (casadi_fmi_memory*)instance;
   // Discrete variables not yet supported
   *discreteStatesNeedUpdate = fmi3False;
   *terminateSimulation = fmi3False;
   *nominalsOfContinuousStatesChanged = fmi3False;
-  *valuesOfContinuousStatesChanged = fmi3False;
+  *valuesOfContinuousStatesChanged = m->continuous_states_changed ? fmi3True : fmi3False;
   *nextEventTimeDefined = fmi3False;
+  // Reset marker
+  m->continuous_states_changed = 0;
+  // Successful return
   return fmi3OK;
 }
 

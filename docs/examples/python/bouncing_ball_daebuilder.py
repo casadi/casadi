@@ -54,3 +54,47 @@ plt.clf()
 plt.plot(tgrid, simres['xf'][0, :].T)
 plt.grid()
 plt.show()
+
+# Export FMU
+fmu_files = dae.export_fmu()
+print('Generated files: {}'.format(fmu_files))
+
+# Compile DLL
+import os
+casadi_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+cfiles = " ".join([f for f in fmu_files if f.endswith('.c')])
+sofile = dae.name() + '.so'
+os.system(f'gcc --shared -fPIC -I{casadi_root}/external_packages/FMI-Standard-3.0/headers/ {cfiles} -o {sofile}')
+print(f'Compiled {sofile}')
+
+# Package into an FMU
+import zipfile
+fmuname = dae.name() + '.fmu'
+with zipfile.ZipFile(fmuname, 'w') as fmufile:
+    # Add generated files to the archive
+    for f in fmu_files:
+      arcname = f if f == 'modelDescription.xml' else 'sources/' + f
+      fmufile.write(f, arcname = arcname)
+      #os.remove(f)
+    # Add compile DLL to the archive (assume Linux 64 bit)
+    fmufile.write(sofile, arcname = f'binaries/x86_64-linux/{sofile}')
+    os.remove(sofile)
+print(f'Created FMU: {fmuname}')
+
+# Load the FMU in FMPy
+try:
+    import fmpy
+    fmpy.dump(fmuname)
+    # Simulate the generated FMU
+    res = fmpy.simulate_fmu(fmuname, stop_time=7)
+    import matplotlib.pyplot as plt
+    plt.figure(1)
+    plt.clf()
+    plt.plot(res['time'], res['h'],'-', label = 'h')
+    plt.xlabel('time')
+    plt.legend()
+    plt.grid()
+    plt.show()
+
+except ImportError as e:
+   print('FMPy not installed. Skipping FMU simulation.')

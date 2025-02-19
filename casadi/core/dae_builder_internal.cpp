@@ -809,6 +809,15 @@ XmlNode DaeBuilderInternal::generate_model_structure() const {
     c.set_attribute("dependencies", xdot.dependencies);
     r.children.push_back(c);
   }
+  // Add event indicators
+  for (size_t i : indices(Category::ZERO)) {
+    const Variable& zero = variable(i);
+    XmlNode c;
+    c.name = "EventIndicator";
+    c.set_attribute("valueReference", static_cast<casadi_int>(zero.value_reference));
+    c.set_attribute("dependencies", zero.dependencies);
+    r.children.push_back(c);
+  }
   return r;
 }
 
@@ -834,23 +843,26 @@ void DaeBuilderInternal::update_dependencies() const {
       xdot.dependencies.push_back(variable(Category::U, j).value_reference);
     }
   }
-  // Dependendencies of the output function
-  Sparsity dy_dxT = oracle.jac_sparsity(oracle.index_out("y"), oracle.index_in("x")).T();
-  Sparsity dy_duT = oracle.jac_sparsity(oracle.index_out("y"), oracle.index_in("u")).T();
-  for (casadi_int i = 0; i < size(Category::Y); ++i) {
-    // Get output variable
-    const Variable& y = variable(Category::Y, i);
-    // Clear dependencies
-    y.dependencies.clear();
-    // Dependencies on states
-    for (casadi_int k = dy_dxT.colind(i); k < dy_dxT.colind(i + 1); ++k) {
-      casadi_int j = dy_dxT.row(k);
-      y.dependencies.push_back(variable(Category::X, j).value_reference);
-    }
-    // Dependencies on controls
-    for (casadi_int k = dy_duT.colind(i); k < dy_duT.colind(i + 1); ++k) {
-      casadi_int j = dy_duT.row(k);
-      y.dependencies.push_back(variable(Category::U, j).value_reference);
+  // Dependendencies of the outputs and event indicators
+  for (Category cat : {Category::Y, Category::ZERO}) {
+    std::string catname = to_string(cat);
+    Sparsity dy_dxT = oracle.jac_sparsity(oracle.index_out(catname), oracle.index_in("x")).T();
+    Sparsity dy_duT = oracle.jac_sparsity(oracle.index_out(catname), oracle.index_in("u")).T();
+    for (casadi_int i = 0; i < size(cat); ++i) {
+      // Get output variable
+      const Variable& y = variable(cat, i);
+      // Clear dependencies
+      y.dependencies.clear();
+      // Dependencies on states
+      for (casadi_int k = dy_dxT.colind(i); k < dy_dxT.colind(i + 1); ++k) {
+        casadi_int j = dy_dxT.row(k);
+        y.dependencies.push_back(variable(Category::X, j).value_reference);
+      }
+      // Dependencies on controls
+      for (casadi_int k = dy_duT.colind(i); k < dy_duT.colind(i + 1); ++k) {
+        casadi_int j = dy_duT.row(k);
+        y.dependencies.push_back(variable(Category::U, j).value_reference);
+      }
     }
   }
 }
@@ -872,7 +884,10 @@ std::vector<std::string> DaeBuilderInternal::export_fmu(const Dict& opts) const 
   // Generate model function
   std::string dae_filename = name_;
   Function dae = shared_from_this<DaeBuilder>().create(dae_filename,
-    {"t", "x", "p", "u"}, {"ode", "y"});
+    {"t", "x", "p", "u"}, {"ode", "y", "zero"});
+  // Event transition function, if needed
+  Function tfun;
+  if (size(Category::ZERO) > 0) tfun = transition("transition_" + name_);
   // Generate C code for model equations
   Dict codegen_opts;
   codegen_opts["with_header"] = true;
@@ -880,6 +895,7 @@ std::vector<std::string> DaeBuilderInternal::export_fmu(const Dict& opts) const 
   gen.add(dae);
   gen.add(dae.forward(1));
   gen.add(dae.reverse(1));
+  if (!tfun.is_null()) gen.add(tfun);
   ret.push_back(gen.generate());
   ret.push_back(dae_filename + ".h");
   // Make sure dependencies are up-to-date
@@ -996,6 +1012,11 @@ std::string DaeBuilderInternal::generate_wrapper(const std::string& guid,
   f << "#define N_Y " << size(Category::Y) << "\n"
     << "fmi3ValueReference y_vr[N_Y] = " << generate(indices(Category::Y)) << ";\n"
     << "\n";
+
+  // Event indicators
+  f << "#define N_ZERO " << size(Category::ZERO) << "\n"
+  << "fmi3ValueReference zero_vr[N_ZERO] = " << generate(indices(Category::ZERO)) << ";\n"
+  << "\n";
 
   // Memory structure
   f << CodeGenerator::fmu_helpers(name_);
