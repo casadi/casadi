@@ -2215,6 +2215,8 @@ void DaeBuilderInternal::clear_cache() const {
 }
 
 const Function& DaeBuilderInternal::oracle(bool sx, bool elim_w, bool lifted_calls) const {
+  casadi_assert(symbolic_, "DaeBuilder oracle only available if symbolic representation");
+
   // Clear cache now, if necessary
   if (clear_cache_) clear_cache();
   // Create an MX oracle, if needed
