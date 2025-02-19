@@ -1089,6 +1089,9 @@ MX DaeBuilderInternal::read_expr(const XmlNode& node) {
         indices(Category::W).push_back(v.index);
         // Set binding expression
         v.beq = read_expr(args[i]);
+        // New syntax: Create an assignment variable
+        Variable& v_beq = assign(v.name, v.beq);
+        v.bind = v_beq.index;
         // Add to list of function arguments
         farg[i] = v.v;
       }
@@ -1732,6 +1735,8 @@ void DaeBuilderInternal::lift(bool lift_shared, bool lift_calls) {
     Variable& v = new_variable(new_w.at(i).name());
     v.v = new_w.at(i);
     v.beq = new_wdef.at(i);
+    Variable& v_beq = assign(v.name, v.beq);
+    v.bind = v_beq.index;
     indices(Category::W).push_back(v.index);
   }
   // Get expressions
@@ -3135,8 +3140,7 @@ void DaeBuilderInternal::eq(const MX& lhs, const MX& rhs, const Dict& opts) {
   } else {
     // Implicit equation: Create residual variable
     Variable& res = add(unique_name("__res__"), Causality::OUTPUT, Variability::CONTINUOUS, Dict());
-    eq(res.v, rhs - lhs, Dict());
-    // Remove from y and classify as res variable
+    res.beq = lhs - rhs;
     categorize(res.index, Category::RES);
   }
   // If derivative variable in the right-hand-side, reclassify as algebraic variable
@@ -3180,8 +3184,7 @@ void DaeBuilderInternal::when(const MX& cond, const std::vector<std::string>& eq
   }
   // Create a new dependent variable for the event indicator
   Variable& e = add(unique_name("__when__"), Causality::LOCAL, Variability::CONTINUOUS, Dict());
-  eq(e.v, zero, Dict());
-  // Move from y to e
+  e.beq = zero;
   categorize(e.index, Category::E);
   // Convert to legacy format, pending refactoring
   std::vector<MX> all_lhs, all_rhs;
@@ -3652,15 +3655,22 @@ void DaeBuilderInternal::import_binding_equations(const XmlNode& eqs) {
       // Get the variable and binding expression
       Variable& var = read_variable(eq[0]);
       if (eq[1].size() == 1) {
-        // Regular expression
+        // Old syntax: Set the binding equation
         var.beq = read_expr(eq[1][0]);
+        // New syntax: Create an assignment variable
+        Variable& beq = assign(var.name, var.beq);
+        var.bind = beq.index;
       } else {
         // OpenModelica 1.17 occationally generates integer values without type specifier (bug?)
         casadi_assert(eq[1].size() == 0, "Not implemented");
         casadi_int val;
         eq[1].get(&val);
         casadi_warning(var.name + " has binding equation without type specifier: " + str(val));
+        // Old syntax: Set the binding equation
         var.beq = val;
+        // New syntax: Create an assignment variable
+        Variable& beq = assign(var.name, val);
+        var.bind = beq.index;
       }
       // Add to list of dependent parameters
       indices(Category::D).push_back(var.index);
@@ -3730,8 +3740,9 @@ void DaeBuilderInternal::import_dynamic_equations(const XmlNode& eqs) {
           indices(Category::X).erase(x_it);  // remove from states
         }
         // Create event indicator
-        (void)add(cond.name + "_smooth", {{"cat", "e"}});
-        variable(cond.name + "_smooth").beq = zc;
+        Variable& e = add(unique_name("__when__"), Causality::LOCAL, Variability::CONTINUOUS, Dict());
+        e.beq = zc;
+        categorize(e.index, Category::E);
         // Add to list of when equations
         when_cond_.push_back(zc);
         when_lhs_.push_back(lhs);
@@ -3762,12 +3773,18 @@ void DaeBuilderInternal::import_dynamic_equations(const XmlNode& eqs) {
           categorize(v.index, Category::X);
           // Set binding equation to derivative variable
           dot_v.beq = beq;
+          // New syntax: Create an assignment variable
+          Variable& dot_v_beq = assign(dot_v.name, beq);
+          dot_v.bind = dot_v_beq.index;
         } else {
           // Left-hand-side is a variable
           Variable& v = read_variable(lhs);
           // Set the equation
           indices(Category::W).push_back(find(v.name));
           v.beq = beq;
+          // New syntax: Create an assignment variable
+          Variable& v_beq = assign(v.name, beq);
+          v.bind = v_beq.index;
         }
       } else {
         casadi_error("Unknown dynamic equation type, got:" + eq.name);
