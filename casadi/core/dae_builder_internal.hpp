@@ -59,7 +59,7 @@ enum class Variability {CONSTANT, FIXED, TUNABLE, DISCRETE, CONTINUOUS, NUMEL};
 // CONTINUOUS   -          -                     U       X/Q/W/Z  X/Q/W/Z  T
 
 // Variable categories
-enum class Category {T, C, P, D, W, U, X, Z, Q, DER, ALG, ASSIGN, REINIT, NUMEL};
+enum class Category {T, C, P, D, W, U, X, Z, Q, DER, ASSIGN, REINIT, NUMEL};
 
 // Output categories for generated functions
 enum class OutputCategory {ODE, ALG, QUAD, ZERO, D, W, Y, NUMEL};
@@ -528,7 +528,7 @@ protected:
   std::vector<Variable*> variables_;
 
   // Model structure
-  std::vector<size_t> outputs_, derivatives_, initial_unknowns_, event_indicators_;
+  std::vector<size_t> outputs_, derivatives_, initial_unknowns_, event_indicators_, residuals_;
 
   /// Find of variable by name
   std::unordered_map<std::string, size_t> varind_;
