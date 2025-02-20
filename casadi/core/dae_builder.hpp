@@ -194,22 +194,6 @@ class CASADI_EXPORT DaeBuilder
       \identifier{2b2} */
   std::vector<MX> init_rhs() const;
 
-  /** \brief When statement: triggering condition
-
-      \identifier{5y} */
-  const std::vector<MX>& when_cond() const;
-
-  /** \brief When statement: left-hand-side
-
-      \identifier{5z} */
-  const std::vector<MX>& when_lhs() const;
-
-  /** \brief When statement: right-hand-side
-
-      \identifier{60} */
-  const std::vector<MX>& when_rhs() const;
-  ///@}
-
   /** \brief Model structure: outputs
 
       \identifier{61} */

@@ -158,18 +158,6 @@ std::vector<MX> DaeBuilder::init_rhs() const {
   return (*this)->init_rhs();
 }
 
-const std::vector<MX>& DaeBuilder::when_cond() const {
-  return (*this)->when_cond_;
-}
-
-const std::vector<MX>& DaeBuilder::when_lhs() const {
-  return (*this)->when_lhs_;
-}
-
-const std::vector<MX>& DaeBuilder::when_rhs() const {
-  return (*this)->when_rhs_;
-}
-
 std::vector<std::string> DaeBuilder::outputs() const {
   try {
     return (*this)->name((*this)->outputs_);
