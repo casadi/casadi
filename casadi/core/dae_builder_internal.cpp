@@ -1289,11 +1289,14 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
     }
   }
 
-  if (!when_cond_.empty()) {
-    stream << "When statements" << std::endl;
-    for (casadi_int k = 0; k < when_cond_.size(); ++k) {
-      stream << "  when " << variable(when_cond_.at(k)).name << " > 0 : " << str(when_lhs_.at(k))
-        << " := " << str(when_rhs_.at(k)) << std::endl;
+  if (!when_.empty()) {
+    stream << "When equations" << std::endl;
+    for (auto weq : when_) {
+      stream << "  when " << variable(weq.first).v << " > 0 : " << std::endl;
+      for (size_t eq : weq.second) {
+        auto v = variable(eq).parent;
+        stream << "    " << variable(v).name << " := " << variable(eq).v << std::endl;
+      }
     }
   }
 }
@@ -1616,10 +1619,6 @@ void DaeBuilderInternal::sanity_check() const {
     casadi_assert(size(Category::T) == 1, "At most one time variable allowed");
     casadi_assert(variable(Category::T, 0).v.is_scalar(), "Non-scalar time t");
   }
-
-  // When statements
-  casadi_assert(when_cond_.size() == when_lhs_.size() && when_lhs_.size() == when_rhs_.size(),
-    "when_cond, when_lhs and when_rhs must all have the the same length");
 }
 
 std::string DaeBuilderInternal::qualified_name(const XmlNode& nn, Attribute* att) {
@@ -2488,7 +2487,7 @@ Function DaeBuilderInternal::transition(const std::string& fname, casadi_int ind
     bool dummy_index_input) const {
 
   // Make sure that the index is valid
-  casadi_assert(index >= 0 && index < when_cond_.size(), "Illegal event index");
+  casadi_assert(index >= 0 && index < when_.size(), "Illegal event index");
 
   // Get input expressions for the oracle
   std::vector<MX> oracle_in = oracle().mx_in();
@@ -2501,11 +2500,17 @@ Function DaeBuilderInternal::transition(const std::string& fname, casadi_int ind
   ret_in[DYN_P] = oracle_in.at(static_cast<size_t>(Category::P));
   ret_in[DYN_U] = oracle_in.at(static_cast<size_t>(Category::U));
 
+  // When equation left-hand sides and right-hand sides
+  std::vector<MX> when_lhs, when_rhs;
+  for (size_t eq : when_.at(index).second) {
+    auto v = variable(eq).parent;
+    when_lhs.push_back(variable(v).v);
+    when_rhs.push_back(variable(eq).v);
+  }
+
   // Expressions for x and z after event
   std::vector<MX> ret_out = {ret_in[DYN_X], ret_in[DYN_Z]};
-  ret_out = MX::substitute(ret_out,
-    std::vector<MX>{when_lhs_.at(index)},
-    std::vector<MX>{when_rhs_.at(index)});
+  ret_out = MX::substitute(ret_out, when_lhs, when_rhs);
 
   // Remove dependent variables, if any
   if (size(Category::W) > 0) {
@@ -2528,14 +2533,14 @@ Function DaeBuilderInternal::transition(const std::string& fname, casadi_int ind
 
 Function DaeBuilderInternal::transition(const std::string& fname) const {
   // If no events, return null
-  if (when_cond_.empty()) return Function();
+  if (when_.empty()) return Function();
 
   // If just a single event, create an event function with a dummy index input
-  if (when_cond_.size() == 1) return transition(fname, 0, true);
+  if (when_.size() == 1) return transition(fname, 0, true);
 
   // Create separate transition functions for each event
   std::vector<Function> f_all;
-  for (casadi_int i = 0; i < when_cond_.size(); ++i) {
+  for (casadi_int i = 0; i < when_.size(); ++i) {
     f_all.push_back(transition(fname + "_" + str(i), i));
   }
 
@@ -3131,15 +3136,15 @@ void DaeBuilderInternal::when(const MX& cond, const std::vector<std::string>& eq
   categorize(e.index, Category::ASSIGN);
   // Convert to legacy format, pending refactoring
   std::vector<MX> all_lhs, all_rhs;
+  std::vector<size_t> all_eqs;
   for (auto&& eq : eqs) {
     Variable& ee = variable(eq);
     casadi_assert_dev(ee.category == Category::ASSIGN || ee.category == Category::REINIT);
     all_lhs.push_back(var(ee.parent));
     all_rhs.push_back(ee.v);
+    all_eqs.push_back(ee.index);
   }
-  when_cond_.push_back(e.index);
-  when_lhs_.push_back(vertcat(all_lhs));
-  when_rhs_.push_back(vertcat(all_rhs));
+  when_.push_back(std::make_pair(e.index, all_eqs));
 }
 
 Variable& DaeBuilderInternal::assign(const std::string& name, const MX& val) {
