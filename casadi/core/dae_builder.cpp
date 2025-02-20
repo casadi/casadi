@@ -134,7 +134,7 @@ std::vector<MX> DaeBuilder::cdef() const {
 
 std::vector<MX> DaeBuilder::ddef() const {
   try {
-    return (*this)->output(OutputCategory::D);
+    return (*this)->output(OutputCategory::DDEF);
   } catch (std::exception& e) {
     THROW_ERROR("ddef", e.what());
     return {};  // never reached
@@ -143,7 +143,7 @@ std::vector<MX> DaeBuilder::ddef() const {
 
 std::vector<MX> DaeBuilder::wdef() const {
   try {
-    return (*this)->output(OutputCategory::W);
+    return (*this)->output(OutputCategory::WDEF);
   } catch (std::exception& e) {
     THROW_ERROR("wdef", e.what());
     return {};  // never reached

@@ -59,10 +59,10 @@ enum class Variability {CONSTANT, FIXED, TUNABLE, DISCRETE, CONTINUOUS, NUMEL};
 // CONTINUOUS   -          -                     U       X/Q/W/Z  X/Q/W/Z  T
 
 // Variable categories
-enum class Category {T, C, P, D, W, U, X, Z, Q, DER, ASSIGN, REINIT, NUMEL};
+enum class Category {T, C, P, D, W, U, X, Z, Q, DER, DEF, NUMEL};
 
 // Output categories for generated functions
-enum class OutputCategory {ODE, ALG, QUAD, ZERO, D, W, Y, NUMEL};
+enum class OutputCategory {ODE, ALG, QUAD, ZERO, DDEF, WDEF, Y, NUMEL};
 
 /// Initial: FMI 2.0 specification, section 2.2.7 or FMI 3.0 specification, section 2.4.7.5
 enum class Initial {EXACT, APPROX, CALCULATED, NA, NUMEL};
