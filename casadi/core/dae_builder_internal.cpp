@@ -3646,16 +3646,6 @@ void DaeBuilderInternal::import_dynamic_equations(const XmlNode& eqs) {
           // Not implemented
           casadi_error(n_equ[0].name + " in when equation not supported");
         }
-        // Turn non-snooth zero-crossing expression into a smooth zero-crossing expression
-        MX zc;
-        switch (cond.v.op()) {
-          case OP_LT:
-            // x1 < x2 <=> x2 - x1 > 0
-            zc = cond.v.dep(1) - cond.v.dep(0);
-            break;
-          default:
-            casadi_error("Cannot turn " + str(cond.v) + " into a smooth expression");
-        }
         set_init(cond.name, MX());  // remove initial conditions, if any
         auto w_it = std::find(indices(Category::W).begin(), indices(Category::W).end(),
           cond.index);
@@ -3667,15 +3657,8 @@ void DaeBuilderInternal::import_dynamic_equations(const XmlNode& eqs) {
         if (x_it != indices(Category::X).end()) {
           indices(Category::X).erase(x_it);  // remove from states
         }
-        // Create event indicator
-        Variable& e = add(unique_name("__when__"), Causality::LOCAL, Variability::CONTINUOUS,
-          zc, Dict());
-        event_indicators_.push_back(e.index);
-        categorize(e.index, Category::ASSIGN);
-        // Add to list of when equations
-        when_cond_.push_back(e.index);
-        when_lhs_.push_back(lhs);
-        when_rhs_.push_back(rhs);
+        // Create a when condition
+        when(cond.v, {assign(variable(lhs).name, rhs).name}, Dict());
       } else if (eq.name == "equ:Equation") {  // Residual equation
         // Consistency checks
         casadi_assert_dev(eq.size() == 1 && eq[0].name == "exp:Sub");
