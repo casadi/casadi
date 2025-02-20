@@ -259,6 +259,10 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   /// Reorder variables in a category
   void reorder(Category cat, const std::vector<size_t>& v);
 
+  /// Reorder any index vector
+  void reorder(const std::string& n, std::vector<size_t>& ind,
+    const std::vector<size_t>& v) const;
+
   /// Prune unused controls
   void prune(bool prune_p, bool prune_u);
 

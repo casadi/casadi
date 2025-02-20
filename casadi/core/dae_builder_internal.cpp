@@ -1349,16 +1349,19 @@ const std::vector<size_t>& DaeBuilderInternal::indices(Category cat) const {
 }
 
 void DaeBuilderInternal::reorder(Category cat, const std::vector<size_t>& v) {
-  // Get the current indices
-  std::vector<size_t>& ind = indices(cat);
+  return reorder(to_string(cat), indices(cat), v);
+}
+
+void DaeBuilderInternal::reorder(const std::string& n, std::vector<size_t>& ind,
+    const std::vector<size_t>& v) const {
   // Check if the sizes match
-  casadi_assert(ind.size() == v.size(), "Cannot reorder " + str(to_string(cat)) + ": "
+  casadi_assert(ind.size() == v.size(), "Cannot reorder " + n + ": "
     + str(v.size()) + " elements provided for " + str(ind.size()) + " components.");
   // Mark elements to be set
   std::vector<bool> set(n_variables(), false);
   for (size_t i : v) set.at(i) = true;
   // Make sure all elements are present
-  for (size_t i : ind) casadi_assert(set.at(i), "Cannot reorder " + str(to_string(cat)) + ": "
+  for (size_t i : ind) casadi_assert(set.at(i), "Cannot reorder " + n + ": "
     + variable(i).name + " is missing.");
   // Set the new order
   std::copy(v.begin(), v.end(), ind.begin());

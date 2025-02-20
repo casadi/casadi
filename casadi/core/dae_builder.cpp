@@ -542,7 +542,14 @@ void DaeBuilder::set_all(const std::string& v, const std::vector<std::string>& n
 
 void DaeBuilder::reorder(const std::string& cat, const std::vector<std::string>& v) {
   try {
-    (*this)->reorder(to_enum<Category>(cat), (*this)->find(v));
+    auto vind = (*this)->find(v);
+    if (cat == "y") {
+      // Reorder outputs
+      (*this)->reorder("y", (*this)->outputs_, vind);
+    } else {
+      // Reorder inputs
+      (*this)->reorder(to_enum<Category>(cat), vind);
+    }
   } catch (std::exception& e) {
     THROW_ERROR("reorder", e.what());
   }
