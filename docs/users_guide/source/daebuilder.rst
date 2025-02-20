@@ -25,59 +25,60 @@ Each |DaeBuilder| instance maintains a list of model variables. The variables mu
   The independent variable, usually time
 
 :math:`c`
-  Constants
+  Constants, calculated explicitly using :math:`c = f_{\text{cdef}}(c)`, where the dependency on :math:`c` is always acyclic
 
 :math:`p`
   Independent parameters
 
 :math:`d`
-  Dependent parameters, calculated from :math:`c` and :math:`p` and, acyclically, other :math:`d`
+  Dependent parameters, calculated explicitly using :math:`d = f_{\text{ddef}}(p, d; c)`, where the dependency on :math:`d` is always acyclic
 
 :math:`u`
   Input variables
 
+:math:`w`
+  Dependent variables, calculated explicitly using :math:`w = f_{\text{wdef}}(t, p, d, u, w, x, z; c)`, where the dependency on :math:`w` is always acyclic
+
 :math:`x`
-  Differential states, each defined by an explicit ordinary differential equation (ODE)
+  Differential states, each defined by an ordinary differential equation (ODE), :math:`\dot{x} = f_{\text{ode}}(t, p, d, u, w, x, z; c)`
 
 :math:`q`
-  Quadrature states, i.e. a differential states that do not appear in
-  the right-hand-sides allowing them to be calculated by so-called quadrature formulas
+  Quadrature states, i.e. a differential states that do not appear in the right-hand-sides, :math:`\dot{q} = f_{\text{quad}}(t, p, d, u, w, x, z; c)`
 
 :math:`z`
-  Algebraic variables, defined implicitly using residual equations
-
-:math:`w`
-  Dependent variables, calculated explicitly from :math:`c`, :math:`p`, :math:`d`, :math:`u`, :math:`x`, :math:`z` and, acyclically, other :math:`w`
+  Algebraic variables, defined implicitly using the algebraic equations, :math:`0 = f_{\text{alg}}(t, p, d, u, w, x, z; c)`
 
 :math:`y`
-  Output variables, calculated explicitly from :math:`c`, :math:`p`, :math:`d`, :math:`u`, :math:`x`, :math:`q`, :math:`z` and :math:`w`
+  Output variables, calculated explicitly using the output equations, :math:`y = f_{\text{y}}(t, p, d, u, w, x, z; c)`
 
-There are also additional categories of internal character, for certain derived expressions, e.g. residual variables, event indicators, derivative variables and variable definitions.
+There are also additional categories of internal character, for certain derived expressions, e.g. residual variables (i.e. the current value of :math:`f_{\text{alg}}`), event indicators, derivative variables and variable definitions. Note that the dependency on :math:`c` is always parametric to the function definition, i.e. a new function needs to be defined if the value of :math:`c` changes.
 
-The category for a variable is determined automatically from its causality and variability according to the following table, where the rows correspond to the causality and the columns to the variability (cf. Table 17 in FMI specification, 3.0.2 [#fmi3]_):
+The category for a variable is determined automatically from its causality and variability according to the following table, where the rows correspond to the causality and the columns to the variability (cf. Table 18 in FMI specification, 3.0.2 [#fmi3]_):
 
-+-------------+------------+-------------+-----------+----------------+-------------------+--------------+
-||            || parameter || calculated || input    || output        || local            || independent |
-||            ||           || Parameter  ||          ||               ||                  ||             |
-+=============+============+=============+===========+================+===================+==============+
-| constant    | n/a        | n/a         | n/a       | :math:`c`      | :math:`c`         | n/a          |
-+-------------+------------+-------------+-----------+----------------+-------------------+--------------+
-| fixed       | :math:`c`  | :math:`d`   | n/a       | n/a            | :math:`d`         | n/a          |
-+-------------+------------+-------------+-----------+----------------+-------------------+--------------+
-| tunable     | :math:`p`  | :math:`d`   | n/a       | n/a            | :math:`d`         | n/a          |
-+-------------+------------+-------------+-----------+----------------+-------------------+--------------+
-| discrete    | n/a        | n/a         | :math:`u` | :math:`x` or   | :math:`x` or      | n/a          |
-|             |            |             |           | :math:`q`      | :math:`q`         |              |
-+-------------+------------+-------------+-----------+----------------+-------------------+--------------+
-| continuous  | n/a        | n/a         | :math:`u` | :math:`x`,     | :math:`x`,        | :math:`t`    |
-|             |            |             |           | :math:`q`,     | :math:`q`,        |              |
-|             |            |             |           | :math:`z`, or, | :math:`z`, or,    |              |
-|             |            |             |           | :math:`w`      | :math:`w`         |              |
-+-------------+------------+-------------+-----------+----------------+-------------------+--------------+
++-------------+------------+-------------+-----------+----------------------+-------------------+--------------+
+||            || parameter || calculated || input    || output              || local            || independent |
+||            ||           || Parameter  ||          || (also in :math:`y`) ||                  ||             |
++=============+============+=============+===========+======================+===================+==============+
+| constant    | n/a        | n/a         | n/a       | :math:`c`            | :math:`c`         | n/a          |
++-------------+------------+-------------+-----------+----------------------+-------------------+--------------+
+| fixed       | :math:`c`  | :math:`d`   | n/a       | n/a                  | :math:`d`         | n/a          |
++-------------+------------+-------------+-----------+----------------------+-------------------+--------------+
+| tunable     | :math:`p`  | :math:`d`   | n/a       | n/a                  | :math:`d`         | n/a          |
++-------------+------------+-------------+-----------+----------------------+-------------------+--------------+
+| discrete    | n/a        | n/a         | :math:`u` | :math:`x` or         | :math:`x` or      | n/a          |
+|             |            |             |           | :math:`q`            | :math:`q`         |              |
++-------------+------------+-------------+-----------+----------------------+-------------------+--------------+
+| continuous  | n/a        | n/a         | :math:`u` | :math:`x`,           | :math:`x`,        | :math:`t`    |
+|             |            |             |           | :math:`q`,           | :math:`q`,        |              |
+|             |            |             |           | :math:`z`, or,       | :math:`z`, or,    |              |
+|             |            |             |           | :math:`w`            | :math:`w`         |              |
++-------------+------------+-------------+-----------+----------------------+-------------------+--------------+
 
 Not all combinations of causality and variability are permitted, as explained in the FMI specification [#fmi3]_. These combinations are marked "n/a" in the table. There may also be multiple combinations mapping to the same variable category.
 
-Variables of continuous variability are are given a category depending on its defining equation. If the defining equation is an ODE, the variable is given the category :math:`x` or :math:`q` depending on whether it appears in the right-hand-side of any differential or algebraic equation. If there is a defining equation for the variable itself, and if it has not previously appeared in any right-hand-side, it becomes part of :math:`w`. If none of the above applies, the variable is given the category :math:`z` and assumed implicitly defined by a residual equation. Variables of output causality will also define an auxiliary dependent variable in the category :math:`y` with associated output equation.
+Variables of continuous variability are are given a category depending on its defining equation, which we will return to in :numref:`sec-model_equations` below. If the defining equation is an ODE, the variable is given the category :math:`x` or :math:`q` depending on whether it appears in the right-hand-side of any differential or algebraic equation. If there is a defining equation for the variable itself, i.e. if it appears in the left-hand-side of an equation, and if it has not previously appeared in any equation, it becomes part of :math:`w`. If none of the above applies, the variable is given the category :math:`z` and assumed implicitly defined by a residual equation.
+
+Variables of output causality will also define an auxiliary dependent variable in the category :math:`y` with associated output equation.
 
 The category of a variable may change during symbolic construction, cf. :numref:`sec-daebuilder_symbolic`, in particular when adding equations. It may also change by explicitly changing the variability or causality of a variable, when such an operation is permitted.
 
@@ -233,7 +234,7 @@ For more information about the hybrid support in CasADi, we refer to the impleme
 
 Reformulating a model
 ---------------------
-Instances of the |DaeBuilder| class are mutable and it is possible, with several restrictions, to change the formulation after creation. In particular, it is possible to change the causality or variability of a variable, as long as the change is possible with the current set of model equations. In particular, it is possible to remove an output variable :math:`y` by changing its causality to local or treating a quadrature variable :math:`q` as a regular state :math:`x` by changing its causality to local. An input variable :math:`u` can be treated as a parameter :math:`p` or a constant :math:`c` by changing the variability to tunable or fixed, respectively (the causality will be automatically updated to "parameter" in this case). In addition, it is always possible to reorder the variables in a category in an arbitrary way -- by default the ordering within a category will match the ordering of the model variables.
+Instances of the |DaeBuilder| class are mutable and it is possible, with several restrictions, to change the formulation after creation. In particular, it is possible to change the causality or variability of a variable, as long as the change is possible with the current set of model equations. In particular, it is possible to remove an output variable :math:`y` by changing its causality to local. An input variable :math:`u` can be treated as a parameter :math:`p` or a constant :math:`c` by changing the variability to tunable or fixed, respectively (the causality will be automatically updated to "parameter" in this case). In addition, it is always possible to reorder the variables in a category in an arbitrary way -- by default the ordering within a category will match the ordering of the model variables.
 
 If a |DaeBuilder| instance has been created symbolically (as opposed as from a standard FMU), additional manipulations such as the elimination of dependent variables, BLT reordering, index reduction, etc. is possible. Some of these features have not been actively maintained or continuously tested, but may be revived with limited work of the C++ source code.
 
@@ -247,19 +248,31 @@ The evaluation of model equations in a |DaeBuilder| instance follows a somewhat 
 .. side-by-side::
     .. code-block:: python
 
-        f = dae.create('f',\
-             ['x','u','p'],['ode'])
+        f = dae.create('f',['x','u','p'],['ode'])
 
     &&
 
     .. code-block:: octave
 
-        f = dae.create('f',...
-             {'x','u','p'},{'ode'});
+        f = dae.create('f',{'x','u','p'},{'ode'});
 
-The names of inputs and outputs correspond to the categories outlined in :numref:`sec-model_variables` and :numref:`sec-model_equations`, respectively. During creation, the function factory will save the current state of the (mutable) |DaeBuilder| instance and the created function will not be impacted by any subsequent changes to or even deletion of the |DaeBuilder| instance. The created functions are thus immutable (with very few exceptions), similar to all other functions in CasADi.
+Similarly, we can create an output function named ``h`` as follows:
 
-We may also use CasADi's naming conventions for derivative functions to include e.g. Jacobian blocks in the function output. The following example creates a function named ``J`` with three inputs (:math:`x`, :math:`u` and :math:`p`) and one (matrix-valued) output corresponding to the Jacobian of :math:`f_{\text{ode}}` with respect to :math:`x`:
+.. side-by-side::
+    .. code-block:: python
+
+        h = dae.create('h',['x','u','p'],['y'])
+
+    &&
+
+    .. code-block:: octave
+
+        h = dae.create('h',{'x','u','p'},{'y'});
+
+
+The names of inputs and outputs correspond to the categories outlined in :numref:`sec-model_variables` and :numref:`sec-model_equations`, respectively. Constants (:math:`c`) are never allowed as mentioned above. Dependent parameters (:math:`d`) and dependent variables (:math:`w`) can be *either* inputs or outputs (but not both). If they are absent from inputs (whether or not they are defined as outputs), they will be substituted out from the expressions during function construction. Outputs (:math:`y`) and other purely dependent variables are only allowed as outputs. During creation, the function factory will save the current state of the (mutable) |DaeBuilder| instance and the created function will not be impacted by any subsequent changes to or even deletion of the |DaeBuilder| instance. The created functions are thus immutable (with very few exceptions), similar to all other functions in CasADi.
+
+We may also use CasADi's naming conventions for derivative functions to include e.g. Jacobian blocks in the function output. The following example creates a function named ``J`` with three (vector-valued) inputs, :math:`x`, :math:`u` and :math:`p`, and one (matrix-valued) output corresponding to the Jacobian of :math:`f_{\text{ode}}` with respect to :math:`x`:
 
 .. side-by-side::
     .. code-block:: python
@@ -274,7 +287,7 @@ We may also use CasADi's naming conventions for derivative functions to include 
         J = dae.create('J',...
              {'x','u','p'} {'jac_ode_x'});
 
-We refer to the notebook `fmu_demo.ipynb` for more examples on how to use the function factory.
+We refer to the notebook `fmu_demo.ipynb` for more examples on how to use the function factory, including how to define and obtain (non-differentiable) auxiliary outputs during evaluation.
 
 .. rubric:: Footnotes
 
