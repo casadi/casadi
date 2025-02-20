@@ -543,7 +543,8 @@ protected:
   std::vector<size_t> init_;
 
   // Event conditions and transition equations
-  std::vector<MX> when_cond_, when_lhs_, when_rhs_;
+  std::vector<size_t> when_cond_;
+  std::vector<MX> when_lhs_, when_rhs_;
 
  /** \brief Is there a time variable?
 

@@ -1292,7 +1292,7 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
   if (!when_cond_.empty()) {
     stream << "When statements" << std::endl;
     for (casadi_int k = 0; k < when_cond_.size(); ++k) {
-      stream << "  when " << str(when_cond_.at(k)) << " > 0 : " << str(when_lhs_.at(k))
+      stream << "  when " << variable(when_cond_.at(k)).name << " > 0 : " << str(when_lhs_.at(k))
         << " := " << str(when_rhs_.at(k)) << std::endl;
     }
   }
@@ -3137,7 +3137,7 @@ void DaeBuilderInternal::when(const MX& cond, const std::vector<std::string>& eq
     all_lhs.push_back(var(ee.parent));
     all_rhs.push_back(ee.v);
   }
-  when_cond_.push_back(variable(e.index).v);
+  when_cond_.push_back(e.index);
   when_lhs_.push_back(vertcat(all_lhs));
   when_rhs_.push_back(vertcat(all_rhs));
 }
@@ -3673,7 +3673,7 @@ void DaeBuilderInternal::import_dynamic_equations(const XmlNode& eqs) {
         event_indicators_.push_back(e.index);
         categorize(e.index, Category::ASSIGN);
         // Add to list of when equations
-        when_cond_.push_back(zc);
+        when_cond_.push_back(e.index);
         when_lhs_.push_back(lhs);
         when_rhs_.push_back(rhs);
       } else if (eq.name == "equ:Equation") {  // Residual equation
