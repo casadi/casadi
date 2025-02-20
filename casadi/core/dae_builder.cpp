@@ -219,7 +219,7 @@ casadi_int DaeBuilder::nq() const {
 }
 
 casadi_int DaeBuilder::nzero() const {
-  return (*this)->size(Category::ZERO);
+  return (*this)->event_indicators_.size();
 }
 
 casadi_int DaeBuilder::ny() const {
@@ -517,7 +517,7 @@ void DaeBuilder::register_y(const std::string& name) {
 }
 
 void DaeBuilder::register_e(const std::string& name) {
-  (*this)->indices(Category::ZERO).push_back(find(name));
+  (*this)->event_indicators_.push_back(find(name));
 }
 
 void DaeBuilder::clear_all(const std::string& v) {
