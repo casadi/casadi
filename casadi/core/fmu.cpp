@@ -862,24 +862,26 @@ int FmuInternal::eval_fd(FmuMemory* m, bool independent_seeds) const {
       casadi_warning("Evaluation failed");
       return 1;
     }
-    // Post-process yk
-    for (size_t i = 0; i < n_unknown; ++i) {
-      // Variable id
-      size_t id = m->id_out_[i];
-      // Differentiation with respect to what variable
-      size_t wrt_id = m->wrt_.at(id);
-      // Find the corresponding input variable
-      size_t wrt_i;
-      for (wrt_i = 0; wrt_i < n_known; ++wrt_i) {
-        if (m->id_in_[wrt_i] == wrt_id) break;
-      }
-      // Check if in bounds
-      if (m->in_bounds_.at(wrt_i)) {
-        // Input was in bounds: Keep output, make dimensionless
-        yk[i] /= nominal_out_[m->id_out_[i]];
-      } else {
-        // Input was out of bounds: Discard output
-        yk[i] = nan;
+    // Post-process yk if there was any scaling
+    if (independent_seeds) {
+      for (size_t i = 0; i < n_unknown; ++i) {
+        // Variable id
+        size_t id = m->id_out_[i];
+        // Differentiation with respect to what variable
+        size_t wrt_id = m->wrt_.at(id);
+        // Find the corresponding input variable
+        size_t wrt_i;
+        for (wrt_i = 0; wrt_i < n_known; ++wrt_i) {
+          if (m->id_in_[wrt_i] == wrt_id) break;
+        }
+        // Check if in bounds
+        if (m->in_bounds_.at(wrt_i)) {
+          // Input was in bounds: Keep output, make dimensionless
+          yk[i] /= nominal_out_[m->id_out_[i]];
+        } else {
+          // Input was out of bounds: Discard output
+          yk[i] = nan;
+        }
       }
     }
   }
@@ -893,6 +895,15 @@ int FmuInternal::eval_fd(FmuMemory* m, bool independent_seeds) const {
 
   // Calculate FD approximation
   finite_diff(m->self.fd_, yk_all, get_ptr(m->d_out_), h, n_unknown, eps);
+
+  // If seeds are dependent, quick return
+  if (!independent_seeds) {
+    // Simpy copy the results to output (no validation)
+    for (size_t ind = 0; ind < m->id_out_.size(); ++ind) {
+      m->osens_[m->id_out_[ind]] = m->d_out_[ind];
+    }
+    return 0;
+  }
 
   // Collect requested variables
   for (size_t ind = 0; ind < m->id_out_.size(); ++ind) {
