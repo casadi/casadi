@@ -2618,6 +2618,7 @@ Function DaeBuilderInternal::fmu_fun(const std::string& name,
     scheme["alg"] = indices(Category::Z);
     casadi_assert(size(Category::Z) == 0, "Not implemented)");
     scheme["y"] = indices(Category::Y);
+    for (size_t& i : scheme["y"]) i = variable(i).parent;
   }
   // Auxilliary variables, if any
   std::vector<std::string> aux;
