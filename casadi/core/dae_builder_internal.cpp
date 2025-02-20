@@ -190,7 +190,6 @@ std::string to_string(Category v) {
   case Category::C: return "c";
   case Category::D: return "d";
   case Category::W: return "w";
-  case Category::Y: return "y";
   case Category::ZERO: return "zero";
   case Category::DER: return "der";
   case Category::ALG: return "alg";
@@ -212,7 +211,6 @@ std::string description(Category v) {
   case Category::C: return "Constants ('c')";
   case Category::D: return "Dependent parameters ('d')";
   case Category::W: return "Dependent variables ('w')";
-  case Category::Y: return "Outputs ('y')";
   case Category::ZERO: return "Zero crossing function ('zero')";
   case Category::DER: return "Time derivatives ('der')";
   case Category::ALG: return "Residual equations ('alg')";
@@ -236,7 +234,6 @@ bool is_input_category(Category cat) {
     case Category::W:
       // Input category
       return true;
-    case Category::Y:  // Fall-through
     case Category::ZERO:  // Fall-through
     case Category::DER:  // Fall-through
     case Category::ALG:  // Fall-through
@@ -774,13 +771,13 @@ XmlNode DaeBuilderInternal::generate_model_structure() const {
   XmlNode r;
   r.name = "ModelStructure";
   // Add outputs
-  for (size_t i : indices(Category::Y)) {
+  for (size_t i : outputs_) {
     const Variable& y = variable(i);
     XmlNode c;
     c.name = "Output";
     c.set_attribute("valueReference", static_cast<casadi_int>(y.value_reference));
     c.set_attribute("dependencies", y.dependencies);
- r.children.push_back(c);
+    r.children.push_back(c);
   }
   // Add state derivatives
   for (size_t i : indices(Category::X)) {
@@ -792,7 +789,7 @@ XmlNode DaeBuilderInternal::generate_model_structure() const {
     r.children.push_back(c);
   }
   // Add initial unknowns: Outputs
-  for (size_t i : indices(Category::Y)) {
+  for (size_t i : outputs_) {
     const Variable& y = variable(i);
     XmlNode c;
     c.name = "InitialUnknown";
@@ -844,13 +841,13 @@ void DaeBuilderInternal::update_dependencies() const {
     }
   }
   // Dependendencies of the outputs and event indicators
-  for (Category cat : {Category::Y, Category::ZERO}) {
-    std::string catname = to_string(cat);
+  for (std::string catname : {"y", "zero"}) {
+    std::vector<size_t> oind = catname == "y" ? outputs_ : indices(Category::ZERO);
     Sparsity dy_dxT = oracle.jac_sparsity(oracle.index_out(catname), oracle.index_in("x")).T();
     Sparsity dy_duT = oracle.jac_sparsity(oracle.index_out(catname), oracle.index_in("u")).T();
-    for (casadi_int i = 0; i < size(cat); ++i) {
+    for (casadi_int i = 0; i < oind.size(); ++i) {
       // Get output variable
-      const Variable& y = variable(cat, i);
+      const Variable& y = variable(oind.at(i));
       // Clear dependencies
       y.dependencies.clear();
       // Dependencies on states
@@ -1009,8 +1006,8 @@ std::string DaeBuilderInternal::generate_wrapper(const std::string& guid,
     << "\n";
 
   // Outputs
-  f << "#define N_Y " << size(Category::Y) << "\n"
-    << "fmi3ValueReference y_vr[N_Y] = " << generate(indices(Category::Y)) << ";\n"
+  f << "#define N_Y " << outputs_.size() << "\n"
+    << "fmi3ValueReference y_vr[N_Y] = " << generate(outputs_) << ";\n"
     << "\n";
 
   // Event indicators
@@ -1208,7 +1205,7 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
   stream << "nx = " << size(Category::X) << ", "
          << "nz = " << size(Category::Z) << ", "
          << "nq = " << size(Category::Q) << ", "
-         << "ny = " << size(Category::Y) << ", "
+         << "ny = " << outputs_.size() << ", "
          << "np = " << size(Category::P) << ", "
          << "nc = " << size(Category::C) << ", "
          << "nd = " << size(Category::D) << ", "
@@ -1287,14 +1284,11 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
     }
   }
 
-  if (size(Category::Y) > 0) {
+  if (!outputs_.empty()) {
     stream << "Output variables" << std::endl;
-    for (size_t y : indices(Category::Y)) {
+    for (size_t y : outputs_) {
       const Variable& v = variable(y);
-      const Variable& p = variable(v.parent);
-      stream << "  " << p.name;
-      if (!is_equal(p.v, v.v)) stream << " := " << v.v;
-      stream << std::endl;
+      stream << "  " << v.name << std::endl;
     }
   }
 
@@ -1770,7 +1764,6 @@ void DaeBuilderInternal::lift(bool lift_shared, bool lift_calls) {
   for (size_t v : indices(Category::X)) ex.push_back(variable(variable(variable(v).der).bind).v);
   for (size_t v : indices(Category::Q)) ex.push_back(variable(variable(variable(v).der).bind).v);
   for (size_t v : indices(Category::ALG)) ex.push_back(variable(v).v);
-  for (size_t v : indices(Category::Y)) ex.push_back(variable(v).v);
   // Lift expressions
   std::vector<MX> new_w, new_wdef;
   Dict opts{{"lift_shared", lift_shared}, {"lift_calls", lift_calls},
@@ -1789,7 +1782,6 @@ void DaeBuilderInternal::lift(bool lift_shared, bool lift_calls) {
   for (size_t v : indices(Category::X)) variable(variable(variable(v).der).bind).v = *it++;
   for (size_t v : indices(Category::Q)) variable(variable(variable(v).der).bind).v = *it++;
   for (size_t v : indices(Category::ALG)) variable(v).v = *it++;
-  for (size_t v : indices(Category::Y)) variable(v).v = *it++;
   // Consistency check
   casadi_assert_dev(it == ex.end());
 }
@@ -1816,7 +1808,6 @@ Category input_category(OutputCategory cat) {
     case OutputCategory::ZERO: return Category::ZERO;
     case OutputCategory::D: return Category::D;
     case OutputCategory::W: return Category::W;
-    case OutputCategory::Y: return Category::Y;
     default: break;
   }
   casadi_error("No input category for " + to_string(cat));
@@ -1840,6 +1831,8 @@ std::vector<MX> DaeBuilderInternal::input(const std::vector<Category>& ind) cons
 }
 
 std::vector<MX> DaeBuilderInternal::output(OutputCategory ind) const {
+  // Quick return if output
+  if (ind == OutputCategory::Y) return var(outputs_);
   // Get corresponding input category
   Category cat = input_category(ind);
   // Return object
@@ -1866,7 +1859,6 @@ std::vector<MX> DaeBuilderInternal::output(OutputCategory ind) const {
       break;
     case OutputCategory::ALG:  // fall-through
     case OutputCategory::ZERO:  // fall-through
-    case OutputCategory::Y:
       // Defined by variable itself
       for (size_t v : indices(cat)) ret.push_back(variable(v).v);
       break;
@@ -2617,8 +2609,7 @@ Function DaeBuilderInternal::fmu_fun(const std::string& name,
     for (size_t& i : scheme["ode"]) i = variable(i).der;
     scheme["alg"] = indices(Category::Z);
     casadi_assert(size(Category::Z) == 0, "Not implemented)");
-    scheme["y"] = indices(Category::Y);
-    for (size_t& i : scheme["y"]) i = variable(i).parent;
+    scheme["y"] = outputs_;
   }
   // Auxilliary variables, if any
   std::vector<std::string> aux;
@@ -2812,12 +2803,8 @@ Variable& DaeBuilderInternal::add(const std::string& name, Causality causality,
     default:
       casadi_error("Unknown causality: " + to_string(causality));
   }
-  // Also create an output variable, if needed
-  if (causality == Causality::OUTPUT) {
-    Variable& y = new_variable("__out__" + name, dimension, v.v);
-    y.parent = v.index;
-    categorize(y.index, Category::Y);
-  }
+  // If an output, add to list of outputs
+  if (causality == Causality::OUTPUT) outputs_.push_back(v.index);
   // Also create a derivative variable, if needed
   if (v.needs_der()) {
     Variable& der_v = new_variable("__der__" + name, dimension);
@@ -2899,57 +2886,17 @@ void DaeBuilderInternal::set_causality(size_t ind, Causality causality) {
   Variable& v = variable(ind);
   // Quick return if same causality
   if (v.causality == causality) return;
-  // Update category: See comment for public interface
-  switch (v.category) {
-    case Category::X:
-      if (causality == Causality::OUTPUT) {
-        // Make quadrature
-        categorize(v.index, Category::Q);
-      } else {
-        // Not possible
-        casadi_error("Cannot change causality of " + v.name + ", which is of category 'x', to "
-          + to_string(causality));
-      }
-      break;
-    case Category::Q:
-      if (causality == Causality::LOCAL) {
-        // Make regular state
-        categorize(v.index, Category::X);
-      } else {
-        // Not possible
-        casadi_error("Cannot change causality of " + v.name + ", which is of category 'q', to "
-          + to_string(causality));
-      }
-      break;
-    case Category::U:
-      casadi_error("Cannot change causality of 'u' directly (only via updates to variability)");
-      break;
-    case Category::Y:
-      if (causality == Causality::LOCAL) {
-        // Remove categorization
-        categorize(v.index, Category::NUMEL);
-      } else {
-        // Not possible
-        casadi_error("Cannot change causality of " + v.name + ", which is of category 'y', to "
-          + to_string(causality));
-      }
-      break;
-    case Category::P:
-      casadi_error("Cannot change causality of 'p' directly (only via updates to variability)");
-      break;
-    case Category::NUMEL:
-      if (causality == Causality::OUTPUT) {
-        // Make output
-        categorize(v.index, Category::Y);
-      } else {
-        // Not possible
-        casadi_error("Cannot change causality of " + v.name + " which is of category 'y' to "
-          + to_string(causality));
-      }
-      break;
-    default:
-      casadi_error("Cannot change causality of " + v.name + " which is of category '"
-        + to_string(v.category) + "'");
+  // Handle permitted changes
+  if (v.causality == Causality::LOCAL && causality == Causality::OUTPUT) {
+    // Add to list of outputs
+    insert(outputs_, v.index);
+  } else if (v.causality == Causality::OUTPUT && causality == Causality::LOCAL) {
+    // Remove from list of outputs
+    remove(outputs_, v.index);
+  } else {
+    // Not possible
+    casadi_error("Cannot change causality of " + v.name + " which is of category '"
+      + to_string(v.category) + "'");
   }
   // Success: Update causality
   v.causality = causality;
@@ -3051,22 +2998,12 @@ void DaeBuilderInternal::set_category(size_t ind, Category cat) {
       break;
     case Category::X:
       if (v.category == Category::Q) {
-        return set_causality(v.index, Causality::LOCAL);
+        return categorize(v.index, Category::X);
       }
       break;
     case Category::Q:
       if (v.category == Category::X) {
-        return set_causality(v.index, Causality::OUTPUT);
-      }
-      break;
-    case Category::Y:
-      if (v.category == Category::NUMEL) {
-        return set_causality(v.index, Causality::OUTPUT);
-      }
-      break;
-    case Category::NUMEL:
-      if (v.category == Category::Y) {
-        return set_causality(v.index, Causality::LOCAL);
+        return categorize(v.index, Category::Q);
       }
       break;
     default:
@@ -3477,10 +3414,6 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
         outputs_.push_back(vrmap_.at(e.attribute<size_t>("valueReference")));
         // Corresponding variable
         Variable& v = variable(outputs_.back());
-        // Create a new output variable
-        Variable& y = new_variable("__out__" + v.name, v.dimension, v.v);
-        y.parent = v.index;
-        categorize(y.index, Category::Y);
         // Get dependencies
         v.dependencies = read_dependencies(e);
         v.dependenciesKind = read_dependencies_kind(e, v.dependencies.size());
@@ -3592,9 +3525,6 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
         outputs_.push_back(e.attribute<casadi_int>("index", 0) - 1);
         // Corresponding variable
         Variable& v = variable(outputs_.back());
-        Variable& y = new_variable("__out__" + v.name, v.dimension, v.v);
-        y.parent = v.index;
-        categorize(y.index, Category::Y);
         // Get dependencies
         if (e.has_attribute("dependencies")) {
           v.dependencies = read_dependencies(e);

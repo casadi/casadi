@@ -70,6 +70,15 @@ const MX& DaeBuilder::time() const {
   }
 }
 
+std::vector<std::string> DaeBuilder::y() const {
+  try {
+    return (*this)->name((*this)->outputs_);
+  } catch (std::exception& e) {
+    THROW_ERROR("y", e.what());
+    return {};  // never reached
+  }
+}
+
 std::vector<MX> DaeBuilder::ode() const {
   try {
     return (*this)->output(OutputCategory::ODE);
@@ -214,7 +223,7 @@ casadi_int DaeBuilder::nzero() const {
 }
 
 casadi_int DaeBuilder::ny() const {
-  return (*this)->size(Category::Y);
+  return (*this)->outputs_.size();
 }
 
 casadi_int DaeBuilder::nu() const {
@@ -504,7 +513,7 @@ void DaeBuilder::register_w(const std::string& name) {
 }
 
 void DaeBuilder::register_y(const std::string& name) {
-  (*this)->indices(Category::Y).push_back(find(name));
+  (*this)->outputs_.push_back(find(name));
 }
 
 void DaeBuilder::register_e(const std::string& name) {

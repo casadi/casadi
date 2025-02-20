@@ -102,6 +102,9 @@ class CASADI_EXPORT DaeBuilder
       \identifier{5f} */
   std::vector<std::string> x() const {return all("x");}
 
+  /// Outputs */
+  std::vector<std::string> y() const;
+
   /** \brief Ordinary differential equations (ODE)
 
       \identifier{5g} */
@@ -383,9 +386,6 @@ class CASADI_EXPORT DaeBuilder
   /// [DEPRECATED] Use all("zero") */
   std::vector<std::string> e() const {return all("zero");}
 
-  /// [DEPRECATED] Use all("y") */
-  std::vector<std::string> y() const {return all("y");}
-
   #endif  // WITH_DEPRECATED_FEATURES
 
   /// Check if dimensions match
@@ -602,9 +602,6 @@ class CASADI_EXPORT DaeBuilder
     the variability
     * Add or remove an output 'y' by setting the causality to 'output' or 'local',
     respectively
-    * Differential states that do not appear in the right-hand-side can be treated as either
-    an regular state 'x' or as a quadrature state 'q' by setting the causality to 'local'
-    and 'output', respectively
 
     No other changes are permitted.
 
@@ -635,8 +632,6 @@ class CASADI_EXPORT DaeBuilder
     * Controls 'u' can be changed to/from tunable parameters 'p' or fixed parameters 'c'
     * Differential states that do not appear in the right-hand-sides can be changed between
     regular states 'x' and quadrature states 'q'
-    * Outputs can be removed by giving it no category (empty string), or reintroduced by
-    setting the category to 'y'.
 
     Other changes are not permitted. Causality and variability is updated accordingly.
 
