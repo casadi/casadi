@@ -561,7 +561,6 @@ int Integrator::advance(IntegratorMemory* m) const {
         // Projected zero-crossing time
         double t_zero = m->t - m->e[i] / m->edot[i];
         // If t_zero is too small or m->edot[i] has the wrong sign, fall back to bisection
-        // TODO(@jaeandersson): Check last inequality, revesed?
         if (t_zero <= m->t_start || (m->e[i] < 0 && m->edot[i] >= 0)) {
           t_zero = 0.5 * (m->t_start + m->t);
         }
@@ -2615,8 +2614,8 @@ int Integrator::predict_events(IntegratorMemory* m) const {
   // Find the next event, if any
   for (casadi_int i = 0; i < ne_; ++i) {
     if (!m->event_triggered[i]) {
-      // Check if zero crossing function is negative and moving in the positive direction
-      if (m->e[i] < 0 && m->edot[i] > 0) {
+      // Check if zero crossing function is positive and moving in the negative direction
+      if (m->e[i] > 0 && m->edot[i] < 0) {
         // Projected zero-crossing time
         double t = m->t - m->e[i] / m->edot[i];
         // Save if earlier than current t_event
