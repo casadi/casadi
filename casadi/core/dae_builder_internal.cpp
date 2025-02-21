@@ -547,6 +547,8 @@ MX Variable::get_der(DaeBuilderInternal& self, bool may_allocate) {
     der_v.der_of = index;
     der_v.parent = index;
     der = der_v.index;
+    // Add to list of derivatives
+    self.derivatives_.push_back(der_v.index);
   }
   // Call the const overload
   return get_der(const_cast<const DaeBuilderInternal&>(self));
@@ -2837,6 +2839,8 @@ Variable& DaeBuilderInternal::add(const std::string& name, Causality causality,
     der_v.der_of = v.index;
     der_v.parent = v.index;
     v.der = der_v.index;
+    // Add to list of derivatives
+    derivatives_.push_back(der_v.index);
   }
   // Return variable reference
   return v;
