@@ -1563,26 +1563,13 @@ namespace std {
       }
 #endif // SWIGPYTHON
 #ifdef SWIGMATLAB
-      std::cout << "mxIsChar?" << mxIsChar(p) << std::endl;
-      std::cout << "mxGetM?" << mxGetM(p) << std::endl;
       if (mxIsChar(p) && mxGetM(p)<=1) {
         if (m) {
           if (mxGetM(p)==0) return true;
           size_t len=mxGetN(p);
-          std::cout << "len?" << len << std::endl;
-          mwSize sz = len;
-          std::cout << "sz?" << sz << std::endl;
-          std::cout << "bytesize?" << (len+1)*sizeof(char) << std::endl;
-          std::cout << " mwSize?" << sizeof(mwSize) << std::endl;
-          std::cout << " mwIndex?" << sizeof(mwIndex) << std::endl;
           std::vector<char> s(len+1);
           if (mxGetString(p, &s[0], (len+1)*sizeof(char))) return false;
-          std::cout << "cahrs: " << s[0] << s[1] << s[2] << "..." << s[len-2] << s[len-1] << std::endl;
-          std::cout << "yay?" << std::endl;
-          char* r = mxArrayToString(p);
-          if (r==0) return false; // Out of memory
-          **m = std::string(r);
-          mxFree(r);
+          **m = std::string(&s[0], len);
         }
         return true;
       }
