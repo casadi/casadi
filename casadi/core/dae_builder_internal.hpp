@@ -197,7 +197,7 @@ struct CASADI_EXPORT Variable {
   bool needs_der() const;
 
   // Derivative of the expression, create at first encounter
-  MX get_der(DaeBuilderInternal& self);
+  MX get_der(DaeBuilderInternal& self, bool may_allocate = true);
 
   // Derivative of the expression, never create
   MX get_der(const DaeBuilderInternal& self) const;
@@ -366,13 +366,15 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   MX get_der(size_t ind) const {return variable(ind).get_der(*this);}
 
   /// Get a derivative expression by variable index (non-const, may create)
-  MX get_der(size_t ind) {return variable(ind).get_der(*this);}
+  MX get_der(size_t ind, bool may_allocate = true) {
+    return variable(ind).get_der(*this, may_allocate);
+  }
 
   /// Get a derivative expression by non-differentiated expression (const, never create)
   MX der(const MX& var) const;
 
   /// Get a derivative expression by non-differentiated expression (non-const, may create)
-  MX der(const MX& var);
+  MX der(const MX& var, bool may_allocate = true);
 
   /// Find a unique name, with a specific prefix
   std::string unique_name(const std::string& prefix) const;
