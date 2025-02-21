@@ -1241,19 +1241,26 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
     if (size(cat) > 0) {
       stream << (cat == Category::X ? "Differential" : "Quadrature") << " equations" << std::endl;
       for (size_t k : indices(cat)) {
+        // Print the name of the derivative
         const Variable& v = variable(k);
-        stream << "  \\dot{" << v.name << "} == ";
+        std::string der_name = "der(" + v.name + ")";
+        stream << "  " << der_name;
         if (v.variability == Variability::DISCRETE) {
           // Discrete variable - derivative is zero
-          stream << 0;
-        } else {
+          stream << " := 0" << std::endl;
+        } else if (v.der >= 0) {
           // Derivative variable
-          casadi_assert(v.der >= 0, "No derivative variable for " + v.name);
           const Variable& vdot = variable(v.der);
-          stream << vdot.name;
-          if (vdot.bind >= 0) stream << " := " << variable(vdot.bind).v;
+          // Print definition, if inconsistent naming of derivative variable
+          if (vdot.name != der_name) stream << " := " << vdot.v;
+          // Print the equation, if any
+          if (vdot.bind >= 0) stream << " == " << variable(vdot.bind).v;
+          stream << std::endl;
+        } else {
+          // Missing equation
+          stream << " == (missing)"  << std::endl;
+          casadi_warning("No derivative variable for " + v.name);
         }
-        stream << std::endl;
       }
     }
   }
@@ -2807,7 +2814,7 @@ Variable& DaeBuilderInternal::add(const std::string& name, Causality causality,
   if (causality == Causality::OUTPUT) outputs_.push_back(v.index);
   // Also create a derivative variable, if needed
   if (v.needs_der()) {
-    Variable& der_v = new_variable("__der__" + name, dimension);
+    Variable& der_v = new_variable("der(" + name + ")", dimension);
     categorize(der_v.index, Category::DER);
     der_v.der_of = v.index;
     der_v.parent = v.index;
