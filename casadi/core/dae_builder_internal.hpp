@@ -59,7 +59,7 @@ enum class Variability {CONSTANT, FIXED, TUNABLE, DISCRETE, CONTINUOUS, NUMEL};
 // CONTINUOUS   -          -                     U       X/Q/W/Z  X/Q/W/Z  T
 
 // Variable categories
-enum class Category {T, C, P, D, W, U, X, Z, Q, DER, DEF, NUMEL};
+enum class Category {T, C, P, D, W, U, X, Z, Q, DER, CALCULATED, NUMEL};
 
 // Output categories for generated functions
 enum class OutputCategory {ODE, ALG, QUAD, ZERO, DDEF, WDEF, Y, NUMEL};

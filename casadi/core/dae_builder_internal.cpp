@@ -191,7 +191,7 @@ std::string to_string(Category v) {
   case Category::D: return "d";
   case Category::W: return "w";
   case Category::DER: return "der";
-  case Category::DEF: return "def";
+  case Category::CALCULATED: return "calculated";
   default: break;
   }
   return "";
@@ -209,7 +209,7 @@ std::string description(Category v) {
   case Category::D: return "Dependent parameters ('d')";
   case Category::W: return "Dependent variables ('w')";
   case Category::DER: return "Time derivatives ('der')";
-  case Category::DEF: return "Defiend expression ('def')";
+  case Category::CALCULATED: return "Calculated variable ('calculated')";
   default: break;
   }
   return "";
@@ -229,7 +229,7 @@ bool is_input_category(Category cat) {
       // Input category
       return true;
     case Category::DER:  // Fall-through
-    case Category::DEF:
+    case Category::CALCULATED:
       // Output category
       return false;
     default: break;
@@ -3103,7 +3103,7 @@ void DaeBuilderInternal::eq(const MX& lhs, const MX& rhs, const Dict& opts) {
     // Implicit equation: Create residual variable
     Variable& alg = add(unique_name("__alg__"), Causality::OUTPUT, Variability::CONTINUOUS,
       lhs - rhs, Dict());
-    categorize(alg.index, Category::DEF);
+    categorize(alg.index, Category::CALCULATED);
   }
   // If derivative variable in the right-hand-side, reclassify as algebraic variable
   for (size_t rhs : rhs_vars) {
@@ -3148,13 +3148,13 @@ void DaeBuilderInternal::when(const MX& cond, const std::vector<std::string>& eq
   Variable& e = add(unique_name("__when__"), Causality::LOCAL, Variability::CONTINUOUS,
     zero, Dict());
   event_indicators_.push_back(e.index);
-  categorize(e.index, Category::DEF);
+  categorize(e.index, Category::CALCULATED);
   // Convert to legacy format, pending refactoring
   std::vector<MX> all_lhs, all_rhs;
   std::vector<size_t> all_eqs;
   for (auto&& eq : eqs) {
     Variable& ee = variable(eq);
-    casadi_assert_dev(ee.category == Category::DEF);
+    casadi_assert_dev(ee.category == Category::CALCULATED);
     all_lhs.push_back(var(ee.parent));
     all_rhs.push_back(ee.v);
     all_eqs.push_back(ee.index);
@@ -3169,7 +3169,7 @@ Variable& DaeBuilderInternal::assign(const std::string& name, const MX& val) {
   Variable& v = add(assign_name, Causality::LOCAL, Variability::CONTINUOUS,
     val, Dict());
   // Classify as assign variable
-  categorize(v.index, Category::DEF);
+  categorize(v.index, Category::CALCULATED);
   v.parent = variable(name).index;
   // Return the variable name
   return v;
@@ -3181,7 +3181,7 @@ Variable& DaeBuilderInternal::reinit(const std::string& name, const MX& val) {
   // Add a new dependent variable defined by val
   Variable& v = add(reinit_name, Causality::LOCAL, Variability::CONTINUOUS, val, Dict());
   // Classify as a defined variable
-  categorize(v.index, Category::DEF);
+  categorize(v.index, Category::CALCULATED);
   v.parent = variable(name).index;
   // Return the variable name
   return v;
