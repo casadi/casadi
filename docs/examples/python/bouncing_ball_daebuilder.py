@@ -75,7 +75,7 @@ with zipfile.ZipFile(fmuname, 'w') as fmufile:
     for f in fmu_files:
       arcname = f if f == 'modelDescription.xml' else 'sources/' + f
       fmufile.write(f, arcname = arcname)
-      #os.remove(f)
+      os.remove(f)
     # Add compile DLL to the archive (assume Linux 64 bit)
     fmufile.write(sofile, arcname = f'binaries/x86_64-linux/{sofile}')
     os.remove(sofile)
