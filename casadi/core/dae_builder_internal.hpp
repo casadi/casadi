@@ -196,8 +196,11 @@ struct CASADI_EXPORT Variable {
   // Does the variable need a derivative variable?
   bool needs_der() const;
 
-  // Derivative of the expression
-  MX dot(const DaeBuilderInternal& self) const;
+  // Derivative of the expression, create at first encounter
+  MX get_der(DaeBuilderInternal& self);
+
+  // Derivative of the expression, never create
+  MX get_der(const DaeBuilderInternal& self) const;
 };
 
 /// \cond INTERNAL
@@ -206,6 +209,7 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   friend class DaeBuilder;
   friend class FmuInternal;
   friend class FmuFunction;
+  friend class Variable;
 
  public:
 
@@ -358,14 +362,17 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   /// Get variable expression by name
   const MX& var(const std::string& name) const;
 
-  /// Get a derivative expression by variable index
-  MX der(size_t ind) const {return variable(ind).dot(*this);}
+  /// Get a derivative expression by variable index (const, never create)
+  MX get_der(size_t ind) const {return variable(ind).get_der(*this);}
 
-  /// Get a derivative expression by name
-  MX der(const std::string& name) const {return der(find(name));}
+  /// Get a derivative expression by variable index (non-const, may create)
+  MX get_der(size_t ind) {return variable(ind).get_der(*this);}
 
-  /// Get a derivative expression by non-differentiated expression
+  /// Get a derivative expression by non-differentiated expression (const, never create)
   MX der(const MX& var) const;
+
+  /// Get a derivative expression by non-differentiated expression (non-const, may create)
+  MX der(const MX& var);
 
   /// Find a unique name, with a specific prefix
   std::string unique_name(const std::string& prefix) const;

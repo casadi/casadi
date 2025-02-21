@@ -525,17 +525,31 @@ bool Variable::needs_der() const {
   return true;
 }
 
-MX Variable::dot(const DaeBuilderInternal& self) const {
+MX Variable::get_der(const DaeBuilderInternal& self) const {
   if (causality == Causality::INDEPENDENT) {
     // Time derivative of independent variable is 1
     return 1;
   } else if (needs_der()) {
+    casadi_assert(der >= 0, "Variable " + name + " has no time derivative");
     // Should have a derviative expression
     return self.variable(der).v;
   } else {
     // Constant or piecewise constant variable
     return MX::zeros(v.sparsity());
   }
+}
+
+MX Variable::get_der(DaeBuilderInternal& self) {
+  // Create a new derivative variable, if needed
+  if (needs_der() && der < 0) {
+    Variable& der_v = self.new_variable("der(" + name + ")", dimension);
+    self.categorize(der_v.index, Category::DER);
+    der_v.der_of = index;
+    der_v.parent = index;
+    der = der_v.index;
+  }
+  // Call the const version
+  return get_der(const_cast<const DaeBuilderInternal&>(self));
 }
 
 DaeBuilderInternal::~DaeBuilderInternal() {
@@ -1673,7 +1687,7 @@ MX DaeBuilderInternal::der(const MX& var) const {
   // Must be a vector
   casadi_assert(var.is_column(), "Input expression must be a vector");
   // Quick return if symbolic variable
-  if (var.is_symbolic()) return der(find(var));
+  if (var.is_symbolic()) return get_der(find(var));
   // If a vertical concatenation
   if (var.is_valid_input()) {
     // Differentiate each primitive
@@ -1686,7 +1700,33 @@ MX DaeBuilderInternal::der(const MX& var) const {
   std::vector<MX> dep = symvar(var);
   // Get derivatives of dependent symbolic primitives
   std::vector<MX> dep_der;
-  for (size_t ind : find(dep)) dep_der.push_back(der(ind));
+  for (size_t ind : find(dep)) dep_der.push_back(get_der(ind));
+  // Forward directional derivative to get time derivative:
+  // dot(var) = d_var/d_dep * dot(dep)
+  std::vector<std::vector<MX>> r = {dep_der};
+  r = forward(std::vector<MX>{var}, dep, r);
+  casadi_assert_dev(r.size() == 1);
+  return vertcat(r.at(0));
+}
+
+MX DaeBuilderInternal::der(const MX& var) {
+  // Must be a vector
+  casadi_assert(var.is_column(), "Input expression must be a vector");
+  // Quick return if symbolic variable
+  if (var.is_symbolic()) return get_der(find(var));
+  // If a vertical concatenation
+  if (var.is_valid_input()) {
+    // Differentiate each primitive
+    auto var_split = var.primitives();
+    for (MX& s : var_split) s = der(s);
+    // Return the concatenation
+    return var.join_primitives(var_split);
+  }
+  // Handle general case: Get dependent symbolic primitives
+  std::vector<MX> dep = symvar(var);
+  // Get derivatives of dependent symbolic primitives
+  std::vector<MX> dep_der;
+  for (size_t ind : find(dep)) dep_der.push_back(get_der(ind));
   // Forward directional derivative to get time derivative:
   // dot(var) = d_var/d_dep * dot(dep)
   std::vector<std::vector<MX>> r = {dep_der};

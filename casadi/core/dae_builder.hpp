@@ -541,8 +541,11 @@ class CASADI_EXPORT DaeBuilder
   /// Get the time derivative of model variables
   std::vector<std::string> der(const std::vector<std::string>& name) const;
 
+  ///@{
   /// Differentiate an expression with respect to time
   MX der(const MX& v) const;
+  MX der(const MX& v);
+  ///@}
 
   /// Get the pre-variables of model variables
   std::vector<std::string> pre(const std::vector<std::string>& name) const;

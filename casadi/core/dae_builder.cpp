@@ -1172,6 +1172,15 @@ MX DaeBuilder::der(const MX& v) const {
   }
 }
 
+MX DaeBuilder::der(const MX& v) {
+  try {
+    return (*this)->der(v);
+  } catch (std::exception& e) {
+    THROW_ERROR("der", e.what());
+    return MX();  // never reached
+  }
+}
+
 double DaeBuilder::attribute(const std::string& a, const std::string& name) const {
   try {
     return (*this)->attribute(to_enum<Attribute>(a), name);
