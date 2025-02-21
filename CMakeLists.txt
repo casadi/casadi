@@ -908,6 +908,12 @@ set(BUILD_ALPAQA_DEPENDENCIES EIGEN3)
 
 option(ALLOW_DOCKER "System has docker installed" OFF)
 
+option(WITH_ZLIB "Compile the ZLIB interface" OFF)
+set(BUILD_ZLIB_GIT_REPO "https://github.com/madler/zlib" CACHE STRING "Git repo used together with BUILD_ZLIB_VERSION")
+set(BUILD_ZLIB_GIT_SHALLOW ON CACHE BOOL "Use shallow clone for ZLIB")
+set(BUILD_ZLIB_VERSION "develop" CACHE STRING "Tag/branch/hash to be used for BUILD_ZLIBA_GIT_REPO")
+option(WITH_BUILD_ZLIB "Build ZLIB (BUILD_ZLIB_VERSION=${BUILD_ZLIB_VERSION}) from downloaded source (BUILD_ZLIB_GIT_REPO=${BUILD_ZLIB_GIT_REPO})." OFF)
+
 function(libraries2flags libraries out)
 # libtool cannot handle absoulte paths (i.e. it omits the library from the list of dependencies)
   set(local "")
@@ -2011,6 +2017,37 @@ if(WITH_SLICOT)
   find_package(SLICOT REQUIRED)
 endif()
 add_feature_info(slicot-interface WITH_SLICOT "Interface to the controls library SLICOT.")
+
+
+if(WITH_ZLIB)
+  if(WITH_BUILD_ZLIB)
+    ExternalProject_Add(libz-external
+      GIT_REPOSITORY ${BUILD_ZLIB_GIT_REPO}
+      GIT_SHALLOW ${BUILD_ZLIB_GIT_SHALLOW}
+      GIT_TAG ${BUILD_ZLIB_VERSION}
+      PREFIX "${CMAKE_BINARY_DIR}/external_projects"
+      UPDATE_COMMAND ""
+      CMAKE_COMMAND "${CMAKE_COMMAND}"
+      CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DMINIZIP_ENABLE_BZIP2=OFF -DZLIB_BUILD_MINIZIP=ON -DBUILD_SHARED_LIBS=OFF)
+    add_library(ZLIB::libz STATIC IMPORTED)
+    add_dependencies(ZLIB::libz libz-external)
+    add_library(MINIZIP::minizip STATIC IMPORTED)
+    add_dependencies(MINIZIP::minizip minizip-external)
+    set_target_properties(ZLIB::libz PROPERTIES
+      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_STATIC_LIBRARY_PREFIX}z${CMAKE_STATIC_LIBRARY_SUFFIX}"
+      INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include")
+    set_target_properties(MINIZIP::minizip PROPERTIES
+      IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_STATIC_LIBRARY_PREFIX}minizip${CMAKE_STATIC_LIBRARY_SUFFIX}"
+      INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include")
+  else()
+    find_package(ZLIB REQUIRED)
+    add_library(ZLIB::libz INTERFACE IMPORTED)
+    set_target_properties(ZLIB::libz PROPERTIES
+      INTERFACE_INCLUDE_DIRECTORIES "${ZLIB_INCLUDE_DIRS}"
+      INTERFACE_LINK_LIBRARIES "${ZLIB_LIBRARIES}")
+  endif()
+endif()
+add_feature_info(zlib-interface WITH_ZLIB "Interface to the zilb.")
 
 if(WITH_SELFCONTAINED)
   # Loop over prescribed folders

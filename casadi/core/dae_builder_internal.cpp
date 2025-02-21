@@ -571,7 +571,7 @@ DaeBuilderInternal::~DaeBuilderInternal() {
 }
 
 DaeBuilderInternal::DaeBuilderInternal(const std::string& name, const std::string& path,
-    const Dict& opts) : name_(name), path_(path) {
+    const Dict& opts) : name_(name), resource_(path) {
   clear_cache_ = false;
   number_of_event_indicators_ = 0;
   provides_directional_derivatives_ = false;

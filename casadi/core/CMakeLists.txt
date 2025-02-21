@@ -271,17 +271,17 @@ target_include_directories(casadi
 
 if(WITH_DL)
   # Core needs support for dynamic linking
-  target_link_libraries(casadi ${CMAKE_DL_LIBS})
+  target_link_libraries(casadi PUBLIC ${CMAKE_DL_LIBS})
 endif()
 
 if(WITH_OPENCL)
   # Core depends on OpenCL for GPU calculations
-  target_link_libraries(casadi ${OPENCL_LIBRARIES})
+  target_link_libraries(casadi PUBLIC ${OPENCL_LIBRARIES})
 endif()
 
 if(RT)
   # Realtime library
-  target_link_libraries(casadi ${RT})
+  target_link_libraries(casadi PUBLIC ${RT})
 endif()
 
 if(CMAKE_CROSS_COMPILING AND MINGW)
@@ -314,6 +314,12 @@ endif()
 
 if(MSVC)
   target_compile_options(casadi PRIVATE /bigobj)
+endif()
+
+if(WITH_ZLIB)
+  target_link_libraries(casadi PRIVATE MINIZIP::minizip ZLIB::libz)
+  target_compile_features(casadi PRIVATE cxx_std_17)
+  target_compile_definitions(casadi PRIVATE CASADI_WITH_ZLIB)
 endif()
 
 get_target_property( compiler_definitions casadi COMPILE_DEFINITIONS )

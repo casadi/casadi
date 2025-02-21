@@ -53,7 +53,7 @@ DaeBuilder::DaeBuilder() {
 
 DaeBuilder::DaeBuilder(const std::string& name, const std::string& path, const Dict& opts) {
   own(new DaeBuilderInternal(name, path, opts));
-  if (!path.empty()) load_fmi_description(path + "/modelDescription.xml");
+  if (!path.empty()) load_fmi_description((*this)->resource_.path() + "/modelDescription.xml");
 }
 
 const std::string& DaeBuilder::name() const {

@@ -451,12 +451,12 @@ void FmuInternal::init(const DaeBuilderInternal* dae) {
   can_be_instantiated_only_once_per_process_ = dae->can_be_instantiated_only_once_per_process_;
 
   // Path to resource directory
-  resource_loc_ = "file://" + dae->path_ + "/resources";
+  resource_loc_ = "file://" + dae->resource_.path() + "/resources";
 
   // Load DLL
   std::string instance_name_no_dot = dae->model_identifier_;
   std::replace(instance_name_no_dot.begin(), instance_name_no_dot.end(), '.', '_');
-  std::string dll_path = dae->path_ + "/binaries/" + system_infix()
+  std::string dll_path = dae->resource_.path() + "/binaries/" + system_infix()
     + "/" + instance_name_no_dot + dll_suffix();
   li_ = Importer(dll_path, "dll");
 

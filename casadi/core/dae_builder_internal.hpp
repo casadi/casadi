@@ -525,7 +525,7 @@ protected:
   std::string name_;
 
   // Path to FMU, if any
-  std::string path_;
+  ZipResource resource_;
 
   // Symbolic representation of the model equations?
   bool symbolic_;
