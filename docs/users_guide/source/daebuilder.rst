@@ -48,10 +48,7 @@ Each |DaeBuilder| instance maintains a list of model variables. The variables mu
 :math:`z`
   Algebraic variables, defined implicitly using the algebraic equations, :math:`0 = f_{\text{alg}}(t, p, d, u, w, x, z; c)`
 
-:math:`y`
-  Output variables, calculated explicitly using the output equations, :math:`y = f_{\text{y}}(t, p, d, u, w, x, z; c)`
-
-There are also additional categories of internal character, for certain derived expressions, e.g. residual variables (i.e. the current value of :math:`f_{\text{alg}}`), event indicators, derivative variables and variable definitions. Note that the dependency on :math:`c` is always parametric to the function definition, i.e. a new function needs to be defined if the value of :math:`c` changes.
+There is also a category for *calculated* model variables, which represent different quantities that can be calculated using the above variables but cannot be used as function inputs. Calculated model variables include output variables, :math:`y`, calculated explicitly using the output equations, :math:`y = f_{\text{y}}(t, p, d, u, w, x, z; c)`. These quantities are referenced via the corresponding model equation, cf. :numref:`sec-model_equations` below. Note that in the functions above, the dependency on :math:`c` is always parametric to the function definition, i.e. a new function needs to be defined if the value of :math:`c` changes.
 
 The category for a variable is determined automatically from its causality and variability according to the following table, where the rows correspond to the causality and the columns to the variability (cf. Table 18 in FMI specification, 3.0.2 [#fmi3]_):
 
@@ -76,13 +73,11 @@ The category for a variable is determined automatically from its causality and v
 
 Not all combinations of causality and variability are permitted, as explained in the FMI specification [#fmi3]_. These combinations are marked "n/a" in the table. There may also be multiple combinations mapping to the same variable category.
 
-Variables of continuous variability are given a category depending on its defining equation, which we will return to in :numref:`sec-model_equations` below. If the defining equation is an ODE, the variable is given the category :math:`x` or :math:`q` depending on whether it appears in the right-hand-side of any differential or algebraic equation. If there is a defining equation for the variable itself, i.e. if it appears in the left-hand-side of an equation, and if it has not previously appeared in any equation, it becomes part of :math:`w`. If none of the above applies, the variable is given the category :math:`z` and assumed implicitly defined by a residual equation.
+Variables of continuous variability are given a category depending on its defining equation, which we will return to in :numref:`sec-model_equations` below. If the defining equation is an ODE, the variable is normally given the category :math:`x` but can also be category :math:`q` *if* detection of quadrature states is enabled and the variable does not appears in the right-hand-side of any other model equation. If there is a defining equation for the variable itself, i.e. if it appears in the left-hand-side of an equation, and if it has not previously appeared in any equation, it becomes part of :math:`w`. If none of the above applies, the variable is given the category :math:`z` and assumed implicitly defined by a residual equation.  A variable with discrete variability, including integer/boolean-valued variables, is treated as a continuous variable with a trivial ODE defined, i.e. :math:`\dot{x} = 0` or :math:`\dot{q} = 0`. After the user generates functions to calculate the ODE right hand sides as described in :numref:`sec-daebuilder_factory`, this structure can easily be detected (e.g. by looking for rows in the Jacobian matrices with only structural zeros).
 
-A variable with discrete variability, including integer/boolean-valued variables, is treated as a continuous variable with a trivial ODE defined, i.e. :math:`\dot{x} = 0` or :math:`\dot{q} = 0`. After the user generates functions to calculate the ODE right hand sides as described in :numref:`sec-daebuilder_factory`, this structure can easily be detected (e.g. by looking for rows in the Jacobian matrices with only structural zeros).
+The set of variables with output causality also define the calculated model outputs :math:`y` with associated output equation.
 
-Variables of output causality will also define an auxiliary dependent variable in the category :math:`y` with associated output equation.
-
-The category of a variable may change during symbolic construction, cf. :numref:`sec-daebuilder_symbolic`, in particular when adding equations. It may also change by explicitly changing the variability or causality of a variable, when such an operation is permitted.
+The category of a variable may change during symbolic construction, cf. :numref:`sec-daebuilder_symbolic`, in particular when adding equations. It may also change by explicitly changing the variability or causality of a variable, when such an operation is permitted. A continuous model variable also changes from category :math:`z` to :math:`x` when it appears differentiated in a model equation.
 
 .. _sec-model_equations:
 
@@ -97,7 +92,7 @@ At the time of this writing, |DaeBuilder| instances supported the following type
   * Quadrature equation, e.g.: :math:`\dot{q} = f_{\text{quad}}(t,x,z,u,p)`
   * When equation, e.g.: when :math:`f_\text{zero}(t,x,z,u,p) < 0` then :math:`x := f_\text{transition}(t,x,z,u,p)`
 
-Future versions of |DaeBuilder| may support more types of equations, in particular related to proper handling of initial equations and event handling, guided by the Modelica standard [#modelica36]_.
+Future versions of |DaeBuilder| may support more types of equations, in particular related to proper handling of initial equations and other types of events, guided by the Modelica standard [#modelica36]_.
 
 The functions in the list above are associated with additional, internal, variable categories, in addition to the categories listed in :numref:`sec-model_variables`. For example ordinary differential equations and quadrature equations are associated with derivative variables and algebraic equations are associated with residual variables. When equations are associated with zero-crossing conditions and a set of assignment operations. We will return to when equations in :numref:`sec-hybrid` below.
 
