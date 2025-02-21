@@ -2832,16 +2832,6 @@ Variable& DaeBuilderInternal::add(const std::string& name, Causality causality,
   }
   // If an output, add to list of outputs
   if (causality == Causality::OUTPUT) outputs_.push_back(v.index);
-  // Also create a derivative variable, if needed
-  if (v.needs_der()) {
-    Variable& der_v = new_variable("der(" + name + ")", dimension);
-    categorize(der_v.index, Category::DER);
-    der_v.der_of = v.index;
-    der_v.parent = v.index;
-    v.der = der_v.index;
-    // Add to list of derivatives
-    derivatives_.push_back(der_v.index);
-  }
   // Return variable reference
   return v;
 }
