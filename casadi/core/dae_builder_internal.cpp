@@ -1284,7 +1284,7 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
   if (!when_.empty()) {
     stream << "When equations" << std::endl;
     for (auto weq : when_) {
-      stream << "  when " << variable(weq.first).v << " > 0 : " << std::endl;
+      stream << "  when " << variable(weq.first).v << " < 0 : " << std::endl;
       for (size_t eq : weq.second) {
         auto v = variable(eq).parent;
         stream << "    " << variable(v).name << " := " << variable(eq).v << std::endl;
@@ -3146,7 +3146,7 @@ void DaeBuilderInternal::when(const MX& cond, const std::vector<std::string>& eq
   // Convert condition into a smooth zero crossing condition
   MX zero;
   if (cond.is_op(OP_LT)) {
-    zero = cond.dep(1) - cond.dep(0);  // Reformulate a < b to b - a > 0
+    zero = cond.dep(0) - cond.dep(1);  // Reformulate a < b to a - b < 0
   } else if (cond.is_op(OP_LE)) {
     casadi_error("Only strict inequality in zero-crossing conditions permitted, got: "
       + str(cond));

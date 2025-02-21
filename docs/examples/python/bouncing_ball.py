@@ -30,8 +30,8 @@ hdot = v
 vdot = -9.81
 xdot = vertcat(hdot, vdot)
 
-# Event indicator, trigger when crossing zero
-event_indicator = -h
+# Event indicator, trigger when it becomes negative
+event_indicator = h
 
 # DAE problem structure, with zero-crossing output
 dae = dict(x = x, ode = xdot, zero = event_indicator)

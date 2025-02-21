@@ -555,13 +555,14 @@ int Integrator::advance(IntegratorMemory* m) const {
     // Detect events
     for (casadi_int i = 0; i < ne_; ++i) {
       // Make sure that event was not already triggered
-      if (m->event_triggered[i] || m->old_e[i] >= 0) continue;
+      if (m->event_triggered[i] || m->old_e[i] <= 0) continue;
       // Check if event was triggered or is projected to be triggered before next output time
-      if (m->e[i] > 0 || (m->edot[i] > 0 && m->e[i] + (m->t_next_out - m->t) * m->edot[i] > 0)) {
+      if (m->e[i] < 0 || (m->edot[i] < 0 && m->e[i] + (m->t_next_out - m->t) * m->edot[i] < 0)) {
         // Projected zero-crossing time
         double t_zero = m->t - m->e[i] / m->edot[i];
         // If t_zero is too small or m->edot[i] has the wrong sign, fall back to bisection
-        if (t_zero <= m->t_start || (m->e[i] > 0 && m->edot[i] <= 0)) {
+        // TODO(@jaeandersson): Check last inequality, revesed?
+        if (t_zero <= m->t_start || (m->e[i] < 0 && m->edot[i] >= 0)) {
           t_zero = 0.5 * (m->t_start + m->t);
         }
         // Update t_next if earliest event so far
