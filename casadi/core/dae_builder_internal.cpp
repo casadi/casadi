@@ -190,7 +190,6 @@ std::string to_string(Category v) {
   case Category::C: return "c";
   case Category::D: return "d";
   case Category::W: return "w";
-  case Category::DER: return "der";
   case Category::CALCULATED: return "calculated";
   default: break;
   }
@@ -199,17 +198,16 @@ std::string to_string(Category v) {
 
 std::string description(Category v) {
   switch (v) {
-  case Category::T: return "Independent variable ('t')";
-  case Category::P: return "Parameters ('p')";
-  case Category::U: return "Control ('u')";
-  case Category::X: return "Differential states ('x')";
-  case Category::Z: return "Algebraic variables ('z')";
-  case Category::Q: return "Quadrature states ('q')";
-  case Category::C: return "Constants ('c')";
-  case Category::D: return "Dependent parameters ('d')";
-  case Category::W: return "Dependent variables ('w')";
-  case Category::DER: return "Time derivatives ('der')";
-  case Category::CALCULATED: return "Calculated variable ('calculated')";
+  case Category::T: return "Independent variable";
+  case Category::P: return "Parameters";
+  case Category::U: return "Control";
+  case Category::X: return "Differential states";
+  case Category::Z: return "Algebraic variables";
+  case Category::Q: return "Quadrature states";
+  case Category::C: return "Constants";
+  case Category::D: return "Dependent parameters";
+  case Category::W: return "Dependent variables";
+  case Category::CALCULATED: return "Calculated variable";
   default: break;
   }
   return "";
@@ -228,13 +226,24 @@ bool is_input_category(Category cat) {
     case Category::W:
       // Input category
       return true;
-    case Category::DER:  // Fall-through
     case Category::CALCULATED:
       // Output category
       return false;
     default: break;
   }
   casadi_error("Cannot handle: " + to_string(cat));
+}
+
+bool is_acyclic(Category cat) {
+  switch (cat) {
+    case Category::C:  // Fall-through
+    case Category::D:  // Fall-through
+    case Category::W:
+      // Acyclic category
+      return true;
+    default:
+      return false;
+  }
 }
 
 std::vector<Category> input_categories() {
@@ -430,6 +439,7 @@ Variable::Variable(casadi_int index, const std::string& name,
   this->parent = -1;
   this->der = -1;
   this->bind = -1;
+  this->in_rhs = false;
   this->value.resize(numel, nan);
   this->dependency = false;
 }
@@ -543,7 +553,7 @@ MX Variable::get_der(DaeBuilderInternal& self, bool may_allocate) {
   // Create a new derivative variable, if needed
   if (may_allocate && needs_der() && der < 0) {
     Variable& der_v = self.new_variable("der(" + name + ")", dimension);
-    self.categorize(der_v.index, Category::DER);
+    self.categorize(der_v.index, Category::Z);
     der_v.der_of = index;
     der_v.parent = index;
     der = der_v.index;
@@ -568,7 +578,7 @@ DaeBuilderInternal::DaeBuilderInternal(const std::string& name, const std::strin
   provides_adjoint_derivatives_ = false;
   can_be_instantiated_only_once_per_process_ = false;
   symbolic_ = true;
-  no_q_ = false;
+  detect_quad_ = false;
   start_time_ = nan;
   stop_time_ = nan;
   tolerance_ = nan;
@@ -585,8 +595,8 @@ DaeBuilderInternal::DaeBuilderInternal(const std::string& name, const std::strin
       fmutol_ = op.second;
     } else if (op.first=="ignore_time") {
       ignore_time_ = op.second;
-    } else if (op.first=="no_q") {
-      no_q_ = op.second;
+    } else if (op.first=="detect_quad") {
+      detect_quad_ = op.second;
     } else {
       casadi_error("No such option: " + op.first);
     }
@@ -1231,52 +1241,25 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
     }
   }
 
-  // Print the variables
-  stream << "Variables" << std::endl;
+  // Print the variables, including outputs
+  stream << "Model variables" << std::endl;
   for (Category cat : {Category::T, Category::C, Category::P, Category::D, Category::X,
       Category::Z, Category::Q, Category::W, Category::U}) {
     if (size(cat) > 0) {
       stream << "  " << to_string(cat) << " = " << var(indices(cat)) << std::endl;
     }
   }
+  if (!outputs_.empty()) stream << "  y = " << var(outputs_) << std::endl;
 
   // All variables that can have dependent variables
   for (Category cat : {Category::C, Category::D, Category::W}) {
     if (size(cat) > 0) {
-      stream << description(cat) << ": " << std::endl;
+      stream << description(cat) << std::endl;
       for (size_t c : indices(cat)) {
         const Variable& v = variable(c);
         stream << "  " << v.name;
         if (v.bind >= 0) stream << " := " << variable(v.bind).v;
         stream << std::endl;
-      }
-    }
-  }
-
-  for (Category cat : {Category::X, Category::Q}) {
-    if (size(cat) > 0) {
-      stream << (cat == Category::X ? "Differential" : "Quadrature") << " equations" << std::endl;
-      for (size_t k : indices(cat)) {
-        // Print the name of the derivative
-        const Variable& v = variable(k);
-        std::string der_name = "der(" + v.name + ")";
-        stream << "  " << der_name;
-        if (v.variability == Variability::DISCRETE) {
-          // Discrete variable - derivative is zero
-          stream << " := 0" << std::endl;
-        } else if (v.der >= 0) {
-          // Derivative variable
-          const Variable& vdot = variable(v.der);
-          // Print definition, if inconsistent naming of derivative variable
-          if (vdot.name != der_name) stream << " := " << vdot.v;
-          // Print the equation, if any
-          if (vdot.bind >= 0) stream << " == " << variable(vdot.bind).v;
-          stream << std::endl;
-        } else {
-          // Missing equation
-          stream << " == (missing)"  << std::endl;
-          casadi_warning("No derivative variable for " + v.name);
-        }
       }
     }
   }
@@ -1295,14 +1278,6 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
       stream << "  " << v.name;
       if (!v.ieq.is_empty()) stream << " := " << v.ieq;
       stream << std::endl;
-    }
-  }
-
-  if (!outputs_.empty()) {
-    stream << "Output variables" << std::endl;
-    for (size_t y : outputs_) {
-      const Variable& v = variable(y);
-      stream << "  " << v.name << std::endl;
     }
   }
 
@@ -1715,7 +1690,10 @@ MX DaeBuilderInternal::der(const MX& var, bool may_allocate) {
   return vertcat(r.at(0));
 }
 
-std::string DaeBuilderInternal::unique_name(const std::string& prefix) const {
+std::string DaeBuilderInternal::unique_name(const std::string& prefix,
+    bool allow_no_prefix) const {
+  // Check if the variable exists without any prefix
+  if (allow_no_prefix && !has(prefix)) return prefix;
   // Find the first available index
   size_t i = 0;
   while (has(prefix + str(i))) i++;
@@ -2792,7 +2770,7 @@ Variable& DaeBuilderInternal::add(const std::string& name, Causality causality,
         categorize(v.index, Category::C);
       } else if (variability == Variability::DISCRETE) {
         // Discrete variables are considered states with zero derivatives
-        categorize(v.index, no_q_ ? Category::X : Category::Q);
+        categorize(v.index, detect_quad_ ? Category::Q : Category::X);
       } else if (variability == Variability::CONTINUOUS) {
         // Continuous variables are considered algebraic variables until given a defining equation
         categorize(v.index, Category::Z);
@@ -2808,7 +2786,7 @@ Variable& DaeBuilderInternal::add(const std::string& name, Causality causality,
         categorize(v.index, Category::C);
       } else if (variability == Variability::DISCRETE) {
         // Discrete variables are considered states with zero derivatives
-        categorize(v.index, no_q_ ? Category::X : Category::Q);
+        categorize(v.index, detect_quad_ ? Category::Q : Category::X);
       } else if (variability == Variability::CONTINUOUS) {
         // Continuous variables are considered algebraic variables until given a defining equation
         categorize(v.index, Category::Z);
@@ -2869,7 +2847,12 @@ void DaeBuilderInternal::categorize(size_t ind, Category cat) {
   }
   // Add to new category, if any
   if (cat != Category::NUMEL) {
-    insert(indices(cat), ind);
+    std::vector<size_t>& indices = this->indices(cat);
+    if (is_acyclic(cat)) {
+      indices.push_back(ind);
+    } else {
+      insert(indices, ind);
+    }
     v.category = cat;
   }
 }
@@ -3016,7 +2999,7 @@ void DaeBuilderInternal::set_category(size_t ind, Category cat) {
       }
       break;
     case Category::X:
-      if (v.category == Category::Q) {
+      if (v.category == Category::Q && !v.in_rhs) {
         return categorize(v.index, Category::X);
       }
       break;
@@ -3057,6 +3040,24 @@ void DaeBuilderInternal::eq(const MX& lhs, const MX& rhs, const Dict& opts) {
   }
   // Make sure right-hand-side only depends on known model variables
   std::vector<size_t> rhs_vars = find(symvar(rhs));
+  // If right-hand-side contains a time derivative that hasn't been defined yet,
+  // add a new algebraic variable der_x and the ODE "der(x) = der_x"
+  // This ensures that the DAE stays in semi-explicit form
+  for (size_t rhs : rhs_vars) {
+    Variable& v = variable(rhs);
+    if (v.category == Category::Z && v.parent >= 0) {
+      // Find the corresponding state variable
+      Variable& x = variable(v.parent);
+      // The "parent" attribute is used in some other cases, like assignments
+      casadi_assert(x.der == v.index, "Cannot handle right-hand-side variable: " + v.name);
+      // Create a new algebraic variable der_{name}, to distinguish from der({name})
+      Variable& der_x = add(unique_name("der_" + x.name, true),
+        Causality::LOCAL, Variability::CONTINUOUS,
+        {{"dimension", {x.dimension}}});
+      // Add the trivial ODE
+      eq(x.get_der(*this), der_x.v, Dict());
+    }
+  }
   // Try to honor a == b as an explicit equation
   if (lhs.is_valid_input()) {
     // Explicit equation
@@ -3065,22 +3066,42 @@ void DaeBuilderInternal::eq(const MX& lhs, const MX& rhs, const Dict& opts) {
       Variable& v = variable(lhs);
       // Set the binding equation
       if (v.has_beq()) {
-        // TODO(@jaeandersson): Treat as implicit equation
-        casadi_error("Already a binding equation for " + v.name);
+        // Treat as implicit equation via recursion
+        return eq(MX::zeros(lhs.sparsity()), lhs - rhs, opts);
       } else {
         // Set the binding equation
         Variable& beq = assign(v.name, rhs);
         v.bind = beq.index;
       }
       // (Re)classify variables
-      if (v.category == Category::DER) {
+      if (v.parent >= 0) {
         // Derivative variable is being set - find the corresponding state variable
         Variable& x = variable(v.parent);
-        // Reclassify as state variable
+        // The "parent" attribute is used in some other cases, like assignments
+        casadi_assert(x.der == v.index, "Cannot handle left-hand-side: " + str(lhs));
+        // Reclassify as a differential state and derivative as a dependent variable
         if (x.category == Category::Z) {
+          // Not previously used: Reclassify as differential state
+          categorize(x.index, detect_quad_ && !x.in_rhs ? Category::Q : Category::X);
+          categorize(v.index, Category::W);
+        } else if (x.category == Category::W) {
+          // Already given a defining equation: Create a new dependent variable and use this
+          // for the previous definition
+          Variable& def_x = add(unique_name("def_" + x.name, true),
+            Causality::LOCAL, Variability::CONTINUOUS,
+            {{"dimension", {x.dimension}}});
+          categorize(def_x.index, Category::W);
+          def_x.bind = x.bind;
+          // We can now reclassify x as a differential state
+          x.bind = -1;
           categorize(x.index, Category::X);
+          categorize(v.index, Category::W);
+          // Add a new implicit equation: 0 == x - def_x
+          Variable& alg = add(unique_name("__alg__"), Causality::LOCAL, Variability::CONTINUOUS,
+            x.v - def_x.v, {{"dimension", x.dimension}});
+          categorize(alg.index, Category::CALCULATED);
+          residuals_.push_back(alg.index);
         } else {
-          casadi_assert(x.category == Category::NUMEL, "No categorization for " + x.name);
           casadi_error("Unexpected category for " + x.name + ": " + to_string(x.category));
         }
       } else if (v.category == Category::Z) {
@@ -3101,29 +3122,17 @@ void DaeBuilderInternal::eq(const MX& lhs, const MX& rhs, const Dict& opts) {
     }
   } else {
     // Implicit equation: Create residual variable
-    Variable& alg = add(unique_name("__alg__"), Causality::OUTPUT, Variability::CONTINUOUS,
-      lhs - rhs, Dict());
+    Variable& alg = add(unique_name("__alg__"), Causality::LOCAL, Variability::CONTINUOUS,
+      lhs - rhs, {{"dimension", std::vector<casadi_int>{lhs.size1()}}});
     categorize(alg.index, Category::CALCULATED);
+    residuals_.push_back(alg.index);
   }
-  // If derivative variable in the right-hand-side, reclassify as algebraic variable
+  // Do not allow any quadrature states in the right-hand-sides
   for (size_t rhs : rhs_vars) {
     Variable& v = variable(rhs);
-    if (v.category == Category::DER) {
-      // Find the corresponding state variable
-      Variable& x = variable(v.parent);
-      // Reclassify as state variable
-      if (x.category == Category::Z) {
-        categorize(x.index, Category::X);
-      } else {
-        casadi_assert(x.category == Category::NUMEL, "No categorization for " + x.name);
-        casadi_error("Unexpected category for " + x.name + ": " + to_string(x.category));
-      }
-      // Reclassify derivative as algebraic variable
-      v.category = Category::Z;
-      insert(indices(Category::Z), v.index);
-    } else if (v.category == Category::Q) {
-      // If quadrature state appears in the right-hand-side, reclassify as differential state
-      categorize(v.index, Category::X);
+    if (!v.in_rhs) {
+      v.in_rhs = true;
+      if (v.category == Category::Q) categorize(v.index, Category::X);
     }
   }
 }
@@ -3264,6 +3273,10 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
 
     // Create new variable
     Variable& var = new_variable(name);
+
+    // Assume all variables in the right-hand-sides for now
+    // Prevents changing X to Q
+    var.in_rhs = true;
 
     // Get type (FMI 3)
     if (fmi_major_ >= 3) var.type = to_enum<Type>(vnode.name);
@@ -3444,9 +3457,9 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
         derivatives_.push_back(vrmap_.at(e.attribute<size_t>("valueReference")));
         // Corresponding variable
         Variable& v = variable(derivatives_.back());
-        // Add to list of states
+        // Add to list of states and derivative to list of dependent variables
         casadi_assert(v.der_of >= 0, "Error processing derivative info for " + v.name);
-        categorize(v.index, Category::DER);
+        categorize(v.index, Category::W);
         categorize(v.der_of, Category::X);
         // Make sure der field is consistent
         variable(v.der_of).der = derivatives_.back();
@@ -3480,9 +3493,9 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
         derivatives_.push_back(e.attribute<casadi_int>("index", 0) - 1);
         // Corresponding variable
         Variable& v = variable(derivatives_.back());
-        // Add to list of states
+        // Add to list of states and derivative to list of dependent variables
         casadi_assert(v.der_of >= 0, "Error processing derivative info for " + v.name);
-        categorize(v.index, Category::DER);
+        categorize(v.index, Category::W);
         categorize(v.der_of, Category::X);
         // Make sure der field is consistent
         variable(v.der_of).der = derivatives_.back();

@@ -59,7 +59,7 @@ enum class Variability {CONSTANT, FIXED, TUNABLE, DISCRETE, CONTINUOUS, NUMEL};
 // CONTINUOUS   -          -                     U       X/Q/W/Z  X/Q/W/Z  T
 
 // Variable categories
-enum class Category {T, C, P, D, W, U, X, Z, Q, DER, CALCULATED, NUMEL};
+enum class Category {T, C, P, D, W, U, X, Z, Q, CALCULATED, NUMEL};
 
 // Output categories for generated functions
 enum class OutputCategory {ODE, ALG, QUAD, ZERO, DDEF, WDEF, Y, NUMEL};
@@ -134,6 +134,9 @@ struct CASADI_EXPORT Variable {
 
   // corresponding binding expression, if any
   casadi_int bind;
+
+  // Does it appear in any right-hand-side?
+  bool in_rhs;
 
   /// Numerical value (also for booleans, integers, enums)
   std::vector<double> value;
@@ -377,7 +380,7 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   MX der(const MX& var, bool may_allocate = true);
 
   /// Find a unique name, with a specific prefix
-  std::string unique_name(const std::string& prefix) const;
+  std::string unique_name(const std::string& prefix, bool allow_no_prefix = true) const;
 
   /// Readable name of the class
   std::string type_name() const {return "DaeBuilderInternal";}
@@ -527,8 +530,8 @@ protected:
   // Symbolic representation of the model equations?
   bool symbolic_;
 
-  // Disallow quadrature states
-  bool no_q_;
+  // Detect quadrature states
+  bool detect_quad_;
 
   // FMI major version
   casadi_int fmi_major_;
@@ -809,6 +812,9 @@ CASADI_EXPORT std::string description(Category v);
 
 // Check if input category
 CASADI_EXPORT bool is_input_category(Category cat);
+
+// Check if acyclic dependency category
+CASADI_EXPORT bool is_acyclic(Category cat);
 
 // Get all input categories
 CASADI_EXPORT std::vector<Category> input_categories();
