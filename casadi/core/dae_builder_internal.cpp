@@ -3304,15 +3304,72 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
       initial = to_enum<Initial>(initial_str);
     }
 
+    // Type specific properties
+    std::string unit, display_unit;
+    double min, max, nominal, start;
+    casadi_int derivative;
+    if (fmi_major_ >= 3) {
+      // FMI 3.0: Type information in the same node
+      switch (type) {
+      case Type::FLOAT32:  // fall-through
+      case Type::FLOAT64:
+        // Floating point valued variables
+        unit = vnode.attribute<std::string>("unit", "");
+        display_unit = vnode.attribute<std::string>("displayUnit", "");
+        min = vnode.attribute<double>("min", -inf);
+        max = vnode.attribute<double>("max", inf);
+        nominal = vnode.attribute<double>("nominal", 1.);
+        start = vnode.attribute<double>("start", 0.);
+        derivative = vnode.attribute<casadi_int>("derivative", -1);
+        break;
+      case Type::INT8:  // fall-through
+      case Type::UINT8:  // fall-through
+      case Type::INT16:  // fall-through
+      case Type::UINT16:  // fall-through
+      case Type::INT32:  // fall-through
+      case Type::UINT32:  // fall-through
+      case Type::INT64:  // fall-through
+      case Type::UINT64:  // fall-through
+        // Integer valued variables
+        min = vnode.attribute<double>("min", -inf);
+        max = vnode.attribute<double>("max", inf);
+        break;
+      default:
+        break;
+      }
+    } else {
+      // FMI 1.0 / 2.0: Type information in a separate node
+      if (vnode.has_child("Real")) {
+        const XmlNode& props = vnode["Real"];
+        unit = props.attribute<std::string>("unit", "");
+        display_unit = props.attribute<std::string>("displayUnit", "");
+        min = props.attribute<double>("min", -inf);
+        max = props.attribute<double>("max", inf);
+        nominal = props.attribute<double>("nominal", 1.);
+        start = props.attribute<double>("start", 0.);
+        derivative = props.attribute<casadi_int>("derivative", -1);
+      } else if (vnode.has_child("Integer")) {
+        const XmlNode& props = vnode["Integer"];
+        type = Type::INT32;
+        min = props.attribute<double>("min", -inf);
+        max = props.attribute<double>("max", inf);
+      } else if (vnode.has_child("Boolean")) {
+        type = Type::BOOLEAN;
+      } else if (vnode.has_child("String")) {
+        type = Type::STRING;
+      } else if (vnode.has_child("Enumeration")) {
+        type = Type::ENUMERATION;
+      } else {
+        casadi_warning("Unknown type for " + name);
+      }
+    }
+
     // Create new variable
     Variable& var = new_variable(name);
 
     // Assume all variables in the right-hand-sides for now
     // Prevents changing X to Q
     var.in_rhs = true;
-
-    // Get type (FMI 3)
-    if (fmi_major_ >= 3) var.type = type;
 
     // Set common attributes, cf. FMI 3.0 specification, 2.4.7.4
     var.value_reference = static_cast<unsigned int>(vnode.attribute<casadi_int>("valueReference"));
@@ -3324,18 +3381,19 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
 
     // Type specific properties
     if (fmi_major_ >= 3) {
+      var.type = type;
       // FMI 3.0: Type information in the same node
       switch (var.type) {
       case Type::FLOAT32:  // fall-through
       case Type::FLOAT64:
         // Floating point valued variables
-        var.unit = vnode.attribute<std::string>("unit", var.unit);
-        var.display_unit = vnode.attribute<std::string>("displayUnit", var.display_unit);
-        var.min = vnode.attribute<double>("min", -inf);
-        var.max = vnode.attribute<double>("max", inf);
-        var.nominal = vnode.attribute<double>("nominal", 1.);
-        var.set_attribute(Attribute::START, vnode.attribute<double>("start", 0.));
-        var.der_of = vnode.attribute<casadi_int>("derivative", var.der_of);
+        var.unit = unit;
+        var.display_unit = display_unit;
+        var.min = min;
+        var.max = max;
+        var.nominal = nominal;
+        var.set_attribute(Attribute::START, start);
+        var.der_of = derivative;
         break;
       case Type::INT8:  // fall-through
       case Type::UINT8:  // fall-through
@@ -3346,8 +3404,8 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
       case Type::INT64:  // fall-through
       case Type::UINT64:  // fall-through
         // Integer valued variables
-        var.min = vnode.attribute<double>("min", -inf);
-        var.max = vnode.attribute<double>("max", inf);
+        var.min = min;
+        var.max = max;
         break;
       default:
         break;
@@ -3355,19 +3413,17 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
     } else {
       // FMI 1.0 / 2.0: Type information in a separate node
       if (vnode.has_child("Real")) {
-        const XmlNode& props = vnode["Real"];
-        var.unit = props.attribute<std::string>("unit", var.unit);
-        var.display_unit = props.attribute<std::string>("displayUnit", var.display_unit);
-        var.min = props.attribute<double>("min", -inf);
-        var.max = props.attribute<double>("max", inf);
-        var.nominal = props.attribute<double>("nominal", 1.);
-        var.set_attribute(Attribute::START, props.attribute<double>("start", 0.));
-        var.der_of = props.attribute<casadi_int>("derivative", var.der_of);
+        var.unit = unit;
+        var.display_unit = display_unit;
+        var.min = min;
+        var.max = max;
+        var.nominal = nominal;
+        var.set_attribute(Attribute::START, start);
+        var.der_of = derivative;
       } else if (vnode.has_child("Integer")) {
-        const XmlNode& props = vnode["Integer"];
         var.type = Type::INT32;
-        var.min = props.attribute<double>("min", -inf);
-        var.max = props.attribute<double>("max", inf);
+        var.min = min;
+        var.max = max;
       } else if (vnode.has_child("Boolean")) {
         var.type = Type::BOOLEAN;
       } else if (vnode.has_child("String")) {
