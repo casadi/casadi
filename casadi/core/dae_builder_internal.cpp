@@ -3427,18 +3427,33 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
     }
   }
 
-  // Handle derivatives
+  // Set "parent" property using "derivative" attribute
   for (size_t i = 0; i < n_variables(); ++i) {
-    if (variable(i).der_of >= 0) {
+    Variable& v = variable(i);
+    if (v.der_of >= 0) {
       if (fmi_major_ >= 3) {
         // Value reference is given: Find corresponding variable
-        variable(i).der_of = vrmap_.at(static_cast<unsigned int>(variable(i).der_of));
+        v.parent = vrmap_.at(static_cast<unsigned int>(v.der_of));
       } else {
         // Variable given with index-1, make index 0
-        variable(i).der_of -= 1;
+        v.parent = v.der_of - 1;
       }
-      // Set der
-      variable(variable(i).der_of).der = i;
+      // TODO(@jaeandersson): Remove this redefinition of der_of
+      v.der_of = v.parent;
+    }
+  }
+
+  // Identify states
+  for (size_t i = 0; i < n_variables(); ++i) {
+    Variable& v = variable(i);
+    if (v.parent >= 0) {
+      // Derivative of a variable
+      Variable& x = variable(v.parent);
+      // Mark as a state
+      x.der = v.index;
+      // Add to list of states and derivative to list of dependent variables
+      // categorize(x.index, Category::X);
+      // categorize(v.index, Category::W);
     }
   }
 }
