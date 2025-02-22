@@ -636,6 +636,22 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
   // Process model structure
   if (fmi_desc.has_child("ModelStructure")) {
     import_model_structure(fmi_desc["ModelStructure"]);
+  } else {
+    // Automatically select states
+    for (size_t i = 0; i < n_variables(); ++i) {
+      Variable& v = variable(i);
+      if (v.parent >= 0) {
+        // Derivative of a variable
+        Variable& x = variable(v.parent);
+        // If already a state, only honor first encounter
+        if (x.der >= 0) continue;
+        // Mark as a state
+        x.der = v.index;
+        // Add to list of states and derivative to list of dependent variables
+        categorize(x.index, Category::X);
+        categorize(v.index, Category::W);
+      }
+    }
   }
 
   // Is a symbolic representation available?
@@ -3440,20 +3456,6 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
       }
       // TODO(@jaeandersson): Remove this redefinition of der_of
       v.der_of = v.parent;
-    }
-  }
-
-  // Identify states
-  for (size_t i = 0; i < n_variables(); ++i) {
-    Variable& v = variable(i);
-    if (v.parent >= 0) {
-      // Derivative of a variable
-      Variable& x = variable(v.parent);
-      // Mark as a state
-      x.der = v.index;
-      // Add to list of states and derivative to list of dependent variables
-      // categorize(x.index, Category::X);
-      // categorize(v.index, Category::W);
     }
   }
 }
