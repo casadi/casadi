@@ -176,9 +176,6 @@ struct CASADI_EXPORT Variable {
   void set_attribute(Attribute a, const std::string& val);
   ///@}
 
-  // Default initial attribute, per specification
-  static Initial default_initial(Causality causality, Variability variability);
-
   // Export as XML
   XmlNode export_xml(const DaeBuilderInternal& self) const;
 
@@ -583,8 +580,11 @@ protected:
       \identifier{2a8} */
   std::vector<MX> init_rhs() const;
 
-  /// Get default variability
-  Variability default_variability(Causality causality, Type type) const;
+  /// Default variability attribute, per the FMI specification
+  static Variability default_variability(Causality causality, Type type);
+
+  // Default initial attribute, per the FMI specification
+  static Initial default_initial(Causality causality, Variability variability);
 
   /// Add a new variable
   Variable& add(const std::string& name, Causality causality, Variability variability,

@@ -386,33 +386,6 @@ void Variable::set_attribute(Attribute a, const std::string& val) {
   }
 }
 
-Initial Variable::default_initial(Causality causality, Variability variability) {
-  // According to table in FMI 2.0.2 specification, section 2.2.7
-  switch (variability) {
-  case Variability::CONSTANT:
-    if (causality == Causality::OUTPUT || causality == Causality::LOCAL)
-      return Initial::EXACT;
-    break;
-  case Variability::FIXED:
-    // Fall-through
-  case Variability::TUNABLE:
-    if (causality == Causality::PARAMETER)
-      return Initial::EXACT;
-    else if (causality == Causality::CALCULATED_PARAMETER || causality == Causality::LOCAL)
-      return Initial::CALCULATED;
-    break;
-  case Variability::DISCRETE:
-  // Fall-through
-  case Variability::CONTINUOUS:
-    if (causality == Causality::OUTPUT || causality == Causality::LOCAL)
-      return Initial::CALCULATED;
-    break;
-  default: break;
-  }
-  // Initial value not available
-  return Initial::NA;
-}
-
 Variable::Variable(casadi_int index, const std::string& name,
     const std::vector<casadi_int>& dimension, const MX& expr)
     : index(index), name(name), dimension(dimension), v(expr) {
@@ -2684,7 +2657,7 @@ std::vector<MX> DaeBuilderInternal::init_rhs() const {
   return ret;
 }
 
-Variability DaeBuilderInternal::default_variability(Causality causality, Type type) const {
+Variability DaeBuilderInternal::default_variability(Causality causality, Type type) {
   // Default variability per FMI 3.0.2, section 2.4.7.4
   // "The default for variables of causality parameter, structural parameter or
   // calculated parameter is fixed."
@@ -2698,6 +2671,33 @@ Variability DaeBuilderInternal::default_variability(Causality causality, Type ty
   } else {
     return Variability::DISCRETE;
   }
+}
+
+Initial DaeBuilderInternal::default_initial(Causality causality, Variability variability) {
+  // According to table in FMI 2.0.2 specification, section 2.2.7
+  switch (variability) {
+  case Variability::CONSTANT:
+    if (causality == Causality::OUTPUT || causality == Causality::LOCAL)
+      return Initial::EXACT;
+    break;
+  case Variability::FIXED:
+    // Fall-through
+  case Variability::TUNABLE:
+    if (causality == Causality::PARAMETER)
+      return Initial::EXACT;
+    else if (causality == Causality::CALCULATED_PARAMETER || causality == Causality::LOCAL)
+      return Initial::CALCULATED;
+    break;
+  case Variability::DISCRETE:
+  // Fall-through
+  case Variability::CONTINUOUS:
+    if (causality == Causality::OUTPUT || causality == Causality::LOCAL)
+      return Initial::CALCULATED;
+    break;
+  default: break;
+  }
+  // Initial value not available
+  return Initial::NA;
 }
 
 Variable& DaeBuilderInternal::add(const std::string& name, Causality causality,
@@ -3276,6 +3276,34 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
       continue;
     }
 
+    // Get type (FMI 3)
+    Type type;
+    if (fmi_major_ >= 3) type = to_enum<Type>(vnode.name);
+
+    // Description
+    std::string description = vnode.attribute<std::string>("description", "");
+
+    // Causality (FMI 1.0 -> FMI 2.0+)
+    std::string causality_str = vnode.attribute<std::string>("causality", "local");
+    if (fmi_major_ == 1 && causality_str == "internal") causality_str = "local";
+    Causality causality = to_enum<Causality>(causality_str);
+
+    // Variability (FMI 1.0 -> FMI 2.0+)
+    std::string variability_str = vnode.attribute<std::string>("variability", "continuous");
+    if (fmi_major_ == 1 && variability_str == "parameter") variability_str = "fixed";
+    Variability variability = to_enum<Variability>(variability_str);
+
+    // Initial property
+    Initial initial = default_initial(causality, variability);
+    std::string initial_str = vnode.attribute<std::string>("initial", "");
+    if (!initial_str.empty()) {
+      // Consistency check
+      casadi_assert(causality != Causality::INPUT && causality != Causality::INDEPENDENT,
+        "The combination causality = '" + to_string(causality) + "', "
+        "initial = '" + initial_str + "' is not allowed per the FMI specification.");
+      initial = to_enum<Initial>(initial_str);
+    }
+
     // Create new variable
     Variable& var = new_variable(name);
 
@@ -3284,33 +3312,16 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
     var.in_rhs = true;
 
     // Get type (FMI 3)
-    if (fmi_major_ >= 3) var.type = to_enum<Type>(vnode.name);
+    if (fmi_major_ >= 3) var.type = type;
 
-    // Read common attributes, cf. FMI 3.0 specification, 2.4.7.4
+    // Set common attributes, cf. FMI 3.0 specification, 2.4.7.4
     var.value_reference = static_cast<unsigned int>(vnode.attribute<casadi_int>("valueReference"));
     vrmap_[var.value_reference] = var.index;
-    var.description = vnode.attribute<std::string>("description", "");
-    std::string causality_str = vnode.attribute<std::string>("causality", "local");
-    std::string variability_str = vnode.attribute<std::string>("variability", "continuous");
-    if (fmi_major_ == 1) {
-        // FMI 1.0 -> FMI 2.0+
-      if (causality_str == "internal") causality_str = "local";
-      if (variability_str == "parameter") variability_str = "fixed";
-    }
-    var.causality = to_enum<Causality>(causality_str);
-    var.variability = to_enum<Variability>(variability_str);
-    std::string initial_str = vnode.attribute<std::string>("initial", "");
-    if (initial_str.empty()) {
-      // Default value
-      var.initial = Variable::default_initial(var.causality, var.variability);
-    } else {
-      // Consistency check
-      casadi_assert(var.causality != Causality::INPUT && var.causality != Causality::INDEPENDENT,
-        "The combination causality = '" + to_string(var.causality) + "', "
-        "initial = '" + initial_str + "' is not allowed per the FMI specification.");
-      // Value specified
-      var.initial = to_enum<Initial>(initial_str);
-    }
+    var.description = description;
+    var.causality = causality;
+    var.variability = variability;
+    var.initial = initial;
+
     // Type specific properties
     if (fmi_major_ >= 3) {
       // FMI 3.0: Type information in the same node
