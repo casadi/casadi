@@ -1760,7 +1760,7 @@ if(WITH_SLEQP)
   add_library(sleqp::sleqp SHARED IMPORTED)
   add_dependencies(sleqp::sleqp sleqp-external)
   set_target_properties(sleqp::sleqp PROPERTIES
-    IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}sleqp${CMAKE_SHARED_LIBRARY_SUFFIX}"
+    IMPORTED_LOCATION "${CMAKE_BINARY_DIR}/external_projects/${SHARED_LIBRARY_RELDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}sleqp${CMAKE_SHARED_LIBRARY_SUFFIX}"
     IMPORTED_IMPLIB "${CMAKE_BINARY_DIR}/external_projects/lib/${CMAKE_SHARED_LIBRARY_PREFIX}sleqp${CMAKE_IMPORT_LIBRARY_SUFFIX}"
     INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_BINARY_DIR}/external_projects/include"
   )
