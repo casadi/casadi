@@ -3276,40 +3276,14 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
       continue;
     }
 
-    // Get type (FMI 3)
-    Type type;
-    if (fmi_major_ >= 3) type = to_enum<Type>(vnode.name);
-
-    // Description
-    std::string description = vnode.attribute<std::string>("description", "");
-
-    // Causality (FMI 1.0 -> FMI 2.0+)
-    std::string causality_str = vnode.attribute<std::string>("causality", "local");
-    if (fmi_major_ == 1 && causality_str == "internal") causality_str = "local";
-    Causality causality = to_enum<Causality>(causality_str);
-
-    // Variability (FMI 1.0 -> FMI 2.0+)
-    std::string variability_str = vnode.attribute<std::string>("variability", "continuous");
-    if (fmi_major_ == 1 && variability_str == "parameter") variability_str = "fixed";
-    Variability variability = to_enum<Variability>(variability_str);
-
-    // Initial property
-    Initial initial = default_initial(causality, variability);
-    std::string initial_str = vnode.attribute<std::string>("initial", "");
-    if (!initial_str.empty()) {
-      // Consistency check
-      casadi_assert(causality != Causality::INPUT && causality != Causality::INDEPENDENT,
-        "The combination causality = '" + to_string(causality) + "', "
-        "initial = '" + initial_str + "' is not allowed per the FMI specification.");
-      initial = to_enum<Initial>(initial_str);
-    }
-
     // Type specific properties
+    Type type;
     std::string unit, display_unit;
     double min, max, nominal, start;
     casadi_int derivative;
     if (fmi_major_ >= 3) {
       // FMI 3.0: Type information in the same node
+      type = to_enum<Type>(vnode.name);
       switch (type) {
       case Type::FLOAT32:  // fall-through
       case Type::FLOAT64:
@@ -3364,6 +3338,30 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
       }
     }
 
+    // Description
+    std::string description = vnode.attribute<std::string>("description", "");
+
+    // Causality (FMI 1.0 -> FMI 2.0+)
+    std::string causality_str = vnode.attribute<std::string>("causality", "local");
+    if (fmi_major_ == 1 && causality_str == "internal") causality_str = "local";
+    Causality causality = to_enum<Causality>(causality_str);
+
+    // Variability (FMI 1.0 -> FMI 2.0+)
+    std::string variability_str = vnode.attribute<std::string>("variability", "continuous");
+    if (fmi_major_ == 1 && variability_str == "parameter") variability_str = "fixed";
+    Variability variability = to_enum<Variability>(variability_str);
+
+    // Initial property
+    Initial initial = default_initial(causality, variability);
+    std::string initial_str = vnode.attribute<std::string>("initial", "");
+    if (!initial_str.empty()) {
+      // Consistency check
+      casadi_assert(causality != Causality::INPUT && causality != Causality::INDEPENDENT,
+        "The combination causality = '" + to_string(causality) + "', "
+        "initial = '" + initial_str + "' is not allowed per the FMI specification.");
+      initial = to_enum<Initial>(initial_str);
+    }
+
     // Create new variable
     Variable& var = new_variable(name);
 
@@ -3378,12 +3376,9 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
     var.causality = causality;
     var.variability = variability;
     var.initial = initial;
-
+    var.type = type;
     // Type specific properties
-    if (fmi_major_ >= 3) {
-      var.type = type;
-      // FMI 3.0: Type information in the same node
-      switch (var.type) {
+    switch (type) {
       case Type::FLOAT32:  // fall-through
       case Type::FLOAT64:
         // Floating point valued variables
@@ -3409,30 +3404,6 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
         break;
       default:
         break;
-      }
-    } else {
-      // FMI 1.0 / 2.0: Type information in a separate node
-      if (vnode.has_child("Real")) {
-        var.unit = unit;
-        var.display_unit = display_unit;
-        var.min = min;
-        var.max = max;
-        var.nominal = nominal;
-        var.set_attribute(Attribute::START, start);
-        var.der_of = derivative;
-      } else if (vnode.has_child("Integer")) {
-        var.type = Type::INT32;
-        var.min = min;
-        var.max = max;
-      } else if (vnode.has_child("Boolean")) {
-        var.type = Type::BOOLEAN;
-      } else if (vnode.has_child("String")) {
-        var.type = Type::STRING;
-      } else if (vnode.has_child("Enumeration")) {
-        var.type = Type::ENUMERATION;
-      } else {
-        casadi_warning("Unknown type for " + name);
-      }
     }
 
     // Initial classification of variables (states/outputs to be added later)
