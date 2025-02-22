@@ -3112,7 +3112,8 @@ void DaeBuilderInternal::eq(const MX& lhs, const MX& rhs, const Dict& opts) {
         // Reclassify as dependent variable
         categorize(v.index, Category::W);
       } else {
-        casadi_error("Cannot handle left-hand-side: " + str(lhs));
+        casadi_error("Cannot handle left-hand-side: " + str(lhs) + " of category '"
+          + to_string(v.category) + "'");
       }
     } else {
       // Concatenation: Split into primitives
@@ -3155,7 +3156,7 @@ void DaeBuilderInternal::when(const MX& cond, const std::vector<std::string>& eq
     casadi_error("Only strict inequality in zero-crossing conditions permitted, got: "
       + str(cond));
   } else {
-    casadi_error("Cannot parse zero-crossing condition" + str(cond));
+    casadi_error("Cannot parse zero-crossing condition: " + str(cond));
   }
   // Create a new dependent variable for the event indicator
   Variable& e = add(unique_name("__when__"), Causality::LOCAL, Variability::CONTINUOUS,
