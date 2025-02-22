@@ -3280,7 +3280,7 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
     Type type;
     std::string unit, display_unit;
     double min, max, nominal, start;
-    casadi_int derivative;
+    casadi_int derivative = -1;
     if (fmi_major_ >= 3) {
       // FMI 3.0: Type information in the same node
       type = to_enum<Type>(vnode.name);
@@ -3377,14 +3377,6 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
 
     // Create new variable
     Variable& var = new_variable(name);
-
-    // Assume all variables in the right-hand-sides for now
-    // Prevents changing X to Q
-    var.in_rhs = true;
-
-    // Set common attributes, cf. FMI 3.0 specification, 2.4.7.4
-    var.value_reference = static_cast<unsigned int>(vnode.attribute<casadi_int>("valueReference"));
-    vrmap_[var.value_reference] = var.index;
     var.description = description;
     var.causality = causality;
     var.variability = variability;
@@ -3401,7 +3393,6 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
         var.max = max;
         var.nominal = nominal;
         var.set_attribute(Attribute::START, start);
-        var.der_of = derivative;
         break;
       case Type::INT8:  // fall-through
       case Type::UINT8:  // fall-through
@@ -3418,6 +3409,13 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
       default:
         break;
     }
+
+    // Assume all variables in the right-hand-sides for now
+    // Prevents changing X to Q
+    var.in_rhs = true;
+    var.value_reference = static_cast<unsigned int>(vnode.attribute<casadi_int>("valueReference"));
+    vrmap_[var.value_reference] = var.index;
+    var.der_of = derivative;
 
     // Initial classification of variables (states/outputs to be added later)
     if (var.causality == Causality::INDEPENDENT) {
