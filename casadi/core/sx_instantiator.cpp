@@ -891,9 +891,6 @@ namespace casadi {
 
     size_t l_unique = l.size();
 
-    std::set<SXNode*> r;
-    for (const SX& e : n) r.insert(e.scalar().get());
-
     for (const SX& e : n) l.insert(e.scalar().get());
 
     return l.size()==l_unique;

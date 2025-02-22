@@ -2097,10 +2097,6 @@ namespace casadi {
 
     size_t l_unique = l.size();
 
-    std::set<MXNode*> r;
-    for (const MX& e : n) r.insert(e.get());
-
-    size_t r_unique = r.size();
     for (const MX& e : n) l.insert(e.get());
 
     return l.size()==l_unique;
