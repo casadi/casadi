@@ -3619,6 +3619,11 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
 }
 
 void DaeBuilderInternal::import_binding_equations(const XmlNode& eqs) {
+  if (debug_) {
+    uout() << "== Structure before importing binding equations ==" << std::endl;
+    disp(uout(), true);
+  }
+
   // Loop over binding equations
   for (casadi_int i = 0; i < eqs.size(); ++i) {
     const XmlNode& eq = eqs[i];
@@ -3648,6 +3653,10 @@ void DaeBuilderInternal::import_binding_equations(const XmlNode& eqs) {
 }
 
 void DaeBuilderInternal::import_dynamic_equations(const XmlNode& eqs) {
+  if (debug_) {
+    uout() << "== Structure before importing dynamic equations ==" << std::endl;
+    disp(uout(), true);
+  }
   // Add discrete states to x_
   // Note: Make generic, should also apply to regular FMUs
   for (Variable* v : variables_) {
@@ -3741,6 +3750,11 @@ void DaeBuilderInternal::import_dynamic_equations(const XmlNode& eqs) {
 }
 
 void DaeBuilderInternal::import_initial_equations(const XmlNode& eqs) {
+  if (debug_) {
+    uout() << "== Structure before importing initial equations ==" << std::endl;
+    disp(uout(), true);
+  }
+
   // Hack: OpenModelica XML may contain duplicate expressions, ignore these
   std::set<std::string> already_added;
   // Add equations
