@@ -453,7 +453,7 @@ std::string simple_mkstemps(const std::string& prefix, const std::string& suffix
     } else {
 #if __cplusplus >= 201703L
       // Extract filename part of path
-        std::string zip_file = std::filesystem::path(path).filename();
+        std::string zip_file = std::filesystem::path(path).filename().string();
 
         lock_file = temporary_file(zip_file + ".", ".lock");
         dir = lock_file.substr(0, lock_file.size()-5) + ".unzipped";
