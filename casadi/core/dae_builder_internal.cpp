@@ -2684,6 +2684,22 @@ std::vector<MX> DaeBuilderInternal::init_rhs() const {
   return ret;
 }
 
+Variability DaeBuilderInternal::default_variability(Causality causality, Type type) const {
+  // Default variability per FMI 3.0.2, section 2.4.7.4
+  // "The default for variables of causality parameter, structural parameter or
+  // calculated parameter is fixed."
+  if (causality == Causality::PARAMETER || causality == Causality::CALCULATED_PARAMETER) {
+    return Variability::FIXED;
+  }
+  // "The default for variables of type Float32 and Float64 and causality other
+  // than parameter, structuralParameter or calculatedParameter is continuous"
+  if (type == Type::FLOAT32 || type == Type::FLOAT64) {
+    return Variability::CONTINUOUS;
+  } else {
+    return Variability::DISCRETE;
+  }
+}
+
 Variable& DaeBuilderInternal::add(const std::string& name, Causality causality,
   Variability variability, const Dict& opts) {
   // No expression provided
@@ -2815,24 +2831,14 @@ Variable& DaeBuilderInternal::add(const std::string& name, Causality causality,
 }
 
 Variable& DaeBuilderInternal::add(const std::string& name, Causality causality, const Dict& opts) {
-  // Default variability per FMI 3.0.2, section 2.4.7.4
-  // "The default for variables of causality parameter, structural parameter or
-  // calculated parameter is fixed."
-  if (causality == Causality::PARAMETER || causality == Causality::CALCULATED_PARAMETER) {
-    return add(name, causality, Variability::FIXED, opts);
-  }
   // Get type
   Type type = Type::FLOAT64;
   if (opts.find("type") != opts.end()) {
     type = to_enum<Type>(opts.at("type").to_string());
   }
-  // "The default for variables of type Float32 and Float64 and causality other
-  // than parameter, structuralParameter or calculatedParameter is continuous"
-  if (type == Type::FLOAT32 || type == Type::FLOAT64) {
-    return add(name, causality, Variability::CONTINUOUS, opts);
-  } else {
-    return add(name, causality, Variability::DISCRETE, opts);
-  }
+
+  // Default variability per FMI 3.0.2, section 2.4.7.4
+  return add(name, causality, default_variability(causality, type), opts);
 }
 
 void DaeBuilderInternal::categorize(size_t ind, Category cat) {

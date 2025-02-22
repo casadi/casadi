@@ -583,6 +583,9 @@ protected:
       \identifier{2a8} */
   std::vector<MX> init_rhs() const;
 
+  /// Get default variability
+  Variability default_variability(Causality causality, Type type) const;
+
   /// Add a new variable
   Variable& add(const std::string& name, Causality causality, Variability variability,
     const Dict& opts);
