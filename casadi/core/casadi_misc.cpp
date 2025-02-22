@@ -49,7 +49,7 @@
 #include <unzip.h>
 #endif // CASADI_WITH_ZLIB
 
-#ifdef __cplusplus >= 201703L
+#if __cplusplus >= 201703L
 #include <filesystem>
 #endif
 
