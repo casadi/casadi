@@ -478,7 +478,7 @@ private:
   CASADI_EXPORT bool extract_zip(const std::string& zip_path, const std::string& output_dir);
 
   /** \brief RAII class for reading from a zip file */
-  class ZipResource {
+  class CASADI_EXPORT ZipResource {
     public:
       /** \brief Initialize with a path 
       *
