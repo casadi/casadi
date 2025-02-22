@@ -3525,11 +3525,11 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
         // Corresponding variable
         Variable& v = variable(derivatives_.back());
         // Add to list of states and derivative to list of dependent variables
-        casadi_assert(v.der_of >= 0, "Error processing derivative info for " + v.name);
+        casadi_assert(v.parent >= 0, "Error processing derivative info for " + v.name);
         categorize(v.index, Category::W);
-        categorize(v.der_of, Category::X);
-        // Make sure der field is consistent
-        variable(v.der_of).der = derivatives_.back();
+        categorize(v.parent, Category::X);
+        // Map der field to derivative variable
+        variable(v.parent).der = derivatives_.back();
         // Get dependencies
         v.dependencies = read_dependencies(e);
         v.dependenciesKind = read_dependencies_kind(e, v.dependencies.size());
@@ -3561,11 +3561,11 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
         // Corresponding variable
         Variable& v = variable(derivatives_.back());
         // Add to list of states and derivative to list of dependent variables
-        casadi_assert(v.der_of >= 0, "Error processing derivative info for " + v.name);
+        casadi_assert(v.parent >= 0, "Error processing derivative info for " + v.name);
         categorize(v.index, Category::W);
-        categorize(v.der_of, Category::X);
-        // Make sure der field is consistent
-        variable(v.der_of).der = derivatives_.back();
+        categorize(v.parent, Category::X);
+        // Map der field to derivative variable
+        variable(v.parent).der = derivatives_.back();
       }
     }
 
@@ -3789,7 +3789,7 @@ void DaeBuilderInternal::import_dynamic_equations(const XmlNode& eqs) {
           Variable& dot_v = variable("der(" + v.name + ")");
           // Map to each other
           v.der = dot_v.index;
-          dot_v.der_of = v.index;
+          dot_v.parent = dot_v.der_of = v.index;
           // Mark as state
           categorize(v.index, Category::X);
           // Set binding equation to derivative variable
