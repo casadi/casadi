@@ -3347,7 +3347,8 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
     Causality causality = to_enum<Causality>(causality_str);
 
     // Variability (FMI 1.0 -> FMI 2.0+)
-    std::string variability_str = vnode.attribute<std::string>("variability", "continuous");
+    std::string variability_str = vnode.attribute<std::string>("variability", 
+      to_string(default_variability(causality, type)));
     if (fmi_major_ == 1 && variability_str == "parameter") variability_str = "fixed";
     Variability variability = to_enum<Variability>(variability_str);
 
