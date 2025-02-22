@@ -3314,6 +3314,7 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
     } else {
       // FMI 1.0 / 2.0: Type information in a separate node
       if (vnode.has_child("Real")) {
+        type = Type::FLOAT64;
         const XmlNode& props = vnode["Real"];
         unit = props.attribute<std::string>("unit", "");
         display_unit = props.attribute<std::string>("displayUnit", "");
@@ -3323,8 +3324,8 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
         start = props.attribute<double>("start", 0.);
         derivative = props.attribute<casadi_int>("derivative", -1);
       } else if (vnode.has_child("Integer")) {
-        const XmlNode& props = vnode["Integer"];
         type = Type::INT32;
+        const XmlNode& props = vnode["Integer"];
         min = props.attribute<double>("min", -inf);
         max = props.attribute<double>("max", inf);
       } else if (vnode.has_child("Boolean")) {
