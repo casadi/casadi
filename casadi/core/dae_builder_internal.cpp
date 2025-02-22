@@ -3441,6 +3441,9 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
     } else if (var.variability == Variability::TUNABLE) {
       categorize(var.index, Category::P);
     }
+
+    // If an output, add to list of outputs
+    if (causality == Causality::OUTPUT) outputs_.push_back(var.index);
   }
 
   // Set "parent" property using "derivative" attribute
@@ -3501,6 +3504,9 @@ std::vector<DependenciesKind> DaeBuilderInternal::read_dependencies_kind(
 }
 
 void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
+  // Do not use the automatic selection of outputs based on output causality
+  outputs_.clear();
+
   if (fmi_major_ >= 3) {
     // Loop over ModelStructure elements
     for (casadi_int i = 0; i < n.size(); ++i) {
