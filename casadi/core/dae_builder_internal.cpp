@@ -2709,15 +2709,13 @@ Variable& DaeBuilderInternal::add(const std::string& name, Causality causality,
 Variable& DaeBuilderInternal::add(const std::string& name, Causality causality,
     Variability variability, const MX& expr, const Dict& opts) {
   // Default options
-  std::string cat, description, type, initial, unit, display_unit;
+  std::string description, type, initial, unit, display_unit;
   std::vector<casadi_int> dimension = {1};
   double min = -casadi::inf, max = casadi::inf;
   std::vector<double> start;
   // Read options
   for (auto&& op : opts) {
-    if (op.first=="cat") {
-      cat = op.second.to_string();
-    } else if (op.first=="dimension") {
+    if (op.first=="dimension") {
       dimension = op.second.to_int_vector();
     } else if (op.first=="description") {
       description = op.second.to_string();
