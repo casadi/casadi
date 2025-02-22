@@ -2727,7 +2727,7 @@ Variable& DaeBuilderInternal::add(const std::string& name, Causality causality,
   // Default options
   std::string description, type, initial, unit, display_unit;
   std::vector<casadi_int> dimension = {1};
-  double min = -casadi::inf, max = casadi::inf;
+  double min = -casadi::inf, max = casadi::inf, nominal = 1;
   std::vector<double> start;
   // Read options
   for (auto&& op : opts) {
@@ -2743,6 +2743,8 @@ Variable& DaeBuilderInternal::add(const std::string& name, Causality causality,
       min = op.second.to_double();
     } else if (op.first=="max") {
       max = op.second.to_double();
+    } else if (op.first=="nominal") {
+      nominal = op.second.to_double();
     } else if (op.first=="start") {
       if (op.second.can_cast_to(OT_DOUBLE)) {
         start.resize(1, op.second.to_double());
@@ -2769,6 +2771,7 @@ Variable& DaeBuilderInternal::add(const std::string& name, Causality causality,
   if (!display_unit.empty()) v.display_unit = display_unit;
   if (min != -casadi::inf) v.min = min;
   if (max != casadi::inf) v.max = max;
+  v.nominal = nominal;
   // Handle different categories
   switch (causality) {
     case Causality::PARAMETER:
@@ -3392,23 +3395,18 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
     }
 
     // Create new variable
-    Variable& var = new_variable(name);
-    var.description = description;
-    var.causality = causality;
-    var.variability = variability;
-    var.initial = initial;
-    var.type = type;
-    // Type specific properties
+    Dict opts {{"description", description}, {"type", to_string(type)},
+      {"initial", to_string(initial)}};
     switch (type) {
       case Type::FLOAT32:  // fall-through
       case Type::FLOAT64:
         // Floating point valued variables
-        var.unit = unit;
-        var.display_unit = display_unit;
-        var.min = min;
-        var.max = max;
-        var.nominal = nominal;
-        var.set_attribute(Attribute::START, start);
+        opts["unit"] = unit;
+        opts["display_unit"] = display_unit;
+        opts["min"] = min;
+        opts["max"] = max;
+        opts["nominal"] = nominal;
+        opts["start"] = start;
         break;
       case Type::INT8:  // fall-through
       case Type::UINT8:  // fall-through
@@ -3419,12 +3417,13 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
       case Type::INT64:  // fall-through
       case Type::UINT64:  // fall-through
         // Integer valued variables
-        var.min = min;
-        var.max = max;
+        opts["min"] = min;
+        opts["max"] = max;
         break;
       default:
         break;
     }
+    Variable& var = add(name, causality, variability, opts);
 
     // Assume all variables in the right-hand-sides for now
     // Prevents changing X to Q
@@ -3432,18 +3431,6 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
     var.value_reference = static_cast<unsigned int>(vnode.attribute<casadi_int>("valueReference"));
     vrmap_[var.value_reference] = var.index;
     var.der_of = derivative;
-
-    // Initial classification of variables (states/outputs to be added later)
-    if (var.causality == Causality::INDEPENDENT) {
-      categorize(var.index, Category::T);
-    } else if (var.causality == Causality::INPUT) {
-      categorize(var.index, Category::U);
-    } else if (var.variability == Variability::TUNABLE) {
-      categorize(var.index, Category::P);
-    }
-
-    // If an output, add to list of outputs
-    if (causality == Causality::OUTPUT) outputs_.push_back(var.index);
   }
 
   // Set "parent" property using "derivative" attribute
@@ -3507,6 +3494,16 @@ void DaeBuilderInternal::import_model_structure(const XmlNode& n) {
   // Do not use the automatic selection of outputs based on output causality
   outputs_.clear();
 
+  // Algebraic variables are handled internally in the FMU
+  for (size_t i = 0; i < n_variables(); ++i) {
+    Variable& v = variable(i);
+    if (v.category == Category::Z) {
+      // Mark as dependent variable, no need for an algebraic equation anymore
+      categorize(v.index, Category::W);
+    }
+  }
+
+  // Read structure
   if (fmi_major_ >= 3) {
     // Loop over ModelStructure elements
     for (casadi_int i = 0; i < n.size(); ++i) {
