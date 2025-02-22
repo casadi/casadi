@@ -3367,6 +3367,14 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
       initial = to_enum<Initial>(initial_str);
     }
 
+    // If an input has a description that starts with "PARAMETER:",
+    // treat it as a tunable parameter
+    if (causality == Causality::INPUT && description.rfind("PARAMETER:", 0) == 0) {
+      // Make tunable parameter
+      causality = Causality::PARAMETER;
+      variability = Variability::TUNABLE;
+    }
+
     // Create new variable
     Variable& var = new_variable(name);
 
@@ -3413,16 +3421,9 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
 
     // Initial classification of variables (states/outputs to be added later)
     if (var.causality == Causality::INDEPENDENT) {
-      // Independent (time) variable
       categorize(var.index, Category::T);
     } else if (var.causality == Causality::INPUT) {
-      // Check if description starts with PARAMETER:
-      if (var.description.rfind("PARAMETER:", 0) == 0) {
-        // Make tunable parameter
-        categorize(var.index, Category::P);
-      } else {
-        categorize(var.index, Category::U);
-      }
+      categorize(var.index, Category::U);
     } else if (var.variability == Variability::TUNABLE) {
       categorize(var.index, Category::P);
     }
