@@ -3346,6 +3346,9 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
     if (fmi_major_ == 1 && causality_str == "internal") causality_str = "local";
     Causality causality = to_enum<Causality>(causality_str);
 
+    // Ignore time variable?
+    if (causality == Causality::INDEPENDENT && ignore_time_) continue;
+
     // Variability (FMI 1.0 -> FMI 2.0+)
     std::string variability_str = vnode.attribute<std::string>("variability", 
       to_string(default_variability(causality, type)));
@@ -3410,7 +3413,7 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
     // Initial classification of variables (states/outputs to be added later)
     if (var.causality == Causality::INDEPENDENT) {
       // Independent (time) variable
-      if (!ignore_time_) categorize(var.index, Category::T);
+      categorize(var.index, Category::T);
     } else if (var.causality == Causality::INPUT) {
       // Check if description starts with PARAMETER:
       if (var.description.rfind("PARAMETER:", 0) == 0) {
