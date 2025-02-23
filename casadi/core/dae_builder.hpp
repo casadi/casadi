@@ -416,6 +416,9 @@ class CASADI_EXPORT DaeBuilder
   /// [DEPRECATED] Use sort("w")
   void sort_w();
 
+  /// [DEPRECATED] Use reorder("z", new_order)
+  void sort_z(const std::vector<std::string>& z_order);
+
   #endif // WITH_DEPRECATED_FEATURES
 
   /** @name Manipulation
@@ -432,9 +435,6 @@ class CASADI_EXPORT DaeBuilder
 
   /// Lift problem formulation by extracting shared subexpressions
   void lift(bool lift_shared = true, bool lift_calls = true);
-
-  /// Sort algebraic variables
-  void sort_z(const std::vector<std::string>& z_order);
 
   /// Prune unused controls
   void prune(bool prune_p = true, bool prune_u = true);

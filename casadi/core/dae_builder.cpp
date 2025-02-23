@@ -260,14 +260,6 @@ std::vector<std::string> DaeBuilder::export_fmu(const Dict& opts) {
   }
 }
 
-void DaeBuilder::sort_z(const std::vector<std::string>& z_order) {
-  try {
-    (*this)->sort_z(z_order);
-  } catch (std::exception& e) {
-    THROW_ERROR("sort_z", e.what());
-  }
-}
-
 void DaeBuilder::prune(bool prune_p, bool prune_u) {
   try {
     (*this)->prune(prune_p, prune_u);
@@ -521,6 +513,14 @@ void DaeBuilder::sort_w() {
     return sort("w");
   } catch (std::exception& e) {
     THROW_ERROR("sort_w", e.what());
+  }
+}
+
+void DaeBuilder::sort_z(const std::vector<std::string>& z_order) {
+  try {
+    return reorder("z", z_order);
+  } catch (std::exception& e) {
+    THROW_ERROR("sort_z", e.what());
   }
 }
 
