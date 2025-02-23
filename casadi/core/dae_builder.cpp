@@ -268,22 +268,6 @@ void DaeBuilder::eliminate_quad() {
   }
 }
 
-void DaeBuilder::sort_d() {
-  try {
-    (*this)->sort_d();
-  } catch (std::exception& e) {
-    THROW_ERROR("sort_d", e.what());
-  }
-}
-
-void DaeBuilder::sort_w() {
-  try {
-    (*this)->sort_w();
-  } catch (std::exception& e) {
-    THROW_ERROR("sort_w", e.what());
-  }
-}
-
 void DaeBuilder::sort_z(const std::vector<std::string>& z_order) {
   try {
     (*this)->sort_z(z_order);
@@ -506,6 +490,38 @@ void DaeBuilder::register_y(const std::string& name) {
 
 void DaeBuilder::register_e(const std::string& name) {
   (*this)->event_indicators_.push_back(find(name));
+}
+
+void DaeBuilder::eliminate_d() {
+  try {
+    return eliminate("d");
+  } catch (std::exception& e) {
+    THROW_ERROR("eliminate_d", e.what());
+  }
+}
+
+void DaeBuilder::eliminate_w() {
+  try {
+    return eliminate("w");
+  } catch (std::exception& e) {
+    THROW_ERROR("eliminate_w", e.what());
+  }
+}
+
+void DaeBuilder::sort_d() {
+  try {
+    return sort("d");
+  } catch (std::exception& e) {
+    THROW_ERROR("sort_d", e.what());
+  }
+}
+
+void DaeBuilder::sort_w() {
+  try {
+    return sort("w");
+  } catch (std::exception& e) {
+    THROW_ERROR("sort_w", e.what());
+  }
 }
 
 void DaeBuilder::clear_all(const std::string& v) {
@@ -796,18 +812,19 @@ MX DaeBuilder::beq(const std::string& name) const {
   }
 }
 
-void DaeBuilder::eliminate_d() {
+void DaeBuilder::eliminate(const std::string& cat) {
   try {
-    (*this)->eliminate_d();
+    return (*this)->eliminate(to_enum<Category>(cat));
   } catch (std::exception& e) {
-    THROW_ERROR("eliminate_d", e.what());
+    THROW_ERROR("eliminate", e.what());
   }
 }
-void DaeBuilder::eliminate_w() {
+
+void DaeBuilder::sort(const std::string& cat) {
   try {
-    (*this)->eliminate_w();
+    return (*this)->sort(to_enum<Category>(cat));
   } catch (std::exception& e) {
-    THROW_ERROR("eliminate_w", e.what());
+    THROW_ERROR("sort", e.what());
   }
 }
 

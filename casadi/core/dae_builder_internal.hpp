@@ -230,23 +230,17 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
    */
   ///@{
 
-  /// Eliminate all dependent parameters
-  void eliminate_d();
+  /// Eliminate all variables of a category
+  void eliminate(Category cat);
 
-  /// Eliminate all dependent variables
-  void eliminate_w();
+  /// Sort all variables of a category
+  void sort(Category cat);
 
   /// Lift problem formulation by extracting shared subexpressions
   void lift(bool lift_shared, bool lift_calls);
 
   /// Eliminate quadrature states and turn them into ODE states
   void eliminate_quad();
-
-  /// Sort dependent parameters
-  void sort_d();
-
-  /// Sort dependent variables
-  void sort_w();
 
   /// Sort algebraic variables
   void sort_z(const std::vector<std::string>& z_order);
@@ -818,6 +812,9 @@ CASADI_EXPORT bool is_input_category(Category cat);
 
 // Check if acyclic dependency category
 CASADI_EXPORT bool is_acyclic(Category cat);
+
+// Definition for acyclyc dependency categories
+CASADI_EXPORT OutputCategory dependent_definition(Category cat);
 
 // Get all input categories
 CASADI_EXPORT std::vector<Category> input_categories();

@@ -400,30 +400,38 @@ class CASADI_EXPORT DaeBuilder
   void register_y(const std::string& name);
   void register_e(const std::string& name);
   ///@}
-#endif // WITH_DEPRECATED_FEATURES
+
+  /// [DEPRECATED] Use eliminate("d")
+  void eliminate_d();
+
+  /// [DEPRECATED] Use eliminate("w")
+  void eliminate_w();
+
+  /// [DEPRECATED] Use sort("d")
+  void sort_d();
+
+  /// [DEPRECATED] Use sort("w")
+  void sort_w();
+
+  #endif // WITH_DEPRECATED_FEATURES
 
   /** @name Manipulation
    *  Reformulate the dynamic optimization problem.
    */
   ///@{
 
-  /// Eliminate all dependent parameters
-  void eliminate_d();
 
-  /// Eliminate all dependent variables
-  void eliminate_w();
+  /// Eliminate all dependent parameters
+  void eliminate(const std::string& cat);
+
+  /// Sort dependent parameters
+  void sort(const std::string& cat);
 
   /// Lift problem formulation by extracting shared subexpressions
   void lift(bool lift_shared = true, bool lift_calls = true);
 
   /// Eliminate quadrature states and turn them into ODE states
   void eliminate_quad();
-
-  /// Sort dependent parameters
-  void sort_d();
-
-  /// Sort dependent variables
-  void sort_w();
 
   /// Sort algebraic variables
   void sort_z(const std::vector<std::string>& z_order);

@@ -198,16 +198,16 @@ std::string to_string(Category v) {
 
 std::string description(Category v) {
   switch (v) {
-  case Category::T: return "Independent variable";
-  case Category::P: return "Parameters";
-  case Category::U: return "Control";
-  case Category::X: return "Differential states";
-  case Category::Z: return "Algebraic variables";
-  case Category::Q: return "Quadrature states";
-  case Category::C: return "Constants";
-  case Category::D: return "Dependent parameters";
-  case Category::W: return "Dependent variables";
-  case Category::CALCULATED: return "Calculated variable";
+  case Category::T: return "independent variable";
+  case Category::P: return "parameter";
+  case Category::U: return "control";
+  case Category::X: return "differential state";
+  case Category::Z: return "algebraic variable";
+  case Category::Q: return "quadrature state";
+  case Category::C: return "constant";
+  case Category::D: return "dependent parameter";
+  case Category::W: return "dependent variable";
+  case Category::CALCULATED: return "calculated variable";
   default: break;
   }
   return "";
@@ -244,6 +244,18 @@ bool is_acyclic(Category cat) {
     default:
       return false;
   }
+}
+
+OutputCategory dependent_definition(Category cat) {
+  switch (cat) {
+    case Category::D:
+      return OutputCategory::DDEF;
+    case Category::W:
+      return OutputCategory::WDEF;
+    default:
+      break;
+  }
+  casadi_error("No dependent definition category for: " + to_string(cat));
 }
 
 std::vector<Category> input_categories() {
@@ -1208,26 +1220,25 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
 
   // Print the functions
   if (!fun_.empty()) {
-    stream << "Functions" << std::endl;
+    stream << "Functions:" << std::endl;
     for (const Function& f : fun_) {
       stream << "  " << f << std::endl;
     }
   }
 
   // Print the variables, including outputs
-  stream << "Model variables" << std::endl;
+  stream << "Model variables:" << std::endl;
   for (Category cat : {Category::T, Category::C, Category::P, Category::D, Category::X,
       Category::Z, Category::Q, Category::W, Category::U}) {
     if (size(cat) > 0) {
       stream << "  " << to_string(cat) << " = " << var(indices(cat)) << std::endl;
     }
   }
-  if (!outputs_.empty()) stream << "  y = " << var(outputs_) << std::endl;
 
   // All variables that can have dependent variables
   for (Category cat : {Category::C, Category::D, Category::W}) {
     if (size(cat) > 0) {
-      stream << description(cat) << std::endl;
+      stream << "List of " << description(cat) << "s (" << to_string(cat) << "):" << std::endl;
       for (size_t c : indices(cat)) {
         const Variable& v = variable(c);
         stream << "  " << v.name;
@@ -1237,15 +1248,36 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
     }
   }
 
+  // Print derivatives
+  for (Category cat : {Category::X, Category::Q}) {
+    if (size(cat) > 0) {
+      stream << "Time derivatives of " << description(cat) << "s (" << to_string(cat) << "):"
+        << std::endl;
+      for (size_t k : indices(cat)) {
+        const Variable& v = variable(k);
+        stream << "  " << v.name << ": " << der(v.v) << std::endl;
+      }
+    }
+  }
+
+  // Outputs
+  if (!outputs_.empty()) {
+    stream << "Outputs (y):" << std::endl;
+    for (size_t k : outputs_) {
+      const Variable& v = variable(k);
+      stream << "  " << v.name << ": " << v.v << std::endl;
+    }
+  }
+
   if (!residuals_.empty()) {
-    stream << "Algebraic equations" << std::endl;
+    stream << "Algebraic equations:" << std::endl;
     for (size_t k : residuals_) {
       stream << "  0 == " << variable(k).v << std::endl;
     }
   }
 
   if (!init_.empty()) {
-    stream << "Initial equations" << std::endl;
+    stream << "Initial equations:" << std::endl;
     for (size_t k : init_) {
       const Variable& v = variable(k);
       stream << "  " << v.name;
@@ -1255,7 +1287,7 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
   }
 
   if (!when_.empty()) {
-    stream << "When equations" << std::endl;
+    stream << "When equations:" << std::endl;
     for (auto weq : when_) {
       stream << "  when " << variable(weq.first).v << " < 0 : " << std::endl;
       for (size_t eq : weq.second) {
@@ -1273,18 +1305,15 @@ void DaeBuilderInternal::eliminate_quad() {
   indices(Category::Q).clear();
 }
 
-void DaeBuilderInternal::sort_d() {
-  std::vector<MX> d = var(indices(Category::D)), ddef = output(OutputCategory::DDEF);
-  sort_dependent(d, ddef);
-  indices(Category::D).clear();
-  for (const MX& e : d) indices(Category::D).push_back(find(e.name()));
-}
-
-void DaeBuilderInternal::sort_w() {
-  std::vector<MX> w = var(indices(Category::W)), wdef = output(OutputCategory::WDEF);
-  sort_dependent(w, wdef);
-  indices(Category::W).clear();
-  for (const MX& e : w) indices(Category::W).push_back(find(e.name()));
+void DaeBuilderInternal::sort(Category cat) {
+  casadi_assert(is_acyclic(cat), "Sorting not supported for category " + to_string(cat));
+  // Find new order based on interdependencies
+  std::vector<MX> v = var(indices(cat)), vdef = output(dependent_definition(cat));
+  sort_dependent(v, vdef);
+  // New order
+  std::vector<size_t> new_order;
+  for (const MX& e : v) new_order.push_back(find(e.name()));
+  std::copy(new_order.begin(), new_order.end(), indices(cat).begin());
 }
 
 void DaeBuilderInternal::sort_z(const std::vector<std::string>& z_order) {
@@ -1674,57 +1703,36 @@ std::string DaeBuilderInternal::unique_name(const std::string& prefix,
   return prefix + str(i);
 }
 
-void DaeBuilderInternal::eliminate_d() {
-  // Quick return if no d
-  if (size(Category::D) == 0) return;
+void DaeBuilderInternal::eliminate(Category cat) {
+  casadi_assert(is_acyclic(cat), "Elimination not supported for category " + to_string(cat));
+
+  // Quick return if no dependent variables
+  if (size(cat) == 0) return;
   // Clear cache after this
   clear_cache_ = true;
   // Ensure variables are sorted
-  sort_d();
+  sort(cat);
   // Expressions where the variables are also being used
   std::vector<MX> ex;
   for (const Variable* v : variables_) {
     if (!v->v.is_constant()) ex.push_back(v->v);
   }
   // Perform elimination
-  std::vector<MX> d = var(indices(Category::D));
-  std::vector<MX> ddef = output(OutputCategory::DDEF);
-  substitute_inplace(d, ddef, ex);
-  // Clear list of dependent parameters
-  indices(Category::D).clear();
-  // Get binding equations
+  std::vector<size_t> ind = indices(cat);
+  std::vector<MX> v = var(ind);
+  std::vector<MX> vdef = output(dependent_definition(cat));
+  substitute_inplace(v, vdef, ex);
+  // Replace binding equations
   auto it = ex.begin();
   for (Variable* v : variables_) {
     if (!v->v.is_constant()) v->v = *it++;
   }
   // Consistency check
   casadi_assert_dev(it == ex.end());
-}
-void DaeBuilderInternal::eliminate_w() {
-  // Quick return if no w
-  if (size(Category::W) == 0) return;
-  // Clear cache after this
-  clear_cache_ = true;
-  // Ensure variables are sorted
-  sort_w();
-  // Expressions where the variables are also being used
-  std::vector<MX> ex;
-  for (const Variable* v : variables_) {
-    if (!v->v.is_constant()) ex.push_back(v->v);
+  // Reclassify as calculated variables
+  for (size_t k : ind) {
+    categorize(variable(k).index, Category::CALCULATED);
   }
-  // Perform elimination
-  std::vector<MX> w = var(indices(Category::W));
-  std::vector<MX> wdef = output(OutputCategory::WDEF);
-  substitute_inplace(w, wdef, ex);
-  // Clear list of dependent variables
-  indices(Category::W).clear();
-  // Get binding equations
-  auto it = ex.begin();
-  for (Variable* v : variables_) {
-    if (!v->v.is_constant()) v->v = *it++;
-  }
-  // Consistency check
-  casadi_assert_dev(it == ex.end());
 }
 
 void DaeBuilderInternal::lift(bool lift_shared, bool lift_calls) {
