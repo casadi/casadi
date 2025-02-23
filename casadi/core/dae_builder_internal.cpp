@@ -1298,13 +1298,6 @@ void DaeBuilderInternal::disp(std::ostream& stream, bool more) const {
   }
 }
 
-void DaeBuilderInternal::eliminate_quad() {
-  // Move all the quadratures to the list of differential states
-  indices(Category::X).insert(indices(Category::X).end(),
-    indices(Category::Q).begin(), indices(Category::Q).end());
-  indices(Category::Q).clear();
-}
-
 void DaeBuilderInternal::sort(Category cat) {
   casadi_assert(is_acyclic(cat), "Sorting not supported for category " + to_string(cat));
   // Find new order based on interdependencies
@@ -1704,6 +1697,13 @@ std::string DaeBuilderInternal::unique_name(const std::string& prefix,
 }
 
 void DaeBuilderInternal::eliminate(Category cat) {
+  // Eliminate quadratures
+  if (cat == Category::Q) {
+    for (size_t q : indices(cat)) set_category(q, Category::X);
+    return;
+  }
+
+  // Assume dependent variable (c, d, w)
   casadi_assert(is_acyclic(cat), "Elimination not supported for category " + to_string(cat));
 
   // Quick return if no dependent variables

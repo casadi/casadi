@@ -407,6 +407,9 @@ class CASADI_EXPORT DaeBuilder
   /// [DEPRECATED] Use eliminate("w")
   void eliminate_w();
 
+  /// [DEPRECATED] Use eliminate("q")
+  void eliminate_quad();
+
   /// [DEPRECATED] Use sort("d")
   void sort_d();
 
@@ -429,9 +432,6 @@ class CASADI_EXPORT DaeBuilder
 
   /// Lift problem formulation by extracting shared subexpressions
   void lift(bool lift_shared = true, bool lift_calls = true);
-
-  /// Eliminate quadrature states and turn them into ODE states
-  void eliminate_quad();
 
   /// Sort algebraic variables
   void sort_z(const std::vector<std::string>& z_order);

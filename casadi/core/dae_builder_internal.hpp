@@ -239,9 +239,6 @@ class CASADI_EXPORT DaeBuilderInternal : public SharedObjectInternal {
   /// Lift problem formulation by extracting shared subexpressions
   void lift(bool lift_shared, bool lift_calls);
 
-  /// Eliminate quadrature states and turn them into ODE states
-  void eliminate_quad();
-
   /// Sort algebraic variables
   void sort_z(const std::vector<std::string>& z_order);
 
