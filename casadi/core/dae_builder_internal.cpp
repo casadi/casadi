@@ -636,22 +636,6 @@ void DaeBuilderInternal::load_fmi_description(const std::string& filename) {
   // Process model structure
   if (fmi_desc.has_child("ModelStructure")) {
     import_model_structure(fmi_desc["ModelStructure"]);
-  } else {
-    // Automatically select states
-    for (size_t i = 0; i < n_variables(); ++i) {
-      Variable& v = variable(i);
-      if (v.parent >= 0) {
-        // Derivative of a variable
-        Variable& x = variable(v.parent);
-        // If already a state, only honor first encounter
-        if (x.der >= 0) continue;
-        // Mark as a state
-        x.der = v.index;
-        // Add to list of states and derivative to list of dependent variables
-        categorize(x.index, Category::X);
-        categorize(v.index, Category::W);
-      }
-    }
   }
 
   // Is a symbolic representation available?
@@ -3281,6 +3265,9 @@ void DaeBuilderInternal::import_model_exchange(const XmlNode& n) {
 }
 
 void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
+  // Mapping from derivative variables to corresponding state variables, FMUX only
+  std::vector<std::pair<std::string, std::string>> fmi1_der;
+
   // Add variables
   for (casadi_int i = 0; i < modvars.size(); ++i) {
     // Get a reference to the variable
@@ -3288,6 +3275,19 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
 
     // Name of variable
     std::string name = vnode.attribute<std::string>("name");
+
+    // Handle variable categories (FMUX)
+    if (fmi_major_ == 1 && vnode.has_child("VariableCategory")) {
+      std::string variable_category = vnode["VariableCategory"].text;
+      if (variable_category == "derivative") {
+        // Create a new derivative variable
+        std::string x_name = vnode["QualifiedName"][0].attribute<std::string>("name");
+        fmi1_der.push_back(std::make_pair(x_name, name));
+      }
+    }
+
+    // When conditions are reformulated into continuous zero-crossing functions
+    if (fmi_major_ == 1 && name.rfind("$whenCondition", 0) == 0) continue;
 
     // Ignore duplicate variables
     if (varind_.find(name) != varind_.end()) {
@@ -3424,6 +3424,7 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
         break;
     }
     Variable& var = add(name, causality, variability, opts);
+    if (debug_) uout() << "Added variable: " << var.name << std::endl;
 
     // Assume all variables in the right-hand-sides for now
     // Prevents changing X to Q
@@ -3440,13 +3441,24 @@ void DaeBuilderInternal::import_model_variables(const XmlNode& modvars) {
       if (fmi_major_ >= 3) {
         // Value reference is given: Find corresponding variable
         v.parent = vrmap_.at(static_cast<unsigned int>(v.der_of));
-      } else {
+      } else if (fmi_major_ > 1) {
         // Variable given with index-1, make index 0
         v.parent = v.der_of - 1;
       }
       // TODO(@jaeandersson): Remove this redefinition of der_of
       v.der_of = v.parent;
     }
+  }
+
+  // Map derivative variables to corresponding state variables, FMUX only
+  for (auto& p : fmi1_der) {
+    // Add to list of derivatives
+    Variable& v = variable(p.first);
+    Variable& der_v = variable(p.second);
+    categorize(der_v.index, Category::Z);
+    der_v.der_of = der_v.parent = v.index;
+    v.der = der_v.index;
+    derivatives_.push_back(der_v.index);
   }
 }
 
@@ -3739,35 +3751,27 @@ void DaeBuilderInternal::import_dynamic_equations(const XmlNode& eqs) {
         casadi_assert(n_cond.size() == 1, "Only one condition in when equation supported");
         casadi_assert(n_equ.size() == 1, "Only one equation in when equation supported");
         // Get expression for condition
-        Variable& cond = read_variable(n_cond[0]);
+        std::string cond_name = n_cond[0][0].attribute<std::string>("name");
+        std::string when_prefix = "$whenCondition";
+        cond_name = cond_name.substr(when_prefix.size());
+        casadi_int ind = std::stoi(cond_name) - 1;
         // Left-hand-side and right-hand-side
         MX lhs, rhs;
         // Handle different types of equations
         if (n_equ[0].name == "exp:Sub") {
           // Assume equation is an assignment
-          lhs = read_expr(n_equ[0][0]);
+          lhs = read_identifier(n_equ[0][0]);
           rhs = read_expr(n_equ[0][1]);
+          when_.at(ind).second.push_back(assign(lhs.name(), rhs).index);
         } else if (n_equ[0].name == "exp:Reinit") {
           // Reinitialization
           lhs = read_identifier(n_equ[0][0]);
           rhs = read_expr(n_equ[0][1]);
+          when_.at(ind).second.push_back(reinit(lhs.name(), rhs).index);
         } else {
           // Not implemented
           casadi_error(n_equ[0].name + " in when equation not supported");
         }
-        set_init(cond.name, MX());  // remove initial conditions, if any
-        auto w_it = std::find(indices(Category::W).begin(), indices(Category::W).end(),
-          cond.index);
-        if (w_it != indices(Category::W).end()) {
-          indices(Category::W).erase(w_it);  // remove from dependent equations
-        }
-        auto x_it = std::find(indices(Category::X).begin(), indices(Category::X).end(),
-          cond.index);
-        if (x_it != indices(Category::X).end()) {
-          indices(Category::X).erase(x_it);  // remove from states
-        }
-        // Create a when condition
-        when(cond.v, {assign(variable(lhs).name, rhs).name}, Dict());
       } else if (eq.name == "equ:Equation") {  // Residual equation
         // Consistency checks
         casadi_assert_dev(eq.size() == 1 && eq[0].name == "exp:Sub");
@@ -3782,24 +3786,27 @@ void DaeBuilderInternal::import_dynamic_equations(const XmlNode& eqs) {
         // Right-hand-side is the binding equation
         MX beq = read_expr(rhs);
         // Left-hand-side is a variable or derivative
+        std::string when_prefix = "$whenCondition";
         if (lhs.name == "exp:Der") {
-          // Differentiated variable
+          // Differential equation
           Variable& v = read_variable(lhs[0]);
-          // Corresponding time derivative
-          Variable& dot_v = variable("der(" + v.name + ")");
-          // Map to each other
-          v.der = dot_v.index;
-          dot_v.parent = dot_v.der_of = v.index;
-          // Mark as state
-          categorize(v.index, Category::X);
-          // Set binding equation to derivative variable
-          dot_v.bind = assign(dot_v.name, beq).index;
+          this->eq(der(v.v), beq, Dict());
+        } else if (lhs.size() > 0
+            && lhs[0].attribute<std::string>("name").rfind(when_prefix, 0) == 0) {
+          // Get the index
+          std::string cond_name = lhs[0].attribute<std::string>("name");
+          if (debug_) uout() << "Reading event indicator: " << cond_name << " := " << beq << std::endl;
+          cond_name = cond_name.substr(when_prefix.size());
+          casadi_int ind = std::stoi(cond_name) - 1;
+          // Ensure consequitive for now
+          casadi_assert(ind == when_.size(), "Non-consequitive when conditions");
+          // Create a when equation with no equations
+          when(beq, {}, Dict());
         } else {
-          // Left-hand-side is a variable
+          // Regular equation
           Variable& v = read_variable(lhs);
-          // Set the equation
-          indices(Category::W).push_back(find(v.name));
-          v.bind = assign(v.name, beq).index;
+          if (debug_) uout() << "Reading equation: " << v.name << " == " << beq << std::endl;
+          this->eq(v.v, beq, Dict());
         }
       } else {
         casadi_error("Unknown dynamic equation type, got:" + eq.name);
@@ -3835,6 +3842,13 @@ void DaeBuilderInternal::import_initial_equations(const XmlNode& eqs) {
         // Get the left-hand-sides and right-hand-sides
         const XmlNode& lhs = eq[0][0];
         const XmlNode& rhs = eq[0][1];
+
+        // Ignore initalizations of when equation indicators
+        if (lhs.size() > 0
+            && lhs[0].attribute<std::string>("name").rfind("$whenCondition", 0) == 0) {
+          continue;
+        }
+
         // Hack: Ignore expressions that just set a $PRE variable
         if (lhs.size() > 0 && lhs[0].attribute<std::string>("name") == "$PRE") {
           casadi_warning(eq_name + " defines a pre-variable, ignored");
